@@ -3,99 +3,54 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\AuthCallbackPage.tsx
-skeleton_hash: 7c8d9ccf38721fe4
+skeleton_hash: 8113ea5de0c1bd17
 entity_hashes:
   func:AuthCallbackPage: b8296e20d27a327c
-  overview: b34c2160d04ee913
+  overview: b36bec70832e9398
   style_tokens: 404ab1f16440192d
-generated_at: 2026-06-06T21:58:25Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış
-Bu modül, kimlik doğrulama akışının tamamlandığı geri dönüş (callback) sayfasıdır. Harici kimlik sağlayıcılarından (OAuth, SSO vb.) gelen yetkilendirme verilerini (token, code vb.) tarayıcı URL'sinden alarak kullanıcı oturumunu başlatır ve ana uygulamaya yönlendirme yapar. Tek bileşenli yapısı, tüm geri dönüş mantığını izole bir noktada toplayarak uygulama giriş sürecinin son adımı olarak görev yapar.
+Kimlik doğrulama akışının son adımı olarak çalışan geri dönüş sayfasıdır. Harici kimlik sağlayıcılarından (OAuth, SSO vb.) dönen yetkilendirme verilerini URL üzerinden yakalayarak kullanıcı oturumunu başlatır ve ana uygulamaya yönlendirme yapar. Hata senaryolarında kullanıcıya anlamlı geri bildirim sunarak giriş sürecinin güvenilir bir şekilde tamamlanmasını sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Kimlik Doğrulama Bileşeni
-Kimlik doğrulama geri dönüş sürecinin tüm yaşam döngüsünü yöneten bileşendir. URL parametrelerini analiz eder, oturum verilerini işler, kullanıcıya bekleme arayüzü gösterir ve oluşabilecek hataları yakalayarak anlamlı bir geri bildirim verir.
+URL parametrelerinden gelen token ve yetkilendirme kodlarını işleyerek oturum başlangıcını yöneten izole sayfa bileşenidir. Tüm callback mantığını tek noktada toplayarak uygulamanın giriş sürecini sonlandırır.
 - AuthCallbackPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi paylaşılmadığından, kod analizinden türetilebilecek mimari varsayımlar belirlenememiştir.
-
-**Not:** `AuthCallbackPage()` fonksiyon imzası仅有olup parametre almamaktadır. Fonksiyon gövdesi mevcut olmadığı için modülün çalışma zamanı bağımlılıkları, veri akışı gereksinimleri veya hata senaryoları hakkında kesin aksiyomlar üretilemez.
-
----
+Bu modül, kimlik doğrulama geri dönüş (callback) sayfası olarak URL'deki yetkilendirme parametrelerini işleyip oturum başlatan bir React bileşenidir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AuthCallbackPage
-**Ne yapar**: VentHub HVAC projesinin kimlik doğrulama akışının geri dönüş (callback) adımını yöneten React tabanlı bir sayfa bileşenidir. Üçüncü taraf kimlik doğrulama sağlayıcısından kullanıcının platforma tekrar yönlendirildiği durumda devreye girer, oturum açma sürecinin başarılı bir şekilde sonlandırılmasını sağlar. Projenin görünüm (view) katmanında özel bir rota üzerinden çalışan, kimlik doğrulama süreçleri için ayrılmış özel bir sayfa bileşenidir.
-**Nasıl yapar**: React ekosistem standartlarına uygun olarak fonksiyonel bir bileşen olarak tanımlanmıştır. Kaynak kodunun `src/views` dizininde yer alması, projenin katmanlı mimarisine uygun olarak yalnızca sayfa düzeyinde işlevsellik sunduğunu teyit eder. Kimlik doğrulama sağlayıcısından gelen yönlendirme isteğini yakalar, süreci tamamlamak için gerekli kimlik doğrulama verilerini alır, kullanıcı oturumunun oluşturulması için ilgili arka plan işlemlerini tetikler.
-**Parametreler**: Tanımında herhangi bir giriş parametresi bulunmamaktadır, dışarıdan herhangi bir değer almaz.
-**Dönüş**: React.FC tipinde geçerli bir React fonksiyonel bileşen döndürür. Bu döndürülen bileşen, tarayıcıda auth callback sayfasının tüm arayüz ve işlevselliklerini son kullanıcıya sunar.
+
+**Ne yapar**: Kimlik doğrulama (authentication) süreçlerinden sonra yönlendirilen kullanıcıyı karşılayan React bileşenidir. OAuth veya benzeri bir kimlik doğrulama akışı tamamlandığında, harici yetkilendirme sağlayıcısı kullanıcıyı bu sayfaya yönlendirir ve bileşen ilgili işlemleri yürütür.
+
+**Nasıl yapar**: Bu bir React fonksiyonel bileşenidertil (React.FC). OAuth callback akışında kullanıcıyı karşılayarak, URI fragment'lerinden veya query parametrelerinden token bilgilerini çıkarıp işleyebilir, ardından kullanıcıyı uygulama içinde uygun sayfaya yönlendirir. Bileşen, authentication state yönetimini üstlenir.
+
+**Parametreler**:
+Bu bileşen doğrudan prop almamaktadır (parametresiz fonksiyon bileşenidir).
+
+**Dönüş**: `React.FC` — React fonksiyonel bileşen tipini döndürür. Sayfa içeriği olarak kimlik doğrulama callback işlemini yöneten JSX içeriği üretir.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AuthCallbackPage.tsx::AuthCallbackPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: AuthCallbackPage.tsx::AuthCallbackPage
+- **params**: (yok — arrow function, React.FC olarak export edilir)
 - **ic_degiskenler**:
-  - `status` — useState hook'u ile tanımlanan state değişkeni, sayfanın mevcut durumunu (loading/success/error) tutar
-  - `message` — useState hook'u ile tanımlanan state değişkeni, kullanıcıya gösterilecek mesajı tutar
-  - `router` — useRouter() hook'u ile elde edilen Next.js router nesnesi, sayfa yönlendirmeleri için kullanılır
-- **Dönüş**: JSX element (React bileşeni)
-
-### [N2_NASIL] AuthCallbackPage.tsx::handleAuthCallback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `hashFragment` — window.location.hash değerini tutar, URL'deki hash fragment bilgisini içerir
-  - `data` — supabase.auth.getSession() çağrısının response data değeri, mevcut oturum bilgisini içerir
-  - `error` — supabase.auth.getSession() çağrısının response error değeri, hata bilgisini içerir
-  - `sessionError` — supabase.auth.exchangeCodeForSession() çağrısının error değeri, token alışverişi hatalarını tutar
-  - `newData` — ikinci supabase.auth.getSession() çağrısının response data değeri, güncellenmiş oturum bilgisini içerir
-  - `newError` — ikinci supabase.auth.getSession() çağrısının response error değeri, güncelleme hatalarını tutar
-- **Dönüş**: void (return ile erken çıkış)
-
-### [N3_NASIL] AuthCallbackPage.tsx::useEffectCallback
-- **params**: (parametre yok)
-- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımlaması yok)
-- **Dönüş**: void
-
-### [N4_NASIL] AuthCallbackPage.tsx::successRedirectHome
-- **params**: (parametre yok)
-- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
-- **Dönüş**: void
-
-### [N5_NASIL] AuthCallbackPage.tsx::errorRedirectLogin
-- **params**: (parametre yok)
-- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
-- **Dönüş**: void
-
-### [N6_NASIL] AuthCallbackPage.tsx::successRedirectHomeSecond
-- **params**: (parametre yok)
-- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
-- **Dönüş**: void
-
-### [N7_NASIL] AuthCallbackPage.tsx::invalidLinkRedirect
-- **params**: (parametre yok)
-- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
-- **Dönüş**: void
-
-### [N8_NASIL] AuthCallbackPage.tsx::catchRedirectLogin
-- **params**: (parametre yok)
-- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
-- **Dönüş**: void
-
-### [N9_NASIL] AuthCallbackPage.tsx::buttonOnClickRedirect
-- **params**: (parametre yok)
-- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı yok, sadece router.push çağrısı)
-- **Dönüş**: void
+  - `status` — useState hook'u; auth durumunu tutar (`'loading' | 'success' | 'error'`), JSX'te hangi durum panelinin gösterileceğini belirler
+  - `message` — useState hook'u; kullanıcıya gösterilecek mesaj metnini tutar (başarı/hata/bilgi)
+  - `router` — `useRouter()` Next.js navigasyon objesi; `router.push()` ile sayfa yönlendirmesi yapılır
+- **Dönüş**: JSX — `min-h-screen` wrapper içinde `status` değerine göre loading/success/error UI'ı render eder
 
 ---
 

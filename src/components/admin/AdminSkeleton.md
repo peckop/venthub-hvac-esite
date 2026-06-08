@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminSkeleton: 586d38b8378960eb
   overview: d5fffe3d7ed9f7eb
   style_tokens: 9ebeaa83a2aaeb97
-generated_at: 2026-05-28T22:35:31Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış
@@ -57,6 +57,15 @@ Bu modülün doğru çalışması için temel mimari varsayımlar fonksiyonun pa
 - `rows?: number`
 - `count?: number`
 - `fields?: number`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/admin/AdminSkeleton.tsx::AdminSkeleton
+- **params**: `variant`, `rows = 5`, `count = 4`, `fields = 6`
+- **ic_degiskenler**: `variant` — Skeleton gösterim modunu belirler (table, cards veya form). Fonksiyon içinde `variant` değeri kontrol edilerek farklı JSX yapıları döndürülür.
+- **Dönüş**: `JSX.Element` — `variant` değerine bağlı olarak farklı loading skeleton yapısı döndürür. Table modunda tablo loading, cards modunda kart grid'i, form modunda form loading skeleton'ı render eder.
 
 ---
 

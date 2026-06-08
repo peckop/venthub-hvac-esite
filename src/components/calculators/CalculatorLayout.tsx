@@ -1,8 +1,9 @@
-import React from 'react'
+import { AlertTriangle,ArrowLeft, Calculator, Info } from 'lucide-react'
 import Link from 'next/link'
-import { Calculator, ArrowLeft, Info, AlertTriangle } from 'lucide-react'
-import Seo from '../Seo'
+import React from 'react'
+
 import { Routes } from '../../utils/routes';
+import Seo from '../Seo'
 
 
 interface CalculatorLayoutProps {

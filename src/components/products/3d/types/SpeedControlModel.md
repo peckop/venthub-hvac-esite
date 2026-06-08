@@ -3,32 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SpeedControlModel.tsx
-skeleton_hash: a03ad3d03d2f2258
+skeleton_hash: 46fa33e4b16072a7
 entity_hashes:
   func:SpeedControlModel: 9391170dd9d01022
-  overview: 7655e22b6e23fc40
+  overview: a057d38dae1c89ff
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:50Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC projesinin ürün 3B görselleştirme altyapısında yer alan hız kontrol mekanizması modelini içeren React bileşenidir. Ürünlerin sanal ortamdaki temsili için gereken hız kontrol bileşeninin tanımını yaparak, 3B ürün tipleri kategorisinde kullanıma sunulur.
+Bu modül, VentHub HVAC projesinin 3B ürün görselleştirme sisteminde, ürünlerin hız kontrol bileşeninin dijital modelini temsil eden bir React bileşenidir. Tek bir bileşen olarak, 3B sahne içinde hız kontrol ünitesinin görsel ve işlevsel tanımını yaparak üst bileşenler tarafından kullanılabilir hale getirir.
 
 ## Fonksiyon Grupları
-### Ana 3B Hız Kontrol Modeli Bileşeni
-Modülün tüm sorumluluğunu üstlenerek, 3B ortamdaki hız kontrol sisteminin modelini render etmek ve yönetmek için gereken tüm işlevselliği barındırır.
-- SpeedControlModel
+### Hız Kontrol Bileşeni Tanımı
+Bu grup, 3B sahneye yerleştirilecek hız kontrol mekanizmasının tek ve merkezi modelini oluşturur. İlgili tüm 3B geometri, doku ve etkileşim tanımlarını içinde barındırır.
+- `SpeedControlModel`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC projesinin 3B ürün bileşenleri katmanında hız kontrolü işlevini modelleyen TypeScript React bileşenidir, doğru çalışması için aşağıdaki koşulların varlığı zorunludur.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer proje içerisinde TypeScript derleyicisi doğru yapılandırılmamışsa, .tsx uzantılı bu modül derlenemez, projeye dahil edilemez.
-[Aksiyom 2]: Eğer modülün çalıştığı React ortamı 16.8 ve üstü sürümleri desteklemiyorsa, fonksiyonel bileşen olarak tasarlanan bu modül uyumsuzluk nedeniyle çalışmaz.
-[Aksiyom 3]: Eğer projeye 3B görselleştirme için gerekli kütüphane entegrasyonu yapılmamışsa, hız kontrol modelinin 3B sahnesine yerleştirilmesi ve kullanıcıya sunulması mümkün olmaz.
-[Aksiyom 4]: Eğer bu modülü çağıran üst bileşen tarafından gerekli giriş parametreleri ve tip tanımları sağlanmamışsa, modül çalışma anında hata fırlatır, hız kontrolü işlevini yerine getiremez.
-[Aksiyom 5]: Eğer modülün HVAC sistemlerine ait hız verilerine erişmesini sağlayacak state yönetim altyapısı entegre edilmemişse, gerçek zamanlı hız değerleri modelde gösterilemez, kullanıcı tarafından yapılan kontrol değişiklikleri sisteme iletilemez.
+**Gerekçe:** Fonksiyon gövdesi verilmediği için, modülün doğru çalışması için gerekli koşullar çıkarılamamaktadır. `SpeedControlModel()` parametresiz olarak tanımlanmış olup, fonksiyon gövdesindeki bağımlılıklar, prop gereksinimleri veya içsel koşullar bilinmemektedir. Mimari varsayımlar yalnızca çalıştırılabilir koddan üretilebileceğinden, mevcut bilgiyle aksiyom oluşturma mümkün değildir.
 
 ---
 
@@ -45,41 +41,18 @@ Bu modül, VentHub HVAC projesinin 3B ürün bileşenleri katmanında hız kontr
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SpeedControlModel.tsx::SpeedControlModel
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: `SpeedControlModel.tsx`::SpeedControlModel
+- **params**: (yok — parametresiz fonksiyon)
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials hook'u ile elde edilen malzeme koleksiyonu, modelin tüm 3D mesh'lerine malzeme atamak için kullanılır
-  - `knobRef` — THREE.Group tipinde React ref nesnesi, modelin dönen potansiyometre düğmesine (knob) erişmek için kullanılır, useRef ile oluşturulmuştur
-  - `ledRef` — THREE.MeshBasicMaterial tipinde React ref nesnesi, modelin LED göstergesinin malzemesine erişerek renk animasyonu uygulamak için kullanılır, useRef ile oluşturulmuştur
-  - `ledMaterial` — useMemo ile önbelleğe alınan THREE.MeshBasicMaterial nesnesi, LED göstergesinin başlangıç malzemesi olarak atanır, bellek sızıntılarını önlemek için memoize edilmiştir
-- **Dönüş**: React Three Fiber `<group>` JSX elementi, SpeedControlModel 3D modelini tanımlayan sahne elemanı
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SpeedControlModel.tsx::anon_useFrame_callback
-- **params**: [state] — useFrame hook'u tarafından sağlanan sahne durumu nesnesi
-- **ic_degiskenler**:
-  - `state.clock.elapsedTime` — sahne yüklendiğinden beri geçen toplam süre, animasyonların zamanlamasını hesaplamak için kullanılır
-  - `time` — state.clock.elapsedTime değerine atanan yerel değişken, tüm animasyon hesaplamalarında kullanılır
-  - `knobRef.current` — knob referansının bağlı olduğu THREE.Group nesnesi, varsa düğmenin Z ekseninde dönme animasyonunu uygulamak için kullanılır
-  - `ledRef.current` — led referansının bağlı olduğu THREE.MeshBasicMaterial nesnesi, varsa LED'in renk değerini güncelleyerek nabız animasyonu uygulamak için kullanılır
-  - `intensity` — LED'in parlaklık seviyesini hesaplamak için kullanılan yerel değişken, zamanın sinüs değerinin mutlak değeri olarak hesaplanır
-  - `greenValue` — LED'in yeşil renk kanalının 8-bit değerini hesaplayan yerel değişken, minimum 100, maksimum 255 olarak ayarlanır
-- **Dönüş**: yok, her frame'de çalışan animasyon güncelleme fonksiyonu, void dönüş tipi
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SpeedControlModel.tsx::anon_map_heatl_callback
-- **params**: [y, i] — map fonksiyonu tarafından sağlanan konum değeri (y) ve dizi indeksi (i)
-- **ic_degiskenler**:
-  - `y` — sol soğutma kanalı mesh'inin Y ekseni konumunu belirten sayısal değer, [-0.3, 0, 0.3] dizisinden gelir
-  - `i` — map fonksiyonu tarafından üretilen dizi indeksi, benzersiz React anahtarı (key) oluşturmak için kullanılır
-  - `materials.matteBlack` — genel malzeme koleksiyonundaki mat siyah malzeme, soğutma kanalı mesh'ine atanır
-- **Dönüş**: React Three Fiber `<mesh>` JSX elementi, sol taraftaki tek bir soğutma kanalı 3D elemanı
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SpeedControlModel.tsx::anon_map_heatr_callback
-- **params**: [y, i] — map fonksiyonu tarafından sağlanan konum değeri (y) ve dizi indeksi (i)
-- **ic_degiskenler**:
-  - `y` — sağ soğutma kanalı mesh'inin Y ekseni konumunu belirten sayısal değer, [-0.3, 0, 0.3] dizisinden gelir
-  - `i` — map fonksiyonu tarafından üretilen dizi indeksi, benzersiz React anahtarı (key) oluşturmak için kullanılır
-  - `materials.matteBlack` — genel malzeme koleksiyonundaki mat siyah malzeme, soğutma kanalı mesh'ine atanır
-- **Dönüş**: React Three Fiber `<mesh>` JSX elementi, sağ taraftaki tek bir soğutma kanalı 3D elemanı
+  - `materials` — `useFanMaterials()` hook'undan dönen malzeme nesnesi; kutu, mat siyah, fırçalanmış alüminyum vb. 3D mesh malzemelerini içerir
+  - `knobRef` — `useRef<THREE.Group>(null)` ile oluşturulan React ref; sahnedeki çevirmeli düğme (potansiyometre) grubuna referans, `useFrame` içinde `rotation.z` ile döndürülür
+  - `ledRef` — `useRef<THREE.MeshBasicMaterial>(null)` ile oluşturulan React ref; LED göstergesinin malzemesine referans, `useFrame` içinde rengi (`setRGB`) değiştirilerek nabız efekti verilir
+  - `ledMaterial` — `useMemo` ile oluşturulmuş `THREE.MeshBasicMaterial` nesnesi, başlangıç rengi `#00ff00` (yeşil); bileşen yeniden render edildiğinde yeniden oluşturulmayı önler
+- **useFrame ic callback degiskenleri** (inline arrow function `(state) => {}`):
+  - `time` — `state.clock.elapsedTime`, üç.js saatinin başlangıçtan itibaren geçen toplam süresi (saniye); hem düğme rotasyonu hem LED nabzı için zaman kaynağı
+  - `intensity` — `Math.abs(Math.sin(time * 2))`, 0–1 arasında nabız yapan değer; LED parlaklığının dalgalanmasını kontrol eder
+  - `greenValue` — `Math.floor(100 + intensity * 155)`, 100–255 aralığında hesaplanan yeşil kanal değeri; `ledRef.current.color.setRGB(0, greenValue/255, 0)` ile LED rengini ayarlar
+- **Dönüş**: JSX (React Three Fiber 3D sahne ağacı) — `group` içinde kutu, ön panel, yan soğutma kanalları (iki taraflı `map` ile 6 adet), çevirmeli düğme, LED gösterge ve VentHub yazısı/plakası
 
 ---
 

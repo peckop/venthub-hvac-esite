@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\audit-logs\page.tsx
-skeleton_hash: a2342151fbfc0ceb
+skeleton_hash: e4fefe528f4949f7
 entity_hashes:
   func:Page: fd2706f7cd85c29f
   overview: 2907a29989d3f1d8
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-07T16:37:31Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,12 @@ Root bileşeni tanımlar ve dinamik yükleme ile asıl sayfa içeriğini render 
 
 ---
 
-## AXIOM
+## AXIOMS – Mimari Varsayımlar
+Bu modül, Next.js uygulamasında bir admin sayfası için üst seviye bir React bileşenidir.
+
+[Aksiyom 1]: Eğer Next.js runtime ortamında dinamik import (next/dynamic) desteği yoksa, modülün ana sayfa içeriği (`AdminAuditLogsPage`) yüklenemez ve sayfa boş kalır.
+[Aksiyom 2]: Eğer React Suspense bileşeni için bir fallback (yükleniyor durumu) bileşeni tanımlı değilse, asıl sayfa içeriği yüklenirken kullanıcıya boş veya hatalı bir ekran gösterilir.
+[Aksiyom 3]: Eğer modül, `/admin/audit-logs` rotası için doğru bir sayfa bileşeni olarak (Next.js App Router yapısında) yapılandırılmamışsa, bu rotaya erişildiğinde 404 hatası veya beklenmeyen bir sayfa görüntülenir.
 
 ---
 

@@ -8,7 +8,7 @@ entity_hashes:
   func:CookiePolicyPage: b3e779c99eb43367
   overview: 07640220d73eceb5
   style_tokens: a770e5a7f64844ff
-generated_at: 2026-05-28T22:40:07Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış

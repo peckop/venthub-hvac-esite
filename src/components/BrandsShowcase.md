@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BrandsShowcase.tsx
-skeleton_hash: 2bdb96d68efadb02
+skeleton_hash: 214a7ca3f7d167b5
 entity_hashes:
   func:BrandsShowcase: 396bbfa4a2991af7
   func:Lane: 607c875efec6621a
   overview: a64c9ee274fd0d0f
   style_tokens: 90e49e0ab0d8115d
-generated_at: 2026-06-06T21:54:43Z
+generated_at: 2026-06-08T10:08:12Z
 ---
 
 ## Genel Bakış

@@ -1,9 +1,11 @@
+import { Check, Loader2,Phone, User } from 'lucide-react'
 import React from 'react'
-import { useI18n } from '@/i18n/I18nProvider'
-import { useAuth } from '../../hooks/useAuth'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { User, Phone, Check, Loader2 } from 'lucide-react'
+
+import { useI18n } from '@/i18n/I18nProvider'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import { useAuth } from '../../hooks/useAuth'
 
 interface UserMetadata {
   full_name?: string

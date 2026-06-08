@@ -1,14 +1,16 @@
 "use client"
-import { Routes } from '../../utils/routes'
-
-import React, { useRef, useState, useMemo, useCallback, useEffect, Suspense } from 'react'
-import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
-import { Environment, Float, Sparkles, Html, useTexture } from '@react-three/drei'
-import * as THREE from 'three'
-import { useRouter } from 'next/navigation'
-import { MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react'
+"use no memo";
+import { Environment, Float, Html, Sparkles, useTexture } from '@react-three/drei'
+import { Canvas, ThreeEvent,useFrame, useThree } from '@react-three/fiber'
 import { useInView } from 'framer-motion'
+import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import React, { Suspense,useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import * as THREE from 'three'
+
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
+
+import { Routes } from '../../utils/routes'
 import Category3DIcon from './Category3DIcon'
 
 const ANIM_STAGGER_DELAY = 0.12

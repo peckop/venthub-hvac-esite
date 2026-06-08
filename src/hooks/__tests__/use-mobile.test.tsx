@@ -1,6 +1,7 @@
-import { renderHook, act } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { useIsMobile, MOBILE_BREAKPOINT } from '../use-mobile'
+import { act,renderHook } from '@testing-library/react'
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { MOBILE_BREAKPOINT,useIsMobile } from '../use-mobile'
 
 describe('useIsMobile hook', () => {
   let matchMediaListeners: Array<(e: MediaQueryListEvent) => void> = []

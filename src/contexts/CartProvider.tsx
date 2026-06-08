@@ -1,7 +1,10 @@
-import React, { useEffect, useState, ReactNode, useRef, useMemo, useCallback } from 'react'
-import type { Product } from '@/types/ui-models'
-import { useAuth } from '../hooks/useAuth'
+"use no memo";
+import React, { ReactNode, useCallback,useEffect, useMemo, useRef, useState } from 'react'
+
 import { useSupabaseClient } from '@/providers/SupabaseProvider'
+import type { Product } from '@/types/ui-models'
+
+import { useAuth } from '../hooks/useAuth'
 
 const CART_SERVER_SYNC = (process.env.NEXT_PUBLIC_CART_SERVER_SYNC ?? 'true') === 'true'
 
@@ -13,8 +16,9 @@ const CART_OWNER_KEY = 'venthub-cart-owner'
 const CART_SCHEMA_KEY = 'venthub-cart-schema'
 const CURRENT_CART_SCHEMA = '2'
 
-import { CartContext } from '../contexts/CartContext'
 import type { CartItem } from '@/types/cart'
+
+import { CartContext } from '../contexts/CartContext'
 
 
 

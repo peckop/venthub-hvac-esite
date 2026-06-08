@@ -1,5 +1,5 @@
-import PageComponent from '../../../../../views/knowledge/TopicPage'
 import { tr } from '../../../../../i18n/dictionaries/tr'
+import PageComponent from '../../../../../views/knowledge/TopicPage'
 
 export const dynamicParams = false
 

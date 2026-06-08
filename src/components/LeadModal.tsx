@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import { Briefcase,Building2, CheckCircle2, ChevronRight, Mail, MapPin, Phone, X } from 'lucide-react'
 import Link from 'next/link'
-import { Building2, X, CheckCircle2, ChevronRight, Mail, Phone, MapPin, Briefcase } from 'lucide-react'
-import { Routes } from '../utils/routes'
+import React, { useState } from 'react'
+
 import { useI18n } from '../i18n/I18nProvider'
+import { Routes } from '../utils/routes'
 
 interface LeadModalProps {
   open: boolean

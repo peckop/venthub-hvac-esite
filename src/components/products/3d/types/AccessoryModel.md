@@ -8,7 +8,7 @@ entity_hashes:
   func:AccessoryModel: 5a654d447c80c9c1
   overview: af9a58f742b9d985
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:44Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

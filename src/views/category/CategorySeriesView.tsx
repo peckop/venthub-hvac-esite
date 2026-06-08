@@ -1,17 +1,18 @@
 'use client';
-import { Routes } from '../../utils/routes'
-
-import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Activity, LayoutGrid,Table as TableIcon, Wind, Zap } from 'lucide-react'
 import Image from 'next/image'
+import React, { useState } from 'react'
+
 import Breadcrumb from '@/components/navigation/Breadcrumb'
 import ProductCard from '@/components/ProductCard'
-import { DomainCategory, DomainProduct } from '../../lib/type-converters'
+
+import { useCart } from '../../hooks/useCartHook'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
-import { Activity, Wind, Zap, Table as TableIcon, LayoutGrid } from 'lucide-react'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
-import { useCart } from '../../hooks/useCartHook'
-import { motion } from 'framer-motion'
+import { DomainCategory, DomainProduct } from '../../lib/type-converters'
+import { Routes } from '../../utils/routes'
 import { isRecord } from '../../utils/type-converters'
 
 interface CategorySeriesViewProps {

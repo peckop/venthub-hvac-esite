@@ -1,11 +1,11 @@
 'use client'
-import { Routes } from '../utils/routes'
-
-import React from 'react'
 import Link from 'next/link'
-import { useI18n } from '../i18n/I18nProvider'
-import BuildTag from './BuildTag'
+import React from 'react'
+
 import { useCategories } from '../contexts/CategoryContext'
+import { useI18n } from '../i18n/I18nProvider'
+import { Routes } from '../utils/routes'
+import BuildTag from './BuildTag'
 // import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 const Footer: React.FC = () => {

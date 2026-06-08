@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx
-skeleton_hash: c759c7f160863769
+skeleton_hash: 00849a212f4b65f7
 entity_hashes:
   func:AdminErrorsPage: a54e992b31a4d175
   func:fmt: f911ea01809e8b2a
   overview: b1c53ea2b726d7c3
   style_tokens: a98ae3ae7fce0104
-generated_at: 2026-06-06T21:57:51Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış

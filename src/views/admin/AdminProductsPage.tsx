@@ -1,36 +1,37 @@
-import VentImage from '@/components/ui/VentImage'
-import React from 'react'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import { adminSearchProducts } from '@/lib/services/product.service'
-import type { DbAdminSearchResult } from '@/types/db-rows'
-import type { DbProduct } from '../../types/db-rows'
-import { toUIProductList, type DomainProduct } from '../../lib/type-converters'
-import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { useSearchParams, usePathname } from 'next/navigation'
-import AdminToolbar from '../../components/admin/AdminToolbar'
-import type { Density } from '../../components/admin/ColumnsMenu'
-import { 
-  adminSectionTitleClass, 
-  adminSubtitleClass,
-  adminTableHeadCellClass, 
-  adminTableCellClass, 
-  adminTableContainerClass,
-  adminButtonPrimaryClass, 
-  adminButtonSecondaryClass,
-  adminTableActionClass, 
-  adminTableActionDangerClass 
-} from '../../utils/adminUi'
-import { useI18n } from '../../i18n/I18nProvider'
-import { formatCurrency } from '../../i18n/format'
-import ProductFormModal from '../../components/admin/products/ProductFormModal'
-import ProductCsvImport from '../../components/admin/products/ProductCsvImport'
-import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
-import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
 import { ChevronRight, Pencil, Plus, SearchX } from 'lucide-react'
+import { usePathname,useSearchParams } from 'next/navigation'
+import React from 'react'
+
+import VentImage from '@/components/ui/VentImage'
+import { adminSearchProducts } from '@/lib/services/product.service'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+import type { DbAdminSearchResult } from '@/types/db-rows'
+
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
-import { useRole } from '../../hooks/useRole'
+import AdminToolbar from '../../components/admin/AdminToolbar'
+import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
+import type { Density } from '../../components/admin/ColumnsMenu'
+import ProductCsvImport from '../../components/admin/products/ProductCsvImport'
+import ProductFormModal from '../../components/admin/products/ProductFormModal'
+import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
 import { useDragScroll } from '../../hooks/useDragScroll'
+import { useRole } from '../../hooks/useRole'
+import { formatCurrency } from '../../i18n/format'
+import { useI18n } from '../../i18n/I18nProvider'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
+import { type DomainProduct,toUIProductList } from '../../lib/type-converters'
+import type { DbProduct } from '../../types/db-rows'
+import { 
+  adminButtonPrimaryClass, 
+  adminButtonSecondaryClass,
+  adminSectionTitleClass, 
+  adminSubtitleClass,
+  adminTableActionClass, 
+  adminTableActionDangerClass, 
+  adminTableCellClass, 
+  adminTableContainerClass,
+  adminTableHeadCellClass} from '../../utils/adminUi'
 
 interface CategoryOpt { id: string; name: string }
 

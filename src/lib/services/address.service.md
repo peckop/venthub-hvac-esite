@@ -11,7 +11,7 @@ entity_hashes:
   func:setDefaultAddress: 369fe22c82c4c3ee
   func:updateAddress: 7395bc16ccf7b629
   overview: 9816bb84388067d9
-generated_at: 2026-06-07T12:06:48Z
+generated_at: 2026-06-08T10:09:34Z
 ---
 
 ## Genel Bakış
@@ -25,14 +25,6 @@ Bu grup, kullanıcı adreslerinin standart veri manipülasyonu işlemlerini yön
 ### Varsayılan Adres Yönetimi
 Kullanıcıların belirli bir adresi teslimat veya fatura amaçlı olarak varsayılan olarak belirlemesini sağlar; bu, ilgili adres kaydının türüne göre özel bir alan güncellenmesini içerir.
 - setDefaultAddress
-
----
-
-## AXIOMS – Mimari Varsayımlar
-
-**[Aksiyom 1 - Supabase Bağlantı Gereksinimi]:** Tüm fonksiyonlar, geçerli bir Supabase istemcisi (`supabase`) parametresi gerektirir; aksi halde veritabanı bağlantısı kurulamaz ve işlemler başarısız olur.
-
-**[Aksiyom 2 - Var olan Adres Kimliği Zorunluluğu]:** `updateAddress`, `deleteAddress` ve `setDefaultAddress` fonksiyonları, veritabanında mevcut olan geçerli bir adres kimliği (`id`) parametresi gerektirir;否则, adres bulunamaz ve işlem başarısız olur.
 
 ---
 
@@ -110,53 +102,6 @@ Bu modül, kullanıcı adresleri için temel CRUD (Oluştur, Listele, Güncelle,
   - `data` — supabase'den dönen user_addresses tablosu satırları
   - `error` — supabase sorgusu sırasında oluşan hata nesnesi
 - **Dönüş**: `Promise<DbUserAddress[]>` — kullanıcının tüm adresleri varsayılan sıralama ile; hata varsa fırlatılır, veri yoksa boş dizi döner
-
----
-
-### [N2_NASIL] AST Pointer: address.service.ts::createAddress
-- **params**: `(supabase: SupabaseClient<Database>, payload: DbUserAddressInsert)`
-- **ic_degiskenler**:
-  - `authData` — supabase.auth.getUser() sonucu, authenticated kullanıcı bilgisini içerir
-  - `userError` — auth.getUser() sırasında oluşan hata nesnesi
-  - `user` — authData.user; mevcut oturumdaki kullanıcı nesnesi
-  - `dbPayload` — veritabanına eklenecek payload; user_id, street_address, address_type alanları doldurulmuş hali
-  - `data` — insert sonrası dönen eklenmiş satır
-  - `error` — insert sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<DbUserAddress>` — newly inserted address kaydı; auth hatası veya insert hatası varsa fırlatılır
-
----
-
-### [N3_NASIL] AST Pointer: address.service.ts::updateAddress
-- **params**: `(supabase: SupabaseClient<Database>, id: string, payload: DbUserAddressUpdate)`
-- **ic_degiskenler**:
-  - `updatePatch` — payload'ın kopyası; address_line varsa street_address olarak eklenir
-  - `data` — update sonrası dönen güncellenmiş satır
-  - `error` — update sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<DbUserAddress>` — güncellenmiş address kaydı; hata varsa fırlatılır
-
----
-
-### [N4_NASIL] AST Pointer: address.service.ts::deleteAddress
-- **params**: `(supabase: SupabaseClient<Database>, id: string)`
-- **ic_degiskenler**:
-  - `error` — delete sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<boolean>` — silme başarılıysa `true`; hata varsa fırlatılır
-
----
-
-### [N5_NASIL] AST Pointer: address.service.ts::setDefaultAddress
-- **params**: `(supabase: SupabaseClient<Database>, kind: 'shipping' | 'billing', id: string)`
-- **ic_degiskenler**:
-  - `authData` — supabase.auth.getUser() sonucu, authenticated kullanıcı bilgisini içerir
-  - `userError` — auth.getUser() sırasında oluşan hata nesnesi
-  - `user` — authData.user; mevcut oturumdaki kullanıcı nesnesi
-  - `flag` — `'is_default_shipping'` veya `'is_default_billing'`; kind parametresine göre belirlenen boolean flag alanı adı
-  - `clearPatch` — flag alanını false yapan patch nesnesi; kullanıcının diğer adreslerindeki varsayılan bayrağını temizler
-  - `clear` — clearPatch ile yapılan update sonucu; hata alanı kontrol edilir
-  - `setPatch` — flag alanını true yapan patch nesnesi; belirtilen id'yi varsayılan yapar
-  - `data` — setPatch ile yapılan update sonrası dönen güncellenmiş satır
-  - `error` — setPatch update sorgusu sırasında oluşan hata nesnesi
-- **Dönüş**: `Promise<DbUserAddress>` — varsayılan olarak ayarlanmış address kaydı; hata varsa fırlatılır
 
 ---
 

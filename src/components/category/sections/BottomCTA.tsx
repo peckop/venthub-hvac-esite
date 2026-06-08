@@ -1,6 +1,7 @@
-import React from 'react'
-import { ArrowUp, ThermometerSun, Package, MessageSquare } from 'lucide-react'
+import { ArrowUp, MessageSquare,Package, ThermometerSun } from 'lucide-react'
 import Link from 'next/link'
+import React from 'react'
+
 import { Routes } from '../../../utils/routes';
 
 

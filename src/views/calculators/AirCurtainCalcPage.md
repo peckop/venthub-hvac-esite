@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\calculators\AirCurtainCalcPage.tsx
-skeleton_hash: 5121b8e490357577
+skeleton_hash: 23bfe1f3e256bf4d
 entity_hashes:
   func:AirCurtainCalcPage: bdec5c3fc5c7251e
   func:canProceed: bc4e4a8101ac93b2
@@ -11,30 +11,41 @@ entity_hashes:
   func:nextStep: 092152293cace343
   func:prevStep: ac646de7f0306b72
   func:reset: 16764b441f7bc7b6
-  overview: 06197f6a8a703230
+  overview: a20024770a1672be
   style_tokens: 310141484625a6c4
-generated_at: 2026-05-28T22:40:02Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformu için havalı perde hesaplamaları yapan kullanıcı arayüzü sayfasını barındıran React bileşenidir. Çok adımlı hesaplama akışını yöneterek kullanıcının adımlar arasında gezinmesini sağlar ve hesaplanan verimlilik değerlerini kullanıcıya sunulacak anlamlı durum kategorilerine dönüştürür.
+Bu modül, VentHub HVAC platformu için hava perdesi (air curtain) hesaplama arayüzünü sunan React sayfasıdır. Çok adımlı bir hesaplama sürecini yöneterek kullanıcıların adım adım bilgi girmesini ve hesaplama yapmasını sağlar. Hesaplanan verimlilik değerlerini arayüzde anlamlı durum kategorilerine dönüştürerek kullanıcıya geri bildirim sunar.
 
 ## Fonksiyon Grupları
+
 ### Ana Sayfa Bileşeni
-Modülün ana giriş noktası olup tüm hesaplayıcı sayfasının işleyişini ve kullanıcı arayüzünü bir araya getirir.
-- AirCurtainCalcPage
+Modülün giriş noktası olan ana React bileşenidir. Tüm hesaplama sayfasının arayüzünü, durum yönetimini ve iş mantığını bir arada barındırır.
+- `AirCurtainCalcPage`
 
-### Adım Yönetimi Fonksiyonları
-Çok adımlı hesaplama sürecindeki kullanıcı gezintisini ve geçiş koşullarını yönetir, ileri/geri adım atma ile süreci sıfırlama işlemlerini kontrol eder.
-- canProceed, nextStep, prevStep, reset
+### Adım Yönetimi
+Çok adımlı hesaplama sürecinde kullanıcının ileri veya geri gitmesini, sonraki adıma geçiş yapabilme koşullarını kontrol etmesini ve gerektiğinde tüm süreci başlangıç değerlerine döndürmesini sağlar.
+- `canProceed`, `nextStep`, `prevStep`, `reset`
 
-### Verimlilik Sınıflandırma Fonksiyonu
-Hesaplanan verimlilik değerini alarak arayüzde kullanılmak üzere belirli performans seviyelerine sınıflandırır.
-- getEfficiencyStatus
+### Verimlilik Değerlendirme
+Hesaplama sonucunda ortaya çıkan verimlilik oranını, arayüzde gösterilmek üzere kabul edilebilirlik seviyelerine (optimal, acceptable, warning) sınıflandırır.
+- `getEfficiencyStatus`
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için sadece fonksiyon imzalarından türetilebilecek temel mimari varsayımlar aşağıdadır. Fonksiyon gövdelerine erişim olmadığı için aksiyomlar kasıtlı olarak kısıtlıdır.
+
+**[Aksiyom 1]:** Eğer `getEfficiencyStatus` fonksiyonuna `undefined` değer verilirse veya hiç verilmezse,fonksiyon geçerli bir durum döndürmelidir (hata fırlatmamalıdır). **Neden:** Fonksiyon imzası `eff: string | undefined` olarak tanımlıdır; bu, efficiency değerinin her zaman mevcut olmadığının kanıtıdır.
+
+**[Aksiyom 2]:** Eğer `canProceed` fonksiyonu çağrıldığında mevcut adımın zorunlu koşulları sağlanmıyorsa, `false` döndürülmelidir ve `nextStep` bir sonraki adıma geçmemelidir. **Neden:** `canProceed` ve `nextStep`'in birlikte varlığı, adımlar arası geçişin koşula bağlı olduğunu gösterir.
+
+**[Aksiyom 3]:** Eğer `reset` fonksiyonu çağrılırsa, tüm adımlar arası geçiş durumu (mevcut adım numarası, girilen değerler) başlangıç değerlerine döndürülmelidir. **Neden:** `reset` fonksiyonunun varlığı, modülün mutable stateful yapıda olduğunu ve bu state'in sıfırlanabilir olması gerektiğini varsayar.
+
+**[Aksiyon 4]:** Eğer `prevStep` ilk adımda çağrılırsa, bir önceki adıma geçilmemelidir (mevcut adımda kalmalı veya hiçbir işlem yapmamalıdır). **Neden:** `prevStep`'in `nextStep` ile birlikte tanımlı olması, adımların sonlu ve sıralı bir aralıkta olduğunu varsayar; ancak bu aralığın başlangıç ve bitiş değerleri fonksiyon imzalarından bilinmemektedir.
 
 ---
 
@@ -86,77 +97,99 @@ Hesaplanan verimlilik değerini alarak arayüzde kullanılmak üzere belirli per
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\calculators\AirCurtainCalcPage.tsx::AirCurtainCalcPage
-- **params**: (parametre yok)
-- **ic_degiskenler**: (fonksiyon gövdesi verilmemiş)
-- **Dönüş**: React.FC (React functional component)
-
-### [N2_NASIL] AST Pointer: src\views\calculators\AirCurtainCalcPage.tsx::canProceed
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: AirCurtainCalcPage.tsx::stepsArray
+- **params**: ()
 - **ic_degiskenler**:
-  - `w` — doorWidth string değerini parseFloat ile number'a çevrilmiş hali, kapı genişliği
-  - `h` — doorHeight string değerini parseFloat ile number'a çevrilmiş hali, kapı yüksekliği
-  - `currentStep` — mevcut adım numarası, hangi adımda olduğunu belirler
-  - `doorWidth` — kapı genişliği string olarak (örn: '1.5')
-  - `doorHeight` — kapı yüksekliği string olarak (örn: '2.5')
-  - `application` — uygulama tipi string olarak (örn: 'comfort', 'insect', 'coldRoom')
-  - `windCondition` — rüzgar durumu string olarak (örn: 'none', 'light', 'moderate', 'strong')
-  - `trafficIntensity` — trafik yoğunluğu string olarak (örn: 'low', 'medium', 'high')
-- **Dönüş**: boolean (adım ilerlemek için şart sağlanıyorsa true)
+- **Dönüş**: Array of step objects
+  - `t` — i18n çeviri fonksiyonu, adım başlıklarını ve açıklamalarını çevirir
 
-### [N3_NASIL] AST Pointer: src\views\calculators\AirCurtainCalcPage.tsx::nextStep
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: AirCurtainCalcPage.tsx::applicationsArray
+- **params**: ()
 - **ic_degiskenler**:
-  - `currentStep` — mevcut adım numarası
+- **Dönüş**: Array of application option objects
+  - `t` — i18n çeviri fonksiyonu, uygulama etiketlerini ve açıklamalarını çevirir
+  - `Thermometer` — Lucide ikon bileşeni,comfort ve coldRoom uygulamaları için kullanılır
+  - `Wind` — Lucide ikon bileşeni, insect uygulaması için kullanılır
+
+### [N3_NASIL] AST Pointer: AirCurtainCalcPage.tsx::windConditionsArray
+- **params**: ()
+- **ic_degiskenler**:
+- **Dönüş**: Array of wind condition option objects
+  - `t` — i18n çeviri fonksiyonu, rüzgar koşulu etiketlerini ve açıklamalarını çevirir
+
+### [N4_NASIL] AST Pointer: AirCurtainCalcPage.tsx::trafficIntensityArray
+- **params**: ()
+- **ic_degiskenler**:
+- **Dönüş**: Array of traffic intensity option objects
+  - `t` — i18n çeviri fonksiyonu, trafik yoğunluğu etiketlerini ve açıklamalarını çevirir
+
+### [N5_NASIL] AST Pointer: AirCurtainCalcPage.tsx::updateUrlParams
+- **params**: ()
+- **ic_degiskenler**:
+  - `params` — URLSearchParams nesnesi, query parametrelerini tutar
+  - `query` — string, params nesnesinin string karşılığı, URL'ye eklenir
+  - `currentStep` — number, mevcut adım numarası (harici state)
+  - `doorWidth` — string, kapı genişliği değeri (harici state)
+  - `doorHeight` — string, kapı yüksekliği değeri (harici state)
+  - `application` — string, seçilen uygulama türü (harici state)
+  - `windCondition` — string, rüzgar koşulu seçimi (harici state)
+  - `trafficIntensity` — string, trafik yoğunluğu seçimi (harici state)
+  - `router` — Next.js router nesnesi, URL değişikliği için kullanılır
+  - `pathname` — string, mevcut URL yolu (harici)
 - **Dönüş**: yok
 
-### [N4_NASIL] AST Pointer: src\views\calculators\AirCurtainCalcPage.tsx::prevStep
-- **params**: (parametre yok)
+### [N6_NASIL] AST Pointer: AirCurtainCalcPage.tsx::calculateResult
+- **params**: ()
 - **ic_degiskenler**:
-  - `currentStep` — mevcut adım numarası
+  - `width` — number, doorWidth'ın float karşılığı, kapı genişliği (metre)
+  - `height` — number, doorHeight'ın float karşılığı, kapı yüksekliği (metre)
+  - `calculationResult` — object, calculateAirCurtain fonksiyonunun dönüş değeri, hesaplama sonuçlarını tutar
+  - `currentStep` — number, mevcut adım numarası (harici state)
+  - `doorWidth` — string, kapı genişliği değeri (harici state)
+  - `doorHeight` — string, kapı yüksekliği değeri (harici state)
+  - `application` — string, seçilen uygulama türü (harici state)
+  - `windCondition` — string, rüzgar koşulu seçimi (harici state)
+  - `trafficIntensity` — string, trafik yoğunluğu seçimi (harici state)
+  - `calculateAirCurtain` — fonksiyon, hava perdesi hesaplamasını yapar
+  - `setResult` — setter fonksiyonu, sonucu state'e kaydeder
 - **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: src\views\calculators\AirCurtainCalcPage.tsx::reset
-- **params**: (parametre yok)
-- **ic_degiskenler**: (sadece state setter'ları kullanılıyor, değişken yok)
+### [N7_NASIL] AST Pointer: AirCurtainCalcPage.tsx::canProceed
+- **params**: ()
+- **ic_degiskenler**:
+  - `w` — number, doorWidth'ın float karşılığı (adım 1 için)
+  - `h` — number, doorHeight'ın float karşılığı (adım 1 için)
+  - `currentStep` — number, mevcut adım numarası (harici state)
+  - `doorWidth` — string, kapı genişliği değeri (harici state)
+  - `doorHeight` — string, kapı yüksekliği değeri (harici state)
+  - `application` — string, seçilen uygulama türü (harici state)
+  - `windCondition` — string, rüzgar koşulu seçimi (harici state)
+  - `trafficIntensity` — string, trafik yoğunluğu seçimi (harici state)
+- **Dönüş**: boolean — devam edilebilirlik durumu
+
+### [N8_NASIL] AST Pointer: AirCurtainCalcPage.tsx::reset
+- **params**: ()
+- **ic_degiskenler**:
+  - `setCurrentStep` — setter fonksiyonu, adım state'ini sıfırlar
+  - `setDoorWidth` — setter fonksiyonu, kapı genişliği state'ini sıfırlar
+  - `setDoorHeight` — setter fonksiyonu, kapı yüksekliği state'ini sıfırlar
+  - `setApplication` — setter fonksiyonu, uygulama state'ini sıfırlar
+  - `setWindCondition` — setter fonksiyonu, rüzgar koşulu state'ini sıfırlar
+  - `setTrafficIntensity` — setter fonksiyonu, trafik yoğunluğu state'ini sıfırlar
+  - `setResult` — setter fonksiyonu, sonuç state'ini null yapar
 - **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: src\views\calculators\AirCurtainCalcPage.tsx::getEfficiencyStatus
-- **params**: eff (string | undefined) — verimlilik durumu string değeri
-- **ic_degiskenler**: (yok)
+### [N9_NASIL] AST Pointer: AirCurtainCalcPage.tsx::getEfficiencyStatus
+- **params**: `(eff: string | undefined)`
+- **ic_degiskenler**:
 - **Dönüş**: 'optimal' | 'acceptable' | 'warning'
 
-### [N7_NASIL] AST Pointer: src\views\calculators\AirCurtainCalcPage.tsx::(URL senkronizasyonu useEffect)
-- **params**: (parametre yok)
+### [N10_NASIL] AST Pointer: AirCurtainCalcPage.tsx::renderGridLine
+- **params**: `(x, i)`
 - **ic_degiskenler**:
-  - `params` — URL parametrelerini tutan URLSearchParams nesnesi
-  - `currentStep` — mevcut adım numarası
-  - `doorWidth` — kapı genişliği string olarak
-  - `doorHeight` — kapı yüksekliği string olarak
-  - `application` — uygulama tipi string olarak
-  - `windCondition` — rüzgar durumu string olarak
-  - `trafficIntensity` — trafik yoğunluğu string olarak
-  - `query` — params.toString() ile oluşturulmuş URL sorgu string'i
-  - `pathname` — mevcut URL yolu
-  - `router` — Next.js router nesnesi
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: src\views\calculators\AirCurtainCalcPage.tsx::(hesaplama useEffect)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `currentStep` — mevcut adım numarası (4. adım kontrolü için)
-  - `width` — doorWidth string değerini parseFloat ile number'a çevrilmiş hali, kapı genişliği
-  - `height` — doorHeight string değerini parseFloat ile number'a çevrilmiş hali, kapı yüksekliği
-  - `application` — uygulama tipi string olarak
-  - `windCondition` — rüzgar durumu string olarak
-  - `trafficIntensity` — trafik yoğunluğu string olarak
-  - `calculationResult` — calculateAirCurtain fonksiyonu ile elde edilmiş hesaplama sonucu nesnesi
-- **Dönüş**: yok
-
-### [N9_NASIL] AST Pointer: src\views\calculators\AirCurtainCalcPage.tsx::(adım gösterici JSX)
-- **params**: x (number) — çizgi x koordinatı, i (number) — harita index
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX element (SVG çizgi ve ok polygon)
+  - `x` — number, grid çizgisi yatay pozisyonu
+  - `i` — number, grid çizgisi indeksi
+- **Dönüş**: JSX element (g bileşeni)
 
 ---
 
@@ -170,8 +203,8 @@ graph TD
     AirCurtainCalcPage_tsx__nextStep["nextStep"]
     AirCurtainCalcPage_tsx__prevStep["prevStep"]
     AirCurtainCalcPage_tsx__reset["reset"]
-    AirCurtainCalcPage_tsx__AirCurtainCalcPage --> AirCurtainCalcPage_tsx__canProceed
     AirCurtainCalcPage_tsx__AirCurtainCalcPage --> AirCurtainCalcPage_tsx__getEfficiencyStatus
+    AirCurtainCalcPage_tsx__AirCurtainCalcPage --> AirCurtainCalcPage_tsx__canProceed
 ```
 
 ## NODE ID STANDARD

@@ -7,7 +7,7 @@ skeleton_hash: d7f5ac351db900a3
 entity_hashes:
   func:robots: 04938e582a28c5d6
   overview: f391529836fd465a
-generated_at: 2026-05-28T22:35:21Z
+generated_at: 2026-06-08T10:08:12Z
 ---
 
 ## Genel Bakış

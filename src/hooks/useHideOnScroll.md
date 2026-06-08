@@ -3,30 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useHideOnScroll.ts
-skeleton_hash: 2bed405d7e5d7641
+skeleton_hash: 571ee459764116bd
 entity_hashes:
   func:useHideOnScroll: 8147a4dacc20e5ab
-  overview: 5345c1edebb9abd4
-generated_at: 2026-05-28T22:37:45Z
+  overview: 12bcf4529d8cd3f7
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinde kullanılan, kaydırma hareketlerine göre kullanıcı arayüzü elemanlarının görünürlüğünü yönetmek üzere tasarlanmış özel bir React hook'u barındırır. Yapılandırılabilir bir kaydırma eşik değeriyle esnek kullanım sunar, görünürlük durumunu tüketen bileşenlere ileterek arayüz elemanlarının dinamik olarak gösterilip gizlenmesini sağlar.
+Bu modül, VentHub HVAC projesindeki bileşenlerin, kullanıcı kaydırma hareketlerine tepki olarak akıllı bir şekilde gösterilip gizlenmesini sağlayan `useHideOnScroll` adında özel bir React hook'u içerir. Hook, yapılandırılabilir bir kaydırma eşik değeri ile çalışır; tarayıcıdaki kaydırma olaylarını dinleyerek, tüketen bileşenlere arayüz elemanının güncel görünürlük durumunu (göster veya gizle) iletir.
 
 ## Fonksiyon Grupları
-### Çekirdek Kaydırma Tepkisi Yönetimi
-Kullanıcıların ekran kaydırma hareketlerini izler, tanımlanan eşik değerine göre UI elemanlarının görünürlüğü için gerekli durumu üretir ve tüketen bileşenlere sunar.
+### Merkezi Kaydırma Davranışı Hook'u
+Kullanıcı kaydırma hareketlerini izleyerek, belirlenen eşik değerine göre bir UI elemanının görünürlüğü için gerekli durum mantığını uygular ve sonuç durumunu bileşenlere sunar.
 - useHideOnScroll
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React hook'u, tarayıcı ortamında çalışarak scroll hareketlerini dinleyen, 50 piksel varsayılan eşik değerine göre bir öğenin görünürlüğünü yönetir; doğru çalışması için tarayıcı DOM API'lerine ve React hooks çalışma zamanına erişimi zorunludur.
+Bu React hook'u, kaydırma olaylarını dinleyerek UI elemanlarının görünürlüğünü yönetmek üzere tasarlandığı için tarayıcı ortamı ve React bağlamına bağlıdır.
 
-[Aksiyom 1]: Eğer tarayıcının window nesnesi, scroll olayını dinleme ve scroll konumunu okuma API'leri (scrollY, addEventListener) erişilemezse, scroll hareketleri takip edilemez, görünürlük değişikliği hiçbir şekilde tetiklenemez.
-[Aksiyom 2]: Eğer modülün çalıştığı ortamda useState ve useEffect gibi temel React hook'ları erişilemezse, durum yönetimi ve olay dinleyicilerinin yaşam döngüsü entegrasyonu yapılamaz, modül hiç çalışmaz.
-[Aksiyom 3]: Eğer threshold parametresi olarak geçerli pozitif sayısal bir değer iletilmez ve varsayılan 50 değerinin devreye alınması engellenirse, kaydırma miktarının eşikle karşılaştırılması yapılamaz, öğe yanlış zamanlarda gizlenir veya gösterilir.
-[Aksiyom 4]: Eğer bileşen unmount olduğunda hook'un kullandığı useEffect temizleme fonksiyonu çalışmazsa, eski scroll olay dinleyicileri temizlenemez, uygulama genelinde bellek sızıntısı ve performans düşüklüğü oluşur.
+[Aksiyom 1]: Eğer tarayıcı ortamı (window ve document nesneleri) yoksa, hook scroll olaylarını dinleyemez ve görünürlük durumu güncellenemez.
+[Aksiyom 2]: Eğer hook, React bileşen hiyerarşisi dışında (örn. doğrudan bir JavaScript dosyasında) kullanılırsa, React bağlamı ve state yönetimi başarısız olur.
+[Aksiyom 3]: Eğer `threshold` parametresi bir sayısal değer olarak sağlanmazsa (örn. string veya null), eşik karşılaştırmaları beklenmeyen davranış gösterir.
+[Aksiyom 4]: Eğer sayfa içeriği kaydırılamıyorsa (yani `scrollHeight` pencere yüksekliğine eşit veya daha küçükse), tetiklenecek kaydırma olayı oluşmaz ve görünürlük durumu başlangıç değerinde kalır.
+[Aksiyom 5]: Eğer `threshold` değeri 0 olarak
 
 ---
 
@@ -57,56 +58,16 @@ Bu React hook'u, tarayıcı ortamında çalışarak scroll hareketlerini dinleye
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useHideOnScroll.ts::useHideOnScroll
-- **params**: [{ threshold = 50 }: UseHideOnScrollOptions, varsayılan değer {}]
+### [N1_NASIL] AST Pointer: src/hooks/useHideOnScroll.ts::useHideOnScroll
+- **params**:
+  - `{ threshold = 50 }` — scroll mesafesi eşiği (piksel), default 50; bu değerin altındaysa sayfa üstte kabul edilir
+  - destructured from `UseHideOnScrollOptions`, outer default `{}`
 - **ic_degiskenler**:
-  - `state` — React useState ile oluşturulan, scroll durumlarını tutan HideOnScrollState tipi nesne
-  - `setState` — state nesnesini güncellemek için kullanılan React state setter fonksiyonu
-  - `lastScrollY` — son kaydedilen dikey scroll konumunu saklayan useRef nesnesi, başlangıç değeri 0
-  - `ticking` — requestAnimationFrame ile ardışık gereksiz güncellemeleri engellemek için kullanılan kilit değişkenini tutan useRef nesnesi, başlangıç değeri false
-  - `useEffect` — scroll olaylarını yönetmek için kullanılan React hook'u, bağımlılık dizisi [threshold]
-- **Dönüş**: HideOnScrollState tipi state nesnesi
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useHideOnScroll.ts::useEffect_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `window` — tarayıcı window nesnesi, sunucu tarafı çalışması için typeof kontrolü yapılır
-  - `updateScrollDir` — scroll durumu değiştiğinde state'i güncellemek için tanımlanan iç fonksiyon
-  - `onScroll` — window scroll olayına bağlanan event handler fonksiyonu
-  - `window.addEventListener` — window nesnesine scroll event listener ekleyen API çağrısı
-  - `updateScrollDir()` — bileşen mount edildiğinde ilk scroll durumunu hesaplamak için çağrılan fonksiyon
-  - `window.removeEventListener` — bileşen unmount olduğunda scroll event listener'ı kaldıran API
-- **Dönüş**: () => void tipinde event listener temizleme fonksiyonu
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useHideOnScroll.ts::updateScrollDir
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `scrollY` — window.scrollY'den alınan mevcut dikey scroll konumu
-  - `setState` — ana fonksiyondaki state'i güncellemek için kullanılan setter fonksiyonu
-  - `lastScrollY.current` — son kaydedilen scroll konumunu işlem sonunda güncellemek için kullanılan ref değeri
-  - `ticking.current` — işlem tamamlandıktan sonra kilit mekanizmasını devre dışı bırakmak için ayarlanan ref değeri
-- **Dönüş**: yok (void)
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useHideOnScroll.ts::setState_prev_callback
-- **params**: [prevState: önceki HideOnScrollState nesnesi]
-- **ic_degiskenler**:
-  - `scrollY` — updateScrollDir'den gelen mevcut dikey scroll konumu
-  - `isAtTop` — scroll'un en başta olup olmadığını tutan değişken, scrollY < threshold olarak hesaplanır
-  - `isScrolled` — herhangi bir kaydırma yapılıp yapılmadığını tutan değişken, scrollY > 0 olarak hesaplanır
-  - `isScrollingDown` — aşağı doğru kaydırma yapılıp yapılmadığını tutan değişken, önceki state'ten alınır ve güncellenir
-  - `isScrollingUp` — yukarı doğru kaydırma yapılıp yapılmadığını tutan değişken, önceki state'ten alınır ve güncellenir
-  - `Math.abs` — scroll konumları arasındaki farkın mutlak değerini hesaplayan yerleşik fonksiyon
-  - `lastScrollY.current` — scroll yönü hesaplamak için kullanılan önceki scroll konumunu tutan ref değeri
-  - `threshold` — ana fonksiyondan gelen minimum kaydırma eşiği değişkeni
-- **Dönüş**: durum değişmemişse prevState, güncellenmişse yeni HideOnScrollState nesnesi
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useHideOnScroll.ts::onScroll
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `ticking.current` — çoklu gereksiz güncellemeyi engellemek için kontrol edilen kilit değeri
-  - `window.requestAnimationFrame` — tarayıcının bir sonraki repaint öncesi güncelleme yapması için çağrılan API
-  - `updateScrollDir` — requestAnimationFrame içine geçilen state güncelleme fonksiyonu
-- **Dönüş**: yok (void)
+  - `state` — `useState` hook'u; mevcut scroll durum nesnesini tutar (`isScrolled`, `isScrollingDown`, `isScrollingUp`, `isAtTop` alanlarını içerir)
+  - `setState` — `state`'i güncellemek için kullanılan setter fonksiyonu
+  - `lastScrollY` — `useRef(0)`; bir sonraki scroll kontrolünde karşılaştırma yapılmak üzere bir önceki `window.scrollY` değeri saklanır
+  - `ticking` — `useRef(false)`; `requestAnimationFrame` ile scroll event throttling'i kontrol eden bayrak; true ise yeni frame kuyruğa alınmaz
+- **Dönüş**: `state` (tip: `HideOnScrollState`) — `{ isScrolled, isScrollingDown, isScrollingUp, isAtTop }`
 
 ---
 

@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { tr } from '../dictionaries/tr'
+import { describe, expect,it } from 'vitest'
+
 import { en } from '../dictionaries/en'
+import { tr } from '../dictionaries/tr'
 
 function getKeys(obj: Record<string, unknown>, prefix = ''): string[] {
   return Object.entries(obj).flatMap(([key, value]) => {

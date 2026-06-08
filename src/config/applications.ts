@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 // Central configuration for application-driven cards used across Home and Products pages
 // This allows enabling/disabling and editing cards from a single source.
 

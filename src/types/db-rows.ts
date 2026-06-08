@@ -1,5 +1,5 @@
-import type { Database, Json } from './database.types';
 import type { AuthorityContent as DynamicAuthorityContent } from './authority';
+import type { Database, Json } from './database.types';
 
 export type PublicSchema = Database['public'];
 export type Tables = PublicSchema['Tables'];

@@ -1,0 +1,38 @@
+{
+  "skill": "superpowers-trivial",
+  "model": "",
+  "date": "",
+  "task_id": "P00-999-3D-COMPILER",
+  "task_title": "3D ve Sepet Modüllerinin React Compiler Uyumlu Refaktörü",
+  "description": "React Compiler ile uyumsuz olduğu için eslint.config.cjs içinde muafiyet listesine alınan 3D modelleme bileşenleri (RoofFanModel, InfiniteProductsShowcase, OrbitalProductsShowcase) ve sepet context provider (CartProvider) dosyalarının mutasyon kurallarına uygun olarak refaktör edilmesi.",
+  "files_modified": [],
+  "allowed_paths": [
+    "src/components/products/3d/types/RoofFanModel.tsx",
+    "src/components/products/InfiniteProductsShowcase.tsx",
+    "src/components/products/OrbitalProductsShowcase.tsx",
+    "src/contexts/CartProvider.tsx",
+    "src/views/admin/AdminReturnsPage.tsx",
+    "eslint.config.cjs"
+  ],
+  "forbidden_paths": [],
+  "max_files_changed": 10,
+  "allowed_change_types": [],
+  "verification_commands": [
+    {
+      "command": "pnpm run lint:ci",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm exec tsc -b tsconfig.build.json",
+      "result": "",
+      "passed": false
+    },
+    {
+      "command": "pnpm test -- --run",
+      "result": "",
+      "passed": false
+    }
+  ],
+  "all_passed": false
+}

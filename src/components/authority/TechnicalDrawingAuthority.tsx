@@ -1,8 +1,9 @@
 'use client'
 
-import React from 'react'
 import { motion } from 'framer-motion'
-import { FileText, Download, Clock, Info } from 'lucide-react'
+import { Clock, Download, FileText, Info } from 'lucide-react'
+import React from 'react'
+
 import type { TechnicalDrawingMetadata } from '../../types/media.types'
 
 interface TechnicalDrawingAuthorityProps {

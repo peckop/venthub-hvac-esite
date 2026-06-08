@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx
-skeleton_hash: 2f0a59f783f085c9
+skeleton_hash: ac8082825c082a0f
 entity_hashes:
   func:SearchOverlay: 5877a83b84daa2a4
   func:addToRecent: bf8c952c533ee587
@@ -16,7 +16,7 @@ entity_hashes:
   func:renderSuggestions: 8f7a31a904a04209
   overview: 7f4ffbd07796d9de
   style_tokens: dd6869457e23a7f7
-generated_at: 2026-06-07T12:03:03Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış
@@ -42,7 +42,9 @@ Bileşenin farklı durumlarını (boş ekran, öneriler listesi, sonuç görün�
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, arama arayüzü akışını yöneten React bileşenidir. Aşağıdaki mimari varsayımlar, fonksiyon imzalarından türetilmiştir.
 
 ---
 
@@ -307,12 +309,12 @@ graph TD
     SearchOverlay_tsx__renderSuggestion["renderSuggestion"]
     SearchOverlay_tsx__renderSuggestions["renderSuggestions"]
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
 ```
 
 ## NODE ID STANDARD

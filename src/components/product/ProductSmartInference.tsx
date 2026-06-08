@@ -1,10 +1,12 @@
 'use client'
 
+import { Activity, Cpu,ShieldCheck, Volume2, Zap } from 'lucide-react'
 import React from 'react'
-import { ShieldCheck, Zap, Volume2, Activity, Cpu } from 'lucide-react'
-import { generateEngineeringSummary, EngineeringInference } from '../../utils/engineeringIntelligence'
+
 import type { Product } from '@/types/ui-models'
+
 import { useI18n } from '../../i18n/I18nProvider'
+import { EngineeringInference,generateEngineeringSummary } from '../../utils/engineeringIntelligence'
 
 interface ProductSmartInferenceProps {
   product: Product

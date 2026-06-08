@@ -1,18 +1,19 @@
 'use client';
 
+import { Plus, Trash2 } from 'lucide-react';
 import React from 'react';
+
 import { useI18n } from '@/i18n/I18nProvider';
 import { 
   AuthorityBlock,
+  ComparisonBlock,
+  CtaBannerBlock,
+  FeaturesGridBlock,
   HeroBlock,
   MediaBlock,
   RichTextBlock,
-  FeaturesGridBlock,
-  ComparisonBlock,
-  CtaBannerBlock,
   SpecsBlock
 } from '@/types/authority';
-import { Plus, Trash2 } from 'lucide-react';
 
 // Standart Form Sınıfları
 const labelClass = "text-sm font-black uppercase tracking-widest text-slate-400 mb-1 block";

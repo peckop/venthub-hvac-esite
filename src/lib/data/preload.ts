@@ -1,8 +1,10 @@
 import { cache } from 'react'
+
 import { getProductBySlug } from '@/lib/services/product.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+
+import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../types/db-rows'
 import { mapDatabaseCategoryToDomain } from '../type-converters'
-import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../types/db-rows'
 
 // Cached product fetcher
 export const getCachedProductBySlug = cache(async (slug: string) => {

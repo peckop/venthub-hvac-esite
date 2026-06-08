@@ -8,7 +8,7 @@ const BuildTag: React.FC = () => {
   if (!short && !branch) return null
   return (
     <span className="text-xs text-steel-gray select-all" title={commit || ''}>
-      {branch || 'local'}@{short || 'dev'}
+      {`${branch || 'local'}@${short || 'dev'}`}
     </span>
   )
 }

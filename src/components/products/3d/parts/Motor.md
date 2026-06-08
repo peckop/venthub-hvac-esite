@@ -8,7 +8,7 @@ entity_hashes:
   func:Motor: 7953538ac04d68b8
   overview: 16f2e6768a864156
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:43Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

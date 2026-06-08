@@ -1,16 +1,18 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { AlertCircle, CheckCircle, Loader, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
-import { CheckCircle, AlertCircle, Loader, ShieldCheck } from 'lucide-react'
-import { useCart } from '../hooks/useCartHook'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+import { useSearchParams } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import { useCart } from '../hooks/useCartHook'
+import { formatDateTime } from '../i18n/datetime'
+import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import { reportError } from '../lib/errorReporter'
-import { formatCurrency } from '../i18n/format'
-import { formatDateTime } from '../i18n/datetime'
 import { Routes } from '../utils/routes'
 
 type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }

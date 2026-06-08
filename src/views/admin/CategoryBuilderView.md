@@ -3,17 +3,17 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\CategoryBuilderView.tsx
-skeleton_hash: 51e67bc6da0fd1e7
+skeleton_hash: d3e8a3a8b724f413
 entity_hashes:
   func:CategoryBuilderView: c538d4ad7085f51d
   func:handleSave: f8b5a865424c16c7
-  overview: 228c38d7ec836061
+  overview: 146d3fa220073c3c
   style_tokens: 745d0461670ee6bd
-generated_at: 2026-06-06T21:58:02Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC admin panelinde kategori yapısının görsel olarak oluşturulması ve düzenlenmesini sağlayan bir React görünüm bileşenidir. Mevcut bir kategoriyi yeniden yapılandırma veya sıfırdan yeni bir kategori hiyerarşisi tasarlama süreçlerini tek bir bileşen üzerinden yönetir.
+Bu modül, VentHub HVAC admin panelinde kategori yapısının görsel olarak oluşturulmasını ve düzenlenmesini sağlayan bir React görünüm bileşenidir. Mevcut bir kategoriyi yeniden yapılandırma veya sıfırdan yeni bir kategori hiyerarşisi tasarlama süreçlerini tek bir bileşen üzerinden yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Görünüm Bileşeni
@@ -21,36 +21,14 @@ Kullanıcıya kategori verilerini düzenleyebileceği bir arayüz sunar. `catego
 - CategoryBuilderView
 
 ### Veri Kaydetme İşleyicisi
-Formda düzenlenen kategori yapısının sunucuya gönderilmesini ve kalıcı hale getirilmesini koordine eder. Kayıt işleminin sonucuna göre kullanıcıya geri bildirim sağlar.
+Formda düzenlenen kategori yapısının sunucuya gönderilmesini ve kalıcı hale getirilmesini koordine eder.
 - handleSave
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için verilen bilgiler yalnızca fonksiyon imzası düzeyindedir; fonksiyon gövdeleri paylaşılmadığından çıkarım kapsamı oldukça dar tutulmuştur.
-
----
-
-[Aksiyom 1]: Eğer `categoryId` prop'u `CategoryBuilderView` bileşenine sağlanmazsa, bileşenin çalışma modu (yeni oluşturma mu yoksa düzenleme mi olduğu) belirsiz olur.
-
-**Neden:** Fonksiyon imzasında `categoryId` için bir default değer tanımlanmamıştır. Prop'un varlığı/yokluğu bileşenin hangi modda çalışacağını belirleyen tek belirleyici olarak görünmektedir; bu ayrımın olmadığında bileşenin hangi davranışı göstereceği imza düzeyinde bilinmemektedir.
-
----
-
-[Aksiyom 2]: Eğer `handleSave()` fonksiyonu çağrıldığında bileşenin iç state'inde kaydedilecek geçerli bir kategori verisi (yapı/hiyerarşisi) mevcut değilse, kaydetme işlemi hatalı bir istekle sonuçlanır veya veri kaybı oluşur.
-
-**Neden:** `handleSave()` parametsiz olarak tanımlıdır; bu durum, fonksiyonun kendi iç state'inden veri okuduğunu gösterir. Fonksiyon gövdesinde state doğrulaması olup olmadığı bilinmediğinden, geçerli veri olmaması durumunda davranış bilinmemektedir.
-
----
-
-[Aksiyom 3]: Eğer `CategoryBuilderView` bileşeni bir React ortamı (parent bileşen, state management, API servisleri) dışında çalıştırılmaya çalışılırsa, fonksiyonların hiçbiri beklenen çıktıyı üretemez.
-
-**Neden:** Her iki fonksiyon da React bileşen imzası (destructure edilmiş props) ve olay işleyici kalıbındadır; React yaşam döngüsüne ve component tree'ye bağımlıdır. Ancak bu bağımlılıkların somut listesi fonksiyon gövdelerinde görülmediğinden, tam olarak hangi servislerin zorunlu olduğu bilinmemektedir.
-
----
-
-> **Not:** Fonksiyon gövdeleri paylaşılmadığı için modül içi veri doğrulama eşikleri, API endpoint bağımlılıkları veya state yapısı hakkında somut aksiyom türetilmemiştir. Yukarıdaki varsayımlar yalnızca fonksiyon imzalarından çıkarılabilen minimum düzeydeki mimari gereklilikleri yansıtmaktadır.
+Bu modül, fonksiyon imzalarından çıkarılabilecek minimal mimari varsayımlar içermektedir. Detaylı iş mantığı uygulama gövdesinde tanımlıdır.
 
 ---
 
@@ -81,35 +59,40 @@ Bu modül için verilen bilgiler yalnızca fonksiyon imzası düzeyindedir; fonk
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: CategoryBuilderView.tsx::CategoryBuilderView
-- **params**: `categoryId` — Kategoriyi yüklemek ve güncellemek için kullanılan benzersiz kimlik
+- **params**: `{ categoryId }` — Kategori ID'si, URL'den gelen prop
 - **ic_degiskenler**:
-  - `router` — Next.js router, geri butonu ile `router.back()` çağrısıyla kullanılır
-  - `category` — `useState<DbCategory | null>`: Supabase'den yüklenen kategori verisi; header'da `category?.name` olarak gösterilir
-  - `blocks` — `useState<AuthorityBlock[] | null>`: Otorite blokları dizisi; AuthorityBuilder'a value, AuthorityRenderer'a content olarak verilir
-  - `loading` — `useState<boolean>`: Yüklenme durumu; true iken loading ekranı, false iken ana editör render edilir
-  - `saving` — `useState<boolean>`: Kaydetme durumu; handleSave tetiklendiğinde true olur, kaydetme butonunu disabled yapar
-  - `previewMode` — `useState<'desktop' | 'mobile'>`: Önizleme panelinin cihaz modu, desktop/mobile butonlarıyla değiştirilir
-  - `showPreview` — `useState<boolean>`: Sağ taraftaki canlı önizleme panelinin açık/kapalı durumunu kontrol eder
-  - `load` — `useCallback(async () => {...}, [categoryId])`: Kategoriyi Supabase'den yükleyen, legacy verileri migrate eden memoized fonksiyon; useEffect içinde çağrılır
-- **Dönüş**: JSX — Loading ekranı veya tam editör sayfası (header + AuthorityBuilder + canlı önizleme sidebar)
+  - `router` — Next.js router instance, sayfa navigasyonu için
+  - `category` — `DbCategory | null`, yüklenen kategori verisi (ad, slug, description vb.)
+  - `setCategory` — category state setter fonksiyonu
+  - `blocks` — `AuthorityBlock[] | null`, Authority Builder için blok dizisi
+  - `setBlocks` — blocks state setter fonksiyonu
+  - `loading` — `boolean`, yükleme durumu flag'i
+  - `setLoading` — loading state setter
+  - `saving` — `boolean`, kaydetme durumu flag'i
+  - `setSaving` — saving state setter
+  - `previewMode` — `'desktop' | 'mobile'`, önizleme cihaz modu
+  - `setPreviewMode` — previewMode state setter
+  - `showPreview` — `boolean`, önizleme paneli görünürlüğü
+  - `setShowPreview` — showPreview state setter
+- **Dönüş**: React JSX elementi (admin paneli layout)
 
 ### [N2_NASIL] AST Pointer: CategoryBuilderView.tsx::load
-- **params**: yok
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `data` — Supabase `select().single()` sorgusundan dönenham veri; `cat` değişkenine cast edilir
-  - `error` — Supabase sorgu sonucundaki hata nesnesi; varsa fırlatılıp catch bloğunda yakalanır
-  - `cat` — `data`'nın `DbCategory` tipine cast edilmiş hali; `description`, `metadata`, `authority_content` alanları okunur
-  - `initialBlocks` — `cat.authority_content`'ün `AuthorityBlock[]` tipine cast edilmiş hali; boşsa legacy migration çalıştırılır
-  - `legacyBlocks` — `AuthorityBlock[]`: Eski statik verilerden oluşturulan blok dizisi; rich-text ve specs blokları push edilir
-  - `meta` — `cat.metadata`'nın `CategoryMetadata | null` tipine cast edilmiş hali; `metric1` ve `metric2` alanları kontrol edilir
-  - `rows` — `SpecsBlock['content']['rows']`: Spec bloğunun satırları; `meta.metric1` ve `meta.metric2`'den label/value çiftleri eklenir
-- **Dönüş**: yok — Yan etki olarak `category` ve `blocks` state'lerini günceller; hata durumunda `toast.error`, başarılı legacy dönüşümde `toast.success` gösterir
+  - `data` — Supabase sorgu sonucu, `categories` tablosundan gelen satır
+  - `error` — Supabase sorgu hatası (varsa)
+  - `cat` — `DbCategory` tipine cast edilmiş data nesnesi
+  - `initialBlocks` — `AuthorityBlock[]`, kategorinin `authority_content` alanından gelen blok dizisi
+  - `legacyBlocks` — `AuthorityBlock[]`, eski format verileri yeni blok formatına dönüştürmek için geçici dizi
+  - `meta` — `CategoryMetadata | null`, kategorinin metadata alanı (metric1, metric2 için)
+  - `rows` — `SpecsBlock['content']['rows']`, teknik özet satırları (label-value çiftleri)
+- **Dönüş**: void (asenkron, state günceller, return yok)
 
 ### [N3_NASIL] AST Pointer: CategoryBuilderView.tsx::handleSave
-- **params**: yok
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `error` — Supabase `update()` çağrısından dönen hata nesnesi; fırlatılıp catch bloğunda yakalanır
-- **Dönüş**: yok — Yan etki olarak `blocks` dizisini `DbJson` tipine cast edip Supabase'deki `categories` tablosunun `authority_content` alanına yazar; `saving` state'ini yönetir; başarı/hata toast mesajı gösterir
+  - `error` — Supabase güncelleme hatası (varsa)
+- **Dönüş**: void (asenkron, state günceller, return yok)
 
 ---
 

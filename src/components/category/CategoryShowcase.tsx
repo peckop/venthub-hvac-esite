@@ -1,18 +1,20 @@
-import { Routes } from '../../utils/routes'
-import VentImage from '@/components/ui/VentImage'
-import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Activity, ArrowRight, CheckCircle2, ChevronDown, ShieldCheck,ThermometerSun, Wind, Zap } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, ThermometerSun, ChevronDown, Zap, Wind, CheckCircle2, Activity, ShieldCheck } from 'lucide-react'
+import React, { useState } from 'react'
+
+import VentImage from '@/components/ui/VentImage'
+
+import { useI18n } from '../../i18n/I18nProvider'
+import { DomainCategory } from '../../lib/type-converters'
+import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
+import { Routes } from '../../utils/routes'
+import Breadcrumb from '../navigation/Breadcrumb'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
 import { BottomCTA } from './sections'
-import Breadcrumb from '../navigation/Breadcrumb'
-import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
-import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { getCategoryDisplayName } from '../../utils/categoryHelpers'
-import { DomainCategory } from '../../lib/type-converters'
-import { useI18n } from '../../i18n/I18nProvider'
 
 interface CategoryShowcaseProps {
     category: DomainCategory
@@ -127,7 +129,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                         {/* Comparison Image */}
                         <div className="flex justify-center mb-12">
                             <VentImage src="/images/category/electric-vs-ambient.png"
-                                alt="Elektrikli vs Ortam Havalı Karşılaştırma"
+                                alt={t('category.electricVsAmbientAlt')}
                                 className="max-w-full md:max-w-3xl rounded-xl shadow-lg"
                              />
                         </div>
@@ -190,11 +192,11 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             >
                                 <Image
                                     src="/images/vortice/vortice_lineo_loft.png"
-                                    alt="Modern Loft Uygulaması"
+                                    alt={t('category.modernLoftAlt')}
                                     fill
                                     sizes="(max-width: 1024px) 100vw, 600px"
                                     className="object-cover transition-transform duration-hvac-glacial group-hover:scale-110"
-                                />
+                                  />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
                                 <div className="absolute bottom-8 left-8 right-8">
                                     <h4 className="text-2xl font-bold text-white mb-2">{t('category.modernLiving')}</h4>
@@ -206,7 +208,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 <div>
                                     <h2 className="text-4xl font-bold text-slate-900 mb-6 tracking-tight">{t('category.flexibilityEsthetics')}</h2>
                                     <p className="text-lg text-slate-600 leading-relaxed italic">
-                                        "Lineo Quiet ES, sadece bir fan değil; modern mimarinin sessiz kahramanıdır."
+                                        “{t('category.lineoQuietQuote')}”
                                     </p>
                                 </div>
 
@@ -239,7 +241,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 >
                                     <Image
                                         src="/images/vortice/vortice_lineo_neon.png"
-                                        alt="Endüstriyel Laboratuvar Uygulaması"
+                                        alt={t('category.industrialLabAlt')}
                                         fill
                                         sizes="(max-width: 1024px) 100vw, 600px"
                                         className="object-cover"
@@ -257,19 +259,19 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-12">
                             <h2 className="text-3xl font-bold text-white mb-4">
-                                {isQuietFan ? 'Vortice Lineo Quiet ES Teknolojisi' : 'Nasıl Çalışır?'}
+                                {isQuietFan ? t('category.lineoTechnologyTitle') : t('category.howItWorksTitle')}
                             </h2>
                             <p className="text-gray-300 max-w-2xl mx-auto">
                                 {isQuietFan 
-                                    ? 'Sessizlik ve performansın mükemmel uyumu. Gelişmiş aerodinamik tasarım ile tanışın.' 
-                                    : 'Hava perdesi, görünmez bir bariyer oluşturarak iç ve dış ortamı birbirinden ayırır.'}
+                                    ? t('category.lineoTechnologyDesc') 
+                                    : t('category.howItWorksDesc')}
                             </p>
                         </div>
                         <div className="flex justify-center">
                             <div className="relative w-full max-w-4xl aspect-video rounded-xl overflow-hidden shadow-2xl">
                                 <Image
                                     src={isQuietFan ? '/images/vortice/vortice_lineo_technical.png' : '/images/category/air-curtain-diagram.png'}
-                                    alt={isQuietFan ? 'Linieo Quiet Teknik Detay' : 'Hava Perdesi Çalışma Prensibi'}
+                                    alt={isQuietFan ? t('category.lineoTechnicalAlt') : t('category.airCurtainDiagramAlt')}
                                     fill
                                     sizes="(max-width: 1024px) 100vw, 900px"
                                     className="object-contain bg-slate-900/50"
@@ -332,15 +334,15 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             {t('category.whyCategory', { category: getCategoryDisplayName(category) })}
                         </h2>
                         <p className="text-steel-gray max-w-2xl mx-auto">
-                            Endüstriyel standartlarda üretim ve yüksek mühendislik çözümleriyle projelerinize değer katıyoruz.
+                            {t('category.whyCategorySubtitle')}
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
-                            { title: "Yüksek Verimlilik", desc: "ErP standartlarına uygun enerji tasarrufu sağlayan motor teknolojisi." },
-                            { title: "Sessiz Çalışma", desc: "Özel akustik izolasyon ve aerodinamik fan tasarımı." },
-                            { title: "Uzun Ömür", desc: "Korozyona dayanıklı gövde ve ağır hizmet tipi bileşenler." }
+                            { title: t('category.why1Title'), desc: t('category.why1Desc') },
+                            { title: t('category.why2Title'), desc: t('category.why2Desc') },
+                            { title: t('category.why3Title'), desc: t('category.why3Desc') }
                         ].map((feature, i) => (
                             <div key={i} className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                                 <div className="w-12 h-12 bg-primary-navy/10 rounded-lg flex items-center justify-center mb-6">

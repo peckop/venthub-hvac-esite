@@ -3,34 +3,42 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanProblem.tsx
-skeleton_hash: 666108ab9c17b196
+skeleton_hash: 71ddba8df99b75f5
 entity_hashes:
   func:SilentFanProblem: f3ccc67c9bb4f247
   func:tr: b282b53f03d688a5
-  overview: 9c713c60ca011b94
+  overview: c3d80f54b946782d
   style_tokens: 3b3553271e7a0f67
-generated_at: 2026-05-28T22:35:47Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, sessiz fan kategorisiyle ilgili bir sorun bildirim bölümünü gösteren bir React bileşeni içerir. Ayrıca, kullanıcı arayüzündeki metinlerin çevirilerini sağlayan küçük bir yardımcı fonksiyon bulunur.
+Bu modül, sessiz fan kategorisindeki sorunları ve çözümleri kullanıcıya gösteren bir React bileşeni sunar. Bileşen, farklı dil destekleri için bir çeviri yardımcısı kullanarak metinleri yerelleştirir.
 
 ## Fonksiyon Grupları
 ### Kullanıcı Arayüzü Bileşeni
-Kategori sayfasındaki sessiz fan sorunlarını listeleyen ve görüntüleyen ana bileşeni tanımlar.
+Sessiz fan ile ilgili olası sorunları, uyarıları ve çözüm önerilerini listeleyen ana sayfa bileşenini oluşturur.
 - SilentFanProblem
 
-### Çeviri Yardımcısı
-Bileşen içinde kullanılan sabit metinlerin farklı dillere çevrilmesini yönetir.
+### Çeviri ve Yerelleştirme
+Bileşen içindeki tüm sabit metinlerin, tanımlı bir dilden autre bir dile çevrilmesini veya yerelleştirme anahtarlarıyla eşleştirilmesini sağlar.
 - tr
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `SilentFanProblem()` fonksiyonu çağrılmazsa, bileşen render edilmez ve ekrana hiçbir çıktı üretilmez.  
-[Aksiyom 2]: Eğer `tr` fonksiyonuna string tipinde olmayan bir argüman geçilirse, TypeScript derleme hatası oluşur.
+Modül, bir React bileşeni olup kullanıcı arayüzü sunar ve çeviri yardımcısı kullanarak metinleri yerelleştirir.
+
+[Aksiyom 1]: Eğer `tr` fonksiyonu için tanımlı bir çeviri yardımcısı (örneğin bir context veya global fonksiyon) yoksa, bileşen içindeki tüm sabit metinler çevrilmemiş veya hatalı gösterimle sonuçlanır.
+
+[Aksiyom 2]: Eğer `tr` fonksiyonuna geçilen `key` parametresi, tanımlı bir çeviri anahtarı listesinde mevcut değilse, `tr` fonksiyonu hata döndürür veya `key`'nin kendisini döndürür (bileşenin tasarımına bağlı).
+
+[Aksiyom 3]: Eğer bileşen farklı bir dil ortamında çalıştırılıyorsa (örneğin, kullanıcının tarayıcı dili veya uygulama dili ayarı farklıysa) ve ilgili dil için çeviri tanımlı değilse, `tr` fonksiyonu varsayılan bir dile (örneğin İngilizce) fallback yapar.
+
+[Aksiyom 4]: Eğer `SilentFanProblem` bileşeni bir React bağlamında (context) dışarıdan bağımlılık olarak `tr` fonksiyonunu almıyorsa, bileşen kendi içinde tanımlı bir `tr` fonksiyonu kullanmalıdır; aksi halde çeviri yapılamaz.
+
+[Aksiyom 5]: Eğer bileşen, sessiz fan kategorisine ait sorun ve çözüm listelerini göstermek için bir dizi (array) veri kullanıyorsa, bu verinin yapılandırması (örneğin her bir sorun-çözüm çiftinin alanları) `tr` anahtarlarıyla uyumlu olmalıdır; aksi halde eksik veya hatalı gösterim oluşur.
 
 ---
 
@@ -62,41 +70,41 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanProblem.tsx::SilentFanProblem
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: SilentFanProblem.tsx::SilentFanProblem
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `t` — çeviri fonksiyonu, useI18n'den gelir; kategoriSilentFan.problem alanındaki çevirileri almak için kullanılır.
-  - `dict` — i18n sözlüğü nesnesi; tüm çevirileri içerir, `dict.categorySilentFan.problem` ile problem bölümü verilerine erişim sağlar.
-  - `sectionRef` — bölüm elementine bağlanan ref; useScrollAnimation ile scroll‑tabanlı animasyonları tetiklemek için kullanılır.
-  - `isVisible` — bölümün şu anda viewport içinde görünür olup olmadığını gösteren boolean; `scrollAnimationClasses.fadeUp(isVisible)` ile animasyon sınıflarını kontrol eder.
-  - `tr` — pomoclı fonksiyon; verilen anahtarın önüne `categorySilentFan.problem.` ekleyip `t` ile çeviri döndürür.
-  - `pDict` — `dict.categorySilentFan.problem` kısaltması; painPoints, visual.withoutPoints, visual.withPoints gibi tüm problem bölümü verilerine hızlı erişim sağlar.
-  - `icons` — `[VolumeX, Zap, Activity, Info]` Lucide ikonlarının dizisi; her pain point kartı için sırayla ikon seçmek için kullanılır.
-  - `colors` — metin ve arka plan CSS sınıflarını tanımlayan nesneler dizisi; her pain point kartına farklı renk teması (mavi, turuncu, mor, pembe) uygulanmasını sağlar.
-  - `painPoints` — `pDict.painPoints` veya boş dizin; her birinin `title` ve `description` alanlarını taşıyan pain point nesnelerinin listesi; kartları render etmek için `.map` ile iterate edilir.
-- **Dönüş**: React.FC (JSX döndüren fonksiyonel bileşen)
+  - `t` — `useI18n` hook'undan dönen çeviri fonksiyonu, key karşılıklarını İngilizce metne çevirir
+  - `dict` — `useI18n` hook'undan dönen tam sözlük nesnesi, alt objelere erişim sağlar
+  - `sectionRef` — `useScrollAnimation<HTMLElement>` hook'undan dönen ref nesnesi, section DOM elementine bağlanır
+  - `isVisible` — `useScrollAnimation` hook'undan dönen boolean, section'ın viewport'a girip girmediğini belirler
+  - `tr` — lokal çeviri fonksiyonu, `t(`categorySilentFan.problem.${key}`)` çağırarak belirli bir key'i çevirir
+  - `pDict` — `dict.categorySilentFan.problem` erişiminden elde edilen sözlük nesnesi, problem bölümünün tüm metin verilerini tutar
+  - `icons` — `[VolumeX, Zap, Activity, Info]` lucide-react ikon bileşenleri dizisi, her pain point kartına bir ikon atanır
+  - `colors` — dört nesneden oluşan renk dizisi, her nesne `text` (metin rengi class'ı) ve `bg` (arka plan rengi class'ı) içerir
+  - `painPoints` — `pDict.painPoints || []` ifadesinden elde edilen dizi, problem kartlarının verilerini (başlık, açıklama) taşır
+- **Dönüş**: JSX — `<section>` elementi, tüm problem bölümünü render eder
 
-### [N2_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanProblem.tsx::tr
-- **params**: `key: string`
+### [N2_NASIL] AST Pointer: SilentFanProblem.tsx::tr
+- **params**: `key: string` — çevrilecek metin anahtarı
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok (fonksiyon sadece çeviri dizesini döndürür, ancak imzada `void` olarak belirtilmiştir)
+- **Dönüş**: `t(...)` çağırımı sonucu çevrilmiş string döner; imza tanımında `yok` olarak belirtilmiştir
 
-### [N3_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanProblem.tsx::painPoints.map callback
-- **params**: `point: PainPoint, index: number`
+### [N3_NASIL] AST Pointer: SilentFanProblem.tsx::painPoints_map_callback
+- **params**: `point: PainPoint` (mevcut pain point nesnesi), `index: number` (dizideki indeks)
 - **ic_degiskenler**:
-  - `Icon` — `icons[index % icons.length]` ile seçilen Lucide ikon bileşeni; kartın üst kısmında gösterilir.
-  - `color` — `colors[index % colors.length]` ile seçilen renk nesnesi; kartın arka plan ve ikon rengini belirler.
-- **Dönüş**: JSX.Element (tek bir pain point kartı)
+  - `Icon` — `icons[index % icons.length]` hesaplamasından elde edilen ikon bileşeni, mevcut karta atanacak lucide ikonu
+  - `color` — `colors[index % colors.length]` hesaplamasından elde edilen renk nesnesi, `.text` ve `.bg` erişimleriyle card stilini belirler
+- **Dönüş**: JSX — `<div>` elementi, bir pain point kartını render eder; `point.title` ve `point.description` kullanılır
 
-### [N4_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanProblem.tsx::visual.withoutPoints.map callback
-- **params**: `p, i`
+### [N4_NASIL] AST Pointer: SilentFanProblem.tsx::withoutPoints_map_callback
+- **params**: `p` (string, "without" listesindeki bir madde metni), `i` (number, indeks)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (tek bir "without" liste öğesi; kırmızı nokta ve metin)
+- **Dönüş**: JSX — `<li>` elementi, `p` değerini kırmızı renkli madde işaretiyle listeler
 
-### [N5_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanProblem.tsx::visual.withPoints.map callback
-- **params**: `p, i`
+### [N5_NASIL] AST Pointer: SilentFanProblem.tsx::withPoints_map_callback
+- **params**: `p` (string, "with" listesindeki bir madde metni), `i` (number, indeks)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (tek bir "with" liste öğesi; mavi nokta ve metin)
+- **Dönüş**: JSX — `<li>` elementi, `p` değerini mavi renkli madde işaretiyle listeler
 
 ---
 

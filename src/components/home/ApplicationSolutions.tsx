@@ -1,7 +1,8 @@
-import { Routes } from '@/utils/routes';
-import React from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
+import React from 'react'
+
+import { Routes } from '@/utils/routes';
 
 interface SolutionItem {
   id: 'parking' | 'kitchen' | 'entrance' | 'comfort'

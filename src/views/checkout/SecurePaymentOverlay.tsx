@@ -1,7 +1,7 @@
 'use client'
 
-import React from 'react'
 import { Lock } from 'lucide-react'
+import React from 'react'
 
 interface SecurePaymentOverlayProps {
     overlayVisible: boolean

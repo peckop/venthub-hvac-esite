@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
-import { iconFor, accentOverlayClass } from '../applicationUi'
+import { describe, expect,it } from 'vitest'
+
+import { accentOverlayClass,iconFor } from '../applicationUi'
 
 describe('applicationUi utilities', () => {
   describe('iconFor', () => {

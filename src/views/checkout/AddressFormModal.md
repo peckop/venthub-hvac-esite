@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx
-skeleton_hash: 3ba5f5925140cd7c
+skeleton_hash: df90862fa528993d
 entity_hashes:
   func:AddressFormModal: 22dcfc4163aec036
   func:handleSave: 51987ec8847e1d2c
   overview: d6c90c44e9a5f962
   style_tokens: 4fa16246087d5121
-generated_at: 2026-06-07T12:14:49Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış
@@ -26,7 +26,23 @@ Kullanıcının formu göndermesiyle tetiklenen veri doğrulama, hazırlama ve �
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, ödeme sürecindeki adres formu modalıdır ve aşağıdaki mimari varsayımlara dayanır:
+
+[Aksiyom 1]: Eğer `onClose` callback'i sağlanmamışsa, modal'ın kullanıcı tarafından kapanması mümkün olmaz.
+
+[Aksiyom 2]: Eğer `onSaved` callback'i sağlanmamışsa, form kaydedildikten sonra üst bileşene bilgi iletilemez ve güncelleme akışı bozulur.
+
+[Aksiyom 3]: Eğer `address` prop'u `undefined` veya `null` ise, modal "yeni adres oluşturma" modunda; aksi halde "mevcut adresi düzenleme" modunda çalışır.
+
+[Aksiyom 4]: Eğer `handleSave` fonksiyonu form doğrulamasını geçemezse, form verileri üst bileşene iletilmez ve modal açık kalır.
+
+[Aksiyom 5]: Eğer `t` (çeviri fonksiyonu) sağlanmamışsa, form alanlarının etiketleri ve hata mesajları gösterilemez.
+
+[Aksiyom 6]: Eğer modal başarıyla kaydedildikten sonra `onSaved` çağrılırsa, sağlanan adres verisi üst bileşen tarafından işlenebilir olmalıdır.
+
+[Aksiyom 7]: Eğer form alanları zorunlu alanları içermiyorsa (örn: sokak, şehir, posta kodu), `handleSave` geçerli bir submit gerçekleştiremez.
 
 ---
 
@@ -58,6 +74,63 @@ Kullanıcının formu göndermesiyle tetiklenen veri doğrulama, hazırlama ve �
 - `onClose: () => void`
 - `onSaved: () => void`
 - `t: (key: string) => string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/views/checkout/AddressFormModal.tsx::AddressFormModal
+- **params**:
+  - `address` — Mevcut adres bilgisi (UserAddress tipinde, undefined ise yeni adres oluşturulacak)
+  - `onClose` — Modal'ı kapatma callback fonksiyonu
+  - `onSaved` — Adres başarıyla kaydedildikten sonra çağrılacak callback fonksiyonu
+  - `t` —Uluslararasılaştırma (i18n) çeviri fonksiyonu
+- **ic_degiskenler**:
+  - `saving` — useState boolean; kaydetme işleminin devam edip etmediğini tutar, true iken buton devre dışıdır
+  - `setSaving` — saving state setter'ı; handleSave içinde true/false olarak ayarlanır
+  - `form` — useState objesi; tüm form alanlarının başlangıç değerlerini address prop'undan veya boş değerlerden oluşturur
+    - `form.label` — Adres etiketi (Ev, İş vb.), address?.label'den veya boş stringden başlatılır
+    - `form.full_name` — Adres sahibinin tam adı, address?.full_name'den veya boş stringden başlatılır
+    - `form.phone` — Telefon numarası, address?.phone'dan veya boş stringden başlatılır
+    - `form.address_line` — Açık adres metni (sokak, bina, daire), address?.address_line'dan veya boş stringden başlatılır
+    - `form.city` — Şehir adı, address?.city'den veya boş stringden başlatılır
+    - `form.district` — İlçe adı, address?.district'ten veya boş stringden başlatılır
+    - `form.postal_code` — Posta kodu, address?.postal_code'dan veya boş stringden başlatılır
+    - `form.is_default_shipping` — Varsayılan gönderim adresi olup olmadığını belirtir boolean, address?.is_default_shipping'den veya false'dan başlatılır
+    - `form.is_default_billing` — Varsayılan fatura adresi olup olmadığını belirtir boolean, address?.is_default_billing'den veya false'dan başlatılır
+  - `setForm` — form state setter'ı; her input change handler'da spread ile güncellenir
+  - `handleSave` — Form gönderim handler'ı; async fonksiyon, addrée göre create veya update yapar
+  - `newAddressPayload` — DbUserAddressInsert tipinde obje; address yoksa oluşturulan yeni adres verisi, user_id boş stringdir (servis tarafından override edilir), address_type form.is_default_shipping'a göre 'shipping' veya 'billing' olarak belirlenir, diğer alanlar form state'inden kopyalanır
+- **Dönüş**: JSX — Sabit pozisyonlu modal overlay, içinde adres formu barındıran beyaz kart. Form alanları: label input, address_line textarea, city/district grid, postal_code input, is_default_shipping/is_default_billing checkbox'ları, submit butonu. saving true iken buton disabled ve '...' gösterir.
+
+### [N2_NASIL] AST Pointer: src/views/checkout/AddressFormModal.tsx::handleSave
+- **params**:
+  - `e` — React.FormEvent; form submit event'i, preventDefault ile varsayılan davranış engellenir
+- **ic_degiskenler**:
+  - `newAddressPayload` — DbUserAddressInsert tipinde obje; sadece address prop'u falsy (undefined) olduğunda oluşturulur. Alanları:
+    - `newAddressPayload.user_id` — Boş string (''); servis katmanında gerçek kullanıcı ID'si ile override edilir
+    - `newAddressPayload.address_type` — form.is_default_shipping true ise 'shipping', aksi halde 'billing' olarak ternary ile belirlenir
+    - `newAddressPayload.label` — form.label değerinden kopyalanır
+    - `newAddressPayload.full_name` — form.full_name değerinden kopyalanır
+    - `newAddressPayload.phone` — form.phone değerinden kopyalanır
+    - `newAddressPayload.address_line` — form.address_line değerinden kopyalanır
+    - `newAddressPayload.city` — form.city değerinden kopyalanır
+    - `newAddressPayload.district` — form.district değerinden kopyalanır
+    - `newAddressPayload.postal_code` — form.postal_code değerinden kopyalanır
+    - `newAddressPayload.is_default_shipping` — form.is_default_shipping değerinden kopyalanır
+    - `newAddressPayload.is_default_billing` — form.is_default_billing değerinden kopyalanır
+- **Yan Etkileri / Çağrılar**:
+  - `setSaving(true)` — Kaydetme başladı, buton devre dışı bırakılır
+  - `updateAddress(supabaseBrowserClient, address.id, {...})` — address prop'u mevcutsa çağrılır, form alanlarını payload olarak gönderir
+  - `toast.success(t('checkout.saved.updated'))` — Güncelleme başarılı bildirimi
+  - `createAddress(supabaseBrowserClient, newAddressPayload)` — address prop'u yoksa çağrılır, yeni adres oluşturur
+  - `toast.success(t('account.addresses.toasts.created') || 'Address created')` — Oluşturma başarılı bildirimi
+  - `onSaved()` — Başarılı kayıt sonrası üst bileşeni bilgilendirir
+  - `onClose()` — Modal'ı kapatır
+  - `console.error(e)` — Catch bloğunda hatayı konsola yazar
+  - `toast.error(...)` — Hata durumunda kullanıcıya hata bildirimi gösterir; message, address varsa 'checkout.saved.updateError', yoksa 'account.addresses.toasts.saveError' veya fallback 'Error while saving'
+  - `setSaving(false)` — Finally bloğunda kaydetme durumu sıfırlanır
+- **Dönüş**: yok (void)
 
 ---
 

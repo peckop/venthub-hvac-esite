@@ -1,12 +1,13 @@
 'use client'
 
+import { CheckCircle,Clock, Mail, MapPin, Phone } from 'lucide-react'
 import React, { useState } from 'react'
-import { Phone, Mail, MapPin, Clock, CheckCircle } from 'lucide-react'
-import { useI18n } from '../i18n/I18nProvider'
-import Seo from '../components/Seo'
+
 import { WhatsAppIcon } from '../components/HVACIcons'
-import { getSupportLink } from '../utils/whatsapp'
+import Seo from '../components/Seo'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
+import { useI18n } from '../i18n/I18nProvider'
+import { getSupportLink } from '../utils/whatsapp'
 
 const ContactPage: React.FC = () => {
   const { t } = useI18n()

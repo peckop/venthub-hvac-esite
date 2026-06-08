@@ -1,5 +1,6 @@
 // three-setup.ts - No strict disables
 import * as THREE from 'three'
+
 import { createTimerClock } from '@/utils/three-utils'
 
 /**

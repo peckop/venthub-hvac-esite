@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ui\Skeleton.tsx
-skeleton_hash: 41c38e19c2e20ef6
+skeleton_hash: 6901832b3f563348
 entity_hashes:
   func:Skeleton: b70faa0883864e7c
   overview: dd78551ca6caccba
   style_tokens: 9afb047eb7d0beac
-generated_at: 2026-05-28T22:37:05Z
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış

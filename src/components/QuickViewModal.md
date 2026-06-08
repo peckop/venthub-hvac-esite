@@ -3,40 +3,41 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\QuickViewModal.tsx
-skeleton_hash: 00d87e64807a05c6
+skeleton_hash: fc9d7ff94e251f3f
 entity_hashes:
   func:QuickViewModal: debc62013d59b5ee
   func:handleAdd: 552a96581034d630
-  overview: 8af2669fbee6ab56
+  overview: c04ebac1db5bee8d
   style_tokens: a0d16d1087294b08
-generated_at: 2026-06-06T21:54:53Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış
-QuickViewModal, ürünlerin hızlı önizlemesini sunan bir modal bileşenidir. Ürün detaylarını görüntüler ve kullanıcıların ürünleri sepete eklemesine olanak tanır. Bileşen, modal durumunu ve kullanıcı etkileşimlerini merkezi olarak yönetir.
+QuickViewModal, ürünlerin hızlı önizlemesini sunan ve kullanıcıların ürünleri doğrudan sepete eklemesine olanak tanıyan bir modal bileşenidir. Bileşen, modal penceresinin görünürlüğünü ve kullanıcı etkileşimlerini yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Modal Bileşeni
-Ürün bilgilerini modal penceresi içinde gösteren ve görünürlük durumunu kontrol eden ana UI bileşenidir.
+Ürün bilgilerini içeren modal penceresini oluşturan ve open/close durumunu kontrol eden ana arayüz bileşenidir.
 - QuickViewModal
 
 ### Ürün Eylem Yönetimi
-Kullanıcı tarafından tetiklenen ürün ekleme işlemi gibi etkileşimleri işleyen yardımcı fonksiyonlardır.
+Kullanıcı arayüzünden tetiklenen, sepete ekleme gibi somut eylemleri işleyen yardımcı fonksiyonlardır.
 - handleAdd
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, bir React bileşeni olup, belirli prop'ların ve bağımlılıkların varlığını gerektirir. Bu koşullar sağlanmadığında bileşen düzgün çalışamaz veya hata verir.
 
-Bu modül, props tabanlı çalışan bir React modal bileşenidir; temel varsayımları fonksiyon imzalarından türetilmiştir.
+[Aksiyom 1]: Eğer `QuickViewModal` bileşenine `product` prop'u geçilmezse veya geçilen değer `null`/`undefined` veya geçersiz bir nesne ise, modal içeriği (örn: ürün adı, fiyatı) düzgün oluşturulamaz ve bileşen render hataları veya eksik veri ile karşılaşır.
 
-[Aksiyom 1]: Eğer `product` prop'u verilmezse veya geçerli bir ürün nesnesi içermiyorsa, modal bileşeni ürün bilgisi gösteremez ve render edilen içerik eksik veya hatalı olur.
+[Aksiyom 2]: Eğer `QuickViewModal` bileşenine `open` prop'u geçilmezse (veya `boolean` bir değer almayan bir değer geçilirse), modal'ın açılıp kapanacağı başlangıç durumu belirsizleşir ve bileşenin render mantığı hatalı çalışabilir (örn: modal hiç açılmayabilir veya her zaman açık kalabilir).
 
-[Aksiyom 2]: Eğer `open` prop'u verilmezse veya `false` değerindeyse, modal.visible durumu kapalıdır ve kullanıcıya modal penceresi gösterilmez.
+[Aksiyom 3]: Eğer `QuickViewModal` bileşenine `onClose` prop'u geçilmezse veya geçilen değer bir fonksiyon (`Function`) değilse, modal'ı kapatmaya yönelik herhangi bir kullanıcı eylemi (örn: kapatma butonuna basma, backdrop'a tıklama) bileşenin iç mantığında işlenemez ve bileşen hata verir.
 
-[Aksiyom 3]: Eğer `onClose` prop'u verilmezse, kullanıcı modal'ı kapatmaya çalıştığında回调 fonksiyon tetiklenemez ve hata oluşur.
+[Aksiyom 4]: Eğer `handleAdd` fonksiyonu tetiklendiğinde, bileşenin dahili durumunda veya üst bileşeninde (`product`'ı tutan) ürün bilgisi (`product` prop'undan gelen) geçerli bir `id` içermiyorsa, sepete ekleme işlemi (muhtemelen bir API çağrısı ile) başarısız olur veya eksik veriyle gerçekleştirilir.
 
-[Aksiyom 4]: `handleAdd()` fonksiyonu çağrıldığında, modal bileşeninin iç bağlamında geçerli bir `product` prop'unun mevcut olması gerekir; aksi takdirde eklenecek ürün bilinmediğinden işlem başarısız olur.
+[Aksiyom 5]: Eğer React veya bileşenin kullandığı UI framework/kütüphanesi (örn: Modal, Button) ortamda mevcut değilse, bileşen hiç oluşturulamaz ve uygulama hata verir.
 
 ---
 
@@ -72,18 +73,19 @@ Bu modül, props tabanlı çalışan bir React modal bileşenidir; temel varsay�
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: QuickViewModal.tsx::QuickViewModal
-- **params**: `{ product, open, onClose }` — product: Product tipinde ürün nesnesi, open: boolean modalın açık olup olmadığını belirler, onClose: callback modalı kapatmak için çağrılır
+- **params**: `{ product, open, onClose }` — destructured obje parametreleri: `product` (Product tipinde ürün nesnesi), `open` (boolean, modalin açık olup olmadığı), `onClose` (modalin kapatılma callback fonksiyonu)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan dönen çeviri fonksiyonu, UI metinlerini uluslararası dil anahtarlarıyla çevirir (t('quickView.title'), t('quickView.addToCart') vb.)
-  - `lang` — useI18n hook'undan dönen aktif dil kodu, formatCurrency'e aktarılarak para birimi formatlamada kullanılır
-  - `addToCart` — useCart hook'undan dönen fonksiyon, verilen Product nesnesini sepete ekler
-  - `price` — Number(product.price) ile product.price'ın number tipine dönüştürülmüş hali, formatCurrency fonksiyonuna argüman olarak geçilir
-- **Dönüş**: `JSX.Element | null` — open veya product falsy ise null döner; aksi halde modal JSX yapısını (dialog, ürün bilgileri, Sepete Ekle ve Ürünü Gör butonları) döner
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('quickView.title')`, `t('quickView.close')` gibi anahtarlarla UI metinlerini çevirir
+  - `lang` — `useI18n()` hook'undan dönen dil kodu string'i; `formatCurrency` çağrısına passed olarak para birimi formatlamada kullanılır
+  - `addToCart` — `useCart()` hook'undan dönen sepete ürün ekleme fonksiyonu; `handleAdd` içinde `addToCart(product)` olarak çağrılır
+  - `price` — `Number(product.price)` ifadesinden türetilen number tipinde fiyat değeri; `formatCurrency(price, lang, ...)` çağrısına passed olarak kullanılır
+  - `handleAd` — parametre almayan arrow function; `addToCart(product)` çağrısı yapar ardından `onClose()` ile modali kapatır
+- **Dönüş**: JSX — `return null` (open veya product falsy ise) veya dialog HTML'i (jsx element ağacı)
 
 ### [N2_NASIL] AST Pointer: QuickViewModal.tsx::handleAdd
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — addToCart(product) ile ürünü sepete ekler, ardından onClose() ile modalı kapatır
+- **ic_degiskenler**: (yok — sadece dış kapsam değişkenleri kullanılır: `addToCart`, `product`, `onClose`)
+- **Dönüş**: yok (undefined) — `addToCart(product)` ile ürünü sepete ekler, `onClose()` ile modalı kapatır; dönüş değeri döndürmez, yalnızca yan etki üretir
 
 ---
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+
 import { useI18n } from '../i18n/I18nProvider'
 import { DomainCategory, DomainProduct, mapCategoryWithLocale } from '../lib/type-converters'
 import type { DbCategory } from '../types/db-rows'

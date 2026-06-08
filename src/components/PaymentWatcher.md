@@ -3,25 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\PaymentWatcher.tsx
-skeleton_hash: 7050f48919ee7325
+skeleton_hash: 9d41c497ac981f87
 entity_hashes:
   func:PaymentWatcher: 0d799bcd7a7c68f4
-  overview: 5bfe4be680217e97
+  overview: cac0a3def1dcd9ec
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:44Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış
-PaymentWatcher modülü, kullanıcı oturumu sırasında ödeme durumunu periyodik olarak izleyen ve gerekli durumlarda yönlendirme yapan bir React bileşenidir. Bileşen, arka planda sessizce çalışarak siparişlerin ödeme durumunu kontrol eder ve kullanıcıya doğrudan görünür bir arayüz sunmaz.
+PaymentWatcher modülü, uygulama genelinde ödeme durumunu arka planda sürekli olarak izleyen bir React bileşenidir. Kullanıcıya herhangi bir arayüz göstermeden, belirli aralıklarla ödeme durumunu kontrol ederek ilgili durumlarda otomatik yönlendirmeler veya durum güncellemeleri yapar.
 
 ## Fonksiyon Grupları
-### Bileşen Tanımı
-Bileşenin temel yapısını, iç durumunu ve periyodik kontrol mekanizmasını tanımlayan ana fonksiyondur.
+### Bileşen Tanımı ve İzleme Mantığı
+Modülün temel yapısını ve periyodik izleme mekanizmasını tanımlayan ana bileşen fonksiyonunu içerir. Bu grup, bileşenin iç durumunu, zamanlayıcı referanslarını ve durum kontrol mantığını bir arada yönetir.
 - PaymentWatcher
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+PaymentWatcher modülü, parametre almayan bir React bileşenidir ve sadece fonksiyon imzasına dayalı sınırlı bilgi mevcuttur.
+
+[Aksiyom 1]: Eğer React Runtime (React kütüphanesi ve bileşen hiyerarşisi) yoksa, bileşen doğru şekilde render edilmez.
+
+[Aksiyom 2]: Eğer bileşen için geçerli bir React Context veya global state kaynağı (Redux, Zustand vb.) yoksa, PaymentWatcher'ın izleyeceği ödeme siparişlerine erişimi olmaz ve işlevselliği çalışmaz.
+
+[Aksiyom 3]: Eğer tarayıcı ortamı (veya React DOM/Server-Side Rendering ortamı) yoksa, bileşen DOM'a bağlanamaz ve periyodik izleme döngüsü başlatılamaz.
 
 ---
 
@@ -42,45 +50,39 @@ Bileşenin temel yapısını, iç durumunu ve periyodik kontrol mekanizmasını 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: PaymentWatcher.tsx::PaymentWatcher
-- **params**: ()
+### [N1_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::PaymentWatcher
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `router` — useRouter() hook'unun dönüşü, Next.js programatik navigasyon (router.push) için
-  - `checkingRef` — useRef(false), checkOnce'un eşzamanlı çalışmasını önleyen boolean lock
-  - `timerRef` — useRef\<number | null\>(null), periyodik setInterval timer ID'sini tutan referans
-  - `pathname` — usePathname() hook'unun dönüşü, mevcut URL path bilgisi
-  - `checkOnce` — useCallback ile tanımlanmış async fonksiyon, sipariş ödeme durumunu Supabase'den kontrol eder
-- **Dönüş**: `null` (React.FC — render edeceği bir JSX yok, sadece side-effect yönetimi yapar)
+  - `router` — useRouter() hook'undan gelen Next.js router instance'ı, programmatic navigasyon için kullanılır
+  - `checkingRef` — useRef<boolean>, checkOnce'ın eşzamanlı çalışmasını engelleyen guard flag tutar
+  - `timerRef` — useRef<number | null>, periyodik checkOnce çağrısını tutan interval ID'si
+  - `pathname` — usePathname() hook'undan gelen mevcut URL path string'i
+  - `checkOnce` — useCallback ile tanımlı async fonksiyon, localStorage'dan sipariş bilgisini okur ve Supabase'den sipariş durumunu kontrol eder
+- **Dönüş**: JSX null döner (yarn component, yalnızca yan etkileri vardır)
 
----
-
-### [N2_NASIL] AST Pointer: PaymentWatcher.tsx::checkOnce (useCallback içindeki async fn)
-- **params**: ()
+### [N2_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::PaymentWatcher::checkOnce
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `raw` — localStorage.getItem(STORAGE_KEY) ile okunan ham JSON string; bekleyen sipariş verisi yoksa fonksiyon erken dönüş yapar
-  - `data` — JSON.parse(raw || '{}') ile parse edilmiş nesne, `{ orderId?: string, conversationId?: string }` yapısında
-  - `orderId` — `data.orderId`'den çıkarılan sipariş ID'si, Supabase sorgusunda filtre parametresi olarak kullanılır
-  - `supabase` — `await import('../lib/supabase')` ile dinamik olarak yüklenen Supabase istemci nesnesi
-  - `row` — `supabase.from('venthub_orders').select('status').eq('id', orderId).maybeSingle()` sorgusunun `data` dönüşü; venthub_orders tablosundan gelen tek satır, `row.status` alanı kontrol edilir (`'paid'` veya `'failed'`)
-  - `error` — aynı Supabase sorgusunun `error` dönüşü; null ise sorgu başarılı demektir
-- **Dönüş**: void (implicit) — localStorage temizler ve `router.push(...)` ile sayfa yönlendirmesi yapar (yan etki)
+  - `raw` — localStorage.getItem(STORAGE_KEY) ile okunan ham JSON string'i veya null
+  - `data` — JSON.parse(raw || '{}') sonucu elde edilen `{ orderId?: string, conversationId?: string }` tipinde parsed obje
+  - `orderId` — data.orderId erişimi ile elde edilen sipariş ID string'i
+  - `supabase` — dinamik import ile yüklenen supabaseBrowserClient instance'ı
+  - `row` — supabase.from('venthub_orders').select('status').eq('id', orderId).maybeSingle() sorgusundan dönen veri satırı
+  - `error` — aynı Supabase sorgusundan dönen hata nesnesi
+- **Dönüş**: void (Promise<void)), fonksiyon localStorage temizler ve router.push ile navigasyon yapar
 
----
-
-### [N3_NASIL] AST Pointer: PaymentWatcher.tsx::useEffect callback
-- **params**: ()
+### [N3_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::PaymentWatcher::useEffect_callback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `onFocus` — window `focus` olay handler'ı; pencere odaklandığında `checkOnce()` çağırır
-  - `onVisibility` — document `visibilitychange` olay handler'ı; `document.visibilityState === 'visible'` ise `checkOnce()` çağırır
-  - `raw` — localStorage.getItem(STORAGE_KEY) ile okunan ham JSON string; eğer veri varsa periyodik kontrol (setInterval) başlatılır
-- **Dönüş**: cleanup fonksiyonu — event listener'ları kaldırır ve interval timer'ı temizler
+  - `onFocus` — window focus olayında checkOnce çağıran callback
+  - `onVisibility` — document visibilitychange olayında visible ise checkOnce çağıran callback
+  - `raw` — localStorage.getItem(STORAGE_KEY) ile okunan ham JSON string'i veya null, bekleyen sipariş olup olmadığını kontrol eder
+- **Dönüş**: temizleme fonksiyonu döner — event listener'ları kaldırır ve interval'ı temizler
 
----
-
-### [N4_NASIL] AST Pointer: PaymentWatcher.tsx::useEffect cleanup function
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — `window.removeEventListener('focus', onFocus)`, `document.removeEventListener('visibilitychange', onVisibility)` ve `window.clearInterval(timerRef.current)` ile kaynakları serbest bırakır
+### [N4_NASIL] AST Pointer: src/components/PaymentWatcher.tsx::PaymentWatcher::useEffect_cleanup
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — yalnızca outer scope'taki onFocus, onVisibility ve timerRef kullanılır)
+- **Dönüş**: void, event listener'ları ve interval'ı temizler
 
 ---
 

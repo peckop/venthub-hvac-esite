@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\tenantServer.ts
-skeleton_hash: e7f4cca016770c0a
+skeleton_hash: 8a002d69b08c384d
 entity_hashes:
   overview: 3d351754b3018bf8
-generated_at: 2026-06-07T18:03:35Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış
@@ -25,18 +25,6 @@ Modül, `next/headers` paketinden `headers` import ederek HTTP istek bağlamın�
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, çok kiracılı (multi-tenant) mimaride kiracı yapılandırma bilgisini sağlayan bir yardımcı modüldür. Aşağıdaki varsayımlar, mevcut modül sabitlerine dayanarak çıkarılmıştır.
-
----
-
-[Aksiyom 1]: Eğer `DEFAULT_TENANT_CONFIG` sabiti tanımlı değilse veya boş/niteliksiz bir değer içeriyorsa, geçerli kiracı bulunamadığında yapılandırma döndürme işlemi başarısız olur veya tutarsız davranış gözlemlenir.
-
-[Aksiyom 2]: Eğer `getTenantConfig` fonksiyonu çağrılamıyorsa (örn. modül yüklenememişse), uygulama genelinde kiracıya özgü yapılandırma bilgilerine erişilemez ve varsayılan/boş bir yapılandırma kullanılması gerekebilir.
-
-[Aksiyom 3]: Eğer `DEFAULT_TENANT_CONFIG` bir nesne (`object`) olarak tanımlı değilse (örn. `null`, `undefined` veya farklı bir tipte ise), beklenmeyen yapılandırma erişim hataları oluşur.
-
----
-
-> **Not:** Fonksiyon gövdesi (gövde kodu) elimde mevcut olmadığından, bu aksiyomlar yalnızca modül sabitleri (`DEFAULT_TENANT_CONFIG`, `getTenantConfig`) ve modülün amaç tanımı üzerinden çıkarılmıştır. Fonksiyon imzası parametreleri, hata yönetimi veya asenkron akış detayları hakkında bilinmediği için hüküm verilmemiştir.
 
 ---
 

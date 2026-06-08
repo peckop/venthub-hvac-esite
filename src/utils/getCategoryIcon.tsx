@@ -1,13 +1,14 @@
 import React from 'react'
+
 import { 
-  FanIcon,
-  HeatRecoveryIcon,
-  AirCurtainIcon,
-  DehumidifierIcon,
-  AirPurifierIcon,
-  FlexibleDuctIcon,
-  SpeedControlIcon,
   AccessoriesIcon,
+  AirCurtainIcon,
+  AirPurifierIcon,
+  DehumidifierIcon,
+  FanIcon,
+  FlexibleDuctIcon,
+  HeatRecoveryIcon,
+  SpeedControlIcon,
 } from '../components/HVACIcons'
 
 type IconProps = { className?: string; size?: number }

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\CategoryCard3D.tsx
-skeleton_hash: 77426920db7b1025
+skeleton_hash: 5c4932d8c2869a5e
 entity_hashes:
   func:CategoryCard3D: b1d42c0fbbe60533
   overview: be950cf7f49cb0f6
   style_tokens: 72417c9ee963573b
-generated_at: 2026-06-06T21:54:41Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış

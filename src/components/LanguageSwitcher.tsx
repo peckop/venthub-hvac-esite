@@ -1,9 +1,10 @@
 'use client'
 
-import React from 'react'
-import { useI18n } from '../i18n/I18nProvider'
-import { usePathname, useRouter } from 'next/navigation'
 import type { Route } from 'next'
+import { usePathname, useRouter } from 'next/navigation'
+import React from 'react'
+
+import { useI18n } from '../i18n/I18nProvider'
 
 const LanguageSwitcher: React.FC = () => {
   const { lang, setLang, t } = useI18n()

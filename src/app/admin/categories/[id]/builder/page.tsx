@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import React, { use } from 'react';
+
 import CategoryBuilderView from '@/views/admin/CategoryBuilderView';
 
 /**

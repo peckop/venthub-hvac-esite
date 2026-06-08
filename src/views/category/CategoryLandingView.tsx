@@ -1,29 +1,29 @@
 'use client';
-import { Routes } from '../../utils/routes'
+import { Info } from 'lucide-react'
+import Image from 'next/image'
+import React, { useEffect,useRef, useState } from 'react'
 
-import React, { useState, useRef, useEffect } from 'react'
-import { type DomainProduct } from '../../lib/type-converters'
-import ProductCard from '@/components/ProductCard'
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
 import {
-    ProblemSection,
-    HowItWorks,
-    VorticeBrand,
-    TypeComparison,
-    FAQ,
-    TrustSignals,
     BottomCTA,
-    SilentFanProblem,
+    FAQ,
+    HowItWorks,
+    ProblemSection,
+    SilentFanFAQ,
     SilentFanHowItWorks,
-    SilentFanVorticeBrand,
+    SilentFanProblem,
     SilentFanTypeComparison,
-    SilentFanFAQ
-} from '@/components/category/sections'
-import { DomainCategory } from '../../lib/type-converters'
-import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
-import Image from 'next/image'
-import { Info } from 'lucide-react'
+    SilentFanVorticeBrand,
+    TrustSignals,
+    TypeComparison,
+    VorticeBrand} from '@/components/category/sections'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
+import ProductCard from '@/components/ProductCard'
+
+import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { type DomainProduct } from '../../lib/type-converters'
+import { DomainCategory } from '../../lib/type-converters'
+import { Routes } from '../../utils/routes'
 
 interface CategoryLandingProps {
     category: DomainCategory

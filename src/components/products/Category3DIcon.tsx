@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
 import { Html } from '@react-three/drei'
-import { MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useFrame } from '@react-three/fiber'
+import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'
+import React, { useRef } from 'react'
+import * as THREE from 'three'
+
 import { FanRenderer } from './3d/FanRenderer'
 
 interface Category3DIconProps {

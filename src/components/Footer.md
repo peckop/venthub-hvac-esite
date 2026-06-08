@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\Footer.tsx
-skeleton_hash: 5daa350ee98ba5a3
+skeleton_hash: 6f896fbcf16d9062
 entity_hashes:
   func:Footer: 1e0192e85e1f6373
   overview: 05f327193547be84
   style_tokens: bb9551672f956ab8
-generated_at: 2026-05-28T22:35:50Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış

@@ -3,24 +3,24 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersBoard.tsx
-skeleton_hash: deea265d79bc82cb
+skeleton_hash: 47ad9cc02026fd33
 entity_hashes:
   func:AdminOrdersBoard: 95304a8afde2c182
   func:MiniDetailPanel: 57eeb99849ddcfbc
   func:OrderStepper: d81db7fb6641c248
   func:getEffectiveStatus: ea418f0307dfab79
   func:shardColor: 021e3e606c5c9dff
-  overview: 0c689c2281ea8969
+  overview: a6538e3c80a6a051
   style_tokens: fede8f2e3790a5c2
-generated_at: 2026-06-06T21:58:03Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelinde siparişlerin durumlarını kart tabanlı bir panoda görselleştirmek için kullanılan bir React bileşenidir. Her sipariş için etkili durumu hesaplar, duruma göre renklendirme yapar, durum değişimlerini adım adım gösterir ve detaylı bilgi paneli sunar.
+Bu modül, yönetim panelinde siparişlerin durumlarını kart tabanlı, interaktif bir panoda görselleştirmek için kullanılan bir React bileşenidir. Her sipariş için hesaplanan etkili duruma göre renklendirme, adım adım durum gösterimi ve detaylı bilgi paneli sunarak sipariş yönetimi akışını destekler.
 
 ## Fonksiyon Grupları
 ### Ana ve Alt Bileşenler
-Kullanıcı arayüzünü oluşturan React bileşenleridir. Ana sipariş panosunu, her bir sipariş kartındaki durum gösterimini ve sipariş detaylarının açılabilir panelini yönetir.
+Kullanıcı arayüzünü oluşturan React bileşenleridir. Ana sipariş panosunu, her bir sipariş kartındaki durum ilerlemesini ve sipariş detaylarının açılabilir mini panelini yönetir.
 - AdminOrdersBoard, OrderStepper, MiniDetailPanel
 
 ### Yardımcı İş Mantığı Fonksiyonları
@@ -31,21 +31,19 @@ UI bileşenlerinden soyutlanmış, hesaplama ve stil belirleme işlerini yapan s
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, sipariş yönetimi panosu için durum hesaplama ve görselleştirme akışını tanımlar.
+Bu modül için, fonksiyon gövdelerindeki imza ve bağımlılıklara dayanan temel mimari varsayımlar şunlardır:
 
-[Aksiyom 1]: Eğer `AdminOrderRow` tipi tanımlı değilse veya geçerli bir sipariş nesnesi içermiyorsa, `getEffectiveStatus` fonksiyonu tanımsız davranış gösterir.
+[Aksiyom 1]: Eğer `getEffectiveStatus` fonksiyonuna geçerli bir `AdminOrderRow` nesnesi (`order`) verilmezse, fonksiyon beklenmedik bir hata fırlatabilir veya tanımsız bir değer döndürebilir; bu durumda `shardColor` ve `OrderStepper` bileşenleri yanlış durum bilgisiyle çalışır.
 
-[Aksiyom 2]: Eğer `getEffectiveStatus` geçerli bir `AdminOrderRow` alamazsa veya hesaplama başarısız olursa, `OrderStepper` bileşeni geçersiz bir `status` string'i alır ve UI'da hatalı durum gösterimi oluşur.
+[Aksiyom 2]: Eğer `OrderStepper` bileşenine geçerli bir `status` stringi verilmezse (null, undefined veya boş string), adım gösterimi doğru render edilmeyebilir veya hata oluşabilir.
 
-[Aksiyom 3]: Eğer `MiniDetailPanel` bileşenine `onClose` callback'i sağlanmazsa, panel kapatılamaz ve kullanıcı detay görüntülerken panele kilitlenir.
+[Aksiyom 3]: Eğer `MiniDetailPanel` bileşenine geçerli bir `order` nesnesi, `onClose` fonksiyonu veya `hasWriteAccess` boolean değeri verilmezse, panel düzgün çalışmayabilir; örneğin, kapatma butonu çalışmaz veya yazma izni gerektiren kontroller hatalı davranır.
 
-[Aksiyom 4]: Eğer `MiniDetailPanel` bileşenine `hasWriteAccess: false` olarak geçilirse, sipariş üzerinde düzenleme/değişiklik işlemleri kullanıcıya sunulmaz (salt okunur mod).
+[Aksiyom 4]: Eğer `shardColor` fonksiyonuna geçerli bir `status` stringi veya `isDragging` boolean değeri verilmezse, uygun renk değeri döndüremeyebilir; bu durumda UI'da renksiz veya hatalı bir kart görüntüsü oluşabilir.
 
-[Aksiyom 5]: Eğer `shardColor` fonksiyonuna geçerli bir `status` string'i verilmezse, kart rengi belirsiz (varsayılan/tanımsız) olur ve sürükleme sırasında görsel ayrım kaybolur.
+[Aksiyom 5]: Eğer `AdminOrdersBoard` ana bileşeni, alt bileşenlere (`OrderStepper`, `MiniDetailPanel`) doğru verileri (örneğin, `status`, `order`, `onClose`, `hasWriteAccess`) iletmezse, tüm board düzgün çalışmayabilir.
 
-[Aksiyom 6]: Eğer `isDragging` durumu `true` iken `shardColor` farklı bir renk döndürmezse, sürükleme sırasında aktif kart ile diğer kartlar arasında görsel ayrım yapılamaz.
-
-[Aksiyom 7]: Eğer `AdminOrdersBoard` bileşeni içinde sipariş listesi boşsa, panoda gösterilecek herhangi bir kart veya `OrderStepper` bileşeni render edilmez.
+[Aksiyom 6]: Eğer `getEffectiveStatus` fonksiyonu, `AdminOrderRow` nesnesinin iç yapısına (örneğin, `status` alanına) erişemezse, etkili durum hesaplanamaz; bu durumda `shardColor` ile `OrderStepper` yanlış durum bilgisiyle çalışır ve UI tutarsız hale gelir.
 
 ---
 
@@ -142,81 +140,10 @@ type ColumnId = 'col_new' | 'col_prep' | 'col_shipped' | 'col_done' | 'col_cance
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminOrdersBoard.tsx::getEffectiveStatus
-- **params**: `(order: AdminOrderRow)` — tek bir sipariş satırı nesnesi
+- **params**: `(order: AdminOrderRow)` — sipariş nesnesi
 - **ic_degiskenler**:
-  *(fonksiyon gövdesinde yerel değişken tanımlanmamıştır; doğrudan parametre özellikleri üzerinden karar verilir)*
-- **Dönüş**: `string` — refund/partial_refunded ise `order.payment_status`, aksi halde `order.status` veya `'pending'`
-
----
-
-### [N2_NASIL] AST Pointer: src/views/admin/AdminOrdersBoard.tsx::OrderStepper
-- **params**: `{ status }: { status: string }` — siparişin mevcut durumunu temsil eden string
-- **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; stepper etiketlerinin lokalize edilmesi için kullanılır
-  - `steps` — 5 elemanlı dizi; her eleman `{ key, label }` formatında tanımlı stepper adımları (pending → paid → confirmed → shipped → delivered)
-  - `getStepIndex` — inner fonksiyon; status string'ini 0–4 arası tam sayi indekse dönüştürür (completed/delivered → 4, shipped → 3, confirmed/processing → 2, paid → 1, diğer → 0)
-  - `currentIndex` — `getStepIndex(status)` çağrısıyla elde edilen mevcut adım indeksi
-  - `isCancelled` — boolean; status `'cancelled'`, `'refunded'` veya `'partial_refunded'` ise true
-- **Dönüş**: JSX elementi (ReactNode) — iptal durumunda rose renkli uyarı div'i, normal durumda progress bar ve adım noktaları içeren JSX
-
----
-
-### [N3_NASIL] AST Pointer: src/views/admin/AdminOrdersBoard.tsx::MiniDetailPanel
-- **params**: `(order: AdminOrderRow, onClose: () => void, hasWriteAccess: boolean)` — sipariş nesnesi, kapatma callback'i, yazma izni flag'i
-- **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; tüm UI metinlerinin lokalize edilmesi için kullanılır
-  - `lang` — `useI18n()` hook'undan dönen dil kodu; `formatCurrency` ve `formatDateTime` çağrılarına geçirilir
-  - `detail` — `useState<OrderDetail | null>(null)` ile tanımlı state; sipariş notları, email logları, kargo taşıyıcı ve takip numarasını tutar
-  - `loading` — `useState(true)` ile tanımlı state; veri yüklenirken true, yükleme tamamlanınca false olur
-  - `noteInput` — `useState('')` ile tanımlı state; not ekleme input'unun değeri
-  - `saving` — `useState(false)` ile tanımlı state; not kaydedilirken true, işlem bitince false olur
-  - `mounted` — `useEffect` içinde tanımlı boolean flag; bileşen unmount olduktan sonra state güncellemesini engeller (cleanup)
-  - `load` — async inner fonksiyon; `ensureSessionFresh()` çağırır, ardından `Promise.all` ile üç supabase sorgusunu paralel çalıştırır:
-    - `notesRes` — `supabase.from('order_notes').select('id,note,created_at').eq('order_id', order.id)` çağrısının sonucu (en fazla 5 not)
-    - `logsRes` — `supabase.from('shipping_email_events').select('subject,created_at').eq('order_id', order.id)` çağrısının sonucu (en fazla 3 email logu)
-    - `orderRes` — `supabase.from('venthub_orders').select('carrier,tracking_number').eq('id', order.id).maybeSingle()` çağrısının sonucu; `orderRes.data?.carrier` ve `orderRes.data?.tracking_number` erişimleri ile kargo bilgileri alınır
-  - `addNote` — async fonksiyon; `hasWriteAccess` kontrol eder, `noteInput.trim()` doğrulaması yapar, `supabase.from('order_notes').insert({ order_id: order.id, note: noteInput.trim() }).select('id,note,created_at').single()` ile yeni not ekler, `setDetail` ile mevcut notlar dizisinin başına ekler, `setNoteInput('')` ile input'u temizler
-- **Dönüş**: JSX elementi (ReactNode) — modal overlay, sipariş detayları, OrderStepper, kargo bilgisi, not listesi ve email logları içeren JSX
-
----
-
-### [N4_NASIL] AST Pointer: src/views/admin/AdminOrdersBoard.tsx::AdminOrdersBoard
-- **params**: *(parametre yok)*
-- **ic_degiskenler**:
-  - `pathname` — `usePathname()` hook'undan dönen mevcut URL yolu; `useEffect` bağımlılık dizisinde kullanılır
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; tüm UI metinleri, toast mesajları, sütun başlıkları için kullanılır
-  - `lang` — `useI18n()` hook'undan dönen dil kodu; `formatCurrency` ve `formatDateTime` çağrılarına geçirilir
-  - `canWrite` — `useRole()` hook'undan dönen izin kontrol fonksiyonu
-  - `hasWriteAccess` — `canWrite('orders')` çağrısıyla elde edilen boolean; sürükleme ve not ekleme işlemlerine izin verilip verilmeyeceğini belirler
-  - `orders` — `useState<AdminOrderRow[]>([])` ile tanımlı state; tüm siparişlerin dizisi
-  - `loading` — `useState(true)` ile tanımlı state; yükleme durumu
-  - `selectedOrder` — `useState<AdminOrderRow | null>(null)` ile tanımlı state; MiniDetailPanel'de gösterilecek seçili sipariş
-  - `expandedCol` — `useState<ColumnId | null>('col_new')` ile tanımlı state; mobil görünümde hangi sütunun genişletildiğini tutar
-  - `scrollRef` — `useRef<HTMLDivElement>(null)` ile tanımlı ref; board container'ının scroll kontrolü için kullanılır
-  - `COLUMNS` — `React.useMemo` ile tanımlı `ColumnDef[]` dizisi; 6 sütun tanımı (col_new, col_prep, col_shipped, col_done, col_cancel, col_refund), her biri `{ id, title, statuses, icon, colorClass, bgClass, targetStatus }` yapısındadır; `t` bağımlılığı ile yeniden hesaplanır
-  - `fetchOrders` — `useCallback` ile sarılı async fonksiyon; `ensureSessionFresh()` çağırır, `supabase.from('view_admin_orders').select('id,status,user_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone,payment_status').order('created_at', { ascending: false }).limit(200)` sorgusuyla siparişleri çeker, `setOrders(data as AdminOrderRow[])` ile state'i günceller; hata durumunda `toast.error` gösterir; `t` bağımlılığı ile memoize edilmiştir
-  - `scrollBoard` — `(direction: 'left' | 'right') => void` fonksiyonu; `scrollRef.current.scrollBy` ile 340px'lik smooth yatay kaydırma yapar
-  - `getOrdersByCol` — `(colId: ColumnId) => AdminOrderRow[]` fonksiyonu; `COLUMNS.find` ile sütun tanımını bulur, `orders.filter` ile ilgili sütunun `statuses` dizisindeki durumlara eşleşen siparişleri döndürür; `getEffectiveStatus` çağrısı ile her siparişin efektif durumunu hesaplar
-  - `onDragEnd` — `async (result: DropResult) => void` fonksiyonu; sürükle-bırak sonucunu işler:
-    - `result`'tan `destination`, `source`, `draggableId` destructuring ile alınır
-    - `destCol` — `COLUMNS.find(c => c.id === destination.droppableId)` ile hedef sütun tanımı
-    - `targetOrder` — `orders.find(o => o.id === draggableId)` ile sürüklünen sipariş nesnesi
-    - `targetStatus` — `destCol.targetStatus` ile hedef durum stringi
-    - `effectiveCurrent` — `getEffectiveStatus(targetOrder)` ile mevcut efektif durum
-    - `oldStatus` — `targetOrder.status` ile değiştirme öncesi orijinal durum
-    -乐观更新: `setOrders(prev => prev.map(...))` ile orders state'ini anlık günceller (refunded durumunda status='cancelled' + payment_status='refunded', diğer durumlarda status=targetStatus)
-    - `res` — `await updateOrderStatus({ orderId: draggableId, newStatus: targetStatus, oldStatus, userId: targetOrder.user_id, reason, auditComment })` API çağrısının sonucu
-    - Başarılıysa `toast.success`, başarısızsa eski duruma geri alma + `toast.error` + `fetchOrders()` çağrısı
-- **Dönüş**: JSX elementi (ReactNode) — loading durumunda AdminSkeleton, normal durumda toolbar, mobil tab-switcher, DragDropContext ile sütunlar ve kartlar, MiniDetailPanel içeren tam sayfa JSX
-
----
-
-### [N5_NASIL] AST Pointer: src/views/admin/AdminOrdersBoard.tsx::shardColor
-- **params**: `(status: string, isDragging: boolean)` — sipariş durumu stringi ve sürükleme durumu flag'i
-- **ic_degiskenler**:
-  - `base` — `status.toLowerCase()` ile küçük harfe dönüştürülmüş durum stringi; case-insensitive karşılaştırma için kullanılır
-  - `color` — string; başlangıçta `'bg-slate-500/20'` değerine sahip, `base` değerine göre conditionally güncellenen Tailwind arka plan rengi class'i (pending → amber, paid/confirmed/processing → cyan, shipped → blue, delivered/completed → emerald, cancelled → rose, refunded/partial_refunded → orange)
-- **Dönüş**: JSX elementi veya `null` — `isDragging` true ise `null`, aksi halde duruma göre renkli blur efektli `<div>` elementi; sürükleme sırasında kartların arka planını süslemek için kullanılır
+  - Değişken yok, sadece parametre üzerinde `order.payment_status` ve `order.status` erişimi yapılır
+- **Dönüş**: `string` — effective durum stringi (payment_status refunded/partial_refunded ise onu, değilse order.status veya 'pending' döner)
 
 ---
 

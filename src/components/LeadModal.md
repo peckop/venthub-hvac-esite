@@ -3,49 +3,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx
-skeleton_hash: e05ac99c5e8bf5bc
+skeleton_hash: 1650fa7e88723541
 entity_hashes:
   func:LeadModal: d62325f85f800f09
   func:handleClose: 63d7dd03089c88aa
   func:submit: 57ac99ffc1840be0
   func:validate: 3e57d313017d2565
-  overview: 666966080ef15820
+  overview: a3ddac6f1a67af59
   style_tokens: 671fc429a274af0c
-generated_at: 2026-05-28T22:36:04Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış
-`LeadModal` bileşeni, bir ürünle ilgili potansiyel müşteri (lead) bilgilerini toplamak için kullanılan bir modal penceresidir. Açılma/kapanma kontrolü, form doğrulama ve gönderim işlemlerini içerir.
+`LeadModal` bileşeni, ürünlerle ilgili potansiyel müşteri (lead) bilgilerini toplamak için kullanılan bir modal form penceresidir. Bileşen, form alanlarının doğrulamasını, gönderim işlemini ve modalın açılıp kapanma kontrollerini yönetir.
 
 ## Fonksiyon Grupları
 ### Modal Kontrol ve Render
-Modalın görünürlüğünü yönetir, kapanma olayını işler ve JSX çıktısını üretir.  
+Modalın açılıp kapanmasını kontrol eder, prop'lar aracılığıyla görünürlüğü yönetir ve form alanlarını içeren JSX yapısını render eder.
 - LeadModal
 
 ### Form Doğrulama
-Kullanıcı tarafından girilen verilerin geçerliliğini kontrol eder.  
+Kullanıcı tarafından doldurulan form alanlarının geçerliliğini kontrol eder; zorunlu alanların doluluğunu ve veri formatlarını doğrular.
 - validate
 
 ### Form İşleme
-Form gönderildiğinde olayları yakalar, doğrulama çalıştırır ve başarılı ise veriyi işler; ayrıca hata durumlarını yönetir.  
+Form gönderim olayını yakalayarak doğrulama çalıştırır, başarılı ise lead verisini işler; ayrıca modal kapatma işlemini ve ilgili callback çağrısını yönetir.
 - submit, handleClose
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Aksiyom 1**: Eğer `LeadModal` bileşenine `open` prop’u sağlanmazsa, modal hiçbir zaman görüntülenmez.  
-**Aksiyom 2**: Eğer `LeadModal` bileşenine `onClose` callback’i sağlanmazsa, modal kapatılmaya çalışıldığında bir hata oluşur ve UI’da “close” işlemi gerçekleşmez.  
-**Aksiyom 3**: Eğer `LeadModal` bileşenine `productName` prop’u sağlanmazsa, modal içinde ürün adı gösterilemez; bu durum UI’da boş bir alan ya da “bilinmiyor” metni olarak ortaya çıkar.  
-**Aksiyom 4**: Eğer `LeadModal` bileşenine `_productId` (alias `__productId`) prop’u sağlanmazsa, `validate` ve `submit` fonksiyonları ürün kimliğine erişemez ve ilgili iş mantığı (ör. API çağrısı) çalışmaz.  
-**Aksiyom 5**: Eğer `validate()` fonksiyonu çağrıldığında gerekli form alanları (ör. isim, e‑posta vb.) eksik ya da geçersizse, `validate` `false` döner ve form gönderimi engellenir.  
-**Aksiyom 6**: Eğer `submit(e)` fonksiyonu çağrıldığında `e` bir `React.FormEvent` nesnesi değilse, fonksiyon içinde `preventDefault()` çağrısı başarısız olur ve sayfa yenilenmesi gerçekleşir.  
-**Aksiyom 7**: Eğer `submit(e)` fonksiyonu içinde `validate()` `false` dönerse, `submit` işlemine devam edilmez ve form verileri gönderilmez.  
-**Aksiyom 8**: Eğer `handleClose()` fonksiyonu çağrıldığında `onClose` callback’i tanımlı değilse, modal kapanmaz ve UI’da “close” butonu işlevsiz kalır.  
-**Aksiyom 9**: Eğer `handleClose()` fonksiyonu çağrıldığında `onClose` tanımlıysa, `onClose` callback’i çalıştırılır ve modal kapanır.  
-
-*Domain‑specific notlar*: Bu aksiyomlar, `LeadModal` bileşeninin doğru çalışması için gerekli olan temel prop ve fonksiyon davranışlarını tanımlar; değer sınırları veya kabul kriterleri fonksiyon gövdesinde belirtilmediği için “bilinmiyor” olarak bırakılmıştır.
+Bu modül için fonksiyon gövdeleri paylaşılmadığı için çıkarılabilir mimari varsayımlar üretilememektedir. Fonksiyon gövdesi içeriği olmadan, modülün doğru çalışması için gerekli koşullar (form alanlarının varlığı, API çağrılarının koşulları, state güncellemelerinin gereklilikleri vb.) tespit edilemez.
 
 ---
 
@@ -94,40 +83,34 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/LeadModal.tsx::validate
-- **params**: (none)
+### [N1_NASIL] AST Pointer: src/components/LeadModal.tsx::LeadModal
+- **params**: (open, onClose, productName, __productId)
+  - `open` — boolean, modal'ın açık olup olmadığını kontrol eder
+  - `onClose` — function, modal kapatma fonksiyonu
+  - `productName` — string, ürün adı, varsayılan mesajda kullanılır
+  - `__productId` — string, ürün ID'si (prop'tan yeniden adlandırılmış)
 - **ic_degiskenler**:
-  - `e` — boş nesne (`Record<string, string>`) oluşturur; hataları tutmak için kullanılır.
-  - `name` — bileşenin `name` state’ini temsil eder; boşsa `e.name` e hata mesajı atanır.
-  - `email` — bileşenin `email` state’ini temsil eder; boşsa `e.contact` e hata mesajı atanır.
-  - `phone` — bileşenin `phone` state’ini temsil eder; boşsa `e.contact` e hata mesajı atanır.
-  - `consent` — bileşenin `consent` state’ini temsil eder; `false` ise `e.consent` e hata mesajı atanır.
-  - `t` — i18n çeviri fonksiyonu; hata mesajlarını çevirir.
-- **Dönüş**: `Record<string, string>` – topladığı hataları döndürür.
+  - (fonksiyon gövdesi verilmemiş, sadece inner fonksiyonlar var)
+- **Dönüş**: React.FC<LeadModalProps> (modal bileşenini render eder)
 
-### [N2_NASIL] AST Pointer: src/components/LeadModal.tsx::submit
-- **params**: `e: React.FormEvent`
+### [N2_NASIL] AST Pointer: src/components/LeadModal.tsx::validate
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `e` — form submit olayını temsil eder; `e.preventDefault()` ile varsayılan davranışı engeller.
-  - `v` — `validate()` fonksiyonunun döndürdüğü hata nesnesi.
-  - `errors` — bileşenin `errors` state’ini güncellemek için `setErrors(v)` ile kullanılır.
-  - `Object` — `Object.keys(v).length` ile hata sayısı kontrol edilir; eğer hata varsa fonksiyon erken döner.
-  - `setSubmitted` — bileşenin `submitted` state’ini `true` yapar.
-  - `setIsSuccess` — bileşenin `isSuccess` state’ini `true` yapar (API çağrısı simülasyonu).
-  - `setTimeout` — 1200 ms sonra başarı durumunu ayarlar, ardından 3000 ms sonra `handleClose()` çağrılır.
-  - `handleClose` — modalı kapatmak için çağrılır.
-- **Dönüş**: yok (void)
+  - `e` — Record<string, string> object, hata mesajlarını tutar, başlangıçta boş object
+- **Dönüş**: `e` object (validation hatalarını içerir)
 
-### [N3_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose
-- **params**: (none)
+### [N3_NASIL] AST Pointer: src/components/LeadModal.tsx::submit
+- **params**: (e: React.FormEvent)
 - **ic_degiskenler**:
-  - `onClose` — üst bileşenden gelen kapanış callback’i; `onClose()` ile modal kapatılır.
-  - `setIsSuccess` — `isSuccess` state’ini `false` yapar.
-  - `setName`, `setCompany`, `setEmail`, `setPhone`, `setCity`, `setAppArea`, `setConsent` — ilgili state’leri sıfırlar veya boş string’e ayarlar.
-  - `setMessage` — `productName` varsa varsayılan mesajı çeviri ile ayarlar, yoksa boş string’e ayarlar.
-  - `setErrors` — hata state’ini boş nesneyle sıfırlar.
-  - `setTimeout` — 300 ms sonra yukarıdaki state sıfırlama işlemlerini gerçekleştirir.
-- **Dönüş**: yok (void)
+  - `e` — React.FormEvent, form submit olayı
+  - `v` — validate() fonksiyonunun dönüş değeri, hata objesi
+- **Dönüş**: yok (yan etkiler: hata state'ini günceller, submit state'ini yönetir, setTimeout ile success modal'ını açar ve 3 saniye sonra handleClose'ı çağırır)
+
+### [N4_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose
+- **params**: (yok)
+- **ic_degiskenler**:
+  - (fonksiyon gövdesinde değişken tanımı yok, sadece state setter'ları ve onClose çağrısı var)
+- **Dönüş**: yok (yan etkiler: onClose callback'ini çağırır, 300ms delay ile form state'ini sıfırlar: isSuccess, name, company, email, phone, city, appArea, consent, message, errors)
 
 ---
 
@@ -139,8 +122,8 @@ graph TD
     LeadModal_tsx__handleClose["handleClose"]
     LeadModal_tsx__submit["submit"]
     LeadModal_tsx__validate["validate"]
-    LeadModal_tsx__LeadModal --> LeadModal_tsx__validate
     LeadModal_tsx__LeadModal --> LeadModal_tsx__handleClose
+    LeadModal_tsx__LeadModal --> LeadModal_tsx__validate
 ```
 
 ## NODE ID STANDARD

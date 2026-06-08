@@ -1,14 +1,16 @@
 'use client'
 
-import React from 'react'
 import { Grid, List } from 'lucide-react'
-import ProductCard from '../../components/ProductCard'
-import CategoryFiltersComponent from '../../components/category/CategoryFilters'
-import { useI18n } from '../../i18n/I18nProvider'
-import PageShell from '../../components/layout/PageShell'
+import React from 'react'
+
 import type { Product } from '@/types/ui-models'
-import type { DomainCategory } from '../../lib/type-converters'
+
+import CategoryFiltersComponent from '../../components/category/CategoryFilters'
+import PageShell from '../../components/layout/PageShell'
+import ProductCard from '../../components/ProductCard'
 import type { CategoryFilters } from '../../hooks/useCategoryGateway'
+import { useI18n } from '../../i18n/I18nProvider'
+import type { DomainCategory } from '../../lib/type-converters'
 
 interface CategoryGridViewProps {
   category: DomainCategory

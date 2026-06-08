@@ -1,6 +1,7 @@
-import VentImage from '@/components/ui/VentImage'
-import React from 'react'
 import { Check, X } from 'lucide-react'
+import React from 'react'
+
+import VentImage from '@/components/ui/VentImage'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
@@ -48,7 +49,7 @@ const SilentFanTypeComparison: React.FC = () => {
                     {/* Right: Neon Visual for Lineo Quiet */}
                     <div className="lg:col-span-2 relative min-h-300px flex items-center justify-center group overflow-hidden">
                         <VentImage src="/images/vortice/vortice_lineo_neon.png"
-                            alt="Neon Engineering"
+                            alt={t('category.lineoNeonAlt')}
                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             fill
                          />

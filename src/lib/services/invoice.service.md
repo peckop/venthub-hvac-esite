@@ -12,7 +12,7 @@ entity_hashes:
   func:setDefaultInvoiceProfile: 5969056d403828fd
   func:updateInvoiceProfile: 978db19027a5f5be
   overview: a257728e512b389b
-generated_at: 2026-06-07T12:08:08Z
+generated_at: 2026-06-08T10:09:34Z
 ---
 
 ## Genel Bakış

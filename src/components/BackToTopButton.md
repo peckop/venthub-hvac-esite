@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx
-skeleton_hash: 9cc228dadd3a82f3
+skeleton_hash: 2b4b594c3539f330
 entity_hashes:
   func:BackToTopButton: c8f2538093a58334
   func:handleScrollToTop: 94e0754193bc122d
   overview: cab9522d3717ffc4
   style_tokens: b29c0a49231e465f
-generated_at: 2026-05-29T18:43:11Z
+generated_at: 2026-06-08T10:08:12Z
 ---
 
 ## Genel Bakış
@@ -51,28 +51,22 @@ Bu modül için verilen fonksiyon gövdesi bulunamadığından, mimari varsayım
 
 ---
 
----
-
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: components/BackToTopButton.tsx::BackToTopButton
+### [N1_NASIL] AST Pointer: src/components/BackToTopButton.tsx::BackToTopButton
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, UI metinlerini uluslararası dillere çevirir (örn. `t('common.backToTop')`)
-  - `visible` — `useScrollThrottle` hook'undan dönen boolean değer; scroll pozisyonuna göre butonun görünürlüğünü kontrol eder (400px'de göster, 300px altında gizle)
-  - `handleScrollToTop` — component içinde tanımlı nested arrow fonksiyon; butona tıklandığında sayfayı tepeye kaydırır ve odak yönetimini sağlar
-  - `isReduced` — `handleScrollToTop` içinde tanımlı boolean; kullanıcının `prefers-reduced-motion` tercihini kontrol eder, `true` ise `auto`, `false` ise `smooth` davranış seçer
-  - `mainContent` — `document.getElementById('main-content')` ile elde edilen `HTMLElement | null`; klavye navigasyonu odağını ana içeriğe taşımak için kullanılır
-- **Dönüş**: JSX — yukarı kaydırma butonu (`<button>`), görünürlüğü `visible` state'ine bağlı olarak opacity/scale class'larıyla kontrol edilir
+    - `t` — `useI18n` hook'undan dönen çeviri fonksiyonu, bileşen içindeki metinlerin lokalizasyonu için kullanılır.
+    - `visible` — `useScrollThrottle` hook'undan dönen boolean değer, sayfanın belirli bir scroll pozisyonunda olup olmadığını belirtir (butonun görünürlüğünü kontrol eder).
+    - `handleScrollToTop` — Sayfayı en üste kaydıran ve odaklayan iç callback fonksiyonu.
+- **Dönüş**: JSX Element (React.FC bileşeni)
 
----
-
-### [N2_NASIL] AST Pointer: components/BackToTopButton.tsx::handleScrollToTop
+### [N2_NASIL] AST Pointer: src/components/BackToTopButton.tsx::handleScrollToTop
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `isReduced` — `typeof window !== 'undefined'` kontrolü sonrası `window.matchMedia('(prefers-reduced-motion: reduce)').matches` ile alınan boolean; kullanıcı reduced motion istiyorsa `true` döner
-  - `mainContent` — `document.getElementById('main-content')` ile DOM'dan çekilen `HTMLElement | null` referansı; `tabindex` attribute'u ayarlanıp `focus()` ile erişilebilirlik odağı buraya taşınır
-- **Dönüş**: yok (void) — `window.scrollTo()` ile sayfayı tepeye kaydırır, ardından `mainContent` elementine `tabindex='-1'` ekleyip `preventScroll: true` ile focus yükler
+    - `isReduced` — Kullanıcının "prefers-reduced-motion" tercihini kontrol eden boolean değişken. `true` ise animasyon devre dışı, `false` ise smooth scroll kullanılır.
+    - `mainContent` — DOM'daki `id="main-content"` olan HTML elementine referans. Odak yönetiminde kullanılır (erişilebilirlik için).
+- **Dönüş**: void
 
 ---
 

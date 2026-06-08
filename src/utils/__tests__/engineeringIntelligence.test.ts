@@ -1,11 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
+import type { Product } from '@/types/ui-models';
+
 import {
-  getNoiseInference,
+  generateEngineeringSummary,
   getEfficiencyInference,
   getMotorInference,
-  generateEngineeringSummary
-} from '../engineeringIntelligence';
-import type { Product } from '@/types/ui-models';
+  getNoiseInference} from '../engineeringIntelligence';
 
 describe('engineeringIntelligence', () => {
   describe('getNoiseInference', () => {

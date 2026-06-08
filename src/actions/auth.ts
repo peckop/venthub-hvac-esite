@@ -1,7 +1,8 @@
 'use server'
 
-import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export interface AuthActionState {
   success?: boolean

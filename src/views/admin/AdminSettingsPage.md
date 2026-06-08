@@ -3,46 +3,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminSettingsPage.tsx
-skeleton_hash: 0888f56aa6c1221b
+skeleton_hash: 3ab4b69c9021010c
 entity_hashes:
   func:AdminSettingsPage: d7abe5daa414ecdd
   func:handleSave: f8b5a865424c16c7
-  overview: d59f9e9f0537eb5a
+  overview: 11ceb26a00a409fc
   style_tokens: 68efb24edb3d518d
-generated_at: 2026-05-28T22:39:24Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesindeki yönetici panelinin ayarlar sayfasını temsil eden React bileşenidir. Sistem genelindeki yapılandırma ayarlarının view ve yönetim arayüzünü sunar. Yönetici bu sayfa üzerinden ayarları görüntüleyip düzenleyebilir ve değişiklikleri sunucuya kaydedebilir.
+AdminSettingsPage, VentHub HVAC projesinin yönetici panelinde yer alan bir React bileşenidir. Modülün temel amacı, sistem genelindeki yapılandırma ayarlarını merkezi bir arayüz üzerinden görüntülemek, düzenlemek ve bu değişikliklerin sunucuda kalıcı hale getirilmesini sağlamaktır. Bileşen, yöneticinin ayarları güvenli bir şekilde yönetmesi için gereken form alanlarını ve interaksiyonları sunar.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Tüm sayfa yapısını, form alanlarını ve kullanıcı etkileşimini yönetir.
+### Arayüz ve Etkileşim Yönetimi
+Bileşenin ana yapısını, form alanlarını ve kullanıcı etkileşimlerini oluşturarak sayfa görünümünü ve yerel durum yönetimi sağlar.
 - AdminSettingsPage
 
-### Veri Kaydetme İşlemleri
-Yapılan değişikliklerin asenkron olarak sunucuya gönderilmesini ve kalıcı hale getirilmesini sağlar.
+### Kalıcı Veri Kaydı
+Düzenlenen ayarların asenkron bir şekilde sunucuya gönderilerek veritabanına işlenmesini sağlar.
 - handleSave
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve modülün amacından yola çıkarak tanımlanmıştır:
+Bu modül için fonksiyon gövdeleri paylaşılmadığından, detaylı mimari varsayımlar çıkarılamamaktadır. Yalnızca fonksiyon imzalarından türetilen temel varsayımlar aşağıda sunulmuştur:
 
-[Aksiyom 1]: Eğer `handleSave()` çağrıldığında geçerli bir oturum veya kimlik doğrulama bilgisi yoksa, ayar kaydetme işlemi başarısız olur veya reddedilir.
+**[Aksiyom 1]:** Eğer React ve JSX çalışma ortamı (runtime) yoksa, `AdminSettingsPage` bileşeni render edilemez ve sayfa görüntülenemez.
 
-[Aksiyom 2]: Eğer `handleSave()` sırasında sunucu bağlantısı kopuksa veya API endpoint'i erişilemez durumda ise, kaydetme işlemi tamamlanamaz ve kullanıcıya hata bildirimi gerekir.
+**[Aksiyom 2]:** Eğer `handleSave` fonksiyonunun erişebileceği bir state (ayar verileri) veya prop verisi yoksa, kaydetme işlemi başarısız olur veya boş/değişiklik içermeyen bir kayıt gerçekleşir.
 
-[Aksiyom 3]: Eğer `AdminSettingsPage` bileşeni çağrılmadan önce kullanıcı rolü "admin" değilse, sayfaya erişim engellenmelidir.
-
-[Aksiyom 4]: Eğer `handleSave()` fonksiyonu daha önceki kayıtlı bir durum (state) içeriğiyle çağrılmazsa, boş veya varsayılan değerler kaydedilir — bu durum veri bütünlüğü sorunlarına yol açabilir.
-
-[Aksiyom 5]: Eğer `handleSave()` asenkron bir işlem olarak tanımlıysa ve kullanıcı işlem devam ederken birden fazla kez tıklarsa, çift kayıt veya çakışma sorunu yaşanabilir.
-
----
-
-**Not:** Fonksiyon imzaları parametresiz ve default değer içermemektedir. Bu nedenle belirli eşik değerleri veya kabul kriterleri bu模ül için tanımlanamamıştır. State yönetimi, API endpoint'leri ve form alanları hakkında kesin bilgi mevcut değildir.
+**[Aksiyom 3]:** Eğer `handleSave` fonksiyonu çağrıldığında arka uç (backend) servisi veya API uç noktası erişilebilir değilse, ayar değişiklikleri sunucuda kalıcı hale getirilemez.
 
 ---
 
@@ -70,48 +62,38 @@ Bu bileşen parametre almaz — React.FC olarak tanımlı, stateles veya kendi i
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminSettingsPage.tsx::AdminSettingsPage
-- **params**: () — parametre yok
+### [N1_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::AdminSettingsPage
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `_t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, UI metinleri için kullanılır
-  - `activeTab` — `useState<'general' | 'payment' | 'admins' | 'system'>('general')` ile tanımlı, hangi sekmenin aktif olduğunu tutar
-  - `setActiveTab` — `activeTab` state setter, sekme değişikliğinde çağrılır
-  - `settings` — `useSettings()` hook'undan dönen `AppSettings` tipinde ayarlar nesnesi
-  - `loading` — `useSettings()` hook'undan dönen boolean, veri yüklenme durumu
-  - `saving` — `useState(false)`, kaydetme işlemi sırasında true olur
-  - `saveStatus` — `useState<{ type: 'success' | 'error', message: string } | null>(null)`, kaydetme sonrası başarı/hata durumu ve mesajı
-  - `setSaveStatus` — `saveStatus` state setter, kaydetme sonucunu günceller
-  - `formData` — `useState<AppSettings | null>(null)`, settings'in yerel düzenlenebilir kopyası
-  - `setFormData` — `formData` state setter, settings verisini form verisine kopyalar
-  - `handleSave` — içinde tanımlı `async ()` fonksiyonu, kaydetme işlemini tetikler
-  - `tabs` — `Array<{ id, label, icon }>`, sekme tanımları dizisi; her eleman `id`, `_t()` ile çevrilmiş `label` ve icon component içerir
-- **Dönüş**: JSX — Loading durumunda spinner, aksi halde ayarlar sayfası layout'u (header, save butonu, tab bar, içerik alanı)
+  - `_t` — `useI18n()` hookundan gelen çeviri fonksiyonu
+  - `activeTab` — Aktif sekmeyi tutan state (`'general' | 'payment' | 'admins' | 'system'`), varsayılan `'general'`
+  - `setActiveTab` — `activeTab` state'ini güncelleyen setter
+  - `settings` — `useSettings()` hookundan gelen `AppSettings` tipinde ayarlar nesnesi
+  - `loading` — `useSettings()` hookundan gelen yükleme durumu boolean'ı
+  - `saving` — Kaydetme durumunu tutan boolean state, varsayılan `false`
+  - `saveStatus` — Kaydetme sonucu durumunu tutan state (`{ type: 'success' | 'error', message: string } | null`), varsayılan `null`
+  - `setSaveStatus` — `saveStatus` state'ini güncelleyen setter
+  - `formData` — Düzenleme amaçlı yerel kopya state (`AppSettings | null`), varsayılan `null`
+  - `setFormData` — `formData` state'ini güncelleyen setter
+  - `React.useEffect` — `settings` ve `formData` bağımlılıklı, `settings` geldiğinde `formData`'yı dolduran efekt
+  - `handleSave` — Async kaydetme fonksiyonu, `setSaveStatus` çağrısı yapar
+  - `tabs` — Sekme tanımlarını içeren dizi, her eleman `{ id: 'general' | 'payment' | 'admins' | 'system', label: string, icon: Component }` yapısında; `_t` ile çeviri alınır
+- **Dönüş**: JSX (React bileşeni), loading durumunda spinner, otherwise ana sayfa layout'u
 
----
-
-### [N2_NASIL] AST Pointer: AdminSettingsPage.tsx::useEffect_callback
-- **params**: () — callback fonksiyonu
+### [N2_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::React.useEffect callback
+- **params**: (yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `setFormData(settings)` yan etkisi ile `settings` verisini `formData`'ya kopyalar, koşul: `settings` mevcut ve `formData` henüz atanmamış
+- **Dönüş**: yok — `settings` mevcut ve `formData` boşsa `setFormData(settings)` çağrısı yaparak yan etki üretir
 
----
+### [N3_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::handleSave
+- **params**: (yok)
+- **ic_degiskenler**: (yok — içerde tanımlı değişken yok)
+- **Dönüş**: `Promise<void>` — açık return yok; sadece `setSaveStatus({ type: 'success', message: 'Deneysel mod: Kaydetme pasif.' })` çağrısı yaparak yan etki üretir
 
-### [N3_NASIL] AST Pointer: AdminSettingsPage.tsx::handleSave
-- **params**: async () — parametre yok
+### [N4_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::tabs.map callback
+- **params**: `tab` — `{ id: 'general' | 'payment' | 'admins' | 'system', label: string, icon: Component }` yapısında sekme nesnesi
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `setSaveStatus({ type: 'success', message: 'Deneysel mod: Kaydetme pasif.' })` çağrısı ile deneysel mod mesajı set eder
-
----
-
-### [N4_NASIL] AST Pointer: AdminSettingsPage.tsx::tabs_map_callback
-- **params**: `tab` — `tabs` dizisindeki her bir eleman; `{ id: 'general' | 'payment' | 'admins' | 'system', label: string, icon: React.FC<{size: number}> }` yapısında
-- **ic_degiskenler**: (yok — doğrudan parametre ve mevcut state'ler kullanılır)
-  - `tab.id` — sekme tanımlayıcısı, `key` prop'u ve `setActiveTab` çağrısı için kullanılır
-  - `tab.icon` — sekme ikonu componenti, `<tab.icon size={18} />` olarak render edilir
-  - `tab.label` — sekme etiket metni, `<button>` içeriğinde gösterilir
-  - `setActiveTab` — useCallback'ten gelen state setter, `tab.id` değerini aktif sekme olarak atar
-  - `activeTab` — mevcut aktif sekme, `activeTab === tab.id` koşulu ile aktif sekme stili uygulanır
-- **Dönüş**: `<button>` JSX elementi — sekme butonu, koşullu CSS class ile aktif/pasif durum render edilir
+- **Dönüş**: JSX — `key={tab.id}`, `onClick={() => setActiveTab(tab.id)}`, `activeTab === tab.id` koşuluyla stillendirme, `<tab.icon size={18} />` ve `{tab.label}`
 
 ---
 

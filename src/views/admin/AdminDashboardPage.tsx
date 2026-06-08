@@ -1,21 +1,22 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { useI18n } from '../../i18n/I18nProvider'
-import StatCard from '../../components/admin/dashboard/StatCard'
-import SalesChart from '../../components/admin/dashboard/SalesChart'
-import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
-import type { DbOrder } from '../../types/db-rows'
 import { 
-  TrendingUp, 
-  ShoppingBag,
+  BellRing,
+  Database,
   HandCoins,
   PackagePlus,
-  Undo2,
-  BellRing,
-  Database
-} from 'lucide-react'
+  ShoppingBag,
+  TrendingUp, 
+  Undo2} from 'lucide-react'
+import React, { useCallback, useEffect, useState } from 'react'
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
+import SalesChart from '../../components/admin/dashboard/SalesChart'
+import StatCard from '../../components/admin/dashboard/StatCard'
+import { useI18n } from '../../i18n/I18nProvider'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
+import type { DbOrder } from '../../types/db-rows'
+import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
 
 interface DashboardChartData {
   date: string

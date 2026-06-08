@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavActionButton.tsx
-skeleton_hash: e5eba658c6a4867c
+skeleton_hash: c67cb47a2d2bd1e8
 entity_hashes:
   func:NavActionButton: 9e352ab0f1dc93af
   overview: 42d52b47442e736b
   style_tokens: 7a26081e3b2c4d09
-generated_at: 2026-05-28T22:36:18Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış

@@ -3,36 +3,35 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\PaymentIframeContainer.tsx
-skeleton_hash: 5bac558917d71a75
+skeleton_hash: 69a0f3097b8ce0d3
 entity_hashes:
   func:PaymentIframeContainer: a26b3523d4f0ca84
-  overview: 80658adb5b36a144
+  overview: 63cea4293d180d15
   style_tokens: aa1cb9d92aed5506
-generated_at: 2026-05-28T22:40:10Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunda ödeme adımında müşterilerin güvenli bir şekilde ödeme işlemini gerçekleştirmesi için kullanılan bir React bileşenidir. Iyzico tabanlı ödeme altyapısıyla entegre çalışarak, gerekli kimlik doğrulama ve ödeme içeriğini barındıran iframe'i sayfaya entegre eder. Ayrıca, ödeme sayfasındaki yardım paneli gibi ek arayüz elemanlarının görünürlük durumunu da yönetir.
+Bu modül, VentHub HVAC platformunda ödeme sürecinde Iyzico tabanlı güvenli ödeme altyapısını entegre eden bir React konteyner bileşenidir. Temel olarak, gerekli güvenlik token'ı ve ödeme içeriği ile donatılmış bir iframe'i sayfaya yerleştirerek ödeme formunun güvenli bir şekilde sunulmasını sağlar. Ayrıca, ödeme sayfasındaki yardım paneli gibi ek arayüz elemanlarının görünürlük durumunu da dışarıdan kontrol edilebilir şekilde yönetir.
 
 ## Fonksiyon Grupları
-### Ana Ödeme Iframe Yönetim Bileşeni
-Modülün tüm temel sorumluluklarını üstlenen bu bileşen, dışarıdan gelen gerekli tüm bilgileri alarak güvenli ödeme iframe'ini render eder ve arayüz durumunu kontrol eder.
+### Ana Ödeme Iframe Konteyner Bileşeni
+Modülün tek ve temel bileşeni olup, dışarıdan gelen parametrelerle (güvenlik token'ı, iframe içeriği, görünürlük durumu) güvenli ödeme arayüzünü render eder ve ilgili durum değişimlerini üst bileşenlere bildirir.
 - PaymentIframeContainer
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, Iyzico ödeme altyapısına ait iframe tabanlı ödeme formunu barındıran bir React konteyner bileşenidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir:
 
-[Aksiyom 1]: Eğer `iyzToken` sağlanmazsa, ödeme iframe'i güvenli bir şekilde başlatılamaz ve ödeme işlemi gerçekleştirilemez.
+Bu modül için, sadece fonksiyon gövdesinden (bu durumda prop imzasından) çıkarılabilecek net, kanıtlanabilir mimari aksiyomlar sınırlıdır. Aşağıdaki aksiyomlar, bileşenin doğru çalışması için zorunlu olan koşulları belirtir.
 
-[Aksiyom 2]: Eğer `paymentFrameContent` sağlanmazsa, iframe içinde render edilecek içerik olmadığından bileşen boş/görünmez kalır.
+[Aksiyom 1]: Eğer `iyzToken` prop'u verilmezse veya geçersiz/boş bir değer (null, undefined) ise, bileşenin ödeme işlemini başlatmak için gerekli olan oturum/b kimlik doğrulaması yapılamaz, bu durum ödeme iframe'inin güvenli bir şekilde oluşturulmasını veya içerik yüklenmesini engeller.
 
-[Aksiyom 3]: Eğer `setShowHelp` fonksiyonu sağlanmazsa, yardım panelinin görünürlük durumu değiştirilemez ve `showHelp` durumu bileşen dışında kontrol edilemez hale gelir.
+[Aksiyom 2]: Eğer `paymentFrameContent` prop'u verilmezse veya geçersiz/boş bir değer ise, bileşenin iframe içinde göstereceği güvenli ödeme sayfası içeriği olmaz, bu durum kullanıcının ödeme formunu görememesine ve işlem yapamamasına yol açar.
 
-[Aksiyom 4]: Eğer `paymentFrameContent` geçerli bir HTML/iframe kaynağı içermiyorsa, tarayıcı tarafından安全 olmayan içerik olarak reddedilebilir veya boş görüntülenir.
+[Aksiyom 3]: Eğer `showHelp` ve `setShowHelp` prop'ları verilmezse, bileşenin yardım panelinin görünürlük durumunu okuması veya bu durumu kullanıcı etkileşimiyle değiştirip üst bileşene bildirmesi mümkün olmaz; bu durum arayüzdeki ilgili kontrollerin işlevsiz kalmasına neden olur.
 
-[Aksiyom 5]: Eğer `iyzToken` geçersiz veya süresi dolmuş bir token ise, Iyzico tarafında ödeme başlatma hatası oluşur ve kullanıcıya hata gösterilmesi beklenir.
+[Aksiyom 4]: Bileşen, `paymentFrameContent`'i bir iframe kaynak içeriği olarak kullanmak üzere tasarlanmıştır. Eğer `paymentFrameContent`, XSS saldırılarına açık veya doğrulanmamış bir kaynaktan geliyorsa, uygulamanın güvenliği tehlikeye girer.
 
 ---
 
@@ -69,16 +68,16 @@ Bu modül, Iyzico ödeme altyapısına ait iframe tabanlı ödeme formunu barın
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/checkout/PaymentIframeContainer.tsx::PaymentIframeContainer
-- **params**: `{ iyzToken, paymentFrameContent, showHelp, setShowHelp, progressPct, overlayStep, t }` — destructure edilmiş prop objesi
+- **params**: `iyzToken`, `paymentFrameContent`, `showHelp`, `setShowHelp`, `progressPct`, `overlayStep`, `t`
 - **ic_degiskenler**:
-  - `iyzToken` — iyzico ödeme token'ı; JSX'te `data-token={iyzToken}` olarakcheckout form div'ine bağlanır; truthy olduğunda iyzico checkout formu render edilir
-  - `paymentFrameContent` — alternatif ödeme iframe HTML içeriği; `iyzToken` yoksa ve bu doluysa `dangerouslySetInnerHTML={{ __html: paymentFrameContent }}` ile render edilir
-  - `showHelp` — boolean; SMS yardım ipuçları bölümünün açılıp kapalı olduğunu kontrol eder (`{showHelp && ( ... )}`Conditional rendering)
-  - `setShowHelp` — state setter fonksiyonu; yardım butonuna tıklandığında `setShowHelp(v => !v)` ile toggle eder
-  - `progressPct` — sayısal yüzde değeri (0-100); progress bar'ın genişliğini `style={{ width: \`${progressPct}%\` }}` olarak ayarlar
-  - `overlayStep` — sayısal overlay adımını (1, 2, 3) temsil eder; `overlayStep === 1` thì "starting", `=== 2` thì "secureForm", diğer durumlarda "bank3d" metnini gösterir
-  - `t` — çeviri fonksiyonu; `t('checkout.paymentSectionTitle')`, `t('checkout.securePaymentBrand', { brand: 'Venthub HVAC' })`, `t('checkout.securePaymentProvider', { provider: 'iyzico' })`, `t('checkout.paymentLoading')`, `t('checkout.formPreparing')`, `t('checkout.overlay.starting')`, `t('checkout.overlay.secureForm')`, `t('checkout.overlay.bank3d')`, `t('checkout.help.smsTitle')`, `t('checkout.help.tip1')`, `t('checkout.help.tip2')`, `t('checkout.help.tip3')` çağrılarında kullanılır
-- **Dönüş**: JSX (React elementi) — Ödeme bölümünün tamamını render eden React bileşeni; `CreditCard`, `Lock`, `CheckCircle` icon'larını lucide-react'ten import eder; üç durumlu conditional rendering (iyzToken varsa form, paymentFrameContent varsa HTML iframe, ikisi de yoksa hazırlık animasyonu) ve yardım toggle butonu içerir
+  - `iyzToken` — iyzico ödeme token'ı; varsa checkout formunu `data-token` attribute'una bağlar, yoksa alternatif yollara yönelir
+  - `paymentFrameContent` — iyzico'dan dönen HTML iframe içeriği; `dangerouslySetInnerHTML` ile doğrudan render edilir
+  - `showHelp` — boolean flag; SMS yardım ipuçlarının açılıp kapanmasını kontrol eder
+  - `setShowHelp` — state setter; butona tıklanınca `v => !v` ile toggling yapar
+  - `progressPct` — yüzde bazlı ilerleme değeri; progress bar'ın `style={{ width }}`'ine bind edilir
+  - `overlayStep` — overlay adım numarası (1, 2 veya 3); ternary zincir ile hangi msg gösterileceğini belirler: `overlayStep === 1 → starting`, `overlayStep === 2 → secureForm`, diğer → bank3d
+  - `t` — i18n çeviri fonksiyonu; `t('checkout.paymentSectionTitle')`, `t('checkout.securePaymentBrand', { brand: 'Venthub HVAC' })`, `t('checkout.securePaymentProvider', { provider: 'iyzico' })`, `t('checkout.paymentLoading')`, `t('checkout.formPreparing')`, `t('checkout.help.smsTitle')`, `t('checkout.help.tip1')`, `t('checkout.help.tip2')`, `t('checkout.help.tip3')`, `t('checkout.overlay.starting')`, `t('checkout.overlay.secureForm')`, `t('checkout.overlay.bank3d')` çağrıları yapılır
+- **Dönüş**: JSX — `{space-y-6}` wrapper div içinde: CreditCard ikonlu başlık, `Lock` ikonlu secure payment header (progress bar + overlayStep mesajı), koşullu render bloğu (`iyzToken` varsa div + `iyzipay-checkout-form` id'li container / `paymentFrameContent` varsa `dangerouslySetInnerHTML` div / ikisi de yoksa `CheckCircle` animasyonlu "form hazırlanıyor" skeleton), toggle butonu ile `showHelp` durumuna göre SMS yardım paneli
 
 ---
 

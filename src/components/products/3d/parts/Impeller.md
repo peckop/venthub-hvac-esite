@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Impeller.tsx
-skeleton_hash: f781e9b52577f1ed
+skeleton_hash: 7e0f9e8008cb4bbb
 entity_hashes:
   func:Impeller: ee1fdf5cf66e515f
   overview: aceb6287c6bba380
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:43Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

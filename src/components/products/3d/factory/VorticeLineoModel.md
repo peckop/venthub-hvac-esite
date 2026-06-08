@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\VorticeLineoModel.tsx
-skeleton_hash: 44b4850e8bddb8bf
+skeleton_hash: 5c05f2726698f5c8
 entity_hashes:
   func:VorticeLineoModel: 4d32037362a7371d
   overview: 36c6bcc733eabf66
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:40Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

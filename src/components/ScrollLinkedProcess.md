@@ -9,7 +9,7 @@ entity_hashes:
   func:scrollTo: ee292d22ad2f3df1
   overview: a4bd4fd5da1416a4
   style_tokens: dffb84eddfacefbd
-generated_at: 2026-05-28T22:36:57Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış

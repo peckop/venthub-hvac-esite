@@ -3,30 +3,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\calculators\CalculatorLayout.tsx
-skeleton_hash: 0b512e351d9a2af9
+skeleton_hash: 52ce63f0ee907c88
 entity_hashes:
   func:CalculatorLayout: 992031a52a171585
-  overview: f453018da69a0ee4
+  overview: 03346310f255f2df
   style_tokens: 8b0a8e4795cce63b
-generated_at: 2026-05-28T22:35:42Z
+generated_at: 2026-06-08T10:08:47Z
 ---
 
 ## Genel Bakış
-`CalculatorLayout` bileşeni, HVAC hesaplayıcı sayfalarının ortak görünümünü ve davranışını tanımlayan bir şablondur. Başlık, açıklama, ikon ve geri dönüş linki gibi temel UI öğelerini alarak, içerik alanını çocuk bileşenlere bırakır ve sayfa tutarlılığını sağlayarak tekrarlanabilir bir düzen sunar.
+`CalculatorLayout` bileşeni, HVAC hesaplayıcı sayfalarının ortak görünümünü ve davranışını tanımlayan bir şablon/sarmalayıcıdır. Başlık, açıklama, ikon ve geri dönüş linki gibi temel UI öğelerini alarak, içerik alanını çocuk bileşenlere bırakır ve sayfa tutarlılığını sağlayarak tekrarlanabilir bir düzen sunar.
 
 ## Fonksiyon Grupları
 ### UI Şablonu ve Yerleşimi
-Bu grup, sayfanın üst kısmındaki başlık, açıklama, ikon ve geri‑link gibi öğeleri oluşturur ve içerik bölgesi için bir konteyner sağlar.  
+Sayfanın üst kısmındaki başlık, açıklama, ikon ve geri‑link gibi öğeleri oluşturur ve içerik bölgesi için bir konteyner sağlayarak tutarlı bir sayfa yapısı sunar.
 - CalculatorLayout
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Eğer `title` prop'u verilmezse, bileşenin başlık bölümü boş veya tanımsız olur.  
-Eğer `description` prop'u verilmezse, bileşenin açıklama bölümü boş veya tanımsız olur.  
-Eğer `icon` prop'u verilmezse, bileşenin ikon bölümü boş veya tanımsız olur.  
-Eğer `backLink` prop'u verilmezse, varsayılan değer `'/products'` kullanılır.  
-*(`bac` parametresi fonksiyon imzasında net olmayan bir değer olduğu için bu parametreye dair varsayım üretilemez.)*
+
+Bu modül, bir layout şablonu olarak çocuk bileşenleri sarmalayan bir wrapper bileşenidir.
+
+[Aksiyom 1]: Eğer `title` prop'u verilmezse, sayfa başlık alanı boş/tanımsız render edilir — bileşen alternatif bir başlık sunmaz.
+
+[Aksiyom 2]: Eğer `description` prop'u verilmezse, açıklama alanı render edilmez veya boş kalır — bileşen varsayılan bir açıklama metni üretmez.
+
+[Aksiyom 3]: Eğer `icon` prop'u verilmezse, ikon alanı gösterilmez veya boş kalır — bileşen otomatik bir ikon atamaz.
+
+[Aksiyom 4]: Eğer `backLink` prop'u verilmezse, geri dönüş linki varsayılan olarak `/products` yolunu hedefler.
+
+[Aksiyom 5]: Fonksiyon imzası sonunda `bac` olarak kesik/tanımsız bir parametre bulunmaktadır — bu durum ya imza hatalıdır ya da eksik bilgi mevcuttur, dolayısıyla bu parametrenin davranışı bilinmiyor.
+
+[Aksiyom 6]: Bu bir layout bileşeni olduğundan,孩子(children) prop'u beklenir — eğer children verilmezse içerik alanı boş render edilir.
 
 ---
 
@@ -64,17 +73,9 @@ Eğer `backLink` prop'u verilmezse, varsayılan değer `'/products'` kullanılı
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/calculators/CalculatorLayout.tsx::CalculatorLayout
-- **params**: title, description, icon, backLink, backLabel, infoText, warningText, children
-- **ic_degiskenler**:
-  - `title` — sayfa başlığı, SEO bileşeni ve h1 başlığında kullanılır
-  - `description` — sayfa açıklaması, SEO bileşeni ve h1 altında gösterilir
-  - `icon` — sol üstte gösterilecek ikon; prop verilmezse varsayılan `<Calculator />` ikonu kullanılır
-  - `backLink` — geri link hedefi; varsayılan '/props' yerine '/products'; `<Link href={...}>` özelliğine atanır (type cast ile `import('next').Route` olarak kullanılır)
-  - `backLabel` — geri link metni; varsayılan 'Ürünlere Dön'; `<Link>` içeriğinde görüntülenir
-  - `infoText` — bilgilendirme banner metni; tanımlıysa mavi arkaplanlı bilgi kutusunda `<Info>` ikonu ve birlikte gösterilir
-  - `warningText` — uyarı banner metni; tanımlıysa turuncu arkaplanlı uyarı kutusunda `<AlertTriangle>` ikonu ve birlikte gösterilir
-  - `children` — bileşenin ana içeriği; `<div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">` içinde render edilir
-- **Dönüş**: React.FC<CalculatorLayoutProps> (React fonksiyonel bileşeni, JSX döndürür)
+- **params**: `title` — sayfanın başlık metni, `<h1>` içinde ve `<Seo>` title'ında kullanılır; `description` — sayfa açıklama metni, alt başlık ve SEO meta description olarak kullanılır; `icon` — header'daki ikon bileşeni, `<Calculator>` fallback'i ile birlikte render edilir; `backLink` — geri dönüş linkinin href değeri, `<Link>` href prop'una bağlanır, varsayılan `'/products'`; `backLabel` — geri dönüş bağlantısının görünen metni, `<Link>` içeriğinde render edilir, varsayılan `'Ürünlere Dön'`; `infoText` — bilgi banner'ı metni, varsa `<Info>` ikonlu mavi banner'da gösterilir; `warningText` — uyarı banner'ı metni, varsa `<AlertTriangle>` ikonlu turuncu banner'da gösterilir; `children` — ana içerik area'sının içeriği, hesaplayıcı formu/bileşenleri burada render edilir
+- **ic_degiskenler**: (fonksiyon gövdesinde harici değişken tanımlanmamıştır, tüm props doğrudan JSX içinde kullanılmıştır)
+- **Dönüş**: JSX elemanı — sayfa düzeni (layout) bileşeni; başlık banner'ı, info/warning banner'ları, ana içerik alanı (`children`) ve alt not bölgesinden oluşan tam sayfa düzenini döndürür
 
 ---
 

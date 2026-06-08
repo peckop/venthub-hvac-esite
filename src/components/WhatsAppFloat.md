@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\WhatsAppFloat.tsx
-skeleton_hash: b5ead15e45e8d41c
+skeleton_hash: f9391033c10cb376
 entity_hashes:
   func:WhatsAppFloat: 594fe2409e378878
   overview: 27f525e3029fcecb
   style_tokens: fb346cbde40036cb
-generated_at: 2026-05-29T19:59:05Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış

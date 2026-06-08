@@ -1,10 +1,12 @@
-import React from 'react'
 import { renderHook } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
-import { useCart } from '../useCartHook'
-import { CartContext, type CartContextType } from '../../contexts/CartContext'
+import React from 'react'
+import { describe, expect, it, vi } from 'vitest'
+
 import type { CartItem } from '@/types/cart'
+
+import { CartContext, type CartContextType } from '../../contexts/CartContext'
 import type { DomainProduct as Product } from '../../types/ui-models'
+import { useCart } from '../useCartHook'
 
 describe('useCart hook', () => {
   it('returns safe fallback object when CartContext is undefined', () => {

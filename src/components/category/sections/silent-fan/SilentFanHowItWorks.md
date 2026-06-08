@@ -3,31 +3,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanHowItWorks.tsx
-skeleton_hash: ea7a36092eb9fbd6
+skeleton_hash: 6738c8a7974ea430
 entity_hashes:
   func:SilentFanHowItWorks: 1d9f7bbf01c39f23
   func:tr: b282b53f03d688a5
-  overview: 5f3bf85694f8ac81
+  overview: 8afe080395065c81
   style_tokens: b11a600d5d7c65a7
-generated_at: 2026-05-28T22:35:47Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, sessiz fanların çalışma prensiplerini açıklayan bir bileşen sunar. `SilentFanHowItWorks` fonksiyonu, kullanıcı arayüzünü oluştururken `tr` fonksiyonu ile metinlerin çevirisi sağlanır, böylece içerik farklı dillerde dinamik olarak gösterilebilir.
+`SilentFanHowItWorks` modülü, sessiz fanların çalışma prensiplerini açıklayan bir React bileşenidir. Bileşen, farklı dil destekleri için çeviri fonksiyonu kullanarak kullanıcıya çoklu dilde içerik sunar.
 
 ## Fonksiyon Grupları
 ### Bileşen Renderlama
-Kullanıcı arayüzünü oluşturan ve sessiz fanların nasıl çalıştığını görsel ve metinsel olarak gösteren ana işlev.
+Sessiz fanların nasıl çalıştığını anlatan görsel ve metinsel içeriği kullanıcı arayüzüne dönüştüren ana React bileşeni.
 - SilentFanHowItWorks
 
-### Çeviri Yardımı
-Bileşen içindeki sabit metinlerin farklı dillere çevrilmesini sağlayan yardımcı işlev.
+### Çeviri Desteği
+Bileşen içindeki metinlerin farklı dillere çevrilmesini sağlayan yardımcı fonksiyon.
 - tr
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için temel mimari varsayımlar, React bileşen yapısı ve çeviri sistemi üzerinedir.
+
+[Axiom 1]: Eğer `tr` fonksiyonu `SilentFanHowItWorks` bileşeninin çalıştığı kapsamda tanımlı veya import edilmemişse, bileşen içindeki tüm çeviri anahtarları (key) işlenemez ve bileşen render edilemez.
+
+[Axiom 2]: Eğer `tr` fonksiyonu geçerli bir dizi veya çeviri sözlüğü ile beslenmemişse, bileşen içindeki metin alanları boş/çevrilmemiş kalır veya `undefined` değerleri gösterir.
+
+[Axiom 3]: Eğer `SilentFanHowItWorks` bileşeni React Component yapısının dışında (örn: düz bir fonksiyon olarak) çağrılırsa, JSX döndürülmez ve bileşen düzgün render edilemez.
+
+[Axiom 4]: Eğer `tr` fonksiyonu, `SilentFanHowItWorks` içinde kullanılan herhangi
 
 ---
 
@@ -51,27 +59,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanHowItWorks.tsx::SilentFanHowItWorks
-- **params**: (parametre yok)
+- **params**: []
 - **ic_degiskenler**:
-  - `t` — `useI18n` hookundan dönen çeviri fonksiyonu; `tr` içinde ve JSX'te `String(tr(...))` çağrısı için kullanılır.
-  - `dict` — `useI18n` hookundan dönen çeviri nesnesi; `dict.categorySilentFan.howItWorks.steps` erişimi için kullanılır.
-  - `sectionRef` — `useScrollAnimation` hookundan dönen ref; `<section>` elementiyle scroll animasyonu bağlamak için `ref` olarak kullanılır.
-  - `isVisible` — `useScrollAnimation` hookundan dönen boolean; section'in görünürlüğüne göre `scrollAnimationClasses.slideRight` ve `slideLeft` sınıflarını uygulamak için kullanılır.
-  - `tr` — yerel çeviri助手 fonksiyonu; `categorySilentFan.howItWorks` alt anahtarına göre `t` fonksiyonunu sarmalar ve JSX'te `String(tr('eyebrow'))`, `String(tr('title'))`, `String(tr('subtitle'))` gibi çağrılarda kullanılır.
-  - `icons` — `[Microscope, Wind, ShieldCheck]` dizisi; `steps.map` içinde `index % icons.length` ile ikon seçimi için kullanılır.
-  - `steps` — `dict.categorySilentFan.howItWorks.steps` veya boş dizi; her adımın başlığı ve açıklamasını renderlemek için `steps.map` ile iterate edilir.
-- **Dönüş**: JSX.Element (bölümün tamamını render eden JSX)
+    - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, genel çeviri anahtarıyla kullanılır
+    - `dict` — `useI18n()` hook'undan dönen sözlük nesnesi, `dict.categorySilentFan.howItWorks.steps` yoluyla adım verilerine erişilir
+    - `sectionRef` — `useScrollAnimation()` hook'undan dönen referans, section DOM elemanına atanır
+    - `isVisible` — `useScrollAnimation()` hook'undan dönen boolean, animasyon tetikleme durumunu tutar
+    - `tr` — Yardımcı fonksiyon, `t()` fonksiyonunu `categorySilentFan.howItWorks.` prefix'le sarar
+    - `icons` — `[Microscope, Wind, ShieldCheck]` dizisi, adımların yanına yerleştirilecek ikonları tutar
+    - `steps` — `dict.categorySilentFan.howItWorks.steps` değerinden gelen adım nesneleri dizisi, `|| []` ile boş dizi fallback'i alınır
+- **Dönüş**: JSX elementi (section) — sessiz fan teknolojisinin nasıl çalıştığını görsel ve metin olarak gösteren bileşen
 
-### [N2_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanHowItWorks.tsx::tr
-- **params**: `(key: string)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: string (i18n tarafından çevrilen metin)
-
-### [N3_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanHowItWorks.tsx::steps.map callback
-- **params**: `(step: {title: string; description: string}, index: number)`
+### [N2_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanHowItWorks.tsx::mapCallback(step, index)
+- **params**: (`step`: adım nesnesi, `index`: number)
 - **ic_degiskenler**:
-  - `Icon` — `icons[index % icons.length]` ile seçilen ikon bileşeni; JSX'te `<Icon className="text-blue-400" size={24} />` ile render edilir.
-- **Dönüş**: JSX.Element (her adım için flex container div)
+    - `Icon` — `icons[index % icons.length]` ile döngüsel olarak seçilen ikon bileşeni (Microscope, Wind veya ShieldCheck)
+- **Dönüş**: JSX elementi (div) — her adım için ikon, başlık ve açıklama içeren bir kart
 
 ---
 

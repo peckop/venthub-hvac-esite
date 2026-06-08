@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\RichTextRenderer.tsx
-skeleton_hash: 542bfec2554f9519
+skeleton_hash: 97032baf78cc63f8
 entity_hashes:
   func:RichTextRenderer: 827584ed75053437
   overview: c7751cfdcd10bdc7
   style_tokens: 95b6c3607cdf0117
-generated_at: 2026-05-28T22:36:55Z
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış

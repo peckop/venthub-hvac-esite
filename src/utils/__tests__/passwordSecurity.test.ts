@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { sha1Hex, hibpPwnedCount } from '../passwordSecurity'
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { hibpPwnedCount,sha1Hex } from '../passwordSecurity'
 
 describe('passwordSecurity', () => {
   beforeEach(() => {

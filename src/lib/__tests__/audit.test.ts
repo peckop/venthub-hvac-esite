@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { logAdminAction } from '../audit'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { beforeEach,describe, expect, it, vi } from 'vitest'
+
+import { logAdminAction } from '../audit'
 
 describe('logAdminAction', () => {
   let mockSupabase: {

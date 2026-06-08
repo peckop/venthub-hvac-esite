@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavBrand.tsx
-skeleton_hash: 763b9381e9c28a6a
+skeleton_hash: 98ccd7153feff405
 entity_hashes:
   overview: c6785379bea85d87
   style_tokens: f2b8e78bf7817c52
-generated_at: 2026-05-28T22:36:27Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış

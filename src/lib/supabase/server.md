@@ -7,7 +7,7 @@ skeleton_hash: 69987a90f70b7197
 entity_hashes:
   func:createSupabaseServerClient: e1abcfb101f22d63
   overview: 32f6efa96dd36ed3
-generated_at: 2026-06-06T21:56:03Z
+generated_at: 2026-06-08T10:10:57Z
 ---
 
 ## Genel Bakış
@@ -24,20 +24,6 @@ Supabase ile iletişim kuracak ve sunucu tarafında çalışacak olan istemci ne
 ## AXIOMS – Mimari Varsayımlar
 
 Supabase sunucu istemcisi oluşturma modülü için temel mimari varsayımlar:
-
----
-
-**[Aksiyom 1]:** Eğer `SUPABASE_URL` ortam değişkeni tanımlı değilse veya geçerli bir URL formatında değilse, istemci oluşturma başarısız olur veya geçersiz bir istemci nesnesi döner.
-
-**[Aksiyom 2]:** Eğer `SUPABASE_ANON_KEY` (veya service_role key) ortam değişkeni tanımlı değilse, istemci kimlik doğrulama (auth) işlemlerinde yetkilendirme hataları oluşur.
-
-**[Aksiyom 3]:** Eğer istek (request) nesnesi cookie'leri okuyamıyorsa (örn: edge runtime'da farklı bir cookie mekanizması gerekiyorsa), oturum (session) bilgisi sunucu tarafında doğrulanamaz.
-
-**[Aksiyom 4]:** Eğer Supabase projesi aktif değilse veya API anahtarı iptal edilmişse, tüm veritabanı ve auth istekleri `401`/`403` hata kodlarıyla başarısız olur.
-
----
-
-> **Not:** Fonksiyon gövdesi paylaşılmadığı için, spesifik implementasyon detaylarına (cookie handling mekanizması, hangi key'in kullanıldığı, error handling stratejisi vb.) ilişkin kesin aksiyonlar üretilememiştir. Yukarıdaki varsayımlar, bu tür bir Supabase server client factory fonksiyonunun çalışması için zorunlu olan genel mimari gereksinimleri temsil etmektedir.
 
 ---
 
@@ -70,14 +56,6 @@ Fonksiyon, `SupabaseClient<Database>` tipinde bir nesne döndürür. Bu nesne, s
   - `value` — `cookiesToSet` içindeki her bir çerezin değeri; `cookieStore.set()` çağrısında kullanılır
   - `options` — `cookiesToSet` içindeki her bir çerezin seçenekleri (path, maxAge, httpOnly vb.); `cookieStore.set()` çağrısında kullanılır
 - **Dönüş**: `Database` tipi ile tiplemiş `createServerClient<Database>` çağısının döndürdüğü Supabase sunucu istemcisi (ServerClient<Database>); cookie getAll/setAll adapter'ı bağlanmış halde
-
----
-
-**Not — İç İçi Fonksiyonlar (nesne literal içinde):**
-
-`getAll()` — `cookieStore.getAll()` çağrısı ile tüm çerezleri döndürür; herhangi bir değişken kullanmaz.
-
-`setAll(cookiesToSet)` — `forEach` ile diziyi iterasyona alır; her elemandan `{ name, value, options }` destructuring ile çıkarır ve `cookieStore.set(name, value, options)` çağrısıyla çerezleri yazar. Hata oluşursa `try/catch` ile sessizce yakalanır (middleware tarafından yenileme ele alındığı varsayılır).
 
 ---
 

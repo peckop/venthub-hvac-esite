@@ -1,9 +1,12 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import '../index.css'
 import '@/lib/three-setup'
-import { Providers, ClientLayout } from '../components/layout/ClientLayout'
+
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+
 import { SITE_URL } from '@/config/siteUrl'
+
+import { ClientLayout,Providers } from '../components/layout/ClientLayout'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-sans' })
 

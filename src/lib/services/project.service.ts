@@ -1,7 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+
 import type { Database } from '../../types/database.types'
-import type { DbUserProject, DbProjectItem, DbProduct } from '../../types/db-rows'
 import type { TablesInsert } from '../../types/database.types'
+import type { DbProduct,DbProjectItem, DbUserProject } from '../../types/db-rows'
 import type { ProjectItem } from '../../types/ui-models'
 import { mapDatabaseProductToDomain } from '../type-converters'
 

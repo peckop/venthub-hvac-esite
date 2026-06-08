@@ -1,9 +1,10 @@
-import { Routes } from '../utils/routes'
-import React, { useMemo } from 'react'
 import Link from 'next/link'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import React, { useMemo } from 'react'
+
 import { useCategories } from '../contexts/CategoryContext'
 import { DomainCategory } from '../lib/type-converters'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { Routes } from '../utils/routes'
 
 interface SubcategoryCardProps {
     subcategory: DomainCategory
@@ -142,7 +143,7 @@ const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
 
     return (
         <>
-            <style>{`
+            <style dangerouslySetInnerHTML={{ __html: `
                 @keyframes subcat-scroll-left {
                     from { transform: translateX(0); }
                     to { transform: translateX(-33.333%); }
@@ -161,7 +162,7 @@ const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
                 .animate-subcat-scroll-right:hover {
                     animation-play-state: paused;
                 }
-            `}</style>
+            ` }} />
 
             <section className="py-8 sm:py-10 bg-white overflow-hidden">
                 {/* Section Header */}

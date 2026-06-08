@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\vitest-setup.tsx
-skeleton_hash: 6124bf6fb09bed29
+skeleton_hash: 9ad8e71f46cf8a70
 entity_hashes:
   overview: ac4b8a364cf9e637
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-07T19:53:16Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış

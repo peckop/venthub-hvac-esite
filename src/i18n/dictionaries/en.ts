@@ -85,6 +85,9 @@ export const en: typeof tr = {
     whatsappTitle: 'Message on WhatsApp',
     whatsappTooltip: 'Engineering Line',
     whatsappSupportMessage: 'Quick support from website',
+    pdf: 'PDF',
+    sku: 'SKU',
+    pdfDatasheet: 'Technical Datasheet',
     whatsapp: {
       faqSupportMessage: 'I could not find the answer I was looking for on the FAQ page...',
       supportMessageDefault: 'Hello, I would like to contact the VentHub HVAC support team.',
@@ -141,6 +144,7 @@ export const en: typeof tr = {
       eyebrow: 'Technical Intelligence Unit',
       searchPlaceholder: 'Search for topic, technical term or product family...',
       readStart: 'Start Reading',
+      heroAlt: 'Engineering Knowledge Hub Visual',
       readTime: '{{count}} min read',
       calculatorsSoon: 'Calculators Soon',
       calculatorsSoonDesc: 'Perform your engineering calculations in seconds.',
@@ -837,6 +841,11 @@ export const en: typeof tr = {
     cookies: 'Cookie Policy',
     privacy: 'Privacy Policy',
     terms: 'Terms of Use'
+  },
+  legal: {
+    kvkkTitle: 'KVKK Clarification Text (Draft)',
+    draftWarning: 'This text is a draft and for testing purposes. Please update it with your company\'s actual details and confirm with a legal expert before going live.',
+    disclaimer: 'This text does not constitute legal advice. It is recommended to seek professional counsel for the final text.'
   },
   admin: {
     common: {
@@ -1665,7 +1674,27 @@ export const en: typeof tr = {
       quickMetricsDesc: 'These fields are displayed as short technical info on category cards.',
       resolutionLabel: 'Recommended resolution:',
       supportedFormatsLabel: 'Supported formats:',
-      uploading: 'Uploading...'
+      uploading: 'Uploading...',
+      modalDesc: 'Manage category details, SEO settings and images.',
+      tabGeneral: 'General Info',
+      tabSeo: 'SEO & Marketing',
+      tabMetrics: 'Metrics & Appearance',
+      formName: 'Category Name',
+      formSlug: 'Slug (URL)',
+      formParent: 'Parent Category',
+      parentNone: 'Main Category (None)',
+      formSortOrder: 'Sort Order (Position)',
+      formDescription: 'Description',
+      formSeoTitle: 'SEO Title',
+      formSeoDesc: 'SEO Description',
+      formFeatured: 'Featured Category',
+      formFeaturedDesc: 'Highlighted on the home page and top menu',
+      imagePreviewAlt: 'Image preview',
+      cancel: 'Cancel',
+      updateCategory: 'Update Category',
+      createCategory: 'Create Category',
+      editCategory: 'Edit Category',
+      createNewCategory: 'Create New Category'
     }
   },
   footer: {
@@ -1847,6 +1876,25 @@ export const en: typeof tr = {
     chooseSeriesDesc: 'Choose the series that suits your needs',
     inspectSeries: 'Inspect Series',
     whyCategory: 'Why {{category}}?',
+    electricVsAmbientAlt: 'Electric vs Ambient Air Comparison',
+    modernLoftAlt: 'Modern Loft Application',
+    lineoQuietQuote: 'Lineo Quiet ES is not just a fan; it is the silent hero of modern architecture.',
+    industrialLabAlt: 'Industrial Laboratory Application',
+    lineoTechnicalAlt: 'Lineo Quiet Technical Detail',
+    lineoNeonAlt: 'Lineo Quiet Neon Engineering Design',
+    vorticeHeritageAlt: 'Vortice Lineo Brand Heritage and History',
+    airCurtainDiagramAlt: 'Air Curtain Operating Principle',
+    whyCategorySubtitle: 'We add value to your projects with production at industrial standards and high engineering solutions.',
+    lineoTechnologyTitle: 'Vortice Lineo Quiet ES Technology',
+    howItWorksTitle: 'How It Works',
+    lineoTechnologyDesc: 'Perfect harmony of silence and performance. Meet the advanced aerodynamic design.',
+    howItWorksDesc: 'The air curtain creates an invisible barrier, separating the indoor and outdoor environments.',
+    why1Title: 'High Efficiency',
+    why1Desc: 'Energy-saving motor technology in compliance with ErP standards.',
+    why2Title: 'Silent Operation',
+    why2Desc: 'Special acoustic insulation and aerodynamic fan design.',
+    why3Title: 'Long Life',
+    why3Desc: 'Corrosion-resistant body and heavy-duty components.',
     filters: 'Filters',
     subcategories: 'Sub-categories',
     priceRange: 'Price Range',
@@ -1858,7 +1906,15 @@ export const en: typeof tr = {
       catalog: 'Category Catalog',
       subGroups: 'Sub Product Groups',
       exploreSeries: 'Explore Series',
-      guarantee: 'VentHub Guarantee'
+      guarantee: 'VentHub Guarantee',
+      discover: 'Discover',
+      whyVenthubTitle: 'Why VentHub Engineering?',
+      premiumEngineeringAlt: 'Premium Engineering Visual',
+      features: [
+        { title: 'Industrial Certification', desc: 'Fully approved systems that have passed international tests.' },
+        { title: 'High Performance', desc: 'Aerodynamic design with maximum efficiency and low energy consumption.' },
+        { title: 'Smart Control', desc: 'Seamless integration with BMS and central automation systems.' }
+      ]
     },
     pressure: 'Pressure (Pa)',
     noise: 'Noise [dB(A)] (Max)',
@@ -1882,7 +1938,67 @@ export const en: typeof tr = {
     listViewAria: 'List view',
     minPlaceholder: 'Min',
     maxPlaceholder: 'Max',
-    ltePlaceholder: '≤'
+    ltePlaceholder: '≤',
+    howItWorksAirCurtain: {
+      title: 'How an Air Curtain Works?',
+      subtitle: 'A simple yet effective principle: Invisible air wall',
+      diagramAlt: 'Air Curtain Working Principle',
+      steps: [
+        {
+          title: 'Powerful Airflow',
+          description: 'The device creates a controlled airflow at high speed.',
+          detail: 'Uniform and strong airflow is provided by specially designed fans and blades.'
+        },
+        {
+          title: 'Invisible Barrier',
+          description: 'The airflow creates an invisible curtain at the door opening.',
+          detail: 'This air curtain separates the indoor and outdoor environments without a physical barrier.'
+        },
+        {
+          title: 'Isolation',
+          description: 'Outdoor air, dust, insects, and odors cannot enter.',
+          detail: 'Indoor temperature is preserved, hygiene standards are maintained.'
+        },
+        {
+          title: 'Comfort',
+          description: 'Ideal environment is provided for customers and employees.',
+          detail: 'Even if the door remains open, indoor comfort is not compromised.'
+        }
+      ]
+    },
+    vorticeBrand: {
+      italianEngineering: 'Italian Engineering',
+      whyVortice: 'Why Vortice?',
+      description1: 'Founded in Milan in 1954, Vortice has been the pioneer of ventilation technology worldwide for over 70 years.',
+      description2: 'Founded by Attilio Pagani, the company won Italy\'s most prestigious design award, Compasso d\'Oro, with its very first product. Today, it serves millions of users in more than 90 countries.',
+      authorizedDealer: 'Authorized Dealer',
+      ceCertified: 'CE Certified',
+      warranty2y: '2-Year Warranty',
+      premiumComfort: 'Premium Comfort',
+      authorizedDealerNotice: 'VentHub is the authorized dealer of Vortice products in Turkey.',
+      highlights: [
+        {
+          value: '70+',
+          label: 'Years Experience',
+          desc: 'Ventilation since 1954'
+        },
+        {
+          value: '90+',
+          label: 'Countries',
+          desc: 'Global distribution network'
+        },
+        {
+          value: '3x',
+          label: 'Compasso d\'Oro',
+          desc: 'Italy\'s most prestigious design award'
+        },
+        {
+          value: '#1',
+          label: 'Europe',
+          desc: 'Leader in the ventilation sector'
+        }
+      ]
+    }
   },
   pdp: {
     loading: 'Loading product...',
@@ -1935,7 +2051,9 @@ export const en: typeof tr = {
       noise: 'Noise Level',
       noSpecsAvailable: 'No technical specifications available for this product.',
       technicalDatasheet: 'TECHNICAL DATASHEET',
-      engineeringAnalysis: 'Engineering Analysis'
+      engineeringAnalysis: 'Engineering Analysis',
+      sku: 'SKU',
+      datasheetPdf: 'DATASHEET (PDF)'
     },
     features: {
       materialQuality: 'Premium material and manufacturing quality',
@@ -2404,6 +2522,8 @@ export const en: typeof tr = {
   brands: {
     sectionTitle: 'Premium HVAC Brands',
     sectionSubtitle: 'As the authorized distributor of leading global HVAC brands in Turkey, we offer top-quality ventilation solutions.',
+    subtitlePart1: 'Trusted Partner of',
+    subtitlePart2: 'World Giants',
     viewAll: 'See All Brands',
     pageTitle: 'Brands',
     pageSubtitle: 'As the authorized representative of the world\'s most prestigious HVAC manufacturers, we bring engineering masterpieces to your projects.',
@@ -2419,7 +2539,8 @@ export const en: typeof tr = {
       title: 'Guaranteed Supply Directly from Manufacturer',
       description: 'Thanks to our direct strategic partnership with all our brands, you have access to the latest technologies, full technical support, and the most competitive lead times.',
       original: '100% Original Product',
-      standard: 'Global Standard Compliance'
+      standard: 'Global Standard Compliance',
+      imageAlt: 'Technical Infrastructure and HVAC Installation'
     },
     detail: {
       heritage: 'Engineering Heritage',
@@ -3147,5 +3268,16 @@ export const en: typeof tr = {
     widthMeter: 'Width (Meter)',
     winterComfort: 'For winter comfort',
     wizardTitle: 'Needs Analysis Wizard'
+  },
+  beforeAfterSlider: {
+    title: 'Before / After',
+    subtitle: 'See the application impact quickly',
+    ariaLabel: 'Before / after comparison',
+    rangeAriaLabel: 'Comparison position'
+  },
+  undecidedUserCta: {
+    title: 'Not sure which product is right for your project?',
+    description: 'Share your project details with our expert engineers. Let us select the most accurate fan for you in compliance with airflow, pressure losses, and regulations.',
+    buttonText: 'Get Expert Support'
   }
 };

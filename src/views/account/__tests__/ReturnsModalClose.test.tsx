@@ -1,6 +1,7 @@
+import { fireEvent,render, screen, waitFor } from '@testing-library/react'
 import React from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
+import { beforeEach,describe, expect, it, vi } from 'vitest'
+
 import AccountReturnsPage from '../AccountReturnsPage'
 
 // Mocks

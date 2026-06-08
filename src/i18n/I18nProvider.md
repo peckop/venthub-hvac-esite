@@ -3,49 +3,47 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\I18nProvider.tsx
-skeleton_hash: 524d487b2f107334
+skeleton_hash: ea0f78564dd725e8
 entity_hashes:
   func:I18nProvider: e23d74154d179265
   func:get: f83a743aef414d1c
   func:interpolate: 02cc51f0bd59e8d6
   func:useI18n: 7f95c6a8fb408f61
-  overview: cf17f12ee8097019
+  overview: 90d7747a572408d5
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-06T08:45:18Z
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış
-Bu modül, React uygulamalarında çok dilli (uluslararasılaştırma) desteğini yönetmek için kullanılan temel i18n altyapısını sunar. Çeviri sözlüklerinden güvenli erişim, dinamik parametrelerle metin interpolasyonu ve React context aracılığıyla bileşenlere dil desteği dağıtma gibi temel işlemleri merkezi olarak yönetir.
+React uygulamalarında çok dilli (uluslararasılaştırma) desteğini merkezi olarak yöneten bir sağlayıcı modülüdür. Çeviri sözlüklerinden iç içe anahtarlarla değer okunmasını, dinamik parametrelerle metin kalıplarının doldurulmasını ve React context aracılığıyla tüm bileşenlere dil bağlamının dağıtılmasını sağlar.
 
 ## Fonksiyon Grupları
 
-### Çekirdek I18n Altyapısı
-Uygulama genelinde çeviri bağlamının (context) oluşturulmasını ve bileşenlerin bu bağlama erişmesini sağlayan React tabanlı yapı taşlarını içerir.
+### Bağlam Sağlayıcıları (Context Providers)
+Uygulama ağaçının üst seviyelerinde çeviri sözlüğünü ve aktif dili barındırarak tüm alt bileşenlere i18n bağlamını dağıtır. Bileşenler bu bağlama bir hook ile erişir.
 - I18nProvider, useI18n
 
-### Çeviri Metni Yardımcıları
-Çeviri sözlüklerinden iç içe anahtarlarla değer almayı ve dinamik parametrelerle metin kalıplarını doldurmayı sağlayan yardımcı işlevleri kapsar.
+### Çeviri Araç Fonksiyonları (Translation Utilities)
+Sözlük objelerinden iç içe anahtar yollarıyla güvenli değer okumasını ve çeviri metinlerindeki yer tutucuları dinamik parametrelerle değiştirmeyi sağlar.
 - get, interpolate
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, React context tabanlı bir i18n (uluslararasılaştırma) sağlayıcısıdır. Aşağıdaki mimari varsayımlar fonksiyon imzalarından türetilmiştir.
+Bu modül, React tabanlı uygulamalarda uluslararasılaştırma (i18n) altyapısını sağlar. Aşağıdaki varsayımlar yalnızca fonksiyon imzalarından türetilmiştir.
 
-**[Aksiyom 1]**: Eğer `useI18n()` bir `I18nProvider` üst bileşeninin dışında (ancestor zincirinde yer almıyorsa) çağrılırsa, React context'ten değer okunamaz ve hook hata/fail verir.
+**[Aksiyom 1]:** `useI18n()` bir `I18nProvider` bileşeninin alt ağacı içinde çağrılmazsa, geçerli bir React Context mevcut değildir ve hook hatalı çalışır.
 
-**[Aksiyom 2]**: Eğer `I18nProvider`'a verilen `dictionary`, `get(obj, path)` fonksiyonunun beklediği hiyerarşik yapıya (üst seviye anahtar dil kodları, iç içe çeviri anahtarları) sahip değilse, çeviri aramaları başarısız olur ve `undefined` döner.
+**[Aksiyom 2]:** `I18nProvider` bileşeni `dictionary` parametresi sağlanmadan çağrılırsa, çeviri sözlüğü boş olur ve tüm dil anahtarı çözümlenemeyen (undefined) değerler döner.
 
-**[Aksiyom 3]**: Eğer `I18nProvider`'a geçirilen `lang` (initialLang) değeri, `dictionary` objesinde tanımlı bir dil anahtarı değilse, geçerli bir çeviri bulunamaz ve boş/hata çıktısı üretilir.
+**[Aksiyom 3]:** `get(obj, path)` fonksiyonunda `obj` parametresi geçerli bir sözlük (Dict) yapısı değilse veya `path` string'i bu sözlük hiyerarşisinde var olmayan bir yola karşılık geliyorsa, fonksiyon `undefined` veya fallback bir değer döner; hata fırlatmaz.
 
-**[Axiom 4]**: Eğer `interpolate(str, params)` çağrısındaki `params` içindeki anahtarlar, `str` içindeki yer tutucu desenleriyle (örn. `{{key}}`) eşleşmiyorsa, yer tutucuların hiçbiri değiştirilmez ve ham string geri döner.
+**[Aksiyom 4]:** `interpolate(str, params)` fonksiyonunda `str` içindeki yer tutucu token'ları (değişken adları) `params` nesnesinin anahtarlarıyla eşleşmezse veya `params` hiç sağlanmazsa, yer tutucular değiştirilmeden olduğu gibi kalır; fırlatılan bir hata yoktur.
 
-**[Axiom 5]**: Eğer `get(obj, path)` çağrısındaki `path` (dot-notation), `obj` içinde geçerli bir yolu temsil etmiyorsa, fonksiyon `undefined` döner; modül bu durumda bir fırlatma (throw) yapmaz.
+**[Aksiyom 5]:** `I18nProvider` bileşeni `initialLang` parametresi ile hangi dilin aktif olacağını belirler; `dictionary` yapısının bu dil anahtarını (örn. `"tr"`, `"en"`) içermesi gerekir. Aksi takdirde o dil için çeviri anahtarı çözümlemesi başarısız olur.
 
----
-
-*Not: Bu modülde tanımlı sabit (constant) bulunmamaktadır. Eşik değer, domain-specific kural veya varsayılan parametre değeri fonksiyon imzalarında belirtilmemiştir; bu nedenle uydurulmamıştır.*
+**[Aksiyom 6]:** `get(obj, path)` fonksiyonunun `path` parametresi için kullanacağı ayrıştırma (parse) stratejisi bilinmiyor —点 (dot) notasyonu, bracket notasyonu veya her ikisi birden olabilir; imza içerisinden bu ayrım çıkarılamamaktadır.
 
 ---
 
@@ -115,40 +113,42 @@ type Dict = Record<string, unknown>
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: i18n/I18nProvider.tsx::get
+### [N1_NASIL] AST Pointer: I18nProvider.tsx::get
 - **params**: `(obj: Dict, path: string)`
 - **ic_degiskenler**:
-  - `keys` — path.split('.') ile elde edilen noktayla ayrılmış anahtarlar dizisi
-  - `current` — döngü içinde mevcut seviyedeki değeri tutan değişken, başlangıçta `obj`'ye eşit
-  - `k` — for döngüsünde her bir anahtarı temsil eden döngü değişkeni
-- **Dönüş**: `string`
+  - `keys` — path.split('.') ile oluşturulan, nokta ile ayrılmış anahtar dizisi
+  - `current` — traversal sırasında mevcut değeri tutan değişken
+  - `k` — for döngüsündeki her bir anahtar (keys array'inden gelen eleman)
+- **Dönüş**: `string` — bulunursa value, bulunamazsa path
 
-### [N2_NASIL] AST Pointer: i18n/I18nProvider.tsx::interpolate
+### [N2_NASIL] AST Pointer: I18nProvider.tsx::interpolate
 - **params**: `(str: string, params?: Record<string, unknown>)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `string`
+- **ic_degiskenler**:
+  - `_m` — regex replace callback'indeki tam eşleşen string
+  - `p1` — regex ile yakalanan anahtar adı (word grubu)
+  - `v` — params[p1] erişiminden elde edilen değer
+- **Dönüş**: `string` — parametrelerle değiştirilmiş string
 
-### [N3_NASIL] AST Pointer: i18n/I18nProvider.tsx::I18nProvider
+### [N3_NASIL] AST Pointer: I18nProvider.tsx::I18nProvider
 - **params**: `({ children, lang: initialLang, dictionary })`
 - **ic_degiskenler**:
-  - `lang` — useState ile tanımlanan mevcut dil durumu, başlangıçta `initialLang || 'tr'`
-  - `setLangState` — useState'ten dönen dil durumunu güncellemek için fonksiyon
-  - `saved` — localStorage'dan okunan kayıtlı dil tercihi
-  - `nav` — `navigator.language` değerinin küçük harfli versiyonu
-  - `setLang` — React.useCallback ile tanımlanan, dil durumunu güncellemek için kararlı fonksiyon
-  - `currentDict` — `dictionary` prop'u veya `DICTS[lang]` sözlüğü
-  - `translation` — `get()` ile anahtar karşılığı alınan çeviri metni
-  - `hasTranslation` — çevirinin anahtarla aynı olup olmadığını kontrol eden mantıksal değişken
-  - `v` — replace fonksiyonundaki geri çağırma ile elde edilen parametre değeri
-  - `dict` — useMemo ile hesaplanan mevcut sözlük
-  - `value` — useMemo ile hesaplanan context değeri
-- **Dönüş**: `React.FC<I18nProviderProps>` (JSX Element)
+  - `lang` — mevcut dil state'i, useState ile yönetilir
+  - `setLangState` — useState'ten dönen state setter fonksiyonu
+  - `saved` — localStorage'dan okunan kayıtlı dil değeri
+  - `nav` — navigator.language değerinin lowercased hali
+  - `setLang` — React.useCallback ile memoize edilmiş dil değiştirme fonksiyonu
+  - `currentDict` — dictionary prop'u veya DICTS[lang] sözlüğü
+  - `translation` — get fonksiyonu ile bulunmuş çeviri stringi
+  - `hasTranslation` — çeviri bulunup bulunmadığını belirleyen boolean
+  - `dict` — useMemo ile memoize edilmiş sözlük
+  - `value` — useMemo ile memoize edilmiş context value nesnesi
+- **Dönüş**: JSX.Provider — I18nContext.Provider ile sarmalanmış children
 
-### [N4_NASIL] AST Pointer: i18n/I18nProvider.tsx::useI18n
-- **params**: (yok)
+### [N4_NASIL] AST Pointer: I18nProvider.tsx::useI18n
+- **params**: yok
 - **ic_degiskenler**:
-  - `ctx` — I18nContext'ten alınan context değeri
-- **Dönüş**: `{ lang: Lang, setLang: (l: Lang) => void, t: (key: TranslationKeyInput, paramsOrAlt?: Record<string, unknown> | string) => string, dict: AppDictionary }`
+  - `ctx` — useContext(I18nContext) ile alınan context değeri
+- **Dönüş**: `{ lang, setLang, t, dict }` veya fallback nesnesi
 
 ---
 
@@ -160,8 +160,8 @@ graph TD
     I18nProvider_tsx__get["get"]
     I18nProvider_tsx__interpolate["interpolate"]
     I18nProvider_tsx__useI18n["useI18n"]
-    I18nProvider_tsx__I18nProvider --> I18nProvider_tsx__get
     I18nProvider_tsx__I18nProvider --> I18nProvider_tsx__interpolate
+    I18nProvider_tsx__I18nProvider --> I18nProvider_tsx__get
 ```
 
 ## NODE ID STANDARD

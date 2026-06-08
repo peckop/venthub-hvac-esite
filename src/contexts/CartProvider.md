@@ -3,35 +3,27 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\CartProvider.tsx
-skeleton_hash: 99a1da87ec776a41
+skeleton_hash: af91028fa486d3bb
 entity_hashes:
   func:CartProvider: 2c15a5ccde773496
-  overview: a21c79a8976fc711
+  overview: 37930ba7d9f73804
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-07T13:58:20Z
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
-Bu modül, alışveriş sepeti durumını ve ilgili işlemleri uygulama genelinde yönetmek için merkezi bir React Context sağlayıcısıdır. Tüm alt bileşenlerin sepet verilerine ve bunlarla ilişkili fonksiyonlara erişmesini mümkün kılar.
+Bu modül, alışveriş sepeti durumunu ve ilgili tüm işlemleri (ürün ekleme, çıkarma, miktar güncelleme, temizleme) uygulama genelinde yönetmek için merkezi bir React Context Provider bileşeni sunar. Sepet verilerinin yerel depolama ile kalıcılığını ve opsiyonel olarak sunucu senkronizasyonunu sağlar.
 
 ## Fonksiyon Grupları
-### Ana Context Sağlayıcı Bileşeni
-Modülün temel ve tek bileşenidir; sepet verilerini, işlevselliklerini ve durum yönetimi mantığını uygulama ağacının alt kısımlarına sağlamak üzere createContext ile context oluşturur.
+### Context Sağlayıcı
+Modülün temel ve tek bileşeni olarak, sepet durumunu ve ilgili tüm işlevsellikleri React component tree'sinin alt kısımlarına sağlar. Bu bileşen olmadan alt bileşenler sepet verilerine erişemez.
 - CartProvider
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, alışveriş sepeti durumunu uygulama genelinde paylaşan bir React Context Provider bileşenidir.
-
-[Aksiyom 1]: Eğer `children` prop'u sağlanmazsa veya `undefined` olursa, provider hiçbir alt bileşini sarmayacak ve context'e erişim sağlanamayacaktır.
-
-[Aksiyom 2]: Eğer `CART_SERVER_SYNC` sabit değeri `true` ise, sepet verileri sunucu ile senkronize edilmelidir; sunucu bağlantısı kopuk veya API endpoint'i erişilemez durumdaysa, senkronizasyon başarısız olur ve yerel sepet durumuyla devam edilir.
-
-[Aksiyom 3]: Eğer `CART_SERVER_SYNC` sabit değeri `false` ise, sunucu senkronizasyonu gerçekleştirilmez; sepet verileri yalnızca istemci tarafında (client-side) tutulur.
-
-[Aksiyom 4]: Eğer React component tree içinde bu provider üst seviyede konumlandırılmazsa, alt bileşenlerin `useCart` veya benzeri hook'lar aracılığıyla sepet context'ine erişimi başarısız olur.
+Bu modül için aksiyon tanımlanamamaktır. Fonksiyon gövdesi verilmemiştir; sadece fonksiyon imzası ve sabit tanımı mevcuttur. Mimari varsayımlar yalnızca fonksiyon gövdesindeki mantıksal akış ve koşullardan üretilebilir.
 
 ---
 
@@ -56,285 +48,223 @@ Bu modül, alışveriş sepeti durumunu uygulama genelinde paylaşan bir React C
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::useEffect_load_cart
-- **params**: () — parametresiz
+### [N1_NASIL] AST Pointer: CartProvider.tsx::(useEffect_load_cart)
+- **params**: ()
 - **ic_degiskenler**:
-  - `schema` — localStorage'dan okunan mevcut CART_SCHEMA_KEY değeri, mevcut şema ile karşılaştırma yapar
-  - `lastStatus` — localStorage'daki 'vh_last_order_status' değeri, son sipariş durumunu tutar
-  - `savedCart` — localStorage'dan okunanserialized sepet verisi (JSON string)
-  - `savedVer` — localStorage'dan okunan versiyon number stringi
-  - `v` — savedVer'in parseInt ile number'a çevirilmiş hali
-- **Dönüş**: void — yan etki: `setItems` çağırarak state'i günceller
+  - `schema` — `localStorage.getItem(CART_SCHEMA_KEY)` çağrısının sonucu; yerel depolama şeması anahtarının değeri
+  - `lastStatus` — `localStorage.getItem('vh_last_order_status')` çağrısının sonucu; önceki sipariş durumunu tutar
+  - `savedCart` — `localStorage.getItem(CART_LOCAL_STORAGE_KEY)` çağrısının sonucu; yerel depolamadan okunan sepet JSON'u
+  - `savedVer` — `localStorage.getItem(CART_VERSION_KEY)` çağrısının sonucu; yerel versiyon numarası string olarak
+  - `v` — `parseInt(savedVer, 10)` ile elde edilen tamsayı versiyon değeri
+- **Dönüş**: yok (yan etki: `setItems` çağırır, localStorage'ı temizler)
 
----
-
-### [N2_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::useEffect_save_cart
-- **params**: () — parametresiz
+### [N2_NASIL] AST Pointer: CartProvider.tsx::(useEffect_save_cart)
+- **params**: ()
 - **ic_degiskenler**:
-  - `v` — Date.now() ile elde edilen timestamp, yerel versiyon olarak kaydedilir
-- **Dönüş**: void — yan etki: localStorage'a items ve versiyon yazar, `localVersionRef.current` güncellenir
+  - `v` — `Date.now()` ile elde edilen Unix timestamp; yerel versiyon zaman damgası olarak kullanılır
+- **Dönüş**: yok (yan etki: localStorage'a items ve versiyon yazar)
 
----
-
-### [N3_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::mergeItems
+### [N3_NASIL] AST Pointer: CartProvider.tsx::mergeItems
 - **params**: (local: CartItem[], server: CartItem[], isGuestCart: boolean)
 - **ic_degiskenler**:
-  - `map` — Merge işleminde kullanılan Map<string, CartItem>, product.id key'li benzersiz ürün haritası
-- **Dönüş**: CartItem[] — birleştirilmiş benzersiz item listesi
+  - `map` — `Map<string, CartItem>` türünde ürün ID'lerini CartItem'a eşleyen harita; birleştirilmiş sepet öğelerini tutar
+- **Dönüş**: `Array.from(map.values())` — birleştirilmiş CartItem dizisi
 
----
-
-### [N4_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::useEffect_syncWithServer
-- **params**: () — parametresiz (useEffect callback)
+### [N4_NASIL] AST Pointer: CartProvider.tsx::(useEffect_sync_with_server)
+- **params**: ()
 - **ic_degiskenler**:
-  - `cancelled` — async işlem iptal flag'i, cleanup'ta true yapılır
-  - `syncWithServer` — iç tanımlı async fonksiyon, sunucu senkronizasyonunu yürütür
-- **Dönüş**: cleanup fonksiyonu () => { cancelled = true }
+  - `cancelled` — boolean bayrak; cleanup fonksiyonunda `true` yapılır, async işlemin iptal edildiğini belirtir
+- **Dönüş**: cleanup fonksiyonu `() => { cancelled = true }` döner (yan etki: `syncWithServer` çağırır)
 
----
-
-### [N5_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::syncWithServer
-- **params**: () — parametresiz
+### [N5_NASIL] AST Pointer: CartProvider.tsx::syncWithServer
+- **params**: ()
 - **ic_degiskenler**:
-  - `cancelled` — async iptal flag'i (dış scope'tan)
-  - `cart` — getOrCreateShoppingCart sonucu dönen shopping cart nesnesi (id içerir)
-  - `currentOwner` — localStorage'dan okunan CART_OWNER_KEY, kimin sepetini tuttuğunu gösterir
-  - `isGuestCart` — misafir sepeti olup olmadığını belirleyen boolean
-  - `discardLocalGuestCart` — yerel misafir sepetinin atılıp atılmayacağını belirler
-  - `clearOnce` — 'vh_clear_server_cart_once' flag'inden okunan boolean, post-order temizlik bayrağı
-  - `raw` — localStorage'dan okunan 'vh_pending_order' ham JSON string
-  - `data` — JSON.parse ile elde edilen { orderId?: string } nesnesi
-  - `oid` — data.orderId değerinin string karşılığı, sipariş ID'si
-  - `ord` — Supabase'den sorgulanan venthub_orders satırı, status ve created_at içerir
-  - `ordErr` — Supabase sorgu hatası
-  - `serverRows` — listCartItemsWithProducts ile gelen ham satır dizisi
-  - `serverItems` — serverRows'un map ile CartItem[] formatına dönüştürülmüş hali
-  - `merged` — merge stratejisine göre oluşturulmuş nihai birleşik item listesi
-  - `priceInfoList` — her merged item için Promise.all ile hesaplanan birim fiyat bilgi listesi
-  - `unitMap` — _productId -> unitPrice eşlemesi yapan Map
-  - `mergedWithPrices` — birim fiyatlar eklenmiş nihai merged item listesi
-- **Dönüş**: void — yan etkiler: setItems, setServerCartId, setSyncing, localStorage, Supabase upsert
+  - `cart` — `getOrCreateShoppingCart(supabase, user.id)` çağrısının sonucu; sunucudaki alışveriş sepeti nesnesi, `cart.id` içerir
+  - `currentOwner` — `localStorage.getItem(CART_OWNER_KEY)` çağrısının sonucu; sepet sahibinin user ID'si
+  - `isGuestCart` — boolean; mevcut sahibin user.id ile eşleşip eşleşmediğine göre misafir sepeti olup olmadığını belirler
+  - `discardLocalGuestCart` — boolean; misafir sepetinin atılıp atılmayacağını belirler
+  - `clearOnce` — boolean; `localStorage.getItem('vh_clear_server_cart_once') === '1'` sonucu, sipariş sonrası temizlik bayrağı
+  - `raw` — `localStorage.getItem('vh_pending_order')` çağrısının sonucu; bekleyen sipariş JSON string'i
+  - `data` — `JSON.parse(raw)` sonucu; `{ orderId?: string }`形状inde bekleyen sipariş verisi
+  - `oid` — `data?.orderId` ifadesinden elde edilen sipariş ID string'i
+  - `ord` — `supabase.from('venthub_orders').select(...).maybeSingle()` sonucu `data` alanı; sipariş kaydı nesnesi
+  - `ordErr` — Supabase sorgusundan dönen hata nesnesi
+  - `serverRows` — `listCartItemsWithProducts(supabase, cart.id)` çağrısının sonucu; sunucudaki sepet satırları dizisi
+  - `serverItems` — `serverRows.map(...)` ile dönüştürülmüş `CartItem[]` dizisi
+  - `merged` — birleştirme stratejisine göre belirlenmiş `CartItem[]` dizisi
+  - `priceInfoList` — `Promise.all(merged.map(...))` sonucu; her ürün için `{ _productId, unitPrice }` nesneleri dizisi
+  - `unitMap` — `Map<string, number | undefined>`; ürün ID'sinden birim fiyata eşleme haritası
+  - `mergedWithPrices` — `merged.map(...)` ile birim fiyatların eklenmesiyle oluşturulmuş nihai `CartItem[]` dizisi
+  - `v` — `Date.now()` ile elde edilen timestamp; yerel versiyon zaman damgası
+- **Dönüş**: yok (yan etki: `setItems`, `setServerCartId`, `setSyncing` çağırır)
 
----
-
-### [N6_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::row_map_callback
-- **params**: (row) — Supabase'den dönen ham satır objesi
-- **ic_degiskenler**: (yok — tek ifade)
-- **Dönüş**: { id: row.item.product_id, product: row.product, quantity: row.item.quantity } — CartItem formatında nesne
-
----
-
-### [N7_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::upsert_map_callback
-- **params**: (it) — merged item listesindeki her CartItem
+### [N6_NASIL] AST Pointer: CartProvider.tsx::(serverRows_map_callback)
+- **params**: (row)
 - **ic_degiskenler**:
-  - `info` — getEffectivePriceInfo sonucu { unitPrice, priceListId } nesnesi
-- **Dönüş**: { _productId: string, unitPrice: number | undefined } — fiyat bilgili item sonucu
+  - `row.item.product_id` — sunucudaki sepet satırının ürün ID'si
+  - `row.product` — sunucudaki sepet satırının ürün nesnesi
+  - `row.item.quantity` — sunucudaki sepet satırının miktarı
+- **Dönüş**: `{ id: row.item.product_id, product: row.product, quantity: row.item.quantity }` — CartItem nesnesi
 
----
+### [N7_NASIL] AST Pointer: CartProvider.tsx::(price_computation_callback)
+- **params**: (it: CartItem)
+- **ic_degiskenler**:
+  - `info` — `getEffectivePriceInfo(supabase, it.product)` çağrısının sonucu; `unitPrice` ve `priceListId` içeren fiyat bilgisi nesnesi
+- **Dönüş**: `{ _productId: it.product.id, unitPrice: info.unitPrice }` veya hata durumunda `{ _productId: it.product.id, unitPrice: undefined }`
 
-### [N8_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::useEffect_logout_handler
-- **params**: () — parametresiz (useEffect callback)
+### [N8_NASIL] AST Pointer: CartProvider.tsx::(useEffect_logout_handler)
+- **params**: ()
 - **ic_degiskenler**: (yok)
-- **Dönüş**: void — yan etki: CART_OWNER_KEY silinir, setServerCartId(null) çağrılır
+- **Dönüş**: yok (yan etki: `localStorage.removeItem(CART_OWNER_KEY)`, `setServerCartId(null)` çağırır)
 
----
-
-### [N9_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::useEffect_cross_tab_sync
-- **params**: () — parametresiz (useEffect callback)
+### [N9_NASIL] AST Pointer: CartProvider.tsx::(useEffect_storage_listener)
+- **params**: ()
 - **ic_degiskenler**:
-  - `onStorage` — StorageEvent handler fonksiyonu, cross-tab senkronizasyonunu yönetir
-- **Dönüş**: cleanup () => window.removeEventListener('storage', onStorage)
+  - `onStorage` — `StorageEvent` parametreli iç fonksiyon; tarayıcı sepet depolama olaylarını dinler
+- **Dönüş**: cleanup fonksiyonu `() => window.removeEventListener('storage', onStorage)`
 
----
-
-### [N10_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::onStorage
-- **params**: (e: StorageEvent) — tarayıcı storage değişiklik olayı
+### [N10_NASIL] AST Pointer: CartProvider.tsx::onStorage
+- **params**: (e: StorageEvent)
 - **ic_degiskenler**:
-  - `owner` — localStorage'dan okunan CART_OWNER_KEY, sepet sahibi user ID
-  - `vStr` — localStorage'dan okunan CART_VERSION_KEY string değeri
-  - `v` — vStr'in parseInt ile number karşılığı, versiyon numarası
-  - `raw` — localStorage'dan okunan CART_LOCAL_STORAGE_KEY ham JSON string
-  - `next` — JSON.parse ile elde edilen parsed CartItem[] dizisi
-- **Dönüş**: void — yan etki: setItems ile state güncellenir
+  - `owner` — `localStorage.getItem(CART_OWNER_KEY)` çağrısının sonucu; mevcut sepet sahibi ID'si
+  - `vStr` — `localStorage.getItem(CART_VERSION_KEY)` çağrısının sonucu veya `'0'` varsayılanı; versiyon string'i
+  - `v` — `parseInt(vStr, 10) || 0` ile elde edilen tamsayı versiyon değeri
+  - `raw` — `localStorage.getItem(CART_LOCAL_STORAGE_KEY)` çağrısının sonucu; ham sepet JSON string'i
+  - `next` — `JSON.parse(raw)` sonucu; parsed sepet dizisi
+- **Dönüş**: yok (yan etki: `setItems`, `localVersionRef.current` günceller)
 
----
-
-### [N11_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::addToCart
+### [N11_NASIL] AST Pointer: CartProvider.tsx::addToCart
 - **params**: (product: Product, quantity = 1)
-- **ic_degiskenler**: (yok — doğrudan setItems ve async işlemler)
-- **Dönüş**: void — yan etkiler: setItems, Supabase upsert, CustomEvent dispatch, toast
+- **ic_degiskenler**: (yok — `items` dışarıdan closure ile gelir)
+- **Dönüş**: yok (yan etki: `setItems` çağırır, `Promise.all` ile sunucu senkronizasyonu başlatır, `CustomEvent` fırlatır)
 
----
-
-### [N12_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::addToCart_setItems_callback
-- **params**: (currentItems) — mevcut CartItem[] state'i
+### [N12_NASIL] AST Pointer: CartProvider.tsx::(addToCart_setItems_callback)
+- **params**: (currentItems: CartItem[])
 - **ic_degiskenler**:
-  - `existingItem` — currentItems içinde product.id eşleşen mevcut item (varsa)
-- **Dönüş**: CartItem[] — güncellenmiş item listesi (mevcut item varsa quantity artırılır, yoksa eklenir)
+  - `existingItem` — `currentItems.find(...)` ile bulunan, ürün ID'si eşleşen mevcut sepet öğesi veya `undefined`
+- **Dönüş**: güncellenmiş `CartItem[]` dizisi
 
----
-
-### [N13_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::addToCart_map_callback
-- **params**: (item) — mevcut items listesindeki her CartItem
-- **ic_degiskenler**: (yok — tek ifade)
-- **Dönüş**: CartItem — product.id eşleşen item'ın quantity'si artırılmış yeni nesne, eşleşmiyorsa aynı item
-
----
-
-### [N14_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::addToCart_promise_callback
-- **params**: ([{ getEffectivePriceInfo }, { upsertCartItem }]) — dinamik import edilmiş modül destructuring'i
-- **ic_degiskenler**: (yok — promise chain başlatır)
-- **Dönüş**: Promise<void>
-
----
-
-### [N15_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::addToCart_info_callback
-- **params**: (info) — getEffectivePriceInfo sonucu { unitPrice, priceListId } nesnesi
+### [N13_NASIL] AST Pointer: CartProvider.tsx::(addToCart_map_callback)
+- **params**: (item)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: void — yan etki: upsertCartItem ve setItems çağrılır
+- **Dönüş**: `{ ...item, quantity: item.quantity + quantity }` veya aynen `item`
 
----
+### [N14_NASIL] AST Pointer: CartProvider.tsx::(addToCart_promise_then_callback)
+- **params**: ([{ getEffectivePriceInfo }, { upsertCartItem }])
+- **ic_degiskenler**: (yok — params destructured)
+- **Dönüş**: yok (yan etki: `getEffectivePriceInfo` ve `upsertCartItem` çağırır)
 
-### [N16_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::removeFromCart
+### [N15_NASIL] AST Pointer: CartProvider.tsx::(addToCart_info_then_callback)
+- **params**: (info)
+- **ic_degiskenler**: (yok — `info.unitPrice` ve `info.priceListId` params içinde doğrudan erişilir)
+- **Dönüş**: yok (yan etki: `upsertCartItem`, `setItems` çağırır)
+
+### [N16_NASIL] AST Pointer: CartProvider.tsx::removeFromCart
 - **params**: (_productId: string)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void — yan etkiler: setItems, removeCartItem, toast
+- **ic_degiskenler**: (yok — `items` dışarıdan closure ile gelir)
+- **Dönüş**: yok (yan etki: `setItems` çağırır, `Promise` ile sunucudan siler)
 
----
-
-### [N17_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::removeFromCart_setItems_callback
-- **params**: (currentItems) — mevcut CartItem[] state'i
+### [N17_NASIL] AST Pointer: CartProvider.tsx::(removeFromCart_setItems_callback)
+- **params**: (currentItems: CartItem[])
 - **ic_degiskenler**:
-  - `item` — _productId eşleşen mevcut item (toast gösterimi için kullanılır)
-- **Dönüş**: CartItem[] — _productId eşleşen item filtrelenmiş liste
+  - `item` — `currentItems.find(...)` ile bulunan, productId eşleşen sepet öğesi
+- **Dönüş**: filtrelenmiş `CartItem[]` dizisi (element çıkarılmış)
 
----
-
-### [N18_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::removeFromCart_import_callback
-- **params**: ({ removeCartItem }) — dinamik import edilmiş modül destructuring'i
+### [N18_NASIL] AST Pointer: CartProvider.tsx::(removeFromCart_import_then_callback)
+- **params**: ({ removeCartItem })
 - **ic_degiskenler**: (yok)
-- **Dönüş**: Promise<void> — removeCartItem sonucu
+- **Dönüş**: `removeCartItem(supabase, serverCartId, _productId)` Promise'i
 
----
-
-### [N19_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::updateQuantity
+### [N19_NASIL] AST Pointer: CartProvider.tsx::updateQuantity
 - **params**: (_productId: string, quantity: number)
 - **ic_degiskenler**:
-  - `product` — items listesinde _productId eşleşen item'ın product nesnesi (server sync için kullanılır)
-- **Dönüş**: void — quantity <= 0 ise removeFromCart çağrılır, sonst setItems ve server upsert
+  - `product` — `items.find(...)` ile bulunan, productId eşleşen sepet öğesinin `product` alanı
+- **Dönüş**: yok (yan etki: `removeFromCart` veya `setItems` çağırır, `Promise.all` ile sunucu senkronizasyonu başlatır)
 
----
-
-### [N20_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::updateQuantity_setItems_callback
-- **params**: (currentItems) — mevcut CartItem[] state'i
-- **ic_degiskenler**: (yok — inline map)
-- **Dönüş**: CartItem[] — _productId eşleşen item'ın quantity'si güncellenmiş liste
-
----
-
-### [N21_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::updateQuantity_map_callback
-- **params**: (item) — mevcut items listesindeki her CartItem
-- **ic_degiskenler**: (yok — tek ifade)
-- **Dönüş**: CartItem — _productId eşleşiyorsa quantity güncellenmiş yeni nesne, eşleşmiyorsa aynı item
-
----
-
-### [N22_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::updateQuantity_promise_callback
-- **params**: ([{ getEffectivePriceInfo }, { upsertCartItem }]) — dinamik import edilmiş modül destructuring'i
-- **ic_degiskenler**: (yok — promise chain başlatır)
-- **Dönüş**: Promise<void>
-
----
-
-### [N23_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::updateQuantity_info_callback
-- **params**: (info) — getEffectivePriceInfo sonucu { unitPrice, priceListId }
+### [N20_NASIL] AST Pointer: CartProvider.tsx::(updateQuantity_setItems_callback)
+- **params**: (currentItems: CartItem[])
 - **ic_degiskenler**: (yok)
-- **Dönüş**: void — yan etki: upsertCartItem ve setItems çağrılır
+- **Dönüş**: map edilmiş `CartItem[]` dizisi
 
----
+### [N21_NASIL] AST Pointer: CartProvider.tsx::(updateQuantity_map_callback)
+- **params**: (item)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `{ ...item, quantity }` veya aynen `item`
 
-### [N24_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::clearCart
+### [N22_NASIL] AST Pointer: CartProvider.tsx::(updateQuantity_promise_then_callback)
+- **params**: ([{ getEffectivePriceInfo }, { upsertCartItem }])
+- **ic_degiskenler**: (yok — params destructured)
+- **Dönüş**: yok (yan etki: `getEffectivePriceInfo` ve `upsertCartItem` çağırır)
+
+### [N23_NASIL] AST Pointer: CartProvider.tsx::(updateQuantity_info_then_callback)
+- **params**: (info)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: `upsertCartItem`, `setItems` çağırır)
+
+### [N24_NASIL] AST Pointer: CartProvider.tsx::clearCart
 - **params**: (opts?: { silent?: boolean })
 - **ic_degiskenler**: (yok)
-- **Dönüş**: void — yan etkiler: setItems([]), localStorage temizliği, StorageEvent dispatch, clearCartItems, toast
+- **Dönüş**: yok (yan etki: `setItems([])`, localStorage temizler, `StorageEvent` fırlatır, `toast` gösterir, sunucuyu temizler)
 
----
-
-### [N25_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::clearCart_import_callback
-- **params**: ({ clearCartItems }) — dinamik import edilmiş modül destructuring'i
+### [N25_NASIL] AST Pointer: CartProvider.tsx::(clearCart_import_then_callback)
+- **params**: ({ clearCartItems })
 - **ic_degiskenler**: (yok)
-- **Dönüş**: Promise<void> — clearCartItems sonucu
+- **Dönüş**: `clearCartItems(supabase, serverCartId)` Promise'i
 
----
+### [N26_NASIL] AST Pointer: CartProvider.tsx::getCartTotal
+- **params**: ()
+- **ic_degiskenler**: (yok — `items` dışarıdan closure ile gelir)
+- **Dönüş**: `number` — sepet toplam tutarı
 
-### [N26_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::getCartTotal
-- **params**: () — parametresiz
-- **ic_degiskenler**: (yok)
-- **Dönüş**: number — sepetin toplam tutarı (birim fiyat × quantity toplamı)
-
----
-
-### [N27_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::getCartTotal_reduce_callback
-- **params**: (total, item) — accumulator ve mevcut CartItem
+### [N27_NASIL] AST Pointer: CartProvider.tsx::(getCartTotal_reduce_callback)
+- **params**: (total: number, item: CartItem)
 - **ic_degiskenler**:
-  - `unit` — item.unitPrice number ise onu, değilse item.product.price'ı fallback olarak kullanan birim fiyat
-- **Dönüş**: number — total + unit * item.quantity
+  - `unit` — birim fiyat; `item.unitPrice` sayıysa onu, değilse `item.product.price`'ı `Number` ile dönüştürür
+- **Dönüş**: `total + unit * item.quantity` — kümülatif toplam
 
----
+### [N28_NASIL] AST Pointer: CartProvider.tsx::getCartCount
+- **params**: ()
+- **ic_degiskenler**: (yok — `items` dışarıdan closure ile gelir)
+- **Dönüş**: `number` — sepetteki toplam ürün adedi
 
-### [N28_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::getCartCount
-- **params**: () — parametresiz
+### [N29_NASIL] AST Pointer: CartProvider.tsx::(getCartCount_reduce_callback)
+- **params**: (total: number, item: CartItem)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: number — sepetteki toplam ürün adedi (quantity toplamı)
+- **Dönüş**: `count + item.quantity` — kümülatif adet toplamı
 
----
-
-### [N29_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::getCartCount_reduce_callback
-- **params**: (count, item) — accumulator ve mevcut CartItem
-- **ic_degiskenler**: (yok — tek ifade)
-- **Dönüş**: number — count + item.quantity
-
----
-
-### [N30_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::applyServerPricing
+### [N30_NASIL] AST Pointer: CartProvider.tsx::applyServerPricing
 - **params**: (serverItems: { product_id: string, unit_price: number }[])
 - **ic_degiskenler**:
-  - `to2` — bir sayıyı 2 ondalık basamağa yuvarlayan yardımcı fonksiyon
-  - `nearlyEqual` — iki sayının 0.01 toleransla eşit olup olmadığını kontrol eden fonksiyon
-  - `pmap` — product_id -> unit_price eşlemesi yapan Map, normalize edilmiş 2 ondalıklı fiyatlar
-  - `changedIds` — gerçekten fiyat değişen itemların product_id'lerini tutan Set
-- **Dönüş**: void — yan etkiler: setItems, upsertCartItem (sunucuya değişiklik yansıtır)
+  - `to2` — `(n: number) => Number(Number(n).toFixed(2))` fonksiyonu; sayıyı 2 ondalık basamağa yuvarlar
+  - `nearlyEqual` — `(a: number, b: number) => Math.abs(to2(a) - to2(b)) <= 0.01` fonksiyonu; iki sayının yaklaşık eşitliğini kontrol eder
+  - `pmap` — `Map<string, number>`; ürün ID'sinden 2 ondalıklı birim fiyatına eşleme haritası
+  - `changedIds` — `Set<string>`; fiyatı gerçekten değişen ürün ID'lerinin kümesi
+- **Dönüş**: yok (yan etki: `setItems` çağırır, sunucuya upsert yapar)
 
----
+### [N31_NASIL] AST Pointer: CartProvider.tsx::(applyServerPricing_setItems_callback)
+- **params**: (curr: CartItem[])
+- **ic_degiskenler**: (yok)
+- **Dönüş**: map edilmiş `CartItem[]` dizisi
 
-### [N31_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::applyServerPricing_setItems_callback
-- **params**: (curr) — mevcut CartItem[] state'i
-- **ic_degiskenler**: (yok — inline map)
-- **Dönüş**: CartItem[] — unitPrice'ları güncellenmiş item listesi
-
----
-
-### [N32_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::applyServerPricing_map_callback
-- **params**: (it) — mevcut items listesindeki her CartItem
+### [N32_NASIL] AST Pointer: CartProvider.tsx::(applyServerPricing_item_map_callback)
+- **params**: (it: CartItem)
 - **ic_degiskenler**:
-  - `nextUnit` — pmap'ten gelen yeni birim fiyat veya null/undefined
-  - `currUnit` — item'ın mevcut birim fiyat değeri (unitPrice veya product.price fallback)
-- **Dönüş**: CartItem — fiyat değiştiyse unitPrice güncellenmiş yeni nesne, aynıysa mevcut item
+  - `nextUnit` — `pmap.get(it.product.id)` ile elde edilen sunucu birim fiyatı veya `undefined`
+  - `currUnit` — mevcut birim fiyat; `it.unitPrice` sayıysa onu, değilse `it.product.price`'ı `Number` ile dönüştürür
+- **Dönüş**: güncellenmiş `CartItem` nesnesi veya aynen `it`
 
----
-
-### [N33_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::applyServerPricing_import_callback
-- **params**: ({ upsertCartItem }) — dinamik import edilmiş modül destructuring'i
+### [N33_NASIL] AST Pointer: CartProvider.tsx::(applyServerPricing_import_then_callback)
+- **params**: ({ upsertCartItem })
 - **ic_degiskenler**:
-  - `tasks` — Promise<unknown>[] dizisi, her changed item için upsert promise'ları tutar
-- **Dönüş**: void — yan etki: Promise.allSettled ile toplu upsert
+  - `tasks` — `Promise<unknown>[]` dizisi; sunucuya yapılacak upsert isteklerinin promise'ları
+  - `it` — `items[i]` döngüsündeki mevcut CartItem
+  - `up` — `pmap.get(it.product.id)` ile elde edilen güncellenmiş birim fiyat
+- **Dönüş**: yok (yan etki: `Promise.allSettled(tasks)` ile sunucu güncellemelerini tetikler)
 
----
-
-### [N34_NASIL] AST Pointer: `src/contexts/CartProvider.tsx`::CartProvider_context_value
-- **params**: () — parametresiz
-- **ic_degiskenler**: (yok — doğrudan nesne literal)
-- **Dönüş**: CartContextValue — { items, syncing, addToCart, removeFromCart, updateQuantity, clearCart, getCartTotal, getCartCount, applyServerPricing }
+### [N34_NASIL] AST Pointer: CartProvider.tsx::(context_value_callback)
+- **params**: ()
+- **ic_degiskenler**: (yok — tüm değerler dışarıdan closure ile gelir: `items`, `syncing`, `addToCart`, `removeFromCart`, `updateQuantity`, `clearCart`, `getCartTotal`, `getCartCount`, `applyServerPricing`)
+- **Dönüş**: `CartContextValue` nesnesi — sepet context'inin sağladığı tüm değerler ve fonksiyonlar
 
 ---
 

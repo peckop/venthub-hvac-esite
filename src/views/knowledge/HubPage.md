@@ -3,20 +3,20 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\knowledge\HubPage.tsx
-skeleton_hash: 51959c03f2b8ee36
+skeleton_hash: aaba60e429f09ad8
 entity_hashes:
   func:HubPage: ae5a0ef5e997bc98
-  overview: 92f1bd1bc9a0b472
+  overview: 71b37ce0d8e45326
   style_tokens: 8d8885134f307444
-generated_at: 2026-06-07T20:34:41Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış
-Bu modül, Bilgi Merkezi sayfasının ana arayüzünü oluşturan React bileşenini içerir. Kullanıcıya bilgi kaynaklarına erişim sağlayan merkezi sayfanın yapısını ve düzenini tanımlar.
+Bu modül, VentHub projesinin "Bilgi Merkezi" (Knowledge Hub) ana sayfasını oluşturan React bileşenini içermektedir. Modül, kullanıcıların bilgi kaynaklarına eriştiği merkezi bir arayüz sunar ve sayfanın yapısını, düzenini ve temel içeriğini tanımlar.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Bilgi Merkezi sayfasının görsel yapısını ve içerik düzenini tanımlar.
+Bilgi Merkezi ana sayfasının tüm görsel yapısını ve temel düzenini render eden ana React bileşenini tanımlar.
 - HubPage
 
 ---
@@ -58,58 +58,17 @@ type TopicSlug = typeof TOPIC_SLUGS[number]
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::HubPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: HubPage.tsx::HubPage (main component)
+- **params**: (parametre yok — anonim arrow function olarak React.FC döner)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook’inden dönen çeviri fonksiyonu, metinleri yerelleştirmek için kullanılır.
-  - `q` — Arama kutusundaki kullanıcı girdisini tutan state değişkeni.
-  - `setQ` — `q` state’ini güncelleyen set fonksiyonu.
-  - `activeTag` — Seçili etiket (veya `'all'`) değerini tutan state değişkeni.
-  - `setActiveTag` — `activeTag` state’ini güncelleyen set fonksiyonu.
-  - `topics` — `TOPIC_SLUGS` listesinden oluşturulan, her bir konu için başlık, özet, okuma süresi ve kategori bilgilerini içeren dizi. `useMemo` ile `t` bağımlılığına göre memoize edilir.
-  - `filtered` — `q` ve `activeTag` değerlerine göre `topics` dizisini filtreleyen dizi. `useMemo` ile `q`, `topics`, `activeTag` bağımlılıklarına göre memoize edilir.
-- **Dönüş**: React element ağacı (JSX) döner; bileşen render edildiğinde UI oluşturur ve yan etkisi yoktur (state ve memoizasyonlar aracılığıyla UI güncellenir).
-
-### [N2_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(TOPIC_SLUGS.map callback)
-- **params**: `slug`
-- **ic_degiskenler**:
-  - `categoryKey` — `slug` değerine göre `'comfort'`, `'safety'` veya `'efficiency'` stringi atanır; kategori çevirisi için kullanılır.
-- **Dönüş**: `{ slug, title, summary, time, category }` nesnesi döner; `title`, `summary`, `time` ve `category` değerleri `t` çeviri fonksiyonu ile oluşturulur.
-
-### [N3_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(filtered useMemo callback)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `text` — `q` değerinin boşlukları temizlenmiş ve küçük harfe dönüştürülmüş hali.
-- **Dönüş**: `topics.filter` çağrısının sonucu olan, arama metni ve seçili etiket koşullarını sağlayan konu nesnelerinin dizisi.
-
-### [N4_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(topics.filter callback)
-- **params**: `tpc`
-- **ic_degiskenler**:
-  - `matchesText` — `text` boş ise `true`, aksi takdirde `tpc.title` ve `tpc.summary` birleştirilip `text` içinde bulunuyorsa `true`.
-  - `matchesTag` — `activeTag` `'all'` ise `true`, aksi takdirde `tpc.slug` ile `activeTag` eşleşiyorsa `true`.
-- **Dönüş**: `matchesText && matchesTag` boolean ifadesi; filtreleme sonucunu belirler.
-
-### [N5_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(title split map callback)
-- **params**: `part, i`
-- **ic_degiskenler**: (hiçbiri)
-- **Dönüş**: `React.Fragment` içinde `part` ve koşullu virgül/`<br/>` öğeleri döner; başlık metnini parçalar ve formatlar.
-
-### [N6_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(TAGS.map callback)
-- **params**: `tag`
-- **ic_degiskenler**:
-  - `tag.key` — Etiketin benzersiz anahtarı, `setActiveTag` çağrısında kullanılır.
-  - `tag.labelKey` — Çeviri dosyasındaki etiket etiketi anahtarı, `t` ile çevrilir.
-- **Dönüş**: `<button>` JSX öğesi döner; tıklanınca `activeTag` güncellenir ve etiket adı gösterilir.
-
-### [N7_NASIL] AST Pointer: src\views\knowledge\HubPage.tsx::(filtered.map callback)
-- **params**: `topic, i`
-- **ic_degiskenler**:
-  - `topic.slug` — Konu sayfasına yönlendirme URL’si için kullanılır.
-  - `topic.category` — Konu kategorisi etiketi.
-  - `topic.time` — Okuma süresi etiketi.
-  - `topic.title` — Konu başlığı.
-  - `topic.summary` — Konu özeti.
-- **Dönüş**: `<motion.div>` içinde `<Link>` JSX öğesi döner; konu kartını ve animasyonlarını oluşturur.
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu, tüm UI metinlerini uluslararasılaştırır
+  - `q` — useState ile yönetilen arama sorgusu state'i, kullanıcının yazdığı filtre metni
+  - `setQ` — q state'ini güncelleyen setter fonksiyonu, input onChange'te çağrılır
+  - `activeTag` — useState ile yönetilen aktif etiket filtresi state'i, TopicSlug veya 'all' tipinde
+  - `setActiveTag` — activeTag state'ini güncelleyen setter fonksiyonu, tag butonlarına tıklanınca çağrılır
+  - `topics` — useMemo ile hesaplanan konu dizisi, TOPIC_SLUGS üzerinde map yaparak her slug için title, summary, time, category içeren nesne üretir
+  - `filtered` — useMemo ile hesaplanan filtrelenmiş konu dizisi, q ve activeTag'e göre topics'i filtreler
+- **Dönüş**: JSX — tam sayfa layout'u (hero, arama barı, etiket navigasyonu, konu grid'i, araçlar bölümü, destek banner'ı)
 
 ---
 

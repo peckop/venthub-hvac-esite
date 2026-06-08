@@ -1,6 +1,7 @@
-import VentImage from '@/components/ui/VentImage'
+import { Award, Clock, Globe, Star } from 'lucide-react'
 import React from 'react'
-import { Award, Globe, Clock, Star } from 'lucide-react'
+
+import VentImage from '@/components/ui/VentImage'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
@@ -66,7 +67,7 @@ const SilentFanVorticeBrand: React.FC = () => {
                     <div className={`${scrollAnimationClasses.slideLeft(isVisible)} relative`}>
                         <div className="relative z-10 rounded-hvac-2xl overflow-hidden border-8 border-slate-800 shadow-2xl">
                             <VentImage src="/images/vortice/vortice_lineo_hero.png"
-                                alt="Vortice Lineo Heritage"
+                                alt={t('category.vorticeHeritageAlt')}
                                 className="w-full h-auto"
                              />
                         </div>

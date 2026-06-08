@@ -1,10 +1,10 @@
-import React from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { adminButtonSecondaryClass } from '../../utils/adminUi'
-import { Settings2, Check, Layout, Maximize2 } from 'lucide-react'
-import { useI18n } from '../../i18n/I18nProvider'
+import { Check, Layout, Maximize2,Settings2 } from 'lucide-react'
+import React from 'react'
 
+import { useI18n } from '../../i18n/I18nProvider'
 import { Density } from '../../types/admin-shared'
+import { adminButtonSecondaryClass } from '../../utils/adminUi'
 
 export type ColumnToggle = { key: string; label: string; checked: boolean; onChange: (v: boolean) => void }
 export type { Density }

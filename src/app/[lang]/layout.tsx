@@ -1,8 +1,9 @@
 import React from 'react'
-import { I18nProvider } from '../../i18n/I18nProvider'
+
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
 import type { AppDictionary, Lang } from '../../i18n/I18nContext'
+import { I18nProvider } from '../../i18n/I18nProvider'
 
 export type { Lang }
 

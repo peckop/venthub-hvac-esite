@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\SecurePaymentOverlay.tsx
-skeleton_hash: 6b77d0737b6e26dc
+skeleton_hash: fe866119a7147af0
 entity_hashes:
   func:SecurePaymentOverlay: 2034f9e5c072e96b
   overview: abfd0850fbcc2e8a
   style_tokens: 5b40eb77343c895c
-generated_at: 2026-05-28T22:40:23Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış
@@ -53,6 +53,19 @@ Bu React tabanlı güvenli ödeme kaplama bileşeni, üst bileşen tarafından�
 - `overlayStep: number`
 - `overlayPercent: number`
 - `t: (key: string) => string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: SecurePaymentOverlay.tsx::SecurePaymentOverlay
+- **params**: (overlayVisible, overlayStep, overlayPercent, t)
+- **ic_degiskenler**: 
+  - `overlayVisible` — Ödeme overlay'ının görünür olup olmadığını belirler (boolean), false ise null döner
+  - `overlayStep` — Overlay'ın hangi adımda olduğunu belirler (1, 2, 3), başlık ve adım renklerini kontrol eder
+  - `overlayPercent` — İlerleme çubuğunun yüzdesini belirler, CSS width stilinde kullanılır
+  - `t` — Çeviri fonksiyonu, tüm UI metinlerini lokalize etmek için kullanılır (checkout.overlay.* key'leri)
+- **Dönüş**: JSX.Element | null (overlayVisible false ise null, değilse React bileşeni)
 
 ---
 

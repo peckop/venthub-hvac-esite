@@ -1,19 +1,20 @@
 'use client';
 
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useI18n } from '../../i18n/I18nProvider';
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import { 
   Package, 
-  Search, 
+  Plus,
   RefreshCw, 
-  Plus
-} from 'lucide-react';
+  Search} from 'lucide-react';
+import React, { useEffect, useMemo,useState } from 'react';
 import { toast } from 'sonner';
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
+
 import InventoryTable from '../../components/admin/InventoryTable';
+import { useI18n } from '../../i18n/I18nProvider';
+import { Density,LoadState } from '../../types/admin-shared';
 import type { Database } from '../../types/database.types';
-import { LoadState, Density } from '../../types/admin-shared';
 
 type InventorySummaryRow = Database['public']['Views']['inventory_summary']['Row'] & { category_id?: string | null };
 type Category = Database['public']['Tables']['categories']['Row'];

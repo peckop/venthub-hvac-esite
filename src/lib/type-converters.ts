@@ -1,8 +1,8 @@
-import type { DbCategory, DbProduct, CategoryMetadata, LocalizedCategoryMetadata } from '../types/db-rows'
+import type { CategoryMetadata, DbCategory, DbProduct, LocalizedCategoryMetadata } from '../types/db-rows'
 import type { DomainCategory, DomainProduct } from '../types/ui-models'
 
 // Re-export domain types so they can be accessed through this module (as expected by other files)
-export type { DomainCategory, DomainProduct, CategoryMetadata, LocalizedCategoryMetadata }
+export type { CategoryMetadata, DomainCategory, DomainProduct, LocalizedCategoryMetadata }
 
 import type { Json } from '../types/database.types'
 

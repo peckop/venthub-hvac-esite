@@ -3,33 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx
-skeleton_hash: 258017575fcc5a61
+skeleton_hash: 91f51cdff870d9a1
 entity_hashes:
   func:AccountShipmentsPage: 6c41daabba3ddc39
-  overview: 2396779c9e104706
+  overview: ca709958064b6e53
   style_tokens: 0076231c43efae4d
-generated_at: 2026-06-06T21:56:53Z
+generated_at: 2026-06-08T10:10:59Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin kullanıcı hesapları bölümünde yer alan ve kullanıcıların kendi gönderi/kargo bilgilerini görüntüleyebileceği tek sayfalık bir arayüz bileşenidir. Bileşen, hesap yönetimi alanı altındaki sevkiyatlar sayfasının ana giriş noktasını oluşturur.
+VentHub HVAC projesinin hesap yönetimi modülüne ait, kullanıcıların kendi sevkiyat ve kargo bilgilerini görüntüleyebildiği tek sayfalık bir arayüz bileşenidir. Modül, hesap section altında yer alan sevkiyatlar sayfasının ana giriş noktasını oluşturarak kullanıcıya ilgili verileri sunar.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Modülün tek ve ana bileşeni olarak, ilgili hesap gönderileri sayfasının tüm arayüzünü ve temel yapıyı oluşturur.
+Hesap gönderileri sayfasının tüm arayüz yapısını ve temel altyapısını oluşturan ana bileşendir.
 - AccountShipmentsPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, parametre almayan bir React fonksiyonel bileşen olup, hesap gönderileri sayfasının tek giriş noktasıdır.
+Bu modül, hesap yönetimi altındaki sevkiyatlar sayfasını oluşturan bir React fonksiyonel bileşenidir. Fonksiyon gövdesi kodu sağlanmadığından, mimari varsayımlar yalnızca fonksiyon imzası ve yapısal bağlam temelinde çıkarılmıştır.
 
-[Aksiyom 1]: Eğer bileşen bir React uygulama bağlamı (Provider ağacı) dışında render edilirse, gerekli context'ler (oturum, tema vb.) sağlanamaz ve bileşen hata verir.
+**[Aksiyom 1]:** Eğer React çalışma ortamı (React context/provider zinciri) mevcut değilse, bileşen挂钩 (hooks) kullanamaz ve hata fırlatır.
 
-[Aksiyom 2]: Eğer bileşen, hesap section dışı bir rota tarafından çağrılarsa, beklenen kullanıcı oturum durumu veya hesap verisi mevcut olmayabilir ve bileşen tutarsız durum sergiler.
+**[Aksiyom 2]:** Eğer bileşen bir hesap (account) route yapısı altında render edilmiyorsa, ilgili layout ve navigasyon bileşenleri tarafından sarmalanmamış olur ve sayfa yapısı tutarsız çalışır.
 
-[Aksiyom 3]: Eğer bileşen props almadığı halde iç bağımlılıklarından biri (API servisi, context, hook) değiştirilirse veya kaldırılırsa, bileşenin çalışma zamanı davranışı bozulur.
+**[Aksiyom 3]:** Eğer kullanıcı oturum açmamış (authenticated) değilse, bileşen sevkiyat verilerini getiremez veya boş/uygunsuz durum gösterir.
 
 ---
 
@@ -75,117 +75,90 @@ type ShipFilter = 'all' | 'shipped' | 'delivered'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AccountShipmentsPage.tsx::useEffectCallback (mounted closure)
+### [N1_NASIL] AST Pointer: AccountShipmentsPage.tsx::AccountShipmentsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `mounted` — cleanup flag; component unmount oldugunda false olur, state guncellemeleri engellenir
-  - `load` — async fonksiyon; siparisleri Supabase'den cekip filtreler
-- **Dönüş**: cleanup fonksiyonu `() => { mounted = false }` doner
-
----
+  - `mounted` — useEffect cleanup flag, component unmount olduğunda false yapılır
+  - `load` — async fonksiyon, sipariş verilerini Supabase'den yükler
+  - `baseSelect` — string, Supabase select sorgusu için alan listesi
+  - `data` — supabase yanıtından gelen sipariş verileri
+  - `error` — supabase sorgu hatası
+  - `fallback` — hata durumunda alternatif sorgu sonucu
+  - `items` — ham verinin maplenmiş hali, order_number düzeltmeleri yapılır
+  - `filtered` — sadece kargo bilgisi olan siparişler
+- **Dönüş**: JSX (sayfa bileşeni)
 
 ### [N2_NASIL] AST Pointer: AccountShipmentsPage.tsx::load
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `baseSelect` — string; Supabase select sorgusu icin secilecek kolon listesi (`'id, created_at, total_amount, status, order_number, carrier, tracking_number, tracking_url, shipped_at, delivered_at'`)
-  - `data` — Supabase'den donen siparis satirlarinin ham verisi
-  - `error` — Supabase sorgusundan donen hata nesnesi
-  - `fallback` — fallback sorgu sonucu; shipping kolonlari yoksa daraltilmis select ile gelen data/error
-  - `items` — `(data || []).map(...)` ile `order_number` fallback'i uygulanmis ShipmentRow dizisi; `item.order_number || item.id` ile order_number garanti altina alinir
-  - `filtered` — items icinden herhangi bir shipping bilgisi olan (carrier, tracking_number, tracking_url, shipped_at, delivered_at) kayitlar
-  - `e` — try-catch yakalanan hata nesnesi
-- **Dönüş**: yok (state gunceller: `setRows(filtered)`, `setLoading`)
+  - `baseSelect` — string, Supabase select sorgusu için alan listesi
+  - `data` — supabase yanıtından gelen sipariş verileri
+  - `error` — supabase sorgu hatası
+  - `fallback` — hata durumunda alternatif sorgu sonucu
+  - `items` — ham verinin maplenmiş hali, order_number düzeltmeleri yapılır
+  - `filtered` — sadece kargo bilgisi olan siparişler
+- **Dönüş**: yok (state set eder)
 
----
-
-### [N3_NASIL] AST Pointer: AccountShipmentsPage.tsx::fallbackMapCallback
-- **params**: `item` — supabase fallback sorgusundan donen tekil siparis kaydi (sadece id, created_at, total_amount, status, order_number icerir)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `item` uzerine shipping kolonlarini null olarak eklenmis genisletilmis nesne doner
-
----
-
-### [N4_NASIL] AST Pointer: AccountShipmentsPage.tsx::itemsMapCallback
-- **params**: `item` — supabase'den donen tekil siparis kaydi (tum kolonlar)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `item` uzerine `order_number` fallback'i uygulanmis nesne doner; `item.order_number || item.id`
-
----
-
-### [N5_NASIL] AST Pointer: AccountShipmentsPage.tsx::formatDate
-- **params**: `d` — `string | null | undefined`; formatlanacak tarih stringi
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `string`; d bos/null ise `'-'`, degilse `formatOnlyDate(d, lang)` cagrisinin donusu
-
----
-
-### [N6_NASIL] AST Pointer: AccountShipmentsPage.tsx::formatPrice
-- **params**: `price` — `number | string`; formatlanacak fiyat degeri
+### [N3_NASIL] AST Pointer: AccountShipmentsPage.tsx::formatDate
+- **params**: `(d?: string | null)`
 - **ic_degiskenler**:
-  - `n` — number; `Number(price) || 0` ile numeric'e donusturulmus fiyat, parse edilemezse 0
-- **Dönüş**: `string`; `formatCurrency(n, lang, { maximumFractionDigits: 0 })` ile formatlanmis para birimi stringi
+  - `d` — formatlanacak tarih stringi veya null
+- **Dönüş**: string (formatlanmış tarih veya "-")
 
----
-
-### [N7_NASIL] AST Pointer: AccountShipmentsPage.tsx::handleCopy
-- **params**: `text` — `string | null | undefined`; panoya kopyalanacak takip numarasi/metin
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `Promise<void>`; `navigator.clipboard.writeText(text)` ile panoya yazar, basari/hata toast gosterir
-
----
-
-### [N8_NASIL] AST Pointer: AccountShipmentsPage.tsx::getShipStatus
-- **params**: `row` — `ShipmentRow`; kargo durumu belirlenecek siparis satiri
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `'delivered' | 'shipped' | 'preparing'`; `row.delivered_at` varsa delivered, `row.shipped_at || row.tracking_number` varsa shipped, diger durumda preparing
-
----
-
-### [N9_NASIL] AST Pointer: AccountShipmentsPage.tsx::getShipStatusBadge
-- **params**: `status` — `'delivered' | 'shipped' | 'preparing'`; durum degeri
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `JSX.Element`; duruma gore renkli badge JSX'i doner — delivered: yesil CheckCircle, shipped: mor Truck, prepared: sari Clock
-
----
-
-### [N10_NASIL] AST Pointer: AccountShipmentsPage.tsx::getStepIndex
-- **params**: `status` — `'delivered' | 'shipped' | 'preparing'`; kargo durumu
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `number`; delivered ise 2, shipped ise 1, prepared ise 0
-
----
-
-### [N11_NASIL] AST Pointer: AccountShipmentsPage.tsx::filterCallback
-- **params**: `r` — `ShipmentRow`; filtrelenen siparis satiri
+### [N4_NASIL] AST Pointer: AccountShipmentsPage.tsx::formatPrice
+- **params**: `(price: number | string)`
 - **ic_degiskenler**:
-  - `s` — string; `getShipStatus(r)` cagrisiyla elde edilen kargo durumu
-- **Dönüş**: `boolean`; `filter === 'all'` ise true, degilse satirin durumu filter eslesiyorsa true
+  - `n` — price'ın number karşılığı, 0 ise fallback
+- **Dönüş**: string (formatlanmış para birimi)
 
----
-
-### [N12_NASIL] AST Pointer: AccountShipmentsPage.tsx::filterButtonRenderCallback
-- **params**: `opt` — `{ value: string, label: string }`; filtre secenek nesnesi
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `JSX.Element`; secili filtre ile eslesen buton render eder; secili ise primary-navy arka planli, degilse beyaz arka planli
-
----
-
-### [N13_NASIL] AST Pointer: AccountShipmentsPage.tsx::orderCardRenderCallback
-- **params**: `o` — `ShipmentRow`; render edilecek siparis satiri
+### [N5_NASIL] AST Pointer: AccountShipmentsPage.tsx::handleCopy
+- **params**: `(text?: string | null)`
 - **ic_degiskenler**:
-  - `shipStatus` — string; `getShipStatus(o)` ile elde edilen kargo durumu
-  - `activeStepIdx` — number; `getStepIndex(shipStatus)` ile elde edilen aktif stepper indeksi
-  - `orderCode` — string; `o.order_number` varsa son parcasi, yoksa `o.id.slice(-8).toUpperCase()` ile olusturulan siparis kodu (ornek: `#ABC12345`)
-- **Dönüş**: `JSX.Element`; siparis karti JSX'i — header, shipping progress stepper, kargo detaylari (firma, takip no, takip linki, kargoya verilme tarihi, teslim tarihi)
+  - `text` — kopyalanacak metin
+- **Dönüş**: yok (clipboard'a yazar, toast gösterir)
 
----
-
-### [N14_NASIL] AST Pointer: AccountShipmentsPage.tsx::stepperRenderCallback
-- **params**: `step` — `{ key: string, label: string, icon: ComponentType }`; stepper adimi; `idx` — number; adimin dizideki indeksi
+### [N6_NASIL] AST Pointer: AccountShipmentsPage.tsx::getShipStatus
+- **params**: `(row: ShipmentRow)`
 - **ic_degiskenler**:
-  - `active` — boolean; `idx <= activeStepIdx` ile bu adamin aktif olup olmadigi
-  - `StepIcon` — ComponentType; `step.icon`'dan alinan ikon bileseni
-- **Dönüş**: `JSX.Element`; tekil stepper adimi ve baglanti cizgisi JSX'i; aktif ise primary-navy, degilse slate-400/slate-200 renkleri
+  - `row` — kargo durumu hesaplanacak sipariş satırı
+- **Dönüş**: `'delivered' | 'shipped' | 'preparing'` (kargo durumu)
+
+### [N7_NASIL] AST Pointer: AccountShipmentsPage.tsx::getShipStatusBadge
+- **params**: `(status: 'delivered' | 'shipped' | 'preparing')`
+- **ic_degiskenler**:
+  - `status` — gösterilecek kargo durumu
+- **Dönüş**: JSX (renkli durum badge'i)
+
+### [N8_NASIL] AST Pointer: AccountShipmentsPage.tsx::getStepIndex
+- **params**: `(status: 'delivered' | 'shipped' | 'preparing')`
+- **ic_degiskenler**:
+  - `status` — adım indeksi hesaplanacak kargo durumu
+- **Dönüş**: number (0, 1 veya 2)
+
+### [N9_NASIL] AST Pointer: AccountShipmentsPage.tsx::filteredOrdersFilter
+- **params**: `(r)` (ShipmentRow tipinde)
+- **ic_degiskenler**:
+  - `r` — filtrelenecek sipariş satırı
+  - `s` — getShipStatus(r) ile hesaplanan kargo durumu
+- **Dönüş**: boolean (filtre kriterine uyuyorsa true)
+
+### [N10_NASIL] AST Pointer: AccountShipmentsPage.tsx::shipStepsMap
+- **params**: `(step, idx)`
+- **ic_degiskenler**:
+  - `step` — shipSteps dizisindeki adım nesnesi
+  - `idx` — adım indeksi
+  - `active` — bu adımın aktif olup olmadığı (idx <= activeStepIdx)
+  - `StepIcon` — step.icon, adımın ikonu
+- **Dönüş**: JSX (React.Fragment içinde adım bileşeni)
+
+### [N11_NASIL] AST Pointer: AccountShipmentsPage.tsx::orderCardMap
+- **params**: `(o)` (ShipmentRow tipinde)
+- **ic_degiskenler**:
+  - `o` — render edilecek sipariş satırı
+  - `shipStatus` — o için hesaplanan kargo durumu
+  - `activeStepIdx` — aktif adım indeksi
+  - `orderCode` — sipariş kodu (id'den türetilmiş)
+- **Dönüş**: JSX (sipariş kartı)
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoundDuctFanModel.tsx
-skeleton_hash: a0c371f59e56b6f1
+skeleton_hash: e7b54615e0d5c4d3
 entity_hashes:
   func:RoundDuctFanModel: d2c6b37b5aca3633
   overview: 3db58d5e3e068a7c
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:49Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış

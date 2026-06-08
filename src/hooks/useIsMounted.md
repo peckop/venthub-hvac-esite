@@ -3,30 +3,34 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useIsMounted.ts
-skeleton_hash: 60e0e6a606c5ed0f
+skeleton_hash: a2364f930e9df71b
 entity_hashes:
   func:useIsMounted: ae14f2fca3691906
-  overview: 77f3711e51ed33d0
-generated_at: 2026-05-28T22:37:46Z
+  overview: 050973256d3540a7
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış
-Bu modül, React tabanlı HVAC projesinde bileşen yaşam döngüsü yönetimi için geliştirilmiş özel bir hook içerir. Temel amacı, React bileşenlerinin sayfaya monte olup olmadığı durumunu güvenli bir şekilde takip ederek, bileşen kaldırıldıktan sonra gerçekleştirilen state güncellemelerinden kaynaklanan bellek sızıntıları ve çalışma zamanı hatalarını önlemektir.
+Bu modül, React bileşenlerinin sayfaya monte olup olmadığını takip eden özel bir hook sunar. Temel amacı, bileşen kaldırıldıktan sonra tetiklenen asenkron işlemlerden kaynaklanan state güncellemelerini ve olası bellek sızıntılarını önlemektir.
 
 ## Fonksiyon Grupları
-### Bileşen Montaj Durumu Takip İşlevi
-React bileşenlerinin mount ve unmount durumlarını güvenli bir şekilde izleyen, asenkron işlem sonrası oluşabilecek hataları engellemek için kullanılan temel işlevi sunar.
+### Bileşen Montaj Durumu Takibi
+Bileşenin mount/unmount yaşam döngüsünü izleyerek, kaldırılmış bileşenlerdeki state güncellemelerine karşı koruma sağlar.
 - useIsMounted
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, React ekosisteminde çalışan özel bir hook olarak, bileşen yaşam döngüsüne entegre şekilde bileşenin mount durumunu izler, çalışması için React runtime ortamının ve hook kullanım standartlarının tam olarak sağlanması zorunludur.
 
-[Aksiyom 1]: Eğer React 16.8 veya daha yeni bir React runtime ortamı yoksa, hook'un içindeki temel React hook bağımlılıkları (useRef, useEffect) çalışmaz, modül hiçbir zaman doğru mount durumu döndüremez.
-[Aksiyom 2]: Eğer hook, React hook kullanım kuralına uygun olarak sadece üst seviyede (koşulsuz şekilde bileşen veya başka özel hook içinde) çağrılmıyorsa, mount durumu için kullanılan referanslar birden fazla bileşen arasında çakışır, tüm çağrılar için yanlış durum değerleri döndürülür.
-[Aksiyom 3]: Eğer React tarafından bileşene ait yaşam döngüsü event'leri (mount, unmount) doğru şekilde tetiklenmiyorsa, modül bileşenin unmount durumunu algılayamaz, daima true değeri döndürerek bellek sızıntılarına veya izin verilmeyen state güncellemelerine yol açar.
-[Aksiyom 4]: Eğer hook React component tree bağlamı dışında çağrılıyorsa, hiçbir yaşam döngüsü tetikleyicisi çalışmaz, modül daima yanlış mount durumu döndürür.
+Bu modül, React'ın hooks mekanizması ve yaşam döngüsüne temel dayalı bir koruyucu yapı sunduğu için aşağıdaki mimari varsayımlar geçerlidir.
+
+[Aksiyom 1]: Eğer `useIsMounted` hook'u bir React fonksiyonel bileşeninin en üst seviyesinde (top-level) çağrılmazsa, React'ın "Invalid hook call" hatası oluşur.
+
+[Aksiyom 2]: Eğer hook'u çağıran bileşen unmount edildiğinde (kaldırıldığında) React'ın `useEffect` temizleme fonksiyonu tetiklenmezse, mount durumu yanlış bir şekilde `true` olarak kalır ve bileşen kaldırıldıktan sonra state güncellemeleri attempted olur, bu da potansiyel bellek sızıntısına yol açar.
+
+[Aksiyom 3]: Eğer React sürümü 16.8 veya üzeri değilse (hooks desteği yoksa), `useIsMounted` hook'u hiç çalıştırılamaz.
+
+[Aksiyom 4]: Eğer SSR (Sunucu tarafı oluşturma) sırasında `useEffect` çalışıyormuş gibi davranılırsa (ki React 18+ ile bu değişti), mounted durumu sunucu ve istemci arasında farklılık göstererek Hydration Mismatch hatasına yol açar.
 
 ---
 
@@ -43,20 +47,13 @@ Bu modül, React ekosisteminde çalışan özel bir hook olarak, bileşen yaşam
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useIsMounted.ts::useIsMounted
+### [N1_NASIL] AST Pointer: src/hooks/useIsMounted.ts::useIsMounted
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `mounted` — Bileşenin DOM'a mount olup olmadığını takip eden boolean state değişkeni, başlangıç değeri false olarak atanır
-  - `setMounted` — React state setter fonksiyonu, `mounted` state değerini güncellemek için kullanılır
-  - `useState` — React state hook'u, false başlangıç değeri ile mounted state'ini oluşturur
-  - `useEffect` — React yan etki hook'u, boş bağımlılık dizisi ile sadece bileşen ilk mount olduğunda çalışacak şekilde yapılandırılır
-- **Dönüş**: boolean tipinde `mounted` değeri (bileşenin güncel mount durumunu temsil eder)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useIsMounted.ts::useIsMounted#mount_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setMounted` — Üst kapsamdan devralınan React state setter fonksiyonu, `mounted` state değerini true olarak günceller
-- **Dönüş**: yok (void)
+  - `mounted` — useState hook'undan dönen boolean state değeri; bileşen挂载(mount) olup olmadığını tutar, başlangıçta `false`'tur
+  - `setMounted` — useState hook'undan dönen setter fonksiyonu; `mounted` state'ini güncellemek için kullanılır, useEffect içinde `true` olarak çağrılır
+  - `useEffect(() => { setMounted(true); }, [])` — React useEffect hook'u; bağımlılık dizisi boş `[]` olduğu için bileşen ilk挂载olduğunda bir kez çalışır ve `setMounted(true)` çağırarak mounted durumunu `true`'ya ayarlar
+- **Dönüş**: `mounted` (boolean) — bileşen挂载 durumunu temsil eden boolean değer
 
 ---
 

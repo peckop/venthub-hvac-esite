@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import type { Session } from '@supabase/supabase-js'
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { ensureSessionFresh } from '../ensureSessionFresh'
 import { supabase } from '../supabase'
-import type { Session } from '@supabase/supabase-js'
 
 // Mock supabase client
 vi.mock('../supabase', () => {

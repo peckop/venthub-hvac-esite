@@ -8,7 +8,7 @@ entity_hashes:
   func:InventoryReservedTable: 126336fe1c94b592
   overview: e173f7662e40b92c
   style_tokens: 45cb66bf7519a761
-generated_at: 2026-05-28T22:35:35Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış

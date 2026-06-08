@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\lib\supabase\client.ts
 skeleton_hash: af393b98f3ea3dda
 entity_hashes:
   overview: 34e9332f051f8980
-generated_at: 2026-06-06T21:55:50Z
+generated_at: 2026-06-08T10:10:57Z
 ---
 
 ## Genel Bakış

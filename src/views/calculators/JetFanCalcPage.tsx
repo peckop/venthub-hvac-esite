@@ -1,13 +1,13 @@
-import React, { useState, useMemo } from 'react'
-import { Wind, Car, RotateCcw, Gauge, ArrowDownUp, MapPin } from 'lucide-react'
+import { ArrowDownUp, Car, Gauge, MapPin,RotateCcw, Wind } from 'lucide-react'
+import React, { useMemo,useState } from 'react'
+
 import {
   CalculatorLayout,
-  ResultCard,
-  ResultGrid,
-  Recommendations,
   InputField,
-  RadioGroup
-} from '../../components/calculators'
+  RadioGroup,
+  Recommendations,
+  ResultCard,
+  ResultGrid} from '../../components/calculators'
 import {
   calculateJetFan,
   type JetFanApplicationType

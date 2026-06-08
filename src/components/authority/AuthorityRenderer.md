@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\authority\AuthorityRenderer.tsx
-skeleton_hash: a5da5b7f6225ccf6
+skeleton_hash: 1f5bcaaa8f6e226d
 entity_hashes:
   func:AuthorityRenderer: b497d8ee6938f090
   func:ComparisonBlock: 3b92c32ed036d564
@@ -14,7 +14,7 @@ entity_hashes:
   func:SpecsBlock: 02f28da6bc471010
   overview: 205541493453ffae
   style_tokens: 783b613fb0128036
-generated_at: 2026-05-28T22:35:41Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış

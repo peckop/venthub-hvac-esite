@@ -3,37 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\AuthContext.tsx
-skeleton_hash: ed9ae4563c42a06c
+skeleton_hash: fe990562a185e84d
 entity_hashes:
   func:AuthProvider: 8a171b0bec808d24
-  overview: d5ddb976c954f5aa
+  overview: 367d05e5814d0229
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-06T21:55:29Z
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasının React yapısında kimlik doğrulama süreçlerini merkezi olarak yöneten temel bir yapıdır. Tüm bileşenler arasında oturum durumu, kullanıcı verileri ve yetkilendirme işlevlerinin tutarlı ve güvenli bir şekilde paylaşılmasını sağlar.
+Bu modül, uygulama genelinde kimlik doğrulama sürecini merkezi olarak yöneten bir React Context yapısıdır. Oturum durumu, kullanıcı bilgileri ve ilgili yetkilendirme işlevlerini tüm alt bileşenlere güvenli bir şekilde dağıtılmasını sağlar.
 
 ## Fonksiyon Grupları
 ### Kimlik Doğrulama Sağlayıcı
-React Context API kullanarak kimlik doğrulama durumunu ve ilgili yardımcı fonksiyonları uygulama ağaçının tüm alt bileşenlerine dağıtarak merkezi bir erişim noktası oluşturur.
+React Context API aracılığıyla kimlik doğrulama durumunu ve ilişkili yardımcı fonksiyonları uygulama ağacındaki tüm alt bileşenlere sunarak tutarlı bir erişim noktası oluşturur.
 - AuthProvider
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi (implementation) paylaşılmadığından, yalnızca fonksiyon imzasından çıkarılabilen temel aksiyomlar tanımlanabilmektedir.
+Bu modül için yalnızca fonksiyon imzası (`AuthProvider({ children })`) mevcut olup, fonksiyon gövdesi (implementation) paylaşılmamıştır. Bu nedenle, sadece imzadan çıkarılabilen kesin varsayımlar aşağıda listelenmiştir:
 
----
+[Aksiyom 1]: Eğer `children` parametresi sağlanmazsa, AuthProvider bileşeni hata verir veya geçersiz bir duruma düşer — çünkü `children`'ın default değeri yoktur ve React Context Provider pattern'inde alt bileşenlerin varlığı zorunludur.
 
-**[Aksiyom 1]:** Eğer `children` prop'u sağlanmazsa, Provider bileşeni uygulama ağaç hiyerarşisinde alt bileşenlere erişilebilir context sunamaz ve React Context zinciri kırılır.
-
-**[Aksiyom 2]:** Eğer `children` olarak geçilen eleman React elemanı (ReactNode) türünde değilse, bileşen render hatası ile karşılaşılır.
-
----
-
-> **Not:** Bu modülün iç state yönetimi, sağladığı context değeri (value), kullanılan alt hook'lar (örn: useState, useEffect), API çağrıları ve yetkilendirme mantığı fonksiyon gövdesinde belirtilmediğinden, bu alanlara ilişkin aksiyomlar **bilinmiyor** durumdadır. Tam aksiyom üretimi için fonksiyon gövdesinin (implementation) paylaşılması gereklidir.
+[Aksiyom 2]: Bu modülün iç kimlik doğrulama mantığı (token yönetimi, oturum kontrolü, yetkilendirme akışı vb.) bilinmiyor — çünkü fonksiyon gövdesi paylaşılmamıştır. Mimari varsayımlar, yalnızca kod implementasyonundan üretilebilir; docstring, yorum veya isimlendirmeden çıkarım yapılmaz.
 
 ---
 
@@ -54,91 +48,22 @@ Bu modül için fonksiyon gövdesi (implementation) paylaşılmadığından, yal
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AuthContext.tsx::AuthProvider
-- **params**: (children: React.ReactNode)
+### [N1_NASIL] AST Pointer: `src/contexts/AuthContext.tsx::AuthProvider`
+- **params**: `{ children }` — React child bileşenleri, AuthContext.Provider içine sarılır
 - **ic_degiskenler**:
-  - `user` — useState hook ile tutulan aktif kullanıcının bilgileri (User veya null)
-  - `session` — useState hook ile tutulan mevcut oturum bilgisi (Session veya null)
-  - `role` — useState hook ile tutulan kullanıcının rolü (UserRole veya null)
-  - `loading` — useState hook ile tutulan genel yükleme durumu flag'i
-  - `roleLoading` — useState hook ile tutulan rol bilgisi yükleme durumu flag'i
-  - `fetchRole` — useCallback ile tanımlanan, verilen userId ve email ile kullanıcının rolünü getiren async fonksiyon
-  - `signIn` — useCallback ile tanımlanan, email ve şifre ile giriş yapan async fonksiyon
-  - `signUp` — useCallback ile tanımlanan, email, şifre ve isim ile kayıt olan async fonksiyon
-  - `signOut` — useCallback ile tanımlanan, mevcut oturumu sonlandıran async fonksiyon
-  - `resetPassword` — useCallback ile tanımlanan, verilen email için şifre sıfırlama isteği gönderen async fonksiyon
-  - `refreshSession` — useCallback ile tanımlanan, mevcut oturumu yenileyen async fonksiyon
-  - `value` — useMemo ile hesaplanan, AuthContext.Provider'a geçirilen tüm state ve fonksiyonları içeren nesne
-- **Dönüş**: AuthContext.Provider bileşeni (children'ı sarmalar)
-
-### [N2_NASIL] AST Pointer: AuthContext.tsx::fetchRole
-- **params**: (userId: string, email?: string)
-- **ic_degiskenler**:
-  - `userRole` — getUserRole() asenkron fonksiyonu ile getirilen kullanıcının rolü
-- **Dönüş**: void (asenkron, state'leri günceller)
-
-### [N3_NASIL] AST Pointer: AuthContext.tsx::useEffectHook
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `getInitialSession` — useState ile tanımlanan asenkron inner fonksiyon, başlangıç oturumunu getirir
-  - `subscription` — supabase.auth.onAuthStateChange() Abonelik nesnesi
-- **Dönüş**: Cleanup fonksiyonu (subscription.unsubscribe() çağrısı)
-
-### [N4_NASIL] AST Pointer: AuthContext.tsx::getInitialSession
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `initialSession` — supabase.auth.getSession() ile getirilen başlangıç oturumu verisi (data.session)
-  - `error` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: void (asenkron, state'leri günceller)
-
-### [N5_NASIL] AST Pointer: AuthContext.tsx::onAuthStateChangeCallback
-- **params**: (event: string, currentSession: Session | null)
-- **ic_degiskenler**:
-  - `newUser` — currentSession?.user ?? null ile hesaplanan kullanıcı nesnesi
-- **Dönüş**: void (asenkron, state'leri günceller)
-
-### [N6_NASIL] AST Pointer: AuthContext.tsx::cleanupSubscription
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (subscription.unsubscribe() çağrısı)
-
-### [N7_NASIL] AST Pointer: AuthContext.tsx::signIn
-- **params**: (email: string, password: string)
-- **ic_degiskenler**:
-  - `data` — supabase.auth.signInWithPassword() çağrısının başarılı sonucu (data.user ve data.session)
-  - `error` — supabase.auth.signInWithPassword() çağrısının hata sonucu
-- **Dönüş**: { error?: AuthError } veya {}
-
-### [N8_NASIL] AST Pointer: AuthContext.tsx::signUp
-- **params**: (email: string, password: string, name: string)
-- **ic_degiskenler**:
-  - `tenantId` — document.cookie'den okunan tenant_id değeri veya undefined
-  - `error` — supabase.auth.signUp() çağrısının hata sonucu
-- **Dönüş**: { error?: AuthError } veya {}
-
-### [N9_NASIL] AST Pointer: AuthContext.tsx::signOut
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `error` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: void (asenkron, state'leri sıfırlar)
-
-### [N10_NASIL] AST Pointer: AuthContext.tsx::resetPassword
-- **params**: (email: string)
-- **ic_degiskenler**:
-  - `error` — supabase.auth.resetPasswordForEmail() çağrısının hata sonucu
-- **Dönüş**: { error?: AuthError } veya {}
-
-### [N11_NASIL] AST Pointer: AuthContext.tsx::refreshSession
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `refreshedSession` — supabase.auth.refreshSession() ile yenilenen oturum verisi (data.session)
-  - `error` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: Session | null
-
-### [N12_NASIL] AST Pointer: AuthContext.tsx::useMemoCallback
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — sadece mevcut state ve fonksiyonları referans alır)
-- **Dönüş**: { user, session, role, loading, roleLoading, signIn, signUp, signOut, resetPassword, refreshSession } nesnesi
+  - `user` — `useState<User | null>(null)` — Mevcut oturum açmış kullanıcı bilgisi
+  - `session` — `useState<Session | null>(null)` — Supabase oturum nesnesi
+  - `role` — `useState<UserRole | null>(null)` — Kullanıcının rol bilgisi
+  - `loading` — `useState(true)` — İlk yükleme durumu flag'i
+  - `roleLoading` — `useState(false)` — Rol yükleme sırasında true olan flag
+  - `fetchRole` — `useCallback` ile sarılmış, userId/email ile rol getiren fonksiyon
+  - `signIn` — `useCallback` ile sarılmış, e-posta/şifre ile giriş yapan fonksiyon
+  - `signUp` — `useCallback` ile sarılmış, e-posta/şifre/isim ile kayıt yapan fonksiyon
+  - `signOut` — `useCallback` ile sarılmış, oturumu kapatan fonksiyon
+  - `resetPassword` — `useCallback` ile sarılmış, şifre sıfırlama e-postası gönderen fonksiyon
+  - `refreshSession` — `useCallback` ile sarılmış, session yenileyen fonksiyon
+  - `value` — `useMemo` ile oluşturulmuş, AuthContext'e verilen değer nesnesi
+- **Dönüş**: JSX — `<AuthContext.Provider value={value}>{children}</AuthContext.Provider>`
 
 ---
 

@@ -1,16 +1,16 @@
 'use client'
-import { Routes } from '../../utils/routes'
-
-import React, { useEffect, useState, useCallback, Suspense } from 'react'
-import { X, Grid3X3, ArrowLeft, ChevronRight } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { Environment,OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Environment } from '@react-three/drei'
-import Category3DIcon from '../products/Category3DIcon'
-import type { CategoryMetadata } from '../../types/db-rows'
+import { ArrowLeft, ChevronRight,Grid3X3, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import React, { Suspense,useCallback, useEffect, useState } from 'react'
+
 import { useCategories } from '../../contexts/CategoryContext'
-import { DomainCategory } from '../../lib/type-converters'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { DomainCategory } from '../../lib/type-converters'
+import type { CategoryMetadata } from '../../types/db-rows'
+import { Routes } from '../../utils/routes'
+import Category3DIcon from '../products/Category3DIcon'
 
 interface CategoryHubOverlayProps {
     isOpen: boolean

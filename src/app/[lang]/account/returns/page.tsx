@@ -1,6 +1,7 @@
 'use client'
 
 import React, { Suspense } from 'react'
+
 import PageComponent from '../../../../views/account/AccountReturnsPage'
 
 export const dynamic = 'force-dynamic'

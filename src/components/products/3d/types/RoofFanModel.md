@@ -3,31 +3,29 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx
-skeleton_hash: ad9dd151fef88357
+skeleton_hash: 735d589cb1665d7b
 entity_hashes:
   func:RoofFanModel: 00a33874d8f27b4a
-  overview: 3c2ffd258e9e4913
+  overview: ce465d71e4aef9af
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:50Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin ürünler kategorisindeki 3D görselleştirme altyapısında kullanılan, çatı tipi vantilatörlerin 3D modelini sunan React bileşenini barındırır. Proje içindeki diğer 3D sahne bileşenlerinin bu modeli kolayca entegre etmesini sağlamak için tek bir ana bileşen olarak tasarlanmıştır.
+Bu modül, VentHub HVAC projesinin ürün görselleştirme altyapısında çatı tipi vantilatörlerin 3D modelini render eden tek ve temel React bileşenini içerir. Bileşen, projenin 3D sahnelerinde kullanılmak üzere tasarlanmış, bağımsız bir model gösterim birimidir.
 
 ## Fonksiyon Grupları
 ### Ana 3D Model Bileşeni
-Modülün tüm sorumluluğunu üstlenerek çatı vantilatörünün 3D modelini oluşturan ve React uygulaması için kullanılabilir hale getiren tek ana işlevi barındırır.
+Modülün tüm işlevini tek bir merkezi bileşen üstlenerek, çatı vantilatörünün 3D modelini oluşturur ve React uygulamasına entegre eder.
 - RoofFanModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC projesinin ürünler bölümünde kullanılan çatı tipi fanın 3B modelini render eden TypeScript React bileşenidir, doğru çalışması için projenin React çalışma zamanı, ortak 3D render altyapısı ve bileşene iletilen zorunlu giriş değerlerinin varlığı zorunludur.
 
-[Aksiyom 1]: Eğer proje genelinde React çalışma zamanı ortamı mevcut değilse, bileşen başlatılamaz, hiçbir içerik üretemez.
-[Aksiyom 2]: Eğer projenin 3B bileşenler klasörünün ortak kullandığı 3D render kütüphaneleri kurulu ve çalışır durumda değilse, RoofFanModel kendi içindeki fan modelini ekrana yansıtamaz.
-[Aksiyom 3]: Eğer üst bileşenden bu bileşene 3B modelin sahadaki konumunu, görünürlüğünü belirleyen zorunlu prop'lar iletilmezse, model arayüzde yanlış konumda görünür veya hiç görüntülenmez.
-[Aksiyom 4]: Eğer RoofFanModel tarafından kullanılan 3B model dosyasına (formatı bilinmiyor) uygulama çalışma zamanında erişilemiyorsa, model yüklenemez, kullanıcı arayüzünde boş bir alan oluşur.
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Neden:** Fonksiyon gövdesi paylaşılmamıştır. Mimari varsayımlar sadece fonksiyon gövdesindeki kod akışından, hata yönetimi mekanizmalarından ve bağımlılık ilişkilerinden üretilebilir. Mevcut bilgiler yalnızca fonksiyon imzası (`RoofFanModel()` - parametresiz) ve modülün genel amacını içeren eski dokümandır.
 
 ---
 
@@ -43,83 +41,91 @@ Bu modül, VentHub HVAC projesinin ürünler bölümünde kullanılan çatı tip
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::RoofFanModel
+### [N1_NASIL] AST Pointer: RoofFanModel.tsx::RoofFanModel
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `materials` — `useFanMaterials` hook'undan alınan 3D modelin tüm parçalarında kullanılan materyaller paketi
-  - `rotorRef` — Fan rotorunu temsil eden THREE.Group nesnesine erişmek için kullanılan React referansı
-  - `logoTexture` — `/Vortice_logo.png` yolundan yüklenen, model üzerinde gösterilen marka logosu texture'ı
-- **Dönüş**: Tüm 3D çatı fanı modelini içeren JSX group elementi
+  - `materials` — useFanMaterials() hook'undan alınan malzeme nesnesi, fan için tüm yüzey materyallerini içerir
+  - `rotorRef` — useRef ile oluşturulan, THREE.Group tipinde rotor grubuna referans
+  - `logoTexture` — useTexture hook'undan alınan Vortice logosu dokusu
+- **Dönüş**: React component (JSX tree) — tam roof fan 3D modelini render eder
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::useFrame_callback
-- **params**: state, delta
+### [N2_NASIL] AST Pointer: RoofFanModel.tsx::useFrame-callback
+- **params**: (state: Three.js state, delta: frame time delta)
 - **ic_degiskenler**:
-  - `rotorRef.current` — Fan rotorunun aktif THREE.Group nesnesi, rotasyonu güncellemek için kullanılır
-- **Dönüş**: yok (sadece rotorun y eksenindeki rotasyonunu her frame'de günceller)
+  - `state` — Three.js render state nesnesi
+  - `delta` — son frame ile geçen süre (saniye)
+- **Dönüş**: yok — rotorRef.current.rotation.y'yi her frame'de azaltarak rotoru döndürür
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::corner_bolt_map_callback
-- **params**: pos, i
+### [N3_NASIL] AST Pointer: RoofFanModel.tsx::corner-bolt-map
+- **params**: (pos: [x,z] koordinat dizisi, i: indis)
 - **ic_degiskenler**:
-  - `pos[0]` — Köşe cıvatasının x eksenindeki konumu
-  - `pos[1]` — Köşe cıvatasının z eksenindeki konumu
-  - `materials.industrialSteel` — Cıvata üzerinde kullanılan endüstriyel çelik materyali
-- **Dönüş**: Köşe cıvatasını temsil eden JSX mesh elementi
+  - `pos` — [x,z] koordinat dizisi, zemin montaj civatasının x ve z pozisyonunu içerir
+  - `i` — indis numarası, key üretimi için kullanılır
+  - `pos[0]` — x koordinatı, mesh'in x pozisyonunda kullanılır
+  - `pos[1]` — z koordinatı, mesh'in z pozisyonunda kullanılır
+- **Dönüş**: JSX element — zemin köşelerindeki montaj civatası
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::support_bar_map_callback
-- **params**: rot, i
+### [N4_NASIL] AST Pointer: RoofFanModel.tsx::support-map
+- **params**: (rot: radyan cinsinden açı, i: indis)
 - **ic_degiskenler**:
-  - `materials.industrialSteel` — L-braket ve montaj parçalarında kullanılan endüstriyel çelik materyali
-- **Dönüş**: Izgara ana taşıyıcı lamasını ve tüm ek parçalarını içeren JSX group elementi
+  - `rot` — taşyıcı lamanın rotasyon açısı (radyan)
+  - `i` — indis numarası, benzersiz key üretimi için kullanılır
+- **Dönüş**: JSX element — 4 ana taşıyıcı lama ve detayları
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::bolt_map_callback
-- **params**: y, j
+### [N5_NASIL] AST Pointer: RoofFanModel.tsx::bolt-map
+- **params**: (y: y-koordinatı, j: indis)
 - **ic_degiskenler**:
-  - `i` — Üst gruptaki destek lama index'i, benzersiz key oluşturmak için kullanılır
-- **Dönüş**: Lama montaj cıvatasını temsil eden JSX mesh elementi
+  - `y` — lama montaj civatasının y-koordinatı (üst/orta/alt)
+  - `j` — indis numarası, benzersiz key üretimi için kullanılır
+- **Dönüş**: JSX element — lama üzerindeki montaj civatası
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::wire_map_callback
-- **params**: _, i
+### [N6_NASIL] AST Pointer: RoofFanModel.tsx::wire-map
+- **params**: (_, i: indis)
 - **ic_degiskenler**:
-  - `angle` — Telin düzlemdeki açısını hesaplamak için kullanılan değer
-  - `r` — Telin merkezden uzaklığını, lamaların hemen içinden geçecek şekilde ayarlayan yarıçap değeri
-- **Dönüş**: Ana lamalara denk gelmeyen teller için JSX mesh elementi, denk gelen durumlarda null
+  - `i` — tel indis numarası (0-63 arası)
+  - `angle` — hesaplanan açı: (i / 64) * Math.PI * 2
+  - `r` — sabit yarıçap: 0.665 (lamaların hemen içinden geçen telsı)
+- **Dönüş**: JSX element veya null (eğer i % 16 === 0 ise lamalara denk gelir)
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::ring_map_callback
-- **params**: _, k
+### [N7_NASIL] AST Pointer: RoofFanModel.tsx::ring-map
+- **params**: (_, k: indis)
 - **ic_degiskenler**:
-  - `k` — Halka index'i, yatay konumu hesaplamak için kullanılır
-- **Dönüş**: Izgara yatay destek halkasını temsil eden JSX mesh elementi
+  - `k` — halka indis numarası (0-7 arası)
+- **Dönüş**: JSX element — yatay destek halkası
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::blade_map_callback
-- **params**: _, i
+### [N8_NASIL] AST Pointer: RoofFanModel.tsx::blade-map
+- **params**: (_, i: indis)
 - **ic_degiskenler**:
-  - `baseAngle` — Kanatın düzlemdeki temel açısını hesaplayan değer
-  - `materials.roofBlade` — Fan kanatları üzerinde kullanılan özel materyal
-- **Dönüş**: Tek bir fan kanadının tüm segmentlerini içeren JSX group elementi
+  - `i` — kanat indis numarası (0-8 arası)
+  - `baseAngle` — kanadın temel açısı: (i / 9) * Math.PI * 2
+- **Dönüş**: JSX element — backward-curved fan kanadı (4 segment)
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::lathe_geometry_points_callback
-- **params**: (parametre yok)
+### [N9_NASIL] AST Pointer: RoofFanModel.tsx::useMemo-lathe-points
+- **params**: () => (boş)
 - **ic_degiskenler**:
-  - `THREE.Vector2` nesneleri — Lathe geometrisi için 2D düzlemdeki şekil noktaları, gövde konik yapısını oluşturur
-- **Dönüş**: Lathe geometrisi için kullanılan 5 adet THREE.Vector2 içeren dizi
+  - `[]` — boş bağımlılık dizisi, useMemo'un sadece bir kez çalışmasını sağlar
+- **Dönüş**: THREE.Vector2[] — lathe geometrisi için profil noktaları dizisi
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::clip_map_callback
-- **params**: rot, i
+### [N10_NASIL] AST Pointer: RoofFanModel.tsx::clip-map
+- **params**: (rot: radyan cinsinden açı, i: indis)
 - **ic_degiskenler**:
-  - `materials.industrialSteel` — Shroud üzerindeki L-braketlerde kullanılan endüstriyel çelik materyali
-- **Dönüş**: Shroud üzerindeki montaj braketini temsil eden JSX group elementi
+  - `rot` — L-Braket'in rotasyon açısı (radyan)
+  - `i` — indis numarası, benzersiz key üretimi için kullanılır
+- **Dönüş**: JSX element — shroud üzerindeki L-Braket montaj detayı
 
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::top_bolt_map_callback
-- **params**: _, i
+### [N11_NASIL] AST Pointer: RoofFanModel.tsx::top-bolt-map
+- **params**: (_, i: indis)
 - **ic_degiskenler**:
-  - `angle` — Üst kapak vidasının düzlemdeki açısını hesaplayan değer
-- **Dönüş**: Üst kapak montaj vidasını temsil eden JSX mesh elementi
+  - `i` — vida indis numarası (0-5 arası)
+  - `angle` — hesaplanan açı: (i / 6) * Math.PI * 2
+- **Dönüş**: JSX element — üst kapak montaj vidası
 
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx::eyebolt_map_callback
-- **params**: x, i
+### [N12_NASIL] AST Pointer: RoofFanModel.tsx::eyebolt-map
+- **params**: (x: x-koordinatı, i: indis)
 - **ic_degiskenler**:
-  - `x` — Taşıma halkasının x eksenindeki konumu
-- **Dönüş**: Üst kapak üzerindeki taşıma halkasını (eyebolt) temsil eden JSX mesh elementi
+  - `x` — eyebolt'un x-koordinatı (-0.10 veya 0.10)
+  - `i` — indis numarası
+- **Dönüş**: JSX element — taşıma halkası (eyebolt)
 
 ---
 

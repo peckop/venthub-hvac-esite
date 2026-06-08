@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
-import Link from 'next/link'
+import { AnimatePresence,motion } from 'framer-motion'
+import { ArrowRight, BookOpen, Calculator, Clock,Search, Settings } from 'lucide-react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search, BookOpen, Calculator, Settings, ArrowRight, Clock } from 'lucide-react'
-import { useI18n } from '../../i18n/I18nProvider'
+import Link from 'next/link'
+import React, { useMemo,useState } from 'react'
+
 import Seo from '../../components/Seo'
+import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes';
 
 
@@ -57,7 +58,7 @@ const HubPage: React.FC = () => {
         <div className="absolute inset-0 opacity-20">
           <Image 
             src="/images/hvac_installation_close_up_premium_3.webp" 
-            alt="Engineering Hub" 
+            alt={t('knowledge.hub.heroAlt')} 
             fill 
             priority
             sizes="100vw"

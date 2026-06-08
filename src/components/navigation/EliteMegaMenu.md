@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\EliteMegaMenu.tsx
-skeleton_hash: 28b877a3d5ff11ac
+skeleton_hash: 19656bc8d2ab1aaa
 entity_hashes:
   func:EliteMegaMenu: 887e772baf4da3df
   func:MobileMegaMenu: 63ce544d1da454df
@@ -11,7 +11,7 @@ entity_hashes:
   func:handleLinkClick: 44a1929f40d26342
   overview: 4a63a261d39e78bd
   style_tokens: 950eb84fcf443cff
-generated_at: 2026-05-28T22:36:16Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış
@@ -146,8 +146,8 @@ graph TD
     EliteMegaMenu_tsx__getSubCategories["getSubCategories"]
     EliteMegaMenu_tsx__handleLinkClick["handleLinkClick"]
     EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__handleLinkClick
-    EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__getSubCategories
     EliteMegaMenu_tsx__MobileMegaMenu --> EliteMegaMenu_tsx__getSubCategories
+    EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__getSubCategories
 ```
 
 ## NODE ID STANDARD

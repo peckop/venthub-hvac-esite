@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { createPortal } from 'react-dom'
+import { Box, ChevronLeft, ChevronRight, Maximize2,X } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { ChevronLeft, ChevronRight, X, Box, Maximize2 } from 'lucide-react'
-import VentImage from './ui/VentImage'
+import React, { useCallback,useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+
 import { useI18n } from '../i18n/I18nProvider'
+import VentImage from './ui/VentImage'
 
 const Product3DViewer = dynamic(
     () => import('./products/3d/Product3DViewer'),

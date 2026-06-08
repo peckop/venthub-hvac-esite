@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\calculators\StepIndicator.tsx
-skeleton_hash: 30b5aabc3b20c3fd
+skeleton_hash: a5a084e8cd54b648
 entity_hashes:
   func:StepIndicator: 203f6e11e7ae2ca6
   overview: 4bdcabdf1533e7e3
   style_tokens: a71e92d8d5570ada
-generated_at: 2026-05-28T22:35:43Z
+generated_at: 2026-06-08T10:08:47Z
 ---
 
 ## Genel Bakış

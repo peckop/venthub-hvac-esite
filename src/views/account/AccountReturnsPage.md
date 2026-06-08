@@ -3,26 +3,20 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx
-skeleton_hash: 57346a7cf775affd
+skeleton_hash: 709af37d99f8ce2a
 entity_hashes:
   func:AccountReturnsPage: b01b740ffc8dc4da
-  overview: 70b8bcf043553f95
+  overview: 70765e01ef58b9d6
   style_tokens: d5328287ff24abb4
-generated_at: 2026-06-06T21:57:02Z
+generated_at: 2026-06-08T10:10:59Z
 ---
 
 ## Genel Bakış
-`AccountReturnsPage`, kullanıcının hesap panelinden iade taleplerini görüntülediği, yeni iade talepleri oluşturduğu ve iade sürecinin zaman çizelgesiyle takip ettiği React sayfa bileşenidir. Supabase üzerinden iade kayıtlarını ve ilişkili sipariş bilgilerini çekerek sayfa durumlarını (yükleniyor, hata, boş liste) yönetir.
+`AccountReturnsPage`, kullanıcının hesap panelinden iade taleplerini görüntülediği ve yeni iade talepleri oluşturduğu React sayfa bileşenidir. Supabase üzerinden iade kayıtlarını ve ilişkili sipariş bilgilerini çekerek sayfa durumlarını yönetir.
 
 ## Fonksiyon Grupları
-### Veri Yükleme ve Durum Yönetimi
-Supabase sorgularıyla iade kayıtlarını ve sipariş bilgilerini çeker; sayfanın yükleniyor, hata veya boş liste durumlarını kontrol eder.
-
-### Yeni İade Talebi Oluşturma
-İade talebi formunun açılmasını, form alanlarının doğrulanmasını ve yeni iade kaydının Supabase'e eklenmesini yönetir.
-
-### Sayfa Düzeni ve Sunum
-İade listesi tablosunu, durum göstergelerini ve iade sürecinin zaman çizelgesini render eden görsel bileşen yapısını oluşturur.
+### Sayfa Bileşeni (AccountReturnsPage)
+Tek bileşen olarak tüm modül sorumluluklarını üstlenir: iade listesini yükler, form açma/kapama durumunu yönetir, Supabase'e yeni kayıt ekler ve iade sürecinin zaman çizelgesini render eder. Kimlik, çeviri, URL parametreleri ve yönlendirme hook'larını kullanarak bağımsız çalışır.
 
 ---
 
@@ -75,142 +69,112 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AccountReturnsPage::(effect_cleanup_returns)
-- **params**: ()
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::useEffectCallbackReturns
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `mounted` — cleanup flag, controls whether state updates should be applied
-  - `load` — async function that fetches returns from Supabase
-  - `setLoading` — state setter for loading indicator
-  - `setRows` — state setter for returns list
-  - `supabase` — Supabase client for database queries
-  - `user` — authenticated user object from useAuth hook
-  - `t` — translation function from useI18n hook
-- **Dönüş**: cleanup function that sets `mounted = false`
+  - `mounted` — bileşen hâlâ bağlıysa true olan bayrak, asenkron işlemler tamamlandığında durumu güncellemek için kullanılır
+  - `load` — asenkron fonksiyon, venthub_returns tablosundan verileri yükler ve state'i günceller
+- **Dönüş**: () => { mounted = false } (temizleme işlevi)
 
-### [N2_NASIL] AST Pointer: AccountReturnsPage::load
-- **params**: ()
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::load
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `setLoading` — state setter for loading indicator
-  - `list` — returned data from Supabase query (array of ReturnRow objects)
-  - `error` — error object from Supabase query
-  - `supabase` — Supabase client for database queries
-  - `setRows` — state setter for returns list
-  - `t` — translation function from useI18n hook
-- **Dönüş**: void (sets state via setRows/setLoading)
+  - `list` — supabase'den gelen veriler (venthub_returns tablosu)
+  - `error` — supabase sorgusundaki hata (yoksa null)
+- **Dönüş**: void (side-effect: setRows ile state güncellenir)
 
-### [N3_NASIL] AST Pointer: AccountReturnsPage::(effect_cleanup_orders)
-- **params**: ()
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::useEffectCallbackOrders
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `mounted` — cleanup flag, controls whether state updates should be applied
-  - `loadOrders` — async function that fetches user's orders from Supabase
-  - `user` — authenticated user object from useAuth hook
-- **Dönüş**: cleanup function that sets `mounted = false`
+  - `mounted` — bileşen hâlâ bağlıysa true olan bayrak
+  - `loadOrders` — asenkron fonksiyon, venthub_orders tablosundan siparişleri yükler
+- **Dönüş**: () => { mounted = false } (temizleme işlevi)
 
-### [N4_NASIL] AST Pointer: AccountReturnsPage::loadOrders
-- **params**: ()
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::loadOrders
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — returned data from Supabase query (array of OrderLite objects)
-  - `error` — error object from Supabase query
-  - `supabase` — Supabase client for database queries
-  - `user` — authenticated user object from useAuth hook
-  - `setOrders` — state setter for orders list
-  - `fb` — fallback query result when main query fails (object with data and error)
-- **Dönüş**: void (sets state via setOrders)
+  - `data` — supabase'den gelen sipariş verileri (OrderLite[] türünde)
+  - `error` — supabase sorgusundaki hata
+  - `fb` — hata durumunda alternatif sorgu sonucu (fallback)
+- **Dönüş**: void (side-effect: setOrders ile state güncellenir)
 
-### [N5_NASIL] AST Pointer: AccountReturnsPage::(map_order_transform)
-- **params**: o — order object from Supabase query
-- **ic_degiskenler**: (none)
-- **Dönüş**: transformed order object with id, created_at, order_number properties
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::mapOrder
+- **params**: `o` — bir sipariş nesnesi (id, order_number, created_at içeren)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: { id: string, created_at: string, order_number: string }
 
-### [N6_NASIL] AST Pointer: AccountReturnsPage::(effect_prefill_order)
-- **params**: ()
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::useEffectCallbackPrefill
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void (side-effect: setOpenModal(true) çağrılır)
+
+### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::getReasons
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string[] — iade sebepleri listesi
+
+### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::handleCreateReturn
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `prefillOrderId` — order ID to pre-fill in the form
-  - `setOpenModal` — state setter for modal visibility
-- **Dönüş**: void (opens modal if prefillOrderId exists)
+  - `payload` — supabase'e eklenecek veri yapısı (order_id, user_id, reason, description)
+  - `error` — supabase insert işlemindeki hata
+  - `list` — refresh sonrası güncellenen return listesi
+- **Dönüş**: void (side-effect: toast mesajları, modal kapatma, state güncellemeleri, navigasyon)
 
-### [N7_NASIL] AST Pointer: AccountReturnsPage::(return_reasons)
-- **params**: ()
-- **ic_degiskenler**: (none)
-- **Dönüş**: string array of predefined return reason options
-
-### [N8_NASIL] AST Pointer: AccountReturnsPage::(submit_return)
-- **params**: ()
+### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::statusClass
+- **params**: `s` — durum string'i (requested, approved, vb.)
 - **ic_degiskenler**:
-  - `form` — form state object with order_id, reason, description fields
-  - `t` — translation function from useI18n hook
-  - `user` — authenticated user object from useAuth hook
-  - `supabase` — Supabase client for database queries
-  - `setOpenModal` — state setter for modal visibility
-  - `setForm` — state setter for form data
-  - `router` — Next.js router for navigation
-  - `setRows` — state setter for returns list
-- **Dönüş**: void (submits form, closes modal, refreshes data, navigates)
+  - `v` — küçük harfe çevrilmiş durum string'i
+- **Dönüş**: string — CSS sınıf adı
 
-### [N9_NASIL] AST Pointer: AccountReturnsPage::statusClass
-- **params**: s — status string to determine CSS class
-- **ic_degiskenler**: (none)
-- **Dönüş**: CSS class string based on status value
+### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::getStatusIcon
+- **params**: `status` — durum string'i
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element — duruma göre ikon bileşeni
 
-### [N10_NASIL] AST Pointer: AccountReturnsPage::getStatusIcon
-- **params**: status — status string to determine icon
-- **ic_degiskenler**: (none)
-- **Dönüş**: JSX icon element (Clock/CheckCircle/XCircle/etc.) based on status
+### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::getStatusLabel
+- **params**: `status` — durum string'i
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string — lokalize edilmiş durum etiketi
 
-### [N11_NASIL] AST Pointer: AccountReturnsPage::getStatusLabel
-- **params**: status — status string to get label for
+### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::getReturnTimeline
+- **params**: `currentStatus` — mevcut durum string'i
 - **ic_degiskenler**:
-  - `t` — translation function from useI18n hook
-- **Dönüş**: translated label string for status (or raw status if translation not found)
+  - `allSteps` — tüm olası timeline adımlarının listesi (key ve label içeren nesneler)
+  - `currentIndex` — mevcut durumun allSteps dizisindeki indeksi
+- **Dönüş**: TimelineStep[] — her adımın tamamlanma ve mevcut durum bilgileri
 
-### [N12_NASIL] AST Pointer: AccountReturnsPage::getReturnTimeline
-- **params**: currentStatus — current return status to build timeline for
+### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::mapTimelineStep
+- **params**: 
+  - `step` — bir timeline adımı nesnesi (key, label)
+  - `index` — adımın dizideki indeksi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: TimelineStep — güncellenmiş timeline adımı (completed ve isCurrent özellikleri eklenmiş)
+
+### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::renderFilterButton
+- **params**: `opt` — filtre seçeneği nesnesi (value ve label özelliklerine sahip)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element — buton bileşeni
+
+### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::renderReturnItem
+- **params**: `r` — ReturnRow nesnesi (id, order_id, reason, description, status, created_at)
 - **ic_degiskenler**:
-  - `allSteps` — array of timeline step objects for normal return flow
-  - `currentIndex` — index of current status in allSteps array
-  - `getStatusLabel` — function to get translated status label
-- **Dönüş**: TimelineStep[] array representing progress steps
+  - `o` — orders dizisinde order_id eşleşen sipariş nesnesi
+  - `code` — formatlanmış sipariş kodu (# ile başlayan)
+  - `timeline` — iade durumu için timeline adımları
+- **Dönüş**: JSX.Element — iade kalemi kartı
 
-### [N13_NASIL] AST Pointer: AccountReturnsPage::(map_timeline_step)
-- **params**: step — timeline step object, index — step index
-- **ic_degiskenler**: (none)
-- **Dönüş**: timeline step object with added completed/isCurrent properties
+### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::renderTimelineStep
+- **params**:
+  - `step` — timeline adımı nesnesi (key, label, completed, isCurrent, isTerminal)
+  - `index` — adımın dizideki indeksi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Fragment — timeline adımının JSX gösterimi
 
-### [N14_NASIL] AST Pointer: AccountReturnsPage::(map_status_filter_button)
-- **params**: opt — filter option object with value and label
-- **ic_degiskenler**:
-  - `setStatusFilter` — state setter for selected status filter
-  - `statusFilter` — current selected status filter value
-- **Dönüş**: JSX button element for status filtering
-
-### [N15_NASIL] AST Pointer: AccountReturnsPage::(map_return_card)
-- **params**: r — return record object from database
-- **ic_degiskenler**:
-  - `orders` — array of user's orders for lookup
-  - `formatDate` — date formatting function from i18n
-  - `lang` — current language setting
-  - `statusClass` — function to get CSS classes for status
-  - `getStatusIcon` — function to get icon for status
-  - `getStatusLabel` — function to get label for status
-  - `getReturnTimeline` — function to build timeline for return
-  - `router` — Next.js router for navigation
-  - `Routes` — route constants
-  - `o` — found order object for this return
-  - `code` — formatted order code string
-  - `timeline` — timeline steps for this return's status
-- **Dönüş**: JSX card element displaying return details and timeline
-
-### [N16_NASIL] AST Pointer: AccountReturnsPage::(map_timeline_step_render)
-- **params**: step — timeline step object, index — step index
-- **ic_degiskenler**: (none)
-- **Dönüş**: JSX fragment with step indicator and label
-
-### [N17_NASIL] AST Pointer: AccountReturnsPage::(map_order_option)
-- **params**: o — order object
-- **ic_degiskenler**:
-  - `formatDate` — date formatting function from i18n
-  - `lang` — current language setting
-- **Dönüş**: JSX option element for order selection dropdown
+### [N17_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\AccountReturnsPage.tsx::renderOrderOption
+- **params**: `o` — OrderLite nesnesi (id, order_number, created_at)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX.Element — option bileşeni
 
 ---
 

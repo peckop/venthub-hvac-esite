@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\brands\[slug]\page.tsx
-skeleton_hash: 4d0ac74e07602d47
+skeleton_hash: b30daca6a451d27c
 entity_hashes:
   func:Page: 4d65ed88cfe128b6
   func:generateMetadata: 188fde844857a885
   func:generateStaticParams: e00bf8d31deb4098
   overview: dfd9b0c15561ff9a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-06T19:23:41Z
+generated_at: 2026-06-08T10:08:10Z
 ---
 
 ## Genel Bakış

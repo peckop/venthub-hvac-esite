@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
+
 import PageComponent from '../../../../../views/calculators/HRVCalcPage'
 
 export default function Page() {

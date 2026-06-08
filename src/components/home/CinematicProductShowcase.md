@@ -3,15 +3,15 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\CinematicProductShowcase.tsx
-skeleton_hash: cab5a4cfb9723539
+skeleton_hash: bd9295ba809a1a28
 entity_hashes:
   func:CinematicProductShowcase: 3aa8752ddebafcfc
   func:Hotspot: de57d250f854e416
   func:handleMouseLeave: 60d41c470a6d0032
   func:handleMouseMove: 717aaec7fdab40a5
-  overview: cc9625ba5ae503da
+  overview: 543d609da89f6ecb
   style_tokens: a631f55105b3a4d3
-generated_at: 2026-06-07T20:34:31Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
@@ -23,14 +23,30 @@ CinematicProductShowcase, ürünleri sinematik ve etkileşimli bir şekilde serg
 - CinematicProductShowcase, Hotspot
 
 ### Etkileşim Kontrolcüleri
-Fare girişlerini dinleyerek hotspot'ların görünürlük ve aktiflik durumlarını yöneten olay işleyicilerdir.
+Fare girişlerini dinleyerek hotspot'ların görünürlük ve aktiflik durumlarını yöneten olay işleyicileridir.
 - handleMouseMove, handleMouseLeave
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, ürün görselleri üzerinde etkileşimli hotspot noktaları sunarak kullanıcı deneyimi sağlayan bir bileşen kümesidir.
+Bu modül, ürün görselleri üzerinde sinematik bir etkileşim deneyimi sunar. Hotspot'lar aracılığıyla kullanıcının ürün üzerindeki belirli noktalarla etkileşime girmesi hedeflenir.
+
+[Aksiyom 1]: Eğer `productImages` array'i boş veya tanımsız ise, bileşen gösterilecek ürün içeriği bulamaz.
+
+[Aksiyom 2]: Eğer `Hotspot` için `x` veya `y` değeri tanımsız ise, hotspot yanlış konumda render edilir.
+
+[Aksiyom 3]: Eğer `Hotspot` için `onToggle` callback'i tanımsız ise, hotspot tıklanabilirlik işlevini yerine getiremez.
+
+[Aksiyom 4]: Eğer `Hotspot` için `label` tanımsız ise, kullanıcının hotspot'un amacını anlaması güçleşir.
+
+[Aksiyom 5]: Eğer `handleMouseMove` için `React.MouseEvent` parametresi geçilmezse, fare pozisyonu okunamaz ve hotspots güncellenemez.
+
+[Aksiyom 6]: Eğer `handleMouseLeave` çağrılmazsa, aktif hotspot'lar temizlenmez ve istenmeyen aktif durumlar kalıcı olur.
+
+[Aksiyom 7]: Eğer `Hotspot`'un `isActive` değeri `boolean` türünde değilse, hotspots'ın aktif/pasif durumu tutarsız çalışır.
+
+[Aksiyom 8]: Eğer `productImages` array'i tanımsız elemanlar içerirse, ürün görselleri düzgün yüklenemez.
 
 ---
 
@@ -95,10 +111,16 @@ Bu modül, ürün görselleri üzerinde etkileşimli hotspot noktaları sunarak 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: CinematicProductShowcase.tsx::Hotspot
-- **params**: `x` — hotspot'in yatay yüzdesi (number), `y` — hotspot'in dikey yüzdesi (number), `label` — hotspot başlık metni (string), `detail` — hotspot açıklama metni (string), `isActive` — bu hotspot'in aktif olup olmadığı (boolean), `onToggle` — tıklanma durumunu toggogle eden callback fonksiyon
+- **params**: `{ x, y, label, detail, isActive, onToggle }`
+  - `x` — Hotspot'ın yatay yüzdesel konumu (CSS left için)
+  - `y` — Hotspot'ın dikey yüzdesel konumu (CSS top için)
+  - `label` — Hotspot butonunun görünen etiket metni
+  - `detail` — Tooltip içinde gösterilen açıklama metni
+  - `isActive` — Hotspot'ın şu an açık olup olmadığını belirten boolean
+  - `onToggle` — Hotspot'a tıklandığında çağrılan toggle fonksiyonu
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu
-- **Dönüş**: JSX element (button ile popup tooltip içeren absolute pozisyonlu div)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu
+- **Dönüş**: JSX (tooltip ve hotspot butonu)
 
 ---
 

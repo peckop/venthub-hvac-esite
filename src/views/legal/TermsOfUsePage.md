@@ -8,7 +8,7 @@ entity_hashes:
   func:TermsOfUsePage: 107aaa4df0cf13a7
   overview: e378e8b50990e5c0
   style_tokens: a770e5a7f64844ff
-generated_at: 2026-05-28T22:40:07Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış

@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\AuthorityBuilder.tsx
-skeleton_hash: a0d22b9a0a435a6b
+skeleton_hash: 68aac8aea8e15aa0
 entity_hashes:
   func:AuthorityBuilder: ea4f02be3be8275d
   func:getInitialContent: d68640fe30ab6ebc
   overview: 03c5d2aeedc01c1b
   style_tokens: debe507a4c224f1e
-generated_at: 2026-05-28T22:35:21Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış

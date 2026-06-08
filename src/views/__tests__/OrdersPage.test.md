@@ -3,36 +3,42 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx
-skeleton_hash: a6449980d65a3ace
+skeleton_hash: 629b5c621a74d893
 entity_hashes:
   func:LocationProbe: 5b91bc45de71299f
   func:chainResult: 1b5aa5b5378b3f99
-  overview: 83e96a7c5f4325c8
+  overview: 619f97f44b86cc7e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:38:51Z
+generated_at: 2026-06-08T10:10:59Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin siparişler sayfasının (OrdersPage) test süreçlerinde kullanılan özel yardımcı fonksiyonları barındırır. React tabanlı bileşen testlerinin ihtiyaç duyduğu veri işleme ve ortam takibi işlevlerini yerine getirerek test senaryolarının güvenilir bir şekilde çalışmasını destekler.
+Bu modül, VentHub HVAC projesinin siparişler sayfası için yazılmış test dosyasıdır. Bileşen davranışlarını doğrulayan test senaryolarını çalıştırarak sipariş listeleme ve filtreleme işlevlerinin doğru çalıştığını garanti altına alır.
 
 ## Fonksiyon Grupları
-### Test Verisi İşleme Yardımcıları
-Test senaryolarında kullanılacak ham verileri işleyerek zincirleme yapıda test sonuçları üretir, testlerde tutarlı veri akışı sağlar.
+### Test Veri Yardımcıları
+Test senaryoları arasında veri akışını yöneten ve zincirleme test sonuçlarını işleyen yardımcı işlevleri kapsar.
 - chainResult
 
-### Konum Takip Test Yardımcısı
-Testler sırasında uygulama konum bilgisini izleyen bir prob görevi görür, siparişler sayfasının konumla ilgili işlevlerinin doğru çalışmasını test etmeye olanak tanır.
+### Konum Sensörü Test Bileşeni
+Siparişler sayfasındaki konum tabanlı filtreleme ve izleme mekanizmalarının test edilmesini sağlayanProbe bileşenidir.
 - LocationProbe
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu OrdersPage test modülünün başarıyla derlenmesi, çalıştırılması ve tüm test senaryolarını geçmesi için modül içinde kullanılan bağımlı fonksiyon, sınıf ve sabitlerin erişilebilir, tür uyumlu ve çalışır durumda olması zorunludur.
 
-[Aksiyom 1]: Eğer chainResult fonksiyonu bu test modülüne import edilemez veya çalıştırılamazsa, tüm sipariş verisi işlemeye dayalı test senaryoları başarısız olur.
-[Aksiyom 2]: Eğer LocationProbe sınıfı örneklenemeyecek durumdaysa veya modüle import edilemiyorsa, konum/filtreleme ile ilgili tüm test adımları exception fırlatarak ilişkili testleri başarısız kılar.
-[Aksiyom 3]: Eğer ordersRow sabit nesnesi tanımlı değilse, TypeScript derleme hatası oluşur ve test modülü hiç çalıştırılamaz.
-[Aksiyom 4]: Eğer chainResult fonksiyonu imzasında tanımlı `unknown` türünde giriş verisini kabul etmeyecek şekilde tür uyumsuzluğuna sahipse, modül derleme aşamasında hata alır, testler çalıştırılamaz.
+Bu modül test yardımcı fonksiyonları içerdiğinden, varsayımlar test ortamının doğru yapılandırılmasına yöneliktir.
+
+**[Aksiyom 1]:** Eğer `chainResult(data: unknown)` fonksiyonuna geçilen `data` parametresi, test senaryosunun beklediği sipariş verisi yapısına (OrdersPage kapsamında) uygun bir formatta değilse, zincirleme sonuç üretimi tutarsız veya hatalı olur.
+
+**[Aksiyom 2]:** Eğer `chainResult` fonksiyonu ardışık/zipseri olarak çağrıldığında, önceki çağrının dönüş değeri sonraki çağrının girdisi olarak kullanılmıyorsa, test verisi akışı kopar ve test senaryosu geçersiz sonuç üretir.
+
+**[Aksiyom 3]:** Eğer `LocationProbe()` fonksiyonu çağrıldığında, test çalıştırma ortamında konum bilgisine erişilebilir bir bağlam (browser/test harness) mevcut değilse, prob işlevi geçerli bir konum verisi üretemez.
+
+**[Aksiyom 4]:** Eğer `ordersRow` sabitinde tanımlanan nesne yapısı, test senaryolarının beklediği alanları (sipariş numarası, durum, tarih vb.) içermiyorsa, OrdersPage bileşeni testleri yanlış doğrulama sonuçları verir.
+
+**[Aksiyom 5]:** Eğer test çalıştırıcısı (örn. Jest/React Testing Library) modüldeki bu yardımcı fonksiyonları içe aktarmadan önce başlatılmamışsa, `LocationProbe` gibi ortam bağımlı fonksiyonlar tanımsız davranır.
 
 ---
 
@@ -64,114 +70,60 @@ Bu OrdersPage test modülünün başarıyla derlenmesi, çalıştırılması ve 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_useauth_mock>
+### [N1_NASIL] AST Pointer: src/views/__tests__/OrdersPage.test.tsx::chainResult
+- **params**: `(data: unknown)` — supabase zincirinin döndüreceği ham veri
+- **ic_degiskenler**:
+  _(fonksiyon gövdesinde ayrı bir değişken tanımlanmamıştır; doğrudan return edilen nesne zinciri oluşturulur)_
+- **Dönüş**: Supabase sorgu zinciri simulatorü nesnesi — `select()` → `eq()` → `order()` → `Promise<{data: [data], error: null}>`
+
+### [N2_NASIL] AST Pointer: src/views/__tests__/OrdersPage.test.tsx::LocationProbe
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `useAuth` — mock auth hook'u, testte sabit kullanıcı bilgisi ve loading durumu döndürür
-  - `user.id` — test kullanıcısının sabit kimlik değeri 'u1'
-  - `user.email` — test kullanıcısının sabit e-posta adresi 'u@u.com'
-  - `user.user_metadata` — test kullanıcısının boş metadata nesnesi
-  - `loading` — auth yüklenme durumu, false olarak sabit ayarlanmış
-- **Dönüş**: useAuth metodunu içeren mock nesnesi
+  - `loc` — `usePathname()` hook'unun döndürdüğü geçerli URL yolu (Next.js navigasyonundan alınan pathname)
+- **Dönüş**: JSX — `<div data-testid="loc-path">{loc}</div>` (mevcut sayfa yolunu gösteren test probe bileşeni)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_usecart_mock>
-- **params**: (parametre yok)
+### [N3_NASIL] AST Pointer: src/views/__tests__/OrdersPage.test.tsx::useAuth_mock_factory
+- **params**: (parametre yok) — anonymous arrow function
 - **ic_degiskenler**:
-  - `useCart` — mock sepet hook'u, testte addToCart mock fonksiyonu döndürür
-  - `addToCart` — vitest ile oluşturulmuş sahte sepete ekleme fonksiyonu
-- **Dönüş**: useCart metodunu içeren mock nesnesi
+  _(içerde değişken yok; return içinde inline nesne oluşturulur)_
+- **Dönüş**: `{ useAuth: () => ({ user: { id: 'u1', email: 'u@u.com', user_metadata: {} }, loading: false }) }` — useAuth hook'unun sahte implementasyonu
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_usei18n_mock>
-- **params**: (parametre yok)
+### [N4_NASIL] AST Pointer: src/views/__tests__/OrdersPage.test.tsx::useCart_mock_factory
+- **params**: (parametre yok) — anonymous arrow function
 - **ic_degiskenler**:
-  - `useI18n` — mock çeviri hook'u, testte t çeviri fonksiyonu döndürür
-  - `t` — sipariş sayfası çevirilerini döndüren çeviri fonksiyonu
-- **Dönüş**: useI18n metodunu içeren mock nesnesi
+  _(içerde değişken yok; return içinde inline nesne oluşturulur)_
+- **Dönüş**: `{ useCart: () => ({ addToCart: vi.fn() }) }` — useCart hook'unun sahte implementasyonu, `addToCart` vitest mock fonksiyonu
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_t_callback>
-- **params**: k: string, _?: Record<string, unknown>
+### [N5_NASIL] AST Pointer: src/views/__tests__/OrdersPage.test.tsx::useI18n_mock_factory
+- **params**: (parametre yok) — anonymous arrow function
 - **ic_degiskenler**:
-  - `k` — istenen çeviri anahtarı, sözlükten ilgili metni çekmek için kullanılır
-  - `_` — kullanılmayan opsiyonel değişken, çeviri parametreleri için ayrılmış
-- **Dönüş**: İstenen anahtara ait çeviri metni, anahtar bulunamazsa anahtarın kendisi
+  _(içerde değişken yok; return içinde inline nesne oluşturulur)_
+- **Dönüş**: `{ useI18n: () => ({ t: (k, _?) => ... }) }` — useI18n hook'unun sahte implementasyonu, `t` fonksiyonu anahtar-çeviri sözlüğünden değer döndürür
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_standalone_t_1>
-- **params**: k: string, _?: Record<string, unknown>
+### [N6_NASIL] AST Pointer: src/views/__tests__/OrdersPage.test.tsx::t_translate_function
+- **params**: `(k: string, _?: Record<string, unknown>)` — `k`: çevrilecek anahtar dizesi, `_`: opsiyonel parametreler (kullanılmıyor)
 - **ic_degiskenler**:
-  - `k` — istenen çeviri anahtarı, sözlükten ilgili metni çekmek için kullanılır
-  - `_` — kullanılmayan opsiyonel değişken, çeviri parametreleri için ayrılmış
-- **Dönüş**: İstenen anahtara ait çeviri metni, anahtar bulunamazsa anahtarın kendisi
+  _(içerde değişken yok; inline sözlük nesnesi `as Record<string, string>` ile oluşturulup `[k]` ile erişilir)_
+- **Dönüş**: `string` — sözlükteki karşılığı veya eşleşme yoksa `k` değerinin kendisi (fallback)
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_standalone_t_2>
-- **params**: k: string, _?: Record<string, unknown>
+### [N7_NASIL] AST Pointer: src/views/__tests__/OrdersPage.test.tsx::supabase_mock_factory
+- **params**: (parametre yok) — anonymous arrow function
 - **ic_degiskenler**:
-  - `k` — istenen çeviri anahtarı, sözlükten ilgili metni çekmek için kullanılır
-  - `_` — kullanılmayan opsiyonel değişken, çeviri parametreleri için ayrılmış
-- **Dönüş**: İstenen anahtara ait çeviri metni, anahtar bulunamazsa anahtarın kendisi
+  _(içerde değişken yok; return içinde inline nesne oluşturulur)_
+- **Dönüş**: `{ supabase: { from: (table) => ... } }` — sahte supabase istemcisi, `from()` methodu tablo adına göre farklı mock zincirler döndürür
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::chainResult
-- **params**: data: unknown
+### [N8_NASIL] AST Pointer: src/views/__tests__/OrdersPage.test.tsx::table_handler
+- **params**: `(table: string)` — supabase sorgusu hedeflenen tablo adı
 - **ic_degiskenler**:
-  - `data` — fonksiyona iletilen veri, mock Supabase sorgu sonucu olarak kullanılır
-- **Dönüş**: Sıralı Supabase sorgu metotları (select, eq, order) içeren mock nesnesi
+  _(içerde değişken yok; parametre `table` ile doğrudan koşullu branch yapılır)_
+- **Dönüş**: Mock supabase sorgu zinciri nesnesi — `table === 'venthub_orders'` ise `chainResult(ordersRow)`, `table === 'products'` ise `{select: () => ({in: () => Promise})}`, aksi halde `chainResult([])`
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_eq_mock>
-- **params**: (parametre yok)
+### [N9_NASIL] AST Pointer: src/views/__tests__/OrdersPage.test.tsx::test_detaylar_button
+- **params**: (parametre yok) — `it(...)` callback'i, async arrow function
 - **ic_degiskenler**:
-  - `eq` — eşitleme filtresi mock metodu, order metodu içeren nesne döndürür
-- **Dönüş**: order metodunu içeren mock sorgu nesnesi
-
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_order_mock>
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `order` — sıralama mock metodu, asenkron olarak veri ve hata nesnesi döndürür
-- **Dönüş**: Veriyi ve null hatayı içeren Promise nesnesi
-
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_supabase_mock>
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `supabase.from` — mock Supabase tablo seçme metodu, tablo adına göre farklı sorgu nesneleri döndürür
-- **Dönüş**: supabase nesnesini içeren mock client nesnesi
-
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_from_callback>
-- **params**: table: string
-- **ic_degiskenler**:
-  - `table` — seçilen veritabanı tablosunun adı, 'venthub_orders' ve 'products' tabloları için özel davranış sergiler
-  - `ordersRow` — testte tanımlı sabit sipariş verisi nesnesi, venthub_orders sorgusunda döndürülür
-- **Dönüş**: Tablonun sorgu metotlarını içeren mock nesnesi
-
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::LocationProbe
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `loc` — usePathname() hook'undan dönen mevcut sayfa path değeri, testte loc-path test id'li div'de görüntülenir
-  - `usePathname` — Next.js navigation hook'u, mevcut URL pathini çekmek için kullanılır
-- **Dönüş**: path değerini içeren test id'li JSX div elementi
-
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_vitest_test_wrapper>
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `it` — Vitest test tanımlama metodu, yönlendirme senaryosunu test eder
-  - `render` — React Testing Library render metodu, test edilen bileşenleri DOM'a ekler
-  - `LocationProbe` — path takibi yapan test bileşeni
-  - `OrdersPage` — test edilen ana siparişler sayfası bileşeni
-- **Dönüş**: yok
-
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_async_test_callback>
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `detailsBtn` — ekrandaki "Detaylar" metnli buton elementi, tıklama işlemi için kullanılır
-  - `user` — userEvent kütüphanesinden oluşturulan kullanıcı etkileşimi simülatörü, butona tıklamak için kullanılır
-  - `screen.findByRole` — React Testing Library DOM sorgulama metodu, Detaylar butonunu bulmak için kullanılır
-  - `waitFor` — React Testing Library asenkron bekleme metodu, yönlendirme sonrası DOM değişikliklerini bekler
-- **Dönüş**: yok (async void)
-
-### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\__tests__\OrdersPage.test.tsx::<anon_waitfor_callback>
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `screen.getByTestId('loc-path')` — loc-path test id'li DOM elementi, yönlendirilen pathin doğruluğunu kontrol etmek için kullanılır
-  - `screen.getByTestId('detail')` — detail test id'li DOM elementi, detay sayfasının yüklendiğini doğrulamak için kullanılır
-  - `expect` — Vitest assertion metodu, DOM durumlarını doğrulamak için kullanılır
-- **Dönüş**: yok
+  - `detailsBtn` — `screen.findByRole('button', { name: /Detaylar/i }, { timeout: 5000 })` ile bulunan "Detaylar" butonu DOM elementi
+  - `user` — `userEvent.setup()` ile oluşturulan kullanıcı simülasyonu nesnesi, tıklama gibi etkileşimleri tetikler
+- **Dönüş**: yok (test fonksiyonu; `render` ile bileşeni mount eder, tıklama tetikler, `waitFor` ile URL paterni `^\/account\/orders\/` eşleşmesini ve `data-testid="detail"` elementinin varlığını doğrular)
 
 ---
 

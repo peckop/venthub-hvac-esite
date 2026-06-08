@@ -8,7 +8,7 @@ entity_hashes:
   func:DomesticFanModel: c93fddd365c3092d
   overview: 10bc29aea86c412e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:46Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

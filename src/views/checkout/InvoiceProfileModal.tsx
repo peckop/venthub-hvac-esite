@@ -1,9 +1,10 @@
 'use client'
 
+import { Building2, CheckCircle,Landmark, User, X } from 'lucide-react'
 import React from 'react'
-import type { InvoiceProfile } from '@/types/ui-models'
-import { X, User, Building2, Landmark, CheckCircle } from 'lucide-react'
+
 import { useI18n } from '@/i18n/I18nProvider'
+import type { InvoiceProfile } from '@/types/ui-models'
 
 interface InvoiceProfileModalProps {
     open: boolean

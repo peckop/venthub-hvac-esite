@@ -2,6 +2,7 @@
 
 import nextDynamic from 'next/dynamic'
 import { Suspense } from 'react'
+
 import { useI18n } from '@/i18n/I18nProvider'
 
 export const dynamic = 'force-dynamic'

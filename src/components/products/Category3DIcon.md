@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\Category3DIcon.tsx
-skeleton_hash: 23bc6c824a67e8aa
+skeleton_hash: 26b109acd1c22ca6
 entity_hashes:
   func:Category3DIcon: 183e6f04e3301ca0
-  overview: 0edc95160e4ce010
+  overview: fc3c14abd899ae11
   style_tokens: b8d757c80f7b09fe
-generated_at: 2026-05-28T22:36:53Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış
-Bu React modülü, VentHub HVAC projesinin ürün bölümünde kullanılan kategori tabanlı 3B ikonları sunmak üzere tasarlanmış yeniden kullanılabilir bir UI bileşenidir. Kategori kimliği, üzerine gelinme durumu, kartın konumu ve dokunma ipucu gereksinimi gibi dinamik parametrelere göre ikonun görünümünü ayarlayarak farklı kullanım senaryolarına uyum sağlar. Ürün kartları üzerindeki kategori görselleştirmelerinin temel yapı taşını oluşturur.
+Bu React modülü, VentHub HVAC projesinin ürün bölümünde kullanılan kategori tabanlı 3B ikonları sunmak üzere tasarlanmış yeniden kullanılabilir bir UI bileşenidir. Kategori kimliği, üzerine gelinme durumu, kartın konumu ve dokunma ipucu gereksinimi gibi dinamik parametrelere göre ikonun görünümünü ayarlayarak farklı kullanım senaryolarına uyum sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
@@ -22,12 +22,16 @@ Modülün tüm sorumluluğunu üstlenen tek giriş noktasıdır, gelen parametre
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React bileşeni, HVAC ürünleri kategorileri için 3B görsel ikonlar render etmek üzere tasarlanmıştır, tüm işlev ve görsel doğruluğu parent bileşenden iletilen dört zorunlu prop'un doğru, tip uygun şekilde sağlanmasına bağlıdır, aksi halde kalıcı işlevsel veya görsel arızalar ortaya çıkar.
 
-[Aksiyom 1]: Eğer kategori kimliği tutan `categorySlug` prop'u geçirilmezse, hangi kategoriye ait 3B ikonun yükleneceği belirsizleşir, ikon hiç render edilemez veya yanlış kategori ikonu gösterilir.
-[Aksiyom 2]: Eğer ikonun üzerine gelinip gelinmediğini tutan `hovered` boolean prop'u geçirilmezse, fare etkileşimine bağlı çalışması gereken 3B görsel efektler tetiklenemez, bileşenin etkileşim özelliği tamamen devre dışı kalır.
-[Aksiyom 3]: Eğer ikonun ön kartta olup olmadığını belirten `isFrontCard` boolean prop'u geçirilmezse, 3B görselin perspektif ve katman sıralaması ayarları yanlış uygulanır, sayfadaki diğer kartlarla görsel uyumsuzluk ve dengesizlik oluşur.
-[Aksiyom 4]: Eğer dokunmatik cihazlarda tıklama ipucu gösterilip gösterilmeyeceğini belirten `shouldShowTapHint` boolean prop'u geçirilmezse, mobil kullanıcılar için gerektiğinde tıklama ipucu gösterilemez, kullanıcı deneyimi bozulur.
+Bu modül, kategori bazlı 3D ikon gösterimi için dört parametreye bağımlıdır; geçerli değerler sağlanmadığında bileşen doğru görsel sonucu üretemez.
+
+[Aksiyom 1]: Eğer `categorySlug` parametresi sağlanmazsa veya geçerli bir kategori tanımlayıcısı içermiyorsa, bileşen hangi 3D ikonu render edeceğini bilemez ve uygun görsel çıktı üretilemez.
+
+[Aksiyom 2]: Eğer `hovered` parametresi sağlanmazsa, bileşen üzerine gelme durumunu bilemez ve ikonun hover durumuna ait görsel geçiş (animasyon, renk değişimi vb.) tetiklenemez.
+
+[Aksiyom 3]: Eğer `isFrontCard` parametresi sağlanmazsa, bileşen kartın konumsal bağlamını (ön/arka) bilemez ve buna göre konumlandırma veya perspektif ayarlaması yapılamaz.
+
+[Aksiyom 4]: Eğer `shouldShowTapHint` parametresi sağlanmazsa, bileşen dokunma ipucunun gösterilip gösterilmeyeceğine karar veremez ve ipucu bileşeni gereksiz veya eksik_render edilebilir.
 
 ---
 
@@ -63,20 +67,17 @@ Bu React bileşeni, HVAC ürünleri kategorileri için 3B görsel ikonlar render
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/Category3DIcon.tsx::Category3DIcon
-- **params**: categorySlug, hovered, isFrontCard, shouldShowTapHint, shouldShowDragHint, hintStage, DetailedModel, scale, modelType, offsetContext
+### [N1_NASIL] AST Pointer: Category3DIcon.tsx::Category3DIcon
+- **params**: (categorySlug, hovered, isFrontCard, shouldShowTapHint, shouldShowDragHint, hintStage, DetailedModel, scale, modelType, offsetContext)
 - **ic_degiskenler**:
-  - `meshRef` — useRef ile oluşturulmuş, 3D sahne içindeki ana grup nesnesini referanslamak için kullanılan ref nesnesi, animasyonlar için kullanılır
-  - `showTapHint` — shouldShowTapHint koşulu ve hintStage'in 'tap' olması durumunda true olan, tıklama ipucunun gösterilip gösterilmeyeceğini belirten boolean değişken
-- **Dönüş**: İçinde 3D model ve UI ipuçları barındıran Three.js JSX group elementi, React bileşen çıktısı
+    - `meshRef` — useRef ile oluşturulan THREE.Group referansı, 3D modelin rotasyonunu kontrol etmek için kullanılır
+    - `showTapHint` — shouldShowTapHint ve hintStage koşullarına göre tap hintinin gösterilip gösterilmeyeceğini belirleyen boolean değer
+- **Dönüş**: React.Group JSX elementi (3D model ve UI hint'lerini içeren container)
 
-### [N2_NASIL] AST Pointer: src/components/products/Category3DIcon.tsx::useFrame_animation_callback
-- **params**: state
-- **ic_degiskenler**:
-  - `meshRef.current` — Üst kapsamdaki meshRef referansının mevcut değeri, varlığı kontrol edilerek rotasyon özelliği güncellenir
-  - `state.clock.elapsedTime` — useFrame hook'u tarafından sağlanan state nesnesinden alınan, sahne başlangıcından beri geçen toplam süre, animasyonun sinüs hesaplaması için kullanılır
-  - `hovered` — Üst kapsamdaki bileşen parametresi, fare ikonun üzerine geldiğinde ek rotasyon hareketi eklemek için kontrol edilir
-- **Dönüş**: yok, sadece yan etki olarak 3D grup nesnesinin y eksenindeki rotasyon değerini her karede günceller
+### [N2_NASIL] AST Pointer: Category3DIcon.tsx::useFrame callback
+- **params**: (state) — useFrame hook'unun sağladığı frame state nesnesi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: meshRef.current.rotation.y'yi günceller)
 
 ---
 

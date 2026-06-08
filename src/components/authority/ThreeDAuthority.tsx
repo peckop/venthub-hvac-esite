@@ -1,16 +1,16 @@
 'use client'
 
-import React, { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber'
 import { 
-    useGLTF, 
+    ContactShadows,
+    Environment, 
+    Html,
     OrbitControls, 
     PerspectiveCamera, 
-    Environment, 
-    ContactShadows,
-    Html
-} from '@react-three/drei'
+    useGLTF} from '@react-three/drei'
+import { Canvas } from '@react-three/fiber'
 import { motion } from 'framer-motion'
+import React, { Suspense } from 'react'
+
 import type { ThreeDMetadata } from '../../types/media.types'
 
 interface ThreeDAuthorityProps {

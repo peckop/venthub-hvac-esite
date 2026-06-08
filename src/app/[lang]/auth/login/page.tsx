@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react'
+
 import LoginPage from '../../../../views/LoginPage'
 
 export default function Page() {

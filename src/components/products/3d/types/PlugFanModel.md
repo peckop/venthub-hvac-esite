@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\PlugFanModel.tsx
-skeleton_hash: 2ebc421bbf0113d6
+skeleton_hash: da6d858340679778
 entity_hashes:
   func:PlugFanModel: b85fe612276b43fc
   overview: 3bc6071f2c07ea0b
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:48Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış

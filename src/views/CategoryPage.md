@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\CategoryPage.tsx
-skeleton_hash: d6a1aef6630b0f1d
+skeleton_hash: c7c26ce889db5076
 entity_hashes:
   func:CategoryPage: 58a326ade322bfe1
   overview: 4a1165b4bde9da1a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:39:56Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış
@@ -61,6 +61,18 @@ Bu bir React view bileşeni olup, fonksiyon gövdesi verilmediğinden yalnızca 
 - `initialCategory?: DomainCategory | null`
 - `initialProducts?: DomainProduct[]`
 - `initialSubCategories?: DomainCategory[]`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: CategoryPage.tsx::CategoryPage
+- **params**:
+  - `initialCategory` — başlangıç kategori verisi, `CategoryMasterView`'e prop olarak iletilir
+  - `initialProducts` — başlangıç ürün listesi, `CategoryMasterView`'e prop olarak iletilir
+  - `initialSubCategories` — başlangıç alt kategori listesi, `CategoryMasterView`'e prop olarak iletilir
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `JSX.Element` — `CategoryMasterView` bileşenini, gelen prop'ları doğrudan aktararak döndürür (proxy/composition pattern)
 
 ---
 

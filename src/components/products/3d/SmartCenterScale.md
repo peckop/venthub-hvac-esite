@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\SmartCenterScale.tsx
-skeleton_hash: 170e8ef52df1e15b
+skeleton_hash: 8cf392c147a81336
 entity_hashes:
   func:SmartCenterScale: b7830112d0facb88
   overview: 3402d5dad5709a6a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:44Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

@@ -7,7 +7,7 @@ skeleton_hash: feee7340f861ea3d
 entity_hashes:
   func:useProjectLists: e3790c9d8b328813
   overview: b42bbc25ae784887
-generated_at: 2026-05-28T22:37:47Z
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış

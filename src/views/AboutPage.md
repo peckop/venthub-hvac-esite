@@ -3,27 +3,42 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\AboutPage.tsx
-skeleton_hash: ecd28b653e17510e
+skeleton_hash: 6d7ff9843f8624af
 entity_hashes:
   func:AboutPage: 7a07cf459964f7ab
   func:t: 470aecfc62464333
-  overview: 9d68dc23ca71a802
+  overview: 1c6f01c6be3af64e
   style_tokens: 6526e41f4914ea4c
-generated_at: 2026-06-07T20:34:41Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin “Hakkında” sayfasını sunan, dil destekli bir React bileşenidir. Modül, sayfanın tüm arayüz yapısını ve çok dilli metin gösterimini yönetir.
+VentHub HVAC projesinin "Hakkında" sayfasını sunan, dil destekli bir React bileşenidir. Modülün temel sorumluluğu, sayfanın arayüz yapısını oluşturmak ve belirli bir dile göre çevrilmiş metin içeriğini göstermektir.
+
+## Fonksiyon Grupları
+### Sayfa Oluşturma ve Görüntüleme
+Bu grup, "Hakkında" sayfasının ana yapısını ve bileşenini oluşturur.
+- AboutPage
+
+### Çeviri ve Yerelleştirme Yönetimi
+Bu grup, sayfa içindeki dinamik metinlerin farklı dillere göre çevrilmesini ve gösterilmesini sağlar.
+- t
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için verilen fonksiyon imzaları ve genel bakışa dayanarak, doğru çalışması için aşağıdaki temel mimari varsayımlar belirlenmiştir.
+Bu modül, çeviri destekli bir React bileşenidir ve `lang` parametresi ile dil seçimini, `t` fonksiyonu ile çok dilli metin gösterimini yönetir.
 
-[Aksiyom 1]: Eğer `t` çeviri fonksiyonu (veya bağlı olduğu çeviri sistemi) çağrılamazsa veya geçerli bir çeviri anahtarı döndüremezse, sayfanın tüm metin içeriği eksik, hatalı veya tanımsız görünür.
+[Aksiyom 1]: Eğer `t` çeviri fonksiyonu (veya bağlı olduğu çeviri sistemi) çağrılamazsa veya geçerli bir çeviri anahtarı döndüremezse, sayfanın metin içeriği eksik veya hatalı görünür.
 
-[Aksiyom 2]: Eğer `lang` parametresi olarak sağlanan değer (örneğin 'tr' veya 'en'), `t` fonksiyonunun veya çeviri sözlüğünün desteklediği bir dil kodu değilse, sayfa o dilde görüntülenemez. Bu durumda bileşenin davranışı `t` fonksiyonunun uygulama mantığına bağlıdır; bilinmiyor, ancak muhtemelen varsayılan dile (`'tr'`) geri döner veya hata gösterir.
+[Aksiyom 2]: Eğer `lang` parametresi olarak sağlanan değer, çeviri sistemi tarafından desteklenmeyen bir dil kodu ise, `t` fonksiyonu geçerli bir çeviri sağlayamaz ve sayfa içeriği hatalı olur.
+
+[Aksiyom 3]: Eğer `lang` parametresi hiç sağlanmazsa, varsayılan değer olarak `'tr'` kullanılır ve sayfa Türkçe içerikle gösterilir.
+
+[Aksiyom 4]: `t` fonksiyonu çağrılmadan önce, bir dil bağlamı (`lang`) ile ilişkilendirilmiş olmalıdır; aksi halde geçerli bir çeviri döndüremez.
+
+[Aksiyom 5]: Eğer `lang` parametresi `null`, `undefined` veya boş string (`''`) olarak atanırsa, çeviri sistemi geçerli bir dil algılayamaz ve metin gösterimi başarısız olur.
 
 ---
 
@@ -60,42 +75,22 @@ Bu modül için verilen fonksiyon imzaları ve genel bakışa dayanarak, doğru 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AboutPage.tsx::AboutPage
-- **params**: `({ lang = 'tr' })` — lang parametresi, sayfanın dilini belirler (varsayılan: 'tr')
+### [N1_NASIL] AST Pointer: src/views/AboutPage.tsx::AboutPage
+- **params**: `lang` — sayfanın dilini belirler, varsayılan 'tr'
 - **ic_degiskenler**:
-  - `dict` — lang parametresine göre seçilen sözlük nesnesi (en veya tr)
-  - `t` — çeviri helper fonksiyonu, key.split('.') ile iç içe erişim yapar
-  - `stats` — istatistik verilerini tutan dizi: {value, label, icon} nesnelerinden oluşur
-  - `coreValues` — temel değerleri tutan dizi: {title, description, icon} nesnelerinden oluşur
-- **Dönüş**: JSX elementi (React component)
+  - `dict` — Lang parametresine göre ('tr' veya 'en') kullanılacak dil sözlüğünü tutar
+  - `t` — Verilen bir anahtar ile (örn: 'aboutPage.heroTitle') dil sözlüğünden karşılık gelen metni döndüren çeviri fonksiyonudur. Anahtar bulunamazsa anahtarın kendisini döndürür.
+  - `stats` — Sayfadaki istatistik bölümünde gösterilecek 4 veri nesnesi (değer, etiket, ikon) dizisi
+  - `coreValues` — Sayfadaki temel değerler bölümünde gösterilecek 3 değer nesnesi (başlık, açıklama, ikon) dizisi
+- **Dönüş**: Sayfanın tamamını temsil eden bir React JSX elementi (min-h-screen bg-white class'lı div). Sayfa; bir hero bölümü, istatistik ızgarası, hikaye/felsefe bölümü, yetkili marka şeridi, değerler ızgarası ve bir çağrı (CTA) bölümü içerir.
 
-### [N2_NASIL] AST Pointer: AboutPage.tsx::t
-- **params**: `(key: string)` — çevrilecek metin anahtarı (örn: 'aboutPage.heroTitle')
+### [N2_NASIL] AST Pointer: src/views/AboutPage.tsx::t
+- **params**: `key` — Çevirisi istenen metnin nokta ile ayrılmış anahtarı (örn: 'aboutPage.heroTitle')
 - **ic_degiskenler**:
-  - `parts` — key.split('.') ile oluşan nokta ayrılmış string dizisi
-  - `current` — mevcut sözlük seviyesi (unknown tipinde başlatılır, Record<string, unknown> olarak cast edilir)
-  - `obj` — current'ın Record<string, unknown> cast edilmiş hali
-- **Dönüş**: string — çevrilmiş metin veya hata durumunda orijinal key
-
-### [N3_NASIL] AST Pointer: AboutPage.tsx::stats_map_callback
-- **params**: `(stat, i)` — stat: {value, label, icon} nesnesi; i: dizi indeksi
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (ScrollReveal içinde istatistik gösterimi)
-
-### [N4_NASIL] AST Pointer: AboutPage.tsx::team_avatars_map_callback
-- **params**: `i` — dizi indeksi
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (avatar görseli)
-
-### [N5_NASIL] AST Pointer: AboutPage.tsx::hvac_brands_map_callback
-- **params**: `(brand)` — HVAC_BRANDS dizisinden gelen brand nesnesi
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (marka ikonu ve kart)
-
-### [N6_NASIL] AST Pointer: AboutPage.tsx::coreValues_map_callback
-- **params**: `(value, i)` — value: {title, description, icon} nesnesi; i: dizi indeksi
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (ScrollReveal içinde değer gösterimi)
+  - `parts` — Anahtarın nokta (`.`) karakterine göre bölünmüş hali (dizi)
+  - `current` — Sözlük içinde gezinirken mevcut seviyeyi tutan değişken. Başlangıçta `dict` nesnesidir
+  - `obj` — `current` değişkeninin `Record<string, unknown>` tipine zorlanmış hali, bir sonraki seviyeye geçmek için kullanılır
+- **Dönüş**: string — `key` anahtarının sözlükteki karşılığı veya bulunamadığında `key`'nin kendisi.
 
 ---
 

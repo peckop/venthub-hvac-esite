@@ -1,5 +1,5 @@
-import { useAuth } from './useAuth'
 import { canAccessPage, canWrite, isReadOnly } from '../lib/rbac'
+import { useAuth } from './useAuth'
 
 /**
  * A custom React hook that evaluates the current user's Role-Based Access Control (RBAC) permissions.

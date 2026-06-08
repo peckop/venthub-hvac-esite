@@ -1,14 +1,16 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation'
-import type { Product } from '@/types/ui-models'
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo,useRef, useState } from 'react'
+
 import { getProductsEnriched } from '@/lib/services/product.service'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
-import { DomainCategory } from '../lib/type-converters'
-import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
-import { useIsMounted } from './useIsMounted'
+import type { Product } from '@/types/ui-models'
+
 import { useCategories } from '../contexts/CategoryContext'
+import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
+import { DomainCategory } from '../lib/type-converters'
+import { useIsMounted } from './useIsMounted'
 
 export interface CategoryFilters {
   sortBy: string

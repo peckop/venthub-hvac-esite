@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
-import { axe } from 'vitest-axe';
 import { ReactElement } from 'react';
+import { axe } from 'vitest-axe';
 
 /**
  * Saha Denetimi (Dynamic Accessibility Inspector)

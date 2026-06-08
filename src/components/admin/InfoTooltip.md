@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InfoTooltip.tsx
-skeleton_hash: 4790b84088da2c3b
+skeleton_hash: 15689fb19f78cf40
 entity_hashes:
   func:InfoTooltip: 183c7d447a0090ba
   overview: aa0bb37988421fc0
   style_tokens: 15a027a0bab7a2ef
-generated_at: 2026-05-28T22:35:34Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış
@@ -28,6 +28,18 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## FONKSİYON DETAYLARI
 
+### InfoTooltip
+**Ne yapar**: Kullanıcıya bilgilendirici bir tooltip (yardım ipucu) gösteren React bileşenidir. Belirli bir metni, hover (üzerine gelme) sırasında küçük bir baloncuk içinde kullanıcıya sunar.
+
+**Nasıl yapar**: Bileşen, verilen text parametresini bir tooltip içinde render eder. size parametresi ile ikonun veya tetikleyicinin boyutu, className ile ek stillendirme seçenekleri özelleştirilebilir. Tooltip, genellikle bir bilgi ikonu (ℹ️) ile tetiklenir ve üzerine gelindiğinde veya tıklandığında bilgilendirici metni gösterir.
+
+**Parametreler**:
+- text: string — Tooltip içinde görüntülenecek bilgilendirici metin
+- size: number (varsayılan: 14) — Tooltip tetikleyicisinin (ikon) piksel cinsinden boyutu
+- className: string (varsayılan: '') — Bileşene eklenecek ek CSS sınıfları
+
+**Dönüş**: React.FC<InfoTooltipProps> — Bileşen, InfoTooltipProps arayüzünü kullanan bir React fonksiyonel bileşeni olarak döner.
+
 ---
 
 ## INTERFACES
@@ -41,13 +53,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InfoTooltip.tsx::InfoTooltip
-- **params**: 
-  - `text` — tooltip içinde görüntülenecek metin içeriği
-  - `size` — (varsayılan 14) Info ikonunun boyutu (piksel cinsinden)
-  - `className` — (varsayılan '') üst div'e eklenecek ek CSS sınıfları
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element — fare üzerine gelindiğinde açılan bir tooltip kutusu ve Info ikonu içeren div döndürür
+### [N1_NASIL] AST Pointer: src/components/admin/InfoTooltip.tsx::InfoTooltip
+- **params**: ({ text, size = 14, className = '' })
+- **ic_degiskenler**:
+  - (Fonksiyon gövdesinde tanımlanmış değişken yok)
+- **Dönüş**: JSX elementi (React bileşeni). Fonksiyon, `text` parametresini tooltip içeriği olarak gösteren ve üzerine gelindiğinde (Tailwind `group-hover` ile) görünür olan, `Info` ikonu ve tooltip kutusu içeren bir React bileşeni döndürür. Parametre olarak `text`, `size` ve `className` kullanılır.
 
 ---
 

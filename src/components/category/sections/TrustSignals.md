@@ -3,25 +3,26 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\TrustSignals.tsx
-skeleton_hash: 08cd7eaf3309672a
+skeleton_hash: 442496b377e8fd6e
 entity_hashes:
   func:TrustSignals: 91fe7d8aaf9157d4
-  overview: ebf860b97d35b224
+  overview: a098e608084837ec
   style_tokens: d8ec8f7dddeaa270
-generated_at: 2026-05-28T22:35:48Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-TrustSignals bileşeni, kategori sayfasında güven ve güvenilirliği gösteren işaretleri (örneğin sertifika, garanti, müşteri yorumları) görsel olarak sunar. Bu bileşen, kullanıcıya ürün veya hizmetin güvenilirliğini hızlıca iletmek için tasarlanmıştır.
+TrustSignals bileşeni, kategori sayfasında kullanıcılara markanın güvenilirliğini görsel olarak iletmek için tasarlanmış bir React bileşenidir. Sertifika logoları, garanti bilgileri ve müşteri yorumları gibi statik güven işaretlerini düzenli bir grid yapısında sunar.
 
 ## Fonksiyon Grupları
-### Ana Bileşen
-Bu grup, kullanıcı arayüzüne güven işaretlerini ekleyen temel fonksiyonu içerir.
+### Güven İşaretleri Bileşeni
+Kullanıcı arayüzünde güven sinyallerini içeren bölümü render eden statik bir bileşendir.
 - TrustSignals
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+
 Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
@@ -38,17 +39,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/sections/TrustSignals.tsx::TrustSignals
+### [N1_NASIL] AST Pointer: src\components\category\sections\TrustSignals.tsx::TrustSignals
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `signals` — const signals = [...] array of objects each containing `icon` (Lucide icon component), `title` (string), and `description` (string); used to render the trust signal items via `.map`.
-- **Dönüş**: JSX.Element (returns a `<section>` containing the trust signals grid and certification badges).
+  - `signals` — Vortice products için güven sinyallerini (özellikleri) tutan dizi. Her eleman icon, title ve description özellikleri içerir
+- **Dönüş**: `section` elementi (React JSX). TrustSignals bileşeninin rendered çıktısı.
 
-### [N2_NASIL] AST Pointer: src/components/category/sections/TrustSignals.tsx::mapCallback
+### [N2_NASIL] AST Pointer: src\components\category\sections\TrustSignals.tsx::signal_callback (signals.map içindeki arrow fonksiyon)
 - **params**: (signal, index)
 - **ic_degiskenler**:
-  - `Icon` — const Icon = signal.icon; extracts the Lucide icon component from the current signal object for rendering.
-- **Dönüş**: JSX.Element (returns a `<div>` representing a single trust signal item with its icon, title, and description).
+  - `Icon` — signal objesinden alınan icon bileşeni (Award, Shield vb.). JSX'te <Icon> olarak render edilir
+- **Dönüş**: `div` elementi (React JSX). Her güven sinyalinin rendered kart görünümü.
 
 ---
 

@@ -1,6 +1,7 @@
-import React from 'react'
+import { ArrowLeft,ShieldAlert } from 'lucide-react'
 import Link from 'next/link'
-import { ShieldAlert, ArrowLeft } from 'lucide-react'
+import React from 'react'
+
 import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes';
 

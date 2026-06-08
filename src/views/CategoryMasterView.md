@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\CategoryMasterView.tsx
-skeleton_hash: 7323e52f356d71e6
+skeleton_hash: a3391ac79ecc1048
 entity_hashes:
   func:CategoryMasterView: 8d66cf8f4164e6f6
   func:renderView: 7ee81c09fd482844
   overview: 97eb92d3808ebe2e
   style_tokens: fca21e5c46ce3029
-generated_at: 2026-05-28T22:40:07Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış
@@ -29,22 +29,6 @@ Ana bileşen tarafından çağrılarak, kullanıcılara sunulacak olan nihai HTM
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül için fonksiyon imzalarından çıkarılabilecek sınırlı mimari varsayımlar mevcuttur.
-
----
-
-**[Aksiyom 1 - Bağımlılık Veri Kaynağı]:** Eğer `initialCategory`, `initialProducts` veya `initialSubCategories` parametreleri çağrıuciden sağlanmazsa, ilgili bileşen başlangıç verileri `undefined` olur ve görünümün beklenen veri yapısıyla çalışması garanti edilemez.
-
-> **Not:** Fonksiyon imzasında bu üç parametre için herhangi bir default değer tanımlanmamıştır. Dolayısıyla bunların bileşen tarafından zorunlu olarak istendiği, ancak çağrı tarafında ne tür bir değer beklendiği (null mu, boş dizi mi, nesne mi) imzadan anlaşılamamaktadır.
-
----
-
-**[Aksiyom 2 - renderView Parametresiz Çalışma]:** Eğer `renderView()` fonksiyonu çağrılmadan önce bileşenin iç durumu bozulursa, fonksiyon parametresiz olduğundan düzeltme mekanizması yoktur.
-
-> **Not:** `renderView()` herhangi bir parametre almaz; dolayısıyla dışarıdan veri veya bağlam aktarımı yapılamaz.
-
----
-
-**[Uyarı – Eksik Bilgi]:** Fonksiyon gövdesine erişim olmadığından, modülün hangi veri tiplerini beklediği, hangi koşullarda hangi çıktıyı ürettiği veya hangi durumlarda hata verdiği gibi kritik mimari varsayımlar **bilinmemektedir**. Tam aksiyon üretimi için fonksiyon gövdelerine erişim gereklidir.
 
 ---
 
@@ -102,26 +86,6 @@ Bu modül için fonksiyon imzalarından çıkarılabilecek sınırlı mimari var
   - `renderView()` — inner fonksiyon çağrısı, JSX döndürür
 - **Kosullu Donus**: `!category && !loading` ise `<ProductsDiscoveryView products={products} isLoading={loading} />` döner
 - **Donus**: JSX — `<div className="min-h-screen">{renderView()}</div>`
-
----
-
-### [N2_NASIL] AST Pointer: CategoryMasterView.tsx::renderView
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `category` — closure'dan erişilen sunum katmanı kategorisi; `displayMode` alanına göre switch ile hangi view'ın render edileceği belirlenir, `parentId` alanı fallback koşulunda kontrol edilir, `raw` alanı tüm view bileşenlerine prop olarak geçirilir
-  - `rawSubCategories` — closure'dan erişilen ham alt kategoriler dizisi; CategoryShowcaseView, CategoryLandingView ve CategoryGridView'e prop olarak geçirilir, `length > 0` koşulu fallback dalında kontrol edilir
-  - `products` — closure'dan erişilen ürünler dizisi; CategoryLandingView, CategorySeriesView ve CategoryGridView'e prop olarak geçirilir, `as DomainProduct[]` type assertion ile cast edilir
-  - `parentCategory` — closure'dan erişilen üst kategori sunum katmanı objesi; optional chaining ile `?.raw` erişilerek CategorySeriesView ve CategoryGridView'e prop olarak geçirilir
-  - `availableBrands` — closure'dan erişilen benzersiz marka listesi; sadece default dalındaki CategoryGridView'e prop olarak geçirilir
-  - `filters` — closure'dan erişilen aktif filtreler objesi; sadece default dalındaki CategoryGridView'e prop olarak geçirilir
-  - `updateFilters` — closure'dan erişilen filtre güncelleme fonksiyonu; sadece default dalındaki CategoryGridView'in `onUpdateFilters` prop'una bağlanır
-  - `loading` — closure'dan erişilen yükleme durumu boolean'ı; sadece default dalındaki CategoryGridView'e prop olarak geçirilir
-- **Cagri Iliskileri**:
-  - `<CategoryShowcaseView category={category.raw} subCategories={rawSubCategories} />` — showcase displayMode dalında render edilir
-  - `<CategoryLandingView category={category.raw} subCategories={rawSubCategories} products={products as DomainProduct[]} />` — landing displayMode dalında ve default fallback'te alt kategoriler mevcutsa render edilir
-  - `<CategorySeriesView category={category.raw} parentCategory={parentCategory?.raw} products={products as DomainProduct[]} />` — series displayMode dalında ve default fallback'te `category.parentId` varsa render edilir
-  - `<CategoryGridView category={category.raw} parentCategory={parentCategory?.raw} subCategories={rawSubCategories} availableBrands={availableBrands} products={products} filters={filters} onUpdateFilters={updateFilters} loading={loading} />` — default fallback dalının en son落 dalında render edilir
-- **Donus**: `category` null ise `null`, aksi halde göreli `category.displayMode` veya fallback koşullarına göre JSX (CategoryShowcaseView | CategoryLandingView | CategorySeriesView | CategoryGridView)
 
 ---
 

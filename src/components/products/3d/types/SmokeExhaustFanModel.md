@@ -3,31 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SmokeExhaustFanModel.tsx
-skeleton_hash: 062084050a189af2
+skeleton_hash: 0c186e3542b04fd1
 entity_hashes:
   func:SmokeExhaustFanModel: c61745ed6f96bf83
-  overview: dbcf102fe547cb19
+  overview: 384ff5fde93c0465
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:50Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC platformunda ürünler bölümünde konumlanan, duman tahliye fanının 3 boyutlu modelini render etmek için geliştirilmiş React bileşenidir. Proje içindeki 3B ürün tipleri kategorisinde yer alan bu modül, platformun 3B görünüm özelliklerinde fan modelinin sorunsuz şekilde gösterilmesini sağlar.
+Bu modül, Venthub HVAC platformunun ürün sergisinde yer alan duman tahliye fanının 3 boyutlu modelini görselleştirmek için tasarlanmış bir React bileşenidir. Modül, 3D ürün modelleri kategorisindeki bu spesifik fanın tarayıcı içinde doğru ve verimli bir şekilde render edilmesini sağlamakla yükümlüdür.
 
 ## Fonksiyon Grupları
 ### Ana 3B Fan Bileşeni
-Modülün temel sorumluluğunu üstlenen bu grup, duman tahliye fanının 3B modelinin tüm işleyiş ve render sürecini tek başına yönetir.
+Bu grup, modülün tek ve temel bileşeni olan fanın 3D modelinin tüm render mantığını ve görünüm akışını yönetir.
 - SmokeExhaustFanModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı 3D duman egzoz fanı modeli bileşeninin doğru çalışması, uygulamanın temel React çalışma zamanı ve 3D model rendering altyapısının erişilebilir olmasına bağlıdır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer React JSX çalışma zamanı bu bileşenin çalıştığı ortamda mevcut değilse, bileşen hiçbir şekilde render edilemez ve uygulama genelinde çalışma zamanı hatası oluşur.
-[Aksiyom 2]: Eğer 3D model bileşenlerinin çalışması için gerekli olan temel 3D rendering kütüphanesi ortama yüklenmemişse, bu modül hedeflediği duman egzoz fanı modelini ekrana çizemez.
-[Aksiyom 3]: Eğer bu modülün kullanması gereken 3D model asset dosyaları (model dosyaları, kaplama vb.) erişilebilir değilse, model yüklemesi başarısız olur ve kullanıcıya boş veya hata içeren bir görsel alan sunulur.
-[Aksiyom 4]: Eğer bu bileşenin çalışması için ihtiyaç duyduğu temel tip tanımları modülün erişebileceği konumda bulunmuyorsa, TypeScript derlemesi başarısız olur ve uygulama build süreci kesilir.
+**Gerekçe:** Fonksiyon imzası `SmokeExhaustFanModel()` olarak verilmiş olup herhangi bir parametre, modül sabiti veya return türü bilgisi mevcut değildir. Fonksiyon gövdesi kodu paylaşılmadığı için, sadece imzadan çıkarılabilecek mimari bir koşul belirlenememiştir. Docstring ve yorumlardan bilgi çıkarılamayacağından, varsayımlar yalnızca fonksiyon gövdesine dayanmalıdır.
 
 ---
 
@@ -43,14 +40,48 @@ Bu React tabanlı 3D duman egzoz fanı modeli bileşeninin doğru çalışması,
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SmokeExhaustFanModel.tsx::SmokeExhaustFanModel
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/products/3d/types/SmokeExhaustFanModel.tsx::SmokeExhaustFanModel
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials hook'u ile temin edilen, tüm fan bileşenlerinde kullanılan materyaller nesnesi
-  - `rotorRef` — THREE.Group tipinde referans, fan rotorunun dönüş animasyonunu kontrol etmek için kullanılır
-  - `useFrame` — react-three-fiber kütüphanesinin her render frame'de çalışan hook'u, rotor dönüşünü uygular
-  - `bladeGeometry` — useMemo ile önbelleğe alınan, fan pervanelerinin 3D geometrisi nesnesi
-- **Dönüş**: React Three Fiber `<group>` JSX elementi, 3D duman egzos fanı modelini temsil eder
+  - `materials` — useFanMaterials() hook'undan dönen malzeme nesnesi; fan için gerekli tüm materyalleri içerir (smokeCoating, castBladeMat, boltMaterial, matteBlack)
+  - `rotorRef` — THREE.Group referansı; rotor grubuna referans tutar, useFrame ile döndürmek için kullanılır
+  - `bladeGeometry` — useMemo ile hesaplanan ve bellek sızıntısını önlemek için önbelleğe alınan THREE.ExtrudeGeometry nesnesi; 6 rotor bıçağının geometrisini tanımlar
+- **Dönüş**: JSX elementi (React bileşeni)
+
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/SmokeExhaustFanModel.tsx::useFrameCallback
+- **params**: (state, delta)
+  - `state` — React-Three-Fiber frame state nesnesi (kullanılmıyor)
+  - `delta` — Son frame ile arasındaki zaman farkı (saniye cinsinden)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (useFrame yan etki callback'i)
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/SmokeExhaustFanModel.tsx::useMemoBladeGeometryCallback
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `shape` — THREE.Shape nesnesi; bıçağın 2D kesit şeklini tanımlar (Bezier eğrileri ile)
+  - `extrudeSettings` — Object literal; ExtrudeGeometry için ExtrudeSettings parametreleri (depth, bevel ayarları)
+- **Dönüş**: THREE.ExtrudeGeometry nesnesi
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/SmokeExhaustFanModel.tsx::flangeMapCallback
+- **params**: (zPos, i)
+  - `zPos` — Flanşın Z eksenindeki konumu (0.38 veya -0.38)
+  - `i` — Flanş indeksi (0 veya 1)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi (flanş grubu)
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/types/SmokeExhaustFanModel.tsx::boltMapCallback
+- **params**: (_, b)
+  - `_` — Kullanılmayan değer (Array(16) elemanı)
+  - `b` — Civata indeksi (0-15 arası)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi (civata mesh'i)
+
+### [N6_NASIL] AST Pointer: src/components/products/3d/types/SmokeExhaustFanModel.tsx::bladeMapCallback
+- **params**: (_, i)
+  - `_` — Kullanılmayan değer (Array(6) elemanı)
+  - `i` — Bıçak indeksi (0-5 arası)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi (bıçak grubu)
 
 ---
 

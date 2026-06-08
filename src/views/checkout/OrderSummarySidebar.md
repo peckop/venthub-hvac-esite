@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\OrderSummarySidebar.tsx
-skeleton_hash: a5b0e7a434933e80
+skeleton_hash: c470ea53787aa68a
 entity_hashes:
   func:OrderSummarySidebar: d1d455540c8e8d0c
   overview: ce3348034c2766ed
   style_tokens: ed45dfd73f706270
-generated_at: 2026-05-28T22:40:13Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış
@@ -34,10 +34,6 @@ Bu sipariş özeti kenar çubuğu bileşeni, ödeme sayfasında maliyet kalemler
 [Aksiyom 4]: Eğer `finalAmount` (ödenecek nihai tutar) parametresi sağlanmazsa, kullanıcının ne kadar ödeyeceği belirsiz kalır.
 
 [Aksiyom 5]: Fonksiyon imzası `couponApp` ile kesilmiş olup tam parametre adı bilinmemektedir; bu parametrenin tipi, zorunluluğu ve ilişkili işlevi fonksiyon gövdesi incelenmeden belirlenemez.
-
----
-
-**Not:** Fonksiyon imzasında hiçbir parametrenin default değeri tanımlı değildir; tüm parametreler调用ıcı tarafından sağlanmalıdır veya bileşen içi varsayılan değer mekanizması gövde içinde tanımlı olabilir (gövde analiz edilmemiştir). Fonksiyon gövdesi erişilebilir olmadığından, bileşenin hangi HTML/JSX yapısını render ettiği, fiyatların nasıl formatlandığı veya kupon indirim mantığı gibi detaylar hakkında çıkarım yapılamamıştır.
 
 ---
 

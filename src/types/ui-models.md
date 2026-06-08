@@ -3,28 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\ui-models.ts
-skeleton_hash: 99b64ded625b7139
+skeleton_hash: 9e808fb0ab3fea56
 entity_hashes:
-  overview: 880a05d23bd685e7
-generated_at: 2026-06-06T21:56:21Z
+  overview: cdd1d441caa7d556
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin UI katmanı için tip tanımları içeren, yalnızca derleme zamanında var olan bir TypeScript modülüdür. Veritabanı tablolarına karşılık gelen temel tipleri (DbCategory, DbProduct vb.) import ederek, bu verilerin UI bileşenlerinde güvenli bir şekilde kullanılmasını sağlayacak arayüz ve tip tanımları tanımlar. Dosyada herhangi bir çalıştırılabilir kod, sabit veya fonksiyon bulunmamaktadır; tüm amacı tip güvenliği sağlamaktır.
+
+Bu modül, VentHub HVAC projesinin UI katmanı için gerekli olan tip ve arayüz tanımlarını içeren, yalnızca derleme zamanında var olan bir TypeScript modülüdür. Veritabanı tablolarına karşılık gelen temel tipleri import ederek, bu verilerin React bileşenlerinde ve UI yardımcı fonksiyonlarında güvenli bir şekilde işlenmesini sağlayacak veri yapılarını tanımlar. Dosyada herhangi bir çalıştırılabilir kod, fonksiyon veya sabit bulunmamaktadır; tüm amacı TypeScript'in statik tip kontrolü aracılığıyla derleme zamanı güvenliği sağlamaktır.
+
+## Modül Yapısı
+
+Dosya, veritabanı tablolarından UI katmanına veri aktarımını kolaylaştıran arayüz tanımları içerir. Tanımlanan ana arayüzler arasında arama önerileri için `SearchSuggestion`, tam metin arama sonuçları için `FtsProductResult` ve ürün listeleme parametreleri için `GetProductsParams` bulunmaktadır. Bu tipler, veritabanından gelen DbCategory, DbProduct, DbInvoiceProfile, DbProjectItem, DbUserAddress ve DbUserProject gibi ham verilerin UI bileşenlerinde kullanılmak üzere şekillendirilmesini sağlar.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül yalnızca TypeScript tip tanımları içermektedir; herhangi bir çalıştırılabilir fonksiyon gövdesi veya modül sabiti bulunmamaktadır. Bu nedenle, fonksiyon gövdesinden türetilebilecek aksiyom yoktur.
+Bu modül yalnızca TypeScript tip tanımları (interfaces ve type aliases) içermekte olup, herhangi bir çalıştırılabilir fonksiyon gövdesi veya modül sabiti içermemektedir. Dolayısıyla, bir fonksiyon gövdesinden çıkarılabilecek çalışma zamanı varsayımları mevcut değildir.
 
-**[Aksiyom 1]:** Eğer `db-rows` modülü mevcut değilse veya içinden `DbCategory` ve `DbProduct` tipleri export edilmiyorsa, derleme zamanında hata oluşur.
+**[Aksiyom 1]:** Eğer bu modül (`ui-models.ts`) bir TypeScript derleyicisi (ör. `tsc`) tarafından bir `.js` veya `.dts` çıktısına dönüştürülmezse, modülün tanımladığı tipler derleme zamanında var olmaz ve projenin hiçbir工作的 zaman kodu etkilenmez.
 
-**[Aksiyom 2]:** Eğer `db-rows` modülündeki `DbCategory` veya `DbProduct` tiplerinin yapıları (alan isimleri/tipleri) değiştirilirse, bu modüldeki karşılık gelen UI tip tanımlarının da güncellenmesi gerekir; aksi takdirde derleme hatası oluşur.
+**[Aksiyom 2]:** Eğer projedeki UI bileşenleri bu modüldeki tiplere (ör. `DbCategory`, `DbProduct`) bağımlıysa ve bu modül güncellenip ilgili tipler değiştirilip yeniden derlenmezse, UI bileşenlerinin tip hataları alması ve derleme sürecinin başarısız olması olur.
 
----
-
-**Not:** Bu dosyada herhangi bir fonksiyon gövdesi, sabit veya çalıştırılabilir kod bulunmadığından, fonksiyonel davranışa ilişkin aksiyom üretilememektedir. Mevcut aksiyomlar yalnızca derleme zamanı bağımlılığı ilişkisine dayanmaktadır.
+**[Aksiyom 3]:** Eğer bu modülde tanımlanan tipler (örn: `DbCategory`) gerçek veritabanı şemasını (`db-rows` veya benzeri bir modüldeki_satır tiplerini) doğru bir şekilde yansıtmıyorsa, UI katmanı veritabanından gelen verilerle tutarsız tiplerde çalışır ve beklenmedik çalışma zamanı hatalarına yol açabilir (örn: `undefined` değerlere erişim, tip uyuşmazlığı).
 
 ---
 
@@ -97,20 +100,24 @@ type ProjectItem = DbProjectItem & { product?: Product }
 
 ## AST POINTERS
 
-Bu dosya (`C:\Users\alize\venthub-hvac\src\types\ui-models.ts`) **tip tanımları dosyasıdır** ve:
+Bu dosyada fonksiyon gövdesi bulunmamaktadır.
 
-- **Fonksiyon gövdesi**: Yok
-- **Fonksiyon imzası**: Yok
-- **Sabit tanımı**: Yok
-- **Class tanımı**: Yok
+`ui-models.ts` dosyası sadece **type importları** içermektedir:
 
-Dosya sadece şu import'ları içerir:
 ```typescript
-import type { DbCategory, DbProduct, DbUserProject, DbProjectItem, DbUserAddress, DbInvoiceProfile }
 import type { Json } from './database.types';
+import type { DbCategory, DbInvoiceProfile, DbProduct, DbProjectItem, DbUserAddress, DbUserProject } 
 ```
 
-Bu import'lar, dosya içinde tanımlanacak tipler tarafından kullanılacak referanslardır. Dosyanın kendisinde herhangi bir çalıştırılabilir fonksiyon veya metot gövdesi bulunmadığından **AST Pointer üretilecek fonksiyon yoktur**.
+Fonksiyon imzası, fonksiyon gövdesi, sabit veya class tanımı **yoktur**.
+
+| Öğe | Durum |
+|-----|-------|
+| Fonksiyon gövdeleri | ❌ Yok |
+| Fonksiyon imzaları | ❌ Yok |
+| Sınıflar | ❌ Yok |
+| Sabitler | ❌ Yok |
+| Import edilen tipler | ✅ 6 adet (Json, DbCategory, DbInvoiceProfile, DbProduct, DbProjectItem, DbUserAddress, DbUserProject) |
 
 ---
 

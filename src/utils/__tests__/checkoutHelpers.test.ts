@@ -1,6 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { getPriceHashLocal } from '../checkoutHelpers'
+import { describe, expect,it } from 'vitest'
+
 import type { CartItem } from '@/types/cart'
+
+import { getPriceHashLocal } from '../checkoutHelpers'
 
 const createMockItem = (
   id: string,

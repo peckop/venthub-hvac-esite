@@ -1,32 +1,33 @@
 /// <reference types="node" />
-import VentImage from '@/components/ui/VentImage'
-import React, { lazy, Suspense, useState, useEffect, useMemo } from 'react'
+import { Layout,Plus, Tags } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
+import React, { lazy, Suspense, useEffect, useMemo,useState } from 'react'
+import { toast } from 'sonner'
+
+import VentImage from '@/components/ui/VentImage'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import type { DbCategory } from '../../types/db-rows'
-import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import AdminToolbar from '../../components/admin/AdminToolbar'
-import AdminSkeleton from '../../components/admin/AdminSkeleton'
+
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import {
-  adminSectionTitleClass,
-  adminSubtitleClass,
-  adminTableHeadCellClass,
-  adminTableCellClass,
-  adminTableContainerClass,
-  adminButtonPrimaryClass,
-  adminTableActionClass,
-  adminTableActionDangerClass
-} from '../../utils/adminUi'
-import { useI18n } from '../../i18n/I18nProvider'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminToolbar from '../../components/admin/AdminToolbar'
 import CategoryFormModal from '../../components/admin/categories/CategoryFormModal'
-import { Tags, Plus, Layout } from 'lucide-react'
 import EditableCell from '../../components/admin/EditableCell'
 import InfoTooltip from '../../components/admin/InfoTooltip'
-import { toast } from 'sonner'
-import { useRole } from '../../hooks/useRole'
 import { useDragScroll } from '../../hooks/useDragScroll'
+import { useRole } from '../../hooks/useRole'
+import { useI18n } from '../../i18n/I18nProvider'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
+import type { DbCategory } from '../../types/db-rows'
+import {
+  adminButtonPrimaryClass,
+  adminSectionTitleClass,
+  adminSubtitleClass,
+  adminTableActionClass,
+  adminTableActionDangerClass,
+  adminTableCellClass,
+  adminTableContainerClass,
+  adminTableHeadCellClass} from '../../utils/adminUi'
 
 // Lazy load menus
 const ColumnsMenu = lazy(() => import('../../components/admin/ColumnsMenu'))

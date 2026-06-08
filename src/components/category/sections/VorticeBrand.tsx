@@ -1,6 +1,9 @@
-import VentImage from '@/components/ui/VentImage'
+import { Award, Clock, Globe, Shield, Star } from 'lucide-react'
 import React from 'react'
-import { Award, Globe, Clock, Shield, Star } from 'lucide-react'
+
+import VentImage from '@/components/ui/VentImage'
+import { useI18n } from '@/i18n/I18nProvider'
+
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
 /**
@@ -8,34 +11,21 @@ import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useSc
  * 70 yıllık İtalyan mühendisliği ve güvenilirlik
  */
 const VorticeBrand: React.FC = () => {
+    const { dict } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
 
-    const highlights = [
-        {
-            icon: Clock,
-            value: '70+',
-            label: 'Yıl Deneyim',
-            description: '1954\'ten beri havalandırma'
-        },
-        {
-            icon: Globe,
-            value: '90+',
-            label: 'Ülke',
-            description: 'Global dağıtım ağı'
-        },
-        {
-            icon: Award,
-            value: '3x',
-            label: 'Compasso d\'Oro',
-            description: 'İtalya\'nın en prestijli tasarım ödülü'
-        },
-        {
-            icon: Star,
-            value: '#1',
-            label: 'Avrupa',
-            description: 'Havalandırma sektöründe lider'
+    const bDict = dict.category.vorticeBrand
+    const icons = [Clock, Globe, Award, Star]
+
+    const highlights = icons.map((Icon, index) => {
+        const item = bDict.highlights[index]
+        return {
+            icon: Icon,
+            value: item.value,
+            label: item.label,
+            description: item.desc
         }
-    ]
+    })
 
     return (
         <section ref={sectionRef} className="py-12 sm:py-16 bg-gradient-to-b from-slate-900 to-slate-800 text-white relative overflow-hidden">
@@ -57,37 +47,38 @@ const VorticeBrand: React.FC = () => {
                                 <div className="w-3 sm:w-4 bg-white" />
                                 <div className="w-3 sm:w-4 bg-red-500" />
                             </div>
-                            <span className="text-xs sm:text-sm font-medium text-gray-400">İtalyan Mühendisliği</span>
+                            <span className="text-xs sm:text-sm font-medium text-gray-400">{bDict.italianEngineering}</span>
                         </div>
 
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">
-                            Neden <span className="text-orange-400">Vortice</span>?
+                            {bDict.whyVortice.split('Vortice')[0]}
+                            <span className="text-orange-400">Vortice</span>
+                            {bDict.whyVortice.split('Vortice')[1] || ''}
                         </h2>
 
                         <p className="text-base sm:text-lg text-gray-300 mb-4 sm:mb-6">
-                            1954 yılında Milano'da kurulan Vortice, 70 yılı aşkın süredir dünya genelinde
-                            havalandırma teknolojisinin öncüsü olmuştur.
+                            {bDict.description1}
                         </p>
 
                         <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8 hidden sm:block">
-                            Attilio Pagani tarafından kurulan şirket, ilk ürünüyle İtalya'nın en prestijli
-                            tasarım ödülü <strong className="text-orange-400">Compasso d'Oro</strong>'yu kazanmıştır.
-                            Bugün 90'dan fazla ülkede milyonlarca kullanıcıya hizmet vermektedir.
+                            {bDict.description2.split('Compasso d\'Oro')[0]}
+                            <strong className="text-orange-400">Compasso d'Oro</strong>
+                            {bDict.description2.split('Compasso d\'Oro')[1] || ''}
                         </p>
 
                         {/* Trust Badges */}
                         <div className="flex flex-wrap gap-2 sm:gap-4">
                             <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
                                 <Shield className="text-green-400" size={16} />
-                                <span className="text-xs sm:text-sm">Yetkili Bayi</span>
+                                <span className="text-xs sm:text-sm">{bDict.authorizedDealer}</span>
                             </div>
                             <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
                                 <Award className="text-yellow-400" size={16} />
-                                <span className="text-xs sm:text-sm">CE Sertifikalı</span>
+                                <span className="text-xs sm:text-sm">{bDict.ceCertified}</span>
                             </div>
                             <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
                                 <Star className="text-orange-400" size={16} />
-                                <span className="text-xs sm:text-sm">2 Yıl Garanti</span>
+                                <span className="text-xs sm:text-sm">{bDict.warranty2y}</span>
                             </div>
                         </div>
                     </div>
@@ -97,11 +88,11 @@ const VorticeBrand: React.FC = () => {
                         {/* Vortice Hero Image */}
                         <div className="relative rounded-2xl overflow-hidden shadow-2xl mb-6">
                             <VentImage src="/images/category/hero-vortice.png"
-                                alt="Vortice Air Curtain Application"
+                                alt={bDict.premiumComfort}
                                 className="w-full h-auto"
                              />
                             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                                <span className="text-yellow-400 text-xs font-bold tracking-wider uppercase">Premium Konfor</span>
+                                <span className="text-yellow-400 text-xs font-bold tracking-wider uppercase">{bDict.premiumComfort}</span>
                             </div>
                         </div>
 
@@ -128,7 +119,9 @@ const VorticeBrand: React.FC = () => {
                 {/* Vortice Logo Mention */}
                 <div className={`mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/10 text-center ${scrollAnimationClasses.fadeIn(isVisible)}`} style={{ transitionDelay: '600ms' }}>
                     <p className="text-xs sm:text-sm text-gray-500">
-                        VentHub, <strong className="text-white">Vortice</strong> ürünlerinin Türkiye yetkili satıcısıdır.
+                        {bDict.authorizedDealerNotice.split('Vortice')[0]}
+                        <strong className="text-white">Vortice</strong>
+                        {bDict.authorizedDealerNotice.split('Vortice')[1] || ''}
                     </p>
                 </div>
             </div>

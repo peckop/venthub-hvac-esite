@@ -1,16 +1,17 @@
-import React from 'react'
-import HomePage from '../../views/HomePage'
-import { getCategories } from '@/lib/services/category.service'
-import { supabaseStaticClient } from '@/lib/supabase/static'
-import { getProducts } from '@/lib/services/product.service'
-import type { Product } from '@/types/ui-models'
-import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
-import { tr } from '../../i18n/dictionaries/tr'
 import type { Metadata } from 'next'
-import { SITE_URL } from '../../config/siteUrl'
-import { CategoryViewModelLite } from '../../components/home/GuidedCategoryDiscovery'
+import React from 'react'
 
+import { getCategories } from '@/lib/services/category.service'
+import { getProducts } from '@/lib/services/product.service'
+import { supabaseStaticClient } from '@/lib/supabase/static'
+import type { Product } from '@/types/ui-models'
+
+import { CategoryViewModelLite } from '../../components/home/GuidedCategoryDiscovery'
+import { SITE_URL } from '../../config/siteUrl'
 import { en } from '../../i18n/dictionaries/en'
+import { tr } from '../../i18n/dictionaries/tr'
+import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
+import HomePage from '../../views/HomePage'
 
 export async function generateStaticParams() {
   return [
@@ -69,8 +70,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 import { unstable_cache } from 'next/cache'
-import { getTenantConfig } from '../../utils/tenantServer'
+
 import { TenantProvider } from '../../hooks/useTenant'
+import { getTenantConfig } from '../../utils/tenantServer'
 
 const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
   async () => {

@@ -1,6 +1,7 @@
 import { createContext } from 'react'
-import type { Product } from '../types/ui-models'
+
 import type { CartItem } from '../types/cart'
+import type { Product } from '../types/ui-models'
 
 
 export interface CartContextType {

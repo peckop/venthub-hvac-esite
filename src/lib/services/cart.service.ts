@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+
 import type { Database } from '../../types/database.types'
-import type { DbShoppingCart, DbCartItem, DbProduct } from '../../types/db-rows'
+import type { DbCartItem, DbProduct,DbShoppingCart } from '../../types/db-rows'
 import type { Product } from '../../types/ui-models'
 import { mapDatabaseProductToDomain } from '../type-converters'
 

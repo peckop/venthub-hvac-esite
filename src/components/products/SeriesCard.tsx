@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import React from 'react';
+
 import { formatCurrency } from '../../i18n/format';
 import { useI18n } from '../../i18n/I18nProvider';
 

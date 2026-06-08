@@ -1,6 +1,6 @@
 "use client";
-import React, { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
+import React, { useMemo,useRef } from 'react'
 import * as THREE from 'three'
 
 export const WallMountedCompactFanModel: React.FC = () => {

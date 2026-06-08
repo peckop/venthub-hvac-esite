@@ -10,7 +10,7 @@ entity_hashes:
   func:buildLathePoints: 1c464dd2bea08bfc
   overview: aa2dd6f5bcc0a3eb
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:39Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

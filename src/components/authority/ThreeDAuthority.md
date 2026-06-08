@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\authority\ThreeDAuthority.tsx
-skeleton_hash: 5889f50b0077d368
+skeleton_hash: a5417eb78feadf0c
 entity_hashes:
   func:Model: cad84f3d7aa627bb
   func:ThreeDAuthority: 003bc9e7ed9ad2d8
   overview: 53fe48ece7de08da
   style_tokens: 79effa301ffb588d
-generated_at: 2026-05-28T22:35:41Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış

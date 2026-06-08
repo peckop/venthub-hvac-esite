@@ -8,7 +8,7 @@ entity_hashes:
   func:Page: d710ec3bcbfd4e2f
   overview: b0edd278ef51fffe
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-06T21:54:02Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış
@@ -27,24 +27,6 @@ Bu modül, Next.js routing tarafından çağrılan bir sayfa bileşenidir. Aşa�
 
 ---
 
-**[Aksiyom 1]:** Eğer `AdminOrdersPage` bileşeni projede tanımlı veya import edilebilir değilse, `Page()` fonksiyonu derleme zamanı hatası ile karşılaşır.
-
-> **Gerekçe:** Modül sabitlerinde `AdminOrdersPage (call)` olarak belirtilmiştir; yani fonksiyon gövdesinde bu bileşenin çağrılması zorunludur.
-
----
-
-**[Aksiyom 2]:** Eğer `Page()` fonksiyonu React/Next.js bileşeni olarak return etmiyorsa, tarayıcıda渲染 hatası oluşur ve sayfa görüntülenemez.
-
-> **Gerekçe:** Fonksiyon imzası `Page()` — parametresiz, slotsuz bir React bileşenidir. Next.js App Router tarafından `/admin/orders` rotasının varsayılan bileşeni olarak yüklenir.
-
----
-
-**[Aksiyom 3]:** Eğer `AdminOrdersPage` bileşeni props bekliyorsa ancak `Page()` fonksiyonundan prop geçirilmiyorsa (fonksiyon imzasında parametre yok), bileşen varsayılan değerlerle veya hata ile çalışır.
-
-> **Gerekçe:** Fonksiyon imzası tamamen parametresizdir: `Page()`. Hiçbir props传递 yapılmamaktadır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### Page
@@ -59,6 +41,16 @@ Bu modül, Next.js routing tarafından çağrılan bir sayfa bileşenidir. Aşa�
 - **AdminOrdersPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminOrdersPage'),
   { ss...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/admin/orders/page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu; string anahtarlarla çok dilli metinleri getirir, örneğin `t('common.loading')`
+- **Dönüş**: JSX — `<Suspense>` ile sarmalanmış `<AdminOrdersPage />` bileşeni; fallback olarak `t('common.loading')` metnini gösteren pulsing yükleme div'i döner
 
 ---
 

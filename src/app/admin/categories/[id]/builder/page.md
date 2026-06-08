@@ -8,7 +8,7 @@ entity_hashes:
   func:CategoryBuilderPage: b1b2565a20b825f9
   overview: 152bd8ffebcdcce2
   style_tokens: 5aeaea31beafa07a
-generated_at: 2026-05-28T22:35:01Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış

@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
-import { buildCategoryBreadcrumb } from '../breadcrumbUtils'
+import { describe, expect, it, vi } from 'vitest'
+
 import { DomainCategory } from '../../lib/type-converters'
+import { buildCategoryBreadcrumb } from '../breadcrumbUtils'
 
 // Mock dependencies
 vi.mock('../categoryHelpers', () => ({

@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath, revalidateTag } from 'next/cache'
+import { NextRequest, NextResponse } from 'next/server'
+
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 
 export const dynamic = 'force-dynamic'

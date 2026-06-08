@@ -9,7 +9,7 @@ entity_hashes:
   func:openLead: 3d89ba2774c36aa2
   overview: 5af9581c1e08259f
   style_tokens: de735ee559e96a8f
-generated_at: 2026-05-28T22:35:44Z
+generated_at: 2026-06-08T10:08:12Z
 ---
 
 ## Genel Bakış

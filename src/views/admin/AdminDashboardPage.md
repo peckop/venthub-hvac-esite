@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminDashboardPage.tsx
-skeleton_hash: c340030cf8d34671
+skeleton_hash: 15a9e97775c5ce01
 entity_hashes:
   func:AdminDashboardPage: d9f200a1ae3a63e1
   overview: 98a75f3d9ee8aa18
   style_tokens: 12dd6d905c26f46b
-generated_at: 2026-06-06T21:57:10Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,15 @@ Yönetici paneline ait tüm içerikleri, durum özetlerini ve gezinme bileşenle
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için fonksiyon gövdesine erişilemediği için, sadece fonksiyon imzasından çıkarılabilecek minimum mimari varsayımlar tanımlanmıştır.
+
+[Aksiyom 1]: Eğer kullanıcı oturumu (auth context) yoksa, bileşen yönetici verilerini gösteremez ve muhtemelen hata verir veya yönlendirilir.
+
+[Aksiyom 2]: Eğer React Router bağlamı (router context) yoksa, bileşen sayfa yönlendirmeleri ve gezinme bağlantıları düzgün çalışmaz.
+
+[Aksiyom 3]: Eğer modülün bağımlı olduğu alt bileşenler (örn: dashboard kartları, grafikler, tablolar) component library'de mevcut değilse, render hatası oluşur.
 
 ---
 

@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
-skeleton_hash: 69d84ccf1f15aa32
+skeleton_hash: 2366ca82975f41a5
 entity_hashes:
   func:SilentFanTypeComparison: d3f5f980a16f61d9
   func:tr: b282b53f03d688a5
   overview: bed9a48986deb76b
   style_tokens: fb4db20eff738486
-generated_at: 2026-05-28T22:35:47Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış

@@ -3,30 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BeforeAfterSlider.tsx
-skeleton_hash: 98863d9789f4629d
+skeleton_hash: 6772ccd7977cb7e8
 entity_hashes:
   func:BeforeAfterSlider: f6df4a2541ee7895
-  overview: 51a709a058824937
+  overview: 0e8c7c405d8bc050
   style_tokens: ae3c52abb33abdfe
-generated_at: 2026-05-28T22:35:42Z
+generated_at: 2026-06-08T10:08:12Z
 ---
 
 ## Genel Bakış
-`BeforeAfterSlider` bileşeni, iki görseli (ön ve arka) yan yana yerleştirerek kullanıcıya bir kaydırıcı üzerinden karşılaştırma imkanı sunar. Kullanıcı kaydırıcıyı sürükleyerek “before” ve “after” görüntülerinin görünür kısmını dinamik olarak ayarlar ve bu sayede görsel farkları etkileşimli şekilde inceleyebilir.
+`BeforeAfterSlider`, iki görseli (önce ve sonra) yan yana konumlandırarak kullanıcıya etkileşimli bir kaydırıcı aracılığıyla görsel karşılaştırma imkânı sunan React bileşenidir. Kullanıcı kaydırıcıyı sürükleyerek her iki görüntünün görünür alanını dinamik olarak ayarlayabilir; bu sayede özellikle HVAC proje görsellerindeki dönüşümler (tadilat öncesi/sonrası vb.) interaktif biçimde sunulur.
 
 ## Fonksiyon Grupları
-### Slider Görüntüleme ve Etkileşim
-Bu grup, kaydırıcıyı render eder, görselleri konumlandırır ve kullanıcı sürükleme hareketlerini işleyerek görüntülerin görünürlüğünü ayarlar.  
+### Görsel Karşılaştırma ve Etkileşim
+Bileşen, before/after kaynak görsellerini bir konteyner içinde yerleştirir, üst üste bindirerek bir tutamaç (handle) aracılığıyla kullanıcının sürüklemesine olanak tanır ve her harekette iki görüntünün görünür kısımlarını buna göre günceller.
 - BeforeAfterSlider
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, gerekli görüntü özelliklerinin sağlandığını ve alt özelliğinin belirtilmediği durumda varsayılan değeri kullanacağını varsayar.
 
-[Aksiyom 1]: Eğer `beforeSrc` prop'u sağlanmazsa, bileşen "before" görüntüsünü render edemez ve görüntü eksikliği olur.  
-[Aksiyom 2]: Eğer `afterSrc` prop'u sağlanmazsa, bileşen "after" görüntüsünü render edemez ve görüntü eksikliği olur.  
-[Aksiyom 3]: Eğer `alt` prop'u sağlanmazsa, bileşen varsayılan değer `'before-after'` kullanır.
+Bu modül için sadece fonksiyon imzasından çıkarılabilecek minimal mimari varsayımlar tanımlanmıştır. Fonksiyon gövdesi verilmediğinden, çalıştırma davranışına ilişkin aksiyomlar belirlenememiştir.
+
+[Aksiyom 1]: Eğer `beforeSrc` parametresi sağlanmazsa, bileşen hata ile karşılaşır veya beklenmeyen davranış gösterir (React bileşeni olarak zorunlu prop'tur, default değeri yoktur).
+
+[Aksiyom 2]: Eğer `afterSrc` parametresi sağlanmazsa, bileşen hata ile karşılaşır veya beklenmeyen davranış gösterir (React bileşeni olarak zorunlu prop'tur, default değeri yoktur).
+
+[Aksiyom 3]: Eğer `alt` parametresi sağlanmazsa, `alt` özelliği otomatik olarak `'before-after'` değerini alır.
 
 ---
 
@@ -54,12 +57,12 @@ Bu modül, gerekli görüntü özelliklerinin sağlandığını ve alt özelliğ
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/BeforeAfterSlider.tsx::BeforeAfterSlider
-- **params**: beforeSrc, afterSrc, alt
+### [N1_NASIL] AST Pointer: BeforeAfterSlider.tsx::BeforeAfterSlider
+- **params**: `beforeSrc`, `afterSrc`, `alt = 'before-after'`
 - **ic_degiskenler**:
-  - `pos` — current slider position percentage (0‑100) that determines the width of the before‑image overlay.
-  - `setPos` — state setter function used to update `pos` when the range input changes.
-- **Dönüş**: JSX element (React component output) – renders the before/after slider UI.
+  - `pos` — Slider'ın mevcut yüzdelik konumunu tutan React state'i (useState(50)). Kullanıcı aralığı değiştirdiğinde güncellenir.
+  - `t` — `useI18n` hook'undan dönen çeviri fonksiyonu. `beforeAfterSlider.title`, `beforeAfterSlider.subtitle`, `beforeAfterSlider.ariaLabel`, `beforeAfterSlider.rangeAriaLabel` anahtarlarıyla çevirileri getirir.
+- **Dönüş**: JSX yapısı (React elementi). Bölüm (`section`) içinde, öncesi ve sonrası görsellerini yan yana veya üst üste gösteren, aralıklı kaydırıcı (`range input`) ile kontrol edilen bir bileşen render eder.
 
 ---
 

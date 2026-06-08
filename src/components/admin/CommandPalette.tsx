@@ -1,20 +1,20 @@
 'use client'
 
-import React from 'react'
-import { useRouter } from 'next/navigation'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import {
-    Search,
-    Package,
-    ShoppingCart,
-    LayoutDashboard,
-    Settings,
-    Users,
+    Activity,
     ArrowRight,
+    LayoutDashboard,
+    Package,
+    Search,
+    Settings,
+    ShoppingCart,
     TrendingUp,
-    X,
-    Activity
-} from 'lucide-react'
+    Users,
+    X} from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import React from 'react'
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 interface SearchResult { id: string; name: string; sku: string }
 

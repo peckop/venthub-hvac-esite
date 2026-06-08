@@ -1,5 +1,5 @@
+import { Ruler,Settings } from 'lucide-react'
 import React from 'react'
-import { Settings, Ruler } from 'lucide-react'
 
 /**
  * Translates a technical specification key into a human-readable Turkish label.

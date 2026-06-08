@@ -1,6 +1,7 @@
-import VentImage from '@/components/ui/VentImage'
+import { Microscope, ShieldCheck,Wind } from 'lucide-react'
 import React from 'react'
-import { Microscope, Wind, ShieldCheck } from 'lucide-react'
+
+import VentImage from '@/components/ui/VentImage'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
@@ -28,10 +29,10 @@ const SilentFanHowItWorks: React.FC = () => {
                     <div className={`${scrollAnimationClasses.slideRight(isVisible)} relative`}>
                         <div className="bg-slate-800 rounded-3xl p-4 sm:p-8 shadow-2xl border border-white/5 relative group">
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl opacity-20 blur-xl group-hover:opacity-30 transition-opacity" />
-                            <VentImage src="/images/vortice/vortice_lineo_technical.png"
-                                alt="Silent Tech Breakdown"
-                                className="w-full h-auto rounded-xl relative z-10"
-                             />
+                             <VentImage src="/images/vortice/vortice_lineo_technical.png"
+                                 alt={t('category.lineoTechnicalAlt')}
+                                 className="w-full h-auto rounded-xl relative z-10"
+                              />
                         </div>
                     </div>
 

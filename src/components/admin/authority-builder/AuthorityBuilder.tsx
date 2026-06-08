@@ -1,22 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
 import { 
-  Plus, 
-  GripVertical, 
-  Trash2, 
-  ChevronUp, 
   ChevronDown, 
-  Eye, 
+  ChevronUp, 
   Code, 
+  Eye, 
+  GripVertical, 
   Layers,
-  LucideIcon
-} from 'lucide-react';
+  LucideIcon,
+  Plus, 
+  Trash2} from 'lucide-react';
+import React, { useState } from 'react';
+
 import { 
   AuthorityBlock, 
   AuthorityBlockType, 
   AuthorityContent 
 } from '@/types/authority';
+
 import { BlockEditor } from './BlockEditor';
 
 // Proje genelindeki standart admin bileşen sınıfları

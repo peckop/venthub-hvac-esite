@@ -1,6 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { generateProductDatasheet } from '../pdfGenerator'
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest'
+
 import type { Product } from '@/types/ui-models'
+
+import { generateProductDatasheet } from '../pdfGenerator'
 
 // Mock jsPDF class
 const mockSetFont = vi.fn()

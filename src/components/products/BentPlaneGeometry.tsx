@@ -1,11 +1,12 @@
-import { Routes } from '../../utils/routes'
-import React, { useRef, useMemo, useState } from 'react'
-import { useFrame, ThreeEvent } from '@react-three/fiber'
-import * as THREE from 'three'
-import { useScroll, useCursor } from '@react-three/drei'
+import { useCursor,useScroll } from '@react-three/drei'
 import { shaderMaterial } from '@react-three/drei'
+import { ThreeEvent,useFrame } from '@react-three/fiber'
 import { extend } from '@react-three/fiber'
 import { useRouter } from 'next/navigation'
+import React, { useMemo, useRef, useState } from 'react'
+import * as THREE from 'three'
+
+import { Routes } from '../../utils/routes'
 
 /**
  * Bent Plane Shader Material

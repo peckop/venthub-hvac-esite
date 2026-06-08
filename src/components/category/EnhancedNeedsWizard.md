@@ -3,48 +3,44 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx
-skeleton_hash: 824de6e3b573097a
+skeleton_hash: 5af54104606d4678
 entity_hashes:
   func:EnhancedNeedsWizard: ca7bec73e049fe61
   func:getUsageLocations: 1e08ffb88dd30b7d
   func:nextStep: 173c7fd2dc919ffb
   func:prevStep: ac646de7f0306b72
-  overview: c93213ab24e014e9
+  overview: 2782285f4578ab6b
   style_tokens: 4dfca29db2f1dc25
-generated_at: 2026-06-06T21:54:46Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıların ihtiyaçlarını adım adım belirlemelerini sağlamak için tasarlanmış bir sihirbaz bileşenidir. Ana işlevi, kullanıcı arayüzünü sunmak, adımlar arasında gezinmeyi yönetmek ve ihtiyaç analizi için gerekli kullanım konumlarını bir yardımcı fonksiyon aracılığıyla temin etmektir.
+Bu modül, kullanıcıların ihtiyaçlarını yapılandırılmış bir süreçte belirlemelerine yardımcı olmak için tasarlanmış adım bazlı bir sihirbaz (wizard) bileşenidir. Bileşen, açılıp kapatılmasını kontrol eden bir durum yönetimi, adımlar arasında gezinmeyi sağlayan mantık ve her adım için gerekli verileri (örneğin, kullanım konumları listesi) hazırlayan yardımcı fonksiyonlar içerir.
 
 ## Fonksiyon Grupları
-### Bileşen Tanımı ve Ana Mantık
-Bu grup, modülün merkezi React bileşenini tanımlar; bileşenin dışarıdan aldığı özelliklerle (prop) nasıl çalışacağını ve genel yapısını belirler.
+### Ana Bileşen ve Durum Yönetimi
+Bu grup, modülün temel React bileşenini ve trên dışarıdan alınan özelliklere (prop) bağlı çalışma mantığını tanımlar. Bileşenin görünür olup olmadığını, nasıl kapatılacağını ve hangi kategori verisiyle çalışacağını belirler.
 - EnhancedNeedsWizard
 
-### Adım Tabanlı Navigasyon
-Sihirbazın farklı aşamaları arasında kullanıcı etkileşimiyle ileri ve geri geçişler yapmayı sağlayan işlevleri kapsar. Bu işlevler bileşenin içindeki adım durumunu günceller.
+### Adım Navigasyonu
+Sihirbazın içinde bulunduğu adımı ileri veya geri götürerek kullanıcı deneyimini yönetir. Bu işlevler bileşenin iç durumunu güncelleyerek arayüzün farklı bölümlerini gösterir.
 - nextStep, prevStep
 
-### Yardımcı Veri İşlevi
-Sihirbazın adım içeriklerini veya seçeneklerini doldurmak için gereken verileri hazırlayan, çeviri fonksiyonuyla çalışan yardımcı bir işlevdir.
+### Yardımcı Veri Hazırlama
+Sihirbazın belirli adımlarında kullanıcıya sunulacak seçenekleri (örneğin, kullanım alanları) doldurmak için gerekli verileri, çeviri fonksiyonunu kullanarak hazırlar.
 - getUsageLocations
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, bir React sihirbaz bileşeninin temel akışını ve dış bağımlılıklarını tanımlayan aksiyomlara sahiptir.
 
-Bu modül için verilen fonksiyon imzalarına dayanan temel mimari varsayımlar tanımlanmıştır.
-
-**[Aksiyom 1]:** Eğer `onClose` prop'u sağlanmazsa, bileşen kapatılamaz ve kullanıcı sihirbazı kapatma girişiminde bulunamaz.
-
-**[Aksiyom 2]:** Eğer `isOpen` prop'u `false` veya `truthy` bir değer değilse, bileşen UI olarak render edilmez.
-
-**[Aksiyom 3]:** Eğer `parentSlug` prop'u string bir değer değilse, kategori hiyerarşisi ve kullanım konumları doğru şekilde belirlenemez.
-
-**[Aksiyom 4]:** Eğer `nextStep` ve `prevStep` arasında modül içi bir `currentStep` state'i (veya eşdeğeri) mevcut değilse, adım ilerleme ve geri gelme navigasyonu çalışmaz.
-
-**[Aksiyom 5]:** Eğer `getUsageLocations` çağrıldığında `t` parametresi (çeviri fonksiyonu) sağlanmazsa, kullanım konumu metinleri hata ile karşılaşır veya boş döner.
+[Aksiyom 1]: Eğer `isOpen` prop'u `false` veya tanımsız değilse, bileşen (wizard) kullanıcı arayüzünde görünür olmalıdır.
+[Aksiyom 2]: Eğer `onClose` fonksiyonu sağlanmamışsa, kullanıcı sihirbazı kapatma eylemini (örn. 'X' butonu veya arka plan tıklaması) gerçekleştiremez ve bileşen kapanamaz.
+[Aksiyom 3]: Eğer `parentSlug` parametresi sağlanmamışsa, sihirbazın içeriği veya hedeflediği alt kategoriler hakkında bilinmezlik oluşur ve adım verileri doğru hazırlanamayabilir.
+[Aksiyom 4]: Eğer `getUsageLocations` fonksiyonu çağrılamıyorsa veya uygun veri döndürmüyorsa, "Kullanım Konumları" adımının içeriği boş veya hatalı olur.
+[Aksiyom 5]: Eğer `nextStep` fonksiyonu, mevcut adımın son adım olduğu durumda çağrılırsa ve buna uygun bir kontrol (örn. adım sayısına ulaşılıp ulaşılmadığı) yoksa, geçersiz bir adım indeksine erişim denemesi yapılarak hata oluşur.
+[Aksiyom 6]: Eğer `prevStep` fonksiyonu, ilk adımda (indeks 0) çağrılırsa ve buna uygun bir kontrol yoksa, negatif bir adım indeksine erişim denemesi yapılarak hata oluşur.
 
 ---
 
@@ -117,44 +113,33 @@ type WizardStep = 1 | 2 | 3 | 4 | 5 | 6
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/EnhancedNeedsWizard.tsx::getUsageLocations
-- **params**: `t: (key: string) => string` — i18n çeviri fonksiyonu, anahtar karşılığında localized metin döndürür
-- **ic_degiskenler**:
-  _(fonksiyon gövdesinde değişken tanımlanmamıştır, doğrudan literal array döndürülür)_
-- **Dönüş**: Array<{ id: string, title: string, description: string, icon: ComponentType, tip: string }> — 4 kullanım alanı nesnesi (entrance, cold-storage, industrial, retail)
+### [N1_NASIL] AST Pointer: EnhancedNeedsWizard.tsx::getUsageLocations
+- **params**: `t` — Çeviri fonksiyonu, Anahtar kelime ile çeviri stringi döndürür
+- **ic_degiskenler**: yok
+- **Dönüş**: Array of objects (her birinde `id`, `title`, `description`, `icon`, `tip` alanları)
 
----
+### [N2_NASIL] AST Pointer: EnhancedNeedsWizard.tsx::EnhancedNeedsWizard
+- **params**: `isOpen` — Sihirbazın açık olup olmadığı, `onClose` — Kapatma fonksiyonu, `parentSlug` — Üst kategori slug'ı
+- **ic_degiskenler**: 
+  - `t` — useI18n hook'undan alınan çeviri fonksiyonu
+  - `state` — WizardState türünde sihirbaz durum nesnesi (step, usageLocation, sector, doorWidth, doorHeight, windCondition, trafficIntensity, heatingNeeded, climateZone, doorFrequency, hasHeating)
+  - `matchedProducts` — MatchedProduct[] türünde eşleşen ürünler dizisi
+  - `loading` — boolean, yükleme durumu
+  - `matchProducts` — useCallback ile tanımlanan ürün eşleştirme fonksiyonu
+  - `useEffect` — state.step === 6 olduğunda matchProducts'ı çağıran efekt
+  - `nextStep` — Bir sonraki adıma geçiş yapan arrow fonksiyon
+  - `prevStep` — Bir önceki adıma geçiş yapan arrow fonksiyon
+- **Dönüş**: JSX element (React.FC) veya null (isOpen false ise)
 
-### [N2_NASIL] AST Pointer: src/components/category/EnhancedNeedsWizard.tsx::EnhancedNeedsWizard
-- **params**:
-  - `isOpen: boolean` — dialogun açık olup olmadığını belirler, false ise null döner (render engellenir)
-  - `onClose: () => void` — dialog kapatma callback'i, backdrop ve X butonuna bağlıdır
-  - `parentSlug: string` — üst kategori slug'ı, supabase ürün sorgusunda `category_slugs` filtresi olarak kullanılır
-- **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, tüm UI metinleri bu fonksiyonla çekilir
-  - `state` — `useState<WizardState>` ile tanımlanan sihirbaz durumu nesnesi; `step` (mevcut adım, 1-6), `usageLocation` (seçilen kullanım alanı), `sector`, `doorWidth` (kapı genişliği, default 1.0), `doorHeight` (kapı yüksekliği, default 2.2), `windCondition` (rüzgar durumu), `trafficIntensity` (yoğunluk), `heatingNeeded` (ısıtma ihtiyacı: yes/no/unsure), `climateZone`, `doorFrequency`, `hasHeating` alanlarını içerir
-  - `matchedProducts` — `useState<MatchedProduct[]>([])` ile tanımlanan eşleşen ürün listesi, step 6'da `matchProducts` tarafından doldurulur
-  - `loading` — `useState<boolean>(false)` ile tanımlanan yükleme durumu flag'i, supabase isteği sırasında true olur
-  - `matchProducts` — `useCallback` ile sarılmış asenkron ürün eşleştirme fonksiyonu; supabase'den aktif ürünleri çeker, `calculateAirCurtain` ile hesaplama yapar, ürünleri kapı boyutu ve ısıtma tercihine göre puanlayarak en iyi 3'ünü `matchedProducts` state'ine yazar
-  - `nextStep` — inner fonksiyon: `state.step` değerini 1 artırarak state'i günceller
-  - `prevStep` — inner fonksiyon: `state.step` değerini 1 azaltarak state'i günceller
-- **Dönüş**: React JSX element (dialog UI) — isOpen false ise `null` döner; step 1'de kullanım alanı seçimi, step 2'de kapı boyutları, step 3'te ısıtma tercihi, step 6'da eşleşen ürün kartları render edilir
+### [N3_NASIL] AST Pointer: EnhancedNeedsWizard.tsx::nextStep
+- **params**: yok
+- **ic_degiskenler**: yok (sadece setState çağrısı yapıyor)
+- **Dönüş**: yok
 
----
-
-### [N3_NASIL] AST Pointer: src/components/category/EnhancedNeedsWizard.tsx::nextStep
-- **params**: _(parametre yok)_
-- **ic_degiskenler**:
-  _(fonksiyon gövdesinde değişken tanımlanmamıştır)_
-- **Dönüş**: yok — `setState` çağrısıyla `state.step` değerini mevcut değer + 1 olarak günceller (side effect: wizard bir sonraki adıma geçer)
-
----
-
-### [N4_NASIL] AST Pointer: src/components/category/EnhancedNeedsWizard.tsx::prevStep
-- **params**: _(parametre yok)_
-- **ic_degiskenler**:
-  _(fonksiyon gövdesinde değişken tanımlanmamıştır)_
-- **Dönüş**: yok — `setState` çağrısıyla `state.step` değerini mevcut değer - 1 olarak günceller (side effect: wizard bir önceki adıma döner)
+### [N4_NASIL] AST Pointer: EnhancedNeedsWizard.tsx::prevStep
+- **params**: yok
+- **ic_degiskenler**: yok (sadece setState çağrısı yapıyor)
+- **Dönüş**: yok
 
 ---
 
@@ -166,8 +151,8 @@ graph TD
     EnhancedNeedsWizard_tsx__getUsageLocations["getUsageLocations"]
     EnhancedNeedsWizard_tsx__nextStep["nextStep"]
     EnhancedNeedsWizard_tsx__prevStep["prevStep"]
-    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__getUsageLocations
     EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__nextStep
+    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__getUsageLocations
 ```
 
 ## NODE ID STANDARD

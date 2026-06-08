@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { safeNumber, safeString, isRecord } from '../type-converters'
+import { describe, expect,it } from 'vitest'
+
+import { isRecord,safeNumber, safeString } from '../type-converters'
 
 describe('safeNumber', () => {
   it('should return the number if passed a number', () => {

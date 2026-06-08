@@ -11,9 +11,10 @@
    - Phase 37: Pro-level hover highlight, 3D tooltip, useMemo materials
 */
 
+import { Edges,Html, RoundedBox, Text, useCursor } from "@react-three/drei"
 import React, { useMemo, useState } from "react"
 import * as THREE from "three"
-import { Text, RoundedBox, useCursor, Html, Edges } from "@react-three/drei"
+
 import { useFanMaterials } from "../materials/useFanMaterials"
 
 // ── HELPERS ───────────────────────────────────────────────

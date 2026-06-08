@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\buildPaymentRequest.ts
-skeleton_hash: 1c47edb9be957105
+skeleton_hash: 3f264fd968a9e810
 entity_hashes:
   func:buildPaymentRequest: 874080c807e1dee1
   overview: d55be1ad42d13d7e
-generated_at: 2026-06-06T21:58:16Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış

@@ -1,9 +1,11 @@
 'use client'
 
-import { Routes } from '@/utils/routes';
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useRef,useState } from 'react'
+
+import { Routes } from '@/utils/routes';
+
 import { useI18n } from '../../i18n/I18nProvider'
 
 interface HomeSinevizyonProps {

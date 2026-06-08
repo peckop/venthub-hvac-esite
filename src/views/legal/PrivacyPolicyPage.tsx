@@ -1,5 +1,6 @@
-import React from 'react'
 import Link from 'next/link'
+import React from 'react'
+
 import legalConfig from '../../config/legal'
 import { Routes } from '../../utils/routes'
 

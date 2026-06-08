@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\PaymentSuccessPage.tsx
-skeleton_hash: 2b14916b762ab73b
+skeleton_hash: cc11ccdacafb6929
 entity_hashes:
   func:PaymentSuccessPage: 1b3614ca0faf5f01
-  overview: dac563423e58ee00
+  overview: 5dba2dbd22d22660
   style_tokens: dcab201fde8662b7
-generated_at: 2026-06-06T21:58:56Z
+generated_at: 2026-06-08T10:10:59Z
 ---
 
 ## Genel Bakış
@@ -51,45 +51,37 @@ type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: str
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: PaymentSuccessPage.tsx::PaymentSuccessPage
+### [N1_NASIL] AST Pointer: src/views/PaymentSuccessPage.tsx::PaymentSuccessPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `searchParams` — useSearchParams hook'unun döndürdüğü URL search parametreleri nesnesi
-  - `t` — useI18n hook'unun döndürdüğü çeviri fonksiyonu
-  - `lang` — useI18n hook'unun döndürdüğü dil kodu (örn: 'tr', 'en')
-  - `clearCart` — useCart hook'unun döndürdüğü sepeti temizleme fonksiyonu
-  - `status` — Ödeme durumunu tutan state ('loading', 'success', 'error')
-  - `paymentInfo` — Ödeme bilgilerini tutan state (conversationId, token, errorMessage)
-  - `orderSummary` — Sipariş özetini tutan state (amount, items, createdAt)
-- **Dönüş**: React.FC (React fonksiyonel component JSX'i)
+  - `searchParams` — URL arama parametrelerini tutan hook, useSearchParams() ile alınır
+  - `t` — useI18n hookundan gelen çeviri fonksiyonu
+  - `lang` — useI18n hookundan gelen dil kodu
+  - `clearCart` — useCart hookundan gelen sepeti temizleme fonksiyonu
+  - `status` — Sayfanın durumunu tutan state değişkeni ('loading', 'success', 'error')
+  - `paymentInfo` — Ödeme bilgilerini tutan state değişkeni (conversationId, token, errorMessage)
+  - `orderSummary` — Sipariş özetini tutan state değişkeni (amount, items, createdAt)
+- **Dönüş**: JSX element (React.FC)
 
-### [N2_NASIL] AST Pointer: PaymentSuccessPage.tsx::useEffect callback
+### [N2_NASIL] AST Pointer: src/views/PaymentSuccessPage.tsx::fetchOrderDetails
+- **params**: (oid?: string)
+- **ic_degiskenler**:
+  - `data` — Supabase'den gelen sipariş verisi (total_amount, created_at, venthub_order_items alanları)
+  - `error` — Supabase sorgusu sırasında oluşan hata nesnesi
+  - `items` — data.venthub_order_items içindeki sipariş kalemleri dizisi
+  - `count` — items dizisindeki tüm kalemlerin quantity değerlerinin toplamı
+- **Dönüş**: void (asenkron, state güncelleme yan etkisi var)
+
+### [N3_NASIL] AST Pointer: src/views/PaymentSuccessPage.tsx::verify
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `conversationId` — URL'den gelen conversationId parametresi
-  - `token` — URL'den gelen token parametresi
-  - `errorMessage` — URL'den gelen hata mesajı parametresi
-  - `orderId` — URL'den gelen sipariş ID parametresi
-  - `statusParam` — URL'den gelen status parametresi
-- **Dönüş**: yok (useEffect side-effect callback)
-
-### [N3_NASIL] AST Pointer: PaymentSuccessPage.tsx::fetchOrderDetails
-- **params**: `(oid?: string)` — Sorgulanacak sipariş ID'si
-- **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen sipariş verisi
-  - `error` — Supabase sorgusundan dönen hata nesnesi
-  - `items` — Sipariş kalemleri dizisi (data.venthub_order_items)
-  - `count` — Tüm kalemlerin toplam adedi (items.reduce ile hesaplanır)
-- **Dönüş**: yok (async void, state günceller)
-
-### [N4_NASIL] AST Pointer: PaymentSuccessPage.tsx::verify
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `data` — Supabase functions/DB sorgularından dönen veri
-  - `error` — Supabase functions/DB sorgularından dönen hata
-  - `msg` — Hata durumunda gösterilecek mesaj (data?.iyzico?.errorMessage veya fallback)
-  - `err` — Catch bloğundaki error nesnesinin message özelliği
-- **Dönüş**: yok (async void, state ve toast günceller)
+  - `data` — iyzico-callback fonksiyonundan gelen yanıt verisi (token dalında)
+  - `error` — iyzico-callback fonksiyonu çağrısında oluşan hata nesnesi (token dalında)
+  - `msg` — Ödeme hata mesajı, data?.iyzico?.errorMessage veya fallback mesaj (token dalında)
+  - `data` — venthub_orders tablosundan sorgulanan sipariş durumu (orderId dalında)
+  - `error` — venthub_orders sorgusu sırasında oluşan hata nesnesi (orderId dalında)
+  - `err` — catch bloğunda yakalanan hata nesnesi, message özelliği
+- **Dönüş**: void (asenkron, state güncelleme ve yan etkiler)
 
 ---
 

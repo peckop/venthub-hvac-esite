@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts
-skeleton_hash: 88db724d7c0cc06b
+skeleton_hash: 705bee3111f9355b
 entity_hashes:
   func:addProductToProject: 3ad72ee68e6e1dbb
   func:createProject: f04be25a87702fe5
@@ -11,47 +11,42 @@ entity_hashes:
   func:listProjectItems: 8111ac3266bdd891
   func:listUserProjects: 01a071f49edbfd8e
   func:removeProductFromProject: a5c4e58b38ee1a14
-  overview: de97a73d679f4e9d
-generated_at: 2026-06-07T12:09:53Z
+  overview: 82cdf1fb2dbcb93a
+generated_at: 2026-06-08T10:09:34Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunda kullanıcıların projelerini yönetmesini ve bu projelere ürün ekleyip çıkarmasını sağlayan bir servis modülüdür. Modül, Supabase veritabanı üzerinden proje yaşam döngüsü (oluşturma, listeleme, silme) ve proje içeriği yönetimi (ürün ekleme, çıkarma, listeleme) işlemlerini merkezi olarak yürütür.
+VentHub HVAC platformunda kullanıcıların projelerini ve bu projelerin içeriklerini yönetmesini sağlayan servis modülüdür. Supabase veritabanı üzerinde proje oluşturma, listeleme ve silme işlemlerinin yanı sıra, projelere ürün ekleme/çıkarma ve proje içeriğini sorgulama gibi operasyonları merkezi bir noktadan yürütür.
 
 ## Fonksiyon Grupları
 ### Proje Yaşam Döngüsü
-Kullanıcının kendi projeleri üzerindeki temel CRUD (Oluştur, Oku, Güncelle, Sil) işlemlerini yönetir; projenin varoluşundan silinmesine kadar olan tüm adımları kapsar.
+Kullanıcının projeleri üzerindeki temel yönetimsel işlemlerini (oluşturma, listeleme, silme) kapsar. Bu fonksiyonlar bir projenin varoluş süresince geçirdiği tüm durumları yönetir.
 - listUserProjects, createProject, deleteProject
 
 ### Proje Ürün Yönetimi
-Oluşturulmuş bir projeye bağlı ürünlerin eklenmesi, çıkarılması ve projenin mevcut içeriğinin sorgulanması gibi proje detayıyla ilgili işlemleri yürütür.
+Oluşturulmuş bir projenin içeriğine ilişkin işlemleri yürütür; ürün ekleme, çıkarma ve projedeki mevcut ürünlerin listelenmesini sağlar. Bu grup, projelerin teknik içeriğini ve malzeme listelerini yönetmekten sorumludur.
 - addProductToProject, removeProductFromProject, listProjectItems
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, Supabase veritabanı üzerinden proje ve proje-ürün ilişkilerini yöneten bir servis katmanıdır. Aşağıda, modülün doğru çalışması için gerekli olan temel mimari varsayımlar listelenmektedir.
 
-Bu modül, Supabase tabanlı bir proje yönetim servisidir ve fonksiyon imzalarından çıkarılan aşağıdaki mimari varsayımlara dayanır.
+[Aksiyom 1]: Eğer `supabase` parametresi ile verilen `SupabaseClient` nesnesi, `Database` tipiyle tutarlı ve geçerli bir veritabanı şemasına sahip değilse, tüm veritabanı işlemleri başarısız olur.
 
-**[Aksiyom 1]:** Eğer `SupabaseClient<Database>` parametresi geçerli ve oturum açmış (authenticated) bir istemci değilse, tüm veritabanı işlemleri başarısız olur veya boş sonuç döner.
+[Aksiyom 2]: Eğer `user_projects` tablosu (veya bu tabloya karşılık gelen veritabanı tablosu) veritabanında mevcut değilse, `createProject` fonksiyonu hata ile sonuçlanır.
 
-**[Aksiyom 2]:** Eğer `listUserProjects` fonksiyonu çağrıldığında aktif bir kullanıcı oturumu (session) yoksa, kullanıcının projeleri listelenemez (boş dizi döner veya hata oluşur).
+[Aksiyom 3]: Eğer `addProductToProject` fonksiyonunda verilen `quantity` parametresi, pozitif bir tamsayı değilse, bu eylem iş mantığı açısından geçersizdir (not: fonksiyon imzasında pozitiflik zorunluluğu açıkça belirtilmemiştir, bu bir iş kuralı varsayımıdır).
 
-**[Aksiyom 3]:** Eğer `deleteProject` için verilen `id` parametresi mevcut bir projeye ait değilse, silinecek kayıt bulunamaz ve değişiklik yapılamaz.
+[Aksiyom 4]: Eğer `projectId` parametresi ile belirtilen proje, `user_projects` tablosunda mevcut değilse veya oturumdaki kullanıcıya ait değilse (eğer iş kuralları buna izin vermiyorsa), `deleteProject`, `addProductToProject`, `removeProductFromProject` ve `listProjectItems` fonksiyonları başarısız olur.
 
-**[Aksiyom 4]:** Eğer `addProductToProject` için verilen `projectId` mevcut bir proje değilse, referans bütünlüğü ihlali (foreign key violation) oluşur.
+[Aksiyom 5]: Eğer `productId` parametresi ile belirtilen ürün, ürünlere ait tabloda (ürün tablosu adı fonksiyon imzasından çıkarılamamaktadır) mevcut değilse, `addProductToProject` fonksiyonu başarısız olur.
 
-**[Aksiyom 5]:** Eğer `addProductToProject` için verilen `productId` mevcut bir ürün değilse, referans bütünlüğü ihlali oluşur.
+[Aksiyom 6]: Eğer `listUserProjects` fonksiyonu çağrıldığında, `supabase` client'ındaki oturumda kimliği doğrulanmış bir kullanıcı (auth.uid()) yoksa, fonksiyon kullanıcıya ait projeleri filtreleyemez ve boş bir liste dönme riski veya hata oluşur.
 
-**[Aksiyom 6]:** Eğer `addProductToProject` için `quantity` parametresi pozitif bir sayı değilse (0 veya negatif), anlamsız bir ürün-miktar ilişkisi oluşturulur.
+[Aksiyom 7]: Eğer `project` parametresi, `TablesInsert<'user_projects'>` tipine uygun (zorunlu alanları içeren) bir nesne değilse, `createProject` fonksiyonu başarısız olur.
 
-**[Aksiyom 7]:** Eğer `removeProductFromProject` için verilen `projectId` veya `productId` kombinasyonu mevcut bir proje-ürün ilişkisi değilse, kaldırılacak kayıt bulunamaz.
-
-**[Aksiyom 8]:** Eğer `createProject` için verilen `TablesInsert<'user_projects'>` verisi gerekli alanları (zorunlu kolonları) içermiyorsa, veritabanı insert işlemi başarısız olur.
-
-**[Aksiyom 9]:** Eğer `listProjectItems` için verilen `projectId` mevcut bir projeye ait değilse, boş sonuç kümesi döner veya hata oluşur.
-
-**[Aksiyom 10]:** Fonksiyon imzalarında proje sahiplik doğrulaması (ownership check) uygulama katmanında görünmemektedir; eğer Supabase Row-Level Security (RLS) politikaları tanımlı değilse, kullanıcılar başkalarının projelerine erişebilir.
+[Aksiyom 8]: Eğer `projectId` ve `productId` kombinasyonu, proje-ürün ilişki tablosunda (örn: `project_items` veya benzeri bir tablo, adı fonksiyon imzasından bilinmemektedir) zaten mevcut değilse, `removeProductFromProject` fonksiyonu hiçbir satırı etkilemez (sessizce başarısız olabilir veya hata dönebilir).
 
 ---
 
@@ -114,43 +109,43 @@ Bu modül, Supabase tabanlı bir proje yönetim servisidir ve fonksiyon imzalar�
 ### [N1_NASIL] AST Pointer: project.service.ts::listUserProjects
 - **params**: (supabase: SupabaseClient<Database>)
 - **ic_degiskenler**:
-  - `data` — Supabase'den `user_projects` tablosuna yapılan sorgunun成功的 sonucunu tutar (Proje nesneleri dizisi veya null).
-  - `error` — Supabase sorgusu sırasında oluşabilecek hatayı tutar (null veya Error nesnesi).
-- **Dönüş**: `Promise<DbUserProject[]>` — Hata fırlatmazsa, sıralanmış proje listesini veya boş bir dizi döndürür.
+  - `data` — supabase.from('user_projects').select('*').order(...) sorgusundan dönen satır listesi
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
+- **Dönüş**: DbUserProject[] — kullanıcının tüm projeleri (updated_at azalan sırayla)
 
 ### [N2_NASIL] AST Pointer: project.service.ts::createProject
 - **params**: (supabase: SupabaseClient<Database>, project: TablesInsert<'user_projects'>)
 - **ic_degiskenler**:
-  - `data` — Yeni oluşturulan projenin tam verisini tutar (tek bir DbUserProject nesnesi veya null).
-  - `error` — `insert` ve `select` işlemleri sırasında oluşabilecek hatayı tutar (null veya Error nesnesi).
-- **Dönüş**: `Promise<DbUserProject>` — Hata fırlatmazsa, yeni oluşturulan projenin verisini döndürür.
+  - `data` — insert sonrası select().single() ile dönen tek satır; yeni oluşturulan proje
+  - `error` — insert sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
+- **Dönüş**: DbUserProject — newly inserted project
 
 ### [N3_NASIL] AST Pointer: project.service.ts::deleteProject
 - **params**: (supabase: SupabaseClient<Database>, id: string)
 - **ic_degiskenler**:
-  - `error` — Belirtilen `id`'ye sahip projeyi silme işlemi sırasında oluşabilecek hatayı tutar (null veya Error nesnesi).
-- **Dönüş**: `Promise<boolean>` — Hata fırlatmazsa `true` döndürerek silme işleminin başarılı olduğunu belirtir.
+  - `error` — delete().eq('id', id) sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
+- **Dönüş**: boolean — başarıyla silindiyse true
 
 ### [N4_NASIL] AST Pointer: project.service.ts::addProductToProject
-- **params**: (supabase: SupabaseClient<Database>, projectId: string, productId: string, quantity: number = 1)
+- **params**: (supabase: SupabaseClient<Database>, projectId: string, productId: string, quantity: number)
 - **ic_degiskenler**:
-  - `data` — Yeni eklenen proje ürününün tam verisini tutar (tek bir DbProjectItem nesnesi veya null).
-  - `error` — `project_items` tablosuna `insert` ve ardından `select` işlemleri sırasında oluşabilecek hatayı tutar (null veya Error nesnesi).
-- **Dönüş**: `Promise<DbProjectItem>` — Hata fırlatmazsa, yeni eklenen proje ürününün verisini döndürür.
+  - `data` — insert({ project_id: projectId, product_id: productId, quantity }).select().single() ile dönen tek satır; eklenen proje kalemi
+  - `error` — insert sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
+- **Dönüş**: DbProjectItem — newly inserted project item
 
 ### [N5_NASIL] AST Pointer: project.service.ts::removeProductFromProject
 - **params**: (supabase: SupabaseClient<Database>, projectId: string, productId: string)
 - **ic_degiskenler**:
-  - `error` — Belirtilen `projectId` ve `productId`'ye sahip ürünü `project_items` tablosundan silme işlemi sırasında oluşabilecek hatayı tutar (null veya Error nesnesi).
-- **Dönüş**: `Promise<boolean>` — Hata fırlatmazsa `true` döndürerek silme işleminin başarılı olduğunu belirtir.
+  - `error` — delete().match({ project_id, product_id }) sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
+- **Dönüş**: boolean — başarıyla silindiyse true
 
 ### [N6_NASIL] AST Pointer: project.service.ts::listProjectItems
 - **params**: (supabase: SupabaseClient<Database>, projectId: string)
 - **ic_degiskenler**:
-  - `data` — Supabase'den `project_items` tablosu ile `products` tablosunu birleştiren (join) sorgunun sonucunu tutar (ilişkili veri dizisi veya null).
-  - `error` — Birleşik (join) sorgu ve `eq` filtresi uygulanırken oluşabilecek hatayı tutar (null veya Error nesnesi).
-  - `items` — `data` dizisinin null olma ihtimaline karşı `|| []` ile安全 hale getirilmiş ve `(DbProjectItem & { product: DbProduct | null })[]` türüne dönüştürülmüş halini tutar.
-- **Dönüş**: `Promise<ProjectItem[]>` — Hata fırlatmazsa, her bir `item` üzerinde `.map` ile dönüştürülmüş ve `product` alanı `mapDatabaseProductToDomain` ile alan-aralıklı (domain) modele dönüştürülmüş proje ürünü listesini döndürür.
+  - `data` — select('*, product:products(*)').eq('project_id', projectId) sorgusundan dönen satır listesi; product ilişkisi dahil
+  - `error` — sorgu sırasında oluşabilecek hata nesnesi; fırlatılır (throw)
+  - `items` — data'nın (DbProjectItem & { product: DbProduct | null })[] olarak tiplendirilmiş hali; map işlemi için kullanılır
+- **Dönüş**: ProjectItem[] — her kalem için product alanı mapDatabaseProductToDomain ile dönüştürülmüş UI model listesi
 
 ---
 

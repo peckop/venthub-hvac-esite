@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminCategoriesPage.tsx
-skeleton_hash: d5d7b21ee3201158
+skeleton_hash: dae12c6e438f075c
 entity_hashes:
   func:AdminCategoriesPage: cf2142f4b075dcd0
   func:handleCreate: df124e23e226a1a4
@@ -11,37 +11,50 @@ entity_hashes:
   func:handleEdit: c5409fbf6f4f144a
   func:load: fc235a1ebf177283
   func:remove: 16990c02664975f8
-  overview: 90e7e121314ac587
+  overview: b45c5f4d361a1fd6
   style_tokens: 0e730a4c2dea0604
-generated_at: 2026-06-06T21:57:12Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yönetim panelinde kategori yönetimi için kullanılan ana React bileşenidir. Sistemdeki kategorilerin yüklenmesi, eklenmesi, düzenlenmesi, tasarım ayarlarının yapılması ve silinmesi gibi tüm CRUD işlemlerini tek bir arayüzden yönetir. Admin kullanıcıya kategoriler üzerinde tam kontrol sağlayan merkezi bir yönetim sayfası oluşturur.
+AdminCategoriesPage, VentHub HVAC yönetim panelindeki kategorileri yönetmek için kullanılan ana React sayfasıdır. Sayfa, kategorilerin listelenmesi, eklenmesi, düzenlenmesi, silinmesi ve tasarım ayarlarının yönetilmesi gibi tüm kategori CRUD işlemlerini tek bir arayüzde sunar. Admin kullanıcısının kategori yapısı üzerindeki tüm operasyonları bu bileşen üzerinden gerçekleştirilir.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Modülün giriş noktası olarak tüm kategori yönetim arayüzünü ve işlevsel mantığı bir araya getiren ana bileşendir.
+### Sayfa Bileşeni
+Kategori yönetim arayüzünün tüm yapısını ve işlevsel akışını tanımlayan ana React bileşenidir.
 - AdminCategoriesPage
 
-### Veri Yükleme ve Silme İşlemleri
-Sunucuyla asenkron iletişim kurarak kategori verilerinin ilk yükleme ve kalıcı silme gibi temel veri işlemlerini yürütür.
+### Veri Yönetim İşlemleri
+Kategori verilerinin sunucudan yüklenmesi ve belirli bir kategorinin sistemden kalıcı olarak silinmesi gibi asenkron veri işlemlerini yönetir.
 - load, remove
 
-### Kullanıcı Eylem İşleyicileri
-Yönetici panelindeki etkileşimlere yanıt olarak yeni kategori oluşturma, mevcut kategoriyi düzenleme ve tasarım sayfasını açma gibi kullanıcı odaklı tüm eylemleri yönetir.
+### Eylem İşleyicileri
+Yeni kategori oluşturma, mevcut kategoriyi düzenleme formunu açma ve kategorinin tasarım sayfasına yönlendirme gibi kullanıcı etkileşimlerini yönetir.
 - handleCreate, handleEdit, handleDesign
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, bir kategori yönetim sayfası olarak temel veri modeli ve işlevsellik için aşağıdaki zorunlu koşulları gerektirir.
 
-[Aksiyom 1]: Eğer `DbCategory` veri modeli (interface veya type) tanımlı veya içe aktarılmamışsa, `handleEdit` ve `handleDesign` fonksiyonları düzgün çalışamaz ve çağrıldığında zaman veya derleme hatası oluşur.
-[Aksiyom 2]: Eğer kategori listesini yükleme mekanizması (örn. API isteği) çalışmıyorsa, `load` fonksiyonu çağrıldığında sayfa verileri boş kalır veya hata oluşur.
-[Aksiyom 3]: Eğer `ColumnsMenu` veya `ExportMenu` bileşenleri içe aktarılmamışsa, modülün render fonksiyonunda bu bileşenleri kullanmaya çalıştığında derleme hatası oluşur.
-[Aksiyom 4]: Eğer kullanıcı oturumu veya rol bilgisi (admin yetkisi) sağlanamıyorsa, sayfanın kendisi erişime kapatılmalı veya tüm CRUD işlemleri reddedilmelidir.
-[Aksiyom 5]: Eğer `remove` fonksiyonu geçersiz (null, undefined veya boş string) bir `id` ile çağrılırsa, silme isteği sunucuya gönderilmez veya geçersiz veri hatası oluşur.
+Bu modül, VentHub HVAC yönetim panelinde kategori yönetimi sağlayan React bileşenidir. Aşağıdaki mimari varsayımlar fonksiyon imzaları ve modül yapısından çıkarılmıştır.
+
+**[Aksiyom 1]**: Eğer `load()` fonksiyonu çağrıldığında arka planda bir kategori listesi servisi (API) mevcut değilse veya ağ bağlantısı kesikse, bileşen kategorileri yükleyemez ve hata durumuna geçer.
+
+**[Aksiyom 2]**: Eğer `handleEdit(r: DbCategory)` fonksiyonuna geçilen `r` parametresi `null` veya `undefined` ise, düzenleme işlemi başarısız olur veya beklenmeyen davranış oluşur.
+
+**[Aksiyom 3]**: Eğer `handleDesign(r: DbCategory)` fonksiyonuna geçilen `r` parametresi `null` veya `undefined` ise, tasarım ayarı işlemi başarısız olur veya beklenmeyen davranış oluşur.
+
+**[Aksiyom 4]**: Eğer `remove(id: string)` fonksiyonuna geçilen `id` boş string (`""`) ise, silme işlemi hedef belirsizliği nedeniyle başarısız olur veya beklenmeyen bir kaydı siler.
+
+**[Aksiyom 5]**: Eğer bileşen yüklendiğinde kategori verilerini tutan state/depo alanı başlatılmamışsa, `ColumnsMenu` ve `ExportMenu` bileşenlerine geçilecek veri listesi boş olur veya hata oluşur.
+
+**[Aksiyom 6]**: Eğer `DbCategory` tipi (`id`, `name` ve/veya diğer zorunlu alanları) içermiyorsa, `handleEdit` ve `handleDesign` fonksiyonları beklenen form alanlarını dolduramaz.
+
+**[Aksiyom 7]**: Eğer `ColumnsMenu` bileşeni çağrıldığında (call) gerekli sütun tanımı verisi sağlanmamışsa, tablo başlıkları eksik veya hatalı render edilir.
+
+**[Aksiyom 8]**: Eğer `ExportMenu` bileşeni çağrıldığında (call) dışa aktarılacak kategori verisi boş listeyse, dışa aktarma işlemi anlamsız bir çıktı üretir veya sessizce başarısız olur.
+
+**[Aksiyom 9]**: Eğer `handleCreate()` fonksiyonu çağrıldığında form alanı zorunlu alanlar (örn: kategori adı) dolu değilse, kayıt işlemi engellenmelidir — aksi halde geçersiz veri kaydı oluşur.
 
 ---
 
@@ -96,36 +109,83 @@ Bu modül, bir kategori yönetim sayfası olarak temel veri modeli ve işlevsell
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminCategoriesPage.tsx::load
+### [N1_NASIL] AST Pointer: AdminCategoriesPage.tsx::useEffectLocalStorageLoad
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — Supabase'den dönen kategori listesi verisi
-  - `fetchErr` — Supabase sorgusu sırasında oluşan hata nesnesi
-  - `e` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: yok (void)
+  - `c` — localStorage'dan okunan sütun görünürlük ayarı stringi; JSON.parse ile `visibleCols` state'ine dönüştürülür
+  - `d` — localStorage'dan okunan yoğunluk (density) ayarı stringi; 'compact' veya 'comfortable' değerlerinden biri ise `density` state'ine set edilir
+- **Dönüş**: yok (side-effect: `setVisibleCols`, `setDensity` state güncellemeleri)
 
-### [N2_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleCreate
+### [N2_NASIL] AST Pointer: AdminCategoriesPage.tsx::useEffectSaveCols
 - **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (void)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (side-effect: `localStorage.setItem` ile `visibleCols` kaydedilir)
 
-### [N3_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleEdit
-- **params**: (r: DbCategory)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (void)
+### [N3_NASIL] AST Pointer: AdminCategoriesPage.tsx::useEffectSaveDensity
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (side-effect: `localStorage.setItem` ile `density` kaydedilir)
 
-### [N4_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleDesign
-- **params**: (r: DbCategory)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (void)
-
-### [N5_NASIL] AST Pointer: AdminCategoriesPage.tsx::remove
-- **params**: (id: string)
+### [N4_NASIL] AST Pointer: AdminCategoriesPage.tsx::load
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `before` — Silinecek kategorinin mevcut durumu (DB'den önceki hali)
-  - `delErr` — Supabase silme işleminde oluşan hata nesnesi
-  - `e` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: yok (void)
+  - `data` — supabase sorgusundan dönen kategori satırları dizisi; `DbCategory[]` türüne cast edilerek `setRows` ile state'e yazılır
+  - `fetchErr` — supabase `select` sorgusundan dönen hata nesnesi; varsa fırlatılır
+  - `e` — try-catch yakaladığı genel hata nesnesi; `message` özelliği `setError` ile state'e yazılır
+- **Dönüş**: yok (side-effect: `setLoading`, `setError`, `setRows` state güncellemeleri)
+
+### [N5_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleCreate
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (side-effect: `setEditingId(null)` ve `setIsModalOpen(true)` ile modal açılır)
+
+### [N6_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleEdit
+- **params**: `r: DbCategory` — düzenlenecek kategori nesnesi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (side-effect: `setEditingId(r.id)` ve `setIsModalOpen(true)` ile modal açılır)
+
+### [N7_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleDesign
+- **params**: `r: DbCategory` — tasarımı yapılacak kategori nesnesi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (side-effect: `router.push` ile `/admin/categories/${r.id}/builder` rotasına yönlendirilir)
+
+### [N8_NASIL] AST Pointer: AdminCategoriesPage.tsx::remove
+- **params**: `id: string` — silinecek kategorinin primary key'i
+- **ic_degiskenler**:
+  - `before` — silinmeden önce `rows` dizisi içinde `r.id === id` koşuluyla bulunan kategori nesnesi; bulunamazsa `null` olur; audit log için referans olarak kullanılır
+  - `delErr` — supabase `delete` sorgusundan dönen hata nesnesi; varsa fırlatılır
+  - `logAdminAction` — `../../lib/audit` dosyasından dinamik import ile yüklenen audit loglama fonksiyonu; silme işlemini kaydeder
+- **Dönüş**: yok (side-effect: supabase'den satır silinir, audit log yazılır, `load()` ile tablo yenilenir)
+
+### [N9_NASIL] AST Pointer: AdminCategoriesPage.tsx::handleCsvExport
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `cols` — CSV başlıkları dizisi; `['id', 'name', 'sort_order', 'slug', 'parent_id', 'description']`
+  - `header` — virgülle birleştirilmiş CSV başlık satırı stringi
+  - `lines` — `filtered` dizisi üzerinden her kategoriyi CSV satırına dönüştüren map sonucu; her satırda `r.id`, `r.name`, `r.sort_order`, `r.slug`, `r.parent_id`, `r.description` değerleri virgülle ayrılır
+  - `csv` — BOM karakteri (`\ufeff`) ile birleştirilmiş tüm CSV içeriği stringi
+  - `blob` — CSV içeriğinden oluşturulan `Blob` nesnesi; `text/csv;charset=utf-8;` MIME tipi ile
+  - `url` — `URL.createObjectURL` ile `blob`'dan türetilen tarayıcı URL'i; indirme bağlantısı olarak kullanılır
+  - `a` — `document.createElement('a')` ile oluşturulan geçici HTML anchor elementi; `href` ve `download` ayarlanıp `click()` ile tetiklenir
+- **Dönüş**: yok (side-effect: tarayıcıda dosya indirme tetiklenir, geçici URL revoke edilir)
+
+### [N10_NASIL] AST Pointer: AdminCategoriesPage.tsx::renderRow
+- **params**: `r: DbCategory` — render edilecek kategori satır nesnesi
+- **ic_degiskenler**: (yok — JSX içinde doğrudan `r` özellikleri ve bileşen prop'ları kullanılır)
+- **Dönüş**: JSX `<tr>` elementi — kategorinin görsel, ad, sıra, slug, üst kategori, açıklama ve aksiyon sütunlarını içeren tablo satırı
+
+### [N11_NASIL] AST Pointer: AdminCategoriesPage.tsx::onSaveName
+- **params**: `val: string` — EditableCell'den gelen yeni kategori adı değeri
+- **ic_degiskenler**:
+  - `upErr` — supabase `update` sorgusundan dönen hata nesnesi; varsa fırlatılır
+- **Dönüş**: yok (side-effect: supabase'de kategori adı güncellenir, `setRows` ile local state synclenir, `toast.success` ile bildirim gösterilir)
+
+### [N12_NASIL] AST Pointer: AdminCategoriesPage.tsx::onSaveSortOrder
+- **params**: `val: string` — EditableCell'den gelen yeni sıralama değeri stringi
+- **ic_degiskenler**:
+  - `num` — `val`'ın `parseInt` ile 10'luk tabanda parse edilmiş tamsayı karşılığı; `isNaN` kontrolü yapılır
+  - `upErr` — supabase `update` sorgusundan dönen hata nesnesi; varsa fırlatılır
+- **Dönüş**: yok (side-effect: supabase'de `sort_order` güncellenir, `setRows` ile local state synclenir, `toast.success` ile bildirim gösterilir, `load()` ile tablo yenilenir)
 
 ---
 
@@ -139,10 +199,10 @@ graph TD
     AdminCategoriesPage_tsx__handleEdit["handleEdit"]
     AdminCategoriesPage_tsx__load["load"]
     AdminCategoriesPage_tsx__remove["remove"]
-    AdminCategoriesPage_tsx__AdminCategoriesPage --> AdminCategoriesPage_tsx__load
     AdminCategoriesPage_tsx__AdminCategoriesPage --> AdminCategoriesPage_tsx__handleEdit
-    AdminCategoriesPage_tsx__AdminCategoriesPage --> AdminCategoriesPage_tsx__handleDesign
+    AdminCategoriesPage_tsx__AdminCategoriesPage --> AdminCategoriesPage_tsx__load
     AdminCategoriesPage_tsx__AdminCategoriesPage --> AdminCategoriesPage_tsx__remove
+    AdminCategoriesPage_tsx__AdminCategoriesPage --> AdminCategoriesPage_tsx__handleDesign
 ```
 
 ## NODE ID STANDARD

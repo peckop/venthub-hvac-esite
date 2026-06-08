@@ -8,7 +8,7 @@ entity_hashes:
   func:LoadingSpinner: 420e244c3ab22ba8
   overview: 055c22213f5fb1f9
   style_tokens: b21c3354ed86bc3e
-generated_at: 2026-05-28T22:36:06Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış

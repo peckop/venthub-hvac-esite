@@ -1,20 +1,20 @@
+import typography from '@tailwindcss/typography';
+
 import {
-  fontSize,
+  blur,
   borderRadius,
-  zIndex,
-  maxWidth,
   boxShadow,
+  fontSize,
   height,
-  minHeight,
   maxHeight,
-  width,
+  maxWidth,
+  minHeight,
   minWidth,
   transitionDuration,
+  transitionProperty,
   transitionTimingFunction,
-  blur,
-  transitionProperty
-} from './src/design-system/tokens.js';
-import typography from '@tailwindcss/typography';
+  width,
+  zIndex} from './src/design-system/tokens.js';
 
 /** @type {import('tailwindcss').Config} */
 const tailwindConfig = {

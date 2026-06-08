@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts
-skeleton_hash: 5c125e59a0aecf21
+skeleton_hash: ddd0a293abdaecae
 entity_hashes:
   func:useApiCall: ad3857eabf77c233
-  overview: 301e3e9f7e67faae
-generated_at: 2026-05-29T18:47:35Z
+  overview: 73b0eea2296f391a
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
@@ -15,7 +15,7 @@ Bu modül, React uygulamalarında API çağrılarını merkezi ve yeniden kullan
 
 ## Fonksiyon Grupları
 ### API Çağrı Orkestrasyonu ve Durum Yönetimi
-Bu grup, tek bir hook ile asenkron API çağrılarının başlatılmasını, yürütülmesini ve sonuçlarının (başarı veya hata) izlenmesini sağlar. Hook, çağrı sürecinde otomatik olarak durum güncellemeleri yaparak bileşenlere stabilized bir veri akışı sunar.
+Bu grup, tek bir hook ile asenkron API çağrılarının başlatılmasını, yürütülmesini ve sonuçlarının (başarı veya hata) izlenmesini sağlar. Hook, çağrı sürecinde otomatik olarak durum güncellemeleri yaparak bileşenlere stabil bir veri akışı sunar.
 - useApiCall
 
 ### Özelleştirilebilir İstek Yapılandırması
@@ -23,28 +23,18 @@ Bu grup, varsayılan istek davranışlarının opsiyonel parametrelerle genişle
 - useApiCall
 
 ---
-*Bu hook, VentHub HVAC projesi içindeki tüm API çağrılarını standartlaştırmak ve merkezi olarak yönetmek temel mimari varsayımı üzerine kurulmuştur.*
-
----
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu hook, API çağrılarını yönetmek için temel bir React hook yapısına ve opsiyonel bir yapılandırma nesnesine bağlıdır. Varsayımlar, fonksiyonun parametreleri ve React hook kuralları üzerine kuruludur.
+Bu hook, React bileşenleri içinde asenkron API çağrılarını yönetmek için kullanılır. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
 
-**[Aksiyom 1]: Eğer `useApiCall` hook'u React fonksiyonel bileşeninin veya başka bir hook'un içinde invok edilmemişse, "Invalid hook call" hatası oluşur.**
-Bu, React'ın hook kurallarına bağlılık varsayımıdır.
+[Aksiyom 1]: Eğer `useApiCall` bir React bileşeni hook bağlamı dışında (örn:普通 bir fonksiyon, sınıf metodu) çağrılırsa, "Invalid hook call" hatası oluşur.
 
-**[Aksiyom 2]: Eğer `defaultOptions` parametresi sağlanmazsa veya `null`/`undefined` olarak geçilirse, hook bir varsayılan (muhtemelen boş) yapılandırma nesnesi ile çalışır.**
-Fonksiyon imzasındaki `?` işareti, parametrenin opsiyonel olduğunu belirtir.
+[Aksiyom 2]: Eğer geçerli bir API endpoint'e erişim (ağ bağlantısı) yoksa, tüm API çağrıları başarısızlık durumuna (`error` dolu, `data` boş) geçer.
 
-**[Aksiyom 3]: Eğer `defaultOptions` içinde bir `url` (API endpoint adresi) veya bunu sağlayan bir `fetchConfig` bileşeni belirtilmemişse, hook'un bir HTTP isteği başlatması mümkün değildir.**
-Hook, bir hedef olmadan API çağrısı yapamaz; bu durum isteği başlatamaz veya bir hata fırlatır.
+[Aksiyom 3]: Eğer `defaultOptions` parametresi olarak geçilen `UseApiCallOptions` yapısı geçerli bir istek yapılandırması (örn: geçerli URL, uygun method) içermiyorsa, istek gönderimi başarısız olur veya beklenmeyen davranış oluşur.
 
-**[Aksiyom 4]: Eğer `defaultOptions` içindeki `method` parametresi (`GET`, `POST`, `PUT`, `DELETE` vb.) geçerli bir HTTP method değilse, istek başarısız olur veya sunucu tarafından reddedilir.**
-Geçersiz bir method ile yapılan istekler standart HTTP hataları (405 Method Not Allowed gibi) ile sonuçlanır.
-
-**[Aksiyom 5]: Eğer `defaultOptions` içindeki `headers`, `body` veya diğer yapılandırma parametreleri, gönderilen isteğin türü (örn: `GET` isteğinde `body` olması) ile uyumsuzsa, istek hata ile sonuçlanır.**
-İstek yapısının HTTP protokolü ile tutarlı olması bir zorunluluktur.
+[Aksiyom 4]: Eğer hook'un bağlandığı React bileşeni bileşen ağacından kaldırılırsa (unmount), devam eden asenkron API isteklerinin sonuçları state güncellemesine yol açmaz (memory leak veya "Can't perform a React state update on an unmounted component" uyarısı oluşmaz).
 
 ---
 
@@ -79,26 +69,26 @@ Geçersiz bir method ile yapılan istekler standart HTTP hataları (405 Method N
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/hooks/useApiCall.ts::useApiCall
-- **params**: `(defaultOptions?: UseApiCallOptions)` — Hook'a geçirilen varsayılan API çağrı seçenekleri
+- **params**: `defaultOptions` (可选, 类型 `UseApiCallOptions`)
 - **ic_degiskenler**:
-  - `state` — useState ile yönetilen {data, loading, error} durum nesnesi, ApiCallState<T> tipinde
-  - `execute` — useCallback ile sarılmış async fonksiyon, API çağrısı yapar ve state'i günceller
-  - `reset` — useCallback ile sarılmış fonksiyon, state'i başlangıç değerine sıfırlar
-- **Dönüş**: `{ ...state, execute, reset }` — state alanlarını (data, loading, error) ve iki metodu içeren nesne
+  - `state` — 由 `useState` 创建的React状态，存储API调用的数据、加载和错误状态。
+  - `execute` — 由 `useCallback` 创建的异步函数，用于执行API调用并更新状态。
+  - `reset` — 由 `useCallback` 创建的函数，用于将状态重置为初始值。
+- **Dönüş**: 返回一个对象，包含扩展的 `state` 属性 (`data`, `loading`, `error`) 以及 `execute` 和 `reset` 方法。
 
 ### [N2_NASIL] AST Pointer: src/hooks/useApiCall.ts::execute
-- **params**: `(apiFunc: () => Promise<T>, options?: UseApiCallOptions)` — Çalıştırılacak API fonksiyonu ve opsiyonel seçenekler
+- **params**: `apiFunc` (类型 `() => Promise<T>`), `options` (可选, 类型 `UseApiCallOptions`)
 - **ic_degiskenler**:
-  - `mergedOptions` — `{ ...defaultOptions, ...options }` ile birleştirilmiş seçenekler nesnesi; showToast, successMessage, errorMessage alanlarını içerir
-  - `result` — `await apiFunc()` çağrısının başarılı sonucu, T tipinde
-  - `error` — catch bloğunda yakalanan hata; `err instanceof Error ? err : new Error(String(err))` ile Error nesnesine dönüştürülmüş
-- **Dönüş**: `Promise<T | null>` — Başarılıysa result, hatalıysa null döner
+  - `mergedOptions` — 将 `defaultOptions`（来自外部作用域）与 `options` 合并后的最终选项对象。
+  - `result` — `apiFunc` 执行成功时返回的异步结果。
+  - `err` — `try...catch` 语句捕获的原始错误对象。
+  - `error` — 经过类型检查和包装后的 `Error` 实例。
+- **Dönüş**: 返回 `Promise<T | null>`。成功时返回 `result`，失败时返回 `null`。
 
 ### [N3_NASIL] AST Pointer: src/hooks/useApiCall.ts::reset
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - (yok)
-- **Dönüş**: yok — Yan etki olarak state'i `{ data: null, loading: false, error: null }` değerine sıfırlar
+- **params**: (无)
+- **ic_degiskenler**: (无)
+- **Dönüş**: 无（函数通过调用 `setState` 产生副作用，重置状态）。
 
 ---
 

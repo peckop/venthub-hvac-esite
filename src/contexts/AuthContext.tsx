@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import type { Session,User } from '@supabase/supabase-js';
+import React, { useCallback,useEffect, useMemo, useState } from 'react';
+
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
-import type { User, Session } from '@supabase/supabase-js';
+
+import { getUserRole } from '../config/admin';
 import type { UserRole } from '../lib/rbac';
 import { AuthContext, type AuthError } from './AuthContextDefinition';
-import { getUserRole } from '../config/admin';
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);

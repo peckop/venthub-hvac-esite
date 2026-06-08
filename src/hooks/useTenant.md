@@ -9,7 +9,7 @@ entity_hashes:
   func:useTenant: 1b557639af7ddf07
   overview: ea8d03008ab03037
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-30T21:35:31Z
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış

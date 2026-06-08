@@ -1,21 +1,21 @@
 "use client"
 
-import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react'
-import * as THREE from 'three'
+import { ContactShadows, Environment, GizmoHelper, GizmoViewcube, Grid, Html, OrbitControls, useProgress } from '@react-three/drei'
 import { Canvas, useThree } from '@react-three/fiber'
-import { OrbitControls, Grid, GizmoHelper, GizmoViewcube, Environment, ContactShadows, Html, useProgress } from '@react-three/drei'
-import { FanRenderer } from './FanRenderer'
 import {
-    RotateCcw,
-    Triangle,
     BoxSelect,
-    Repeat,
-    RefreshCw,
     ChevronLeft,
-    Globe
-} from 'lucide-react'
-import { getModelPlacement } from '../../../utils/3dModelOffsets'
+    Globe,
+    RefreshCw,
+    Repeat,
+    RotateCcw,
+    Triangle} from 'lucide-react'
+import React, { Suspense, useCallback, useEffect, useRef,useState } from 'react'
+import * as THREE from 'three'
+
 import { useI18n } from '../../../i18n/I18nProvider'
+import { getModelPlacement } from '../../../utils/3dModelOffsets'
+import { FanRenderer } from './FanRenderer'
 
 function Loader() {
     const { progress } = useProgress()

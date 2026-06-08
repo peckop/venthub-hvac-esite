@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\layout\CookieConsent.tsx
-skeleton_hash: fffd063be9e63817
+skeleton_hash: 7a44fe33260c64ae
 entity_hashes:
   func:CookieConsent: ab64b95154357198
   overview: 02fd6c06c04c6c38
   style_tokens: 20b5f371d2cf3ccf
-generated_at: 2026-05-29T11:37:31Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış

@@ -1,5 +1,5 @@
+import { Award, CreditCard, Lock, Phone,Shield, Truck } from 'lucide-react'
 import React from 'react'
-import { Shield, Award, Lock, Truck, CreditCard, Phone } from 'lucide-react'
 
 /**
  * TrustSignals - Güven sinyalleri bölümü

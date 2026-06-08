@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ui\VentImage.tsx
-skeleton_hash: 0f1a56dcc8d8266c
+skeleton_hash: 3d81ecfd4042178c
 entity_hashes:
   func:VentImage: 5527f2e63e5e22a5
   overview: ed4ba88e88a612db
   style_tokens: 1d628435b48e7258
-generated_at: 2026-06-07T19:51:56Z
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
@@ -40,10 +40,6 @@ Bu modül, görsel gösterimi ve yedek görsel mekanizması üzerine kurulu bir 
 [Aksiyom 5]: Eğer `fallbackType` olarak sağlanan değer, `FALLBACK_IMAGES` nesnesindeki hiçbir anahtar ile eşleşmiyorsa, bileşen yedek görseli bulamaz ve görsel alanı boş kalır.
 
 [Aksiyom 6]: Eğer `FALLBACK_IMAGES` nesnesindeki bir anahtarın değeri geçerli bir görsel yolu (URL/path) içermiyorsa, o fallback türü seçildiğinde tarayıcıda kırık görsel ikonu görüntülenir.
-
----
-
-> **Not:** Fonksiyon gövdesi (gövde kodu) paylaşılmadığından, bileşenin iç render mantığı, hata yakalama stratejisi veya `FALLBACK_IMAGES` içindeki gerçek değerler hakkında spekülasyon yapılmamıştır.
 
 ---
 

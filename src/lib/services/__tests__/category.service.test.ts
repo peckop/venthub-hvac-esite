@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getCategories } from '../category.service'
+import { beforeEach,describe, expect, it, vi } from 'vitest'
+
 import { supabase } from '../../supabase'
+import { getCategories } from '../category.service'
 
 vi.mock('../../supabase', () => {
   const getMock = () => {

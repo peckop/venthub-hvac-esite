@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\FAQ.tsx
-skeleton_hash: 6ed52d5ed59875d8
+skeleton_hash: 9a13a98a037d1e22
 entity_hashes:
   func:FAQ: 09e0c00f56bbdf5d
   overview: 46750effbb9bfa8b
   style_tokens: 44e8cc594d8dadd1
-generated_at: 2026-05-28T22:35:46Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış

@@ -1,5 +1,6 @@
+import { Filter, Ruler, Settings,ThermometerSun } from 'lucide-react'
 import React, { useState } from 'react'
-import { Filter, Ruler, ThermometerSun, Settings } from 'lucide-react'
+
 import { useI18n } from '../../i18n/I18nProvider'
 
 interface NeedsAnalysisWizardProps {

@@ -8,7 +8,7 @@ entity_hashes:
   func:ExproofFanModel: 9ab526a69ad42620
   overview: 7f95db9ecbcd6088
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:47Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

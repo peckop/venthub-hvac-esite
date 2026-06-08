@@ -1,7 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+
 import type { Database } from '../../types/database.types'
-import type { Category } from '../../types/ui-models'
 import type { DbCategory } from '../../types/db-rows'
+import type { Category } from '../../types/ui-models'
 import { toUICategoryList } from '../type-converters'
 
 export async function getCategories(supabase: SupabaseClient<Database>): Promise<Category[]> {

@@ -1,8 +1,9 @@
 'use client'
 
 import React from 'react'
-import { useI18n } from '../i18n/I18nProvider'
+
 import { useScrollThrottle } from '../hooks/useScrollThrottle'
+import { useI18n } from '../i18n/I18nProvider'
 
 const BackToTopButton: React.FC = () => {
   const { t } = useI18n()

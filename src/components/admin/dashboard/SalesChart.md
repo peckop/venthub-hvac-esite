@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\SalesChart.tsx
-skeleton_hash: 8dd65454f964d2ba
+skeleton_hash: d31ca9fe12bd815b
 entity_hashes:
   func:SalesChart: 81798fe6d2553ef7
   overview: 0b8303dd7641efb3
   style_tokens: d6e6bd2ac73e7719
-generated_at: 2026-05-28T22:35:31Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış

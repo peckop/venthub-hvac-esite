@@ -1,15 +1,15 @@
 
 
 // @vitest-environment happy-dom
+import { cleanup,fireEvent, render, screen, within } from '@testing-library/react'
 import React from 'react'
-import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, screen, within, fireEvent, cleanup } from '@testing-library/react'
-import ReviewSummary from '@/views/checkout/ReviewSummary'
-import {
-  type CheckoutCustomerInfo as CustomerInfo,
-  type CheckoutAddressInfo as AddressInfo
-} from '@/types/db-rows'
+import { afterEach,describe, expect, it, vi } from 'vitest'
+
 import { I18nProvider } from '@/i18n/I18nProvider'
+import {
+  type CheckoutAddressInfo as AddressInfo,
+  type CheckoutCustomerInfo as CustomerInfo} from '@/types/db-rows'
+import ReviewSummary from '@/views/checkout/ReviewSummary'
 
 vi.mock('@/i18n/dictionaries/tr', () => ({
   tr: {

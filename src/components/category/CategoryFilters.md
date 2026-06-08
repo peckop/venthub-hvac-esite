@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\CategoryFilters.tsx
-skeleton_hash: 287ab9b1b75d703c
+skeleton_hash: 8c83e5f2ab7475c1
 entity_hashes:
   func:CategoryFilters: 420d76bf670f1cf8
   func:toggleBrand: 67afbe53ea415719
   overview: e7958b385edc9e41
   style_tokens: 57cd966a2983f774
-generated_at: 2026-05-28T22:35:42Z
+generated_at: 2026-06-08T10:08:47Z
 ---
 
 ## Genel Bakış

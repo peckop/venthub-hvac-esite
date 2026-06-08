@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect,useState } from 'react';
 
 /**
  * Next.js 15 (veya genel SSR) mimarisinde Hydration Mismatch hatalarını önlemek için kullanılır.

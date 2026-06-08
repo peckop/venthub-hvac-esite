@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\GuidedCategoryDiscovery.tsx
-skeleton_hash: bb4c9176e8c993df
+skeleton_hash: ba5d7c49596af173
 entity_hashes:
   func:GuidedCategoryDiscovery: 3b7f2bdef4872624
   overview: a1eb122d99c941ad
   style_tokens: ba1e7efd5f41a7fe
-generated_at: 2026-06-07T20:34:31Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış

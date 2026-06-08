@@ -1,23 +1,24 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { 
-  Save, 
   ChevronLeft, 
+  Eye,
+  Layout,
   Loader2, 
   Monitor, 
-  Smartphone,
-  Layout,
-  Eye,
   PanelRight,
+  Save, 
+  Smartphone,
 } from 'lucide-react';
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+import React, { useCallback,useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
 import { AuthorityBuilder } from '@/components/admin/authority-builder/AuthorityBuilder';
 import { AuthorityRenderer } from '@/components/authority/AuthorityRenderer';
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import { AuthorityBlock, SpecsBlock } from '@/types/authority';
-import { DbCategory, CategoryMetadata, DbJson } from '@/types/db-rows';
-import { toast } from 'sonner';
+import { CategoryMetadata, DbCategory, DbJson } from '@/types/db-rows';
 
 interface CategoryBuilderViewProps {
   categoryId: string;

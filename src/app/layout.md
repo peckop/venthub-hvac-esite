@@ -3,33 +3,35 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\layout.tsx
-skeleton_hash: 121ea14bce4b42cb
+skeleton_hash: 335e557e99a8a428
 entity_hashes:
   func:RootLayout: b91efb59fd6362f0
-  overview: b75fce6203810ddf
+  overview: a13603912e8a012c
   style_tokens: eebc13a3fedd1bcb
-generated_at: 2026-06-07T11:00:50Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub web uygulamasının temel yapı taşını oluşturur. Tüm sayfaları saran kök layout bileşenini tanımlayarak tutarlı bir HTML yapısı, font ayarları ve ortak stil referanslarını sağlar. Sayfa içerikleri bu düzenin içine yerleştirilerek uygulamanın genel görünümünü ve düzenini belirler.
+Bu modül, VentHub web uygulamasının kök yerleşim bileşenidir. Tüm sayfaları saran ortak HTML yapısını, dil ayarlarını, font yapılandırmasını ve sağlayıcı sarmalayıcısını tanımlayarak uygulamanın tutarlı bir şekilde render edilmesini sağlar.
 
 ## Fonksiyon Grupları
-### Layout Rendering
-Uygulamanın en dış çerçevesini ve temel HTML yapısını oluşturarak tüm sayfaların bu düzen bileşeni üzerinden tarayıcıya sunulmasını sağlar.
+### Sayfa Yerleşimi
+Uygulamanın en dış HTML çerçevesini oluşturarak tüm sayfa içeriklerinin bu düzen içinde tarayıcıya sunulmasını sağlar.
 - RootLayout
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için belirgin mimari varsayımlar mevcuttur.
+Bu Next.js layout modülü için temel mimari varsayımlar şunlardır:
 
-**[Aksiyom 1]:** Eğer `children` parametresi sağlanmazsa, React bileşeni hata verir veya boş bir layout render edilir.
+[Aksiyom 1]: Eğer `children` parametresi sağlanmazsa veya geçerli bir React.ReactNode içermiyorsa, React bileşeni hata fırlatır veya boş bir layout render edilir.
 
----
+[Aksiyom 2]: Eğer `inter` font sabiti (call() metoduyla kullanılır) tanımlı değilse veya geçerli bir Next.js font nesnesi içermiyorsa, layout’daki tipografi doğru şekilde yüklenemez.
 
-**Not:** Verilen bilgiler (fonksiyon imzası, modül sabitleri ve eski doküman içeriği) incelendiğinde, bu bir React layout bileşenidir ve minimal bir API'ye sahiptir. Fonksiyon gövdesine erişim olmadan, iş mantığına dayalı detaylı aksiyomlar çıkarılamamaktadır. Mevcut verilerden sadece parametre zorunluluğu tespit edilebilmiştir.
+[Aksiyom 3]: Eğer `metadata` sabiti tanımlı değilse veya geçerli bir Next.js metadata nesnesi (başlık, açıklama vb. içeren) içermiyorsa, sayfaların head bölümü doğru meta bilgilerle oluşturulamaz.
+
+[Aksiyom 4]: Eğer `RootLayout` bileşeni React subtree olarak (children ile) çağrılmazsa, uygulamanın hiçbir içeriği render edilmez.
 
 ---
 
@@ -58,17 +60,14 @@ Bu modül için belirgin mimari varsayımlar mevcuttur.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/app/layout.tsx`::RootLayout
-- **params**:
-  - `children` — `React.ReactNode` tipinde, layout içinde render edilecek alt sayfa ve bileşenlerin tümünü temsil eder; `ClientLayout` içine `{children}` olarak yerleştirilir
-- **ic_degiskenler**: Fonksiyon gövdesinde `const`/`let` ile tanımlanmış yerel değişken yoktur. JSX içinde aşağıdaki harici referanslar kullanılır:
-  - `inter` — `next/font/google`'dan import edilmiş font nesnesi; `inter.variable` ve `inter.className` özellikleri `<body>`'nin `className` prop'una template literal ile bağlanarak Inter fontu uygulanır
-  - `Providers` — `ClientLayout` modülünden import edilmiş context sağlayıcı sarmalayıcı bileşen; sayfa genelinde (theme, query client vb.) sağlayıcıları children'a outer sarmalayıcı olarak sarılır
-  - `ClientLayout` — client tarafı layout sarmalayıcı bileşen; `Providers` içinde, `children`'ı ve JSON-LD scriptini sarmalar
-  - `SITE_URL` — `@/config/siteUrl`'den import edilmiş sabit string; JSON-LD `WebSite` nesnesinin `url` alanına atanarak schema.org yapılandırılmış verisi oluşturulur
-  - `JSON.stringify` — JSON-LD nesnesini string'e dönüştürür; ardından `.replace(/</g, '\\u003c').replace(/>/g, '\\u003e')` zinciri ile `<` ve `>` karakterleri escape edilir
-  - `dangerouslySetInnerHTML` — React prop'u; script etiketine `__html` anahtarıyla doğrudan HTML enjekte eder
-- **Dönüş**: Belirtilmemiş (Explicit return type yok). Fonksiyon JSX döndürür — `<html>` > `<body>` > `<Providers>` > `<ClientLayout>` > (`<script>` JSON-LD + `{children}`) şeklinde tam sayfa iskeletini render eder. Yan etki olarak Inter font CSS değişkenleri sayfaya yayılır ve schema.org WebSite JSON-LD markup'u DOM'a enjekte edilir.
+### [N1_NASIL] AST Pointer: src/app/layout.tsx::RootLayout
+- **params**: `children` — React.ReactNode tipinde, sayfanın içeriğini temsil eder
+- **ic_degiskenler**: (değişken yok, sadece parametre ve import edilen sabitler kullanılır)
+  - `inter` — `next/font/google`'den import edilen font nesnesi; `.variable` ve `.className` özellikleri CSS sınıfları üretir
+  - `SITE_URL` — `@/config/siteUrl`'dan import edilen sabit string; JSON-LD şemasında site URL'sini belirtir
+  - `Providers` — `../components/layout/ClientLayout`'dan import edilen bileşen; sağlayıcı (context) sarmalayıcısı
+  - `ClientLayout` — `../components/layout/ClientLayout`'dan import edilen bileşen; istemci tarafı layout sarmalayıcısı
+- **Dönüş**: yok (JSX element döner, TypeScript'te dönüş tipi belirtilmemiş)
 
 ---
 

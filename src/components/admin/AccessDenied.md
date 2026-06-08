@@ -3,31 +3,29 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\AccessDenied.tsx
-skeleton_hash: d0926a9df2156265
+skeleton_hash: ce06faa120043b3d
 entity_hashes:
   func:AccessDenied: ea91e56a2eab80b9
-  overview: 0772c5e63ff4e542
+  overview: c138e2727c8c240f
   style_tokens: 07b65f88bee816f7
-generated_at: 2026-05-28T22:35:22Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış
-AccessDenied bileşeni, yönetim panelinde yetkisiz erişim durumunda kullanıcıya bilgilendirme amaçlı bir hata sayfası sunan bağımsız bir React bileşenidir. Tek bir amacı vardır: kullanıcıya erişim izni olmadığını bildirmek ve ana sayfaya yönlendirme yapma seçeneği sunmak.
+AccessDenied, yönetim panelinde yetkisiz erişim durumunda kullanıcıya bilgilendirme amaçlı bir hata sayfası sunan basit bir React bileşenidir. Tek bir amacı vardır: kullanıcıya erişim izni olmadığını bildirmek ve ana sayfaya yönlendirme seçeneği sunmak.
 
 ## Fonksiyon Grupları
 ### Arayüz Sunumu
-Kullanıcıya erişim reddedildiğini belirten mesajı ve yönlendirme butonunu render ederek tek sayfalık hata arayüzünü oluşturur.
+Erişim reddedildiğinde kullanıcıya bilgilendirici bir mesaj ve yönlendirme butonu göstererek tek sayfalık hata arayüzünü oluşturur.
 - AccessDenied
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, parametre almayan ve modül sabitleri içermeyen basit bir React UI bileşenidir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer bileşen React Router veya benzeri bir yönlendirme altyapısı olmayan bir ortamda çalıştırılırsa, ana sayfaya yönlendirme butonu işlevsiz kalır.
-
-[Aksiyom 2]: Eğer bileşen bir React bağlamı (context) dışın render edilirse, React bileşenLifecycle'ı düzgün çalışmayacağından hata oluşur.
+**Gerekçe:** Fonksiyon imzası `AccessDenied()` şeklinde olup parametresiz ve basit bir sunum (presentational) bileşenidir. Fonksiyon gövdesinde (JSX kodu) erişilemediğinden, hangi bağımlılıkların (routing, authentication context vb.) kullanıldığı doğrulanamamaktadır. Bu nedenle spekülatif varsayımlarda bulunulmamıştır.
 
 ---
 
@@ -51,14 +49,12 @@ Bu modül, parametre almayan ve modül sabitleri içermeyen basit bir React UI b
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/AccessDenied.tsx::AccessDenied
-- **params**: (parametre yok)
+- **params**: (yok — arrow function, parametre almıyor)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hookundan destructured çeviri fonksiyonu; `t('admin.ui.backToDashboard')` çağrılarak Türkçe metin elde edilir
-- **Dönüş**: JSX — Erişim engellendi sayfasını render eden React bileşeni; `ShieldAlert` ikonu, başlık, açıklama metni ve admin dashboard'a yönlendiren Link içerir
-- **Hook Kullanımları**:
-  - `useI18n()` — dil çeviri sistemi bağlamını sağlar, `{ t }` destructured olarak alınır
-- **Sabit/Sabit Yapı Erişimleri**:
-  - `Routes.admin.dashboard()` — admin dashboard rotasının URL'ini döndürür, Link bileşeninin `href` prop'unda kullanılır
+  - `t` — `useI18n()` hook'undan döndürülen çeviri fonksiyonu; `t('admin.ui.backToDashboard')` şeklinde kullanılarak lokalize metin döndürür
+- **Hook Kullanimi**:
+  - `useI18n()` — i18n context'inden çeviri fonksiyonunu almak için çağrılır, `{ t }` destructuring ile çıkarılır
+- **Dönüş**: JSX — `min-h-screen` container içinde glass-effect kart, `ShieldAlert` ikonu, hata mesajı başlığı ve `Link` ile dashboard'a yönlendirme butonu döndüren React functional component
 
 ---
 

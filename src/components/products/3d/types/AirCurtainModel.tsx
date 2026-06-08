@@ -1,8 +1,9 @@
 "use client";
-import React, { useRef, useMemo } from 'react'
-import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
+import React, { useMemo,useRef } from 'react'
 import * as THREE from 'three'
+
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export interface AirCurtainModelProps {

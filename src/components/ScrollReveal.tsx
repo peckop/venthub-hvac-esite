@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 
 interface ScrollRevealProps {
@@ -32,5 +33,3 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
     </Component>
   )
 }
-
-export default ScrollReveal

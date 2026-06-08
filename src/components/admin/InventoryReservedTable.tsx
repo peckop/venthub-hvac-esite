@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { formatDateTime } from '../../i18n/datetime'
 
 export type ReservedRow = {

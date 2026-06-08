@@ -1,14 +1,16 @@
 'use client'
 
-import { Routes } from '@/utils/routes';
-import { motion, AnimatePresence } from 'framer-motion'
-import React, { useMemo, useState } from 'react'
-import ProductCard from '../ProductCard'
-import { useI18n } from '../../i18n/I18nProvider'
-import type { Category, Product } from '@/types/ui-models'
-import Link from 'next/link'
+import { AnimatePresence,motion } from 'framer-motion'
 import Image from 'next/image'
+import Link from 'next/link'
+import React, { useMemo, useState } from 'react'
+
+import type { Category, Product } from '@/types/ui-models'
 import { normalizeImageUrl } from '@/utils/imageUtils'
+import { Routes } from '@/utils/routes';
+
+import { useI18n } from '../../i18n/I18nProvider'
+import ProductCard from '../ProductCard'
 
 type CommercialTab = 'featured' | 'newArrivals' | 'bestSellers'
 

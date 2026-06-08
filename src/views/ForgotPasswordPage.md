@@ -3,30 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ForgotPasswordPage.tsx
-skeleton_hash: b54e4633f0082cc9
+skeleton_hash: b223d64b36d7551e
 entity_hashes:
   func:ForgotPasswordPage: 40bcbdf4b0d8dfc1
   func:handleSubmit: 460293fdfa9263b6
-  overview: 279129df493eb1f6
+  overview: b6edcf7438326096
   style_tokens: 90202b3fc6cca016
-generated_at: 2026-05-29T18:49:37Z
+generated_at: 2026-06-08T10:10:59Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıların şifre sıfırlama talebini başlatmalarını sağlayan tek sayfalık bir React bileşenidir. E-posta adresi girişi formunu sunarak, kullanıcının şifre yenileme işlemi için kimlik doğrulama servisine istek gönderir.
+Bu modül, kullanıcıların şifre sıfırlama talebini iletmek için kullanılan tek sayfalık bir React bileşenidir. Kullanıcıya e-posta adresi girişi sunarak, gizli bir servisi aracılığıyla şifre yenileme sürecini başlatır.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni
-Sayfanın genel yapısını, form düzenini ve kullanıcı arayüzünü tanımlayan ana React bileşenidir.
+### Sayfa Yapısı ve Görünüm
+Modülün ana bileşenini tanımlar; sayfa düzenini, form elemanlarını ve kullanıcı arayüzünü oluşturarak şifre sıfırlama akışının görsel çerçevesini sağlar.
 - ForgotPasswordPage
 
-### Form İşlemleri
-Kullanıcının formu gönderdiğinde tetiklenen, varsayılan tarayıcı davranışını engelleyerek şifre sıfırlama isteğini asenkron olarak yöneten olay处理leyicidir.
+### Form Veri İşleme ve Etkileşim
+Kullanıcının formu gönderme eylemini yakalar, varsayılan tarayıcı davranışını engeller ve toplanan verileri (e-posta) şifre sıfırlama servisine asenkron olarak iletir.
 - handleSubmit
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül, kullanıcının şifre sıfırlama talebini iletmek için bir form sunar ve bu sürecin doğru işleyişi için aşağıdaki varsayımlar gereklidir.
 
+[Aksiyom 1]: Eğer form gönderme olayı (`e`) doğru şekilde engellenmezse (örn. `e.preventDefault()` çağrılmazsa), tarayıcının varsayılan form gönderme davranışı tetiklenir ve sayfa yeniden yüklenerek istek gönderilemez.
+
+[Aksiyom 2]: Eğer kullanıcının girdiği e-posta adresi sunucu tarafında geçerli ve kayıtlı bir kullanıcıya ait değilse, şifre sıfırlama isteği sunucu tarafından reddedilir (hata mesajı döner).
+
+[Aksiyom 3]: Eğer modülün çalıştığı ortamda ağ bağlantısı (internet) yoksa, şifre sıfırlama isteği sunucuya iletilemez ve istek başarısız olur.
 
 ---
 
@@ -52,29 +59,27 @@ Kullanıcının formu gönderdiğinde tetiklenen, varsayılan tarayıcı davran�
 ### [N1_NASIL] AST Pointer: src/views/ForgotPasswordPage.tsx::ForgotPasswordPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `email` — `useState('')` hook'undan dönen state, kullanıcının girdiği e-posta adresini tutar
-  - `setEmail` — `useState('')` hook'undan dönen setter, email state'ini günceller
-  - `loading` — `useState(false)` hook'undan dönen state, form gönderim süresince true olur, submit butonunu disabled yapar
-  - `setLoading` — `useState(false)` hook'undan dönen setter, loading state'ini günceller
-  - `emailSent` — `useState(false)` hook'undan dönen state, sıfırlama e-postası başarıyla gönderildiğinde true olur, sayfayı teşekkür ekranına çevirir
-  - `setEmailSent` — `useState(false)` hook'undan dönen setter, emailSent state'ini günceller
-  - `resetPassword` — `useAuth()` hook'undan destructure edilen fonksiyon, Supabase'e şifre sıfırlama isteği gönderir
-  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu, çok dilli metinleri getirir
-- **Dönüş**: JSX — `emailSent` false ise şifre sıfırlama formu, true ise "e-posta gönderildi" teşekkür ekranı render eder
-
----
+  - `email` — useState hook'u ile oluşturulmuş state değişkeni, kullanıcının girdiği e-posta adresini tutar
+  - `setEmail` — email state'ini güncellemek için kullanılan setter fonksiyonu
+  - `loading` — useState hook'u ile oluşturulmuş state değişkeni, yükleme durumunu (true/false) tutar
+  - `setLoading` — loading state'ini güncellemek için kullanılan setter fonksiyonu
+  - `emailSent` — useState hook'u ile oluşturulmuş state değişkeni, şifre sıfırlama e-postasının gönderilip gönderilmediğini tutar
+  - `setEmailSent` — emailSent state'ini güncellemek için kullanılan setter fonksiyonu
+  - `resetPassword` — useAuth hook'undan gelen, şifre sıfırlama işlemini yapan asenkron fonksiyon
+  - `t` — useI18n hook'undan gelen, çeviri yapmak için kullanılan fonksiyon
+  - `handleSubmit` — form gönderildiğinde çalışan asenkron olay işleyici fonksiyon
+- **Dönüş**: JSX elementi (React FC bileşeni)
 
 ### [N2_NASIL] AST Pointer: src/views/ForgotPasswordPage.tsx::handleSubmit
-- **params**: `e: React.FormEvent` — form submit olay nesnesi, `e.preventDefault()` ile varsayılan submit engellenir
+- **params**: (e: React.FormEvent — form submit olayı)
 - **ic_degiskenler**:
-  - `email` — outer scope'tan closure ile erişilen state, sıfırlanacak kullanıcının e-posta adresi; boşsa toast hatası verip return eder
-  - `setLoading` — outer scope'tan closure ile erişilen setter, fonksiyon başında `true`, finally bloğunda `false` olarak ayarlanır
-  - `resetPassword` — outer scope'tan closure ile erişilen auth fonksiyonu, `email` parametresiyle `await resetPassword(email)` olarak çağrılır; `{ error }` destructuring ile sonucu ayrıştırılır
-  - `t` — outer scope'tan closure ile erişilen çeviri fonksiyonu, toast mesajlarında kullanılır (`auth.email`, `auth.required`, `auth.userNotFound`, `auth.resetError`, `auth.resetEmailSent`, `auth.unexpectedError`)
-  - `error` (try bloğu) — `resetPassword` dönüşünden destructuring ile elde edilen hata nesnesi; `error.message` içinde `'User not found'` aranır, farklıysa raw message gösterilir
-  - `error` (catch bloğu) — yakalanan beklenmedik hata nesnesi, `console.error` ile loglanır ve `auth.unexpectedError` toast gösterilir
-  - `setEmailSent` — outer scope'tan closure ile erişilen setter, hata yoksa `true` olarak ayarlanır ve teşekkür ekranına geçiş yapar
-- **Dönüş**: yok (void) — yan etkiler: toast bildirimleri gösterir, state'leri günceller
+  - `e` — React form olayı nesnesi, preventDefault() ile varsayılan davranışı engellenir
+  - `email` — ForgotPasswordPage kapsamından gelen e-posta state'i, sıfırlama isteği için kullanılır
+  - `resetPassword` — ForgotPasswordPage kapsamından gelen, şifre sıfırlama API'sini çağıran fonksiyon
+  - `t` — ForgotPasswordPage kapsamından gelen çeviri fonksiyonu, hata/success mesajlarını çevirir
+  - `error` — resetPassword() çağrısından dönen hata nesnesi (try bloğunda)
+  - `error` — catch bloğunda yakalanan beklenmedik hata nesnesi
+- **Dönüş**: void (asenkron fonksiyon, promise döner)
 
 ---
 

@@ -9,7 +9,7 @@ entity_hashes:
   func:iconFor: 8ef77854d85af42b
   overview: bbb9266e1effc225
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:38:58Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış
@@ -26,7 +26,19 @@ Uygulama temasındaki belirli vurgu renkleri için gerekli CSS sınıflarını, 
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, VentHub HVAC uygulamasında ikon gösterimi ve vurgu rengi CSS sınıfı üretimi için merkezi UI yardımcı fonksiyonları sunar.
+
+**[Aksiyom 1]:** Eğer `Svg` objesi (modül sabiti) tanımlı değilse veya içeriği eksikse, `iconFor` fonksiyonu istenen ikonu render edemez ve ikon gösterimi başarısız olur.
+
+**[Aksiyom 2]:** Eğer `icon` parametresi geçerli bir `ApplicationIcon` değeri değilse, `iconFor` fonksiyonu eşleşen SVG kaynağı bulamaz ve ikon gösterilemez.
+
+**[Aksiyom 3]:** Eğer `size` parametresi `iconFor` fonksiyonuna geçirilmezse, ikon için varsayılan bir boyut kullanılacağı varsayılır (değer bilinmiyor — default parametre değeri imzada belirtilmemiş).
+
+**[Aksiyom 4]:** Eğer `accent` parametresi geçerli bir `ApplicationAccent` değeri değilse, `accentOverlayClass` fonksiyonu eşleşen CSS sınıfı üretemez ve vurgu rengi stili uygulanamaz.
+
+**[Aksiyom 5]:** Eğer `accentOverlayClass` fonksiyonu tarafından üretilen CSS sınıf adı, uygulamanın global stil tanımlarında (örn: Tailwind, CSS modülleri) tanımlı değilse, vurgu rengi görsel olarak uygulanmaz.
 
 ---
 

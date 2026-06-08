@@ -1,5 +1,5 @@
+import { AlertTriangle, CheckCircle, Info, TrendingUp } from 'lucide-react'
 import React from 'react'
-import { CheckCircle, AlertTriangle, Info, TrendingUp } from 'lucide-react'
 
 type ResultStatus = 'optimal' | 'acceptable' | 'warning' | 'critical' | 'info'
 

@@ -3,36 +3,35 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountLayout.tsx
-skeleton_hash: 169762df22609c8d
+skeleton_hash: e4c1bf353b1ae29d
 entity_hashes:
   func:AccountLayout: 3732e58c82b2882b
-  overview: e42f2d8bdcf12925
+  overview: 9ee83d10d025d2f2
   style_tokens: cca55516cfe981ad
-generated_at: 2026-05-28T22:39:10Z
+generated_at: 2026-06-08T10:10:59Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesindeki hesap yönetim arayüzünün temel yapısını oluşturan React layout bileşenidir. Tek başına bir düzen (layout) sağlama sorumluluğuna sahiptir ve hesap bölümündeki tüm alt sayfaların tutarlı bir şekilde sunulmasını garanti eder.
+Bu modül, VentHub HVAC projesindeki hesap yönetim arayüzünün temel yapısını oluşturan React layout bileşenidir. Hesap bölümündeki tüm alt sayfaların tutarlı bir şekilde sunulmasını sağlayan çerçeve düzenini (wrapper layout) tanımlar.
 
 ## Fonksiyon Grupları
 ### Ana Hesap Düzeni Bileşeni
-Hesap bölümündeki tüm sayfaların ortak çerçeve yapısını ve düzenini tanımlayan temel layout bileşenidir.
+Hesap bölümündeki tüm sayfaların ortak çerçeve yapısını ve düzenini tanımlayan temel layout bileşenidir. İsteğe bağlı olarak içeriğe sahip olabilir ve hesap sayfalarını saran bir konteyner görevi görür.
 - AccountLayout
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için, fonksiyon imzasından ve modül yapısından çıkarılabilen temel aksiyomlar aşağıdadır. Fonksiyon gövdesine erişim olmadığından, yalnızca imza tabanlı çıkarımlar yapılmıştır.
 
-**[Aksiyom 1]**: Eğer `children` prop'u sağlanmazsa (undefined/null olarak传递 edilir), bileşen yine de hata vermeden render edilmeli ve boş bir hesap düzeni çerçevesi döndürmelidir — çünkü `children` parametresi `?` (opsiyonel) olarak imzalanmıştır.
+Bu modül, VentHub HVAC projesindeki hesap yönetim arayüzünün temel yapısını oluşturan bir React layout (düzen) bileşeni olan `AccountLayout`'ı tanımlar. Fonksiyon gövdesi verilmediği için, aksiyomlar fonksiyon imzası ve eski dokümanın genel bakış açıklaması referans alınarak üretilmiştir.
 
-**[Aksiyom 2]**: Eğer `children` prop'u sağlanırsa, bu değer `React.ReactNode` tipinde olmalıdır. Eğer farklı bir tip (örn: boolean, number)传递 edilirsa, React'ın çalışma zamanı (runtime) davranışı devreye girer ve tip uyumsuzluğu oluşur.
+**Aksiyom 1:** Eğer `AccountLayout` bileşeni, `children` prop'u ile çağrılmazsa, hesap yönetim sayfalarının içeriği render edilemez.
 
-**[Aksiyom 3]**: Eğer React runtime ortamı (React kütüphanesi ve JSX dönüştürücüsü) mevcut değilse, bu bileşen hiç render edilemez; modülün çalışması için React 18+ çalışma zamanı ortamının var olması gerekir.
+**Aksiyom 2:** Eğer `AccountLayout` bileşeni, hesap bölümündeki bir alt sayfa (örn: profil, şifre değiştirme) tarafından kullanılmazsa, sayfa tutarlı bir çerçeve düzeni içinde sunulamaz.
 
----
+**Aksiyom 3:** Eğer `AccountLayout` bileşeni, React ortamında doğru bir layout konteyneri olarak uygulanmazsa, hesap arayüzünün farklı sayfaları arasında görsel ve yapısal tutarlılık sağlanamaz.
 
-**Not**: Modül içinde herhangi bir sabit, koşul kontrolü, eşik değeri veya iş mantığı (fonksiyon gövdesi) bulunmadığından, alan-spesifik (domain-specific) aksiyon tanımı yapılamamıştır. Bileşen salt bir *wrapper layout* olarak tasarlanmıştır.
+**Aksiyom 4:** Eğer `AccountLayout` bileşeni, `children` olarak geçilen React düğümlerini (`React.ReactNode`) doğru şekilde işleyip render etmezse, iç sayfa içerikleri ekranda görüntülenemez.
 
 ---
 
@@ -80,22 +79,18 @@ type TabGroup = { label: string; items: TabItem[] }
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/account/AccountLayout.tsx::AccountLayout
-- **params**: ({ children }: { children?: React.ReactNode })
+### [N1_NASIL] AST Pointer: `src\views\account\AccountLayout.tsx`::AccountLayout
+- **params**: `{ children }` — React.ReactNode tipinde opsiyonel children prop'u, hesap sayfalarının ana içerik alanını oluşturur
 - **ic_degiskenler**:
-  - `router` — useRouter hook'undan gelen Next.js yönlendirici nesnesi, oturum açılmamış kullanıcıları login sayfasına yönlendirmek için kullanılır
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, navigasyon etiketlerini ve başlıkları çok dilli olarak almak için kullanılır
-  - `user` — useAuth hook'undan gelen mevcut kullanıcı nesnesi (null olabilir), oturum durumunu belirler
-  - `loading` — useAuth hook'undan gelen boolean, oturum bilgisi yüklenirken true'dur
-  - `pathname` — usePathname hook'undan gelen mevcut URL yolu stringi, aktif menü öğesini belirlemek için kullanılır
-  - `navGroups` — Hesap düzeninin sol sidebar navigasyon menüsünü oluşturan TabGroup[] dizisi, üç grup (Özet, Sipariş & Kargo, Hesap Yönetimi) içerir
-  - `active` — useEffect cleanup fonksiyonu için boolean flag, component unmount olduğunda false yapılarak state güncellemesi engellenir
-  - `shouldRender` — Render koşulunu belirleyen boolean, geliştirme modunda true veya user yüklenmiş ve mevcutsa true döner
-  - `group` — navGroups.map callback parametresi, mevcut navigasyon grubu nesnesi (label ve items içerir)
-  - `gi` — navGroups.map callback parametresi, grubun indeks numarası (number), key olarak kullanılır
-  - `tab` — group.items.map callback parametresi, bireysel navigasyon öğesi (to, label, icon içerir)
-  - `isActive` — pathname === tab.to karşılaştırması sonucu oluşan boolean, mevcut sayfanın bu tab'a karşılık gelip gelmediğini belirler
-- **Dönüş**: JSX (React.ReactNode) — Hesap düzeninin tam sayfa layout'unu döndürür, sol tarafta sticky sidebar (navigasyon menüsü) ve sağ tarafta ana içerik bölgesi (children) içerir; ayrıca useEffect ile oturum kontrolü yan etkisi vardır (geliştirme modu dışında user yoksa login'e yönlendirir)
+  - `router` — Next.js useRouter hook'undan dönen router nesnesi, sayfa yönlendirmeleri için kullanılır
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu, çok dilli metinleri döndürür
+  - `user` — useAuth hook'undan dönen mevcut kullanıcı nesnesi, kimlik doğrulama durumunu gösterir
+  - `loading` — useAuth hook'undan dönen boolean, kimlik doğrulama yüklenme durumunu gösterir
+  - `pathname` — usePathname hook'undan dönen mevcut URL yolu, aktif navigasyon belirlemek için kullanılır
+  - `navGroups` — TabGroup[] tipinde dizi, hesap sayfası navigasyon menüsünü tanımlar (3 grup: Özet, Sipariş & Kargo, Hesap Yönetimi)
+  - `active` — React.useEffect içindeki boolean, effect temizleme işlemini kontrol eder
+  - `shouldRender` — boolean, component'in render edilip edilmeyeceğini belirler (development modu veya kimlik doğrulama durumuna göre)
+- **Dönüş**: JSX element — hesap sayfası düzenini döndürür (sidebar navigasyon ve ana içerik alanı)
 
 ---
 

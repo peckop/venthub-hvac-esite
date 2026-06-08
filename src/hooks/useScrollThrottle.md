@@ -3,32 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx
-skeleton_hash: b3a95bf57068fc98
+skeleton_hash: 5184d4b744012e60
 entity_hashes:
   func:useScrollThrottle: 8c5a736c0985619d
-  overview: cbc1c5af98f49080
+  overview: 780bbb29a8b9d01e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:37:49Z
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış
-Bu modül, React projelerinde kullanılmak üzere tasarlanmış, kaydırma (scroll) işlemlerinin tetiklediği sık olayları sınırlayarak uygulama performansını artıran özel bir hook içerir. Kullanıcılara kısıtlama süresi ve kaydırma eşikleri gibi yapılandırılabilir seçenekler sunarak farklı kullanım senaryolarına esnek şekilde uyum sağlar.
+Bu modül, React uygulamalarında kaydırma (scroll) olaylarının çok sık tetiklenmesini önlemek için tasarlanmış bir throttle mekanizması sunar. `useScrollThrottle` hook'u, yapılandırılabilir eşik değerleri ve süre parametreleri ile olayları filtreleyerek performansı artırır ve gereksiz hesaplama yükünü azaltır.
 
 ## Fonksiyon Grupları
-### Scroll Olayı Kısıtlama (Throttling) Hook'u
-Modülün tüm temel sorumluluğunu üstlenen ana işlevdir, gelen yapılandırma seçeneklerine göre kaydırma dinleyicisini yönetir ve olayları belirtilen süreyle kısıtlayarak gereksiz işlem yükünü ortadan kaldırır.
+### Kaydırma Olayı Kısıtlama Hook'u
+Modülün tek ve temel bileşeni olup, kaydırma olaylarını belirli bir süre aralığında veya eşik değeri aşıldığında tetiklenecek şekilde sınırlar.
 - useScrollThrottle
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React scroll throttling hook'u, çalıştığı ortamda tarayıcı olay sistemi, React hook yaşam döngüleri ve geçirilen parametrelerin tip-değer uyumluluğu varsayımlarına dayanır; bu koşullar sağlanmadığı takdirde hook beklenen şekilde çalışmaz.
 
-[Aksiyom 1]: Eğer hook'un çalıştığı ortamda `window` nesnesinin `addEventListener`/`removeEventListener` metotları ve `scroll` olay tetikleme mekanizması yoksa, scroll hareketleri asla algılanamaz, hook hiç çalışmaz.
-[Aksiyom 2]: Eğer ilk parametre olarak geçirilen `thresholdOrOptions`, ne sayı ne de geçerli `ScrollThrottleOptions` tipinde bir nesne ise, scroll tetikleme eşiği ve ayarları doğru hesaplanamaz, beklenmedik zamanlarda tetikleme veya hiç tetiklememe sorunu oluşur.
-[Aksiyom 3]: Eğer ikinci parametre olarak geçirilen `throttleMsParam` pozitif bir sayı değilse, scroll eventlerinin belirtilen süreyle kısıtlanması (throttling) sağlanamaz, gereğinden fazla tetikleme olur veya mekanizma tamamen devre dışı kalır.
-[Aksiyom 4]: Eğer hook'un çalıştığı React ortamında `useEffect`, `useCallback` gibi temel yaşam döngüsü hook'ları erişilemez veya hatalı çalışıyorsa, component unmount olduğunda scroll event dinleyicisi temizlenemez, bellek sızıntısı oluşur ve birden fazla aynı dinleyici eklenerek throttle mekanizması bozulur.
-[Aksiyom 5]: Eğer tarayıcı olmayan ortamlarda (SSR gibi) `window` nesnesinin varlığını kontrol eden ön koşullar olmadan hook çalıştırılırsa, çalışma ortamında hata fırlatılır, uygulama akışı durur.
+Bu hook, React fonksiyonel bileşenleri veya diğer hook'lar içinde çalışacak şekilde tasarlanmıştır ve kaydırma olaylarını kısıtlamak için geçerli parametreler gerektirir.
+
+**[Aksiyom 1]:** Eğer `useScrollThrottle` React hooks kurallarına uygun olarak (üst seviyede, koşullu çağrılmadan) çağrılmazsa, React kancalar kuralları ihlal edilir ve bileşen beklenmeyen davranış gösterir.
+
+**[Aksiyom 2]:** Eğer `thresholdOrOptions` parametresi geçerli bir `number` veya `ScrollThrottleOptions` nesnesi formatında sağlanmazsa, kaydırma eşik değerlendirmesi veya yapılandırma okuma hatası oluşur.
+
+**[Aksiyom 3]:** Eğer `throttleMsParam` parametresi pozitif bir sayısal değer olarak sağlanmazsa (0 veya negatif olursa), throttling mekanizması beklenen şekilde çalışmayı durdurur veya sonsuz tetikleme döngüsüne neden olur.
+
+**[Aksiyom 4]:** Eğer调用 bu hook bileşen içinde bir `scroll` event listener'ı bağlanacak uygun bir DOM elementine (veya `window`) erişim sağlayamazsa, kaydırma olayları dinlenemez ve hook işlevsiz kalır.
+
+**[Aksiyom 5]:** Eğer hook bileşen_UNMOUNT olduğunda scroll event listener temizlenmezse (cleanup fonksiyonu ile), bellek sızıntısı ve hala aktif olan eski listener'ların gereksiz çalışmasına yol açar.
 
 ---
 
@@ -62,25 +67,25 @@ type ScrollThrottleOptions = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx::useScrollThrottle
-- **params**: thresholdOrOptions: number | ScrollThrottleOptions, throttleMsParam: number
+### [N1_NASIL] AST Pointer: src/hooks/useScrollThrottle.tsx::useScrollThrottle
+- **params**: (thresholdOrOptions: number | ScrollThrottleOptions = 100, throttleMsParam: number = 16)
 - **ic_degiskenler**:
-  - `showAt` — scroll konumunun üzerine çıkıldığında scroll durumunu aktifleştirmek için kullanılan eşik değeri
-  - `hideBelow` — scroll konumunun altına düşüldüğünde scroll durumunu devre dışı bırakmak için histerezis amaçlı eşik değeri
-  - `throttleMs` — scroll eventlerini sınırlandırmak için kullanılan throttling gecikme süresi
-  - `initialDelayMs` — ilk komponent mountunda durum ayarlaması için bekleme süresi
-  - `syncKey` — senkronizasyon tetikleyicisi olarak kullanılan opsiyonel anahtar
-  - `isScrolled` — scroll durumunu tutan React state değeri, kullanıcının showAt eşğini geçip geçmediğini belirtir
-  - `setIsScrolled` — isScrolled state'ini güncellemek için React state setter fonksiyonu
-  - `tickingRef` — requestAnimationFrame ile işlem devam ederken tekrar tetiklenmesini önlemek için kullanılan ref
-  - `timeoutRef` — throttle mekanizmasındaki aktif timeout'u saklamak için kullanılan ref
-  - `initialTimerRef` — ilk gecikmeli durum ayarı için aktif timeout'u saklayan ref
-  - `hasMountedRef` — komponentin ilk kez mount olup olmadığını izleyen ref
-  - `lastAboveRef` — bir önceki scroll ölçümünde showAt eşği geçilmiş miydi diye saklayan ref
-  - `lastBelowRef` — bir önceki scroll ölçümünde hideBelow eşğinin altında mıydı diye saklayan ref
-  - `handleScroll` — scroll eventini işleyen, useCallback ile sarmalanmış ana işleyici fonksiyonu
-  - `throttledScroll` — handleScroll'u throttle süresi ile sınırlayan ara fonksiyon
-- **Dönüş**: boolean (isScrolled)
+  - `showAt` — Sticky header'ın gösterilmeye başlanacağı scroll eşiği. thresholdOrOptions number ise o değer, obje ise thresholdOrOptions.showAt, yoksa 100.
+  - `hideBelow` — Sticky header'ın gizleneceği scroll eşiği. showAt değerinden 40px daha aşağısı veya belirtilen değer.
+  - `throttleMs` — Scroll eventinin ne sıklıkla işleneceği (milisaniye cinsinden).
+  - `initialDelayMs` — Sayfa ilk yüklendiğinde sticky header'ın görünmesi için gecikme süresi (milisaniye).
+  - `syncKey` — Senkronizasyon anahtarı, değiştiğinde scroll konumunu yeniden değerlendirir.
+  - `isScrolled` — Sticky header'ın görünür olup olmadığını tutan state değişkeni. Başlangıçta false.
+  - `tickingRef` — requestAnimationFrame ile scroll işlenirken tekrar girişi engellemek için kullanılan ref. Başlangıçta false.
+  - `timeoutRef` — Throttle için kullanılan setTimeout ref'i. Başlangıçta null.
+  - `initialTimerRef` — İlk gecikme için kullanılan setTimeout ref'i. Başlangıçta null.
+  - `hasMountedRef` — Hook'un ilk kez mount edilip edilmediğini takip eden ref. Başlangıçta false.
+  - `lastAboveRef` — Bir önceki örneklemede scroll'un showAt'in üzerinde olup olmadığını tutan ref. Başlangıçta false.
+  - `lastBelowRef` — Bir önceki örneklemede scroll'un hideBelow'ın altında olup olmadığını tutan ref. Başlangıçta true.
+  - `handleScroll` — Scroll olayını işleyen useCallback fonksiyonu. isScrolled, showAt, hideBelow'ye bağımlı.
+  - `throttledScroll` — handleScroll'u throttle eden useCallback fonksiyonu. handleScroll ve throttleMs'ye bağımlı.
+  - `initialScrollTop` — useEffect içinde window.scrollY'nin ilk değeri. Sayfa ilk yüklendiğinde mevcut scroll konumunu tutar.
+- **Dönüş**: `isScrolled` (boolean) — Sticky header'ın görünür olup olmadığı.
 
 ---
 

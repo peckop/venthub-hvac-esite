@@ -1,5 +1,7 @@
 import React from 'react'
+
 import { useI18n } from '@/i18n/I18nProvider'
+
 import { trackEvent } from '../utils/analytics'
 
 const CaseStudySection: React.FC = () => {

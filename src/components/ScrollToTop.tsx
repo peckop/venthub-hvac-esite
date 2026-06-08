@@ -1,7 +1,7 @@
 'use client'
 
-import { useLayoutEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import { useLayoutEffect } from 'react'
 
 /**
  * Route değişiminde sayfayı anında en üste kaydırır (Sadece PUSH aksiyonlarında).

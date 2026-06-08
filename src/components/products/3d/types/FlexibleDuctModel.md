@@ -3,31 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\FlexibleDuctModel.tsx
-skeleton_hash: c528a6e230f99d4c
+skeleton_hash: 72da243b231bb973
 entity_hashes:
   func:FlexibleDuctModel: 37698f17927cf0cb
-  overview: a748c200cfba6807
+  overview: 6249aa8e31ba2a59
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:47Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinde yer alan bu modül, ürün kataloğundaki esnek havalandırma kanallarının 3 boyutlu olarak görselleştirilmesini sağlayan ana React bileşenini barındırır. Uygulamanın 3D ürün görüntüleme sisteminde kullanılan bu bileşen, esnek kanalların 3D sahada doğru şekilde render edilmesinden sorumludur.
+Bu modül, VentHub HVAC platformunda esnek havalandırma kanallarının 3 boyutlu modellerini oluşturarak ürün kataloğunda görselleştirmeyi sağlayan temel React bileşenini içerir. Modül, esnek kanalların geometrik özelliklerini alarak 3D sahada doğru bir şekilde render edilmesini ve ana uygulama akışıyla entegre olmasını sağlar.
 
 ## Fonksiyon Grupları
-### Ana 3D Bileşen
-Modülün tek ana bileşeni olarak, esnek kanalların tüm 3D görselleştirme ve temel bileşen mantığını yürütür, uygulamanın ürün 3D görüntüleme akışında sorunsuz entegrasyon sağlar.
+### 3D Model Bileşeni
+Esnek havalandırma kanalının 3D geometrisini, temel parametrelerini ve etkileşim mantığını yöneterek, ana sahneye entegre edilebilir bir bileşen halinde sunar.
 - FlexibleDuctModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Venthub HVAC platformunun 3D ürün görselleştirme katmanında kullanılan, esnek kanalların 3D modellemesini yapan React bileşeni olan FlexibleDuctModel'in doğru çalışması için çalışma ortamı, gerekli bağımlılıkları ve giriş parametrelerinin eksiksiz olması zorunludur.
 
-[Aksiyom 1]: Eğer JSX desteğine sahip, React bileşenlerini çalıştırabilecek bir frontend runtime ortamı yoksa, bu bileşen hiçbir şekilde yüklenemez, esnek kanalın 3D modeli kullanıcıya görüntülenemez.
-[Aksiyom 2]: Eğer 3D modeli ana sahneye eklemek için gereken geçerli bir 3D motoru referansı bileşene prop olarak iletilmezse, esnek kanalın geometrik yapısı oluşturulamaz, ürün görselleştirmesi tamamen başarısız olur.
-[Aksiyom 3]: Eğer modele ait HVAC sistemine özgü temel geometrik parametreler (esnek kanala ait uzunluk, çap vb.) giriş olarak iletilmezse, 3D model gerçek ürün boyutlarına uygun şekilde oluşturulamaz, ürün temsili yanlış olur.
-[Aksiyom 4]: Eğer bileşenin üst component'ten aldığı görünürlük, seçilme durumu gibi temel etkileşim prop'ları eksiksiz iletilmezse, modelin kullanıcı işlemlerine uygun olarak gösterilmesi/gizlenmesi sağlanamaz, 3D ürün görünümünde kalıcı tutarsızlık oluşur.
+FlexibleDuctModel, parametresiz bir React bileşenidir; 3D sahnesi ve ilgili bağımlılıklar dış ortamdan sağlanır.
+
+[Aksiyom 1]: Eğer React canvas / WebGL bağlamı (Three.js sahnesi, kamera, ışıklandırma) bileşenin dışında hazırlanmamışsa, 3D render düzgün çalışmaz.
+
+[Aksiyom 2]: Eğer bileşenin Render Engine (örn. drei/fiber Three.js ortamı) içine yerleştirilmemişse, JSX içindeki 3D primitive'ler (mesh, geometri) hata ile karşılaşır veya görünmez kalır.
+
+[Aksiyom 3]: Eğer FlexibleDuctModel'e ait geometri modeli (buffer, vertices, material) yüklenememiş veya tanımlanmamışsa, bileşen boş/null bir sahne üretir.
+
+[Aksiyom 4]: Eğer bileşen React Suspense veya Error Boundary gibi bir sarmalayıcı tarafından korunmamışsa ve asenkron model yükleme başarısız olursa, üst bileşen ağacı render zinciri kırılır.
+
+[Aksiyom 5]: Eğer bileşenin bağımlı olduğu 3D kitaplık (Three.js / React Three Fiber) proje bağlamında yüklü değilse, modül hiç derlenemez.
 
 ---
 
@@ -43,55 +49,51 @@ Venthub HVAC platformunun 3D ürün görselleştirme katmanında kullanılan, es
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\FlexibleDuctModel.tsx::FlexibleDuctModel
+### [N1_NASIL] AST Pointer: FlexibleDuctModel.tsx::FlexibleDuctModel
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `_materials` — useFanMaterials hook'u ile alınan malzeme nesneleri topluluğu
-  - `meshRef` — Esnek kanalın ana gövde mesh'ine erişmek için kullanılan React ref nesnesi, THREE.Mesh tipinde
-  - `spiralRef` — Kanalın dışındaki spiral halka grubuna erişmek için kullanılan React ref nesnesi, THREE.Group tipinde
-  - `createWaveCurve` — Zaman değerine göre animasyonlu dalga eğrisi oluşturan iç yardımcı fonksiyon
-  - `useFrame` — React-three-fiber'in her frame'de çalışan güncelleme hook'u
-  - `initialCurve` — useMemo ile önbelleğe alınan, ilk render'da kullanılacak başlangıç dalga eğrisi
-  - `spiralCount` — Dış spiral yapıda oluşturulacak toplam halka sayısını belirten sabit
-- **Dönüş**: 3D sahneye eklenen esnek kanal modelini içeren React JSX group elemanı
+  - `_materials` — useFanMaterials() hook'unun döndürdüğü malzeme objesi (bileşen içinde kullanılmıyor)
+  - `meshRef` — Ana kanal gövdesi (tube) için React ref, THREE.Mesh referansı tutar
+  - `spiralRef` — Dış spiral halkaları için React ref, THREE.Group referansı tutar
+  - `createWaveCurve` — Dalga eğrisi oluşturmak için iç fonksiyon, time parametresi ile eğri oluşturur
+  - `initialCurve` — useMemo ile oluşturulan başlangıç eğrisi, createWaveCurve(0) çağrısı ile elde edilir
+  - `spiralCount` — Sabit değer 20, dış spiral halka sayısını belirtir
+- **Dönüş**: JSX elementi (group içinde tube mesh ve spiral halkalar)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\FlexibleDuctModel.tsx::createWaveCurve
-- **params**: [time: number] — Animasyon için kullanılan toplam geçen zaman değeri
+### [N2_NASIL] AST Pointer: FlexibleDuctModel.tsx::createWaveCurve
+- **params**: (time: number) — Animasyon zaman damgası
 - **ic_degiskenler**:
-  - `points` — Eğriyi oluşturan 3D vektör noktalarını depolayan dizi
-  - `segments` — Eğri için ayrılacak parça sayısını belirten sabit
-  - `i` — Segmentleri döngüleyen sayaç
-  - `t` - 0 ile 1 arasında normalize edilmiş segment konumu
-  - `x` — Noktanın X ekseni koordinatı
-  - `wavePhase` — Dalga hareketinin zamanla değişen fazını hesaplayan değer
-  - `waveAmplitude` — Dalganın Y eksenindeki maksimum genliğini hesaplayan değer
-  - `y` — Noktanın Y ekseni koordinatı, dalga hareketine göre dinamik değişir
-- **Dönüş**: Oluşturulan düzgün 3B eğri nesnesi, THREE.CatmullRomCurve3 tipinde
+  - `points` — THREE.Vector3[] türünde nokta dizisi, eğriyi oluşturmak için kullanılır
+  - `segments` — Sabit değer 30, eğrinin segment sayısını belirtir
+  - `t` — Döngü değişkeni, her bir noktanın oransal konumu (0-1 arası)
+  - `x` — Eğri noktalarının x koordinatı, t değerine bağlı olarak hesaplanır
+  - `wavePhase` — Dalga fazı, time ve t değerlerine bağlı olarak hesaplanır
+  - `waveAmplitude` — Dalga genliği, sinüs fonksiyonu ile hesaplanır
+  - `y` — Eğri noktalarının y koordinatı, dalga fazı ve genliğine bağlı olarak hesaplanır
+- **Dönüş**: THREE.CatmullRomCurve3 — Oluşturulan eğri nesnesi
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\FlexibleDuctModel.tsx::useFrame_callback
-- **params**: [state] — React-three-fiber tarafından sağlanan sahne state nesnesi, zamanlayıcı (clock) içerir
+### [N3_NASIL] AST Pointer: FlexibleDuctModel.tsx::useFrame_callback
+- **params**: (state) — useFrame hook'unun sağladığı state objesi
 - **ic_degiskenler**:
-  - `meshRef.current` — Referans edilen ana kanal mesh'inin güncel çalışma zamanı değeri
-  - `spiralRef.current` — Referans edilen spiral grubunun güncel çalışma zamanı değeri
-  - `time` — State.clock'tan alınan sahnenin toplam geçmiş süresi
-  - `curve` — Güncel zaman ile oluşturulan yeni dalga eğrisi
-  - `newGeometry` — Yeni eğriye göre oluşturulan THREE.TubeGeometry nesnesi, ana kanala atanır
-  - `spiralCount` — Spiral grubu içindeki toplam çocuk eleman (halka) sayısı
-  - `i` — Spiral halkalarını döngüleyen sayaç
-  - `t` — Mevcut spiral elemanının eğri üzerindeki normalize edilmiş konumu
-  - `point` — Eğri üzerindeki spiral elemanının konum vektörü
-  - `tangent` — Eğri üzerindeki noktanın teğet vektörü, rotasyon hesaplamak için kullanılır
-  - `child` — Döngüdeki mevcut spiral halka mesh'i
-  - `quaternion` — Spiral elemanının eğri teğetine göre rotasyonunu hesaplayan THREE.Quaternion nesnesi
-- **Dönüş**: void, referanslar yüklenmemişse erken return, aksi halde her frame'de kanal geometrisini ve spiral konumlarını günceller
+  - `time` — state.clock.elapsedTime, animasyonun geçen süresi
+  - `curve` — createWaveCurve(time) çağrısı ile oluşturulan güncellenmiş eğri
+  - `newGeometry` — curve kullanılarak oluşturulan yeni TubeGeometry nesnesi
+  - `spiralCount` — spiralRef.current.children.length, mevcut spiral halka sayısı
+  - `i` — Döngü değişkeni, spiral halkalarını dolaşmak için kullanılır
+  - `t` — Döngü içindeki oransal konum (0-1 arası)
+  - `point` — curve.getPoint(t) ile eğri üzerindeki belirli bir nokta
+  - `tangent` — curve.getTangent(t) ile eğrinin teğet vektörü
+  - `child` — spiralRef.current.children[i], döngüdeki mevcut spiral halka nesnesi
+  - `quaternion` — Yeni Quaternion nesnesi, halkanın rotasyonunu hesaplamak için kullanılır
+- **Dönüş**: yok (yan etkiler: meshRef.current.geometry güncellenir, spiral halkalarının pozisyonu ve rotasyonu güncellenir)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\FlexibleDuctModel.tsx::spiral_map_callback
-- **params**: [_, i] — Kullanılmayan dizi elemanı (_), spiral elemanının sıralı indeksi (i)
+### [N4_NASIL] AST Pointer: FlexibleDuctModel.tsx::Array_map_callback
+- **params**: (_, i) — Array.map callback parametreleri (değer, indeks)
 - **ic_degiskenler**:
-  - `key={i}` — React listelemesi için gereken benzersiz anahtar değeri
-  - `torusGeometry` — Spiral halka şekli için oluşturulan THREE.TorusGeometry nesnesi
-  - `meshStandardMaterial` — Spiral halkasına uygulanan üç boyutlu malzeme, renk, pürüzlülük ve metaliklik değerleri ayarlanmış
-- **Dönüş**: Her bir spiral halka için React JSX mesh elemanı
+  - `key` — i değeri, React listelemesi için benzersiz anahtar
+  - `torusGeometry args` — [0.29, 0.018, 8, 24] sabit değerleri, torus geometrisi parametreleri
+  - `meshStandardMaterial props` — color, roughness, metalness değerleri, malzeme özellikleri
+- **Dönüş**: JSX elementi (mesh içinde torusGeometry ve meshStandardMaterial)
 
 ---
 

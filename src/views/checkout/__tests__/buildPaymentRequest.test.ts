@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
-import { describe, it, expect } from 'vitest'
+import { describe, expect,it } from 'vitest'
+
 import { buildPaymentRequest } from '@/views/checkout/buildPaymentRequest'
 
 describe('buildPaymentRequest', () => {

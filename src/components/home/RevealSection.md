@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\RevealSection.tsx
-skeleton_hash: 3c04c6123362e9cb
+skeleton_hash: 1f8a96e34b715af3
 entity_hashes:
   func:RevealSection: ba33115191e442f1
   overview: 83509008900591e6
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:08Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış

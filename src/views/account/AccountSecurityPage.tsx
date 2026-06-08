@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import type { UserIdentity } from '@supabase/supabase-js'
-import { toast } from 'sonner'
-import { useAuth } from '../../hooks/useAuth'
-import { useI18n } from '@/i18n/I18nProvider'
-import { hibpPwnedCount } from '../../utils/passwordSecurity'
-import { ShieldCheck, Lock, Key, Check, Loader2, Mail, Link as LinkIcon, Unlink, Chrome } from 'lucide-react'
-
+import { Check, Chrome,Key, Link as LinkIcon, Loader2, Lock, Mail, ShieldCheck, Unlink } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+
+import { useI18n } from '@/i18n/I18nProvider'
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import { useAuth } from '../../hooks/useAuth'
+import { hibpPwnedCount } from '../../utils/passwordSecurity'
 export default function AccountSecurityPage() {
   const router = useRouter()
   const { user } = useAuth()

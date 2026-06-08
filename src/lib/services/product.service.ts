@@ -1,8 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+
 import type { Database } from '../../types/database.types'
-import type { DbProduct, DbAdminSearchResult } from '../../types/db-rows'
-import type { Product, SearchSuggestion, FtsProductResult, GetProductsParams } from '../../types/ui-models'
-import { toUIProductList, mapDatabaseProductToDomain } from '../type-converters'
+import type { DbAdminSearchResult,DbProduct } from '../../types/db-rows'
+import type { FtsProductResult, GetProductsParams,Product, SearchSuggestion } from '../../types/ui-models'
+import { mapDatabaseProductToDomain,toUIProductList } from '../type-converters'
 
 export async function getProductsEnriched(
   supabase: SupabaseClient<Database>,

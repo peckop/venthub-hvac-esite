@@ -8,7 +8,7 @@ entity_hashes:
   func:StrategicBrands: cf2c83a7b060b93b
   overview: 3329d9ad42f18a85
   style_tokens: 908950a4b058f189
-generated_at: 2026-05-28T22:36:04Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış  

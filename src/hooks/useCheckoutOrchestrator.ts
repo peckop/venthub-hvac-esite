@@ -1,19 +1,21 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useAuth } from './useAuth'
-import { useI18n } from '../i18n/I18nProvider'
+import { useCallback,useEffect, useState } from 'react'
+import { toast } from 'sonner'
+
 import { listAddresses } from '@/lib/services/address.service'
-import type { UserAddress, InvoiceProfile } from '@/types/ui-models'
-import { listInvoiceProfiles } from '../lib/services/invoice.service'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
+import type { InvoiceProfile,UserAddress } from '@/types/ui-models'
+
+import { useI18n } from '../i18n/I18nProvider'
+import { listInvoiceProfiles } from '../lib/services/invoice.service'
 import { 
-  CheckoutCustomerInfo, 
   CheckoutAddressInfo, 
+  CheckoutCustomerInfo, 
   CheckoutInvoiceInfo, 
   CheckoutLegalConsents 
 } from '../types/db-rows'
-import { toast } from 'sonner'
+import { useAuth } from './useAuth'
 
 export const useCheckoutOrchestrator = () => {
   const { user } = useAuth()

@@ -101,6 +101,9 @@ export const tr = {
     whatsappTitle: 'WhatsApp ile yaz',
     whatsappTooltip: 'Mühendislik Hattı',
     whatsappSupportMessage: 'Web sitesinden hızlı destek',
+    pdf: 'PDF',
+    sku: 'SKU',
+    pdfDatasheet: 'Teknik Döküman',
     whatsapp: {
       faqSupportMessage: 'Sıkça Sorulan Sorular sayfasında aradığım cevabı bulamadım...',
       supportMessageDefault: 'Merhaba, VentHub HVAC destek ekibiyle iletişime geçmek istiyorum.',
@@ -221,6 +224,7 @@ export const tr = {
       eyebrow: 'Technical Intelligence Unit',
       searchPlaceholder: 'Konu, teknik terim veya ürün ailesi ara...',
       readStart: 'Okumaya Başla',
+      heroAlt: 'Mühendislik Bilgi Merkezi Görseli',
       readTime: '{{count}} dk okuma',
       calculatorsSoon: 'Hesaplayıcılar Yakında',
       calculatorsSoonDesc: 'Mühendislik hesaplamalarınızı saniyeler içinde yapın.',
@@ -725,6 +729,11 @@ export const tr = {
     privacy: 'Gizlilik Politikası',
     terms: 'Kullanım Koşulları'
   },
+  legal: {
+    kvkkTitle: 'KVKK Aydınlatma Metni (Taslak)',
+    draftWarning: 'Bu metin taslaktır ve test amaçlıdır. Canlıya çıkmadan önce şirketinizin gerçek bilgileri ile güncelleyiniz ve bir hukukçudan teyit alınız.',
+    disclaimer: 'Bu metin hukuki danışmanlık niteliği taşımaz. Nihai metin için uzman görüşü almanız tavsiye edilir.'
+  },
   footer: {
     quickLinks: 'Hızlı Linkler',
     categories: 'Kategoriler',
@@ -766,7 +775,27 @@ export const tr = {
       metric2ValuePlaceholder: 'Örn: 1.5 kW',
       imageLabel: 'Kategori Görseli',
       clickToUpload: 'Yüklemek için tıklayın',
-      uploading: 'Yükleniyor...'
+      uploading: 'Yükleniyor...',
+      modalDesc: 'Kategori bilgilerini, SEO ayarlarını ve görsellerini yönetin.',
+      tabGeneral: 'Genel Bilgiler',
+      tabSeo: 'SEO & Pazarlama',
+      tabMetrics: 'Metrikler & Görünüm',
+      formName: 'Kategori Adı',
+      formSlug: 'Slug (URL)',
+      formParent: 'Üst Kategori',
+      parentNone: 'Ana Kategori (Yok)',
+      formSortOrder: 'Sıralama (Pozisyon)',
+      formDescription: 'Açıklama',
+      formSeoTitle: 'SEO Başlığı',
+      formSeoDesc: 'SEO Açıklaması',
+      formFeatured: 'Öne Çıkarılan Kategori',
+      formFeaturedDesc: 'Ana sayfada ve üst menüde vurgulanır',
+      imagePreviewAlt: 'Görsel önizleme',
+      cancel: 'Vazgeç',
+      updateCategory: 'Kategoriyi Güncelle',
+      createCategory: 'Kategori Oluştur',
+      editCategory: 'Kategoriyi Düzenle',
+      createNewCategory: 'Yeni Kategori Oluştur'
     },
     products: {
       form: {
@@ -1634,6 +1663,8 @@ export const tr = {
   brands: {
     sectionTitle: 'Premium HVAC Markaları',
     sectionSubtitle: 'Dünyanın önde gelen HVAC markalarının Türkiye distribütörü olarak en kaliteli havalandırma çözümlerini sunuyoruz.',
+    subtitlePart1: 'Dünya Devlerinin',
+    subtitlePart2: 'Güvenilir Partneri',
     viewAll: 'Tüm Markaları Gör',
     pageTitle: 'Markalar',
     pageSubtitle: 'Dünyanın en prestijli HVAC üreticilerinin yetkili temsilcisi olarak, mühendislik harikası çözümleri projelerinizle buluşturuyoruz.',
@@ -1649,7 +1680,8 @@ export const tr = {
       title: 'Doğrudan Üreticiden Güvenceli Tedarik',
       description: 'Tüm markalarımızla olan doğrudan stratejik ortaklığımız sayesinde, en yeni teknolojilere, tam teknik desteğe ve en rekabetçi termin sürelerine sahip olursunuz.',
       original: '100% Orijinal Ürün',
-      standard: 'Global Standart Uyumu'
+      standard: 'Global Standart Uyumu',
+      imageAlt: 'Teknik Altyapı ve HVAC Kurulumu'
     },
     detail: {
       heritage: 'Mühendislik Mirası',
@@ -2012,7 +2044,15 @@ export const tr = {
       catalog: 'Kategori Katalogu',
       subGroups: 'Alt Ürün Grupları',
       exploreSeries: 'Serileri İncele',
-      guarantee: 'VentHub Güvencesi'
+      guarantee: 'VentHub Güvencesi',
+      discover: 'Keşfet',
+      whyVenthubTitle: 'Neden VentHub Mühendisliği?',
+      premiumEngineeringAlt: 'Premium Mühendislik Görseli',
+      features: [
+        { title: 'Endüstriyel Sertifikasyon', desc: 'Uluslararası testlerden geçmiş, tam onaylı sistemler.' },
+        { title: 'Yüksek Performans', desc: 'Aerodinamik tasarım ile maksimum verimlilik ve düşük enerji tüketimi.' },
+        { title: 'Akıllı Kontrol', desc: 'BMS ve merkezi otomasyon sistemleriyle kusursuz entegrasyon.' }
+      ]
     },
     discoverMore: 'Devamını Keşfet',
     whichAirCurtain: 'Hangi Hava Perdesini Seçmelisiniz?',
@@ -2039,6 +2079,25 @@ export const tr = {
     chooseSeriesDesc: 'İhtiyacınıza uygun seriyi seçin',
     inspectSeries: 'Seriyi İncele',
     whyCategory: 'Neden {{category}}?',
+    electricVsAmbientAlt: 'Elektrikli vs Ortam Havalı Karşılaştırma',
+    modernLoftAlt: 'Modern Loft Uygulaması',
+    lineoQuietQuote: 'Lineo Quiet ES, sadece bir fan değil; modern mimarinin sessiz kahramanıdır.',
+    industrialLabAlt: 'Endüstriyel Laboratuvar Uygulaması',
+    lineoTechnicalAlt: 'Linieo Quiet Teknik Detay',
+    lineoNeonAlt: 'Lineo Quiet Neon Mühendislik Tasarımı',
+    vorticeHeritageAlt: 'Vortice Lineo Marka Mirası ve Geçmişi',
+    airCurtainDiagramAlt: 'Hava Perdesi Çalışma Prensibi',
+    whyCategorySubtitle: 'Endüstriyel standartlarda üretim ve yüksek mühendislik çözümleriyle projelerinize değer katıyoruz.',
+    lineoTechnologyTitle: 'Vortice Lineo Quiet ES Teknolojisi',
+    howItWorksTitle: 'Nasıl Çalışır?',
+    lineoTechnologyDesc: 'Sessizlik ve performansın mükemmel uyumu. Gelişmiş aerodinamik tasarım ile tanışın.',
+    howItWorksDesc: 'Hava perdesi, görünmez bir bariyer oluşturarak iç ve dış ortamı birbirinden ayırır.',
+    why1Title: 'Yüksek Verimlilik',
+    why1Desc: 'ErP standartlarına uygun enerji tasarrufu sağlayan motor teknolojisi.',
+    why2Title: 'Sessiz Çalışma',
+    why2Desc: 'Özel akustik izolasyon ve aerodinamik fan tasarımı.',
+    why3Title: 'Uzun Ömür',
+    why3Desc: 'Korozyona dayanıklı gövde ve ağır hizmet tipi bileşenler.',
     airflow: 'Hava Debisi (m³/h)',
     brands: 'Markalar',
     clean: 'Temizle',
@@ -2067,7 +2126,67 @@ export const tr = {
     sortByPriceHigh: 'Fiyat: Yüksekten Düşüğe',
     sortByPriceLow: 'Fiyat: Düşükten Yükseğe',
     subcategories: 'Alt Kategoriler',
-    techFilters: 'Teknik Filtreler'
+    techFilters: 'Teknik Filtreler',
+    howItWorksAirCurtain: {
+      title: 'Hava Perdesi Nasıl Çalışır?',
+      subtitle: 'Basit ama etkili bir prensip: Görünmez hava duvarı',
+      diagramAlt: 'Hava Perdesi Çalışma Prensibi',
+      steps: [
+        {
+          title: 'Güçlü Hava Akışı',
+          description: 'Cihaz, yüksek hızda kontrollü bir hava akışı oluşturur.',
+          detail: 'Özel tasarımlı fan ve kanatlar sayesinde düzgün ve güçlü bir hava akımı sağlanır.'
+        },
+        {
+          title: 'Görünmez Bariyer',
+          description: 'Hava akışı, kapı açıklığında görünmez bir perde oluşturur.',
+          detail: 'Bu hava perdesi, iç ve dış ortamı fiziksel bir engel olmadan birbirinden ayırır.'
+        },
+        {
+          title: 'İzolasyon',
+          description: 'Dış hava, toz, böcek ve koku içeri giremez.',
+          detail: 'İç ortam sıcaklığı korunur, hijyen standartları sağlanır.'
+        },
+        {
+          title: 'Konfor',
+          description: 'Müşteriler ve çalışanlar için ideal ortam sağlanır.',
+          detail: 'Kapı açık kalsa bile iç mekan konforu bozulmaz.'
+        }
+      ]
+    },
+    vorticeBrand: {
+      italianEngineering: 'İtalyan Mühendisliği',
+      whyVortice: 'Neden Vortice?',
+      description1: '1954 yılında Milano\'da kurulan Vortice, 70 yılı aşkın süredir dünya genelinde havalandırma teknolojisinin öncüsü olmuştur.',
+      description2: 'Attilio Pagani tarafından kurulan şirket, ilk ürünüyle İtalya\'nın en prestijli tasarım ödülü Compasso d\'Oro\'yu kazanmıştır. Bugün 90\'dan fazla ülkede milyonlarca kullanıcıya hizmet vermektedir.',
+      authorizedDealer: 'Yetkili Bayi',
+      ceCertified: 'CE Sertifikalı',
+      warranty2y: '2 Yıl Garanti',
+      premiumComfort: 'Premium Konfor',
+      authorizedDealerNotice: 'VentHub, Vortice ürünlerinin Türkiye yetkili satıcısıdır.',
+      highlights: [
+        {
+          value: '70+',
+          label: 'Yıl Deneyim',
+          desc: '1954\'ten beri havalandırma'
+        },
+        {
+          value: '90+',
+          label: 'Ülke',
+          desc: 'Global dağıtım ağı'
+        },
+        {
+          value: '3x',
+          label: 'Compasso d\'Oro',
+          desc: 'İtalya\'nın en prestijli tasarım ödülü'
+        },
+        {
+          value: '#1',
+          label: 'Avrupa',
+          desc: 'Havalandırma sektöründe lider'
+        }
+      ]
+    }
   },
   pdp: {
     loading: 'Ürün yükleniyor...',
@@ -2120,7 +2239,9 @@ export const tr = {
       noise: 'Ses Seviyesi',
       noSpecsAvailable: 'Bu ürün için teknik özellik bulunmamaktadır.',
       technicalDatasheet: 'TEKNİK VERİ SAYFASI',
-      engineeringAnalysis: 'Mühendislik Analizi'
+      engineeringAnalysis: 'Mühendislik Analizi',
+      sku: 'SKU',
+      datasheetPdf: 'TEKNİK DÖKÜMAN (PDF)'
     },
     features: {
       materialQuality: 'Birinci sınıf malzeme ve üretim kalitesi',
@@ -3145,5 +3266,16 @@ export const tr = {
     },
     subtitle: 'Altyapımız, güvenliğimiz ve süreçlerimiz şeffaf ve standartlara uygundur.',
     title: 'Güven & Uyum'
+  },
+  beforeAfterSlider: {
+    title: 'Öncesi / Sonrası',
+    subtitle: 'Uygulama etkisini hızlıca görün',
+    ariaLabel: 'Öncesi / sonrası karşılaştırma',
+    rangeAriaLabel: 'Karşılaştırma konumu'
+  },
+  undecidedUserCta: {
+    title: 'Hangi ürünün projenize uygun olduğundan emin değil misiniz?',
+    description: 'Projenizin detaylarını uzman mühendislerimizle paylaşın. Hava debisi, basınç kayıpları ve yönetmeliklere uygun en doğru fan seçimini sizin için yapalım.',
+    buttonText: 'Uzman Desteği Alın'
   }
 };

@@ -7,7 +7,7 @@ skeleton_hash: 65924fd41c1d17d7
 entity_hashes:
   func:useCart: 24a780c5d0077b33
   overview: a6bb925fcf63c562
-generated_at: 2026-05-28T22:37:41Z
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
@@ -25,10 +25,6 @@ Uygulamanın tüm bölümlerinden erişilebilen, sepet verisiyle ilgili tüm dur
 Fonksiyon gövdesi (function body) sağlanmadığından, bu modüle özgü somut mimari varsayımlar çıkarılamamıştır. Aşağıda yalnızca fonksiyon imzasından türetilen minimal aksiyomlar yer almaktadır:
 
 **[Aksiyom 1]:** Eğer `useCart()` bir React hook olarak çağrılmıyorsa (React bileşen içi veya başka bir hook içinde değilse), React Hook kuralları ihlal edilir ve beklenmeyen davranış oluşur.
-
----
-
-> ⚠️ **Not:** Gerçek fonksiyon gövdesi (içerik, state tanımlamaları, return yapısı, bağımlılıklar) paylaşılmadığı için, bu modülün hangi state management aracını kullandığı, ne döndürdüğü, hangi API'leri çağırdığı veya hangi dış bağımlılıklara sahip olduğu **bilinmiyor** olarak değerlendirilmiştir. Somut aksiyon üretmek için fonksiyon gövdesinin tamamı gereklidir.
 
 ---
 

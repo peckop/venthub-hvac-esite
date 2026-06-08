@@ -1,18 +1,19 @@
 'use client';
-import { Routes } from '../../utils/routes'
-
-import VentImage from '@/components/ui/VentImage'
-import React, { useState } from 'react'
+import { Activity, ArrowRight, ChevronDown, Layers,ShieldCheck, ThermometerSun, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, ThermometerSun, ChevronDown, Zap, Activity, ShieldCheck, Layers } from 'lucide-react'
-import { getCategoryIcon } from '../../utils/getCategoryIcon'
+import React, { useState } from 'react'
+
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
 import { BottomCTA } from '@/components/category/sections'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
-import { DomainCategory } from '../../lib/type-converters'
-import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
-import { useI18n } from '@/i18n/I18nProvider'
+import VentImage from '@/components/ui/VentImage'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
+import { useI18n } from '@/i18n/I18nProvider'
+
+import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { DomainCategory } from '../../lib/type-converters'
+import { getCategoryIcon } from '../../utils/getCategoryIcon'
+import { Routes } from '../../utils/routes'
 
 interface CategoryShowcaseProps {
     category: DomainCategory
@@ -26,7 +27,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     onSubcategorySelect
 }) => {
     const router = useRouter()
-    const { t } = useI18n()
+    const { t, dict } = useI18n()
     const { wrapCategory } = useCategoryViewModel()
     const [wizardOpen, setWizardOpen] = useState(false)
     
@@ -49,7 +50,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
 
     // Breadcrumb (VENTHUB SIGNATURE - FIXED LOCATION)
     const breadcrumbItems = [
-        { label: 'Ana Sayfa', href: '/' },
+        { label: t('category.breadcrumbHome'), href: '/' },
         { label: vm?.displayName || category.name, href: Routes.category(category.slug) }
     ]
 
@@ -110,7 +111,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                     onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
                     className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
                 >
-                    <span className="text-xs uppercase tracking-widest font-bold">Keşfet</span>
+                    <span className="text-xs uppercase tracking-widest font-bold">{t('category.showcase.discover')}</span>
                     <ChevronDown className="w-5 h-5" />
                 </button>
             </section>
@@ -162,27 +163,32 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                 <ShieldCheck size={16} />
                                 <span>{t('category.showcase.guarantee')}</span>
                             </div>
-                            <h2 className="text-5xl font-light tracking-tight mb-12">Neden <span className="font-medium italic">VentHub Mühendisliği?</span></h2>
+                            <h2 className="text-5xl font-light tracking-tight mb-12">
+                                {dict.category.showcase.whyVenthubTitle.split('VentHub')[0]}
+                                <span className="font-medium italic">
+                                    VentHub
+                                    {dict.category.showcase.whyVenthubTitle.split('VentHub')[1] || ''}
+                                </span>
+                            </h2>
                             <div className="space-y-10">
-                                {[
-                                    { icon: ShieldCheck, title: 'Endüstriyel Sertifikasyon', desc: 'Uluslararası testlerden geçmiş, tam onaylı sistemler.' },
-                                    { icon: Activity, title: 'Yüksek Performans', desc: 'Aerodinamik tasarım ile maksimum verimlilik ve düşük enerji tüketimi.' },
-                                    { icon: Zap, title: 'Akıllı Kontrol', desc: 'BMS ve merkezi otomasyon sistemleriyle kusursuz entegrasyon.' }
-                                ].map((item, i) => (
-                                    <div key={i} className="flex gap-6 group">
-                                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500">
-                                            <item.icon size={24} />
+                                {[ShieldCheck, Activity, Zap].map((Icon, i) => {
+                                    const item = dict.category.showcase.features[i]
+                                    return (
+                                        <div key={i} className="flex gap-6 group">
+                                            <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500">
+                                                <Icon size={24} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xl font-bold mb-2">{item.title}</h4>
+                                                <p className="text-slate-400 font-light leading-relaxed">{item.desc}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h4 className="text-xl font-bold mb-2">{item.title}</h4>
-                                            <p className="text-slate-400 font-light leading-relaxed">{item.desc}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                    )
+                                })}
                             </div>
                         </div>
                         <div className="relative aspect-square rounded-hvac-3xl overflow-hidden border border-white/10 shadow-2xl">
-                            <VentImage src={heroImage} alt="Premium Engineering" className="object-cover opacity-60" fill />
+                            <VentImage src={heroImage} alt={dict.category.showcase.premiumEngineeringAlt} className="object-cover opacity-60" fill />
                         </div>
                     </div>
                 </div>

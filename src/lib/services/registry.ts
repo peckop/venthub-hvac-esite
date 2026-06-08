@@ -1,67 +1,56 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+
 import type { Database } from '@/types/database.types'
 import type { TablesInsert } from '@/types/database.types'
-
-import {
-  listAddresses,
-  createAddress,
-  updateAddress,
-  deleteAddress,
-  setDefaultAddress
-} from './address.service'
 import type { DbUserAddressInsert, DbUserAddressUpdate } from '@/types/db-rows'
-
-import {
-  getOrCreateShoppingCart,
-  listCartItems,
-  listCartItemsWithProducts,
-  upsertCartItem,
-  removeCartItem,
-  clearCartItems
-} from './cart.service'
-
-import { getCategories } from './category.service'
-
-import {
-  listInvoiceProfiles,
-  createInvoiceProfile,
-  updateInvoiceProfile,
-  deleteInvoiceProfile,
-  setDefaultInvoiceProfile,
-  fetchDefaultInvoiceProfile
-} from './invoice.service'
 import type { DbInvoiceProfileInsert, DbInvoiceProfileUpdate } from '@/types/db-rows'
-
-import {
-  getEffectiveUnitPrice,
-  getEffectivePriceInfo
-} from './pricing.service'
-
-import {
-  getProductsEnriched,
-  getSearchSuggestions,
-  ftsSearchProducts,
-  getProducts,
-  getAllProducts,
-  getProductsByCategory,
-  getProductsBySubcategory,
-  getProductById,
-  getProductBySlugOrId,
-  getProductBySlug,
-  getFeaturedProducts,
-  searchProducts,
-  adminSearchProducts
-} from './product.service'
 import type { Product } from '@/types/ui-models'
 
 import {
-  listUserProjects,
+  createAddress,
+  deleteAddress,
+  listAddresses,
+  setDefaultAddress,
+  updateAddress} from './address.service'
+import {
+  clearCartItems,
+  getOrCreateShoppingCart,
+  listCartItems,
+  listCartItemsWithProducts,
+  removeCartItem,
+  upsertCartItem} from './cart.service'
+import { getCategories } from './category.service'
+import {
+  createInvoiceProfile,
+  deleteInvoiceProfile,
+  fetchDefaultInvoiceProfile,
+  listInvoiceProfiles,
+  setDefaultInvoiceProfile,
+  updateInvoiceProfile} from './invoice.service'
+import {
+  getEffectivePriceInfo,
+  getEffectiveUnitPrice} from './pricing.service'
+import {
+  adminSearchProducts,
+  ftsSearchProducts,
+  getAllProducts,
+  getFeaturedProducts,
+  getProductById,
+  getProductBySlug,
+  getProductBySlugOrId,
+  getProducts,
+  getProductsByCategory,
+  getProductsBySubcategory,
+  getProductsEnriched,
+  getSearchSuggestions,
+  searchProducts} from './product.service'
+import {
+  addProductToProject,
   createProject,
   deleteProject,
-  addProductToProject,
-  removeProductFromProject,
-  listProjectItems
-} from './project.service'
+  listProjectItems,
+  listUserProjects,
+  removeProductFromProject} from './project.service'
 
 export class AddressService {
   constructor(private supabase: SupabaseClient<Database>) {}

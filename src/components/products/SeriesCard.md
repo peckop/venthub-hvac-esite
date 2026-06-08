@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\SeriesCard.tsx
-skeleton_hash: d5dbc3aad85a1db0
+skeleton_hash: ea5f0023d6cb79d7
 entity_hashes:
   func:SeriesCard: cf8b7a8f3470f163
   overview: d4236c58f6d08940
   style_tokens: f167f421a986922b
-generated_at: 2026-05-28T22:37:11Z
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,8 @@ Kendisine iletilen seri adı, görseli, ürün sayısı, en düşük fiyat ve y�
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 

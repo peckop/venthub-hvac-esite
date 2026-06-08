@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\AdminEmptyState.tsx
-skeleton_hash: 05a2a1042b4522e9
+skeleton_hash: 431d118c1d7d127a
 entity_hashes:
   func:AdminEmptyState: 0a5636f5d0d24f8e
   overview: a8e9e23763cc1b0a
   style_tokens: 18a94c8091a667ca
-generated_at: 2026-05-28T22:35:33Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış
@@ -30,10 +30,6 @@ Bu modül için fonksiyon gövdesi (implementation body) verilmemiştir; dolayı
 - `icon: Parametre`, bir React bileşeni olarak geçirilmektedir (büyük harfle başlaması nedeniyle).
 
 Ancak bu parametrelerin zorunlu olup olmadığı, hangi durumlarda hata fırlatıldığı veya hangi koşullarda farklı render dalına geçildiği **bilinmiyor** çünkü fonksiyon gövdesi paylaşılmamıştır.
-
----
-
-*Not: Tam aksiyon üretmek için `AdminEmptyState` fonksiyonunun gövdesi (return bloğu, koşullu kontroller, varsayılan değer atamaları) gereklidir.*
 
 ---
 

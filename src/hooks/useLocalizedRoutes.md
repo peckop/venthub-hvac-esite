@@ -9,7 +9,7 @@ entity_hashes:
   func:localizeUrl: cc0ed6edc9446b73
   func:useLocalizedRoutes: d8dba6cf829a1dea
   overview: 97bf2a088d5e0b24
-generated_at: 2026-06-07T11:02:13Z
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış

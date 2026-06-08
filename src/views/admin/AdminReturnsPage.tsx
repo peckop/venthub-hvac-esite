@@ -1,31 +1,33 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { useAuth } from '../../hooks/useAuth'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import { useI18n } from '../../i18n/I18nProvider'
-import { useRouter, usePathname } from 'next/navigation'
-import { Routes } from '../../utils/routes'
-import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
+"use no memo";
+import { CheckCircle, ChevronRight, Clock, Package, RefreshCw,Truck, XCircle } from 'lucide-react'
+import { Undo2 } from 'lucide-react'
+import { usePathname,useRouter } from 'next/navigation'
+import React, { useCallback,useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { syncOrderFromReturn } from '../../lib/orderStatusService'
-import { 
-  adminSectionTitleClass, 
-  adminSubtitleClass,
-  adminTableHeadCellClass, 
-  adminTableCellClass, 
-  adminCardClass, 
-  adminTableActionPrimaryClass,
-  adminButtonSecondaryClass 
-} from '../../utils/adminUi'
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
-import { formatDateTime, formatDate, formatTime } from '../../i18n/datetime'
-import { formatCurrency } from '../../i18n/format'
-import { useRole } from '../../hooks/useRole'
-import AdminSkeleton from '../../components/admin/AdminSkeleton'
-import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import { Undo2 } from 'lucide-react'
+import { useAuth } from '../../hooks/useAuth'
 import { useDragScroll } from '../../hooks/useDragScroll'
+import { useRole } from '../../hooks/useRole'
+import { formatDate, formatDateTime, formatTime } from '../../i18n/datetime'
+import { formatCurrency } from '../../i18n/format'
+import { useI18n } from '../../i18n/I18nProvider'
+import { syncOrderFromReturn } from '../../lib/orderStatusService'
+import { 
+  adminButtonSecondaryClass, 
+  adminCardClass, 
+  adminSectionTitleClass, 
+  adminSubtitleClass,
+  adminTableActionPrimaryClass,
+  adminTableCellClass, 
+  adminTableHeadCellClass} from '../../utils/adminUi'
+import { Routes } from '../../utils/routes'
 
 interface ReturnWithOrder {
   id: string

@@ -1,5 +1,6 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
+import React, { Component, ErrorInfo, ReactNode } from 'react'
+
 import { I18nContext } from '../i18n/I18nContext'
 
 interface Props {

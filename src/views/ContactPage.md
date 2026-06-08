@@ -3,37 +3,43 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ContactPage.tsx
-skeleton_hash: 485416222821ec4f
+skeleton_hash: a75cc095aa8a4a35
 entity_hashes:
   func:ArrowRight: 1546741fbe749202
   func:ContactPage: a5b3030a0864a814
   func:handleSubmit: 460293fdfa9263b6
-  overview: d36d38f2c5628948
+  overview: 060d74556606246c
   style_tokens: 21b7b2d66d6de05a
-generated_at: 2026-05-28T22:40:06Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
-## Genel Bakış  
-`ContactPage` bir tek sayfa React bileşenidir; kullanıcıdan e‑posta, telefon ve mesaj bilgilerini toplar, form gönderildiğinde bu verileri işleyen bir asenkron fonksiyon çağırır. Sayfa, basit bir stil ve yönlendirme ikonu içerir.
+## Genel Bakış
+Bu modül, VentHub uygulamasının iletişim sayfasını temsil eden tek bir React bileşeninden oluşur. Temel amacı, kullanıcıdan iletişim formu verilerini (e-posta, telefon, mesaj) toplayarak bu bilgileri sunucuya göndermektir.
 
-## Fonksiyon Grupları  
+## Fonksiyon Grupları
+### Ana Sayfa Bileşeni
+Modülün ana yapısını ve kullanıcı arayüzünü oluşturur; form alanlarını, başlığı ve gönderme butonunu render eder.
+- ContactPage
 
-### Sayfa Bileşeni  
-`ContactPage` sayfanın ana yapısını oluşturur, form alanlarını ve gönderme butonunu render eder.  
-- ContactPage  
+### Form Veri İşleme
+Kullanıcı formu gönderdiğinde tetiklenen mantıksal akışı yönetir; form verilerini toplar, doğrular ve bir eylem (örn. sunucuya gönderme) başlatır.
+- handleSubmit
 
-### Form İşleme  
-`handleSubmit` form gönderildiğinde tetiklenir, e‑postayı, telefonu ve mesajı alır, gerekli doğrulamaları yapar ve sunucuya gönderir.  
-- handleSubmit  
-
-### Yardımcı Bileşen  
-`ArrowRight` basit bir ok ikonunu, varsayılan 16 piksel boyutuyla render eder; sayfanın navigasyon veya butonlarında kullanılır.  
+### Yardımcı UI Bileşenleri
+Sayfa içinde tekrar kullanılabilen, küçük ve tek sorumlu görsel öğeleri sağlar.
 - ArrowRight
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon gövdeleri erişime açık değildir.
+
+**[Aksiyom 1]**: Eğer `handleSubmit` fonksiyonu `React.FormEvent` parametresi almıyorsa, form gönderim olayı doğru yakalanamaz ve kullanıcı girişleri işlenemez.
+
+**[Aksiyom 2]**: Eğer `ArrowRight` bileşeni `size` parametresi desteklemiyorsa, bileşen farklı bağlamda (buton, başlık vb.) kullanıldığında boyut ayarlanamaz ve tutarsız render oluşur.
+
+**[Aksiyom 3]**: Eğer `ContactPage` bileşeni bir React form elemanı içermiyorsa, `handleSubmit` hiçbir zaman tetiklenemez ve sayfa işlevsiz kalır.
 
 ---
 
@@ -73,34 +79,31 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\ContactPage.tsx::ContactPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: ContactPage.tsx::ContactPage
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook’inden dönen çeviri fonksiyonu, metinleri yerelleştirmek için kullanılır.
-  - `formSubmitted` — formun gönderilip gönderilmediğini tutan boolean state, başlangıçta `false`.
-  - `setFormSubmitted` — `formSubmitted` state’ini güncelleyen setter fonksiyonu.
-  - `whatsappLink` — `getSupportLink(t('common.whatsapp.supportMessageDefault'))` ifadesiyle oluşturulan WhatsApp destek URL’si.
-  - `heroBadgeRef` — `useScrollAnimation` hook’u tarafından döndürülen element referansı, hero badge için kaydırma animasyonu.
-  - `heroBadgeVisible` — hero badge’ın görünürlük durumu (boolean) aynı hook’tan.
-  - `contactGridRef` — iletişim kartları grid’i için element referansı, kaydırma animasyonu.
-  - `contactGridVisible` — grid’in görünürlük durumu (boolean) aynı hook’tan.
-  - `formSuccessRef` — form gönderiminden sonra gösterilen başarı mesajı için element referansı, kaydırma animasyonu.
-  - `formSuccessVisible` — başarı mesajının görünürlük durumu (boolean) aynı hook’tan.
-  - `contactCards` — her bir iletişim kartının `icon`, `title`, `value`, `href`, `label` alanlarını içeren dizi.
-  - `handleSubmit` — form gönderildiğinde çalıştırılan async fonksiyon (aşağıda ayrı olarak tanımlanmıştır).
-- **Dönüş**: React bileşeni JSX döndürür (`React.ReactNode`). Bileşen yan etkisizdir; sadece UI render eder ve kullanıcı etkileşimlerine (form gönderimi, link tıklamaları) yanıt verir.
+  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
+  - `formSubmitted` — form gönderim durumunu tutan state değişkeni
+  - `setFormSubmitted` — formSubmitted state'ini güncelleyen setter fonksiyonu
+  - `whatsappLink` — getSupportLink() ile oluşturulan WhatsApp destek bağlantısı
+  - `heroBadgeRef` — Hero badge bölümü için ref nesnesi
+  - `heroBadgeVisible` — Hero badge bölümünün görünür olup olmadığını belirten boolean
+  - `contactGridRef` — İletişim kartları grid'i için ref nesnesi
+  - `contactGridVisible` — İletişim kartlarının görünür olup olmadığını belirten boolean
+  - `formSuccessRef` — Form başarı mesajı bölümü için ref nesnesi
+  - `formSuccessVisible` — Form başarı mesajının görünür olup olmadığını belirten boolean
+  - `contactCards` — İletişim bilgilerini tutan dizi (Phone, Mail, MapPin ikonları ile)
+- **Dönüş**: React.JSX.Element (sayfa yapısı)
 
-### [N2_NASIL] AST Pointer: src\views\ContactPage.tsx::handleSubmit
-- **params**: `e` — `React.FormEvent` tipinde form submit olayı.
-- **ic_degiskenler**:
-  - `e` — form submit olay nesnesi; `preventDefault()` ile varsayılan form gönderimi engellenir.
-- **Dönüş**: `void` (yok). Fonksiyon, `setFormSubmitted(true)` çağrısı ile `formSubmitted` state’ini `true` yapar; bu da UI’da başarı mesajının gösterilmesini tetikler.
+### [N2_NASIL] AST Pointer: ContactPage.tsx::handleSubmit
+- **params**: (e: React.FormEvent)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void (formSubmitted state'ini true yapar)
 
-### [N3_NASIL] AST Pointer: src\views\ContactPage.tsx::ArrowRight
-- **params**: `size = 16` — opsiyonel parametre, ikonun genişlik ve yüksekliğini belirler; varsayılan değer 16.
-- **ic_degiskenler**:
-  - `size` — SVG’nin `width` ve `height` özniteliklerine atanır; ikonun boyutunu kontrol eder.
-- **Dönüş**: `React.ReactNode` (JSX). `size` değerine göre ayarlanmış bir SVG elementi döndürür.
+### [N3_NASIL] AST Pointer: ContactPage.tsx::ArrowRight
+- **params**: ({ size = 16 })
+- **ic_degiskenler**: (yok)
+- **Dönüş**: React.JSX.Element (SVG ok ikonu)
 
 ---
 

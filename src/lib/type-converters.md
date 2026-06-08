@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts
-skeleton_hash: 1ee7cdb2fc5748ed
+skeleton_hash: e21d31f12838b8e3
 entity_hashes:
   func:isRecord: 9a2880b352f34e74
   func:mapCategoryWithLocale: b422ccbc9ea334f8
@@ -12,28 +12,26 @@ entity_hashes:
   func:toSupabaseJson: 23958b955001ea94
   func:toUICategoryList: 9721c9c2f6b7b799
   func:toUIProductList: a473c58e2b2833ca
-  overview: ed7319ca6bf134d4
-generated_at: 2026-05-28T22:38:34Z
+  overview: d299bc1749a66082
+generated_at: 2026-06-08T10:10:57Z
 ---
 
 ## Genel Bakış
-
-Bu modül, veritabanı ile uygulama arasında veri transferi sırasında tip dönüştürme işlemlerini merkezi olarak yönetir. Supabase'e gönderilecek verilerin JSON serileştirilmesi ve veritabanı tiplerinin uygulama içi kullanım için hazırlanmış domain tiplerine çevrilmesi temel sorumluluklarıdır.
+Bu modül, Supabase veritabanı ile uygulama arasındaki veri akışını kolaylaştıran merkezi bir dönüşüm katmanıdır. Ham veritabanı kayıtlarını uygulama içinde kullanıma uygun, zenginleştirilmiş domain nesnelerine dönüştürmek ve dış servislere gönderilecek verileri JSON formatına hazırlamak temel sorumluluklarıdır.
 
 ## Fonksiyon Grupları
-
-### Veritabanı → Domain Dönüşümleri
-Tek bir veritabanı kaydını karşılık gelen domain nesnesine dönüştürür. Kategori ve ürün olmak üzere iki temel varlık tipi için ayrı haritalama fonksiyonları bulunur; dil desteği gerektiğinde locale bilgisi de işlenir.
+### Veritabanı Kayıtlarını Domain Nesnelerine Dönüştürme
+Tek bir veritabanı kaydını (kategori veya ürün) karşılık gelen uygulama içi domain nesnesine dönüştürür. Dil desteği gerektiğinde locale ayarına göre alanları haritalandırarak zenginleştirilmiş bir nesne oluşturur.
 
 - `mapDatabaseCategoryToDomain`, `mapDatabaseProductToDomain`, `mapCategoryWithLocale`
 
-### Toplu Dönüştürücüler
-Birden fazla veritabanı kaydını aynı anda domain nesnesi listesine dönüştürerek UI katmanına hazır hale getirir. Tekli haritalama fonksiyonlarını döngü içinde çağırarak toplu dönüşümü basitleştirir.
+### Toplu Dönüşüm İşlemleri
+Birden fazla veritabanı kaydını (kategori listesi veya ürün listesi) aynı anda domain nesneleri koleksiyonuna dönüştürerek UI katmanına veri sağlamak için gerekli toplu dönüşümü basitleştirir.
 
 - `toUICategoryList`, `toUIProductList`
 
-### Serileştirme ve Yardımcı Araçlar
-Dış servislere gönderilecek verilerin JSON formatına dönüştürülmesi ve girdi değerlerinin nesne (record) tipinde olup olmadığının kontrolü gibi alt düzey yardımcı işlemleri sağlar.
+### Yardımcı Dönüştürme ve Doğrulama Araçları
+Verileri dış servislere (Supabase) gönderilmek üzere JSON formatına serileştirmek ve girdi değerlerinin nesne yapısında olup olmadığını kontrol etmek için gerekli düşük seviyeli yardımcı araçları sağlar.
 
 - `toSupabaseJson`, `isRecord`
 
@@ -41,21 +39,21 @@ Dış servislere gönderilecek verilerin JSON formatına dönüştürülmesi ve 
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, veritabanı tiplerini uygulama katmanı tiplerine dönüştüren bir veri dönüşüm modülüdür. Doğru çalışması için aşağıdaki varsayımlar geçerlidir.
+Bu modül, veritabanı tiplerinden uygulama içi domain tiplerine veri dönüşümü yaptığı için, girdi verilerinin beklenen yapıda (shape) olması temel varsayımdır. Aksi takdirde dönüşüm hataları, eksik veriler veya çalışma zamanı hataları oluşur.
 
-**[Aksiyom 1]**: Eğer `DbCategory` veya `DbProduct` tipleri tanımlı değilse, `mapDatabaseCategoryToDomain`, `mapDatabaseProductToDomain`, `mapCategoryWithLocale`, `toUICategoryList` ve `toUIProductList` fonksiyonları derleme hatası verir.
+[Aksiyom 1]: Eğer `toSupabaseJson` fonksiyonuna geçilen `data` parametresi, JavaScript nesne serileştirme (JSON.stringify) işlemine uygun, döngüsel referans içermeyen geçerli bir veri yapısı değilse, fonksiyon beklenmeyen bir hata fırlatır veya geçersiz bir JSON dizesi üretir.
 
-**[Aksiyom 2]**: Eğer `mapCategoryWithLocale` fonksiyonuna `lang` parametresi olarak `'tr'` veya `'en'` dışında bir değer verilirse, fonksiyonun davranışı tanımsızdır (TypeScript derleme aşamasında engellenir).
+[Aksiyom 2]: Eğer `isRecord` fonksiyonuna geçilen `value` parametresi `null` veya `undefined` ise, fonksiyon `false` döndürür.
 
-**[Aksiyom 3]**: Eğer `toUICategoryList` veya `toUIProductList` fonksiyonlarına `undefined` veya `null` yerine geçerli bir dizi ([]) verilmezse, iç iterasyon hata ile karşılaşır.
+[Aksiyom 3]: Eğer `mapDatabaseCategoryToDomain` fonksiyonuna geçilen `dbCat` parametresi, `DbCategory` tipinin tanımladığı zorunlu alanları (örn: `id`, `name_tr`, `name_en` gibi alanlar) içermiyorsa, fonksiyonun içinde yapılacak alan erişiminde (`dbCat.xxx`) bir `undefined` hatası oluşur veya eksik alanları olan hatalı bir domain nesnesi üretilir.
 
-**[Aksiyom 4]**: Eğer `toSupabaseJson` fonksiyonuna verilen `data` nesnesi `JSON.stringify` tarafından serileştirilebilir (cyclic referans içermeyen, desteklenen tiplerden oluşan) bir yapı değilse, Supabase'e gönderilebilir geçerli bir JSON çıktısı üretilemez.
+[Aksiyom 4]: Eğer `mapDatabaseProductToDomain` fonksiyonuna geçilen `dbProd` parametresi, `DbProduct` tipinin tanımladığı zorunlu alanları içermiyorsa, benzer şekilde alan erişim hataları veya eksik alanlı domain nesnesi oluşur.
 
-**[Aksiyom 5]**: Eğer `mapDatabaseCategoryToDomain` veya `mapDatabaseProductToDomain` fonksiyonlarına verilen veritabanı nesneleri, beklenen alanları (field'ları) içermiyorsa, dönüşüm sonucu eksik veya `undefined` değerler içeren domain nesneleri oluşur.
+[Aksiyom 5]: Eğer `toUICategoryList` veya `toUIProductList` fonksiyonlarına geçilen dizi (`DbCategory[]` veya `DbProduct[]`) boş bir dizi (`[]`) ise, fonksiyonlar sırasıyla boş bir `UICategory[]` veya `UIProduct[]` dizi döndürür.
 
-**[Aksiyom 6]**: Eğer `isRecord` fonksiyonu `null` veya dizi tipinde bir değer alırsa, bu değerler için `false` döndürmelidir (JavaScript'te `typeof null === 'object'` ve `typeof [] === 'object'` durumları).
+[Aksiyom 6]: Eğer `mapCategoryWithLocale` fonksiyonuna geçilen `lang` parametresi, fonksiyon imzasında belirtilen `'tr' | 'en'` birleşim tipine uymayan bir değerse (örn: kodun TypeScript olmayan bir ortamda çalıştırılması durumunda), fonksiyonun dil bazlı alan seçme mantığı (`name_tr` veya `name_en` arasında geçiş) bozulur ve beklenmeyen bir alan değeri (`undefined`) döner.
 
-**[Aksiyom 7]**: Eğer `mapCategoryWithLocale` fonksiyonu locale duyarlı alanları içeren bir DbCategory alırsa, ilgili alanın dil karşılığı (`tr` veya `en`) nesne içinde mevcut olmalıdır; aksi halde dönüşüm sonucu boş veya eksik alan oluşur.
+[Aksiyom 7]: Bu modüldeki tüm haritalama fonksiyonları (`mapDatabaseCategoryToDomain`, `mapDatabaseProductToDomain`, `mapCategoryWithLocale`), veritabanı şemasındaki alan isimleri ile domain modelindeki alan isimleri arasında önceden tanımlı, sabit bir eşleşme olduğu varsayımıyla çalışır. Veritabanı şemasında alan ismi değişikliği yapılırsa bu fonksiyonların güncel gerekir.
 
 ---
 
@@ -118,61 +116,52 @@ Bu modül, veritabanı tiplerini uygulama katmanı tiplerine dönüştüren bir 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/lib/type-converters.ts::toSupabaseJson
-- **params**: `data: T` — JSON'a dönüştürülecek herhangi bir veri
+### [N1_NASIL] AST Pointer: type-converters.ts::toSupabaseJson
+- **params**: `data: T` — JSON' dönüştürülecek herhangi bir tipte veri
 - **ic_degiskenler**:
-  - `JSON.stringify(data)` — Veriyi JSON stringine dönüştürür
-  - `JSON.parse(...)` — JSON stringini tekrar parse ederek derin kopya oluşturur
-- **Dönüş**: `Json` — Derin kopyalanmış JSON verisi
+  - `JSON.parse(JSON.stringify(data))` — veri önce string'e serialize edilip sonra parse edilerek derin bir kopya oluşturulur; bu işlem ile `T` tipi `Json` tipine dönüştürülür
+- **Dönüş**: `Json` — derin kopya oluşturulmuş ve Json türüne cast edilmiş veri
 
-### [N2_NASIL] AST Pointer: src/lib/type-converters.ts::isRecord
-- **params**: `value: unknown` — Kontrol edilecek değer
-- **ic_degiskenler**:
-  - `typeof value === 'object'` — Değerin object tipinde olup olmadığını kontrol eder
-  - `value !== null` — Değerin null olmadığını kontrol eder
-  - `!Array.isArray(value)` — Değerin dizi olmadığını kontrol eder
-- **Dönüş**: `value is Record<string, unknown>` — Değerin record (nesne) olup olmadığı type guard'ı
+### [N2_NASIL] AST Pointer: type-converters.ts::isRecord
+- **params**: `value: unknown` — kontrol edilecek herhangi bir değer
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `value is Record<string, unknown>` — value'nun nesne olup olmadığı (array ve null olmayan), type guard sonucu
 
-### [N3_NASIL] AST Pointer: src/lib/type-converters.ts::mapDatabaseCategoryToDomain
-- **params**: `dbCat: DbCategory` — Veritabanından gelen kategori nesnesi
+### [N3_NASIL] AST Pointer: type-converters.ts::mapDatabaseCategoryToDomain
+- **params**: `dbCat: DbCategory` — veritabanından gelen kategori nesnesi
 - **ic_degiskenler**:
-  - `dbCat.name` — Kategorinin adı (nullsa boş string)
-  - `dbCat.menu_label` — Menü etiketi (nullsa name veya boş string)
-  - `dbCat.marketing_title` — Pazarlama başlığı (nullsa name veya boş string)
-  - `dbCat.description` — Kategori açıklaması (nullsa boş string)
-- **Dönüş**: `DomainCategory` — Düzenlenmiş ve garanti altına alınmış string alanlarıyla kategori nesnesi
+  - `dbCat.name` — kategorinin adı; String() ile string'e çevrilir, boş ise boş string fallback'i alınır
+  - `dbCat.menu_label` — menü etiketi; String() ile string'e çevrilir, boş ise dbCat.name fallback'i alınır
+  - `dbCat.marketing_title` — pazarlama başlığı; String() ile string'e çevrilir, boş ise dbCat.name fallback'i alınır
+  - `dbCat.description` — kategori açıklaması; String() ile string'e çevrilir, boş ise boş string fallback'i alınır
+- **Dönüş**: `DomainCategory` — dbCat'in tüm alanlarını yayarak String() güvenliğine geçirilmiş name, menu_label, marketing_title, description alanlarıyla dönen domain nesnesi
 
-### [N4_NASIL] AST Pointer: src/lib/type-converters.ts::mapDatabaseProductToDomain
-- **params**: `dbProd: DbProduct` — Veritabanından gelen ürün nesnesi
+### [N4_NASIL] AST Pointer: type-converters.ts::mapDatabaseProductToDomain
+- **params**: `dbProd: DbProduct` — veritabanından gelen ürün nesnesi
 - **ic_degiskenler**:
-  - `dbProd.name` — Ürün adı (nullsa boş string)
-  - `dbProd.description` — Ürün açıklaması (nullsa boş string)
-  - `dbProd.brand` — Marka adı (nullsa 'Venthub' varsayılanı)
-- **Dönüş**: `DomainProduct` — Düzenlenmiş ve garanti altına alınmış string alanlarıyla ürün nesnesi
+  - `dbProd.name` — ürün adı; String() ile string'e çevrilir, boş ise boş string fallback'i alınır
+  - `dbProd.description` — ürün açıklaması; String() ile string'e çevrilir, boş ise boş string fallback'i alınır
+  - `dbProd.brand` — ürün markası; String() ile string'e çevrilir, boş ise `'Venthub'` fallback'i alınır
+- **Dönüş**: `DomainProduct` — dbProd'un tüm alanlarını yayarak String() güvenliğine geçirilmiş name, description, brand alanlarıyla dönen domain nesnesi
 
-### [N5_NASIL] AST Pointer: src/lib/type-converters.ts::toUICategoryList
-- **params**: `cats: DbCategory[]` — Kategori nesneleri dizisi
-- **ic_degiskenler**:
-  - `mapDatabaseCategoryToDomain` — Her kategoriyi dönüştüren fonksiyon referansı
-- **Dönüş**: `DomainCategory[]` — Dönüştürülmüş kategori nesneleri dizisi
+### [N5_NASIL] AST Pointer: type-converters.ts::toUICategoryList
+- **params**: `cats: DbCategory[]` — DbCategory dizisi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `DomainCategory[]` — cats dizisi üzerinde `mapDatabaseCategoryToDomain` fonksiyonu uygulanarak elde edilen DomainCategory dizisi
 
-### [N6_NASIL] AST Pointer: src/lib/type-converters.ts::toUIProductList
-- **params**: `prods: DbProduct[]` — Ürün nesneleri dizisi
-- **ic_degiskenler**:
-  - `mapDatabaseProductToDomain` — Her ürünü dönüştüren fonksiyon referansı
-- **Dönüş**: `DomainProduct[]` — Dönüştürülmüş ürün nesneleri dizisi
+### [N6_NASIL] AST Pointer: type-converters.ts::toUIProductList
+- **params**: `prods: DbProduct[]` — DbProduct dizisi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `DomainProduct[]` — prods dizisi üzerinde `mapDatabaseProductToDomain` fonksiyonu uygulanarak elde edilen DomainProduct dizisi
 
-### [N7_NASIL] AST Pointer: src/lib/type-converters.ts::mapCategoryWithLocale
-- **params**: `dbCat: DbCategory` — Veritabanından gelen kategori nesnesi, `lang: 'tr' | 'en' = 'tr'` — Dil tercihi (varsayılan 'tr')
+### [N7_NASIL] AST Pointer: type-converters.ts::mapCategoryWithLocale
+- **params**: `dbCat: DbCategory` — veritabanından gelen kategori nesnesi; `lang: 'tr' | 'en'` — dil kodu, varsayılan `'tr'`
 - **ic_degiskenler**:
-  - `mapDatabaseCategoryToDomain(dbCat)` — Veritabanı kategorisini domain modeline dönüştüren çağrı
-  - `base` — Dönüştürülmüş temel kategori nesnesi
-  - `dbCat.metadata` — Kategorinin metadata alanı (null olabilir)
-  - `meta` — dbCat.metadata'nın kendisi
-  - `meta[lang]` — Seçilen dil için metadata
-  - `meta['tr']` — Türkçe metadata (fallback)
-  - `localized` — Dil-specific metadata veya fallback değer
-- **Dönüş**: `DomainCategory` — Localized metadata ile zenginleştirilmiş kategori nesnesi
+  - `base` — `mapDatabaseCategoryToDomain(dbCat)` çağrısıyla elde edilen temel DomainCategory nesnesi; fonksiyonun dönüş değeri olarak kullanılır (metadata yoksa doğrudan döner)
+  - `dbCat.metadata` — kategorinin ham metadata nesnesi; falsy ise base döner
+  - `meta` — `dbCat.metadata` referansı; metadata objesinin kendisi
+  - `localized` — `meta[lang]` ya da `meta['tr']` ya da `meta` fallback'i ile elde edilen dil-specific CategoryMetadata nesnesi; `as CategoryMetadata` ile cast edilir
+- **Dönüş**: `DomainCategory` — base'in tüm alanları加上 `metadata` alanı ile genişletilmiş; metadata içeriği `...meta` (tüm diller) üzerine `...localized` (seçili dil) yazılarak birleştirilmiş DomainCategory nesnesi
 
 ---
 

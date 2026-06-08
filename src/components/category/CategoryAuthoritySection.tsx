@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { AuthorityContent } from '@/types/authority';
+
 import { AuthorityRenderer } from '@/components/authority/AuthorityRenderer';
+import { AuthorityContent } from '@/types/authority';
 
 interface CategoryAuthoritySectionProps {
   content: AuthorityContent | null;

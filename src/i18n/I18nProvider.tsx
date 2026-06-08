@@ -1,10 +1,10 @@
 'use client'
 
-import React, { useContext, useMemo, useState, useEffect } from 'react'
+import React, { useContext, useEffect,useMemo, useState } from 'react'
+
 import { en } from './dictionaries/en'
 import { tr } from './dictionaries/tr'
-
-import { I18nContext, type Lang, type AppDictionary, type TranslationKeyInput } from './I18nContext'
+import { type AppDictionary, I18nContext, type Lang, type TranslationKeyInput } from './I18nContext'
 
 export type { Lang }
 

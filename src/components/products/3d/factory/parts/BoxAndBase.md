@@ -8,7 +8,7 @@ entity_hashes:
   func:BoxAndBase: af353be0b7cd10d8
   overview: 1776944b67282716
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:49Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

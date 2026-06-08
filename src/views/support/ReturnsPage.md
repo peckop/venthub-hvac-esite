@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\support\ReturnsPage.tsx
-skeleton_hash: 5e7613c20eb0ce3f
+skeleton_hash: 4374c37626f1d952
 entity_hashes:
   func:ReturnsPage: 58d2fb57da45461b
   overview: 95b133e51b479d65
   style_tokens: f66481541679296a
-generated_at: 2026-05-28T22:40:22Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış

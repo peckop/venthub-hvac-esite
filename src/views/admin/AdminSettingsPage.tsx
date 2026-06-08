@@ -1,17 +1,17 @@
 'use client'
 
-import React, { useState } from 'react'
 import { 
-  Save, 
   Activity, 
-  Globe, 
-  CreditCard, 
-  ShieldCheck, 
+  AlertCircle, 
   CheckCircle2, 
-  AlertCircle 
-} from 'lucide-react'
+  CreditCard, 
+  Globe, 
+  Save, 
+  ShieldCheck} from 'lucide-react'
+import React, { useState } from 'react'
+
+import { type AppSettings,useSettings } from '../../hooks/useSettings'
 import { useI18n } from '../../i18n/I18nProvider'
-import { useSettings, type AppSettings } from '../../hooks/useSettings'
 
 const AdminSettingsPage: React.FC = () => {
   const { t: _t } = useI18n()

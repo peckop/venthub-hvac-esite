@@ -3,33 +3,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventoryPage.tsx
-skeleton_hash: 9d18d8e3717d7917
+skeleton_hash: 2ed2b5bd5353eb20
 entity_hashes:
   func:AdminInventoryPage: 66c4abfcbc4634eb
   func:fetchData: 3334aa9b134a3cd8
-  overview: 69a8090469d0bd88
+  overview: 2e6508db8807146a
   style_tokens: 6c71c306ec3450e6
-generated_at: 2026-06-06T21:57:20Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
-
-Bu modül, yönetici panelindeki envanter yönetim sayfasını sunan bir React bileşenidir. Envante ait verileri sunucudan çekerek kullanıcıya sunar ve sayfa yapısını oluşturur.
+Bu modül, yönetici panelindeki envanter yönetim sayfasını oluşturan bir React bileşenidir. Temel olarak, sayfanın kullanıcı arayüzünü sunar ve sayfada görüntülenecek envanter verilerini asenkron olarak sunucudan çeker.
 
 ## Fonksiyon Grupları
-
 ### Sayfa Bileşeni
-Yönetici paneli envanter sayfasının kullanıcı arayüzünü ve sayfa düzenini tanımlar. Bileşen, sayfa içeriğini ve etkileşim alanlarını render eder.
+Yönetici paneli envanter sayfasının genel yapısını ve arayüzünü tanımlar. Bileşen, sayfa düzenini ve içerik alanlarını oluşturur.
 - AdminInventoryPage
 
-### Veri Yonetimi
-Sayfada görüntülenecek envanter bilgilerini asenkron olarak sunucudan çeker. Bileşenin ihtiyaç duyduğu verileri sağlamakla görevlidir.
+### Veri Çekme İşlemleri
+Sayfanın ihtiyaç duyduğu envanter verilerini harici bir kaynaktan (ör. API) asenkron olarak alan işlevi yönetir.
 - fetchData
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için fonksiyon imzaları ve sabitler sınırlı bilgi içerdiğinden, çıkarılabilecek mimari varsayımlar kısıtlıdır.
+
+[Aksiyom 1]: Eğer `fetchData()` fonksiyonu çağrıldığında ağ bağlantısı veya API erişilebilirliği yoksa, envanter verileri alınamaz ve bileşen veri gösteremez.
+
+[Aksiyom 2]: Eğer `AdminInventoryPage` bileşeni render edildiğinde `fetchData()` sonucu başarısız olursa (null/undefined/hata dönüyorsa), sayfa eksik veya hatalı veri ile görüntülenir.
+
+[Aksiyom 3]: Eğer `fetchData()` fonksiyonu parametresiz tanımlanmışsa, API endpoint adresi veya filtre parametreleri fonksiyon dışından (dış bağımlılık/global state/proptype) sağlanmalıdır; yoksa veri kaynağı belirsizdir.
 
 ---
 
@@ -67,72 +72,24 @@ type Category = Database['public']['Tables']['categories']['Row']
 
 ## AST POINTERS
 
-### [N1_NASIL] AdminInventoryPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/views/admin/AdminInventoryPage.tsx::AdminInventoryPage
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `_t` — useI18n() hook'undan gelen çeviri fonksiyonu
-  - `[loading, setLoading]` — sayfa yüklenme durumu state'i
-  - `[data, setData]` — inventory_summary tablosundan çekilen envanter verisi dizisi
-  - `[categories, setCategories]` — categories tablosundan çekilen kategori listesi dizisi
-  - `[searchTerm, setSearchTerm]` — ürün arama metni state'i
-  - `[filterCategory, setFilterCategory]` — seçili kategori filtresi (string veya null)
-  - `[filterStockStatus]` — stok durumu filtresi: 'all', 'low' veya 'out'
-  - `filteredData` — useMemo ile hesaplanmış, filtrelenmiş ve dönüştürülmüş envanter verisi
-- **Dönüş**: JSX (React bileşeni)
-
----
-
-### [N2_NASIL] fetchData
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `invRes` — Promise.all ile supabase.inventory_summary tablosundan gelen yanıt (product_id, name, supplier_name, warehouse_location, physical_stock, reserved_stock, available_stock alanları)
-  - `catRes` — Promise.all ile supabase.categories tablosundan gelen yanıt (id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content alanları)
-  - `err` — catch bloğundaki hata nesnesi (unknown tipi)
-- **Yan etkiler**: setLoading(true/false), setData(invRes.data), setCategories(catRes.data), toast.error(), console.error()
-- **Dönüş**: yok (undefined)
-
----
-
-### [N3_NASIL] useEffect Callback (fetchData çağırıcı)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - (yok — doğrudan fetchData() çağırılıyor)
-- **Yan etkiler**: fetchData() fonksiyonunu çalıştırır
-- **Dönüş**: yok
-
----
-
-### [N4_NASIL] useMemo Callback (filteredData hesaplayıcı)
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `item` — data dizisindeki her bir envanter satırı (filter ve map callback'inde kullanılır)
-  - `matchesSearch` — searchTerm boş veya item.name içeriğinde arama metni varsa true
-  - `matchesCategory` — filterCategory null veya item.category_id eşleşiyorsa true
-  - `stock` — item.physical_stock değeri, 0 ise 0 olarak alınır
-  - `threshold` — düşük stok eşiği sabiti (5)
-  - `matchesStock` — filterStockStatus 'all', 'low' veya 'out' durumuna göre stok eşleşme durumu
-- **Bağımlılıklar**: [data, searchTerm, filterCategory, filterStockStatus]
-- **Dönüş**: filtrelenmiş ve dönüştürülmüş envanter satırı dizisi (product_id, name, physical_stock, reserved_stock, available_stock, warehouse_location, supplier_name)
-
----
-
-### [N5_NASIL] Filter Callback (item => boolean)
-- **params**: `item` — data dizisinden gelen tek bir envanter satırı
-- **ic_degiskenler**:
-  - `matchesSearch` — searchTerm boşsa true, değilse item.name küçük harfe çevrilip searchTerm içeriğinde aranır
-  - `matchesCategory` — filterCategory null ise true, değilse item.category_id === filterCategory kontrolü
-  - `stock` — item.physical_stock değeri, null/undefined ise 0 olarak alınır
-  - `threshold` — düşük stok eşiği sabiti (5)
-  - `matchesStock` — 'all' ise true; 'low' ise stock <= 5 && stock > 0; 'out' ise stock <= 0
-- **Dönüş**: boolean (matchesSearch && matchesCategory && matchesStock)
-
----
-
-### [N6_NASIL] Map Callback (item => object)
-- **params**: `item` — filter'dan geçmiş tek bir envanter satırı
-- **ic_degiskenler**:
-  - (yok — doğrudan nesne döndürülür)
-- **Dönüş**: `{ product_id, name, physical_stock, reserved_stock, available_stock, warehouse_location, supplier_name }` — product_id boş string, name boşsa 'İsimsiz Ürün', stok alanları 0 fallback ile
+  - `_t` — i18n çeviri fonksiyonu (useI18n'den alınan `t`, `_t` ile aliaslanmış, JSX içinde doğrudan kullanılmıyor)
+  - `loading` — boolean state, verilerin yüklenip yüklenmediğini tutar, true iken spinner gösterilir
+  - `setLoading` — loading state setter, fetchData içinde true/false olarak ayarlanır
+  - `data` — `InventorySummaryRow[]` tipinde state, envanter özet satırlarını tutar
+  - `setData` — data state setter, fetchData ile supabase sonucu buraya yazılır
+  - `categories` — `Category[]` tipinde state, kategori listesini tutar
+  - `setCategories` — categories state setter, fetchData ile supabase sonucu buraya yazılır
+  - `searchTerm` — string state, ürün adına göre arama filtresi değerini tutar
+  - `setSearchTerm` — searchTerm state setter, input onChange ile güncellenir
+  - `filterCategory` — `string | null` state, seçili kategori filtresini tutar
+  - `setFilterCategory` — filterCategory state setter, select onChange ile güncellenir
+  - `filterStockStatus` — `'all' | 'low' | 'out'` state, stok durumu filtresini tutar (sadece 'all' olarak başlatılmış, değiştirilmiyor)
+  - `fetchData` — async fonksiyon, envanter ve kategori verilerini paralel olarak yükler
+  - `filteredData` — useMemo ile hesaplanan, searchTerm/filterCategory/filterStockStatus'e göre filtrelenmiş ve formatlanmış envanter satır dizisi
+- **Dönüş**: JSX (React functional component)
 
 ---
 

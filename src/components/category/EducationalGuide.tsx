@@ -1,5 +1,6 @@
+import { CheckCircle2,Sun, Wind } from 'lucide-react'
 import React from 'react'
-import { Sun, Wind, CheckCircle2 } from 'lucide-react'
+
 import { useI18n } from '../../i18n/I18nProvider'
 
 interface EducationalGuideProps {

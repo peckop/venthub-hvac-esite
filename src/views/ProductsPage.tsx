@@ -1,8 +1,9 @@
 'use client'
 
 import React from 'react'
-import ProductsDiscoveryView from './ProductsDiscoveryView'
+
 import type { DomainCategory } from '../lib/type-converters'
+import ProductsDiscoveryView from './ProductsDiscoveryView'
 
 interface ProductsPageProps {
   initialCategories?: DomainCategory[]

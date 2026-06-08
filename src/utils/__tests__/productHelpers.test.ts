@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect,it } from 'vitest'
+
 import {
-  translateSpecKey,
   formatSpecValue,
-  groupTechnicalSpecs
-} from '../productHelpers'
+  groupTechnicalSpecs,
+  translateSpecKey} from '../productHelpers'
 
 describe('translateSpecKey', () => {
   it('should translate known keys correctly regardless of case', () => {

@@ -1,12 +1,14 @@
 'use client'
 
+import { motion } from 'framer-motion'
+import { ChevronRight, FolderPlus, Loader2,Plus, X } from 'lucide-react'
+import React, { useState } from 'react'
+
 import VentImage from '@/components/ui/VentImage'
 import { useI18n } from '@/i18n/I18nProvider';
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import { X, Plus, FolderPlus, ChevronRight, Loader2 } from 'lucide-react'
-import { useProjectLists } from '../../hooks/useProjectLists'
 import type { Product } from '@/types/ui-models'
+
+import { useProjectLists } from '../../hooks/useProjectLists'
 
 interface AddToProjectModalProps {
   product: Product

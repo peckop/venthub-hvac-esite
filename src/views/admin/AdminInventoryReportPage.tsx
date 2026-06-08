@@ -1,17 +1,19 @@
-import React from 'react'
+import { eachDayOfInterval,endOfDay, format, startOfDay, subDays } from 'date-fns'
+import { Activity, ArrowDownRight, ArrowUpRight, Download, MinusCircle,PackageMinus, PlusCircle, TrendingUp } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
-import AdminSkeleton from '../../components/admin/AdminSkeleton'
-import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import AdminToolbar from '../../components/admin/AdminToolbar'
-import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
-import { Activity, ArrowDownRight, ArrowUpRight, TrendingUp, PackageMinus, Download, PlusCircle, MinusCircle } from 'lucide-react'
-import DateRangePicker from '../../components/admin/DateRangePicker'
+import React from 'react'
 import { DateRange } from 'react-day-picker'
-import { endOfDay, startOfDay, subDays, format, eachDayOfInterval } from 'date-fns'
+import { Area, AreaChart, Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer,Tooltip as RechartsTooltip, XAxis, YAxis } from 'recharts'
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminToolbar from '../../components/admin/AdminToolbar'
+import DateRangePicker from '../../components/admin/DateRangePicker'
 import { useDragScroll } from '../../hooks/useDragScroll'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
+import { adminButtonSecondaryClass,adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass } from '../../utils/adminUi'
 
 export default function AdminInventoryReportPage() {
     const pathname = usePathname()

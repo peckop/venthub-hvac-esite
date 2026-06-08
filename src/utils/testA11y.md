@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\testA11y.tsx
-skeleton_hash: b4d0b31ea211e1da
+skeleton_hash: 58ec9ba451ed45ec
 entity_hashes:
   func:testA11y: 6d4bd31af048cc2e
   overview: 20d45dae2ce47704
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:38:50Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış

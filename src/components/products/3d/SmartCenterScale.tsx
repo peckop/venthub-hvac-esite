@@ -1,6 +1,6 @@
 "use client";
-import React, { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
+import React, { useRef, useState } from 'react'
 import * as THREE from 'three'
 
 interface SmartCenterScaleProps {

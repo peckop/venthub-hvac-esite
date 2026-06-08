@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\MegaMenu3DBackground.tsx
-skeleton_hash: f289eb27b38f4676
+skeleton_hash: 1a127717bea49813
 entity_hashes:
   func:MegaMenu3DBackground: bb72cddf66cbd5a0
-  overview: ac53e718717e2ea0
+  overview: dd5cca8b8a57c612
   style_tokens: 487664132884f59c
-generated_at: 2026-05-28T22:36:31Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış
-MegaMenu3DBackground modülü, mega menü bileşeninin arka planında üç boyutlu bir görsel efekt sunan bir React bileşeni tanımlar. Bileşen, menünün hangi kategorisi olduğunu belirten bir slug parametresi alır ve ona göre 3D bir model ile metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder.
+MegaMenu3DBackground modülü, mega menü bileşeninin arka planında drei boyutlu bir görsel efekt sunan bir React bileşeni tanımlar. Bileşen, menünün hangi kategorisi olduğunu belirten bir slug parametresi alır ve ona göre 3D bir model ile metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
@@ -23,13 +23,15 @@ Mega menünün görsel arka planını oluşturan temel işlevi yerine getirir; 3
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için aşağıdaki varsayımlar geçerlidir.
+Bu modül, mega menü arka planı için 3D görsel efekt sağlayan bir React bileşenidir.
 
-[Aksiyom 1]: Eğer `categorySlug` prop'u sağlanmazsa, bileşen arka plan görselini doğru şekilde renderlayamaz veya çalışma zamanı hatası oluşur.
+**[Aksiyom 1]**: Eğer `categorySlug` prop'u sağlanmazsa, bileşen hangi kategori için 3D arka plan oluşturacağını bilemez ve uygun görsel içeriği render edemez.
 
-[Aksiyom 2]: Eğer `categorySlug` geçerli bir kategori slug'ı (örn: "klima", "ısıtma" gibi) değilse, bileşen uygun arka plan görselini bulamaz veya boş/hatalı bir arka plan gösterir.
+**[Aksiyom 2]**: Eğer `categorySlug` geçerli bir kategori slugsı değilse (örn: bilinmeyen veya desteklenmeyen bir değer), bileşen eşleşen 3D modeli bulamaz ve arka plan doğru oluşturulamaz.
 
-[Aksiyom 3]: Eğer bileşen bir mega menü içinde kullanılmıyorsa, arka plan görselinin konumlandırması ve boyutu hatalı olur.
+**[Aksiyom 3]**: Eğer tarayıcı CSS transform veya gerekli 3D rendering özelliklerini desteklemiyorsa, bileşen 3D görsel efekti doğru şekilde gösteremez.
+
+**[Aksiyom 4]**: Eğer bileşen mega menü yapısı dışında kullanılmak istenirse, arka planın ekranda konumlandırılması ve boyutlandırılması hedeflenen bağlama uygun olmayabilir.
 
 ---
 
@@ -57,16 +59,14 @@ Bu modül için aşağıdaki varsayımlar geçerlidir.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `MegaMenu3DBackground.tsx`::MegaMenu3DBackground
-- **params**: `{ categorySlug }` — Kategori slug'ı, 3D ikonun hangi kategoriyi göstereceğini belirler
-- **ic_degiskenler**:
-  *(fonksiyon gövdesinde herhangi bir `let`, `const`, `var` değişken tanımlaması yoktur — doğrudan JSX döner)*
-- **Dönüş**: JSX Fragment (`<React.Fragment>`) — İki katmanlı JSX yapısı:
-  1. Üst %75 alanı kaplayan `div` içinde `Canvas` (Three.js sahnesi): kamera ayarları, ışıklandırma (`ambientLight`, `directionalLight`), `Environment` preset, `Category3DIcon` bileşeni ve `OrbitControls` (sadece otomatik döndürme aktif)
-  2. Tam ekranı kaplayan gradient overlay `div` (`bg-gradient-to-t from-white/60`)
-- **Kullanılan prop'lar**:
-  - `categorySlug` — `Category3DIcon` bileşenine `categorySlug={categorySlug}` olarak iletilir
-- **Yan etkiler**: Yok (pure render fonksiyonu)
+### [N1_NASIL] AST Pointer: components/navigation/MegaMenu3DBackground.tsx::MegaMenu3DBackground
+- **params**: `categorySlug` — Menüde seçili kategorinin slug değeri, 3D ikon bileşenine aktarılır
+- **ic_degiskenler**: (yok — parametre dışında hiçbir değişken tanımlanmamıştır)
+- **Dönüş**: JSX elementi (`<>...</>` Fragment) — 3D Canvas ve gradient overlay içeren bir React bileşeni döndürür
+
+**Kullanım detayı:**
+- `categorySlug` → `<Category3DIcon categorySlug={categorySlug} ...>` içinde kullanılır, ilgili kategorinin 3D modelinin yüklenmesini sağlar
+- Fonksiyonda hiçbir iç değişken tanımlanmaz; tüm yapı JSX return ifadesi içinde doğrudan oluşturulur
 
 ---
 

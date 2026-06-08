@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useI18n } from '@/i18n/I18nProvider';
-import Link from 'next/link'
 import {
-    X, ChevronLeft,
-    DoorOpen, Snowflake, Factory, ShoppingCart,
-    Ruler, ArrowRight
-} from 'lucide-react'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import { toUIProductList, type DomainProduct } from '../../lib/type-converters'
-import { DbProduct, DbJson } from '../../types/db-rows'
-import { calculateAirCurtain } from '../../lib/hvacCalculations'
-import { Routes } from '../../utils/routes'
+ArrowRight,
+ChevronLeft,
+    DoorOpen, Factory,     Ruler, ShoppingCart,
+Snowflake,     X} from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import React, { useCallback,useEffect, useState } from 'react'
+
+import { useI18n } from '@/i18n/I18nProvider';
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import { calculateAirCurtain } from '../../lib/hvacCalculations'
+import { type DomainProduct,toUIProductList } from '../../lib/type-converters'
+import { DbJson,DbProduct } from '../../types/db-rows'
+import { Routes } from '../../utils/routes'
 
 // Types
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6

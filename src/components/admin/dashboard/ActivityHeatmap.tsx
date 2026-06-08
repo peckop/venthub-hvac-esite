@@ -1,14 +1,14 @@
+import { Activity } from 'lucide-react'
 import {
-    ScatterChart,
+    Cell,
+    ResponsiveContainer,
     Scatter,
+    ScatterChart,
+    Tooltip,
     XAxis,
     YAxis,
-    ZAxis,
-    Tooltip,
-    ResponsiveContainer,
-    Cell
-} from 'recharts'
-import { Activity } from 'lucide-react'
+    ZAxis} from 'recharts'
+
 import AdminEmptyState from '../AdminEmptyState'
 
 interface HeatmapData {

@@ -1,5 +1,6 @@
-import React from 'react';
 import Image, { ImageProps } from 'next/image';
+import React from 'react';
+
 import { normalizeImageUrl } from '@/utils/imageUtils';
 
 interface VentImageProps extends Omit<ImageProps, 'src'> {

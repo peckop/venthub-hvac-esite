@@ -3,25 +3,24 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx
-skeleton_hash: 8ad114957db3cec0
+skeleton_hash: 70662fd2c48dfc86
 entity_hashes:
-  overview: 4730a8e4a3e6b8e0
+  overview: 2f4e1aa515db008a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:38:52Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin kullanıcı hesapları bölümündeki iade işlemleri sayfasında yer alan iade modalının kapanma davranışını test eden bir birim test dosyasıdır. Vitest test çatısı ve React Testing Library araçlarını kullanarak ilgili bileşenin işlevlerini doğrular, testlerde sahte gezinme fonksiyonları kullanır ve test senaryolarını ana iade sayfası bileşeni üzerinde yürütür. Modülde herhangi bir özel kullanıcı tanımlı fonksiyon bulunmaz, sadece test senaryolarını çalıştırmak için gereken üst seviye kod, içe aktarılan harici kütüphane araçları ve testlerde kullanılan sahte değişkenler mevcuttur.
+Bu modül, VentHub HVAC projesinin kullanıcı hesapları bölümündeki iade işlemleri sayfasında yer alan iade modalının kapanma davranışını test eden birim test dosyasıdır. Vitest test çatısı ve React Testing Library araçlarını kullanarak `AccountReturnsPage` bileşeninin ilgili senaryolarını doğrular. Modülde kullanıcı tanımlı fonksiyon bulunmaz; testler için gerekli üst seviye kod, dış kütüphane importları ve sahte (mock) değişkenler mevcuttur.
+
+## Test Yapısı
+Dosya, React Router'ın `useNavigate` ve `useLocation` hook'larını test ortamında mocklayarak (`mockNavigate`, `mockReplace`) iade modalının kapanma sürecinde tetiklenen navigasyon ve location state güncelleme işlemlerinin doğru çalıştığını doğrulama amacını taşır. Test senaryoları, fireEvent ve waitFor gibi React Testing Library araçlarıyla asenkron UI etkileşimlerini simüle eder.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React test modülünün başarılı bir şekilde çalışması ve tanımlı test senaryolarını doğru doğrulayabilmesi için test ortamının mock fonksiyon yönetimi yeteneğine, kullanılan React Router hook'larının testte doğru şekilde mocklanmasına ve test edilen ana bileşenin sorunsuz import edilebilmesine bağlıdır.
 
-[Aksiyom 1]: Eğer test ortamında mock fonksiyonlarının çağrı sayısı ve aldığı parametreleri doğrulama yeteneği yoksa, navigation ve location güncelleme işlemlerinin doğru tetiklendiği kanıtlanamaz, tüm test senaryoları geçersiz kalır.
-[Aksiyom 2]: Eğer React Router'ın useNavigate hook'u testte mocklanarak tanımlı mockNavigate nesnesi sağlanmamışsa, modal kapanma işleminde tetiklenen navigation çağrısı çalışma zamanı hatası fırlatır, test başarısız olur.
-[Aksiyom 3]: Eğer React Router'ın useLocation hook'unun replace metodu testte mocklanarak tanımlı mockReplace nesnesi sağlanmamışsa, location state güncelleme işlemi sırasında hata oluşur, test çalıştırılamaz.
-[Aksiyom 4]: Eğer test edilen asıl ReturnsModalClose bileşeni test modülüne hatasız bir şekilde import edilememişse, bileşen render edilemez, hiçbir test senaryosu çalışmaz.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -37,104 +36,80 @@ Bu React test modülünün başarılı bir şekilde çalışması ve tanımlı t
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_0
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::mock_router_factory
+- **params**: () (parametre yok)
 - **ic_degiskenler**:
-  - `mockNavigate` — Next.js useRouter hook'unun push metodu için tanımlanmış mock çağrı fonksiyonu
-  - `mockReplace` — Next.js useRouter hook'unun replace metodu için tanımlanmış mock çağrı fonksiyonu
-  - `vi.fn()` — useRouter'ın prefetch metodu için oluşturulan Vitest boş mock fonksiyonu
-  - `new URLSearchParams('new=ord1')` - useSearchParams hook'u için döndürülen, 'new=ord1' sorgu parametresi içeren URL arama parametreleri nesnesi
-- **Dönüş**: { useRouter: () => Router Nesnesi, usePathname: () => string, useSearchParams: () => URLSearchParams }
+  - `push: mockNavigate` — useRouter.push olarak mock Navigate fonksiyonu
+  - `replace: mockReplace` — useRouter.replace olarak mock Replace fonksiyonu
+  - `prefetch: vi.fn()` — useRouter.prefetch için boş mock fonksiyon
+- **Dönüş**: `{ useRouter, usePathname, useSearchParams }` — Next.js router hook'larının mock nesnesi
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_1
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::mock_router_push_replace
+- **params**: () (parametre yok)
 - **ic_degiskenler**:
-  - `mockNavigate` — Router nesnesinin push metodu için atanmış mock çağrı fonksiyonu
-  - `mockReplace` — Router nesnesinin replace metodu için atanmış mock çağrı fonksiyonu
-  - `vi.fn()` — Router nesnesinin prefetch metodu için oluşturulan Vitest boş mock fonksiyonu
-- **Dönüş**: { push: Function, replace: Function, prefetch: Function }
+  - `push: mockNavigate` — push fonksiyonu olarak mockNavigate referansı
+  - `replace: mockReplace` — replace fonksiyonu olarak mockReplace referansı
+  - `prefetch: vi.fn()` — prefetch için boş mock fonksiyon
+- **Dönüş**: `{ push, replace, prefetch }` — router push/replace/prefetch nesnesi
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_2
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `mockAuth` — Kimlik doğrulama hook'u için tanımlanmış mock auth nesnesi
-- **Dönüş**: { useAuth: () => typeof mockAuth }
+### [N3_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::mock_auth_factory
+- **params**: () (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `{ useAuth: () => mockAuth }` — useAuth hook'unun mock'u
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_3
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `mockI18n` — Uluslararasılaştırma hook'u için tanımlanmış mock i18n nesnesi
-- **Dönüş**: { useI18n: () => typeof mockI18n }
+### [N4_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::mock_i18n_factory
+- **params**: () (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `{ useI18n: () => mockI18n }` — useI18n hook'unun mock'u
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_4
-- **params**: (table: string)
+### [N5_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::mock_supabase_factory
+- **params**: () (parametre yok)
 - **ic_degiskenler**:
-  - `table` — Supabase sorgusunda kullanılacak veritabanı tablo adı
-  - `chain.select` — Sorgu zinciri için select metodu mock'u, kendisini döndürür
-  - `chain.insert` — Sorgu zinciri için insert metodu mock'u, boş promise döndürür
-  - `chain.order` — Sorgu zinciri için order metodu mock'u, kendisini döndürür
-  - `chain.eq` — Sorgu zinciri için eşitlik filtresi metodu mock'u, kendisini döndürür
-  - `chain.then` — Promise olarak kullanılabilecek then metodu mock'u, tabloya göre test verisi döndürür
-- **Dönüş**: Sorgu zinciri objesi (chain)
+  - `supabase` — mock Supabase client nesnesi, `from` fonksiyonu ile zincirleme sorgu oluşturma sağlar
+- **Dönüş**: `{ supabase }` — Supabase client mock nesnesi
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_5
-- **params**: (table: string)
+### [N6_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::supabase_from_chain
+- **params**: `(table: string)` — sorgulanacak tablo adı
 - **ic_degiskenler**:
-  - `table` — Supabase sorgusunda kullanılacak veritabanı tablo adı
-  - `chain.select` — Sorgu zinciri için select metodu mock'u, kendisini döndürür
-  - `chain.insert` — Sorgu zinciri için insert metodu mock'u, boş veri/hata nesnesi içeren promise döndürür
-  - `chain.order` — Sorgu zinciri için order metodu mock'u, kendisini döndürür
-  - `chain.eq` — Sorgu zinciri için eşitlik filtresi metodu mock'u, kendisini döndürür
-  - `chain.then` — Promise olarak kullanılabilecek then metodu mock'u, tabloya göre test verisi döndürür
-- **Dönüş**: Sorgu zinciri objesi (chain)
+  - `chain` — select/insert/order/eq/then metodlarını barındıran zincir nesnesi
+  - `chain.select` — `mockReturnThis()` ile zinciri devam ettirir
+  - `chain.insert` — `{ data: null, error: null }` Promise'i döndürür
+  - `chain.order` — `mockReturnThis()` ile zinciri devam ettirir
+  - `chain.eq` — `mockReturnThis()` ile zinciri devam ettirir
+  - `chain.then` — tabloya göre mock veri döndüren callback fonksiyonu
+- **Dönüş**: `chain` — Supabase sorgu zincir nesnesi
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_6
-- **params**: (callback: (args: { data: Record<string, unknown>[], error: unknown }) => unknown)
+### [N7_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::supabase_then_callback
+- **params**: `(callback: (args: { data: Record<string, unknown>[], error: unknown }) => unknown)` — Supabase sorgu sonucunu işleyecek callback
 - **ic_degiskenler**:
-  - `callback` — Then metodu tarafından çağrılacak, veriyi işleyen callback fonksiyonu
-  - `table` — Üst kapsamdan gelen, sorgulanan tablo adı
-  - `args.data` — Callback'e gönderilecek, tabloya göre oluşturulmuş test verisi dizisi
-  - `args.error` — Callback'e gönderilecek hata nesnesi (tüm testlerde null)
-- **Dönüş**: Callback fonksiyonunun dönüş değeri
+  - `table` — üst kapsamdan gelen tablo adı, hangi tablonun mock veri döndüreceğini belirler
+- **Dönüş**: `callback({ data, error })` — tablo adına göre mock veri ile callback çağrısı
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_7
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `vi` — Vitest kütüphanesi nesnesi, tüm mock'ları sıfırlamak için kullanılır
-- **Dönüş**: yok
+### [N8_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::after_each_cleanup
+- **params**: () (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — `vi.restoreAllMocks()` ile tüm mock'ları temizler (yan etki)
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_8
-- **params**: (parametre yok)
+### [N9_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::test_modal_overlay_click
+- **params**: () (parametre yok)
 - **ic_degiskenler**:
-  - `render` — React Testing Library'nin component render etme fonksiyonu
-  - `AccountReturnsPage` — Test edilen ana sayfa componenti
-  - `container` — Render edilen componentin DOM kapsayıcısı
-  - `screen` — React Testing Library'nin DOM sorgulama nesnesi
-  - `modalHeading` — Modal başlığını tutan DOM elementi,/i returns\.new/ regex ile bulunur
-  - `overlay` — Modal arkasındaki bulanıklaştırılmış arka plan elementi, .backdrop-blur-sm sınıfı ile seçilir
-  - `fireEvent` — Kullanıcı etkileşimleri simüle etmek için React Testing Library fonksiyonu
-  - `waitFor` — Async DOM değişikliklerini beklemek için React Testing Library fonksiyonu
-- **Dönüş**: Promise<void> (async test fonksiyonu)
+  - `container` — `render(<AccountReturnsPage />)` sonucu dönen DOM container'ı
+  - `modalHeading` — `screen.findByText(/returns\.new/i, { selector: 'h3' })` ile bulunan modal başlık elemanı
+  - `overlay` — `container.querySelector('.backdrop-blur-sm')` ile bulunan modal arka plan overlay elemanı
+- **Dönüş**: yok — test assertion'larını çalıştırır (yan etki)
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_9
-- **params**: (parametre yok)
+### [N10_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::test_modal_render_and_close
+- **params**: () (async, parametre yok)
 - **ic_degiskenler**:
-  - `render` — React Testing Library'nin component render etme fonksiyonu
-  - `AccountReturnsPage` — Test edilen ana sayfa componenti
-  - `container` — Render edilen componentin DOM kapsayıcısı
-  - `screen` — React Testing Library'nin DOM sorgulama nesnesi
-  - `modalHeading` — Modal başlığını tutan DOM elementi, /returns\.new/ regex ile bulunur
-  - `overlay` — Modal arkasındaki bulanıklaştırılmış arka plan elementi, .backdrop-blur-sm sınıfı ile seçilir
-  - `fireEvent` — Kullanıcı etkileşimleri simüle etmek için React Testing Library fonksiyonu
-  - `waitFor` — Async DOM değişikliklerini beklemek için React Testing Library fonksiyonu
-- **Dönüş**: Promise<void> (async test fonksiyonu)
+  - `container` — `render(<AccountReturnsPage />)` sonucu dönen DOM container'ı
+  - `modalHeading` — `screen.findByText(/returns\.new/i, { selector: 'h3' })` ile bulunan modal başlık elemanı, `toBeInTheDocument()` ile doğrulanır
+  - `overlay` — `container.querySelector('.backdrop-blur-sm')` ile bulunan modal overlay elemanı, `toBeTruthy()` ile doğrulanır
+- **Dönüş**: yok — `fireEvent.click(overlay)` ve `waitFor` ile modal kapanma testini çalıştırır
 
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\account\__tests__\ReturnsModalClose.test.tsx::anonim_10
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `screen` — React Testing Library'nin DOM sorgulama nesnesi
-  - `expect` — Vitest assertion fonksiyonu, DOM elementi varlığını kontrol eder
-- **Dönüş**: yok
+### [N11_NASIL] AST Pointer: __tests__/ReturnsModalClose.test.tsx::assertion_modal_closed
+- **params**: () (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — `screen.queryByText` ile modal başlığının DOM'dan kaldırıldığını doğrular
 
 ---
 

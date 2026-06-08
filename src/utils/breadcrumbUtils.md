@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\breadcrumbUtils.ts
-skeleton_hash: 118288454cb930a5
+skeleton_hash: 5887cccc1e7f23ab
 entity_hashes:
   func:buildCategoryBreadcrumb: 75f26731c077f8ae
   overview: f70a9db5a198b67e
-generated_at: 2026-05-28T22:38:44Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış

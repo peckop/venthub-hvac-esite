@@ -1,4 +1,5 @@
 import React from 'react'
+
 import type { ApplicationAccent, ApplicationIcon } from '../config/applications'
 
 const Svg = {

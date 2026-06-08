@@ -3,26 +3,30 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\legal\KVKKPage.tsx
-skeleton_hash: 1c341980847d22bc
+skeleton_hash: 2dde66b0b8678d9d
 entity_hashes:
   func:KVKKPage: aa86d51285a03cb2
-  overview: f3246c955e327a67
-  style_tokens: ceaea319d6812937
-generated_at: 2026-05-28T22:40:07Z
+  overview: f3ce89e4fcf51ae6
+  style_tokens: 326833844f2bc7df
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış
-Bu modül, KVKK (Kişisel Verilerin Korunması Kanunu) ile ilgili bilgileri sunan bir React sayfa bileşenini tanımlar. Tek bir işlev olan `KVKKPage`, sayfanın görsel yapısını ve içeriğini oluşturmak için kullanılır.
+Bu modül, VentHub HVAC projesinin yasal sayfalar bölümüne ait KVKK (Kişisel Verilerin Korunması Kanunu) bilgilendirme sayfasını tanımlayan basit bir React görünüm bileşenidir. Statik yasal içerikleri kullanıcıya sunmak dışında herhangi bir veri işleme veya durum yönetimi içermez.
 
 ## Fonksiyon Grupları
-### Bileşen Tanımı
-Bu grup, sayfanın temel yapısını ve render mantığını sağlayan tek işlevi içerir.
+### Sayfa Bileşeni
+Tek başına sayfanın tüm JSX yapısını ve yasal bilgilendirme içeriğini oluşturan görünüm bileşenini barındırır.
 - KVKKPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül, KVKK bilgilendirme sayfasını oluşturan minimal bir React bileşenidir. Fonksiyon gövdesinde belirgin bir mantıksal akış veya koşullu işlm yoktur.
+
+[Aksiyom 1]: Eğer `KvkkContentTr` modülde çağrıya uygun (callable) olarak tanımlı değilse, Türkçe KVKK içeriği render edilemez ve bileşen hata verir.
+
+[Aksiyom 2]: Eğer `KvkkContentEn` modülde çağrıya uygun (callable) olarak tanımlı değilse, İngilizce KVKK içeriği render edilemez ve bileşen hata verir.
 
 ---
 
@@ -36,12 +40,20 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+## SABİTLER
+- **KvkkContentTr** (call) — `dynamic(() => import('./components/tr/KvkkContent').then(m => m.KvkkContentTr...`
+- **KvkkContentEn** (call) — `dynamic(() => import('./components/en/KvkkContent').then(m => m.KvkkContentEn...`
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\legal\KVKKPage.tsx::KVKKPage
+### [N1_NASIL] AST Pointer: src/views/legal/KVKKPage.tsx::KVKKPage
 - **params**: (parametre yok)
-- **ic_degiskenler**: (hiç yok)
-- **Dönüş**: React.FC (JSX element döndürür)
+- **ic_degiskenler**:
+  - `lang` — useI18n() hookundan dönen dil kodu (örn: 'tr', 'en'), hangi KVKK içeriğinin gösterileceğini belirler
+  - `t` — useI18n() hookundan dönen çeviri fonksiyonu, anahtar kelimelerle çevrilmiş metinleri getirir
+- **Dönüş**: React.FC (JSX elementi — tüm sayfa yapısını ve dinamik içeriği döndürür)
 
 ---
 
@@ -66,7 +78,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-primary-navy`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`, `text-yellow-800`
-- **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
+- **Renkler:** `bg-slate-100/50`, `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xs`, `text-yellow-800`
+- **Layout:** `bg-yellow-50`, `border-yellow-200`, `h-96`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
 - **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `font-semibold`, `lg:px-8`, `list-disc`, `mb-3`, `mb-6`, `mt-2`, `mt-4`, `mx-auto`, `pl-6`, `prose`, `px-4`, `py-10`
+- **Yardımcı Sınıflar:** `animate-pulse`, `border`, `dark:prose-invert`, `font-bold`, `lg:px-8`, `mb-6`, `mt-4`, `mx-auto`, `prose`, `px-4`, `py-10`, `rounded-lg`, `rounded-xl`, `sm:px-6`, `space-y-6`

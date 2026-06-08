@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\category.service.ts
-skeleton_hash: deb5a879b52721d9
+skeleton_hash: df5c1b64f5ac1b6f
 entity_hashes:
   func:getCategories: 7d5e8e0b45de974e
   overview: 094095f1defe0e5b
-generated_at: 2026-06-07T12:07:41Z
+generated_at: 2026-06-08T10:09:34Z
 ---
 
 ## Genel Bakış
@@ -23,18 +23,6 @@ Uygulamadaki filtreleme menüleri, navigasyon ve raporlama araçları gibi bile�
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül için aksiyomlar, yalnızca fonksiyon imzasından çıkarılabilen koşullara dayanır.
-
----
-
-**[Aksiyom 1]:** Eğer `supabase` parametresi (`SupabaseClient<Database>` tipinde) fonksiyona iletilmezse, `getCategories` fonksiyonu çağrılamaz — TypeScript derleme hatası oluşur.
-
-**[Aksiyom 2]:** Eğer iletilen `supabase` istemcisi geçerli bir veritabanı bağlantısına sahip değilse (oturum açılmamış, token süresi dolmuş veya yanlış URL ile oluşturulmuş), fonksiyon çalışma zamanında veritabanı erişim hatası ile karşılaşır.
-
-**[Aksiyom 3]:** Eğer `Database` generic parametresi, kategori tablosunu (veya ilgili tabloları) içermeyen bir şema tanımıyla oluşturulmuşsa, sorgulama zamanında tip uyumsuzluğu veya "relation not found" hatası oluşur.
-
----
-
-**Not:** Fonksiyon gövdesi, dönüş tipi ve iç implementasyon detayları paylaşılmadığından, dönüş biçimi, filtreleme mantığı, hata yönetimi veya önbellek stratejisi hakkında aksiyom türetilmemiştir.
 
 ---
 

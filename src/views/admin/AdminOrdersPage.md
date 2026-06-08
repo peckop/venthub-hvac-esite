@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx
-skeleton_hash: b986dd83464799bf
+skeleton_hash: e7a3cb1b38b68513
 entity_hashes:
   func:AdminOrdersPage: 5e0c5a247946014a
   func:addNote: d10d93627e7dcc54
@@ -24,30 +24,38 @@ entity_hashes:
   func:sortIndicator: 43ac755400ab07d3
   func:submitShip: 0b47468e1ba29f91
   func:toggleSort: 5416b105263f00aa
-  overview: 41c84287094a98bf
+  overview: 61d201805ab00bd4
   style_tokens: 37fc37c91a33397d
-generated_at: 2026-06-06T21:58:38Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
-`AdminOrdersPage.tsx`, yönetici panelindeki sipariş yönetim sayfası olarak görev yapan bir React bileşenidir. Modül, siparişlerin listelenmesi, sıralanması, filtrelenmesi ve yönetilmesi için gerekli olan tüm arayüz ve veri işleme mantığını bir arada bulundurur.
+`AdminOrdersPage`, yönetici panelinde siparişlerin listelendiği, sıralandığı ve yönetildiği ana sayfa bileşenidir. Modül, kargo gönderimi, not ekleme/silme, sipariş loglarını görüntüleme gibi işlemleri modal pencereler üzerinden yürütür. Ayrıca sipariş verilerini CSV olarak dışa aktarma ve toplu kargo iptali gibi toplu işlemleri de destekler.
 
 ## Fonksiyon Grupları
-### Ana Bileşen ve Etkileşim Kontrolleri
-Sayfanın ana yapısını oluşturan React bileşeni ve siparişlerle ilgili farklı işlemleri (gönderi, not, loglar) başlatan modal pencerelerini açıp kapama fonksiyonlarını içerir.
+### Ana Bileşen ve Modal Yönetimi
+Sayfa yapısını oluşturur ve siparişlerle ilgili farklı işlemler için modal pencereleri açıp kapatır.
 - AdminOrdersPage, openShipModal, closeShipModal, openLogsModal, closeLogsModal, openNotesModal, closeNotesModal
 
-### Sipariş İşlemleri ve Veri Yönetimi
-Siparişler üzerinde yapılan veri değişikliklerini ve toplu eylemleri yönetir. Not ekleme/silme, kargo bilgisi gönderme, toplu iptal ve dışa aktarma gibi işlemleri kapsar.
+### Sipariş İşlemleri
+Not ekleme ve silme, kargo bilgisi gönderme, toplu kargo iptali ve sipariş verilerini dışa aktarma gibi veri değişimlerini yönetir.
 - addNote, deleteNote, submitShip, bulkCancelShipping, exportCsv
 
-### Sıralama ve Görünüm Yardımcıları
-Sipariş tablosunun sıralama mantığını, durum görselleştirmesini ve tarih/miktar formatlamasını sağlayan yardımcı fonksiyonları barındırır.
-- toggleSort, sortIndicator, prettyStatus, badgeClass, formatAmount, safeDate, generateTrackingUrl
+### Sıralama Kontrolleri
+Sipariş tablosunda sütuna göre sıralama yapmayı ve sıralama yönü göstergesini yönetir.
+- toggleSort, sortIndicator
+
+### Görünüm ve Biçimlendirme Yardımcıları
+Tarih, tutar, sipariş durumu ve kargo takip bilgilerinin okunaklı formatta gösterilmesini sağlar.
+- formatAmount, safeDate, prettyStatus, badgeClass, generateTrackingUrl
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Neden:** Mimari aksiyomlar, fonksiyon gövdelerinin analiz edilmesiyle üretilebilir. Bu modül için yalnızca fonksiyon imzaları (başlıklar) verilmiş olup, fonksiyon gövdeleri (implementasyon detayları) paylaşılmamıştır. Aksiyom üretimi için fonksiyonların içinde hangi koşulların kontrol edildiği, hangi durumlarda hata fırlatıldığı veya hangi invariant'ların korunduğu gibi bilgilere ihtiyaç vardır. Bu bilgiler olmadan varsayımda bulunmak "uydurma" olacağından, aksiyom üretilememektedir.
 
 ---
 
@@ -220,344 +228,263 @@ type SortKey = 'id' | 'status' | 'conversation' | 'amount' | 'created'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::statusLabelsFactory
-- **params**: ()
+### [N1_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::AdminOrdersPage
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — Fonksiyon scope'unda tanımlı çeviri fonksiyonu (useContext'ten gelir)
-- **Dönüş**: `{value: string, label: string}[]` — Sipariş durum etiketleri dizisi
+  - `t` — çeviri fonksiyonu, useTranslation veya benzeri hook'tan gelir
+  - `query` — arama çubuğundaki ham sorgu metni
+  - `debouncedQuery` — 300ms gecikmeli arama sorgusu, API sorgularında kullanılır
+  - `status` — filtrelenen sipariş durumu (paid, confirmed, shipped vb.)
+  - `presetPendingShipments` — URL'den gelen pendingShipments preset bayrağı
+  - `dateRange` — DateRange nesnesi, created_at tarih filtresi için from/to içerir
+  - `page` — mevcut sayfa numarası, pagination için kullanılır
+  - `sortKey` — sıralama yapılan sütun anahtarı (id, status, amount, created vb.)
+  - `sortDir` — sıralama yönü ('asc' veya 'desc')
+  - `rows` — AdminOrderRow[] tipinde yüklenen sipariş satırları dizisi
+  - `total` — toplam sipariş sayısı, pagination için kullanılır
+  - `loading` — yükleme durumu bayrağı
+  - `viewMode` — görünüm modu ('list' veya diğer)
+  - `bulkMode` — toplu işlem modu aktif mi
+  - `selectedIds` — seçili sipariş ID'leri dizisi
+  - `shipOpen` — kargo modalı açık mı
+  - `shipId` — kargo modalında düzenlenen siparişin ID'si
+  - `carrier` — kargo firması adı
+  - `tracking` — kargo takip numarası
+  - `sendEmail` — kargo bildirimi e-posta gönderilsin mi
+  - `advBulk` — gelişmiş toplu kargo modu aktif mi
+  - `advRows` — gelişmiş toplu modda her sipariş için {id, carrier, tracking} dizisi
+  - `logsOpen` — e-posta logları modalı açık mı
+  - `logsLoading` — e-posta logları yükleniyor mu
+  - `emailLogs` — EmailLog[] tipinde e-posta gönderim kayıtları
+  - `notesOrderId` — not modalında düzenlenen siparişin ID'si
+  - `notesOpen` — notlar modalı açık mı
+  - `notes` — OrderNote[] tipinde sipariş notları dizisi
+  - `noteInput` — yeni not giriş alanı metni
+  - `lastFetchId` — Ref, sıralı fetch'lerde eski istekleri geçersiz kılmak için sayaç
+  - `deepLinkAppliedRef` — Ref, deep link parametrelerinin uygulanıp uygulanmadığını takip eder
+  - `visibleCols` — hangi sütunların görünür olduğunu belirten nesne
+  - `hasWriteAccess` — kullanıcının yazma yetkisi var mı
+  - `lang` — mevcut dil kodu (Lang tipi, örn 'tr')
+  - `ensureSessionFresh` — Supabase session tazeleme fonksiyonu
+  - `PAGE_SIZE` — sayfa başına satır sabiti
+  - `searchParams` — URL arama parametreleri (useSearchParams)
+  - `pathname` — mevcut URL yolu (usePathname)
+- **Dönüş**: JSX elementi (React.FC) — admin sipariş yönetimi sayfası
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::hasSearchQuery
-- **params**: ()
+### [N2_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::statusOptions
+- **params**: (parametre yok) — arrow function
 - **ic_degiskenler**:
-  - `window` — Tarayıcı global nesnesi
-  - `qs` — URL arama parametreleri (URLSearchParams)
-- **Dönüş**: `boolean` — URL'de q veya preset parametresi varsa true
+  - `t` — çeviri fonksiyonu, state option'larının label'ları için kullanılır
+- **Dönüş**: Array<{value: string, label: string}> — sipariş durumu filtre seçenekleri dizisi
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::debounceQuery
-- **params**: ()
+### [N3_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::hasDeepLink
+- **params**: (parametre yok) — arrow function
 - **ic_degiskenler**:
-  - `query` — Arama sorgusu (state değişkeni)
-  - `setDebouncedQuery` — Debounced sorgu güncelleme fonksiyonu
-  - `t` — setTimeout timer nesnesi
-- **Dönüş**: `() => void` — Timer temizleme fonksiyonu
+  - `qs` — URLSearchParams nesnesi, window.location.search'den parse edilir
+- **Dönüş**: boolean — URL'de q veya preset parametresi varsa true
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::applyDeepLinkFromWindow
-- **params**: ()
+### [N4_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::debouncedQueryEffect
+- **params**: (parametre yok) — useEffect cleanup callback
 - **ic_degiskenler**:
-  - `deepLinkAppliedRef` — Deep link uygulanmış mı ref referansı
-  - `window` — Tarayıcı global nesnesi
-  - `urlParams` — URL arama parametreleri (URLSearchParams)
-  - `preset` — URL preset parametresi değeri
-  - `setPresetPendingShipments` — pending shipments preset state güncelleme
-  - `setStatus` — Durum state güncelleme
-  - `qParam` — URL q parametresi değeri
-  - `setQuery` — Sorgu state güncelleme
-  - `setDebouncedQuery` — Debounced sorgu state güncelleme
+  - `t` — setTimeout ID'si, 300ms debounce gecikmesi için timer referansı
+- **Dönüş**: () => void — cleanup fonksiyonu, timer'ı temizler
+
+### [N5_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::deepLinkEffect
+- **params**: (parametre yok) — useEffect callback
+- **ic_degiskenler**:
+  - `urlParams` — URLSearchParams nesnesi, window.location.search'den parse edilir
+  - `preset` — URL'deki preset parametresi değeri (null veya string)
+  - `qParam` — URL'deki q parametresi değeri (null veya string)
 - **Dönüş**: yok
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::applyDeepLinkFromSearchParams
-- **params**: ()
+### [N6_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::searchParamsEffect
+- **params**: (parametre yok) — useEffect callback
 - **ic_degiskenler**:
-  - `searchParams` — Next.js useSearchParams hook'u
-  - `deepLinkAppliedRef` — Deep link uygulanmış mı ref referansı
-  - `preset` — URL preset parametresi değeri
-  - `setPresetPendingShipments` — pending shipments preset state güncelleme
-  - `setStatus` — Durum state güncelleme
-  - `qParam` — URL q parametresi değeri
-  - `setQuery` — Sorgu state güncelleme
-  - `setDebouncedQuery` — Debounced sorgu state güncelleme
+  - `preset` — searchParams'tan alınan preset parametresi
+  - `isPending` — preset'in 'pendingShipments' olup olmadığı
+  - `qParam` — searchParams'tan alınan q parametresi
 - **Dönüş**: yok
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::fetchOrders
-- **params**: ()
+### [N7_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::fetchOrders
+- **params**: (parametre yok) — async arrow function
 - **ic_degiskenler**:
-  - `fetchId` — Her fetch isteği için benzersiz sayaç (lastFetchId ref'inden)
-  - `setLoading` — Yükleniyor durumu güncelleme
-  - `ensureSessionFresh` — Oturum tazeleme fonksiyonu
-  - `supabase` — Supabase client instance'ı
-  - `presetPendingShipments` — pending shipments preset durumu
-  - `status` — Durum filtresi
-  - `debouncedQuery` — Debounced arama sorgusu
-  - `dateRange` — Tarih aralığı filtresi
-  - `page` — Sayfa numarası
-  - `PAGE_SIZE` — Sayfa boyutu sabiti
-  - `offset` — Sayfalama ofset değeri
-  - `data` — Supabase sorgu sonucu (AdminOrderRow[])
-  - `count` — Toplam kayıt sayısı
-  - `error` — Sorgu hatası
-  - `setRows` — Satır verileri state güncelleme
-  - `setTotal` — Toplam sayı state güncelleme
-  - `toast` — Bildirim gösterme fonksiyonu
-  - `t` — Çeviri fonksiyonu
-- **Dönüş**: Promise<void>
+  - `fetchId` — artan sayaç, concurrent fetch'lerde race condition önlemi için kullanılır
+  - `qb` — Supabase query builder, view_admin_orders tablosuna sorgu zinciri kurulur
+  - `q` — trimlenmiş arama sorgusu metni
+  - `offset` — pagination offset hesabı: (page - 1) * PAGE_SIZE
+  - `data` — Supabase yanıtından gelen satır dizisi
+  - `count` — Supabase yanıtından gelen toplam kayıt sayısı
+  - `fetchErr` — Supabase sorgu hatası
+- **Dönüş**: yok (state'leri günceller: rows, total, loading)
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::triggerFetchOrders
-- **params**: ()
-- **ic_degiskenler**:
-  - `viewMode` — Görünüm modu (list veya grid)
-  - `fetchOrders` — Siparişleri çekme fonksiyonu
-- **Dönüş**: yok
+### [N8_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::viewModeEffect
+- **params**: (parametre yok) — useEffect callback
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — viewMode 'list' ise fetchOrders çağırır
 
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::openShipModal
-- **params**: `id: string` — Sipariş ID'si
+### [N9_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::openShipModal
+- **params**: `id: string` — düzenlenecek siparişin benzersiz ID'si
 - **ic_degiskenler**:
-  - `setBulkMode` — Toplu mod state güncelleme
-  - `setShipId` — Kargo modal sipariş ID state güncelleme
-  - `setCarrier` — Kargo firması state güncelleme
-  - `setTracking` — Takip numarası state güncelleme
-  - `setSendEmail` — E-posta gönderim state güncelleme
-  - `supabase` — Supabase client instance'ı
-  - `data` — Sorgu sonucu (carrier ve tracking_number alanları)
-  - `setShipOpen` — Kargo modal açma state güncelleme
-- **Dönüş**: Promise<void>
+  - `data` — Supabase'den dönen venthub_orders satırı, carrier ve tracking_number içerir
+  - `dto` — data'nın tip güvenli hali: { carrier?: string | null; tracking_number?: string | null }
+- **Dönüş**: yok (state'leri günceller: bulkMode, shipId, carrier, tracking, sendEmail, shipOpen)
 
-### [N9_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::initializeAdvBulkRows
-- **params**: ()
-- **ic_degiskenler**:
-  - `shipOpen` — Kargo modalı açık mı durumu
-  - `bulkMode` — Toplu mod durumu
-  - `selectedIds` — Seçili sipariş ID'leri
-  - `setAdvRows` — Gelişmiş toplu satır verilerini güncelleme
-  - `setAdvBulk` — Gelişmiş toplu mod güncelleme
-- **Dönüş**: yok
+### [N10_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::shipOpenEffect
+- **params**: (parametre yok) — useEffect callback
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — shipOpen ve bulkMode true ise advRows'ı başlatır
 
-### [N10_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::openLogsModal
-- **params**: `id: string` — Sipariş ID'si
+### [N11_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::openLogsModal
+- **params**: `id: string` — e-posta logları görüntülenecek siparişin ID'si
 - **ic_degiskenler**:
-  - `setLogsOpen` — Log modal açma state güncelleme
-  - `setLogsLoading` — Log yükleniyor durumu güncelleme
-  - `supabase` — Supabase client instance'ı
-  - `data` — E-posta log verileri (EmailLog[])
-  - `error` — Sorgu hatası
-  - `setEmailLogs` — E-posta logları state güncelleme
-  - `toast` — Bildirim gösterme fonksiyonu
-  - `t` — Çeviri fonksiyonu
-- **Dönüş**: Promise<void>
+  - `data` — Supabase'den dönen shipping_email_events satırları dizisi
+  - `error` — Supabase sorgu hatası
+- **Dönüş**: yok (state'leri günceller: logsOpen, logsLoading, emailLogs)
 
-### [N11_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::openNotesModal
-- **params**: `id: string` — Sipariş ID'si
+### [N12_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::openNotesModal
+- **params**: `id: string` — notları görüntülenecek siparişin ID'si
 - **ic_degiskenler**:
-  - `setNotesOrderId` — Not modal sipariş ID state güncelleme
-  - `setNotesOpen` — Not modal açma state güncelleme
-  - `supabase` — Supabase client instance'ı
-  - `data` — Not verileri (OrderNote[])
-  - `error` — Sorgu hatası
-  - `setNotes` — Notlar state güncelleme
-  - `toast` — Bildirim gösterme fonksiyonu
-  - `t` — Çeviri fonksiyonu
-- **Dönüş**: Promise<void>
+  - `data` — Supabase'den dönen order_notes satırları dizisi
+  - `error` — Supabase sorgu hatası
+- **Dönüş**: yok (state'leri günceller: notesOrderId, notesOpen, notes)
 
-### [N12_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::addNote
-- **params**: ()
+### [N13_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::addNote
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `notesOrderId` — Not eklenecek sipariş ID'si
-  - `noteInput` — Not input değeri
-  - `supabase` — Supabase client instance'ı
-  - `data` — Eklenen not verisi (OrderNote)
-  - `error` — Sorgu hatası
-  - `setNotes` — Notları güncelleme (önceki notların üzerine ekleme)
-  - `setNoteInput` — Not input state güncelleme
-  - `toast` — Bildirim gösterme fonksiyonu
-  - `t` — Çeviri fonksiyonu
-- **Dönüş**: Promise<void>
+  - `data` — Supabase insert sonucu dönen tek satır OrderNote nesnesi
+  - `error` — Supabase insert hatası
+- **Dönüş**: yok (state'leri günceller: notes, noteInput)
 
-### [N13_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::deleteNote
-- **params**: `noteId: string` — Silinecek not ID'si
+### [N14_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::deleteNote
+- **params**: `noteId: string` — silinecek notun benzersiz ID'si
 - **ic_degiskenler**:
-  - `supabase` — Supabase client instance'ı
-  - `error` — Silme hatası
-  - `setNotes` — Notları güncelleme (silinen notu listeden kaldırma)
-  - `toast` — Bildirim gösterme fonksiyonu
-  - `t` — Çeviri fonksiyonu
-- **Dönüş**: Promise<void>
+  - `error` — Supabase delete hatası
+- **Dönüş**: yok (state'i günceller: notes, toast gösterir)
 
-### [N14_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::submitShip
-- **params**: ()
+### [N15_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::submitShip
+- **params**: (parametre yok) — async arrow function
 - **ic_degiskenler**:
-  - `bulkMode` — Toplu mod durumu
-  - `shipId` — Kargo modal sipariş ID'si
-  - `rows` — Sipariş satırları
-  - `selectedIds` — Seçili sipariş ID'leri
-  - `carrier` — Kargo firması
-  - `tracking` — Takip numarası
-  - `sendEmail` — E-posta gönderim durumu
-  - `generateTrackingUrl` — Takip URL oluşturma fonksiyonu
-  - `supabase` — Supabase client instance'ı
-  - `logAdminAction` — Admin loglama fonksiyonu
-  - `setRows` — Satır verileri state güncelleme
-  - `setShipOpen` — Kargo modal kapatma state güncelleme
-  - `toast` — Bildirim gösterme fonksiyonu
-  - `t` — Çeviri fonksiyonu
-  - `alert` — Uyarı gösterme fonksiyonu
-  - `setSelectedIds` — Seçili ID'leri sıfırlama
-  - `setBulkMode` — Toplu modu kapatma
-  - `advBulk` — Gelişmiş toplu mod durumu
-  - `advRows` — Gelişmiş toplu satır verileri
-  - `mapById` — ID bazlı satır haritası
-  - `invalid` — Geçersiz satırlar dizisi
-  - `results` — Promise.all sonuçları
-  - `targets` — Hedef sipariş ID'leri
-- **Dönüş**: Promise<void>
+  - `curRow` — shipId ile eşleşen mevcut satır (rows.find ile)
+  - `isShipped` — mevcut satırın durumu 'shipped' mi
+  - `turl` — generateTrackingUrl ile oluşturulan kargo takip URL'i veya null
+  - `fnErr` — supabase.functions.invoke hatası
+  - `targets` — seçili ve henüz shipped olmayan sipariş ID'leri dizisi (bulk mod için)
+  - `results` — Promise.all ile dönen {id, ok} sonuçları dizisi (bulk mod için)
+  - `mapById` — Map<id, {id, carrier, tracking}> advRows'ın ID bazlı haritası (advanced bulk için)
+  - `invalid` — geçersiz (carrier veya tracking boş) satır ID'leri dizisi (advanced bulk için)
+  - `row` — mapById'den alınan tek satır (advanced bulk döngüsünde)
+- **Dönüş**: yok (state'leri günceller: rows, shipOpen, selectedIds, bulkMode)
 
-### [N15_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::submitSingleShip
-- **params**: `id: string` — Sipariş ID'si
+### [N16_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::bulkSimpleHandler
+- **params**: `id` — sipariş ID'si
 - **ic_degiskenler**:
-  - `supabase` — Supabase client instance'ı
-  - `carrier` — Kargo firması
-  - `tracking` — Takip numarası
-  - `sendEmail` — E-posta gönderim durumu
-  - `generateTrackingUrl` — Takip URL oluşturma fonksiyonu
-  - `fnErr` — Fonksiyon hatası
-- **Dönüş**: Promise<{id: string, ok: boolean}>
+  - `fnErr` — supabase.functions.invoke hatası
+- **Dönüş**: { id: string, ok: boolean } — işlenen sipariş ve başarı durumu
 
-### [N16_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::validateAdvancedBulkRow
-- **params**: `id: string` — Sipariş ID'si
+### [N17_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::bulkValidationCheck
+- **params**: `id` — sipariş ID'si
 - **ic_degiskenler**:
-  - `mapById` — ID bazlı satır haritası
-  - `row` — Belirli ID'ye karşılık gelen satır
-- **Dönüş**: `boolean` — Satır geçerli mi (carrier ve tracking dolu mu)
+  - `row` — mapById.get(id) ile alınan satır
+- **Dönüş**: boolean — satır yoksa veya carrier/tracking boşsa true (geçersiz)
 
-### [N17_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::submitAdvancedBulkShip
-- **params**: `id: string` — Sipariş ID'si
+### [N18_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::bulkAdvancedHandler
+- **params**: `id` — sipariş ID'si
 - **ic_degiskenler**:
-  - `mapById` — ID bazlı satır haritası
-  - `row` — Belirli ID'ye karşılık gelen satır
-  - `generateTrackingUrl` — Takip URL oluşturma fonksiyonu
-  - `supabase` — Supabase client instance'ı
-  - `sendEmail` — E-posta gönderim durumu
-  - `fnErr` — Fonksiyon hatası
-  - `turl` — Takip URL'si
-- **Dönüş**: Promise<{id: string, ok: boolean}>
+  - `row` — mapById.get(id)! ile alınan satır (non-null assertion)
+  - `turl` — generateTrackingUrl(row.carrier, row.tracking) ile oluşturulan takip URL'i
+  - `fnErr` — supabase.functions.invoke hatası
+- **Dönüş**: { id: string, ok: boolean } — işlenen sipariş ve başarı durumu
 
-### [N18_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::getSortedRows
-- **params**: ()
+### [N19_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::sortedRows
+- **params**: (parametre yok) — useMemo arrow function
 - **ic_degiskenler**:
-  - `rows` — Sipariş satırları
-  - `sortKey` — Sıralama anahtarı
-  - `sortDir` — Sıralama yönü
-- **Dönüş**: `AdminOrderRow[]` — Sıralanmış satırlar
+  - `arr` — rows'un sıralanmış kopyası ([...rows])
+  - `dir` — sıralama yön çarpanı (asc ise 1, desc ise -1)
+- **Dönüş**: AdminOrderRow[] — sıralanmış sipariş satırları dizisi
 
-### [N19_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::sortComparator
-- **params**: `(a, b)` — Sıralanacak iki satır
+### [N20_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::sortComparator
+- **params**: `a: AdminOrderRow, b: AdminOrderRow` — karşılaştırılacak iki satır
 - **ic_degiskenler**:
-  - `sortDir` — Sıralama yönü (asc veya desc)
-  - `sortKey` — Sıralama anahtarı
-- **Dönüş**: `number` — Karşılaştırma sonucu (-1, 0, 1)
+  - `dir` — sıralama yön çarpanı (asc ise 1, desc ise -1)
+- **Dönüş**: number — negatif, sıfır veya pozitif sıralama karşılaştırma sonucu
 
-### [N20_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::toggleSort
-- **params**: `key: SortKey` — Sıralama anahtarı
-- **ic_degiskenler**:
-  - `sortKey` — Mevcut sıralama anahtarı
-  - `setSortDir` — Sıralama yönü state güncelleme
-  - `setSortKey` — Sıralama anahtarı state güncelleme
-- **Dönüş**: yok
+### [N21_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::toggleSort
+- **params**: `key: SortKey` — sıklanacak sütun anahtarı
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (state'leri günceller: sortKey, sortDir)
 
-### [N21_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::sortIndicator
-- **params**: `key: SortKey` — Sıralama anahtarı
-- **ic_degiskenler**:
-  - `sortKey` — Mevcut sıralama anahtarı
-  - `sortDir` — Sıralama yönü
-- **Dönüş**: `string` — Sıralama göstergesi (▲ veya ▼)
+### [N22_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::sortIndicator
+- **params**: `key: SortKey` — göstergesi istenen sütun anahtarı
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string — sıralama yönü göstergesi ('▲', '▼' veya boş string)
 
-### [N22_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::bulkCancelShipping
-- **params**: ()
+### [N23_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::bulkCancelShipping
+- **params**: (parametre yok) — async function
 - **ic_degiskenler**:
-  - `rows` — Sipariş satırları
-  - `selectedIds` — Seçili sipariş ID'leri
-  - `targets` — Kargo iptal edilecek hedef ID'leri
-  - `window` — Tarayıcı global nesnesi (confirm için)
-  - `supabase` — Supabase client instance'ı
-  - `setRows` — Satır verileri state güncelleme
-  - `setSelectedIds` — Seçili ID'leri sıfırlama
-  - `results` — Promise.all sonuçları
-  - `failed` — Başarısız olan sipariş ID'leri
-- **Dönüş**: Promise<void>
+  - `targets` — durumu 'shipped' olan seçili sipariş ID'leri dizisi
+  - `results` — Promise.all ile dönen {id, ok} sonuçları dizisi
+  - `failed` — başarısız olan sipariş ID'leri dizisi
+- **Dönüş**: yok (state'leri günceller: rows, selectedIds)
 
-### [N23_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::cancelShippingForOrder
-- **params**: `id: string` — Sipariş ID'si
+### [N24_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::bulkCancelSingleHandler
+- **params**: `id` — iptal edilecek sipariş ID'si
 - **ic_degiskenler**:
-  - `supabase` — Supabase client instance'ı
-  - `fnErr` — Fonksiyon hatası
-- **Dönüş**: Promise<{id: string, ok: boolean}>
+  - `fnErr` — supabase.functions.invoke hatası
+- **Dönüş**: { id: string, ok: boolean } — işlenen sipariş ve başarı durumu
 
-### [N24_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::exportCsv
-- **params**: ()
+### [N25_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::exportCsv
+- **params**: (parametre yok) — function declaration
 - **ic_degiskenler**:
-  - `t` — Çeviri fonksiyonu
-  - `rows` — Sipariş satırları
-  - `header` — CSV başlık satırı
-  - `lines` — CSV veri satırları
-  - `blob` — Blob nesnesi (dosya içeriği)
-  - `url` — Object URL
-  - `a` — Anchor element (dosya indirme için)
-- **Dönüş**: yok
+  - `header` — CSV başlık satırı dizisi (orderId, status, amount)
+  - `lines` — rows dizisinin CSV satırlarına dönüştürülmüş hali
+  - `blob` — BOM (\ufeff) eklenmiş CSV verisi Blob nesnesi
+  - `url` — Blob'dan oluşturulan nesne URL'i
+  - `a` — tetiklenen geçici <a> elementi, dosya indirme işlemini başlatır
+- **Dönüş**: yok — dosya indirme tetikler (yan etki)
 
-### [N25_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::OrderRow
-- **params**: `r: AdminOrderRow` — Sipariş satır verisi
-- **ic_degiskenler**:
-  - `selectedIds` — Seçili sipariş ID'leri
-  - `setSelectedIds` — Seçili ID'leri güncelleme
-  - `visibleCols` — Görünür sütunlar
-  - `t` — Çeviri fonksiyonu
-  - `lang` — Dil ayarı
-  - `badgeClass` — Rozet CSS sınıfı
-  - `prettyStatus` — Durum çevirisi
-  - `formatAmount` — Tutar formatlama
-  - `safeDate` — Tarih formatlama
-  - `hasWriteAccess` — Yazma erişim izni
-  - `openShipModal` — Kargo modal açma fonksiyonu
-  - `openLogsModal` — Log modal açma fonksiyonu
-  - `openNotesModal` — Not modal açma fonksiyonu
-- **Dönüş**: JSX.Element — Tablo satırı
+### [N26_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::renderOrderRow
+- **params**: `r: AdminOrderRow` — render edilecek sipariş satırı
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde ek değişken yok, doğrudan JSX döner)
+- **Dönüş**: JSX elementi — tek bir sipariş tablo satırı (<tr>)
 
-### [N26_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::EmailLogRow
-- **params**: `(l, i)` — Log verisi ve indeks
-- **ic_degiskenler**:
-  - `l.created_at` — Oluşturulma tarihi
-  - `l.subject` — E-posta konusu
-  - `safeDate` — Tarih formatlama
-- **Dönüş**: JSX.Element — E-posta log satırı
+### [N27_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::renderLogRow
+- **params**: `l: EmailLog, i: number` — e-posta log satırı ve indeksi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi — tek bir e-posta log satırı (<tr>)
 
-### [N27_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::NoteCard
-- **params**: `n: OrderNote` — Not verisi
-- **ic_degiskenler**:
-  - `n.id` — Not ID'si
-  - `n.note` — Not içeriği
-  - `n.created_at` — Oluşturulma tarihi
-  - `deleteNote` — Not silme fonksiyonu
-  - `safeDate` — Tarih formatlama
-- **Dönüş**: JSX.Element — Not kartı
+### [N28_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::renderNoteCard
+- **params**: `n: OrderNote` — render edilecek not nesnesi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi — tek bir not kartı div'i, silme butonu ve tarih içerir
 
-### [N28_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::formatAmount
-- **params**: `v?: number | null, lang: Lang = 'tr'` — Tutar ve dil
-- **ic_degiskenler**:
-  - `formatCurrency` — Para birimi formatlama fonksiyonu
-- **Dönüş**: `string` — Formatlanmış tutar
+### [N29_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::formatAmount
+- **params**: `v?: number | null` — formatlanacak tutar, `lang: Lang` — dil kodu (varsayılan 'tr')
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string — formatlanmış para birimi stringi veya '-'
 
-### [N29_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::safeDate
-- **params**: `iso: string, lang: Lang = 'tr'` — ISO tarih ve dil
-- **ic_degiskenler**:
-  - `formatDateTime` — Tarih formatlama fonksiyonu
-- **Dönüş**: `string` — Formatlanmış tarih
+### [N30_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::safeDate
+- **params**: `iso: string` — ISO tarih stringi, `lang: Lang` — dil kodu (varsayılan 'tr')
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string — formatlanmış tarih veya hata durumunda ham iso stringi
 
-### [N30_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::prettyStatus
-- **params**: `s: string, t: (key: string, params?: Record<string, unknown>) => string` — Durum kodu ve çeviri fonksiyonu
+### [N31_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::prettyStatus
+- **params**: `s: string` — durum anahtarı, `t: (key: string, params?: Record<string, unknown>) => string` — çeviri fonksiyonu
 - **ic_degiskenler**:
-  - `key` — Küçük harfe çevrilmiş durum kodu
-- **Dönüş**: `string` — Çevrilmiş durum etiketi
+  - `key` — küçük harfe çevrilmiş durum stringi
+- **Dönüş**: string — çevrilmiş durum etiketi veya ham durum stringi
 
-### [N31_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::badgeClass
-- **params**: `s: string` — Durum kodu
+### [N32_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::badgeClass
+- **params**: `s: string` — durum anahtarı
 - **ic_degiskenler**:
-  - `base` — Temel CSS sınıfları
-  - `key` — Küçük harfe çevrilmiş durum kodu
-- **Dönüş**: `string` — Duruma göre CSS sınıfı
+  - `base` — tüm durumlar için ortak CSS class parçası
+  - `key` — küçük harfe çevrilmiş durum stringi
+- **Dönüş**: string — Tailwind CSS class string'i (duruma özel badge stili)
 
-### [N32_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminOrdersPage.tsx::generateTrackingUrl
-- **params**: `carrier: string, tracking: string` — Kargo firması ve takip numarası
+### [N33_NASIL] AST Pointer: src/views/admin/AdminOrdersPage.tsx::generateTrackingUrl
+- **params**: `carrier: string` — kargo firması adı, `tracking: string` — kargo takip numarası
 - **ic_degiskenler**:
-  - `c` — Küçük harfe çevrilmiş kargo firması adı
-- **Dönüş**: `string | null` — Takip URL'si veya null
+  - `c` — carrier'ın küçük harfe çevrilmiş hali
+- **Dönüş**: string | null — tanımlı kargo firması için takip URL'i, desteklenmeyen firma ise null
 
 ---
 
@@ -584,17 +511,17 @@ graph TD
     AdminOrdersPage_tsx__sortIndicator["sortIndicator"]
     AdminOrdersPage_tsx__submitShip["submitShip"]
     AdminOrdersPage_tsx__toggleSort["toggleSort"]
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__prettyStatus
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__toggleSort
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__formatAmount
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openShipModal
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openLogsModal
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openNotesModal
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__deleteNote
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__safeDate
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__toggleSort
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openNotesModal
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__openLogsModal
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__sortIndicator
-    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__badgeClass
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__formatAmount
     AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__generateTrackingUrl
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__badgeClass
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__safeDate
+    AdminOrdersPage_tsx__AdminOrdersPage --> AdminOrdersPage_tsx__prettyStatus
 ```
 
 ## NODE ID STANDARD

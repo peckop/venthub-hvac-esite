@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ScrollToTop.tsx
-skeleton_hash: b72ab5d4ecf79309
+skeleton_hash: 117b074cbbe911cf
 entity_hashes:
   func:ScrollToTop: 67a45bb41004286e
   overview: 3fbf0b01314ba145
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:37:05Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış

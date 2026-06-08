@@ -1,14 +1,15 @@
 'use client'
 
-import React from 'react'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
-import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowRight, CheckCircle2, AlertCircle, BookOpen } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowRight, BookOpen,CheckCircle2 } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import React from 'react'
+
+import Seo from '../../components/Seo'
 import { useI18n } from '../../i18n/I18nProvider'
 import { getCategoryUrlFromTopic } from '../../utils/applicationLinks'
-import Seo from '../../components/Seo'
 import { Routes } from '../../utils/routes';
 
 

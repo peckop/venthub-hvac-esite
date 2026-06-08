@@ -3,36 +3,47 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\products\[slug]\page.tsx
-skeleton_hash: 9525409a021484e9
+skeleton_hash: a0fed4356ba5895c
 entity_hashes:
   func:Page: 23ecda9f387402f7
   func:generateMetadata: c086561deb8aad58
   func:generateStaticParams: 10793e6b52b39af0
-  overview: 400995d1dea4efaa
+  overview: 6d2c8f1d1305f6ba
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-06T19:25:17Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js App Router yapısında çok dilli (Türkçe ve İngilizce) ürün detay sayfalarını yönetir. Modül, derleme zamanında hangi sayfaların önceden oluşturulacağını belirler, her sayfa için SEO uyumlu meta verileri üretir ve son olarak ilgili ürün içeriğini kullanıcıya sunar.
+Bu modül, Next.js uygulamasında çok dilli (Türkçe/İngilizce) ürün detay sayfalarını oluşturma ve sunma sorumluluğunu taşır. Modül, statik site oluşturma sürecini planlayarak hangi sayfaların derleneceğini belirler, her bir sayfa için arama motoru optimizasyonu (SEO) meta verilerini dinamik olarak üretir ve son olarak ilgili dil ve ürün adresine (slug) uygun içeriği kullanıcıya sunar.
 
 ## Fonksiyon Grupları
+### Derleme Zamanı Sayfa Planlaması
+Modül, uygulamanın derleme (build) aşamasında hangi dil ve ürün kombinasyonları için sayfaların önceden oluşturulacağını (statik olarak üretileceğini) belirler. Bu, uygulamanın verimli çalışmasını ve ilgili sayfaların istek üzerine değil, derleme zamanında hazır olmasını sağlar.
+- `generateStaticParams`
 
-### Derleme Zamanı Planlama
-Hangi dil-ürün kombinasyonları için sayfaların statik olarak üretileceğini belirleyerek build sürecini yönlendirir.
-- generateStaticParams
+### Dinamik SEO Meta Verisi Üretimi
+Her bir ürün detay sayfası için arama motorları ve sosyal paylaşım platformları tarafından okunabilecek dinamik meta bilgiler (başlık, açıklama, vb.) oluşturur. Bu sayede sayfalar arama sonuçlarında doğru ve çekici bir şekilde listelenir.
+- `generateMetadata`
 
-### Arama Motoru Optimizasyonu
-Her ürün sayfasına özel olarak başlık, açıklama ve OpenGraph gibi meta bilgilerini dinamik şekilde oluşturur.
-- generateMetadata
-
-### Sayfa Sunumu
-Dil ve slug parametrelerine göre ürün verisini çekerek, kullanıcının göreceği sayfa içeriğini render eder.
-- Page
+### Ürün Sayfası Sunumu
+Kullanıcı tarafından ziyaret edildiğinde, ilgili dil ve ürün adresine (slug) karşılık gelen asıl sayfa içeriğini render ederek tarayıcıda gösterir. Bu fonksiyon, sayfanın görünür kısmını oluşturan ana bileşendir.
+- `Page`
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, Next.js App Router yapısında çok dilli ürün detay sayfalarını yöneten bir sayfa bileşenidir.
+
+[Aksiyom 1]: Eğer `generateStaticParams` fonksiyonu geçerli bir parametre nesneleri dizisi döndürmüyorsa, Next.js derleme aşamasında hangi sayfaları statik olarak üreteceğini bilemez ve build süreci başarısız olur veya eksik sayfalar oluşur.
+
+[Aksiyom 2]: Eğer `generateMetadata` fonksiyonuna iletilen `params.lang` değeri 'tr' veya 'en' dışında bir değerse, modül için tanımlanmamış bir dilde meta veri üretilemez ve SEO verileri eksik veya hatalı olur.
+
+[Aksiyom 3]: Eğer `params.slug` değerine karşılık gelen ürün verisi (örn: bir API veya veritabanı sorgusu ile) mevcut değilse, `Page` bileşeni geçerli bir ürün içeriği render edemez ve sayfa hata durumuna düşer veya boş görünür.
+
+[Aksiyom 4]: Eğer `Page` bileşeninin props olarak aldığı `params.lang` geçerli bir dil kodu değilse (örn: desteklenmeyen bir dil), modül doğru dilde içerik sunamaz ve olası bir hata yönetim mekanizması devreye girmezse sayfa bozuk görünebilir.
+
+[Aksiyom 5]: Eğer `generateStaticParams` ve/veya `generateMetadata` fonksiyonları, modülün çalışması için gerekli olan (örn: ürün listesini çeken) harici bir veri kaynağına erişemiyorsa, derleme zamanı planlama ve SEO verisi üretimi tamamlanamaz.
 
 ---
 
@@ -72,29 +83,29 @@ Dil ve slug parametrelerine göre ürün verisini çekerek, kullanıcının gör
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/[lang]/products/[slug]/page.tsx::generateStaticParams
-- **params**: parametre yok
+### [N1_NASIL] AST Pointer: `src/app/[lang]/products/[slug]/page.tsx`::generateStaticParams
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `products` — Supabase products tablosundan aktif ve slug'ı dolu tüm ürünleri getiren sorgunun sonucu
-  - `paths` — products dizisini filtreleyerek her slug için 'tr' ve 'en' dilleriyle oluşturulan statik parametre yolları dizisi
-- **Dönüş**: `{ lang: string, slug: string }[]` veya boş dizi
+  - `products` — Supabase'den çekilen aktif ve slug değeri null olmayan ürünlerin listesi
+  - `paths` — Her ürün için `tr` ve `en` dillerinde olmak üzere oluşturulan statik parametre yolları dizisi
+- **Dönüş**: `Array<{ lang: string, slug: string }>` (yollar) veya boş dizi `[]`
 
-### [N2_NASIL] AST Pointer: src/app/[lang]/products/[slug]/page.tsx::generateMetadata
-- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — Next.js 15+ formatında parametreler
+### [N2_NASIL] AST Pointer: `src/app/[lang]/products/[slug]/page.tsx`::generateMetadata
+- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — URL parametreleri (asenkron çözümlenir)
 - **ic_degiskenler**:
-  - `slug` — params promise'inden çözülen ürün slug değeri
-  - `product` — getCachedProductBySlug ile slug'a karşılık gelen ürün verisi
-  - `canonicalPath` — product.slug değerinden oluşan kanonik URL yolu
-- **Dönüş**: Metadata objesi (title, description, alternates, openGraph) veya varsayılan metadata
+  - `slug` — params promise'ından çözümlenen ürün slug değeri
+  - `product` — `getCachedProductBySlug(slug)` ile önbellekten getirilen ürün nesnesi
+  - `canonicalPath` — product.slug değerinden türetilen kanonik URL yolu
+- **Dönüş**: SEO metadata nesnesi (title, description, alternates, openGraph alanları) veya varsayılan fallback metadata
 
-### [N3_NASIL] AST Pointer: src/app/[lang]/products/[slug]/page.tsx::Page
-- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — Next.js 15+ formatında parametreler
+### [N3_NASIL] AST Pointer: `src/app/[lang]/products/[slug]/page.tsx`::Page
+- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — URL parametreleri (asenkron çözümlenir)
 - **ic_degiskenler**:
-  - `slug` — params promise'inden çözülen ürün slug değeri
-  - `productData` — Başlangıçta null, ardından getCachedProductBySlug ile yüklenen ürün verisi
-  - `canonicalPath` — productData?.slug veya 'generic' fallback değeri
-  - `jsonLd` — Schema.org uyumlu JSON-LD yapılandırılmış veri objesi
-- **Dönüş**: JSX (script tag ve PageComponent)
+  - `slug` — params promise'ından çözümlenen ürün slug değeri
+  - `productData` — `getCachedProductBySlug(slug)` ile getirilen Product tipinde ürün nesnesi veya null
+  - `canonicalPath` — productData.slug değerinden türetilen kanonik URL yolu; yoksa `'generic'`
+  - `jsonLd` — Schema.org Product tipinde yapılandırılmış JSON-LD verisi (SEO için schema markup)
+- **Dönüş**: JSX Fragment — JSON-LD script etiketi ve `PageComponent` bileşeninin render edildiği React fragment
 
 ---
 

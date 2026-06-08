@@ -1,10 +1,11 @@
+import { CheckCircle, CreditCard, Edit2, Loader2,MapPin, Plus, Trash2, Truck } from 'lucide-react'
 import React, { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+
+import { useI18n } from '@/i18n/I18nProvider'
 import { createAddress, deleteAddress, listAddresses, setDefaultAddress, updateAddress } from '@/lib/services/address.service'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { UserAddress } from '@/types/ui-models'
-import { toast } from 'sonner'
-import { useI18n } from '@/i18n/I18nProvider'
-import { MapPin, Plus, Trash2, Edit2, CheckCircle, Truck, CreditCard, Loader2 } from 'lucide-react'
 
 import { useAuth } from '../../hooks/useAuth'
 

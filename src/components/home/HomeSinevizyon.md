@@ -3,37 +3,48 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\HomeSinevizyon.tsx
-skeleton_hash: 7bf18d2b5fbf4eb2
+skeleton_hash: 170df0d436adedd3
 entity_hashes:
   func:HomeSinevizyon: 3c834ec7a93a53b9
   func:getSlideContent: ab470a33cf7d22ae
   func:handleTouchEnd: f36f5348e5c17a8d
   func:handleTouchStart: 66d8f271101148e9
-  overview: ad86b1170bdcb3cc
+  overview: 5c966a134e8a00b4
   style_tokens: 209427f386c5ad68
-generated_at: 2026-06-07T20:34:31Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC projesinin ana ekranında dinamik slayt gösterisi (sinevizyon) sunan bir React bileşeni tanımlar. Kullanıcıların dokunmatik hareketlerle slaytlar arasında geçiş yapmasını sağlarken, her slayt için uygun içeriği dinamik olarak oluşturur. Alıntı butonuna tıklandığında dışarıdan aktarılan geri çağırım fonksiyonunu tetikleyerek bileşeni ana uygulama ile entegre eder.
+HomeSinevizyon modülü, projenin ana ekranında yer alan ve dokunmatik etkileşimlerle slaytlar arasında geçiş yapılabilen dinamik bir sinevizyon (banner) bileşenidir. Her slayt için başlık, açıklama ve eylem butonu gibi içerikleri indeks bazlı olarak sağlar ve kullanıcı “Alıntı Al” butonuna tıkladığında ana uygulamaya bildirim gönderir.
 
 ## Fonksiyon Grupları
-### Ana Bileşen Yönetimi
-Sinevizyonun temel çalışma yapısını oluşturan ana bileşendir, dışarıdan alınan geri çağırımları entegre eder ve tüm alt işlevleri koordine ederek slayt gösterisinin sorunsuz çalışmasını sağlar.
+### Ana Bileşen ve Koordinasyon
+Sinevizyonun tüm işlevlerini bir araya getiren üst düzey React bileşenidir. State yönetimi, dokunma olayları, içerik oluşturma ve dışarıya bildirim gönderme gibi temel akışları koordine eder.
 - HomeSinevizyon
 
-### Dokunmatik Etkileşim Yönetimi
-Kullanıcının ekrana dokunma başlangıç ve bitiş olaylarını yakalar, bu hareketleri işleyerek slaytlar arasında geçiş işlemini tetikler.
+### Dokunmatik Etkileşim İşleme
+Kullanıcının ekrana dokunma başlangıç ve bitiş anlarını yakalayarak slayt geçişlerini tetikler. Bu sayede mobil cihazlarda akıcı bir kaydırma deneyimi sunulur.
 - handleTouchStart, handleTouchEnd
 
-### Slayt İçeriği Yönetimi
-Verilen slayt indeksine göre o slaytta gösterilecek tüm içeriği sağlayarak dinamik ve sıralı içerik sunumunu mümkün kılar.
+### Dinamik Slayt İçerik Oluşturma
+Verilen slayt numarasına göre o slayta ait başlık, açıklama, resim ve diğer bileşenleri üreten yardımcı fonksiyondur. İçerik yönetimini merkezileştirerek kod tekrarını önler.
 - getSlideContent
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-(Sentez hatası)
+
+Bu modül, dokunmatik slayt gösterimi sunan React bileşeninin doğru çalışması için aşağıdaki mimari varsayımları gerektirir.
+
+[Aksiyom 1]: Eğer `onQuoteClick` bir çağrılabilir fonksiyon (callback) olarak sağlanmıyorsa, kullanıcı slaytlardaki "Alıntı" butonuna tıkladığında çalışma zamanı hatası oluşur ve teklif akışı tetiklenemez.
+
+[Aksiyom 2]: Eğer `slidesData` sabit dizisi tanımlı veya boş (`undefined`/boş dizi) ise, sinevizyon hiçbir slayt gösteremeyerek boş/beklenmeyen bir durum sergiler.
+
+[Aksiyom 3]: Eğer `getSlideContent` fonksiyonuna geçirilen `index` parametresi `slidesData` dizisinin geçerli indeks aralığının (0 ≤ index < slidesData.length) dışında ise, fonksiyon geçersiz slayt içeriği (`undefined`) döndürür ve bileşen hatalı render edilir.
+
+[Aksiyom 4]: Eğer `handleTouchStart` veya `handleTouchEnd` fonksiyonlarına `React.TouchEvent` dışı bir nesne geçirilirse, dokunmatik kayma (swipe) hesaplaması doğru yapılamaz ve slayt geçişi bozulur.
+
+[Aksiyom 5]: Eğer `slidesData` dizisindeki her bir elemanın slayt gösterimi için gerekli alanları (örn: başlık, açıklama, görsel yolu) eksik ise, `getSlideContent` hatalı veya eksik içerik render eder.
 
 ---
 
@@ -103,43 +114,19 @@ Verilen slayt indeksine göre o slaytta gösterilecek tüm içeriği sağlayarak
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/home/HomeSinevizyon.tsx::HomeSinevizyon
-- **params**: (`{ onQuoteClick }`)
+### [N1_NASIL] AST Pointer: `HomeSinevizyon.tsx`::HomeSinevizyon
+- **params**: `{ onQuoteClick }` — slayt geçişlerinde "Teklif Al" modalını tetikleyen callback fonksiyonu
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook’den gelen çeviri fonksiyonu, metinleri yerelleştirmek için kullanılır.
-  - `currentSlide` — `useState(0)` ile tanımlanan mevcut slayt indeksini tutar.
-  - `setCurrentSlide` — `currentSlide` değerini güncelleyen state setter fonksiyonu.
-  - `isMounted` — bileşenin DOM’a monte edilip edilmediğini izleyen boolean state.
-  - `setIsMounted` — `isMounted` değerini güncelleyen state setter fonksiyonu.
-  - `touchStartX` — `useRef<number | null>(null)` ile tanımlanan dokunma başlangıç X koordinatını saklayan ref.
-  - `isInitialMount` — `useRef(true)` ile tanımlanan, bileşenin ilk render’ı olup olmadığını izleyen ref.
-  - `paginate` — `useCallback` içinde tanımlanan, `newDirection` parametresiyle `currentSlide`ı kaydıran fonksiyon.
-  - `timer` — otomatik slayt geçişi için `setInterval` tarafından döndürülen zamanlayıcı kimliği; effect temizleme fonksiyonunda `clearInterval(timer)` ile iptal edilir.
-  - `handleKeyDown` — klavye ok tuşlarını dinleyen ve `paginate` çağıran yerel fonksiyon; `window.addEventListener`/`removeEventListener` ile yönetilir.
-- **Dönüş**: React element (JSX) döndürür; bileşen yan etkileri olarak zamanlayıcı, klavye ve dokunma event listener’ları kurar.
-
-### [N2_NASIL] AST Pointer: src/components/home/HomeSinevizyon.tsx::handleTouchStart
-- **params**: (`e: React.TouchEvent`)
-- **ic_degiskenler**:
-  - `touchStartX` — dış scope’tan gelen `useRef` objesi; `e.touches[0].clientX` değeriyle güncellenir.
-- **Dönüş**: yok (fonksiyon sadece `touchStartX.current` değerini ayarlar).
-
-### [N3_NASIL] AST Pointer: src/components/home/HomeSinevizyon.tsx::handleTouchEnd
-- **params**: (`e: React.TouchEvent`)
-- **ic_degiskenler**:
-  - `touchStartX` — dış scope’tan gelen `useRef`; başlangıç koordinatı kontrol edilir.
-  - `touchEndX` — `e.changedTouches[0].clientX` ile elde edilen dokunma bitiş X koordinatı.
-  - `diff` — `touchStartX.current - touchEndX` farkı; kaydırma yönünü belirlemek için kullanılır.
-- **Dönüş**: yok (gerektiğinde `paginate` çağırır, ardından `touchStartX.current`i `null` yapar).
-
-### [N4_NASIL] AST Pointer: src/components/home/HomeSinevizyon.tsx::getSlideContent
-- **params**: (`index: number`)
-- **ic_degiskenler**:
-  - `t` — dış scope’tan gelen çeviri fonksiyonu.
-  - `eyebrow` — `t('home.hero.sinevizyon.slides.${index}.eyebrow')` sonucunu veya varsayılan `'VentHub Engineering'` değerini tutar.
-  - `title` — `t('home.hero.sinevizyon.slides.${index}.title')` sonucunu veya varsayılan `'High Performance HVAC'` değerini tutar.
-  - `subtitle` — `t('home.hero.sinevizyon.slides.${index}.subtitle')` sonucunu veya varsayılan `'Advanced solutions for industrial ventilation.'` değerini tutar.
-- **Dönüş**: `{ eyebrow, title, subtitle }` nesnesi (slide içeriği).
+  - `t` — `useI18n()` hookundan dönen çeviri fonksiyonu, tüm UI metinlerini localize eder
+  - `currentSlide` — `useState(0)`, aktif slayt indexini tutar
+  - `setCurrentSlide` — `currentSlide` state setter'ı, slayt değiştirme işlemlerinde çağrılır
+  - `isMounted` — `useState(false)`, hydration tamamlandıktan sonra `true` olur; useEffect'lerde güvenli erişim sağlar
+  - `setIsMounted` — `isMounted` state setter'ı
+  - `touchStartX` — `useRef<number | null>(null)`, dokunma başlangıç X koordinatını tutar; swipe mesafesi hesaplamak için kullanılır
+  - `isInitialMount` — `useRef(true)`, ilk mount tespiti için kullanılır, useEffect içinde `false`'a çekilir
+  - `paginate` — `useCallback` ile sarılı slayt geçiş fonksiyonu, `newDirection` parametresiyle sarmal kaydırma yapar
+  - `slidesData` — dışarıdan import edilen sabit array, tüm slayt verilerini (görseller, anahtarlar, ürünler) içerir
+- **Dönüş**: JSX — sinevizyon bölümünü render eden React bileşeni, arka plan görselleri, metin içeriği, ürün görselleri ve göstergeleri döndürür
 
 ---
 

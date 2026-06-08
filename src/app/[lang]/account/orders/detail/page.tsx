@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
-import PageComponent from '../../../../../views/account/OrderDetailPage'
+
 import { tr } from '../../../../../i18n/dictionaries/tr'
+import PageComponent from '../../../../../views/account/OrderDetailPage'
 
 export const dynamic = 'force-dynamic'
 

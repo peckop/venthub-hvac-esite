@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\DehumidifierModel.tsx
-skeleton_hash: 79d354e4d2dec91d
+skeleton_hash: 546e5367c5082c92
 entity_hashes:
   func:DehumidifierModel: a8e5762ecd12c788
   overview: 5e0b32def27ebb18
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:46Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

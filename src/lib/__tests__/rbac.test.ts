@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
 import { canAccessPage, canWrite, isReadOnly } from '../rbac';
 
 describe('RBAC (Role Based Access Control)', () => {

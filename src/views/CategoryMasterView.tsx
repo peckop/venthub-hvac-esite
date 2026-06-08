@@ -1,17 +1,16 @@
 'use client'
 
 import React, { useMemo } from 'react'
+
 import { useCategoryGateway } from '../hooks/useCategoryGateway'
 import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
-import CategoryShowcaseView from './category/CategoryShowcaseView'
+import type { DomainCategory } from '../lib/type-converters'
+import { DomainProduct } from '../lib/type-converters'
 import CategoryGridView from './category/CategoryGridView'
 import CategoryLandingView from './category/CategoryLandingView'
 import CategorySeriesView from './category/CategorySeriesView'
+import CategoryShowcaseView from './category/CategoryShowcaseView'
 import ProductsDiscoveryView from './ProductsDiscoveryView'
-
-
-import type { DomainCategory } from '../lib/type-converters'
-import { DomainProduct } from '../lib/type-converters'
 
 interface CategoryMasterViewProps {
   initialCategory?: DomainCategory | null

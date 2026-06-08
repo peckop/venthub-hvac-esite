@@ -1,6 +1,9 @@
-import VentImage from '@/components/ui/VentImage'
+import { ArrowDown, ChevronDown, ChevronUp,Shield, Thermometer, Wind } from 'lucide-react'
 import React, { useState } from 'react'
-import { Wind, ArrowDown, Shield, Thermometer, ChevronDown, ChevronUp } from 'lucide-react'
+
+import VentImage from '@/components/ui/VentImage'
+import { useI18n } from '@/i18n/I18nProvider'
+
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
 /**
@@ -8,35 +11,26 @@ import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useSc
  * Hava perdesinin çalışma prensibini görselleştirir
  */
 const HowItWorks: React.FC = () => {
+    const { dict } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const [activeStep, setActiveStep] = useState(0)
 
-    const steps = [
-        {
-            icon: Wind,
-            title: 'Güçlü Hava Akışı',
-            description: 'Cihaz, yüksek hızda kontrollü bir hava akışı oluşturur.',
-            detail: 'Özel tasarımlı fan ve kanatlar sayesinde düzgün ve güçlü bir hava akımı sağlanır.'
-        },
-        {
-            icon: ArrowDown,
-            title: 'Görünmez Bariyer',
-            description: 'Hava akışı, kapı açıklığında görünmez bir perde oluşturur.',
-            detail: 'Bu hava perdesi, iç ve dış ortamı fiziksel bir engel olmadan birbirinden ayırır.'
-        },
-        {
-            icon: Shield,
-            title: 'İzolasyon',
-            description: 'Dış hava, toz, böcek ve koku içeri giremez.',
-            detail: 'İç ortam sıcaklığı korunur, hijyen standartları sağlanır.'
-        },
-        {
-            icon: Thermometer,
-            title: 'Konfor',
-            description: 'Müşteriler ve çalışanlar için ideal ortam sağlanır.',
-            detail: 'Kapı açık kalsa bile iç mekan konforu bozulmaz.'
+    const stepIcons = [Wind, ArrowDown, Shield, Thermometer]
+    const stepsData = dict.category.howItWorksAirCurtain.steps
+
+    const steps = stepIcons.map((Icon, index) => {
+        const stepData = stepsData[index]
+        return {
+            icon: Icon,
+            title: stepData.title,
+            description: stepData.description,
+            detail: stepData.detail
         }
-    ]
+    })
+
+    const titleVal = dict.category.howItWorksAirCurtain.title
+    const subtitleVal = dict.category.howItWorksAirCurtain.subtitle
+    const diagramAltVal = dict.category.howItWorksAirCurtain.diagramAlt
 
     return (
         <section ref={sectionRef} className="py-12 sm:py-16 bg-white overflow-hidden">
@@ -44,10 +38,10 @@ const HowItWorks: React.FC = () => {
                 {/* Section Header */}
                 <div className={`text-center mb-8 sm:mb-12 ${scrollAnimationClasses.fadeUp(isVisible)}`}>
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Hava Perdesi Nasıl Çalışır?
+                        {titleVal}
                     </h2>
                     <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                        Basit ama etkili bir prensip: Görünmez hava duvarı
+                        {subtitleVal}
                     </p>
                 </div>
 
@@ -55,7 +49,7 @@ const HowItWorks: React.FC = () => {
                     {/* Technical Diagram Image */}
                     <div className={`relative rounded-2xl overflow-hidden shadow-xl ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
                         <VentImage src="/images/category/air-curtain-diagram.png"
-                            alt="Hava Perdesi Çalışma Prensibi"
+                            alt={diagramAltVal}
                             className="w-full h-auto"
                             width={1200}
                             height={800}

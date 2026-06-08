@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect,useState } from 'react'
+
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 export interface AppSettings {

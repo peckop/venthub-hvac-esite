@@ -3,38 +3,40 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\productHelpers.ts
-skeleton_hash: cdb04e41cfaea839
+skeleton_hash: 37c2c0abc7820f85
 entity_hashes:
   func:formatSpecValue: 0b8f9bc746e92a72
   func:groupTechnicalSpecs: 51db2787f818ddff
   func:translateSpecKey: 29d8d7c9441eed5b
-  overview: 4b30ef2d65385d1e
-generated_at: 2026-05-28T22:38:49Z
+  overview: d7a104403f7d2f6a
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinde yer alan bu yardımcı modül, ürün teknik özelliklerinin kullanıcı arayüzlerinde kullanılmaya hazır hale getirilmesini sağlar. Ürünlerle ilgili ham spesifikasyon verilerini işleyerek okunabilir, düzenli bir formata dönüştürür, platformun ürün detay ve listeleme sayfalarında ihtiyaç duyduğu tüm veri ön işleme adımlarını yerine getirir. Üç temel fonksiyonu üzerinden anahtar çevirme, değer biçimlendirme ve gruplama işlerini tek bir modül altında toplar.
+VentHub HVAC projesindeki bu yardımcı modül, ürünlerin teknik özelliklerini (spesifikasyonlarını) insan tarafından okunabilir ve kullanıcı arayüzlerinde gösterilmeye uygun bir forma dönüştürmekle sorumludur. Ham veri setlerini işleyerek anahtar terimleri çevirir, değerleri biçimlendirir ve tüm özellikleri mantıksal gruplar altında organize eder.
 
 ## Fonksiyon Grupları
-### Spesifikasyon Dönüştürme Fonksiyonları
-Sistem içindeki ham teknik özellik etiketlerini ve değerlerini kullanıcı dostu, anlaşılır formata çevirmekten sorumludur. Teknik kısaltmaları ve kodlanmış terimleri insanların okuyabileceği açıklamalara dönüştürür, değerleri de sunum için uygun biçimde düzenler.
+### Veri Dönüştürme ve Biçimlendirme
+Ham teknik özellik anahtarlarını ve değerlerini, son kullanıcıya sunulacak anlamlı ve düzenli metinlere dönüştürmekle görevlidir.
 - translateSpecKey, formatSpecValue
 
-### Spesifikasyon Organizasyon Fonksiyonu
-Tek bir nesne olarak gelen tüm ham teknik özellik kümesini mantıksal kategoriler altında gruplayarak düzenli bir yapıya kavuşturur. Dağınık spesifikasyon verilerini kullanıcı arayüzünde kolayca sunulabilecek şekilde organize eder.
+### Veri Organizasyonu
+Çeşitli teknik özelliklerden oluşan ham bir veri kümesini, tanımlanmış bir düzende ve öncelik sırasına göre gruplandırarak düzenli bir yapıya kavuşturur.
 - groupTechnicalSpecs
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Ürün teknik özellikleri üzerinde anahtar çevirisi, değer biçimlendirme ve gruplama/sıralama işlemleri yapan bu yardımcı modülün doğru çalışması için aşağıdaki koşulların karşılanması zorunludur.
 
-[Aksiyom 1]: Eğer modül sabiti SPEC_SORT_ORDER tanımsız, bozuk veya eksik yapıdaysa, groupTechnicalSpecs fonksiyonu teknik özellikleri doğru gruplayamaz ve sıralayamaz.
-[Aksiyom 2]: Eğer translateSpecKey fonksiyonuna gönderilen key parametresi string tipinde değilse, özellik anahtarı çevirisi yapılamaz, beklenmedik ham anahtar değeri üretilir.
-[Aksiyom 3]: Eğer formatSpecValue fonksiyonuna gönderilen key parametresi string tipinde değilse, biçimlendirme kuralı seçilemez, özellik değeri doğru biçimlendirilemez.
-[Aksiyom 4]: Eğer groupTechnicalSpecs fonksiyonuna gönderilen specs parametresi ne null/undefined ne de geçerli Record<string, unknown> yapısındaysa, gruplama işlemi başarısız olur, fonksiyon hata fırlatır veya boş çıktı üretir.
-[Aksiyom 5]: Eğer translateSpecKey fonksiyonunda kullanılan anahtar çeviri eşleşmeleri (mapping) tüm geçerli özellik anahtarlarını kapsamıyorsa, eşleşmeyen anahtarlar çevrilmeden kullanılır, kullanıcı arayüzünde anlaşılmaz etiketler görünür.
-[Aksiyom 6]: Eğer formatSpecValue fonksiyonuna gönderilen value parametresi, ilgili key için desteklenmeyen bir veri tipindeyse, özellik değeri standart dışı biçimde gösterilir, birim ekleme, nicel sıralama gibi işlemler başarısız olur.
+Bu modül, ürün teknik özelliklerinin dönüştürülmesi ve biçimlendirilmesi için yardımcı fonksiyonlar içerir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir:
+
+[Aksiyom 1]: Eğer `translateSpecKey` fonksiyonuna verilen `key` parametresi için çeviri sözlüğünde karşılık gelen bir tanımlama yoksa, fonksiyon anahtarı olduğu gibi döndürür (çeviri yapılmaz).
+
+[Aksiyom 2]: Eğer `formatSpecValue` fonksiyonuna verilen `value` parametresi, `key`'e özgü beklenen formatta (örneğin `Date` nesnesi, birim bilgisi gerektiren bir metin vb.) sağlanmamışsa, değer varsayılan bir metin temsiline (örneğin `[object Object]`, `Invalid Date`) dönüştürülür veya hata ele alımı devreye girer.
+
+[Aksiyom 3]: Eğer `groupTechnicalSpecs` fonksiyonuna `specs` parametresi olarak `null` veya `undefined` değeri verilirse, fonksiyon boş bir grup sözlüğü döndürür.
+
+[Aksiyom 4]: Eğer modül içinde tanımlı `SPEC_SORT_ORDER` sabiti (objesi) yoksa, `groupTechnicalSpecs` fonksiyonu tarafından üretilen grupların sıralaması tanımsız veya rastgele olur; belirli bir sıralama garantisi verilemez.
 
 ---
 
@@ -77,34 +79,27 @@ Tek bir nesne olarak gelen tüm ham teknik özellik kümesini mantıksal kategor
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\productHelpers.ts::translateSpecKey
-- **params**: [key: string]
+### [N1_NASIL] AST Pointer: src/utils/productHelpers.ts::translateSpecKey
+- **params**: `(key: string)` — Türkçeye çevrilecek teknik özellik anahtarı
 - **ic_degiskenler**:
-  - `translations` — Teknik spesifikasyon anahtarlarının Türkçe çevirilerini tutan kayıt nesnesi, anahtar eşleşmesi ile çeviri sağlar
-  - `lowerKey` — Gelen `key` parametresinin küçük harfe çevrilmiş hali, çeviri haritasında anahtar ararken kullanılır
-- **Dönüş**: string (çevrilmiş veya formatlanmış orijinal anahtar metni)
+  - `translations` — Spec anahtarlarını Türkçe etiketlere eşleyen sözlük (ör: 'rpm_max' → '2. Kademe Devir Hızı')
+  - `lowerKey` — `key` parametresinin küçük harfli hali, büyük/küçük harf duyarsız sözlük araması için
+- **Dönüş**: `string` — Çevrilmiş Türkçe etiket veya `_` ile ayrılmış kelimeleri baş harfi büyükleştirilmiş hali
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\productHelpers.ts::formatSpecValue
-- **params**: [key: string, value: unknown]
+### [N2_NASIL] AST Pointer: src/utils/productHelpers.ts::formatSpecValue
+- **params**: `(key: string, value: unknown)` — Biçimlendirilecek teknik özellik anahtarı ve değeri
 - **ic_degiskenler**:
-  - `stringValue` — Gelen `value` parametresinin stringe dönüştürülmüş hali, birim ekleme işlemlerinde temel olarak kullanılır
-  - `lowerKey` — Gelen `key` parametresinin küçük harfe çevrilmiş hali, anahtar sonuna göre uygun birim eklemesi yapmak için kullanılır
-- **Dönüş**: string (birim eklenmiş, formatlanmış spesifikasyon değeri)
+  - `stringValue` — `value` parametresinin string temsili, birim eklemek için kullanılır
+  - `lowerKey` — `key` parametresinin küçük harfli hali, son ek kontrolü ile doğru birimi belirler
+- **Dönüş**: `string` - Birim eklenmiş biçimlendirilmiş değer (ör: "25 mm", "50 Hz") veya değerin kendisi
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\productHelpers.ts::groupTechnicalSpecs
-- **params**: [specs: Record<string, unknown> | null | undefined]
+### [N3_NASIL] AST Pointer: src/utils/productHelpers.ts::groupTechnicalSpecs
+- **params**: `(specs: Record<string, unknown> | null | undefined)` — Gruplanacak teknik özellikler sözlüğü
 - **ic_degiskenler**:
-  - `groups` — Spesifikasyonları kategorize eden ana nesne, her kategori için etiket, ikon ve boş spesifikasyon nesnesi tutar
-  - `key` — `Object.entries(specs)` iterasyonunda elde edilen mevcut spesifikasyonun anahtarı
-  - `value` — `Object.entries(specs)` iterasyonunda elde edilen mevcut spesifikasyonun değeri
-  - `k` — Mevcut iterasyondaki `key`'in küçük harfe çevrilmiş hali, spesifikasyonun hangi gruba atanacağını belirlemek için kullanılır
-- **Dönüş**: Kategorize edilmiş grup nesnesi, boş/null gelen specs için null döndürür
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\productHelpers.ts::specGroupAssignmentCallback
-- **params**: [[key: string, value: unknown]] (tuple olarak alınan spesifikasyon anahtar-değer çifti)
-- **ic_degiskenler**:
-  - `k` — Gelen anahtarın küçük harfe çevrilmiş hali, spesifikasyonun uygun gruba atanması için anahtar içeriğini kontrol etmede kullanılır
-- **Dönüş**: yok (sadece dış kapsamdaki `groups` nesnesine spesifikasyon ekler, herhangi bir dönüş değeri yoktur)
+  - `groups` — Dört kategoriye ayrılmış grup yapısı: `performance` (performans ölçüleri, `Settings` ikonu), `physical` (fiziksel ölçümler, `Ruler` ikonu), `electrical` (elektriksel veriler, `Settings` ikonu), `other` (diğer özellikler, `Settings` ikonu); her kategori `label`, `icon` ve boş `specs` sözlüğü içerir
+  - `k` — Döngü içindeki mevcut anahtarın küçük harf hali, kategori sınıflandırması için kullanılır
+- **Dönüş**: `Record<string, { label: string; icon: React.ComponentType; specs: Record<string, unknown> }> | null` — Gruplanmış özellikler sözlüğü veya `specs` null/undefined ise `null` döner
+- **Yan etkiler**: `Object.entries(specs)` döngüsü ile her özellik, anahtar kelime eşleşmesine göre ilgili grubun `specs` alanına atanır: airflow/speed/rpm/delivery/pressure → performance, size/weight/width/height/depth/dim_ → physical, voltage/power/hz/absorbed/current/phase → electrical, diğerleri → other; null/undefined/boş string değerler atlanır
 
 ---
 

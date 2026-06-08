@@ -1,9 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import React, { createContext, useCallback,useContext, useEffect, useMemo, useState } from 'react';
+
 import { getCategories } from '@/lib/services/category.service';
 import { useSupabaseClient } from '@/providers/SupabaseProvider';
-import { toUICategoryList, DomainCategory } from '../lib/type-converters';
+
+import { DomainCategory,toUICategoryList } from '../lib/type-converters';
 import type { CategoryMetadata } from '../types/db-rows';
 
 interface CategoryContextType {

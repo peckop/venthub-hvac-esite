@@ -1,6 +1,7 @@
-import React from 'react'
-import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import React from 'react'
+
 import { useI18n } from '../../i18n/I18nProvider'
 
 const WarrantyPage: React.FC = () => {

@@ -1,13 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { ArrowLeft, Eye, EyeOff, Loader2,Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
-import { useAuth } from '../hooks/useAuth'
-import { ArrowLeft, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useState } from 'react'
 import { toast } from 'sonner'
-import { useI18n } from '../i18n/I18nProvider'
+
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import { useAuth } from '../hooks/useAuth'
+import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
 const LoginPage: React.FC = () => {

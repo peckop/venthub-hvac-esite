@@ -1,20 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
-import { 
-  Activity, 
-  RefreshCw, 
-  CheckCircle2, 
-  XCircle, 
-  Clock,
-  Code
-} from 'lucide-react';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { DbWebhookEvent } from '@/types/db-rows';
+import { 
+  Activity, 
+  CheckCircle2, 
+  Clock,
+  Code,
+  RefreshCw, 
+  XCircle} from 'lucide-react';
+import React, { useEffect,useState } from 'react';
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import { Database } from '@/types/database.types';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { DbWebhookEvent } from '@/types/db-rows';
 
 // Use centralized DbWebhookEvent instead of local interface
 type WebhookEventRow = DbWebhookEvent;

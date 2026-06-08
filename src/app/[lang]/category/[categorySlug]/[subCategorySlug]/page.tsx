@@ -1,12 +1,14 @@
 import React from 'react'
-import PageComponent from '../../../../../views/CategoryPage'
-import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+
+import { en } from '@/i18n/dictionaries/en'
+import { tr } from '@/i18n/dictionaries/tr'
 import { getProductsEnriched } from '@/lib/services/product.service'
-import { mapDatabaseCategoryToDomain } from '../../../../../lib/type-converters'
-import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../../../../types/db-rows'
+import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+
 import type { DomainProduct } from '../../../../../lib/type-converters'
-
-
+import { mapDatabaseCategoryToDomain } from '../../../../../lib/type-converters'
+import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../../../../types/db-rows'
+import PageComponent from '../../../../../views/CategoryPage'
 
 async function getCategoryData(slug: string) {
   const { data, error } = await supabase
@@ -54,10 +56,11 @@ export async function generateStaticParams() {
   })
 }
 
-export default async function Page({ params }: { params: Promise<{ categorySlug: string, subCategorySlug: string }> }) {
-  const { subCategorySlug } = await params
+export default async function Page({ params }: { params: Promise<{ categorySlug: string, subCategorySlug: string, lang: string }> }) {
+  const { subCategorySlug, lang } = await params
   
   const category = await getCategoryData(subCategorySlug)
+  const dict = lang === 'en' ? en : tr
   
   let products: DomainProduct[] = []
   if (category) {
@@ -68,7 +71,7 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
   }
 
   return (
-    <React.Suspense fallback={<div className="container mx-auto py-12 px-4 text-center text-slate-500">Yükleniyor...</div>}>
+    <React.Suspense fallback={<div className="container mx-auto py-12 px-4 text-center text-slate-500">{dict.common.loading}</div>}>
       <PageComponent initialCategory={category} initialProducts={products} />
     </React.Suspense>
   )

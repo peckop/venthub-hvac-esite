@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\ActivityHeatmap.tsx
-skeleton_hash: 2c5758de78bc1dee
+skeleton_hash: fcfcf08ada0258f3
 entity_hashes:
   func:ActivityHeatmap: bd94540a2dbd025e
   func:CustomTooltip: 99bc62d30dc2bdeb
   overview: 0c663e64337450d6
   style_tokens: 92623035906e7e7c
-generated_at: 2026-05-28T22:35:38Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış
@@ -43,11 +43,21 @@ Bu modül için aksiyomlar, sadece fonksiyon imzalarından ve bileşen yapısın
 
 ---
 
-**Not:** Bu aksiyomlar sadece fonksiyon imzaları ve bileşen tanımları referans alınarak oluşturulmuştur. Fonksiyon gövdesindeki detaylı doğrulama, varsayılan değer处理 ve hata yönetimi mantığı bilinmemektedir.
-
----
-
 ## FONKSİYON DETAYLARI
+
+### ActivityHeatmap
+**Ne yapar**: ActivityHeatmap, haftalık aktivite verilerini ısı haritası (heatmap) formatında görselleştiren bir React bileşenidir. Verilen veri kümesine göre gün ve saat bazında renk kodlu bir gösterim sunar.
+
+**Nasıl yapar**: Bileşen, HeatmapData türündeki data prop'unu alır ve her bir hücre için aktivite yoğunluğuna bağlı olarak renk intensitesi hesaplar. `title` prop'u ısı haritasının üst kısmında başlık olarak görüntülenir.
+
+**Parametreler**:
+- `data` — `HeatmapData[]` türünde olup, ısı haritasında gösterilecek haftalık aktivite veri dizisini temsil eder
+- `title` — `string` türünde olup, ısı haritasının başlığını belirler
+
+**Dönüş**: `React.FC<ActivityHeatmapProps>` — ActivityHeatmapProps arayüzüne uygun bir React fonksiyonel bileşeni döndürür
+
+### CustomTooltip
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
@@ -66,34 +76,37 @@ Bu modül için aksiyomlar, sadece fonksiyon imzalarından ve bileşen yapısın
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/dashboard/ActivityHeatmap.tsx::ActivityHeatmap
-- **params**: data, title
+### [N1_NASIL] AST Pointer: `ActivityHeatmap.tsx::ActivityHeatmap`
+- **params**: (`data`, `title`)
 - **ic_degiskenler**: 
-  - `dayNames` — array of Turkish abbreviated day names used for Y‑axis labels.
-  - `chartData` — transformed data array where each object contains `hour`, `dayIndex` (0 = Mon … 6 = Sun), `dayName` (string) and `count`.
-  - `CustomTooltip` — a React component that renders the tooltip content when a scatter point is active.
-  - `maxCount` — holds the maximum `count` value across `chartData`, used to set the Z‑axis domain.
-  - `zRange` — tuple `[minArea, maxArea]` defining the minimum and maximum bubble size for the Z‑axis.
-- **Dönüş**: JSX element (the rendered component)
+  - `dayNames` — Türkçe gün isimleri dizisi (Pzt, Sal, Çar, Per, Cum, Cmt, Paz)
+  - `chartData` — `data.map()` ile oluşturulan, `hour`, `dayIndex`, `dayName`, `count` özellikleri olan dizi
+  - `ourDayIndex` — `d.day` değerinden hesaplanan indeks (0=Pzt, 6=Paz)
+  - `data` (CustomTooltip içindeki) — `payload[0].payload` erişimiyle alınan HeatmapData & dayName nesnesi
+  - `maxCount` — `chartData` dizisi içindeki maksimum `count` değeri (Z ekseni ölçeklendirmesi için)
+  - `zRange` — `[20, 400]` sabit dizisi, baloncuk boyut aralığı
+  - `intensity` — Her `entry.count / maxCount` oranı
+  - `opacity` — `Math.max(0.15, intensity)` hesaplamasıyla belirlenen opaklık
+- **Dönüş**: JSX elementi (React component)
 
-### [N2_NASIL] AST Pointer: src/components/admin/dashboard/ActivityHeatmap.tsx::chartData.map callback
-- **params**: d
+### [N2_NASIL] AST Pointer: `ActivityHeatmap.tsx::CustomTooltip`
+- **params**: (`active`, `payload`)
 - **ic_degiskenler**: 
-  - `ourDayIndex` — computed Y‑axis index (0 = Mon, …, 6 = Sun) derived from `d.day`.
-- **Dönüş**: object `{ hour: number, dayIndex: number, dayName: string, count: number }`
+  - `data` — `payload[0].payload` erişimiyle alınan HeatmapData & dayName nesnesi
+- **Dönüş**: JSX elementi veya `null`
 
-### [N3_NASIL] AST Pointer: src/components/admin/dashboard/ActivityHeatmap.tsx::CustomTooltip
-- **params**: active, payload
+### [N3_NASIL] AST Pointer: `ActivityHeatmap.tsx::data.map callback`
+- **params**: (`d`)
 - **ic_degiskenler**: 
-  - `data` — the tooltip payload (`payload[0].payload`) containing `dayName`, `hour` and `count` for the active point.
-- **Dönüş**: JSX element (tooltip div) or `null`
+  - `ourDayIndex` — `d.day` değerinden hesaplanan indeks (Pazartesi başlangıçlı)
+- **Dönüş**: `{ hour, dayIndex, dayName, count }` nesnesi
 
-### [N4_NASIL] AST Pointer: src/components/admin/dashboard/ActivityHeatmap.tsx::Scatter data map callback
-- **params**: entry, index
+### [N4_NASIL] AST Pointer: `ActivityHeatmap.tsx::chartData.map callback`
+- **params**: (`entry`, `index`)
 - **ic_degiskenler**: 
-  - `intensity` — ratio `entry.count / maxCount` used to determine visual strength.
-  - `opacity` — bubble fill opacity, clamped to a minimum of 0.15.
-- **Dönüş**: JSX element (`<Cell>`) representing a scatter point.
+  - `intensity` — `entry.count / maxCount` hesaplamasıyla elde edilen yoğunluk oranı
+  - `opacity` — `Math.max(0.15, intensity)` hesaplamasıyla belirlenen opaklık değeri
+- **Dönüş**: `<Cell>` JSX elementi
 
 ---
 

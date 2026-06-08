@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\konular\[slug]\page.tsx
-skeleton_hash: e0d4abb9cfa64325
+skeleton_hash: a57903678e35d28e
 entity_hashes:
   func:Page: 2d510b14b2c5d81b
   func:generateStaticParams: f1cbfd553f9fcd39
   overview: 379a6c4a34f8235e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:34:48Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış

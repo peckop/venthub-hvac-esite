@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+
 import { adminButtonPrimaryClass } from '../../utils/adminUi'
 
 interface BulkActionToolbarProps {

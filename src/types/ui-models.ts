@@ -1,5 +1,5 @@
-import type { DbCategory, DbProduct, DbUserProject, DbProjectItem, DbUserAddress, DbInvoiceProfile } from './db-rows';
 import type { Json } from './database.types';
+import type { DbCategory, DbInvoiceProfile,DbProduct, DbProjectItem, DbUserAddress, DbUserProject } from './db-rows';
 
 /**
  * DomainCategory: The sanitized, UI-ready version of a category.

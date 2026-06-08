@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\i18n\I18nContext.ts
 skeleton_hash: e6d6e8b6a44ec265
 entity_hashes:
   overview: 0ce19631cc889ffb
-generated_at: 2026-06-06T08:44:39Z
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış
@@ -22,7 +22,9 @@ Modül, projede kullanılacak dil seçeneklerini (`tr` | `en`) temsil eden `Lang
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül bir React Context tanımıdır ve doğrudan fonksiyon gövdesi içermemektedir. Dolayısıyla modülün çalışması için gereken bağlam düzeyinde varsayımlar aşağıdadır.
 
 ---
 
@@ -78,19 +80,6 @@ type TranslationKeyInput = TranslationKeys | (string & Record<never, never>)
 ## AST POINTERS
 
 Bu dosyada **fonksiyon gövdesi bulunmamaktadır**. Dosya yalnızca bir React Context nesnesi oluşturur ve dışa aktarır.
-
----
-
-### [N1_NASIL] AST Pointer: i18n/I18nContext.ts::I18nContext (Context Oluşturma)
-
-- **params**: —
-- **ic_degiskenler**:
-  - `I18nContext` — `createContext(tr)` çağrısı ile oluşturulan React Context nesnesi; uygulama genelinde çeviri (i18n) değerlerini sağlamak için kullanılır; başlangıç değeri olarak `tr` sözlüğü (Türkçe) verilmiştir
-- **Dönüş**: — (dosya düzeyinde sadece `I18nContext` sabiti tanımlanıp export edilir; fonksiyon dönüşü yoktur)
-
----
-
-**Not:** Bu dosyada herhangi bir fonksiyon gövdesi, method veya sınıf tanımı bulunmamaktadır. Dosyanın tek amacı `createContext` çağrısı ile bir context nesnesi oluşturup dışa aktarmaktır.
 
 ---
 

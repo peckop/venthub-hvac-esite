@@ -4,6 +4,7 @@
  */
 
 import type { Product } from '@/types/ui-models';
+
 import { isRecord } from './type-converters';
 
 export interface EngineeringInference {

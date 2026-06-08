@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\TrustProofSection.tsx
-skeleton_hash: 3990bf5913c326a6
+skeleton_hash: 40c6f2af4b673a2a
 entity_hashes:
   func:TrustProofSection: ff4459fea67ab188
   overview: ecbeef82efa3251a
   style_tokens: fd859472e8c1a696
-generated_at: 2026-06-07T20:34:31Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış

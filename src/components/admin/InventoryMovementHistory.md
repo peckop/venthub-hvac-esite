@@ -8,7 +8,7 @@ entity_hashes:
   func:InventoryMovementHistory: 2413e5385b8816cc
   overview: a9fb0b3f91f018c7
   style_tokens: 1f29bfe131c33c25
-generated_at: 2026-05-28T22:35:35Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış

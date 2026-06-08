@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useRole.ts
-skeleton_hash: 2c18158cd6a4a6f5
+skeleton_hash: f05bb9f611a27aa5
 entity_hashes:
   func:useRole: fc94b629f746b287
   overview: a47ed3737adf4eba
-generated_at: 2026-05-28T22:37:48Z
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış

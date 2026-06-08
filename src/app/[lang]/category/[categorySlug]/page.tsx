@@ -1,12 +1,16 @@
 import React, { cache } from 'react'
-import PageComponent from '../../../../views/CategoryPage'
-import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+
+import { en } from '@/i18n/dictionaries/en'
+import { tr } from '@/i18n/dictionaries/tr'
 import { getProductsEnriched } from '@/lib/services/product.service'
-import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
-import type { DomainCategory, DomainProduct } from '../../../../lib/type-converters'
-import type { DbCategory, CategoryMetadata, AuthorityContent } from '../../../../types/db-rows'
+import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+
 import { SITE_URL } from '../../../../config/siteUrl'
 import { getCachedCategoryData, preloadCategory } from '../../../../lib/data/preload'
+import type { DomainCategory, DomainProduct } from '../../../../lib/type-converters'
+import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
+import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../../../types/db-rows'
+import PageComponent from '../../../../views/CategoryPage'
 
 // React.cache() ile bağımsız Supabase ORM sorgusu (L10_05 Kurumsal Disiplini)
 const _getCachedSupabaseData = cache((id: string) => {
@@ -27,26 +31,30 @@ export async function generateStaticParams() {
   ])
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ categorySlug: string }> }) {
-  const { categorySlug } = await params
+export async function generateMetadata({ params }: { params: Promise<{ categorySlug: string, lang: string }> }) {
+  const { categorySlug, lang } = await params
   preloadCategory(categorySlug)
   const category = await getCachedCategoryData(categorySlug)
   
   if (!category) {
     return {
-      title: 'Kategori Bulunamadı | VentHub',
+      title: lang === 'en' ? 'Category Not Found | VentHub' : 'Kategori Bulunamadı | VentHub',
     }
   }
 
+  const desc = lang === 'en'
+    ? `Explore the highest quality and most economical ventilation products in the ${category.name} category.`
+    : `${category.name} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`
+
   return {
     title: `${category.name} | VentHub`,
-    description: `${category.name} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfenin.`,
+    description: desc,
     alternates: {
       canonical: `${SITE_URL}/category/${categorySlug}`,
     },
     openGraph: {
       title: `${category.name} | VentHub`,
-      description: `${category.name} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`,
+      description: desc,
       url: `${SITE_URL}/category/${categorySlug}`,
       siteName: 'VentHub',
       images: [
@@ -56,16 +64,17 @@ export async function generateMetadata({ params }: { params: Promise<{ categoryS
           height: 630,
         },
       ],
-      locale: 'tr_TR',
+      locale: lang === 'en' ? 'en_US' : 'tr_TR',
       type: 'website',
     },
   }
 }
 
-export default async function Page({ params }: { params: Promise<{ categorySlug: string }> }) {
-  const { categorySlug } = await params
+export default async function Page({ params }: { params: Promise<{ categorySlug: string, lang: string }> }) {
+  const { categorySlug, lang } = await params
   preloadCategory(categorySlug)
   const category = await getCachedCategoryData(categorySlug)
+  const dict = lang === 'en' ? en : tr
   
   let products: DomainProduct[] = []
   let subCategories: DomainCategory[] = []
@@ -103,7 +112,7 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     "name": category?.name || categorySlug,
-    "description": `${category?.name || categorySlug} kategorisindeki ürünler`,
+    "description": lang === 'en' ? `Products in category ${category?.name || categorySlug}` : `${category?.name || categorySlug} kategorisindeki ürünler`,
     "url": `${SITE_URL}/category/${categorySlug}`,
     "numberOfItems": products.length,
     "itemListElement": products
@@ -121,7 +130,7 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
       />
-      <React.Suspense fallback={<div className="container mx-auto py-12 px-4 text-center text-slate-500">Yükleniyor...</div>}>
+      <React.Suspense fallback={<div className="container mx-auto py-12 px-4 text-center text-slate-500">{dict.common.loading}</div>}>
         <PageComponent initialCategory={category} initialProducts={products} initialSubCategories={subCategories} />
       </React.Suspense>
     </>

@@ -1,5 +1,6 @@
+import { CreditCard,Lock, ShieldCheck } from 'lucide-react'
 import React from 'react'
-import { Lock, ShieldCheck, CreditCard } from 'lucide-react'
+
 import { useI18n } from '../i18n/I18nProvider'
 
 interface SecurityRibbonProps {

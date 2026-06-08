@@ -1,14 +1,14 @@
 'use client'
-import { Routes } from '../../utils/routes'
-
-import React, { useEffect, useState } from 'react'
 import * as NavigationMenu from '@radix-ui/react-navigation-menu'
-import Link from 'next/link'
 import { ChevronDown, ExternalLink } from 'lucide-react'
-import { getCategoryIcon } from '../../utils/getCategoryIcon'
-import MegaMenu3DBackground from './MegaMenu3DBackground'
-import { DomainCategory } from '../../lib/type-converters'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
+
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { DomainCategory } from '../../lib/type-converters'
+import { getCategoryIcon } from '../../utils/getCategoryIcon'
+import { Routes } from '../../utils/routes'
+import MegaMenu3DBackground from './MegaMenu3DBackground'
 
 interface EliteMegaMenuProps {
     categories: DomainCategory[]

@@ -1,13 +1,14 @@
-import { Routes } from '../utils/routes'
-import React, { useMemo } from 'react'
-import Link from 'next/link'
 import {
-    Wind, Fan, Droplet, Thermometer,
-    AirVent, Settings, Package, Wrench, LucideIcon
-} from 'lucide-react'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+    AirVent, Droplet, Fan, LucideIcon,
+Package, Settings, Thermometer,
+    Wind, Wrench} from 'lucide-react'
+import Link from 'next/link'
+import React, { useMemo } from 'react'
+
 import { useCategories } from '../contexts/CategoryContext'
 import { DomainCategory } from '../lib/type-converters'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { Routes } from '../utils/routes'
 
 // Kategori ikonları - slug bazlı eşleme
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
@@ -144,7 +145,7 @@ const CategoryFlow: React.FC<CategoryFlowProps> = ({
 
     return (
         <>
-            <style>{`
+            <style dangerouslySetInnerHTML={{ __html: `
                 @keyframes category-scroll-left {
                     from { transform: translateX(0); }
                     to { transform: translateX(-33.333%); }
@@ -163,7 +164,7 @@ const CategoryFlow: React.FC<CategoryFlowProps> = ({
                 .animate-category-scroll-right:hover {
                     animation-play-state: paused;
                 }
-            `}</style>
+            ` }} />
 
             <section className="py-12 sm:py-16 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
                 {/* Section Header */}

@@ -3,43 +3,53 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx
-skeleton_hash: b004be65939f363c
+skeleton_hash: 94383266ce9e0732
 entity_hashes:
   func:InfiniteProductsShowcase: 085e1a5c6ded015b
   func:ProductCard: 9a7014f633ef56b4
   func:SceneContent: 03f3d506874eed14
   func:getOptimizedImageUrl: 17e01a36f07a7e10
   func:handleClick: bffc3b12eebc550c
-  overview: 30d5253fe6fbef7a
+  overview: 107d0b226b7eef2b
   style_tokens: 6568addf96368125
-generated_at: 2026-05-28T22:36:50Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış
-Bu modül, ürünleri sonsuz kaydırma (infinite scroll) mantığıyla gösteren bir React bileşeni sağlar. Görsel optimizasyonu, ürün kartları ve 3B sahne içeriği gibi işlevleri birleştirerek kullanıcıya etkileşimli bir ürün vitrini sunar.
+Bu modül, ürünleri Three.js tabanlı 3B bir sahnede sonsuz kaydırma mantığıyla sergileyen React bileşenidir. Görsel optimizasyonu, etkileşimli ürün kartlarını ve 3B sahne yönetimini tek bir bileşen yapısında birleştirerek kullanıcıya akıcı bir vitrin deneyimi sunar.
 
 ## Fonksiyon Grupları
 ### Görsel Optimizasyonu
-Ürün görsellerinin istenen boyutta ve formatta sunulmasını sağlayan yardımcı işlevi içerir.
+Ürün görsellerinin boyut ve format açısından optimize edilerek sunulmasını sağlayan yardımcı işlevi kapsar.
 - getOptimizedImageUrl
 
 ### Kullanıcı Arayüzü Bileşenleri
-Ürün kartlarının oluşturulması ve bu kartların bir koleksiyon olarak sahne içinde düzenlenmesini yönetir.
-- ProductCard
-- SceneContent
+Ürün kartlarının görsel ve etkileşimli yapısını, bu kartların 3B sahne içinde nasıl yerleştirileceğini tanımlayan bileşenleri içerir.
+- ProductCard, SceneContent
 
-### Etkileşim İşleyicisi
-Kullanıcının ürün kartlarına yaptığı tıklamaları yakalayıp ilgili yanıtları tetikler.
+### Olay İşleyicisi
+Kullanıcının ürün kartlarına tıklama gibi etkileşimlerini yakalayıp ilgili tepkileri tetikleyen işlevleri barındırır.
 - handleClick
 
 ### Ana Bileşen
-Ürün listesini alır, sonsuz kaydırma mantığını uygulayıp diğer bileşenleri bir araya getirerek tamamlı vitrini render eder.
+Ürün listesini alarak sonsuz kaydırma mantığını uygular ve tüm alt bileşenleri bir araya getirerek tamamlı vitrini render eder.
 - InfiniteProductsShowcase
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için, verilen fonksiyon imzalarına dayanan temel mimari varsayımlar şunlardır:
+
+[Aksiyom 1]: Eğer `getOptimizedImageUrl` fonksiyonuna geçerli bir görsel URL'si (`url`) veya geçerli bir genişlik (`width`) parametresi verilmezse, işlevsel olmayan veya hatalı bir görsel URL'si döndürülür.
+
+[Aksiyom 2]: Eğer `ProductCard` bileşenine geçerli bir `item` nesnesi (içeriğinde gerekli ürün bilgilerini taşıması beklenen) sağlanmazsa, bileşen ürün kartını doğru şekilde render edemez.
+
+[Aksiyom 3]: Eğer `handleClick` olay işleyicisine geçerli bir `ThreeEvent<MouseEvent>` nesnesi verilmezse (örn. `e` parametresi null veya tanımsız ise), tıklama olayı beklenen şekilde işlenemez.
+
+[Aksiyom 4]: Eğer `SceneContent` bileşenine geçerli bir `items` dizisi (en az bir ürün içermesi beklenen) sağlanmazsa veya `items` bir dizi değilse, sahne içeriği boş render edilir.
+
+[Aksiyom 5]: Eğer `InfiniteProductsShowcase` ana bileşenine geçerli bir `items` dizisi (ürün listesini içermesi gereken) verilmezse, sonsuz kaydırmalı vitrin gösterimi başarısız olur ve bileşen boş render edilir.
 
 ---
 
@@ -105,68 +115,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::getOptimizedImageUrl
-- **params**: (url: string, width = 400)
+### [N1_NASIL] AST Pointer: src/components/products/InfiniteProductsShowcase.tsx::getOptimizedImageUrl
+- **params**: `url: string`, `width: number` (varsayılan 400)
 - **ic_degiskenler**:
-  - `base` — `url`’un “?” karakterinden önceki kısmını tutar; render URL oluşturmak için kullanılır.
-  - `renderUrl` — `base` içinde “/object/” varsa “/render/image/” ile değiştirilmiş hali; son URL’ye ek parametreler eklenir.
-- **Dönüş**: `string` (optimize edilmiş veya orijinal URL)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::ProductCard
-- **params**: ({ item, index, total, gap, scrollOffset, isPaused, onHover })
-- **ic_degiskenler**:
-  - `groupRef` — `<group>` öğesinin referansı; konum ve dönüş animasyonları burada güncellenir.
-  - `imageRef` — `<DreiImage>` mesh referansı; ölçek ve ışınım (emissive) efektleri burada uygulanır.
-  - `router` — Next.js yönlendirme nesnesi; tıklama olayında kategori sayfasına yönlendirme yapılır.
-  - `hovered` — `boolean` state; fare üzerindeyken `true`, çıkınca `false`.
-  - `setHover` — `hovered` state’ini güncelleyen fonksiyon.
-  - `optimizedUrl` — `item.image` için `getOptimizedImageUrl` ile elde edilen, texture olarak kullanılacak URL.
-  - `sphereWidth` — `total * gap`; sonsuz kaydırma hesabında kullanılan toplam genişlik.
-- **Dönüş**: `React.ReactElement` (JSX içinde `<group>` ve içindeki öğeler)
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::ProductCard_useFrame
-- **params**: (state, _delta)
-- **ic_degiskenler**:
-  - `offset` — `scrollOffset.current`; kaydırma miktarını tutar.
-  - `xPos` — Hesaplanan X konumu; grup konumunu ve dönüşünü belirler.
-  - `targetScale` — `hovered` durumuna göre `1.15` ya da `1.0`; ölçekleme lerp hedefi.
-  - `mat` — `imageRef.current.material` tip dönüşümü; `MeshStandardMaterial` olarak kullanılır, emissive yoğunluğu burada ayarlanır.
-- **Dönüş**: `yok` (yan etkileri: grup konumu/rotasyonu, mesh ölçeği ve materyal emissive ayarı)
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::ProductCard_handleClick
-- **params**: (e: ThreeEvent<MouseEvent>)
-- **ic_degiskenler**:
-  - `e` — Gelen fare olayı; `stopPropagation()` ile olay yayılımı durdurulur.
-- **Dönüş**: `yok` (yan etki: `router.push(Routes.category(item.id))` ile sayfa yönlendirmesi)
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::SceneContent
-- **params**: ({ items, isPaused, onHover })
-- **ic_degiskenler**:
-  - `gap` — Ürün kartları arasındaki sabit mesafe; `5` olarak tanımlanır.
-  - `scrollOffset` — `useRef(0)` ile oluşturulan kaydırma ofseti; `useFrame` içinde güncellenir.
-  - `camera` — `useThree()` ile alınan kamera nesnesi; solunum (breathing) animasyonu burada uygulanır.
-- **Dönüş**: `React.ReactElement` (JSX içinde `<Bvh>` ve sahne öğeleri)
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::SceneContent_useFrame
-- **params**: (state, delta)
-- **ic_degiskenler**:
-  - `scrollOffset` — `scrollOffset.current`; `isPaused` false olduğunda artar, 1’i geçtiğinde sıfırlanır.
-  - `camera` — `camera.position.x` ve `camera.position.y`; `THREE.MathUtils.lerp` ile zaman bazlı sinüs fonksiyonlarıyla hareket ettirilir.
-- **Dönüş**: `yok` (yan etkileri: `scrollOffset` ve `camera` konum güncellemeleri)
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::SceneContent_mapCallback
-- **params**: (item, i)
-- **ic_degiskenler**:
-  - `item` — Tek bir ürün nesnesi; `ProductCard` prop’ları içinde kullanılır.
-  - `i` — Ürün indeks numarası; `ProductCard` prop’ları içinde kullanılır.
-- **Dönüş**: `React.ReactElement` (`<ProductCard …/>`)
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\InfiniteProductsShowcase.tsx::InfiniteProductsShowcase
-- **params**: ({ items })
-- **ic_degiskenler**:
-  - `isPaused` — `boolean` state; otomatik akışı duraklatma kontrolü.
-  - `setIsPaused` — `isPaused` state’ini güncelleyen fonksiyon; `SceneContent` üzerinden hover durumuna göre tetiklenir.
-- **Dönüş**: `React.ReactElement` (JSX içinde `<Canvas>` ve UI overlay)
+  - `base` — `url` stringinden query string (`?`之后) bölümü çıkarılmış temel URL; Supabase path manipülasyonunda kullanılır
+  - `renderUrl` — `base` içindeki `/object/` segmenti `/render/image/` ile değiştirilmiş render-uyumlu URL
+- **Dönüş**: string — Supabase görseli için optimize edilmiş webp render URL'i veya orijinal `url` (Supabase değilse)
 
 ---
 

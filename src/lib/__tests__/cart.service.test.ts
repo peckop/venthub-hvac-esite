@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getOrCreateShoppingCart, listCartItems, upsertCartItem, removeCartItem, clearCartItems } from '../services/cart.service'
+import { beforeEach,describe, expect, it, vi } from 'vitest'
+
+import { clearCartItems,getOrCreateShoppingCart, listCartItems, removeCartItem, upsertCartItem } from '../services/cart.service'
 import { supabase } from '../supabase'
 
 vi.mock('../supabase', () => {

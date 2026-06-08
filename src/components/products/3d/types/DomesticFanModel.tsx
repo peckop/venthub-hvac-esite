@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef } from 'react'
 import * as THREE from 'three'
+
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export const DomesticFanModel: React.FC = () => {

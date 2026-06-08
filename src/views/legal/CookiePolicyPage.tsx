@@ -1,4 +1,5 @@
 import React from 'react'
+
 import legalConfig from '../../config/legal'
 
 const CookiePolicyPage: React.FC = () => {

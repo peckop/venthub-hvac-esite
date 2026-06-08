@@ -8,7 +8,7 @@ entity_hashes:
   func:GreenClamps: 957b30489f158a33
   overview: 56ea2345484e125a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:38Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

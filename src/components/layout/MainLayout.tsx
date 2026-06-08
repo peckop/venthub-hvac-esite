@@ -1,18 +1,18 @@
 'use client'
 
-import React, { Suspense, lazy, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useScrollThrottle } from '../../hooks/useScrollThrottle'
+import React, { lazy, Suspense, useEffect, useState } from 'react'
 
-// Bileşenler
-import StickyHeader from '../StickyHeader'
-import Footer from '../Footer'
+import { useScrollThrottle } from '../../hooks/useScrollThrottle'
+import { Routes } from '../../utils/routes';
 import BackToTopButton from '../BackToTopButton'
-import ScrollToTop from '../ScrollToTop'
+import Footer from '../Footer'
 import LanguageSwitcher from '../LanguageSwitcher'
 import PaymentWatcher from '../PaymentWatcher'
-import { Routes } from '../../utils/routes';
+import ScrollToTop from '../ScrollToTop'
+// Bileşenler
+import StickyHeader from '../StickyHeader'
 
 
 // Lazy Overlays

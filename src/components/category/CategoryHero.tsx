@@ -1,15 +1,17 @@
 'use client'
 
-import React from 'react'
-import { useRouter } from 'next/navigation'
 import { ArrowLeft, Layers, ShieldCheck, Zap } from 'lucide-react'
-import VentImage from '../ui/VentImage'
-import { getCategoryIcon } from '../../utils/getCategoryIcon'
-import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { useRouter } from 'next/navigation'
+import React from 'react'
+
+import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
+import { cn } from '@/lib/utils'
+
 import { useI18n } from '../../i18n/I18nProvider'
 import type { DomainCategory } from '../../lib/type-converters'
-import { cn } from '@/lib/utils'
-import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { getCategoryIcon } from '../../utils/getCategoryIcon'
+import VentImage from '../ui/VentImage'
 
 interface CategoryHeroProps {
   category: DomainCategory | null

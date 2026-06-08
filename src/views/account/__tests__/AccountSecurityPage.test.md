@@ -3,25 +3,32 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\__tests__\AccountSecurityPage.test.tsx
-skeleton_hash: 178ee6f967011c3b
+skeleton_hash: 575f4d7bd4a1e049
 entity_hashes:
   func:renderWithProviders: 836f0c3bce4ec02c
-  overview: 0112e0bab9ff71b2
+  overview: c2cb0ff270a47d92
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-06T21:56:36Z
+generated_at: 2026-06-08T10:10:59Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasının hesap güvenliği sayfası için tasarlanmış bir test dosyasıdır. Amaç, testlerin tekrarlanabilir ve tutarlı bir ortamda çalışmasını sağlamaktır. Modül, test processlerini hızlandırmak ve standartlaştırmak için gerekli yardımcı araçları içerir.
+Bu modül, VentHub HVAC uygulamasının Hesap Güvenliği sayfası için yazılmış test dosyasıdır. Temel amacı, test senaryolarının çalıştırılacağı ortamı hazırlamak ve her testin tutarlı, izole bir bağlamda çalışmasını sağlamaktır. Tek bir yardımcı fonksiyon içerir; bu fonksiyon test edilen bileşeni uygulamanın gerçek üretimbenzerti koşullarına yakın bir ortamda render eder.
 
 ## Fonksiyon Grupları
 ### Test Ortamı Hazırlığı
-Test senaryoları çalıştırılmadan önce gerekli olan tüm bağlam (context) ve sağlayıcı (provider) bileşenlerini test edilen ana bileşenin etrafında sarmalayarak gerçekçi bir çalışma ortamı yaratır. Bu sayede her test kendi içinde tutarlı bir yapıya sahip olur.
+Testler çalıştırılmadan önce gerekli tüm sağlayıcıları (I18nProvider, AuthContext.Provider vb.) merkezi bir şekilde yapılandırarak test bileşeninin etrafını sarar. Bu sayede her test senaryosu kimlik doğrulama, uluslararasılaştırma gibi temel uygulama bağlamlarıyla donatılmış izole bir ortamda çalışır.
 - renderWithProviders
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül, testler için bir ortam hazırlayan yardımcı bir fonksiyon içerir. Doğru çalışması için aşağıdaki varsayımlar geçerlidir:
 
+[Aksiyom 1]: Eğer `renderWithProviders` fonksiyonunun çağrıldığı test ortamı, React test yardımcılarını (örn: `@testing-library/react`) içermiyorsa, bileşen düzgün bir şekilde render edilemez ve test başarısız olur.
+
+[Aksiyom 2]: Eğer `renderWithProviders` fonksiyonunun sarmaladığı (`wrapper`) `React.ReactElement` (`ui` parametresi) için gerekli bağımlılık sağlayıcıları (örn: `AuthProvider`, `ThemeProvider`, `MemoryRouter`) eksik veya hatalı yapılandırılmışsa, test edilen bileşen (`AccountSecurityPage`) bağlamdan yoksun kalır ve beklenmeyen davranışlar sergiler veya hata fırlatır.
+
+[Aksiyom 3]: Eğer `userEmail` parametresi bir değer olarak sağlanmazsa, fonksiyon varsayılan olarak `'u@example.com'` değerini kullanır. Bu varsayılan değerin, test senaryosunun beklentilerini karşılamadığı durumlarda, test düzgün çalışmayabilir.
 
 ---
 
@@ -40,116 +47,136 @@ Test senaryoları çalıştırılmadan önce gerekli olan tüm bağlam (context)
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: AccountSecurityPage.test.tsx::useRouterMock
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: useRouter mock objesi (push, replace, prefetch metodları)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ useRouter, useSearchParams, usePathname }` — Next.js hook'larının mock tanımları
 
-### [N2_NASIL] AST Pointer: AccountSecurityPage.test.tsx::useSearchParamsMock
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: Boş URLSearchParams nesnesi
+### [N2_NASIL] AST Pointer: AccountSecurityPage.test.tsx::routerMethodsMock
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ push, replace, prefetch }` — Router metodlarının vi.fn() mock'ları
 
-### [N3_NASIL] AST Pointer: AccountSecurityPage.test.tsx::usePathnameMock
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: '/' karakter dizisi
+### [N3_NASIL] AST Pointer: AccountSecurityPage.test.tsx::toastMock
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ toast: { error, success } }` — Sonner toast mock'ları
 
-### [N4_NASIL] AST Pointer: AccountSecurityPage.test.tsx::toastMock
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: toast mock objesi (error ve success metodları)
+### [N4_NASIL] AST Pointer: AccountSecurityPage.test.tsx::supabaseMock
+- **params**: yok
+- **ic_degiskenler**:
+  - `mockClient` — Supabase browser client mock'u, auth metodlarını (getUser, signInWithPassword, updateUser, unlinkIdentity, linkIdentity) barındırır
+- **Dönüş**: `{ supabaseBrowserClient: mockClient }` — Mock supabase client'ı
 
-### [N5_NASIL] AST Pointer: AccountSecurityPage.test.tsx::supabaseMock
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `mockClient` — Supabase client mock nesnesi, auth metodlarını (getUser, signInWithPassword, updateUser, unlinkIdentity, linkIdentity) mock eder
-- **Dönüş**: supabaseBrowserClient mock objesi
+### [N5_NASIL] AST Pointer: AccountSecurityPage.test.tsx::hibpMock
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ hibpPwnedCount }` — HIBP pwned count mock fonksiyonu (0 döner)
 
-### [N6_NASIL] AST Pointer: AccountSecurityPage.test.tsx::hibpMock
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: hibpPwnedCount mock fonksiyonu
+### [N6_NASIL] AST Pointer: AccountSecurityPage.test.tsx::renderWithProviders
+- **params**: `ui: React.ReactElement`, `{ userEmail = 'u@example.com' } = {}`
+- **ic_degiskenler**:
+  - `authValue` — AuthContext provider için mock değer, user (email, id), session, role, loading, signIn, signUp, signOut, resetPassword, refreshSession içerir
+- **Dönüş**: `render(...)` sonucu — I18nProvider ve AuthContext.Provider ile sarılmış bileşenin render sonucu
 
-### [N7_NASIL] AST Pointer: AccountSecurityPage.test.tsx::renderWithProviders
-- **params**: (ui: React.ReactElement, options: { userEmail?: string })
-- **ic_degiskenler**: 
-  - `authValue` — AuthContext provider için mock değer, kullanıcı oturumunu simüle eder
-- **Dönüş**: render sonucu (React testing library)
+### [N7_NASIL] AST Pointer: AccountSecurityPage.test.tsx::beforeEachCleanup
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `vi.clearAllMocks()` çağırarak tüm mock'ları temizler
 
-### [N8_NASIL] AST Pointer: AccountSecurityPage.test.tsx::clearAllMocks
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok
+### [N8_NASIL] AST Pointer: AccountSecurityPage.test.tsx::afterEachCleanup
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `cleanup()` çağırarak unmount edilmemiş bileşenleri temizler
 
-### [N9_NASIL] AST Pointer: AccountSecurityPage.test.tsx::cleanup
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok
+### [N9_NASIL] AST Pointer: AccountSecurityPage.test.tsx::test_ShowsValidationErrorsEmptyCurrentPassword
+- **params**: yok (async arrow function)
+- **ic_degiskenler**:
+  - `getByPlaceholderText` — Placeholder text'e göre element bulan query fonksiyonu
+  - `getByRole` — Role attribute'a göre element bulan query fonksiyonu
+  - `newInput` — 'New password' placeholder'ına sahip input elementi
+  - `confirmInput` — 'New password (confirm)' placeholder'ına sahip input elementi
+  - `saveBtn` — 'Save' role'üne sahip button elementi
+- **Dönüş**: yok — Mevcut şifre boşken toast.error çağrıldığını doğrular
 
-### [N10_NASIL] AST Pointer: AccountSecurityPage.test.tsx::shows validation errors for empty current password
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `getByPlaceholderText` — Render sonucundan placeholder文本 ile element bulan fonksiyon
-  - `getByRole` — Render sonucundan ARIA rolü ile element bulan fonksiyon
-  - `newInput` — Yeni şifre input elementi
-  - `confirmInput` — Şifre onay input elementi
-  - `saveBtn` — Kaydet butonu elementi
-- **Dönüş**: yok
+### [N10_NASIL] AST Pointer: AccountSecurityPage.test.tsx::test_ShowsValidationErrorShortPassword
+- **params**: yok (async arrow function)
+- **ic_degiskenler**:
+  - `getByPlaceholderText` — Placeholder text'e göre element bulan query fonksiyonu
+  - `getByRole` — Role attribute'a göre element bulan query fonksiyonu
+  - `currentInput` — İlk 'Current password' placeholder input'u (HTMLInputElement olarak cast)
+  - `newInput` — 'New password' placeholder input'u
+  - `confirmInput` — 'New password (confirm)' placeholder input'u
+  - `saveBtn` — 'Save' role button'u
+- **Dönüş**: yok — Kısa şifre için güvenlik kuralı hatası doğrulanır
 
-### [N11_NASIL] AST Pointer: AccountSecurityPage.test.tsx::shows validation error for short new password
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `getByPlaceholderText` — Render sonucundan placeholder文本 ile element bulan fonksiyon
-  - `getByRole` — Render sonucundan ARIA rolü ile element bulan fonksiyon
-  - `currentInput` — Mevcut şifre input elementi (HTMLInputElement olarak cast edilmiş)
-  - `newInput` — Yeni şifre input elementi
-  - `confirmInput` — Şifre onay input elementi
-  - `saveBtn` — Kaydet butonu elementi
-- **Dönüş**: yok
+### [N11_NASIL] AST Pointer: AccountSecurityPage.test.tsx::test_ShowsValidationErrorPasswordsDoNotMatch
+- **params**: yok (async arrow function)
+- **ic_degiskenler**:
+  - `getByPlaceholderText` — Placeholder query fonksiyonu
+  - `getByRole` — Role query fonksiyonu
+  - `currentInput` — İlk 'Current password' input elementi
+  - `newInput` — 'New password' input elementi
+  - `confirmInput` — 'New password (confirm)' input elementi
+  - `saveBtn` — 'Save' button elementi
+- **Dönüş**: yok — Şifreler eşleşmediğinde hata mesajı doğrulanır
 
-### [N12_NASIL] AST Pointer: AccountSecurityPage.test.tsx::shows validation error when passwords do not match
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `getByPlaceholderText` — Render sonucundan placeholder文本 ile element bulan fonksiyon
-  - `getByRole` — Render sonucundan ARIA rolü ile element bulan fonksiyon
-  - `currentInput` — Mevcut şifre input elementi (HTMLInputElement olarak cast edilmiş)
-  - `newInput` — Yeni şifre input elementi
-  - `confirmInput` — Şifre onay input elementi
-  - `saveBtn` — Kaydet butonu elementi
-- **Dönüş**: yok
+### [N12_NASIL] AST Pointer: AccountSecurityPage.test.tsx::test_HandlesWrongCurrentPassword
+- **params**: yok (async arrow function)
+- **ic_degiskenler**:
+  - `getByPlaceholderText` — Placeholder query fonksiyonu
+  - `getByRole` — Role query fonksiyonu
+  - `currentInput` — İlk 'Current password' input elementi
+  - `newInput` — 'New password' input elementi
+  - `confirmInput` — 'New password (confirm)' input elementi
+  - `saveBtn` — 'Save' button elementi
+- **Dönüş**: yok — Yanlış mevcut şifre ile AuthError fırlatıldığında hatanın ele alındığını doğrular
 
-### [N13_NASIL] AST Pointer: AccountSecurityPage.test.tsx::handles wrong current password
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `getByPlaceholderText` — Render sonucundan placeholder文本 ile element bulan fonksiyon
-  - `getByRole` — Render sonucundan ARIA rolü ile element bulan fonksiyon
-  - `currentInput` — Mevcut şifre input elementi (HTMLInputElement olarak cast edilmiş)
-  - `newInput` — Yeni şifre input elementi
-  - `confirmInput` — Şifre onay input elementi
-  - `saveBtn` — Kaydet butonu elementi
-- **Dönüş**: yok
+### [N13_NASIL] AST Pointer: AccountSecurityPage.test.tsx::signInWithPasswordFailureMock
+- **params**: yok (arrow function)
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ data: { user: null, session: null }, error: AuthError }` — signInWithPassword başarısız mock yanıtı
 
-### [N14_NASIL] AST Pointer: AccountSecurityPage.test.tsx::updates password successfully
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `getByPlaceholderText` — Render sonucundan placeholder文本 ile element bulan fonksiyon
-  - `getByRole` — Render sonucundan ARIA rolü ile element bulan fonksiyon
-  - `currentInput` — Mevcut şifre input elementi (HTMLInputElement olarak cast edilmiş)
-  - `newInput` — Yeni şifre input elementi
-  - `confirmInput` — Şifre onay input elementi
-  - `saveBtn` — Kaydet butonu elementi
-- **Dönüş**: yok
+### [N14_NASIL] AST Pointer: AccountSecurityPage.test.tsx::test_UpdatesPasswordSuccessfully
+- **params**: yok (async arrow function)
+- **ic_degiskenler**:
+  - `getByPlaceholderText` — Placeholder query fonksiyonu
+  - `getByRole` — Role query fonksiyonu
+  - `currentInput` — İlk 'Current password' input elementi
+  - `newInput` — 'New password' input elementi
+  - `confirmInput` — 'New password (confirm)' input elementi
+  - `saveBtn` — 'Save' button elementi
+- **Dönüş**: yok — Başarılı şifre güncelleme işlemini ve toast.success çağrısını doğrular
 
-### [N15_NASIL] AST Pointer: AccountSecurityPage.test.tsx::shows error when update fails
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `getByPlaceholderText` — Render sonucundan placeholder文本 ile element bulan fonksiyon
-  - `getByRole` — Render sonucundan ARIA rolü ile element bulan fonksiyon
-  - `currentInput` — Mevcut şifre input elementi (HTMLInputElement olarak cast edilmiş)
-  - `newInput` — Yeni şifre input elementi
-  - `confirmInput` — Şifre onay input elementi
-  - `saveBtn` — Kaydet butonu elementi
-- **Dönüş**: yok
+### [N15_NASIL] AST Pointer: AccountSecurityPage.test.tsx::signInWithPasswordSuccessMock
+- **params**: yok (arrow function)
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ data: { user, session }, error: null }` — signInWithPassword başarılı mock yanıtı
+
+### [N16_NASIL] AST Pointer: AccountSecurityPage.test.tsx::updateUserSuccessMock
+- **params**: yok (arrow function)
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ data: { user }, error: null }` — updateUser başarılı mock yanıtı
+
+### [N17_NASIL] AST Pointer: AccountSecurityPage.test.tsx::test_ShowsErrorWhenUpdateFails
+- **params**: yok (async arrow function)
+- **ic_degiskenler**:
+  - `getByPlaceholderText` — Placeholder query fonksiyonu
+  - `getByRole` — Role query fonksiyonu
+  - `currentInput` — İlk 'Current password' input elementi
+  - `newInput` — 'New password' input elementi
+  - `confirmInput` — 'New password (confirm)' input elementi
+  - `saveBtn` — 'Save' button elementi
+- **Dönüş**: yok — updateUser başarısız olduğunda toast.error çağrıldığını doğrular
+
+### [N18_NASIL] AST Pointer: AccountSecurityPage.test.tsx::signInWithPasswordSuccessMock2
+- **params**: yok (arrow function)
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ data: { user, session }, error: null }` — signInWithPassword başarılı mock yanıtı
+
+### [N19_NASIL] AST Pointer: AccountSecurityPage.test.tsx::updateUserFailureMock
+- **params**: yok (arrow function)
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ data: { user: null }, error: AuthError }` — updateUser başarısız mock yanıtı
 
 ---
 

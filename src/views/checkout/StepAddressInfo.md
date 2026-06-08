@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx
-skeleton_hash: a0457c9364541b22
+skeleton_hash: 5d6517bcf8ccfc58
 entity_hashes:
   func:StepAddressInfo: d5b5813fe5d1d5af
   overview: a2c2c2af4883e494
   style_tokens: 7a84088359f41f22
-generated_at: 2026-06-06T21:58:35Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,19 @@ Bu modül, ödeme sürecinin (checkout) adres bilgisi adımını yöneten bir Re
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, üst bileşenden kontrol edilen state/prop çiftlerine bağımlı bir React form bileşenidir.
+
+[Aksiyom 1]: Eğer `setShippingAddress` fonksiyonu çağrılamaz (undefined veya non-function) yoksa, kullanıcının teslimat adresi bilgilerini günclemesi mümkün olmaz ve üst bileşenin state'i değişmez.
+
+[Aksiyom 2]: Eğer `setBillingAddress` (imzada kesik olarak `setBi` görünen) fonksiyonu çağrılamaz yoksa, kullanıcının fatura adresi bilgilerini güncellemesi mümkün olmaz ve üst bileşenin state'i değişmez.
+
+[Aksiyom 3]: Eğer `shippingAddress` objesi üst bileşen tarafından başlatılmamış (undefined/null) yoksa, form alanlarının varsayılan değerleri boş/görünmez olur ve kullanıcı mevcut bir adres bilgisiyle başlamaz.
+
+[Aksiyom 4]: Eğer `billingAddress` objesi üst bileşen tarafından başlatılmamış (undefined/null) yoksa, form alanlarının varsayılan değerleri boş/görünmez olur ve kullanıcı mevcut bir adres bilgisiyle başlamaz.
+
+[Aksiyom 5]: Eğer üst bileşen, `setShippingAddress` ve `setBillingAddress` setter'larını aynı state yönetim bağlamında (örn:同一 useCallback/useState) sağlamazsa, bileşen içinde yapılan adres güncellemeleri üst seviyeye yansımayabilir.
 
 ---
 
@@ -77,28 +89,6 @@ Bu modül, ödeme sürecinin (checkout) adres bilgisi adımını yöneten bir Re
   - `setBillingAddress` — billingAddress durumunu güncelleyen React state setter fonksiyonu
 - **ic_degiskenler**: *(gövde verilmemiş — sadece imza bilgisi mevcut)*
 - **Dönüş**: `React.FC<StepAddressInfoProps>` (JSX bileşeni)
-
----
-
-### [N2_NASIL] AST Pointer: `StepAddressInfo.tsx`::shippingPostalCodeHandler (anonim arrow function)
-- **params**:
-  - `e` — React `ChangeEvent<HTMLInputElement>` olay nesnesi, input'un değişim olayını temsil eder
-- **ic_degiskenler**:
-  - `v` — `e.target.value` değerinden rakam dışı karakterlerin temizlendiği ve en fazla 10 karakter uzunluğunda tutulan posta kodu stringi
-- **yan_etkiler**:
-  - `setShippingAddress` çağrısı — mevcut `shippingAddress` nesnesinin `postalCode` alanını `v` değeriyle genişleterek (spread) günceller: `{ ...shippingAddress, postalCode: v }`
-- **Dönüş**: yok
-
----
-
-### [N3_NASIL] AST Pointer: `StepAddressInfo.tsx`::billingPostalCodeHandler (anonim arrow function)
-- **params**:
-  - `e` — React `ChangeEvent<HTMLInputElement>` olay nesnesi, input'un değişim olayını temsil eder
-- **ic_degiskenler**:
-  - `v` — `e.target.value` değerinden rakam dışı karakterlerin temizlendiği ve en fazla 10 karakter uzunluğunda tutulan posta kodu stringi
-- **yan_etkiler**:
-  - `setBillingAddress` çağrısı — mevcut `billingAddress` nesnesinin `postalCode` alanını `v` değeriyle genişleterek (spread) günceller: `{ ...billingAddress, postalCode: v }`
-- **Dönüş**: yok
 
 ---
 

@@ -1,9 +1,11 @@
-import { Routes } from './utils/routes'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
+
+import { createRedirectResponse,resolveUserClaims } from '@/utils/router'
+
 import { resolveTenant } from './lib/tenantResolver'
-import { resolveUserClaims, createRedirectResponse } from '@/utils/router'
+import { Routes } from './utils/routes'
 
 export const config = {
   matcher: [

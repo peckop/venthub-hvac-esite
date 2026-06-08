@@ -8,7 +8,7 @@ entity_hashes:
   func:getCategoryIcon: e7e3d3061db761f5
   overview: c7c53a125873016e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:38:46Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış

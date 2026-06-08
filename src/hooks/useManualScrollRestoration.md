@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useManualScrollRestoration.ts
-skeleton_hash: 3b3d57951e288ef3
+skeleton_hash: 419f22409352fc82
 entity_hashes:
   func:useManualScrollRestoration: c36f5fe9ca492bf5
   overview: fbb89d52cd2f5084
-generated_at: 2026-05-28T22:37:47Z
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış

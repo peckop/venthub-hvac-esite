@@ -1,18 +1,19 @@
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import { validateServerCart } from '../lib/order'
-import { getPriceHashLocal, getPriceHashServer } from '../utils/checkoutHelpers'
-import type { CartItem } from '@/types/cart'
 import type { User } from '@supabase/supabase-js'
+import { useRouter } from 'next/navigation'
+import { useEffect,useState } from 'react'
+import { toast } from 'sonner'
 
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+import type { CartItem } from '@/types/cart'
+
+import { validateServerCart } from '../lib/order'
 import { 
-  CheckoutCustomerInfo, 
   CheckoutAddressInfo, 
+  CheckoutCustomerInfo, 
   CheckoutInvoiceInfo, 
   CheckoutLegalConsents 
 } from '../types/db-rows'
+import { getPriceHashLocal, getPriceHashServer } from '../utils/checkoutHelpers'
 
 interface UseCheckoutPaymentProps {
   items: CartItem[]

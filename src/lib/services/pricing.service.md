@@ -9,7 +9,7 @@ entity_hashes:
   func:getEffectiveUnitPrice: cf8d140432bff796
   func:nowIso: 7121138d8247572d
   overview: 8fa776710b49f603
-generated_at: 2026-06-07T12:08:34Z
+generated_at: 2026-06-08T10:09:34Z
 ---
 
 ## Genel Bakış
@@ -95,46 +95,6 @@ type UserRole = 'individual' | 'dealer' | 'corporate' | 'admin'
 
 ---
 
-### [N2_NASIL] AST Pointer: pricing.service.ts::getEffectiveUnitPrice
-- **params**: `supabase: SupabaseClient<Database>`, `product: Product`
-- **ic_degiskenler**:
-  - `info` — `getEffectivePriceInfo` çağrısının sonucunu tutar; bir `{ unitPrice: number, priceListId: string | null }` nesnesidir.
-- **Dönüş**: `Promise<number>` — `info.unitPrice` değerini döndürür; ürün için geçerli birim fiyatı temsil eder.
-
----
-
-### [N3_NASIL] AST Pointer: pricing.service.ts::getEffectivePriceInfo
-- **params**: `supabase: SupabaseClient<Database>`, `product: Product`
-- **ic_degiskenler**:
-  - `fallback` — `product.price` alanından hesaplanan yedek birim fiyat; `product.price` number ise doğrudan kullanılır, string ise `parseFloat` ile dönüştürülür; geçerli sayı değilse `0` döner. Tüm fallback senaryolarında kullanılacak varsayılan fiyattır.
-  - `authData` — `supabase.auth.getUser()` çağrısının data tarafı; oturum açmış kullanıcının bilgilerini barındırır.
-  - `userErr` — `supabase.auth.getUser()` çağrısının hata tarafı; auth hatası varsa null kullanıcıya yol açar.
-  - `user` — Auth sonucundan elde edilen kullanıcı nesnesi; `userErr` varsa `null`, değilse `authData?.user` değerini alır.
-  - `prof` — `user_profiles` tablosundan sorgulanan profil satırı; `id`, `role`, `organization_id` alanlarını içerir.
-  - `profErr` — Profil sorgusunun hata tarafı; hata varsa fallback dönülür.
-  - `profile` — `prof` değerinin `UserProfileLight` tipine cast edilmiş halidir; `prof` null ise boş nesne `{}` kullanılır.
-  - `role` — `profile.role` alanından elde edilen kullanıcı rolü; `undefined` veya boş ise `'individual'` varsayılır. Price list eşleştirmesinde kullanılır.
-  - `now` — `nowIso()` çağrısıyla elde edilen geçerli ISO zaman damgası; price listelerin `effective_from` ve `effective_to` alanlarıyla karşılaştırma yapılırken kullanılır.
-  - `lists` — `price_lists` tablosundan aktif ve geçerli tarih aralığındaki price list satırlarının dizisi; her satır `id`, `user_type`, `effective_from` alanlarını içerir.
-  - `listErr` — Price listeler sorgusunun hata tarafı; hata varsa fallback dönülür.
-  - `typedLists` — `lists` dizisinin `PriceListRow[]` tipine cast edilmiş halidir; tip güvenliği sağlar.
-  - `matchedLists` — `typedLists` içinden `list.user_type === role` koşulunu sağlayan veya `user_type`'ı null olan (varsayılan) listelerin filtrelenmiş dizisi.
-  - `sorted` — `matchedLists` dizisinin sıralanmış halidir; belirli user_type eşleşmesi varsayılan eşleşmeden önceliklendirilir, eşitlikte `effective_from` tarihi büyük olan üste gelir.
-  - `chosen` — `sorted` dizisinden ilk (en uygun) price list nesnesi; dizi boş ise `null` olur.
-  - `priceListIds` — Denenecek price list ID'lerinin dizisi; `chosen` varsa `[chosen.id, null]`, yoksa `[null]` şeklindedir. For döngüsünde sırayla denenir.
-  - `plId` — For döngüsünün her iterasyonundaki price list ID'si; `null` ise varsayılan fiyat listesi, diğer durumda seçilen price list ID'sidir.
-  - `query` — `product_prices` tablosuna yapılan Supabase sorgu nesnesi; `product_id`, `is_active`, ve `price_list_id` filtreleri uygulanır.
-  - `rows` — `product_prices` tablosundan dönen fiyat satırlarının dizisi; her satır `base_price`, `sale_price`, `discount_percentage`, `valid_from`, `valid_until` alanlarını içerir.
-  - `prErr` — Ürün fiyatları sorgusunun hata tarafı; hata varsa veya satır yoksa bir sonraki `plId`'ye geçilir.
-  - `pick` — `rows` dizisinden tarih aralığı (valid_from/valid_until) uygun olan ilk satır; hiçbiri uygun değilse `rows[0]` kullanılır. Fiyat hesaplamasının temel satırıdır.
-  - `base` — `pick.base_price` değerinin number'a dönüştürülmüş hali; indirim veya satış fiyatı yoksa doğrudan kullanılır.
-  - `sale` — `pick.sale_price` değeri; `null` değilse ve geçerli bir pozitif sayı ise doğrudan birim fiyat olarak kullanılır.
-  - `disc` — `pick.discount_percentage` değerinin number'a dönüştürülmüş hali; `base` üzerinden yüzde indirim hesaplamasında kullanılır.
-  - `val` — `disc > 0` olduğunda `base * (1 - disc / 100)` işlemiyle hesaplanan indirimli fiyat; `Math.max(0, ...)` ile negatif olmasını engellenir.
-- **Dönüş**: `Promise<{ unitPrice: number, priceListId: string | null }>` — Ürün için geçerli birim fiyatı ve kullanılan price list ID'si. Tüm denemeler başarısız olursa `fallback` birim fiyat ve `null` price list ID döner. Hata yakalandığında `console.error` ile loglanır ve fallback değeri döner.
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -142,8 +102,8 @@ graph TD
     pricing_service_ts__getEffectivePriceInfo["getEffectivePriceInfo"]
     pricing_service_ts__getEffectiveUnitPrice["getEffectiveUnitPrice"]
     pricing_service_ts__nowIso["nowIso"]
-    pricing_service_ts__getEffectiveUnitPrice --> pricing_service_ts__getEffectivePriceInfo
     pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__nowIso
+    pricing_service_ts__getEffectiveUnitPrice --> pricing_service_ts__getEffectivePriceInfo
 ```
 
 ## NODE ID STANDARD

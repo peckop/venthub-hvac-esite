@@ -1,9 +1,10 @@
 import { MetadataRoute } from 'next'
-import { getCategories } from '../lib/services/category.service'
-import { supabaseStaticClient } from '../lib/supabase/static'
-import { getAllProducts } from '../lib/services/product.service'
-import { HVAC_BRANDS } from '../data/brands'
+
 import { SITE_URL } from '../config/siteUrl'
+import { HVAC_BRANDS } from '../data/brands'
+import { getCategories } from '../lib/services/category.service'
+import { getAllProducts } from '../lib/services/product.service'
+import { supabaseStaticClient } from '../lib/supabase/static'
 import { Routes } from '../utils/routes'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

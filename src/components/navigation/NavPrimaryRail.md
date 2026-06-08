@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavPrimaryRail.tsx
-skeleton_hash: be27047d81aba124
+skeleton_hash: 678838c89ffec9b3
 entity_hashes:
   overview: 4d24cdf1272dfd45
   style_tokens: ab3a3305965e5539
-generated_at: 2026-05-28T22:36:31Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış
@@ -18,30 +18,6 @@ NavPrimaryRail.tsx modülü, uygulamanın ana gezinti çubuğunu (navigation rai
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, props tabanlı bir React bileşenidir; girdilerin interface tanımlarına uygunluğu ve bağımlılıkların mevcudiyeti üzerine mimari varsayımlar içerir.
-
----
-
-**[Aksiyom 1]:** Eğer `NavPrimaryRailProps.items` dizisi boş (`[]`) olarak verilirse, bileşen herhangi bir gezinti öğesi göstermez (boş rail render edilir).
-
-**[Aksiyom 2]:** Eğer `ResolvedNavigationItem.id` alanı bir string değilse veya benzersiz değilse, React'in `key` prop'u düzgün çalışmaz ve render hataları veya beklenmeyen davranışlar oluşur.
-
-**[Aksiyom 3]:** Eğer `ResolvedNavigationItem.href` alanı sağlanmamışsa (undefined/optional), ilgili öğeye tıklanabilir bir yönlendirme linki atanmaz; bileşenin `href` yokluğunu nasıl ele aldığına bağlı olarak öğe pasif veya devre dışı kalır.
-
-**[Aksiyom 4]:** Eğer `isCategoriesLoading` değeri `true` ise, bileşen kategori verilerinin henüz hazır olmadığını belirtir ve muhtemelen yükleme durumu gösterimi yapar; bu sırada kategoriye bağlı menü öğeleri kullanıma sunulmaz.
-
-**[Aksiyom 5]:** Eğer `isCategoryHubOpen` değeri `true` ise, kategori hub paneli/açılır menü açık durumdadır; `isCategoriesLoading` aynı anda `true` ise, açık panel içinde yükleme durumu gösterilir.
-
-**[Aksiyom 6]:** Eğer `@/lib/utils` modülündeki `cn` yardımcı fonksiyonu mevcut değilse veya çalışmazsa, bileşenin koşullu CSS sınıf birleştirme mantığı bozulur ve stil hataları oluşur.
-
-**[Aksiyom 7]:** Eğer Next.js `Link` bileşeni veya `useRouter` hook'u mevcut değilse/yüklenemezse, sayfa yönlendirme (navigation) işlevi çalışmaz.
-
-**[Aksiyom 8]:** Eğer `items` prop'u `null` veya `undefined` olarak verilirse (React'ta zorunlu prop olduğu için `NavPrimaryRailProps` tanımına göre), bileşen çalışma zamanı hatası verir.
-
----
-
-**Domain-Specific Kurallar:**
-- `ResolvedNavigationItem.id` alanı React `key` prop'u olarak kullanıldığından, aynı `items` dizisi içinde `id` değerlerinin benzersiz olması zorunludur.
-- `href` opsiyonel olduğundan, bileşenin `href` içermeyen öğeler için tıklama davranışı (ör. sadece açılır menü tetikleme) modül içi bir karardır.
 
 ---
 

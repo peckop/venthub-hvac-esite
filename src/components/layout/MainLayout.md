@@ -3,34 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\layout\MainLayout.tsx
-skeleton_hash: 4aa70162bd38d961
+skeleton_hash: 470234bc83b49681
 entity_hashes:
   func:MainLayout: 51353f0c7669626b
-  overview: 7e72cc7b6a87bed6
+  overview: 4609ebe9b2a4256c
   style_tokens: c300b80e9d38560c
-generated_at: 2026-05-29T18:46:10Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın temel ve tutarlı sayfa yapısını oluşturan ana React bileşenidir. Sayfa içeriklerini (`children`) alarak, ortak bir düzen içinde (başlık, menü, alt bilgi) sarmalar ve tüm sayfaların görünümünü standartlaştırır.
+Bu modül, uygulamanın tüm sayfalarına tutarlı bir görünüm kazandıran ana layout bileşenidir. URL yoluna bağlı olarak yönetim paneli veya genel site düzeni sunarak sayfa içeriklerini ortak bir iskelet içinde sarar. Ayrıca bildirim, sepet bildirimi ve WhatsApp iletişim butonu gibi küresel arayüz elemanlarını merkezi olarak yönetir.
 
 ## Fonksiyon Grupları
-### Düzen Renderlama
-Uygulamanın genel görsel iskeletini ve sayfa yerleşimini yöneten temel bileşeni içerir.
+### Sayfa Düzeni ve Yerleşim
+Uygulamanın temel görsel yapısını ve sayfa yerleşimini belirleyen ana layout bileşenini içerir. Rota bazlı olarak farklı düzen varyantlarını (yönetim paneli veya genel site) render eder.
 - MainLayout
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, ana sayfa düzenini sağlayan bir layout bileşenidir ve孩子.children prop'u ile alt içerikleri sarar.
 
-[Aksiyom 1]: Eğer `children` propu sağlanmazsa, modül sadece outer wrapper (header, menü, footer alanlarını içeren yapı) render edilir, orta içerik bölgesi boş kalır.
+Bu modül, uygulamanın ana sayfa düzenini sağlayan React layout bileşenidir ve içeriği (`children`) ile birlikte ek bileşenleri (Toaster, AddToCartToast, WhatsAppFloat) render eder.
 
-[Aksiyom 2]: Eğer `Toaster` bileşeni (veya modüldeki karşılığı) render edilmezse, uygulama genelinde toast bildirimleri gösterilemez.
+[Aksiyom 1]: Eğer `children` propu geçerli bir React elementi değilse (null, undefined veya geçersiz JSX), layout yapısı (header, menü, footer) yalnız render edilir ancak ana içerik alanı boş kalır.
 
-[Aksiyom 3]: Eğer `AddToCartToast` bileşeni render edilmezse, sepete ekleme işlemleri sonrası kullanıcıya bildirim gösterilmez.
+[Aksiyom 2]: Eğer `Toaster` bileşeni modül bağlamında tanımlı veya import edilmemişse, bildirim toastları kullanıcıya gösterilmez.
 
-[Aksiyom 4]: Eğer `WhatsAppFloat` bileşeni render edilmezse, sağ alt köşedeki sabit WhatsApp iletişim butonu görünmez olur.
+[Aksiyom 3]: Eğer `AddToCartToast` bileşeni modül bağlamında tanımlı veya import edilmemişse, sepete ekleme bildirimi kullanıcıya gösterilmez.
+
+[Aksiyom 4]: Eğer `WhatsAppFloat` bileşeni modül bağlamında tanımlı veya import edilmemişse, WhatsApp iletişim butonu sayfada görünmez.
+
+[Aksiyom 5]: Eğer `MainLayoutProps` tipi `children` alanını içermiyorsa veya Children tipi uyumsuzsa, TypeScript derleme hatası oluşur ve modül render edilemez.
 
 ---
 
@@ -65,17 +68,34 @@ Bu modül, ana sayfa düzenini sağlayan bir layout bileşenidir ve孩子.childr
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/layout/MainLayout.tsx::MainLayout
-- **params**: `{ children }: MainLayoutProps`
-- **ic_degiskenler**:
-  - `pathname` — `usePathname()` hook'undan alınan mevcut sayfa rotası, admin kontrolü ve `useScrollThrottle` parametresi olarak kullanılır
-  - `isAdmin` — `pathname`'in `/admin` ile başlayıp başlamadığını kontrol eden boolean, admin layout dalını tetikler
-  - `isScrolled` — `useScrollThrottle` hook'undan dönen boolean, sayfanın kaydırma durumunu belirtir, `StickyHeader`'a aktarılır
-  - `enableToaster` — `useState(false)` ile tanımlanan state, ilk etkileşim (`pointerdown`/`keydown`) sonrası `true` olur; `Toaster` ve `AddToCartToast`'ın render edilmesini kontrol eder
-  - `setEnableToaster` — `enableToaster` state'ini `true` yapan setter fonksiyonu, `useEffect` içindeki event listener callback'inde çağrılır
-  - `enableWhatsApp` — `useState(false)` ile tanımlanan state, ilk `scroll` olayı sonrası `true` olur; `WhatsAppFloat`'ın render edilmesini kontrol eder
-  - `setEnableWhatsApp` — `enableWhatsApp` state'ini `true` yapan setter fonksiyonu, `useEffect` içindeki `scroll` event listener callback'inde çağrılır
-- **Dönüş**: JSX element (`React.ReactNode`) — `isAdmin` true ise basit admin layout, değilse tam site layout'u (header, main, footer, overlay'ler dahil) döner
+### [N1_NASIL] AST Pointer: MainLayout.tsx::MainLayout
+- **params**: (children: React.ReactNode)
+- **ic_degiskenler**: 
+  - `pathname` — usePathname() hookundan alınan mevcut sayfa yolu
+  - `isAdmin` — pathname'in '/admin' ile başlayıp başlamadığını kontrol eden boolean
+  - `isScrolled` — useScrollThrottle hook'undan dönen scroll pozisyonu durumu
+  - `enableToaster` — Toaster ve AddToCartToast bileşenlerinin etkinleştirilip etkinleştirilmeyeceğini kontrol eden state
+  - `setEnableToaster` — enableToaster state'ini güncellemek için setter fonksiyonu
+  - `enableWhatsApp` — WhatsAppFloat bileşeninin etkinleştirilip etkinleştirilmeyeceğini kontrol eden state
+  - `setEnableWhatsApp` — enableWhatsApp state'ini güncellemek için setter fonksiyonu
+- **Dönüş**: React JSX element (JSX return)
+
+### [N2_NASIL] AST Pointer: MainLayout.tsx::useEffectCallbackForEnableToaster
+- **params**: (yok)
+- **ic_degiskenler**: 
+  - `enable` — setEnableToaster(true) çağıran arrow fonksiyon
+- **Dönüş**: Cleanup fonksiyonu (arrow fonksiyon)
+
+### [N3_NASIL] AST Pointer: MainLayout.tsx::cleanupEffectForEnableToaster
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
+
+### [N4_NASIL] AST Pointer: MainLayout.tsx::useEffectCallbackForEnableWhatsApp
+- **params**: (yok)
+- **ic_degiskenler**: 
+  - `enable` — setEnableWhatsApp(true) çağıran arrow fonksiyon
+- **Dönüş**: Cleanup fonksiyonu (arrow fonksiyon)
 
 ---
 

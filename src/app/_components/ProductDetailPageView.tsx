@@ -1,54 +1,52 @@
 'use client'
-import { Routes } from '../../utils/routes'
-
-import React, { useState, useEffect, useRef, useMemo } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
-import type { Route } from 'next'
-import { getProductBySlug, getProductsEnriched } from '../../lib/services/product.service'
-import type { Product } from '../../types/ui-models'
-import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
-import { useCart } from '../../hooks/useCartHook'
-import { BrandIcon } from '../../components/HVACIcons'
-import ProductCard from '../../components/ProductCard'
-import Seo from '../../components/Seo'
-import { useI18n } from '../../i18n/I18nProvider'
-import { formatCurrency } from '../../i18n/format'
-import LeadModal from '../../components/LeadModal'
-import { toast } from 'sonner'
 import { 
   ArrowLeft,
-  ShoppingCart,
-  Heart,
-  Share2,
-  Truck,
-  Shield,
-  Star,
-  ChevronRight,
-  FileText,
-  Download,
   Award,
+  ChevronDown,
+  ChevronRight,
+  Download,
+  FileText,
+  FolderPlus,
+  Heart,
+  Info,
+  Loader2,
   Ruler,
   Settings,
-  Info,
-  ChevronDown,
-  FolderPlus,
-  Loader2
-} from 'lucide-react'
+  Share2,
+  Shield,
+  ShoppingCart,
+  Star,
+  Truck} from 'lucide-react'
+import type { Route } from 'next'
+import Link from 'next/link'
+import { useParams, useRouter } from 'next/navigation'
+import React, { useEffect, useMemo,useRef, useState } from 'react'
+import { toast } from 'sonner'
+
+import { BrandIcon } from '../../components/HVACIcons'
 import ImageGallery from '../../components/ImageGallery'
-import RichTextRenderer from '../../components/products/RichTextRenderer'
+import LeadModal from '../../components/LeadModal'
 import { ProductSmartInference } from '../../components/product/ProductSmartInference'
+import ProductCard from '../../components/ProductCard'
 import { AddToProjectModal } from '../../components/products'
-import { useProjectLists } from '../../hooks/useProjectLists'
+import RichTextRenderer from '../../components/products/RichTextRenderer'
+import Seo from '../../components/Seo'
 import { useCategories } from '../../contexts/CategoryContext'
+import { useCart } from '../../hooks/useCartHook'
+import { useProjectLists } from '../../hooks/useProjectLists'
+import { formatCurrency } from '../../i18n/format'
+import { useI18n } from '../../i18n/I18nProvider'
+import { getProductBySlug, getProductsEnriched } from '../../lib/services/product.service'
+import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
+import type { CategoryMetadata } from '../../types/db-rows'
+import type { Product } from '../../types/ui-models'
 // import { DomainCategory } from '../../lib/type-converters'
 import { 
-  translateSpecKey, 
   formatSpecValue, 
   groupTechnicalSpecs,
-  SPEC_SORT_ORDER
-} from '../../utils/productHelpers'
-import type { CategoryMetadata } from '../../types/db-rows'
+  SPEC_SORT_ORDER,
+  translateSpecKey} from '../../utils/productHelpers'
+import { Routes } from '../../utils/routes'
 
 export interface ProductDetailPageProps {
   initialProduct?: Product | null
@@ -431,7 +429,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       <div className={`w-1 h-1 rounded-full ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green' : 'bg-warning-orange'}`} />
                       <span>{typeof product.stock_qty === 'number' && product.stock_qty > 0 ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
                     </div>
-                    <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">SKU: {product.sku}</span>
+                    <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{`${t('pdp.labels.sku')}: ${product.sku}`}</span>
                   </div>
                 </div>
               </div>
@@ -531,7 +529,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   {isGeneratingPdf ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} className="group-hover:animate-bounce" />}
                   <div className="flex flex-col">
                     <span className="text-xs uppercase tracking-wider">{t('pdp.labels.technicalDatasheet')}</span>
-                    <span className="text-xs text-white/50 font-medium uppercase tracking-hvac-normal">DATASHEET (PDF)</span>
+                    <span className="text-xs text-white/50 font-medium uppercase tracking-hvac-normal">{t('pdp.labels.datasheetPdf')}</span>
                   </div>
                 </div>
                 <ChevronRight size={16} className="opacity-30 group-hover:opacity-100 transition-opacity" />
@@ -748,7 +746,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                               <div className="text-center">
                                 <FileText size={28} className="text-primary-navy/40 mx-auto mb-2" />
                                 <p className="text-industrial-gray font-black text-xs uppercase tracking-widest">{t(`pdp.diagramsExtra.${type}`)}</p>
-                                <p className="text-xs text-steel-gray font-bold mt-1 uppercase tracking-tighter">PDF {t('common.pdfDatasheet')}</p>
+                                <p className="text-xs text-steel-gray font-bold mt-1 uppercase tracking-tighter">{`${t('common.pdf')} ${t('common.pdfDatasheet')}`}</p>
                               </div>
                             </div>
                           ))}
@@ -806,8 +804,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                           <div className="bg-slate-50 rounded-2xl p-5 mb-5 group-hover:bg-air-blue/10 transition-colors"><Award size={36} className="text-primary-navy/30 mx-auto" /></div>
                           <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-3">{t(`pdp.cert.${cert}`)}</h4>
                           <div className="text-xs text-steel-gray space-y-1 font-bold uppercase tracking-widest opacity-60">
-                            <p>{t('pdp.certLabels.certificateNo')}: {cert.toUpperCase()}-2024</p>
-                            <p>{t('pdp.certLabels.standard')}: ISO/EN-STD</p>
+                            <p>{`${t('pdp.certLabels.certificateNo')}: ${cert.toUpperCase()}-2024`}</p>
+                            <p>{`${t('pdp.certLabels.standard')}: ISO/EN-STD`}</p>
                           </div>
                         </div>
                       ))}
@@ -838,5 +836,3 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     </div>
   )
 }
-
-export default ProductDetailPage

@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
+import { toast } from 'sonner'
+
 import type { UserAddress } from '@/types/ui-models'
+
 import { createAddress, updateAddress } from '../../lib/services/address.service'
 import { supabaseBrowserClient } from '../../lib/supabase/client'
-import { toast } from 'sonner'
 import type { DbUserAddressInsert } from '../../types/db-rows'
 
 interface AddressFormModalProps {

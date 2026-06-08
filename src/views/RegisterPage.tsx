@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import { ArrowLeft, CheckCircle,Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
 import Link from 'next/link'
-import { useAuth } from '../hooks/useAuth'
-import { ArrowLeft, Mail, Lock, User, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import React, { useState } from 'react'
 import { toast } from 'sonner'
+
+import { useAuth } from '../hooks/useAuth'
 import { useI18n } from '../i18n/I18nProvider'
 import { hibpPwnedCount } from '../utils/passwordSecurity'
 import { Routes } from '../utils/routes'

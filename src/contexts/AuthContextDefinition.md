@@ -3,24 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\AuthContextDefinition.ts
-skeleton_hash: a2d540bab1caba16
+skeleton_hash: d6530f0fb124bc6c
 entity_hashes:
-  overview: bd987590e3d0b068
-generated_at: 2026-05-28T22:37:32Z
+  overview: f2f5edb4e854ff35
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
 
-Bu modül, VentHub HVAC projesinde kimlik doğrulama verilerinin uygulama geninde paylaşılmasını sağlayan merkezi bir React Context tanımıdır. Supabase'in `User` ve `Session` tiplerini, uygulama özelinde tanımlanmış `UserRole` rol tipi ile birleştirerek tip güvenli bir `AuthContext` nesnesi oluşturur.
-
-Modül herhangi bir iş mantığı, API çağrısı veya veritabanı sorgusu içermez; yalnızca üst seviye bir bağlam tanımı ve tip aktarımı realizasyonudur. Kimlik doğrulama akışının yürütülmesi (`AuthProvider`, `useAuth` hook'u vb.) bu dosyanın sorumluluğu dışında, ilgili bileşenlerde gerçekleşir.
+Bu modül, VentHub HVAC projesinde kimlik doğrulama verilerinin uygulama geninde paylaşılmasını sağlayan merkezi bir React Context tanımıdır. Supabase'in `User` ve `Session` tiplerini, uygulama özelinde tanımlanmış `UserRole` rol tipi ile birleştirerek tip güvenli bir `AuthContext` nesnesi oluşturur. Modül, kimlik doğrulama işlevlerinin (giriş yapma, kayıt olma, çıkış yapma, şifre sıfırlama) ve ilgili durumların (kullanıcı, oturum, rol, yükleme) tanımını sağlar; bu işlevlerin Gerçek zamanlı olarak Supabase Auth API'leri ve veritabanı tablolarını kullanması beklenir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, React uygulamasında kimlik doğrulama bağlamı (context) tanımı yapmakla yükümlüdür.
 
-[Aksiyom 1]: Eğer React'ten createContext fonksiyonu içe akt
+Bu modül, bir React Context nesnesi tanımlayan ve dışa aktaran bir tiptir.
+
+[Aksiyom 1]: Eğer `AuthContext` modülde tanımlı değilse veya dışa aktarılmamışsa, uygulama geninde kimlik doğrulama durumu paylaşımı yapılamaz.
+
+[Aksiyom 2]: Eğer `AuthContext` React.createContext tarafından üretilmemiş bir değerse (call edilebilir yapı bozulmuşsa), bileşenler bağlamı tüketemeyecektir.
 
 ---
 
@@ -55,9 +56,9 @@ Bu modül, React uygulamasında kimlik doğrulama bağlamı (context) tanımı y
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/contexts/AuthContextDefinition.ts::AuthContext
-- **params**: `(call) createContext<AuthContextValue | undefined>(undefined)` — createContext çağrısı ile AuthContext oluşturulur, başlangıç değeri `undefined` olarak atanır
-- **ic_degiskenler**: yok — dosya sadece context tanımı içerir, fonksiyon gövdesi bulunmamaktadır
-- **Dönüş**: `React.Context<AuthContextValue | undefined>` — React Context nesnesi döner;供給cısı olmayan bileşenler `undefined` alır
+- **params**: (yok — sabit(context) tanımı, fonksiyon değil)
+- **ic_degiskenler**: (yok — fonksiyon gövdesi mevcut değil)
+- **Dönüş**: `Context<AuthContextType | undefined>` — `createContext` çağrısı sonucu dönen React Context nesnesi
 
 ---
 

@@ -3,25 +3,26 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventoryReportPage.tsx
-skeleton_hash: 2a852e29713397e1
+skeleton_hash: 5bac2dbf0b3ead7f
 entity_hashes:
   func:AdminInventoryReportPage: d037654ecb70b8e0
-  overview: 88f23f146110f3c7
+  overview: 2182ca4c78bfcab4
   style_tokens: 23d781c8192db1b8
-generated_at: 2026-06-06T21:57:34Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC sistem yöneticileri için tasarlanmış bir React sayfasıdır. Temel amacı, yöneticilerin sistemdeki envanter ve stok verilerini görüntüleyebileceği bir rapor arayüzü sunmaktır. Sayfa, yönetici panelinin bir parçası olarak işlev görür ve veri görselleştirme ve raporlama sorumluluğunu taşır.
+Bu modül, VentHub HVAC yöneticileri için sistemdeki envanter verilerini görselleştiren ve raporlayan bir React sayfasıdır. Tek bir üst düzey bileşenden oluşur ve yönetici arayüzünde envanter raporu ekranının tüm yapısını ve iş akışını yönetir. Sayfa, yalnızca yetkili yönetici kullanıcılar tarafından erişilebilir bir şekilde tasarlanmıştır.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Bu modülün tek ve temel React bileşenidir. Yönetici arayüzündeki envanter raporu sayfasının tüm kullanıcı arayüzü yapısını, düzenini ve veri akışını oluşturup yönetir.
+Bu grup, yönetici rapor sayfasının tüm kullanıcı arayüzünü, veri yüklemesini ve sunum mantığını barındıran temel React bileşeninden oluşur.
 - AdminInventoryReportPage
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -38,106 +39,53 @@ Bu modülün tek ve temel React bileşenidir. Yönetici arayüzündeki envanter 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminInventoryReportPage.tsx::loadData
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: `src/views/admin/AdminInventoryReportPage.tsx`::async_loadData
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `query` — Supabase sorgu nesnesi; `inventory_movements` tablosundan veri çekmek için oluşturulan zincirli sorgu. Başlangıçta `select` ve `order` ile başlatılır, ardından tarih aralığı filtresi (`gte`, `lte`) koşullu olarak eklenir.
-  - `movements` — Supabase yanıtından dönen ham hareket verisi dizisi (`data` alanı). Sorgu sonucu başarıyla alındığında kullanılır, aksi halde `[]` atanır.
-  - `movementsError` — Supabase sorgu sonucundaki hata nesnesi. Tanımsız değilse `throw` ile fırlatılır.
-- **Dönüş**: yok (state'leri `setLoading`, `setMovementsData`, `setLoading` ile günceller; `movements` verisini `setMovementsData` ile kaydeder)
+  - `query` — Supabase sorgu nesnesi, `inventory_movements` tablosundan veri çeker; `id`, `delta`, `reason`, `created_at`, `product_id`, `products(name)` alanlarını seçer; `created_at` üzerine azalan sıralama uygular
+  - `movements` — Supabase sorgusunun başarılı sonucu: stok hareketleri satır dizisi (`data` alanından)
+  - `movementsError` — Supabase sorgusunun hata nesnesi (`error` alanından); hata varsa fırlatılır
+- **Dönüş**: yok (yan etki: `setLoading`, `setMovementsData` çağırır)
 
----
-
-### [N2_NASIL] AST Pointer: AdminInventoryReportPage.tsx::useEffect tetikleyici
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: `src/views/admin/AdminInventoryReportPage.tsx`::useEffect_loadData_caller
+- **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: `loadData()` asenkron olarak çağrılır)
+- **Dönüş**: yok (yan etki: `loadData()` asenkron çağrısını tetikler)
 
----
-
-### [N3_NASIL] AST Pointer: AdminInventoryReportPage.tsx::computeStats
-- **params**: (yok)
+### [N3_NASIL] AST Pointer: `src/views/admin/AdminInventoryReportPage.tsx`::computeStats
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `tIn` — Toplam giriş (stok artış) miktarını tutar. Pozitif `delta` değerlerinin toplamı.
-  - `tOut` — Toplam çıkış (stok azalış) miktarını tutar. Negatif `delta` değerlerinin mutlaklarının toplamı.
-  - `reasonMap` — `Record<string, number>` tipinde sözlük; her hareket sebebine (`sale`, `return`, `restock`, `manual_in`, `manual_out`, `adjustment`) göre mutlak miktarların toplamını tutar.
-  - `productSales` — `Record<string, { name: string, out: number }>` tipinde sözlük; ürün adına göre toplam çıkış miktarını tutar. En çok satan ürünlerin sıralaması için kullanılır.
-  - `trendMap` — `Record<string, { date: string, incoming: number, outgoing: number }>` tipinde sözlük; tarih bazlı giriş/çıkış trend verisini tutar. Grafiğe dönüştürülmeden önce `Object.values()` ile diziye çevrilir.
-  - `term` — `searchQuery` değerinin trim ve küçük harfe çevrilmiş hali; filtreleme terimi.
-  - `filtered` — `movementsData` dizisinin `term` ile filtrelenmiş hali. Ürün adı veya `product_id` eşleşmesi kontrol edilir.
-  - `dateKey` — `m.created_at` değerinin `'yyyy-MM-dd'` formatında formatlanmış hali; trend haritasında anahtar olarak kullanılır.
-  - `deltaAbs` — `m.delta` değerinin mutlak değeri; çıkış hesaplamalarında kullanılır.
-  - `pname` — Hareketin ait olduğu ürünün adı; `m.products.name` alanından alınır, tanımsızsa `m.product_id` kullanılır.
-  - `rData` — Sebep bazlı grafiğe dönüştürülmüş dizi. `reasonMap` değerlerinden oluşturulur, `value > 0` olanlar filtrelenir.
-  - `sortedProds` — `productSales` değerlerinin `out` alanına göre azalan sıralaması. İlk 8 ürün alınır ve isimleri 15 karakterden uzunsa kısaltılır.
-- **Dönüş**: yok (yan etkiler: `setStats`, `setReasonData`, `setTopProducts`, `setTrendData` ile state'leri günceller)
+  - `tIn` — Toplam giriş miktarı, pozitif delta değerlerinin toplamı; başlangıçta 0
+  - `tOut` — Toplam çıkış miktarı, negatif delta değerlerinin mutlak değerleri toplamı; başlangıçta 0
+  - `reasonMap` — Sebep bazlı miktar sözlüğü; anahtarlar: `sale`, `return`, `restock`, `manual_in`, `manual_out`, `adjustment`; her biri başlangıçta 0
+  - `productSales` — Ürün bazlı satış miktarı sözlüğü; her eleman `{ name: string, out: number }` formatında; ürün adına göre gruplanmış toplam çıkış miktarı
+  - `trendMap` — Tarih bazlı giriş/çıkış trend sözlüğü; anahtar `yyyy-MM-dd` formatlı tarih stringi, değer `{ date: string, incoming: number, outgoing: number }`
+  - `term` — `searchQuery`'nin küçük harfe çevrilmiş ve boşlukları trimmed hali; filtreleme için kullanılır
+  - `filtered` — `searchQuery` boşsa `movementsData`'nın tamamı, doluysa ürün adı veya product_id eşleşenlerle filtrelenmiş stok hareketleri dizisi
+  - `days` — `dateRange.from` ile `dateRange.to` arasındaki tüm günlerin dizisi (date-fns `eachDayOfInterval` ile)
+  - `dateKey` — Her hareketin `created_at` alanının `yyyy-MM-dd` formatlı tarih stringi
+  - `deltaAbs` — Her hareketin `delta` değerinin mutlak değeri; negatif delta çıkış olarak sayılır
+  - `pname` — Hareketin ilişkili ürününün adı; `products.name` alanından alınır, yoksa `product_id` fallback kullanılır
+  - `rData` — Pasta grafik için sebep bazlı veri dizisi; her eleman `{ name: string, value: number, color: string }` formatında; `value > 0` olanlar filtrelenmiş
+  - `sortedProds` — En çok satılan ilk 8 ürünün sıralanmış dizisi; `productSales` sözlüğünden büyükten küçüğe sıralanmış, ilk 8'i alınmış; `name` 15 karakterden uzunsa kısaltılmış
+- **Dönüş**: yok (yan etki: `setStats`, `setReasonData`, `setTopProducts`, `setTrendData` çağırır)
 
----
-
-### [N4_NASIL] AST Pointer: AdminInventoryReportPage.tsx::trendMap_init_callback
-- **params**: `d` — `eachDayOfInterval` tarafından döndürülen tek bir `Date` nesnesi; tarih aralığındaki her günü temsil eder.
+### [N4_NASIL] AST Pointer: `src/views/admin/AdminInventoryReportPage.tsx`::handleExport
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `k` — `d` değerinin `'yyyy-MM-dd'` formatında formatlanmış hali; `trendMap` sözlüğünün anahtarı.
-- **Dönüş**: yok (yan etki: `trendMap[k]` değerini `{ date, incoming: 0, outgoing: 0 }` ile başlatır)
+  - `header` — CSV dosyasının başlık satırı dizisi: `['ID', 'Tarih', 'Ürün', 'Miktar', 'Sebep', 'Ürün ID']`
+  - `csvRows` — `movementsData` dizisi üzerinde `map` ile üretilen CSV satırları; her satır bir string dizisi olarak hazırlanıp virgülle birleştirilmiş; içindeki çift tırnak işaretleri escape edilmiş
+  - `csvString` — BOM (`\ufeff`) karakteriyle başlayan tam CSV içeriği; başlık satırı ve veri satırları newline ile birleştirilmiş
+  - `blob` — CSV string'inden oluşturulan `Blob` nesnesi; MIME type `text/csv;charset=utf-8;`
+  - `url` — Blob'dan oluşturulan geçici URL (`URL.createObjectURL`)
+  - `a` — Dinamik olarak oluşturulan `<a>` DOM elementi; indirme bağlantısı olarak kullanılır
+- **Dönüş**: yok (yan etki: `stok-raporu-{tarih}.csv` dosyasını tarayıcıda indirir)
 
----
-
-### [N5_NASIL] AST Pointer: AdminInventoryReportPage.tsx::filteredForEach_callback
-- **params**: `m` — Tek bir envanter hareketi nesnesi; `id`, `delta`, `reason`, `created_at`, `product_id`, `products` alanlarını içerir.
+### [N5_NASIL] AST Pointer: `src/views/admin/AdminInventoryReportPage.tsx`::getFilteredData
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `dateKey` — `m.created_at` değerinin `'yyyy-MM-dd'` formatında formatlanmış hali; `trendMap` içindeki ilgili tarih anahtarı.
-  - `deltaAbs` — `m.delta` değerinin `Math.abs` ile hesaplanan mutlak değeri; çıkış miktarı olarak kullanılır.
-  - `pname` — Hareketin ürün adı; `m.products.name` alanından (`Record<string, unknown>` cast ile) alınır, tanımsızsa `m.product_id` fallback olarak kullanılır.
-- **Dönüş**: yok (yan etki: `tIn`, `tOut`, `trendMap[dateKey].incoming/outgoing`, `reasonMap[m.reason]`, `productSales[pname].out` değerlerini günceller)
-
----
-
-### [N6_NASIL] AST Pointer: AdminInventoryReportPage.tsx::topProducts_map_callback
-- **params**: `p` — `productSales` sözlüğündeki bir değer nesnesi; `{ name: string, out: number }` yapısındadır.
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `{ name: string, amount: number }` — Grafik verisi için düzenlenmiş ürün nesnesi. `name` 15 karakterden uzunsa `substring(0, 15) + '...'` ile kısaltılır, `amount` ise `out` değeridir.
-
----
-
-### [N7_NASIL] AST Pointer: AdminInventoryReportPage.tsx::exportCSV
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `header` — CSV dosyasının başlık satırı dizisi: `['ID', 'Tarih', 'Ürün', 'Miktar', 'Sebep', 'Ürün ID']`.
-  - `csvRows` — Her hareket nesnesini CSV formatına dönüştürülmüş satırlar dizisi. Her eleman `m.id`, tarih (`'yyyy-MM-dd HH:mm'`), ürün adı veya `m.product_id`, `m.delta`, `m.reason`, `m.product_id` değerlerini içerir. Tüm değerler çift tırnak ile sarılır ve iç tırnaklar escape edilir.
-  - `csvString` — BOM (`\ufeff`) ile başlayan, başlık ve veri satırlarının newline ile birleştirilmiş tam CSV metni.
-  - `blob` — `csvString` içeriğinden oluşturulan `Blob` nesnesi; `text/csv;charset=utf-8;` MIME türü ile.
-  - `url` — `blob` nesnesinden türetilen geçici URL; `URL.createObjectURL` ile oluşturulur.
-  - `a` — DOM'da oluşturulan geçici `<a>` elementi; indirme bağlantısı olarak kullanılır.
-- **Dönüş**: yok (yan etki: dosya indirme tetiklenir, geçici URL `revokeObjectURL` ile temizlenir)
-
----
-
-### [N8_NASIL] AST Pointer: AdminInventoryReportPage.tsx::csvRow_map_callback
-- **params**: `m` — Tek bir envanter hareketi nesnesi; `id`, `delta`, `reason`, `created_at`, `product_id`, `products` alanlarını içerir.
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `string` — Tek bir CSV satırı. Değerler virgülle ayrılır, her değer çift tırnak içine alınır, iç tırnaklar (`"`) escape edilir (`""`).
-
----
-
-### [N9_NASIL] AST Pointer: AdminInventoryReportPage.tsx::getFilteredMovements
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `term` — `searchQuery` değerinin trim ve küçük harfe çevrilmiş hali; filtreleme terimi.
-- **Dönüş**: `movementsData` dizisinin filtrelenmiş hali. `term` boşsa tüm `movementsData` döner; doluysa ürün adı (`m.products.name`) veya `product_id` küçük harf karşılaştırması ile filtreleme yapılır.
-
----
-
-### [N10_NASIL] AST Pointer: AdminInventoryReportPage.tsx::incomingRow_render_callback
-- **params**: `m` — Tek bir envanter hareketi nesnesi (pozitif `delta` ile giriş hareketi); `id`, `delta`, `created_at`, `products` alanlarını içerir.
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX `<tr>` elementi — Giriş hareketlerini gösteren tablo satırı. Hücreler: tarih (`'dd.MM HH:mm'` formatında), ürün adı (veya `product_id`), `+delta` değeri (yeşil renk ile).
-
----
-
-### [N11_NASIL] AST Pointer: AdminInventoryReportPage.tsx::outgoingRow_render_callback
-- **params**: `m` — Tek bir envanter hareketi nesnesi (negatif `delta` ile çıkış hareketi); `id`, `delta`, `created_at`, `products` alanlarını içerir.
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX `<tr>` elementi — Çıkış hareketlerini gösteren tablo satırı. Hücreler: tarih (`'dd.MM HH:mm'` formatında), ürün adı (veya `product_id`), `delta` değeri (kırmızı renk ile).
+  - `term` — `searchQuery`'nin küçük harfe çevrilmiş ve boşlukları trimmed hali; filtreleme terimi
+- **Dönüş**: `movementsData` dizisi — `term` boşsa tamamı; doluysa ürün adı (`products.name`) veya `product_id` alanlarında `term` içerenlerle filtrelenmiş stok hareketleri dizisi
 
 ---
 

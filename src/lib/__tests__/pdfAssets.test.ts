@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
-import { getAbsoluteAssetUrl } from '../pdfAssets'
+import { describe, expect, it, vi } from 'vitest'
+
 import { SITE_URL } from '../../config/siteUrl'
+import { getAbsoluteAssetUrl } from '../pdfAssets'
 
 describe('getAbsoluteAssetUrl', () => {
   it('should prepend browser origin when window is defined', () => {

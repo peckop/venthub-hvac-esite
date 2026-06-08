@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
-import { printQrLabel } from './InventoryQrLabel'
+
 import { InventoryRow, ReservedRow } from '../../types/inventory'
-import InventoryStockAdjust from './InventoryStockAdjust'
-import InventoryReservedTable from './InventoryReservedTable'
 import InventoryMovementHistory, { Movement } from './InventoryMovementHistory'
+import { printQrLabel } from './InventoryQrLabel'
+import InventoryReservedTable from './InventoryReservedTable'
+import InventoryStockAdjust from './InventoryStockAdjust'
 
 interface InventoryDetailDrawerProps {
     selected: InventoryRow | null

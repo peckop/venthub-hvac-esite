@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { calculateHRV, calculateDuct, calculateAirCurtain, type HRVInput } from '../hvacCalculations'
+import { describe, expect,it } from 'vitest'
+
+import { calculateAirCurtain, calculateDuct, calculateHRV, type HRVInput } from '../hvacCalculations'
 
 describe('calculateHRV', () => {
   const defaultInput: HRVInput = {

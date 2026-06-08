@@ -8,7 +8,7 @@ entity_hashes:
   func:NavShell: 6b1b48f5c901dde6
   overview: 5c6cc2484e8ea784
   style_tokens: fe546e0bed477a10
-generated_at: 2026-05-28T22:36:41Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,19 @@ Bu grup, uygulama navigasyonunu oluşturan tek bileşeni kapsar. Temel amacı, d
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+NavShell, dışarıdan yapılandırılan parametrelerle çalışan bir navigasyon kabuk bileşenidir.
+
+**[Aksiyom 1]**: Eğer `progress` değeri verilmişse, bu değer sayısal bir değer olmalıdır (default: `0`). Eğer sayısal değilse, bileşen beklenmeyen davranış gösterebilir veya render hatası oluşur.
+
+**[Aksiyom 2]**: Eğer `showProgress = false` ise, `progress` parametresinin değeri anlamsızdır; ilerleme göstergesi render edilmez. İlerleme çubuğunun görünür olması için `showProgress` açıkça `true` olarak ayarlanmalıdır.
+
+**[Aksiyom 3]**: Eğer `fixed = true` ise, navigasyon bileşeni sayfada sabit konumlandırılır (position: fixed). `fixed = false` olduğunda ise bileşen akışa (flow) göre konumlanır.
+
+**[Aksiyom 4]**: Fonksiyon imzası kesik (`isScrol...` olarak sonlanıyor), bu nedenle ilgili parametrenin tam adı ve default değeri bilinmemektedir. Tam imza olmadan bu parametre için aksiyom üretilemez.
+
+**[Aksiyom 5]**: Eğer `progress` değeri `showProgress = true` iken negatif veya 100'den büyük bir sayı olarak verilmişse, bileşenin bu değeri nasıl işlediği fonksiyon gövdesinde tanımlı değildir — geçerli aralık (örn. 0-100) belirsizdir.
 
 ---
 

@@ -3,50 +3,47 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\middleware.ts
-skeleton_hash: 26f9b5f9a3ad6c83
+skeleton_hash: b384cc334926dde6
 entity_hashes:
   func:detectLocale: 5c19d05a4ba76afe
   func:middleware: 40d52344cd7722d0
-  overview: 93d9d476cdaf7bfc
-generated_at: 2026-06-07T15:52:28Z
+  overview: 94128ae24c53fc1c
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js uygulamasında tüm HTTP isteklerini yakalayan ve işleyen merkezi bir middleware bileşenidir. Tenant kimlik çözümlemesi, dil tabanlı yönlendirmeler, SEO uyumlu URL normalleştirmeleri ve admin paneli için
+Bu modül, Next.js uygulamasında gelen tüm HTTP isteklerini yöneten merkezi bir middleware bileşenidir. Temel olarak isteklerin dilini tespit ederek uygun yönlendirmeleri yapar, SEO dostu URL normalleştirmelerini yönetir ve admin paneli için erişim kontrolü uygular.
+
+## Fonksiyon Grupları
+### Dil Tespiti ve Yönlendirme
+Bu grup, isteğin dilini belirleyen ve kullanıcıları doğru dil sürümüne yönlendiren temel dil işlevlerini içerir.
+- detectLocale, middleware
+
+### URL Normalleştirme ve Eşleme
+Bu grup, istek URL'lerini analiz eden, UUID tabanlı desenleri eşleştiren ve SEO uyumlu yapılandırma kurallarını uygulayan mantığı kapsar.
+- middleware
+
+### Erişim Kontrolü ve Koruma
+Bu grup, belirli rotalar için kullanıcı rolü kontrolü yapan ve admin gibi korumalı sayfalara erişimi düzenleyen güvenlik işlevlerini barındırır.
+- middleware
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, istek tabanlı dil tespiti ve URL deseni eşleme yapan bir Next.js middleware modülüdür.
+Bu modül, dil tespiti ve yönlendirme ile UUID tabanlı URL eşleme ve erişim kontrolü yapan bir Next.js middleware'idir. Aşağıdaki varsayımlar modülün doğru çalışması için zorunludur.
 
----
+[Aksiyom 1]: Eğer `LOCALES` sabiti tanımlı değilse veya desteklenen dil kodlarını içeren geçerli bir dizi içermiyorsa, `detectLocale` istekten geçerli bir dil tespit edemez ve yönlendirme kararı sağlıklı alınamaz.
 
-**[Aksiyom 1 – Geçerli Lokal Kümeleri Tanımlı Olmalı]**: Eğer `LOCALES` sabiti tanımlı değilse veya geçerli bir lokal kümesi içermiyorsa, `detectLocale` fonksiyonunun döndüğü değer `NEXT_LOCALE` cookie'si veya `Accept-Language` header'ı ile eşleşemeyebilir ve fonksiyonun beklenen lokal değerlerinden (`tr`, `en`) birini garantileyemez.
+[Aksiyom 2]: Eğer `UUID_REGEX` sabiti tanımlı değilse veya geçerli bir düzenli ifade (RegExp) içermiyorsa, `middleware` UUID tabanlı URL desenlerini eşleyemez ve SEO normalleştirmesi çalışamaz.
 
----
+[Aksiyom 3]: Eğer `request` parametresi `NextRequest` türünde değilse veya `nextUrl` (URL nesnesi), `headers` (HTTP başlıkları) gibi gerekli özelliklere sahip değilse, hem `detectLocale` hem `middleware` fonksiyonları hata ile karşılaşır.
 
-**[Aksiyom 2 – NextRequest Nesnesi Geçerli Olmalı]**: Eğer `request` parametresi geçerli bir `NextRequest` nesnesi değilse (örn: `null`, `undefined` veya farklı bir tipteyse), hem `detectLocale` hem de `middleware` fonksiyonu `cookie` ve `headers` erişiminde hata fırlatır.
+[Aksiyom 4]: Eğer `ADMIN_ROLES` sabiti tanımlı değilse veya geçerli bir rol listesi (dizi/küme) içermiyorsa, admin paneli erişim kontrolü çalışamaz veYetkilendirme kararı verilemez.
 
----
+[Aksiyom 5]: Eğer `config` nesnesi tanımlı değilse veya yönlendirme/normalleştirme parametrelerini içermiyorsa, middleware yönlendirme ve yapılandırma kararları alamaz.
 
-**[Aksiyom 3 – UUID_REGEX Deseni Tanımlı Olmalı]**: Eğer `UUID_REGEX` sabiti tanımlı değilse veya geçerli bir regex ifadesi içermiyorsa, `middleware` fonksiyonunun UUID tabanlı URL eşleme mantığı çalışamaz ve beklenen rotalar tanınamaz.
-
----
-
-**[Aksiyom 4 – ADMIN_ROLES Tanımlı Olmalı]**: Eğer `ADMIN_ROLES` sabiti tanımlı değilse veya geçerli bir ifade içermiyorsa, middleware içindeki rol bazlı erişim kontrolü (admin sayfaları için) çalışamaz.
-
----
-
-**[Aksiyom 5 – config Nesnesi Tanımlı Olmalı]**: Eğer `config` nesnesi tanımlı değilse veya Next.js middleware config formatına uymuyorsa (örn: `matcher` alanı eksikse), middleware'in hangi rotalarda tetikleneceği belirsizleşir ve tüm isteklerde veya hiçbir istekte çalışmaz.
-
----
-
-**[Aksiyom 6 – Cookie Erişilebilirliği]**: Eğer istek cookie'leri içermiyorsa veya tarayıcı/ortam cookie'leri devre dışı bırakmışsa, `detectLocale` fonksiyonu `NEXT_LOCALE` cookie'sinden değer okuyamaz ve doğrudan `Accept-Language` header kontrolüne veya varsayılan locale'e (`tr`) yönelir.
-
----
-
-**[Aksiyom 7 – Accept-Language Header'ı Opsiyonel]**: Eğer istekte `Accept-Language` header'ı bulunmuyorsa ve ayrıca `NEXT_LOCALE` cookie'si de yoksa veya geçersizse, `detectLocale` varsayılan locale olarak `'tr'` döner. Bu durumda varsayılan dilin Türkçenin olmadığı senaryo desteklenmez.
+[Aksiyom 6]: Eğer `LOCALES` boş bir dizi ise, hiçbir dil kodu desteklenmediğinden `detectLocale` herhangi bir eşleşme yapamaz ve istek yönlendirilemez.
 
 ---
 
@@ -89,11 +86,44 @@ Bu modül, istek tabanlı dil tespiti ve URL deseni eşleme yapan bir Next.js mi
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/middleware.ts::detectLocale
-- **params**: `request: NextRequest` — HTTP isteği nesnesi, cookie ve header bilgilerini içerir
-- **ic_degiskenler**:
-  - `cookieLocale` — `request.cookies.get('NEXT_LOCALE')?.value` ile okunur; tarayıcıda depolanan dil tercihini tutar, 'tr' veya 'en' olup kontrol edilir
-  - `acceptLang` — `request.headers.get('accept-language') || ''` ile okunur; tarayıcının dil tercih header'ını tutar, küçük harfe çevrilerek 'en' içerip içermediği kontrol edilir
-- **Dönüş**: `string` — `'en'` veya `'tr'` (varsayılan olarak)
+- **params**: (request: NextRequest)
+- **ic_degiskenler**: 
+  - `cookieLocale` — `request.cookies.get('NEXT_LOCALE')?.value` ifadesinden elde edilen dil tercihi değeridir. 'tr' veya 'en' ise doğrudan kullanılır.
+  - `acceptLang` — `request.headers.get('accept-language')` header'ından gelen dil tercihi stringidir, yoksa boş string olarak alınır.
+- **Dönüş**: string (hangi dilin kullanılacağını belirler)
+
+### [N2_NASIL] AST Pointer: src/middleware.ts::middleware
+- **params**: (request: NextRequest)
+- **ic_degiskenler**: 
+  - `host` — `request.headers.get('host')` ifadesinden alınan HTTP host header'ı, tenant çözümleme için kullanılır.
+  - `tenantId` — `resolveTenant(host)` çağrısı ile elde edilen kiracı identifier'ı, istek header'ına ve cookie'ye eklenir.
+  - `response` — `NextResponse.next()` ile oluşturulan temel yanıt nesnesi, middleware süreç boyunca modificar edilir.
+  - `setTenantCookie` — Inner function, `response` nesnesine `tenant_id` cookie'sini ekler ve yanıt döner.
+  - `redirectResponse` — Inner function, `createRedirectResponse` kullanarak yönlendirme yanıtını oluşturur, önce `setTenantCookie` çağırır.
+  - `pathname` — `request.nextUrl.pathname` ifadesinden alınan isteğin URL path'i, yönlendirme mantığında kullanılır.
+  - `segments` — `pathname.split('/').filter(Boolean)` ile oluşturulmuş path segmentleri dizisi.
+  - `firstSegment` — `segments[0]` ifadesinden elde edilen ilk path segmenti, dil kontrolü ve yönlendirme için kullanılır.
+  - `locale` — Varsayılan dil (`DEFAULT_LOCALE`) olarak başlatılır, path'te dil belirtilmişse güncellenir.
+  - `effectiveSegments` — `segments` dizisinin kopyası, dil segmenti kaldırılmış hali (gerekirse).
+  - `isLocaleInPath` — `firstSegment`'in `LOCALES` dizisi içinde olup olmadığını kontrol eden boolean.
+  - `isAuthApi` — `auth/callback` veya `auth/signout` rotası olup olmadığını belirleyen boolean.
+  - `isSpecialRoute` — `admin`, `api`, auth API'leri veya statik dosyalar (sitemap.xml, robots.txt) için boolean.
+  - `detectedLocale` — `detectLocale(request)` çağrısı ile tespit edilen dil, locale enjeksiyonu için kullanılır.
+  - `supabaseUrl` — `process.env.NEXT_PUBLIC_SUPABASE_URL` ortam değişkeninden alınan Supabase URL'i.
+  - `anonKey` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY` ortam değişkeninden alınan Supabase anonim anahtarı.
+  - `identifier` — `effectiveSegments[1]` ifadesinden elde edilen ürün identifikatörü (UUID kontrolü yapılır).
+  - `data` — Supabase `products` tablosundan `slug` alanını seçen sorgudan dönen veri (UUID→SEO slug yönlendirmesi için).
+  - `error` — UUID slug lookup sırasında oluşan hata, yakalanıp loglanır.
+  - `isDev` — `process.env.NODE_ENV === 'development'` kontrolünden elde edilen boolean.
+  - `isLocalhost` — `host`'un `localhost` veya `127.0.0.1` ile başlayıp başlamadığını kontrol eden boolean.
+  - `secret` — `process.env.JWT_CLAIMS_COOKIE_SECRET` veya `anonKey` kullanılarak oluşturulan JWT gizli anahtarı.
+  - `claims` — `resolveUserClaims()` çağrısı ile elde edilen kullanıcı claim'leri (role bilgisi içerir).
+  - `error` — `resolveUserClaims()` çağrısından dönen hata nesnesi.
+  - `jwtRole` — `claims?.user_role` ifadesinden elde edilen kullanıcı rolü (string veya undefined).
+  - `roleString` — `jwtRole`'ün string olduğundan emin olmak için dönüştürülmüş hali.
+  - `loginUrl` — Yetki hatası durumunda yönlendirilecek giriş sayfası URL'i.
+  - `homeUrl` — Yetkisiz erişim durumunda yönlendirilecek ana sayfa URL'i.
+- **Dönüş**: yok (NextResponse nesnesi yan etki olarak döner)
 
 ---
 

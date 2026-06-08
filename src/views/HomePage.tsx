@@ -1,19 +1,20 @@
 import React from 'react'
 
-import HomeSinevizyon from '../components/home/HomeSinevizyon'
-import CinematicProductShowcase from '../components/home/CinematicProductShowcase'
-import GuidedCategoryDiscovery from '../components/home/GuidedCategoryDiscovery'
+import type { Product } from '@/types/ui-models'
+
 import ApplicationSolutions from '../components/home/ApplicationSolutions'
-import TrustProofSection from '../components/home/TrustProofSection'
+import CinematicProductShowcase from '../components/home/CinematicProductShowcase'
 import FeaturedCommercialBlocks from '../components/home/FeaturedCommercialBlocks'
-import StrategicBrands from '../components/home/StrategicBrands'
+import GuidedCategoryDiscovery from '../components/home/GuidedCategoryDiscovery'
+import { CategoryViewModelLite } from '../components/home/GuidedCategoryDiscovery'
+import HomePageClientWrapper from '../components/home/HomePageClientWrapper'
+import HomeSinevizyon from '../components/home/HomeSinevizyon'
 import KnowledgeBlock from '../components/home/KnowledgeBlock'
 import RevealSection from '../components/home/RevealSection'
-import HomePageClientWrapper from '../components/home/HomePageClientWrapper'
+import StrategicBrands from '../components/home/StrategicBrands'
+import TrustProofSection from '../components/home/TrustProofSection'
 import { ScrollObserver } from '../components/ui/ScrollObserver'
-import type { Product } from '@/types/ui-models'
 import { DomainCategory } from '../lib/type-converters'
-import { CategoryViewModelLite } from '../components/home/GuidedCategoryDiscovery'
 
 interface HomePageProps {
   initialCategories?: CategoryViewModelLite[]

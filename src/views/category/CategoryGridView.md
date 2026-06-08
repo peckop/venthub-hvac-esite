@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\category\CategoryGridView.tsx
-skeleton_hash: f32b4a660e2d91c5
+skeleton_hash: 56885ae50d938e31
 entity_hashes:
   func:CategoryGridView: 7b1f2c5723260534
   overview: bbed19dee4115a19
   style_tokens: 9b61cf001b5ee023
-generated_at: 2026-06-06T21:58:12Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış

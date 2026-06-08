@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\FanRenderer.tsx
-skeleton_hash: b26fb97ae335cca0
+skeleton_hash: d15bc0bedf605a76
 entity_hashes:
   func:FanRenderer: 6acd4deea60e5442
   overview: 4950f318713848c3
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:42Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış

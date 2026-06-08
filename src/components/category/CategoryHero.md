@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\CategoryHero.tsx
-skeleton_hash: 2839fbcf97470680
+skeleton_hash: 41f5573c50d8e1df
 entity_hashes:
   func:CategoryHero: e691a6ccb1379798
   func:handleBack: 7a67af4e5dfa77e4
   overview: 4b47da32e01e754d
   style_tokens: 6910b683995fc9aa
-generated_at: 2026-05-28T22:35:44Z
+generated_at: 2026-06-08T10:08:47Z
 ---
 
 ## Genel Bakış

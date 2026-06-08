@@ -1,13 +1,13 @@
 'use client'
-import { Routes } from '../../utils/routes'
-
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import { ArrowLeft, ChevronRight } from 'lucide-react'
-import OrbitalProductsShowcase from './OrbitalProductsShowcase'
+import { useRouter } from 'next/navigation'
+import React, { useCallback,useEffect, useMemo, useState } from 'react'
+
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useI18n } from '../../i18n/I18nProvider'
+import { Routes } from '../../utils/routes'
+import OrbitalProductsShowcase from './OrbitalProductsShowcase'
 
 // Helper to determine 3D model type based on slug
 const getModelTypeForCategory = (slug?: string): string | undefined => {

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\CheckoutProgress.tsx
-skeleton_hash: 84dfed65cdf896e6
+skeleton_hash: d1eb6163a4658ba4
 entity_hashes:
   func:CheckoutProgress: 49b0cf86a525644a
   overview: 9c6eb086dfed68a0
   style_tokens: 755270530bcb7865
-generated_at: 2026-05-28T22:40:05Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış

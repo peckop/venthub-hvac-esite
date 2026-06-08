@@ -1,8 +1,9 @@
-import PageComponent from '../../../_components/ProductDetailPageView'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 import type { Product } from '@/types/ui-models'
+
 import { SITE_URL } from '../../../../config/siteUrl'
 import { getCachedProductBySlug, preloadProduct } from '../../../../lib/data/preload'
+import { ProductDetailPage as PageComponent } from '../../../_components/ProductDetailPageView'
 
 
 export async function generateStaticParams() {

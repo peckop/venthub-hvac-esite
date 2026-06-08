@@ -1,13 +1,14 @@
 'use client'
 
-import React from 'react'
-import { HVAC_BRANDS } from '../data/brands'
-import { BrandIcon } from '../components/HVACIcons'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
+import React from 'react'
+
+import { BrandIcon } from '../components/HVACIcons'
 import Seo from '../components/Seo'
-import { useI18n } from '../i18n/I18nProvider'
+import { HVAC_BRANDS } from '../data/brands'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
+import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
 /**
@@ -137,7 +138,7 @@ const BrandsPage: React.FC = () => {
             <div className="relative aspect-square lg:aspect-video rounded-hvac-3xl overflow-hidden border border-white/5">
               <Image 
                 src="/images/hvac_installation_close_up_premium_3.webp" 
-                alt="Technical Network" 
+                alt={t('brands.trust.imageAlt')} 
                 fill 
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover brightness-50"

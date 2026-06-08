@@ -1,6 +1,7 @@
-import { vi } from 'vitest'
 import '@testing-library/jest-dom'
+
 import React from 'react'
+import { vi } from 'vitest'
 
 // Mock Lucide Icons - Using proper React types
 const mockIcons: Record<string, React.FC<React.ComponentPropsWithoutRef<'div'>>> = {}

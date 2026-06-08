@@ -1,6 +1,8 @@
 'use client'
-import { Routes } from '../utils/routes'
-
+import { AnimatePresence,motion } from 'framer-motion'
+import { LayoutGrid, List } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
 /**
  * @view ProductsDiscoveryView
  * @description "Ürünleri Keşfet" sayfası.
@@ -13,16 +15,14 @@ import { Routes } from '../utils/routes'
  * 4. Sabit (sticky) küçülmüş moddayken üstüne tıklanırsa YERİNDE genişler.
  * 5. Kullanıcı ekranın en tepesine döndüğünde eski büyük haline döner.
  */
+import React, { useCallback, useRef,useState } from 'react'
 
-import React, { useState, useCallback, useRef } from 'react'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
-import { LayoutGrid, List } from 'lucide-react'
-import { useI18n } from '../i18n/I18nProvider'
 import type { Product } from '@/types/ui-models'
-import type { DomainCategory } from '../lib/type-converters'
+
 import ProductCard from '../components/ProductCard'
+import { useI18n } from '../i18n/I18nProvider'
+import type { DomainCategory } from '../lib/type-converters'
+import { Routes } from '../utils/routes'
 
 const CategoryOrbitCarousel = dynamic(
     () => import('../components/products/CategoryOrbitCarousel'),

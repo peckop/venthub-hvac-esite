@@ -1,10 +1,12 @@
-import React from 'react'
-import type { Product } from '@/types/ui-models'
-import { X, ShoppingCart, Eye } from 'lucide-react'
-import { useCart } from '../hooks/useCartHook'
+import { Eye,ShoppingCart, X } from 'lucide-react'
 import Link from 'next/link'
-import { useI18n } from '../i18n/I18nProvider'
+import React from 'react'
+
+import type { Product } from '@/types/ui-models'
+
+import { useCart } from '../hooks/useCartHook'
 import { formatCurrency } from '../i18n/format'
+import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
 interface QuickViewModalProps {

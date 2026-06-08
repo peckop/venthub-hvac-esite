@@ -8,7 +8,7 @@ entity_hashes:
   func:ScrollReveal: 5164aa702775b185
   overview: 7c3e9f948c132ef9
   style_tokens: fce5caac08f51876
-generated_at: 2026-06-06T21:55:06Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış
@@ -22,7 +22,19 @@ ScrollReveal, çocuk bileşenleri sarmalayarak kaydırma olaylarını izler ve g
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+ScrollReveal bileşeni, kaydırma tabanlı animasyonları çocuklar için uygulayan bir sarmalayıcı component'tir.
+
+**[Aksiyom 1 - Zorunlu Animation Prop'u]:** Eğer `animation` parametresi verilmezse, bileşen geçerli bir animasyon uygulayamaz ve çocuk bileşenler animasyon olmadan rendered olur.
+
+**[Aksiyom 2 - Zorunlu Children Prop'u]:** Eğer `children` parametresi verilmezse, bileşen render edilecek bir içerik barındırmaz ve animasyon uygulanacak bir hedef olmaz.
+
+**[Aksiyom 3 - StaggerIndex Sıralama Bağımlılığı]:** Eğer `staggerIndex` parametresi verilmezse, bileşen sıralı animasyon (stagger) zamanlamasında bağımsız/tek başına çalışır, diğer ScrollReveal bileşenlerinden bağımsız tetiklenir.
+
+**[Aksiyom 4 - As Prop'u Geçerli Component']):** Eğer `as` prop'u geçerli bir React component'i (Comp) içermeyen bir değer alırsa, bileşen geçerli bir HTML elementi veya component olarak render edilemez ve hata oluşur.
+
+**[Aksiyom 5 - ClassName Varsayılan Davranış]:** `className` parametresi verilmezse boş string (`''`) kullanılır, bu durumda bileşene ek CSS sınıfı uygulanmaz.
 
 ---
 

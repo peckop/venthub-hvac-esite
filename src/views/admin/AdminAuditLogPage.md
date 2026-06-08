@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminAuditLogPage.tsx
-skeleton_hash: 70abd3db6590fef6
+skeleton_hash: 1a2e899b84ab1132
 entity_hashes:
   func:AdminAuditLogPage: 50d17db2bc55805a
-  overview: 7ad01a8799bdff81
+  overview: e5218eb356c499d1
   style_tokens: d2a1c3bee3a34f52
-generated_at: 2026-06-07T18:03:57Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
@@ -24,7 +24,7 @@ Modülün tek sorumluluğu olan yönetici denetim günlüğü sayfasının kulla
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-*(Not: Verilen bilgiler arasında AdminAuditLogPage fonksiyonunun gövdesi bulunmamaktadır. Mimari varsayımlar, yalnızca fonksiyon gövdesindeki kod analizinden üretilebilir. Fonksiyon gövdesi paylaşılmadığı için somut aksiyon çıkarılamamıştır.)*
+**Not:** Verilen bilgiler (fonksiyon imzası, sabitler ve eski dokü
 
 ---
 
@@ -55,65 +55,28 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminAuditLogPage.tsx::AdminAuditLogPage
+### [N1_NASIL] AST Pointer: src\views\admin\AdminAuditLogPage.tsx::AdminAuditLogPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini çevirir
-  - `lang` — useI18n hook'undan gelen mevcut dil kodu
-  - `dragScrollRef` — useDragScroll hook'undan gelen ref nesnesi, sürükleme ile yatay kaydırma için DOM referansı
-  - `router` — useRouter hook'undan gelen Next.js yönlendirici nesnesi, sayfa yönlendirmeleri için
-  - `rows` — AuditRow[] türünde state, sunucudan çekilen denetim logu satırlarını tutar
-  - `loading` — boolean state, veri yükleme durumunu belirtir
-  - `error` — string|null türünde state, hata mesajını tutar
-  - `total` — number state, toplam log sayısını tutar (sayfalama için)
-  - `page` — number state, mevcut sayfa numarasını tutar
-  - `q` — string state, arama çubuğuna girilen ham arama sorgusunu tutar
-  - `debouncedQ` — string state, debounce uygulanmış arama sorgusunu tutar
-  - `fromDate` — string state, filtre için başlangıç tarihini tutar (YYYY-MM-DD formatında)
-  - `toDate` — string state, filtre için bitiş tarihini tutar (YYYY-MM-DD formatında)
-  - `action` — string state, filtre için aksiyon türünü tutar (INSERT, UPDATE, DELETE, CUSTOM)
-  - `batch` — string state, filtre için batch ID'sini tutar
-  - `expandedId` — string|null türünde state, genişletilmiş satırın ID'sini tutar
-  - `pathname` — usePathname hook'undan gelen mevcut sayfa yolunu tutar
-  - `searchParams` — useSearchParams hook'undan gelen URL arama parametrelerini tutar
-- **Dönüş**: React.FC (React fonksiyonel component)
-
-### [N2_NASIL] AST Pointer: AdminAuditLogPage.tsx::debounceEffect
-- **params**: () — useEffect callback'i olarak çağrılır
-- **ic_degiskenler**:
-  - `t` — setTimeout sonucu oluşturulan zamanlayıcı ID'si, debounce gecikmesini kontrol eder
-- **Dönüş**: void (clearTimeout cleanup fonksiyonu döndürür)
-
-### [N3_NASIL] AST Pointer: AdminAuditLogPage.tsx::fetchLogs
-- **params**: () — useCallback ile sarılmış async fonksiyon
-- **ic_degiskenler**:
-  - `query` — Supabase sorgu nesnesi, filtreler ve sayfalama ile oluşturulur
-  - `like` — string, debounce edilmiş arama sorgusunu LIKE operatörü için formatlar
-  - `from` — number, sayfalama için başlangıç indeksini hesaplar
-  - `to` — number, sayfalama için bitiş indeksini hesaplar
-  - `data` — AuditRow[]|null, Supabase'den dönen veri dizisi
-  - `error` — any türünde Supabase hatası
-  - `count` — number|null, toplam kayıt sayısını döner
-  - `e` — Error türünde yakalanan hata nesnesi
-- **Dönüş**: Promise<void> (async fonksiyon)
-
-### [N4_NASIL] AST Pointer: AdminAuditLogPage.tsx::searchParamsEffect
-- **params**: () — useEffect callback'i olarak çağrılır
-- **ic_degiskenler**:
-  - `b` — string, searchParams'dan alınan batch parametresinin temizlenmiş hali
-- **Dönüş**: void
-
-### [N5_NASIL] AST Pointer: AdminAuditLogPage.tsx::clearBatchHandler
-- **params**: () — onClick handler olarak çağrılır
-- **ic_degiskenler**:
-  - `url` — URL nesnesi, mevcut sayfa URL'sini temsil eder
-- **Dönüş**: void
-
-### [N6_NASIL] AST Pointer: AdminAuditLogPage.tsx::renderRow
-- **params**: `r` — AuditRow türünde, tek bir denetim log satırı
-- **ic_degiskenler**:
-  - (ic değişken yok — sadece parametre `r` kullanılır)
-- **Dönüş**: JSX.Element (React fragment ve tr elemanları)
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu, UI metinlerini uluslararasılaştırma için kullanılır
+  - `lang` — `useI18n()` hook'undan gelen dil kodu, `formatDateTime` fonksiyonuna tarih formatı için传递 edilir
+  - `dragScrollRef` — `useDragScroll<HTMLDivElement>()` hook'undan dönen ref, yatay kaydırılabilir tablo konteynerine bağlanır
+  - `router` — `useRouter()` hook'undan gelen Next.js yönlendirme nesnesi, URL manipülasyonu ve navigasyon için kullanılır
+  - `rows` — `AuditRow[]` tipinde state, Supabase'den çekilen denetim kayıtlarını tutar
+  - `loading` — `boolean` tipinde state, veri yükleme durumunu gösterir (skeleton gösterilip gösterilmeyeceğini belirler)
+  - `error` — `string | null` tipinde state, hata mesajını tutar, varsa ekranda rose renkli bant olarak gösterilir
+  - `total` — `number` tipinde state, filtrelenmiş toplam kayıt sayısını tutar, sayfalama hesaplamalarında kullanılır
+  - `page` — `number` tipinde state, aktif sayfa numarasını tutar, varsayılan 1
+  - `q` — `string` tipinde state, arama kutusunun ham değerini tutar (debounce öncesi)
+  - `debouncedQ` — `string` tipinde state, 300ms debounce sonucu oluşmuş arama terimini tutar, API sorgusunda kullanılır
+  - `fromDate` — `string` tipinde state, başlangıç tarih filtresi (YYYY-MM-DD formatında input'tan gelir)
+  - `toDate` — `string` tipinde state, bitiş tarih filtresi (YYYY-MM-DD formatında input'tan gelir)
+  - `action` — `string` tipinde state, seçilen aksiyon filtresi (INSERT/UPDATE/DELETE/CUSTOM)
+  - `batch` — `string` tipinde state, batch ID filtresi, URL search params'dan okunur
+  - `pathname` — `usePathname()` hook'undan gelen mevcut URL yolu, `fetchLogs` yeniden çağrıldığında tetikleyici olarak kullanılır
+  - `searchParams` — `useSearchParams()` hook'undan gelen URL parametreleri, `batch` parametreini okumak için kullanılır
+  - `expandedId` — `string | null` tipinde state, detayı genişletilmiş satırın ID'sini tutar
+- **Dönüş**: JSX — AdminAuditLogPage bileşeninin render ettiği JSX yapısı (header, filtre bannerı, toolbar, tablo, pagination, hata bantı)
 
 ---
 

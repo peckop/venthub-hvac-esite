@@ -1,17 +1,18 @@
-import { Routes } from '@/utils/routes';
-import React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
 import { 
-  Award, Shield, Target, Globe, Zap, 
-  Factory, Microscope
-} from 'lucide-react'
-import Seo from '../components/Seo'
+  Award,   Factory, Globe, Microscope,
+Shield, Target, Zap} from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import React from 'react'
+
+import { Routes } from '@/utils/routes';
+
 import { BrandIcon } from '../components/HVACIcons'
+import { ScrollReveal } from '../components/ScrollReveal'
+import Seo from '../components/Seo'
 import { HVAC_BRANDS } from '../data/brands'
-import ScrollReveal from '../components/ScrollReveal'
-import { tr } from '../i18n/dictionaries/tr'
 import { en } from '../i18n/dictionaries/en'
+import { tr } from '../i18n/dictionaries/tr'
 
 interface AboutPageProps {
   lang?: string

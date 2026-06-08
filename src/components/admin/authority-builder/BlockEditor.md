@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\BlockEditor.tsx
-skeleton_hash: bb9ce06ca0b5ad23
+skeleton_hash: cfab5611e3d1584a
 entity_hashes:
   func:BlockEditor: 214d29bf0d4fb6bd
   overview: 451c6f0d8f51e9a4
   style_tokens: bc113824a6724140
-generated_at: 2026-05-28T22:35:21Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış

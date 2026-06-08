@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ProductCard.tsx
-skeleton_hash: 3de726cd21c481ab
+skeleton_hash: 4a22b4591c05c2c0
 entity_hashes:
   overview: 4ebb1c4f22471a6d
   style_tokens: 19c7d9ec430fc71d
-generated_at: 2026-06-06T21:55:05Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış
@@ -20,20 +20,6 @@ Bu bileşen以下 bağımlılıklar kullanır: `Product` türü, `BrandIcon`, `V
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül için fonksiyon gövdesi (implementation) verilmemiştir. Sağlanan bilgiler仅有 dosya yolu ve modül sabitleri olup, mimari varsayımların türetilmesi için gerekli olan **fonksiyon gövdesi** bulunmamaktadır.
-
----
-
-**Not:** Mimari varsayımlar (axioms), yalnızca fonksiyon gövdesinden (implementation code) üretilebilir. Dosya yolu, modül adı veya eski doküman içeriği gibi kaynaklardan çıkarım yapılması güvenilir değildir. 
-
-`ProductCard` bileşeninin gerçek implementasyon kodu (React component body) sağlandığında, aşağıdaki alanlarda aksiyomlar çıkarılabilir:
-
-- Props interface zorunlulukları (hangi alanların `undefined` olamayacağı)
-- `useCart` hook'unun dönüş yapısı varsayımları
-- `formatCurrency` fonksiyonunun giriş koşulları
-- `Product` nesnesinin minimum gerekli alanları
-- `Link` bileşenine geçilen URL formatı gereksinimleri
-
-**Öneri:** Lütfen `ProductCard.tsx` dosyasının **fonksiyon gövdesini** (component implementation) paylaşın.
 
 ---
 

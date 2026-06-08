@@ -1,7 +1,7 @@
-import { Routes } from '../utils/routes'
 import type { BreadcrumbItem } from '../components/navigation/Breadcrumb'
-import { getCategoryDisplayName } from './categoryHelpers'
 import { DomainCategory } from '../lib/type-converters'
+import { Routes } from '../utils/routes'
+import { getCategoryDisplayName } from './categoryHelpers'
 
 /**
  * Helper: Kategori sayfaları için breadcrumb items oluştur

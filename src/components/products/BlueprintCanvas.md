@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\BlueprintCanvas.tsx
-skeleton_hash: eb4c5010ca026ec1
+skeleton_hash: c3b37221286447d4
 entity_hashes:
   func:BlueprintCanvas: b871a8b848648d7b
   func:CinematicCard: 7fb3fd44dcd5e71f
-  overview: e6d08556883a0989
+  overview: 119d927fb341d61c
   style_tokens: 31f4acfd42638e52
-generated_at: 2026-05-28T22:37:01Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış
@@ -27,14 +27,13 @@ Görselleri, havada süzülen animasyonlar ve holografik efektlerle zenginleşti
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, ürün görsellerinin ve holografik efektlerin etkili bir şekilde sunulmasına dayanır.
 
-Bu modül için fonksiyon gövdeleri verilmediğinden, aksiyom üretilememektedir. Sadece fonksiyon imzası ve modül sabitlerindeki `image` parametresinin zorunlu olabileceği düşünülebilir, ancak bu bir varsayım olarak kesinleştirilemez.
+[Aksiyom 1]: Eğer `BlueprintCanvas` veya `CinematicCard` bileşenine geçerli bir `image` kaynağı (URL, dosya yolu veya modül) verilmemişse, bileşen bir görsel içeriği gösteremez ve potansiyel olarak kırık bir resim simgesi veya boş alan ile sonuçlanır.
 
-[Aksiyom 1]: Eğer `CinematicCard` bileşeni çağrıldığında `image` prop'u sağlanmazsa, bileşenin nasıl davranacağı bilinmiyor.
+[Aksiyom 2]: Eğer `image` prop'u geçerli bir görsel formatı (örn. jpg, png, svg) veya tarayıcı tarafından çözülebilir bir kaynak içermiyorsa, bileşen görseli gösteremez ve varsayılan tarayıcı kırık resim davranışını sergiler.
 
-[Aksiyom 2]: Eğer `BlueprintCanvas` bileşeni çağrıldığında `image` prop'u sağlanmazsa, bileşenin nasıl davranacağı bilinmiyor.
-
-[Aksiyom 3]: Eğer `HolographicMaterial` çağrılmak istendiğinde gerekli parametreler sağlanmazsa, nasıl bir hata döneceği bilinmiyor.
+[Aksiyom 3]: Eğer `HolographicMaterial` modül sabiti doğru bir şekilde oluşturulmamış veya调用 edilemiyorsa, `BlueprintCanvas` bileşeninin holografik/parıltılı görsel efektleri uygulanamaz ve bileşen düz, efektsiz bir görsel gösterir.
 
 ---
 
@@ -75,6 +74,21 @@ Bu modül için fonksiyon gövdeleri verilmediğinden, aksiyom üretilememektedi
         uTime: 0,
         uTexture: null,
         u...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: BlueprintCanvas.tsx::CinematicCard
+- **params**: `{ image }` — kart üzerinde gösterilecek görselin URL/path'i (string)
+- **ic_degiskenler**:
+  - `texture` — `useTexture(image)` ile yüklenen THREE.Texture nesnesi, kart üzerindeki görsel dokuyu temsil eder; holographicMaterial'a `uTexture` olarak geçirilir
+  - `meshRef` — `useRef<THREE.Mesh>(null)` ile oluşturulan Ref nesnesi, ana kart mesh'ine (`<mesh ref={meshRef}>`) bağlanır; useFrame içinde rotation ve material erişimi için kullanılır
+  - `state` — useFrame callback parametresi, React Three Fiber'ın her frame'de sağladığı durum nesnesi; `state.mouse` (fare pozisyonu) ve `state.clock` (geçen süre) içerir
+  - `x` — `state.mouse.x`'ten destructured değer, mouse'un yatay pozisyonu; `meshRef.current.rotation.y` hesaplamasında parallax efekti için kullanılır
+  - `y` — `state.mouse.y`'den destructured değer, mouse'un dikey pozisyonu; `meshRef.current.rotation.x` hesaplamasında parallax efekti için kullanılır
+  - `material` — `meshRef.current.material`'ın `THREE.ShaderMaterial` tipine cast edilmiş hali; holographic shader'ın uniform'larına (`uTime`) erişim sağlamak için kullanılır
+- **Dönüş**: JSX — `<Float>` sarmalayıcısı içinde holographic dokulu ana kart mesh'i ve arkasında ambient glow mesh'inden oluşan React element ağacı
 
 ---
 

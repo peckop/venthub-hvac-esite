@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\page.tsx
-skeleton_hash: 19ca955f9f321742
+skeleton_hash: 8a3c1adcc3bae43d
 entity_hashes:
   func:RootPage: 465ea7eadb5b28f2
   func:generateMetadata: 507857aa921043d5
@@ -11,7 +11,7 @@ entity_hashes:
   func:getCachedHomeData: 3cdedf9dace01d81
   overview: 42896b594ed92fa2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-07T12:00:49Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış

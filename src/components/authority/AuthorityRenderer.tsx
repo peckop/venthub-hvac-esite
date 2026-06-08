@@ -1,23 +1,24 @@
 'use client';
 
+import DOMPurify from 'isomorphic-dompurify';
+import * as LucideIcons from 'lucide-react';
+import Image from 'next/image';
 import React from 'react';
+
+import { cn } from '@/lib/utils';
 import { 
   AuthorityContent, 
+  ComparisonBlock as ComparisonBlockType,
+  CtaBannerBlock as CtaBannerBlockType,
+  FeaturesGridBlock as FeaturesGridBlockType,
   HeroBlock as HeroBlockType, 
-  SpecsBlock as SpecsBlockType,
   MediaBlock as MediaBlockType,
   RichTextBlock as RichTextBlockType,
-  FeaturesGridBlock as FeaturesGridBlockType,
-  ComparisonBlock as ComparisonBlockType,
-  CtaBannerBlock as CtaBannerBlockType
-} from '@/types/authority';
-import { cn } from '@/lib/utils';
-import VideoAuthority from './VideoAuthority';
-import ThreeDAuthority from './ThreeDAuthority';
+  SpecsBlock as SpecsBlockType} from '@/types/authority';
+
 import TechnicalDrawingAuthority from './TechnicalDrawingAuthority';
-import * as LucideIcons from 'lucide-react';
-import DOMPurify from 'isomorphic-dompurify';
-import Image from 'next/image';
+import ThreeDAuthority from './ThreeDAuthority';
+import VideoAuthority from './VideoAuthority';
 
 // --- YARDIMCI BİLEŞENLER ---
 

@@ -1,27 +1,28 @@
  
+import { AlertCircle, Crown, Eye, Package, SearchX,Shield, ShieldCheck, Tag, Users } from 'lucide-react'
+import { usePathname,useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { useAuth } from '../../hooks/useAuth'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { useRouter, usePathname } from 'next/navigation'
-import { Crown, Shield, ShieldCheck, Users, AlertCircle, Package, Tag, Eye, SearchX } from 'lucide-react'
 import { toast } from 'sonner'
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminToolbar from '../../components/admin/AdminToolbar'
+import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { listAdminUsers, setUserAdminRole } from '../../config/admin'
+import { useAuth } from '../../hooks/useAuth'
+import { useDragScroll } from '../../hooks/useDragScroll'
+import { useRole } from '../../hooks/useRole'
+import { formatDate } from '../../i18n/datetime'
+import { useI18n } from '../../i18n/I18nProvider'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { 
   adminSectionTitleClass, 
   adminSubtitleClass,
-  adminTableHeadCellClass, 
   adminTableCellClass, 
-  adminTableContainerClass 
-} from '../../utils/adminUi'
-import AdminToolbar from '../../components/admin/AdminToolbar'
-import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
-import AdminSkeleton from '../../components/admin/AdminSkeleton'
-import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import { useI18n } from '../../i18n/I18nProvider'
-import { formatDate } from '../../i18n/datetime'
-import { useRole } from '../../hooks/useRole'
-import { useDragScroll } from '../../hooks/useDragScroll'
+  adminTableContainerClass, 
+  adminTableHeadCellClass} from '../../utils/adminUi'
 import { Routes } from '../../utils/routes'
 
 interface AdminUser {

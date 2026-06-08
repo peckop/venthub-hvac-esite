@@ -3,41 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx
-skeleton_hash: abdf7c719afe9daf
+skeleton_hash: adc9bd4df4fca87e
 entity_hashes:
   func:FeaturedCommercialBlocks: 1889811721e866db
-  overview: 1af19abb15edd41e
+  overview: cdfdca949aa78f1f
   style_tokens: 0fba0ab3cddfc2f6
-generated_at: 2026-06-07T19:51:14Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, ana sayfada öne çıkan ticari ürünleri görselleri ve temel bilgileriyle birlikte sergileyen bir React bileşenidir. Ürün listesini düzenleyerek kullanıcıya sunmanın yanı sıra, görsel URL'lerinin geçerli ve kullanıma hazır olmasını sağlayan bir yardımcı işlevi de içerir.
+Bu modül, ana sayfada öne çıkan ticari ürünleri (örneğin klima, havalandırma üniteleri gibi) görselleri ve temel bilgileriyle birlikte sergileyen bir React bileşenidir. Gelen ürün verisini işleyerek, eksik veya geçerli görsel adreslerini temizleyen yardımcı bir işlev ile birlikte kullanıcıya düzgün bir görünüm sunar.
 
 ## Fonksiyon Grupları
-### Görsel İşleme Yardımcıları
-Boş veya geçersiz görsel URL değerlerini temizleyerek, bileşenin kullanabileceği güvenli ve standart bir URL formatı üretir.
-- normalizeImageUrl
-
 ### Ana Görünüm Bileşeni
-Öne çıkan ticari ürünleri, verilen başlangıç verisine göre alıp düzenler ve kullanıcıya görselleriyle birlikte sunar; veri eksikse varsayılan boş liste ile çalışır.
+Verilen başlangıç ürün listesine göre öne çıkan ticari ürün bloklarını düzenler ve kullanıcıya sunar; veri sağlanmazsa boş bir liste ile çalışarak bileşenin stabil kalmasını sağlar.
 - FeaturedCommercialBlocks
+
+### Görsel İşleme Yardımcıları
+Ürün nesnelerindeki görsel URL adreslerini kontrol eder; boş, eksik veya geçerli olmayan değerleri temizleyerek bileşenin kullanabileceği standart ve güvenli bir URL formatı üretir.
+- normalizeImageUrl
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, ana sayfada öne çıkan ticari ürün bloklarını sergileyen bir React bileşenidir.
+Bu modül, girdi olarak verilen `initialProducts` değerinin bir dizi (Array) yapısında olmasını ve her elemanın ürün nesnesi (object) formatında olmasını bekler.
 
-**[Aksiyom 1]**: Eğer `initialProducts` prop'u array türünde bir değer olarak sağlanmazsa, bileşen varsayılan boş dizi `[]` ile başlatılır ve render edilecek ürün bloğu bulunmaz.
+[Aksiyom 1]: Eğer `initialProducts` parametresi bir dizi (Array) değilse, bileşen render sürecinde hata verir veya TypeError ile karşılaşır.
 
-**[Aksiyom 2]**: Eğer `initialProducts` içindeki herhangi bir ürün nesnesi görsel URL bilgisi içermiyorsa veya geçersiz bir URL sağlıyorsa, `normalizeImageUrl` yardımcı fonksiyonu bu durumu temizleyerek standart bir URL formatı üretmek zorundadır; aksi takdirde render edilen görsel bileşeni kırılır.
+[Aksiyom 2]: Eğer `initialProducts` boş dizi (`[]`) olarak sağlanırsa bileşen stabil kalır ve boş/hiç ürün içermeyen bir görünüm render eder.
 
-**[Aksiyom 3]**: Eğer `initialProducts` boş dizi olarak kalırsa (hiç ürün sağlanmazsa), bileşen öne çıkan ürün bloklarını gösteren bölümü boş/hiç render etmelidir; bileşen çökmemeli veya hata fırlatmamalıdır.
-
-**[Aksiyom 4]**: Eğer `normalizeImageUrl` fonksiyonu boş string (`""`) veya `null`/`undefined` değer alırsa, bileşenin görsel gösterim zinciri bozulmadan çalışacak şekilde bir fallback mekanizması sunmalıdır.
-
-**[Aksiyom 5]**: Eğer `initialProducts` dizisindeki ürünlerin görsel alanı bir external (harici) URL ile sağlanıyorsa, bu URL'lerin scheme'i (http/https) geçerli olmalıdır; aksi takdirde `normalizeImageUrl` düzeltme yapamaz ve görsel yüklenemez.
+[Aksiyom 3]: Eğer `initialProducts` içindeki ürün nesnelerinin görsel alanı (`image`/`imageURL` gibi bir alan) geçerli bir URL içermiyorsa veya hiç yoksa, bileşen varsayılan/bos bir görsel gösterir veya görseli atlar; bileşenin çökmesine yol açmaz.
 
 ---
 
@@ -71,32 +67,15 @@ type CommercialTab = 'featured' | 'newArrivals' | 'bestSellers'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: FeaturedCommercialBlocks.tsx::FeaturedCommercialBlocks
-- **params**: (initialProducts = [])
+### [N1_NASIL] AST Pointer: `src/components/home/FeaturedCommercialBlocks.tsx`::FeaturedCommercialBlocks
+- **params**: `{ initialProducts = [] }` — destructured prop, `initialProducts` başlangıç ürün listesi, boş dizi fallback'li
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, farklı locale anahtarlarını çevirerek UI metinlerini oluşturur
-  - `activeTab` — Mevcut aktif sekmeyi tutan state, 'featured' ile başlıyor
-  - `productsByTab` — useMemo ile hesaplanan, sekmelere göre ayrılmış ürün listelerini tutan nesne {featured, newArrivals, bestSellers}
-  - `activeProducts` — productsByTab nesnesinden activeTab ile erişilen, mevcut sekmeye karşılık gelen ürün listesi
-- **Dönüş**: React JSX section elementi (featured ticari ürün bloklarını gösteren bölüm)
-
-### [N2_NASIL] AST Pointer: FeaturedCommercialBlocks.tsx::productsByTab callback
-- **params**: ()
-- **ic_degiskenler**:
-  - `featured` — initialProducts içinden is_featured flag'ine göre filtrelenmiş ve ilk 4 ürüne kesilmiş liste, eğer boşsa ilk 4 üründen oluşan liste
-  - `newArrivals` — initialProducts'ıncreated_at tarihine göre büyükten küçüğe sıralanmış ve ilk 4 ürüne kesilmiş liste
-  - `bestSellers` — initialProducts içinden indeks 4-8 aralığındaki ürünler (ilk 4'ten sonraki 4 ürün), eğer boşsa ilk 4 üründen oluşan liste
-- **Dönüş**: { featured, newArrivals, bestSellers } nesnesi
-
-### [N3_NASIL] AST Pointer: FeaturedCommercialBlocks.tsx::tab button mapper
-- **params**: (tab)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: React JSX button elementi (sekmeler arası geçiş butonu)
-
-### [N4_NASIL] AST Pointer: FeaturedCommercialBlocks.tsx::product mapper
-- **params**: (product, idx)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: React JSX motion.div elementi (ProductCard'ı sarmalayan animasyonlu div)
+  - `t` — `useI18n()` hookundan dönen çeviri fonksiyonu, `t('home.featuredCommercial.eyebrow')` gibi anahtarlarla string çevirisi yapar
+  - `activeTab` — `useState<CommercialTab>` state değişkeni, şu anki aktif sekmeyi tutar, varsayılan `'featured'`
+  - `setActiveTab` — `activeTab` state'ini güncelleyen setter fonksiyonu, tab butonlarının `onClick` handler'ında çağrılır
+  - `productsByTab` — `useMemo` ile hesaplanan nesne, `{ featured, newArrivals, bestSellers }` anahtarlarına sahip Product dizilerini barındırır, `[initialProducts]` bağımlılığıyla yeniden hesaplanır
+  - `activeProducts` — `productsByTab[activeTab]` erişimiyle elde edilen Product dizisi, mevcut sekmedeki ürünleri temsil eder; hem ürün kartları grid'inde `.map()` ile hem de sidebar'da `activeProducts[0]?.image_url` ve `activeProducts[0]?.name` erişimiyle kullanılır
+- **Dönüş**: JSX — `<section>` wrapper'ı içinde header, tab butonları, ürün grid'i ve sidebar barındıran React elementi
 
 ---
 

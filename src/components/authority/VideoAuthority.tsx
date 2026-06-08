@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Play, Volume2, VolumeX } from 'lucide-react'
-import type { VideoMetadata } from '../../types/media.types'
 import Image from 'next/image'
+import React, { useState } from 'react'
+
+import type { VideoMetadata } from '../../types/media.types'
 
 interface VideoAuthorityProps {
     metadata: VideoMetadata

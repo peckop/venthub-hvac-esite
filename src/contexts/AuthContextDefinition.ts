@@ -1,5 +1,6 @@
+import type { Session,User } from '@supabase/supabase-js'
 import { createContext } from 'react'
-import type { User, Session } from '@supabase/supabase-js'
+
 import type { UserRole } from '../lib/rbac'
 
 export interface AuthError { message: string }

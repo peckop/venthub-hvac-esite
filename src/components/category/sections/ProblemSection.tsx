@@ -1,5 +1,6 @@
+import { Bug, DollarSign, Thermometer,Wind } from 'lucide-react'
 import React from 'react'
-import { DollarSign, Wind, Bug, Thermometer } from 'lucide-react'
+
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
 /**

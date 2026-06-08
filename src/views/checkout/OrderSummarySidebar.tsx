@@ -1,7 +1,8 @@
 'use client'
 
-import React from 'react'
 import { Lock } from 'lucide-react'
+import React from 'react'
+
 import { formatCurrency } from '../../i18n/format'
 import { Lang } from '../../i18n/I18nContext'
 

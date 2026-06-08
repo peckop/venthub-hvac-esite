@@ -3,41 +3,42 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ImageGallery.tsx
-skeleton_hash: b504c74305128bd7
+skeleton_hash: dd8ff83e4103cbc6
 entity_hashes:
   func:ImageGallery: ed5cc2a855b5b9b8
   func:handleMouseLeave: 60d41c470a6d0032
   func:handleMouseMove: b68c1278669bcb7a
-  overview: 8b6fae0642827a18
+  overview: f4654744ad74eeea
   style_tokens: 01bec99debdcd366
-generated_at: 2026-05-28T22:35:59Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış
-ImageGallery bileşeni, bir ürünün görsellerini listeleyip kullanıcı etkileşimlerine yanıt veren bir resim galerisi sunar. Görsellerin gösterimi ve fare hareketlerine dayalı dinamik efektler bileşenin temel işlevlerini oluşturur.
+ImageGallery bileşeni, bir ürünün görsellerini düzenli bir galeri formatında sergileyen ve kullanıcının fare etkileşimlerine yanıt veren dinamik bir React bileşenidir. Temel işlevi, görsellerin gösterimini ve bu görseller üzerinde fare hareketlerine bağlı olarak tetiklenen efektleri (örneğin yakınlaştırma veya açıklama gösterimi) yönetmektir.
 
 ## Fonksiyon Grupları
-### Görsel Render ve Yerleşim
-Bileşenin ana işlevi, gelen görsel listesini ve ürün bilgilerini alarak ekrana düzenli bir galeriyi çizdirmektir.
+### Görsel Galeri Oluşturma ve Yerleşim
+Bileşenin ana gövdesi, dışarıdan gelen görsel listesi ve ürün meta verilerini alarak ekrana düzenli ve interaktif bir galeri yerleşimi oluşturur.
 - ImageGallery
 
 ### Fare Etkileşimi Yönetimi
-Kullanıcının galeriye üzerindeki fare hareketlerini izleyerek görsel üzerinde geçici efektler (örneğin zoom veya açıklama gösterimi) sağlar.
+Kullanıcının fare hareketlerini izleyerek galeri üzerinde geçici görsel efektlerin başlatılmasını ve sonlandırılmasını kontrol eden yardımcı işlevler.
 - handleMouseMove
 - handleMouseLeave
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması gerekir.
 
-[Aksiyom 1]: Eğer `images` prop'u sağlanmazsa, galeride görüntü gösterilemez ve bileşen boş görünebilir.  
-[Aksiyom 2]: Eğer `productName` prop'u sağlanmazsa, ürün adı bölümü render edilmez veya undefined gösterilir.  
-[Aksiyom 3]: Eğer `slug` prop'u sağlanmazsa, ürüne özgü URL oluşturulaması ve ilgili navigasyon işlevselliği kaybolur.  
-[Aksiyom 4]: Eğer `modelType` prop'u sağlanmazsa, `Product3DViewer` bileşeni doğru model tipi alamadığından 3D görüntüleme işlevi çalışmayabilir.  
-[Aksiyom 5]: Eğer `handleMouseMove` fonksiyonuna geçirilen argüman `React.MouseEvent<HTMLDivElement>` tipi değilse (örneğin başka bir eleman üzerinden olay veya null), TypeScript çalışma‑zamanı tip hatası oluşur ve fonksiyon beklendiği gibi çalışmayabilir.  
-[Aksiyom 6]: Eğer `handleMouseLeave` fonksiyonu çağrılmazsa (örneğin mouse leave eventi bağlanmazsa), fare öğeden çıktığında ilgili durum güncellenmez ve kullanıcı deneyimi etkilenir.  
-[Aksiyom 7]: Eğer `Product3DViewer` bileşeni içe aktarılamaz veya tanımlanmazsa, `ImageGallery` render edilirken hata verir ve 3D görüntüleme özelliği kullanılamaz.
+Bu modül için, fonksiyon gövdesinden üretilen aksiyomlar aşağıdadır. Aksiyomlar yalnızca fonksiyon imzaları ve modül sabitleri temel alınarak çıkarılmıştır; docstring, yorum veya değişken isimlerinden bilgi çıkarılmamıştır.
+
+[Aksiyom 1]: Eğer `images` parametresi boş bir dizi ise veya `undefined`/`null` olarak iletilirse, bileşen düzgün render edilemez ve potansiyel olarak hata oluşur.
+[Aksiyom 2]: Eğer `productName` parametresi `undefined` veya boş string olarak iletilirse, galeri içindeki ürün adı gösterimi eksik veya hatalı olur.
+[Aksiyom 3]: Eğer `slug` parametresi geçerli bir ürün tanımlayıcısı içermiyorsa, `Product3DViewer` çağrılamaz veya yanlış ürün yüklenir.
+[Aksiyom 4]: Eğer `modelType` parametresi `Product3DViewer` componenti tarafından beklenen formatta değilse, 3D görüntüleyici doğru çalışmayabilir.
+[Aksiyom 5]: Eğer `handleMouseMove` fonksiyonu `React.MouseEvent<HTMLDivElement>` tipinde bir event almıyorsa, fare hareketi takibi yapılamaz ve dinamik efektler devre dışı kalır.
+[Aksiyom 6]: Eğer `handleMouseLeave` fonksiyonu çağrılmasa, fare galeri alanından ayrıldığında efektler sıfırlanmaz ve geçici durumlar kalıcı olur.
+[Aksiyom 7]: Eğer `Product3DViewer` modülü içe aktarılamıyorsa veya kullanılamıyorsa, 3D model görüntüleme işlevi çalışmaz.
 
 ---
 
@@ -89,85 +90,20 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/ImageGallery.tsx::ImageGallery
-- **params**: (images, productName, slug, modelType)
+### [N1_NASIL] AST Pointer: ImageGallery.tsx::ImageGallery
+- **params**: `{ images, productName, slug, modelType }`
 - **ic_degiskenler**:
-  - `t` — çeviri fonksiyonu, i18n'den alınan t metodu
-  - `activeIdx` — aktif görselin indeksi, useState ile tutulan durum
-  - `setActiveIdx` — activeIdx'i güncelleyen setter fonksiyonu
-  - `isLightboxOpen` — lightbox açılıp açılmadığını gösteren boolean durum
-  - `setIsLightboxOpen` — lightbox durumunu güncelleyen setter
-  - `is3DMode` — 3D görüntüleme modunun aktif olup olmadığını gösteren boolean
-  - `setIs3DMode` — 3D modunu güncelleyen setter
-  - `is3DFullscreen` — 3D tam ekran modunun aktif olup olmadığını gösteren boolean
-  - `setIs3DFullscreen` — 3D tam ekran durumunu güncelleyen setter
-  - `zoomStyle` — görsele uygulanacak zoom stilini tutan React.CSSProperties nesnesi
-  - `setZoomStyle` — zoomStyle'i güncelleyen setter
-  - `imageContainerRef` — görsel konteyner div'ine referans tutan useRef
-  - `activeImage` — aktif indeksteki görsel nesnesi (images[activeIdx] veya null)
-  - `handleMouseMove` — fare hareketi ile zoom efekti için tanımlanan fonksiyon
-  - `handleMouseLeave` — fare çıktığında zoom'u sıfırlayan fonksiyon
-  - `nextImage` — sonraki görsele geçmek için useCallback ile oluşturulan fonksiyon
-  - `prevImage` — önceki görsele geçmek için useCallback ile oluşturulan fonksiyon
-- **Dönüş**: React.FC<ImageGalleryProps> (JSX elementi)
-
-### [N2_NASIL] AST Pointer: src/components/ImageGallery.tsx::handleMouseMove
-- **params**: (e: React.MouseEvent<HTMLDivElement>)
-- **ic_degiskenler**:
-  - `left` — imageContainerRef.current'in sol koordinatı (getBoundingClientRect().left)
-  - `top` — imageContainerRef.current'in üst koordinatı
-  - `width` — imageContainerRef.current'in genişliği
-  - `height` — imageContainerRef.current'in yüksekliği
-  - `x` — fare X koordinatının konteyner içindeki yüzdelik konumu (0‑100)
-  - `y` — fare Y koordinatının konteyner içindeki yüzdelik konumu (0‑100)
-- **Dönüş**: yok
-
-### [N3_NASIL] AST Pointer: src/components/ImageGallery.tsx::handleMouseLeave
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N4_NASIL] AST Pointer: src/components/ImageGallery.tsx::nextImage
-- **params**: (e?: React.MouseEvent)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N5_NASIL] AST Pointer: src/components/ImageGallery.tsx::prevImage
-- **params**: (e?: React.MouseEvent)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N6_NASIL] AST Pointer: src/components/ImageGallery.tsx::useEffect callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `handleKeyDown` — klavye tuşlarına basıldığında çağrılan iç fonksiyon (Escape, ok tuşları)
-  - `locked` — lightbox veya 3D tam ekran açıksa true, body overflow'unu kilitlemek için kullanılan boolean
-- **Dönüş**: cleanup fonksiyonu (void)
-
-### [N7_NASIL] AST Pointer: src/components/ImageGallery.tsx::handleKeyDown (useEffect içi)
-- **params**: (e: KeyboardEvent)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N8_NASIL] AST Pointer: src/components/ImageGallery.tsx::cleanup function (useEffect içi)
-- **params**: (parametre yok)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N9_NASIL] AST Pointer: src/components/ImageGallery.tsx::imageContainerRef onKeyDown
-- **params**: (e)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok
-
-### [N10_NASIL] AST Pointer: src/components/ImageGallery.tsx::main thumbnail map callback
-- **params**: (img, idx)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (thumbnail butonu)
-
-### [N11_NASIL] AST Pointer: src/components/ImageGallery.tsx::lightbox thumbnail map callback
-- **params**: (img, idx)
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX elementi (lightbox thumbnail butonu)
+  - `t` — `useI18n()` hook'undan alınan çeviri fonksiyonu, UI metinleri için kullanılır
+  - `activeIdx` — `useState(0)`, o an seçili olan resmin indeksini tutar
+  - `isLightboxOpen` — `useState(false)`, lightbox modalının açık olup olmadığını tutar
+  - `is3DMode` — `useState(false)`, 3D model görünümünün aktif olup olmadığını tutar
+  - `is3DFullscreen` — `useState(false)`, 3D modelin tam ekran modunda olup olmadığını tutar
+  - `zoomStyle` — `useState<React.CSSProperties>({})`, mouse hover zoom efekti için CSS transform stilini tutar
+  - `imageContainerRef` — `useRef<HTMLDivElement>(null)`, ana resim container DOM elementine referans verir
+  - `activeImage` — `images` dizisinden `activeIdx` ile seçili olan resim nesnesi (path, alt içerir) veya `null`
+  - `nextImage` — `useCallback`, sonraki resme geçmek için fonksiyon, `(prev + 1) % images.length` hesaplar
+  - `prevImage` — `useCallback`, önceki resme geçmek için fonksiyon, `(prev - 1 + images.length) % images.length` hesaplar
+- **Dönüş**: JSX (resim galerisi UI'ı, thumbnail'ler, lightbox portal, 3D viewer portal)
 
 ---
 

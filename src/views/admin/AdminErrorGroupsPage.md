@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorGroupsPage.tsx
-skeleton_hash: 6ad894e4ce1fe0c0
+skeleton_hash: cdc389217ed218f5
 entity_hashes:
   func:AdminErrorGroupsPage: 2df4b29ac83c8598
   func:bulkApplyStatus: 2e737880df202268
@@ -13,48 +13,41 @@ entity_hashes:
   func:updateAssignedTo: 115d7b001b19d674
   func:updateNotes: 57b7793991d9e6a2
   func:updateStatus: 6c7719de765f38dd
-  overview: e52d0620d9f9a09b
+  overview: fda4ea54cce394c0
   style_tokens: 5e40817d604cd18b
-generated_at: 2026-06-06T21:57:26Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelindeki hata gruplarını yönetmek için kullanılan bir React sayfasıdır. Sistemde kaydedilen istemci hatalarını gruplar halinde sunar ve yöneticilerin bu grupları sıralamasına, durumlarını değiştirmesine, sorumlu ataması yapmasına ve notlar eklemesine olanak tanır. Modül, hem toplu işlemleri hem de bireysel grup detaylarını tek bir arayüz altında birleştirerek hata yönetimi süreçlerini merkezileştirir.
+Bu modül, yönetici panelindeki hata gruplarını görüntülemek ve yönetmek için kullanılan bir React sayfasıdır. Hata gruplarını filtreleme, sıralama, tek tek veya toplu olarak durum güncelleme, sorumlu atama ve not ekleme gibi işlemleri merkezi bir arayüzden sunar.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Yapısı ve Arayüz Etkileşimleri
-Modülün temelini oluşturan ana bileşeni ve sayfa üzerindeki genel sıralama ile seçim kontrollerini yönetir.
+### Sayfa Yapısı ve Listeleme Kontrolleri
+Ana bileşeni oluşturarak sayfanın temel yapısını kurar ve hata gruplarının sıralama ile seçim durumlarını yönetir.
 - AdminErrorGroupsPage, toggleSort, toggleSelect
 
-### Bireysel Hata Grubu Yönetim İşlemleri
-Belirli bir hata grubu üzerinde gerçekleştirilerek durum güncelleme, sorumlu atama, not ekleme ve o gruba ait en son hata kayıtlarını getirme gibi detaylı operasyonları kapsar.
+### Bireysel Hata Grubu İşlemleri
+Belirli bir hata grubu üzerinde durum değişikliği, sorumlu atama, not güncelleme ve detaylı hata kayıtlarını yükleme gibi operasyonları gerçekleştirir.
 - updateStatus, updateAssignedTo, updateNotes, loadLatestClientErrors
 
-### Toplu İşlem Yönetimi
-Seçili olan birden fazla hata grubuna aynı anda belirli bir durum değişikliğini uygulamak için kullanılan verimli toplu işleme fonksiyonudur.
+### Toplu İşlemler
+Birden fazla seçili hata grubuna aynı anda durum değişikliği uygulayarak verimli toplu yönetim sağlar.
 - bulkApplyStatus
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, yönetici panelinde hata gruplarını yönetmek için bir arayüz sunar. Temel varsayımlar, hata gruplarının ve ilişkili verilerin (kullanıcılar, hata kayıtları) varlığına dayanır.
 
-Bu modül, hata grupları listesini yöneten bir yönetici sayfasıdır ve seçim/durum durumlarını bileşen içi state'te tutar.
+[Aksiyom 1]: Eğer bir hata grubu ID'si (id) verilmemişse veya geçerli bir hata grubunu temsil etmiyorsa, `updateStatus`, `updateAssignedTo`, `updateNotes` ve `loadLatestClientErrors` fonksiyonları bu grup üzerinde geçerli bir işlem yapamaz; API çağrıları hata ile sonuçlanır veya sessizce başarısız olur.
 
-[Aksiyom 1]: Eğer `toggleSort` fonksiyonuna `'last_seen'` veya `'count'` dışında bir değer verilirse, sıralama davranışı tanımsızdır.
+[Aksiyom 2]: Eğer `updateAssignedTo` fonksiyonuna boş bir string ('') verilse bile, bu bir geçerli operasyondur (sorumlunun kaldırılması). Fonksiyon, geçerli bir kullanıcı ID'si veya boş bir değer almalıdır; aksi halde API isteği reddedilir.
 
-[Aksiyom 2]: Eğer `updateStatus` fonksiyonuna `'open'`, `'resolved'` veya `'ignored'` dışında bir durum değeri verilirse, güncelleme davranışı tanımsızdır.
+[Aksiyom 3]: Eğer `toggleSort` fonksiyonu çağrılmadan önce mevcut sıralama durumu (state) bilinmiyorsa veya geçerli bir başlangıç değeri ('last_seen' veya 'count') yoksa, sıralama yönü (artan/azalan) tanımsız olur ve beklenmedik bir sıralama sonucu üretilir.
 
-[Aksiyom 3]: Eğer `updateAssignedTo` fonksiyonuna boş string (`''`) verilirse, ilgili hata grubunun sorumlusu kaldırılır (atama temizlenir).
+[Aksiyom 4]: Eğer `bulkApplyStatus` fonksiyonu çağrıldığında hiç bir hata grubu seçilmemişse (seçim durumu 'on' olan grup listesi boşsa), toplu durum güncelleme operasyonu çalıştırılmaz; herhangi bir API çağrısı yapılmaz.
 
-[Aksiyom 4]: Eğer `bulkApplyStatus` çağrıldığında hiçbir hata grubu seçili (`toggleSelect` ile `on: true` yapılmamış) değilse, toplu güncelleme işlemi hiçbir kayıt üzerinde etkili olmaz.
-
-[Aksiyom 5]: Eğer `bulkApplyStatus` çağrıldığında uygulanacak geçerli bir durum değeri (`'open'`, `'resolved'` veya `'ignored'`) bileşen state'inde mevcut değilse, toplu güncelleme davranışı tanımsızdır.
-
-[Aksiyom 6]: Eğer `loadLatestClientErrors` fonksiyonuna geçerli bir `groupId` verilmezse (boş string veya olmayan bir ID), istemci hata kayıtları yüklenmez.
-
-[Aksiyom 7]: Eğer `updateNotes` fonksiyonuna geçersiz bir `id` verilse bile, fonksiyon varolan kayıtlar üzerinde dış etki (side effect) oluşturmaz; yalnızca eşleşen kayıt varsa güncellenir.
-
-[Aksiyom 8]: `bulkApplyStatus` fonksiyonu parametre almaz; bu durum, uygulanacak durum değerinin fonksiyon çağrılmadan önce bileşen içi state'inde önceden ayarlanması gerektiğini varsayar.
+[Aksiyom 5]: Eğer `loadLatestClientErrors` fonksiyonuna geçerli bir `groupId` verilirse, bu fonksiyon o gruba ait son istemci hatalarını (muhtemelen bir dizi/liste) yükler. `groupId` geçerli bir hata grubunu göstermiyorsa, yükleme işlemi hata ile sonuçlanır.
 
 ---
 
@@ -158,51 +151,56 @@ Bu modül, hata grupları listesini yöneten bir yönetici sayfasıdır ve seçi
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::AdminErrorGroupsPage
-- **params**: ()
-- **ic_degiskenler**:
-- **Dönüş**: React.FC bileşeni; hata gruplarını yöneten, filtreleyen ve gösteren React bileşeni
+- **params**: (parametre yok)
+- **ic_degiskenler**: (fonksiyon gövdesi verilmemiş, sadece importlar ve imza mevcut)
+- **Dönüş**: React.FC
 
 ### [N2_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::toggleSort
 - **params**: (by: 'last_seen' | 'count')
-- **ic_degiskenler**:
+- **ic_degiskenler**: (fonksiyon içinde yeni değişken tanımlanmamış)
 - **Dönüş**: yok
 
 ### [N3_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::updateStatus
 - **params**: (id: string, newStatus: 'open' | 'resolved' | 'ignored')
-- **ic_degiskenler**:
-  - `prev` — güncelleme öncesi mevcut satır listesinin kopyası, hata durumunda geri almak için
-- **Dönüş**: yok (async)
+- **ic_degiskenler**: 
+  - `prev` — güncelleme öncesi rows dizisinin referansı, hata durumunda geri almak için saklanır
+  - `error` — supabase.from('error_groups').update() yanıtından destructuring ile alınan hata objesi
+- **Dönüş**: yok
 
 ### [N4_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::updateAssignedTo
 - **params**: (id: string, userId: string | '')
-- **ic_degiskenler**:
-  - `val` — boş string ise null, değilse userId değeri, atama işleminde kullanılır
-  - `prev` — güncelleme öncesi mevcut satır listesinin kopyası, hata durumunda geri almak için
-- **Dönüş**: yok (async)
+- **ic_degiskenler**: 
+  - `val` — userId boş string ise null, değilse userId olarak atanır (atama için normalize değer)
+  - `prev` — güncelleme öncesi rows dizisinin referansı, hata durumunda geri almak için saklanır
+  - `error` — supabase.from('error_groups').update() yanıtından destructuring ile alınan hata objesi
+- **Dönüş**: yok
 
 ### [N5_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::updateNotes
 - **params**: (id: string, notes: string)
-- **ic_degiskenler**:
-  - `prev` — güncelleme öncesi mevcut satır listesinin kopyası, hata durumunda geri almak için
-- **Dönüş**: yok (async)
+- **ic_degiskenler**: 
+  - `prev` — güncelleme öncesi rows dizisinin referansı, hata durumunda geri almak için saklanır
+  - `error` — supabase.from('error_groups').update() yanıtından destructuring ile alınan hata objesi
+- **Dönüş**: yok
 
 ### [N6_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::loadLatestClientErrors
 - **params**: (groupId: string)
-- **ic_degiskenler**:
-  - `queryResult` — Supabase sorgusunun sonucu (data ve error içeren obje)
-  - `data` — queryResult'dan gelen hata satırları dizisi
-  - `error` — queryResult'dan gelen hata nesnesi
-- **Dönüş**: yok (async)
+- **ic_degiskenler**: 
+  - `queryResult` — supabase.from('client_errors').select() sorgu sonucu obje
+  - `data` — queryResult'dan destructuring ile alınan satır dizisi
+  - `error` — queryResult'dan destructuring ile alınan hata objesi
+- **Dönüş**: yok
 
 ### [N7_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::toggleSelect
 - **params**: (id: string, on: boolean)
-- **ic_degiskenler**:
+- **ic_degiskenler**: (fonksiyon içinde yeni değişken tanımlanmamış)
 - **Dönüş**: yok
 
 ### [N8_NASIL] AST Pointer: src\views\admin\AdminErrorGroupsPage.tsx::bulkApplyStatus
-- **params**: ()
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (async)
+- **params**: (parametre yok)
+- **ic_degiskenler**: 
+  - `error` — supabase.from('error_groups').update() yanıtından destructuring ile alınan hata objesi
+  - `e` — try-catch bloğu tarafından yakalanan hata (console.error için)
+- **Dönüş**: yok
 
 ---
 
@@ -218,12 +216,12 @@ graph TD
     AdminErrorGroupsPage_tsx__updateAssignedTo["updateAssignedTo"]
     AdminErrorGroupsPage_tsx__updateNotes["updateNotes"]
     AdminErrorGroupsPage_tsx__updateStatus["updateStatus"]
+    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateStatus
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSelect
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__loadLatestClientErrors
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__toggleSort
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateNotes
     AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateAssignedTo
-    AdminErrorGroupsPage_tsx__AdminErrorGroupsPage --> AdminErrorGroupsPage_tsx__updateStatus
 ```
 
 ## NODE ID STANDARD

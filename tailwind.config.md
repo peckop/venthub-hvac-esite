@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\tailwind.config.js
-skeleton_hash: e6cacf4521e0ee49
+skeleton_hash: 75b6ff9dabb79078
 entity_hashes:
   overview: b1c731813de023aa
-generated_at: 2026-06-07T11:03:07Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış
@@ -17,7 +17,11 @@ Bu dosyada fonksiyon bulunmamaktadır; yapılandırma nesnesi ve modül seviyesi
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** `tailwind.config.js` dosyası bir yapılandırma nesnesi (`tailwindConfig`) ve bir eklenti import'u (`typography`) içermektedir. Çalışan bir fonksiyon gövdesi bulunmadığından, aksiyom üretimi için gereken koşul-sonuç zinciri oluşturulamamaktadır. Modül, sadece statik veri yapısı (Tailwind CSS konfigürasyonu) tanımlamaktadır.
 
 ---
 

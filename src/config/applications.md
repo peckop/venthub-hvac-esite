@@ -3,23 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\config\applications.ts
-skeleton_hash: 66a67e1c0079217c
+skeleton_hash: cffc3542d82ab37c
 entity_hashes:
-  overview: f2506fc587bf463a
-generated_at: 2026-05-28T22:37:09Z
+  overview: 2544d4d89196ebc3
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin yapılandırma katmanında yer alan bu modül, hiçbir harici kaynağa bağımlılığı olmayan, yalnızca üst seviye kod barındıran statik bir yapılandırma dosyasıdır. Modül, platformun kullanıcı arayüzünde görüntülenecek uygulamalara ait kartların tüm meta verilerini merkezileştiren `APPLICATION_CARDS` adında tek bir sabit barındırır. Hiçbir ortam değişkeni kullanmaz veya herhangi bir harici API/tablo sorgulaması yapmaz, yalnızca sabit uygulama kartı verilerini projenin ilgili bölümleriyle paylaşmak amacıyla oluşturulmuştur.
+VentHub HVAC projesinin yapılandırma katmanında yer alan bu modül, statik bir veri deposu olarak görev yapar ve uygulama arayüzünde görüntülenecek kartların tüm meta verilerini `APPLICATION_CARDS` sabit dizisi altında merkezileştirir. Dosya herhangi bir fonksiyon içermeyen, yalnızca üst seviye tanım barındıran bir yapılandırma dosyasıdır; ortam değişkeni okumaz, harici API veya veritabanı sorgulaması yapmaz. Modülün tek amacı, uygulama kartlarına ait icon, başlık, açıklama ve yönlendirme bilgileri gibi sabit verileri projenin tüketen birimleriyle paylaşmaktır.
+
+## Modül Yapısı
+Bu dosyada fonksiyon bulunmamaktadır. Modül, yalnızca `APPLICATION_CARDS` adında bir dizi sabiti ve `ApplicationIcon` adlı bir type tanımı içerir. Yapılandırma verileri doğrudan kod içinde statik olarak tanımlanmış olup, çalışma zamanında herhangi bir dönüşüme uğramaz; ilgili bileşenler ve sayfalar tarafından doğrudan içe aktarılarak kullanılır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, VentHub HVAC sisteminin ilgili tüketen birimleri tarafından kullanılacak uygulama kartı yapılandırmalarını barındıran konfigürasyon modülüdür, doğru çalışabilmesi için sahip olduğu tek sabit dizinin (APPLICATION_CARDS) tüketenlerin beklediği gereksinimlere uygun tanımlanması zorunludur.
 
-[Aksiyom 1]: Eğer APPLICATION_CARDS isimli sabit dizi modül içerisinde tanımlı değilse, bu modülü içe aktaran tüm birimlerde uygulama kartı verisine erişim sağlanamaz, çalışma zamanı hatası oluşur.
-[Aksiyom 2]: Eğer APPLICATION_CARDS dizisi, modülü kullanan birimlerin beklediği temel yapıda (her öğenin gerekli tüm özelliklere sahip olması) tanımlanmamışsa, tüketen birimlerde kart listeleme, görüntüleme veya kullanıcı etkileşimi işlemleri başarısız olur.
-[Aksiyom 3]: Eğer APPLICATION_CARDS dizisindeki kart öğeleri için benzersiz olması gereken tanımlayıcı özellikleri tekil olacak şekilde ayarlanmamışsa, tüketen birimlerde kart çakışmaları oluşur, yönlendirme, filtreleme gibi işlemler yanlış çalışır.
+Bu modül, VentHub HVAC projesinin UI katmanı tarafından tüketilen statik bir yapılandırma modülüdür; runtime davranışı içermez ve yalnızca sabit veri sağlar.
+
+**[Aksiyom 1 - Veri Yapısı Sabitliği]:** Eğer `APPLICATION_CARDS` dizisi yapısı (alan adları, alan tipleri veya alan sayısı) bilinçli olarak değiştirilmezse, bu modülü tüketen tüm UI bileşenlerinde render hataları veya tip uyumsuzlukları oluşur.
+
+**[Aksiyom 2 - Export Yükümlülüğü]:** Eğer `APPLICATION_CARDS` sabiti modül tarafından export edilmezse, import eden tüm consumer modüllerde derleme hatası oluşur.
+
+**[Aksiyom 3 - Boş Dizi Yasağı]:** Eğer `APPLICATION_CARDS` boş bir dizi olarak tanımlanırsa (eleman eklenmezse), UI tarafında uygulama kartı listeleme ekranı içeriksiz/hatalı görüntülenir.
+
+**[Aksiyom 4 - Bağımlılıksızlık Garantisi]:** Eğer bu modül dış bir API, ortam değişkeni veya dosya sistemi erişimi eklerse, build sürecinin bağımsızlık prensibi ihlal edilir ve modülün test edilebilirliği azalır.
+
+**[Aksiyom 5 - Eşzamanlı Erişim]:** Bu modül salt okunur (read-only) yapıdadır; eğer consumer bir bileşen `APPLICATION_CARDS` dizisini runtime'da değiştirirse (mutation), diğer tüm tüketen bileşenler tutarsız veri görüntüler.
 
 ---
 
@@ -65,11 +75,13 @@ type ApplicationCard = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\config\applications.ts::TANIMLANMIŞ FONKSİYON YOK
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `APPLICATION_CARDS` — Dosyada tanımlı tek sabit, dizi (array) türünde, dosya kapsamında herhangi bir işleyen fonksiyon gövdesi tanımlanmamıştır
-- **Dönüş**: yok
+Bu dosya (**applications.ts**) sadece bir yapılandırma dosyasıdır ve **fonksiyon içermemektedir**.
+
+### İçe Aktarımlar
+- Yok
+
+### Sabitler
+- `APPLICATION_CARDS` — Uygulama kartlarının tanımlandığı dizi (array). Muhtemelen UI'da gösterilen başvuru türlerinin (örn: konut, ticari, endüstriyel) kart bilgilerini (başlık, açıklama, ikon, değer vb.) tutar.
 
 ---
 

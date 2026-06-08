@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\layout\ClientLayout.tsx
-skeleton_hash: d3b4d3734259a93f
+skeleton_hash: 5ca35bb911077749
 entity_hashes:
   func:ClientLayout: 6950fd4597251d25
   func:ClientLayoutInner: 51b8420900083527
@@ -11,7 +11,7 @@ entity_hashes:
   func:Providers: 3400c1a5354d979d
   overview: 1cb24898c372f6f1
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-07T13:57:19Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış

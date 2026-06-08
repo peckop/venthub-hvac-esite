@@ -3,26 +3,36 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\HowItWorks.tsx
-skeleton_hash: bc4f7b9d7d53d17d
+skeleton_hash: f939c5ab19313d86
 entity_hashes:
   func:HowItWorks: 796882dbc75a0b9a
-  overview: 64591c81a70db9e6
+  overview: 543fb3742a61781d
   style_tokens: 86e780eada6c1862
-generated_at: 2026-05-28T22:35:46Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, ürünün veya hizmetin nasıl çalıştığını açıklayan bir bölümün React bileşenini tanımlar. Tek bir fonksiyon üzerinden kullanıcı arayüzü oluşturularak, “Nasıl Çalışır” içeriği sayfada render edilir.
+Bu modül, bir hava perdesi ürününün çalışma prensibini interaktif ve adım adım anlatan bir React bileşenini tanımlar. Modül, “Nasıl Çalışır” adlı bölümün tüm görsel ve işlevsel yapısını, adım bazlı animasyonlu içerik gösterimiyle birlikte oluşturur.
 
 ## Fonksiyon Grupları
-### Görüntüleme ve Yerleşim
-Bu grup, bölümün görsel yapısını ve içeriğini oluşturan işlevi içerir.
-- HowItWorks
+### Bileşen Yapılandırması ve State Yönetimi
+Temel bileşenin yapısını, bağımlılıklarını ve iç durumunu (örneğin aktif adım, görünürlük) yöneten merkezi işlev grubudur.
+- HowItWorks, sectionRef, isVisible, activeStep, setActiveStep
+
+### Adım Bazlı İçerik Sunumu
+Ürünün çalışma adımlarını (ikon, başlık, açıklama) bir dizi yapısında tutarak, kullanıcının etkileşimine göre açılıp kapanan dinamik arayüz oluşturur.
+- steps, activeStep, setActiveStep
+
+### Animasyon ve Etkileşim Tetikleme
+Bölümün görünür olmasını izleyerek kaydırma animasyonlarını tetikler ve kullanıcı arayüzündeki geçişleri kontrol eder.
+- sectionRef, isVisible, activeStep
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Gerekçe:** Fonksiyon imzası `HowItWorks()` olarak tanımlanmış olup parametre almamaktadır. Modül sabitleri de bulunmamaktadır. Bu nedenle, fonksiyon gövdesinden türetilebilecek herhangi bir mimari koşul (bağımlılık, girdi-çıktı zorunluluğu, eşik değeri vb.) belirlenememiştir.
 
 ---
 
@@ -38,22 +48,21 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/sections/HowItWorks.tsx::HowItWorks
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: components/category/sections/HowItWorks.tsx::anonymous_component
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `sectionRef` — referans到 DOM öğesi için scroll animasyonu kullanılır
-  - `isVisible` — bölümün şu anda görünür olup olmadığını gösteren boolean değer
-  - `activeStep` — açılan adımın (akkordiyon) indeksi
-  - `setActiveStep` — `activeStep` state'ini güncelleyen setter fonksiyonu
-  - `steps` — her adımın ikon, başlık, açıklama ve detayını içeren nesneler dizisi
-- **Dönüş**: React.FC
-
-### [N2_NASIL] AST Pointer: src/components/category/sections/HowItWorks.tsx::(step,index)=>...
-- **params**: step, index
-- **ic_degiskenler**:
-  - `Icon` — `step.icon`тенден React bileşeni, adımın ikonunu render etmek için kullanılır
-  - `isActive` — `step` indeksi `activeStep` ile eşleşiyorsa true, UI'yı aç/kapatmak için kullanılır
-- **Dönüş**: JSX.Element
+  - `dict` — `useI18n()` hook'undan dönen sözlük nesnesi; çeviri metinlerine erişim sağlar
+  - `sectionRef` — `useScrollAnimation<HTMLElement>()` hook'undan dönen ref; section DOM elementine bağlanarak scroll animasyonu tetiklenmesini sağlar
+  - `isVisible` — `useScrollAnimation<HTMLElement>()` hook'undan dönen boolean; section'ın viewport'a girip girmediğini belirler
+  - `activeStep` — `useState(0)` ile oluşturulan state; şu an hangi adımın açık (aktif) olduğunu tutar (0-3 arası index veya -1 = hepsi kapalı)
+  - `setActiveStep` — `useState` setter fonksiyonu; tıklanan adımın index'ini veya -1 değerini alarak activeStep state'ini günceller
+  - `stepIcons` — `[Wind, ArrowDown, Shield, Thermometer]` sabit dizisi; her adım için lucide-react icon bileşeni referansı tutar
+  - `stepsData` — `dict.category.howItWorksAirCurtain.steps` erişimi; sözlükten gelen adım verileri (title, description, detail) dizisi
+  - `steps` — `stepIcons.map()` ile oluşturulan nesne dizisi; her eleman `{ icon, title, description, detail }` yapısındadır
+  - `titleVal` — `dict.category.howItWorksAirCurtain.title` erişimi; bölüm başlık metni (h2 içinde render edilir)
+  - `subtitleVal` — `dict.category.howItWorksAirCurtain.subtitle` erişimi; bölüm alt başlık/description metni
+  - `diagramAltVal` — `dict.category.howItWorksAirCurtain.diagramAlt` erişimi; VentImage bileşeninin alt metin değeri
+- **Dönüş**: JSX element (React.FC) — `<section>` wrapper içinde header, teknik diyagram görseli (VentImage) ve adım butonları (steps.map) içeren tam sayfa bölümü
 
 ---
 

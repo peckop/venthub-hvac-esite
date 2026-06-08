@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\StepCustomerInfo.tsx
-skeleton_hash: 0f6c10a75d5ca248
+skeleton_hash: 984db39179f13711
 entity_hashes:
   func:StepCustomerInfo: 2698d0acd17fa1de
   overview: 3962b33f58fa703d
   style_tokens: 61f2a39b43a19a77
-generated_at: 2026-05-28T22:40:06Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış

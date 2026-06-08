@@ -1,7 +1,7 @@
 'use client'
 
-import React from 'react'
 import { User } from 'lucide-react'
+import React from 'react'
 
 import { CheckoutCustomerInfo } from '../../types/db-rows'
 

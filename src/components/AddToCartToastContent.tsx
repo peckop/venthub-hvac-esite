@@ -1,9 +1,11 @@
 'use client'
 
-import React from 'react'
 import Link from 'next/link'
-import { useI18n } from '../i18n/I18nProvider'
+import React from 'react'
+
 import type { Product } from '@/types/ui-models'
+
+import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
 interface AddToCartToastContentProps {

@@ -1,6 +1,9 @@
-import VentImage from '@/components/ui/VentImage'
+import { ArrowRight,Check, HelpCircle, Wind, X, Zap } from 'lucide-react'
 import React, { useState } from 'react'
-import { Zap, Wind, Check, X, HelpCircle, ArrowRight } from 'lucide-react'
+
+import VentImage from '@/components/ui/VentImage'
+import { useI18n } from '@/i18n/I18nProvider'
+
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
 interface TypeComparisonProps {
@@ -13,6 +16,7 @@ interface TypeComparisonProps {
  * Detaylı fayda karşılaştırması + kararsızlar için wizard tetikleyici
  */
 const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectType }) => {
+    const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const [hoveredType, setHoveredType] = useState<'elektrikli' | 'ortam' | null>(null)
 
@@ -80,7 +84,7 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                 <div className={`flex justify-center mb-8 sm:mb-12 ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
                     <div className="relative w-full max-w-3xl aspect-video">
                         <VentImage src="/images/category/electric-vs-ambient.png"
-                            alt="Elektrikli vs Ortam Havalı Karşılaştırma"
+                            alt={t('category.electricVsAmbientAlt')}
                             className="rounded-xl shadow-lg object-cover"
                             fill
                         />

@@ -1,14 +1,14 @@
 'use client'
-import { Routes } from '../../utils/routes'
-
-import React from 'react'
-import Link from 'next/link'
 import { Filter } from 'lucide-react'
-import { useI18n } from '../../i18n/I18nProvider'
-import { formatCurrency } from '../../i18n/format'
-import { getCategoryDisplayName } from '../../utils/categoryHelpers'
-import type { DomainCategory } from '../../lib/type-converters'
+import Link from 'next/link'
+import React from 'react'
+
 import type { CategoryFilters as FilterState } from '../../hooks/useCategoryGateway'
+import { formatCurrency } from '../../i18n/format'
+import { useI18n } from '../../i18n/I18nProvider'
+import type { DomainCategory } from '../../lib/type-converters'
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { Routes } from '../../utils/routes'
 
 interface CategoryFiltersProps {
   category: DomainCategory

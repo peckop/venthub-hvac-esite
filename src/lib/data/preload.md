@@ -3,35 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\data\preload.ts
-skeleton_hash: d7582c0d3f648efe
+skeleton_hash: a55c7e077252a69f
 entity_hashes:
   func:preloadCategory: 5c31b78ecaccbf15
   func:preloadProduct: ffb09955ca2af5e6
-  overview: 4f8c5f040d941a01
-generated_at: 2026-06-07T12:06:28Z
+  overview: 429cab0c1f1eaff7
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcı navigasyonunu hızlandırmak için ürünler ve kategoriler gibi temel verileri tarayıcı tarafında önceden yüklemekle sorumludur. Fonksiyonlar, veri alma süreçlerini tetikleyerek olası sonraki sayfa geçişlerinde yüklenme gecikmesini azaltır.
+Bu modül, tarayıcı tarafında performans optimizasyonu sağlamak için temel veri varlıklarının (ürün ve kategoriler) önceden yüklenmesini tetikleme sorumluluğuna sahiptir. Fonksiyonlar, sayfa geçişleri sırasında verilerin zaten hazırlanmış olmasını sağlayarak kullanıcı deneyimini iyileştirir.
 
 ## Fonksiyon Grupları
-### Önbellekleme Tetikleyicileri
-Bu grup, belirli bir slug ile gelen istekleri işleyerek ilgili verilerin tarayıcı önbelleğine alınmasını sağlar. Fonksiyonlar doğrudan veri döndürmez, sadece yükleme işlemini başlatır.
+### Veri Önbellekleme Tetikleyicileri
+Bu grup, belirli bir varlık tanımlayıcısı (slug) ile çağrıldığında, ilgili veri setinin arka planda tarayıcı önbelleğine alınmasını başlatan fonksiyonları içerir. Fonksiyonlar doğrudan veri sağlamaz, yalnızca yükleme işlemini başlatarak sonraki navigasyonları hızlandırır.
 - preloadProduct, preloadCategory
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, tarayıcı tarafında veri önbellekleme tetikleyicileri içerir. Aşağıdaki varsayımlar, fonksiyon imzalarından ve modül yapısından türetilmiştir.
+Bu modül, ürünlerin ve kategorilerin tarayıcı tarafında önceden yüklenmesini sağlayan iki fonksiyondan oluşur. Aşağıdaki varsayımlar, fonksiyon imzaları ve modül sabitlerinden türetilmiştir.
 
-[Aksiyom 1]: Eğer `preloadProduct` fonksiyonu çağrıldığında `slug` parametresi geçerli bir ürün tanımlayıcısı değilse, ilgili ürün verisi önbelleğe alınamaz ve potansiyel navigasyonda veri yükleme gecikmesi yaşanır.
+[Aksiyom 1]: Eğer `preloadProduct` çağrısında `slug` parametresi verilmezse,fonksiyon doğru çalışamaz — çünkü `slug: string` zorunlu bir parametredir ve varsayılan bir değer tanımı yoktur.
 
-[Aksiyom 2]: Eğer `preloadCategory` fonksiyonu çağrıldığında `slug` parametresi geçerli bir kategori tanımlayıcısı değilse, ilgili kategori verisi önbelleğe alınamaz ve potansiyel navigasyonda veri yükleme gecikmesi yaşanır.
+[Aksiyom 2]: Eğer `preloadCategory` çağrısında `slug` parametresi verilmezse, fonksiyon doğru çalışamaz — çünkü `slug: string` zorunlu bir parametredir ve varsayılan bir değer tanımı yoktur.
 
-[Aksiyom 3]: Bu modülün doğru çalışması için, `getCachedProductBySlug` ve `getCachedCategoryData` fonksiyonlarının var olması ve çağrılabilir durumda olması gerekir; aksi takdirde önbellekleme tetikleme işlemleri başarısız olur.
+[Aksiyom 3]: Eğer `getCachedProductBySlug` fonksiyonu modülde tanımlı olmasaydı, `preloadProduct`'ın önceden yükleme yaptığı verilerin sonradan erişilebilir olacağı bir mekanizma bulunmazdı — bu iki fonksiyon arasında dolaylı bir bağımlılık vardır.
 
-[Aksiyom 4]: Bu modüldeki fonksiyonlar sadece yükleme işlemini tetikler, doğrudan veri dönmez; eğer tetikleme mekanizması başarısız olursa, sonraki sayfa geçişlerinde veriler önbellekten alınamaz ve tam yükleme gecikmesi yaşanır.
+[Aksiyom 4]: Eğer `getCachedCategoryData` fonksiyonu modülde tanımlı olmasaydı, `preloadCategory`'in önceden yükleme yaptığı verilerin sonradan erişilebilir olacağı bir mekanizma bulunmazdı — bu iki fonksiyon arasında dolaylı bir bağımlılık vardır.
+
+[Aksiyom 5]: Eğer verilen `slug` değeri geçersiz veya var olmayan bir kaydı referans alıyorsa, bu durum fonksiyon imzasından anlaşılamaz — fonksiyon imzası slug'ın geçerliliğini zorlamaz, bu kontrolün önbellekleme katmanında (`getCachedProductBySlug` / `getCachedCategoryData`) veya veri sağlayıcıda yapılması beklenir.
 
 ---
 
@@ -65,11 +67,17 @@ Bu modül, tarayıcı tarafında veri önbellekleme tetikleyicileri içerir. Aş
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/lib/data/preload.ts::getCachedProductBySlug
-- **params**: (`slug: string`)
+### [N1_NASIL] AST Pointer: src/lib/data/preload.ts::preloadProduct
+- **params**: `slug: string` — ön yüklenecek ürünün URL slug'ı
 - **ic_degiskenler**:
-  _(değişken yok — doğrudan return ile çağrı iletilir)_
-- **Dönüş**: `getProductBySlug(slug)`ReturnType — slug ile ürün servisi sonucu (Promise); `void` ile sarılmış olarak kullanılır
+  - (yok — doğrudan `void getCachedProductBySlug(slug)` çağrısı yapılır, ara değişken yoktur)
+- **Dönüş**: yok (`void`) —fonksiyon bir değer döndürmez, yalnızca `getCachedProductBySlug` çağrısının yan etkisiyle (cache'e yazma) çalışır
+
+### [N2_NASIL] AST Pointer: src/lib/data/preload.ts::preloadCategory
+- **params**: `slug: string` — ön yüklenecek kategorinin URL slug'ı
+- **ic_degiskenler**:
+  - (yok — doğrudan `void getCachedCategoryData(slug)` çağrısı yapılır, ara değişken yoktur)
+- **Dönüş**: yok (`void`) — fonksiyon bir değer döndürmez, yalnızca `getCachedCategoryData` çağrısının yan etkisiyle (cache'e yazma) çalışır
 
 ---
 

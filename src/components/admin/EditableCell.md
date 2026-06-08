@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\EditableCell.tsx
-skeleton_hash: df7dad40afd16a13
+skeleton_hash: 6bceb8c2f03611c7
 entity_hashes:
   func:EditableCell: c69e143b78ab0750
-  overview: afceb79d7ede9415
+  overview: e0ead7dc16886f70
   style_tokens: 2f2ada2707ada249
-generated_at: 2026-05-29T18:44:07Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış
@@ -23,11 +23,19 @@ Bu modül, tek bir kapsamlı bileşenden oluşur ve tablo hücrelerinin görünt
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için varsayımlar, EditableCell bileşeninin doğru çalışması için zorunlu koşulları belirtir.
+Bu modül, bir React bileşeni olup hücre düzenleme işlevi için aşağıdaki mimari varsayımları içerir.
 
-[Axiom 1]: Eğer onSave callback fonksiyonu sağlanmamışsa veya çağrılamıyorsa, kullanıcı düzenlemeleri kaydedemez ve hata oluşur.
+[Aksiyom 1]: Eğer `value` prop'u sağlanmazsa, bileşen hücrede gösterilecek başlangıç değerini bilemez ve boş/undefined bir durum oluşur.
 
-[Axiom 2]: Eğer type parametresi geçerli bir HTML input type değeri (örn: text
+[Aksiyom 2]: Eğer `onSave` callback fonksiyonu sağlanmazsa, kullanıcı düzenlemeyi tamamladığında değişiklikler üst bileşene iletilemez ve veri kaybı oluşur.
+
+[Aksiyom 3]: Eğer `type` parametresi geçerli bir input tipi (örn: 'text', 'number') değilse, tarayıcı varsayılan text input davranışı gösterir.
+
+[Aksiyom 4]: Hücre tıklanarak düzenleme moduna geçilemezse, kullanıcı hücre değerini hiçbir zaman düzenleyemez ve bileşen salt okunur hale gelir.
+
+[Aksiyom 5]: Eğer düzenleme modunda input alanı oluşturulamazsa (örn: odak yönetimi başarısız olursa), kullanıcı değişiklik yapamaz ve düzenleme akışı bozulur.
+
+[Aksiyom 6]: Eğer `onSave` çağrısı başarısız olursa veya hata fırlatırsa, üst bileşen hatayı ele alamaz ve kullanıcıya geri bildirim verilemez.
 
 ---
 
@@ -64,75 +72,70 @@ Bu modül için varsayımlar, EditableCell bileşeninin doğru çalışması iç
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: EditableCell.tsx::EditableCell
-- **params**: `value` — hücre mevcut değeri; `onSave` — async callback, düzenlenmiş değeri kaydetmek için çağrılır; `type` — input türü (varsayılan `'text'`); `placeholder` — değer boşsa gösterilen yer tutucu (varsayılan `'-'`); `className` — dışarıdan ek CSS sınıfı (varsayılan `''`); `disabled` — düzenlemeyi devre dışı bırakıp bırakmayacağı (varsayılan `false`); `inputWidth` — input genişlik CSS sınıfı (varsayılan `'w-24'`)
+### [N1_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::EditableCell
+- **params**: (value, onSave, type, placeholder, className, disabled, inputWidth)
 - **ic_degiskenler**:
-  - `editing` — `useState<boolean>` — hücrenin düzenleme modunda olup olmadığını tutar
-  - `draft` — `useState<string>` — input'taki geçici düzenleme değeri; `value`'dan türetilir, kaydetmeye kadar yerel tutulur
-  - `saving` — `useState<boolean>` — `onSave` çağrısının devam edip etmediğini takip eder, bitene kadar input devre dışı kalır
-  - `inputRef` — `useRef<HTMLInputElement>` — input DOM elemanına erişim sağlar, düzenleme moduna girildiğinde odaklama ve seçim için kullanılır
-  - `useEffect` (draft senkron) — `value` değiştiğinde ve düzenleme modunda değilken `draft`'ı yeni `value` ile senkronize eder
-  - `useEffect` (focus) — `editing` `true` olduğunda input'a otomatik focus veselectAll yapar
-  - `startEdit` — `useCallback` — disabled veya saving değilse draft'ı value'dan doldurur ve editing modunu açar
-  - `cancel` — `useCallback` — draft'ı orijinal value'ya sıfırlar ve editing modunu kapatır
-  - `save` — `useCallback(async)` — draft trimlenmiş hali ile orijinal value karşılaştırır; değişiklik yoksa sadece modu kapatır, varsa `onSave(trimmed)` çağırır, hata olursa toast gösterir ve eski değere döner
-  - `handleKeyDown` — `useCallback` — Enter tuşunda `save()`, Escape tuşunda `cancel()` tetikler
-- **Dönüş**: `JSX.Element` — editing modunda `div` içinde `input` + optional spinner; normal modda `button` ile hücre değeri veya placeholder gösterilir
+    - `editing` — Düzenleme modunda olup olmadığını kontrol eden boolean state
+    - `draft` — Düzenlenen değerin geçici olarak tutulduğu state
+    - `saving` — Kaydetme işleminin devam edip etmediğini gösteren boolean state
+    - `inputRef` — Input elementine referans tutan ref nesnesi
+    - `startEdit` — Düzenleme moduna giriş fonksiyonu (useCallback ile memoize)
+    - `cancel` — Düzenlemeyi iptal eden fonksiyon (useCallback ile memoize)
+    - `save` — Değişiklikleri kaydeden async fonksiyon (useCallback ile memoize)
+    - `handleKeyDown` — Tuş olaylarını yöneten fonksiyon (useCallback ile memoize)
+- **Dönüş**: React.ReactNode (JSX)
 
-### [N2_NASIL] AST Pointer: EditableCell.tsx::useEffect[draft-senkron]
-- **params**: yok (useEffect callback)
-- **ic_degiskenler**:
-  - `editing` — dış scope'tan; düzenleme modunda olup olmadığı kontrol edilir
-  - `value` — dış scope'tan; hücrenin güncel değeri, String'e çevrilerek draft'a yazılır
-  - `setDraft` — dış scope'tan; draft state setter'ı
-- **Dönüş**: yok (yan etki: `editing` false iken `draft`'ı `String(value ?? '')` ile günceller)
+### [N2_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::useEffectCallback_1
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
 
-### [N3_NASIL] AST Pointer: EditableCell.tsx::useEffect[focus]
-- **params**: yok (useEffect callback)
-- **ic_degiskenler**:
-  - `editing` — dış scope'tan; düzenleme modunda olup olmadığı kontrol edilir
-  - `inputRef` — dış scope'tan; input DOM elemanı referansı
-- **Dönüş**: yok (yan etki: editing true ve inputRef.current mevcutsa `focus()` ve `select()` çağırır)
+### [N3_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::useEffectCallback_2
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
 
-### [N4_NASIL] AST Pointer: EditableCell.tsx::startEdit
-- **params**: yok
-- **ic_degiskenler**:
-  - `disabled` — dış scope'tan; hücre devre dışıysa düzenleme başlatılmaz
-  - `saving` — dış scope'tan; kaydetme devam ediyorsa düzenleme başlatılmaz
-  - `value` — dış scope'tan; mevcut değer `String(value ?? '')` ile draft'a yazılır
-  - `setDraft` — dış scope'tan; draft state setter'ı
-  - `setEditing` — dış scope'tan; editing state setter'ı
-- **Dönüş**: yok (yan etki: disabled/saving değilse draft'ı value ile doldurup editing modunu açar)
+### [N4_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::startEdit
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
 
-### [N5_NASIL] AST Pointer: EditableCell.tsx::cancel
-- **params**: yok
-- **ic_degiskenler**:
-  - `value` — dış scope'tan; mevcut değer `String(value ?? '')` ile draft'a geri yazılır
-  - `setDraft` — dış scope'tan; draft state setter'ı
-  - `setEditing` — dış scope'tan; editing state setter'ı
-- **Dönüş**: yok (yan etki: draft'ı orijinal value'ya sıfırlar ve editing modunu kapatır)
+### [N5_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::cancel
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
 
-### [N6_NASIL] AST Pointer: EditableCell.tsx::save
-- **params**: yok
+### [N6_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::save
+- **params**: ()
 - **ic_degiskenler**:
-  - `draft` — dış scope'tan; input'taki mevcut düzenleme değeri, `.trim()` ile boşlukları temizlenir → `trimmed`
-  - `trimmed` — `draft.trim()` sonucu; karşılaştırma ve kaydetme için kullanılacak temizlenmiş değer
-  - `original` — `String(value ?? '')`; hücrenin orijinal değeri, karşılaştırma ve hata durumunda geri dönüş için kullanılır
-  - `value` — dış scope'tan; orijinal hücre değeri
-  - `onSave` — dış scope'tan; async kaydetme callback'i, `onSave(trimmed)` ile çağrılır
-  - `setEditing` — dış scope'tan; editing state setter'ı
-  - `setSaving` — dış scope'tan; saving state setter'ı
-  - `toast` — `sonner` import'undan; hata durumunda `toast.error('Güncelleme başarısız')` gösterir
-- **Dönüş**: yok (yan etki: değişiklik varsa `onSave(trimmed)` çağırır; hata olursa draft'ı orijinal değere sıfırlar ve hata toast'u gösterir; finally bloğunda saving'i false yapar)
+    - `trimmed` — draft değerinin baş/son boşlukları temizlenmiş hali
+    - `original` — Mevcut value parametresinin string karşılığı
+- **Dönüş**: Promise<void>
 
-### [N7_NASIL] AST Pointer: EditableCell.tsx::handleKeyDown
-- **params**: `e` — `React.KeyboardEvent` — tuş olayı nesnesi
-- **ic_degiskenler**:
-  - `e.key` — basılan tuşun adı; `'Enter'` veya `'Escape'` kontrol edilir
-  - `e.preventDefault` — varsayılan tarayıcı davranışını engeller
-  - `save` — dış scope'tan; kaydetme fonksiyonu, Enter tuşunda tetiklenir (`void save()`)
-  - `cancel` — dış scope'tan; iptal fonksiyonu, Escape tuşunda tetiklenir
-- **Dönüş**: yok (yan etki: Enter → `save()`, Escape → `cancel()` çağırır; her iki durumda da `preventDefault()` ile varsayılan davranış engellenir)
+### [N7_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::handleKeyDown
+- **params**: (e: React.KeyboardEvent)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
+
+### [N8_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::onClickEditingView
+- **params**: (e)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
+
+### [N9_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::onChangeInput
+- **params**: (e)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
+
+### [N10_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::onBlurInput
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
+
+### [N11_NASIL] AST Pointer: src/components/admin/EditableCell.tsx::onClickButton
+- **params**: (e)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: void
 
 ---
 

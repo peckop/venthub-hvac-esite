@@ -1,36 +1,36 @@
  
-import React from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
-import { format as _format } from 'date-fns'
-import {
-  adminSectionTitleClass,
-  adminSubtitleClass,
-  adminButtonSecondaryClass,
-  adminTableHeadCellClass,
-  adminTableContainerClass,
-  adminSelectClass,
-  adminSelectStyle
-} from '../../utils/adminUi'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import AdminToolbar from '../../components/admin/AdminToolbar'
-import ExportMenu from '../../components/admin/ExportMenu'
-import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
-import AdminSkeleton from '../../components/admin/AdminSkeleton'
-import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import { logAdminAction } from '../../lib/audit'
-import { useI18n } from '../../i18n/I18nProvider'
-import { formatCurrency } from '../../i18n/format'
-import { formatDateTime } from '../../i18n/datetime'
-import { toast } from 'sonner'
-import { X, Truck, LayoutList, KanbanSquare, ShoppingCart, Info } from 'lucide-react'
-import AdminOrdersBoard from './AdminOrdersBoard'
-import DateRangePicker from '../../components/admin/DateRangePicker'
-import { DateRange } from 'react-day-picker'
 import { endOfDay } from 'date-fns'
-import { useRole } from '../../hooks/useRole'
-import { Lang } from '../../i18n/I18nContext'
+import { Info,KanbanSquare, LayoutList, ShoppingCart, Truck, X } from 'lucide-react'
+import { usePathname, useSearchParams } from 'next/navigation'
+import React from 'react'
+import { DateRange } from 'react-day-picker'
+import { toast } from 'sonner'
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminToolbar from '../../components/admin/AdminToolbar'
+import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import DateRangePicker from '../../components/admin/DateRangePicker'
+import ExportMenu from '../../components/admin/ExportMenu'
 import { useDragScroll } from '../../hooks/useDragScroll'
+import { useRole } from '../../hooks/useRole'
+import { formatDateTime } from '../../i18n/datetime'
+import { formatCurrency } from '../../i18n/format'
+import { Lang } from '../../i18n/I18nContext'
+import { useI18n } from '../../i18n/I18nProvider'
+import { logAdminAction } from '../../lib/audit'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
+import {
+  adminButtonSecondaryClass,
+  adminSectionTitleClass,
+  adminSelectClass,
+  adminSelectStyle,
+  adminSubtitleClass,
+  adminTableContainerClass,
+  adminTableHeadCellClass} from '../../utils/adminUi'
+import AdminOrdersBoard from './AdminOrdersBoard'
 
 interface AdminOrderRow {
   id: string

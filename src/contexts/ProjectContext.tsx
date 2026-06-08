@@ -1,5 +1,6 @@
 import { createContext } from 'react'
-import type { UserProject, ProjectItem, Product } from '@/types/ui-models'
+
+import type { Product,ProjectItem, UserProject } from '@/types/ui-models'
 
 export interface ProjectContextType {
   projects: UserProject[]

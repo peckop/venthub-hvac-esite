@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\CommandPalette.tsx
-skeleton_hash: 738d408fb3f2d88d
+skeleton_hash: 9283b2670a449382
 entity_hashes:
   func:CommandPalette: d6aeed4e7453fe44
   func:handleKeyDown: 1487e8d647499b5f
   func:selectItem: 2c4ba43ca43f0c65
   overview: 6e2ec88e5bcb2e73
   style_tokens: 7dfe1be44eebd77e
-generated_at: 2026-06-06T21:55:09Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış

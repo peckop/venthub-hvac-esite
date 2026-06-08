@@ -3,30 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\EducationalGuide.tsx
-skeleton_hash: 7e846c4ac4505192
+skeleton_hash: ca18e2b43a0d6fc3
 entity_hashes:
   func:EducationalGuide: 062bdc9e16ff212e
-  overview: 6548521c92a45ec1
+  overview: b0535ec50facf114
   style_tokens: dfe57f52c58ea755
-generated_at: 2026-05-28T22:35:45Z
+generated_at: 2026-06-08T10:08:47Z
 ---
 
 ## Genel Bakış
-EducationalGuide, belirli bir kategori slug'ına göre eğitim içeriğini gösteren bir React bileşenidir. Bu bileşen, kategori bazlı öğretici materyalleri dinamik olarak yükleyip kullanıcıya sunar.
+EducationalGuide, belirli bir kategori slug'ı referans alarak dinamik eğitim içeriği sunan bir React bileşenidir. Bileşen, gelen slug parametresine göre ilgili kılavuz materyalini yükler ve render ederek kullanıcıya kategoriye özel bilgilendirici bir arayüz sunar.
 
 ## Fonksiyon Grupları
-### Bileşen Tanımı
-Bileşenin ana yapısını ve dışarıdan gelen veriyi işleyen fonksiyondur.
+### İçerik Görüntüleme
+Bileşenin temel sorumluluğu, bir kategori kimliğine dayalı eğitim içeriğini alıp kullanıcıya sunmaktır.
+- EducationalGuide
+
+### Durum Yönetimi ve Hata Fallback'ı
+Bileşen, geçersiz veya eksik girdi durumlarında (ör. boş slug, eşleşmeyen kategori) uygun fallback arayüzünü veya hata mesajını yöneterek uygulamanın bozulmasını önler.
+- EducationalGuide
+
+### Bileşen Arayüzü
+Dışarıdan sadece `categorySlug` prop'u kabul ederek basit ve odaklı bir API sunar.
 - EducationalGuide
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, `categorySlug` propunun mevcut ve geçerli bir string olduğu varsayımına dayanır.
 
-[Aksiyom 1]: Eğer `categorySlug` prop'u sağlanmazsa, component undefined hatasıyla render edilmeye çalışır ve UI bozulur.  
-[Aksiyom 2]: Eğer `categorySlug` boş bir string ise, component herhangi bir eğitim içeriği göstermez ve boş bir alan render eder.  
-[Aksiyom 3]: Eğer `categorySlug` mevcut bir kategori ile eşleşmezse, component veri bulunamadı durumunu gösterir (fallback mesajı veya yükleme hatası).
+Bu modül, `categorySlug` propunun dışarıdan sağlanması gerekliliğine dayanır.
+
+[Aksiyom 1]: Eğer `categorySlug` prop'u çağrılmazsa, bileşen undefined bir değer ile çalışır ve beklenmeyen davranış oluşur.
 
 ---
 
@@ -50,11 +57,12 @@ Bu modül, `categorySlug` propunun mevcut ve geçerli bir string olduğu varsay�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/EducationalGuide.tsx::EducationalGuide
-- **params**: (categorySlug)
-- **ic_degiskenler**: 
-  - `t` — translation function obtained from `useI18n()` hook, used to retrieve localized strings for UI labels and descriptions
-- **Dönüş**: JSX.Element | null (returns null when categorySlug does not contain 'hava-perde', otherwise returns the JSX element representing the guide)
+### [N1_NASIL] AST Pointer: EducationalGuide.tsx::EducationalGuide
+- **params**: `(categorySlug)` — kategori slug'ı, hangi kategorinin görüntüleneceğini belirler (örn: 'hava-perde')
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'unun return değerinden destructuring ile alınan çeviri fonksiyonu; JSX içinde `t('category.whichAirCurtain')`, `t('category.airCurtainHelper')`, `t('category.ambientAir')`, `t('category.ambientAirDesc')`, `t('category.ambientPoint1')`, `t('category.ambientPoint2')`, `t('category.ambientPoint3')`, `t('category.electricHeated')`, `t('category.electricHeatedDesc')`, `t('category.electricPoint1')`, `t('category.electricPoint2')`, `t('category.electricPoint3')` çağrılarıyla kullanılır
+- **Dönüş**: `null | JSX.Element` — `categorySlug` `'hava-perde'` içermiyorsa `null`, içeriyorsa educational guide JSX'i döner
+- **Yan etkiler**: Yok (sunucu tarafı etkisi yok, sadece render)
 
 ---
 

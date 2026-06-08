@@ -3,36 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\DuctFanModel.tsx
-skeleton_hash: a1ad11ae7c7b34fd
+skeleton_hash: e008da7c837f898d
 entity_hashes:
   func:DuctFanModel: 17f5aa11f6202531
   func:RectangularDuctFanModel: c575246c49ae9f50
-  overview: 68716c558aae1e37
+  overview: 3724c6e43d80601a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:47Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış
-Bu modül, havalandırma sistemlerinde kullanılan kanal fanları için veri modelleri ve ilgili React bileşen tanımlarını içerir. Temel veri yapısını tanımlayan fonksiyonla genel bir model sunulurken, belirli bir fan türü için özelleştirilmiş bir bileşen de sağlanır.
+Bu modül, HVAC (Isıtma, Havalandırma ve Klima) sistemlerinde kullanılan kanal tipi fanlar için 3D model ve bileşen tanımları sunar. Modül, temel bir kanal fanı modeliyle genel bir yapı tanımlarken, belirli bir dikdörtgen kanal fanı türü için özelleştirilmiş bir React bileşeni de içerir. Bileşenler dış parametre almamakta olup, yalnızca iç mantık ve varsayılan yapılandırma ile çalışır.
 
 ## Fonksiyon Grupları
-### Model ve Veri Tanımları
-Temel kanal fanı veri yapısını ve özelliklerini belirler.
+### Model ve Yapı Tanımları
+Havalandırma kanalı fanlarının temel veri yapısını ve genel 3D model bileşenini tanımlar.
 - DuctFanModel
 
-### Bileşen Tanımları
-Belirli bir kanal fanı türü için React fonksiyonel bileşeni oluşturur ve döndürür.
+### Özelleşmiş Bileşen Tanımları
+Belirli bir kanal fanı türü (örneğin dikdörtgen kesitli) için çalışacak, dışarıdan veri almayan özel bir React bileşeni oluşturur.
 - RectangularDuctFanModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, dışarıdan parametre almayan iki React bileşeni tanımlar; bu yüzden davranışları sadece iç mantık ve (varsa) state'e bağlıdır.
-
-- **Aksiyom 1**: Eğer `DuctFanModel()` veya `RectangularDuctFanModel()` fonksiyonlarına hiçbir argüman geçirilmezse, bileşenin çıktısı sadece iç mantığına ve (varsa) kullanılan hook’lara veya state’e bağlıdır; dışarıdan gelen veri etkilemez.  
-- **Aksiyom 2**: Eğer bu bileşenlere prop geçilirse (TypeScript’te izin verilebilir olsa da), fonksiyon imzası hiçbir parametre kabul etmediği için bu prop’lar bileşen tarafından görmezden gelir / kullanılamaz.  
-- **Aksiyom 3**: Eğer bileşen render edilirse, üretilen JSX çıktısı yalnızca fonksiyon gövdesindeki sabit ifadeler, hooks ve iç state tarafından belirlenir; dışarıdan değişen değerler etkilemez.  
-- **Aksiyom 4**: Eğer bileşenin iç state veya hook’ları hakkında bilgi yoksa, bu değerlerin varsayılanları veya başlangıç değerleri bilinmiyor; bu yüzden sadece “iç mantık” üzerinden varsayım yapılabilir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -56,44 +51,52 @@ Bu modül, dışarıdan parametre almayan iki React bileşeni tanımlar; bu yüz
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/3d/types/DuctFanModel.tsx::DuctFanModel
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `fanRef` — REF to THREE.Group used to rotate the fan in the animation frame
-  - `materials` — object returned by useFanMaterials containing predefined material instances
-  - `localBladeColor` — Memoized THREE.MeshStandardMaterial with custom blade color, metalness and roughness
-- **Dönüş**: JSX.Element
+### [N1_NASIL] AST Pointer: DuctFanModel.tsx::DuctFanModel
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `fanRef` — useRef ile oluşturulmuş, THREE.Group nesnesini referans alan React ref'i. Pervane grubunu döndürmek için kullanılır.
+  - `materials` — useFanMaterials hook'unun dönüş değeri. Merkezi malzeme nesnelerini (galvanizedSteel vb.) içerir, JSX'teki mesh bileşenlerine atanır.
+  - `localBladeColor` — useMemo ile oluşturulmuş, pervane bıçakları için özelleştirilmiş bir THREE.MeshStandardMaterial nesnesi. Kırmızımsı bir renk ve metalik özelliklere sahiptir.
+  - `useFrame` callback'indeki `state` — useFrame hook'una ait, React Three Fiber'in güncelleme döngüsü durumunu temsil eder (kullanılmamıştır).
+  - `useFrame` callback'indeki `delta` — Son kareden bu yana geçen süre (saniye). fanRef.current.rotation.y değerini bu delta ile çarpıp azaltarak pervaneyi döndürmek için kullanılır.
+- **Dönüş**: JSX elemanı (3D sahne yapısı). `group` elemanı içinde silindirler, kutular ve pervane geometrilerinden oluşan bir kanal fanı modelini render eder.
 
-### [N2_NASIL] AST Pointer: src/components/products/3d/types/DuctFanModel.tsx::useFrame_callback
-- **params**: state, delta
+### [N2_NASIL] AST Pointer: DuctFanModel.tsx::RectangularDuctFanModel
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `materials` — Fonksiyon gövdesinde useFanMaterials hook'u ile alınan malzeme nesneleri. JSX'teki mesh bileşenlerine (galvanizedSteel, industrialSteel, matteBlack, brushedAluminum) atanır.
+- **Dönüş**: `React.FC` tipinde bir fonksiyon bileşeni. Dikdörtgen kanal fanı geometrisini (ana gövde, destekler, klemens kutusu, pervane milini) render eder.
+
+### [N3_NASIL] AST Pointer: DuctFanModel.tsx::useFrame Callback (DuctFanModel içinde)
+- **params**: `(state, delta)` — useFrame hook'unun parametreleri. state: Fiber durumu, delta: kare süresi.
+- **ic_degiskenler**: (yok, sadece outer scope'taki `fanRef` kullanılır)
+- **Dönüş**: yok (yan etki: her karede fanRef.current.rotation.y değerini azaltarak pervaneyi döndürür).
+
+### [N4_NASIL] AST Pointer: DuctFanModel.tsx::useMemo Callback (DuctFanModel içinde)
+- **params**: (yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok
+- **Dönüş**: `THREE.MeshStandardMaterial` nesnesi (renk: '#be123c', metalness: 0.6, roughness: 0.4).
 
-### [N3_NASIL] AST Pointer: src/components/products/3d/types/DuctFanModel.tsx::useMemo_factory
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: THREE.MeshStandardMaterial
+### [N5_NASIL] AST Pointer: DuctFanModel.tsx::map Callback (DuctFanModel - TAŞIYICI AYAK)
+- **params**: `(z, i)` — z: [-0.2, 0.2] dizisinden gelen koyma değeri (Y ekseninde), i: dizi indeksi.
+- **ic_degiskenler**: (yok, sadece parametreler ve outer scope'taki `materials` kullanılır)
+- **Dönüş**: JSX `<mesh>` elemanı (destek ayağı parçası).
 
-### [N4_NASIL] AST Pointer: src/components/products/3d/types/DuctFanModel.tsx::map_z_i
-- **params**: z, i
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element
+### [N6_NASIL] AST Pointer: DuctFanModel.tsx::map Callback (DuctFanModel - PERVANE)
+- **params**: `(rot, i)` — rot: [0, 45, ..., 315] dizisinden gelen açı değeri (derece), i: dizi indeksi.
+- **ic_degiskenler**: (yok, sadece parametreler ve outer scope'taki `localBladeColor` kullanılır)
+- **Dönüş**: JSX `<group>` elemanı (belirli açıyla döndürülmüş bir pervane bıçağı).
 
-### [N5_NASIL] AST Pointer: src/components/products/3d/types/DuctFanModel.tsx::map_rot_i
-- **params**: rot, i
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element
+### [N7_NASIL] AST Pointer: DuctFanModel.tsx::RectangularDuctFanModel Callback (iç)
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `materials` — useFanMaterials hook'undan alınan malzeme nesneleri.
+- **Dönüş**: JSX elemanı (dikdörtgen kanal fanı geometrisi).
 
-### [N6_NASIL] AST Pointer: src/components/products/3d/types/DuctFanModel.tsx::RectangularDuctFanModel
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `materials` — object returned by useFanMaterials containing predefined material instances
-- **Dönüş**: JSX.Element
-
-### [N7_NASIL] AST Pointer: src/components/products/3d/types/DuctFanModel.tsx::map_x_i
-- **params**: x, i
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element
+### [N8_NASIL] AST Pointer: DuctFanModel.tsx::map Callback (RectangularDuctFanModel içinde)
+- **params**: `(x, i)` — x: [-0.5, 0.5] dizisinden gelen koyma değeri (X ekseninde), i: dizi indeksi.
+- **ic_degiskenler**: (yok, sadece parametreler ve outer scope'taki `materials` kullanılır)
+- **Dönüş**: JSX `<mesh>` elemanı (dikdörtgen fanın yan destek parçası).
 
 ---
 

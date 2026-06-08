@@ -3,32 +3,40 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminWebhookEventsPage.tsx
-skeleton_hash: 9b69492b52d4088d
+skeleton_hash: fcb39370657fdd67
 entity_hashes:
   func:AdminWebhookEventsPage: 48683db839635910
   func:fetchEvents: 48cd1e3258f9387a
-  overview: 08c43a78d63b3e0f
+  overview: 7c63490659a70022
   style_tokens: e452abbd98ef7800
-generated_at: 2026-06-06T21:58:12Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış
-Venthub HVAC yönetici panelindeki webhook olaylarını izlemeye yönelik bir sayfa bileşenidir. Sistemde tetiklenen webhook'ları listeleyerek yöneticilere detaylı bir görünüm sunar. Sayfa, sunucudan asenkron olarak veri çeker ve bu verileri kullanıcılara düzenli bir arayüzle gösterir.
+
+Ventrub HVAC yönetici panelindeki webhook olaylarını görüntülemeye yönelik bir sayfa bileşenidir. Admin kullanıcıların sistemde tetiklenen webhook'ları listeleyerek izlemesini ve yönetmesini sağlar. Sayfa, arka planda sunucudan asenkron olarak veri çekerek webhook olaylarını düzenli bir arayüzle sunar.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Bileşeni
-Sayfanın temel yapısını ve kullanıcı arayüzünü oluşturan ana React bileşenidir. Webhook olay listesinin rendering'ini, sayfa düzenini ve kullanıcı etkileşimlerini yönetir.
+
+### Sayfa Bileşeni
+Sayfanın ana yapısını ve kullanıcı arayüzünü oluşturan React bileşenidir. Sayfa düzenini render eder ve veri çekme sürecini başlatarak kullanıcıya webhook olaylarını sunar.
 - AdminWebhookEventsPage
 
-### Veri Yönetimi
-Sayfanın ihtiyaç duyduğu webhook olaylarını sunucudan asenkron olarak çeken ve bileşene aktaran veri çekme işlevdir. Veri yükleme sürecini ve hata yönetimini üstlenir.
+### Veri Çekme
+Sayfanın ihtiyaç duyduğu webhook olaylarını sunucudan asenkron olarak çeken yardımcı fonksiyondur. Arka uç veri kaynağıyla iletişim kurarak olay verilerini sayfa bileşenine iletir.
 - fetchEvents
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için yalnızca fonksiyon imzalarından türetilebilen sınırlı mimari varsayımlar tanımlanabilir. Fonksiyon gövdesi erişilemediğinden, çıkarımlar minimum düzeyde tutulmuştur.
+
+[Aksiyom 1]: Eğer `fetchEvents()` çağrıldığında sunucu tarafı bir API uç noktası (endpoint) mevcut değilse, veriler getirilemez ve bileşen veri durumunda kalır (boş liste veya hata durumu).
+
+[Aksiyom 2]: Eğer `fetchEvents()` işlevi çağrılmadan önce veya çağrı sırasında ağ bağlantısı kesilmişse, webhook olayları başarıyla alınamaz ve bileşen veri gösteremez.
+
+[Aksiyom 3]: Eğer `AdminWebhookEventsPage()` bir React ortamı (provider, router vb.) dışında kullanılırsa, bileşen düzgün render edilemez.
 
 ---
 
@@ -67,38 +75,41 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AdminWebhookEventsPage.tsx::AdminWebhookEventsPage
+### [N1_NASIL] AST Pointer: src\views\admin\AdminWebhookEventsPage.tsx::AdminWebhookEventsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `loading` — yükleme durumunu belirten boolean state, true olduğunda veri çekiliyor demektir
-  - `setLoading` — loading state'ini güncellemek için setter fonksiyonu
-  - `events` — WebhookEventRow tipinde dizi, sunucudan çekilen webhook olaylarını tutar
-  - `setEvents` — events state'ini güncellemek için setter fonksiyonu
-  - `selectedEvent` — şu an seçili olan webhook olayı nesnesi veya null, detay panelinde gösterilir
-  - `setSelectedEvent` — selectedEvent state'ini güncellemek için setter fonksiyonu
-  - `fetchEvents` — asenkron fonksiyon, veritabanından webhook_events tablosunu çeker ve events state'ini günceller
-- **Dönüş**: JSX elementi (React bileşeninin render ettiği arayüz)
+  - `loading` — useState<boolean> ile oluşturulan boolean, veri yükleme durumunu takip eder
+  - `events` — useState<WebhookEventRow[]> ile oluşturulan dizi, webhook olaylarının listesini tutar
+  - `selectedEvent` — useState<WebhookEventRow | null> ile oluşturulan nesne, tabloda seçili olan olayı tutar
+  - `fetchEvents` — async arrow fonksiyonu, Supabase'den webhook_events tablosundan son 50 kaydı çeker
+  - `adminClient` — supabase istemcisinin SupabaseClient<AdminDatabase> türüne cast edilmiş hali, genişletilmiş tablo erişimi sağlar
+  - `query` — adminClient.from('webhook_events') ile oluşturulan Supabase sorgu nesnesi, select/order/limit zinciri uygulanır
+  - `data` — Supabase select sorgusunun başarıyla döndürdüğü ham veri
+  - `fetchErr` — Supabase yanıtındaki error alanı, sorgu hatalarını tutar
+  - `eventsData` — data'nın WebhookEventRow[] türüne cast edilmiş hali, null ise boş dizi fallback'i kullanılır
+  - `err` — catch bloğundaki genel hata nesnesi, console.error'a yazdırılır
+- **Dönüş**: JSX — AdminWebhookEventsPage bileşeninin render ettiği React JSX, webhook olayları listesi tablosu ve olay detay panelini içerir; return (JSX) satırı JSX elementi döndürür
 
-### [N2_NASIL] AST Pointer: AdminWebhookEventsPage.tsx::fetchEvents
+### [N2_NASIL] AST Pointer: src\views\admin\AdminWebhookEventsPage.tsx::fetchEvents
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `adminClient` — SupabaseClient<AdminDatabase> tipinde, tip güvenli veritabanı erişimi için supabase istemcisidir
-  - `query` — webhook_events tablosu için sorgu nesnesi, select, order ve limit operations için kullanılır
-  - `data` — sorgudan dönen ham veri, WebhookEventRow[] tipine dönüştürülür
-  - `fetchErr` — sorgu hatası varsa yakalanan error nesnesi
-  - `eventsData` — data'nın WebhookEventRow[] tipine dönüştürülmüş hali, data boş ise boş dizi döner
-  - `err` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: void (asenkron, state güncelleme yan etkisi var)
+  - `adminClient` — supabase istemcisinin SupabaseClient<AdminDatabase> türüne cast edilmiş hali, tip güvenli tablo erişimi sağlar
+  - `query` — adminClient.from('webhook_events') ile oluşturulan Supabase sorgu nesnesi, select('*') + order('created_at', {ascending: false}) + limit(50) zinciri uygulanır
+  - `data` — Supabase select sorgusunun başarıyla döndürdüğü ham veri, WebhookEventRow[]'a cast edilir
+  - `fetchErr` — Supabase yanıtındaki error alanı, sorgu hatalarını tutar; truthy ise throw edilir
+  - `eventsData` — data'nın WebhookEventRow[] türüne cast edilmiş hali, null/undefined ise boş dizi fallback'i kullanılır
+  - `err` — catch bloğundaki genel hata nesnesi, console.error('Webhook events fetch error:', err) ile yazdırılır
+- **Dönüş**: yok — fonksiyon yan etkisi olarak loading state'ini true ile başlatır, try/finally bloğu ile false'a ayarlar; events state'ini setEvents(eventsData) ile günceller
 
-### [N3_NASIL] AST Pointer: AdminWebhookEventsPage.tsx::useEffect callback
+### [N3_NASIL] AST Pointer: src\views\admin\AdminWebhookEventsPage.tsx::useEffect Callback
 - **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: void (yan etki olarak fetchEvents fonksiyonunu çağırır)
+- **Dönüş**: yok — yan etkisi: bileşen mount edildiğinde fetchEvents() fonksiyonunu çağırır; boş bağımlılık dizisi [] ile sadece ilk render'da çalışır
 
-### [N4_NASIL] AST Pointer: AdminWebhookEventsPage.tsx::event map callback
-- **params**: `event` — WebhookEventRow tipinde, işlenen tek bir webhook olayı nesnesi
-- **ic_degiskenler**: (yok, sadece parametre kullanılıyor)
-- **Dönüş**: JSX elementi (tr tablo satırı)
+### [N4_NASIL] AST Pointer: src\views\admin\AdminWebhookEventsPage.tsx::event Map Callback (tablo satırı render fonksiyonu)
+- **params**: `event` — WebhookEventRow tipinde bir webhook olay nesnesi, events dizisinin her bir elemanıdır
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX `<tr>` elementi — event.id ile key, event.event_type Olay Tipi hücresinde, event.provider Kaynak hücresinde, event.status değerine göre koşullu render ile İşlendi/Hata/Bekliyor durum göstergesi (CheckCircle2/XCircle/Clock ikonları ile), format(new Date(event.created_at), 'd MMM HH:mm', {locale: tr}) ile Türkçe formatta tarih gösterilir; onClick={() => setSelectedEvent(event)} ile tıklandığında olayı seçer; selectedEvent?.id === event.id kontrolü ile seçili satır vurgulanır
 
 ---
 

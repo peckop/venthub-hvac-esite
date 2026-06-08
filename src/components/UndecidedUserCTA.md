@@ -3,32 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\UndecidedUserCTA.tsx
-skeleton_hash: 0a3483208ef6d9f8
+skeleton_hash: 4602fa6ee6d31113
 entity_hashes:
   func:UndecidedUserCTA: e9ab9b6769bffef9
-  overview: 6734a4b4c3b6cbe2
+  overview: 568957f343e21561
   style_tokens: d1dc68fb1553bbf5
-generated_at: 2026-05-28T22:37:07Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış
-Venthub HVAC platformunda henüz platformdaki adımlara karar verememiş kararsız kullanıcılar için özel olarak tasarlanmış bir React kullanıcı arayüzü bileşeni barındırır. Bu bileşen, kullanıcıları uygun yönlendirmelere sevk eden eyleme çağrı içeriklerini ve etkileşimli öğeleri ekrana sunmak üzere geliştirilmiştir.
+Venthub HVAC platformunda henüz kendi yolunu çizememiş kararsız kullanıcıları hedefleyen bir React bileşenidir. Platformdaki olası adımları ve seçenekleri net bir şekilde sunarak kullanıcıları harekete geçmeye yönlendirir.
 
 ## Fonksiyon Grupları
-### Ana Kullanıcı Arayüzü Bileşeni
-Modülün tek ve ana işlevi olarak, tüm arayüz render işlemini üstlenir. Proje içinde başka bileşenlerden çağrıldığında kararsız kullanıcılar için hazırlanmış özel çağrı metinlerini ve etkileşim öğelerini ekrana yükler.
+### Kararsız Kullanıcı Yönlendirme Bileşeni
+Platforma henüz tam olarak entegre olamamış veya hangi adımı atacağına karar verememiş kullanıcılar için eyleme çağrı (CTA) içeriğini ekrana render eder. Tek başına çalışan bağımsız bir sunum bileşenidir.
 - UndecidedUserCTA
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu istemci tarafı React bileşeni, kararsız kullanıcılara yönelik harekete geçirici çağrı mesajlarını (CTA) görüntülemek için tasarlanmıştır, çalışması için React çalışma zamanı ve DOM erişiminin sürekli olarak mevcut olması zorunludur.
 
-[Aksiyom 1]: Eğer React çalışma zamanı ortamı mevcut değilse, bileşen hiçbir şekilde başlatılamaz ve kullanıcıya hiçbir zaman sunulamaz.
-[Aksiyom 2]: Eğer bileşen geçerli bir DOM ortamında (veya sunucu taraflı render durumunda hydration işlemi tamamlanmış bir ortamda) çalıştırılmazsa, render hatası oluşur, kullanıcıya CTA içeriği gösterilemez.
-[Aksiyom 3]: Eğer bu bileşen ana (parent) React bileşeni tarafından uygulama component tree yapısına dahil edilmezse, hiçbir zaman tetiklenmez ve kullanıcıya sunulmaz.
-[Aksiyom 4]: Eğer bileşenin çalışması için gereken tüm React bağlamları (tema, çeviri, global uygulama durumu vb.) üst bileşen tarafından sağlanmazsa, bileşen hatalı render olur veya beklenen görsel/işlevsel özellikleri sunamaz.
-[Aksiyom 5]: Eğer kullanıcının "kararsız" durumu üst bileşen tarafından doğru şekilde tespit edilip bu CTA'nın gösterim koşulu tetiklenmezse, hedef kullanıcı grubuna hiçbir zaman sunulamaz.
+Bu bileşen, parametresiz olarak çağrılan ve JSX döndüren bir React bileşenidir.
+
+[Aksiyom 1]: Eğer UndecidedUserCTA bileşeni props (özellik) almadan çağrılırsa, bileşen içeriği tamamen kendi iç state'ine veya sabit değerlere dayanarak render edilir.
+
+[Aksiyom 2]: Eğer bileşen bir React component olarak tanımlanmışsa, çağrıldığında geçerli bir JSX/ReactNode yapısı döndürmek zorundadır; aksi halde React render hatası oluşur.
+
+[Aksiyom 3]: Eğer bileşen parametresiz tanımlanmışsa, dışarıdan özelleştirme (metin, renk, eylem callback'i vb.) yapılamaz; bileşen içeriği sabittir veya iç state tarafından kontrol edilir.
 
 ---
 
@@ -45,14 +46,13 @@ Bu istemci tarafı React bileşeni, kararsız kullanıcılara yönelik harekete 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\UndecidedUserCTA.tsx::UndecidedUserCTA
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/UndecidedUserCTA.tsx::UndecidedUserCTA
+- **params**: (parametre yok — fonksiyon Arrow function olarak tanımlı, parametre almıyor)
 - **ic_degiskenler**:
-  - `Link` — Next.js yönlendirme bileşeni, kullanıcıyı danışmanlık için iletişim sayfasına yönlendirmek üzere kullanılır
-  - `MessageSquare` — Lucide-react ikon bileşeni, CTA bloğunda mesaj temalı simge olarak görüntülenir
-  - `ArrowRight` — Lucide-react ikon bileşeni, buton içindeki hareketli sağ ok simgesi olarak kullanılır
-  - `Routes` — Proje rota yardımcı nesnesi, 'consulting' etiketli iletişim rotasını oluşturmak için çağrılır
-- **Dönüş**: Kararsız kullanıcıları uzman mühendis danışmanlığına yönlendiren React JSX elementi
+  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; JSX içinde `t('undecidedUserCta.title')`, `t('undecidedUserCta.description')`, `t('undecidedUserCta.buttonText')` çağrılarıyla lokalize metinler render eder
+- **Dönüş**: JSX (React element) — `div` sarmalayıcı içinde gradient arka planlı, responsive bir CTA (Call To Action) kartı; `MessageSquare` ikonu, `t()` ile çevrilmiş başlık/açıklama metni, ve `Link` bileşeni içeren `Routes.contact('consulting')` href'li buton döner
+- **Yan etkiler**: Yok (saf bileşen, state değiştirmez, side-effect tetiklemez)
+- **Referanslanan dış kaynaklar**: `useI18n()` hook'u, `Routes.contact()` helper'ı, `ArrowRight` ve `MessageSquare` lucide-react ikonları, `Link` Next.js bileşeni
 
 ---
 

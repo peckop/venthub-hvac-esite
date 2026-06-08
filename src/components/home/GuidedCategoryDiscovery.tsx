@@ -1,8 +1,10 @@
-import { Routes } from '../../utils/routes'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
+
 import { normalizeImageUrl } from '@/utils/imageUtils'
+
+import { Routes } from '../../utils/routes'
 
 export interface CategoryViewModelLite {
   id: string;

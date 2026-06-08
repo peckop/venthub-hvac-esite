@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react'
-import { useI18n } from '@/i18n/I18nProvider';
+import { zodResolver } from '@hookform/resolvers/zod'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Tabs from '@radix-ui/react-tabs'
+import { Loader2,Save, Trash2, Upload, X } from 'lucide-react'
+import React, { useEffect,useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { X, Upload, Trash2, Save, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { useI18n } from '@/i18n/I18nProvider';
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
+import { toSupabaseJson } from '../../../lib/type-converters'
 import type { Database } from '../../../types/database.types'
-import type { DbCategory, CategoryMetadata } from '../../../types/db-rows'
+import type { CategoryMetadata,DbCategory } from '../../../types/db-rows'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
 import VentImage from '../../ui/VentImage'
-import { toSupabaseJson } from '../../../lib/type-converters'
 
 
 type CategoryUpdate = Database['public']['Tables']['categories']['Update']
@@ -52,6 +54,9 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     onSuccess
 }) => {
     const { t } = useI18n();
+    const resolutionVal = '800x800px';
+    const formatsVal = 'WebP, PNG, JPG';
+    const dot = '.';
     const [loading, setLoading] = useState(false)
     const [previewImage, setPreviewImage] = useState<string | null>(null)
     const [uploadingImage, setUploadingImage] = useState(false)
@@ -233,10 +238,10 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                     <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
                         <div>
                             <Dialog.Title className="text-xl font-bold text-white tracking-tight">
-                                {category ? 'Kategoriyi Düzenle' : 'Yeni Kategori Oluştur'}
+                                {category ? t('admin.categories.editCategory') : t('admin.categories.createNewCategory')}
                             </Dialog.Title>
                             <Dialog.Description className="text-sm text-slate-400 mt-1">
-                                Kategori bilgilerini, SEO ayarlarını ve görsellerini yönetin.
+                                {t('admin.categories.modalDesc')}
                             </Dialog.Description>
                         </div>
                         <Dialog.Close className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white">
@@ -250,19 +255,19 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                 value="general"
                                 className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors"
                             >
-                                Genel Bilgiler
+                                {t('admin.categories.tabGeneral')}
                             </Tabs.Trigger>
                             <Tabs.Trigger 
                                 value="seo"
                                 className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors"
                             >
-                                SEO & Pazarlama
+                                {t('admin.categories.tabSeo')}
                             </Tabs.Trigger>
                             <Tabs.Trigger 
                                 value="content"
                                 className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors"
                             >
-                                Metrikler & Görünüm
+                                {t('admin.categories.tabMetrics')}
                             </Tabs.Trigger>
                         </Tabs.List>
 
@@ -271,21 +276,21 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                 <Tabs.Content value="general" className="space-y-6">
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Kategori Adı</label>
+                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formName')}</label>
                                             <input 
                                                 {...form.register('name')}
                                                 className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600"
-                                                placeholder="Örn: Endüstriyel Fanlar"
+                                                placeholder={t('admin.categories.formName') + '...'}
                                             />
                                             {form.formState.errors.name && <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">{form.formState.errors.name.message}</p>}
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Slug (URL)</label>
+                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formSlug')}</label>
                                             <input 
                                                 {...form.register('slug')}
                                                 className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 font-mono"
-                                                placeholder="endustriyel-fanlar"
+                                                placeholder="slug..."
                                             />
                                             {form.formState.errors.slug && <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">{form.formState.errors.slug.message}</p>}
                                         </div>
@@ -293,12 +298,12 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
 
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Üst Kategori</label>
+                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formParent')}</label>
                                             <select 
                                                 {...form.register('parent_id')}
                                                 className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer"
                                             >
-                                                <option value="" className="bg-surface-deep">Ana Kategori (Yok)</option>
+                                                <option value="" className="bg-surface-deep">{t('admin.categories.parentNone')}</option>
                                                 {parentIdOptions.map(p => (
                                                     <option key={p.id} value={p.id} className="bg-surface-deep">{p.name}</option>
                                                 ))}
@@ -306,7 +311,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Sıralama (Pozisyon)</label>
+                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formSortOrder')}</label>
                                             <input 
                                                 type="number"
                                                 {...form.register('sort_order', { valueAsNumber: true })}
@@ -316,33 +321,33 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">Açıklama</label>
+                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formDescription')}</label>
                                         <textarea 
                                             {...form.register('description')}
                                             rows={4}
                                             className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 resize-none"
-                                            placeholder="Kategori hakkında genel bilgi..."
+                                            placeholder={t('admin.categories.formDescription') + '...'}
                                         />
                                     </div>
                                 </Tabs.Content>
 
                                 <Tabs.Content value="seo" className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">SEO Başlığı</label>
+                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formSeoTitle')}</label>
                                         <input 
                                             {...form.register('seo_title')}
                                             className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors"
-                                            placeholder="Arama motoru başlığı"
+                                            placeholder="SEO title..."
                                         />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">SEO Açıklaması</label>
+                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formSeoDesc')}</label>
                                         <textarea 
                                             {...form.register('seo_desc')}
                                             rows={3}
                                             className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors"
-                                            placeholder="Arama motoru açıklaması"
+                                            placeholder="SEO description..."
                                         />
                                     </div>
 
@@ -354,8 +359,8 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                             className="w-5 h-5 rounded border-white/10 bg-white/5 text-cyan-500 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0"
                                         />
                                         <label htmlFor="is_featured" className="text-sm font-bold text-white cursor-pointer select-none">
-                                            Öne Çıkarılan Kategori
-                                            <span className="block text-xs font-normal text-slate-500 mt-1 uppercase tracking-tight">Ana sayfada ve üst menüde vurgulanır</span>
+                                            {t('admin.categories.formFeatured')}
+                                            <span className="block text-xs font-normal text-slate-500 mt-1 uppercase tracking-tight">{t('admin.categories.formFeaturedDesc')}</span>
                                         </label>
                                     </div>
                                 </Tabs.Content>
@@ -370,7 +375,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                     <>
                                                         <VentImage 
                                                             src={previewImage} 
-                                                            alt="Preview" 
+                                                            alt={t('admin.categories.imagePreviewAlt')} 
                                                             className="w-full h-full object-cover transition-transform group-hover:scale-110" 
                                                         />
                                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -406,8 +411,8 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                             <div className="flex-1 space-y-4">
                                                 <p className="text-xs text-slate-500 leading-relaxed">
                                                     {t('admin.categories.imageDesc')} <br/>
-                                                    {t('admin.categories.resolutionLabel')} <span className="text-white font-bold">800x800px</span>. <br/>
-                                                    {t('admin.categories.supportedFormatsLabel')} <span className="text-white font-bold">WebP, PNG, JPG</span>.
+                                                    {t('admin.categories.resolutionLabel')} <span className="text-white font-bold">{resolutionVal}</span>{dot} <br/>
+                                                    {t('admin.categories.supportedFormatsLabel')} <span className="text-white font-bold">{formatsVal}</span>{dot}
                                                 </p>
                                                 <div className="space-y-2">
                                                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.common.imageUrlWithManual')}</label>
@@ -479,7 +484,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                 onClick={() => onOpenChange(false)}
                                 className="px-6 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors"
                             >
-                                Vazgeç
+                                {t('admin.categories.cancel')}
                             </button>
                             <button 
                                 type="submit" 
@@ -492,7 +497,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                 ) : (
                                     <Save size={16} className="group-hover:-translate-y-px transition-transform" />
                                 )}
-                                {category ? 'Kategoriyi Güncelle' : 'Kategori Oluştur'}
+                                {category ? t('admin.categories.updateCategory') : t('admin.categories.createCategory')}
                             </button>
                         </div>
                     </Tabs.Root>

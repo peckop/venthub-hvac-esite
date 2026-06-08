@@ -3,37 +3,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\BottomCTA.tsx
-skeleton_hash: 1f08a41bd7ff999f
+skeleton_hash: 32687a28e8d73f76
 entity_hashes:
   func:BottomCTA: c122a8232d826ce8
   func:scrollToTop: 40a3c590b7862492
-  overview: 55c7f6e0cceee5e1
+  overview: d7baf241fd518005
   style_tokens: 0b28756a678eed77
-generated_at: 2026-05-28T22:35:45Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, bir kategori sayfasının alt kısmında kullanıcıya eylem teşvik eden bir çağrı‑etkileşim (CTA) bileşeni sunar ve sayfanın en üstüne hızlıca dönme işlevi sağlar. BottomCTA bileşeni, sihirbazı açma veya ürünleri gösterme gibi etkileşimleri yönetirken, scrollToTop fonksiyonu sayfa kaydırma deneyimini iyileştirmek için kullanılır.
+Bu modül, bir kategori sayfasının alt kısmında yer alarak kullanıcıları belirli aksiyonlara yönlendiren bir CTA (Çağrı‑Eylemi) bileşenini ve sayfanın en üstüne hızlıca dönme işlevini barındırır. Bileşen, sihirbazı açma veya ürünleri gösterme gibi etkileşimleri tetiklerken, yardımcı fonksiyon sayfa gezinme deneyimini iyileştirir.
 
 ## Fonksiyon Grupları
 ### Kullanıcı Arayüzü ve Etkileşim
-Kategori sayfasının alt kısmında görsel bir CTA göstererek kullanıcıya belirli eylemler (sihirbazı açma, ürün listeleme) sunar ve bu eylemlerin tetiklenmesini sağlar.
+Kategori sayfasının sonunda, kullanıcıya eylem teşvik eden görsel bir bileşen sunar; bu bileşen, harici callback fonksiyonları aracılığıyla ana uygulama mantığıyla entegre olarak sihirbaz açma veya ürün listeleme gibi görevleri tetikler.
 - BottomCTA
 
 ### Sayfa Navigasyonu
-Kullanıcının sayfanın başına hızlıca dönmesini sağlayan basit bir kaydırma işlevi içerir, böylece uzun listelerde üst menüye erişim kolaylaşır.
+Sayfayı en üste kaydırarak kullanıcının üst menülere veya başlangıç noktasına kolayca erişmesini sağlayan temel bir gezinme yardımcı işlevini içerir.
 - scrollToTop
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, gerekli callback fonksiyonlarının ve `categoryN` propunun sağlandığı ve tarayıcı ortamında çalıştığı varsayımıyla doğru şekilde işlev görür.
+Bu modülün doğru çalışması için temel olarak harici callback fonksiyonlarının sağlanması ve tarayıcı ortamı gereklidir.
 
-[Aksiyom 1]: Eğer `onOpenWizard` propu sağlanmazsa, wizard açma işlevi tetiklenemez.  
-[Aksiyom 2]: Eğer `onShowProducts` propu sağlanmazsa, ürün listeleme işlevi tetiklenemez.  
-[Aksiyom 3]: Eğer `categoryN` propu sağlanmazsa, component rendering sırasında hata oluşur veya beklenen içerik gösterilemez.  
-[Aksiyom 4]: Eğer `showWizard` propu sağlanmazsa, varsayılan olarak `true` değeri kullanılır ve wizard açık olarak başlar.  
-[Aksiyom 5]: Eğer `scrollToTop` fonksiyonu tarayıcı dışı bir ortam (ör. sunucu tarafı render) çağrılırsa, `window.scrollTo` erişimi yoksa hata oluşur.
+**[Aksiyom 1]:** Eğer `onOpenWizard` callback fonksiyonu sağlanmazsa, ilgili butona tıklandığında sihirbaz açılamaz ve kullanıcı etkileşimi hedeflenen aksiyona ulaşamaz.
+
+**[Aksiyom 2]:** Eğer `onShowProducts` callback fonksiyonu sağlanmazsa, ilgili butona tıklandığında ürün listesi görüntülenemez.
+
+**[Aksiyom 3]:** Eğer `scrollToTop` fonksiyonu, tarayıcı ortamında (`window.scrollTo`) çalıştırılamaz bir bağlamda çağrılırsa, sayfanın en üstüne kaydırma işlemi başarısız olur.
+
+**[Aksiyom 4]:** Eğer `showWizard` parametresi `false` olarak ayarlanırsa, sihirbazı açmaya yönelik arayüz bileşenleri (buton, container) gösterilmez; ancak componentin genel yapısal varlığı devam eder.
 
 ---
 
@@ -69,17 +71,20 @@ Bu modül, gerekli callback fonksiyonlarının ve `categoryN` propunun sağland�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/sections/BottomCTA.tsx::BottomCTA
-- **params**: onOpenWizard, onShowProducts, showWizard, categoryName
-- **ic_degiskenler**: 
-  - `scrollToTop` — fonksiyon, sayfayı yukarıya kaydırır (window.scrollTo)
-- **Dönüş**: React.FC<BottomCTAProps>
+### [N1_NASIL] AST Pointer: BottomCTA.tsx::BottomCTA
+- **params**: `{ onOpenWizard, onShowProducts, showWizard = true, categoryName = 'Ürünler' }`
+- **ic_degiskenler**: 内部变量，仅在函数体（返回的 JSX）中实际使用。
+  - `categoryName` — 从 props 接收的分类名称字符串，用在页眉文本中（通过 `.toLowerCase()` 显示）。
+  - `showWizard` — 布尔值，控制布局（网格列数）和“Wizard”按钮的渲染。
+  - `onOpenWizard` — 回调函数，作为“Bana Uygun Olanı Bul”按钮的 `onClick` 处理器。
+  - `onShowProducts` — 回调函数，作为“Modelleri İncele”按钮的 `onClick` 处理器。
+  - `scrollToTop` — 在函数体内定义的内部函数，用于滚动到页面顶部。作为“Başa Dön”按钮的 `onClick` 处理器。
+- **Dönüş**: React 元素（JSX 代码）。
 
-### [N2_NASIL] AST Pointer: src/components/category/sections/BottomCTA.tsx::scrollToTop
+### [N2_NASIL] AST Pointer: BottomCTA.tsx::scrollToTop
 - **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - (yok) — fonksiyon içinde hiçbir değişken tanımlanmaz
-- **Dönüş**: yok
+- **ic_degiskenler**: Bu fonksiyon gövdesinde herhangi bir değişken tanımlanmaz veya kullanılmaz. `window` nesnesi doğrudan koşullu olarak erişilir.
+- **Dönüş**: yok (undefined). Yan etkisi: Sayfayı yumuşak bir şekilde yukarı kaydırır.
 
 ---
 

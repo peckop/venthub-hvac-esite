@@ -3,31 +3,30 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\TypeComparison.tsx
-skeleton_hash: e64ca2d20ec08be2
+skeleton_hash: af1d682b269e3679
 entity_hashes:
   func:TypeComparison: 4dc351c7c18b2642
-  overview: e7e7315fa09b979c
+  overview: 54025c31ff520977
   style_tokens: ef09d8c28bb43bb7
-generated_at: 2026-05-28T22:35:48Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, kategori bölümlerinde farklı türleri karşılaştırmak amacıyla kullanılan bir React bileşeni tanımlar. Kullanıcıya tür seçimi ve sihirbaz açma gibi etkileşimler sunar.
+Bu modül, farklı ürün türlerini (örneğin elektrikli ve ortam havalı sistemleri) görsel olarak karşılaştırmak için kullanılan bir React bileşenidir. Kullanıcıya tercih ettiği türü seçme veya kararsız kaldığında daha fazla yardım almak için bir sihirbazı başlatma olanağı sunar.
 
 ## Fonksiyon Grupları
-### Ana Bileşen
-Bileşen, ekranda karşılaştırma görünümünü oluşturur ve dışarıdan gelen onOpenWizard ve onSelectType geri çağrılarını tetikler.
+### Karşılaştırma ve Seçim Bileşeni
+Kullanıcıya farklı türleri yan yana göstererek karşılaştırma yapmasını sağlar; seçim yapıldığında veya yardıma ihtiyaç duyulduğunda ilgili işlemleri tetikler.
 - TypeComparison
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, `onOpenWizard` ve `onSelectType` prop'larının fonksiyon olarak sağlandığını varsayar.
+Bu bileşen, `onOpenWizard` ve `onSelectType` prop'larının varlığına ve doğru kullanımına bağlıdır.
 
-[Aksiyom 1]: Eğer `onOpenWizard` prop'u sağlanmazsa veya `undefined` ise, component içinde bu fonksiyon çağrıldığında hata oluşur.  
-[Aksiyom 2]: Eğer `onSelectType` prop'u sağlanmazsa veya `undefined` ise, component içinde bu fonksiyon çağrıldığında hata oluşur.  
-[Aksiyom 3]: Eğer `onOpenWizard` prop'u bir fonksiyon değilse, çağrıldığında `TypeError` oluşur.  
-[Aksiyom 4]: Eğer `onSelectType` prop'u bir fonksiyon değilse, çağrıldığında `TypeError` oluşur.
+[Aksiyom 1]: Eğer `onOpenWizard` prop'u (bir fonksiyon) yoksa, bileşen "kararsız kalındığında sihirbazı aç" işlevini tetikleyemez ve bu durum kullanıcı deneyimini olumsuz etkiler.
+[Aksiyom 2]: Eğer `onSelectType` prop'u (bir fonksiyon) yoksa, bileşen kullanıcı bir sistem türü seçtiğinde bu seçimi üst bileşene bildiremez ve seçim eylemi sonuçsuz kalır.
+[Aksiyom 3]: Eğer `onOpenWizard` veya `onSelectType` prop'ları, bileşen içinden çağrıldıklarında beklenen formatta (örneğin, gerekli parametrelerle) çağrılmazlarsa, üst bileşende hatalara veya beklenmeyen davranışlara yol açar.
 
 ---
 
@@ -54,36 +53,37 @@ Bu modül, `onOpenWizard` ve `onSelectType` prop'larının fonksiyon olarak sağ
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/category/sections/TypeComparison.tsx::TypeComparison
-- **params**: onOpenWizard, onSelectType
+- **params**: (onOpenWizard, onSelectType) — onOpenWizard: wizard modal'ını açmak için callback fonksiyonu; onSelectType: seçilen tip ('elektrikli' veya 'ortam') ile çağrılan callback fonksiyonu
 - **ic_degiskenler**:
-  - `sectionRef` — reference to the section element used for scroll‑animation hook
-  - `isVisible` — boolean flag indicating whether the section is currently visible in the viewport
-  - `hoveredType` — holds the currently hovered type identifier ('elektrikli' | 'ortam' | null)
-  - `setHoveredType` — state setter function to update `hoveredType`
-  - `types` — array of configuration objects for each type, containing title, subtitle, icon, color classes, benefits, bestFor, and notFor lists
-- **Dönüş**: JSX.Element
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu; i18n çevirileri için kullanılır (ör. `t('category.electricVsAmbientAlt')`)
+  - `sectionRef` — useScrollAnimation hook'undan dönen ref nesnesi; section DOM elemanına bağlanarak scroll animasyonu takibi yapılır
+  - `isVisible` — useScrollAnimation hook'undan dönen boolean; section'ın viewport'a girip girmediğini belirtir, animasyon sınıflarını aktif/pasif yapar
+  - `hoveredType` — useState ile tutulan state; hangi tip kartının üzerine gelindiğini takip eder ('elektrikli', 'ortam' veya null)
+  - `setHoveredType` — hoveredType state'ini güncelleyen setter fonksiyonu; mouseenter/mouseleave olaylarında çağrılır
+  - `types` — iki elemanlı dizi; her bir hava perdesi tipinin (elektrikli ve ortam) tanım bilgilerini (id, title, subtitle, icon, color, colorClasses, benefits, bestFor, notFor) içerir
+- **Dönüş**: JSX — Section bileşenini render eder; başlık, karşılaştırma görseli (VentImage), iki karşılaştırma kartı ve kararsız kullanıcılar için wizard CTA bölümü
 
-### [N2_NASIL] AST Pointer: src/components/category/sections/TypeComparison.tsx::map callback (type) => ...
-- **params**: type
+### [N2_NASIL] AST Pointer: src/components/category/sections/TypeComparison.tsx::(type) => ...
+- **params**: (type) — types dizisinin bir elemanı; id, title, subtitle, icon, color, colorClasses, benefits, bestFor, notFor alanlarını içerir
 - **ic_degiskenler**:
-  - `Icon` — React component icon extracted from `type.icon`
-  - `isHovered` — boolean indicating if this type is currently hovered (`hoveredType === type.id`)
-- **Dönüş**: JSX.Element
+  - `Icon` — type.icon değerinden alınan icon bileşeni (Zap veya Wind); kartın header kısmında görsel olarak kullanılır
+  - `isHovered` — boolean; hover durumunu kontrol eder (`hoveredType === type.id`); kartın hover durumuna göre CSS sınıflarını belirler
+- **Dönüş**: JSX — Tek bir karşılaştırma kartını render eder; header (icon + title + subtitle), benefits listesi, bestFor etiketleri, notFor etiketleri ve tip seçme butonu (CTA)
 
-### [N3_NASIL] AST Pointer: src/components/category/sections/TypeComparison.tsx::benefits.map callback (benefit, i) => ...
-- **params**: benefit, i
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element
+### [N3_NASIL] AST Pointer: src/components/category/sections/TypeComparison.tsx::(benefit, i) => ...
+- **params**: (benefit, i) — benefit: benefits dizisinin bir elemanı (string); i: elemanın indeks numarası
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — Tek bir avantaj maddesini render eder; Check ikonu ve benefit metni
 
-### [N4_NASIL] AST Pointer: src/components/category/sections/TypeComparison.tsx::bestFor.map callback (item, i) => ...
-- **params**: item, i
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element
+### [N4_NASIL] AST Pointer: src/components/category/sections/TypeComparison.tsx::(item, i) => ... [bestFor]
+- **params**: (item, i) — item: bestFor dizisinin bir elemanı (string); i: elemanın indeks numarası
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — Tek bir "en uygun" etiketini render eder; type'a özgü renk sınıfları ile stillendirilmiş span elemanı
 
-### [N5_NASIL] AST Pointer: src/components/category/sections/TypeComparison.tsx::notFor.map callback (item, i) => ...
-- **params**: item, i
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX.Element
+### [N5_NASIL] AST Pointer: src/components/category/sections/TypeComparison.tsx::(item, i) => ... [notFor]
+- **params**: (item, i) — item: notFor dizisinin bir elemanı (string); i: elemanın indeks numarası
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — Tek bir "tercih edilmez" etiketini render eder; X ikonu ve item metni ile gri tonlarında span elemanı
 
 ---
 

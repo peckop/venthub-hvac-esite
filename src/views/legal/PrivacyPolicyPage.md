@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\legal\PrivacyPolicyPage.tsx
-skeleton_hash: 236dec3edf614633
+skeleton_hash: 3af1b409ac29bb31
 entity_hashes:
   func:PrivacyPolicyPage: 40c3e34ff307a7eb
   overview: f7094466668600a6
   style_tokens: 59b3a50b22e1661e
-generated_at: 2026-05-28T22:40:07Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış

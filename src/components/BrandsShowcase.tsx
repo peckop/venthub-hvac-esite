@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useMemo } from 'react'
-import { HVAC_BRANDS } from '../data/brands'
-import { BrandIcon } from './HVACIcons'
-import Link from 'next/link'
-import { useI18n } from '../i18n/I18nProvider'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
+import React, { useMemo } from 'react'
+
+import { HVAC_BRANDS } from '../data/brands'
+import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes';
+import { BrandIcon } from './HVACIcons'
 
 
 const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ items, durationSec = 50 }) => {
@@ -14,7 +15,7 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
 
   return (
     <div className="relative overflow-hidden group">
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes marquee-premium { 
           from { transform: translateX(0); } 
           to { transform: translateX(-33.33%); } 
@@ -25,7 +26,7 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
         .marquee-premium-track:hover {
           animation-play-state: paused;
         }
-      `}</style>
+      ` }} />
       <div className="flex marquee-premium-track w-max gap-20 py-12">
         {repeated.map((brand, idx) => (
           <Link key={`${brand.slug}-${idx}`} href={Routes.brand(brand.slug)} className="group/brand">
@@ -76,7 +77,10 @@ const BrandsShowcase: React.FC = () => {
             transition={{ delay: 0.1 }}
             className="text-3xl font-extralight tracking-[ -0.05em] text-slate-900 sm:text-5xl"
           >
-            Dünya Devlerinin <span className="font-medium text-slate-950">Güvenilir Partneri</span>
+            {t('brands.subtitlePart1')}{' '}
+            <span className="font-medium text-slate-950">
+              {t('brands.subtitlePart2')}
+            </span>
           </motion.h2>
         </div>
 

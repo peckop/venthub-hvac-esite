@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SubcategoryFlow.tsx
-skeleton_hash: 13e1e95885fb9327
+skeleton_hash: 2ba496ffc2012924
 entity_hashes:
   func:ScrollingLane: f84481d0c85d01e8
   func:SubcategoryCard: cd96e8043ed6039d
   func:SubcategoryFlow: 9dafb4b55b36d1b9
   overview: 55b8eed097840887
   style_tokens: 329d32771128cbd3
-generated_at: 2026-05-28T22:37:16Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış

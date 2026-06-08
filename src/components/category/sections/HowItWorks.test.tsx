@@ -1,8 +1,10 @@
-import { describe, it, expect, vi, beforeAll } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
-import HowItWorks from './HowItWorks'
-import { testA11y } from '@/utils/testA11y'
+import { fireEvent,render, screen } from '@testing-library/react'
 import React from 'react'
+import { beforeAll,describe, expect, it, vi } from 'vitest'
+
+import { testA11y } from '@/utils/testA11y'
+
+import HowItWorks from './HowItWorks'
 
 // Mock IntersectionObserver for useScrollAnimation
 beforeAll(() => {

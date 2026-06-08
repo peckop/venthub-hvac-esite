@@ -1,8 +1,9 @@
-import React from 'react'
-import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
-import { useI18n } from '../../i18n/I18nProvider'
+import { useRouter } from 'next/navigation'
+import React from 'react'
+
 import { WhatsAppIcon } from '../../components/HVACIcons'
+import { useI18n } from '../../i18n/I18nProvider'
 import { getSupportLink, isWhatsAppAvailable } from '../../utils/whatsapp'
 
 const FAQPage: React.FC = () => {

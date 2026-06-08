@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LanguageSwitcher.tsx
-skeleton_hash: dfec695a41b4fbe5
+skeleton_hash: 81fcd9fee11ddf92
 entity_hashes:
   func:LanguageSwitcher: e20e68a6d834aa54
   func:switchLanguage: ceec0990f90068b4
   overview: 2f23c86896c74c04
   style_tokens: 819c78943fe15425
-generated_at: 2026-05-29T18:43:11Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış

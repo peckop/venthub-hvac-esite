@@ -1,17 +1,17 @@
 'use client'
 
+import { TrendingUp } from 'lucide-react'
 import React from 'react'
 import {
-    AreaChart,
     Area,
-    XAxis,
-    YAxis,
+    AreaChart,
+    Brush,
     CartesianGrid,
-    Tooltip,
     ResponsiveContainer,
-    Brush
-} from 'recharts'
-import { TrendingUp } from 'lucide-react'
+    Tooltip,
+    XAxis,
+    YAxis} from 'recharts'
+
 import AdminEmptyState from '../AdminEmptyState'
 
 interface SalesChartProps {

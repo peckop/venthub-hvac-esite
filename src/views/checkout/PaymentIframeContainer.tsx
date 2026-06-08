@@ -1,7 +1,7 @@
 'use client'
 
+import { CheckCircle,CreditCard, Lock } from 'lucide-react'
 import React from 'react'
-import { CreditCard, Lock, CheckCircle } from 'lucide-react'
 
 interface PaymentIframeContainerProps {
     iyzToken: string

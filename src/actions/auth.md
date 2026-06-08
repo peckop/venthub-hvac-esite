@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\actions\auth.ts
-skeleton_hash: 3a5d9cd138c91154
+skeleton_hash: 5ffd222888e9694f
 entity_hashes:
   func:loginAction: c30804abb0cb7f33
   overview: d107b84c0f7e9bda
-generated_at: 2026-06-06T19:22:29Z
+generated_at: 2026-06-08T10:08:10Z
 ---
 
 ## Genel Bakış

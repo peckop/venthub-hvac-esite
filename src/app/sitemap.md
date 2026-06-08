@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\sitemap.ts
-skeleton_hash: b03af8c8b5a74eba
+skeleton_hash: a821b6a29a446127
 entity_hashes:
   func:sitemap: 6471d8775000e352
   overview: 9af1926cebf28d0e
-generated_at: 2026-06-07T12:01:58Z
+generated_at: 2026-06-08T10:08:12Z
 ---
 
 ## Genel Bakış
@@ -29,10 +29,6 @@ Bu modül için minimum aksiyom tanımlanabilir. `sitemap()` fonksiyonu parametr
 [Aksiyom 2]: Eğer Next.js router yapılandırmasında tanımlı rotalar değiştirilir ancak fonksiyon bu değişiklikleri yansıtmazsa, site haritası eksik veya tutarsız URL'ler içerir.
 
 [Aksiyom 3]: Eğer fonksiyon çağrıldığında içeriğe erişim sağlanamazsa (veritabanı, API, dosya sistemi vb.), site haritası boş veya hatalı döner.
-
----
-
-**Not:** Fonksiyon gövdesi detaylı olarak sunulmadığından, bağımlılıklar, dönüş tipi yapısı ve iş mantığı hakkında kesin aksiyom türetilmemiştir. Daha kesin aksiyonlar için `sitemap()` gövdesinin tam kodu gereklidir.
 
 ---
 

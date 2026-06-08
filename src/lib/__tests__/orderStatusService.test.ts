@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { updateOrderStatus, syncOrderFromReturn } from '../orderStatusService'
-import { supabase } from '../supabase'
+import { beforeEach,describe, expect, it, vi } from 'vitest'
+
 import * as audit from '../audit'
+import { syncOrderFromReturn,updateOrderStatus } from '../orderStatusService'
+import { supabase } from '../supabase'
 
 vi.mock('../supabase', () => ({
   supabase: {

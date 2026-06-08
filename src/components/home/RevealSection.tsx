@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react'
 import { motion } from 'framer-motion'
+import React from 'react'
 
 const RevealSection: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <motion.div

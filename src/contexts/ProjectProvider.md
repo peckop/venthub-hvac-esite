@@ -3,33 +3,35 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\ProjectProvider.tsx
-skeleton_hash: 58fcf7c654a51a80
+skeleton_hash: 16c82486b7616aed
 entity_hashes:
   func:ProjectProvider: 48fd4159fdf830c0
-  overview: 71feeb2615451519
+  overview: 56739bf2be524198
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-07T13:59:21Z
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
-ProjectProvider, VentHub HVAC projesinde proje verilerinin uygulama genelinde paylaşılmasını sağlayan bir React Context sağlayıcı bileşenidir. Bileşen ağacının üst katmanlarında konumlandırılarak, prop drilling ihtiyacını ortadan kaldırır ve tüm alt bileşenlere tutarlı veri erişimi sunar.
+ProjectProvider, VentHub HVAC projesinde proje verilerinin uygulama genelinde paylaşılmasını sağlayan temel bir React Context sağlayıcı bileşenidir. Bu bileşen, uygulama ağaçının üst katmanlarında yer alarak tüm alt bileşenlere prop drilling (prop iletmek) ihtiyacını ortadan kaldırır ve veriye merkezi bir erişim noktası sunar.
 
 ## Fonksiyon Grupları
 ### Bağlam Sağlayıcı
-Uygulama içindeki proje verilerini ve ilgili işlevsellikleri merkezi bir noktadan yöneterek alt bileşenlere iletir.
+Uygulama genelinde kullanılacak proje verisi ve işlevselliğini tanımlayan bir React bağlamını (context) oluşturarak, tüm alt bileşenlere tutarlı ve erişilebilir bir veri katmanı sağlar.
 - ProjectProvider
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-ProjectProvider modülü, bir React Context sağlayıcısı olarak proje verilerini alt bileşenlere iletmek için tasarlanmıştır. Aşağıdaki mimari varsayımlar, fonksiyon imzası ve modül sabitlerine dayanmaktadır:
+ProjectProvider, React Context kullanarak proje verilerini alt bileşenlere ileten bir sağlayıcı bileşendir. Aşağıdaki varsayımlar fonksiyon imzası ve modül sabitlerine dayanmaktadır.
 
-[Aksiyom 1]: Eğer `children` parametresi geçilmezse veya `undefined`/`null` olursa, provider bileşeni geçerli bir React node render edemez ve bileşen ağacında hata oluşur.
+[Aksiyom 1]: Eğer `children` prop'u sağlanmazsa, sağlayıcı içeriği render etmeyeceği için alt bileşenler Proje bağlamına erişemez ve uygulama alanı boş kalır.
 
-[Aksiyom 2]: Eğer `ProjectContext` modül seviyesinde doğru tanımlanmamış veya dışa aktarılmamışsa, provider'ın sağlayacağı bağlam değeri alt bileşenlere ulaştırılamaz ve `useContext(ProjectContext)` kullanan tüm alt bileşenler `undefined` değer alır.
+[Aksiyom 2]: Eğer `ProjectContext` çağrılmazsa (useContext içinde kullanılmazsa), alt bileşenler sağlanan proje verilerine erişemez.
 
-[Aksiyom 3]: Eğer `children` JSX elementi içermiyorsa (boş fragment veya empty array), provider geçerli birReact ağacı oluşturur ancak hiçbir alt bileşene bağlam sağlamaz.
+[Aksiyom 3]: Eğer ProjectProvider bileşen hiyerarşisinde üst seviyede yer almazsa, alt bileşenlerin `ProjectContext` tüketimi başarısız olur veya varsayılan değer döner.
+
+[Aksiyom 4]: Eğer ProjectProvider aynı anda birden fazla kez iç içe kullanılırsa, içteki sağlayıcı dıştakini geçersiz kılabilir (context override davranışı).
 
 ---
 
@@ -71,79 +73,65 @@ ProjectProvider modülü, bir React Context sağlayıcısı olarak proje veriler
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::ProjectProvider
-- **params**: `{ children }` — React bileşen çocukları
+- **params**: `{ children }` — React children prop
 - **ic_degiskenler**:
-  - `supabase` — Supabase istemcisi, `useSupabaseClient()` hook'undan alınır, tüm API çağrılarında kullanılır
-  - `projects` — `useState<UserProject[]>([])` ile oluşturulan proje listesi state'i
-  - `loading` — `useState(true)` ile oluşturulan yükleme durumu flag'i
-  - `user` — `useAuth()` hook'undan alınan mevcut oturum açmış kullanıcı nesnesi
-  - `refreshProjects` — useCallback ile sarılmış, projeleri API'den çekip state'i güncelleyen fonksiyon
-  - `addProject` — useCallback ile sarılmış, yeni proje oluşturan fonksiyon
-  - `removeProject` — useCallback ile sarılmış, proje silen fonksiyon
-  - `addItem` — useCallback ile sarılmış, projeye ürün ekleyen fonksiyon
-  - `removeItem` — useCallback ile sarılmış, projeden ürün çıkaran fonksiyon
-  - `getProjectItems` — useCallback ile sarılmış, projenin ürünlerini getiren fonksiyon
-  - `value` — `useMemo` ile oluşturulan, context'e verilen değer nesnesi
-- **Dönüş**: `<ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>` JSX
-
----
+  - `supabase` — useSupabaseClient() hook'undan alınan Supabase client instance, veritabanı işlemleri için kullanılır
+  - `projects` — useState ile tanımlı state, kullanıcının projelerini tutan UserProject[] dizisi
+  - `setProjects` — projects state'ini güncellemek için setter fonksiyonu
+  - `loading` — useState ile tanımlı state, projelerin yüklenme durumunu belirten boolean
+  - `setLoading` — loading state'ini güncellemek için setter fonksiyonu
+  - `user` — useAuth() hook'undan alınan mevcut kullanıcının bilgileri
+  - `refreshProjects` — projeleri yenileyen useCallback fonksiyonu
+  - `addProject` — yeni proje ekleyen useCallback fonksiyonu
+  - `removeProject` — proje silen useCallback fonksiyonu
+  - `addItem` — projeye ürün ekleyen useCallback fonksiyonu
+  - `removeItem` - projeden ürün çıkaran useCallback fonksiyonu
+  - `getProjectItems` — projenin ürünlerini getiren useCallback fonksiyonu
+  - `value` — useMemo ile memoize edilmiş context value nesnesi
+- **Dönüş**: `<ProjectContext.Provider value={value}>` JSX elementi
 
 ### [N2_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::refreshProjects
 - **params**: yok
 - **ic_degiskenler**:
-  - `data` — `await listUserProjects(supabase)` çağrısının dönüş değeri, proje listesi
-- **Dönüş**: `void` (async, return değeri yok)
+  - `data` — listUserProjects(supabase) çağrısının sonucu, kullanıcının projeleri
+- **Dönüş**: void (setProjects ile state günceller)
 
----
-
-### [N3_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::useEffect (projeleri yükleme efekti)
-- **params**: yok (anonim arrow function)
+### [N3_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::useEffectCallback
+- **params**: yok
 - **ic_degiskenler**: yok
-- **Dönüş**: yok (side-effect: `refreshProjects()` çağırır veya `projects`/`loading` state'lerini sıfırlar)
-
----
+- **Dönüş**: void (yan etki: refreshProjects çağırır veya state'i sıfırlar)
 
 ### [N4_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::addProject
-- **params**: `name: string`, `description?: string` (opsiyonel)
+- **params**: `(name: string, description?: string)` — proje adı ve opsiyonel açıklama
 - **ic_degiskenler**:
-  - `newProject` — `await createProject(supabase, { name, description, user_id: user.id })` çağrısının dönüşü, newly created proje nesnesi
-- **Dönüş**: `Promise<UserProject | null>` — başarıysa `newProject`, hata/sebep yoksa `null`
-
----
+  - `newProject` — createProject() çağrısının sonucu, newly created project objesi
+- **Dönüş**: UserProject objesi veya null
 
 ### [N5_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::removeProject
-- **params**: `id: string` — silinecek projenin ID'si
+- **params**: `(id: string)` — silinecek projenin ID'si
 - **ic_degiskenler**: yok
-- **Dönüş**: `Promise<void>` (return yok)
-
----
+- **Dönüş**: void (setProjects ile state günceller)
 
 ### [N6_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::addItem
-- **params**: `projectId: string`, `_productId: string`, `quantity: number = 1`
+- **params**: `(projectId: string, _productId: string, quantity: number = 1)` — proje ID, ürün ID, miktar
 - **ic_degiskenler**: yok
-- **Dönüş**: `Promise<void>` (return yok)
-
----
+- **Dönüş**: void
 
 ### [N7_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::removeItem
-- **params**: `projectId: string`, `_productId: string`
+- **params**: `(projectId: string, _productId: string)` — proje ID, ürün ID
 - **ic_degiskenler**: yok
-- **Dönüş**: `Promise<void>` (return yok)
-
----
+- **Dönüş**: void
 
 ### [N8_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::getProjectItems
-- **params**: `projectId: string`
+- **params**: `(projectId: string)` — ürünlerin getirileceği projenin ID'si
 - **ic_degiskenler**:
-  - `items` — `await listProjectItems(supabase, projectId)` çağrısının dönüşü, proje ürünleri listesi
-- **Dönüş**: `Promise<ProjectItem[]>` — başarıysa `items`, hata ise boş dizi `[]`
+  - `items` — listProjectItems(supabase, projectId) çağrısının sonucu, projenin ürünleri
+- **Dönüş**: ProjectItem[] dizisi
 
----
-
-### [N9_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::value (useMemo callback)
-- **params**: yok (anonim arrow function)
-- **ic_degiskenler**: yok (dışarıdaki `projects`, `loading`, `refreshProjects`, `addProject`, `removeProject`, `addItem`, `removeItem`, `getProjectItems` değişkenlerini doğrudan referans olarak döndürür)
-- **Dönüş**: nesne — `{ projects, loading, refreshProjects, addProject, removeProject, addItem, removeItem, getProjectItems }`
+### [N9_NASIL] AST Pointer: src/contexts/ProjectProvider.tsx::useMemoCallback
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: context value nesnesi (`{ projects, loading, refreshProjects, addProject, removeProject, addItem, removeItem, getProjectItems }`)
 
 ---
 

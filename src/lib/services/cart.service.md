@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\cart.service.ts
-skeleton_hash: 8760ab1fcfa2cce2
+skeleton_hash: 017cd5f7c528c1d2
 entity_hashes:
   func:clearCartItems: 972204eb8a36e659
   func:ensureUserProfile: 6312a911845ce8e2
@@ -12,58 +12,42 @@ entity_hashes:
   func:listCartItemsWithProducts: 96bedce021359f51
   func:removeCartItem: eb9a13492089563b
   func:upsertCartItem: 9fca062a94d78c4c
-  overview: 0214ae2fbc0f7766
-generated_at: 2026-06-07T12:07:20Z
+  overview: 72bb9110dad5d4a2
+generated_at: 2026-06-08T10:09:34Z
 ---
 
 ## Genel Bakış
-
-Bu modül, VentHub HVAC platformunda alışveriş sepeti yönetimini merkezi olarak sağlayan servis katmanıdır. Kullanıcı profilini doğrulamaktan sepetin oluşturulmasına, sepet içeriğinin listelenmesinden ürün ekleme/güncelleme ve silme işlemlerine kadar tüm sepet lifecycle'ını Supabase veritabanı üzerinden yönetir. Her kullanıcıya yalnızca tek bir sepet atayarak veri tutarlılığını garanti altına alır.
+Bu modül, VentHub HVAC platformunda alışveriş sepeti yönetimini merkezi olarak sağlayan servis katmanıdır. Kullanıcının sepetteki ürünlerle gerçekleştireceği tüm işlemleri (oluşturma, okuma, güncelleme, silme) Supabase veritabanı üzerindeki tek bir sepet üzerinden yönetir. Modül, kullanıcı başına tek sepet prensibini garanti altına alarak veri tutarlılığını korur.
 
 ## Fonksiyon Grupları
-
 ### Sepet ve Profil Hazırlığı
-
-Sepet işlemlerinin yürütülebilmesi için gerekli ön koşulları sağlar. Kullanıcının veritabanında profil kaydının olup olmadığını doğrular ve kullanıcıya ait sepeti bulur; yoksa yeni bir sepet oluşturarak döndürür.
+Sepet işlemlerine başlamadan önce gerekli altyapıyı kurar. Kullanıcının veritabanında bir profile sahip olduğunu doğrular ve kullanıcıya atanmış bir sepet olmadığını tespit ettiğinde yeni bir sepet oluşturur.
 
 - ensureUserProfile, getOrCreateShoppingCart
 
 ### Sepet İçeriği Sorgulama
-
-Sepetteki ürünlerin okunmasına yönelik fonksiyonları kapsar. Temel sepet öğelerini ham şekilde listelemek veya ürün bilgileriyle zenginleştirilmiş bir görünüm elde etmek için kullanılır.
+Sepetteki ürünlerin okunmasına yönelik fonksiyonları kapsar. Ya sadece sepet kalemlerinin temel bilgilerini ya da bu kalemlerin ait olduğu ürün detaylarıyla zenginleştirilmiş tam bir listeyi getirir.
 
 - listCartItems, listCartItemsWithProducts
 
 ### Sepet İçeriği Değişiklikleri
-
-Sepet içeriğinin yazma odaklı işlemlerini yönetir. Ürün ekleme ve miktar güncelleme, tekil ürün çıkarma veya sepetin tamamen temizlenmesi gibi tüm değiştirme operasyonlarını gerçekleştirir.
+Sepet içeriğinin tüm yazma odaklı işlemlerini yönetir. Ürün ekleme/güncelleme, tek bir ürünü sepetten çıkarma veya sepetin tüm içeriğini tamamen temizleme gibi değişiklikleri gerçekleştirir.
 
 - upsertCartItem, removeCartItem, clearCartItems
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, kullanıcı başına tek bir sepet prensibiyle çalışır ve tüm işlemler Supabase veritabanı üzerindedir.
 
-[Aksiyom 1]: Eğer `ensureUserProfile` fonksiyonu kullanıcı profilini doğrulayamazsa, sepet işlemleri kullanıcıya ait olmayan verilerle çalışabilir.
+Bu modül, Supabase tabanlı bir alışveriş sepeti yönetim servisi olup aşağıdaki mimari varsayımlar üzerine kurulmuştur:
 
-[Aksiyom 2]: Eğer `getOrCreateShoppingCart` fonksiyonu kullanıcının mevcut sepetini bulamazsa, yeni bir sepet oluşturur; aksi takdirde mevcut sepeti döndürür.
+**[Aksiyom 1]:** Eğer `SupabaseClient<Database>` nesnesi sağlanmamışsa veya geçerli bir veritabanı bağlantısı içermiyorsa, tüm fonksiyonlar başarısız olur. (Tüm fonksiyonlar bu parametreyi zorunlu olarak alır)
 
-[Aksiyom 3]: Eğer `listCartItems` veya `listCartItemsWithProducts` fonksiyonları geçerli bir `cartId` almazsa, boş veya hata içeren bir sonuç döndürür.
+**[Aksiyom 2]:** Eğer `userId` parametresi geçerli bir Supabase Auth kullanıcısına ait değilse (örn: silinmiş veya askıya alınmış hesap), `ensureUserProfile` ve `getOrCreateShoppingCart` fonksiyonları beklenmeyen sonuç döndürür.
 
-[Aksiyom 4]: Eğer `upsertCartItem` fonksiyonunda `quantity` 0 veya negatif bir değer olarak verilirse, sepet öğesi silinebilir veya hata oluşabilir.
+**[Aksiyom 3]:** Eğer `cartId` parametresi veritabanında mevcut bir alışveriş sepetine ait değilse, `listCartItems`, `listCartItemsWithProducts`, `upsertCartItem`, `removeCartItem` ve `clearCartItems` fonksiyonları boş veya hatalı sonuç döndürür.
 
-[Aksiyom 5]: Eğer `removeCartItem` fonksiyonu var olmayan bir `productId` ile çağrılırsa, sepet içeriğinde değişiklik yapmaz.
-
-[Aksiyom 6]: Eğer `clearCartItems` fonksiyonu çağrılırsa, belirtilen `cartId`'ye ait tüm sepet öğeleri silinir.
-
-[Aksiyom 7]: Eğer `upsertCartItem` fonksiyonunda `unitPrice` veya `priceListId` parametreleri sağlanmazsa, varsayılan fiyatlandırma mantığı kullanılabilir.
-
-[Aksiyom 8]: Eğer Supabase istemcisi (`supabase`) geçersiz veya oturum açmamışsa, tüm fonksiyonlar hata ile sonuçlanır.
-
-[Aksiyom 9]: Eğer `cartId` parametresi tüm sepet işlemleri için sağlanmazsa, fonksiyonlar çalışamaz.
-
-[Aksiyom 10]: Eğer `userId` parametresi `ensureUserProfile` veya `getOrCreateShoppingCart` için sağlanmazsa, kullanıcıya ait sepet profili oluşturulamaz veya alınamaz.
+**[Aksiyom 4]:** Eğer `upsertCartItem` çağrısında `quantity` parametresi `0` veya negatif bir değer olarak verilirse, modülün davranış炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭炭
 
 ---
 
@@ -145,70 +129,13 @@ Bu modül, kullanıcı başına tek bir sepet prensibiyle çalışır ve tüm i�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/lib/services/cart.service.ts::ensureUserProfile
-- **params**: (supabase: SupabaseClient<Database>, userId: string)
+### [N1_NASIL] AST Pointer: `src/lib/services/cart.service.ts::ensureUserProfile`
+- **params**: `(supabase: SupabaseClient<Database>, userId: string)`
 - **ic_degiskenler**:
-  - `prof` — user_profiles tablosundan select ile dönen profil kaydı (id alanı)
-  - `selErr` — user_profiles select sorgusundaki hata nesnesi
-  - `insErr` — user_profiles insert sorgusundaki hata nesnesi
-- **Dönüş**: `boolean` — profil mevcutsa veya başarıyla oluşturulduysa true, aksi halde false
-
-### [N2_NASIL] AST Pointer: src/lib/services/cart.service.ts::getOrCreateShoppingCart
-- **params**: (supabase: SupabaseClient<Database>, userId: string)
-- **ic_degiskenler**:
-  - `existing` — shopping_carts tablosundan user_id eşleşmesiyle dönen mevcut sepet kayıtları dizisi
-  - `selErr` — existing select sorgusundaki hata nesnesi
-  - `attemptInsert` — inner async fonksiyon; shopping_carts'a insert + single select yapan lambda
-  - `data` — attemptInsert sonucu dönen sepet verisi (initial atama: ilk insert denemesinin sonucu, retry sonucu güncellenebilir)
-  - `error` — attemptInsert sonucu dönen hata nesnesi (retry sonucu güncellenebilir)
-  - `err` — error nesnesinin SupabaseError olarak cast edilmiş hali; code ve message alanlarına erişim için kullanılır
-  - `again` — unique conflict sonrası tekrar select ile dönen mevcut sepet verisi
-  - `sel2` — again select sorgusundaki hata nesnesi
-- **Dönüş**: `Promise<DbShoppingCart>` — mevcut veya yeni oluşturulmuş sepet nesnesi
-
-### [N3_NASIL] AST Pointer: src/lib/services/cart.service.ts::listCartItems
-- **params**: (supabase: SupabaseClient<Database>, cartId: string)
-- **ic_degiskenler**:
-  - `data` — cart_items tablosundan cart_id eşleşmesiyle dönen satır verileri dizisi
-  - `error` — cart_items select sorgusundaki hata nesnesi
-- **Dönüş**: `Promise<DbCartItem[]>` — sepete ait tüm ürün satırları; hata durumunda fırlatılır
-
-### [N4_NASIL] AST Pointer: src/lib/services/cart.service.ts::listCartItemsWithProducts
-- **params**: (supabase: SupabaseClient<Database>, cartId: string)
-- **ic_degiskenler**:
-  - `items` — listCartItems çağrısından dönen DbCartItem dizisi
-  - `_productIds` — items dizisindeki tüm benzersiz product_id değerlerinden oluşan string dizi (Set ile tekrarlar kaldırılmış)
-  - `products` — products tablosundan _productIds ile eşleşen DbProduct kayıtları dizisi
-  - `pErr` — products select sorgusundaki hata nesnesi
-  - `map` — DbProduct'ları Product domain modeline dönüştürüp product.id key'iyle eşleyen Map<string, Product>
-  - `p` — products dizisi üzerindeki for döngüsü elemanı (DbProduct tipinde)
-- **Dönüş**: `Promise<{ item: DbCartItem; product: Product }[]>` — her sepet satırının ilgili ürün bilgisiyle birleştiği dizi; product'u olmayan satırlar filter ile çıkarılır
-
-### [N5_NASIL] AST Pointer: src/lib/services/cart.service.ts::upsertCartItem
-- **params**: (supabase: SupabaseClient<Database>, params: { cartId: string; _productId: string; quantity: number; unitPrice?: number | null; priceListId?: string | null })
-- **ic_degiskenler**:
-  - `cartId` — params objesinden destructure edilmiş sepet ID'si
-  - `_productId` — params objesinden destructure edilmiş ürün ID'si
-  - `quantity` — params objesinden destructure edilmiş miktar
-  - `unitPrice` — params objesinden destructure edilmiş birim fiyat (optional)
-  - `priceListId` — params objesinden destructure edilmiş fiyat listesi ID'si (optional)
-  - `sel` — cart_items tablosunda cart_id + product_id eşleşmesiyle mevcut satır arama sonucu (select id)
-  - `common` — update/insert ortak kullanılacak veri objesi; quantity alanını içerir, opsiyonel olarak unit_price ve price_list_id eklenir
-  - `upd` — mevcut satır bulunduğunda update sorgusunun sonucu (returning *)
-  - `ins` — mevcut satır bulunamadığında insert sorgusunun sonucu (returning *)
-- **Dönüş**: `Promise<DbCartItem[]>` — upsert sonrası carts_items satırı/ları
-
-### [N6_NASIL] AST Pointer: src/lib/services/cart.service.ts::removeCartItem
-- **params**: (supabase: SupabaseClient<Database>, cartId: string, productId: string)
-- **ic_degiskenler**:
-  - `error` — cart_items delete sorgusundaki hata nesnesi
-- **Dönüş**: `Promise<boolean>` — silme başarılıysa true; hata durumunda fırlatılır
-
-### [N7_NASIL] AST Pointer: src/lib/services/cart.service.ts::clearCartItems
-- **params**: (supabase: SupabaseClient<Database>, cartId: string)
-- **ic_degiskenler**:
-  - `error` — cart_items delete sorgusundaki hata nesnesi
-- **Dönüş**: `Promise<boolean>` — temizleme başarılıysa true; hata durumunda fırlatılır
+  - `prof` — `user_profiles` tablosundan `userId` eşleşmesiyle select edilen tek satır profil kaydı; `maybeSingle()` sonucu dönen `data` destructuring'i
+  - `selErr` — profil select sorgusundaki olası hata; `!selErr && prof` kontrolüyle mevcut profil varlığı anlaşılır
+  - `insErr` — profil insert sorgusundaki olası hata; `insErr` varsa `false`, yoksa `true` döner
+- **Dönüş**: `boolean` — profil mevcutsa veya başarıyla oluşturulduysa `true`, hata oluştuysa `false`
 
 ---
 

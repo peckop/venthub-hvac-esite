@@ -1,12 +1,13 @@
+import { SearchX } from 'lucide-react'
 import React from 'react'
-import { adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
-import EditableCell from './EditableCell'
-import InfoTooltip from './InfoTooltip'
+
+import { useDragScroll } from '../../hooks/useDragScroll'
+import { Density, InventoryRow, LoadState, SortKey, VisibleCols } from '../../types/inventory'
+import { adminTableCellClass,adminTableHeadCellClass } from '../../utils/adminUi'
 import AdminEmptyState from './AdminEmptyState'
 import AdminSkeleton from './AdminSkeleton'
-import { SearchX } from 'lucide-react'
-import { InventoryRow, SortKey, LoadState, Density, VisibleCols } from '../../types/inventory'
-import { useDragScroll } from '../../hooks/useDragScroll'
+import EditableCell from './EditableCell'
+import InfoTooltip from './InfoTooltip'
 
 interface InventoryTableProps {
     rows: InventoryRow[]

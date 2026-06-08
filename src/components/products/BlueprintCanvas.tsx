@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useRef } from 'react'
-import { Canvas, useFrame, extend } from '@react-three/fiber'
-import * as THREE from 'three'
 import { Float, shaderMaterial, useTexture } from '@react-three/drei'
+import { Canvas, extend,useFrame } from '@react-three/fiber'
+import React, { useRef } from 'react'
+import * as THREE from 'three'
 
 // Custom Holographic Shader Material
 const HolographicMaterial = shaderMaterial(

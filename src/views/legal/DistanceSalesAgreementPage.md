@@ -8,7 +8,7 @@ entity_hashes:
   func:DistanceSalesAgreementPage: 818f8664074dced3
   overview: 926bc742391d576d
   style_tokens: bd7814a811af4780
-generated_at: 2026-05-28T22:40:07Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış

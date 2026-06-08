@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\HRVModel.tsx
-skeleton_hash: 6df93aa6828ad3af
+skeleton_hash: 738f8ba482d2f3e1
 entity_hashes:
   func:HRVModel: 0b331f626c131748
   overview: 84b86c708078850f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:47Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış

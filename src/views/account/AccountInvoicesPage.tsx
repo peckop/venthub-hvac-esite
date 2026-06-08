@@ -1,13 +1,15 @@
 'use client'
 
-import React, { useEffect, useCallback, useState } from 'react'
+import { Building2, CheckCircle, Edit2, FileText, Landmark, Loader2,Plus, Trash2, User } from 'lucide-react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
+
 import { createInvoiceProfile, deleteInvoiceProfile, listInvoiceProfiles, setDefaultInvoiceProfile, updateInvoiceProfile } from '@/lib/services/invoice.service'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { InvoiceProfile } from '@/types/ui-models'
+
 import { useAuth } from '../../hooks/useAuth'
 import { useI18n } from '../../i18n/I18nProvider'
-import { toast } from 'sonner'
-import { FileText, Plus, Trash2, Edit2, CheckCircle, User, Building2, Landmark, Loader2 } from 'lucide-react'
 
 type InvoiceProfileType = 'individual' | 'corporate'
 

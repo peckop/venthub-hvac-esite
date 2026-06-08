@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach,describe, expect, it, vi } from 'vitest';
 
 // First we need to isolate the module since flags are module level state
 describe('prefetchProductsPage', () => {

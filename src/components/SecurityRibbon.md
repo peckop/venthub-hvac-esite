@@ -3,31 +3,35 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SecurityRibbon.tsx
-skeleton_hash: 280aae49acbb2909
+skeleton_hash: 5b31708d00170873
 entity_hashes:
   func:SecurityRibbon: a7c5f379d943c103
-  overview: 549cf1e90e5e7dc2
+  overview: 08117376b2a86eee
   style_tokens: 3e379506fde07599
-generated_at: 2026-05-28T22:36:58Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC platformunda kullanılmak üzere geliştirilmiş React tabanlı bir kullanıcı arayüzü bileşeni barındırır. Platformun güvenilirliğini ve ödeme güvenliğini vurgulamak için tasarlanan güvenlik şeridi/banner bileşeni, farklı kullanım senaryolarına göre özelleştirilebilir şekilde çalışır.
+SecurityRibbon, Venthub HVAC platformunda kullanıcı güvenini artırmak amacıyla tasarlanmış bir React UI bileşenidir. Ödeme sayfalarında veya güven vurgulanan alanlarda marka ve ödeme sağlayıcısı bilgilerini gösteren özelleştirilebilir bir güvenlik bannerı sunar. Bileşen, farklı görünüm varyantlarıyla farklı tasarım ihtiyaçlarına uyum sağlar.
 
 ## Fonksiyon Grupları
-### Ana Güvenlik Şeridi Bileşeni
-Modülün temel sorumluluğunu üstlenen bu bileşen, marka ismi, ödeme sağlayıcısı ismi ve görünüm varyantı gibi parametreler alarak ihtiyaca uygun güvenlik bannerı oluşturur.
+### Güvenlik Bannerı Bileşeni
+Kullanıcıya marka güveni ve ödeme güvenliği mesajlarını iletmekle sorumlu olan React bileşeni. Marka adı, ödeme sağlayıcısı ve görünüm varyantı gibi parametreler aracılığıyla farklı senaryolara uyarlanabilir.
 - SecurityRibbon
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-React tabanlı SecurityRibbon UI bileşeni, marka ve ödeme sağlayıcısı bilgilerini kullanıcıya göstermek üzere tasarlanmış güvenlik bandı bileşenidir, doğru çalışması için React çalışma zamanının mevcutluğu ve kendisine iletilen prop'ların belirlenen tiplere uygun olması zorunludur.
 
-[Aksiyom 1]: Eğer SecurityRibbon bileşeni bir React çalışma zamanı içinde çalıştırılmazsa, bileşen hiçbir şekilde render edilemez, kullanıcıya hiçbir içerik gösterilemez.
-[Aksiyom 2]: Eğer brandName prop'u geçerli string tipinde bir değer olarak iletilmezse, varsayılan değerin devreye girememesi durumunda bantta boş veya tanımsız marka ismi gösterilir, marka kimliği tutarsızlığı oluşur.
-[Aksiyom 3]: Eğer providerName prop'u geçerli string tipinde bir değer olarak iletilmezse, varsayılan değerin kullanılamaması halinde bantta yanlış veya görünmeyen ödeme sağlayıcısı bilgisi gösterilir, kullanıcının platforma olan güvenini olumsuz etkiler.
-[Aksiyom 4]: Eğer variant prop'u geçerli görünüm tipinde bir string olarak iletilmezse, bant stil bozukluklarıyla veya yanlış düzenle render edilir, bulunduğu sayfanın arayüz bütünlüğünü bozar.
+Bu React UI bileşeni (SecurityRibbon), marka adı ve ödeme sağlayıcısı bilgilerini gösteren bir güvenlik şeridi/banner componentidir.
+
+**[Aksiyom 1]:** Eğer `variant` geçerli bir değer değilse (örneğin fonksiyon imzasında `'banne'` olarak kesilmiş/parsellenmemiş bir değer gönderilmişse), bileşen beklenmeyen görünüm sergileyebilir veya rendering hatası oluşur.
+
+**[Aksiyom 2]:** Eğer `brandName` parametresi sağlanmazsa, bileşen varsayılan olarak `'Venthub HVAC'` değerini kullanır; bu nedenle bileşen her zaman bir marka adı ile çalışır.
+
+**[Aksiyom 3]:** Eğer `providerName` parametresi sağlanmazsa, bileşen varsayılan olarak `'iyzico'` ödeme sağlayıcısını kullanır; bu nedenle bileşen her zaman bir ödeme sağlayıcı bilgisi ile çalışır.
+
+**[Aksiyom 4]:** Fonksiyon imzasındaki `variant` parametresinin varsayılan değeri `'banne'` olarak kesilmiş/parsellenmemiş görünmektedir — bu durum, variant'ın beklenen tam değeri (muhtemelen `'banner'`) yerine geçersiz bir string ile başlatılmasına neden olur.
 
 ---
 
@@ -55,13 +59,16 @@ React tabanlı SecurityRibbon UI bileşeni, marka ve ödeme sağlayıcısı bilg
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\SecurityRibbon.tsx::SecurityRibbon
-- **params**: brandName (varsayılan değer: 'Venthub HVAC'), providerName (varsayılan değer: 'iyzico'), variant (varsayılan değer: 'banner')
+### [N1_NASIL] AST Pointer: SecurityRibbon.tsx::SecurityRibbon
+- **params**:
+  - `brandName` — marka adı, varsayılan `'Venthub HVAC'`
+  - `providerName` — ödeme sağlayıcı adı, varsayılan `'iyzico'`
+  - `variant` — bileşen görünüm varyantı, varsayılan `'banner'`
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, ödeme sayfasındaki güvenlik metinlerini yerelleştirmek için kullanılır
-  - `base` — ana kapsayıcı div'in Tailwind CSS sınıflarını birleştiren string, gelen variant parametresine göre dolgu (padding) değerlerini ayarlar
-  - `badge` — tüm güvenlik rozetlerinin ortak Tailwind CSS sınıflarını tutan string, PCI DSS, 3D Secure, 256-bit SSL rozetleri için ortak stil sağlar
-- **Dönüş**: React JSX elementi, güvenli ödeme bilgisini gösteren UI şeriti döndürür
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; string localization için kullanılır
+  - `base` — bileşenin dış sarmalayıcı div'ine uygulanacak koşullu CSS class string'i; `variant === 'banner'` kontrolüne göre padding (`p-4 md:p-5` veya `p-3`) değişir
+  - `badge` — güvenlik rozetlerine (PCI DSS, 3D Secure, 256‑bit SSL) uygulanacak sabit CSS class string'i
+- **Dönüş**: JSX — `Lock`, `ShieldCheck`, `CreditCard` ikonları ve `t()` ile çevrilmiş brandName/providerName değerlerini gösteren güvenlik bilgi ribonu
 
 ---
 

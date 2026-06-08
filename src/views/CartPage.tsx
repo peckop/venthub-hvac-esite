@@ -1,13 +1,14 @@
 'use client'
 
-import React from 'react'
-import { useCart } from '../hooks/useCartHook'
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
+import { ArrowLeft,Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import React from 'react'
+
 import { BrandIcon } from '../components/HVACIcons'
 import SecurityRibbon from '../components/SecurityRibbon'
-import { useI18n } from '../i18n/I18nProvider'
+import { useCart } from '../hooks/useCartHook'
 import { formatCurrency } from '../i18n/format'
+import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
 const CartPage: React.FC = () => {

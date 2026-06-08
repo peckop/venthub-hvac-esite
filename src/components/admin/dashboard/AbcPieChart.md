@@ -3,25 +3,27 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\AbcPieChart.tsx
-skeleton_hash: d9fe34c63e3b0a63
+skeleton_hash: 611a19bfc52d2b80
 entity_hashes:
   func:AbcPieChart: 7bea9a0163aecd5b
-  overview: fae5c7b54ba69454
+  overview: 9b9476fab7bc8e23
   style_tokens: cc7ba7a958715321
-generated_at: 2026-05-28T22:35:56Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki gösterge tablosunda ABC tipi verileri dairesel grafik (pie chart) olarak görselleştiren bir React bileşeni sunar. Veri ve opsiyonel başlık bilgisini alarak grafik oluşturur ve kullanıcı arayüzünde başlıkla birlikte sunar.
+AbcPieChart modülü, yönetim panelindeki gösterge tablosunda ABC ürün sınıflandırması verilerini dairesel grafik (pie chart) olarak görselleştiren bir React bileşeni sunar. Veri dizisini ve isteğe bağlı bir başlık alarak interaktif bir grafik oluşturur; veri yoksa veya tüm değerler sıfırsa boş bir durum ekranı gösterir.
 
 ## Fonksiyon Grupları
-### Pasta Grafiği Görselleştirme
-Bileşenin temel sorumluluğunu oluşturur: gelen veriyi ve başlığı işleyerek interaktif bir pasta grafiği bileşeni oluşturma ve ekranda gösterme.
+### Pasta Grafiği Oluşturma ve Gösterim
+Bu grup, bileşenin temel sorumluluğunu karşılar: ham veriyi kontrol edip işleyerek, interaktif bir pasta grafiği bileşeni oluşturur ve başlıkla birlikte kullanıcı arayüzünde sunar.
 - AbcPieChart
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, ABC sınıflandırmalı pasta grafiği görselleştiren bir React bileşenidir.
 
 ---
 
@@ -50,11 +52,19 @@ Bileşenin temel sorumluluğunu oluşturur: gelen veriyi ve başlığı işleyer
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: AbcPieChart.tsx::AbcPieChart
-- **params**: ({ data, title }: AbcPieChartProps)
-- **ic_degiskenler**: 
-    - `totalValue` — data dizisindeki tüm elemanların value değerlerinin toplamı (stok adetlerinin toplamı)
-- **Dönüş**: JSX.Element (React bileşeni)
+### [N1_NASIL] AST Pointer: `src/components/admin/dashboard/AbcPieChart.tsx`::AbcPieChart
+- **params**: `{ data, title }: AbcPieChartProps`
+  - `data` — ABC sınıflandırma verisi dizisi; her eleman `value` (stok adedi) ve `color` (hücre rengi) özelliklerine sahiptir; boşsa veya tüm değerleri 0 ise boş durum bileşeni gösterilir
+  - `title` — grafik başlık metni; sağlanmazsa `"ABC Ürün Sınıflandırması"` varsayılanı kullanılır
+- **ic_degiskenler**:
+  - `totalValue` — `data.reduce((acc,_curr)=>acc+curr.value,0)` ile hesaplanan toplam stok adedi; merkezde büyük rakam olarak gösterilir
+- **Callback parametreleri** (map/formatter içinde):
+  - `entry` — `data.map` callback'indeki mevcut eleman; `entry.color` ile hücre rengi alınır
+  - `index` — `data.map` callback'indeki indeks; `key={`cell-${index}`}` oluşturulurken kullanılır
+  - `value` (Tooltip formatter) — Tooltip'te gösterilen sayısal değer; `"${value} Ürün"` formatına dönüştürülür
+  - `name` (Tooltip formatter) — Tooltip'te gösterilen sınıf adı; `"${name} Sınıfı"` formatına dönüştürülür
+  - `value` (Legend formatter) — Legend satırındaki etiket metni; `value` string olarak büyük harfli span içinde render edilir
+- **Dönüş**: JSX (React elementi) — `data` boş/tümü sıfır ise `AdminEmptyState` içeren empty-state JSX; aksi halde `ResponsiveContainer > PieChart` ile merkezde toplam gösteren pie chart JSX
 
 ---
 

@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
-import { supabaseStaticClient as supabase } from '@/lib/supabase/static';
 import { cache } from 'react';
+
+import { supabaseStaticClient as supabase } from '@/lib/supabase/static';
 
 export interface TenantConfig {
   id: string;

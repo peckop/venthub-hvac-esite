@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\auth\signout\route.ts
-skeleton_hash: b9c1accaa1c17d8a
+skeleton_hash: 2beec7f26f4fd0e8
 entity_hashes:
   func:POST: c85301a22b3fe20e
   overview: fa888e32d3000f25
-generated_at: 2026-06-07T13:56:49Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış

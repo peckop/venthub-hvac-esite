@@ -8,7 +8,7 @@ entity_hashes:
   func:BulkActionToolbar: ba39222c0aa88e73
   overview: e440025fef007b62
   style_tokens: 812207303bb8adc3
-generated_at: 2026-05-28T22:35:21Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış

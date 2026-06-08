@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import CategoryMasterView from './CategoryMasterView';
+
 import type { DomainCategory, DomainProduct } from '../lib/type-converters';
+import CategoryMasterView from './CategoryMasterView';
 
 export interface CategoryPageProps {
   initialCategory?: DomainCategory | null;

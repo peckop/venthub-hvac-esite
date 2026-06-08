@@ -8,7 +8,7 @@ entity_hashes:
   func:SnailFanModel: 43312a20c26f093f
   overview: 6e44ab631bd58611
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:50Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış

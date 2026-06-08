@@ -1,12 +1,13 @@
 'use client'
 
-import React from 'react'
 import { MapPin } from 'lucide-react'
 import Link from 'next/link'
+import React from 'react'
+
 import type { UserAddress } from '@/types/ui-models'
-import { Routes } from '../../utils/routes'
 
 import { CheckoutAddressInfo, CheckoutInvoiceInfo, CheckoutLegalConsents } from '../../types/db-rows'
+import { Routes } from '../../utils/routes'
 
 interface StepAddressInfoProps {
     shippingAddress: CheckoutAddressInfo

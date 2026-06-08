@@ -8,7 +8,7 @@ entity_hashes:
   func:BuildTag: 33fa67732a403b49
   overview: 5afd4a9c8d0105c9
   style_tokens: 9c295aa26dd24226
-generated_at: 2026-05-28T22:35:42Z
+generated_at: 2026-06-08T10:08:12Z
 ---
 
 ## Genel Bakış

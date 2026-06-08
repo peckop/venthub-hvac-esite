@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\layout.tsx
-skeleton_hash: 958c3e3da44dac0f
+skeleton_hash: a70d63de0e254a7a
 entity_hashes:
   func:LangLayout: 894f6821eb40308a
   func:generateStaticParams: 8c98a454509d7f36
   overview: 8fb6408ed372ba76
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:34:58Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış
@@ -58,15 +58,6 @@ type Props = {
 - **params**: (parametre yok)
 - **ic_degiskenler**: (yok — fonksiyon gövdesinde değişken tanımlanmamış)
 - **Dönüş**: `{ lang: string }[]` — statik olarak tanımlanmış iki nesne içeren dizi: `{ lang: 'tr' }` ve `{ lang: 'en' }`
-
----
-
-### [N2_NASIL] AST Pointer: src/app/[lang]/layout.tsx::LangLayout
-- **params**: `{ children: React.ReactNode, params: Promise<{ lang: string }> }`
-- **ic_degiskenler**:
-  - `lang` — `await params` sonucu destructured ile elde edilen dil kodu; `'tr'` veya `'en'` değerini alır
-  - `dictionary` — `lang === 'en'` koşuluna göre `en` veya `tr` sözlük nesnesini seçer; `AppDictionary` tipindedir
-- **Dönüş**: JSX — `<I18nProvider>` bileşeninin içine `lang` ve `dictionary` prop olarak geçirilip `children` sarılır
 
 ---
 

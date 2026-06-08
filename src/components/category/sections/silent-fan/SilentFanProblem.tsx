@@ -1,6 +1,7 @@
-import VentImage from '@/components/ui/VentImage'
+import { Activity, Info,VolumeX, Zap } from 'lucide-react'
 import React from 'react'
-import { VolumeX, Zap, Activity, Info } from 'lucide-react'
+
+import VentImage from '@/components/ui/VentImage'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
@@ -70,7 +71,7 @@ const SilentFanProblem: React.FC = () => {
                 <div className={`relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '400ms' }}>
                     <div className="aspect-video md:aspect-21/9 relative">
                         <VentImage src="/images/vortice/vortice_lineo_loft.png"
-                            alt="Silent Comfort"
+                            alt={t('category.modernLoftAlt')}
                             className="absolute inset-0 w-full h-full object-cover"
                          />
                         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />

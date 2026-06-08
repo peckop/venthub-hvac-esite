@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminCouponsPage.tsx
-skeleton_hash: 4f965a8f4cefef65
+skeleton_hash: 25acdde5872f6f76
 entity_hashes:
   func:AdminCouponsPage: f0fec4b54553c13d
   func:dbToUi: c92f28b112f4d513
@@ -13,7 +13,7 @@ entity_hashes:
   func:toggleActive: bde4db4c0f16dfdc
   overview: f357386a52d01dc0
   style_tokens: 4a0b7c9fcb1d8a38
-generated_at: 2026-06-06T21:57:15Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
@@ -153,79 +153,6 @@ type DbCouponRow = {
 
 ---
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::dbToUi
-- **params**: `(row: DbCouponRow)` — veritabanından gelen kupon satırı
-- **ic_degiskenler**:
-  (yok — doğrudan `row` propiedadlerinden oluşur)
-- **Dönüş**: `CouponRow` nesnesi — `row.discount_type === 'percentage'` ise `'percent'`, aksi halde `'fixed'`; `row.discount_value` `Number()` ile sayısallaştırılır; `row.valid_from`, `row.valid_until`, `row.is_active`, `row.usage_limit`, `row.used_count` alanları null-safe olarak eşlenir
-
----
-
-### [N3_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::filtered
-- **params**: `(parametre yok)`
-- **ic_degiskenler**:
-  - `s` — `q` değerinin küçük harfe çevrilmiş hali; filtreleme için arama metni olarak kullanılır
-- **Dönüş**: Filtrelenmiş `CouponRow[]` dizisi — `q.trim()` boşsa tüm `rows` döner; değilse `r.code` veya `r.type` içinde `s` içeren satırlar filtrelenir
-- **Not**: `q` ve `rows` dış scope'tan (React state) erişilir
-
----
-
-### [N4_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::saveCoupon
-- **params**: `(parametre yok)`
-- **ic_degiskenler**:
-  - `codeTrim` — `form.code` değerinin boşlukları trim edilmiş hali; kupon kodunun doğrulanması ve payload'da kullanılması için
-  - `issues` — `string[]` validasyon hatalarının toplandığı dizi; `toast.error` ile kullanıcıya gösterilir
-  - `val` — `form.value` sayısallaştırılmış hali; kupon indirim değeri
-  - `payload` — Supabase edge function'a gönderilen veri nesnesi; `code`, `discount_type`, `discount_value`, `valid_from`, `valid_until`, `is_active`, `usage_limit`, `used_count` alanlarını içerir
-  - `response` — `supabase.functions.invoke('admin-create-coupon', { body: {...} })` çağrısının sonucu; `{ data, error }` olarak destructure edilir
-  - `data` — `response.data`; `DbCouponRow | null` tipinde; başarıyla oluşturulursa kupon verisi
-  - `error` — `response.error`; `unknown | null` tipinde; oluştuysa fırlatılır
-  - `ui` — `dbToUi(data as DbCouponRow)` çağrısının sonucu; UI formatına dönüştürülmüş kupon
-- **Dönüş**: `void` — `setRows` ile state güncellenir, `toast.success` ile bildirim gönderilir, `form` sıfırlanır
-- **Not**: `form`, `setForm`, `setRows`, `setSaving` dış scope'tan erişilir; `isAllowedCouponType` ile `form.type` doğrulanır
-
----
-
-### [N5_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::toggleActive
-- **params**: `(id: string, active: boolean)` — `id` toggellenecek kuponun ID'si; `active` mevcut aktif durumu
-- **ic_degiskenler**:
-  - `data` — `supabase.from('coupons').update(...).select(...).single()` çağrısının `{ data, error }` destructuring'inden gelen `data`; `{ id: string; is_active: boolean }` tipinde; güncellenen kuponun yeni durumu
-  - `error` — aynı destructuring'den gelen `error`; oluştuysa fırlatılır
-- **Dönüş**: `void` — `setRows` ile ilgili satırın `active` alanı `data.is_active` değerine göre güncellenir; `toast.success` ile bildirim gönderilir
-- **Not**: `setRows` dış scope'tan erişilir
-
----
-
-### [N6_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::useEffect (fetch coupons)
-- **params**: `(parametre yok)` — anonim async callback
-- **ic_degiskenler**:
-  - `data` — `supabase.from('coupons').select(...)` çağrısının sonucu; `DbCouponRow[]` veya `null`; kupon listesi
-  - `error` — `supabase` çağrısının hata sonucu; oluştuysa `throw` edilir
-  - `mapped` — `(data || []).map(d => dbToUi(d as DbCouponRow))` ile oluşturulan `CouponRow[]` dizisi; UI formatına dönüştürülmüş kuponlar
-- **Dönüş**: `void` — `setLoading(true)` ile loading başlatılır; `ensureSessionFresh()` ile oturum kontrolü yapılır; `setRows(mapped)` ile state güncellenir; `setLoading(false)` ile loading bitirilir
-- **Not**: `setLoading`, `setRows` dış scope'tan erişilir; `ensureSessionFresh`, `supabase`, `dbToUi` import edilen fonksiyonlardır
-
----
-
-### [N7_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::setForm (usage_limit handler)
-- **params**: `(f)` — mevcut form state'i (React state updater callback)
-- **ic_degiskenler**:
-  - `raw` — `e.target.value`'nin `Number()` ile sayısallaştırılmış hali; boşsa `null`
-  - `normalized` — `raw` > 0 ise `raw`, aksi halde `null`; geçersiz sıfır/negatif değerleri normalize eder
-- **Dönüş**: Yeni form nesnesi — `...f` ile mevcut form korunur, `usage_limit` alanına `normalized` değeri atanır
-- **Not**: `e` (React.ChangeEvent) dışarıdan gelir; `form` state'i React state updater pattern'inde kullanılır
-
----
-
-### [N8_NASIL] AST Pointer: src/views/admin/AdminCouponsPage.tsx::row map callback (render)
-- **params**: `(r, idx)` — `r`: `CouponRow` satır verisi; `idx`: dizideki indeks (animasyon gecikmesi için)
-- **ic_degiskenler**:
-  (yok — doğrudan `r` propiedadlerinden JSX içinde erişilir)
-- **Dönüş**: JSX `<tr>` elementi — `r.code`, `r.type`, `r.value`, `r.active`, `r.starts_at`, `r.ends_at`, `r.used_count`, `r.usage_limit`, `r.created_at` alanları tablo hücrelerinde gösterilir; `hasWriteAccess` && `toggleActive(r.id, r.active)` ile aktif/pasif toggle butonu bağlanır; `idx * 50` ms animasyon gecikmesi uygulanır
-- **Not**: `hasWriteAccess`, `toggleActive`, `formatCurrency`, `formatDateTime`, `lang`, `adminTableCellClass` dış scope'tan erişilir
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -236,10 +163,10 @@ graph TD
     AdminCouponsPage_tsx__isAllowedCouponType["isAllowedCouponType"]
     AdminCouponsPage_tsx__saveCoupon["saveCoupon"]
     AdminCouponsPage_tsx__toggleActive["toggleActive"]
-    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__filtered
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__dbToUi
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__isAllowedCouponType
     AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__toggleActive
-    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__dbToUi
+    AdminCouponsPage_tsx__AdminCouponsPage --> AdminCouponsPage_tsx__filtered
 ```
 
 ## NODE ID STANDARD

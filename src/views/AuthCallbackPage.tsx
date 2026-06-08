@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import { AlertCircle,CheckCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import { CheckCircle, AlertCircle } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
 import { Routes } from '../utils/routes'
 
 const AuthCallbackPage: React.FC = () => {

@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react'
+import { useCallback,useRef } from 'react'
 
 /**
  * Provides a callback ref that enables horizontal drag-to-scroll functionality on a container element.

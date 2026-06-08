@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\products\ProductCsvImport.tsx
-skeleton_hash: cf87ca292a02701c
+skeleton_hash: 1330c8b076710dd1
 entity_hashes:
   func:ProductCsvImport: 1375065d67decd2a
   overview: 19951cbd59cf400f
   style_tokens: d505eb2f0859ff7f
-generated_at: 2026-06-06T21:54:44Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış

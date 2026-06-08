@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminLayout.tsx
-skeleton_hash: f9a4b14f366ee150
+skeleton_hash: 22caa40e7a23907b
 entity_hashes:
   func:AdminLayout: f3d3a8a9833ef080
-  overview: d411381d25a05687
+  overview: 877e95444b1fd98a
   style_tokens: dab87eff3332d515
-generated_at: 2026-06-02T09:12:51Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin yönetici (admin) arayüzünün temel düzen yapısını oluşturan bir React bileşeni barındırıyor. Tüm admin sayfalarında ortak olarak kullanılan ana düzeni sağlayarak, her sayfaya ait içerikleri bu ortak düzenin içerisinde sunuyor.
+Bu modül, VentHub HVAC projesinin yönetici (admin) arayüzünün temel düzen yapısını tanımlayan bir React bileşeni içerir. AdminLayout bileşeni, tüm admin sayfalarında ortak olarak kullanılan düzeni sağlayarak, her sayfaya ait içerikleri bu düzenin içerisinde sunar. Böylece, yönetici panelinde tutarlı ve merkezi bir görünüm elde edilir.
 
 ## Fonksiyon Grupları
 ### Ana Admin Düzen Bileşeni
@@ -22,11 +22,12 @@ Yönetici paneli tüm sayfaları için ortak ana düzen yapısını oluşturan t
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı yönetim paneli layout bileşeni, sadece yetkilendirilmiş admin kullanıcılarının eriştiği uygulama içi yönetim rotalarında içerikleri sarmalamak üzere tasarlanmıştır, çalışması için tek aldığı parametre olan children prop'unun geçerli bir React tarafından render edilebilir öğe olması zorunludur.
 
-[Aksiyom 1]: Eğer AdminLayout bileşenine geçerli, React tarafından render edilebilir bir children prop'u iletilmezse, yönetim paneli içerikleri kullanıcıya gösterilemez, boş bir yönetim paneli arayüzü ortaya çıkar.
-[Aksiyom 2]: Eğer bu bileşen sadece yetkilendirilmiş admin yetkisine sahip kullanıcıların erişebildiği rotalarda kullanılmazsa, yetkisiz kullanıcıların yönetim paneli arayüzüne erişme riski oluşur.
-[Aksiyom 3]: Eğer uygulama rota yönetimi tarafından bu layout kapsamındaki tüm yönetim rotalarına erişim öncesi admin yetki kontrolü gerçekleştirilmezse, modülün erişimi kısıtlamak amacıyla kullanılma gerekliliği tam olarak karşılanamaz.
+Bu modül, VentHub HVAC yönetici panelinin ortak düzen (layout) yapısını sağlayan React bileşenidir.
+
+[Aksiyom 1]: Eğer `children` prop'u sağlanmazsa veya `null`/`undefined` değer alırsa, düzen bileşeni içeriği boş olarak render edilir.
+
+[Aksiyom 2]: Eğer `AdminLayout` bileşeni, admin paneli dışı bir sayfada kullanılmak üzere çağrılırsa, bileşen kendi başına yetkilendirme kontrolü yapmadığından erişim kısıtlaması uygulanmaz.
 
 ---
 
@@ -44,55 +45,22 @@ Bu React tabanlı yönetim paneli layout bileşeni, sadece yetkilendirilmiş adm
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminLayout.tsx::AdminLayout
-- **params**: [`children` — Sayfa içeriğini içeren opsiyonel React düğümü]
+- **params**: `children` — React child component'ler, layout içinde render edilen sayfa içeriği
 - **ic_degiskenler**:
-  - `sidebarOpen` — Kenar çubuğunun açık/kapalı durumunu tuten durum değişkeni
-  - `setSidebarOpen` — Kenar çubuğu durumunu güncellemek için kullanılan state setter fonksiyonu
-  - `pathname` — usePathname hook'undan alınan mevcut uygulama yolu
-  - `user` — useAuth hook'undan alınan oturum açmış kullanıcı nesnesi
-  - `authLoading` — useAuth hook'undan alınan kimlik doğrulama yükleme durumu bayrağı
-  - `role` — useRole hook'undan alınan kullanıcının sistem rolü
-  - `canAccess` — useRole hook'undan alınan rotalara erişim iznini kontrol eden fonksiyon
-  - `roleLoading` — useRole hook'undan alınan rol yükleme durumu bayrağı
-  - `router` — useRouter hook'undan alınan Next.js yönlendirme nesnesi
-  - `t` — useI18n hook'undan alınan çok dilli çeviri fonksiyonu
-  - `loading` — Kimlik doğrulama ve rol yükleme durumlarının toplam yükleme bayrağı
-  - `isEmailAdmin` — Kullanıcının e-posta adresiyle yönetici olup olmadığını kontrol eden sonuç değeri
-  - `navGroups` — Yönetici paneli navigasyon menüsü gruplarını ve öğelerini içeren dizi
-- **Dönüş**: Tam yönetici paneli düzenini içeren React JSX elementi
-
-### [N2_NASIL] AST Pointer: src/views/admin/AdminLayout.tsx::useEffect_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `loading` - Üst kapsamdaki toplam yükleme bayrağı
-  - `user` - Üst kapsamdaki oturum açmış kullanıcı nesnesi
-  - `router` - Üst kapsamdaki Next.js yönlendirme nesnesi
-  - `isEmailAdmin` - Üst kapsamdaki e-posta ile yönetici olma durumu
-  - `canAccess` - Üst kapsamdaki erişim kontrolü fonksiyonu
-  - `pathname` - Üst kapsamdaki mevcut uygulama yolu
-  - `role` - Üst kapsamdaki kullanıcı rolü
-  - `hasAccess` - Mevcut rotaya erişim iznini tutan geçici kontrol değişkeni
-- **Dönüş**: void (erişim kontrollerini çalıştırır, gerektiğinde yönlendirme yapar, erken dönüşlerle akışı sonlandırır)
-
-### [N3_NASIL] AST Pointer: src/views/admin/AdminLayout.tsx::navGroups_map_callback
-- **params**: [`group` — Navigasyon grubu nesnesi, `gi` — Navigasyon grubu dizin indeksi]
-- **ic_degiskenler**:
-  - `group.label` — Navigasyon grubunun başlık metni
-  - `group.items` — Grup içindeki navigasyon öğelerini içeren dizi
-  - `pathname` - Üst kapsamdaki mevcut uygulama yolu
-  - `setSidebarOpen` - Üst kapsamdaki kenar çubuğu durumunu güncelleyen fonksiyon
-- **Dönüş**: Tek bir navigasyon grubunu içeren React JSX elementi
-
-### [N4_NASIL] AST Pointer: src/views/admin/AdminLayout.tsx::groupItems_map_callback
-- **params**: [`item` — Tekil navigasyon öğesi nesnesi]
-- **ic_degiskenler**:
-  - `item.href` - Navigasyon öğesinin yönlendireceği rota
-  - `item.label` - Navigasyon öğesinin görünen başlık metni
-  - `item.icon` - Navigasyon öğesinde gösterilecek ikon bileşeni
-  - `pathname` - Üst kapsamdaki mevcut uygulama yolu
-  - `window.innerWidth` - Tarayıcı penceresinin genişliği (mobil kontrolü için kullanılır)
-  - `setSidebarOpen` - Üst kapsamdaki kenar çubuğu durumunu güncelleyen fonksiyon
-- **Dönüş**: Tekil navigasyon linkini içeren Next.js Link React JSX elementi
+  - `sidebarOpen` — boolean state, sidebar'ın açık/kapalı durumunu tutar
+  - `setSidebarOpen` — sidebarOpen state'ini güncelleyen setter fonksiyonu
+  - `pathname` — usePathname() hook'undan gelen mevcut URL yolu, aktif menü vurgulaması ve erişim kontrolünde kullanılır
+  - `user` — useAuth() hook'undan gelen kimlik doğrulanmış kullanıcı nesnesi, email fallback ve avatar initial için kullanılır
+  - `authLoading` — useAuth() hook'undan gelen yükleme durumu, useLoading'den yeniden adlandırılmış
+  - `role` — useRole() hook'undan gelen kullanıcının rol bilgisi, erişim kontrolünde kullanılır
+  - `canAccess` — useRole() hook'undan gelen fonksiyon, verilen path için rol tabanlı erişim kontrolü yapar
+  - `roleLoading` — useRole() hook'undan gelen yükleme durumu
+  - `router` — useRouter() hook'undan gelen Next.js router, yönlendirme işlemleri için
+  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu, menü etiketlerinin uluslararasılaştırılması için
+  - `loading` — authLoading veya roleLoading true ise true olan birleşik yükleme durumu
+  - `isEmailAdmin` — isAdminByEmail(user.email) çağrısının boolean sonucu, email tabanlı admin bypass kontrolü
+  - `navGroups` — menü yapısını tanımlayan array, her biri label ve items içeren grup nesneleri
+- **Dönüş**: React JSX (admin layout UI — header, sidebar, ana içerik area'sı, CommandPalette)
 
 ---
 

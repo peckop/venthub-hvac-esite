@@ -3,43 +3,45 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx
-skeleton_hash: b542cdd2cde6050b
+skeleton_hash: 082d9c9b95cc1a84
 entity_hashes:
   func:InventoryTable: 056840a2667ef544
-  overview: 998a56ed5857e9c5
+  overview: 163a93a3c7286734
   style_tokens: 4bf1cdbb52b9f224
-generated_at: 2026-05-28T22:35:36Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış
-`InventoryTable` bileşeni, yönetim panelinde envanter verilerini tablo biçiminde gösteren bir React komponentidir. Gelen veri (satırlar, yükleme durumu, hata bilgisi vb.) ve kullanıcı etkileşimleri (seçim, görünür sütunlar) üzerinden tabloyu oluşturur, durumları yönetir ve UI güncellemelerini gerçekleştirir.
+InventoryTable, yönetim panelinde envanter verilerini tablo formatında gösteren bir React bileşenidir. Gelen satır verileri, yükleme ve hata durumları ile seçili satır ve görünür sütun bilgilerini işleyerek kullanıcıya etkileşimli bir tablo sunar.
 
 ## Fonksiyon Grupları
-### UI Render ve Layout
-Tablonun başlık, satır ve hücre yapılarını oluşturur; Material‑UI ya da benzeri bir tablo kütüphanesi kullanarak görsel düzeni üretir.  
+### UI Render ve Tablo Oluşturma
+Bileşen, gelen verilere göre tablo başlıklarını, satırlarını ve hücre yapısını oluşturarak görsel düzeni üretir.
 - InventoryTable
 
-### Veri ve Durum Yönetimi
-Gelen `rows`, `loading`, `error` gibi prop’ları değerlendirir, boş veri, yükleme spinner’ı veya hata mesajı gibi durumları koşullu olarak render eder.  
-- InventoryTable (durum kontrolü içinde)
+### Durum Yönetimi ve Koşullu Renderlama
+Yükleme, hata ve boş veri durumlarını kontrol ederek uygun gösterge veya mesajları tablo ile birlikte veya yerine render eder.
+- InventoryTable (iç mantıkta)
 
-### Kullanıcı Etkileşimi ve Seçim
-`selected` ve `visibleCols` prop’larını kullanarak satır seçimini, çoklu seçim davranışını ve hangi sütunların gösterileceğini yönetir; ilgili callback’leri tetikleyerek dış bileşenle iletişimi sağlar.  
-- InventoryTable (seçim ve görünürlük mantığı içinde)
+### Etkileşim ve Seçim Yönetimi
+Kullanıcının satır seçimini ve sütun görünürlüğünü yönetir; ilgili callback fonksiyonlarını kullanarak üst bileşenlerle durum paylaşımını sağlar.
+- InventoryTable (prop kullanımında)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Aksiyom 1**: Eğer `rows` sağlanmazsa, tablo veri kaynağı olmadan render edilir ve boş bir tablo gösterilir.  
-**Aksiyom 2**: Eğer `loading` değeri `true` değilse, yükleme göstergesi (spinner) gösterilmez ve tablo içeriği doğrudan render edilir.  
-**Aksiyom 3**: Eğer `error` değeri `null`/`undefined` değilse, hata mesajı gösterilir ve tablo verileri gösterilmez.  
-**Aksiyom 4**: Eğer `selected` sağlanmazsa, hiçbir satırın seçili olduğu varsayılmaz; seçili satır listesi boş kabul edilir.  
-**Aksiyom 5**: Eğer `visibleCols` sağlanmazsa, tüm tanımlı sütunlar varsayılan olarak görünür kabul edilir.  
-**Aksiyom 6**: Eğer `den` (yani `InventoryTableProps`) eksik ya da tip olarak uyumsuzsa, bileşen çalışmaz ve bir tip hatası (runtime exception) fırlatılır.  
+Bu modül için fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzası temelinde sınırlı aksiyomlar üretilebilir.
 
-*Domain‑specific not:* Bu aksiyomlar, fonksiyon imzasındaki parametrelerin varlığı ve tip uyumluluğu üzerine kuruludur; değerlerin kesin tipleri ve sınırları (ör. `rows` uzunluğu, `visibleCols` maksimum sayısı) belgelenmemiştir, bu yüzden “bilinmiyor” olarak bırakılmıştır.
+**[Aksiyom 1]:** Eğer `rows` prop'u undefined veya null olarak sağlanırsa, tablonun veri satırları gösterilemeyeceği veya boş duruma geçeceği varsayılır.
+
+**[Aksiyom 2]:** Eğer `loading` prop'u true olarak sağlanırsa, tablonun veri yüklenme sürecinde olduğunu ve muhtemelen bir yüklenme göstergesi sunacağı varsayılır.
+
+**[Aksiyom 3]:** Eğer `error` prop'u truthy bir değer olarak sağlanırsa, tablonun hata durumunu gösterdiği ve veri göstermeyi askıya alabileceği varsayılır.
+
+**[Aksiyom 4]:** Eğer `visibleCols` prop'u boş bir dizi olarak sağlanırsa, tabloda hiçbir sütunun görüntülenmeyeceği varsayılır.
+
+**[Aksiyom 5]:** `den` prop'unun rolü ve türü fonksiyon imzasından net olarak anlaşılamamaktadır — davranışı belirsizdir.
 
 ---
 
@@ -105,34 +107,36 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx::InventoryTable
+### [N1_NASIL] AST Pointer: InventoryTable.tsx::InventoryTable
 - **params**: (rows, loading, error, selected, visibleCols, density, sortKey, sortDir, groupByCategory, groupedRows, onSort, onSelect, onUpdateLocation, onUpdateSupplier, hasWriteAccess, thresholdMap, defaultThreshold, effectiveThreshold)
 - **ic_degiskenler**:
-  - `dragScrollRef` — `useDragScroll` hookundan gelen ref, tablo kaydırma davranışını yönetir.
-  - `headPad` — `density` değerine göre başlık hücreleri için uygulanacak padding sınıfı (`'px-2 py-2'` veya `''`).
-  - `cellPad` — `density` değerine göre veri hücreleri için uygulanacak padding sınıfı (`'px-2 py-2'` veya `''`).
-  - `sortIndicator` — `(key: SortKey) => string` tipinde iç fonksiyon; verilen sütun anahtarının sıralama yönünü gösteren ok işareti döndürür.
-  - `statusBadge` — `(r: InventoryRow) => JSX.Element` tipinde iç fonksiyon; stok durumuna göre renkli bir badge JSX’i üretir.
-  - `TableRow` — `({ r }: { r: InventoryRow }) => JSX.Element` tipinde iç bileşen; tek bir envanter satırını render eder.
-- **Dönüş**: JSX.Element (React bileşeni)
+  - `dragScrollRef` — useDragScroll hook'unun oluşturduğu DOM referansı, sürükleme ile yatay kaydırma için kullanılır
+  - `headPad` — density 'compact' ise 'px-2 py-2', değilse boş string; tablo başlık hücreleri için padding belirler
+  - `cellPad` — density 'compact' ise 'px-2 py-2', değilse boş string; tablo veri hücreleri için padding belirler
+  - `sortIndicator` — SortKey parametresi alan iç fonksiyon, sıralama yönüne göre ok karakteri (▲/▼) döndürür
+  - `statusBadge` — InventoryRow parametresi alan iç fonksiyon, stok durumuna göre JSX badge döndürür
+  - `TableRow` — InventoryRow parametresi alan React bileşeni, tek bir tablo satırını render eder
+- **Dönüş**: JSX (div > table yapısı, dragScrollRef ile sarmalanmış)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx::sortIndicator
-- **params**: (key)
-- **ic_degiskenler**: *yok*
-- **Dönüş**: string (sıralama yönünü gösteren `'▲'` veya `'▼'` karakteri, eşleşmezse boş string)
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx::statusBadge
-- **params**: (r)
+### [N2_NASIL] AST Pointer: InventoryTable.tsx::sortIndicator
+- **params**: (key: SortKey)
 - **ic_degiskenler**:
-  - `net` — `r.available_stock`; mevcut kullanılabilir stok miktarı.
-  - `th` — `effectiveThreshold(r.product_id)`; ürün için hesaplanan eşik değeri (varsa).
-  - `base` — Badge için ortak CSS sınıflarını içeren temel stil stringi.
-- **Dönüş**: JSX.Element (stok durumuna göre renkli bir `<span>` badge)
+  - (yok — parametre ve closure değişkenleri kullanır)
+- **Dönüş**: string (empty, '▲', veya '▼')
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx::TableRow
-- **params**: ({ r })
-- **ic_degiskenler**: *yok* (tüm kullanılan değerler dışarıdan gelen `r` ve üst bileşenin props/const’larından elde edilir)
-- **Dönüş**: JSX.Element (bir `<tr>` satırı ve içinde koşullu `<td>` hücreleri)
+### [N3_NASIL] AST Pointer: InventoryTable.tsx::statusBadge
+- **params**: (r: InventoryRow)
+- **ic_degiskenler**:
+  - `net` — r.available_stock değerini temsil eder, mevcut stok miktarı
+  - `th` — effectiveThreshold(r.product_id) çağrısıyla elde edilen eşik değeri, null veya number olabilir
+  - `base` — ortak CSS sınıf dizisi, tüm badge varyantları için temel stil tanımlar
+- **Dönüş**: JSX (span elementi, duruma göre farklı CSS sınıfları ve metin)
+
+### [N4_NASIL] AST Pointer: InventoryTable.tsx::TableRow
+- **params**: ({ r }: { r: InventoryRow })
+- **ic_degiskenler**:
+  - (yok — sadece parametre r kullanılır, dış kapsamdaki visibleCols, selected, cellPad, onSelect, vb. kullanılır)
+- **Dönüş**: JSX (tr elementi, ürün verisini gösteren satır)
 
 ---
 

@@ -1,22 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { Wind, Thermometer, DoorOpen, Zap, ArrowRight, ArrowLeft, RotateCcw } from 'lucide-react'
-import { useI18n } from '../../i18n/I18nProvider'
+import { ArrowLeft, ArrowRight, DoorOpen, RotateCcw,Thermometer, Wind, Zap } from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import React, { useEffect, useMemo,useState } from 'react'
+
 import {
   CalculatorLayout,
-  StepIndicator,
+  InputField,
+  RadioGroup,
+  Recommendations,
   ResultCard,
   ResultGrid,
-  Recommendations,
-  InputField,
-  RadioGroup
-} from '../../components/calculators'
+  StepIndicator} from '../../components/calculators'
+import { useI18n } from '../../i18n/I18nProvider'
 import {
-  calculateAirCurtain,
   type AirCurtainApplication,
-  type WindCondition,
-  type TrafficIntensity
-} from '../../lib/hvacCalculations'
+  calculateAirCurtain,
+  type TrafficIntensity,
+  type WindCondition} from '../../lib/hvacCalculations'
 
 const AirCurtainCalcPage: React.FC = () => {
   const { t } = useI18n()

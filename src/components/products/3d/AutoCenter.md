@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\AutoCenter.tsx
-skeleton_hash: f3dfc5b0d20062b8
+skeleton_hash: 9ff8526ee667760a
 entity_hashes:
   func:AutoCenter: 7e5fd029da989dd5
   overview: 3be99e46f5543048
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:55Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış

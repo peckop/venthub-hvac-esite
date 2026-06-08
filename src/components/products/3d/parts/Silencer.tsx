@@ -1,6 +1,7 @@
 "use client";
 import React, { useMemo } from 'react'
 import * as THREE from 'three'
+
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 interface SilencerProps {
@@ -100,6 +101,4 @@ export const Silencer: React.FC<SilencerProps> = ({
             ))}
         </group>
     )
-}
-
-export default Silencer
+}

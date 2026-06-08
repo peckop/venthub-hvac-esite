@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\Breadcrumb.tsx
-skeleton_hash: 2d7ad05f4cfd2258
+skeleton_hash: 152dc957e572d5cb
 entity_hashes:
   func:Breadcrumb: 8dc746a161585543
   overview: 82dedeadab76807c
   style_tokens: 37bda1495ede52cb
-generated_at: 2026-05-28T22:36:24Z
+generated_at: 2026-06-08T10:08:49Z
 ---
 
 ## Genel Bakış

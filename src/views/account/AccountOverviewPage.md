@@ -3,42 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx
-skeleton_hash: c6b06ca12f994aa7
+skeleton_hash: 74ca884d1dcec1a0
 entity_hashes:
   func:AccountOverviewPage: 6b4bb347d1256607
-  overview: 666ec0a2df1ce43b
+  overview: 55e40bf9d68b1dff
   style_tokens: 98f0536966ac7e31
-generated_at: 2026-06-07T12:13:56Z
+generated_at: 2026-06-08T10:10:59Z
 ---
 
 ## Genel Bakış
-AccountOverviewPage modülü, VentHub HVAC uygulamasında kullanıcıların kendi hesap özetlerine eriştiği ana dashboard sayfasıdır. Bu bileşen, kullanıcının profil bilgilerini, sipariş geçmişini, kargo durumlarını ve adreslerini tek bir merkezi arayüzde birleştirerek sunar. Hesap yönetimine dair temel bilgileri görselleştiren bu sayfa, kullanıcı deneyiminin odak noktalarından biridir.
+VentHub HVAC uygulamasının Account modülü içinde yer alan AccountOverviewPage, kullanıcının kişisel hesap yönetimine dair tüm temel bilgileri görselleştirdiği merkezi dashboard sayfasıdır. Profil bilgileri, sipariş geçmişi, aktif kargo durumları ve kayıtlı adreslerini tek bir entegre arayüzde sunarak kullanıcıya kapsamlı bir hesap özeti sağlar. Sayfa, hesapla ilgili kritik verileri sunucudan çekip düzenleyerek bilgiye hızlı erişimi amaçlar.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Kullanıcının tüm hesap özetini oluşturup render eden ana React bileşenidir. Verileri (siparişler, adresler, istatistikler) sunucudan çeker, işler ve düzenli bir dashboard aracılığıyla kullanıcıya sunar.
+Kullanıcının hesap özetini oluşturan ve tarayıcıda render edilen temel React bileşenidir. Verileri işler, hata ve yükleme durumlarını yönetir ve düzenli bir dashboard aracılığıyla kullanıcıya sunar.
 - AccountOverviewPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi ve modül sabitleri sağlanmadığından, sadece fonksiyon imzası ve modül sabitlerinden türetilebilecek mimari varsayımlar sınırlıdır.
+Bu modül, parametresiz bir React sayfa bileşeni olup, çalışması için aşağıdaki mimari varsayımlara ihtiyaç duyar:
 
-[Aksiyom 1]: Eğer React runtime ortamı (JSX/TSX render contexts) yoksa, bileşen render edilemez ve sayfa görüntülenemez olur.
+[Aksiyom 1]: Eğer kullanıcı kimlik doğrulaması (authentication) yapılmamışsa, hesap özet sayfasının verilerini göstermesi beklenemez — kullanıcı oturumu yoksa sayfa içerikleri boş kalır veya yönlendirme yapılır.
 
-[Aksiyom 2]: Eğer AccountOverviewPage bileşeni çağrıldığında üst bileşen zincirinde gerekli context provider'lar (oturum kimliği, tema, vb.) sağlanmıyorsa, bileşen içeresindeki hook çağrıları hata fırlatır ve bileşen çöker olur.
+[Aksiyom 2]: Eğer hesap özet verilerini sağlayan backend API uç noktaları (sipariş geçmişi, profil bilgileri, adres listesi) erişilebilir değilse, ilgili dashboard bileşenleri veri gösteremez.
 
-[Aksiyom 3]: Eğer hesap özet verilerini çeken taraf (API servisleri veya veri kaynakları) erişilebilir değilse, bileşen boş/yükleniyor durumunda kalır veya hata durumu gösterir olur.
+[Aksiyom 3]: Eğer React Router veya eşdeğeri yönlendirme bağlamı (routing context) mevcut değilse, sayfa içi navigasyon linkleri (sipariş detayı, adres yönetimi vb.) çalışmaz.
 
----
+[Aksiyom 4]: Eğer kullanıcı oturum bilgilerini sağlayan auth context/provider üst seviyede bağlanmamışsa, bileşen kullanıcının profil bilgilerine erişemez.
 
-**Not:** Bu modül için:
-- Parametre yok (fonksiyon imzası: `AccountOverviewPage()`)
-- Modül sabiti tanımlanmamış
-- Fonksiyon gövdesi sağlanmadığı için iç mantık varsayımları üretilememektedir
-
-Gerekli mimari varsayımların tamamı için **fonksiyon gövdesinin** incelenmesi gerekmektedir.
+[Aksiyom 5]: Eğer modül Tailwind CSS veya stil sistemi (style_tokens) yüklenmemişse, dashboard arayüzü beklenen görsel formatta render edilmez.
 
 ---
 
@@ -71,93 +66,11 @@ Gerekli mimari varsayımların tamamı için **fonksiyon gövdesinin** incelenme
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `AccountOverviewPage.tsx`::useEffectCallback
-- **params**: () — React useEffect callback parametresiz
+### [N1_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::useEffect_callback
+- **params**: () — parametre yok, React useEffect callback
 - **ic_degiskenler**:
-  - `mounted` — boolean bayrak, bileşen hâlâ takılıysa state güncellemelerine izin verir; temizleme fonksiyonunda `false` yapılır
-  - `load` — asenkron veri yükleme fonksiyonu tanımı, içinde adres ve sipariş verilerini çeker
-  - Return temizleme fonksiyonu `() => { mounted = false }` — bileşen unmount edildiğinde mounted'i false yapar
-- **Dönüş**: Temizleme fonksiyonu `() => void` (unmount cleanup)
-
-### [N2_NASIL] AST Pointer: `AccountOverviewPage.tsx`::load
-- **params**: () — parametresiz async fonksiyon
-- **ic_degiskenler**:
-  - `user` — useAuth hook'tan gelen kullanıcı nesnesi; `user.id` ile sipariş filtrelemesi yapılır, `user` null ise fonksiyon erken döner
-  - `setLoading` — React state setter, yükleme durumunutrue/false yapar
-  - `setAddresses` — React state setter, adres listesini günceller
-  - `setOrders` — React state setter, sipariş listesini günceller
-  - `addrData` — `listAddresses(supabase)` çağrısının dönüş değeri, `UserAddress[]` dizisi; başarılı sorgulama sonrası adresleri tutar
-  - `orderData` — `ShipmentRecord[]` tipinde dizi, sipariş verilerini biriktirir; başlangıçta boş dizi
-  - `data` — Supabase sorgusunun success durumundaki ham veri (`venthub_orders` tablosu satırları)
-  - `error` — Supabase sorgusunun hata nesnesi; `(error as { code: string }).code` ile `PGRST100` kontrolü yapılır
-  - `supabase.from('venthub_orders').select('id, created_at, total_amount, status, order_number, carrier, tracking_number, shipped_at, delivered_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50)` — birincil sipariş sorgusu, tüm alanları çeker
-  - `fallback` — birincil sorgu hata verdiğinde alternatif sorgu sonucu; daha az alanla (`id, created_at, total_amount, status, order_number`) çalışır
-  - `fallback.data` — fallback sorgusunun ham verisi, `Record<string, unknown>[]` olarak gelir
-  - `d` — fallback.data map içindeki her bir satır kaydı; spread edilip eksik alanlar (`carrier`, `tracking_number`, `shipped_at`, `delivered_at`) `null` ile doldurulur
-  - `e` — dış try-catch'te yakalanan hata, `console.error('Overview load error', e)` ile loglanır
-- **Dönüş**: void (yan etki: state'leri günceller — `setAddresses`, `setOrders`, `setLoading`)
-
-### [N3_NASIL] AST Pointer: `AccountOverviewPage.tsx`::fallbackMapCallback
-- **params**: (`d` — `Record<string, unknown>`, fallback sorgusundan gelen tek bir sipariş satırı)
-- **ic_degiskenler**:
-  - `d` — Ham ham veri nesnesi; `...d` spread edilerek mevcut alanlar korunur ve eksik alanlar `null` ile eklenir
-- **Dönüş**: `ShipmentRecord` — orijinal alanlara ek olarak `carrier: null`, `tracking_number: null`, `shipped_at: null`, `delivered_at: null` eklenmiş nesne
-
-### [N4_NASIL] AST Pointer: `AccountOverviewPage.tsx`::getShipStatus
-- **params**: (`row?: ShipmentRecord` — opsiyonel sipariş kaydı)
-- **ic_degiskenler**:
-  - `row` — opsiyonel ShipmentRecord parametresi; null/undefined ise `'preparing'` döner
-- **Mantıksal Akış**:
-  - `row.delivered_at` truthy veya `row.status.toLowerCase() === 'delivered'` → `'delivered'`
-  - `row.shipped_at` truthy veya `row.tracking_number` truthy veya `row.status.toLowerCase() === 'shipped'` → `'shipped'`
-  - Hiçbiri eşleşmezse → `'preparing'`
-- **Dönüş**: `'delivered' | 'shipped' | 'preparing'`
-
-### [N5_NASIL] AST Pointer: `AccountOverviewPage.tsx`::activeShipStatusBadge
-- **params**: (`status` — `'delivered' | 'shipped' | 'preparing'`, sipariş durumu)
-- **ic_degiskenler**:
-  - Yok; doğrudan switch ile JSX döner
-- **Kullanılan Import Bileşenleri**:
-  - `CheckCircle` — teslim edildi ikonu (green badge içinde)
-  - `Truck` — kargoda ikonu (purple badge içinde)
-  - `Clock` — hazırlanıyor ikonu (amber badge içinde)
-- **Dönüş**: JSX `<span>` elementi — duruma göre renkli badge (bg-green-500/10, bg-purple-500/10, bg-amber-500/10)
-
-### [N6_NASIL] AST Pointer: `AccountOverviewPage.tsx`::getShipIndex
-- **params**: (`status` — `'delivered' | 'shipped' | 'preparing'`, sipariş durumu)
-- **ic_degiskenler**:
-  - Yok; doğrudan koşullu return
-- **Dönüş**: `number` — `'delivered'` → 2, `'shipped'` → 1, diğer → 0
-
-### [N7_NASIL] AST Pointer: `AccountOverviewPage.tsx`::shipStepMapCallback
-- **params**: (`step` — adım nesnesi `{ key, icon, label }`, `idx` — dizin indeksi)
-- **ic_degiskenler**:
-  - `active` — `boolean`, `idx <= activeStepIdx` ile hesaplanır; bu adımın aktif/pasif durumunu belirler
-  - `StepIcon` — `step.icon` referansı, adımın ikon bileşeni; `<StepIcon size={20} />` olarak render edilir
-- **Kullanılan Dış Değişkenler**:
-  - `activeStepIdx` — componente ait state, hangi adıma kadar ilerlendiğini tutar
-  - `shipSteps` — adım dizisi, `.length - 1` ile son adım kontrolü yapılır
-- **Dönüş**: `JSX.Element` — `<React.Fragment>` içinde adım ikonu + bağlantı çizgisi (adım arası progress bar)
-
-### [N8_NASIL] AST Pointer: `AccountOverviewPage.tsx`::orderItemMapCallback
-- **params**: (`o` — `ShipmentRecord`, tek bir sipariş kaydı)
-- **ic_degiskenler**:
-  - `isDelivered` — `boolean`, `o.status.toLowerCase() === 'delivered'` kontrolü; ikon ve kart rengini belirler
-  - `code` — `string`, sipariş kodu formatı; `o.order_number` varsa `#${o.order_number.split('-')[1]}`, yoksa `#${o.id.slice(-8).toUpperCase()}`
-- **Kullanılan Dış Değişkenler**:
-  - `formatCurrency` — import edilen para birimi formatlama fonksiyonu; `formatCurrency(Number(o.total_amount), lang, { maximumFractionDigits: 0 })` çağrılır
-  - `formatDate` — import edilen tarih formatlama fonksiyonu; `formatDate(o.created_at, lang)` çağrılır
-  - `lang` — dil ayarı, format fonksiyonlarına parametre olarak verilir
-  - `Routes.account.orderDetail(o.id)` — sipariş detay sayfası URL'si; hem `<Link href>` hem `router.push()` içinde kullanılır
-  - `router` — Next.js router, `router.push()` ile navigasyon yapılır
-  - `activeShipStatusBadge` — durum badge'ini render eden fonksiyon; `activeShipStatusBadge(getShipStatus(o))` çağrılır
-  - `getShipStatus` — sipariş durumunu belirleyen fonksiyon; `getShipStatus(o)` çağrılır
-- **Kullanılan Import Bileşenleri**:
-  - `Package` — sipariş ikonu; `isDelivered` durumuna göre renk değişir
-  - `Calendar` — tarih ikonu, sipariş tarihi yanında gösterilir
-  - `Link` — Next.js link bileşeni, sipariş detayına tıklanabilir başlık oluşturur
-  - `ArrowRight` — sağ ok ikonu, buton içinde navigasyon tetikler
-- **Dönüş**: `JSX.Element` — sipariş kartı `<div>`, içinde ikon + sipariş kodu + tutar + tarih + durum badge'i + navigasyon butonu
+  - `mounted` — component unmount olduktan sonra state güncellemelerini engelleyen bayrak, cleanup'ta `false` yapılır
+- **Dönüş**: cleanup fonksiyonu döner → `() => { mounted = false }`
 
 ---
 

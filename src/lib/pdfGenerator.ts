@@ -1,8 +1,10 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+
 import type { Product } from '@/types/ui-models';
-import { PDF_FONTS, PDF_COLORS, getBase64ImageFromUrl, getAbsoluteAssetUrl } from './pdfAssets';
+
 import { SITE_URL } from '../config/siteUrl';
+import { getAbsoluteAssetUrl,getBase64ImageFromUrl, PDF_COLORS, PDF_FONTS } from './pdfAssets';
 
 /**
  * PDF Üretim Servisi (Premium Tasarım & Türkçe Karakter Destekli)

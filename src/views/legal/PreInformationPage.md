@@ -8,7 +8,7 @@ entity_hashes:
   func:PreInformationPage: 3746fdd57fa8f528
   overview: 9f7c71a3d1be24be
   style_tokens: f624520e4dc7da19
-generated_at: 2026-05-28T22:40:07Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış

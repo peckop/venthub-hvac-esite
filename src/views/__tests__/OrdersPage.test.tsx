@@ -1,8 +1,8 @@
-import React from 'react'
-import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { usePathname } from 'next/navigation'
+import React from 'react'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({ user: { id: 'u1', email: 'u@u.com', user_metadata: {} }, loading: false })

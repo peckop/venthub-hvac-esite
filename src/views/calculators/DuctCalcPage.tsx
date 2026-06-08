@@ -1,19 +1,18 @@
-import React, { useState, useMemo } from 'react'
-import { Wind, Ruler, RotateCcw, Circle, Square } from 'lucide-react'
-import { useI18n } from '../../i18n/I18nProvider'
+import { Circle, RotateCcw, Ruler, Square,Wind } from 'lucide-react'
+import React, { useMemo,useState } from 'react'
+
 import {
   CalculatorLayout,
-  ResultCard,
-  ResultGrid,
-  Recommendations,
   InputField,
-  RadioGroup
-} from '../../components/calculators'
+  RadioGroup,
+  Recommendations,
+  ResultCard,
+  ResultGrid} from '../../components/calculators'
+import { useI18n } from '../../i18n/I18nProvider'
 import {
   calculateDuct,
-  type DuctType,
-  type DuctMaterial
-} from '../../lib/hvacCalculations'
+  type DuctMaterial,
+  type DuctType} from '../../lib/hvacCalculations'
 
 const DuctCalcPage: React.FC = () => {
   const { t } = useI18n()

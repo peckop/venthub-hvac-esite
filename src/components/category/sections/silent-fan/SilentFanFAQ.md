@@ -3,31 +3,40 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanFAQ.tsx
-skeleton_hash: 6c6af5e226009042
+skeleton_hash: 1db8d98a09e6c4cc
 entity_hashes:
   func:SilentFanFAQ: 514de334aa5d1d84
   func:tr: b282b53f03d688a5
-  overview: 04a22bd0b6f69650
+  overview: b16446a0ec91f7da
   style_tokens: 325897ca39ea7e85
-generated_at: 2026-05-28T22:35:47Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, sessiz fan kategorisiyle ilgili sık sorulan sorular (FAQ) içeriğini gösteren bir React bileşeni tanımlar. Ayrıca, içerik içinde kullanılan metinlerin çevirilerini sağlayan basit bir yardımcı fonksiyon içerir.
+Bu modül, sessiz fan kategorisine ait Sıkça Sorulan Sorular (SSS) bölümünü kullanıcıya sunan bir React bileşenidir. Modül, içeriğin çoklu dil desteğiyle sunulmasını sağlayan basit bir çeviri yardımcı fonksiyonu da içerir.
 
 ## Fonksiyon Grupları
-### Bileşen Tanımı
-Kullanıcı arayüzünde silent‑fan bölümünün FAQ kısmını render eden ana bileşeni oluşturur.
+### Ana Bileşen
+Sessiz fan ürünleriyle ilgili SSS içeriğini ekranda gösteren ana arayüz bileşenini tanımlar.
 - SilentFanFAQ
 
-### Yerelleştirme Yardımcı
-Bileşen içindeki sabit metinlerin farklı dillere çevrilmesini kolaylaştıran bir çeviri işlevi sağlar.
+### Yardımcı Fonksiyonlar
+Bileşen içindeki metinlerin farklı dillere çevrilmesini sağlayan temel bir yerelleştirme (i18n) yardımcısı sunar.
 - tr
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve modülün genel amacına dayanarak aşağıdaki gibi tanımlanmıştır.
+
+[Aksiyom 1]: Eğer `tr` fonksiyonuna geçilen `key` parametresi, mevcut çeviri sözlüğünde (veya çeviri yönetim sisteminde) tanımlı değilse, `tr` fonksiyonu geçerli bir çeviri dizesi (string) üretemez ve bu durum bileşenin(`SilentFanFAQ`) metin içeriğinin eksik veya hatalı görüntülenmesine yol açar.
+
+[Aksiyom 2]: Eğer `SilentFanFAQ` bileşeni, çeviri için gerekli bağlamı (context) veya yapılandırmayı içeren üst bileşenler tarafından çağrılmıyorsa, bileşen kendi içinde tanımlı sabit bir içeriğe sahip olmadığı için boş veya anlamsız bir SSS listesi görüntüler.
+
+[Aksiyom 3]: Eğer `tr` fonksiyonu tarafından döndürülen çeviri dizesi, tarayıcıda desteklenmeyen veya hatalı karakter encoding'ine sahip bir Unicode karakter içeriyorsa, bileşenin görüntülenen metinleri bozuk (mojibake) olur.
+
+[Aksiyom 4]: Eğer `SilentFanFAQ` bileşeni, prop'lar aracılığıyla harici bir SSS verisi (örn: `faqItems` listesi) almıyorsa ve kendi içinde de böyle bir veri kaynağı yoksa, bileşen hiçbir SSS madde render edemez.
 
 ---
 
@@ -51,30 +60,18 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanFAQ.tsx::SilentFanFAQ
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: SilentFanFAQ.tsx::SilentFanFAQ
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `t` — çeviri fonksiyonu, useI18n hookundan elde edilen i18n çeviri işlevi.
-  - `dict` — i18n sözlüğü nesnesi, categorySilentFan.faq.items gibi çeviri verilerini içerir.
-  - `sectionRef` — bölüm öğesine bağlanacak ref, useScrollAnimation ile scroll tabanlı animasyon için kullanılır.
-  - `isVisible` — bölümün görünürlüğünü gösteren boolean değer, useScrollAnimation tarafından sağlanır.
-  - `openIndex` — şu anda açık olan FAQ öğesinin indeksi (kapalıysa null) tutan useState durumu.
-  - `setOpenIndex` — openIndex durumunu güncelleyen setter fonksiyonu.
-  - `tr` — kategori özelı FAQ çeviri anahtarını oluşturan yardımcı fonksiyon, `categorySilentFan.faq.` öneki ekler.
-  - `items` — dict.categorySilentFan.faq.items çeviri verisi, tanımlı değilse boş dizi.
-- **Dönüş**: JSX elementi (React.FC) — tüm FAQ bölümünü render eden section öğesi.
-
-### [N2_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanFAQ.tsx::tr
-- **params**: key: string
-- **ic_degiskenler**:
-  - (yok) — fonksiyon gövdesinde yeni bir değişken tanımlanmaz; t dışarıdaki kapsamdan kapatılır.
-- **Dönüş**: string — `categorySilentFan.faq.{key}` anahtarına karşılık gelen çevrilen metin.
-
-### [N3_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanFAQ.tsx::map callback
-- **params**: item: { q: string; a: string }, index: number
-- **ic_degiskenler**:
-  - `isOpen` — boolean, verilen index'in openIndex durumuyla eşleşip eşleşmediğini kontrol eder; true ise ilgili FAQ açıktır.
-- **Dönüş**: JSX elementi — tek bir FAQ öğesini (başlık butonu ve içerik paneli) render eden div.
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, key bazlı çeviri yapmak için kullanılır
+  - `dict` — `useI18n()` hook'undan dönen sözlük nesnesi, categorySilentFan verisine erişim sağlar
+  - `sectionRef` — `useScrollAnimation<HTMLElement>()` dönen ref, DOM section elemanına bağlanır (scroll animasyonu tetikleme)
+  - `isVisible` — `useScrollAnimation()` dönen boolean, section'ın görünür olup olmadığını belirler, CSS sınıflarını koşullu aktif eder
+  - `openIndex` — `useState<number | null>(0)` state değeri, hangi FAQ maddesinin açık olduğunu tutar (başlangıçta ilki açık)
+  - `setOpenIndex` — state setter, tıklanan maddenin index'ini veya null atar
+  - `tr` — inner helper fonksiyonu, `categorySilentFan.faq.` prefix'ini otomatik ekleyerek `t()` çağırır
+  - `items` — `dict.categorySilentFan.faq.items` dizisi, FAQ maddeleri listesi; sözlükte yoksa boş dizi (`[]`) fallback
+- **Dönüş**: React.ReactNode (JSX section — SSS bölümü, scroll animasyonlu, accordion yapılı FAQ bileşeni)
 
 ---
 

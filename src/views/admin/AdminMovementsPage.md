@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminMovementsPage.tsx
-skeleton_hash: 69c9969109461a7b
+skeleton_hash: d7e0c5e1be9b3059
 entity_hashes:
   func:AdminMovementsPage: 8124deab54f3903c
   func:exportCsv: 8df468c265c92836
@@ -11,46 +11,48 @@ entity_hashes:
   func:reasonLabel: 198d67e42557b45d
   func:sortIndicator: 43ac755400ab07d3
   func:toggleSort: 920f5ed12088bfa0
-  overview: 727d8000b31a89fa
+  overview: 792c2402f98544fc
   style_tokens: 4a63e81d7d11a34c
-generated_at: 2026-06-07T18:03:57Z
+generated_at: 2026-06-08T10:11:00Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yönetim platformunun yönetici panelindeki "Hareketler" sayfasını oluşturan React bileşenidir. Modül, hareket kayıtlarını listeleyerek sıralama ve dışa aktarma işlemleri sunar. Hareket nedenleri gibi alanlar için çok dilli destek sağlar.
+Bu modül, VentHub HVAC yönetim platformunun yönetici panelindeki "Hareketler" sayfasını oluşturan React bileşenidir. Modül, tüm hareket kayıtlarını tablo formatında sunarak sıralama ve farklı formatlarda dışa aktarma işlemleri sağlar. Hareket nedenleri gibi alanlar için çok dilli etiket desteği sunulmaktadır.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Modülün ana giriş noktası olup tüm sayfa düzenini ve işlevselliğini bir arada yönetir.
+Modülün ana giriş noktası olup tüm sayfa düzenini, veri akışını ve üst düzey işlevselliği koordine eder.
 - AdminMovementsPage
 
-### Yerelleştirme Yardımcı Fonksiyonu
-Hareket nedenleri gibi kodlanmış anahtarları, kullanıcının diline göre okunabilir etiketlere dönüştürür.
+### Veri Görüntüleme ve Yerelleştirme
+Ham veriyi kullanıcıya gösterilebilir forma dönüştürmek ve çok dilli destek sağlamakla sorumludur.
 - reasonLabel
 
-### Sıralama İşlevleri
-Tabloda hangi sütuna göre sıralama yapıldığını değiştirir ve mevcut sıralama yönünü görsel olarak gösterir.
+### Tablo Sıralama İşlevleri
+Tablonun hangi sütuna göre sıralanacağını değiştirir ve mevcut sıralama durumunu kullanıcıya görsel olarak iletir.
 - toggleSort, sortIndicator
 
 ### Veri Dışa Aktarma İşlevleri
-Listelenen hareket verilerini CSV ve Excel dosyalarına aktarma süreçlerini başlatır.
+Tablodaki mevcut veri setini CSV ve Excel gibi yaygın formatlara dönüştürerek dışa aktarma işlemini başlatır.
 - exportCsv, exportXls
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, VentHub HVAC yönetim platformunun yönetici panelindeki "Hareketler" sayfasını oluşturan React bileşenidir. Sistemdeki tüm hareket kayıtlarını listeler, düzenler ve yöneticiye farklı formatlarda dışa aktarma olanağı sağlar.
+Bu modül, hareket kayıtlarını listeleyen ve yöneten bir yönetici sayfası bileşenidir. Aşağıdaki mimari varsayımlar, fonksiyon imzaları ve mevcut sabitler temel alınarak tanımlanmıştır.
 
-[Aksiyom 1]: Eğer `reasonLabel` fonksiyonu, `key` parametresi olarak `null` veya `undefined` değerini alırsa, `t` fonksiyonu çağrılmaz ve `undefined` döner.
-[Aksiyom 2]: Eğer `reasonLabel` fonksiyonu, `ALL_REASONS` sabitinde yer almayan bir `key` değeri alırsa, `t` fonksiyonu çağrılmaz ve `undefined` döner.
-[Aksiyom 3]: Eğer `toggleSort` fonksiyonu, `key` parametresi olarak geçerli bir `SortKey` değeri almazsa, sıralama durumu değişmez.
-[Aksiyom 4]: Eğer `sortIndicator` fonksiyonu, `key` parametresi olarak geçerli bir `SortKey` değeri almazsa, boş bir string veya nötr bir gösterge döner.
-[Aksiyom 5]: Eğer `exportCsv` fonksiyonu, mevcut hareket verisi boşsa, boş bir CSV dosyası oluşturur veya kullanıcıya bilgi verir.
-[Aksiyom 6]: Eğer `exportXls` fonksiyonu, mevcut hareket verisi boşsa, boş bir XLS dosyası oluşturur veya kullanıcıya bilgi verir.
-[Aksiyom 7]: Eğer `AdminMovementsPage` bileşeni, gerekli veri kaynağını (hareketler listesi) sunucudan alamazsa, hata durumu veya boş bir tablo gösterir.
-[Aksiyom 8]: Eğer `AdminMovementsPage` bileşeni, sıralama durumu (`sortKey` ve `sortDirection`) için geçersiz bir değer alırsa, varsayılan sıralamaya döner.
-[Aksiyom 9]: Eğer `AdminMovementsPage` bileşeni, dışa aktarma fonksiyonları çağrıldığında, tarayıcı izni veya dosya yazma izni yoksa, kullanıcıya hata mesajı gösterir.
+[Aksiyom 1]: Eğer `reasonLabel(key, t)` fonksiyonu çağrıldığında `key` parametresi `null` veya `undefined` ise, fonksiyonun ne döndüreceği tanımsızdır (örn: boş string, `null` veya bir hata fırlatması beklenir, ancak kesin davranış bilinmemektedir).
+
+[Aksiyom 2]: Eğer `reasonLabel(key, t)` fonksiyonuna geçerli (null olmayan) bir `key` verilirse, bu anahtarın modül içinde tanımlı bir kaynakta (örn: `ALL_REASONS` sabitinde veya API yanıtında) karşılığı olmalıdır. Karşılık yoksa, fonksiyonun ne döndüreceği bilinmemektedir.
+
+[Aksiyom 3]: Eğer `toggleSort(key)` fonksiyonu, geçerli bir `SortKey` değeri içermeyen bir argüman ile çağrılırsa, sıralama durumu bozulabilir veya fonksiyon hata fırlatabilir.
+
+[Aksiyom 4]: Eğer `exportCsv()` veya `exportXls()` fonksiyonları çağrıldığında, o anda görüntülenen veri seti (örn: filtrelenmiş, sıralanmış) dışa aktarılacaksa, modülün bu mevcut durumu izlemesi gerekir; aksi takdirde dışa aktarılan veri kullanıcının gördüğü veriyle tutarsız olur.
+
+[Aksiyom 5]: Eğer `sortIndicator(key)` fonksiyonu, geçerli bir `SortKey` değeri içermeyen bir argüman ile çağrılırsa, fonksiyonun ne döndüreceği (örn: boş string, belirli bir ikon) bilinmemektedir.
+
+[Aksiyom 6]: `ALL_REASONS` sabiti, `reasonLabel` fonksiyonu tarafından kullanılacak bir eşleme (mapping) yapısı içermelidir. Eğer bu sabit tanımsız veya boş ise, `reasonLabel` fonksiyonu geçerli etiketler üretemez.
 
 ---
 
@@ -155,96 +157,153 @@ type SortKey = 'date' | 'product' | 'delta' | 'reason' | 'ref'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::reasonLabel
-- **params**: `key` (string | null | undefined — ham sebep anahtarı), `t` ((k: string) => string — çeviri fonksiyonu)
+- **params**: `key: string | null | undefined` — sebep anahtarı, `t: (k: string) => string` — çeviri fonksiyonu
 - **ic_degiskenler**:
-  - `val` — `key` parametresini `String()` ile string'e dönüştürüp boş string fallback uygular; switch/if-else dal kontrolünde kullanılır
-- **Dönüş**: `string` — çevrilmiş sebep etiketi veya varsayılan `'-'`
+  - `val` — key'in null/undefined olma durumuna karşı güvenli string'e dönüştürülmüş hali; switch karşılaştırmasında kullanılır
+- **Dönüş**: `string` — verilen key'e karşılık gelen çevrilmiş sebep etiketi veya '-'
 
 ### [N2_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::fetchPage (async pageNum)
-- **params**: `pageNum` (number — istenen sayfa numarası)
+- **params**: `pageNum: number` — istenen sayfa numarası (1-tabanlı)
 - **ic_degiskenler**:
-  - `from` — sayfalama başlangıç indeksi: `(pageNum - 1) * PAGE_SIZE`
-  - `to` — sayfalama bitiş indeksi: `from + PAGE_SIZE - 1`
-  - `query` — Supabase `inventory_movements` tablosu üzerindeki zincirli sorgu nesnesi; `batchFilter`, `dateRange.from`, `dateRange.to` koşullarıyla filtrelenir
-  - `data` — Supabase sorgusundan dönen ham hareket satırları
-  - `error` — Supabase sorgu hatası nesnesi
-  - `count` — Supabase tarafından dönen toplam eşleşme sayısı (`{ count: 'exact' }` ile)
-  - `movements` — `data` dizisinin `Movement[]` tipine cast edilmiş hali; `setRows` ile state'e yazılır
-  - `ids` — `movements` içinden benzersiz `product_id` değerlerinden oluşmuş Set; ürün ve kategori sorguları için kullanılır
-  - `prodRes` — `products` tablosundan `ids` ile eşleşen kayıtları çeken Supabase yanıt nesnesi
-  - `catRes` — `categories` tablosundan tüm kategorileri adlarına göre sıralayarak çeken Supabase yanıt nesnesi
-  - `map` — `Record<string, Product>` tipinde; `product_id` → `Product` eşleme sözlüğü; `prodRes.data` döngüsüyle doldurulur
-  - `cmap` — `Record<string, string | null>` tipinde; `product_id` → `category_id` eşleme sözlüğü; `p.category_id ?? null` fallback ile doldurulur
-- **Dönüş**: yok (yan etkiler: `setLoading`, `setRows`, `setProductMap`, `setProductCategoryMap`, `setCategories`, `setHasMore`, `setError` state güncellemeleri ve `ensureSessionFresh()` API çağrısı)
+  - `from` — Supabase range sorgusu için başlangıç indeksi; `(pageNum - 1) * PAGE_SIZE` hesaplanır
+  - `to` — Supabase range sorgusu için bitiş indeksi; `from + PAGE_SIZE - 1` hesaplanır
+  - `query` — Supabase sorgu zinciri; `inventory_movements` tablosuna filtereler eklenerek inşa edilir
+  - `data` — Supabase'den dönen ham satır verisi (Movement[])
+  - `error` — Supabase sorgusundan dönen hata nesnesi
+  - `count` — toplam satır sayısı (sayfalama hesaplama için)
+  - `movements` — data'nın Movement[] tipine cast edilmiş hali; satırlara ve map'lere beslenir
+  - `ids` — movements içindeki benzersiz product_id kümesi; ürün ve kategori verisi çekmek için kullanılır
+  - `prodRes` — products tablosundan gelen yanıt; ürün adı, SKU, category_id bilgilerini içerir
+  - `catRes` — categories tablosundan gelen yanıt; kategori adlarını içerir
+  - `map` — product_id -> Product eşlemesi; ürün bilgilerine hızlı erişim sağlar
+  - `cmap` -> `productCategoryMap` — product_id -> category_id eşlemesi; kategori bazlı filtreleme ve gösterim için kullanılır
+- **Dönüş**: yok (state setter'ları çağırarak yan etki üretir: setRows, setProductMap, setProductCategoryMap, setCategories, setHasMore, setError, setLoading)
 
-### [N3_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::initBatchFilter (anonim)
+### [N3_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::initBatchFilter
 - **params**: yok
 - **ic_degiskenler**:
-  - `b` — `searchParams?.get('batch')` değerinin trim edilmiş hali; boşsa boş string fallback; `setBatchFilter` ile state'e yazılır
-- **Dönüş**: yok (yan etki: `setBatchFilter`)
+  - `b` — searchParams'tan okunan 'batch' parametresinin trim edilmiş hali; batchFilter state'ine atanır
+- **Dönüş**: yok (setBatchFilter ile state günceller)
 
-### [N4_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::getActiveCategories (anonim)
+### [N4_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::getUsedCategories
 - **params**: yok
 - **ic_degiskenler**:
-  - `idSet` — `Set<string>` tipinde; her bir `row`'un `productCategoryMap[m.product_id]` değerinden toplanan benzersiz kategori ID'leri
-- **Dönüş**: `Category[]` — `categories` dizisinin `idSet` içindeki ID'lere sahip elemanlarından filtrelenmiş hali
+  - `idSet` — mevcut rows içinde kullanılan benzersiz category ID kümesi; hangi kategorilerin filtrelenebilir olduğunu belirler
+- **Dönüş**: `Category[]` — sadece mevcut satırlarda referansı olan kategorilerin filtrelenmiş listesi
 
-### [N5_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::filterMovements (anonim)
+### [N5_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::collectCategoryIds (m => ...)
+- **params**: `m: Movement` — tek bir hareket kaydı
+- **ic_degiskenler**:
+  - `cid` — productCategoryMap içinde m.product_id'den elde edilen category_id; set'e eklenir
+- **Dönüş**: yok (dışarıdaki idSet'e yan etki)
+
+### [N6_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::getFilteredRows
 - **params**: yok
 - **ic_degiskenler**:
-  - `base` — `rows` dizisinin referans kopyası; arama ve filtreleme zincirinde başlangıç dizisi olarak kullanılır
-  - `term` — `q` değerinin trim edilip küçük harfe çevrilmiş hali; ürün adı ve SKU eşleşmesinde kullanılır
-- **Dönüş**: `Movement[]` — arama terimi, `selectedCategory` ve `reasonFilter` koşullarına göre filtrelenmiş satırlar
+  - `base` — filtreleme öncesi başlangıç olarak rows'un kopyası; ardışık filter'larla daraltılır
+  - `term` — arama kutusundaki q değerinin trim ve lowercase hali; ürün adı/SKU eşleştirmesinde kullanılır
+- **Dönüş**: `Movement[]` — tüm filtrelerden (arama, kategori, sebep) geçmiş satır dizisi
 
-### [N6_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::sortedMovements (anonim)
+### [N7_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::searchFilter (r => ...)
+- **params**: `r: Movement` — filtrelenecek tek satır
+- **ic_degiskenler**:
+  - `p` — productMap'ten r.product_id ile elde edilen Product nesnesi
+  - `name` — ürün adının lowercase hali; term ile karşılaştırılır
+  - `sku` — ürün SKU'sunun lowercase hali; term ile karşılaştırılır
+- **Dönüş**: `boolean` — satırın arama terimiyle eşleşip eşleşmediği
+
+### [N8_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::getSortedRows
 - **params**: yok
 - **ic_degiskenler**:
-  - `arr` — `filtered` dizisinin spread ile oluşturulmuş shallow kopyası; sıralama üzerinde değişiklik yapılmadan önce diziyi korur
-- **Dönüş**: `Movement[]` — `sortKey` ve `sortDir` değerlerine göre sıralanmış satırlar (`date`, `product`, `delta`, `reason`, `ref` switch dalları)
+  - `arr` — filtered dizisinin sıralanabilir kopyası; sıralama işlemine tabi tutulur
+- **Dönüş**: `Movement[]` — sortKey ve sortDir'e göre sıralanmış satır dizisi
 
-### [N7_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::toggleSort
-- **params**: `key` (SortKey — sıralanacak sütun anahtarı)
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (yan etki: `setSortDir` ile yön terslenir veya `setSortKey` + `setSortDir` ile yeni sütun seçilir; `date` anahtarı varsayılan olarak `'desc'` yön alır)
+### [N9_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::sortComparator (a, b)
+- **params**: `a: Movement` — karşılaştırılacak birinci satır, `b: Movement` — karşılaştırılacak ikinci satır
+- **ic_degiskenler**:
+  - `dir` — sıralama yönü çarpanı; asc ise 1, desc ise -1
+  - `an` — (product sort dalında) birinci satırın ürün adının lowercase'i
+  - `bn` — (product sort dalında) ikinci satırın ürün adının lowercase'i
+  - `ar` — (ref sort dalında) birinci satırın order_id'si veya boş string
+  - `br` — (ref sort dalında) ikinci satırın order_id'si veya boş string
+- **Dönüş**: `number` — sıralama karşılaştırma sonucu (negatif, sıfır veya pozitif)
 
-### [N8_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::sortIndicator
-- **params**: `key` (SortKey — kontrol edilecek sütun anahtarı)
-- **ic_degiskenler**: yok
-- **Dönüş**: `string` — aktif sütun değilse boş string, `'asc'` yönünde `'▲'`, `'desc'` yönünde `'▼'`
+### [N10_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::toggleSort
+- **params**: `key: SortKey` — sıralanacak sütunun anahtarı
+- **ic_degiskenler**: (yok — doğrudan state setter çağrıları)
+- **Dönüş**: yok (setSortDir veya setSortKey ile state günceller)
 
-### [N9_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::exportCsv
+### [N11_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::sortIndicator
+- **params**: `key: SortKey` — göstergesi sorulan sütun anahtarı
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string` — sıralama yönüne göre '▲', '▼' veya boş string
+
+### [N12_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::exportCsv
 - **params**: yok
 - **ic_degiskenler**:
-  - `h` — CSV başlık satırı dizisi; `t()` ile çevrilmiş sütun başlıkları (`date`, `product`, `SKU`, `delta`, `reason`, `ref`)
-  - `lines` — `filtered` dizisi üzerinde `map` ile oluşturulan CSV satırları; her satır `productMap` lookup, `formatDateTime`, `reasonLabel` ve `order_id.slice(-8)` değerlerini içerir
-  - `bom` — `'\ufeff'` UTF-8 BOM karakteri; Excel'in doğru encoding algılaması için kullanılır
-  - `csvData` — `h` ve `lines`'ın `\n` ile birleştirilmiş tam CSV içeriği
-  - `blob` — `csvData` ve BOM'dan oluşturulan `Blob` nesnesi; MIME tipi `text/csv;charset=utf-8;`
-  - `url` — `URL.createObjectURL(blob)` ile üretilen geçici dosya URL'i
-  - `link` — `document.createElement('a')` ile oluşturulan DOM köprü elemanı; `url` ve `download` attribute'u ayarlanıp `.click()` ile tetiklenir
-- **Dönüş**: yok (yan etki: tarayıcıda CSV dosyası indirme tetiklenir; `URL.revokeObjectURL` ile URL serbest bırakılır)
+  - `h` — CSV sütun başlıkları dizisi; çeviri fonksiyonu t() ile hazırlanır
+  - `lines` — filtered satırlarının CSV satırına dönüştürülmüş hali; her satır virgülle ayrılıp tırnak içine alınır
+  - `bom` — UTF-8 BOM karakteri; Excel'in doğru kodlamayı tanıması için eklenir
+  - `csvData` — başlık ve satırların birleştirilmiş ham CSV metni
+  - `blob` — CSV verisinden oluşturulmuş Blob nesnesi; indirme bağlantısı için kullanılır
+  - `url` — blob için oluşturulan geçici Object URL'i
+  - `link` — programatik olarak oluşturulmuş `<a>` elementi; dosya indirme tetikleyicisi
+- **Dönüş**: yok (tarayıcıda dosya indirme tetikler)
 
-### [N10_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::exportXls
+### [N13_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::csvRowMapper (m => ...)
+- **params**: `m: Movement` — CSV satırına dönüştürülecek hareket kaydı
+- **ic_degiskenler**:
+  - `p` — productMap'ten m.product_id ile elde edilen Product nesnesi
+- **Dönüş**: `string` — virgülle ayrılmış, tırnak içine alınmış CSV satır stringi
+
+### [N14_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::exportXls
 - **params**: yok
 - **ic_degiskenler**:
-  - `rowsHtml` — `filtered` dizisi üzerinde `map` ile oluşturulan HTML `<tr>` satırları; her hücre `formatDateTime`, `productMap` lookup, `reasonLabel` ve `order_id.slice(-8)` değerlerini içerir
-  - `tHtml` — `<!DOCTYPE html>` ile başlayan tam HTML belgesi; `<table>` yapısını `<thead>` başlık satırları ve `<tbody>` ile `rowsHtml` gövdesini kapsar
-  - `blob` — `tHtml`'den oluşturulan `Blob` nesnesi; MIME tipi `application/vnd.ms-excel`
-  - `url` — `URL.createObjectURL(blob)` ile üretilen geçici dosya URL'i
-  - `link` — `document.createElement('a')` ile oluşturulan DOM köprü elemanı; `download` attribute'u `inventory_movements_p${page}.xls` olarak ayarlanır
-- **Dönüş**: yok (yan etki: tarayıcıda XLS dosyası indirme tetiklenir; `URL.revokeObjectURL` ile URL serbest bırakılır)
+  - `rowsHtml` — filtered satırlarının HTML `<tr>` elementlerine dönüştürülmüş birleşik stringi
+  - `tHtml` — tam HTML belgesi; tablo başlıkları ve satırları içerir, .xls olarak indirilir
+  - `blob` — HTML verisinden oluşturulmuş Blob nesnesi; MIME type `application/vnd.ms-excel`
+  - `url` — blob için oluşturulan geçici Object URL'i
+  - `link` — programatik olarak oluşturulmuş `<a>` elementi; dosya indirme tetikleyicisi
+- **Dönüş**: yok (tarayıcıda dosya indirme tetikler)
 
-### [N11_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::loadPreferences (anonim)
+### [N15_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::xlsRowMapper (m => ...)
+- **params**: `m: Movement` — HTML tablo satırına dönüştürülecek hareket kaydı
+- **ic_degiskenler**:
+  - `p` — productMap'ten m.product_id ile elde edilen Product nesnesi
+  - `d` — formatDateTime ile biçimlendirilmiş tarih stringi
+  - `pr` — ürün adı veya fallback olarak product_id
+  - `s` — ürün SKU'su veya boş string
+  - `dl` — hareket miktarı (delta)
+  - `r` — reasonLabel ile çevrilmiş sebep etiketi
+  - `o` — order_id'nin son 8 karakteri, büyük harfe çevrilmiş; veya boş string
+- **Dönüş**: `string` — bir HTML `<tr>` elementi stringi
+
+### [N16_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::loadSavedPreferences
 - **params**: yok
 - **ic_degiskenler**:
-  - `rawCols` — `localStorage.getItem(\`${STORAGE_KEY}:cols\`)` ile okunan sütun görünürlük tercihleri JSON string'i
-  - `rawDen` — `localStorage.getItem(\`${STORAGE_KEY}:density\`)` ile okunan yoğunluk tercihi string'i; `'compact'` veya `'comfortable'` değerlerinden biri olmalıdır
-- **Dönüş**: yok (yan etki: `setVisibleCols` ile sütun görünürlükleri, `setDensity` ile yoğunluk state'i güncellenir; `try-catch` ile sessizce hata yutulur)
+  - `rawCols` — localStorage'dan okunan sütun görünürlük ayarları JSON stringi
+  - `rawDen` — localStorage'dan okunan yoğunluk (density) ayarı stringi
+- **Dönüş**: yok (setVisibleCols ve setDensity ile state günceller)
 
-### [N12_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::resetFilters (anonim)
+### [N17_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::mapReasonToMenuItem (r => ...)
+- **params**: `r: string` — ALL_REASONS dizisindeki tek bir sebep anahtarı
+- **ic_degiskenler**: (yok — inline obje üretimi)
+- **Dönüş**: `{ key: string, label: string, active: boolean, onToggle: () => void }` — ColumnsMenu/_COLUMNS_MENU için sebep filtre menü öğesi
+
+### [N18_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::resetFilters
 - **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (yan etki: `setPage(1)`, `setQ('')`, `setSelectedCategory('')`, `setDateRange(undefined)`, `setReasonFilter(...)` ile tüm filtre state'leri başlangıç değerlerine sıfırlanır; `ALL_REASONS` dizisi `map` ile `Record<string, boolean>` formatına dönüştürülüp tüm sebepler `true` olarak ayarlanır)
+- **ic_degiskenler**: (yok — doğrudan state setter çağrıları)
+- **Dönüş**: yok (setPage, setQ, setSelectedCategory, setDateRange, setReasonFilter ile tüm filtre state'lerini sıfırlar)
+
+### [N19_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::renderMovementRow (m => ...)
+- **params**: `m: Movement` — tabloda satır olarak gösterilecek hareket kaydı
+- **ic_degiskenler**: (yok — doğrudan JSX içinde m, productMap, visibleCols, formatDateTime, reasonLabel kullanılır)
+- **Dönüş**: `JSX.Element` — hareket kaydını temsil eden `<tr>` elementi; visibleCols ayarlarına göre koşulsuz sütun gösterir
+
+### [N20_NASIL] AST Pointer: src/views/admin/AdminMovementsPage.tsx::AdminMovementsPage
+- **params**: yok (parametre yok, React FC bileşeni)
+- **ic_degiskenler**: (fonksiyon gövdesi bileşen içindeki hook'lardan ve alt bileşenlerden oluşur; tüm state ve fonksiyon tanımları bu kapsama girer)
+- **Dönüş**: `React.FC` — admin stok hareketleri sayfasını render eden React bileşeni
 
 ---
 
@@ -258,9 +317,9 @@ graph TD
     AdminMovementsPage_tsx__reasonLabel["reasonLabel"]
     AdminMovementsPage_tsx__sortIndicator["sortIndicator"]
     AdminMovementsPage_tsx__toggleSort["toggleSort"]
-    AdminMovementsPage_tsx__AdminMovementsPage --> AdminMovementsPage_tsx__reasonLabel
-    AdminMovementsPage_tsx__AdminMovementsPage --> AdminMovementsPage_tsx__toggleSort
     AdminMovementsPage_tsx__AdminMovementsPage --> AdminMovementsPage_tsx__sortIndicator
+    AdminMovementsPage_tsx__AdminMovementsPage --> AdminMovementsPage_tsx__toggleSort
+    AdminMovementsPage_tsx__AdminMovementsPage --> AdminMovementsPage_tsx__reasonLabel
 ```
 
 ## NODE ID STANDARD

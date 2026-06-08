@@ -1,6 +1,6 @@
-import PageComponent from '../../../../views/BrandDetailPage'
-import { HVAC_BRANDS } from '../../../../data/brands'
 import { SITE_URL } from '../../../../config/siteUrl'
+import { HVAC_BRANDS } from '../../../../data/brands'
+import PageComponent from '../../../../views/BrandDetailPage'
 
 export async function generateStaticParams() {
   try {

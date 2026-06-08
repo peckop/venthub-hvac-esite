@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react'
+
 import BrandsPage from '../../../views/BrandsPage'
 
 export default function Page() {

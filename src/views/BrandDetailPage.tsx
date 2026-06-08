@@ -1,21 +1,23 @@
 'use client'
 
-import VentImage from '@/components/ui/VentImage'
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
+import { ArrowRight, ExternalLink,Package } from 'lucide-react'
 import Image from 'next/image'
-import { HVAC_BRANDS } from '../data/brands'
-import { getProductsEnriched } from '../lib/services/product.service'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+
+import VentImage from '@/components/ui/VentImage'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
-import type { Product } from '../types/ui-models'
+
 import { BrandIcon } from '../components/HVACIcons'
-import { ArrowRight, Package, ExternalLink } from 'lucide-react'
-import Seo from '../components/Seo'
-import { useI18n } from '../i18n/I18nProvider'
 import Breadcrumb from '../components/navigation/Breadcrumb'
-import { Routes } from '../utils/routes'
+import Seo from '../components/Seo'
+import { HVAC_BRANDS } from '../data/brands'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
+import { useI18n } from '../i18n/I18nProvider'
+import { getProductsEnriched } from '../lib/services/product.service'
+import type { Product } from '../types/ui-models'
+import { Routes } from '../utils/routes'
 
 const BRAND_DETAILS: Record<string, {
   founded?: number

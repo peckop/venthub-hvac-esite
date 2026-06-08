@@ -3,24 +3,20 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\AddToProjectModal.tsx
-skeleton_hash: d7b9006a963b7d28
+skeleton_hash: b523d4075dbe1bad
 entity_hashes:
   func:AddToProjectModal: 27f66ff6372a1fa9
-  overview: 4cc7e676daf152dc
+  overview: 4ec0a41f38191057
   style_tokens: 49ec4d1f3ff40796
-generated_at: 2026-06-07T20:34:31Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış
-Bu modül, bir ürünün projeye eklenmesi için kullanılan modal bileşenini tanımlar. Ürün bilgilerini görüntüler, ekleme işlemini başlatır ve pencerenin kontrolünü sağlar.
+Bu modül, bir ürünün projeye eklenmesi için kullanılan modal (açılır pencere) bileşenini tanımlar. Ürün bilgilerini görüntüler ve projeye ekleme işlemini başlatan kullanıcı arayüzünü yönetir.
 
 ## Fonksiyon Grupları
 ### Modal Bileşeni
 Bu grup, açılır pencerenin temel yapısını, durumunu ve görünümünü oluşturarak kullanıcı arayüzünü yönetir.
-- AddToProjectModal
-
-### Ürün Entegrasyonu
-Bu grup, ilgili ürün verilerini modal içerisine entegre eder ve projeye ekleme eylemi için gerekli mantığı yürütür.
 - AddToProjectModal
 
 ---
@@ -29,15 +25,11 @@ Bu grup, ilgili ürün verilerini modal içerisine entegre eder ve projeye eklem
 
 Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel aksiyomlar tanımlanmıştır.
 
-[Aksiyom 1]: Eğer `product` parametresi sağlanmazsa veya geçerli bir ürün nesnesi içermiyorsa, modal içinde ürün bilgileri gösterilemez ve bileşen hata verebilir.
+[Aksiyom 1]: Eğer `product` parametresi sağlanmazsa, modal içinde ürün bilgisi gösterilemez ve projeye ekleme eylemi eksik çalışır.
 
-[Aksiyom 2]: Eğer `isOpen` parametresi `false` veya truthy bir değer olarak ayarlanmazsa, modal açılmaz ve kullanıcı eyleme geçemez.
+[Aksiyom 2]: Eğer `isOpen` parametresi `false` ise, modal görünmez ve kullanıcı arayüzü modalı göstermez.
 
-[Aksiyom 3]: Eğer `onClose` callback fonksiyonu sağlanmazsa, modal kapatma eylemi (X butonu, backdrop tıklama) çalıştığında bileşen hata verebilir veya modal kapanamaz.
-
-[Aksiyom 4]: Eğer `isOpen` `true` iken `onClose` çağrıldığında state güncellenmezse, modal kapanmaz ve açık kalır.
-
-[Aksiyom 5]: Eğer `product` nesnesi gerekli alanları (örn: ürün adı, görsel, fiyat — değerler bilinmiyor) içermiyorsa, modal içinde eksik veya hatalı veri gösterimi oluşur.
+[Aksiyom 3]: Eğer `onClose` callback fonksiyonu sağlanmazsa, modal kapatılamaz ve kullanıcı pencereyi kapatamaz.
 
 ---
 
@@ -68,33 +60,51 @@ Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel aksiyom
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/AddToProjectModal.tsx::AddToProjectModal
-- **params**: (`product: Product`, `isOpen: boolean`, `onClose: () => void`)
+### [N1_NASIL] AST Pointer: AddToProjectModal.tsx::AddToProjectModal
+- **params**: `{ product, isOpen, onClose }` — `product` eklenecek ürün nesnesi (Product tipinde), `isOpen` modalın açık/kapalı durumu (boolean), `onClose` modalı kapatma callback fonksiyonu
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan dönen çeviri fonksiyonu, UI metinleri için kullanılır
-  - `projects` — useProjectLists hook'undan dönen mevcut projeler listesi
-  - `addProject` — useProjectLists hook'undan dönen yeni proje oluşturma fonksiyonu
-  - `addItemToProject` — useProjectLists hook'undan dönen projeye ürün ekleme fonksiyonu
-  - `newProjectName` — useState ile oluşturulan string state, yeni proje adını tutar
-  - `isCreating` — useState ile oluşturulan boolean state, yeni proje oluşturma modunun açık olup olmadığını belirtir
-  - `selectedProjectId` — useState ile oluşturulan string|null state, seçilen projenin ID'sini tutar
-  - `isAdding` — useState ile oluşturulan boolean state, ürün ekleme işleminin devam edip etmediğini belirtir
-  - `handleCreateAndAdd` — yeni proje oluşturup ürünü ekleyen async fonksiyon
-  - `handleAddToExisting` — mevcut projeye ürün ekleyen async fonksiyon
-- **Dönüş**: JSX (React elemanı) veya null (isOpen false ise)
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu, `t('common.addToProject')` gibi çağrılarla lokalize metin üretir
+  - `projects` — `useProjectLists()` hook'undan gelen mevcut projeler dizisi, kullanıcının projelerini listeler
+  - `addProject` — `useProjectLists()` hook'undan gelen fonksiyon, yeni proje oluşturmak için `addProject(newProjectName)` çağrılır
+  - `addItemToProject` — `useProjectLists()` hook'undan gelen fonksiyon, bir projeye ürün eklemek için `addItemToProject(projectId, productId)` çağrılır
+  - `newProjectName` — useState ile yönetilen string, yeni proje adı input değerini tutar
+  - `setNewProjectName` — useState setter, yeni proje adını günceller
+  - `isCreating` — useState ile yönetilen boolean, yeni proje oluşturma formunun açık/kapalı durumunu kontrol eder
+  - `setIsCreating` — useState setter, oluşturma formunun görünürlüğünü toggler
+  - `selectedProjectId` — useState ile yönetilen `string | null`, hangi projeye ekleme yapıldığını takip eder (spinner gösterimi için)
+  - `setSelectedProjectId` — useState setter, seçili proje ID'sini günceller
+  - `isAdding` — useState ile yönetilen boolean, ekleme işlemi sırasında loading durumunu yönetir
+  - `setIsAdding` — useState setter, loading durumunu toggler
+  - `handleCreateAndAdd` — async fonksiyon referansı, yeni proje oluşturup ürünü ekler
+  - `handleAddToExisting` — async fonksiyon referansı, mevcut projeye ürün ekler
+- **Dönüş**: JSX.Element (modal JSX'i) veya `null` (`!isOpen` durumunda)
 
-### [N2_NASIL] AST Pointer: src/components/products/AddToProjectModal.tsx::handleCreateAndAdd
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: AddToProjectModal.tsx::handleCreateAndAdd
+- **params**: yok
 - **ic_degiskenler**:
-  - `project` — addProject fonksiyonunun promise'ından dönen newly created proje nesnesi
-  - `error` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: Promise<void> (yan etkiler: yeni proje oluşturur, ürünü ekler, modalı kapatır)
+  - `newProjectName` — useState string, oluşturulacak yeni projenin adı; `.trim()` ile boşluk kontrolü yapılır
+  - `isAdding` — boolean, `setIsAdding(true)` ile loading başlatılır, `finally` bloğunda `false` yapılır
+  - `setIsAdding` — setter, loading durumunu yönetir
+  - `addProject` — hook fonksiyonu, `addProject(newProjectName)` ile yeni proje oluşturur, dönen nesnede `project.id` alanı kullanılır
+  - `project` — `await addProject(newProjectName)` sonucu dönen proje nesnesi, `.id` alanı ile `addItemToProject`'e geçilir
+  - `addItemToProject` — hook fonksiyonu, `addItemToProject(project.id, product.id)` ile ürünü projeye ekler
+  - `product` — props'tan gelen Product nesnesi, `.id` alanı ile `addItemToProject`'e geçilir
+  - `onClose` — props callback, başarılı ekleme sonrası modalı kapatır
+  - `error` — catch bloğu ile yakalanan hata nesnesi, `console.error(error)` ile loglanır
+- **Dönüş**: yok (void async)
 
-### [N3_NASIL] AST Pointer: src/components/products/AddToProjectModal.tsx::handleAddToExisting
-- **params**: (`projectId: string`)
+### [N3_NASIL] AST Pointer: AddToProjectModal.tsx::handleAddToExisting
+- **params**: `(projectId: string)` — ürünün eklenecek mevcut projenin ID'si
 - **ic_degiskenler**:
-  - `error` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: Promise<void> (yan etkiler: ürünü seçili projeye ekler, modalı kapatır)
+  - `projectId` — parametre, hedef projenin string ID'si
+  - `setSelectedProjectId` — setter, `setSelectedProjectId(projectId)` ile hangi projede loading olduğunu belirtir
+  - `isAdding` — boolean, `setIsAdding(true)` ile loading başlatılır, `finally` bloğunda `false` yapılır
+  - `setIsAdding` — setter, loading durumunu yönetir
+  - `addItemToProject` — hook fonksiyonu, `addItemToProject(projectId, product.id)` ile ürünü projeye ekler
+  - `product` — props'tan gelen Product nesnesi, `.id` alanı ile `addItemToProject`'e geçilir
+  - `onClose` — props callback, başarılı ekleme sonrası modalı kapatır
+  - `error` — catch bloğu ile yakalanan hata nesnesi, `console.error(error)` ile loglanır
+- **Dönüş**: yok (void async)
 
 ---
 

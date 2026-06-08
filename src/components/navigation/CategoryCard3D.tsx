@@ -1,8 +1,8 @@
-import React, { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber'
 import { Environment } from '@react-three/drei'
+import { Canvas } from '@react-three/fiber'
 import { ChevronRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import React, { Suspense } from 'react'
 const Category3DIcon = dynamic(() => import('../products/Category3DIcon'), { ssr: false, loading: () => null })
 import type { Category } from '@/types/ui-models'
 

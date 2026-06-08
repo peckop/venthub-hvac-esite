@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\api\webhook\supabase\route.ts
-skeleton_hash: fd9bb44065467f64
+skeleton_hash: 2fd2103c27a09b70
 entity_hashes:
   func:POST: b4117100eb99acd2
   overview: f01f3fd680e913b2
-generated_at: 2026-06-06T21:54:12Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış
@@ -64,6 +64,48 @@ Bu modül, Supabase webhook olaylarını HMAC ile doğrulayıp önbellek yenilem
 - `schema: string`
 - `record: Record<string, unknown> | null`
 - `old_record: Record<string, unknown> | null`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/api/webhook/supabase/route.ts::POST
+
+- **params**:
+  - `request: NextRequest` — Next.js tarafından sağlanan HTTP istek nesnesi, webhook payload'ını ve header'ları barındırır
+
+- **ic_degiskenler**:
+  - `payload` — `request.json()` ile parse edilen JSON gövdesi, `SupabaseWebhookPayload` tipinde; tablo adı, event türü, kayıt verilerini içerir
+  - `webhookSecret` — `request.headers.get('x-webhook-secret')` ile alınan, istemcinin gönderdiği webhook doğrulama token'ı
+  - `expectedSecret` — `process.env.SUPABASE_WEBHOOK_SECRET` ortam değişkeninden okunan, sunucuda beklenen geçerli secret değeri
+  - `table` — `payload`'dan destructured; hangi veritabanı tablosunda değişim olduğunu belirtir (`'products'`, `'categories'`, `'inventory_movements'`)
+  - `type` — `payload`'dan destructured; event türünü belirtir (`INSERT`, `UPDATE`, `DELETE`)
+  - `record` — `payload`'dan destructured; insert/update sonrası yeni kayıt verisi (nullable)
+  - `old_record` — `payload`'dan destructured; update/delete öncesi eski kayıt verisi (nullable)
+  - `activeRecord` — `record || old_record` ifadesinden türetilen; mevcut olan kaydı tutar, `record` varsa onu, yoksa `old_record`'u kullanır
+  - `tenantId` — `activeRecord.tenant_id` erişiminden elde edilen kiracı (tenant) tanımlayıcısı string; tenant'a özel tag revalidation'ları için kullanılır
+  - `revalidatedPaths` — `string[]` tipinde dizi; fonksiyon boyunca revalidate edilen tüm URL path'lerinin toplandığı akümülatör listesi
+  - `revalidatedTags` — `string[]` tipinde dizi; fonksiyon boyunca revalidate edilen tüm cache tag'lerinin toplandığı akümülatör listesi
+  - `productSlug` (products dalı) — `activeRecord.slug` erişiminden elde edilen ürün slug'ı; ürün detay sayfalarının path revalidation'ı için kullanılır
+  - `categoryId` — `activeRecord.category_id` erişiminden elde edilen kategori ID'si; ürünün ait olduğu kategoriyi bulmak için Supabase sorgusunda kullanılır
+  - `category` — `supabase.from('categories').select('slug').eq('id', categoryId).single()` sorgusunun `data` alanından destructured; kategori nesnesi, `category.slug` erişimi ile kategori path revalidation'ı yapılır
+  - `categorySlug` (categories dalı) — `activeRecord.slug` erişiminden elde edilen kategori slug'ı; kategori sayfalarının path revalidation'ı için kullanılır
+  - `productId` — `activeRecord.product_id` erişiminden elde edilen ürün ID'si; envanter hareketinin ait olduğu ürünü bulmak için Supabase sorgusunda kullanılır
+  - `product` — `supabase.from('products').select('slug, category_id').eq('id', productId).single()` sorgusunun `data` alanından destructured; ürün nesnesi, `product.slug` ve `product.category_id` erişimleri yapılır
+  - `productSlug` (inventory_movements dalı) — `product.slug` erişiminden elde edilen ürün slug'ı; ürün detay sayfalarının path revalidation'ı için kullanılır
+  - `category` (inventory_movements dalı) — `supabase.from('categories').select('slug').eq('id', product.category_id).single()` sorgusunun `data` alanından destructured; ürünün bağlı olduğu kategorinin slug bilgisini içerir
+  - `errorMsg` — catch bloğunda `error instanceof Error ? error.message : String(error)` ifadesinden türetilen; hata mesajının string karşılığı, 500 yanıt gövdesine yazılır
+
+- **Supabase API Çağrıları**:
+  - `supabase.from('categories').select('slug').eq('id', categoryId).single()` — products dalında, ürünün kategori slug'ını çekmek için
+  - `supabase.from('products').select('slug, category_id').eq('id', productId).single()` — inventory_movements dalında, envanter hareketinin ait olduğu ürünün slug ve kategori bilgisini çekmek için
+  - `supabase.from('categories').select('slug').eq('id', product.category_id).single()` — inventory_movements dalında, ürünün bağlı olduğu kategorinin slug'ını çekmek için
+
+- **Dönüş**: `NextResponse` — Üç farklı durumda döner:
+  1. Başarılı webhook işleminde: `{ revalidated: true, event: { table, type }, revalidatedPaths, revalidatedTags, timestamp }` gövdeli 200 yanıtı
+  2. Yetkisiz istekte (secret eşleşmiyor): `{ error: 'Unauthorized' }` gövdeli 401 yanıtı
+  3. Hata yakalandığında: `{ error: errorMsg }` gövdeli 500 yanıtı
+  - Yan etkiler: `revalidatePath()` ve `revalidateTag()` çağrıları ile Next.js ISR cache'ini invalidation eder
 
 ---
 

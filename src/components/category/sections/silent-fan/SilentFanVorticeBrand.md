@@ -3,31 +3,40 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanVorticeBrand.tsx
-skeleton_hash: 498d1962230f0b1c
+skeleton_hash: bdb180c4a8fae5fb
 entity_hashes:
   func:SilentFanVorticeBrand: e07a3a521f52112d
   func:tr: b282b53f03d688a5
-  overview: c14ff90f1c330ae7
+  overview: 754a28961314bbb7
   style_tokens: 40e58eb2e4f109bb
-generated_at: 2026-05-28T22:35:47Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, sessiz fan ürünlerini Vortice markasıyla tanıtan bir React bileşenini ve bu bileşen içinde kullanılan basit bir çeviri yardımcı fonksiyonunu içerir. Bileşen, ürün bilgilerini görsel olarak sunarken, çeviri fonksiyonu metinlerin çok dilli desteklenmesini sağlar.
+Bu modül, sessiz fan ürünlerini Vortice markasıyla tanıtan bir React bileşenini ve bu bileşen içinde kullanılan bir çeviri yardımcı fonksiyonunu içerir. Bileşen, markaya özel ürün bilgilerini ve görsel düzeni sunarken, çeviri fonksiyonu arayüz metinlerinin çok dilli olarak görüntülenmesini sağlar.
 
 ## Fonksiyon Grupları
 ### Kullanıcı Arayüzü Bileşeni
-Bu grup, ekranda görüntülenen sessiz fan ürün listesini ve ilgili görsel öğeleri oluşturan ana bileşeni içerir.
+Bu grup, Vortice markasına ait sessiz fan ürünlerini ekranda görsel olarak sunan ana React bileşenini ve ilgili düzeni tanımlar.
 - SilentFanVorticeBrand
 
 ### Çeviri Yardımcı Fonksiyonu
-Bu grup, bileşen içindeki sabit metinlerin farklı dillere çevrilmesini sağlayan küçük bir yardımcı işlevi barındırır.
+Bu grup, bileşen içindeki sabit metinlerin farklı dillere çevrilmesini sağlamak için kullanılan basit bir yardımcı fonksiyonu barındırır.
 - tr
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için minimalist aksiyomlar, yalnızca fonksiyon imzalarından türetilmiştir.
+
+[Aksiyom 1]: Eğer `tr` fonksiyonuna geçilen `key` değeri, çeviri sözlüğünde (translation dictionary) tanımlı bir anahtar değilse, undefined veya boş bir değer döner ve bileşen üzerinde tanımsız metin görüntülenebilir.
+
+[Aksiyom 2]: Eğer `SilentFanVorticeBrand` bileşeni çağrılmadan önce çeviri sözlüğü veya sağlayıcısı (provider) yüklenmemişse, `tr` fonksiyonu çağrılamaz ve bileşen render aşamasında hata verir.
+
+[Aksiyom 3]: Eğer `tr` fonksiyonuna boş string (`""`) geçilirse, bileşen üzerinde boş bir metin alanı oluşur.
+
+[Aksiyom 4]: `SilentFanVorticeBrand` parametresiz çağrılmaktadır; bileşenin ihtiyacı olan tüm veriler (ürün listesi, görseller vb.) modül içi import'lar veya React context aracılığıyla sağlanmalıdır.
 
 ---
 
@@ -51,34 +60,23 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanVorticeBrand.tsx::SilentFanVorticeBrand
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: `src/components/category/sections/silent-fan/SilentFanVorticeBrand.tsx`::SilentFanVorticeBrand
+- **params**: (parametre yok) — anonim React functional component, arrow function
 - **ic_degiskenler**:
-  - `t` — `useI18n` hookundan dönen çeviri fonksiyonu; anahtar bazlı metinleri almak için kullanılır.
-  - `dict` — `useI18n` tarafından sağlanan tüm i18n veri nesnesi; çeviri verilerine erişim sağlar.
-  - `sectionRef` — `<section>` öğesine bağlanan `ref`; `useScrollAnimation` ile öğenin görünürlüğünü takip etmek için kullanılır.
-  - `isVisible` — `useScrollAnimation` tarafından döndürüzen boolean; öğe viewport içinde görünür olduğunda `true`, aksi takdirde `false`.
-  - `tr` — yerel çeviri助手 fonksiyonu; parametre olarak gelen anahtarın önüne `categorySilentFan.brand.` ekleyerek `t` fonksiyonunu çağırır.
-  - `bDict` — `dict.categorySilentFan.brand` nesnesi; marka bölümüne ait çeviri verilerini içerir (stats, badges vb.).
-  - `icons` — `[Clock, Globe, Award, Star]` dizisi; istatistik kartlarındaki ikonları sırayla kullanmak için tutulur.
-  - `stats` — `bDict.stats || []` ifadesiyle elde edilen liste; marka istatistiklerini tutar, veri yoksa boş dizi olur.
-- **Dönüş**: JSX element (bileşen render ettiği `<section>` ve içeriği)
-
-### [N2_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanVorticeBrand.tsx::tr
-- **params**: `(key: string)`
-- **ic_degiskenler**: (yok) — fonksiyon gövdesinde yeni değişken tanımlanmaz.
-- **Dönüş**: `string` — `t` fonksiyonundan dönen çevirilmiş metin.
-
-### [N3_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanVorticeBrand.tsx::(item, index: number) inside stats.map
-- **params**: `(item: any, index: number)` — `item` bir stat nesnesi (`{ value, label }`), `index` dizindeki sırası.
-- **ic_degiskenler**:
-  - `Icon` — `icons[index % icons.length]` ile seçilen bileşen (`Clock`, `Globe`, `Award` veya `Star`); JSX elementi olarak render edilir.
-- **Dönüş**: JSX element — her stat için bir `<div>` (ikon ve değer/etiket) döndürür.
-
-### [N4_NASIL] AST Pointer: src/components/category/sections/silent-fan/SilentFanVorticeBrand.tsx::(badge: string, i: number) inside badges.map
-- **params**: `(badge: string, i: number)` — `badge` rozet metni, `i` dizindeki sırası.
-- **ic_degiskenler**: (yok) — fonksiyon gövdesinde yeni değişken tanımlanmaz.
-- **Dönüş**: JSX element — her rozet için stil uygulanmış `<div>` döndürür.
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu, `tr` içinde sarmalanarak `categorySilentFan.brand.*` alanına yönlendirir
+  - `dict` — `useI18n()` hook'undan gelen sözlük objesi, tam çeviri içeriğine erişim sağlar
+  - `sectionRef` — `useScrollAnimation<HTMLElement>()` hook'undan dönen ref, `<section>` elementine atanarak IntersectionObserver tetikleme noktası olarak kullanılır
+  - `isVisible` — `useScrollAnimation<HTMLElement>()` hook'undan dönen boolean, section'ın ekranda görünüp görünmediğini tutar; `scrollAnimationClasses.slideRight/isVisible` ve `scrollAnimationClasses.slideLeft/isVisible` ile CSS animasyon sınıflarını koşullu aktif eder
+  - `tr` — `(key: string) => t(...)` şeklinde tanımlı yerel yardımcı fonksiyon, verilen key'i `categorySilentFan.brand.` prefix'i ile birleştirerek çeviriyi kısaltmalı yoldan getirir
+  - `bDict` — `dict.categorySilentFan.brand` erişiminden elde edilen alt sözlük objesi; `bDict.stats` ve `bDict.badges` alanlarından veri okunur
+  - `icons` — `[Clock, Globe, Award, Star]` sabit dizisi; lucide-react'ten import edilen 4 ikon bileşeni, stats.map içinde her satıra sırasıyla ikon atamak için kullanılır
+  - `stats` — `bDict.stats || []` ifadesinden elde edilen istatistik nesneleri dizisi; her biri `{ value, label }` yapısına sahiptir, `.map()` ile dönülerek kartlar oluşturulur
+  - `item` — `stats.map` callback'inde dönen her bir istatistik nesnesi; `item.value` ve `item.label` alanları JSX'te render edilir
+  - `index` — `stats.map` callback'indeki sıralama indeksi; `icons[index % icons.length]` ile ikon seçiminde modular aritmetik kullanılır
+  - `Icon` — `icons[index % icons.length]` ifadesinden hesaplanan bileşen; `stats.map` içinde her satıra karşılık gelen ikon bileşenini tutar, `<Icon className="..." size={24} />` olarak render edilir
+  - `badge` — `(badge: string, i: number)` callback parametresi; `bDict.badges` dizisindeki her bir rozet metni, `<div>` içinde doğrudan.textContent olarak render edilir
+  - `i` — `(badge: string, i: number)` callback parametresi; rozet indeksi, `key={i}` için ve `i === 0` koşuluyla ilk rozete mavi arka plan vermek için kullanılır
+- **Dönüş**: `JSX.Element` — React bileşeni, hero section'ı render eden `<section>` elementi döner; sol tarafta başlık, açıklama, istatistik kartları ve rozetler, sağ tarafta VentImage ile görsel içeren iki sütunlu grid layout
 
 ---
 

@@ -3,33 +3,41 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\calculators\DuctCalcPage.tsx
-skeleton_hash: 834d4aeeba7373bf
+skeleton_hash: 2f798e3361126451
 entity_hashes:
   func:DuctCalcPage: 531002b319923b38
   func:reset: 16764b441f7bc7b6
-  overview: 942800c1e8cf5fbf
+  overview: 1f3bf3c7f06ebe09
   style_tokens: 002582f3ef540f0d
-generated_at: 2026-05-28T22:39:59Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinde kanal hesaplama işlemlerini gerçekleştiren React tabanlı bir sayfa bileşenidir. Kullanıcıların HVAC sistemleri için gerekli kanal boyutlarını hesaplayabileceği etkileşimli bir arayüz sunar ve hesaplama sürecinin yönetimini sağlar.
+Bu modül, VentHub HVAC projesinde kanal (duct) hesaplama işlemlerini yöneten React tabanlı bir sayfa bileşenidir. Kullanıcıların HVAC sistemleri için gerekli kanal boyutlarını hesaplayabileceği etkileşimli bir arayüz sunar ve hesaplama sürecinin yönetimini sağlar. Temel olarak, kullanıcı girdilerini alarak hesaplama yapar ve form alanlarının sıfırlanması gibi yardımcı işlemleri koordine eder.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Kanal hesaplama sayfasının tüm arayüzünü ve iş mantığını bir arada yöneten ana React bileşenidir. Kullanıcıdan girdi alır, hesaplama işlemlerini koordine eder ve sonuçları görüntüler.
+Kanal hesaplama sayfasının tüm arayüzünü ve iş mantığını yöneten ana React bileşenidir. Kullanıcıdan girdi alır, hesaplama işlemlerini koordine eder ve sonuçları görüntüler.
 - DuctCalcPage
 
 ### Hesaplama Yardımcı İşlemleri
-Kullanıcı tarafından girilen değerlerin ve hesaplama durumunun başlangıç değerlerine dönüştürülmesini sağlayan yardımcı işlevdir. Form alanlarını temizleyerek kullanıcının yeni bir hesaplama yapmasına olanak tanır.
+Hesaplama form alanlarının ve kullanıcı girdilerinin başlangıç durumuna sıfırlanmasını sağlayan yardımcı işlevdir. Kullanıcının yeni bir hesaplama sürecine başlaması için formu temizler.
 - reset
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-DuctCalcPage modülünün doğru çalışması için React bileşeni lifecycle ve form state yönetimi temel varsayımları geçerlidir.
+Bu modül için fonksiyon gövdesinden türetilebilecek net mimari varsayımlar sınırlıdır; çünkü verilen fonksiyon imzaları (DuctCalcPage() ve reset()) boş veya çok temeldir. Varsayımlar, bu imzaların varlığından ve genel React bileşeni yapısından çıkarımlara dayanır.
 
-[Aksiyom 1]: Eğer DuctCalcPage bileşeni için hesaplama form alanlarına karşılık gelen state'ler (useState, vb.) tanımlı değilse, kullanıcı veri giremez veya
+[Aksiyom 1]: Eğer DuctCalcPage bileşeni, React tarafından doğru şekilde挂载 (mount) edilmezse, kanal hesaplama arayüzü kullanıcıya gösterilmez.
+
+[Aksiyom 2]: Eğer reset() fonksiyonu çağrılmazsa, bileşen içindeki form alanları veya hesaplama durumu, başlangıç değerlerine sıfırlanmaz.
+
+[Aksiyom 3]: Eğer DuctCalcPage bileşeni içinde state yönetimi (örn. useState) düzgün çalışmıyorsa, kullanıcı girdileri veya hesaplama sonuçları tutarsız kalabilir.
+
+[Aksiyom 4]: Eğer hesaplama mantığı (muhtemelen DuctCalcPage gövdesinde tanımlı) geçerli bir parametre kümesi almazsa (örn. eksik kanal boyutu girdisi), hesaplama sonucu hatalı veya eksik olabilir.
+
+[Aksiyom 5]: Eğer form doğrulama (input validation) fonksiyon gövdesinde uygulanmışsa, geçersiz değerler (örn. negatif kanal genişliği) hesaplamaya sokulmamalıdır; aksi halde hesaplama sonucu geçersiz olur. (Not: Varsayılan değerler verilmediği için, doğrulama kuralları ve eşik değerleri bilinmiyor.)
 
 ---
 
@@ -56,62 +64,51 @@ DuctCalcPage modülünün doğru çalışması için React bileşeni lifecycle v
 ### [N1_NASIL] AST Pointer: DuctCalcPage.tsx::DuctCalcPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hookundan dönen çeviri fonksiyonu
-  - `ductTypeOptions` — useMemo ile hesaplanan kanat tipi seçenekleri (circular/rectangular)
-  - `materialOptions` — useMemo ile hesaplanan malzeme seçenekleri (galvanized/pvc/flex)
-  - `airflow` — hava debisi state değişkeni (varsayılan: '500')
-  - `setAirflow` — airflow state'ini güncelleyen setter
-  - `ductType` — kanat tipi state değişkeni (DuctType: 'rectangular')
-  - `setDuctType` — ductType state'ini güncelleyen setter
-  - `diameter` — çap state değişkeni (sadece dairesel kanat için, varsayılan: '200')
-  - `setDiameter` — diameter state'ini güncelleyen setter
-  - `width` — genişlik state değişkeni (sadece dikdörtgen kanat için, varsayılan: '300')
-  - `setWidth` — width state'ini güncelleyen setter
-  - `height` — yükseklik state değişkeni (sadece dikdörtgen kanat için, varsayılan: '200')
-  - `setHeight` — height state'ini güncelleyen setter
-  - `length` — uzunluk state değişkeni (varsayılan: '10')
-  - `setLength` — length state'ini güncelleyen setter
-  - `material` — malzeme state değişkeni (DuctMaterial: 'galvanized')
-  - `setMaterial` — material state'ini güncelleyen setter
-  - `result` — useMemo ile hesaplanan kanat hesaplama sonucu (DuctCalcResult veya null)
-  - `reset` — formu sıfırlayan fonksiyon
-- **Dönüş**: JSX (CalculatorLayout bileşeni)
+  - `t` — useI18n hookundan gelen çeviri fonksiyonu, tüm metinler için kullanılır
+  - `ductTypeOptions` — useMemo ile hesaplanan kanat tipi seçenekleri (circular ve rectangular)
+  - `materialOptions` — useMemo ile hesaplanan malzeme seçenekleri (galvanized, pvc, flex)
+  - `airflow` — hava debisi değerini tutan state değişkeni
+  - `setAirflow` — airflow state'ini güncelleyen setter fonksiyonu
+  - `ductType` — seçili kanat tipini tutan state değişkeni (circular veya rectangular)
+  - `setDuctType` — ductType state'ini güncelleyen setter fonksiyonu
+  - `diameter` — dairesel kanat çapı değerini tutan state değişkeni
+  - `setDiameter` — diameter state'ini güncelleyen setter fonksiyonu
+  - `width` — dikdörtgen kanat genişliği değerini tutan state değişkeni
+  - `setWidth` — width state'ini güncelleyen setter fonksiyonu
+  - `height` — dikdörtgen kanat yüksekliği değerini tutan state değişkeni
+  - `setHeight` — height state'ini güncelleyen setter fonksiyonu
+  - `length` — kanat uzunluğu değerini tutan state değişkeni
+  - `setLength` — length state'ini güncelleyen setter fonksiyonu
+  - `material` — seçili malzeme tipini tutan state değişkeni
+  - `setMaterial` — material state'ini güncelleyen setter fonksiyonu
+  - `result` — useMemo ile hesaplanan hesaplama sonucu (null veya obje)
+  - `reset` — state'leri başlangıç değerlerine sıfırlayan fonksiyon
+- **Dönüş**: React component (JSX)
 
 ### [N2_NASIL] AST Pointer: DuctCalcPage.tsx::reset
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `setAirflow` — airflow state'ini '500' değerine sıfırlayan setter
-  - `setDuctType` — ductType state'ini 'rectangular' değerine sıfırlayan setter
-  - `setDiameter` — diameter state'ini '200' değerine sıfırlayan setter
-  - `setWidth` — width state'ini '300' değerine sıfırlayan setter
-  - `setHeight` — height state'ini '200' değerine sıfırlayan setter
-  - `setLength` — length state'ini '10' değerine sıfırlayan setter
-  - `setMaterial` — material state'ini 'galvanized' değerine sıfırlayan setter
+- **ic_degiskenler**: yok
 - **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: DuctCalcPage.tsx::ductTypeOptions (useMemo callback)
+### [N3_NASIL] AST Pointer: DuctCalcPage.tsx::useMemo_ductTypeOptions
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n hookundan dönen çeviri fonksiyonu (closure tarafından erişiliyor)
-  - `Circle` — lucide-react icon bileşeni (dairesel kanat için)
-  - `Square` — lucide-react icon bileşeni (dikdörtgen kanat için)
-- **Dönüş**: Array<{value: string, label: string, description: string, icon: JSX.Element}>
+- **ic_degiskenler**: yok
+- **Dönüş**: dizi (option objeleri)
 
-### [N4_NASIL] AST Pointer: DuctCalcPage.tsx::materialOptions (useMemo callback)
+### [N4_NASIL] AST Pointer: DuctCalcPage.tsx::useMemo_materialOptions
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — useI18n hookundan dönen çeviri fonksiyonu (closure tarafından erişiliyor)
-- **Dönüş**: Array<{value: string, label: string, description: string}>
+- **ic_degiskenler**: yok
+- **Dönüş**: dizi (option objeleri)
 
-### [N5_NASIL] AST Pointer: DuctCalcPage.tsx::result (useMemo callback)
+### [N5_NASIL] AST Pointer: DuctCalcPage.tsx::useMemo_calculation
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `flow` — airflow state'inin parseFloat ile sayısal karşılığı
-  - `len` — length state'inin parseFloat ile sayısal karşılığı
-  - `dia` — diameter state'inin parseFloat ile sayısal karşılığı
-  - `w` — width state'inin parseFloat ile sayısal karşılığı
-  - `h` — height state'inin parseFloat ile sayısal karşılığı
-- **Dönüş**: DuctCalcResult nesnesi veya null (hatalı girdi durumunda)
+  - `flow` — airflow state'inden parse edilen float, 0 ise fallback 0
+  - `len` — length state'inden parse edilen float, 0 ise fallback 0
+  - `dia` — diameter state'inden parse edilen float, 0 ise fallback 0
+  - `w` — width state'inden parse edilen float, 0 ise fallback 0
+  - `h` — height state'inden parse edilen float, 0 ise fallback 0
+- **Dönüş**: null veya hesaplama sonucu obje
 
 ---
 

@@ -1,16 +1,18 @@
 'use client'
 
-import React from 'react'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import React from 'react'
+
 import type { FtsProductResult, SearchSuggestion } from '@/types/ui-models'
+
+import { useCategories } from '../contexts/CategoryContext'
 import { useI18n } from '../i18n/I18nProvider'
-import { highlightMatch } from '../utils/searchHighlight'
+import { supabaseBrowserClient } from '../lib/supabase/client'
+import type { DbCategory } from '../types/db-rows'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { Routes } from '../utils/routes'
-import type { DbCategory } from '../types/db-rows'
-import { useCategories } from '../contexts/CategoryContext'
-import { supabaseBrowserClient } from '../lib/supabase/client'
+import { highlightMatch } from '../utils/searchHighlight'
 
 interface SearchOverlayProps {
   open: boolean

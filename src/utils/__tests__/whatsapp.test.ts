@@ -1,18 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach,describe, expect, it, vi } from 'vitest'
+
+import * as utils from '../../lib/utils'
 import {
-  getWhatsAppNumber,
-  formatPhoneNumber,
   createWhatsAppLink,
+  formatPhoneNumber,
+  generateContactMessage,
+  generateFAQSupportMessage,
   generateStockInquiryMessage,
   generateSupportMessage,
   generateTechnicalQuoteMessage,
-  generateFAQSupportMessage,
-  generateContactMessage,
-  isWhatsAppAvailable,
   getStockInquiryLink,
-  getSupportLink
-} from '../whatsapp'
-import * as utils from '../../lib/utils'
+  getSupportLink,
+  getWhatsAppNumber,
+  isWhatsAppAvailable} from '../whatsapp'
 
 vi.mock('../../lib/utils', () => ({
   buildWhatsAppLink: vi.fn((phone, msg) => `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`)

@@ -8,7 +8,7 @@ entity_hashes:
   func:Page: 766296f80aeb6522
   overview: c73bb90923c0bd87
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-05-28T22:34:48Z
+generated_at: 2026-06-08T10:08:10Z
 ---
 
 ## Genel Bakış

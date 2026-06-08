@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ProductsPage.tsx
-skeleton_hash: 40ef96baa6f0d234
+skeleton_hash: f1a75c549871cdc5
 entity_hashes:
   func:ProductsPage: 6bc2b4f1a097b21a
   overview: d5a8d0a1df0adbe7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:40:28Z
+generated_at: 2026-06-08T10:10:59Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,17 @@ Bu modül, VentHub HVAC projesindeki ürünlerin listelendiği ve keşfedildiği
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, bir React sayfa bileşeni olup dışarıdan başlatma verileri alarak ürün listeleme arayüzünü oluşturur.
+
+[Aksiyom 1]: Eğer `initialCategories` prop'u sağlanmazsa, ProductsPage bileşeni kategorisiz bir ürün listeleme sayfası olarak çalışır veya hata oluşur (fonksiyon gövdesinde nasıl kullanıldığı bilinmiyor).
+
+[Aksiyom 2]: Eğer `initialCategories` bir dizi (array) formatında değilse, bileşen beklenmedik davranış gösterebilir (prop isminden çıkarılan kategori listesi varsayımı).
+
+[Aksiyom 3]: Eğer React ortamı (Router, State Management vb.) doğru yapılandırılmamışsa, bileşen sayfa yönlendirmelerinde veya durum yönetiminde başarısız olur (sayfa bileşeni olması nedeniyle).
+
+[Aksiyom 4]: Eğer `initialCategories` boş bir dizi ise, sayfa tüm ürünleri kategori filtresi olmadan gösterir veya "kategori bulunamadı" durumuna düşer (boş dizi davranışı bilinmiyor).
 
 ---
 
@@ -44,6 +54,15 @@ Bu modül, VentHub HVAC projesindeki ürünlerin listelendiği ve keşfedildiği
 
 ### ProductsPageProps
 - `initialCategories?: DomainCategory[]`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: ProductsPage.tsx::ProductsPage
+- **params**: `initialCategories` — üst bileşenden gelen başlangıç kategorileri listesi (`DomainCategory[]`)
+- **ic_degiskenler**: (yok — fonksiyon gövedesinde herhangi bir değişken tanımlanmamıştır)
+- **Dönüş**: `<ProductsDiscoveryView>` JSX elementi — `initialCategories` prop'unu alt bileşene iletir
 
 ---
 

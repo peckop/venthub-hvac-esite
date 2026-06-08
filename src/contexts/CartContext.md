@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\CartContext.tsx
-skeleton_hash: bcf8fdf88a2f5de4
+skeleton_hash: fcecd9351d5bed43
 entity_hashes:
   overview: 5c2e2a3fcb9d0dde
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-06T21:55:00Z
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
@@ -57,21 +57,6 @@ Bu modül, yalnızca bir React Context tanımı içererek alışveriş sepeti du
 ## AST POINTERS
 
 Dosya içinde herhangi bir **fonksiyon gövdesi** bulunmamaktadır. Dosya yalnızca bir React Context tanımı ve tip importlarından oluşmaktadır.
-
----
-
-Dosya yapısı:
-
-| Öğe | Açıklama |
-|-----|----------|
-| `import { createContext } from 'react'` | React Context oluşturucu import edilmiş |
-| `import type { Product }` | Ürün tipi import edilmiş (kullanım alanı belirsiz — muhtemelen Context interface'inde kullanılıyor) |
-| `import type { CartItem }` | Sepet öğesi tipi import edilmiş (kullanım alanı belirsiz — muhtemelen Context interface'inde kullanılıyor) |
-| `CartContext (call)` | `createContext(...)` çağrısı ile bir Context nesnesi oluşturulmuş — **bu bir fonksiyon gövdesi değil, üst seviye bir ifadedir** |
-
----
-
-> **Not:** Bu dosyada analiz edilecek bir fonksiyon gövdesi mevcut değildir. `CartContext (call)` ifadesi, `createContext` fonksiyonunun **çağrısı** olup, kendi içinde bir gövde içermez. Bu nedenleParams, iç değişken ve dönüş analizi yapılamamaktadır.
 
 ---
 

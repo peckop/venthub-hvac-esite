@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react'
+import { Activity, Bell, Box, Check, Clock,ShoppingBag, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+import React, { useEffect, useRef,useState } from 'react'
 import { toast } from 'sonner'
-import { ShoppingBag, Box, Bell, X, Check, Activity, Clock } from 'lucide-react'
-import { formatDateTime } from '../../i18n/datetime'
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
 import { useTenant } from '../../hooks/useTenant'
+import { formatDateTime } from '../../i18n/datetime'
 
 interface AppNotification {
     id: string

@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { adminSelectClass, adminSelectStyle } from '../../utils/adminUi'
 import * as Switch from '@radix-ui/react-switch'
+import { Search,SlidersHorizontal } from 'lucide-react'
+import React, { useEffect,useRef, useState } from 'react'
+
 import { useI18n } from '../../i18n/I18nProvider'
-import { SlidersHorizontal, Search } from 'lucide-react'
+import { adminSelectClass, adminSelectStyle } from '../../utils/adminUi'
 
 export type AdminToolbarChip = {
   key: string

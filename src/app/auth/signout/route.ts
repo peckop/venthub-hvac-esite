@@ -1,7 +1,8 @@
-import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { clearClaimsCacheCookie } from '@/utils/router'
 
 export async function POST(request: Request) {

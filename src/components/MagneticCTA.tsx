@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+
 import { useI18n } from '../i18n/I18nProvider'
 
 const MagneticCTA: React.FC = () => {

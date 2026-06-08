@@ -8,10 +8,10 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/'
 }))
 
-import React from 'react'
-import { render, screen, cleanup } from '@testing-library/react'
+import { cleanup,render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import React from 'react'
+import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock sonner
 vi.mock('sonner', () => ({
@@ -43,11 +43,13 @@ vi.mock('../../../utils/passwordSecurity', () => ({
 }))
 
 // Provide minimal Auth and I18n contexts
+import { toast } from 'sonner'
+
+import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+
 import { AuthContext } from '../../../contexts/AuthContextDefinition'
 import { I18nProvider } from '../../../i18n/I18nProvider'
 import AccountSecurityPage from '../AccountSecurityPage'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
-import { toast } from 'sonner'
 
 function renderWithProviders(ui: React.ReactElement, { userEmail = 'u@example.com' } = {}) {
   const authValue: React.ContextType<typeof AuthContext> = {

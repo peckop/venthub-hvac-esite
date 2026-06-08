@@ -3,30 +3,43 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\knowledge\TopicPage.tsx
-skeleton_hash: 0c7e1c369b37db44
+skeleton_hash: fcebd7ec56cccae1
 entity_hashes:
   func:TopicPage: f0965ed8eda6ce60
-  overview: 288735bf511e8c87
+  overview: e2c2f0ab8ac5351b
   style_tokens: cc78d049395b1cf9
-generated_at: 2026-06-07T20:34:41Z
+generated_at: 2026-06-08T10:11:02Z
 ---
 
 ## Genel Bakış
-`TopicPage` bileşeni, bir konuya ait dinamik içeriği URL parametresi (`slug`) üzerinden alıp, ilgili veri kaynaklarından (örneğin API veya yerel veri dosyaları) konunun detaylarını çekerek kullanıcıya sunan bir sayfa bileşenidir. React‑router ile entegre çalışır ve sayfa başlığı, meta verileri ve içerik bölümlerini render eder.
+TopicPage bileşeni, VentHub HVAC platformunda bilgi tabanındaki konuların detaylı sayfa görünümünü sağlayan ana React bileşenidir. URL'den gelen benzersiz bir tanımlayıcı ile (slug) ilgili konunun tüm içeriğini, başlığını ve ilişkili verilerini çekerek kullanıcıya sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Veri Çekme ve Hazırlama
-Bu grup, `slug` değerine göre konu verisini elde eder, hata ve yükleme durumlarını yönetir, ardından bileşenin render aşamasına hazır hâle getirir.  
+### Sayfa Verisi Yönetimi ve Koordinasyon
+Bileşen, aldığı slug parametresini kullanarak ilgili konu verisini çeker, yükleme ve hata durumlarını yönetir ve render işlemi için gerekli verileri hazırlar.
 - TopicPage
 
-### UI Render ve Layout
-Bu grup, alınan veri üzerinden başlık, açıklama, görseller ve ilgili alt bileşenleri (ör. `KnowledgeCard`, `RelatedTopics`) düzenleyerek kullanıcı arayüzünü oluşturur.  
-- TopicPage (render kısmı)
+### Kullanıcı Arayüzü Oluşturma
+Hazırlanan veriler kullanılarak konu sayfasının başlığı, ana içeriği, meta bilgileri ve ilişkili konu kartları gibi UI bileşenleri render edilerek tam bir sayfa oluşturulur.
+- TopicPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için temel mimari varsayımlar aşağıdadır:
+
+[Aksiyom 1]: Eğer `propSlug` parametresi geçerli bir değer (boş string veya undefined/null değil) yoksa, sayfa içeriği düzgün yüklenemez ve hata/yükleme durumu sonsuz döngüde kalabilir.
+
+[Aksiyom 2]: Eğer `slug` değerine karşılık gelen konu verisi API veya yerel veri kaynağında mevcut değilse, bileşen bir hata durumu render etmelidir (veri bulunamadı).
+
+[Aksiyom 3]: Eğer veri kaynağı (API) erişilemez durumdaysa veya network bağlantısı kopuksa, bileşen-network/hata durumunu göstermeli ve yeniden deneme mekanizması sunmalıdır.
+
+[Aksiyom 4]: Eğer veri başarıyla çekildi ancak zorunlu alanlar (başlık, içerik bölümü) eksikse, bileşen kısmi render veya hata durumuna geçmelidir.
+
+[Aksiyom 5]: Eğer `slug` parametresi değişir (örn: kullanıcı farklı bir konuya geçerse), bileşen mevcut veriyi temizlemeli ve yeni slug için tekrar veri çekme işlemi başlatmalıdır.
+
+[Aksiyom 6]: Eğer veri çekme işlemi devam ediyorsa (yükleniyor durumu), bileşen bir skeleton/loading göstergesi render etmeli, eski veriyi göstermemelidir.
 
 ---
 
@@ -50,20 +63,30 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\knowledge\TopicPage.tsx::TopicPage
-- **params**: `{ slug: propSlug }` – bileşene dışarıdan gelen `slug` özelliği, `propSlug` adıyla yerel değişkene atanır.
+### [N1_NASIL] AST Pointer: TopicPage.tsx::TopicPage
+- **params**: `(propSlug)` — Sayfaya dışarıdan gelen opsiyonel topic slug'ı
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hookundan dönen çeviri fonksiyonu; `t(key)` ile i18n metinlerine erişir.
-  - `params` — `useParams()` hookundan alınan URL parametreleri nesnesi.
-  - `currentSlug` — `propSlug` mevcutsa onu, yoksa `params?.slug` değerini (string) tutar; konu kimliğini belirler.
-  - `base` — `currentSlug` varsa `"knowledge.topics.${currentSlug}"` biçiminde, yoksa boş string; çeviri anahtarlarının ön ekini oluşturur.
-  - `title` — `t(`${base}.title`)` çağrısıyla elde edilen konu başlığı metni.
-  - `exists` — `currentSlug` tanımlı ve `title` çeviri anahtarına eşit değilse `true`; konunun varlığını gösterir.
-  - `rawSteps` — `t(`${base}.steps`)` ile alınan ham adım verisi (herhangi bir tipte).
-  - `steps` — `Array.isArray(rawSteps) ? rawSteps : []` ifadesiyle, `rawSteps` bir dizi ise onu, değilse boş dizi olarak tutar.
-  - `rawPitfalls` — `t(`${base}.pitfalls`)` ile alınan ham risk verisi (herhangi bir tipte).
-  - `pitfalls` — `Array.isArray(rawPitfalls) ? rawPitfalls : []` ifadesiyle, `rawPitfalls` bir dizi ise onu, değilse boş dizi olarak tutar.
-- **Dönüş**: `JSX.Element` – koşula göre “bulunamadı” mesajı veya tam konu sayfası içeren JSX yapısını döner.
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu, sayfadaki tüm metinleri çevirir
+  - `params` — useParams hook'undan dönen URL parametreleri nesnesi
+  - `currentSlug` — Aktif topic slug'ı; propSlug varsa onu, yoksa params.slug'ı kullanır
+  - `base` — Çeviri anahtarı için temel yol; "knowledge.topics.{currentSlug}" formatında
+  - `title` — Mevcut topic'in çevirisi ile elde edilen başlık
+  - `exists` — Topic'in var olup olmadığını belirleyen boolean; currentSlug ve title kontrolü
+  - `rawSteps` — Topic'in adım listesini içeren hammadde veri (dizi veya string olabilir)
+  - `steps` — İşlenmiş adım listesi; rawSteps dizi ise onu, değilse boş dizi kullanır
+  - `rawPitfalls` — Topic'in tuzak listesini içeren hammadde veri (dizi veya string olabilir)
+  - `pitfalls` — İşlenmiş tuzak listesi; rawPitfalls dizi ise onu, değilse boş dizi kullanır
+- **Dönüş**: JSX elementi (React.FC) — Topic içeriği veya "bulunamadı" sayfası
+
+### [N2_NASIL] AST Pointer: TopicPage.tsx::stepsCallback
+- **params**: `(s: string, i: number)` — `s`: Tek bir adım metni, `i`: Adımın dizideki indeks numarası
+- **ic_degiskenler**: (yok — parametreler doğrudan JSX'te kullanılır)
+- **Dönüş**: JSX elementi — Her adım için gösterilecek div bileşeni
+
+### [N3_NASIL] AST Pointer: TopicPage.tsx::pitfallsCallback
+- **params**: `(s: string, i: number)` — `s`: Tek bir tuzak/tavsiye metni, `i`: Tuzak listesindeki indeks numarası
+- **ic_degiskenler**: (yok — parametreler doğrudan JSX'te kullanılır)
+- **Dönüş**: JSX elementi — Her tuzak için gösterilecek div bileşeni
 
 ---
 

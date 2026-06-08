@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\authority\VideoAuthority.tsx
-skeleton_hash: ab89d91ee94c3aeb
+skeleton_hash: 5da7532bc10b8800
 entity_hashes:
   func:VideoAuthority: e820e802f63e86c2
   overview: 6991295f943a61c1
   style_tokens: ee9eb5151ad04adf
-generated_at: 2026-05-28T22:35:41Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış

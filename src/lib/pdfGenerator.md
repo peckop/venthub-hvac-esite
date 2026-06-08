@@ -3,45 +3,49 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\pdfGenerator.ts
-skeleton_hash: 459843494b89b28a
+skeleton_hash: d6cf907668b941a8
 entity_hashes:
   func:arrayBufferToBase64: ac0cb07b30bf5c01
   func:generateProductDatasheet: eac5e07d950d7a2e
-  overview: 936f502efa6fe32b
-generated_at: 2026-06-07T15:51:57Z
+  overview: 8f2e14b413976ba5
+generated_at: 2026-06-08T10:09:33Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformu için özelleştirilmiş ürün veri sayfası (PDF) oluşturmayı sağlar. Ürün bilgilerini, çok dilli çeviri desteğini ve isteğe bağlı görselleri entegre ederek profesyonel dokümanlar üretir. Modül, PDF oluşturma sürecinde gerekli olan yardımcı veri dönüşüm işlemlerini de yönetir.
+Bu modül, VentHub HVAC sistemi için ürün teknik spesifikasyonlarını ve bilgilerini içeren profesyonel PDF belgeleri oluşturmakla sorumludur. Modül, ürün verilerini, çok dilli metin çevirilerini ve opsiyonel görselleri bir araya getirerek dinamik ve kullanıma hazır dokümanlar üretir.
 
 ## Fonksiyon Grupları
 ### Ana PDF Üretim Süreci
-Ürün detaylarını, çeviri anahtarlarını ve görsel URL'sini alarak tam bir PDF dokümanı üretir. Bu süreç, çok dilli metin desteği ve görsel entegrasyonu dahil olmak üzere tüm hazırlık adımlarını yönetir.
+Bu grup, bir ürünün tüm bilgilerini ve ilişkili parametreleri alarak son kullanıcıya sunulacak tek sayfalık (veya çok sayfalık) bir PDF dokümanını oluşturma işlemini yönetir.
 - generateProductDatasheet
 
 ### Yardımcı Veri Dönüşüm Fonksiyonları
-PDF'e eklenecek ikili (binary) verileri, doküman yapısının anlayabileceği temel formata (base64) dönüştürerek ana sürecin kullanımına hazırlar.
+Bu grup, PDF içeriğine yerleştirilecek olan ikili (binary) formatındaki verileri (örneğin, görseller) Base64 kodlamasına dönüştürerek ana sürecin kullanabileceği hale getiren yardımcı araçları içerir.
 - arrayBufferToBase64
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için geçerli mimari varsayımlar aşağıdadır.
+Bu modül, ürün veri sayfası PDF'i oluşturma ve ArrayBuffer'ı Base64'e dönüştürme amacıyla tasarlanmıştır. Aşağıdaki mimari varsayımlar fonksiyon imzalarından türetilmiştir.
 
-[Aksiyom 1]: Eğer `generateProductDatasheet` fonksiyonuna geçerli bir `product` (Product tipi) nesnesi verilmemişse, PDF üretimi başarısız olur veya geçersiz çıktı oluşur.
+**[Aksiyom 1 - Zorunlu Dil Belirteci]:**
+Eğer `lang` parametresi `generateProductDatasheet` çağrısında sağlanmazsa, PDF oluşturma süreci başarısız olur. `lang` parametresi default değere sahip değildir ve zorunludur.
 
-[Aksiyom 2]: Eğer `generateProductDatasheet` fonksiyonuna `lang` parametresi sağlanmamışsa, fonksiyon çağrısı başarısız olur (parametre zorunludur, default değeri yoktur).
+**[Aksiyom 2 - Ürün Verisi Zorunluluğu]:**
+Eğer `product` parametresi `generateProductDatasheet` çağrısında geçilmezse veya geçersiz bir `Product` nesnesi ise, PDF oluşturma başarısız olur.
 
-[Aksiyom 3]: Eğer `imageUrl` parametresi verilmemişse, PDF içeriğinde ürün görseli olmadan oluşturulur.
+**[Aksiyom 3 - Çeviri Fonksiyonunun Opsiyonelliği]:**
+Eğer `translateKey` parametresi sağlanmazsa, modül çok dilli çeviri desteği olmadan çalışır; PDF içeriği varsayılan/çevrilmemiş metinlerle oluşturulur.
 
-[Aksiyom 4]: Eğer `translateKey` parametresi verilmemişse, PDF içeriğinde çeviri desteksiz (ham anahtar değerleriyle) oluşturulur.
+**[Aksiyom 4 - Görsel URL'sinin Opsiyonelliği]:**
+Eğer `imageUrl` parametresi sağlanmazsa, PDF ürün görseli içermeyen bir formatta üretilir; görsel bölümü atlanır.
 
-[Aksiyom 5]: Eğer `arrayBufferToBase64` fonksiyonuna geçerli bir `ArrayBuffer` nesnesi verilmemişse, Base64 dönüşümü başarısız olur.
+**[Aksiyom 5 - ArrayBuffer Geçerliliği]:**
+Eğer `arrayBufferToBase64` fonksiyonuna geçilen `buffer` parametresi geçerli bir `ArrayBuffer` instance'ı değilse, Base64 dönüşümü başarısız olur veya tanımsız sonuç üretir.
 
-[Aksiyom 6]: Eğer `lang` değeri uygulama tarafından desteklenmeyen bir dil kodu ise, PDF içeriğinde çeviri hataları veya eksik çeviriler oluşur (davranış bilinmiyor — desteklenen dil listesi modül içinde tanımlı değildir).
-
-[Aksiyom 7]: Eğer `Product` nesnesi beklenen alanları (alan yapısı bilinmiyor) içermiyorsa, PDF üretimi sırasında hata oluşur.
+**[Aksiyom 6 - Ürün Tipi Bağımlılığı]:**
+Eğer `Product` tipi modülün çalıştığı bağlamda tanımlı değilse veya beklenen alanları içermiyorsa, `generateProductDatasheet` fonksiyonu beklenmeyen hata ile karşılaşır. `Product` yapısının minimum gerekli alanları bilinmiyor (fonksiyon gövdesinden çıkarılamaz).
 
 ---
 
@@ -72,40 +76,61 @@ Bu modül için geçerli mimari varsayımlar aşağıdadır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/pdfGenerator.ts::generateProductDatasheet
-- **params**: `product: Product, imageUrl?: string, translateKey?: (key: string) => string, lang: string = 'tr'`
-- **ic_degiskenler**: 
-  - `doc` — jsPDF PDF belge nesnesi, tüm çizim ve ekleme işlemleri bu nesne üzerinden yapılır
-  - `fontName` — mevcut font adı, başlangıçta 'helvetica', Roboto başarırsa 'Roboto' olur
-  - `fontResponse` — fetch ile Roboto Regular font dosyasının HTTP response nesnesi
-  - `fontBuffer` — Regular fontun ArrayBuffer verisi, arrayBufferToBase64'e gönderilir
-  - `fontBase64` — Regular fontun base64 string'e çevrilmiş hali
-  - `fontBoldResponse` — fetch ile Roboto Bold font dosyasının HTTP response nesnesi
-  - `fontBoldBuffer` — Bold fontun ArrayBuffer verisi
-  - `fontBoldBase64` — Bold fontun base64 string'e çevrilmiş hali
-  - `pageWidth` — PDF sayfasının genişliği (mm cinsinden)
-  - `pageHeight` — PDF sayfasının yüksekliği (mm cinsinden)
-  - `margin` — sayfa kenar boşlukları (15mm)
-  - `drawHeader` — üst bilgi (logo, başlık, referans no) çizen inner fonksiyon
-  - `drawFooter` — alt bilgi (sayfa numarası, site URL) çizen inner fonksiyon
-  - `currentY` — dikey çizim pozisyonunu takip eden sayaç, içerik ilerledikçe artırılır
-  - `splitTitle` — ürün adının sayfa genişliğine sığacak şekilde bölünmüş hali (dizi)
-  - `brandModelText` — marka ve model kodunu içeren localized metin stringi
-  - `contentWidth` — içerik alanının genişliği (sayfa genişliği - 2×margin)
-  - `imageSize` — ürün görselinin boyutu (70mm×70mm)
-  - `renderDescriptionFallback` — görsel yoksa açıklama metnini çizen inner fonksiyon
-  - `tableData` — teknik özellikler tablosunun satırlarını tutan dizi, her satır [label, value] formatında
-  - `getPagesFn` — Reflect.get ile elde edilen toplam sayfa sayısını döndüren fonksiyon
-  - `totalPages` — PDF'deki toplam sayfa sayısı
-  - `cleanName` — ürün adından özel karakterlerin temizlenmiş ve kısaltılmış hali (dosya adı için)
-- **Dönüş**: `Promise<void>` (PDF dosyasını kaydeder, değer döndürmez)
+- **params**: (product: Product, imageUrl?: string, translateKey?: (key: string) => string, lang: string)
+- **ic_degiskenler**:
+  - `doc` — jsPDF instance, PDF belgesi oluşturmak ve düzenlemek için kullanılır
+  - `fontName` — Yüklenecek fontun adı, varsayılan olarak 'helvetica', başarırsa 'Roboto' olur
+  - `pageWidth` — Sayfa genişliği (mm cinsinden)
+  - `pageHeight` — Sayfa yüksekliği (mm cinsinden)
+  - `margin` — Sayfa kenar boşluğu (mm cinsinden)
+  - `drawHeader` — Header çizimini yapan iç içe fonksiyon
+  - `drawFooter` — Footer çizimini yapan iç içe fonksiyon
+  - `currentY` — Mevcut dikey konum (sayfa içindeki Y ekseni)
+  - `splitTitle` — Ürün adının satırlara bölünmüş hali
+  - `brandModelText` — Marka ve model kodu metni
+  - `contentWidth` — İçerik genişliği (sayfa genişliği eksi kenar boşlukları)
+  - `imageSize` — Ürün görselinin boyutu (mm)
+  - `renderDescriptionFallback` — Görsel yoksa açıklamayı çizmek için iç içe fonksiyon
+  - `tableData` — Teknik özellikler tablosu verisi (string[][] dizisi)
+  - `getPagesFn` — Toplam sayfa sayısını almak için fonksiyon
+  - `totalPages` — Toplam sayfa sayısı
+  - `cleanName` — Ürün adının temizlenmiş hali (dosya adı için)
+- **Dönüş**: Promise<void> (PDF dosyasını indirir, dönüş değeri yok)
 
-### [N2_NASIL] AST Pointer: src/lib/pdfGenerator.ts::arrayBufferToBase64
-- **params**: `buffer: ArrayBuffer`
-- **ic_degiskenler**: 
-  - `binary` — ArrayBuffer'ın string temsili, her byte charFromCode ile eklenir
-  - `bytes` — ArrayBuffer'ın Uint8Array görünümü, byte'lara tek tek erişim için
-  - `len` — byte dizisinin toplam uzunluğu (byteLength)
-- **Dönüş**: `string` (base64 encoded veri)
+### [N2_NASIL] AST Pointer: src/lib/pdfGenerator.ts::generateProductDatasheet::drawHeader
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `title` — Sayfa başlığı, dile göre 'TEKNİK ÜRÜN FÖYÜ' veya 'TECHNICAL DATASHEET'
+- **Dönüş**: void (yan etki: doc üzerine header çizer)
+
+### [N3_NASIL] AST Pointer: src/lib/pdfGenerator.ts::generateProductDatasheet::drawFooter
+- **params**: (pageNum: number, totalPages: number)
+- **ic_degiskenler**:
+  - `footerText` — Footer metni, dile göre oluşturulur
+  - `pageText` — Sayfa numarası metni, dile göre oluşturulur
+- **Dönüş**: void (yan etki: doc üzerine footer çizer)
+
+### [N4_NASIL] AST Pointer: src/lib/pdfGenerator.ts::generateProductDatasheet::renderDescriptionFallback
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `splitDesc` — Ürün açıklamasının satırlara bölünmüş hali
+- **Dönüş**: void (yan etki: doc üzerine açıklama metni çizer)
+
+### [N5_NASIL] AST Pointer: src/lib/pdfGenerator.ts::generateProductDatasheet::tableData.forEach callback
+- **params**: ([key, value])
+- **ic_degiskenler**:
+  - `label` — Özelliğin etiketi, translateKey fonksiyonu varsa çevrilir
+  - `valText` — Özelliğin değeri, string'e dönüştürülmüş hali
+- **Dönüş**: void (yan etki: tableData dizisine satır ekler)
+
+### [N6_NASIL] AST Pointer: src/lib/pdfGenerator.ts::arrayBufferToBase64
+- **params**: (buffer: ArrayBuffer)
+- **ic_degiskenler**:
+  - `binary` — ArrayBuffer'ın binary string karşılığı
+  - `bytes` — ArrayBuffer'ın Uint8Array görünümü
+  - `len` — Byte dizisinin uzunluğu
+  - `i` — Döngü sayacı
+- **Dönüş**: string (Base64 encoded string)
 
 ---
 

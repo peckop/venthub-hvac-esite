@@ -3,27 +3,26 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCategoryGateway.ts
-skeleton_hash: 2cef58f62566c2e0
+skeleton_hash: f7fb006be0a43495
 entity_hashes:
   func:useCategoryGateway: 7b8285c822bab503
-  overview: 10ada5bfa92152db
-generated_at: 2026-06-07T12:05:26Z
+  overview: 129d55f8e47e2bd2
+generated_at: 2026-06-08T10:09:32Z
 ---
 
 ## Genel Bakış
-Bu modül, kategori yönetimi süreçlerini merkezi ve tutarlı bir şekilde sağlamak için tasarlanmış bir React hook'u sunar. Kategori, ilişkili ürünler ve alt kategori verilerini başlangıç parametrelerinden alarak, kategori yapısına ve filtreleme durumuna erişimi soyutlayan bir arayüz oluşturur. Bileşenlerin tekrarlayan veri yönetimi kodları yazmadan dinamik kategori verilerini kullanmasını olanak tanır.
+Bu modül, bir React hook'u olan `useCategoryGateway`'i tanımlar. Hook, kategori sayfaları için gerekli olan kategori verisi, ilişkili ürünler ve alt kategoriler gibi bilgileri başlangıç parametrelerinden alarak, tüm veri yönetimini ve durumunu merkezi bir noktadan soyutlar. Bileşenlerin tekrarlayan veri yönetimi kodları yazmadan, dinamik ve filtrelenmiş kategori verilerine erişimini sağlar.
 
 ## Fonksiyon Grupları
-### Kategori Sayfası Veri Akışı Yönetimi
-Hook, bir kategori sayfası için gerekli tüm veri akışını ve durum yönetimini merkezi olarak yönetir. Kategori bilgiler
+### Kategori Verisi Yönetimi ve Sayfa Durumu
+Bu grup, kategori sayfasının tüm yaşam döngüsünü yöneten tek bir merkezi hook içerir. Hook, başlangıç verilerini alır, ilişkili ürünleri ve alt kategorileri yönetir, yükleme durumunu takip eder ve muhtemelen URL tabanlı filtreleme senkronizasyonunu sağlar.
+- `useCategoryGateway`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için, verilen fonksiyon gövdesine dayalı olarak kesin ve somut mimari varsayımlar üretilememektedir. Modülün çalışma mantığı ve bağımlılıkları fonksiyon gövdesindeki kod ile tanımlanır. Mevcut sadece fonksiyon imzası ve sabit isimleriyle, fonksiyonun nasıl davranacağına dair doğru ve ispatlanabilir aksiyomlar çıkarılamaz.
-
-Eğer modülün işlevselliği için zorunlu olan koşullar (örn: `initialCategory` parametresinin null olmaması, `initialProducts` ve `initialSubCategories` array'lerinin geçerli yapıda olması) belirlenecekse, `useCategoryGateway` fonksiyonunun **gövdesi (body)** incelenmelidir.
+Bu modül, kategori sayfası veri akışını merkezi olarak yöneten bir React hook'u olup, başlangıç verilerini parametre olarak alır ve filtreleme durumunu yönetir.
 
 ---
 
@@ -91,26 +90,90 @@ Nesne yapısı döndürür:
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/hooks/useCategoryGateway.ts::useCategoryGateway
-- **params**: (initialCategory?: DomainCategory | null, initialProducts?: Product[], initialSubCategories?: DomainCategory[])
+- **params**: `(initialCategory?: DomainCategory | null, initialProducts?: Product[], initialSubCategories?: DomainCategory[])`
 - **ic_degiskenler**:
-  - `isMounted` — Component mount durumunu takip eden boolean, useIsMounted hook'undan gelir
-  - `params` — Next.js useParams hook'undan gelen URL parametreleri (slug, subCategorySlug, categorySlug vb.)
-  - `router` — Next.js useRouter hook'undan gelen router nesnesi, sayfa yönlendirmeleri için
-  - `pathname` — Next.js usePathname hook'undan gelen mevcut URL yolu
-  - `searchParams` — Next.js useSearchParams hook'undan gelen URL arama parametreleri
-  - `globalCategories` — CategoryContext'ten gelen tüm kategorilerin listesi
-  - `categoriesLoading` — CategoryContext'ten gelen yükleme durumu
-  - `slug` — params'tan çıkarılan geçerli kategorinin slug'ı (params.slug, params.subCategorySlug veya params.categorySlug)
-  - `parentSlug` — params'tan çıkarılan üst kategorinin slug'ı (params.parentSlug veya params.categorySlug)
-  - `category` — State, mevcut kategoriyi tutar (initialCategory veya null)
-  - `parentCategory` — State, üst kategoriyi tutar
-  - `subCategories` — State, alt kategorilerin listesini tutar
-  - `products` — State, ürün listesini tutar (initialProducts veya boş dizi)
-  - `loading` — State, yükleme durumunu tutar (slug varsa ve initialCategory yoksa true)
-  - `filters` — State, filtre parametrelerini tutar (DEFAULT_FILTERS)
-  - `isFirstRender` — useRef, ilk render'ı takip eder (SSR hydration için)
-  - `categoryMaps` — useMemo, kategorileri farklı açılardan erişilebilir kılan haritalar (byId, bySlug, rootBySlug, bySlugAndParent, childrenByParentId)
-- **Dönüş**: { category: DomainCategory | null, parentCategory: DomainCategory | null, subCategories: DomainCategory[], products: Product[], loading: boolean, filters: CategoryFilters, updateFilters: (updates: Partial<CategoryFilters>) => void }
+  - `isMounted` — useIsMounted() hook'undan gelen, bileşenin mounted olup olmadığını gösteren boolean
+  - `params` — useParams() hook'undan gelen URL parametreleri objesi
+  - `router` — useRouter() hook'undan gelen Next.js yönlendirici
+  - `pathname` — usePathname() hook'undan gelen mevcut URL yolu
+  - `searchParams` — useSearchParams() hook'undan gelen URL search parametreleri
+  - `globalCategories` — useCategories() hook'undan gelen tüm kategoriler dizisi
+  - `categoriesLoading` — useCategories() hook'undan gelen yükleme durumu boolean
+  - `slug` — URL'den çıkarılan kategori slug'ı (params?.slug || params?.subCategorySlug || params?.categorySlug)
+  - `parentSlug` — URL'den çıkarılan üst kategori slug'ı (params?.parentSlug veya categorySlug)
+  - `category` — Mevcut kategori state'i
+  - `setCategory` — category state'ini güncelleyen setter fonksiyonu
+  - `parentCategory` — Üst kategori state'i
+  - `setParentCategory` — parentCategory state'ini güncelleyen setter fonksiyonu
+  - `subCategories` — Alt kategoriler dizisi state'i
+  - `setSubCategories` — subCategories state'ini güncelleyen setter fonksiyonu
+  - `products` — Ürünler dizisi state'i
+  - `setProducts` — products state'ini güncelleyen setter fonksiyonu
+  - `loading` — Yükleme durumu boolean state'i
+  - `setLoading` — loading state'ini güncelleyen setter fonksiyonu
+  - `filters` — Filtreler state'i (CategoryFilters tipinde)
+  - `setFilters` — filters state'ini güncelleyen setter fonksiyonu
+  - `isFirstRender` — useRef ile oluşturulan, ilk render olup olmadığını takip eden boolean ref
+  - `updateFilters` — useCallback ile memoize edilmiş, filtreleri güncelleyen ve URL'yi senkronize eden fonksiyon
+  - `categoryMaps` — useMemo ile hesaplanmış kategori haritaları nesnesi (byId, bySlug, rootBySlug, bySlugAndParent, childrenByParentId)
+- **Dönüş**: `{ category, parentCategory, subCategories, products, loading, filters, updateFilters }` nesnesi
+
+### [N2_NASIL] AST Pointer: src/hooks/useCategoryGateway.ts::useCategoryGateway::useEffect[syncFilters]
+- **params**: `(/* anonim arrow fonksiyon */)`
+- **ic_degiskenler**:
+  - `spBrands` — searchParams.get('brands') ile alınan virgülle ayrılmış marka listesi string'i
+  - `viewModeParam` — searchParams.get('viewMode') ile alınan görünüm modu parametresi
+- **Dönüş**: yok (yan etki: filters state'ini günceller)
+
+### [N3_NASIL] AST Pointer: src/hooks/useCategoryGateway.ts::useCategoryGateway::updateFilters
+- **params**: `(updates: Partial<CategoryFilters>)`
+- **ic_degiskenler**:
+  - `prev` — setFilters callback'indeki önceki filters state'i
+  - `newFilters` — { ...prev, ...updates } ile birleştirilmiş yeni filtreler objesi
+  - `urlParams` — new URLSearchParams(window.location.search) ile oluşturulan URL parametreleri
+  - `newQueryString` — urlParams.toString() ile oluşturulmuş URL query string'i
+- **Dönüş**: yok (yan etki: filters state'ini ve URL'yi günceller)
+
+### [N4_NASIL] AST Pointer: src/hooks/useCategoryGateway.ts::useCategoryGateway::useMemo[categoryMaps]
+- **params**: `(/* anonim arrow fonksiyon */)`
+- **ic_degiskenler**:
+  - `byId` — Kategorileri ID'lerine göre eşleştiren Map<string, DomainCategory>
+  - `bySlug` — Kategorileri slug'larına göre eşleştiren Map<string, DomainCategory>
+  - `rootBySlug` — Ana kategorileri (parent_id olmayan) slug'larına göre eşleştiren Map<string, DomainCategory>
+  - `bySlugAndParent` — Kategorileri slug|parent_id kombinasyonuna göre eşleştiren Map<string, DomainCategory>
+  - `childrenByParentId` — Her ana kategorinin alt kategorilerini tutan Map<string, DomainCategory[]>
+  - `c` — for döngüsündeki her bir kategori objesi
+  - `key` — `${c.slug}|${c.parent_id}` formatında bySlugAndParent Map'i için anahtar
+  - `children` — childrenByParentId Map'inden alınan mevcut children dizisi
+- **Dönüş**: `{ byId, bySlug, rootBySlug, bySlugAndParent, childrenByParentId }` nesnesi
+
+### [N5_NASIL] AST Pointer: src/hooks/useCategoryGateway.ts::useCategoryGateway::useEffect[fetchData]
+- **params**: `(/* anonim arrow fonksiyon */)`
+- **ic_degiskenler**:
+  - `fetchData` — Asenkron veri çekme fonksiyonu tanımı
+- **Dönüş**: yok (yan etki: fetchData fonksiyonunu çağırır)
+
+### [N6_NASIL] AST Pointer: src/hooks/useCategoryGateway.ts::useCategoryGateway::useEffect[fetchData]::fetchData
+- **params**: `(/* parametre yok */)`
+- **ic_degiskenler**:
+  - `targetCategory` — Bulunan hedef kategori (DomainCategory | null)
+  - `targetParentCategory` — Bulunan üst kategori (DomainCategory | null)
+  - `subs` — Alt kategoriler dizisi (DomainCategory[])
+  - `categoryIds` — İstek için kullanılacak kategori ID'leri dizisi
+  - `productsData` — getProductsEnriched() API çağrısından dönen ürün verisi
+  - `maxPrice` — Ürünler arasındaki maksimum fiyat değeri
+  - `ceilMax` — ceil() ile yukarı yuvarlanmış maksimum fiyat
+  - `p` — Döngüdeki her bir ürünün price değeri
+  - `orderA` — a.metadata.sort_order'dan sayısal sıralama değeri
+  - `orderB` -- b.metadata.sort_order'dan sayısal sıralama değeri
+- **Dönüş**: yok (yan etki: category, parentCategory, subCategories, products, loading, filters state'lerini günceller)
+
+### [N7_NASIL] AST Pointer: src/hooks/useCategoryGateway.ts::useCategoryGateway::useEffect[fetchData]::fetchData::sortFunction
+- **params**: `(a: DomainCategory, b: DomainCategory)`
+- **ic_degiskenler**:
+  - `orderA` — a.metadata.sort_order değerini number'a çevirip 0 default ile
+  - `orderB` — b.metadata.sort_order değerini number'a çevirip 0 default ile
+- **Dönüş**: `number` (a'nın b'den önce gelip gelmeyeceğini belirleyen sıralama değeri)
 
 ---
 

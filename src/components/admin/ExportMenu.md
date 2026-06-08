@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\ExportMenu.tsx
-skeleton_hash: ce1680439765f206
+skeleton_hash: a10b677ea8364439
 entity_hashes:
   func:ExportMenu: 9e536638b7cdf449
   overview: fcef70276d80a8c4
   style_tokens: 7659c3683121a964
-generated_at: 2026-05-28T22:35:34Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış
@@ -28,6 +28,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## FONKSİYON DETAYLARI
 
+### ExportMenu
+**Ne yapar**: Bu bileşen, yönetici arayüzünde dışa aktarma seçenekleri sunan bir menü oluşturur. Kullanıcıya verileri farklı formatlarda dışa aktarma imkanı sağlar.
+
+**Nasıl yapar**: Bileşen, verilen `items` dizisini kullanarak bir menü listesi oluşturur. Her bir item için bir dışa aktarma seçeneği sunar. `buttonLabel` parametresi ile menünün üzerindeki düğme etiketi özelleştirilebilir. Bileşen, tıklanan öğenin bilgilerini bir üst bileşene iletir.
+
+**Parametreler**:
+- items: ExportMenuItem[] — Dışa aktarma seçeneklerini içeren dizi. Her bir seçenek, dışa aktarılacak veri kaynağını ve formatını belirtir.
+- buttonLabel: string (opsiyonel) — Menüyü açan düğmenin üzerindeki metin. Belirtilmezse varsayılan bir etiket kullanılır.
+
+**Dönüş**: React bileşeni (React.FC) — Oluşturulan dışa aktarma menüsünü render eden bir React bileşeni. Bileşen, ExportMenuItem[] dizisi ve opsiyonel buttonLabel string'i alır.
+
 ---
 
 ## TYPE ALIASES
@@ -45,16 +56,13 @@ type ExportMenuItem = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/ExportMenu.tsx::ExportMenu
-- **params**: items, buttonLabel
-- **ic_degiskenler**: 
-  - `_t` — localization function returned by `useI18n()` used to translate UI strings such as admin.a11y.export, admin.common.export, admin.inventory.fileFormat, admin.common.noOptions
-- **Dönüş**: JSX element (`<DropdownMenu.Root>`) representing the export menu component
-
-### [N2_NASIL] AST Pointer: src/components/admin/ExportMenu.tsx::item map callback
-- **params**: item
-- **ic_degiskenler**: yok
-- **Dönüş**: JSX element (`<DropdownMenu.Item>`) representing a single export option in the dropdown menu
+### [N1_NASIL] AST Pointer: ExportMenu.tsx::ExportMenu
+- **params**:
+  - `items` — ExportMenuItem[] türünde, dışa aktarma menüsü seçeneklerinin listesi. Her item `key`, `label` ve `onSelect` özelliklerine sahiptir
+  - `buttonLabel` — string (optional), menü tetikleyici butonunda gösterilecek özel metin. Tanımlı değilse varsayılan çeviri kullanılır
+- **ic_degiskenler**:
+  - `_t` — `useI18n()` hookundan elde edilen çeviri fonksiyonu (`t` olarak alınmış, `_t` olarak yeniden adlandırılmış). Menü metinlerinin çok dilli çevirilerini sağlamak için kullanılır
+- **Dönüş**: JSX (DropdownMenu.Root bileşeni — dışa aktarma menüsü UI'ı)
 
 ---
 

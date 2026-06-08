@@ -3,30 +3,44 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\products\page.tsx
-skeleton_hash: 27c4d552fa855011
+skeleton_hash: 25247ca60bdf661a
 entity_hashes:
-  func:Page: c96e4d8c93f660fc
+  func:Page: 92a39fc420a9c185
   func:getCachedProducts: 13bd3816d5356001
-  overview: 9e731c9de7837ec1
+  overview: 21dc1b0e4ca1a720
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-06-07T12:01:19Z
+generated_at: 2026-06-08T10:08:11Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js uygulamasında dil bazlı dinamik bir ürün listesi sayfasını sunucu tarafında yönetir. Temel işlevi, istenen dile göre önbellekten ürün verileri çekmek ve bu verileri kullanarak sayfanın HTML çıktısını oluşturmaktır.
+
+Bu modül, Next.js uygulamasında dil bazlı dinamik bir ürün listesi sayfasını sunucu tarafında yönetir. Temel işlevi, istenen dile göre önbellekten ürün verileri çekerek sayfanın HTML çıktısını oluşturmaktır.
 
 ## Fonksiyon Grupları
+
 ### Dil-Bazlı Veri Sağlama
-Bu grup, belirli bir dil parametresine karşılık gelen ürün verilerini almak ve sunucu tarafında performans için önbellekten sunmakla sorumludur.
+Belirli bir dil parametresine karşılık gelen ürün verilerini sunucu tarafında önbellekten almak ve performans sağlamakla sorumludur.
 - getCachedProducts
 
 ### Sayfa Oluşturma ve Bileşen Birleştirme
-Bu grup, isteği işleyerek dil parametresini çıkarır, gerekli verileri getirir ve sayfanın tüm React bileşenlerini birleştirip son HTML çıktısını üretir.
+İsteği işleyerek dil parametresini çıkarır, gerekli verileri getirir ve sayfanın tüm React bileşenlerini birleştirip son HTML çıktısını üretir.
 - Page
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, Next.js dil bazlı ürün listesi sayfasını sunucu tarafında yönetmek üzere tasarlanmıştır. Aşağıdaki mimari varsayımlar fonksiyon imzalarından türetilmiştir.
+
+**[Aksiyom 1]:** Eğer `getCachedProducts` çağrısında `lang` parametresi sağlanmazsa, ürün verileri ilgili dil için önbellekten retrieve edilemez ve çağrı başarısız olur.
+
+**[Aksiyom 2]:** Eğer `getCachedProducts` çağrısında `tenantId` parametresi sağlanmazsa, hangi kiracıya (tenant) ait ürünlerin getirileceği belirsizleşir ve çağrı başarısız olur.
+
+**[Aksiyom 3]:** Eğer `Page` bileşeninin `params` argümanı bir `Promise<{ lang: string }>` olarak resolve olmazsa, sayfa hangi dilde render edileceğini bilemez ve HTML çıktısı oluşturulamaz.
+
+**[Aksiyom 4]:** Eğer `Page` bileşeninin `params` Promise'i içindeki `lang` alanı eksik veya `string` tipinde değilse, dil parametresi `getCachedProducts` fonksiyonuna geçersiz aktarılır ve sayfa hatalı çalışır.
+
+**[Aksiyom 5]:** Eğer `getCachedProducts` fonksiyonuna geçerli `lang` ve `tenantId` değerleri sağlanmazsa, sayfa oluşturma sürecinde ürün verisi bulunamaz ve bileşen birleştirme (component composition) aşamasında veri eksikliği oluşur.
 
 ---
 
@@ -41,45 +55,38 @@ Bu grup, isteği işleyerek dil parametresini çıkarır, gerekli verileri getir
 **Dönüş**: Bilinmiyor. Fonksiyonun return tipi açıkça belirtilmemiş.
 
 ### Page
-**Ne yapar**: `/products` rotasındaki sayfa bileşenidir ve Global Discovery giriş noktası olarak görev yapar. Kategori seçilmediği için sistem otomatik olarak 'Discovery' moduna geçer.
-**Nasıl yapar**: Async bir React sayfa bileşenidir. İlk olarak `params` içindeki `lang` parametresini `await` ile çözer. Ardından `getTenantConfig()` ile kiracı yapılandırmasını alır ve `tenantId`'yi çıkarır. `getCachedProducts` fonksiyonunu kullanarak belirtilen dil ve kiracı ID'si için ürünleri getirir. Son olarak `React.Suspense` ile sarılmış bir `CategoryMasterView` bileşeni döner. `initialCategory` `null` olarak ayarlandığı için `MasterView` bu durumu Discovery olarak işler. Ayrıca `TenantProvider` ile kiracı yapılandırmasını alt bileşenlere sağlar.
+
+**Ne yapar**: /products rotasının ana sayfa bileşenidir. Tenant yapılandırmasını, önbellekten ürünleri ve dil sözlüğünü yükleyerek CategoryMasterView bileşenini render eder. Kategori seçilmediği için sistem otomatik olarak "Discovery" modunda açılır.
+
+**Nasıl yapar**: Fonksiyon asenktron çalışır. Önce params içinden lang değerini çıkarır, ardından getTenantConfig() ile tenant yapılandırmasını, getCachedProducts() ile önbellekten ürün listesini çeker. Dil seçimine göre sözlük (dict) nesnesini belirler. Son olarak TenantProvider sarmalayıcısı içinde initialCategory null olarak CategoryMasterView bileşenini Suspense ile sarmalayarak render eder.
+
 **Parametreler**:
-- params: Promise<{ lang: string }> — Sayfa parametreleri, içinde `lang` dizisi bulunan bir Promise.
-**Dönüş**: JSX Elemanı. Sayfa bileşeni, `CategoryMasterView`'ı içeren bir React bileşeni döner.
+- `params`: `Promise<{ lang: string }>` — URL parametrelerini içeren asenktron nesne. Resolve edildiğinde lang (dil kodu) değerini döndürür.
+
+**Dönüş**: `React.JSX.Element` — CategoryMasterView bileşenini içeren Suspense sarmalı JSX yapısı döndürür.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/[lang]/products/page.tsx::getCachedProducts
+### [N1_NASIL] AST Pointer: `[lang]/products/page.tsx`::getCachedProducts
 - **params**: `(lang: string, tenantId: string)`
-- **ic_degiskenler**:
-  - *(fonksiyon gövdesinde tanımlı yerel değişken yok — tüm değerler doğrudan ifade içinde kullanılır)*
-- **İfade-içi kullanım**:
-  - `unstable_cache(...)` — cache sarmalayıcı çağrısı
-  - `getProductsEnriched(supabaseStaticClient, { limit: 100 })` — asenkron ürün getirme çağrısı; `supabaseStaticClient` statik supabase istemcisi, `{ limit: 100 }` sorgu filtresi
-  - `['products-discovery', lang, tenantId]` — cache key dizisi; `lang` ve `tenantId` parametreleri burada kullanılır
-  - `tags: ['products-discovery', \`products-discovery-${tenantId}\`]` — cache etiketleri; template literal içinde `tenantId` kullanılır
-  - `revalidate: false` — cache süresiz sabit demektir
-  - `()` — cache sonucu hemen invoke edilir (immediate invocation)
-- **Dönüş**: `DomainProduct[]` (getProductsEnriched sonucu, cache sarmalayıcısı üzerinden)
+- **ic_degiskenler**: (govde tek bir ifade — explicit değişken yok)
+  - `unstable_cache`'e verilen **cache key**: `['products-discovery', lang, tenantId]` — cache lookup'ta kullanılan benzersiz anahtar
+  - `unstable_cache`'e verilen **options.tags**: `['products-discovery', `products-discovery-${tenantId}`]` — revalidation/purge için tag dizisi
+  - `unstable_cache`'e verilen **options.revalidate**: `false` — cache'in otomatik yenilenmemesi gerektiğini belirtir
+  - `getProductsEnriched(supabaseStaticClient, { limit: 100 })` — asıl veri sağlayan servis çağrısı, supabaseStaticClient üzerinden max 100 ürün döner
+- **Dönüş**: `getProductsEnriched`'in DomainProduct[] sonucu (unstable_cache ile sarılmış)
 
----
-
-### [N2_NASIL] AST Pointer: src/app/[lang]/products/page.tsx::Page
-- **params**: `{ params }: { params: Promise<{ lang: string }> }`
+### [N2_NASIL] AST Pointer: `[lang]/products/page.tsx`::Page
+- **params**: `{ params: Promise<{ lang: string }> }`
 - **ic_degiskenler**:
-  - `lang` — URL'den gelen dil kodu; `await params` ile destructured
-  - `tenantConfig` — tenant yapılandırma nesnesi; `getTenantConfig()` çağrısının dönüşü
-  - `tenantId` — tenant tanımlayıcısı; `tenantConfig.id` erişimi ile elde edilir
-  - `products: DomainProduct[]` — zenginleştirilmiş ürün listesi; `getCachedProducts(lang, tenantId)` çağrısının dönüşü
-- **JSX içindeki kullanım**:
-  - `params` — `await params` ile çözümlenir (Promise<{ lang: string }>)
-  - `tenantConfig` — `getTenantConfig()` sonucu; `TenantProvider` component'ine `value` olarak verilir
-  - `tenantId` — `tenantConfig.id` erişimi; `getCachedProducts`'a argüman olarak iletilir
-  - `products` — `getCachedProducts` sonucu; `CategoryMasterView` component'ine `initialProducts` prop'u olarak verilir
-  - `null` — `initialCategory` prop'u; MasterView'ın bunu Discovery olarak işleyeceği belirtilmiş
-- **Dönüş**: JSX (`React.Suspense` > `TenantProvider` > `CategoryMasterView` sarmalaması)
+  - `lang` — `await params`'dan destructured dil kodu (`"en"` veya `"tr"`), sözlük seçimi ve cache key için kullanılır
+  - `tenantConfig` — `await getTenantConfig()` çağrısının sonucu; kiracı yapılandırma nesnesi, `id` ve `TenantProvider`'a verilen value olarak kullanılır
+  - `tenantId` — `tenantConfig.id`'den çıkarılan kiracı tanımlayıcısı stringi, `getCachedProducts` çağrısına ve cache tag'ine parametre olarak verilir
+  - `products` — `DomainProduct[]` türünde, `await getCachedProducts(lang, tenantId)` ile getirilen zenginleştirilmiş ürün listesi, `CategoryMasterView`'a `initialProducts` olarak aktarılır
+  - `dict` — `lang === 'en' ? en : tr` koşuluyla seçilen sözlük nesnesi; JSX içinde `dict.common.loading` erişimi ile loading fallback metni sağlanır
+- **Dönüş**: JSX — `<React.Suspense>` içeren `CategoryMasterView` bileşeni (`initialCategory={null}`, `initialProducts={products}`) ile `TenantProvider` sarmalı
 
 ---
 

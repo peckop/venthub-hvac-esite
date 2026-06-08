@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\lib\supabase\static.ts
 skeleton_hash: d527b4d5606a49af
 entity_hashes:
   overview: cb63656e8f0a9199
-generated_at: 2026-06-06T21:55:49Z
+generated_at: 2026-06-08T10:10:57Z
 ---
 
 ## Genel Bakış
@@ -15,7 +15,19 @@ Bu modül, Statik Supabase istemcisini yapılandırarak dış kaynak bağımlıl
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, statik bir Supabase istemcisi oluşturmak için ortam değişkenlerine bağımlıdır. Aşağıda modülün doğru çalışması için gerekli mimari varsayımlar listelenmektedir.
+
+[Aksiyom 1]: Eğer `NEXT_PUBLIC_SUPABASE_URL` ortam değişkeni tanımlı değilse veya boşsa, `SUPABASE_URL` sabiti `https://placeholder.supabase.co` değerine düşer. Bu durumda `supabaseStaticClient` geçersiz bir URL ile yapılandırılır; tüm veritabanı istekleri başarısız olur veya yanlış bir hedefe yönlendirilir.
+
+[Aksiyom 2]: Eğer `NEXT_PUBLIC_SUPABASE_ANON_KEY` ortam değişkeni tanımlı değilse veya boşsa, `SUPABASE_ANON_KEY` sabiti bir placeholder anahtara (kesin değer belgede kesik, `'placeholder-k...'` olarak başlıyor) düşer. Bu durumda `supabaseStaticClient` geçersiz bir kimlik doğrulama anahtarı ile yapılandırılır; Supabase API çağrıları yetkilendirme hataları ile karşılaşır.
+
+[Aksiyom 3]: `supabaseStaticClient` nesnesi modül yüklenirken (`module level`) bir kez oluşturulur ve değiştirilemez. Eğer bu istemci yanlış yapılandırılmışsa (örn. geçersiz URL veya anahtar), uygulama boyunca tüm statik/sunucu tarafı veri erişimleri etkilenir; sorunu düzeltmek için modülün yeniden yüklenmesi veya uygulamanın yeniden başlatılması gerekir.
+
+[Aksiyom 4]: Modülün `process.env` nesnesine erişim gerektirir. Eğer çalışma ortamı (runtime) `process.env` desteklemiyorsa (örn. bazı tarayıcı ortamları), `SUPABASE_URL` ve `SUPABASE_ANON_KEY` değerleri `undefined` olarak değerlendirilir ve placeholder değerler devreye girer; bu da geçersiz bir bağlantı yapılandırmasına yol açar.
+
+[Aksiyom 5]: `supabaseStaticClient` nesnesinin `Database` tipi ile tip güvenli olması, modülün import edildiği dosyalarda bu tipe uygun veritabanı şeması tanımının (`Database` tipi) mevcut olmasını gerektirir. Eğer `Database` tipi tanımlı değilse veya yanlış tanımlanmışsa, derleme zamanı tip hataları oluşur.
 
 ---
 
@@ -41,16 +53,6 @@ Bu dosyada herhangi bir **fonksiyon gövdesi** bulunmamaktadır. Dosya yalnızca
 
 - **Sabit tanımlamalar**: `SUPABASE_URL` ve `SUPABASE_ANON_KEY` (binary expression ile değer ataması)
 - **Modül düzeyi client oluşturma**: `supabaseStaticClient` (fonksiyon gövedesi olmayan, doğrudan `createClient` çağrısı)
-
----
-
-### [N1_NASIL] AST Pointer: `src/lib/supabase/static.ts`::(modül_düzeyi)
-- **params**: yok (fonksiyon değil, modül düzeyi kod)
-- **ic_degiskenler**:
-  - `SUPABASE_URL` — `binary_expression` ile hesaplanan Supabase proje URL'i sabiti
-  - `SUPABASE_ANON_KEY` — `binary_expression` ile hesaplanan Supabase anon anahtarı sabiti
-  - `supabaseStaticClient` — `createClient(SUPABASE_URL, SUPABASE_ANON_KEY)` çağrısı ile oluşturulan ve `Database` tipi ile типlendirilmiş statik Supabase istemcisi; modül dışına export edilerek其他 dosyalar tarafından kullanılır
-- **Dönüş**: yok (modül düzeyi; `supabaseStaticClient` export edilir)
 
 ---
 

@@ -1,11 +1,13 @@
 'use client'
 
-import React, { createContext,  useEffect, useState, useMemo, useCallback } from 'react'
-import { listUserProjects, createProject, deleteProject, addProductToProject, removeProductFromProject, listProjectItems } from '@/lib/services/project.service'
-import { useSupabaseClient } from '@/providers/SupabaseProvider'
-import type { UserProject, ProjectItem } from '@/types/ui-models'
-import { useAuth } from '../hooks/useAuth'
+import React, { createContext,  useCallback,useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+
+import { addProductToProject, createProject, deleteProject, listProjectItems,listUserProjects, removeProductFromProject } from '@/lib/services/project.service'
+import { useSupabaseClient } from '@/providers/SupabaseProvider'
+import type { ProjectItem,UserProject } from '@/types/ui-models'
+
+import { useAuth } from '../hooks/useAuth'
 
 interface ProjectContextType {
   projects: UserProject[]

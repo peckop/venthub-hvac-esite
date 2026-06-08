@@ -1,16 +1,17 @@
 'use client'
 
-import React, { Suspense, useEffect } from 'react'
-import { CartProvider } from '../../contexts/CartProvider'
-import AuthProvider from '../../contexts/AuthContext'
-import { CategoryProvider } from '../../contexts/CategoryContext'
 import { usePathname, useSearchParams } from 'next/navigation'
-import MainLayout from './MainLayout'
-import { I18nProvider } from '../../i18n/I18nProvider'
-import { ProjectProvider } from '../../contexts/ProjectProvider'
-import CookieConsent from './CookieConsent'
+import React, { Suspense, useEffect } from 'react'
 
 import { SupabaseProvider } from '@/providers/SupabaseProvider'
+
+import AuthProvider from '../../contexts/AuthContext'
+import { CartProvider } from '../../contexts/CartProvider'
+import { CategoryProvider } from '../../contexts/CategoryContext'
+import { ProjectProvider } from '../../contexts/ProjectProvider'
+import { I18nProvider } from '../../i18n/I18nProvider'
+import CookieConsent from './CookieConsent'
+import MainLayout from './MainLayout'
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (

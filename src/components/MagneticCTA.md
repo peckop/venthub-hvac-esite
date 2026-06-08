@@ -10,7 +10,7 @@ entity_hashes:
   func:onMove: 0f9106ce87047fd0
   overview: 798bbdff09c682bc
   style_tokens: dfcd3a7af18b6331
-generated_at: 2026-05-28T22:36:19Z
+generated_at: 2026-06-08T10:08:35Z
 ---
 
 ## Genel Bakış
@@ -76,34 +76,6 @@ Bu modül için temel varsayım: `onMove` ve `onLeave` olay işleyicilerinin, fa
   - `onMove` — `React.MouseEventHandler<HTMLDivElement>` türünde fare hareket handler'ı; fare koordinatlarına göre CSS custom property'ler (`--dx`, `--dy`) ayarlayarak butonun manyetik kayma efektini hesaplar
   - `onLeave` — fare div'den ayrılınca tetiklenen handler; CSS custom property'leri sıfırlar ve `hover` durumunu `false` yapar
 - **Dönüş**: JSX (`<section>` — CTA bölümü; başlık, alt başlık ve manyetik efektli buton içerir)
-
----
-
-### [N2_NASIL] AST Pointer: MagneticCTA.tsx::onMove
-- **params**: `(e: React.MouseEvent<HTMLDivElement>)` — fare hareket olayı nesnesi
-- **ic_degiskenler**:
-  - `hover` — outer scope'tan closure ile erişilen boolean; `false` ise fonksiyon erken return ile çıkar
-  - `el` — `ref.current`'ten elde edilen DOM elementi (HTMLDivElement); `null` ise erken return yapılır
-  - `rect` — `el.getBoundingClientRect()` sonucu DOMRect nesnesi; elementin viewport'taki konum ve boyut bilgisini tutar (`rect.left`, `rect.top`, `rect.width`, `rect.height` kullanılır)
-  - `dx` — yatay manyetik kayma mesafesi (px); `((e.clientX - rect.left) / rect.width - 0.5) * 12` formülü ile fare imlecinin element merkezine göre yatay oranı 12px aralığa ölçeklenir
-  - `dy` — dikey manyetik kayma mesafesi (px); `((e.clientY - rect.top) / rect.height - 0.5) * 12` formülü ile aynı mantık dikey eksende uygulanır
-- **Dönüş**: yok (yan etki: `el.style.setProperty('--dx', ...)` ve `el.style.setProperty('--dy', ...)` ile CSS custom property'leri güncellenir)
-
----
-
-### [N3_NASIL] AST Pointer: MagneticCTA.tsx::onLeave
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `el` — `ref.current`'ten elde edilen DOM elementi (HTMLDivElement); `null` ise erken return yapılır
-- **Dönüş**: yok (yan etki: `el.style.setProperty('--dx', '0px')` ve `el.style.setProperty('--dy', '0px')` ile kayma efekti sıfırlanır; `setHover(false)` çağrısı ile hover durumu deaktif edilir)
-
----
-
-### [N4_NASIL] AST Pointer: MagneticCTA.tsx::inline onClick handler
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `window` — `typeof window !== 'undefined'` kontrolü ile SSR güvenliği sağlanır; `window` tanımlı ise `window.openLeadModal?.()` çağrılarak lead modal açılır
-- **Dönüş**: yok (yan etki: lead modal penceresi açılır)
 
 ---
 

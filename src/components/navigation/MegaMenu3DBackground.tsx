@@ -1,8 +1,9 @@
 'use client'
 
-import React, { Suspense } from 'react'
+import { Environment,OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Environment } from '@react-three/drei'
+import React, { Suspense } from 'react'
+
 import Category3DIcon from '../products/Category3DIcon'
 
 interface MegaMenu3DBackgroundProps {

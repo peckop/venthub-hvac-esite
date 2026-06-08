@@ -3,35 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\utils.ts
-skeleton_hash: de0a20b8af7fe7b4
+skeleton_hash: bf2da76717d645d4
 entity_hashes:
   func:buildWhatsAppLink: 5a13d41915079738
   func:cn: 2cda58c352da4d7c
-  overview: dce777117b4a4d4d
-generated_at: 2026-05-28T22:38:33Z
+  overview: 0d255118ec884be0
+generated_at: 2026-06-08T10:10:57Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin genel amaçlı yardımcı fonksiyonlarını içerir. Temel olarak arayüz geliştirme süreçlerinde kullanılan CSS sınıfı birleştirme işlevi ve kullanıcı iletişimini kolaylaştıran WhatsApp link oluşturma aracını sunar. Fonksiyonlar bağımsız ve odaklıdır, projenin farklı bölümlerinde yeniden kullanılmak üzere tasarlanmıştır.
+Bu modül, VentHub HVAC projesinin genel yardımcı fonksiyonlarını içerir. Arayüz stil yönetimini ve WhatsApp iletişim entegrasyonunu kolaylaştıran bağımsız ve yeniden kullanabilir araçlar sunar.
 
 ## Fonksiyon Grupları
 ### CSS Sınıfı Yönetimi
-Arayüzdeki dinamik CSS sınıflarını güvenli ve verimli bir şekilde birleştirmek için kullanılır. Bu işlev, koşullu sınıfları ve çakışmaları yöneterek temiz ve bakımı kolay stil tanımları oluşturmayı sağlar.
+Tailwind CSS sınıflarını dinamik ve koşullu olarak birleştirerek temiz, bakımı kolay stil tanımları oluşturmayı sağlar.
 - cn()
 
 ### WhatsApp İletişim Entegrasyonu
-Kullanıcıların doğrudan WhatsApp üzerinden iletişim kurmasını kolaylaştırır. Belirtilen telefon numarası ve mesaj ile önceden yapılandırılmış, tıklanabilir bir iletişim bağlantısı üretir.
+Kullanıcıların doğrudan WhatsApp üzerinden iletişim kurmasını kolaylaştıran, telefon numarası ve mesaj ile tıklanabilir bağlantılar üretir.
 - buildWhatsAppLink
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, VentHub HVAC projesinin genel yardımcı (utility) fonksiyonlarını içerir ve her biri belirli bir amacı olan bağımsız araçlar sunar.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `buildWhatsAppLink` fonksiyonu çalıştırılacaksa, `phone` parametresi geçerli bir telefon numarası formatında olmalıdır. Eğer geçerli bir telefon numarası Formatında değilse, oluşturulan link WhatsApp tarafından tanınamaz ve iletişim başlatılamaz.
-
-[Aksiyom 2]: Eğer `buildWhatsAppLink` fonksiyonu çalıştırılacaksa, `text` parametresi boş bir string ("") olmamalıdır. Eğer metin içeriği boş olursa, kullanıcı WhatsApp'a yönlendirildiğinde boş bir mesaj alanı ile karşılaşır ve bu beklenen bir kullanım deneyimi sağlamaz.
+**Gerekçe:** Verilen modüldeki fonksiyonların (`cn`, `buildWhatsAppLink`) gövdeleri paylaşılmamıştır. Mimari varsayımlar yalnızca fonksiyon gövdelerinden üretilmelidir; docstring'lerden veya fonksiyon adlarından çıkarım yapılmaz. Gövde bilgisi olmadan modüle özgü koşul–sonuç ilişkileri belirlenemez.
 
 ---
 
@@ -63,18 +61,20 @@ Bu modül, VentHub HVAC projesinin genel yardımcı (utility) fonksiyonlarını 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/utils.ts::cn
-- **params**: `...inputs: ClassValue[]`
+- **params**: `...inputs: ClassValue[]` — clsx'e aktarılan bir veya birden fazla CSS class value'su
 - **ic_degiskenler**:
-  - `inputs` — clsx ve twMerge'e iletilmek üzere spread edilen ClassValue dizisi
-- **Dönüş**: `string` — çakışması giderilmiş birleştirilmiş Tailwind sınıf dizesi
+  - `inputs` — clsx fonksiyonuna parametre olarak giden, ClassValue[] tipinde rest parametresi; birden fazla CSS class ifadesini tutar
+- **Dönüş**: `twMerge(clsx(inputs))` — clsx ile birleştirilmiş class'ları, Tailwind çakışmalarını çözerek döndürür
 
 ### [N2_NASIL] AST Pointer: src/lib/utils.ts::buildWhatsAppLink
-- **params**: (`phone: string`, `text: string`)
+- **params**: `phone: string, text: string`
 - **ic_degiskenler**:
-  - `p` — `phone` değerinden tüm rakam dışı karakterlerin temizlenmiş hali; WhatsApp URL'sindeki numara (try bloğunda tanımlı)
-  - `q` — `text` değerinden oluşturulmuş URLSearchParams dizesi; query parametresi olarak eklenecek (try bloğunda tanımlı)
-  - `p` — catch bloğunda phone'dan yeniden türetilen temiz numara; hata durumunda fallback URL için kullanılır
-- **Dönüş**: `string` — `https://wa.me/{p}` veya `https://wa.me/{p}?text={q}` formatında WhatsApp deep link
+  - `p` — `phone` parametresinden rakam dışı tüm karakterlerin (`+`, `-`, `()`, boşluk vb.) temizlendiği, sadece rakamlardan oluşan telefon numarası
+  - `q` — `text` parametresinin `URLSearchParams` ile URL-safe query string'e dönüştürülmüş hali
+- **Dönüş**: `https://wa.me/{p}?text={q}` formatında WhatsApp doğrudan mesaj bağlantısı; hata durumunda sadece `https://wa.me/{p}`
+
+**Try bloğu detayı**: `p` ve `q` oluşturulur; `q` boş değilse `?${q}` eklenerek tam URL döndürülür.
+**Catch bloğu detayı**: Sadece `p` oluşturulur, query parametresi olmadan `https://wa.me/${p}` döndürülür.
 
 ---
 

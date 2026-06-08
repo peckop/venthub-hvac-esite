@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\InternalFanRotor.tsx
-skeleton_hash: eaaf785a44af0afb
+skeleton_hash: 079208e280e5fc2a
 entity_hashes:
   func:InternalFanRotor: ac57944d86aa281e
   overview: d9f5198d3b7b9bcf
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:38Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

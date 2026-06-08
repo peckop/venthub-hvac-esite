@@ -3,32 +3,27 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\authority\TechnicalDrawingAuthority.tsx
-skeleton_hash: c25fd098e9856261
+skeleton_hash: 51d32304c1cae956
 entity_hashes:
   func:TechnicalDrawingAuthority: fdb68a3fb07822eb
-  overview: c71b29f5c3a00fb8
+  overview: 644a3bf371af42f4
   style_tokens: b07a83f8b2a17b2b
-generated_at: 2026-05-28T22:35:40Z
+generated_at: 2026-06-08T10:08:37Z
 ---
 
 ## Genel Bakış
-`TechnicalDrawingAuthority` bileşeni, teknik çizim verilerini alıp bunları stil sınıflarıyla birlikte görsel bir temsile dönüştürür. Çizim listesini ve isteğe bağlı CSS sınıflarını kullanarak UI’da uygun bir şekilde render eder.
-
-## Fonksiyon Grupları
-### Render ve Görsel Oluşturma
-Bu grup, bileşenin aldığı `drawings` ve `className` parametrelerini kullanarak JSX çıktısını üretir; her bir çizimi uygun HTML öğelerine yerleştirerek ve ek stiller uygulayarak görsel temsili sağlar.  
-- TechnicalDrawingAuthority
+`TechnicalDrawingAuthority` modülü, bir dizi teknik çizim verisini alarak bunları依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然依然
 
 ---
 
-## AXIOMS – Mimari Varsayımlar  
-Bu modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
+## AXIOMS – Mimari Varsayımlar
+Bu modülün doğru çalışması için aşağıdaki varsayımlar zorunludur.
 
-[Aksiyom 1]: Eğer `drawings` tanımlı değilse (undefined veya null), `TechnicalDrawingAuthority` bileşeni `drawings` üzerinde iterasyon yapamadığından hata fırlatır veya hiçbir çizim render etmez.  
-[Aksiyom 2]: Eğer `drawings` bir dizi (iterable) değilse, bileşen `map` gibi yöntemleri kullanamadığından render sırasında bir istisna oluşur.  
-[Aksiyom 3]: Eğer `className` prop’u string türünde değilse, bileşene geçirilen sınıf özniteliği beklenildiği gibi uygulanmayabilir ve DOM’da sınıf ataması başarısız olabilir.  
-[Aksiyom 4]: Eğer `formatColors` sabiti tanımlı değilse (undefined veya null), bileşen stil tanımlarını bu nesnedan alamadığı için renk stilleri uygulanamaz veya varsayılan stillere döner.  
-[Aksiyom 5]: Eğer `formatColors` bir obje değilse, stil özelliklerine erişim çalışma zamanında başarısız olur ve görsel çıktı beklenen renkleri gösteremeyebilir.
+[Aksiyom 1]: `drawings` parametresi传入edilmelidir. Eğer `drawings` parametresi yoksa, bileşen render işlemi başarısız olur.
+
+[Aksiyom 2]: `drawings` parametresi, `formatColors` sabit nesnesindeki anahtarlar ile uyumlu veri yapısına sahip olmalıdır. Eğer drawings verisi formatColors ile eşleşmeyen değerler içeriyorsa, çizim renklendirmesi eksik veya hatalı olur.
+
+[Aksiyom 3]: `formatColors` sabit nesnesi tanımlı ve geçerli bir nesne olmalıdır. Eğer `formatColors` nesnesi yoksa veya boşsa, çizimler için renk formatlaması uygulanamaz.
 
 ---
 
@@ -63,23 +58,14 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar gerekir.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/authority/TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
-- **params**: drawings, className = ''
-- **ic_degiskenler**:
-  - `formatColors` — object mapping drawing format strings to CSS class strings used to style the format indicator.
-- **Dönüş**: JSX.Element
-
-### [N2_NASIL] AST Pointer: src/components/authority/TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority.map
-- **params**: doc, idx
-- **ic_degiskenler**:
-  - `doc` — object containing drawing metadata (id, format, category, version, title, url, lastUpdated).
-  - `idx` — numeric index of the drawing in the drawings array, used to calculate animation delay.
-  - `formatColors` — object mapping format strings to CSS class strings for styling the format badge.
-  - `FileText` — icon component from lucide-react representing a file, used to display the drawing type.
-  - `Download` — icon component from lucide-react representing a download action, used in the download link.
-  - `Clock` — icon component from lucide-react representing a clock, used to show last updated timestamp.
-  - `Info` — icon component from lucide-react representing an info symbol, used to prefix the format label.
-- **Dönüş**: JSX.Element
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\authority\TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
+- **params**: ({ drawings, className = '' }: TechnicalDrawingAuthorityProps)
+- **ic_degiskenler**: 
+  - `drawings` — TechnicalDrawingAuthorityProps'tan gelen, çizim belgeleri dizisi. Her çizim doc nesnesi olarak map içinde iterate edilir.
+  - `className` — TechnicalDrawingAuthorityProps'tan gelen ek CSS sınıfı, varsayılan olarak boş string. Grid container'ına eklenir.
+  - `doc` — drawings dizisindeki her bir çizim nesnesi (TechnicalDrawingMetadata). map callback'inde her iterasyonda mevcut çizim öğesini temsil eder.
+  - `idx` — drawings dizisindeki her bir çizimin indeksi (sayı). Animasyon gecikme süresini hesaplamak için kullanılır.
+- **Dönüş**: JSX.Element (React bileşeni, JSX döndürür)
 
 ---
 

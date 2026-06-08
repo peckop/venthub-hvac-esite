@@ -1,13 +1,14 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect,it } from 'vitest'
+
+import type { DbCategory, DbProduct } from '../../types/db-rows'
 import {
-    toSupabaseJson,
     isRecord,
     mapDatabaseCategoryToDomain,
     mapDatabaseProductToDomain,
+    toSupabaseJson,
     toUICategoryList,
     toUIProductList
 } from '../type-converters'
-import type { DbCategory, DbProduct } from '../../types/db-rows'
 
 describe('type-converters', () => {
     describe('toSupabaseJson', () => {

@@ -3,28 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\VorticeBrand.tsx
-skeleton_hash: 94eed6a8060e5ab3
+skeleton_hash: e7b568aa0d2a584f
 entity_hashes:
   func:VorticeBrand: a8d2715dd40c7de5
-  overview: 07ac1657460cc044
+  overview: 0819e90fcacb5fea
   style_tokens: 751231d1b5ff9e5b
-generated_at: 2026-05-28T22:35:48Z
+generated_at: 2026-06-08T10:08:48Z
 ---
 
 ## Genel Bakış
-Bu modül, Vortice markasıyla ilgili ürün veya bilgi bölümünü gösteren bir React bileşeni tanımlar. Bileşen, sayfa içinde marka özetini, görsellerini ve bağlantılarını düzenler.
+VorticeBrand modülü, Vortice markasının 70 yıllık İtalyan mühendisliği ve güvenilirlik hikayesini anlatan, sayfa içine yerleştirilmiş bir bölüm bileşenidir. Props almayan bu bileşen, statik içerik ve görsellerle marka hikayesini sunar; ayrıca viewport'a girdiğinde tetiklenen kaydırma animasyonları kullanarak dinamik bir görünüm sağlar.
 
 ## Fonksiyon Grupları
-### Ana Bileşen Tanımı
-Bu grup, modülün tek işlevini içerir ve kullanıcı arayüzünde Vortice marka bölümünü oluşturur.
+### Ana Bileşen ve İçerik Yapısı
+Bileşenin temel yapısını ve sunduğu statik içeriği tanımlar. Vortice markasının hikayesini, başlığını, açıklamasını ve temel görsellerini kapsayan bölümü oluşturur.
 - VorticeBrand
+
+### Animasyon ve Görünür Alan Mantığı
+Bileşenin görünür alana girdiğinde tetiklenen animasyonları kontrol eden mantık ve ilgili CSS sınıf adlarını yönetir. Bu, kaydırma esnasında farklı bölümlerin (başlık, açıklama, istatistikler vb.) sırayla veya eş zamanlı olarak kaybolup belirmesini sağlar.
+- VorticeBrand (fonksiyon içindeki animasyon değişkenleri ve mantığı)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, props almayan bir React fonksiyon bileşeni olarak tasarlanmıştır.
 
-[Aksiyom 1]: Eğer `VorticeBrand` fonksiyonuna prop geçilirse, bileşenin render çıktısı ve davranışı garantilenmez.
+Bu modül için fonksiyon gövdesi verilmediği için kapsamlı mimari varsayımlar üretilememektedir. Sadece fonksiyon imzasından türetilen temel varsayım aşağıdadır.
+
+[Aksiyom 1]: Eğer VorticeBrand fonksiyonu için hiçbir parametre tanımlanmamışsa, bileşen dış bağımlılıklara ihtiyaç duymayan, tamamen içeriği statik olan bir yapıda çalışır.
 
 ---
 
@@ -40,26 +45,28 @@ Bu modül, props almayan bir React fonksiyon bileşeni olarak tasarlanmıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/sections/VorticeBrand.tsx::VorticeBrand
+### [N1_NASIL] AST Pointer: category/sections/VorticeBrand.tsx::VorticeBrand
 - **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `sectionRef` — ref to the section element for scroll animation
-  - `isVisible` — boolean indicating whether the section is in viewport for animation
-  - `highlights` — array of objects containing icon, value, label, description for stats
-  - `scrollAnimationClasses` — object with animation class names (slideRight, slideLeft, fadeUp, fadeIn) used for scroll‑based animations
-  - `VentImage` — component used to display the hero image
-  - `Award`, `Globe`, `Clock`, `Shield`, `Star` — icon components from lucide‑react used in highlights and badge UI
-- **Dönüş**: JSX.Element
+- **ic_degiskenler**: 
+  - `dict` — useI18n hook'undan gelen çeviri sözlüğü nesnesi
+  - `sectionRef` — section elementi için ref referansı, scroll animasyonu için DOM elementini temsil eder
+  - `isVisible` — section'ın görünür olup olmadığını belirten boolean, scroll animasyonu kontrolü için kullanılır
+  - `bDict` — Vortice markasına ait çeviri içeriği (dict.category.vorticeBrand)
+  - `icons` — Clock, Globe, Award, Star icon bileşenlerinden oluşan dizi
+  - `highlights` — icons dizisinin .map() ile işlenmesiyle oluşan, her bir highlight item için {icon, value, label, description} nesneleri içeren dizi
+- **Dönüş**: React.FC (JSX elementi - section yapısı)
 
-### [N2_NASIL] AST Pointer: src/components/category/sections/VorticeBrand.tsx::<anonymous>
-- **params**: `item`, `index`
-- **ic_degiskenler**:
-  - `item` — each element of highlights array containing icon, value, label, description
-  - `index` — numeric index of the current highlight in the map iteration
-  - `Icon` — React component extracted from item.icon (e.g., Clock, Globe) used to render the icon
-  - `scrollAnimationClasses` — animation class helper used to get fadeUp class based on visibility
-  - `isVisible` — boolean from outer scope indicating visibility, used to conditionally apply fadeUp animation
-- **Dönüş**: JSX.Element
+### [N2_NASIL] AST Pointer: category/sections/VorticeBrand.tsx::VorticeBrand (first map callback)
+- **params**: (Icon, index) - Icon: icon bileşeni, index: dizi indeksi
+- **ic_degiskenler**: 
+  - `item` — bDict.highlights[index] erişimi ile alınan mevcut highlight verisi
+- **Dönüş**: {icon: Icon, value: item.value, label: item.label, description: item.desc} nesnesi
+
+### [N3_NASIL] AST Pointer: category/sections/VorticeBrand.tsx::VorticeBrand (second map callback)
+- **params**: (item, index) - item: highlight nesnesi, index: dizi indeksi
+- **ic_degiskenler**: 
+  - `Icon` — item.icon erişimi ile alınan icon bileşeni
+- **Dönüş**: JSX elementi (div yapısı)
 
 ---
 

@@ -10,7 +10,7 @@ entity_hashes:
   func:SnailHousing: e93db710a7808387
   overview: f65ca24cfa337066
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:42Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış

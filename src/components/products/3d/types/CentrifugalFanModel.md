@@ -3,20 +3,20 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx
-skeleton_hash: c33c6b43d86f7e23
+skeleton_hash: 37480a504fe00518
 entity_hashes:
   func:CentrifugalFanModel: 2ca1d8ced8088e61
-  overview: 950751ea57960c49
+  overview: 13b0dbbbe05fc33c
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:46Z
+generated_at: 2026-06-08T10:09:30Z
 ---
 
 ## Genel Bakış
-Bu modül, santrifüval fan modelinin üç boyutlu görselleştirmesini sağlayan bir React bileşenini içerir. Bileşen, fanın geometrik ve görsel özelliklerini tanımlayarak 3D ortamında kullanıcıya etkileşimli bir gösterim sunar.
+Bu modül, santrifüj tip fanın (salyangoz fan) üç boyutlu modelini render eden bir React bileşeni içerir. Bileşen, fanın ana yapı taşlarını — tahrik motorunu, spiral konaklamayı ve radyal kanatlı pervaneyi — 3D ortamında görselleştirerek etkileşimli bir ürün gösterimi sunar. Props almayan bağımsız bir bileşendir.
 
 ## Fonksiyon Grupları
-### Bileşen Tanımı
-Bileşenin ana yapısını ve dışa aktarımını gerçekleştiren fonksiyondur.
+### 3D Bileşen Tanımı
+Fanın three.js tabanlı üç boyutlu geometrisini ve malzemelerini oluşturarak sahneye yerleştiren bileşen tanımı grubudur.
 - CentrifugalFanModel
 
 ---
@@ -42,52 +42,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx::CentrifugalFanModel
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: CentrifugalFanModel.tsx::CentrifugalFanModel
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials hook tarafından döndürülen materyal nesnesi; mesh component’lerde kullanılan renk ve finish referanslarını sağlar.
-  - `impellerRef` — döngü pervane (impeller) grubuna referans olan useRef; useFrame içinde pervanenin rotation.z değerini güncelleyerek animasyon sağlar.
-  - `impellerBladeGeometry` — useMemo ile bir kez hesaplanan THREE.ExtrudeGeometry; her impeller kanatı için aynı geometriyi yeniden kullanarak performansı artırır.
-  - `scrollShape` — useMemo ile bir kez hesaplanan THREE.Shape; spiral housing (salyangoz) profili tanımlar ve extrudeGeometry ile 3D mesh oluşturulur.
-- **Dönüş**: JSX.Element (React bileşeninin render çıktısı)
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx::useFrame_callback
-- **params**: state, delta
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (useFrame callback’i bir değer döndürmez; sadece side‑effect yapar)
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx::impellerBladeGeometry_memo
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `shape` — THREE.Shape nesnesi; kanat profili dış kenardan iç kenara quadraticCurve ve lineTo komutlarıyla çizilir.
-  - `extrudeSettings` — ExtrudeGeometry için derleme, eğrilik ve segment ayarlarını tanımlayan yapı nesnesi.
-- **Dönüş**: THREE.ExtrudeGeometry (tek bir impeller kanatı geometrisi)
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx::scrollShape_memo
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `shape` — THREE.Shape nesnesi; spiral housing (salyangoz) dış konturunu moveTo, lineTo ve quadraticCurveTo komutlarıyla tanımlar.
-- **Dönüş**: THREE.Shape (spiral housing profili)
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx::coolingFin_map
-- **params**: _, i
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (her soğutma kanadı için <mesh> elementi)
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx::impellerBlade_map
-- **params**: _, i
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (her impeller kanatı için <group> içinde <mesh> elementi)
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx::protectionRing_map
-- **params**: r, i
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (her koruma izgarası halkası için <mesh> elementi)
-
-### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx::protectionWire_map
-- **params**: angle, i
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (her koruma izgarası tel için <mesh> elementi)
+  - `materials` — `useFanMaterials()` hook'undan dönen malzeme nesnesi; industrialBlue, industrialSteel, galvanizedSteel, darkGrey, motorSilver, logoRed, bladeBlack, matteBlack özelliklerini içerir, tüm mesh'lerin material prop'larında kullanılır
+  - `impellerRef` — `useRef<THREE.Group>(null)` ile oluşturulan React ref nesnesi; dönen impeller grubuna (`<group ref={impellerRef}>`) bağlanır, useFrame callback'inde rotation.z değiştirilerek pervane döndürülür
+  - `impellerBladeGeometry` — `useMemo` ile oluşturulan `THREE.ExtrudeGeometry`; geriye kıvrımlı santrifüj kanat geometrisi, 12 adet kanat mesh'inde `geometry` prop'unda kullanılır
+  - `scrollShape` — `useMemo` ile oluşturulan `THREE.Shape`; spiral (salyangoz) muhafaza profilini tanımlar, `extrudeGeometry` args'inde kullanılır
+- **Dönüş**: JSX — `<group scale={[1,1,1]}>` root elementi içeren 4 alt gruptan oluşan React Three Fiber bileşeni (Motor Grubu, Housing/Spiral Gövde, İmeller Grubu, Koruma Izgarası)
 
 ---
 

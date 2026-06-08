@@ -3,35 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountAddressesPage.tsx
-skeleton_hash: 6fe726e89ba95c44
+skeleton_hash: 4e76e0a93f138f4e
 entity_hashes:
   func:AccountAddressesPage: c3066b52b6395a25
-  overview: fbf2bafbca772acf
+  overview: cfdfd55850a3c6f9
   style_tokens: 20e5949307a3284f
-generated_at: 2026-06-07T12:12:05Z
+generated_at: 2026-06-08T10:10:59Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcının hesap adreslerini görüntülemesini ve yönetmesini sağlayan tek bir React sayfa bileşeninden oluşur. Adres listeleme, ekleme, düzenleme, silme ve varsayılan adres belirleme gibi tüm temel adres yönetim işlemlerini tek bir bileşen içinde merkezi olarak sunar.
+Bu modül, kullanıcının hesap adreslerini görüntülemesini ve yönetmesini sağlayan tek bir React sayfa bileşeninden oluşur. Adres listeleme, ekleme, düzenleme, silme ve varsayılan adres belirleme gibi tüm temel adres yönetim işlemlerini tek bir bileşen içinde merkezi olarak sunar. Modül, bağımsız bir hesap alt sayfası olarak çalışır ve gerekli verileri içinden veya bağlamdan (context) sağlar.
 
 ## Fonksiyon Grupları
 ### Adres Sayfası Yönetimi
-Kullanıcının tüm adreslerini listeleme, yeni adres oluşturma, mevcut adresleri düzenleme ve silme, ayrıca bir adresi varsayılan olarak belirleme gibi temel CRUD işlemlerini ve ilgili arayüz durumlarını yöneten ana bileşen.
+Kullanıcının tüm adreslerini listeleme, yeni adres oluşturma, mevcut adresleri değiştirme ve silme, ayrıca bir adresi varsayılan olarak belirleme gibi temel CRUD işlemlerini ve ilgili arayüz durumlarını yöneten ana bileşen.
 - AccountAddressesPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-Bu modül, kullanıcının hesap adreslerini görüntülemesini ve yönetmesini sağlayan bağımsız bir React sayfa bileşenidir.
-
-[Aksiyom 1]: Eğer bileşen dışarıdan prop almıyorsa (fonksiyon imzası parametresiz), tüm adres verileri ve işlevsellik modül içinden (API çağrıları, context, store) sağlanmalıdır.
-
-[Aksiyom 2]: Eğer `emptyForm` sabiti tanımlı değilse veya boş/bozuk bir nesne ise, yeni adres formu başlatılamaz ve form bileşeni beklenmeyen duruma düşer.
-
-[Aksiyom 3]: Eğer `emptyForm` nesnesi undefined veya null ise, form bileşeninin initial state'i tanımsız olacağından, form alanlarıcontrolled bileşenlerde hata oluşur veya boş gösterilir.
-
-[Aksiyom 4]: Eğer bu sayfa modülü bir hesap alt sayfası olarak çalışıyorsa, kullanıcı kimlik bilgilerinin (auth token vb.) üst seviye bir context/provider tarafından sağlanıyor olması gerekir; aksi halde API çağrıları başarısız olur.
+**Not:** Verilen modülde yalnızca `AccountAddressesPage()` fonksiyon imzası ve `emptyForm` sabiti bulunmaktadır. Fonksiyon gövdesine erişim olmadığı için, modülün doğru çalışması için gerekli mimari varsayımlar (bağımlılıklar, veri yapıları, API çağrıları vb.) belirlenememiştir. AXIOMS'lerin üretilebilmesi için fonksiyon gövdesi kodunun sağlanması gerekmektedir.
 
 ---
 
@@ -79,98 +72,127 @@ Bu modül, kullanıcının hesap adreslerini görüntülemesini ve yönetmesini 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/account/AccountAddressesPage.tsx::AccountAddressesPage
+### [N1_NASIL] AST Pointer: AccountAddressesPage::(anonim-yukle)
+- **params**: (parametre yok — anonim ok arrow function)
+- **ic_degiskenler**:
+  - `setLoading(true)` / `setLoading(false)` — yükleme durumunu açar/kapatır, async işlemler sırasında UI loading göstergesi kontrol edilir
+  - `data` — `listAddresses(supabaseBrowserClient)` çağrısının dönüş değeri; kullanıcının adres listesi (`UserAddress[]`)
+  - `setItems(data)` — adres listesini state'e yazar, liste render'da kullanılır
+  - `e` — try-catch yakalama bloğu, hata nesnesi; `console.error` ile loglanır
+  - `supabaseBrowserClient` — import edilmiş Supabase istemci singleton'ı, API çağrılarına iletilir
+  - `t('account.addresses.toasts.loadError')` — i18n çeviri fonksiyonu; hata toast mesajı için lokalize metin döndürür
+  - `toast.error(...)` — sonner kütüphanesi ile kullanıcıya hata bildirimi gösterir
+- **Dönüş**: yok (state setter'ları ile yan etki: `items`, `loading` güncellenir)
+
+### [N2_NASIL] AST Pointer: AccountAddressesPage::startEdit
+- **params**: `a: UserAddress` — düzenlenecek mevcut adres nesnesi
+- **ic_degiskenler**:
+  - `setForm({...})` — form state'ini `a` nesnesinin alanlarıyla doldurur; şu alanlar kopyalanır:
+    - `a.id` — adresin benzersiz kimliği, düzenleme modunda kullanılır (`isEditing` koşulunu tetikler)
+    - `a.label` — adres etiketi (ör. "Ev", "İş"); boşsa boş string
+    - `a.full_name` — alıcı tam adı; boşsa boş string
+    - `a.phone` — telefon numarası; boşsa boş string
+    - `a.address_line` — açık adres satırı; boşsa boş string
+    - `a.city` — il/ad; boşsa boş string
+    - `a.district` — ilçe; boşsa boş string
+    - `a.postal_code` — posta kodu; boşsa boş string
+    - `a.country` — ülke kodu; boşsa varsayılan `'TR'`
+    - `a.is_default_shipping` — varsayılan teslimat adresi mi; `?? false` ile undefined false'a düşer
+    - `a.is_default_billing` — varsayılan fatura adresi mi; `?? false` ile undefined false'a düşer
+  - `window.scrollTo({ top: 0, behavior: 'smooth' })` — mobilde form alanına kaydırma; tarayıcı DOM API çağrısı
+- **Dönüş**: yok (yan etki: `form` state güncellenir, sayfa kaydırılır)
+
+### [N3_NASIL] AST Pointer: AccountAddressesPage::resetForm
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — listAddresses API çağrısından dönen UserAddress listesi
-  - `e` — try-catch yapısında yakalanan hata nesnesi
-- **Dönüş**: JSX (React bileşeni)
+  - `setForm({ ...emptyForm })` — form state'ini `emptyForm` sabitinin浅拷贝'sı ile sıfırlar
+  - `emptyForm` — import edilmiş boş form nesnesi sabiti; tüm form alanlarının varsayılan değerlerini içerir
+- **Dönüş**: yok (yan etki: `form` state sıfırlanır)
 
-### [N2_NASIL] AST Pointer: src/views/account/AccountAddressesPage.tsx::startEdit
-- **params**: `a` — UserAddress tipinde, düzenlenecek adres nesnesi
+### [N4_NASIL] AST Pointer: AccountAddressesPage::handleSubmit
+- **params**: `e: React.FormEvent` — form submit olay nesnesi
 - **ic_degiskenler**:
-  - `a.id` — adresin benzersiz tanımlayıcısı
-  - `a.label` — adres etiketi (ör: "Ev", "İş")
-  - `a.full_name` — tam ad
-  - `a.phone` — telefon numarası
-  - `a.address_line` — adres satırı
-  - `a.city` — şehir
-  - `a.district` — ilçe
-  - `a.postal_code` — posta kodu
-  - `a.country` — ülke kodu
-  - `a.is_default_shipping` — varsayılan kargo adresi mi
-  - `a.is_default_billing` — varsayılan fatura adresi mi
-- **Dönüş**: void (yan etki: form state'ini günceller, sayfayı yukarı kaydırır)
+  - `e.preventDefault()` — varsayılan form submit davranışını engeller (sayfa yenilenmesini önler)
+  - `form.address_line` — form state'inden address_line alanı; doğrulama kontrolü yapılır (boş olamaz)
+  - `form.city` — form state'inden city alanı; doğrulama kontrolü yapılır (boş olamaz)
+  - `form.district` — form state'inden district alanı; doğrulama kontrolü yapılır (boş olamaz)
+  - `t('account.addresses.toasts.requiredFields')` — zorunlu alan hatası için lokalize mesaj
+  - `toast.error(...)` — doğrulama hatası kullanıcıya gösterilir
+  - `user` — `useAuth()` hook'undan gelen kimlik bilgisi; null ise hata fırlatılır
+  - `user.id` — kimlik doğrulanmış kullanıcının ID'si; yeni adres oluşturmada `user_id` alanına yazılır
+  - `setSaving(true)` / `setSaving(false)` — kaydetme durumunu açar/kapatır; buton loading durumu kontrol edilir
+  - `isEditing` — boolean; true ise güncelleme, false ise oluşturma dalına girilir
+  - `form.id` — form state'inden mevcut adres ID'si; düzenleme modunda `updateAddress` çağrısına iletilir
+  - `form.label` — adres etiketi; hem güncelleme hem oluşturma çağrısına iletilir
+  - `form.full_name` — alıcı tam adı; hem güncelleme hem oluşturma çağrısına iletilir
+  - `form.phone` — telefon numarası; hem güncelleme hem oluşturma çağrısına iletilir
+  - `form.address_line` — açık adres; hem `address_line` hem `street_address` olarak haritalanır
+  - `form.city` — il/ad; API çağrısına iletilir
+  - `form.district` — ilçe; API çağrısına iletilir
+  - `form.postal_code` — posta kodu; API çağrısına iletilir
+  - `form.country` — ülke kodu; API çağrısına iletilir
+  - `form.is_default_shipping` — varsayılan teslimat adresi bayrağı; API çağrısına iletilir
+  - `form.is_default_billing` — varsayılan fatura adresi bayrağı; API çağrısına iletilir
+  - `updateAddress(supabaseBrowserClient, form.id, {...})` — güncelleme API çağrısı; mevcut adresi patch eder
+  - `createAddress(supabaseBrowserClient, {...})` — oluşturma API çağrısı; yeni adres ekler; `address_type` alanı `form.is_default_shipping` değerine göre `'shipping'` veya `'billing'` olarak haritalanır
+  - `supabaseBrowserClient` — Supabase istemci singleton'ı; API fonksiyonlarına iletilir
+  - `t('account.addresses.toasts.updated')` — güncelleme başarı mesajı (lokalize)
+  - `t('account.addresses.toasts.created')` — oluşturma başarı mesajı (lokalize)
+  - `toast.success(...)` — başarı bildirimi gösterir
+  - `resetForm()` — formu sıfırlar (N3_NASIL fonksiyonu)
+  - `refresh()` — adres listesini yeniden çeker (N1_NASIL ile aynı mantık)
+  - `e` — catch bloğu hata nesnesi; `console.error` ile loglanır
+  - `t('account.addresses.toasts.saveError')` — kaydetme hatası için lokalize mesaj
+  - `toast.error(...)` — hata bildirimi gösterir
+- **Dönüş**: yok (yan etki: `form` sıfırlanır, `items` yenilenir, `saving` sıfırlanır)
 
-### [N3_NASIL] AST Pointer: src/views/account/AccountAddressesPage.tsx::resetForm
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (yan etki: form state'ini emptyForm ile sıfırlar)
-
-### [N4_NASIL] AST Pointer: src/views/account/AccountAddressesPage.tsx::handleSubmit
-- **params**: `e` — React.FormEvent, form submit olayı
+### [N5_NASIL] AST Pointer: AccountAddressesPage::handleDelete
+- **params**: `id: string` — silinecek adresin benzersiz kimliği
 - **ic_degiskenler**:
-  - `form.address_line` — formdaki adres satırı değeri
-  - `form.city` — formdaki şehir değeri
-  - `form.district` — formdaki ilçe değeri
-  - `user` — useAuth hook'tan gelen kullanıcı nesnesi
-  - `isEditing` — düzenleme modunda olup olmadığını belirleyen boolean state
-  - `form.id` — düzenleme modunda ise mevcut adresin ID'si
-  - `form.label` — formdaki etiket değeri
-  - `form.full_name` — formdaki tam ad değeri
-  - `form.phone` — formdaki telefon değeri
-  - `form.postal_code` — formdaki posta kodu değeri
-  - `form.country` — formdaki ülke kodu değeri
-  - `form.is_default_shipping` — formdaki kargo varsayılanı durumu
-  - `form.is_default_billing` — formdaki fatura varsayılanı durumu
-  - `e.preventDefault()` — form submit varsayılan davranışını engeller
-  - `user.id` — kullanıcının benzersiz tanımlayıcısı
-  - `setSaving` — kaydetme durumunu güncelleyen state setter
-  - `resetForm` — formu sıfırlayan fonksiyon
-  - `refresh` — adres listesini yenileyen fonksiyon
-  - `console.error(e)` — hata durumunda konsola log yazar
-- **Dönüş**: void (yan etki: form submit eder, API çağrısı yapar, toast bildirimleri gösterir)
+  - `confirm(t('account.addresses.toasts.confirmDelete') as string)` — tarayıcı onay dialogu; kullanıcı silme işlemini onaylamalı, onaylamazsa fonksiyon erken return ile çıkar
+  - `t('account.addresses.toasts.confirmDelete')` — silme onay mesajı için lokalize metin; `as string` ile type assert edilir
+  - `deleteAddress(supabaseBrowserClient, id)` — silme API çağrısı; belirtilen adresi veritabanından siler
+  - `supabaseBrowserClient` — Supabase istemci singleton'ı
+  - `toast.success(t('account.addresses.toasts.deleted'))` — silme başarı mesajı
+  - `refresh()` — adres listesini yeniden çeker
+  - `form.id` — mevcut form state'indeki adres ID'si; silinen adres düzenlemekteyse form sıfırlanır
+  - `resetForm()` — formu sıfırlar (silen adres formda açıksa)
+  - `e` — catch bloğu hata nesnesi; `console.error` ile loglanır
+  - `t('account.addresses.toasts.deleteError')` — silme hatası için lokalize mesaj
+- **Dönüş**: yok (yan etki: `items` yenilenir, `form` koşullu sıfırlanır)
 
-### [N5_NASIL] AST Pointer: src/views/account/AccountAddressesPage.tsx::handleDelete
-- **params**: `id` — string, silinecek adresin benzersiz tanımlayıcısı
+### [N6_NASIL] AST Pointer: AccountAddressesPage::makeDefault
+- **params**: `id: string` — varsayılan yapılacak adresin ID'si; `kind: 'shipping' | 'billing'` — hangi türün varsayılan olacağı
 - **ic_degiskenler**:
-  - `confirm(...)` — silme onayı için browser onay dialogu
-  - `form.id` — form state'indeki mevcut adres ID'si
-  - `refresh` — adres listesini yenileyen fonksiyon
-  - `resetForm` — formu sıfırlayan fonksiyon
-  - `console.error(e)` — hata durumunda konsola log yazar
-- **Dönüş**: void (yan etki: adres siler, toast bildirimi gösterir)
+  - `setDefaultAddress(supabaseBrowserClient, kind, id)` — API çağrısı; belirtilen adresi belirtilen türde varsayılan yapar
+  - `supabaseBrowserClient` — Supabase istemci singleton'ı
+  - `toast.success(...)` — başarı bildirimi; `kind === 'shipping'` koşuluyla farklı lokalize mesaj gösterir
+  - `t('account.addresses.toasts.defaultSetShipping')` — teslimat varsayılan ayarlama başarı mesajı
+  - `t('account.addresses.toasts.defaultSetBilling')` — fatura varsayılan ayarlama başarı mesajı
+  - `refresh()` — adres listesini yeniden çeker (varsayılan bayrakları güncellemek için)
+  - `e` — catch bloğu hata nesnesi; `console.error` ile loglanır
+  - `t('account.addresses.toasts.updateError')` — güncelleme hatası için lokalize mesaj
+- **Dönüş**: yok (yan etki: `items` yenilenir)
 
-### [N6_NASIL] AST Pointer: src/views/account/AccountAddressesPage.tsx::makeDefault
-- **params**: 
-  - `id` — string, varsayılan yapılacak adresin benzersiz tanımlayıcısı
-  - `kind` — 'shipping' | 'billing', adres türü
+### [N7_NASIL] AST Pointer: AccountAddressesPage::(anonim-render)
+- **params**: `a` — `UserAddress` tipinde tek bir adres nesnesi; liste render'ında her eleman için çağrılır
 - **ic_degiskenler**:
-  - `kind === 'shipping'` — kargo türü kontrolü
-  - `kind === 'billing'` — fatura türü kontrolü
-  - `refresh` — adres listesini yenileyen fonksiyon
-  - `console.error(e)` — hata durumunda konsola log yazar
-- **Dönüş**: void (yan etki: varsayılan adresi belirler, toast bildirimi gösterir)
-
-### [N7_NASIL] AST Pointer: src/views/account/AccountAddressesPage.tsx::(a) => (JSX)
-- **params**: `a` — UserAddress tipinde, render edilecek adres nesnesi
-- **ic_degiskenler**:
-  - `a.id` — adresin benzersiz tanımlayıcısı (key olarak kullanılır)
-  - `a.label` — adres etiketi (gösterim için)
-  - `a.full_name` — tam ad (gösterim için)
-  - `a.address_line` — adres satırı (gösterim için)
-  - `a.district` — ilçe (gösterim için)
-  - `a.city` — şehir (gösterim için)
-  - `a.postal_code` — posta kodu (gösterim için)
-  - `a.phone` — telefon numarası (gösterim için)
-  - `a.is_default_shipping` — kargo varsayılan durumu (badge gösterimi için)
-  - `a.is_default_billing` — fatura varsayılan durumu (badge gösterimi için)
-  - `startEdit(a)` — düzenleme butonu onClick handler'ı
-  - `handleDelete(a.id)` — silme butonu onClick handler'ı
-  - `makeDefault(a.id, 'shipping')` — kargo varsayılan yapma butonu handler'ı
-  - `makeDefault(a.id, 'billing')` — fatura varsayılan yapma butonu handler'ı
-  - `t(...)` — i18n çeviri fonksiyonu
-- **Dönüş**: JSX (React bileşeni)
+  - `a.id` — adresin benzersiz kimliği; React `key` prop'u olarak kullanılır ve buton onClick handler'larına iletilir
+  - `a.label` — adres etiketi (ör. "Ev", "İş"); başlık olarak gösterilir, boşsa `t('account.addresses.unregistered')` fallback gösterilir
+  - `a.full_name` — alıcı tam adı; koşullu olarak render edilir (boşsa gösterilmez)
+  - `a.address_line` — açık adres satırı; ana adres gösterimi
+  - `a.district` — ilçe adı; alt bilgi satırında gösterilir
+  - `a.city` — il/ad; alt bilgi satırında gösterilir
+  - `a.postal_code` — posta kodu; boşsa boş string fallback ile gösterilir
+  - `a.phone` — telefon numarası; koşullu olarak render edilir (boşsa gösterilmez)
+  - `a.is_default_shipping` — boolean; true ise yeşil "Varsayılan" badge gösterilir, false ise "Varsayılan Yap" butonu gösterilir
+  - `a.is_default_billing` — boolean; true ise mavi "Varsayılan" badge gösterilir, false ise "Varsayılan Yap" butonu gösterilir
+  - `t(...)` — i18n çeviri fonksiyonu; çok farklı lokalize metin anahtarı ile çağrılır (badge metinleri, buton başlıkları, etiket fallback'leri)
+  - `startEdit(a)` — düzenle butonu onClick handler'ı; düzenlenecek adresi form state'e aktarır
+  - `handleDelete(a.id)` — sil butonu onClick handler'ı; adres ID'si ile silme işlemini başlatır
+  - `makeDefault(a.id, 'shipping')` — teslimat varsayılan yap butonu onClick handler'ı
+  - `makeDefault(a.id, 'billing')` — fatura varsayılan yap butonu onClick handler'ı
+- **Dönüş**: JSX — tek bir adres kartı (`<div>`) JSX elemanı döndürür;.address_card
 
 ---
 

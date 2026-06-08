@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryDetailDrawer.tsx
-skeleton_hash: b4c161454e49e38a
+skeleton_hash: a795a88f64a4a4b7
 entity_hashes:
   func:InventoryDetailDrawer: 3a57400ca0f546b7
   overview: 92caa1481da5cee7
   style_tokens: 4b283d8541dc151c
-generated_at: 2026-05-28T22:35:31Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış

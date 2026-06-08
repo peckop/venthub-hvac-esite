@@ -10,7 +10,7 @@ entity_hashes:
   func:getMotorInference: ef91c03ee063a82d
   func:getNoiseInference: 9266c31de55779b5
   overview: 9ce3d52a464cda5e
-generated_at: 2026-06-06T21:56:28Z
+generated_at: 2026-06-08T10:10:58Z
 ---
 
 ## Genel Bakış
@@ -34,7 +34,23 @@ Bu mühendislik zekâsı modülü, ürünlere ait temel mühendislik metriklerin
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, HVAC ürün teknik parametrelerinden mühendislik çıkarımları üretir; fonksiyon imzalarına ve yapılarına dayalı aşağıdaki varsayımlar geçerlidir.
+
+**[Aksiyom 1]**: Eğer `getNoiseInference` çağrısında `db` parametresi sayısal bir değer olarak sağlanmazsa, gürültü çıkarımı üretilemez (fonksiyon zorunlu parametre bekler, default değer yoktur).
+
+**[Aksiyom 2]**: Eğer `getEfficiencyInference` çağrısında `efficiency` parametresi sağlanmazsa, fonksiyon varsayılan/boş bir verimlilik çıkarımı üretir (parametre opsiyoneldir, `undefined` kabul edilir).
+
+**[Aksiyom 3]**: Eğer `getMotorInference` çağrısında `motorType` parametresi sağlanmazsa, fonksiyon varsayılan/boş bir motor çıkarımı üretir (parametre opsiyoneldir, `undefined` kabul edilir).
+
+**[Aksiyom 4]**: Eğer `generateEngineeringSummary` çağrısında geçerli bir `Product` nesnesi sağlanmazsa, mühendislik özeti üretilemez (fonksiyon zorunlu parametre bekler).
+
+**[Aksiyom 5]**: `generateEngineeringSummary` fonksiyonu, tekil çıkarım fonksiyonlarının (`getNoiseInference`, `getEfficiencyInference`, `getMotorInference`) çıktılarına bağımlıdır; bu fonksiyonlardan birinin hatalı veya eksik sonuç üretmesi, özetin ilgili bölümünün eksik olmasına yol açar.
+
+**[Aksiyom 6]**: `getNoiseInference`, `getEfficiencyInference` ve `getMotorInference` fonksiyonları saf (side-effect-free) olmalıdır; aynı parametrelerle tekrar tekrar çağrıldığında her seferinde aynı sonucu üretmelidir (deterministik çıkarım).
+
+**[Aksiyom 7]**: Fonksiyon gövdelerinde belirtilen eşik değerleri ve çıkarım kuralları modül içinde sabittir; örneğin dB aralıkları, verimlilik yüzdesi eşikleri ve motor tipi eşlemeleri modül dışında değiştirilemez (yapısal sabitlik).
 
 ---
 
@@ -123,8 +139,8 @@ graph TD
     engineeringIntelligence_ts__getEfficiencyInference["getEfficiencyInference"]
     engineeringIntelligence_ts__getMotorInference["getMotorInference"]
     engineeringIntelligence_ts__getNoiseInference["getNoiseInference"]
-    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getMotorInference
     engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getEfficiencyInference
+    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getMotorInference
     engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getNoiseInference
 ```
 

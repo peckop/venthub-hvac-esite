@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts
-skeleton_hash: de20496c9f79f680
+skeleton_hash: 44d049374770bbaa
 entity_hashes:
   func:adminSearchProducts: 8d062d9b98a5adbd
   func:fetchProductBy: 801cc0baf830919f
@@ -19,59 +19,67 @@ entity_hashes:
   func:getProductsEnriched: d722af217df6b114
   func:getSearchSuggestions: c869859ad564f520
   func:searchProducts: 21df141aa66cf1d1
-  overview: 9d64dd60f5705827
-generated_at: 2026-06-07T12:09:28Z
+  overview: 92f56a383d3f3250
+generated_at: 2026-06-08T10:09:34Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesindeki ürün verilerine erişim ve manipülasyon işlemlerini merkezi olarak yöneten servis modülüdür. Hem son kullanıcı arayüzleri hem de yönetici paneli için ürün listeleme, detay getirme, arama ve filtreleme işlevlerini tek bir noktadan sunar. Modül, farklı veri hazırlama ve erişim kalıplarını destekleyerek esnek bir yapı sunar.
+VentHub HVAC projesindeki tüm ürün verilerine erişimi sağlayan merkezi servis modülüdür. Son kullanıcı arayüzleri ve yönetici paneli için ürün listeleme, detay getirme, arama ve filtreleme fonksiyonlarını kapsar. Farklı veri hazırlama ve erişim kalıplarını (zenginleştirilmiş listeler, toplu arama, esnek tanımlayıcı erişimi) destekleyerek veri katmanı için tek bir erişim noktası oluşturur.
 
 ## Fonksiyon Grupları
 ### Tekil Ürün Erişimi
-Tek bir ürünün detaylarını, ID veya benzersiz URL kısaltması (slug) gibi tanımlayıcılarla esnek bir şekilde getirir. Temel veri çekme işlemini merkezileştirir ve hata yönetimi sunar.
+Tek bir ürünün detaylarını, ID, slug veya her ikisiyle de esnek bir şekilde getirir. Temel veri çekme işlemini merkezileştirerek farklı tanımlayıcı türleriyle çalışmayı destekler.
 - fetchProductBy, getProductById, getProductBySlug, getProductBySlugOrId
 
 ### Toplu Ürün Listeleme ve Kategorik Filtreleme
-Ürünleri toplu olarak, belirli kategorilere veya alt kategorilere göre, öne çıkanlar olarak veya zenginleştirilmiş ek bilgilerle birlikte listeler. Farklı kullanım senaryolarına uygun veri kümeleri sağlar.
+Ürünleri toplu olarak, belirli kategorilere veya alt kategorilere göre, öne çıkanlar olarak veya zenginleştirilmiş ek bilgilerle birlikte listeler. Farklı kullanım senaryolarına (ana sayfa, kategori sayfaları, özel listeler) uygun veri kümeleri sağlar.
 - getProducts, getAllProducts, getProductsByCategory, getProductsBySubcategory, getFeaturedProducts, getProductsEnriched
 
 ### Arama ve Öneri İşlevleri
-Son kullanıcılar için tam metin tabanlı ürün arama ve otomatik arama önerileri sunar. Ayrıca yönetici paneli için gelişmiş arama ve filtreleme imkanı sağlar.
-- getSearchSuggestions, ftsSearchProducts, searchProducts, adminSearchProducts
+Son kullanıcılar için metin tabanlı arama yapar ve otomatik arama önerileri sunar. Tam metin arama ve daha basit arama sorguları için farklı fonksiyonlar sağlar.
+- searchProducts, getSearchSuggestions, ftsSearchProducts
+
+### Yönetici Paneli İşlevleri
+Yönetici arayüzleri için gelişmiş ve filtrelenmiş ürün araması sağlar. Sayfalama (limit/offset) ve kategori bazlı filtreleme gibi ek özellikler sunarak büyük veri setlerinde etkin arama yapmayı destekler.
+- adminSearchProducts
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Supabase üzerinden ürün verilerine erişim sağlayan merkezi bir servistir. Aşağıdaki varsayımlar fonksiyon imzalarından çıkarılmıştır.
+Bu modül, Supabase üzerinden ürün verilerine erişim sağlayan bir veri erişim katmanıdır. Aşağıdaki mimari varsayımlar modülün doğru çalışması için zorunludur:
 
-**[Aksiyom 1]:** Eğer `supabase` parametresi geçerli ve aktif bir Supabase bağlantısı değilse, tüm fonksiyonlar veritabanı bağlantısı hatası ile karşılaşır.
+[Aksiyom 1]: Eğer `supabase` parametresi (SupabaseClient<Database>) geçerli bir Supabase istemcisi değilse, tüm fonksiyonlar veritabanı bağlantısı hatası ile karşılaşır.
 
-**[Aksiyom 2]:** Eğer `q`, `query`, `identifier`, `id`, `slug`, `value` gibi arama/filtreleme parametreleri boş string (`""`) olarak verilirse, sonuç kümesi boş döner veya beklenmeyen davranış oluşur.
+[Aksiyom 2]: Eğer veritabanında `products` tablosu yoksa, hiçbir ürün sorgusu çalışamaz.
 
-**[Aksiyom 3]:** Eğer `getProductsByCategory` çağrısında verilen `categoryId`, veritabanında var olmayan bir kategoriye aitse, boş sonuç listesi döner.
+[Aksiyom 3]: Eğer `products` tablosunda `id` sütunu yoksa, `getProductById` fonksiyonu çalışamaz.
 
-**[Aksiyom 4]:** Eğer `getProductsBySubcategory` çağrısında verilen `subcategoryId`, veritabanında var olmayan bir alt kategoriye aitse, boş sonuç listesi döner.
+[Aksiyom 4]: Eğer `products` tablosunda `slug` sütunu yoksa, `getProductBySlug` ve `getProductBySlugOrId` fonksiyonları çalışamaz.
 
-**[Aksiyom 5]:** Eğer `fetchProductBy` fonksiyonunda `column` parametresi `'id'` veya `'slug'` dışındaki bir değer olarak verilirse, TypeScript derleme zamanında hata oluşur — çalışma zamanında bu duruma ulaşılamaz.
+[Aksiyom 5]: Eğer `slug` sütunu için benzersizlik (unique) kısıtlaması yoksa, `getProductBySlug` birden fazla sonuç döndürebilir veya beklenmeyen davranış oluşur.
 
-**[Aksiyom 6]:** Eğer `getSearchSuggestions` fonksiyonunda `limit` sıfıran küçük bir değer olarak verilirse, Supabase sorgu hatası oluşur veya boş sonuç döner.
+[Aksiyom 6]: Eğer `products` tablosunda `category_id` sütunu yoksa, `getProductsByCategory` ve `adminSearchProducts` filtreleme fonksiyonları çalışamaz.
 
-**[Aksiyom 7]:** Eğer `ftsSearchProducts` fonksiyonunda `limit` sıfıran küçük bir değer olarak verilirse, Supabase full-text search sorgu hatası oluşur.
+[Aksiyom 7]: Eğer `products` tablosunda `subcategory_id` sütunu yoksa, `getProductsBySubcategory` fonksiyonu çalışamaz.
 
-**[Aksiyom 8]:** Eğer `adminSearchProducts` fonksiyonunda `limit` veya `offset` sıfıran küçük değer olarak verilirse, Supabase sayfalama sorgu hatası oluşur.
+[Aksiyom 8]: Eğer `categories` veya `subcategories` tabloları ile referans bütünlüğü (foreign key) tanımlı değilse, JOIN tabanlı sorgular (örn. enriched_products) hata verir.
 
-**[Aksiyom 9]:** Eğer `getProductById` veya `getProductBySlug` çağrısında verilen `id`/`slug`, veritabanında kayıtlı bir ürünün alanına karşılık gelmiyorsa, boş sonuç veya null döner (fonksiyon imzasında `throwOnError` kullanılmamıştır).
+[Aksiyom 9]: Eğer `GetProductsParams` tipi geçerli bir nesne yapısına sahip değilse, `getProductsEnriched` fonksiyonu parametre hatası ile karşılaşır.
 
-**[Aksiyom 10]:** Eğer `fetchProductBy` fonksiyonunda `throwOnError` olarak `true` verilip, aranan ürün bulunamazsa, fonksiyon bir hata fırlatır (atılan).
+[Aksiyom 10]: Eğer `throwOnError` parametresi `true` olarak ayarlandığında ve istenen ürün mevcut değilse, `fetchProductBy` fonksiyonu bir hata fırlatmalıdır; aksi halde调用çı beklenmeyen bir undefined/alınmayan sonuç ile karşılaşır.
 
-**[Aksiyom 11]:** Eğer `getProductsEnriched` fonksiyonunda `params` parametresi `GetProductsParams` tipine uygun değilse, TypeScript derleme zamanında hata oluşur.
+[Aksiyom 11]: Eğer `ftsSearchProducts` fonksiyonu çağrıldığında Full-Text Search (FTS) indeksi veritabanında tanımlı değilse, arama sorgusu başarısız olur.
 
-**[Aksiyom 12]:** Eğer `ftsSearchProducts` fonksiyonunda `filters.category_id` verilmişse, bu değer veritabanında geçerli bir kategori ID'sine karşılık gelmelidir; aksi halde filtre sonucu boş döner.
+[Aksiyom 12]: Eğer `featured` veya benzeri bir alan (ürünün öne çıkarılmasını belirten) `products` tablosunda tanımlı değilse, `getFeaturedProducts` fonksiyonu boş sonuç döndürür veya hata verir.
 
-**[Aksiyom 13]:** Eğer `searchProducts` fonksiyonu arama terimi olarak çok kısa bir string (örn: 1 karakter) alırsa, full-text search indeksinin minimum token uzunluğuna bağlı olarak boş sonuç veya hata oluşabilir.
+[Aksiyom 13]: Eğer `q` parametresi boş string (`""`) olarak verilirse, `getSearchSuggestions`, `ftsSearchProducts`, `searchProducts` ve `adminSearchProducts` fonksiyonları boş sonuç kümesi döndürmelidir; aksi halde beklenmeyen tüm kayıtların dönmesi riski oluşur.
 
-**[Aksiyom 14]:** Eğer `getProductsEnriched`, `getProducts`, `getAllProducts` gibi toplu listeleme fonksiyonları veritabanında hiç ürün kaydı yoksa, boş dizi döner — boş liste bir hata durumu değildir.
+[Aksiyom 14]: Eğer `limit` parametresi 0 veya negatif bir değer olarak verilirse, sorgu beklenmeyen sonuçlar döndürebilir veya Supabase tarafında hata oluşabilir.
+
+[Aksiyom 15]: Eğer `fetchProductBy` fonksiyonuna `column` parametresi olarak `'id'` veya `'slug'` dışı bir değer verilse (tip sistemi bypass edilirse), veritabanı sorgusu hata verir.
+
+[Aksiyom 16]: Eğer `categoryId` parametresi `adminSearchProducts` fonksiy
 
 ---
 
@@ -199,135 +207,108 @@ Bu modül, Supabase üzerinden ürün verilerine erişim sağlayan merkezi bir s
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: product.service.ts::getProductsEnriched
-- **params**: `supabase` (SupabaseClient<Database>), `params` (GetProductsParams, varsayılan `{}`)
+### [N1_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductsEnriched
+- **params**: `(supabase: SupabaseClient<Database>, params: GetProductsParams = {})`
 - **ic_degiskenler**:
-  - `resolvedCategoryIds` — params'tan gelen category ID/slug listesi; slug ise UUID'ye dönüştürülerek güncellenir
-  - `potentialSlugs` — resolvedCategoryIds içinden UUID formatında olmayan (yani slug olan) değerlerin filtrelenmiş hali
-  - `categories` — `supabase.from('categories').select('id, slug').in('slug', potentialSlugs)` çağrısından dönen kategori kayıtları
-  - `slugToIdMap` — slug'dan ID'ye eşleme yapmak için oluşturulan `Map<string, string>`; `categories.map(c => [c.slug, c.id])` ile doldurulur
-  - `data` — `supabase.rpc('get_products_enriched', {...})` çağrısının başarılı sonucu, enriched ürün listesi
-  - `error` — RPC çağrısının hata sonucu
-  - `enrichedProducts` — `data` überinden map edilen, `meta_description: null`, `meta_title: null`, `purchase_price: null`, `is_category_manual: null` eklenmiş DbProduct[]
-  - `fallbackData` (hata dalı 1) — category filtreli fallback: `supabase.from('products').select(...).or(...)` ile filtrelenmiş veri; `resolvedCategoryIds` varsa kullanılır
-  - `fallbackData` (hata dalı 2) — filtresiz fallback: `supabase.from('products').select(...).limit(...)` ile gelen tüm ürünler
-- **Dönüş**: `Promise<Product[]>` — `toUIProductList()` ile dönüştürülmüş ürün listesi; success'te enrichedProducts'tan, hata durumunda fallbackData'dan üretilir
+  - `resolvedCategoryIds` — params.categoryIds değerini tutar; slug ise UUID'ye dönüştürülerek güncellenir
+  - `potentialSlugs` — resolvedCategoryIds içinde UUID formatına uymayan elemanları filtreler (slug olarak kabul edilenler)
+  - `categories` — supabase'den çekilen kategori verisi (id ve slug alanları)
+  - `slugToIdMap` — slug → id eşlemesi yapan Map nesnesi
+  - `data` — rpc('get_products_enriched') çağrısının başarı sonucu
+  - `error` — rpc çağrısının hata sonucu
+  - `fallbackData` — rpc hatası durumunda products tablosundan fallback olarak çekilen veri (iki farklı sorguda kullanılır)
+  - `enrichedProducts` — rpc sonucu veriye null değerler eklenmiş (meta_description, meta_title, purchase_price, is_category_manual) nihai ürün listesi
+- **Dönüş**: `Promise<Product[]>` — enriched veya fallback ürün listesi; hata durumunda boş/fallback liste döner, exception fırlatmaz
 
----
-
-### [N2_NASIL] AST Pointer: product.service.ts::getSearchSuggestions
-- **params**: `supabase` (SupabaseClient<Database>), `q` (string), `limit` (number, varsayılan `6`)
+### [N2_NASIL] AST Pointer: src/lib/services/product.service.ts::getSearchSuggestions
+- **params**: `(supabase: SupabaseClient<Database>, q: string, limit: number = 6)`
 - **ic_degiskenler**:
-  - `data` — `supabase.rpc('get_search_suggestions', { p_q: q, p_limit: limit })` çağrısının başarılı sonucu, arama önerileri listesi
-  - `error` — RPC çağrısının hata sonucu
-- **Dönüş**: `Promise<SearchSuggestion[]>` — `data` varsa `as SearchSuggestion[]` ile cast edilerek döner, hata durumunda boş dizi `[]`
+  - `data` — rpc('get_search_suggestions') çağrısının başarı sonucu
+  - `error` — rpc çağrısının hata sonucu
+- **Dönüş**: `Promise<SearchSuggestion[]>` — arama önerileri listesi; hata durumunda boş dizi döner
 
----
-
-### [N3_NASIL] AST Pointer: product.service.ts::ftsSearchProducts
-- **params**: `supabase` (SupabaseClient<Database>), `q` (string), `limit` (number, varsayılan `20`), `filters` (opsiyonel `{ category_id?: string }`)
+### [N3_NASIL] AST Pointer: src/lib/services/product.service.ts::ftsSearchProducts
+- **params**: `(supabase: SupabaseClient<Database>, q: string, limit = 20, filters?: { category_id?: string })`
 - **ic_degiskenler**:
-  - `payload` — RPC çağrısı için oluşturulan parametre objesi: `{ p_q: q, p_limit: limit, p_filters: filters || {} }`
-  - `data` — `supabase.rpc('fts_search_products', payload)` çağrısının başarılı sonucu, full-text search ürün sonuçları
-  - `error` — RPC çağrısının hata sonucu
-- **Dönüş**: `Promise<FtsProductResult[]>` — `data` varsa `as FtsProductResult[]` cast ile döner; hata durumunda `throw error`
+  - `payload` — rpc çağrısı için parametre nesnesi (p_q, p_limit, p_filters)
+  - `data` — rpc('fts_search_products') çağrısının başarı sonucu
+  - `error` — rpc çağrısının hata sonucu
+- **Dönüş**: `Promise<FtsProductResult[]>` — full-text search sonuçları; hata durumunda exception fırlatır
 
----
-
-### [N4_NASIL] AST Pointer: product.service.ts::getProducts
-- **params**: `supabase` (SupabaseClient<Database>), `limit` (opsiyonel number)
+### [N4_NASIL] AST Pointer: src/lib/services/product.service.ts::getProducts
+- **params**: `(supabase: SupabaseClient<Database>, limit?: number)`
 - **ic_degiskenler**:
-  - `query` — `supabase.from('products').select(...).eq('status', 'active').order(...)` ile oluşturulmuş, Zincirli Supabase sorgu nesnesi; `limit` varsa `query.limit(limit)` ile güncellenir
-  - `data` — `query` çalıştırıldığında dönen ürün listesi
-  - `error` — sorgunun hata sonucu
-- **Dönüş**: `Promise<Product[]>` — `toUIProductList((data as DbProduct[]) || [])` ile dönüştürülmüş aktif ürün listesi; hata durumunda `throw error`
+  - `query` — supabase.from('products').select() ile oluşturulmuş zincir sorgu nesnesi; status='active', is_featured ve name sıralaması içerir; opsiyonel limit eklenir
+  - `data` — query'nin execute edilmesi sonucu dönen veri
+  - `error` — sorgu hata sonucu
+- **Dönüş**: `Promise<Product[]>` — aktif ürünler listesi; hata durumunda exception fırlatır
 
----
-
-### [N5_NASIL] AST Pointer: product.service.ts::getAllProducts
-- **params**: `supabase` (SupabaseClient<Database>)
+### [N5_NASIL] AST Pointer: src/lib/services/product.service.ts::getAllProducts
+- **params**: `(supabase: SupabaseClient<Database>)`
 - **ic_degiskenler**:
-  - `data` — `supabase.from('products').select(...).eq('status', 'active').order(...)` çağrısının sonucu, tüm aktif ürünler
-  - `error` — sorgunun hata sonucu
-- **Dönüş**: `Promise<Product[]>` — `toUIProductList()` ile dönüştürülmüş tüm aktif ürünler; hata durumunda `throw error`
+  - `data` — products tablosundan status='active' filtresi ile çekilen tüm veriler
+  - `error` — sorgu hata sonucu
+- **Dönüş**: `Promise<Product[]>` — tüm aktif ürünler; hata durumunda exception fırlatır
 
----
-
-### [N6_NASIL] AST Pointer: product.service.ts::getProductsByCategory
-- **params**: `supabase` (SupabaseClient<Database>), `categoryId` (string)
+### [N6_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductsByCategory
+- **params**: `(supabase: SupabaseClient<Database>, categoryId: string)`
 - **ic_degiskenler**:
-  - `data` — `supabase.from('products').select(...).or('category_id.eq.{categoryId}, subcategory_id.eq.{categoryId}').eq('status', 'active').order(...)` çağrısının sonucu; hem `category_id` hem `subcategory_id` eşleşen ürünler
-  - `error` — sorgunun hata sonucu
-- **Dönüş**: `Promise<Product[]>` — `toUIProductList()` ile dönüştürülmüş kategori/alt kategori ürünler; hata durumunda `throw error`
+  - `data` — category_id veya subcategory_id eşleşen aktif ürünler
+  - `error` — sorgu hata sonucu
+- **Dönüş**: `Promise<Product[]>` — belirtilen kategoriye ait ürünler; hata durumunda exception fırlatır
 
----
-
-### [N7_NASIL] AST Pointer: product.service.ts::getProductsBySubcategory
-- **params**: `supabase` (SupabaseClient<Database>), `subcategoryId` (string)
+### [N7_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductsBySubcategory
+- **params**: `(supabase: SupabaseClient<Database>, subcategoryId: string)`
 - **ic_degiskenler**:
-  - `data` — `supabase.from('products').select(...).eq('subcategory_id', subcategoryId).eq('status', 'active').order(...)` çağrısının sonucu
-  - `error` — sorgunun hata sonucu
-- **Dönüş**: `Promise<Product[]>` — `toUIProductList()` ile dönüştürülmüş alt kategori ürünleri; hata durumunda `throw error`
+  - `data` — subcategory_id eşleşen aktif ürünler
+  - `error` — sorgu hata sonucu
+- **Dönüş**: `Promise<Product[]>` — belirtilen alt kategoriye ait ürünler; hata durumunda exception fırlatır
 
----
-
-### [N8_NASIL] AST Pointer: product.service.ts::fetchProductBy
-- **params**: `supabase` (SupabaseClient<Database>), `column` (`'id' | 'slug'`), `value` (string), `throwOnError` (boolean, varsayılan `false`)
+### [N8_NASIL] AST Pointer: src/lib/services/product.service.ts::fetchProductBy
+- **params**: `(supabase: SupabaseClient<Database>, column: 'id' | 'slug', value: string, throwOnError = false)`
 - **ic_degiskenler**:
-  - `query` — `supabase.from('products').select(...).eq(column, value).maybeSingle()` ile oluşturulmuş sorgu; `column` parametresine göre `id` veya `slug` alanında eşleşme yapar
-  - `data` — `query` çalıştırıldığında dönen tekil DbProduct kaydı
-  - `error` — sorgunun hata sonucu
-- **Dönüş**: `Promise<Product | null>` — başarılıysa `mapDatabaseProductToDomain(data as DbProduct)` ile Product'a dönüştürülerek döner; hata varsa `throwOnError` true ise `throw error`, değilse `null` döner; `data` null ise `null` döner
+  - `query` — products tablosunda belirtilen column=value eşleşmesi ile tek kayıt sorgusu; maybeSingle() kullanılır
+  - `data` — sorgu sonucu bulunan ürün kaydı
+  - `error` — sorgu hata sonucu
+- **Dönüş**: `Promise<Product | null>` — bulunan ürün veya null; throwOnError true ise hata durumunda exception fırlatır
 
----
+### [N9_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductById
+- **params**: `(supabase: SupabaseClient<Database>, id: string)`
+- **ic_degiskenler**: (yok — doğrudan fetchProductBy çağrısı)
+- **Dönüş**: `Promise<Product | null>` — fetchProductBy('id', id, true) çağrısı; hata durumunda exception fırlatır
 
-### [N9_NASIL] AST Pointer: product.service.ts::getProductById
-- **params**: `supabase` (SupabaseClient<Database>), `id` (string)
-- **ic_degiskenler**: (yok — doğrudan `fetchProductBy` çağrısı)
-- **Dönüş**: `Promise<Product | null>` — `fetchProductBy(supabase, 'id', id, true)` çağrısının sonucu; `throwOnError: true` ile çağrıldığı için hata durumunda fırlatır
-
----
-
-### [N10_NASIL] AST Pointer: product.service.ts::getProductBySlugOrId
-- **params**: `supabase` (SupabaseClient<Database>), `identifier` (string)
+### [N10_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductBySlugOrId
+- **params**: `(supabase: SupabaseClient<Database>, identifier: string)`
 - **ic_degiskenler**:
-  - `isUuid` — `identifier`'ın UUID formatında olup olmadığını test eden regex eşleşme sonucu boolean; `/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier)` ile hesaplanır
-- **Dönüş**: `Promise<Product | null>` — `fetchProductBy(supabase, isUuid ? 'id' : 'slug', identifier, false)` çağrısı; UUID ise `id` alanından, değilse `slug` alanından arar
+  - `isUuid` — identifier'ın UUID formatında olup olmadığını test eden regex eşleşme sonucu (boolean)
+- **Dönüş**: `Promise<Product | null>` — identifier UUID ise id ile, değilse slug ile fetchProductBy çağrısı; hata durumunda null döner
 
----
+### [N11_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductBySlug
+- **params**: `(supabase: SupabaseClient<Database>, slug: string)`
+- **ic_degiskenler**: (yok — doğrudan fetchProductBy çağrısı)
+- **Dönüş**: `Promise<Product | null>` — fetchProductBy('slug', slug, false) çağrısı; hata durumunda null döner
 
-### [N11_NASIL] AST Pointer: product.service.ts::getProductBySlug
-- **params**: `supabase` (SupabaseClient<Database>), `slug` (string)
-- **ic_degiskenler**: (yok — doğrudan `fetchProductBy` çağrısı)
-- **Dönüş**: `Promise<Product | null>` — `fetchProductBy(supabase, 'slug', slug, false)` çağrısının sonucu; `throwOnError: false` ile çağrıldığı için hata durumunda `null` döner
-
----
-
-### [N12_NASIL] AST Pointer: product.service.ts::getFeaturedProducts
-- **params**: `supabase` (SupabaseClient<Database>)
+### [N12_NASIL] AST Pointer: src/lib/services/product.service.ts::getFeaturedProducts
+- **params**: `(supabase: SupabaseClient<Database>)`
 - **ic_degiskenler**:
-  - `data` — `supabase.from('products').select(...).eq('is_featured', true).eq('status', 'active').limit(6)` çağrısının sonucu; öne çıkan aktif ürünler
-  - `error` — sorgunun hata sonucu
-- **Dönüş**: `Promise<Product[]>` — `toUIProductList()` ile dönüştürülmüş en fazla 6 öne çıkan ürün; hata durumunda `throw error`
+  - `data` — is_featured=true ve status='active' filtreli, limit 6 ürünler
+  - `error` — sorgu hata sonucu
+- **Dönüş**: `Promise<Product[]>` — öne çıkan ürünler (maksimum 6); hata durumunda exception fırlatır
 
----
-
-### [N13_NASIL] AST Pointer: product.service.ts::searchProducts
-- **params**: `supabase` (SupabaseClient<Database>), `query` (string)
+### [N13_NASIL] AST Pointer: src/lib/services/product.service.ts::searchProducts
+- **params**: `(supabase: SupabaseClient<Database>, query: string)`
 - **ic_degiskenler**:
-  - `data` — `supabase.from('products').select(...).or('name.ilike.%{query}%, brand.ilike.%{query}%, sku.ilike.%{query}%, model_code.ilike.%{query}%, description.ilike.%{query}%').eq('status', 'active').limit(20)` çağrısının sonucu; `name`, `brand`, `sku`, `model_code`, `description` alanlarında LIKE araması yapar
-  - `error` — sorgunun hata sonucu
-- **Dönüş**: `Promise<Product[]>` — `toUIProductList()` ile dönüştürülmüş arama sonuçları (max 20); hata durumunda `throw error`
+  - `data` — products tablosunda name, brand, sku, model_code, description alanlarında ilike ile arama yapılan aktif ürünler
+  - `error` — sorgu hata sonucu
+- **Dönüş**: `Promise<Product[]>` — arama sonuçları (maksimum 20); hata durumunda exception fırlatır
 
----
-
-### [N14_NASIL] AST Pointer: product.service.ts::adminSearchProducts
-- **params**: `supabase` (SupabaseClient<Database>), `q` (string), `limit` (number, varsayılan `50`), `offset` (number, varsayılan `0`), `categoryId` (opsiyonel string)
+### [N14_NASIL] AST Pointer: src/lib/services/product.service.ts::adminSearchProducts
+- **params**: `(supabase: SupabaseClient<Database>, q: string, limit = 50, offset = 0, categoryId?: string)`
 - **ic_degiskenler**:
-  - `payload` — RPC parametre objesi: `{ p_q: q, p_limit: limit, p_offset: offset }` olarak başlatılır; `categoryId` varsa `p_category_id` alanı eklenir
-  - `data` — `supabase.rpc('admin_search_products', payload)` çağrısının sonucu, admin arama sonuçları listesi
-  - `error` — RPC çağrısının hata sonucu
-- **Dönüş**: `Promise<DbAdminSearchResult[]>` — `data` varsa `as DbAdminSearchResult[]` cast ile döner; hata durumunda `throw error`
+  - `payload` — rpc çağrısı için parametre nesnesi; p_q, p_limit, p_offset içerir; opsiyonel p_category_id eklenir
+  - `data` — rpc('admin_search_products') çağrısının başarı sonucu
+  - `error` — rpc çağrısının hata sonucu
+- **Dönüş**: `Promise<DbAdminSearchResult[]>` — admin arama sonuçları; hata durumunda exception fırlatır
 
 ---
 
@@ -349,8 +330,8 @@ graph TD
     product_service_ts__getProductsEnriched["getProductsEnriched"]
     product_service_ts__getSearchSuggestions["getSearchSuggestions"]
     product_service_ts__searchProducts["searchProducts"]
-    product_service_ts__getProductById --> product_service_ts__fetchProductBy
     product_service_ts__getProductBySlugOrId --> product_service_ts__fetchProductBy
+    product_service_ts__getProductById --> product_service_ts__fetchProductBy
     product_service_ts__getProductBySlug --> product_service_ts__fetchProductBy
 ```
 

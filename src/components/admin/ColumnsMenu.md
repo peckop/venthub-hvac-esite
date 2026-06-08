@@ -3,37 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\ColumnsMenu.tsx
-skeleton_hash: 8e6ac07df5b78228
+skeleton_hash: 0b60e261dadfb14d
 entity_hashes:
   func:ColumnsMenu: acb58bb1e295bcab
-  overview: e3dc8c1ebce8d947
+  overview: b2310e22f90d9a39
   style_tokens: f68608c28260c039
-generated_at: 2026-05-28T22:35:32Z
+generated_at: 2026-06-08T10:08:36Z
 ---
 
 ## Genel Bakış
-`ColumnsMenu` bileşeni, yönetim panelindeki tablolarda sütunların görünürlüğünü ve satır yoğunluğunu yönetmeye yarayan bir menü bileşenidir. Dışarıdan aldığı sütun listesini ve yoğunluk ayarını kullanarak, kullanıcının bu tercihleri kolayca değiştirimesine olanak tanır.
+ColumnsMenu, tablo yapılandırma menüsü olarak işlev gören bir React bileşenidir. Temel amacı, kullanıcıların tablolarındaki sütunların görünürlüğünü açıp kapatmasına ve satır yoğunluğunu ayarlamasına olanak tanımaktır. Bileşen, dışarıdan gelen konfigürasyon ve geri çağırma fonksiyonlarıyla etkileşime girerek bu tercihleri yönetir.
 
 ## Fonksiyon Grupları
-### Menü ve Kontrol Mantığı
-Bu grup, menünün kullanıcıya sunulması, sütun açma/kapama denetimlerinin listelenmesi ve yoğunluk değişikliklerinin üst bileşene iletilmesinden sorumludur.
+### Sütun ve Yoğunluk Yönetimi
+Bileşen, verilen sütun yapılandırmasını kullanarak kullanıcıya tercihler sunar ve bu tercihlerdeki değişiklikleri üst bileşene iletir. Ana sorumluluk, sütun görünürlüğü denetimleri ile yoğunluk seçimi arasındaki etkileşimi yönetmektir.
 - ColumnsMenu
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, sütunların görünürlüğünü ve satır yoğunluğunu yöneten bir menü bileşenidir. Doğru çalışması için aşağıdaki koşulların sağlanmış olması gerekir.
 
-Bu modül için mimari varsayımlar, fonksiyon imzası ve bileşenin tablo yapılandırması menüsü rolü temel alınarak belirlenmiştir.
-
-**[Aksiyom 1]**: Eğer `columns` parametresi dizisi boş veya tanımsızsa, menüde sütun denetimleri oluşturulamaz ve kullanıcı hiçbir sütunu açıp kapatamaz.
-
-**[Aksiyom 2]**: Eğer `onDensityChange` callback fonksiyonu sağlanmamışsa, kullanıcı yoğunluk değiştirdiğinde üst bileşene bildirim yapılamaz ve yoğunluk değişikliği uygulanamaz.
-
-**[Aksiyom 3]**: Eğer `density` parametresi geçerli bir yoğunluk değeri (örn: `compact`, `normal`, `comfortable`) içermiyorsa, yoğunluk seçim durumu doğru görüntülenemez.
-
-**[Aksiyom 4]**: Eğer `buttonLabel` parametresi sağlanmamışsa, menü tetikleme düğmesinde varsayılan bir etiket yoksa boş veya anlamsız bir düğme görüntülense bile bileşen render edilmeye devam eder.
-
-**[Aksiyom 5]**: Eğer `columns` dizisi içindeki herhangi bir sütun nesnesi gerekli alanları (örn: `id`, görünürlük durumu) içermiyorsa, o sütun için denetim düzgün oluşturulamaz.
+[Aksiyom 1]: Eğer `columns` prop'u (sütun listesi) yoksa, bileşen süt
 
 ---
 
@@ -66,20 +57,11 @@ type ColumnToggle = { key: string; label: string; checked: boolean; onChange: (v
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/ColumnsMenu.tsx::ColumnsMenu
-- **params**: `{ columns, density, onDensityChange, buttonLabel }`
-  - `columns` — `ColumnToggle[]` tipinde, sütunların açma/kapama durumlarını ve etiketlerini içeren dizi; `.map()` ile dönülerek her sütun için checkbox öğesi oluşturulur
-  - `density` — `Density` tipinde aktif satır yoğunluk modu (`"comfortable"` veya `"compact"`); radio grubunun seçili değerini belirler ve koşullu CSS sınıfları için kullanılır
-  - `onDensityChange` — `(d: Density) => void` tipinde geri çağırma fonksiyonu; kullanıcı yoğunluk seçimini değiştirdiğinde `DropdownMenu.RadioGroup.onValueChange` içinde çağrılır
-  - `buttonLabel` — `string | undefined`, opsiyonel buton metni; tanımlıysa kullanılır, aksi halde `_t('admin.common.view')` veya `'Görünüm'` fallback'i gösterilir
+### [N1_NASIL] AST Pointer: ColumnsMenu.tsx::ColumnsMenu
+- **params**: { columns, density, onDensityChange, buttonLabel }
 - **ic_degiskenler**:
-  - `_t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu (`t`); bileşen içindeki tüm kullanıcıya dönük metinlerin uluslararasılaştırılmasını sağlar (`_t('admin.a11y.menu')`, `_t('admin.common.view')`, `_t('admin.inventory.activeColumns')`, `_t('admin.inventory.density')`, `_t('admin.inventory.densityComfortable')`, `_t('admin.inventory.densityCompact')`)
-- **col (map callback parametresi)** — `columns.map(col => ...)` içindeki her bir `ColumnToggle` öğesi:
-  - `col.key` — benzersiz React listesi anahtarı; `DropdownMenu.CheckboxItem`'a `key` prop'u olarak verilir
-  - `col.checked` — `boolean`, sütunun şu anda görünür olup olmadığını belirtir; checkbox'ın `checked` prop'u ve koşullu CSS sınıfları (`bg-cyan-400`) için kullanılır
-  - `col.onChange` — `(v: boolean) => void` tipinde sütun durumu değiştirme callback'i; `onCheckedChange` içinde `Boolean(v)` ile çağrılarak sütun açılır/kapanır
-  - `col.label` — `string`, sütunun kullanıcıya gösterilen Türkçe/yerel adı; checkbox öğesinin hem metin içeriğinde hem `aria-label`'inde kullanılır
-- **Dönüş**: JSX — Radix UI `DropdownMenu` bileşeni; sütun toggle checkbox'larından ve yoğunluk seçim radio butonlarından oluşan bir dropdown menü
+  - `_t` — useI18n hook'undan alınan çeviri fonksiyonu, UI metinlerini çevirilerden almak için kullanılır
+- **Dönüş**: JSX (React element) — DropdownMenu bileşeni, sütun toggle'ları ve yoğunluk seçicisi içeren menü UI'ı
 
 ---
 

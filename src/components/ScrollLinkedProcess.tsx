@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
+
 import { useI18n } from '../i18n/I18nProvider'
 
 const ScrollLinkedProcess: React.FC = () => {

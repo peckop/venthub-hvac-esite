@@ -3,30 +3,30 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminOrdersBoard.test.tsx
-skeleton_hash: eaf39fa2341ceb17
+skeleton_hash: 7d5c012893992ce0
 entity_hashes:
   func:getEffectiveStatus: 23e3045303173787
-  overview: e7b9a89704c3bbc1
+  overview: 7398a7c041f3dd25
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:39:15Z
+generated_at: 2026-06-08T10:11:01Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun yönetici sipariş paneli (AdminOrdersBoard) için yazılmış bir test dosyasıdır. Modülün temel amacı, test senaryoları sırasında kullanılacak yardımcı fonksiyonları sunarak testlerin güvenilirliğini ve tekrar kullanılabilirliğini sağlamaktır.
+Bu modül, yönetici sipariş panelinin test dosyasıdır ve test senaryoları sırasında kullanılacak yardımcı fonksiyonları içerir. Temel olarak siparişlerin etkili durumunu hesaplayan bir işlev sunarak test süreçlerinin tutarlılığını sağlar.
 
 ## Fonksiyon Grupları
 ### Test Yardımcı Fonksiyonları
-Test süreçlerinde ortak ihtiyaçları karşılamak üzere tasarlanmış, tekrar kullanılabilir yardımcı işlevleri barındırır.
+Test senaryoları sırasında sipariş verilerinin durumunu hesaplamak ve doğrulamak için kullanılan yardımcı işlevleri barındırır.
 - getEffectiveStatus
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu test modülünün AdminOrdersBoard yönetici sipariş paneli bileşenini ve içerdiği sipariş durumu hesaplama mantığını doğru şekilde test edebilmesi için sipariş veri yapısı, test ortamı bağımlılıkları ve temel fonksiyon implementasyonunun belirli zorunlu koşulları sağlaması gerekmektedir.
+Bu modül için temel mimari varsayımlar, `getEffectiveStatus` fonksiyonunun çalışması için gerekli giriş verisi yapısına ve beklenen çıktının türüne ilişkindir.
 
-[Aksiyom 1]: Eğer getEffectiveStatus fonksiyonuna iletilen order nesnesi beklenen sipariş veri yapısına sahip değilse, etkili sipariş durumu doğru hesaplanamaz ve tüm durum bazlı test senaryoları başarısız olur.
-[Aksiyom 2]: Eğer test modülünün çalıştığı ortamda TypeScript derleyicisi, React Testing Library ve AdminOrdersBoard bileşeninin tüm üretim bağımlılıkları mevcut değilse, testler hiç çalıştırılamaz ve bileşenin işlevselliği hiçbir şekilde doğrulanamaz.
-[Aksiyom 3]: Eğer getEffectiveStatus fonksiyonunun ana üretim kodundaki gerçek implementasyonu test modülünde varsayılan davranışla tutarsızsa, testler geçersiz sonuçlar üretir ve AdminOrdersBoard'un canlı ortamda doğru çalışması garantilenemez.
+[Aksiyom 1]: Eğer `order` parametresi `null` veya `undefined` ise, fonksiyon bir hata fırlatır veya tanımsız davranış gösterir.
+[Aksiyom 2]: Eğer `order` bir nesne ise ancak `status` alanını içermiyorsa veya `status` alanı `undefined` ise, fonksiyon varsayılan bir durum (örn: 'beklemede') döndürür.
+[Aksiyom 3]: Fonksiyon, herhangi bir girdi için her zaman bir string (durum) değeri döndürmek zorundadır. Hiçbir durumda `null`, `undefined` veya başka bir türde değer dönmemelidir.
 
 ---
 
@@ -43,17 +43,14 @@ Bu test modülünün AdminOrdersBoard yönetici sipariş paneli bileşenini ve i
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\views\admin\__tests__\AdminOrdersBoard.test.tsx::getEffectiveStatus
-- **params**: (order: unknown)
+### [N1_NASIL] AST Pointer: `src/views/admin/__tests__/AdminOrdersBoard.test.tsx`::getEffectiveStatus
+- **params**: `order: unknown` — Ham sipariş nesnesi, tipi bilinmeyen herhangi bir değer olabilir
 - **ic_degiskenler**:
-  - `o` — `order` parametresinin `Record<string, unknown>` tipine dönüştürülmüş hali. Fonksiyon içinde `o.payment_status` ve `o.status` özelliklerine erişmek için kullanılır.
-- **Dönüş**: string — `payment_status` 'refunded' veya 'partial_refunded' ise onu, aksi halde `status` değerini veya varsayılan olarak 'pending' döner.
-
-### [N2_NASIL] AST Pointer: src\views\admin\__tests__\AdminOrdersBoard.test.tsx::getColumnForStatus
-- **params**: (status: string)
-- **ic_degiskenler**:
-  - `COLUMNS` — Test ortamında tanımlanan sütun dizisi. Her eleman bir nesne olup `id` ve `statuses` özellikleri içerir. Fonksiyon, verilen `status` parametresine göre uygun sütun `id`'sini bulmak için bu dizi üzerinde `find` methodu kullanır.
-- **Dönüş**: string — Verilen duruma karşılık gelen sütun `id`'sini döner, bulunamazsa varsayılan olarak 'col_new' döner.
+  - `o` — `order` parametresinin `Record<string, unknown>` olarak tip assert edilmiş hali; dict alanlarına erişim için kullanılır
+- **Erisimler**:
+  - `o.payment_status` — Siparişin ödeme durumu; `'refunded'` veya `'partial_refunded'` kontrolü yapılır
+  - `o.status` — Siparişin genel durumu; payment_status eşleşmezse fallback olarak kullanılır
+- **Dönüş**: `string` — Öncelik sırasıyla `o.payment_status` (refunded/partial_refunded ise), ardından `o.status`, son olarak `'pending'` string değeri döner
 
 ---
 

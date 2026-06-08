@@ -1,7 +1,8 @@
 "use client";
-import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import React, { useRef } from 'react'
 import * as THREE from 'three'
+
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 interface ImpellerProps {

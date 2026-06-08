@@ -3,46 +3,55 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx
-skeleton_hash: bc305732fcc469c5
+skeleton_hash: c5a07a48db427616
 entity_hashes:
   func:EdgeOverlay: 48aefc8964111cb4
   func:InteractivePart: d4921a7aaa094ed5
   func:MountingChassis: 3daf7b9afda8d603
   func:SilentChannelFanModel: 98c6a822fa24c046
-  overview: a2db499a1d227db1
+  overview: f08ca432f193e889
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:50Z
+generated_at: 2026-06-08T10:09:31Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC sistemlerinde kullanılan sessiz kanal fanları için interaktif 3D React bileşeni sunar. Fanın tüm fiziksel yapısını üç boyutlu olarak oluşturur, kullanıcı etkileşimlerini yönetir ve parça patlatma, seçme, gizleme gibi gelişmiş görsel opsiyonları destekler. Three.js tabanlı 3D kütüphanelerle entegre çalışacak şekilde tasarlanmıştır.
+Bu modül, sessiz kanal fanları için interaktif bir 3D React bileşenidir. Ana sorumluluğu, fanın tüm bileşenlerini (gövde, şasi, kenarlıklar vb.) Three.js geometrileriyle bir araya getirmek, bu parçaların görünümünü (patlama, gizleme, izole etme) ve kullanıcı etkileşimlerini (tıklama, üzerine gelme) yönetmektir.
 
 ## Fonksiyon Grupları
-### Ana Kök 3D Model Bileşeni
-Tüm fan modelinin merkezi bileşenidir, tüm alt parçaları bir araya getirir, gelen tüm konfigürasyonları modele uygular ve ana görünümden sorumludur.
+### Ana Model Orkestratörü
+Tüm fan modelinin üst düzey bileşenidir. Alt parçaları, gelen parametreleri (patlama mesafesi, seçili parça, gizli parçalar) ve etkileşim olaylarını birleştirerek nihai 3D view'u render eder.
 - SilentChannelFanModel
 
-### Kullanıcı Etkileşimi Yönetim Bileşeni
-Modelin parçalarının kullanıcı tıklamaları, fare üzerine gelme gibi etkileşimlerini yönetir, parçaların gizlenmesi, izole edilmesi gibi interaktif özellikleri sağlayan sarmalayıcı bileşendir.
+### Etkileşim Yöneticisi
+3D model parçalarının kullanıcı etkileşimlerini (tıklama, üzerine gelme) soyutlayan ve yöneten bir sarmalayıcı bileşendir. Ayrıca parçaların gizlenmesi veya izole edilmesi mantığını uygular.
 - InteractivePart
 
-### 3D Model Alt Parçası Bileşenleri
-Fanın fiziksel yapısını oluşturan ayrı görsel alt bileşenlerdir, belirtilen boyut, malzeme ve görünüm ayarlarına göre modele ait şasi, kenar kaplaması gibi parçaları render eder.
-- MountingChassis, EdgeOverlay
+### Yapısal ve Dekoratif 3D Parçalar
+Fanın fiziksel yapısını oluşturan, belirli geometrik parametrelerle (boy, çap, yarıçap) ve malzemelerle tanımlanan alt 3D bileşenleridir. Her biri modelin belirli bir bölümünü render eder.
+- MountingChassis (montaj şasesi)
+- EdgeOverlay (kenar kaplaması)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu 3B sessiz kanal fanı modelini render eden React bileşeni, üç boyutlu geometrisinin, parça etkileşimlerinin ve görünürlük ayarlarının doğru çalışması için tüm bağımlı alt bileşenlere ve tüm zorunlu prop değerlerinin hatasız iletilmesi zorunluluğuna dayanır.
 
-[Aksiyom 1]: Eğer MountingChassis bileşenine iletilen bodyHalfLen, neckLen, neckRad, bRad sayısal prop'ları geçerli pozitif sayı olarak sağlanmazsa, fan şasisinin 3B geometrisi bozulur, sahada doğru render edilemez.
-[Aksiyom 2]: Eğer MountingChassis ve EdgeOverlay bileşenlerine iletilen displayStyle string prop'u iletilmezse, bu bileşenlerin görsel stilleri uygulanamaz, modelin görsel sunumu hatalı olur.
-[Aksiyom 3]: Eğer MountingChassis bileşenine iletilen THREE.Material türündeki material prop'u geçerli bir Three.js malzemesi olarak sağlanmazsa, şasi bileşeni yüzey özellikleri olmadan render edilir, görünürlüğü kaybolur.
-[Aksiyom 4]: Eğer InteractivePart ve SilentChannelFanModel bileşenlerine iletilen onPartClick tıklama işleyici fonksiyonu geçerli bir fonksiyon olarak sağlanmazsa, kullanıcının model parçalarıyla tıklama etkileşimi çalışmaz, parça seçimi işlemleri başarısız olur.
-[Aksiyom 5]: Eğer InteractivePart bileşenine iletilen children prop'u geçerli React alt elemanları olarak sağlanmazsa, tüm model parçaları kullanıcı girişlerine yanıt veremez, 3B sahadaki tüm etkileşimler devre dışı kalır.
-[Aksiyom 6]: Eğer SilentChannelFanModel ana bileşenine iletilen explode prop'u 0'dan küçük negatif bir sayı olarak gönderilirse, model parçalarının ayrıştırma (explode) işlemi ters çalışır, tüm parçaların konumları bozulur.
-[Aksiyom 7]: Eğer SilentChannelFanModel bileşenine iletilen hiddenParts dizisi geçerli bir dizi olarak sağlanmazsa, gizlenmesi gereken model parçaları görünmeye devam eder, parça gizleme kuralı uygulanamaz.
-[Aksiyom 8]: Eğer SilentChannelFanModel bileşeninin zorunlu SilentChannelFanModelProps türündeki temel prop'ları eksiksiz olarak iletilmezse, ana fan modeli bileşeni çalışmaz, 3B saha içinde hiç render edilemez.
+Bu modül için fonksiyon gövdeleri paylaşılmamıştır; yalnızca fonksiyon imzalarından ve modül yapısından çıkarılabilen temel mimari varsayımlar aşağıdadır.
+
+**[Aksiyom 1]:** Eğer `MountingChassis` bileşenine geçirilen `bodyHalfLen`, `neckLen`, `neckRad` veya `bRad` değerlerinden herhangi biri negatif veya sıfırsa, Three.js geometri oluşturma hataları oluşur veya anlamsız 3D model geometrisi üretilir.
+
+**[Aksiyom 2]:** Eğer `MountingChassis` bileşenine geçirilen `material` parametresi geçerli bir `THREE.Material` instance'ı değilse, Three.js render sürecinde Material tipi uyumsuzluğu hatası oluşur.
+
+**[Aksiyom 3]:** Eğer `SilentChannelFanModel` bileşenine geçirilen `hiddenParts` dizisi içindeki elemanlar, `InteractivePart` bileşenlerinin `name` değerleriyle eşleşmiyorsa, hiçbir parça gizlenmez ve tüm parçalar görünür kalır.
+
+**[Aksiyom 4]:** Eğer `SilentChannelFanModel` bileşeninde `explode` parametresi 0'dan farklı bir değere ayarlanırsa, parçaların orijinal pozisyonlarından dışarı doğru dağıtılması beklenir; ancak dağıtma vektörlerinin yönleri ve uzaklıkları fonksiyon gövdesinde tanımlı olmadığından, bu davranış bilinmiyor.
+
+**[Aksiyom 5]:** Eğer `InteractivePart` bileşenine `onPartClick` callback'i geçirilmemişse, parça tıklama etkileşimi çalışmayabilir veya hata oluşabilir; bu durum fonksiyon gövdesinde ele alınıp alınmadığı bilinmiyor.
+
+**[Aksiyom 6]:** Eğer `InteractivePart` bileşenine `isolatedPart` değeri olarak geçilen isim, mevcut bir parçanın `name` değeriyle eşleşmiyorsa, izolasyon etkileşimi hiçbir parçaya uygulanmaz.
+
+**[Aksiyom 7]:** Eğer `SilentChannelFanModel` bileşeninin `displayStyle` parametresi geçerli bir değer değilse (örn: boş string veya tanımsız bir enum değeri), `EdgeOverlay` ve `MountingChassis` bileşenlerine anlamsız display stil bilgisi iletilir ve görsel çıktı belirsiz olur.
+
+**[Aksiyom 8]:** `SilentChannelFanModel` tüm alt 3D bileşenleri (EdgeOverlay, MountingChassis, InteractivePart) bünyesinde barındırdığından, bu modülün `@react-three/fiber` veya eşdeğeri Three.js React entegrasyonu ile bir `<Canvas>` içine yerleştirilmesi zorunludur; aksi halde 3D sahne oluşturulamaz.
 
 ---
 
@@ -117,14 +126,10 @@ Bu 3B sessiz kanal fanı modelini render eden React bileşeni, üç boyutlu geom
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx::EdgeOverlay
-- **params**: displayStyle: string
-- **ic_degiskenler**:
-  - `displayStyle` — Kenar çizim stilini belirleyen giriş parametresi, geçerli stil değerlerini kontrol etmek için kullanılır
-  - `Edges.threshold` - Kenar algılama eşiği, 12 olarak sabit ayarlanmıştır
-  - `Edges.color` - Kenarların çizim rengi, stile göre siyah veya gri olarak atanır
-  - `Edges.linewidth` - Kenarların kalınlığı, stile göre 2 veya 1 olarak atanır
-- **Dönüş**: Stil geçerli değilse null, geçerliyse Three.js Edges JSX elemanı
+### [N1_NASIL] AST Pointer: `SilentChannelFanModel.tsx`::EdgeOverlay
+- **params**: `{ displayStyle: string }`
+- **ic_degiskenler**: (yok — sadece params kullanılır)
+- **Dönüş**: `JSX.Element | null` — `displayStyle` `'shadedEdges'` veya `'hiddenLines'` ise `<Edges>` bileşeni döner, aksi halde `null`.
 
 ---
 
