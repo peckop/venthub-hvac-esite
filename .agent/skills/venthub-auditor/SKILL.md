@@ -13,6 +13,8 @@ metadata:
   - working directory state
   outputs:
   - integrity verification status
+  commands:
+    validate: python .agent/skills/venthub-auditor/scripts/run_audit.py
 depends_on:
 - venthub-architecture
 next_steps:

@@ -116,21 +116,21 @@ def analyze_diff(diff_output: str) -> list:
     return violations
 
 def main():
-    print("🛡️ VentHub Diff-Review Integrity Checker başlatılıyor...")
+    print("[INFO] VentHub Diff-Review Integrity Checker baslatiliyor...")
     diff_output = run_git_diff()
     
     if not diff_output.strip():
-        print("✅ Değişiklik bulunamadı veya diff temiz.")
+        print("[OK] Degisiklik bulunamadi veya diff temiz.")
         sys.exit(0)
         
     violations = analyze_diff(diff_output)
     
     if not violations:
-        print("✅ Kod değişiklikleri otonom analizden başarıyla geçti. Yıkıcı anti-pattern tespit edilmedi.")
+        print("[OK] Kod degisiklikleri otonom analizden basariyla gecti. Yikici anti-pattern tespit edilmedi.")
         sys.exit(0)
         
     has_blocker = False
-    print("\n🚨 DİKKAT: AŞAĞIDAKİ TEHLİKELİ KALIPLAR TESPİT EDİLDİ:")
+    print("\n[WARNING] DIKKAT: ASAGIDAKI TEHLIKELI KALIPLAR TESPIT EDILDI:")
     print("="*60)
     for v in violations:
         print(f"[{v['severity']}] Dosya: {v['file']}")
@@ -144,11 +144,11 @@ def main():
     print("="*60)
     
     if has_blocker:
-        print("❌ [BLOCKER] tespit edildi. İşlem (`/bitir` veya Execute) reddedildi.")
-        print("Lütfen hataları düzeltin veya '// diff-ignore' ekleyip tekrar deneyin.")
+        print("[FAIL] [BLOCKER] tespit edildi. Islem (/bitir veya Execute) reddedildi.")
+        print("Lutfen hatalari duzeltin veya '// diff-ignore' ekleyip tekrar deneyin.")
         sys.exit(1)
     else:
-        print("⚠️ Uyarılar var ama [BLOCKER] bulunamadı. Lütfen değişikliklerinizi manuel gözden geçirin.")
+        print("[WARNING] Uyarilar var ama [BLOCKER] bulunamadi. Lutfen degisikliklerinizi manuel gozden gecirin.")
         sys.exit(0) # MAJOR and MINOR are just warnings
 
 if __name__ == "__main__":

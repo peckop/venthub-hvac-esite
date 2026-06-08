@@ -65,3 +65,4 @@ mcp_config_for_claude_code.json
 .agent/cache/
 .agent/scratch/
 scratch/
+!scratch/compile_skills.py

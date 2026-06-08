@@ -29,6 +29,7 @@ skills:
     run_last: false
     exclusions:
     - multi-agent-research
+    commands: {}
   - name: multi-agent-research
     path: .agent/skills/multi-agent-research/SKILL.md
     description: Reusable worker-judge multi-agent orchestrator for high-quality codebase
@@ -48,6 +49,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
   - name: skills-creator
     path: .agent/skills/skills-creator/SKILL.md
     description: Automatically creates, updates, and optimizes modular agent skills.
@@ -70,6 +72,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
     recovery:
     - If validation fails, check skills-evaluator.py logs or run the subagent optimizer
       again.
@@ -95,6 +98,7 @@ skills:
     - enterprise-multiagent
     run_last: false
     exclusions: []
+    commands: {}
   intelligence:
   - name: find-skills
     path: .agent/skills/find-skills/SKILL.md
@@ -114,6 +118,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
   - name: notebook-navigator
     path: .agent/skills/notebook-navigator/SKILL.md
     description: Use this skill to identify NotebookLM IDs and execute conceptual,
@@ -132,6 +137,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
     recovery:
       on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
   - name: notebooklm-sync
@@ -152,6 +158,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
     recovery:
       on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
     prerequisites:
@@ -174,6 +181,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
     recovery:
       on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
     prerequisites:
@@ -200,6 +208,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
   - name: supabase
     path: .agent/skills/supabase/SKILL.md
     description: Use when doing tasks involving Supabase products, client libraries,
@@ -219,6 +228,7 @@ skills:
     - supabase-security
     run_last: false
     exclusions: []
+    commands: {}
   - name: supabase-security
     path: .agent/skills/supabase-security/SKILL.md
     description: Defines RLS policies, database migrations (migration yaz), policies
@@ -240,6 +250,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
   - name: typography
     path: .agent/skills/typography/SKILL.md
     description: Applies typography principles for fonts, readability, text styling,
@@ -258,6 +269,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
   - name: ui-ux-pro-max
     path: .agent/skills/ui-ux-pro-max/SKILL.md
     description: Provides UI/UX design recommendations, Tailwind styling, HSL colors,
@@ -279,6 +291,7 @@ skills:
     - web-design-guidelines
     run_last: false
     exclusions: []
+    commands: {}
   - name: venthub-architecture
     path: .agent/skills/venthub-architecture/SKILL.md
     description: Defines VentHub architecture, component patterns, and Next.js App
@@ -298,6 +311,7 @@ skills:
     - venthub-auditor
     run_last: false
     exclusions: []
+    commands: {}
   - name: vercel-composition-patterns
     path: .agent/skills/vercel-composition-patterns/SKILL.md
     description: React composition patterns that scale, including compound component
@@ -316,6 +330,7 @@ skills:
     - vercel-react-best-practices
     run_last: false
     exclusions: []
+    commands: {}
   - name: vercel-react-best-practices
     path: .agent/skills/vercel-react-best-practices/SKILL.md
     description: React and Next.js performance optimization guidelines from Vercel.
@@ -335,6 +350,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
   - name: web-design-guidelines
     path: .agent/skills/web-design-guidelines/SKILL.md
     description: Reviews UI code for Web Interface Guidelines and design compliance.
@@ -354,6 +370,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
   audit:
   - name: diff-review
     path: .agent/skills/diff-review/SKILL.md
@@ -374,6 +391,8 @@ skills:
     - git-commit
     run_last: false
     exclusions: []
+    commands:
+      validate: python .agent/skills/diff-review/scripts/check_diff_rules.py
   - name: fallow
     path: .agent/skills/fallow/SKILL.md
     description: Codebase intelligence for JS/TS. Reports quality, dead-code, unused
@@ -392,6 +411,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
   - name: lighthouse-performance-guard
     path: .agent/skills/lighthouse-performance-guard/SKILL.md
     description: Automates web page performance audits, Lighthouse tracing, and web
@@ -411,6 +431,7 @@ skills:
     - performance-alignment
     run_last: false
     exclusions: []
+    commands: {}
   - name: performance-alignment
     path: .agent/skills/performance-alignment/SKILL.md
     description: Coordinates collaborative, multi-turn RAG analysis with NotebookLM
@@ -429,6 +450,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
   - name: venthub-auditor
     path: .agent/skills/venthub-auditor/SKILL.md
     description: VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, pre-commit
@@ -449,6 +471,8 @@ skills:
     - venthub-enterprise-audit
     run_last: false
     exclusions: []
+    commands:
+      validate: python .agent/skills/venthub-auditor/scripts/run_audit.py
   - name: venthub-catalog-importer
     path: .agent/skills/venthub-catalog-importer/SKILL.md
     description: Ingests and validates HVAC catalog PDFs. Trigger for importing catalogs
@@ -466,6 +490,7 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
+    commands: {}
   - name: venthub-enterprise-audit
     path: .agent/skills/venthub-enterprise-audit/SKILL.md
     description: 'Proje teslimi öncesi "10/10 Onay" denetim motorudur. L1-L12 adımlarını
@@ -487,6 +512,8 @@ skills:
     run_last: true
     exclusions:
     - venthub-auditor
+    commands:
+      validate: python .agent/skills/venthub-enterprise-audit/run_enterprise_audit.py
   - name: venthub-global-rontgen
     path: .agent/skills/venthub-global-rontgen/SKILL.md
     description: 'Proje genelini radar ve rontgen komutlarıyla fiziki olarak tarar.
@@ -506,6 +533,7 @@ skills:
     - venthub-enterprise-audit
     run_last: false
     exclusions: []
+    commands: {}
   utils:
   - name: git-commit
     path: .agent/skills/git-commit/SKILL.md
@@ -527,6 +555,7 @@ skills:
     next_steps: []
     run_last: true
     exclusions: []
+    commands: {}
   - name: to-issues
     path: .agent/skills/to-issues/SKILL.md
     description: Breaks a plan, specification, or PRD into structured issues or tasks.
@@ -547,6 +576,7 @@ skills:
     - teamwork-director
     run_last: false
     exclusions: []
+    commands: {}
   - name: to-prd
     path: .agent/skills/to-prd/SKILL.md
     description: Turns the current conversation transcript or context into a structured
@@ -566,3 +596,4 @@ skills:
     - to-issues
     run_last: false
     exclusions: []
+    commands: {}

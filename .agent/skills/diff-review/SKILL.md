@@ -14,6 +14,8 @@ metadata:
   - git diff output
   outputs:
   - checks verdict (pass/fail)
+  commands:
+    validate: python .agent/skills/diff-review/scripts/check_diff_rules.py
 depends_on: []
 next_steps:
 - git-commit

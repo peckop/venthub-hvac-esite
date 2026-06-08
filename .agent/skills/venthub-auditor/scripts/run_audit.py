@@ -31,7 +31,7 @@ AUDIT_RULES = [
 ]
 
 def run_audit(target_dir="src"):
-    print(f"🚀 VentHub Technical Debt Audit Starting: {target_dir}\n")
+    print(f"[INFO] VentHub Technical Debt Audit Starting: {target_dir}\n")
     results = []
     
     for root, _, files in os.walk(target_dir):
@@ -63,7 +63,7 @@ def run_audit(target_dir="src"):
 
     # Sonuçları Raporla
     if not results:
-        print("✅ No issues found! Codebase is Grade A.")
+        print("[OK] No issues found! Codebase is Grade A.")
     else:
         print(f"Found {len(results)} issues:\n")
         # Severity'e göre sırala
@@ -72,11 +72,17 @@ def run_audit(target_dir="src"):
         current_file = ""
         for r in results:
             if current_file != r["file"]:
-                print(f"\n📂 File: {r['file']}")
+                print(f"\n[FILE] File: {r['file']}")
                 current_file = r["file"]
             print(f"  [{r['severity']}] Line {r['line']}: {r['rule']} -> {r['snippet'][:80]}...")
 
-    print("\n🏁 Audit Completed.")
+    print("\n[INFO] Audit Completed.")
 
 if __name__ == "__main__":
+    import sys
+    if hasattr(sys.stdout, 'reconfigure'):
+        try:
+            sys.stdout.reconfigure(encoding='utf-8')
+        except Exception:
+            pass
     run_audit()
