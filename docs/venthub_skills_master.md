@@ -2,14 +2,14 @@
 
 This document compiles the core operational skills, guardrails, and validation protocols used by autonomous agents in the VentHub HVAC enterprise project.
 
-Generated automatically from local modular plugin skills under `.agent/plugins/venthub-core/`.
+Generated automatically from local modular skills under `.agent/skills/`.
 
 ---
 
 ## 1. Yetenek: diff-review
 > **Açıklama:** Statik Git diff analizi yoluyla yıkıcı pattern'leri tespit eder.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/audit/diff-review/`
+**Klasör Yolu:** `.agent/skills/diff-review/`
 
 # Diff-Review Skill (Değişiklik Güvenliği Kontrolü)
 
@@ -48,7 +48,7 @@ const foo: any = parseUnknownData(); // diff-ignore: Dış API'den gelen veriye 
 ## 2. Yetenek: enterprise-multiagent
 > **Açıklama:** Orchestrates specialized worker-judge multi-agent teams for VentHub HVAC developments complying with strict quality baselines
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/orchestration/enterprise-multiagent/`
+**Klasör Yolu:** `.agent/skills/enterprise-multiagent/`
 
 # Enterprise Multi-Agent Orchestration Skill (VentHub HVAC)
 
@@ -217,7 +217,7 @@ Hiçbir kod değişikliği aşağıdaki kapılardan geçmeden canlıya alınamaz
 ## 3. Yetenek: fallow
 > **Açıklama:** Codebase intelligence for JavaScript and TypeScript. Free static layer reports quality, changed-code risk, cleanup opportunities (unused files, exports, types, dependencies), code duplication, circular dependencies, complexity hotspots, architecture boundary violations, feature flag patterns, and opt-in security candidates. Runtime coverage merges production execution data into the same health report for hot-path review, cold-path deletion confidence, and stale-flag evidence, with a single local capture available by default and continuous/cloud runtime monitoring available as an optional mode. 118 framework plugins, zero configuration, sub-second static analysis. Use when asked to analyze code health, audit PR risk, find cleanup opportunities or unused code, detect duplicates, check circular dependencies, audit complexity, check architecture boundaries, detect feature flags, surface security candidates, clean up the codebase, auto-fix issues, merge runtime coverage, or run fallow.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/audit/fallow/`
+**Klasör Yolu:** `.agent/skills/fallow/`
 
 # Fallow: codebase intelligence for JavaScript and TypeScript
 
@@ -326,7 +326,7 @@ cargo install fallow-cli        # build from source
 ## 4. Yetenek: find-skills
 > **Açıklama:** Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/intelligence/find-skills/`
+**Klasör Yolu:** `.agent/skills/find-skills/`
 
 # Find Skills
 
@@ -471,7 +471,7 @@ npx skills init my-xyz-skill
 ## 5. Yetenek: git-commit
 > **Açıklama:** Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions "/commit". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/utils/git-commit/`
+**Klasör Yolu:** `.agent/skills/git-commit/`
 
 # Git Commit with Conventional Commits
 
@@ -596,7 +596,7 @@ EOF
 ## 6. Yetenek: i18n-conventions
 > **Açıklama:** Defines internationalization patterns for VentHub. Use when adding new text, labels, or messages to the application.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/guards/i18n-conventions/`
+**Klasör Yolu:** `.agent/skills/i18n-conventions/`
 
 # i18n Conventions Skill
 
@@ -783,7 +783,7 @@ VentHub projesi enterprise seviyesinde dil güvenliğini sağlamak için şu iki
 ## 7. Yetenek: lighthouse-performance-guard
 > **Açıklama:** Automates page performance tracing, audits code against Vercel & Addy Osmani rules, enforces TDD (Test-First), and coordinates Multi-Agent review to prevent performance regressions.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/audit/lighthouse-performance-guard/`
+**Klasör Yolu:** `.agent/skills/lighthouse-performance-guard/`
 
 # Lighthouse Performance Guard & Optimization Pipeline
 
@@ -851,7 +851,7 @@ Kritik sayfa rotalarında (Anasayfa, Ürün Detay, Sepet vb.) Lighthouse Perform
 ## 8. Yetenek: multi-agent-research
 > **Açıklama:** Reusable worker-judge multi-agent orchestrator for high-quality research, design, and technical verification.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/orchestration/multi-agent-research/`
+**Klasör Yolu:** `.agent/skills/multi-agent-research/`
 
 # Multi-Agent Research Orchestrator
 
@@ -977,7 +977,7 @@ Use the following curated repositories and NotebookLM digital twins as primary r
 ## 9. Yetenek: notebook-navigator
 > **Açıklama:** >
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/intelligence/notebook-navigator/`
+**Klasör Yolu:** `.agent/skills/notebook-navigator/`
 
 # NotebookLM Navigator (Ajanlar İçin Referans Rehberi)
 
@@ -1098,7 +1098,7 @@ NotebookLM sadece statik bir doküman arşivi değil, kod tabanının ve mimarin
 ## 10. Yetenek: notebooklm-sync
 > **Açıklama:** >
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/intelligence/notebooklm-sync/`
+**Klasör Yolu:** `.agent/skills/notebooklm-sync/`
 
 # NotebookLM Otonom Senkronizasyon (NLM Sync)
 
@@ -1250,7 +1250,7 @@ Eğer `cc doc batch` rate limit'e takılırsa:
 ## 11. Yetenek: orion-cli
 > **Açıklama:** >
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/intelligence/orion-cli/`
+**Klasör Yolu:** `.agent/skills/orion-cli/`
 
 # Orion CLI Dokümantasyon Pipeline
 
@@ -1457,7 +1457,7 @@ orion memory synapse     ← ÖN KOŞUL: orion memory search
 ## 12. Yetenek: performance-alignment
 > **Açıklama:** Coordinates collaborative, multi-turn RAG analysis with NotebookLM and the user to diagnose and plan performance optimizations without assumptions.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/audit/performance-alignment/`
+**Klasör Yolu:** `.agent/skills/performance-alignment/`
 
 # Performance Alignment & Diagnosis Skill
 
@@ -1505,7 +1505,7 @@ Bu skill, VentHub HVAC projesinde veya herhangi bir enterprise yazılım projesi
 ## 13. Yetenek: supabase
 > **Açıklama:** Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector).
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/guards/supabase/`
+**Klasör Yolu:** `.agent/skills/supabase/`
 
 # Supabase
 
@@ -1758,7 +1758,7 @@ Do NOT use `apply_migration` to change a local database schema — it writes a m
 ## 14. Yetenek: supabase-security
 > **Açıklama:** Defines RLS policies, migration patterns, and security best practices for VentHub Supabase. Use when writing SQL, creating policies, or modifying database schema.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/guards/supabase-security/`
+**Klasör Yolu:** `.agent/skills/supabase-security/`
 
 ## 🛫 Prerequisites (Ön Koşul Kontrolü)
 
@@ -1983,7 +1983,7 @@ export async function POST(request: Request) {
 ## 15. Yetenek: teamwork-director
 > **Açıklama:** >
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/orchestration/teamwork-director/`
+**Klasör Yolu:** `.agent/skills/teamwork-director/`
 
 # teamwork-director
 
@@ -2484,7 +2484,7 @@ Artifact status'unu ayarla: `Launched`.
 ## 16. Yetenek: to-issues
 > **Açıklama:** Break a plan, spec, or PRD into independently-grabbable tasks. Use when the user wants to convert a plan into issues or tasks.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/utils/to-issues/`
+**Klasör Yolu:** `.agent/skills/to-issues/`
 
 # To Issues
 
@@ -2501,7 +2501,7 @@ Break a plan or PRD into vertical slices (tracer bullets) and write them as a ch
 ## 17. Yetenek: to-prd
 > **Açıklama:** Turn the current conversation context into a PRD. Use when the user wants to create a PRD from the current context.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/utils/to-prd/`
+**Klasör Yolu:** `.agent/skills/to-prd/`
 
 # To PRD
 
@@ -2524,7 +2524,7 @@ This skill takes the current conversation context and codebase understanding and
 ## 18. Yetenek: typography
 > **Açıklama:** Apply professional typography principles to create readable, hierarchical, and aesthetically refined interfaces. Use when setting type scales, choosing fonts, adjusting spacing, designing text-heavy layouts, implementing dark mode typography, or when asked about readability, font pairing, line height, measure, typographic hierarchy, variable fonts, font loading, or OpenType features.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/guards/typography/`
+**Klasör Yolu:** `.agent/skills/typography/`
 
 # Typography
 
@@ -2971,7 +2971,7 @@ See [tailwind-integration.md](references/tailwind-integration.md) for complete p
 ## 19. Yetenek: ui-ux-pro-max
 > **Açıklama:** UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/guards/ui-ux-pro-max/`
+**Klasör Yolu:** `.agent/skills/ui-ux-pro-max/`
 
 # ui-ux-pro-max
 
@@ -3292,7 +3292,7 @@ Before delivering UI code, verify these items:
 ## 20. Yetenek: venthub-architecture
 > **Açıklama:** Defines VentHub project structure, file organization, and component patterns. Use when creating new files, components, or understanding where code belongs.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/guards/venthub-architecture/`
+**Klasör Yolu:** `.agent/skills/venthub-architecture/`
 
 # VentHub Architecture Skill
 
@@ -3376,7 +3376,7 @@ E-ticaret sayfalarında aşağıdaki yapılandırılmış veriler zorunludur:
 ## 21. Yetenek: venthub-auditor
 > **Açıklama:** VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, Next.js 15/React 19 uyumu, tip güvenliği, robotik temizlik denetimi YANISIRA Kritik Varlık korumalarını üstlenir.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/audit/venthub-auditor/`
+**Klasör Yolu:** `.agent/skills/venthub-auditor/`
 
 ## 🛫 Prerequisites (Ön Koşul Kontrolü)
 
@@ -3465,7 +3465,7 @@ Bir görev ancak `check_integrity.py` V5 üzerinden 0 (sıfır) BLOCKER aldığ�
 ## 22. Yetenek: venthub-catalog-importer
 > **Açıklama:** Ingests and validates HVAC catalog PDFs using an autonomous Visual Multi-Agent Team.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/audit/venthub-catalog-importer/`
+**Klasör Yolu:** `.agent/skills/venthub-catalog-importer/`
 
 # VentHub Otonom PDF Görsel Ajan Hattı (Visual Multi-Agent Ingestion Pipeline)
 
@@ -3535,7 +3535,7 @@ Ana Ajan (Proje Şefi), PDF işleme sürecini başlatırken sırasıyla şu alt 
 ## 23. Yetenek: venthub-enterprise-audit
 > **Açıklama:** >
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/audit/venthub-enterprise-audit/`
+**Klasör Yolu:** `.agent/skills/venthub-enterprise-audit/`
 
 # VentHub Enterprise Audit Skill (v1.1)
 
@@ -3802,7 +3802,7 @@ BLOCKED    → Herhangi bir 🔴 STRICT kontrol FAIL → teslim yapılamaz
 ## 24. Yetenek: venthub-global-rontgen
 > **Açıklama:** Proje genelini veya büyük modülleri tepeden tırnağa Fiziki (Terminal) Radar ve Komutlarla test eder. Hallucination/Mental taramayı KESİN OLARAK yasaklayan, salt JSON kanıta dayanan Production Kalkanıdır.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/audit/venthub-global-rontgen/`
+**Klasör Yolu:** `.agent/skills/venthub-global-rontgen/`
 
 # VentHub Global Röntgen & Review Skill (ZORUNLU JSON EDİSYONU)
 
@@ -3932,7 +3932,7 @@ Sisteme yalan söyleyemezsin. Gözle baktığın hiçbir şeye `PASS` verme, yal
 ---
 
 ## 25. Yetenek: vercel-composition-patterns
-**Klasör Yolu:** `.agent/plugins/venthub-core/guards/vercel-composition-patterns/`
+**Klasör Yolu:** `.agent/skills/vercel-composition-patterns/`
 
 # React Composition Patterns
 
@@ -4015,7 +4015,7 @@ For the complete guide with all rules expanded: `AGENTS.md`
 ## 26. Yetenek: vercel-react-best-practices
 > **Açıklama:** React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/guards/vercel-react-best-practices/`
+**Klasör Yolu:** `.agent/skills/vercel-react-best-practices/`
 
 # Vercel React Best Practices
 
@@ -4163,7 +4163,7 @@ For the complete guide with all rules expanded: `AGENTS.md`
 ## 27. Yetenek: web-design-guidelines
 > **Açıklama:** Review UI code for Web Interface Guidelines compliance. Use when asked to "review my UI", "check accessibility", "audit design", "review UX", or "check my site against best practices".
 
-**Klasör Yolu:** `.agent/plugins/venthub-core/guards/web-design-guidelines/`
+**Klasör Yolu:** `.agent/skills/web-design-guidelines/`
 
 # Web Interface Guidelines
 
