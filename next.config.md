@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\next.config.mjs
 skeleton_hash: bb7b26f4927f7e09
 entity_hashes:
   overview: ce293451cf435cb1
-generated_at: 2026-05-29T11:38:45Z
+generated_at: 2026-06-08T09:00:15Z
 ---
 
 ## Genel Bakış
@@ -37,10 +37,6 @@ Bu modül bir Next.js yapılandırma dosyasıdır (`next.config.mjs`). Aşağıd
 
 ---
 
-**Not:** Bu dosya Minimal bilgi içermektedir — sadece iki modül sabiti (`withBundleAnalyzer` ve `nextConfig`) tanımlıdır. Fonksiyon imzası, parametre veya default değer bilgisi mevcut olmadığından, daha detaylı aksiyon çıkarılamamıştır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ---
@@ -63,13 +59,6 @@ Bu modül bir Next.js yapılandırma dosyasıdır (`next.config.mjs`). Aşağıd
 - **params**: (yok)
 - **ic_degiskenler**: (yok — fonksiyon doğrudan array literal döner)
 - **Dönüş**: `Array<{ source: string, destination: string, permanent: boolean }>` — Türkçe kategori slug'larını İngilizce karşılıklarına yönlendiren kalıcı (301) redirect kuralları listesi. Toplam 13 redirect kuralı içerir; her kural bir `source` (eski Türkçe URL paterni, `:path*` wildcard'lı), bir `destination` (yeni İngilizce URL paterni) ve `permanent: true` alanlarından oluşur.
-
----
-
-### [N2_NASIL] AST Pointer: next.config.mjs::headers
-- **params**: (yok)
-- **ic_degiskenler**: (yok — fonksiyon doğrudan array literal döner)
-- **Dönüş**: `Array<{ source: string, headers: Array<{ key: string, value: string }> }>` — Tüm sayfalara (`/(.*)` glob) uygulanacak HTTP güvenlik başlıkları kuralları listesi. İçerik: `X-DNS-Prefetch-Control` (on), `Strict-Transport-Security` (2 yıl max-age, includeSubDomains, preload), `X-Frame-Options` (DENY — iframe engelleme), `X-Content-Type-Options` (nosniff), `Referrer-Policy` (strict-origin-when-cross-origin), ve `Content-Security-Policy-Report-Only` (kapsamlı CSP raporlama politikası — Supabase, Vercel Insights, GitHub raw kaynaklarına connect izni, frame-ancestors none, form-action self).
 
 ---
 

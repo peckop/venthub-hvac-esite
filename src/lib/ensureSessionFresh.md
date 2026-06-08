@@ -7,7 +7,7 @@ skeleton_hash: f34dd9fb935a7aac
 entity_hashes:
   func:ensureSessionFresh: 28037b5d7337277a
   overview: 7e306322f9d1fbb3
-generated_at: 2026-05-28T22:38:03Z
+generated_at: 2026-06-08T08:57:36Z
 ---
 
 ## Genel Bakış

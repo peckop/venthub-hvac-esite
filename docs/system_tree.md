@@ -2,15 +2,66 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-07T14:05:35.737722+00:00
+compiled_at: 2026-06-08T10:14:51.880435+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-08T10:14:51.880435+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
 📂 venthub-hvac/
+├── ⚪ `CHANGELOG.md`
+├── ⚪ `CONTEXT.md`
+├── ⚠️ `ORIGINAL_REQUEST.md`
+├── ⚠️ `PROJECT.md`
+├── ⚪ `README.md`
+├── ⚪ `RECOMMENDATIONS.md`
+├── ⚠️ `TEST_INFRA.md`
+├── ⚠️ `TEST_READY.md`
+├── 📂 **docs/**
+│   ├── 📂 **archive/**
+│   │   ├── ⚪ `014-kategori-ssr-plan.md`
+│   │   ├── ⚪ `JULES_PROMPT.md`
+│   │   ├── ⚪ `NEXT_STEPS.md`
+│   │   ├── ⚪ `VENTHUB_ULTIMATE_PROMPT.md`
+│   │   ├── ⚪ `WARP.md`
+│   │   ├── ⚪ `ajanlar_ve_karmasa_3d_carousel_casestudy.md`
+│   │   ├── ⚪ `architectural_vision.md`
+│   │   ├── ⚪ `changelog_2025_legacy.md`
+│   │   ├── ⚪ `legacy-vite-seo-report.md`
+│   │   ├── ⚪ `legacy_homepage_enhancements_2025.md`
+│   │   ├── ⚪ `legacy_smart_routing_plan.md`
+│   │   ├── ⚪ `plan-and-tasklist-current.md`
+│   │   ├── ⚪ `plan-and-tasklist.md`
+│   │   └── ⚪ `project_state_and_skills_audit.md`
+│   ├── ⚪ `database_schema_master.md`
+│   ├── ⚪ `design_system_config.md`
+│   ├── 📂 **products/**
+│   │   ├── ⚪ `AIR_DOOR_AD_900_MASTER.md`
+│   │   └── ⚪ `AIR_DOOR_AD_900_SEO.md`
+│   ├── 📂 **reference/**
+│   │   └── 📂 **supabase/**
+│   │       ├── ⚪ `auth-hooks.md`
+│   │       ├── ⚪ `custom-claims-and-role-based-access-control-rbac.md`
+│   │       ├── ⚪ `realtime-authorization.md`
+│   │       └── ⚪ `row-level-security.md`
+│   ├── 📂 **screenshots/**
+│   │   └── ⚪ `README.md`
+│   ├── ⚪ `supabase_functions_master.md`
+│   ├── ⚪ `system_tree.md`
+│   ├── ⚪ `venthub_hvac_master.md`
+│   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
+│   ├── ⚪ `venthub_saas_faz1_prompt.md`
+│   ├── ⚪ `venthub_saas_master_roadmap.md`
+│   ├── ⚪ `venthub_skills_master.md`
+│   └── ⚪ `vortice_catalogs.md`
+├── 📂 **memory-engine/**
+│   └── ⚪ `README.md`
+├── ⚠️ `next.config.md`
+├── ✅ `sentry.client.config.ts`
+├── ❌ `sentry.edge.config.ts`
+├── ❌ `sentry.server.config.ts`
 ├── 📂 **src/**
 │   ├── 📂 **actions/**
 │   │   └── ✅ `auth.ts`
@@ -103,13 +154,13 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   └── 📂 **products/**
 │   │   │       ├── 📂 **[slug]/**
-│   │   │       │   └── ❌ `page.tsx`
-│   │   │       └── ❌ `page.tsx`
+│   │   │       │   └── ✅ `page.tsx`
+│   │   │       └── ✅ `page.tsx`
 │   │   ├── 📂 **_components/**
 │   │   │   └── ✅ `ProductDetailPageView.tsx`
 │   │   ├── 📂 **admin/**
 │   │   │   ├── 📂 **audit-logs/**
-│   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **categories/**
 │   │   │   │   ├── 📂 **[id]/**
 │   │   │   │   │   └── 📂 **builder/**
@@ -160,7 +211,7 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   ├── 📂 **assets/**
 │   │   └── 📂 **images/**
 │   ├── 📂 **components/**
-│   │   ├── ❌ `AddToCartToast.tsx`
+│   │   ├── ✅ `AddToCartToast.tsx`
 │   │   ├── ✅ `AddToCartToastContent.tsx`
 │   │   ├── ✅ `BackToTopButton.tsx`
 │   │   ├── ✅ `BeforeAfterSlider.tsx`
@@ -179,17 +230,17 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   │   ├── ✅ `LoadingSpinner.tsx`
 │   │   ├── ✅ `MagneticCTA.tsx`
 │   │   ├── ✅ `MegaMenu.tsx`
-│   │   ├── ❌ `PaymentWatcher.tsx`
+│   │   ├── ✅ `PaymentWatcher.tsx`
 │   │   ├── ✅ `ProductCard.tsx`
 │   │   ├── ✅ `QuickViewModal.tsx`
 │   │   ├── ✅ `ScrollLinkedProcess.tsx`
-│   │   ├── ❌ `ScrollReveal.tsx`
+│   │   ├── ✅ `ScrollReveal.tsx`
 │   │   ├── ✅ `ScrollToTop.tsx`
-│   │   ├── ❌ `SearchOverlay.tsx`
+│   │   ├── ✅ `SearchOverlay.tsx`
 │   │   ├── ✅ `SecurityRibbon.tsx`
 │   │   ├── ✅ `Seo.tsx`
 │   │   ├── ✅ `SpotlightHeroOverlay.tsx`
-│   │   ├── ❌ `StickyHeader.tsx`
+│   │   ├── ✅ `StickyHeader.tsx`
 │   │   ├── ✅ `SubcategoryFlow.tsx`
 │   │   ├── ❌ `TiltCard.tsx`
 │   │   ├── ✅ `UndecidedUserCTA.tsx`
@@ -222,7 +273,7 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   │   │   ├── 📂 **categories/**
 │   │   │   │   └── ✅ `CategoryFormModal.tsx`
 │   │   │   ├── 📂 **dashboard/**
-│   │   │   │   ├── ❌ `AbcPieChart.tsx`
+│   │   │   │   ├── ✅ `AbcPieChart.tsx`
 │   │   │   │   ├── ✅ `ActivityHeatmap.tsx`
 │   │   │   │   ├── ✅ `RecentOrdersTable.tsx`
 │   │   │   │   ├── ✅ `SalesChart.tsx`
@@ -292,8 +343,8 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   │   │   ├── ✅ `NavBrand.tsx`
 │   │   │   ├── ✅ `NavPrimaryRail.tsx`
 │   │   │   ├── ✅ `NavSearchTrigger.tsx`
-│   │   │   ├── ❌ `NavSecondaryRail.tsx`
-│   │   │   ├── ❌ `NavShell.tsx`
+│   │   │   ├── ✅ `NavSecondaryRail.tsx`
+│   │   │   ├── ✅ `NavShell.tsx`
 │   │   │   └── ✅ `NavUtilityRail.tsx`
 │   │   ├── 📂 **product/**
 │   │   │   └── ✅ `ProductSmartInference.tsx`
@@ -352,7 +403,7 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
 │   │   │   ├── ✅ `RichTextRenderer.tsx`
-│   │   │   ├── ❌ `SeriesCard.tsx`
+│   │   │   ├── ✅ `SeriesCard.tsx`
 │   │   │   └── 📂 **visual-models/**
 │   │   └── 📂 **ui/**
 │   │       ├── ✅ `ScrollObserver.tsx`
@@ -396,10 +447,10 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   │   ├── ✅ `useRole.ts`
 │   │   ├── ✅ `useScrollAnimation.ts`
 │   │   ├── ✅ `useScrollThrottle.tsx`
-│   │   ├── ❌ `useSettings.ts`
+│   │   ├── ✅ `useSettings.ts`
 │   │   └── ✅ `useTenant.tsx`
 │   ├── 📂 **i18n/**
-│   │   ├── ❌ `I18nContext.ts`
+│   │   ├── ✅ `I18nContext.ts`
 │   │   ├── ✅ `I18nProvider.tsx`
 │   │   ├── ✅ `datetime.ts`
 │   │   ├── 📂 **dictionaries/**
@@ -415,7 +466,7 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   │   ├── ✅ `hvacCalculations.ts`
 │   │   ├── ✅ `order.ts`
 │   │   ├── ✅ `orderStatusService.ts`
-│   │   ├── ❌ `pdfAssets.ts`
+│   │   ├── ✅ `pdfAssets.ts`
 │   │   ├── ✅ `pdfGenerator.ts`
 │   │   ├── ✅ `productsApi.ts`
 │   │   ├── ✅ `rbac.ts`
@@ -431,12 +482,12 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   │   ├── 📂 **supabase/**
 │   │   │   ├── ✅ `client.ts`
 │   │   │   ├── ✅ `server.ts`
-│   │   │   └── ❌ `static.ts`
+│   │   │   └── ✅ `static.ts`
 │   │   ├── ✅ `supabase.ts`
 │   │   ├── ✅ `tenantResolver.ts`
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `utils.ts`
-│   ├── ❌ `middleware.ts`
+│   ├── ✅ `middleware.ts`
 │   ├── 📂 **providers/**
 │   │   └── ✅ `SupabaseProvider.tsx`
 │   ├── 📂 **test/**
@@ -455,7 +506,7 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   │   ├── ✅ `adminUi.ts`
 │   │   ├── ❌ `analytics.ts`
 │   │   ├── ✅ `applicationLinks.ts`
-│   │   ├── ❌ `applicationUi.tsx`
+│   │   ├── ✅ `applicationUi.tsx`
 │   │   ├── ✅ `breadcrumbUtils.ts`
 │   │   ├── ✅ `categoryHelpers.ts`
 │   │   ├── ✅ `checkoutHelpers.ts`
@@ -476,7 +527,7 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `whatsapp.ts`
 │   └── 📂 **views/**
-│       ├── ❌ `AboutPage.tsx`
+│       ├── ✅ `AboutPage.tsx`
 │       ├── ✅ `AuthCallbackPage.tsx`
 │       ├── ✅ `BrandDetailPage.tsx`
 │       ├── ✅ `BrandsPage.tsx`
@@ -485,47 +536,47 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │       ├── ✅ `CategoryPage.tsx`
 │       ├── ✅ `CheckoutPage.tsx`
 │       ├── ✅ `ContactPage.tsx`
-│       ├── ❌ `ForgotPasswordPage.tsx`
+│       ├── ✅ `ForgotPasswordPage.tsx`
 │       ├── ✅ `HomePage.tsx`
 │       ├── ✅ `LoginPage.tsx`
 │       ├── ✅ `OrdersPage.tsx`
 │       ├── ✅ `PaymentSuccessPage.tsx`
 │       ├── ✅ `ProductsDiscoveryView.tsx`
-│       ├── ❌ `ProductsPage.tsx`
+│       ├── ✅ `ProductsPage.tsx`
 │       ├── ✅ `RegisterPage.tsx`
 │       ├── 📂 **account/**
 │       │   ├── ✅ `AccountAddressesPage.tsx`
 │       │   ├── ✅ `AccountInvoicesPage.tsx`
 │       │   ├── ✅ `AccountLayout.tsx`
 │       │   ├── ✅ `AccountOverviewPage.tsx`
-│       │   ├── ❌ `AccountProfilePage.tsx`
+│       │   ├── ✅ `AccountProfilePage.tsx`
 │       │   ├── ✅ `AccountReturnsPage.tsx`
 │       │   ├── ✅ `AccountSecurityPage.tsx`
 │       │   ├── ✅ `AccountShipmentsPage.tsx`
 │       │   └── ✅ `OrderDetailPage.tsx`
 │       ├── 📂 **admin/**
-│       │   ├── ❌ `AdminAuditLogPage.tsx`
+│       │   ├── ✅ `AdminAuditLogPage.tsx`
 │       │   ├── ✅ `AdminCategoriesPage.tsx`
 │       │   ├── ✅ `AdminCouponsPage.tsx`
-│       │   ├── ❌ `AdminDashboardPage.tsx`
+│       │   ├── ✅ `AdminDashboardPage.tsx`
 │       │   ├── ✅ `AdminErrorGroupsPage.tsx`
 │       │   ├── ✅ `AdminErrorsPage.tsx`
 │       │   ├── ✅ `AdminInventoryPage.tsx`
-│       │   ├── ❌ `AdminInventoryReportPage.tsx`
+│       │   ├── ✅ `AdminInventoryReportPage.tsx`
 │       │   ├── ✅ `AdminInventorySettingsPage.tsx`
 │       │   ├── ✅ `AdminLayout.tsx`
 │       │   ├── ✅ `AdminLogisticsPage.tsx`
 │       │   ├── ✅ `AdminMovementsPage.tsx`
 │       │   ├── ✅ `AdminOrdersBoard.tsx`
-│       │   ├── ❌ `AdminOrdersPage.tsx`
-│       │   ├── ❌ `AdminProductsPage.tsx`
+│       │   ├── ✅ `AdminOrdersPage.tsx`
+│       │   ├── ✅ `AdminProductsPage.tsx`
 │       │   ├── ✅ `AdminReturnsPage.tsx`
 │       │   ├── ✅ `AdminSettingsPage.tsx`
 │       │   ├── ✅ `AdminUsersPage.tsx`
 │       │   ├── ✅ `AdminWebhookEventsPage.tsx`
 │       │   └── ✅ `CategoryBuilderView.tsx`
 │       ├── 📂 **calculators/**
-│       │   ├── ❌ `AirCurtainCalcPage.tsx`
+│       │   ├── ✅ `AirCurtainCalcPage.tsx`
 │       │   ├── ✅ `DuctCalcPage.tsx`
 │       │   ├── ✅ `HRVCalcPage.tsx`
 │       │   └── ✅ `JetFanCalcPage.tsx`
@@ -535,7 +586,7 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │       │   ├── ✅ `CategorySeriesView.tsx`
 │       │   └── ✅ `CategoryShowcaseView.tsx`
 │       ├── 📂 **checkout/**
-│       │   ├── ❌ `AddressFormModal.tsx`
+│       │   ├── ✅ `AddressFormModal.tsx`
 │       │   ├── ✅ `AddressSelectModal.tsx`
 │       │   ├── ✅ `CheckoutProgress.tsx`
 │       │   ├── ✅ `InvoiceProfileModal.tsx`
@@ -543,7 +594,7 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │       │   ├── ✅ `PaymentIframeContainer.tsx`
 │       │   ├── ✅ `ReviewSummary.tsx`
 │       │   ├── ✅ `SecurePaymentOverlay.tsx`
-│       │   ├── ❌ `StepAddressInfo.tsx`
+│       │   ├── ✅ `StepAddressInfo.tsx`
 │       │   ├── ✅ `StepCustomerInfo.tsx`
 │       │   └── ✅ `buildPaymentRequest.ts`
 │       ├── 📂 **knowledge/**
@@ -555,102 +606,100 @@ Bu belge, otonom derleyici tarafından 2026-06-07T14:05:35.737722+00:00 tarihind
 │       │   ├── ✅ `KVKKPage.tsx`
 │       │   ├── ✅ `PreInformationPage.tsx`
 │       │   ├── ✅ `PrivacyPolicyPage.tsx`
-│       │   └── ✅ `TermsOfUsePage.tsx`
+│       │   ├── ✅ `TermsOfUsePage.tsx`
+│       │   └── 📂 **components/**
+│       │       ├── 📂 **en/**
+│       │       │   └── ✅ `KvkkContent.tsx`
+│       │       └── 📂 **tr/**
+│       │           └── ✅ `KvkkContent.tsx`
 │       └── 📂 **support/**
 │           ├── ✅ `FAQPage.tsx`
 │           ├── ✅ `ReturnsPage.tsx`
 │           ├── ✅ `ShippingPage.tsx`
 │           └── ✅ `WarrantyPage.tsx`
-└── 📂 **supabase/**
-    └── 📂 **functions/**
-        ├── 📂 **_shared/**
-        │   ├── ✅ `cors.ts`
-        │   ├── ✅ `notify.ts`
-        │   ├── ✅ `rate_limit.ts`
-        │   ├── ✅ `sentry.ts`
-        │   └── ✅ `tenant_config.ts`
-        ├── 📂 **admin-create-coupon/**
-        ├── 📂 **admin-iyzico-reconcile/**
-        ├── 📂 **admin-order-inspect/**
-        ├── 📂 **admin-orders-latest/**
-        ├── 📂 **admin-update-order/**
-        ├── 📂 **admin-update-shipping/**
-        ├── 📂 **apply-coupon/**
-        ├── 📂 **delivery-notification/**
-        │   └── 📂 **templates/**
-        │       └── 📂 **email/**
-        ├── 📂 **healthz/**
-        ├── 📂 **iyzico-callback/**
-        ├── 📂 **iyzico-payment/**
-        ├── 📂 **iyzico-refund/**
-        ├── 📂 **log-client-error/**
-        ├── 📂 **notification-service/**
-        ├── 📂 **order-confirmation/**
-        │   └── 📂 **templates/**
-        │       └── 📂 **email/**
-        ├── 📂 **order-housekeeping/**
-        ├── 📂 **order-validate/**
-        ├── 📂 **refund-order-mock/**
-        ├── 📂 **release-expired-reservations/**
-        ├── 📂 **return-status-notification/**
-        ├── 📂 **returns-webhook/**
-        ├── 📂 **shipping-notification/**
-        │   └── 📂 **templates/**
-        │       └── 📂 **email/**
-        ├── 📂 **shipping-status/**
-        ├── 📂 **shipping-webhook/**
-        └── 📂 **stock-alert/**
+├── 📂 **supabase/**
+│   ├── 📂 **functions/**
+│   │   ├── 📂 **_shared/**
+│   │   │   ├── ✅ `cors.ts`
+│   │   │   ├── ✅ `notify.ts`
+│   │   │   ├── ✅ `rate_limit.ts`
+│   │   │   ├── ✅ `sentry.ts`
+│   │   │   └── ✅ `tenant_config.ts`
+│   │   ├── 📂 **admin-create-coupon/**
+│   │   ├── 📂 **admin-iyzico-reconcile/**
+│   │   ├── 📂 **admin-order-inspect/**
+│   │   ├── 📂 **admin-orders-latest/**
+│   │   ├── 📂 **admin-update-order/**
+│   │   ├── 📂 **admin-update-shipping/**
+│   │   ├── 📂 **apply-coupon/**
+│   │   ├── 📂 **delivery-notification/**
+│   │   │   └── 📂 **templates/**
+│   │   │       └── 📂 **email/**
+│   │   ├── 📂 **healthz/**
+│   │   ├── 📂 **iyzico-callback/**
+│   │   ├── 📂 **iyzico-payment/**
+│   │   ├── 📂 **iyzico-refund/**
+│   │   ├── 📂 **log-client-error/**
+│   │   ├── 📂 **notification-service/**
+│   │   ├── 📂 **order-confirmation/**
+│   │   │   └── 📂 **templates/**
+│   │   │       └── 📂 **email/**
+│   │   ├── 📂 **order-housekeeping/**
+│   │   ├── 📂 **order-validate/**
+│   │   ├── 📂 **refund-order-mock/**
+│   │   ├── 📂 **release-expired-reservations/**
+│   │   ├── 📂 **return-status-notification/**
+│   │   ├── 📂 **returns-webhook/**
+│   │   ├── 📂 **shipping-notification/**
+│   │   │   └── 📂 **templates/**
+│   │   │       └── 📂 **email/**
+│   │   ├── 📂 **shipping-status/**
+│   │   ├── 📂 **shipping-webhook/**
+│   │   └── 📂 **stock-alert/**
+│   └── 📂 **migrations/**
+├── 📂 **support/**
+└── ✅ `tailwind.config.js`
 ```
 
 ## Eksik Dokümantasyonlar
-Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
+- [ ] `sentry.edge.config.ts`
+- [ ] `sentry.server.config.ts`
 
 ## Sahipsiz (Orphan) MD Dosyaları
-Harika! Eşleşmeyen başıboş bir `.md` dosyası bulunmuyor. ✅
+Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
+- [⚠️] `ORIGINAL_REQUEST.md`
+- [⚠️] `PROJECT.md`
+- [⚠️] `TEST_INFRA.md`
+- [⚠️] `TEST_READY.md`
+- [⚠️] `next.config.md`
 
 ## Geçersiz Şablon (Invalid Format)
 Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterprise standardı için güncelleyin:
 - [❌] `src\app\[lang]\about\page.md`
 - [❌] `src\app\[lang]\account\addresses\page.md`
 - [❌] `src\app\[lang]\account\invoices\page.md`
-- [❌] `src\app\[lang]\products\[slug]\page.md`
-- [❌] `src\app\[lang]\products\page.md`
-- [❌] `src\app\admin\audit-logs\page.md`
 - [❌] `src\app\admin\coupons\page.md`
 - [❌] `src\app\admin\inventory\report\page.md`
 - [❌] `src\app\admin\webhook-events\page.md`
-- [❌] `src\components\AddToCartToast.md`
-- [❌] `src\components\PaymentWatcher.md`
-- [❌] `src\components\ScrollReveal.md`
-- [❌] `src\components\SearchOverlay.md`
-- [❌] `src\components\StickyHeader.md`
 - [❌] `src\components\TiltCard.md`
-- [❌] `src\components\admin\dashboard\AbcPieChart.md`
 - [❌] `src\components\layout\PageShell.md`
-- [❌] `src\components\navigation\NavSecondaryRail.md`
-- [❌] `src\components\navigation\NavShell.md`
 - [❌] `src\components\products\3d\factory\Assembler.md`
-- [❌] `src\components\products\SeriesCard.md`
 - [❌] `src\config\orbitalCarouselConfig.md`
 - [❌] `src\data\brands.md`
 - [❌] `src\design-system\tokens.md`
-- [❌] `src\hooks\useSettings.md`
-- [❌] `src\i18n\I18nContext.md`
-- [❌] `src\lib\pdfAssets.md`
-- [❌] `src\lib\supabase\static.md`
-- [❌] `src\middleware.md`
 - [❌] `src\types\database.md`
 - [❌] `src\utils\analytics.md`
-- [❌] `src\utils\applicationUi.md`
-- [❌] `src\views\AboutPage.md`
-- [❌] `src\views\ForgotPasswordPage.md`
-- [❌] `src\views\ProductsPage.md`
-- [❌] `src\views\account\AccountProfilePage.md`
-- [❌] `src\views\admin\AdminAuditLogPage.md`
-- [❌] `src\views\admin\AdminDashboardPage.md`
-- [❌] `src\views\admin\AdminInventoryReportPage.md`
-- [❌] `src\views\admin\AdminOrdersPage.md`
-- [❌] `src\views\admin\AdminProductsPage.md`
-- [❌] `src\views\calculators\AirCurtainCalcPage.md`
-- [❌] `src\views\checkout\AddressFormModal.md`
-- [❌] `src\views\checkout\StepAddressInfo.md`
+- [❌] `src\app\[lang]\about\page.md`
+- [❌] `src\app\[lang]\account\addresses\page.md`
+- [❌] `src\app\[lang]\account\invoices\page.md`
+- [❌] `src\app\admin\coupons\page.md`
+- [❌] `src\app\admin\inventory\report\page.md`
+- [❌] `src\app\admin\webhook-events\page.md`
+- [❌] `src\components\TiltCard.md`
+- [❌] `src\components\layout\PageShell.md`
+- [❌] `src\components\products\3d\factory\Assembler.md`
+- [❌] `src\config\orbitalCarouselConfig.md`
+- [❌] `src\data\brands.md`
+- [❌] `src\design-system\tokens.md`
+- [❌] `src\types\database.md`
+- [❌] `src\utils\analytics.md`

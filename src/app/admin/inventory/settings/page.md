@@ -8,7 +8,7 @@ entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: dac29de5a88fc4b5
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:35:08Z
+generated_at: 2026-06-08T08:57:36Z
 ---
 
 ## Genel Bakış
@@ -21,33 +21,9 @@ Envanter ayarları sayfasının kullanıcı arayüzünü oluşturur ve ilgili ya
 
 ---
 
-**Not:** Bu modül tek bileşenden oluşan basit bir sayfa yapısına sahiptir. Daha karmaşık işlevsellik alt bileşenler veya harici modüller aracılığıyla sağlanmaktadır.
-
----
-
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-**Gerekçe:**
-
-Modül analiz edildiğinde aksiyom türetilememesinin nedenleri:
-
-1. **Parametre yok:** `Page()` fonksiyonu herhangi bir parametre almıyor, bu nedenle parametre geçerliliği ile ilgili aksiyom tanımlanamıyor.
-
-2. **Modül sabiti yok:** Tanımlı sabit bulunmadığından eşik değerleri, izin verilen aralıklar veya yapılandırma kuralları çıkarılamıyor.
-
-3. **İç mantık bilinmiyor:** Fonksiyon gövdesinde hangi API'lerin çağrıldığı, hangi state'lerin kullanıldığı veya hangi koşulların kontrol edildiği belirtilmemiş.
-
-4. **Docstring'den bilgi çıkarılmaz:** Kurallar gereği yorumlardan veya değişken isimlerinden bilgi üretmek yasak.
-
-**Not:** Bu modül, yalnızca JSX döndüren basit bir UI bileşeni olarak tanımlanmış. Mimari varsayımların üretilebilmesi için en azından şu bilgilerden birine ihtiyaç vardır:
-- Bileşenin bağımlılıkları (context, store, props)
-- Kullanılan servisler veya API çağrıları
-- Koşullu render mantığı
-- Hata yönetimi gereksinimleri
 
 ---
 

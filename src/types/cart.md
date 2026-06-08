@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\types\cart.ts
 skeleton_hash: 46dc29d150f0a1fa
 entity_hashes:
   overview: 54581459c744006e
-generated_at: 2026-06-06T21:56:01Z
+generated_at: 2026-06-08T08:57:37Z
 ---
 
 ## Genel Bakış
@@ -20,15 +20,6 @@ Bu dosyada fonksiyon veya metot bulunmamaktadır; yalnızca arayüz (interface) 
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-**Açıklama:** Verilen girdilerde fonksiyon imzaları, modül sabitleri veya kod içeriği bulunmamaktadır. Mimari varsayımlar yalnızca mevcut fonksiyon gövdelerinden türetilebilir; docstring'lerden, yorumlardan veya değişken isimlerinden bilgi çıkarılamaz. `cart.ts` dosyasının içeriği (tip tanımları, interface'ler, type alias'lar vb.) analiz için sağlanmamıştır.
-
-**Gerekli bilgiler:**
-- Fonksiyon imzaları veya metot tanımları
-- Interface / Type tanımları (eğer fonksiyonel bir rol üstleniyorsa)
-- Modül içi sabitler veya varsayılan değerler
 
 ---
 

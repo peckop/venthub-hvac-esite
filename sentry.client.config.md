@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\sentry.client.config.ts
 skeleton_hash: ff75e94a761e823f
 entity_hashes:
   overview: b30de304c94c2910
-generated_at: 2026-06-07T16:36:53Z
+generated_at: 2026-06-08T09:00:20Z
 ---
 
 ## Genel Bakış
@@ -24,16 +24,6 @@ Bu modül için fonksiyon gövdesi içeriği mevcut değildir; yalnızca modül 
 **Tespit edilen modül sabitleri:**
 - `dsn` (member_expression): Sentry veri kaynağı adı (muhtemelen bir nesne üyesi olarak erişilen DSN değeri)
 - `isProd` (binary_expression): Üretim ortamı durumunu belirten mantıksal karşılaştırma sonucu
-
----
-
-**[Aksiyom 1]:** Eğer `dsn` değeri tanımsız, boş veya geçersiz bir DSN formatında ise, Sentry istemcisi hata raporlama işlevini yerine getiremez ve izleme verileri toplanamaz.
-
-**[Aksiyom 2]:** Eğer `isProd` değerinin hesaplanmasında kullanılan kaynak (örn: `process.env.NODE_ENV` veya benzeri ortam değişkeni) mevcut değilse, `isProd` tutarsız veya beklenmeyen bir değer alabilir; bu da ortam bazlı yapılandırma davranışını etkiler.
-
----
-
-> **Not:** Bu modül bir yapılandırma (config) dosyası olup, yalnızca sabit değer tanımları içerdiği için derinlemesine iş mantığı aksiyomları çıkarılamamıştır. Fonksiyon gövdesi bulunmadığından, yukarıdaki aksiyomlar yalnızca mevcut sabit tanımlarından türetilmiştir.
 
 ---
 

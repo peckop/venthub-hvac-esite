@@ -9,7 +9,7 @@ entity_hashes:
   func:generateStaticParams: 6d1b3e72f8b2da9f
   overview: 8dff6fca298bde81
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:35:06Z
+generated_at: 2026-06-08T08:58:05Z
 ---
 
 ## Genel Bakış

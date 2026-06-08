@@ -8,7 +8,7 @@ entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 0087da9b3ff4e9df
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:34:58Z
+generated_at: 2026-06-08T08:57:36Z
 ---
 
 ## Genel Bakış
@@ -26,10 +26,6 @@ Sayfanın görsel çıktısını üretir; KVKK metnini ve gerekli bileşenleri d
 Bu modül için fonksiyon gövdesi verilmediğinden ve fonksiyon imzasında (`Page()`) herhangi bir parametre veya koşul belirtilmediğinden, sadece fonksiyon imzasına dayalı mimari varsayımlar çıkarılamamaktadır.
 
 **Not:** Fonksiyon imzasında parametre bulunmamakla birlikte, modül Next.js `[lang]` route segment'i kullanmaktadır. Bu dil parametresinin Next.js tarafından otomatik olarak enjekte edildiği varsayılmaktadır. Ancak bu bilgi fonksiyon gövdesinden değil, kaynak yolundan türetildiği için aksiyom olarak raporlanmamaktadır.
-
----
-
-*Fonksiyon gövdesi sağlandığında, daha spesifik mimari varsayımlar eklenebilir.*
 
 ---
 

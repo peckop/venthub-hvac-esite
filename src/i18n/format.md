@@ -7,7 +7,7 @@ skeleton_hash: a1aee483816db6d5
 entity_hashes:
   func:formatCurrency: a5c5acb7b633147a
   overview: 272343283b681615
-generated_at: 2026-05-28T22:37:51Z
+generated_at: 2026-06-08T08:57:36Z
 ---
 
 ## Genel Bakış

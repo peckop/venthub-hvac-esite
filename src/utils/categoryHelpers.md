@@ -10,7 +10,7 @@ entity_hashes:
   func:getCategoryMarketingTitle: 72c2aaa786c01ff4
   func:parsePriceToNumber: 42be44b6c84206bc
   overview: 61e31d74a200c4af
-generated_at: 2026-05-28T22:38:44Z
+generated_at: 2026-06-08T08:57:54Z
 ---
 
 ## Genel Bakış
@@ -47,35 +47,52 @@ Bu modül, veritabanından gelen kategori nesnelerini kullanıcı arayüzü içi
 - t?: (key: string) => string — İsteğe bağlı olarak sağlanan, i18next veya özel bir hook'tan gelen çeviri fonksiyonu, çeviri anahtarı alıp yerelleştirilmiş string döndürür
 **Dönüş**: string, çözümlenmiş yerelleştirilmiş kategori görünüm adı, her zaman geçerli bir string olarak döndürülür
 
+### getCategoryMarketingTitle
+
+**Ne yapar**: Verilen kategori nesnesinin pazarlama odaklı başlığını döndürür. Veritabanında tanımlı bir `marketing_title` alanı varsa onu kullanır, aksi takdirde standart ekran adını (display name) alternatif olarak返回 eder.
+
+**Nasıl yapar**: Fonksiyon, kategori nesnesinin `marketing_title` alanını kontrol eder. Eğer bu alan mevcut ve doluysa doğrudan o değer döndürülür. Alan yoksa veya boşsa, kategorinin standart display name değeri fallback olarak kullanılır. Null veya undefined girdiler için güvenli bir şekilde çalışır.
+
+**Parametreler**:
+- `category`: `DbCategory | null | undefined` — Pazarlama başlığı bilgisi çıkarılacak veritabanı kategori nesnesi. Null veya undefined olabilir.
+
+**Dönüş**: `string` — Kategorinin pazarlama başlığı veya alternatif olarak standart ekran adı.
+
+### getCategoryDescription
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### parsePriceToNumber
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\categoryHelpers.ts::getCategoryDisplayName
-- **params**: ["category: DbCategory | null | undefined", "t?: (key: string) => string"]
+### [N1_NASIL] AST Pointer: src/utils/categoryHelpers.ts::getCategoryDisplayName
+- **params**: `category: DbCategory | null | undefined`, `t?: (key: string) => string`
 - **ic_degiskenler**:
-  - `tKey` — kategori için çeviri anahtarı olarak kullanılan, öncelikle `translation_key` değerini, yoksa `slug` değerini alan değişken
-  - `translationPath` — i18n çevirisinde kullanılacak tam yol, oluşturulan tKey'i `common.categoryList.` önekiyle birleştirir
-  - `translated` — i18n çeviri fonksiyonu `t` ile alınan, kategorinin çevrilmiş görünen adı
-- **Dönüş**: string
+  - `tKey` — i18n çevirisi için kullanılacak anahtar değer; önce `category.translation_key`, yoksa `category.slug` kullanılır
+  - `translationPath` — i18n çeviri fonksiyonuna geçirilen tam yolu temsil eden string; `common.categoryList.{tKey}` formatında
+  - `translated` — `t(translationPath)` çağrısının döndürdüğü çeviri sonucu; eğer geçerli bir çeviri varsa kullanılır
+- **Dönüş**: `string` — kategori gösterim adı; sırasıyla çeviriden, `menu_label`'dan veya `name`'den döner
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\categoryHelpers.ts::getCategoryMarketingTitle
-- **params**: ["category: DbCategory | null | undefined"]
+### [N2_NASIL] AST Pointer: src/utils/categoryHelpers.ts::getCategoryMarketingTitle
+- **params**: `category: DbCategory | null | undefined`
 - **ic_degiskenler**: (yok)
-- **Dönüş**: string
+- **Dönüş**: `string` — `category.marketing_title` varsa onu, yoksa `getCategoryDisplayName(category)` sonucunu döner
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\categoryHelpers.ts::getCategoryDescription
-- **params**: ["category: DbCategory | null | undefined"]
+### [N3_NASIL] AST Pointer: src/utils/categoryHelpers.ts::getCategoryDescription
+- **params**: `category: DbCategory | null | undefined`
 - **ic_degiskenler**:
-  - `meta` — kategoriyle ilişkili metadata nesnesi, `hero_description` alanını okumak için kullanılır
-- **Dönüş**: string
+  - `meta` — `category.metadata` değerini tutar; hero açıklaması için kullanılır
+- **Dönüş**: `string` — `meta.hero_description` varsa onu, yoksa `category.description`'ı, o da yoksa boş string döner
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\utils\categoryHelpers.ts::parsePriceToNumber
-- **params**: ["val: unknown"]
+### [N4_NASIL] AST Pointer: src/utils/categoryHelpers.ts::parsePriceToNumber
+- **params**: `val: unknown`
 - **ic_degiskenler**:
-  - `cleaned` — giriş değerinden sayısal olmayan karakterleri temizleyen, virgül ayracını noktaya çeviren standartlaştırılmış fiyat stringi
-  - `parsed` — temizlenmiş fiyat stringinden `parseFloat` ile çıkarılmış ondalıklı sayısal değer
-- **Dönüş**: number
+  - `cleaned` — string değerden rakam, nokta ve virgül dışındaki tüm karakterlerin temizlendiği; virgülün noktaya dönüştürüldüğü intermediate string
+  - `parsed` — `cleaned` string'inin `parseFloat` ile number'a dönüştürülmüş hali
+- **Dönüş**: `number` — `val` number ise aynen, string ise temizlenip parse edilmiş sayı, parse edilemezse `0`, diğer tipler için `0` döner
 
 ---
 

@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\lib\supabase.ts
 skeleton_hash: b896a177a93a8a4e
 entity_hashes:
   overview: 8a47b4c00ad1c0ec
-generated_at: 2026-06-06T21:56:04Z
+generated_at: 2026-06-08T08:57:37Z
 ---
 
 ## Genel Bakış
@@ -46,10 +46,6 @@ Bu modül, Supabase istemcisini conditional (koşullu) olarak başlatmak için t
 
 ---
 
-**Not:** Modülde `supabase` değişkeni bir ternary expression (koşullu ifade) ile başlatıldığı için, eksik ortam değişkeni durumunda istemcinin `null` veya `undefined` olacağı varsayılmaktadır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ---
@@ -62,34 +58,6 @@ Bu modül, Supabase istemcisini conditional (koşullu) olarak başlatmak için t
 ## AST POINTERS
 
 Bu dosyada analiz edilecek **fonksiyon gövdesi bulunmamaktadır**.
-
----
-
-### Dosya Yapısı Özeti
-
-**Kaynak:** `src/lib/supabase.ts`
-
-**İçerik:**
-- 2 adet import statement'ı
-- 1 adet sabit (ternary expression): `supabase`
-- 0 adet fonksiyon gövdesi
-- 0 adet class tanımı
-
----
-
-### Mevcut Tanımlamalar
-
-| Tanım | Tür | Açıklama |
-|-------|-----|----------|
-| `supabaseBrowserClient` | Import | `./supabase/client` modülünden içe aktarılmış, tarayıcı tarafı Supabase istemcisi |
-| `supabaseStaticClient` | Import | `./supabase/static` modülünden içe aktarılmış, statik/SSG tarafı Supabase istemcisi |
-| `supabase` | Sabit (Ternary) | Ortam koşuluna bağlı olarak `supabaseBrowserClient` veya `supabaseStaticClient` değerini alan conditionally assigned client |
-
----
-
-### Sonuç
-
-Bu dosya yalnızca re-export / barrel dosya işlevi görmektedir. `supabase` sabiti bir ternary expression ile ortam değişkenine göre hangi client'ın kullanılacağını belirler. Fonksiyon gövdesi yer almadığından **params, iç değişkenler ve dönüş değeri çıkarımı yapılamamaktadır**.
 
 ---
 
