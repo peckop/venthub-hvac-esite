@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "run font değiştir",
+    "okunabilirlik",
+    "can you execute text styling?",
+    "run okunabilirlik",
+    "text styling",
+    "run text styling",
+    "font değiştir",
+    "execute font değiştir",
+    "help me with font değiştir",
+    "start font değiştir task",
+    "perform font değiştir",
+    "execute okunabilirlik"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

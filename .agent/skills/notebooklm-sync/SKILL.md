@@ -1,8 +1,25 @@
 ---
 name: notebooklm-sync
-description: >
-  Projedeki Markdown (.md) dosyalarını NotebookLM ile otonom olarak senkronize etmek (Hard Reset) için kullanın. TETİKLE: Kullanıcı "NLM'yi güncelle", "Senkronizasyon yap", "docs/ klasörünü eşitle", "Master MD'yi yenile", "NotebookLM'e aktar" dediğinde veya mimari bir dokümantasyon değişikliği sonrası "yenileme" istendiğinde. ASLA TETİKLEME: Kullanıcı NotebookLM'den sadece bir şey arıyorsa, yeni bir defter oluşturuyorsa, sadece bir Google Drive/yerel dosya eklemek istiyorsa veya NotebookLM sesli özet/podcast özelliklerini soruyorsa. Bu komut tüm projeyi sil baştan NotebookLM'e yükler.
+description: Projedeki Markdown (.md) dosyalarını NotebookLM ile senkronize (nlm sync)
+  etmek, defteri güncellemek ve hafızayı yenilemek için kullanılır (Hard Reset). Kullanıcı
+  NotebookLM'de arama yapmak istediğinde ASLA tetiklemeyin. Veritabanı sıfırlama,
+  git işlemleri veya linter çalıştırma amacıyla KULLANMAYIN.
+category: intelligence
+metadata:
+  triggers:
+  - nlm sync
+  - defteri güncelle
+  - hafızayı yenile
+  inputs:
+  - docs/*.md
+  outputs:
+  - synced NotebookLM source
+  recovery:
+    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+  prerequisites:
+  - nlm login
 ---
+
 
 # NotebookLM Otonom Senkronizasyon (NLM Sync)
 

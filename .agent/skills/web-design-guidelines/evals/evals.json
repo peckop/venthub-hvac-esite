@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "can you execute design guidelines check?",
+    "erişilebilirlik denetle",
+    "run a11y check",
+    "can you execute erişilebilirlik denetle?",
+    "a11y check",
+    "run design guidelines check",
+    "run erişilebilirlik denetle",
+    "execute erişilebilirlik denetle",
+    "help me with erişilebilirlik denetle",
+    "start erişilebilirlik denetle task",
+    "perform erişilebilirlik denetle",
+    "execute a11y check"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "can you execute diff review?",
+    "run git diff check",
+    "can you execute commit check?",
+    "commit check",
+    "run diff review",
+    "diff review",
+    "execute diff review",
+    "help me with diff review",
+    "start diff review task",
+    "perform diff review",
+    "run commit check",
+    "execute commit check"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

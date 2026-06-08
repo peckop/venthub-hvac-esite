@@ -1,9 +1,23 @@
 ---
 name: git-commit
-description: 'Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions "/commit". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping'
+description: Executes git commit commands, analyzes changes to generate conventional
+  commit messages, and handles staging. Trigger for commit requests, conventional
+  commits, or the /commit command. Do NOT use for other git operations (like creating
+  a new branch) or general text formatting.
 license: MIT
 allowed-tools: Bash
+category: utils
+metadata:
+  triggers:
+  - commit yap
+  - /commit
+  - conventional commit
+  inputs:
+  - staged changes diff
+  outputs:
+  - formatted git commit message
 ---
+
 
 # Git Commit with Conventional Commits
 

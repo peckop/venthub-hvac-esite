@@ -1,7 +1,22 @@
 ---
 name: multi-agent-research
-description: Reusable worker-judge multi-agent orchestrator for high-quality research, design, and technical verification.
+description: Reusable worker-judge multi-agent orchestrator for high-quality codebase
+  research, architectural analysis, design, and RAG technical verification. Trigger
+  when analyzing the codebase, performing RAG research, or executing architectural
+  reviews. Do NOT use for database resets, formatting, git branching, or running local
+  unit tests.
+category: orchestration
+metadata:
+  triggers:
+  - kod tabanını araştır
+  - mimari analiz
+  - RAG research
+  inputs:
+  - research query
+  outputs:
+  - research_notes.md
 ---
+
 
 # Multi-Agent Research Orchestrator
 
@@ -121,4 +136,3 @@ Use the following curated repositories and NotebookLM digital twins as primary r
    - **Scope:** In-depth documentation on custom MCP servers, agent configurations, commands, and orchestration strategies.
 2. **Antigravity: Yapay Zeka İçin 1400+ Ajan Yeteneği Kütüphanesi** (ID: `fe83b525-4562-461d-b73f-b3f03edc2fa0`):
    - **Scope:** Full dictionary and descriptions of pre-built skill models across all domains.
-

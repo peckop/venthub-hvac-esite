@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "run conventional commit",
+    "run /commit",
+    "/commit",
+    "commit yap",
+    "can you execute conventional commit?",
+    "conventional commit",
+    "run commit yap",
+    "execute commit yap",
+    "help me with commit yap",
+    "start commit yap task",
+    "perform commit yap",
+    "execute /commit"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

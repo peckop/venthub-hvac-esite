@@ -1,7 +1,21 @@
 ---
 name: find-skills
-description: Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.
+description: Helps users search, discover, and install agent skills/capabilities based
+  on queries like "how do I do X" or when they express interest in extending functionality.
+  Do NOT use for general developer tasks like database reset, code formatting, git
+  branch creation, or installing Node.js/tools on the host OS.
+category: intelligence
+metadata:
+  triggers:
+  - skill bul
+  - yetenek ara
+  - how do I do X
+  inputs:
+  - skill query
+  outputs:
+  - recommended skills list
 ---
+
 
 # Find Skills
 

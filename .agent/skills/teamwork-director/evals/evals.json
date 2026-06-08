@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "takıma iş ver",
+    "can you execute takıma iş ver?",
+    "can you execute teamwork-preview?",
+    "can you execute /teamwork-preview?",
+    "teamwork-preview",
+    "sprint başlat",
+    "run takıma iş ver",
+    "execute takıma iş ver",
+    "help me with takıma iş ver",
+    "start takıma iş ver task",
+    "perform takıma iş ver",
+    "run sprint başlat"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

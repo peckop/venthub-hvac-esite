@@ -1,16 +1,33 @@
 ---
 name: lighthouse-performance-guard
-description: Automates page performance tracing, audits code against Vercel & Addy Osmani rules, enforces TDD (Test-First), and coordinates Multi-Agent review to prevent performance regressions.
-when_to_use: >
-  Kullan: Projede yeni bir sayfa eklendiginde, performans düsüsü (Lighthouse regresyonu) yasandiginda veya anasayfa/kritik rotalarda Core Web Vitals metriklerini stabilize etmek istendiginde.
+description: Automates web page performance audits, Lighthouse tracing, and web vitals
+  checks against performance guidelines to prevent regressions. Do NOT use for general
+  database setup, running local unit tests (Vitest), formatting markdown tables, or
+  styling fonts.
+when_to_use: 'Kullan: Projede yeni bir sayfa eklendiginde, performans düsüsü (Lighthouse
+  regresyonu) yasandiginda veya anasayfa/kritik rotalarda Core Web Vitals metriklerini
+  stabilize etmek istendiginde.
+
+  '
 allowed-tools:
-  - call_mcp_tool
-  - run_command
-  - write_to_file
-  - replace_file_content
-  - view_file
-  - grep_search
+- call_mcp_tool
+- run_command
+- write_to_file
+- replace_file_content
+- view_file
+- grep_search
+category: audit
+metadata:
+  triggers:
+  - lighthouse audit
+  - performance check
+  - web vitals check
+  inputs:
+  - local web server page url
+  outputs:
+  - tracing analysis report
 ---
+
 
 # Lighthouse Performance Guard & Optimization Pipeline
 

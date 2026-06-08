@@ -21,7 +21,8 @@
     "mri": "pnpm run knip && pnpm run analyze",
     "clean": "rimraf .next out",
     "postinstall": "pnpm run type-check",
-    "supabase:gen": "npx supabase@latest gen types typescript --project-id tnofewwkwlyjsqgwjjga > src/types/database.types.ts"
+    "supabase:gen": "npx supabase@latest gen types typescript --project-id tnofewwkwlyjsqgwjjga > src/types/database.types.ts",
+    "skills:verify": "python scripts/skills-evaluator.py"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

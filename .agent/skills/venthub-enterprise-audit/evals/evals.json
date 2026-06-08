@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "run sprint delivery check",
+    "10/10 check",
+    "run 10/10 check",
+    "sprint delivery check",
+    "run enterprise audit",
+    "can you execute 10/10 check?",
+    "enterprise audit",
+    "execute enterprise audit",
+    "help me with enterprise audit",
+    "start enterprise audit task",
+    "perform enterprise audit",
+    "execute 10/10 check"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

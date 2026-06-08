@@ -1,7 +1,21 @@
 ---
 name: to-issues
-description: Break a plan, spec, or PRD into independently-grabbable tasks. Use when the user wants to convert a plan into issues or tasks.
+description: Breaks a plan, specification, or PRD into structured issues or tasks.
+  Trigger for creating issues (issue oluştur), dividing plans (planı böl), or tasks
+  to issues. Do NOT use for general git operations, styling fonts, or running unit
+  tests.
+category: utils
+metadata:
+  triggers:
+  - issue oluştur
+  - planı böl
+  - tasks to issues
+  inputs:
+  - approved implementation plan
+  outputs:
+  - structured issues list
 ---
+
 
 # To Issues
 

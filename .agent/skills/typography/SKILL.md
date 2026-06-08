@@ -1,7 +1,21 @@
 ---
 name: typography
-description: Apply professional typography principles to create readable, hierarchical, and aesthetically refined interfaces. Use when setting type scales, choosing fonts, adjusting spacing, designing text-heavy layouts, implementing dark mode typography, or when asked about readability, font pairing, line height, measure, typographic hierarchy, variable fonts, font loading, or OpenType features.
+description: Applies typography principles for fonts, readability, text styling, type
+  scales, and line spacing. Trigger for font modification (font değiştir), readability
+  (okunabilirlik), or text styling. Do NOT use for general git operations, running
+  unit tests, or database resets.
+category: guards
+metadata:
+  triggers:
+  - font değiştir
+  - okunabilirlik
+  - text styling
+  inputs:
+  - typography requirements
+  outputs:
+  - type scale rules
 ---
+
 
 # Typography
 

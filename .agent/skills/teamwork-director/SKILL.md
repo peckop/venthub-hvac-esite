@@ -1,13 +1,23 @@
 ---
 name: teamwork-director
-description: >
-  Teamwork-preview prompt hazırlama yöneticisi. Projenin kalite seviyesini
-  (project-dna.yaml) okur, kullanıcının geliştirme talebini proje standartlarıyla
-  harmanlar ve zenginleştirilmiş prompt oluşturarak takıma delege eder.
-  Kullanıcı "takıma iş ver", "teamwork ile geliştir", "sprint başlat",
-  "/teamwork-preview" kullanmak istediğinde veya büyük bir geliştirme görevini
-  ajan takımına delege etmek istediğinde tetiklenir.
+description: Teamwork-preview prompt hazırlama yöneticisi. "takıma iş ver", "sprint
+  başlat", "/teamwork-preview" veya teamwork-preview istendiğinde zenginleştirilmiş
+  prompt hazırlar ve takıma delege eder. Veritabanı sıfırlama, git branch oluşturma,
+  birim testi çalıştırma veya metin formatlama durumlarında KULLANMAYIN.
+category: orchestration
+metadata:
+  triggers:
+  - takıma iş ver
+  - sprint başlat
+  - /teamwork-preview
+  - teamwork-preview
+  inputs:
+  - project-dna.yaml
+  - user request
+  outputs:
+  - prompt_draft.md
 ---
+
 
 # teamwork-director
 

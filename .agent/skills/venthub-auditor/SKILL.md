@@ -1,7 +1,20 @@
 ---
 name: venthub-auditor
-description: VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, Next.js 15/React 19 uyumu, tip güvenliği, robotik temizlik denetimi YANISIRA Kritik Varlık korumalarını üstlenir.
+description: VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, pre-commit kontrolleri,
+  bütünlük denetimi (bütünlük denetle) ve integrity check gerçekleştirir. Birim testlerini
+  çalıştırmak (Vitest), git branch oluşturmak veya veritabanı sıfırlamak için KULLANMAYIN.
+category: audit
+metadata:
+  triggers:
+  - integrity check
+  - bütünlük denetle
+  - pre-commit check
+  inputs:
+  - working directory state
+  outputs:
+  - integrity verification status
 ---
+
 
 ## 🛫 Prerequisites (Ön Koşul Kontrolü)
 

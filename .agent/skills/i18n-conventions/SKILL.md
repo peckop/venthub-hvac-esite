@@ -1,7 +1,23 @@
 ---
 name: i18n-conventions
-description: Defines internationalization patterns for VentHub. Use when adding new text, labels, or messages to the application.
+description: Defines internationalization (i18n) conventions for VentHub. Use when
+  translating text, updating dictionary files, adding/modifying JSX labels, or performing
+  i18n dictionary updates. Do NOT use for styling fonts, database operations, or running
+  test suites.
+category: guards
+metadata:
+  triggers:
+  - metin ekle
+  - çeviri yap
+  - i18n
+  - dictionary update
+  inputs:
+  - JSX text string
+  outputs:
+  - tr.ts / en.ts updates
+  - Routes usage
 ---
+
 
 # i18n Conventions Skill
 

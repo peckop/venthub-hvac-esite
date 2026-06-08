@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "can you execute component refactor?",
+    "run component refactor",
+    "component refactor",
+    "compound component design",
+    "can you execute compound component design?",
+    "run compound component design",
+    "execute component refactor",
+    "help me with component refactor",
+    "start component refactor task",
+    "perform component refactor",
+    "execute compound component design",
+    "help me with compound component design"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

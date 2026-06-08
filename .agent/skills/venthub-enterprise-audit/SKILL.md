@@ -1,10 +1,21 @@
 ---
 name: venthub-enterprise-audit
-description: >
-  Proje teslimi öncesi "10/10 Onay" denetim motoru.
-  11 katmanlı gerçek terminal kanıtına dayalı denetim yapar.
-  Deep MRI kapsamını da içerir (L11). Röntgen gibi PASS/BLOCKED karar verir.
+description: 'Proje teslimi öncesi "10/10 Onay" denetim motorudur. L1-L12 adımlarını
+  çalıştırıp PASS/FAIL raporu üretir. Tetikleyicileri: enterprise audit, 10/10 check,
+  sprint delivery check. Genel linter denetimi, veritabanı sıfırlama veya git işlemleri
+  için KULLANMAYIN.'
+category: audit
+metadata:
+  triggers:
+  - enterprise audit
+  - 10/10 check
+  - sprint delivery check
+  inputs:
+  - final codebase state
+  outputs:
+  - L1-L12 pass/fail report
 ---
+
 
 # VentHub Enterprise Audit Skill (v1.1)
 

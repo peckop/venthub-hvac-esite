@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "run renk seç",
+    "run style fix",
+    "tasarım yap",
+    "can you execute style fix?",
+    "style fix",
+    "Tailwind styling",
+    "run tasarım yap",
+    "execute tasarım yap",
+    "help me with tasarım yap",
+    "start tasarım yap task",
+    "perform tasarım yap",
+    "renk seç"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

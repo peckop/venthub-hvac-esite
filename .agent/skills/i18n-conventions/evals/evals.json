@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "run dictionary update",
+    "çeviri yap",
+    "i18n",
+    "can you execute metin ekle?",
+    "dictionary update",
+    "metin ekle",
+    "run metin ekle",
+    "execute metin ekle",
+    "help me with metin ekle",
+    "start metin ekle task",
+    "perform metin ekle",
+    "run çeviri yap"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

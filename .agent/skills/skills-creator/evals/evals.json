@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "yeni skill oluştur",
+    "yetenek ekle",
+    "skill yarat",
+    "yetenek oluştur",
+    "skill optimize et",
+    "run skills-creator",
+    "run yeni skill oluştur",
+    "execute yeni skill oluştur",
+    "help me with yeni skill oluştur",
+    "start yeni skill oluştur task",
+    "perform yeni skill oluştur",
+    "run skill yarat"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "run vitest tests",
+    "change typography settings",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

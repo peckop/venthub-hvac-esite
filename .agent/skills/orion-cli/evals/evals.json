@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "tree oluştur",
+    "run tree oluştur",
+    "can you execute doküman üret?",
+    "can you execute tree oluştur?",
+    "run doküman üret",
+    "run orion doc",
+    "orion doc",
+    "execute orion doc",
+    "help me with orion doc",
+    "start orion doc task",
+    "perform orion doc",
+    "doküman üret"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

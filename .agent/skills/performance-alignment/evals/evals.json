@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "can you execute performans planı?",
+    "run RAG performance alignment",
+    "RAG performance alignment",
+    "can you execute RAG performance alignment?",
+    "run performans planı",
+    "performans planı",
+    "execute performans planı",
+    "help me with performans planı",
+    "start performans planı task",
+    "perform performans planı",
+    "execute RAG performance alignment",
+    "help me with RAG performance alignment"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

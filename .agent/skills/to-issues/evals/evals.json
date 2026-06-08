@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "run planı böl",
+    "planı böl",
+    "tasks to issues",
+    "can you execute tasks to issues?",
+    "run issue oluştur",
+    "issue oluştur",
+    "execute issue oluştur",
+    "help me with issue oluştur",
+    "start issue oluştur task",
+    "perform issue oluştur",
+    "execute planı böl",
+    "help me with planı böl"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

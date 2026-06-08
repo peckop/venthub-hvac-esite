@@ -1,11 +1,23 @@
 ---
 name: web-design-guidelines
-description: Review UI code for Web Interface Guidelines compliance. Use when asked to "review my UI", "check accessibility", "audit design", "review UX", or "check my site against best practices".
+description: Reviews UI code for Web Interface Guidelines and design compliance. Trigger
+  for accessibility checks (erişilebilirlik denetle, a11y check), or design guidelines
+  checks. Do NOT use for git commands, styling fonts, or running unit tests.
 metadata:
   author: vercel
-  version: "1.0.0"
+  version: 1.0.0
   argument-hint: <file-or-pattern>
+  triggers:
+  - erişilebilirlik denetle
+  - a11y check
+  - design guidelines check
+  inputs:
+  - UI code files
+  outputs:
+  - a11y compliance report
+category: guards
 ---
+
 
 # Web Interface Guidelines
 

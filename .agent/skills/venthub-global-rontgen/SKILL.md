@@ -1,7 +1,21 @@
 ---
 name: venthub-global-rontgen
-description: Proje genelini veya büyük modülleri tepeden tırnağa Fiziki (Terminal) Radar ve Komutlarla test eder. Hallucination/Mental taramayı KESİN OLARAK yasaklayan, salt JSON kanıta dayanan Production Kalkanıdır.
+description: 'Proje genelini radar ve rontgen komutlarıyla fiziki olarak tarar. Tetikleyicileri:
+  rontgen, radar, global scan, linter check. Veritabanı sıfırlama, genel git işlemleri
+  veya sadece birim testleri çalıştırmak amacıyla KULLANMAYIN.'
+category: audit
+metadata:
+  triggers:
+  - rontgen
+  - radar
+  - global scan
+  - linter check
+  inputs:
+  - project codebase
+  outputs:
+  - rontgen-template.json log analysis
 ---
+
 
 # VentHub Global Röntgen & Review Skill (ZORUNLU JSON EDİSYONU)
 

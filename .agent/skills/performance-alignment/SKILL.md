@@ -1,14 +1,30 @@
 ---
 name: performance-alignment
-description: Coordinates collaborative, multi-turn RAG analysis with NotebookLM and the user to diagnose and plan performance optimizations without assumptions.
-when_to_use: >
-  Kullan: Projede performans düsüslügü, optimizasyon ihtiyaci veya karmasik mimari kararlar verileceginde NotebookLM defterleri ile kullanici arasinda kontrollü, karsilastirmali ve çift sorgulu analiz yapmak istendiginde.
+description: Coordinates collaborative, multi-turn RAG analysis with NotebookLM to
+  diagnose and create performance alignment plans or performance trace analysis. Trigger
+  for performance plans and RAG performance alignment queries. Do NOT use for general
+  database reset, git commands, or typography styling.
+when_to_use: 'Kullan: Projede performans düsüslügü, optimizasyon ihtiyaci veya karmasik
+  mimari kararlar verileceginde NotebookLM defterleri ile kullanici arasinda kontrollü,
+  karsilastirmali ve çift sorgulu analiz yapmak istendiginde.
+
+  '
 allowed-tools:
-  - call_mcp_tool
-  - write_to_file
-  - view_file
-  - run_command
+- call_mcp_tool
+- write_to_file
+- view_file
+- run_command
+category: audit
+metadata:
+  triggers:
+  - performans planı
+  - RAG performance alignment
+  inputs:
+  - performance trace logs
+  outputs:
+  - performance alignment plan
 ---
+
 
 # Performance Alignment & Diagnosis Skill
 

@@ -1,12 +1,25 @@
 ---
 name: fallow
-description: Codebase intelligence for JavaScript and TypeScript. Free static layer reports quality, changed-code risk, cleanup opportunities (unused files, exports, types, dependencies), code duplication, circular dependencies, complexity hotspots, architecture boundary violations, feature flag patterns, and opt-in security candidates. Runtime coverage merges production execution data into the same health report for hot-path review, cold-path deletion confidence, and stale-flag evidence, with a single local capture available by default and continuous/cloud runtime monitoring available as an optional mode. 118 framework plugins, zero configuration, sub-second static analysis. Use when asked to analyze code health, audit PR risk, find cleanup opportunities or unused code, detect duplicates, check circular dependencies, audit complexity, check architecture boundaries, detect feature flags, surface security candidates, clean up the codebase, auto-fix issues, merge runtime coverage, or run fallow.
+description: Codebase intelligence for JS/TS. Reports quality, dead-code, unused dependencies,
+  circular dependencies, duplication, and complexity. Use when running fallow, dead-code
+  checks, or unused dependency analysis. Do NOT use for database operations, environment
+  installations, or general text/git/font formatting tasks.
 license: MIT
 metadata:
   author: Bart Waardenburg
   version: 1.0.0
   homepage: https://docs.fallow.tools
+  triggers:
+  - fallow run
+  - dead-code check
+  - unused dependencies check
+  inputs:
+  - source files graph
+  outputs:
+  - fallow health output report
+category: audit
 ---
+
 
 # Fallow: codebase intelligence for JavaScript and TypeScript
 

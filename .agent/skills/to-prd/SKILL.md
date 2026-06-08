@@ -1,7 +1,21 @@
 ---
 name: to-prd
-description: Turn the current conversation context into a PRD. Use when the user wants to create a PRD from the current context.
+description: Turns the current conversation transcript or context into a structured
+  PRD (Product Requirements Document). Trigger for generating a PRD (prd üret, prd
+  oluştur, chat to prd). Do NOT use for git commands, styling fonts, running unit
+  tests, or database resets.
+category: utils
+metadata:
+  triggers:
+  - prd üret
+  - prd oluştur
+  - chat to prd
+  inputs:
+  - conversation transcript
+  outputs:
+  - product requirements document
 ---
+
 
 # To PRD
 

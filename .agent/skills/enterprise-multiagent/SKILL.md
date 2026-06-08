@@ -1,17 +1,36 @@
 ---
 name: enterprise-multiagent
-description: Orchestrates specialized worker-judge multi-agent teams for VentHub HVAC developments complying with strict quality baselines
-when_to_use: >
-  Kullan: Multi-agent ekibi kurarak enterprise seviyede is dagilimi yapilmak istendiginde, planlama ve kodlama calismalarinda bagimsiz denetim gerektiginde. Ornekler: 'Ajan takimi kur', 'Multi-agent gorev dagilimi yap', 'Ajanlari organize et', 'Enterprise ekibi cagir'.
+description: Orchestrates specialized worker-judge multi-agent teams for VentHub HVAC
+  developments complying with strict quality baselines. Trigger when delegating tasks,
+  starting a sprint, or managing multi-agent runs. Do NOT use for database resets,
+  general git branch creation, text formatting, or running unit tests directly.
+when_to_use: 'Kullan: Multi-agent ekibi kurarak enterprise seviyede is dagilimi yapilmak
+  istendiginde, planlama ve kodlama calismalarinda bagimsiz denetim gerektiginde.
+  Ornekler: ''Ajan takimi kur'', ''Multi-agent gorev dagilimi yap'', ''Ajanlari organize
+  et'', ''Enterprise ekibi cagir''.
+
+  '
 allowed-tools:
-  - define_subagent
-  - invoke_subagent
-  - send_message
-  - manage_subagents
-  - run_command
-  - write_to_file
-  - view_file
+- define_subagent
+- invoke_subagent
+- send_message
+- manage_subagents
+- run_command
+- write_to_file
+- view_file
+category: orchestration
+metadata:
+  triggers:
+  - delegasyon
+  - multi-agent run
+  - sprint start
+  inputs:
+  - prompt_draft.md
+  outputs:
+  - code changes
+  - review verdict
 ---
+
 
 # Enterprise Multi-Agent Orchestration Skill (VentHub HVAC)
 

@@ -1,10 +1,23 @@
 ---
 name: supabase
-description: "Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector)."
+description: Use when doing tasks involving Supabase products, client libraries, database
+  client, writing services (servis yaz), or database queries (db query). Do NOT use
+  for styling fonts, creating git branches, running unit tests, or formatting markdown
+  tables.
 metadata:
   author: supabase
-  version: "0.1.2"
+  version: 0.1.2
+  triggers:
+  - supabase client
+  - servis yaz
+  - db query
+  inputs:
+  - service code structure
+  outputs:
+  - DI-compliant supabase client usages
+category: guards
 ---
+
 
 # Supabase
 

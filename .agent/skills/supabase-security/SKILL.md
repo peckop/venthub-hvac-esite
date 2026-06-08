@@ -1,7 +1,23 @@
 ---
 name: supabase-security
-description: Defines RLS policies, migration patterns, and security best practices for VentHub Supabase. Use when writing SQL, creating policies, or modifying database schema.
+description: Defines RLS policies, database migrations (migration yaz), policies (policy
+  oluştur), and security redirection middleware (middleware redirect). Do NOT use
+  for font/typography adjustments, creating git branches, running unit tests, or general
+  text formatting.
+category: guards
+metadata:
+  triggers:
+  - migration yaz
+  - policy oluştur
+  - RLS
+  - middleware redirect
+  inputs:
+  - database schema change requests
+  outputs:
+  - idempotent SQL migrations
+  - JWT claims validation code
 ---
+
 
 ## 🛫 Prerequisites (Ön Koşul Kontrolü)
 

@@ -1,14 +1,29 @@
 ---
 name: venthub-catalog-importer
-description: Ingests and validates HVAC catalog PDFs using an autonomous Visual Multi-Agent Team.
-when_to_use: >
-  Kullan: 'ingest a PDF catalog', 'process Vortice catalogs', 'run visual multi-agent team', 'extract specifications from PDF'.
+description: Ingests and validates HVAC catalog PDFs. Trigger for importing catalogs
+  (katalog oku), scanning PDFs (pdf scan), and HVAC catalog imports. Do NOT use for
+  running unit tests, creating git branches, or database resets.
+when_to_use: 'Kullan: ''ingest a PDF catalog'', ''process Vortice catalogs'', ''run
+  visual multi-agent team'', ''extract specifications from PDF''.
+
+  '
 allowed-tools:
-  - run_command
-  - view_file
-  - write_to_file
-  - replace_file_content
+- run_command
+- view_file
+- write_to_file
+- replace_file_content
+category: audit
+metadata:
+  triggers:
+  - katalog oku
+  - pdf scan
+  - hvac catalog import
+  inputs:
+  - catalog pdf files
+  outputs:
+  - validated catalog data JSON
 ---
+
 
 # VentHub Otonom PDF Görsel Ajan Hattı (Visual Multi-Agent Ingestion Pipeline)
 

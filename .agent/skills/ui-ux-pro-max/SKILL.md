@@ -1,7 +1,24 @@
 ---
 name: ui-ux-pro-max
-description: UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks.
+description: Provides UI/UX design recommendations, Tailwind styling, HSL colors,
+  design patterns, and palettes. Trigger for UI design (tasarım yap), color selection
+  (renk seç), styling fixes (style fix), and Tailwind styling. Do NOT use for git
+  branch creation, running unit tests, or database resets.
+category: guards
+metadata:
+  triggers:
+  - tasarım yap
+  - renk seç
+  - style fix
+  - Tailwind styling
+  inputs:
+  - design query
+  outputs:
+  - HSL css token definitions
+  - standard tailwind class recommendations
 ---
+
+
 # ui-ux-pro-max
 
 Comprehensive design guide for web and mobile applications. Contains 67 styles, 96 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 13 technology stacks. Searchable database with priority-based recommendations.

@@ -1,7 +1,21 @@
 ---
 name: diff-review
-description: Statik Git diff analizi yoluyla yıkıcı pattern'leri tespit eder.
+description: Git diff çıktılarını analiz ederek yıkıcı ve tehlikeli kod örüntülerini
+  (pattern) tespit eder. Sadece kod değişikliklerini (git diff veya commit öncesi)
+  incelemek için kullanın. Yeni git branch'i oluşturma, kod commit'leme veya genel
+  git işlemleri için KULLANMAYIN.
+category: audit
+metadata:
+  triggers:
+  - diff review
+  - commit check
+  - git diff check
+  inputs:
+  - git diff output
+  outputs:
+  - checks verdict (pass/fail)
 ---
+
 
 # Diff-Review Skill (Değişiklik Güvenliği Kontrolü)
 
@@ -34,4 +48,3 @@ const foo: any = parseUnknownData(); // diff-ignore: Dış API'den gelen veriye 
 6. **Mock data sızıntısı:** app/ path'lerinde inline object array kalıntıları (geçici test verisi).
 7. **Secret sızıntısı (service_role):** Supabase service_role anahtarının client bundle'a sızması.
 8. **useSearchParams Suspense İhlali:** Git diff'te yeni eklenen veya değiştirilen bir dosyada `useSearchParams` hook'unun kullanıldığı, ancak dosya içerisinde `<Suspense>` sarmalının veya wrapper'ının yer almadığı durumlar riskli kabul edilerek uyarılır.
-

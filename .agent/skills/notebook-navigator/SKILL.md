@@ -1,14 +1,23 @@
 ---
 name: notebook-navigator
-description: >
-  Triggers when the user asks a conceptual, architectural, or research question
-  that requires deep external knowledge, reference to past documentation,
-  guidelines on RAG/Memory, or queries about specific domains
-  (like 3D rendering, DevOps, React/Next.js, Supabase, or Vortice product catalogs).
-  Use this skill to identify the correct NotebookLM notebook ID and perform queries.
-  DO NOT use this skill for simple local code edits.
-  DO USE this skill when you need a "second brain" or technical research guidance.
+description: Use this skill to identify NotebookLM IDs and execute conceptual, architectural,
+  RAG, or research queries requiring deep external domain knowledge. DO NOT use for
+  local code changes, unit testing, git branching, formatting markdown tables, or
+  styling fonts.
+category: intelligence
+metadata:
+  triggers:
+  - notebooklm query
+  - ikizden sorgula
+  - RAG query
+  inputs:
+  - query string
+  outputs:
+  - rag response text
+  recovery:
+    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
 ---
+
 
 # NotebookLM Navigator (Ajanlar İçin Referans Rehberi)
 

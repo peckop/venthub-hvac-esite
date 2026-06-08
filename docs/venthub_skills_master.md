@@ -7,7 +7,7 @@ Generated automatically from local modular skills under `.agent/skills/`.
 ---
 
 ## 1. Yetenek: diff-review
-> **Açıklama:** Statik Git diff analizi yoluyla yıkıcı pattern'leri tespit eder.
+> **Açıklama:** Git diff çıktılarını analiz ederek yıkıcı ve tehlikeli kod örüntülerini (pattern) tespit eder. Sadece kod değişikliklerini (git diff veya commit öncesi) incelemek için kullanın. Yeni git branch'i oluşturma, kod commit'leme veya genel git işlemleri için KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/diff-review/`
 
@@ -46,7 +46,7 @@ const foo: any = parseUnknownData(); // diff-ignore: Dış API'den gelen veriye 
 ---
 
 ## 2. Yetenek: enterprise-multiagent
-> **Açıklama:** Orchestrates specialized worker-judge multi-agent teams for VentHub HVAC developments complying with strict quality baselines
+> **Açıklama:** Orchestrates specialized worker-judge multi-agent teams for VentHub HVAC developments complying with strict quality baselines. Trigger when delegating tasks, starting a sprint, or managing multi-agent runs. Do NOT use for database resets, general git branch creation, text formatting, or running unit tests directly.
 
 **Klasör Yolu:** `.agent/skills/enterprise-multiagent/`
 
@@ -215,7 +215,7 @@ Hiçbir kod değişikliği aşağıdaki kapılardan geçmeden canlıya alınamaz
 ---
 
 ## 3. Yetenek: fallow
-> **Açıklama:** Codebase intelligence for JavaScript and TypeScript. Free static layer reports quality, changed-code risk, cleanup opportunities (unused files, exports, types, dependencies), code duplication, circular dependencies, complexity hotspots, architecture boundary violations, feature flag patterns, and opt-in security candidates. Runtime coverage merges production execution data into the same health report for hot-path review, cold-path deletion confidence, and stale-flag evidence, with a single local capture available by default and continuous/cloud runtime monitoring available as an optional mode. 118 framework plugins, zero configuration, sub-second static analysis. Use when asked to analyze code health, audit PR risk, find cleanup opportunities or unused code, detect duplicates, check circular dependencies, audit complexity, check architecture boundaries, detect feature flags, surface security candidates, clean up the codebase, auto-fix issues, merge runtime coverage, or run fallow.
+> **Açıklama:** Codebase intelligence for JS/TS. Reports quality, dead-code, unused dependencies, circular dependencies, duplication, and complexity. Use when running fallow, dead-code checks, or unused dependency analysis. Do NOT use for database operations, environment installations, or general text/git/font formatting tasks.
 
 **Klasör Yolu:** `.agent/skills/fallow/`
 
@@ -324,7 +324,7 @@ cargo install fallow-cli        # build from source
 ---
 
 ## 4. Yetenek: find-skills
-> **Açıklama:** Helps users discover and install agent skills when they ask questions like "how do I do X", "find a skill for X", "is there a skill that can...", or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.
+> **Açıklama:** Helps users search, discover, and install agent skills/capabilities based on queries like "how do I do X" or when they express interest in extending functionality. Do NOT use for general developer tasks like database reset, code formatting, git branch creation, or installing Node.js/tools on the host OS.
 
 **Klasör Yolu:** `.agent/skills/find-skills/`
 
@@ -469,7 +469,7 @@ npx skills init my-xyz-skill
 ---
 
 ## 5. Yetenek: git-commit
-> **Açıklama:** Execute git commit with conventional commit message analysis, intelligent staging, and message generation. Use when user asks to commit changes, create a git commit, or mentions "/commit". Supports: (1) Auto-detecting type and scope from changes, (2) Generating conventional commit messages from diff, (3) Interactive commit with optional type/scope/description overrides, (4) Intelligent file staging for logical grouping
+> **Açıklama:** Executes git commit commands, analyzes changes to generate conventional commit messages, and handles staging. Trigger for commit requests, conventional commits, or the /commit command. Do NOT use for other git operations (like creating a new branch) or general text formatting.
 
 **Klasör Yolu:** `.agent/skills/git-commit/`
 
@@ -594,7 +594,7 @@ EOF
 ---
 
 ## 6. Yetenek: i18n-conventions
-> **Açıklama:** Defines internationalization patterns for VentHub. Use when adding new text, labels, or messages to the application.
+> **Açıklama:** Defines internationalization (i18n) conventions for VentHub. Use when translating text, updating dictionary files, adding/modifying JSX labels, or performing i18n dictionary updates. Do NOT use for styling fonts, database operations, or running test suites.
 
 **Klasör Yolu:** `.agent/skills/i18n-conventions/`
 
@@ -781,7 +781,7 @@ VentHub projesi enterprise seviyesinde dil güvenliğini sağlamak için şu iki
 ---
 
 ## 7. Yetenek: lighthouse-performance-guard
-> **Açıklama:** Automates page performance tracing, audits code against Vercel & Addy Osmani rules, enforces TDD (Test-First), and coordinates Multi-Agent review to prevent performance regressions.
+> **Açıklama:** Automates web page performance audits, Lighthouse tracing, and web vitals checks against performance guidelines to prevent regressions. Do NOT use for general database setup, running local unit tests (Vitest), formatting markdown tables, or styling fonts.
 
 **Klasör Yolu:** `.agent/skills/lighthouse-performance-guard/`
 
@@ -849,7 +849,7 @@ Kritik sayfa rotalarında (Anasayfa, Ürün Detay, Sepet vb.) Lighthouse Perform
 ---
 
 ## 8. Yetenek: multi-agent-research
-> **Açıklama:** Reusable worker-judge multi-agent orchestrator for high-quality research, design, and technical verification.
+> **Açıklama:** Reusable worker-judge multi-agent orchestrator for high-quality codebase research, architectural analysis, design, and RAG technical verification. Trigger when analyzing the codebase, performing RAG research, or executing architectural reviews. Do NOT use for database resets, formatting, git branching, or running local unit tests.
 
 **Klasör Yolu:** `.agent/skills/multi-agent-research/`
 
@@ -975,7 +975,7 @@ Use the following curated repositories and NotebookLM digital twins as primary r
 ---
 
 ## 9. Yetenek: notebook-navigator
-> **Açıklama:** >
+> **Açıklama:** Use this skill to identify NotebookLM IDs and execute conceptual, architectural, RAG, or research queries requiring deep external domain knowledge. DO NOT use for local code changes, unit testing, git branching, formatting markdown tables, or styling fonts.
 
 **Klasör Yolu:** `.agent/skills/notebook-navigator/`
 
@@ -1096,7 +1096,7 @@ NotebookLM sadece statik bir doküman arşivi değil, kod tabanının ve mimarin
 ---
 
 ## 10. Yetenek: notebooklm-sync
-> **Açıklama:** >
+> **Açıklama:** Projedeki Markdown (.md) dosyalarını NotebookLM ile senkronize (nlm sync) etmek, defteri güncellemek ve hafızayı yenilemek için kullanılır (Hard Reset). Kullanıcı NotebookLM'de arama yapmak istediğinde ASLA tetiklemeyin. Veritabanı sıfırlama, git işlemleri veya linter çalıştırma amacıyla KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/notebooklm-sync/`
 
@@ -1248,7 +1248,7 @@ Eğer `cc doc batch` rate limit'e takılırsa:
 ---
 
 ## 11. Yetenek: orion-cli
-> **Açıklama:** >
+> **Açıklama:** Orion CLI dokümantasyon pipeline komutlarını öğretir, tree veya şema üretir. "doküman üret", "orion doc", veya "tree oluştur" istendiğinde tetikleyin. Kullanıcı sadece kod yazmak, debug yapmak, test çalıştırmak veya veritabanı/git işlemleri yapmak istediğinde ASLA tetiklemeyin.
 
 **Klasör Yolu:** `.agent/skills/orion-cli/`
 
@@ -1455,7 +1455,7 @@ orion memory synapse     ← ÖN KOŞUL: orion memory search
 ---
 
 ## 12. Yetenek: performance-alignment
-> **Açıklama:** Coordinates collaborative, multi-turn RAG analysis with NotebookLM and the user to diagnose and plan performance optimizations without assumptions.
+> **Açıklama:** Coordinates collaborative, multi-turn RAG analysis with NotebookLM to diagnose and create performance alignment plans or performance trace analysis. Trigger for performance plans and RAG performance alignment queries. Do NOT use for general database reset, git commands, or typography styling.
 
 **Klasör Yolu:** `.agent/skills/performance-alignment/`
 
@@ -1502,8 +1502,98 @@ Bu skill, VentHub HVAC projesinde veya herhangi bir enterprise yazılım projesi
 
 ---
 
-## 13. Yetenek: supabase
-> **Açıklama:** Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector).
+## 13. Yetenek: skills-creator
+> **Açıklama:** Automatically creates, updates, and optimizes modular agent skills. Trigger for creating new skills (yeni skill oluştur, skill yarat/optimize et), adding capabilities (yetenek ekle/oluştur), or compiling the manifest. Do NOT use for database operations, font formatting, or running general unit tests.
+
+**Klasör Yolu:** `.agent/skills/skills-creator/`
+
+## 🛫 Prerequisites (Ön Koşul Kontrolü)
+
+Bu skill'i kullanmadan önce aşağıdaki adımları sırayla doğrula:
+
+1. **İsim Formatı:** Oluşturulacak yetenek adı kebab-case (küçük harf, rakam ve tire) olmalıdır (Örn: `supabase-security`).
+2. **Kategori Seçimi:** Yetenek şu kategorilerden birine ait olmalıdır: `orchestration`, `intelligence`, `guards`, `audit`, `utils`.
+3. **Validasyon Komutu:** Yeteneğin doğruluğunu yerel olarak test edecek bir komut (Örn: `pnpm run test` veya bir doğrulama betiği) belirlenmiş olmalıdır.
+
+---
+
+# Yetenek Oluşturma ve Optimizasyon Protokolü
+
+Bu yetenek, VentHub HVAC projesinde yeni modüler yetenekler tanımlarken ve mevcut yetenekleri optimize ederken izlenmesi gereken kuralları ve adımları belirler.
+
+## Yetenek Geliştirme Yaşam Döngüsü (Life Cycle)
+
+```mermaid
+graph TD
+    A[Girdi ve Kapsam Analizi] --> B[Scaffold & Taslak Oluşturma]
+    B --> C[Evals Sorgularını Hazırlama]
+    C --> D[Subagent ile Semantik Optimizasyon Döngüsü]
+    D --> E[Derleme & Manifest Güncelleme]
+    E --> F[Yerel Validasyon Kapısı]
+    F --> G[NotebookLM Senkronizasyonu]
+```
+
+---
+
+## 🛠️ Adım Adım İşlem Rehberi
+
+### Adım 1: Taslak Oluşturma (Scaffolding)
+Yerel şablonlama CLI aracını kullanarak yetenek klasörünü ve temel dosyalarını oluştur:
+```bash
+python scripts/skills-creator.py --name <yetenek-adi> --description "<aciklama>" --category <kategori>
+```
+Bu komut `.agent/skills/<yetenek-adi>/` dizinini, `SKILL.md` şablonunu ve varsayılan `evals/evals.json` dosyasını oluşturacaktır.
+
+### Adım 2: Evals Sorgularını Hazırlama (12/8 Train/Test Split Kuralı)
+Açıklamanın belirli kelimelere aşırı uyum sağlamasını (overfitting) engellemek için `evals/evals.json` dosyasında **toplam en az 20 adet** test sorgusu tanımla ve bunları 12/8 oranında ayır:
+- **12 Eğitim (Train) Sorgusu (%60):** Optimizasyon döngüsü esnasında ajanın açıklamayı revize etmesi için kullanılır (Örn: 8 `should_trigger`, 4 `should_not_trigger`).
+- **8 Test (Held-Out Validation) Sorgusu (%40):** Ajanın açıklamayı ezberlemediğini (memorization) ve genelleme yapabildiğini doğrulamak için döngü dışında tutulur (Örn: 4 `should_trigger`, 4 `should_not_trigger`).
+
+### Adım 3: Subagent ile Otonom Açıklama Optimizasyonu (Train/Test Feedback Loop)
+Açıklamanın doğruluğunu dinamik olarak test etmek ve aşırı uyumu önlemek için `stable_skill_optimizer_subagent` subagent'ını kullan:
+1. **Subagent Tanımı:**
+   - **Name:** `stable_skill_optimizer_subagent`
+   - **Role:** `Stable Skill Optimizer Worker`
+   - **Prompt:** `Optimize the '<yetenek-adi>' skill description using the 12/8 Train/Test Split Rule. Perform iterative updates on the 12 training queries until 100% accuracy, then run a held-out evaluation on the 8 testing queries to verify generalization.`
+
+2. **Döngü İşleyişi:** Subagent, açıklamayı 12 eğitim sorgusuyla optimize eder; eğitim tamamlanınca açıklamayı 8 held-out test sorgusuyla test eder. Başarılı olursa (genelleme doğrulanırsa) `SKILL.md` güncellenir ve eklenti derlenir.
+
+### Adım 4: Derleme ve Güncelleme (Compilation)
+Değişikliklerin eklenti manifestosuna yazılması için derleyiciyi çalıştır:
+```bash
+python scratch/compile_skills.py
+```
+Bu işlem `.agent/plugins/venthub-core/manifest.yaml` ve `docs/venthub_skills_master.md` dosyalarını günceller.
+
+### Adım 5: Yerel Kalite Kapısı (Local Validation Gate)
+Sistemdeki tüm yetenekleri çakışma, semantik benzerlik ve kapsam testlerinden geçirmek için değerlendiriciyi çalıştır:
+```bash
+python scripts/skills-evaluator.py
+```
+PR ve CI/CD süreçlerinde kalite kapısı olarak entegre edilmiş pnpm betiğini de kullanabilirsin:
+```bash
+pnpm run skills:verify
+```
+Hata (`Errors > 0`) durumunda çakışan veya eksik trigger'ları kontrol et; semantik çakışma uyarılarını incele ve optimizasyon döngüsünü tekrarla.
+
+### Adım 6: Dijital İkiz Senkronizasyonu (NotebookLM Sync)
+Derlenen master yetenek kümesini Google NotebookLM'e aktar:
+```bash
+orion doc tree --nlm-sync --force-sync
+```
+
+---
+
+## ⚠️ Kritik Kurallar ve Çakışma Yönetimi
+- **Eşsiz Tetikleyiciler:** İki farklı yetenek aynı `trigger` kelimesine sahip olamaz. `skills-evaluator.py` bunu engeller.
+- **Semantik Çakışma ve Benzerlik Kontrolü:** İki yeteneğin açıklamaları (`description`) arasındaki kelime benzerliği (Jaccard similarity/intersection) **%60'ın üzerinde** olamaz. Eğer benzerlik oranı bu eşiği aşarsa, kalite kapısı `[WARNING] Semantic similarity detected between Skill A and Skill B` uyarısı üretecektir. Bu durumda açıklamalardan birini veya her ikisini daha özgün ve ayrışacak şekilde revize etmelisin.
+- **Açıklama Kalitesi:** Yetenek açıklaması (`description`), ajanın ne zaman bu yeteneği seçmesi gerektiğini çok net ifade etmelidir. Çok geniş veya çok dar tanımlardan kaçın.
+- **Yıkıcı Eylemler:** Sistem genelini bozabilecek veya veri kaybına yol açabilecek işlemler içeren yetenekler mutlaka `Prerequisites` kısmında kullanıcıdan onay (`/override` veya açık izin) istemelidir.
+
+---
+
+## 14. Yetenek: supabase
+> **Açıklama:** Use when doing tasks involving Supabase products, client libraries, database client, writing services (servis yaz), or database queries (db query). Do NOT use for styling fonts, creating git branches, running unit tests, or formatting markdown tables.
 
 **Klasör Yolu:** `.agent/skills/supabase/`
 
@@ -1755,8 +1845,8 @@ Do NOT use `apply_migration` to change a local database schema — it writes a m
 
 ---
 
-## 14. Yetenek: supabase-security
-> **Açıklama:** Defines RLS policies, migration patterns, and security best practices for VentHub Supabase. Use when writing SQL, creating policies, or modifying database schema.
+## 15. Yetenek: supabase-security
+> **Açıklama:** Defines RLS policies, database migrations (migration yaz), policies (policy oluştur), and security redirection middleware (middleware redirect). Do NOT use for font/typography adjustments, creating git branches, running unit tests, or general text formatting.
 
 **Klasör Yolu:** `.agent/skills/supabase-security/`
 
@@ -1980,8 +2070,8 @@ export async function POST(request: Request) {
 
 ---
 
-## 15. Yetenek: teamwork-director
-> **Açıklama:** >
+## 16. Yetenek: teamwork-director
+> **Açıklama:** Teamwork-preview prompt hazırlama yöneticisi. "takıma iş ver", "sprint başlat", "/teamwork-preview" veya teamwork-preview istendiğinde zenginleştirilmiş prompt hazırlar ve takıma delege eder. Veritabanı sıfırlama, git branch oluşturma, birim testi çalıştırma veya metin formatlama durumlarında KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/teamwork-director/`
 
@@ -2481,8 +2571,8 @@ Artifact status'unu ayarla: `Launched`.
 
 ---
 
-## 16. Yetenek: to-issues
-> **Açıklama:** Break a plan, spec, or PRD into independently-grabbable tasks. Use when the user wants to convert a plan into issues or tasks.
+## 17. Yetenek: to-issues
+> **Açıklama:** Breaks a plan, specification, or PRD into structured issues or tasks. Trigger for creating issues (issue oluştur), dividing plans (planı böl), or tasks to issues. Do NOT use for general git operations, styling fonts, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/to-issues/`
 
@@ -2498,8 +2588,8 @@ Break a plan or PRD into vertical slices (tracer bullets) and write them as a ch
 
 ---
 
-## 17. Yetenek: to-prd
-> **Açıklama:** Turn the current conversation context into a PRD. Use when the user wants to create a PRD from the current context.
+## 18. Yetenek: to-prd
+> **Açıklama:** Turns the current conversation transcript or context into a structured PRD (Product Requirements Document). Trigger for generating a PRD (prd üret, prd oluştur, chat to prd). Do NOT use for git commands, styling fonts, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/to-prd/`
 
@@ -2521,8 +2611,8 @@ This skill takes the current conversation context and codebase understanding and
 
 ---
 
-## 18. Yetenek: typography
-> **Açıklama:** Apply professional typography principles to create readable, hierarchical, and aesthetically refined interfaces. Use when setting type scales, choosing fonts, adjusting spacing, designing text-heavy layouts, implementing dark mode typography, or when asked about readability, font pairing, line height, measure, typographic hierarchy, variable fonts, font loading, or OpenType features.
+## 19. Yetenek: typography
+> **Açıklama:** Applies typography principles for fonts, readability, text styling, type scales, and line spacing. Trigger for font modification (font değiştir), readability (okunabilirlik), or text styling. Do NOT use for general git operations, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/typography/`
 
@@ -2968,8 +3058,8 @@ See [tailwind-integration.md](references/tailwind-integration.md) for complete p
 
 ---
 
-## 19. Yetenek: ui-ux-pro-max
-> **Açıklama:** UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks.
+## 20. Yetenek: ui-ux-pro-max
+> **Açıklama:** Provides UI/UX design recommendations, Tailwind styling, HSL colors, design patterns, and palettes. Trigger for UI design (tasarım yap), color selection (renk seç), styling fixes (style fix), and Tailwind styling. Do NOT use for git branch creation, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/ui-ux-pro-max/`
 
@@ -3289,8 +3379,8 @@ Before delivering UI code, verify these items:
 
 ---
 
-## 20. Yetenek: venthub-architecture
-> **Açıklama:** Defines VentHub project structure, file organization, and component patterns. Use when creating new files, components, or understanding where code belongs.
+## 21. Yetenek: venthub-architecture
+> **Açıklama:** Defines VentHub architecture, component patterns, and Next.js App Router rules. Trigger for creating new components (yeni bileşen oluştur), React Server Components (RSC render), or PPR configuration (PPR config). Do NOT use for git commands, database resets, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/venthub-architecture/`
 
@@ -3373,8 +3463,8 @@ E-ticaret sayfalarında aşağıdaki yapılandırılmış veriler zorunludur:
 
 ---
 
-## 21. Yetenek: venthub-auditor
-> **Açıklama:** VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, Next.js 15/React 19 uyumu, tip güvenliği, robotik temizlik denetimi YANISIRA Kritik Varlık korumalarını üstlenir.
+## 22. Yetenek: venthub-auditor
+> **Açıklama:** VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, pre-commit kontrolleri, bütünlük denetimi (bütünlük denetle) ve integrity check gerçekleştirir. Birim testlerini çalıştırmak (Vitest), git branch oluşturmak veya veritabanı sıfırlamak için KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-auditor/`
 
@@ -3462,8 +3552,8 @@ Bir görev ancak `check_integrity.py` V5 üzerinden 0 (sıfır) BLOCKER aldığ�
 
 ---
 
-## 22. Yetenek: venthub-catalog-importer
-> **Açıklama:** Ingests and validates HVAC catalog PDFs using an autonomous Visual Multi-Agent Team.
+## 23. Yetenek: venthub-catalog-importer
+> **Açıklama:** Ingests and validates HVAC catalog PDFs. Trigger for importing catalogs (katalog oku), scanning PDFs (pdf scan), and HVAC catalog imports. Do NOT use for running unit tests, creating git branches, or database resets.
 
 **Klasör Yolu:** `.agent/skills/venthub-catalog-importer/`
 
@@ -3532,8 +3622,8 @@ Ana Ajan (Proje Şefi), PDF işleme sürecini başlatırken sırasıyla şu alt 
 
 ---
 
-## 23. Yetenek: venthub-enterprise-audit
-> **Açıklama:** >
+## 24. Yetenek: venthub-enterprise-audit
+> **Açıklama:** Proje teslimi öncesi "10/10 Onay" denetim motorudur. L1-L12 adımlarını çalıştırıp PASS/FAIL raporu üretir. Tetikleyicileri: enterprise audit, 10/10 check, sprint delivery check. Genel linter denetimi, veritabanı sıfırlama veya git işlemleri için KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-enterprise-audit/`
 
@@ -3799,8 +3889,8 @@ BLOCKED    → Herhangi bir 🔴 STRICT kontrol FAIL → teslim yapılamaz
 
 ---
 
-## 24. Yetenek: venthub-global-rontgen
-> **Açıklama:** Proje genelini veya büyük modülleri tepeden tırnağa Fiziki (Terminal) Radar ve Komutlarla test eder. Hallucination/Mental taramayı KESİN OLARAK yasaklayan, salt JSON kanıta dayanan Production Kalkanıdır.
+## 25. Yetenek: venthub-global-rontgen
+> **Açıklama:** Proje genelini radar ve rontgen komutlarıyla fiziki olarak tarar. Tetikleyicileri: rontgen, radar, global scan, linter check. Veritabanı sıfırlama, genel git işlemleri veya sadece birim testleri çalıştırmak amacıyla KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-global-rontgen/`
 
@@ -3931,7 +4021,9 @@ Sisteme yalan söyleyemezsin. Gözle baktığın hiçbir şeye `PASS` verme, yal
 
 ---
 
-## 25. Yetenek: vercel-composition-patterns
+## 26. Yetenek: vercel-composition-patterns
+> **Açıklama:** React composition patterns that scale, including compound component design, context providers, and component refactoring. Trigger for component refactoring (component refactor) and compound component design. Do NOT use for general git operations, running unit tests, or database resets.
+
 **Klasör Yolu:** `.agent/skills/vercel-composition-patterns/`
 
 # React Composition Patterns
@@ -4012,8 +4104,8 @@ For the complete guide with all rules expanded: `AGENTS.md`
 
 ---
 
-## 26. Yetenek: vercel-react-best-practices
-> **Açıklama:** React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.
+## 27. Yetenek: vercel-react-best-practices
+> **Açıklama:** React and Next.js performance optimization guidelines from Vercel. Trigger for performance optimization (performans optimize et), waterfall fixes (waterfall fix), or RSC optimization. Do NOT use for git branch creation, database resets, or formatting markdown tables.
 
 **Klasör Yolu:** `.agent/skills/vercel-react-best-practices/`
 
@@ -4160,8 +4252,8 @@ For the complete guide with all rules expanded: `AGENTS.md`
 
 ---
 
-## 27. Yetenek: web-design-guidelines
-> **Açıklama:** Review UI code for Web Interface Guidelines compliance. Use when asked to "review my UI", "check accessibility", "audit design", "review UX", or "check my site against best practices".
+## 28. Yetenek: web-design-guidelines
+> **Açıklama:** Reviews UI code for Web Interface Guidelines and design compliance. Trigger for accessibility checks (erişilebilirlik denetle, a11y check), or design guidelines checks. Do NOT use for git commands, styling fonts, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/web-design-guidelines/`
 

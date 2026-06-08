@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "run sprint start",
+    "sprint start",
+    "can you execute delegasyon?",
+    "run multi-agent run",
+    "can you execute sprint start?",
+    "run delegasyon",
+    "delegasyon",
+    "execute delegasyon",
+    "help me with delegasyon",
+    "start delegasyon task",
+    "perform delegasyon",
+    "multi-agent run"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

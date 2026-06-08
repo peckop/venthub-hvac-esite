@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "can you execute yeni bileşen oluştur?",
+    "yeni bileşen oluştur",
+    "can you execute PPR config?",
+    "RSC render",
+    "run yeni bileşen oluştur",
+    "run RSC render",
+    "execute yeni bileşen oluştur",
+    "help me with yeni bileşen oluştur",
+    "start yeni bileşen oluştur task",
+    "perform yeni bileşen oluştur",
+    "execute RSC render",
+    "help me with RSC render"
+  ],
+  "should_not_trigger": [
+    "reset the whole database machine",
+    "how to install node.js on windows",
+    "send an email to my manager",
+    "what is the weather in Istanbul",
+    "set font size to 16px",
+    "Vitest birim testlerini çalıştır",
+    "create a new branch in git",
+    "format this text as a markdown table"
+  ]
+}

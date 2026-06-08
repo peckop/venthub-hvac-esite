@@ -1,12 +1,26 @@
 ---
 name: orion-cli
-description: >
-  Orion CLI dokümantasyon pipeline komutlarını öğretir. TETİKLE: Kullanıcı
-  "doküman üret", "md güncelle", "doc yap", "doc pipeline", "tree oluştur", "NLM sync",
-  "schema çıkar", "hook kur", "orion doc" dediğinde veya bir kod dosyası değişikliği sonrası
-  dokümantasyon güncellenmesi gerektiğinde. ASLA TETİKLEME: Kullanıcı sadece kod yazmak,
-  debug yapmak, test çalıştırmak veya Orion CLI ile ilgisi olmayan işlemler istediğinde.
+description: Orion CLI dokümantasyon pipeline komutlarını öğretir, tree veya şema
+  üretir. "doküman üret", "orion doc", veya "tree oluştur" istendiğinde tetikleyin.
+  Kullanıcı sadece kod yazmak, debug yapmak, test çalıştırmak veya veritabanı/git
+  işlemleri yapmak istediğinde ASLA tetiklemeyin.
+category: intelligence
+metadata:
+  triggers:
+  - orion doc
+  - doküman üret
+  - tree oluştur
+  inputs:
+  - source code files
+  outputs:
+  - docs/*.md
+  recovery:
+    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+  prerequisites:
+  - OPENROUTER_API_KEY
+  - nlm login (NotebookLM sync için)
 ---
+
 
 # Orion CLI Dokümantasyon Pipeline
 

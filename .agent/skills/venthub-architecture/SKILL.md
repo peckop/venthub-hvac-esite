@@ -1,7 +1,21 @@
 ---
 name: venthub-architecture
-description: Defines VentHub project structure, file organization, and component patterns. Use when creating new files, components, or understanding where code belongs.
+description: Defines VentHub architecture, component patterns, and Next.js App Router
+  rules. Trigger for creating new components (yeni bileşen oluştur), React Server
+  Components (RSC render), or PPR configuration (PPR config). Do NOT use for git commands,
+  database resets, or running unit tests.
+category: guards
+metadata:
+  triggers:
+  - yeni bileşen oluştur
+  - RSC render
+  - PPR config
+  inputs:
+  - code design query
+  outputs:
+  - architecture compliance guidelines
 ---
+
 
 # VentHub Architecture Skill
 
