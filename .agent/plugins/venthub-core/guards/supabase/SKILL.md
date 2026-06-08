@@ -162,7 +162,24 @@ const getCachedData = (tenantId: string, lang: string) =>
   )()
 ```
 
-### 6. Import Hygiene & Wildcard Ban
+### 6. Dependency Injection (DI) & Singleton client import yasağı
+Dosya seviyesinde global Supabase istemci nesnelerinin (örneğin `supabaseBrowserClient`, `createSupabaseServerClient`, `supabaseStaticClient`) servis veya component dosyalarında doğrudan singleton olarak ithal edilip (global import) kullanılması kesinlikle **YASAKTIR**.
+* **Kural:** `src/lib/services/` altındaki tüm veri servis fonksiyonları, ilk parametre olarak `supabase: SupabaseClient<Database>` bağımlılığını zorunlu tutmalıdır. Modül düzeyinde statik istemci import'ları veya varsayılan (default) fallback istemciler kesinlikle kaldırılmalıdır.
+* **Örnek Servis Tanımı:**
+  ```typescript
+  import { SupabaseClient } from '@supabase/supabase-js'
+  import { Database } from '@/types/database.types'
+
+  export async function getProducts(supabase: SupabaseClient<Database>) {
+    const { data, error } = await supabase.from('products').select('*')
+    return { data, error }
+  }
+  ```
+* **Çağırıcı Kuralları (Caller Conventions):**
+  - **Client-Side (İstemci Tarafı):** Bileşenler, hook'lar veya context'ler içinden yapılan servis çağrılarında ilk parametre olarak `supabaseBrowserClient` nesnesi geçilmelidir.
+  - **Server-Side (Sunucu Tarafı):** Server Component'ler, Server Action'lar veya API rotalarında yapılan servis çağrılarında ilk parametre olarak `await createSupabaseServerClient()` (istek bazlı) veya `supabaseStaticClient` (statik render durumlarında) nesnesi geçilmelidir.
+
+### 7. Import Hygiene & Wildcard Ban
 - **Banned**: Wildcard exports (`export *`) from service files (e.g. `src/lib/supabase.ts`) are banned. Wildcard exports create circular dependencies and bloated JS bundles.
 - **Allowed**: Always direct-import services or database types from their respective files (e.g., import `{ Category }` from `@/types/database.types` or direct from `@/lib/services/category`).
 

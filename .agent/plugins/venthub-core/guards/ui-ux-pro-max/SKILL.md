@@ -218,6 +218,13 @@ python3 skills/ui-ux-pro-max/scripts/search.py "fintech crypto" --design-system 
 
 ## Common Rules for Professional UI
 
+### 💎 Strict Token Sistemi (Tailwind Arbitrary Class Yasağı)
+VentHub UI tasarımı sıkı bir token sistemine bağlıdır. Tasarımdaki renk, boyut ve mesafe kurallarının bütünlüğü için aşağıdaki kısıtlamalar **ZORUNLUDUR**:
+* **Tailwind Arbitrary Class Yasağı:** Tailwind CSS içerisinde `w-[92vw]`, `bg-[#ff0000]`, `h-[42px]` gibi serbest/keyfi (arbitrary) köşeli parantezli değerlerin doğrudan yazılması kesinlikle **YASAKTIR**.
+* **HSL CSS Custom Property Kullanımı:** Tüm renk ve tasarım değerleri, projenin global CSS değişkenleri (CSS Custom Properties - HSL token'ları) üzerinden tüketilmelidir. 
+  - *Yanlış:* `bg-[#1a202c]` veya `text-[#ff4500]`
+  - *Doğru:* HSL değişkenlerinden türeyen Tailwind sınıfları (örneğin `bg-background`, `text-primary`, `border-border` vb.) ya da CSS Custom Property değerleri.
+
 These are frequently overlooked issues that make UI look unprofessional:
 
 ### Icons & Visual Elements

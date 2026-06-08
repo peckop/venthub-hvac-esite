@@ -31,6 +31,8 @@ Agent olarak veritabanı işlemi yaparken bu kurallara uymalıyım.
 2. **Public tablolar için SELECT policy var** (ürünler, kategoriler)
 3. **Yazma işlemleri (INSERT/UPDATE/DELETE) admin/service_role gerektirir**
 4. **Kullanıcı verisi sadece kendi sahibine görünür** (`auth.uid() = user_id`)
+5. **Multi-Tenant İzolasyonu (SaaS):** Tenant'a özel (tenant-aware) olan tüm tablolarda `tenant_id` kolonu bulunmalıdır. Bu tablolara yazılan RLS politikalarında, cross-tenant veri sızıntısını (Data Bleeding) önlemek amacıyla mutlaka `tenant_id = jwt_tenant_id()` veya `tenant_id = (SELECT public.jwt_tenant_id())` koşulu zorunlu tutulmalıdır.
+   - Örnek: `CREATE POLICY "tenant_isolation_select" ON my_table FOR SELECT TO authenticated USING (tenant_id = (SELECT public.jwt_tenant_id()));`
 
 ### Policy Yazım Şablonu
 ```sql

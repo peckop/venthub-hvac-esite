@@ -258,6 +258,8 @@ Bu proje Enterprise seviyesinde geliştirilmektedir. Tüm yeni kod için:
 - Mevcut {test_baseline} test regresyona uğramamalıdır
 - Hata yönetimi: uygun exception handling ve logging olmalıdır
 - Public API'ler için docstring / JSDoc zorunludur
+- **Middleware DB Yasağı:** `src/middleware.ts` veya Edge Runtime sınırlarında Supabase istemcisi ile veritabanı sorgusu tetiklemek **kesinlikle yasaktır**. Tüm yetkilendirme ve kiracı (tenant) doğrulama işlemleri JWT claims (`supabase.auth.getClaims()`) üzerinden yapılmalıdır.
+- **Cache Key İzolasyonu:** `unstable_cache` veya `next/cache` kullanan tüm yerlerde cache anahtarlarına mutlaka dil ve `tenantId` eklenmelidir: `['key', lang, tenantId]`. Aksi takdirde veri sızıntısı (Data Bleeding) riski oluşur.
 
 ### R[N+1]. Dokümantasyon Güncellemesi
 Tüm geliştirme tamamlandıktan sonra, yapılan değişiklikleri yansıtacak şekilde kök dizindeki ilgili markdown dosyaları güncellenmelidir:

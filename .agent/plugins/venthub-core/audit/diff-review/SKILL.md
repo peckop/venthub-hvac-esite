@@ -33,3 +33,5 @@ const foo: any = parseUnknownData(); // diff-ignore: Dış API'den gelen veriye 
 5. **Hardcoded URL sızıntısı (localhost:3000):** Geliştirme ortamı URL'si production bundle'a gitmemeli.
 6. **Mock data sızıntısı:** app/ path'lerinde inline object array kalıntıları (geçici test verisi).
 7. **Secret sızıntısı (service_role):** Supabase service_role anahtarının client bundle'a sızması.
+8. **useSearchParams Suspense İhlali:** Git diff'te yeni eklenen veya değiştirilen bir dosyada `useSearchParams` hook'unun kullanıldığı, ancak dosya içerisinde `<Suspense>` sarmalının veya wrapper'ının yer almadığı durumlar riskli kabul edilerek uyarılır.
+

@@ -1,0 +1,99 @@
+name: venthub-core
+version: 1.0.0
+description: "VentHub Core Developer & Quality Plugin - LLM Ajanları için Entegre Geliştirme ve Kalite Rehberleri"
+rules:
+  evidence_required: true      # Hiçbir denetim (röntgen, audit vb.) aracı terminal log kanıtı olmadan onay veremez
+  prerequisite_check: true     # Her adımdan önce project-dna.yaml okunmalıdır
+  critical_asset_protection: true # protected_paths kapsamındaki dosyalara izinsiz/onaysız müdahale edilemez
+
+skills:
+  orchestration:
+    - name: teamwork-director
+      path: orchestration/teamwork-director/SKILL.md
+      description: "Sprint planlama ve görev dağılım kılavuzu. project-dna.yaml'a göre kalite kontratı enjekte eder."
+    - name: enterprise-multiagent
+      path: orchestration/enterprise-multiagent/SKILL.md
+      description: "Worker-Judge çoklu ajan koordinasyon motoru yönergesi."
+    - name: multi-agent-research
+      path: orchestration/multi-agent-research/SKILL.md
+      description: "Araştırma ve mimari analiz alt ajan koordinasyon kılavuzu."
+
+  intelligence:
+    - name: notebook-navigator
+      path: intelligence/notebook-navigator/SKILL.md
+      description: "NotebookLM dijital ikiz arama ve bilgi edinme rehberi."
+    - name: notebooklm-sync
+      path: intelligence/notebooklm-sync/SKILL.md
+      description: "Markdown dokümantasyonunu NotebookLM ile eşitleme yönergesi."
+    - name: orion-cli
+      path: intelligence/orion-cli/SKILL.md
+      description: "Orion CLI komutları ve döküman üretim pipeline kılavuzu."
+    - name: find-skills
+      path: intelligence/find-skills/SKILL.md
+      description: "Yeni yeteneklerin aranması ve keşfedilmesi kılavuzu."
+
+  guards:
+    - name: venthub-architecture
+      path: guards/venthub-architecture/SKILL.md
+      description: "React 19, Next.js 15, SSR, PPR ve mimari standartlar kılavuzu."
+    - name: i18n-conventions
+      path: guards/i18n-conventions/SKILL.md
+      description: "Çok dilli sözlük, type-locking ve Routes proxy kullanım standartları."
+    - name: supabase-security
+      path: guards/supabase-security/SKILL.md
+      description: "SQL migration, multi-tenant RLS ve JWT claims RBAC kuralları."
+    - name: supabase
+      path: guards/supabase/SKILL.md
+      description: "Supabase client factories ve Dependency Injection (DI) kuralları."
+    - name: ui-ux-pro-max
+      path: guards/ui-ux-pro-max/SKILL.md
+      description: "CSS HSL değişkenleri ve strict Tailwind arbitrary class yasağı."
+    - name: web-design-guidelines
+      path: guards/web-design-guidelines/SKILL.md
+      description: "Erişilebilirlik (WCAG 2.2 AA) ve web standartları denetim rehberi."
+    - name: typography
+      path: guards/typography/SKILL.md
+      description: "Tipografi, okunabilirlik ve font hiyerarşisi standartları."
+    - name: vercel-composition-patterns
+      path: guards/vercel-composition-patterns/SKILL.md
+      description: "React bileşen kompozisyon ve kod mimarisi standartları."
+    - name: vercel-react-best-practices
+      path: guards/vercel-react-best-practices/SKILL.md
+      description: "Next.js/React performans optimizasyon ve render kuralları."
+
+  audit:
+    - name: venthub-auditor
+      path: audit/venthub-auditor/SKILL.md
+      description: "Bütünlük kalkanı (check_integrity.py) ve kritik varlık koruma denetimleri."
+    - name: venthub-global-rontgen
+      path: audit/venthub-global-rontgen/SKILL.md
+      description: "Fiziki terminal komut kanıtlı radar linter/compiler tarama kılavuzu."
+    - name: venthub-enterprise-audit
+      path: audit/venthub-enterprise-audit/SKILL.md
+      description: "Teslim öncesi L1-L12 Kalite Kapıları terminal denetim checklist'i."
+    - name: lighthouse-performance-guard
+      path: audit/lighthouse-performance-guard/SKILL.md
+      description: "Chrome DevTools Tracing ve Web Vitals performans regresyon kontrolü."
+    - name: fallow
+      path: audit/fallow/SKILL.md
+      description: "Dead-code, unused dependencies ve Next.js 15 PPR Suspense statik analizi."
+    - name: diff-review
+      path: audit/diff-review/SKILL.md
+      description: "Git commit öncesi riskli kod kalıplarının (any, drop table vb.) denetimi."
+    - name: performance-alignment
+      path: audit/performance-alignment/SKILL.md
+      description: "NotebookLM ile otonom performans ve RAG analiz koordinasyonu."
+    - name: venthub-catalog-importer
+      path: audit/venthub-catalog-importer/SKILL.md
+      description: "HVAC PDF katalog verilerinin otonom taranması ve doğrulanması."
+
+  utils:
+    - name: git-commit
+      path: utils/git-commit/SKILL.md
+      description: "Conventional Commit standartları ve akıllı staging rehberi."
+    - name: to-issues
+      path: utils/to-issues/SKILL.md
+      description: "Geliştirme planlarının bağımsız iş listelerine dönüştürülmesi."
+    - name: to-prd
+      path: utils/to-prd/SKILL.md
+      description: "Mevcut diyalog bağlamının PRD dökümanına dönüştürülmesi."

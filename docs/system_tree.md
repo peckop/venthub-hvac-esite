@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-08T10:14:51.880435+00:00
+compiled_at: 2026-06-08T10:46:58.177035+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-08T10:14:51.880435+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-08T10:46:58.177035+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -56,6 +56,7 @@ Bu belge, otonom derleyici tarafından 2026-06-08T10:14:51.880435+00:00 tarihind
 │   ├── ⚪ `venthub_saas_master_roadmap.md`
 │   ├── ⚪ `venthub_skills_master.md`
 │   └── ⚪ `vortice_catalogs.md`
+├── ⚠️ `implementation_plan.md`
 ├── 📂 **memory-engine/**
 │   └── ⚪ `README.md`
 ├── ⚠️ `next.config.md`
@@ -671,6 +672,7 @@ Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `
 - [⚠️] `PROJECT.md`
 - [⚠️] `TEST_INFRA.md`
 - [⚠️] `TEST_READY.md`
+- [⚠️] `implementation_plan.md`
 - [⚠️] `next.config.md`
 
 ## Geçersiz Şablon (Invalid Format)
