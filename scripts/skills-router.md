@@ -9,157 +9,153 @@ entity_hashes:
   func:load_skills: 8311e82cbb169770
   func:main: c5a8f37c545bafb2
   overview: 189370cdcb7f1882
-generated_at: 2026-06-08T18:08:03Z
+generated_at: 2026-06-08T18:08:07Z
 ---
 
 ## Genel Bakış
-Bu modül, projedeki becerileri (skills) keşfetmek ve yüklemekten sorumludul. Depo kök dizinini bularak ilişkili beceriler dizinindeki tüm modülleri tarar ve sisteme dahil eder.
+Bu modül, VentHub projesinin "beceri" sistemini yöneten yönlendirici (router) bir yapıdır. Proje dizinindeki beceri dosyalarını tarar, yükler ve çalıştırılacak uygun beceriyi belirleyerek ana işlevselliği başlatır. Modül, dinamik beceri yönetimi ve proje yapısının keşfedilmesi temelinde çalışır.
 
 ## Fonksiyon Grupları
-### Dizin Keşfi
-Depo yapısını analiz ederek kök dizini ve becerilerin bulunduğu konumu tespit eder.
-- `get_repo_root`, `main`
+### Proje Yapısı Keşfi
+Proje kök dizinini otomatik olarak tespit ederek modülün ve becerilerin doğru konumda bulunmasını sağlar.
+- get_repo_root
 
-### Beceri Yükleme
-Beceri dizinindeki modülleri okuyarak sistem için kullanılabilir hale getirir.
-- `load_skills`
+### Beceri Yükleme ve Yönlendirme
+Beceri dizinindeki modülleri tarar, yükler ve sistemin çalışması için gerekli olan ana kontrol akışını başlatarak uygun beceriyi yönlendirir.
+- load_skills, main
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, repo kök dizinini bulup skills dizinindeki yetenekleri yükleyen bir yönlendirici modülüdür.
+Bu modül, repo içindeki skill dosyalarını yükleyen ve yönlendiren bir scripttir. Aşağıda fonksiyon imzalarından türetilen mimari varsayımlar yer almaktadır.
 
-[Aksiyom 1]: Eğer `load_skills` tarafından alınan `skills_dir` parametresi geçerli bir dizin yolu değilse veya dizin mevcut değilse, `FileNotFoundError` veya ilgili bir istisna fırlatılır.
+[Aksiyom 1]: Eğer `get_repo_root()` çalıştırıldığında modül dosyası bir git reposu içinde değilse veya往上 dizinlerde `.git` dizini bulunamazsa, repo root'u çözümlenemez ve modül çalışması başarısız olur.
 
-[Aksiyom 2]: Eğer `get_repo_root()` çağrıldığında modülün çalıştığı dizinden yukarı doğru .git veya benzeri bir repo gösterge dizini bulunamazsa, repo root'u tespit edilemez ve modül hatalı çalışır.
+[Aksiyom 2]: Eğer `load_skills(skills_dir: Path)` çağrısında belirtilen `skills_dir` dizini mevcut değilse veya Path nesnesi geçerli bir dizin yolunu temsil etmiyorsa, skill dosyaları yüklenemez.
 
-[Aksiyom 3]: Eğer `load_skills` fonksiyonu success ile çalışması için `skills_dir` içinde geçerli skill dosyaları (belirli format/dosya uzantısı) yoksa, boş bir skill listesi veya hata döner (detay bilinmiyor).
+[Aksiyom 3]: Eğer `skills_dir` dizini mevcutsa ancak içeriğinde geçerli skill dosyaları (yüklenebilir modüller) yoksa, `load_skills` boş veya eksik bir skill listesi ile döner.
 
-[Aksiyom 4]: Eğer `main()` fonksiyonu çalıştırıldığında `get_repo_root()` sonucu ile `load_skills` için kullanılacak dizin yolu tutarsızsa, skill yükleme başarısız olur.
+[Aksiyom 4]: Eğer `main()` çağrıldığında `get_repo_root()` başarıyla bir Path döndürmezse veya bu root'a bağlı `skills_dir` geçerli değilse, modülün ana iş akşı tamamlanamaz.
+
+---
+
+**Not:** Bu modül için fonksiyon gövdelerine erişim olmadığından, hangi dosya formatlarının yüklendiğine (`.py`, `.yaml` vb.), skill dosyalarından beklenen arayüzlere veya spesifik eşik değerlerine dair aksiyom tanımlanamamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### get_repo_root
-**Ne yapar**: Git deposunun kök dizinini (en üst seviya dizinini) döndürür.
-**Nasıl yapar**: `git rev-parse --show-toplevel` komutunu çalıştırarak Git deposunun kök dizinini elde eder. Komut başarılı olursa dönen değerden temizlenmiş bir `Path` nesnesi döndürülür. Herhangi bir hata oluşursa (örneğin, dizin bir Git deposu değilse), `__file__` konumuna göre iki üst dizine çıkarak bir `Path` nesnesi döndürür. Bu, projenin kök dizinine alternatif bir erişim yöntemi sağlar.
-**Parametreler**:
-- Bu fonksiyon parametre almaz.
-**Dönüş**: `Path` — Git deposunun kök dizinini veya varsayılan bir dizin yolunu temsil eden bir pathlib.Path nesnesi.
+**Ne yapar**: Git repository'nin kok dizinini (en ust dizin) bulur ve bir Path nesnesi olarak dondurur. Git komutu basarisiz olursa, dosyanin kendi konumundan iki ust dizine cikarak projenin kokunu yaklasik olarak belirler.
+
+**Nasil yapar**: `git rev-parse --show-toplevel` komutunu `subprocess.check_output` ile calistirarak Git'in tespit ettigi kok dizini alir. Herhangi bir istisna olusursa (ornegin dizin bir Git repository degilse), `__file__` degiskeninin resolve edilmis konumunun iki ust dizinine (`.parent.parent`) giderek projenin kok dizinini dondurur.
+
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+
+**Donus**: `Path` — Git repository'nin kok dizinini temsil eden bir pathlib.Path nesnesi.
 
 ### load_skills
-**Ne yapar**: Belirtilen dizindeki tüm yeteneklerin (skill) yapılandırma dosyalarını okur ve bir listeye dönüştürerek döndürür.
-**Nasıl yapar**: Verilen `skills_dir` dizinindeki her alt dizini tarar. Her alt dizinde `SKILL.md` adlı bir dosya arar. Bulursa bu dosyayı UTF-8编码 ile okur. Dosya içeriğinin `---` karakterleriyle ayrılmış bir YAML frontmatter bölümü bekler. Bu bölümü `yaml.safe_load` ile ayrıştırarak yeteneğin temel bilgilerini (`name`, `description`, `depends_on`, `next_steps`, `run_last`, `exclusions`) ve tetikleyici (`triggers`) listesini çıkarır. Bu bilgileri bir sözlük listesine ekler. Dizin mevcut değilse veya frontmatter ayrıştırma hatası oluşursa hata mesajı yazdırıp işlemi atlar.
-**Parametreler**:
-- skills_dir: `Path` — Yeteneklerin (.skill dosyalarını içeren) bulunduğu dizin yolu.
-**Dönüş**: `list[dict]` — Her bir yeteneğin `name`, `description`, `depends_on`, `next_steps`, `run_last`, `exclusions` ve `triggers` anahtarlarını içeren sözlüklerden oluşan bir liste. Herhangi bir yetenek yüklenemezse boş bir liste döner.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ### main
-**Ne yapar**: Komut satırından alınan bir kullanıcı sorgusunu analiz eder, en uygun yetenek modüllerini (skills) sıralar ve sonuçları JSON formatında yazdırır.
-**Nasıl yapar**: `argparse` ile `--query` parametresini alır. `get_repo_root()` kullanarak projenin kök dizinini belirler ve yeteneklerin (`skills_dir`) ve ONNX model dosyalarının (`model_path`, `tokenizer_path`) yollarını oluşturur. `load_skills()` ile tüm yetenekleri yükler. Hiç yetenek yoksa `CONVERSATIONAL` durumuyla çıkar. Tokenizer ile sorguyu ve tüm yetenek açıklamalarını kodlar, ONNX modeli ile embeddings çıkarır. Ortalama havuzlama (mean pooling) ile cümle embeddings'leri hesaplar ve kosinüs benzerliği hesaplaması yapar. Ardından, tetikleyici eşleşmesi (`triggers`), yetenek ismi eşleşmesi ve `DEV_KEYWORDS` anahtar kelime listesi ile sorgu filtrelemesi yaparak puanları artırır. Eğer sorgu geliştirme ile ilgili anahtar kelimeler içermiyor veya hiçbir tetikleyici ile eşleşmiyorsa `CONVERSATIONAL` döndürür. Aksi takdirde, belirli bir eşik değerinin (`0.32`) üzerinde puan alan aday yetenekleri filtreler, `exclusions` (hariç tutulanlar) mantığını uygular ve `depends_on`/`run_last` bağımlılıklarını dikkate alarak topolojik sıralama yapar. Son olarak, sıralanmış yetenek yollarını `MATCHED` durumuyla birlikte JSON formatında yazdırır.
-**Parametreler**:
-- Bu fonksiyon komut satırı argümanları üzerinden çalışır. `argparse` ile tanımlanan tek parametre:
-  - `--query` (`str`, zorunlu) — Analiz edilecek kullanıcı sorgu dizgesi.
-**Dönüş**: `None` (döndürmez, `sys.stdout`'a JSON yazdırır). Yazdırılan JSON nesnesinin yapısı şöyledir:
-  - `status`: `"MATCHED"` veya `"CONVERSATIONAL"` (string).
-  - Yalnızca `status` `"MATCHED"` olduğunda ek olarak `path` anahtarı bulunur: Sıralanmış yetenek isimlerinden oluşan bir liste (list[str]).
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: scripts/skills-router.py::get_repo_root
-- **params**: (yok)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `output` — `subprocess.check_output` ile git komutunun stdout çıktısı; repo kök dizininin path'i olarak döner (sonundaki whitespace strip edilmiş)
-- **Dönüş**: `Path` — git repo kök dizini; hata durumunda script'in bulunduğu dizinin üst dizini
+  - `output` — `subprocess.check_output` ile çalıştırılan `git rev-parse --show-toplevel` komutunun stdout çıktısı; repo kök dizinini temsil eden path stringi
+- **Dönüş**: `Path` — output stringinin strip edilmiş hali ile oluşturulmuş Path nesnesi; exception durumunda __file__'ın iki üst dizini
 
 ### [N2_NASIL] AST Pointer: scripts/skills-router.py::load_skills
-- **params**: `(skills_dir: Path)` — Yeteneklerin bulunduğu dizin yolu
+- **params**: `skills_dir: Path` — yeteneklerin bulunduğu dizin yolu
 - **ic_degiskenler**:
-  - `skills_list` — Yüklenen yeteneklerin tutulduğu liste; her eleman bir yetenek sözlüğüdür
-  - `skill_path` — `skills_dir` içinde sıralanan her bir alt dizin (potansiyel yetenek dizini)
-  - `skill_md_path` — İlgili yetenek dizinindeki `SKILL.md` dosya yolu
-  - `content` — `SKILL.md` dosyasının ham string içeriği
-  - `parts` — İçeriğin `---` separator ile bölünmüş parçaları (frontmatter ayrıştırması için)
-  - `frontmatter_text` — YAML frontmatter bloğunun ham metni (parts[1])
-  - `frontmatter` — `yaml.safe_load` ile ayrıştırılmış frontmatter sözlüğü
-  - `name` — Yeteneğin adı; frontmatter'dan alınır, yoksa dizin adı kullanılır
-  - `description` — Yeteneğin açıklaması; frontmatter'dan alınır
-  - `depends_on` — Bu yeteneğin bağımlı olduğu diğer yeteneklerin listesi
-  - `next_steps` — Bu yetenekten sonra çalışması gereken yeteneklerin listesi
-  - `run_last` — Bu yeteneğin sıranın sonunda çalıştırılıp çalıştırılmayacağı bayrağı
-  - `exclusions` — Bu yetenek çalışırken dışlanması gereken diğer yeteneklerin listesi
-  - `metadata` — Frontmatter'daki `metadata` alt sözlüğü
-  - `triggers` — Bu yeteneği tetikleyen anahtar kelimeler listesi; önce metadata'dan, yoksa frontmatter'dan alınır
-- **Dönüş**: `list` — Sözlük listesi; her sözlük bir yeteneğin name, description, depends_on, next_steps, run_last, exclusions, triggers alanlarını içerir; hata durumunda boş liste döner
+  - `skills_list` — yüklenen tüm yeteneklerin dict listesini tutan toplama listesi; fonksiyon sonunda return edilir
+  - `skill_path` — skills_dir içinde sıralı olarak iterasyon yapılan her bir alt dizin yolu (Path nesnesi)
+  - `skill_md_path` — her skill_path altında aranan SKILL.md dosyasının tam yolu (skill_path / "SKILL.md")
+  - `content` — SKILL.md dosyasının tüm içeriği; "---" ile bölünerek frontmatter ayrıştırılır
+  - `parts` — content'in "---" delimiter'ı ile bölünmüş hali; en az 3 elemanlı olmalı ve "---" ile başlamalı
+  - `frontmatter_text` — parts[1] indeksindeki frontmatter YAML metni
+  - `frontmatter` — `yaml.safe_load` ile ayrıştırılmış frontmatter dict'i; None ise boş dict fallback
+  - `name` — frontmatter["name"] değeri veya skill_path.name fallback'i; yeteneğin kısa adı
+  - `description` — frontmatter["description"] değeri; yeteneğin açıklaması
+  - `depends_on` — frontmatter["depends_on"] listesi; bağımlı olunan yeteneklerin isimleri
+  - `next_steps` — frontmatter["next_steps"] listesi; bu yetenekten sonra çalışması gereken yetenekler
+  - `run_last` — frontmatter["run_last"] boolean değeri; True ise en son sıraya konulur
+  - `exclusions` — frontmatter["exclusions"] listesi; bu yetenek aktifken dışlanması gereken diğer yeteneklerin isimleri
+  - `metadata` — frontmatter["metadata"] dict'i; ek metadata alanlarını içerir (triggers dahil)
+  - `triggers` — metadata["triggers"] veya doğrudan frontmatter["triggers"] listesi; yeteneği tetikleyen anahtar kelimeler
+  - `e` — open ile açılan SKILL.md dosya nesnesi (with bloğu içinde)
+- **Dönüş**: list of dict — her dict bir yeteneğin name, description, depends_on, next_steps, run_last, exclusions, triggers alanlarını içerir; hata veya dizin yokluğunda boş liste
 
 ### [N3_NASIL] AST Pointer: scripts/skills-router.py::main
-- **params**: (yok)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `parser` — `argparse.ArgumentParser` nesnesi; komut satırı argümanlarını tanımlar
-  - `args` — `parser.parse_args()` sonucu; `args.query` alanını içerir (kullanıcının sorgu metni)
-  - `repo_root` — `get_repo_root()` çağrısıyla elde edilen repo kök dizini `Path` nesnesi
-  - `skills_dir` — `repo_root / ".agent" / "skills"` yetenekler dizin yolu
-  - `model_path` — `repo_root / ".agent" / "cache" / "onnx" / "model.onnx"` ONNX model dosya yolu
-  - `tokenizer_path` — `repo_root / ".agent" / "cache" / "onnx" / "tokenizer.json"` tokenizer dosya yolu
-  - `skills` — `load_skills(skills_dir)` ile yüklenen yetenekler sözlüğü listesi
-  - `tokenizer` — `tokenizers.Tokenizer.from_file` ile yüklenen tokenizer nesnesi; padding ve truncation yapılandırılmış
-  - `texts` — Encode edilecek metinler listesi; `[args.query]` ile tüm yetenek açıklarının birleşimi
-  - `encodings` — `tokenizer.encode_batch(texts)` sonucu; her eleman bir `Encoding` nesnesi
-  - `input_ids` — Token ID'lerinden oluşan numpy dizisi, shape (batch_size, seq_len), dtype int64
-  - `attention_mask` — Attention mask numpy dizisi, dtype int64
-  - `token_type_ids` — Token type ID numpy dizisi, dtype int64
-  - `session` — `ort.InferenceSession` nesnesi; ONNX modelini yükler
-  - `ort_inputs` — ONNX modeline girilen input sözlüğü; input_ids, attention_mask, token_type_ids içerir
-  - `ort_outputs` — `session.run` çıktısı; "last_hidden_state" tensor'ünü içerir
-  - `token_embeddings` — Modelden çıkan token embeddingleri, shape (batch_size, seq_len, 384)
-  - `input_mask_expanded` — Attention mask'ın son eksende expand edilmiş hali
-  - `sum_embeddings` — Token embeddinglerin maskelenmiş toplamı, axis=1
-  - `sum_mask` — Mask'ın toplamı; sıfıra bölmeyi önlemek için clip ile a_min=1e-9
-  - `sentence_embeddings` — Mean pooling sonucu cümle embeddingleri, shape (batch_size, 384)
-  - `norms` — Cümle embeddinglerinin L2 normları, shape (batch_size, 1)
-  - `normalized_embeddings` — L2 normalize edilmiş cümle embeddingleri
-  - `query_embedding` — Sorgunun normalize edilmiş embeddingi (normalized_embeddings[0])
-  - `skill_embeddings` — Yetenek açıklamalarının normalize edilmiş embeddingleri (normalized_embeddings[1:])
-  - `similarities` — Query ile her yetenek arasındaki cosine benzerlik skorları, shape (n_skills,)
-  - `DEV_KEYWORDS` — Teknik/geliştirme ile ilgili anahtar kelimeler kümesi; sorgunun teknik olup olmadığını belirlemek için kullanılır
-  - `query_lower` — Sorgunun küçük harfe dönüştürülmüş, strip edilmiş hali
-  - `SYNONYMS` — Türkçe-İngilizce eş anlamlı kelime eşleme sözlüğü; query_lower üzerinde regex ile replaces yapılır
-  - `query_tokens` — query_lower'dan çıkarılmış token'ların kümesi (regex `\w+` ile)
-  - `any_trigger_match` — Herhangi bir yeteneğin tetikleyicisiyle eşleşme olup olmadığının bayrağı
-  - `has_dev_keyword` — Sorgu token'larının DEV_KEYWORDS ile kesişim olup olmadığının bayrağı
-  - `idx` — for döngüsü indeksi (skills listesi üzerinde)
-  - `s` — for döngüsündeki mevcut yetenek sözlüğü; `.score` ve `.raw_score` alanları döngü içinde eklenir
-  - `cosine_sim` — Mevcut yeteneğin cosine benzerlik skoru (float)
-  - `boost` — Tetikleyici ve isim eşleşmesine göre eklenen skor artışı
-  - `trigger_matched` — Mevcut yeteneğin herhangi bir tetikleyicisiyle tam eşleşme durumu
-  - `partial_matched` — Mevcut yeteneğin tetikleyicilerinde kısmi kelime eşleşmesi durumu
-  - `trigger` — Tetikleyiciler listesindeki mevcut tetikleyici metni
-  - `trig_lower` — Tetikleyicinin küçük harfe dönüştürülmüş, strip edilmiş hali
-  - `trig_words` — Tetikleyiciden çıkarılmış 3 karakterden uzun kelimeler
-  - `matched_words` — query_lower içinde bulunan tetikleyici kelimeleri
-  - `max_score` — Tüm yeteneklerin `.score` değerleri arasındaki maksimum skor
-  - `candidates` — Skoru >= 0.32 olan yeteneklerin filtrelenmiş listesi
-  - `candidates_sorted` — Adayların skora göre azalan sıralanmış hali
-  - `excluded_names` — Hariç tutulması gereken yetenek isimlerinin kümesi
-  - `c` — candidates_sorted döngüsündeki mevcut aday
-  - `excl` — c["exclusions"] listesindeki mevcut hariç tutma ismi
-  - `active_candidates` — Hariç tutma filtresinden geçmiş aktif adaylar listesi
-  - `nodes` — Aktif aday yetenek isimleri listesi
-  - `adj` — Graf komşuluk listesi sözlüğü; her düğüm için bağımlılık yönlerini tutar
-  - `in_degree` — Her düğümün giren kenar sayısı sözlüğü
-  - `u` — Mevcut yeteneğin ismi (topolojik sıralama grafiğinde düğüm)
-  - `dep` — c["depends_on"] listesindeki bağımlılık ismi
-  - `v` — Karşılaştırılan diğer yeteneklerin ismi (run_last kontrolü)
-  - `queue` — Kahn algoritması için sıfır giren kenarlı düğümlerin kuyruğu; skora göre azalan sıralı
-  - `curr` — Kuyruktan çıkarılan mevcut düğüm
-  - `neighbor` — curr düğümünün komşusu
-  - `ordered` — Topolojik sıralama sonucu yetenek isimleri listesi (çalışma sırası)
-  - `missing` — Döngü nedeniyle sıralamaya alınamayan düğümler (fallback)
-- **Dönüş**: `yok` — Yan etki olarak stdout'a JSON çıktısı basar; `{"status": "CONVERSATIONAL"}` veya `{"status": "MATCHED", "path": [...]}` formatında
+  - `parser` — `argparse.ArgumentParser` nesnesi; "Route query to modular agent skills." açıklamasıyla oluşturulur
+  - `args` — `parser.parse_args()` dönüşü; `args.query` alanını taşır (kullanıcının sorgu stringi)
+  - `repo_root` — `get_repo_root()` çağrısı ile elde edilen repo kök dizini Path nesnesi
+  - `skills_dir` — yeteneklerin bulunduğu dizin: `repo_root / ".agent" / "skills"`
+  - `model_path` — ONNX model dosyasının yolu: `repo_root / ".agent" / "cache" / "onnx" / "model.onnx"`
+  - `tokenizer_path` — tokenizer JSON dosyasının yolu: `repo_root / ".agent" / "cache" / "onnx" / "tokenizer.json"`
+  - `skills` — `load_skills(skills_dir)` çağrısı ile yüklenen yeteneklerin listesi
+  - `tokenizer` — `tokenizers.Tokenizer.from_file(str(tokenizer_path))` ile yüklenen tokenizer nesnesi
+  - `texts` — `[args.query]` + tüm yeteneklerin description'larından oluşan birleşik metin listesi; encode_batch'e girer
+  - `encodings` — `tokenizer.encode_batch(texts)` dönüşü; her eleman bir Encoding nesnesi (ids, attention_mask, type_ids içerir)
+  - `input_ids` — encodings'teki her elemanın e.ids dizisinden oluşturulmuş numpy int64 array; shape: (batch_size, seq_len)
+  - `attention_mask` — encodings'teki her elemanın e.attention_mask dizisinden oluşturulmuş numpy int64 array; padding maskesini taşır
+  - `token_type_ids` — encodings'teki her elemanın e.type_ids dizisinden oluşturulmuş numpy int64 array; sentence pair bilgisi
+  - `session` — `ort.InferenceSession(str(model_path))` ile yüklenen ONNX Runtime inference oturumu
+  - `ort_inputs` — model girişlerini dict olarak tutar: "input_ids", "attention_mask", "token_type_ids" key'leri
+  - `ort_outputs` — `session.run(["last_hidden_state"], ort_inputs)` dönüşü; listedeki [0]. eleman token_embeddings
+  - `token_embeddings` — ort_outputs[0]; shape: (batch_size, seq_len, 384); her token için 384 boyutlu embedding
+  - `input_mask_expanded` — attention_mask'in son boyutla expand edilmiş hali; token_embeddings ile çarpılmak için broadcast
+  - `sum_embeddings` — token_embeddings * input_mask_expanded çarpımının seq_len (axis=1) boyunca toplamı; (batch_size, 384) shape
+  - `sum_mask` — input_mask_expanded'ın seq_len boyunca toplamı; 1e-9 ile clip edilmiş (sıfıra bölmeyi önler)
+  - `sentence_embeddings` — sum_embeddings / sum_mask; her cümleye ait ortalama pooled embedding; shape: (batch_size, 384)
+  - `norms` — sentence_embeddings'ın L2 norm'u; (batch_size, 1) keepdims shape; 1e-9 ile clip edilmiş
+  - `normalized_embeddings` — sentence_embeddings / norms; birim küre üzerinde normalize edilmiş embedding'ler
+  - `query_embedding` — normalized_embeddings[0]; sorgunun normalize edilmiş embedding'i
+  - `skill_embeddings` — normalized_embeddings[1:]; tüm yeteneklerin normalize edilmiş embedding'leri
+  - `similarities` — `np.dot(skill_embeddings, query_embedding)` kosinüs benzerlikleri; shape: (num_skills,)
+  - `DEV_KEYWORDS` — geliştirme ile ilgili anahtar kelimelerin set'i; Türkçe ve İngilizce terimler; query'de varsa o sorgunun geliştirme amaçlı olduğunu belirtir
+  - `query_lower` — `args.query.lower().strip()`; küçük harfe çevrilmiş ve trim edilmiş sorgu
+  - `SYNONYMS` — Türkçe-İngilizce eş anlamlı kelime eşlemesi dict'i; query_lower üzerinde replace için kullanılır
+  - `query_tokens` — query_lower'dan regex ile extract edilmiş \w+ token'larının set'i
+  - `any_trigger_match` — boolean; herhangi bir yeteneğin trigger'ı ile eşleşme olup olmadığını takip eder
+  - `has_dev_keyword` — boolean; query_tokens ile DEV_KEYWORDS kesişiminin boş olup olmadığını belirtir
+  - `idx` — for döngüsü indisleri; similarities array'inden ilgili yeteneğin benzerlik skorunu almak için kullanılır
+  - `s` — for döngüsü içindeki mevcut yetenek dict'i; trigger, name eşleme ve boost hesaplamaları bu dict üzerinde yapılır
+  - `cosine_sim` — `float(similarities[idx])`; ilgili yeteneğin kosinüs benzerlik skoru
+  - `boost` — tetikleme eşlemelerine göre eklenen skor bonusu (0.0, 0.25 veya 0.45)
+  - `trigger_matched` — boolean; tam trigger eşleşmesi olup olmadığını belirtir
+  - `partial_matched` — boolean; kısmi kelime eşleşmesi olup olmadığını belirtir
+  - `trigger` — s["triggers"] listesindeki her bir tetikleme metni
+  - `trig_lower` — trigger'ın küçük harfe çevrilmiş ve strip edilmiş hali
+  - `trig_words` — trig_lower'dan regex ile extract edilmiş ve uzunluğu >=3 olan kelime listesi
+  - `matched_words` — trig_words içinde query_lower'da bulunan kelimelerin listesi
+  - `max_score` — tüm yeteneklerin "score" değerlerinin maximumu;.float
+  - `candidates` — score >= 0.32 olan yeteneklerin filtrelenmiş listesi
+  - `candidates_sorted` — candidates'ın score'a göre azalan sıralaması
+  - `excluded_names` — dışlanması gereken yetenek isimlerinin set'i; exclusions'dan doldurulur
+  - `c` — candidates_sorted üzerindeki döngü elemanı; name ve exclusions alanları kullanılır
+  - `excl` — c["exclusions"] listesindeki her bir dışlanma ismi
+  - `active_candidates` — excluded_names'te olmayan adayların filtrelenmiş listesi
+  - `nodes` — active_candidates'taki yetenek isimlerinin listesi; topolojik sıralama için düğümler
+  - `adj` — yetenek isimlerinden komşu listelerine mappings yapan adjacency dict'i
+  - `in_degree` — her düğümün giren kenar sayısını tutan dict
+  - `u` — mevcut yeteneğin ismi (c["name"]); kenar ekleme kaynaku
+  - `dep` — c["depends_on"] listesindeki her bir bağımlılık ismi
+  - `v` — other_c["name"]; run_last mantığında karşılaştırılan diğer yetenek ismi
+  - `queue` — Kahn algoritması için sıfır giren dereceli düğümlerin başlangıç listesi
+  - `curr` — queue'dan çıkarılan ve sıralamaya eklenen mevcut düğüm ismi
+  - `neighbor` — adj[curr] listesindeki komşu düğümler; giren dereceleri azaltılır
+  - `ordered` — topolojik sıralama sonucu yetenek isimlerinin düzenli listesi
+  - `missing` — ordered'da bulunmayan düğümler (döngü durumu); fallback olarak sona eklenir
+- **Dönüş**: yok — `print(json.dumps(...))` ile stdout'a JSON çıktısı basar: `{"status": "CONVERSATIONAL"}` veya `{"status": "MATCHED", "path": [...]}`
 
 ---
 
