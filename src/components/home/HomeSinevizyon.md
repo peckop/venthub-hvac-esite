@@ -6,12 +6,12 @@ source_path: C:\Users\alize\venthub-hvac\src\components\home\HomeSinevizyon.tsx
 skeleton_hash: 170df0d436adedd3
 entity_hashes:
   func:HomeSinevizyon: 3c834ec7a93a53b9
-  func:getSlideContent: ab470a33cf7d22ae
+  func:getSlideContent: f0f8402cdc557acd
   func:handleTouchEnd: f36f5348e5c17a8d
   func:handleTouchStart: 66d8f271101148e9
   overview: 5c966a134e8a00b4
   style_tokens: 209427f386c5ad68
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-08T22:10:20Z
 ---
 
 ## Genel Bakış
@@ -75,11 +75,15 @@ Bu modül, dokunmatik slayt gösterimi sunan React bileşeninin doğru çalışm
 **Dönüş**: void — Fonksiyon bir değer döndürmez, sadece durum güncellemesi yapar
 
 ### getSlideContent
-**Ne yapar**: Verilen slayt indeksine karşılık gelen içeriği (ör. görüntü, metin, alıntı) döndürerek bileşenin render edeceği öğeyi hazırlar.  
-**Nasıl yapar**: İndex parametresini kullanarak önceden tanımlanmış bir veri dizisi veya yapıdan ilgili slayt nesnesini seçer; bu nesne genellikle `image`, `text`, `quote` gibi alanları içerir ve bu alanlar JSX olarak dönüştürülerek return edilir.  
-**Parametreler**:  
-- index: number — Gösterilecek slaytın sıfır tabanlı pozisyonu  
-**Dönüş**: JSX.Element veya null — Belirtilen indekse ait slayt içeriğini temsil eden React elementi; geçersiz indeks için null döndürülebilir.
+
+**Ne yapar**: Verilen slide indeksine karşılık gelen slayt içerik verisini döndürür. Sinevizyonda her bir slaytın gösterileceği metinsel içerikleri (etiket başlığı, ana başlık ve alt başlık) sağlar.
+
+**Nasıl yapar**: Fonksiyon, slide indeksini parametre olarak alır ve bu indekse karşılık gelen slaytın tüm metinsel içerik bileşenlerini içeren bir nesne döndürür. İçerik nesnesi `eyebrow` (üst küçük başlık/tanımlama etiketi), `title` (ana büyük başlık) ve `subtitle` (açıklama metni) alanlarını içerir. Bu yapı, bileşen içinde her slayt için tutarlı bir içerik şablonu sunar.
+
+**Parametreler**:
+- `index`: number — Hangi slaytın içeriğinin getirileceğini belirten indeks numarası. 0'dan başlayan sıralı bir değerdir.
+
+**Dönüş**: `{ eyebrow: string, title: string, subtitle: string }` — Slaytın üst etiket metnini, ana başlığını ve açıklama alt başlığını içeren bir nesne döndürür.
 
 ---
 
@@ -114,19 +118,131 @@ Bu modül, dokunmatik slayt gösterimi sunan React bileşeninin doğru çalışm
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `HomeSinevizyon.tsx`::HomeSinevizyon
-- **params**: `{ onQuoteClick }` — slayt geçişlerinde "Teklif Al" modalını tetikleyen callback fonksiyonu
+### [N1_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::HomeSinevizyon`
+- **params**: `{ onQuoteClick }` — tırnak talebi butonuna tıklandığında çağrılan callback fonksiyonu
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hookundan dönen çeviri fonksiyonu, tüm UI metinlerini localize eder
-  - `currentSlide` — `useState(0)`, aktif slayt indexini tutar
-  - `setCurrentSlide` — `currentSlide` state setter'ı, slayt değiştirme işlemlerinde çağrılır
-  - `isMounted` — `useState(false)`, hydration tamamlandıktan sonra `true` olur; useEffect'lerde güvenli erişim sağlar
-  - `setIsMounted` — `isMounted` state setter'ı
-  - `touchStartX` — `useRef<number | null>(null)`, dokunma başlangıç X koordinatını tutar; swipe mesafesi hesaplamak için kullanılır
-  - `isInitialMount` — `useRef(true)`, ilk mount tespiti için kullanılır, useEffect içinde `false`'a çekilir
-  - `paginate` — `useCallback` ile sarılı slayt geçiş fonksiyonu, `newDirection` parametresiyle sarmal kaydırma yapar
-  - `slidesData` — dışarıdan import edilen sabit array, tüm slayt verilerini (görseller, anahtarlar, ürünler) içerir
-- **Dönüş**: JSX — sinevizyon bölümünü render eden React bileşeni, arka plan görselleri, metin içeriği, ürün görselleri ve göstergeleri döndürür
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, i18n key'lerini çeviri metinlerine dönüştürür
+  - `currentSlide` — `useState(0)` ile tanımlı, aktif slayt indeksini tutar (0-tabanlı)
+  - `isMounted` — `useState(false)` ile tanımlı, bileşenin tarayıcıda mount olup olmadığını kontrol eder (hydration sonrası true olur)
+  - `touchStartX` — `useRef<number | null>(null)` ile tanımlı, mobil dokunma başlangıç X koordinatını tutar
+  - `isInitialMount` — `useRef(true)` ile tanımlı, ilk mount durumunu takip eder, useEffect içinde false yapılır
+  - `paginate` — `useCallback` ile sarılı, `newDirection` parametresi kadar slayt ileri/geri kaydırır; mevcut indeksi `slidesData.length` modülü ile döngüsel olarak hesaplar
+  - `handleTouchStart` — React TouchEvent handler'ı, dokunma başlangıç X koordinatını `touchStartX.current`'e kaydeder
+  - `handleTouchEnd` — React TouchEvent handler'ı, dokunma bitiş koordinatıyla karşılaştırarak 50px eşik üzeri kaydırma algılar ve slayt değiştirir
+  - `getSlideContent` — `index` parametresi ile `slidesData` indeksine karşılık gelen i18n eyebrow, title, subtitle değerlerini dönen fonksiyon
+- **Dönüş**: JSX — sinevizyon section elementi (arka plan görselleri, slide içerikleri, ürün görselleri, slayt göstergeleri)
+
+---
+
+### [N2_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::useEffect_initialMount`
+- **params**: yok (boş bağımlılık dizisi `[]`)
+- **ic_degiskenler**:
+  - Yok
+- **Dönüş**: yok — bileşen mount edildiğinde `isMounted`'ı true yapar, `isInitialMount.current`'ı false yapar; temizlik fonksiyonu yoktur
+
+---
+
+### [N3_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::paginate`
+- **params**: `newDirection: number` — slayt yönü (+1 ileri, -1 geri)
+- **ic_degiskenler**:
+  - Yok
+- **Dönüş**: yok — `setCurrentSlide` ile state güncellenir, mevcut indeks + yeni yön + toplam slayt sayısı mod slayt sayısı hesaplanır
+
+---
+
+### [N4_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::useEffect_autoPlay`
+- **params**: yok (bağımlılıklar: `[paginate, isMounted]`)
+- **ic_degiskenler**:
+  - `timer` — `setInterval` dönen ID'si, 120 saniyede bir `paginate(1)` çağırır; temizlikte `clearInterval` ile durdurulur
+- **Dönüş**: cleanup fonksiyonu döner — `timer`'ı temizler
+
+---
+
+### [N5_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::useEffect_keyDown`
+- **params**: yok (bağımlılıklar: `[paginate]`)
+- **ic_degiskenler**:
+  - `handleKeyDown` — `KeyboardEvent` handler'ı, `ArrowRight` tuşuna basıldığında `paginate(1)`, `ArrowLeft` tuşuna basıldığında `paginate(-1)` çağırır
+- **Dönüş**: cleanup fonksiyonu döner — `window`'dan `keydown` event listener'ı kaldırır
+
+---
+
+### [N6_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::handleKeyDown`
+- **params**: `e: KeyboardEvent` — klavye olay nesnesi
+- **ic_degiskenler**: Yok
+- **Dönüş**: yok — `e.key` değerine göre `paginate` fonksiyonunu çağırır (yan etki)
+
+---
+
+### [N7_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::handleTouchStart`
+- **params**: `e: React.TouchEvent` — dokunma olay nesnesi
+- **ic_degiskenler**: Yok
+- **Dönüş**: yok — `e.touches[0].clientX` değerini `touchStartX.current`'e atar (yan etki)
+
+---
+
+### [N8_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::handleTouchEnd`
+- **params**: `e: React.TouchEvent` — dokunma olay nesnesi
+- **ic_degiskenler**:
+  - `touchEndX` — `e.changedTouches[0].clientX` değerinden hesaplanan dokunma bitiş X koordinatı
+  - `diff` — `touchStartX.current - touchEndX` hesaplaması ile başlangıç ve bitiş arasındaki yatay fark
+- **Dönüş**: yok — `Math.abs(diff) > 50` eşik kontrolü sonrası pozitif ise `paginate(1)`, negatif ise `paginate(-1)` çağırır; `touchStartX.current` sıfırlanır
+
+---
+
+### [N9_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::getSlideContent`
+- **params**: `index: number` — slayt indeks numarası
+- **ic_degiskenler**: Yok
+- **Dönüş**: `{ eyebrow: string, title: string, subtitle: string }` — i18n çevirileri ile doldurulan obje; her alan fallback değerine sahiptir (`'VentHub Engineering'`, `'High Performance HVAC'`, `'Advanced solutions for industrial ventilation.'`)
+
+---
+
+### [N10_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::onClick_quoteButton`
+- **params**: yok (inline arrow fonksiyon)
+- **ic_degiskenler**: Yok
+- **Dönüş**: yok — `onQuoteClick` varsa çağrılır; yoksa `typeof window !== "undefined"` kontrolü sonrası `window.openLeadModal?.()` çağrılır
+
+---
+
+### [N11_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::map_slidesData_background`
+- **params**: `slide` — slidesData dizisindeki slayt objesi (image, key, products alanları), `idx` — slayt indeksi
+- **ic_degiskenler**: Yok
+- **Dönüş**: `null` (eğer `idx === 0` ise, çünkü slide 0 statik olarak ayrı render edilir) veya JSX `<div>` elementi (slide görseli + overlay katmanları)
+
+---
+
+### [N12_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::map_slidesData_content`
+- **params**: `slide` — slidesData dizisindeki slayt objesi, `idx` — slayt indeksi
+- **ic_degiskenler**:
+  - `currentContent` — `getSlideContent(idx)` çağrısıyla dönen `{ eyebrow, title, subtitle }` objesi
+- **Dönüş**: JSX `<div>` elementi — slayt başlık, alt başlık ve CTA butonları içeren içerik bloğu
+
+---
+
+### [N13_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::map_airFlowParticles`
+- **params**: `_` — kullanılmayan eleman (undefined), `i` — dizi indeksi (0-5 arası)
+- **ic_degiskenler**: Yok
+- **Dönüş**: JSX `<div>` elementi — CSS animasyonlu hava akışı partikülü; `top` stili `${20 + i * 15}%`, `animationDelay` stili `${i * 0.5}s` hesaplanır
+
+---
+
+### [N14_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::map_slidesData_products`
+- **params**: `slide` — slidesData dizisindeki slayt objesi, `slideIdx` — slayt indeksi
+- **ic_degiskenler**: Yok
+- **Dönüş**: JSX `<div>` elementi — slaytın `products` dizisini map eden container; aktif slayt kontrolü ile opacity/scale/z-index değerleri dinamik hesaplanır
+
+---
+
+### [N15_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::map_slideProducts`
+- **params**: `p` — `slide.products` dizisindeki ürün objesi (`url`, `link`, `labelKey`, `subLabelKey` alanları), `i` — ürün indeksi (0 veya 1)
+- **ic_degiskenler**: Yok
+- **Dönüş**: JSX `<div>` elementi — ürün görseli (`p.url`), HUD etiketi (`t(p.labelKey)`, `t(p.subLabelKey)`), Link (`p.link`), animasyonlu float efekti (`animation: float ${5 + i}s`)
+
+---
+
+### [N16_NASIL] AST Pointer: `src/components/home/HomeSinevizyon.tsx::map_slideIndicators`
+- **params**: `_` — kullanılmayan eleman, `idx` — slayt indeksi
+- **ic_degiskenler**: Yok
+- **Dönüş**: JSX `<button>` elementi — slayt göstergesi butonu; tıklandığında `setCurrentSlide(idx)` çağrılır, `idx === currentSlide` kontrolü ile aktif gösterge genişliği ve rengi değişir
 
 ---
 

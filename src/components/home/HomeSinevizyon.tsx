@@ -108,7 +108,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
 
   return (
     <section 
-      className="relative w-full h-80vh lg:h-90vh min-h-650px overflow-hidden bg-slate-950 flex items-center touch-pan-y contain-layout"
+      className="relative w-full h-auto lg:h-90vh lg:min-h-650px overflow-hidden bg-slate-950 flex items-center touch-pan-y contain-layout py-16 lg:py-0"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -164,7 +164,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
         );
       })}
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-16">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
         {/* Left Side: Content */}
         <div className="w-full lg:w-1/2 relative">
           {slidesData.map((slide, idx) => {
@@ -178,23 +178,23 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                     : 'opacity-0 -translate-x-8 absolute inset-0 z-0 pointer-events-none'
                 }`}
               >
-                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-5 py-2.5 text-xs font-bold uppercase tracking-hvac-loose text-cyan-400 backdrop-blur-md mb-8">
+                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-5 py-2.5 text-xs font-bold uppercase tracking-hvac-loose text-cyan-400 backdrop-blur-md mb-4 lg:mb-8">
                   <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-glow-sm" />
                   <span>{currentContent.eyebrow}</span>
                 </div>
 
-                <h1 className="text-5xl font-light leading-hvac-105 tracking-tighter text-white sm:text-6xl lg:text-8xl mb-8">
+                <h1 className="text-3xl font-light leading-hvac-105 tracking-tighter text-white sm:text-5xl lg:text-8xl mb-4 lg:mb-8">
                   {currentContent.title}
                 </h1>
 
-                <p className="max-w-xl text-xl font-light leading-relaxed text-slate-300 mb-12">
+                <p className="max-w-xl text-sm sm:text-xl font-light leading-relaxed text-slate-300 mb-6 lg:mb-12">
                   {currentContent.subtitle}
                 </p>
 
-                <div className="flex flex-col gap-5 sm:flex-row">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <Link
                     href={Routes.products()}
-                    className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl bg-cyan-500 px-12 text-sm font-bold uppercase tracking-widest text-slate-950 transition-shadow hover:bg-cyan-400 hover:shadow-glow-lg"
+                    className="group relative inline-flex h-12 lg:h-16 items-center justify-center overflow-hidden rounded-2xl bg-cyan-500 px-12 text-sm font-bold uppercase tracking-widest text-slate-950 transition-shadow hover:bg-cyan-400 hover:shadow-glow-lg"
                   >
                     {t('home.hero.primaryCta')}
                   </Link>
@@ -207,7 +207,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                         window.openLeadModal?.();
                       }
                     }}
-                    className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/5 px-12 text-sm font-bold uppercase tracking-widest text-white backdrop-blur-md transition-colors duration-300 hover:bg-white/10"
+                    className="group relative inline-flex h-12 lg:h-16 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/5 px-12 text-sm font-bold uppercase tracking-widest text-white backdrop-blur-md transition-colors duration-300 hover:bg-white/10"
                   >
                     {t('home.hero.secondaryCta')}
                   </button>
@@ -218,7 +218,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
         </div>
 
         {/* Right Side: Floating High-Tech Products */}
-        <div className="w-full lg:w-1/2 relative h-450px sm:h-550px">
+        <div className="w-full lg:w-1/2 relative h-320px sm:h-450px lg:h-550px">
           {/* Animated Air Flow Particles using optimized CSS */}
           <div className="absolute inset-0 pointer-events-none z-0">
             {[...Array(6)].map((_, i) => (
