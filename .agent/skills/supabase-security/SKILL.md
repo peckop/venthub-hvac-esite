@@ -16,8 +16,12 @@ metadata:
   outputs:
   - idempotent SQL migrations
   - JWT claims validation code
+depends_on:
+- supabase
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 ## 🛫 Prerequisites (Ön Koşul Kontrolü)
 

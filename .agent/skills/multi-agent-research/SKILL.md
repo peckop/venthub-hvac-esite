@@ -15,8 +15,11 @@ metadata:
   - research query
   outputs:
   - research_notes.md
+depends_on: []
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # Multi-Agent Research Orchestrator
 

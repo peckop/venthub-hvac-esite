@@ -16,8 +16,12 @@ metadata:
   outputs:
   - a11y compliance report
 category: guards
+depends_on:
+- ui-ux-pro-max
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # Web Interface Guidelines
 

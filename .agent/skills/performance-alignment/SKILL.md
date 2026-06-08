@@ -23,8 +23,12 @@ metadata:
   - performance trace logs
   outputs:
   - performance alignment plan
+depends_on:
+- lighthouse-performance-guard
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # Performance Alignment & Diagnosis Skill
 

@@ -16,8 +16,13 @@ metadata:
   - user request
   outputs:
   - prompt_draft.md
+depends_on:
+- to-issues
+next_steps:
+- enterprise-multiagent
+run_last: false
+exclusions: []
 ---
-
 
 # teamwork-director
 

@@ -17,8 +17,12 @@ metadata:
   outputs:
   - performance aligned components code
 category: guards
+depends_on:
+- vercel-composition-patterns
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # Vercel React Best Practices
 

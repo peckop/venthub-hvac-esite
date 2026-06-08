@@ -19,8 +19,11 @@ metadata:
   prerequisites:
   - OPENROUTER_API_KEY
   - nlm login (NotebookLM sync için)
+depends_on: []
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # Orion CLI Dokümantasyon Pipeline
 

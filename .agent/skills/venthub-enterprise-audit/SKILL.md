@@ -14,8 +14,14 @@ metadata:
   - final codebase state
   outputs:
   - L1-L12 pass/fail report
+depends_on:
+- venthub-auditor
+- venthub-global-rontgen
+next_steps: []
+run_last: true
+exclusions:
+- venthub-auditor
 ---
-
 
 # VentHub Enterprise Audit Skill (v1.1)
 

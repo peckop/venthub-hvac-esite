@@ -14,8 +14,13 @@ metadata:
   - approved implementation plan
   outputs:
   - structured issues list
+depends_on:
+- to-prd
+next_steps:
+- teamwork-director
+run_last: false
+exclusions: []
 ---
-
 
 # To Issues
 

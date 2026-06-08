@@ -26,8 +26,12 @@ metadata:
   - local web server page url
   outputs:
   - tracing analysis report
+depends_on: []
+next_steps:
+- performance-alignment
+run_last: false
+exclusions: []
 ---
-
 
 # Lighthouse Performance Guard & Optimization Pipeline
 

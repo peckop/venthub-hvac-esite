@@ -16,8 +16,12 @@ metadata:
   outputs:
   - DI-compliant supabase client usages
 category: guards
+depends_on: []
+next_steps:
+- supabase-security
+run_last: false
+exclusions: []
 ---
-
 
 # Supabase
 

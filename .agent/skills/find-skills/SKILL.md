@@ -14,8 +14,11 @@ metadata:
   - skill query
   outputs:
   - recommended skills list
+depends_on: []
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # Find Skills
 

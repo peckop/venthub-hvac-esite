@@ -16,8 +16,12 @@ metadata:
   outputs:
   - clean react composition patterns
 category: guards
+depends_on: []
+next_steps:
+- vercel-react-best-practices
+run_last: false
+exclusions: []
 ---
-
 
 # React Composition Patterns
 

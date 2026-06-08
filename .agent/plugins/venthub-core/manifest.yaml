@@ -24,6 +24,11 @@ skills:
     outputs:
     - code changes
     - review verdict
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions:
+    - multi-agent-research
   - name: multi-agent-research
     path: .agent/skills/multi-agent-research/SKILL.md
     description: Reusable worker-judge multi-agent orchestrator for high-quality codebase
@@ -39,6 +44,10 @@ skills:
     - research query
     outputs:
     - research_notes.md
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
   - name: skills-creator
     path: .agent/skills/skills-creator/SKILL.md
     description: Automatically creates, updates, and optimizes modular agent skills.
@@ -57,6 +66,10 @@ skills:
     outputs:
     - modular skill folder under .agent/skills/
     - compiled manifest.yaml and master docs
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
     recovery:
     - If validation fails, check skills-evaluator.py logs or run the subagent optimizer
       again.
@@ -76,6 +89,12 @@ skills:
     - user request
     outputs:
     - prompt_draft.md
+    depends_on:
+    - to-issues
+    next_steps:
+    - enterprise-multiagent
+    run_last: false
+    exclusions: []
   intelligence:
   - name: find-skills
     path: .agent/skills/find-skills/SKILL.md
@@ -91,6 +110,10 @@ skills:
     - skill query
     outputs:
     - recommended skills list
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
   - name: notebook-navigator
     path: .agent/skills/notebook-navigator/SKILL.md
     description: Use this skill to identify NotebookLM IDs and execute conceptual,
@@ -105,6 +128,10 @@ skills:
     - query string
     outputs:
     - rag response text
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
     recovery:
       on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
   - name: notebooklm-sync
@@ -121,6 +148,10 @@ skills:
     - docs/*.md
     outputs:
     - synced NotebookLM source
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
     recovery:
       on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
     prerequisites:
@@ -139,6 +170,10 @@ skills:
     - source code files
     outputs:
     - docs/*.md
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
     recovery:
       on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
     prerequisites:
@@ -161,6 +196,10 @@ skills:
     outputs:
     - tr.ts / en.ts updates
     - Routes usage
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
   - name: supabase
     path: .agent/skills/supabase/SKILL.md
     description: Use when doing tasks involving Supabase products, client libraries,
@@ -175,6 +214,11 @@ skills:
     - service code structure
     outputs:
     - DI-compliant supabase client usages
+    depends_on: []
+    next_steps:
+    - supabase-security
+    run_last: false
+    exclusions: []
   - name: supabase-security
     path: .agent/skills/supabase-security/SKILL.md
     description: Defines RLS policies, database migrations (migration yaz), policies
@@ -191,6 +235,11 @@ skills:
     outputs:
     - idempotent SQL migrations
     - JWT claims validation code
+    depends_on:
+    - supabase
+    next_steps: []
+    run_last: false
+    exclusions: []
   - name: typography
     path: .agent/skills/typography/SKILL.md
     description: Applies typography principles for fonts, readability, text styling,
@@ -205,6 +254,10 @@ skills:
     - typography requirements
     outputs:
     - type scale rules
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
   - name: ui-ux-pro-max
     path: .agent/skills/ui-ux-pro-max/SKILL.md
     description: Provides UI/UX design recommendations, Tailwind styling, HSL colors,
@@ -221,6 +274,11 @@ skills:
     outputs:
     - HSL css token definitions
     - standard tailwind class recommendations
+    depends_on: []
+    next_steps:
+    - web-design-guidelines
+    run_last: false
+    exclusions: []
   - name: venthub-architecture
     path: .agent/skills/venthub-architecture/SKILL.md
     description: Defines VentHub architecture, component patterns, and Next.js App
@@ -235,6 +293,11 @@ skills:
     - code design query
     outputs:
     - architecture compliance guidelines
+    depends_on: []
+    next_steps:
+    - venthub-auditor
+    run_last: false
+    exclusions: []
   - name: vercel-composition-patterns
     path: .agent/skills/vercel-composition-patterns/SKILL.md
     description: React composition patterns that scale, including compound component
@@ -248,6 +311,11 @@ skills:
     - react component props structure
     outputs:
     - clean react composition patterns
+    depends_on: []
+    next_steps:
+    - vercel-react-best-practices
+    run_last: false
+    exclusions: []
   - name: vercel-react-best-practices
     path: .agent/skills/vercel-react-best-practices/SKILL.md
     description: React and Next.js performance optimization guidelines from Vercel.
@@ -262,6 +330,11 @@ skills:
     - react components code
     outputs:
     - performance aligned components code
+    depends_on:
+    - vercel-composition-patterns
+    next_steps: []
+    run_last: false
+    exclusions: []
   - name: web-design-guidelines
     path: .agent/skills/web-design-guidelines/SKILL.md
     description: Reviews UI code for Web Interface Guidelines and design compliance.
@@ -276,6 +349,11 @@ skills:
     - UI code files
     outputs:
     - a11y compliance report
+    depends_on:
+    - ui-ux-pro-max
+    next_steps: []
+    run_last: false
+    exclusions: []
   audit:
   - name: diff-review
     path: .agent/skills/diff-review/SKILL.md
@@ -291,6 +369,11 @@ skills:
     - git diff output
     outputs:
     - checks verdict (pass/fail)
+    depends_on: []
+    next_steps:
+    - git-commit
+    run_last: false
+    exclusions: []
   - name: fallow
     path: .agent/skills/fallow/SKILL.md
     description: Codebase intelligence for JS/TS. Reports quality, dead-code, unused
@@ -305,6 +388,10 @@ skills:
     - source files graph
     outputs:
     - fallow health output report
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
   - name: lighthouse-performance-guard
     path: .agent/skills/lighthouse-performance-guard/SKILL.md
     description: Automates web page performance audits, Lighthouse tracing, and web
@@ -319,6 +406,11 @@ skills:
     - local web server page url
     outputs:
     - tracing analysis report
+    depends_on: []
+    next_steps:
+    - performance-alignment
+    run_last: false
+    exclusions: []
   - name: performance-alignment
     path: .agent/skills/performance-alignment/SKILL.md
     description: Coordinates collaborative, multi-turn RAG analysis with NotebookLM
@@ -332,6 +424,11 @@ skills:
     - performance trace logs
     outputs:
     - performance alignment plan
+    depends_on:
+    - lighthouse-performance-guard
+    next_steps: []
+    run_last: false
+    exclusions: []
   - name: venthub-auditor
     path: .agent/skills/venthub-auditor/SKILL.md
     description: VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, pre-commit
@@ -346,6 +443,12 @@ skills:
     - working directory state
     outputs:
     - integrity verification status
+    depends_on:
+    - venthub-architecture
+    next_steps:
+    - venthub-enterprise-audit
+    run_last: false
+    exclusions: []
   - name: venthub-catalog-importer
     path: .agent/skills/venthub-catalog-importer/SKILL.md
     description: Ingests and validates HVAC catalog PDFs. Trigger for importing catalogs
@@ -359,6 +462,10 @@ skills:
     - catalog pdf files
     outputs:
     - validated catalog data JSON
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
   - name: venthub-enterprise-audit
     path: .agent/skills/venthub-enterprise-audit/SKILL.md
     description: 'Proje teslimi öncesi "10/10 Onay" denetim motorudur. L1-L12 adımlarını
@@ -373,6 +480,13 @@ skills:
     - final codebase state
     outputs:
     - L1-L12 pass/fail report
+    depends_on:
+    - venthub-auditor
+    - venthub-global-rontgen
+    next_steps: []
+    run_last: true
+    exclusions:
+    - venthub-auditor
   - name: venthub-global-rontgen
     path: .agent/skills/venthub-global-rontgen/SKILL.md
     description: 'Proje genelini radar ve rontgen komutlarıyla fiziki olarak tarar.
@@ -387,6 +501,11 @@ skills:
     - project codebase
     outputs:
     - rontgen-template.json log analysis
+    depends_on: []
+    next_steps:
+    - venthub-enterprise-audit
+    run_last: false
+    exclusions: []
   utils:
   - name: git-commit
     path: .agent/skills/git-commit/SKILL.md
@@ -402,6 +521,12 @@ skills:
     - staged changes diff
     outputs:
     - formatted git commit message
+    depends_on:
+    - diff-review
+    - venthub-auditor
+    next_steps: []
+    run_last: true
+    exclusions: []
   - name: to-issues
     path: .agent/skills/to-issues/SKILL.md
     description: Breaks a plan, specification, or PRD into structured issues or tasks.
@@ -416,6 +541,12 @@ skills:
     - approved implementation plan
     outputs:
     - structured issues list
+    depends_on:
+    - to-prd
+    next_steps:
+    - teamwork-director
+    run_last: false
+    exclusions: []
   - name: to-prd
     path: .agent/skills/to-prd/SKILL.md
     description: Turns the current conversation transcript or context into a structured
@@ -430,3 +561,8 @@ skills:
     - conversation transcript
     outputs:
     - product requirements document
+    depends_on: []
+    next_steps:
+    - to-issues
+    run_last: false
+    exclusions: []

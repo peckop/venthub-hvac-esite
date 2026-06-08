@@ -21,8 +21,11 @@ metadata:
   recovery:
   - If validation fails, check skills-evaluator.py logs or run the subagent optimizer
     again.
+depends_on: []
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 ## 🛫 Prerequisites (Ön Koşul Kontrolü)
 

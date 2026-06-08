@@ -18,8 +18,11 @@ metadata:
     on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
   prerequisites:
   - nlm login
+depends_on: []
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # NotebookLM Otonom Senkronizasyon (NLM Sync)
 

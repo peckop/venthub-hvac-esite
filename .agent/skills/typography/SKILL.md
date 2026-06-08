@@ -14,8 +14,11 @@ metadata:
   - typography requirements
   outputs:
   - type scale rules
+depends_on: []
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # Typography
 

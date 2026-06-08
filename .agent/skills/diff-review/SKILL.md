@@ -14,8 +14,12 @@ metadata:
   - git diff output
   outputs:
   - checks verdict (pass/fail)
+depends_on: []
+next_steps:
+- git-commit
+run_last: false
+exclusions: []
 ---
-
 
 # Diff-Review Skill (Değişiklik Güvenliği Kontrolü)
 

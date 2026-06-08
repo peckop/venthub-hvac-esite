@@ -16,8 +16,12 @@ metadata:
   outputs:
   - HSL css token definitions
   - standard tailwind class recommendations
+depends_on: []
+next_steps:
+- web-design-guidelines
+run_last: false
+exclusions: []
 ---
-
 
 # ui-ux-pro-max
 

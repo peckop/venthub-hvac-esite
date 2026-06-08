@@ -16,8 +16,11 @@ metadata:
   - rag response text
   recovery:
     on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+depends_on: []
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # NotebookLM Navigator (Ajanlar İçin Referans Rehberi)
 

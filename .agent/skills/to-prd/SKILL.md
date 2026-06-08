@@ -14,8 +14,12 @@ metadata:
   - conversation transcript
   outputs:
   - product requirements document
+depends_on: []
+next_steps:
+- to-issues
+run_last: false
+exclusions: []
 ---
-
 
 # To PRD
 

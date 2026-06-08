@@ -203,6 +203,48 @@ def evaluate_skills():
     if similarity_warnings == 0:
         print("  [OK] No semantic similarity collision detected between skill descriptions.")
         
+    # 5. Circular Dependency Cycle Check
+    print("\n5. Circular Dependency Cycle Check:")
+    adj_graph = {}
+    for category, skills_list in skills_section.items():
+        for skill in skills_list:
+            name = skill.get("name")
+            depends_on = skill.get("depends_on", [])
+            adj_graph[name] = depends_on
+            
+    visited = {}
+    cycle_path = []
+    cycle_detected = False
+    
+    def dfs(u, path):
+        nonlocal cycle_detected, cycle_path
+        if visited.get(u, 0) == 1:
+            cycle_detected = True
+            cycle_path = path[path.index(u):] + [u]
+            return True
+        if visited.get(u, 0) == 2:
+            return False
+            
+        visited[u] = 1
+        for v in adj_graph.get(u, []):
+            if v in adj_graph:
+                if dfs(v, path + [u]):
+                    return True
+        visited[u] = 2
+        return False
+        
+    for node in adj_graph:
+        if visited.get(node, 0) == 0:
+            if dfs(node, []):
+                break
+                
+    if cycle_detected:
+        cycle_str = " -> ".join(cycle_path)
+        print(f"  [ERROR] Circular dependency detected: {cycle_str}")
+        errors.append(f"Circular dependency: {cycle_str}")
+    else:
+        print("  [OK] No circular dependencies detected in the skill graph.")
+        
     print(f"\n==================================================")
     print(f"Summary of Evaluation:")
     print(f"  Errors: {len(errors)}")

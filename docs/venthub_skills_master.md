@@ -4,6 +4,23 @@ This document compiles the core operational skills, guardrails, and validation p
 
 Generated automatically from local modular skills under `.agent/skills/`.
 
+## Yetenek Bağımlılık Grafı (Mermaid Dependency Graph)
+
+```mermaid
+graph TD
+    diff-review --> git-commit
+    venthub-auditor --> git-commit
+    lighthouse-performance-guard --> performance-alignment
+    supabase --> supabase-security
+    to-issues --> teamwork-director
+    to-prd --> to-issues
+    venthub-architecture --> venthub-auditor
+    venthub-auditor --> venthub-enterprise-audit
+    venthub-global-rontgen --> venthub-enterprise-audit
+    vercel-composition-patterns --> vercel-react-best-practices
+    ui-ux-pro-max --> web-design-guidelines
+```
+
 ---
 
 ## 1. Yetenek: diff-review

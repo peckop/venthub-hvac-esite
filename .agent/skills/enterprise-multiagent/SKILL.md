@@ -29,8 +29,12 @@ metadata:
   outputs:
   - code changes
   - review verdict
+depends_on: []
+next_steps: []
+run_last: false
+exclusions:
+- multi-agent-research
 ---
-
 
 # Enterprise Multi-Agent Orchestration Skill (VentHub HVAC)
 

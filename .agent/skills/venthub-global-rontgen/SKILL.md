@@ -14,8 +14,12 @@ metadata:
   - project codebase
   outputs:
   - rontgen-template.json log analysis
+depends_on: []
+next_steps:
+- venthub-enterprise-audit
+run_last: false
+exclusions: []
 ---
-
 
 # VentHub Global Röntgen & Review Skill (ZORUNLU JSON EDİSYONU)
 

@@ -14,8 +14,12 @@ metadata:
   - code design query
   outputs:
   - architecture compliance guidelines
+depends_on: []
+next_steps:
+- venthub-auditor
+run_last: false
+exclusions: []
 ---
-
 
 # VentHub Architecture Skill
 

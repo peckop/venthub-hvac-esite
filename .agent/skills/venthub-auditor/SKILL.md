@@ -13,8 +13,13 @@ metadata:
   - working directory state
   outputs:
   - integrity verification status
+depends_on:
+- venthub-architecture
+next_steps:
+- venthub-enterprise-audit
+run_last: false
+exclusions: []
 ---
-
 
 ## 🛫 Prerequisites (Ön Koşul Kontrolü)
 

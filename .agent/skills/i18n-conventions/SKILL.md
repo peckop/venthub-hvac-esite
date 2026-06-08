@@ -16,8 +16,11 @@ metadata:
   outputs:
   - tr.ts / en.ts updates
   - Routes usage
+depends_on: []
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # i18n Conventions Skill
 

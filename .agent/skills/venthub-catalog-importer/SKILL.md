@@ -22,8 +22,11 @@ metadata:
   - catalog pdf files
   outputs:
   - validated catalog data JSON
+depends_on: []
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # VentHub Otonom PDF Görsel Ajan Hattı (Visual Multi-Agent Ingestion Pipeline)
 

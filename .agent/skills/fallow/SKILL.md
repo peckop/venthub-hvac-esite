@@ -18,8 +18,11 @@ metadata:
   outputs:
   - fallow health output report
 category: audit
+depends_on: []
+next_steps: []
+run_last: false
+exclusions: []
 ---
-
 
 # Fallow: codebase intelligence for JavaScript and TypeScript
 

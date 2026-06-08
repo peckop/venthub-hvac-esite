@@ -16,8 +16,13 @@ metadata:
   - staged changes diff
   outputs:
   - formatted git commit message
+depends_on:
+- diff-review
+- venthub-auditor
+next_steps: []
+run_last: true
+exclusions: []
 ---
-
 
 # Git Commit with Conventional Commits
 
