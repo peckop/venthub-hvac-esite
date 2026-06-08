@@ -165,7 +165,7 @@ def main():
         "analiz": "audit",
     }
     for tr, eng in SYNONYMS.items():
-        query_lower = re.sub(r'\b' + tr + r'\b', eng, query_lower)
+        query_lower = query_lower.replace(tr, eng)
         
     # Basic tokenization
     query_tokens = set(re.findall(r'\w+', query_lower))
@@ -181,7 +181,6 @@ def main():
         
         # Trigger matching
         trigger_matched = False
-        partial_matched = False
         for trigger in s.get("triggers", []):
             trig_lower = trigger.lower().strip()
             if trig_lower in query_lower:
@@ -189,13 +188,11 @@ def main():
                 break
                 
             # Word-by-word matching
-            trig_words = [w for w in re.findall(r'\w+', trig_lower) if len(w) >= 3]
+            trig_words = [w for w in re.findall(r'\w+', trig_lower) if len(w) >= 1]
             matched_words = [w for w in trig_words if w in query_lower]
             if len(matched_words) == len(trig_words) and trig_words:
                 trigger_matched = True
                 break
-            elif len(matched_words) > 0:
-                partial_matched = True
                 
         # Name matching
         if s["name"].replace("-", " ") in query_lower or s["name"] in query_lower:
@@ -203,9 +200,6 @@ def main():
             
         if trigger_matched:
             boost += 0.45
-            any_trigger_match = True
-        elif partial_matched:
-            boost += 0.25
             any_trigger_match = True
             
         s["score"] = cosine_sim + boost
@@ -221,9 +215,14 @@ def main():
         print(json.dumps({"status": "CONVERSATIONAL"}))
         return
         
-    # Extract candidates with score >= 0.32
-    candidates = [s for s in skills if s["score"] >= 0.32]
-    
+    # Filter candidates with stricter threshold:
+    # Must have a trigger match or name match, OR have raw similarity >= 0.50
+    candidates = []
+    for s in skills:
+        has_trigger = s["score"] > s["raw_score"]
+        if has_trigger or s["raw_score"] >= 0.50:
+            candidates.append(s)
+            
     # Filter by exclusions
     # Priority based on score (descending)
     candidates_sorted = sorted(candidates, key=lambda x: x["score"], reverse=True)
@@ -234,12 +233,28 @@ def main():
         for excl in c["exclusions"]:
             excluded_names.add(excl)
             
-    active_candidates = [c for c in candidates_sorted if c["name"] not in excluded_names]
+    directly_matched = [c["name"] for c in candidates_sorted if c["name"] not in excluded_names]
     
-    if not active_candidates:
+    if not directly_matched:
         print(json.dumps({"status": "CONVERSATIONAL"}))
         return
         
+    # Transitively resolve all dependencies to build the full routing set
+    final_active_set = set()
+    def add_with_dependencies(skill_name):
+        if skill_name in final_active_set:
+            return
+        final_active_set.add(skill_name)
+        s_obj = next((s for s in skills if s["name"] == skill_name), None)
+        if s_obj:
+            for dep in s_obj.get("depends_on", []):
+                add_with_dependencies(dep)
+                
+    for name in directly_matched:
+        add_with_dependencies(name)
+        
+    active_candidates = [s for s in skills if s["name"] in final_active_set]
+    
     # Topological sorting (using depends_on/run_last)
     nodes = [c["name"] for c in active_candidates]
     adj = {node: [] for node in nodes}
