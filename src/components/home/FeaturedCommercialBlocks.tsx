@@ -48,7 +48,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
   const activeProducts = productsByTab[activeTab]
 
   return (
-    <section className="relative py-24 lg:py-32 bg-white overflow-hidden">
+    <section className="relative py-24 lg:py-32 bg-white overflow-hidden content-auto-showcase">
       <div className="max-w-page mx-auto px-6">
         
         {/* Header Block */}
@@ -93,7 +93,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
                   aria-label={t(`home.featuredCommercial.tabs.${tab}`)}
                   onClick={() => setActiveTab(tab)}
                   className={`relative px-6 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors duration-500 rounded-lg ${
-                    activeTab === tab ? 'text-white' : 'text-slate-500 hover:text-slate-900'
+                    activeTab === tab ? 'text-white' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   {activeTab === tab && (

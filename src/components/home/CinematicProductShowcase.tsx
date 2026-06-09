@@ -113,7 +113,7 @@ const CinematicProductShowcase: React.FC = () => {
 
   return (
     <section 
-      className="relative w-full bg-slate-950 py-24 lg:py-32 overflow-hidden border-y border-white/5"
+      className="relative w-full bg-slate-950 py-24 lg:py-32 overflow-hidden border-y border-white/5 content-auto"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
@@ -167,8 +167,9 @@ const CinematicProductShowcase: React.FC = () => {
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
                       className="object-contain drop-shadow-cinematic-drop z-20"
-                      // Only priority for the first element or if visible
-                      priority={activeImageIdx === 0}
+                      // Set priority false and load lazily for below-the-fold content
+                      priority={false}
+                      loading="lazy"
                     />
 
                     <div className="absolute inset-0 z-30">

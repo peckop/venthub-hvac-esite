@@ -300,7 +300,7 @@ export const BrandIcon: React.FC<{ brand: string; className?: string }> = ({
         src={src} 
         alt={alt} 
         fill
-        sizes="(max-width: 768px) 100vw, 25vw"
+        sizes="(max-width: 768px) 192px, 192px"
         className="object-contain"
       />
     </div>

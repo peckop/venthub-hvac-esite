@@ -115,7 +115,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             alt={product.name}
             fallbackType="product"
             fill
-            sizes="(max-width: 768px) 50vw, 300px"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
             className="object-contain transition-transform duration-500 group-hover:scale-105 p-6"
             priority={priority}
           />

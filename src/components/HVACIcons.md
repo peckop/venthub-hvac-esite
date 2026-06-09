@@ -17,7 +17,7 @@ entity_hashes:
   func:WhatsAppIcon: e7d41d76023d8693
   overview: dff8b3ed99dcf496
   style_tokens: 3b0534c287cddb44
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-09T06:46:02Z
 ---
 
 ## Genel Bakış

@@ -86,22 +86,22 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link href={Routes.destek.sss()} className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href={Routes.destek.sss()} className="text-gray-300 hover:text-white transition-colors text-sm">
                   • {t('support.links.faq')}
                 </Link>
               </li>
               <li>
-                <Link href={Routes.destek.iadeDegisim()} className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href={Routes.destek.iadeDegisim()} className="text-gray-300 hover:text-white transition-colors text-sm">
                   • {t('support.links.returns')}
                 </Link>
               </li>
               <li>
-                <Link href={Routes.destek.teslimatKargo()} className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href={Routes.destek.teslimatKargo()} className="text-gray-300 hover:text-white transition-colors text-sm">
                   • {t('support.links.shipping')}
                 </Link>
               </li>
               <li>
-                <Link href={Routes.destek.garantiServis()} className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href={Routes.destek.garantiServis()} className="text-gray-300 hover:text-white transition-colors text-sm">
                   • {t('support.links.warranty')}
                 </Link>
               </li>
