@@ -1,7 +1,7 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useRef } from 'react'
-import * as THREE from 'three'
+import type { Group, Object3D } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
@@ -11,18 +11,18 @@ import { useFanMaterials } from '../materials/useFanMaterials'
  */
 export function HRVModel() {
     const materials = useFanMaterials()
-    const freshRef = useRef<THREE.Group>(null)
-    const staleRef = useRef<THREE.Group>(null)
+    const freshRef = useRef<Group>(null)
+    const staleRef = useRef<Group>(null)
 
     useFrame((_, delta) => {
         if (freshRef.current) {
-            freshRef.current.children.forEach((child: THREE.Object3D) => {
+            freshRef.current.children.forEach((child: Object3D) => {
                 child.position.x += delta * 0.5
                 if (child.position.x > 0.45) child.position.x = -0.45
             })
         }
         if (staleRef.current) {
-            staleRef.current.children.forEach((child: THREE.Object3D) => {
+            staleRef.current.children.forEach((child: Object3D) => {
                 child.position.x -= delta * 0.5
                 if (child.position.x < -0.45) child.position.x = 0.45
             })

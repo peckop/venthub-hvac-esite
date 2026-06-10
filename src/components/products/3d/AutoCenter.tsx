@@ -1,7 +1,8 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { Box3, Vector3 } from 'three'
 
 /**
  * Otomatik Merkezleme Bileşeni (v2 - STABLE)
@@ -19,7 +20,7 @@ import * as THREE from 'three'
  * @param shift - [x, y, z] Manuel kaydırma (Opsiyonel). Otomatik merkezleme üzerine eklenir.
  */
 export const AutoCenter: React.FC<{ children: React.ReactNode; enabled?: boolean; shift?: [number, number, number] }> = ({ children, enabled = true, shift = [0, 0, 0] }) => {
-    const groupRef = useRef<THREE.Group>(null)
+    const groupRef = useRef<Group>(null)
     const isLocked = useRef(false)
     const frameCount = useRef(0)
 
@@ -38,12 +39,12 @@ export const AutoCenter: React.FC<{ children: React.ReactNode; enabled?: boolean
         groupRef.current.updateMatrixWorld(true)
 
         // 2. Bounding Box hesapla
-        const box = new THREE.Box3().setFromObject(groupRef.current)
+        const box = new Box3().setFromObject(groupRef.current)
 
         // 3. Box geçerli mi kontrol et
         if (box.isEmpty()) return
 
-        const center = new THREE.Vector3()
+        const center = new Vector3()
         box.getCenter(center)
 
         // 4. Offset hesapla ve uygula

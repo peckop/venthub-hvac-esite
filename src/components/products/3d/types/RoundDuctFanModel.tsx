@@ -1,13 +1,13 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export const RoundDuctFanModel: React.FC = () => {
     const materials = useFanMaterials()
-    const fanRef = useRef<THREE.Group>(null)
+    const fanRef = useRef<Group>(null)
 
     // MIXED FLOW - SADE TASARIM (NO RINGS)
     // Şişkin Gövde (Cylinder) + Giriş Çıkış (Cylinder) + Kelepçeler (Cylinder Band)

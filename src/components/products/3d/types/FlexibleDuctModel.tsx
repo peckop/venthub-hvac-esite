@@ -1,7 +1,8 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group,Mesh } from 'three'
+import { CatmullRomCurve3, Quaternion,TubeGeometry, Vector3 } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
@@ -11,12 +12,12 @@ import { useFanMaterials } from '../materials/useFanMaterials'
  */
 export function FlexibleDuctModel() {
     const _materials = useFanMaterials()
-    const meshRef = useRef<THREE.Mesh>(null)
-    const spiralRef = useRef<THREE.Group>(null)
+    const meshRef = useRef<Mesh>(null)
+    const spiralRef = useRef<Group>(null)
 
     // Animasyonlu dalga eğrisi oluşturucu
     const createWaveCurve = (time: number) => {
-        const points: THREE.Vector3[] = []
+        const points: Vector3[] = []
         const segments = 30
 
         for (let i = 0; i <= segments; i++) {
@@ -25,9 +26,9 @@ export function FlexibleDuctModel() {
             const wavePhase = t * Math.PI * 2 - time * 2
             const waveAmplitude = Math.sin(t * Math.PI) * 0.3 
             const y = Math.sin(wavePhase) * waveAmplitude
-            points.push(new THREE.Vector3(x, y, 0))
+            points.push(new Vector3(x, y, 0))
         }
-        return new THREE.CatmullRomCurve3(points)
+        return new CatmullRomCurve3(points)
     }
 
     useFrame((state) => {
@@ -36,7 +37,7 @@ export function FlexibleDuctModel() {
 
         // Dinamik geometri güncelleme
         const curve = createWaveCurve(time)
-        const newGeometry = new THREE.TubeGeometry(curve, 64, 0.28, 24, false)
+        const newGeometry = new TubeGeometry(curve, 64, 0.28, 24, false)
         meshRef.current.geometry.dispose()
         meshRef.current.geometry = newGeometry
 
@@ -50,8 +51,8 @@ export function FlexibleDuctModel() {
             const child = spiralRef.current.children[i]
             child.position.copy(point)
 
-            const quaternion = new THREE.Quaternion()
-            quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tangent)
+            const quaternion = new Quaternion()
+            quaternion.setFromUnitVectors(new Vector3(0, 0, 1), tangent)
             child.quaternion.copy(quaternion)
         }
     })

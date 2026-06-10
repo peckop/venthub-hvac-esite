@@ -3,29 +3,24 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\materials\useFanMaterials.ts
-skeleton_hash: dd608e774ce8a871
+skeleton_hash: ac08a6998abfba65
 entity_hashes:
   func:useFanMaterials: 61fbb447cfb5105d
-  overview: 457832609e7ab6a2
-generated_at: 2026-05-28T22:36:41Z
+  overview: 6254e91c186b694f
+generated_at: 2026-06-10T09:39:37Z
 ---
 
 ## Genel Bakış
-Bu modül, 3D fan ürünlerinin görsel görünümünü belirleyen malzeme tanımlarını sağlayan bir React hookudur. `useFanMaterials` fonksiyonu, ürünün yüzey özelliklerini hazırlayıp diğer bileşenlerin kullanımına sunar.
+Bu modül, 3D fan ürünlerinin görsel renderında kullanılan malzeme ve yüzey özelliklerini tanımlayan bir React hookudur. Tek bir hook fonksiyonu içerir ve bu fonksiyon, malzeme tanımını oluşturarak diğer 3D bileşenlere hazır bir veri yapısı sunar.
 
 ## Fonksiyon Grupları
-### Malzeme Tanımlama Grubu
-Bu grup, fan ürününün 3D modelinde kullanılan malzeme özelliklerini hazırlar ve döndürür.
+### Malzeme Tanımlama
+Fan modelinin 3D görünümünü belirleyen malzeme özelliklerini (örneğin, parlak, mat siyah yüzey) tutar ve buna ilişkin bir nesneyi dışarıya açar.
 - useFanMaterials
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için aşağıdaki mimari varsayımlar geçerlidir.
 
-[Aksiyom 1]: Eğer `MATERIALS_CACHE` tanımlı değilse veya bir nesne değilse, `useFanMaterials` fonksiyonu beklenmeyen değer döndürebilir veya hata fırlatabilir.  
-[Aksiyom 2]: Eğer `MATERIALS_CACHE` boş bir nesne (`{}`) ise, `useFanMaterials` tarafından döndürülen veri yapısı varsayılan veya boş değerler içerir.  
-[Aksiyom 3]: Eğer `useFanMaterials` bir React bileşeninin render süreci dışında (örneğin, düz bir fonksiyon veya olay işleyicisinde) çağrılırsa, Hook kuralları ihlal edilerek çalışma zamanı hatası oluşur.
 
 ---
 
@@ -50,19 +45,23 @@ type FanMaterials = ReturnType<typeof useFanMaterials>
 
 ## SABİTLER
 - **MATERIALS_CACHE** (object) — `{
-    matteBlack: new THREE.MeshStandardMaterial({
+    matteBlack: new MeshStandardMaterial({
         color: '#1a1a1a',
-...`
+      ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/3d/materials/useFanMaterials.ts::useFanMaterials
+### [N1_NASIL] AST Pointer: `src/components/products/3d/materials/useFanMaterials.ts`::useFanMaterials
 - **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `MATERIALS_CACHE` — imported constant object containing material definitions; accessed to spread its contents and to retrieve specific material properties (vorticeGreen, industrialSteel, const_chassisInnerMat) for use in the returned object.
-- **Dönüş**: object — returns a new object merging all entries from MATERIALS_CACHE with overridden or added properties: clampMat (set to MATERIALS_CACHE.vorticeGreen), baseMat (set to MATERIALS_CACHE.industrialSteel), chassisInnerMat (set to MATERIALS_CACHE.const_chassisInnerMat), and galvanizedSteel (set to MATERIALS_CACHE.industrialSteel).
+- **ic_degiskenler**: (fonksiyon gövdesinde bildirilmiş dahili değişken yok)
+- **Referanslar (fonksiyon içinde erişilen)**:
+  - `MATERIALS_CACHE` — Önceden tanımlı nesne; tüm malzeme tanımlarını barındıran paylaşımlı önbellek nesnesi, spread (`...`) ile kopyalanarak return nesnesinin temelini oluşturur
+  - `MATERIALS_CACHE.vorticeGreen` — `clampMat` alias'ı olarak döndürülen MeshBasicMaterial/MeshPhysicalMaterial referansı
+  - `MATERIALS_CACHE.industrialSteel` — Hem `baseMat` hem de `galvanizedSteel` alias'ı olarak kullanılan standart malzeme referansı
+  - `MATERIALS_CACHE.const_chassisInnerMat` — `chassisInnerMat` alias'ı olarak döndürülen şasi iç yüzey malzemesi referansı
+- **Dönüş**: `{...MATERIALS_CACHE, clampMat, baseMat, chassisInnerMat, galvanizedSteel}` — Fan malzemeleri sözlüğü; `MATERIALS_CACHE`'in tüm anahtarlarını genişletir ve kısa isimlerle (alias) erişilebilir malzeme özellikleri ekler
 
 ---
 

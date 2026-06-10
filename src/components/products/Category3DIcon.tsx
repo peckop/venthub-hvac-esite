@@ -4,7 +4,7 @@ import { Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'
 import React, { useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
 
 import { FanRenderer } from './3d/FanRenderer'
 
@@ -37,7 +37,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
     modelType,
     offsetContext
 }) => {
-    const meshRef = useRef<THREE.Group>(null)
+    const meshRef = useRef<Group>(null)
 
     useFrame((state) => {
         if (meshRef.current) {

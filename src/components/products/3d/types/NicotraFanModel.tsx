@@ -1,13 +1,14 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { Path,Shape } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export const NicotraFanModel: React.FC = () => {
     const materials = useFanMaterials()
-    const fanRef = useRef<THREE.Group>(null)
+    const fanRef = useRef<Group>(null)
 
     // Nicotra Gebhardt DD Serisi - CORRECTED AXIS
     // Salganyoz DİK durur. Mil YATAY (X ekseni) durur.
@@ -19,7 +20,7 @@ export const NicotraFanModel: React.FC = () => {
     })
 
     const sideShape = useMemo(() => {
-        const shape = new THREE.Shape()
+        const shape = new Shape()
         // Logaritmik Spiral Profili
         const segments = 48
         for (let i = 0; i <= segments; i++) {
@@ -34,7 +35,7 @@ export const NicotraFanModel: React.FC = () => {
         shape.lineTo(0.5, 0.5)
         shape.lineTo(0.2, 0.5)
 
-        const hole = new THREE.Path()
+        const hole = new Path()
         hole.absarc(0, 0, 0.28, 0, Math.PI * 2, true)
         shape.holes.push(hole)
         return shape

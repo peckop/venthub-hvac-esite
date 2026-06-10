@@ -1,6 +1,6 @@
 "use client"
 import React, { useMemo } from "react"
-import * as THREE from "three"
+import { BoxGeometry,LatheGeometry, TorusGeometry, Vector2 } from "three"
 
 import { useFanMaterials } from "../../materials/useFanMaterials"
 
@@ -20,8 +20,8 @@ const PROFILE_POINTS: [number, number][] = [
   [ 0.76, 0.485], [ 0.76, 0.000]
 ]
 
-function buildLathePoints(): THREE.Vector2[] {
-  return PROFILE_POINTS.map(([y, r]) => new THREE.Vector2(r, y))
+function buildLathePoints(): Vector2[] {
+  return PROFILE_POINTS.map(([y, r]) => new Vector2(r, y))
 }
 
 const INNER_PROFILE_POINTS: [number, number][] = [
@@ -29,8 +29,8 @@ const INNER_PROFILE_POINTS: [number, number][] = [
   [ 0.00, 0.406], [ 0.15, 0.418], [ 0.30, 0.432], [ 0.45, 0.445], [ 0.60, 0.455], [ 0.72, 0.460]
 ]
 
-function buildInnerLathePoints(): THREE.Vector2[] {
-  return INNER_PROFILE_POINTS.map(([y, r]) => new THREE.Vector2(r, y))
+function buildInnerLathePoints(): Vector2[] {
+  return INNER_PROFILE_POINTS.map(([y, r]) => new Vector2(r, y))
 }
 
 const MainChassis: React.FC<MainChassisProps> = ({
@@ -41,14 +41,14 @@ const MainChassis: React.FC<MainChassisProps> = ({
 }) => {
   const { galvanizedSteel, chassisInnerMat, safetyOrange } = useFanMaterials()
 
-  const outerGeo = useMemo(() => new THREE.LatheGeometry(buildLathePoints(), 72), [])
-  const innerGeo = useMemo(() => new THREE.LatheGeometry(buildInnerLathePoints(), 72), [])
-  const flangeGeo = useMemo(() => new THREE.TorusGeometry(0.493, 0.012, 12, 72), [])
+  const outerGeo = useMemo(() => new LatheGeometry(buildLathePoints(), 72), [])
+  const innerGeo = useMemo(() => new LatheGeometry(buildInnerLathePoints(), 72), [])
+  const flangeGeo = useMemo(() => new TorusGeometry(0.493, 0.012, 12, 72), [])
 
   const ribGeos = useMemo(() => {
-    const ribs: THREE.BoxGeometry[] = []
+    const ribs: BoxGeometry[] = []
     for (let i = 0; i < 4; i++) {
-      ribs.push(new THREE.BoxGeometry(0.008, 1.44, 0.008))
+      ribs.push(new BoxGeometry(0.008, 1.44, 0.008))
     }
     return ribs
   }, [])

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\RoofFanModel.tsx
-skeleton_hash: 735d589cb1665d7b
+skeleton_hash: a6be924df77471b5
 entity_hashes:
   func:RoofFanModel: 00a33874d8f27b4a
-  overview: ce465d71e4aef9af
+  overview: c22c0e5b7f773317
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:48:38Z
 ---
 
 ## Genel Bakış
@@ -22,10 +22,7 @@ Modülün tüm işlevini tek bir merkezi bileşen üstlenerek, çatı vantilatö
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
 Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Neden:** Fonksiyon gövdesi paylaşılmamıştır. Mimari varsayımlar sadece fonksiyon gövdesindeki kod akışından, hata yönetimi mekanizmalarından ve bağımlılık ilişkilerinden üretilebilir. Mevcut bilgiler yalnızca fonksiyon imzası (`RoofFanModel()` - parametresiz) ve modülün genel amacını içeren eski dokümandır.
 
 ---
 
@@ -42,90 +39,86 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: RoofFanModel.tsx::RoofFanModel
-- **params**: (parametre yok)
+- **params**: ()
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials() hook'undan alınan malzeme nesnesi, fan için tüm yüzey materyallerini içerir
-  - `rotorRef` — useRef ile oluşturulan, THREE.Group tipinde rotor grubuna referans
-  - `logoTexture` — useTexture hook'undan alınan Vortice logosu dokusu
-- **Dönüş**: React component (JSX tree) — tam roof fan 3D modelini render eder
+  - `materials` — useFanMaterials() hook'undan gelen malzeme nesnesi (matteBlack, industrialSteel, roofAntracite, roofBlade gibi malzemeleri içerir)
+  - `rotorRef` — useRef<Group> ile oluşturulan referans; plug fan rotorunu döndürmek için kullanılır (rotorRef.current.rotation.y ile erişilir)
+  - `logoTexture` — useTexture('/Vortice_logo.png') ile yüklenen Vortice logo dokusu; anisotropy 16 olarak ayarlanır
+- **Dönüş**: JSX element (React.FC) — 3D çatı fanı modelini render eder
 
-### [N2_NASIL] AST Pointer: RoofFanModel.tsx::useFrame-callback
-- **params**: (state: Three.js state, delta: frame time delta)
-- **ic_degiskenler**:
-  - `state` — Three.js render state nesnesi
-  - `delta` — son frame ile geçen süre (saniye)
-- **Dönüş**: yok — rotorRef.current.rotation.y'yi her frame'de azaltarak rotoru döndürür
+### [N2_NASIL] AST Pointer: RoofFanModel.tsx::useFrame_callback
+- **params**: (state, delta)
+  - `state` — useFrame'den gelen state nesnesi (kullanılmıyor)
+  - `delta` — son kareden bu yana geçen süre (saniye cinsinden, rotor dönüş hızı için kullanılır)
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (yan etki: rotorRef.current.rotation.y azaltarak rotoru döndürür)
 
-### [N3_NASIL] AST Pointer: RoofFanModel.tsx::corner-bolt-map
-- **params**: (pos: [x,z] koordinat dizisi, i: indis)
-- **ic_degiskenler**:
-  - `pos` — [x,z] koordinat dizisi, zemin montaj civatasının x ve z pozisyonunu içerir
-  - `i` — indis numarası, key üretimi için kullanılır
-  - `pos[0]` — x koordinatı, mesh'in x pozisyonunda kullanılır
-  - `pos[1]` — z koordinatı, mesh'in z pozisyonunda kullanılır
-- **Dönüş**: JSX element — zemin köşelerindeki montaj civatası
+### [N3_NASIL] AST Pointer: RoofFanModel.tsx::corner_bolt_map
+- **params**: (pos, i)
+  - `pos` — dört köşe konumu [x, z] dizisi (örn: [0.64, 0.64])
+  - `i` — döngü indeksi (0-3 arası)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (mesh) — zemin montaj civatası (cylinderGeometry)
 
-### [N4_NASIL] AST Pointer: RoofFanModel.tsx::support-map
-- **params**: (rot: radyan cinsinden açı, i: indis)
-- **ic_degiskenler**:
-  - `rot` — taşyıcı lamanın rotasyon açısı (radyan)
-  - `i` — indis numarası, benzersiz key üretimi için kullanılır
-- **Dönüş**: JSX element — 4 ana taşıyıcı lama ve detayları
+### [N4_NASIL] AST Pointer: RoofFanModel.tsx::support_lama_map
+- **params**: (rot, i)
+  - `rot` — lama açısı (radyan, 45°, 135°, 225°, 315° değerleri)
+  - `i` — döngü indeksi (0-3 arası)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (group) — lama gövdesi, L-büküm ayak ve montaj civataları
 
-### [N5_NASIL] AST Pointer: RoofFanModel.tsx::bolt-map
-- **params**: (y: y-koordinatı, j: indis)
-- **ic_degiskenler**:
-  - `y` — lama montaj civatasının y-koordinatı (üst/orta/alt)
-  - `j` — indis numarası, benzersiz key üretimi için kullanılır
-- **Dönüş**: JSX element — lama üzerindeki montaj civatası
+### [N5_NASIL] AST Pointer: RoofFanModel.tsx::lama_bolt_map
+- **params**: (y, j)
+  - `y` — civata dikey konumu (0.20, 0, -0.20)
+  - `j` — döngü indeksi (0-2 arası)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (mesh) — lama montaj civatası (cylinderGeometry)
 
-### [N6_NASIL] AST Pointer: RoofFanModel.tsx::wire-map
-- **params**: (_, i: indis)
+### [N6_NASIL] AST Pointer: RoofFanModel.tsx::wire_map
+- **params**: (_, i)
+  - `_` — kullanılmayan parametre
+  - `i` — tel indeksi (0-63 arası, 16'nın katları hariç)
 - **ic_degiskenler**:
-  - `i` — tel indis numarası (0-63 arası)
-  - `angle` — hesaplanan açı: (i / 64) * Math.PI * 2
-  - `r` — sabit yarıçap: 0.665 (lamaların hemen içinden geçen telsı)
-- **Dönüş**: JSX element veya null (eğer i % 16 === 0 ise lamalara denk gelir)
+  - `angle` — telin açısal pozisyonu (i/64 * 2π)
+  - `r` — telin yarıçapı (0.665, lamaların içinden geçer)
+- **Dönüş**: JSX element (mesh) veya null (16'nın katlarında null döner)
 
-### [N7_NASIL] AST Pointer: RoofFanModel.tsx::ring-map
-- **params**: (_, k: indis)
-- **ic_degiskenler**:
-  - `k` — halka indis numarası (0-7 arası)
-- **Dönüş**: JSX element — yatay destek halkası
+### [N7_NASIL] AST Pointer: RoofFanModel.tsx::ring_map
+- **params**: (_, k)
+  - `_` — kullanılmayan parametre
+  - `k` — halka indeksi (0-7 arası)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (mesh) — yatay destek halkası (torusGeometry)
 
-### [N8_NASIL] AST Pointer: RoofFanModel.tsx::blade-map
-- **params**: (_, i: indis)
+### [N8_NASIL] AST Pointer: RoofFanModel.tsx::blade_map
+- **params**: (_, i)
+  - `_` — kullanılmayan parametre
+  - `i` — kanat indeksi (0-8 arası, 9 kanat)
 - **ic_degiskenler**:
-  - `i` — kanat indis numarası (0-8 arası)
-  - `baseAngle` — kanadın temel açısı: (i / 9) * Math.PI * 2
-- **Dönüş**: JSX element — backward-curved fan kanadı (4 segment)
+  - `baseAngle` — kanatın temel açısı (i/9 * 2π)
+- **Dönüş**: JSX element (group) — backward-curved kanat (4 segment)
 
-### [N9_NASIL] AST Pointer: RoofFanModel.tsx::useMemo-lathe-points
-- **params**: () => (boş)
-- **ic_degiskenler**:
-  - `[]` — boş bağımlılık dizisi, useMemo'un sadece bir kez çalışmasını sağlar
-- **Dönüş**: THREE.Vector2[] — lathe geometrisi için profil noktaları dizisi
+### [N9_NASIL] AST Pointer: RoofFanModel.tsx::clip_map
+- **params**: (rot, i)
+  - `rot` — L-braket açısı (0, 90°, 180°, 270°)
+  - `i` — döngü indeksi (0-3 arası)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (group) — shroud üzerindeki montaj braketi
 
-### [N10_NASIL] AST Pointer: RoofFanModel.tsx::clip-map
-- **params**: (rot: radyan cinsinden açı, i: indis)
+### [N10_NASIL] AST Pointer: RoofFanModel.tsx::top_bolt_map
+- **params**: (_, i)
+  - `_` — kullanılmayan parametre
+  - `i` — vida indeksi (0-5 arası, 6 vida)
 - **ic_degiskenler**:
-  - `rot` — L-Braket'in rotasyon açısı (radyan)
-  - `i` — indis numarası, benzersiz key üretimi için kullanılır
-- **Dönüş**: JSX element — shroud üzerindeki L-Braket montaj detayı
+  - `angle` — vida açısal pozisyonu (i/6 * 2π)
+- **Dönüş**: JSX element (mesh) — üst kapak montaj vidası
 
-### [N11_NASIL] AST Pointer: RoofFanModel.tsx::top-bolt-map
-- **params**: (_, i: indis)
-- **ic_degiskenler**:
-  - `i` — vida indis numarası (0-5 arası)
-  - `angle` — hesaplanan açı: (i / 6) * Math.PI * 2
-- **Dönüş**: JSX element — üst kapak montaj vidası
-
-### [N12_NASIL] AST Pointer: RoofFanModel.tsx::eyebolt-map
-- **params**: (x: x-koordinatı, i: indis)
-- **ic_degiskenler**:
-  - `x` — eyebolt'un x-koordinatı (-0.10 veya 0.10)
-  - `i` — indis numarası
-- **Dönüş**: JSX element — taşıma halkası (eyebolt)
+### [N11_NASIL] AST Pointer: RoofFanModel.tsx::eyebolt_map
+- **params**: (x, i)
+  - `x` — eyebolt x konumu (-0.10 veya 0.10)
+  - `i` — döngü indeksi (0-1 arası, 2 eyebolt)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element (mesh) — taşıma halkası (torusGeometry)
 
 ---
 

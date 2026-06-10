@@ -1,6 +1,6 @@
 "use client";
 import React, { useMemo } from 'react'
-import * as THREE from 'three'
+import { DoubleSide,Path, Shape, ShapeGeometry } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
@@ -23,7 +23,7 @@ export const Silencer: React.FC<SilencerProps> = ({
 
     // Perforated inner surface geometry - holes pattern
     const _perforationGeometry = useMemo(() => {
-        const shape = new THREE.Shape()
+        const shape = new Shape()
         // Create a ring with holes using shape
         const holeRadius = radius * 0.85
         const holeCount = 12
@@ -33,12 +33,12 @@ export const Silencer: React.FC<SilencerProps> = ({
             const hx = Math.cos(angle) * holeRadius
             const hy = Math.sin(angle) * holeRadius
 
-            const hole = new THREE.Path()
+            const hole = new Path()
             hole.absarc(hx, hy, 0.03, 0, Math.PI * 2, true)
             shape.holes.push(hole)
         }
 
-        return new THREE.ShapeGeometry(shape, 8)
+        return new ShapeGeometry(shape, 8)
     }, [radius])
 
     return (
@@ -75,7 +75,7 @@ export const Silencer: React.FC<SilencerProps> = ({
                                 color="#1a1a1a"
                                 metalness={0.3}
                                 roughness={0.8}
-                                side={THREE.DoubleSide}
+                                side={DoubleSide}
                                 transparent
                                 opacity={0.6}
                             />

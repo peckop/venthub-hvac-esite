@@ -3,54 +3,65 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\MainChassis.tsx
-skeleton_hash: 6015fae74239eb8e
+skeleton_hash: 352a525786c594ef
 entity_hashes:
   func:MainChassis: 6dd2e12708a32b7b
-  func:buildInnerLathePoints: b3728666b0ee9845
-  func:buildLathePoints: 1c464dd2bea08bfc
-  overview: aa2dd6f5bcc0a3eb
+  func:buildInnerLathePoints: 899a29ff8993fbf2
+  func:buildLathePoints: b2b421c8a803ff34
+  overview: 2b61bbe9ce53a1c8
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:30Z
+generated_at: 2026-06-10T09:39:09Z
 ---
 
 ## Genel Bakış
-Bu modül, 3B bir şasi modelinin geometrik noktalarını oluşturan yardımcı fonksiyonları ve bu noktaları kullanarak render edilen ana şasi bileşenini içerir. Geometri oluşturma işlevleri, şeklin profilini tanımlayan nokta dizilerini üretir; ana fonksiyon ise bu verileri alarak React tabanlı bir 3B nesne döndürür.
+Bu modül, 3B bir şasinin dış ve iç profillerini tanımlayan geometrik nokta dizilerini üretmekle sorumludur. Elde edilen bu noktalar, React tabanlı bir 3B modelleme bileşeni tarafından kullanılarak görsel ve etkileşimli bir şasi parçası oluşturulur.
 
 ## Fonksiyon Grupları
-### Geometri Üretimi
-Bu grup, şasinin dış ve iç profilini tanımlayan nokta dizilerini hesaplar.
-- buildLathePoints
-- buildInnerLathePoints
+### Geometrik Veri Üretimi
+Bu grup, şasinin döndürme (lathe) geometrisini oluşturacak olan dış ve iç profil noktalarını hesaplar.
+- buildLathePoints, buildInnerLathePoints
 
-### Bileşen Renderlama
-Bu grup, hesaplanan nokta verilerini kullanarak görsel şasi modelini oluşturur ve etkileşim özelliklerini yönetir.
+### 3B Bileşen Oluşturma
+Bu grup, üretilen geometrik verileri alarak tarayıcıda renderedilen interaktif bir 3B şasi modelini döndüren React bileşenini tanımlar.
 - MainChassis
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması gerekir.
 
-[Aksiyom 1]: Eğer **PROFILE_POINTS** tanımı veya içeriği yoksa, `buildLathePoints()` fonksiyonu geçerli bir nokta listesi üretemez ve boş veya tanımsız bir sonuç döndürür.  
-[Aksiyom 2]: Eğer **INNER_PROFILE_POINTS** tanımı veya içeriği yoksa, `buildInnerLathePoints()` fonksiyonu geçerli bir iç profil nokta listesi üretemez ve boş veya tanımsız bir sonuç döndürür.  
-[Aksiyom 3]: Eğer **MainChassis** bileşenine `isSelected` prop’u verilmez veya tip boolean dışında bir değer geçerse, seçili durumuna dayalı görsel veya mantıksal koşullar beklenmedik şekilde değerlendirilir.  
-[Aksiyom 4]: Eğer **MainChassis** bileşenine `isIsolated` prop’u verilmez veya tip boolean dışında bir değer geçerse, izolasyon durumuna bağlı stil veya davranışlar beklenmedik şekilde uygulanır.  
-[Aksiyom 5]: Eğer **MainChassis** bileşenine `isHidden` prop’u verilmez veya tip boolean dışında bir değer geçerse, gizlenme/görünürlük kontrolü beklenmedik şekilde çalışır.  
-[Aksiyom 6]: Eğer **MainChassis** bileşenine `onClick` prop’u verilmez veya tip fonksiyon dışında bir değer geçerse, kullanıcı tıklamasını işleyen olay yöneticisi çalışmaz veya hata üretir.  
-[Aksiyom 7]: Eğer `buildLathePoints()` ve `buildInnerLathePoints()` fonksiyonları sırasıyla **PROFILE_POINTS** ve **INNER_PROFILE_POINTS** dışındaki verilere bağımlıysa, bu fonksiyonların çıktısı beklenen geometriyi üretemez.  
+Bu modül, dış ve iç profil geometrilerini üreten iki bağımsız fonksiyon ile bu geometriyi render eden bir React bileşeninden oluşur. Fonksiyon imzaları ve modül sabitleri üzerinden aşağıdaki varsayımlar türetilmiştir.
 
-Bu varsayımlar, modülün mevcut fonksiyon imzaları ve sabitleri çerçevesinde mantıksal olarak türetilmiştir; belge, yorum veya varsayılan değerler dışındaki bilgilerden türetilmemiştir.
+---
+
+**[Aksiyom 1]:** Eğer `PROFILE_POINTS` sabiti tanımlı değilse veya boş dizi ise, `buildLathePoints()` geçerli dış profil geometri noktaları üretemez.
+
+**[Aksiyom 2]:** Eğer `INNER_PROFILE_POINTS` sabiti tanımlı değilse veya boş dizi ise, `buildInnerLathePoints()` geçerli iç profil geometri noktaları üretemez.
+
+**[Aksiyom 3]:** Eğer `MainChassis` bileşeni çağrıldığında `isSelected` prop'u sağlanmamışsa, bileşenin seçim durumu belirsiz olur.
+
+**[Aksiyom 4]:** Eğer `MainChassis` bileşeni çağrıldığında `isIsolated` prop'u sağlanmamışsa, bileşenin izole durumu belirsiz olur.
+
+**[Aksiyom 5]:** Eğer `MainChassis` bileşeni çağrıldığında `isHidden` prop'u sağlanmamışsa, bileşenin görünürlük durumu belirsiz olur.
+
+**[Aksiyom 6]:** Eğer `onClick` callback'i sağlanmamışsa ve kullanıcı şasiye tıklarsa, tıklama olayı işlenemez (propagation durumu bilinmiyor).
+
+**[Aksiyom 7]:** `PROFILE_POINTS` ve `INNER_PROFILE_POINTS` dizilerinin her bir elemanının, geçerli 3D koordinat verisi (sayısal değerler içeren yapı) içerdiği varsayılır; aksi halde geometri oluşturma fonksiyonları hatalı sonuç döndürür.
+
+**[Aksiyom 8]:** `buildLathePoints()` ve `buildInnerLathePoints()` fonksiyonları parametresiz oldukları için, girdilerini yalnızca modül kapsamındaki sabitlerden (`PROFILE_POINTS`, `INNER_PROFILE_POINTS`) alır; harici bağımlılıkları yoktur.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### buildLathePoints
-**Ne yapar**: Bir torun (lathe) geometrisi için 2D noktalar dizisi oluşturur. Bu noktalar, bir eksen çevresinde döndürülerek 3D bir modelin profilini tanımlar.  
-**Nasıl yapar**: Fonksiyon, önceden tanımlanmış bir profil (örneğin chassis dış konturunun kesiti) üzerinden sırayla THREE.Vector2 nesneleri üretir ve bu nesneleri bir dizide toplar.  
-**Parametreler**:  
-- (parametre yok)  
-**Dönüş**: THREE.Vector2[] – Oluşturulan 2D noktaların dizisi; her bir nokta X ve Y koordinatlarını içerir.
+**Ne yapar**: Dış gövde profil noktalarını Three.js Vector2 nesnelerine dönüştürerek döner. Bu fonksiyon, torna (lathe) geometrisi oluşturmak için gerekli olan dış yüzey profil noktalarını hazırlar.
+
+**Nasıl yapar**: PROFILE_POINTS dizisi üzerinde map fonksiyonu ile iterasyon yapar. Her bir noktayı [y, r] formatından alır ve Vector2(r, y) şeklinde yeni bir vektör nesnesine dönüştürür. X eksenine yarıçap (r), Y eksenine yükseklik (y) değeri atanır.
+
+**Parametreler**:
+- Parametre almaz
+
+**Dönüş**: Vector2[] — Dış gövde profilini temsil eden Vector2 vektörleri dizisi. Her vektör, sırasıyla (yarıçap, yükseklik) koordinatlarını içerir.
 
 ### buildInnerLathePoints
 **Ne yapar**: Bir torun geometrisinin iç kısmı (örneğin boşluk veya ince duvar) için 2D noktalar dizisi üretir. Bu noktalar, dış profilin iç eşdeğerini oluşturmak için kullanılır.  
@@ -94,45 +105,62 @@ Bu varsayımlar, modülün mevcut fonksiyon imzaları ve sabitleri çerçevesind
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::buildLathePoints
+### [N1_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::buildLathePoints
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: THREE.Vector2[]
+- **ic_degiskenler**:
+  - `PROFILE_POINTS` — Sabit array, `map` ile `[y, r]` çiftlerini `Vector2(r, y)`'ye dönüştürür; dış gövde profil noktalarını tanımlar
+- **Dönüş**: `Vector2[]` — LatheGeometry'ye verilecek 2B profil noktaları
 
-### [N2_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::buildInnerLathePoints
+---
+
+### [N2_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::buildInnerLathePoints
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: THREE.Vector2[]
+- **ic_degiskenler**:
+  - `INNER_PROFILE_POINTS` — Sabit array, `map` ile `[y, r]` çiftlerini `Vector2(r, y)`'ye dönüştürür; iç gövde profil noktalarını tanımlar
+- **Dönüş**: `Vector2[]` — LatheGeometry'ye verilecek iç profil noktaları
 
-### [N3_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::MainChassis
-- **params**: isSelected, isIsolated, isHidden, onClick
-- **ic_degiskenler**: 
-  - `galvanizedSteel` — useFanMaterials hook tarafından döndürülen galvanize paslanmaz malzeme
-  - `chassisInnerMat` — useFanMaterials hook tarafından döndürülen şasi iç malzemesi
-  - `safetyOrange` — useFanMaterials hook tarafından döndürülen güvenlik turuncu rengi
-  - `outerGeo` — buildLathePoints ile oluşturulan dış torüs geometrisi (LatheGeometry)
-  - `innerGeo` — buildInnerLathePoints ile oluşturulan iç torüs geometrisi (LatheGeometry)
-  - `flangeGeo` — sabit çaplı torüs geometrisi (TorusGeometry) flange için
-  - `ribGeos` — 4 adet BoxGeometry içeren rib geometri dizisi
-  - `mainMaterial` — isSelected ise safetyOrange, değilse galvanizedSteel seçilen malzeme
-- **Dönüş**: JSX.Element | null (grup veya null)
+---
 
-### [N4_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::ribGeos
+### [N3_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::MainChassis
+- **params**: `{ isSelected, isIsolated, isHidden, onClick }` — Destructured props
+- **ic_degiskenler**:
+  - `galvanizedSteel` — `useFanMaterials()` hook'undan gelen galvaniz çelik malzemesi; varsayılan dış gövde rengi
+  - `chassisInnerMat` — `useFanMaterials()` hook'undan gelen iç şasi malzemesi; iç mesh'e atanır
+  - `safetyOrange` — `useFanMaterials()` hook'undan gelen turuncu malzeme; seçili durumda dış gövde rengi
+  - `outerGeo` — `useMemo` ile oluşturulan `LatheGeometry(buildLathePoints(), 72)`; dış gövde geometrisi, 72 segment
+  - `innerGeo` — `useMemo` ile oluşturulan `LatheGeometry(buildInnerLathePoints(), 72)`; iç gövde geometrisi, 72 segment
+  - `flangeGeo` — `useMemo` ile oluşturulan `TorusGeometry(0.493, 0.012, 12, 72)`; flanş/halka geometrisi, 0.493 yarıçap, 0.012 tüp yarıçapı
+  - `ribGeos` — `useMemo` callback'inden dönen `BoxGeometry[]` dizisi; 4 adet `BoxGeometry(0.008, 1.44, 0.008)` (ince dikey kaburga)
+  - `mainMaterial` — `isSelected ? safetyOrange : galvanizedSteel` koşullu atama; seçiliyse turuncu, değilse galvaniz çelik
+- **Dönüş**: JSX `<group name="MainChassis">` — 1 outer mesh, 1 inner mesh, 2 flanş mesh (üst/alt y=±0.72), 4 rib mesh (dairesel yerleşim)
+
+---
+
+### [N4_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::ribGeos (useMemo callback)
 - **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `ribs` — BoxGeometry nesnelerini tutan başlangıç boş dizisi
-  - `i` — döngü sayacı, 0‑3 arasında değişir
-- **Dönüş**: THREE.BoxGeometry[]
+- **ic_degiskenler**:
+  - `ribs` — `BoxGeometry[]` boş dizi; döngüde 4 adet `BoxGeometry(0.008, 1.44, 0.008)` push edilir
+  - `i` — `let` ile tanımlı döngü sayacı, 0..3 arası; her iterasyonda yeni bir kaburga geometrisi ekler
+- **Dönüş**: `BoxGeometry[]` — 4 elemanlı geometri dizisi
 
-### [N5_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::handleClick
-- **params**: e (MouseEvent)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: (yok) — olay propagasyonunu durdurur ve onClick props fonksiyonunu çağırır
+---
 
-### [N6_NASIL] AST Pointer: src/components/products/3d/factory/parts/MainChassis.tsx::ribMap
-- **params**: geo (THREE.BoxGeometry), i (number)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element (<mesh> elementi) — rib geometrisi için mesh döndürür
+### [N5_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::onClick (event handler)
+- **params**: `e` — React synthetic event
+- **ic_degiskenler**:
+  - `e` — Tıklama eventi; `e.stopPropagation()` ile yukarı propogasyon engellenir
+  - `onClick` — Prop'tan gelen opsiyonel callback; `onClick?.()` ile çağrılır (event durdurulduktan sonra)
+- **Dönüş**: yok (yan etki: tıklama event'i durdurulur, üst bileşen onClick çağrılır)
+
+---
+
+### [N6_NASIL] AST Pointer: `src/components/products/3d/factory/parts/MainChassis.tsx`::ribGeos.map callback
+- **params**: `geo, i` — `geo`: mevcut `BoxGeometry` elemanı, `i`: dizi indeksi (0..3)
+- **ic_degiskenler**:
+  - `geo` — Mevcut iterasyondaki `BoxGeometry` nesnesi; `<mesh>`'in `geometry` prop'una atanır
+  - `i` — Dizi indeksi; hem `key={i}` hem de dairesel konum hesaplamasında `Math.cos((i * Math.PI) / 2)` ve `Math.sin((i * Math.PI) / 2)` ile kullanılır
+  - `mainMaterial` — Dışarıdan kapanan değişken; tüm rib mesh'lerine `material` olarak atanır
+- **Dönüş**: JSX `<mesh>` — 4 kaburga, yarıçap 0.485 daire üzerinde 0°, 90°, 180°, 270° açılarıyla yerleştirilmiş
 
 ---
 
@@ -143,8 +171,8 @@ graph TD
     MainChassis_tsx__MainChassis["MainChassis"]
     MainChassis_tsx__buildInnerLathePoints["buildInnerLathePoints"]
     MainChassis_tsx__buildLathePoints["buildLathePoints"]
-    MainChassis_tsx__MainChassis --> MainChassis_tsx__buildLathePoints
     MainChassis_tsx__MainChassis --> MainChassis_tsx__buildInnerLathePoints
+    MainChassis_tsx__MainChassis --> MainChassis_tsx__buildLathePoints
 ```
 
 ## NODE ID STANDARD

@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\BentPlaneGeometry.tsx
-skeleton_hash: 0f092659c19f1b1f
+skeleton_hash: 6c4c6bb1b0f73109
 entity_hashes:
   func:BentPlaneGeometry: 925b96f61263e22a
   func:handleClick: bffc3b12eebc550c
-  overview: 8aa34a9d784b08a2
+  overview: 8878452264c689a5
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:53:26Z
 ---
 
 ## Genel Bakış
@@ -26,19 +26,7 @@ Bükülmüş düzlem geometrisini Three.js sahasında oluşturup render eden ana
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
 
-Bu modül, React-three-fiber kullanarak Three.js sahasında eğilmiş düzlem geometrisi render eden bir bileşendir ve aşağıdaki mimari varsayımlarla çalışır:
-
-[Aksiyom 1]: Eğer `image` parametresi geçerli bir görsel kaynağı içermiyorsa (texture, URL veya asset), `BentPlaneMaterial` bileşeni doğru dota uygulanamaz ve geometri boş veya eksik görünümle render edilir.
-
-[Aksiyom 2]: Eğer `BentPlaneMaterial` bileşeni çağrılmazsa veya hatalı parametrelerle çağrılırsa, geometri malzemesi oluşturulamaz ve 3B nesne görünmez hale gelir.
-
-[Aksiyom 3]: Eğer `position` parametresi geçerli bir [x, y, z] vektör dizisi içermiyorsa, bileşen varsayılan `[0, 0, 0]` konumunu kullanır ve bu durum sahada beklenmeyen konumlanmaya yol açabilir.
-
-[Aksiyom 4]: Eğer `id` parametresi benzersiz bir tanımlayıcı sağlamıyorsa, React-three-fiber sahasındaki nesne tanımlama ve tıklama olayları çakışabilir veya yanlış eşleşebilir.
-
-[Aksiyom 5]: Eğer `handleClick` fonksiyonuna geçerli bir `ThreeEvent<MouseEvent>` nesnesi sağlanmıyorsa, tıklama olayı işlenemez ve bileşen interaktif tepki veremez.
 
 ---
 
@@ -78,7 +66,8 @@ Bu modül, React-three-fiber kullanarak Three.js sahasında eğilmiş düzlem ge
 - **BentPlaneMaterial** (call) — `shaderMaterial(
     {
         uTime: 0,
-        uTexture: new THREE.Textur...`
+        uTexture: new Texture(),
+...`
 
 ---
 
@@ -86,18 +75,41 @@ Bu modül, React-three-fiber kullanarak Three.js sahasında eğilmiş düzlem ge
 
 ### [N1_NASIL] AST Pointer: BentPlaneGeometry.tsx::BentPlaneGeometry
 - **params**: `{ image, id, position = [0, 0, 0] }`
-  - `image` — yüklenmesi gereken dokunun URL'isi
-  - `id` — ürünün benzersiz tanımlayıcısı, tıklanınca route'a gönderilir
-  - `position` — mesh'in 3D sahnedeki [x, y, z] koordinatları, varsayılan [0, 0, 0]
+  - `image` — texture image source URL, TextureLoader ile yüklenir
+  - `id` — ürün/kategori ID'si, tıklanınca navigasyonda kullanılır
+  - `position` — mesh'in 3D pozisyonu, varsayılan [0, 0, 0]
 - **ic_degiskenler**:
-  - `router` — `useRouter()` hook'undan dönen Next.js router nesnesi, programlı navigasyon için
-  - `meshRef` — `useRef<THREE.Mesh>(null)`, Three.js mesh DOM'a erişmek için ref
-  - `materialRef` — `useRef<THREE.ShaderMaterial>(null)`, shader material'a erişmek için ref
-  - `scroll` — `useScroll()` hook'undan dönen scroll nesnesi, `.offset` ile mevcut scroll oranı alınır
-  - `hovered` — `useState(false)`, imlecin mesh üzerinde olup olmadığını tutan boolean state
-  - `texture` — `useMemo(() => new THREE.TextureLoader().load(image), [image])`, image parametresinden yüklenen THREE.Texture, `colorSpace` SRGB olarak ayarlanır
-  - `handleClick` — `(e: ThreeEvent<MouseEvent>) => { ... }` tıklama olayını işleyen callback, `e.stopPropagation()` ve `router.push(Routes.category(id))` çağırır
-- **Dönüş**: JSX — `<mesh>` elementi, içinde `<planeGeometry>` ve `<bentPlaneMaterial>` barındırır
+  - `router` — Next.js useRouter hook'u, sayfa yönlendirmesi için
+  - `meshRef` — useRef<Mesh>(null), Three.js mesh elementine referans, scale animasyonu için
+  - `materialRef` — useRef<ShaderMaterial>(null), shader material'a referans, uniform güncellemeleri için
+  - `scroll` — useScroll() drei hook'u, sayfa kaydırma offset'ini takip eder
+  - `hovered` — useState(false), fare üstüne gelme durumu boolean state
+  - `texture` — useMemo(() => new TextureLoader().load(image), [image]), yüklenen Three.js Texture nesnesi
+  - `texture.colorSpace` — SRGBColorSpace değerine atanır, doğru renk uzayı için
+  - `handleClick` — tıklama olayı handler fonksiyonu
+- **Dönüş**: JSX element (mesh bileşeni)
+
+### [N2_NASIL] AST Pointer: BentPlaneGeometry.tsx::useFrame callback
+- **params**: yok (anonim arrow function)
+- **ic_degiskenler**:
+  - `meshRef.current` — varsa mesh referansı, erişim guard kontrolü yapılır
+  - `materialRef.current` — varsa material referansı, erişim guard kontrolü yapılır
+  - `materialRef.current.uniforms.uScrollOffset` — shader uniform'u, scroll offset değeri atanır
+  - `materialRef.current.uniforms.uHover` — shader uniform'u, hover durumu lerp ile interpolasyon yapılır
+  - `scroll.offset` — mevcut sayfa kaydırma offset değeri
+  - `hovered` — hover state boolean değeri, 1 veya 0'a lerp edilir
+  - `targetScale` — const, hovered durumuna göre 1.1 veya 1.0 ölçek değeri
+  - `meshRef.current.scale.x` — mesh'in X ekseni ölçeği, lerp ile animasyon
+  - `meshRef.current.scale.y` — mesh'in Y ekseni ölçeği, lerp ile animasyon
+- **Dönüş**: yok (her frame çağrılır, uniform ve scale güncelleme yan etkisi)
+
+### [N3_NASIL] AST Pointer: BentPlaneGeometry.tsx::handleClick
+- **params**: `(e: ThreeEvent<MouseEvent>)` — Three.js farenin tıklama olayı
+- **ic_degiskenler**:
+  - `e` — ThreeEvent<MouseEvent> nesnesi, tıklama eventi
+  - `router` — component scope'tan kapanır, Next.js yönlendirme için
+  - `id` — prop'tan kapanır, category route oluşturmada kullanılır
+- **Dönüş**: yok (e.stopPropagation() ile olay yayılımını durdurur, router.push ile navigasyon yan etkisi)
 
 ---
 

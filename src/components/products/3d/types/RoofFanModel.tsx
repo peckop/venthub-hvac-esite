@@ -3,13 +3,14 @@
 import { useTexture } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { DoubleSide,Vector2 } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export const RoofFanModel: React.FC = () => {
     const materials = useFanMaterials()
-    const rotorRef = useRef<THREE.Group>(null)
+    const rotorRef = useRef<Group>(null)
 
     // Vortice Torrette TR-ED Serisi - Teknik İyileştirme
     // - Oranlar: Büyük Konik Başlık / Dar Alt Izgara
@@ -185,11 +186,11 @@ export const RoofFanModel: React.FC = () => {
             <mesh position={[0, 0, 0]} material={materials.roofAntracite}>
                 <latheGeometry args={[
                     useMemo(() => [
-                        new THREE.Vector2(0.69, 0.58),  // Shroud eteği alt (DIŞA AÇILI/KONİK)
-                        new THREE.Vector2(0.65, 0.76),  // Shroud eteği üst
-                        new THREE.Vector2(0.60, 0.80),  // Yumuşak geçiş radyüsü 1
-                        new THREE.Vector2(0.38, 0.86),  // Yumuşak geçiş radyüsü 2 (Koniye bağlanış)
-                        new THREE.Vector2(0.22, 1.28),  // Koni üst
+                        new Vector2(0.69, 0.58),  // Shroud eteği alt (DIŞA AÇILI/KONİK)
+                        new Vector2(0.65, 0.76),  // Shroud eteği üst
+                        new Vector2(0.60, 0.80),  // Yumuşak geçiş radyüsü 1
+                        new Vector2(0.38, 0.86),  // Yumuşak geçiş radyüsü 2 (Koniye bağlanış)
+                        new Vector2(0.22, 1.28),  // Koni üst
                     ], []),
                     64
                 ]} />
@@ -213,7 +214,7 @@ export const RoofFanModel: React.FC = () => {
             <group position={[0, 1.02, 0.33]} rotation={[-0.36, 0, 0]}>
                 <mesh>
                     <planeGeometry args={[0.14, 0.14]} />
-                    {logoTexture && <meshStandardMaterial map={logoTexture} transparent={false} side={THREE.DoubleSide} />}
+                    {logoTexture && <meshStandardMaterial map={logoTexture} transparent={false} side={DoubleSide} />}
                     {!logoTexture && <meshStandardMaterial color="#008C45" />}
                 </mesh>
             </group>

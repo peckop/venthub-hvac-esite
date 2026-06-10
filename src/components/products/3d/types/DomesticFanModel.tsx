@@ -1,12 +1,12 @@
 "use client";
 import React, { useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export const DomesticFanModel: React.FC = () => {
     const materials = useFanMaterials()
-    const fanRef = useRef<THREE.Group>(null)
+    const fanRef = useRef<Group>(null)
 
     // Referans Görsel 3: Kare, Beyaz/Metalik, Delikli Izgaralı Banyo Fanı (Vortice Quattro vb.)
 

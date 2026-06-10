@@ -3,40 +3,42 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\JetFanModel.tsx
-skeleton_hash: 89abb80d68fa0a96
+skeleton_hash: c298291b50e6a753
 entity_hashes:
   func:FlexibleCable: 7422952d69466487
   func:JetFanModel: b12c8fa3c1846be6
-  overview: 8a7cf9e540eb1306
+  overview: 036f18c566d2c82f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:46:54Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformu için geliştirilen, jet fan tipi ekipmanın React tabanlı 3D modelini ve bu modelin içinde yer alan yardımcı bileşenleri barındırır. Modülün temel amacı, ürünün 3B sahnede gerçekçi ve etkileşimli bir şekilde görselleştirilmesini sağlamaktır.
+Bu modül, VentHub HVAC platformundaki jet fan tipi ekipmanın React tabanlı 3D modelini ve bu modelin içinde yer alan yardımcı alt bileşenlerini tanımlar. Modülün temel amacı, ilgili ürünün sahnede gerçekçi ve etkileşimli bir şekilde görselleştirilmesini sağlamaktır.
 
 ## Fonksiyon Grupları
 ### Ana 3B Model Bileşeni
-Modülün dışarıya açılan temel bileşenini oluşturur; jet fanın ana 3B geometrisini ve görünümünü tanımlar.
+Modülün dışarıya açılan temel bileşeni; jet fanın ana 3B geometrisini, görünümünü ve sahne entegrasyonunu tanımlar.
 - JetFanModel
 
 ### Yardımcı Alt Bileşenler
-Ana modelin yapısında yer alan, belirli bir parça veya özellik için kullanıma özel, yeniden kullanılabilir görsel bileşenleri içerir.
+Ana modelin yapısı içinde yer alan, belirli bir parça veya özellik için kullanıma özel, yeniden kullanılabilir görsel bileşenleri içerir.
 - FlexibleCable
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, jet fan tipi HVAC ekipmanının 3D görselleştirme bileşenlerini içerir.
+Bu modül, jet fan tipi 3D görselleştirme bileşenlerinden oluşmaktadır.
 
-**[Aksiyom 1 - Materials Zorunluluğu]:** `FlexibleCable` bileşeni çağrılmak için `materials` parametresi `FanMaterials` tipinde sağlanmalıdır. Eğer `FanMaterials` tipinde `materials` parametresi sağlanmazsa, bileşen derleme zamanında tip hatası verir veya render sırasında çalışmayı durdurur.
+**[Aksiyom 1]:** Eğer `FlexibleCable` bileşeni `materials` parametresi olmadan çağrılırsa, bileşen düzgün render edilemez veya derleme hatası oluşur. `materials` parametresi zorunludur ve `FanMaterials` tipinde olmalıdır.
 
-**[Aksiyom 2 - FanMaterials Tip Bağımlılığı]:** `FanMaterials` tipi bu modül dışında tanımlı olmalıdır. Eğer `FanMaterials` tipi tanımsız veya ithal edilemez (import edilemez) olursa, `FlexibleCable` bileşeninin imzası compile edilemez ve modül kullanılamaz hale gelir.
+**[Aksiyom 2]:** Eğer `FanMaterials` tipi tanımlı değilse veya geçerli bir yapıda değilse, `FlexibleCable` bileşeninin malzeme özellikleri eksik kalır ve 3D modelde malzeme gösterimi hatalı olur.
 
-**[Aksiyom 3 - JetFanModel Veri Bağımlılığı]:** `JetFanModel` bileşeni parameterez olarak hiçbir veri almaz. Eğer `JetFanModel`'in render işlemi için gerekli veriler (malzeme, geometri, konum vb.) React context veya üst bileşen prop'ları aracılığıyla sağlanmazsa, bileşen boş veya hatalı render edilir.
+**[Aksiyom 3]:** Eğer `JetFanModel` ana 3D sahneye yerleştirilmezse, jet fan modeli görsel olarak görünmez olur.
 
-**[Aksiyom 4 - Bileşen İlişkisi Varsayımı]:** `JetFanModel` ana bileşen olarak, `FlexibleC供` gibi alt bileşenleri kendi içinde barındırabilir. Eğer `JetFanModel` içinde `FlexibleCable` kullanılacaksa, `materials` prop'u `JetFanModel`'e gelen veriden türetilerek sağlanmalıdır; aksi halde alt bileşen hata verir.
+---
+
+**Not:** Bu modül için fonksiyon gövdesi detayları paylaşılmadığından, sadece fonksiyon imzalarından türeyen zorunluluklar (parametre gereksinimleri) aksiyom olarak belirlenmiştir. Fonksiyon iç mantığına ilişkin ek varsayımlar, gövde kodu incelendikten sonra eklenebilir.
 
 ---
 
@@ -59,15 +61,92 @@ Bu modül, jet fan tipi HVAC ekipmanının 3D görselleştirme bileşenlerini i�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/components/products/3d/types/JetFanModel.tsx`::JetFanModel
+### [N1_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::JetFanModel
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `materials` — `useFanMaterials()` hook'undan dönen FanMaterials nesnesi; tüm 3D mesh'lerin renk ve yüzey malzemelerini (jetOrange, greyBox, matteBlack, cableGrey, brushedAluminum) sağlar
-  - `fanRef` — `useRef<THREE.Group>(null)` ile oluşturulan React ref nesnesi; iç pervane rotorunu referans alarak useFrame içinde döndürmek için kullanılır
-- **useFrame callback ic degiskenler**:
-  - `state` — `@react-three/fiber` tarafından sağlanan frame state nesnesi (bu fonksiyonda kullanılmıyor, sadece imza gereği mevcut)
-  - `delta` — iki frame arasındaki zaman farkı (saniye); `fanRef.current.rotation.y -= delta * 25` ifadesinde pervane hızı için kullanılır
-- **Dönüş**: JSX — `<group>` içinde 3D jet fan modeli (ana silindirik gövde, elektrik kutusu, kablo girişi, montaj ayakları, iç pervane rotoru)
+  - `materials` — useFanMaterials hook'unun dönüş değeri; tüm 3D model malzemelerini (jetOrange, greyBox, matteBlack, cableGrey, brushedAluminum) içerir
+  - `fanRef` — useRef<Group>(null) ile oluşturulan React ref; iç pervaneyi (rotor) referans alır, useFrame içinde döndürmek için kullanılır
+- **Dönüş**: JSX (React.FC) — 3B jet fan modelini oluşturan React Three Fiber group elemanı
+
+---
+
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::useFrame_callback
+- **params**: `(state, delta)` — state: Three.js state objesi (kullanılmıyor), delta: son frame ile geçen süre (saniye)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok — fanRef.current.rotation.y değerini delta * 25 kadar azaltarak pervaneyi döndürür (yan etki)
+
+---
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_sol_kanatlar
+- **params**: `(xVal, k)` — xVal: kanat pozisyonu (0, -0.12, -0.22), k: index anahtarı
+- **ic_degiskenler**:
+  - `r` — sabit yarıçap değeri 0.31; silindirik gövde yarıçapını temsil eder
+  - `w` — hesaplanmış genişlik; `2 * Math.sqrt(Math.max(0, r*r - xVal*xVal))` formülüyle xVal konumundaki daire kirişi genişliğini hesaplar
+- **Dönüş**: JSX mesh elemanı — sol taraftaki yatay iç kanat
+
+---
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_mazgal_tel
+- **params**: `(_, k)` — _ : kullanılmayan index, k: tel çubuk indexi (0-7)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX mesh elemanı — dairesel mazgal ızgaranın tek bir tel çubuğu
+
+---
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_mazgal halka
+- **params**: `(radius, j)` — radius: halka yarıçapı (0.12, 0.2, 0.28), j: index anahtarı
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX mesh elemanı — mazgal ızgaranın tek bir dairesel halkası
+
+---
+
+### [N6_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_elektrik_bx
+- **params**: `bx` — X ekseninde vida pozisyonu (0.065, -0.065)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Nested map sonucu JSX — elektrik kutusu vidalarının bir satırı
+
+---
+
+### [N7_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_elektrik_by
+- **params**: `by` — Y ekseninde vida pozisyonu (0.05, -0.05)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX mesh elemanı — tek bir vida (matteBlack silindir)
+
+---
+
+### [N8_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_montaj_xPos
+- **params**: `xPos` — X ekseninde montaj ayağı pozisyonu (-0.35, 0.35)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX group elemanı — bir montaj ayağı çifti (zPos map'i içinde 2 ayak)
+
+---
+
+### [N9_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_montaj_zPos
+- **params**: `zPos` — Z ekseninde montaj ayağı pozisyonu (-0.22, 0.22)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX group elemanı — tek bir montaj ayağı (dikey plaka + yatay taban + somun)
+
+---
+
+### [N10_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::map_callback_pervane
+- **params**: `(_, i)` — _ : kullanılmayan index, i: kanat indexi (0-7)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX mesh elemanı — pervanenin tek bir kanadı (cableGrey malzemeli kutu)
+
+---
+
+### [N11_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::FlexibleCable
+- **params**: `{ materials }` — FanMaterials tipinde; materials.cableGrey kullanılır
+- **ic_degiskenler**:
+  - `path` — useMemo ile memoize edilmiş CatmullRomCurve3 nesnesi; 4 noktadan oluşan kablo eğrisi yolu
+- **Dönüş**: JSX mesh elemanı — tubeGeometry ile oluşturulmuş 3B kablo modeli
+
+---
+
+### [N12_NASIL] AST Pointer: src/components/products/3d/types/JetFanModel.tsx::useMemo_callback_FlexibleCable
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `CatmullRomCurve3` — 4 Vector3 noktasından (0,0,0 → 0,0.04,0.05 → 0,0.06,0.12 → 0,0.06,0.175) oluşan Catmull-Rom spline eğrisi
 
 ---
 

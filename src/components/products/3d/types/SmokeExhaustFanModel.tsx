@@ -1,13 +1,14 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { ExtrudeGeometry,Shape } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export function SmokeExhaustFanModel() {
     const materials = useFanMaterials()
-    const rotorRef = useRef<THREE.Group>(null)
+    const rotorRef = useRef<Group>(null)
 
     // DUMAN EGZOZ FANI (MAX FILL UPDATE)
     // 1. Blade Length: Extended to 0.51 (Tip Radius 0.69 vs Casing 0.70). Gap = 1cm.
@@ -22,7 +23,7 @@ export function SmokeExhaustFanModel() {
 
     // BLADE GEOMETRY: Long Cleaver - Memoized to prevent leaks
     const bladeGeometry = useMemo(() => {
-        const shape = new THREE.Shape()
+        const shape = new Shape()
 
         // Blade Root at (0,0). X is Radial Length. Y is Chord Width.
         // Root Chord
@@ -46,7 +47,7 @@ export function SmokeExhaustFanModel() {
             bevelSize: 0.003,
             bevelSegments: 2
         }
-        return new THREE.ExtrudeGeometry(shape, extrudeSettings)
+        return new ExtrudeGeometry(shape, extrudeSettings)
     }, [])
 
     return (

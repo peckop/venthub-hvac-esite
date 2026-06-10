@@ -2,7 +2,8 @@
 import { Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group, Mesh, MeshBasicMaterial } from 'three'
+import { AdditiveBlending,Color, DoubleSide } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
@@ -12,7 +13,7 @@ export interface AirCurtainModelProps {
 }
 
 export function AirCurtainModel({ isHeated = false, showMixed = false }: AirCurtainModelProps) {
-    const drumRef = useRef<THREE.Group>(null)
+    const drumRef = useRef<Group>(null)
     const materials = useFanMaterials()
 
     // Animasyon: İç tambur fanın (Cross-Flow) X ekseni etrafında dönmesi
@@ -131,7 +132,7 @@ export function AirCurtainModel({ isHeated = false, showMixed = false }: AirCurt
 // Görsel: Cihaz genişliğinde yatay dilimler, üstten alta gradient opacity,
 // dalga animasyonuyla akan hava efekti.
 function AirFlow({ isHeated, showMixed }: { isHeated: boolean, showMixed: boolean }) {
-    const meshRefs = useRef<(THREE.Mesh | null)[]>([])
+    const meshRefs = useRef<(Mesh | null)[]>([])
 
     const SLICE_COUNT = 28          // Yatay dilim sayısı
     const CURTAIN_WIDTH = 2.32      // Perde genişliği (cihaz genişliğiyle eşleşir)
@@ -169,7 +170,7 @@ function AirFlow({ isHeated, showMixed }: { isHeated: boolean, showMixed: boolea
         slices.forEach((s, i) => {
             const mesh = meshRefs.current[i]
             if (!mesh) return
-            const mat = mesh.material as THREE.MeshBasicMaterial
+            const mat = mesh.material as MeshBasicMaterial
 
             // Normalize konum (0=üst, 1=alt)
             const t = i / (SLICE_COUNT - 1)
@@ -186,8 +187,8 @@ function AirFlow({ isHeated, showMixed }: { isHeated: boolean, showMixed: boolea
         })
     })
 
-    const hotColor = new THREE.Color("#fb923c")   // Sıcak
-    const coldColor = new THREE.Color("#38bdf8")   // Soğuk
+    const hotColor = new Color("#fb923c")   // Hot
+    const coldColor = new Color("#38bdf8")   // Cold
 
     return (
         // Akış başlangıcı: Üfleme ızgarasının hemen altı (bu group zaten ızgara içinde)
@@ -203,8 +204,8 @@ function AirFlow({ isHeated, showMixed }: { isHeated: boolean, showMixed: boolea
                         color={s.type === 1 ? hotColor : coldColor}
                         transparent
                         opacity={0}
-                        side={THREE.DoubleSide}
-                        blending={THREE.AdditiveBlending}
+                        side={DoubleSide}
+                        blending={AdditiveBlending}
                         depthWrite={false}
                     />
                 </mesh>

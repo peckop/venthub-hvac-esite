@@ -3,35 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\Category3DIcon.tsx
-skeleton_hash: 26b109acd1c22ca6
+skeleton_hash: 511a70b464c7831f
 entity_hashes:
   func:Category3DIcon: 183e6f04e3301ca0
-  overview: fc3c14abd899ae11
+  overview: b7e45f97931594a0
   style_tokens: b8d757c80f7b09fe
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:54:12Z
 ---
 
 ## Genel Bakış
-Bu React modülü, VentHub HVAC projesinin ürün bölümünde kullanılan kategori tabanlı 3B ikonları sunmak üzere tasarlanmış yeniden kullanılabilir bir UI bileşenidir. Kategori kimliği, üzerine gelinme durumu, kartın konumu ve dokunma ipucu gereksinimi gibi dinamik parametrelere göre ikonun görünümünü ayarlayarak farklı kullanım senaryolarına uyum sağlar.
+Bu modül, VentHub HVAC projesinin ürün bölümünde kategori bazlı 3D ikonları göstermek için kullanılan yeniden kullanılabilir bir React UI bileşenidir. Kategori tipi, üzerine gelme durumu, kart konumu ve dokunma ipucu gereksinimi gibi parametrelerle ikonun görünümünü dinamik olarak ayarlar.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Modülün tüm sorumluluğunu üstlenen tek giriş noktasıdır, gelen parametreleri işleyerek uygun 3B ikonun ekrana yansıtılmasını yönetir.
+Modülün tek ve ana bileşeni olarak tüm sorumluluğu üstlenir, gelen parametrelere göre uygun 3D ikonu render eder.
 - Category3DIcon
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kategori bazlı 3D ikon gösterimi için dört parametreye bağımlıdır; geçerli değerler sağlanmadığında bileşen doğru görsel sonucu üretemez.
+Bu modül, kategori bazlı 3D ikon gösterimi için dört parametreye bağlı olarak çalışır.
 
-[Aksiyom 1]: Eğer `categorySlug` parametresi sağlanmazsa veya geçerli bir kategori tanımlayıcısı içermiyorsa, bileşen hangi 3D ikonu render edeceğini bilemez ve uygun görsel çıktı üretilemez.
+[Aksiyom 1]: Eğer `categorySlug` parametresi geçerli bir kategori tanımlayıcısı olarak sağlanmazsa, hangi kategori ikonunun gösterileceği belirlenemez ve bileşen anlamlı bir içerik üretemez.
 
-[Aksiyom 2]: Eğer `hovered` parametresi sağlanmazsa, bileşen üzerine gelme durumunu bilemez ve ikonun hover durumuna ait görsel geçiş (animasyon, renk değişimi vb.) tetiklenemez.
+[Aksiyom 2]: Eğer `hovered` parametresi boolean türünde bir değer olarak sağlanmazsa, ikonun üzerine gelinme durumuna bağlı görsel geçiş (hover animasyonu/stili) doğru şekilde hesaplanamaz.
 
-[Aksiyom 3]: Eğer `isFrontCard` parametresi sağlanmazsa, bileşen kartın konumsal bağlamını (ön/arka) bilemez ve buna göre konumlandırma veya perspektif ayarlaması yapılamaz.
+[Aksiyom 3]: Eğer `isFrontCard` parametresi boolean türünde bir değer olarak sağlanmazsa, ikonun kartın ön yüzünde mi yoksa arka yüzünde mi konumlandığı bilinemez ve buna bağlı 3D perspective/rendering kararı verilemez.
 
-[Aksiyom 4]: Eğer `shouldShowTapHint` parametresi sağlanmazsa, bileşen dokunma ipucunun gösterilip gösterilmeyeceğine karar veremez ve ipucu bileşeni gereksiz veya eksik_render edilebilir.
+[Aksiyom 4]: Eğer `shouldShowTapHint` parametresi boolean türünde bir değer olarak sağlanmazsa, dokunma ipucu göstergesinin görünür olup olmadığı belirlenemez ve kullanıcıya sunulacak etkileşim yönlendirmesi yapılamaz.
+
+[Aksiyom 5]: Eğer fonksiyon imzasında hiç `default değer` tanımlanmamışsa, tüm parametreler调用yan taraf tarafından açıkça sağlanmalıdır; aksi halde `undefined` değerlerle çalışılması gerekir ve bileşen beklenmeyen davranış sergileyebilir.
 
 ---
 
@@ -68,16 +70,32 @@ Bu modül, kategori bazlı 3D ikon gösterimi için dört parametreye bağımlı
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: Category3DIcon.tsx::Category3DIcon
-- **params**: (categorySlug, hovered, isFrontCard, shouldShowTapHint, shouldShowDragHint, hintStage, DetailedModel, scale, modelType, offsetContext)
+- **params**: `categorySlug` — kategorinin URL dostu adı, FanRenderer'a slugs olarak geçer
 - **ic_degiskenler**:
-    - `meshRef` — useRef ile oluşturulan THREE.Group referansı, 3D modelin rotasyonunu kontrol etmek için kullanılır
-    - `showTapHint` — shouldShowTapHint ve hintStage koşullarına göre tap hintinin gösterilip gösterilmeyeceğini belirleyen boolean değer
-- **Dönüş**: React.Group JSX elementi (3D model ve UI hint'lerini içeren container)
+  - `meshRef` — useRef ile oluşturulmuş THREE.Group referansı, 3D sahnedeki grup elemanına erişmek için kullanılır
+  - `showTapHint` — shouldShowTapHint ve hintStage === 'tap' koşullarının birleşimi, dokunma ipucunun gösterilip gösterilmeyeceğini belirler
+- **Dönüş**: JSX elementi (React.ReactNode) — 3D sahne grubu ve koşullu UI hint bileşenlerini render eder
 
-### [N2_NASIL] AST Pointer: Category3DIcon.tsx::useFrame callback
-- **params**: (state) — useFrame hook'unun sağladığı frame state nesnesi
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: meshRef.current.rotation.y'yi günceller)
+### [N2_NASIL] AST Pointer: Category3DIcon.tsx::useFrame回调
+- **params**: `state` — useFrame'in sağladığı state objesi, state.clock.elapsedTime ile zaman bilgisine erişilir
+- **ic_degiskenler**:
+  - (parametre içinde değişken yok, doğrudan state.clock.elapsedTime kullanılır)
+- **Dönüş**: yok (yan etki: meshRef.current'ın rotation.y değerini değiştirir)
+
+### [N3_NASIL] AST Pointer: Category3DIcon.tsx::FanRenderer Kullanımı
+- **params**: (parametre yok, JSX içinde çağrı)
+- **ic_degiskenler**:
+  - `categorySlug` — props'tan gelen değer, FanRenderer'a `slug` prop'u olarak geçer
+  - `modelType` — props'tan gelen değer, FanRenderer'a `modelType` prop'u olarak geçer
+- **Dönüş**: yok (yan etki: FanRenderer bileşenini render eder)
+
+### [N4_NASIL] AST Pointer: Category3DIcon.tsx::Html Kullanımı
+- **params**: (parametre yok, JSX içinde çağrı)
+- **ic_degiskenler**:
+  - `isFrontCard` — props'tan gelen boolean, ön kartta olup olmadığınızı kontrol eder
+  - `shouldShowDragHint` — props'tan gelen boolean, sürükleme ipucunun gösterilip gösterilmeyeceğini belirler
+  - `hintStage` — props'tan gelen string, ipucu aşamasını belirtir ('tap' veya 'drag')
+- **Dönüş**: yok (yan etki: 3D sahne üzerine HTML overlay'leri yerleştirir)
 
 ---
 

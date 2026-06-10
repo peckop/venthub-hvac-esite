@@ -1,6 +1,6 @@
 "use client";
 import React, { useMemo } from 'react'
-import * as THREE from 'three'
+import { DoubleSide,Shape } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
@@ -60,7 +60,7 @@ export const Housing: React.FC<HousingProps> = ({ radius, length, thickness = 0.
             <mesh material={materials.galvanizedSteel} castShadow receiveShadow>
                 {/* openEnded: true, side: DoubleSide ile içini de gösterelim */}
                 <cylinderGeometry args={[radius, radius, length, 32, 1, true]} />
-                <meshStandardMaterial color="#94a3b8" metalness={0.6} roughness={0.4} side={THREE.DoubleSide} />
+                <meshStandardMaterial color="#94a3b8" metalness={0.6} roughness={0.4} side={DoubleSide} />
             </mesh>
 
             {/* Gövde kalınlığı illüzyonu için uçlara halkalar */}
@@ -80,7 +80,7 @@ export const SnailHousing: React.FC<{ scale?: number }> = ({ scale = 1 }) => {
     const materials = useFanMaterials()
 
     const shape = useMemo(() => {
-        const s = new THREE.Shape()
+        const s = new Shape()
 
         // Salyangoz Spirali (Logaritmik spiral yaklaşımı)
         s.moveTo(0.5, 0)

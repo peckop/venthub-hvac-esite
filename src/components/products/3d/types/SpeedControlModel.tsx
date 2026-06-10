@@ -1,17 +1,18 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { MeshBasicMaterial } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export function SpeedControlModel() {
     const materials = useFanMaterials()
-    const knobRef = useRef<THREE.Group>(null)
-    const ledRef = useRef<THREE.MeshBasicMaterial>(null)
+    const knobRef = useRef<Group>(null)
+    const ledRef = useRef<MeshBasicMaterial>(null)
 
     // LED Material - Memoized to prevent leaks
-    const ledMaterial = useMemo(() => new THREE.MeshBasicMaterial({ color: '#00ff00' }), [])
+    const ledMaterial = useMemo(() => new MeshBasicMaterial({ color: '#00ff00' }), [])
 
     useFrame((state) => {
         const time = state.clock.elapsedTime

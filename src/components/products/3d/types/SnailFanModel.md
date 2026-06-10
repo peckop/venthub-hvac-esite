@@ -3,31 +3,32 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx
-skeleton_hash: a88f0daa446dde1f
+skeleton_hash: 8c1cbc5c9d7f6757
 entity_hashes:
   func:SnailFanModel: 43312a20c26f093f
-  overview: 6e44ab631bd58611
+  overview: 0330a77864ae91b3
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:51:48Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun ürünler bölümündeki 3D görüntüleme altyapısı için geliştirilen bu modül, salyangoz tipi fanların 3D modelini render etmek üzere tasarlanmıştır. React tabanlı bir yapıda çalışan modül, diğer 3D ürün bileşenleriyle uyumlu şekilde entegre olarak platformdaki ürün görselleştirme ihtiyacını karşılar.
+Bu modül, VentHub HVAC platformunun ürün görselleştirme altyapısında, salyangoz tipi fanların üç boyutlu modellerini tarayıcı ortamında render etmekle yükümlüdür. React ekosistemi içinde çalışarak, ürün sayfalarında gerçekçi ve etkileşimli fan görünümleri sunmayı amaçlayan tek amaçlı bir bileşen paketidir.
 
 ## Fonksiyon Grupları
-### Ana 3D Bileşeni
-Modülün tek ve temel fonksiyonu olarak salyangoz fan 3D modelini uygulamaya sunar, tüm görüntüleme süreçlerini üstlenerek fan modelini platformun ilgili sayfasına entegre eder.
+### 3D Fan Modeli Bileşeni
+Modülün temel ve tek sorumluluğu, salyangoz fanın üç boyutlu modelini oluşturup kullanıcıya sunmaktır. Fonksiyon, 3D sahne entegrasyonu ve görsel parametreleri yöneterek fanı ekranda canlandırır.
 - SnailFanModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Tarayıcıda çalışan React tabanlı 3D HVAC ürün modeli bileşenidir, proje içindeki ürün 3D görselleştirme akışında kullanılır, çalışması için ekosistemdeki tüm ilgili 3D altyapı ve React çalışma zamanının sorunsuz şekilde sağlanması zorunludur.
+React tabanlı 3D render bileşeni olarak çalışan bu modül, salyangoz fan modelinin görüntülenmesi için belirli ortam koşullarına bağlıdır.
 
-[Aksiyom 1]: Eğer çalıştığı tarayıcıda WebGL desteği bulunmuyorsa, 3D fan modeli hiçbir şekilde ekrana renderlanamaz, kullanıcıya ürün 3D görünümü sunulamaz.
-[Aksiyom 2]: Eğer projenin entegre ettiği 3D render kütüphanesi (örn: Three.js, React Three Fiber) bileşen çalıştırılmadan önce yüklenmemişse, modelin geometrik ve görsel öğeleri oluşturulamaz, boş veya hatalı görsel çıktı oluşur.
-[Aksiyom 3]: Eğer bu bileşen çağrıldığında üst bileşen tarafından kendisine iletilen geçerli 3D sahne referansı sağlanmamışsa, model mevcut ürün sahnesine eklenemez, ürün görselleştirme akışı tamamen kesilir.
-[Aksiyom 4]: Eğer bileşen React bileşen ağacı kurallarına aykırı olarak yetkili olmayan bir bağlamda çağrılırsa, modelin konumlandırma, ölçeklendirme gibi temel görsel özellikleri çalışmaz, proje genelinde tüm ürün görselleştirmelerinde tutarsızlıklar ortaya çıkar.
+[Aksiyom 1]: Eğer React runtime ortamı (tarayıcı DOM'u) yoksa, SnailFanModel bileşeni render edilemez.
+
+[Aksiyom 2]: Eğer WebGL desteği veya Three.js benzeri 3D render kütüphanesi yüklü değilse, salyangoz fan 3D modeli görüntülenemez.
+
+[Aksiyom 3]: Eğer bu bileşen 3D ürün görüntüleme altyapısı (ürün sayfası/bileşeni) içinde çağrılmazsa, fan modeli sayfada yer almaz.
 
 ---
 
@@ -47,63 +48,46 @@ Tarayıcıda çalışan React tabanlı 3D HVAC ürün modeli bileşenidir, proje
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::SnailFanModel
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials hook'undan alınan tüm 3D model materyallerini tutan nesne
-  - `scrollShape` — useMemo ile önbelleğe alınan salyangoz gövdesinin 2D şeklini tanımlayan THREE.Shape nesnesi
-  - `Bolt` — içeride tanımlanan konum parametresi alan 3D cıvata bileşeni
-- **Dönüş**: Tüm fan modelini içeren ana JSX group elementi
+  - `materials` — useFanMaterials() hook'undan dönen materyal objesi, tüm 3D parçalar için malzeme tanımlarını içerir
+  - `scrollShape` — useMemo ile oluşturulan salyangoz formu Shape nesnesi, extrudeGeometry için kullanılır
+  - `Bolt` — Standart cıvata bileşeni, position parametresi ile konumlandırılır
+- **Dönüş**: JSX.Element (React functional component)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::scrollShapeMemoCallback
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::scrollShapeCreator
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `shape` — salyangoz konturunu çizmek için oluşturulan THREE.Shape nesnesi, üzerine çizim komutları eklenir
-- **Dönüş**: Tamamlanmış salyangoz şeklini içeren THREE.Shape nesnesi
+  - `shape` — Three.js Shape nesnesi, salyangoz formunun 2D konturu oluşturulur
+- **Dönüş**: Shape (Three.js Shape nesnesi)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::BoltComponent
-- **params**: [{ position: [number, number, number] }]
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::Bolt
+- **params**: `{ position: [number, number, number] }` — Cıvatanın 3D koordinat pozisyonu
 - **ic_degiskenler**:
-  - `position[0]` — cıvatanın 3D sahnesindeki X konumu
-  - `position[1]` — cıvatanın 3D sahnesindeki Y konumu
-  - `position[2]` — cıvatanın 3D sahnesindeki Z konumu
-  - `materials.boltChrome` — cıvataya uygulanan krom kaplama materyali
-  - `cylinderGeometry` — cıvata gövdesi için silindir geometrisi
-  - `sphereGeometry` — cıvata başı için kesik küre geometrisi
-- **Dönüş**: 3D cıvata modelini içeren JSX group elementi
+  - `materials` — Ana bileşenden gelen materyal objesi, materials.boltChrome kullanılır
+- **Dönüş**: JSX.Element (Cıvata 3D modeli)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::coolingFinMapCallback
-- **params**: [_, i]
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::coolingFinMapper
+- **params**: `(_, i)` — _ kullanılmayan eleman, i döngü indeksi
 - **ic_degiskenler**:
-  - `i` — map döngüsündeki mevcut soğutma kanadının sıra numarası
-  - `materials.industrialBlue` — kanada uygulanan endüstriyel mavi materyal
-  - `boxGeometry` — soğutma kanadı için dikdörtgen prizma geometrisi
-- **Dönüş**: Tek soğutma kanadını temsil eden JSX mesh elementi
+  - `materials` — Ana bileşenden gelen materyal objesi, materials.industrialBlue kullanılır
+- **Dönüş**: JSX.Element (Soğutma kanadı mesh)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::mountBoltMapCallback
-- **params**: [angle, i]
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::boltMapper
+- **params**: `(angle, i)` — angle açı derecesi (radyana çevrilir), i döngü indeksi
 - **ic_degiskenler**:
-  - `angle` — vidanın konumunu hesaplamak için kullanılan açı (derece cinsinden)
-  - `i` — map döngüsündeki vidanın sıra numarası
-  - `Math.cos(angle * Math.PI / 180) * 0.22` — vidanın X konumu
-  - `Math.sin(angle * Math.PI / 180) * 0.22` — vidanın Y konumu
-  - `0.025` — vidanın sabit Z konumu
-- **Dönüş**: Konumlandırılmış Bolt bileşenini içeren JSX elementi
+  - `materials` — Ana bileşenden gelen materyal objesi, Bolt bileşenine aktarılır
+- **Dönüş**: JSX.Element (Bolt bileşeni ile konumlandırılmış cıvata)
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::guardRingMapCallback
-- **params**: [r, i]
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::ringMapper
+- **params**: `(r, i)` — r daire yarıçapı, i döngü indeksi
 - **ic_degiskenler**:
-  - `r` — mevcut koruma halkasının yarıçapı
-  - `i` — map döngüsündeki halkanın sıra numarası
-  - `materials.industrialBlue` — halkaya uygulanan endüstriyel mavi materyal
-  - `torusGeometry` — halka şekli için tor geometrisi
-- **Dönüş**: Tek koruma halkasını temsil eden JSX mesh elementi
+  - `materials` — Ana bileşenden gelen materyal objesi, materials.industrialBlue kullanılır
+- **Dönüş**: JSX.Element (Torus geometrik halka mesh)
 
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::guardWireMapCallback
-- **params**: [angle, i]
+### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SnailFanModel.tsx::wireMapper
+- **params**: `(angle, i)` — angle açı derecesi (radyana çevrilir), i döngü indeksi
 - **ic_degiskenler**:
-  - `angle` — mevcut koruma telinin rotasyon açısı (derece cinsinden)
-  - `i` — map döngüsündeki telin sıra numarası
-  - `materials.industrialBlue` — tele uygulanan endüstriyel mavi materyal
-  - `boxGeometry` — koruma teli için dikdörtgen prizma geometrisi
-- **Dönüş**: Tek koruma telini temsil eden JSX mesh elementi
+  - `materials` — Ana bileşenden gelen materyal objesi, materials.industrialBlue kullanılır
+- **Dönüş**: JSX.Element (Dikdörtgen kutu geometrik tel mesh)
 
 ---
 

@@ -21,6 +21,10 @@ metadata:
   recovery:
   - If validation fails, check skills-evaluator.py logs or run the subagent optimizer
     again.
+  commands:
+    validate: python -c "import pathlib; assert pathlib.Path('scripts/skills-creator.py').exists(),
+      'Creator script missing'; assert pathlib.Path('scripts/compile_skills.py').exists(),
+      'Compiler script missing'; print('Skills creator ready.')"
 depends_on: []
 next_steps: []
 run_last: false
@@ -81,7 +85,7 @@ Açıklamanın doğruluğunu dinamik olarak test etmek ve aşırı uyumu önleme
 ### Adım 4: Derleme ve Güncelleme (Compilation)
 Değişikliklerin eklenti manifestosuna yazılması için derleyiciyi çalıştır:
 ```bash
-python scratch/compile_skills.py
+python scripts/compile_skills.py
 ```
 Bu işlem `.agent/plugins/venthub-core/manifest.yaml` ve `docs/venthub_skills_master.md` dosyalarını günceller.
 

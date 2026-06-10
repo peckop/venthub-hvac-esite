@@ -3,26 +3,41 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\DomesticFanModel.tsx
-skeleton_hash: ce8718fb332bf442
+skeleton_hash: 18dc1a68bf51d789
 entity_hashes:
   func:DomesticFanModel: c93fddd365c3092d
-  overview: 10bc29aea86c412e
+  overview: f5e11a1dadb240ae
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:30Z
+generated_at: 2026-06-10T09:44:14Z
 ---
 
 ## Genel Bakış
-Bu modül, 3D ürün görselleştirme bileşenleri içinde ev tipi tavan fanı modelini tanımlayan bir React bileşeni sağlar. DomesticFanModel fonksiyonu, fanın görsel ve etkileşimli özelliklerini yöneterek UI'ya entegrasyonu kolaylaştırır.
+Bu modül, 3D ürün görselleştirme sistemi içinde ev tipi tavan fanı modelini temsil eden bir React bileşeni tanımlar. Bileşen, fanın üç boyutlu geometrisini ve malzemelerini oluşturarak UI'da statik veya etkileşimli bir şekilde render edilmesini sağlar.
 
 ## Fonksiyon Grupları
 ### Bileşen Tanımı
-Bu grup, modülün temel yapı taşı olan fonksiyonu içerir ve fan modelinin render edilmesiyle ilgili sorumluluğu üstlenir.
+Modülün temel ve tek yapı taşını oluşturur; ev tipi fanın 3D modelinin dış görünüşünü ve temel yapısını tanımlayan React fonksiyonel bileşeni içerir.
 - DomesticFanModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül için belirgin fonksiyon gövdesi (code body) paylaşılmadığından, sadece fonksiyon imzası ve dosya uzantısına dayalı temel mimari varsayımlar çıkarılabilir.
+
+**Genel Varsayım**: `DomesticFanModel()` parametresiz bir React fonksiyonel bileşenidir (.tsx).
+
+---
+
+**[Aksiyom 1]**: Eğer React çalışma ortamı (React runtime / DOM) yoksa, bileşen render edilemez ve hata oluşur.
+
+**[Aksiyom 2]**: Eğer 3D render管kütüphanesi (örn: Three.js, @react-three/fiber) bağımlılığı yoksa veya yüklü değilse, bileşenin 3D model gösterim işlevi çalıştırılamaz.
+
+**[Aksiyom 3]**: Eğer bileşen çağrılmadan önce uygun bir React Context veya Props aracılığıyla gerekli veriler sağlanmamışsa (fonksiyon imzasında parametre tanımlı olmadığından), bileşenin model verilerine erişimi bilinmiyor olur ve varsayılan/boş bir durum gösterir.
+
+---
+
+> **Not**: Fonksiyon gövdesi paylaşılmadığından, iç bileşen bağımlılıkları, eşik değerleri veya kabul kriterleri hakkında kesin çıkarım yapılamamıştır. Daha ayrıntılı aksiyomlar için `DomesticFanModel` fonksiyonunun gövde kodunun (return bloğu, hook çağrıları, import'lar) sağlanması gerekmektedir.
 
 ---
 
@@ -40,33 +55,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: DomesticFanModel.tsx::DomesticFanModel
-- **params**: (parametre yok)
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `materials` — result of useFanMaterials hook providing THREE.js material objects for meshes.
-  - `fanRef` — useRef hook holding a reference to the THREE.Group that wraps the fan geometry.
-  - `panelSize` — constant defining the width and depth of the front panel (set to 1.0 world units).
-  - `panelThickness` — constant defining the thickness of the front panel (set to 0.08 world units).
-- **Dönüş**: JSX element representing the fan component (React.FC return).
-
-### [N2_NASIL] AST Pointer: DomesticFanModel.tsx::(row mapper)
-- **params**: `_` (unused), `row` (index of the current row in the grid)
-- **ic_degiskenler**:
-  - `col` — loop variable from the inner map, representing column index.
-  - `x` — computed X offset for the hole mesh based on column index and panel size.
-  - `y` — computed Y offset for the hole mesh based on row index and panel size.
-  - `panelSize` — outer‑scope constant defining panel dimensions, used to scale the grid.
-  - `materials` — outer‑scope hook result providing the industrialSteel material.
-- **Dönüş**: JSX `<mesh>` element for a single hole in the grid.
-
-### [N3_NASIL] AST Pointer: DomesticFanModel.tsx::(col mapper)
-- **params**: `_` (unused), `col` (index of the current column in the inner grid)
-- **ic_degiskenler**:
-  - `row` — outer‑scope variable from the row mapper, indicating current row.
-  - `x` — computed X offset for the hole mesh based on column index and panel size.
-  - `y` — computed Y offset for the hole mesh based on row index and panel size.
-  - `panelSize` — outer‑scope constant defining panel dimensions.
-  - `materials` — outer‑scope hook result providing the industrialSteel material.
-- **Dönüş**: JSX `<mesh>` element for a single hole in the grid.
+  - `materials` — `useFanMaterials()` hook'undan elde edilen, modelin farklı parçaları için kullanılacak (fırçalanmış alüminyum, mat siyah, endüstriyel çelik vb.) materyaller nesnesi
+  - `fanRef` — `useRef<Group>(null)` ile oluşturulan, JSX'teki `<group>` elemanına referans veren React ref nesnesi
+  - `panelSize` — Fansız panelin boyutunu tanımlayan sabit (1.0 birim kare)
+  - `panelThickness` — Fansız panelin kalınlığını tanımlayan sabit (0.08 birim)
+- **Dönüş**: `React.FC` — 3D banyo fanı modelini (ön panel, ızgara, arka gövde ve markalama) oluşturan React fonksiyonel bileşeni
 
 ---
 

@@ -3,30 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Silencer.tsx
-skeleton_hash: e4ebd20f97a501f3
+skeleton_hash: 0d417fee6be9a360
 entity_hashes:
   func:Silencer: b0d56de6b93be1bd
-  overview: d6a0c154ebf448d9
+  overview: ae5f7c5e5d83ff51
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:30Z
+generated_at: 2026-06-10T09:41:48Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC ürünlerinin 3B görselleştirilmesi için kullanılan bir susturucu (silencer) parçasını tanımlayan bir React bileşenidir. Bileşen, susturucunun yarımçapı, uzunluğu ve konumunu ayarlamak için props kabul eder ve bu parametrelerle ilgili 3B modeli oluşturur.
+Bu modül, HVAC ürünlerinin 3 boyutlu görselleştirilmesinde kullanılan, silindirik bir susturucu parçasını temsil eden yapılandırımlı bir React bileşenidir. Bileşen, parçanın temel geometrik özelliklerini ve 3D sahadaki konumunu belirleyen parametreler alır.
 
 ## Fonksiyon Grupları
-### Bileşen Tanımı
-Bu grup, modülün tek dışa görünen işlevini içerir; susturucu parçasının görsel ve geometrik özelliklerini belirleyen props ile yapılandırılabilir bir React fonksiyonel bileşeni tanımlar.
+### Bileşen Tanımı ve Oluşturma
+Bu grup, modülün tek ve temel işlevini tanımlar; susturucu parçasının geometrisini ve görünümünü belirleyen bir React fonksiyonel bileşeni sağlar.
 - Silencer
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
 
-[Aksiyom 1]: Eğer `radius` prop'u verilmezse, varsayılan değer **0.6** kullanılır.  
-[Aksiyom 2]: Eğer `length` prop'u verilmezse, varsayılan değer **0.8** kullanılır.  
-[Aksiyom 3]: Eğer `position` prop'u verilmezse, varsayılan değer **[0, 0, 0]** kullanılır.
 
 ---
 
@@ -55,44 +50,39 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::Silencer
-- **params**: radius, length, position
+- **params**: (`radius` — Genlik yarıçapı, varsayılan 0.6; `length` — Uzunluk, varsayılan 0.8; `position` — 3B konum vektörü, varsayılan [0,0,0])
 - **ic_degiskenler**:
-  - `materials` — hook returning fan materials object (galvanizedSteel, industrialSteel, matteBlack) used for mesh materials.
-  - `_perforationGeometry` — memoized geometry for perforated inner surface with holes pattern, depends on radius.
-- **Dönüş**: JSX.Element
+  - `materials` — `useFanMaterials()` hook'undan dönen malzeme nesnesi. 3B modellere uygulanacak malzemeleri (galvanizedSteel, industrialSteel, matteBlack) içerir.
+  - `_perforationGeometry` — `useMemo` ile hesaplanan ve önbelleğe alınan iç delikli yüzey geometrisi. `radius` değişkenine bağlı olarak yeniden hesaplanır.
+- **Dönüş**: JSX elementi (React bileşeni). `group` elementi içinde 3D silansör modelini render eder.
 
-### [N2_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::_perforationGeometry callback
-- **params**: (none)
+### [N2_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::useMemo callback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `shape` — THREE.Shape instance defining the outer ring where holes are subtracted.
-  - `holeRadius` — radius of the ring on which holes are placed (0.85 × radius).
-  - `holeCount` — number of holes around the ring (fixed at 12).
-  - `angle` — current angle for each hole iteration in radians.
-  - `hx`, `hy` — x and y coordinates of the hole center for the current iteration.
-  - `hole` — THREE.Path representing a circular hole added to `shape.holes`.
-- **Dönüş**: THREE.ShapeGeometry
+  - `shape` — Three.js `Shape` nesnesi. Deliklerin oluşturulacağı temel şekil.
+  - `holeRadius` — Deliklerin oluşturulacağı halka yarıçapı. `radius * 0.85` hesaplanır.
+  - `holeCount` — Oluşturulacak delik sayısı. Sabit 12.
+  - `angle` — Döngü içinde her deliğin açısı. `(i / holeCount) * Math.PI * 2` ile hesaplanır.
+  - `hx` — Deliğin merkezinin x koordinatı. `Math.cos(angle) * holeRadius` ile hesaplanır.
+  - `hy` — Deliğin merkezinin y koordinatı. `Math.sin(angle) * holeRadius` ile hesaplanır.
+  - `hole` — Three.js `Path` nesnesi. Tek bir daire deliğini temsil eder. `shape.holes` dizisine eklenir.
+- **Dönüş**: `ShapeGeometry` nesnesi. Deliklerle oluşturulmuş 2B şekilden türetilmiş geometri.
 
-### [N3_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::perforation rings map
-- **params**: _, i
+### [N3_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::map callback (perforation rings)
+- **params**: (`_` — Kullanılmayan mevcut eleman, `i` — Dizideki mevcut indeks)
 - **ic_degiskenler**:
-  - `_` — unused placeholder for the array element (zero).
-  - `i` — index of the current perforation ring (0‑5).
-  - `zPos` — vertical position along the silencer length for the ring, calculated to distribute six rings evenly.
-- **Dönüş**: JSX.Element
+  - `zPos` — Halkanın z-ekseni üzerindeki konumu. `length` ve `i` değerlerinden hesaplanır: `-length / 2 + (i + 1) * (length / 7)`.
+- **Dönüş**: JSX elementi. Delikli iç yüzeydeki akustik halka geometrisini render eden `mesh`.
 
-### [N4_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::reinforcement rings map
-- **params**: z, i
-- **ic_degiskenler**:
-  - `z` — z‑axis offset for each reinforcement ring (‑0.3, 0, 0.3).
-  - `i` — index of the current ring.
-- **Dönüş**: JSX.Element
+### [N4_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::map callback (structural reinforcement rings)
+- **params**: (`z` — Halkanın z ekseni konumu, `i` — Dizideki mevcut indeks)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi. Yapısal destek halkasını (torus) render eden `mesh`.
 
-### [N5_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::mounting brackets map
-- **params**: angle, i
-- **ic_degiskenler**:
-  - `angle` — rotation angle in degrees for each bracket (0, 120, 240).
-  - `i` — index of the current bracket.
-- **Dönüş**: JSX.Element
+### [N5_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::map callback (mounting brackets)
+- **params**: (`angle` — Braketin döndürme açısı (derece), `i` — Dizideki mevcut indeks)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi. Montaj braketini ( kutu geometrisi ) içeren `group`.
 
 ---
 

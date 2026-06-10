@@ -4,7 +4,8 @@ import { ThreeEvent,useFrame } from '@react-three/fiber'
 import { extend } from '@react-three/fiber'
 import { useRouter } from 'next/navigation'
 import React, { useMemo, useRef, useState } from 'react'
-import * as THREE from 'three'
+import type { Mesh, ShaderMaterial } from 'three'
+import { Color, DoubleSide,MathUtils, SRGBColorSpace, Texture, TextureLoader } from 'three'
 
 import { Routes } from '../../utils/routes'
 
@@ -15,10 +16,10 @@ import { Routes } from '../../utils/routes'
 const BentPlaneMaterial = shaderMaterial(
     {
         uTime: 0,
-        uTexture: new THREE.Texture(),
+        uTexture: new Texture(),
         uScrollOffset: 0,
         uHover: 0,
-        uColor: new THREE.Color('#22d3ee') // Cyan glow
+        uColor: new Color('#22d3ee') // Cyan glow
     },
     // Vertex Shader
     `
@@ -80,9 +81,9 @@ import type { ThreeElements as _ThreeElements } from '@react-three/fiber'
 declare module '@react-three/fiber' {
     interface ThreeElements {
         bentPlaneMaterial: _ThreeElements['shaderMaterial'] & {
-            uTexture?: THREE.Texture
+            uTexture?: Texture
             uHover?: number
-            uColor?: THREE.Color
+            uColor?: Color
         }
     }
 }
@@ -99,8 +100,8 @@ interface BentPlaneGeometryProps {
  */
 const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, position = [0, 0, 0] }) => {
     const router = useRouter()
-    const meshRef = useRef<THREE.Mesh>(null)
-    const materialRef = useRef<THREE.ShaderMaterial>(null)
+    const meshRef = useRef<Mesh>(null)
+    const materialRef = useRef<ShaderMaterial>(null)
     const scroll = useScroll()
 
     const [hovered, setHover] = useState(false)
@@ -109,8 +110,8 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
     useCursor(hovered)
 
     // Load texture
-    const texture = useMemo(() => new THREE.TextureLoader().load(image), [image])
-    texture.colorSpace = THREE.SRGBColorSpace
+    const texture = useMemo(() => new TextureLoader().load(image), [image])
+    texture.colorSpace = SRGBColorSpace
 
     useFrame(() => {
         if (!meshRef.current || !materialRef.current) return
@@ -119,12 +120,12 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
         if (materialRef.current.uniforms.uScrollOffset) {
             materialRef.current.uniforms.uScrollOffset.value = scroll.offset
         }
-        materialRef.current.uniforms.uHover.value = THREE.MathUtils.lerp(materialRef.current.uniforms.uHover.value, hovered ? 1 : 0, 0.1)
+        materialRef.current.uniforms.uHover.value = MathUtils.lerp(materialRef.current.uniforms.uHover.value, hovered ? 1 : 0, 0.1)
 
         // Scale on hover for zoom effect
         const targetScale = hovered ? 1.1 : 1.0
-        meshRef.current.scale.x = THREE.MathUtils.lerp(meshRef.current.scale.x, targetScale, 0.1)
-        meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, targetScale, 0.1)
+        meshRef.current.scale.x = MathUtils.lerp(meshRef.current.scale.x, targetScale, 0.1)
+        meshRef.current.scale.y = MathUtils.lerp(meshRef.current.scale.y, targetScale, 0.1)
     })
 
     const handleClick = (e: ThreeEvent<MouseEvent>) => {
@@ -145,7 +146,7 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
                 ref={materialRef}
                 uTexture={texture}
                 transparent
-                side={THREE.DoubleSide}
+                side={DoubleSide}
             />
         </mesh>
     )

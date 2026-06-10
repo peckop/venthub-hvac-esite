@@ -1,13 +1,14 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { CatmullRomCurve3, Vector3 } from 'three'
 
 import { type FanMaterials,useFanMaterials } from '../materials/useFanMaterials'
 
 export const JetFanModel: React.FC = () => {
     const materials = useFanMaterials()
-    const fanRef = useRef<THREE.Group>(null)
+    const fanRef = useRef<Group>(null)
 
     // OTOPARK JET FAN (Referans: Kullanıcı Resimleri - DÜZELTME)
     // - Sol taraf: DAMPER KANATLARI (3-4 adet yatay kanat)
@@ -146,11 +147,11 @@ export const JetFanModel: React.FC = () => {
 
 const FlexibleCable = ({ materials }: { materials: FanMaterials }) => {
     const path = useMemo(() => {
-        return new THREE.CatmullRomCurve3([
-            new THREE.Vector3(0, 0, 0),
-            new THREE.Vector3(0, 0.04, 0.05),
-            new THREE.Vector3(0, 0.06, 0.12),
-            new THREE.Vector3(0, 0.06, 0.175),
+        return new CatmullRomCurve3([
+            new Vector3(0, 0, 0),
+            new Vector3(0, 0.04, 0.05),
+            new Vector3(0, 0.06, 0.12),
+            new Vector3(0, 0.06, 0.175),
         ])
     }, [])
 

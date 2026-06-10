@@ -13,7 +13,8 @@
 
 import { Edges,Html, RoundedBox, Text, useCursor } from "@react-three/drei"
 import React, { useMemo, useState } from "react"
-import * as THREE from "three"
+import type { Material } from 'three'
+import { Path,Shape } from 'three'
 
 import { useFanMaterials } from "../materials/useFanMaterials"
 
@@ -34,7 +35,7 @@ const EdgeOverlay = ({ displayStyle }: { displayStyle: string }) => {
 /* ─────────────────────────────────────────────────────
    COMPONENT: MOUNTING CHASSIS (Bottom Base)
    ───────────────────────────────────────────────────── */
-function MountingChassis({ bodyHalfLen, neckLen, neckRad, bRad, material, displayStyle }: { bodyHalfLen: number, neckLen: number, neckRad: number, bRad: number, material: THREE.Material, displayStyle: string }) {
+function MountingChassis({ bodyHalfLen, neckLen, neckRad, bRad, material, displayStyle }: { bodyHalfLen: number, neckLen: number, neckRad: number, bRad: number, material: Material, displayStyle: string }) {
     const chassisWidth = neckRad * 2.2
     const chassisLen = (bodyHalfLen + neckLen) * 2
 
@@ -46,14 +47,14 @@ function MountingChassis({ bodyHalfLen, neckLen, neckRad, bRad, material, displa
 
     const baseExtrudeSettings = useMemo(() => ({ depth: baseThick, bevelEnabled: true, bevelSize: 0.002, bevelThickness: 0.002 }), [baseThick])
     const baseShape = useMemo(() => {
-        const s = new THREE.Shape()
+        const s = new Shape()
         const w = chassisWidth / 2
         const l = chassisLen / 2
         s.moveTo(-w, -l); s.lineTo(w, -l); s.lineTo(w, l); s.lineTo(-w, l); s.closePath()
 
         const slotW = 0.02; const slotL = chassisLen * 0.5; const slotR = slotW / 2
         for (const xOff of [-w * 0.6, w * 0.6]) {
-            const hole = new THREE.Path()
+            const hole = new Path()
             hole.moveTo(xOff + slotR, -slotL / 2)
             hole.lineTo(xOff + slotW - slotR, -slotL / 2)
             hole.quadraticCurveTo(xOff + slotW, -slotL / 2, xOff + slotW, -slotL / 2 + slotR)
@@ -70,7 +71,7 @@ function MountingChassis({ bodyHalfLen, neckLen, neckRad, bRad, material, displa
 
     const wallExtrudeSettings = useMemo(() => ({ depth: wallThick, bevelEnabled: true, bevelSize: 0.002, bevelThickness: 0.002 }), [wallThick])
     const wallShape = useMemo(() => {
-        const s = new THREE.Shape()
+        const s = new Shape()
         const w = chassisWidth / 2
         const h = wallHeight
         s.moveTo(-w, 0); s.lineTo(-w, h); s.lineTo(-(neckRad * 0.99), h)

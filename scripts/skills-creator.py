@@ -195,7 +195,7 @@ Describe when the agent should use this skill.
     
     # Compile
     print("\nCompiling skills and updating manifest...")
-    compile_success = run_script("scratch/compile_skills.py", repo_root)
+    compile_success = run_script("scripts/compile_skills.py", repo_root)
     
     # Evaluate
     if compile_success:

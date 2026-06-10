@@ -3,31 +3,35 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\AutoCenter.tsx
-skeleton_hash: 9ff8526ee667760a
+skeleton_hash: 780a64c9eae7c864
 entity_hashes:
   func:AutoCenter: 7e5fd029da989dd5
-  overview: 3be99e46f5543048
+  overview: 9be491c8c9204cb2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-10T09:37:16Z
 ---
 
 ## Genel Bakış
-AutoCenter modülü, üç boyutlu sahnelerde çocuk bileşenleri otomatik olarak belirli bir merkez noktasına hizalamak için tasarlanmış bir React konteyner bileşenidir. Bileşen, etkinleştirildiğinde içeriğin sınırlayıcı kutusunu hesaplayarak merkezleme işlemini otomatik olarak uygular ve opsiyonel bir kaydırma (shift) parametresi ile bu konumu ince ayarlamaya olanak tanır.
+AutoCenter modülü, 3D sahnelerdeki çocuk bileşenlerin otomatik olarak merkeze hizalanmasını sağlayan bir React sarmalayıcı bileşenidir. Bileşen, içeriğin sınırlayıcı kutusunu hesaplayarak modelin sahnede dengeli bir şekilde konumlandırılmasını sağlar. Opsiyonel kaydırma parametresi ile bu konumlandırma ince ayara olanak tanır.
 
 ## Fonksiyon Grupları
-### Ana Bileşen
-Bu grup, modülün temel ve tek işlevini yerine getiren merkezi bileşeni barındırır. Bileşen, çocuk düğümlerini alır, merkezleme mantığını çalıştırır ve gerekli konumlandırma dönüşümlerini uygular.
+### Merkezleme Bileşeni
+Modülün tek ve temel bileşenini oluşturur. Çocuk düğümleri alır, merkezleme mantığını uygular ve gerekli konumlandırma dönüşümlerini hesaplar.
 - AutoCenter
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, 3D bir sahne içinde çocuk bileşenlerini merkeze hizalamak ve konumlandırmak için kullanılır.
 
-[Aksiyom 1]: Eğer **children** prop'u bir React node içermiyorsa, bileşen hiçbir içerik render etmez.
-[Aksiyom 2]: Eğer **enabled** prop'u `false` olarak ayarlanmazsa (veya verilmezse), bileşen varsayılan olarak children bileşeninin otomatik ortalama (centering) işlemini uygular.
-[Aksiyom 3]: Eğer **shift** prop'u bir dizi olarak verilmezse (veya verilmezse), bileşen varsayılan olarak `[0, 0, 0]` kaydırma vektörünü kullanır.
-[Aksiyom 4]: Eğer **shift** prop'u olarak verilen dizinin uzunluğu 3 değilse veya elemanları sayısal değillerse, bileşen beklenmedik davranış gösterebilir.
+Bu modül için temel mimari varsayımlar fonksiyon imzasından çıkarılmıştır:
+
+[Aksiyom 1]: Eğer `children` parametresi sağlanmazsa, bileşen render edilecek içeriğe sahip olmadığından merkezleme işlemi uygulanacak bir hedef bulunmaz.
+
+[Aksiyom 2]: Eğer `enabled` parametresi `false` olarak ayarlanırsa, modül merkezleme mantığını devre dışı bırakır ve children bileşenleri transform uygulanmadan render edilir.
+
+[Aksiyom 3]: Eğer `shift` parametresi verilmezse, varsayılan olarak `[0, 0, 0]` kullanılır; bu durumda herhangi bir eksende kaydırma uygulanmaz.
+
+[Aksiyom 4]: Eğer `shift` dizisi 3 elemandan farklı uzunlukta sağlanırsa, bu beklenmeyen bir giriş olur ve x, y, z ekseni kaydırma değerlerinin tam olarak karşılanması mümkün olmaz.
 
 ---
 
@@ -49,30 +53,23 @@ Bu modül, 3D bir sahne içinde çocuk bileşenlerini merkeze hizalamak ve konum
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\AutoCenter.tsx::AutoCenter
+### [N1_NASIL] AST Pointer: src\components\products\3d\AutoCenter.tsx::AutoCenter
 - **params**: ({ children, enabled = true, shift = [0, 0, 0] })
 - **ic_degiskenler**:
-  - `groupRef` — useRef ile oluşturulmuş, THREE.Group türünde bir referans. 3D nesne grubunu temsil eder, Bounding Box hesaplaması ve pozisyon ayarlaması için kullanılır.
-  - `isLocked` — useRef ile oluşturulmuş, boolean değer tutar. Centering işleminin yapılıp yapılmadığını gösterir, true olduğunda useFrame callback'i artık çalışmayı durdurur.
-  - `frameCount` — useRef ile oluşturulmuş, frame sayısını tutar. İlk 3 frame'i atlamak için kullanılır.
-- **Dönüş**: JSX elementi olarak <group ref={groupRef}>{children}</group> döner. Fonksiyonun ana görevi, children elementlerini bir 3D grup içinde sarmalamak ve useFrame hook'u ile bu grubun dikey (Y) merkezini hesaplayarak otomatik olarak yukarı kaydırmaktır.
+  - `groupRef` — useRef<Group>(null): Three.js Group nesnesine referans, 3D grubun DOM elementine erişmek için kullanılır
+  - `isLocked` — useRef(false): Merkezleme işlemi tamamlandıktan sonra kilitlenme durumunu tutar
+  - `frameCount` — useRef(0): Frame sayacını tutar, ilk birkaç frame'i atlamak için kullanılır
+- **Dönüş**: JSX elementi (<group ref={groupRef}>{children}</group>)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\AutoCenter.tsx::useFrame callback
-- **params**: () => (parametre yok, useFrame hook'unun callback parametresi olarak çağrılır)
+### [N2_NASIL] AST Pointer: src\components\products\3d\AutoCenter.tsx::useFrame_callback
+- **params**: () => { ... }
 - **ic_degiskenler**:
-  - **Dış menzilden erişilenler (closure)**:
-    - `isLocked` — useRef nesnesinin .current değeri. true ise fonksiyon erken döner (kilitli).
-    - `enabled` — AutoCenter bileşeninin enabled prop'u. false ise fonksiyon erken döner (devre dışı).
-    - `groupRef` — useRef nesnesinin .current değeri, THREE.Group nesnesi. Pozisyon ayarlaması için kullanılır.
-    - `frameCount` — useRef nesnesinin .current değeri. Frame sayacını artırır.
-    - `shift` — AutoCenter bileşeninin shift prop'u. Varsayılan offset değerleri için kullanılır.
-  - **Fonksiyon içinde tanımlananlar**:
-    - `box` — new THREE.Box3() instance. Grubun sınırlarını hesaplamak için kullanılır.
-    - `center` — new THREE.Vector3() instance. Bounding box'ın merkezini tutar.
-    - `yOffset` — number. Y ekseni için hesaplanan offset (-center.y + shift[1]).
-    - `xOffset` — number. X ekseni için shift[0] değerinden alınan offset.
-    - `zOffset` — number. Z ekseni için shift[2] değerinden alınan offset.
-- **Dönüş**: Yok (void). Yan etkisi olarak groupRef.current'ın pozisyonunu günceller ve isLocked.current'ı true yapar. Fonksiyonun amacı, her frame'de (ilk 3 frame hariç) 3D grubun bounding box'ını hesaplayıp, grubun Y eksenindeki merkezini shift[1] değeri ile ayarlayarak otomatik olarak yukarı kaydırmaktır, ardından kilitleyerek tekrar hesap yapmayı durdurur.
+  - `box` — new Box3().setFromObject(groupRef.current): Grubun bounding box'ını hesaplar
+  - `center` — new Vector3(): Bounding box'ın merkezini tutar
+  - `yOffset` — -center.y + shift[1]: Y ekseni için hesaplanan ofset, merkezleme ve shift değerini birleştirir
+  - `xOffset` — shift[0]: X ekseni için ofset değeri, shift parametresinden alınır
+  - `zOffset` — shift[2]: Z ekseni için ofset değeri, shift parametresinden alınır
+- **Dönüş**: yok (yan etki: groupRef.current.position'ı ayarlar, isLocked.current'ı true yapar)
 
 ---
 

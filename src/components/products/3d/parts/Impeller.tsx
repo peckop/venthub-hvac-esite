@@ -1,7 +1,7 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
@@ -20,7 +20,7 @@ export const Impeller: React.FC<ImpellerProps> = ({
     color = 'aluminum',
     spinSpeed = 5
 }) => {
-    const groupRef = useRef<THREE.Group>(null)
+    const groupRef = useRef<Group>(null)
     const materials = useFanMaterials()
 
     const material = color === 'plastic' ? materials.matteBlack :

@@ -1,10 +1,11 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { DoubleSide,ExtrudeGeometry, Path, Shape } from 'three'
 
 export const WallMountedCompactFanModel: React.FC = () => {
-    const fanRef = useRef<THREE.Group>(null)
+    const fanRef = useRef<Group>(null)
 
     useFrame((state, delta) => {
         if (fanRef.current) {
@@ -14,7 +15,7 @@ export const WallMountedCompactFanModel: React.FC = () => {
 
     // 1. PLATE GEOMETRY
     const plateGeometry = useMemo(() => {
-        const shape = new THREE.Shape()
+        const shape = new Shape()
         shape.moveTo(-0.5, -0.5)
         shape.lineTo(0.5, -0.5)
         shape.lineTo(0.5, 0.5)
@@ -29,17 +30,17 @@ export const WallMountedCompactFanModel: React.FC = () => {
             [holeOffset, -holeOffset], [-holeOffset, -holeOffset]
         ]
         corners.forEach(([x, y]) => {
-            const hole = new THREE.Path()
+            const hole = new Path()
             hole.absarc(x, y, holeRadius, 0, Math.PI * 2, true)
             shape.holes.push(hole)
         })
 
         // Center Hole
-        const centerHole = new THREE.Path()
+        const centerHole = new Path()
         centerHole.absarc(0, 0, 0.42, 0, Math.PI * 2, true)
         shape.holes.push(centerHole)
 
-        return new THREE.ExtrudeGeometry(shape, { depth: 0.02, bevelEnabled: false })
+        return new ExtrudeGeometry(shape, { depth: 0.02, bevelEnabled: false })
     }, [])
 
     // --- COLOR PALETTE (Hardcoded for Safety) ---
@@ -60,7 +61,7 @@ export const WallMountedCompactFanModel: React.FC = () => {
                         color={COLORS.PLATE}
                         roughness={0.6}
                         metalness={0.6}
-                        side={THREE.DoubleSide}
+                        side={DoubleSide}
                     />
                 </mesh>
 
@@ -71,7 +72,7 @@ export const WallMountedCompactFanModel: React.FC = () => {
                         color={COLORS.PLATE}
                         roughness={0.6}
                         metalness={0.6}
-                        side={THREE.DoubleSide}
+                        side={DoubleSide}
                     />
                 </mesh>
             </group>
@@ -122,7 +123,7 @@ export const WallMountedCompactFanModel: React.FC = () => {
                                     emissive={COLORS.BLADE_ORANGE}
                                     emissiveIntensity={0.2} // Rengi patlatmak için hafif emissive
                                     roughness={0.4}
-                                    side={THREE.DoubleSide}
+                                    side={DoubleSide}
                                 />
                             </mesh>
                         </group>
@@ -171,7 +172,7 @@ export const WallMountedCompactFanModel: React.FC = () => {
                             color={COLORS.WIRE_GUARD}
                             metalness={0.8}
                             roughness={0.2}
-                            side={THREE.DoubleSide}
+                            side={DoubleSide}
                         />
                     </mesh>
                 ))}
@@ -184,7 +185,7 @@ export const WallMountedCompactFanModel: React.FC = () => {
                             color={COLORS.WIRE_GUARD}
                             metalness={0.8}
                             roughness={0.2}
-                            side={THREE.DoubleSide}
+                            side={DoubleSide}
                         />
                     </mesh>
                 ))}

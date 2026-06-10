@@ -3,56 +3,56 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SpeedControlModel.tsx
-skeleton_hash: 46fa33e4b16072a7
+skeleton_hash: a0f512a475f7e896
 entity_hashes:
-  func:SpeedControlModel: 9391170dd9d01022
-  overview: a057d38dae1c89ff
+  func:SpeedControlModel: 6f22a04f587b7f3b
+  overview: 3d1a9a9bb44e6c4e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:52:39Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin 3B ürün görselleştirme sisteminde, ürünlerin hız kontrol bileşeninin dijital modelini temsil eden bir React bileşenidir. Tek bir bileşen olarak, 3B sahne içinde hız kontrol ünitesinin görsel ve işlevsel tanımını yaparak üst bileşenler tarafından kullanılabilir hale getirir.
+Bu modül, VentHub HVAC projesinin 3B ürün görselleştirme sisteminde hız kontrol bileşeninin dijital modelini tanımlar. HVAC ekipmanlarının hız ayarlama özelliklerini 3B ortamda standartlaştırılmış bir veri yapısı ile sunarak, ilgili bileşenlerin bu modeli tutarlı şekilde kullanmasını sağlar.
 
 ## Fonksiyon Grupları
-### Hız Kontrol Bileşeni Tanımı
-Bu grup, 3B sahneye yerleştirilecek hız kontrol mekanizmasının tek ve merkezi modelini oluşturur. İlgili tüm 3B geometri, doku ve etkileşim tanımlarını içinde barındırır.
+### Hız Kontrol Modeli Tanımı
+Bu grup, 3B sahne içinde hız kontrol ünitesinin geometri, doku ve etkileşim tanımlarını içeren merkezi modeli oluşturur.
 - `SpeedControlModel`
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
+## AXIOMS – Mimari Vksayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Gerekçe:** Fonksiyon gövdesi verilmediği için, modülün doğru çalışması için gerekli koşullar çıkarılamamaktadır. `SpeedControlModel()` parametresiz olarak tanımlanmış olup, fonksiyon gövdesindeki bağımlılıklar, prop gereksinimleri veya içsel koşullar bilinmemektedir. Mimari varsayımlar yalnızca çalıştırılabilir koddan üretilebileceğinden, mevcut bilgiyle aksiyom oluşturma mümkün değildir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### SpeedControlModel
-**Ne yapar**: VentHub HVAC projesinin ürün bileşenleri kapsamında yer alan 3B görselleştirme modülleri için hız kontrol sistemine özel tür tanımlama işlevidir. Proje içindeki HVAC ekipmanlarının hız ayarlama özelliklerinin 3B ortamda kullanılabilmesi için gerekli veri modelinin şemasını tanımlar, tüm ilgili bileşenlerde standartlaştırılmış veri yapısı kullanımını sağlar.
-**Nasıl yapar**: TypeScript tabanlı React projesinde tür tanımlama (type definition) rolü üstlenir, 3B bileşenler içerisinde hız kontrol sistemi ile ilgili tüm veri noktalarının tip güvenliğini garanti eder. Proje geliştirme sürecinde hız kontrol parametrelerinin tutarsız kullanımlarını önler, olası tür uyumsuzluğu hatalarını derleme aşamasında yakalanmasına olanak tanır.
-**Parametreler**:
-- Tanımlı herhangi bir giriş parametresi bulunmamaktadır
-**Dönüş**: İşlevin dönüş tipi resmi olarak tanımlanmamıştır, kaynak kodda belirtilen bilgiye göre void veya bilinmeyen bir türdür. Herhangi bir değer döndürmesi amaçlanmamış, yalnızca tür tanımlama amacıyla oluşturulmuştur.
+**Ne yapar**: Bu fonksiyon, VentHub HVAC sistemi için bir hız kontrol ünitesinin 3B modelini oluşturur. Model, bir kutu gövdesi, ön panel, yan soğutma kanatları, çevirmeli bir düğme (potansiyometre) ve bir LED durum göstergesi içerir. Fonksiyon, düğmenin sürekli dönmesini ve LED'in yeşil renkte nabız atmasını simüle ederek animasyonlu bir demonstrasyon sağlar.
+
+**Nasıl yapar**: Fonksiyon, `useFanMaterials` özel hook'unu kullanarak model için gerekli tüm malzemeleri (boxMat, matteBlack, brushedAluminum vb.) alır. `useRef` hook'ları ile düğme grubu ve LED malzemesi için referanslar tutulur. `useMemo` kullanılarak bir `MeshBasicMaterial` instance'ı oluşturulur ve bağımlılık dizisi boş bırakılarak yeniden oluşturulması önlenir. Ana animasyon mantığı, `useFrame` hook'u içinde yer alır: her karede `state.clock.elapsedTime` kullanılarak zaman tabanlı sinüs fonksiyonları hesaplanır. Düğme grubunun `rotation.z`属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性属性
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `SpeedControlModel.tsx`::SpeedControlModel
-- **params**: (yok — parametresiz fonksiyon)
+### [N1_NASIL] AST Pointer: `3d/types/SpeedControlModel.tsx`::SpeedControlModel
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `materials` — `useFanMaterials()` hook'undan dönen malzeme nesnesi; kutu, mat siyah, fırçalanmış alüminyum vb. 3D mesh malzemelerini içerir
-  - `knobRef` — `useRef<THREE.Group>(null)` ile oluşturulan React ref; sahnedeki çevirmeli düğme (potansiyometre) grubuna referans, `useFrame` içinde `rotation.z` ile döndürülür
-  - `ledRef` — `useRef<THREE.MeshBasicMaterial>(null)` ile oluşturulan React ref; LED göstergesinin malzemesine referans, `useFrame` içinde rengi (`setRGB`) değiştirilerek nabız efekti verilir
-  - `ledMaterial` — `useMemo` ile oluşturulmuş `THREE.MeshBasicMaterial` nesnesi, başlangıç rengi `#00ff00` (yeşil); bileşen yeniden render edildiğinde yeniden oluşturulmayı önler
-- **useFrame ic callback degiskenleri** (inline arrow function `(state) => {}`):
-  - `time` — `state.clock.elapsedTime`, üç.js saatinin başlangıçtan itibaren geçen toplam süresi (saniye); hem düğme rotasyonu hem LED nabzı için zaman kaynağı
-  - `intensity` — `Math.abs(Math.sin(time * 2))`, 0–1 arasında nabız yapan değer; LED parlaklığının dalgalanmasını kontrol eder
-  - `greenValue` — `Math.floor(100 + intensity * 155)`, 100–255 aralığında hesaplanan yeşil kanal değeri; `ledRef.current.color.setRGB(0, greenValue/255, 0)` ile LED rengini ayarlar
-- **Dönüş**: JSX (React Three Fiber 3D sahne ağacı) — `group` içinde kutu, ön panel, yan soğutma kanalları (iki taraflı `map` ile 6 adet), çevirmeli düğme, LED gösterge ve VentHub yazısı/plakası
+  - `materials` — useFanMaterials() hook'undan dönen malzeme objesi; içinde boxMat, matteBlack, brushedAluminum gibi materyaller barındırır, JSX'te mesh'lere material olarak atanır
+  - `knobRef` — useRef<Group>(null); JSX'te döndürme düğmesi (potansiyometre) grubuna ref olarak bağlanır, useFrame içinde `knobRef.current.rotation.z` ile döndürülür
+  - `ledRef` — useRef<MeshBasicMaterial>(null); JSX'te LED circle'daki primitive'e ref olarak bağlanır, useFrame içinde `ledRef.current.color.setRGB(...)` ile renk güncellenir
+  - `ledMaterial` — useMemo ile oluşturulmuş yeşil renkte (`#00ff00`) MeshBasicMaterial; JSX'te LED circle'ın material'ı olarak primitive object olarak atanır
+- **useFrame callback değişkenleri** (iç callback):
+  - `state` — React Three Fiber frame state objesi; `state.clock.elapsedTime` ile geçen süre alınır
+  - `time` — `state.clock.elapsedTime` değerinin saklandığı değişken; sinüs hesaplamalarında kullanılır
+  - `intensity` — `Math.abs(Math.sin(time * 2))` hesabından elde edilen 0–1 arası yoğunluk değeri; LED parlaklık pulsasyonunu belirler
+  - `greenValue` — `Math.floor(100 + intensity * 155)` formülüyle hesaplanan 100–255 arası yeşil kanal integer değeri; `ledRef.current.color.setRGB()` çağrısında `greenValue / 255` olarak normalize edilerek kullanılır
+- **JSX map callback değişkenleri** (her iki `.map()` çağrısında):
+  - `y` — `[-0.3, 0, 0.3]` dizisinden gelen dikey (Y ekseni) pozisyon değeri; yan soğutma kanadı mesh'lerinin `position` prop'u içinde kullanılır
+  - `i` — `.map()` index'i; `key` prop'u içinde `heatl-${i}` / `heatr-${i}` formatında benzersiz anahtar oluşturmak için kullanılır
+- **Dönüş**: JSX (React.ReactNode) — Three.js geometrilerini ve materyallerini içeren React Three Fiber sahne grubu; bir hız kontrol kutusunun (potansiyometre düğmeli, LED göstergeli, soğutma kanallı) 3D modelini render eder, her frame'de düğmeyi döndürür ve LED'i parlaklık pulsasyonuyla aydınlatır
 
 ---
 

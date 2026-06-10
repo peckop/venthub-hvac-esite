@@ -11,7 +11,8 @@ import {
     RotateCcw,
     Triangle} from 'lucide-react'
 import React, { Suspense, useCallback, useEffect, useRef,useState } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { Vector3 } from 'three'
 
 import { useI18n } from '../../../i18n/I18nProvider'
 import { getModelPlacement } from '../../../utils/3dModelOffsets'
@@ -45,7 +46,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode, t: (key
     }
 }
 
-function ModelRotator({ children, enabled, rotationRef }: { children: React.ReactNode, enabled: boolean, rotationRef: React.MutableRefObject<THREE.Group | null> }) {
+function ModelRotator({ children, enabled, rotationRef }: { children: React.ReactNode, enabled: boolean, rotationRef: React.MutableRefObject<Group | null> }) {
     const { gl, camera } = useThree()
     const isDragging = useRef(false)
     const previousMouse = useRef({ x: 0, y: 0 })
@@ -64,8 +65,8 @@ function ModelRotator({ children, enabled, rotationRef }: { children: React.Reac
             const dy = e.clientY - previousMouse.current.y
             previousMouse.current = { x: e.clientX, y: e.clientY }
             const speed = 0.005
-            const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion)
-            const camUp = new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion)
+            const camRight = new Vector3(1, 0, 0).applyQuaternion(camera.quaternion)
+            const camUp = new Vector3(0, 1, 0).applyQuaternion(camera.quaternion)
             rotationRef.current.rotateOnWorldAxis(camUp, dx * speed)
             rotationRef.current.rotateOnWorldAxis(camRight, dy * speed)
         }
@@ -102,7 +103,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
     const [rotationMode, setRotationMode] = useState<'orbit' | 'free'>('orbit')
     
     const controlsRef = useRef<React.ElementRef<typeof OrbitControls> | null>(null)
-    const modelGroupRef = useRef<THREE.Group | null>(null)
+    const modelGroupRef = useRef<Group | null>(null)
 
     const tb = isFullscreen
         ? { icon: 18, font: 'text-xs', pad: 'p-1.5', minW: 'min-w-40px', div: 'h-7', top: 'top-4' }

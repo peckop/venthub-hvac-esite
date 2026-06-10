@@ -5,7 +5,8 @@ import { useInView } from 'framer-motion'
 import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { Suspense,useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import * as THREE from 'three'
+import type { Group, Mesh, MeshStandardMaterial } from 'three'
+import { DoubleSide, MathUtils, SRGBColorSpace, Vector3 } from 'three'
 
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
 
@@ -90,7 +91,7 @@ const Stage: React.FC<{
  * 3D Yükleme animasyonu için wireframe
  */
 const PlaceholderWireframe = ({ scale = 1 }: { scale?: number }) => {
-    const meshRef = useRef<THREE.Mesh>(null)
+    const meshRef = useRef<Mesh>(null)
     useFrame((state) => {
         if (meshRef.current) {
             meshRef.current.rotation.y = state.clock.elapsedTime * 0.5
@@ -115,14 +116,14 @@ const PlaceholderWireframe = ({ scale = 1 }: { scale?: number }) => {
 const SuspendedCardMaterial = ({ finalPath, hovered }: { finalPath: string | null, hovered: boolean }) => {
     const texture = useTexture(finalPath || '/images/placeholders/product-placeholder.png')
     if (texture) {
-        texture.colorSpace = THREE.SRGBColorSpace
+        texture.colorSpace = SRGBColorSpace
     }
     return (
         <meshStandardMaterial
             map={texture || undefined}
             transparent
             opacity={0}
-            side={THREE.DoubleSide}
+            side={DoubleSide}
             emissive={hovered ? CONFIG.glowColor : '#000000'}
             emissiveIntensity={hovered ? CONFIG.emissiveIntensity * 1.5 : 0}
         />
@@ -148,8 +149,8 @@ const OrbitalCard: React.FC<{
     shouldShowDragHint: boolean
     modelScale: number // Receive modelScale
 }> = ({ item, index, total, sharedState, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint, shouldShowDragHint, modelScale }) => {
-    const groupRef = useRef<THREE.Group>(null)
-    const meshRef = useRef<THREE.Mesh>(null)
+    const groupRef = useRef<Group>(null)
+    const meshRef = useRef<Mesh>(null)
     const router = useRouter()
     const [hovered, setHover] = useState(false)
     const [isNearFront, setIsNearFront] = useState(false)
@@ -160,7 +161,7 @@ const OrbitalCard: React.FC<{
     const pointerDownTime = useRef(0)
     // FIX: Re-render storm prevention — only set state when value actually changes
     const lastIsNearRef = useRef(false)
-    const targetScaleRef = useRef(new THREE.Vector3())
+    const targetScaleRef = useRef(new Vector3())
 
     // El ikonu görünüm timer'ı
     // SceneContent'ten externalShouldShowHint true gelirse: 4sn göster, sonra gizle
@@ -314,9 +315,9 @@ const OrbitalCard: React.FC<{
         const startY = -4.0
 
         // X ve Z için Vacuum, Y için yaylanma + lerp
-        const x = THREE.MathUtils.lerp(startX, targetX, vacuumEase)
-        const z = THREE.MathUtils.lerp(startZ, targetZ, vacuumEase)
-        const y = THREE.MathUtils.lerp(startY, targetY, vacuumEase) + arch
+        const x = MathUtils.lerp(startX, targetX, vacuumEase)
+        const z = MathUtils.lerp(startZ, targetZ, vacuumEase)
+        const y = MathUtils.lerp(startY, targetY, vacuumEase) + arch
 
         // Apply Position (Scale parent'tan silindi, artık child level'da uygulanır)
         groupRef.current.scale.set(1, 1, 1) // Parent scale reset to 1
@@ -344,7 +345,7 @@ const OrbitalCard: React.FC<{
 
         // Position'a z-offset ekle (hover'da kart öne gelir)
         const hoverTargetZ = z + hoverZOffset
-        groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, hoverTargetZ, 0.12)
+        groupRef.current.position.z = MathUtils.lerp(groupRef.current.position.z, hoverTargetZ, 0.12)
 
         // 🎯 PULSE EFFECT DISABLED: Fixed scale to prevent "tick" jumping
         const pulseMultiplier = 1
@@ -355,10 +356,10 @@ const OrbitalCard: React.FC<{
         // Scale uygulama
         if (meshRef.current && !item.categorySlug) {
             // 2D Plane Scale
-            meshRef.current.scale.x = THREE.MathUtils.lerp(meshRef.current.scale.x, pulsedScale, 0.15)
-            meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, pulsedScale, 0.15)
+            meshRef.current.scale.x = MathUtils.lerp(meshRef.current.scale.x, pulsedScale, 0.15)
+            meshRef.current.scale.y = MathUtils.lerp(meshRef.current.scale.y, pulsedScale, 0.15)
 
-            const mat = meshRef.current.material as THREE.MeshStandardMaterial
+            const mat = meshRef.current.material as MeshStandardMaterial
             if (mat) mat.opacity = easeOutCubic
         } else if (groupRef.current) {
             // 3D Icon Scale - Wrapper group'a uygula

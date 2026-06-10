@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Impeller.tsx
-skeleton_hash: 7e0f9e8008cb4bbb
+skeleton_hash: 69e782a56b6238dd
 entity_hashes:
   func:Impeller: ee1fdf5cf66e515f
-  overview: aceb6287c6bba380
+  overview: 325d6f2b890bb892
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:30Z
+generated_at: 2026-06-10T09:41:19Z
 ---
 
 ## Genel Bakış
@@ -21,13 +21,7 @@ Bu grup, impellerin görsel temsilini oluşturan ana işlevi içerir; props değ
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
-Impeller componentunun doğru çalışması için aşağıdaki varsayımlar geçerlidir.
 
-[Aksiyom 1]: Eğer `type` prop'u verilmezse, component render edilemez veya hata verir.  
-[Aksiyom 2]: Eğer `diameter` prop'u verilmezse, varsayılan değer **1** kullanılır.  
-[Aksiyom 3]: Eğer `bladeCount` prop'u verilmezse, varsayılan değer **8** kullanılır.  
-[Aksiyom 4]: Eğer `color` prop'u verilmezse, varsayılan değer **'aluminum'** kullanılır.
 
 ---
 
@@ -58,38 +52,44 @@ Impeller componentunun doğru çalışması için aşağıdaki varsayımlar geç
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Impeller.tsx::Impeller
-- **params**: type, diameter, bladeCount, color, spinSpeed
+### [N1_NASIL] AST Pointer: src/components/products/3d/parts/Impeller.tsx::Impeller
+- **params**: (type, diameter = 1, bladeCount = 8, color = 'aluminum', spinSpeed = 5)
 - **ic_degiskenler**:
-  - `groupRef` — ref to THREE.Group that wraps the impeller meshes, used to rotate the whole model in the animation loop
-  - `materials` — object returned by `useFanMaterials` containing all predefined material presets (industrialSteel, matteBlack, brushedAluminum, etc.)
-  - `material` — selected material based on the `color` prop (plastic → matteBlack, steel → industrialSteel, otherwise brushedAluminum)
-  - `radius` — half of the `diameter` value, used to scale geometries (cylinders, spheres, boxes, etc.) proportionally
-- **Dönüş**: JSX.Element
+  - `groupRef` — Three.js Group objesine referans, useFrame hook'unda döndürme işleminde kullanılır
+  - `materials` — useFanMaterials hook'undan gelen materyal objeleri (matteBlack, industrialSteel, brushedAluminum vb.)
+  - `material` — color parametresine göre seçilen spesifik materyal (plastic için matteBlack, steel için industrialSteel, diğerleri için brushedAluminum)
+  - `radius` — diameter'ın yarısı, tüm geometri hesaplamalarında kullanılır
+- **Dönüş**: React JSX elementi (3D impeller modeli)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Impeller.tsx::useFrame callback
-- **params**: _, delta
+### [N2_NASIL] AST Pointer: src/components/products/3d/parts/Impeller.tsx::useFrame callback
+- **params**: (_, delta)
+  - `_` — frame bilgisi (kullanılmıyor)
+  - `delta` — son frame'den bu yana geçen süre (animasyon hızı için)
 - **ic_degiskenler**:
-  - (yok)
-- **Dönüş**: yok
+  - `groupRef.current` — useFrame içinde döndürülecek olan Group objesi
+  - `spinSpeed` — dış kapsamdan gelen döndürme hızı (dönüş parametresi)
+- **Dönüş**: yok (yan etki: groupRef.current.rotation.z'yi delta * spinSpeed kadar azaltır)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Impeller.tsx::Axial blade map callback
-- **params**: _, i
-- **ic_degiskenler**:
-  - (yok)
-- **Dönüş**: JSX.Element
+### [N3_NASIL] AST Pointer: src/components/products/3d/parts/Impeller.tsx::axial blades map callback
+- **params**: (_, i)
+  - `_` — Array.fill(0) ile oluşturulan boş eleman (kullanılmıyor)
+  - `i` — mevcut kanat index'i (0'dan bladeCount'a kadar)
+- **ic_degiskenler**: yok
+- **Dönüş**: React JSX elementi (tek bir axial kanat)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Impeller.tsx::Radial blade map callback
-- **params**: _, i
-- **ic_degiskenler**:
-  - (yok)
-- **Dönüş**: JSX.Element
+### [N4_NASIL] AST Pointer: src/components/products/3d/parts/Impeller.tsx::radial blades map callback
+- **params**: (_, i)
+  - `_` — Array.fill(0) ile oluşturulan boş eleman (kullanılmıyor)
+  - `i` — mevcut kanatçık index'i (0'dan bladeCount*2'ye kadar)
+- **ic_degiskenler**: yok
+- **Dönüş**: React JSX elementi (tek bir radial kanatçık)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Impeller.tsx::BackwardCurved blade map callback
-- **params**: _, i
-- **ic_degiskenler**:
-  - (yok)
-- **Dönüş**: JSX.Element
+### [N5_NASIL] AST Pointer: src/components/products/3d/parts/Impeller.tsx::backward curved blades map callback
+- **params**: (_, i)
+  - `_` — Array.fill(0) ile oluşturulan boş eleman (kullanılmıyor)
+  - `i` — mevcut kanat index'i (0'dan 7'ye kadar, sabit sayı)
+- **ic_degiskenler**: yok
+- **Dönüş**: React JSX elementi (tek bir backward_curved kanat)
 
 ---
 

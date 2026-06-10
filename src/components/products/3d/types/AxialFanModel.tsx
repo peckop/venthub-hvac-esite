@@ -1,7 +1,8 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { ExtrudeGeometry,Shape } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 import { Silencer } from '../parts/Silencer'
@@ -18,7 +19,7 @@ export function AxialFanModel({
     silencerLength = 0.7
 }: AxialFanModelProps) {
     const materials = useFanMaterials()
-    const fanRef = useRef<THREE.Group>(null)
+    const fanRef = useRef<Group>(null)
 
     // BVN REFERENCE STYLE REDESIGN
     // 1. All Black (Glossy/Painted Steel).
@@ -34,7 +35,7 @@ export function AxialFanModel({
 
     // REFINED SICKLE BLADE GEOMETRY (BVN Style) - Memoized to prevent leaks
     const bladeGeometry = useMemo(() => {
-        const shape = new THREE.Shape()
+        const shape = new Shape()
         shape.moveTo(0, 0)
         // Leading Edge (Hücum Kenarı) - Dışa doğru kavis
         shape.bezierCurveTo(0.1, 0.15, 0.25, 0.22, 0.36, 0.10)
@@ -50,7 +51,7 @@ export function AxialFanModel({
             bevelSize: 0.005,
             bevelSegments: 2
         }
-        return new THREE.ExtrudeGeometry(shape, extrudeSettings)
+        return new ExtrudeGeometry(shape, extrudeSettings)
     }, [])
 
     return (

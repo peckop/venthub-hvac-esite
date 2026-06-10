@@ -3,31 +3,41 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\ExproofFanModel.tsx
-skeleton_hash: dfe4cdea0afb8b94
+skeleton_hash: 354e6cd6a8427029
 entity_hashes:
   func:ExproofFanModel: 9ab526a69ad42620
-  overview: 7f95db9ecbcd6088
+  overview: 7368b48961b4d2a7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:30Z
+generated_at: 2026-06-10T09:45:24Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunun ürün 3B bileşenleri koleksiyonunda yer alan bu modül, patlamaya dayanıklı (exproof) fan ürünlerinin ürün detay sayfalarında kullanılacak 3D modellerini render etmek amacıyla geliştirilmiştir. React tabanlı mimariye uygun olarak yapılandırılan modül, exproof fanlara özel 3B görselleştirme işini tek bir ana bileşen üzerinden yürütür.
+VentHub HVAC platformunda patlamaya dayanıklı (exproof) fan ürünlerinin 3 boyutlu görselleştirilmesini sağlayan React bileşenidir. Ürün detay sayfalarında kullanılmak üzere tasarlanmış, 3D model renderlama altyapısıyla entegre çalışan tek bir modül.
 
 ## Fonksiyon Grupları
 ### Ana 3B Bileşeni
-Modülün temel sorumluluğu olan exproof fan 3D modelini ekrana döker, ürün sayfası altyapısıyla uyumlu çalışacak şekilde yapılandırılır ve ilgili 3B sahne öğelerini yönetir.
+Exproof fan ürünlerinin 3D modelini ekrana döken, React Three Fiber veya benzeri 3D render kütüphaneleriyle uyumlu çalışan temel bileşeni barındırır.
 - ExproofFanModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı 3D ürün modeli bileşeni, exproof (patlamaya dayanıklı) sınıfı HVAC fan ürünlerinin 3 boyutlu görselleştirmesini gerçekleştirmek için tasarlanmıştır, doğru çalışması için aşağıdaki koşulların varlığı zorunludur.
 
-[Aksiyom 1]: Eğer ExproofFanModel bileşeninin bulunduğu üst React ağacında 3D renderlama altyapısı (React Three Fiber, Three.js vb.) entegre edilmemişse, 3D fan modeli ekrana çizilemez, kullanıcıya boş veya hata veren içerik gösterilir.
-[Aksiyom 2]: Eğer bu bileşene üst bileşenler tarafından exproof fan modelinin geometri, materyal ve model dosyalarına erişim izni ve bağlantı sağlanmamışsa, 3D modelin yüklenmesi başarısız olur, ürün görselleştirme işlemi gerçekleştirilemez.
-[Aksiyom 3]: Eğer ExproofFanModel'in çalıştığı kullanıcı tarayıcısında WebGL 3D renderlama desteği bulunmuyorsa, 3D içerik oluşturma işlemi hiç başlayamaz, bileşen tamamen işlevsiz kalır.
-[Aksiyom 4]: Eğer bu bileşene exproof fan ürünlerinin standart tip tanımları aktarılmamışsa, modele ait ürün özellikleriyle eşleşen özelleştirilmiş görselleştirme yapılamaz, yanlış veya eksik fan modeli gösterimi oluşur.
+Bu modül, props almayan bir React bileşenidrop; doğru çalışması için dış bağımlılıklara ve ortam koşullarına bağlıdır.
+
+[Aksiyom 1]: Eğer React ortamı (React kütüphanesi ve JSX/TSX derleyici desteği) mevcut değilse, bileşen render edilemez ve hata fırlatır.
+
+[Aksiyom 2]: Eğer 3D modelleme/renderleme kütüphanesi (örn: Three.js, React Three Fiber) ortamda bulunmuyorsa, exproof fan 3D modeli görüntülenemez.
+
+[Aksiyom 3]: Eğer bileşen bir React bileşen ağacı içinde çağrılmazsa (örn: bir `div` içine doğrudan yerleştirilirse), React hata mekanizması devreye girer.
+
+[Aksiyom 4]: Eğer 3D model dosyası (fan modeli kaynak varlığı) erişilebilir konumda değilse, model görünmez veya yükleme hatası oluşur.
+
+[Aksiyom 5]: Eğer bileşen çağrılmadan önce gerekli 3D sahne (Canvas/Scene) altyapısı hazırlanmamışsa, bileşen kendi içinde bu altyapıyı sağlamıyorsa render başarısız olur (bileşenin kendi içinde 3D sahne oluşturup oluşturmadığı bilinmiyor).
+
+---
+
+**Not:** Fonksiyon imzası `ExproofFanModel()` olarak tanımlı olup parametre almamaktadır. Bileşen gövdesi paylaşılmadığı için, 3D model yükleme mekanizması, hata yönetimi ve render stratejisi gibi iç uygulama detayları hakkında kesin varsayımlarda bulunulamamıştır.
 
 ---
 
@@ -44,57 +54,24 @@ Bu React tabanlı 3D ürün modeli bileşeni, exproof (patlamaya dayanıklı) s�
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\ExproofFanModel.tsx::ExproofFanModel
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/products/3d/types/ExproofFanModel.tsx::ExproofFanModel
+- **params**: () -> React.FC
 - **ic_degiskenler**:
-  - `materials` - useFanMaterials hook'undan alınan, tüm 3D modelin mesh'leri için gerekli renk ve kaplama ayarlarını içeren materyal nesnesi
-  - `scrollShape` - useMemo ile önbelleğe alınan, salyangoz fan gövdesinin 2D dış konturunu tanımlayan THREE.Shape nesnesi
-  - `Bolt` - içinde tanımlanan, krom cıvata 3D modelini oluşturan iç React bileşeni
-- **Dönüş**: Tüm exproof fan 3D modelini içeren Three.js JSX group elementi, React.FC türünde
+  - `materials` — `useFanMaterials()` Hook'unun retorno değeri; motor, gövde, cıvata ve koruma ızgarası için gerekli tüm Three.js materyallerini (metal, lastik, boya vb.) sağlar.
+  - `scrollShape` — `useMemo` ile optimize edilmiş bir `Shape` nesnesi; salyangoz gövdesinin (scroll housing) 2D dış konturunu tanımlar, `extrudeGeometry` için temel geometriyi oluşturur.
+  - `Bolt` — Fonksiyonel React bileşeni; belirtilen `position` dizisi (3D koordinat) ile cıvata geometrisini (silindir gövde + yarım küre baş) render eder.
+- **Dönüş**: `React.FC` (JSX ile motor, salyangoz gövdesi, emiş ünitesi ve atış ağzını oluşturan bir React fonksiyon bileşeni)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\ExproofFanModel.tsx::scrollShape_creator
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/ExproofFanModel.tsx::scrollShape
+- **params**: () -> void (parametre yok)
 - **ic_degiskenler**:
-  - `shape` - salyangoz gövdenin 2D hattını oluşturmak için başlatılan THREE.Shape nesnesi, üzerinde çizim metotları çağrılarak kontur tamamlanır
-- **Dönüş**: Tamamlanmış salyangoz konturunu içeren THREE.Shape nesnesi
+  - `shape` — Yeni oluşturulmuş bir `Shape` nesnesi; `moveTo`, `lineTo`, `quadraticCurveTo` metotlarıyla çizgi ve eğri noktaları tanımlanarak salyangoz formu dış konturu oluşturulur.
+- **Dönüş**: `Shape` (Three.js Shape objesi, `extrudeGeometry` için kullanılır)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\ExproofFanModel.tsx::Bolt
-- **params**: { position: [number, number, number] }
-- **ic_degiskenler**:
-  - `position` - parametreden alınan, cıvatanın 3D sahada yerleştirileceği 3 boyutlu koordinat dizisi
-  - `materials.boltChrome` - ana fonksiyondan erişilen, cıvata için kullanılan krom kaplama materyali
-- **Dönüş**: Cıvata modelini oluşturan, konumlandırılmış Three.js JSX group elementi
-
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\ExproofFanModel.tsx::cooling_fin_map_callback
-- **params**: _, i
-- **ic_degiskenler**:
-  - `i` - map döngüsünün indeksi, benzersiz key değeri olarak ve her kanat için ayrı rotasyon açısı hesaplamasında kullanılır
-  - `materials.motorSilver` - motor gövdesi ve kanatları için kullanılan alüminyum rengi materyal
-- **Dönüş**: Tek bir soğutma kanadını temsil eden Three.js mesh elementi
-
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\ExproofFanModel.tsx::bolt_position_map_callback
-- **params**: angle, i
-- **ic_degiskenler**:
-  - `angle` - cıvatanın yerleştirileceği açı (derece cinsinden), Math.cos/Math.sin ile 3D koordinatlara dönüştürülür
-  - `i` - döngü indeksi, benzersiz key değeri olarak kullanılır
-  - `Bolt` - ana fonksiyonda tanımlanan cıvata bileşeni
-- **Dönüş**: Açıya göre konumlandırılmış Bolt bileşeni
-
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\ExproofFanModel.tsx::concentric_ring_map_callback
-- **params**: r, i
-- **ic_degiskenler**:
-  - `r` - torus geometrisinin ana yarıçapı, her halka için farklı boyut ayarlamada kullanılır
-  - `i` - döngü indeksi, benzersiz key değeri olarak kullanılır
-  - `materials.matteBlack` - koruma ızgarası elemanları için kullanılan mat siyah materyal
-- **Dönüş**: Tek bir konsentrik koruma halkasını temsil eden Three.js mesh elementi
-
-### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\ExproofFanModel.tsx::radial_wire_map_callback
-- **params**: angle, i
-- **ic_degiskenler**:
-  - `angle` - radyal telin rotasyon açısı (derece cinsinden), radyana çevrilerek mesh rotasyonunda kullanılır
-  - `i` - döngü indeksi, benzersiz key değeri olarak kullanılır
-  - `materials.matteBlack` - koruma ızgarası elemanları için kullanılan mat siyah materyal
-- **Dönüş**: Tek bir radyal koruma telini temsil eden Three.js mesh elementi
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/ExproofFanModel.tsx::Bolt
+- **params**: `position` — `[number, number, number]` tipinde 3D koordinat dizisi; cıvatanın sahne içindeki (x, y, z) konumunu belirler.
+- **ic_degiskenler**: (yok — parametre dışında iç değişken içermeyen saf bir bileşen)
+- **Dönüş**: `JSX.Element` (`<group>` içinde `cylinderGeometry` ve `sphereGeometry` ile oluşturulmuş cıvata görseli)
 
 ---
 

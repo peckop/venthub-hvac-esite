@@ -1,7 +1,8 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useRef, useState } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { Box3, Vector3 } from 'three'
 
 interface SmartCenterScaleProps {
     children: React.ReactNode
@@ -29,7 +30,7 @@ export const SmartCenterScale: React.FC<SmartCenterScaleProps> = ({
     visibleDelay = 3,
     alignment = 'center'
 }) => {
-    const groupRef = useRef<THREE.Group>(null)
+    const groupRef = useRef<Group>(null)
     const [isVisible, setIsVisible] = useState(false)
     const isLocked = useRef(false)
     const frameCount = useRef(0)
@@ -48,15 +49,15 @@ export const SmartCenterScale: React.FC<SmartCenterScaleProps> = ({
         groupRef.current.updateMatrixWorld(true)
 
         // 2. Bounding Box hesapla
-        const box = new THREE.Box3().setFromObject(groupRef.current)
+        const box = new Box3().setFromObject(groupRef.current)
         if (box.isEmpty()) {
             console.warn('[SmartCenterScale] Empty bounding box for object', groupRef.current)
             return
         }
 
         // 3. Merkez ve Boyut bilgisi al
-        const center = new THREE.Vector3()
-        const size = new THREE.Vector3()
+        const center = new Vector3()
+        const size = new Vector3()
         box.getCenter(center)
         box.getSize(size)
 

@@ -1,13 +1,13 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export const PlugFanModel: React.FC = () => {
     const materials = useFanMaterials()
-    const fanRef = useRef<THREE.Group>(null)
+    const fanRef = useRef<Group>(null)
 
     useFrame(() => {
         if (fanRef.current) {

@@ -1,12 +1,12 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export function DehumidifierModel() {
-    const fanWheelRef = useRef<THREE.Group>(null)
+    const fanWheelRef = useRef<Group>(null)
     const materials = useFanMaterials()
 
     useFrame((state, delta) => {

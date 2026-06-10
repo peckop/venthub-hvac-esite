@@ -1,6 +1,6 @@
 "use client";
 import React, { useMemo } from 'react'
-import * as THREE from 'three'
+import { Shape } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
@@ -12,7 +12,7 @@ export const SnailFanModel: React.FC = () => {
 
     // Salyangoz Formu - Dış Kontur (Exproof ile BİREBİR AYNI)
     const scrollShape = useMemo(() => {
-        const shape = new THREE.Shape()
+        const shape = new Shape()
         shape.moveTo(0, 0.44)
         shape.lineTo(0.58, 0.44)
         shape.lineTo(0.58, 0.08)

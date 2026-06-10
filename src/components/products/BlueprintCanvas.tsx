@@ -3,7 +3,8 @@
 import { Float, shaderMaterial, useTexture } from '@react-three/drei'
 import { Canvas, extend,useFrame } from '@react-three/fiber'
 import React, { useRef } from 'react'
-import * as THREE from 'three'
+import type { Mesh, ShaderMaterial,Texture } from 'three'
+import { MathUtils } from 'three'
 
 // Custom Holographic Shader Material
 const HolographicMaterial = shaderMaterial(
@@ -58,7 +59,7 @@ extend({ HolographicMaterial })
 declare module '@react-three/fiber' {
     interface ThreeElements {
         holographicMaterial: {
-            uTexture: THREE.Texture;
+            uTexture: Texture;
             uOpacity?: number;
             uTime?: number;
             transparent?: boolean;
@@ -72,17 +73,17 @@ declare module '@react-three/fiber' {
  */
 const CinematicCard: React.FC<{ image: string }> = ({ image }) => {
     const texture = useTexture(image)
-    const meshRef = useRef<THREE.Mesh>(null)
+    const meshRef = useRef<Mesh>(null)
 
     useFrame((state) => {
         // Subtle tilt based on mouse position (Parallax)
         if (meshRef.current) {
             const { x, y } = state.mouse
-            meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, -y * 0.2, 0.1)
-            meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, x * 0.2, 0.1)
+            meshRef.current.rotation.x = MathUtils.lerp(meshRef.current.rotation.x, -y * 0.2, 0.1)
+            meshRef.current.rotation.y = MathUtils.lerp(meshRef.current.rotation.y, x * 0.2, 0.1)
 
             // Update shader time
-            const material = meshRef.current.material as THREE.ShaderMaterial;
+            const material = meshRef.current.material as ShaderMaterial;
             if (material && material.uniforms && material.uniforms.uTime) {
                 material.uniforms.uTime.value = state.clock.getElapsedTime();
             }

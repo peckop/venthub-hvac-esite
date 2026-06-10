@@ -3,41 +3,46 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\HRVModel.tsx
-skeleton_hash: 738f8ba482d2f3e1
+skeleton_hash: 70636daa783b970e
 entity_hashes:
-  func:HRVModel: 0b331f626c131748
-  overview: 84b86c708078850f
+  func:HRVModel: 2813a37fd256fdd7
+  overview: ca8ffe7ca3ce1f94
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:46:25Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC projesinin ürünler bölümündeki 3B ürün görselleştirme katmanında yer alan, ısı geri kazanım ventilatörleri (HRV) için özel React bileşeni barındırır. Sadece proje içindeki 3B ürün gösterimleri için tasarlanan modül, HRV tipi cihazların 3D sahnesinde doğru şekilde sunulmasını sağlayan ana bileşeni içerir.
+Bu modül, Venthub HVAC projesinin ürün gösterimleri için kullanılan 3D görselleştirme katmanında yer alır. Modül, ısı geri kazanım ventilatörleri (HRV) cihazlarının 3B ortamda doğru şekilde render edilmesini sağlayan temel React bileşenini barındırır.
 
 ## Fonksiyon Grupları
 ### Ana 3B HRV Model Bileşeni
-HRV cihazlarının 3B ortamda render edilmesini, temel görsel ve sahne uyumlu özelliklerinin yönetilmesini üstlenen tek ana bileşeni barındırır.
+HRV cihazlarının 3D sahnede görsel olarak sunulmasını üstlenen tek bir bileşeni içerir.
 - HRVModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React tabanlı 3B bileşen, HRV tipi HVAC cihazının kullanıcı arayüzünde 3 boyutlu olarak görüntülenmesini sağlamak üzere tasarlanmıştır, çalışması için 3B renderlama ekosisteminin ve ürün konfigürasyon verilerinin üst katmanlardan eksiksiz sağlanması zorunludur.
-
-[Aksiyom 1]: Eğer projeye entegre edilen React Three Fiber, Three.js gibi 3B renderlama kütüphaneleri bu bileşenden önce başarılı bir şekilde yüklenmemişse, HRV modeli hiçbir şekilde kullanıcıya görüntülenemez.
-[Aksiyom 2]: Eğer bu bileşene üst bileşenler tarafından HRV modeline ait geometri, malzeme ve sahne içi konumlandırma verileri iletilmemişse, 3B model doğru yerde, doğru görünürlükte sahneye eklenemez.
-[Aksiyom 3]: Eğer VentHub projesinin ürün veri kaynağından HRV cihazına ait gerçek boyutlar, konfigürasyon özellikleri bu bileşene aktarılmamışsa, 3B modelin ölçeklemesi gerçek hayattaki cihazla orantısız olur, görsel tutarsızlık oluşur.
-[Aksiyom 4]: Eğer bileşenin çalıştığı son kullanıcı tarayıcısı WebGL standardını desteklemiyorsa, tüm 3B içerik gibi HRV modeli de hiç görüntülenemez, kullanıcı boş bir içerik alanıyla karşılaşır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### HRVModel
-**Ne yapar**: VentHub HVAC projesinin ürün odaklı 3D bileşenleri grubunda yer alan, Isı Geri Kazanım Ünitesi (HRV) için tasarlanmış React bileşenidir. Hava akışı animasyonu ve fiziksel tabanlı yapısı ile HRV ünitesinin çalışma prensibini 3 boyutlu ortamda görselleştirmek üzere geliştirilmiştir.
-**Nasıl yapar**: Projenin belirlediği 3D ürün bileşeni standartlarına uygun olarak geliştirilen bileşen, öncelikle HRV ünitesinin fiziksel yapısını 3D ortamda render eder. Sonrasında entegre edilmiş özel hava akışı animasyonunu çalıştırarak ünitenin çalışma sürecini kullanıcılar için anlaşılır hale getirir.
-**Parametreler**: Orijinal fonksiyon tanımında herhangi bir girdi parametresi belirtilmemiştir, bu bileşen herhangi bir parametre almaz.
-**Dönüş**: Fonksiyonun orijinal tanımında dönüş tipi void veya bilinmiyor olarak işaretlenmiş, herhangi bir uydurma bilgi eklenmemiştir. Bileşen yapısı gereği React ortamında JSX elementi döndürmesi beklenir ancak orijinal tanımda resmi olarak bir dönüş tipi tanımlanmamıştır.
+
+**Ne yapar**: Hava akışı animasyonlu, fiziksel tabanlı bir Isı Geri Kazanım Ünitesi (HRV) 3D modelini React Three Fiber sahnesinde render eder. Taze hava (mavi) ve atık hava (kırmızı) partiküllerinin cihaz üzerinden geçişini sürekli animasyonla simüle eder.
+
+**Nasıl yapar**: `useFanMaterials` hook'u ile malzemeleri (RAL7035 gri, mat siyah) alır. İki ayrı `useRef` ile taze ve atık hava partiküllerini tutar. `useFrame` içinde her karede delta süresine bağlı olarak partiküllerin x ekseninde hareketini günceller: taze hava partikülleri sağa (+x) doğru hareket ederken 0.45 sınırını aştığında -0.45'e sarılır; atık hava partikülleri sola (-x) doğru hareket ederken -0.45 alt sınırını aştığında 0.45'e sarılır. Bu sonsuz döngü, havanın sürekli akışını görsel olarak simüle eder. JSX dönüşünde ana gövde kutusu, dört silindirik bağlantı flanşı, kontrol ünitesi/filtre kapağı detayı ve iki animasyonlu hava akışı grubu oluşturulur.
+
+**Parametreler**:
+Bu fonksiyon parametre almaz. Sıfır argümanlı bir React fonksiyonel bileşenidir.
+
+**Dönüş**: `JSX.Element` — 3D sahne içinde yer alacak bir `<group>` elemanı döndürür. Grup `[1.2, 1.2, 1.2]` ölçekli olup şu alt elemanları içerir:
+- Ana gövde: 1.2 × 1.3 × 0.65 boyutlarında kutu geometri, RAL7035 gri malzeme
+- Bağlantı flanşları: 4 adet silindirik geometri (yarıçap 0.09, yükseklik 0.18, 12 segment), mat siyah malzeme, üst yüzeyde dört köşeye konumlandırılmış
+- Kontrol ünitesi / filtre kapağı: 0.35 × 0.18 × 0.02 boyutlarında ince kutu, mat siyah malzeme
+- Taze hava partikülleri: 3 adet mavi (#3b82f6) şeffaf küp, `freshRef` ile referanslı, z = 0.12 düzleminde animasyonlu
+- Atık hava partikülleri: 3 adet kırmızı (#ef4444) şeffaf küp, `staleRef` ile referanslı, z = -0.12 düzleminde animasyonlu
 
 ---
 
@@ -46,60 +51,11 @@ Bu React tabanlı 3B bileşen, HRV tipi HVAC cihazının kullanıcı arayüzünd
 ### [N1_NASIL] AST Pointer: src/components/products/3d/types/HRVModel.tsx::HRVModel
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials hook'u ile elde edilen, modelin tüm parçalarında kullanılan materyaller nesnesi
-  - `freshRef` — THREE.Group tipinde React referansı, taze hava animasyonu yapan kürelerin grup nesnesini işaret eder
-  - `staleRef` — THREE.Group tipinde React referansı, atık hava animasyonu yapan kürelerin grup nesnesini işaret eder
-  - `useFrame` — Her karede çalışan react-three/fiber hook'u, hava akışı animasyonunu yönetmek için kullanılır
-- **Dönüş**: Tüm HRV cihazının 3D geometrilerini ve animasyon referanslarını içeren React Three Fiber JSX group elementi
-
-### [N2_NASIL] AST Pointer: src/components/products/3d/types/HRVModel.tsx::useFrameAnimationCallback
-- **params**: `_`, `delta`
-- **ic_degiskenler**:
-  - `delta` — Son kare ile geçen süreyi tutan, animasyon hızını senkronize etmek için kullanılan zaman değeri
-  - `freshRef.current` — Taze hava küreleri grubunun mevcut nesnesi, null kontrolü yapılarak erişilir
-  - `staleRef.current` — Atık hava küreleri grubunun mevcut nesnesi, null kontrolü yapılarak erişilir
-- **Dönüş**: yok (sadece sahne nesnelerinin pozisyonlarını güncelleyen yan etki bırakır)
-
-### [N3_NASIL] AST Pointer: src/components/products/3d/types/HRVModel.tsx::freshAirChildUpdateCallback
-- **params**: `child`
-- **ic_degiskenler**:
-  - `child` — Üzerinde işlem yapılan, taze hava grubu içindeki üç boyutlu sahne nesnesi
-  - `delta` — Animasyon hızını ayarlamak için kullanılan zaman farkı değeri
-  - `child.position.x` — Nesnenin X eksenindeki pozisyonu, sürekli güncellenerek hareket sağlar
-- **Dönüş**: yok (sadece ilgili nesnenin X pozisyonunu günceller)
-
-### [N4_NASIL] AST Pointer: src/components/products/3d/types/HRVModel.tsx::staleAirChildUpdateCallback
-- **params**: `child`
-- **ic_degiskenler**:
-  - `child` — Üzerinde işlem yapılan, atık hava grubu içindeki üç boyutlu sahne nesnesi
-  - `delta` — Animasyon hızını ayarlamak için kullanılan zaman farkı değeri
-  - `child.position.x` — Nesnenin X eksenindeki pozisyonu, ters yönde hareket ettirmek için güncellenir
-- **Dönüş**: yok (sadece ilgili nesnenin X pozisyonunu günceller)
-
-### [N5_NASIL] AST Pointer: src/components/products/3d/types/HRVModel.tsx::ductFlangeMapCallback
-- **params**: `pos`, `i`
-- **ic_degiskenler**:
-  - `pos` — Flanşın sahne üzerindeki 3 boyutlu konumunu tutan sayı dizisi
-  - `i` — Map fonksiyonundaki geçerli elemanın indeksi, React anahtarı olarak kullanılır
-  - `materials.matteBlack` - Flanşlara uygulanan mat siyah materyal, materyaller nesnesinden erişilir
-  - `Math.PI` — Flanşın dönüşünü ayarlamak için kullanılan pi sabiti
-- **Dönüş**: HRV cihazının bağlantı flanşlarını temsil eden, konumlandırılmış JSX mesh elementi
-
-### [N6_NASIL] AST Pointer: src/components/products/3d/types/HRVModel.tsx::freshAirSphereMapCallback
-- **params**: `x`, `i`
-- **ic_degiskenler**:
-  - `x` — Taze hava küresinin X eksenindeki başlangıç konumu
-  - `i` — Map fonksiyonundaki geçerli elemanın indeksi, benzersiz React anahtarı oluşturmak için kullanılır
-  - `#3b82f6` — Taze havayı temsil eden mavi renk kodu, küre materyaline uygulanır
-- **Dönüş**: Animasyonlu taze hava küresini temsil eden JSX mesh elementi
-
-### [N7_NASIL] AST Pointer: src/components/products/3d/types/HRVModel.tsx::staleAirSphereMapCallback
-- **params**: `x`, `i`
-- **ic_degiskenler**:
-  - `x` — Atık hava küresinin X eksenindeki başlangıç konumu
-  - `i` — Map fonksiyonundaki geçerli elemanın indeksi, benzersiz React anahtarı oluşturmak için kullanılır
-  - `#ef4444` — Atık havayı temsil eden kırmızı renk kodu, küre materyaline uygulanır
-- **Dönüş**: Animasyonlu atık hava küresini temsil eden JSX mesh elementi
+    * `materials` — useFanMaterials() hook'undan dönen materyal nesnesi, 3D modellere farklı yüzey materyallerini (ral7035, matteBlack) uygulamak için kullanılır
+    * `freshRef` — useRef ile oluşturulan React ref nesnesi, taze hava partiküllerini (mavi küreler) içeren Three.js Group nesnesine referans verir, animasyonda child'ların pozisyonunu güncellemek için kullanılır
+    * `staleRef` — useRef ile oluşturulan React ref nesnesi, atık hava partiküllerini (kırmızı küreler) içeren Three.js Group nesnesine referans verir, animasyonda child'ların pozisyonunu güncellemek için kullanılır
+- **Dönüş**: JSX (React Three Fiber bileşeni) — [1.2, 1.2, 1.2] ölçeğinde bir group döner; içinde ana gövde (boxGeometry), 4 flanş (cylinderGeometry), kontrol ünitesi detayı ve animasyonlu hava akışı partikülleri (sphereGeometry) içerir
+- **Yan Etkileri**: useFrame hook'u her frame'de çağrılır, freshRef ve staleRef ile referans verilen group'ların children elemanlarının position.x değerlerini delta zamanına göre artırır/azaltır (hava akışı animasyonu)
 
 ---
 

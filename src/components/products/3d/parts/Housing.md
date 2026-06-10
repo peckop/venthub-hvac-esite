@@ -3,42 +3,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Housing.tsx
-skeleton_hash: 0d92c96336f20e12
+skeleton_hash: c7f666abf2ccc50d
 entity_hashes:
   func:Flange: aa8addd79c82b57e
   func:Housing: 5e80dc3de87ab9cf
   func:SnailHousing: e93db710a7808387
-  overview: f65ca24cfa337066
+  overview: 8d10df3935873405
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:30Z
+generated_at: 2026-06-10T09:40:13Z
 ---
 
-## Genel Bakış
-Bu modül, 3B modelleme bağlamında kullanılan temel mekanik parçaları tanımlayan React bileşenlerini içerir. Her fonksiyon, belirli geometrik özellikleri (yarıçap, uzunluk, kalınlık, delik sayısı vb.) parametre olarak alarak ilgili parçanın görsel ve yapısal temsilini üretir.
 
-## Fonksiyon Grupları
-### Temel Parça Oluşturucular
-Bu grup, modülün ana işlevini oluşturan üç farklı 3B parçayı tanımlayan bileşenleri içerir; her biri belirli bir mekanik işlevi için özelleştirilmiş geometri üretir.
-- Flange, Housing, SnailHousing
-
-### Özelleştirilebilir Özellik Grupları
-Bu işlevler, parçaların temel boyutlarını ve görünüm özelliklerini ayarlamak için kullanılan parametreleri kabul eder; böylece aynı temel tasarım üzerinden çeşitli varyantlar kolayca üretilebilir.
-- Flange (yarıçap ve delik sayısı)
-- Housing (yarıçap, uzunluk, kalınlık ve genişlik)
-- SnailHousing (ölçek faktörü)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modülün fonksiyon imzalarından türetilen varsayımlar aşağıda belirtilmiştir.
+Bu modül, 3B geometri üreten React bileşenlerinden oluşur; geometrik parametrelerin geçerli ve tutarlı olması beklenir.
 
-[Aksiyom 1]: Eğer **Flange** fonksiyonuna `radius` parametresi verilmezse, fonksiyon çalıştırılamaz (eksik gerekli argüman hatası olur).  
-[Aksiyom 2]: Eğer **Flange** fonksiyonuna `holes` parametresi verilmezse, `holes` varsayılan olarak **8** değerini alır.  
-[Aksiyom 3]: Eğer **Housing** fonksiyonuna `radius` parametresi verilmezse, fonksiyon çalıştırılamaz.  
-[Aksiyom 4]: Eğer **Housing** fonksiyonuna `length` parametresi verilmezse, fonksiyon çalıştırılamaz.  
-[Aksiyom 5]: Eğer **Housing** fonksiyonuna `thickness` parametresi verilmezse, `thickness` varsayılan olarak **0.02** değerini alır.  
-[Aksiyom 6]: Eğer **Housing** fonksiyonuna `width` parametresi verilmezse, fonksiyon çalıştırılamaz.  
-[Aksiyom 7]: Eğer **SnailHousing** fonksiyonuna `scale` parametresi verilmezse, `scale` varsayılan olarak **1** değerini alır.
+**[Aksiyom 1]**: Eğer `Flange` için `radius` pozitif bir sayı değilse, geometrik olarak tanımsız veya görünmez bir flanş oluşur.
+
+**[Aksiyom 2]**: Eğer `Flange` için `holes` pozitif bir tamsayı değilse, deliklerin doğru oluşturulamaz; tutarsız veya eksik delik deseni oluşur.
+
+**[Aksiyom 3]**: Eğer `Housing` için `radius` pozitif bir sayı değilse, gövde geometrisi tanımsız hale gelir.
+
+**[Aksiyom 4]**: Eğer `Housing` için `length` pozitif bir sayı değilse, gövde boyutu anlamsız olur veya çöker.
+
+**[Aksiyom 5]**: Eğer `Housing` için `thickness` pozitif bir sayı değilse, gövde et kalınlığı negatif veya sıfır olur; bu fiziksel olarak geçersiz bir durumdur.
+
+**[Aksiyom 6]**: Eğer `SnailHousing` için `scale` pozitif bir sayı değilse, salyangoz gövdesi ters orantılı veya ters çevrilmiş olur; beklenmeyen geometri oluşur.
+
+**[Aksiyom 7]**: Eğer `radius` ile `width` (Housing'de `_width` olarak geçer) arasındaki oran fiziksel olarak geçerli bir oran değilse (örn. çap `width`'ten küçükse), Housing geometrisi kendini içe doğru katlayabilir veya çakışabilir.
+
+**[Aksiyom 8]**: Eğer `Housing` için `thickness` değeri `radius`'tan büyükse, gövde içi tamamen dolu hale gelir; delik veya boşluk kalmaz.
 
 ---
 
@@ -89,25 +85,31 @@ Bu modülün fonksiyon imzalarından türetilen varsayımlar aşağıda belirtil
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Housing.tsx::Flange
-- **params**: radius, holes = 8
-- **ic_degiskenler**: 
-  - `materials` — hook returning material objects (galvanizedSteel, industrialSteel) used for mesh materials
-- **Dönüş**: JSX.Element
+### [N1_NASIL] AST Pointer: components/products/3d/parts/Housing.tsx::Flange
+- **params**: `radius` — flanşın dış yarıçapı, `holes = 8` — flanştaki cıvata delik sayısı (varsayılan 8)
+- **ic_degiskenler**:
+  - `materials` — `useFanMaterials()` hook'undan gelen malzeme nesnesi, galvaniz çelik ve endüstriyel çelik materyallerini içerir
+  - `angle` — (map callback içinde) her cıvatanın açısal konumu, `(i * Math.PI * 2) / holes` ile hesaplanan radyan cinsinden açı
+  - `r` — cıvataların yerleştirildiği yarıçap, `radius + 0.05` olarak flanş yüzeyine yerleştirilir
+- **Dönüş**: `<group>` elemanı içinde ana ringGeometry halkası ve `Array(holes).fill(0).map(...)` ile döngüsel olarak oluşturulmuş cıvata mesh'leri
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Housing.tsx::Housing
-- **params**: radius, length, thickness = 0.02, width: _width
-- **ic_degiskenler**: 
-  - `materials` — hook returning material objects (galvanizedSteel) used for mesh materials
-- **Dönüş**: JSX.Element
+---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Housing.tsx::SnailHousing
-- **params**: scale = 1
-- **ic_degiskenler**: 
-  - `materials` — hook returning material objects (galvanizedSteel, industrialSteel) used for mesh materials
-  - `shape` — memoized THREE.Shape defining the snail housing profile
-  - `extrudeSettings` — configuration object for ExtrudeGeometry (steps, depth, bevel settings)
-- **Dönüş**: JSX.Element
+### [N2_NASIL] AST Pointer: components/products/3d/parts/Housing.tsx::Housing
+- **params**: `radius` — silindirik gövde yarıçapı, `length` — gövde boyu (silindir yüksekliği), `thickness = 0.02` — gövde kalınlığı (halka genişliği), `width: _width` — genişlik parametresi (prefixed `_`, kullanılmıyor)
+- **ic_degiskenler**:
+  - `materials` — `useFanMaterials()` hook'undan gelen malzeme nesnesi, galvaniz çelik materyalini içerir
+- **Dönüş**: `<group rotation={[Math.PI / 2, 0, 0]}>` içinde openEnded silindir gövdesi + üst ve alt uçlarda `ringGeometry` halkalar ile kalınlık illüzyonu
+
+---
+
+### [N3_NASIL] AST Pointer: components/products/3d/parts/Housing.tsx::SnailHousing
+- **params**: `scale = 1` — salyangoz gövdesinin genel ölçek çarpanı (varsayılan 1)
+- **ic_degiskenler**:
+  - `materials` — `useFanMaterials()` hook'undan gelen malzeme nesnesi, galvaniz çelik ve endüstriyel çelik materyallerini içerir
+  - `shape` — `useMemo` ile oluşturulan `Three.Shape` nesnesi, salyangoz spirali geometrisini tanımlar; Bezier eğrileri ile logaritmik spiral yaklaşımı ve kare çıkış ağzı (atış) çizimini içerir
+  - `extrudeSettings` — `{ steps: 2, depth: 0.6, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 2 }` — `ExtrudeGeometry` için extrüzyon parametreleri; 2 adım, 0.6 birim derinlik, yuvarlatılmış kenarlar
+- **Dönüş**: `<group scale={scale}>` içinde iki adet yan kapak (shapeGeometry ile ön/arka yüz), extruded gövde (extrudeGeometry ile dolu gövde) ve kare çıkış flanşı (boxGeometry)
 
 ---
 

@@ -3,32 +3,38 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\PlugFanModel.tsx
-skeleton_hash: da6d858340679778
+skeleton_hash: 1ead6ef037badd4a
 entity_hashes:
   func:PlugFanModel: b85fe612276b43fc
-  overview: 3bc6071f2c07ea0b
+  overview: e48f3eec2a768329
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:47:53Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC platformunun ürün 3D görselleştirme sisteminin bir parçasıdır ve fişli tip fan (Plug Fan) ürününü 3 boyutlu olarak ekranda sunmak üzere tasarlanmış bir React bileşeni barındırır. Yalnızca ilgili ürünün 3D modelini renderlamakla görevli, bağımsız bir bileşen olarak çalışır.
+VentHub HVAC platformunun 3D ürün görselleştirme altyapısında yer alan bu modül, fişli tip fan (Plug Fan) ürününü three.js ve React ekosistemi kullanarak tarayıcıda üç boyutlu olarak sunan bağımsız bir bileşendir. Model asset'lerini yükler, sahneye yerleştirir ve üst bileşenlere dışa aktarılan tek bir fonksiyonel React bileşeni olarak render işlemini yönetir.
 
 ## Fonksiyon Grupları
-### Ana 3D Ürün Bileşeni
-Modülün tek ve ana sorumluluğunu üstlenen, Plug Fan ürününün 3D modelini React ortamında istendiği her yerde kullanılmak üzere renderlamak için dışa aktarılan ana bileşendir.
+
+### 3D Fan Modeli Bileşeni
+Modülün tek ve temel sorumluluğu olan bu bileşen, Plug Fan ürününün 3D model dosyalarını React çalışma ortamında yükleyip tarayıcı tabanlı three.js sahnesinde görselleştirir; konum, ölçek ve döndürme gibi parametreleri alarak istenen formatta render eder.
 - PlugFanModel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu React TypeScript ile geliştirilen 3D fan modeli bileşeninin doğru çalışması için çalışma zamanında frontend ortamındaki temel 3D çalışma altyapısı, bağımlılıkları ve asset erişimlerinin mevcudiyeti zorunludur.
 
-[Aksiyom 1]: Eğer çalışma zamanında React çalışma ortamı yoksa, bileşen initialize edilemez ve hiçbir şekilde render işlemi gerçekleştirilemez.
-[Aksiyom 2]: Eğer proje içerisinde 3D render işlemleri için kullanılan üç.js gibi temel 3D kütüphanesi çalışma zamanında yüklenmemişse, bu bileşen fan modelini sahneye ekleyemez, geçerli bir görsel çıktı üretemez.
-[Aksiyom 3]: Eğer proje içerisinde tanımlı olan PlugFan modeline ait 3D model dosyaları, kaplamalar ve ilgili assetlere erişim imkanı yoksa, model yüklenemez, boş veya hatalı görsel çıktı üretilir.
-[Aksiyom 4]: Eğer bu bileşeni kullanan üst bileşenler tarafından iletilmesi zorunlu olan modelin konumu, boyutları gibi model spesifikasyonu verileri eksik iletilir veya hiç iletilmezse, model varsayılan konfigürasyonsuz olarak ekrana sığmaz veya istenen ürün özelliklerini yansıtamaz.
-[Aksiyom 5]: Eğer bu bileşenin çalıştığı tarayıcı ortamında WebGL desteği yoksa, 3D modelin renderı hiçbir şekilde gerçekleştirilemez, kullanıcıya model görüntülenemez.
+Bu modül için fonksiyon gövdesi (iç实现) paylaşılmamıştır. Mevcut bilgiler yalnızca fonksiyon imzası ve genel doküman açıklamasıdır. Aşağıdaki varsayımlar bu kısıtlı bilgiye dayanarak çıkarılmıştır:
+
+[Aksiyom 1]: Eğer `PlugFanModel` bir React JSX bileşeni olarak kullanılmazsa (doğrudan `createElement` ile çağrılsa veya geçersiz bir yere yerleştirilse), React render hatası oluşur.
+
+[Aksiyom 2]: Eğer `PlugFanModel` bileşeni çağrı paramsız (`PlugFanModel()` şeklinde) beklenen bir bağlamda prop'larla çağrılırsa, fazladan prop'lar yoksayılır veya TypeScript derleme uyarısı verir; bileşen dış bağımlılık olarak tanımlı bir prop'a erişemez.
+
+[Aksiyom 3]: Eğer bileşenin çalışması için zorunlu olan 3D renderlama ortamı (örn: Three.js canvas, React Three Fiber sağlayıcısı) mevcut değilse, 3D model ekranda renderlanamaz.
+
+---
+
+**Not:** Fonksiyon gövdesi paylaşılmadığı için, bileşenin iç bağımlılıkları, yüklediği modeller, kullandığı materyaller veya varsayılan değerleri hakkında kesin çıkarım yapılamamaktadır. Yukarıdaki aksiyomlar yalnızca fonksiyon imzasındaki **parametresiz çağrı** gerçeğine ve React bileşen yapısının doğasına dayanmaktadır.
 
 ---
 
@@ -45,31 +51,39 @@ Bu React TypeScript ile geliştirilen 3D fan modeli bileşeninin doğru çalış
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\PlugFanModel.tsx::PlugFanModel
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: types/PlugFanModel.tsx::PlugFanModel
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `materials` — useFanMaterials hook'u ile alınan, tüm fan parçalarında kullanılan malzeme tanımlarını barındıran nesne
-  - `fanRef` — useRef ile oluşturulan, dönen fan pervanesi grubunun Three.js Group referansını tutan, animasyon işlemleri için kullanılan ref nesnesi
-- **Dönüş**: Tüm fan bileşenlerini içeren ana React Three Fiber JSX group elementi
+  - `materials` — `useFanMaterials()` hook'undan dönen 3D materyal nesneleri; içinde `galvanizedSteel`, `industrialSteel`, `safetyOrange`, `ral7035`, `matteBlack` gibi materyal referansları barındırır, JSX'te mesh'lerin `material` prop'larında kullanılır
+  - `fanRef` — `useRef<Group>(null)` ile oluşturulmuş React ref nesnesi; Three.js `Group` tipinde bir referans tutar, `useFrame` callback'inde fan pervanesinin `rotation.z` değerini değiştirmek için `fanRef.current` üzerinden erişilir; JSX'te pervane grubuna `ref={fanRef}` olarak bağlanır
+- **Dönüş**: `JSX.Element` — Plug Fan 3D modelini oluşturan React elementi; içinde emiş hunisi, pervane (7 kanatlı geriye eğimli), motor (soğutma kanatçıkları ve klemens kutusu dahil) ve taban kaidesi bulunan `<group>` yapısı döner; dış group'a `scale={[0.7, 0.7, 0.7]}` ve `rotation={[0, Math.PI / 4, 0]}` uygulanır
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\PlugFanModel.tsx::useFrame_callback
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `fanRef.current` — fan pervanesi grubunun aktif Three.js nesnesi, null kontrolü yapıldıktan sonra Z ekseni rotasyonu her frame'de güncellenir
-- **Dönüş**: yok (sadece pervane rotasyonunu güncelleyen yan etki yaratır)
+---
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\PlugFanModel.tsx::fan_blade_map_callback
-- **params**: [_, i] — map fonksiyonunun kullanılmayan dizi elemanı parametresi (_) ve döngü indeksi parametresi (i)
-- **ic_degiskenler**:
-  - `i` — mevcut kanatın indeksi, tüm kanatların 360 derece boyunca eşit dağılması için rotasyon değeri hesaplamasında kullanılır
-  - `materials.safetyOrange` — fan kanatlarında kullanılan turuncu emniyet malzemesi
-- **Dönüş**: Tek bir fan kanadını oluşturan React Three Fiber JSX group elementi
+### [N2_NASIL] AST Pointer: types/PlugFanModel.tsx::useFrame_callback
+- **params**: (yok — useFrame'in state/delta parametreleri kullanılmamış)
+- **ic_degiskenler**: (yok)
+  - `fanRef.current` — dış scope'daki `fanRef` referansının mevcut Three.js Group nesnesine erişimi; `null` kontrolü yapıldıktan sonra `rotation.z` alanına `-0.1` eklenerek pervanenin her frame'de kendi ekseni etrafında dönmesi sağlanır
+- **Dönüş**: yok (yan etki: her frame'de `fanRef.current.rotation.z` güncellenir)
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\products\3d\types\PlugFanModel.tsx::motor_cooling_fin_map_callback
-- **params**: [_, i] — map fonksiyonunun kullanılmayan dizi elemanı parametresi (_) ve döngü indeksi parametresi (i)
-- **ic_degiskenler**:
-  - `i` — mevcut soğutma kanatçığının indeksi, tüm kanatçıkların motor gövdesi etrafında eşit dağılması için rotasyon değeri hesaplamasında kullanılır
-- **Dönüş**: Tek bir motor soğutma kanatçığını oluşturan React Three Fiber JSX mesh elementi
+---
+
+### [N3_NASIL] AST Pointer: types/PlugFanModel.tsx::blade_map_callback
+- **params**:
+  - `_` — `Array(7).fill(0)` ile üretilen boş eleman, kullanılmıyor
+  - `i` — kanat indeksi (0–6); her bir kanatın dairesel konumunu hesaplamak için kullanılır, `(i / 7) * Math.PI * 2` formülü ile 7 kanat eşit aralıklarla dağıtılır
+- **ic_degiskenler**: (yok)
+  - `materials.safetyOrange` — outer scope'taki `materials` üzerinden erişilen turuncu materyal; her kanat mesh'ine uygulanır
+- **Dönüş**: `JSX.Element` — tek bir pervane kanadını temsil eden `<group>` elementi; `rotation={[0, 0, (i / 7) * Math.PI * 2]}` ile dairesel konumlandırılmış, içinde `boxGeometry args={[0.015, 0.3, 0.25]}` boyutlarında bir `<mesh>` barındırır
+
+---
+
+### [N4_NASIL] AST Pointer: types/PlugFanModel.tsx::cooling_fin_map_callback
+- **params**:
+  - `_` — `Array(12).fill(0)` ile üretilen boş eleman, kullanılmıyor
+  - `i` — kanatçık indeksi (0–11); her bir soğutma kanatçığının dairesel konumunu hesaplamak için kullanılır, `(i / 12) * Math.PI * 2` formülü ile 12 kanatçık eşit aralıklarla dağıtılır
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `JSX.Element` — tek bir motor soğutma kanatçığını temsil eden `<mesh>` elementi; `rotation={[0, (i / 12) * Math.PI * 2, 0]}` ile Y ekseni etrafında dairesel konumlandırılmış, `position={[0.18, 0, 0]}` ile motor gövdesinin dış yüzeyine yerleştirilmiş, `boxGeometry args={[0.04, 0.35, 0.02]}` boyutlarında ve inline `<meshStandardMaterial color="#94a3b8" />` materyaline sahiptir
 
 ---
 

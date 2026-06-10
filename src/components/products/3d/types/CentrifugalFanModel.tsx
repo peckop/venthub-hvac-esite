@@ -1,7 +1,8 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { ExtrudeGeometry,Shape } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
@@ -13,7 +14,7 @@ import { useFanMaterials } from '../materials/useFanMaterials'
  */
 export const CentrifugalFanModel: React.FC = () => {
     const materials = useFanMaterials()
-    const impellerRef = useRef<THREE.Group>(null)
+    const impellerRef = useRef<Group>(null)
 
     // Dönen pervaneyi animasyonla döndür
     useFrame((state, delta) => {
@@ -24,7 +25,7 @@ export const CentrifugalFanModel: React.FC = () => {
 
     // İmpeller kanat geometrisi (Geriye kıvrımlı santrifüj kanatlar)
     const impellerBladeGeometry = useMemo(() => {
-        const shape = new THREE.Shape()
+        const shape = new Shape()
         // Kanat profili - dış kenardan iç kenara
         shape.moveTo(0, 0.12)
         shape.quadraticCurveTo(0.18, 0.10, 0.22, 0)
@@ -38,12 +39,12 @@ export const CentrifugalFanModel: React.FC = () => {
             bevelSize: 0.004,
             bevelSegments: 1
         }
-        return new THREE.ExtrudeGeometry(shape, extrudeSettings)
+        return new ExtrudeGeometry(shape, extrudeSettings)
     }, [])
 
     // Spiral housing (salyangoz) profili
     const scrollShape = useMemo(() => {
-        const shape = new THREE.Shape()
+        const shape = new Shape()
         shape.moveTo(0, 0.40)
         shape.lineTo(0.50, 0.40)
         shape.lineTo(0.50, 0.06)

@@ -3,15 +3,15 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx
-skeleton_hash: c5a07a48db427616
+skeleton_hash: 1bd00a5e41882fff
 entity_hashes:
   func:EdgeOverlay: 48aefc8964111cb4
   func:InteractivePart: d4921a7aaa094ed5
-  func:MountingChassis: 3daf7b9afda8d603
+  func:MountingChassis: c35d126e80bb7273
   func:SilentChannelFanModel: 98c6a822fa24c046
-  overview: f08ca432f193e889
+  overview: 50df7eb459585814
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:50:02Z
 ---
 
 ## Genel Bakış
@@ -35,23 +35,21 @@ Fanın fiziksel yapısını oluşturan, belirli geometrik parametrelerle (boy, �
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdeleri paylaşılmamıştır; yalnızca fonksiyon imzalarından ve modül yapısından çıkarılabilen temel mimari varsayımlar aşağıdadır.
+Bu modül, Three.js tabanlı bir 3D fan modelinin parçalarını orkestre eden bir React bileşen ağıdır. Aşağıdaki varsayımlar fonksiyon imzalarından türetilmiştir.
 
-**[Aksiyom 1]:** Eğer `MountingChassis` bileşenine geçirilen `bodyHalfLen`, `neckLen`, `neckRad` veya `bRad` değerlerinden herhangi biri negatif veya sıfırsa, Three.js geometri oluşturma hataları oluşur veya anlamsız 3D model geometrisi üretilir.
+[Aksiyom 1]: Eğer `EdgeOverlay` bileşeni `displayStyle` parametresi olmadan çağrılırsa, bileşen render sırasında hata verir (zorunlu string parametre, default değer yoktur).
 
-**[Aksiyom 2]:** Eğer `MountingChassis` bileşenine geçirilen `material` parametresi geçerli bir `THREE.Material` instance'ı değilse, Three.js render sürecinde Material tipi uyumsuzluğu hatası oluşur.
+[Aksiyom 2]: Eğer `MountingChassis` bileşeni `bodyHalfLen`, `neckLen`, `neckRad` veya `bRad` parametrelerinden herhangi biri olmadan çağrılırsa, Three.js geometri hesaplamaları geçersiz boyutlarla çalışır veya hata oluşur (dört parametre de zorunlu number, default değerleri yoktur).
 
-**[Aksiyom 3]:** Eğer `SilentChannelFanModel` bileşenine geçirilen `hiddenParts` dizisi içindeki elemanlar, `InteractivePart` bileşenlerinin `name` değerleriyle eşleşmiyorsa, hiçbir parça gizlenmez ve tüm parçalar görünür kalır.
+[Aksiyom 3]: Eğer `SilentChannelFanModel` çağrılırken `explode` parametresi verilmezse, değer `0` olarak kabul edilir ve parçalar arası patlama mesafesi sıfırdır (default: `0`).
 
-**[Aksiyom 4]:** Eğer `SilentChannelFanModel` bileşeninde `explode` parametresi 0'dan farklı bir değere ayarlanırsa, parçaların orijinal pozisyonlarından dışarı doğru dağıtılması beklenir; ancak dağıtma vektörlerinin yönleri ve uzaklıkları fonksiyon gövdesinde tanımlı olmadığından, bu davranış bilinmiyor.
+[Aksiyom 4]: Eğer `SilentChannelFanModel` çağrılırken `hiddenParts` parametresi verilmezse, boş dizi `[]` olarak kabul edilir ve hiçbir parça gizli durumda başlar (default: `[]`).
 
-**[Aksiyom 5]:** Eğer `InteractivePart` bileşenine `onPartClick` callback'i geçirilmemişse, parça tıklama etkileşimi çalışmayabilir veya hata oluşabilir; bu durum fonksiyon gövdesinde ele alınıp alınmadığı bilinmiyor.
+[Aksiyom 5]: Eğer `InteractivePart` bileşeni `hiddenParts` veya `isolatedPart` parametreleri olmadan çağrılırsa, bu parçanın görünürlük ve izolasyon durumu üst bileşen tarafından belirlenmelidir; aksi takdirde parçanın görünürlüğü belirsiz kalır.
 
-**[Aksiyom 6]:** Eğer `InteractivePart` bileşenine `isolatedPart` değeri olarak geçilen isim, mevcut bir parçanın `name` değeriyle eşleşmiyorsa, izolasyon etkileşimi hiçbir parçaya uygulanmaz.
+[Aksiyom 6]: Eğer `MountingChassis` bileşeni `material` parametresi geçerli bir `Material` tipi olmadan çağrılırsa, Three.js materyal oluşturma sırasında hata oluşur (zorunlu parametre, tipi `Material`).
 
-**[Aksiyom 7]:** Eğer `SilentChannelFanModel` bileşeninin `displayStyle` parametresi geçerli bir değer değilse (örn: boş string veya tanımsız bir enum değeri), `EdgeOverlay` ve `MountingChassis` bileşenlerine anlamsız display stil bilgisi iletilir ve görsel çıktı belirsiz olur.
-
-**[Aksiyom 8]:** `SilentChannelFanModel` tüm alt 3D bileşenleri (EdgeOverlay, MountingChassis, InteractivePart) bünyesinde barındırdığından, bu modülün `@react-three/fiber` veya eşdeğeri Three.js React entegrasyonu ile bir `<Canvas>` içine yerleştirilmesi zorunludur; aksi halde 3D sahne oluşturulamaz.
+[Aksiyom 7]: Eğer `SilentChannelFanModel` bileşenine `selectedPart` veya `isolatedPart` olarak `MountingChassis` veya `EdgeOverlay` bileşenlerinin tanınmayan bir ismi verilirse, ilgili parça vurgulanmaz veya izole edilmez.
 
 ---
 
@@ -65,16 +63,20 @@ Bu modül için fonksiyon gövdeleri paylaşılmamıştır; yalnızca fonksiyon 
 **Dönüş**: Tipi belirtilmemiştir, void veya bilinmiyor olarak tanımlanmıştır.
 
 ### MountingChassis
-**Ne yapar**: Sessiz kanal fanının ana montaj şasisinin 3B geometrisini oluşturan React bileşenidir. Fanın gövde ve bağlantı boynu kısımlarını tanımlayan boyut ve malzeme parametreleriyle gerçekçi bir şasi modeli oluşturur.
-**Nasıl yapar**: Aldığı uzunluk, yarıçap ve malzeme bilgilerini Three.js geometri fonksiyonlarıyla işler, girilen displayStyle parametresine göre şasinin görsel görünümünü ayarlar ve 3B sahneye ekler.
+
+**Ne yapar**: Fan montaj şasesini (chassis) 3B olarak oluşturur. Taban plakası, üzerindeki montaj yuvaları ve iki adet eğik üst yüzeyli dikey duvar elemanlarını içeren tam bir şase geometrisi üretir. Bu bileşen, sessiz kanatlı fan modelinin alt kısmına monte edilen yapısal destek parçasını temsil eder.
+
+**Nasıl yapar**: Fonksiyon, verilen boyut parametrelerine dayanarak iki ana geometrik parça oluşturur. Öncelikle taban plakasını (baseShape) oluşturur: dikdörtgen bir plaka üzerine, iki adet yuvarlatılmış köşeli slot deliği (montaj vida yuvası) yerleştirir. Bu şekil `extrudeGeometry` ile verilen kalınlıkta 3B haline getirilir. İkinci olarak dikey duvar şeklini (wallShape) oluşturur: altı düz, üstü ise boyun (neck) yarıçapına uygun yarım daire formunda eğimli bir duvar profili çizilir ve aynı extrude işlemine tabi tutulur. Duvarlar, şase uzunluğu boyunca iki uçta simetrik olarak konumlandırılır; birinci duvar ön yüzde, ikinci duvar ise 180 derece döndürülmüş olarak arka yüzde yer alır. Tüm geometrik hesaplamalarda `useMemo` kullanılarak gereksiz yeniden hesaplamalar önlenir. Her bir `mesh` üzerine `EdgeOverlay` bileşeni eklenerek kenar çizimi (`displayStyle`) kontrolü sağlanır. Bileşen, `group` elemanlarının iç içe yerleştirilmesiyle `[0, -bRad, 0]` konumuna-ofset edilerek fan gövdesinin altına hizalanır.
+
 **Parametreler**:
-- name: bodyHalfLen — type: number — Fan gövdesinin tam uzunluğunun yarısını belirten sayısal değer, geometrik ölçekleme için kullanılır.
-- name: neckLen — type: number — Şasinin bağlantı boynunun toplam uzunluğunu tanımlayan sayısal değer.
-- name: neckRad — type: number — Şasi boynunun yarıçapını belirten sayısal değer.
-- name: bRad — type: number — Gövde tabanının yarıçapını tanımlayan sayısal değer.
-- name: material — type: THREE.Material — Şasi geometrisine uygulanacak Three.js uyumlu 3B malzeme nesnesi.
-- name: displayStyle — type: string — Şasinin sahne içerisinde hangi görsel stilde gösterileceğini belirten string değer.
-**Dönüş**: Tipi belirtilmemiştir, void veya bilinmiyor olarak tanımlanmıştır.
+- `bodyHalfLen`: `number` — Fan gövdesinin yarım uzunluğu; şase taban plakasının toplam uzunluğunu hesaplamak için kullanılır. `(bodyHalfLen + neckLen) * 2` formülüyle taban uzunluğu belirlenir.
+- `neckLen`: `number` — Boyun (neck) bölgesinin uzunluğu; hem taban plakasının toplam uzunluğuna hem de duvarların yerleştirildiği eksenel pozisyona (`wallZ`) ve duvar duvar yüksekliğinin konumlandırılmasına etki eder.
+- `neckRad`: `number` — Boyun bölgesinin yarıçapı; duvar şeklinin üst kısmındaki yarım daire yayının (absarc) yarıçapı olarak kullanılır. Ayrıca şase genişliği `neckRad * 2.2` olarak hesaplanır ve duvar üst kenarının iç kenarı `neckRad * 0.99` olarak kısaltılır.
+- `bRad`: `number` — Ana fan gövdesinin yarıçapı; dikey duvarların yüksekliğini (`bRad * 0.9`) belirler ve bileşenin dikey konum-ofsetinde (`-bRad`) referans olarak kullanılır.
+- `material`: `Material` — Three.js material nesnesi; tüm mesh elemanlarına uygulanan yüzey malzemesini tanımlar. Renk, parlaklık, opaklık gibi görsel özellikleri belirler.
+- `displayStyle`: `string` — Kenar çizimi gösterim stilini belirten dize değeri; her bir mesh elemanına eklenen `EdgeOverlay` bileşenine iletilir. Wireframe, solid veya outline gibi farklı görüntüleme modları için kullanılır.
+
+**Dönüş**: JSX bileşeni döndürür — bir React Three Fiber `group` elemanı içinde taban plakası ve iki adet simetrik dikey duvar olmak üzere üç `mesh` elemanını barındıran 3B sahne düğümü. Doğrudan bir return tipi (`void` değil) olup, render edilebilir bir JSX yapısıdır.
 
 ### InteractivePart
 **Ne yapar**: 3B fan modelinin herhangi bir parçasını kullanıcı etkileşimlerine açık hale getiren sarmalayıcı React bileşenidir. Parçalara tıklama, üzerine gelme gibi olayları yönetir, gizleme ve izole etme işlemlerini kontrol eder.
@@ -126,10 +128,105 @@ Bu modül için fonksiyon gövdeleri paylaşılmamıştır; yalnızca fonksiyon 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `SilentChannelFanModel.tsx`::EdgeOverlay
-- **params**: `{ displayStyle: string }`
-- **ic_degiskenler**: (yok — sadece params kullanılır)
-- **Dönüş**: `JSX.Element | null` — `displayStyle` `'shadedEdges'` veya `'hiddenLines'` ise `<Edges>` bileşeni döner, aksi halde `null`.
+### [N1_NASIL] AST Pointer: types/SilentChannelFanModel.tsx::EdgeOverlay
+- **params**: `{ displayStyle }` — displayStyle: string, kenar çizimi modu ('shadedEdges' | 'hiddenLines')
+- **ic_degiskenler**:
+  (yok — parametreler dışında iç değişken kullanılmaz)
+- **Dönüş**: `null` veya `<Edges>` JSX elemanı. `displayStyle` 'shadedEdges' veya 'hiddenLines' değilse `null` döner; aksi halde renk ve çizgi kalınlığı modu göre ayarlanmış `<Edges>` bileşeni render eder.
+
+---
+
+### [N2_NASIL] AST Pointer: types/SilentChannelFanModel.tsx::MountingChassis
+- **params**: `bodyHalfLen` (number, gövde yarı uzunluğu), `neckLen` (number, boyun uzunluğu), `neckRad` (number, boyun yarıçapı), `bRad` (number, ana gövde yarıçapı), `material` (Material, Three.js malzeme), `displayStyle` (string, kenar çizim modu)
+- **ic_degiskenler**:
+  - `chassisWidth` — şasi genişliği, `neckRad * 2.2` hesaplanır
+  - `chassisLen` — şasi uzunluğu, `(bodyHalfLen + neckLen) * 2` hesaplanır
+  - `wallZ` — dikey duvarların Z ekseninde konumu, `(chassisLen / 2) - neckLen * 0.8`
+  - `wallHeight` — dikey duvarların yüksekliği, `bRad * 0.9`
+  - `baseThick` — taban kalınlığı, sabit `0.012`
+  - `wallThick` — duvar kalınlığı, sabit `0.012`
+  - `baseExtrudeSettings` — useMemo hook'u, taban şekli için extrude ayarları (depth, bevel parametreleri)
+  - `baseShape` — useMemo hook'u, taban Shape nesnesi; dikdörtgen ana gövde ve iki adet slot deliği (Path hole) oluşturur
+  - `wallExtrudeSettings` — useMemo hook'u, duvar şekli için extrude ayarları
+  - `wallShape` — useMemo hook'u, duvar Shape nesnesi; dikdörtgen alt kısım ve üstte yarım daire (absarc) içeren profil
+- **Dönüş**: JSX `<group>` yapısı — `[0, -bRad, 0]` pozisyonunda 3 adet mesh içerir: 1 adet taban (extrudeGeometry + baseShape), 2 adet dikey duvar (`wallZ` ve `-wallZ` pozisyonlarında, ikincisi Y ekseni etrafında 180° döndürülmüş). Her mesh'e `material` atanmış ve `EdgeOverlay` child olarak eklenmiştir.
+
+---
+
+### [N3_NASIL] AST Pointer: types/SilentChannelFanModel.tsx::MountingChassis.baseShape (useMemo callback)
+- **params**: (yok — useCallback/useMemo anonim fonksiyonu)
+- **ic_degiskenler**:
+  - `s` — Shape nesnesi, taban ana konturu oluşturmak için kullanılır
+  - `w` — kontur genişliğinin yarısı, `chassisWidth / 2`
+  - `l` — kontur uzunluğunun yarısı, `chassisLen / 2`
+  - `slotW` — slot deliğinin genişliği, sabit `0.02`
+  - `slotL` — slot deliğinin uzunluğu, `chassisLen * 0.5`
+  - `slotR` — slot köşe yarıçapı, `slotW / 2`
+  - `xOff` — for döngüsü değişkeni, her slot için x-ekseni ofseti (`-w * 0.6` ve `w * 0.6`)
+  - `hole` — Path nesnesi, her slot deliğinin konturunu temsil eder (moveTo, lineTo, quadraticCurveTo ile yuvarlak köşeli dikdörtgen delik)
+- **Dönüş**: Shape nesnesi `s` — iki adet slot deliği (`s.holes`) içeren tam kontur
+
+---
+
+### [N4_NASIL] AST Pointer: types/SilentChannelFanModel.tsx::MountingChassis.wallShape (useMemo callback)
+- **params**: (yok — useCallback/useMemo anonim fonksiyonu)
+- **ic_degiskenler**:
+  - `s` — Shape nesnesi, dikey duvar profilini oluşturmak için
+  - `w` — kontur genişliğinin yarısı, `chassisWidth / 2`
+  - `h` — duvar yüksekliği, `wallHeight`
+- **Dönüş**: Shape nesnesi `s` — alt kısım dikdörtgen, üst kısım `neckRad` yarıçapında yarım daire (absarc ile `Math.PI` → `2 * Math.PI`) ile oluşturulmuş kapalı profil
+
+---
+
+### [N5_NASIL] AST Pointer: types/SilentChannelFanModel.tsx::InteractivePart
+- **params**: `name` (string, parçanın adı), `children` (React child elemanları), `onPartClick` (fonksiyon, tıklama callback), `onHover` (fonksiyon, hover callback), `hiddenParts` (string[] | undefined, gizli parçalar listesi), `isolatedPart` (string | undefined, izole edilmiş parça adı)
+- **ic_degiskenler**:
+  - `hovered` — useState hook'u (boolean), imlecin parçanın üzerinde olup olmadığını tutar, başlangıç değeri `false`
+  - `setHover` — useState'in setter fonksiyonu, `hovered` durumunu günceller
+- **Dönüş**: `null` veya `<group>` JSX elemanı. `hiddenParts` içinde `name` varsa veya `isolatedPart` tanımlı ve `name`'e eşit değilse `null` döner; aksi halde tıklama, hover ve pointer-out event handler'ları bağlanmış bir `<group>` döner ve `children` render edilir. `useCursor(hovered)` ile hover durumunda imleç değişimi sağlanır.
+
+---
+
+### [N6_NASIL] AST Pointer: types/SilentChannelFanModel.tsx::InteractivePart.onClick handler
+- **params**: `e` (PointerEvent, Three.js pointer event objesi)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: `e.stopPropagation()` ile event yayılımını durdurur, `onPartClick?.(name)` ile tıklanan parçanın adını üst bileşene iletir)
+
+---
+
+### [N7_NASIL] AST Pointer: types/SilentChannelFanModel.tsx::InteractivePart.onPointerOver handler
+- **params**: `e` (PointerEvent, Three.js pointer event objesi)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: `e.stopPropagation()` ile event durdurulur, `setHover(true)` ile `hovered` durumu true'ya çekilir, `onHover?.(name)` ile üst bileşene parça adı iletilir)
+
+---
+
+### [N8_NASIL] AST Pointer: types/SilentChannelFanModel.tsx::InteractivePart.onPointerOut handler
+- **params**: `e` (PointerEvent, Three.js pointer event objesi)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: `e.stopPropagation()` ile event durdurulur, `setHover(false)` ile `hovered` durumu false'a çekilir, `onHover?.(null)` ile üst bileşene `null` iletilir)
+
+---
+
+### [N9_NASIL] AST Pointer: types/SilentChannelFanModel.tsx::SilentChannelFanModel
+- **params**: `explode` (number, varsayılan `0`, parçaların ayrılma mesafesi), `onPartClick` (fonksiyon, tıklama callback), `selectedPart` (string, seçili parça adı), `isolatedPart` (string, izole parça adı), `hiddenParts` (string[], varsayılan `[]`, gizlenecek parçalar), `displayStyle` (string, varsayılan `'shaded'`, render modu), `enableTooltip` (boolean, varsayılan `false`, tooltip gösterilip gösterilmeyeceği)
+- **ic_degiskenler**:
+  - `materials` — `useFanMaterials()` hook'unun dönüşü; `{ matteBlack, jetOrange, vorticeGreen }` gibi malzeme objelerini içerir
+  - `hoveredPart` — useState hook'u (string | null), imlecin üzerinde bulunduğu parçanın adını tutar, başlangıç `null`
+  - `setHoveredPart` — useState'in setter fonksiyonu
+  - `bRad` — ana gövde yarıçapı, sabit `0.32`
+  - `sphereEndRad` — küresel uç yarıçapı, sabit `0.2625`
+  - `neckRad` — boyun (geçiş bölgesi) yarıçapı, `sphereEndRad * 0.75`
+  - `bodyHalfLen` — gövde yarı uzunluğu, sabit `0.54`
+  - `internalAssemblyLen` — iç montaj uzunluğu, `bodyHalfLen * 2`
+  - `phiLimit` — küresel geometri açı limiti, `Math.asin(sphereEndRad / bRad)`
+  - `naturalHeight` — doğal yükseklik, `bRad * Math.cos(phiLimit)`
+  - `compensatoryStretch` — telafi edici uzatma oranı, `naturalHeight > 0.01 ? bodyHalfLen / naturalHeight : 1` — kürenin kısaltılmış görünümünü dikey eksende düzeltmek için
+- **Dönüş**: JSX `<group>` — `enableTooltip && hoveredPart` koşulu sağlanıyorsa `<Html>` tooltip'i (parça adı gösteren styled div), ardından 4 ana InteractivePart grubu:
+  1. **"Montaj Ayağı / Şasi"** — `<MountingChassis>` bileşeni, `explode * 0.8` kadar aşağı kaydırılmış
+  2. **"Dış Gövde (Plastik)"** — `<sphereGeometry>` ile oluşturulmuş küresel kabuk, `compensatoryStretch` ile dikey uzatılmış, `explode * 0.5` kadar dışa kaydırılmış
+  3. **"Akustik İzolasyon (Sarı Sünger)"** — `<cylinderGeometry>` ile iç silindir, `internalAssemblyLen` uzunluğunda, `explode * 1.5` kadar kaydırılmış
+  4. **"Elektrik Bağlantı Kutusu"** — `<RoundedBox>` kutu ve `<Text>` ile "VORTICE" markalama plakası, `explode * 0.5` kadar dışa kaydırılmış
 
 ---
 

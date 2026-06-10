@@ -1,14 +1,15 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
 import React, { useMemo,useRef } from 'react'
-import * as THREE from 'three'
+import type { Group } from 'three'
+import { MeshStandardMaterial } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 
 
 export function DuctFanModel() {
-    const fanRef = useRef<THREE.Group>(null)
+    const fanRef = useRef<Group>(null)
     const materials = useFanMaterials() // Centralized materials
 
     // ROUND DUCT FAN (Kanal Tipi) - SCALE FIX
@@ -20,7 +21,7 @@ export function DuctFanModel() {
     })
 
     // Localized specialized materials using useMemo for lifecycle safety
-    const localBladeColor = useMemo(() => new THREE.MeshStandardMaterial({
+    const localBladeColor = useMemo(() => new MeshStandardMaterial({
         color: '#be123c',
         metalness: 0.6,
         roughness: 0.4
