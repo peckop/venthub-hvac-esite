@@ -5,7 +5,7 @@ on:
     branches: [ master ]
     paths:
       - 'supabase/migrations/**.sql'
-      - 'scripts/**'
+      - 'supabase/config.toml'
       - '.github/workflows/supabase-migrate.yml'
   workflow_dispatch:
 
