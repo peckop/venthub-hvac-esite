@@ -3,48 +3,44 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\scripts\skills-evaluator.py
-skeleton_hash: 9dbe2a4032898519
+skeleton_hash: 815249efceb2924b
 entity_hashes:
-  func:evaluate_skills: 89f0aead688f6d6c
+  func:evaluate_skills: cc8ab09c218b71a2
+  func:get_changed_files: 432c8edf630ff56d
+  func:get_changed_skill_dirs: e9de63bbb02c084a
   func:get_repo_root: 277aa78581abc579
-  func:run_local_validation_command: 8560b6321c4579a6
-  overview: 6fbec1d32e82c0a5
-generated_at: 2026-06-08T18:07:17Z
+  func:has_source_code_changes: 9483c11e27bb19d8
+  func:parse_args: ed0b3ecbed79e5de
+  func:run_local_validation_command: 7d9170a5ba57b366
+  overview: d48b944827d32472
+generated_at: 2026-06-10T09:12:00Z
 ---
 
 ## Genel Bakış
 
-Bu modül, HVAC projesinin "skills" (yetenek/beceriler) bileşenlerini yerel ortamda doğrulamak ve değerlendirmekten sorumludur. Repo kök dizinini tespit ederek ilgili doğrulama komutlarını çalıştırır ve sonuçları raporlar.
+Bu modül, HVAC projesinin "skills" bileşenlerini yerel ortamda doğrulamak ve değerlendirmekten sorumludur. Repo kök dizinini tespit ederek, değişen dosyaları analiz edip ilgili skills dizinlerini bulur ve yerel doğrulama komutlarını çalıştırarak sürecin başarısını raporlar. Tüm değerlendirme akışını koordine eden üst düzey bir giriş noktası sunar.
 
 ## Fonksiyon Grupları
 
-### Ortam Altyapısı
-Repository kök dizinini dinamik olarak tespit ederek modülün farklı ortamlarda çalışabilmesini sağlar.
-- get_repo_root
+### Ortam ve Altyapı Yönetimi
+Değerlendirme sürecinin çalıştırılacağı temel ortamı (repo kök dizini) belirler ve parametreleri ayrıştırır.
+- get_repo_root, parse_args
 
-### Komut Çalıştırma
-Yerel ortamda doğrulama komutlarını çalıştırır ve başarı durumunu boolean değer olarak döndürerek hata yönetimi için temel oluşturur.
+### Değişiklik Analizi
+Git deposunda hangi dosyaların ve dolayısıyla hangi skills dizinlerinin değiştiğini tespit ederek değerlendirme kapsamını belirler.
+- get_changed_files, get_changed_skill_dirs, has_source_code_changes
+
+### Komut Çalıştırma Altyapısı
+Yerel ortamda belirli doğrulama komutlarını çalıştırır ve başarı durumunu raporlar; sürecin temel yürütme mekanizmasını oluşturur.
 - run_local_validation_command
 
-### Değerlendirme Akışını Orkestra Etmek
-Tüm değerlendirme sürecini koordine eden üst düzey fonksiyondur; altyapı ve komut çalıştırma fonksiyonlarını bir araya getirerek skills doğrulamasını başlatır.
+### Değerlendirme Orkestrasyonu
+Tüm sürecin (değişiklik tespiti, komut çalıştırma) akışını ve koordinasyonunu yöneten ana mantık bloğudur.
 - evaluate_skills
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
 
-Bu modül, fonksiyon imzalarına dayalı olarak aşağıdaki mimari varsayımları içerir:
-
-[Aksiyom 1]: Eğer `get_repo_root()` çağrıldığında geçerli bir git repository mevcut değilse, kök dizin tespit edilemez ve modülün geri kalanı çalışamaz.
-
-[Aksiyom 2]: Eğer `run_local_validation_command` çağrısında `cmd` parametresi geçerli bir komut içermiyorsa, komut başarısız olur veya beklenmeyen davranış sergilenir.
-
-[Aksiyom 3]: Eğer `run_local_validation_command` çağrısında `cwd` parametresi olarak verilen `Path` mevcut bir dizini göstermiyorsa, komut çalıştırılamaz.
-
-[Aksiyom 4]: Eğer `evaluate_skills()` çağrıldığında yerel ortamda komut çalıştırma yetkisi (izinleri) yoksa, doğrulama komutları yürütülemez.
-
-[Aksiyom 5]: Eğer `get_repo_root()` başarılı bir şekilde kök dizini döndüremiyorsa, `evaluate_skills()` akışı bozulur çünkü `run_local_validation_command` için geçerli bir `cwd` elde edilemez.
 
 ---
 
@@ -64,6 +60,18 @@ Bu modül, fonksiyon imzalarına dayalı olarak aşağıdaki mimari varsayımlar
 - cwd: `Path` — Komutun çalıştırılacağı çalışma dizini.
 **Dönüş**: `bool` — Komut başarıyla çalıştırılabilir ve dönüş kodu `0` ise `True`, aksi halde `False`.
 
+### get_changed_files
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### get_changed_skill_dirs
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### has_source_code_changes
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### parse_args
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
 ### evaluate_skills
 
 **Ne yapar**: VentHub projesindeki tüm becerileri (skills) kapsamlı bir şekilde değerlendiren ve doğrulayan bir motor fonksiyonudur. Manifest dosyasını okuyarak tetikleyici çarpışmalarını, test kapsamını, semantik benzerliği ve döngüsel bağımlılıkları tespit eder. Değerlendirme sonucunda hata ve uyarı listesi oluşturarak sistemin sağlık durumunu raporlar.
@@ -78,90 +86,134 @@ Bu fonksiyon parametre almamaktadır.
 
 ---
 
+## SABİTLER
+- **HEAVY_SKILL_NAMES** (set)
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: scripts/skills-evaluator.py::get_repo_root
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\scripts\skills-evaluator.py::get_repo_root
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `output` — Git komutunun stdout çıktısı, repo kök dizinini temsil eden string
-- **Dönüş**: Path (Git komutuyla elde edilen kök dizin veya alternatif olarak __file__'ın ebeveyni)
+  - `output` — subprocess.check_output ile alınan git komutu çıktısı, repo kök dizinini temsil eden string
+- **Dönüş**: Path (repo kök dizini)
 
-### [N2_NASIL] AST Pointer: scripts/skills-evaluator.py::run_local_validation_command
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\scripts\skills-evaluator.py::run_local_validation_command
 - **params**: (cmd: str, cwd: Path)
 - **ic_degiskenler**:
-  - `res` — subprocess.run sonucu, returncode, stdout, stderr bilgilerini içeren CompletedProcess nesnesi
+  - `res` — subprocess.run sonucu, çalıştırılan komutun dönüş değerleri (returncode, stdout, stderr) dahil
 - **Dönüş**: bool (komut başarılıysa True, değilse False)
 
-### [N3_NASIL] AST Pointer: scripts/skills-evaluator.py::evaluate_skills
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\scripts\skills-evaluator.py::get_changed_files
+- **params**: (repo_root: Path)
+- **ic_degiskenler**:
+  - `changed` — set() olarak başlatılan değişiklik dosyaları集合i, tüm türlerden değişiklikleri toplar
+  - `out` — her bir git komutunun çıktısı (staged, unstaged, untracked dosyalar için ayrı)
+- **Dönüş**: list[str] (değişiklik içeren dosya yolları listesi)
+
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\scripts\skills-evaluator.py::get_changed_skill_dirs
+- **params**: (repo_root: Path)
+- **ic_degiskenler**:
+  - `changed_files` — get_changed_files ile alınan tüm değişen dosya yolları
+  - `skill_prefix` — ".agent/skills/" sabit string'i, skill dizinlerinin yolu
+  - `changed_skills` — set() olarak başlatılan değişiklik içeren skill dizin isimleri
+  - `f_normalized` — normalize edilmiş (forward slash içeren) dosya yolu
+  - `remainder` — skill dizininden sonraki kalan yol kısmı
+  - `parts` — remainder'ın "/" ile分割 edilmiş hali
+- **Dönüş**: set[str] (değişiklik içeren skill dizin isimleri)
+
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\scripts\skills-evaluator.py::has_source_code_changes
+- **params**: (repo_root: Path)
+- **ic_degiskenler**:
+  - `changed_files` — get_changed_files ile alınan tüm değişen dosya yolları
+  - `source_extensions` — kaynak kod dosya uzantıları集合i (".ts", ".tsx", ".js", ".jsx", ".css", ".json", ".py")
+  - `infra_prefixes` — altyapı dizin ön ekleri tuple'ı (".agent/", "scripts/", "docs/", ".github/", ".vscode/")
+  - `f_normalized` — normalize edilmiş (forward slash içeren) dosya yolu
+  - `ext` — dosya uzantısı (lowercase)
+- **Dönüş**: bool (kaynak kod değişikliği varsa True)
+
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\scripts\skills-evaluator.py::parse_args
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `repo_root` — get_repo_root() tarafından döndürülen Git repo kök dizini
-  - `skills_dir` — .agent/skills dizinini temsil eden Path nesnesi
-  - `manifest_path` — .agent/plugins/venthub-core/manifest.yaml dosyasının tam yolu
-  - `manifest_data` — YAML dosyasından yüklenen manifest içeriği (sözlük)
-  - `skills_section` — manifest_data'daki "skills" bölümü, kategorilere göre gruplanmış skill listeleri
-  - `all_skills` — Tüm skill tanımlarının listesi
-  - `trigger_map` — Tetikleyici kelimelerin hangi skill'ler tarafından kullanıldığını gösteren sözlük
-  - `errors` — Tespit edilen hataların listesi
-  - `warnings` — Uyarıların listesi
-  - `category` — Mevcut kategori adı (döngü değişkeni)
-  - `skills_list` — Mevcut kategorideki skill listesi (döngü değişkeni)
-  - `name` — Skill'in adı (skill.get("name"))
-  - `path` — Skill'in dosya yolu (skill.get("path"))
-  - `triggers` — Skill'in tetikleyici kelimeleri listesi (skill.get("triggers_on"))
-  - `recovery` — Skill'in kurtarma stratejisi (skill.get("recovery"))
-  - `t` — Mevcut tetikleyici kelime (döngü değişkeni)
-  - `t_lower` — Küçük harfe dönüştürülmüş ve boşlukları temizlenmiş tetikleyici kelime
-  - `rel_path` — Skill'in göreceli dosya yolu (skill.get("path"))
-  - `skill_md_path` — Skill'in SKILL.md dosyasının tam yolu
-  - `skill_dir` — Skill'in bulunduğu dizin
-  - `evals_file` — Skill'in evals.json dosyasının tam yolu
-  - `evals_data` — evals.json dosyasından yüklenen değerlendirme verileri
-  - `should_trigger` — Tetiklenmesi gereken test sorguları listesi
-  - `should_not_trigger` — Tetiklenmemesi gereken test sorguları listesi
-  - `split_status` — 12/8 train/test split durumu ("VERIFIED" veya "INCOMPLETE")
-  - `triggers_lower` — Küçük harfe dönüştürülmüş tetikleyici kelimelerin listesi
-  - `query` — Mevcut test sorgusu (döngü değişkeni)
-  - `query_lower` — Küçük harfe dönüştürülmüş test sorgusu
-  - `matched` — Sorgunun tetikleyici ile eşleşip eşleşmediğini gösteren bayrak
-  - `content` — SKILL.md dosyasının içeriği
-  - `parts` — YAML frontmatter ayırma karakterine göre bölünmüş içerik parçaları
-  - `metadata_yaml` — YAML frontmatter'dan yüklenen metadata
-  - `metadata` — "metadata" anahtarındaki değer
-  - `commands` — "commands" altındaki komutlar sözlüğü
-  - `validate_cmd` — Doğrulama komutu (commands.get("validate"))
-  - `similarity_warnings` — Benzerlik uyarılarının sayısı
-  - `i` — Döngü sayacı (tüm skill çiftlerini döndürmek için)
-  - `j` — İkinci döngü sayacı (i'den büyük indeksler için)
-  - `skill_a` — Birinci skill (all_skills[i])
-  - `skill_b` — İkinci skill (all_skills[j])
-  - `name_a` — Birinci skill'in adı
-  - `name_b` — İkinci skill'in adı
-  - `desc_a` — Birinci skill'in açıklaması
-  - `desc_b` — İkinci skill'in açıklaması
-  - `words_a` — Birinci skill'in açıklamasındaki kelimeler kümesi
-  - `words_b` — İkinci skill'in açıklamasındaki kelimeler kümesi
-  - `intersection` — İki kelime kümesinin kesişimi
-  - `union` — İki kelime kümesinin birleşimi
-  - `similarity` — Jaccard benzerlik skoru
-  - `warning_msg` — Benzerlik uyarısı mesajı
-  - `adj_graph` — Skill'ler arası bağımlılık grafiği (komşuluk listesi)
-  - `node` — Mevcut düğüm adı (döngü değişkeni)
-  - `visited` — Ziyaret edilen düğümlerin durumunu tutan sözlük (0: ziyaret edilmedi, 1: yolda, 2: tamamlandı)
-  - `cycle_path` — Tespit edilen döngü yolu
-  - `cycle_detected` — Döngü tespit edilip edilmediğini gösteren bayrak
-  - `dfs` — Rekürsif derinlik öncelige arama fonksiyonu (iç fonksiyon)
-- **Dönüş**: bool (hata yoksa True, hata varsa False)
+  - `parser` — argparse.ArgumentParser nesnesi, komut satırı argümanlarını tanımlar
+- **Dönüş**: Namespace (parse_args sonucu, --force ve --skill argümanlarını içerir)
 
-### [N4_NASIL] AST Pointer: scripts/skills-evaluator.py::dfs
-- **params**: (u: str, path: list)
+### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\scripts\skills-evaluator.py::evaluate_skills
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `cycle_detected` — Döngü tespit edilip edilmediğini gösteren nonlocal bayrak (evaluate_skills'ten)
-  - `cycle_path` — Tespit edilen döngü yolu (evaluate_skills'ten)
-  - `u` — Mevcut düğüm adı (parametre)
-  - `path` — Mevcut ziyaret yolu (parametre)
-  - `v` — Komşu düğüm (döngü değişkeni)
-- **Dönüş**: bool (döngü tespit edildiyse True, aksi halde False)
+  - `args` — parse_args sonucu, komut satırı argümanları
+  - `repo_root` — get_repo_root ile alınan repo kök dizini Path nesnesi
+  - `skills_dir` — repo_root/.agent/skills dizini Path nesnesi
+  - `manifest_path` — manifest.yaml dosyasının tam yolu Path nesnesi
+  - `manifest_data` — yaml.safe_load ile yüklenen manifest YAML verisi
+  - `skills_section` — manifest_data["skills"] anahtarı altındaki tüm skill tanımları
+  - `all_skills` — tüm skill'lerin listesi (skills_section'den doldurulur)
+  - `trigger_map` — trigger_word -> skill name listesi eşlemesi sözlüğü
+  - `errors` — hata mesajları listesi
+  - `warnings` — uyarı mesajları listesi
+  - `category` — skills_section'deki döngü değişkeni, skill kategorisi
+  - `skills_list` — category altındaki skill listesi
+  - `skill` — döngüdeki mevcut skill sözlüğü
+  - `name` — skill.get("name") ile alınan skill adı
+  - `path` — skill.get("path") ile alınan skill yolu (relative)
+  - `triggers` — skill.get("triggers_on") ile alınan trigger listesi
+  - `recovery` — skill.get("recovery") ile alınan recovery bilgisi
+  - `t` — triggers listesindeki döngü değişkeni, tek bir trigger string
+  - `t_lower` — t'nin lowercase ve strip edilmiş hali
+  - `collisions_found` — collision tespiti bayrağı
+  - `trigger` — trigger_map'teki döngü değişkeni, trigger string
+  - `skills` — trigger_map'teki trigger'a karşılık gelen skill isimleri listesi
+  - `evals_file` — skill'in evals.json dosya yolu Path nesnesi
+  - `evals_data` — json.load ile yüklenen evals.json verisi
+  - `should_trigger` — evals_data["should_trigger"] listesi (pozitif test sorguları)
+  - `should_not_trigger` — evals_data["should_not_trigger"] listesi (negatif test sorguları)
+  - `split_status` — "VERIFIED" veya "INCOMPLETE" string'i, 12/8 split durumu
+  - `triggers_lower` — skill'in tüm trigger'larının lowercase hali listesi
+  - `query` — should_trigger veya should_not_trigger listelerindeki döngü değişkeni
+  - `matched` — query'nin herhangi bir trigger ile eşleşip eşleşmediği bayrağı
+  - `changed_skills` — get_changed_skill_dirs ile alınan değişiklik içeren skill dizinleri seti
+  - `source_changed` — has_source_code_changes ile alınan kaynak kod değişikliği durumu
+  - `validated_count` — çalıştırılan validation komut sayısı
+  - `skipped_count` — atlanan validation komut sayısı
+  - `skill_md_path` — skill'in SKILL.md dosya yolu Path nesnesi
+  - `content` — SKILL.md dosyasının içeriği string
+  - `parts` — content'in "---" ile分割 edilmiş hali listesi
+  - `metadata_yaml` — parts[1]'den parse edilen YAML metadata
+  - `metadata` — metadata_yaml["metadata"] anahtarı altındaki veri
+  - `commands` — metadata["commands"] anahtarı altındaki komut sözlüğü
+  - `validate_cmd` — commands["validate"] anahtarı altındaki validate komutu string
+  - `success` — run_local_validation_command dönüş değeri, bool
+  - `similarity_warnings` — semantic similarity uyarı sayısı
+  - `i` — all_skills listesindeki outer döngü indeksi
+  - `j` — all_skills listesindeki inner döngü indeksi
+  - `skill_a` — all_skills[i] elementi, karşılaştırma çiftinin ilk elemanı
+  - `skill_b` — all_skills[j] elementi, karşılaştırma çiftinin ikinci elemanı
+  - `name_a` — skill_a["name"] değeri
+  - `name_b` — skill_b["name"] değeri
+  - `desc_a` — skill_a["description"] değeri (yoksa "")
+  - `desc_b` — skill_b["description"] değeri (yoksa "")
+  - `words_a` — desc_a'dan extract edilen kelimeler集合i (lowercase)
+  - `words_b` — desc_b'dan extract edilen kelimeler集合i (lowercase)
+  - `intersection` — words_a ve words_b'nin kesişimi集合i
+  - `union` — words_a ve words_b'nin birleşimi集合i
+  - `similarity` — Jaccard benzerliği (intersection/union)
+  - `warning_msg` — semantic similarity uyarı mesajı string
+  - `adj_graph` — skill name -> depends_on listesi eşlemesi sözlüğü (graf)
+  - `visited` — DFS'de ziyaret durumu sözlüğü (0: ziyaret edilmedi, 1: ziyaret ediliyor, 2: tamamlandı)
+  - `cycle_path` — tespit edilen döngü yolunu tutan liste
+  - `cycle_detected` — döngü tespit edilip edilmediği bayrağı
+  - `node` — adj_graph'daki döngü değişkeni, skill adı
+  - `u` — dfs fonksiyonundaki mevcut düğüm parametresi (döngü içinde kullanılır)
+  - `v` — u'nun komşusu (depends_on listesindeki elemanlar)
+  - `cycle_str` — döngü yolunun string gösterimi (-> ile ayrılmış)
+- **Dönüş**: bool (değerlendirme başarılıysa True, hata varsa False)
+
+### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\scripts\skills-evaluator.py::dfs
+- **params**: (u, path)
+- **ic_degiskenler**:
+  - (dış Evaluate_skills fonksiyonunun nonlocal değişkenlerini kullanır: `cycle_detected`, `cycle_path`, `visited`, `adj_graph`)
+- **Dönüş**: bool (döngü tespit edildiyse True, değilse False)
 
 ---
 
@@ -170,7 +222,11 @@ Bu fonksiyon parametre almamaktadır.
 ```mermaid
 graph TD
     skills-evaluator_py__evaluate_skills["evaluate_skills"]
+    skills-evaluator_py__get_changed_files["get_changed_files"]
+    skills-evaluator_py__get_changed_skill_dirs["get_changed_skill_dirs"]
     skills-evaluator_py__get_repo_root["get_repo_root"]
+    skills-evaluator_py__has_source_code_changes["has_source_code_changes"]
+    skills-evaluator_py__parse_args["parse_args"]
     skills-evaluator_py__run_local_validation_command["run_local_validation_command"]
 ```
 
@@ -179,11 +235,19 @@ graph TD
   file: scripts\skills-evaluator.py
   function: scripts\skills-evaluator.py::get_repo_root
   function: scripts\skills-evaluator.py::run_local_validation_command
+  function: scripts\skills-evaluator.py::get_changed_files
+  function: scripts\skills-evaluator.py::get_changed_skill_dirs
+  function: scripts\skills-evaluator.py::has_source_code_changes
+  function: scripts\skills-evaluator.py::parse_args
   function: scripts\skills-evaluator.py::evaluate_skills
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: evaluate_skills
+  export: get_changed_files
+  export: get_changed_skill_dirs
   export: get_repo_root
+  export: has_source_code_changes
+  export: parse_args
   export: run_local_validation_command

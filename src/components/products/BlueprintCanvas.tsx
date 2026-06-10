@@ -124,7 +124,7 @@ const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
                  style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)', backgroundSize: '24px 24px' }} 
             />
             
-            <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+            <Canvas frameloop="always" dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 45 }}>
                 <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} />
                 <CinematicCard image={image} />

@@ -9,7 +9,7 @@ entity_hashes:
   func:CinematicCard: 7fb3fd44dcd5e71f
   overview: 119d927fb341d61c
   style_tokens: 31f4acfd42638e52
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:12:40Z
 ---
 
 ## Genel Bakış

@@ -82,7 +82,8 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
             className={`relative rounded-3xl bg-slate-50 border border-slate-200 shadow-inner overflow-hidden ${className}`}
             style={{ minHeight: '400px' }}
         >
-            <Canvas shadows="percentage" dpr={[1, 2]}>
+            {/* Use 'always' when autoRotate needs continuous rendering, 'demand' for static scenes */}
+            <Canvas shadows="percentage" frameloop={metadata.config?.autoRotate ? 'always' : 'demand'} dpr={[1, 1.5]}>
                 <PerspectiveCamera makeDefault position={[0, 0, metadata.config?.initialZoom ?? 5]} fov={45} />
                 
                 <ambientLight intensity={0.5} />
@@ -112,6 +113,7 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
                 </Suspense>
 
                 <OrbitControls 
+                    makeDefault
                     enablePan={false}
                     minPolarAngle={Math.PI / 4}
                     maxPolarAngle={Math.PI / 1.5}

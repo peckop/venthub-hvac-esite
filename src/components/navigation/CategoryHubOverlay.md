@@ -10,7 +10,7 @@ entity_hashes:
   func:handleSubCategoryClick: abc84e61f250f252
   overview: de37cbcaa5dd3e9b
   style_tokens: 96d06533c66f365a
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-10T09:12:03Z
 ---
 
 ## Genel Bakış
@@ -127,8 +127,8 @@ graph TD
     CategoryHubOverlay_tsx__CategoryHubOverlay["CategoryHubOverlay"]
     CategoryHubOverlay_tsx__handleCategoryClick["handleCategoryClick"]
     CategoryHubOverlay_tsx__handleSubCategoryClick["handleSubCategoryClick"]
-    CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleCategoryClick
     CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleSubCategoryClick
+    CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleCategoryClick
 ```
 
 ## NODE ID STANDARD

@@ -22,6 +22,8 @@ const MegaMenu3DBackground: React.FC<MegaMenu3DBackgroundProps> = ({ categorySlu
                 <Canvas
                     camera={{ position: [0, 0.1, 2.2], fov: 40 }}
                     style={{ background: 'transparent' }}
+                    frameloop="demand"
+                    dpr={[1, 1]}
                 >
                     <Suspense fallback={null}>
                         <Environment preset="city" />

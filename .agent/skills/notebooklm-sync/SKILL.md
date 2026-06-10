@@ -161,6 +161,22 @@ Eğer `cc doc batch` rate limit'e takılırsa:
 - Kalan dosyaları `cc doc single --py-file <dosya>` ile tek tek yap
 - Son çare: kaynak kodu okuyup MD'yi elle yaz
 
+## Git Hook Entegrasyonu
+
+> **Not:** Projede `post-commit` git hook'u yapılandırılmıştır. Bu hook, her başarılı commit sonrasında otomatik olarak `orion doc changed` ve NLM sync pipeline'ını tetikler. Dolayısıyla çoğu durumda senkronizasyon için ekstra bir adım gerekmez.
+
+### Manuel Sync Gereken Durumlar
+
+Aşağıdaki senaryolarda hook çalışmaz veya yetersiz kalır — bu durumlarda bu skill'i manuel olarak tetikleyin:
+
+| Senaryo | Neden | Çözüm |
+|---------|-------|-------|
+| `git commit --no-verify` kullanıldığında | `--no-verify` tüm hook'ları atlar | `cc doc tree --nlm-sync --force-sync` |
+| Hook hata verip sessizce başarısız olduğunda | Hook exit code 0 döner ama sync tamamlanmaz | Aynı komutu elle çalıştır |
+| Toplu refactor/rename sonrası | Hook yalnızca diff'teki dosyaları işler, silinen/yeniden adlandırılan dosyalar eksik kalabilir | `cc doc all --force` ardından `cc doc tree --nlm-sync --force-sync` |
+| `.cc_docs.yaml` yapılandırması değiştiğinde | Hook eski config ile çalışmış olabilir | Full pipeline'ı baştan çalıştır (Adım 1–4) |
+| CI/CD ortamında (hook yok) | Sunucuda git hook'lar kurulu değildir | Pipeline'a NLM sync adımını ekle |
+
 ## AXIOMS
 
 - **A1:** Master MD'ye kök dosyalar (README vb.) dahil edilmez — standalone_files olarak ayrı yüklenir.

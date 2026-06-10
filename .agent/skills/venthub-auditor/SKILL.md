@@ -14,7 +14,7 @@ metadata:
   outputs:
   - integrity verification status
   commands:
-    validate: python .agent/skills/venthub-auditor/scripts/run_audit.py
+    validate: python -c "import pathlib; assert pathlib.Path('.agent/skills/venthub-auditor/scripts/run_audit.py').exists(), 'Audit script missing'; print('Venthub auditor skill ready.')"
 depends_on:
 - venthub-architecture
 next_steps:

@@ -8,7 +8,7 @@ entity_hashes:
   func:CategorySpotlightScene: a7f8b134dbbbfdd7
   overview: 21fb58d1bec5fba7
   style_tokens: d4731e166286b701
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-10T09:12:03Z
 ---
 
 ## Genel Bakış

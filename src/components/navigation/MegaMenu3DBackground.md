@@ -8,7 +8,7 @@ entity_hashes:
   func:MegaMenu3DBackground: bb72cddf66cbd5a0
   overview: dd5cca8b8a57c612
   style_tokens: 487664132884f59c
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-10T09:12:27Z
 ---
 
 ## Genel Bakış

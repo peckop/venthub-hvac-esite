@@ -66,3 +66,7 @@ mcp_config_for_claude_code.json
 .agent/scratch/
 scratch/
 !scratch/compile_skills.py
+
+# Auto-generated caches
+.codegraph/
+__pycache__/

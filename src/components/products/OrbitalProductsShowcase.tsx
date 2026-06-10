@@ -1,5 +1,4 @@
 "use client"
-"use no memo";
 import { Environment, Float, Html, Sparkles, useTexture } from '@react-three/drei'
 import { Canvas, ThreeEvent,useFrame, useThree } from '@react-three/fiber'
 import { useInView } from 'framer-motion'
@@ -833,7 +832,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                 shadows="percentage"
                 gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
                 frameloop={isInView ? "always" : "demand"}
-                dpr={typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio) : [1, 1.5]}
+                dpr={typeof window !== 'undefined' ? Math.min(1.5, window.devicePixelRatio) : [1, 1.5]}
                 camera={{
                     position: [0, (CONFIG.cameraHeight * (typeof containerHeight === 'number' && containerHeight < 400 ? 0.8 : 1)), CONFIG.cameraDistance],
                     fov: (CONFIG.cameraFOV * (typeof containerHeight === 'number' && containerHeight < 400 ? 1.15 : 1))

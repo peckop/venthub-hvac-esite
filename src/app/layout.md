@@ -3,35 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\layout.tsx
-skeleton_hash: 335e557e99a8a428
+skeleton_hash: ec7afc7631488d32
 entity_hashes:
   func:RootLayout: b91efb59fd6362f0
-  overview: a13603912e8a012c
+  overview: 49bead2b697f0509
   style_tokens: eebc13a3fedd1bcb
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-10T09:12:03Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub web uygulamasının kök yerleşim bileşenidir. Tüm sayfaları saran ortak HTML yapısını, dil ayarlarını, font yapılandırmasını ve sağlayıcı sarmalayıcısını tanımlayarak uygulamanın tutarlı bir şekilde render edilmesini sağlar.
+Bu modül, VentHub web uygulamasının en üst düzey React yerleşim bileşenidir. Tüm sayfaları saran temel HTML yapısını, dil ayarlarını, font yapılandırmasını ve uygulama genelindeki sağlayıcıları tanımlayarak sayfaların tutarlı ve doğru bir şekilde tarayıcıya sunulmasını sağlar.
 
 ## Fonksiyon Grupları
-### Sayfa Yerleşimi
-Uygulamanın en dış HTML çerçevesini oluşturarak tüm sayfa içeriklerinin bu düzen içinde tarayıcıya sunulmasını sağlar.
+### Yerleşim ve Sarmalama
+Uygulamanın tüm sayfalarını kapsayan temel HTML yapısını ve gerekli sağlayıcıları oluşturarak içeriğin doğru ortamda render edilmesini sağlar.
 - RootLayout
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu Next.js layout modülü için temel mimari varsayımlar şunlardır:
+Bu modül, Next.js App Router kök layout bileşenidir ve tüm sayfaları saran HTML yapısını tanımlar.
 
-[Aksiyom 1]: Eğer `children` parametresi sağlanmazsa veya geçerli bir React.ReactNode içermiyorsa, React bileşeni hata fırlatır veya boş bir layout render edilir.
+[Aksiyom 1]: Eğer `children` parametresi sağlanmazsa, React bileşeni render edilemez ve uygulama hata fırlatır.
 
-[Aksiyom 2]: Eğer `inter` font sabiti (call() metoduyla kullanılır) tanımlı değilse veya geçerli bir Next.js font nesnesi içermiyorsa, layout’daki tipografi doğru şekilde yüklenemez.
+[Aksiyom 2]: Eğer `inter` font sabiti (`inter (call)`) geçerli bir Next.js Font nesnesi değilse, uygulamabuild/compile aşamasında hata oluşur.
 
-[Aksiyom 3]: Eğer `metadata` sabiti tanımlı değilse veya geçerli bir Next.js metadata nesnesi (başlık, açıklama vb. içeren) içermiyorsa, sayfaların head bölümü doğru meta bilgilerle oluşturulamaz.
-
-[Aksiyom 4]: Eğer `RootLayout` bileşeni React subtree olarak (children ile) çağrılmazsa, uygulamanın hiçbir içeriği render edilmez.
+[Aksiyom 3]: Eğer `metadata` nesnesi geçerli bir Next.js Metadata yapısı içermiyorsa, SEO ve sayfa başlık bilgileri düzgün render edilmez.
 
 ---
 
@@ -61,13 +59,12 @@ Bu Next.js layout modülü için temel mimari varsayımlar şunlardır:
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/layout.tsx::RootLayout
-- **params**: `children` — React.ReactNode tipinde, sayfanın içeriğini temsil eder
-- **ic_degiskenler**: (değişken yok, sadece parametre ve import edilen sabitler kullanılır)
-  - `inter` — `next/font/google`'den import edilen font nesnesi; `.variable` ve `.className` özellikleri CSS sınıfları üretir
-  - `SITE_URL` — `@/config/siteUrl`'dan import edilen sabit string; JSON-LD şemasında site URL'sini belirtir
-  - `Providers` — `../components/layout/ClientLayout`'dan import edilen bileşen; sağlayıcı (context) sarmalayıcısı
-  - `ClientLayout` — `../components/layout/ClientLayout`'dan import edilen bileşen; istemci tarafı layout sarmalayıcısı
-- **Dönüş**: yok (JSX element döner, TypeScript'te dönüş tipi belirtilmemiş)
+- **params**:
+  - `children` — React.ReactNode türünde, sayfanın alt sayfa içeriklerini temsil eder, doğrudan `{children}` olarak JSX'e yerleştirilir
+- **ic_degiskenler**:
+  - Fonksiyon gövdesinde harici bir değişken tanımlanmamıştır
+- **Return**: JSX eleman döndürür — `<html>` etiketi ile sarılmış tam sayfa yapısı (`<html>` > `<body>` > `<Providers>` > `<ClientLayout>` > JSON-LD script + `{children}`)
+- **Yan etkileri**: `inter` font değişkeni ve className'i `<body>` üzerinde uygulanır; `dangerouslySetInnerHTML` ile JSON-LD yapılandırılmış veri sayfaya enjekte edilir; `SITE_URL` sabitinden site adresi alınarak schema.org WebSite objesi oluşturulur
 
 ---
 

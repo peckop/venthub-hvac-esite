@@ -2588,7 +2588,100 @@ Artifact status'unu ayarla: `Launched`.
 
 ---
 
-## 17. Yetenek: to-issues
+## 17. Yetenek: threejs-webgl-performance
+> **Açıklama:** Three.js ve React Three Fiber (R3F) tabanlı 3D render performansını optimize etmek, draw call'ları azaltmak, gölge işlemeyi yönetmek ve Lighthouse mobil skorlarını yükseltmek için pratik kuralları sunar.
+
+**Klasör Yolu:** `.agent/skills/threejs-webgl-performance/`
+
+# Three.js & R3F WebGL Performance Optimization Skill
+
+Bu yetenek, VentHub HVAC projesinde yer alan 3D modellerin (özellikle kategori gösterimleri ve ürün detay stüdyolarındaki fan/cihaz modelleri) render performansını maksimize etmek ve Lighthouse mobil skorlarını (30-40 aralığından 90+ seviyesine) yükseltmek amacıyla tasarlanmıştır.
+
+---
+
+## 1. Ne Zaman Tetiklenmeli?
+- 3D Canvas bileşenlerinde (örn: `Product3DViewer.tsx`, `OrbitalProductsShowcase.tsx`) performans düşüşü, FPS kaybı veya mobil cihazlarda ısınma/kasılma şikayetleri olduğunda.
+- React Three Fiber (`<Canvas>`) veya Three.js kodlarında değişiklik yapılması gerektiğinde.
+- Mobil cihazlar için Lighthouse performans audits / web vitals kontrolleri yapıldığında.
+
+---
+
+## 2. Temel Performans Prensipleri
+
+### A. İsteğe Bağlı Render (Rendering On Demand)
+Standart bir 3D Canvas, saniyede 60 kez (60 FPS) sürekli yeniden çizilir. Kullanıcı sahneyle etkileşime girmediğinde veya sahne durağan olduğunda bu döngüyü çalıştırmak, mobil işlemcileri ve pilleri tüketir.
+- **R3F Kuralı:** `<Canvas>` bileşeninde `frameloop="demand"` kullanarak render'ı sadece state veya props değiştiğinde ya da etkileşim olduğunda tetikleyin.
+- **Kullanım Şekli:**
+  ```tsx
+  <Canvas 
+    frameloop="demand"
+    // Diğer ayarlar...
+  >
+  ```
+- **Dinamik Invalidate:** Eğer sahnede animasyon yapılıyorsa veya kamera dönüyorsa, geçici olarak frameloop'u `always` yapabilir veya R3F'in `invalidate` metodunu çağırabilirsiniz.
+
+### B. Geometri & Materyal Memoization (useMemo)
+R3F JSX bileşenleri içerisinde inline yazılan diziler (örn: `args={[1, 32, 16]}`) her render'da yeni referans oluşturur. Bu durum R3F'in Three.js nesnelerini (Geometri/Materyal) her seferinde yok edip yeniden yaratmasına (reconstruct) yol açar. Bu işlem devasa bir çöp toplayıcı (Garbage Collector) yükü ve anlık donmalar (lag spike) yaratır.
+- **Kural:** Tüm özel geometrileri, parametre dizilerini ve materyalleri `useMemo` ile sarmalayın veya component dışında tanımlayın.
+- **Örnek:**
+  ```tsx
+  // Doğru yaklaşım:
+  const bladeGeometry = useMemo(() => {
+    return new THREE.ExtrudeGeometry(shape, settings)
+  }, [settings])
+  
+  return <mesh geometry={bladeGeometry} material={materials.matteBlack} />
+  ```
+
+### C. Gölge (Shadow) Optimizasyon Kuralları
+Dinamik gölgeler, sahnenin her karede ışık gözünden tekrar çizilmesini (render pass) gerektirir. Mobil cihazlarda dinamik gölgeyi tamamen kapatmak veya statikleştirmek en kritik adımdır.
+- **Project DNA Kuralı:** Proje standartları gereğince gölge haritalama türü kesinlikle `"percentage"` (ya da standarda göre ayarlanmış hali) olmalıdır:
+  ```tsx
+  <Canvas shadows="percentage">
+  ```
+- **BakeShadows (Drei):** Işıklar ve nesneler hareket etmiyorsa, Drei'nin `<BakeShadows />` bileşenini kullanarak gölgeleri ilk karede hesaplayıp dondurun.
+- **ContactShadows:** Pahalı geometri gölgeleri yerine, zemin seviyesinde sahte gölge oluşturmak için Drei'nin `<ContactShadows />` bileşenini tercih edin.
+  ```tsx
+  <ContactShadows 
+    position={[0, -1.5, 0]} 
+    opacity={0.4} 
+    scale={10} 
+    blur={2} 
+    far={3} 
+  />
+  ```
+
+### D. Dinamik Ölçekleme & DPR (Device Pixel Ratio) Yönetimi
+Mobil ekranlar yüksek piksel yoğunluğuna (retina/3x) sahiptir. Mobil cihazlarda DPR'ı 3 olarak ayarlamak, GPU'nun işlemesi gereken piksel sayısını 9 kat artırır.
+- **Kural:** DPR değerini mobil cihazlarda en fazla 1.5 veya 2 ile sınırlandırın.
+- **Çözüm:** `<Canvas dpr={[1, 1.5]}>` kullanarak mobil cihazlarda çözünürlüğü düşürün.
+- **PerformanceMonitor (Drei):** FPS düştüğünde çözünürlüğü dinamik olarak düşüren yapıyı kurun:
+  ```tsx
+  import { PerformanceMonitor, AdaptiveDpr } from '@react-three/drei'
+
+  // Canvas içinde:
+  <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(1.5)}>
+    <AdaptiveDpr pixelated />
+  </PerformanceMonitor>
+  ```
+
+### E. Draw Calls Azaltma (Instancing & Merging)
+Özellikle kategori veya liste sayfalarında birden fazla aynı nesne çizileceği zaman Draw Call sayısını düşürmek gerekir.
+- **Instances (Drei):** Aynı mesh'ten yüzlerce adet çizilecekse `<Instances>` ve `<Instance>` bileşenlerini kullanın.
+- **Merged (Drei):** Farklı geometrileri tek bir çizim pass'inde birleştirmek için kullanın.
+
+---
+
+## 3. Performans Denetim Listesi (Audit Checklist)
+1. [ ] Canvas bileşeninde `frameloop="demand"` tanımlı mı?
+2. [ ] `args` propları veya geometriler her render'da yeniden oluşturuluyor mu (useMemo eksikliği)?
+3. [ ] Gölgeler `<BakeShadows />` ile dondurulmuş mu veya `<ContactShadows />` mu kullanılıyor?
+4. [ ] Mobil için `dpr={[1, 1.5]}` ayarı yapılmış mı?
+5. [ ] `shadows="percentage"` kuralına uyulmuş mu?
+
+---
+
+## 18. Yetenek: to-issues
 > **Açıklama:** Breaks a plan, specification, or PRD into structured issues or tasks. Trigger for creating issues (issue oluştur), dividing plans (planı böl), or tasks to issues. Do NOT use for general git operations, styling fonts, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/to-issues/`
@@ -2605,7 +2698,7 @@ Break a plan or PRD into vertical slices (tracer bullets) and write them as a ch
 
 ---
 
-## 18. Yetenek: to-prd
+## 19. Yetenek: to-prd
 > **Açıklama:** Turns the current conversation transcript or context into a structured PRD (Product Requirements Document). Trigger for generating a PRD (prd üret, prd oluştur, chat to prd). Do NOT use for git commands, styling fonts, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/to-prd/`
@@ -2628,7 +2721,7 @@ This skill takes the current conversation context and codebase understanding and
 
 ---
 
-## 19. Yetenek: typography
+## 20. Yetenek: typography
 > **Açıklama:** Applies typography principles for fonts, readability, text styling, type scales, and line spacing. Trigger for font modification (font değiştir), readability (okunabilirlik), or text styling. Do NOT use for general git operations, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/typography/`
@@ -3075,7 +3168,7 @@ See [tailwind-integration.md](references/tailwind-integration.md) for complete p
 
 ---
 
-## 20. Yetenek: ui-ux-pro-max
+## 21. Yetenek: ui-ux-pro-max
 > **Açıklama:** Provides UI/UX design recommendations, Tailwind styling, HSL colors, design patterns, and palettes. Trigger for UI design (tasarım yap), color selection (renk seç), styling fixes (style fix), and Tailwind styling. Do NOT use for git branch creation, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/ui-ux-pro-max/`
@@ -3396,7 +3489,7 @@ Before delivering UI code, verify these items:
 
 ---
 
-## 21. Yetenek: venthub-architecture
+## 22. Yetenek: venthub-architecture
 > **Açıklama:** Defines VentHub architecture, component patterns, and Next.js App Router rules. Trigger for creating new components (yeni bileşen oluştur), React Server Components (RSC render), or PPR configuration (PPR config). Do NOT use for git commands, database resets, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/venthub-architecture/`
@@ -3480,7 +3573,7 @@ E-ticaret sayfalarında aşağıdaki yapılandırılmış veriler zorunludur:
 
 ---
 
-## 22. Yetenek: venthub-auditor
+## 23. Yetenek: venthub-auditor
 > **Açıklama:** VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, pre-commit kontrolleri, bütünlük denetimi (bütünlük denetle) ve integrity check gerçekleştirir. Birim testlerini çalıştırmak (Vitest), git branch oluşturmak veya veritabanı sıfırlamak için KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-auditor/`
@@ -3569,7 +3662,7 @@ Bir görev ancak `check_integrity.py` V5 üzerinden 0 (sıfır) BLOCKER aldığ�
 
 ---
 
-## 23. Yetenek: venthub-catalog-importer
+## 24. Yetenek: venthub-catalog-importer
 > **Açıklama:** Ingests and validates HVAC catalog PDFs. Trigger for importing catalogs (katalog oku), scanning PDFs (pdf scan), and HVAC catalog imports. Do NOT use for running unit tests, creating git branches, or database resets.
 
 **Klasör Yolu:** `.agent/skills/venthub-catalog-importer/`
@@ -3639,7 +3732,7 @@ Ana Ajan (Proje Şefi), PDF işleme sürecini başlatırken sırasıyla şu alt 
 
 ---
 
-## 24. Yetenek: venthub-enterprise-audit
+## 25. Yetenek: venthub-enterprise-audit
 > **Açıklama:** Proje teslimi öncesi "10/10 Onay" denetim motorudur. L1-L12 adımlarını çalıştırıp PASS/FAIL raporu üretir. Tetikleyicileri: enterprise audit, 10/10 check, sprint delivery check. Genel linter denetimi, veritabanı sıfırlama veya git işlemleri için KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-enterprise-audit/`
@@ -3906,7 +3999,7 @@ BLOCKED    → Herhangi bir 🔴 STRICT kontrol FAIL → teslim yapılamaz
 
 ---
 
-## 25. Yetenek: venthub-global-rontgen
+## 26. Yetenek: venthub-global-rontgen
 > **Açıklama:** Proje genelini radar ve rontgen komutlarıyla fiziki olarak tarar. Tetikleyicileri: rontgen, radar, global scan, linter check. Veritabanı sıfırlama, genel git işlemleri veya sadece birim testleri çalıştırmak amacıyla KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-global-rontgen/`
@@ -4038,7 +4131,7 @@ Sisteme yalan söyleyemezsin. Gözle baktığın hiçbir şeye `PASS` verme, yal
 
 ---
 
-## 26. Yetenek: vercel-composition-patterns
+## 27. Yetenek: vercel-composition-patterns
 > **Açıklama:** React composition patterns that scale, including compound component design, context providers, and component refactoring. Trigger for component refactoring (component refactor) and compound component design. Do NOT use for general git operations, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/vercel-composition-patterns/`
@@ -4121,7 +4214,7 @@ For the complete guide with all rules expanded: `AGENTS.md`
 
 ---
 
-## 27. Yetenek: vercel-react-best-practices
+## 28. Yetenek: vercel-react-best-practices
 > **Açıklama:** React and Next.js performance optimization guidelines from Vercel. Trigger for performance optimization (performans optimize et), waterfall fixes (waterfall fix), or RSC optimization. Do NOT use for git branch creation, database resets, or formatting markdown tables.
 
 **Klasör Yolu:** `.agent/skills/vercel-react-best-practices/`
@@ -4269,7 +4362,7 @@ For the complete guide with all rules expanded: `AGENTS.md`
 
 ---
 
-## 28. Yetenek: web-design-guidelines
+## 29. Yetenek: web-design-guidelines
 > **Açıklama:** Reviews UI code for Web Interface Guidelines and design compliance. Trigger for accessibility checks (erişilebilirlik denetle, a11y check), or design guidelines checks. Do NOT use for git commands, styling fonts, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/web-design-guidelines/`

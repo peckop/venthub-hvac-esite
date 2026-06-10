@@ -153,7 +153,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
 
     return (
         <div className={`relative w-full h-full bg-product-3d-radial ${isFullscreen ? 'fixed inset-0 z-toast' : 'rounded-xl overflow-hidden border border-light-gray'}`}>
-            <Canvas shadows="percentage" dpr={[1, 2]} camera={{ position: [2, 2, 2.8], fov: 40 }} gl={{ alpha: true }}>
+            <Canvas shadows="percentage" frameloop="always" dpr={[1, 2]} camera={{ position: [2, 2, 2.8], fov: 40 }} gl={{ alpha: true }}>
                 <ambientLight intensity={0.7} />
                 <directionalLight position={[10, 15, 10]} intensity={1.5} castShadow shadow-mapSize={2048} />
                 <Environment preset="city" />

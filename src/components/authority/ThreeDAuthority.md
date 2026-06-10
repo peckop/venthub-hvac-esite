@@ -6,10 +6,10 @@ source_path: C:\Users\alize\venthub-hvac\src\components\authority\ThreeDAuthorit
 skeleton_hash: a5417eb78feadf0c
 entity_hashes:
   func:Model: cad84f3d7aa627bb
-  func:ThreeDAuthority: 003bc9e7ed9ad2d8
+  func:ThreeDAuthority: 719c18fa619c7fe9
   overview: 53fe48ece7de08da
   style_tokens: 79effa301ffb588d
-generated_at: 2026-06-08T10:08:37Z
+generated_at: 2026-06-10T09:12:03Z
 ---
 
 ## Genel Bakış
@@ -48,12 +48,16 @@ Bu modülün çalışması için aşağıdaki varsayımlar geçerlidir:
 **Dönüş**: void — fonksiyon JSX elementi döndürür, açık bir değer döndürmez.
 
 ### ThreeDAuthority
-**Ne yapar**: Gerçek 3D ürün modellerini (GLB/GLTF) interaktif olarak render eder ve performansı artırmak için “Click‑to‑Load” stratejisini kullanır.  
-**Nasıl yapar**: `metadata` prop’undan model URL ve hotspots bilgilerini çıkarır, bu bilgileri `Model` component’ına geçirir; `className` prop’sı kök elemana uygulanarak ek stillendirme mümkün olur.  
+
+**Ne yapar**: ThreeDAuthority, gerçek 3D ürün modellerini (GLB/GLTF formatında) interaktif olarak tarayıcıda render eden bir React bileşenidir. Bileşen, performans optimizasyonu için 'Click-to-Load' stratejisi uygulayarak başlangıçta hafif bir placeholder gösterir ve kullanıcı etkileşimi sonrasında tam 3D motorunu başlatır.
+
+**Nasıl yapar**: Fonksiyon, React useState hook'u ile `isStarted` durumunu yönetir. Başlangıçta `isStarted` false olduğunda, animasyonlu bir yükleme ikonu ve "Click to Initialize Engine" yazısı içeren tıklanabilir bir placeholder bileşeni döndürür. Kullanıcı bu alana tıkladığında `isStarted` true olur ve bileşen tam 3D Canvas yapısına geçiş yapar. Canvas içinde React Three Fiber kütüphanesi kullanılarak PerspectiveCamera, ambientLight, spotLight, OrbitControls ve Model bileşenleri render edilir. `metadata` objesinden gelen yapılandırma değerleri (modelUrl, hotspots, autoRotate, initialZoom, environment, shadows) ile sahne özelleştirilir. frameloop parametresi, autoRotate aktifse 'always', değilse 'demand' olarak ayarlanarak performans optimizasyonu sağlanır.
+
 **Parametreler**:
-- `metadata`: ThreeDAuthorityProps — modelin URL ve opsiyonel hotspots gibi tüm gerekli veri yapısını içerir.  
-- `className`: string — komponentin kök elemanına eklenmek istenen ek CSS sınıfı; varsayılan değer boş string ('').  
-**Dönüş**: void — fonksiyon JSX elementi döndürür, açık bir değer döndürmez.
+- `metadata`: ThreeDAuthorityProps — 3D sahne yapılandırma bilgilerini içeren obje. İçerisinde `modelUrl` (3D model dosya yolu), `hotspots` (etkileşimli noktalar dizisi), ve `config` (sahne ayarları) alanları bulunur. `config` içinde `autoRotate` (otomatik döndürme), `initialZoom` (başlangıç zoom mesafesi), `environment` (ortam preset'i, varsayılan 'studio'), ve `shadows` (gölge durumu) özellikleri yer alır.
+- `className`: string — Varsayılan değeri boş string olan opsiyonel parametre. Bileşenin kök elementine ek CSS sınıfı eklemek için kullanılır. Dışarıdan stillendirme ve layout kontrolü sağlar.
+
+**Dönüş**: JSX.Element — Bileşen her durumda bir React JSX yapısı döndürür. `isStarted` durumuna göre ya placeholder yapısı ya da tam 3D Canvas yapısı render edilir. Return type olarak `JSX.Element` veya `React.ReactElement` kullanılır.
 
 ---
 
@@ -67,24 +71,24 @@ Bu modülün çalışması için aşağıdaki varsayımlar geçerlidir:
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/authority/ThreeDAuthority.tsx::Model
-- **params**: url, hotspots
+### [N1_NASIL] AST Pointer: `src/components/authority/ThreeDAuthority.tsx`::Model
+- **params**:
+  - `url: string` — 3D model dosyasının URL adresi, useGLTF'e doğrudan verilir
+  - `hotspots?: ThreeDMetadata['hotspots']` — opsiyonel hotspots dizisi, 3D sahne üzerinde interaktif noktalar tanımlar
 - **ic_degiskenler**:
-  - `url` — string prop providing the GLTF model URL
-  - `hotspots` — optional array of hotspot metadata objects
-  - `scene` — GLTF scene object returned by `useGLTF(url)`
-  - `spot` — current hotspot element from `.map` iteration
-  - `idx` — index of the current hotspot in the array
-- **Dönüş**: JSX element (React fragment) representing the 3D model with its hotspots
+  - `scene` — useGLTF(url) hook'undan dönen GLTF sahne objesi, `<primitive object={scene}>` ile Canvas'a yerleştirilir
+  - `spot` — hotspots.map() iterator callback içindeki mevcut hotspots elemanı, `spot.position`, `spot.label`, `spot.description` erişimleri yapılır
+  - `idx` — hotspots.map() iterator callbackindeki indeks, `<Html key={idx}>` olarak React key olarak kullanılır
+- **Dönüş**: JSX — `<group>` içinde `<primitive>` ve maplenmiş `<Html>` hotspot bileşenleri döner
 
-### [N2_NASIL] AST Pointer: src/components/authority/ThreeDAuthority.tsx::ThreeDAuthority
-- **params**: metadata, className
+### [N2_NASIL] AST Pointer: `src/components/authority/ThreeDAuthority.tsx`::ThreeDAuthority
+- **params**:
+  - `metadata: ThreeDAuthorityProps` — 3D bileşenin yapılandırma verisi, `metadata.modelUrl`, `metadata.hotspots`, `metadata.config?.autoRotate`, `metadata.config?.initialZoom`, `metadata.config?.environment`, `metadata.config?.shadows` alanları erişilir
+  - `className: string` (varsayılan `''`) — dışarıdan ek stillendirme sınıfı, motion.div'in className birleştirilmesinde kullanılır
 - **ic_degiskenler**:
-  - `metadata` — prop object containing `modelUrl`, `hotspots`, and `config`
-  - `className` — optional CSS class string (defaults to empty string)
-  - `isStarted` — boolean state flag indicating whether the 3D engine has been initialized
-  - `setIsStarted` — state setter function used to set `isStarted` to true
-- **Dönüş**: JSX element (`motion.div`) rendering either the initialization placeholder or the full 3D canvas with model, lights, controls, and overlay.
+  - `isStarted` — React.useState(false) state'inden dönen boolean değer, 3D motorun başlatılıp başlatılmadığını tutar; `false` iken placeholder UI, `true` iken Canvas render edilir
+  - `setIsStarted` — React.useState'den dönen state setter fonksiyonu, onClick handler içinde `setIsStarted(true)` çağrılarak 3D sahne başlatılır
+- **Dönüş**: JSX — `isStarted === false` iken tıklanabilir placeholder `<motion.div>` (spinner animasyonlu "Click to Initialize Engine" ekranı); `isStarted === true` iken `<Canvas>` içeren tam interaktif 3D görünüm (`Model`, `Environment`, `ContactShadows`, `OrbitControls`, `PerspectiveCamera` bileşenleriyle birlikte) döner
 
 ---
 

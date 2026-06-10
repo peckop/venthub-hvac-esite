@@ -19,7 +19,7 @@ metadata:
 depends_on:
 - diff-review
 - venthub-auditor
-next_steps: []
+next_steps: [notebooklm-sync]
 run_last: true
 exclusions: []
 ---

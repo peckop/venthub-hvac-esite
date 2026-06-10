@@ -251,6 +251,28 @@ skills:
     run_last: false
     exclusions: []
     commands: {}
+  - name: threejs-webgl-performance
+    path: .agent/skills/threejs-webgl-performance/SKILL.md
+    description: Three.js ve React Three Fiber (R3F) tabanlı 3D render performansını
+      optimize etmek, draw call'ları azaltmak, gölge işlemeyi yönetmek ve Lighthouse
+      mobil skorlarını yükseltmek için pratik kuralları sunar.
+    triggers_on:
+    - threejs performance
+    - r3f render optimization
+    - webgl optimization
+    - 3d canvas lag
+    inputs:
+    - 3D Canvas settings
+    - R3F component code
+    outputs:
+    - Performance optimization plan
+    - Audit checklist
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
+    commands:
+      validate: echo "Three.js performance guidelines loaded."
   - name: typography
     path: .agent/skills/typography/SKILL.md
     description: Applies typography principles for fonts, readability, text styling,

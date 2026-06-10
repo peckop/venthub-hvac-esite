@@ -1,5 +1,4 @@
 import '../index.css'
-import '@/lib/three-setup'
 
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'

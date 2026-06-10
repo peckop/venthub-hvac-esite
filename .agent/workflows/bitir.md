@@ -86,6 +86,14 @@ git commit -m "TİP: açıklama"
 git push origin master
 ```
 
+11. **Orion Doc & NLM Sync:**
+   - `orion doc changed` ile değişen dosyaların dokümantasyonunu güncelle
+   - Post-commit hook otomatik çalışmazsa: `orion doc tree --nlm-sync --force-sync`
+```bash
+orion doc changed
+orion doc tree --nlm-sync --force-sync
+```
+
 ## 📜 Kalite Notları
 - **Sıfır Tolerans:** Lint uyarısı veya TSC hatası olan kod mühürlenemez.
 - **Bütünlük:** Build testi geçmeyen kod projeyi kıracağı için push edilemez.

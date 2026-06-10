@@ -157,6 +157,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                             style={{ background: 'transparent' }} 
                                             gl={{ antialias: false, alpha: true }}
                                             dpr={[1, 1.5]}
+                                            frameloop="demand"
                                             className="animate-in fade-in zoom-in-95 duration-700"
                                         >
                                             <Suspense fallback={null}>

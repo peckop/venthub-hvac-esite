@@ -1,7 +1,9 @@
 import os
+import sys
 import json
 import yaml
 import re
+import argparse
 from pathlib import Path
 import subprocess
 
@@ -14,8 +16,11 @@ def get_repo_root() -> Path:
 
 def run_local_validation_command(cmd: str, cwd: Path) -> bool:
     try:
-        # Run command and capture output
-        res = subprocess.run(cmd, shell=True, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        res = subprocess.run(
+            cmd, shell=True, cwd=cwd,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            text=True, encoding="utf-8", errors="replace"
+        )
         if res.returncode == 0:
             return True
         else:
@@ -27,14 +32,109 @@ def run_local_validation_command(cmd: str, cwd: Path) -> bool:
         print(f"      [Exception] Failed to execute validation command: {e}")
         return False
 
+# ---------------------------------------------------------------------------
+# Differential validation helpers
+# ---------------------------------------------------------------------------
+
+def get_changed_files(repo_root: Path) -> list[str]:
+    """Get list of files changed in the working tree + staged vs HEAD."""
+    changed = set()
+    try:
+        # Staged changes
+        out = subprocess.check_output(
+            ["git", "diff", "--cached", "--name-only"],
+            cwd=repo_root, text=True, stderr=subprocess.DEVNULL
+        )
+        changed.update(l.strip() for l in out.splitlines() if l.strip())
+    except Exception:
+        pass
+    try:
+        # Unstaged changes
+        out = subprocess.check_output(
+            ["git", "diff", "--name-only"],
+            cwd=repo_root, text=True, stderr=subprocess.DEVNULL
+        )
+        changed.update(l.strip() for l in out.splitlines() if l.strip())
+    except Exception:
+        pass
+    try:
+        # Untracked files
+        out = subprocess.check_output(
+            ["git", "ls-files", "--others", "--exclude-standard"],
+            cwd=repo_root, text=True, stderr=subprocess.DEVNULL
+        )
+        changed.update(l.strip() for l in out.splitlines() if l.strip())
+    except Exception:
+        pass
+    return list(changed)
+
+
+def get_changed_skill_dirs(repo_root: Path) -> set[str]:
+    """Return set of skill directory names that have changed files."""
+    changed_files = get_changed_files(repo_root)
+    skill_prefix = ".agent/skills/"
+    changed_skills = set()
+    for f in changed_files:
+        f_normalized = f.replace("\\", "/")
+        if f_normalized.startswith(skill_prefix):
+            # Extract skill name: .agent/skills/<skill-name>/...
+            remainder = f_normalized[len(skill_prefix):]
+            parts = remainder.split("/")
+            if parts:
+                changed_skills.add(parts[0])
+    return changed_skills
+
+
+def has_source_code_changes(repo_root: Path) -> bool:
+    """Check if application source code files have changed (not agent infra)."""
+    changed_files = get_changed_files(repo_root)
+    source_extensions = {".ts", ".tsx", ".js", ".jsx", ".css", ".json", ".py"}
+    # Directories that are agent infrastructure, not application source
+    infra_prefixes = (".agent/", "scripts/", "docs/", ".github/", ".vscode/")
+    for f in changed_files:
+        f_normalized = f.replace("\\", "/")
+        if any(f_normalized.startswith(p) for p in infra_prefixes):
+            continue
+        ext = os.path.splitext(f_normalized)[1].lower()
+        if ext in source_extensions:
+            return True
+    return False
+
+
+# Heavy validate commands that should only run when source code changes
+HEAVY_SKILL_NAMES = {
+    "venthub-enterprise-audit",
+    "venthub-auditor",
+    "venthub-global-rontgen",
+}
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="VentHub TDD Skills Evaluator & Collision Engine")
+    parser.add_argument("--force", action="store_true",
+                        help="Force full validation for ALL skills (ignore differential logic)")
+    parser.add_argument("--skill", type=str, default=None,
+                        help="Validate only a specific skill by name")
+    return parser.parse_args()
+
 def evaluate_skills():
+    args = parse_args()
     repo_root = get_repo_root()
     skills_dir = repo_root / ".agent" / "skills"
     manifest_path = repo_root / ".agent" / "plugins" / "venthub-core" / "manifest.yaml"
     
     print(f"\n==================================================")
     print(f"VentHub TDD Skills Evaluator & Collision Engine")
-    print(f"==================================================\n")
+    print(f"==================================================")
+    
+    # Differential mode info
+    if args.force:
+        print(f"  Mode: FULL (--force)")
+    elif args.skill:
+        print(f"  Mode: SINGLE (--skill {args.skill})")
+    else:
+        print(f"  Mode: DIFFERENTIAL (smart validation)")
+    print()
     
     if not manifest_path.exists():
         print(f"[ERROR] manifest.yaml not found at {manifest_path}. Please run compile_skills.py first.")
@@ -141,13 +241,29 @@ def evaluate_skills():
                         print(f"    [ERROR] should_not_trigger query '{query}' matches registered trigger '{t}'!")
                         errors.append(f"Skill '{name}': negative query '{query}' matched trigger '{t}'")
                         
-    # 3. Validation Command Check
+    # 3. Validation Command Check (Differential)
     print("\n3. Execution Validation:")
+    
+    # Determine which skills need validation
+    changed_skills = get_changed_skill_dirs(repo_root)
+    source_changed = has_source_code_changes(repo_root)
+    
+    if not args.force:
+        print(f"  Changed skill dirs: {sorted(changed_skills) if changed_skills else '(none)'}")
+        print(f"  Source code changed: {source_changed}")
+    
+    validated_count = 0
+    skipped_count = 0
+    
     for category, skills_list in skills_section.items():
         for skill in skills_list:
             name = skill.get("name")
             rel_path = skill.get("path")
             skill_md_path = repo_root / rel_path
+            
+            # --skill filter: skip if not the target skill
+            if args.skill and name != args.skill:
+                continue
             
             # Check SKILL.md for validate command in metadata
             with open(skill_md_path, "r", encoding="utf-8") as f:
@@ -163,13 +279,31 @@ def evaluate_skills():
                 validate_cmd = commands.get("validate")
                 
                 if validate_cmd:
+                    # --- Differential Logic ---
+                    if not args.force:
+                        # Skip heavy audit skills unless source code actually changed
+                        if name in HEAVY_SKILL_NAMES and not source_changed:
+                            print(f"  [SKIP] '{name}': Heavy audit skipped (no source code changes)")
+                            skipped_count += 1
+                            continue
+                        
+                        # Skip unchanged skills' validate commands
+                        if name not in changed_skills and name not in HEAVY_SKILL_NAMES:
+                            print(f"  [SKIP] '{name}': No changes detected in skill directory")
+                            skipped_count += 1
+                            continue
+                    # --- End Differential Logic ---
+                    
                     print(f"  Running validate command for '{name}': {validate_cmd}")
                     # Resolve command path if needed, execute relative to repo root
                     success = run_local_validation_command(validate_cmd, repo_root)
                     if success:
                         print(f"    [OK] Validation command passed!")
+                        validated_count += 1
                     else:
                         errors.append(f"Skill '{name}' validation command failed")
+    
+    print(f"\n  Validation summary: {validated_count} executed, {skipped_count} skipped")
                         
     # 4. Semantic Similarity (Offline Description Check)
     print("\n4. Semantic Similarity Analysis:")

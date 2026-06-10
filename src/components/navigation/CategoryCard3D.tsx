@@ -47,6 +47,7 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                     style={{ background: 'transparent' }}
                     gl={{ antialias: false, powerPreference: "high-performance" }}
                     dpr={1}
+                    frameloop="demand"
                 >
                     {/* Lighting Setup for Menu Tiles */}
                     <Environment preset="city" />

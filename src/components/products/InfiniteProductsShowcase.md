@@ -12,7 +12,7 @@ entity_hashes:
   func:handleClick: bffc3b12eebc550c
   overview: 107d0b226b7eef2b
   style_tokens: 6568addf96368125
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-10T09:12:40Z
 ---
 
 ## Genel Bakış

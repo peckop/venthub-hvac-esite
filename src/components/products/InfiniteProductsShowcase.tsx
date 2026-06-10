@@ -1,5 +1,4 @@
 'use client'
-"use no memo";
 import { 
     AdaptiveDpr, 
     AdaptiveEvents,
@@ -221,6 +220,7 @@ const InfiniteProductsShowcase: React.FC<InfiniteProductsShowcaseProps> = ({ ite
         <div className="w-full h-showcase relative bg-surface-darker overflow-hidden group/canvas content-auto-showcase">
             <Canvas
                 shadows={false}
+                frameloop="always"
                 gl={{ 
                     antialias: true,
                     powerPreference: "high-performance",
