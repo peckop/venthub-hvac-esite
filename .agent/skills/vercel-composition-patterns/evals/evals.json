@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "can you execute component refactor?",
-    "run component refactor",
     "component refactor",
     "compound component design",
-    "can you execute compound component design?",
-    "run compound component design",
-    "execute component refactor",
-    "help me with component refactor",
-    "start component refactor task",
-    "perform component refactor",
-    "execute compound component design",
-    "help me with compound component design"
+    "bu formu component refactor ile yeniden yapılandır",
+    "can you apply compound component design to the tabs?",
+    "I need a component refactor for the filter panel",
+    "compound component design ile dropdown menü oluştur",
+    "how do I do a component refactor using context providers?",
+    "sidebar'ı compound component design pattern'ı ile yaz",
+    "component refactor yaparak prop drilling'i azalt",
+    "can you suggest a compound component design for the modal?",
+    "karmaşık form yapısı için component refactor gerekiyor",
+    "apply compound component design to the accordion widget"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "React performans optimizasyonu yap",
+    "run vitest on the component tests",
+    "create a conventional git commit",
+    "supabase veritabanında yeni tablo oluştur",
+    "change the color palette and HSL tokens",
+    "translate component labels to Turkish",
+    "run lighthouse audit on the page",
+    "write an RLS security policy"
   ]
 }

@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "run web vitals check",
-    "run lighthouse audit",
-    "performance check",
-    "web vitals check",
-    "can you execute web vitals check?",
     "lighthouse audit",
-    "execute lighthouse audit",
-    "help me with lighthouse audit",
-    "start lighthouse audit task",
-    "perform lighthouse audit",
-    "run performance check",
-    "execute performance check"
+    "performance check",
+    "anasayfa için web vitals check yap",
+    "run a lighthouse audit on the product page",
+    "bu sayfanın performance check sonuçlarını göster",
+    "I need a web vitals check for the mobile viewport",
+    "lighthouse audit ile LCP skorunu kontrol et",
+    "can you run a performance check to find regressions?",
+    "web vitals check yaparak CLS problemlerini tespit et",
+    "sayfanın yükleme hızı için lighthouse audit çalıştır",
+    "is the FCP score acceptable? run a web vitals check",
+    "performance check ile sayfa optimizasyonunu doğrula"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "React component performansını optimize et",
+    "run vitest on the API handlers",
+    "create a database migration for users table",
+    "font ailesini Outfit olarak değiştir",
+    "commit the current changes with a message",
+    "add Tailwind dark mode support",
+    "veritabanı RLS policy oluştur",
+    "generate documentation with orion cli"
   ]
 }

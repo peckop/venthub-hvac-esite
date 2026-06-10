@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "hvac catalog import",
-    "run pdf scan",
-    "run katalog oku",
-    "pdf scan",
     "katalog oku",
-    "can you execute katalog oku?",
-    "execute katalog oku",
-    "help me with katalog oku",
-    "start katalog oku task",
-    "perform katalog oku",
-    "execute pdf scan",
-    "help me with pdf scan"
+    "pdf scan",
+    "hvac catalog import",
+    "bu PDF dosyasını katalog oku ile içe aktar",
+    "can you run a pdf scan on the Daikin catalog?",
+    "hvac catalog import for the new product line",
+    "katalog oku: Mitsubishi klima ürün kataloğu",
+    "I need a pdf scan to extract product specifications",
+    "yeni ürün kataloğunu hvac catalog import ile yükle",
+    "katalog oku komutunu çalıştır ve verileri doğrula",
+    "run a pdf scan on the updated price list PDF",
+    "hvac catalog import ile ürün verilerini JSON'a çevir"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "supabase veritabanına ürün verisi ekle",
+    "run vitest on the importer module",
+    "create a conventional git commit",
+    "add i18n translations for catalog labels",
+    "change the product card design",
+    "run lighthouse audit on the catalog page",
+    "generate a PRD for the import feature",
+    "write an RLS policy for catalog data"
   ]
 }

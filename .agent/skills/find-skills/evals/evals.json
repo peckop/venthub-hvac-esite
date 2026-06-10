@@ -1,26 +1,26 @@
 {
   "should_trigger": [
     "skill bul",
-    "run yetenek ara",
-    "can you execute how do I do X?",
-    "can you execute skill bul?",
-    "run skill bul",
     "yetenek ara",
-    "execute skill bul",
-    "help me with skill bul",
-    "start skill bul task",
-    "perform skill bul",
-    "execute yetenek ara",
-    "help me with yetenek ara"
+    "how do I do X for code analysis?",
+    "bana uygun bir skill bul",
+    "can you yetenek ara for database management?",
+    "performans testi için skill bul",
+    "how do I do X when I need to audit the project?",
+    "mevcut yetenekleri listele, yetenek ara",
+    "is there a skill bul feature for deployment?",
+    "yetenek ara: çeviri ve lokalizasyon",
+    "I want to know how do I do X for PDF processing",
+    "hangi skill bul sonuçları var accessibility için?"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "yeni skill oluştur ve manifest'e ekle",
+    "run vitest for the auth module",
+    "create a git commit with conventional format",
+    "veritabanı migration yaz",
+    "change the primary color in the theme",
+    "deploy the project to Vercel",
+    "translate all labels to Turkish",
+    "run lighthouse performance check"
   ]
 }

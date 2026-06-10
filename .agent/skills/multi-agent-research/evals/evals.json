@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "run kod tabanını araştır",
-    "can you execute RAG research?",
-    "can you execute mimari analiz?",
     "kod tabanını araştır",
-    "can you execute kod tabanını araştır?",
-    "run RAG research",
-    "execute kod tabanını araştır",
-    "help me with kod tabanını araştır",
-    "start kod tabanını araştır task",
-    "perform kod tabanını araştır",
     "mimari analiz",
-    "run mimari analiz"
+    "RAG research",
+    "proje yapısını anlamak için kod tabanını araştır",
+    "can you run a RAG research on the auth module?",
+    "mimari analiz yaparak bağımlılık haritasını çıkar",
+    "how does the routing work? kod tabanını araştır",
+    "I need a RAG research to understand the data flow",
+    "bu modülün mimari analiz raporunu hazırla",
+    "kod tabanını araştır ve servis katmanını analiz et",
+    "deep RAG research on the component architecture",
+    "yeni özellik için mimari analiz yap"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "takıma delegasyon yap ve sprint başlat",
+    "run vitest unit tests on services",
+    "supabase veritabanında tablo oluştur",
+    "create a new agent skill from scratch",
+    "font boyutunu ve satır aralığını ayarla",
+    "write an RLS policy for the projects table",
+    "generate issues from the implementation plan",
+    "commit the staged changes to git"
   ]
 }

@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "run renk seç",
-    "run style fix",
     "tasarım yap",
-    "can you execute style fix?",
+    "renk seç",
     "style fix",
     "Tailwind styling",
-    "run tasarım yap",
-    "execute tasarım yap",
-    "help me with tasarım yap",
-    "start tasarım yap task",
-    "perform tasarım yap",
-    "renk seç"
+    "dashboard için tasarım yap",
+    "projenin ana renk seç paleti ne olmalı?",
+    "broken card layout needs a style fix",
+    "can you apply Tailwind styling to the sidebar?",
+    "HVAC kontrol paneli için tasarım yap lütfen",
+    "I need to renk seç for the dark mode theme",
+    "navbar alignment issues, style fix needed",
+    "Tailwind styling ile responsive grid oluştur"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "font ailesini ve type scale'i değiştir",
+    "run vitest on the UI components",
+    "create a conventional git commit",
+    "supabase client ile kullanıcı verisi çek",
+    "write a database migration script",
+    "run fallow dead-code analysis",
+    "generate a PRD from the design discussion",
+    "deploy the UI changes to staging"
   ]
 }

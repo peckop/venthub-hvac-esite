@@ -1,26 +1,26 @@
 {
   "should_trigger": [
     "performans optimize et",
-    "can you execute RSC optimization?",
-    "run waterfall fix",
-    "run performans optimize et",
-    "can you execute waterfall fix?",
-    "RSC optimization",
-    "execute performans optimize et",
-    "help me with performans optimize et",
-    "start performans optimize et task",
-    "perform performans optimize et",
     "waterfall fix",
-    "execute waterfall fix"
+    "RSC optimization",
+    "bu sayfayı performans optimize et",
+    "can you apply a waterfall fix to the data fetching?",
+    "I need RSC optimization for the product listing",
+    "performans optimize et: server component'ları iyileştir",
+    "waterfall fix yaparak paralel veri çekmeyi sağla",
+    "how do I apply RSC optimization for streaming SSR?",
+    "client bundle'ı küçültmek için performans optimize et",
+    "data loading waterfall fix needed for the dashboard",
+    "RSC optimization ile sunucu tarafı rendering'i hızlandır"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "React compound component pattern uygula",
+    "run vitest on the performance tests",
+    "create a conventional git commit",
+    "supabase client ile veri sorgula",
+    "change the navigation bar design",
+    "translate performance labels to Turkish",
+    "run lighthouse audit on the homepage",
+    "write a database migration script"
   ]
 }

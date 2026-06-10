@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "run pre-commit check",
-    "pre-commit check",
-    "can you execute bütünlük denetle?",
     "integrity check",
-    "run integrity check",
-    "can you execute pre-commit check?",
-    "execute integrity check",
-    "help me with integrity check",
-    "start integrity check task",
-    "perform integrity check",
     "bütünlük denetle",
-    "run bütünlük denetle"
+    "pre-commit check",
+    "push öncesi integrity check çalıştır",
+    "projenin bütünlük denetle sonuçlarını göster",
+    "can you run a pre-commit check on the staged files?",
+    "I need an integrity check to verify architecture compliance",
+    "bütünlük denetle ile mimari kuralları doğrula",
+    "is the project passing the pre-commit check?",
+    "integrity check yaparak eksik dosyaları tespit et",
+    "commit öncesi bütünlük denetle komutu çalıştır",
+    "run a pre-commit check to catch breaking changes"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "enterprise audit ile 10/10 onay raporu al",
+    "run vitest on the auditor scripts",
+    "create a new git branch for testing",
+    "supabase veritabanı sorgula",
+    "change the button hover animation",
+    "translate audit report labels to Turkish",
+    "run lighthouse audit on the main page",
+    "generate documentation with orion doc"
   ]
 }

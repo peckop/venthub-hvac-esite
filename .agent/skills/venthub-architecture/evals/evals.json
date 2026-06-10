@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "can you execute yeni bileşen oluştur?",
     "yeni bileşen oluştur",
-    "can you execute PPR config?",
     "RSC render",
-    "run yeni bileşen oluştur",
-    "run RSC render",
-    "execute yeni bileşen oluştur",
-    "help me with yeni bileşen oluştur",
-    "start yeni bileşen oluştur task",
-    "perform yeni bileşen oluştur",
-    "execute RSC render",
-    "help me with RSC render"
+    "PPR config",
+    "dashboard için yeni bileşen oluştur",
+    "can you configure RSC render for the product page?",
+    "PPR config ayarlarını Next.js App Router ile yap",
+    "I need to yeni bileşen oluştur for the HVAC controls",
+    "RSC render stratejisini server component'lar için belirle",
+    "how do I set up PPR config for partial prerendering?",
+    "yeni bileşen oluştur: filtre sidebar'ı",
+    "optimize the RSC render pipeline for streaming",
+    "PPR config ile dinamik ve statik kısımları ayır"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "React compound component pattern uygula",
+    "run vitest on the architecture tests",
+    "create a conventional git commit",
+    "supabase veritabanına yeni tablo ekle",
+    "change the color palette for dark mode",
+    "translate component labels to English",
+    "run lighthouse performance audit",
+    "write an RLS security policy"
   ]
 }

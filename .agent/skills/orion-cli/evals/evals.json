@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "tree oluştur",
-    "run tree oluştur",
-    "can you execute doküman üret?",
-    "can you execute tree oluştur?",
-    "run doküman üret",
-    "run orion doc",
     "orion doc",
-    "execute orion doc",
-    "help me with orion doc",
-    "start orion doc task",
-    "perform orion doc",
-    "doküman üret"
+    "doküman üret",
+    "tree oluştur",
+    "proje için orion doc çalıştır",
+    "can you generate docs with orion doc?",
+    "src klasörü için tree oluştur",
+    "doküman üret ve markdown olarak kaydet",
+    "I need an orion doc pipeline for the API module",
+    "tree oluştur komutuyla proje ağacını göster",
+    "how do I use orion doc to generate documentation?",
+    "yeni modül için doküman üret lütfen",
+    "proje yapısını tree oluştur ile görselleştir"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "NotebookLM'i senkronize et",
+    "run vitest on documentation tests",
+    "create a conventional git commit",
+    "supabase client ile veri sorgula",
+    "add accessibility attributes to buttons",
+    "translate labels using i18n conventions",
+    "run performance check on the page",
+    "refactor the React component structure"
   ]
 }

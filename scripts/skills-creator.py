@@ -156,36 +156,86 @@ Describe when the agent should use this skill.
     with open(skill_md_path, "w", encoding="utf-8") as f:
         f.write(f"---\n{yaml_text}---\n\n{skill_body}")
         
-    # Generate 12 should_trigger queries
-    st_queries = []
-    for t in triggers:
-        st_queries.append(t)
-        st_queries.append(f"run {t}")
-        st_queries.append(f"execute {t}")
-        st_queries.append(f"help me with {t}")
-        st_queries.append(f"start {t} task")
-        st_queries.append(f"perform {t}")
-    
-    st_queries = list(dict.fromkeys(st_queries)) # remove duplicates
-    while len(st_queries) < 12:
-        st_queries.append(f"generic triggering query variation {len(st_queries) + 1}")
+    # Generate 12 diverse should_trigger queries using natural language paraphrases.
+    # Covers: direct Turkish commands, English equivalents, indirect requests,
+    # question forms, and contextual triggers from the skill's trigger list.
+    # Avoids mechanical prefixes like 'run X', 'execute X', 'start X task'.
+    st_templates = [
+        # Direct triggers (Turkish) — use actual trigger phrases first
+        lambda n, ts: ts[0] if len(ts) > 0 else f"{n} oluştur",
+        lambda n, ts: ts[1] if len(ts) > 1 else f"{n} yap",
+        lambda n, ts: ts[2] if len(ts) > 2 else f"yeni {n} ekle",
+        # English equivalents
+        lambda n, ts: f"create a new {n}",
+        lambda n, ts: f"scaffold a {n} module",
+        # Indirect requests
+        lambda n, ts: f"I need a new {n} for this project",
+        lambda n, ts: f"can you add a {n} plugin?",
+        # Question forms (mixed language)
+        lambda n, ts: f"how do I set up {n}?",
+        lambda n, ts: f"{n} nasıl yapılır?",
+        # Contextual / action-oriented
+        lambda n, ts: f"{n} için yeni bir modül ekle",
+        lambda n, ts: f"{n} modülü oluşturmam lazım",
+        lambda n, ts: f"build me a {n} capability",
+    ]
+
+    st_queries = [tmpl(name, triggers) for tmpl in st_templates]
+    st_queries = list(dict.fromkeys(st_queries))  # deduplicate preserving order
     st_queries = st_queries[:12]
     
-    # Generate 8 should_not_trigger queries
-    snt_queries = [
+    # Generate 8 skill-specific should_not_trigger queries.
+    # Uses category-based near-miss negatives for inter-skill discrimination,
+    # plus skill-name-derived negatives (related entity, wrong action).
+    category_negatives = {
+        "orchestration": [
+            "run unit tests", "fix typescript error",
+            "deploy to vercel", "query the database",
+            "style the sidebar component", "translate text to English",
+        ],
+        "intelligence": [
+            "commit changes", "create component",
+            "run build", "format markdown table",
+            "add RLS policy", "scan PDF catalog",
+        ],
+        "guards": [
+            "search notebooks", "orchestrate agents",
+            "run enterprise audit", "import catalog data",
+            "generate typography scale", "deploy edge function",
+        ],
+        "audit": [
+            "create new skill", "translate text",
+            "style component", "scaffold module",
+            "run performance trace", "sync notebooks",
+        ],
+        "utils": [
+            "analyze performance", "query database",
+            "design UI layout", "run lighthouse audit",
+            "orchestrate multi-agent sprint", "import HVAC catalog",
+        ],
+    }
+
+    # Fallback generic negatives for unknown categories
+    generic_negatives = [
         "reset the whole database machine",
         "how to install node.js on windows",
         "set font size to 16px",
-        "Vitest birim testlerini çalıştır",
-        "create a new branch in git",
-        "format this text as a markdown table",
         "generate an image of a cat",
-        "deploy the current project code to staging"
     ]
-    
+
+    # Pick 4 category-based near-miss negatives + 4 contextual/generic negatives
+    cat_negs = category_negatives.get(category, generic_negatives * 2)[:4]
+    contextual_negs = [
+        f"delete {name}",           # related entity, wrong action
+        f"debug {name} error",      # related entity, wrong action
+        "format this code",         # generic unrelated
+        "run the development server",  # generic unrelated
+    ]
+    snt_queries = cat_negs + contextual_negs
+
     evals_data = {
         "should_trigger": st_queries,
-        "should_not_trigger": snt_queries
+        "should_not_trigger": snt_queries,
     }
     
     with open(evals_dir / "evals.json", "w", encoding="utf-8") as f:

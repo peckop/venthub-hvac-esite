@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "unused dependencies check",
-    "can you execute dead-code check?",
-    "can you execute unused dependencies check?",
-    "can you execute fallow run?",
     "fallow run",
-    "run fallow run",
-    "execute fallow run",
-    "help me with fallow run",
-    "start fallow run task",
-    "perform fallow run",
     "dead-code check",
-    "run dead-code check"
+    "projede kullanılmayan bağımlılıkları bul, unused dependencies check yap",
+    "can you do a fallow run on the src directory?",
+    "I think there's dead code, run a dead-code check",
+    "unused dependencies check ile gereksiz paketleri tespit et",
+    "fallow run çalıştırıp kod kalitesi raporu al",
+    "how do I find unused exports with a dead-code check?",
+    "are there circular dependencies? run fallow run to check",
+    "projede dead-code check yaparak ölü kodları bul",
+    "run an unused dependencies check on package.json",
+    "fallow run ile complexity skoru öğrenmek istiyorum"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "run eslint and fix formatting issues",
+    "lighthouse performans testi çalıştır",
+    "write a new React component for the dashboard",
+    "veritabanı şemasını güncelle",
+    "commit the changes with a conventional message",
+    "translate button labels to English",
+    "upgrade Node.js to the latest LTS version",
+    "add Tailwind classes to the navbar"
   ]
 }

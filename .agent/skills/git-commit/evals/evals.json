@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "run conventional commit",
-    "run /commit",
-    "/commit",
     "commit yap",
-    "can you execute conventional commit?",
+    "/commit",
     "conventional commit",
-    "run commit yap",
-    "execute commit yap",
-    "help me with commit yap",
-    "start commit yap task",
-    "perform commit yap",
-    "execute /commit"
+    "bu değişiklikleri commit yap",
+    "I need to create a conventional commit message",
+    "commit yap ve anlamlı bir mesaj yaz",
+    "can you run /commit for staged files?",
+    "conventional commit formatında mesaj oluştur",
+    "hazır olan dosyaları commit yap lütfen",
+    "generate a conventional commit for the refactoring",
+    "staged değişiklikler için /commit çalıştır",
+    "please write a conventional commit message for these changes"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "create a new branch called feature/auth",
+    "diff review yaparak değişiklikleri incele",
+    "push the current branch to remote",
+    "rebase this branch onto main",
+    "run vitest on all test files",
+    "supabase veritabanına yeni tablo ekle",
+    "generate TypeScript types for the API",
+    "merge the feature branch into develop"
   ]
 }

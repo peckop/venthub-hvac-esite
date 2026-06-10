@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "run font değiştir",
-    "okunabilirlik",
-    "can you execute text styling?",
-    "run okunabilirlik",
-    "text styling",
-    "run text styling",
     "font değiştir",
-    "execute font değiştir",
-    "help me with font değiştir",
-    "start font değiştir task",
-    "perform font değiştir",
-    "execute okunabilirlik"
+    "okunabilirlik",
+    "text styling",
+    "başlık fontunu font değiştir ile Inter yap",
+    "sayfanın okunabilirlik seviyesini artır",
+    "can you apply better text styling to the cards?",
+    "font değiştir: body için Roboto kullan",
+    "metin okunabilirlik kurallarına uygun mu kontrol et",
+    "I need better text styling for the product descriptions",
+    "mobil cihazlarda okunabilirlik iyileştirmesi gerekiyor",
+    "text styling ayarlarını güncelleyip type scale oluştur",
+    "how do I font değiştir for the navigation labels?"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "renk paleti değiştir ve tema güncelle",
+    "run vitest on the typography component",
+    "create a git commit for style changes",
+    "supabase veritabanında yeni sütun ekle",
+    "run lighthouse performance audit",
+    "translate button labels to Turkish",
+    "write an RLS policy for user data",
+    "run fallow dead-code analysis"
   ]
 }

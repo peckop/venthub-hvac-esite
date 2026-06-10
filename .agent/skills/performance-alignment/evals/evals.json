@@ -1,26 +1,26 @@
 {
   "should_trigger": [
-    "can you execute performans planı?",
-    "run RAG performance alignment",
-    "RAG performance alignment",
-    "can you execute RAG performance alignment?",
-    "run performans planı",
     "performans planı",
-    "execute performans planı",
-    "help me with performans planı",
-    "start performans planı task",
-    "perform performans planı",
-    "execute RAG performance alignment",
-    "help me with RAG performance alignment"
+    "RAG performance alignment",
+    "sayfanın yavaşlığı için performans planı hazırla",
+    "can you create a RAG performance alignment report?",
+    "LCP sorununu çözmek için performans planı oluştur",
+    "I need a RAG performance alignment for the dashboard",
+    "performans planı yaparak bottleneck'ları belirle",
+    "run a RAG performance alignment on the trace logs",
+    "mobil skorlar düşük, performans planı gerekiyor",
+    "RAG performance alignment ile optimizasyon önerileri al",
+    "detaylı bir performans planı ile iyileştirme adımları belirle",
+    "how to improve CLS? start a RAG performance alignment"
   ],
   "should_not_trigger": [
-    "reset the whole database machine",
-    "how to install node.js on windows",
-    "send an email to my manager",
-    "what is the weather in Istanbul",
-    "set font size to 16px",
-    "Vitest birim testlerini çalıştır",
-    "create a new branch in git",
-    "format this text as a markdown table"
+    "lighthouse audit çalıştır ve skoru göster",
+    "React component waterfall sorununu düzelt",
+    "run vitest for the performance module",
+    "change the font to Roboto",
+    "create a database migration",
+    "commit the latest performance fixes",
+    "deploy the optimized bundle to staging",
+    "add dark mode to the settings page"
   ]
 }
