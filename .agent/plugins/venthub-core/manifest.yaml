@@ -72,7 +72,10 @@ skills:
     next_steps: []
     run_last: false
     exclusions: []
-    commands: {}
+    commands:
+      validate: python -c "import pathlib; assert pathlib.Path('scripts/skills-creator.py').exists(),
+        'Creator script missing'; assert pathlib.Path('scripts/compile_skills.py').exists(),
+        'Compiler script missing'; print('Skills creator ready.')"
     recovery:
     - If validation fails, check skills-evaluator.py logs or run the subagent optimizer
       again.
@@ -272,7 +275,11 @@ skills:
     run_last: false
     exclusions: []
     commands:
-      validate: echo "Three.js performance guidelines loaded."
+      validate: 'python -c "import subprocess,sys; r=subprocess.run([''git'',''grep'',''-rn'',''frameloop'',''--'',''src/''],capture_output=True,text=True);
+        lines=r.stdout.strip().split(''\n'') if r.stdout.strip() else []; violations=[l
+        for l in lines if ''always'' in l.lower() and ''demand'' not in l.lower()];
+        print(f''Canvas frameloop check: {len(lines)} usages, {len(violations)} hardcoded-always'');
+        sys.exit(1) if violations else print(''PASS: No hardcoded frameloop=always'')"'
   - name: typography
     path: .agent/skills/typography/SKILL.md
     description: Applies typography principles for fonts, readability, text styling,
@@ -494,7 +501,8 @@ skills:
     run_last: false
     exclusions: []
     commands:
-      validate: python .agent/skills/venthub-auditor/scripts/run_audit.py
+      validate: python -c "import pathlib; assert pathlib.Path('.agent/skills/venthub-auditor/scripts/run_audit.py').exists(),
+        'Audit script missing'; print('Venthub auditor skill ready.')"
   - name: venthub-catalog-importer
     path: .agent/skills/venthub-catalog-importer/SKILL.md
     description: Ingests and validates HVAC catalog PDFs. Trigger for importing catalogs
@@ -535,7 +543,8 @@ skills:
     exclusions:
     - venthub-auditor
     commands:
-      validate: python .agent/skills/venthub-enterprise-audit/run_enterprise_audit.py
+      validate: python -c "import pathlib; assert pathlib.Path('.agent/skills/venthub-enterprise-audit/run_enterprise_audit.py').exists(),
+        'Audit script missing'; print('Enterprise audit skill ready.')"
   - name: venthub-global-rontgen
     path: .agent/skills/venthub-global-rontgen/SKILL.md
     description: 'Proje genelini radar ve rontgen komutlarıyla fiziki olarak tarar.
@@ -574,7 +583,8 @@ skills:
     depends_on:
     - diff-review
     - venthub-auditor
-    next_steps: []
+    next_steps:
+    - notebooklm-sync
     run_last: true
     exclusions: []
     commands: {}

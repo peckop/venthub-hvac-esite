@@ -1,5 +1,54 @@
 # Changelog
 
+### [2026-06-10] 3D Performance Overhaul, THREE.js Tree-Shaking, Skills Infrastructure & CI Hardening
+
+**Summary:** Major rendering performance improvements across all 3D canvases (frameloop demand mode, DPR cap, memo cleanup), full THREE.js tree-shaking migration (34 files), skills infrastructure upgrades (natural language evals, semantic routing, dependency resolution), CI workflow scope narrowing, and codebase language convention enforcement.
+
+**Changes:**
+
+- **Performance — 3D Canvas & Mobile (perf):**
+  - Canvas `frameloop` optimized: 6 navigation components switched to `demand` mode; product showcase components set to `conditional`/`always` as needed.
+  - Device Pixel Ratio (DPR) capped at `1.5` on mobile across `ThreeDAuthority`, `BlueprintCanvas`, and `OrbitalProductsShowcase`.
+  - Removed `'use no memo'` directives from heavy 3D components to restore React compiler memoization.
+  - Homepage mobile performance: GPU-composited animations, WCAG contrast compliance, LCP `fetchPriority`/`decoding` optimization, WebP image conversion, filter blur animation removal, and image quality reduction to 70%.
+  - Tenant config wrapped with `React.cache`; `content-auto-table` optimizations applied. Supabase provider memoization improved and missing `Suspense` boundaries added.
+
+- **Performance — THREE.js Tree-Shaking (refactor):**
+  - Converted 34 files from `import * as THREE` wildcard imports to selective named imports, enabling bundler tree-shaking.
+  - Deleted dead code files: `three-setup.ts` and `three-utils.ts` (never imported anywhere).
+
+- **Skills Infrastructure (feat/fix/refactor):**
+  - Eval quality upgraded: mechanical prefix-based queries replaced with natural language queries (28/29 evals passing).
+  - Skills-creator eval generation: category-based near-miss negatives for more robust routing.
+  - `compile_skills.py` moved from `scratch/` to `scripts/` for proper project tooling.
+  - Added `validate` command to skills-creator.
+  - Skills-evaluator: differential mode, encoding fix, lightweight self-checks.
+  - `threejs-webgl-performance` SKILL.md: 12 digital twin axioms added (189 → 321 lines).
+  - ONNX semantic graph routing layer with topological sorting and dependency checking.
+  - Orchestrator finalized with transitive dependency resolution and encoding safety.
+  - False-positive match resolution in router via stricter word tokenization.
+  - Batch optimization of all 28 skills; 12/8 train/test split evaluator integrated.
+  - Manifest enriched with `inputs`, `outputs`, `triggers`, and `prerequisites`.
+  - Modular skills restructured into unified `venthub-core` plugin.
+  - Auto-recovery configuration added for expired tokens.
+
+- **CI/CD (ci):**
+  - Narrowed `supabase-migrate` workflow trigger: removed `scripts/**` path to prevent spurious runs.
+
+- **Other Changes (fix/refactor/feat):**
+  - Async KVKK i18n split implemented with named export refactoring and global linter formatting.
+  - PDF font load 404 resolved: Roboto CDN fallback crash fixed with type-safe fallback.
+  - Unused `loginAction` server action and its documentation removed.
+  - Console warnings remediated: `GoTrueClient`, prefetch 404, font preload issues fixed.
+
+- **Rules:**
+  - Code Language Rule enforced: all code and comments in English; user-facing communication in Turkish.
+
+**Validation:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ | `pnpm run build` ✅
+
+---
+
+
 ### [2026-06-07] Dependency Injection, Connection Pooling, Edge Claims Caching, and ESLint Guards Integration
 
 **Özet:** Uygulamanın mimari bütünlüğünü, güvenlik sınırlarını ve sunucu performansını garanti altına almak amacıyla; Dependency Injection (DI) servis kayıt mekanizması (`ServiceRegistry`), Edge üzerinde JWT Claims Caching / Edge Middleware claims caching (`JWT_CLAIMS_COOKIE_SECRET`), serverless bağlantı havuzlama (port `6543`), çapraz ortam (browser/server) istemci kirlenmesini engelleyen ESLint guardrail kuralları entegre edilmiş ve tüm veritabanı servisleri dependency injection ile parametrik çalışacak şekilde tamamlanmıştır.

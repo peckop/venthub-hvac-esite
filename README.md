@@ -4,6 +4,31 @@ HVAC sektörüne özel, B2B/B2C karma satış mimarisi üzerine kurulu premium e
 
 ---
 
+## 📊 Teknoloji Yığını & Proje Metrikleri
+
+| Katman | Teknoloji | Sürüm |
+|---|---|---|
+| Framework | Next.js (App Router, PPR) | **15.5.18** |
+| UI Kütüphanesi | React | **19.0.0** |
+| 3D Motor | Three.js / React Three Fiber | **0.183.2** / **9.5.0** |
+| Animasyon | Framer Motion | **11.13.1** |
+| Veritabanı & Auth | Supabase (SSR + JS Client) | **latest** |
+| Stil Sistemi | TailwindCSS | **3.4.16** |
+| Tip Güvenliği | TypeScript | **5.7.2** |
+| Test Altyapısı | Vitest + Testing Library | **4.1.3** |
+| Hata Takibi | Sentry | **8.54.0** |
+| Paket Yöneticisi | pnpm | — |
+
+> **🤖 AI Otonom Yetenek Sayısı:** Projede **29 adet** uzmanlaşmış `.agent/skills/` yeteneği aktiftir (performans, güvenlik, mimari, i18n, NotebookLM entegrasyonu, multi-agent orkestrasyon vb.).
+
+### 🆕 Son Geliştirmeler
+- ⚡ **3D Performans Optimizasyonu:** Canvas frameloop, DPR ve memo direktifleri optimize edildi; wildcard THREE importları seçici (selective) named import'lara dönüştürüldü.
+- 📱 **Mobil Performans & Erişilebilirlik:** Ana sayfa mobil performansı ve erişilebilirlik iyileştirmeleri uygulandı.
+- 🔧 **CI/CD İyileştirmesi:** Supabase migrate tetikleyicisi yalnızca veritabanı yollarına daraltıldı.
+- 🧠 **Skill Değerlendirme Yükseltmesi:** Doğal dil sorguları ile skill eşleştirme kalitesi artırıldı; geçişli bağımlılık çözümlemesi ve daha sıkı kelime tokenizasyonu eklendi.
+
+---
+
 ## 🦾 PROJE BELGE MERKEZİ (SCADA BİLGİ KÜTÜPHANESİ)
 
 VentHub sistemine ait tüm işletim, mimari ve otonom kurallar **5 Ciltlik Master Kitaplık** altında birleştirilmiştir. Geliştiriciler ve yapay zeka ajanları için tek geçerli referans noktaları bunlardır:

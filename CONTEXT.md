@@ -51,14 +51,16 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 ### Frontend
 | Teknoloji | Versiyon | Kullanım |
 |-----------|----------|----------|
-| Next.js | 15 | App Router, SSR/SSG |
-| React | 19 | UI bileşenler |
-| TypeScript | 5.x | Tip güvenliği |
-| Tailwind CSS | 4.x | Styling, Dynamic Theme Ready (.light/.dark runtime CSS variables) |
-| React Three Fiber | - | 3D görselleştirme |
-| Framer Motion | - | Animasyonlar |
-| Sonner | - | Toast bildirimleri |
-| @tailwindcss/typography | 0.5.x | prose sınıfları ile yasal ve teknik bilgi sayfalarının Bringhurst tipografi standardına getirilmesi |
+| Next.js | 15.5.18 | App Router, SSR/SSG, PPR (Kısmi Ön Oluşturma) |
+| React | 19.0.0 | UI bileşenler, React Compiler |
+| TypeScript | 5.7.2 | Tip güvenliği (strict mode, `any` yasak) |
+| Tailwind CSS | 3.4.16 | Styling, Dynamic Theme Ready (.light/.dark runtime CSS variables) |
+| React Three Fiber | 9.5.0 | 3D görselleştirme (Three.js 0.183.2) |
+| Framer Motion | 11.13.1 | Animasyonlar |
+| Sonner | 2.0.7 | Toast bildirimleri |
+| Recharts | 2.14.1 | Admin dashboard grafikleri |
+| Vitest | 4.1.3 | Test altyapısı (Testing Library + axe-core a11y) |
+| @tailwindcss/typography | 0.5.19 | prose sınıfları ile yasal ve teknik bilgi sayfalarının Bringhurst tipografi standardına getirilmesi |
 
 ### Backend
 | Teknoloji | Kullanım |
@@ -76,6 +78,7 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 | RLS Politikaları | 132 (Çoklu kiracı sızdırmazlığı aktif) |
 | RPC Fonksiyonları | 55 (jwt_tenant_id, metadata ve profile sync dahil) |
 | İndeksler | 47 (Kiracı kolon indeksleri dahil) |
+| Migrasyon Dosyaları | 174 |
 
 ### Dış Entegrasyonlar
 | Servis | Kullanım |
@@ -85,6 +88,18 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 | Twilio | WhatsApp/SMS bildirimleri (stok uyarıları) |
 | Sentry | Hata izleme ve raporlama |
 | Vercel | CI/CD ve hosting |
+
+### Supabase İstemci Fabrikaları & DI (Dependency Injection)
+
+Eski singleton bağımlılıklar kaldırılarak üçlü istemci yapısına geçilmiştir:
+
+| İstemci Türü | Dosya | Kullanım |
+|-------------|-------|----------|
+| **Browser Client** | `src/lib/supabase/client.ts` | İstemci bileşenlerinde singleton, `createBrowserClient` |
+| **Server Client** | `src/lib/supabase/server.ts` | Her HTTP isteğine özel (per-request), `createServerClient` + `cookies()` |
+| **Static Client** | `src/lib/supabase/static.ts` | SSG sınırlarında çerez erişimi gerektirmeyen durumlar, `persistSession: false` |
+
+Tüm servis fonksiyonları ilk parametre olarak `supabase: SupabaseClient<Database>` bağımlılığını zorunlu tutar (DI). Modül düzeyinde statik istemci importları kaldırılmıştır.
 
 ---
 
@@ -122,7 +137,7 @@ venthub-hvac/
 │       ├── legal/              # Hukuki sayfalar (KVKK, gizlilik...)
 │       └── support/            # Destek sayfaları (SSS, iade, kargo...)
 ├── supabase/
-│   ├── functions/              # Edge Functions (28 fonksiyon)
+│   ├── functions/              # Edge Functions (25 fonksiyon)
 │   │   ├── _shared/            # Paylaşılan modüller (notify, sentry, rate_limit)
 │   │   ├── iyzico-payment/     # Ödeme başlatma
 │   │   ├── iyzico-callback/    # Ödeme callback
@@ -134,8 +149,8 @@ venthub-hvac/
 │   │   └── ...                 # Diğer fonksiyonlar
 │   └── migrations/             # PostgreSQL migration dosyaları
 ├── docs/                       # Üretilmiş dokümantasyon
-│   ├── venthub_hvac_master.md  # Frontend master MD (432 dosya)
-│   ├── supabase_functions_master.md # Backend master MD (28 dosya)
+│   ├── venthub_hvac_master.md  # Frontend master MD (930+ dosya)
+│   ├── supabase_functions_master.md # Backend master MD (25 fonksiyon)
 │   └── database_schema_master.md   # DB şema master MD
 ├── .agent/                     # AI ajan konfigürasyonu
 │   ├── skills/                 # AI yetenekleri (SKILL.md)
@@ -266,15 +281,23 @@ RBAC `user_profiles.role` alanı + `useRole()` hook + Edge Function auth middlew
 
 ---
 
-## 11. 3D Ürün Modelleri
+## 11. 3D Ürün Modelleri & Performans Stratejisi
 
-React Three Fiber ile geliştirilen interaktif 3D modeller:
+React Three Fiber (`@react-three/fiber` 9.5.0) ve `@react-three/drei` ile geliştirilen interaktif 3D modeller:
 - **JetFanModel** — Jet fan ekipmanı
 - **HRVModel** — Isı geri kazanım cihazı
 - **SilentChannelFanModel** — Sessiz kanal tipi fan
 - **Silencer** — Susturucu parçası
 
-Performans stratejisi: **Click-to-Load** (lazy loading ile ilk yükleme maliyeti sıfır).
+### 3D Mimari Kurallar
+| Kural | Detay |
+|-------|-------|
+| **Render Stratejisi** | Click-to-Load (lazy loading ile ilk yükleme maliyeti sıfır) |
+| **Media Authority** | `ThreeDAuthority` bileşeni üzerinden GLB/GLTF formatında metadata ve hotspot tanımlarıyla sahneye entegrasyon |
+| **Gölge Motoru** | `PCFSoftShadowMap` kullanımı ❌ YASAK — gölge haritalama `'percentage'` olmalı |
+| **CSP İzinleri** | `next.config.mjs` → `connect-src` → `raw.githubusercontent.com` ve `raw.githack.com` kalıcı whitelist |
+| **Ekosistem Kısıtı** | Saf Three.js DOM manipülasyonu yasak — yalnızca R3F + Drei ekosistemi |
+| **Viewport Optimizasyonu** | Below-the-fold 3D canvas alanları `.content-auto` (`content-visibility: auto`) ile sarmalanmalı |
 
 ---
 
@@ -319,7 +342,7 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 
 **NotebookLM Digital Twin:** Tüm master MD'ler NLM'e yüklenerek proje hafızası oluşturulur. Notebook ID: `235043eb-970f-4a52-9f39-1d02b2621e9c`
 - **Otonom Oturum Yönetimi:** Dokümantasyon eşitlemeleri sırasında oluşabilecek `Authentication expired` hataları, kullanıcı müdahalesi gerekmeksizin otonom olarak `nlm login` + `refresh_auth` mekanizması ile sessizce çözülür.
-- **Supabase Edge Functions Mühürü:** Güncel mimaride yer alan 26 adet Edge Function'ın (`cc doc batch`) dokümanlarının senkronizasyon sırasında NotebookLM'e tam ve eksiksiz aktarılması zorunludur. Bu durum tüm mikroservislerin otonom denetimini garanti eder.
+- **Supabase Edge Functions Mühürü:** Güncel mimaride yer alan 25 adet Edge Function'ın (`cc doc batch`) dokümanlarının senkronizasyon sırasında NotebookLM'e tam ve eksiksiz aktarılması zorunludur. Bu durum tüm mikroservislerin otonom denetimini garanti eder.
 - **Orion CLI Granüler Dökümantasyon Standardı:** Dökümantasyon motoru, tüm modüller için `entity_hashes` tabanlı parça değişimi takibi yapar ve `AST POINTERS` standardına uygun olarak iç değişkenleri (`ic_degiskenler`, `params`, `dönüşler`) en ince kılcal damarına kadar detaylandırır.
 - **Xiaomi mimoV2 Premium Token Planı ve Paralel İşçi (Workers) Standardı:** Projemiz, **Xiaomi mimoV2 Premium Token** (mimo-v2.5) planına abonedir. Bu sayede dakikalık token ve istek hız sınırları (TPM/RPM limits) son derece yüksektir. Gelecek tüm oturumlarda ve dokümantasyon güncellemelerinde Orion CLI komutları (özellikle `orion doc all` veya `orion doc changed`) doğrudan **`--workers 20`** (20 paralel işçi) parametresi ile çalıştırılmalı, böylece bekleme süreleri en aza indirilmelidir.
 
@@ -361,7 +384,28 @@ Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
 
 ---
 
-## 15. Geliştirici Oturumu & Sohbet Yönetimi (Session Shortcuts)
+## 15. AI Skill (Yetenek) Ekosistemi
+
+Projede **29 adet uzmanlaşmış otonom yetenek** (`.agent/skills/`) aktiftir. Her yetenek, sıkı bir oluşturma ve optimizasyon protokolü ile yönetilir.
+
+### Yetenek Kategorileri
+| Kategori | Kapsam |
+|----------|--------|
+| **orchestration** | Multi-agent takım yönetimi, görev dağılımı, iş akışı yönlendirmeleri |
+| **intelligence** | Proje hafızası, NotebookLM dijital ikiz senkronizasyonu, araştırma/okuma görevleri |
+| **guards** | Kod standartları, TypeScript tip güvenliği, i18n JSONB kuralları, tasarım token korkulukları |
+| **audit** | L1-L12 kalite kapıları, performans ve güvenlik denetimleri |
+| **utils** | Yardımcı araçlar, Git commit formatlamaları, CLI betik yöneticileri |
+
+### Yetenek Yönetim Protokolü
+- **Skills CLI:** Mevcut ekosistemdeki yetenekleri keşfetmek veya yeni yetenek eklemek için `npx skills` paket yöneticisi
+- **Otonom Açıklama Optimizasyonu:** `skills-creator` → 12/8 Train/Test Split kuralı ile açıklama doğruluğu %100'e optimize edilir
+- **Çakışma Yönetimi:** `python .agent/scripts/skills-evaluator.py` kalite kapısı — Jaccard benzerlik eşiği %60
+- **Derleme:** `.agent/plugins/venthub-core/manifest.yaml` + `docs/venthub_skills_master.md` SSOT güncellemesi
+
+---
+
+## 16. Geliştirici Oturumu & Sohbet Yönetimi (Session Shortcuts)
 
 Bu projede kullanılan Antigravity CLI (`agy.exe`) konuşmalarını isimlendirmek ve yönetmek için Windows PowerShell Profilinde (`$PROFILE`) bir sistem entegrasyonu kurulmuştur:
 
@@ -373,6 +417,6 @@ Bu projede kullanılan Antigravity CLI (`agy.exe`) konuşmalarını isimlendirme
 
 ---
 
-*Son güncelleme: 2026-05-30*
+*Son güncelleme: 2026-06-10*
 
 

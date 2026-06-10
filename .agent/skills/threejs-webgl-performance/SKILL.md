@@ -15,7 +15,7 @@ metadata:
   - Performance optimization plan
   - Audit checklist
   commands:
-    validate: python -c "import subprocess,sys; r=subprocess.run(['git','grep','-rn','frameloop','--','src/'],capture_output=True,text=True); lines=r.stdout.strip().split('\n') if r.stdout.strip() else []; violations=[l for l in lines if 'always' in l.lower() and 'demand' not in l.lower()]; print(f'Canvas frameloop check: {len(lines)} usages, {len(violations)} hardcoded-always'); sys.exit(1) if violations else print('PASS: No hardcoded frameloop=always')"
+    validate: 'python -c "import subprocess,sys; r=subprocess.run([''git'',''grep'',''-rn'',''frameloop'',''--'',''src/''],capture_output=True,text=True); lines=r.stdout.strip().split(''\n'') if r.stdout.strip() else []; violations=[l for l in lines if ''always'' in l.lower() and ''demand'' not in l.lower()]; print(f''Canvas frameloop check: {len(lines)} usages, {len(violations)} hardcoded-always''); sys.exit(1) if violations else print(''PASS: No hardcoded frameloop=always'')"'
 depends_on: []
 next_steps: []
 run_last: false
