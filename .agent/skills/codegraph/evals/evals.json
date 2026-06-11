@@ -1,0 +1,28 @@
+{
+  "skill_name": "codegraph",
+  "version": "1.0.0",
+  "should_trigger": [
+    "kim kullanıyor bu bileşeni",
+    "who calls Footer component",
+    "impact analizi yap OrbitalProductsShowcase için",
+    "bu değişiklik hangi dosyaları etkiler",
+    "dependency chain göster products sayfası için",
+    "find all callers of useCategories hook",
+    "hangi bileşenler THREE.js kullanıyor",
+    "code graph ara CategoryMasterView",
+    "bu fonksiyonu kim çağırıyor",
+    "import zincirini göster",
+    "what depends on this module",
+    "bağımlılık analizi yap"
+  ],
+  "should_not_trigger": [
+    "veritabanı migration yaz",
+    "git commit yap",
+    "font değiştir",
+    "unit test çalıştır",
+    "yeni skill oluştur",
+    "lighthouse performans testi",
+    "deploy to vercel",
+    "format this code"
+  ]
+}

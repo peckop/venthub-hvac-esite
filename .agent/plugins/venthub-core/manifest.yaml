@@ -103,6 +103,46 @@ skills:
     exclusions: []
     commands: {}
   intelligence:
+  - name: codegraph
+    path: .agent/skills/codegraph/SKILL.md
+    description: Codebase intelligence via CodeGraph MCP. Use for caller/callee analysis,
+      impact assessment, dependency chain exploration, and symbol search. Trigger
+      for import analysis, 'who uses X', 'what calls Y', impact analysis, or dependency
+      exploration. Do NOT use for database operations, git commands, running tests,
+      or font styling.
+    triggers_on:
+    - kim kullanıyor
+    - who calls
+    - who uses
+    - import analizi
+    - import zinciri
+    - impact analizi
+    - bağımlılık zinciri
+    - bağımlılık analizi
+    - dependency chain
+    - caller analysis
+    - bu değişiklik neyi etkiler
+    - hangi dosyalar etkilenir
+    - hangi bileşenler
+    - hangi dosyaları
+    - kim çağırıyor
+    - what depends
+    - find all callers
+    - symbol search
+    - code graph
+    inputs:
+    - symbol name or file path
+    outputs:
+    - caller/callee graph
+    - impact analysis report
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
+    commands:
+      status: Use codegraph_status MCP tool to check index health
+    prerequisites:
+    - codegraph MCP server running
   - name: find-skills
     path: .agent/skills/find-skills/SKILL.md
     description: Helps users search, discover, and install agent skills/capabilities

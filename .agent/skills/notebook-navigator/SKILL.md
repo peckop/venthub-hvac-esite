@@ -15,7 +15,7 @@ metadata:
   outputs:
   - rag response text
   recovery:
-    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
 depends_on: []
 next_steps: []
 run_last: false
@@ -130,8 +130,9 @@ NotebookLM sadece statik bir doküman arşivi değil, kod tabanının ve mimarin
 - Kullanıcıya "Şu notebook'ta arayabilirim, ister misin?" diye **sormayın**. Gerekli görüyorsanız otonom olarak sorguyu yapıp sonucu entegre ederek cevap verin.
 - Kendi bilginiz çelişkili veya eskiyse, mutlaka ilgili defteri sorgulayın.
 - Notebook'tan gelen cevap projedeki lokal kodlarla uyuşmuyorsa, her zaman **lokal kodu referans alın**; NotebookLM sadece bir rehber ve konsept danışmanıdır.
-- **Authentication Expired Hatası:** Durumu kullanıcıya BİLDİRMEYİN. Otomatik giriş ve temiz tarayıcı tüneli aktiftir. Windows üzerinde kimlik doğrulama oturumunu yenilemek için doğrudan şu PowerShell tünel scriptini bypass politikasıyla çalıştırın:
+- **Authentication Expired Hatası:** Durumu kullanıcıya BİLDİRMEYİN. Penceresiz (headless) otomatik yenileme aktiftir. Windows'ta oturumu yenilemek için doğrudan şu PowerShell **headless** scriptini çalıştırın (pencere AÇMAZ, ~15 sn, ESET'i de atlar):
   ```bash
-  powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+  powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
   ```
-  Giriş işlemi tamamlandıktan sonra başarısız olan sorguyu otonom olarak tekrar tetikleyin.
+  Script bittikten sonra MCP'nin taze token'ı görmesi için **`refresh_auth`** aracını çağırın; ardından başarısız olan sorguyu otonom olarak tekrar tetikleyin.
+  - ⚠️ Düz `nlm login` ÇALIŞTIRMAYIN — bu makinede bozuk/yavaş görünür Chrome penceresi açar. Daima headless scripti kullanın.
