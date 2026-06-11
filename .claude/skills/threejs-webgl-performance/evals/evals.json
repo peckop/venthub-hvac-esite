@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "how to optimize threejs performance on mobile",
+    "r3f render optimization guidelines",
+    "run webgl optimization for 3d model viewer",
+    "how to fix 3d canvas lag",
+    "threejs performance optimization on mobile",
+    "need threejs performance audit",
+    "r3f render optimization best practices",
+    "methods for webgl optimization in react",
+    "reduce 3d canvas lag on mobile viewports",
+    "how to fix 3d canvas lag on showcase",
+    "threejs performance rendering guidelines",
+    "apply r3f render optimization to canvas"
+  ],
+  "should_not_trigger": [
+    "reset the database migrations",
+    "how to change css font scale",
+    "create git commit with message",
+    "run eslint on the project",
+    "add unit tests with vitest",
+    "deploy this branch to vercel",
+    "configure supabase security row level policy",
+    "translate text inside components"
+  ]
+}

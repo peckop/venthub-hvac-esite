@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "yeni skill oluştur",
+    "skill yarat",
+    "skill optimize et",
+    "projemize yeni bir yetenek ekle",
+    "can you run the skills-creator for a new audit skill?",
+    "yetenek oluştur: PDF import yeteneği lazım",
+    "I need to yeni skill oluştur for database backups",
+    "mevcut skill'i skill optimize et ile geliştir",
+    "skills-creator kullanarak manifest'e yeni giriş ekle",
+    "how do I skill yarat for a custom workflow?",
+    "yetenek ekle: deployment otomasyonu",
+    "skill optimize et ile evals kalitesini artır"
+  ],
+  "should_not_trigger": [
+    "mevcut skill'leri listele ve ara",
+    "run vitest for the skills module",
+    "create a git branch for the new feature",
+    "write RLS policy for the skills table",
+    "change button colors in the design system",
+    "translate component labels to English",
+    "run lighthouse performance audit",
+    "generate a PRD document"
+  ]
+}

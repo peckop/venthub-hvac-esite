@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "rontgen",
+    "radar",
+    "global scan",
+    "linter check",
+    "projeye rontgen çekerek sorunları bul",
+    "can you run a radar scan on the entire codebase?",
+    "global scan ile tüm dosyaları tara",
+    "I need a linter check across the project",
+    "rontgen taraması yaparak kod kalitesini değerlendir",
+    "radar çalıştır ve sorunlu modülleri tespit et",
+    "run a global scan to find all warnings",
+    "linter check ile kod standartlarını doğrula"
+  ],
+  "should_not_trigger": [
+    "enterprise audit ile 10/10 raporu oluştur",
+    "run vitest on the scanner module",
+    "create a conventional git commit",
+    "supabase client ile veri çek",
+    "change the dashboard color scheme",
+    "translate lint error messages",
+    "run lighthouse performance audit",
+    "generate a PRD from the analysis"
+  ]
+}

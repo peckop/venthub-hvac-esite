@@ -70,3 +70,7 @@ scratch/
 # Auto-generated caches
 .codegraph/
 __pycache__/
+
+# Claude Code: sadece makineye özel yerel ayar repoya girmez.
+# Skill'ler (.claude/skills) git'te kalır — cihaz çökerse kaybolmasın (.agent gibi).
+.claude/settings.local.json

@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "issue oluştur",
+    "planı böl",
+    "tasks to issues",
+    "bu PRD'den issue oluştur",
+    "can you convert tasks to issues for the sprint?",
+    "implementasyon planını planı böl ile parçala",
+    "I need to break this plan into tasks to issues",
+    "issue oluştur: her modül için ayrı görev yarat",
+    "büyük feature'ı planı böl ile küçük parçalara ayır",
+    "convert the roadmap items to tasks to issues format",
+    "yeni özellik spesifikasyonundan issue oluştur",
+    "planı böl ve her issue'ya öncelik ata"
+  ],
+  "should_not_trigger": [
+    "PRD dokümanı oluştur",
+    "run vitest on the issues module",
+    "create a conventional git commit",
+    "supabase client ile görevleri sorgula",
+    "change the issue tracker UI colors",
+    "translate issue labels to Turkish",
+    "run fallow code quality analysis",
+    "deploy the issue tracking feature"
+  ]
+}

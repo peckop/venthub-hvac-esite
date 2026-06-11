@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "erişilebilirlik denetle",
+    "a11y check",
+    "design guidelines check",
+    "formların erişilebilirlik denetle sonuçlarını göster",
+    "can you run an a11y check on the navigation component?",
+    "design guidelines check ile WCAG uyumunu doğrula",
+    "I need an erişilebilirlik denetle for the checkout flow",
+    "a11y check yaparak eksik aria label'ları bul",
+    "projenin design guidelines check'ten geçip geçmediğini kontrol et",
+    "erişilebilirlik denetle ile kontrast oranlarını ölç",
+    "run an a11y check on all interactive elements",
+    "design guidelines check ile tutarlılığı doğrula"
+  ],
+  "should_not_trigger": [
+    "renk seç ve UI tasarımı yap",
+    "run vitest on the accessibility tests",
+    "create a conventional git commit",
+    "supabase veritabanında sorgu çalıştır",
+    "change the font to Outfit",
+    "translate accessibility labels to Turkish",
+    "run lighthouse performance audit",
+    "write a database migration for new tables"
+  ]
+}

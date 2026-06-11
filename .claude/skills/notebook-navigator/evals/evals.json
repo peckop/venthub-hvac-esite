@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "notebooklm query",
+    "ikizden sorgula",
+    "RAG query",
+    "HVAC standartları hakkında ikizden sorgula",
+    "can you run a notebooklm query about ventilation rates?",
+    "RAG query ile havalandırma normlarını sorgula",
+    "ikizden sorgula: enerji verimliliği standartları nelerdir?",
+    "I need a notebooklm query on Turkish building codes",
+    "RAG query yaparak dokümantasyondaki bilgiyi doğrula",
+    "projenin tasarım kararları hakkında ikizden sorgula",
+    "run a RAG query for the ASHRAE guidelines",
+    "notebooklm query ile domain bilgisi çek"
+  ],
+  "should_not_trigger": [
+    "NotebookLM'i senkronize et ve kaynakları güncelle",
+    "run the codebase analysis with multi-agent",
+    "write a database migration script",
+    "generate conventional commit message",
+    "deploy the app to production",
+    "change the UI color palette",
+    "run fallow dead-code analysis",
+    "create issues from the PRD"
+  ]
+}

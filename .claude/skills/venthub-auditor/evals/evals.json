@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "integrity check",
+    "bütünlük denetle",
+    "pre-commit check",
+    "push öncesi integrity check çalıştır",
+    "projenin bütünlük denetle sonuçlarını göster",
+    "can you run a pre-commit check on the staged files?",
+    "I need an integrity check to verify architecture compliance",
+    "bütünlük denetle ile mimari kuralları doğrula",
+    "is the project passing the pre-commit check?",
+    "integrity check yaparak eksik dosyaları tespit et",
+    "commit öncesi bütünlük denetle komutu çalıştır",
+    "run a pre-commit check to catch breaking changes"
+  ],
+  "should_not_trigger": [
+    "enterprise audit ile 10/10 onay raporu al",
+    "run vitest on the auditor scripts",
+    "create a new git branch for testing",
+    "supabase veritabanı sorgula",
+    "change the button hover animation",
+    "translate audit report labels to Turkish",
+    "run lighthouse audit on the main page",
+    "generate documentation with orion doc"
+  ]
+}

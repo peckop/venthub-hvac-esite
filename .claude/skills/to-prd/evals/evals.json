@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "prd üret",
+    "prd oluştur",
+    "chat to prd",
+    "bu konuşmadan prd üret",
+    "can you create a prd oluştur from our discussion?",
+    "chat to prd ile bu oturumu dökümante et",
+    "I need a prd üret for the new HVAC module",
+    "mevcut sohbetten prd oluştur lütfen",
+    "how do I use chat to prd to capture requirements?",
+    "prd üret: kullanıcı gereksinimleri ve hedefler",
+    "bu planı prd oluştur formatına dönüştür",
+    "convert our brainstorming into a chat to prd"
+  ],
+  "should_not_trigger": [
+    "planı issue'lara böl ve dağıt",
+    "run vitest on the documentation module",
+    "create a git commit for the PRD",
+    "supabase veritabanında sorgu çalıştır",
+    "change the document viewer styling",
+    "translate PRD sections to English",
+    "run lighthouse audit on the docs page",
+    "write an RLS policy for the documents table"
+  ]
+}

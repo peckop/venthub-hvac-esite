@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "font değiştir",
+    "okunabilirlik",
+    "text styling",
+    "başlık fontunu font değiştir ile Inter yap",
+    "sayfanın okunabilirlik seviyesini artır",
+    "can you apply better text styling to the cards?",
+    "font değiştir: body için Roboto kullan",
+    "metin okunabilirlik kurallarına uygun mu kontrol et",
+    "I need better text styling for the product descriptions",
+    "mobil cihazlarda okunabilirlik iyileştirmesi gerekiyor",
+    "text styling ayarlarını güncelleyip type scale oluştur",
+    "how do I font değiştir for the navigation labels?"
+  ],
+  "should_not_trigger": [
+    "renk paleti değiştir ve tema güncelle",
+    "run vitest on the typography component",
+    "create a git commit for style changes",
+    "supabase veritabanında yeni sütun ekle",
+    "run lighthouse performance audit",
+    "translate button labels to Turkish",
+    "write an RLS policy for user data",
+    "run fallow dead-code analysis"
+  ]
+}

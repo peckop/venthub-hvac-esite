@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "tasarım yap",
+    "renk seç",
+    "style fix",
+    "Tailwind styling",
+    "dashboard için tasarım yap",
+    "projenin ana renk seç paleti ne olmalı?",
+    "broken card layout needs a style fix",
+    "can you apply Tailwind styling to the sidebar?",
+    "HVAC kontrol paneli için tasarım yap lütfen",
+    "I need to renk seç for the dark mode theme",
+    "navbar alignment issues, style fix needed",
+    "Tailwind styling ile responsive grid oluştur"
+  ],
+  "should_not_trigger": [
+    "font ailesini ve type scale'i değiştir",
+    "run vitest on the UI components",
+    "create a conventional git commit",
+    "supabase client ile kullanıcı verisi çek",
+    "write a database migration script",
+    "run fallow dead-code analysis",
+    "generate a PRD from the design discussion",
+    "deploy the UI changes to staging"
+  ]
+}

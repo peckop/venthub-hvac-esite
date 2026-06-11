@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "nlm sync",
+    "defteri güncelle",
+    "hafızayı yenile",
+    "projedeki dokümanları nlm sync ile eşitle",
+    "can you run nlm sync to update the notebook?",
+    "NotebookLM kaynağını defteri güncelle ile yenile",
+    "I need to hafızayı yenile after the documentation changes",
+    "nlm sync çalıştır ve son değişiklikleri gönder",
+    "defteri güncelle komutuyla kaynakları tazele",
+    "hafızayı yenile: yeni eklenen markdown dosyaları var",
+    "run nlm sync to push the latest docs",
+    "dokümanlar değişti, defteri güncelle lütfen"
+  ],
+  "should_not_trigger": [
+    "NotebookLM'den HVAC standartlarını sorgula",
+    "run vitest on the sync module",
+    "create a git commit for the docs",
+    "generate a tree diagram with orion cli",
+    "veritabanı tablolarını listele",
+    "add i18n translations for new labels",
+    "change typography scale settings",
+    "run lighthouse audit on the docs page"
+  ]
+}

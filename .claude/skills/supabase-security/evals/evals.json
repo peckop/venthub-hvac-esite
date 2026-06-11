@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "migration yaz",
+    "policy oluştur",
+    "RLS",
+    "users tablosu için migration yaz",
+    "can you create an RLS policy for the projects table?",
+    "yeni tablo için policy oluştur",
+    "I need a middleware redirect for unauthenticated users",
+    "migration yaz: catalog tablosuna yeni sütun ekle",
+    "RLS kurallarını güncelle ve test et",
+    "how do I set up middleware redirect for role-based access?",
+    "veritabanı güvenliği için policy oluştur lütfen",
+    "migration yaz ve schema değişikliğini uygula"
+  ],
+  "should_not_trigger": [
+    "supabase client ile veri sorgula",
+    "run vitest on the auth middleware",
+    "create a conventional git commit",
+    "add i18n support for error messages",
+    "change the primary font family",
+    "run dead-code analysis on the project",
+    "generate a PRD from the meeting notes",
+    "deploy the latest changes to production"
+  ]
+}

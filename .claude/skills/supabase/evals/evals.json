@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "supabase client",
+    "servis yaz",
+    "db query",
+    "supabase client kullanarak veri çek",
+    "can you write a servis yaz for the projects table?",
+    "I need a db query to fetch user profiles",
+    "supabase client ile authentication servisini bağla",
+    "yeni bir CRUD servis yaz for the catalog module",
+    "db query yaparak aktif kullanıcıları listele",
+    "how do I use the supabase client for real-time subscriptions?",
+    "ürün listesi için servis yaz lütfen",
+    "run a db query to check the table schema"
+  ],
+  "should_not_trigger": [
+    "RLS policy oluştur ve güvenliği sağla",
+    "run vitest on the service layer",
+    "create a git commit for the API changes",
+    "add i18n translations for database error messages",
+    "change the dashboard color scheme",
+    "run lighthouse audit on the data page",
+    "generate project documentation with orion",
+    "run fallow dead-code check on services"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "enterprise audit",
+    "10/10 check",
+    "sprint delivery check",
+    "teslim öncesi enterprise audit çalıştır",
+    "can you run a 10/10 check before the release?",
+    "sprint delivery check ile L1-L12 adımlarını doğrula",
+    "I need an enterprise audit to get the final approval",
+    "10/10 check yaparak projenin teslime hazır olduğunu onayla",
+    "sprint sonu sprint delivery check raporu oluştur",
+    "enterprise audit ile tüm kalite kapılarını kontrol et",
+    "is the project passing the 10/10 check?",
+    "run a sprint delivery check for the HVAC module"
+  ],
+  "should_not_trigger": [
+    "pre-commit integrity check çalıştır",
+    "run vitest on the enterprise module",
+    "create a new git branch",
+    "supabase veritabanına migration ekle",
+    "change the audit dashboard layout",
+    "translate audit labels to English",
+    "run fallow dead-code analysis",
+    "generate project documentation"
+  ]
+}

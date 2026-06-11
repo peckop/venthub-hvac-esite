@@ -1,0 +1,361 @@
+{
+  "rontgen_name": "VentHub Global Mimari Röntgen (Enterprise Edition)",
+  "rontgen_date": "YYYY-MM-DD",
+  "git_commit_sha": "HEAD",
+  "agent_id": "Antigravity",
+  "checks": {
+    "1_zero_tolerance_linting": {
+      "target": "ESLint kod standartlarına tam uyum sağlamalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "run",
+          "lint"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "2_strict_type_checking": {
+      "target": "TypeScript denetiminden sıfır (0) hata ile geçilmeli.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "run",
+          "type-check"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "3_lockfile_consistency_guard": {
+      "target": "pnpm-lock.yaml ve package.json tamamen senkron olmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "install",
+          "--frozen-lockfile"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "4_i18n_leakage_check": {
+      "target": "JSX, TSX içindeki kullanıcıya dönük hardcoded metinler bulunmamalı.",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "node",
+        "args": [
+          ".agent/skills/venthub-global-rontgen/i18n_ast_checker.mjs"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "5_build_and_bundle_size_guard": {
+      "target": "Next.js Build işleminin pürüzsüz bitmesi ve rotaların boyut ölçümü uyarısı (WARNING).",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "run",
+          "build"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "6_unit_test_gate": {
+      "target": "Birim testlerin başarıyla geçilmesi.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "pnpm",
+        "args": [
+          "test",
+          "--",
+          "--run"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "7_route_ssot_enforcement": {
+      "target": "Hardcoded path kaçaklarını önleme. Merkezi SSOT rota sabitleri (Routes.xx) kullanılmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "href=\"/|\\.push\\('/",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "8_next15_async_params_guard": {
+      "target": "Next.js 15: Dinamik rotalardaki params kesinlikle await edilmelidir.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "params\\.[a-zA-Z]+",
+          "src/app/",
+          "--exclude=await params"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "9_modern_image_optimization": {
+      "target": "SEO ve LCP Core Web Vitals hedefleri için ham <img > etiketi kullanımı yasaktır. Kesinlikle next/image <Image> bileşeni kullanılmalıdır.",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "<img ",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "10_seo_and_uuid_leakage": {
+      "target": "JSON-LD, SEO sitemap veya yönlendirmelerde UUID sızıntısı kalmamalı. Yalnızca 'slug' kullanılmalı.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "href=\"/products/[0-9a-fA-F\\-]{36}",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "11_registry_process_integrity": {
+      "target": "Kalıcı hafıza dosyalarında (PULSE.md, plan.json) boş (placeholder '...') kullanımının engellenmesi.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "\\.\\.\\.",
+          "registry/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "12_client_boundary_rontgen": {
+      "target": "Client sızıntısı: 'use client' layout veya ana Root component'lerde değil, uç/yaprak bileşenlerde barınmalı.",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "use client",
+          "src/views/",
+          "src/app/layout.tsx"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "13_cors_wildcard_guard": {
+      "target": "Auth endpoint lerde Access-Control-Allow-Origin: * kullanilmamali.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "Access-Control-Allow-Origin.*\\\\*",
+          "src/app/api/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "14_service_role_leak": {
+      "target": "service_role anahtari NEXT_PUBLIC_ prefixi ile client a sizmamali.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "NEXT_PUBLIC.*service_role|NEXT_PUBLIC.*SERVICE_ROLE",
+          "src/",
+          ".env"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "15_hardcoded_localhost": {
+      "target": "Production kodunda localhost URL kalintisi bulunmamali.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "http://localhost[:\\\\d]*",
+          "src/",
+          "supabase/functions/",
+          "--exclude=\\\\.env|\\\\.example|__tests__|siteUrl.ts|LoginPage.tsx|AdminAuditLogPage.tsx|AdminMovementsPage.tsx"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "16_stripe_idempotency": {
+      "target": "Stripe checkout.sessions.create cagrilarinda idempotencyKey kullanilmali.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "sessions\\.create",
+          "supabase/functions/",
+          "src/app/api/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Varlik kontrolu."
+    },
+    "17_ui_data_integrity": {
+      "target": "UI da NaN, undefined, [object Object] gibi ham veri sizintisi olmamali.",
+      "enforcement_level": "WARNING",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          ">\\\\s*(NaN|undefined|object Object)\\\\s*<|\\\\{\\\\s*(NaN|undefined|object Object)\\\\s*\\\\}",
+          "src/views/",
+          "src/components/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "18_hmac_webhook_verification": {
+      "target": "Webhook endpoint'lerinde HMAC-SHA256 (hmacValid veya signature) kontrolü yapılmalı.",
+      "enforcement_level": "STRICT",
+      "presence_check": true,
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "hmacValid|x-webhook-secret|x-signature|Stripe-Signature",
+          "supabase/functions/",
+          "src/app/api/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "19_seo_hreflang_alternates": {
+      "target": "Sitemap alternates language SEO hreflang yapıları tanımlı olmalıdır.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "alternates.*languages|languages.*tr.*en",
+          "src/app/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "20_ppr_hydration_boundary": {
+      "target": "useSearchParams kullanan client bileşenleri Suspense sarmalayıcısına sahip olmalıdır.",
+      "enforcement_level": "STRICT",
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "useSearchParams",
+          "src/components/",
+          "src/app/[lang]/",
+          "--exclude=ClientLayout.tsx"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    },
+    "21_supabase_golden_triad": {
+      "target": "SQL migration dosyalarında GRANT, ENABLE RLS ve CREATE POLICY sırayla tanımlanmalı, user_metadata yerine app_metadata tercih edilmelidir.",
+      "enforcement_level": "STRICT",
+      "presence_check": true,
+      "executor": {
+        "tool": "regex_scan",
+        "args": [
+          "ENABLE ROW LEVEL SECURITY|GRANT.*TO|CREATE POLICY|app_metadata|jwt_role",
+          "supabase/migrations/"
+        ],
+        "expected_exit_codes": [
+          0
+        ]
+      },
+      "status": "PENDING",
+      "evidence": ""
+    }
+  },
+  "overall_ship_status": "BLOCKED | CONDITIONAL | READY"
+}

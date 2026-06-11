@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "performans optimize et",
+    "waterfall fix",
+    "RSC optimization",
+    "bu sayfayı performans optimize et",
+    "can you apply a waterfall fix to the data fetching?",
+    "I need RSC optimization for the product listing",
+    "performans optimize et: server component'ları iyileştir",
+    "waterfall fix yaparak paralel veri çekmeyi sağla",
+    "how do I apply RSC optimization for streaming SSR?",
+    "client bundle'ı küçültmek için performans optimize et",
+    "data loading waterfall fix needed for the dashboard",
+    "RSC optimization ile sunucu tarafı rendering'i hızlandır"
+  ],
+  "should_not_trigger": [
+    "React compound component pattern uygula",
+    "run vitest on the performance tests",
+    "create a conventional git commit",
+    "supabase client ile veri sorgula",
+    "change the navigation bar design",
+    "translate performance labels to Turkish",
+    "run lighthouse audit on the homepage",
+    "write a database migration script"
+  ]
+}

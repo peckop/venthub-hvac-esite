@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "metin ekle",
+    "çeviri yap",
+    "i18n dictionary update gerekiyor",
+    "bu butona yeni bir metin ekle",
+    "sayfadaki labelleri çeviri yap ile Türkçeye çevir",
+    "how do I add i18n support to a new component?",
+    "dictionary update for the new error messages",
+    "i18n kurallarına uygun şekilde metin ekle",
+    "can you çeviri yap for the settings page labels?",
+    "update the i18n dictionaries with missing keys",
+    "yeni eklenen modül için dictionary update yap",
+    "I need to add i18n translations for the dashboard"
+  ],
+  "should_not_trigger": [
+    "change the font family to Inter",
+    "supabase client ile veri çek",
+    "run lighthouse audit on the homepage",
+    "create a compound React component",
+    "veritabanı şemasında RLS policy ekle",
+    "deploy the project to staging",
+    "run dead-code analysis with fallow",
+    "generate a PRD document from notes"
+  ]
+}

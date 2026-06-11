@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "diff review",
+    "commit check",
+    "son değişikliklerin diff review'ını yap",
+    "PR göndermeden önce git diff check yapar mısın?",
+    "can you do a diff review of my staged changes?",
+    "I need a commit check before pushing",
+    "koddaki değişiklikleri diff review ile analiz et",
+    "is there a way to run a git diff check on this branch?",
+    "commit öncesi commit check gerekiyor",
+    "review the git diff check results for dangerous patterns",
+    "bu PR için diff review yapılmalı",
+    "please run a commit check on the latest changes"
+  ],
+  "should_not_trigger": [
+    "create a new git branch for the feature",
+    "commit yap ve push et",
+    "run eslint on the entire project",
+    "deploy the application to production",
+    "write unit tests for the auth module",
+    "change the button color to blue",
+    "veritabanı migration dosyası oluştur",
+    "translate the error messages to Turkish"
+  ]
+}
