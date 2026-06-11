@@ -23,7 +23,219 @@ graph TD
 
 ---
 
-## 1. Yetenek: diff-review
+## 1. Yetenek: codegraph
+> **Açıklama:** Codebase intelligence via CodeGraph MCP. Use for caller/callee analysis, impact assessment, dependency chain exploration, and symbol search. Trigger for import analysis, 'who uses X', 'what calls Y', impact analysis, or dependency exploration. Do NOT use for database operations, git commands, running tests, or font styling.
+
+**Klasör Yolu:** `.agent/skills/codegraph/`
+
+# CodeGraph — Codebase Intelligence Skill
+
+## Overview
+
+CodeGraph is a SQLite-backed knowledge graph that indexes every symbol, edge, and file in the workspace. It provides sub-millisecond read access to structural relationships (callers, callees, dependencies, impact) that would otherwise require expensive grep + file-read loops. Use CodeGraph **before** writing or editing code to understand blast radius, dependency chains, and symbol locations.
+
+### When to Use
+
+- **Pre-refactoring**: Understand what will break before you touch anything
+- **Architecture questions**: "How does X work?", "What calls Y?"
+- **Import/dependency analysis**: Trace the full dependency chain of any module
+- **Dead code detection**: Find components or functions with zero callers
+- **Change propagation**: Know which files a modification will ripple through
+
+### When NOT to Use
+
+- Database operations (migrations, queries, RLS policies)
+- Git commands (commit, branch, merge)
+- Running tests (Vitest, Playwright, Lighthouse)
+- Font styling or typography adjustments
+
+---
+
+## Available Tools
+
+All tools are called via the `codegraph` MCP server using `call_mcp_tool`.
+
+| Tool | Description | Key Parameters | When to Use |
+|------|-------------|----------------|-------------|
+| `codegraph_explore` | **PRIMARY** — Returns verbatim source of relevant symbols grouped by file. Usually the ONLY call needed. | `query` (natural language or symbol names), `maxFiles` (default 12) | Almost any question: "how does X work", architecture, bugs, surveying an area |
+| `codegraph_search` | Quick symbol search by name. Returns locations only (no code). | `query`, `kind` (function/method/class/interface/type/variable/route/component), `limit` | Finding a symbol's location before deeper analysis |
+| `codegraph_callers` | Lists all functions/components that call a given symbol. | `symbol`, `limit` (default 20) | "Who calls this?", "Who imports this?" |
+| `codegraph_callees` | Lists all functions/components that a given symbol calls. | `symbol`, `limit` (default 20) | "What does this function depend on?" |
+| `codegraph_impact` | Lists symbols affected by changing a given symbol. Traverses dependency levels. | `symbol`, `depth` (default 2) | Pre-refactor blast radius analysis |
+| `codegraph_node` | Full detail for ONE symbol — location, signature, callers/callees trail, optional verbatim body. Handles overloaded names. | `symbol`, `includeCode` (default false), `file`, `line` | When `codegraph_explore` trimmed a body you need, or disambiguating overloaded names |
+| `codegraph_files` | Indexed file tree with language + symbol counts. Faster than glob for project layout. | `path`, `pattern`, `format` (tree/flat/grouped), `maxDepth` | Understanding project structure, filtering by directory or glob |
+| `codegraph_status` | Index health check: file counts, node counts, edge counts. | `projectPath` | Debugging index freshness issues |
+
+### Example MCP Call
+
+```
+call_mcp_tool(
+  ServerName: "codegraph",
+  ToolName: "codegraph_callers",
+  Arguments: { "symbol": "OrbitalProductsShowcase" }
+)
+```
+
+---
+
+## Use Cases
+
+### 1. Pre-Refactoring Impact Analysis
+
+Before renaming, moving, or restructuring a symbol, understand the full blast radius:
+
+```
+Step 1: codegraph_impact → symbol: "Footer", depth: 3
+Step 2: Review all affected symbols and files
+Step 3: Plan migration path based on dependency graph
+```
+
+### 2. Finding All Consumers of a Component
+
+Discover every place a React component or hook is imported and used:
+
+```
+Step 1: codegraph_callers → symbol: "useCategories"
+Step 2: Review caller locations and usage patterns
+```
+
+### 3. Understanding Import / Dependency Chains
+
+Trace the full dependency chain of any module or page:
+
+```
+Step 1: codegraph_explore → query: "products page data flow CategoryMasterView"
+Step 2: Follow the callee chain for deeper understanding
+```
+
+### 4. Dead Code Detection
+
+Find components, functions, or hooks with zero callers:
+
+```
+Step 1: codegraph_files → path: "src/components", pattern: "*.tsx"
+Step 2: For each symbol, codegraph_callers → check for 0 results
+Step 3: Flag unreferenced symbols as potential dead code
+```
+
+### 5. Change Propagation Analysis
+
+Understand the ripple effect of modifying a shared utility:
+
+```
+Step 1: codegraph_impact → symbol: "cn", depth: 2
+Step 2: Group affected files by feature area
+Step 3: Create a scoped test plan covering all impacted areas
+```
+
+---
+
+## Workflow Examples
+
+### "Who imports OrbitalProductsShowcase?"
+
+```
+Tool:   codegraph_callers
+Args:   { "symbol": "OrbitalProductsShowcase" }
+Result: List of all files and functions that reference this component
+```
+
+### "What will break if I change Footer.tsx?"
+
+```
+Tool:   codegraph_impact
+Args:   { "symbol": "Footer", "depth": 3 }
+Result: Full dependency tree of symbols affected by changes to Footer
+```
+
+### "Find all THREE.js usage"
+
+```
+Tool:   codegraph_search
+Args:   { "query": "THREE", "limit": 20 }
+Result: All symbols referencing THREE.js with their locations and kinds
+```
+
+### "Show dependency chain for the products page"
+
+```
+Tool:   codegraph_explore
+Args:   { "query": "products page route CategoryMasterView data fetching" }
+Result: Verbatim source of relevant symbols grouped by file, showing the full data flow
+```
+
+### "What does the useCategories hook depend on?"
+
+```
+Tool:   codegraph_callees
+Args:   { "symbol": "useCategories" }
+Result: All functions, services, and APIs that useCategories calls internally
+```
+
+### "Show me the project structure under src/components"
+
+```
+Tool:   codegraph_files
+Args:   { "path": "src/components", "format": "tree", "maxDepth": 3 }
+Result: Hierarchical file tree with language tags and symbol counts
+```
+
+---
+
+## Common Tool Chains
+
+| Goal | Chain |
+|------|-------|
+| Flow / "how does X reach Y" | ONE `codegraph_explore` with symbol names spanning the flow |
+| Onboarding / understanding an area | ONE `codegraph_explore` (follow up with `codegraph_node` if needed) |
+| Refactor planning | `codegraph_search` → `codegraph_callers` → `codegraph_impact` |
+| Debugging a regression | `codegraph_callers` of suspected symbol; widen with `codegraph_impact` |
+| Project layout overview | `codegraph_files` with desired format and depth |
+
+---
+
+## Integration with Other Skills
+
+### multi-agent-research
+
+CodeGraph answers structural code queries (callers, callees, dependency chains) that research subagents would otherwise need grep + read loops to resolve. Use `codegraph_explore` as the primary source for code structure questions in research workflows.
+
+### diff-review
+
+Before committing, use `codegraph_impact` on each modified symbol to verify the blast radius matches expectations. Combines well with the diff-review skill's pre-commit checks.
+
+### venthub-auditor
+
+CodeGraph's caller analysis enables dead-code detection at the symbol level. The auditor can flag components with zero callers as candidates for removal, complementing the auditor's integrity checks.
+
+### fallow
+
+CodeGraph provides symbol-level dependency data that complements Fallow's module-level analysis. Use CodeGraph for fine-grained "who calls this function" queries and Fallow for broader unused-dependency and circular-dependency detection.
+
+---
+
+## Anti-Patterns
+
+- **Do NOT grep first** when looking up a symbol — `codegraph_search` is faster and more accurate (AST-parsed, not text-matched).
+- **Do NOT chain `codegraph_search` + `codegraph_node`** to understand an area — ONE `codegraph_explore` returns everything in a single round-trip.
+- **Do NOT loop `codegraph_node` over many symbols** — `codegraph_explore` returns them all grouped by file in one call.
+- **Do NOT re-verify codegraph results with grep** — they come from a full AST parse and are more accurate than text search.
+- **After editing, check the staleness banner** — when a tool response shows "⚠️ Some files referenced below were edited since the last index sync…", read those specific files for accurate content. Trust codegraph for everything else.
+
+---
+
+## AXIOMS
+
+1. **CodeGraph is always the first tool for structural queries.** Before using grep, file-read, or manual search, check if CodeGraph can answer the question directly.
+2. **`codegraph_explore` is the primary entry point.** Start with explore for any "how does X work" or "what is X" question. Only reach for specialized tools (`callers`, `callees`, `impact`) when you need a specific relationship.
+3. **Trust AST over text.** CodeGraph's index is built from full AST parsing. Its results are more reliable than regex-based search for structural relationships.
+4. **Index freshness matters.** The index lags file writes by ~1 second. After edits, check the staleness banner and use `codegraph_status` if debugging freshness.
+5. **Cross-file resolution is best-effort.** Ambiguous calls may return multiple candidates. Use the `file` and `line` parameters on `codegraph_node` to disambiguate.
+6. **CodeGraph supplements, not replaces.** TypeScript compiler, test suites, and linters still own correctness validation. CodeGraph provides structural context they don't have.
+
+---
+
+## 2. Yetenek: diff-review
 > **Açıklama:** Git diff çıktılarını analiz ederek yıkıcı ve tehlikeli kod örüntülerini (pattern) tespit eder. Sadece kod değişikliklerini (git diff veya commit öncesi) incelemek için kullanın. Yeni git branch'i oluşturma, kod commit'leme veya genel git işlemleri için KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/diff-review/`
@@ -62,7 +274,7 @@ const foo: any = parseUnknownData(); // diff-ignore: Dış API'den gelen veriye 
 
 ---
 
-## 2. Yetenek: enterprise-multiagent
+## 3. Yetenek: enterprise-multiagent
 > **Açıklama:** Orchestrates specialized worker-judge multi-agent teams for VentHub HVAC developments complying with strict quality baselines. Trigger when delegating tasks, starting a sprint, or managing multi-agent runs. Do NOT use for database resets, general git branch creation, text formatting, or running unit tests directly.
 
 **Klasör Yolu:** `.agent/skills/enterprise-multiagent/`
@@ -231,7 +443,7 @@ Hiçbir kod değişikliği aşağıdaki kapılardan geçmeden canlıya alınamaz
 
 ---
 
-## 3. Yetenek: fallow
+## 4. Yetenek: fallow
 > **Açıklama:** Codebase intelligence for JS/TS. Reports quality, dead-code, unused dependencies, circular dependencies, duplication, and complexity. Use when running fallow, dead-code checks, or unused dependency analysis. Do NOT use for database operations, environment installations, or general text/git/font formatting tasks.
 
 **Klasör Yolu:** `.agent/skills/fallow/`
@@ -340,7 +552,7 @@ cargo install fallow-cli        # build from source
 
 ---
 
-## 4. Yetenek: find-skills
+## 5. Yetenek: find-skills
 > **Açıklama:** Helps users search, discover, and install agent skills/capabilities based on queries like "how do I do X" or when they express interest in extending functionality. Do NOT use for general developer tasks like database reset, code formatting, git branch creation, or installing Node.js/tools on the host OS.
 
 **Klasör Yolu:** `.agent/skills/find-skills/`
@@ -485,7 +697,7 @@ npx skills init my-xyz-skill
 
 ---
 
-## 5. Yetenek: git-commit
+## 6. Yetenek: git-commit
 > **Açıklama:** Executes git commit commands, analyzes changes to generate conventional commit messages, and handles staging. Trigger for commit requests, conventional commits, or the /commit command. Do NOT use for other git operations (like creating a new branch) or general text formatting.
 
 **Klasör Yolu:** `.agent/skills/git-commit/`
@@ -610,7 +822,7 @@ EOF
 
 ---
 
-## 6. Yetenek: i18n-conventions
+## 7. Yetenek: i18n-conventions
 > **Açıklama:** Defines internationalization (i18n) conventions for VentHub. Use when translating text, updating dictionary files, adding/modifying JSX labels, or performing i18n dictionary updates. Do NOT use for styling fonts, database operations, or running test suites.
 
 **Klasör Yolu:** `.agent/skills/i18n-conventions/`
@@ -797,7 +1009,7 @@ VentHub projesi enterprise seviyesinde dil güvenliğini sağlamak için şu iki
 
 ---
 
-## 7. Yetenek: lighthouse-performance-guard
+## 8. Yetenek: lighthouse-performance-guard
 > **Açıklama:** Automates web page performance audits, Lighthouse tracing, and web vitals checks against performance guidelines to prevent regressions. Do NOT use for general database setup, running local unit tests (Vitest), formatting markdown tables, or styling fonts.
 
 **Klasör Yolu:** `.agent/skills/lighthouse-performance-guard/`
@@ -865,7 +1077,7 @@ Kritik sayfa rotalarında (Anasayfa, Ürün Detay, Sepet vb.) Lighthouse Perform
 
 ---
 
-## 8. Yetenek: multi-agent-research
+## 9. Yetenek: multi-agent-research
 > **Açıklama:** Reusable worker-judge multi-agent orchestrator for high-quality codebase research, architectural analysis, design, and RAG technical verification. Trigger when analyzing the codebase, performing RAG research, or executing architectural reviews. Do NOT use for database resets, formatting, git branching, or running local unit tests.
 
 **Klasör Yolu:** `.agent/skills/multi-agent-research/`
@@ -991,7 +1203,7 @@ Use the following curated repositories and NotebookLM digital twins as primary r
 
 ---
 
-## 9. Yetenek: notebook-navigator
+## 10. Yetenek: notebook-navigator
 > **Açıklama:** Use this skill to identify NotebookLM IDs and execute conceptual, architectural, RAG, or research queries requiring deep external domain knowledge. DO NOT use for local code changes, unit testing, git branching, formatting markdown tables, or styling fonts.
 
 **Klasör Yolu:** `.agent/skills/notebook-navigator/`
@@ -1112,7 +1324,7 @@ NotebookLM sadece statik bir doküman arşivi değil, kod tabanının ve mimarin
 
 ---
 
-## 10. Yetenek: notebooklm-sync
+## 11. Yetenek: notebooklm-sync
 > **Açıklama:** Projedeki Markdown (.md) dosyalarını NotebookLM ile senkronize (nlm sync) etmek, defteri güncellemek ve hafızayı yenilemek için kullanılır (Hard Reset). Kullanıcı NotebookLM'de arama yapmak istediğinde ASLA tetiklemeyin. Veritabanı sıfırlama, git işlemleri veya linter çalıştırma amacıyla KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/notebooklm-sync/`
@@ -1280,7 +1492,7 @@ Aşağıdaki senaryolarda hook çalışmaz veya yetersiz kalır — bu durumlard
 
 ---
 
-## 11. Yetenek: orion-cli
+## 12. Yetenek: orion-cli
 > **Açıklama:** Orion CLI dokümantasyon pipeline komutlarını öğretir, tree veya şema üretir. "doküman üret", "orion doc", veya "tree oluştur" istendiğinde tetikleyin. Kullanıcı sadece kod yazmak, debug yapmak, test çalıştırmak veya veritabanı/git işlemleri yapmak istediğinde ASLA tetiklemeyin.
 
 **Klasör Yolu:** `.agent/skills/orion-cli/`
@@ -1487,7 +1699,7 @@ orion memory synapse     ← ÖN KOŞUL: orion memory search
 
 ---
 
-## 12. Yetenek: performance-alignment
+## 13. Yetenek: performance-alignment
 > **Açıklama:** Coordinates collaborative, multi-turn RAG analysis with NotebookLM to diagnose and create performance alignment plans or performance trace analysis. Trigger for performance plans and RAG performance alignment queries. Do NOT use for general database reset, git commands, or typography styling.
 
 **Klasör Yolu:** `.agent/skills/performance-alignment/`
@@ -1535,7 +1747,7 @@ Bu skill, VentHub HVAC projesinde veya herhangi bir enterprise yazılım projesi
 
 ---
 
-## 13. Yetenek: skills-creator
+## 14. Yetenek: skills-creator
 > **Açıklama:** Automatically creates, updates, and optimizes modular agent skills. Trigger for creating new skills (yeni skill oluştur, skill yarat/optimize et), adding capabilities (yetenek ekle/oluştur), or compiling the manifest. Do NOT use for database operations, font formatting, or running general unit tests.
 
 **Klasör Yolu:** `.agent/skills/skills-creator/`
@@ -1625,7 +1837,7 @@ orion doc tree --nlm-sync --force-sync
 
 ---
 
-## 14. Yetenek: supabase
+## 15. Yetenek: supabase
 > **Açıklama:** Use when doing tasks involving Supabase products, client libraries, database client, writing services (servis yaz), or database queries (db query). Do NOT use for styling fonts, creating git branches, running unit tests, or formatting markdown tables.
 
 **Klasör Yolu:** `.agent/skills/supabase/`
@@ -1878,7 +2090,7 @@ Do NOT use `apply_migration` to change a local database schema — it writes a m
 
 ---
 
-## 15. Yetenek: supabase-security
+## 16. Yetenek: supabase-security
 > **Açıklama:** Defines RLS policies, database migrations (migration yaz), policies (policy oluştur), and security redirection middleware (middleware redirect). Do NOT use for font/typography adjustments, creating git branches, running unit tests, or general text formatting.
 
 **Klasör Yolu:** `.agent/skills/supabase-security/`
@@ -2103,7 +2315,7 @@ export async function POST(request: Request) {
 
 ---
 
-## 16. Yetenek: teamwork-director
+## 17. Yetenek: teamwork-director
 > **Açıklama:** Teamwork-preview prompt hazırlama yöneticisi. "takıma iş ver", "sprint başlat", "/teamwork-preview" veya teamwork-preview istendiğinde zenginleştirilmiş prompt hazırlar ve takıma delege eder. Veritabanı sıfırlama, git branch oluşturma, birim testi çalıştırma veya metin formatlama durumlarında KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/teamwork-director/`
@@ -2604,7 +2816,7 @@ Artifact status'unu ayarla: `Launched`.
 
 ---
 
-## 17. Yetenek: threejs-webgl-performance
+## 18. Yetenek: threejs-webgl-performance
 > **Açıklama:** Three.js ve React Three Fiber (R3F) tabanlı 3D render performansını optimize etmek, draw call'ları azaltmak, gölge işlemeyi yönetmek ve Lighthouse mobil skorlarını yükseltmek için pratik kuralları sunar.
 
 **Klasör Yolu:** `.agent/skills/threejs-webgl-performance/`
@@ -2908,7 +3120,7 @@ Three.js r165+ ile gelen `WebGPURenderer` ve TSL (Three.js Shading Language) des
 
 ---
 
-## 18. Yetenek: to-issues
+## 19. Yetenek: to-issues
 > **Açıklama:** Breaks a plan, specification, or PRD into structured issues or tasks. Trigger for creating issues (issue oluştur), dividing plans (planı böl), or tasks to issues. Do NOT use for general git operations, styling fonts, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/to-issues/`
@@ -2925,7 +3137,7 @@ Break a plan or PRD into vertical slices (tracer bullets) and write them as a ch
 
 ---
 
-## 19. Yetenek: to-prd
+## 20. Yetenek: to-prd
 > **Açıklama:** Turns the current conversation transcript or context into a structured PRD (Product Requirements Document). Trigger for generating a PRD (prd üret, prd oluştur, chat to prd). Do NOT use for git commands, styling fonts, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/to-prd/`
@@ -2948,7 +3160,7 @@ This skill takes the current conversation context and codebase understanding and
 
 ---
 
-## 20. Yetenek: typography
+## 21. Yetenek: typography
 > **Açıklama:** Applies typography principles for fonts, readability, text styling, type scales, and line spacing. Trigger for font modification (font değiştir), readability (okunabilirlik), or text styling. Do NOT use for general git operations, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/typography/`
@@ -3395,7 +3607,7 @@ See [tailwind-integration.md](references/tailwind-integration.md) for complete p
 
 ---
 
-## 21. Yetenek: ui-ux-pro-max
+## 22. Yetenek: ui-ux-pro-max
 > **Açıklama:** Provides UI/UX design recommendations, Tailwind styling, HSL colors, design patterns, and palettes. Trigger for UI design (tasarım yap), color selection (renk seç), styling fixes (style fix), and Tailwind styling. Do NOT use for git branch creation, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/ui-ux-pro-max/`
@@ -3716,7 +3928,7 @@ Before delivering UI code, verify these items:
 
 ---
 
-## 22. Yetenek: venthub-architecture
+## 23. Yetenek: venthub-architecture
 > **Açıklama:** Defines VentHub architecture, component patterns, and Next.js App Router rules. Trigger for creating new components (yeni bileşen oluştur), React Server Components (RSC render), or PPR configuration (PPR config). Do NOT use for git commands, database resets, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/venthub-architecture/`
@@ -3800,7 +4012,7 @@ E-ticaret sayfalarında aşağıdaki yapılandırılmış veriler zorunludur:
 
 ---
 
-## 23. Yetenek: venthub-auditor
+## 24. Yetenek: venthub-auditor
 > **Açıklama:** VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, pre-commit kontrolleri, bütünlük denetimi (bütünlük denetle) ve integrity check gerçekleştirir. Birim testlerini çalıştırmak (Vitest), git branch oluşturmak veya veritabanı sıfırlamak için KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-auditor/`
@@ -3889,7 +4101,7 @@ Bir görev ancak `check_integrity.py` V5 üzerinden 0 (sıfır) BLOCKER aldığ�
 
 ---
 
-## 24. Yetenek: venthub-catalog-importer
+## 25. Yetenek: venthub-catalog-importer
 > **Açıklama:** Ingests and validates HVAC catalog PDFs. Trigger for importing catalogs (katalog oku), scanning PDFs (pdf scan), and HVAC catalog imports. Do NOT use for running unit tests, creating git branches, or database resets.
 
 **Klasör Yolu:** `.agent/skills/venthub-catalog-importer/`
@@ -3959,7 +4171,7 @@ Ana Ajan (Proje Şefi), PDF işleme sürecini başlatırken sırasıyla şu alt 
 
 ---
 
-## 25. Yetenek: venthub-enterprise-audit
+## 26. Yetenek: venthub-enterprise-audit
 > **Açıklama:** Proje teslimi öncesi "10/10 Onay" denetim motorudur. L1-L12 adımlarını çalıştırıp PASS/FAIL raporu üretir. Tetikleyicileri: enterprise audit, 10/10 check, sprint delivery check. Genel linter denetimi, veritabanı sıfırlama veya git işlemleri için KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-enterprise-audit/`
@@ -4226,7 +4438,7 @@ BLOCKED    → Herhangi bir 🔴 STRICT kontrol FAIL → teslim yapılamaz
 
 ---
 
-## 26. Yetenek: venthub-global-rontgen
+## 27. Yetenek: venthub-global-rontgen
 > **Açıklama:** Proje genelini radar ve rontgen komutlarıyla fiziki olarak tarar. Tetikleyicileri: rontgen, radar, global scan, linter check. Veritabanı sıfırlama, genel git işlemleri veya sadece birim testleri çalıştırmak amacıyla KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-global-rontgen/`
@@ -4358,7 +4570,7 @@ Sisteme yalan söyleyemezsin. Gözle baktığın hiçbir şeye `PASS` verme, yal
 
 ---
 
-## 27. Yetenek: vercel-composition-patterns
+## 28. Yetenek: vercel-composition-patterns
 > **Açıklama:** React composition patterns that scale, including compound component design, context providers, and component refactoring. Trigger for component refactoring (component refactor) and compound component design. Do NOT use for general git operations, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/vercel-composition-patterns/`
@@ -4441,7 +4653,7 @@ For the complete guide with all rules expanded: `AGENTS.md`
 
 ---
 
-## 28. Yetenek: vercel-react-best-practices
+## 29. Yetenek: vercel-react-best-practices
 > **Açıklama:** React and Next.js performance optimization guidelines from Vercel. Trigger for performance optimization (performans optimize et), waterfall fixes (waterfall fix), or RSC optimization. Do NOT use for git branch creation, database resets, or formatting markdown tables.
 
 **Klasör Yolu:** `.agent/skills/vercel-react-best-practices/`
@@ -4589,7 +4801,7 @@ For the complete guide with all rules expanded: `AGENTS.md`
 
 ---
 
-## 29. Yetenek: web-design-guidelines
+## 30. Yetenek: web-design-guidelines
 > **Açıklama:** Reviews UI code for Web Interface Guidelines and design compliance. Trigger for accessibility checks (erişilebilirlik denetle, a11y check), or design guidelines checks. Do NOT use for git commands, styling fonts, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/web-design-guidelines/`

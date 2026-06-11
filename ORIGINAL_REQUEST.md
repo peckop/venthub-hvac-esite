@@ -259,3 +259,92 @@ Tüm kabul kriterleri aşağıdaki sırayla doğrulanmalıdır:
 4. `README.md`, `CHANGELOG.md` ve `RECOMMENDATIONS.md` dosyalarındaki değişiklikleri git diff ile doğrula.
 5. `pnpm run build`
 
+## Follow-up — 2026-06-10T15:00:34+03:00
+
+VentHub HVAC e-ticaret sitesinin Lighthouse performans puanını Desktop 37→85+, Mobile 30→70+ seviyesine çıkarmak. Mevcut 3 kritik metrik (TBT 13,680ms, CLS 0.656, SI 7.9s) düzeltilecek. Plan NLM dijital ikiz tarafından doğrulanmış ve onaylanmıştır.
+
+Working directory: c:\Users\alize\venthub-hvac
+Integrity mode: development
+
+## Requirements
+
+### R1. CLS Fix — Footer Layout Shift (0.656 → <0.1)
+`src/components/Footer.tsx` bileşenine Tailwind token ile min-height ekle (arbitrary class YASAK — enterprise kuralı). Footer içindeki logo/görsellere explicit width/height attribute ekle. Products grid container'a `content-visibility: auto` + `contain-intrinsic-size` ekle.
+
+### R2. TBT Fix — Three.js Lazy-Load ve Code Splitting (13,680ms → <500ms)
+- `src/components/products/CategoryOrbitCarousel.tsx` L10: `OrbitalProductsShowcase` statik import → `next/dynamic` + `ssr: false`
+- `src/views/CategoryMasterView.tsx` L9-13: 5 view variant statik import → `next/dynamic`
+- `src/components/navigation/StickyHeader.tsx` L30: `React.lazy()` → `next/dynamic` (SearchOverlay, CategoryHubOverlay, MegaMenu)
+- Projede mevcut `src/components/LazyInView.tsx` bileşenini 3D Canvas container'lara uygula (YENİ BİLEŞEN YAZMA)
+- Below-fold 3D container'lara `.content-auto` sınıfı + `contain-intrinsic-size` ekle
+- Her `next/dynamic` bileşenini `<Suspense fallback={<Skeleton />}>` ile sarmala — skeleton boyutları gerçek bileşenle eşleşmeli
+
+### R3. Network Optimizasyonu — HDR ve Polyfill Temizliği
+- 6 navigasyon bileşeninden `<Environment preset="city"/>` kaldır → `<ambientLight intensity={0.8} />` + `<directionalLight position={[5,5,5]} intensity={1} />` ile değiştir. Dosyalar: CategoryCard3D.tsx, MegaMenu3DBackground.tsx, CategoryHubOverlay.tsx, CategorySpotlightScene.tsx, InfiniteProductsShowcase.tsx, OrbitalProductsShowcase.tsx
+- `Product3DViewer.tsx` için self-hosted düşük çözünürlüklü HDR kullan: `<Environment files="/env/city_256.hdr" />`
+- `package.json` browserslist güncelle: `["chrome >= 90", "firefox >= 90", "safari >= 15", "edge >= 90"]` — legacy polyfill'leri kaldır
+
+### R4. Mimari Kurallar (Kırılma Önleme)
+- Arbitrary Tailwind class (`min-h-[320px]` gibi) KULLANMA — sadece token: `min-h-80`, `min-h-96`, `min-h-hvac-hero`
+- `React.lazy()` KULLANMA — sadece `next/dynamic` (AX-08 kuralı)
+- 3D skeleton'larda `PlaceholderWireframe` deseni kullan (AX-09)
+- Mevcut `LazyInView` bileşenini kullan, yeni wrapper YAZMA
+
+## Acceptance Criteria
+
+### Build Integrity
+- [ ] `npx tsc --noEmit` — 0 hata
+- [ ] `npx next build` — başarılı, 0 hata
+
+### Bundle Size
+- [ ] `pnpm run analyze` çalıştırıldığında hiçbir chunk 500KB'ı geçmemeli
+- [ ] Three.js chunk'ı initial JS payload'ından ayrılmış olmalı (ayrı chunk'ta)
+
+### Performance Metrics (Lighthouse Emülasyon)
+- [ ] TBT < 500ms (mevcut: 13,680ms)
+- [ ] CLS < 0.1 (mevcut: 0.656)
+- [ ] Footer elementi 0 CLS üretmeli
+- [ ] Three.js bileşenleri viewport'a girene kadar yüklenmemeli
+
+### Code Quality
+- [ ] Projede hiçbir `React.lazy()` kullanımı kalmamalı — hepsi `next/dynamic`
+- [ ] `<Environment preset="city"/>` navigasyon bileşenlerinde kalmamalı (sadece Product3DViewer hariç)
+- [ ] Arbitrary Tailwind class (`min-h-[...]`, `h-[...]`) eklenmemiş olmalı
+- [ ] `OrbitalProductsShowcase` artık `CategoryOrbitCarousel` içinde statik import edilmemeli
+
+### Verification Commands
+```bash
+# 1. TypeScript
+npx tsc --noEmit
+
+# 2. Build
+npx next build
+
+# 3. Bundle analiz
+pnpm run analyze
+
+# 4. Grep kontrolleri
+grep -r "React.lazy" src/ --include="*.tsx" --include="*.ts"    # 0 sonuç olmalı
+grep -r "preset=\"city\"" src/components/navigation/ --include="*.tsx"  # 0 sonuç olmalı
+grep -rn "import.*OrbitalProductsShowcase" src/components/products/CategoryOrbitCarousel.tsx  # dynamic import olmalı
+```
+
+## Follow-up — 2026-06-10T15:01:41+03:00
+
+Kullanıcı talebi doğrultusunda, sprint hedeflerine dokümantasyon güncellemesini de ekliyoruz. Lütfen gereksinimleri ve kabul kriterlerini aşağıdaki şekilde güncelleyip yürütmeye dahil et:
+
+1. Gereksinimlere R5 olarak ekle:
+### R5. Dokümantasyon Güncellemesi
+Tüm geliştirme tamamlandıktan sonra, yapılan değişiklikleri yansıtacak şekilde kök dizindeki ilgili markdown dosyaları güncellenmelidir:
+- `README.md` — Yeni mimari yapı, dynamic import değişiklikleri, 3D optimizasyonları ve proje yapısı güncellemeleri.
+- `CHANGELOG.md` — Yapılan tüm değişikliklerin kronolojik kaydı.
+**DİKKAT:** `CONTEXT.md` dosyasına DOKUNULMAMALIDIR — bu dosya NotebookLM tarafından yönetilir.
+
+2. Kabul Kriterlerine (Acceptance Criteria) ekle:
+### Documentation
+- [ ] `README.md` güncellenmiş olmalı
+- [ ] `CHANGELOG.md` tüm değişiklikleri içermeli
+- [ ] `CONTEXT.md` dosyasına dokunulmamış olmalı
+
+Lütfen bu güncellemeyi orkestratör subagent'a ve tüm ekiplere ilet.
+

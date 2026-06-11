@@ -2,16 +2,20 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-08T12:27:54.797029+00:00
+compiled_at: 2026-06-11T09:27:37.835343+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-08T12:27:54.797029+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-11T09:27:37.835343+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
 📂 venthub-hvac/
+├── 📂 ** .agents/**
+│   └── 📂 **explorer_m4_1_gen2/**
+│       └── ⚠️ `handoff.md`
 ├── ⚪ `CHANGELOG.md`
+├── ⚠️ `CLAUDE.md`
 ├── ⚪ `CONTEXT.md`
 ├── ⚠️ `ORIGINAL_REQUEST.md`
 ├── ⚠️ `PROJECT.md`
@@ -19,6 +23,8 @@ Bu belge, otonom derleyici tarafından 2026-06-08T12:27:54.797029+00:00 tarihind
 ├── ⚪ `RECOMMENDATIONS.md`
 ├── ⚠️ `TEST_INFRA.md`
 ├── ⚠️ `TEST_READY.md`
+├── ⚠️ `VISION.md`
+├── 📂 **cache/**
 ├── 📂 **docs/**
 │   ├── 📂 **archive/**
 │   │   ├── ⚪ `014-kategori-ssr-plan.md`
@@ -35,8 +41,11 @@ Bu belge, otonom derleyici tarafından 2026-06-08T12:27:54.797029+00:00 tarihind
 │   │   ├── ⚪ `plan-and-tasklist-current.md`
 │   │   ├── ⚪ `plan-and-tasklist.md`
 │   │   └── ⚪ `project_state_and_skills_audit.md`
+│   ├── 📂 **audits/**
+│   │   └── ⚪ `admin-panel-audit-2026-06-11.md`
 │   ├── ⚪ `database_schema_master.md`
 │   ├── ⚪ `design_system_config.md`
+│   ├── ⚪ `lighthouse_diagnostic_2026-06-10.md`
 │   ├── 📂 **products/**
 │   │   ├── ⚪ `AIR_DOOR_AD_900_MASTER.md`
 │   │   └── ⚪ `AIR_DOOR_AD_900_SEO.md`
@@ -56,6 +65,8 @@ Bu belge, otonom derleyici tarafından 2026-06-08T12:27:54.797029+00:00 tarihind
 │   ├── ⚪ `venthub_saas_master_roadmap.md`
 │   ├── ⚪ `venthub_skills_master.md`
 │   └── ⚪ `vortice_catalogs.md`
+├── 📂 **explorer_m2_3/**
+│   └── ⚠️ `analysis.md`
 ├── ⚠️ `implementation_plan.md`
 ├── 📂 **memory-engine/**
 │   └── ⚪ `README.md`
@@ -65,7 +76,6 @@ Bu belge, otonom derleyici tarafından 2026-06-08T12:27:54.797029+00:00 tarihind
 ├── ❌ `sentry.server.config.ts`
 ├── 📂 **src/**
 │   ├── 📂 **actions/**
-│   │   └── ✅ `auth.ts`
 │   ├── 📂 **app/**
 │   │   ├── 📂 **[lang]/**
 │   │   │   ├── 📂 **about/**
@@ -338,7 +348,7 @@ Bu belge, otonom derleyici tarafından 2026-06-08T12:27:54.797029+00:00 tarihind
 │   │   │   ├── ✅ `CategoryCard3D.tsx`
 │   │   │   ├── ✅ `CategoryHubOverlay.tsx`
 │   │   │   ├── ✅ `CategorySpotlightScene.tsx`
-│   │   │   ├── ✅ `EliteMegaMenu.tsx`
+│   │   │   ├── ❌ `EliteMegaMenu.tsx`
 │   │   │   ├── ✅ `MegaMenu3DBackground.tsx`
 │   │   │   ├── ✅ `NavActionButton.tsx`
 │   │   │   ├── ✅ `NavBrand.tsx`
@@ -362,22 +372,22 @@ Bu belge, otonom derleyici tarafından 2026-06-08T12:27:54.797029+00:00 tarihind
 │   │   │   │   │   └── 📂 **parts/**
 │   │   │   │   │       ├── ✅ `BoxAndBase.tsx`
 │   │   │   │   │       ├── ✅ `GreenClamps.tsx`
-│   │   │   │   │       ├── ✅ `InternalFanRotor.tsx`
+│   │   │   │   │       ├── ❌ `InternalFanRotor.tsx`
 │   │   │   │   │       └── ✅ `MainChassis.tsx`
 │   │   │   │   ├── 📂 **materials/**
-│   │   │   │   │   └── ✅ `useFanMaterials.ts`
+│   │   │   │   │   └── ❌ `useFanMaterials.ts`
 │   │   │   │   ├── 📂 **parts/**
 │   │   │   │   │   ├── ✅ `Housing.tsx`
-│   │   │   │   │   ├── ✅ `Impeller.tsx`
+│   │   │   │   │   ├── ❌ `Impeller.tsx`
 │   │   │   │   │   ├── ✅ `Motor.tsx`
-│   │   │   │   │   └── ✅ `Silencer.tsx`
+│   │   │   │   │   └── ❌ `Silencer.tsx`
 │   │   │   │   └── 📂 **types/**
 │   │   │   │       ├── ✅ `AccessoryModel.tsx`
 │   │   │   │       ├── ✅ `AirCurtainModel.tsx`
 │   │   │   │       ├── ✅ `AirPurifierModel.tsx`
 │   │   │   │       ├── ✅ `AxialFanModel.tsx`
-│   │   │   │       ├── ✅ `CentrifugalFanModel.tsx`
-│   │   │   │       ├── ✅ `DehumidifierModel.tsx`
+│   │   │   │       ├── ❌ `CentrifugalFanModel.tsx`
+│   │   │   │       ├── ❌ `DehumidifierModel.tsx`
 │   │   │   │       ├── ✅ `DomesticFanModel.tsx`
 │   │   │   │       ├── ✅ `DuctFanModel.tsx`
 │   │   │   │       ├── ✅ `ExproofFanModel.tsx`
@@ -392,14 +402,14 @@ Bu belge, otonom derleyici tarafından 2026-06-08T12:27:54.797029+00:00 tarihind
 │   │   │   │       ├── ✅ `SmokeExhaustFanModel.tsx`
 │   │   │   │       ├── ✅ `SnailFanModel.tsx`
 │   │   │   │       ├── ✅ `SpeedControlModel.tsx`
-│   │   │   │       └── ✅ `WallMountedCompactFanModel.tsx`
+│   │   │   │       └── ❌ `WallMountedCompactFanModel.tsx`
 │   │   │   ├── ✅ `AddToProjectModal.tsx`
-│   │   │   ├── ✅ `BentPlaneGeometry.tsx`
-│   │   │   ├── ✅ `BlueprintCanvas.tsx`
+│   │   │   ├── ❌ `BentPlaneGeometry.tsx`
+│   │   │   ├── ❌ `BlueprintCanvas.tsx`
 │   │   │   ├── ✅ `Category3DIcon.tsx`
 │   │   │   ├── ✅ `CategoryOrbitCarousel.tsx`
 │   │   │   ├── ✅ `InfiniteProductsShowcase.tsx`
-│   │   │   ├── ✅ `OrbitalProductsShowcase.tsx`
+│   │   │   ├── ❌ `OrbitalProductsShowcase.tsx`
 │   │   │   ├── ✅ `ProductsHero.tsx`
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
@@ -524,7 +534,6 @@ Bu belge, otonom derleyici tarafından 2026-06-08T12:27:54.797029+00:00 tarihind
 │   │   ├── ✅ `searchHighlight.tsx`
 │   │   ├── ✅ `tenantServer.ts`
 │   │   ├── ✅ `testA11y.tsx`
-│   │   ├── ✅ `three-utils.ts`
 │   │   ├── ✅ `type-converters.ts`
 │   │   └── ✅ `whatsapp.ts`
 │   └── 📂 **views/**
@@ -668,10 +677,14 @@ Bu belge, otonom derleyici tarafından 2026-06-08T12:27:54.797029+00:00 tarihind
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
+- [⚠️] ` .agents\explorer_m4_1_gen2\handoff.md`
+- [⚠️] `CLAUDE.md`
 - [⚠️] `ORIGINAL_REQUEST.md`
 - [⚠️] `PROJECT.md`
 - [⚠️] `TEST_INFRA.md`
 - [⚠️] `TEST_READY.md`
+- [⚠️] `VISION.md`
+- [⚠️] `explorer_m2_3\analysis.md`
 - [⚠️] `implementation_plan.md`
 - [⚠️] `next.config.md`
 
@@ -685,7 +698,18 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\app\admin\webhook-events\page.md`
 - [❌] `src\components\TiltCard.md`
 - [❌] `src\components\layout\PageShell.md`
+- [❌] `src\components\navigation\EliteMegaMenu.md`
 - [❌] `src\components\products\3d\factory\Assembler.md`
+- [❌] `src\components\products\3d\factory\parts\InternalFanRotor.md`
+- [❌] `src\components\products\3d\materials\useFanMaterials.md`
+- [❌] `src\components\products\3d\parts\Impeller.md`
+- [❌] `src\components\products\3d\parts\Silencer.md`
+- [❌] `src\components\products\3d\types\CentrifugalFanModel.md`
+- [❌] `src\components\products\3d\types\DehumidifierModel.md`
+- [❌] `src\components\products\3d\types\WallMountedCompactFanModel.md`
+- [❌] `src\components\products\BentPlaneGeometry.md`
+- [❌] `src\components\products\BlueprintCanvas.md`
+- [❌] `src\components\products\OrbitalProductsShowcase.md`
 - [❌] `src\config\orbitalCarouselConfig.md`
 - [❌] `src\data\brands.md`
 - [❌] `src\design-system\tokens.md`
@@ -699,7 +723,18 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\app\admin\webhook-events\page.md`
 - [❌] `src\components\TiltCard.md`
 - [❌] `src\components\layout\PageShell.md`
+- [❌] `src\components\navigation\EliteMegaMenu.md`
 - [❌] `src\components\products\3d\factory\Assembler.md`
+- [❌] `src\components\products\3d\factory\parts\InternalFanRotor.md`
+- [❌] `src\components\products\3d\materials\useFanMaterials.md`
+- [❌] `src\components\products\3d\parts\Impeller.md`
+- [❌] `src\components\products\3d\parts\Silencer.md`
+- [❌] `src\components\products\3d\types\CentrifugalFanModel.md`
+- [❌] `src\components\products\3d\types\DehumidifierModel.md`
+- [❌] `src\components\products\3d\types\WallMountedCompactFanModel.md`
+- [❌] `src\components\products\BentPlaneGeometry.md`
+- [❌] `src\components\products\BlueprintCanvas.md`
+- [❌] `src\components\products\OrbitalProductsShowcase.md`
 - [❌] `src\config\orbitalCarouselConfig.md`
 - [❌] `src\data\brands.md`
 - [❌] `src\design-system\tokens.md`

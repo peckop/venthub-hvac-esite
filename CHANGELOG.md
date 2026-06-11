@@ -1,5 +1,31 @@
 # Changelog
 
+### [2026-06-10 - Follow-up] Performance Optimization, CLS & TBT Fixes, Network & Visual Alignment
+
+**Summary:** Follow-up performance sprint focusing on Cumulative Layout Shift (CLS) and Total Blocking Time (TBT) remediations. This includes resolving layout shifts using the `min-h-hvac-section` token, code-splitting heavy 3D elements, removing external network dependencies from Three.js environment maps, and syncing skeleton loading heights with 3D canvas heights.
+
+**Changes:**
+
+- **CLS Fixes (perf):**
+  - Resolved footer layout shifts using the `min-h-hvac-section` layout token and fixed-size assets.
+  - Optimized product grids with `content-visibility: auto`.
+
+- **TBT Fixes (perf):**
+  - Code-split heavy 3D navigation layers and dynamic interfaces using `next/dynamic` (`{ ssr: false }`).
+  - Implemented lazy loading for off-screen Three.js assets using `<LazyInView>`.
+
+- **Network & 3D Optimizations (perf):**
+  - Replaced Drei `<Environment>` presets with local lights in 6 navigation components to eliminate external network dependencies.
+  - Hosted local `/env/city_256.hdr` environment map for `Product3DViewer`.
+  - Updated `browserslist` configuration.
+
+- **Visual & Height Alignment (fix):**
+  - Synced skeleton loader placeholder height (`min-h-hvac-section` - 400px) in `AuthorityRenderer.tsx` with loaded `ThreeDAuthority.tsx` canvas height (400px), completely eliminating loading transition layout shifts.
+
+**Validation:** `pnpm run type-check` ✅ | `pnpm run lint` ✅ | `pnpm run build` ✅
+
+---
+
 ### [2026-06-10] 3D Performance Overhaul, THREE.js Tree-Shaking, Skills Infrastructure & CI Hardening
 
 **Summary:** Major rendering performance improvements across all 3D canvases (frameloop demand mode, DPR cap, memo cleanup), full THREE.js tree-shaking migration (34 files), skills infrastructure upgrades (natural language evals, semantic routing, dependency resolution), CI workflow scope narrowing, and codebase language convention enforcement.
