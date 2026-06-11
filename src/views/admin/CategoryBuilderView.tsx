@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 
 import { AuthorityBuilder } from '@/components/admin/authority-builder/AuthorityBuilder';
 import { AuthorityRenderer } from '@/components/authority/AuthorityRenderer';
+import { useRole } from '@/hooks/useRole';
+import { logAdminAction } from '@/lib/audit';
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import { AuthorityBlock, SpecsBlock } from '@/types/authority';
 import { CategoryMetadata, DbCategory, DbJson } from '@/types/db-rows';
@@ -26,6 +28,8 @@ interface CategoryBuilderViewProps {
 
 const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId }) => {
   const router = useRouter();
+  const { canWrite } = useRole();
+  const hasWriteAccess = canWrite('categories');
   const [category, setCategory] = useState<DbCategory | null>(null);
   const [blocks, setBlocks] = useState<AuthorityBlock[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -96,6 +100,10 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
   useEffect(() => { load(); }, [load]);
 
   const handleSave = async () => {
+    if (!hasWriteAccess) {
+      toast.error('Bu işlem için yetkiniz yok.');
+      return;
+    }
     setSaving(true);
     try {
       // Use DbJson (re-exported Json) to satisfy Supabase requirement without 'any'
@@ -104,6 +112,16 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
         .update({ authority_content: blocks as DbJson })
         .eq('id', categoryId);
       if (error) throw error;
+      // Audit log (hata UI'ı bloklamasın)
+      try {
+        await logAdminAction(supabase, {
+          table_name: 'categories',
+          row_pk: categoryId,
+          action: 'UPDATE',
+          after: { block_count: blocks?.length ?? 0 },
+          comment: 'authority content kaydedildi',
+        });
+      } catch { /* swallow */ }
       toast.success('Değişiklikler sisteme mühürlendi.');
     } catch (e) {
       console.error('Save error:', e);
@@ -149,9 +167,10 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
              </button>
           </div>
 
-          <button 
-            onClick={handleSave} 
-            disabled={saving}
+          <button
+            onClick={handleSave}
+            disabled={saving || !hasWriteAccess}
+            title={!hasWriteAccess ? 'Bu işlem için yetkiniz yok' : undefined}
             className="flex items-center gap-3 bg-white text-slate-900 hover:bg-cyan-400 hover:text-white disabled:opacity-50 px-8 py-2.5 rounded-xl text-xs font-black tracking-widest shadow-xl transition-transform active:scale-95"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}

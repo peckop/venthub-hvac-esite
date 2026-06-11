@@ -307,6 +307,8 @@ const AdminProductsPage: React.FC = () => {
       const ids = Array.from(selectedIds)
       const { error } = await supabase.from('products').update({ status }).in('id', ids)
       if (error) throw error
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, { table_name: 'products', row_pk: null, action: 'UPDATE', after: { status, ids }, comment: `toplu durum: ${status} (${ids.length} urun)` })
       setSelectedIds(new Set())
       await load()
     } catch (e) { alert('Toplu güncelleme hatası: ' + (e as Error).message) }
@@ -330,6 +332,8 @@ const AdminProductsPage: React.FC = () => {
       const ids = Array.from(selectedIds)
       const { error } = await supabase.from('products').delete().in('id', ids)
       if (error) throw error
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, { table_name: 'products', row_pk: null, action: 'DELETE', before: { ids }, after: null, comment: `toplu silme (${ids.length} urun)` })
       setSelectedIds(new Set())
       await load()
     } catch (e) { alert('Toplu silme hatası: ' + (e as Error).message) }

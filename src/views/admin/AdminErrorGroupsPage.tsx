@@ -215,11 +215,18 @@ const AdminErrorGroupsPage: React.FC = () => {
 
   const updateStatus = async (id: string, newStatus: 'open' | 'resolved' | 'ignored') => {
     const prev = rows
+    const before = rows.find(r => r.id === id)?.status ?? null
     setRows(rs => rs.map(r => r.id === id ? { ...r, status: newStatus } : r))
     const { error } = await supabase.from('error_groups').update({ status: newStatus }).eq('id', id)
     if (error) {
       setRows(prev)
+      return
     }
+    // Audit log (hata UI'ı bloklamasın)
+    try {
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, { table_name: 'error_groups', row_pk: id, action: 'UPDATE', before: { status: before }, after: { status: newStatus }, comment: 'hata grubu statu degisimi' })
+    } catch { /* swallow */ }
   }
 
   const updateAssignedTo = async (id: string, userId: string | '') => {

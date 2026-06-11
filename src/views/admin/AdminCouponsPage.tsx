@@ -13,6 +13,7 @@ import { useRole } from '../../hooks/useRole'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
+import { logAdminAction } from '../../lib/audit'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { 
   adminButtonPrimaryClass, 
@@ -166,6 +167,7 @@ const AdminCouponsPage: React.FC = () => {
   }
 
   async function toggleActive(id: string, active: boolean) {
+    if (!hasWriteAccess) { toast.error('Bu işlem için yetkiniz yok.'); return }
     try {
       const { data, error } = await supabase
         .from('coupons')
@@ -175,6 +177,17 @@ const AdminCouponsPage: React.FC = () => {
         .single()
       if (error) throw error
       setRows(prev => prev.map(r => r.id === id ? { ...r, active: (data as { id: string; is_active: boolean }).is_active } : r))
+      // Audit log (hata UI'ı bloklamasın)
+      try {
+        await logAdminAction(supabase, {
+          table_name: 'coupons',
+          row_pk: id,
+          action: 'UPDATE',
+          before: { is_active: active },
+          after: { is_active: !active },
+          comment: 'kupon aktiflik degisimi',
+        })
+      } catch { /* swallow */ }
       toast.success(!active ? 'Kupon aktif edildi' : 'Kupon pasif edildi')
     } catch (e) {
       console.error('toggle active error', e)
