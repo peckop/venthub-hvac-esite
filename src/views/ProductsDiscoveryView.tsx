@@ -137,7 +137,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                                 <p className="text-slate-500 mb-6 max-w-sm">{t('products.emptyDesc')}</p>
                             </div>
                         ) : (
-                            <div className={`transition-opacity duration-300 ${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'} ${
+                            <div className={`transition-opacity duration-300 content-auto ${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'} ${
                                 viewMode === 'grid'
                                     ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
                                     : 'flex flex-col gap-6 max-w-5xl mx-auto'

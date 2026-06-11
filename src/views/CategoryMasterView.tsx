@@ -1,16 +1,18 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import React, { useMemo } from 'react'
 
 import { useCategoryGateway } from '../hooks/useCategoryGateway'
 import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
 import type { DomainCategory } from '../lib/type-converters'
 import { DomainProduct } from '../lib/type-converters'
-import CategoryGridView from './category/CategoryGridView'
-import CategoryLandingView from './category/CategoryLandingView'
-import CategorySeriesView from './category/CategorySeriesView'
-import CategoryShowcaseView from './category/CategoryShowcaseView'
-import ProductsDiscoveryView from './ProductsDiscoveryView'
+
+const CategoryGridView = dynamic(() => import('./category/CategoryGridView'), { ssr: false })
+const CategoryLandingView = dynamic(() => import('./category/CategoryLandingView'), { ssr: false })
+const CategorySeriesView = dynamic(() => import('./category/CategorySeriesView'), { ssr: false })
+const CategoryShowcaseView = dynamic(() => import('./category/CategoryShowcaseView'), { ssr: false })
+const ProductsDiscoveryView = dynamic(() => import('./ProductsDiscoveryView'), { ssr: false })
 
 interface CategoryMasterViewProps {
   initialCategory?: DomainCategory | null
@@ -41,7 +43,11 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
 
 
   if (!category && !loading) {
-    return <ProductsDiscoveryView products={products} isLoading={loading} />
+    return (
+      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy" /></div>}>
+        <ProductsDiscoveryView products={products} isLoading={loading} />
+      </React.Suspense>
+    )
   }
 
   // Determine which view to render based on ViewModel's displayMode
@@ -113,7 +119,9 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
 
   return (
     <div className="min-h-screen">
-      {renderView()}
+      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy" /></div>}>
+        {renderView()}
+      </React.Suspense>
     </div>
   )
 }

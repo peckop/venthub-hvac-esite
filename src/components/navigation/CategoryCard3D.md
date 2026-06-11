@@ -3,32 +3,36 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\CategoryCard3D.tsx
-skeleton_hash: 5c4932d8c2869a5e
+skeleton_hash: 715a52126b64af3e
 entity_hashes:
   func:CategoryCard3D: b1d42c0fbbe60533
-  overview: be950cf7f49cb0f6
+  overview: 67a2b49d67dea5de
   style_tokens: 72417c9ee963573b
-generated_at: 2026-06-10T09:12:03Z
+generated_at: 2026-06-11T16:13:47Z
 ---
 
 ## Genel Bakış
-`CategoryCard3D`, bir kategori adı ve alt kategori sayısını, etkileşimli ve üç boyutlu bir kart olarak görselleştiren bir React bileşenidir. Bileşen, verilen bilgileri stillendirilmiş bir arayüze dönüştürür ve tıklama olayı ile üst düzey navigasyon işlevselliğine katkıda bulunur. Bileşenin davranışı, prop değerlerinin sağlanması veya eksikliği konusunda belirli varsayımlarla tanımlıdır.
+`CategoryCard3D`,HVAC ürün kategorilerini üç boyutlu animasyonlu bir kart olarak sunan React bileşenidir. Kullanıcılar bu kartlar aracılığıyla kategori isimlerini ve alt kategori sayılarını görsel olarak keşfedebilir, üzerine tıklayarak ilgili kategori sayfasına geçiş yapabilir. Bileşen, modern bir navigasyon deneyimi için 3D dönüş efektleri ve etkileşimli hover durumları sağlar.
 
 ## Fonksiyon Grupları
-### Bileşen ve Görsel Sunum
-Bu grup, bileşenin temel amacını, aldığı verileri nasıl işlediğini ve kullanıcıya nasıl sunulduğunu kapsar.
+
+### Kategori Kartı Bileşeni
+Tek bileşen, kategori verisini alıp 3D animasyonlu bir kart arayüzüne dönüştürmekten sorumludur. Tıklama ve hover etkileşimlerini yöneterek navigasyon akışını destekler.
 - CategoryCard3D
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, category bilgisini ve alt kategori sayısını kullanarak etkileşimli bir 3D kart görseli sunar.
 
-[Aksiyom 1]: Eğer `onClick` parametresi bir fonksiyon değilse, bileşenin tıklama olayı tetiklenemez ve kullanıcı etkileşimi çalışmaz.
+[Genel varsayım]: CategoryCard3D bileşeni, category prop'u ile gelen bir nesnenin name alanını ve subCategoryCount prop'u ile gelen sayıyı 3D bir kart olarak görselleştirmek için tasarlanmıştır.
 
-[Aksiyom 2]: Eğer `category` parametresi bir string veya geçerli bir obje değilse, bileşenin içeriği düzgün oluşturulamaz ve render hata ile sonuçlanabilir.
+[Aksiyom 1]: Eğer category prop'u verilmemişse veya category.name alanı yoksa, bileşen category adını gösteren metin alanı boş veya tanımsız olur.
 
-[Aksiyom 3]: Eğer `subCategoryCount` bir sayı (number) tipi değilse, alt kategori sayısı gösterimi anlamsız veya hatalı olur; değeri `undefined` veya `null` ise bileşen bu alanı gizleyebilir (varsayım).
+[Aksiyom 2]: Eğer subCategoryCount prop'u verilmemişse, bileşen "0" sayısını (veya varsayılan olarak tanımlanmışsa onu) alt kategori sayısı olarak görüntüler.
+
+[Aksiyom 3]: Eğer onClick prop'u verilmemişse veya fonksiyon değilse, bileşen tıklama olayına tepki vermez.
+
+[Aksiyom 4]: Eğer Category3DIcon sabit fonksiyonu çağrılamazsa veya geçerli bir React elemanı döndürmezse, kartın sol tarafında icon alanı boş kalır.
 
 ---
 
@@ -65,16 +69,22 @@ Bu modül, category bilgisini ve alt kategori sayısını kullanarak etkileşiml
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/navigation/CategoryCard3D.tsx::CategoryCard3D
-- **params**: `category` — Category tipinde nesne; kategori verisini taşır (`.slug` ve `.metadata?.model_type` özellikleri erişilir
-  - `subCategoryCount` — number; alt kategori sayısını temsil eder, metin olarak "{subCategoryCount} seri" biçiminde gösterilir
-  - `onClick` — () => void; kart tıklandığında çağrılacak geri çağıdırma fonksiyonu; div'in onClick ve onKeyDown içinde tetiklenir
+- **params**: `{ category, subCategoryCount, onClick }` — category: Category nesnesi (slug ve metadata alanları içerir), subCategoryCount: number (kaç alt seri olduğunu belirtir), onClick: (() => void) | undefined (tıklama callback fonksiyonu)
 - **ic_degiskenler**:
-  - `getCategoryDisplayName(category)` — Category nesnesinden insancıl display adı döndüren yardımcı fonksiyon; aria-label string birleştirme ve h3 içeriği olmak üzere iki kez çağrılır
-  - `category.slug` — kategorinin URL dostu tanımlayıcısı; Category3DIcon bileşenine categorySlug prop'u olarak iletilir
-  - `category.metadata?.model_type` — opsiyonel metadata nesnesinden 3D model tipini çeker; Category3DIcon bileşenine modelType prop'u olarak iletilir
-  - `e` — KeyboardEvent nesnesi; onKeyDown inline handler'ının parametresidir
-  - `e.key` — basılan tuşun string temsili; 'Enter' ve ' ' (boşluk) değerlerine karşı kontrol edilir
-- **Dönüş**: JSX.Element — tıklanabilir 3D kategori kartı; arka plan blur katmanı, Three.js Canvas içinde 3D ikon, alt kısımda kategori adı ve seri sayısı, sağda ChevronRight ikonu barındırır; onClick çağrıldığında tetiklenir, Enter/Space tuşuyla da erişilebilirlik desteği sağlar
+  - `getCategoryDisplayName(category)` — categoryHelpers'dan gelen yardımcı fonksiyon, kategorinin gösterilecek adını üretir (JSX'te iki kez çağrılır: aria-label ve h3 içeriği)
+  - `category.slug` — Category3DIcon'a iletilen kategori slug değeri
+  - `category.metadata?.model_type` — Category3DIcon'a iletilen 3D model türü, opsiyonel
+  - `e` — onKeyDown inline handler parametresi, KeyboardEvent; `e.key` tuş değerini tutar, `e.preventDefault()` ile varsayılan davranışı engeller
+- **Dönüş**: JSX elementi — `div` (role="button") içinde 3D Canvas area (Three.js Canvas + Category3DIcon) ve metin içeriği (kategori adı + seri sayısı + chevron ikonu) barındıran kart yapısı. return ile doğrudan JSX döndürür.
+
+---
+
+### [N2_NASIL] AST Pointer: src/components/navigation/CategoryCard3D.tsx::(e) => { ... } (onKeyDown handler)
+- **params**: `e` — KeyboardEvent, tuş basma olayını temsil eder
+- **ic_degiskenler**:
+  - `e.key` — basılan tuşun değeri; `'Enter'` veya `' '` (boşluk) kontrol edilir
+  - `onClick` — üst kapsamdan closure ile erişilen prop; tuşa basıldığında ve tanımlıysa çağrılır
+- **Dönüş**: yok (void) — `e.preventDefault()` ile varsayılan scroll/eti对抗 engellenir, ardından `onClick()` çağrılır; yan etki olarak üst bileşenin tıklama mantığı tetiklenir
 
 ---
 

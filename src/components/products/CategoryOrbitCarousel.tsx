@@ -1,5 +1,6 @@
 'use client'
 import { ArrowLeft, ChevronRight } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import React, { useCallback,useEffect, useMemo, useState } from 'react'
 
@@ -7,7 +8,8 @@ import { useCategories } from '../../contexts/CategoryContext'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes'
-import OrbitalProductsShowcase from './OrbitalProductsShowcase'
+
+const OrbitalProductsShowcase = dynamic(() => import('./OrbitalProductsShowcase'), { ssr: false })
 
 // Helper to determine 3D model type based on slug
 const getModelTypeForCategory = (slug?: string): string | undefined => {
@@ -314,16 +316,18 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                             to { opacity: 1; transform: scale(1); }
                         }
                     `}</style>
-                    <OrbitalProductsShowcase
-                        items={displayItems}
-                        onCardClick={handleCardClick}
-                        externalPause={isTransitioning}
-                        onFocusedItemChange={handleFocusedItemChange}
-                        onFrontCardChange={handleFrontCardChange}
-                        modelScale={responsiveModelScale}
-                        containerHeight={responsiveHeight}
-                        skipHints={level === 'subcategory'}
-                    />
+                    <React.Suspense fallback={<div className="flex items-center justify-center bg-surface-darker w-full" style={{ minHeight: responsiveHeight }} />}>
+                        <OrbitalProductsShowcase
+                            items={displayItems}
+                            onCardClick={handleCardClick}
+                            externalPause={isTransitioning}
+                            onFocusedItemChange={handleFocusedItemChange}
+                            onFrontCardChange={handleFrontCardChange}
+                            modelScale={responsiveModelScale}
+                            containerHeight={responsiveHeight}
+                            skipHints={level === 'subcategory'}
+                        />
+                    </React.Suspense>
                 </div>
             </div>
         </section>

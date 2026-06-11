@@ -3,32 +3,26 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\CategoryMasterView.tsx
-skeleton_hash: a3391ac79ecc1048
+skeleton_hash: 675d5fb17f81b1ea
 entity_hashes:
   func:CategoryMasterView: 8d66cf8f4164e6f6
   func:renderView: 7ee81c09fd482844
-  overview: 97eb92d3808ebe2e
-  style_tokens: fca21e5c46ce3029
-generated_at: 2026-06-08T10:10:58Z
+  overview: 9cd4c9c276b969d6
+  style_tokens: 196a053d563de9bf
+generated_at: 2026-06-11T16:17:49Z
 ---
 
 ## Genel Bakış
-CategoryMasterView, VentHub HVAC platformunda kategori yönetimi için kullanılan ana React bileşenidir. Ana kategori, ürün ve alt kategori verilerini dışarıdan alarak, bu verileri yöneten ve görüntüleyen bir arayüz oluşturur.
-
-## Fonksiyon Grupları
-### Bileşen giriş ve başlatma
-Ana bileşenin dış ortamdan aldığı başlangıç verilerini (ana kategori, ürünler, alt kategoriler) alarak kendi içinde işleyen ve yönetme arayüzünü başlatan temel yapıyı tanımlar.
-- CategoryMasterView
-
-### Görünüm oluşturma
-Ana bileşen tarafından çağrılarak, kullanıcılara sunulacak olan nihai HTML ve arayüz yapısını oluşturan yardımcı render fonksiyonunu temsil eder.
-- renderView
+CategoryMasterView, VentHub HVAC uygul
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon imzalarından çıkarılabilecek sınırlı mimari varsayımlar mevcuttur.
+Bu modül için temel mimari varsayım, dış kaynaklardan gelen başlangıç verilerinin varlığı ve iç bileşenlerin doğru veri yapısıyla çağrılmasıdır.
+
+[Aksiyom 1]: Eğer `initialCategory` parametresi (`{name: string, id: string}` yapısında bir nesne) sağlanmazsa, `CategoryMasterView` bileşeni ana kategori verisi olmadan başlatılır ve `renderView()` içindeki ilgili alt bileşenlere (`CategoryGridView`, `CategoryLandingView`) geçersiz veya eksik veri aktarımı riski oluşur.
+[Aksiyom 2]: Eğer `initialProducts` parametresi (bir ürün nesneleri dizisi, `[{id: string, ...}, ...]` yapısında) sağlanmazsa, `CategorySeriesView` ve `CategoryShowcaseView` bileşenlerine gösterilecek ürün listesi传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递
 
 ---
 
@@ -60,32 +54,45 @@ Bu modül için fonksiyon imzalarından çıkarılabilecek sınırlı mimari var
 
 ---
 
+## SABİTLER
+- **CategoryGridView** (call) — `dynamic(() => import('./category/CategoryGridView'), { ssr: false })`
+- **CategoryLandingView** (call) — `dynamic(() => import('./category/CategoryLandingView'), { ssr: false })`
+- **CategorySeriesView** (call) — `dynamic(() => import('./category/CategorySeriesView'), { ssr: false })`
+- **CategoryShowcaseView** (call) — `dynamic(() => import('./category/CategoryShowcaseView'), { ssr: false })`
+- **ProductsDiscoveryView** (call) — `dynamic(() => import('./ProductsDiscoveryView'), { ssr: false })`
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: CategoryMasterView.tsx::CategoryMasterView
-- **params**: `{ initialCategory, initialProducts, initialSubCategories }`
+- **params**: `initialCategory, initialProducts, initialSubCategories`
 - **ic_degiskenler**:
-  - `rawCategory` — `useCategoryGateway` hook'undan dönen ham kategori verisi; `wrapCategory` ile sarılır
-  - `rawParentCategory` — `useCategoryGateway` hook'undan dönen üst kategori ham verisi; `wrapCategory` ile sarılır
-  - `rawSubCategories` — `useCategoryGateway` hook'undan dönen alt kategoriler dizisi (ham); alt view bileşenlerine prop olarak doğrudan geçirilir
-  - `products` — `useCategoryGateway` hook'undan dönen ürünler dizisi; view bileşenlerine prop olarak geçirilir
-  - `loading` — `useCategoryGateway` hook'undan dönen yükleme durumu boolean'ı; early return ve CategoryGridView'e prop olarak kullanılır
-  - `filters` — `useCategoryGateway` hook'undan dönen aktif filtreler objesi; CategoryGridView'e prop olarak geçirilir
-  - `updateFilters` — `useCategoryGateway` hook'undan dönen filtre güncelleme fonksiyonu; CategoryGridView'in `onUpdateFilters` prop'una bağlanır
-  - `wrapCategory` — `useCategoryViewModel` hook'undan dönen kategori sarmalama fonksiyonu; ham veriyi sunum katmanı formatına dönüştürür
-  - `category` — `useMemo` ile `wrapCategory(rawCategory)` hesaplanan sunum katmanı kategorisi; `displayMode`, `raw`, `parentId` alanlarına erişilir
-  - `parentCategory` — `useMemo` ile `wrapCategory(rawParentCategory)` hesaplanan üst kategori sunum katmanı objesi; optional chaining ile `?.raw` erişimi yapılır
-  - `availableBrands` — `useMemo` ile `products` dizisinden `p.brand` değerlerinin benzersiz olarak filtrelenmesiyle oluşturulan marka listesi; CategoryGridView'e prop olarak geçirilir
-  - `renderView` — inner arrow function; `category.displayMode` ve fallback koşullarına göre hangi view bileşeninin render edileceğini belirler
-- **Cagri Iliskileri**:
-  - `useCategoryGateway(initialCategory, initialProducts, initialSubCategories)` — Gateway hook'u çağrısı, 7 değer döndürür
-  - `useCategoryViewModel()` — ViewModel hook'u çağrısı, `{ wrapCategory }` döndürür
-  - `useMemo(() => wrapCategory(rawCategory), [rawCategory, wrapCategory])` — category useMemo memoizasyonu
-  - `useMemo(() => wrapCategory(rawParentCategory), [rawParentCategory, wrapCategory])` — parentCategory useMemo memoizasyonu
-  - `useMemo(() => Array.from(new Set(products.map(p => p.brand).filter(Boolean))), [products])` — availableBrands useMemo memoizasyonu
-  - `renderView()` — inner fonksiyon çağrısı, JSX döndürür
-- **Kosullu Donus**: `!category && !loading` ise `<ProductsDiscoveryView products={products} isLoading={loading} />` döner
-- **Donus**: JSX — `<div className="min-h-screen">{renderView()}</div>`
+  - `rawCategory` — useCategoryGateway'den dönen ham kategori verisi, wrapCategory ile sarmalanmadan önce kullanılır
+  - `rawParentCategory` — useCategoryGateway'den dönen ham üst kategori verisi, wrapCategory ile sarmalanmadan önce kullanılır
+  - `rawSubCategories` — useCategoryGateway'den dönen ham alt kategoriler dizisi, view bileşenlerine doğrudan aktarılır
+  - `products` — useCategoryGateway'den dönen ürün listesi, view bileşenlerine ve marka çıkarımına kullanılır
+  - `loading` — useCategoryGateway'den dönen boolean yükleme durumu, ProductsDiscoveryView ve CategoryGridView'e aktarılır
+  - `filters` — useCategoryGateway'den dönen filtre durum nesnesi, CategoryGridView'e aktarılır
+  - `updateFilters` — useCategoryGateway'den dönen filtre güncelleme fonksiyonu, CategoryGridView'e onUpdateFilters olarak aktarılır
+  - `wrapCategory` — useCategoryViewModel'den gelen fonksiyon, ham kategori verisini ViewModel formatına sarmalar
+  - `category` — useMemo ile wrapCategory(rawCategory) sonucu, kategorinin ViewModel sarmalı; displayMode ve parentId erişimi ile hangi view'ın render edileceğini belirler
+  - `parentCategory` — useMemo ile wrapCategory(rawParentCategory) sonucu, üst kategorinin ViewModel sarmalı; raw özelliği CategorySeriesView ve CategoryGridView'e aktarılır
+  - `availableBrands` — useMemo ile products dizisinden p.brand değerlerinin benzersiz kümesi; CategoryGridView'e aktarılır
+- **Dönüş**: JSX element (React.FC) — category yüklenmemişse ProductsDiscoveryView, aksi halde renderView() sonucunu Suspense ile saran div
+
+### [N2_NASIL] AST Pointer: CategoryMasterView.tsx::renderView
+- **params**: yok
+- **ic_degiskenler**:
+  - `category` — closure'dan erişilen ViewModel sarmalı; null ise null döner, displayMode alanına göre switch ile hangi view bileşeninin render edileceğini belirler, parentId alanı ile alt/ana kategori ayrımı yapar
+  - `rawSubCategories` — closure'dan erişilen ham alt kategoriler dizisi; CategoryShowcaseView, CategoryLandingView ve CategoryGridView bileşenlerine subCategories prop'u olarak aktarılır
+  - `parentCategory` — closure'dan erişilen üst kategori ViewModel sarmalı; optional zincirle ?.raw erişimi ile CategorySeriesView ve CategoryGridView'e parentCategory prop'u olarak aktarılır
+  - `products` — closure'dan erişilen ürün listesi; CategoryLandingView, CategorySeriesView ve CategoryGridView'e products prop'u olarak aktarılır
+  - `availableBrands` — closure'dan erişilen benzersiz marka listesi; CategoryGridView'e availableBrands prop'u olarak aktarılır
+  - `filters` — closure'dan erişilen filtre durum nesnesi; CategoryGridView'e filters prop'u olarak aktarılır
+  - `updateFilters` — closure'dan erişilen filtre güncelleme fonksiyonu; CategoryGridView'e onUpdateFilters prop'u olarak aktarılır
+  - `loading` — closure'dan erişilen boolean yükleme durumu; CategoryGridView'e loading prop'u olarak aktarılır
+- **Dönüş**: JSX element | null — category.displayMode değerine göre CategoryShowcaseView, CategoryLandingView, CategorySeriesView veya CategoryGridView bileşeninden birini döner; category null ise null döner
 
 ---
 
@@ -111,7 +118,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** (yok)
-- **Layout:** `min-h-screen`
+- **Renkler:** `bg-white`, `border-b-2`, `border-primary-navy`
+- **Layout:** `flex`, `h-8`, `items-center`, `justify-center`, `min-h-screen`, `w-8`
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** (yok)
+- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`

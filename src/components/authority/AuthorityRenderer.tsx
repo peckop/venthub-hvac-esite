@@ -16,8 +16,8 @@ import {
   RichTextBlock as RichTextBlockType,
   SpecsBlock as SpecsBlockType} from '@/types/authority';
 
+import LazyInView from '../LazyInView';
 import TechnicalDrawingAuthority from './TechnicalDrawingAuthority';
-import ThreeDAuthority from './ThreeDAuthority';
 import VideoAuthority from './VideoAuthority';
 
 // --- YARDIMCI BİLEŞENLER ---
@@ -228,11 +228,15 @@ export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> =
                     />
                   )}
                   {mediaBlock.content.mediaType === '3d' && (
-                    <ThreeDAuthority 
-                      metadata={{
-                        modelId: mediaBlock.content.mediaId,
-                        modelUrl: mediaBlock.content.mediaId,
-                        format: 'glb'
+                    <LazyInView
+                      loader={() => import('./ThreeDAuthority')}
+                      placeholder={<div className="min-h-hvac-section w-full bg-slate-900/10 animate-pulse rounded-hvac-lg" />}
+                      componentProps={{
+                        metadata: {
+                          modelId: mediaBlock.content.mediaId,
+                          modelUrl: mediaBlock.content.mediaId,
+                          format: 'glb' as const
+                        }
                       }}
                     />
                   )}

@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useCallback,useEffect, useMemo, useRef, useState } from 'react'
@@ -25,9 +26,19 @@ import NavSecondaryRail from './navigation/NavSecondaryRail'
 import NavShell from './navigation/NavShell'
 import NavUtilityRail from './navigation/NavUtilityRail'
 
-const SearchOverlay = React.lazy(() => import('./SearchOverlay'))
-const MegaMenu = React.lazy(() => import('./MegaMenu'))
-const CategoryHubOverlay = React.lazy(() => import('./navigation/CategoryHubOverlay'))
+const SearchOverlay = dynamic(() => import('./SearchOverlay'), { ssr: false })
+const MegaMenu = dynamic(() => import('./MegaMenu'), { ssr: false })
+const CategoryHubOverlay = dynamic(() => import('./navigation/CategoryHubOverlay'), { ssr: false })
+
+const SearchOverlaySkeleton = () => (
+  <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-modal animate-pulse" />
+)
+const MegaMenuSkeleton = () => (
+  <div className="absolute top-full left-0 right-0 min-h-hvac-section bg-white border-t border-slate-200 shadow-xl animate-pulse" />
+)
+const CategoryHubOverlaySkeleton = () => (
+  <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-modal animate-pulse" />
+)
 
 interface StickyHeaderProps {
   isScrolled: boolean
@@ -263,9 +274,21 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
           </>
         }
       />
-      {isSearchOverlayOpen && <React.Suspense fallback={null}><SearchOverlay open={isSearchOverlayOpen} onClose={closeSearchOverlay} /></React.Suspense>}
-      {isMenuOpen && <React.Suspense fallback={null}><MegaMenu isOpen={isMenuOpen} onClose={closeMenu} /></React.Suspense>}
-      {isCategoryHubOpen && <React.Suspense fallback={null}><CategoryHubOverlay isOpen={isCategoryHubOpen} onClose={closeCategoryHub} /></React.Suspense>}
+      {isSearchOverlayOpen && (
+        <React.Suspense fallback={<SearchOverlaySkeleton />}>
+          <SearchOverlay open={isSearchOverlayOpen} onClose={closeSearchOverlay} />
+        </React.Suspense>
+      )}
+      {isMenuOpen && (
+        <React.Suspense fallback={<MegaMenuSkeleton />}>
+          <MegaMenu isOpen={isMenuOpen} onClose={closeMenu} />
+        </React.Suspense>
+      )}
+      {isCategoryHubOpen && (
+        <React.Suspense fallback={<CategoryHubOverlaySkeleton />}>
+          <CategoryHubOverlay isOpen={isCategoryHubOpen} onClose={closeCategoryHub} />
+        </React.Suspense>
+      )}
     </>
   )
 })

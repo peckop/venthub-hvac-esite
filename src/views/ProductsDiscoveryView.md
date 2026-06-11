@@ -7,8 +7,8 @@ skeleton_hash: a62e2580bbc279b4
 entity_hashes:
   func:ProductsDiscoveryView: 6785edea688433d2
   overview: 7231c6a1b74d8b9e
-  style_tokens: 17792abc2680c491
-generated_at: 2026-06-08T10:10:59Z
+  style_tokens: 8ab4f603b12ea696
+generated_at: 2026-06-11T16:17:49Z
 ---
 
 ## Genel Bakış
@@ -108,4 +108,4 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Renkler:** `bg-cyan-500/5`, `bg-slate-50`, `bg-slate-50/50`, `bg-surface-darker`, `bg-white`, `border-b`, `border-dashed`, `border-slate-100`, `border-slate-200`, `border-slate-200/60`, `border-white/5`, `hover:text-slate-600`, `md:text-4xl`, `text-3xl`, `text-center`
 - **Layout:** `flex`, `flex-col`, `flex-wrap`, `gap-3`, `gap-6`, `grid`, `grid-cols-1`, `h-16`, `h-300px`, `h-8`, `items-center`, `items-start`, `justify-between`, `justify-center`, `lg:grid-cols-3`
 - **Varyant/Responsive:** `:`, `hover:`, `lg:`, `md:`, `sm:`, `xl:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${isLoading`, `${viewMode`, `:`, `===`, `animate-pulse`, `blur-100`, `border`, `capitalize`, `duration-300`, `duration-700`, `ease-hvac-ease`, `font-bold`, `font-extrabold`, `font-medium`
+- **Yardımcı Sınıflar:** `$`, `${isLoading`, `${viewMode`, `:`, `===`, `animate-pulse`, `blur-100`, `border`, `capitalize`, `content-auto`, `duration-300`, `duration-700`, `ease-hvac-ease`, `font-bold`, `font-extrabold`

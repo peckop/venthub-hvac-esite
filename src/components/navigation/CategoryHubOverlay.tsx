@@ -1,5 +1,5 @@
 'use client'
-import { Environment,OrbitControls } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import { ArrowLeft, ChevronRight,Grid3X3, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -161,9 +161,8 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                             className="animate-in fade-in zoom-in-95 duration-700"
                                         >
                                             <Suspense fallback={null}>
-                                                <Environment preset="city" />
-                                                <ambientLight intensity={0.5} />
-                                                <directionalLight position={[10, 10, 5]} intensity={1} />
+                                                <ambientLight intensity={0.8} />
+                                                <directionalLight position={[5, 5, 5]} intensity={1} />
                                                 <Category3DIcon categorySlug={hoveredCategory.slug} scale={1.2} />
                                                 <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={2} />
                                             </Suspense>

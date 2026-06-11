@@ -3,35 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\MegaMenu3DBackground.tsx
-skeleton_hash: 1a127717bea49813
+skeleton_hash: 0ed000a95de9a55b
 entity_hashes:
   func:MegaMenu3DBackground: bb72cddf66cbd5a0
-  overview: dd5cca8b8a57c612
+  overview: bbf3490d865f5caf
   style_tokens: 487664132884f59c
-generated_at: 2026-06-10T09:12:27Z
+generated_at: 2026-06-11T16:14:54Z
 ---
 
 ## Genel Bakış
-MegaMenu3DBackground modülü, mega menü bileşeninin arka planında drei boyutlu bir görsel efekt sunan bir React bileşeni tanımlar. Bileşen, menünün hangi kategorisi olduğunu belirten bir slug parametresi alır ve ona göre 3D bir model ile metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder.
+Bu modül, mega menü bileşeninin arka planında üç boyutlu bir görsel efekt sunan bir React bileşenini tanımlar. Bileşen, verilen kategori slug'ına göre 3D bir model ve metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder.
 
 ## Fonksiyon Grupları
-### Ana Bileşen
-Mega menünün görsel arka planını oluşturan temel işlevi yerine getirir; 3D modeli ve okunabilirlik için gerekli gradyanı bir arada sunar.
+### Ana Bileşen (3D Arka Plan)
+Mega menünün arka planını oluşturmak için gerekli olan 3D model ve gradyan overlay'ı bir arada sunan temel React bileşenini tanımlar.
 - MegaMenu3DBackground
 
 ---
 
-## AXIOMS – Mimari Varsayımlar
 
-Bu modül, mega menü arka planı için 3D görsel efekt sağlayan bir React bileşenidir.
-
-**[Aksiyom 1]**: Eğer `categorySlug` prop'u sağlanmazsa, bileşen hangi kategori için 3D arka plan oluşturacağını bilemez ve uygun görsel içeriği render edemez.
-
-**[Aksiyom 2]**: Eğer `categorySlug` geçerli bir kategori slugsı değilse (örn: bilinmeyen veya desteklenmeyen bir değer), bileşen eşleşen 3D modeli bulamaz ve arka plan doğru oluşturulamaz.
-
-**[Aksiyom 3]**: Eğer tarayıcı CSS transform veya gerekli 3D rendering özelliklerini desteklemiyorsa, bileşen 3D görsel efekti doğru şekilde gösteremez.
-
-**[Aksiyom 4]**: Eğer bileşen mega menü yapısı dışında kullanılmak istenirse, arka planın ekranda konumlandırılması ve boyutlandırılması hedeflenen bağlama uygun olmayabilir.
 
 ---
 
@@ -59,14 +49,17 @@ Bu modül, mega menü arka planı için 3D görsel efekt sağlayan bir React bil
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: components/navigation/MegaMenu3DBackground.tsx::MegaMenu3DBackground
-- **params**: `categorySlug` — Menüde seçili kategorinin slug değeri, 3D ikon bileşenine aktarılır
-- **ic_degiskenler**: (yok — parametre dışında hiçbir değişken tanımlanmamıştır)
-- **Dönüş**: JSX elementi (`<>...</>` Fragment) — 3D Canvas ve gradient overlay içeren bir React bileşeni döndürür
-
-**Kullanım detayı:**
-- `categorySlug` → `<Category3DIcon categorySlug={categorySlug} ...>` içinde kullanılır, ilgili kategorinin 3D modelinin yüklenmesini sağlar
-- Fonksiyonda hiçbir iç değişken tanımlanmaz; tüm yapı JSX return ifadesi içinde doğrudan oluşturulur
+### [N1_NASIL] AST Pointer: src/components/navigation/MegaMenu3DBackground.tsx::MegaMenu3DBackground
+- **params**:
+  - `categorySlug` — PropTypes destructuring'den gelen kategori slug değeri; Category3DIcon bileşenine hangi kategori ikonunun gösterileceğini belirtir
+- **ic_degiskenler**: yok (fonksiyon gövdesinde herhangi bir `const`/`let`/`var` değişken tanımı bulunmamaktadır; doğrudan JSX döner)
+- **Dönüş**: React JSX Fragment — Üst %75 alanı kaplayan 3D Canvas (ambientLight, directionalLight, Category3DIcon, OrbitControls ile) ve alttan yukarıya doğru beyaz gradient overlay div'inden oluşan React Element Tree
+- **Yan etkiler**: Yok (stateless, side-effect-free saf bileşen)
+- **JSX içinde erişilen prop**: `categorySlug` — Category3DIcon'a `categorySlug={categorySlug}` olarak aktarılır
+- **Canvas yapılandırma değerleri**: `camera.position = [0, 0.1, 2.2]`, `camera.fov = 40`, `dpr = [1, 1]`, `frameloop = "demand"`
+- **OrbitControls yapılandırma değerleri**: `enableZoom = false`, `enablePan = false`, `enableRotate = false`, `autoRotate = true`, `autoRotateSpeed = 1.5`
+- **Category3DIcon prop değerleri**: `categorySlug` (prop'tan), `scale = 0.9`
+- **Light değerleri**: `ambientLight.intensity = 0.8`, `directionalLight.position = [5, 5, 5]`, `directionalLight.intensity = 1`
 
 ---
 

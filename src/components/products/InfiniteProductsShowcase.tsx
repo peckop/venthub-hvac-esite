@@ -3,7 +3,6 @@ import {
     AdaptiveDpr, 
     AdaptiveEvents,
     Bvh,
-    Environment, 
     Float, 
     Image as DreiImage, 
     Preload,
@@ -234,10 +233,10 @@ const InfiniteProductsShowcase: React.FC<InfiniteProductsShowcaseProps> = ({ ite
                 <color attach="background" args={['#020617']} />
                 
                 {/* Lighting */}
-                <ambientLight intensity={0.5} />
+                <ambientLight intensity={0.8} />
+                <directionalLight position={[5, 5, 5]} intensity={1} />
                 <pointLight position={[10, 10, 10]} intensity={1} color="#22d3ee" />
                 <pointLight position={[-10, -10, -10]} intensity={0.5} color="#3b82f6" />
-                <Environment preset="night" />
 
                 <SceneContent items={items} isPaused={isPaused} onHover={setIsPaused} />
                 

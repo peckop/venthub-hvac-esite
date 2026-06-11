@@ -1,5 +1,5 @@
 "use client"
-import { Environment, Float, Html, Sparkles, useTexture } from '@react-three/drei'
+import { Float, Html, Sparkles, useTexture } from '@react-three/drei'
 import { Canvas, ThreeEvent,useFrame, useThree } from '@react-three/fiber'
 import { useInView } from 'framer-motion'
 import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'
@@ -840,16 +840,12 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                 }}
             >
                 <MotionTransitionFix />
-                <ambientLight intensity={0.5} />
+                <ambientLight intensity={0.8} />
+                <directionalLight position={[5, 5, 5]} intensity={1} />
                 <spotLight position={[10, 12, 10]} angle={0.3} penumbra={1} intensity={1} castShadow />
 
                 {/* Zemin ve Sparkles - HEMEN GÖRÜNÜR */}
                 <Stage sharedState={sharedState} />
-
-                {/* Environment Suspense ile ayrıldı */}
-                <Suspense fallback={null}>
-                    <Environment preset="city" />
-                </Suspense>
 
                 {/* Elemanlar hemen mount olur, ürün bazlı yerel Suspense başlar */}
                 <CarouselItems

@@ -1,4 +1,4 @@
-import { Environment } from '@react-three/drei'
+
 import { Canvas } from '@react-three/fiber'
 import { ChevronRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -50,9 +50,8 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                     frameloop="demand"
                 >
                     {/* Lighting Setup for Menu Tiles */}
-                    <Environment preset="city" />
                     <ambientLight intensity={0.8} />
-                    <directionalLight position={[10, 10, 5]} intensity={1} />
+                    <directionalLight position={[5, 5, 5]} intensity={1} />
                     <pointLight position={[-10, -10, -10]} intensity={1} color="#b0e0e6" />
 
                     <Suspense fallback={null}>

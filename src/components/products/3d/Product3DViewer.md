@@ -14,7 +14,7 @@ entity_hashes:
   func:handleViewChange: ea99a6a2d5d89bd3
   overview: 2769d8a94fb30e5c
   style_tokens: d2e480f938f25b44
-generated_at: 2026-06-10T09:37:45Z
+generated_at: 2026-06-11T16:14:55Z
 ---
 
 ## Genel Bakış
@@ -34,22 +34,6 @@ Bu grup, 3D sahne oluşturulurken veya model yüklenirken ortaya çıkabilecek b
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, 3D ürün modeli görüntüleme bileşenlerinden oluşur. Aşağıdaki mimari varsayımlar, yalnızca fonksiyon imzalarından (parametre tipleri, zorunluluk ve default değerler) çıkarılmıştır.
-
----
-
-**[Aksiyom 1]:** Eğer `Product3DViewer` çağrısında `slug` parametresi sağlanmazsa, modül hangi ürünün 3D modelinin yükleneceğini bilemez ve doğru model gösterilemez.
-
-**[Aksiyom 2]:** Eğer `Product3DViewer` çağrısında `modelType` parametresi sağlanmazsa, modül 3D modelin hangi türde olduğunu (örn. dosya formatı/tipi) bilmediği için model yükleme ve render süreci başlatılamaz.
-
-**[Aksiyom 3]:** Eğer `isFullscreen` `true` olarak ayarlanırken `onClose` callback'i sağlanmazsa, kullanıcı tam ekran modundan çıkamaz; çünkü `onClose`'un default değeri yoktur ve çıkış mekanizması yalnızca bu callback üzerinden çalışır.
-
-**[Aksiyom 4]:** Eğer `ModelRotator` bileşeninde `rotationRef.current` `null` değerinde kalırsa (yani bir Three.js `Group` nesnesine bağlanmazsa), döndürme işleminin hedef nesnesi olmadığı için model döndürülemez.
-
-**[Aksiyom 5]:** Eğer `ModelRotator` bileşeninde `enabled` `false` olarak ayarlanırsa, model döndürme pasif hale gelir; children bileşeni yine de render edilir ancak rotasyon eylemi gerçekleşmez.
-
-**[Aksiyom 6]:** Eğer `handleViewChange` fonksiyonu `'front' | 'top' | 'right' | 'back' | 'bottom' | 'left' | 'iso'` kümesi dışında bir view değeriyle çağrılırsa, kamera açısı geçersizdir ve tanımlı bir görünüm ayarı yapılamaz. Toplam 7 tanımlı görünüm mevcuttur.
-
-**[Aksiyom 7]:** Eğer `ErrorBoundary` constructor'ında `t` (ç
 
 ---
 

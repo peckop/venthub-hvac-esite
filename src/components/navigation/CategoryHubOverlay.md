@@ -3,50 +3,43 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\CategoryHubOverlay.tsx
-skeleton_hash: d7d5c78f7642ca43
+skeleton_hash: f6fae04d841bfbb8
 entity_hashes:
   func:CategoryHubOverlay: fb718076583f7612
   func:handleCategoryClick: f62c24f62a6cba1b
   func:handleSubCategoryClick: abc84e61f250f252
-  overview: de37cbcaa5dd3e9b
+  overview: 925c9568484a32c3
   style_tokens: 96d06533c66f365a
-generated_at: 2026-06-10T09:12:03Z
+generated_at: 2026-06-11T16:14:13Z
 ---
 
 ## Genel Bakış
-CategoryHubOverlay, kullanıcıların kategorileri ve alt kategorileri görüntüleyip seçebileceği bir kapalı/açılır menü bileşenidir. Bileşen, `isOpen` prop'u ile görünürlüğünü kontrol eder ve `onClose` prop'u ile kapatma işlemini yönetir. Kullanıcı etkileşimlerini işleyerek ilgili kategori veya alt kategori seçim tetikler.
+CategoryHubOverlay, kategorileri ve alt kategorileri listeleyen bir kapak/açılır menü bileşenidir. Bileşenin görünürlüğü `isOpen` prop'u ile kontrol edilir ve `onClose` prop'u aracılığıyla kapatma işlemi dışarıya bildirilir.
 
 ## Fonksiyon Grupları
 ### Bileşen Renderlama
-Overlay'in durumuna göre arayüzün oluşturulması ve render edilmesinden sorumludur. Görünürlük, `isOpen` prop'u ile kontrol edilir.
+Overlay'in açık/kapalı durumuna göre arayüzün oluşturulmasından ve render edilmesinden sorumludur.
 - CategoryHubOverlay
 
 ### Etkileşim İşleyicileri
-Kullanıcının kategori veya alt kategori seçeneklerine tıklaması durumunda tetiklenecek işlemleri yönetir. Bu işleyiciler, bileşen içindeki tıklama olaylarına bağlıdır.
-- handleCategoryClick
-- handleSubCategoryClick
+Kullanıcının kategori veya alt kategori üzerine tıklamasıyla tetiklenen seçim işlemlerini yönetir.
+- handleCategoryClick, handleSubCategoryClick
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için belirlenen mimari varsayımlar, fonksiyon imzalarına ve prop'ların beklenen kullanımına dayanır.
+Bu modül, bir React kapalı/açılır menü (overlay) bileşenidir ve dışarıdan sağlanan props'lara bağımlıdır.
 
-[Aksiyom 1]: Eğer `isOpen` prop'u sağlanmazsa, bileşenin başlangıç görünürlük durumu belirsizdir ve bileşen hatalı davranabilir.
+[Aksiyom 1]: Eğer `isOpen` prop'u sağlanmazsa veya `undefined` ise, bileşenin görünürlük durumu belirsiz olur ve overlay'in doğru şekilde gösterilip gösterilmeyeceği kontrolden çıkar.
 
-[Aksiyom 2]: Eğer `isOpen` false değerini alırsa, bileşen (overlay) gizli durumda render edilmemeli veya görünmez olmalıdır.
+[Aksiyom 2]: Eğer `onClose` callback'i sağlanmazsa, kullanıcı overlay'i kapatmak istediğinde kapatma işlemi tetiklenemez ve menü açık kalır (kullanıcı dışarı tıklayarak veya ESC ile kapatamaz).
 
-[Aksiyom 3]: Eğer `isOpen` true değerini alırsa, bileşen (overlay) görünür durumda render edilmeli ve kullanıcı etkileşimine açık olmalıdır.
+[Aksiyom 3]: Eğer `handleCategoryClick` çağrısında `category` parametresi `DomainCategory` tipinde bir nesne olarak sağlanmazsa, kategori seçim işlemi hatalı çalışır veya çöker.
 
-[Aksiyom 4]: Eğer `onClose` prop'u sağlanmazsa, bileşenin kapatma işlemi tetiklendiğinde hata oluşur veya kapatma işlevi çalışmaz.
+[Aksiyom 4]: Eğer `handleSubCategoryClick` çağrısında `subCategory` parametresi `DomainCategory` tipinde bir nesne olarak sağlanmazsa, alt kategori seçim işlemi hatalı çalışır veya çöker.
 
-[Aksiyom 5]: Eğer `onClose` bir fonksiyon değilse (örn: null veya undefined), bileşenin kapanma mekanizması bozulur.
-
-[Aksiyom 6]: Eğer `handleCategoryClick` çağrıldığında `category` parametresi `DomainCategory` tipine uygun değilse, kategori seçim tetikleme işlemi beklenmeyen sonuçlar doğurur.
-
-[Aksiyom 7]: Eğer `handleSubCategoryClick` çağrıldığında `subCategory` parametresi `DomainCategory` tipine uygun değilse, alt kategori seçim tetikleme işlemi beklenmeyen sonuçlar doğurur.
-
-[Aksiyom 8]: Eğer `isOpen` true iken bileşen render edilir ancak geçerli kategori verisi (DomainCategory) sağlanmazsa, menü içeriği boş veya hatalı görüntülenir.
+[Aksiyom 5]: Eğer `isOpen` `true` olarak ayarlandığında `onClose` fonksiyonu çağrılamaz durumdaysa (örn. referans kaybı), overlay açıldıktan sonra programatik olarak kapatılamaz.
 
 ---
 
@@ -90,33 +83,97 @@ Bu modül için belirlenen mimari varsayımlar, fonksiyon imzalarına ve prop'la
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: CategoryHubOverlay.tsx::CategoryHubOverlay
-- **params**: `isOpen` — overlay'ın açılıp kapatıldığını kontrol eden boolean, `onClose` — overlay'ı kapatmak için çağrılan fonksiyon
+- **params**: `{ isOpen, onClose }` — isOpen: overlay'in açık olup olmadığını belirler, onClose: overlay'i kapatmak için çağrılan callback
 - **ic_degiskenler**:
-    - `router` — Next.js useRouter hook'undan gelen yönlendirme nesnesi, sayfa yönlendirmeleri için kullanılır
-    - `categories` — useCategories hook'undan gelen tüm kategorilerin listesi (düz liste)
-    - `mainCategories` — useCategories hook'undan gelen `categoryTree` verisi, ana (üst seviye) kategorilerin ağacı
-    - `wrapCategory` — useCategoryViewModel hook'undan gelen, ham kategori verisini görünüm modeline dönüştüren fonksiyon
-    - `isAnimating` — animasyon durumunu kontrol eden state, CSS geçişlerini tetikler
-    - `isVisible` — overlay'ın DOM'da bulunup bulunmayacağını kontrol eden state, gecikmeli kapanma için kullanılır
-    - `hoveredCategory` — Fareyle üzerine gelinen kategoriyi tutan DomainCategory state'i
-    - `selectedParentCategory` — Seçilen üst kategoriyi tutan DomainCategory state'i (alt kategorileri gösterirken kullanılır)
-    - `getSubCategoryCount` — useCallback ile tanımlanmış, verilen üst kategori ID'sine ait alt kategori sayısını hesaplayan fonksiyon
-    - `handleCategoryClick` — Kategori tıklamasını işleyen iç fonksiyon
-    - `handleSubCategoryClick` — Alt kategori tıklamasını işleyen iç fonksiyon
-    - `displayCategories` — Görüntülenecek kategorilerin listesi, seçili üst kategorinin alt kategorileri veya ana kategoriler
-    - `hoveredVm` — `hoveredCategory`'nin `wrapCategory` ile oluşturulmuş görünüm modeli
-- **Dönüş**: React.FC<CategoryHubOverlayProps> — JSX elementi veya `null` (isVisible false ise)
+  - `router` — useRouter() hook'undan gelen Next.js router, sayfa yönlendirmeleri için kullanılır
+  - `categories` — useCategories() hook'undan gelen tüm kategoriler dizisi, alt kategori sayımlarında ve filtrelemede kullanılır
+  - `mainCategories` — useCategories() hook'undan gelen categoryTree alias'ı, üst düzey kategorileri temsil eder
+  - `wrapCategory` — useCategoryViewModel() hook'undan gelen fonksiyon, DomainCategory'yi view model'e dönüştürür
+  - `isAnimating` — useState<boolean>, overlay animasyon durumunu kontrol eder (scale-y, opacity transitionları)
+  - `isVisible` — useState<boolean>, overlay'in DOM'da render edilip edilmeyeceğini kontrol eder
+  - `hoveredCategory` — useState<DomainCategory | null>, sol panelde hover edilen kategoriyi tutar, 3D ikon ve açıklama gösterimi için kullanılır
+  - `selectedParentCategory` — useState<DomainCategory | null>, tıklanan üst kategoriyi tutar, alt kategori listesine geçiş yapar
+  - `getSubCategoryCount` — useCallback ile tanımlı fonksiyon, bir kategorinin alt kategori sayısını döndürür
+  - `handleCategoryClick` — useCallback olmayan fonksiyon, kategori tıklamasını yönetir (alt kategori varsa seçim, yoksa yönlendirme)
+  - `handleSubCategoryClick` — useCallback olmayan fonksiyon, alt kategori tıklamasında sayfa yönlendirmesi yapar
+  - `displayCategories` — selectedParentCategory'e göre filtrelenmiş veya mainCategories olan kategoriler dizisi, JSX'te map ile render edilir
+  - `hoveredVm` — hoveredCategory'in wrapCategory() ile oluşturulmuş view model'i, JSX'te displayName ve description olarak kullanılır
+- **Dönüş**: JSX elementi veya `null` (isVisible false ise null döner)
 
-### [N2_NASIL] AST Pointer: CategoryHubOverlay.tsx::handleCategoryClick
-- **params**: `category` — DomainCategory tipinde, tıklanan kategori nesnesi
+### [N2_NASIL] AST Pointer: CategoryHubOverlay.tsx::useEffect (hoveredCategory başlatma)
+- **params**: yok
 - **ic_degiskenler**:
-    - `subCount` — `categories` listesinden filtrelenerek hesaplanan, verilen kategorinin alt kategori sayısı
+  (boş — useCallback içinde değişken tanımlanmamış)
 - **Dönüş**: yok
 
-### [N3_NASIL] AST Pointer: CategoryHubOverlay.tsx::handleSubCategoryClick
-- **params**: `subCategory` — DomainCategory tipinde, tıklanan alt kategori nesnesi
-- **ic_degiskenler**: (yok)
+### [N3_NASIL] AST Pointer: CategoryHubOverlay.tsx::getSubCategoryCount
+- **params**: `parentId: string` — alt kategori sayılacak olan üst kategorinin ID'si
+- **ic_degiskenler**:
+  (fonksiyon gövdesinde ek değişken yok, doğrudan filter sonucu length döndürür)
+- **Dönüş**: `number` — parentId'ye sahip alt kategorilerin sayısı
+
+### [N4_NASIL] AST Pointer: CategoryHubOverlay.tsx::useEffect (isOpen açılış/kapanış yönetimi)
+- **params**: yok
+- **ic_degiskenler**:
+  - `timer` — setTimeout handle'ı, kapanış animasyonu sonrası isVisible'ı false yapar, cleanup'ta temizlenir
+- **Dönüş**: cleanup fonksiyonu (clearTimer)
+
+### [N5_NASIL] AST Pointer: CategoryHubOverlay.tsx::requestAnimationFrame callback
+- **params**: yok
+- **ic_degiskenler**:
+  (boş)
 - **Dönüş**: yok
+
+### [N6_NASIL] AST Pointer: CategoryHubOverlay.tsx::useEffect (Escape tuşu handler)
+- **params**: yok
+- **ic_degiskenler**:
+  - `handleEsc` — KeyboardEvent handler, Escape tuşuna basıldığında selectedParentCategory varsa geri döner, yoksa onClose() çağırır
+- **Dönüş**: cleanup fonksiyonu (keydown listener kaldırılır)
+
+### [N7_NASIL] AST Pointer: CategoryHubOverlay.tsx::handleEsc
+- **params**: `e: KeyboardEvent` — klavye olayı nesnesi
+- **ic_degiskenler**:
+  (boş)
+- **Dönüş**: yok
+
+### [N8_NASIL] AST Pointer: CategoryHubOverlay.tsx::useEffect (body overflow yönetimi)
+- **params**: yok
+- **ic_degiskenler**:
+  (boş)
+- **Dönüş**: cleanup fonksiyonu (body overflow'u sıfırlar)
+
+### [N9_NASIL] AST Pointer: CategoryHubOverlay.tsx::useEffect cleanup (overflow reset)
+- **params**: yok
+- **ic_degiskenler**:
+  (boş)
+- **Dönüş**: yok
+
+### [N10_NASIL] AST Pointer: CategoryHubOverlay.tsx::handleCategoryClick
+- **params**: `category: DomainCategory` — tıklanan kategori nesnesi
+- **ic_degiskenler**:
+  - `subCount` — category.id'ye sahip alt kategorilerin sayısı, 0'dan büyükse alt kategori listesine geçilir
+- **Dönüş**: yok
+
+### [N11_NASIL] AST Pointer: CategoryHubOverlay.tsx::handleSubCategoryClick
+- **params**: `subCategory: DomainCategory` — tıklanan alt kategori nesnesi
+- **ic_degiskenler**:
+  (boş — doğrudan selectedParentCategory kontrolü yapılıp router.push çağrılır)
+- **Dönüş**: yok
+
+### [N12_NASIL] AST Pointer: CategoryHubOverlay.tsx::IIFE (metric gösterimi)
+- **params**: yok
+- **ic_degiskenler**:
+  - `metadata` — hoveredCategory.metadata'inin CategoryMetadata olarak cast edilmiş hali, metric bilgilerini içerir
+  - `metric1` — metadata.metric1 alanının { value, label } nesnesi olarak cast edilmiş hali, ekranda gösterilen istatistik değeri
+- **Dönüş**: JSX elementi veya `null` (metric1 yoksa null)
+
+### [N13_NASIL] AST Pointer: CategoryHubOverlay.tsx::map callback (displayCategories)
+- **params**: `cat` — DomainCategory, map içindeki her bir kategori elemanı
+- **ic_degiskenler**:
+  - `vm` — wrapCategory(cat) ile oluşturulan view model, displayName gösterimi için kullanılır
+  - `isSelected` — selectedParentCategory !== null kontrolünden türetilen boolean, alt kategori modunda olunduğunu belirtir
+  - `subCount` — isSelected false ise getSubCategoryCount(cat.id) ile hesaplanan alt kategori sayısı, 0'dan büyükse "Alt Kategori" etiketi gösterilir
+- **Dönüş**: JSX button elementi
 
 ---
 
@@ -127,8 +184,8 @@ graph TD
     CategoryHubOverlay_tsx__CategoryHubOverlay["CategoryHubOverlay"]
     CategoryHubOverlay_tsx__handleCategoryClick["handleCategoryClick"]
     CategoryHubOverlay_tsx__handleSubCategoryClick["handleSubCategoryClick"]
-    CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleSubCategoryClick
     CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleCategoryClick
+    CategoryHubOverlay_tsx__CategoryHubOverlay --> CategoryHubOverlay_tsx__handleSubCategoryClick
 ```
 
 ## NODE ID STANDARD

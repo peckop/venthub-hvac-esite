@@ -8,7 +8,7 @@ entity_hashes:
   func:Footer: 1e0192e85e1f6373
   overview: 05f327193547be84
   style_tokens: 266d0ec5d4b33045
-generated_at: 2026-06-09T06:46:02Z
+generated_at: 2026-06-11T16:12:03Z
 ---
 
 ## Genel Bakış

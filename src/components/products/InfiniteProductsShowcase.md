@@ -12,7 +12,7 @@ entity_hashes:
   func:handleClick: bffc3b12eebc550c
   overview: b1b7345878b827c3
   style_tokens: 6568addf96368125
-generated_at: 2026-06-10T09:55:33Z
+generated_at: 2026-06-11T16:15:47Z
 ---
 
 ## Genel Bakış
@@ -133,89 +133,6 @@ Bu modül, Three.js tabanlı 3B sahnede sonsuz kaydırma ile ürün vitrini serg
   - `base` — `url.split('?')[0]` ile elde edilen query string öncesi kısım; orijinal dosya yolunu temsil eder
   - `renderUrl` — `base` içinde `/object/` varsa `/render/image/` ile değiştirilmiş Supabase render URL'i; yoksa `base` aynen kalır
 - **Dönüş**: `string` — `?width=X&quality=75&format=webp` parametreli optimizasyonlu URL veya orijinal `url` (supabase değilse / boşsa)
-
----
-
-### [N2_NASIL] AST Pointer: `InfiniteProductsShowcase.tsx::ProductCard`
-- **params**: `({ item, index, total, gap, scrollOffset, isPaused, onHover })`
-  - `item: ProductItem` — Ürün veri nesnesi; `item.image`, `item.id`, `item.title` alanları kullanılır
-  - `index: number` — Ürünün sıralama indeksi; yatay pozisyon hesabında çarpımlandırılır
-  - `total: number` — Toplam ürün sayısı; `sphereWidth = total * gap` hesabında kullanılır
-  - `gap: number` — Ürünler arasındaki uzamsal boşluk (Three.js world birimi)
-  - `scrollOffset: React.MutableRefObject<number>` — Anlık kayma ofset değeri; useFrame içinde `scrollOffset.current` olarak okunur
-  - `isPaused: boolean` — Akış duraklatılmışsa `true`; Float component'e `speed` parametresi olarak geçilir
-  - `onHover: (hovering: boolean) => void` — Hover durumu değiştiğinde üst bileşene bildirim callback'i
-- **ic_degiskenler**:
-  - `groupRef` — `useRef<Group>(null)` — Three.js Group DOM referansı; useFrame içinde `position.x` ve `rotation.y` değerleri ayarlanır
-  - `imageRef` — `useRef<Mesh>(null)` — Mesh DOM referansı; useFrame içinde `scale.x`, `scale.y` ve `material.emissiveIntensity` düzenlenir
-  - `router` — `useRouter()` — Next.js router; handleClick içinde `router.push(Routes.category(item.id))` ile navigasyon yapılır
-  - `hovered` — `useState(false)` — Fare üzerine gelindiğinde `true` olan boolean state; scale hedefi ve renk seçimini belirler
-  - `optimizedUrl` — `useMemo(() => getOptimizedImageUrl(item.image), [item.image])` — `item.image` değişiminde yeniden hesaplanan önbellekli optimizasyonlu görsel URL'i; DreiImage `url` prop'una geçilir
-  - `sphereWidth` — `total * gap` — Sonsuz kayma döngüsünün toplam genişliği; modül wrap-around hesabında kullanılır
-  - `handleClick` — `(e: ThreeEvent<MouseEvent>) => void` — `e.stopPropagation()` ile event yayılımını durdurur, `router.push(Routes.category(item.id))` ile ürün sayfasına yönlendirir
-- **Dönüş**: JSX — `<group>` içinde `<Float>`, `<DreiImage>`, koşullu `<mesh>` (hover halkası), `<Text>` elemanları
-
----
-
-### [N3_NASIL] AST Pointer: `InfiniteProductsShowcase.tsx::ProductCard.useFrame`
-- **params**: `(state, _delta)`
-  - `state` — Three.js useFrame state nesnesi; `state.clock.elapsedTime` ile animasyon süresine erişilir
-  - `_delta` — Frame'ler arası geçen süre (saniye); bu callback içinde kullanılmıyor
-- **ic_degiskenler**:
-  - `offset` — `scrollOffset.current` — Dışarıdan gelen anlık kayma ofset değeri; pozisyon hesabının temel girdisi
-  - `xPos` — `((index * gap) - (offset * sphereWidth))` formülü ile hesaplanan ham yatay pozisyon; modül wrap-around ile `[-sphereWidth/2, sphereWidth/2)` aralığına sarılır; `groupRef.current.position.x` ve `groupRef.current.rotation.y` değerlerine atanır
-  - `targetScale` — `hovered ? 1.15 : 1.0` — Hover durumuna göre hedef ölçek; `MathUtils.lerp` ile yumuşak geçiş uygulanır
-  - `mat` — `imageRef.current.material as MeshStandardMaterial` — Mesh malzemesi referansı; `emissiveIntensity` alanı `MathUtils.lerp` ve `Math.sin(state.clock.elapsedTime * 4)` ile nabız efekti için ayarlanır
-- **Dönüş**: yok
-
----
-
-### [N4_NASIL] AST Pointer: `InfiniteProductsShowcase.tsx::handleClick`
-- **params**: `(e: ThreeEvent<MouseEvent>)`
-  - `e: ThreeEvent<MouseEvent>` — Three.js tarafından sarılmış MouseEvent nesnesi; `e.stopPropagation()` çağrılır
-- **ic_degiskenler**: yok
-- **Dönüş**: yok — yan etki: `router.push(Routes.category(item.id))` ile ürün detay sayfasına navigasyon yapılır
-
----
-
-### [N5_NASIL] AST Pointer: `InfiniteProductsShowcase.tsx::SceneContent`
-- **params**: `({ items, isPaused, onHover })`
-  - `items: ProductItem[]` — Render edilecek ürün dizisi; `.map()` ile ProductCard bileşenlerine dönüştürülür
-  - `isPaused: boolean` — Akış duraklatılmışsa `true`; useFrame içinde scroll artışını engeller
-  - `onHover: (h: boolean) => void` — Hover durumu callback'i; her ProductCard'a aktarılır
-- **ic_degiskenler**:
-  - `gap` — `5` — Sabit uzamsal boşluk sabiti (Three.js world birimi); her ProductCard'a prop olarak geçilir
-  - `scrollOffset` — `useRef(0)` — Sonsuz kayma ofseti mutable ref'i; useFrame içinde her frame `delta * 0.02` kadar artırılır, 1'i aşınca 1 çıkarılarak döngüsel akış sağlanır
-  - `camera` — `useThree().camera` — Three.js kamera nesnesi; useFrame içinde `position.x` ve `position.y` `MathUtils.lerp` ile solunum (breathing) efekti için ayarlanır
-- **Dönüş**: JSX — `<Bvh>` içinde `<group>`, `<Suspense>`, `.map()` ProductCard listesi, ground plane `<mesh>`, `<Sparkles>` parçacık efekti
-
----
-
-### [N6_NASIL] AST Pointer: `InfiniteProductsShowcase.tsx::SceneContent.useFrame`
-- **params**: `(state, delta)`
-  - `state` — Three.js useFrame state; `state.clock.elapsedTime` kamera breathing periyodu için kullanılır
-  - `delta` — Frame'ler arası geçen süre (saniye); `scrollOffset.current` artış miktarının çarpanıdır
-- **ic_degiskenler**: yok (dış kapanımdan erişilen değişkenler: `scrollOffset`, `isPaused`, `camera`)
-- **Dönüş**: yok — yan etki: `scrollOffset.current` güncellenir, `camera.position.x` ve `camera.position.y` ayarlanır
-
----
-
-### [N7_NASIL] AST Pointer: `InfiniteProductsShowcase.tsx::SceneContent.mapCallback`
-- **params**: `(item, i)`
-  - `item: ProductItem` — Mevcut ürün verisi; ProductCard'a `item` prop'u olarak geçilir
-  - `i: number` — Ürünün dizideki indeksi; ProductCard'a hem `index` hem `key` oluşturmak için kullanılır
-- **ic_degiskenler**: yok
-- **Dönüş**: `<ProductCard>` JSX elemanı — `key`, `item`, `index`, `total`, `gap`, `scrollOffset`, `isPaused`, `onHover` prop'ları ile
-
----
-
-### [N8_NASIL] AST Pointer: `InfiniteProductsShowcase.tsx::InfiniteProductsShowcase`
-- **params**: `({ items })`
-  - `items: ProductItem[]` — Render edilecek ürün listesi; boşsa `null` döner
-- **ic_degiskenler**:
-  - `isPaused` — `useState(false)` — Akışın duraklatılıp duraklatılmadığını tutan boolean state; `true` olduğunda otomatik kayma durur, overlay metni "Duraklatıldı" gösterir
-  - `setIsPaused` — `useState`'in setter fonksiyonu; `SceneContent` bileşenine `onHover` prop'u olarak geçilir, hover durumuna göre akışı durdurur/başlatır
-- **Dönüş**: `JSX | null` — Boş `items` durumunda `null`; aksi takdirde `<div>` wrapper içinde `<Canvas>` (3D sahne: ambientLight, pointLight'lar, Environment, SceneContent, AdaptiveDpr, AdaptiveEvents, Preload), overlay talimat `<div>`'i, sol ve sağ gradient maske `<div>`'leri
 
 ---
 

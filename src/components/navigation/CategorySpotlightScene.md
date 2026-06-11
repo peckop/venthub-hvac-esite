@@ -3,27 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\CategorySpotlightScene.tsx
-skeleton_hash: ec6f8e94c84b4af3
+skeleton_hash: b4baf1a923aef1b1
 entity_hashes:
   func:CategorySpotlightScene: a7f8b134dbbbfdd7
-  overview: 21fb58d1bec5fba7
+  overview: f87b88559127da21
   style_tokens: d4731e166286b701
-generated_at: 2026-06-10T09:12:03Z
+generated_at: 2026-06-11T16:14:30Z
 ---
 
 ## Genel Bakış
-CategorySpotlightScene modülü, navigasyon sisteminde belirli bir kategoriyi öne çıkaran görsel bir sahne bileşenidir. Verilen kategori slug değerine göre ilgili kategorinin içeriğini kullanıcıya sunar.
+Bu modül, navigasyon sistemi içinde belirli bir kategoriyi öne çıkaran görsel bir vitrin bileşeni olarak görev yapar. Temel sorumluluğu, gelen `categorySlug` değerine göre ilgili kategorinin benzersiz sahne yapısını ve içeriğini kullanıcıya sunmaktır.
 
 ## Fonksiyon Grupları
 ### Bileşen Renderlama
-Kategori öne çıkarma sahnesinin kullanıcı arayüzünü oluşturmak ve göstermekten sorumludur.
+Bu grup, belirli bir kategorinin öne çıkan sahnesinin kullanıcı arayüzünü oluşturmak ve sayfada göstermekten sorumludur.
 - CategorySpotlightScene
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için tanımlanan fonksiyon imzası temelinde aşağıdaki mimari varsayımlar belirlenmiştir.
+Bu modül için fonksiyon imzası temelinde aşağıdaki mimari varsayımlar belirlenmiştir.
+
+---
+
+[Aksiyom 1]: Eğer `categorySlug` parametresi传递edilmezse, bileşen doğru bir kategori gösterimi yapamaz ve hatalı veya boş bir sahne oluşturulur.
+
+[Aksiyom 2]: Eğer `categorySlug` geçerli bir kategori tanımlayıcısı (slug formatında) içermiyorsa, bileşen ilgili kategoriyi bulamaz ve beklenmeyen bir durum oluşur.
+
+---
+
+**Not:** Bu modül için fonksiyon imzasında belirtilen `categorySlug` parametresi dışında varsayılan değer veya opsiyonel parametre bulunmamaktadır. Bileşenin iç render mantığı, API çağrıları veya hata yönetim mekanizmaları fonksiyon imzasından çıkarılamamıştır.
 
 ---
 
@@ -51,12 +61,10 @@ Bu modül için tanımlanan fonksiyon imzası temelinde aşağıdaki mimari vars
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/navigation/CategorySpotlightScene.tsx::CategorySpotlightScene
-- **params**: `{ categorySlug }` — render edilecek kategorinin slug değeri; Category3DIcon bileşenine prop olarak iletilir
-- **ic_degiskenler**:
-  (fonksiyon gövdesinde herhangi bir değişken tanımlanmamıştır; tüm değerler JSX içinde doğrudan inline kullanılmıştır)
-- **Dönüş**: JSX — `div.absolute.inset-0.pointer-events-none` sarmalayıcısı içinde Three.js `Canvas` ve sahne elemanları (dört farklı ışık kaynağı, Suspense ile sarılmış Float animasyonu içinde Category3DIcon, otomatik dönen OrbitControls ve city preset'li Environment)
-- **Yan etkiler**: 3D sahne otomatik döndürme (`autoRotate` @ 1.8 hız) ve yüzer animasyon (`Float` @ speed 2) içerir; `pointer-events-none` CSS class'ı ile tıklama olaylarını engeller
+### [N1_NASIL] AST Pointer: CategorySpotlightScene.tsx::CategorySpotlightScene
+- **params**: (categorySlug) — Kategori slug'ı, Category3DIcon bileşenine prop olarak geçirilir
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX (React bileşeni) — 3D sahne ve içinde yüzen bir kategori ikonu
 
 ---
 
