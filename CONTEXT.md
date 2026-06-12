@@ -42,6 +42,11 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 | **Faz 3: Tenant Admin + Billing** | Tenant kendi işini yönetsin, subscription/billing sistemi | 📋 Planlandı |
 | **Faz 4: Marketplace + Plugin** | Çoklu satıcı, komisyon, plugin mimarisi | 📋 Uzun vade |
 
+> ⚠️ **Gerçek-zemin:** Faz 1 *altyapısı* (tenant tabloları, çoğu tabloda `tenant_id`) uygulandı; ama tenant
+> **izolasyonu ENFORCE EDİLMİYOR** — `tenantResolver` hardcoded fallback'e düşüyor, 3 tablo `tenant_id`'siz.
+> "🏆 BİTTİ" = altyapı kuruldu, izolasyon değil. Gerçek multi-tenant → blueprint **R4** onarımı (bkz.
+> `docs/audits/dealer-data-ground-truth-2026-06-11.md`).
+>
 > Detaylı plan: `docs/plans/venthub_saas_master_roadmap.md` · Faz 1 prompt: `docs/plans/venthub_saas_faz1_prompt.md`
 
 ---

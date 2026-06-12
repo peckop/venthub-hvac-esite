@@ -4,6 +4,12 @@
 > **Durum:** Faz 1 başlatılacak, Faz 2-4 planlanmış
 > **Model:** Opus 4.6 (Planlama), Teamwork (Uygulama)
 
+> ⚠️ **GÜNCEL GERÇEK (2026-06-12 — gerçek-zemin notu):** Faz 1 *altyapısı* uzak DB'ye uygulandı, AMA tenant
+> **izolasyonu STUB** durumunda: `tenantResolver` hardcoded `DEFAULT_TENANT_ID`'ye düşüyor, 3 tablo
+> (`organizations`/`user_projects`/`project_items`) `tenant_id` taşımıyor. Bu roadmap'in "tam izole" hedefi
+> henüz ENFORCE EDİLMİYOR — gerçek multi-tenant blueprint **R4** onarımına bağlı.
+> Kanıt: `docs/audits/dealer-data-ground-truth-2026-06-11.md`.
+
 ---
 
 ## 📌 Proje Kimliği

@@ -3,7 +3,8 @@
 > **Not:** Bu dosya kurucunun **vizyonunu ve ticari niyetini** kaydeder (11 Haziran 2026'da
 > sözlü anlatımdan derlendi). Burada yazılanlar **hedef/niyet**tir — *gerçekte kurulu olan*
 > değil. Ticari hazırlık ("umut var mı") ayrıca, **kod tabanının gerçek durumuna** (CodeGraph)
-> karşı değerlendirilir; vizyon yön verir, kanıt sayılmaz. Verdict için → bu dosyanın sonu / `RECOMMENDATIONS.md`.
+> karşı değerlendirilir; vizyon yön verir, kanıt sayılmaz. Verdict için → **bu dosyanın sonu (§6)**.
+> (Bayi/B2B katmanının kanıtlı gerçeği için → `docs/audits/dealer-data-ground-truth-2026-06-11.md`.)
 
 ## 1. Kurucu & Sektör Otoritesi (asıl varlık)
 

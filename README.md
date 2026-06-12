@@ -19,7 +19,7 @@ HVAC sektörüne özel, B2B/B2C karma satış mimarisi üzerine kurulu premium e
 | Hata Takibi | Sentry | **8.54.0** |
 | Paket Yöneticisi | pnpm | — |
 
-> **🤖 AI Otonom Yetenek Sayısı:** Projede **29 adet** uzmanlaşmış `.agent/skills/` yeteneği aktiftir (performans, güvenlik, mimari, i18n, NotebookLM entegrasyonu, multi-agent orkestrasyon vb.).
+> **🤖 AI Otonom Yetenek Sayısı:** Projede **30+** uzmanlaşmış yetenek aktiftir (`.claude/skills/`; legacy `.agent/skills/`) — performans, güvenlik, mimari, i18n, NotebookLM entegrasyonu, multi-agent orkestrasyon vb. Güncel liste: `docs/venthub_skills_master.md`.
 
 ### 🆕 Son Geliştirmeler
 - 🚀 **Performans Optimizasyonu Sprinti (10.06.2026):**

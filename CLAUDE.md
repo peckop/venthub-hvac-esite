@@ -85,10 +85,11 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 ## Doküman Haritası
 
 - `CONTEXT.md` — uçtan uca kapsamlı referans (mimari, DB, akışlar, kurallar). **İlk buraya bak.**
+- `docs/README.md` — doküman sistemi haritası ("hangi soru → hangi dosya"). `docs/standards/` = cetveller (admin/bayi standartları, blueprint), `docs/audits/` = ölçümler, `docs/plans/` = roadmap.
 - `PROJECT.md` — DI & güvenlik milestone kayıtları + arayüz kontratları.
 - `RECOMMENDATIONS.md` · `CHANGELOG.md` — durum ve değişiklik geçmişi.
-- `docs/` — üretilmiş master MD'ler (frontend, edge functions, DB şema).
-- `.agent/skills/` — Antigravity formatındaki yetenekler (Claude Code tarafına taşınması planlı).
+- `docs/` (kök) — **üretilmiş** master MD'ler (frontend, edge functions, DB şema) — elle düzenleme.
+- `.claude/skills/` — Claude Code yetenekleri (aktif). `.agent/skills/` = legacy Antigravity (faz-out).
 
 ## Bilgi Kaynağı İş Akışı (üç katman)
 
