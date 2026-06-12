@@ -42,7 +42,7 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 | **Faz 3: Tenant Admin + Billing** | Tenant kendi işini yönetsin, subscription/billing sistemi | 📋 Planlandı |
 | **Faz 4: Marketplace + Plugin** | Çoklu satıcı, komisyon, plugin mimarisi | 📋 Uzun vade |
 
-> Detaylı plan: `docs/venthub_saas_master_roadmap.md` · Faz 1 prompt: `docs/venthub_saas_faz1_prompt.md`
+> Detaylı plan: `docs/plans/venthub_saas_master_roadmap.md` · Faz 1 prompt: `docs/plans/venthub_saas_faz1_prompt.md`
 
 ---
 
@@ -74,11 +74,9 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 | Özellik | Detay |
 |---------|-------|
 | Motor | PostgreSQL (Supabase hosted) |
-| Tablolar | 28 (Tenants ve Order Refund Events dahil) |
-| RLS Politikaları | 132 (Çoklu kiracı sızdırmazlığı aktif) |
-| RPC Fonksiyonları | 55 (jwt_tenant_id, metadata ve profile sync dahil) |
-| İndeksler | 47 (Kiracı kolon indeksleri dahil) |
-| Migrasyon Dosyaları | 174 |
+| Güncel topoloji | Tablo / RLS politika / fonksiyon / indeks **sayıları için daima `docs/database_schema_master.md`** (otomatik üretilir — elle sayı yazma, drift eder) |
+| Çoklu kiracı | tenant-scoped RLS aktif (bkz. §14 SaaS kuralları) |
+| Helper'lar | `jwt_tenant_id()`, metadata/profile sync RPC'leri |
 
 ### Dış Entegrasyonlar
 | Servis | Kullanım |
@@ -137,7 +135,7 @@ venthub-hvac/
 │       ├── legal/              # Hukuki sayfalar (KVKK, gizlilik...)
 │       └── support/            # Destek sayfaları (SSS, iade, kargo...)
 ├── supabase/
-│   ├── functions/              # Edge Functions (25 fonksiyon)
+│   ├── functions/              # Edge Functions (~30 fonksiyon, _shared dahil)
 │   │   ├── _shared/            # Paylaşılan modüller (notify, sentry, rate_limit)
 │   │   ├── iyzico-payment/     # Ödeme başlatma
 │   │   ├── iyzico-callback/    # Ödeme callback
@@ -150,7 +148,7 @@ venthub-hvac/
 │   └── migrations/             # PostgreSQL migration dosyaları
 ├── docs/                       # Üretilmiş dokümantasyon
 │   ├── venthub_hvac_master.md  # Frontend master MD (930+ dosya)
-│   ├── supabase_functions_master.md # Backend master MD (25 fonksiyon)
+│   ├── supabase_functions_master.md # Backend master MD (~30 fonksiyon, _shared dahil)
 │   └── database_schema_master.md   # DB şema master MD
 ├── .agent/                     # AI ajan konfigürasyonu
 │   ├── skills/                 # AI yetenekleri (SKILL.md)
@@ -163,26 +161,12 @@ venthub-hvac/
 
 ## 5. Veritabanı Ana Tabloları
 
-| Tablo | Amaç |
-|-------|------|
-| `venthub_orders` | Siparişler (durum, tutar, müşteri, kargo) |
-| `venthub_returns` | İade talepleri ve süreç yönetimi |
-| `products` | Ürün kataloğu (SKU, fiyat, stok, teknik özellikler) |
-| `cart_items` | Sepet verileri |
-| `user_profiles` | Kullanıcı profilleri (rol, isim, telefon) |
-| `inventory_movements` | Stok giriş/çıkış hareketleri |
-| `price_lists` | B2B fiyat listeleri |
-| `wizard_selections` | İhtiyaç sihirbazı kullanıcı seçimleri |
-| `admin_audit_log` | Admin işlem denetim kaydı |
-| `shipping_webhook_events` | Kargo webhook audit log |
-| `returns_webhook_events` | İade webhook audit log |
-| `order_email_events` | E-posta gönderim audit log |
-| `categories` | Ürün kategorileri (hiyerarşik) |
-| `addresses` | Kullanıcı adresleri |
-| `invoice_profiles` | Fatura profilleri (bireysel/kurumsal) |
-| `coupons` | İndirim kuponları |
-| `tenants` | Kiracı kayıtları, subdomain, özel alan adı, tema/stil, özellik bayrakları (feature flags) ve marka ayarları |
-| `order_refund_events` | Sipariş iade/refund hareketleri ve tutar denetim kaydı |
+Tam tablo/kolon/constraint/RLS listesi **otomatik üretilir → `docs/database_schema_master.md`** (elle liste tutma, drift eder). Domain çekirdeği, kabaca:
+
+- **Ticaret:** `venthub_orders`, `venthub_returns`, `order_refund_events`, `products`, `categories`, `cart_items`, `coupons`, `price_lists`
+- **Kullanıcı/B2B:** `user_profiles` (org_id, tenant_id), `addresses`, `invoice_profiles`, `organizations`, `product_prices`, `user_projects`
+- **Operasyon/denetim:** `inventory_movements`, `admin_audit_log`, `*_webhook_events`, `order_email_events`, `wizard_selections`
+- **SaaS:** `tenants` (subdomain, tema, feature flags, marka)
 
 ---
 
@@ -228,17 +212,11 @@ Düşük stok → stock-alert → WhatsApp/SMS bildirim (Twilio)
 
 ## 7. Rol Bazlı Erişim (RBAC)
 
-| Rol | Yetki |
-|-----|-------|
-| `super_admin` | Tüm sistem yönetimi, tüm tenant'lara erişim |
-| `admin` | Sipariş yönetimi, stok, kargo, iade işlemleri |
-| `moderator` | İçerik yönetimi, ürün düzenleme |
-| `editor` | Bilgi merkezi içerik düzenleme |
-| `support` | Müşteri destek işlemleri |
-| `customer` | Ürün görüntüleme, sepet, sipariş, hesap yönetimi |
-| `user` | Temel kullanıcı (varsayılan) |
+Geçerli roller — **canlı `user_profiles.role` CHECK kısıtı**: `super_admin`, `admin`, `warehouse`, `sales`, `viewer`, `user`.
 
-RBAC `user_profiles.role` alanı + `useRole()` hook + Edge Function auth middleware ile uygulanır. 108 RLS politikası veritabanı seviyesinde güvenliği sağlar.
+> ⚠️ `moderator` / `editor` / `support` / `customer` DB'de **geçersizdir** (CHECK reddeder). Rol → izin matrisi `src/lib/rbac.ts` (SSOT); güncel RLS topolojisi `docs/database_schema_master.md`.
+
+RBAC `user_profiles.role` + `useRole()` hook + Edge Function auth middleware ile uygulanır; RLS politikaları DB seviyesinde sızdırmazlığı sağlar. SaaS yetki kararları **`app_metadata`** üzerinden (bkz. §14).
 
 ---
 
@@ -331,20 +309,11 @@ React Three Fiber (`@react-three/fiber` 9.5.0) ve `@react-three/drei` ile geliş
 
 ## 13. Dokümantasyon Altyapısı
 
-Proje, **Corpus Callosum (cc)** pipeline ile otonom dokümantasyon üretir:
+Proje, **orion** pipeline ile kaynak koddan otonom `.md` üretir; master'lar **NotebookLM dijital ikizine** yüklenir (proje hafızası). Notebook ID: `235043eb-970f-4a52-9f39-1d02b2621e9c`.
 
-| Komut | İşlev |
-|-------|-------|
-| `cc doc all` | Frontend kaynak → MD üretimi |
-| `cc doc batch --batch-dir supabase/functions` | Edge Function → MD üretimi |
-| `cc doc schema` | DB şema → MD üretimi |
-| `cc doc tree --nlm-sync --force-sync` | Master birleştirme + NLM upload |
-
-**NotebookLM Digital Twin:** Tüm master MD'ler NLM'e yüklenerek proje hafızası oluşturulur. Notebook ID: `235043eb-970f-4a52-9f39-1d02b2621e9c`
-- **Otonom Oturum Yönetimi:** Dokümantasyon eşitlemeleri sırasında oluşabilecek `Authentication expired` hataları, kullanıcı müdahalesi gerekmeksizin otonom olarak `nlm login` + `refresh_auth` mekanizması ile sessizce çözülür.
-- **Supabase Edge Functions Mühürü:** Güncel mimaride yer alan 25 adet Edge Function'ın (`cc doc batch`) dokümanlarının senkronizasyon sırasında NotebookLM'e tam ve eksiksiz aktarılması zorunludur. Bu durum tüm mikroservislerin otonom denetimini garanti eder.
-- **Orion CLI Granüler Dökümantasyon Standardı:** Dökümantasyon motoru, tüm modüller için `entity_hashes` tabanlı parça değişimi takibi yapar ve `AST POINTERS` standardına uygun olarak iç değişkenleri (`ic_degiskenler`, `params`, `dönüşler`) en ince kılcal damarına kadar detaylandırır.
-- **Xiaomi mimoV2 Premium Token Planı ve Paralel İşçi (Workers) Standardı:** Projemiz, **Xiaomi mimoV2 Premium Token** (mimo-v2.5) planına abonedir. Bu sayede dakikalık token ve istek hız sınırları (TPM/RPM limits) son derece yüksektir. Gelecek tüm oturumlarda ve dokümantasyon güncellemelerinde Orion CLI komutları (özellikle `orion doc all` veya `orion doc changed`) doğrudan **`--workers 20`** (20 paralel işçi) parametresi ile çalıştırılmalı, böylece bekleme süreleri en aza indirilmelidir.
+- **Komutlar & tam akış** → `.claude/skills/notebooklm-sync/` yeteneği (`orion doc all | batch | schema | tree`). (Eski `cc doc` alias'ı hâlâ çalışır ama `orion` kullan.)
+- **Sync modeli — MILESTONE/MANUEL (her commit'te DEĞİL):** LLM-güdümlü; sırayla **auth-tazele** (`.agent/scripts/nlm-headless-refresh.ps1`, penceresiz ~15sn) → `orion doc tree --nlm-sync --force-sync` → `notebook_query` ile **DOĞRULA**. Mekanik auto-sync auth düşünce sessizce başarısız olduğu için kaldırıldı; **post-commit hook artık yereldir** (NLM'e dokunmaz). Bkz. memory `nlm-sync-milestone-model`.
+- **Üretilen vs küratörlü:** kök master'lar (`*_master.md`, `system_tree.md`) elle düzenlenmez (pipeline ezer); küratörlü dokümanlar `docs/` alt klasörlerinde — harita: **`docs/README.md`**.
 
 ---
 
@@ -417,6 +386,6 @@ Bu projede kullanılan Antigravity CLI (`agy.exe`) konuşmalarını isimlendirme
 
 ---
 
-*Son güncelleme: 2026-06-10*
+*Son güncelleme: 2026-06-12 (twin-denetimli sadeleştirme: bayat sayılar→pointer, RBAC rolleri canlıya hizalandı, sync modeli güncellendi)*
 
 

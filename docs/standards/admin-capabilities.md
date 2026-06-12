@@ -48,52 +48,43 @@ yazıyoruz ki sonra açmak refactor değil, anahtar çevirmek olsun (bkz. `admin
 
 ## 3. Bayi/Dealer Enterprise Modülü (en büyük boşluk — Avensair'in kalbi)
 
-**Sade dille:** Bugün "bayi" diye bir şey yok; herkes düz kullanıcı. Enterprise bir distribütör paneli
-şunları ZORUNLU ister:
+**Sade dille:** Bugün "bayi" diye bir şey yok; herkes düz kullanıcı. Bunu enterprise distribütör paneline
+taşımak Avensair'in kalbi.
 
-1. **Bayi organizasyonu** (entity) — bir bayi = bir şirket; altında **birden çok kullanıcı** (satınalmacı,
-   muhasebe). Bugünkü `user_projects.user_id` yerine `dealer_id`/org bağı.
-2. **Bayi kademeleri (tier)** — Gümüş/Altın/Platin → farklı iskonto/fiyat listesi.
-3. **Bayiye özel fiyat listesi** — mevcut `priceListId` tohumunu **admin'den yönetilebilir** yap: liste
-   oluştur, ürünlere özel fiyat, bayiye/tier'a ata. (`getEffectiveUnitPrice` zaten okuyor.)
-4. **Cari/kredi limiti** — bakiye, vade, limit aşımı uyarısı (B2B'nin olmazsa olmazı).
-5. **Proje → Teklif → Sipariş hattı** — bayinin `user_projects` BOM'unu admin görür → teklif (PDF/onay) →
-   siparişe çevir. Mevcut "teklif iste" tohumunu **yönetilen pipeline** yap.
-6. **Bayi performans paneli** — ciro, sipariş sıklığı, ABC, hedef.
-7. **Bayi onboarding** — başvuru → onay → fiyat listesi ata → davet.
-
-Hepsi `admin-standard.md` kontratına uyar (Resource Index + Details + RBAC 3 katman + audit + tenant-scope).
+> **Otorite bu dosya DEĞİL** (eski hâli varsayımsaldı). Bayi modülünün:
+> - **NE'si** (domain: bayi≠kullanıcı, roller, fiyat, CPQ, deal-registration) → **`dealer-network-standard.md`**
+> - **NASIL'ı** (R0→B2 sırası, ORG-TIER fiyat kararı, gerçek DB zemini) → **`dealer-module-blueprint.md`**
+>
+> Burada tekrar etmiyoruz (drift önlemi). Tüm bayi sayfaları yine `admin-standard.md` kontratına uyar
+> (Resource Index + Details + RBAC 3 katman + audit + tenant-scope).
 
 ---
 
 ## 4. Farklılaştırıcılar — "herkesin yaptığı" DEĞİL, bizi ayıran
 
-> İlke: jenerik mağaza admin'i ürün+sipariş+müşteri yönetir. Bizim moat'ımız **kod değil domain** —
-> 14 yıl HVAC + ESP IP + teknik otorite (bkz. `venthub-vision`). Admin bunu **ifade etmeli**.
+> İlke: moat = **kod değil domain** (14 yıl HVAC + ESP IP + teknik otorite). Admin bunu **ifade etmeli**.
 
-| Herkes bunu yapar | **VentHub farkı (fayda için, hatır için değil)** |
-|---|---|
-| Ürün listesi | **Spec-driven HVAC katalog** — debi/basınç/ses/filtre-sınıfı/ESP yapısal veri → faceted filtre + seçim zekâsı. (Başta dediğin PDF→spec→Supabase altyapısı bunu besler.) |
-| Genel müşteri | **B2B HVAC distribütör kokpiti** — bayi ağı enablement (§3), distribütör iş modeline birebir |
-| Sepet→ödeme | **Proje/BOM → Teklif → Sipariş** — HVAC proje-bazlı satılır, impuls değil |
-| Statik açıklama | **Authority içerik motoru** (var) + ileride **ESP/DW172 seçim motoru** (asıl IP — moat) |
-| 2D foto | **3D prosedürel vitrin** (30+ model, var) |
+> **Tek ev:** Farklılaştırıcı/moat sentezi → **`../VISION.md`** (vizyon/moat) + B2B yansıması
+> **`dealer-network-standard.md §13`**. Burada listeyi tekrar tutmuyoruz (drift önlemi).
 
-**Stratejik net:** Avensair'i kazandıran farklılaştırıcılar = **§3 bayi modülü + spec-driven katalog +
-teklif hattı**. Seçim motoru (ESP) bir sonraki dalga — kopyalanamaz moat ama Avensair DoD'si için şart değil.
+**Stratejik net (bu dosyanın katkısı):** Avensair'i kazandıran çekirdek = **§3 bayi modülü + spec-driven
+katalog + teklif hattı**. ESP/DW172 seçim motoru bir sonraki dalga — kopyalanamaz moat ama Avensair
+DoD'si için şart değil.
 
 ---
 
 ## 5. Avensair-önce yol haritası (sıralı)
 
-1. **Bayi modülü temeli** (§3.1–3.3): dealer org + tier + bayiye-özel fiyat listesi yönetimi. *(Avensair DoD çekirdeği)*
-2. **Proje→Teklif→Sipariş hattı** (§3.5): mevcut `user_projects` tohumunu admin pipeline'a bağla.
-3. **Cari/limit** (§3.4) + **bayi performans paneli** (§3.6).
-4. **Spec-driven katalog** (§4): ürün spec'lerini yapısal veriye al → faceted filtre.
-5. Mevcut admin'i `admin-standard.md` cetveline göre **standartlaştır** (ortak tablo kiti, RBAC/audit boşlukları).
-6. Refund aksiyonu + CMS/merchandising (değerlendirmeye alındı, ikinci dalga).
+> ⚠️ **Bayi modülü sıralaması `dealer-module-blueprint.md §3`'e tabidir:** B1-B2 (panel/seed) ÖNCESİ
+> R0–R5 ONARIM şarttır. Aşağıdaki "bayi modülü" maddesi, blueprint'in onarım-sonra-inşa sırasına göre
+> okunmalı — kırık altyapı üstüne inşa olarak değil.
 
-> Her madde için `admin-standard.md §8` cetveli geçerli; her yeni sayfa o kontrata uyar.
+1. **Bayi modülü** → `dealer-module-blueprint.md` R0–B2 (onarım → panel → seed). *(Avensair DoD çekirdeği)*
+2. **Spec-driven katalog** (§4): ürün spec'lerini yapısal veriye al → faceted filtre.
+3. Mevcut admin'i `admin-standard.md` cetveline göre **standartlaştır** (ortak tablo kiti, RBAC/audit boşlukları).
+4. Refund aksiyonu + CMS/merchandising (ikinci dalga).
+
+> Her yeni sayfa `admin-standard.md §8` cetveline uyar.
 
 ## 6. SaaS-hazır (sonra — bugün kurma, hazırlığını yap)
 

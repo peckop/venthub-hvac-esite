@@ -50,7 +50,12 @@ Dört kaynağın da birleştiği temel: alıcı bir *kişi* değil, bir *şirket
 - Çözülmüş sonuç **Combined Price List**'e materialize edilir; storefront onu okur.
 
 > **VentHub tohumu:** `priceListId` + `getEffectiveUnitPrice` **zaten var** — eksik olan, fiyat listesini
-> **admin'den yönetip bayiye/tier'a atayan** UI. Tohum doğru, katman eksik.
+> **admin'den yönetip tier'a atayan** UI. Tohum doğru, katman eksik.
+
+> ⚠️ **Uygulanan model ≠ bu domain ideali (çelişki değil, kapsam kararı).** Yukarısı PRM/B2B teorisinin
+> tam hâli (çok-katman override, per-account). VentHub'ın **faz-1'de inşa ettiği** model
+> `dealer-module-blueprint.md §2`'deki **ORG-TIER tek sözleşme**: segment = `organizations.tier_level`
+> (role değil), fiyat tier'a göre çözülür. Per-account / çok-katman = ileride additive — bugün kurulmaz.
 
 ## 4. Katalog görünürlüğü (gated catalog)
 
