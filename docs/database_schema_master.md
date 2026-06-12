@@ -1,9 +1,9 @@
 # Veritabani Semasi — venthub-hvac
 
 ---
-compiled_at: 2026-06-12T06:47:37.276229+00:00
+compiled_at: 2026-06-12T06:56:19.491029+00:00
 tables: 38
-policies: 12
+policies: 101
 functions: 38
 indexes: 78
 ---
@@ -694,1826 +694,281 @@ indexes: 78
 
 ## 2. RLS POLICY'LER
 
-### TABLES
+### admin_audit_log
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| admin_audit_log_insert_v2 ON public.admin_audit_log FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
+| admin_audit_log_insert_v2 | INSERT | authenticated | `-` |
+| admin_audit_log_select_v2 | SELECT | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()))` |
+| admin_audit_log_service_role | ALL | service_role | `USING (true)` |
 
+### cart_items
 
---
--- Name: admin_audit_log admin_audit_log_select_v2; Type: POLICY; Schema: public; Owner: -
---
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| cart_items_service_role | ALL | service_role | `USING (true)` |
+| ci_auth_all | ALL | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND (cart_id IN ( SELECT shopping_c` |
 
-CREATE POLICY admin_audit_log_select_v2 ON public.admin_audit_log FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
+### categories
 
-
---
--- Name: admin_audit_log admin_audit_log_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY admin_audit_log_service_role ON public.admin_audit_log TO service_role USING (true);
-
-
---
--- Name: error_groups admins_read_error_groups; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY admins_read_error_groups ON public.error_groups FOR SELECT TO authenticated USING (public.is_admin_user());
-
-
---
--- Name: cart_items; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
-
---
--- Name: cart_items cart_items_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY cart_items_service_role ON public.cart_items TO service_role USING (true);
-
-
---
--- Name: categories cat_admin_delete_opt; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY cat_admin_delete_opt ON public.categories FOR DELETE TO authenticated USING ((EXISTS ( SELECT 1
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| cat_admin_delete_opt | DELETE | authenticated | `USING ((EXISTS ( SELECT 1
    FROM public.user_profiles
-  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
-
-
---
--- Name: categories cat_admin_insert_opt; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY cat_admin_insert_opt ON public.categories FOR INSERT TO authenticated WITH CHECK ((EXISTS ( SELECT 1
+  WHERE ((user_profiles.i` |
+| cat_admin_insert_opt | INSERT | authenticated | `-` |
+| cat_admin_update_opt | UPDATE | authenticated | `USING ((EXISTS ( SELECT 1
    FROM public.user_profiles
-  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
-
-
---
--- Name: categories cat_admin_update_opt; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY cat_admin_update_opt ON public.categories FOR UPDATE TO authenticated USING ((EXISTS ( SELECT 1
-   FROM public.user_profiles
-  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))) WITH CHECK ((EXISTS ( SELECT 1
-   FROM public.user_profiles
-  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
-
-
---
--- Name: categories cat_public_read_opt; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY cat_public_read_opt ON public.categories FOR SELECT USING (true);
-
-
---
--- Name: categories; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
-
---
--- Name: category_mapping_rules; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.category_mapping_rules ENABLE ROW LEVEL SECURITY;
-
---
--- Name: cart_items ci_auth_all; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY ci_auth_all ON public.cart_items TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (cart_id IN ( SELECT shopping_carts.id
-   FROM public.shopping_carts
-  WHERE ((shopping_carts.user_id = ( SELECT auth.uid() AS uid)) AND (shopping_carts.tenant_id = public.jwt_tenant_id())))))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (cart_id IN ( SELECT shopping_carts.id
-   FROM public.shopping_carts
-  WHERE ((shopping_carts.user_id = ( SELECT auth.uid() AS uid)) AND (shopping_carts.tenant_id = public.jwt_tenant_id()))))));
-
-
---
--- Name: client_errors; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.client_errors ENABLE ROW LEVEL SECURITY;
-
---
--- Name: contact_messages; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.contact_messages ENABLE ROW LEVEL SECURITY;
-
---
--- Name: coupons; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
-
---
--- Name: coupons coupons_admin_delete; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY coupons_admin_delete ON public.coupons FOR DELETE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: coupons coupons_admin_insert; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY coupons_admin_insert ON public.coupons FOR INSERT TO authenticated WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: coupons coupons_admin_update; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY coupons_admin_update ON public.coupons FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: coupons coupons_select_anon; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY coupons_select_anon ON public.coupons FOR SELECT TO anon USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))));
-
-
---
--- Name: coupons coupons_select_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY coupons_select_authenticated ON public.coupons FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin) OR ((is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))))));
-
-
---
--- Name: coupons coupons_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY coupons_service_role ON public.coupons TO service_role USING (true);
-
-
---
--- Name: error_groups; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.error_groups ENABLE ROW LEVEL SECURITY;
-
---
--- Name: inventory_movements; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.inventory_movements ENABLE ROW LEVEL SECURITY;
-
---
--- Name: inventory_movements inventory_movements_select_admin; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY inventory_movements_select_admin ON public.inventory_movements FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: inventory_movements inventory_movements_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY inventory_movements_service_role ON public.inventory_movements TO service_role USING (true);
-
-
---
--- Name: inventory_settings; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.inventory_settings ENABLE ROW LEVEL SECURITY;
-
---
--- Name: inventory_settings inventory_settings_select_all; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY inventory_settings_select_all ON public.inventory_settings FOR SELECT TO anon, authenticated USING ((tenant_id = public.jwt_tenant_id()));
-
-
---
--- Name: inventory_settings inventory_settings_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY inventory_settings_service_role ON public.inventory_settings TO service_role USING (true);
-
-
---
--- Name: inventory_settings inventory_settings_update_admin; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY inventory_settings_update_admin ON public.inventory_settings FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: shopping_carts merged_shopping_carts_service_role_select; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY merged_shopping_carts_service_role_select ON public.shopping_carts FOR SELECT TO service_role USING ((true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true));
-
-
---
--- Name: order_attachments; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.order_attachments ENABLE ROW LEVEL SECURITY;
-
---
--- Name: order_attachments order_attachments_admin_delete; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_attachments_admin_delete ON public.order_attachments FOR DELETE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: order_attachments order_attachments_admin_insert; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_attachments_admin_insert ON public.order_attachments FOR INSERT TO authenticated WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: order_attachments order_attachments_admin_update; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_attachments_admin_update ON public.order_attachments FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: order_attachments order_attachments_select_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_attachments_select_authenticated ON public.order_attachments FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin) OR ((NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id
-   FROM public.venthub_orders
-  WHERE ((venthub_orders.user_id = ( SELECT auth.uid() AS uid)) AND (venthub_orders.tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)))))))));
-
-
---
--- Name: order_attachments order_attachments_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_attachments_service_role ON public.order_attachments TO service_role USING (true);
-
-
---
--- Name: order_email_events; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.order_email_events ENABLE ROW LEVEL SECURITY;
-
---
--- Name: order_notes; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.order_notes ENABLE ROW LEVEL SECURITY;
-
---
--- Name: order_notes order_notes_admin_delete; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_notes_admin_delete ON public.order_notes FOR DELETE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: order_notes order_notes_admin_insert; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_notes_admin_insert ON public.order_notes FOR INSERT TO authenticated WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: order_notes order_notes_admin_update; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_notes_admin_update ON public.order_notes FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: order_notes order_notes_select_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_notes_select_authenticated ON public.order_notes FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin) OR ((NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id
-   FROM public.venthub_orders
-  WHERE ((venthub_orders.user_id = ( SELECT auth.uid() AS uid)) AND (venthub_orders.tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)))))))));
-
-
---
--- Name: order_notes order_notes_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_notes_service_role ON public.order_notes TO service_role USING (true);
-
-
---
--- Name: order_refund_events; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.order_refund_events ENABLE ROW LEVEL SECURITY;
-
---
--- Name: order_refund_events order_refund_events_admin_select; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_refund_events_admin_select ON public.order_refund_events FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
-
-
---
--- Name: order_refund_events order_refund_events_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY order_refund_events_service_role ON public.order_refund_events TO service_role USING (true);
-
-
---
--- Name: venthub_orders orders_delete_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY orders_delete_policy ON public.venthub_orders FOR DELETE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user() AS is_admin_user)));
-
-
---
--- Name: venthub_orders orders_insert_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY orders_insert_policy ON public.venthub_orders FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
-
-
---
--- Name: venthub_orders orders_select_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY orders_select_policy ON public.venthub_orders FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
-
-
---
--- Name: venthub_orders orders_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY orders_service_role ON public.venthub_orders TO service_role USING (true);
-
-
---
--- Name: venthub_orders orders_update_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY orders_update_policy ON public.venthub_orders FOR UPDATE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user)))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
-
-
---
--- Name: organizations; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
-
---
--- Name: payment_transactions; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.payment_transactions ENABLE ROW LEVEL SECURITY;
-
---
--- Name: price_lists; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.price_lists ENABLE ROW LEVEL SECURITY;
-
---
--- Name: price_lists price_lists_admin_delete; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY price_lists_admin_delete ON public.price_lists FOR DELETE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: price_lists price_lists_admin_insert; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY price_lists_admin_insert ON public.price_lists FOR INSERT TO authenticated WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: price_lists price_lists_admin_update; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY price_lists_admin_update ON public.price_lists FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: price_lists price_lists_select_anon; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY price_lists_select_anon ON public.price_lists FOR SELECT TO anon USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (is_active = true)));
-
-
---
--- Name: price_lists price_lists_select_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY price_lists_select_authenticated ON public.price_lists FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin) OR (is_active = true))));
-
-
---
--- Name: price_lists price_lists_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY price_lists_service_role ON public.price_lists TO service_role USING (true);
-
-
---
--- Name: products prod_admin_delete_opt; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY prod_admin_delete_opt ON public.products FOR DELETE TO authenticated USING ((EXISTS ( SELECT 1
-   FROM public.user_profiles
-  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
-
-
---
--- Name: products prod_admin_insert_opt; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY prod_admin_insert_opt ON public.products FOR INSERT TO authenticated WITH CHECK ((EXISTS ( SELECT 1
-   FROM public.user_profiles
-  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
-
-
---
--- Name: products prod_admin_update_opt; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY prod_admin_update_opt ON public.products FOR UPDATE TO authenticated USING ((EXISTS ( SELECT 1
-   FROM public.user_profiles
-  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))) WITH CHECK ((EXISTS ( SELECT 1
-   FROM public.user_profiles
-  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
-
-
---
--- Name: products prod_public_read_opt; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY prod_public_read_opt ON public.products FOR SELECT USING (true);
-
-
---
--- Name: product_authorities; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.product_authorities ENABLE ROW LEVEL SECURITY;
-
---
--- Name: product_images; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;
-
---
--- Name: product_images product_images_select_all; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY product_images_select_all ON public.product_images FOR SELECT USING (true);
-
-
---
--- Name: product_images product_images_update_admin; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY product_images_update_admin ON public.product_images FOR UPDATE TO authenticated USING ((EXISTS ( SELECT 1
-   FROM public.user_profiles
-  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying])::text[])))))) WITH CHECK ((EXISTS ( SELECT 1
-   FROM public.user_profiles
-  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying])::text[]))))));
-
-
---
--- Name: product_prices; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.product_prices ENABLE ROW LEVEL SECURITY;
-
---
--- Name: product_prices product_prices_admin_delete; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY product_prices_admin_delete ON public.product_prices FOR DELETE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: product_prices product_prices_admin_insert; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY product_prices_admin_insert ON public.product_prices FOR INSERT TO authenticated WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: product_prices product_prices_admin_update; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY product_prices_admin_update ON public.product_prices FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
-
-
---
--- Name: product_prices product_prices_select_anon; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY product_prices_select_anon ON public.product_prices FOR SELECT TO anon USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (is_active = true)));
-
-
---
--- Name: product_prices product_prices_select_authenticated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY product_prices_select_authenticated ON public.product_prices FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin) OR (is_active = true))));
-
-
---
--- Name: product_prices product_prices_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY product_prices_service_role ON public.product_prices TO service_role USING (true);
-
-
---
--- Name: products; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
-
---
--- Name: project_items; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.project_items ENABLE ROW LEVEL SECURITY;
-
---
--- Name: rate_limits; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.rate_limits ENABLE ROW LEVEL SECURITY;
-
---
--- Name: venthub_returns returns_delete_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY returns_delete_policy ON public.venthub_returns FOR DELETE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user() AS is_admin_user)));
-
-
---
--- Name: venthub_returns returns_insert_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY returns_insert_policy ON public.venthub_returns FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
-
-
---
--- Name: venthub_returns returns_select_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY returns_select_policy ON public.venthub_returns FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
-
-
---
--- Name: venthub_returns returns_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY returns_service_role ON public.venthub_returns TO service_role USING (true);
-
-
---
--- Name: venthub_returns returns_update_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY returns_update_policy ON public.venthub_returns FOR UPDATE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user() AS is_admin_user))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user() AS is_admin_user)));
-
-
---
--- Name: returns_webhook_events; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.returns_webhook_events ENABLE ROW LEVEL SECURITY;
-
---
--- Name: returns_webhook_events returns_webhook_events_admin_select; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY returns_webhook_events_admin_select ON public.returns_webhook_events FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
-
-
---
--- Name: returns_webhook_events returns_webhook_events_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY returns_webhook_events_service_role ON public.returns_webhook_events TO service_role USING (true);
-
-
---
--- Name: shopping_carts sc_auth_all; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY sc_auth_all ON public.shopping_carts TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
-
-
---
--- Name: shipping_email_events; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.shipping_email_events ENABLE ROW LEVEL SECURITY;
-
---
--- Name: shipping_email_events shipping_email_events_admin_select; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY shipping_email_events_admin_select ON public.shipping_email_events FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
-
-
---
--- Name: shipping_email_events shipping_email_events_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY shipping_email_events_service_role ON public.shipping_email_events TO service_role USING (true);
-
-
---
--- Name: shipping_idempotency; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.shipping_idempotency ENABLE ROW LEVEL SECURITY;
-
---
--- Name: shipping_webhook_events; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.shipping_webhook_events ENABLE ROW LEVEL SECURITY;
-
---
--- Name: shipping_webhook_events shipping_webhook_events_admin_select; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY shipping_webhook_events_admin_select ON public.shipping_webhook_events FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
-
-
---
--- Name: shipping_webhook_events shipping_webhook_events_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY shipping_webhook_events_service_role ON public.shipping_webhook_events TO service_role USING (true);
-
-
---
--- Name: shopping_carts; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.shopping_carts ENABLE ROW LEVEL SECURITY;
-
---
--- Name: shopping_carts shopping_carts_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY shopping_carts_service_role ON public.shopping_carts TO service_role USING (true);
-
-
---
--- Name: site_settings; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
-
---
--- Name: tenants; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.tenants ENABLE ROW LEVEL SECURITY;
-
---
--- Name: tenants tenants_all_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY tenants_all_service_role ON public.tenants TO service_role USING (true);
-
-
---
--- Name: tenants tenants_select; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY tenants_select ON public.tenants FOR SELECT TO anon, authenticated USING (true);
-
-
---
--- Name: user_invoice_profiles uip_own; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY uip_own ON public.user_invoice_profiles TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
-
-
---
--- Name: user_addresses; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.user_addresses ENABLE ROW LEVEL SECURITY;
-
---
--- Name: user_addresses user_addresses_delete; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_addresses_delete ON public.user_addresses FOR DELETE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
-
-
---
--- Name: user_addresses user_addresses_insert; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_addresses_insert ON public.user_addresses FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
-
-
---
--- Name: user_addresses user_addresses_select; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_addresses_select ON public.user_addresses FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
-
-
---
--- Name: user_addresses user_addresses_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_addresses_service_role ON public.user_addresses TO service_role USING (true);
-
-
---
--- Name: user_addresses user_addresses_update; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_addresses_update ON public.user_addresses FOR UPDATE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
-
-
---
--- Name: user_invoice_profiles; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.user_invoice_profiles ENABLE ROW LEVEL SECURITY;
-
---
--- Name: user_invoice_profiles user_invoice_profiles_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_invoice_profiles_service_role ON public.user_invoice_profiles TO service_role USING (true);
-
-
---
--- Name: user_profiles; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
-
---
--- Name: user_profiles user_profiles_delete_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_profiles_delete_policy ON public.user_profiles FOR DELETE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
-
-
---
--- Name: user_profiles user_profiles_insert_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_profiles_insert_policy ON public.user_profiles FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ((id = ( SELECT auth.uid() AS uid)) OR public.is_admin_user())));
-
-
---
--- Name: user_profiles user_profiles_select_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_profiles_select_policy ON public.user_profiles FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ((id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
-
-
---
--- Name: user_profiles user_profiles_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_profiles_service_role ON public.user_profiles TO service_role USING (true);
-
-
---
--- Name: user_profiles user_profiles_update_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY user_profiles_update_policy ON public.user_profiles FOR UPDATE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ((id = ( SELECT auth.uid() AS uid)) OR public.is_admin_user()))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ((id = ( SELECT auth.uid() AS uid)) OR public.is_admin_user())));
-
-
---
--- Name: user_projects; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.user_projects ENABLE ROW LEVEL SECURITY;
-
---
--- Name: venthub_order_items; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.venthub_order_items ENABLE ROW LEVEL SECURITY;
-
---
--- Name: venthub_order_items venthub_order_items_insert_optimized; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY venthub_order_items_insert_optimized ON public.venthub_order_items FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (EXISTS ( SELECT 1
-   FROM public.venthub_orders
-  WHERE ((venthub_orders.id = venthub_order_items.order_id) AND (venthub_orders.user_id = ( SELECT auth.uid() AS uid)) AND (venthub_orders.tenant_id = public.jwt_tenant_id()))))));
-
-
---
--- Name: venthub_order_items venthub_order_items_select_consolidated; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY venthub_order_items_select_consolidated ON public.venthub_order_items FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ((order_id IN ( SELECT venthub_orders.id
-   FROM public.venthub_orders
-  WHERE ((venthub_orders.user_id = ( SELECT auth.uid() AS uid)) AND (venthub_orders.tenant_id = public.jwt_tenant_id())))) OR ( SELECT public.is_admin_user() AS is_admin_user))));
-
-
---
--- Name: venthub_order_items venthub_order_items_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY venthub_order_items_service_role ON public.venthub_order_items TO service_role USING (true);
-
-
---
--- Name: venthub_orders; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.venthub_orders ENABLE ROW LEVEL SECURITY;
-
---
--- Name: venthub_returns; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.venthub_returns ENABLE ROW LEVEL SECURITY;
-
---
--- Name: wizard_selections; Type: ROW SECURITY; Schema: public; Owner: -
---
-
-ALTER TABLE public.wizard_selections ENABLE ROW LEVEL SECURITY;
-
---
--- Name: wizard_selections wizard_selections_service_role; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY wizard_selections_service_role ON public.wizard_selections TO service_role USING (true);
-
-
---
--- Name: wizard_selections ws_anon_insert; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY ws_anon_insert ON public.wizard_selections FOR INSERT TO anon WITH CHECK ((tenant_id = public.jwt_tenant_id()));
-
-
---
--- Name: wizard_selections ws_auth_all; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY ws_auth_all ON public.wizard_selections TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
-
-
---
--- Name: SCHEMA public; Type: ACL; Schema: -; Owner: -
---
-
-GRANT USAGE ON SCHEMA public TO postgres;
-GRANT USAGE ON SCHEMA public TO anon;
-GRANT USAGE ON SCHEMA public TO authenticated;
-GRANT USAGE ON SCHEMA public TO service_role;
-GRANT USAGE ON SCHEMA public TO supabase_auth_admin;
-
-
---
--- Name: FUNCTION _normalize_rls_expr(expr text); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public._normalize_rls_expr(expr text) TO anon;
-GRANT ALL ON FUNCTION public._normalize_rls_expr(expr text) TO authenticated;
-GRANT ALL ON FUNCTION public._normalize_rls_expr(expr text) TO service_role;
-
-
---
--- Name: FUNCTION adjust_stock(p_product_id uuid, p_delta integer, p_reason text); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text) TO service_role;
-GRANT ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text) TO authenticated;
-
-
---
--- Name: FUNCTION adjust_stock(p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid) TO service_role;
-GRANT ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid) TO authenticated;
-
-
---
--- Name: FUNCTION adjust_stock_v2(p_product_id uuid, p_delta integer); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.adjust_stock_v2(p_product_id uuid, p_delta integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.adjust_stock_v2(p_product_id uuid, p_delta integer) TO service_role;
-
-
---
--- Name: FUNCTION admin_list_all_users(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.admin_list_all_users() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.admin_list_all_users() TO service_role;
-
-
---
--- Name: FUNCTION admin_list_users(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.admin_list_users() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.admin_list_users() TO service_role;
-GRANT ALL ON FUNCTION public.admin_list_users() TO authenticated;
-
-
---
--- Name: FUNCTION admin_search_products(p_q text, p_limit integer, p_offset integer, p_category_id uuid); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.admin_search_products(p_q text, p_limit integer, p_offset integer, p_category_id uuid) TO anon;
-GRANT ALL ON FUNCTION public.admin_search_products(p_q text, p_limit integer, p_offset integer, p_category_id uuid) TO authenticated;
-GRANT ALL ON FUNCTION public.admin_search_products(p_q text, p_limit integer, p_offset integer, p_category_id uuid) TO service_role;
-
-
---
--- Name: FUNCTION bump_rate_limit(p_key text, p_limit integer, p_window_seconds integer); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.bump_rate_limit(p_key text, p_limit integer, p_window_seconds integer) TO anon;
-GRANT ALL ON FUNCTION public.bump_rate_limit(p_key text, p_limit integer, p_window_seconds integer) TO authenticated;
-GRANT ALL ON FUNCTION public.bump_rate_limit(p_key text, p_limit integer, p_window_seconds integer) TO service_role;
-
-
---
--- Name: FUNCTION custom_access_token_hook(event jsonb); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.custom_access_token_hook(event jsonb) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.custom_access_token_hook(event jsonb) TO service_role;
-GRANT ALL ON FUNCTION public.custom_access_token_hook(event jsonb) TO supabase_auth_admin;
-
-
---
--- Name: FUNCTION enforce_role_change(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.enforce_role_change() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.enforce_role_change() TO service_role;
-
-
---
--- Name: TABLE venthub_orders; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.venthub_orders TO anon;
-GRANT ALL ON TABLE public.venthub_orders TO authenticated;
-GRANT ALL ON TABLE public.venthub_orders TO service_role;
-
-
---
--- Name: FUNCTION fn_admin_get_orders(p_id text, p_conv text, p_status text, p_limit integer); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.fn_admin_get_orders(p_id text, p_conv text, p_status text, p_limit integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.fn_admin_get_orders(p_id text, p_conv text, p_status text, p_limit integer) TO service_role;
-
-
---
--- Name: FUNCTION fn_admin_update_order_status(p_id text, p_status text, p_conv text); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.fn_admin_update_order_status(p_id text, p_status text, p_conv text) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.fn_admin_update_order_status(p_id text, p_status text, p_conv text) TO service_role;
-
-
---
--- Name: FUNCTION fn_auto_categorize_products(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.fn_auto_categorize_products() TO anon;
-GRANT ALL ON FUNCTION public.fn_auto_categorize_products() TO authenticated;
-GRANT ALL ON FUNCTION public.fn_auto_categorize_products() TO service_role;
-
-
---
--- Name: FUNCTION fn_enrich_product_specs(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.fn_enrich_product_specs() TO anon;
-GRANT ALL ON FUNCTION public.fn_enrich_product_specs() TO authenticated;
-GRANT ALL ON FUNCTION public.fn_enrich_product_specs() TO service_role;
-
-
---
--- Name: FUNCTION fts_search_products(p_q text, p_limit integer, p_filters jsonb); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.fts_search_products(p_q text, p_limit integer, p_filters jsonb) TO anon;
-GRANT ALL ON FUNCTION public.fts_search_products(p_q text, p_limit integer, p_filters jsonb) TO authenticated;
-GRANT ALL ON FUNCTION public.fts_search_products(p_q text, p_limit integer, p_filters jsonb) TO service_role;
-
-
---
--- Name: FUNCTION generate_order_number(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.generate_order_number() TO anon;
-GRANT ALL ON FUNCTION public.generate_order_number() TO authenticated;
-GRANT ALL ON FUNCTION public.generate_order_number() TO service_role;
-
-
---
--- Name: FUNCTION get_admin_users(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.get_admin_users() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.get_admin_users() TO service_role;
-
-
---
--- Name: FUNCTION get_products_enriched(p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.get_products_enriched(p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.get_products_enriched(p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric) TO service_role;
-GRANT ALL ON FUNCTION public.get_products_enriched(p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric) TO authenticated;
-GRANT ALL ON FUNCTION public.get_products_enriched(p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric) TO anon;
-
-
---
--- Name: FUNCTION get_search_suggestions(p_q text, p_limit integer); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.get_search_suggestions(p_q text, p_limit integer) TO anon;
-GRANT ALL ON FUNCTION public.get_search_suggestions(p_q text, p_limit integer) TO authenticated;
-GRANT ALL ON FUNCTION public.get_search_suggestions(p_q text, p_limit integer) TO service_role;
-
-
---
--- Name: FUNCTION get_user_role(user_id uuid); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.get_user_role(user_id uuid) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.get_user_role(user_id uuid) TO service_role;
-
-
---
--- Name: FUNCTION handle_new_user_metadata(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.handle_new_user_metadata() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.handle_new_user_metadata() TO service_role;
-
-
---
--- Name: FUNCTION handle_new_user_profile(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.handle_new_user_profile() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.handle_new_user_profile() TO service_role;
-
-
---
--- Name: FUNCTION handle_supabase_webhook(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.handle_supabase_webhook() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.handle_supabase_webhook() TO service_role;
-
-
---
--- Name: FUNCTION increment_coupon_usage(p_code text); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.increment_coupon_usage(p_code text) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.increment_coupon_usage(p_code text) TO service_role;
-
-
---
--- Name: FUNCTION increment_error_group_count(p_group_id uuid); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.increment_error_group_count(p_group_id uuid) TO anon;
-GRANT ALL ON FUNCTION public.increment_error_group_count(p_group_id uuid) TO authenticated;
-GRANT ALL ON FUNCTION public.increment_error_group_count(p_group_id uuid) TO service_role;
-
-
---
--- Name: FUNCTION is_admin(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.is_admin() TO service_role;
-GRANT ALL ON FUNCTION public.is_admin() TO authenticated;
-
-
---
--- Name: FUNCTION is_admin_user(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.is_admin_user() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.is_admin_user() TO service_role;
-GRANT ALL ON FUNCTION public.is_admin_user() TO authenticated;
-
-
---
--- Name: FUNCTION is_staff_user(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.is_staff_user() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.is_staff_user() TO service_role;
-GRANT ALL ON FUNCTION public.is_staff_user() TO authenticated;
-
-
---
--- Name: FUNCTION is_user_admin(user_id uuid); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.is_user_admin(user_id uuid) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.is_user_admin(user_id uuid) TO service_role;
-GRANT ALL ON FUNCTION public.is_user_admin(user_id uuid) TO authenticated;
-
-
---
--- Name: FUNCTION jwt_role(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.jwt_role() TO anon;
-GRANT ALL ON FUNCTION public.jwt_role() TO authenticated;
-GRANT ALL ON FUNCTION public.jwt_role() TO service_role;
-
-
---
--- Name: FUNCTION jwt_tenant_id(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.jwt_tenant_id() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.jwt_tenant_id() TO service_role;
-GRANT ALL ON FUNCTION public.jwt_tenant_id() TO authenticated;
-GRANT ALL ON FUNCTION public.jwt_tenant_id() TO anon;
-
-
---
--- Name: FUNCTION normalize_product_threshold_overrides(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.normalize_product_threshold_overrides() TO anon;
-GRANT ALL ON FUNCTION public.normalize_product_threshold_overrides() TO authenticated;
-GRANT ALL ON FUNCTION public.normalize_product_threshold_overrides() TO service_role;
-
-
---
--- Name: FUNCTION process_order_stock_reduction(p_order_id text); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.process_order_stock_reduction(p_order_id text) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.process_order_stock_reduction(p_order_id text) TO service_role;
-
-
---
--- Name: FUNCTION reverse_inventory_batch(p_batch_id uuid); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.reverse_inventory_batch(p_batch_id uuid) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.reverse_inventory_batch(p_batch_id uuid) TO service_role;
-
-
---
--- Name: FUNCTION reverse_inventory_batch(p_batch_id uuid, p_max_minutes integer); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.reverse_inventory_batch(p_batch_id uuid, p_max_minutes integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.reverse_inventory_batch(p_batch_id uuid, p_max_minutes integer) TO service_role;
-
-
---
--- Name: FUNCTION set_order_number(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.set_order_number() TO anon;
-GRANT ALL ON FUNCTION public.set_order_number() TO authenticated;
-GRANT ALL ON FUNCTION public.set_order_number() TO service_role;
-
-
---
--- Name: FUNCTION set_stock(p_product_id uuid, p_new_qty integer, p_reason text); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text) TO service_role;
-GRANT ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text) TO authenticated;
-
-
---
--- Name: FUNCTION set_stock(p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid) TO service_role;
-GRANT ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid) TO authenticated;
-
-
---
--- Name: FUNCTION set_updated_at(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.set_updated_at() TO anon;
-GRANT ALL ON FUNCTION public.set_updated_at() TO authenticated;
-GRANT ALL ON FUNCTION public.set_updated_at() TO service_role;
-
-
---
--- Name: FUNCTION set_user_admin_role(user_id uuid, new_role text); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.set_user_admin_role(user_id uuid, new_role text) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.set_user_admin_role(user_id uuid, new_role text) TO service_role;
-GRANT ALL ON FUNCTION public.set_user_admin_role(user_id uuid, new_role text) TO authenticated;
-
-
---
--- Name: FUNCTION set_user_role(user_id uuid, new_role text); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.set_user_role(user_id uuid, new_role text) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.set_user_role(user_id uuid, new_role text) TO service_role;
-
-
---
--- Name: FUNCTION sync_payment_status_with_status(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.sync_payment_status_with_status() TO anon;
-GRANT ALL ON FUNCTION public.sync_payment_status_with_status() TO authenticated;
-GRANT ALL ON FUNCTION public.sync_payment_status_with_status() TO service_role;
-
-
---
--- Name: FUNCTION tr_auto_categorize_trigger(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.tr_auto_categorize_trigger() TO anon;
-GRANT ALL ON FUNCTION public.tr_auto_categorize_trigger() TO authenticated;
-GRANT ALL ON FUNCTION public.tr_auto_categorize_trigger() TO service_role;
-
-
---
--- Name: FUNCTION update_inventory_settings(p_default_low_stock_threshold integer); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.update_inventory_settings(p_default_low_stock_threshold integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.update_inventory_settings(p_default_low_stock_threshold integer) TO service_role;
-
-
---
--- Name: FUNCTION update_inventory_thresholds(p_default integer, p_reset_overrides boolean); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.update_inventory_thresholds(p_default integer, p_reset_overrides boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION public.update_inventory_thresholds(p_default integer, p_reset_overrides boolean) TO service_role;
-
-
---
--- Name: FUNCTION update_updated_at_column(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.update_updated_at_column() TO anon;
-GRANT ALL ON FUNCTION public.update_updated_at_column() TO authenticated;
-GRANT ALL ON FUNCTION public.update_updated_at_column() TO service_role;
-
-
---
--- Name: FUNCTION update_user_profiles_updated_at(); Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON FUNCTION public.update_user_profiles_updated_at() TO anon;
-GRANT ALL ON FUNCTION public.update_user_profiles_updated_at() TO authenticated;
-GRANT ALL ON FUNCTION public.update_user_profiles_updated_at() TO service_role;
-
-
---
--- Name: FUNCTION user_invoice_profiles_ensure_single_default(); Type: ACL; Schema: public; Owner: -
---
-
-REVOKE ALL ON FUNCTION public.user_invoice_profiles_ensure_single_default() FROM PUBLIC;
-GRANT ALL ON FUNCTION public.user_invoice_profiles_ensure_single_default() TO service_role;
-
-
---
--- Name: TABLE admin_audit_log; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.admin_audit_log TO anon;
-GRANT ALL ON TABLE public.admin_audit_log TO authenticated;
-GRANT ALL ON TABLE public.admin_audit_log TO service_role;
-
-
---
--- Name: TABLE user_profiles; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.user_profiles TO anon;
-GRANT ALL ON TABLE public.user_profiles TO authenticated;
-GRANT ALL ON TABLE public.user_profiles TO service_role;
-GRANT SELECT ON TABLE public.user_profiles TO supabase_auth_admin;
-
-
---
--- Name: TABLE admin_users; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.admin_users TO anon;
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.admin_users TO authenticated;
-GRANT ALL ON TABLE public.admin_users TO service_role;
-
-
---
--- Name: TABLE cart_items; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.cart_items TO anon;
-GRANT ALL ON TABLE public.cart_items TO authenticated;
-GRANT ALL ON TABLE public.cart_items TO service_role;
-
-
---
--- Name: TABLE categories; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON TABLE public.categories TO anon;
-GRANT ALL ON TABLE public.categories TO authenticated;
-GRANT ALL ON TABLE public.categories TO service_role;
-
-
---
--- Name: TABLE category_mapping_rules; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.category_mapping_rules TO anon;
-GRANT ALL ON TABLE public.category_mapping_rules TO authenticated;
-GRANT ALL ON TABLE public.category_mapping_rules TO service_role;
-
-
---
--- Name: TABLE client_errors; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.client_errors TO anon;
-GRANT ALL ON TABLE public.client_errors TO authenticated;
-GRANT ALL ON TABLE public.client_errors TO service_role;
-
-
---
--- Name: TABLE contact_messages; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.contact_messages TO anon;
-GRANT ALL ON TABLE public.contact_messages TO authenticated;
-GRANT ALL ON TABLE public.contact_messages TO service_role;
-
-
---
--- Name: TABLE coupons; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.coupons TO anon;
-GRANT ALL ON TABLE public.coupons TO authenticated;
-GRANT ALL ON TABLE public.coupons TO service_role;
-
-
---
--- Name: TABLE error_groups; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.error_groups TO anon;
-GRANT ALL ON TABLE public.error_groups TO authenticated;
-GRANT ALL ON TABLE public.error_groups TO service_role;
-
-
---
--- Name: TABLE inventory_movements; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.inventory_movements TO anon;
-GRANT ALL ON TABLE public.inventory_movements TO authenticated;
-GRANT ALL ON TABLE public.inventory_movements TO service_role;
-
-
---
--- Name: TABLE inventory_settings; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.inventory_settings TO anon;
-GRANT ALL ON TABLE public.inventory_settings TO authenticated;
-GRANT ALL ON TABLE public.inventory_settings TO service_role;
-
-
---
--- Name: TABLE products; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON TABLE public.products TO anon;
-GRANT ALL ON TABLE public.products TO authenticated;
-GRANT ALL ON TABLE public.products TO service_role;
-
-
---
--- Name: TABLE inventory_summary; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.inventory_summary TO anon;
-GRANT ALL ON TABLE public.inventory_summary TO authenticated;
-GRANT ALL ON TABLE public.inventory_summary TO service_role;
-
-
---
--- Name: TABLE venthub_order_items; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.venthub_order_items TO anon;
-GRANT ALL ON TABLE public.venthub_order_items TO authenticated;
-GRANT ALL ON TABLE public.venthub_order_items TO service_role;
-
-
---
--- Name: TABLE inventory_velocity; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.inventory_velocity TO anon;
-GRANT ALL ON TABLE public.inventory_velocity TO authenticated;
-GRANT ALL ON TABLE public.inventory_velocity TO service_role;
-
-
---
--- Name: TABLE order_attachments; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.order_attachments TO anon;
-GRANT ALL ON TABLE public.order_attachments TO authenticated;
-GRANT ALL ON TABLE public.order_attachments TO service_role;
-
-
---
--- Name: TABLE order_email_events; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.order_email_events TO anon;
-GRANT ALL ON TABLE public.order_email_events TO authenticated;
-GRANT ALL ON TABLE public.order_email_events TO service_role;
-
-
---
--- Name: TABLE order_notes; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.order_notes TO anon;
-GRANT ALL ON TABLE public.order_notes TO authenticated;
-GRANT ALL ON TABLE public.order_notes TO service_role;
-
-
---
--- Name: TABLE order_refund_events; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.order_refund_events TO anon;
-GRANT ALL ON TABLE public.order_refund_events TO authenticated;
-GRANT ALL ON TABLE public.order_refund_events TO service_role;
-
-
---
--- Name: TABLE organizations; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.organizations TO anon;
-GRANT ALL ON TABLE public.organizations TO authenticated;
-GRANT ALL ON TABLE public.organizations TO service_role;
-
-
---
--- Name: TABLE payment_transactions; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.payment_transactions TO anon;
-GRANT ALL ON TABLE public.payment_transactions TO authenticated;
-GRANT ALL ON TABLE public.payment_transactions TO service_role;
-
-
---
--- Name: TABLE price_lists; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON TABLE public.price_lists TO anon;
-GRANT ALL ON TABLE public.price_lists TO authenticated;
-GRANT ALL ON TABLE public.price_lists TO service_role;
-
-
---
--- Name: TABLE product_authorities; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.product_authorities TO anon;
-GRANT ALL ON TABLE public.product_authorities TO authenticated;
-GRANT ALL ON TABLE public.product_authorities TO service_role;
-
-
---
--- Name: TABLE product_images; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON TABLE public.product_images TO anon;
-GRANT ALL ON TABLE public.product_images TO authenticated;
-GRANT ALL ON TABLE public.product_images TO service_role;
-
-
---
--- Name: TABLE product_prices; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON TABLE public.product_prices TO anon;
-GRANT ALL ON TABLE public.product_prices TO authenticated;
-GRANT ALL ON TABLE public.product_prices TO service_role;
-
-
---
--- Name: TABLE project_items; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.project_items TO anon;
-GRANT ALL ON TABLE public.project_items TO authenticated;
-GRANT ALL ON TABLE public.project_items TO service_role;
-
-
---
--- Name: TABLE rate_limits; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.rate_limits TO anon;
-GRANT ALL ON TABLE public.rate_limits TO authenticated;
-GRANT ALL ON TABLE public.rate_limits TO service_role;
-
-
---
--- Name: TABLE reserved_orders; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON TABLE public.reserved_orders TO service_role;
-GRANT SELECT ON TABLE public.reserved_orders TO authenticated;
-
-
---
--- Name: TABLE returns_webhook_events; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.returns_webhook_events TO anon;
-GRANT ALL ON TABLE public.returns_webhook_events TO authenticated;
-GRANT ALL ON TABLE public.returns_webhook_events TO service_role;
-
-
---
--- Name: SEQUENCE returns_webhook_events_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON SEQUENCE public.returns_webhook_events_id_seq TO anon;
-GRANT ALL ON SEQUENCE public.returns_webhook_events_id_seq TO authenticated;
-GRANT ALL ON SEQUENCE public.returns_webhook_events_id_seq TO service_role;
-
-
---
--- Name: TABLE shipping_email_events; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.shipping_email_events TO anon;
-GRANT ALL ON TABLE public.shipping_email_events TO authenticated;
-GRANT ALL ON TABLE public.shipping_email_events TO service_role;
-
-
---
--- Name: TABLE shipping_idempotency; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.shipping_idempotency TO anon;
-GRANT ALL ON TABLE public.shipping_idempotency TO authenticated;
-GRANT ALL ON TABLE public.shipping_idempotency TO service_role;
-
-
---
--- Name: TABLE shipping_webhook_events; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.shipping_webhook_events TO anon;
-GRANT ALL ON TABLE public.shipping_webhook_events TO authenticated;
-GRANT ALL ON TABLE public.shipping_webhook_events TO service_role;
-
-
---
--- Name: SEQUENCE shipping_webhook_events_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON SEQUENCE public.shipping_webhook_events_id_seq TO anon;
-GRANT ALL ON SEQUENCE public.shipping_webhook_events_id_seq TO authenticated;
-GRANT ALL ON SEQUENCE public.shipping_webhook_events_id_seq TO service_role;
-
-
---
--- Name: TABLE shopping_carts; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.shopping_carts TO anon;
-GRANT ALL ON TABLE public.shopping_carts TO authenticated;
-GRANT ALL ON TABLE public.shopping_carts TO service_role;
-
-
---
--- Name: TABLE site_settings; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.site_settings TO anon;
-GRANT ALL ON TABLE public.site_settings TO authenticated;
-GRANT ALL ON TABLE public.site_settings TO service_role;
-
-
---
--- Name: TABLE tenants; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON TABLE public.tenants TO anon;
-GRANT ALL ON TABLE public.tenants TO authenticated;
-GRANT ALL ON TABLE public.tenants TO service_role;
-
-
---
--- Name: TABLE user_addresses; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.user_addresses TO anon;
-GRANT ALL ON TABLE public.user_addresses TO authenticated;
-GRANT ALL ON TABLE public.user_addresses TO service_role;
-
-
---
--- Name: TABLE user_invoice_profiles; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.user_invoice_profiles TO anon;
-GRANT ALL ON TABLE public.user_invoice_profiles TO authenticated;
-GRANT ALL ON TABLE public.user_invoice_profiles TO service_role;
-
-
---
--- Name: TABLE user_projects; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.user_projects TO anon;
-GRANT ALL ON TABLE public.user_projects TO authenticated;
-GRANT ALL ON TABLE public.user_projects TO service_role;
-
-
---
--- Name: TABLE venthub_returns; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.venthub_returns TO anon;
-GRANT ALL ON TABLE public.venthub_returns TO authenticated;
-GRANT ALL ON TABLE public.venthub_returns TO service_role;
-
-
---
--- Name: TABLE view_admin_orders; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.view_admin_orders TO anon;
-GRANT ALL ON TABLE public.view_admin_orders TO authenticated;
-GRANT ALL ON TABLE public.view_admin_orders TO service_role;
-
-
---
--- Name: TABLE wizard_selections; Type: ACL; Schema: public; Owner: -
---
-
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.wizard_selections TO anon;
-GRANT ALL ON TABLE public.wizard_selections TO authenticated;
-GRANT ALL ON TABLE public.wizard_selections TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: -
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: -
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: -
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: -
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: -
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO service_role;
-
-
---
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: -
---
-
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON TABLES TO postgres;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON TABLES TO anon;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON TABLES TO authenticated;
-ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL | ALL | public | `-` |
+  WHERE ((user_profiles.i` |
+| cat_public_read_opt | SELECT | public | `USING (true)` |
 
 ### contact_messages
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| Admins can view messages | SELECT | authenticated | `(EXISTS ( SELECT 1
+| Admins can view messages | SELECT | authenticated | `USING ((EXISTS ( SELECT 1
    FROM public.user_profiles
-  WHERE ((user_profiles.id = ( S` |
+  WHERE ((user_profiles.i` |
+
+### coupons
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| coupons_admin_delete | DELETE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| coupons_admin_insert | INSERT | authenticated | `-` |
+| coupons_admin_update | UPDATE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| coupons_select_anon | SELECT | anon | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (is_` |
+| coupons_select_authenticated | SELECT | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( S` |
+| coupons_service_role | ALL | service_role | `USING (true)` |
+
+### error_groups
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| admins_read_error_groups | SELECT | authenticated | `USING (public.is_admin_user())` |
+
+### inventory_movements
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| inventory_movements_select_admin | SELECT | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| inventory_movements_service_role | ALL | service_role | `USING (true)` |
+
+### inventory_settings
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| inventory_settings_select_all | SELECT | anon | `USING ((tenant_id = public.jwt_tenant_id()))` |
+| inventory_settings_service_role | ALL | service_role | `USING (true)` |
+| inventory_settings_update_admin | UPDATE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+
+### order_attachments
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| order_attachments_admin_delete | DELETE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| order_attachments_admin_insert | INSERT | authenticated | `-` |
+| order_attachments_admin_update | UPDATE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| order_attachments_select_authenticated | SELECT | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( S` |
+| order_attachments_service_role | ALL | service_role | `USING (true)` |
+
+### order_notes
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| order_notes_admin_delete | DELETE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| order_notes_admin_insert | INSERT | authenticated | `-` |
+| order_notes_admin_update | UPDATE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| order_notes_select_authenticated | SELECT | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( S` |
+| order_notes_service_role | ALL | service_role | `USING (true)` |
+
+### order_refund_events
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| order_refund_events_admin_select | SELECT | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()))` |
+| order_refund_events_service_role | ALL | service_role | `USING (true)` |
 
 ### organizations
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| Anyone can view organizations | SELECT | public | `true` |
+| Anyone can view organizations | SELECT | public | `USING (true)` |
+
+### price_lists
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| price_lists_admin_delete | DELETE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| price_lists_admin_insert | INSERT | authenticated | `-` |
+| price_lists_admin_update | UPDATE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| price_lists_select_anon | SELECT | anon | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (is_` |
+| price_lists_select_authenticated | SELECT | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( S` |
+| price_lists_service_role | ALL | service_role | `USING (true)` |
 
 ### product_authorities
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| Product authorities are manageable by admins. | ALL | public | `(EXISTS ( SELECT 1
+| Product authorities are manageable by admins. | ALL | public | `USING ((EXISTS ( SELECT 1
    FROM public.user_profiles
-  WHERE ((user_profiles.id = ( S` |
+  WHERE ((user_profiles.i` |
+
+### product_images
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| product_images_select_all | SELECT | public | `USING (true)` |
+| product_images_update_admin | UPDATE | authenticated | `USING ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.i` |
+
+### product_prices
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| product_prices_admin_delete | DELETE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| product_prices_admin_insert | INSERT | authenticated | `-` |
+| product_prices_admin_update | UPDATE | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SE` |
+| product_prices_select_anon | SELECT | anon | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (is_` |
+| product_prices_select_authenticated | SELECT | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( S` |
+| product_prices_service_role | ALL | service_role | `USING (true)` |
+
+### products
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| prod_admin_delete_opt | DELETE | authenticated | `USING ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.i` |
+| prod_admin_insert_opt | INSERT | authenticated | `-` |
+| prod_admin_update_opt | UPDATE | authenticated | `USING ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.i` |
+| prod_public_read_opt | SELECT | public | `USING (true)` |
 
 ### project_items
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| Users can delete items from their projects | DELETE | public | `(EXISTS ( SELECT 1
+| Users can delete items from their projects | DELETE | public | `USING ((EXISTS ( SELECT 1
    FROM public.user_projects
-  WHERE ((user_projects.id = pro` |
+  WHERE ((user_projects.i` |
 | Users can insert items in their projects | INSERT | public | `-` |
-| Users can update items in their projects | UPDATE | public | `(EXISTS ( SELECT 1
+| Users can update items in their projects | UPDATE | public | `USING ((EXISTS ( SELECT 1
    FROM public.user_projects
-  WHERE ((user_projects.id = pro` |
-| Users can view items in their projects | SELECT | public | `(EXISTS ( SELECT 1
+  WHERE ((user_projects.i` |
+| Users can view items in their projects | SELECT | public | `USING ((EXISTS ( SELECT 1
    FROM public.user_projects
-  WHERE ((user_projects.id = pro` |
+  WHERE ((user_projects.i` |
+
+### returns_webhook_events
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| returns_webhook_events_admin_select | SELECT | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()))` |
+| returns_webhook_events_service_role | ALL | service_role | `USING (true)` |
+
+### shipping_email_events
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| shipping_email_events_admin_select | SELECT | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()))` |
+| shipping_email_events_service_role | ALL | service_role | `USING (true)` |
+
+### shipping_webhook_events
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| shipping_webhook_events_admin_select | SELECT | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()))` |
+| shipping_webhook_events_service_role | ALL | service_role | `USING (true)` |
+
+### shopping_carts
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| merged_shopping_carts_service_role_select | SELECT | service_role | `USING ((true OR true OR true OR true OR true OR true OR true OR true OR true OR ` |
+| sc_auth_all | ALL | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() ` |
+| shopping_carts_service_role | ALL | service_role | `USING (true)` |
+
+### tenants
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| tenants_all_service_role | ALL | service_role | `USING (true)` |
+| tenants_select | SELECT | anon | `USING (true)` |
+
+### user_addresses
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| user_addresses_delete | DELETE | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() ` |
+| user_addresses_insert | INSERT | authenticated | `-` |
+| user_addresses_select | SELECT | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() ` |
+| user_addresses_service_role | ALL | service_role | `USING (true)` |
+| user_addresses_update | UPDATE | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() ` |
+
+### user_invoice_profiles
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| uip_own | ALL | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() ` |
+| user_invoice_profiles_service_role | ALL | service_role | `USING (true)` |
+
+### user_profiles
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| user_profiles_delete_policy | DELETE | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()))` |
+| user_profiles_insert_policy | INSERT | authenticated | `-` |
+| user_profiles_select_policy | SELECT | authenticated | `USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ((id` |
+| user_profiles_service_role | ALL | service_role | `USING (true)` |
+| user_profiles_update_policy | UPDATE | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND ((id = ( SELECT auth.uid() AS u` |
 
 ### user_projects
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| Users can delete their own projects | DELETE | public | `(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELEC` |
+| Users can delete their own projects | DELETE | public | `USING ((( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ` |
 | Users can insert their own projects | INSERT | public | `-` |
-| Users can update their own projects | UPDATE | public | `(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELEC` |
-| Users can view their own projects | SELECT | public | `(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELEC` |
+| Users can update their own projects | UPDATE | public | `USING ((( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ` |
+| Users can view their own projects | SELECT | public | `USING ((( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ` |
+
+### venthub_order_items
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| venthub_order_items_insert_optimized | INSERT | authenticated | `-` |
+| venthub_order_items_select_consolidated | SELECT | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND ((order_id IN ( SELECT venthub_` |
+| venthub_order_items_service_role | ALL | service_role | `USING (true)` |
+
+### venthub_orders
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| orders_delete_policy | DELETE | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user()` |
+| orders_insert_policy | INSERT | authenticated | `-` |
+| orders_select_policy | SELECT | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid()` |
+| orders_service_role | ALL | service_role | `USING (true)` |
+| orders_update_policy | UPDATE | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid()` |
+
+### venthub_returns
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| returns_delete_policy | DELETE | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user()` |
+| returns_insert_policy | INSERT | authenticated | `-` |
+| returns_select_policy | SELECT | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid()` |
+| returns_service_role | ALL | service_role | `USING (true)` |
+| returns_update_policy | UPDATE | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user()` |
+
+### wizard_selections
+
+| Policy | Islem | Rol | Kosul |
+|--------|-------|-----|-------|
+| wizard_selections_service_role | ALL | service_role | `USING (true)` |
+| ws_anon_insert | INSERT | anon | `-` |
+| ws_auth_all | ALL | authenticated | `USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() ` |
 
 ## 3. FONKSIYONLAR (PL/pgSQL)
 
