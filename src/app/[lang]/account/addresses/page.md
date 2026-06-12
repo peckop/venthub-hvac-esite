@@ -8,7 +8,7 @@ entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-06T19:22:50Z
+generated_at: 2026-06-12T10:17:59Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,10 @@ Modülün tek bileşeni olan `Page`, adres yönetim sayfasının içerik bölüm
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -52,14 +55,6 @@ Modülün tek bileşeni olan `Page`, adres yönetim sayfasının içerik bölüm
 - **ic_degiskenler**:
   (değişken yok — doğrudan JSX döndürür)
 - **Dönüş**: JSX — `min-h-screen` flex container içinde `animate-spin` sınıfına sahip dönen spinner div'i; loading durumu için kullanıluyor (nextDynamic loading bileşeni olarak)
-
----
-
-### [N2_NASIL] AST Pointer: [lang]/account/addresses/page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  (değişken yok — doğrudan JSX döndürür)
-- **Dönüş**: JSX — `<PageComponent />` bileşeninin render edilmesi; `PageComponent`, `next/dynamic` ile import edilmiş olan dinamik adres sayfası bileşenidir
 
 ---
 

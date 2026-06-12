@@ -8,7 +8,7 @@ entity_hashes:
   func:Page: 556d56b0dab8a0be
   overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-06T21:53:57Z
+generated_at: 2026-06-12T10:18:30Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,13 @@ Modülün tek sorumluluğu, admin kupon sayfasının tarayıcıda görüntülenm
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, basit bir Next.js sayfa yönlendiricisi olduğundan minimal sayıda aksiyom bulunmaktadır.
+
+**[Aksiyom 1]**: Eğer `AdminCouponsPage` bileşeni mevcut değilse veya import edilemiyorsa, `Page` bileşeni render edilemez ve sayfa hata verir.
+
+**[Aksiyom 2]**: Eğer bu dosya Next.js App Router'ın beklediği dizin yapısında (`app/admin/coupons/page.tsx`) değilse, ilgili URL rota olarak eşleştirilmez.
 
 ---
 

@@ -8,7 +8,7 @@ entity_hashes:
   func:DehumidifierModel: 9ef5181c317802b4
   overview: 5b9ba7d5b196184b
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:43:51Z
+generated_at: 2026-06-12T10:22:00Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,17 @@ Bu grup, modülün tek ve temel bileşenini oluşturur. Sorumluluğu, nemlendiri
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, parametresiz bir React Three Fiber 3B model bileşenidir.
+
+---
+
+[Aksiyom 1]: Eğer React Three Fiber Canvas bağlamı (Three.js ortamı) yoksa, bileşen 3B sahne oluşturamaz ve render hatası ile sonuçlanır.
+
+[Aksiyom 2]: Bileşen parametresiz (`DehumidifierModel()`) çağrılmak zorundadır; prop bağımlılığı olmadığından, harici veri beslemesi olmadan kendi içinde sabit geometri ve materyal tanımlarıyla çalışmalıdır.
+
+[Aksiyom 3]: Eğer `useFrame` veya benzeri animasyon döngüsü mekanizması yoksa, fan tekerleği döndürme animasyonu çalışmaz ve statik bir model gösterilir.
 
 ---
 

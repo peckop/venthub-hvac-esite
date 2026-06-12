@@ -7,7 +7,7 @@ skeleton_hash: ac08a6998abfba65
 entity_hashes:
   func:useFanMaterials: 61fbb447cfb5105d
   overview: 6254e91c186b694f
-generated_at: 2026-06-10T09:39:37Z
+generated_at: 2026-06-12T10:20:58Z
 ---
 
 ## Genel Bakış
@@ -20,7 +20,15 @@ Fan modelinin 3D görünümünü belirleyen malzeme özelliklerini (örneğin, p
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
 
+**Not:** Verilen bilgilerde `useFanMaterials` fonksiyonunun gövdesi (implementasyon detayı) bulunmamaktadır. Sadece fonksiyon imzası ve modül sabiti verilmiştir. Mimari varsayımlar, fonksiyonun çalışma mantığı ve iç koşullarından türetilebilir. Bu durumda, modülün doğru çalışması için gerekli koşullar belirlenememiştir.
+
+**Potansiyel Aksiyomlar (Eğer fonksiyon gövdesi verilmiş olsaydı):**
+- Eğer `MATERIALS_CACHE` nesnesi geçerli bir malzeme verisi içermiyorsa, 3D render hatalı sonuçlar verir.
+- Eğer `useFanMaterials()` hook'u React bileşeninin dışında çağrılıyorsa, React hook kuralları ihlal edilir.
+- Eğer hook farklı fan türleri için malzeme varyasyonları döndürüyorsa ve bunların tanımlı bir enum/obje ile eşleşmiyorsa, tip hatası oluşur.
 
 ---
 

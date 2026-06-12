@@ -12,7 +12,7 @@ entity_hashes:
   func:onMove: 855a2394d5f31485
   overview: 49812a020a38dab5
   style_tokens: 9c70068ed275c69c
-generated_at: 2026-05-28T22:37:19Z
+generated_at: 2026-06-12T10:19:16Z
 ---
 
 ## Genel Bakış
@@ -33,7 +33,14 @@ Eğilme açısı gibi hesaplanan sayısal değerleri tanımlı minimum ve maksim
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül, fare hareketleriyle 3D eğilme efekti yaratan bir React bileşeni olduğundan, aşağıdaki mimari varsayımlar modülün doğru çalışması için zorunludur.
 
+[Aksiyom 1]: Eğer `clamp` fonksiyonu için `min` parametresi, `max` parametresinden büyükse, fonksiyon beklenmedik sonuçlar döndürür veya başarısız olur.
+[Aksiyom 2]: Eğer `TiltCard` bileşeni için `maxTilt` parametresi negatif bir sayı olarak sağlanırsa, eğilme açısı hesaplamaları anlamsız hale gelir ve bileşen düzgün çalışmaz.
+[Aksiyom 3]: Eğer `onMove`, `onEnter` veya `onLeave` olay işleyicileri bir React olay nesnesi (örn. `React.MouseEvent`) içermeyen farklı bir argümanla çağrılırsa, bileşenin iç durumu tutarsız hale gelir ve eğilme efekti bozulur.
+[Aksiyom 4]: Eğer modül, React'ın bileşen yaşam döngüsü ve durum yönetimi (useState, useEffect) mekanizmalarından yoksun bir ortamda çalıştırılmaya çalışılırsa, bileşen işlevsel olmaz.
+[Aksiyom 5]: Eğer `TiltCard` bileşeni fare olaylarını (`mousemove`, `mouseenter`, `mouseleave`) tetikleyemeyen bir ortamda (örn. dokunmatik cihazlar) kullanılırsa, eğilme efekti tetiklenemez; ancak bileşen statik olarak görüntülenebilir.
 
 ---
 
@@ -90,57 +97,6 @@ Eğilme açısı gibi hesaplanan sayısal değerleri tanımlı minimum ve maksim
 
 ---
 
-### [N2_NASIL] AST Pointer: TiltCard.tsx::TiltCard
-- **params**: `({ children, maxTilt = 18 })` — children: kart içeriği, maxTilt: eğim açısı üst limiti (derece)
-- **ic_degiskenler**:
-  - `wrapperRef` — useRef, dış sarmalayıcı div referansı
-  - `innerRef` — useRef, iç div referansı (transform uygulanan eleman)
-  - `mounted` — useState, bileşenin mount olup olmadığını takip eder
-  - `hover` — useState, mouse'un kart üzerinde olup olmadığını belirtir
-  - `supportsTilt` — boolean, cihazın hover ve fine pointer destekleyip desteklemediğini kontrol eder
-  - `prefersReduced` — boolean, kullanıcının reduced-motion tercihi olup olmadığını kontrol eder
-  - `shouldSkip` — boolean, tilt efektinin atlanıp atlanmayacağını belirler (supportsTilt veya prefersReduced durumuna göre)
-  - `onMove` — React.MouseEventHandler, mouse hareketi handler'ı
-  - `onEnter` — React.MouseEventHandler, mouse giriş handler'ı
-  - `onLeave` — React.MouseEventHandler, mouse çıkış handler'ı
-- **Dönüş**: JSX Element — shouldSkip true ise basit div, değil ise tilt efektli div yapısı
-
----
-
-### [N3_NASIL] AST Pointer: TiltCard.tsx::onMove
-- **params**: `(e: React.MouseEvent<HTMLDivElement>)` — mouse hareket olayı
-- **ic_degiskenler**:
-  - `container` — wrapperRef.current, dış sarmalayıcı div DOM elemanı
-  - `el` — innerRef.current, iç div DOM elemanı (transform uygulanacak)
-  - `rect` — container.getBoundingClientRect(), container'ın ekran koordinatları ve boyutları
-  - `x` — mouse'un container içindeki yatay pozisyonu (0-1 arası oran)
-  - `y` — mouse'un container içindeki dikey pozisyonu (0-1 arası oran)
-  - `rx` — X ekseni dönüş açısı (derece), clamp ile -maxTilt ile maxTilt arasında sınırlanmış
-  - `ry` — Y ekseni dönüş açısı (derece), clamp ile -maxTilt ile maxTilt arasında sınırlanmış
-  - `sx` — gölge yatay ofseti (piksel), x pozisyonuna göre hesaplanır
-  - `sy` — gölge dikey ofseti (piksel), y pozisyonuna göre hesaplanır
-- **Kullanılan dış değişkenler**: wrapperRef, innerRef, maxTilt, hover, clamp
-- **Dönüş**: yok — container CSS değişkenlerini (--px, --py) ve el transform/shadow değerlerini yan etki olarak değiştirir
-
----
-
-### [N4_NASIL] AST Pointer: TiltCard.tsx::onEnter
-- **params**: `(e: React.MouseEvent<HTMLDivElement>)` — mouse giriş olayı
-- **ic_degiskenler**: (yok)
-- **Kullanılan dış değişkenler**: setHover (true yapar), onMove (e ile çağrılarak başlangıç transform'u uygulanır)
-- **Dönüş**: yok — hover durumunu true yapar ve onMove'u tetikler
-
----
-
-### [N5_NASIL] AST Pointer: TiltCard.tsx::onLeave
-- **params**: `(parametre yok)`
-- **ic_degiskenler**:
-  - `el` — innerRef.current, iç div DOM elemanı (transform sıfırlanacak)
-- **Kullanılan dış değişkenler**: setHover (false yapar), innerRef
-- **Dönüş**: yok — hover durumunu false yapar, el transform ve box-shadow değerlerini sıfırlar
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -150,8 +106,8 @@ graph TD
     TiltCard_tsx__onEnter["onEnter"]
     TiltCard_tsx__onLeave["onLeave"]
     TiltCard_tsx__onMove["onMove"]
-    TiltCard_tsx__TiltCard --> TiltCard_tsx__clamp
     TiltCard_tsx__TiltCard --> TiltCard_tsx__onMove
+    TiltCard_tsx__TiltCard --> TiltCard_tsx__clamp
 ```
 
 ## NODE ID STANDARD

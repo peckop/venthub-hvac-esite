@@ -9,7 +9,7 @@ entity_hashes:
   func:CinematicCard: 7fb3fd44dcd5e71f
   overview: 38622d63184c12d0
   style_tokens: 31f4acfd42638e52
-generated_at: 2026-06-10T09:53:52Z
+generated_at: 2026-06-12T10:22:51Z
 ---
 
 ## Genel Bakış
@@ -26,7 +26,12 @@ Görselleri, animasyonlar ve holografik efektlerle zenginleştirerek, ürünün 
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül için temel prop bağımlılıkları ve harici bileşen çağrıları varsayımları tanımlanmıştır.
 
+[Aksiyom 1]: Eğer `CinematicCard` bileşenine geçerli bir `image` prop'u (URL veya dosya yolu) sağlanmazsa, bileşen hata verir veya boş/görsel içermeyen bir kart render eder.
+[Aksiyom 2]: Eğer `BlueprintCanvas` bileşenine geçerli bir `image` prop'u (URL veya dosya yolu) sağlanmazsa, bileşen hata verir veya boş/mavi baskı içermeyen bir tuval render eder.
+[Aksiyom 3]: Eğer `HolographicMaterial` çağrılamıyorsa (örn. Three.js/React Three Fiber ortamı yoksa veya modül bulunamıyorsa), holografik efekt uygulanamaz ve ilgili bileşenlerin görsel performansı önemli ölçüde düşer veya hata verir.
 
 ---
 

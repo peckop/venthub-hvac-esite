@@ -8,7 +8,7 @@ entity_hashes:
   func:Page: 03bf0c7eea267025
   overview: c697ddf7c92cfa4f
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-06T21:54:19Z
+generated_at: 2026-06-12T10:19:00Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,19 @@ Modülün dışa açık tek bileşenini tanımlar. Bu bileşen, Next.js App Rout
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için belirli aksiyom tanımlanması güçtür çünkü fonksiyon gövdesi verilmemiştir. Ancak mevcut bilgilere dayanarak:
+
+**[Aksiyom 1]:** Eğer `AdminWebhookEventsPage` modülü/ bileşeni import edilebilir konumda değilse (modül yolu tanımsız veya dosya mevcut değilse), `Page` bileşeni render edilemez ve çalışma zamanı hatası oluşur.
+
+**[Aksiyom 2]:** Eğer Next.js App Router yapısı (dosya tabanlı rotlama) mevcut değilse, bu bileşen `/admin/webhook-events` rotasına otomatik olarak bağlanmaz.
+
+**[Aksiyom 3]:** Eğer `AdminWebhookEventsPage` bileşeni geçersiz bir React elemanı döndürüyorsa (null, undefined veya geçersiz JSX), `Page` bileşeni hata verir.
+
+---
+
+**Not:** Bu modül tek bir sayfa giriş noktası olup, tüm iş mantığını `AdminWebhookEventsPage` bileşenine devretmektedir. Bileşen içeriği (props alımı, durum yönetimi, yan etkiler vb.) bu modül kapsamında değildikten bilinmemektedir. Detaylı aksiyomlar için `AdminWebhookEventsPage` modülünün analiz edilmesi gerekir.
 
 ---
 

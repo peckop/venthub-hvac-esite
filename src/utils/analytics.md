@@ -7,7 +7,7 @@ skeleton_hash: 850bc2150819ea68
 entity_hashes:
   func:trackEvent: a39f838e00080681
   overview: 6ae77f9a934c8a05
-generated_at: 2026-05-28T22:38:59Z
+generated_at: 2026-06-12T10:23:55Z
 ---
 
 ## Genel Bakış
@@ -20,7 +20,15 @@ Uygulamadaki tüm analiz olaylarını standart bir arayüz üzerinden harici ser
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, uygulama içi olayları harici analiz servislerine (GA4/GTM) iletmek üzere tasarlanmıştır; servis mevcut değilse konsol fallback'i kullanılır.
+
+[Aksiyom 1]: Eğer çalışma ortamında geçerli bir analitik servis (Google Analytics 4 veya Google Tag Manager) yapılandırılmamışsa, `trackEvent` çağrısı konsola loglama fallback'ine yönelir.
+
+[Aksiyom 2]: Eğer `params` parametresindeki değerler JSON serileştirilebilir (JSON-serializable) olmadığında, analitik servise iletim sırasında sessiz hata oluşur veya olay kaybolur.
+
+[Aksiyom 3]: Eğer `name` parametresi boş string (`""`) olarak verildiğinde, servise tanımsız bir olay adı iletilir ve analitik panelinde anlamsız veri birikir.
 
 ---
 

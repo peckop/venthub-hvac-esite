@@ -11,7 +11,7 @@ entity_hashes:
   func:handleLinkClick: 44a1929f40d26342
   overview: fd9efe0c94d2526c
   style_tokens: 950eb84fcf443cff
-generated_at: 2026-06-10T09:12:27Z
+generated_at: 2026-06-12T10:19:42Z
 ---
 
 ## Genel Bakış
@@ -32,7 +32,18 @@ Menü yapısını oluşturmak için gerekli olan, belirli bir üst kategorinin t
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül için genel bir varsayım cümlesi: Menü bileşenleri, verilen `categories` verisine bağımlıdır ve navigasyon callback'leri (`onNavigate`) olmadan işlevsel olamaz.
 
+[Aksiyom 1]: Eğer `categories` verisi (menü kategorileri hiyerarşisi) sağlanmazsa veya boş/yanlış formatta olursa, `EliteMegaMenu` ve `MobileMegaMenu` bileşenleri menü öğelerini render edemez.
+
+[Aksiyom 2]: Eğer `onNavigate` callback fonksiyonu sağlanmazsa, `handleLinkClick` aracılığıyla tetiklenen menü bağlantısı tıklamaları (slugs) sayfa yönlendirmesi yapamaz.
+
+[Aksiyom 3]: Eğer `getSubCategories(parentId)` fonksiyonu, geçerli bir `parentId` parametresi almazsa veya bu ID'ye karşılık gelen alt kategoriler `categories` verisi içinde bulunamazsa, menüde alt kategoriler gösterilemez veya boş döner.
+
+[Aksiyom 4]: Eğer `handleLinkClick(level, slug)` fonksiyonu, geçersiz bir `level` (örn. negatif veya olmayan bir hiyerarşi seviyesi) veya boş/geçersiz bir `slug` ile çağrılırsa, beklenen yönlendirme gerçekleşmez ve navigasyon hata verir.
+
+[Aksiyom 5]: Eğer `MegaMenu3DBackground` çağrılamaz veya bileşen olarak kullanılam
 
 ---
 
@@ -107,9 +118,9 @@ graph TD
     EliteMegaMenu_tsx__MobileMegaMenu["MobileMegaMenu"]
     EliteMegaMenu_tsx__getSubCategories["getSubCategories"]
     EliteMegaMenu_tsx__handleLinkClick["handleLinkClick"]
-    EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__getSubCategories
-    EliteMegaMenu_tsx__MobileMegaMenu --> EliteMegaMenu_tsx__getSubCategories
     EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__handleLinkClick
+    EliteMegaMenu_tsx__MobileMegaMenu --> EliteMegaMenu_tsx__getSubCategories
+    EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__getSubCategories
 ```
 
 ## NODE ID STANDARD

@@ -8,7 +8,7 @@ entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-06T19:23:13Z
+generated_at: 2026-06-12T10:18:20Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,23 @@ Hesap faturaları sayfasının giriş noktasını ve temel yapısını oluşturu
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, minimal bir React sarmalayıcı (wrapper) bileşenidir; fonksiyon gövdesi yalnızca `<PageComponent />` öğesini döndürür. Dolayısıyla mimari varsayımlar sınırlıdır.
+
+---
+
+**[Aksiyom 1]:** Eğer `PageComponent` modülü çalış zamanında içe aktarılamazsa (import başarısız olursa), `Page` bileşeni render edilemez ve uygulama bu sayfada hata verir.
+
+**[Aksiyom 2]:** Eğer React/JSX çalışma ortamı (runtime) mevcut değilse, `Page` fonksiyonu geçerli bir React elementi döndüremez ve bileşen ağaç (component tree) oluşturulamaz.
+
+**[Aksiyom 3]:** Eğer `PageComponent`自身i bağımlılık gerektiriyorsa (prop, context vb.) ve bunlar sağlanmamışsa, `PageComponent`'in kendi iç hata oluşumu beklenebilir; ancak `Page` fonksiyonu bu bağımlılıkları doğrudan yönetmez.
+
+**[Aksiyom 4]:** `Page` fonksiyonu parametre almaz; dolayısıyla调用侧 (caller) bu bileşene prop geçirme yetkisine sahip değildir — tüm veri akışı `PageComponent` içinde veya üst bileşen zincirinden (context, layout vb.) sağlanmalıdır.
+
+---
+
+> **Not:** Bu modül, yalnızca bir çocuğu (child) sarmalayan ince bir zar (thin wrapper) yapısındadır. Fonksiyon gövdesinde koşullu mantık, veri dönüştürme veya hata işleme bulunmamaktadır; bu nedenle yukarıdaki varsayımlar modülün minimum zorunluluklarını yansıtmaktadır.
 
 ---
 
@@ -50,13 +66,6 @@ Hesap faturaları sayfasının giriş noktasını ve temel yapısını oluşturu
 - **params**: (parametre yok)
 - **ic_degiskenler**: (yok)
 - **Dönüş**: JSX — `div` içinde `animate-spin` class'lı spinner loading göstergesi döndürür; `min-h-screen`, `flex`, `items-center`, `justify-center` ile ekran ortasında dönen bir yükleme animasyonu sunar
-
----
-
-### [N2_NASIL] AST Pointer: `[lang]/account/invoices/page.tsx`::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX — `PageComponent` sabitini render eder; `PageComponent` dosya başında `nextDynamic` ile import edilmiş (muhtemelen code-split) bir bileşendir
 
 ---
 

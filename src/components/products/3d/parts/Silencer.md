@@ -8,7 +8,7 @@ entity_hashes:
   func:Silencer: b0d56de6b93be1bd
   overview: ae5f7c5e5d83ff51
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:41:48Z
+generated_at: 2026-06-12T10:21:26Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,23 @@ Bu grup, modülün tek ve temel işlevini tanımlar; susturucu parçasının geo
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, 3D sahada silindirik bir susturucu parçası oluşturan bir React bileşenidir. Aşağıdaki mimari varsayımlar fonksiyon imzasından türetilmiştir.
+
+[Aksiyom 1]: Eğer `radius` parametresi negatif veya sıfır değer alırsa, geçersiz silindirik geometri oluşur (geometrik olarak tanımsız).
+
+[Aksiyom 2]: Eğer `length` parametresi negatif veya sıfır değer alırsa, geçersiz silindirik geometri oluşur (geometrik olarak tanımsız).
+
+[Aksiyom 3]: Eğer `position` parametresi 3 elemanlı bir dizi [x, y, z] formatında verilmezse, bileşenin 3D sahadaki konumu tanımsız olur.
+
+[Aksiyom 4]: Eğer bileşen bir 3D sahne bağlamı (örn: Three.js sahnesi) dışında render edilirse, geometrik nesne görüntülenemez.
+
+[Aksiyom 5]: Eğer `radius` ve `length` değerleri arasındaki oran aşırı derecede farklılaşır (örn: radius ≫ length veya length ≫ radius), susturucu geometrisi gerçekçi bir görünüm kazanamaz; bunun için eşik değer bilinmiyor.
+
+---
+
+**Not:** Bu modül için belirli eşik değerleri (minimum/maximum radius, length) veya kabul kriterleri fonksiyon imzasında tanımlanmamıştır. Sadece geometrik tanımlılık varsayımları çıkarılmıştır.
 
 ---
 

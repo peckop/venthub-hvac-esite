@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\data\brands.ts
 skeleton_hash: d2735fab6497e2fb
 entity_hashes:
   overview: 1c324d780c68eb8e
-generated_at: 2026-06-06T21:55:24Z
+generated_at: 2026-06-12T10:23:07Z
 ---
 
 ## Genel Bakış
@@ -19,7 +19,15 @@ Bu modül, HVAC (Isıtma, Ventilasyon ve Klima) markalarına ilişkin statik ver
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için temel mimari varsayım, sunulan verinin tutarlılığı ve erişilebilirliğidir.
+
+[Aksiyom 1]: Eğer `HVAC_BRANDS` sabiti tanımlanmamış veya boş bir array (`[]`) olarak tanımlanmışsa, uygulama içindeki tüm marka bazlı filtreleme, arama ve gösterim fonksiyonları (örneğin; filtre menüleri, marka listeleri, raporlama ekranları) boş sonuç döndürür veya marka verisini hiç sunamaz.
+
+[Aksiyom 2]: Eğer `HVACBrand` arayüzündeki `name`, `slug` veya `description` alanları bir nesnede tanımlanmamışsa veya istenen tipte (string) değilse, o marka ile ilgili kullanıcı arayüzünde hatalı veya eksik bilgi görüntülenir. (`country` alanının tipi ve zorunluluğu belirtilmediği için varsayıma girmez.)
+
+[Aksiyom 3
 
 ---
 
@@ -64,10 +72,6 @@ Bu dosyada fonksiyon bulunmamaktadır.
 - **Fonksiyon**: yok
 - **Import**: yok
 - **Class**: yok
-
----
-
-**Not**: Bu dosya bir veri tanım dosyasıdır ve herhangi bir fonksiyon içermemektedir. `HVAC_BRANDS` sabiti muhtemelen dış dosyalarda `import` edilerek kullanılmaktadır.
 
 ---
 

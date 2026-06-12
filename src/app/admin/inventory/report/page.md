@@ -8,7 +8,7 @@ entity_hashes:
   func:InventoryReportPage: bfcc8ccf4dbc326a
   overview: 4a0a3d3311d8e694
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-06T21:53:59Z
+generated_at: 2026-06-12T10:18:40Z
 ---
 
 ## Genel Bakış
@@ -23,7 +23,13 @@ Envanter rapor sayfasının kök bileşenini tanımlar ve yönetir. Yönetim pan
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için minimal aksiyomlar tanımlanmıştır. Fonksiyon gövdesinin tamamı görünmediğinden, yalnızca dokümanda belirtilen referanslara dayalı varsayımlar üretilmiştir.
+
+[Aksiyom 1]: Eğer `AdminInventoryReportPage` bileşeni import edilmemiş veya mevcut değilse, `InventoryReportPage` JSX render hatası ile karşılaşır ve sayfa yüklenemez.
+
+[Aksiyom 2]: Eğer React çalışma ortamı (rendering context) mevcut değilse, bileşen JSX döndüremez ve uygulama hata verir.
 
 ---
 

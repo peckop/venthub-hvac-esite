@@ -8,7 +8,7 @@ entity_hashes:
   func:InternalFanRotor: ac57944d86aa281e
   overview: 256aaa04411e9436
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:38:43Z
+generated_at: 2026-06-12T10:20:40Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,23 @@ Bu grup, modülün tek bileşeni olan InternalFanRotor'u tanımlar. Fonksiyon, g
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, 3D bir iç fan rotoru bileşenidir ve Three.js/React Three Fiber benzeri bir 3D renderlama ortamında çalışır.
+
+[Aksiyom 1]: Eğer 3D renderlama bağlamı (Three.js Canvas/Scene) yoksa, bileşen düzgün render edilmez ve görünmez olur.
+
+[Aksiyom 2]: Eğer `position` parametresi 3 elemanlı bir dizi [x, y, z] formatında değilse, bileşenin 3D sahnedeki konumu tanımsız olur.
+
+[Aksiyom 3]: Eğer `radius` parametresi 0 veya negatif bir değer olarak verilirse, fan rotor geometrisi oluşmaz veya çöker.
+
+[Aksiyom 4]: Eğer `spinSpeed` parametresi 0 olarak ayarlanırsa, rotor dönmeyecektir; negatif değer yön değişikliğine neden olur (bu beklenen bir davranış olabilir veya olmayabilir, bilinmiyor).
+
+[Aksiyom 5]: Fonksiyon imzası `rotat...` ile kesilmiş olduğundan, bileşenin tam parametre listesi bilinmiyor — olası ek parametreler (rotation, color, material vb.) olabilir.
+
+---
+
+**Not**: Bu aksiyomlar yalnızca fonksiyon imzasından türetilmiştir. Docstring ve yorumlardan bilgi çıkarılmamıştır. Fonksiyon imzası kesik (truncated) olduğu için bileşenin tam sözleşme gereksinimleri belirsizdir.
 
 ---
 
@@ -76,32 +92,6 @@ Bu grup, modülün tek bileşeni olan InternalFanRotor'u tanımlar. Fonksiyon, g
   - `bladeCount` — sabit `6`, kanat sayısı
   - `bladeMaterial` — `isSelected` durumuna göre `materials.safetyOrange` veya `materials.vorticeGreen` seçilir
 - **Dönüş**: `JSX.Element | null` — JSX grubu veya erken `null` dönüşü
-
----
-
-### [N2_NASIL] AST Pointer: InternalFanRotor.tsx::useFrame_callback
-- **params**:
-  - `_` — `useFrame` ilk parametresi (unused, clock state)
-  - `delta` — son frame ile geçen süre (saniye cinsinden)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (void) — `groupRef.current.rotation.y` üzerinde yan etki: `delta * spinSpeed` kadar Y-ekseninde döndürme, `isSelected` ise durdurulur
-
----
-
-### [N3_NASIL] AST Pointer: InternalFanRotor.tsx::onClick_handler
-- **params**:
-  - `e` — React click event nesnesi
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (void) — `e.stopPropagation()` ile event yayılımını durdurur, ardından `onClick?.()` callback'ini çağırır
-
----
-
-### [N4_NASIL] AST Pointer: InternalFanRotor.tsx::map_callback
-- **params**:
-  - `_` — dizi elemanı (kullanılmıyor)
-  - `i` — mevcut elemanın indeksi (`0` arası `bladeCount - 1`), kanat açı hesaplamasında kullanılır
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `JSX.Element` — her kanat için `<group>` + `<mesh>` + `<boxGeometry>` JSX'i döner; `rotation` `(i * Math.PI * 2) / bladeCount` ile hesaplanır, `position` `radius * 0.58 + (explode * 0.1)` ile hesaplanır
 
 ---
 

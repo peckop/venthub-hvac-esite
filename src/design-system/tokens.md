@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\design-system\tokens.js
 skeleton_hash: 49c7465326318d5b
 entity_hashes:
   overview: 604c676f787fff08
-generated_at: 2026-05-28T22:37:44Z
+generated_at: 2026-06-12T10:23:25Z
 ---
 
 ## Genel Bakış  
@@ -17,7 +17,14 @@ Bu dosyada herhangi bir fonksiyon bulunmamaktadır. Modül, üst düzey (top-lev
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
+Bu modül, tasarım sisteminin temel yapı taşlarını (design tokens) tanımlayan tamamen statik bir yapılandırma dosyasıdır. Dolayısıyla, modülün doğru çalışması için aşağıdaki temel varsayımlar geçerlidir.
 
+[Aksiyom 1]: Eğer `zIndex` nesnesi tanımlı değilse veya gerekli seviyeleri (ör. 'modal', 'sticky', 'dropdown') içermiyorsa, uygulamadaki katman sıralaması (layering) tutarsız olur ve bazı UI bileşenleri (ör. menüler, modallar) beklenmedik şekilde arka planda kalabilir.
+[Aksiyom 2]: Eğer `fontSize` nesnesi tanımlı değilse veya tüm gerekli tipografik seviyeleri içermiyorsa, tipografi hiyerarşisi bozulur ve metin boyutları tutarsız bir hale gelir.
+[Aksiyom 3]: Eğer `height` ve `width` gibi boyut nesneleri (min/max varyasyonları dahil) tanımlı değilse, bileşenler için standart bir ölçüm sistemi bulunmaz ve yerleşim (layout) tutarsızlıkları oluşur.
+[Aksiyom 4]: Eğer `transitionDuration` ve `transitionTimingFunction` nesneleri tanımlı değilse veya yetersiz ise, uygulama genelinde animasyon ve geçiş süreleri ile eğrileri tutarsız olur, bu da kullanıcı deneyimini olumsuz etkiler.
+[Aksiyom 5]: Eğer `boxShadow` ve `blur` nesneleri tanımlı değilse veya yetersiz varyantlara sahipse, derinlik ve vurgulama efektleri için tutarlı bir stil kuralı oluşturulamaz.
 
 ---
 

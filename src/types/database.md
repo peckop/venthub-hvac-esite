@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\types\database.ts
 skeleton_hash: b1d7533d6bb673aa
 entity_hashes:
   overview: 60fe8414ff851e26
-generated_at: 2026-05-28T22:38:41Z
+generated_at: 2026-06-12T10:23:40Z
 ---
 
 ## Genel Bakış
@@ -14,7 +14,25 @@ generated_at: 2026-05-28T22:38:41Z
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, yalnızca TypeScript tip tanımları içeren纯 (pure) bir yeniden dışa aktarma (re-export) modülüdür. Çalıştırılabilir kod, fonksiyon gövdesi veya sabit değer içermediğinden, fonksiyon gövdesinden türetilebilecek mimari aksiyom bulunmamaktadır.
+
+**Bu modül için özel aksiyom tanımlanmamıştır.**
+
+---
+
+### Notlar
+
+| Konu | Durum |
+|------|-------|
+| Fonksiyon gövdesi | Yok – modül sadece tip yeniden aktarımı içerir |
+| Çalıştırılabilir kod | Yok |
+| Sabit değerler | Yok |
+| Koşullu mantık | Yok |
+| Eşik değeri / kabul kriteri | Tanımlı değil |
+
+Modül yapısı gereği (`Database` tipini `./database.types`'den import edip export eden纯 typoloji dosyası), girdi-çıktı dönüşümü veya koşullu akış söz konusu değildir; dolayısıyla "Eğer ... yoksa, ... olur" formatında türetilebilecek bir mimari varsayım üretilememektedir.
 
 ---
 
@@ -73,10 +91,6 @@ Bu dosyada fonksiyon bulunmamaktadır.
 **Dosya:** `C:\Users\alize\venthub-hvac\src\types\database.ts`
 
 **İçerik:** Dosya sadece `./database.types` modülünden `Database` tipini import etmektedir. Herhangi bir fonksiyon, sabit veya sınıf tanımı içermemektedir. Bu bir type definition dosyasıdır.
-
----
-
-AST Pointer üretilecek fonksiyon gövdesi mevcut değildir.
 
 ---
 

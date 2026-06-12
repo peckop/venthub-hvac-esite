@@ -8,7 +8,7 @@ entity_hashes:
   func:MegaMenu3DBackground: bb72cddf66cbd5a0
   overview: bbf3490d865f5caf
   style_tokens: 487664132884f59c
-generated_at: 2026-06-11T16:14:54Z
+generated_at: 2026-06-12T10:20:05Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,11 @@ Mega menünün arka planını oluşturmak için gerekli olan 3D model ve gradyan
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için, verilen fonksiyon gövdesi (içerik) paylaşılmadığı için yalnızca fonksiyon imzasından türetilebilecek sınırlı aksiyomlar tanımlanabilmektedir.
+
+[Aksiyom 1]: Eğer `categorySlug` prop'u sağlanmazsa veya `undefined` olarak geçilirse, bileşenin hangi kategoriye ait 3D arka plan modelini ve ilgili gradyan overlay'ı render edeceği belirsiz olur; bileşen hedefsiz çalışır ve beklenen 3D görsel efekti üretemez.
 
 ---
 

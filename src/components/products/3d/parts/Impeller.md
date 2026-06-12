@@ -8,7 +8,7 @@ entity_hashes:
   func:Impeller: ee1fdf5cf66e515f
   overview: 325d6f2b890bb892
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:41:19Z
+generated_at: 2026-06-12T10:21:11Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,15 @@ Bu grup, impellerin görsel temsilini oluşturan ana işlevi içerir; props değ
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, 3D bir impeller (pompa çarkı) görselleştirmek için kullanılan bir React bileşenidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
+
+[Aksiyom 1]: Eğer `type` parametresi verilmemişse veya geçerli bir impeller tipini temsil etmiyorsa, bileşen hangi geometrik formu oluşturacağını bilemez ve render hatalı veya boş olur.
+[Aksiyom 2]: Eğer `diameter` parametresi `0` veya negatif bir değer olarak verilirse, impellerin 3D modelinin temel boyutu tanımsız kalır ve geometri oluşturulamaz.
+[Aksiyom 3]: Eğer `bladeCount` parametresi `0` veya negatif bir tam sayı olarak verilirse, pala (kanat) sayısı tanımsız kalır ve impeller geometrisi hatalı oluşturulur.
+[Aksiyom 4]: Eğer `color` parametresi geçerli bir renk değeri (hex kodu, RGB dizisi veya tarayıcı/tanımlı renk adı) içermiyorsa, 3D nesneye uygulanacak malzeme rengi belirsiz kalır.
+[Aksiyom 5]: Bu bileşen, geçerli bir 3D sahne bağlamı (örneğin, bir `<Canvas>` veya eşdeğeri) içinde render edilmelidir; eğer böyle bir bağlam sağlanmamışsa, bileşen görünür bir çıktı üretemez.
 
 ---
 

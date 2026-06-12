@@ -8,7 +8,7 @@ entity_hashes:
   func:CentrifugalFanModel: 2ca1d8ced8088e61
   overview: 6444af53b2b5ccbf
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:43:26Z
+generated_at: 2026-06-12T10:21:42Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,17 @@ Santrifüj fanın three.js geometrisini ve malzemelerini oluşturarak sahneye ye
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca fonksiyon imzasından çıkarılabilecek sınırlı varsayımlar tanımlanabilmektedir.
+
+[Aksiyom 1]: Eğer `CentrifugalFanModel` fonksiyonu parametre almıyorsa, bileşenin tüm konfigürasyon değerlerinin (fan boyutları, malzeme özellikleri, döndürme hızı vb.) fonksiyon gövdesi içinde sabit olarak tanımlı olması gerekir; aksi halde bileşen esnek bir şekilde özelleştirilemez.
+
+[Aksiyom 2]: Eğer `CentrifugalFanModel` bir React bileşeniyse ve props almıyorsa, bileşenin dış bağımlılıklarını (three.js sahne, kamera, ışıklandırma) kendi içinde oluşturup yönetmesi gerekir; aksi halde bileşen çalışamaz.
+
+---
+
+> **Not:** Fonksiyon gövdesi (implementation) sağlanmadığı için, bileşenin iç yapısı, kullandığı three.js nesneleri, geometri türleri ve render zinciri hakkında kesin aksiyomlar üretilememektedir. Detaylı aksiyomlar için fonksiyon gövdesinin paylaşılması gereklidir.
 
 ---
 

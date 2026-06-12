@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-12T09:21:11.235761+00:00
+compiled_at: 2026-06-12T10:24:41.182660+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-12T10:24:41.182660+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -89,12 +89,12 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   ├── 📂 **app/**
 │   │   ├── 📂 **[lang]/**
 │   │   │   ├── 📂 **about/**
-│   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **account/**
 │   │   │   │   ├── 📂 **addresses/**
-│   │   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   ├── 📂 **invoices/**
-│   │   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   ├── ✅ `layout.tsx`
 │   │   │   │   ├── 📂 **orders/**
 │   │   │   │   │   ├── 📂 **detail/**
@@ -188,7 +188,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   │   │   │   │       └── ✅ `page.tsx`
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **coupons/**
-│   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **error-groups/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **errors/**
@@ -196,7 +196,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   │   │   ├── 📂 **inventory/**
 │   │   │   │   ├── ✅ `page.tsx`
 │   │   │   │   ├── 📂 **report/**
-│   │   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   └── 📂 **settings/**
 │   │   │   │       └── ✅ `page.tsx`
 │   │   │   ├── ✅ `layout.tsx`
@@ -216,7 +216,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   │   │   ├── 📂 **users/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   └── 📂 **webhook-events/**
-│   │   │       └── ❌ `page.tsx`
+│   │   │       └── ✅ `page.tsx`
 │   │   ├── 📂 **api/**
 │   │   │   ├── 📂 **health/**
 │   │   │   │   └── ✅ `route.ts`
@@ -263,7 +263,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   │   ├── ✅ `SpotlightHeroOverlay.tsx`
 │   │   ├── ✅ `StickyHeader.tsx`
 │   │   ├── ✅ `SubcategoryFlow.tsx`
-│   │   ├── ❌ `TiltCard.tsx`
+│   │   ├── ✅ `TiltCard.tsx`
 │   │   ├── ✅ `UndecidedUserCTA.tsx`
 │   │   ├── ✅ `VisualShowcase.tsx`
 │   │   ├── ✅ `WhatsAppFloat.tsx`
@@ -352,14 +352,14 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   │   │   ├── ✅ `ClientLayout.tsx`
 │   │   │   ├── ✅ `CookieConsent.tsx`
 │   │   │   ├── ✅ `MainLayout.tsx`
-│   │   │   └── ❌ `PageShell.tsx`
+│   │   │   └── ✅ `PageShell.tsx`
 │   │   ├── 📂 **navigation/**
 │   │   │   ├── ✅ `Breadcrumb.tsx`
 │   │   │   ├── ✅ `CategoryCard3D.tsx`
 │   │   │   ├── ✅ `CategoryHubOverlay.tsx`
 │   │   │   ├── ✅ `CategorySpotlightScene.tsx`
-│   │   │   ├── ❌ `EliteMegaMenu.tsx`
-│   │   │   ├── ❌ `MegaMenu3DBackground.tsx`
+│   │   │   ├── ✅ `EliteMegaMenu.tsx`
+│   │   │   ├── ✅ `MegaMenu3DBackground.tsx`
 │   │   │   ├── ✅ `NavActionButton.tsx`
 │   │   │   ├── ✅ `NavBrand.tsx`
 │   │   │   ├── ✅ `NavPrimaryRail.tsx`
@@ -376,28 +376,28 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   │   │   │   ├── ✅ `Product3DViewer.tsx`
 │   │   │   │   ├── ✅ `SmartCenterScale.tsx`
 │   │   │   │   ├── 📂 **factory/**
-│   │   │   │   │   ├── ❌ `Assembler.tsx`
+│   │   │   │   │   ├── ✅ `Assembler.tsx`
 │   │   │   │   │   ├── ✅ `VorticeLineoModel.tsx`
 │   │   │   │   │   ├── 📂 **blueprints/**
 │   │   │   │   │   └── 📂 **parts/**
 │   │   │   │   │       ├── ✅ `BoxAndBase.tsx`
 │   │   │   │   │       ├── ✅ `GreenClamps.tsx`
-│   │   │   │   │       ├── ❌ `InternalFanRotor.tsx`
+│   │   │   │   │       ├── ✅ `InternalFanRotor.tsx`
 │   │   │   │   │       └── ✅ `MainChassis.tsx`
 │   │   │   │   ├── 📂 **materials/**
-│   │   │   │   │   └── ❌ `useFanMaterials.ts`
+│   │   │   │   │   └── ✅ `useFanMaterials.ts`
 │   │   │   │   ├── 📂 **parts/**
 │   │   │   │   │   ├── ✅ `Housing.tsx`
-│   │   │   │   │   ├── ❌ `Impeller.tsx`
+│   │   │   │   │   ├── ✅ `Impeller.tsx`
 │   │   │   │   │   ├── ✅ `Motor.tsx`
-│   │   │   │   │   └── ❌ `Silencer.tsx`
+│   │   │   │   │   └── ✅ `Silencer.tsx`
 │   │   │   │   └── 📂 **types/**
 │   │   │   │       ├── ✅ `AccessoryModel.tsx`
 │   │   │   │       ├── ✅ `AirCurtainModel.tsx`
 │   │   │   │       ├── ✅ `AirPurifierModel.tsx`
 │   │   │   │       ├── ✅ `AxialFanModel.tsx`
-│   │   │   │       ├── ❌ `CentrifugalFanModel.tsx`
-│   │   │   │       ├── ❌ `DehumidifierModel.tsx`
+│   │   │   │       ├── ✅ `CentrifugalFanModel.tsx`
+│   │   │   │       ├── ✅ `DehumidifierModel.tsx`
 │   │   │   │       ├── ✅ `DomesticFanModel.tsx`
 │   │   │   │       ├── ✅ `DuctFanModel.tsx`
 │   │   │   │       ├── ✅ `ExproofFanModel.tsx`
@@ -412,10 +412,10 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   │   │   │       ├── ✅ `SmokeExhaustFanModel.tsx`
 │   │   │   │       ├── ✅ `SnailFanModel.tsx`
 │   │   │   │       ├── ✅ `SpeedControlModel.tsx`
-│   │   │   │       └── ❌ `WallMountedCompactFanModel.tsx`
+│   │   │   │       └── ✅ `WallMountedCompactFanModel.tsx`
 │   │   │   ├── ✅ `AddToProjectModal.tsx`
-│   │   │   ├── ❌ `BentPlaneGeometry.tsx`
-│   │   │   ├── ❌ `BlueprintCanvas.tsx`
+│   │   │   ├── ✅ `BentPlaneGeometry.tsx`
+│   │   │   ├── ✅ `BlueprintCanvas.tsx`
 │   │   │   ├── ✅ `Category3DIcon.tsx`
 │   │   │   ├── ✅ `CategoryOrbitCarousel.tsx`
 │   │   │   ├── ✅ `InfiniteProductsShowcase.tsx`
@@ -434,7 +434,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   │   ├── ✅ `admin.ts`
 │   │   ├── ✅ `applications.ts`
 │   │   ├── ✅ `legal.ts`
-│   │   ├── ❌ `orbitalCarouselConfig.ts`
+│   │   ├── ✅ `orbitalCarouselConfig.ts`
 │   │   └── ✅ `siteUrl.ts`
 │   ├── 📂 **contexts/**
 │   │   ├── ✅ `AuthContext.tsx`
@@ -445,9 +445,9 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   │   ├── ✅ `ProjectContext.tsx`
 │   │   └── ✅ `ProjectProvider.tsx`
 │   ├── 📂 **data/**
-│   │   └── ❌ `brands.ts`
+│   │   └── ✅ `brands.ts`
 │   ├── 📂 **design-system/**
-│   │   └── ❌ `tokens.js`
+│   │   └── ✅ `tokens.js`
 │   ├── 📂 **hooks/**
 │   │   ├── ✅ `use-mobile.tsx`
 │   │   ├── ✅ `useApiCall.ts`
@@ -516,7 +516,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   │   ├── ✅ `admin-shared.ts`
 │   │   ├── ✅ `authority.ts`
 │   │   ├── ✅ `cart.ts`
-│   │   ├── ❌ `database.ts`
+│   │   ├── ✅ `database.ts`
 │   │   ├── ✅ `database.types.ts`
 │   │   ├── ✅ `db-rows.ts`
 │   │   ├── ✅ `inventory.ts`
@@ -525,7 +525,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihind
 │   ├── 📂 **utils/**
 │   │   ├── ✅ `3dModelOffsets.ts`
 │   │   ├── ✅ `adminUi.ts`
-│   │   ├── ❌ `analytics.ts`
+│   │   ├── ✅ `analytics.ts`
 │   │   ├── ✅ `applicationLinks.ts`
 │   │   ├── ✅ `applicationUi.tsx`
 │   │   ├── ✅ `breadcrumbUtils.ts`
@@ -700,54 +700,4 @@ Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `
 - [⚠️] `next.config.md`
 
 ## Geçersiz Şablon (Invalid Format)
-Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterprise standardı için güncelleyin:
-- [❌] `src\app\[lang]\about\page.md`
-- [❌] `src\app\[lang]\account\addresses\page.md`
-- [❌] `src\app\[lang]\account\invoices\page.md`
-- [❌] `src\app\admin\coupons\page.md`
-- [❌] `src\app\admin\inventory\report\page.md`
-- [❌] `src\app\admin\webhook-events\page.md`
-- [❌] `src\components\TiltCard.md`
-- [❌] `src\components\layout\PageShell.md`
-- [❌] `src\components\navigation\EliteMegaMenu.md`
-- [❌] `src\components\navigation\MegaMenu3DBackground.md`
-- [❌] `src\components\products\3d\factory\Assembler.md`
-- [❌] `src\components\products\3d\factory\parts\InternalFanRotor.md`
-- [❌] `src\components\products\3d\materials\useFanMaterials.md`
-- [❌] `src\components\products\3d\parts\Impeller.md`
-- [❌] `src\components\products\3d\parts\Silencer.md`
-- [❌] `src\components\products\3d\types\CentrifugalFanModel.md`
-- [❌] `src\components\products\3d\types\DehumidifierModel.md`
-- [❌] `src\components\products\3d\types\WallMountedCompactFanModel.md`
-- [❌] `src\components\products\BentPlaneGeometry.md`
-- [❌] `src\components\products\BlueprintCanvas.md`
-- [❌] `src\config\orbitalCarouselConfig.md`
-- [❌] `src\data\brands.md`
-- [❌] `src\design-system\tokens.md`
-- [❌] `src\types\database.md`
-- [❌] `src\utils\analytics.md`
-- [❌] `src\app\[lang]\about\page.md`
-- [❌] `src\app\[lang]\account\addresses\page.md`
-- [❌] `src\app\[lang]\account\invoices\page.md`
-- [❌] `src\app\admin\coupons\page.md`
-- [❌] `src\app\admin\inventory\report\page.md`
-- [❌] `src\app\admin\webhook-events\page.md`
-- [❌] `src\components\TiltCard.md`
-- [❌] `src\components\layout\PageShell.md`
-- [❌] `src\components\navigation\EliteMegaMenu.md`
-- [❌] `src\components\navigation\MegaMenu3DBackground.md`
-- [❌] `src\components\products\3d\factory\Assembler.md`
-- [❌] `src\components\products\3d\factory\parts\InternalFanRotor.md`
-- [❌] `src\components\products\3d\materials\useFanMaterials.md`
-- [❌] `src\components\products\3d\parts\Impeller.md`
-- [❌] `src\components\products\3d\parts\Silencer.md`
-- [❌] `src\components\products\3d\types\CentrifugalFanModel.md`
-- [❌] `src\components\products\3d\types\DehumidifierModel.md`
-- [❌] `src\components\products\3d\types\WallMountedCompactFanModel.md`
-- [❌] `src\components\products\BentPlaneGeometry.md`
-- [❌] `src\components\products\BlueprintCanvas.md`
-- [❌] `src\config\orbitalCarouselConfig.md`
-- [❌] `src\data\brands.md`
-- [❌] `src\design-system\tokens.md`
-- [❌] `src\types\database.md`
-- [❌] `src\utils\analytics.md`
+Harika! Tüm MD belgeleri Enterprise-Ready (5N1K + Axioms) şablonuna uygun. ✅

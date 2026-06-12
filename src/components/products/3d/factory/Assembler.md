@@ -8,7 +8,7 @@ entity_hashes:
   func:Assembler: fce0437dc1401eb7
   overview: 1319e0e67eee55ba
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:36:50Z
+generated_at: 2026-06-12T10:20:27Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,21 @@ Bileşen, gelen veriyi (blueprint) işleyerek sahneyi oluşturur, tüm 3D parça
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, bir React bileşeni olup 3D ürün montajını render eder. Aşağıdaki varsayımlar fonksiyon imzası ve modül tanımına dayanmaktadır.
+
+[Aksiyom 1]: Eğer `blueprint` parametresi `null` veya `undefined` ise, bileşen 3D sahneyi doğru bir şekilde render edemez ve montaj başarısız olur.
+
+[Aksiyom 2]: Eğer `explode` parametresi `0`'dan farklı bir değer alırsa, parçalar arasındaki mesafe bu değere göre orantılı olarak artar (patlama efekti aktifleşir).
+
+[Aksiyom 3]: Eğer `onPartClick` callback'i sağlanmamışsa (`undefined`), kullanıcının parçalara tıklama etkileşimi çalışmaz veya sessizce yoksayılır.
+
+[Aksiyom 4]: Eğer `selectedPart` parametresi `undefined` ise, hiçbir parça seçili durumda değildir (varsayılan durum).
+
+[Aksiyom 5]: Eğer `blueprint` yapısı içinde tanımlı parça verileri (geometry, position, relationship) yoksa, ilgili parçalar sahneye yerleştirilemez ve eksik render oluşur.
+
+[Aksiyom 6]: `blueprint` yapısının, parçalar arası montaj ilişkilerini ve hiyerarşisini tanımlayan geçerli bir veri yapısına sahip olması gerekir; aksi takdirde parçaların pozisyonları ve bağlantıları bilinmez.
 
 ---
 
@@ -75,15 +89,6 @@ Bileşen, gelen veriyi (blueprint) işleyerek sahneyi oluşturur, tüm 3D parça
 - **ic_degiskenler**:
   - Yok — return içinde doğrudan JSX döndürür, ara değişken oluşturmaz
 - **Dönüş**: `JSX.Element` — `<group>` elemanı içinde `blueprint.parts.map()` ile her parça için `<group>` ve `<Suspense>` ile sarılmış dinamik React bileşenleri döndürür. `blueprint.scale || 1` ile genel ölçeklendirme uygular.
-
----
-
-### [N2_NASIL] AST Pointer: src/components/products/3d/factory/Assembler.tsx::map callback (part, index)
-- **params**: `part` (blueprint.parts dizisindeki tek bir parçanın nesnesi — `component`, `name`, `position`, `rotation`, `scale`, `props` alanlarını içerir), `index` (number — dizi indeksi, key oluşturmak için kullanılır)
-- **ic_degiskenler**:
-  - `Component` — `part.component` değerinden alınan React bileşeni referansı; `React.createElement` ile dinamik olarak render edilmek üzere kullanılır
-  - `explodeOffset: [number, number, number]` — Parçanın 3D koordinat vektörü; `part.position` koordinatları `explode` oranıyla çarpılarak merkezden uzaklaştırılmış pozisyon hesaplanır. Her eksen için `part.position?.[0]`, `part.position?.[1]`, `part.position?.[2]` subscript erişimleri ile x, y, z değerleri okunur ve `(1 + explode * 2)` çarpanıyla çarpılır; `position` tanımsızsa `0` varsayılır
-- **Dönüş**: `JSX.Element` — Her parça için `<Suspense fallback={null}>` içine sarılmış, `React.createElement` ile dinamik olarak oluşturulmuş React bileşeni döndürür. Component'e şu prop'lar aktarılır: `part.props` spread edilir, `explode`, `isSelected` (`selectedPart === part.name` ile belirlenir), `isIsolated` (`isolatedPart === part.name || isolatedPart === null` ile belirlenir), `isHidden` (`hiddenParts.includes(part.name)` ile belirlenir), `onClick` (callback içinde `onPartClick?.(part.name)` çağrısı). Dış `{/* key: `${part.name}-${index}` */}` ile React key atanır.
 
 ---
 

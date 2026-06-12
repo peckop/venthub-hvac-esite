@@ -2,12 +2,12 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-12T06:30:05.983038+00:00
-total_compiled_files: 403
+compiled_at: 2026-06-12T10:30:42.748675+00:00
+total_compiled_files: 428
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-12T06:30:05.983038+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-12T10:30:42.748675+00:00 tarihinde tüm alt modüllerin güncel mimari dokümanlarının birleştirilmesiyle otonom olarak derlenmiştir.
 
 
 
@@ -868,6 +868,101 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** `font-mono`, `tracking-widest`, `uppercase`
 
 ---
+# FILE: src\app\admin\coupons\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\admin\coupons\page.tsx
+skeleton_hash: f0cb795416035c48
+entity_hashes:
+  func:Page: 556d56b0dab8a0be
+  overview: c697ddf7c92cfa4f
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-06-12T10:18:30Z
+---
+
+## Genel Bakış
+Bu modül, admin panelinin kupon yönetim sayfasını sunan basit bir Next.js sayfa yönlendiricisidir. Tek bir `Page` bileşeni içermekte olup, asıl kupon yönetim arayüzünü dinamik olarak yükleyerek render eder.
+
+## Fonksiyon Grupları
+### Sayfa Yönlendirici
+Modülün tek sorumluluğu, admin kupon sayfasının tarayıcıda görüntülenmesini sağlamaktır. Dinamik import ile asıl bileşeni yükleyerek sayfayı sunar.
+- `Page`
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, basit bir Next.js sayfa yönlendiricisi olduğundan minimal sayıda aksiyom bulunmaktadır.
+
+**[Aksiyom 1]**: Eğer `AdminCouponsPage` bileşeni mevcut değilse veya import edilemiyorsa, `Page` bileşeni render edilemez ve sayfa hata verir.
+
+**[Aksiyom 2]**: Eğer bu dosya Next.js App Router'ın beklediği dizin yapısında (`app/admin/coupons/page.tsx`) değilse, ilgili URL rota olarak eşleştirilmez.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: Page fonksiyonu, admin kupon sayfasını oluşturan `AdminCouponsPage` bileşenini render eder. Bu, Next.js sayfa dosyasının varsayılan dışa aktarımı olarak görev yapar ve admin panelindeki kupon yönetim arayüzünü temsil eder.
+
+**Nasıl yapar**: Fonksiyon, herhangi bir mantık veya durum yönetimi içermez; doğrudan `<AdminCouponsPage />` JSX öğesini döndürerek çalışır. Sarmalayıcı (wrapper) görevi görerek asıl bileşenin sayfaya eklenmesini sağlar.
+
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**: JSX.Element türünde `AdminCouponsPage` bileşenini döndürür.
+
+---
+
+## SABİTLER
+- **AdminCouponsPage** (call) — `nextDynamic(
+
+  () => import('../../../views/admin/AdminCouponsPage'),
+
+  { s...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/admin/coupons/page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: (iç değişken yok)
+- **Kullanilan Bilesenler**:
+  - `AdminCouponsPage` — import edilmiş React bileşeni, JSX içinde `<AdminCouponsPage />` olarak render edilir
+- **Dönüş**: JSX element — `<AdminCouponsPage />` bileşeninin render ettiği React node'u döner
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\admin\coupons\page.tsx
+  function: src\app\admin\coupons\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
+
+---
 # FILE: src\app\admin\error-groups\page.md
 
 ---
@@ -1147,6 +1242,101 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`
+
+---
+# FILE: src\app\admin\inventory\report\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\admin\inventory\report\page.tsx
+skeleton_hash: e3b6dcb6f41911c2
+entity_hashes:
+  func:InventoryReportPage: bfcc8ccf4dbc326a
+  overview: 4a0a3d3311d8e694
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-06-12T10:18:40Z
+---
+
+## Genel Bakış
+
+Yönetim panelindeki envanter rapor sayfasının üst düzey giriş noktasıdır. Tek bir React sayfa bileşeni olarak, rapor arayüzünün yüklenmesini ve render edilmesini sağlar.
+
+## Fonksiyon Grupları
+
+### Sayfa Bileşeni
+Envanter rapor sayfasının kök bileşenini tanımlar ve yönetir. Yönetim paneli düzeni içinde rapor görünümünü kullanıcıya sunar.
+- InventoryReportPage
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için minimal aksiyomlar tanımlanmıştır. Fonksiyon gövdesinin tamamı görünmediğinden, yalnızca dokümanda belirtilen referanslara dayalı varsayımlar üretilmiştir.
+
+[Aksiyom 1]: Eğer `AdminInventoryReportPage` bileşeni import edilmemiş veya mevcut değilse, `InventoryReportPage` JSX render hatası ile karşılaşır ve sayfa yüklenemez.
+
+[Aksiyom 2]: Eğer React çalışma ortamı (rendering context) mevcut değilse, bileşen JSX döndüremez ve uygulama hata verir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### InventoryReportPage
+**Ne yapar**: `InventoryReportPage` bileşenini render eder ve `<AdminInventoryReportPage />` JSX elemanını döndürür. Bu sayede yönetim panelindeki envanter raporu sayfası görüntülenir.  
+
+**Nasıl yapar**: Fonksiyon, React fonksiyonel bileşeni olarak tanımlanmıştır; içinde tek bir return ifadesi bulunur ve doğrudan `AdminInventoryReportPage` bileşenini JSX olarak döndürür.  
+
+**Parametreler**:  
+- *Hiç yok* — Fonksiyon parametre almaz; sabit bir bileşen döndürür.  
+
+**Dönüş**:  
+- `JSX.Element` — `<AdminInventoryReportPage />` bileşenini temsil eden JSX elemanı.
+
+---
+
+## SABİTLER
+- **AdminInventoryReportPage** (call) — `nextDynamic(
+
+  () => import('../../../../views/admin/AdminInventoryReportPag...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/admin/inventory/report/page.tsx::InventoryReportPage
+- **params**: (parametre yok)
+- **ic_degiskenler**: (değişken tanımlanmamıştır)
+- **Dönüş**: `<AdminInventoryReportPage />` JSX bileşeni döndürür
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\admin\inventory\report\page.tsx
+  function: src\app\admin\inventory\report\page.tsx::InventoryReportPage
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: InventoryReportPage
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
 
 ---
 # FILE: src\app\admin\inventory\settings\page.md
@@ -1893,6 +2083,106 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** `animate-pulse`
 
 ---
+# FILE: src\app\admin\webhook-events\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\admin\webhook-events\page.tsx
+skeleton_hash: fad447b6edb0cff9
+entity_hashes:
+  func:Page: 03bf0c7eea267025
+  overview: c697ddf7c92cfa4f
+  style_tokens: f00e706f0d7166cc
+generated_at: 2026-06-12T10:19:00Z
+---
+
+## Genel Bakış
+Bu modül, yönetim panelindeki webhook olayları sayfasını sunan bir React giriş noktasıdır. Tek bir bileşeni (`Page`) dışa aktararak, sayfanın asıl içeriğini dinamik olarak yüklenen `AdminWebhookEventsPage` alt bileşenine devreder.
+
+## Fonksiyon Grupları
+### Sayfa Bileşeni
+Modülün dışa açık tek bileşenini tanımlar. Bu bileşen, Next.js App Router yapısında ilgili rotaya bağlanır ve kullanıcıya sayfa arayüzünü sunar.
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için belirli aksiyom tanımlanması güçtür çünkü fonksiyon gövdesi verilmemiştir. Ancak mevcut bilgilere dayanarak:
+
+**[Aksiyom 1]:** Eğer `AdminWebhookEventsPage` modülü/ bileşeni import edilebilir konumda değilse (modül yolu tanımsız veya dosya mevcut değilse), `Page` bileşeni render edilemez ve çalışma zamanı hatası oluşur.
+
+**[Aksiyom 2]:** Eğer Next.js App Router yapısı (dosya tabanlı rotlama) mevcut değilse, bu bileşen `/admin/webhook-events` rotasına otomatik olarak bağlanmaz.
+
+**[Aksiyom 3]:** Eğer `AdminWebhookEventsPage` bileşeni geçersiz bir React elemanı döndürüyorsa (null, undefined veya geçersiz JSX), `Page` bileşeni hata verir.
+
+---
+
+**Not:** Bu modül tek bir sayfa giriş noktası olup, tüm iş mantığını `AdminWebhookEventsPage` bileşenine devretmektedir. Bileşen içeriği (props alımı, durum yönetimi, yan etkiler vb.) bu modül kapsamında değildikten bilinmemektedir. Detaylı aksiyomlar için `AdminWebhookEventsPage` modülünün analiz edilmesi gerekir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: Admin panelindeki webhook olayları sayfasını render eder. Bu fonksiyon, Next.js App Router yapısında `/admin/webhook-events` rotasının sayfa bileşenini tanımlar ve tarayıcıda webhook olaylarının görüntülenmesini sağlar.
+
+**Nasıl yapar**: Fonksiyon, içeriğinde herhangi bir mantık veya state yönetimi barındırmaz. Doğrudan `AdminWebhookEventsPage` adlı alt bileşeni return ederek sayfa yapısının render edilmesini tetikler. Bu basit yapı, sayfa yüklemesi ve yönlendirme işlemlerinin Next.js tarafından otomatik olarak yönetilmesini sağlar.
+
+**Parametreler**:
+- Fonksiyon herhangi bir parametre almaz
+
+**Dönüş**: JSX Element — `AdminWebhookEventsPage` componentinin render edeceği arayüz unsurunu döndürür. Return edilen değer, React tarafından işlenerek tarayıcıda webhook olayları yönetim arayüzü olarak görüntülenir.
+
+---
+
+## SABİTLER
+- **AdminWebhookEventsPage** (call) — `nextDynamic(
+
+  () => import('../../../views/admin/AdminWebhookEventsPage'),
+...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/app/admin/webhook-events/page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok — fonksiyon gövdesinde hiçbir değişken tanımlanmamış)
+- **Dis Bilesenler**: `AdminWebhookEventsPage` — import edilmiş React bileşeni, fonksiyon içinde `<AdminWebhookEventsPage />` şeklinde JSX olarak render ediliyor
+- **Dönüş**: JSX Element (`<AdminWebhookEventsPage />`) — bir sonraki React bileşeninin render edeceği UI yapısını döndürüyor
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\admin\webhook-events\page.tsx
+  function: src\app\admin\webhook-events\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `text-center`, `text-slate-400`
+- **Layout:** `p-8`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`
+
+---
 # FILE: src\app\api\health\route.md
 
 ---
@@ -2470,6 +2760,148 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** (yok)
 
 ---
+# FILE: src\app\[lang]\about\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\about\page.tsx
+skeleton_hash: 0764930d9f5459d2
+entity_hashes:
+  func:Page: 32fe3fdb17787a5b
+  func:generateStaticParams: 6d1b3e72f8b2da9f
+  overview: 8dff6fca298bde81
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-12T10:17:31Z
+---
+
+## Genel Bakış
+Bu modül, çoklu dil desteği sunan "Hakkında" sayfasını oluşturur. Next.js App Router yapısında `[lang]/about` rotasına karşılık gelir ve hem statik sayfa yapılandırmasını hem de sayfa içeriğinin render edilmesini yönetir.
+
+## Fonksiyon Grupları
+### Statik Sayfa Yapılandırması
+Bu grup, sayfanın hangi dil varyantları için önceden oluşturulacağını belirler.
+- generateStaticParams
+
+### Sayfa Renderlama
+Bu grup, dil parametresine göre sayfa içeriğini JSX olarak üretir ve kullanıcıya sunar.
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, Next.js App Router yapısında çoklu dil destekli "Hakkında" sayfasını yöneten bir sayfa bileşenidir. Aşağıdaki varsayımlar fonksiyon imzalarından çıkarılmıştır.
+
+---
+
+**[Aksiyom 1]**: Eğer `Page` fonksiyonuna geçirilen `params` nesnesi `lang` alanı içermiyorsa, sayfa içeriği istenen dilde render edilemez.
+
+> Next.js App Router'da `[lang]` bir dinamik rotadır ve `params.lang` zorunlu olarak beslenmelidir.
+
+---
+
+**[Aksiyom 2]**: Eğer `generateStaticParams()` fonksiyonu boş bir dizi döndürüyorsa, hiçbir dil için statik sayfa önceden oluşturulamaz ve istek üzerine (on-demand) render edilmesi gerekir.
+
+> Fonksiyon, desteklenen dil kodlarının listesini döndürerek hangi varyantların build aşamasında oluşturulacağını belirler.
+
+---
+
+**[Aksiyom 3]**: Eğer `generateStaticParams()` tarafından döndürülen dil kodları ile `Page` fonksiyonunun beklediği `params.lang` değerleri tutarsızsa, geçersiz bir rotaya erişim denenir ve hata oluşur.
+
+> Örneğin, `generateStaticParams` yalnızca `["tr", "en"]` döndürüyor ama runtime'da `params.lang === "de"` isteği geliyorsa, bu geçersizdir.
+
+---
+
+**[Aksiyom 4]**: Eğer `Page` bileşeni `params` parametresi olmadan (veya `params.lang` alanına erişilmeden) çağrılırsa, bileşen düzgün render edilemez.
+
+> Fonksiyon imzası `Page({ params }: PageProps)` şeklindedir; `params` bağımlılığı zorunludur.
+
+---
+
+**[Aksiyom 5]**: Eğer bu modül bir "Hakkında" sayfasıysa ve `generateStaticParams` desteklenen dilleri dış kaynaktan (ör. yapılandırma dosyası, API) alıyorsa, o kaynağın erişilebilir ve tutarlı olması gerekir; aksi halde build aşamasında hata oluşur.
+
+> Bu modülde `generateStaticParams` gövdesi verilmediği için kaynağın doğası bilinmemektedir, ancak herhangi bir dış bağımlılık varsa erişilebilir olmalıdır.
+
+---
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: Bu fonksiyon, bir Next.js sayfa bileşeni olarak davranır ve belirli bir dile ait "Hakkımızda" sayfasının içeriğini sunar. Fonksiyon asenkrondur ve URL'den gelen dil parametresini alarak ilgili bileşeni render eder.
+
+**Nasıl yapar**: Fonksiyon, `params` nesnesinden asenkron olarak `lang` değerini çözer. Çözülen bu dil kodu, sayfa içeriğini ve çevirilerini yöneten `PageComponent` bileşenine prop olarak iletilir. Bu sayede aynı sayfa yapısı farklı diller için içeriğini dinamik olarak günceller.
+
+**Parametreler**:
+- `params`: `Promise<PageProps>` — URL'den gelen ve `lang` anahtarını içeren asenkron parametre nesnesi. Next.js tarafından sayfa yolundaki dinamik segmentlerden otomatik olarak oluşturulur.
+
+**Dönüş**: `JSX.Element` — `PageComponent` bileşeninin döndürdüğü ve ilgili dil için hazırlanmış "Hakkımızda" sayfasının JSX yapısı.
+
+### generateStaticParams
+**Ne yapar**: Bu fonksiyon, Next.js'in statik site oluşturma (SSG) sürecinde kullanılacak olan tüm olası `lang` parametre değerlerini döndürür. Temel amacı, build esnasında hangi diller için statik HTML dosyası oluşturulacağını sisteme bildirmektir.
+
+**Nasıl yapar**: Fonksiyon, önceden tanımlı bir array döndürür. Her bir obje, bir `lang` parametre değeri temsil eder. Next.js bu listeyi iterasyona uğratır ve her bir `lang` değeri için `Page` fonksiyonunu ayrı ayrı çalıştırarak statik HTML dosyaları üretir. Bu mekanizma, uygulama performansını artırır ve sayfaların önceden derlenmesini sağlar.
+
+**Parametreler**: Bu fonksiyonun herhangi bir parametresi yoktur.
+
+**Dönüş**: `Array<{ lang: string }>` — Statik olarak oluşturulacak sayfalar için gerekli dil kodlarını içeren bir nesne dizisi. Mevcut yapıda `tr` (Türkçe) ve `en` (İngilizce) olmak üzere iki dil desteği tanımlıdır.
+
+---
+
+## INTERFACES
+
+### PageProps
+- `params: Promise<{ lang: string }>`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: `[lang]/about/page.tsx::Page`
+- **params**: `{ params: PageProps }` — Next.js sayfası prop'ları, `lang` parametresini içerir
+- **ic_degiskenler**:
+  - `lang` — `await params` sonucu destructure edilen dil kodu ('tr' veya 'en'), `PageComponent`'e prop olarak geçirilir
+- **Dönüş**: JSX (`<PageComponent lang={lang} />`) — About sayfasının dil bazlı bileşeni
+
+### [N2_NASIL] AST Pointer: `[lang]/about/page.tsx::generateStaticParams`
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `Array<{ lang: string }>` — Statik olarak üretilecek sayfa dil varyasyonları listesi (`tr` ve `en`)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\[lang]\about\page.tsx
+  function: src\app\[lang]\about\page.tsx::Page
+  function: src\app\[lang]\about\page.tsx::generateStaticParams
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+  export: generateStaticParams
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
 # FILE: src\app\[lang]\account\layout.md
 
 ---
@@ -2643,6 +3075,196 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** (yok)
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\app\[lang]\account\addresses\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\addresses\page.tsx
+skeleton_hash: 09aed64513c67e34
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: c697ddf7c92cfa4f
+  style_tokens: 9144ece4bffe7964
+generated_at: 2026-06-12T10:17:59Z
+---
+
+## Genel Bakış
+Bu modül, kullanıcının hesabındaki adresleri yönetmesine olanak tanıyan Next.js sayfa giriş noktasıdır. Tek bir `Page` fonksiyonu ile dinamik olarak yüklenen `AccountAddressesPage` bileşenini render ederek dil duyarlı adres yönetim arayüzünü sunar.
+
+## Fonksiyon Grupları
+### Sayfa Giriş Noktası
+Modülün tek bileşeni olan `Page`, adres yönetim sayfasının içerik bölümünü dinamik import yoluyla yükler ve sayfayı kullanıcıya sunar.
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: `Page` fonksiyonu, React bileşeni olarak tanımlanmış bir fonksiyondur ve `<PageComponent />` JSX elemanını döndürerek ilgili sayfanın içeriğini render eder.  
+
+**Nasıl yapar**: Fonksiyon, doğrudan bir JSX ifadesi olan `<PageComponent />`'i return eder; ek bir mantık, durum yönetimi veya yan etki (side‑effect) içermez.  
+
+**Parametreler**:  
+- *Yok* — Fonksiyon herhangi bir argüman almaz.
+
+**Dönüş**:  
+- `JSX.Element` — `<PageComponent />` bileşenini temsil eden JSX elemanı döndürür.
+
+---
+
+## SABİTLER
+- **PageComponent** (call) — `nextDynamic(() => import('../../../../views/account/AccountAddressesPage'), {...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: [lang]/account/addresses/page.tsx::anonim_arrow_function
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  (değişken yok — doğrudan JSX döndürür)
+- **Dönüş**: JSX — `min-h-screen` flex container içinde `animate-spin` sınıfına sahip dönen spinner div'i; loading durumu için kullanıluyor (nextDynamic loading bileşeni olarak)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\[lang]\account\addresses\page.tsx
+  function: src\app\[lang]\account\addresses\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-b-2`, `border-primary-navy`
+- **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`
+
+---
+# FILE: src\app\[lang]\account\invoices\page.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\invoices\page.tsx
+skeleton_hash: df4e5591ff5aa6e8
+entity_hashes:
+  func:Page: 02ee67f324c336e5
+  overview: c697ddf7c92cfa4f
+  style_tokens: 9144ece4bffe7964
+generated_at: 2026-06-12T10:18:20Z
+---
+
+## Genel Bakış
+Bu modül, kullanıcının hesap panelindeki fatura listesi sayfasını temsil eden kök React bileşenini içerir. Sayfa, dinamik bir yükleme stratejisi kullanarak asıl görünüm bileşenini yükler ve böylece performansı artırırken ilgili arayüzü sunar.
+
+## Fonksiyon Grupları
+### Ana Sayfa Bileşeni
+Hesap faturaları sayfasının giriş noktasını ve temel yapısını oluşturur. Dinamik içe aktarma yoluyla asıl görünüm bileşenini yükleyerek sayfayı render eder.
+- Page
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, minimal bir React sarmalayıcı (wrapper) bileşenidir; fonksiyon gövdesi yalnızca `<PageComponent />` öğesini döndürür. Dolayısıyla mimari varsayımlar sınırlıdır.
+
+---
+
+**[Aksiyom 1]:** Eğer `PageComponent` modülü çalış zamanında içe aktarılamazsa (import başarısız olursa), `Page` bileşeni render edilemez ve uygulama bu sayfada hata verir.
+
+**[Aksiyom 2]:** Eğer React/JSX çalışma ortamı (runtime) mevcut değilse, `Page` fonksiyonu geçerli bir React elementi döndüremez ve bileşen ağaç (component tree) oluşturulamaz.
+
+**[Aksiyom 3]:** Eğer `PageComponent`自身i bağımlılık gerektiriyorsa (prop, context vb.) ve bunlar sağlanmamışsa, `PageComponent`'in kendi iç hata oluşumu beklenebilir; ancak `Page` fonksiyonu bu bağımlılıkları doğrudan yönetmez.
+
+**[Aksiyom 4]:** `Page` fonksiyonu parametre almaz; dolayısıyla调用侧 (caller) bu bileşene prop geçirme yetkisine sahip değildir — tüm veri akışı `PageComponent` içinde veya üst bileşen zincirinden (context, layout vb.) sağlanmalıdır.
+
+---
+
+> **Not:** Bu modül, yalnızca bir çocuğu (child) sarmalayan ince bir zar (thin wrapper) yapısındadır. Fonksiyon gövdesinde koşullu mantık, veri dönüştürme veya hata işleme bulunmamaktadır; bu nedenle yukarıdaki varsayımlar modülün minimum zorunluluklarını yansıtmaktadır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Page
+**Ne yapar**: React bileşeni `Page` fonksiyonu, JSX içinde `<PageComponent />` öğesini döndürerek bir sayfa görünümü oluşturur.  
+
+**Nasıl yapar**: Fonksiyon, doğrudan bir JSX ifadesi olan `<PageComponent />`'i return eder; ek bir mantık, durum yönetimi veya yan etki yoktur.  
+
+**Parametreler**:
+- (hiç parametre almaz)
+
+**Dönüş**: JSX.Element — `<PageComponent />` bileşenini temsil eden React öğesi.
+
+---
+
+## SABİTLER
+- **PageComponent** (call) — `nextDynamic(() => import('../../../../views/account/AccountInvoicesPage'), {
+...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: `[lang]/account/invoices/page.tsx`::(anonim.loading)
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX — `div` içinde `animate-spin` class'lı spinner loading göstergesi döndürür; `min-h-screen`, `flex`, `items-center`, `justify-center` ile ekran ortasında dönen bir yükleme animasyonu sunar
+
+---
+
+## NODE ID STANDARD
+
+  file: src\app\[lang]\account\invoices\page.tsx
+  function: src\app\[lang]\account\invoices\page.tsx::Page
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Page
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `border-b-2`, `border-primary-navy`
+- **Layout:** `flex`, `h-12`, `items-center`, `justify-center`, `min-h-screen`, `w-12`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`
 
 ---
 # FILE: src\app\[lang]\account\orders\page.md
@@ -10334,6 +10956,152 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `absolute`, `bottom-3`, `flex`, `flex-shrink-0`, `from-blue-50`, `from-white`, `gap-3`, `group-hover:from-blue-100`, `h-10`, `h-24`, `hover:shadow-md`, `items-center`, `justify-center`, `left-0`, `left-1/2`
 - **Varyant/Responsive:** `:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
 - **Yardımcı Sınıflar:** `${direction`, `-translate-x-1/2`, `:`, `===`, `animate-pulse`, `animate-subcat-scroll-left`, `animate-subcat-scroll-right`, `border`, `duration-300`, `font-bold`, `font-semibold`, `group`, `group-hover:opacity-100`, `hover:scale-105`, `inset-y-0`
+
+---
+# FILE: src\components\TiltCard.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\TiltCard.tsx
+skeleton_hash: 11168335cd8d8a31
+entity_hashes:
+  func:TiltCard: bfd1d2a43ccba8c3
+  func:clamp: 6b6f2a3bb4b3c92e
+  func:onEnter: 6efee232fcfe2e0b
+  func:onLeave: 47432f2c7853fc8a
+  func:onMove: 855a2394d5f31485
+  overview: 49812a020a38dab5
+  style_tokens: 9c70068ed275c69c
+generated_at: 2026-06-12T10:19:16Z
+---
+
+## Genel Bakış
+TiltCard, fare etkileşimleriyle üç boyutlu eğilme efekti sunan interaktif bir React kart bileşenidir. Kullanıcı faresini kart üzerinde hareket ettirdiğinde, kart真实世界'deki bir nesne gibi eğilerek modern ve dinamik bir görsel deneyim yaratır. Maksimum eğilme açısı dışarıdan özelleştirilebilir.
+
+## Fonksiyon Grupları
+### Ana Bileşen
+TiltCard'ın temel yapısını oluşturarak içeriği sarar ve eğilme efekti için yapılandırma parametrelerini tanımlar. Bu grup, bileşenin dışarıya açılan arayüzünü ve yaşam döngüsünü yönetir.
+- TiltCard
+
+### Fare Etkileşim Yöneticileri
+Kullanıcının kart üzerindeki fare hareketlerini yakalayarak eğilme hesaplamalarını tetikler. Fare kart üzerine geldiğinde, hareket ettiğinde ve ayrıldığında分别 ilgili efekt başlangıç, güncelleme ve bitiş işlemlerini yürütür.
+- onMove, onEnter, onLeave
+
+### Değer Sınırlandırma Aracı
+Eğilme açısı gibi hesaplanan sayısal değerleri tanımlı minimum ve maksimum aralıkta tutarak efektin kontrollü çalışmasını garanti eder. Aşırı değerlerin önüne geçerek görsel tutarlılığı korur.
+- clamp
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül, fare hareketleriyle 3D eğilme efekti yaratan bir React bileşeni olduğundan, aşağıdaki mimari varsayımlar modülün doğru çalışması için zorunludur.
+
+[Aksiyom 1]: Eğer `clamp` fonksiyonu için `min` parametresi, `max` parametresinden büyükse, fonksiyon beklenmedik sonuçlar döndürür veya başarısız olur.
+[Aksiyom 2]: Eğer `TiltCard` bileşeni için `maxTilt` parametresi negatif bir sayı olarak sağlanırsa, eğilme açısı hesaplamaları anlamsız hale gelir ve bileşen düzgün çalışmaz.
+[Aksiyom 3]: Eğer `onMove`, `onEnter` veya `onLeave` olay işleyicileri bir React olay nesnesi (örn. `React.MouseEvent`) içermeyen farklı bir argümanla çağrılırsa, bileşenin iç durumu tutarsız hale gelir ve eğilme efekti bozulur.
+[Aksiyom 4]: Eğer modül, React'ın bileşen yaşam döngüsü ve durum yönetimi (useState, useEffect) mekanizmalarından yoksun bir ortamda çalıştırılmaya çalışılırsa, bileşen işlevsel olmaz.
+[Aksiyom 5]: Eğer `TiltCard` bileşeni fare olaylarını (`mousemove`, `mouseenter`, `mouseleave`) tetikleyemeyen bir ortamda (örn. dokunmatik cihazlar) kullanılırsa, eğilme efekti tetiklenemez; ancak bileşen statik olarak görüntülenebilir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### clamp
+**Ne yapar**: Bir sayısal değeri, belirtilen minimum ve maximum sınırlar arasında sıkıştırır (clipping). Değer aralık dışındaysa en yakın sınaira sabitlenir.
+
+**Nasıl yapar**: Fonksiyon, verilen `v` değerini `min` ve `max` değerleri ile karşılaştırır. `v`, `min` değerinden küçükse `min` değerini, `max` değerinden büyükse `max` değerini, aksi halde `v` değerinin kendisini döndürür. Bu, genellikle mouse hareketi veya animasyon hesaplamalarında değerin kontrollü kalmasını sağlamak için kullanılır.
+
+**Parametreler**:
+- v: number — Sınırlanacak olan sayısal değer
+- min: number — İzin verilen değer aralığının alt sınırı
+- max: number — İzin verilen değer aralığının üst sınırı
+
+**Dönüş**: Fonksiyonun dönüş tipi sağlanan bilgide açıkça belirtilmemiştir. Ancak bu tür clamp fonksiyonları genellikle number tipinde değer döndürür.
+
+### TiltCard
+**Ne yapar**: Fare hareketlerine göre eğme (tilt) efekti uygulayan, tekrarlanabilir bir React bileşenidir. İçerisindeki tüm çocuk içerikleri sarmalayarak, kullanıcı kartla etkileşime girdiğinde 3D benzeri eğim efekti sunar. Maksimum eğme açısı dışarıdan yapılandırılabilir, varsayılan bir değerle kullanıma hazırdır.
+**Nasıl yapar**: Kendi bünyesinde fare olaylarını izleyen onMove, onEnter, onLeave işleyicilerini barındırır, bu işleyicileri ana kapsayıcı div elementine bağlar. Eğme hesaplamalarında clamp fonksiyonunu kullanarak açının sınırları aşmasını engeller, aldığı maxTilt değerini tüm eğme hesaplamalarında temel alır. İçerisine gelen children prop'unu kendi içindeki kapsayıcıda render ederek efekti içeriğe uygular.
+**Parametreler**:
+- name: children — type: React.ReactNode — Bileşen içerisinde gösterilecek, eğme efekti uygulanacak tüm içerik, her türlü React tarafından desteklenen iç öğe olabilir.
+- name: maxTilt — type: number — Kartın uygulayabileceği maksimum eğme açısı, isteğe bağlı olarak dışarıdan değer geçirilebilir, varsayılan olarak 18 derece olarak ayarlanmıştır.
+**Dönüş**: React.FC<React.PropsWithChildren<{ maxTilt?: number }>> tipinde bir React bileşeni döndürür, çocuklu yapıyı destekler, maxTilt prop'unu opsiyonel olarak kabul eden tür yapısına sahiptir.
+
+### onMove
+**Ne yapar**: TiltCard bileşeninin alanı üzerinde fare hareket ettiğinde tetiklenen olay işleyicisidir, anlık fare konumuna göre kartın eğme miktarını hesaplayıp günceller. Kullanıcının fare hareketlerini eğme açısına dönüştürerek akıcı bir 3D efekti sağlar.
+**Nasıl yapar**: Fare olayından gelen konum verilerini alır, TiltCard'ın boyutlarını ve sayfa üzerindeki konumunu hesaplar, elde edilen koordinatları eğme açısına çevirir. Hesaplanan açının maxTilt sınırını aşmasını clamp fonksiyonuyla engeller, sürekli güncellenen değerle kartın eğimini akıcı bir şekilde değiştirir.
+**Parametreler**:
+- name: e — type: React.MouseEvent<HTMLDivElement> — Tetiklenen fare hareketi olayının tüm detaylarını içeren nesne, fare konumu, hedef element gibi tüm gerekli verilere erişim sağlar.
+**Dönüş**: HTMLDivElement elementleri için uyumlu React.MouseEventHandler<HTMLDivElement> tipinde bir olay işleyicisi döndürür, fare hareketi olaylarını yakalayıp işlemek üzere yapılandırılmıştır.
+
+### onEnter
+**Ne yapar**: TiltCard bileşeninin kapsama alanına fare ilk girdiğinde tetiklenen olay işleyicisidir, eğme efektinin başlatılmasını ve gerekli tüm başlangıç durumlarının ayarlanmasını sağlar. Kullanıcının kartla etkileşime geçtiğini algılayarak efekti aktif hale getirir.
+**Nasıl yapar**: Fare kartın alanına girdiğinde animasyon geçişlerini aktif eder, eğme hesaplamaları için gereken ilk konum ve durum değerlerini ayarlar, olası gecikmeleri önlemek için gerekli ön yüklemeleri yapar, kullanıcının ilk etkileşimini algılayarak efektin sorunsuz başlamasını sağlar.
+**Parametreler**:
+- name: e — type: React.MouseEvent<HTMLDivElement> — Fare giriş olayının tüm detaylarını içeren, hedef element ve olay metriklerini barındıran React fare olay nesnesi.
+**Dönüş**: HTMLDivElement elementleri için uyumlu React.MouseEventHandler<HTMLDivElement> tipinde bir olay işleyicisi döndürür, fare element alanına giriş olayını yakalamak üzere yapılandırılmıştır.
+
+### onLeave
+**Ne yapar**: TiltCard bileşeninin kapsama alanından fare çıkış yaptığında tetiklenen olay işleyicisidir, eğme efektinin sonlandırılıp kartın orijinal varsayılan konumuna dönmesini sağlar. Kullanıcının kartla etkileşimini bitirdiğini algılayarak tüm geçici durumları temizler.
+**Nasıl yapar**: Fare kartın alanından çıktığında mevcut eğme açılarını sıfırlar, animasyonlu bir geçişle kartın orijinal konumuna dönmesini sağlar, etkileşim sırasında oluşturulan tüm geçici durum değerlerini temizler, bir sonraki etkileşime hazır hale getirir.
+**Parametreler**: Herhangi bir harici parametre almaz, iç mantığında olay nesnesini kullanarak işlemlerini gerçekleştirir.
+**Dönüş**: HTMLDivElement elementleri için uyumlu React.MouseEventHandler<HTMLDivElement> tipinde bir olay işleyicisi döndürür, fare element alanından çıkış olayını yakalamak üzere yapılandırılmıştır.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: TiltCard.tsx::clamp
+- **params**: `(v: number, min: number, max: number)`
+- **ic_degiskenler**: (fonksiyon gövdesi verilmemiş, çağrı侧dan çağrılmış)
+- **Dönüş**: number — v değerini min ve max arasında sıkıştırılmış olarak döndürür
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    TiltCard_tsx__TiltCard["TiltCard"]
+    TiltCard_tsx__clamp["clamp"]
+    TiltCard_tsx__onEnter["onEnter"]
+    TiltCard_tsx__onLeave["onLeave"]
+    TiltCard_tsx__onMove["onMove"]
+    TiltCard_tsx__TiltCard --> TiltCard_tsx__onMove
+    TiltCard_tsx__TiltCard --> TiltCard_tsx__clamp
+```
+
+## NODE ID STANDARD
+
+  file: src\components\TiltCard.tsx
+  function: src\components\TiltCard.tsx::clamp
+  function: src\components\TiltCard.tsx::TiltCard
+  function: src\components\TiltCard.tsx::onMove
+  function: src\components\TiltCard.tsx::onEnter
+  function: src\components\TiltCard.tsx::onLeave
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: TiltCard
+  export: clamp
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** `absolute`, `relative`
+- **Varyant/Responsive:** `group-hover:` önekleri
+- **Yardımcı Sınıflar:** `duration-200`, `group`, `group-hover:opacity-100`, `inset-0`, `opacity-0`, `pointer-events-none`, `rounded-xl`, `transition-opacity`, `transition-transform`, `will-change-transform`
 
 ---
 # FILE: src\components\UndecidedUserCTA.md
@@ -20434,6 +21202,107 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** `duration-300`, `font-bold`, `pointer-events-auto`, `pointer-events-none`, `px-3`, `px-6`, `py-1`, `py-3`, `rounded-full`, `shrink-0`, `tracking-tighter`, `tracking-widest`, `transition-colors`, `uppercase`
 
 ---
+# FILE: src\components\layout\PageShell.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\layout\PageShell.tsx
+skeleton_hash: 7ca98b70fc84e47d
+entity_hashes:
+  overview: 09c986d2dcf8a577
+  style_tokens: f9c95184ddfe4989
+generated_at: 2026-06-12T10:19:17Z
+---
+
+## Genel Bakış
+Bu modül, uygulama sayfalarının düzenini tutarlı ve modüler bir şekilde yöneten bir React düzen kabuğu (`PageShell`) bileşeni sağlar. Bileşen, `forwardRef` kullanılarak oluşturularak, içeriğe önceden tanımlanmış genişlik ve boşluk stillerini uygulayan bir `<section>` elemanı render eder. Modül, ortam değişkenlerine veya harici API'lere/veritabanı tablolarına doğrudan erişim yapmaz; yalnızca prop'lar aracılığıyla gelen stillere ve içeriğe odaklanır.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, saf bir sunum katmanı bileşeni olup, harici servisler veya durum yönetimi ile etkileşime girmez. Varsayımlar, prop-to-style eşleme tutarlılığına odaklanır.
+
+[Aksiyom 1]: Eğer `widthStyles` nesnesi, `width` prop'unun tüm olası değerleri (`'contained'`, `'wide'`, `'full'`) için eşleme içermiyorsa, ilgili genişlik stili uygulanmaz ve bileşen varsayılan/stilless bir `<section>` olarak render edilir.
+
+[Aksiyom 2]: Eğer `spacingStyles` nesnesi, `spacing` prop'unun tüm olası değerleri (`'none'`, `'sm'`, `'md'`, `'lg'`) için eşleme içermiyorsa, ilgili boşluk stili uygulanmaz ve bileşen varsayılan/stilless bir `<section>` olarak render edilir.
+
+[Aksiyom 3]: Eğer `children` prop'u sağlanmıyorsa, bileşen geçerli ancak içeriği boş bir `<section>` elemanı render eder; hata fırlatmaz.
+
+[Aksiyom 4]: Eğer `width` veya `spacing` prop'u `undefined` olarak bırakılıyorsa (opsiyonel oldukları için), bileşen ilgili stil maping'ine başvurmaz ve yalnızca varsayılan (sıfır) genişlik/boşluk stiliyle render edilir.
+
+[Aksiyom 5]: Eğer `forwardRef` ile iletilen `ref`, bir DOM düğümüne (`<section>`) yönlendirilmiyorsa (örn. string ref veya callback ref yanlış kullanılıyorsa), React uyarı fırlatır ancak bileşen yine de render edilir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+---
+
+## INTERFACES
+
+### PageShellProps
+- `children: React.ReactNode`
+- `width?: 'contained' | 'wide' | 'full'`
+- `spacing?: 'none' | 'sm' | 'md' | 'lg'`
+
+---
+
+## SABİTLER
+- **widthStyles** (object) — `{
+
+    contained: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
+
+    wide: 'max-w...`
+- **spacingStyles** (object) — `{
+
+    none: '',
+
+    sm: 'py-4 sm:py-6',
+
+    md: 'py-8 sm:py-12',
+
+    lg: ...`
+- **PageShell** (call) — `forwardRef<HTMLElement, PageShellProps>(({ 
+
+    children, 
+
+    width = 'con...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: components/layout/PageShell.tsx::PageShell
+- **params**: ({ children, width = 'contained', spacing = 'md', className = '', ...props }, ref)
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX (`<section>` elementi)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\layout\PageShell.tsx
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `${className`, `${spacingStyles[spacing]`, `${widthStyles[width]`
+
+---
 # FILE: src\components\navigation\Breadcrumb.md
 
 ---
@@ -20990,6 +21859,262 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 ### Tailwind Sınıf Özeti
 - **Renkler:** (yok)
 - **Layout:** `absolute`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `inset-0`, `pointer-events-none`
+
+---
+# FILE: src\components\navigation\EliteMegaMenu.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\navigation\EliteMegaMenu.tsx
+skeleton_hash: 5d909e52efdfecc6
+entity_hashes:
+  func:EliteMegaMenu: 887e772baf4da3df
+  func:MobileMegaMenu: 63ce544d1da454df
+  func:getSubCategories: b504c4c1aa89bb99
+  func:handleLinkClick: 44a1929f40d26342
+  overview: fd9efe0c94d2526c
+  style_tokens: 950eb84fcf443cff
+generated_at: 2026-06-12T10:19:42Z
+---
+
+## Genel Bakış
+Bu modül, web sitesinin ana navigasyonunu sağlayan çok seviyeli bir mega menü bileşenidir. Hem masaüstü hem de mobil cihazlar için optimize edilmiş iki farklı görünüm sunar ve kullanıcının tıklamalarını dinamik bir şekilde işleyerek doğru sayfaya yönlendirir.
+
+## Fonksiyon Grupları
+### Menü Bileşenleri
+Masaüstü ve mobil cihazlara özel, veriye dayalı arayüzü render eden iki ana React bileşenini içerir.
+- `EliteMegaMenu`, `MobileMegaMenu`
+
+### Etkileşim ve Yönlendirme İşleyicileri
+Kullanıcının bir menü bağlantısına tıklaması olayını yakalar ve tıklanan öğenin seviyesine göre uygun navigasyon yolunu hesaplayarak tetikler.
+- `handleLinkClick`
+
+### Veri Yardımcıları
+Menü yapısını oluşturmak için gerekli olan, belirli bir üst kategorinin tüm alt kategorilerini filtreleyip döndüren yardımcı bir mantık birimi.
+- `getSubCategories`
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için genel bir varsayım cümlesi: Menü bileşenleri, verilen `categories` verisine bağımlıdır ve navigasyon callback'leri (`onNavigate`) olmadan işlevsel olamaz.
+
+[Aksiyom 1]: Eğer `categories` verisi (menü kategorileri hiyerarşisi) sağlanmazsa veya boş/yanlış formatta olursa, `EliteMegaMenu` ve `MobileMegaMenu` bileşenleri menü öğelerini render edemez.
+
+[Aksiyom 2]: Eğer `onNavigate` callback fonksiyonu sağlanmazsa, `handleLinkClick` aracılığıyla tetiklenen menü bağlantısı tıklamaları (slugs) sayfa yönlendirmesi yapamaz.
+
+[Aksiyom 3]: Eğer `getSubCategories(parentId)` fonksiyonu, geçerli bir `parentId` parametresi almazsa veya bu ID'ye karşılık gelen alt kategoriler `categories` verisi içinde bulunamazsa, menüde alt kategoriler gösterilemez veya boş döner.
+
+[Aksiyom 4]: Eğer `handleLinkClick(level, slug)` fonksiyonu, geçersiz bir `level` (örn. negatif veya olmayan bir hiyerarşi seviyesi) veya boş/geçersiz bir `slug` ile çağrılırsa, beklenen yönlendirme gerçekleşmez ve navigasyon hata verir.
+
+[Aksiyom 5]: Eğer `MegaMenu3DBackground` çağrılamaz veya bileşen olarak kullanılam
+
+---
+
+## FONKSİYON DETAYLARI
+
+### MobileMegaMenu
+**Ne yapar**: Mobil cihazlarda kullanılan bir mega menü bileşenini tanımlar. Verilen kategori listesi ve yönlendirme fonksiyonunu alarak menünün görsel ve etkileşimsel yapısını oluşturur.  
+**Nasıl yapar**: Fonksiyon, `categories` ve `onNavigate` prop’larını alır ve bu verileri `EliteMegaMenu` bileşenine aktararak aynı menü mantığını mobil uyumlu bir şekilde render eder.  
+**Parametreler**:
+- `categories`: array — Menüde gösterilecek kategori nesnelerinin listesi.  
+- `onNavigate`: function (opsiyonel) — Bir menü öğesine tıklandığında çalıştırılacak geri çağırma fonksiyonu.  
+**Dönüş**: `React.FC<EliteMegaMenuProps>` — `EliteMegaMenuProps` tipinde özellikler alan bir React fonksiyonel bileşeni.
+
+### EliteMegaMenu
+**Ne yapar**: Masaüstü ve büyük ekranlarda kullanılan ana mega menü bileşenini oluşturur. Kategori hiyerarşisini ve navigasyon davranışını yönetir.  
+**Nasıl yapar**: Gelen `categories` dizisini dolaşarak her bir kategori için başlık ve alt kategori linklerini render eder; `onNavigate` fonksiyonu tıklama olaylarına bağlanır.  
+**Parametreler**:
+- `categories`: array — Menüde gösterilecek ana kategori nesneleri.  
+- `onNavigate`: function (opsiyonel) — Menü öğesi tıklandığında tetiklenecek geri çağırma.  
+**Dönüş**: `React.FC<EliteMegaMenuProps>` — `EliteMegaMenuProps` tipinde özellikler alan bir React fonksiyonel bileşeni.
+
+### handleLinkClick
+**Ne yapar**: Belirli bir menü seviyesindeki (level) ve slug değerine sahip bir linke tıklandığında yürütülen işlemleri tanımlar.  
+**Nasıl yapar**: Fonksiyon, tıklama olayını yakalar ve verilen `level` ile `slug` parametrelerini kullanarak yönlendirme ya da izleme gibi işlemleri gerçekleştirir; örnek kullanım `() => handleLinkClick(0, category.slug)` şeklindedir.  
+**Parametreler**:
+- `level`: number — Menüdeki hiyerarşi seviyesini belirten sayı.  
+- `slug`: string — Tıklanan kategori ya da alt kategori için benzersiz tanımlayıcı.  
+**Dönüş**: Belirtilmemiş (fonksiyonun dönüş tipi dokümantasyonda tanımlı değildir).
+
+### getSubCategories
+**Ne yapar**: Verilen bir üst kategori kimliğine (`parentId`) ait alt kategori listesini elde eder.  
+**Nasıl yapar**: Fonksiyon, `parentId` parametresiyle çağrıldığında ilgili alt kategorileri döndürür; örnek kullanım içinde `const subs = getSubCategories(category.id)` şeklinde görülür ve dönen `subs` dizisi render sürecinde alt linkler olarak gösterilir.  
+**Parametreler**:
+- `parentId`: string — Alt kategorilerin alınacağı üst kategori kimliği.  
+**Dönüş**: Belirtilmemiş (fonksiyonun dönüş tipi dokümantasyonda tanımlı değildir).
+
+---
+
+## INTERFACES
+
+### EliteMegaMenuProps
+- `categories: DomainCategory[]`
+- `onNavigate?: () => void`
+
+---
+
+## SABİTLER
+- **MegaMenu3DBackground** (call) — `dynamic(() => import('./MegaMenu3DBackground'), { ssr: false })`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: `src/components/navigation/EliteMegaMenu.tsx`::MobileMegaMenu
+- **params**: `({ categories, onNavigate })` — `categories`: DomainCategory dizisi (tüm kategoriler), `onNavigate`: menü öğesine tıklandığında çağrılan callback fonksiyonu
+- **ic_degiskenler**:
+  - `wrapCategory` — `useCategoryViewModel()` hook'undan dönen kategori view model wrapper fonksiyonu; ham kategori verisini UI için zenginleştirilmiş view model'e dönüştürür
+  - `mainCategories` — `categories.filter((c) => !c.parent_id)` ile elde edilen üst seviye (parent_id'si olmayan) kategoriler dizisi
+  - `getSubCategories` — `(parentId: string) => categories.filter((c) => c.parent_id === parentId)` tanımlı inline arrow fonksiyon; verilen parentId'e ait alt kategorileri filtreler ve döner
+  - `subs` — map callback içinde, `getSubCategories(category.id)` çağrısıyla elde edilen her ana kategoriye ait alt kategoriler dizisi
+  - `vm` — map callback içinde, `wrapCategory(category)` ile sarılmış ana kategorinin view model nesnesi; `vm?.displayName` olarak kullanılır
+  - `subVm` — iç içe map callback içinde, `wrapCategory(sub)` ile sarılmış alt kategorinin view model nesnesi; `subVm?.displayName` olarak kullanılır
+- **Dönüş**: JSX — Mobil cihazlar için dikey kartlar halinde kategori listesi ve alt kategori linkleri içeren menü layout'u
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    EliteMegaMenu_tsx__EliteMegaMenu["EliteMegaMenu"]
+    EliteMegaMenu_tsx__MobileMegaMenu["MobileMegaMenu"]
+    EliteMegaMenu_tsx__getSubCategories["getSubCategories"]
+    EliteMegaMenu_tsx__handleLinkClick["handleLinkClick"]
+    EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__handleLinkClick
+    EliteMegaMenu_tsx__MobileMegaMenu --> EliteMegaMenu_tsx__getSubCategories
+    EliteMegaMenu_tsx__EliteMegaMenu --> EliteMegaMenu_tsx__getSubCategories
+```
+
+## NODE ID STANDARD
+
+  file: src\components\navigation\EliteMegaMenu.tsx
+  function: src\components\navigation\EliteMegaMenu.tsx::MobileMegaMenu
+  function: src\components\navigation\EliteMegaMenu.tsx::EliteMegaMenu
+  function: src\components\navigation\EliteMegaMenu.tsx::handleLinkClick
+  function: src\components\navigation\EliteMegaMenu.tsx::getSubCategories
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: EliteMegaMenu
+  export: MobileMegaMenu
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- `lg:w-hvac-mega-lg`, `md:w-hvac-mega-md`, `rounded-hvac-sm`, `sm:w-hvac-mega-sm`
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-opacity-95`, `bg-slate-50/80`, `bg-white`, `border-slate-100/50`, `border-slate-200/50`, `data-[state=open]:bg-slate-100`, `hover:bg-slate-50`, `hover:text-primary-navy`, `text-base`, `text-primary-navy`, `text-secondary-blue`, `text-slate-600`, `text-slate-700`, `text-slate-900`, `text-sm`
+- **Layout:** `absolute`, `backdrop-blur-md`, `backdrop-blur-sm`, `block`, `col-span-1`, `flex`, `flex-col`, `gap-0.5`, `gap-2`, `gap-4`, `gap-x-8`, `grid`, `grid-cols-2`, `h-3`, `h-full`
+- **Varyant/Responsive:** `data-[motion=from-end]:`, `data-[motion=from-start]:`, `data-[motion=to-end]:`, `data-[motion=to-start]:`, `data-[state=open]:`, `disabled:`, `focus-visible:`, `group-data-[state=open]:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `border`, `center`, `cursor-pointer`, `data-[motion=from-end]:animate-enterFromRight`, `data-[motion=from-start]:animate-enterFromLeft`, `data-[motion=to-end]:animate-exitToRight`, `data-[motion=to-start]:animate-exitToLeft`, `disabled:opacity-50`, `disabled:pointer-events-none`, `duration-300`, `duration-hvac-normal`, `ease-in`, `focus-visible:ring-2`, `focus-visible:ring-slate-300`, `font-bold`
+
+---
+# FILE: src\components\navigation\MegaMenu3DBackground.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\navigation\MegaMenu3DBackground.tsx
+skeleton_hash: 0ed000a95de9a55b
+entity_hashes:
+  func:MegaMenu3DBackground: bb72cddf66cbd5a0
+  overview: bbf3490d865f5caf
+  style_tokens: 487664132884f59c
+generated_at: 2026-06-12T10:20:05Z
+---
+
+## Genel Bakış
+Bu modül, mega menü bileşeninin arka planında üç boyutlu bir görsel efekt sunan bir React bileşenini tanımlar. Bileşen, verilen kategori slug'ına göre 3D bir model ve metin okunabilirliğini artıran bir gradyan overlay oluşturarak menünün arka planını render eder.
+
+## Fonksiyon Grupları
+### Ana Bileşen (3D Arka Plan)
+Mega menünün arka planını oluşturmak için gerekli olan 3D model ve gradyan overlay'ı bir arada sunan temel React bileşenini tanımlar.
+- MegaMenu3DBackground
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için, verilen fonksiyon gövdesi (içerik) paylaşılmadığı için yalnızca fonksiyon imzasından türetilebilecek sınırlı aksiyomlar tanımlanabilmektedir.
+
+[Aksiyom 1]: Eğer `categorySlug` prop'u sağlanmazsa veya `undefined` olarak geçilirse, bileşenin hangi kategoriye ait 3D arka plan modelini ve ilgili gradyan overlay'ı render edeceği belirsiz olur; bileşen hedefsiz çalışır ve beklenen 3D görsel efekti üretemez.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### MegaMenu3DBackground
+**Ne yapar**: Bu fonksiyon, bir MegaMenü dropdown bileşeninin arka planını oluşturmak için kullanılan bir React functional bileşenidir. Temel amacı, menü içeriğinin arkasına etkileyici bir 3D görsel ve okunabilirlik sağlayan bir gradyan katmanı yerleştirmektir.
+
+**Nasıl yapar**: Fonksiyon, verilen `categorySlug` prop'una göre dinamik olarak bir 3D model veya tema yükleyerek arka planı oluşturur. Bileşenin üst kısmına büyük bir 3D görsel yerleştirirken, alt kısımda koyu bir gradyan efekti uygular. Bu gradyan, üzerine yerleştirilen menü metinlerinin okunabilirliğini önemli ölçüde artırır.
+
+**Parametreler**:
+- `categorySlug`: string — Arka planın görsel temasını belirleyen kategori slug'ı. Bu parametre, 3D modelin veya arka planın içeriğini belirlemek için kullanılır.
+- `MegaMenu3DBackgroundProps`: object — Bileşenin alabileceği diğer özellikleri tanımlayan props nesnesi.
+
+**Dönüş**: `React.FC<MegaMenu3DBackgroundProps>` tipinde bir React functional bileşeni döndürür.
+
+---
+
+## INTERFACES
+
+### MegaMenu3DBackgroundProps
+- `categorySlug: string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/navigation/MegaMenu3DBackground.tsx::MegaMenu3DBackground
+- **params**:
+  - `categorySlug` — PropTypes destructuring'den gelen kategori slug değeri; Category3DIcon bileşenine hangi kategori ikonunun gösterileceğini belirtir
+- **ic_degiskenler**: yok (fonksiyon gövdesinde herhangi bir `const`/`let`/`var` değişken tanımı bulunmamaktadır; doğrudan JSX döner)
+- **Dönüş**: React JSX Fragment — Üst %75 alanı kaplayan 3D Canvas (ambientLight, directionalLight, Category3DIcon, OrbitControls ile) ve alttan yukarıya doğru beyaz gradient overlay div'inden oluşan React Element Tree
+- **Yan etkiler**: Yok (stateless, side-effect-free saf bileşen)
+- **JSX içinde erişilen prop**: `categorySlug` — Category3DIcon'a `categorySlug={categorySlug}` olarak aktarılır
+- **Canvas yapılandırma değerleri**: `camera.position = [0, 0.1, 2.2]`, `camera.fov = 40`, `dpr = [1, 1]`, `frameloop = "demand"`
+- **OrbitControls yapılandırma değerleri**: `enableZoom = false`, `enablePan = false`, `enableRotate = false`, `autoRotate = true`, `autoRotateSpeed = 1.5`
+- **Category3DIcon prop değerleri**: `categorySlug` (prop'tan), `scale = 0.9`
+- **Light değerleri**: `ambientLight.intensity = 0.8`, `directionalLight.position = [5, 5, 5]`, `directionalLight.intensity = 1`
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\navigation\MegaMenu3DBackground.tsx
+  function: src\components\navigation\MegaMenu3DBackground.tsx::MegaMenu3DBackground
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: MegaMenu3DBackground
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-gradient-to-t`, `from-white/60`, `to-transparent`, `via-transparent`
+- **Layout:** `absolute`, `from-white/60`, `h-3/4`, `left-0`, `right-0`, `top-0`
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** `inset-0`, `pointer-events-none`
 
@@ -22014,6 +23139,291 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** `absolute`, `backdrop-blur-sm`, `fixed`, `flex`, `flex-shrink-0`, `h-16`, `h-full`, `items-center`, `items-start`, `justify-between`, `justify-center`, `line-clamp-2`, `max-h-48`, `max-w-md`, `overflow-hidden`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `group-hover:`, `hover:` önekleri
 - **Yardımcı Sınıflar:** `-translate-y-1/2`, `animate-spin`, `border`, `cursor-default`, `disabled:opacity-50`, `focus-visible:ring-2`, `focus-visible:ring-primary-navy/10`, `font-bold`, `font-medium`, `font-semibold`, `group`, `group-hover:translate-x-0.5`, `inset-0`, `italic`, `leading-relaxed`
+
+---
+# FILE: src\components\products\BentPlaneGeometry.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\BentPlaneGeometry.tsx
+skeleton_hash: 6c4c6bb1b0f73109
+entity_hashes:
+  func:BentPlaneGeometry: 925b96f61263e22a
+  func:handleClick: bffc3b12eebc550c
+  overview: 8878452264c689a5
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-12T10:22:31Z
+---
+
+## Genel Bakış
+Bu modül, VentHub HVAC projesinde Three.js ve React-three-fiber kullanılarak oluşturulmuş, 3 boyutlu sahalarda eğilmiş düzlem geometrisi gösteren bir React bileşenini tanımlar. Bileşen, görsel bir dokuya sahip, konumlandırılabilir ve tıklama etkileşimine açık bir 3B nesne sunar. Temel olarak, ürün görselleştirmeleri için interaktif ve estetik bir 3B bileşen sağlamakla sorumludur.
+
+## Fonksiyon Grupları
+### Ana Geometri Bileşeni
+Bükülmüş düzlem geometrisini Three.js sahasında oluşturup render eden ana React bileşenidir. Görsel, benzersiz kimlik ve konum bilgilerini alarak 3B nesneyi sahaya yerleştirir.
+- BentPlaneGeometry
+
+### Etkileşim İşleyicisi
+3B geometri üzerine yapılan fare tıklamalarını algılayıp yöneten olay işleyicisidir. Three.js olay sistemiyle uyumlu çalışarak kullanıcı etkileşimlerini tetikler.
+- handleClick
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### BentPlaneGeometry
+**Ne yapar**: Bükülmüş düzlem geometrisi oluşturarak her bir ürünü eğri bir kart formunda Three.js sahnesinde görselleştirir. Bu bileşen, ürün kartlarının eğri yüzeydeki görünümünü sağlamak için kullanılır.
+
+**Nasıl yapar**: React Functional Component olarak tanımlanmış bir Three.js bileşenidir. Verilen görüntüyü (image) ve pozisyon bilgisini alarak eğri bir yüzey üzerinde rendered. Pozisyon parametresi varsayılan olarak [0, 0, 0] koordinatlarını kullanır ancak üst bileşen (ProductCard) tarafından kontrol edilebilir.
+
+**Parametreler**:
+- image: texture veya image source — Eğri yüzey üzerinde gösterilecek ürün görseli
+- id: string veya number — Bileşenin benzersiz tanımlayıcısı, DOM ve state yönetiminde kullanılır
+- position: [number, number, number] (varsayılan: [0, 0, 0]) — Three.js sahnesindeki 3D konum koordinatları (x, y, z)
+
+**Dönüş**: React.FC<BentPlaneGeometryProps> — Tip güvenli bir React Functional Component, bileşenin Three.js sahnesine entegre edilebilir yapıda olduğunu belirtir
+
+### handleClick
+**Ne yapar**: BentPlaneGeometry bileşenine tıklandığında tetiklenen olay işleyici fonksiyondur. Ürün kartı üzerine yapılan tıklama hareketlerini yakalamak ve ilgili aksiyonları tetiklemek için tasarlanmıştır.
+**Nasıl yapar**: Three.js tarafından sağlanan, orijinal fare tıklama olayını sarmalayan ThreeEvent nesnesini alır, bu nesne üzerinden tıklama olayının tüm özelliklerine erişerek gerekli işlemleri yürütür.
+**Parametreler**:
+- e: ThreeEvent<MouseEvent> — Three.js kütüphanesi tarafından üretilen, tarayıcının orijinal MouseEvent'ini sarmalayan olay nesnesidir, tıklamanın konumu, hedefi ve ilgili diğer tüm olay özelliklerine erişim sağlar
+**Dönüş**: Dönüş türü belirtilmemiştir, standart olay işleyicilerle uyumlu olarak herhangi bir değer döndürmez, void dönüş tipi beklenir.
+
+---
+
+## INTERFACES
+
+### BentPlaneGeometryProps
+- `image: string`
+- `id: string`
+- `position?: [number, number, number]`
+
+---
+
+## SABİTLER
+- **BentPlaneMaterial** (call) — `shaderMaterial(
+
+    {
+
+        uTime: 0,
+
+        uTexture: new Texture(),
+
+...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: BentPlaneGeometry.tsx::BentPlaneGeometry
+- **params**: `{ image, id, position = [0, 0, 0] }`
+  - `image` — texture image source URL, TextureLoader ile yüklenir
+  - `id` — ürün/kategori ID'si, tıklanınca navigasyonda kullanılır
+  - `position` — mesh'in 3D pozisyonu, varsayılan [0, 0, 0]
+- **ic_degiskenler**:
+  - `router` — Next.js useRouter hook'u, sayfa yönlendirmesi için
+  - `meshRef` — useRef<Mesh>(null), Three.js mesh elementine referans, scale animasyonu için
+  - `materialRef` — useRef<ShaderMaterial>(null), shader material'a referans, uniform güncellemeleri için
+  - `scroll` — useScroll() drei hook'u, sayfa kaydırma offset'ini takip eder
+  - `hovered` — useState(false), fare üstüne gelme durumu boolean state
+  - `texture` — useMemo(() => new TextureLoader().load(image), [image]), yüklenen Three.js Texture nesnesi
+  - `texture.colorSpace` — SRGBColorSpace değerine atanır, doğru renk uzayı için
+  - `handleClick` — tıklama olayı handler fonksiyonu
+- **Dönüş**: JSX element (mesh bileşeni)
+
+### [N2_NASIL] AST Pointer: BentPlaneGeometry.tsx::useFrame callback
+- **params**: yok (anonim arrow function)
+- **ic_degiskenler**:
+  - `meshRef.current` — varsa mesh referansı, erişim guard kontrolü yapılır
+  - `materialRef.current` — varsa material referansı, erişim guard kontrolü yapılır
+  - `materialRef.current.uniforms.uScrollOffset` — shader uniform'u, scroll offset değeri atanır
+  - `materialRef.current.uniforms.uHover` — shader uniform'u, hover durumu lerp ile interpolasyon yapılır
+  - `scroll.offset` — mevcut sayfa kaydırma offset değeri
+  - `hovered` — hover state boolean değeri, 1 veya 0'a lerp edilir
+  - `targetScale` — const, hovered durumuna göre 1.1 veya 1.0 ölçek değeri
+  - `meshRef.current.scale.x` — mesh'in X ekseni ölçeği, lerp ile animasyon
+  - `meshRef.current.scale.y` — mesh'in Y ekseni ölçeği, lerp ile animasyon
+- **Dönüş**: yok (her frame çağrılır, uniform ve scale güncelleme yan etkisi)
+
+### [N3_NASIL] AST Pointer: BentPlaneGeometry.tsx::handleClick
+- **params**: `(e: ThreeEvent<MouseEvent>)` — Three.js farenin tıklama olayı
+- **ic_degiskenler**:
+  - `e` — ThreeEvent<MouseEvent> nesnesi, tıklama eventi
+  - `router` — component scope'tan kapanır, Next.js yönlendirme için
+  - `id` — prop'tan kapanır, category route oluşturmada kullanılır
+- **Dönüş**: yok (e.stopPropagation() ile olay yayılımını durdurur, router.push ile navigasyon yan etkisi)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\BentPlaneGeometry.tsx
+  function: src\components\products\BentPlaneGeometry.tsx::BentPlaneGeometry
+  function: src\components\products\BentPlaneGeometry.tsx::handleClick
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: BentPlaneGeometry
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\components\products\BlueprintCanvas.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\BlueprintCanvas.tsx
+skeleton_hash: fb3513205dba7fa7
+entity_hashes:
+  func:BlueprintCanvas: b871a8b848648d7b
+  func:CinematicCard: 7fb3fd44dcd5e71f
+  overview: 38622d63184c12d0
+  style_tokens: 31f4acfd42638e52
+generated_at: 2026-06-12T10:22:51Z
+---
+
+## Genel Bakış
+Bu modül, Venthub HVAC projesinin ürün bileşenleri içinde yer alan, ürün görsellerini ve mavi baskıları sunmak için tasarlanmış iki bağımsız React bileşenini barındırır. Temel amacı, ürün sayfalarının farklı bölümlerinde (örneğin ana galeri veya öne çıkan kartlar alanı) esnek ve görsel açıdan çekici bir gösterim sağlamaktır.
+
+## Fonksiyon Grupları
+### Ana Ürün Görseli Gösterimi
+Ürünün temel görselini veya mavi baskı resmini, genellikle ürün detay sayfalarında ana odak noktası olarak sunmak için kullanılan temel bileşendir.
+- BlueprintCanvas
+
+### Sinematik Vurgu Kartı
+Görselleri, animasyonlar ve holografik efektlerle zenginleştirerek, ürünün belirli özelliklerini veya promosyon görsellerini estetik bir kart formatında öne çıkarmak için kullanılan yardımcı bileşendir.
+- CinematicCard
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için temel prop bağımlılıkları ve harici bileşen çağrıları varsayımları tanımlanmıştır.
+
+[Aksiyom 1]: Eğer `CinematicCard` bileşenine geçerli bir `image` prop'u (URL veya dosya yolu) sağlanmazsa, bileşen hata verir veya boş/görsel içermeyen bir kart render eder.
+[Aksiyom 2]: Eğer `BlueprintCanvas` bileşenine geçerli bir `image` prop'u (URL veya dosya yolu) sağlanmazsa, bileşen hata verir veya boş/mavi baskı içermeyen bir tuval render eder.
+[Aksiyom 3]: Eğer `HolographicMaterial` çağrılamıyorsa (örn. Three.js/React Three Fiber ortamı yoksa veya modül bulunamıyorsa), holografik efekt uygulanamaz ve ilgili bileşenlerin görsel performansı önemli ölçüde düşer veya hata verir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### CinematicCard
+**Ne yapar**: Bu fonksiyon, verilen bir görseli derinlik efekti, süzülme animasyonu ve holografik overlay (katman) ile sinematik bir 3D kart formatında render eder. Kullanıcıya interaktif ve görsel olarak zengin bir bileşen sunmayı amaçlar.
+
+**Nasıl yapar**: Fonksiyon, React functional component yapısında tasarlanmıştır. `image` prop'u alarak başlar. İç mantığında, CSS transform ve animation özelliklerini (perspective, rotateX, rotateY, translateZ vb.) kullanarak 3D derinlik hissi yaratır. Hover veya其他 etkileşimlerle süzülme (floating) animasyonunu tetikleyebilir. Son olarak, yarı saydam bir holografik overlay efektini görselin üzerine bindirerek sinematik görünümü tamamlar.
+
+**Parametreler**:
+- image: string — 3D kart içinde gösterilecek görselin URL'si veya kaynak yolu.
+
+**Dönüş**: `React.FC<{ image: string }>` tipinde bir React functional component döndürür.
+
+### BlueprintCanvas
+**Ne yapar**: Bu fonksiyon, bir mühendislik veya mimari plan (blueprint) görselini interaktif bir tuval (canvas) üzerinde göstermek ve muhtemelen üzerinde çizim veya vurgulama işlemleri yapmak için kullanılır.
+
+**Nasıl yapar**: Fonksiyon, `BlueprintCanvasProps` arayüzünden türetilmiş prop'ları alır. Temel olarak bir `image` prop'u kullanarak arka planda bir mühendislik planı görseli yükler. Bu görseli bir `<canvas>` veya benzeri bir React bileşeni içinde render ederek, kullanıcının üzerinde yakınlaştırma, kaydırma veya çizim yapabilmesini sağlayacak interaktif bir alan oluşturur.
+
+**Parametreler**:
+- image: string — Blueprint tuvalinde arka plan olarak görüntülenecek mühendislik planı görselinin URL'si veya yolu.
+
+**Dönüş**: `React.FC<BlueprintCanvasProps>` tipinde bir React functional component döndürür. `BlueprintCanvasProps` arayüzünün tam tanımı dış kaynakta yer almaktadır.
+
+---
+
+## INTERFACES
+
+### BlueprintCanvasProps
+- `image: string`
+
+---
+
+## SABİTLER
+- **HolographicMaterial** (call) — `shaderMaterial(
+
+    {
+
+        uTime: 0,
+
+        uTexture: null,
+
+        u...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/products/BlueprintCanvas.tsx::CinematicCard
+- **params**: `{ image }` — string, 3D kart üzerinde gösterilecek görselin yolu
+- **ic_degiskenler**:
+  - `texture` — `useTexture(image)` ile yüklenen Three.js texture nesnesi, `holographicMaterial`'a `uTexture` olarak geçirilir
+  - `meshRef` — `useRef<Mesh>(null)`, ana kart mesh'ine referans; `useFrame` içinde rotation ve material erişimi için kullanılır
+- **ic_degiskenler (useFrame callback içinde)**:
+  - `state` — `useFrame` callback parametresi, Three.js frame state nesnesi; `state.mouse` ve `state.clock` erişimi sağlar
+  - `x` — `state.mouse.x` destructured değeri, fare imlecinin yatay normalized konumu (-1 ile 1 arası)
+  - `y` — `state.mouse.y` destructured değeri, fare imlecinin dikey normalized konumu (-1 ile 1 arası)
+  - `material` — `meshRef.current.material` cast edilmiş `ShaderMaterial` nesnesi; `uTime` uniform güncellenmesi için kullanılır
+- **Dönüş**: JSX — `<Float>` sarmalayıcısı içinde holografik materyal ve parlama efektli 3D kart
+
+### [N2_NASIL] AST Pointer: src/components/products/BlueprintCanvas.tsx::BlueprintCanvas
+- **params**: `{ image }` — string, canvas'a geçirilecek görselin yolu
+- **ic_degiskenler**: yok (fonksiyon gövdesinde herhangi bir değişken tanımlanmamıştır)
+- **Dönüş**: JSX — React Three Fiber `Canvas` içeren `CinematicCard` sarmalayan, arka plan grid deseni, köşe teknik dekoratif UI katmanları ve vignette overlay ile tamamlanmış sarmalayıcı div bileşeni
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\BlueprintCanvas.tsx
+  function: src\components\products\BlueprintCanvas.tsx::CinematicCard
+  function: src\components\products\BlueprintCanvas.tsx::BlueprintCanvas
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: BlueprintCanvas
+  export: CinematicCard
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** `bg-cyan-500`, `bg-surface-darkest`, `bg-white/10`, `bg-white/20`, `border-white/5`, `text-cyan-500`, `text-right`, `text-slate-500`, `text-white`, `text-xs`
+- **Layout:** `absolute`, `bottom-6`, `flex`, `flex-col`, `gap-1`, `gap-2`, `h-0.5`, `h-1.5`, `h-full`, `h-px`, `items-center`, `items-end`, `justify-between`, `justify-end`, `left-6`
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `animate-pulse`, `border`, `font-black`, `group`, `inset-0`, `leading-none`, `mt-1`, `opacity-20`, `pointer-events-none`, `rounded-3xl`, `rounded-full`, `tracking-widest`, `uppercase`
 
 ---
 # FILE: src\components\products\Category3DIcon.md
@@ -24228,6 +25638,129 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** (yok)
 
 ---
+# FILE: src\components\products\3d\factory\Assembler.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\Assembler.tsx
+skeleton_hash: c8cc58b4d1c21209
+entity_hashes:
+  func:Assembler: fce0437dc1401eb7
+  overview: 1319e0e67eee55ba
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-12T10:20:27Z
+---
+
+## Genel Bakış
+Assembler.tsx, 3D ürün modellerinin montajını ve görselleştirmesini sağlayan temel bir React bileşenidir. Bu bileşen, bir ürünün tüm parçalarını bir araya getirerek interaktif bir 3D sahne oluşturur ve kullanıcının bu parçalarla etkileşime girmesini (tıklama, patlama efekti) sağlar. Temel amacı, statik bir model sunmak yerine, parçaların relationships'ini ve durumunu (seçili, patlamış) dinamik bir şekilde yönetmektir.
+
+## Fonksiyon Grupları
+### Ana Render ve Etkileşim Yönetimi
+Bileşen, gelen veriyi (blueprint) işleyerek sahneyi oluşturur, tüm 3D parça nesnelerini render eder ve kullanıcı etkileşimlerini (tıklama, seçme) yöneterek ilgili geri çağırma fonksiyonlarını tetikler.
+- Assembler
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, bir React bileşeni olup 3D ürün montajını render eder. Aşağıdaki varsayımlar fonksiyon imzası ve modül tanımına dayanmaktadır.
+
+[Aksiyom 1]: Eğer `blueprint` parametresi `null` veya `undefined` ise, bileşen 3D sahneyi doğru bir şekilde render edemez ve montaj başarısız olur.
+
+[Aksiyom 2]: Eğer `explode` parametresi `0`'dan farklı bir değer alırsa, parçalar arasındaki mesafe bu değere göre orantılı olarak artar (patlama efekti aktifleşir).
+
+[Aksiyom 3]: Eğer `onPartClick` callback'i sağlanmamışsa (`undefined`), kullanıcının parçalara tıklama etkileşimi çalışmaz veya sessizce yoksayılır.
+
+[Aksiyom 4]: Eğer `selectedPart` parametresi `undefined` ise, hiçbir parça seçili durumda değildir (varsayılan durum).
+
+[Aksiyom 5]: Eğer `blueprint` yapısı içinde tanımlı parça verileri (geometry, position, relationship) yoksa, ilgili parçalar sahneye yerleştirilemez ve eksik render oluşur.
+
+[Aksiyom 6]: `blueprint` yapısının, parçalar arası montaj ilişkilerini ve hiyerarşisini tanımlayan geçerli bir veri yapısına sahip olması gerekir; aksi takdirde parçaların pozisyonları ve bağlantıları bilinmez.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Assembler
+
+**Ne yapar**: `Assembler`, HVAC ürünleri için 3D montaj (assembly) görüntüleyen bir React bileşenidir. Verilen bir mavi plan (blueprint) yapısına göre parçaları three-dimensional ortamda render eder ve kullanıcının parçalarla etkileşime girmesini sağlar.
+
+**Nasıl yapar**: Bileşen, `blueprint` prop'u aracılığıyla ürünün parçalarını, bağlantılarını ve geometrik verilerini alır. `explode` parametresi ile parçalar arasındaki mesafeyi kontrollü şekilde artırarak "patlatılmış görünüm" (exploded view) oluşturur. Seçili parçayı belirlemek için `selectedPart` prop'unu kullanır ve bir parçaya tıklandığında `onPartClick` callback fonksiyonunu çağırarak üst bileşene bildirimde bulunur. Bu yapı, ürünlerin montaj sırasını ve parça ilişkilerini görsel olarak sunar.
+
+**Parametreler**:
+- `blueprint` — `BlueprintData` (veya benzeri yapı tipi) — 3D montajın temelini oluşturan veri yapısı; parçaların geometrileri, pozisyonları ve ilişkileri hakkında bilgi içerir. Bu, bileşenin görüntülemesini istediği tüm 3D model verilerinin ana kaynağıdır.
+- `explode` — `number` (varsayılan: `0`) — Parçalar arasındaki patlama (exploded) mesafesini belirleyen çarpan değeridir. `0` değeri montaj durumunu (parçalar birleşik), pozitif değerler ise parçaların birbirinden uzaklaştığı exploded view durumunu temsil eder.
+- `onPartClick` — `(partId: string) => void` — Bir parça üzerine tıklandığında tetiklenen geri çağırma fonksiyonudur. Tıklanan parçanın kimliğini (ID) üst bileşene iletir; böylece seçim, detay gösterimi gibi işlemler tetiklenebilir.
+- `selectedPart` — `string | null` — Şu anda seçili olan parçanın kimliğini belirtir. `null` değerinde hiçbir parça seçili değildir. Seçili parça, görsel olarak vurgulanır (highlight) veya farklı renklendirilerek kullanıcıya geri bildirim sağlanır.
+
+**Dönüş**: `React.FC<AssemblerProps>` — Montaj görüntülemesini içeren bir React fonksiyonel bileşeni döndürür. Bu bileşen, 3D sahneyi (scene), kamerayı, ışıklandırmayı ve parçaları içeren tam bir montaj görüntüleyiciyi render eder.
+
+---
+
+## INTERFACES
+
+### PartConfig
+- `name: string`
+- `component: React.ElementType`
+- `position?: [number, number, number]`
+- `rotation?: [number, number, number]`
+- `scale?: [number, number, number]`
+- `props?: Record<string, unknown>`
+
+### BluePrint
+- `slug: string`
+- `scale?: number`
+- `parts: PartConfig[]`
+
+### AssemblerProps
+- `blueprint: BluePrint`
+- `explode?: number`
+- `onPartClick?: (partName: string) => void`
+- `selectedPart?: string | null`
+- `isolatedPart?: string | null`
+- `hiddenParts?: string[]`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/products/3d/factory/Assembler.tsx::Assembler (ana arrow function)
+- **params**: `blueprint` (React bileşeni için gerekli tüm parça ve yapılandırma verisini içeren nesne), `explode` (number, varsayılan 0 — parçaları merkezden uzaklaştırma oranı), `onPartClick` (function | undefined — parçaya tıklandığında çağrılacak callback), `selectedPart` (string | undefined — şu an seçili olan parçanın adı), `isolatedPart` (string | undefined — yalıtılmış parçanın adı, null ise hiçbir parça yalıtılmamıştır), `hiddenParts` (string[], varsayılan [] — gizli parçaların isim listesi)
+- **ic_degiskenler**:
+  - Yok — return içinde doğrudan JSX döndürür, ara değişken oluşturmaz
+- **Dönüş**: `JSX.Element` — `<group>` elemanı içinde `blueprint.parts.map()` ile her parça için `<group>` ve `<Suspense>` ile sarılmış dinamik React bileşenleri döndürür. `blueprint.scale || 1` ile genel ölçeklendirme uygular.
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\3d\factory\Assembler.tsx
+  function: src\components\products\3d\factory\Assembler.tsx::Assembler
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Assembler
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
 # FILE: src\components\products\3d\factory\VorticeLineoModel.md
 
 ---
@@ -24533,6 +26066,132 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** (yok)
 
 ---
+# FILE: src\components\products\3d\factory\parts\InternalFanRotor.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\InternalFanRotor.tsx
+skeleton_hash: e86dc5a160b53977
+entity_hashes:
+  func:InternalFanRotor: ac57944d86aa281e
+  overview: 256aaa04411e9436
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-12T10:20:40Z
+---
+
+## Genel Bakış
+Bu modül, 3B bir iç fan rotoru (InternalFanRotor) React bileşenini tanımlar. Bileşen, fan rotorunun geometrik ve dönme özelliklerini (yarıçap, hız, konum, rotasyon) alarak 3B sahnesinde render eden bir fabrika parçasıdır.
+
+## Fonksiyon Grupları
+### Bileşen Tanımı
+Bu grup, modülün tek bileşeni olan InternalFanRotor'u tanımlar. Fonksiyon, girdi olarak aldığı boyut, hız ve konum özellikleriyle 3B fan rotorunu oluşturan ve döndüren bir React bileşeni döndürür.
+- InternalFanRotor
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, 3D bir iç fan rotoru bileşenidir ve Three.js/React Three Fiber benzeri bir 3D renderlama ortamında çalışır.
+
+[Aksiyom 1]: Eğer 3D renderlama bağlamı (Three.js Canvas/Scene) yoksa, bileşen düzgün render edilmez ve görünmez olur.
+
+[Aksiyom 2]: Eğer `position` parametresi 3 elemanlı bir dizi [x, y, z] formatında değilse, bileşenin 3D sahnedeki konumu tanımsız olur.
+
+[Aksiyom 3]: Eğer `radius` parametresi 0 veya negatif bir değer olarak verilirse, fan rotor geometrisi oluşmaz veya çöker.
+
+[Aksiyom 4]: Eğer `spinSpeed` parametresi 0 olarak ayarlanırsa, rotor dönmeyecektir; negatif değer yön değişikliğine neden olur (bu beklenen bir davranış olabilir veya olmayabilir, bilinmiyor).
+
+[Aksiyom 5]: Fonksiyon imzası `rotat...` ile kesilmiş olduğundan, bileşenin tam parametre listesi bilinmiyor — olası ek parametreler (rotation, color, material vb.) olabilir.
+
+---
+
+**Not**: Bu aksiyomlar yalnızca fonksiyon imzasından türetilmiştir. Docstring ve yorumlardan bilgi çıkarılmamıştır. Fonksiyon imzası kesik (truncated) olduğu için bileşenin tam sözleşme gereksinimleri belirsizdir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### InternalFanRotor
+**Ne yapar**: InternalFanRotor, bir 3D ortamda iç fan dönüşürü componentini tanımlar. Verilen yarıçap, dönüş hızı, konum ve rotasyon değerlerine göre fanın görsel ve davranışsal özelliklerini ayarlar.
+
+**Nasıl yapar**: Fonksiyon, props olarak alınan değerleri kullanarak bir React functional component döndürür. Bu component, iç fan dönüşürüsünün geometrisini ve animasyonunu (örneğin spinSpeed ile sürekli döndürme) belirleyen JSX veya 3D kitaplık çağrılarını içerir. Varsayılan değerler sağlandığı için props eksik bırakılırsa güvenli bir yedek kullanılır.
+
+**Parametreler**:
+- radius: number — Fanın yarıçapı; varsayılan değer 0.25 birim.
+- spinSpeed: number — Fanın saniyede dönüş hızı (örneğin devrim/saniye); varsayılan değer 10.
+- position: number[] — Fanın 3D uzaydaki konumu; [x, y, z] formatında bir dizi, varsayılan değer [0, 0, 0].
+- rotat: ??? — Parçalı görünen parametre; snippet'te tam adı veya tipi belirtilmemiştir, bu yüzden tip ve açıklama kaynak kodunda eksiktir.
+
+**Dönüş**: React.FC<InternalFanRotorProps> — InternalFanRotorProps tipini karşılayan bir React fonksiyonel componenti döndürür; bu component render edildiğinde 3D ortamda iç fan dönüşürüsünü gösterir.
+
+---
+
+## INTERFACES
+
+### InternalFanRotorProps
+- `radius?: number`
+- `spinSpeed?: number`
+- `position?: [number, number, number]`
+- `rotation?: [number, number, number]`
+- `isSelected?: boolean`
+- `isIsolated?: boolean`
+- `isHidden?: boolean`
+- `onClick?: () => void`
+- `explode?: number`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: InternalFanRotor.tsx::InternalFanRotor
+- **params**:
+  - `radius` — fan rotor yarıçapı, varsayılan `0.25`
+  - `spinSpeed` — dönme hızı, varsayılan `10`
+  - `position` — THREE.js group pozisyonu, varsayılan `[0, 0, 0]`
+  - `rotation` — THREE.js group rotasyonu, varsayılan `[0, 0, 0]`
+  - `isSelected` — seçili durum flag'i, blade rengini belirler
+  - `isIsolated` — izolasyon durumu flag'i, `false` ise gizlenir
+  - `isHidden` — gizlilik flag'i, `true` ise `null` döner
+  - `onClick` — tıklama callback fonksiyonu
+  - `explode` — blade patlama mesafesi, varsayılan `0`
+- **ic_degiskenler**:
+  - `groupRef` — THREE.js `Group` referansı, `useRef` ile oluşturulur, `useFrame` içinde döndürme yapılır
+  - `materials` — `useFanMaterials()` hook'undan dönen material nesnesi (`matteBlack`, `safetyOrange`, `vorticeGreen` içerir)
+  - `bladeCount` — sabit `6`, kanat sayısı
+  - `bladeMaterial` — `isSelected` durumuna göre `materials.safetyOrange` veya `materials.vorticeGreen` seçilir
+- **Dönüş**: `JSX.Element | null` — JSX grubu veya erken `null` dönüşü
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\3d\factory\parts\InternalFanRotor.tsx
+  function: src\components\products\3d\factory\parts\InternalFanRotor.tsx::InternalFanRotor
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: InternalFanRotor
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
 # FILE: src\components\products\3d\factory\parts\MainChassis.md
 
 ---
@@ -24743,6 +26402,95 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** (yok)
 
 ---
+# FILE: src\components\products\3d\materials\useFanMaterials.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\materials\useFanMaterials.ts
+skeleton_hash: ac08a6998abfba65
+entity_hashes:
+  func:useFanMaterials: 61fbb447cfb5105d
+  overview: 6254e91c186b694f
+generated_at: 2026-06-12T10:20:58Z
+---
+
+## Genel Bakış
+Bu modül, 3D fan ürünlerinin görsel renderında kullanılan malzeme ve yüzey özelliklerini tanımlayan bir React hookudur. Tek bir hook fonksiyonu içerir ve bu fonksiyon, malzeme tanımını oluşturarak diğer 3D bileşenlere hazır bir veri yapısı sunar.
+
+## Fonksiyon Grupları
+### Malzeme Tanımlama
+Fan modelinin 3D görünümünü belirleyen malzeme özelliklerini (örneğin, parlak, mat siyah yüzey) tutar ve buna ilişkin bir nesneyi dışarıya açar.
+- useFanMaterials
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+**Not:** Verilen bilgilerde `useFanMaterials` fonksiyonunun gövdesi (implementasyon detayı) bulunmamaktadır. Sadece fonksiyon imzası ve modül sabiti verilmiştir. Mimari varsayımlar, fonksiyonun çalışma mantığı ve iç koşullarından türetilebilir. Bu durumda, modülün doğru çalışması için gerekli koşullar belirlenememiştir.
+
+**Potansiyel Aksiyomlar (Eğer fonksiyon gövdesi verilmiş olsaydı):**
+- Eğer `MATERIALS_CACHE` nesnesi geçerli bir malzeme verisi içermiyorsa, 3D render hatalı sonuçlar verir.
+- Eğer `useFanMaterials()` hook'u React bileşeninin dışında çağrılıyorsa, React hook kuralları ihlal edilir.
+- Eğer hook farklı fan türleri için malzeme varyasyonları döndürüyorsa ve bunların tanımlı bir enum/obje ile eşleşmiyorsa, tip hatası oluşur.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### useFanMaterials
+**Ne yapar**: Bilinmiyor (verilen bilgiye göre fonksiyonun görevi belirtilmemiştir).  
+**Nasıl yapar**: Bilinmiyor (fonksiyonun iç mantığı sağlanmamıştır).  
+**Parametreler**: Parametre yok.  
+**Dönüş**: Return tipi void veya bilinmiyor olarak belirtilmiştir (net bir dönüş değeri belirtilmemiştir).
+
+---
+
+## TYPE ALIASES
+
+### FanMaterials
+```typescript
+type FanMaterials = ReturnType<typeof useFanMaterials>
+```
+
+---
+
+## SABİTLER
+- **MATERIALS_CACHE** (object) — `{
+    matteBlack: new MeshStandardMaterial({
+        color: '#1a1a1a',
+      ...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: `src/components/products/3d/materials/useFanMaterials.ts`::useFanMaterials
+- **params**: (parametre yok)
+- **ic_degiskenler**: (fonksiyon gövdesinde bildirilmiş dahili değişken yok)
+- **Referanslar (fonksiyon içinde erişilen)**:
+  - `MATERIALS_CACHE` — Önceden tanımlı nesne; tüm malzeme tanımlarını barındıran paylaşımlı önbellek nesnesi, spread (`...`) ile kopyalanarak return nesnesinin temelini oluşturur
+  - `MATERIALS_CACHE.vorticeGreen` — `clampMat` alias'ı olarak döndürülen MeshBasicMaterial/MeshPhysicalMaterial referansı
+  - `MATERIALS_CACHE.industrialSteel` — Hem `baseMat` hem de `galvanizedSteel` alias'ı olarak kullanılan standart malzeme referansı
+  - `MATERIALS_CACHE.const_chassisInnerMat` — `chassisInnerMat` alias'ı olarak döndürülen şasi iç yüzey malzemesi referansı
+- **Dönüş**: `{...MATERIALS_CACHE, clampMat, baseMat, chassisInnerMat, galvanizedSteel}` — Fan malzemeleri sözlüğü; `MATERIALS_CACHE`'in tüm anahtarlarını genişletir ve kısa isimlerle (alias) erişilebilir malzeme özellikleri ekler
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\3d\materials\useFanMaterials.ts
+  function: src\components\products\3d\materials\useFanMaterials.ts::useFanMaterials
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: FanMaterials
+  export: useFanMaterials
+
+---
 # FILE: src\components\products\3d\parts\Housing.md
 
 ---
@@ -24900,6 +26648,138 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** (yok)
 
 ---
+# FILE: src\components\products\3d\parts\Impeller.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Impeller.tsx
+skeleton_hash: 69e782a56b6238dd
+entity_hashes:
+  func:Impeller: ee1fdf5cf66e515f
+  overview: 325d6f2b890bb892
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-12T10:21:11Z
+---
+
+## Genel Bakış
+Bu modül, 3 boyutlu bir impeller (pompa çarkı) görselleştirmek için kullanılan bir React bileşenidir. Bileşen, tip, çap, pala sayısı ve renk gibi özellikleri props üzerinden alarak impellerin görünümünü dinamik olarak oluşturur.
+
+## Fonksiyon Grupları
+### Bileşen Tanımı ve Renderleme
+Bu grup, impellerin görsel temsilini oluşturan ana işlevi içerir; props değerlerine göre impellerin geometrisini, boyutunu ve renk ayarlarını belirleyerek ekrana çizer.
+- Impeller (ana bileşen fonksiyonu)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, 3D bir impeller (pompa çarkı) görselleştirmek için kullanılan bir React bileşenidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
+
+[Aksiyom 1]: Eğer `type` parametresi verilmemişse veya geçerli bir impeller tipini temsil etmiyorsa, bileşen hangi geometrik formu oluşturacağını bilemez ve render hatalı veya boş olur.
+[Aksiyom 2]: Eğer `diameter` parametresi `0` veya negatif bir değer olarak verilirse, impellerin 3D modelinin temel boyutu tanımsız kalır ve geometri oluşturulamaz.
+[Aksiyom 3]: Eğer `bladeCount` parametresi `0` veya negatif bir tam sayı olarak verilirse, pala (kanat) sayısı tanımsız kalır ve impeller geometrisi hatalı oluşturulur.
+[Aksiyom 4]: Eğer `color` parametresi geçerli bir renk değeri (hex kodu, RGB dizisi veya tarayıcı/tanımlı renk adı) içermiyorsa, 3D nesneye uygulanacak malzeme rengi belirsiz kalır.
+[Aksiyom 5]: Bu bileşen, geçerli bir 3D sahne bağlamı (örneğin, bir `<Canvas>` veya eşdeğeri) içinde render edilmelidir; eğer böyle bir bağlam sağlanmamışsa, bileşen görünür bir çıktı üretemez.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Impeller
+**Ne yapar**: Impeller bileşeni, verilen parametrelere göre bir impeller (pompa veya fan kanadı) modelini render eden bir React bileşenidir.  
+**Nasıl yapar**: Bileşen, `type`, `diameter`, `bladeCount` ve `color` props'larını alır; bu değerleri iç geometri ve stil hesaplamalarında kullanarak SVG veya Canvas üzerinden impeller görselini oluşturur. Varsayılan değerler sağlandığı için zorunlu olmayan tüm parametreler isteğe bağlıdır.  
+**Parametreler**:
+- type: string — Impellerin türü (örneğin 'radial', 'axial' gibi) ve render edilecek geometriyi belirler.  
+- diameter: number — Impellerin çapı; birim genellikle metre veya milimetre olarak kabul edilir, varsayılan değer 1.  
+- bladeCount: number — Impellerin kanat (palette) sayısı; varsayılan değer 8.  
+- color: string — Impellerin rengi; CSS renk değeri alır, varsayılan değer 'aluminum'.  
+**Dönüş**: React.FC<ImpellerProps> — Tip güvenli bir React fonksiyonel bileşeni döndürür; bu bileşen JSX elementi olarak kullanılabilir.
+
+---
+
+## INTERFACES
+
+### ImpellerProps
+- `type: 'axial' | 'radial' | 'backward_curved'`
+- `diameter?: number`
+- `bladeCount?: number`
+- `color?: 'aluminum' | 'plastic' | 'steel'`
+- `spinSpeed?: number`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/products/3d/parts/Impeller.tsx::Impeller
+- **params**: (type, diameter = 1, bladeCount = 8, color = 'aluminum', spinSpeed = 5)
+- **ic_degiskenler**:
+  - `groupRef` — Three.js Group objesine referans, useFrame hook'unda döndürme işleminde kullanılır
+  - `materials` — useFanMaterials hook'undan gelen materyal objeleri (matteBlack, industrialSteel, brushedAluminum vb.)
+  - `material` — color parametresine göre seçilen spesifik materyal (plastic için matteBlack, steel için industrialSteel, diğerleri için brushedAluminum)
+  - `radius` — diameter'ın yarısı, tüm geometri hesaplamalarında kullanılır
+- **Dönüş**: React JSX elementi (3D impeller modeli)
+
+### [N2_NASIL] AST Pointer: src/components/products/3d/parts/Impeller.tsx::useFrame callback
+- **params**: (_, delta)
+  - `_` — frame bilgisi (kullanılmıyor)
+  - `delta` — son frame'den bu yana geçen süre (animasyon hızı için)
+- **ic_degiskenler**:
+  - `groupRef.current` — useFrame içinde döndürülecek olan Group objesi
+  - `spinSpeed` — dış kapsamdan gelen döndürme hızı (dönüş parametresi)
+- **Dönüş**: yok (yan etki: groupRef.current.rotation.z'yi delta * spinSpeed kadar azaltır)
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/parts/Impeller.tsx::axial blades map callback
+- **params**: (_, i)
+  - `_` — Array.fill(0) ile oluşturulan boş eleman (kullanılmıyor)
+  - `i` — mevcut kanat index'i (0'dan bladeCount'a kadar)
+- **ic_degiskenler**: yok
+- **Dönüş**: React JSX elementi (tek bir axial kanat)
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/parts/Impeller.tsx::radial blades map callback
+- **params**: (_, i)
+  - `_` — Array.fill(0) ile oluşturulan boş eleman (kullanılmıyor)
+  - `i` — mevcut kanatçık index'i (0'dan bladeCount*2'ye kadar)
+- **ic_degiskenler**: yok
+- **Dönüş**: React JSX elementi (tek bir radial kanatçık)
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/parts/Impeller.tsx::backward curved blades map callback
+- **params**: (_, i)
+  - `_` — Array.fill(0) ile oluşturulan boş eleman (kullanılmıyor)
+  - `i` — mevcut kanat index'i (0'dan 7'ye kadar, sabit sayı)
+- **ic_degiskenler**: yok
+- **Dönüş**: React JSX elementi (tek bir backward_curved kanat)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\3d\parts\Impeller.tsx
+  function: src\components\products\3d\parts\Impeller.tsx::Impeller
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Impeller
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
 # FILE: src\components\products\3d\parts\Motor.md
 
 ---
@@ -24979,6 +26859,139 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Motor
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\components\products\3d\parts\Silencer.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\parts\Silencer.tsx
+skeleton_hash: 0d417fee6be9a360
+entity_hashes:
+  func:Silencer: b0d56de6b93be1bd
+  overview: ae5f7c5e5d83ff51
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-12T10:21:26Z
+---
+
+## Genel Bakış
+Bu modül, HVAC ürünlerinin 3 boyutlu görselleştirilmesinde kullanılan, silindirik bir susturucu parçasını temsil eden yapılandırımlı bir React bileşenidir. Bileşen, parçanın temel geometrik özelliklerini ve 3D sahadaki konumunu belirleyen parametreler alır.
+
+## Fonksiyon Grupları
+### Bileşen Tanımı ve Oluşturma
+Bu grup, modülün tek ve temel işlevini tanımlar; susturucu parçasının geometrisini ve görünümünü belirleyen bir React fonksiyonel bileşeni sağlar.
+- Silencer
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, 3D sahada silindirik bir susturucu parçası oluşturan bir React bileşenidir. Aşağıdaki mimari varsayımlar fonksiyon imzasından türetilmiştir.
+
+[Aksiyom 1]: Eğer `radius` parametresi negatif veya sıfır değer alırsa, geçersiz silindirik geometri oluşur (geometrik olarak tanımsız).
+
+[Aksiyom 2]: Eğer `length` parametresi negatif veya sıfır değer alırsa, geçersiz silindirik geometri oluşur (geometrik olarak tanımsız).
+
+[Aksiyom 3]: Eğer `position` parametresi 3 elemanlı bir dizi [x, y, z] formatında verilmezse, bileşenin 3D sahadaki konumu tanımsız olur.
+
+[Aksiyom 4]: Eğer bileşen bir 3D sahne bağlamı (örn: Three.js sahnesi) dışında render edilirse, geometrik nesne görüntülenemez.
+
+[Aksiyom 5]: Eğer `radius` ve `length` değerleri arasındaki oran aşırı derecede farklılaşır (örn: radius ≫ length veya length ≫ radius), susturucu geometrisi gerçekçi bir görünüm kazanamaz; bunun için eşik değer bilinmiyor.
+
+---
+
+**Not:** Bu modül için belirli eşik değerleri (minimum/maximum radius, length) veya kabul kriterleri fonksiyon imzasında tanımlanmamıştır. Sadece geometrik tanımlılık varsayımları çıkarılmıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### Silencer
+**Ne yapar**: Silencer bileşeni, HVAC sistemlerinde ses azaltma amacıyla kullanılan bir susturucu (silencer) modelini oluşturur. Silindir şeklinde bir dış kabuk ve iç kısmında delikli yüzey barındırarak gürültüyü düşürür.  
+**Nasıl yapar**: Bileşen, verilen `radius`, `length` ve `position` parametrelerini kullanarak bir silindir geometrisi üretir; iç yüzeye delikli bir pattern ekleyerek ses emme özelliğini simüle eder ve bu geometriyi React üzerinden JSX olarak döndürür.  
+**Parametreler**:
+- radius: number — Silindirin yarıçapı (metre cinsinden), varsayılan değer 0.6  
+- length: number — Silindirin uzunluğu (metre cinsinden), varsayılan değer 0.8  
+- position: number[] — Silencerin 3D uzayda konumunu belirten [x, y, z] koordinatları, varsayılan değer [0, 0, 0]  
+**Dönüş**: React.FC<SilencerProps> — Bir React fonksiyonel bileşeni döndürür; render edildiğinde silencerin 3D modelini ekrana çizer.
+
+---
+
+## INTERFACES
+
+### SilencerProps
+- `radius?: number`
+- `length?: number`
+- `position?: [number, number, number]`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::Silencer
+- **params**: (`radius` — Genlik yarıçapı, varsayılan 0.6; `length` — Uzunluk, varsayılan 0.8; `position` — 3B konum vektörü, varsayılan [0,0,0])
+- **ic_degiskenler**:
+  - `materials` — `useFanMaterials()` hook'undan dönen malzeme nesnesi. 3B modellere uygulanacak malzemeleri (galvanizedSteel, industrialSteel, matteBlack) içerir.
+  - `_perforationGeometry` — `useMemo` ile hesaplanan ve önbelleğe alınan iç delikli yüzey geometrisi. `radius` değişkenine bağlı olarak yeniden hesaplanır.
+- **Dönüş**: JSX elementi (React bileşeni). `group` elementi içinde 3D silansör modelini render eder.
+
+### [N2_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::useMemo callback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `shape` — Three.js `Shape` nesnesi. Deliklerin oluşturulacağı temel şekil.
+  - `holeRadius` — Deliklerin oluşturulacağı halka yarıçapı. `radius * 0.85` hesaplanır.
+  - `holeCount` — Oluşturulacak delik sayısı. Sabit 12.
+  - `angle` — Döngü içinde her deliğin açısı. `(i / holeCount) * Math.PI * 2` ile hesaplanır.
+  - `hx` — Deliğin merkezinin x koordinatı. `Math.cos(angle) * holeRadius` ile hesaplanır.
+  - `hy` — Deliğin merkezinin y koordinatı. `Math.sin(angle) * holeRadius` ile hesaplanır.
+  - `hole` — Three.js `Path` nesnesi. Tek bir daire deliğini temsil eder. `shape.holes` dizisine eklenir.
+- **Dönüş**: `ShapeGeometry` nesnesi. Deliklerle oluşturulmuş 2B şekilden türetilmiş geometri.
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::map callback (perforation rings)
+- **params**: (`_` — Kullanılmayan mevcut eleman, `i` — Dizideki mevcut indeks)
+- **ic_degiskenler**:
+  - `zPos` — Halkanın z-ekseni üzerindeki konumu. `length` ve `i` değerlerinden hesaplanır: `-length / 2 + (i + 1) * (length / 7)`.
+- **Dönüş**: JSX elementi. Delikli iç yüzeydeki akustik halka geometrisini render eden `mesh`.
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::map callback (structural reinforcement rings)
+- **params**: (`z` — Halkanın z ekseni konumu, `i` — Dizideki mevcut indeks)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi. Yapısal destek halkasını (torus) render eden `mesh`.
+
+### [N5_NASIL] AST Pointer: src/components/products/3d/parts/Silencer.tsx::map callback (mounting brackets)
+- **params**: (`angle` — Braketin döndürme açısı (derece), `i` — Dizideki mevcut indeks)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi. Montaj braketini ( kutu geometrisi ) içeren `group`.
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\3d\parts\Silencer.tsx
+  function: src\components\products\3d\parts\Silencer.tsx::Silencer
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Silencer
 
 ---
 
@@ -25436,6 +27449,253 @@ Bu modül için fonksiyon gövdesi erişilebilir olmadığından, yalnızca fonk
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AxialFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\components\products\3d\types\CentrifugalFanModel.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\CentrifugalFanModel.tsx
+skeleton_hash: 24a998d3a25d1846
+entity_hashes:
+  func:CentrifugalFanModel: 2ca1d8ced8088e61
+  overview: 6444af53b2b5ccbf
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-12T10:21:42Z
+---
+
+## Genel Bakış
+Bu modül, santrifüj tip fanın (salyangoz fan) three.js tabanlı üç boyutlu modelini render eden bağımsız bir React bileşenini tanımlar. Bileşen, fanın ana yapı taşlarını (tahrik motoru, spiral konaklama ve radyal kanatlı pervane) statik bir şekilde 3D ortamında görselleştirerek etkileşimli bir ürün gösterimi sunar.
+
+## Fonksiyon Grupları
+### 3D Fan Modeli Bileşen Tanımı
+Santrifüj fanın three.js geometrisini ve malzemelerini oluşturarak sahneye yerleştiren, props almayan tek bir React bileşenini içerir.
+- CentrifugalFanModel
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için fonksiyon gövdesi sağlanmadığından, yalnızca fonksiyon imzasından çıkarılabilecek sınırlı varsayımlar tanımlanabilmektedir.
+
+[Aksiyom 1]: Eğer `CentrifugalFanModel` fonksiyonu parametre almıyorsa, bileşenin tüm konfigürasyon değerlerinin (fan boyutları, malzeme özellikleri, döndürme hızı vb.) fonksiyon gövdesi içinde sabit olarak tanımlı olması gerekir; aksi halde bileşen esnek bir şekilde özelleştirilemez.
+
+[Aksiyom 2]: Eğer `CentrifugalFanModel` bir React bileşeniyse ve props almıyorsa, bileşenin dış bağımlılıklarını (three.js sahne, kamera, ışıklandırma) kendi içinde oluşturup yönetmesi gerekir; aksi halde bileşen çalışamaz.
+
+---
+
+> **Not:** Fonksiyon gövdesi (implementation) sağlanmadığı için, bileşenin iç yapısı, kullandığı three.js nesneleri, geometri türleri ve render zinciri hakkında kesin aksiyomlar üretilememektedir. Detaylı aksiyomlar için fonksiyon gövdesinin paylaşılması gereklidir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### CentrifugalFanModel
+**Ne yapar**: Bu fonksiyon, santrifüj fanın 3B modelini gösteren bir React bileşeni tanımlar. Bileşen, fanın temel parçalarını (motor, konaklama ve pervane) temsil ederek kullanıcıya görsel bir yapı sunar.
+
+**Nasıl yapar**: Fonksiyon içeriği, verilen docstring’te belirtilen özellikleri açıklayan bir JSX yapısı döndürür; motorun merkezi tahrik olduğu, konaklamanın spiral/salyangoz tipinde olduğu ve pervanenin radyal kanatlı, dönen yapı olduğu bilgileri bileşenin render ettiği öğelerle eşleştirir. Props almadığı için dışarıdan veri beklemez ve statik bir görselleştirme sağlar.
+
+**Parametreler**:  
+- (Parametre yok)
+
+**Dönüş**: React.FC türünde bir fonksiyonel bileşen döner; bu, JSX elementi render ederek santrifüj fan modelini ekrana getirir.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: CentrifugalFanModel.tsx::CentrifugalFanModel
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `materials` — useFanMaterials() hook'undan gelen 3D malzeme nesneleri (industrialBlue, industrialSteel, galvanizedSteel, darkGrey, motorSilver, logoRed, bladeBlack, matteBlack)
+  - `impellerRef` — useRef<Group>(null) ile oluşturulan ref; dönen impeller grubuna referans verir, useFrame içinde rotation.z ayarı için kullanılır
+  - `impellerBladeGeometry` — useMemo ile hesaplanan ExtrudeGeometry; 12 adet geriye kıvrımlı santrifüj kanatın 3D geometrisini oluşturur
+  - `scrollShape` — useMemo ile hesaplanan Shape; spiral (salyangoz) housing profilini tanımlar, extrudeGeometry ile 3D'ye dönüştürülür
+- **Dönüş**: JSX — 3D santrifüj fan modeli (motor grubu, spiral housing, dönen impeller, koruma ızgarası)
+
+### [N2_NASIL] AST Pointer: CentrifugalFanModel.tsx::useFrame callback
+- **params**: `state` — useFrame tarafından sağlanan frame state objesi (kullanılmıyor), `delta` — geçen süre (saniye cinsinden, rotasyon hızı hesaplamada kullanılır)
+- **ic_degiskenler**:
+  - (yok — doğrudan impellerRef.current.rotation.z üzerine yazılır)
+- **Dönüş**: yok (yan etki: impellerRef.current.rotation.z -= delta * 12 ile pervaneyi her frame döndürür)
+
+### [N3_NASIL] AST Pointer: CentrifugalFanModel.tsx::impellerBladeGeometry useMemo callback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `shape` — new Shape() ile oluşturulan 2D kanat profili; moveTo, quadraticCurveTo, lineTo ile dış kenardan iç kenara kıvrımlı profil çizimi
+  - `extrudeSettings` — ExtrudeGeometry için ayarlar nesnesi; depth: 0.03 (kalınlık), bevelEnabled: true, bevelThickness: 0.004, bevelSize: 0.004, bevelSegments: 1
+- **Dönüş**: ExtrudeGeometry — şekillendirilmiş 3D kanat geometrisi
+
+### [N4_NASIL] AST Pointer: CentrifugalFanModel.tsx::scrollShape useMemo callback
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `shape` — new Shape() ile oluşturulan 2D spiral housing profili; moveTo, lineTo, quadraticCurveTo ile salyangoz formu çizimi
+- **Dönüş**: Shape — spiral housing'in 2D profili
+
+### [N5_NASIL] AST Pointer: CentrifugalFanModel.tsx::soğutma kanatları map callback
+- **params**: `_` — doldurma elemanı (kullanılmıyor), `i` — dizi indeksi (0-15 arası, her kanat için açı hesaplamada kullanılır)
+- **ic_degiskenler**:
+  - (yok — params içindeki i kullanılır)
+- **Dönüş**: JSX mesh — tek bir soğutma kanadı; rotation [0, 0, i * (Math.PI / 8)] ile 16 kanat eşit aralıklarla yerleştirilir
+
+### [N6_NASIL] AST Pointer: CentrifugalFanModel.tsx::impeller kanatları map callback
+- **params**: `_` — doldurma elemanı (kullanılmıyor), `i` — dizi indeksi (0-11 arası, kanat açısını belirler)
+- **ic_degiskenler**:
+  - (yok — params içindeki i kullanılır; impellerBladeGeometry closure'dan erişilir)
+- **Dönüş**: JSX group — tek bir kanat grubu; rotation [0, 0, (i / 12) * Math.PI * 2] ile 12 kanat eşit açılarla yerleştirilir
+
+### [N7_NASIL] AST Pointer: CentrifugalFanModel.tsx::koruma ızgarası halka map callback
+- **params**: `r` — torus yarıçapı değeri (0.06, 0.10, 0.14 veya 0.18 — her bir halkanın yarıçapı), `i` — dizi indeksi (0-3 arası, benzersiz key üretimi için)
+- **ic_degiskenler**:
+  - (yok — params içindeki r ve i kullanılır)
+- **Dönüş**: JSX mesh — tek bir koruma halkası; torusGeometry ile r yarıçapında oluşturulur
+
+### [N8_NASIL] AST Pointer: CentrifugalFanModel.tsx::koruma ızgarası tel map callback
+- **params**: `angle` — tel açısı derece cinsinden (0, 60, 120, 180, 240 veya 300 — her telin döndürme açısı), `i` — dizi indeksi (0-5 arası, benzersiz key üretimi için)
+- **ic_degiskenler**:
+  - (yok — params içindeki angle ve i kullanılır)
+- **Dönüş**: JSX mesh — tek bir koruma teli; rotation [0, 0, angle * Math.PI / 180] ile radyana çevrilerek yerleştirilir
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\3d\types\CentrifugalFanModel.tsx
+  function: src\components\products\3d\types\CentrifugalFanModel.tsx::CentrifugalFanModel
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: CentrifugalFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\components\products\3d\types\DehumidifierModel.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\DehumidifierModel.tsx
+skeleton_hash: 4515c32920cb2979
+entity_hashes:
+  func:DehumidifierModel: 9ef5181c317802b4
+  overview: 5b9ba7d5b196184b
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-12T10:22:00Z
+---
+
+## Genel Bakış
+Bu modül, VentHub HVAC uygulaması için özel olarak tasarlanmış, üç boyutlu (3B) bir nemlendirici (kurutucu) ürün modelini temsil eden bir React Three Fiber bileşenidir. Bileşen, cihazın görsel yapısını, dahili bileşenlerini ve dönen fan tekerleği animasyonunu tanımlayarak, ürünün etkileşimli 3B gösterimini sağlar.
+
+## Fonksiyon Grupları
+### 3D Model Bileşeni
+Bu grup, modülün tek ve temel bileşenini oluşturur. Sorumluluğu, nemlendiricinin geometrik yapısını, malzemelerini ve fan tekerleğinin sürekli döndüğü animasyon mantığını tanımlayarak JSX formatında bir 3B model döndürmektir.
+- DehumidifierModel
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, parametresiz bir React Three Fiber 3B model bileşenidir.
+
+---
+
+[Aksiyom 1]: Eğer React Three Fiber Canvas bağlamı (Three.js ortamı) yoksa, bileşen 3B sahne oluşturamaz ve render hatası ile sonuçlanır.
+
+[Aksiyom 2]: Bileşen parametresiz (`DehumidifierModel()`) çağrılmak zorundadır; prop bağımlılığı olmadığından, harici veri beslemesi olmadan kendi içinde sabit geometri ve materyal tanımlarıyla çalışmalıdır.
+
+[Aksiyom 3]: Eğer `useFrame` veya benzeri animasyon döngüsü mekanizması yoksa, fan tekerleği döndürme animasyonu çalışmaz ve statik bir model gösterilir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### DehumidifierModel
+**Ne yapar**: Bu fonksiyon, bir kurutma makinesinin (dehumidifier) 3D modelini oluşturur ve canlandırır. Fonksiyon, bir React bileşeni olarak Three.js sahnesine yerleştirilecek bir `group` JSX elementi döndürür.
+
+**Nasıl yapar**: Fonksiyon, `useRef` hook'u ile fan pervanesi için bir referans (`fanWheelRef`) oluşturur ve `useFanMaterials()` hook'undan malzeme nesnelerini alır. `useFrame` hook'unu kullanarak her görüntü karesinde (`delta` süresince) fan pervanesinin (`fanWheelRef.current`) Y ekseni etrafında sabit bir hızla (delta * 6) dönmesini sağlar. Döndüğü JSX yapısı, gövde, üst panel, ekran, su tankı, fan montajı (dönen pervane ve ızgara), yan havalandırma deliği ve ayaklar olmak üzere several `mesh` ve `group` nesnelerinden oluşan bir 3D modeli temsil eder. Her `mesh` elementi, belirli bir geometri (`boxGeometry`, `planeGeometry` vb.) ve `materials` objesinden alınan bir malzeme ile tanımlanmıştır.
+
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+
+**Dönüş**: Fonksiyon, React bileşeni olarak bir JSX elementi (`React.ReactElement`) döndürür. Dönüş tipi resmi olarak `void` değil, bileşenin render ettiği 3D sahne yapısıdır.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/components/products/3d/types/DehumidifierModel.tsx::DehumidifierModel
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `fanWheelRef` — useRef ile oluşturulmuş bir referans nesnesi, dönen fan tekerleğinin (fanWheelRef.current) döndürülmesi için kullanılır
+  - `materials` — useFanMaterials hook'undan dönen malzeme nesnesi (boxMat, matteBlack, chassisInnerMat, castIron, industrialSteel, rubber gibi materyalleri içerir)
+- **Dönüş**: JSX - nem alma cihazının (dehumidifier) 3D modelini oluşturan React bileşeni. Gövde, panel, ekran, su tankı, fan sistemi ve ayakları içeren bir 3D model döndürür.
+
+### [N2_NASIL] AST Pointer: src/components/products/3d/types/DehumidifierModel.tsx::useFrame callback (state, delta)
+- **params**: (state, delta)
+  - `state` — useFrame tarafından sağlanan state nesnesi (kullanılmıyor)
+  - `delta` — son kareden bu yana geçen süre (saniye cinsinden), fan hızını hesaplamak için kullanılır
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok - her karede çalışarak fanWheelRef.current.rotation.y değerini delta * 6 kadar artırarak fanı döndürür
+
+### [N3_NASIL] AST Pointer: src/components/products/3d/types/DehumidifierModel.tsx::map callback (x, i) - lg1 ayağı
+- **params**: (x, i)
+  - `x` — [-0.5, 0.5] dizisinden gelen x koordinatı, ayakların yatay konumunu belirler
+  - `i` — döngü indeksi, benzersiz key oluşturmak için kullanılır
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX - modelin ön (z=0.3) tarafındaki silindirik ayaklardan birini döndürür
+
+### [N4_NASIL] AST Pointer: src/components/products/3d/types/DehumidifierModel.tsx::map callback (x, i) - lg2 ayağı
+- **params**: (x, i)
+  - `x` — [-0.5, 0.5] dizisinden gelen x koordinatı, ayakların yatay konumunu belirler
+  - `i` — döngü indeksi, benzersiz key oluşturmak için kullanılır
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX - modelin arka (z=-0.3) tarafındaki silindirik ayaklardan birini döndürür
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\3d\types\DehumidifierModel.tsx
+  function: src\components\products\3d\types\DehumidifierModel.tsx::DehumidifierModel
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: DehumidifierModel
 
 ---
 
@@ -27234,6 +29494,90 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Yardımcı Sınıflar:** (yok)
 
 ---
+# FILE: src\components\products\3d\types\WallMountedCompactFanModel.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\WallMountedCompactFanModel.tsx
+skeleton_hash: 744e4deb9ef6c5ae
+entity_hashes:
+  func:WallMountedCompactFanModel: 500276a0a7bacf11
+  overview: 4350355f50e38bb0
+  style_tokens: dd5ed8d0f58dcf57
+generated_at: 2026-06-12T10:22:07Z
+---
+
+## Genel Bakış
+Bu modül, VentHub HVAC projesinin 3D ürün görselleştirme sisteminde duvara monte kompakt fanların three boyutlu modelinin render edilmesini sağlayan tek bir React bileşeninden oluşur. Ürün sayfalarında ilgili fan modelinin interaktif 3D gösterimini sunmakla yükümlüdür.
+
+## Fonksiyon Grupları
+### 3D Ürün Bileşeni
+Duvara monte kompakt fanın three boyutlu modelini React uygulaması içinde renderlayan ve ürün sayfasında görüntülenmesini sağlayan temel yapıdır.
+- WallMountedCompactFanModel
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için özel aksiyom tanımlanmamıştır.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### WallMountedCompactFanModel
+**Ne yapar**: Venthub HVAC projesinin ürünler bölümündeki 3D görselleştirme katmanında kullanılmak üzere, duvara monte kompakt vantilatörün 3 boyutlu modelini barındıran bir React fonksiyonel bileşeni sunar. Projenin tip güvenliği standartlarına uygun olarak 3D ürün modelleri ailesinin bir parçası olarak yapılandırılmış, sadece bu spesifik vantilatör modelinin 3B olarak render edilmesini sağlar.
+**Nasıl yapar**: TypeScript ile güçlendirilmiş tip güvenliği sunan bir yapı ile, React.FC türünde hazırlanmış bileşeni doğrudan döndüren bir fabrika yapısı sunar. Kaynak kodunun bulunduğu dizin itibarıyla tüm duvara monte kompakt vantilatörlere ait 3B görsel varlıkları ve geometrik tanımları içeren bileşeni projenin diğer bölümlerinin kullanımına sunar, projenin 3D modelleme entegrasyonlarıyla sorunsuz çalışacak şekilde önceden yapılandırılmıştır.
+**Parametreler**: Bu fonksiyon herhangi bir giriş parametresi almamaktadır.
+**Dönüş**: React.FC türünde bir React fonksiyonel bileşeni döndürür. Bu döndürülen bileşen, uygulama içindeki herhangi bir noktada çağrıldığında, duvara monte kompakt vantilatörün 3D modelini React render süreci kapsamında ilgili ekrana çizmek üzere kullanılır.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: WallMountedCompactFanModel.tsx::WallMountedCompactFanModel
+- **params**: () — parametre yok
+- **ic_degiskenler**:
+  - `fanRef` — `useRef<Group>(null)` ile oluşturulan referans; Three.js Group nesnesine erişim sağlar, useFrame içinde pervane rotasyonunu kontrol eder
+  - `plateGeometry` — `useMemo` ile hesaplanan ExtrudeGeometry; duvar montaj plakasının 3D geometrisini tutar (kare plaka, montaj delikleri, merkez delik)
+  - `COLORS` — Sabit renk paleti nesnesi; tüm 3D parçaların renklerini tanımlar
+    - `COLORS.PLATE` — `'#94a3b8'` galvaniz çelik rengi, montaj plakası ve venturi ağzı için
+    - `COLORS.BLACK_PARTS` — `'#1e293b'` mat siyah, motor gövdesi ve göbek için
+    - `COLORS.BLADE_ORANGE` — `'#ea580c'` güvenlik turuncusu, pervane kanatları için
+    - `COLORS.WIRE_GUARD` — `'#64748b'` endüstriyel çelik, tel kafes ve standoffs için
+- **Dönüş**: JSX elementi — `<group>` içinde duvar montajlı kompakt fanın tüm 3D bileşenlerini (plaka, motor, pervane, tel kafes, klemens kutusu) içeren React Three Fiber bileşeni
+
+---
+
+## NODE ID STANDARD
+
+  file: src\components\products\3d\types\WallMountedCompactFanModel.tsx
+  function: src\components\products\3d\types\WallMountedCompactFanModel.tsx::WallMountedCompactFanModel
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: WallMountedCompactFanModel
+
+---
+
+## STİL TOKENLERİ
+
+### Arbitrary Değerler (token'a geçirilmemiş)
+Yok — tüm stiller token'a geçirilmiş. ✅
+
+### Kullanılan Token'lar (zaten token'a geçirilmiş)
+- (yok)
+
+### Tailwind Sınıf Özeti
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** (yok)
+
+---
 # FILE: src\components\ui\ScrollObserver.md
 
 ---
@@ -27989,6 +30333,82 @@ C:\Users\alize\venthub-hvac\src\config\legal.ts dosyasında analiz edilebilir he
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: LegalConfig
+
+---
+# FILE: src\config\orbitalCarouselConfig.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\config\orbitalCarouselConfig.ts
+skeleton_hash: a8316a8cfcf9cfd2
+entity_hashes:
+  overview: eca02fed19b4de2a
+generated_at: 2026-06-12T10:23:05Z
+---
+
+## Genel Bakış
+Bu modül, VentHub HVAC projesindeki orbital karousel (döner taşıyıcı) bileşeninin yapılandırma ayarlarını barındıran bir üst seviye sabit tanımlama dosyasıdır. Tek bir `ORBITAL_CAROUSEL_CONFIG` nesnesi dışa aktararak, bu yapılandırmaya ihtiyaç duyan tüm modüllere merkezi bir erişim noktası sunar. Dosyada herhangi bir işlev (fonksiyon), ortam değişkeni okuması veya dış API/veri tabanı sorgusu bulunmamakta olup, saf bir yapılandırma verisi deposu olarak tasarlanmıştır.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, saf bir yapılandırma verisi deposu olarak tasarlanmıştır; herhangi bir işlev (fonksiyon), ortam değişkeni okuması veya dış API sorgusu içermemektedir.
+
+[Aksiyom 1]: Eğer `ORBITAL_CAROUSEL_CONFIG` nesnesi tanımlı ve dışa aktarılabilir (exportable) değilse, bu yapılandırmaya bağımlı olan tüm modüllerin derleme zamanı hata alması olur.
+
+[Aksiyom 2]: Eğer `OrbitalCarouselConfig` type alias'ı, `ORBITAL_CAROUSEL_CONFIG` nesnesinin gerçek yapısıyla (typeof) eşleşmiyor veya bu eşleşme bozulursa, TypeScript derleyicisi tip uyumsuzluk hatası verir olur.
+
+[Aksiyom 3]: Eğer modül çalıştırma zamanında (runtime) herhangi bir dış bağımlılık (import) gerektiriyorsa — ki mevcut tasarıma göre gerektirmemektedir — bu bağımlılığın sağlanamaması durumunda modülün kullanılabilirliği ortadan kalkar olur.
+
+> **Not:** Bu modülde herhangi bir fonksiyon gövdesi, koşul dalı (branch), döngü veya mantıksal iş mantığı bulunmadığından, fonksiyonel aksiyom üretimi için girdi mevcut değildir. Yukarıdaki varsayımlar, modülün var olma ve dışa aktarım (export) mekanizmasına yöneliktir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+---
+
+## TYPE ALIASES
+
+### OrbitalCarouselConfig
+```typescript
+type OrbitalCarouselConfig = typeof ORBITAL_CAROUSEL_CONFIG
+```
+
+---
+
+## SABİTLER
+- **ORBITAL_CAROUSEL_CONFIG** (object) — `{
+
+    // ═══════════════════════════════════════════════════════════
+
+    //...`
+
+---
+
+## AST POINTERS
+
+Bu dosyada fonksiyon bulunmamaktadır. Dosya salt bir yapılandırma (config) dosyasıdır.
+
+### [N1_NASIL] AST Pointer: src/config/orbitalCarouselConfig.ts::ORBITAL_CAROUSEL_CONFIG (sabit)
+- **Tür**: `const ORBITAL_CAROUSEL_CONFIG` — orbital carousel bileşeninin konfigürasyon nesnesi
+- **İçerik**: Objelerden oluşan bir yapılandırma sabiti; fonksiyon, method veya hesaplama içermeyen statik veri tanımı
+- **Dönüş**: Yok (dışa aktarılan sabit nesne)
+
+---
+
+## NODE ID STANDARD
+
+  file: src\config\orbitalCarouselConfig.ts
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: ORBITAL_CAROUSEL_CONFIG
+  export: OrbitalCarouselConfig
 
 ---
 # FILE: src\config\siteUrl.md
@@ -29018,6 +31438,239 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Layout:** (yok)
 - **Varyant/Responsive:** (yok)
 - **Yardımcı Sınıflar:** (yok)
+
+---
+# FILE: src\data\brands.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\data\brands.ts
+skeleton_hash: d2735fab6497e2fb
+entity_hashes:
+  overview: 1c324d780c68eb8e
+generated_at: 2026-06-12T10:23:07Z
+---
+
+## Genel Bakış
+
+Bu modül, HVAC (Isıtma, Ventilasyon ve Klima) markalarına ilişkin statik veri koleksiyonunu içerir. Sistem genelinde kullanılan marka listesini tek bir merkezi noktadan sağlamak amacıyla tasarlanmıştır ve herhangi bir işlevsel mantık barındırmaz — yalnızca veri tanımlaması yapar.
+
+## İçerik
+
+`HVAC_BRANDS` sabiti, uygulama genelinde referans olarak kullanılan marka bilgilerini tutar. Bu veri yapısı, filtreleme menülerinde, raporlama ekranlarında veya marka bazlı arama fonksiyonlarında kullanılmak üzere dışa aktarılır. Dosya saf veri modülüdür; herhangi bir fonksiyon, sınıf veya mantıksal akış içermez.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için temel mimari varsayım, sunulan verinin tutarlılığı ve erişilebilirliğidir.
+
+[Aksiyom 1]: Eğer `HVAC_BRANDS` sabiti tanımlanmamış veya boş bir array (`[]`) olarak tanımlanmışsa, uygulama içindeki tüm marka bazlı filtreleme, arama ve gösterim fonksiyonları (örneğin; filtre menüleri, marka listeleri, raporlama ekranları) boş sonuç döndürür veya marka verisini hiç sunamaz.
+
+[Aksiyom 2]: Eğer `HVACBrand` arayüzündeki `name`, `slug` veya `description` alanları bir nesnede tanımlanmamışsa veya istenen tipte (string) değilse, o marka ile ilgili kullanıcı arayüzünde hatalı veya eksik bilgi görüntülenir. (`country` alanının tipi ve zorunluluğu belirtilmediği için varsayıma girmez.)
+
+[Aksiyom 3
+
+---
+
+## FONKSİYON DETAYLARI
+
+---
+
+## INTERFACES
+
+### HVACBrand
+- `name: string`
+- `slug: string`
+- `description: string`
+- `country: string`
+- `founded?: number`
+- `headquarters?: string`
+- `website?: string`
+- `specialty?: string`
+- `logo?: string`
+
+---
+
+## SABİTLER
+- **HVAC_BRANDS** (array) — `[
+  { 
+    name: 'Vortice', 
+    slug: 'vortice', 
+    description: '1954 yıl...`
+
+---
+
+## AST POINTERS
+
+Bu dosyada fonksiyon bulunmamaktadır.
+
+### Dosya Yapısı Özeti
+
+**`C:\Users\alize\venthub-hvac\src\data\brands.ts`**
+
+- **Tip**: Statik veri dosyası
+- **İçerik**: Yalnızca `HVAC_BRANDS` sabit dizisi (array)
+- **Fonksiyon**: yok
+- **Import**: yok
+- **Class**: yok
+
+---
+
+## NODE ID STANDARD
+
+  file: src\data\brands.ts
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: HVACBrand
+  export: HVAC_BRANDS
+
+---
+# FILE: src\design-system\tokens.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\design-system\tokens.js
+skeleton_hash: 49c7465326318d5b
+entity_hashes:
+  overview: 604c676f787fff08
+generated_at: 2026-06-12T10:23:25Z
+---
+
+## Genel Bakış  
+Bu modül, tasarım sisteminin temel yapı taşlarını (design tokens) tanımlayan tamamen statik bir yapılandırma dosyasıdır. İçerisinde fonksiyon, sınıf veya yan etkili kod bulunmaz; yalnızca `zIndex`, `maxWidth`, `borderRadius`, `fontSize`, `boxShadow`, `height`, `width`, `transitionDuration` ve `blur` gibi görsel tutarlılık için gerekli sabit nesneler tanımlanır ve dışa aktarılır.  
+
+## Fonksiyon Grupları  
+Bu dosyada herhangi bir fonksiyon bulunmamaktadır. Modül, üst düzey (top-level) sabit tanımlamalarından oluşmaktadır ve yalnızca nesne dışa aktarımı yapmaktadır.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+Bu modül, tasarım sisteminin temel yapı taşlarını (design tokens) tanımlayan tamamen statik bir yapılandırma dosyasıdır. Dolayısıyla, modülün doğru çalışması için aşağıdaki temel varsayımlar geçerlidir.
+
+[Aksiyom 1]: Eğer `zIndex` nesnesi tanımlı değilse veya gerekli seviyeleri (ör. 'modal', 'sticky', 'dropdown') içermiyorsa, uygulamadaki katman sıralaması (layering) tutarsız olur ve bazı UI bileşenleri (ör. menüler, modallar) beklenmedik şekilde arka planda kalabilir.
+[Aksiyom 2]: Eğer `fontSize` nesnesi tanımlı değilse veya tüm gerekli tipografik seviyeleri içermiyorsa, tipografi hiyerarşisi bozulur ve metin boyutları tutarsız bir hale gelir.
+[Aksiyom 3]: Eğer `height` ve `width` gibi boyut nesneleri (min/max varyasyonları dahil) tanımlı değilse, bileşenler için standart bir ölçüm sistemi bulunmaz ve yerleşim (layout) tutarsızlıkları oluşur.
+[Aksiyom 4]: Eğer `transitionDuration` ve `transitionTimingFunction` nesneleri tanımlı değilse veya yetersiz ise, uygulama genelinde animasyon ve geçiş süreleri ile eğrileri tutarsız olur, bu da kullanıcı deneyimini olumsuz etkiler.
+[Aksiyom 5]: Eğer `boxShadow` ve `blur` nesneleri tanımlı değilse veya yetersiz varyantlara sahipse, derinlik ve vurgulama efektleri için tutarlı bir stil kuralı oluşturulamaz.
+
+---
+
+## FONKSİYON DETAYLARI
+
+---
+
+## SABİTLER
+- **zIndex** (object) — `{
+  'raised':   '10',
+  'dropdown': '50',
+  'sticky':   '90',
+  'modal':    '...`
+- **maxWidth** (object) — `{
+  'page':    '100rem',     // 1600px
+  'content': '56.25rem',   // 900px
+  ...`
+- **borderRadius** (object) — `{
+  'hvac-sm':  '0.375rem',  // 6px
+  'hvac-md':  '1rem',      // 16px
+  'hva...`
+- **fontSize** (object) — `{
+  'display': ['var(--font-size-display)', { lineHeight: '1.1' }],
+  '7px': ...`
+- **boxShadow** (object) — `{
+  // Mevcut korunanlar
+  'hvac':                  '0 4px 6px -1px rgba(30,6...`
+- **height** (object) — `{
+  'hvac-input':   '40px',   // 5×8
+  'hvac-thumb':   '72px',   // 9×8
+  'hv...`
+- **minHeight** (object) — `{
+  'hvac-input':   '40px',
+  'hvac-card':    '160px',  // 20×8
+  'hvac-panel...`
+- **maxHeight** (object) — `{
+  'hvac-menu':    '300px',
+  'hvac-panel':   '480px',  // 60×8
+  'hvac-moda...`
+- **width** (object) — `{
+  'hvac-menu':    '360px',  // 45×8 (toast, küçük panel)
+  'hvac-modal':   ...`
+- **minWidth** (object) — `{
+  'hvac-btn':     '120px',  // 15×8
+  'hvac-menu':    '140px',
+  'hvac-sele...`
+- **transitionDuration** (object) — `{
+  'hvac-fast':   '150ms',
+  'hvac-normal': '250ms',
+  'hvac-slow':   '600ms...`
+- **transitionTimingFunction** (object) — `{
+  'hvac-ease':   'cubic-bezier(0.16, 1, 0.3, 1)',
+  'hvac-spring': 'cubic-b...`
+- **blur** (object) — `{
+  '80':  '80px',
+  '100': '100px',
+  '120': '120px',
+  '150': '150px',
+  '2...`
+- **transitionProperty** (object) — `{
+  'opacity-transform':           'opacity, transform',
+  'opacity-only':   ...`
+
+---
+
+## AST POINTERS
+
+Bu dosya (`tokens.js`) **fonksiyon içermemektedir**. Dosya yalnızca dışa aktarılan (export edilen) sabit tasarım token nesnelerinden oluşmaktadır:
+
+| Sabit | Tür | Açıklama |
+|---|---|---|
+| `zIndex` | object | Z-index katman değerleri |
+| `maxWidth` | object | Maksimum genişlik değerleri |
+| `borderRadius` | object | Köşe yuvarlaklığı değerleri |
+| `fontSize` | object | Yazı tipi boyutu değerleri |
+| `boxShadow` | object | Kutu gölgesi değerleri |
+| `height` | object | Yükseklik değerleri |
+| `minHeight` | object | Minimum yükseklik değerleri |
+| `maxHeight` | object | Maksimum yükseklik değerleri |
+| `width` | object | Genişlik değerleri |
+| `minWidth` | object | Minimum genişlik değerleri |
+| `transitionDuration` | object | Geçiş süresi değerleri |
+| `transitionTimingFunction` | object | Geçiş zamanlama fonksiyonu değerleri |
+| `blur` | object | Bulanıklık değerleri |
+| `transitionProperty` | object | Geçiş özelliği değerleri |
+
+**Fonksiyon gövdesi:** `(yok)`
+**AST Pointer üretilecek fonksiyon bulunmamaktadır.**
+
+---
+
+## NODE ID STANDARD
+
+  file: src\design-system\tokens.js
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: blur
+  export: borderRadius
+  export: boxShadow
+  export: fontSize
+  export: height
+  export: maxHeight
+  export: maxWidth
+  export: minHeight
+  export: minWidth
+  export: transitionDuration
+  export: transitionProperty
+  export: transitionTimingFunction
+  export: width
+  export: zIndex
 
 ---
 # FILE: src\hooks\use-mobile.md
@@ -37173,6 +39826,121 @@ Bu dosyada (`cart.ts`) tanımlanmış herhangi bir fonksiyon gövdesi bulunmamak
   export: CartItem
 
 ---
+# FILE: src\types\database.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\types\database.ts
+skeleton_hash: b1d7533d6bb673aa
+entity_hashes:
+  overview: 60fe8414ff851e26
+generated_at: 2026-06-12T10:23:40Z
+---
+
+## Genel Bakış
+`src/types/database.ts`, projenin veritabanı şeması için merkezi TypeScript tip erişimi sağlayan纯 typoloji modülüdür. Dosya, yalnızca `./database.types` modülünden `Database` tipini yeniden export ederek tüm projenin bu türe tutarlı ve tip-güvenli bir şekilde erişmesini garanti altına alır. Çalıştırılabilir kod, fonksiyon veya ortam değişkeni içermeyen bu modül, veritabanı tabloları ve ilişkileri hakkında derleyiciye bilgi sağlayarak Servisler, Hook'lar ve ORM katmanları arasında tip uyumsuzluğunun önüne geçer.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, yalnızca TypeScript tip tanımları içeren纯 (pure) bir yeniden dışa aktarma (re-export) modülüdür. Çalıştırılabilir kod, fonksiyon gövdesi veya sabit değer içermediğinden, fonksiyon gövdesinden türetilebilecek mimari aksiyom bulunmamaktadır.
+
+**Bu modül için özel aksiyom tanımlanmamıştır.**
+
+---
+
+### Notlar
+
+| Konu | Durum |
+|------|-------|
+| Fonksiyon gövdesi | Yok – modül sadece tip yeniden aktarımı içerir |
+| Çalıştırılabilir kod | Yok |
+| Sabit değerler | Yok |
+| Koşullu mantık | Yok |
+| Eşik değeri / kabul kriteri | Tanımlı değil |
+
+Modül yapısı gereği (`Database` tipini `./database.types`'den import edip export eden纯 typoloji dosyası), girdi-çıktı dönüşümü veya koşullu akış söz konusu değildir; dolayısıyla "Eğer ... yoksa, ... olur" formatında türetilebilecek bir mimari varsayım üretilememektedir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+---
+
+## TYPE ALIASES
+
+### Tables
+```typescript
+type Tables = <T extends keyof Database['public']['Tables']>
+```
+
+### Enums
+```typescript
+type Enums = <T extends keyof Database['public']['Enums']>
+```
+
+### Category
+```typescript
+type Category = Tables<'categories'>
+```
+
+### Product
+```typescript
+type Product = Tables<'products'>
+```
+
+### Order
+```typescript
+type Order = Tables<'venthub_orders'>
+```
+
+### OrderItem
+```typescript
+type OrderItem = Tables<'venthub_order_items'>
+```
+
+### Profile
+```typescript
+type Profile = Tables<'user_profiles'>
+```
+
+### Project
+```typescript
+type Project = Tables<'user_projects'>
+```
+
+---
+
+## AST POINTERS
+
+Bu dosyada fonksiyon bulunmamaktadır.
+
+**Dosya:** `C:\Users\alize\venthub-hvac\src\types\database.ts`
+
+**İçerik:** Dosya sadece `./database.types` modülünden `Database` tipini import etmektedir. Herhangi bir fonksiyon, sabit veya sınıf tanımı içermemektedir. Bu bir type definition dosyasıdır.
+
+---
+
+## NODE ID STANDARD
+
+  file: src\types\database.ts
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: Category
+  export: Enums
+  export: Order
+  export: OrderItem
+  export: Product
+  export: Profile
+  export: Project
+  export: Tables
+
+---
 # FILE: src\types\database.types.md
 
 ---
@@ -38332,6 +41100,86 @@ Bu dosyada fonksiyon bulunmamaktadır.
   export: adminCardClass
   export: adminCardPaddedClass
   export: adminSelectStyle
+
+---
+# FILE: src\utils\analytics.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\src\utils\analytics.ts
+skeleton_hash: 850bc2150819ea68
+entity_hashes:
+  func:trackEvent: a39f838e00080681
+  overview: 6ae77f9a934c8a05
+generated_at: 2026-06-12T10:23:55Z
+---
+
+## Genel Bakış
+VentHub HVAC projesindeki analiz utility modülüdür. Tek bir merkezi fonksiyonla tüm uygulama içi olayların harici analiz servislerine veya geliştirme modunda konsola kaydedilmesini sağlar.
+
+## Fonksiyon Grupları
+### Olay Takibi
+Uygulamadaki tüm analiz olaylarını standart bir arayüz üzerinden harici servislere veya konsola yönlendirerek merkezi veri toplama sorumluluğunu üstlenir.
+- trackEvent
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, uygulama içi olayları harici analiz servislerine (GA4/GTM) iletmek üzere tasarlanmıştır; servis mevcut değilse konsol fallback'i kullanılır.
+
+[Aksiyom 1]: Eğer çalışma ortamında geçerli bir analitik servis (Google Analytics 4 veya Google Tag Manager) yapılandırılmamışsa, `trackEvent` çağrısı konsola loglama fallback'ine yönelir.
+
+[Aksiyom 2]: Eğer `params` parametresindeki değerler JSON serileştirilebilir (JSON-serializable) olmadığında, analitik servise iletim sırasında sessiz hata oluşur veya olay kaybolur.
+
+[Aksiyom 3]: Eğer `name` parametresi boş string (`""`) olarak verildiğinde, servise tanımsız bir olay adı iletilir ve analitik panelinde anlamsız veri birikir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### trackEvent
+**Ne yapar**: Bu fonksiyon, bir analitik (analytics) olayını güvenli bir şekilde izlemeyi sağlar. Görevi, belirtilen olay adı ve ilişkili parametreleri, mevcut bir analitik servisine (Google Analytics 4 veya Google Tag Manager) iletir. Eğer böyle bir servis yoksa sessizce işlevsiz kalır veya geliştirme ortamında bir log mesajı basarak hata vermeden çalışmaya devam eder.
+
+**Nasıl yapar**: Fonksiyon首先, tarayıcı ortamında olup olmadığını kontrol eder. Ardından, `window.gtag` fonksiyonunun varlığına bakarak GA4'e, yoksa `window.dataLayer` dizisinin varlığına bakarak GTM'ye olayı göndermeyi dener. Herhangi bir servise olay iletilememişse ve ortam geliştirme (development) modundaysa, `DEBUG_ANALYTICS` bayrağı aktifse konsola bilgilendirici bir uyarı loglar. Tüm işlem bir `try-catch` bloğu içinde gerçekleşir; olası analitik hataları yakalanarak ana uygulamanın çökmesi engellenir.
+
+**Parametreler**:
+- `name`: `string` — İzlenecek olayın adıdır. Örneğin 'add_to_cart', 'page_view' gibi bir string olmalıdır.
+- `params`: `Record<string, unknown>` — Olaya ilişkilendirilecek ek parametreler veya meta verileri temsil eder. Nesne formatındadır ve fonksiyon çağrısında belirtilmezse boş bir nesne (`{}`) olarak atanır.
+
+**Dönüş**: Fonksiyon herhangi bir değer dönmez (`void`). Sadece bir yan etki (analitik servise olay gönderme veya konsola log yazma) oluşturur.
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/utils/analytics.ts::trackEvent
+- **params**: 
+  - `name: string` - Takip edilecek analitik olayının benzersiz ismi
+  - `params: Record<string, unknown>` - Olayla ilişkili ek verileri içeren nesne, varsayılan olarak boş nesne atanır
+- **ic_degiskenler**:
+  - `delivered` - Analitik olayın gtag veya dataLayer takip sistemlerinden herhangi birine başarıyla iletilip iletilmediğini takip eden boolean bayrak
+  - `typeof window` - Kodun sunucu tarafında mı çalıştığını tespit etmek için tarayıcı pencere nesnesinin varlığını kontrol eden ifade
+  - `window.gtag` - Google Analytics entegrasyonu varsa mevcut olan global gtag fonksiyonu, olay göndermek için çalıştırılır
+  - `window.dataLayer` - Google Tag Manager entegrasyonu varsa mevcut olan global veri dizisi, gtag mevcut değilse olay bu diziye eklenir
+  - `window.DEBUG_ANALYTICS` - Analitik olaylarının konsola loglanıp loglanmayacağını kontrol eden global boolean bayrak
+  - `process.env.NODE_ENV` - Uygulamanın çalışma ortamını (geliştirme/üretim) belirten ortam değişkeni, geliştirme ortamında düşük iletilen olaylar için ek loglama yapılır
+  - `console.warn` - Tarayıcı konsoluna uyarı logu yazdırmak için kullanılan API, debug modunda olay detaylarını yazdırır
+- **Dönüş**: yok (void), herhangi bir değer döndürmez, sadece yan etki olarak analitik olayları gönderir, loglar; oluşan hataları yutarak uygulamanın çökmesini engeller
+
+---
+
+## NODE ID STANDARD
+
+  file: src\utils\analytics.ts
+  function: src\utils\analytics.ts::trackEvent
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: trackEvent
 
 ---
 # FILE: src\utils\applicationLinks.md
@@ -52486,7 +55334,7 @@ HVAC sektörüne özel, B2B/B2C karma satış mimarisi üzerine kurulu premium e
 | Hata Takibi | Sentry | **8.54.0** |
 | Paket Yöneticisi | pnpm | — |
 
-> **🤖 AI Otonom Yetenek Sayısı:** Projede **29 adet** uzmanlaşmış `.agent/skills/` yeteneği aktiftir (performans, güvenlik, mimari, i18n, NotebookLM entegrasyonu, multi-agent orkestrasyon vb.).
+> **🤖 AI Otonom Yetenek Sayısı:** Projede **30+** uzmanlaşmış yetenek aktiftir (`.claude/skills/`; legacy `.agent/skills/`) — performans, güvenlik, mimari, i18n, NotebookLM entegrasyonu, multi-agent orkestrasyon vb. Güncel liste: `docs/venthub_skills_master.md`.
 
 ### 🆕 Son Geliştirmeler
 - 🚀 **Performans Optimizasyonu Sprinti (10.06.2026):**

@@ -8,7 +8,7 @@ entity_hashes:
   func:WallMountedCompactFanModel: 500276a0a7bacf11
   overview: 4350355f50e38bb0
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:53:01Z
+generated_at: 2026-06-12T10:22:07Z
 ---
 
 ## Genel Bakış
@@ -21,7 +21,9 @@ Duvara monte kompakt fanın three boyutlu modelini React uygulaması içinde ren
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -48,35 +50,6 @@ Duvara monte kompakt fanın three boyutlu modelini React uygulaması içinde ren
     - `COLORS.BLADE_ORANGE` — `'#ea580c'` güvenlik turuncusu, pervane kanatları için
     - `COLORS.WIRE_GUARD` — `'#64748b'` endüstriyel çelik, tel kafes ve standoffs için
 - **Dönüş**: JSX elementi — `<group>` içinde duvar montajlı kompakt fanın tüm 3D bileşenlerini (plaka, motor, pervane, tel kafes, klemens kutusu) içeren React Three Fiber bileşeni
-
----
-
-### [N2_NASIL] AST Pointer: WallMountedCompactFanModel.tsx::useFrame_callback
-- **params**: `state` — useFrame tarafından sağlanan frame durum bilgisi, `delta` — son frame ile geçen süre (saniye cinsinden)
-- **ic_degiskenler**:
-  - `fanRef.current` — okunuyor; fan referansının geçerli olup olmadığı kontrol edilir (null kontrolü)
-- **Dönüş**: yok — yan etki: `fanRef.current.rotation.z` değerini `delta * 15` kadar azaltarak pervaneyi döndürür
-
----
-
-### [N3_NASIL] AST Pointer: WallMountedCompactFanModel.tsx::useMemo_callback
-- **params**: () — parametre yok
-- **ic_degiskenler**:
-  - `shape` — `new Shape()` ile oluşturulan 2D şekil; montaj plakasının dış konturunu ve deliklerini tanımlar
-  - `holeRadius` — `0.03`; köşe montaj deliklerinin yarıçapı
-  - `holeOffset` — `0.42`; köşe montaj deliklerinin merkezden uzaklığı
-  - `corners` — 4 elemanlı dizi; her biri `[x, y]` koordinat çifti, dört köşedeki montaj deliği pozisyonlarını tutar: `[0.42, 0.42]`, `[-0.42, 0.42]`, `[0.42, -0.42]`, `[-0.42, -0.42]`
-  - `hole` — forEach içinde `new Path()` ile oluşturulan her montaj deliği yolu; `absarc` ile dairesel delik tanımlanır
-  - `centerHole` — `new Path()` ile oluşturulan merkez delik yolu; `absarc(0, 0, 0.42, ...)` ile tanımlanır, pervane millerinin geçeceği büyük delik
-- **Dönüş**: `ExtrudeGeometry` — `{ depth: 0.02, bevelEnabled: false }` parametreleriyle oluşturulmuş extrude edilmiş 3D geometri nesnesi
-
----
-
-### [N4_NASIL] AST Pointer: WallMountedCompactFanModel.tsx::forEach_mounting_hole_callback
-- **params**: `[x, y]` — destructured dizi; `corners` dizisinden gelen montaj deliği koordinatları
-- **ic_degiskenler**:
-  - `hole` — `new Path()` ile oluşturulan delik yolu nesnesi; `shape.holes` dizisine push edilerek plaka geometrisine delik eklenir
-- **Dönüş**: yok — yan etki: `shape.holes.push(hole)` ile shape nesnesine delik ekler
 
 ---
 

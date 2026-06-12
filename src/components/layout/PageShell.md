@@ -7,7 +7,7 @@ skeleton_hash: 7ca98b70fc84e47d
 entity_hashes:
   overview: 09c986d2dcf8a577
   style_tokens: f9c95184ddfe4989
-generated_at: 2026-05-28T22:36:18Z
+generated_at: 2026-06-12T10:19:17Z
 ---
 
 ## Genel Bakış
@@ -15,7 +15,19 @@ Bu modül, uygulama sayfalarının düzenini tutarlı ve modüler bir şekilde y
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, saf bir sunum katmanı bileşeni olup, harici servisler veya durum yönetimi ile etkileşime girmez. Varsayımlar, prop-to-style eşleme tutarlılığına odaklanır.
+
+[Aksiyom 1]: Eğer `widthStyles` nesnesi, `width` prop'unun tüm olası değerleri (`'contained'`, `'wide'`, `'full'`) için eşleme içermiyorsa, ilgili genişlik stili uygulanmaz ve bileşen varsayılan/stilless bir `<section>` olarak render edilir.
+
+[Aksiyom 2]: Eğer `spacingStyles` nesnesi, `spacing` prop'unun tüm olası değerleri (`'none'`, `'sm'`, `'md'`, `'lg'`) için eşleme içermiyorsa, ilgili boşluk stili uygulanmaz ve bileşen varsayılan/stilless bir `<section>` olarak render edilir.
+
+[Aksiyom 3]: Eğer `children` prop'u sağlanmıyorsa, bileşen geçerli ancak içeriği boş bir `<section>` elemanı render eder; hata fırlatmaz.
+
+[Aksiyom 4]: Eğer `width` veya `spacing` prop'u `undefined` olarak bırakılıyorsa (opsiyonel oldukları için), bileşen ilgili stil maping'ine başvurmaz ve yalnızca varsayılan (sıfır) genişlik/boşluk stiliyle render edilir.
+
+[Aksiyom 5]: Eğer `forwardRef` ile iletilen `ref`, bir DOM düğümüne (`<section>`) yönlendirilmiyorsa (örn. string ref veya callback ref yanlış kullanılıyorsa), React uyarı fırlatır ancak bileşen yine de render edilir.
 
 ---
 

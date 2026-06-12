@@ -9,7 +9,7 @@ entity_hashes:
   func:generateStaticParams: 6d1b3e72f8b2da9f
   overview: 8dff6fca298bde81
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:58:05Z
+generated_at: 2026-06-12T10:17:31Z
 ---
 
 ## Genel Bakış
@@ -26,7 +26,41 @@ Bu grup, dil parametresine göre sayfa içeriğini JSX olarak üretir ve kullan�
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, Next.js App Router yapısında çoklu dil destekli "Hakkında" sayfasını yöneten bir sayfa bileşenidir. Aşağıdaki varsayımlar fonksiyon imzalarından çıkarılmıştır.
+
+---
+
+**[Aksiyom 1]**: Eğer `Page` fonksiyonuna geçirilen `params` nesnesi `lang` alanı içermiyorsa, sayfa içeriği istenen dilde render edilemez.
+
+> Next.js App Router'da `[lang]` bir dinamik rotadır ve `params.lang` zorunlu olarak beslenmelidir.
+
+---
+
+**[Aksiyom 2]**: Eğer `generateStaticParams()` fonksiyonu boş bir dizi döndürüyorsa, hiçbir dil için statik sayfa önceden oluşturulamaz ve istek üzerine (on-demand) render edilmesi gerekir.
+
+> Fonksiyon, desteklenen dil kodlarının listesini döndürerek hangi varyantların build aşamasında oluşturulacağını belirler.
+
+---
+
+**[Aksiyom 3]**: Eğer `generateStaticParams()` tarafından döndürülen dil kodları ile `Page` fonksiyonunun beklediği `params.lang` değerleri tutarsızsa, geçersiz bir rotaya erişim denenir ve hata oluşur.
+
+> Örneğin, `generateStaticParams` yalnızca `["tr", "en"]` döndürüyor ama runtime'da `params.lang === "de"` isteği geliyorsa, bu geçersizdir.
+
+---
+
+**[Aksiyom 4]**: Eğer `Page` bileşeni `params` parametresi olmadan (veya `params.lang` alanına erişilmeden) çağrılırsa, bileşen düzgün render edilemez.
+
+> Fonksiyon imzası `Page({ params }: PageProps)` şeklindedir; `params` bağımlılığı zorunludur.
+
+---
+
+**[Aksiyom 5]**: Eğer bu modül bir "Hakkında" sayfasıysa ve `generateStaticParams` desteklenen dilleri dış kaynaktan (ör. yapılandırma dosyası, API) alıyorsa, o kaynağın erişilebilir ve tutarlı olması gerekir; aksi halde build aşamasında hata oluşur.
+
+> Bu modülde `generateStaticParams` gövdesi verilmediği için kaynağın doğası bilinmemektedir, ancak herhangi bir dış bağımlılık varsa erişilebilir olmalıdır.
+
+---
 
 ---
 

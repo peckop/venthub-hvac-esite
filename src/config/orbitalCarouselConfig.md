@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\config\orbitalCarouselConfig.ts
 skeleton_hash: a8316a8cfcf9cfd2
 entity_hashes:
   overview: eca02fed19b4de2a
-generated_at: 2026-05-28T22:37:25Z
+generated_at: 2026-06-12T10:23:05Z
 ---
 
 ## Genel Bakış
@@ -14,7 +14,17 @@ Bu modül, VentHub HVAC projesindeki orbital karousel (döner taşıyıcı) bile
 
 ---
 
+## AXIOMS – Mimari Varsayımlar
 
+Bu modül, saf bir yapılandırma verisi deposu olarak tasarlanmıştır; herhangi bir işlev (fonksiyon), ortam değişkeni okuması veya dış API sorgusu içermemektedir.
+
+[Aksiyom 1]: Eğer `ORBITAL_CAROUSEL_CONFIG` nesnesi tanımlı ve dışa aktarılabilir (exportable) değilse, bu yapılandırmaya bağımlı olan tüm modüllerin derleme zamanı hata alması olur.
+
+[Aksiyom 2]: Eğer `OrbitalCarouselConfig` type alias'ı, `ORBITAL_CAROUSEL_CONFIG` nesnesinin gerçek yapısıyla (typeof) eşleşmiyor veya bu eşleşme bozulursa, TypeScript derleyicisi tip uyumsuzluk hatası verir olur.
+
+[Aksiyom 3]: Eğer modül çalıştırma zamanında (runtime) herhangi bir dış bağımlılık (import) gerektiriyorsa — ki mevcut tasarıma göre gerektirmemektedir — bu bağımlılığın sağlanamaması durumunda modülün kullanılabilirliği ortadan kalkar olur.
+
+> **Not:** Bu modülde herhangi bir fonksiyon gövdesi, koşul dalı (branch), döngü veya mantıksal iş mantığı bulunmadığından, fonksiyonel aksiyom üretimi için girdi mevcut değildir. Yukarıdaki varsayımlar, modülün var olma ve dışa aktarım (export) mekanizmasına yöneliktir.
 
 ---
 

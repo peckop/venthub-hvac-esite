@@ -9,7 +9,7 @@ entity_hashes:
   func:handleClick: bffc3b12eebc550c
   overview: 8878452264c689a5
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-10T09:53:26Z
+generated_at: 2026-06-12T10:22:31Z
 ---
 
 ## Genel Bakış
@@ -26,7 +26,10 @@ Bükülmüş düzlem geometrisini Three.js sahasında oluşturup render eden ana
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
