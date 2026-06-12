@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-12T10:24:41.182660+00:00
+compiled_at: 2026-06-12T10:45:34.762172+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-12T10:24:41.182660+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-12T10:45:34.762172+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -82,8 +82,8 @@ Bu belge, otonom derleyici tarafından 2026-06-12T10:24:41.182660+00:00 tarihind
 │   └── ⚪ `README.md`
 ├── ⚠️ `next.config.md`
 ├── ✅ `sentry.client.config.ts`
-├── ❌ `sentry.edge.config.ts`
-├── ❌ `sentry.server.config.ts`
+├── ✅ `sentry.edge.config.ts`
+├── ✅ `sentry.server.config.ts`
 ├── 📂 **src/**
 │   ├── 📂 **actions/**
 │   ├── 📂 **app/**
@@ -684,8 +684,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T10:24:41.182660+00:00 tarihind
 ```
 
 ## Eksik Dokümantasyonlar
-- [ ] `sentry.edge.config.ts`
-- [ ] `sentry.server.config.ts`
+Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
