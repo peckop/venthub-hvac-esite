@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-12T06:30:05.834507+00:00
+compiled_at: 2026-06-12T07:13:16.532016+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-12T06:30:05.834507+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-12T07:13:16.532016+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -23,7 +23,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T06:30:05.834507+00:00 tarihind
 ├── ⚪ `RECOMMENDATIONS.md`
 ├── ⚠️ `TEST_INFRA.md`
 ├── ⚠️ `TEST_READY.md`
-├── ⚠️ `VISION.md`
+├── ⚪ `VISION.md`
 ├── 📂 **cache/**
 ├── 📂 **docs/**
 │   ├── 📂 **archive/**
@@ -692,7 +692,6 @@ Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `
 - [⚠️] `PROJECT.md`
 - [⚠️] `TEST_INFRA.md`
 - [⚠️] `TEST_READY.md`
-- [⚠️] `VISION.md`
 - [⚠️] `explorer_m2_3\analysis.md`
 - [⚠️] `implementation_plan.md`
 - [⚠️] `next.config.md`
