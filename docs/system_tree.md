@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-11T09:27:37.835343+00:00
+compiled_at: 2026-06-12T06:30:05.834507+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-11T09:27:37.835343+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-12T06:30:05.834507+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -42,7 +42,8 @@ Bu belge, otonom derleyici tarafından 2026-06-11T09:27:37.835343+00:00 tarihind
 │   │   ├── ⚪ `plan-and-tasklist.md`
 │   │   └── ⚪ `project_state_and_skills_audit.md`
 │   ├── 📂 **audits/**
-│   │   └── ⚪ `admin-panel-audit-2026-06-11.md`
+│   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
+│   │   └── ⚪ `dealer-data-ground-truth-2026-06-11.md`
 │   ├── ⚪ `database_schema_master.md`
 │   ├── ⚪ `design_system_config.md`
 │   ├── ⚪ `lighthouse_diagnostic_2026-06-10.md`
@@ -57,6 +58,12 @@ Bu belge, otonom derleyici tarafından 2026-06-11T09:27:37.835343+00:00 tarihind
 │   │       └── ⚪ `row-level-security.md`
 │   ├── 📂 **screenshots/**
 │   │   └── ⚪ `README.md`
+│   ├── 📂 **standards/**
+│   │   ├── ⚪ `SOURCES.md`
+│   │   ├── ⚪ `admin-capabilities.md`
+│   │   ├── ⚪ `admin-standard.md`
+│   │   ├── ⚪ `dealer-module-blueprint.md`
+│   │   └── ⚪ `dealer-network-standard.md`
 │   ├── ⚪ `supabase_functions_master.md`
 │   ├── ⚪ `system_tree.md`
 │   ├── ⚪ `venthub_hvac_master.md`
@@ -349,7 +356,7 @@ Bu belge, otonom derleyici tarafından 2026-06-11T09:27:37.835343+00:00 tarihind
 │   │   │   ├── ✅ `CategoryHubOverlay.tsx`
 │   │   │   ├── ✅ `CategorySpotlightScene.tsx`
 │   │   │   ├── ❌ `EliteMegaMenu.tsx`
-│   │   │   ├── ✅ `MegaMenu3DBackground.tsx`
+│   │   │   ├── ❌ `MegaMenu3DBackground.tsx`
 │   │   │   ├── ✅ `NavActionButton.tsx`
 │   │   │   ├── ✅ `NavBrand.tsx`
 │   │   │   ├── ✅ `NavPrimaryRail.tsx`
@@ -409,7 +416,7 @@ Bu belge, otonom derleyici tarafından 2026-06-11T09:27:37.835343+00:00 tarihind
 │   │   │   ├── ✅ `Category3DIcon.tsx`
 │   │   │   ├── ✅ `CategoryOrbitCarousel.tsx`
 │   │   │   ├── ✅ `InfiniteProductsShowcase.tsx`
-│   │   │   ├── ❌ `OrbitalProductsShowcase.tsx`
+│   │   │   ├── ✅ `OrbitalProductsShowcase.tsx`
 │   │   │   ├── ✅ `ProductsHero.tsx`
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
@@ -628,6 +635,8 @@ Bu belge, otonom derleyici tarafından 2026-06-11T09:27:37.835343+00:00 tarihind
 │           ├── ✅ `ShippingPage.tsx`
 │           └── ✅ `WarrantyPage.tsx`
 ├── 📂 **supabase/**
+│   ├── 📂 **baselines/**
+│   │   └── ⚪ `README.md`
 │   ├── 📂 **functions/**
 │   │   ├── 📂 **_shared/**
 │   │   │   ├── ✅ `cors.ts`
@@ -699,6 +708,7 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\components\TiltCard.md`
 - [❌] `src\components\layout\PageShell.md`
 - [❌] `src\components\navigation\EliteMegaMenu.md`
+- [❌] `src\components\navigation\MegaMenu3DBackground.md`
 - [❌] `src\components\products\3d\factory\Assembler.md`
 - [❌] `src\components\products\3d\factory\parts\InternalFanRotor.md`
 - [❌] `src\components\products\3d\materials\useFanMaterials.md`
@@ -709,7 +719,6 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\components\products\3d\types\WallMountedCompactFanModel.md`
 - [❌] `src\components\products\BentPlaneGeometry.md`
 - [❌] `src\components\products\BlueprintCanvas.md`
-- [❌] `src\components\products\OrbitalProductsShowcase.md`
 - [❌] `src\config\orbitalCarouselConfig.md`
 - [❌] `src\data\brands.md`
 - [❌] `src\design-system\tokens.md`
@@ -724,6 +733,7 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\components\TiltCard.md`
 - [❌] `src\components\layout\PageShell.md`
 - [❌] `src\components\navigation\EliteMegaMenu.md`
+- [❌] `src\components\navigation\MegaMenu3DBackground.md`
 - [❌] `src\components\products\3d\factory\Assembler.md`
 - [❌] `src\components\products\3d\factory\parts\InternalFanRotor.md`
 - [❌] `src\components\products\3d\materials\useFanMaterials.md`
@@ -734,7 +744,6 @@ Aşağıdaki `.md` dosyalarında '5N1K' veya 'AXIOM' yapıları eksik. Enterpris
 - [❌] `src\components\products\3d\types\WallMountedCompactFanModel.md`
 - [❌] `src\components\products\BentPlaneGeometry.md`
 - [❌] `src\components\products\BlueprintCanvas.md`
-- [❌] `src\components\products\OrbitalProductsShowcase.md`
 - [❌] `src\config\orbitalCarouselConfig.md`
 - [❌] `src\data\brands.md`
 - [❌] `src\design-system\tokens.md`
