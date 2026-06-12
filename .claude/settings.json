@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/protect-config.cjs",
+            "statusMessage": "config-protection"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/accumulate-edits.cjs"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/verify-on-stop.cjs",
+            "async": true,
+            "timeout": 120,
+            "statusMessage": "verify (eslint --fix + tsc)"
+          }
+        ]
+      }
+    ]
+  }
+}
