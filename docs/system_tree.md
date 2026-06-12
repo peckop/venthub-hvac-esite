@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-12T07:13:16.532016+00:00
+compiled_at: 2026-06-12T09:21:11.235761+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-12T07:13:16.532016+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-12T09:21:11.235761+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -26,6 +26,8 @@ Bu belge, otonom derleyici tarafından 2026-06-12T07:13:16.532016+00:00 tarihind
 ├── ⚪ `VISION.md`
 ├── 📂 **cache/**
 ├── 📂 **docs/**
+│   ├── ⚪ `DURUM-TAKIP.md`
+│   ├── ⚪ `README.md`
 │   ├── 📂 **archive/**
 │   │   ├── ⚪ `014-kategori-ssr-plan.md`
 │   │   ├── ⚪ `JULES_PROMPT.md`
@@ -43,19 +45,24 @@ Bu belge, otonom derleyici tarafından 2026-06-12T07:13:16.532016+00:00 tarihind
 │   │   └── ⚪ `project_state_and_skills_audit.md`
 │   ├── 📂 **audits/**
 │   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
-│   │   └── ⚪ `dealer-data-ground-truth-2026-06-11.md`
+│   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
+│   │   └── ⚪ `lighthouse_diagnostic_2026-06-10.md`
 │   ├── ⚪ `database_schema_master.md`
 │   ├── ⚪ `design_system_config.md`
-│   ├── ⚪ `lighthouse_diagnostic_2026-06-10.md`
+│   ├── 📂 **plans/**
+│   │   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
+│   │   ├── ⚪ `venthub_saas_faz1_prompt.md`
+│   │   └── ⚪ `venthub_saas_master_roadmap.md`
 │   ├── 📂 **products/**
 │   │   ├── ⚪ `AIR_DOOR_AD_900_MASTER.md`
 │   │   └── ⚪ `AIR_DOOR_AD_900_SEO.md`
 │   ├── 📂 **reference/**
-│   │   └── 📂 **supabase/**
-│   │       ├── ⚪ `auth-hooks.md`
-│   │       ├── ⚪ `custom-claims-and-role-based-access-control-rbac.md`
-│   │       ├── ⚪ `realtime-authorization.md`
-│   │       └── ⚪ `row-level-security.md`
+│   │   ├── 📂 **supabase/**
+│   │   │   ├── ⚪ `auth-hooks.md`
+│   │   │   ├── ⚪ `custom-claims-and-role-based-access-control-rbac.md`
+│   │   │   ├── ⚪ `realtime-authorization.md`
+│   │   │   └── ⚪ `row-level-security.md`
+│   │   └── ⚪ `vortice_catalogs.md`
 │   ├── 📂 **screenshots/**
 │   │   └── ⚪ `README.md`
 │   ├── 📂 **standards/**
@@ -67,11 +74,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T07:13:16.532016+00:00 tarihind
 │   ├── ⚪ `supabase_functions_master.md`
 │   ├── ⚪ `system_tree.md`
 │   ├── ⚪ `venthub_hvac_master.md`
-│   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
-│   ├── ⚪ `venthub_saas_faz1_prompt.md`
-│   ├── ⚪ `venthub_saas_master_roadmap.md`
-│   ├── ⚪ `venthub_skills_master.md`
-│   └── ⚪ `vortice_catalogs.md`
+│   └── ⚪ `venthub_skills_master.md`
 ├── 📂 **explorer_m2_3/**
 │   └── ⚠️ `analysis.md`
 ├── ⚠️ `implementation_plan.md`
