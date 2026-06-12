@@ -1,11 +1,11 @@
 # Veritabani Semasi — venthub-hvac
 
 ---
-compiled_at: 2026-06-06T09:33:02.942142+00:00
-tables: 28
-policies: 132
-functions: 55
-indexes: 47
+compiled_at: 2026-06-12T06:47:37.276229+00:00
+tables: 38
+policies: 12
+functions: 38
+indexes: 78
 ---
 
 ## 1. TABLOLAR
@@ -14,7687 +14,2547 @@ indexes: 47
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| at | timestamptz NOT NULL |
-| actor | uuid NULL |
+| id | uuid |
+| at | timestamp with time zone |
+| actor | uuid |
 | table_name | text |
-| row_pk | text NULL |
+| row_pk | text |
 | action | text |
-| before | jsonb NULL |
-| after | jsonb NULL |
-| comment | text NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| before | jsonb |
+| after | jsonb |
+| comment | text |
+| tenant_id | uuid |
 
-### admin_audit_log
+### cart_items
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| at | timestamptz NOT NULL |
-| actor | uuid NULL |
-| table_name | text |
-| row_pk | text NULL |
-| action | text |
-| before | jsonb NULL |
-| after | jsonb NULL |
-| comment | text NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| id | uuid |
+| cart_id | uuid |
+| product_id | uuid |
+| quantity | integer |
+| unit_price | numeric(10,2) |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| price_list_id | uuid |
+| tenant_id | uuid |
+
+**Constraint'ler:**
+- `CONSTRAINT cart_items_quantity_check CHECK ((quantity > 0))`
+
+### categories
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| name | text |
+| slug | text |
+| parent_id | uuid |
+| level | integer |
+| description | text |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| image_url | text |
+| seo_title | text |
+| seo_desc | text |
+| is_featured | boolean |
+| sort_order | integer |
+| metadata | jsonb |
+| is_active | boolean |
+| authority_content | jsonb |
+| menu_label | text |
+| marketing_title | text |
+| translation_key | text |
+| display_mode | text |
+
+### category_mapping_rules
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| priority | integer |
+| brand_filter | text |
+| name_pattern | text |
+| exclude_pattern | text |
+| spec_conditions | jsonb |
+| target_subcategory_id | uuid |
+| description | text |
+| created_at | timestamp with time zone |
 
 ### client_errors
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| at | timestamptz NOT NULL |
-| url | text NULL |
+| id | uuid |
+| at | timestamp with time zone |
+| url | text |
 | message | text |
-| stack | text NULL |
-| user_agent | text NULL |
-| release | text NULL |
-| env | text NULL |
-| level | text NOT NULL |
-| extra | jsonb NULL |
+| stack | text |
+| user_agent | text |
+| release | text |
+| env | text |
+| level | text |
+| extra | jsonb |
+| group_id | uuid |
 
 ### contact_messages
 
 | Sutun | Tip |
 |-------|-----|
-| id | UUID |
-| name | TEXT |
-| email | TEXT |
-| phone | TEXT |
-| company | TEXT |
-| subject | TEXT |
-| message | TEXT |
-| department | contact_department NOT NULL |
-| status | contact_status NOT NULL |
-| created_at | TIMESTAMPTZ |
-| ip_address | TEXT -- Security auditing |
+| id | uuid |
+| name | text |
+| email | text |
+| phone | text |
+| company | text |
+| subject | text |
+| message | text |
+| department | public.contact_department |
+| status | public.contact_status |
+| created_at | timestamp with time zone |
+| ip_address | text |
 
 ### coupons
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| code | text UNIQUE NOT NULL CHECK (length(code) >= 3 AND length(code) <= 50) |
+| id | uuid |
+| code | text |
 | description | text |
-| discount_type | text NOT NULL CHECK (discount_type IN ('percentage','fixed_amount')) |
-| discount_value | decimal(10,2) NOT NULL CHECK (discount_value > 0) |
-| minimum_order_amount | decimal(10,2) |
-| usage_limit | integer CHECK (usage_limit IS NULL OR usage_limit > 0) |
+| discount_type | text |
+| discount_value | numeric(10,2) |
+| minimum_order_amount | numeric(10,2) |
+| usage_limit | integer |
 | used_count | integer |
 | is_active | boolean |
-| valid_from | timestamptz |
-| valid_until | timestamptz |
-| created_at | timestamptz |
-| updated_at | timestamptz |
+| valid_from | timestamp with time zone |
+| valid_until | timestamp with time zone |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
 | created_by | uuid |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| tenant_id | uuid |
 
 **Constraint'ler:**
-- `CONSTRAINT valid_date_range CHECK (valid_until IS NULL OR valid_until > valid_from)`
-- `CONSTRAINT usage_limit_check CHECK (usage_limit IS NULL OR used_count <= usage_limit)`
-
-### coupons
-
-| Sutun | Tip |
-|-------|-----|
-| id | uuid PRIMARY KEY |
-| code | text NOT NULL UNIQUE |
-| type | text NOT NULL CHECK (type IN ('percent','fixed')) |
-| value | numeric(12,2) |
-| starts_at | timestamptz NULL |
-| ends_at | timestamptz NULL |
-| active | boolean NOT NULL |
-| usage_limit | int NULL |
-| used_count | int NOT NULL |
-| created_at | timestamptz NOT NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+- `CONSTRAINT coupons_code_check CHECK (((length(code) >= 3) AND (length(code) <= 50)))`
+- `CONSTRAINT coupons_discount_type_check CHECK ((discount_type = ANY (ARRAY['percentage'::text, 'fixed_amount'::text])))`
+- `CONSTRAINT coupons_discount_value_check CHECK ((discount_value > (0)::numeric))`
+- `CONSTRAINT coupons_minimum_order_amount_check CHECK ((minimum_order_amount >= (0)::numeric))`
+- `CONSTRAINT coupons_usage_limit_check CHECK (((usage_limit IS NULL) OR (usage_limit > 0)))`
+- `CONSTRAINT coupons_used_count_check CHECK ((used_count >= 0))`
+- `CONSTRAINT usage_limit_check CHECK (((usage_limit IS NULL) OR (used_count <= usage_limit)))`
+- `CONSTRAINT valid_date_range CHECK (((valid_until IS NULL) OR (valid_until > valid_from)))`
 
 ### error_groups
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| signature | text UNIQUE |
-| level | text NOT NULL |
-| last_message | text NULL |
-| url_sample | text NULL |
-| env | text NULL |
-| release | text NULL |
-| first_seen | timestamptz NOT NULL |
-| last_seen | timestamptz NOT NULL |
-| count | bigint NOT NULL |
-| status | text NOT NULL |
-| assigned_to | uuid NULL |
-| notes | text NULL |
+| id | uuid |
+| signature | text |
+| level | text |
+| last_message | text |
+| url_sample | text |
+| env | text |
+| release | text |
+| first_seen | timestamp with time zone |
+| last_seen | timestamp with time zone |
+| count | bigint |
+| status | text |
+| assigned_to | uuid |
+| notes | text |
 
 ### inventory_movements
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| product_id | uuid NOT NULL |
-| order_id | uuid NULL |
+| id | uuid |
+| product_id | uuid |
+| order_id | uuid |
 | delta | integer |
-| reason | text NOT NULL CHECK (char_length(reason) BETWEEN 3 AND 32) |
-| created_at | timestamptz NOT NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| reason | text |
+| created_at | timestamp with time zone |
+| batch_id | uuid |
+| original_movement_id | uuid |
+| reversed_by_movement_id | uuid |
+| undo_by_user_id | uuid |
+| undo_at | timestamp with time zone |
+| tenant_id | uuid |
 
-### inventory_movements
-
-| Sutun | Tip |
-|-------|-----|
-| id | uuid PRIMARY KEY |
-| product_id | uuid NOT NULL |
-| order_id | uuid NULL |
-| delta | integer |
-| reason | text NOT NULL CHECK (char_length(reason) BETWEEN 3 AND 32) |
-| created_at | timestamptz NOT NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+**Constraint'ler:**
+- `CONSTRAINT inventory_movements_reason_check CHECK (((char_length(reason) >= 3) AND (char_length(reason) <= 32)))`
 
 ### inventory_settings
 
 | Sutun | Tip |
 |-------|-----|
-| id | boolean PRIMARY KEY |
-| default_low_stock_threshold | integer NOT NULL |
-| updated_at | timestamptz NOT NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| id | boolean |
+| default_low_stock_threshold | integer |
+| updated_at | timestamp with time zone |
+| alert_email | text |
+| alert_webhook_url | text |
+| reservation_timeout_hours | integer |
+| tenant_id | uuid |
 
 ### order_attachments
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| order_id | uuid NOT NULL |
-| filename | text NOT NULL CHECK (length(filename) >= 1) |
+| id | uuid |
+| order_id | uuid |
+| filename | text |
 | file_path | text |
-| file_size | bigint CHECK (file_size > 0) |
+| file_size | bigint |
 | mime_type | text |
 | description | text |
 | is_internal | boolean |
-| created_at | timestamptz |
+| created_at | timestamp with time zone |
 | created_by | uuid |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| tenant_id | uuid |
 
-### order_attachments
+**Constraint'ler:**
+- `CONSTRAINT order_attachments_file_size_check CHECK ((file_size > 0))`
+- `CONSTRAINT order_attachments_filename_check CHECK ((length(filename) >= 1))`
+
+### order_email_events
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| order_id | uuid NOT NULL |
-| url | text |
-| filename | text NULL |
-| created_at | timestamptz NOT NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| id | uuid |
+| order_id | uuid |
+| email_to | text |
+| subject | text |
+| provider | text |
+| provider_message_id | text |
+| created_at | timestamp with time zone |
 
 ### order_notes
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| order_id | uuid NOT NULL |
-| note | text NOT NULL CHECK (length(note) >= 1) |
-| is_internal | boolean |
-| created_at | timestamptz |
-| created_by | uuid |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
-### order_notes
-
-| Sutun | Tip |
-|-------|-----|
-| id | uuid PRIMARY KEY |
-| order_id | uuid NOT NULL |
-| user_id | uuid NULL |
+| id | uuid |
+| order_id | uuid |
+| user_id | uuid |
 | note | text |
-| created_at | timestamptz NOT NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| is_internal | boolean |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| tenant_id | uuid |
+
+**Constraint'ler:**
+- `CONSTRAINT order_notes_note_check CHECK ((length(note) >= 1))`
 
 ### order_refund_events
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
+| id | uuid |
 | order_id | uuid |
 | amount | numeric(12,2) |
-| reason | text NULL |
-| actor_user_id | uuid NULL |
-| created_at | timestamptz NOT NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| reason | text |
+| actor_user_id | uuid |
+| created_at | timestamp with time zone |
+| tenant_id | uuid |
+
+### organizations
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| name | character varying(255) |
+| tier_level | integer |
+| is_active | boolean |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+
+### payment_transactions
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| transaction_id | text |
+| order_id | uuid |
+| user_id | uuid |
+| amount | numeric(10,2) |
+| currency | text |
+| status | text |
+| payment_method | text |
+| provider_response | jsonb |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+
+**Constraint'ler:**
+- `CONSTRAINT payment_transactions_status_check CHECK ((status = ANY (ARRAY['pending'::text, 'success'::text, 'failed'::text, 'cancelled'::text])))`
+
+### price_lists
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| name | character varying(255) |
+| description | text |
+| user_type | character varying(50) |
+| is_active | boolean |
+| effective_from | timestamp with time zone |
+| effective_to | timestamp with time zone |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| tenant_id | uuid |
+
+### product_authorities
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| product_id | uuid |
+| expert_name | text |
+| expert_title | text |
+| expert_avatar_url | text |
+| content | text |
+| badge_text | text |
+| rating | integer |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+
+**Constraint'ler:**
+- `CONSTRAINT product_authorities_rating_check CHECK (((rating >= 1) AND (rating <= 5)))`
 
 ### product_images
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid primary key |
-| product_id | uuid not null |
+| id | uuid |
+| product_id | uuid |
 | path | text |
-| alt | text null |
-| sort_order | int not null |
-| created_at | timestamptz not null |
+| alt | text |
+| sort_order | integer |
+| created_at | timestamp with time zone |
+
+### product_prices
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| product_id | uuid |
+| price_list_id | uuid |
+| base_price | numeric(10,2) |
+| sale_price | numeric(10,2) |
+| discount_percentage | numeric(5,2) |
+| is_active | boolean |
+| valid_from | timestamp with time zone |
+| valid_until | timestamp with time zone |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| tenant_id | uuid |
+
+### products
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| name | text |
+| brand | text |
+| price | numeric(10,2) |
+| sku | text |
+| category_id | uuid |
+| subcategory_id | uuid |
+| status | text |
+| is_featured | boolean |
+| description | text |
+| technical_specs | jsonb |
+| image_url | text |
+| stock_qty | integer |
+| low_stock_threshold | integer |
+| airflow_capacity | numeric(10,2) |
+| noise_level | numeric(5,2) |
+| pressure_rating | numeric(10,2) |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| low_stock_override | boolean |
+| purchase_price | numeric(12,2) |
+| slug | text |
+| meta_title | text |
+| meta_description | text |
+| model_code | text |
+| warehouse_location | text |
+| supplier_name | text |
+| is_category_manual | boolean |
+
+**Constraint'ler:**
+- `CONSTRAINT products_status_check CHECK ((status = ANY (ARRAY['active'::text, 'inactive'::text, 'out_of_stock'::text])))`
+
+### project_items
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| project_id | uuid |
+| product_id | uuid |
+| quantity | integer |
+| notes | text |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+
+**Constraint'ler:**
+- `CONSTRAINT project_items_quantity_check CHECK ((quantity > 0))`
 
 ### rate_limits
 
 | Sutun | Tip |
 |-------|-----|
 | key | text |
-| bucket | timestamptz |
-| count | integer not null |
-
-**Constraint'ler:**
-- `constraint rate_limits_pkey primary key (key, bucket)`
+| bucket | timestamp with time zone |
+| count | integer |
 
 ### returns_webhook_events
 
 | Sutun | Tip |
 |-------|-----|
-| id | bigserial |
-| event_id | text NOT NULL UNIQUE |
-| return_id | uuid NULL |
-| order_id | uuid NULL |
-| carrier | text NULL |
-| tracking_number | text NULL |
-| status_raw | text NULL |
-| status_mapped | text NULL |
+| id | bigint |
+| event_id | text |
+| return_id | uuid |
+| order_id | uuid |
+| carrier | text |
+| tracking_number | text |
+| status_raw | text |
+| status_mapped | text |
 | body_hash | text |
-| received_at | timestamptz NOT NULL |
-| processed_at | timestamptz NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| received_at | timestamp with time zone |
+| processed_at | timestamp with time zone |
+| tenant_id | uuid |
 
 ### shipping_email_events
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| order_id | uuid NULL |
+| id | uuid |
+| order_id | uuid |
 | email_to | text |
 | subject | text |
 | provider | text |
-| provider_message_id | text NULL |
-| carrier | text NULL |
-| tracking_number | text NULL |
-| created_at | timestamptz NOT NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| provider_message_id | text |
+| carrier | text |
+| tracking_number | text |
+| created_at | timestamp with time zone |
+| tenant_id | uuid |
 
 ### shipping_idempotency
 
 | Sutun | Tip |
 |-------|-----|
 | key | text |
-| scope | text not null |
-| created_at | timestamptz not null |
+| scope | text |
+| created_at | timestamp with time zone |
 
 ### shipping_webhook_events
 
 | Sutun | Tip |
 |-------|-----|
-| id | bigserial |
-| event_id | text not null unique |
-| order_id | uuid null |
-| order_number | text null |
-| carrier | text null |
-| status_raw | text null |
-| status_mapped | text null |
+| id | bigint |
+| event_id | text |
+| order_id | uuid |
+| order_number | text |
+| carrier | text |
+| status_raw | text |
+| status_mapped | text |
 | body_hash | text |
-| received_at | timestamptz not null |
-| processed_at | timestamptz null |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| received_at | timestamp with time zone |
+| processed_at | timestamp with time zone |
+| tenant_id | uuid |
+
+### shopping_carts
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| user_id | uuid |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| tenant_id | uuid |
+
+### site_settings
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| key | text |
+| value | jsonb |
+| description | text |
+| updated_at | timestamp with time zone |
+| updated_by | uuid |
 
 ### tenants
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid PRIMARY KEY |
-| name | text UNIQUE NOT NULL |
-| subdomain | text UNIQUE |
-| custom_domain | text UNIQUE |
-| is_active | boolean NOT NULL DEFAULT true |
-| created_at | timestamptz NOT NULL DEFAULT now() |
-| features | jsonb NOT NULL DEFAULT '{}' |
-| styles | jsonb NOT NULL DEFAULT '{}' |
-| config | jsonb NOT NULL DEFAULT '{}' |
-| theme_config | jsonb NOT NULL DEFAULT '{}' |
-
-### tenants
-
-| Sutun | Tip |
-|-------|-----|
-| id | uuid PRIMARY KEY |
-| name | text UNIQUE NOT NULL |
-| subdomain | text UNIQUE |
-| custom_domain | text UNIQUE |
-| is_active | boolean NOT NULL DEFAULT true |
-| created_at | timestamptz NOT NULL DEFAULT now() |
-| features | jsonb NOT NULL DEFAULT '{}' |
-| styles | jsonb NOT NULL DEFAULT '{}' |
-| config | jsonb NOT NULL DEFAULT '{}' |
-| theme_config | jsonb NOT NULL DEFAULT '{}' |
+| id | uuid |
+| name | text |
+| subdomain | text |
+| custom_domain | text |
+| is_active | boolean |
+| created_at | timestamp with time zone |
+| features | jsonb |
+| styles | jsonb |
+| config | jsonb |
+| theme_config | jsonb |
 
 ### user_addresses
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid primary key |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| id | uuid |
+| user_id | uuid |
+| address_line | text |
+| district | text |
+| city | text |
+| postal_code | text |
+| country | text |
+| address_type | text |
+| is_default | boolean |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| is_default_shipping | boolean |
+| is_default_billing | boolean |
+| label | text |
+| full_name | text |
+| phone | text |
+| full_address | text |
+| street_address | text |
+| tenant_id | uuid |
+
+**Constraint'ler:**
+- `CONSTRAINT user_addresses_address_type_check CHECK ((address_type = ANY (ARRAY['shipping'::text, 'billing'::text])))`
 
 ### user_invoice_profiles
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid primary key |
-| user_id | uuid not null |
-| type | text not null check (type in ('individual','corporate')) |
-| title | text |
-| tckn | text |
+| id | uuid |
+| user_id | uuid |
+| profile_type | text |
 | company_name | text |
-| vkn | text |
+| tax_number | text |
 | tax_office | text |
-| e_invoice | boolean |
+| first_name | text |
+| last_name | text |
+| address_line | text |
+| district | text |
+| city | text |
+| postal_code | text |
+| country | text |
 | is_default | boolean |
-| created_at | timestamptz not null |
-| updated_at | timestamptz not null |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| tenant_id | uuid |
+
+**Constraint'ler:**
+- `CONSTRAINT user_invoice_profiles_profile_type_check CHECK ((profile_type = ANY (ARRAY['individual'::text, 'corporate'::text])))`
 
 ### user_profiles
 
 | Sutun | Tip |
 |-------|-----|
-| id | UUID PRIMARY KEY |
-| role | VARCHAR(20) NOT NULL |
-| full_name | TEXT |
-| phone | TEXT |
-| created_at | TIMESTAMPTZ NOT NULL |
-| updated_at | TIMESTAMPTZ NOT NULL |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| id | uuid |
+| role | character varying(20) |
+| full_name | text |
+| phone | text |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| organization_id | uuid |
+| tenant_id | uuid |
+
+**Constraint'ler:**
+- `CONSTRAINT user_profiles_role_check CHECK (((role)::text = ANY ((ARRAY['super_admin'::character varying, 'admin'::character varying, 'warehouse'::character varying, 'sales'::character varying, 'viewer'::character varying, 'user'::character varying])::text[])))`
+
+### user_projects
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| user_id | uuid |
+| name | text |
+| description | text |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+
+### venthub_order_items
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| order_id | uuid |
+| product_id | uuid |
+| product_name | text |
+| product_sku | text |
+| product_brand | text |
+| unit_price | numeric(10,2) |
+| quantity | integer |
+| total_price | numeric(10,2) |
+| product_snapshot | jsonb |
+| created_at | timestamp with time zone |
+| price_at_time | numeric(10,2) |
+| product_image_url | text |
+| unit_price_snapshot | numeric(10,2) |
+| price_list_id_snapshot | uuid |
+| product_name_snapshot | text |
+| product_sku_snapshot | text |
+| tax_rate_snapshot | numeric |
+| tenant_id | uuid |
+
+### venthub_orders
+
+| Sutun | Tip |
+|-------|-----|
+| id | uuid |
+| order_number | text |
+| user_id | uuid |
+| status | text |
+| total_amount | numeric(10,2) |
+| shipping_method | text |
+| shipping_address | jsonb |
+| billing_address | jsonb |
+| invoice_profile | jsonb |
+| payment_method | text |
+| payment_status | text |
+| conversation_id | text |
+| shipping_carrier | text |
+| shipping_tracking_number | text |
+| shipped_at | timestamp with time zone |
+| delivered_at | timestamp with time zone |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| customer_name | text |
+| customer_email | text |
+| carrier | text |
+| tracking_url | text |
+| subtotal_snapshot | numeric(10,2) |
+| legal_consents | jsonb |
+| invoice_type | text |
+| invoice_info | jsonb |
+| payment_token | text |
+| customer_phone | text |
+| tracking_number | text |
+| payment_debug | jsonb |
+| coupon_code | text |
+| coupon_discount | numeric |
+| locale | text |
+| tenant_id | uuid |
+
+**Constraint'ler:**
+- `CONSTRAINT venthub_orders_coupon_discount_check CHECK ((coupon_discount >= (0)::numeric))`
+- `CONSTRAINT venthub_orders_payment_status_check CHECK ((payment_status = ANY (ARRAY['pending'::text, 'paid'::text, 'failed'::text, 'refunded'::text, 'partial_refunded'::text])))`
+- `CONSTRAINT venthub_orders_status_check CHECK ((status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'processing'::text, 'shipped'::text, 'delivered'::text, 'cancelled'::text])))`
 
 ### venthub_returns
 
 | Sutun | Tip |
 |-------|-----|
-| id | uuid primary key |
-| user_id | uuid not null |
-| order_id | text not null |
+| id | uuid |
+| user_id | uuid |
+| order_id | uuid |
+| status | text |
 | reason | text |
 | description | text |
-| status | text not null |
-| created_at | timestamptz not null |
-| updated_at | timestamptz not null |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| refund_amount | numeric(10,2) |
+| admin_notes | text |
+| requested_at | timestamp with time zone |
+| approved_at | timestamp with time zone |
+| processed_at | timestamp with time zone |
+| completed_at | timestamp with time zone |
+| created_at | timestamp with time zone |
+| updated_at | timestamp with time zone |
+| tenant_id | uuid |
+
+**Constraint'ler:**
+- `CONSTRAINT venthub_returns_status_check CHECK ((status = ANY (ARRAY['requested'::text, 'approved'::text, 'rejected'::text, 'in_transit'::text, 'received'::text, 'refunded'::text, 'cancelled'::text])))`
 
 ### wizard_selections
 
 | Sutun | Tip |
 |-------|-----|
-| id | UUID PRIMARY KEY |
-| user_id | UUID |
-| session_id | TEXT |
-| door_width_cm | INT |
-| door_height_cm | INT |
-| usage_location | TEXT, -- 'entrance', 'cold-storage', 'industrial', 'retail' |
-| sector | TEXT |
-| wind_condition | TEXT, -- 'none', 'light', 'moderate', 'strong' |
-| traffic_intensity | TEXT, -- 'low', 'medium', 'high' |
-| heating_needed | TEXT, -- 'yes', 'no', 'unsure' |
-| climate_zone | TEXT, -- 'cold', 'moderate', 'warm' |
-| calculated_airflow_m3h | INT |
-| calculated_nozzle_velocity | DECIMAL(5,2) |
-| calculated_power_w | INT |
-| recommended_series | TEXT, -- 'elektrikli-isitici', 'ortam-havali' |
-| recommended_product_ids | UUID[] |
-| selected_product_id | UUID |
-| created_at | TIMESTAMPTZ |
-| ip_address | INET |
-| user_agent | TEXT |
-| order_id | UUID |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| id | uuid |
+| user_id | uuid |
+| session_id | text |
+| door_width_cm | integer |
+| door_height_cm | integer |
+| usage_location | text |
+| sector | text |
+| wind_condition | text |
+| traffic_intensity | text |
+| heating_needed | text |
+| climate_zone | text |
+| calculated_airflow_m3h | integer |
+| calculated_nozzle_velocity | numeric(5,2) |
+| calculated_power_w | integer |
+| recommended_series | text |
+| recommended_product_ids | uuid[] |
+| selected_product_id | uuid |
+| created_at | timestamp with time zone |
+| ip_address | inet |
+| user_agent | text |
+| order_id | uuid |
+| tenant_id | uuid |
 
 ## 2. RLS POLICY'LER
 
-### CATEGORIES
+### TABLES
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| cart_items_insert_own ON public.cart_items FOR INSERT TO authenticated WITH CHECK (EXISTS (SELECT 1 FROM public.shopping_carts c WHERE c.id = cart_items.cart_id AND c.user_id = (SELECT auth.uid())));';
-END IF;
-IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_update_own') THEN
-    EXECUTE 'CREATE POLICY cart_items_update_own ON public.cart_items FOR UPDATE TO authenticated USING (EXISTS (SELECT 1 FROM public.shopping_carts c WHERE c.id = cart_items.cart_id AND c.user_id = (SELECT auth.uid()))) WITH CHECK (EXISTS (SELECT 1 FROM public.shopping_carts c WHERE c.id = cart_items.cart_id AND c.user_id = (SELECT auth.uid())));';
-END IF;
-IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_delete_own') THEN
-    EXECUTE 'CREATE POLICY cart_items_delete_own ON public.cart_items FOR DELETE TO authenticated USING (EXISTS (SELECT 1 FROM public.shopping_carts c WHERE c.id = cart_items.cart_id AND c.user_id = (SELECT auth.uid())));';
-END IF;
-END $$;
-
--- shopping_carts: drop broad ALL policy; create split write policies
-DO $$ BEGIN
-IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_modify_own') THEN
-    EXECUTE 'DROP POLICY shopping_carts_modify_own ON public.shopping_carts';
-END IF;
-END $$;
-
-DO $$ BEGIN
-IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_insert_own') THEN
-    EXECUTE 'CREATE POLICY shopping_carts_insert_own ON public.shopping_carts FOR INSERT TO authenticated WITH CHECK (user_id = (SELECT auth.uid()));';
-END IF;
-IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_update_own') THEN
-    EXECUTE 'CREATE POLICY shopping_carts_update_own ON public.shopping_carts FOR UPDATE TO authenticated USING (user_id = (SELECT auth.uid())) WITH CHECK (user_id = (SELECT auth.uid()));';
-END IF;
-IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_delete_own') THEN
-    EXECUTE 'CREATE POLICY shopping_carts_delete_own ON public.shopping_carts FOR DELETE TO authenticated USING (user_id = (SELECT auth.uid()));';
-END IF;
-END $$;
-
-COMMIT;
+| admin_audit_log_insert_v2 ON public.admin_audit_log FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
 
 
--- FILE: 20260220_optimize_performance_advisor_part3.sql
--- 20260220_optimize_performance_advisor_part3.sql
--- Description: Applies the ultimate fix for the lingering 6 Performance Advisor warnings
+--
+-- Name: admin_audit_log admin_audit_log_select_v2; Type: POLICY; Schema: public; Owner: -
+--
 
-BEGIN;
-
--- 1. FIX MULTIPLE PERMISSIVE POLICIES | ALL | public | `-` |
-
-### FUNCTION
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| user_profiles_select_self
-    ON public.user_profiles
-    FOR SELECT
-    USING (id = auth.uid());
-  END IF;
-END
-$$;
-
--- INSERT self profile
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_insert_self'
-  ) THEN
-    CREATE POLICY user_profiles_insert_self
-    ON public.user_profiles
-    FOR INSERT
-    WITH CHECK (id = auth.uid());
-  END IF;
-END
-$$;
-
--- UPDATE own profile
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_update_self'
-  ) THEN
-    CREATE POLICY user_profiles_update_self
-    ON public.user_profiles
-    FOR UPDATE
-    USING (id = auth.uid())
-    WITH CHECK (id = auth.uid());
-  END IF;
-END
-$$;
+CREATE POLICY admin_audit_log_select_v2 ON public.admin_audit_log FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
 
 
--- FILE: 20250829_order_item_snapshots.sql
-begin;
+--
+-- Name: admin_audit_log admin_audit_log_service_role; Type: POLICY; Schema: public; Owner: -
+--
 
--- Snapshot columns for order items
-alter table if exists public.venthub_order_items
-  add column if not exists unit_price_snapshot numeric,
-  add column if not exists price_list_id_snapshot text,
-  add column if not exists product_name_snapshot text,
-  add column if not exists product_sku_snapshot text,
-  add column if not exists tax_rate_snapshot numeric;
-
--- Optional: store subtotal snapshot on order header
-alter table if exists public.venthub_orders
-  add column if not exists subtotal_snapshot numeric;
-
-commit;
+CREATE POLICY admin_audit_log_service_role ON public.admin_audit_log TO service_role USING (true);
 
 
+--
+-- Name: error_groups admins_read_error_groups; Type: POLICY; Schema: public; Owner: -
+--
 
--- FILE: 20250901_add_shipping_method_to_orders.sql
--- Add shipping_method column to venthub_orders for service-level selection
-alter table if exists public.venthub_orders
-  add column if not exists shipping_method text;
-
--- Optional index for filtering/analytics
-create index if not exists venthub_orders_shipping_method_idx on public.venthub_orders (shipping_method);
+CREATE POLICY admins_read_error_groups ON public.error_groups FOR SELECT TO authenticated USING (public.is_admin_user());
 
 
+--
+-- Name: cart_items; Type: ROW SECURITY; Schema: public; Owner: -
+--
 
--- FILE: 20250901_shipping_webhook_events.sql
--- shipping_webhook_events audit & dedup table
-create table if not exists public.shipping_webhook_events (
-  id bigserial primary key,
-  event_id text not null unique,
-  order_id uuid null,
-  order_number text null,
-  carrier text null,
-  status_raw text null,
-  status_mapped text null,
-  body_hash text not null,
-  received_at timestamptz not null default now(),
-  processed_at timestamptz null
-);
+ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 
-create index if not exists shipping_webhook_events_order_id_idx on public.shipping_webhook_events(order_id);
-create index if not exists shipping_webhook_events_received_at_idx on public.shipping_webhook_events(received_at desc);
+--
+-- Name: cart_items cart_items_service_role; Type: POLICY; Schema: public; Owner: -
+--
 
-alter table public.shipping_webhook_events enable row level security;
--- No RLS policies added: only Service Role (edge functions) can write/read.
+CREATE POLICY cart_items_service_role ON public.cart_items TO service_role USING (true);
 
 
+--
+-- Name: categories cat_admin_delete_opt; Type: POLICY; Schema: public; Owner: -
+--
 
--- FILE: 20250902_add_product_stock_columns.sql
--- Products tablosuna stok management kolonları ekle
--- Hızlı fix: stock_qty ve low_stock_threshold kolonları eksik
-
-begin;
-
--- Stok kolonlarını ekle (idempotent - çoktan varsa hata vermez)
-DO $$
-BEGIN
-  -- stock_qty kolonu ekle
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema = 'public' 
-      AND table_name = 'products' 
-      AND column_name = 'stock_qty'
-  ) THEN
-    ALTER TABLE public.products 
-    ADD COLUMN stock_qty integer NOT NULL DEFAULT 0;
-    
-    RAISE NOTICE 'Added stock_qty column to products table';
-  ELSE
-    RAISE NOTICE 'stock_qty column already exists';
-  END IF;
-
-  -- low_stock_threshold kolonu ekle  
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema = 'public' 
-      AND table_name = 'products' 
-      AND column_name = 'low_stock_threshold'
-  ) THEN
-    ALTER TABLE public.products 
-    ADD COLUMN low_stock_threshold integer NULL DEFAULT 5;
-    
-    RAISE NOTICE 'Added low_stock_threshold column to products table';
-  ELSE
-    RAISE NOTICE 'low_stock_threshold column already exists';
-  END IF;
-END $$;
-
--- Mevcut ürünlere test stok değerleri ver (sadece 0 olanlar için)
-UPDATE public.products 
-SET stock_qty = 50, low_stock_threshold = 5 
-WHERE stock_qty = 0 OR stock_qty IS NULL;
-
--- Kontrol query
-SELECT 
-  count(*) as product_count,
-  avg(stock_qty) as avg_stock,
-  min(stock_qty) as min_stock,
-  max(stock_qty) as max_stock
-FROM public.products;
-
-commit;
+CREATE POLICY cat_admin_delete_opt ON public.categories FOR DELETE TO authenticated USING ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
 
 
--- FILE: 20250902_admin_user_setup.sql
--- Admin user setup - Production için otomatik admin rol atama
--- Migration olarak çalışacak, sizin için admin rolü otomatik atanacak
+--
+-- Name: categories cat_admin_insert_opt; Type: POLICY; Schema: public; Owner: -
+--
 
-begin;
-
--- Admin user'ını otomatik tespit et ve rol ata
-DO $$
-DECLARE
-    admin_user_id uuid;
-    admin_email text;
-BEGIN
-    -- En son kayıt olan user'ı admin yap (genellikle site sahibi)
-    SELECT u.id, u.email INTO admin_user_id, admin_email
-    FROM auth.users u
-    ORDER BY u.created_at DESC
-    LIMIT 1;
-    
-    IF admin_user_id IS NOT NULL THEN
-        -- User profile oluştur veya güncelle
-        INSERT INTO public.user_profiles (id, role, created_at, updated_at)
-        VALUES (admin_user_id, 'admin', now(), now())
-        ON CONFLICT (id) 
-        DO UPDATE SET 
-            role = 'admin',
-            updated_at = now();
-            
-        RAISE NOTICE 'Admin role assigned to user: %', admin_email;
-    ELSE
-        RAISE NOTICE 'No users found in auth.users table';
-    END IF;
-    
-    -- Ek güvenlik: Eğer birden fazla user varsa, ilk user'ı da admin yap
-    SELECT u.id INTO admin_user_id
-    FROM auth.users u
-    ORDER BY u.created_at ASC
-    LIMIT 1;
-    
-    IF admin_user_id IS NOT NULL THEN
-        INSERT INTO public.user_profiles (id, role, created_at, updated_at)
-        VALUES (admin_user_id, 'admin', now(), now())
-        ON CONFLICT (id) 
-        DO UPDATE SET 
-            role = 'admin',
-            updated_at = now();
-    END IF;
-    
-END $$;
-
--- Sonuç kontrolü
-SELECT 
-    u.email,
-    COALESCE(up.role, 'no-role') as role,
-    up.updated_at
-FROM auth.users u
-LEFT JOIN public.user_profiles up ON u.id = up.id
-ORDER BY u.created_at;
-
-commit;
+CREATE POLICY cat_admin_insert_opt ON public.categories FOR INSERT TO authenticated WITH CHECK ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
 
 
--- FILE: 20250902_create_stock_rpc_functions.sql
--- Stok yönetimi RPC fonksiyonlarını oluştur
--- Admin stock sayfası için gerekli adjust_stock ve set_stock fonksiyonları
+--
+-- Name: categories cat_admin_update_opt; Type: POLICY; Schema: public; Owner: -
+--
 
-begin;
+CREATE POLICY cat_admin_update_opt ON public.categories FOR UPDATE TO authenticated USING ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))) WITH CHECK ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
 
--- Önce inventory_movements tablosu olduğunu kontrol et
-CREATE TABLE IF NOT EXISTS public.inventory_movements (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
-  order_id uuid NULL REFERENCES public.venthub_orders(id) ON DELETE SET NULL,
-  delta integer NOT NULL,
-  reason text NOT NULL CHECK (char_length(reason) BETWEEN 3 AND 32),
-  created_at timestamptz NOT NULL DEFAULT now()
-);
 
--- RLS aktif et
+--
+-- Name: categories cat_public_read_opt; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY cat_public_read_opt ON public.categories FOR SELECT USING (true);
+
+
+--
+-- Name: categories; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: category_mapping_rules; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.category_mapping_rules ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: cart_items ci_auth_all; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY ci_auth_all ON public.cart_items TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (cart_id IN ( SELECT shopping_carts.id
+   FROM public.shopping_carts
+  WHERE ((shopping_carts.user_id = ( SELECT auth.uid() AS uid)) AND (shopping_carts.tenant_id = public.jwt_tenant_id())))))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (cart_id IN ( SELECT shopping_carts.id
+   FROM public.shopping_carts
+  WHERE ((shopping_carts.user_id = ( SELECT auth.uid() AS uid)) AND (shopping_carts.tenant_id = public.jwt_tenant_id()))))));
+
+
+--
+-- Name: client_errors; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.client_errors ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: contact_messages; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.contact_messages ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: coupons; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: coupons coupons_admin_delete; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY coupons_admin_delete ON public.coupons FOR DELETE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: coupons coupons_admin_insert; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY coupons_admin_insert ON public.coupons FOR INSERT TO authenticated WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: coupons coupons_admin_update; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY coupons_admin_update ON public.coupons FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: coupons coupons_select_anon; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY coupons_select_anon ON public.coupons FOR SELECT TO anon USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))));
+
+
+--
+-- Name: coupons coupons_select_authenticated; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY coupons_select_authenticated ON public.coupons FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin) OR ((is_active = true) AND ((valid_until IS NULL) OR (valid_until > now()))))));
+
+
+--
+-- Name: coupons coupons_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY coupons_service_role ON public.coupons TO service_role USING (true);
+
+
+--
+-- Name: error_groups; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.error_groups ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: inventory_movements; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
 ALTER TABLE public.inventory_movements ENABLE ROW LEVEL SECURITY;
 
--- Admin için select policy
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies 
-    WHERE schemaname='public' 
-      AND tablename='inventory_movements' 
-      AND policyname='inventory_movements_select_admin'
-  ) THEN
-    CREATE POLICY inventory_movements_select_admin ON public.inventory_movements
-      FOR SELECT USING ( 
-        (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') = 'admin' 
-      );
-  END IF;
-END$$;
-
--- adjust_stock fonksiyonu - stok miktarını artır/azalt
-CREATE OR REPLACE FUNCTION public.adjust_stock(p_product_id uuid, p_delta int, p_reason text)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-  -- Stok güncelle
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
-  WHERE id = p_product_id;
-  
-  -- Hareket kaydı oluştur
-  INSERT INTO public.inventory_movements (product_id, delta, reason) 
-  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'));
-END;
-$$;
-
--- set_stock fonksiyonu - stok miktarını belirli değere ayarla
-CREATE OR REPLACE FUNCTION public.set_stock(p_product_id uuid, p_new_qty int, p_reason text)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  v_current int;
-  v_delta int;
-BEGIN
-  -- Mevcut stok miktarını al
-  SELECT COALESCE(stock_qty, 0) INTO v_current 
-  FROM public.products 
-  WHERE id = p_product_id;
-  
-  -- Delta hesapla
-  v_delta := p_new_qty - v_current;
-  
-  -- Eğer değişiklik yoksa işlem yapma
-  IF v_delta = 0 THEN
-    RETURN;
-  END IF;
-  
-  -- Stok güncelle
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, p_new_qty)
-  WHERE id = p_product_id;
-  
-  -- Hareket kaydı oluştur
-  INSERT INTO public.inventory_movements (product_id, delta, reason) 
-  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'));
-END;
-$$;
-
--- Permissions ver
-GRANT EXECUTE ON FUNCTION public.adjust_stock(uuid, int, text) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.set_stock(uuid, int, text) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.adjust_stock(uuid, int, text) TO service_role;
-GRANT EXECUTE | ALL | public | `-` |
-
-### PDP
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| products_public_read on public.products
-      for select to anon, authenticated
-      using (true);
-  end if;
-end $$;
-
--- Admin/moderator can INSERT/UPDATE/DELETE
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='products' AND policyname='products_insert_admin'
-  ) THEN
-    CREATE POLICY products_insert_admin ON public.products
-      FOR INSERT TO authenticated
-      WITH CHECK ( public.jwt_role() IN ('admin','moderator') );
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='products' AND policyname='products_update_admin_only'
-  ) THEN
-    CREATE POLICY products_update_admin_only ON public.products
-      FOR UPDATE TO authenticated
-      USING ( public.jwt_role() IN ('admin','moderator') )
-      WITH CHECK ( public.jwt_role() IN ('admin','moderator') );
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='products' AND policyname='products_delete_admin'
-  ) THEN
-    CREATE POLICY products_delete_admin ON public.products
-      FOR DELETE TO authenticated
-      USING ( public.jwt_role() IN ('admin','moderator') );
-  END IF;
-END $$;
-
--- 2) CATEGORIES
--- Public read
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='categories' AND policyname='categories_public_read'
-  ) THEN
-    CREATE POLICY categories_public_read ON public.categories
-      FOR SELECT TO anon, authenticated
-      USING (true);
-  END IF;
-END $$;
-
--- Admin/moderator write
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='categories' AND policyname='categories_insert_admin'
-  ) THEN
-    CREATE POLICY categories_insert_admin ON public.categories
-      FOR INSERT TO authenticated
-      WITH CHECK ( public.jwt_role() IN ('admin','moderator') );
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='categories' AND policyname='categories_update_admin'
-  ) THEN
-    CREATE POLICY categories_update_admin ON public.categories
-      FOR UPDATE TO authenticated
-      USING ( public.jwt_role() IN ('admin','moderator') )
-      WITH CHECK ( public.jwt_role() IN ('admin','moderator') );
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='categories' AND policyname='categories_delete_admin'
-  ) THEN
-    CREATE POLICY categories_delete_admin ON public.categories
-      FOR DELETE TO authenticated
-      USING ( public.jwt_role() IN ('admin','moderator') );
-  END IF;
-END $$;
-
-commit;
-
-
-
--- FILE: 20250909_set_admin_recep.sql
-begin;
-
--- Ensure user 'recep.varlik@gmail.com' has admin role in public.user_profiles
-DO $$
-DECLARE
-  uid uuid;
-BEGIN
-  SELECT id INTO uid FROM auth.users WHERE email = 'recep.varlik@gmail.com' LIMIT 1;
-  IF uid IS NOT NULL THEN
-    INSERT INTO public.user_profiles (id, role, created_at, updated_at)
-    VALUES (uid, 'admin', now(), now())
-    ON CONFLICT (id)
-    DO UPDATE SET role='admin', updated_at=now();
-  END IF;
-END $$;
-
-commit;
-
-
-
--- FILE: 20250909_storage_auth_grants.sql
-begin;
-
--- Ensure authenticated role has required privileges alongside RLS policies
--- Storage schema grants
-grant usage on schema storage to authenticated;
-grant select, insert, update, delete on storage.objects to authenticated;
-
--- Public schema grants for product_images
-grant usage on schema public to authenticated;
-grant select, insert, update, delete on public.product_images to authenticated;
-
-commit;
-
-
-
--- FILE: 20250909_storage_objects_insert_auth.sql
-begin;
-
--- Allow any authenticated user to INSERT into storage.objects for 'product-images' bucket (upload)
--- UPDATE/DELETE remain restricted to admin/moderator via existing policies.
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_insert_authenticated'
-  ) THEN
-    CREATE POLICY product_images_insert_authenticated ON storage.objects
-      FOR INSERT TO authenticated
-      WITH CHECK (bucket_id = 'product-images' AND auth.uid() IS NOT NULL);
-  END IF;
-END $$;
-
-commit;
-
-
-
--- FILE: 20250910_add_products_model_code.sql
-begin;
-
--- Add model_code (MPN) to products for separating distributor model from SKU
-alter table if exists public.products
-  add column if not exists model_code text null;
-
-comment on column public.products.model_code is 'Distributor/Manufacturer model code (MPN). Display | ALL | public | `-` |
-
-### admin_audit_log
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| admin_audit_log_select_admins
-      ON public.admin_audit_log
-      FOR SELECT
-      TO authenticated
-      USING (
-        EXISTS (
-          SELECT 1 FROM public.user_profiles up
-          WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-        )
-      );
-  END IF;
-END $$;
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
--- CREATE INSERT policy (admins/moderators)
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='admin_audit_log' AND policyname='admin_audit_log_insert_admins'
-  ) THEN
-    CREATE POLICY admin_audit_log_insert_admins
-      | INSERT | authenticated | `-` |
-| admin_audit_log_select_v2 | SELECT | authenticated | `public.is_admin_user(` |
-| admin_audit_log_insert_v2 | INSERT | authenticated | `-` |
-
-### any
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| %I ON %I.%I AS PERMISSIVE FOR %s TO %I',
-                      merged_name, t.schemaname, t.tablename, cmdname, r.rolname);
-          IF using_or IS NOT NULL AND cmd IN ('r','w','d') THEN
-            q := q || format(' USING (%s)', using_or);
-          END IF;
-          IF check_or IS NOT NULL AND cmd IN ('a','w') THEN
-            q := q || format(' WITH CHECK (%s)', check_or);
-          END IF;
-          EXECUTE q;
-        ELSE
-          q := format('ALTER POLICY %I ON %I.%I', merged_name, t.schemaname, t.tablename);
-          IF using_or IS NOT NULL AND cmd IN ('r','w','d') THEN
-            q := q || format(' USING (%s)', using_or);
-          END IF;
-          IF check_or IS NOT NULL AND cmd IN ('a','w') THEN
-            q := q || format(' WITH CHECK (%s)', check_or);
-          END IF;
-          EXECUTE q;
-        END IF;
-
-        -- Remove this role from original policies and drop if empty
-        FOR pol IN
-          SELECT p.oid, p.polname, p.polroles
-          FROM pg_policy p
-          WHERE p.polpermissive = true
-            AND p.polrelid = t.relid
-            AND p.polcmd = cmd
-            AND (r.oid = ANY (p.polroles))
-            AND p.polname <> merged_name
-        LOOP
-          IF array_length(pol.polroles,1) > 1 THEN
-            -- Reassign remaining roles to this policy (excluding r)
-            q := (
-              WITH role_names AS (
-                SELECT rolname
-                FROM pg_roles
-                WHERE oid = ANY (pol.polroles) AND rolname <> r.rolname
-              )
-              SELECT 'ALTER POLICY ' || quote_ident(pol.polname) ||
-                     ' ON ' || quote_ident(t.schemaname) || '.' || quote_ident(t.tablename) ||
-                     ' TO ' || string_agg(quote_ident(rolname), ', ')
-              FROM role_names
-            );
-            IF q IS NOT NULL THEN
-              EXECUTE q;
-            END IF;
-          ELSE
-            EXECUTE format('DROP POLICY IF EXISTS %I ON %I.%I', pol.polname, t.schemaname, t.tablename);
-          END IF;
-        END LOOP;
-
-      END LOOP; -- cmd
-    END LOOP; -- role
-  END LOOP; -- table
-END
-$merge$ LANGUAGE plpgsql;
-
-
-
--- FILE: 20250910_rls_phase2b_merge_star_policies.sql
--- Phase 2B: Merge permissive policies that use polcmd='*' into per-action merged policies and remove role from originals
--- Rationale: Advisor flags multiple permissive policies per role+action; wildcard policies count for every action and cause duplicates.
-
-DO $$
-DECLARE
-  t RECORD;
-  r RECORD;
-  pol RECORD;
-  actions text[] := ARRAY['r','a','w','d'];
-  cmd text;
-  cmdname text;
-  using_expr text;
-  check_expr text;
-  merged_name text;
-  exists_count int;
-  q text;
-BEGIN
-  -- Iterate public tables
-  FOR t IN
-    SELECT n.nspname AS schemaname, c.relname AS tablename, c.oid AS relid
-    FROM pg_class c
-    JOIN pg_namespace n ON n.oid = c.relnamespace
-    WHERE n.nspname = 'public' AND c.relkind = 'r'
-  LOOP
-    -- Roles appearing | ALL | public | `-` |
-
-### cart_items
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| user_addresses_select
-      on public.user_addresses for select
-      using (auth.uid() = user_id);
-  end if;
-
-  if not exists (
-    select 1 from pg_policies
-    where schemaname = 'public' and tablename = 'user_addresses' and policyname = 'user_addresses_insert'
-  ) then
-    create policy user_addresses_insert
-      on public.user_addresses for insert
-      with check (auth.uid() = user_id);
-  end if;
-
-  if not exists (
-    select 1 from pg_policies
-    where schemaname = 'public' and tablename = 'user_addresses' and policyname = 'user_addresses_update'
-  ) then
-    create policy user_addresses_update
-      on public.user_addresses for update
-      using (auth.uid() = user_id);
-  end if;
-
-  if not exists (
-    select 1 from pg_policies
-    where schemaname = 'public' and tablename = 'user_addresses' and policyname = 'user_addresses_delete'
-  ) then
-    create policy user_addresses_delete
-      on public.user_addresses for delete
-      using (auth.uid() = user_id);
-  end if;
-end $$;
-
-commit;
-
-
-
--- FILE: 202508261125_fix_user_addresses_fk.sql
-begin;
-
--- Ensure user_addresses.user_id references auth.users(id) instead of legacy user_profiles
-DO $$
-DECLARE
-  v_target_schema text;
-  v_target_table text;
-BEGIN
-  SELECT ccu.table_schema, ccu.table_name
-    INTO v_target_schema, v_target_table
-  FROM information_schema.table_constraints tc
-  JOIN information_schema.constraint_column_usage ccu
-    ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.constraint_schema
-  WHERE tc.constraint_type = 'FOREIGN KEY'
-    AND tc.table_schema = 'public'
-    AND tc.table_name = 'user_addresses'
-    AND tc.constraint_name = 'user_addresses_user_id_fkey';
-
-  IF v_target_schema IS NOT NULL AND (v_target_schema <> 'auth' OR v_target_table <> 'users') THEN
-    -- Drop legacy FK and recreate to auth.users
-    BEGIN
-      ALTER TABLE public.user_addresses DROP CONSTRAINT user_addresses_user_id_fkey;
-    EXCEPTION WHEN undefined_object THEN
-      -- already dropped
-      NULL;
-    END;
-
-    ALTER TABLE public.user_addresses
-      ADD CONSTRAINT user_addresses_user_id_fkey
-      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
-  END IF;
-END $$;
-
-commit;
-
-
-
--- FILE: 202508261956_user_invoice_profiles.sql
--- user_invoice_profiles table for saved invoice profiles per user
--- Creates table, RLS policies, updated_at trigger and single-default enforcement per (user_id,type)
-
--- Ensure pgcrypto for gen_random_uuid()
-create extension if not exists pgcrypto;
-
-create table if not exists public.user_invoice_profiles (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  type text not null check (type in ('individual','corporate')),
-  title text,
-  -- individual
-  tckn text,
-  -- corporate
-  company_name text,
-  vkn text,
-  tax_office text,
-  e_invoice boolean default false,
-  is_default boolean default false,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
--- Helpful indexes (wrapped in DO blocks to handle missing columns gracefully)
-create index if not exists idx_user_invoice_profiles_user on public.user_invoice_profiles(user_id);
-
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_invoice_profiles' AND column_name = 'type') THEN
-    CREATE INDEX IF NOT EXISTS idx_user_invoice_profiles_type ON public.user_invoice_profiles(type);
-  END IF;
-END $$;
-
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_invoice_profiles' AND column_name = 'type')
-     AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_invoice_profiles' AND column_name = 'is_default') THEN
-    CREATE UNIQUE INDEX IF NOT EXISTS uniq_user_invoice_profiles_default_per_type
-      ON public.user_invoice_profiles(user_id, type)
-      WHERE is_default IS TRUE;
-  END IF;
-END $$;
-
-
-alter table public.user_invoice_profiles enable row level security;
-
--- RLS: owner-only access (CREATE POLICY IF NOT EXISTS workaround)
-DO $$ BEGIN
-  CREATE POLICY user_invoice_profiles_select ON public.user_invoice_profiles
-    FOR SELECT USING (auth.uid() = user_id);
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-
-DO $$ BEGIN
-  CREATE POLICY user_invoice_profiles_insert ON public.user_invoice_profiles
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-
-DO $$ BEGIN
-  CREATE POLICY user_invoice_profiles_update ON public.user_invoice_profiles
-    FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-
-DO $$ BEGIN
-  CREATE POLICY user_invoice_profiles_delete ON public.user_invoice_profiles
-    FOR DELETE USING (auth.uid() = user_id);
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
-
--- updated_at trigger
-create or replace function public.set_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1
-    FROM pg_trigger
-    WHERE tgname = 'trg_user_invoice_profiles_updated_at'
-      AND tgrelid = 'public.user_invoice_profiles'::regclass
-  ) THEN
-    CREATE TRIGGER trg_user_invoice_profiles_updated_at
-      BEFORE UPDATE ON public.user_invoice_profiles
-      FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
-  END IF;
-END;
-$$;
-
--- Ensure only one default per user and type
-create or replace function public.user_invoice_profiles_ensure_single_default()
-returns trigger as $$
-begin
-  if (new.is_default is true) then
-    update public.user_invoice_profiles
-      set is_default = false
-      where user_id = new.user_id
-        and type = new.type
-        and id <> new.id;
-  end if;
-  return new;
-end;
-$$ language plpgsql;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1
-    FROM pg_trigger t
-    JOIN pg_class c ON c.oid = t.tgrelid
-    JOIN pg_namespace n ON n.oid = c.relnamespace
-    WHERE t.tgname = 'trg_user_invoice_profiles_single_default'
-      AND n.nspname = 'public'
-      AND c.relname = 'user_invoice_profiles'
-  ) THEN
-    CREATE TRIGGER trg_user_invoice_profiles_single_default
-      BEFORE INSERT OR UPDATE ON public.user_invoice_profiles
-      FOR EACH ROW EXECUTE FUNCTION public.user_invoice_profiles_ensure_single_default();
-  END IF;
-END;
-$$;
-
--- EOF
-
-
-
--- FILE: 202508270945_enable_rls_public.sql
--- Enable RLS on public-facing tables and add safe read-only policies where appropriate
--- This migration is idempotent and guards for missing tables/policies.
-
-begin;
-
--- Helper: enable RLS on a table if it exists
-create or replace function public._enable_rls_if_exists(tbl regclass)
-returns void language plpgsql as $$
-begin
-  execute format('alter table if exists %s enable row level security', tbl);
-end; $$;
-
--- Helper: create SELECT policy if not exists
-create or replace function public._create_select_policy_if_absent(
-  p_schemaname text,
-  p_tablename text,
-  p_policyname text,
-  p_using_sql text
-) returns void language plpgsql as $$
-begin
-  if not exists (
-    select 1 from pg_policies
-    where pg_policies.schemaname = p_schemaname
-      and pg_policies.tablename  = p_tablename
-      and pg_policies.policyname = p_policyname
-  ) then
-    execute format('create policy %I on %I.%I for select using (%s)', p_policyname, p_schemaname, p_tablename, p_using_sql);
-  end if;
-end; $$;
-
--- Categories: public read
-do $$ begin
-  perform public._enable_rls_if_exists('public.categories');
-  if to_regclass('public.categories') is not null then
-    perform public._create_select_policy_if_absent('public','categories','p_anon_read_categories','true');
-  end if;
-end $$;
-
--- Products: public read only active
-do $$ begin
-  perform public._enable_rls_if_exists('public.products');
-  if to_regclass('public.products') is not null then
-    perform public._create_select_policy_if_absent('public','products','p_anon_read_active_products','status = ''active''');
-  end if;
-end $$;
-
--- Brands: public read
-do $$ begin
-  perform public._enable_rls_if_exists('public.brands');
-  if to_regclass('public.brands') is not null then
-    perform public._create_select_policy_if_absent('public','brands','p_anon_read_brands','true');
-  end if;
-end $$;
-
--- Product images: public read
-do $$ begin
-  perform public._enable_rls_if_exists('public.product_images');
-  if to_regclass('public.product_images') is not null then
-    perform public._create_select_policy_if_absent('public','product_images','p_anon_read_product_images','true');
-  end if;
-end $$;
-
--- Product documents: public read
-do $$ begin
-  perform public._enable_rls_if_exists('public.product_documents');
-  if to_regclass('public.product_documents') is not null then
-    perform public._create_select_policy_if_absent('public','product_documents','p_anon_read_product_documents','true');
-  end if;
-end $$;
-
--- Technical specifications: public read
-do $$ begin
-  perform public._enable_rls_if_exists('public.technical_specifications');
-  if to_regclass('public.technical_specifications') is not null then
-    perform public._create_select_policy_if_absent('public','technical_specifications','p_anon_read_technical_specs','true');
-  end if;
-end $$;
-
--- Turkey cities: public read
-do $$ begin
-  perform public._enable_rls_if_exists('public.turkey_cities');
-  if to_regclass('public.turkey_cities') is not null then
-    perform public._create_select_policy_if_absent('public','turkey_cities','p_anon_read_turkey_cities','true');
-  end if;
-end $$;
-
--- Enable RLS (no public policies) on internal or user-owned tables flagged by linter
--- Access will be restricted unless explicit policies exist elsewhere.
-select public._enable_rls_if_exists('public.hvac_calculations');
-select public._enable_rls_if_exists('public.search_analytics');
-select public._enable_rls_if_exists('public.ai_chat_sessions');
-select public._enable_rls_if_exists('public.ai_recommendations');
-select public._enable_rls_if_exists('public.cart_items');
-select public._enable_rls_if_exists('public.payment_transactions');
-select public._enable_rls_if_exists('public.ai_chat_messages');
-select public._enable_rls_if_exists('public.inventory_movements');
-select public._enable_rls_if_exists('public.price_lists');
-select public._enable_rls_if_exists('public.product_reviews');
-select public._enable_rls_if_exists('public.support_tickets');
-select public._enable_rls_if_exists('public.support_messages');
-select public._enable_rls_if_exists('public.profiles');
-select public._enable_rls_if_exists('public.wishlists');
-select public._enable_rls_if_exists('public.warehouses');
-select public._enable_rls_if_exists('public.technical_spec_templates');
-select public._enable_rls_if_exists('public.wishlist_items');
-select public._enable_rls_if_exists('public.inventory_items');
-select public._enable_rls_if_exists('public.system_settings');
-select public._enable_rls_if_exists('public.stripe_payment_intents');
-select public._enable_rls_if_exists('public.customer_profiles');
-select public._enable_rls_if_exists('public.product_variations');
-select public._enable_rls_if_exists('public.recently_viewed_products');
-select public._enable_rls_if_exists('public.product_comparisons');
-select public._enable_rls_if_exists('public.search_filters');
-select public._enable_rls_if_exists('public.product_analytics');
-
--- ============================================
--- EKSİK POLICY'LER (FAZ 0 DÜZELTME)
--- ============================================
-
--- cart_items: Kullanıcı sadece kendi sepetini görebilir
-do $$ begin
-  perform public._create_select_policy_if_absent('public','cart_items','p_user_read_own_cart','user_id = auth.uid()');
-end $$;
-
--- payment_transactions: Kullanıcı sadece kendi ödemelerini görebilir
-do $$ begin
-  perform public._create_select_policy_if_absent('public','payment_transactions','p_user_read_own_transactions','user_id = auth.uid()');
-end $$;
-
--- inventory_movements: Sadece admin kullanıcılar görebilir
-do $$ begin
-  perform public._create_select_policy_if_absent('public','inventory_movements','p_admin_read_inventory','auth.jwt() ->> ''role'' = ''admin''');
-end $$;
-
--- price_lists: Aktif fiyat listeleri herkese görünür
-do $$ begin
-  perform public._create_select_policy_if_absent('public','price_lists','p_anon_read_active_price_lists','active = true');
-end $$;
-
--- Cleanup helpers (optional keep for future use). Comment out drop if you want to reuse.
-drop function if exists public._create_select_policy_if_absent(text,text,text,text);
-drop function if exists public._enable_rls_if_exists(regclass);
-
-commit;
-
-
-
--- FILE: 202508271740_add_shipping_tracking_fields.sql
--- Add shipping/tracking fields to venthub_orders
-BEGIN;
-
-ALTER TABLE public.venthub_orders
-  ADD COLUMN IF NOT EXISTS carrier text,
-  ADD COLUMN IF NOT EXISTS tracking_number text,
-  ADD COLUMN IF NOT EXISTS tracking_url text,
-  ADD COLUMN IF NOT EXISTS shipped_at timestamptz,
-  ADD COLUMN IF NOT EXISTS delivered_at timestamptz;
-
-COMMIT;
-
-
-
--- FILE: 202508271900_venthub_returns.sql
--- Create venthub_returns table for returns/cancellation requests
-create table if not exists public.venthub_returns (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  order_id text not null references public.venthub_orders(id) on delete cascade,
-  reason text not null,
-  description text,
-  status text not null default 'requested' check (status in ('requested','approved','rejected','in_transit','received','refunded','cancelled')),
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create index if not exists idx_venthub_returns_user on public.venthub_returns(user_id);
-create index if not exists idx_venthub_returns_order on public.venthub_returns(order_id);
-
--- updated_at trigger
-create or replace function public.set_updated_at()
-returns trigger language plpgsql as $$
-begin
-  new.updated_at := now();
-  return new;
-end;
-$$;
-
-drop trigger if exists trg_venthub_returns_updated_at on public.venthub_returns;
-create trigger trg_venthub_returns_updated_at
-before update on public.venthub_returns
-for each row execute function public.set_updated_at();
-
--- RLS
-alter table public.venthub_returns enable row level security;
-
--- Policies: user can select own returns
-drop policy if exists returns_select_own on public.venthub_returns;
-create policy returns_select_own
-  on public.venthub_returns for select
-  using (user_id = auth.uid());
-
--- User can insert a return only for their own order
-drop policy if exists returns_insert_own_order on public.venthub_returns;
-create policy returns_insert_own_order
-  on public.venthub_returns for insert
-  with check (
-    user_id = auth.uid()
-    and exists (
-      select 1 from public.venthub_orders o
-      where o.id = order_id and o.user_id = auth.uid()
-    )
-  );
-
--- Updates and deletes restricted to service role for now (admin/backoffice)
-drop policy if exists returns_update_service on public.venthub_returns;
-create policy returns_update_service
-  on public.venthub_returns for update
-  using (auth.role() = 'service_role')
-  with check (auth.role() = 'service_role');
-
-drop policy if exists returns_delete_service on public.venthub_returns;
-create policy returns_delete_service
-  on public.venthub_returns for delete
-  using (auth.role() = 'service_role');
-
-
--- FILE: 202508271905_add_order_number.sql
--- Add order_number to venthub_orders (nullable, for display/reference)
-BEGIN;
-
-ALTER TABLE public.venthub_orders
-  ADD COLUMN IF NOT EXISTS order_number text;
-
--- Optional: ensure fast sorting/filtering by order_number
-CREATE INDEX IF NOT EXISTS idx_venthub_orders_order_number ON public.venthub_orders(order_number);
-
-COMMIT;
-
-
-
--- FILE: 20250828_cart_items_add_price_list_id.sql
--- Add optional price_list_id to cart_items and FK
--- Date: 2025-08-28
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema='public' AND table_name='cart_items' AND column_name='price_list_id'
-  ) THEN
-    ALTER TABLE public.cart_items ADD COLUMN price_list_id uuid NULL;
-  END IF;
-END
-$$;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint WHERE conname='cart_items_price_list_id_fkey'
-  ) THEN
-    ALTER TABLE public.cart_items
-      ADD CONSTRAINT cart_items_price_list_id_fkey
-      FOREIGN KEY (price_list_id) REFERENCES public.price_lists(id) ON DELETE SET NULL;
-  END IF;
-END
-$$;
-
-
-
--- FILE: 20250828_cart_items_add_unit_price.sql
--- Add unit_price column to cart_items (idempotent)
--- Date: 2025-08-28
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema='public' AND table_name='cart_items' AND column_name='unit_price'
-  ) THEN
-    ALTER TABLE public.cart_items ADD COLUMN unit_price numeric NULL;
-  END IF;
-END
-$$;
-
-
-
--- FILE: 20250828_cart_items_timestamps.sql
--- Add created_at and updated_at to cart_items with trigger (idempotent)
--- Date: 2025-08-28
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema='public' AND table_name='cart_items' AND column_name='created_at'
-  ) THEN
-    ALTER TABLE public.cart_items ADD COLUMN created_at timestamptz NOT NULL DEFAULT now();
-  END IF;
-END
-$$;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema='public' AND table_name='cart_items' AND column_name='updated_at'
-  ) THEN
-    ALTER TABLE public.cart_items ADD COLUMN updated_at timestamptz NULL;
-  END IF;
-END
-$$;
-
--- Upsert/updates should touch updated_at
-CREATE OR REPLACE FUNCTION public.set_updated_at()
-RETURNS trigger LANGUAGE plpgsql AS $$
-BEGIN
-  NEW.updated_at := now();
-  RETURN NEW;
-END;
-$$;
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_trigger
-    WHERE tgname='tr_cart_items_set_updated_at'
-  ) THEN
-    CREATE TRIGGER tr_cart_items_set_updated_at
-    BEFORE UPDATE | EACH | public | `-` |
-| cart_items_select_own | SELECT | public | `exists (
-        select 1 from public.shopping_carts c
-        where c.id = cart` |
-| cart_items_modify_own | ALL | public | `exists (
-        select 1 from public.shopping_carts c
-        where c.id = cart` |
-| cart_items_all | ALL | authenticated | `cart_id IN (
-            SELECT id FROM public.shopping_carts
-            WHERE ` |
-| cart_items_user_all | ALL | authenticated | `cart_id IN (
-            SELECT id FROM public.shopping_carts
-            WHERE ` |
-| cart_items_user_all | ALL | authenticated | `cart_id IN (
-            SELECT id FROM public.shopping_carts
-            WHERE ` |
-| ci_auth_all | ALL | authenticated | `cart_id IN (SELECT id FROM public.shopping_carts WHERE user_id = (SELECT auth.ui` |
-| cart_items_select_own | SELECT | authenticated | `EXISTS (
-    SELECT 1 FROM public.shopping_carts c
-    WHERE c.id = cart_items.c` |
-
-### categories
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| categories_admin_modify | ALL | authenticated | `EXISTS (
-    SELECT 1 FROM user_profiles
-    WHERE id = (SELECT auth.uid(` |
-| categories_public_select | SELECT | public | `true` |
-| cat_public_read_opt | SELECT | public | `true` |
-| cat_admin_all_opt | ALL | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-| cat_admin_insert_opt | INSERT | authenticated | `-` |
-| cat_admin_update_opt | UPDATE | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-| cat_admin_delete_opt | DELETE | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-
-### client_error_groups
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| admins_read_error_groups | SELECT | authenticated | `public.is_admin_user(` |
+--
+-- Name: inventory_movements inventory_movements_select_admin; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY inventory_movements_select_admin ON public.inventory_movements FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: inventory_movements inventory_movements_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY inventory_movements_service_role ON public.inventory_movements TO service_role USING (true);
+
+
+--
+-- Name: inventory_settings; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.inventory_settings ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: inventory_settings inventory_settings_select_all; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY inventory_settings_select_all ON public.inventory_settings FOR SELECT TO anon, authenticated USING ((tenant_id = public.jwt_tenant_id()));
+
+
+--
+-- Name: inventory_settings inventory_settings_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY inventory_settings_service_role ON public.inventory_settings TO service_role USING (true);
+
+
+--
+-- Name: inventory_settings inventory_settings_update_admin; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY inventory_settings_update_admin ON public.inventory_settings FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: shopping_carts merged_shopping_carts_service_role_select; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY merged_shopping_carts_service_role_select ON public.shopping_carts FOR SELECT TO service_role USING ((true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true OR true));
+
+
+--
+-- Name: order_attachments; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.order_attachments ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: order_attachments order_attachments_admin_delete; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_attachments_admin_delete ON public.order_attachments FOR DELETE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: order_attachments order_attachments_admin_insert; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_attachments_admin_insert ON public.order_attachments FOR INSERT TO authenticated WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: order_attachments order_attachments_admin_update; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_attachments_admin_update ON public.order_attachments FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: order_attachments order_attachments_select_authenticated; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_attachments_select_authenticated ON public.order_attachments FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin) OR ((NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id
+   FROM public.venthub_orders
+  WHERE ((venthub_orders.user_id = ( SELECT auth.uid() AS uid)) AND (venthub_orders.tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)))))))));
+
+
+--
+-- Name: order_attachments order_attachments_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_attachments_service_role ON public.order_attachments TO service_role USING (true);
+
+
+--
+-- Name: order_email_events; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.order_email_events ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: order_notes; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.order_notes ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: order_notes order_notes_admin_delete; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_notes_admin_delete ON public.order_notes FOR DELETE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: order_notes order_notes_admin_insert; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_notes_admin_insert ON public.order_notes FOR INSERT TO authenticated WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: order_notes order_notes_admin_update; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_notes_admin_update ON public.order_notes FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: order_notes order_notes_select_authenticated; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_notes_select_authenticated ON public.order_notes FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin) OR ((NOT is_internal) AND (order_id IN ( SELECT venthub_orders.id
+   FROM public.venthub_orders
+  WHERE ((venthub_orders.user_id = ( SELECT auth.uid() AS uid)) AND (venthub_orders.tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)))))))));
+
+
+--
+-- Name: order_notes order_notes_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_notes_service_role ON public.order_notes TO service_role USING (true);
+
+
+--
+-- Name: order_refund_events; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.order_refund_events ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: order_refund_events order_refund_events_admin_select; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_refund_events_admin_select ON public.order_refund_events FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
+
+
+--
+-- Name: order_refund_events order_refund_events_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY order_refund_events_service_role ON public.order_refund_events TO service_role USING (true);
+
+
+--
+-- Name: venthub_orders orders_delete_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY orders_delete_policy ON public.venthub_orders FOR DELETE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user() AS is_admin_user)));
+
+
+--
+-- Name: venthub_orders orders_insert_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY orders_insert_policy ON public.venthub_orders FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
+
+
+--
+-- Name: venthub_orders orders_select_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY orders_select_policy ON public.venthub_orders FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
+
+
+--
+-- Name: venthub_orders orders_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY orders_service_role ON public.venthub_orders TO service_role USING (true);
+
+
+--
+-- Name: venthub_orders orders_update_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY orders_update_policy ON public.venthub_orders FOR UPDATE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user)))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
+
+
+--
+-- Name: organizations; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: payment_transactions; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.payment_transactions ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: price_lists; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.price_lists ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: price_lists price_lists_admin_delete; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY price_lists_admin_delete ON public.price_lists FOR DELETE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: price_lists price_lists_admin_insert; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY price_lists_admin_insert ON public.price_lists FOR INSERT TO authenticated WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: price_lists price_lists_admin_update; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY price_lists_admin_update ON public.price_lists FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: price_lists price_lists_select_anon; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY price_lists_select_anon ON public.price_lists FOR SELECT TO anon USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (is_active = true)));
+
+
+--
+-- Name: price_lists price_lists_select_authenticated; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY price_lists_select_authenticated ON public.price_lists FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin) OR (is_active = true))));
+
+
+--
+-- Name: price_lists price_lists_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY price_lists_service_role ON public.price_lists TO service_role USING (true);
+
+
+--
+-- Name: products prod_admin_delete_opt; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY prod_admin_delete_opt ON public.products FOR DELETE TO authenticated USING ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
+
+
+--
+-- Name: products prod_admin_insert_opt; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY prod_admin_insert_opt ON public.products FOR INSERT TO authenticated WITH CHECK ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
+
+
+--
+-- Name: products prod_admin_update_opt; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY prod_admin_update_opt ON public.products FOR UPDATE TO authenticated USING ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[])))))) WITH CHECK ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying, 'moderator'::character varying])::text[]))))));
+
+
+--
+-- Name: products prod_public_read_opt; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY prod_public_read_opt ON public.products FOR SELECT USING (true);
+
+
+--
+-- Name: product_authorities; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.product_authorities ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: product_images; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: product_images product_images_select_all; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY product_images_select_all ON public.product_images FOR SELECT USING (true);
+
+
+--
+-- Name: product_images product_images_update_admin; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY product_images_update_admin ON public.product_images FOR UPDATE TO authenticated USING ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying])::text[])))))) WITH CHECK ((EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( SELECT auth.uid() AS uid)) AND ((user_profiles.role)::text = ANY ((ARRAY['admin'::character varying, 'superadmin'::character varying])::text[]))))));
+
+
+--
+-- Name: product_prices; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.product_prices ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: product_prices product_prices_admin_delete; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY product_prices_admin_delete ON public.product_prices FOR DELETE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: product_prices product_prices_admin_insert; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY product_prices_admin_insert ON public.product_prices FOR INSERT TO authenticated WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: product_prices product_prices_admin_update; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY product_prices_admin_update ON public.product_prices FOR UPDATE TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin))) WITH CHECK (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin)));
+
+
+--
+-- Name: product_prices product_prices_select_anon; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY product_prices_select_anon ON public.product_prices FOR SELECT TO anon USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (is_active = true)));
+
+
+--
+-- Name: product_prices product_prices_select_authenticated; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY product_prices_select_authenticated ON public.product_prices FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND (( SELECT public.is_user_admin(( SELECT auth.uid() AS uid)) AS is_user_admin) OR (is_active = true))));
+
+
+--
+-- Name: product_prices product_prices_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY product_prices_service_role ON public.product_prices TO service_role USING (true);
+
+
+--
+-- Name: products; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: project_items; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.project_items ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: rate_limits; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.rate_limits ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: venthub_returns returns_delete_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY returns_delete_policy ON public.venthub_returns FOR DELETE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user() AS is_admin_user)));
+
+
+--
+-- Name: venthub_returns returns_insert_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY returns_insert_policy ON public.venthub_returns FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
+
+
+--
+-- Name: venthub_returns returns_select_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY returns_select_policy ON public.venthub_returns FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ((user_id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
+
+
+--
+-- Name: venthub_returns returns_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY returns_service_role ON public.venthub_returns TO service_role USING (true);
+
+
+--
+-- Name: venthub_returns returns_update_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY returns_update_policy ON public.venthub_returns FOR UPDATE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user() AS is_admin_user))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ( SELECT public.is_admin_user() AS is_admin_user)));
+
+
+--
+-- Name: returns_webhook_events; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.returns_webhook_events ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: returns_webhook_events returns_webhook_events_admin_select; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY returns_webhook_events_admin_select ON public.returns_webhook_events FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
+
+
+--
+-- Name: returns_webhook_events returns_webhook_events_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY returns_webhook_events_service_role ON public.returns_webhook_events TO service_role USING (true);
+
+
+--
+-- Name: shopping_carts sc_auth_all; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY sc_auth_all ON public.shopping_carts TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
+
+
+--
+-- Name: shipping_email_events; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.shipping_email_events ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: shipping_email_events shipping_email_events_admin_select; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY shipping_email_events_admin_select ON public.shipping_email_events FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
+
+
+--
+-- Name: shipping_email_events shipping_email_events_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY shipping_email_events_service_role ON public.shipping_email_events TO service_role USING (true);
+
+
+--
+-- Name: shipping_idempotency; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.shipping_idempotency ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: shipping_webhook_events; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.shipping_webhook_events ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: shipping_webhook_events shipping_webhook_events_admin_select; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY shipping_webhook_events_admin_select ON public.shipping_webhook_events FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
+
+
+--
+-- Name: shipping_webhook_events shipping_webhook_events_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY shipping_webhook_events_service_role ON public.shipping_webhook_events TO service_role USING (true);
+
+
+--
+-- Name: shopping_carts; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.shopping_carts ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: shopping_carts shopping_carts_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY shopping_carts_service_role ON public.shopping_carts TO service_role USING (true);
+
+
+--
+-- Name: site_settings; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: tenants; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.tenants ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: tenants tenants_all_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY tenants_all_service_role ON public.tenants TO service_role USING (true);
+
+
+--
+-- Name: tenants tenants_select; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY tenants_select ON public.tenants FOR SELECT TO anon, authenticated USING (true);
+
+
+--
+-- Name: user_invoice_profiles uip_own; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY uip_own ON public.user_invoice_profiles TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
+
+
+--
+-- Name: user_addresses; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.user_addresses ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: user_addresses user_addresses_delete; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_addresses_delete ON public.user_addresses FOR DELETE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
+
+
+--
+-- Name: user_addresses user_addresses_insert; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_addresses_insert ON public.user_addresses FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
+
+
+--
+-- Name: user_addresses user_addresses_select; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_addresses_select ON public.user_addresses FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
+
+
+--
+-- Name: user_addresses user_addresses_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_addresses_service_role ON public.user_addresses TO service_role USING (true);
+
+
+--
+-- Name: user_addresses user_addresses_update; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_addresses_update ON public.user_addresses FOR UPDATE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
+
+
+--
+-- Name: user_invoice_profiles; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.user_invoice_profiles ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: user_invoice_profiles user_invoice_profiles_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_invoice_profiles_service_role ON public.user_invoice_profiles TO service_role USING (true);
+
+
+--
+-- Name: user_profiles; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: user_profiles user_profiles_delete_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_profiles_delete_policy ON public.user_profiles FOR DELETE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND public.is_admin_user()));
+
+
+--
+-- Name: user_profiles user_profiles_insert_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_profiles_insert_policy ON public.user_profiles FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ((id = ( SELECT auth.uid() AS uid)) OR public.is_admin_user())));
+
+
+--
+-- Name: user_profiles user_profiles_select_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_profiles_select_policy ON public.user_profiles FOR SELECT TO authenticated USING (((tenant_id = ( SELECT public.jwt_tenant_id() AS jwt_tenant_id)) AND ((id = ( SELECT auth.uid() AS uid)) OR ( SELECT public.is_admin_user() AS is_admin_user))));
+
+
+--
+-- Name: user_profiles user_profiles_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_profiles_service_role ON public.user_profiles TO service_role USING (true);
+
+
+--
+-- Name: user_profiles user_profiles_update_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY user_profiles_update_policy ON public.user_profiles FOR UPDATE TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ((id = ( SELECT auth.uid() AS uid)) OR public.is_admin_user()))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND ((id = ( SELECT auth.uid() AS uid)) OR public.is_admin_user())));
+
+
+--
+-- Name: user_projects; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.user_projects ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: venthub_order_items; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.venthub_order_items ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: venthub_order_items venthub_order_items_insert_optimized; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY venthub_order_items_insert_optimized ON public.venthub_order_items FOR INSERT TO authenticated WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM public.venthub_orders
+  WHERE ((venthub_orders.id = venthub_order_items.order_id) AND (venthub_orders.user_id = ( SELECT auth.uid() AS uid)) AND (venthub_orders.tenant_id = public.jwt_tenant_id()))))));
+
+
+--
+-- Name: venthub_order_items venthub_order_items_select_consolidated; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY venthub_order_items_select_consolidated ON public.venthub_order_items FOR SELECT TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND ((order_id IN ( SELECT venthub_orders.id
+   FROM public.venthub_orders
+  WHERE ((venthub_orders.user_id = ( SELECT auth.uid() AS uid)) AND (venthub_orders.tenant_id = public.jwt_tenant_id())))) OR ( SELECT public.is_admin_user() AS is_admin_user))));
+
+
+--
+-- Name: venthub_order_items venthub_order_items_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY venthub_order_items_service_role ON public.venthub_order_items TO service_role USING (true);
+
+
+--
+-- Name: venthub_orders; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.venthub_orders ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: venthub_returns; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.venthub_returns ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: wizard_selections; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.wizard_selections ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: wizard_selections wizard_selections_service_role; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY wizard_selections_service_role ON public.wizard_selections TO service_role USING (true);
+
+
+--
+-- Name: wizard_selections ws_anon_insert; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY ws_anon_insert ON public.wizard_selections FOR INSERT TO anon WITH CHECK ((tenant_id = public.jwt_tenant_id()));
+
+
+--
+-- Name: wizard_selections ws_auth_all; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY ws_auth_all ON public.wizard_selections TO authenticated USING (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid)))) WITH CHECK (((tenant_id = public.jwt_tenant_id()) AND (user_id = ( SELECT auth.uid() AS uid))));
+
+
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: -
+--
+
+GRANT USAGE ON SCHEMA public TO postgres;
+GRANT USAGE ON SCHEMA public TO anon;
+GRANT USAGE ON SCHEMA public TO authenticated;
+GRANT USAGE ON SCHEMA public TO service_role;
+GRANT USAGE ON SCHEMA public TO supabase_auth_admin;
+
+
+--
+-- Name: FUNCTION _normalize_rls_expr(expr text); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public._normalize_rls_expr(expr text) TO anon;
+GRANT ALL ON FUNCTION public._normalize_rls_expr(expr text) TO authenticated;
+GRANT ALL ON FUNCTION public._normalize_rls_expr(expr text) TO service_role;
+
+
+--
+-- Name: FUNCTION adjust_stock(p_product_id uuid, p_delta integer, p_reason text); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text) TO service_role;
+GRANT ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text) TO authenticated;
+
+
+--
+-- Name: FUNCTION adjust_stock(p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid) TO service_role;
+GRANT ALL ON FUNCTION public.adjust_stock(p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid) TO authenticated;
+
+
+--
+-- Name: FUNCTION adjust_stock_v2(p_product_id uuid, p_delta integer); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.adjust_stock_v2(p_product_id uuid, p_delta integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.adjust_stock_v2(p_product_id uuid, p_delta integer) TO service_role;
+
+
+--
+-- Name: FUNCTION admin_list_all_users(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.admin_list_all_users() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.admin_list_all_users() TO service_role;
+
+
+--
+-- Name: FUNCTION admin_list_users(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.admin_list_users() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.admin_list_users() TO service_role;
+GRANT ALL ON FUNCTION public.admin_list_users() TO authenticated;
+
+
+--
+-- Name: FUNCTION admin_search_products(p_q text, p_limit integer, p_offset integer, p_category_id uuid); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.admin_search_products(p_q text, p_limit integer, p_offset integer, p_category_id uuid) TO anon;
+GRANT ALL ON FUNCTION public.admin_search_products(p_q text, p_limit integer, p_offset integer, p_category_id uuid) TO authenticated;
+GRANT ALL ON FUNCTION public.admin_search_products(p_q text, p_limit integer, p_offset integer, p_category_id uuid) TO service_role;
+
+
+--
+-- Name: FUNCTION bump_rate_limit(p_key text, p_limit integer, p_window_seconds integer); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.bump_rate_limit(p_key text, p_limit integer, p_window_seconds integer) TO anon;
+GRANT ALL ON FUNCTION public.bump_rate_limit(p_key text, p_limit integer, p_window_seconds integer) TO authenticated;
+GRANT ALL ON FUNCTION public.bump_rate_limit(p_key text, p_limit integer, p_window_seconds integer) TO service_role;
+
+
+--
+-- Name: FUNCTION custom_access_token_hook(event jsonb); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.custom_access_token_hook(event jsonb) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.custom_access_token_hook(event jsonb) TO service_role;
+GRANT ALL ON FUNCTION public.custom_access_token_hook(event jsonb) TO supabase_auth_admin;
+
+
+--
+-- Name: FUNCTION enforce_role_change(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.enforce_role_change() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.enforce_role_change() TO service_role;
+
+
+--
+-- Name: TABLE venthub_orders; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.venthub_orders TO anon;
+GRANT ALL ON TABLE public.venthub_orders TO authenticated;
+GRANT ALL ON TABLE public.venthub_orders TO service_role;
+
+
+--
+-- Name: FUNCTION fn_admin_get_orders(p_id text, p_conv text, p_status text, p_limit integer); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.fn_admin_get_orders(p_id text, p_conv text, p_status text, p_limit integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.fn_admin_get_orders(p_id text, p_conv text, p_status text, p_limit integer) TO service_role;
+
+
+--
+-- Name: FUNCTION fn_admin_update_order_status(p_id text, p_status text, p_conv text); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.fn_admin_update_order_status(p_id text, p_status text, p_conv text) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.fn_admin_update_order_status(p_id text, p_status text, p_conv text) TO service_role;
+
+
+--
+-- Name: FUNCTION fn_auto_categorize_products(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.fn_auto_categorize_products() TO anon;
+GRANT ALL ON FUNCTION public.fn_auto_categorize_products() TO authenticated;
+GRANT ALL ON FUNCTION public.fn_auto_categorize_products() TO service_role;
+
+
+--
+-- Name: FUNCTION fn_enrich_product_specs(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.fn_enrich_product_specs() TO anon;
+GRANT ALL ON FUNCTION public.fn_enrich_product_specs() TO authenticated;
+GRANT ALL ON FUNCTION public.fn_enrich_product_specs() TO service_role;
+
+
+--
+-- Name: FUNCTION fts_search_products(p_q text, p_limit integer, p_filters jsonb); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.fts_search_products(p_q text, p_limit integer, p_filters jsonb) TO anon;
+GRANT ALL ON FUNCTION public.fts_search_products(p_q text, p_limit integer, p_filters jsonb) TO authenticated;
+GRANT ALL ON FUNCTION public.fts_search_products(p_q text, p_limit integer, p_filters jsonb) TO service_role;
+
+
+--
+-- Name: FUNCTION generate_order_number(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.generate_order_number() TO anon;
+GRANT ALL ON FUNCTION public.generate_order_number() TO authenticated;
+GRANT ALL ON FUNCTION public.generate_order_number() TO service_role;
+
+
+--
+-- Name: FUNCTION get_admin_users(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.get_admin_users() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.get_admin_users() TO service_role;
+
+
+--
+-- Name: FUNCTION get_products_enriched(p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.get_products_enriched(p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.get_products_enriched(p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric) TO service_role;
+GRANT ALL ON FUNCTION public.get_products_enriched(p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric) TO authenticated;
+GRANT ALL ON FUNCTION public.get_products_enriched(p_category_ids uuid[], p_limit integer, p_offset integer, p_search_query text, p_sort_by text, p_brand text, p_min_price numeric, p_max_price numeric) TO anon;
+
+
+--
+-- Name: FUNCTION get_search_suggestions(p_q text, p_limit integer); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.get_search_suggestions(p_q text, p_limit integer) TO anon;
+GRANT ALL ON FUNCTION public.get_search_suggestions(p_q text, p_limit integer) TO authenticated;
+GRANT ALL ON FUNCTION public.get_search_suggestions(p_q text, p_limit integer) TO service_role;
+
+
+--
+-- Name: FUNCTION get_user_role(user_id uuid); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.get_user_role(user_id uuid) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.get_user_role(user_id uuid) TO service_role;
+
+
+--
+-- Name: FUNCTION handle_new_user_metadata(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.handle_new_user_metadata() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.handle_new_user_metadata() TO service_role;
+
+
+--
+-- Name: FUNCTION handle_new_user_profile(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.handle_new_user_profile() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.handle_new_user_profile() TO service_role;
+
+
+--
+-- Name: FUNCTION handle_supabase_webhook(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.handle_supabase_webhook() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.handle_supabase_webhook() TO service_role;
+
+
+--
+-- Name: FUNCTION increment_coupon_usage(p_code text); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.increment_coupon_usage(p_code text) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.increment_coupon_usage(p_code text) TO service_role;
+
+
+--
+-- Name: FUNCTION increment_error_group_count(p_group_id uuid); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.increment_error_group_count(p_group_id uuid) TO anon;
+GRANT ALL ON FUNCTION public.increment_error_group_count(p_group_id uuid) TO authenticated;
+GRANT ALL ON FUNCTION public.increment_error_group_count(p_group_id uuid) TO service_role;
+
+
+--
+-- Name: FUNCTION is_admin(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.is_admin() TO service_role;
+GRANT ALL ON FUNCTION public.is_admin() TO authenticated;
+
+
+--
+-- Name: FUNCTION is_admin_user(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.is_admin_user() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.is_admin_user() TO service_role;
+GRANT ALL ON FUNCTION public.is_admin_user() TO authenticated;
+
+
+--
+-- Name: FUNCTION is_staff_user(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.is_staff_user() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.is_staff_user() TO service_role;
+GRANT ALL ON FUNCTION public.is_staff_user() TO authenticated;
+
+
+--
+-- Name: FUNCTION is_user_admin(user_id uuid); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.is_user_admin(user_id uuid) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.is_user_admin(user_id uuid) TO service_role;
+GRANT ALL ON FUNCTION public.is_user_admin(user_id uuid) TO authenticated;
+
+
+--
+-- Name: FUNCTION jwt_role(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.jwt_role() TO anon;
+GRANT ALL ON FUNCTION public.jwt_role() TO authenticated;
+GRANT ALL ON FUNCTION public.jwt_role() TO service_role;
+
+
+--
+-- Name: FUNCTION jwt_tenant_id(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.jwt_tenant_id() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.jwt_tenant_id() TO service_role;
+GRANT ALL ON FUNCTION public.jwt_tenant_id() TO authenticated;
+GRANT ALL ON FUNCTION public.jwt_tenant_id() TO anon;
+
+
+--
+-- Name: FUNCTION normalize_product_threshold_overrides(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.normalize_product_threshold_overrides() TO anon;
+GRANT ALL ON FUNCTION public.normalize_product_threshold_overrides() TO authenticated;
+GRANT ALL ON FUNCTION public.normalize_product_threshold_overrides() TO service_role;
+
+
+--
+-- Name: FUNCTION process_order_stock_reduction(p_order_id text); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.process_order_stock_reduction(p_order_id text) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.process_order_stock_reduction(p_order_id text) TO service_role;
+
+
+--
+-- Name: FUNCTION reverse_inventory_batch(p_batch_id uuid); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.reverse_inventory_batch(p_batch_id uuid) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.reverse_inventory_batch(p_batch_id uuid) TO service_role;
+
+
+--
+-- Name: FUNCTION reverse_inventory_batch(p_batch_id uuid, p_max_minutes integer); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.reverse_inventory_batch(p_batch_id uuid, p_max_minutes integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.reverse_inventory_batch(p_batch_id uuid, p_max_minutes integer) TO service_role;
+
+
+--
+-- Name: FUNCTION set_order_number(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.set_order_number() TO anon;
+GRANT ALL ON FUNCTION public.set_order_number() TO authenticated;
+GRANT ALL ON FUNCTION public.set_order_number() TO service_role;
+
+
+--
+-- Name: FUNCTION set_stock(p_product_id uuid, p_new_qty integer, p_reason text); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text) TO service_role;
+GRANT ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text) TO authenticated;
+
+
+--
+-- Name: FUNCTION set_stock(p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid) TO service_role;
+GRANT ALL ON FUNCTION public.set_stock(p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid) TO authenticated;
+
+
+--
+-- Name: FUNCTION set_updated_at(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.set_updated_at() TO anon;
+GRANT ALL ON FUNCTION public.set_updated_at() TO authenticated;
+GRANT ALL ON FUNCTION public.set_updated_at() TO service_role;
+
+
+--
+-- Name: FUNCTION set_user_admin_role(user_id uuid, new_role text); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.set_user_admin_role(user_id uuid, new_role text) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.set_user_admin_role(user_id uuid, new_role text) TO service_role;
+GRANT ALL ON FUNCTION public.set_user_admin_role(user_id uuid, new_role text) TO authenticated;
+
+
+--
+-- Name: FUNCTION set_user_role(user_id uuid, new_role text); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.set_user_role(user_id uuid, new_role text) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.set_user_role(user_id uuid, new_role text) TO service_role;
+
+
+--
+-- Name: FUNCTION sync_payment_status_with_status(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.sync_payment_status_with_status() TO anon;
+GRANT ALL ON FUNCTION public.sync_payment_status_with_status() TO authenticated;
+GRANT ALL ON FUNCTION public.sync_payment_status_with_status() TO service_role;
+
+
+--
+-- Name: FUNCTION tr_auto_categorize_trigger(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.tr_auto_categorize_trigger() TO anon;
+GRANT ALL ON FUNCTION public.tr_auto_categorize_trigger() TO authenticated;
+GRANT ALL ON FUNCTION public.tr_auto_categorize_trigger() TO service_role;
+
+
+--
+-- Name: FUNCTION update_inventory_settings(p_default_low_stock_threshold integer); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.update_inventory_settings(p_default_low_stock_threshold integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.update_inventory_settings(p_default_low_stock_threshold integer) TO service_role;
+
+
+--
+-- Name: FUNCTION update_inventory_thresholds(p_default integer, p_reset_overrides boolean); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.update_inventory_thresholds(p_default integer, p_reset_overrides boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION public.update_inventory_thresholds(p_default integer, p_reset_overrides boolean) TO service_role;
+
+
+--
+-- Name: FUNCTION update_updated_at_column(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.update_updated_at_column() TO anon;
+GRANT ALL ON FUNCTION public.update_updated_at_column() TO authenticated;
+GRANT ALL ON FUNCTION public.update_updated_at_column() TO service_role;
+
+
+--
+-- Name: FUNCTION update_user_profiles_updated_at(); Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON FUNCTION public.update_user_profiles_updated_at() TO anon;
+GRANT ALL ON FUNCTION public.update_user_profiles_updated_at() TO authenticated;
+GRANT ALL ON FUNCTION public.update_user_profiles_updated_at() TO service_role;
+
+
+--
+-- Name: FUNCTION user_invoice_profiles_ensure_single_default(); Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON FUNCTION public.user_invoice_profiles_ensure_single_default() FROM PUBLIC;
+GRANT ALL ON FUNCTION public.user_invoice_profiles_ensure_single_default() TO service_role;
+
+
+--
+-- Name: TABLE admin_audit_log; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.admin_audit_log TO anon;
+GRANT ALL ON TABLE public.admin_audit_log TO authenticated;
+GRANT ALL ON TABLE public.admin_audit_log TO service_role;
+
+
+--
+-- Name: TABLE user_profiles; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.user_profiles TO anon;
+GRANT ALL ON TABLE public.user_profiles TO authenticated;
+GRANT ALL ON TABLE public.user_profiles TO service_role;
+GRANT SELECT ON TABLE public.user_profiles TO supabase_auth_admin;
+
+
+--
+-- Name: TABLE admin_users; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.admin_users TO anon;
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.admin_users TO authenticated;
+GRANT ALL ON TABLE public.admin_users TO service_role;
+
+
+--
+-- Name: TABLE cart_items; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.cart_items TO anon;
+GRANT ALL ON TABLE public.cart_items TO authenticated;
+GRANT ALL ON TABLE public.cart_items TO service_role;
+
+
+--
+-- Name: TABLE categories; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.categories TO anon;
+GRANT ALL ON TABLE public.categories TO authenticated;
+GRANT ALL ON TABLE public.categories TO service_role;
+
+
+--
+-- Name: TABLE category_mapping_rules; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.category_mapping_rules TO anon;
+GRANT ALL ON TABLE public.category_mapping_rules TO authenticated;
+GRANT ALL ON TABLE public.category_mapping_rules TO service_role;
+
+
+--
+-- Name: TABLE client_errors; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.client_errors TO anon;
+GRANT ALL ON TABLE public.client_errors TO authenticated;
+GRANT ALL ON TABLE public.client_errors TO service_role;
+
+
+--
+-- Name: TABLE contact_messages; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.contact_messages TO anon;
+GRANT ALL ON TABLE public.contact_messages TO authenticated;
+GRANT ALL ON TABLE public.contact_messages TO service_role;
+
+
+--
+-- Name: TABLE coupons; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.coupons TO anon;
+GRANT ALL ON TABLE public.coupons TO authenticated;
+GRANT ALL ON TABLE public.coupons TO service_role;
+
+
+--
+-- Name: TABLE error_groups; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.error_groups TO anon;
+GRANT ALL ON TABLE public.error_groups TO authenticated;
+GRANT ALL ON TABLE public.error_groups TO service_role;
+
+
+--
+-- Name: TABLE inventory_movements; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.inventory_movements TO anon;
+GRANT ALL ON TABLE public.inventory_movements TO authenticated;
+GRANT ALL ON TABLE public.inventory_movements TO service_role;
+
+
+--
+-- Name: TABLE inventory_settings; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.inventory_settings TO anon;
+GRANT ALL ON TABLE public.inventory_settings TO authenticated;
+GRANT ALL ON TABLE public.inventory_settings TO service_role;
+
+
+--
+-- Name: TABLE products; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.products TO anon;
+GRANT ALL ON TABLE public.products TO authenticated;
+GRANT ALL ON TABLE public.products TO service_role;
+
+
+--
+-- Name: TABLE inventory_summary; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.inventory_summary TO anon;
+GRANT ALL ON TABLE public.inventory_summary TO authenticated;
+GRANT ALL ON TABLE public.inventory_summary TO service_role;
+
+
+--
+-- Name: TABLE venthub_order_items; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.venthub_order_items TO anon;
+GRANT ALL ON TABLE public.venthub_order_items TO authenticated;
+GRANT ALL ON TABLE public.venthub_order_items TO service_role;
+
+
+--
+-- Name: TABLE inventory_velocity; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.inventory_velocity TO anon;
+GRANT ALL ON TABLE public.inventory_velocity TO authenticated;
+GRANT ALL ON TABLE public.inventory_velocity TO service_role;
+
+
+--
+-- Name: TABLE order_attachments; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.order_attachments TO anon;
+GRANT ALL ON TABLE public.order_attachments TO authenticated;
+GRANT ALL ON TABLE public.order_attachments TO service_role;
+
+
+--
+-- Name: TABLE order_email_events; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.order_email_events TO anon;
+GRANT ALL ON TABLE public.order_email_events TO authenticated;
+GRANT ALL ON TABLE public.order_email_events TO service_role;
+
+
+--
+-- Name: TABLE order_notes; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.order_notes TO anon;
+GRANT ALL ON TABLE public.order_notes TO authenticated;
+GRANT ALL ON TABLE public.order_notes TO service_role;
+
+
+--
+-- Name: TABLE order_refund_events; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.order_refund_events TO anon;
+GRANT ALL ON TABLE public.order_refund_events TO authenticated;
+GRANT ALL ON TABLE public.order_refund_events TO service_role;
+
+
+--
+-- Name: TABLE organizations; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.organizations TO anon;
+GRANT ALL ON TABLE public.organizations TO authenticated;
+GRANT ALL ON TABLE public.organizations TO service_role;
+
+
+--
+-- Name: TABLE payment_transactions; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.payment_transactions TO anon;
+GRANT ALL ON TABLE public.payment_transactions TO authenticated;
+GRANT ALL ON TABLE public.payment_transactions TO service_role;
+
+
+--
+-- Name: TABLE price_lists; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.price_lists TO anon;
+GRANT ALL ON TABLE public.price_lists TO authenticated;
+GRANT ALL ON TABLE public.price_lists TO service_role;
+
+
+--
+-- Name: TABLE product_authorities; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.product_authorities TO anon;
+GRANT ALL ON TABLE public.product_authorities TO authenticated;
+GRANT ALL ON TABLE public.product_authorities TO service_role;
+
+
+--
+-- Name: TABLE product_images; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.product_images TO anon;
+GRANT ALL ON TABLE public.product_images TO authenticated;
+GRANT ALL ON TABLE public.product_images TO service_role;
+
+
+--
+-- Name: TABLE product_prices; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.product_prices TO anon;
+GRANT ALL ON TABLE public.product_prices TO authenticated;
+GRANT ALL ON TABLE public.product_prices TO service_role;
+
+
+--
+-- Name: TABLE project_items; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.project_items TO anon;
+GRANT ALL ON TABLE public.project_items TO authenticated;
+GRANT ALL ON TABLE public.project_items TO service_role;
+
+
+--
+-- Name: TABLE rate_limits; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.rate_limits TO anon;
+GRANT ALL ON TABLE public.rate_limits TO authenticated;
+GRANT ALL ON TABLE public.rate_limits TO service_role;
+
+
+--
+-- Name: TABLE reserved_orders; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.reserved_orders TO service_role;
+GRANT SELECT ON TABLE public.reserved_orders TO authenticated;
+
+
+--
+-- Name: TABLE returns_webhook_events; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.returns_webhook_events TO anon;
+GRANT ALL ON TABLE public.returns_webhook_events TO authenticated;
+GRANT ALL ON TABLE public.returns_webhook_events TO service_role;
+
+
+--
+-- Name: SEQUENCE returns_webhook_events_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON SEQUENCE public.returns_webhook_events_id_seq TO anon;
+GRANT ALL ON SEQUENCE public.returns_webhook_events_id_seq TO authenticated;
+GRANT ALL ON SEQUENCE public.returns_webhook_events_id_seq TO service_role;
+
+
+--
+-- Name: TABLE shipping_email_events; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.shipping_email_events TO anon;
+GRANT ALL ON TABLE public.shipping_email_events TO authenticated;
+GRANT ALL ON TABLE public.shipping_email_events TO service_role;
+
+
+--
+-- Name: TABLE shipping_idempotency; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.shipping_idempotency TO anon;
+GRANT ALL ON TABLE public.shipping_idempotency TO authenticated;
+GRANT ALL ON TABLE public.shipping_idempotency TO service_role;
+
+
+--
+-- Name: TABLE shipping_webhook_events; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.shipping_webhook_events TO anon;
+GRANT ALL ON TABLE public.shipping_webhook_events TO authenticated;
+GRANT ALL ON TABLE public.shipping_webhook_events TO service_role;
+
+
+--
+-- Name: SEQUENCE shipping_webhook_events_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON SEQUENCE public.shipping_webhook_events_id_seq TO anon;
+GRANT ALL ON SEQUENCE public.shipping_webhook_events_id_seq TO authenticated;
+GRANT ALL ON SEQUENCE public.shipping_webhook_events_id_seq TO service_role;
+
+
+--
+-- Name: TABLE shopping_carts; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.shopping_carts TO anon;
+GRANT ALL ON TABLE public.shopping_carts TO authenticated;
+GRANT ALL ON TABLE public.shopping_carts TO service_role;
+
+
+--
+-- Name: TABLE site_settings; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.site_settings TO anon;
+GRANT ALL ON TABLE public.site_settings TO authenticated;
+GRANT ALL ON TABLE public.site_settings TO service_role;
+
+
+--
+-- Name: TABLE tenants; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.tenants TO anon;
+GRANT ALL ON TABLE public.tenants TO authenticated;
+GRANT ALL ON TABLE public.tenants TO service_role;
+
+
+--
+-- Name: TABLE user_addresses; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.user_addresses TO anon;
+GRANT ALL ON TABLE public.user_addresses TO authenticated;
+GRANT ALL ON TABLE public.user_addresses TO service_role;
+
+
+--
+-- Name: TABLE user_invoice_profiles; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.user_invoice_profiles TO anon;
+GRANT ALL ON TABLE public.user_invoice_profiles TO authenticated;
+GRANT ALL ON TABLE public.user_invoice_profiles TO service_role;
+
+
+--
+-- Name: TABLE user_projects; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.user_projects TO anon;
+GRANT ALL ON TABLE public.user_projects TO authenticated;
+GRANT ALL ON TABLE public.user_projects TO service_role;
+
+
+--
+-- Name: TABLE venthub_returns; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.venthub_returns TO anon;
+GRANT ALL ON TABLE public.venthub_returns TO authenticated;
+GRANT ALL ON TABLE public.venthub_returns TO service_role;
+
+
+--
+-- Name: TABLE view_admin_orders; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.view_admin_orders TO anon;
+GRANT ALL ON TABLE public.view_admin_orders TO authenticated;
+GRANT ALL ON TABLE public.view_admin_orders TO service_role;
+
+
+--
+-- Name: TABLE wizard_selections; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE public.wizard_selections TO anon;
+GRANT ALL ON TABLE public.wizard_selections TO authenticated;
+GRANT ALL ON TABLE public.wizard_selections TO service_role;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: -
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO anon;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO authenticated;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR SEQUENCES; Type: DEFAULT ACL; Schema: public; Owner: -
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres;
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO anon;
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO authenticated;
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON SEQUENCES TO service_role;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: -
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO postgres;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO authenticated;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO service_role;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR FUNCTIONS; Type: DEFAULT ACL; Schema: public; Owner: -
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO postgres;
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon;
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO authenticated;
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON FUNCTIONS TO service_role;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: -
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO postgres;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO anon;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO authenticated;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO service_role;
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: public; Owner: -
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON TABLES TO postgres;
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON TABLES TO anon;
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL ON TABLES TO authenticated;
+ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin IN SCHEMA public GRANT ALL | ALL | public | `-` |
 
 ### contact_messages
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| Public can insert contact messages | INSERT | public | `-` |
-| Admins can view messages | SELECT | authenticated | `EXISTS (
-        SELECT 1 FROM user_profiles 
-        WHERE id = auth.uid(` |
-| contact_messages_public_insert | INSERT | public | `-` |
-| contact_messages_admin_select | SELECT | authenticated | `EXISTS (
-            SELECT 1 FROM public.user_profiles
-            WHERE user_p` |
-| contact_messages_admin_update | UPDATE | authenticated | `EXISTS (
-            SELECT 1 FROM public.user_profiles
-            WHERE user_p` |
-| contact_messages_public_insert | INSERT | public | `-` |
-| admin_view_messages | SELECT | authenticated | `EXISTS (
-            SELECT 1 FROM public.user_profiles 
-            WHERE id = ` |
-| cm_auth_select_opt | SELECT | authenticated | `(user_id = (SELECT auth.uid(` |
-| Admins can view messages | SELECT | authenticated | `EXISTS (
-        SELECT 1 FROM public.user_profiles
-        WHERE id = (SELECT a` |
+| Admins can view messages | SELECT | authenticated | `(EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( S` |
 
-### coupons
+### organizations
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| shipping_email_events_admin_select
-      ON public.shipping_email_events
-      FOR SELECT TO authenticated
-      USING (
-        EXISTS (
-          SELECT 1 FROM public.user_profiles up
-          WHERE up.id = auth.uid()
-            AND up.role IN ('admin','superadmin')
-        )
-      );
-    $$;
-  END IF;
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
+| Anyone can view organizations | SELECT | public | `true` |
 
-  -- order_email_events admin select
-  IF EXISTS (
-    SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='order_email_events'
-  ) AND NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='order_email_events' AND policyname='order_email_events_admin_select'
-  ) THEN
-    EXECUTE $$
-      CREATE POLICY order_email_events_admin_select
-      ON public.order_email_events
-      FOR SELECT TO authenticated
-      USING (
-        EXISTS (
-          SELECT 1 FROM public.user_profiles up
-          WHERE up.id = auth.uid()
-            AND up.role IN ('admin','superadmin')
-        )
-      );
-    $$;
-  END IF;
-
-  -- returns_webhook_events admin select (silence INFO and allow admin inspection)
-  IF EXISTS (
-    SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='returns_webhook_events'
-  ) AND NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='returns_webhook_events' AND policyname='returns_webhook_events_admin_select'
-  ) THEN
-    EXECUTE $$
-      CREATE POLICY returns_webhook_events_admin_select
-      ON public.returns_webhook_events
-      FOR SELECT TO authenticated
-      USING (
-        EXISTS (
-          SELECT 1 FROM public.user_profiles up
-          WHERE up.id = auth.uid()
-            AND up.role IN ('admin','superadmin')
-        )
-      );
-    $$;
-  END IF;
-END$$;
-
--- 3) Harden search_path for trigger function public.enforce_role_change()
-DO $$
-DECLARE
-  fn_oid oid;
-BEGIN
-  SELECT p.oid INTO fn_oid
-  FROM pg_proc p
-  JOIN pg_namespace n ON p.pronamespace = n.oid
-  WHERE n.nspname = 'public'
-    AND p.proname = 'enforce_role_change'
-    AND pg_catalog.pg_get_function_identity_arguments(p.oid) = '';
-
-  IF fn_oid IS NOT NULL THEN
-    EXECUTE 'ALTER FUNCTION public.enforce_role_change() SET search_path = pg_catalog, public;';
-  END IF;
-END$$;
-
-COMMIT;
-
-
--- FILE: 20250914_security_rls_policies2.sql
-BEGIN;
-
--- 20250914_security_rls_policies2.sql
--- Purpose: Add explicit RLS policies (service_role insert, admin select) for email audit tables
---          and ensure returns_webhook_events also has policies. Re-apply safe search_path for enforce_role_change().
-
--- Ensure RLS is enabled (idempotent)
-ALTER TABLE IF EXISTS public.shipping_email_events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS public.order_email_events    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS public.returns_webhook_events ENABLE ROW LEVEL SECURITY;
-
-DO $$
-BEGIN
-  -- shipping_email_events policies
-  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='shipping_email_events') THEN
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shipping_email_events' AND policyname='shipping_email_events_service_insert'
-    ) THEN
-      EXECUTE $$
-        CREATE POLICY shipping_email_events_service_insert
-        ON public.shipping_email_events
-        FOR INSERT TO service_role
-        WITH CHECK (true);
-      $$;
-    END IF;
-
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shipping_email_events' AND policyname='shipping_email_events_admin_select'
-    ) THEN
-      EXECUTE $$
-        CREATE POLICY shipping_email_events_admin_select
-        ON public.shipping_email_events
-        FOR SELECT TO authenticated
-        USING (
-          EXISTS (
-            SELECT 1 FROM public.user_profiles up
-            WHERE up.id = auth.uid() AND up.role IN ('admin','superadmin')
-          )
-        );
-      $$;
-    END IF;
-  END IF;
-
-  -- order_email_events policies
-  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='order_email_events') THEN
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='order_email_events' AND policyname='order_email_events_service_insert'
-    ) THEN
-      EXECUTE $$
-        CREATE POLICY order_email_events_service_insert
-        ON public.order_email_events
-        FOR INSERT TO service_role
-        WITH CHECK (true);
-      $$;
-    END IF;
-
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='order_email_events' AND policyname='order_email_events_admin_select'
-    ) THEN
-      EXECUTE $$
-        CREATE POLICY order_email_events_admin_select
-        ON public.order_email_events
-        FOR SELECT TO authenticated
-        USING (
-          EXISTS (
-            SELECT 1 FROM public.user_profiles up
-            WHERE up.id = auth.uid() AND up.role IN ('admin','superadmin')
-          )
-        );
-      $$;
-    END IF;
-  END IF;
-
-  -- returns_webhook_events policies
-  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='returns_webhook_events') THEN
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='returns_webhook_events' AND policyname='returns_webhook_events_service_insert'
-    ) THEN
-      EXECUTE $$
-        CREATE POLICY returns_webhook_events_service_insert
-        ON public.returns_webhook_events
-        FOR INSERT TO service_role
-        WITH CHECK (true);
-      $$;
-    END IF;
-
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='returns_webhook_events' AND policyname='returns_webhook_events_admin_select'
-    ) THEN
-      EXECUTE $$
-        CREATE POLICY returns_webhook_events_admin_select
-        ON public.returns_webhook_events
-        FOR SELECT TO authenticated
-        USING (
-          EXISTS (
-            SELECT 1 FROM public.user_profiles up
-            WHERE up.id = auth.uid() AND up.role IN ('admin','superadmin')
-          )
-        );
-      $$;
-    END IF;
-  END IF;
-END$$;
-
--- Re-apply safe search_path for enforce_role_change()
-DO $$
-DECLARE fn_oid oid;
-BEGIN
-  SELECT p.oid INTO fn_oid
-  FROM pg_proc p
-  JOIN pg_namespace n ON p.pronamespace = n.oid
-  WHERE n.nspname = 'public'
-    AND p.proname = 'enforce_role_change'
-    AND pg_catalog.pg_get_function_identity_arguments(p.oid) = '';
-  IF fn_oid IS NOT NULL THEN
-    EXECUTE 'ALTER FUNCTION public.enforce_role_change() SET search_path = pg_catalog, public;';
-  END IF;
-END$$;
-
-COMMIT;
-
-
--- FILE: 20250915152500_admin_coupons_notes_attachments.sql
--- 2025-09-15 Create coupons, order_notes, order_attachments with RLS and grants
--- Ensure pgcrypto is available for gen_random_uuid()
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
-
-SET LOCAL search_path = public, extensions;
-
--- Helper trigger for updated_at
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Coupons table
-CREATE TABLE IF NOT EXISTS public.coupons (
-  id uuid PRIMARY KEY DEFAULT extensions.gen_random_uuid(),
-  code text UNIQUE NOT NULL CHECK (length(code) >= 3 AND length(code) <= 50),
-  description text,
-  discount_type text NOT NULL CHECK (discount_type IN ('percentage','fixed_amount')),
-  discount_value decimal(10,2) NOT NULL CHECK (discount_value > 0),
-  minimum_order_amount decimal(10,2) DEFAULT 0 CHECK (minimum_order_amount >= 0),
-  usage_limit integer CHECK (usage_limit IS NULL OR usage_limit > 0),
-  used_count integer DEFAULT 0 CHECK (used_count >= 0),
-  is_active boolean DEFAULT true,
-  valid_from timestamptz DEFAULT now(),
-  valid_until timestamptz,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now(),
-  created_by uuid REFERENCES auth.users(id),
-  CONSTRAINT valid_date_range CHECK (valid_until IS NULL OR valid_until > valid_from),
-  CONSTRAINT usage_limit_check CHECK (usage_limit IS NULL OR used_count <= usage_limit)
-);
-
-CREATE INDEX IF NOT EXISTS idx_coupons_code ON public.coupons(code);
-CREATE INDEX IF NOT EXISTS idx_coupons_active_valid ON public.coupons(is_active, valid_from, valid_until) WHERE is_active = true;
-
-DROP TRIGGER IF EXISTS update_coupons_updated_at ON public.coupons;
-CREATE TRIGGER update_coupons_updated_at BEFORE UPDATE | EACH | public | `-` |
-| Admin users can manage coupons | ALL | authenticated | `is_admin_user(auth.uid(` |
-| Public can view active coupons | SELECT | public | `-` |
-
-### email
+### product_authorities
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| order_refund_events_service_insert
-      ON public.order_refund_events
-      FOR INSERT TO service_role
-      WITH CHECK (true);
-    $$;
-  END IF;
+| Product authorities are manageable by admins. | ALL | public | `(EXISTS ( SELECT 1
+   FROM public.user_profiles
+  WHERE ((user_profiles.id = ( S` |
 
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='order_refund_events' AND policyname='order_refund_events_admin_select') THEN
-    EXECUTE $$
-      CREATE POLICY order_refund_events_admin_select
-      ON public.order_refund_events
-      FOR SELECT TO authenticated
-      USING (EXISTS (SELECT 1 FROM public.user_profiles up WHERE up.id = auth.uid() AND up.role IN ('admin','superadmin')));
-    $$;
-  END IF;
-END$$;
-
-COMMIT;
-
-
--- FILE: 20250914_returns_webhook_events.sql
-BEGIN;
-
--- 1) Returns webhook audit/dedup table
-CREATE TABLE IF NOT EXISTS public.returns_webhook_events (
-  id bigserial PRIMARY KEY,
-  event_id text NOT NULL UNIQUE,
-  return_id uuid NULL,
-  order_id uuid NULL,
-  carrier text NULL,
-  tracking_number text NULL,
-  status_raw text NULL,
-  status_mapped text NULL,
-  body_hash text NOT NULL,
-  received_at timestamptz NOT NULL DEFAULT now(),
-  processed_at timestamptz NULL
-);
-CREATE INDEX IF NOT EXISTS returns_webhook_events_return_id_idx ON public.returns_webhook_events(return_id);
-CREATE INDEX IF NOT EXISTS returns_webhook_events_received_at_idx ON public.returns_webhook_events(received_at DESC);
-ALTER TABLE public.returns_webhook_events ENABLE ROW LEVEL SECURITY;
-
--- 2) Minimal policy: Service role only (edge functions). No public access.
--- (RLS defaults to deny; functions use service role.)
-
-COMMIT;
-
-
--- FILE: 20250914_security_rls_email_events_and_search_path.sql
-BEGIN;
-
--- 20250914_security_rls_email_events_and_search_path.sql
--- Purpose:
--- 1) Enable RLS | ALL | public | `-` |
-
-### error_groups
+### project_items
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| client_errors_select_admin_jwt
-      ON public.client_errors FOR SELECT
-      TO authenticated
-      USING (public.jwt_role() IN ('admin','moderator'));
-  END IF;
-END $$;
+| Users can delete items from their projects | DELETE | public | `(EXISTS ( SELECT 1
+   FROM public.user_projects
+  WHERE ((user_projects.id = pro` |
+| Users can insert items in their projects | INSERT | public | `-` |
+| Users can update items in their projects | UPDATE | public | `(EXISTS ( SELECT 1
+   FROM public.user_projects
+  WHERE ((user_projects.id = pro` |
+| Users can view items in their projects | SELECT | public | `(EXISTS ( SELECT 1
+   FROM public.user_projects
+  WHERE ((user_projects.id = pro` |
 
--- Fallback: allow the project owner by email (only this address) to read client errors
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='client_errors' AND policyname='client_errors_select_owner_email'
-  ) THEN
-    CREATE POLICY client_errors_select_owner_email
-      ON public.client_errors FOR SELECT
-      TO authenticated
-      USING ((current_setting('request.jwt.claims', true)::jsonb ->> 'email') = 'recep.varlik@gmail.com');
-  END IF;
-END $$;
-
-
-
--- FILE: 20250908_enable_realtime_error_tables.sql
--- Ensure Realtime publication includes error tables (idempotent)
--- Created: 2025-09-08
-
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_publication_tables
-      WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'error_groups'
-    ) THEN
-      ALTER PUBLICATION supabase_realtime ADD TABLE public.error_groups;
-    END IF;
-
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_publication_tables
-      WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'client_errors'
-    ) THEN
-      ALTER PUBLICATION supabase_realtime ADD TABLE public.client_errors;
-    END IF;
-  END IF;
-END $$;
-
-
--- FILE: 20250908_error_groups.sql
--- Error groups for client-side logging aggregation
--- Created: 2025-09-08
-
-CREATE TABLE IF NOT EXISTS public.error_groups (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  signature text UNIQUE NOT NULL,
-  level text NOT NULL DEFAULT 'error',
-  last_message text NULL,
-  url_sample text NULL,
-  env text NULL,
-  release text NULL,
-  first_seen timestamptz NOT NULL DEFAULT now(),
-  last_seen timestamptz NOT NULL DEFAULT now(),
-  count bigint NOT NULL DEFAULT 1,
-  status text NOT NULL DEFAULT 'open', -- open | resolved | ignored
-  assigned_to uuid NULL REFERENCES public.user_profiles(id) ON DELETE SET NULL,
-  notes text NULL
-);
-
-ALTER TABLE public.error_groups ENABLE ROW LEVEL SECURITY;
-
--- Admin/moderator can read/update
-CREATE POLICY IF NOT EXISTS error_groups_select_admin ON public.error_groups
-  FOR SELECT TO authenticated
-  USING (public.jwt_role() IN ('admin','moderator'));
-
-CREATE POLICY IF NOT EXISTS error_groups_update_admin ON public.error_groups
-  FOR UPDATE TO authenticated
-  USING (public.jwt_role() IN ('admin','moderator'))
-  WITH CHECK (public.jwt_role() IN ('admin','moderator'));
-
--- No INSERT policy: insert via service role (Edge Function)
-
--- Helpful indexes
-CREATE INDEX IF NOT EXISTS idx_error_groups_last_seen ON public.error_groups(last_seen DESC);
-CREATE INDEX IF NOT EXISTS idx_error_groups_count ON public.error_groups(count DESC);
-
--- Link raw errors to groups
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name='client_errors' AND column_name='group_id'
-  ) THEN
-    ALTER TABLE public.client_errors
-      ADD COLUMN group_id uuid NULL REFERENCES public.error_groups(id) ON DELETE SET NULL;
-  END IF;
-END $$;
-
-
--- FILE: 20250908_error_groups_policies_fix.sql
--- Broaden error_groups RLS to allow admin/moderator by DB role as well as JWT claim
--- Created: 2025-09-08
-
--- SELECT policy via user_profiles (non-recursive, safe)
-CREATE POLICY IF NOT EXISTS error_groups_select_admin_db
-  ON public.error_groups
-  FOR SELECT
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  );
-
--- UPDATE policy via user_profiles (for status/assigned_to/notes changes)
-CREATE POLICY IF NOT EXISTS error_groups_update_admin_db
-  | UPDATE | authenticated | `EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.ui` |
-| admins_read_error_groups | SELECT | authenticated | `public.is_admin_user(` |
-
-### order_attachments
+### user_projects
 
 | Policy | Islem | Rol | Kosul |
 |--------|-------|-----|-------|
-| Admin users can manage order attachments | ALL | authenticated | `is_admin_user(auth.uid(` |
-| Order owners can view non-internal attachments | SELECT | authenticated | `NOT is_internal AND order_id IN (SELECT id FROM public.venthub_orders WHERE user` |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
-### order_notes
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| Admin users can manage order notes | ALL | authenticated | `is_admin_user(auth.uid(` |
-| Order owners can view non-internal notes | SELECT | authenticated | `NOT is_internal AND order_id IN (SELECT id FROM public.venthub_orders WHERE user` |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
-### product_images
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| user_profiles_select_admin_list
-      ON public.user_profiles FOR SELECT
-      TO authenticated
-      USING (role IN ('admin','moderator'));
-  END IF;
-END $$;
-
-
-
--- FILE: 20250908_fix_user_profiles_recursion.sql
--- Fix infinite recursion in user_profiles RLS policies by avoiding subqueries on the same table
--- Created: 2025-09-08
-
--- Helper expression to read JWT role safely
--- Note: This reads the 'role' claim from the current request JWT
-CREATE OR REPLACE FUNCTION public.jwt_role()
-RETURNS text
-LANGUAGE sql
-STABLE
-AS $$
-  SELECT COALESCE( NULLIF(current_setting('request.jwt.claims', true), ''), '{}' )::jsonb ->> 'role'
-$$;
-
--- Ensure RLS enabled
-ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
-
--- Drop recursive policies if they exist
-DROP POLICY IF EXISTS user_profiles_select_admin ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_update_admin ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_update_own ON public.user_profiles;
-
--- Re-create safe policies
--- 1) Select own (keep)
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_select_own'
-  ) THEN
-    CREATE POLICY user_profiles_select_own
-      ON public.user_profiles FOR SELECT
-      USING (id = auth.uid());
-  END IF;
-END $$;
-
--- 2) Select for admins via JWT claim (no subselects)
-CREATE POLICY user_profiles_select_admin
-  ON public.user_profiles FOR SELECT
-  USING (
-    public.jwt_role() IN ('admin','moderator')
-  );
-
--- 3) Update own (allow if same user; prevent role escalation by requiring NEW.role equals JWT role)
-CREATE POLICY user_profiles_update_own
-  ON public.user_profiles FOR UPDATE
-  USING (id = auth.uid())
-  WITH CHECK (
-    id = auth.uid() AND
-    (role IS NULL OR role = public.jwt_role())
-  );
-
--- 4) Update for admins via JWT claim
-CREATE POLICY user_profiles_update_admin
-  ON public.user_profiles FOR UPDATE
-  USING (public.jwt_role() IN ('admin','moderator'))
-  WITH CHECK (public.jwt_role() IN ('admin','moderator'));
-
--- Note: Existing insert policies (insert_own, insert_service) remain unchanged
-
-
--- FILE: 20250908_increment_error_group_count.sql
--- RPC to atomically increment error group count and update last_seen
--- Created: 2025-09-08
-
-CREATE OR REPLACE FUNCTION public.increment_error_group_count(p_group_id uuid)
-RETURNS void
-LANGUAGE sql
-AS $$
-  UPDATE public.error_groups
-  SET count = count + 1,
-      last_seen = now()
-  WHERE id = p_group_id;
-$$;
-
-COMMENT ON FUNCTION public.increment_error_group_count(uuid)
-  IS 'Atomically increments error_groups.count and updates last_seen for the given group id.';
-
-
-
--- FILE: 20250908_product_images.sql
-begin;
-
-create table if not exists public.product_images (
-  id uuid primary key default gen_random_uuid(),
-  product_id uuid not null references public.products(id) on delete cascade,
-  path text not null,
-  alt text null,
-  sort_order int not null default 0,
-  created_at timestamptz not null default now()
-);
-
-create index if not exists idx_product_images_product_sort on public.product_images(product_id, sort_order);
-
-alter table public.product_images enable row level security;
-
--- Public select policy (anyone can read)
-do $$
-begin
-  if not exists (
-    select 1 from pg_policies where schemaname='public' and tablename='product_images' and policyname='product_images_select_all'
-  ) then
-    create policy product_images_select_all on public.product_images
-      for select using (true);
-  end if;
-end $$;
-
--- Admin/moderator insert
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='product_images' AND policyname='product_images_insert_admin'
-  ) THEN
-    CREATE POLICY product_images_insert_admin ON public.product_images
-      FOR INSERT
-      WITH CHECK ( (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') IN ('admin','moderator') );
-  END IF;
-END $$;
-
--- Admin/moderator update
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='product_images' AND policyname='product_images_update_admin'
-  ) THEN
-    CREATE POLICY product_images_update_admin ON public.product_images
-      FOR UPDATE
-      USING ( (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') IN ('admin','moderator') )
-      WITH CHECK ( (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') IN ('admin','moderator') );
-  END IF;
-END $$;
-
--- Admin/moderator delete
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='product_images' AND policyname='product_images_delete_admin'
-  ) THEN
-    CREATE POLICY product_images_delete_admin ON public.product_images
-      FOR DELETE
-      USING ( (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') IN ('admin','moderator') );
-  END IF;
-END $$;
-
-commit;
-
-
-
--- FILE: 20250908_products_pricing_seo.sql
-begin;
-
--- Add purchase_price column if missing
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema='public' AND table_name='products' AND column_name='purchase_price'
-  ) THEN
-    ALTER TABLE public.products ADD COLUMN purchase_price numeric(12,2) NULL;
-  END IF;
-END $$;
-
--- Add slug column if missing
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema='public' AND table_name='products' AND column_name='slug'
-  ) THEN
-    ALTER TABLE public.products ADD COLUMN slug text NULL;
-  END IF;
-END $$;
-
--- Add meta_title column if missing
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema='public' AND table_name='products' AND column_name='meta_title'
-  ) THEN
-    ALTER TABLE public.products ADD COLUMN meta_title text NULL;
-  END IF;
-END $$;
-
--- Add meta_description column if missing
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema='public' AND table_name='products' AND column_name='meta_description'
-  ) THEN
-    ALTER TABLE public.products ADD COLUMN meta_description text NULL;
-  END IF;
-END $$;
-
--- Unique index on lower(slug) for case-insensitive uniqueness
-DO $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema='public' AND table_name='products' AND column_name='slug'
-  ) AND NOT EXISTS (
-    SELECT 1 FROM pg_indexes WHERE schemaname='public' AND tablename='products' AND indexname='uq_products_slug_lower'
-  ) THEN
-    CREATE UNIQUE INDEX uq_products_slug_lower ON public.products (lower(slug));
-  END IF;
-END $$;
-
-commit;
-
-
-
--- FILE: 20250908_products_update_policies.sql
-begin;
-
--- Ensure RLS update policy for products limited to admin/moderator only
--- Assumes RLS is already enabled on public.products and a public SELECT policy exists
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='products' AND policyname='products_update_admin_only'
-  ) THEN
-    CREATE POLICY products_update_admin_only ON public.products
-      FOR UPDATE TO authenticated
-      USING ( public.jwt_role() IN ('admin','moderator') )
-      WITH CHECK ( public.jwt_role() IN ('admin','moderator') );
-  END IF;
-END$$;
-
-commit;
-
-
-
--- FILE: 20250908_storage_product_images.sql
-begin;
-
--- Create public bucket for product images
-insert into storage.buckets (id, name, public)
-values ('product-images', 'product-images', true)
-on conflict (id) do nothing;
-
--- Public read access for product-images bucket
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_read_public'
-  ) THEN
-    CREATE POLICY product_images_read_public ON storage.objects
-      FOR SELECT
-      USING (bucket_id = 'product-images');
-  END IF;
-END $$;
-
--- Admin/moderator write access (insert/update/delete)
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_insert_admin'
-  ) THEN
-    CREATE POLICY product_images_insert_admin ON storage.objects
-      FOR INSERT
-      WITH CHECK (
-        bucket_id = 'product-images'
-        AND (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') IN ('admin','moderator')
-      );
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_update_admin'
-  ) THEN
-    CREATE POLICY product_images_update_admin ON storage.objects
-      FOR UPDATE
-      USING (
-        bucket_id = 'product-images'
-        AND (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') IN ('admin','moderator')
-      )
-      WITH CHECK (
-        bucket_id = 'product-images'
-        AND (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') IN ('admin','moderator')
-      );
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_delete_admin'
-  ) THEN
-    CREATE POLICY product_images_delete_admin ON storage.objects
-      FOR DELETE
-      USING (
-        bucket_id = 'product-images'
-        AND (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') IN ('admin','moderator')
-      );
-  END IF;
-END $$;
-
-commit;
-
-
-
--- FILE: 20250909_debug_rls_product_images.sql
-begin;
-
--- Create helper to inspect current request/session context safely
--- Returns values that help diagnose RLS: current_user (db role), auth.uid(), and raw JWT claims
-create or replace function public.debug_context()
-returns jsonb
-language sql
-stable
-as $$
-  select jsonb_build_object(
-    'current_user', current_user,
-    'auth_uid', auth.uid(),
-    'jwt_claims', coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb
-  );
-$$;
-
--- Allow both anon and authenticated to execute; the function only reads session context
-grant execute on function public.debug_context() to anon, authenticated;
-
--- Create helper to list active policies on product_images
--- Uses SECURITY DEFINER so it can read pg_policies regardless of caller permissions.
-create or replace function public.debug_policies_product_images()
-returns table (
-  schemaname text,
-  tablename text,
-  policyname text,
-  permissive boolean,
-  roles name[],
-  cmd text,
-  qual text,
-  with_check text
-)
-language sql
-security definer
-set search_path = pg_catalog, public
-as $$
-  select p.schemaname,
-         p.tablename,
-         p.policyname,
-         p.permissive,
-         p.roles,
-         p.cmd,
-         p.qual,
-         p.with_check
-  from pg_policies p
-  where p.schemaname = 'public' and p.tablename = 'product_images'
-  order by p.policyname;
-$$;
-
--- Make it callable by both anon and authenticated for read-only diagnostics
-grant execute on function public.debug_policies_product_images() to anon, authenticated;
-
-commit;
-
-
--- FILE: 20250909_fix_product_images_rls.sql
-begin;
-
--- Fix product_images table RLS: allow admin/moderator by user_profiles role (not JWT claim)
-
-alter table if exists public.product_images enable row level security;
-
--- Drop old claim-based policies if present
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='product_images' AND policyname='product_images_insert_admin') THEN
-    DROP POLICY product_images_insert_admin ON public.product_images;
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='product_images' AND policyname='product_images_update_admin') THEN
-    DROP POLICY product_images_update_admin ON public.product_images;
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='product_images' AND policyname='product_images_delete_admin') THEN
-    DROP POLICY product_images_delete_admin ON public.product_images;
-  END IF;
-END $$;
-
--- Recreate policies using user_profiles role check
-CREATE POLICY IF NOT EXISTS product_images_insert_admin ON public.product_images
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  );
-
-CREATE POLICY IF NOT EXISTS product_images_update_admin ON public.product_images
-  FOR UPDATE TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  );
-
-CREATE POLICY IF NOT EXISTS product_images_delete_admin ON public.product_images
-  FOR DELETE TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  );
-
--- Also fix storage.objects (product-images bucket) policies to use user_profiles role
--- Drop claim-based policies if present
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_insert_admin') THEN
-    DROP POLICY product_images_insert_admin ON storage.objects;
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_update_admin') THEN
-    DROP POLICY product_images_update_admin ON storage.objects;
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_delete_admin') THEN
-    DROP POLICY product_images_delete_admin ON storage.objects;
-  END IF;
-END $$;
-
--- Recreate storage policies
-CREATE POLICY product_images_insert_admin ON storage.objects
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    bucket_id = 'product-images' AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  );
-
-CREATE POLICY product_images_update_admin ON storage.objects
-  FOR UPDATE TO authenticated
-  USING (
-    bucket_id = 'product-images' AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  )
-  WITH CHECK (
-    bucket_id = 'product-images' AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  );
-
-CREATE POLICY product_images_delete_admin ON storage.objects
-  FOR DELETE TO authenticated
-  USING (
-    bucket_id = 'product-images' AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  );
-
-commit;
-
-
-
--- FILE: 20250909_product_images_rls_reset.sql
-begin;
-
--- Kesin reset: product_images tabloundaki TÜM politikaları düşür ve doğru politikaları yeniden oluştur
--- Amaç: claim (jwt role) tabanlı eski politikalar kalmışsa temizlemek ve user_profiles + auth.uid() ile net izin vermek
-
--- RLS açık olsun
-alter table if exists public.product_images enable row level security;
-
--- Var olan tüm politikaları kaldır
-DO $$
-DECLARE pol record;
-BEGIN
-  FOR pol IN
-    SELECT policyname
-    FROM pg_policies
-    WHERE schemaname='public' AND tablename='product_images'
-  LOOP
-    EXECUTE format('DROP POLICY %I ON public.product_images', pol.policyname);
-  END LOOP;
-END $$;
-
--- Herkese SELECT (katalog görüntüleme; zaten storage public read var)
-CREATE POLICY product_images_select_all ON public.product_images
-  FOR SELECT
-  USING (true);
-
--- Yalnızca admin/moderator (user_profiles) yazabilir/güncelleyebilir/silebilir
--- Not: TO authenticated — istemci gerçekten oturumlu ise kullanılır.
-CREATE POLICY product_images_insert_admin ON public.product_images
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  );
-
-CREATE POLICY product_images_update_admin ON public.product_images
-  FOR UPDATE TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  );
-
-CREATE POLICY product_images_delete_admin ON public.product_images
-  FOR DELETE TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin','moderator')
-    )
-  );
-
-commit;
-
-
--- FILE: 20250909_product_images_to_public.sql
-begin;
--- noop migration: intentionally left empty while diagnosing RLS | ALL | public | `-` |
-| product_images_update_consolidated | UPDATE | authenticated | `true` |
-| product_images_update_admin | UPDATE | authenticated | `EXISTS (
-            SELECT 1 FROM public.user_profiles 
-            WHERE id = ` |
-| product_images_update_admin | UPDATE | authenticated | `EXISTS (
-            SELECT 1 FROM public.user_profiles 
-            WHERE id = ` |
-| product_images_update_admin | UPDATE | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = auth.uid(` |
-| pi_admin_all_opt | ALL | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-
-### products
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| products_update_admin_stock | UPDATE | public | `(SELECT coalesce(nullif(current_setting('request.jwt.claims', true` |
-| products_update_stock_authenticated | UPDATE | public | `auth.uid(` |
-| products_read | SELECT | public | `-` |
-| products_admin_write | ALL | authenticated | `EXISTS (
-            SELECT 1 FROM public.user_profiles
-            WHERE id = (` |
-| prod_read | SELECT | public | `-` |
-| prod_admin | ALL | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-| products_public_read | SELECT | public | `-` |
-| p_public_read | SELECT | public | `-` |
-| p_admin_write | ALL | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-| p_public_read | SELECT | public | `-` |
-| prod_admin_insert | INSERT | authenticated | `-` |
-| prod_admin_update | UPDATE | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-| prod_admin_delete | DELETE | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-| p_public_read | SELECT | public | `-` |
-| prod_admin | ALL | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = auth.uid(` |
-| prod_public_read_opt | SELECT | public | `true` |
-| prod_public_read_opt | SELECT | public | `true` |
-| prod_admin_all_opt | ALL | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-| prod_admin_insert_opt | INSERT | authenticated | `-` |
-| prod_admin_update_opt | UPDATE | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-| prod_admin_delete_opt | DELETE | authenticated | `EXISTS (SELECT 1 FROM public.user_profiles WHERE id = (SELECT auth.uid(` |
-
-### reserved_orders
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| inventory_settings_select_all ON public.inventory_settings
-      FOR SELECT USING (true);
-  END IF;
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='inventory_settings' AND policyname='inventory_settings_update_admin'
-  ) THEN
-    CREATE POLICY inventory_settings_update_admin ON public.inventory_settings
-      FOR UPDATE USING ( (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') = 'admin' );
-  END IF;
-END$$;
-
--- Movements: allow SELECT for admin; INSERT only via RPC (deny-all policy here)
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='inventory_movements' AND policyname='inventory_movements_select_admin'
-  ) THEN
-    CREATE POLICY inventory_movements_select_admin ON public.inventory_movements
-      FOR SELECT USING ( (SELECT coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role') = 'admin' );
-  END IF;
-END$$;
-
--- 5) RPCs: set_stock and adjust_stock (security definer)
-CREATE OR REPLACE FUNCTION public.set_stock(p_product_id uuid, p_new_qty int, p_reason text)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  v_current int;
-  v_delta int;
-BEGIN
-  SELECT stock_qty INTO v_current FROM public.products WHERE id = p_product_id FOR UPDATE;
-  IF v_current IS NULL THEN
-    RAISE EXCEPTION 'Product not found';
-  END IF;
-  v_delta := p_new_qty - v_current;
-  IF v_delta = 0 THEN
-    RETURN;
-  END IF;
-  UPDATE public.products SET stock_qty = stock_qty + v_delta WHERE id = p_product_id;
-  INSERT INTO public.inventory_movements (product_id, delta, reason) VALUES (p_product_id, v_delta, COALESCE(p_reason, 'adjust'));
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION public.adjust_stock(p_product_id uuid, p_delta int, p_reason text)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-  UPDATE public.products SET stock_qty = stock_qty + p_delta WHERE id = p_product_id;
-  INSERT INTO public.inventory_movements (product_id, delta, reason) VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'));
-END;
-$$;
-
--- 6) Grants: allow authenticated to execute RPC; updates to products still rely on RLS policies if enabled
-GRANT EXECUTE ON FUNCTION public.set_stock(uuid, int, text) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.adjust_stock(uuid, int, text) TO authenticated;
-
-commit;
-
-
--- FILE: 20250902_order_items_fk_rls.sql
-begin;
-
--- Ensure FK from venthub_order_items.order_id -> venthub_orders.id
-do $$
-begin
-  if not exists (
-    select 1 from information_schema.table_constraints 
-    where table_schema='public' and table_name='venthub_order_items' and constraint_name='venthub_order_items_order_id_fkey'
-  ) then
-    alter table public.venthub_order_items
-      add constraint venthub_order_items_order_id_fkey
-      foreign key (order_id) references public.venthub_orders(id) on delete cascade;
-  end if;
-end$$;
-
--- Enable RLS on order items
-alter table if exists public.venthub_order_items enable row level security;
-
--- Policy: a user can SELECT items of their own orders
-do $$
-begin
-  if not exists (
-    select 1 from pg_policies 
-    where schemaname='public' and tablename='venthub_order_items' and policyname='select_own_order_items'
-  ) then
-    create policy select_own_order_items on public.venthub_order_items
-      for select
-      using (exists (
-        select 1 from public.venthub_orders o
-        where o.id = venthub_order_items.order_id and o.user_id = auth.uid()
-      ));
-  end if;
-end$$;
-
-commit;
-
-
-
--- FILE: 20250902_order_stock_deduction.sql
--- Order sonrası atomik stok düşümü RPC fonksiyonu
--- Roadmap milestone: Order sonrası atomik stok düşümü + idempotent guard
-
-begin;
-
--- Order sonrası stok düşümü yapan güvenli RPC
-CREATE OR REPLACE FUNCTION public.process_order_stock_reduction(p_order_id text)
-RETURNS jsonb
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  v_order_exists boolean := false;
-  v_processed_count int := 0;
-  v_failed_products text[] := '{}';
-  v_item record;
-  v_current_stock int;
-  v_result jsonb;
-BEGIN
-  -- Order var mı kontrol et
-  SELECT EXISTS(
-    SELECT 1 FROM public.venthub_orders 
-    WHERE id = p_order_id AND status IN ('paid', 'processing')
-  ) INTO v_order_exists;
-  
-  IF NOT v_order_exists THEN
-    RETURN jsonb_build_object(
-      'success', false, 
-      'error', 'Order not found or not in processed state',
-      'processed_count', 0
-    );
-  END IF;
-
-  -- Order items'ları döngü ile işle
-  FOR v_item IN 
-    SELECT oi.product_id, oi.quantity, p.name as product_name, p.stock_qty
-    FROM public.venthub_order_items oi
-    JOIN public.products p ON p.id = oi.product_id
-    WHERE oi.order_id = p_order_id
-  LOOP
-    BEGIN
-      -- Mevcut stok kontrol et
-      v_current_stock := COALESCE(v_item.stock_qty, 0);
-      
-      -- Yeterli stok var mı?
-      IF v_current_stock >= v_item.quantity THEN
-        -- Idempotency kontrol: Bu order+product için zaten işlem yapılmış mı?
-        IF NOT EXISTS(
-          SELECT 1 FROM public.inventory_movements 
-          WHERE order_id = p_order_id::uuid 
-            AND product_id = v_item.product_id 
-            AND reason = 'order_sale'
-        ) THEN
-          -- Stok düş
-          PERFORM public.adjust_stock(
-            v_item.product_id, 
-            -v_item.quantity,  -- negatif (stok düşümü)
-            'order_sale'
-          );
-          
-          -- Inventory_movements'a order referansı ekle (mevcut adjust_stock bunu yapmıyor)
-          UPDATE public.inventory_movements 
-          SET order_id = p_order_id::uuid
-          WHERE product_id = v_item.product_id 
-            AND reason = 'order_sale' 
-            AND order_id IS NULL
-            AND id = (
-              SELECT id FROM public.inventory_movements 
-              WHERE product_id = v_item.product_id 
-                AND reason = 'order_sale' 
-                AND order_id IS NULL
-              ORDER BY created_at DESC 
-              LIMIT 1
-            );
-          
-          v_processed_count := v_processed_count + 1;
-        END IF;
-      ELSE
-        -- Yetersiz stok - failed products listesine ekle
-        v_failed_products := array_append(v_failed_products, v_item.product_name);
-      END IF;
-      
-    EXCEPTION WHEN OTHERS THEN
-      -- Hata durumunda failed listesine ekle
-      v_failed_products := array_append(v_failed_products, v_item.product_name);
-    END;
-  END LOOP;
-
-  -- Sonucu hazırla
-  v_result := jsonb_build_object(
-    'success', true,
-    'processed_count', v_processed_count,
-    'failed_products', v_failed_products,
-    'order_id', p_order_id
-  );
-
-  RETURN v_result;
-END;
-$$;
-
--- Grant permissions
-GRANT EXECUTE ON FUNCTION public.process_order_stock_reduction(text) TO service_role;
-
-commit;
-
-
--- FILE: 20250903_admin_returns_policy.sql
--- Admin users should be able to update returns status
--- This extends the existing service_role policy to include admin users
-
--- Create a helper function to check if user is admin
-create or replace function public.is_admin_user()
-returns boolean
-language plpgsql security definer
-as $$
-begin
-  -- For development: allow all authenticated users to be admin
-  if current_setting('app.environment', true) = 'development' then
-    return auth.uid() is not null;
-  end if;
-  
-  -- For production: check user_profiles table for admin role
-  return exists (
-    select 1 from public.user_profiles 
-    where id = auth.uid() and role = 'admin'
-  );
-end;
-$$;
-
--- Update the returns update policy to allow admin users
-drop policy if exists returns_update_admin on public.venthub_returns;
-create policy returns_update_admin
-  on public.venthub_returns for update
-  using (
-    auth.role() = 'service_role' OR 
-    public.is_admin_user()
-  )
-  with check (
-    auth.role() = 'service_role' OR 
-    public.is_admin_user()
-  );
-
--- Allow admin users to select all returns (not just their own)
-drop policy if exists returns_select_admin on public.venthub_returns;
-create policy returns_select_admin
-  on public.venthub_returns for select
-  using (
-    user_id = auth.uid() OR  -- Users can see their own
-    public.is_admin_user()   -- Admins can see all
-  );
-
--- Set development environment (remove this in production)
--- This can be set via Supabase dashboard: Settings > API > Custom Claims
--- ALTER DATABASE postgres SET app.environment = 'development';
-
-
--- FILE: 20250903_role_based_admin_system.sql
--- Database tabanlı admin role sistemi
--- user_profiles tablosunu güçlendirip role yönetimi ekleyelim
-
--- user_profiles tablosunun mevcut durumunu kontrol et ve güçlendir
-CREATE TABLE IF NOT EXISTS public.user_profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    role VARCHAR(20) NOT NULL DEFAULT 'user',
-    full_name TEXT,
-    phone TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Role kolonu için check constraint ekle
-DO $$
-BEGIN
-    -- Eğer constraint yoksa ekle
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.table_constraints 
-        WHERE constraint_name = 'user_profiles_role_check' 
-        AND table_name = 'user_profiles'
-    ) THEN
-        ALTER TABLE public.user_profiles 
-        ADD CONSTRAINT user_profiles_role_check 
-        CHECK (role IN ('user', 'admin', 'moderator'));
-    END IF;
-END $$;
-
--- Role kolonu yoksa ekle, varsa güncelle
-DO $$
-BEGIN
-    -- Role kolonu yoksa ekle
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'user_profiles' 
-        AND column_name = 'role'
-    ) THEN
-        ALTER TABLE public.user_profiles ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'user';
-    END IF;
-    
-    -- full_name kolonu yoksa ekle
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'user_profiles' 
-        AND column_name = 'full_name'
-    ) THEN
-        ALTER TABLE public.user_profiles ADD COLUMN full_name TEXT;
-    END IF;
-    
-    -- phone kolonu yoksa ekle
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'user_profiles' 
-        AND column_name = 'phone'
-    ) THEN
-        ALTER TABLE public.user_profiles ADD COLUMN phone TEXT;
-    END IF;
-    
-    -- created_at kolonu yoksa ekle
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'user_profiles' 
-        AND column_name = 'created_at'
-    ) THEN
-        ALTER TABLE public.user_profiles ADD COLUMN created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
-    END IF;
-    
-    -- updated_at kolonu yoksa ekle
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'user_profiles' 
-        AND column_name = 'updated_at'
-    ) THEN
-        ALTER TABLE public.user_profiles ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
-    END IF;
-END $$;
-
--- Index'ler
-CREATE INDEX IF NOT EXISTS idx_user_profiles_role ON public.user_profiles(role);
-CREATE INDEX IF NOT EXISTS idx_user_profiles_created_at ON public.user_profiles(created_at);
-
--- Updated at trigger
-CREATE OR REPLACE FUNCTION public.update_user_profiles_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Trigger'ı oluştur/güncelle
-DROP TRIGGER IF EXISTS trg_user_profiles_updated_at ON public.user_profiles;
-CREATE TRIGGER trg_user_profiles_updated_at
-    BEFORE UPDATE ON public.user_profiles
-    FOR EACH ROW EXECUTE FUNCTION public.update_user_profiles_updated_at();
-
--- RLS etkinleştir
-ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
-
--- RLS Politikaları güncelle
--- Kullanıcılar kendi profillerini görebilir
-DROP POLICY IF EXISTS user_profiles_select_own ON public.user_profiles;
-CREATE POLICY user_profiles_select_own
-    ON public.user_profiles FOR SELECT
-    USING (id = auth.uid());
-
--- Admin'ler tüm profilleri görebilir
-DROP POLICY IF EXISTS user_profiles_select_admin ON public.user_profiles;
-CREATE POLICY user_profiles_select_admin
-    ON public.user_profiles FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.user_profiles up 
-            WHERE up.id = auth.uid() AND up.role = 'admin'
-        )
-    );
-
--- Kullanıcılar kendi profillerini güncelleyebilir (role hariç)
-DROP POLICY IF EXISTS user_profiles_update_own ON public.user_profiles;
-CREATE POLICY user_profiles_update_own
-    ON public.user_profiles FOR UPDATE
-    USING (id = auth.uid())
-    WITH CHECK (
-        id = auth.uid() AND 
-        -- Role değişikliği yapılamaz (sadece admin yapabilir)
-        (role IS NULL OR role = (SELECT role FROM public.user_profiles WHERE id = auth.uid()))
-    );
-
--- Admin'ler tüm profilleri güncelleyebilir (role dahil)
-DROP POLICY IF EXISTS user_profiles_update_admin ON public.user_profiles;
-CREATE POLICY user_profiles_update_admin
-    ON public.user_profiles FOR UPDATE
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.user_profiles up 
-            WHERE up.id = auth.uid() AND up.role = 'admin'
-        )
-    );
-
--- Kullanıcılar kendi profillerini oluşturabilir
-DROP POLICY IF EXISTS user_profiles_insert_own ON public.user_profiles;
-CREATE POLICY user_profiles_insert_own
-    ON public.user_profiles FOR INSERT
-    WITH CHECK (
-        id = auth.uid() AND 
-        role = 'user' -- Yeni kullanıcılar sadece 'user' rolü alabilir
-    );
-
--- Admin profil oluşturma (service_role için)
-DROP POLICY IF EXISTS user_profiles_insert_service ON public.user_profiles;
-CREATE POLICY user_profiles_insert_service
-    ON public.user_profiles FOR INSERT
-    WITH CHECK (auth.role() = 'service_role');
-
--- Admin helper fonksiyonları
-CREATE OR REPLACE FUNCTION public.is_user_admin(user_id UUID)
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-    RETURN EXISTS (
-        SELECT 1 FROM public.user_profiles 
-        WHERE id = user_id AND role = 'admin'
-    );
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION public.get_user_role(user_id UUID)
-RETURNS TEXT
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-    user_role TEXT;
-BEGIN
-    SELECT role INTO user_role 
-    FROM public.user_profiles 
-    WHERE id = user_id;
-    
-    RETURN COALESCE(user_role, 'user');
-END;
-$$;
-
--- Admin kullanıcı atama fonksiyonu (sadece service_role için)
-CREATE OR REPLACE FUNCTION public.set_user_admin_role(user_id UUID, new_role TEXT)
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-    -- Sadece geçerli roller
-    IF new_role NOT IN ('user', 'admin', 'moderator') THEN
-        RAISE EXCEPTION 'Invalid role: %', new_role;
-    END IF;
-    
-    -- Kullanıcının profile'ı var mı kontrol et
-    IF NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE id = user_id) THEN
-        -- Profile oluştur
-        INSERT INTO public.user_profiles (id, role) VALUES (user_id, new_role)
-        ON CONFLICT (id) DO UPDATE SET role = new_role, updated_at = NOW();
-    ELSE
-        -- Role güncelle
-        UPDATE public.user_profiles SET role = new_role, updated_at = NOW() WHERE id = user_id;
-    END IF;
-    
-    RETURN TRUE;
-END;
-$$;
-
--- İlk admin kullanıcı ataması (eğer hiç admin yoksa)
-DO $$
-DECLARE
-    admin_count INTEGER;
-    first_user_id UUID;
-BEGIN
-    -- Kaç admin var kontrol et
-    SELECT COUNT(*) INTO admin_count 
-    FROM public.user_profiles 
-    WHERE role = 'admin';
-    
-    IF admin_count = 0 THEN
-        -- Hiç admin yoksa, ilk kullanıcıyı admin yap
-        SELECT id INTO first_user_id 
-        FROM auth.users 
-        ORDER BY created_at ASC 
-        LIMIT 1;
-        
-        IF first_user_id IS NOT NULL THEN
-            -- Profile oluştur/güncelle
-            INSERT INTO public.user_profiles (id, role, created_at, updated_at)
-            VALUES (first_user_id, 'admin', NOW(), NOW())
-            ON CONFLICT (id) 
-            DO UPDATE SET 
-                role = 'admin', 
-                updated_at = NOW();
-                
-            RAISE NOTICE 'First user (%) has been assigned admin role', first_user_id;
-        END IF;
-    END IF;
-END $$;
-
--- Admin kullanıcı listesi görüntüleme view'ı
-CREATE OR REPLACE VIEW public.admin_users AS
-SELECT 
-    u.id,
-    u.email,
-    up.full_name,
-    up.phone,
-    up.role,
-    up.created_at,
-    up.updated_at
-FROM auth.users u
-LEFT JOIN public.user_profiles up ON u.id = up.id
-WHERE up.role IN ('admin', 'moderator')
-ORDER BY up.created_at DESC;
-
--- View için RLS 
-ALTER VIEW public.admin_users SET (security_invoker = on);
-
-COMMENT ON TABLE public.user_profiles IS 'Kullanıcı profilleri ve rolleri';
-COMMENT ON COLUMN public.user_profiles.role IS 'Kullanıcı rolü: user, admin, moderator';
-COMMENT ON FUNCTION public.is_user_admin IS 'Kullanıcının admin olup olmadığını kontrol eder';
-COMMENT ON FUNCTION public.get_user_role IS 'Kullanıcının rolünü getirir';
-COMMENT ON FUNCTION public.set_user_admin_role IS 'Kullanıcıya admin rolü atar (sadece service_role)';
-COMMENT ON VIEW public.admin_users IS 'Admin ve moderatör kullanıcıları listesi';
-
-
--- FILE: 202509041116_fix_categories_rls.sql
--- Fix RLS for public.categories: enable RLS and ensure public read policy exists
-
-alter table if exists public.categories enable row level security;
-
--- Ensure public read policy exists (idempotent)
-do $$
-begin
-  if not exists (
-    select 1 from pg_policies
-    where schemaname = 'public'
-      and tablename = 'categories'
-      and policyname = 'categories_public_read'
-  ) then
-    create policy categories_public_read
-      on public.categories
-      for select
-      to anon, authenticated
-      using (true);
-  end if;
-end$$;
-
-
-
--- FILE: 20250904_inventory_views.sql
--- Inventory summary views
--- View 1: inventory_summary - physical, reserved (unshipped paid/confirmed/processing), available
-CREATE OR REPLACE VIEW public.inventory_summary AS
-WITH reserved AS (
-  SELECT voi.product_id, SUM(voi.quantity)::int AS reserved_qty
-  FROM public.venthub_order_items AS voi
-  JOIN public.venthub_orders AS o ON o.id = voi.order_id
-  WHERE o.status IN ('confirmed','paid','processing')
-    AND o.shipped_at IS NULL
-  GROUP BY voi.product_id
-)
-SELECT 
-  p.id AS product_id,
-  p.name,
-  COALESCE(p.stock_qty,0)      AS physical_stock,
-  COALESCE(r.reserved_qty,0)   AS reserved_stock,
-  (COALESCE(p.stock_qty,0) - COALESCE(r.reserved_qty,0)) AS available_stock
-FROM public.products p
-LEFT JOIN reserved r ON r.product_id = p.id;
-
--- View 2: reserved_orders - which orders are reserving each product (unshipped)
-CREATE OR REPLACE VIEW public.reserved_orders AS
-SELECT 
-  voi.product_id,
-  o.id          AS order_id,
-  o.created_at,
-  o.status,
-  o.payment_status,
-  voi.quantity
-FROM public.venthub_order_items voi
-JOIN public.venthub_orders o ON o.id = voi.order_id
-WHERE o.status IN ('confirmed','paid','processing')
-  AND o.shipped_at IS NULL;
-
--- Optional grants (read for authenticated)
-GRANT SELECT ON public.inventory_summary TO authenticated;
-GRANT SELECT | ALL | public | `-` |
-
-### returns_webhook_events
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| admins_read_returns_webhooks | SELECT | authenticated | `public.is_admin_user(` |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
-### shipping_email_events
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| admins_read_shipping_emails | SELECT | authenticated | `public.is_admin_user(` |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
-### shipping_webhook_events
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| admins_read_shipping_webhooks | SELECT | authenticated | `public.is_admin_user(` |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
-### shopping_carts
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| shopping_carts_select_own | SELECT | public | `user_id = auth.uid(` |
-| shopping_carts_modify_own | ALL | public | `user_id = auth.uid(` |
-| shopping_carts_all | ALL | authenticated | `user_id = (SELECT auth.uid(` |
-| shopping_carts_user_all | ALL | authenticated | `user_id = (SELECT auth.uid(` |
-| shopping_carts_user_all | ALL | authenticated | `user_id = (SELECT auth.uid(` |
-| sc_auth_all | ALL | authenticated | `user_id = (SELECT auth.uid(` |
-| shopping_carts_select_own | SELECT | authenticated | `user_id = (SELECT auth.uid(` |
-
-### user_invoice_profiles
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| user_invoice_profiles_own | ALL | authenticated | `user_id = (SELECT auth.uid(` |
-| uip_own | ALL | authenticated | `user_id = (SELECT auth.uid(` |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
-### user_profiles
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| cart_items_insert_own
-      ON public.cart_items
-      FOR INSERT TO authenticated
-      WITH CHECK (
-        EXISTS (
-          SELECT 1 FROM public.shopping_carts c
-          WHERE c.id = cart_items.cart_id AND c.user_id = auth.uid()
-        )
-      );
-    $$;
-  END IF;
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
-  -- UPDATE own
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_update_own') THEN
-    EXECUTE $$
-      CREATE POLICY cart_items_update_own
-      ON public.cart_items
-      FOR UPDATE TO authenticated
-      USING (
-        EXISTS (
-          SELECT 1 FROM public.shopping_carts c
-          WHERE c.id = cart_items.cart_id AND c.user_id = auth.uid()
-        )
-      )
-      WITH CHECK (
-        EXISTS (
-          SELECT 1 FROM public.shopping_carts c
-          WHERE c.id = cart_items.cart_id AND c.user_id = auth.uid()
-        )
-      );
-    $$;
-  END IF;
-
-  -- DELETE own
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_delete_own') THEN
-    EXECUTE $$
-      CREATE POLICY cart_items_delete_own
-      ON public.cart_items
-      FOR DELETE TO authenticated
-      USING (
-        EXISTS (
-          SELECT 1 FROM public.shopping_carts c
-          WHERE c.id = cart_items.cart_id AND c.user_id = auth.uid()
-        )
-      );
-    $$;
-  END IF;
-END$$;
-
--- SHOPPING_CARTS: consolidate RLS similarly
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_modify_own') THEN
-    EXECUTE 'DROP POLICY shopping_carts_modify_own ON public.shopping_carts';
-  END IF;
-
-  -- INSERT own
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_insert_own') THEN
-    EXECUTE $$
-      CREATE POLICY shopping_carts_insert_own
-      ON public.shopping_carts
-      FOR INSERT TO authenticated
-      WITH CHECK (user_id = auth.uid());
-    $$;
-  END IF;
-
-  -- UPDATE own
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_update_own') THEN
-    EXECUTE $$
-      CREATE POLICY shopping_carts_update_own
-      ON public.shopping_carts
-      FOR UPDATE TO authenticated
-      USING (user_id = auth.uid())
-      WITH CHECK (user_id = auth.uid());
-    $$;
-  END IF;
-
-  -- DELETE own
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_delete_own') THEN
-    EXECUTE $$
-      CREATE POLICY shopping_carts_delete_own
-      ON public.shopping_carts
-      FOR DELETE TO authenticated
-      USING (user_id = auth.uid());
-    $$;
-  END IF;
-END$$;
-
--- PRODUCTS: drop legacy duplicate update policy if the newer one exists
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='products' AND policyname='products_update_admin_only')
-     AND EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='products' AND policyname='products_update_admin_stock') THEN
-    EXECUTE 'DROP POLICY products_update_admin_stock ON public.products';
-  END IF;
-END$$;
-
-COMMIT;
-
--- FILE: 20250919_rls_consolidation_user_profiles_returns.sql
-BEGIN;
-
--- USER_PROFILES: merged policies for authenticated; clean duplicates; align service insert
-DO $$
-BEGIN
-  -- SELECT (authenticated: own or admin)
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='merged_user_profiles_authenticated_select'
-  ) THEN
-    EXECUTE $$
-      CREATE POLICY merged_user_profiles_authenticated_select
-      ON public.user_profiles
-      FOR SELECT TO authenticated
-      USING ( id = auth.uid() OR public.jwt_role() IN ('admin','superadmin') );
-    $$;
-  END IF;
-
-  -- INSERT (authenticated: own or admin)
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='merged_user_profiles_authenticated_insert'
-  ) THEN
-    EXECUTE $$
-      CREATE POLICY merged_user_profiles_authenticated_insert
-      ON public.user_profiles
-      FOR INSERT TO authenticated
-      WITH CHECK ( id = auth.uid() OR public.jwt_role() IN ('admin','superadmin') );
-    $$;
-  END IF;
-
-  -- UPDATE (authenticated: own or admin)
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='merged_user_profiles_authenticated_update'
-  ) THEN
-    EXECUTE $$
-      CREATE POLICY merged_user_profiles_authenticated_update
-      ON public.user_profiles
-      FOR UPDATE TO authenticated
-      USING ( id = auth.uid() OR public.jwt_role() IN ('admin','superadmin') )
-      WITH CHECK ( id = auth.uid() OR public.jwt_role() IN ('admin','superadmin') );
-    $$;
-  END IF;
-
-  -- Ensure service insert exists for system writes
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_service_insert'
-  ) THEN
-    EXECUTE $$
-      CREATE POLICY user_profiles_service_insert
-      ON public.user_profiles
-      FOR INSERT TO service_role
-      WITH CHECK (true);
-    $$;
-  END IF;
-
-  -- If historical service insert policy exists, make sure it's assigned to service_role
-  IF EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_insert_service'
-  ) THEN
-    EXECUTE 'ALTER POLICY user_profiles_insert_service ON public.user_profiles TO service_role';
-  END IF;
-
-  -- Drop older duplicates (safe: only if present)
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_select_self') THEN
-    EXECUTE 'DROP POLICY user_profiles_select_self ON public.user_profiles';
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_select_own') THEN
-    EXECUTE 'DROP POLICY user_profiles_select_own ON public.user_profiles';
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_select_admin') THEN
-    EXECUTE 'DROP POLICY user_profiles_select_admin ON public.user_profiles';
-  END IF;
-
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_insert_self') THEN
-    EXECUTE 'DROP POLICY user_profiles_insert_self ON public.user_profiles';
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_insert_own') THEN
-    EXECUTE 'DROP POLICY user_profiles_insert_own ON public.user_profiles';
-  END IF;
-
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_update_self') THEN
-    EXECUTE 'DROP POLICY user_profiles_update_self ON public.user_profiles';
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_update_own') THEN
-    EXECUTE 'DROP POLICY user_profiles_update_own ON public.user_profiles';
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_update_admin') THEN
-    EXECUTE 'DROP POLICY user_profiles_update_admin ON public.user_profiles';
-  END IF;
-END$$;
-
--- VENTHUB_RETURNS: rely on merged_* for authenticated; align service policies
-DO $$
-BEGIN
-  -- Ensure service policies are scoped to service_role (not authenticated)
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='returns_update_service') THEN
-    EXECUTE 'ALTER POLICY returns_update_service ON public.venthub_returns TO service_role';
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='returns_delete_service') THEN
-    EXECUTE 'ALTER POLICY returns_delete_service ON public.venthub_returns TO service_role';
-  END IF;
-
-  -- If merged authenticated policies exist, drop redundant specific ones
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='merged_venthub_returns_authenticated_select') THEN
-    IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='returns_select_admin') THEN
-      EXECUTE 'DROP POLICY returns_select_admin ON public.venthub_returns';
-    END IF;
-    IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='returns_select_own') THEN
-      EXECUTE 'DROP POLICY returns_select_own ON public.venthub_returns';
-    END IF;
-  END IF;
-
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='merged_venthub_returns_authenticated_insert') THEN
-    IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='returns_insert_own_order') THEN
-      EXECUTE 'DROP POLICY returns_insert_own_order ON public.venthub_returns';
-    END IF;
-  END IF;
-
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='merged_venthub_returns_authenticated_update') THEN
-    IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='returns_update_admin') THEN
-      EXECUTE 'DROP POLICY returns_update_admin ON public.venthub_returns';
-    END IF;
-  END IF;
-
-  -- delete: keep service delete for system ops; merged auth delete handles users
-END$$;
-
-COMMIT;
-
--- FILE: 20251128_fts_technical_specs.sql
--- 20251128: Enhanced Full-text search including technical_specs and description
--- Fixes issue where searching for technical values (debi, airflow, etc.) returns 0 results
-
--- Drop old index
-DROP INDEX IF EXISTS public.idx_products_fts_tr;
-
--- Create enhanced FTS index including technical_specs and description
-CREATE INDEX idx_products_fts_tr_enhanced ON public.products USING gin (
-  to_tsvector('turkish', 
-    coalesce(name,'') || ' ' || 
-    coalesce(model_code,'') || ' ' || 
-    coalesce(sku,'') || ' ' || 
-    coalesce(brand,'') || ' ' ||
-    coalesce(description,'') || ' ' ||
-    -- Extract text from technical_specs JSON
-    coalesce(technical_specs::text,'')
-  )
-);
-
--- Update fts_search_products function to include technical_specs
-CREATE OR REPLACE FUNCTION public.fts_search_products(
-  p_q text,
-  p_limit integer DEFAULT 20,
-  p_filters jsonb DEFAULT '{}'::jsonb
-)
-RETURNS TABLE(
-  id uuid,
-  name text,
-  sku text,
-  brand text,
-  price numeric,
-  rank real
-)
-LANGUAGE sql
-STABLE
-SECURITY INVOKER
-SET search_path TO pg_catalog, public
-AS $$
-  WITH params AS (
-    SELECT
-      coalesce(p_q,'')::text AS raw,
-      plainto_tsquery('turkish', coalesce(p_q,'')) AS tsq,
-      LEAST(GREATEST(p_limit,1), 100) AS lim,
-      p_filters AS f
-  )
-  SELECT p.id, p.name, p.sku, p.brand, p.price,
-         ts_rank(
-           to_tsvector('turkish', 
-             coalesce(p.name,'') || ' ' || 
-             coalesce(p.model_code,'') || ' ' || 
-             coalesce(p.sku,'') || ' ' || 
-             coalesce(p.brand,'') || ' ' ||
-             coalesce(p.description,'') || ' ' ||
-             coalesce(p.technical_specs::text,'')
-           ),
-           (SELECT tsq FROM params)
-         ) AS rank
-  FROM public.products p, params x
-  WHERE (
-    p.name ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.model_code ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.sku ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.brand ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.description ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.technical_specs::text ILIKE '%' || x.raw || '%'
-    OR to_tsvector('turkish', 
-         coalesce(p.name,'') || ' ' || 
-         coalesce(p.model_code,'') || ' ' || 
-         coalesce(p.sku,'') || ' ' || 
-         coalesce(p.brand,'') || ' ' ||
-         coalesce(p.description,'') || ' ' ||
-         coalesce(p.technical_specs::text,'')
-       ) @@ x.tsq
-  )
-  AND (
-    (NOT (x.f ? 'category_id')) OR (p.category_id = (x.f->>'category_id')::uuid)
-  )
-  AND p.status = 'active'
-  ORDER BY rank DESC NULLS LAST, p.name ASC
-  LIMIT x.lim;
-$$;
-
-
--- FILE: 20251203_fix_performance_lints.sql
--- Fix Performance Lints: RLS Initplan & Multiple Permissive Policies
-
--- 1. venthub_returns
-DROP POLICY IF EXISTS returns_update_admin ON public.venthub_returns;
-DROP POLICY IF EXISTS returns_update_service ON public.venthub_returns;
-DROP POLICY IF EXISTS returns_select_admin ON public.venthub_returns;
-DROP POLICY IF EXISTS returns_insert_own_order ON public.venthub_returns;
-DROP POLICY IF EXISTS returns_delete_service ON public.venthub_returns;
-
-CREATE POLICY returns_select_policy ON public.venthub_returns FOR SELECT
-  USING ( user_id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY returns_insert_policy ON public.venthub_returns FOR INSERT
-  WITH CHECK ( user_id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY returns_update_policy ON public.venthub_returns FOR UPDATE
-  USING ( (SELECT auth.role()) = 'service_role' OR (SELECT is_admin_user()) );
-
-CREATE POLICY returns_delete_policy ON public.venthub_returns FOR DELETE
-  USING ( (SELECT auth.role()) = 'service_role' OR (SELECT is_admin_user()) );
-
-
--- 2. shopping_carts
-DROP POLICY IF EXISTS shopping_carts_delete_own ON public.shopping_carts;
-DROP POLICY IF EXISTS shopping_carts_insert_own ON public.shopping_carts;
-DROP POLICY IF EXISTS shopping_carts_update_own ON public.shopping_carts;
-DROP POLICY IF EXISTS shopping_carts_select_own ON public.shopping_carts;
-
-CREATE POLICY shopping_carts_policy ON public.shopping_carts
-  USING ( user_id = (SELECT auth.uid()) OR (SELECT auth.role()) = 'service_role' )
-  WITH CHECK ( user_id = (SELECT auth.uid()) OR (SELECT auth.role()) = 'service_role' );
-
-
--- 3. orders
-DROP POLICY IF EXISTS orders_delete_own ON public.venthub_orders;
-DROP POLICY IF EXISTS orders_insert_own ON public.venthub_orders;
-DROP POLICY IF EXISTS orders_update_own ON public.venthub_orders;
-DROP POLICY IF EXISTS orders_select_own ON public.venthub_orders;
-
-CREATE POLICY orders_select_policy ON public.venthub_orders FOR SELECT
-  USING ( user_id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY orders_insert_policy ON public.venthub_orders FOR INSERT
-  WITH CHECK ( user_id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY orders_update_policy ON public.venthub_orders FOR UPDATE
-  USING ( user_id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY orders_delete_policy ON public.venthub_orders FOR DELETE
-  USING ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-
--- 4. products
-DROP POLICY IF EXISTS merged_products_authenticated_delete ON public.products;
-DROP POLICY IF EXISTS merged_products_authenticated_insert ON public.products;
-DROP POLICY IF EXISTS merged_products_authenticated_update ON public.products;
-DROP POLICY IF EXISTS merged_products_anon_select ON public.products;
-DROP POLICY IF EXISTS products_delete_admin ON public.products;
-DROP POLICY IF EXISTS products_insert_admin ON public.products;
-DROP POLICY IF EXISTS products_update_admin ON public.products;
-DROP POLICY IF EXISTS products_select_public ON public.products;
-
-CREATE POLICY products_select_policy ON public.products FOR SELECT
-  USING (true);
-
-CREATE POLICY products_modify_policy ON public.products
-  USING ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' )
-  WITH CHECK ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-
--- FILE: 20251203_fix_products_lints.sql
--- Fix Products Performance Lints: Split modify policy and drop redundant ones
-
--- products
-DROP POLICY IF EXISTS products_modify_policy ON public.products;
-DROP POLICY IF EXISTS products_update_admin_stock ON public.products;
-
-CREATE POLICY products_insert_policy ON public.products FOR INSERT
-  WITH CHECK ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY products_update_policy ON public.products FOR UPDATE
-  USING ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY products_delete_policy ON public.products FOR DELETE
-  USING ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-
--- FILE: 20251203_fix_products_select_lint.sql
--- Fix Final Products Performance Lint: Drop merged select policy
-
--- products
-DROP POLICY IF EXISTS merged_products_authenticated_select ON public.products;
-
-
--- FILE: 20251203_fix_remaining_lints.sql
--- Fix Remaining Performance Lints: Drop merged policies and fix cart_items
-
--- 1. cart_items
-DROP POLICY IF EXISTS cart_items_delete_own ON public.cart_items;
-DROP POLICY IF EXISTS cart_items_insert_own ON public.cart_items;
-DROP POLICY IF EXISTS cart_items_update_own ON public.cart_items;
-DROP POLICY IF EXISTS cart_items_select_own ON public.cart_items;
-DROP POLICY IF EXISTS merged_cart_items_authenticated_delete ON public.cart_items;
-DROP POLICY IF EXISTS merged_cart_items_authenticated_insert ON public.cart_items;
-DROP POLICY IF EXISTS merged_cart_items_authenticated_update ON public.cart_items;
-
-CREATE POLICY cart_items_policy ON public.cart_items
-  USING ( (SELECT auth.uid()) = (SELECT user_id FROM public.shopping_carts WHERE id = cart_id) OR (SELECT auth.role()) = 'service_role' )
-  WITH CHECK ( (SELECT auth.uid()) = (SELECT user_id FROM public.shopping_carts WHERE id = cart_id) OR (SELECT auth.role()) = 'service_role' );
-
--- 2. shopping_carts (Drop merged)
-DROP POLICY IF EXISTS merged_shopping_carts_authenticated_delete ON public.shopping_carts;
-DROP POLICY IF EXISTS merged_shopping_carts_authenticated_insert ON public.shopping_carts;
-DROP POLICY IF EXISTS merged_shopping_carts_authenticated_update ON public.shopping_carts;
-
--- 3. venthub_orders (Drop merged)
-DROP POLICY IF EXISTS merged_venthub_orders_authenticated_select ON public.venthub_orders;
-
--- 4. venthub_returns (Drop merged)
-DROP POLICY IF EXISTS merged_venthub_returns_authenticated_delete ON public.venthub_returns;
-DROP POLICY IF EXISTS merged_venthub_returns_authenticated_insert ON public.venthub_returns;
-DROP POLICY IF EXISTS merged_venthub_returns_authenticated_select ON public.venthub_returns;
-
-
--- FILE: 20251203_fix_user_profiles_lints.sql
--- Fix User Profiles Performance Lints: Drop merged and redundant policies
-
--- user_profiles
-DROP POLICY IF EXISTS merged_user_profiles_authenticated_delete ON public.user_profiles;
-DROP POLICY IF EXISTS merged_user_profiles_authenticated_select ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_insert_own ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_insert_self ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_insert_service ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_select_admin ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_update_admin ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_update_own ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_update_self ON public.user_profiles;
-
-CREATE POLICY user_profiles_select_policy ON public.user_profiles FOR SELECT
-  USING ( id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY user_profiles_insert_policy ON public.user_profiles FOR INSERT
-  WITH CHECK ( id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY user_profiles_update_policy ON public.user_profiles FOR UPDATE
-  USING ( id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY user_profiles_delete_policy | DELETE | public | `(SELECT is_admin_user(` |
-
-### venthub_order_items
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| venthub_order_items_select_consolidated | SELECT | authenticated | `order_id IN (
-        SELECT id FROM venthub_orders WHERE user_id = (SELECT auth` |
-| venthub_order_items_insert_optimized | INSERT | authenticated | `-` |
-| venthub_order_items_insert_optimized | INSERT | authenticated | `-` |
-| venthub_order_items_select_consolidated | SELECT | authenticated | `order_id IN (
-        SELECT id FROM public.venthub_orders WHERE user_id = (SELE` |
-
-### venthub_orders
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| orders_select_policy | SELECT | authenticated | `user_id = (SELECT auth.uid(` |
-
-### venthub_returns
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| user_profiles_insert_merged ON public.user_profiles
-      FOR INSERT TO public
-      WITH CHECK (
-        (id = auth.uid() AND (role IS NULL OR role = 'user'))
-        OR (auth.role() = 'service_role')
-      )
-    $$;
-  END IF;
-END $$;
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
--- Drop older duplicate INSERT policies (idempotent)
-DROP POLICY IF EXISTS user_profiles_insert_service ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_insert_own ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_insert_self ON public.user_profiles;
-
--- Merge UPDATE policies for user_profiles into a single permissive policy
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_update_merged'
-  ) THEN
-    EXECUTE $$
-      CREATE POLICY user_profiles_update_merged ON public.user_profiles
-      FOR UPDATE TO public
-      USING (
-        (id = auth.uid()) OR ((SELECT jwt_role()) = ANY (ARRAY['admin','moderator','superadmin']))
-      )
-      WITH CHECK (
-        ((id = auth.uid()) AND ((role IS NULL) OR (role::text = jwt_role())))
-        OR ((SELECT jwt_role()) = ANY (ARRAY['admin','moderator','superadmin']))
-      )
-    $$;
-  END IF;
-END $$;
-
--- Drop older duplicate UPDATE policies (idempotent)
-DROP POLICY IF EXISTS user_profiles_update_self ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_update_admin ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_update_own ON public.user_profiles;
-
--- Merge UPDATE policies for venthub_returns into a single permissive policy
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='venthub_returns_update_merged'
-  ) THEN
-    EXECUTE $$
-      CREATE POLICY venthub_returns_update_merged | UPDATE | public | `(auth.role(` |
-| coupons_admin_all ON public.coupons
-      FOR ALL TO authenticated
-      USING (EXISTS (SELECT 1 FROM public.user_profiles up WHERE up.id = auth.uid() AND up.role IN ('admin','superadmin')))
-      WITH CHECK (EXISTS (SELECT 1 FROM public.user_profiles up WHERE up.id = auth.uid() AND up.role IN ('admin','superadmin')));
-    $$;
-  END IF;
-
-  -- order_notes
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='order_notes' AND policyname='order_notes_admin_all') THEN
-    EXECUTE $$
-      CREATE POLICY order_notes_admin_all ON public.order_notes
-      FOR ALL TO authenticated
-      USING (EXISTS (SELECT 1 FROM public.user_profiles up WHERE up.id = auth.uid() AND up.role IN ('admin','superadmin')))
-      WITH CHECK (EXISTS (SELECT 1 FROM public.user_profiles up WHERE up.id = auth.uid() AND up.role IN ('admin','superadmin')));
-    $$;
-  END IF;
-
-  -- order_attachments
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='order_attachments' AND policyname='order_attachments_admin_all') THEN
-    EXECUTE $$
-      CREATE POLICY order_attachments_admin_all ON public.order_attachments
-      FOR ALL TO authenticated
-      USING (EXISTS (SELECT 1 FROM public.user_profiles up WHERE up.id = auth.uid() AND up.role IN ('admin','superadmin')))
-      WITH CHECK (EXISTS (SELECT 1 FROM public.user_profiles up WHERE up.id = auth.uid() AND up.role IN ('admin','superadmin')));
-    $$;
-  END IF;
-END$$;
-
-COMMIT;
-
-
--- FILE: 20250916_shipping_idempotency.sql
--- Idempotency table for shipping operations
-create table if not exists public.shipping_idempotency (
-  key text primary key,
-  scope text not null default 'admin-update-shipping',
-  created_at timestamptz not null default now()
-);
-
--- Optional retention: keep last 14 days
-create index if not exists shipping_idempotency_created_at_idx on public.shipping_idempotency (created_at);
-
--- FILE: 20250917_rate_limit.sql
--- supabase/migrations/20250917_rate_limit.sql
--- Basic rate-limiting state table + helper function
--- Tracks request counts per key in a rolling window using minute buckets.
-
-create table if not exists public.rate_limits (
-  key text not null,
-  bucket timestamptz not null,
-  count integer not null default 0,
-  constraint rate_limits_pkey primary key (key, bucket)
-);
-
--- Optional: retention policy via trigger or a scheduled job could prune old buckets
-
-create or replace function public.bump_rate_limit(p_key text, p_limit int, p_window_seconds int)
-returns table(allowed boolean, remaining int, reset_at timestamptz) language plpgsql as $$
-declare
-  now_ts timestamptz := now();
-  bucket_ts timestamptz := date_trunc('minute', now_ts);
-  window_start timestamptz := now_ts - make_interval(secs => p_window_seconds);
-  total int := 0;
-  resets_at timestamptz := bucket_ts + interval '1 minute';
-begin
-  -- upsert current bucket
-  insert into public.rate_limits(key, bucket, count)
-  values (p_key, bucket_ts, 1)
-  on conflict (key, bucket) do update set count = public.rate_limits.count + 1;
-
-  -- sum counts within window
-  select coalesce(sum(count), 0) into total
-  from public.rate_limits
-  where key = p_key and bucket >= date_trunc('minute', window_start);
-
-  if total <= p_limit then
-    return query select true as allowed, greatest(p_limit - total, 0) as remaining, resets_at as reset_at;
-  else
-    return query select false as allowed, 0 as remaining, resets_at as reset_at;
-  end if;
-end $$;
-
--- Helpful index for pruning/queries
-create index if not exists rate_limits_bucket_idx on public.rate_limits (bucket);
-
-
--- FILE: 20250918_inventory_batch_undo.sql
--- Inventory batch undo support: add batch_id, extend stock RPCs, and add reverse_inventory_batch
-begin;
-
--- 1) Schema: inventory_movements.batch_id
-ALTER TABLE public.inventory_movements
-  ADD COLUMN IF NOT EXISTS batch_id uuid NULL;
-
-CREATE INDEX IF NOT EXISTS idx_inventory_movements_batch_id
-  ON public.inventory_movements(batch_id);
-
--- 2) Replace adjust_stock with batch support (default null)
-DROP FUNCTION IF EXISTS public.adjust_stock(uuid, int, text);
-CREATE OR REPLACE FUNCTION public.adjust_stock(
-  p_product_id uuid,
-  p_delta int,
-  p_reason text,
-  p_batch_id uuid DEFAULT NULL
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-  -- Update product stock
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
-  WHERE id = p_product_id;
-
-  -- Insert movement
-  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id)
-  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'), p_batch_id);
-END;
-$$;
-
--- 3) Replace set_stock with batch support (default null)
-DROP FUNCTION IF EXISTS public.set_stock(uuid, int, text);
-CREATE OR REPLACE FUNCTION public.set_stock(
-  p_product_id uuid,
-  p_new_qty int,
-  p_reason text,
-  p_batch_id uuid DEFAULT NULL
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  v_current int;
-  v_delta int;
-BEGIN
-  SELECT COALESCE(stock_qty, 0) INTO v_current 
-  FROM public.products 
-  WHERE id = p_product_id;
-
-  v_delta := p_new_qty - v_current;
-  IF v_delta = 0 THEN
-    RETURN;
-  END IF;
-
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, p_new_qty)
-  WHERE id = p_product_id;
-
-  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id) 
-  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'), p_batch_id);
-END;
-$$;
-
--- 4) Add reverse_inventory_batch to create compensating movements and revert stock
-CREATE OR REPLACE FUNCTION public.reverse_inventory_batch(p_batch_id uuid)
-RETURNS integer
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-DECLARE
-  r RECORD;
-  cnt int := 0;
-BEGIN
-  IF p_batch_id IS NULL THEN
-    RETURN 0;
-  END IF;
-
-  FOR r IN SELECT product_id, delta FROM public.inventory_movements WHERE batch_id = p_batch_id LOOP
-    -- revert stock
-    UPDATE public.products
-    SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) - r.delta)
-    WHERE id = r.product_id;
-
-    -- compensating movement
-    INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id)
-    VALUES (r.product_id, -r.delta, 'undo:csv', p_batch_id);
-
-    cnt := cnt + 1;
-  END LOOP;
-
-  RETURN cnt;
-END;
-$$;
-
--- 5) Grants
-GRANT EXECUTE ON FUNCTION public.adjust_stock(uuid, int, text, uuid) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.set_stock(uuid, int, text, uuid) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.reverse_inventory_batch(uuid) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.adjust_stock(uuid, int, text, uuid) TO service_role;
-GRANT EXECUTE ON FUNCTION public.set_stock(uuid, int, text, uuid) TO service_role;
-GRANT EXECUTE ON FUNCTION public.reverse_inventory_batch(uuid) TO service_role;
-
-commit;
-
-
--- FILE: 20250919_advisor_fixes.sql
-begin;
-
--- 1) Function search_path hardening for SECURITY DEFINER functions
-ALTER FUNCTION public.bump_rate_limit(text, integer, integer) SET search_path = 'pg_catalog, public';
-ALTER FUNCTION public.enforce_role_change() SET search_path = 'pg_catalog, public';
-ALTER FUNCTION public.update_updated_at_column() SET search_path = 'pg_catalog, public';
-ALTER FUNCTION public.reverse_inventory_batch(uuid, integer) SET search_path = 'pg_catalog, public';
-
--- 2) Add missing foreign key covering indexes
-CREATE INDEX IF NOT EXISTS idx_cart_items_product_id ON public.cart_items(product_id);
-CREATE INDEX IF NOT EXISTS idx_product_prices_price_list_id ON public.product_prices(price_list_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_order_items_order_id ON public.venthub_order_items(order_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_order_items_product_id ON public.venthub_order_items(product_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_orders_user_id ON public.venthub_orders(user_id);
-
--- 3) Drop duplicate index (best-effort; if not applicable, no-op)
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname='cart_items_cart_product_uniq') THEN
-    EXECUTE 'DROP INDEX public.cart_items_cart_product_uniq';
-  END IF;
-END$$;
-
-commit;
-
--- FILE: 20250919_fix_search_path_inventory_functions.sql
--- Fix search_path for SECURITY DEFINER functions (advisor lint)
-begin;
-
-CREATE OR REPLACE FUNCTION public.adjust_stock(
-  p_product_id uuid,
-  p_delta int,
-  p_reason text,
-  p_batch_id uuid DEFAULT NULL
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-BEGIN
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
-  WHERE id = p_product_id;
-
-  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id)
-  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'), p_batch_id);
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION public.set_stock(
-  p_product_id uuid,
-  p_new_qty int,
-  p_reason text,
-  p_batch_id uuid DEFAULT NULL
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-DECLARE
-  v_current int;
-  v_delta int;
-BEGIN
-  SELECT COALESCE(stock_qty, 0) INTO v_current 
-  FROM public.products 
-  WHERE id = p_product_id;
-
-  v_delta := p_new_qty - v_current;
-  IF v_delta = 0 THEN
-    RETURN;
-  END IF;
-
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, p_new_qty)
-  WHERE id = p_product_id;
-
-  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id) 
-  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'), p_batch_id);
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION public.reverse_inventory_batch(
-  p_batch_id uuid,
-  p_max_minutes int DEFAULT 30
-)
-RETURNS integer
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-DECLARE
-  r RECORD;
-  cnt int := 0;
-  comp_id uuid;
-  cutoff timestamptz := now() - (make_interval(mins => p_max_minutes));
-  v_actor uuid;
-BEGIN
-  IF p_batch_id IS NULL THEN
-    RETURN 0;
-  END IF;
-
-  BEGIN
-    v_actor := nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub';
-  EXCEPTION WHEN others THEN
-    v_actor := NULL;
-  END;
-
-  IF EXISTS (
-    SELECT 1 FROM public.inventory_movements
-    WHERE batch_id = p_batch_id AND created_at < cutoff
-  ) THEN
-    RAISE EXCEPTION 'UNDO_WINDOW_EXPIRED';
-  END IF;
-
-  FOR r IN SELECT id, product_id, delta FROM public.inventory_movements WHERE batch_id = p_batch_id LOOP
-    UPDATE public.products
-    SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) - r.delta)
-    WHERE id = r.product_id;
-
-    INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id, original_movement_id, undo_by_user_id, undo_at)
-    VALUES (r.product_id, -r.delta, 'undo:csv', p_batch_id, r.id, v_actor::uuid, now())
-    RETURNING id INTO comp_id;
-
-    UPDATE public.inventory_movements SET reversed_by_movement_id = comp_id WHERE id = r.id;
-
-    cnt := cnt + 1;
-  END LOOP;
-
-  RETURN cnt;
-END;
-$$;
-
-commit;
-
--- FILE: 20250919_fix_search_path_misc.sql
--- Harden search_path for remaining functions flagged by Advisor
-BEGIN;
-ALTER FUNCTION IF EXISTS public.enforce_role_change() SET search_path = pg_catalog, public;
-ALTER FUNCTION IF EXISTS public.bump_rate_limit(text, int, int) SET search_path = pg_catalog, public;
-ALTER FUNCTION IF EXISTS public.update_updated_at_column() SET search_path = pg_catalog, public;
-COMMIT;
-
-
--- FILE: 20250919_fix_search_path_reverse_inventory_batch.sql
--- Harden search_path for reverse_inventory_batch
-BEGIN;
-ALTER FUNCTION IF EXISTS public.reverse_inventory_batch(uuid, integer) SET search_path = pg_catalog, public;
-COMMIT;
-
-
--- FILE: 20250919_fk_indexes_and_duplicate_cleanup.sql
--- Add missing foreign key indexes and drop duplicate index per performance advisor
-BEGIN;
-
--- Missing FK indexes
-CREATE INDEX IF NOT EXISTS idx_cart_items_product_id ON public.cart_items (product_id);
-CREATE INDEX IF NOT EXISTS idx_coupons_created_by ON public.coupons (created_by);
-CREATE INDEX IF NOT EXISTS idx_order_attachments_created_by ON public.order_attachments (created_by);
-CREATE INDEX IF NOT EXISTS idx_order_attachments_order_id ON public.order_attachments (order_id);
-CREATE INDEX IF NOT EXISTS idx_order_email_events_order_id ON public.order_email_events (order_id);
-CREATE INDEX IF NOT EXISTS idx_order_notes_user_id ON public.order_notes (user_id);
-CREATE INDEX IF NOT EXISTS idx_product_images_product_id ON public.product_images (product_id);
-CREATE INDEX IF NOT EXISTS idx_product_prices_price_list_id ON public.product_prices (price_list_id);
-CREATE INDEX IF NOT EXISTS idx_user_invoice_profiles_user_id ON public.user_invoice_profiles (user_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_order_items_order_id ON public.venthub_order_items (order_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_order_items_product_id ON public.venthub_order_items (product_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_orders_user_id ON public.venthub_orders (user_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_returns_order_id ON public.venthub_returns (order_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_returns_user_id | ALL | public | `-` |
-| venthub_returns_select_consolidated | SELECT | authenticated | `user_id = (SELECT auth.uid(` |
-| venthub_returns_select_consolidated | SELECT | authenticated | `user_id = (SELECT auth.uid(` |
-
-### webhook_events
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| admins_read_webhook_events | SELECT | authenticated | `public.is_admin_user(` |
-
-### wizard_selections
-
-| Policy | Islem | Rol | Kosul |
-|--------|-------|-----|-------|
-| Users can view own selections | SELECT | authenticated | `user_id = (SELECT auth.uid(` |
-| Anyone can insert selections | INSERT | public | `-` |
-| Admin can view all selections | SELECT | authenticated | `EXISTS (
-            SELECT 1 FROM public.admin_users
-            WHERE admin_us` |
-| Admin can update selections | UPDATE | authenticated | `EXISTS (
-            SELECT 1 FROM public.admin_users
-            WHERE admin_us` |
-| wizard_selections_anon_insert | INSERT | anon | `-` |
-| wizard_selections_auth_all | ALL | authenticated | `user_id = (SELECT auth.uid(` |
-| wizard_selections_user_all | ALL | authenticated | `user_id = (SELECT auth.uid(` |
-| wizard_selections_admin_select | SELECT | authenticated | `EXISTS (
-            SELECT 1 FROM public.user_profiles
-            WHERE user_p` |
-| wizard_selections_user_all | ALL | authenticated | `user_id = (SELECT auth.uid(` |
-| wizard_selections_admin_read | SELECT | authenticated | `EXISTS (
-            SELECT 1 FROM public.user_profiles up
-            WHERE up.` |
-| ws_anon_insert | INSERT | anon | `-` |
-| ws_auth_all | ALL | authenticated | `user_id = (SELECT auth.uid(` |
-| ws_anon_insert | INSERT | anon | `-` |
-| ws_anon_insert | INSERT | anon | `-` |
-| ws_anon_insert | INSERT | anon | `-` |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-| tenant_id | uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE |
-
-
--- FILE: 20260530220000_tenant_schema_setup.sql
--- Multi-Tenant SaaS Foundation Migration
--- Target: public.tenants table and 21 Tenant-Aware tables.
--- Sequence: Golden Triad (Grants -> Enable RLS -> Recreate Policies).
-
-BEGIN;
-
--- ==========================================
--- PART 1: public.tenants setup
--- ==========================================
-
-CREATE TABLE IF NOT EXISTS public.tenants (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text NOT NULL UNIQUE,
-  subdomain text UNIQUE,
-  custom_domain text UNIQUE,
-  is_active boolean NOT NULL DEFAULT true,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-
--- Golden Triad: Grants
-GRANT SELECT ON public.tenants TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.tenants TO authenticated;
-GRANT ALL ON public.tenants TO service_role;
-
--- Golden Triad: Enable RLS
-ALTER TABLE public.tenants ENABLE ROW LEVEL SECURITY;
-
--- Golden Triad: Policies
-DROP POLICY IF EXISTS tenants_select ON public.tenants;
-CREATE POLICY tenants_select ON public.tenants
-  FOR SELECT TO anon, authenticated USING (true);
-
-DROP POLICY IF EXISTS tenants_all_service_role ON public.tenants;
-CREATE POLICY tenants_all_service_role ON public.tenants
-  FOR ALL TO service_role USING (true);
-
--- Populate default tenant
-INSERT INTO public.tenants (id, name, subdomain, is_active)
-VALUES ('d3b07384-d113-495f-a558-8c38634e0000', 'Default Tenant', 'default', true)
-ON CONFLICT (id) DO NOTHING;
-
-
--- ==========================================
--- PART 2: jwt_tenant_id() RPC Helper
--- ==========================================
-
-CREATE OR REPLACE FUNCTION public.jwt_tenant_id()
-RETURNS uuid
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  claims_str text;
-  tenant_id_val text;
-BEGIN
-  -- Extract raw JWT claims string safely
-  claims_str := current_setting('request.jwt.claims', true);
-  
-  IF claims_str IS NULL OR claims_str = '' THEN
-    RETURN 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-  END IF;
-  
-  -- Parse JSON and extract app_metadata -> tenant_id
-  tenant_id_val := claims_str::jsonb -> 'app_metadata' ->> 'tenant_id';
-  
-  IF tenant_id_val IS NULL OR tenant_id_val = '' THEN
-    RETURN 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-  END IF;
-  
-  RETURN tenant_id_val::uuid;
-EXCEPTION
-  WHEN OTHERS THEN
-    RETURN 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-END;
-$$;
-
-
--- ==========================================
--- PART 3: Adding tenant_id column and foreign key index
--- ==========================================
-
--- 1. shopping_carts
-ALTER TABLE public.shopping_carts ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_shopping_carts_tenant_id ON public.shopping_carts(tenant_id);
-
--- 2. cart_items
-ALTER TABLE public.cart_items ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_cart_items_tenant_id ON public.cart_items(tenant_id);
-
--- 3. venthub_orders
-ALTER TABLE public.venthub_orders ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_venthub_orders_tenant_id ON public.venthub_orders(tenant_id);
-
--- 4. venthub_order_items
-ALTER TABLE public.venthub_order_items ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_venthub_order_items_tenant_id ON public.venthub_order_items(tenant_id);
-
--- 5. venthub_returns
-ALTER TABLE public.venthub_returns ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_venthub_returns_tenant_id ON public.venthub_returns(tenant_id);
-
--- 6. coupons
-ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_coupons_tenant_id ON public.coupons(tenant_id);
-
--- 7. inventory_movements
-ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_inventory_movements_tenant_id ON public.inventory_movements(tenant_id);
-
--- 8. inventory_settings
-ALTER TABLE public.inventory_settings ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_inventory_settings_tenant_id ON public.inventory_settings(tenant_id);
-
--- 9. price_lists
-ALTER TABLE public.price_lists ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_price_lists_tenant_id ON public.price_lists(tenant_id);
-
--- 10. product_prices
-ALTER TABLE public.product_prices ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_product_prices_tenant_id ON public.product_prices(tenant_id);
-
--- 11. order_attachments
-ALTER TABLE public.order_attachments ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_order_attachments_tenant_id ON public.order_attachments(tenant_id);
-
--- 12. order_notes
-ALTER TABLE public.order_notes ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_order_notes_tenant_id ON public.order_notes(tenant_id);
-
--- 13. order_refund_events
-ALTER TABLE public.order_refund_events ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_order_refund_events_tenant_id ON public.order_refund_events(tenant_id);
-
--- 14. user_profiles
-ALTER TABLE public.user_profiles ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_user_profiles_tenant_id ON public.user_profiles(tenant_id);
-
--- 15. user_addresses
-ALTER TABLE public.user_addresses ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_user_addresses_tenant_id ON public.user_addresses(tenant_id);
-
--- 16. user_invoice_profiles
-ALTER TABLE public.user_invoice_profiles ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_user_invoice_profiles_tenant_id ON public.user_invoice_profiles(tenant_id);
-
--- 17. wizard_selections
-ALTER TABLE public.wizard_selections ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_wizard_selections_tenant_id ON public.wizard_selections(tenant_id);
-
--- 18. shipping_email_events
-ALTER TABLE public.shipping_email_events ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_shipping_email_events_tenant_id ON public.shipping_email_events(tenant_id);
-
--- 19. shipping_webhook_events
-ALTER TABLE public.shipping_webhook_events ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_shipping_webhook_events_tenant_id ON public.shipping_webhook_events(tenant_id);
-
--- 20. returns_webhook_events
-ALTER TABLE public.returns_webhook_events ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_returns_webhook_events_tenant_id ON public.returns_webhook_events(tenant_id);
-
--- 21. admin_audit_log
-ALTER TABLE public.admin_audit_log ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_admin_audit_log_tenant_id ON public.admin_audit_log(tenant_id);
-
-
--- ==========================================
--- PART 4: Applying Golden Triad & Recreating Policies
--- ==========================================
-
--- 1. shopping_carts
-GRANT SELECT ON public.shopping_carts TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.shopping_carts TO authenticated;
-GRANT ALL ON public.shopping_carts TO service_role;
-ALTER TABLE public.shopping_carts ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "sc_auth_all" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_policy" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_select_own" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_modify_own" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_all" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_user_all" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_service_role" ON public.shopping_carts;
-
-CREATE POLICY "sc_auth_all" ON public.shopping_carts
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "shopping_carts_service_role" ON public.shopping_carts
-  FOR ALL TO service_role USING (true);
-
-
--- 2. cart_items
-GRANT SELECT ON public.cart_items TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.cart_items TO authenticated;
-GRANT ALL ON public.cart_items TO service_role;
-ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "ci_auth_all" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_policy" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_select_own" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_modify_own" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_all" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_user_all" ON public.cart_items;
-DROP POLICY IF EXISTS "p_user_read_own_cart" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_service_role" ON public.cart_items;
-
-CREATE POLICY "ci_auth_all" ON public.cart_items
-  FOR ALL TO authenticated
-  USING (
-    tenant_id = public.jwt_tenant_id() AND
-    cart_id IN (SELECT id FROM public.shopping_carts WHERE user_id = (SELECT auth.uid()) AND tenant_id = public.jwt_tenant_id())
-  )
-  WITH CHECK (
-    tenant_id = public.jwt_tenant_id() AND
-    cart_id IN (SELECT id FROM public.shopping_carts WHERE user_id = (SELECT auth.uid()) AND tenant_id = public.jwt_tenant_id())
-  );
-
-CREATE POLICY "cart_items_service_role" ON public.cart_items
-  FOR ALL TO service_role USING (true);
-
-
--- 3. venthub_orders
-GRANT SELECT ON public.venthub_orders TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.venthub_orders TO authenticated;
-GRANT ALL ON public.venthub_orders TO service_role;
-ALTER TABLE public.venthub_orders ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "orders_select_policy" ON public.venthub_orders;
-DROP POLICY IF EXISTS "orders_insert_policy" ON public.venthub_orders;
-DROP POLICY IF EXISTS "orders_update_policy" ON public.venthub_orders;
-DROP POLICY IF EXISTS "orders_delete_policy" ON public.venthub_orders;
-DROP POLICY IF EXISTS "orders_service_role" ON public.venthub_orders;
-
-CREATE POLICY "orders_select_policy" ON public.venthub_orders
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
-CREATE POLICY "orders_insert_policy" ON public.venthub_orders
-  FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
-CREATE POLICY "orders_update_policy" ON public.venthub_orders
-  FOR UPDATE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
-CREATE POLICY "orders_delete_policy" ON public.venthub_orders
-  FOR DELETE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (SELECT public.is_admin_user()));
-
-CREATE POLICY "orders_service_role" ON public.venthub_orders
-  FOR ALL TO service_role USING (true);
-
-
--- 4. venthub_order_items
-GRANT SELECT ON public.venthub_order_items TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.venthub_order_items TO authenticated;
-GRANT ALL ON public.venthub_order_items TO service_role;
-ALTER TABLE public.venthub_order_items ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "venthub_order_items_select_consolidated" ON public.venthub_order_items;
-DROP POLICY IF EXISTS "venthub_order_items_insert_optimized" ON public.venthub_order_items;
-DROP POLICY IF EXISTS "venthub_order_items_service_role" ON public.venthub_order_items;
-
-CREATE POLICY "venthub_order_items_select_consolidated" ON public.venthub_order_items
-  FOR SELECT TO authenticated
-  USING (
-    tenant_id = public.jwt_tenant_id() AND (
-      order_id IN (SELECT id FROM public.venthub_orders WHERE user_id = (SELECT auth.uid()) AND tenant_id = public.jwt_tenant_id())
-      OR (SELECT public.is_admin_user())
-    )
-  );
-
-CREATE POLICY "venthub_order_items_insert_optimized" ON public.venthub_order_items
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    tenant_id = public.jwt_tenant_id() AND
-    EXISTS (SELECT 1 FROM public.venthub_orders WHERE id = order_id AND user_id = (SELECT auth.uid()) AND tenant_id = public.jwt_tenant_id())
-  );
-
-CREATE POLICY "venthub_order_items_service_role" ON public.venthub_order_items
-  FOR ALL TO service_role USING (true);
-
-
--- 5. venthub_returns
-GRANT SELECT ON public.venthub_returns TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.venthub_returns TO authenticated;
-GRANT ALL ON public.venthub_returns TO service_role;
-ALTER TABLE public.venthub_returns ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "venthub_returns_select_consolidated" ON public.venthub_returns;
-DROP POLICY IF EXISTS "returns_select_policy" ON public.venthub_returns;
-DROP POLICY IF EXISTS "returns_insert_policy" ON public.venthub_returns;
-DROP POLICY IF EXISTS "returns_update_policy" ON public.venthub_returns;
-DROP POLICY IF EXISTS "returns_delete_policy" ON public.venthub_returns;
-DROP POLICY IF EXISTS "returns_service_role" ON public.venthub_returns;
-
-CREATE POLICY "returns_select_policy" ON public.venthub_returns
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
-CREATE POLICY "returns_insert_policy" ON public.venthub_returns
-  FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
-CREATE POLICY "returns_update_policy" ON public.venthub_returns
-  FOR UPDATE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (SELECT public.is_admin_user()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (SELECT public.is_admin_user()));
-
-CREATE POLICY "returns_delete_policy" ON public.venthub_returns
-  FOR DELETE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (SELECT public.is_admin_user()));
-
-CREATE POLICY "returns_service_role" ON public.venthub_returns
-  FOR ALL TO service_role USING (true);
-
-
--- 6. coupons
-GRANT SELECT ON public.coupons TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.coupons TO authenticated;
-GRANT ALL ON public.coupons TO service_role;
-ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Admin users can manage coupons" ON public.coupons;
-DROP POLICY IF EXISTS "Public can view active coupons" ON public.coupons;
-DROP POLICY IF EXISTS "coupons_admin_all" ON public.coupons;
-DROP POLICY IF EXISTS "coupons_public_select" ON public.coupons;
-DROP POLICY IF EXISTS "coupons_service_role" ON public.coupons;
-
-CREATE POLICY "coupons_admin_all" ON public.coupons
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "coupons_public_select" ON public.coupons
-  FOR SELECT TO anon, authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND is_active = true AND (valid_until IS NULL OR valid_until > now()));
-
-CREATE POLICY "coupons_service_role" ON public.coupons
-  FOR ALL TO service_role USING (true);
-
-
--- 7. inventory_movements
-GRANT SELECT ON public.inventory_movements TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.inventory_movements TO authenticated;
-GRANT ALL ON public.inventory_movements TO service_role;
-ALTER TABLE public.inventory_movements ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "inventory_movements_select_admin" ON public.inventory_movements;
-DROP POLICY IF EXISTS "p_admin_read_inventory" ON public.inventory_movements;
-DROP POLICY IF EXISTS "inventory_movements_service_role" ON public.inventory_movements;
-
-CREATE POLICY "inventory_movements_select_admin" ON public.inventory_movements
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "inventory_movements_service_role" ON public.inventory_movements
-  FOR ALL TO service_role USING (true);
-
-
--- 8. inventory_settings
-GRANT SELECT ON public.inventory_settings TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.inventory_settings TO authenticated;
-GRANT ALL ON public.inventory_settings TO service_role;
-ALTER TABLE public.inventory_settings ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "inventory_settings_select_all" ON public.inventory_settings;
-DROP POLICY IF EXISTS "inventory_settings_update_admin" ON public.inventory_settings;
-DROP POLICY IF EXISTS "inventory_settings_service_role" ON public.inventory_settings;
-
-CREATE POLICY "inventory_settings_select_all" ON public.inventory_settings
-  FOR SELECT TO anon, authenticated
-  USING (tenant_id = public.jwt_tenant_id());
-
-CREATE POLICY "inventory_settings_update_admin" ON public.inventory_settings
-  FOR UPDATE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "inventory_settings_service_role" ON public.inventory_settings
-  FOR ALL TO service_role USING (true);
-
-
--- 9. price_lists
-GRANT SELECT ON public.price_lists TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.price_lists TO authenticated;
-GRANT ALL ON public.price_lists TO service_role;
-ALTER TABLE public.price_lists ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "p_anon_read_active_price_lists" ON public.price_lists;
-DROP POLICY IF EXISTS "price_lists_select" ON public.price_lists;
-DROP POLICY IF EXISTS "price_lists_admin_all" ON public.price_lists;
-DROP POLICY IF EXISTS "price_lists_service_role" ON public.price_lists;
-
-CREATE POLICY "price_lists_select" ON public.price_lists
-  FOR SELECT TO anon, authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (is_active = true OR public.is_user_admin(auth.uid())));
-
-CREATE POLICY "price_lists_admin_all" ON public.price_lists
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "price_lists_service_role" ON public.price_lists
-  FOR ALL TO service_role USING (true);
-
-
--- 10. product_prices
-GRANT SELECT ON public.product_prices TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_prices TO authenticated;
-GRANT ALL ON public.product_prices TO service_role;
-ALTER TABLE public.product_prices ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "product_prices_select" ON public.product_prices;
-DROP POLICY IF EXISTS "product_prices_admin_all" ON public.product_prices;
-DROP POLICY IF EXISTS "product_prices_service_role" ON public.product_prices;
-
-CREATE POLICY "product_prices_select" ON public.product_prices
-  FOR SELECT TO anon, authenticated
-  USING (tenant_id = public.jwt_tenant_id());
-
-CREATE POLICY "product_prices_admin_all" ON public.product_prices
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "product_prices_service_role" ON public.product_prices
-  FOR ALL TO service_role USING (true);
-
-
--- 11. order_attachments
-GRANT SELECT ON public.order_attachments TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.order_attachments TO authenticated;
-GRANT ALL ON public.order_attachments TO service_role;
-ALTER TABLE public.order_attachments ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Admin users can manage order attachments" ON public.order_attachments;
-DROP POLICY IF EXISTS "Order owners can view non-internal attachments" ON public.order_attachments;
-DROP POLICY IF EXISTS "order_attachments_admin_all" ON public.order_attachments;
-DROP POLICY IF EXISTS "order_attachments_view_policy" ON public.order_attachments;
-DROP POLICY IF EXISTS "order_attachments_service_role" ON public.order_attachments;
-
-CREATE POLICY "order_attachments_admin_all" ON public.order_attachments
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "order_attachments_view_policy" ON public.order_attachments
-  FOR SELECT TO authenticated
-  USING (
-    tenant_id = public.jwt_tenant_id() AND
-    NOT is_internal AND
-    order_id IN (SELECT id FROM public.venthub_orders WHERE user_id = auth.uid() AND tenant_id = public.jwt_tenant_id())
-  );
-
-CREATE POLICY "order_attachments_service_role" ON public.order_attachments
-  FOR ALL TO service_role USING (true);
-
-
--- 12. order_notes
-GRANT SELECT ON public.order_notes TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.order_notes TO authenticated;
-GRANT ALL ON public.order_notes TO service_role;
-ALTER TABLE public.order_notes ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Admin users can manage order notes" ON public.order_notes;
-DROP POLICY IF EXISTS "Order owners can view non-internal notes" ON public.order_notes;
-DROP POLICY IF EXISTS "order_notes_admin_all" ON public.order_notes;
-DROP POLICY IF EXISTS "order_notes_view_policy" ON public.order_notes;
-DROP POLICY IF EXISTS "order_notes_service_role" ON public.order_notes;
-
-CREATE POLICY "order_notes_admin_all" ON public.order_notes
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "order_notes_view_policy" ON public.order_notes
-  FOR SELECT TO authenticated
-  USING (
-    tenant_id = public.jwt_tenant_id() AND
-    NOT is_internal AND
-    order_id IN (SELECT id FROM public.venthub_orders WHERE user_id = auth.uid() AND tenant_id = public.jwt_tenant_id())
-  );
-
-CREATE POLICY "order_notes_service_role" ON public.order_notes
-  FOR ALL TO service_role USING (true);
-
-
--- 13. order_refund_events
-GRANT SELECT ON public.order_refund_events TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.order_refund_events TO authenticated;
-GRANT ALL ON public.order_refund_events TO service_role;
-ALTER TABLE public.order_refund_events ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "order_refund_events_admin_select" ON public.order_refund_events;
-DROP POLICY IF EXISTS "order_refund_events_service_role" ON public.order_refund_events;
-
-CREATE POLICY "order_refund_events_admin_select" ON public.order_refund_events
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "order_refund_events_service_role" ON public.order_refund_events
-  FOR ALL TO service_role USING (true);
-
-
--- 14. user_profiles
-GRANT SELECT ON public.user_profiles TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.user_profiles TO authenticated;
-GRANT ALL ON public.user_profiles TO service_role;
-ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "user_profiles_select_policy" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_insert_policy" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_update_policy" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_delete_policy" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_update_merged" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_insert_merged" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_service_role" ON public.user_profiles;
-
-CREATE POLICY "user_profiles_select_policy" ON public.user_profiles
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (id = (SELECT auth.uid()) OR public.is_admin_user()));
-
-CREATE POLICY "user_profiles_insert_policy" ON public.user_profiles
-  FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (id = (SELECT auth.uid()) OR public.is_admin_user()));
-
-CREATE POLICY "user_profiles_update_policy" ON public.user_profiles
-  FOR UPDATE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (id = (SELECT auth.uid()) OR public.is_admin_user()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (id = (SELECT auth.uid()) OR public.is_admin_user()));
-
-CREATE POLICY "user_profiles_delete_policy" ON public.user_profiles
-  FOR DELETE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "user_profiles_service_role" ON public.user_profiles
-  FOR ALL TO service_role USING (true);
-
-
--- 15. user_addresses
-GRANT SELECT ON public.user_addresses TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.user_addresses TO authenticated;
-GRANT ALL ON public.user_addresses TO service_role;
-ALTER TABLE public.user_addresses ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "user_addresses_select" ON public.user_addresses;
-DROP POLICY IF EXISTS "user_addresses_insert" ON public.user_addresses;
-DROP POLICY IF EXISTS "user_addresses_update" ON public.user_addresses;
-DROP POLICY IF EXISTS "user_addresses_delete" ON public.user_addresses;
-DROP POLICY IF EXISTS "user_addresses_service_role" ON public.user_addresses;
-
-CREATE POLICY "user_addresses_select" ON public.user_addresses
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "user_addresses_insert" ON public.user_addresses
-  FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "user_addresses_update" ON public.user_addresses
-  FOR UPDATE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "user_addresses_delete" ON public.user_addresses
-  FOR DELETE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "user_addresses_service_role" ON public.user_addresses
-  FOR ALL TO service_role USING (true);
-
-
--- 16. user_invoice_profiles
-GRANT SELECT ON public.user_invoice_profiles TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.user_invoice_profiles TO authenticated;
-GRANT ALL ON public.user_invoice_profiles TO service_role;
-ALTER TABLE public.user_invoice_profiles ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "user_invoice_profiles_own" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "uip_own" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "user_invoice_profiles_service_role" ON public.user_invoice_profiles;
-
-CREATE POLICY "uip_own" ON public.user_invoice_profiles
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "user_invoice_profiles_service_role" ON public.user_invoice_profiles
-  FOR ALL TO service_role USING (true);
-
-
--- 17. wizard_selections
-GRANT SELECT ON public.wizard_selections TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.wizard_selections TO authenticated;
-GRANT ALL ON public.wizard_selections TO service_role;
-ALTER TABLE public.wizard_selections ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "ws_anon_insert" ON public.wizard_selections;
-DROP POLICY IF EXISTS "ws_auth_all" ON public.wizard_selections;
-DROP POLICY IF EXISTS "wizard_selections_service_role" ON public.wizard_selections;
-
-CREATE POLICY "ws_anon_insert" ON public.wizard_selections
-  FOR INSERT TO anon
-  WITH CHECK (tenant_id = public.jwt_tenant_id());
-
-CREATE POLICY "ws_auth_all" ON public.wizard_selections
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "wizard_selections_service_role" ON public.wizard_selections
-  FOR ALL TO service_role USING (true);
-
-
--- 18. shipping_email_events
-GRANT SELECT ON public.shipping_email_events TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.shipping_email_events TO authenticated;
-GRANT ALL ON public.shipping_email_events TO service_role;
-ALTER TABLE public.shipping_email_events ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "admins_read_shipping_emails" ON public.shipping_email_events;
-DROP POLICY IF EXISTS "shipping_email_events_admin_select" ON public.shipping_email_events;
-DROP POLICY IF EXISTS "shipping_email_events_service_role" ON public.shipping_email_events;
-
-CREATE POLICY "shipping_email_events_admin_select" ON public.shipping_email_events
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "shipping_email_events_service_role" ON public.shipping_email_events
-  FOR ALL TO service_role USING (true);
-
-
--- 19. shipping_webhook_events
-GRANT SELECT ON public.shipping_webhook_events TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.shipping_webhook_events TO authenticated;
-GRANT ALL ON public.shipping_webhook_events TO service_role;
-ALTER TABLE public.shipping_webhook_events ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "admins_read_shipping_webhooks" ON public.shipping_webhook_events;
-DROP POLICY IF EXISTS "shipping_webhook_events_admin_select" ON public.shipping_webhook_events;
-DROP POLICY IF EXISTS "shipping_webhook_events_service_role" ON public.shipping_webhook_events;
-
-CREATE POLICY "shipping_webhook_events_admin_select" ON public.shipping_webhook_events
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "shipping_webhook_events_service_role" ON public.shipping_webhook_events
-  FOR ALL TO service_role USING (true);
-
-
--- 20. returns_webhook_events
-GRANT SELECT ON public.returns_webhook_events TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.returns_webhook_events TO authenticated;
-GRANT ALL ON public.returns_webhook_events TO service_role;
-ALTER TABLE public.returns_webhook_events ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "admins_read_returns_webhooks" ON public.returns_webhook_events;
-DROP POLICY IF EXISTS "returns_webhook_events_admin_select" ON public.returns_webhook_events;
-DROP POLICY IF EXISTS "returns_webhook_events_service_role" ON public.returns_webhook_events;
-
-CREATE POLICY "returns_webhook_events_admin_select" ON public.returns_webhook_events
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "returns_webhook_events_service_role" ON public.returns_webhook_events
-  FOR ALL TO service_role USING (true);
-
-
--- 21. admin_audit_log
-GRANT SELECT ON public.admin_audit_log TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.admin_audit_log TO authenticated;
-GRANT ALL ON public.admin_audit_log TO service_role;
-ALTER TABLE public.admin_audit_log ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "admin_audit_log_select_v2" ON public.admin_audit_log;
-DROP POLICY IF EXISTS "admin_audit_log_insert_v2" ON public.admin_audit_log;
-DROP POLICY IF EXISTS "admin_audit_log_service_role" ON public.admin_audit_log;
-
-CREATE POLICY "admin_audit_log_select_v2" ON public.admin_audit_log
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "admin_audit_log_insert_v2" ON public.admin_audit_log
-  FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "admin_audit_log_service_role" ON public.admin_audit_log
-  FOR ALL TO service_role USING (true);
-
--- Refresh PostgREST schema cache
-NOTIFY pgrst, 'reload schema';
-
-COMMIT;
-
-
-
--- FILE: 20260530221000_tenant_auth_integration.sql
--- Migration: Supabase Auth Claims & Profile Integration Triggers
--- Created: 2026-05-30 22:10:00
--- Target: auth.users triggers to inject tenant_id claims and sync with public.user_profiles
-
--- PART 1: handle_new_user_metadata trigger function
-CREATE OR REPLACE FUNCTION public.handle_new_user_metadata()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  tenant_id_raw text;
-  resolved_tenant_id uuid;
-BEGIN
-  -- Extract tenant_id from raw_user_meta_data
-  tenant_id_raw := new.raw_user_meta_data ->> 'tenant_id';
-  
-  -- Safe block to parse and check tenant_id validity in the tenants table
-  BEGIN
-    IF tenant_id_raw IS NOT NULL THEN
-      SELECT id INTO resolved_tenant_id FROM public.tenants WHERE id = tenant_id_raw::uuid AND is_active = true;
-    END IF;
-  EXCEPTION WHEN OTHERS THEN
-    resolved_tenant_id := NULL;
-  END;
-
-  -- Default to 'd3b07384-d113-495f-a558-8c38634e0000' if not found or invalid
-  IF resolved_tenant_id IS NULL THEN
-    resolved_tenant_id := 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-  END IF;
-
-  -- Inject tenant_id into raw_app_meta_data so it is included in JWT claims
-  new.raw_app_meta_data := jsonb_set(
-    COALESCE(new.raw_app_meta_data, '{}'::jsonb),
-    '{tenant_id}',
-    to_jsonb(resolved_tenant_id::text)
-  );
-
-  -- Also set tenant_id in raw_user_meta_data
-  new.raw_user_meta_data := jsonb_set(
-    COALESCE(new.raw_user_meta_data, '{}'::jsonb),
-    '{tenant_id}',
-    to_jsonb(resolved_tenant_id::text)
-  );
-
-  RETURN new;
-END;
-$$;
-
--- Bind the metadata handler trigger BEFORE INSERT on auth.users
-DROP TRIGGER IF EXISTS trg_handle_new_user_metadata ON auth.users;
-CREATE TRIGGER trg_handle_new_user_metadata
-  BEFORE INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_new_user_metadata();
-
-
--- PART 2: handle_new_user_profile trigger function
-CREATE OR REPLACE FUNCTION public.handle_new_user_profile()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  resolved_tenant_id uuid;
-  full_name_val text;
-  role_val text;
-BEGIN
-  -- Extract resolved tenant_id from new.raw_app_meta_data
-  resolved_tenant_id := (new.raw_app_meta_data ->> 'tenant_id')::uuid;
-  
-  -- Extract other metadata values
-  full_name_val := new.raw_user_meta_data ->> 'full_name';
-  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
-
-  -- Insert or update public.user_profiles mapping
-  INSERT INTO public.user_profiles (id, tenant_id, full_name, role, created_at, updated_at)
-  VALUES (
-    new.id,
-    resolved_tenant_id,
-    full_name_val,
-    role_val,
-    now(),
-    now()
-  )
-  ON CONFLICT (id) DO UPDATE
-  SET
-    tenant_id = EXCLUDED.tenant_id,
-    full_name = EXCLUDED.full_name,
-    role = EXCLUDED.role,
-    updated_at = now();
-
-  RETURN new;
-END;
-$$;
-
--- Bind the profile handler trigger AFTER INSERT on auth.users
-DROP TRIGGER IF EXISTS trg_handle_new_user_profile ON auth.users;
-CREATE TRIGGER trg_handle_new_user_profile
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_new_user_profile();
-
-
-
--- FILE: 20260530222000_add_tenant_config_columns.sql
--- Migration: Add tenant config columns and update default tenant config
--- Location: supabase/migrations/20260530222000_add_tenant_config_columns.sql
-
-BEGIN;
-
--- Add features and styles columns to public.tenants table if they do not exist
-ALTER TABLE public.tenants 
-ADD COLUMN IF NOT EXISTS features JSONB NOT NULL DEFAULT '{}'::jsonb;
-
-ALTER TABLE public.tenants 
-ADD COLUMN IF NOT EXISTS styles JSONB NOT NULL DEFAULT '{}'::jsonb;
-
--- Update the default tenant with active features and styles
-UPDATE public.tenants
-SET 
-  features = '{"viewer3d": true, "engineeringCalculators": true, "pdfExports": true}'::jsonb,
-  styles = '{"primaryColor": "#0f172a", "secondaryColor": "#3b82f6"}'::jsonb
-WHERE id = 'd3b07384-d113-495f-a558-8c38634e0000';
-
-COMMIT;
-
-
-
--- FILE: 20260530223000_add_tenant_branding_config.sql
--- Migration: Add tenant branding config columns and seed default tenant
--- Location: supabase/migrations/20260530223000_add_tenant_branding_config.sql
-
-BEGIN;
-
--- Add config, theme_config, and features columns to public.tenants table if they do not exist
-ALTER TABLE public.tenants 
-ADD COLUMN IF NOT EXISTS config JSONB NOT NULL DEFAULT '{}'::jsonb;
-
-ALTER TABLE public.tenants 
-ADD COLUMN IF NOT EXISTS theme_config JSONB NOT NULL DEFAULT '{}'::jsonb;
-
-ALTER TABLE public.tenants 
-ADD COLUMN IF NOT EXISTS features JSONB NOT NULL DEFAULT '{}'::jsonb;
-
--- Seed the default tenant 'd3b07384-d113-495f-a558-8c38634e0000' with branding configurations in JSONB
-UPDATE public.tenants
-SET config = jsonb_build_object(
-  'brand_name', 'VentHub',
-  'brand_logo_url', 'https://venthub-hvac-esite.vercel.app/images/logo.png',
-  'brand_primary_color', '#2563eb',
-  'email_from', 'VentHub <onboarding@resend.dev>'
-)
-WHERE id = 'd3b07384-d113-495f-a558-8c38634e0000';
-
-COMMIT;
-
-
-
--- FILE: 20260530224000_tenant_aware_storage_policies.sql
--- Migration: Tenant-Aware Path-Based Storage Isolation Policies
--- Location: supabase/migrations/20260530224000_tenant_aware_storage_policies.sql
-
-BEGIN;
-
--- 1. DROP ALL OLD INSECURE AND NON-TENANT-AWARE POLICIES
-DROP POLICY IF EXISTS product_images_read_public ON storage.objects;
-DROP POLICY IF EXISTS product_images_insert_authenticated ON storage.objects;
-DROP POLICY IF EXISTS product_images_insert_admin ON storage.objects;
-DROP POLICY IF EXISTS product_images_update_admin ON storage.objects;
-DROP POLICY IF EXISTS product_images_delete_admin ON storage.objects;
-
--- Ensure RLS is active on storage.objects (storage.objects has RLS active by default)
--- ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
--- 2. CREATE TENANT-AWARE AND ROLE-VERIFIED POLICIES
-
--- SELECT: Public reading of files only if they belong to an active tenant
-CREATE POLICY product_images_select_tenant ON storage.objects
-  FOR SELECT TO public
-  USING (
-    bucket_id = 'product-images'
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND EXISTS (
-      SELECT 1 FROM public.tenants t
-      WHERE t.id = split_part(name, '/', 1)::uuid
-      AND t.is_active = true
-    )
-  );
-
--- INSERT: Restrict uploads to tenant folder matching jwt_tenant_id() + user must be admin/moderator in that tenant
-CREATE POLICY product_images_insert_tenant ON storage.objects
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    bucket_id = 'product-images'
-    -- A: Enforce file path begins with a valid UUID matching the user's active tenant claim
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND split_part(name, '/', 1)::uuid = public.jwt_tenant_id()
-    -- B: Verify user is registered, belongs to the active tenant, and has write permissions
-    AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.tenant_id = public.jwt_tenant_id()
-      AND up.role IN ('admin', 'moderator')
-    )
-  );
-
--- UPDATE: Restrict file replacements to owners matching active tenant + admin/moderator roles
-CREATE POLICY product_images_update_tenant ON storage.objects
-  FOR UPDATE TO authenticated
-  USING (
-    bucket_id = 'product-images'
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND split_part(name, '/', 1)::uuid = public.jwt_tenant_id()
-    AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.tenant_id = public.jwt_tenant_id()
-      AND up.role IN ('admin', 'moderator')
-    )
-  )
-  WITH CHECK (
-    bucket_id = 'product-images'
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND split_part(name, '/', 1)::uuid = public.jwt_tenant_id()
-    AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.tenant_id = public.jwt_tenant_id()
-      AND up.role IN ('admin', 'moderator')
-    )
-  );
-
--- DELETE: Restrict deletions to owners matching active tenant + admin/moderator roles
-CREATE POLICY product_images_delete_tenant ON storage.objects
-  FOR DELETE TO authenticated
-  USING (
-    bucket_id = 'product-images'
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND split_part(name, '/', 1)::uuid = public.jwt_tenant_id()
-    AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.tenant_id = public.jwt_tenant_id()
-      AND up.role IN ('admin', 'moderator')
-    )
-  );
-
--- Refresh PostgREST schema cache
-NOTIFY pgrst, 'reload schema';
-
-COMMIT;
-
-
-
-
--- FILE: 20260602070000_security_hardening.sql
-BEGIN;
-
--- ============================================================================
--- R1: User Profiles RLS Recursion Fix
--- ============================================================================
--- Redefine is_admin_user() to safely read role from JWT claims first (recursion-free)
-CREATE OR REPLACE FUNCTION public.is_admin_user()
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $$
-DECLARE
-  claims jsonb;
-  user_role text;
-BEGIN
-  -- If service_role, bypass checks and return true
-  IF auth.role() = 'service_role' THEN
-    RETURN TRUE;
-  END IF;
-
-  -- Retrieve JWT claims from request context
-  claims := nullif(current_setting('request.jwt.claims', true), '')::jsonb;
-  
-  IF claims IS NOT NULL THEN
-    user_role := COALESCE(
-      claims ->> 'user_role',
-      claims -> 'app_metadata' ->> 'user_role',
-      claims -> 'user_metadata' ->> 'role'
-    );
-    IF user_role IS NOT NULL THEN
-      RETURN user_role IN ('admin', 'superadmin');
-    END IF;
-  END IF;
-
-  -- Fallback to database lookup if claims are empty (e.g. backend script, triggers)
-  RETURN EXISTS (
-    SELECT 1 FROM public.user_profiles 
-    WHERE id = auth.uid() AND role IN ('admin','superadmin')
-  );
-END;
-$$;
-
--- Drop and recreate the user_profiles SELECT policy to use the non-recursive is_admin_user()
-DROP POLICY IF EXISTS user_profiles_select_policy ON public.user_profiles;
-CREATE POLICY user_profiles_select_policy ON public.user_profiles FOR SELECT
-  USING ( id = auth.uid() OR public.is_admin_user() );
-
-
--- ============================================================================
--- R2: GraphQL Schema Exposure Prevention
--- ============================================================================
--- 1. Tables with existing comments (Preserve and Append)
-COMMENT ON TABLE public.user_profiles IS 'Kullanıcı profilleri ve rolleri | @graphql({"disabled": true})';
-COMMENT ON TABLE public.wizard_selections IS 'Hava perdesi seçim wizard kaydları - hukuki koruma amaçlı | @graphql({"disabled": true})';
-COMMENT ON TABLE public.venthub_orders IS 'Payment system fixed on 2025-09-03 - all required columns added | @graphql({"disabled": true})';
-COMMENT ON TABLE public.venthub_order_items IS 'Order items schema fixed on 2025-09-03 - optional fields made nullable | @graphql({"disabled": true})';
-COMMENT ON VIEW public.admin_users IS 'Admin ve moderatör kullanıcıları listesi | @graphql({"disabled": true})';
-
--- 2. Tables without existing comments (Directly Disable)
-COMMENT ON TABLE public.admin_audit_log IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.cart_items IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.category_mapping_rules IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.client_errors IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.contact_messages IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.coupons IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.error_groups IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.inventory_movements IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.inventory_settings IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.order_attachments IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.order_email_events IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.order_notes IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.order_refund_events IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.organizations IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.payment_transactions IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.product_authorities IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.project_items IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.rate_limits IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.returns_webhook_events IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.shipping_email_events IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.shipping_idempotency IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.shipping_webhook_events IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.shopping_carts IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.site_settings IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.user_addresses IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.user_invoice_profiles IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.user_projects IS '@graphql({"disabled": true})';
-COMMENT ON TABLE public.venthub_returns IS '@graphql({"disabled": true})';
-
-
--- ============================================================================
--- R3 & R4: Storage Policy Hardening & Obsolete Policy Drop
--- ============================================================================
--- Drop permissive public/authenticated read/upload policies on product-images bucket
-DROP POLICY IF EXISTS product_images_read_public ON storage.objects;
-DROP POLICY IF EXISTS product_images_select_tenant ON storage.objects;
-DROP POLICY IF EXISTS product_images_insert_authenticated ON storage.objects;
-
--- Recreate the SELECT policy to target authenticated roles only, fix the name shadowing bug,
--- and enforce user membership validation against the active tenant.
-CREATE POLICY product_images_select_tenant ON storage.objects
-  FOR SELECT TO authenticated
-  USING (
-    bucket_id = 'product-images'
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND split_part(name, '/', 1)::uuid = public.jwt_tenant_id()
-    AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.tenant_id = public.jwt_tenant_id()
-    )
-  );
-
-
--- ============================================================================
--- R5a: Search Path Lock for Webhook Trigger Function
--- ============================================================================
-ALTER FUNCTION public.handle_supabase_webhook() SET search_path = pg_catalog, public, net;
-
-
--- ============================================================================
--- R6: Custom Auth JWT Hook
--- ============================================================================
--- Update handle_new_user_metadata() to populate user_role and tenant_id claims
-CREATE OR REPLACE FUNCTION public.handle_new_user_metadata()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  tenant_id_raw text;
-  resolved_tenant_id uuid;
-  role_val text;
-BEGIN
-  -- Extract tenant_id from raw_user_meta_data
-  tenant_id_raw := new.raw_user_meta_data ->> 'tenant_id';
-  
-  -- Safe block to parse and check tenant_id validity in the tenants table
-  BEGIN
-    IF tenant_id_raw IS NOT NULL THEN
-      SELECT id INTO resolved_tenant_id FROM public.tenants WHERE id = tenant_id_raw::uuid AND is_active = true;
-    END IF;
-  EXCEPTION WHEN OTHERS THEN
-    resolved_tenant_id := NULL;
-  END;
-
-  -- Default to 'd3b07384-d113-495f-a558-8c38634e0000' if not found or invalid
-  IF resolved_tenant_id IS NULL THEN
-    resolved_tenant_id := 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-  END IF;
-
-  -- Extract role from metadata, default to 'user'
-  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
-
-  -- Inject tenant_id and user_role into raw_app_meta_data so they are included in JWT claims
-  new.raw_app_meta_data := jsonb_set(
-    COALESCE(new.raw_app_meta_data, '{}'::jsonb),
-    '{tenant_id}',
-    to_jsonb(resolved_tenant_id::text)
-  );
-  new.raw_app_meta_data := jsonb_set(
-    new.raw_app_meta_data,
-    '{user_role}',
-    to_jsonb(role_val)
-  );
-
-  -- Also set tenant_id and user_role in raw_user_meta_data
-  new.raw_user_meta_data := jsonb_set(
-    COALESCE(new.raw_user_meta_data, '{}'::jsonb),
-    '{tenant_id}',
-    to_jsonb(resolved_tenant_id::text)
-  );
-  new.raw_user_meta_data := jsonb_set(
-    new.raw_user_meta_data,
-    '{role}',
-    to_jsonb(role_val)
-  );
-
-  RETURN new;
-END;
-$$;
-
-
--- ============================================================================
--- R7: Function Execution Revocation
--- ============================================================================
--- Revoke execution from public for all 30 security definer functions
-REVOKE EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text, uuid) FROM public;
-REVOKE EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text) FROM public;
-REVOKE EXECUTE ON FUNCTION public.adjust_stock_v2(uuid, integer) FROM public;
-REVOKE EXECUTE ON FUNCTION public.admin_list_all_users() FROM public;
-REVOKE EXECUTE ON FUNCTION public.admin_list_users() FROM public;
-REVOKE EXECUTE ON FUNCTION public.enforce_role_change() FROM public;
-REVOKE EXECUTE ON FUNCTION public.fn_admin_get_orders(text, text, text, integer) FROM public;
-REVOKE EXECUTE ON FUNCTION public.fn_admin_update_order_status(text, text, text) FROM public;
-REVOKE EXECUTE ON FUNCTION public.get_admin_users() FROM public;
-REVOKE EXECUTE ON FUNCTION public.get_products_enriched(uuid[], integer, integer, text, text, text, numeric, numeric) FROM public;
-REVOKE EXECUTE ON FUNCTION public.get_user_role(uuid) FROM public;
-REVOKE EXECUTE ON FUNCTION public.handle_new_user_metadata() FROM public;
-REVOKE EXECUTE ON FUNCTION public.handle_new_user_profile() FROM public;
-REVOKE EXECUTE ON FUNCTION public.handle_supabase_webhook() FROM public;
-REVOKE EXECUTE ON FUNCTION public.increment_coupon_usage(text) FROM public;
-REVOKE EXECUTE ON FUNCTION public.is_admin() FROM public;
-REVOKE EXECUTE ON FUNCTION public.is_admin_user() FROM public;
-REVOKE EXECUTE ON FUNCTION public.is_staff_user() FROM public;
-REVOKE EXECUTE ON FUNCTION public.is_user_admin(uuid) FROM public;
-REVOKE EXECUTE ON FUNCTION public.jwt_tenant_id() FROM public;
-REVOKE EXECUTE ON FUNCTION public.process_order_stock_reduction(text) FROM public;
-REVOKE EXECUTE ON FUNCTION public.reverse_inventory_batch(uuid, integer) FROM public;
-REVOKE EXECUTE ON FUNCTION public.reverse_inventory_batch(uuid) FROM public;
-REVOKE EXECUTE ON FUNCTION public.set_stock(uuid, integer, text, uuid) FROM public;
-REVOKE EXECUTE ON FUNCTION public.set_stock(uuid, integer, text) FROM public;
-REVOKE EXECUTE ON FUNCTION public.set_user_admin_role(uuid, text) FROM public;
-REVOKE EXECUTE ON FUNCTION public.set_user_role(uuid, text) FROM public;
-REVOKE EXECUTE ON FUNCTION public.update_inventory_settings(integer) FROM public;
-REVOKE EXECUTE ON FUNCTION public.update_inventory_thresholds(integer, boolean) FROM public;
-REVOKE EXECUTE ON FUNCTION public.user_invoice_profiles_ensure_single_default() FROM public;
-
--- Grant EXECUTE back to authenticated and anon for the functions used in RLS policies or context resolution
-GRANT EXECUTE ON FUNCTION public.is_admin_user() TO authenticated, anon;
-GRANT EXECUTE ON FUNCTION public.jwt_tenant_id() TO authenticated, anon;
-GRANT EXECUTE ON FUNCTION public.is_user_admin(uuid) TO authenticated, anon;
-GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, anon;
-GRANT EXECUTE ON FUNCTION public.is_staff_user() TO authenticated, anon;
-
-
--- ============================================================================
--- R9: Drop Obsolete Debug Functions
--- ============================================================================
-DROP FUNCTION IF EXISTS public.debug_context();
-DROP FUNCTION IF EXISTS public.debug_policies_product_images();
-
-
--- ============================================================================
--- R10: Restrict Anon SELECT Privileges
--- ============================================================================
--- Revoke SELECT privilege from anon on the 36 sensitive tables and views
-REVOKE SELECT ON TABLE public.admin_audit_log FROM anon;
-REVOKE SELECT ON TABLE public.admin_users FROM anon;
-REVOKE SELECT ON TABLE public.cart_items FROM anon;
-REVOKE SELECT ON TABLE public.category_mapping_rules FROM anon;
-REVOKE SELECT ON TABLE public.client_errors FROM anon;
-REVOKE SELECT ON TABLE public.contact_messages FROM anon;
-REVOKE SELECT ON TABLE public.coupons FROM anon;
-REVOKE SELECT ON TABLE public.error_groups FROM anon;
-REVOKE SELECT ON TABLE public.inventory_movements FROM anon;
-REVOKE SELECT ON TABLE public.inventory_settings FROM anon;
-REVOKE SELECT ON TABLE public.inventory_summary FROM anon;
-REVOKE SELECT ON TABLE public.inventory_velocity FROM anon;
-REVOKE SELECT ON TABLE public.order_attachments FROM anon;
-REVOKE SELECT ON TABLE public.order_email_events FROM anon;
-REVOKE SELECT ON TABLE public.order_notes FROM anon;
-REVOKE SELECT ON TABLE public.order_refund_events FROM anon;
-REVOKE SELECT ON TABLE public.organizations FROM anon;
-REVOKE SELECT ON TABLE public.payment_transactions FROM anon;
-REVOKE SELECT ON TABLE public.product_authorities FROM anon;
-REVOKE SELECT ON TABLE public.project_items FROM anon;
-REVOKE SELECT ON TABLE public.rate_limits FROM anon;
-REVOKE SELECT ON TABLE public.returns_webhook_events FROM anon;
-REVOKE SELECT ON TABLE public.shipping_email_events FROM anon;
-REVOKE SELECT ON TABLE public.shipping_idempotency FROM anon;
-REVOKE SELECT ON TABLE public.shipping_webhook_events FROM anon;
-REVOKE SELECT ON TABLE public.shopping_carts FROM anon;
-REVOKE SELECT ON TABLE public.site_settings FROM anon;
-REVOKE SELECT ON TABLE public.user_addresses FROM anon;
-REVOKE SELECT ON TABLE public.user_invoice_profiles FROM anon;
-REVOKE SELECT ON TABLE public.user_profiles FROM anon;
-REVOKE SELECT ON TABLE public.user_projects FROM anon;
-REVOKE SELECT ON TABLE public.venthub_order_items FROM anon;
-REVOKE SELECT ON TABLE public.venthub_orders FROM anon;
-REVOKE SELECT ON TABLE public.venthub_returns FROM anon;
-REVOKE SELECT ON TABLE public.view_admin_orders FROM anon;
-REVOKE SELECT ON TABLE public.wizard_selections FROM anon;
-
-COMMIT;
-
-
-
--- FILE: 20260602080000_security_hardening_fixes.sql
--- Migration: Security Hardening Fixes
--- Target: public.user_profiles, custom JWT auth hook, prevent self-elevation, internal auth checks, explicit function revocations
--- Created: 2026-06-02
-
-BEGIN;
-
--- ==========================================
--- 1. R1 Fix (Cross-Tenant Leak)
--- ==========================================
-DROP POLICY IF EXISTS user_profiles_select_policy ON public.user_profiles;
-CREATE POLICY user_profiles_select_policy ON public.user_profiles FOR SELECT TO authenticated
-  USING ( tenant_id = public.jwt_tenant_id() AND (id = auth.uid() OR public.is_admin_user()) );
-
-
--- ==========================================
--- 2. R6 (Custom Access Token Auth Hook)
--- ==========================================
-CREATE OR REPLACE FUNCTION public.custom_access_token_hook(event jsonb)
-RETURNS jsonb
-LANGUAGE plpgsql
-STABLE
-SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $$
-DECLARE
-  claims jsonb;
-  user_role text;
-  tenant_id_val text;
-BEGIN
-  -- Retrieve the user's role and tenant_id from the database user_profiles table
-  SELECT role, tenant_id::text INTO user_role, tenant_id_val
-  FROM public.user_profiles
-  WHERE id = (event->>'user_id')::uuid;
-
-  claims := event->'claims';
-
-  -- Ensure app_metadata is not null
-  IF (claims->'app_metadata') IS NULL THEN
-    claims := jsonb_set(claims, '{app_metadata}', '{}'::jsonb);
-  END IF;
-
-  -- Inject the role into JWT claims as user_role
-  IF user_role IS NOT NULL THEN
-    claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
-    claims := jsonb_set(claims, '{app_metadata, user_role}', to_jsonb(user_role));
-  ELSE
-    claims := jsonb_set(claims, '{user_role}', '"user"'::jsonb);
-    claims := jsonb_set(claims, '{app_metadata, user_role}', '"user"'::jsonb);
-  END IF;
-
-  -- Inject tenant_id into JWT claims as tenant_id (both root and app_metadata)
-  IF tenant_id_val IS NOT NULL THEN
-    claims := jsonb_set(claims, '{tenant_id}', to_jsonb(tenant_id_val));
-    claims := jsonb_set(claims, '{app_metadata, tenant_id}', to_jsonb(tenant_id_val));
-  ELSE
-    claims := jsonb_set(claims, '{tenant_id}', '"d3b07384-d113-495f-a558-8c38634e0000"'::jsonb);
-    claims := jsonb_set(claims, '{app_metadata, tenant_id}', '"d3b07384-d113-495f-a558-8c38634e0000"'::jsonb);
-  END IF;
-
-  -- Put the modified claims back in the event
-  event := jsonb_set(event, '{claims}', claims);
-  RETURN event;
-END;
-$$;
-
--- Configure permissions for the Auth Hook
-GRANT USAGE ON SCHEMA public TO supabase_auth_admin;
-GRANT SELECT ON TABLE public.user_profiles TO supabase_auth_admin;
-GRANT EXECUTE ON FUNCTION public.custom_access_token_hook(jsonb) TO supabase_auth_admin;
-REVOKE EXECUTE ON FUNCTION public.custom_access_token_hook(jsonb) FROM anon, authenticated, public;
-
-
--- ==========================================
--- 3. Prevent Role Self-Elevation Triggers
--- ==========================================
-CREATE OR REPLACE FUNCTION public.handle_new_user_metadata()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  tenant_id_raw text;
-  resolved_tenant_id uuid;
-  role_val text;
-BEGIN
-  -- Extract tenant_id from raw_user_meta_data
-  tenant_id_raw := new.raw_user_meta_data ->> 'tenant_id';
-  
-  -- Safe block to parse and check tenant_id validity in the tenants table
-  BEGIN
-    IF tenant_id_raw IS NOT NULL THEN
-      SELECT id INTO resolved_tenant_id FROM public.tenants WHERE id = tenant_id_raw::uuid AND is_active = true;
-    END IF;
-  EXCEPTION WHEN OTHERS THEN
-    resolved_tenant_id := NULL;
-  END;
-
-  -- Default to 'd3b07384-d113-495f-a558-8c38634e0000' if not found or invalid
-  IF resolved_tenant_id IS NULL THEN
-    resolved_tenant_id := 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-  END IF;
-
-  -- Extract role from metadata, default to 'user'
-  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
-
-  -- Prevent role self-elevation
-  IF NOT (auth.role() = 'service_role' OR public.is_admin_user()) THEN
-    role_val := 'user';
-  END IF;
-
-  -- Inject tenant_id and user_role into raw_app_meta_data so they are included in JWT claims
-  new.raw_app_meta_data := jsonb_set(
-    COALESCE(new.raw_app_meta_data, '{}'::jsonb),
-    '{tenant_id}',
-    to_jsonb(resolved_tenant_id::text)
-  );
-  new.raw_app_meta_data := jsonb_set(
-    new.raw_app_meta_data,
-    '{user_role}',
-    to_jsonb(role_val)
-  );
-
-  -- Also set tenant_id and user_role in raw_user_meta_data
-  new.raw_user_meta_data := jsonb_set(
-    COALESCE(new.raw_user_meta_data, '{}'::jsonb),
-    '{tenant_id}',
-    to_jsonb(resolved_tenant_id::text)
-  );
-  new.raw_user_meta_data := jsonb_set(
-    new.raw_user_meta_data,
-    '{role}',
-    to_jsonb(role_val)
-  );
-
-  RETURN new;
-END;
-$$;
-
-CREATE OR REPLACE FUNCTION public.handle_new_user_profile()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  resolved_tenant_id uuid;
-  full_name_val text;
-  role_val text;
-BEGIN
-  -- Extract resolved tenant_id from new.raw_app_meta_data
-  resolved_tenant_id := (new.raw_app_meta_data ->> 'tenant_id')::uuid;
-  
-  -- Extract other metadata values
-  full_name_val := new.raw_user_meta_data ->> 'full_name';
-  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
-
-  -- Prevent role self-elevation
-  IF NOT (auth.role() = 'service_role' OR public.is_admin_user()) THEN
-    role_val := 'user';
-  END IF;
-
-  -- Insert or update public.user_profiles mapping
-  INSERT INTO public.user_profiles (id, tenant_id, full_name, role, created_at, updated_at)
-  VALUES (
-    new.id,
-    resolved_tenant_id,
-    full_name_val,
-    role_val,
-    now(),
-    now()
-  )
-  ON CONFLICT (id) DO UPDATE
-  SET
-    tenant_id = EXCLUDED.tenant_id,
-    full_name = EXCLUDED.full_name,
-    role = EXCLUDED.role,
-    updated_at = now();
-
-  RETURN new;
-END;
-$$;
-
-
--- ==========================================
--- 4. Internal Authorization Checks (Defense-in-depth)
--- ==========================================
-
--- Drop functions before recreating to avoid parameter default / signature collision errors
-DROP FUNCTION IF EXISTS public.set_user_admin_role(uuid, text);
-DROP FUNCTION IF EXISTS public.adjust_stock(uuid, integer, text, uuid);
-DROP FUNCTION IF EXISTS public.adjust_stock(uuid, integer, text);
-DROP FUNCTION IF EXISTS public.set_stock(uuid, integer, text, uuid);
-DROP FUNCTION IF EXISTS public.set_stock(uuid, integer, text);
-
--- set_user_admin_role
-CREATE OR REPLACE FUNCTION public.set_user_admin_role(user_id UUID, new_role TEXT)
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $$
-BEGIN
-  IF NOT (auth.role() = 'service_role' OR EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() 
-      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
-  )) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  IF new_role NOT IN ('user','admin','moderator','superadmin', 'super_admin', 'warehouse', 'sales', 'viewer') THEN
-    RAISE EXCEPTION 'Invalid role: %', new_role;
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE id = user_id) THEN
-    INSERT INTO public.user_profiles (id, role) VALUES (user_id, new_role)
-    ON CONFLICT (id) DO UPDATE SET role=new_role, updated_at=NOW();
-  ELSE
-    UPDATE public.user_profiles SET role=new_role, updated_at=NOW() WHERE id = user_id;
-  END IF;
-
-  RETURN TRUE;
-END;
-$$;
-
--- adjust_stock(p_product_id, p_delta, p_reason, p_batch_id)
-CREATE OR REPLACE FUNCTION public.adjust_stock(
-  p_product_id uuid,
-  p_delta int,
-  p_reason text,
-  p_batch_id uuid
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-BEGIN
-  IF NOT (auth.role() = 'service_role' OR EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() 
-      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
-  )) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
-  WHERE id = p_product_id;
-
-  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id)
-  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'), p_batch_id);
-END;
-$$;
-
--- adjust_stock(p_product_id, p_delta, p_reason)
-CREATE OR REPLACE FUNCTION public.adjust_stock(
-  p_product_id uuid,
-  p_delta int,
-  p_reason text
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-BEGIN
-  IF NOT (auth.role() = 'service_role' OR EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() 
-      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
-  )) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
-  WHERE id = p_product_id;
-  
-  INSERT INTO public.inventory_movements (product_id, delta, reason) 
-  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'));
-END;
-$$;
-
--- set_stock(p_product_id, p_new_qty, p_reason, p_batch_id)
-CREATE OR REPLACE FUNCTION public.set_stock(
-  p_product_id uuid,
-  p_new_qty int,
-  p_reason text,
-  p_batch_id uuid
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-DECLARE
-  v_current int;
-  v_delta int;
-BEGIN
-  IF NOT (auth.role() = 'service_role' OR EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() 
-      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
-  )) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  SELECT COALESCE(stock_qty, 0) INTO v_current 
-  FROM public.products 
-  WHERE id = p_product_id;
-
-  v_delta := p_new_qty - v_current;
-  IF v_delta = 0 THEN
-    RETURN;
-  END IF;
-
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, p_new_qty)
-  WHERE id = p_product_id;
-
-  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id) 
-  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'), p_batch_id);
-END;
-$$;
-
--- set_stock(p_product_id, p_new_qty, p_reason)
-CREATE OR REPLACE FUNCTION public.set_stock(
-  p_product_id uuid,
-  p_new_qty int,
-  p_reason text
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-DECLARE
-  v_current int;
-  v_delta int;
-BEGIN
-  IF NOT (auth.role() = 'service_role' OR EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() 
-      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
-  )) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  SELECT COALESCE(stock_qty, 0) INTO v_current 
-  FROM public.products 
-  WHERE id = p_product_id;
-  
-  v_delta := p_new_qty - v_current;
-  
-  IF v_delta = 0 THEN
-    RETURN;
-  END IF;
-  
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, p_new_qty)
-  WHERE id = p_product_id;
-  
-  INSERT INTO public.inventory_movements (product_id, delta, reason) 
-  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'));
-END;
-$$;
-
-
--- ==========================================
--- 5. R7 Fix (Explicit Function Execution Revocation)
--- ==========================================
-
--- Revoke execution from public, anon, and authenticated explicitly for all 30 functions
-REVOKE EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text, uuid) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.adjust_stock_v2(uuid, integer) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.admin_list_all_users() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.admin_list_users() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.enforce_role_change() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.fn_admin_get_orders(text, text, text, integer) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.fn_admin_update_order_status(text, text, text) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.get_admin_users() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.get_products_enriched(uuid[], integer, integer, text, text, text, numeric, numeric) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.get_user_role(uuid) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.handle_new_user_metadata() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.handle_new_user_profile() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.handle_supabase_webhook() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.increment_coupon_usage(text) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.is_admin() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.is_admin_user() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.is_staff_user() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.is_user_admin(uuid) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.jwt_tenant_id() FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.process_order_stock_reduction(text) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.reverse_inventory_batch(uuid, integer) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.reverse_inventory_batch(uuid) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.set_stock(uuid, integer, text, uuid) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.set_stock(uuid, integer, text) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.set_user_admin_role(uuid, text) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.set_user_role(uuid, text) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.update_inventory_settings(integer) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.update_inventory_thresholds(integer, boolean) FROM anon, authenticated, public;
-REVOKE EXECUTE ON FUNCTION public.user_invoice_profiles_ensure_single_default() FROM anon, authenticated, public;
-
--- Grant execution back to authenticated and anon ONLY for RLS helper functions
-GRANT EXECUTE ON FUNCTION public.is_admin_user() TO authenticated, anon;
-GRANT EXECUTE ON FUNCTION public.jwt_tenant_id() TO authenticated, anon;
-GRANT EXECUTE ON FUNCTION public.is_user_admin(uuid) TO authenticated, anon;
-GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, anon;
-GRANT EXECUTE ON FUNCTION public.is_staff_user() TO authenticated, anon;
-
--- Grant execute to authenticated/service_role on other RPC functions as needed by application or admin actions
-GRANT EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text, uuid) TO authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.adjust_stock(uuid, integer, text) TO authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.admin_list_users() TO authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.set_stock(uuid, integer, text, uuid) TO authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.set_stock(uuid, integer, text) TO authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.set_user_admin_role(uuid, text) TO authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.get_products_enriched(uuid[], integer, integer, text, text, text, numeric, numeric) TO authenticated, anon, service_role;
-
-COMMIT;
-
-
-
--- FILE: 20260602090000_security_hardening_null_fix.sql
--- Migration: Security Hardening Null-Safe Fixes
--- Target: Redefine 7 database functions to use COALESCE(auth.role(), '') = 'service_role'
--- Created: 2026-06-02
-
-BEGIN;
-
--- 1. handle_new_user_metadata()
-CREATE OR REPLACE FUNCTION public.handle_new_user_metadata()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  tenant_id_raw text;
-  resolved_tenant_id uuid;
-  role_val text;
-BEGIN
-  -- Extract tenant_id from raw_user_meta_data
-  tenant_id_raw := new.raw_user_meta_data ->> 'tenant_id';
-  
-  -- Safe block to parse and check tenant_id validity in the tenants table
-  BEGIN
-    IF tenant_id_raw IS NOT NULL THEN
-      SELECT id INTO resolved_tenant_id FROM public.tenants WHERE id = tenant_id_raw::uuid AND is_active = true;
-    END IF;
-  EXCEPTION WHEN OTHERS THEN
-    resolved_tenant_id := NULL;
-  END;
-
-  -- Default to 'd3b07384-d113-495f-a558-8c38634e0000' if not found or invalid
-  IF resolved_tenant_id IS NULL THEN
-    resolved_tenant_id := 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-  END IF;
-
-  -- Extract role from metadata, default to 'user'
-  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
-
-  -- Prevent role self-elevation using COALESCE for null-safety
-  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR public.is_admin_user()) THEN
-    role_val := 'user';
-  END IF;
-
-  -- Inject tenant_id and user_role into raw_app_meta_data so they are included in JWT claims
-  new.raw_app_meta_data := jsonb_set(
-    COALESCE(new.raw_app_meta_data, '{}'::jsonb),
-    '{tenant_id}',
-    to_jsonb(resolved_tenant_id::text)
-  );
-  new.raw_app_meta_data := jsonb_set(
-    new.raw_app_meta_data,
-    '{user_role}',
-    to_jsonb(role_val)
-  );
-
-  -- Also set tenant_id and user_role in raw_user_meta_data
-  new.raw_user_meta_data := jsonb_set(
-    COALESCE(new.raw_user_meta_data, '{}'::jsonb),
-    '{tenant_id}',
-    to_jsonb(resolved_tenant_id::text)
-  );
-  new.raw_user_meta_data := jsonb_set(
-    new.raw_user_meta_data,
-    '{role}',
-    to_jsonb(role_val)
-  );
-
-  RETURN new;
-END;
-$$;
-
-
--- 2. handle_new_user_profile()
-CREATE OR REPLACE FUNCTION public.handle_new_user_profile()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  resolved_tenant_id uuid;
-  full_name_val text;
-  role_val text;
-BEGIN
-  -- Extract resolved tenant_id from new.raw_app_meta_data
-  resolved_tenant_id := (new.raw_app_meta_data ->> 'tenant_id')::uuid;
-  
-  -- Extract other metadata values
-  full_name_val := new.raw_user_meta_data ->> 'full_name';
-  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
-
-  -- Prevent role self-elevation using COALESCE for null-safety
-  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR public.is_admin_user()) THEN
-    role_val := 'user';
-  END IF;
-
-  -- Insert or update public.user_profiles mapping
-  INSERT INTO public.user_profiles (id, tenant_id, full_name, role, created_at, updated_at)
-  VALUES (
-    new.id,
-    resolved_tenant_id,
-    full_name_val,
-    role_val,
-    now(),
-    now()
-  )
-  ON CONFLICT (id) DO UPDATE
-  SET
-    tenant_id = EXCLUDED.tenant_id,
-    full_name = EXCLUDED.full_name,
-    role = EXCLUDED.role,
-    updated_at = now();
-
-  RETURN new;
-END;
-$$;
-
-
--- 3. set_user_admin_role(user_id UUID, new_role TEXT)
-CREATE OR REPLACE FUNCTION public.set_user_admin_role(user_id UUID, new_role TEXT)
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $$
-BEGIN
-  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() 
-      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
-  )) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  IF new_role NOT IN ('user','admin','moderator','superadmin', 'super_admin', 'warehouse', 'sales', 'viewer') THEN
-    RAISE EXCEPTION 'Invalid role: %', new_role;
-  END IF;
-
-  IF NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE id = user_id) THEN
-    INSERT INTO public.user_profiles (id, role) VALUES (user_id, new_role)
-    ON CONFLICT (id) DO UPDATE SET role=new_role, updated_at=NOW();
-  ELSE
-    UPDATE public.user_profiles SET role=new_role, updated_at=NOW() WHERE id = user_id;
-  END IF;
-
-  RETURN TRUE;
-END;
-$$;
-
-
--- 4. adjust_stock(p_product_id, p_delta, p_reason, p_batch_id)
-CREATE OR REPLACE FUNCTION public.adjust_stock(
-  p_product_id uuid,
-  p_delta int,
-  p_reason text,
-  p_batch_id uuid
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-BEGIN
-  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() 
-      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
-  )) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
-  WHERE id = p_product_id;
-
-  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id)
-  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'), p_batch_id);
-END;
-$$;
-
-
--- 5. adjust_stock(p_product_id, p_delta, p_reason)
-CREATE OR REPLACE FUNCTION public.adjust_stock(
-  p_product_id uuid,
-  p_delta int,
-  p_reason text
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-BEGIN
-  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() 
-      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
-  )) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, COALESCE(stock_qty, 0) + p_delta)
-  WHERE id = p_product_id;
-  
-  INSERT INTO public.inventory_movements (product_id, delta, reason) 
-  VALUES (p_product_id, p_delta, COALESCE(p_reason, 'adjust'));
-END;
-$$;
-
-
--- 6. set_stock(p_product_id, p_new_qty, p_reason, p_batch_id)
-CREATE OR REPLACE FUNCTION public.set_stock(
-  p_product_id uuid,
-  p_new_qty int,
-  p_reason text,
-  p_batch_id uuid
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-DECLARE
-  v_current int;
-  v_delta int;
-BEGIN
-  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() 
-      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
-  )) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  SELECT COALESCE(stock_qty, 0) INTO v_current 
-  FROM public.products 
-  WHERE id = p_product_id;
-
-  v_delta := p_new_qty - v_current;
-  IF v_delta = 0 THEN
-    RETURN;
-  END IF;
-
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, p_new_qty)
-  WHERE id = p_product_id;
-
-  INSERT INTO public.inventory_movements (product_id, delta, reason, batch_id) 
-  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'), p_batch_id);
-END;
-$$;
-
-
--- 7. set_stock(p_product_id, p_new_qty, p_reason)
-CREATE OR REPLACE FUNCTION public.set_stock(
-  p_product_id uuid,
-  p_new_qty int,
-  p_reason text
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'pg_catalog, public'
-AS $$
-DECLARE
-  v_current int;
-  v_delta int;
-BEGIN
-  IF NOT (COALESCE(auth.role(), '') = 'service_role' OR EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() 
-      AND up.role IN ('super_admin', 'admin', 'warehouse', 'moderator', 'superadmin', 'moderater')
-  )) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  SELECT COALESCE(stock_qty, 0) INTO v_current 
-  FROM public.products 
-  WHERE id = p_product_id;
-  
-  v_delta := p_new_qty - v_current;
-  
-  IF v_delta = 0 THEN
-    RETURN;
-  END IF;
-  
-  UPDATE public.products 
-  SET stock_qty = GREATEST(0, p_new_qty)
-  WHERE id = p_product_id;
-  
-  INSERT INTO public.inventory_movements (product_id, delta, reason) 
-  VALUES (p_product_id, v_delta, COALESCE(p_reason, 'set'));
-END;
-$$;
-
-COMMIT;
-
-
-
-
--- FILE: 20260602100000_resolve_linter_warnings.sql
--- Migration: Resolve database linter warnings (GraphQL exposure, extension schema, public exec checks)
--- Target: pg_graphql, pg_net, is_admin/is_admin_user/is_staff_user/is_user_admin
--- Created: 2026-06-02
-
-BEGIN;
-
--- ==========================================
--- 1. GraphQL Schema Exposure Cleanup
--- ==========================================
--- The project uses Supabase REST/PostgREST API exclusively (no Apollo client or graphql dependencies).
--- Dropping pg_graphql resolves all 48 lint warnings regarding schema exposure to anon/authenticated.
-DROP EXTENSION IF EXISTS pg_graphql CASCADE;
-
-
--- ==========================================
--- 2. Extension Schema Hardening
--- ==========================================
--- Move pg_net extension out of public schema to clean extensions schema as recommended by lint 0014.
-CREATE SCHEMA IF NOT EXISTS extensions;
-DROP EXTENSION IF EXISTS pg_net CASCADE;
-CREATE EXTENSION pg_net WITH SCHEMA extensions;
-
-
--- ==========================================
--- 3. Revoke Execute Permissions from Anon
--- ==========================================
--- Revoke execution rights from anon/public for administrative query check functions.
--- They remain accessible to authenticated and service_role as required for RLS policy evaluation.
-REVOKE EXECUTE ON FUNCTION public.is_admin() FROM anon, public;
-REVOKE EXECUTE ON FUNCTION public.is_admin_user() FROM anon, public;
-REVOKE EXECUTE ON FUNCTION public.is_staff_user() FROM anon, public;
-REVOKE EXECUTE ON FUNCTION public.is_user_admin(uuid) FROM anon, public;
-
-COMMIT;
-
-
-
--- FILE: 20260602110000_hardened_invoker_functions.sql
--- Migration: Convert RLS helpers and public search to SECURITY INVOKER
--- Target: jwt_tenant_id, is_admin_user, is_admin, is_staff_user, is_user_admin, get_products_enriched
--- Created: 2026-06-02
-
-BEGIN;
-
-ALTER FUNCTION public.jwt_tenant_id() SECURITY INVOKER;
-ALTER FUNCTION public.is_admin_user() SECURITY INVOKER;
-ALTER FUNCTION public.is_admin() SECURITY INVOKER;
-ALTER FUNCTION public.is_staff_user() SECURITY INVOKER;
-ALTER FUNCTION public.is_user_admin(uuid) SECURITY INVOKER;
-ALTER FUNCTION public.get_products_enriched(uuid[], integer, integer, text, text, text, numeric, numeric) SECURITY INVOKER;
-
-COMMIT;
-
-
-
-
--- FILE: 20260602120000_resolve_performance_and_duplicate_rls.sql
--- Migration: Resolve RLS Performance & Clean Up Duplicate Policies
--- Created: 2026-06-02
--- Description:
--- 1. Cleans up 31 multiple permissive policies by dropping duplicates and legacy merged_ policies.
--- 2. Resolves 11 auth_rls_initplan warnings by wrapping RLS functions/claims in subqueries (SELECT ...).
--- 3. Resolves the remaining 5 multiple permissive SELECT policy warnings by merging SELECT policies and splitting ALL policies for coupons, order_attachments, order_notes, price_lists, and product_prices.
-
-BEGIN;
-
--- ============================================================================
--- 1. DROP DUPLICATE & OVERLAPPING POLICIES (multiple_permissive_policies fix)
--- ============================================================================
-
--- contact_messages duplicate select policy
-DROP POLICY IF EXISTS "admin_view_messages" ON public.contact_messages;
-
--- coupons duplicate merged policies
-DROP POLICY IF EXISTS "merged_coupons_anon_select" ON public.coupons;
-DROP POLICY IF EXISTS "merged_coupons_authenticated_select" ON public.coupons;
-DROP POLICY IF EXISTS "merged_coupons_dashboard_user_select" ON public.coupons;
-DROP POLICY IF EXISTS "merged_coupons_service_role_select" ON public.coupons;
-DROP POLICY IF EXISTS "merged_coupons_authenticated_insert" ON public.coupons;
-DROP POLICY IF EXISTS "merged_coupons_authenticated_update" ON public.coupons;
-DROP POLICY IF EXISTS "merged_coupons_authenticated_delete" ON public.coupons;
-
--- inventory_movements duplicate merged policies
-DROP POLICY IF EXISTS "merged_inventory_movements_authenticated_select" ON public.inventory_movements;
-DROP POLICY IF EXISTS "merged_inventory_movements_service_role_select" ON public.inventory_movements;
-
--- inventory_settings duplicate merged policies
-DROP POLICY IF EXISTS "merged_inventory_settings_anon_select" ON public.inventory_settings;
-DROP POLICY IF EXISTS "merged_inventory_settings_authenticated_select" ON public.inventory_settings;
-DROP POLICY IF EXISTS "merged_inventory_settings_authenticated_update" ON public.inventory_settings;
-DROP POLICY IF EXISTS "merged_inventory_settings_service_role_select" ON public.inventory_settings;
-
--- order_attachments duplicate merged policies
-DROP POLICY IF EXISTS "merged_order_attachments_authenticated_select" ON public.order_attachments;
-DROP POLICY IF EXISTS "merged_order_attachments_service_role_select" ON public.order_attachments;
-DROP POLICY IF EXISTS "merged_order_attachments_authenticated_insert" ON public.order_attachments;
-DROP POLICY IF EXISTS "merged_order_attachments_authenticated_update" ON public.order_attachments;
-DROP POLICY IF EXISTS "merged_order_attachments_authenticated_delete" ON public.order_attachments;
-
--- order_notes duplicate merged policies
-DROP POLICY IF EXISTS "merged_order_notes_authenticated_delete" ON public.order_notes;
-DROP POLICY IF EXISTS "merged_order_notes_authenticated_insert" ON public.order_notes;
-DROP POLICY IF EXISTS "merged_order_notes_authenticated_select" ON public.order_notes;
-DROP POLICY IF EXISTS "merged_order_notes_service_role_select" ON public.order_notes;
-DROP POLICY IF EXISTS "merged_order_notes_authenticated_update" ON public.order_notes;
-
--- order_refund_events duplicate merged policies
-DROP POLICY IF EXISTS "merged_order_refund_events_authenticated_select" ON public.order_refund_events;
-DROP POLICY IF EXISTS "merged_order_refund_events_service_role_select" ON public.order_refund_events;
-
--- price_lists duplicate merged policies
-DROP POLICY IF EXISTS "merged_price_lists_anon_select" ON public.price_lists;
-DROP POLICY IF EXISTS "merged_price_lists_authenticated_select" ON public.price_lists;
-DROP POLICY IF EXISTS "merged_price_lists_service_role_select" ON public.price_lists;
-DROP POLICY IF EXISTS "merged_price_lists_authenticated_insert" ON public.price_lists;
-DROP POLICY IF EXISTS "merged_price_lists_authenticated_update" ON public.price_lists;
-DROP POLICY IF EXISTS "merged_price_lists_authenticated_delete" ON public.price_lists;
-
--- product_prices duplicate merged policies
-DROP POLICY IF EXISTS "merged_product_prices_anon_select" ON public.product_prices;
-DROP POLICY IF EXISTS "merged_product_prices_authenticated_delete" ON public.product_prices;
-DROP POLICY IF EXISTS "merged_product_prices_authenticated_insert" ON public.product_prices;
-DROP POLICY IF EXISTS "merged_product_prices_authenticated_select" ON public.product_prices;
-DROP POLICY IF EXISTS "merged_product_prices_authenticated_update" ON public.product_prices;
-DROP POLICY IF EXISTS "merged_product_prices_service_role_select" ON public.product_prices;
-
--- tenants duplicate merged policies
-DROP POLICY IF EXISTS "merged_tenants_anon_select" ON public.tenants;
-DROP POLICY IF EXISTS "merged_tenants_authenticated_select" ON public.tenants;
-DROP POLICY IF EXISTS "merged_tenants_service_role_select" ON public.tenants;
-
--- user_addresses duplicate merged policies
-DROP POLICY IF EXISTS "merged_user_addresses_authenticated_delete" ON public.user_addresses;
-DROP POLICY IF EXISTS "merged_user_addresses_authenticated_insert" ON public.user_addresses;
-DROP POLICY IF EXISTS "merged_user_addresses_authenticated_select" ON public.user_addresses;
-DROP POLICY IF EXISTS "merged_user_addresses_authenticated_update" ON public.user_addresses;
-DROP POLICY IF EXISTS "merged_user_addresses_service_role_select" ON public.user_addresses;
-
--- user_profiles duplicate merged policies
-DROP POLICY IF EXISTS "merged_user_profiles_authenticated_insert" ON public.user_profiles;
-DROP POLICY IF EXISTS "merged_user_profiles_authenticated_update" ON public.user_profiles;
-DROP POLICY IF EXISTS "merged_user_profiles_service_role_select" ON public.user_profiles;
-
--- venthub_orders duplicate merged policies
-DROP POLICY IF EXISTS "merged_venthub_orders_authenticated_delete" ON public.venthub_orders;
-DROP POLICY IF EXISTS "merged_venthub_orders_authenticated_insert" ON public.venthub_orders;
-DROP POLICY IF EXISTS "merged_venthub_orders_authenticated_update" ON public.venthub_orders;
-DROP POLICY IF EXISTS "merged_venthub_orders_service_role_select" ON public.venthub_orders;
-
--- venthub_returns duplicate merged policies
-DROP POLICY IF EXISTS "merged_venthub_returns_authenticated_update" ON public.venthub_returns;
-
--- Drop other redundant merged policies from the database
-DROP POLICY IF EXISTS "merged_category_mapping_rules_authenticated_select" ON public.category_mapping_rules;
-DROP POLICY IF EXISTS "merged_rate_limits_service_role_select" ON public.rate_limits;
-DROP POLICY IF EXISTS "merged_wizard_selections_service_role_select" ON public.wizard_selections;
-DROP POLICY IF EXISTS "merged_admin_audit_log_service_role_select" ON public.admin_audit_log;
-DROP POLICY IF EXISTS "merged_returns_webhook_events_service_role_insert" ON public.returns_webhook_events;
-DROP POLICY IF EXISTS "merged_returns_webhook_events_service_role_select" ON public.returns_webhook_events;
-DROP POLICY IF EXISTS "merged_cart_items_service_role_select" ON public.cart_items;
-DROP POLICY IF EXISTS "merged_client_errors_authenticated_select" ON public.client_errors;
-DROP POLICY IF EXISTS "merged_organizations_authenticated_delete" ON public.organizations;
-DROP POLICY IF EXISTS "merged_organizations_authenticated_insert" ON public.organizations;
-DROP POLICY IF EXISTS "merged_organizations_authenticated_update" ON public.organizations;
-DROP POLICY IF EXISTS "merged_payment_transactions_authenticated_delete" ON public.payment_transactions;
-DROP POLICY IF EXISTS "merged_payment_transactions_authenticated_insert" ON public.payment_transactions;
-DROP POLICY IF EXISTS "merged_payment_transactions_authenticated_select" ON public.payment_transactions;
-DROP POLICY IF EXISTS "merged_payment_transactions_authenticated_update" ON public.payment_transactions;
-DROP POLICY IF EXISTS "merged_site_settings_anon_select" ON public.site_settings;
-DROP POLICY IF EXISTS "merged_site_settings_authenticated_select" ON public.site_settings;
-DROP POLICY IF EXISTS "merged_site_settings_authenticated_update" ON public.site_settings;
-DROP POLICY IF EXISTS "merged_product_images_authenticated_delete" ON public.product_images;
-DROP POLICY IF EXISTS "merged_product_images_authenticated_insert" ON public.product_images;
-DROP POLICY IF EXISTS "merged_shipping_idempotency_service_role_select" ON public.shipping_idempotency;
-DROP POLICY IF EXISTS "merged_user_invoice_profiles_service_role_select" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "merged_shipping_email_events_service_role_insert" ON public.shipping_email_events;
-DROP POLICY IF EXISTS "merged_shipping_email_events_service_role_select" ON public.shipping_email_events;
-DROP POLICY IF EXISTS "merged_shipping_webhook_events_service_role_select" ON public.shipping_webhook_events;
-DROP POLICY IF EXISTS "merged_order_email_events_authenticated_select" ON public.order_email_events;
-DROP POLICY IF EXISTS "merged_order_email_events_service_role_insert" ON public.order_email_events;
-
-
--- ============================================================================
--- 2. RE-CREATE FLAG-CHECK POLICIES WITH (SELECT ...) WRAPPER & SPLIT / MERGED SELECT
--- ============================================================================
-
--- 2.1 public.inventory_settings -> inventory_settings_update_admin
-DROP POLICY IF EXISTS "inventory_settings_update_admin" ON public.inventory_settings;
-CREATE POLICY "inventory_settings_update_admin" ON public.inventory_settings
-  FOR UPDATE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))))
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
--- 2.2 public.coupons -> Split coupons_admin_all and merge SELECT
-DROP POLICY IF EXISTS "coupons_admin_all" ON public.coupons;
-DROP POLICY IF EXISTS "coupons_public_select" ON public.coupons;
-
-CREATE POLICY "coupons_select_authenticated" ON public.coupons FOR SELECT TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND ((SELECT public.is_user_admin((SELECT auth.uid()))) OR (is_active = true AND (valid_until IS NULL OR valid_until > now()))));
-
-CREATE POLICY "coupons_select_anon" ON public.coupons FOR SELECT TO anon
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND is_active = true AND (valid_until IS NULL OR valid_until > now()));
-
-CREATE POLICY "coupons_admin_insert" ON public.coupons FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-CREATE POLICY "coupons_admin_update" ON public.coupons FOR UPDATE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))))
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-CREATE POLICY "coupons_admin_delete" ON public.coupons FOR DELETE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-
--- 2.3 & 2.4 public.order_notes -> Split order_notes_admin_all and merge SELECT
-DROP POLICY IF EXISTS "order_notes_admin_all" ON public.order_notes;
-DROP POLICY IF EXISTS "order_notes_view_policy" ON public.order_notes;
-
-CREATE POLICY "order_notes_select_authenticated" ON public.order_notes FOR SELECT TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (
-    (SELECT public.is_user_admin((SELECT auth.uid()))) OR
-    (NOT is_internal AND order_id IN (
-      SELECT id FROM public.venthub_orders 
-      WHERE user_id = (SELECT auth.uid()) AND tenant_id = (SELECT public.jwt_tenant_id())
-    ))
-  ));
-
-CREATE POLICY "order_notes_admin_insert" ON public.order_notes FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-CREATE POLICY "order_notes_admin_update" ON public.order_notes FOR UPDATE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))))
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-CREATE POLICY "order_notes_admin_delete" ON public.order_notes FOR DELETE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-
--- 2.5 public.user_profiles -> user_profiles_select_policy
-DROP POLICY IF EXISTS "user_profiles_select_policy" ON public.user_profiles;
-CREATE POLICY "user_profiles_select_policy" ON public.user_profiles
-  FOR SELECT TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
--- 2.6 public.inventory_movements -> inventory_movements_select_admin
-DROP POLICY IF EXISTS "inventory_movements_select_admin" ON public.inventory_movements;
-CREATE POLICY "inventory_movements_select_admin" ON public.inventory_movements
-  FOR SELECT TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-
--- 2.7 & 2.8 public.order_attachments -> Split order_attachments_admin_all and merge SELECT
-DROP POLICY IF EXISTS "order_attachments_admin_all" ON public.order_attachments;
-DROP POLICY IF EXISTS "order_attachments_view_policy" ON public.order_attachments;
-
-CREATE POLICY "order_attachments_select_authenticated" ON public.order_attachments FOR SELECT TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (
-    (SELECT public.is_user_admin((SELECT auth.uid()))) OR
-    (NOT is_internal AND order_id IN (
-      SELECT id FROM public.venthub_orders 
-      WHERE user_id = (SELECT auth.uid()) AND tenant_id = (SELECT public.jwt_tenant_id())
-    ))
-  ));
-
-CREATE POLICY "order_attachments_admin_insert" ON public.order_attachments FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-CREATE POLICY "order_attachments_admin_update" ON public.order_attachments FOR UPDATE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))))
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-CREATE POLICY "order_attachments_admin_delete" ON public.order_attachments FOR DELETE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-
--- 2.9 public.product_prices -> Split product_prices_admin_all and merge SELECT
-DROP POLICY IF EXISTS "product_prices_admin_all" ON public.product_prices;
-DROP POLICY IF EXISTS "product_prices_select" ON public.product_prices;
-
-CREATE POLICY "product_prices_select_authenticated" ON public.product_prices FOR SELECT TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND ((SELECT public.is_user_admin((SELECT auth.uid()))) OR is_active = true));
-
-CREATE POLICY "product_prices_select_anon" ON public.product_prices FOR SELECT TO anon
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND is_active = true);
-
-CREATE POLICY "product_prices_admin_insert" ON public.product_prices FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-CREATE POLICY "product_prices_admin_update" ON public.product_prices FOR UPDATE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))))
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-CREATE POLICY "product_prices_admin_delete" ON public.product_prices FOR DELETE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-
--- 2.10 & 2.11 public.price_lists -> Split price_lists_admin_all and merge SELECT
-DROP POLICY IF EXISTS "price_lists_admin_all" ON public.price_lists;
-DROP POLICY IF EXISTS "price_lists_select" ON public.price_lists;
-
-CREATE POLICY "price_lists_select_authenticated" ON public.price_lists FOR SELECT TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND ((SELECT public.is_user_admin((SELECT auth.uid()))) OR is_active = true));
-
-CREATE POLICY "price_lists_select_anon" ON public.price_lists FOR SELECT TO anon
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND is_active = true);
-
-CREATE POLICY "price_lists_admin_insert" ON public.price_lists FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-CREATE POLICY "price_lists_admin_update" ON public.price_lists FOR UPDATE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))))
-  WITH CHECK (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-CREATE POLICY "price_lists_admin_delete" ON public.price_lists FOR DELETE TO authenticated
-  USING (tenant_id = (SELECT public.jwt_tenant_id()) AND (SELECT public.is_user_admin((SELECT auth.uid()))));
-
-COMMIT;
-
-
-
--- FILE: 20260530220000_tenant_schema_setup.sql
--- Multi-Tenant SaaS Foundation Migration
--- Target: public.tenants table and 21 Tenant-Aware tables.
--- Sequence: Golden Triad (Grants -> Enable RLS -> Recreate Policies).
-
-BEGIN;
-
--- ==========================================
--- PART 1: public.tenants setup
--- ==========================================
-
-CREATE TABLE IF NOT EXISTS public.tenants (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text NOT NULL UNIQUE,
-  subdomain text UNIQUE,
-  custom_domain text UNIQUE,
-  is_active boolean NOT NULL DEFAULT true,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-
--- Golden Triad: Grants
-GRANT SELECT ON public.tenants TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.tenants TO authenticated;
-GRANT ALL ON public.tenants TO service_role;
-
--- Golden Triad: Enable RLS
-ALTER TABLE public.tenants ENABLE ROW LEVEL SECURITY;
-
--- Golden Triad: Policies
-DROP POLICY IF EXISTS tenants_select ON public.tenants;
-CREATE POLICY tenants_select ON public.tenants
-  FOR SELECT TO anon, authenticated USING (true);
-
-DROP POLICY IF EXISTS tenants_all_service_role ON public.tenants;
-CREATE POLICY tenants_all_service_role ON public.tenants
-  FOR ALL TO service_role USING (true);
-
--- Populate default tenant
-INSERT INTO public.tenants (id, name, subdomain, is_active)
-VALUES ('d3b07384-d113-495f-a558-8c38634e0000', 'Default Tenant', 'default', true)
-ON CONFLICT (id) DO NOTHING;
-
-
--- ==========================================
--- PART 2: jwt_tenant_id() RPC Helper
--- ==========================================
-
-CREATE OR REPLACE FUNCTION public.jwt_tenant_id()
-RETURNS uuid
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  claims_str text;
-  tenant_id_val text;
-BEGIN
-  -- Extract raw JWT claims string safely
-  claims_str := current_setting('request.jwt.claims', true);
-  
-  IF claims_str IS NULL OR claims_str = '' THEN
-    RETURN 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-  END IF;
-  
-  -- Parse JSON and extract app_metadata -> tenant_id
-  tenant_id_val := claims_str::jsonb -> 'app_metadata' ->> 'tenant_id';
-  
-  IF tenant_id_val IS NULL OR tenant_id_val = '' THEN
-    RETURN 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-  END IF;
-  
-  RETURN tenant_id_val::uuid;
-EXCEPTION
-  WHEN OTHERS THEN
-    RETURN 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-END;
-$$;
-
-
--- ==========================================
--- PART 3: Adding tenant_id column and foreign key index
--- ==========================================
-
--- 1. shopping_carts
-ALTER TABLE public.shopping_carts ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_shopping_carts_tenant_id ON public.shopping_carts(tenant_id);
-
--- 2. cart_items
-ALTER TABLE public.cart_items ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_cart_items_tenant_id ON public.cart_items(tenant_id);
-
--- 3. venthub_orders
-ALTER TABLE public.venthub_orders ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_venthub_orders_tenant_id ON public.venthub_orders(tenant_id);
-
--- 4. venthub_order_items
-ALTER TABLE public.venthub_order_items ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_venthub_order_items_tenant_id ON public.venthub_order_items(tenant_id);
-
--- 5. venthub_returns
-ALTER TABLE public.venthub_returns ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_venthub_returns_tenant_id ON public.venthub_returns(tenant_id);
-
--- 6. coupons
-ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_coupons_tenant_id ON public.coupons(tenant_id);
-
--- 7. inventory_movements
-ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_inventory_movements_tenant_id ON public.inventory_movements(tenant_id);
-
--- 8. inventory_settings
-ALTER TABLE public.inventory_settings ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_inventory_settings_tenant_id ON public.inventory_settings(tenant_id);
-
--- 9. price_lists
-ALTER TABLE public.price_lists ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_price_lists_tenant_id ON public.price_lists(tenant_id);
-
--- 10. product_prices
-ALTER TABLE public.product_prices ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_product_prices_tenant_id ON public.product_prices(tenant_id);
-
--- 11. order_attachments
-ALTER TABLE public.order_attachments ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_order_attachments_tenant_id ON public.order_attachments(tenant_id);
-
--- 12. order_notes
-ALTER TABLE public.order_notes ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_order_notes_tenant_id ON public.order_notes(tenant_id);
-
--- 13. order_refund_events
-ALTER TABLE public.order_refund_events ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_order_refund_events_tenant_id ON public.order_refund_events(tenant_id);
-
--- 14. user_profiles
-ALTER TABLE public.user_profiles ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_user_profiles_tenant_id ON public.user_profiles(tenant_id);
-
--- 15. user_addresses
-ALTER TABLE public.user_addresses ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_user_addresses_tenant_id ON public.user_addresses(tenant_id);
-
--- 16. user_invoice_profiles
-ALTER TABLE public.user_invoice_profiles ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_user_invoice_profiles_tenant_id ON public.user_invoice_profiles(tenant_id);
-
--- 17. wizard_selections
-ALTER TABLE public.wizard_selections ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_wizard_selections_tenant_id ON public.wizard_selections(tenant_id);
-
--- 18. shipping_email_events
-ALTER TABLE public.shipping_email_events ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_shipping_email_events_tenant_id ON public.shipping_email_events(tenant_id);
-
--- 19. shipping_webhook_events
-ALTER TABLE public.shipping_webhook_events ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_shipping_webhook_events_tenant_id ON public.shipping_webhook_events(tenant_id);
-
--- 20. returns_webhook_events
-ALTER TABLE public.returns_webhook_events ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_returns_webhook_events_tenant_id ON public.returns_webhook_events(tenant_id);
-
--- 21. admin_audit_log
-ALTER TABLE public.admin_audit_log ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES public.tenants(id) ON DELETE CASCADE;
-CREATE INDEX IF NOT EXISTS idx_admin_audit_log_tenant_id ON public.admin_audit_log(tenant_id);
-
-
--- ==========================================
--- PART 4: Applying Golden Triad & Recreating Policies
--- ==========================================
-
--- 1. shopping_carts
-GRANT SELECT ON public.shopping_carts TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.shopping_carts TO authenticated;
-GRANT ALL ON public.shopping_carts TO service_role;
-ALTER TABLE public.shopping_carts ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "sc_auth_all" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_policy" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_select_own" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_modify_own" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_all" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_user_all" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_service_role" ON public.shopping_carts;
-
-CREATE POLICY "sc_auth_all" ON public.shopping_carts
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "shopping_carts_service_role" ON public.shopping_carts
-  FOR ALL TO service_role USING (true);
-
-
--- 2. cart_items
-GRANT SELECT ON public.cart_items TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.cart_items TO authenticated;
-GRANT ALL ON public.cart_items TO service_role;
-ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "ci_auth_all" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_policy" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_select_own" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_modify_own" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_all" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_user_all" ON public.cart_items;
-DROP POLICY IF EXISTS "p_user_read_own_cart" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_service_role" ON public.cart_items;
-
-CREATE POLICY "ci_auth_all" ON public.cart_items
-  FOR ALL TO authenticated
-  USING (
-    tenant_id = public.jwt_tenant_id() AND
-    cart_id IN (SELECT id FROM public.shopping_carts WHERE user_id = (SELECT auth.uid()) AND tenant_id = public.jwt_tenant_id())
-  )
-  WITH CHECK (
-    tenant_id = public.jwt_tenant_id() AND
-    cart_id IN (SELECT id FROM public.shopping_carts WHERE user_id = (SELECT auth.uid()) AND tenant_id = public.jwt_tenant_id())
-  );
-
-CREATE POLICY "cart_items_service_role" ON public.cart_items
-  FOR ALL TO service_role USING (true);
-
-
--- 3. venthub_orders
-GRANT SELECT ON public.venthub_orders TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.venthub_orders TO authenticated;
-GRANT ALL ON public.venthub_orders TO service_role;
-ALTER TABLE public.venthub_orders ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "orders_select_policy" ON public.venthub_orders;
-DROP POLICY IF EXISTS "orders_insert_policy" ON public.venthub_orders;
-DROP POLICY IF EXISTS "orders_update_policy" ON public.venthub_orders;
-DROP POLICY IF EXISTS "orders_delete_policy" ON public.venthub_orders;
-DROP POLICY IF EXISTS "orders_service_role" ON public.venthub_orders;
-
-CREATE POLICY "orders_select_policy" ON public.venthub_orders
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
-CREATE POLICY "orders_insert_policy" ON public.venthub_orders
-  FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
-CREATE POLICY "orders_update_policy" ON public.venthub_orders
-  FOR UPDATE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
-CREATE POLICY "orders_delete_policy" ON public.venthub_orders
-  FOR DELETE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (SELECT public.is_admin_user()));
-
-CREATE POLICY "orders_service_role" ON public.venthub_orders
-  FOR ALL TO service_role USING (true);
-
-
--- 4. venthub_order_items
-GRANT SELECT ON public.venthub_order_items TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.venthub_order_items TO authenticated;
-GRANT ALL ON public.venthub_order_items TO service_role;
-ALTER TABLE public.venthub_order_items ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "venthub_order_items_select_consolidated" ON public.venthub_order_items;
-DROP POLICY IF EXISTS "venthub_order_items_insert_optimized" ON public.venthub_order_items;
-DROP POLICY IF EXISTS "venthub_order_items_service_role" ON public.venthub_order_items;
-
-CREATE POLICY "venthub_order_items_select_consolidated" ON public.venthub_order_items
-  FOR SELECT TO authenticated
-  USING (
-    tenant_id = public.jwt_tenant_id() AND (
-      order_id IN (SELECT id FROM public.venthub_orders WHERE user_id = (SELECT auth.uid()) AND tenant_id = public.jwt_tenant_id())
-      OR (SELECT public.is_admin_user())
-    )
-  );
-
-CREATE POLICY "venthub_order_items_insert_optimized" ON public.venthub_order_items
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    tenant_id = public.jwt_tenant_id() AND
-    EXISTS (SELECT 1 FROM public.venthub_orders WHERE id = order_id AND user_id = (SELECT auth.uid()) AND tenant_id = public.jwt_tenant_id())
-  );
-
-CREATE POLICY "venthub_order_items_service_role" ON public.venthub_order_items
-  FOR ALL TO service_role USING (true);
-
-
--- 5. venthub_returns
-GRANT SELECT ON public.venthub_returns TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.venthub_returns TO authenticated;
-GRANT ALL ON public.venthub_returns TO service_role;
-ALTER TABLE public.venthub_returns ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "venthub_returns_select_consolidated" ON public.venthub_returns;
-DROP POLICY IF EXISTS "returns_select_policy" ON public.venthub_returns;
-DROP POLICY IF EXISTS "returns_insert_policy" ON public.venthub_returns;
-DROP POLICY IF EXISTS "returns_update_policy" ON public.venthub_returns;
-DROP POLICY IF EXISTS "returns_delete_policy" ON public.venthub_returns;
-DROP POLICY IF EXISTS "returns_service_role" ON public.venthub_returns;
-
-CREATE POLICY "returns_select_policy" ON public.venthub_returns
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
-CREATE POLICY "returns_insert_policy" ON public.venthub_returns
-  FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (user_id = (SELECT auth.uid()) OR (SELECT public.is_admin_user())));
-
-CREATE POLICY "returns_update_policy" ON public.venthub_returns
-  FOR UPDATE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (SELECT public.is_admin_user()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (SELECT public.is_admin_user()));
-
-CREATE POLICY "returns_delete_policy" ON public.venthub_returns
-  FOR DELETE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (SELECT public.is_admin_user()));
-
-CREATE POLICY "returns_service_role" ON public.venthub_returns
-  FOR ALL TO service_role USING (true);
-
-
--- 6. coupons
-GRANT SELECT ON public.coupons TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.coupons TO authenticated;
-GRANT ALL ON public.coupons TO service_role;
-ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Admin users can manage coupons" ON public.coupons;
-DROP POLICY IF EXISTS "Public can view active coupons" ON public.coupons;
-DROP POLICY IF EXISTS "coupons_admin_all" ON public.coupons;
-DROP POLICY IF EXISTS "coupons_public_select" ON public.coupons;
-DROP POLICY IF EXISTS "coupons_service_role" ON public.coupons;
-
-CREATE POLICY "coupons_admin_all" ON public.coupons
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "coupons_public_select" ON public.coupons
-  FOR SELECT TO anon, authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND is_active = true AND (valid_until IS NULL OR valid_until > now()));
-
-CREATE POLICY "coupons_service_role" ON public.coupons
-  FOR ALL TO service_role USING (true);
-
-
--- 7. inventory_movements
-GRANT SELECT ON public.inventory_movements TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.inventory_movements TO authenticated;
-GRANT ALL ON public.inventory_movements TO service_role;
-ALTER TABLE public.inventory_movements ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "inventory_movements_select_admin" ON public.inventory_movements;
-DROP POLICY IF EXISTS "p_admin_read_inventory" ON public.inventory_movements;
-DROP POLICY IF EXISTS "inventory_movements_service_role" ON public.inventory_movements;
-
-CREATE POLICY "inventory_movements_select_admin" ON public.inventory_movements
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "inventory_movements_service_role" ON public.inventory_movements
-  FOR ALL TO service_role USING (true);
-
-
--- 8. inventory_settings
-GRANT SELECT ON public.inventory_settings TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.inventory_settings TO authenticated;
-GRANT ALL ON public.inventory_settings TO service_role;
-ALTER TABLE public.inventory_settings ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "inventory_settings_select_all" ON public.inventory_settings;
-DROP POLICY IF EXISTS "inventory_settings_update_admin" ON public.inventory_settings;
-DROP POLICY IF EXISTS "inventory_settings_service_role" ON public.inventory_settings;
-
-CREATE POLICY "inventory_settings_select_all" ON public.inventory_settings
-  FOR SELECT TO anon, authenticated
-  USING (tenant_id = public.jwt_tenant_id());
-
-CREATE POLICY "inventory_settings_update_admin" ON public.inventory_settings
-  FOR UPDATE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "inventory_settings_service_role" ON public.inventory_settings
-  FOR ALL TO service_role USING (true);
-
-
--- 9. price_lists
-GRANT SELECT ON public.price_lists TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.price_lists TO authenticated;
-GRANT ALL ON public.price_lists TO service_role;
-ALTER TABLE public.price_lists ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "p_anon_read_active_price_lists" ON public.price_lists;
-DROP POLICY IF EXISTS "price_lists_select" ON public.price_lists;
-DROP POLICY IF EXISTS "price_lists_admin_all" ON public.price_lists;
-DROP POLICY IF EXISTS "price_lists_service_role" ON public.price_lists;
-
-CREATE POLICY "price_lists_select" ON public.price_lists
-  FOR SELECT TO anon, authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (is_active = true OR public.is_user_admin(auth.uid())));
-
-CREATE POLICY "price_lists_admin_all" ON public.price_lists
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "price_lists_service_role" ON public.price_lists
-  FOR ALL TO service_role USING (true);
-
-
--- 10. product_prices
-GRANT SELECT ON public.product_prices TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_prices TO authenticated;
-GRANT ALL ON public.product_prices TO service_role;
-ALTER TABLE public.product_prices ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "product_prices_select" ON public.product_prices;
-DROP POLICY IF EXISTS "product_prices_admin_all" ON public.product_prices;
-DROP POLICY IF EXISTS "product_prices_service_role" ON public.product_prices;
-
-CREATE POLICY "product_prices_select" ON public.product_prices
-  FOR SELECT TO anon, authenticated
-  USING (tenant_id = public.jwt_tenant_id());
-
-CREATE POLICY "product_prices_admin_all" ON public.product_prices
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "product_prices_service_role" ON public.product_prices
-  FOR ALL TO service_role USING (true);
-
-
--- 11. order_attachments
-GRANT SELECT ON public.order_attachments TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.order_attachments TO authenticated;
-GRANT ALL ON public.order_attachments TO service_role;
-ALTER TABLE public.order_attachments ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Admin users can manage order attachments" ON public.order_attachments;
-DROP POLICY IF EXISTS "Order owners can view non-internal attachments" ON public.order_attachments;
-DROP POLICY IF EXISTS "order_attachments_admin_all" ON public.order_attachments;
-DROP POLICY IF EXISTS "order_attachments_view_policy" ON public.order_attachments;
-DROP POLICY IF EXISTS "order_attachments_service_role" ON public.order_attachments;
-
-CREATE POLICY "order_attachments_admin_all" ON public.order_attachments
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "order_attachments_view_policy" ON public.order_attachments
-  FOR SELECT TO authenticated
-  USING (
-    tenant_id = public.jwt_tenant_id() AND
-    NOT is_internal AND
-    order_id IN (SELECT id FROM public.venthub_orders WHERE user_id = auth.uid() AND tenant_id = public.jwt_tenant_id())
-  );
-
-CREATE POLICY "order_attachments_service_role" ON public.order_attachments
-  FOR ALL TO service_role USING (true);
-
-
--- 12. order_notes
-GRANT SELECT ON public.order_notes TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.order_notes TO authenticated;
-GRANT ALL ON public.order_notes TO service_role;
-ALTER TABLE public.order_notes ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Admin users can manage order notes" ON public.order_notes;
-DROP POLICY IF EXISTS "Order owners can view non-internal notes" ON public.order_notes;
-DROP POLICY IF EXISTS "order_notes_admin_all" ON public.order_notes;
-DROP POLICY IF EXISTS "order_notes_view_policy" ON public.order_notes;
-DROP POLICY IF EXISTS "order_notes_service_role" ON public.order_notes;
-
-CREATE POLICY "order_notes_admin_all" ON public.order_notes
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_user_admin(auth.uid()));
-
-CREATE POLICY "order_notes_view_policy" ON public.order_notes
-  FOR SELECT TO authenticated
-  USING (
-    tenant_id = public.jwt_tenant_id() AND
-    NOT is_internal AND
-    order_id IN (SELECT id FROM public.venthub_orders WHERE user_id = auth.uid() AND tenant_id = public.jwt_tenant_id())
-  );
-
-CREATE POLICY "order_notes_service_role" ON public.order_notes
-  FOR ALL TO service_role USING (true);
-
-
--- 13. order_refund_events
-GRANT SELECT ON public.order_refund_events TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.order_refund_events TO authenticated;
-GRANT ALL ON public.order_refund_events TO service_role;
-ALTER TABLE public.order_refund_events ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "order_refund_events_admin_select" ON public.order_refund_events;
-DROP POLICY IF EXISTS "order_refund_events_service_role" ON public.order_refund_events;
-
-CREATE POLICY "order_refund_events_admin_select" ON public.order_refund_events
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "order_refund_events_service_role" ON public.order_refund_events
-  FOR ALL TO service_role USING (true);
-
-
--- 14. user_profiles
-GRANT SELECT ON public.user_profiles TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.user_profiles TO authenticated;
-GRANT ALL ON public.user_profiles TO service_role;
-ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "user_profiles_select_policy" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_insert_policy" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_update_policy" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_delete_policy" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_update_merged" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_insert_merged" ON public.user_profiles;
-DROP POLICY IF EXISTS "user_profiles_service_role" ON public.user_profiles;
-
-CREATE POLICY "user_profiles_select_policy" ON public.user_profiles
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (id = (SELECT auth.uid()) OR public.is_admin_user()));
-
-CREATE POLICY "user_profiles_insert_policy" ON public.user_profiles
-  FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (id = (SELECT auth.uid()) OR public.is_admin_user()));
-
-CREATE POLICY "user_profiles_update_policy" ON public.user_profiles
-  FOR UPDATE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND (id = (SELECT auth.uid()) OR public.is_admin_user()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND (id = (SELECT auth.uid()) OR public.is_admin_user()));
-
-CREATE POLICY "user_profiles_delete_policy" ON public.user_profiles
-  FOR DELETE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "user_profiles_service_role" ON public.user_profiles
-  FOR ALL TO service_role USING (true);
-
-
--- 15. user_addresses
-GRANT SELECT ON public.user_addresses TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.user_addresses TO authenticated;
-GRANT ALL ON public.user_addresses TO service_role;
-ALTER TABLE public.user_addresses ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "user_addresses_select" ON public.user_addresses;
-DROP POLICY IF EXISTS "user_addresses_insert" ON public.user_addresses;
-DROP POLICY IF EXISTS "user_addresses_update" ON public.user_addresses;
-DROP POLICY IF EXISTS "user_addresses_delete" ON public.user_addresses;
-DROP POLICY IF EXISTS "user_addresses_service_role" ON public.user_addresses;
-
-CREATE POLICY "user_addresses_select" ON public.user_addresses
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "user_addresses_insert" ON public.user_addresses
-  FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "user_addresses_update" ON public.user_addresses
-  FOR UPDATE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "user_addresses_delete" ON public.user_addresses
-  FOR DELETE TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "user_addresses_service_role" ON public.user_addresses
-  FOR ALL TO service_role USING (true);
-
-
--- 16. user_invoice_profiles
-GRANT SELECT ON public.user_invoice_profiles TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.user_invoice_profiles TO authenticated;
-GRANT ALL ON public.user_invoice_profiles TO service_role;
-ALTER TABLE public.user_invoice_profiles ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "user_invoice_profiles_own" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "uip_own" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "user_invoice_profiles_service_role" ON public.user_invoice_profiles;
-
-CREATE POLICY "uip_own" ON public.user_invoice_profiles
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "user_invoice_profiles_service_role" ON public.user_invoice_profiles
-  FOR ALL TO service_role USING (true);
-
-
--- 17. wizard_selections
-GRANT SELECT ON public.wizard_selections TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.wizard_selections TO authenticated;
-GRANT ALL ON public.wizard_selections TO service_role;
-ALTER TABLE public.wizard_selections ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "ws_anon_insert" ON public.wizard_selections;
-DROP POLICY IF EXISTS "ws_auth_all" ON public.wizard_selections;
-DROP POLICY IF EXISTS "wizard_selections_service_role" ON public.wizard_selections;
-
-CREATE POLICY "ws_anon_insert" ON public.wizard_selections
-  FOR INSERT TO anon
-  WITH CHECK (tenant_id = public.jwt_tenant_id());
-
-CREATE POLICY "ws_auth_all" ON public.wizard_selections
-  FOR ALL TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()))
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND user_id = (SELECT auth.uid()));
-
-CREATE POLICY "wizard_selections_service_role" ON public.wizard_selections
-  FOR ALL TO service_role USING (true);
-
-
--- 18. shipping_email_events
-GRANT SELECT ON public.shipping_email_events TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.shipping_email_events TO authenticated;
-GRANT ALL ON public.shipping_email_events TO service_role;
-ALTER TABLE public.shipping_email_events ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "admins_read_shipping_emails" ON public.shipping_email_events;
-DROP POLICY IF EXISTS "shipping_email_events_admin_select" ON public.shipping_email_events;
-DROP POLICY IF EXISTS "shipping_email_events_service_role" ON public.shipping_email_events;
-
-CREATE POLICY "shipping_email_events_admin_select" ON public.shipping_email_events
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "shipping_email_events_service_role" ON public.shipping_email_events
-  FOR ALL TO service_role USING (true);
-
-
--- 19. shipping_webhook_events
-GRANT SELECT ON public.shipping_webhook_events TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.shipping_webhook_events TO authenticated;
-GRANT ALL ON public.shipping_webhook_events TO service_role;
-ALTER TABLE public.shipping_webhook_events ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "admins_read_shipping_webhooks" ON public.shipping_webhook_events;
-DROP POLICY IF EXISTS "shipping_webhook_events_admin_select" ON public.shipping_webhook_events;
-DROP POLICY IF EXISTS "shipping_webhook_events_service_role" ON public.shipping_webhook_events;
-
-CREATE POLICY "shipping_webhook_events_admin_select" ON public.shipping_webhook_events
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "shipping_webhook_events_service_role" ON public.shipping_webhook_events
-  FOR ALL TO service_role USING (true);
-
-
--- 20. returns_webhook_events
-GRANT SELECT ON public.returns_webhook_events TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.returns_webhook_events TO authenticated;
-GRANT ALL ON public.returns_webhook_events TO service_role;
-ALTER TABLE public.returns_webhook_events ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "admins_read_returns_webhooks" ON public.returns_webhook_events;
-DROP POLICY IF EXISTS "returns_webhook_events_admin_select" ON public.returns_webhook_events;
-DROP POLICY IF EXISTS "returns_webhook_events_service_role" ON public.returns_webhook_events;
-
-CREATE POLICY "returns_webhook_events_admin_select" ON public.returns_webhook_events
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "returns_webhook_events_service_role" ON public.returns_webhook_events
-  FOR ALL TO service_role USING (true);
-
-
--- 21. admin_audit_log
-GRANT SELECT ON public.admin_audit_log TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.admin_audit_log TO authenticated;
-GRANT ALL ON public.admin_audit_log TO service_role;
-ALTER TABLE public.admin_audit_log ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "admin_audit_log_select_v2" ON public.admin_audit_log;
-DROP POLICY IF EXISTS "admin_audit_log_insert_v2" ON public.admin_audit_log;
-DROP POLICY IF EXISTS "admin_audit_log_service_role" ON public.admin_audit_log;
-
-CREATE POLICY "admin_audit_log_select_v2" ON public.admin_audit_log
-  FOR SELECT TO authenticated
-  USING (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "admin_audit_log_insert_v2" ON public.admin_audit_log
-  FOR INSERT TO authenticated
-  WITH CHECK (tenant_id = public.jwt_tenant_id() AND public.is_admin_user());
-
-CREATE POLICY "admin_audit_log_service_role" ON public.admin_audit_log
-  FOR ALL TO service_role USING (true);
-
--- Refresh PostgREST schema cache
-NOTIFY pgrst, 'reload schema';
-
-COMMIT;
-
-
-
--- FILE: 20260530221000_tenant_auth_integration.sql
--- Migration: Supabase Auth Claims & Profile Integration Triggers
--- Created: 2026-05-30 22:10:00
--- Target: auth.users triggers to inject tenant_id claims and sync with public.user_profiles
-
--- PART 1: handle_new_user_metadata trigger function
-CREATE OR REPLACE FUNCTION public.handle_new_user_metadata()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  tenant_id_raw text;
-  resolved_tenant_id uuid;
-BEGIN
-  -- Extract tenant_id from raw_user_meta_data
-  tenant_id_raw := new.raw_user_meta_data ->> 'tenant_id';
-  
-  -- Safe block to parse and check tenant_id validity in the tenants table
-  BEGIN
-    IF tenant_id_raw IS NOT NULL THEN
-      SELECT id INTO resolved_tenant_id FROM public.tenants WHERE id = tenant_id_raw::uuid AND is_active = true;
-    END IF;
-  EXCEPTION WHEN OTHERS THEN
-    resolved_tenant_id := NULL;
-  END;
-
-  -- Default to 'd3b07384-d113-495f-a558-8c38634e0000' if not found or invalid
-  IF resolved_tenant_id IS NULL THEN
-    resolved_tenant_id := 'd3b07384-d113-495f-a558-8c38634e0000'::uuid;
-  END IF;
-
-  -- Inject tenant_id into raw_app_meta_data so it is included in JWT claims
-  new.raw_app_meta_data := jsonb_set(
-    COALESCE(new.raw_app_meta_data, '{}'::jsonb),
-    '{tenant_id}',
-    to_jsonb(resolved_tenant_id::text)
-  );
-
-  -- Also set tenant_id in raw_user_meta_data
-  new.raw_user_meta_data := jsonb_set(
-    COALESCE(new.raw_user_meta_data, '{}'::jsonb),
-    '{tenant_id}',
-    to_jsonb(resolved_tenant_id::text)
-  );
-
-  RETURN new;
-END;
-$$;
-
--- Bind the metadata handler trigger BEFORE INSERT on auth.users
-DROP TRIGGER IF EXISTS trg_handle_new_user_metadata ON auth.users;
-CREATE TRIGGER trg_handle_new_user_metadata
-  BEFORE INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_new_user_metadata();
-
-
--- PART 2: handle_new_user_profile trigger function
-CREATE OR REPLACE FUNCTION public.handle_new_user_profile()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_catalog
-AS $$
-DECLARE
-  resolved_tenant_id uuid;
-  full_name_val text;
-  role_val text;
-BEGIN
-  -- Extract resolved tenant_id from new.raw_app_meta_data
-  resolved_tenant_id := (new.raw_app_meta_data ->> 'tenant_id')::uuid;
-  
-  -- Extract other metadata values
-  full_name_val := new.raw_user_meta_data ->> 'full_name';
-  role_val := COALESCE(new.raw_user_meta_data ->> 'role', 'user');
-
-  -- Insert or update public.user_profiles mapping
-  INSERT INTO public.user_profiles (id, tenant_id, full_name, role, created_at, updated_at)
-  VALUES (
-    new.id,
-    resolved_tenant_id,
-    full_name_val,
-    role_val,
-    now(),
-    now()
-  )
-  ON CONFLICT (id) DO UPDATE
-  SET
-    tenant_id = EXCLUDED.tenant_id,
-    full_name = EXCLUDED.full_name,
-    role = EXCLUDED.role,
-    updated_at = now();
-
-  RETURN new;
-END;
-$$;
-
--- Bind the profile handler trigger AFTER INSERT on auth.users
-DROP TRIGGER IF EXISTS trg_handle_new_user_profile ON auth.users;
-CREATE TRIGGER trg_handle_new_user_profile
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_new_user_profile();
-
-
-
--- FILE: 20260530222000_add_tenant_config_columns.sql
--- Migration: Add tenant config columns and update default tenant config
--- Location: supabase/migrations/20260530222000_add_tenant_config_columns.sql
-
-BEGIN;
-
--- Add features and styles columns to public.tenants table if they do not exist
-ALTER TABLE public.tenants 
-ADD COLUMN IF NOT EXISTS features JSONB NOT NULL DEFAULT '{}'::jsonb;
-
-ALTER TABLE public.tenants 
-ADD COLUMN IF NOT EXISTS styles JSONB NOT NULL DEFAULT '{}'::jsonb;
-
--- Update the default tenant with active features and styles
-UPDATE public.tenants
-SET 
-  features = '{"viewer3d": true, "engineeringCalculators": true, "pdfExports": true}'::jsonb,
-  styles = '{"primaryColor": "#0f172a", "secondaryColor": "#3b82f6"}'::jsonb
-WHERE id = 'd3b07384-d113-495f-a558-8c38634e0000';
-
-COMMIT;
-
-
-
--- FILE: 20260530223000_add_tenant_branding_config.sql
--- Migration: Add tenant branding config columns and seed default tenant
--- Location: supabase/migrations/20260530223000_add_tenant_branding_config.sql
-
-BEGIN;
-
--- Add config, theme_config, and features columns to public.tenants table if they do not exist
-ALTER TABLE public.tenants 
-ADD COLUMN IF NOT EXISTS config JSONB NOT NULL DEFAULT '{}'::jsonb;
-
-ALTER TABLE public.tenants 
-ADD COLUMN IF NOT EXISTS theme_config JSONB NOT NULL DEFAULT '{}'::jsonb;
-
-ALTER TABLE public.tenants 
-ADD COLUMN IF NOT EXISTS features JSONB NOT NULL DEFAULT '{}'::jsonb;
-
--- Seed the default tenant 'd3b07384-d113-495f-a558-8c38634e0000' with branding configurations in JSONB
-UPDATE public.tenants
-SET config = jsonb_build_object(
-  'brand_name', 'VentHub',
-  'brand_logo_url', 'https://venthub-hvac-esite.vercel.app/images/logo.png',
-  'brand_primary_color', '#2563eb',
-  'email_from', 'VentHub <onboarding@resend.dev>'
-)
-WHERE id = 'd3b07384-d113-495f-a558-8c38634e0000';
-
-COMMIT;
-
-
-
--- FILE: 20260530224000_tenant_aware_storage_policies.sql
--- Migration: Tenant-Aware Path-Based Storage Isolation Policies
--- Location: supabase/migrations/20260530224000_tenant_aware_storage_policies.sql
-
-BEGIN;
-
--- 1. DROP ALL OLD INSECURE AND NON-TENANT-AWARE POLICIES
-DROP POLICY IF EXISTS product_images_read_public ON storage.objects;
-DROP POLICY IF EXISTS product_images_insert_authenticated ON storage.objects;
-DROP POLICY IF EXISTS product_images_insert_admin ON storage.objects;
-DROP POLICY IF EXISTS product_images_update_admin ON storage.objects;
-DROP POLICY IF EXISTS product_images_delete_admin ON storage.objects;
-
--- Ensure RLS is active on storage.objects (storage.objects has RLS active by default)
--- ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
--- 2. CREATE TENANT-AWARE AND ROLE-VERIFIED POLICIES
-
--- SELECT: Public reading of files only if they belong to an active tenant
-CREATE POLICY product_images_select_tenant ON storage.objects
-  FOR SELECT TO public
-  USING (
-    bucket_id = 'product-images'
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND EXISTS (
-      SELECT 1 FROM public.tenants t
-      WHERE t.id = split_part(name, '/', 1)::uuid
-      AND t.is_active = true
-    )
-  );
-
--- INSERT: Restrict uploads to tenant folder matching jwt_tenant_id() + user must be admin/moderator in that tenant
-CREATE POLICY product_images_insert_tenant ON storage.objects
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    bucket_id = 'product-images'
-    -- A: Enforce file path begins with a valid UUID matching the user's active tenant claim
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND split_part(name, '/', 1)::uuid = public.jwt_tenant_id()
-    -- B: Verify user is registered, belongs to the active tenant, and has write permissions
-    AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.tenant_id = public.jwt_tenant_id()
-      AND up.role IN ('admin', 'moderator')
-    )
-  );
-
--- UPDATE: Restrict file replacements to owners matching active tenant + admin/moderator roles
-CREATE POLICY product_images_update_tenant ON storage.objects
-  FOR UPDATE TO authenticated
-  USING (
-    bucket_id = 'product-images'
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND split_part(name, '/', 1)::uuid = public.jwt_tenant_id()
-    AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.tenant_id = public.jwt_tenant_id()
-      AND up.role IN ('admin', 'moderator')
-    )
-  )
-  WITH CHECK (
-    bucket_id = 'product-images'
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND split_part(name, '/', 1)::uuid = public.jwt_tenant_id()
-    AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.tenant_id = public.jwt_tenant_id()
-      AND up.role IN ('admin', 'moderator')
-    )
-  );
-
--- DELETE: Restrict deletions to owners matching active tenant + admin/moderator roles
-CREATE POLICY product_images_delete_tenant ON storage.objects
-  FOR DELETE TO authenticated
-  USING (
-    bucket_id = 'product-images'
-    AND (name ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/')
-    AND split_part(name, '/', 1)::uuid = public.jwt_tenant_id()
-    AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid()
-      AND up.tenant_id = public.jwt_tenant_id()
-      AND up.role IN ('admin', 'moderator')
-    )
-  );
-
--- Refresh PostgREST schema cache
-NOTIFY pgrst, 'reload schema';
-
-COMMIT;
-
-
+| Users can delete their own projects | DELETE | public | `(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELEC` |
+| Users can insert their own projects | INSERT | public | `-` |
+| Users can update their own projects | UPDATE | public | `(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELEC` |
+| Users can view their own projects | SELECT | public | `(( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELECT ( SELEC` |
 
 ## 3. FONKSIYONLAR (PL/pgSQL)
 
-### `jwt_tenant_id()` → uuid
-
-### `handle_new_user_metadata()` → trigger
-
-### `handle_new_user_profile()` → trigger
-
-### `jwt_tenant_id()` → uuid
-
-### `handle_new_user_metadata()` → trigger
-
-### `handle_new_user_profile()` → trigger
-
-### `_create_select_policy_if_absent(p_schemaname text, p_tablename text, p_policyname text, p_using_sql text)` → void
-
-### `_enable_rls_if_exists(tbl regclass)` → void
-
 ### `_normalize_rls_expr(expr text)` → text
 
-### `_normalize_rls_expr(expr text)` → text
+### `adjust_stock(p_product_id uuid, p_delta integer, p_reason text)` → void
 
-### `_normalize_rls_expr(expr text)` → text
+### `adjust_stock(p_product_id uuid, p_delta integer, p_reason text, p_batch_id uuid)` → void
 
-### `_normalize_rls_expr(expr text)` → text
+### `adjust_stock_v2(p_product_id uuid, p_delta integer)` → void
 
-### `adjust_stock(p_product_id uuid, p_delta int, p_reason text)` → void
-
-### `adjust_stock(p_product_id uuid, p_delta int, p_reason text)` → void
-
-### `adjust_stock(p_product_id uuid, p_delta int, p_reason text, p_batch_id uuid DEFAULT NULL)` → void
-
-### `admin_list_users()
-RETURNS TABLE (
-  id uuid, email text, full_name text, phone text, role text, created_at timestamptz, updated_at timestamptz
-)
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $$
+### `admin_list_all_users() RETURNS TABLE(id uuid, email text, full_name text, phone text, role text, created_at timestamp with time zone, updated_at timestamp with time zone)
+    LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO 'public', 'pg_temp'
+    AS $$
 BEGIN
-  -- Only allow admins/moderators to execute successfully
+  -- Authorization: allow admins/moderators/super_admin/superadmin only
   IF NOT EXISTS (
     SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
+    WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator', 'super_admin', 'superadmin')
   ) THEN
     RAISE EXCEPTION 'not authorized';
   END IF;
 
   RETURN QUERY
-  SELECT u.id, u.email, up.full_name, up.phone, up.role, up.created_at, up.updated_at
+  SELECT u.id, (u.email)::text        AS email, (up.full_name)::text   AS full_name, (up.phone)::text       AS phone, COALESCE((up.role)::text, 'user') AS role, COALESCE(up.created_at, u.created_at) AS created_at, COALESCE(up.updated_at, u.updated_at) AS updated_at
   FROM auth.users u
   LEFT JOIN public.user_profiles up ON up.id = u.id
-  WHERE up.role IN ('admin', 'moderator')
-  ORDER BY up.created_at DESC;
+  ORDER BY COALESCE(up.created_at, u.created_at) DESC;
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.admin_list_users() TO authenticated;
 
--- 3) Inventory-related views should run with invoker semantics
-DO $$
-BEGIN
-  PERFORM 1 FROM pg_views WHERE schemaname='public' AND viewname='reserved_orders';
-  IF FOUND THEN
-    ALTER VIEW public.reserved_orders SET (security_invoker = on);
-  END IF;
-END $$;
+--
+-- Name: admin_list_users(); Type: FUNCTION; Schema: public; Owner: -
+--
 
-DO $$
-BEGIN
-  PERFORM 1 FROM pg_views WHERE schemaname='public' AND viewname='inventory_summary';
-  IF FOUND THEN
-    ALTER VIEW public.inventory_summary SET (security_invoker = on);
-  END IF;
-END $$;
-
-COMMIT;
-
-
-
--- FILE: 20250911_perf_fk_indexes_and_index_cleanup.sql
-BEGIN;
-
--- Add covering indexes for foreign keys (idempotent)
-CREATE INDEX IF NOT EXISTS idx_cart_items_product_id ON public.cart_items(product_id);
-CREATE INDEX IF NOT EXISTS idx_product_prices_price_list_id ON public.product_prices(price_list_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_order_items_order_id ON public.venthub_order_items(order_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_order_items_product_id ON public.venthub_order_items(product_id);
-CREATE INDEX IF NOT EXISTS idx_venthub_orders_user_id ON public.venthub_orders(user_id);
-
--- Remove duplicate index (keep a single unique constraint/index)
-DO $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_indexes WHERE schemaname='public' AND tablename='cart_items' AND indexname='cart_items_cart_product_uniq'
-  ) THEN
-    EXECUTE 'DROP INDEX IF EXISTS public.cart_items_cart_product_uniq';
-  END IF;
-END $$;
-
-COMMIT;
-
-
-
--- FILE: 20250911_rbac_superadmin.sql
-BEGIN;
-
--- 1) user_profiles.role CHECK constraint: include 'superadmin' (idempotent)
-DO $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM information_schema.table_constraints 
-    WHERE table_schema='public' AND table_name='user_profiles' AND constraint_name='user_profiles_role_check'
-  ) THEN
-    ALTER TABLE public.user_profiles DROP CONSTRAINT user_profiles_role_check;
-  END IF;
-END $$;
-
-ALTER TABLE public.user_profiles 
-  ADD CONSTRAINT user_profiles_role_check 
-  CHECK (role IN ('user', 'moderator', 'admin', 'superadmin'));
-
--- 2) Helper functions: treat superadmin as admin-equivalent
-CREATE OR REPLACE FUNCTION public.is_user_admin(user_id UUID)` → BOOLEAN
-
-### `admin_list_users()
-RETURNS TABLE (
-  id uuid, email text, full_name text, phone text, role text, created_at timestamptz, updated_at timestamptz
-)
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $$
-BEGIN
-  -- Allow admins/moderators/superadmin
-  IF NOT EXISTS (
-    SELECT 1 FROM public.user_profiles up
-    WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator', 'superadmin')
-  ) THEN
-    RAISE EXCEPTION 'not authorized';
-  END IF;
-
-  RETURN QUERY
-  SELECT u.id, u.email, up.full_name, up.phone, up.role, up.created_at, up.updated_at
-  FROM auth.users u
-  LEFT JOIN public.user_profiles up ON up.id = u.id
-  WHERE up.role IN ('admin', 'moderator', 'superadmin')
-  ORDER BY up.created_at DESC;
-END;
-$$;
-
-GRANT EXECUTE ON FUNCTION public.admin_list_users() TO authenticated;
-
-COMMIT;
-
-
--- FILE: 20250914_admin_list_users_fix_types.sql
-BEGIN;
-
--- Fix type mismatch in admin_list_users: cast varchar columns to text
-CREATE OR REPLACE FUNCTION public.admin_list_users()
-RETURNS TABLE (
-  id uuid, email text, full_name text, phone text, role text, created_at timestamptz, updated_at timestamptz
-)
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $$
+CREATE FUNCTION public.admin_list_users() RETURNS TABLE(id uuid, email text, full_name text, phone text, role text, created_at timestamp with time zone, updated_at timestamp with time zone)
+    LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO 'public', 'pg_temp'
+    AS $$
 BEGIN
   -- Authorization: allow admins/moderators/superadmin only
   IF NOT EXISTS (
@@ -7713,1775 +2573,82 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.admin_list_users() TO authenticated;
 
-COMMIT;
+--
+-- Name: admin_search_products(text, integer, integer, uuid); Type: FUNCTION; Schema: public; Owner: -
+--
 
-
--- FILE: 20250914_enforce_role_change_self_protect.sql
-BEGIN;
-
--- Enforce stronger role protections: users cannot change their own role via UI unless superadmin
--- 1) Helper: only superadmin can change roles of others; user cannot change their own role to lower privilege
-CREATE OR REPLACE FUNCTION public.enforce_role_change()` → trigger
-
-### `bump_rate_limit(p_key text, p_limit int, p_window_seconds int)
-returns table(allowed boolean, remaining int, reset_at timestamptz) language plpgsql as $$
-declare
-  now_ts timestamptz := now();
-  bucket_ts timestamptz := date_trunc('minute', now_ts);
-  window_start timestamptz := now_ts - make_interval(secs => p_window_seconds);
-  total int := 0;
-  resets_at timestamptz := bucket_ts + interval '1 minute';
-begin
-  -- upsert current bucket
-  insert into public.rate_limits(key, bucket, count)
-  values (p_key, bucket_ts, 1)
-  on conflict (key, bucket) do update set count = public.rate_limits.count + 1;
-
-  -- sum counts within window
-  select coalesce(sum(count), 0) into total
-  from public.rate_limits
-  where key = p_key and bucket >= date_trunc('minute', window_start);
-
-  if total <= p_limit then
-    return query select true as allowed, greatest(p_limit - total, 0) as remaining, resets_at as reset_at;
-  else
-    return query select false as allowed, 0 as remaining, resets_at as reset_at;
-  end if;
-end $$;
-
--- Helpful index for pruning/queries
-create index if not exists rate_limits_bucket_idx on public.rate_limits (bucket);
-
-
--- FILE: 20250918_inventory_batch_undo.sql
--- Inventory batch undo support: add batch_id, extend stock RPCs, and add reverse_inventory_batch
-begin;
-
--- 1) Schema: inventory_movements.batch_id
-ALTER TABLE public.inventory_movements
-  ADD COLUMN IF NOT EXISTS batch_id uuid NULL;
-
-CREATE INDEX IF NOT EXISTS idx_inventory_movements_batch_id
-  ON public.inventory_movements(batch_id);
-
--- 2) Replace adjust_stock with batch support (default null)
-DROP FUNCTION IF EXISTS public.adjust_stock(uuid, int, text);
-CREATE OR REPLACE FUNCTION public.adjust_stock(
-  p_product_id uuid, p_delta int, p_reason text, p_batch_id uuid DEFAULT NULL)` → void
-
-### `bump_rate_limit(p_key text, p_window_seconds integer DEFAULT 60, p_max_requests integer DEFAULT 10)` → boolean
-
-### `debug_context()` → jsonb
-
-### `debug_policies_product_images()
-returns table (
-  schemaname text, tablename text, policyname text, permissive boolean, roles name[], cmd text, qual text, with_check text
-)
-language sql
-security definer
-set search_path = pg_catalog, public
-as $$
-  select p.schemaname, p.tablename, p.policyname, p.permissive, p.roles, p.cmd, p.qual, p.with_check
-  from pg_policies p
-  where p.schemaname = 'public' and p.tablename = 'product_images'
-  order by p.policyname;
-$$;
-
--- Make it callable by both anon and authenticated for read-only diagnostics
-grant execute on function public.debug_policies_product_images() to anon, authenticated;
-
-commit;
-
-
--- FILE: 20250909_fix_product_images_rls.sql
-begin;
-
--- Fix product_images table RLS: allow admin/moderator by user_profiles role (not JWT claim)
-
-alter table if exists public.product_images enable row level security;
-
--- Drop old claim-based policies if present
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='product_images' AND policyname='product_images_insert_admin') THEN
-    DROP POLICY product_images_insert_admin ON public.product_images;
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='product_images' AND policyname='product_images_update_admin') THEN
-    DROP POLICY product_images_update_admin ON public.product_images;
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='product_images' AND policyname='product_images_delete_admin') THEN
-    DROP POLICY product_images_delete_admin ON public.product_images;
-  END IF;
-END $$;
-
--- Recreate policies using user_profiles role check
-CREATE POLICY IF NOT EXISTS product_images_insert_admin ON public.product_images
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  );
-
-CREATE POLICY IF NOT EXISTS product_images_update_admin ON public.product_images
-  FOR UPDATE TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  );
-
-CREATE POLICY IF NOT EXISTS product_images_delete_admin ON public.product_images
-  FOR DELETE TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  );
-
--- Also fix storage.objects (product-images bucket) policies to use user_profiles role
--- Drop claim-based policies if present
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_insert_admin') THEN
-    DROP POLICY product_images_insert_admin ON storage.objects;
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_update_admin') THEN
-    DROP POLICY product_images_update_admin ON storage.objects;
-  END IF;
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_delete_admin') THEN
-    DROP POLICY product_images_delete_admin ON storage.objects;
-  END IF;
-END $$;
-
--- Recreate storage policies
-CREATE POLICY product_images_insert_admin ON storage.objects
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    bucket_id = 'product-images' AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  );
-
-CREATE POLICY product_images_update_admin ON storage.objects
-  FOR UPDATE TO authenticated
-  USING (
-    bucket_id = 'product-images' AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  )
-  WITH CHECK (
-    bucket_id = 'product-images' AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  );
-
-CREATE POLICY product_images_delete_admin ON storage.objects
-  FOR DELETE TO authenticated
-  USING (
-    bucket_id = 'product-images' AND EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  );
-
-commit;
-
-
-
--- FILE: 20250909_product_images_rls_reset.sql
-begin;
-
--- Kesin reset: product_images tabloundaki TÜM politikaları düşür ve doğru politikaları yeniden oluştur
--- Amaç: claim (jwt role) tabanlı eski politikalar kalmışsa temizlemek ve user_profiles + auth.uid() ile net izin vermek
-
--- RLS açık olsun
-alter table if exists public.product_images enable row level security;
-
--- Var olan tüm politikaları kaldır
-DO $$
-DECLARE pol record;
-BEGIN
-  FOR pol IN
-    SELECT policyname
-    FROM pg_policies
-    WHERE schemaname='public' AND tablename='product_images'
-  LOOP
-    EXECUTE format('DROP POLICY %I ON public.product_images', pol.policyname);
-  END LOOP;
-END $$;
-
--- Herkese SELECT (katalog görüntüleme; zaten storage public read var)
-CREATE POLICY product_images_select_all ON public.product_images
-  FOR SELECT
-  USING (true);
-
--- Yalnızca admin/moderator (user_profiles) yazabilir/güncelleyebilir/silebilir
--- Not: TO authenticated — istemci gerçekten oturumlu ise kullanılır.
-CREATE POLICY product_images_insert_admin ON public.product_images
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  );
-
-CREATE POLICY product_images_update_admin ON public.product_images
-  FOR UPDATE TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  );
-
-CREATE POLICY product_images_delete_admin ON public.product_images
-  FOR DELETE TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles up
-      WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-    )
-  );
-
-commit;
-
-
--- FILE: 20250909_product_images_to_public.sql
-begin;
--- noop migration: intentionally left empty while diagnosing RLS on product_images
-commit;
-
-
-
--- FILE: 20250909_rls_hardening_products_categories.sql
-begin;
-
--- RLS hardening for products, categories and cleanup of broad policies
-
--- Ensure helper exists (jwt_role) – already created in previous migrations
--- Enable RLS defensively
-alter table if exists public.products enable row level security;
-alter table if exists public.categories enable row level security;
-
--- 1) PRODUCTS
--- Drop overly broad authenticated update policy if present
-do $$
-begin
-  if exists (
-    select 1 from pg_policies
-    where schemaname='public' and tablename='products' and policyname='products_update_stock_authenticated'
-  ) then
-    drop policy "products_update_stock_authenticated" on public.products;
-  end if;
-end $$;
-
--- Public/anon can SELECT products (catalog)
-do $$
-begin
-  if not exists (
-    select 1 from pg_policies
-    where schemaname='public' and tablename='products' and policyname='products_public_read'
-  ) then
-    create policy products_public_read on public.products
-      for select to anon, authenticated
-      using (true);
-  end if;
-end $$;
-
--- Admin/moderator can INSERT/UPDATE/DELETE
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='products' AND policyname='products_insert_admin'
-  ) THEN
-    CREATE POLICY products_insert_admin ON public.products
-      FOR INSERT TO authenticated
-      WITH CHECK ( public.jwt_role() IN ('admin', 'moderator') );
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='products' AND policyname='products_update_admin_only'
-  ) THEN
-    CREATE POLICY products_update_admin_only ON public.products
-      FOR UPDATE TO authenticated
-      USING ( public.jwt_role() IN ('admin', 'moderator') )
-      WITH CHECK ( public.jwt_role() IN ('admin', 'moderator') );
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='products' AND policyname='products_delete_admin'
-  ) THEN
-    CREATE POLICY products_delete_admin ON public.products
-      FOR DELETE TO authenticated
-      USING ( public.jwt_role() IN ('admin', 'moderator') );
-  END IF;
-END $$;
-
--- 2) CATEGORIES
--- Public read
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='categories' AND policyname='categories_public_read'
-  ) THEN
-    CREATE POLICY categories_public_read ON public.categories
-      FOR SELECT TO anon, authenticated
-      USING (true);
-  END IF;
-END $$;
-
--- Admin/moderator write
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='categories' AND policyname='categories_insert_admin'
-  ) THEN
-    CREATE POLICY categories_insert_admin ON public.categories
-      FOR INSERT TO authenticated
-      WITH CHECK ( public.jwt_role() IN ('admin', 'moderator') );
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='categories' AND policyname='categories_update_admin'
-  ) THEN
-    CREATE POLICY categories_update_admin ON public.categories
-      FOR UPDATE TO authenticated
-      USING ( public.jwt_role() IN ('admin', 'moderator') )
-      WITH CHECK ( public.jwt_role() IN ('admin', 'moderator') );
-  END IF;
-
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='categories' AND policyname='categories_delete_admin'
-  ) THEN
-    CREATE POLICY categories_delete_admin ON public.categories
-      FOR DELETE TO authenticated
-      USING ( public.jwt_role() IN ('admin', 'moderator') );
-  END IF;
-END $$;
-
-commit;
-
-
-
--- FILE: 20250909_set_admin_recep.sql
-begin;
-
--- Ensure user 'recep.varlik@gmail.com' has admin role in public.user_profiles
-DO $$
+CREATE FUNCTION public.admin_search_products(p_q text, p_limit integer DEFAULT 50, p_offset integer DEFAULT 0, p_category_id uuid DEFAULT NULL::uuid) RETURNS TABLE(id uuid, name text, sku text, model_code text, brand text, status text, category_id uuid, price numeric, purchase_price numeric, stock_qty integer, low_stock_threshold integer, is_featured boolean, slug text, rank real, total_count bigint)
+    LANGUAGE plpgsql STABLE
+    SET search_path TO 'pg_catalog', 'public'
+    AS $$
 DECLARE
-  uid uuid;
+  v_limit int;
+  v_offset int;
+  v_tsq tsquery;
+  v_raw text;
+  v_raw_wildcard text;
 BEGIN
-  SELECT id INTO uid FROM auth.users WHERE email = 'recep.varlik@gmail.com' LIMIT 1;
-  IF uid IS NOT NULL THEN
-    INSERT INTO public.user_profiles (id, role, created_at, updated_at)
-    VALUES (uid, 'admin', now(), now())
-    ON CONFLICT (id)
-    DO UPDATE SET role='admin', updated_at=now();
+  v_limit  := LEAST(GREATEST(p_limit, 1), 200);
+  v_offset := GREATEST(p_offset, 0);
+  v_raw    := coalesce(trim(p_q), '');
+  v_raw_wildcard := replace(v_raw, ' ', '%');
+
+  -- Empty query → return empty (caller should use normal Supabase query)
+  IF v_raw = '' THEN
+    RETURN;
   END IF;
-END $$;
 
-commit;
+  v_tsq := plainto_tsquery('turkish', v_raw);
 
-
-
--- FILE: 20250909_storage_auth_grants.sql
-begin;
-
--- Ensure authenticated role has required privileges alongside RLS policies
--- Storage schema grants
-grant usage on schema storage to authenticated;
-grant select, insert, update, delete on storage.objects to authenticated;
-
--- Public schema grants for product_images
-grant usage on schema public to authenticated;
-grant select, insert, update, delete on public.product_images to authenticated;
-
-commit;
-
-
-
--- FILE: 20250909_storage_objects_insert_auth.sql
-begin;
-
--- Allow any authenticated user to INSERT into storage.objects for 'product-images' bucket (upload)
--- UPDATE/DELETE remain restricted to admin/moderator via existing policies.
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='product_images_insert_authenticated'
-  ) THEN
-    CREATE POLICY product_images_insert_authenticated ON storage.objects
-      FOR INSERT TO authenticated
-      WITH CHECK (bucket_id = 'product-images' AND auth.uid() IS NOT NULL);
-  END IF;
-END $$;
-
-commit;
-
-
-
--- FILE: 20250910_add_products_model_code.sql
-begin;
-
--- Add model_code (MPN) to products for separating distributor model from SKU
-alter table if exists public.products
-  add column if not exists model_code text null;
-
-comment on column public.products.model_code is 'Distributor/Manufacturer model code (MPN). Display on PDP as Model; fallback to SKU if null.';
-
-commit;
-
-
-
--- FILE: 20250910_drop_duplicate_cart_items_index.sql
--- 20250910_drop_duplicate_cart_items_index.sql
--- Purpose: Drop duplicate index on cart_items: {cart_items_cart_product_uniq, cart_items_cart_product_unique}
--- Keep: cart_items_cart_product_unique; Drop: cart_items_cart_product_uniq (if exists)
-
-BEGIN;
-
-DO $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_indexes 
-    WHERE schemaname='public' AND tablename='cart_items' AND indexname='cart_items_cart_product_uniq'
-  ) THEN
-    EXECUTE 'DROP INDEX IF EXISTS public.cart_items_cart_product_uniq';
-  END IF;
-END $$;
-
-COMMIT;
-
-
-
--- FILE: 20250910_fix_admin_audit_log_policies.sql
--- 20250910_fix_admin_audit_log_policies.sql
--- Purpose: Ensure admin_audit_log has explicit RLS policies (Advisor: RLS enabled but no policies)
--- Approach: Idempotently (re)create SELECT/INSERT policies limited to admin/moderator via user_profiles.
--- Generated: 2025-09-10
-
-BEGIN;
-
--- Ensure table exists
-CREATE TABLE IF NOT EXISTS public.admin_audit_log (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), at timestamptz NOT NULL DEFAULT now(), actor uuid NULL DEFAULT auth.uid(), table_name text NOT NULL, row_pk text NULL, action text NOT NULL, before jsonb NULL, after jsonb NULL, comment text NULL
-);
-
--- Enable RLS
-ALTER TABLE public.admin_audit_log ENABLE ROW LEVEL SECURITY;
-
--- Drop legacy policies if present (to avoid duplicates / quoted names)
-DO $$
-BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='admin_audit_log' AND policyname='admin can read logs'
-  ) THEN
-    DROP POLICY "admin can read logs" ON public.admin_audit_log;
-  END IF;
-  IF EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='admin_audit_log' AND policyname='admin can insert logs'
-  ) THEN
-    DROP POLICY "admin can insert logs" ON public.admin_audit_log;
-  END IF;
-END $$;
-
--- CREATE SELECT policy (admins/moderators)
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='admin_audit_log' AND policyname='admin_audit_log_select_admins'
-  ) THEN
-    CREATE POLICY admin_audit_log_select_admins
-      ON public.admin_audit_log
-      FOR SELECT
-      TO authenticated
-      USING (
-        EXISTS (
-          SELECT 1 FROM public.user_profiles up
-          WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-        )
-      );
-  END IF;
-END $$;
-
--- CREATE INSERT policy (admins/moderators)
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE schemaname='public' AND tablename='admin_audit_log' AND policyname='admin_audit_log_insert_admins'
-  ) THEN
-    CREATE POLICY admin_audit_log_insert_admins
-      ON public.admin_audit_log
-      FOR INSERT
-      TO authenticated
-      WITH CHECK (
-        EXISTS (
-          SELECT 1 FROM public.user_profiles up
-          WHERE up.id = auth.uid() AND up.role IN ('admin', 'moderator')
-        )
-      );
-  END IF;
-END $$;
-
--- NOTE: No UPDATE/DELETE policies (disallow by default)
-
-COMMIT;
-
-
-
--- FILE: 20250910_fix_function_search_path.sql
--- 20250910_fix_function_search_path.sql
--- Purpose: Set secure search_path for functions flagged by Advisor (role mutable search_path)
--- Approach: Dynamically ALTER FUNCTION ... SET search_path = 'public, pg_temp' for specific functions if they exist.
--- Generated: 2025-09-10
-
-BEGIN;
-
-DO $$
-DECLARE
-  r RECORD;
-BEGIN
-  FOR r IN
+  RETURN QUERY
+  WITH matched AS (
     SELECT
-      n.nspname AS schema_name, p.proname AS function_name, pg_catalog.pg_get_function_identity_arguments(p.oid) AS args
-    FROM pg_proc p
-    JOIN pg_namespace n ON p.pronamespace = n.oid
-    WHERE n.nspname = 'public'
-      AND p.proname IN (
-        'normalize_product_threshold_overrides', 'set_user_role', 'is_user_admin', 'get_user_role', 'jwt_role', 'generate_order_number', 'set_order_number', 'is_admin_user', 'get_admin_users', 'sync_payment_status_with_status', 'process_order_stock_reduction', 'update_updated_at_column', 'set_stock', 'adjust_stock', 'update_user_profiles_updated_at', 'set_user_admin_role', 'increment_error_group_count', 'set_updated_at'
-      )
-  LOOP
-    EXECUTE format('ALTER FUNCTION %I.%I(%s) SET search_path = public, pg_temp;', r.schema_name, r.function_name, r.args);
-  END LOOP;
-END $$;
-
-COMMIT;
-
-
-
--- FILE: 20250910_fix_normalizer_search_path.sql
--- Fix Advisor: function_search_path_mutable for public._normalize_rls_expr
--- Lock down function-specific search_path to avoid role-mutable search_path issues.
-
-ALTER FUNCTION public._normalize_rls_expr(text)
-  SET search_path = pg_temp;
-
-
--- FILE: 20250910_fix_normalizer_search_path2.sql
--- Ensure function search_path explicitly includes public for compatibility with Advisor expectations
-ALTER FUNCTION public._normalize_rls_expr(text)
-  SET search_path = public, pg_temp;
-
-
--- FILE: 20250910_perf_fk_indexes_and_drop_unused.sql
--- Performance: Add covering indexes for reported unindexed foreign keys; Drop reported unused indexes
-
--- 1) Covering indexes for FKs (IF NOT EXISTS)
-CREATE INDEX IF NOT EXISTS idx_cart_items_price_list_id ON public.cart_items(price_list_id);
-CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON public.categories(parent_id);
-CREATE INDEX IF NOT EXISTS idx_client_errors_group_id ON public.client_errors(group_id);
-CREATE INDEX IF NOT EXISTS idx_error_groups_assigned_to ON public.error_groups(assigned_to);
-CREATE INDEX IF NOT EXISTS idx_inventory_movements_product_id ON public.inventory_movements(product_id);
-CREATE INDEX IF NOT EXISTS idx_payment_transactions_order_id ON public.payment_transactions(order_id);
-CREATE INDEX IF NOT EXISTS idx_payment_transactions_user_id ON public.payment_transactions(user_id);
-CREATE INDEX IF NOT EXISTS idx_products_category_id ON public.products(category_id);
-CREATE INDEX IF NOT EXISTS idx_products_subcategory_id ON public.products(subcategory_id);
-
--- 2) Drop unused indexes (IF EXISTS)
-DROP INDEX IF EXISTS public.idx_cart_items_cart_id;
-DROP INDEX IF EXISTS public.idx_cart_items_product_id;
-DROP INDEX IF EXISTS public.idx_product_images_product_sort;
-DROP INDEX IF EXISTS public.idx_product_prices_active;
-DROP INDEX IF EXISTS public.idx_product_prices_price_list_id;
-DROP INDEX IF EXISTS public.idx_product_prices_product_id;
-DROP INDEX IF EXISTS public.idx_user_addresses_user_id;
-DROP INDEX IF EXISTS public.idx_user_invoice_profiles_user;
-DROP INDEX IF EXISTS public.idx_user_profiles_created_at;
-DROP INDEX IF EXISTS public.idx_user_profiles_role;
-DROP INDEX IF EXISTS public.idx_venthub_order_items_order_id;
-DROP INDEX IF EXISTS public.idx_venthub_order_items_product_id;
-DROP INDEX IF EXISTS public.idx_venthub_orders_conversation_id;
-DROP INDEX IF EXISTS public.idx_venthub_orders_created_at;
-DROP INDEX IF EXISTS public.idx_venthub_orders_order_number;
-DROP INDEX IF EXISTS public.idx_venthub_orders_payment_status;
-DROP INDEX IF EXISTS public.idx_venthub_orders_status;
-DROP INDEX IF EXISTS public.idx_venthub_orders_user_id;
-DROP INDEX IF EXISTS public.idx_venthub_returns_order;
-DROP INDEX IF EXISTS public.idx_venthub_returns_user;
-DROP INDEX IF EXISTS public.shipping_webhook_events_order_id_idx;
-DROP INDEX IF EXISTS public.shipping_webhook_events_received_at_idx;
-DROP INDEX IF EXISTS public.venthub_orders_shipping_method_idx;
-
-
--- FILE: 20250910_rls_initplan_normalize4.sql
--- Normalize RLS policy expressions to avoid per-row re-evaluation of auth.* and current_setting() calls
--- This migration creates a helper normalizer and rewrites all public schema policies accordingly.
-
--- 1) Helper function to normalize a single expression text
-CREATE OR REPLACE FUNCTION public._normalize_rls_expr(expr text)` → text
-
-### `enforce_role_change()` → TRIGGER
-
-### `fn_admin_get_orders(p_id text default null, p_conv text default null, p_status text default null, p_limit int default 10)` → setof venthub_orders
-
-### `fn_admin_update_order_status(p_id text default null, p_status text default null, p_conv text default null)` → venthub_orders
-
-### `fts_search_products(p_q text, p_limit integer DEFAULT 20, p_filters jsonb DEFAULT '{}'::jsonb
-)
-RETURNS TABLE(
-  id uuid, name text, sku text, brand text, price numeric, rank real
-)
-LANGUAGE sql
-STABLE
-SECURITY INVOKER
-SET search_path TO pg_catalog, public
-AS $$
-  WITH params AS (
-    SELECT
-      coalesce(p_q, '')::text AS raw, plainto_tsquery('turkish', coalesce(p_q, '')) AS tsq, LEAST(GREATEST(p_limit, 1), 100) AS lim, p_filters AS f
-  )
-  SELECT p.id, p.name, p.sku, p.brand, p.price, ts_rank(
-           to_tsvector('turkish', coalesce(p.name, '') || ' ' || coalesce(p.model_code, '') || ' ' || coalesce(p.sku, '') || ' ' || coalesce(p.brand, '')), (SELECT tsq FROM params)
-         ) AS rank
-  FROM public.products p, params x
-  WHERE (
-    p.name ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.model_code ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.sku ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.brand ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR to_tsvector('turkish', coalesce(p.name, '') || ' ' || coalesce(p.model_code, '') || ' ' || coalesce(p.sku, '') || ' ' || coalesce(p.brand, '')) @@ x.tsq
-  )
-  AND (
-    (NOT (x.f ? 'category_id')) OR (p.category_id = (x.f->>'category_id')::uuid)
-  )
-  ORDER BY rank DESC NULLS LAST, p.name ASC
-  LIMIT x.lim;
-$$;
-
-
--- FILE: 20250919_inventory_batch_window.sql
--- Add undo metadata columns and restrict reverse_inventory_batch to a time window
-begin;
-
--- 1) Add metadata columns
-ALTER TABLE public.inventory_movements
-  ADD COLUMN IF NOT EXISTS original_movement_id uuid NULL, ADD COLUMN IF NOT EXISTS reversed_by_movement_id uuid NULL, ADD COLUMN IF NOT EXISTS undo_by_user_id uuid NULL, ADD COLUMN IF NOT EXISTS undo_at timestamptz NULL;
-
--- Optional indexes for lookups
-CREATE INDEX IF NOT EXISTS idx_inventory_movements_original_id ON public.inventory_movements(original_movement_id);
-CREATE INDEX IF NOT EXISTS idx_inventory_movements_reversed_by ON public.inventory_movements(reversed_by_movement_id);
-
--- 2) Replace reverse_inventory_batch with time window and metadata handling
-DROP FUNCTION IF EXISTS public.reverse_inventory_batch(uuid);
-CREATE OR REPLACE FUNCTION public.reverse_inventory_batch(p_batch_id uuid, p_max_minutes int DEFAULT 30)` → integer
-
-### `fts_search_products(p_q text, p_limit integer DEFAULT 20, p_filters jsonb DEFAULT '{}'::jsonb
-)
-RETURNS TABLE(
-  id uuid, name text, sku text, brand text, price numeric, rank real
-)
-LANGUAGE sql
-STABLE
-SECURITY INVOKER
-SET search_path TO pg_catalog, public
-AS $$
-  WITH params AS (
-    SELECT
-      coalesce(p_q, '')::text AS raw, plainto_tsquery('turkish', coalesce(p_q, '')) AS tsq, LEAST(GREATEST(p_limit, 1), 100) AS lim, p_filters AS f
-  )
-  SELECT p.id, p.name, p.sku, p.brand, p.price, ts_rank(
-           to_tsvector('turkish', coalesce(p.name, '') || ' ' || 
-             coalesce(p.model_code, '') || ' ' || 
-             coalesce(p.sku, '') || ' ' || 
-             coalesce(p.brand, '') || ' ' ||
-             coalesce(p.description, '') || ' ' ||
-             coalesce(p.technical_specs::text, '')
-           ), (SELECT tsq FROM params)
-         ) AS rank
-  FROM public.products p, params x
-  WHERE (
-    p.name ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.model_code ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.sku ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.brand ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.description ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-    OR p.technical_specs::text ILIKE '%' || x.raw || '%'
-    OR to_tsvector('turkish', coalesce(p.name, '') || ' ' || 
-         coalesce(p.model_code, '') || ' ' || 
-         coalesce(p.sku, '') || ' ' || 
-         coalesce(p.brand, '') || ' ' ||
-         coalesce(p.description, '') || ' ' ||
-         coalesce(p.technical_specs::text, '')
-       ) @@ x.tsq
-  )
-  AND (
-    (NOT (x.f ? 'category_id')) OR (p.category_id = (x.f->>'category_id')::uuid)
-  )
-  AND p.status = 'active'
-  ORDER BY rank DESC NULLS LAST, p.name ASC
-  LIMIT x.lim;
-$$;
-
-
--- FILE: 20251203_fix_performance_lints.sql
--- Fix Performance Lints: RLS Initplan & Multiple Permissive Policies
-
--- 1. venthub_returns
-DROP POLICY IF EXISTS returns_update_admin ON public.venthub_returns;
-DROP POLICY IF EXISTS returns_update_service ON public.venthub_returns;
-DROP POLICY IF EXISTS returns_select_admin ON public.venthub_returns;
-DROP POLICY IF EXISTS returns_insert_own_order ON public.venthub_returns;
-DROP POLICY IF EXISTS returns_delete_service ON public.venthub_returns;
-
-CREATE POLICY returns_select_policy ON public.venthub_returns FOR SELECT
-  USING ( user_id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY returns_insert_policy ON public.venthub_returns FOR INSERT
-  WITH CHECK ( user_id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY returns_update_policy ON public.venthub_returns FOR UPDATE
-  USING ( (SELECT auth.role()) = 'service_role' OR (SELECT is_admin_user()) );
-
-CREATE POLICY returns_delete_policy ON public.venthub_returns FOR DELETE
-  USING ( (SELECT auth.role()) = 'service_role' OR (SELECT is_admin_user()) );
-
-
--- 2. shopping_carts
-DROP POLICY IF EXISTS shopping_carts_delete_own ON public.shopping_carts;
-DROP POLICY IF EXISTS shopping_carts_insert_own ON public.shopping_carts;
-DROP POLICY IF EXISTS shopping_carts_update_own ON public.shopping_carts;
-DROP POLICY IF EXISTS shopping_carts_select_own ON public.shopping_carts;
-
-CREATE POLICY shopping_carts_policy ON public.shopping_carts
-  USING ( user_id = (SELECT auth.uid()) OR (SELECT auth.role()) = 'service_role' )
-  WITH CHECK ( user_id = (SELECT auth.uid()) OR (SELECT auth.role()) = 'service_role' );
-
-
--- 3. orders
-DROP POLICY IF EXISTS orders_delete_own ON public.venthub_orders;
-DROP POLICY IF EXISTS orders_insert_own ON public.venthub_orders;
-DROP POLICY IF EXISTS orders_update_own ON public.venthub_orders;
-DROP POLICY IF EXISTS orders_select_own ON public.venthub_orders;
-
-CREATE POLICY orders_select_policy ON public.venthub_orders FOR SELECT
-  USING ( user_id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY orders_insert_policy ON public.venthub_orders FOR INSERT
-  WITH CHECK ( user_id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY orders_update_policy ON public.venthub_orders FOR UPDATE
-  USING ( user_id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY orders_delete_policy ON public.venthub_orders FOR DELETE
-  USING ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-
--- 4. products
-DROP POLICY IF EXISTS merged_products_authenticated_delete ON public.products;
-DROP POLICY IF EXISTS merged_products_authenticated_insert ON public.products;
-DROP POLICY IF EXISTS merged_products_authenticated_update ON public.products;
-DROP POLICY IF EXISTS merged_products_anon_select ON public.products;
-DROP POLICY IF EXISTS products_delete_admin ON public.products;
-DROP POLICY IF EXISTS products_insert_admin ON public.products;
-DROP POLICY IF EXISTS products_update_admin ON public.products;
-DROP POLICY IF EXISTS products_select_public ON public.products;
-
-CREATE POLICY products_select_policy ON public.products FOR SELECT
-  USING (true);
-
-CREATE POLICY products_modify_policy ON public.products
-  USING ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' )
-  WITH CHECK ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-
--- FILE: 20251203_fix_products_lints.sql
--- Fix Products Performance Lints: Split modify policy and drop redundant ones
-
--- products
-DROP POLICY IF EXISTS products_modify_policy ON public.products;
-DROP POLICY IF EXISTS products_update_admin_stock ON public.products;
-
-CREATE POLICY products_insert_policy ON public.products FOR INSERT
-  WITH CHECK ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY products_update_policy ON public.products FOR UPDATE
-  USING ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY products_delete_policy ON public.products FOR DELETE
-  USING ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-
--- FILE: 20251203_fix_products_select_lint.sql
--- Fix Final Products Performance Lint: Drop merged select policy
-
--- products
-DROP POLICY IF EXISTS merged_products_authenticated_select ON public.products;
-
-
--- FILE: 20251203_fix_remaining_lints.sql
--- Fix Remaining Performance Lints: Drop merged policies and fix cart_items
-
--- 1. cart_items
-DROP POLICY IF EXISTS cart_items_delete_own ON public.cart_items;
-DROP POLICY IF EXISTS cart_items_insert_own ON public.cart_items;
-DROP POLICY IF EXISTS cart_items_update_own ON public.cart_items;
-DROP POLICY IF EXISTS cart_items_select_own ON public.cart_items;
-DROP POLICY IF EXISTS merged_cart_items_authenticated_delete ON public.cart_items;
-DROP POLICY IF EXISTS merged_cart_items_authenticated_insert ON public.cart_items;
-DROP POLICY IF EXISTS merged_cart_items_authenticated_update ON public.cart_items;
-
-CREATE POLICY cart_items_policy ON public.cart_items
-  USING ( (SELECT auth.uid()) = (SELECT user_id FROM public.shopping_carts WHERE id = cart_id) OR (SELECT auth.role()) = 'service_role' )
-  WITH CHECK ( (SELECT auth.uid()) = (SELECT user_id FROM public.shopping_carts WHERE id = cart_id) OR (SELECT auth.role()) = 'service_role' );
-
--- 2. shopping_carts (Drop merged)
-DROP POLICY IF EXISTS merged_shopping_carts_authenticated_delete ON public.shopping_carts;
-DROP POLICY IF EXISTS merged_shopping_carts_authenticated_insert ON public.shopping_carts;
-DROP POLICY IF EXISTS merged_shopping_carts_authenticated_update ON public.shopping_carts;
-
--- 3. venthub_orders (Drop merged)
-DROP POLICY IF EXISTS merged_venthub_orders_authenticated_select ON public.venthub_orders;
-
--- 4. venthub_returns (Drop merged)
-DROP POLICY IF EXISTS merged_venthub_returns_authenticated_delete ON public.venthub_returns;
-DROP POLICY IF EXISTS merged_venthub_returns_authenticated_insert ON public.venthub_returns;
-DROP POLICY IF EXISTS merged_venthub_returns_authenticated_select ON public.venthub_returns;
-
-
--- FILE: 20251203_fix_user_profiles_lints.sql
--- Fix User Profiles Performance Lints: Drop merged and redundant policies
-
--- user_profiles
-DROP POLICY IF EXISTS merged_user_profiles_authenticated_delete ON public.user_profiles;
-DROP POLICY IF EXISTS merged_user_profiles_authenticated_select ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_insert_own ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_insert_self ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_insert_service ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_select_admin ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_update_admin ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_update_own ON public.user_profiles;
-DROP POLICY IF EXISTS user_profiles_update_self ON public.user_profiles;
-
-CREATE POLICY user_profiles_select_policy ON public.user_profiles FOR SELECT
-  USING ( id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY user_profiles_insert_policy ON public.user_profiles FOR INSERT
-  WITH CHECK ( id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY user_profiles_update_policy ON public.user_profiles FOR UPDATE
-  USING ( id = (SELECT auth.uid()) OR (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-CREATE POLICY user_profiles_delete_policy ON public.user_profiles FOR DELETE
-  USING ( (SELECT is_admin_user()) OR (SELECT auth.role()) = 'service_role' );
-
-
--- FILE: 20251204_add_air_door_ad900.sql
--- Insert AIR DOOR AD 900 product
-INSERT INTO public.products (
-  name, slug, model_code, sku, brand, description, technical_specs, category_id, status, meta_title, meta_description
-) 
-SELECT
-  'AIR DOOR AD 900', 'air-door-ad-900', '65195', '65195', 'Vortice', 'Aluminium front panel with satin finish, colour silver, and air inlet grille comprising 9 horizontal sections of polished aluminium. Rear pressed steel casing, colour black. Nominal width: 900 mm. Neutral version (ambient temp), 2 speeds. AC motor with double shaft extension and thermal overload protection. 2 tangential fans moulded in thermoplastic resin (SAN). IR remote control included.', '{
-    "absorbed_current_max_a": 0.70, "absorbed_power_1st_speed_w": 110, "frequency_hz": 50, "max_ambient_temp_c": 30, "max_absorbed_power_max_speed_w": 160, "number_of_speeds": 2, "voltage_v": 230, "weight_kg": 10, "airflow_speed_max_ms": 11, "airflow_speed_min_ms": 9, "delivery_1st_speed_ls": 305, "delivery_1st_speed_m3h": 1100, "max_delivery_max_speed_ls": 388, "max_delivery_max_speed_m3h": 1400, "rpm_max": 1450, "rpm_min": 1400, "sound_pressure_level_lp_db_a_2m_max": 57, "sound_pressure_level_lp_db_a_2m_min": 55, "size_a_mm": 900, "size_b_mm": 220, "size_c_mm": 190
-  }'::jsonb, (SELECT id FROM public.categories WHERE name ILIKE '%Hava Perdesi%' OR name ILIKE '%Air Curtains%' LIMIT 1), 'active', 'AIR DOOR AD 900 - Vortice Air Curtain 900mm | VentHub', 'Buy Vortice AIR DOOR AD 900 Air Curtain. 900mm width, 2 speeds, neutral air, max airflow 1400 m3/h. Perfect for shops and commercial entrances. Fast shipping.'
-WHERE NOT EXISTS (
-    SELECT 1 FROM public.products WHERE sku = '65195'
-);
-
-
--- FILE: 20251204_fix_air_door_ad900_duplicate_and_localize.sql
--- Delete the duplicate product created by mistake
-DELETE FROM public.products WHERE sku = '65195';
-
--- Update the existing product with correct data and Turkish content
-UPDATE public.products
-SET
-  model_code = '65195', description = 'Saten bitişli gümüş renkli alüminyum ön panel ve 9 yatay cilalı alüminyum bölümden oluşan hava giriş ızgarası. Arka preslenmiş çelik gövde, siyah renk. Nominal genişlik: 900 mm. Nötr versiyon (ortam sıcaklığı), 2 hız kademesi. Çift şaft uzantılı ve termal aşırı yük korumalı AC motor. Termoplastik reçineden (SAN) kalıplanmış 2 teğetsel fan. IR uzaktan kumanda dahildir.', technical_specs = '{
-    "rpm_max": 1450, "rpm_min": 1400, "size_a_mm": 900, "size_b_mm": 220, "size_c_mm": 190, "voltage_v": 230, "weight_kg": 10, "frequency_hz": 50, "number_of_speeds": 2, "max_ambient_temp_c": 30, "airflow_speed_max_ms": 11, "airflow_speed_min_ms": 9, "delivery_1st_speed_ls": 305, "absorbed_current_max_a": 0.7, "delivery_1st_speed_m3h": 1100, "max_delivery_max_speed_ls": 388, "absorbed_power_1st_speed_w": 110, "max_delivery_max_speed_m3h": 1400, "max_absorbed_power_max_speed_w": 160, "sound_pressure_level_lp_db_a_2m_max": 57, "sound_pressure_level_lp_db_a_2m_min": 55
-  }'::jsonb, meta_title = 'Vortice AIR DOOR AD 900 - Ortam Havalı Hava Perdesi 900mm | VentHub', meta_description = 'Vortice AIR DOOR AD 900 Hava Perdesi satın al. 900mm genişlik, 2 hız kademesi, nötr hava, 1400 m3/h maksimum hava debisi. Mağaza ve ticari girişler için ideal. Hızlı kargo.', slug = 'vortice-air-door-ad-900-ortam-havali-hava-perdesi', updated_at = NOW()
-WHERE sku = 'AVE-VOR-00013';
-
-
--- FILE: 20251204_improve_air_door_ad900_content.sql
--- Update AIR DOOR AD 900 with professional marketing content
-UPDATE public.products
-SET
-  description = 'Vortice AIR DOOR AD 900, ticari ve endüstriyel alanlar için özel olarak tasarlanmış, yüksek performanslı bir hava perdesidir. İç ve dış ortam arasındaki hava geçişini engelleyerek iklimlendirme maliyetlerini düşürür, enerji tasarrufu sağlar ve konforlu bir iç mekan iklimi yaratır. Şık İtalyan tasarımı ve gümüş renkli saten alüminyum ön paneli ile her türlü modern dekorasyona mükemmel uyum sağlar.
-
-**Öne Çıkan Özellikler:**
-
-*   **Yüksek Performans:** 1400 m³/h maksimum hava debisi ile kapı girişlerinde güçlü ve etkili bir görünmez bariyer oluşturur.
-*   **Premium Tasarım:** 9 yatay cilalı alüminyum bölümden oluşan zarif ön ızgara ve dayanıklı siyah preslenmiş çelik arka gövde.
-*   **Uzun Ömürlü Teknoloji:** Termal aşırı yük korumalı, çift şaftlı güçlü AC motor ve termoplastik reçineden (SAN) üretilmiş dayanıklı teğetsel fanlar.
-*   **Esnek Kontrol:** Dahili IR uzaktan kumanda ile 2 farklı hız kademesi (Düşük/Yüksek) ihtiyaca göre kolayca ayarlanabilir.
-*   **Sessiz Konfor:** Optimize edilmiş fan tasarımı sayesinde, yüksek performansı düşük ses seviyesiyle sunar.
-
-**Kullanım Alanları:**
-Mağazalar, ofisler, restoranlar, oteller, marketler ve insan trafiğinin yoğun olduğu tüm ticari işletmelerin giriş kapıları için idealdir (Maksimum montaj yüksekliği: 3 metre).', meta_description = 'Vortice AIR DOOR AD 900 Hava Perdesi ile işletmenizin havasını koruyun ve enerji tasarrufu sağlayın. 900mm, şık İtalyan tasarımı, yüksek performans ve uzaktan kumanda özelliği. Hemen inceleyin.', updated_at = NOW()
-WHERE sku = 'AVE-VOR-00013';
-
-
--- FILE: 20251212_fix_rls_performance.sql
--- Migration: Fix RLS Performance Issues
--- Date: 2025-12-12
--- Purpose: Resolve Supabase Advisor warnings for RLS initplan and multiple permissive policies
-
--- ============================================
--- SECTION 1: Consolidate Multiple Permissive Policies
--- ============================================
-
--- product_images: Consolidate UPDATE policies
-DO $$
-DECLARE r RECORD;
-BEGIN
-    -- Drop all existing UPDATE policies on product_images
-    FOR r IN SELECT policyname FROM pg_policies WHERE tablename = 'product_images' AND cmd = 'UPDATE' AND schemaname = 'public' LOOP
-        EXECUTE 'DROP POLICY IF EXISTS "' || r.policyname || '" ON product_images';
-        RAISE NOTICE 'Dropped product_images UPDATE policy: %', r.policyname;
-    END LOOP;
-END $$;
-
--- Recreate single consolidated UPDATE policy for product_images
-CREATE POLICY "product_images_update_consolidated"
-ON product_images FOR UPDATE
-TO authenticated
-USING (true)
-WITH CHECK (true);
-
--- venthub_order_items: Consolidate SELECT policies
-DO $$
-DECLARE r RECORD;
-BEGIN
-    FOR r IN SELECT policyname FROM pg_policies WHERE tablename = 'venthub_order_items' AND cmd = 'SELECT' AND schemaname = 'public' AND permissive = 'PERMISSIVE' LOOP
-        EXECUTE 'DROP POLICY IF EXISTS "' || r.policyname || '" ON venthub_order_items';
-        RAISE NOTICE 'Dropped venthub_order_items SELECT policy: %', r.policyname;
-    END LOOP;
-END $$;
-
--- Recreate single consolidated SELECT policy for venthub_order_items using subselect pattern
-CREATE POLICY "venthub_order_items_select_consolidated"
-ON venthub_order_items FOR SELECT
-TO authenticated
-USING (
-    order_id IN (
-        SELECT id FROM venthub_orders WHERE user_id = (SELECT auth.uid())
+      p.id, p.name, p.sku, p.model_code, p.brand, p.status, p.category_id, p.price, p.purchase_price, p.stock_qty, p.low_stock_threshold, p.is_featured, p.slug, ts_rank(
+        to_tsvector('turkish', coalesce(p.name, '') || ' ' ||
+          coalesce(p.model_code, '') || ' ' ||
+          coalesce(p.sku, '') || ' ' ||
+          coalesce(p.brand, '') || ' ' ||
+          coalesce(p.description, '') || ' ' ||
+          coalesce(p.technical_specs::text, '')
+        ), v_tsq
+      ) AS rank
+    FROM public.products p
+    WHERE (
+      p.name ILIKE '%' || v_raw_wildcard || '%'
+      OR p.model_code ILIKE '%' || v_raw_wildcard || '%'
+      OR p.sku ILIKE '%' || v_raw_wildcard || '%'
+      OR p.brand ILIKE '%' || v_raw_wildcard || '%'
+      OR p.slug ILIKE '%' || v_raw_wildcard || '%'
+      OR p.technical_specs::text ILIKE '%' || v_raw || '%'
+      OR to_tsvector('turkish', coalesce(p.name, '') || ' ' ||
+           coalesce(p.model_code, '') || ' ' ||
+           coalesce(p.sku, '') || ' ' ||
+           coalesce(p.brand, '') || ' ' ||
+           coalesce(p.description, '') || ' ' ||
+           coalesce(p.technical_specs::text, '')
+         ) @@ v_tsq
     )
-    OR
-    EXISTS (SELECT 1 FROM auth.users WHERE id = (SELECT auth.uid()) AND raw_user_meta_data->>'role' = 'admin')
-);
-
--- venthub_returns: Consolidate SELECT policies
-DO $$
-DECLARE r RECORD;
-BEGIN
-    FOR r IN SELECT policyname FROM pg_policies WHERE tablename = 'venthub_returns' AND cmd = 'SELECT' AND schemaname = 'public' AND permissive = 'PERMISSIVE' LOOP
-        EXECUTE 'DROP POLICY IF EXISTS "' || r.policyname || '" ON venthub_returns';
-        RAISE NOTICE 'Dropped venthub_returns SELECT policy: %', r.policyname;
-    END LOOP;
-END $$;
-
--- Recreate single consolidated SELECT policy for venthub_returns
-CREATE POLICY "venthub_returns_select_consolidated"
-ON venthub_returns FOR SELECT
-TO authenticated
-USING (
-    user_id = (SELECT auth.uid())
-    OR
-    EXISTS (SELECT 1 FROM auth.users WHERE id = (SELECT auth.uid()) AND raw_user_meta_data->>'role' = 'admin')
-);
-
--- ============================================
--- SECTION 2: Analyze tables to update statistics
--- ============================================
-ANALYZE products;
-ANALYZE product_images;
-ANALYZE venthub_order_items;
-ANALYZE venthub_returns;
-
--- ============================================
--- END OF MIGRATION
--- ============================================
-
-
--- FILE: 20251212_init_category_metadata.sql
--- Migration to initialize Category Metadata for new Landing Pages
--- Resolves "hybrid" data issues by moving hardcoded content into the database.
-
--- 0. Create metadata column if not exists
-ALTER TABLE categories ADD COLUMN IF NOT EXISTS metadata jsonb DEFAULT '{}'::jsonb;
-
--- 1. Fanlar (Industrial Fans)
-UPDATE categories 
-SET metadata = '{
-  "display_mode": "series", "hero_title": "Endüstriyel Havalandırma Çözümleri", "hero_description": "Yüksek performanslı, enerji verimli ve uzun ömürlü fan teknolojileri. Aksiyal, santrifüj ve jet fanlarda İtalyan mühendisliği.", "technical_summary": "15, 000+ m³/h Kapasite", "features": [
-    { "icon": "wind", "title": "Yüksek Performans", "description": "Optimize edilmiş kanat yapısı ile maksimum debi." }, { "icon": "zap", "title": "Enerji Verimliliği", "description": "EC motor teknolojisi ile %40''a varan tasarruf." }
-  ]
-}'::jsonb
-WHERE slug = 'fanlar';
-
--- 2. Hava Perdeleri (Air Curtains)
-UPDATE categories 
-SET metadata = '{
-  "display_mode": "series", "hero_title": "Ticari ve Endüstriyel Hava Perdeleri", "hero_description": "İşletmeniz için görünmez konfor bariyeri. İç ortam havasını korurken enerji tasarrufu sağlayın.", "technical_summary": "Görünmez Hava Bariyeri", "features": [
-    { "icon": "shield", "title": "İzolasyon", "description": "Dış ortam havasını ve tozunu etkili bir şekilde engeller." }, { "icon": "thermometer", "title": "İklim Koruma", "description": "Yazın serin, kışın sıcak havayı içeride tutar." }
-  ]
-}'::jsonb
-WHERE slug = 'hava-perdeleri';
-
--- 3. Isı Geri Kazanım (Heat Recovery)
-UPDATE categories 
-SET metadata = '{
-  "display_mode": "series", "hero_title": "Isı Geri Kazanım Sistemleri", "hero_description": "Taze hava kalitesinden ödün vermeden enerji tasarrufu yapın. %90''a varan verimlilik.", "technical_summary": "%90 Isı Verimliliği", "features": [
-    { "icon": "leaf", "title": "Eco-Friendly", "description": "Atık ısıyı geri kazanarak karbon ayak izini azaltır." }, { "icon": "activity", "title": "Hava Kalitesi", "description": "Sürekli taze hava sirkülasyonu sağlar." }
-  ]
-}'::jsonb
-WHERE slug = 'isi-geri-kazanim-cihazlari';
-
--- 4. Hava Temizleyiciler
-UPDATE categories 
-SET metadata = '{
-  "display_mode": "showcase", "hero_title": "Profesyonel Hava Temizleme", "hero_description": "HEPA ve UV-C teknolojisi ile virüs, bakteri ve alerjenlerden arınmış temiz hava.", "technical_summary": "HEPA + UV-C Filtrasyon", "features": [
-    { "icon": "shield-check", "title": "Anti-Viral", "description": "UV-C teknolojisi ile patojenleri etkisiz hale getirir." }, { "icon": "sparkles", "title": "HEPA Filtre", "description": "%99.97 partikül tutma kapasitesi." }
-  ]
-}'::jsonb
-WHERE slug = 'hava-temizleyiciler-anti-viral-urunler';
-
--- 5. Hız Kontrolü
-UPDATE categories 
-SET metadata = '{
-  "display_mode": "list", "hero_title": "Hassas Hız Kontrol Cihazları", "hero_description": "Fanlarınızın performansını optimize edin. Frekans invertörleri ve hız anahtarları.", "technical_summary": "Tam Kontrol", "features": [
-    { "icon": "settings", "title": "Hassas Ayar", "description": "İhtiyaca göre debi ve basınç kontrolü." }, { "icon": "cpu", "title": "Otomasyon", "description": "BMS sistemleri ile tam uyumlu entegrasyon." }
-  ]
-}'::jsonb
-WHERE slug = 'hiz-kontrolu-cihazlari';
-
--- 6. Aksesuarlar
-UPDATE categories 
-SET metadata = '{
-  "display_mode": "list", "hero_title": "HVAC Montaj Aksesuarları", "hero_description": "Profesyonel montaj için gerekli tüm bağlantı elemanları ve tamamlayıcı ürünler.", "technical_summary": "Tamamlayıcı Çözümler", "features": [
-    { "icon": "tool", "title": "Kolay Montaj", "description": "Uygulama süresini kısaltan pratik tasarımlar." }, { "icon": "layers", "title": "Dayanıklılık", "description": "Uzun ömürlü malzemelerden üretilmiştir." }
-  ]
-}'::jsonb
-WHERE slug = 'aksesuarlar';
-
--- 7. Flexible Kanallar
-UPDATE categories 
-SET metadata = '{
-  "display_mode": "list", "hero_title": "Flexible Hava Kanalları", "hero_description": "Esnek, dayanıklı ve izolasyonlu hava taşıma çözümleri.", "technical_summary": "Esnek & Dayanıklı", "features": [
-    { "icon": "maximize", "title": "Esneklik", "description": "Dar alanlarda kolay uygulama imkanı." }, { "icon": "shield", "title": "İzolasyon", "description": "Isı ve ses yalıtımlı seçenekler." }
-  ]
-}'::jsonb
-WHERE slug = 'flexible-hava-kanallari';
-
--- 8. Nem Alma
-UPDATE categories 
-SET metadata = '{
-  "display_mode": "showcase", "hero_title": "Nem Alma Cihazları", "hero_description": "İdeal nem dengesi için endüstriyel ve ev tipi profesyonel çözümler.", "technical_summary": "Nem Kontrolü", "features": [
-    { "icon": "droplet", "title": "Nem Kontrolü", "description": "İstenmeyen nemi ve küf oluşumunu engeller." }, { "icon": "home", "title": "Konfor", "description": "Sağlıklı ve konforlu yaşam alanları yaratır." }
-  ]
-}'::jsonb
-WHERE slug = 'nem-alma-cihazlari';
-
-
--- FILE: 20251215_advanced_search_final.sql
--- 20251215: Advanced Search & Autocomplete
--- Enables hybrid FTS + Trigram scoring and "Did you mean?" logic.
-
--- 1. Ensure extensions
-CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA extensions;
-
--- 2. Upgrade Search RPC (Hybrid Scoring)
-CREATE OR REPLACE FUNCTION public.fts_search_products(
-  p_q text, p_limit integer DEFAULT 20, p_filters jsonb DEFAULT '{}'::jsonb
-)
-RETURNS TABLE(
-  id uuid, name text, sku text, brand text, price numeric, rank real, is_fuzzy_match boolean
-)
-LANGUAGE sql
-STABLE
-SECURITY INVOKER
-SET search_path TO pg_catalog, public
-AS $$
-  WITH params AS (
-    SELECT
-      coalesce(p_q, '')::text AS raw, plainto_tsquery('turkish', coalesce(p_q, '')) AS tsq, LEAST(GREATEST(p_limit, 1), 100) AS lim, p_filters AS f
-  ), scoring AS (
-    SELECT 
-      p.id, p.name, p.sku, p.brand, p.price, -- Score 1: FTS Rank
-      ts_rank(
-        to_tsvector('turkish', coalesce(p.name, '') || ' ' || coalesce(p.model_code, '') || ' ' || coalesce(p.sku, '') || ' ' || coalesce(p.brand, '')), (SELECT tsq FROM params)
-      ) AS fts_score, -- Score 2: Trigram Similarity (name only for simplicity/speed)
-      similarity(p.name, (SELECT raw FROM params)) AS trgm_score
-    FROM public.products p, params x
-    WHERE 
-      p.status = 'active'
-      AND (
-        (NOT (x.f ? 'category_id')) OR (p.category_id = (x.f->>'category_id')::uuid)
-      )
+    AND (p_category_id IS NULL OR p.category_id = p_category_id)
   )
   SELECT
-    s.id, s.name, s.sku, s.brand, s.price, -- Hybrid Rank: FTS is primary (1.0), Trigram is boost (0.5)
-    (s.fts_score + (s.trgm_score * 0.5))::real AS rank, -- If FTS score is low/zero but Trigram is high, it's a fuzzy match
-    (s.fts_score < 0.1 AND s.trgm_score > 0.3) AS is_fuzzy_match
-  FROM scoring s, params x
-  WHERE
-    -- Return if either FTS matches OR Trigram similarity is good enough (>0.1)
-    s.fts_score > 0 OR s.trgm_score > 0.1
-    -- Also check direct SKU match separately? No, FTS handles it.
-  ORDER BY rank DESC
-  LIMIT x.lim;
-$$;
-
--- 3. New RPC: Search Suggestions (Autocomplete)
-CREATE OR REPLACE FUNCTION public.get_search_suggestions(
-  p_q text, p_limit integer DEFAULT 5
-)
-RETURNS TABLE(
-  type text, label text, url text, metadata jsonb
-)
-LANGUAGE sql
-STABLE
-SECURITY INVOKER
-SET search_path TO pg_catalog, public
-AS $$
-  WITH params AS (SELECT p_q AS raw), -- Product Suggestions
-  products AS (
-    SELECT
-      'product'::text AS type, name AS label, '/products/' || id AS url, jsonb_build_object('price', price, 'brand', brand) AS metadata, similarity(name, (SELECT raw FROM params)) AS sim
-    FROM public.products
-    WHERE status = 'active' 
-      AND (name ILIKE '%' || (SELECT raw FROM params) || '%' OR similarity(name, (SELECT raw FROM params)) > 0.1)
-    ORDER BY sim DESC
-    LIMIT 3
-  ), -- Category Suggestions
-  categories AS (
-    SELECT
-      'category'::text AS type, name AS label, '/category/' || slug AS url, jsonb_build_object('description', description) AS metadata, similarity(name, (SELECT raw FROM params)) AS sim
-    FROM public.categories
-    WHERE name ILIKE '%' || (SELECT raw FROM params) || '%'
-    ORDER BY sim DESC
-    LIMIT 2
-  ), -- Brand Suggestions
-  brands AS (
-    SELECT DISTINCT
-      'brand'::text AS type, brand AS label, '/products?brand=' || brand AS url, '{}'::jsonb AS metadata, similarity(brand, (SELECT raw FROM params)) AS sim
-    FROM public.products
-    WHERE brand ILIKE '%' || (SELECT raw FROM params) || '%'
-    LIMIT 1
-  )
-  SELECT type, label, url, metadata FROM products
-  UNION ALL
-  SELECT type, label, url, metadata FROM categories
-  UNION ALL
-  SELECT type, label, url, metadata FROM brands
-  LIMIT p_limit;
+    m.id, m.name, m.sku, m.model_code, m.brand, m.status, m.category_id, m.price, m.purchase_price, m.stock_qty, m.low_stock_threshold, m.is_featured, m.slug, m.rank, count(*) OVER() AS total_count
+  FROM matched m
+  ORDER BY m.rank DESC NULLS LAST, m.name ASC
+  LIMIT v_limit
+  OFFSET v_offset;
+END;
 $$;
 
 
--- FILE: 20251215_advanced_search_fix.sql
--- 20251215: Fix Filter Logic in Advanced Search
--- Adds support for brand, price_min, and price_max in the filter JSONB
-
-CREATE OR REPLACE FUNCTION public.fts_search_products(
-  p_q text, p_limit integer DEFAULT 20, p_filters jsonb DEFAULT '{}'::jsonb
-)
-RETURNS TABLE(
-  id uuid, name text, sku text, brand text, price numeric, rank real, is_fuzzy_match boolean
-)
-LANGUAGE sql
-STABLE
-SECURITY INVOKER
-SET search_path TO pg_catalog, public
-AS $$
-  WITH params AS (
-    SELECT
-      coalesce(p_q, '')::text AS raw, plainto_tsquery('turkish', coalesce(p_q, '')) AS tsq, LEAST(GREATEST(p_limit, 1), 100) AS lim, p_filters AS f
-  ), scoring AS (
-    SELECT 
-      p.id, p.name, p.sku, p.brand, p.price, -- Score 1: FTS Rank
-      ts_rank(
-        to_tsvector('turkish', coalesce(p.name, '') || ' ' || coalesce(p.model_code, '') || ' ' || coalesce(p.sku, '') || ' ' || coalesce(p.brand, '')), (SELECT tsq FROM params)
-      ) AS fts_score, -- Score 2: Trigram Similarity
-      similarity(p.name, (SELECT raw FROM params)) AS trgm_score
-    FROM public.products p, params x
-    WHERE 
-      p.status = 'active'
-      -- Category Filter
-      AND (
-        (NOT (x.f ? 'category_id')) OR (p.category_id = (x.f->>'category_id')::uuid)
-      )
-      -- Brand Filter
-      AND (
-        (NOT (x.f ? 'brand')) OR (p.brand = (x.f->>'brand'))
-      )
-      -- Price Min Filter
-      AND (
-        (NOT (x.f ? 'price_min')) OR (p.price >= (x.f->>'price_min')::numeric)
-      )
-      -- Price Max Filter
-      AND (
-        (NOT (x.f ? 'price_max')) OR (p.price <= (x.f->>'price_max')::numeric)
-      )
-  )
-  SELECT
-    s.id, s.name, s.sku, s.brand, s.price, (s.fts_score + (s.trgm_score * 0.5))::real AS rank, (s.fts_score < 0.1 AND s.trgm_score > 0.3) AS is_fuzzy_match
-  FROM scoring s, params x
-  WHERE
-    (s.fts_score > 0 OR s.trgm_score > 0.1)
-  ORDER BY rank DESC
-  LIMIT x.lim;
-$$;
-
-
--- FILE: 20251215_distribute_products.sql
--- 20251215: Distribute Products to Subcategories (Data Fix)
--- Moves products from Root categories to Subcategories based on Name keywords
-
-DO $$
-DECLARE
-  cat_id uuid;
-BEGIN
-  -- 1. Aksiyal Fanlar
-  SELECT id INTO cat_id FROM categories WHERE name ILIKE '%Aksiyal Fan%' LIMIT 1;
-  IF cat_id IS NOT NULL THEN
-    RAISE NOTICE 'Updating Aksiyal Fanlar (Category ID: %)', cat_id;
-    UPDATE products SET category_id = cat_id WHERE name ILIKE '%Aksiyal%' AND category_id != cat_id;
-  END IF;
-
-  -- 2. Radyal Fanlar
-  SELECT id INTO cat_id FROM categories WHERE name ILIKE '%Radyal Fan%' LIMIT 1;
-  IF cat_id IS NOT NULL THEN
-    RAISE NOTICE 'Updating Radyal Fanlar (Category ID: %)', cat_id;
-    UPDATE products SET category_id = cat_id WHERE name ILIKE '%Radyal%' AND category_id != cat_id;
-  END IF;
-
-  -- 3. Kanal Tipi Fanlar
-  SELECT id INTO cat_id FROM categories WHERE name ILIKE '%Kanal Tipi%' LIMIT 1;
-  IF cat_id IS NOT NULL THEN
-     RAISE NOTICE 'Updating Kanal Tipi Fanlar (Category ID: %)', cat_id;
-    UPDATE products SET category_id = cat_id WHERE name ILIKE '%Kanal Tipi%' AND category_id != cat_id;
-  END IF;
-  
-  -- 4. Çatı Tipi Fanlar
-  SELECT id INTO cat_id FROM categories WHERE name ILIKE '%Çatı Tipi%' LIMIT 1;
-  IF cat_id IS NOT NULL THEN
-    RAISE NOTICE 'Updating Çatı Tipi Fanlar (Category ID: %)', cat_id;
-    UPDATE products SET category_id = cat_id WHERE name ILIKE '%Çatı Tipi%' AND category_id != cat_id;
-  END IF;
-
-  -- 5. Jet Fanlar
-  SELECT id INTO cat_id FROM categories WHERE name ILIKE '%Jet Fan%' LIMIT 1;
-  IF cat_id IS NOT NULL THEN
-    RAISE NOTICE 'Updating Jet Fanlar (Category ID: %)', cat_id;
-    UPDATE products SET category_id = cat_id WHERE name ILIKE '%Jet Fan%' AND category_id != cat_id;
-  END IF;
-
-  -- 6. Duman Egzoz Fanları
-  SELECT id INTO cat_id FROM categories WHERE name ILIKE '%Duman%' AND name ILIKE '%Fan%' LIMIT 1;
-  IF cat_id IS NOT NULL THEN
-    RAISE NOTICE 'Updating Duman Egzoz Fanları (Category ID: %)', cat_id;
-    UPDATE products SET category_id = cat_id 
-    WHERE (name ILIKE '%Duman%' OR name ILIKE '%Egzoz%') 
-    AND category_id != cat_id 
-    AND name NOT ILIKE '%Jet%'; -- Exclude Jet Fans if matched
-  END IF;
-
-  -- 7. Hava Perdeleri (Isıtıcılı)
-  SELECT id INTO cat_id FROM categories WHERE name ILIKE '%Isıtıcılı%' AND name ILIKE '%Perde%' LIMIT 1;
-  IF cat_id IS NOT NULL THEN
-    RAISE NOTICE 'Updating Isıtıcılı Hava Perdeleri (Category ID: %)', cat_id;
-    UPDATE products SET category_id = cat_id WHERE name ILIKE '%Isıtıcılı%' AND category_id != cat_id;
-  END IF;
-
-   -- 8. Hava Perdeleri (Isıtıcısız)
-  SELECT id INTO cat_id FROM categories WHERE name ILIKE '%Isıtıcısız%' AND name ILIKE '%Perde%' LIMIT 1;
-  IF cat_id IS NOT NULL THEN
-    RAISE NOTICE 'Updating Isıtıcısız Hava Perdeleri (Category ID: %)', cat_id;
-    UPDATE products SET category_id = cat_id WHERE name ILIKE '%Isıtıcısız%' AND category_id != cat_id;
-  END IF;
-
-END $$;
-
-
--- FILE: 20251215_distribute_products_v2.sql
--- 20251215_distribute_products_v2.sql
--- Smart product distribution to subcategories based on product name keywords
--- This runs as a DB migration, bypassing RLS
-
-DO $$
-DECLARE
-  subcat_rec RECORD;
-  updated_count INT;
-BEGIN
-  -- ============ FANLAR SUBCATEGORIES ============
-  
-  -- Sessiz Kanal Tipi Fanlar (matches "Quiet", "Lineo...Quiet")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'sessiz-kanal-tipi-fanlar';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%Quiet%' OR name ILIKE '%Sessiz%' OR name ILIKE '%Silent%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Sessiz Kanal Tipi Fanlar: % updated', updated_count;
-  END IF;
-
-  -- Kanal Tipi Fanlar (matches "Lineo", "CA-IL", "Kanal Tipi" but NOT "Quiet")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'kanal-tipi-fanlar';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%Lineo%' OR name ILIKE '%CA-IL%' OR name ILIKE '%Kanal Tipi%')
-      AND name NOT ILIKE '%Quiet%'
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Kanal Tipi Fanlar: % updated', updated_count;
-  END IF;
-
-  -- Otopark Jet Fanları (matches "Jet Fan", "TJF", "JPF")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'otopark-jet-fanlari';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%Jet Fan%' OR name ILIKE '%TJF%' OR name ILIKE '%JPF%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Otopark Jet Fanları: % updated', updated_count;
-  END IF;
-
-  -- Çatı Tipi Fanlar (matches "Çatı", "Roof", "TRM", "TRT", "TORRETTE")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'cati-tipi-fanlar';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%Çatı%' OR name ILIKE '%Roof%' OR name ILIKE '%TRM%' OR name ILIKE '%TRT%' OR name ILIKE '%TORRETTE%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Çatı Tipi Fanlar: % updated', updated_count;
-  END IF;
-
-  -- Duman Egzoz Fanları (matches "Duman", "THGT", "F400", "F300", "Smoke")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'duman-egzoz-fanlari';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%Duman%' OR name ILIKE '%THGT%' OR name ILIKE '%F400%' OR name ILIKE '%F300%' OR name ILIKE '%Smoke%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Duman Egzoz Fanları: % updated', updated_count;
-  END IF;
-
-  -- Sığınak Havalandırma Fanları (matches "Sığınak", "BVU", "Shelter")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'siginak-havalandirma-fanlari';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%Sığınak%' OR name ILIKE '%BVU%' OR name ILIKE '%Shelter%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Sığınak Havalandırma Fanları: % updated', updated_count;
-  END IF;
-
-  -- Nicotra Gebhardt Fanlar (matches "NICOTRA", "GEBHARDT", "DD ", "ADH")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'nicotra-gebhardt-fanlar';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%NICOTRA%' OR name ILIKE '%GEBHARDT%' OR name ILIKE 'DD %' OR name ILIKE '% DD %' OR name ILIKE '%ADH%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Nicotra Gebhardt Fanlar: % updated', updated_count;
-  END IF;
-
-  -- Duvar Tipi Kompakt Aksiyal Fanlar (matches "Vario", "Punto", "Duvar")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'duvar-tipi-kompakt-aksiyal-fanlar';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%Vario%' OR name ILIKE '%Punto%' OR name ILIKE '%Duvar%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Duvar Tipi Kompakt Aksiyal Fanlar: % updated', updated_count;
-  END IF;
-
-  -- ============ HAVA PERDELERİ SUBCATEGORIES ============
-  
-  -- Elektrikli Isıtıcılı (matches "AD-H", "AD-E", "Elektrikli", "Isıtıcılı")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'elektrikli-isitici';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%AD-H%' OR name ILIKE '%AD-E%' OR name ILIKE '%Elektrikli%' OR name ILIKE '%Isıtıcılı%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Elektrikli Isıtıcılı: % updated', updated_count;
-  END IF;
-
-  -- Ortam Havalı (matches "AD-" without "AD-H", "AD-E" or "Isıtıcısız")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'ortam-havali';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%Isıtıcısız%' OR name ILIKE '%Ambient%' OR name ILIKE '%Ortam Havalı%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Ortam Havalı: % updated', updated_count;
-  END IF;
-
-  -- ============ ISI GERİ KAZANIM SUBCATEGORIES ============
-
-  -- Konut Tipi (matches "HRS", "Konut", "Alüminyum Eşanjör")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'konut-tipi-isi-geri-kazanim';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%HRS%' OR name ILIKE '%Konut%' OR name ILIKE '%Alüminyum Eşanjör%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'Konut Tipi IGK: % updated', updated_count;
-  END IF;
-
-  -- ============ HIZ KONTROLÜ SUBCATEGORIES ============
-
-  -- DANFOSS (matches "DANFOSS", "VLT", "FC ")
-  SELECT id INTO subcat_rec FROM categories WHERE slug = 'danfoss';
-  IF subcat_rec.id IS NOT NULL THEN
-    UPDATE products SET category_id = subcat_rec.id
-    WHERE (name ILIKE '%DANFOSS%' OR name ILIKE '%VLT%')
-      AND category_id != subcat_rec.id;
-    GET DIAGNOSTICS updated_count = ROW_COUNT;
-    RAISE NOTICE 'DANFOSS: % updated', updated_count;
-  END IF;
-
-END $$;
-
-
--- FILE: 20251218_wizard_selections.sql
--- Wizard Selections - Kullanıcı Seçim Kayıt Sistemi
--- Amaç: Hukuki koruma için wizard seçimlerinin kaydedilmesi
--- Tarih: 2024-12-18
-
--- =====================================================
--- wizard_selections tablosu
--- Kullanıcının wizard'da yaptığı tüm seçimleri saklar
--- =====================================================
-
-CREATE TABLE IF NOT EXISTS public.wizard_selections (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Kullanıcı bilgileri
-    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL, session_id TEXT NOT NULL, -- Kapı boyutları (giriş)
-    door_width_cm INT NOT NULL, door_height_cm INT NOT NULL, -- Kullanım ve sektör
-    usage_location TEXT, -- 'entrance', 'cold-storage', 'industrial', 'retail'
-    sector TEXT, -- Çevresel koşullar
-    wind_condition TEXT, -- 'none', 'light', 'moderate', 'strong'
-    traffic_intensity TEXT, -- 'low', 'medium', 'high'
-    
-    -- Isıtma
-    heating_needed TEXT, -- 'yes', 'no', 'unsure'
-    climate_zone TEXT, -- 'cold', 'moderate', 'warm'
-    
-    -- Hesaplama sonuçları
-    calculated_airflow_m3h INT, calculated_nozzle_velocity DECIMAL(5, 2), calculated_power_w INT, -- Önerilen ve seçilen ürünler
-    recommended_series TEXT, -- 'elektrikli-isitici', 'ortam-havali'
-    recommended_product_ids UUID[], selected_product_id UUID REFERENCES public.products(id) ON DELETE SET NULL, -- Meta
-    created_at TIMESTAMPTZ DEFAULT NOW(), ip_address INET, user_agent TEXT, -- Sipariş ile eşleştirme
-    order_id UUID REFERENCES public.venthub_orders(id) ON DELETE SET NULL
-);
-
--- =====================================================
--- İndeksler
--- =====================================================
-
-CREATE INDEX IF NOT EXISTS idx_wizard_selections_user_id ON public.wizard_selections(user_id);
-CREATE INDEX IF NOT EXISTS idx_wizard_selections_session_id ON public.wizard_selections(session_id);
-CREATE INDEX IF NOT EXISTS idx_wizard_selections_created_at ON public.wizard_selections(created_at);
-CREATE INDEX IF NOT EXISTS idx_wizard_selections_order_id ON public.wizard_selections(order_id);
-
--- =====================================================
--- RLS Politikaları
--- =====================================================
-
-ALTER TABLE public.wizard_selections ENABLE ROW LEVEL SECURITY;
-
--- Kullanıcılar kendi kayıtlarını görebilir
-CREATE POLICY "Users can view own selections"
-    ON public.wizard_selections
-    FOR SELECT
-    TO authenticated
-    USING (
-        user_id = (SELECT auth.uid())
-        OR session_id = current_setting('app.session_id', true)
-    );
-
--- Anonim kullanıcılar dahil herkes kayıt oluşturabilir
-CREATE POLICY "Anyone can insert selections"
-    ON public.wizard_selections
-    FOR INSERT
-    TO anon, authenticated
-    WITH CHECK (true);
-
--- Admin tüm kayıtları görebilir
-CREATE POLICY "Admin can view all selections"
-    ON public.wizard_selections
-    FOR SELECT
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.admin_users
-            WHERE admin_users.user_id = (SELECT auth.uid())
-        )
-    );
-
--- Admin sipariş eşleştirmesi yapabilir
-CREATE POLICY "Admin can update selections"
-    ON public.wizard_selections
-    FOR UPDATE
-    TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.admin_users
-            WHERE admin_users.user_id = (SELECT auth.uid())
-        )
-    );
-
--- =====================================================
--- Yorum
--- =====================================================
-
-COMMENT ON TABLE public.wizard_selections IS 'Hava perdesi seçim wizard kaydları - hukuki koruma amaçlı';
-COMMENT ON COLUMN public.wizard_selections.session_id IS 'Anonim kullanıcılar için oturum tanımlayıcı';
-COMMENT ON COLUMN public.wizard_selections.calculated_airflow_m3h IS 'Formül ile hesaplanan gerekli debi (m³/h)';
-COMMENT ON COLUMN public.wizard_selections.order_id IS 'Bu seçimle ilişkilendirilen sipariş (varsa)';
-
-
--- FILE: 20251222_create_contact_messages.sql
--- Create Enums
-DO $$ BEGIN
-    CREATE TYPE contact_department AS ENUM ('sales', 'support', 'consulting');
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
-    CREATE TYPE contact_status AS ENUM ('new', 'read', 'archived');
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-
--- Create Table
-CREATE TABLE IF NOT EXISTS contact_messages (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL, phone TEXT, company TEXT, subject TEXT NOT NULL, message TEXT NOT NULL, department contact_department NOT NULL DEFAULT 'sales', status contact_status NOT NULL DEFAULT 'new', created_at TIMESTAMPTZ DEFAULT now(), ip_address TEXT -- Security auditing
-);
-
--- Enable RLS
-ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
-
--- Policies
--- 1. Allow public inserts (Anyone can contact)
-CREATE POLICY "Public can insert contact messages" 
-ON contact_messages 
-FOR INSERT 
-WITH CHECK (true);
-
--- 2. Allow admins to view messages (assuming user_profiles has role column check, otherwise strictly service_role)
--- For safety/simplicity initially, we restrict to service_role or we can add a basic check.
--- We'll allow 'service_role' (implicit override) and authenticated admins.
-CREATE POLICY "Admins can view messages" 
-ON contact_messages 
-FOR SELECT 
-TO authenticated
-USING (
-    EXISTS (
-        SELECT 1 FROM user_profiles 
-        WHERE id = auth.uid() 
-        AND role = 'admin'
-    )
-);
-
--- Grant permissions needed for anon/authenticated to insert
-GRANT INSERT ON contact_messages TO anon, authenticated;
-GRANT SELECT ON contact_messages TO authenticated; -- needed for admin policy
-
-
--- FILE: 20260101_advisor_complete_fix.sql
--- ============================================================================
--- Supabase Advisor Complete Fix (2026-01-01 v3)
--- Fixes ALL remaining security and performance warnings
--- ============================================================================
-
--- ============================================================================
--- PART 1: SECURITY - Fix Function Search Paths (4 functions)
--- ============================================================================
-
--- These functions exist but need search_path set
-ALTER FUNCTION IF EXISTS public.reverse_inventory_batch(uuid, integer) SET search_path = pg_catalog, public;
-ALTER FUNCTION IF EXISTS public.bump_rate_limit(text, integer, integer) SET search_path = pg_catalog, public;
-ALTER FUNCTION IF EXISTS public.enforce_role_change() SET search_path = pg_catalog, public;
-ALTER FUNCTION IF EXISTS public.update_updated_at_column() SET search_path = pg_catalog, public;
-
--- ============================================================================
--- PART 2: PERFORMANCE - Fix duplicate index on cart_items
--- ============================================================================
-
-DROP INDEX IF EXISTS public.cart_items_cart_product_unique;
--- Keep cart_items_cart_product_uniq
-
--- ============================================================================
--- PART 3: PERFORMANCE - Consolidate wizard_selections policies
--- Drop ALL existing and create single optimized policies
--- ============================================================================
-
-DROP POLICY IF EXISTS "Users can view own selections" ON public.wizard_selections;
-DROP POLICY IF EXISTS "merged_wizard_selections_authenticated_select" ON public.wizard_selections;
-DROP POLICY IF EXISTS "Anyone can insert selections" ON public.wizard_selections;
-DROP POLICY IF EXISTS "merged_wizard_selections_anon_insert" ON public.wizard_selections;
-DROP POLICY IF EXISTS "merged_wizard_selections_authenticated_insert" ON public.wizard_selections;
-DROP POLICY IF EXISTS "wizard_selections_user_all" ON public.wizard_selections;
-DROP POLICY IF EXISTS "wizard_selections_admin_read" ON public.wizard_selections;
-
--- Consolidated policies with initplan optimization
-CREATE POLICY "wizard_selections_anon_insert" ON public.wizard_selections
-    FOR INSERT TO anon WITH CHECK (true);
-
-CREATE POLICY "wizard_selections_auth_all" ON public.wizard_selections
-    FOR ALL TO authenticated
-    USING (user_id = (SELECT auth.uid()))
-    WITH CHECK (user_id = (SELECT auth.uid()));
-
--- ============================================================================
--- PART 4: PERFORMANCE - Consolidate cart_items policies
--- Policies causing issues: cart_items_modify_own, cart_items_policy
--- ============================================================================
-
-DROP POLICY IF EXISTS "cart_items_modify_own" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_policy" ON public.cart_items;
-DROP POLICY IF EXISTS "cart_items_user_all" ON public.cart_items;
-
--- Single consolidated policy
-CREATE POLICY "cart_items_all" ON public.cart_items
-    FOR ALL TO authenticated
-    USING (
-        cart_id IN (
-            SELECT id FROM public.shopping_carts
-            WHERE user_id = (SELECT auth.uid())
-        )
-    )
-    WITH CHECK (
-        cart_id IN (
-            SELECT id FROM public.shopping_carts
-            WHERE user_id = (SELECT auth.uid())
-        )
-    );
-
--- ============================================================================
--- PART 5: PERFORMANCE - Consolidate shopping_carts policies
--- Policies causing issues: shopping_carts_modify_own, shopping_carts_policy, shopping_carts_select_own
--- ============================================================================
-
-DROP POLICY IF EXISTS "shopping_carts_modify_own" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_policy" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_select_own" ON public.shopping_carts;
-DROP POLICY IF EXISTS "shopping_carts_user_all" ON public.shopping_carts;
-
--- Single consolidated policy
-CREATE POLICY "shopping_carts_all" ON public.shopping_carts
-    FOR ALL TO authenticated
-    USING (user_id = (SELECT auth.uid()))
-    WITH CHECK (user_id = (SELECT auth.uid()));
-
--- ============================================================================
--- PART 6: PERFORMANCE - Consolidate products policies
--- Policies causing issues: merged_products_*, products_*_policy
--- ============================================================================
-
-DROP POLICY IF EXISTS "merged_products_anon_select" ON public.products;
-DROP POLICY IF EXISTS "products_select_policy" ON public.products;
-DROP POLICY IF EXISTS "merged_products_authenticated_delete" ON public.products;
-DROP POLICY IF EXISTS "products_delete_policy" ON public.products;
-DROP POLICY IF EXISTS "merged_products_authenticated_insert" ON public.products;
-DROP POLICY IF EXISTS "products_insert_policy" ON public.products;
-DROP POLICY IF EXISTS "merged_products_authenticated_update" ON public.products;
-DROP POLICY IF EXISTS "products_update_policy" ON public.products;
-DROP POLICY IF EXISTS "products_public_read" ON public.products;
-
--- Public read
-CREATE POLICY "products_read" ON public.products
-    FOR SELECT TO anon, authenticated
-    USING (true);
-
--- Admin write (insert, update, delete)
-CREATE POLICY "products_admin_write" ON public.products
-    FOR ALL TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.user_profiles
-            WHERE id = (SELECT auth.uid())
-            AND role IN ('admin', 'superadmin')
-        )
-    )
-    WITH CHECK (
-        EXISTS (
-            SELECT 1 FROM public.user_profiles
-            WHERE id = (SELECT auth.uid())
-            AND role IN ('admin', 'superadmin')
-        )
-    );
-
--- ============================================================================
--- PART 7: PERFORMANCE - Consolidate user_invoice_profiles policies
--- Policies causing issues: merged_user_invoice_profiles_*, user_invoice_profiles_*
--- ============================================================================
-
-DROP POLICY IF EXISTS "merged_user_invoice_profiles_authenticated_delete" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "user_invoice_profiles_delete" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "merged_user_invoice_profiles_authenticated_insert" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "user_invoice_profiles_insert" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "merged_user_invoice_profiles_authenticated_select" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "user_invoice_profiles_select" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "merged_user_invoice_profiles_authenticated_update" ON public.user_invoice_profiles;
-DROP POLICY IF EXISTS "user_invoice_profiles_update" ON public.user_invoice_profiles;
-
--- Single consolidated policy for user's own profiles
-CREATE POLICY "user_invoice_profiles_own" ON public.user_invoice_profiles
-    FOR ALL TO authenticated
-    USING (user_id = (SELECT auth.uid()))
-    WITH CHECK (user_id = (SELECT auth.uid()));
-
--- ============================================================================
--- Done - All advisor warnings should be resolved (except password which is auth config)
--- ============================================================================
-
-
--- FILE: 20260101_advisor_definitive_fix.sql
--- ============================================================================
--- Supabase Advisor Definitive Fix (2026-01-01 FINAL)
--- Uses CREATE OR REPLACE to properly set search_path for all functions
--- ============================================================================
-
--- ============================================================================
--- PART 1: Fix bump_rate_limit with full function body + search_path
--- ============================================================================
-
-CREATE OR REPLACE FUNCTION public.bump_rate_limit(p_key text, p_limit int, p_window_seconds int)
-RETURNS TABLE(allowed boolean, remaining int, reset_at timestamptz)
-LANGUAGE plpgsql
-SECURITY INVOKER
-SET search_path = pg_catalog, public
-AS $$
+--
+-- Name: bump_rate_limit(text, integer, integer); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.bump_rate_limit(p_key text, p_limit integer, p_window_seconds integer) RETURNS TABLE(allowed boolean, remaining integer, reset_at timestamp with time zone)
+    LANGUAGE plpgsql
+    SET search_path TO 'pg_catalog', 'public'
+    AS $$
 DECLARE
   now_ts timestamptz := now();
   bucket_ts timestamptz := date_trunc('minute', now_ts);
@@ -9506,20 +2673,146 @@ BEGIN
   END IF;
 END $$;
 
--- ============================================================================
--- PART 2: Fix enforce_role_change with full function body + search_path
--- ============================================================================
 
-CREATE OR REPLACE FUNCTION public.enforce_role_change()` → trigger
+--
+-- Name: custom_access_token_hook(jsonb); Type: FUNCTION; Schema: public; Owner: -
+--
 
-### `get_products_enriched(p_category_ids uuid[] DEFAULT NULL, p_limit int DEFAULT 50, p_offset int DEFAULT 0, p_search_query text DEFAULT NULL, p_sort_by text DEFAULT 'name', p_brand text DEFAULT NULL, p_min_price numeric DEFAULT NULL, p_max_price numeric DEFAULT NULL
-)
-RETURNS TABLE (
-  id uuid, name text, brand text, price numeric, sku text, slug text, model_code text, category_id uuid, subcategory_id uuid, status text, is_featured boolean, description text, image_url text, image_alt text, stock_qty int, low_stock_threshold int, low_stock_override boolean, technical_specs jsonb, airflow_capacity numeric, noise_level numeric, pressure_rating numeric, created_at timestamptz, updated_at timestamptz, warehouse_location text, supplier_name text
-) 
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
+CREATE FUNCTION public.custom_access_token_hook(event jsonb)` → jsonb
+
+### `enforce_role_change()` → trigger
+
+### `fn_admin_get_orders(p_id text DEFAULT NULL::text, p_conv text DEFAULT NULL::text, p_status text DEFAULT NULL::text, p_limit integer DEFAULT 10) RETURNS SETOF public.venthub_orders
+    LANGUAGE sql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+  select *
+  from venthub_orders
+  where (p_id is null or id = p_id::uuid)
+    and (p_conv is null or conversation_id = p_conv)
+    and (p_status is null or status = p_status)
+  order by created_at desc
+  limit coalesce(p_limit, 10);
+$$;
+
+
+--
+-- Name: fn_admin_update_order_status(text, text, text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.fn_admin_update_order_status(p_id text DEFAULT NULL::text, p_status text DEFAULT NULL::text, p_conv text DEFAULT NULL::text) RETURNS public.venthub_orders
+    LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+declare
+  v_row venthub_orders;
+begin
+  update venthub_orders
+     set status = p_status
+   where (p_id is not null and id = p_id::uuid)
+      or (p_id is null and p_conv is not null and conversation_id = p_conv)
+  returning * into v_row;
+
+  return v_row;
+end;
+$$;
+
+
+--
+-- Name: fn_auto_categorize_products(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.fn_auto_categorize_products()` → void
+
+### `fn_enrich_product_specs()` → void
+
+### `fts_search_products(p_q text, p_limit integer DEFAULT 20, p_filters jsonb DEFAULT '{}'::jsonb) RETURNS TABLE(id uuid, name text, sku text, brand text, price numeric, rank real)
+    LANGUAGE plpgsql STABLE
+    SET search_path TO 'pg_catalog', 'public'
+    AS $$
+DECLARE
+  v_limit int;
+  v_tsq tsquery;
+  v_raw text;
+  v_raw_wildcard text;
+BEGIN
+  v_limit := LEAST(GREATEST(p_limit, 1), 100);
+  v_raw := coalesce(p_q, '');
+  v_raw_wildcard := replace(v_raw, ' ', '%');
+  v_tsq := plainto_tsquery('turkish', v_raw);
+
+  RETURN QUERY
+  SELECT p.id, p.name, p.sku, p.brand, p.price, ts_rank(
+           to_tsvector('turkish', coalesce(p.name, '') || ' ' || 
+             coalesce(p.model_code, '') || ' ' || 
+             coalesce(p.sku, '') || ' ' || 
+             coalesce(p.brand, '') || ' ' ||
+             coalesce(p.description, '') || ' ' ||
+             coalesce(p.technical_specs::text, '')
+           ), v_tsq
+         ) AS rank
+  FROM public.products p
+  WHERE (
+    p.name ILIKE '%' || v_raw_wildcard || '%'
+    OR p.model_code ILIKE '%' || v_raw_wildcard || '%'
+    OR p.sku ILIKE '%' || v_raw_wildcard || '%'
+    OR p.brand ILIKE '%' || v_raw_wildcard || '%'
+    OR p.description ILIKE '%' || v_raw_wildcard || '%'
+    OR p.technical_specs::text ILIKE '%' || v_raw || '%'
+    OR to_tsvector('turkish', coalesce(p.name, '') || ' ' || 
+         coalesce(p.model_code, '') || ' ' || 
+         coalesce(p.sku, '') || ' ' || 
+         coalesce(p.brand, '') || ' ' ||
+         coalesce(p.description, '') || ' ' ||
+         coalesce(p.technical_specs::text, '')
+       ) @@ v_tsq
+  )
+  AND (
+    (NOT (p_filters ? 'category_id')) OR (p.category_id = (p_filters->>'category_id')::uuid)
+  )
+  AND p.status = 'active'
+  ORDER BY rank DESC NULLS LAST, p.name ASC
+  LIMIT v_limit;
+END;
+$$;
+
+
+--
+-- Name: generate_order_number(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.generate_order_number()` → character varying
+
+### `get_admin_users() RETURNS TABLE(id uuid, email character varying, created_at timestamp with time zone, role text, full_name text)
+    LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO 'public', 'pg_temp'
+    AS $$
+BEGIN
+  -- Admin kontrolü
+  IF NOT EXISTS (
+    SELECT 1 FROM user_profiles 
+    WHERE user_profiles.id = auth.uid() AND user_profiles.role IN ('admin', 'superadmin', 'super_admin')
+  ) THEN
+    RAISE EXCEPTION 'Access denied: Admin role required';
+  END IF;
+  
+  -- Admin ise kullanıcıları döndür
+  RETURN QUERY
+  SELECT u.id, u.email, u.created_at, p.role, p.full_name
+  FROM auth.users u
+  LEFT JOIN user_profiles p ON u.id = p.id;
+END;
+$$;
+
+
+--
+-- Name: get_products_enriched(uuid[], integer, integer, text, text, text, numeric, numeric); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.get_products_enriched(p_category_ids uuid[] DEFAULT NULL::uuid[], p_limit integer DEFAULT 50, p_offset integer DEFAULT 0, p_search_query text DEFAULT NULL::text, p_sort_by text DEFAULT 'name'::text, p_brand text DEFAULT NULL::text, p_min_price numeric DEFAULT NULL::numeric, p_max_price numeric DEFAULT NULL::numeric) RETURNS TABLE(id uuid, name text, brand text, price numeric, sku text, slug text, model_code text, category_id uuid, subcategory_id uuid, status text, is_featured boolean, description text, image_url text, image_alt text, stock_qty integer, low_stock_threshold integer, low_stock_override boolean, technical_specs jsonb, airflow_capacity numeric, noise_level numeric, pressure_rating numeric, created_at timestamp with time zone, updated_at timestamp with time zone, warehouse_location text, supplier_name text)
+    LANGUAGE plpgsql
+    SET search_path TO 'public', 'extensions'
+    AS $$
 BEGIN
   RETURN QUERY
   WITH first_images AS (
@@ -9555,488 +2848,282 @@ END;
 $$;
 
 
--- FILE: 20260401000000_add_categories_display_mode.sql
--- Migration: Add display_mode column to Categories and seed data
+--
+-- Name: get_search_suggestions(text, integer); Type: FUNCTION; Schema: public; Owner: -
+--
 
-ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS display_mode TEXT DEFAULT 'series';
+CREATE FUNCTION public.get_search_suggestions(p_q text, p_limit integer DEFAULT 6) RETURNS TABLE(type text, label text, url text, metadata jsonb)
+    LANGUAGE plpgsql STABLE
+    SET search_path TO 'pg_catalog', 'public'
+    AS $$
+DECLARE
+  v_limit int;
+  v_raw text;
+  v_like text;
+BEGIN
+  v_limit := LEAST(GREATEST(p_limit, 1), 20);
+  v_raw   := coalesce(trim(p_q), '');
+  
+  IF v_raw = '' THEN
+    RETURN;
+  END IF;
 
--- Update showcase slugs
-UPDATE public.categories 
-SET display_mode = 'showcase' 
-WHERE slug IN (
-    'residential-ventilation', 'industrial-ventilation', 'commercial-ventilation', 'heat-recovery-vmc', 'air-treatment', 'hygiene-sanitizer', 'summer-ventilation', 'air-conditioning', 'electric-heating', 'industrial-ceiling-fans', 'accessories-components', 'smart-home'
-);
+  v_like := '%' || replace(v_raw, ' ', '%') || '%';
 
--- Update landing slugs
-UPDATE public.categories 
-SET display_mode = 'landing' 
-WHERE slug IN (
-    'hava-perdeleri', 'sessiz-kanal-tipi-fanlar', 'nem-alma-cihazlari'
-);
-
-
--- FILE: 20260401175136_update_categories_slug.sql
--- ============================================================
--- KATEGORI SLUG INGILIZCE GUNCELLEMESI (P04-016)
--- ============================================================
--- Bu migration tablodaki mevcut Turkce sluglari uluslararası
--- standardlara gecirmek icin cevirir. products tablosu UUID ile
--- category_id referansi kullandigindan Foreign Key'ler bozulmaz. 
--- ============================================================
-
-BEGIN;
-
-UPDATE categories SET slug = 'fans', name = 'Fans' WHERE slug = 'fanlar';
-UPDATE categories SET slug = 'air-curtains', name = 'Air Curtains' WHERE slug = 'hava-perdeleri';
-UPDATE categories SET slug = 'heat-recovery-units', name = 'Heat Recovery Units' WHERE slug = 'isi-geri-kazanim-cihazlari';
-UPDATE categories SET slug = 'air-purifiers', name = 'Air Purifiers' WHERE slug = 'hava-temizleyiciler-anti-viral-urunler';
-UPDATE categories SET slug = 'speed-controllers', name = 'Speed Controllers' WHERE slug = 'hiz-kontrolu-cihazlari';
-UPDATE categories SET slug = 'accessories', name = 'Accessories' WHERE slug = 'aksesuarlar';
-UPDATE categories SET slug = 'flexible-air-ducts', name = 'Flexible Air Ducts' WHERE slug = 'flexible-hava-kanallari';
-UPDATE categories SET slug = 'dehumidifiers', name = 'Dehumidifiers' WHERE slug = 'nem-alma-cihazlari';
-
--- Zaten onceki migrationlarda olan veya taslak olan alt kategoriler icin (opsiyonel guvenlik guncellemeleri):
-UPDATE categories SET slug = 'industrial-ventilation', name = 'Industrial Ventilation' WHERE slug = 'endustriyel-havalandirma';
-UPDATE categories SET slug = 'commercial-ventilation', name = 'Commercial Ventilation' WHERE slug = 'ticari-havalandirma';
-UPDATE categories SET slug = 'residential-ventilation', name = 'Residential Ventilation' WHERE slug = 'konut-tipi-havalandirma';
-UPDATE categories SET slug = 'smoke-exhaust-fans', name = 'Smoke Exhaust Fans' WHERE slug = 'duman-egzoz-fanlari';
-UPDATE categories SET slug = 'jet-fans', name = 'Jet Fans' WHERE slug = 'otopark-jet-fanlari';
-
-COMMIT;
-
-
--- FILE: 20260402000000_security_and_performance_hardening.sql
--- =============================================================================
--- VentHub: Güvenlik Sertleştirme ve Performans Optimizasyonu
--- Tarih: 2026-04-02
--- Kaynak: Supabase Advisor Audit (2026-04-01)
--- =============================================================================
-
-BEGIN;
-
--- -----------------------------------------------------------------------------
--- 1. SECURITY DEFINER VIEW → SECURITY INVOKER
--- Sorun: View yaratıcısının RLS'i sorgulayan kullanıcıya dayatıyordu
--- Çözüm: security_invoker = true ile sorgulayanın yetkileri geçerli olur
--- -----------------------------------------------------------------------------
-
-DROP VIEW IF EXISTS public.inventory_summary;
-CREATE VIEW public.inventory_summary
-  WITH (security_invoker = true)
-AS
- WITH movement_stats AS (
-         SELECT inventory_movements.product_id, COALESCE(sum(abs(inventory_movements.delta)), (0)::bigint) AS total_out_30d
-           FROM inventory_movements
-          WHERE ((inventory_movements.delta < 0)
-            AND ((inventory_movements.reason = 'sale'::text) OR (inventory_movements.reason = 'manual_out'::text))
-            AND (inventory_movements.created_at >= (now() - '30 days'::interval)))
-          GROUP BY inventory_movements.product_id
-        )
- SELECT p.id AS product_id, p.stock_qty, COALESCE(m.total_out_30d, (0)::bigint) AS total_out_30d, round(((COALESCE(m.total_out_30d, (0)::bigint))::numeric / 30.0), 2) AS daily_velocity, CASE
-        WHEN (COALESCE(m.total_out_30d, (0)::bigint) = 0) THEN (9999)::numeric
-        ELSE round(((p.stock_qty)::numeric / ((COALESCE(m.total_out_30d, (0)::bigint))::numeric / 30.0)))
-    END AS days_until_empty, (COALESCE(p.purchase_price, (0)::numeric) * (p.stock_qty)::numeric) AS capital_tied_up, CASE
-        WHEN (COALESCE(m.total_out_30d, (0)::bigint) >= 10) THEN 'A'::text
-        WHEN (COALESCE(m.total_out_30d, (0)::bigint) >= 3) THEN 'B'::text
-        ELSE 'C'::text
-    END AS abc_class
-   FROM (products p
-     LEFT JOIN movement_stats m ON ((p.id = m.product_id)));
-
-DROP VIEW IF EXISTS public.inventory_velocity;
-CREATE VIEW public.inventory_velocity
-  WITH (security_invoker = true)
-AS
- WITH reserved AS (
-         SELECT voi.product_id, (sum(voi.quantity))::integer AS reserved_qty
-           FROM (venthub_order_items voi
-             JOIN venthub_orders o ON ((o.id = voi.order_id)))
-          WHERE ((o.status = ANY (ARRAY['confirmed'::text, 'paid'::text, 'processing'::text]))
-            AND (o.shipped_at IS NULL))
-          GROUP BY voi.product_id
-        )
- SELECT p.id AS product_id, p.name, COALESCE(p.stock_qty, 0) AS physical_stock, COALESCE(r.reserved_qty, 0) AS reserved_stock, (COALESCE(p.stock_qty, 0) - COALESCE(r.reserved_qty, 0)) AS available_stock, p.warehouse_location, p.supplier_name
-   FROM (products p
-     LEFT JOIN reserved r ON ((r.product_id = p.id)));
-
--- -----------------------------------------------------------------------------
--- 2. FUNCTION SEARCH_PATH SABİTLEME
--- Sorun: Mutable search_path → saldırgan sahte tablo yerleştirebilir
--- Çözüm: search_path = public, extensions ile kilitlendi
--- -----------------------------------------------------------------------------
-
-ALTER FUNCTION public.get_products_enriched(
-  uuid[], integer, integer, text, text, text, numeric, numeric
-)
-SET search_path = public, extensions;
-
--- -----------------------------------------------------------------------------
--- 3. ÇAKIŞAN RLS POLICY TEMİZLİĞİ
--- Sorun: Her sorgu için birden fazla permissive policy çalışıyordu
--- Çözüm: merged_ prefix'li şişirilmiş policy'ler kaldırıldı
---         admins_read_* ve _v2 olanlar (sade ve doğru) korundu
--- -----------------------------------------------------------------------------
-
-DROP POLICY IF EXISTS merged_admin_audit_log_authenticated_insert ON public.admin_audit_log;
-DROP POLICY IF EXISTS merged_admin_audit_log_authenticated_select ON public.admin_audit_log;
-DROP POLICY IF EXISTS merged_error_groups_authenticated_select ON public.error_groups;
-DROP POLICY IF EXISTS merged_returns_webhook_events_authenticated_select ON public.returns_webhook_events;
-DROP POLICY IF EXISTS merged_shipping_email_events_authenticated_select ON public.shipping_email_events;
-DROP POLICY IF EXISTS merged_shipping_webhook_events_authenticated_select ON public.shipping_webhook_events;
--- product_authorities: ALL policy SELECT'i zaten kapsıyor
-DROP POLICY IF EXISTS "Product authorities are viewable by everyone." ON public.product_authorities;
-
-COMMIT;
-
--- -----------------------------------------------------------------------------
--- 4. EKSİK FK İNDEKSLERİ
--- Sorun: FK kolonlarında index yoktu → JOIN full table scan yapıyordu
--- Not: CONCURRENTLY transaction dışında çalışır, tablo kilitlenmez
--- -----------------------------------------------------------------------------
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_category_mapping_rules_target_subcategory
-  ON public.category_mapping_rules(target_subcategory_id);
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_project_items_product_id
-  ON public.project_items(product_id);
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_site_settings_updated_by
-  ON public.site_settings(updated_by);
-
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_user_projects_user_id
-  ON public.user_projects(user_id);
+  RETURN QUERY
+  (
+    -- Products (max 4)
+    SELECT
+      'product'::text AS type, p.name::text AS label, ('/products/' || p.id::text)::text AS url, jsonb_build_object(
+        'sku', p.sku, 'brand', coalesce(p.brand, ''), 'model_code', coalesce(p.model_code, '')
+      ) AS metadata
+    FROM public.products p
+    WHERE p.status = 'active'
+      AND (
+        p.name ILIKE v_like
+        OR p.sku ILIKE v_like
+        OR p.model_code ILIKE v_like
+        OR p.brand ILIKE v_like
+      )
+    ORDER BY
+      CASE WHEN p.name ILIKE v_raw || '%' THEN 0 ELSE 1 END, p.is_featured DESC NULLS LAST, p.name
+    LIMIT LEAST(v_limit, 4)
+  )
+  UNION ALL
+  (
+    -- Categories (max 2)
+    SELECT
+      'category'::text AS type, c.name::text AS label, ('/category/' || c.slug)::text AS url, jsonb_build_object('level', c.level) AS metadata
+    FROM public.categories c
+    WHERE c.is_active = true
+      AND c.name ILIKE v_like
+    ORDER BY c.level, c.name
+    LIMIT 2
+  )
+  UNION ALL
+  (
+    -- Brands (max 2, distinct from products)
+    SELECT DISTINCT ON (p.brand)
+      'brand'::text AS type, p.brand::text AS label, ('/products?brand=' || p.brand)::text AS url, jsonb_build_object() AS metadata
+    FROM public.products p
+    WHERE p.status = 'active'
+      AND p.brand IS NOT NULL
+      AND p.brand ILIKE v_like
+    ORDER BY p.brand
+    LIMIT 2
+  )
+  LIMIT v_limit;
+END;
+$$;
 
 
--- FILE: 20260408100000_fix_contact_messages_rls.sql
--- =============================================================================
--- Migration: Fix contact_messages RLS
--- Date: 2026-04-08
--- Description: Replaces auth.uid() with (SELECT auth.uid()) to trigger
--- PostgreSQL's initplan caching and reduce row-by-row execution times, -- fixing the initplan performance vulnerability and type linting issues.
--- =============================================================================
+--
+-- Name: get_user_role(uuid); Type: FUNCTION; Schema: public; Owner: -
+--
 
-BEGIN;
+CREATE FUNCTION public.get_user_role(user_id uuid)` → text
 
-DROP POLICY IF EXISTS "Admins can view messages" ON public.contact_messages;
+### `handle_new_user_metadata()` → trigger
 
-CREATE POLICY "Admins can view messages"
-ON public.contact_messages
-FOR SELECT
-TO authenticated
-USING (
-    EXISTS (
-        SELECT 1 FROM public.user_profiles
-        WHERE id = (SELECT auth.uid())
-        AND role IN ('admin', 'superadmin')
-    )
-);
+### `handle_new_user_profile()` → trigger
 
-COMMIT;
+### `handle_supabase_webhook()` → trigger
 
-
--- FILE: 20260524_idempotent_stock_reduction.sql
--- Migration: Add idempotency and row-level locking to process_order_stock_reduction
--- Objective: Eliminate race conditions during concurrent webhook requests and enforce transaction isolation.
-
-CREATE OR REPLACE FUNCTION public.process_order_stock_reduction(p_order_id text)` → jsonb
-
-### `get_user_role(user_id UUID)` → TEXT
+### `increment_coupon_usage(p_code text)` → void
 
 ### `increment_error_group_count(p_group_id uuid)` → void
 
+### `is_admin()` → boolean
+
 ### `is_admin_user()` → boolean
 
-### `is_admin_user()` → BOOLEAN
+### `is_staff_user()` → boolean
 
-### `is_admin_user()` → BOOLEAN
-
-### `is_user_admin(user_id UUID)` → BOOLEAN
-
-### `is_user_admin(user_id UUID)` → BOOLEAN
+### `is_user_admin(user_id uuid)` → boolean
 
 ### `jwt_role()` → text
 
-### `process_order_stock_reduction(p_order_id text)` → jsonb
+### `jwt_tenant_id()` → uuid
+
+### `normalize_product_threshold_overrides()` → trigger
 
 ### `process_order_stock_reduction(p_order_id text)` → jsonb
-
-### `reverse_inventory_batch(p_batch_id uuid)` → integer
-
-### `reverse_inventory_batch(p_batch_id uuid, p_max_minutes int DEFAULT 30)` → integer
-
-### `reverse_inventory_batch(p_batch_id uuid, p_max_minutes int DEFAULT 30)` → integer
 
 ### `reverse_inventory_batch(p_batch_id uuid)` → void
 
-### `set_stock(p_product_id uuid, p_new_qty int, p_reason text)` → void
+### `reverse_inventory_batch(p_batch_id uuid, p_max_minutes integer DEFAULT 30)` → integer
 
-### `set_stock(p_product_id uuid, p_new_qty int, p_reason text)` → void
+### `set_order_number()` → trigger
 
-### `set_stock(p_product_id uuid, p_new_qty int, p_reason text, p_batch_id uuid DEFAULT NULL)` → void
+### `set_stock(p_product_id uuid, p_new_qty integer, p_reason text)` → void
 
-### `set_stock(p_product_id uuid, p_new_qty int, p_reason text, p_batch_id uuid DEFAULT NULL)` → void
-
-### `set_updated_at()` → trigger
+### `set_stock(p_product_id uuid, p_new_qty integer, p_reason text, p_batch_id uuid)` → void
 
 ### `set_updated_at()` → trigger
 
-### `set_updated_at()` → trigger
+### `set_user_admin_role(user_id uuid, new_role text)` → boolean
 
-### `set_updated_at()` → trigger
+### `set_user_role(user_id uuid, new_role text)` → boolean
 
-### `set_user_admin_role(user_id UUID, new_role TEXT)` → BOOLEAN
+### `sync_payment_status_with_status()` → trigger
 
-### `set_user_admin_role(user_id UUID, new_role TEXT)` → BOOLEAN
+### `tr_auto_categorize_trigger()` → trigger
 
-### `set_user_admin_role(user_id UUID, new_role TEXT)` → BOOLEAN
+### `update_inventory_settings(p_default_low_stock_threshold integer)` → void
 
-### `update_updated_at_column()` → TRIGGER
+### `update_inventory_thresholds(p_default integer, p_reset_overrides boolean DEFAULT false)` → void
 
 ### `update_updated_at_column()` → trigger
 
-### `update_updated_at_column()` → TRIGGER
-
-### `update_user_profiles_updated_at()` → TRIGGER
+### `update_user_profiles_updated_at()` → trigger
 
 ### `user_invoice_profiles_ensure_single_default()` → trigger
-
-### `user_invoice_profiles_ensure_single_default()` → TRIGGER
-
-## 4. VIEW'LAR
-
-### admin_users
-```sql
-SELECT 
-    u.id,
-    u.email,
-    up.full_name,
-    up.phone,
-    up.role,
-    up.created_at,
-    up.updated_at
-FROM auth.users u
-LEFT JOIN public.user_profiles up ON u.id = up.id
-WHERE up.role IN ('admin', 'moderator')
-ORDER BY up.created_at DESC
-```
-
-### inventory_summary
-```sql
-WITH reserved AS (
-  SELECT voi.product_id, SUM(voi.quantity)::int AS reserved_qty
-  FROM public.venthub_order_items AS voi
-  JOIN public.venthub_orders AS o ON o.id = voi.order_id
-  WHERE o.status IN ('confirmed','paid','processing')
-    AND o.shipped_at IS NULL
-  GROUP BY voi.product_id
-)
-SELECT 
-
-```
-
-### inventory_summary
-```sql
-WITH reserved AS (
-  SELECT voi.product_id, SUM(voi.quantity)::int AS reserved_qty
-  FROM public.venthub_order_items AS voi
-  JOIN public.venthub_orders AS o ON o.id = voi.order_id
-  WHERE o.status IN ('confirmed','paid','processing')
-    AND o.shipped_at IS NULL
-  GROUP BY voi.product_id
-)
-SELECT 
-
-```
-
-### inventory_velocity
-```sql
-WITH movement_stats AS (
-  SELECT 
-    product_id,
-    COALESCE(SUM(ABS(delta)), 0) as total_out_30d
-  FROM public.inventory_movements
-  WHERE delta < 0 
-    AND (reason = 'sale' OR reason = 'manual_out')
-    AND created_at >= NOW() - INTERVAL '30 days'
-  GROUP BY product_id
-)
-SELECT 
-  p.id as prod
-```
-
-### reserved_orders
-```sql
-SELECT 
-  voi.product_id,
-  o.id          AS order_id,
-  o.created_at,
-  o.status,
-  o.payment_status,
-  voi.quantity
-FROM public.venthub_order_items voi
-JOIN public.venthub_orders o ON o.id = voi.order_id
-WHERE o.status IN ('confirmed','paid','processing')
-  AND o.shipped_at IS NULL
-```
 
 ## 5. TRIGGER'LAR
 
 | Trigger | Zamanlama | Event | Tablo |
 |---------|-----------|-------|-------|
-| trg_handle_new_user_metadata | before | insert | auth.users |
-| trg_handle_new_user_profile | after | insert | auth.users |
-| trg_handle_new_user_metadata | before | insert | auth.users |
-| trg_handle_new_user_profile | after | insert | auth.users |
-| user_addresses_set_timestamp | before | update | user_addresses |
-| trg_user_invoice_profiles_updated_at | BEFORE | UPDATE | user_invoice_profiles |
-| trg_venthub_returns_updated_at | before | update | venthub_returns |
+| cart_items_updated_at | BEFORE | UPDATE | cart_items |
+| organizations_updated_at | BEFORE | UPDATE | organizations |
+| price_lists_updated_at | BEFORE | UPDATE | price_lists |
+| product_prices_updated_at | BEFORE | UPDATE | product_prices |
+| set_order_number_trigger | BEFORE | INSERT | venthub_orders |
+| shopping_carts_updated_at | BEFORE | UPDATE | shopping_carts |
 | tr_cart_items_set_updated_at | BEFORE | UPDATE | cart_items |
+| trg_sync_payment_status_ins | BEFORE | INSERT | venthub_orders |
+| trg_user_invoice_profiles_updated_at | BEFORE | UPDATE | user_invoice_profiles |
 | trg_user_profiles_updated_at | BEFORE | UPDATE | user_profiles |
+| trg_venthub_returns_updated_at | BEFORE | UPDATE | venthub_returns |
 | update_coupons_updated_at | BEFORE | UPDATE | coupons |
+| update_order_notes_updated_at | BEFORE | UPDATE | order_notes |
+| update_venthub_order_items_updated_at | BEFORE | UPDATE | venthub_order_items |
+| update_venthub_orders_updated_at | BEFORE | UPDATE | venthub_orders |
+| user_addresses_set_timestamp | BEFORE | UPDATE | user_addresses |
+| venthub_order_items_updated_at | BEFORE | UPDATE | venthub_order_items |
+| venthub_orders_updated_at | BEFORE | UPDATE | venthub_orders |
 
 ## 6. INDEKSLER
 
 | Indeks | Tablo | Tip | Sutunlar |
 |--------|-------|-----|----------|
-| idx_shopping_carts_tenant_id | shopping_carts | btree | tenant_id |
-| idx_cart_items_tenant_id | cart_items | btree | tenant_id |
-| idx_venthub_orders_tenant_id | venthub_orders | btree | tenant_id |
-| idx_venthub_order_items_tenant_id | venthub_order_items | btree | tenant_id |
-| idx_venthub_returns_tenant_id | venthub_returns | btree | tenant_id |
-| idx_coupons_tenant_id | coupons | btree | tenant_id |
-| idx_inventory_movements_tenant_id | inventory_movements | btree | tenant_id |
-| idx_inventory_settings_tenant_id | inventory_settings | btree | tenant_id |
-| idx_price_lists_tenant_id | price_lists | btree | tenant_id |
-| idx_product_prices_tenant_id | product_prices | btree | tenant_id |
-| idx_order_attachments_tenant_id | order_attachments | btree | tenant_id |
-| idx_order_notes_tenant_id | order_notes | btree | tenant_id |
-| idx_order_refund_events_tenant_id | order_refund_events | btree | tenant_id |
-| idx_user_profiles_tenant_id | user_profiles | btree | tenant_id |
-| idx_user_addresses_tenant_id | user_addresses | btree | tenant_id |
-| idx_user_invoice_profiles_tenant_id | user_invoice_profiles | btree | tenant_id |
-| idx_wizard_selections_tenant_id | wizard_selections | btree | tenant_id |
-| idx_shipping_email_events_tenant_id | shipping_email_events | btree | tenant_id |
-| idx_shipping_webhook_events_tenant_id | shipping_webhook_events | btree | tenant_id |
-| idx_returns_webhook_events_tenant_id | returns_webhook_events | btree | tenant_id |
 | idx_admin_audit_log_tenant_id | admin_audit_log | btree | tenant_id |
-| idx_shopping_carts_tenant_id | shopping_carts | btree | tenant_id |
-| idx_cart_items_tenant_id | cart_items | btree | tenant_id |
-| idx_venthub_orders_tenant_id | venthub_orders | btree | tenant_id |
-| idx_venthub_order_items_tenant_id | venthub_order_items | btree | tenant_id |
-| idx_venthub_returns_tenant_id | venthub_returns | btree | tenant_id |
-| idx_coupons_tenant_id | coupons | btree | tenant_id |
-| idx_inventory_movements_tenant_id | inventory_movements | btree | tenant_id |
-| idx_inventory_settings_tenant_id | inventory_settings | btree | tenant_id |
-| idx_price_lists_tenant_id | price_lists | btree | tenant_id |
-| idx_product_prices_tenant_id | product_prices | btree | tenant_id |
-| idx_order_attachments_tenant_id | order_attachments | btree | tenant_id |
-| idx_order_notes_tenant_id | order_notes | btree | tenant_id |
-| idx_order_refund_events_tenant_id | order_refund_events | btree | tenant_id |
-| idx_user_profiles_tenant_id | user_profiles | btree | tenant_id |
-| idx_user_addresses_tenant_id | user_addresses | btree | tenant_id |
-| idx_user_invoice_profiles_tenant_id | user_invoice_profiles | btree | tenant_id |
-| idx_wizard_selections_tenant_id | wizard_selections | btree | tenant_id |
-| idx_shipping_email_events_tenant_id | shipping_email_events | btree | tenant_id |
-| idx_shipping_webhook_events_tenant_id | shipping_webhook_events | btree | tenant_id |
-| idx_returns_webhook_events_tenant_id | returns_webhook_events | btree | tenant_id |
-| idx_admin_audit_log_tenant_id | admin_audit_log | btree | tenant_id |
-| idx_cart_items_product_id | cart_items | btree | product_id |
 | cart_items_cart_product_unique | cart_items | btree | cart_id, product_id |
+| idx_cart_items_price_list_id | cart_items | btree | price_list_id |
+| idx_cart_items_product_id | cart_items | btree | product_id |
+| idx_cart_items_tenant_id | cart_items | btree | tenant_id |
+| idx_categories_menu_label | categories | btree | menu_label |
+| idx_categories_parent_id | categories | btree | parent_id |
+| idx_category_mapping_rules_target_subcategory | category_mapping_rules | btree | target_subcategory_id |
 | idx_client_errors_at | client_errors | btree | at |
+| idx_client_errors_group_id | client_errors | btree | group_id |
+| idx_coupons_active_valid | coupons | btree | is_active, valid_from, valid_until |
+| idx_coupons_code | coupons | btree | code |
 | idx_coupons_created_by | coupons | btree | created_by |
+| idx_coupons_tenant_id | coupons | btree | tenant_id |
+| idx_error_groups_assigned_to | error_groups | btree | assigned_to |
+| idx_inventory_movements_batch_id | inventory_movements | btree | batch_id |
+| idx_inventory_movements_original_id | inventory_movements | btree | original_movement_id |
+| idx_inventory_movements_product_id | inventory_movements | btree | product_id |
+| idx_inventory_movements_reversed_by | inventory_movements | btree | reversed_by_movement_id |
+| idx_inventory_movements_tenant_id | inventory_movements | btree | tenant_id |
+| inventory_movements_order_product_reason_key | inventory_movements | btree | order_id, product_id, reason |
+| idx_inventory_settings_tenant_id | inventory_settings | btree | tenant_id |
 | idx_order_attachments_created_by | order_attachments | btree | created_by |
 | idx_order_attachments_order_id | order_attachments | btree | order_id |
+| idx_order_attachments_tenant_id | order_attachments | btree | tenant_id |
 | idx_order_email_events_order_id | order_email_events | btree | order_id |
+| idx_order_notes_order_id | order_notes | btree | order_id |
+| idx_order_notes_tenant_id | order_notes | btree | tenant_id |
 | idx_order_notes_user_id | order_notes | btree | user_id |
+| idx_order_refund_events_tenant_id | order_refund_events | btree | tenant_id |
+| idx_payment_transactions_order_id | payment_transactions | btree | order_id |
+| idx_payment_transactions_user_id | payment_transactions | btree | user_id |
+| idx_price_lists_tenant_id | price_lists | btree | tenant_id |
+| idx_product_authorities_product_id | product_authorities | btree | product_id |
 | idx_product_images_product_id | product_images | btree | product_id |
 | idx_product_prices_price_list_id | product_prices | btree | price_list_id |
-| uq_products_slug_lower | products | btree | lower(slug |
-| idx_products_name_trgm | products | gin | name extensions.gin_trgm_ops |
-| idx_products_model_code_trgm | products | gin | model_code extensions.gin_trgm_ops |
-| idx_products_sku_trgm | products | gin | sku extensions.gin_trgm_ops |
+| idx_product_prices_tenant_id | product_prices | btree | tenant_id |
 | idx_products_brand_trgm | products | gin | brand extensions.gin_trgm_ops |
-| idx_products_fts_tr | products | gin | to_tsvector('turkish', coalesce(name,'' |
-| idx_products_fts_tr_enhanced | products | gin | to_tsvector('turkish', 
-    coalesce(name,'' |
+| idx_products_category_id | products | btree | category_id |
+| idx_products_featured | products | btree | is_featured |
+| idx_products_name_trgm | products | gin | name extensions.gin_trgm_ops |
+| idx_products_slug | products | btree | slug |
+| idx_products_subcategory_id | products | btree | subcategory_id |
+| uq_products_slug_lower | products | btree | lower(slug |
+| idx_project_items_product_id | project_items | btree | product_id |
 | rate_limits_bucket_idx | rate_limits | btree | bucket |
+| idx_returns_webhook_events_tenant_id | returns_webhook_events | btree | tenant_id |
+| returns_webhook_events_received_at_idx | returns_webhook_events | btree | received_at DESC |
+| returns_webhook_events_return_id_idx | returns_webhook_events | btree | return_id |
+| idx_shipping_email_events_order_id | shipping_email_events | btree | order_id |
+| idx_shipping_email_events_tenant_id | shipping_email_events | btree | tenant_id |
+| shipping_email_events_created_at_idx | shipping_email_events | btree | created_at DESC |
 | shipping_idempotency_created_at_idx | shipping_idempotency | btree | created_at |
+| idx_shipping_webhook_events_tenant_id | shipping_webhook_events | btree | tenant_id |
+| idx_shopping_carts_tenant_id | shopping_carts | btree | tenant_id |
+| idx_shopping_carts_user_unique | shopping_carts | btree | user_id |
+| idx_site_settings_updated_by | site_settings | btree | updated_by |
+| idx_user_addresses_tenant_id | user_addresses | btree | tenant_id |
+| user_addresses_one_default_billing | user_addresses | btree | user_id |
+| user_addresses_one_default_shipping | user_addresses | btree | user_id |
+| idx_user_invoice_profiles_tenant_id | user_invoice_profiles | btree | tenant_id |
 | idx_user_invoice_profiles_user_id | user_invoice_profiles | btree | user_id |
+| idx_user_profiles_tenant_id | user_profiles | btree | tenant_id |
+| idx_user_projects_user_id | user_projects | btree | user_id |
 | idx_venthub_order_items_order_id | venthub_order_items | btree | order_id |
 | idx_venthub_order_items_product_id | venthub_order_items | btree | product_id |
-| venthub_orders_shipping_method_idx | venthub_orders | btree | shipping_method |
+| idx_venthub_order_items_tenant_id | venthub_order_items | btree | tenant_id |
+| idx_venthub_orders_tenant_id | venthub_orders | btree | tenant_id |
 | idx_venthub_orders_user_id | venthub_orders | btree | user_id |
 | idx_venthub_returns_order_id | venthub_returns | btree | order_id |
+| idx_venthub_returns_tenant_id | venthub_returns | btree | tenant_id |
 | idx_venthub_returns_user_id | venthub_returns | btree | user_id |
+| idx_wizard_selections_created_at | wizard_selections | btree | created_at |
+| idx_wizard_selections_order_id | wizard_selections | btree | order_id |
+| idx_wizard_selections_selected_product_id | wizard_selections | btree | selected_product_id |
+| idx_wizard_selections_session_id | wizard_selections | btree | session_id |
+| idx_wizard_selections_tenant_id | wizard_selections | btree | tenant_id |
+| idx_wizard_selections_user_id | wizard_selections | btree | user_id |
 
 ## 7. TABLO ILISKI DIYAGRAMI
 
 ```mermaid
 erDiagram
-    tenants ||--o{ shopping_carts : references
-    tenants ||--o{ cart_items : references
-    tenants ||--o{ venthub_orders : references
-    tenants ||--o{ venthub_order_items : references
-    tenants ||--o{ venthub_returns : references
-    tenants ||--o{ coupons : references
-    tenants ||--o{ inventory_movements : references
-    tenants ||--o{ inventory_settings : references
-    tenants ||--o{ price_lists : references
-    tenants ||--o{ product_prices : references
-    tenants ||--o{ order_attachments : references
-    tenants ||--o{ order_notes : references
-    tenants ||--o{ order_refund_events : references
-    tenants ||--o{ user_profiles : references
-    tenants ||--o{ user_addresses : references
-    tenants ||--o{ user_invoice_profiles : references
-    tenants ||--o{ wizard_selections : references
-    tenants ||--o{ shipping_email_events : references
-    tenants ||--o{ shipping_webhook_events : references
-    tenants ||--o{ returns_webhook_events : references
-    tenants ||--o{ admin_audit_log : references
-    tenants ||--o{ shopping_carts : references
-    tenants ||--o{ cart_items : references
-    tenants ||--o{ venthub_orders : references
-    tenants ||--o{ venthub_order_items : references
-    tenants ||--o{ venthub_returns : references
-    tenants ||--o{ coupons : references
-    tenants ||--o{ inventory_movements : references
-    tenants ||--o{ inventory_settings : references
-    tenants ||--o{ price_lists : references
-    tenants ||--o{ product_prices : references
-    tenants ||--o{ order_attachments : references
-    tenants ||--o{ order_notes : references
-    tenants ||--o{ order_refund_events : references
-    tenants ||--o{ user_profiles : references
-    tenants ||--o{ user_addresses : references
-    tenants ||--o{ user_invoice_profiles : references
-    tenants ||--o{ wizard_selections : references
-    tenants ||--o{ shipping_email_events : references
-    tenants ||--o{ shipping_webhook_events : references
-    tenants ||--o{ returns_webhook_events : references
-    tenants ||--o{ admin_audit_log : references
-    venthub_returns ||--o{ venthub_orders : references
-    venthub_returns ||--o{ price_lists : references
-    inventory_movements ||--o{ products : references
-    inventory_movements ||--o{ venthub_orders : references
-    error_groups ||--o{ user_profiles : references
-    product_images ||--o{ products : references
-    order_notes ||--o{ venthub_orders : references
-    order_attachments ||--o{ venthub_orders : references
+    wizard_selections ||--o{ tenants : references
+    wizard_selections ||--o{ shopping_carts : references
+    wizard_selections ||--o{ price_lists : references
     wizard_selections ||--o{ products : references
+    wizard_selections ||--o{ categories : references
+    wizard_selections ||--o{ error_groups : references
+    wizard_selections ||--o{ user_profiles : references
     wizard_selections ||--o{ venthub_orders : references
+    wizard_selections ||--o{ user_projects : references
+    admin_audit_log
+    cart_items
+    category_mapping_rules
+    client_errors
+    contact_messages
+    coupons
+    inventory_movements
+    inventory_settings
+    venthub_order_items
+    order_attachments
+    order_email_events
+    order_notes
+    order_refund_events
+    organizations
+    payment_transactions
+    product_authorities
+    product_images
+    product_prices
+    project_items
+    rate_limits
+    returns_webhook_events
+    shipping_email_events
+    shipping_idempotency
+    shipping_webhook_events
+    site_settings
     user_addresses
     user_invoice_profiles
-    shipping_webhook_events
-    inventory_settings
-    admin_audit_log
-    client_errors
-    admin_audit_log
-    shipping_email_events
-    order_refund_events
-    returns_webhook_events
-    coupons
-    coupons
-    shipping_idempotency
-    rate_limits
-    contact_messages
+    venthub_returns
 ```
