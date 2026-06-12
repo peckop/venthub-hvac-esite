@@ -17,6 +17,22 @@
 
 ## 2. Ürün Vizyonu
 
+### 2.0 Ürün Özü: Dünya-standardı **modüler ticaret platformu** (HVAC = beachhead)
+
+> **Reframe (11 Haziran 2026):** Ürünün özü "bir HVAC sitesi" değil — **dünya standardında ticaret
+> altyapısı**. "İster HVAC ister buğday, konu **ticaret**." HVAC bu altyapının **giriş pazarı**
+> (beachhead): kurucunun domain'i + yazılımda en geri kalmış, en az hizmet alan dikey.
+
+- **Çekirdek = kapsamlı ama MODÜLER ticaret platformu** (katalog, fiyat, sepet, sipariş, stok, B2B hesap,
+  teklif/CPQ, ödeme...). 3D vitrin, LLM danışman ve mühendislik araçları (§2.1–2.3) bu çekirdeğin üstündeki
+  **farklılaştırıcı katmanlardır** — çekirdeğin kendisi değil.
+- **Neden ürün? (ihtiyaç):** Hedef pazar — Türkiye'deki orta/küçük HVAC firmaları — yazılımda **Excel
+  seviyesinde**: teklifler Excel'den hazırlanıp gönderiliyor, stok takibi Excel'le (bazen o bile yok). Kendi
+  IT altyapıları yok; sektörü bilmeyen yazılımcılar da belirli seviyenin üstüne çıkamıyor. Bu boşluğu dolduran
+  bir ürün **yok**.
+- **Amaç (ürün hedefi):** Bu pazara, hiç sahip olmadığı **dünya-standardı ticaret altyapısını**, sektörü
+  gerçekten anlayan biri eliyle ve **modüler** biçimde (her firma ihtiyacına göre modül açar) getirmek.
+
 ### 2.1 3D Ürün Konsepti (görsel etki)
 - Türkiye'de **3D ürün konseptli HVAC sitesi bilinmiyor** (kurucunun bilgisi dahilinde) — fark yaratma iddiası.
 - Hedefler: ürünü çevirip inceleme; **"deneme" deneyimi** — devir arttıkça **dinamik basınç–debi ilişkisi**,
@@ -32,6 +48,33 @@
 - Muhtemel ileri hedef: kendi sunucusunda **CFD analizleri** (pişirme ekipmanı ısıl yükleri,
   taze hava/egzoz dengelemesi). — *Yüksek kapsam/efor riski; v1 dışı aday.*
 
+### 2.4 Modüler Mimari (composable commerce → modüler monolit)
+
+- Dünya-standardı adı **Composable Commerce / MACH**. Tek geliştirici için tam mikroservis fazla yük; doğru
+  yorum **modüler monolit** — tek kod tabanı/dağıtım, ama içeride **katı modül sınırları + temiz kontratlar**
+  ("tasarımda composable, dağıtımda monolit"). Headless/API-öncelikli ilkeler şimdi; mikroservis ileride gerekirse.
+- **Kazanç:** her modül tek tek geliştirilebilir VE ileride tek tek **SaaS olarak satılabilir** → çok-kiracı köprüsü.
+- **Modül haritası (platform iskeleti):** Katalog/PIM · Arama · CMS · Fiyat · Promosyon · Sepet · Checkout ·
+  **Teklif/CPQ** · Sipariş (OMS) · Stok · Kargo · İade · Hesaplar · **B2B Şirket** · **Bayi** · Ödeme · Vergi ·
+  Bildirim · Analitik · Çok-kiracı. *(Mühendislik foundation'ı: `docs/standards/admin-standard.md` = her
+  modülün admin'i NASIL kurulur; `dealer-network-standard.md` = B2B/Bayi domain standardı.)*
+
+### 2.5 B2B Bayi-Ağı Modülü (farklılaştırıcının kalbi)
+
+Hedef pazarın asıl derdi: bayi/distribütör ağ yönetimi mail/Excel'de, şeffaflıktan uzak. Dünya-standardı
+çözüm (PRM + B2B commerce) bu platforma gömülünce kopyalanması zor bir değer doğar:
+
+- **Bayi ≠ kullanıcı** — şirket hesabı + çok kullanıcı + roller + hiyerarşi.
+- **Bayiye özel fiyat listesi** + cari/limit + **teklif → sipariş (CPQ)** hattı.
+- **Deal Registration:** bayi bir işi/projeyi *kaydeder*, sistem sahipliği mühürler; çakışma ("bayilerin
+  birbirine girmesi") otomatik tespit edilir → **şeffaflık + ölçülebilirlik**. (Kanal yönetiminin kanıtlanmış
+  mekanizması; e-ticarete + HVAC'a gömülü hâli nadir.)
+- **Ortak proje havuzu** — mekanik/proje firmaları aynı havuzda; adil alacaklandırma (split).
+
+> **Dürüst durum (vizyon ≠ kurulu):** Kodda **tohumlar var** (`priceListId` + `getEffectiveUnitPrice` =
+> bayiye-özel fiyat; `user_projects` = proje/BOM + "teklif iste"; fatura profilleri = B2B faturalama).
+> **Bayi katmanının kendisi (org/tier/deal-registration/pipeline) henüz kurulmadı.** Yani: temel atılmış, kat çıkılacak.
+
 ## 3. Pazar Bağlamı & Sinyaller
 
 - **Avensair** (Vortice TR distribütörü, kurucunun arkadaşı; kurucu onun bayisi):
@@ -41,6 +84,17 @@
 - Site **e-ticaret tarafı olmadan da** (kurumsal/platform sitesi olarak) satılabilir.
 - Olası iş modelleri: (a) tek-seferlik **site satışı**, (b) **kiralama/SaaS** (recurring),
   (c) kendi markasıyla **dikey e-ticaret**.
+
+### 3.1 Pazar Boşluğu (araştırmayla doğrulandı, 11 Haziran 2026)
+
+- **"Herkeste *selection* var, hiç kimsede *commerce* yok."** HVAC liderleri (Systemair, Daikin, Grundfos,
+  Belimo, Trox) spec-driven seçim + CAD/BIM araçlarına sahip — ama seçimi **işleme** (teklif→sipariş)
+  bağlamıyor; çoğu "BOM oluştur / temsilciyle görüş" çıkmazında. Yalnızca Belimo/Grundfos seçimi gerçekten
+  siparişe bağlamış. Üretici seviyesinde gerçek bayi portalı **yok** (gerçek B2B ticaret distribütörlerde — Watsco).
+- HVAC dağıtım satışının yalnızca **~%7,9'u** e-ticaretten geçiyor (Watsco istisna: 51.000+ yüklenici).
+- **Whitespace = VentHub'ın hedefi:** entegre, web/mobil, çok-kiracılı, **bayiye-özel fiyatlı
+  seçim→teklif→sipariş hattı** — uçtan uca **tek lider bile** kurmamış. Kurucunun domain anlayışı, sektörü
+  bilmeyen yazılımcının kuramadığı **seçim+ticaret köprüsünü** kurmaya izin veriyor. Asıl, kopyalanamaz fark budur.
 
 ## 4. Bilinen Riskler (kurucunun kendi tespiti)
 
@@ -83,6 +137,10 @@ Gerçek risk pazar/rakip/kod değil — **bitirip teslim edememe** (mükemmeliye
 seçim mantığı** — formüller standart, calc UI kiti kurulu, bilgi kafanda (1-2 hafta). Bu hem tek başına
 satılabilir mühendislik aracı, hem LLM danışmanın kopyalanamaz beslemesi. Sıra: **IP aracı → LLM danışman
 (IP'yle besli) → 3D minimal vitrin.** CFD/ses/montaj: ödeyen müşteri isteyene kadar **tek satır kod yok**.
+
+> **Köprü farkı (§3.1 ile bağ):** ESP/DW172 seçim mantığı tek başına değerli; ama asıl kopyalanamaz olan,
+> onu **doğrudan teklife/siparişe ve bayiye-özel fiyata** bağlayan hat — *seçim → commerce köprüsü*. Liderler
+> bile bunu uçtan uca kuramamış. Moat = IP (seçim) **×** dünya-standardı ticaret altyapısı (modüler platform).
 
 ## 8. ACIMASIZ v1 (filtre: "Avensair'in EVET'ini yakınlaştırıyor mu?")
 
