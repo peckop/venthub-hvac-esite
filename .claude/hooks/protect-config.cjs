@@ -29,6 +29,13 @@ if (!filePath) process.exit(0);
 const base = path.basename(filePath).toLowerCase();
 const rel = filePath.replace(/\\/g, '/').toLowerCase();
 
+/* ---- ON/OFF ANAHTARI: guard.state ('ON' / 'OFF') ---- */
+try {
+  const st = fs.readFileSync(path.join(__dirname, 'guard.state'), 'utf8');
+  const line = st.split('\n').map((l) => l.trim()).find((l) => /^(ON|OFF)$/i.test(l));
+  if (line && line.toUpperCase() === 'OFF') process.exit(0); // guard KAPALI -> her seye izin
+} catch {}
+
 /* ---- KATMAN 0: guard'ın kendini koruması (kelepçeyi açamayayım) ---- */
 if (rel.includes('.claude/hooks/')) {
   process.stderr.write(

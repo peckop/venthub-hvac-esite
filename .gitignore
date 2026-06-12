@@ -80,3 +80,6 @@ cache/
 explorer_m2_3/
 explorer_m4_*/
 docs/screenshots/*.png
+
+# Guard ON/OFF anahtari (yerel toggle, commitlenmez)
+.claude/hooks/guard.state
