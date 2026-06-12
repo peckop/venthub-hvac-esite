@@ -1,186 +1,146 @@
 ---
 name: notebooklm-sync
-description: Projedeki Markdown (.md) dosyalarını NotebookLM ile senkronize (nlm sync)
-  etmek, defteri güncellemek ve hafızayı yenilemek için kullanılır (Hard Reset). Kullanıcı
-  NotebookLM'de arama yapmak istediğinde ASLA tetiklemeyin. Veritabanı sıfırlama,
-  git işlemleri veya linter çalıştırma amacıyla KULLANMAYIN.
+description: Projedeki Markdown (.md) dosyalarını NotebookLM dijital ikizine senkronize
+  etmek için MILESTONE/MANUEL olarak kullanılır (auth-tazele → sync → query-doğrula).
+  Kullanıcı NotebookLM'de ARAMA yapmak istediğinde ASLA tetiklemeyin (o → notebook-navigator).
+  Veritabanı sıfırlama, git işlemleri veya linter çalıştırma amacıyla KULLANMAYIN.
 category: intelligence
 metadata:
   triggers:
   - nlm sync
+  - twin'i güncelle
   - defteri güncelle
   - hafızayı yenile
   inputs:
   - docs/*.md
+  - VISION.md
+  - docs/standards/*.md
   outputs:
   - synced NotebookLM source
   recovery:
-    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
   prerequisites:
-  - nlm login
+  - nlm-headless-refresh.ps1
 depends_on: []
 next_steps: []
 run_last: false
 exclusions: []
 ---
 
-# NotebookLM Otonom Senkronizasyon (NLM Sync)
+# NotebookLM Senkronizasyon (Milestone/Manuel Model)
 
-Bu yetenek (Skill), projedeki kaynak koddan (.py/.ts/.tsx/.js/.jsx) Markdown dokümantasyon üretir, bunları Master MD'lerde birleştirir ve otonom olarak NotebookLM'e yükler.
+Bu yetenek, projenin `.md` dokümanlarını **NotebookLM dijital ikizine** (twin) yükler.
+Twin = "niçin / mimari karar / tasarım" sorularının RAG katmanı; kod yapısı için CodeGraph kullanılır.
 
-## Kullanım Amacı
+## NEDEN MILESTONE/MANUEL (her-commit değil)
 
-Projenin **Tek Doğru Kaynağı (SSOT)** koddur. Kodun meta-verisi `.md` dosyalarında yazar. Mimari değiştikçe NotebookLM hafızasının eskimesini önlemek için bu pipeline tetiklenmelidir.
+NLM sync **ağ + NotebookLM auth** gerektiren kırılgan bir adımdır. Eskiden post-commit hook
+bunu her commit'te mekanik çalıştırıyordu — **auth düştüğünde SESSİZCE başarısız oluyordu**
+(`nlm_sync_performed: true` yazıp hiçbir şey yüklemeden). Döngüde akıl olmadığı için kimse
+fark etmiyordu; twin sessizce eskiyordu.
 
-## Nasıl Kullanılır?
+**Yönetici ilke:** Kırılgan adım, LLM'in döngüde olduğu yere taşınır. Yalnız LLM şunu yapabilir:
+(a) önce auth'u tazele, (b) sync'i çalıştır, (c) **defteri sorgulayıp gerçekten güncellendiğini
+doğrula**, (d) dürüst raporla. Bu yüzden:
 
-Senkronizasyonu başlatmak için aşağıdaki adımları sırayla `run_command` aracıyla çalıştırmanız yeterlidir:
+- **post-commit hook artık YEREL-only** — sadece `system_tree.md`'yi tazeler, NLM'e DOKUNMAZ.
+- **NLM sync = bu skill** ile, milestone'da (örn. bir R-fazı/özellik bitince) elle tetiklenir.
 
-### Adım 0 — NLM CLI Güncelleme (her sync öncesi)
+## Sync Adımları (sırayla)
 
-```bash
-pip install --upgrade notebooklm-mcp-cli
-```
+> Komutlar `orion doc ...` ile çalışır (`cc` eski alias'tır, hâlâ çalışır ama `orion` kullan).
+> Aşağıda `<ROOT>` = repo kökü (ör. `c:/Users/alize/venthub-hvac`).
 
-### Adım 1 — Frontend Dokümantasyon Üretimi
-
-Değişen kaynak dosyaları için `.md` belgelerini üret veya güncelle:
-
-```bash
-cc doc all --changed-only
-```
-
-> Eğer tüm dosyaları sıfırdan üretmek istiyorsan `--force` ekle:
-> `cc doc all --force`
-
-### Adım 2 — Supabase Edge Functions Dokümantasyonu
-
-Backend fonksiyonları için `.md` belgelerini üret:
+### Adım 0 — Auth TAZELE (her sync'in ZORUNLU ilk adımı)
 
 ```bash
-cc doc batch --batch-dir supabase/functions
+powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
 ```
 
-> İlk çalıştırmada `--force` ekle. Sonraki çalıştırmalarda hash kontrolü ile sadece değişenler güncellenir.
+Penceresiz (~15sn), şifre girişi yok — kayıtlı Chrome profilinden taze cookie çeker.
+Bitince MCP'ye tanıt: `refresh_auth` tool'unu çağır. Çıktıda "✓ Authentication valid!" görmelisin.
+> (İsteğe bağlı) CLI tazeliği: `pip install --upgrade notebooklm-mcp-cli`.
 
-### Adım 3 — Database Schema Dokümantasyonu
+### Adım 1 — Yerel dokümanları güncelle (NLM'e dokunmadan)
 
 ```bash
-cc doc schema
+orion doc all --changed-only                          # değişen kaynak .md'leri üret
+orion doc batch --batch-dir supabase/functions        # edge function master
+orion doc schema --no-use-dump                         # DB şema master (baseline snapshot'tan)
 ```
 
-> `supabase db dump` veya migration dosyalarından DB şemasını parse edip `docs/database_schema_master.md` üretir.
+> `orion doc schema` artık bağlı ve çalışır. Kaynak merdiveni:
+> `--sql-file > supabase db dump > supabase/baselines/ (en yeni) > migrations`.
+> Docker kapalıyken baseline snapshot kullanılır → out-of-band tablolar da kapsanır.
+> A3: sync ÖNCESİ bu adım çalışmalı, yoksa eski `.md` NLM'e gider.
 
-### Adım 4 — System Tree + Master MD + NLM Sync
-
-Tree oluştur, master'ları birleştir ve NotebookLM'e yükle:
+### Adım 2 — Master birleştir + NLM'e YÜKLE
 
 ```bash
-cc doc tree --nlm-sync --force-sync
+orion doc tree --nlm-sync --force-sync --repo-root <ROOT>
 ```
 
-> `--force-sync` bayrağı, Enterprise şablonuna (5N1K/AXIOM) uymayan `.md` dosyalarını atlayarak sync'in durmasını engeller.
+Eski master+standalone kaynakları siler, yenilerini yükler (Hard Reset). `--force-sync`
+şablona uymayan `.md`'leri atlayıp sync'i durdurmaz.
 
-## İşlem Akışı (Bilinmesi Gerekenler)
+### Adım 3 — DOĞRULA (sessiz-kaçırmayı yakalayan adım — ATLAMA)
 
-Bu komutları çalıştırdığınızda arka planda şunlar gerçekleşir:
+Twin'i `notebook_query` ile sorgula ve gerçekten güncellendiğini gör:
+- Kaynak listesi: `source_list_drive(notebook_id)` → beklenen dosyalar yeni ID'lerle orada mı?
+- İçerik: son eklenen bir dokümana özel bir soru sor (ör. bayi modülü için "R0→B2 planı nedir?")
+  ve cevabın doğru kaynağı (citation) gösterdiğini doğrula.
 
-1. **migrator_lite:** Tree-sitter ile kaynak dosyaları tarar, LLM ile 5N1K formatında `.md` üretir.
-2. **batch:** `supabase/functions/` altındaki Edge Function'ları `rglob` ile tarar, her biri için `.md` üretir.
-3. **schema:** Supabase DB şemasını parse edip `docs/database_schema_master.md` üretir.
-4. **docs_tree linter:** `system_tree.md` oluşturur, sahipsiz/eksik dokümanları raporlar.
-5. **Master MD birleştirme:** `source_dirs` altındaki tüm geçerli `.md` dosyaları ana master'da birleştirilir.
-6. **Extra Masters birleştirme:** `.cc_docs.yaml`'daki `extra_masters` listesindeki her giriş için ayrı master MD derlenir.
-7. **NLM temizlik:** Eski master ve standalone kaynaklar `nlm source delete` ile silinir.
-8. **NLM yükleme:** Yeni master + standalone + extra master dosyalar ayrı ayrı yüklenir.
+## .cc_docs.yaml — Sync Setinin SSOT'u
 
-## VentHub NLM Kaynak Yapısı
-
-### 3 Master MD (Digital Twin)
-
-| Master MD | Kaynak | İçerik |
-|-----------|--------|--------|
-| `venthub_hvac_master.md` | `src/` (432+ dosya) | Frontend: components, hooks, views, lib, utils, types |
-| `supabase_functions_master.md` | `supabase/functions/` (28+ dosya) | Backend: Edge Functions, webhook'lar, ödeme, bildirim |
-| `database_schema_master.md` | `cc doc schema` | DB: tablolar, RLS, trigger'lar, indeksler |
-
-### .cc_docs.yaml Yapılandırması
+Twin'e NE gideceğini bu dosya belirler. **Yeni bir önemli doküman (standart/vizyon/audit)
+twin'e girmesini istiyorsan `standalone_files`'a EKLE** — yoksa sync onu hiç görmez.
 
 ```yaml
-source_dirs: [src]
+source_dirs: [src, .]
 master_md: "docs/venthub_hvac_master.md"
 notebook_id: "235043eb-970f-4a52-9f39-1d02b2621e9c"
-standalone_files: [README.md, docs/database_schema_master.md]
-skip_dirs: [__pycache__, .git, .agent, .venv, venv, mcp-env, node_modules, ...]
-skip_files: [venthub_hvac_master.md, system_tree.md, supabase_functions_master.md, ...]
-
+standalone_files: [README.md, CONTEXT.md, CHANGELOG.md, RECOMMENDATIONS.md, VISION.md,
+  docs/database_schema_master.md, docs/design_system_config.md, docs/venthub_skills_master.md,
+  docs/standards/admin-standard.md, docs/standards/admin-capabilities.md,
+  docs/standards/dealer-network-standard.md, docs/standards/dealer-module-blueprint.md,
+  docs/audits/dealer-data-ground-truth-2026-06-11.md,
+  docs/reference/supabase/*.md]
 extra_masters:
-  - name: "supabase_functions_master.md"
-    source_dirs: "supabase/functions"
-    output: "docs/supabase_functions_master.md"
+  - {name: "supabase_functions_master.md", source_dirs: "supabase/functions", output: "docs/supabase_functions_master.md"}
 ```
 
-### Defter ID Tespiti
+**ÖNEMLİ:** `standalone_files` master'a DAHİL EDİLMEZ (dupe önlemi). Standalone = kendi başlıklı
+kaynak olarak yüklenir; sorgu/citation'da temiz görünür.
 
-1. Proje kökünde `.cc_docs.yaml` dosyasını bul
-2. `notebook_id` alanını oku
-3. Boşsa → yeni defter oluştur ve ID'yi `.cc_docs.yaml`'a kaydet
+## İşlem Akışı (arka planda ne olur)
 
-### Kaynak Yapısı
-
-| Alan | Kaynak | Açıklama |
-|------|--------|---------|
-| `notebook_id` | .cc_docs.yaml | Defter ID |
-| `standalone_files` | .cc_docs.yaml | Ayrı yüklenecek dosyalar (master'a DAHİL EDİLMEZ) |
-| `master_md` | .cc_docs.yaml | Ana master MD dosya adı |
-| `extra_masters` | .cc_docs.yaml | Ayrı derlenen ek master MD'ler |
-
-**ÖNEMLİ:** Standalone dosyalar master'a DAHİL EDİLMEZ. Çift bilgi (duplicate) oluşmasını önlemek için bu ayrım korunmalıdır.
-
-## Komut Çıktısının Doğrulanması
-
-Komutu çalıştırdıktan sonra terminal çıktısında şu ifadeyi görmelisiniz:
-> `NLM Sync completed successfully! NotebookLM is now 100% up-to-date with local architecture.`
-
-Eğer bu mesajı alırsanız işlem başarılı demektir. Kullanıcıya "NotebookLM senkronizasyonu eksiksiz olarak tamamlandı" bilgisini verebilirsiniz.
+1. **migrator_lite:** Tree-sitter + LLM ile kaynak `.md`'leri 5N1K formatında üretir.
+2. **batch:** `supabase/functions/` taranır, edge function master derlenir.
+3. **schema:** DB şeması parse → `docs/database_schema_master.md` (Mermaid ER dahil).
+4. **docs_tree:** `system_tree.md` + ana master derlenir (idempotent — yalnız içerik değişince yazar).
+5. **NLM temizlik:** Eski master+standalone kaynaklar silinir.
+6. **NLM yükleme:** Yeni master + standalone + extra master ayrı ayrı yüklenir.
+   (Elle eklenen kaynaklar — Typography, lighthouse vb. — yönetilmediği için KORUNUR.)
 
 ## Hata Durumları
 
-### Authentication Expired Hatası
-**ÖNEMLİ KURAL:** Eğer komut "Authentication expired" hatası verirse, oturumu yenilemek için doğrudan `notebook-navigator` yeteneğindeki (Skill) kimlik doğrulama adımlarını izleyin. Giriş işlemi tamamlandıktan sonra senkronizasyon komutunu tekrar tetikleyin.
+### "Authentication expired"
+Adım 0'ı çalıştır (`nlm-headless-refresh.ps1`) → `refresh_auth` → komutu tekrarla.
+Eski yöntem (görünür Chrome, ESET-yavaş) yerine **daima headless script**.
 
-### cc doc tree Master MD 0 Dosya Hatası
-Eğer `cc doc tree` komutu "→ 0 MD NLM'e birlestirilecek" diyorsa:
-- `.cc_docs.yaml`'daki `source_dirs` doğru mu kontrol et
-- `extra_masters` içindeki `source_dirs` ana `source_dirs` ile çakışmadığından emin ol
-- Gerekirse master birleştirmeyi doğrudan Python ile yap
+### `orion doc tree` → "0 MD NLM'e birlestirilecek"
+- `.cc_docs.yaml` `source_dirs` doğru mu?
+- `extra_masters.source_dirs` ana `source_dirs` ile çakışmasın.
 
-### LLM Rate Limit (batch modda)
-Eğer `cc doc batch` rate limit'e takılırsa:
-- Durdur, `--force` olmadan tekrar başlat (tamamlananları hash ile atlar)
-- Kalan dosyaları `cc doc single --py-file <dosya>` ile tek tek yap
-- Son çare: kaynak kodu okuyup MD'yi elle yaz
-
-## Git Hook Entegrasyonu
-
-> **Not:** Projede `post-commit` git hook'u yapılandırılmıştır. Bu hook, her başarılı commit sonrasında otomatik olarak `orion doc changed` ve NLM sync pipeline'ını tetikler. Dolayısıyla çoğu durumda senkronizasyon için ekstra bir adım gerekmez.
-
-### Manuel Sync Gereken Durumlar
-
-Aşağıdaki senaryolarda hook çalışmaz veya yetersiz kalır — bu durumlarda bu skill'i manuel olarak tetikleyin:
-
-| Senaryo | Neden | Çözüm |
-|---------|-------|-------|
-| `git commit --no-verify` kullanıldığında | `--no-verify` tüm hook'ları atlar | `cc doc tree --nlm-sync --force-sync` |
-| Hook hata verip sessizce başarısız olduğunda | Hook exit code 0 döner ama sync tamamlanmaz | Aynı komutu elle çalıştır |
-| Toplu refactor/rename sonrası | Hook yalnızca diff'teki dosyaları işler, silinen/yeniden adlandırılan dosyalar eksik kalabilir | `cc doc all --force` ardından `cc doc tree --nlm-sync --force-sync` |
-| `.cc_docs.yaml` yapılandırması değiştiğinde | Hook eski config ile çalışmış olabilir | Full pipeline'ı baştan çalıştır (Adım 1–4) |
-| CI/CD ortamında (hook yok) | Sunucuda git hook'lar kurulu değildir | Pipeline'a NLM sync adımını ekle |
+### LLM Rate Limit (batch/all modda)
+Durdur, `--force` olmadan tekrar başlat (hash ile tamamlananları atlar) →
+kalanları `orion doc single --py-file <dosya>` ile tek tek → son çare elle yaz.
 
 ## AXIOMS
 
-- **A1:** Master MD'ye kök dosyalar (README vb.) dahil edilmez — standalone_files olarak ayrı yüklenir.
-- **A2:** NLM defterinde tam 3 master + standalone kaynak olmalıdır (frontend master + supabase master + db schema + README).
-- **A3:** Sync öncesi mutlaka migrator_lite + batch + schema çalıştırılmalıdır — aksi halde eski `.md` NLM'e gider.
-- **A4:** Auth hatası aldığında `notebook-navigator` yeteneğindeki oturum yenileme adımlarını çalıştır.
-- **A5:** NLM CLI güncelleme kontrolü her sync öncesi yapılmalıdır.
+- **A1:** `standalone_files` master'a dahil edilmez (dupe önlemi).
+- **A2:** Twin'de 3 master (frontend/functions/schema) + standalone set + elle-eklenenler bulunur.
+- **A3:** Sync ÖNCESİ Adım 1 (all/batch/schema) çalışmalı — yoksa eski `.md` yüklenir.
+- **A4:** Auth düşünce `nlm-headless-refresh.ps1` (headless) çalıştır, sonra `refresh_auth`.
+- **A5:** Sync MILESTONE eylemidir; her commit'te DEĞİL. post-commit hook artık yerel-only.
+- **A6:** Sync'i DOĞRULAMADAN (Adım 3) "tamamlandı" deme — sessiz-kaçırma ancak query ile yakalanır.
