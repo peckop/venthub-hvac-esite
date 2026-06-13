@@ -41,11 +41,11 @@ Twin (doktrin merceği) v2'yi standarda karşı çürüttü; her bulgu **gerçek
 
 ---
 
-## FAZ 0' — Ön-koşullar (kısa, kapıyı çalışır yap)
-1. Mevcut **3 lint error'unu temizle** (import-sort autofix + 2 console) → kapı yeşil-çalışır olur.
-2. **HEX-in-JSX lint kuralı** ekle (className + style + chart prop'ları) → gerçek X8'i yakalar.
-3. **i18n sözlüğünü parçala:** `src/i18n/dictionaries/admin/<sayfa>.tr|en.ts` + barrel; her göç sadece kendi dosyasına yazar (paralel çatışma biter). Parity testi barrel düzeyinde kalır.
-4. **Tenant kararı:** kite `tenantScoped` flag'i; gerçek multi-tenant SaaS Faz 2'ye not düşülür (bu plan onu KAPSAMAZ).
+## FAZ 0' — Ön-koşullar ✅ TAMAMLANDI (2026-06-13 · branch `feat/admin-enterprise-faz0` · gate: lint 0, tsc 0, 445 test)
+1. ✅ **3 lint error temizlendi** (i18n AST checker: console→error, import-sort autofix, ölü `const r`). Commit `775168c`.
+2. ✅ **HEX-in-JSX kuralı eklendi** — `eslint.config.cjs`: admin tsx'te ham HEX = **error** (`no-restricted-syntax` + esquery regex; JSX prop + obje/style değeri). 3D (R3F) ve storefront **muaf**; chart dosyaları (`admin/dashboard/**` + `AdminInventoryReportPage`) Faz 2 token-göçüne dek **`ignores` ile karantinalı**. Commit `74fc982`.
+3. ✅ **i18n sözlüğü parçalandı** — admin bloğu (22 grup) → `src/i18n/dictionaries/admin/<grup>.tr|en.ts` (44 dosya) + 2 barrel (`admin/tr.ts`, `admin/en.ts`); ana `tr.ts`/`en.ts` barrel'ı import edip `admin,` ile yerleştirir; `typeof tr` **birebir korundu**, parity testi barrel düzeyinde. **Faz 1 göçü için:** her sayfa yalnız kendi `admin/<grup>.tr|en.ts` dosyasına yazar (çatışma yok). Gruplar: `authority, categories, products, common, users, inventory, orders, dashboard, errors, toolbar, menu, titles, webhooks, a11y, returns, logistics, audit, errorGroups, movements, search, settings, ui`. Commit `6869066`.
+4. ✅ **Tenant kararı** — kite `tenantScoped?: boolean` flag'i (varsayılan **kapalı**); kod-doğrulandı (admin tablolarında `tenant_id` yok, `resolveTenant` sabit-UUID stub). Gerçek çok-kiracılık = `dealer-module-blueprint` / SaaS Faz 2 (bu plan KAPSAMAZ).
 
 ## FAZ 0 — TEMEL (tek/odaklı, küçük)
 1. **`useAdminTable<Row>` hook'u** — kontratı **Products + Inventory'nin gerçek ihtiyacından** kazı (en zor sayfalar): density, visibleCols, sort (tam-server|tam-client), server pagination+count, **çift-mod fetchAdapter** (normal + RPC), selectedIds (multi-normalize), debounced arama, URL-state senkron, opsiyonel `tenantScoped`.
