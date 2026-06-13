@@ -13,8 +13,21 @@ export interface AdminAuditLogInput {
 }
 
 /**
- * @function logAdminAction
- * @description Admin paneli işlemlerini denetim günlüğüne (audit log) kaydeder.
+ * Records an administrative action (INSERT, UPDATE, DELETE, or CUSTOM) into the system's audit log.
+ * Automatically resolves the acting user ID from the active session if one is not explicitly provided in the payload.
+ *
+ * @param client - The active Supabase client instance.
+ * @param input - A single audit log payload or an array of payloads to insert.
+ * @returns A promise that resolves when the insertion attempt is complete.
+ * @throws Never throws; network and validation errors are silently caught and logged via console.warn to prevent disrupting admin workflows.
+ *
+ * @example
+ * await logAdminAction(supabase, {
+ *   table_name: 'venthub_orders',
+ *   action: 'UPDATE',
+ *   row_pk: 'order-123',
+ *   comment: 'status changed to processed'
+ * });
  */
 export async function logAdminAction(
   client: SupabaseClient,

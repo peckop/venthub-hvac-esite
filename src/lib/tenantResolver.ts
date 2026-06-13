@@ -3,6 +3,17 @@ export interface TenantInfo {
   slug: string;
 }
 
+/**
+ * Resolves the appropriate tenant details by parsing the request's host string.
+ * Extracts the subdomain from complex hosts and maps infrastructure domains (like `api` and `www`) or local development domains back to the default tenant.
+ *
+ * @param host - The raw host string (e.g., 'tenant1.venthub.com:3000') from the incoming request.
+ * @returns The resolved tenant's ID and identifier slug.
+ *
+ * @example
+ * resolveTenant('b2b.venthub.com'); // returns { tenantId: '...', slug: 'b2b' }
+ * resolveTenant('localhost'); // returns { tenantId: '...', slug: 'default' }
+ */
 export function resolveTenant(host: string | null | undefined): TenantInfo {
   const DEFAULT_TENANT_ID = 'd3b07384-d113-495f-a558-8c38634e0000';
   const DEFAULT_SLUG = 'default';

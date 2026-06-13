@@ -40,7 +40,16 @@ const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
 
 
 /**
- * Verilen rol, belirtilen sayfaya erisebilir mi?
+ * Evaluates whether a given user role is authorized to view a specific application page/path.
+ * Also enforces strict system protections, such as exclusively limiting '/admin/users' access to the 'super_admin' role.
+ *
+ * @param role - The assigned role of the active user.
+ * @param path - The routing path to be evaluated (e.g. '/admin/inventory').
+ * @returns True if the user role allows accessing the page; otherwise, false.
+ *
+ * @example
+ * const isAllowed = canAccessPage('warehouse', '/admin/inventory'); // returns true
+ * const isAllowedUser = canAccessPage('user', '/admin/orders'); // returns false
  */
 export function canAccessPage(role: UserRole | null | undefined, path: string): boolean {
     if (!role) return false;
@@ -60,7 +69,16 @@ export function canAccessPage(role: UserRole | null | undefined, path: string): 
 }
 
 /**
- * Verilen rol, belirtilen entity'de yazma/düzenleme işlemi yapabilir mi?
+ * Evaluates whether a given user role is authorized to perform write/edit actions on a specific business entity.
+ * It strictly forbids any role, including 'admin', from modifying user entities.
+ *
+ * @param role - The assigned role of the active user.
+ * @param entity - The business entity being written to (e.g., 'orders', 'products').
+ * @returns True if the user role permits writing to the entity; otherwise, false.
+ *
+ * @example
+ * const isAllowed = canWrite('sales', 'orders'); // returns true
+ * const isAllowedAdmin = canWrite('admin', 'users'); // returns false
  */
 export function canWrite(role: UserRole | null | undefined, entity: string): boolean {
     if (!role) return false;
@@ -77,7 +95,13 @@ export function canWrite(role: UserRole | null | undefined, entity: string): boo
 }
 
 /**
- * Kullanıcı salt-okunur mu?
+ * Determines if the user role is strictly restricted to read-only operations across the application.
+ *
+ * @param role - The assigned role of the active user.
+ * @returns True if the role is 'viewer', 'user', or undefined; otherwise, false.
+ *
+ * @example
+ * const readOnly = isReadOnly('viewer'); // returns true
  */
 export function isReadOnly(role: UserRole | null | undefined): boolean {
     if (!role) return true;

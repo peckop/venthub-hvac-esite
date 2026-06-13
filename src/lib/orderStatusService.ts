@@ -63,7 +63,21 @@ function resolveDbFields(uiStatus: string): { status: string; payment_status?: s
 }
 
 /**
- * Merkezi sipariş statüsü güncelleme fonksiyonu.
+ * Centralized service to update an order's status and perform related synchronization tasks.
+ * Converts UI status strings into corresponding `status` and `payment_status` database fields, handles returns table sync, restores inventory stocks if the order transitions into a cancelled state, and writes an entry into the audit log.
+ *
+ * @param input - The payload containing order identifiers, the targeted new status, and sync override flags.
+ * @returns A promise that resolves to the result detailing the success state and error message (if any).
+ * @throws Never throws; exceptions are caught and returned inside the error property of `UpdateOrderStatusResult`.
+ *
+ * @example
+ * const result = await updateOrderStatus({
+ *   orderId: 'uuid-123',
+ *   newStatus: 'refunded',
+ *   oldStatus: 'shipped',
+ *   userId: 'user-456'
+ * });
+ * if (!result.ok) console.error(result.error);
  */
 export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<UpdateOrderStatusResult> {
     const {
@@ -127,8 +141,17 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
 }
 
 /**
- * Returns tablosundan statü değiştiğinde Orders tablosunu da günceller.
- * (İki yönlü senkronizasyon — Returns→Orders tarafı)
+ * Synchronizes a status update originating from the `venthub_returns` table back to the primary `venthub_orders` table.
+ * Translates return-specific statuses (e.g., 'received', 'approved') into strictly valid DB-level order statuses. Includes writing an audit log for traceability.
+ *
+ * @param orderId - The unique identifier of the order to update.
+ * @param returnStatus - The updated status string from the returns table.
+ * @returns A promise resolving to the success state, or error message on failure.
+ * @throws Never throws; DB failures are caught and returned in the result object.
+ *
+ * @example
+ * const result = await syncOrderFromReturn('uuid-123', 'approved');
+ * // The order status in venthub_orders is now 'processing'
  */
 export async function syncOrderFromReturn(orderId: string, returnStatus: string): Promise<UpdateOrderStatusResult> {
     // Returns statülerini Orders statülerine map'le (DB kısıtlamalarına uygun)

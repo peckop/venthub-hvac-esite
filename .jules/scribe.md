@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2026-06-13 - Added TSDoc to functions
+**Learning:** Writing strict TSDoc for functions returning void needs an explicit `@returns A promise that resolves when...` pattern, even if the result is void, to clarify the asynchronous lifecycle. Similarly, side-effects like silent error catching via `console.warn` must be documented in `@throws` to ensure developers know errors won't bubble.
+**Action:** Always document the silent suppression behavior of utility functions in the `@throws` block.
