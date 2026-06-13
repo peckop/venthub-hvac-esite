@@ -1,9 +1,11 @@
 export const users = {
       subtitle: 'Sistem kullanıcılarını ve rollerini yönetin.',
       searchPlaceholder: 'E-posta, isim, şirket veya VKN ile ara...',
+      columnsButton: 'Görünüm',
       table: {
         user: 'Kullanıcı',
         created: 'Kayıt',
+        createdLabel: 'Katılım',
         actions: 'İşlem',
         company: 'Şirket & B2B',
         role: 'Rol'
@@ -16,7 +18,7 @@ export const users = {
           superadmin: 'Süper Yönetici: Tüm yetkiler + rol atamaları (güvenlik için sınırlı görünürlük)',
           user: 'Kullanıcı: Standart kullanıcı (yalnızca kendi hesabını yönetir)'
         },
-        title: 'Kullanıcı Rol Sistemi'
+        title: 'Rol Yetkilendirme Rehberi'
       },
       roles: {
         superadmin: 'Tüm sistem ayarlarına ve rol yönetimine tam erişim.',
@@ -27,11 +29,15 @@ export const users = {
       },
       permissionsError: 'Kullanıcı rolleri değiştirme yetkiniz yok.',
       actionTitles: {
-        admin: 'Yönetici yap',
-        cannotDemoteSelf: 'Kendi yetkinizi düşüremezsiniz',
-        moderator: 'Moderatör yap',
+        super_admin: 'Süperadmin yap',
+        admin: 'Admin yap',
+        warehouse: 'Depo yetkisi ver',
+        sales: 'Satış yetkisi ver',
+        viewer: 'İzleyici yetkisi ver',
+        user: 'Normal kullanıcı yap',
         superadmin: 'Süper yönetici yap',
-        user: 'Kullanıcı yap'
+        moderator: 'Moderatör yap',
+        cannotDemoteSelf: 'Kendi yetkinizi düşüremezsiniz'
       },
       actions: {
         admin: 'Yönetici',
@@ -39,11 +45,17 @@ export const users = {
         superadmin: 'Süper Yönetici',
         user: 'Kullanıcı'
       },
+      noEmail: '—',
+      emptyTitle: 'Kullanıcı bulunamadı',
+      emptyDescription: 'Bu listede henüz herhangi bir kayıt bulunmuyor.',
+      filterEmptyDescription: 'Aramanızla eşleşen kullanıcı bulunamadı.',
       empty: {
         admins: 'Henüz yönetici kullanıcı yok.',
         all: 'Kullanıcı listesi boş.',
         filtered: 'Aramanızla eşleşen kullanıcı bulunamadı.'
       },
+      accessDeniedTitle: 'Erişim Engellendi',
+      accessDeniedDesc: 'Bu sayfayı görüntülemek için yetkiniz bulunmuyor.',
       tabs: {
         admins: 'Yönetici Kullanıcılar ({{count}})',
         all: 'Tüm Kullanıcılar ({{count}})'
@@ -53,6 +65,7 @@ export const users = {
         allLoadFailed: 'Kullanıcılar yüklenemedi',
         roleNotUpdated: 'Rol güncellenemedi',
         roleUpdateError: 'Rol güncelleme hatası',
+        noPermission: 'Kullanıcı rolleri değiştirme yetkiniz yok.',
         roleUpdated: 'Kullanıcı rolü "{{role}}" olarak güncellendi'
       }
 };

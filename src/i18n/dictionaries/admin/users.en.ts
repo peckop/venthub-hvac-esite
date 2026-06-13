@@ -1,58 +1,71 @@
 export const users = {
       subtitle: 'Manage system users and their roles.',
-      tabs: {
-        admins: 'Admin Users ({{count}})',
-        all: 'All Users ({{count}})'
-      },
       searchPlaceholder: 'Search by email or name',
+      columnsButton: 'View',
       table: {
         user: 'User',
-        company: 'Company & B2B',
-        role: 'Role',
         created: 'Created',
-        actions: 'Actions'
-      },
-      empty: {
-        filtered: 'No users match your search.',
-        admins: 'No admin users yet.',
-        all: 'User list is empty.'
-      },
-      actions: {
-        superadmin: 'Superadmin',
-        admin: 'Admin',
-        moderator: 'Mod',
-        user: 'User'
-      },
-      actionTitles: {
-        superadmin: 'Make superadmin',
-        admin: 'Make admin',
-        moderator: 'Make moderator',
-        user: 'Make user',
-        cannotDemoteSelf: 'You can\'t demote yourself'
-      },
-      toasts: {
-        adminsLoadFailed: 'Failed to load admin users',
-        allLoadFailed: 'Failed to load users',
-        roleUpdated: 'User role updated to "{{role}}"',
-        roleNotUpdated: 'Role could not be updated',
-        roleUpdateError: 'Role update error'
+        createdLabel: 'Joined',
+        actions: 'Actions',
+        company: 'Company & B2B',
+        role: 'Role'
       },
       info: {
-        title: 'User Role System',
+        subtitle: 'Control the privilege levels of roles for system security.',
         items: {
           superadmin: 'Superadmin: All privileges + role assignments (limited visibility for security)',
           admin: 'Admin: Access to operations panel (inventory, returns, shipping, users)',
           moderator: 'Moderator: Limited admin privilege (inventory and returns)',
           user: 'User: Regular user (only manages own account)'
         },
-        subtitle: 'Control the privilege levels of roles for system security.'
+        title: 'Role Authorization Guide'
+      },
+      roles: {
+        superadmin: 'Full access to all system settings and role management.',
+        admin: 'Privilege for product, order and content management.',
+        warehouse: 'Privilege for stock management and inventory movements.',
+        sales: 'Privilege for order, shipping, return and coupon management.',
+        viewer: 'Privilege to view all modules read-only (view-only).'
       },
       permissionsError: 'You do not have permission to change user roles.',
-      roles: {
-        admin: 'Privilege for product, order and content management.',
-        sales: 'Privilege for order, shipping, return and coupon management.',
-        superadmin: 'Full access to all system settings and role management.',
-        viewer: 'Privilege to view all modules read-only (view-only).',
-        warehouse: 'Privilege for stock management and inventory movements.'
+      actionTitles: {
+        super_admin: 'Make superadmin',
+        admin: 'Make admin',
+        warehouse: 'Grant warehouse access',
+        sales: 'Grant sales access',
+        viewer: 'Grant viewer access',
+        user: 'Make regular user',
+        superadmin: 'Make superadmin',
+        moderator: 'Make moderator',
+        cannotDemoteSelf: 'You can\'t demote yourself'
+      },
+      actions: {
+        admin: 'Admin',
+        moderator: 'Mod',
+        superadmin: 'Superadmin',
+        user: 'User'
+      },
+      noEmail: '—',
+      emptyTitle: 'No users found',
+      emptyDescription: 'There are no records in this list yet.',
+      filterEmptyDescription: 'No users match your search.',
+      empty: {
+        admins: 'No admin users yet.',
+        all: 'User list is empty.',
+        filtered: 'No users match your search.'
+      },
+      accessDeniedTitle: 'Access Denied',
+      accessDeniedDesc: 'You do not have permission to view this page.',
+      tabs: {
+        admins: 'Admin Users ({{count}})',
+        all: 'All Users ({{count}})'
+      },
+      toasts: {
+        adminsLoadFailed: 'Failed to load admin users',
+        allLoadFailed: 'Failed to load users',
+        roleNotUpdated: 'Role could not be updated',
+        roleUpdateError: 'Role update error',
+        noPermission: 'You do not have permission to change user roles.',
+        roleUpdated: 'User role updated to "{{role}}"'
       }
 };

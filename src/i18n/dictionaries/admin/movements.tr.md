@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\movements.tr.ts
-skeleton_hash: 338ffdee324c79cb
+skeleton_hash: e79560ab4ea296d0
 entity_hashes:
   overview: 913c3c44e13878f9
-generated_at: 2026-06-13T11:14:32Z
+generated_at: 2026-06-13T18:54:46Z
 ---
 
 ## Genel Bakış
@@ -19,25 +19,13 @@ Bu dosyada fonksiyon bulunmamaktadır. Modül seviyesinde tanımlanmış tek bir
 
 ---
 
-# AXIOMS – Mimari Varsayımlar
+## AXIOMS – Mimari Varsayımlar
 
-Bu modül, admin paneli "hareketler" (movements) ekranı için Türkçe çeviri sözlüğü içeren statik bir i18n modülüdür.
+Bu modül, yalnızca statik bir çeviri sözlüğü (nesne sabiti) dışa aktaran bir i18n dosyasıdır; herhangi bir fonksiyon gövdesi veya çalış zamanı mantığı içermez. Dolayısıyla mimari aksiyomlar son derece sınırlıdır.
 
----
+**[Aksiyom 1]:** Eğer `movements` nesnesi doğru şekilde export edilmemişse, i18n sistemi Türkçe dil seçeneğinde hareket ekranlarındaki metinleri yükleyemez ve arayüzde çeviri anahtarları (örn. `"movements.someKey"`) ham metin olarak görünür olur.
 
-**[Aksiyom 1]:** Eğer `movements` nesnesi tanımlı değilse veya boş `{}` ise, admin panelinin hareketler ekranındaki tüm metin alanları boş/bozuk görünür.
-
-**[Aksiyom 2]:** Eğer `movements` nesnesindeki herhangi bir çeviri anahtarı (key) eksikse, ilgili UI bileşeninde çeviri key'in kendisi ham metin olarak görüntülenir (fallback davranışı).
-
-**[Aksiyom 3]:** Eğer bu dosya UTF-8 encoding ile kaydedilmemişse, Türkçe karakterler (ı, İ, ş, ç, ğ, ö, ü) hatalı render edilir.
-
-**[Aksiyom 4]:** Eğer `movements` nesnesinin yapısı (iç içe key-value düzeni) tüketici tarafındaki `t('movements.xxx.yyy')` çağrılarıyla eşleşmiyorsa, ilgili çeviriler bulunamaz ve UI'da hatalı/metin-dışı gösterim oluşur.
-
-**[Aksiyom 5]:** Bu modül sadece **statik veri** içerir; herhangi bir fonksiyon, method veya hesaplama barındırmaz. Çalışma zamanında (runtime) modüle ait hiçbir yan etki (side-effect) oluşmaz.
-
----
-
-> **Not:** Dosyanın gerçek içeriği (nested object yapısı ve key değerleri) paylaşılmadığı için, aksiyomlar modülün türüne (i18n dictionary) ve yapısına (movements object) dayalı olarak türetilmiştir. İçerik detayı paylaşıldığında aksiyomlar spesifik key'ler ile zenginleştirilebilir.
+**[Aksiyom 2]:** Eğer `movements` nesnesinin değerleri string dışı bir tipe sahipse (örn. `null`, `undefined`, nesne), i18n render fonksiyonu beklenen metin yerine hata veya boş değer döndürür; arayüzde metin alanları kırılır.
 
 ---
 
@@ -47,9 +35,7 @@ Bu modül, admin paneli "hareketler" (movements) ekranı için Türkçe çeviri 
 
 ## SABİTLER
 - **movements** (object) — `{
-      batchFilterPrefix: 'Filtre: Toplu İşlem',
-      export: {
-        csv...`
+      subtitle: 'Envanter giriş/çıkış hareketlerini izleyin, filtreleyin ve...`
 
 ---
 

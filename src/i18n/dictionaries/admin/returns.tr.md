@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\returns.tr.ts
-skeleton_hash: 0f9b313612a99e63
+skeleton_hash: 44a92297eaac8348
 entity_hashes:
   overview: f74c60dbdfef5408
-generated_at: 2026-06-13T11:16:09Z
+generated_at: 2026-06-13T18:54:46Z
 ---
 
 ## Genel Bakış
@@ -27,10 +27,6 @@ Bu modül için fonksiyon gövdesi verilmediğinden, spefisifik aksiyom üretile
 
 ---
 
-**Not:** Bu modül bir i18n sözlük dosyası (`returns.tr.ts`) olduğundan, tipik bir iş mantığı modülü gibi değil, statik veri yapısı olarak çalışır. Detaylı aksiyom üretmek için fonksiyon gövdelerine ihtiyaç vardır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ---
@@ -38,7 +34,7 @@ Bu modül için fonksiyon gövdesi verilmediğinden, spefisifik aksiyom üretile
 ## SABİTLER
 - **returns** (object) — `{
       total: 'Toplam: {{count}} iade talebi yönetiliyor.',
-      searchPlac...`
+      subtitle: ...`
 
 ---
 

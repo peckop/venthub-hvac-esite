@@ -1,4 +1,8 @@
 export const errorGroups = {
+      subtitle: 'Monitor, assign, and manage the status of grouped client errors.',
+      emptyTitle: 'No Error Groups Found',
+      emptyDescription: 'There are no recorded error groups yet.',
+      filterEmptyDescription: 'No error groups match the selected filters.',
       searchPlaceholder: 'search signature/message',
       filter: {
         statusAll: 'Status: All',
@@ -20,7 +24,8 @@ export const errorGroups = {
       },
       bulk: {
         selected: 'Selected groups: {{count}}',
-        statusTitle: 'Status:'
+        statusTitle: 'Status:',
+        apply: 'Apply'
       },
       assigned: {
         none: '(none)'
@@ -36,5 +41,13 @@ export const errorGroups = {
         envTitle: 'Env',
         userAgentTitle: 'User Agent',
         stackSummary: 'stack'
+      },
+      toasts: {
+        statusUpdated: 'Status updated.',
+        assignedUpdated: 'Assignment updated.',
+        notesSaved: 'Note saved.',
+        bulkApplied: 'Bulk status applied.',
+        noPermission: 'You do not have permission for this action.',
+        failed: 'The operation failed.'
       }
 };

@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\returns.en.ts
-skeleton_hash: ab0bded8d42f4ae4
+skeleton_hash: dbad1b4875a49d25
 entity_hashes:
   overview: f74c60dbdfef5408
-generated_at: 2026-06-13T11:15:57Z
+generated_at: 2026-06-13T18:54:46Z
 ---
 
 ## Genel Bakış
@@ -38,7 +38,7 @@ içermemektedir. Bu nedenle "Eğer ... yoksa, ... olur." formatında üretilecek
 ## SABİTLER
 - **returns** (object) — `{
       total: 'Total: {{count}} return requests',
-      searchPlaceholder: '...`
+      subtitle: 'Track ret...`
 
 ---
 

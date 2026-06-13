@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\users.en.ts
-skeleton_hash: 40a49da56d2831d6
+skeleton_hash: 45db999d4f6266de
 entity_hashes:
   overview: e82fc2cbc75bd133
-generated_at: 2026-06-13T11:18:47Z
+generated_at: 2026-06-13T18:54:46Z
 ---
 
 ## Genel Bakış
@@ -37,8 +37,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## SABİTLER
 - **users** (object) — `{
       subtitle: 'Manage system users and their roles.',
-      tabs: {
-     ...`
+      searchPlaceho...`
 
 ---
 

@@ -1,4 +1,5 @@
 export const movements = {
+      subtitle: 'Track, filter and export inventory in/out movements',
       toolbar: {
         categoryTitle: 'Category',
         allCategories: 'All Categories'
@@ -12,6 +13,7 @@ export const movements = {
       },
       export: {
         csvLabel: 'CSV (with visible filters)',
+        xlsLabel: 'Excel (with visible filters)',
         headers: {
           date: 'Date',
           product: 'Product',
@@ -22,6 +24,9 @@ export const movements = {
         }
       },
       batchFilterPrefix: 'Filter: Batch',
+      emptyTitle: 'No Movements Found',
+      emptyDescription: 'There are no recorded inventory movements yet.',
+      filterEmptyDescription: 'No inventory movements match the selected filters or search criteria.',
       pageLabel: 'Page {{page}}',
       reasons: {
         undo: 'Undo',

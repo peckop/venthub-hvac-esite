@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\errorGroups.tr.ts
-skeleton_hash: 22f0d3bb35b3be22
+skeleton_hash: dfcf2527d8350dc0
 entity_hashes:
   overview: 38d648bd807c5d10
-generated_at: 2026-06-13T11:11:27Z
+generated_at: 2026-06-13T18:54:37Z
 ---
 
 ## Genel Bakış
@@ -30,11 +30,7 @@ Bu modül, yönetimsel hata gruplarının Türkçe çevirilerini tutan bir ulusl
 
 ## SABİTLER
 - **errorGroups** (object) — `{
-      assigned: {
-        none: '(hiçbiri)'
-      },
-      bulk: {
-        ...`
+      subtitle: 'Toplanmış istemci hatalarını izleyin, atayın ve durumların...`
 
 ---
 

@@ -1,6 +1,11 @@
 export const returns = {
       total: 'Total: {{count}} return requests',
+      subtitle: 'Track return requests and move their status forward.',
       searchPlaceholder: 'Search by order no, customer name, email or reason',
+      columnsButton: 'View',
+      emptyTitle: 'No return requests',
+      emptyDescription: 'No return requests yet.',
+      filterEmptyDescription: 'No return requests match the filters.',
       export: {
         csvLabel: 'CSV (with visible filters)',
         xlsLabel: 'Excel (.xls — HTML table)',

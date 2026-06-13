@@ -1,10 +1,15 @@
 export const errorGroups = {
+      subtitle: 'Toplanmış istemci hatalarını izleyin, atayın ve durumlarını yönetin.',
+      emptyTitle: 'Hata Grubu Bulunamadı',
+      emptyDescription: 'Henüz kaydedilmiş bir hata grubu görünmüyor.',
+      filterEmptyDescription: 'Seçilen filtrelere uygun hata grubu bulunamadı.',
       assigned: {
         none: '(hiçbiri)'
       },
       bulk: {
         selected: 'Seçilen gruplar: {{count}}',
-        statusTitle: 'Durum:'
+        statusTitle: 'Durum:',
+        apply: 'Uygula'
       },
       details: {
         envTitle: 'Ortam',
@@ -36,5 +41,13 @@ export const errorGroups = {
         level: 'Seviye',
         signature: 'İmza',
         status: 'Durum'
+      },
+      toasts: {
+        statusUpdated: 'Durum güncellendi.',
+        assignedUpdated: 'Atama güncellendi.',
+        notesSaved: 'Not kaydedildi.',
+        bulkApplied: 'Toplu durum uygulandı.',
+        noPermission: 'Bu işlem için yetkiniz yok.',
+        failed: 'İşlem başarısız oldu.'
       }
 };

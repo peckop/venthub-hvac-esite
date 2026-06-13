@@ -1,6 +1,11 @@
 export const returns = {
       total: 'Toplam: {{count}} iade talebi yönetiliyor.',
+      subtitle: 'İade taleplerini takip edin, durumlarını ileri taşıyın.',
       searchPlaceholder: 'Sipariş no, müşteri ismi, e-posta veya sebep ile ara',
+      columnsButton: 'Görünüm',
+      emptyTitle: 'İade talebi yok',
+      emptyDescription: 'Henüz iade talebi bulunmuyor.',
+      filterEmptyDescription: 'Filtrelerle eşleşen iade talebi bulunamadı.',
       export: {
         csvLabel: 'CSV (Görünen filtrelerle)',
         xlsLabel: 'Excel (.xls — HTML tablo)',

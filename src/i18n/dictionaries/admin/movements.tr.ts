@@ -1,7 +1,12 @@
 export const movements = {
+      subtitle: 'Envanter giriş/çıkış hareketlerini izleyin, filtreleyin ve dışa aktarın',
       batchFilterPrefix: 'Filtre: Toplu İşlem',
+      emptyTitle: 'Hareket Bulunamadı',
+      emptyDescription: 'Henüz kaydedilmiş bir envanter hareketi bulunmuyor.',
+      filterEmptyDescription: 'Seçilen filtrelere veya arama kriterlerine uygun envanter hareketi bulunmuyor.',
       export: {
         csvLabel: 'CSV (görünür filtrelerle)',
+        xlsLabel: 'Excel (görünür filtrelerle)',
         headers: {
           date: 'Tarih',
           delta: 'Değişim',
