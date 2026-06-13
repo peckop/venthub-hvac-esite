@@ -1,0 +1,20 @@
+export const a11y = {
+      close: 'Kapat',
+      delete: 'Sil',
+      edit: 'Düzenle',
+      save: 'Kaydet',
+      search: 'Ara',
+      filter: 'Filtrele',
+      menu: 'Menü',
+      settings: 'Ayarlar',
+      refresh: 'Yenile',
+      export: 'Dışa Aktar',
+      import: 'İçe Aktar',
+      expand: 'Genişlet',
+      collapse: 'Daralt',
+      next: 'Sonraki',
+      prev: 'Önceki',
+      copy: 'Kopyala',
+      upload: 'Dosya Yükle',
+      download: 'İndir'
+};

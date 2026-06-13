@@ -1,0 +1,47 @@
+import { a11y } from './a11y.tr'
+import { audit } from './audit.tr'
+import { authority } from './authority.tr'
+import { categories } from './categories.tr'
+import { common } from './common.tr'
+import { dashboard } from './dashboard.tr'
+import { errorGroups } from './errorGroups.tr'
+import { errors } from './errors.tr'
+import { inventory } from './inventory.tr'
+import { logistics } from './logistics.tr'
+import { menu } from './menu.tr'
+import { movements } from './movements.tr'
+import { orders } from './orders.tr'
+import { products } from './products.tr'
+import { returns } from './returns.tr'
+import { search } from './search.tr'
+import { settings } from './settings.tr'
+import { titles } from './titles.tr'
+import { toolbar } from './toolbar.tr'
+import { ui } from './ui.tr'
+import { users } from './users.tr'
+import { webhooks } from './webhooks.tr'
+
+export const admin = {
+  authority,
+  categories,
+  products,
+  common,
+  users,
+  inventory,
+  orders,
+  dashboard,
+  errors,
+  toolbar,
+  menu,
+  titles,
+  webhooks,
+  a11y,
+  returns,
+  logistics,
+  audit,
+  errorGroups,
+  movements,
+  search,
+  settings,
+  ui,
+}

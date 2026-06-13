@@ -1,0 +1,33 @@
+export const webhooks = {
+      subtitle: 'Sistemler arası veri akışını ve otomatik bildirimleri izleyin.',
+      noReturns: 'İade Etkinliği Bulunamadı',
+      noReturnsDesc: 'Şu an için kaydedilmiş herhangi bir iade webhook etkinliği bulunmuyor.',
+      noEmails: 'E-Posta Etkinliği Bulunamadı',
+      noEmailsDesc: 'Şu an için kaydedilmiş herhangi bir sevkiyat/kargo e-posta etkinliği bulunmuyor.',
+      emailsTable: {
+        date: 'Tarih',
+        order: 'Sipariş',
+        provider: 'Sağlayıcı',
+        subject: 'Konu',
+        to: 'Alıcı'
+      },
+      returnsTable: {
+        carrier: 'Kargo Firması',
+        eventId: 'Etkinlik ID',
+        order: 'Sipariş',
+        received: 'Alındı',
+        statusMapped: 'Durum (eşleşen)'
+      },
+      search: {
+        returns: 'event_id, order_id, _return_id, kargo, durum',
+        shipping: 'order_id, e-posta, konu, sağlayıcı'
+      },
+      tabs: {
+        returns: 'İadeler',
+        shipping: 'Sevkiyat E-postaları'
+      },
+      tip: {
+        rowAction: 'Detayları ve yeniden işlem menüsünü açmak için bir satıra tıklayın.'
+      },
+      title: 'Webhook Etkinlikleri'
+};

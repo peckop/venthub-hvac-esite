@@ -1,0 +1,20 @@
+export const a11y = {
+      close: 'Close',
+      collapse: 'Collapse',
+      copy: 'Copy',
+      delete: 'Delete',
+      download: 'Download',
+      edit: 'Edit',
+      expand: 'Expand',
+      export: 'Export',
+      filter: 'Filter',
+      import: 'Import',
+      menu: 'Menu',
+      next: 'Next',
+      prev: 'Previous',
+      refresh: 'Refresh',
+      save: 'Save',
+      search: 'Search',
+      settings: 'Settings',
+      upload: 'Upload File'
+};
