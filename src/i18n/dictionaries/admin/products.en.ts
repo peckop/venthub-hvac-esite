@@ -1,4 +1,23 @@
 export const products = {
+      subtitle: 'Manage the entire product catalog and track stock and price updates in real time.',
+      emptyTitle: 'No products yet',
+      emptyDescription: 'Add your first product to start building your catalog.',
+      filterEmptyDescription: 'No products match your search criteria. Please adjust the filters or add a new product.',
+      brandless: 'No brand',
+      noImage: 'No Img',
+      expand: {
+        title: 'Technical Product Parameters',
+        empty: 'No additional technical specifications defined for this product.'
+      },
+      bulk: {
+        statusConfirm: 'Are you sure you want to update the status of {{count}} selected products to "{{status}}"?',
+        statusFailed: 'Bulk update error',
+        featureFailed: 'Featured update error',
+        deleteConfirm: 'Are you sure you want to DELETE {{count}} selected products? This action cannot be undone!',
+        deleteFailed: 'Bulk delete error',
+        priceConfirm: 'A price update will be applied to {{count}} selected products. Do you confirm?',
+        priceFailed: 'Price update error'
+      },
       toolbar: {
         categoryTitle: 'Category',
         allCategories: 'All Categories'
@@ -17,6 +36,7 @@ export const products = {
         sku: 'SKU',
         category: 'Category',
         status: 'Status',
+        health: 'Performance',
         price: 'Price',
         stock: 'Stock',
         actions: 'Actions'
@@ -100,6 +120,7 @@ export const products = {
       },
       toasts: {
         loadFailed: 'Could not load',
+        noPermission: 'You do not have permission for this action',
         altSaveFailed: 'Could not save alt text: {{msg}}',
         imagesSaved: 'Images saved',
         imagesSaveFailed: 'Could not save images: {{msg}}',

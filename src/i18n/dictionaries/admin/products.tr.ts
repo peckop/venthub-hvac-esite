@@ -1,4 +1,23 @@
 export const products = {
+      subtitle: 'Tüm ürün kataloğunu yönetin, stok ve fiyat güncellemelerini anlık olarak takip edin.',
+      emptyTitle: 'Henüz ürün yok',
+      emptyDescription: 'İlk ürünü ekleyerek kataloğunuzu oluşturmaya başlayın.',
+      filterEmptyDescription: 'Arama kriterlerinize uyan ürün bulunamadı. Lütfen filtreleri değiştirin veya yeni ürün ekleyin.',
+      brandless: 'Markasız',
+      noImage: 'No Img',
+      expand: {
+        title: 'Teknik Ürün Parametreleri',
+        empty: 'Bu ürün için tanımlanmış ek teknik özellik bulunmuyor.'
+      },
+      bulk: {
+        statusConfirm: 'Seçili {{count}} ürünün durumunu "{{status}}" olarak güncellemek istediğinize emin misiniz?',
+        statusFailed: 'Toplu güncelleme hatası',
+        featureFailed: 'Vitrin güncelleme hatası',
+        deleteConfirm: 'Seçili {{count}} ürünü SİLMEK istediğinize emin misiniz? Bu işlem geri alınamaz!',
+        deleteFailed: 'Toplu silme hatası',
+        priceConfirm: 'Seçili {{count}} ürüne fiyat güncellemesi uygulanacak. Onaylıyor musunuz?',
+        priceFailed: 'Fiyat güncelleme hatası'
+      },
       form: {
         name: 'Ürün Adı',
         category: 'Kategori',
@@ -95,6 +114,7 @@ export const products = {
       table: {
         actions: 'İşlemler',
         category: 'Kategori',
+        health: 'Performans',
         image: 'Görsel',
         name: 'Ad',
         price: 'Fiyat',
@@ -105,6 +125,7 @@ export const products = {
       toasts: {
         altSaveFailed: 'Alt metin kaydedilemedi: {{msg}}',
         deleteFailed: 'Silinemedi: {{msg}}',
+        noPermission: 'Bu işlem için yetkiniz yok',
         imagesSaveFailed: 'Görseller kaydedilemedi: {{msg}}',
         imagesSaved: 'Görseller kaydedildi',
         loadFailed: 'Yüklenemedi',

@@ -119,7 +119,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
 
     return (
         <>
-            <input id="prod-import-input" type="file" accept=".csv,text/csv" className="hidden" onChange={handleFileChange} />
+            <input id="prod-import-input" type="file" accept=".csv,text/csv" aria-label={t('admin.products.import.button')} className="hidden" onChange={handleFileChange} />
             <button
                 onClick={() => document.getElementById('prod-import-input')?.click()}
                 className={`${adminButtonSecondaryClass}`}

@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\products.tr.ts
-skeleton_hash: 9fb5d5ca17537ec7
+skeleton_hash: a24f569288c4ef99
 entity_hashes:
   overview: b4058d53edae1644
-generated_at: 2026-06-13T11:15:34Z
+generated_at: 2026-06-13T21:06:01Z
 ---
 
 ## Genel Bakış
@@ -37,10 +37,7 @@ Bu modül için temel aksiyomlar:
 
 ## SABİTLER
 - **products** (object) — `{
-      form: {
-        name: 'Ürün Adı',
-        category: 'Kategori',
-     ...`
+      subtitle: 'Tüm ürün kataloğunu yönetin, stok ve fiyat güncellemelerin...`
 
 ---
 

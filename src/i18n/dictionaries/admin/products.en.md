@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\products.en.ts
-skeleton_hash: b2e337ac5203431f
+skeleton_hash: 948f847f034305bd
 entity_hashes:
   overview: b4058d53edae1644
-generated_at: 2026-06-13T11:15:22Z
+generated_at: 2026-06-13T21:06:01Z
 ---
 
 ## Genel Bakış
@@ -35,32 +35,13 @@ Bu modül, ürünlerle ilgili İngilizce çeviri anahtarlarını içeren bir i18
 
 ## SABİTLER
 - **products** (object) — `{
-      toolbar: {
-        categoryTitle: 'Category',
-        allCategories: ...`
+      subtitle: 'Manage the entire product catalog and track stock and pric...`
 
 ---
 
 ## AST POINTERS
 
 Bu dosya **fonksiyon içermeyen**, sadece i18n (uluslararasılaştırma) sözlüğü tanımlayan bir veri dosyasıdır.
-
----
-
-### [N1_DOSYA] AST Pointer: src/i18n/dictionaries/admin/products.en.ts::products
-- **params**: (fonksiyon değil — sabit nesne tanımı)
-- **ic_degiskenler**: (yok — doğrudan nesne literal'i)
-- **Dönüş**: `products` object — Admin ürünler sayfası için İngilizce çeviri metinlerini içeren sözlük nesnesi
-
-**Tanımlı Structure (nesne anahtarları)**:
-
-| Anahtar | Tür | Açıklama |
-|---------|-----|----------|
-| `products` | object | Tüm ürün sayfası çevirilerini barındıran kök nesne |
-
----
-
-**Not**: Bu dosyada herhangi bir fonksiyon gövdesi, method, class veya import bulunmamaktadır. Dosya salt veri (translation dictionary) dosyasıdır. Fonksiyonel analiz yapılamaz.
 
 ---
 
