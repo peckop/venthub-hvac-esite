@@ -3,29 +3,24 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\tr.ts
-skeleton_hash: 4bd0c5d000e0f1a4
+skeleton_hash: b6dc563b6dd8a8de
 entity_hashes:
-  overview: c015499002971f60
-generated_at: 2026-06-13T11:18:06Z
+  overview: e77595acec187e79
+generated_at: 2026-06-13T15:04:52Z
 ---
 
 ## Genel Bakış
-Bu modül, admin panelinin Türkçe çevirilerini merkezi bir noktadan yöneten bir dil sözlüğü dosyasıdır. Farklı işlevsel alanlara ait çeviri nesnelerini bir araya getirir ve bunları tek bir "admin" adlı dışa açık bir sözlük olarak sunar. Modülün temel amacı, çevirilerin tutarlılığını ve bakımını kolaylaştırmaktır.
+Bu modül, admin panelinin Türkçe çeviri sözlüğünü tanımlayan bir dil kaynak dosyasıdır. Farklı işlevsel alanlara ait (yetkilendirme, kategoriler, ortak metinler vb.) çeviri nesnelerini bir araya getirerek, uygulamanın Türkçe arayüzünde kullanılmak üzere merkezi bir `admin` sözlüğü oluşturur ve dışa aktarır.
 
-## Fonksiyon Grupları
-*(Bu dosyada herhangi bir fonksiyon tanımlı değildir.)*
+## Modül Yapısı ve Sorumlulukları
+Dosya, statik bir key-value veri yapısıdır ve herhangi bir iş mantığı veya fonksiyon içermez. Temel sorumluluğu, alt modüllerden (`a11y`, `audit`, `authority` vb.) import edilen çeviri nesnelerini birleştirip `admin` adlı tek, tutarlı ve erişilebilir bir sözlük nesnesi olarak dışa sunmaktır. Bu yapı, dil değiştirme mekanizması tarafından yüklenerek arayüz bileşenlerine çeviri metinleri sağlar; herhangi bir API, veritabanı veya ortam değişkeniyle doğrudan etkileşimi yoktur.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül bir i18n çeviri sözlüğü (dictionary) yapısıdır ve statik bir key-value objesi olarak tanımlanmıştır. Sadece veri taşıma/amacıyla kullanılır.
-
-**[Aksiyom 1]:** Eğer `admin` nesnesi içinde tanımlı bir çeviri key'i (API çağrısı, UI bileşeni veya middleware tarafından) aranıyorsa, o key'in `admin` objesi içinde var olması gerekir; yoksa, istenen dil için çeviri bulunamaz ve uygulama davranışı tanımsızdır (boş string, fallback key veya runtime hatası oluşur).
-
-**[Aksiyom 2]:** Eğer bu sözlük dosyası uygulamanın dil değiştirme (locale switching) mekanizması tarafından yükleniyorsa, `admin` objesinin her bir value'sunun string türünde olması gerekir; yoksa, çeviri rendering sırasında hata oluşur.
-
-**[Aksiyom 3]:** Eğer bu dosya bir `export` ile dışa açılıyorsa, modülü import eden tüketici tarafında `admin` objesinin erişilebilir (truthy) olması gerekir; yoksa, consumer tarafında `undefined` reference hatası oluşur.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -39,13 +34,35 @@ Bu modül bir i18n çeviri sözlüğü (dictionary) yapısıdır ve statik bir k
   categories,
   products,
   common,
-  users,
-  inventory,
-  or...`
+  coupons,
+  dataTable,
+  ...`
 
 ---
 
 ## AST POINTERS
+
+Bu dosya **fonksiyon içermeyen bir dictionary/modül dosyasıdır**. Sadece import'lar ve bir nesne export'u bulunmaktadır.
+
+### [N1_NASIL] AST Pointer: src/i18n/dictionaries/admin/tr.ts::(modül yapısı)
+- **params**: yok (fonksiyon değil, modül)
+- **ic_degiskenler**:
+  - `a11y` — Erişilebilirlik çevirilerini içeren import
+  - `audit` — Audit/sistem log çevirilerini içeren import
+  - `authority` — Yetki/hak çevirilerini içeren import
+  - `categories` — Kategori çevirilerini içeren import
+  - `common` — Ortak/genel çevirileri içeren import
+  - `coupons` — Kupon çevirilerini içeren import
+  - `dashboard` — Dashboard/panel çevirilerini içeren import
+  - `dataTable` — Veri tablosu çevirilerini içeren import
+  - `errorGroups` — Hata grupları çevirilerini içeren import
+  - `errors` — Hata mesajları çevirilerini içeren import
+  - `admin` — Tüm çevirileri birleştiren ana dictionary nesnesi (export edilen)
+- **Dönüş**: yok (yan etki: `admin` nesnesini export eder)
+
+---
+
+**Not**: Bu dosya bir `dictionary` dosyasıdır ve herhangi bir fonksiyon gövdesi içermemektedir. `admin` nesnesi muhtemelen tüm import edilen çeviri nesnelerini birleştiren bir `export const admin = { ...a11y, ...audit, ...authority, ...categories, ...common, ...coupons, ...dashboard, ...dataTable, ...errorGroups, ...errors }` yapısına sahiptir.
 
 ---
 

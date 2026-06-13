@@ -3,42 +3,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\en.ts
-skeleton_hash: c4cb063f1ba2c520
+skeleton_hash: 0fc6f1eeba141f7a
 entity_hashes:
-  overview: a741317a2d701ec4
-generated_at: 2026-06-13T11:10:48Z
+  overview: 3d02093c393d55b1
+generated_at: 2026-06-13T15:04:26Z
 ---
 
 ## Genel Bakış
 
-Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturarak birden fazla alt sözlüğü tek bir `admin` nesnesi altında birleştirir. A11y, denetim, otorite, kategoriler, ortak metinler, kontrol paneli, hata grupları ve hata mesajları gibi farklı modüllerin çeviri kaynaklarını merkezi bir noktadan对外a sunar. Bu yapı, uygulama genelinde tutarlı dil kullanımı sağlar ve çeviri yönetimini kolaylaştırır.
-
-## Modül Yapısı
-
-### Bağımlılıklar
-Dosya, aşağıdaki sözlük modüllerinden çevirileri içe aktarır:
-- a11y.en, audit.en, authority.en, categories.en, common.en, dashboard.en, errorGroups.en, errors.en
-
-### Dışa Aktarım
-- **admin**: Tüm alt sözlüklerin birleştirildiği ana İngilizce sözlük nesnesi
+Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturarak erişilebilirlik, denetim, otorite, kategoriler, ortak metinler, kontrol paneli, veri tablosu ve kuponlar gibi farklı modüllerin çeviri kaynaklarını tek bir `admin` nesnesi altında birleştirir. Uygulama genelinde tutarlı dil kullanımı sağlamak ve çeviri yönetimini merkezileştirmek amacıyla yapılandırılmış statik bir veri dosyasıdır. Dosya herhangi bir fonksiyon, ortam değişkeni veya API çağrısı içermez; yalnızca import edilmiş alt sözlükleri bir araya getirerek dışa aktarır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül veri ihracatı (data export) yapan bir sözlük modülüdür. Fonksiyon imzası bulunmamaktadır.
+
+**[Aksiyom 1]**: Eğer `admin` nesnesi düzgün bir JavaScript nesnesi (object) olarak tanımlanmazsa, uygulama içinde çeviri erişimi başarısız olur ve tanımsız (undefined) referans hataları oluşur.
+
+**[Aksiyom 2]**: Eğer `admin` nesnesinin içindeki alt sözlük anahtarları (a11y, audit, authority, categories, common, dashboard, errorGroups, errors) eksik veya yanlış tanımlanırsa, ilgili modüllerde çeviri anahtarları çözümlenemez ve uygulama arayüzünde hata mesajları veya boş metinler görüntülenir.
+
+**[Aksiyom 3]**: Eğer `admin` nesnesi `default export` veya `named export` olarak dışa aktarılmazsa, modülü içe aktaran dosyalar `admin` sözlüğüne erişemez ve lokalizasyon sistemi çalışmaz.
 
 ---
 
-**Gerekçe:**
-
-Bu modül bir **i18n (uluslararasılaşma) sözlük dosyası**dır (`admin` adında bir object sabiti içerir). Modülde:
-
-- **Fonksiyon gövdesi bulunmamaktadır** — aksiyomların üretileceği temel kaynak yoktur
-- Yalnızca statik bir veri yapısı (object constant) mevcuttur
-- Modül, bir API sunmaz; sadece çeviri metinleri içeren bir veri kaynağıdır
-
-Mimari aksiyomlar, fonksiyonların çalışma koşullarından türetilebilir; bu modülde böyle bir yapı olmadığından aksiyom üretmek mümkün değildir.
+*Not: Bu modül salt veri (dictionary) modülü olduğundan, iş mantığı veya hesaplama varsayımı içermemektedir. Aksiyomlar yalnızca dışa aktarım yapısına ve veri bütünlüğüne yöneliktir.*
 
 ---
 
@@ -49,38 +38,45 @@ Mimari aksiyomlar, fonksiyonların çalışma koşullarından türetilebilir; bu
 ## SABİTLER
 - **admin** (object) — `{
   common,
+  coupons,
+  dataTable,
   dashboard,
   errors,
   toolbar,
-  menu,
-  titles,
-  audit,
-  in...`
+  menu,...`
 
 ---
 
 ## AST POINTERS
 
-Bu dosyada fonksiyon gövdesi bulunmamaktadır. Dosya, i18n sözlük dosyası olup sadece import'lar ve bir nesne sabitinin export'unu içerir.
+Bu dosyada **fonksiyon gövdesi bulunmamaktadır**. Dosya, sadece import edilen sözlük nesnelerini bir araya getiren bir i18n sözlük birleştirme dosyasıdır.
 
-### [N1_KOSUL] AST Pointer: admin\en.ts::admin
+---
 
-- **params**: yok
-- **ic_degiskenler**:
-  - `admin` — İngilizce admin arayüz çevirilerini içeren nesne; aşağıdaki alt nesneleri birleştirir (spread):
-    - `...a11y` — Erişilebilirlik çevirilerinden aktarım (a11y.en.ts kaynaklı)
-    - `...audit` — Denetim/audit çevirilerinden aktarım (audit.en.ts kaynaklı)
-    - `...authority` — Yetki çevirilerinden aktarım (authority.en.ts kaynaklı)
-    - `...categories` — Kategori çevirilerinden aktarım (categories.en.ts kaynaklı)
-    - `...common` — Ortak/genel çevirilerden aktarım (common.en.ts kaynaklı)
-    - `...dashboard` — Dashboard çevirilerinden aktarım (dashboard.en.ts kaynaklı)
-    - `...errorGroups` — Hata grupları çevirilerinden aktarım (errorGroups.en.ts kaynaklı)
-    - `...errors` — Hatalar çevirilerinden aktarım (errors.en.ts kaynaklı)
-    - `...inventory` — Envanter çevirilerinden aktarım (inventory.en.ts kaynaklı)
-    - `...logistics` — Lojistik çevirilerinden aktarım (logistics.en.ts kaynaklı)
-- **Dönüş**: `admin` nesnesi (i18n dictionary object) — spread operatörü ile 10 farklı çeviriden birleştirilmiş tek bir flat/nesne yapısı olarak export edilir
+### Dosya Yapısı Özeti
 
-**Not**: Dosya fonksiyon/barındırmaz; saf bir veri (translation dictionary) modülüdür. `admin` sabiti, tüm alt sözlüklerin birleşimi olarak dışa aktarılır.
+**Dosya**: `src/i18n/dictionaries/admin/en.ts`
+
+**İçerik**: Sadece import deklarasyonları ve bir `admin` sabit nesnesi export'u bulunmaktadır.
+
+**Import'lar**:
+- `a11y` — from `./a11y.en`
+- `audit` — from `./audit.en`
+- `authority` — from `./authority.en`
+- `categories` — from `./categories.en`
+- `common` — from `./common.en`
+- `coupons` — from `./coupons.en`
+- `dashboard` — from `./dashboard.en`
+- `dataTable` — from `./dataTable.en`
+- `errorGroups` — from `./errorGroups.en`
+- `errors` — from `./errors.en`
+
+**Sabitler**:
+- `admin` (object) — Tüm import edilen sözlüklerin birleştirildiği ana admin sözlük nesnesi
+
+---
+
+> **Not**: Bu dosya `"use strict"` veya herhangi bir fonksiyon/barındırmamaktadır. AST Pointer üretimi için fonksiyon gövdesi gerekli olup, bu dosyada analiz edilecek fonksiyon bulunmamaktadır.
 
 ---
 

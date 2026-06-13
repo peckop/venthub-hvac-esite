@@ -3,7 +3,9 @@ import { audit } from './audit.tr'
 import { authority } from './authority.tr'
 import { categories } from './categories.tr'
 import { common } from './common.tr'
+import { coupons } from './coupons.tr'
 import { dashboard } from './dashboard.tr'
+import { dataTable } from './dataTable.tr'
 import { errorGroups } from './errorGroups.tr'
 import { errors } from './errors.tr'
 import { inventory } from './inventory.tr'
@@ -26,6 +28,8 @@ export const admin = {
   categories,
   products,
   common,
+  coupons,
+  dataTable,
   users,
   inventory,
   orders,
