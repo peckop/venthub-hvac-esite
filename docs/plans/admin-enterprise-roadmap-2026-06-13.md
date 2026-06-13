@@ -69,6 +69,21 @@ Sıra = cetvel skoru × Avensair B2B değeri. **OrdersBoard ve Dashboard burada 
 | 1d | Categories(44), CategoryBuilder(50) |
 | 1e | Products(58)*, Returns(58), ErrorGroups(61) — *Products kit-evrim, seri |
 
+> **🔬 2026-06-13 — Kod-okumalı triyaj DÜZELTMESİ (kanıt > skor):** 14 sayfanın gerçek kodu okundu (4'ü tam,
+> 8'i paralel salt-okunur keşif-ajanı). Cetvel-skoru ≠ göç-temizliği çıktı. Gerçek Faz-1 liste sayısı **9**
+> (4 sayfa özel-arketip → Faz 2'ye taşındı):
+>
+> | Katman | Sayfalar | Karar |
+> |---|---|---|
+> | **T1 temiz leaf** | **Errors**✓(server), **AuditLog**(server), **Categories**(client+audit), **Movements**(server, sort-kararı) | paralel-güvenli |
+> | **T2 tasarım-gerek** | **ErrorGroups**(bulk+expand+audit-boşluk), **Returns**(durum-makinesi+sipariş-sync+2 edge), **Users**(çift-tab+rol-grid), **Orders**(3 modal+board+bulk, en ağır) | dikkatli/sıralı |
+> | **T3 → Faz 2** | **Logistics**(edit-worksheet), **InventorySettings**(form), **InventoryReport**(recharts rapor), **CategoryBuilder**(blok-kurucu) | liste DEĞİL; Dashboard ailesi |
+> | **T4 sıralı** | **Products** | kit-evrim, son |
+>
+> **Yürütme (kontrol-öncelikli):** Errors = server-mod DOĞRULAYICI → **✓ BİTTİ** (kit'e `initialFilters` eklendi;
+> tsc/lint/test/axe yeşil; server-sayfalama+filtre+sort yolu kanıtlandı). Sonra T1 kalan (AuditLog+Categories+Movements)
+> **paralel** + sayfa-başı yargıç-ajan + watchdog + benim kapım → T2 dikkatli → Products seri. Logistics artık 1a değil.
+
 **Her göç checklist'i:** local state sil → `useAdminTable` → `DataTableKit` → hardcoded TR → **kendi sözlük dosyası** → bulk→`BulkBar` → mutasyon RBAC-gate+audit → axe → cetvel.
 **Paralel güvenlik:** her sayfa ayrı worktree+branch; **dalga sırasında TÜM paylaşımlı altyapı DONDURULUR** = {kit, BulkBar, adminUi.ts, tokens.js, eslint.config.cjs, sözlük barrel}. Sadece Mimar bunlara dokunur.
 **Bitti:** her sayfa ayrı branch + lint/tsc/test yeşil + cetvel ≥85.

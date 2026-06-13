@@ -54,6 +54,11 @@ export interface UseAdminTableOptions<T> {
   /** URL'ye senkron (useSearchParams → çağıran bileşen <Suspense> ister) */
   syncUrl?: boolean
   debounceMs?: number
+  /**
+   * server-mode varsayılan filtreler (ör. Errors son-7-gün penceresi + env=production,
+   * Orders durum ön-seçimi). URL'de filtre VARSA o kazanır; yoksa bunlar tohumlanır.
+   */
+  initialFilters?: Record<string, string[]>
 }
 
 export interface PaginationApi {
@@ -157,6 +162,7 @@ export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTabl
     initialSort,
     syncUrl = true,
     debounceMs = 300,
+    initialFilters,
   } = options
 
   const searchParams = useSearchParams()
@@ -202,9 +208,13 @@ export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTabl
   const [debouncedQuery, setDebouncedQuery] = useState<string>(() =>
     syncUrl && searchParams ? (searchParams.get('q') ?? '').trim() : '',
   )
-  const [filters, setFilters] = useState<Record<string, string[]>>(() =>
-    syncUrl && searchParams ? parseFiltersFromParams(new URLSearchParams(searchParams.toString())) : {},
-  )
+  const [filters, setFilters] = useState<Record<string, string[]>>(() => {
+    if (syncUrl && searchParams) {
+      const parsed = parseFiltersFromParams(new URLSearchParams(searchParams.toString()))
+      if (Object.keys(parsed).length > 0) return parsed
+    }
+    return initialFilters ?? {}
+  })
 
   const [rawRows, setRawRows] = useState<T[]>([])
   const [serverTotal, setServerTotal] = useState<number>(0)
