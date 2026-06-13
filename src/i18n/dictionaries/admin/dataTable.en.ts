@@ -20,5 +20,8 @@ export const dataTable = {
         page: 'Page',
         of: 'of',
         rowsPerPage: 'Rows per page'
+      },
+      export: {
+        csv: 'Download CSV'
       }
 };

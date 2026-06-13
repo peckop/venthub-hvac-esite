@@ -90,6 +90,8 @@ export interface SelectionApi {
 
 export interface UseAdminTableResult<T> {
   rows: T[]
+  /** client/none-mode: filtre-ÖNCESİ tüm yüklü satırlar (faceted count için); server-mode: mevcut sayfa */
+  allRows: T[]
   totalMatched: number
   isLoading: boolean
   error: string | null
@@ -287,6 +289,7 @@ export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTabl
 
   /* ---- URL yazımı (syncUrl) — router.replace, ham history YASAK [ADV-2#e] ---- */
   const lastUrlRef = useRef<string>(syncUrl ? searchParams?.toString() ?? '' : '')
+  const justWroteRef = useRef<boolean>(false)
 
   const buildQuery = useCallback((): string => {
     const params = new URLSearchParams()
@@ -304,6 +307,7 @@ export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTabl
     const qs = buildQuery()
     if (qs === lastUrlRef.current) return
     lastUrlRef.current = qs
+    justWroteRef.current = true
     router.replace((qs ? `${pathname}?${qs}` : pathname) as import('next').Route, { scroll: false })
   }, [syncUrl, buildQuery, pathname, router])
 
@@ -311,7 +315,13 @@ export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTabl
   useEffect(() => {
     if (!syncUrl) return
     const current = searchParams?.toString() ?? ''
-    if (current === lastUrlRef.current) return // kendi yazdığımız
+    if (justWroteRef.current) {
+      // kendi yazımımızın echo'su (veya URL henüz güncellenmedi) → state'i RESETLEME
+      if (current === lastUrlRef.current) justWroteRef.current = false
+      return
+    }
+    if (current === lastUrlRef.current) return
+    // gerçek dış değişiklik (geri/ileri tuşu) → state'i URL'den yenile
     lastUrlRef.current = current
     const sp = new URLSearchParams(current)
     setPageRaw(Math.max(1, parseInt(sp.get('page') ?? '1', 10) || 1))
@@ -416,6 +426,7 @@ export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTabl
 
   return {
     rows,
+    allRows: paginationMode === 'server' ? rows : rawRows,
     totalMatched,
     isLoading,
     error,

@@ -20,5 +20,8 @@ export const dataTable = {
         page: 'Sayfa',
         of: '/',
         rowsPerPage: 'Sayfa başına satır'
+      },
+      export: {
+        csv: 'CSV olarak indir'
       }
 };
