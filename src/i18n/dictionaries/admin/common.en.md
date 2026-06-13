@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\common.en.ts
-skeleton_hash: 262b5fbb8744cbe3
+skeleton_hash: e69f1971d57136f7
 entity_hashes:
   overview: 43c6db6003831046
-generated_at: 2026-06-13T11:09:06Z
+generated_at: 2026-06-13T18:02:39Z
 ---
 
 ## Genel Bakış
@@ -38,18 +38,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## AST POINTERS
 
 Bu dosya fonksiyon içermemektedir — i18n sözlük/tradüksiyon dosyasıdır.
-
----
-
-### [N1_DATA] AST Pointer: `common.en.ts`::common (nesne)
-
-- **params**: (yok — nesne exportu)
-- **ic_degiskenler**: (yok — nesne içindeki key-value çiftleri veri tanımıdır, fonksiyon değişkeni değildir)
-- **Dönüş**: (yok) — `common` adlı nesne module export olarak dışa açılır; admin arayüzünde kullanılan İngilizce ortak metinlerin (buton etiketleri, başlıklar, mesajlar vb.) depolandığı sözlük yapısıdır.
-
----
-
-> **Not:** Dosyada import, fonksiyon imzası, class tanımı veya fonksiyon gövdesi bulunmamaktadır. Tamamen statik veri (translation dictionary) içeren bir `.ts` dosyasıdır.
 
 ---
 

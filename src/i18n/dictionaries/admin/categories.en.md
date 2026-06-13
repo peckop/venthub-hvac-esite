@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\categories.en.ts
-skeleton_hash: fe70c690b3e90f8b
+skeleton_hash: 7bb25cc23af40cc0
 entity_hashes:
   overview: e1ad358253fda567
-generated_at: 2026-06-13T11:08:37Z
+generated_at: 2026-06-13T18:02:39Z
 ---
 
 ## Genel Bakış
@@ -34,8 +34,7 @@ Bu modül, i18n sistemi tarafından kullanılan statik bir dil sözlüğü dosya
 
 ## SABİTLER
 - **categories** (object) — `{
-      clickToUpload: 'Click to upload',
-      imageDesc: 'Category images a...`
+      subtitle: 'Manage the product hierarchy and category tree from here.'...`
 
 ---
 
@@ -49,10 +48,6 @@ Bu dosyada **hiç fonksiyon bulunmamaktadır**. Dosya saf bir i18n sözlük dosy
 - **Icerik**: Admin kategorileri için İngilizce çeviri dizeleri
 - **Kullanim**: `categories` sabiti, uygulamanınadmin kategorileri bölümündeki metinleri uluslararasılaştırma (i18n) için kullanılır
 - **Dönüş**: Yok (nesne dışa aktarılır)
-
----
-
-**Özet**: Dosya `C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\categories.en.ts` konumunda olup, tylko bir `categories` objesini export eden bir i18n sözlük dosyasıdır. Fonksiyon, method veya class içermemektedir.
 
 ---
 

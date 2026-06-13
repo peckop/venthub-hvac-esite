@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\audit.tr.ts
-skeleton_hash: f414d82f4b0dae67
+skeleton_hash: 14cea5204a49eedf
 entity_hashes:
   overview: 296262cb85b992c0
-generated_at: 2026-06-13T11:07:53Z
+generated_at: 2026-06-13T18:02:39Z
 ---
 
 ## Genel Bakış
@@ -34,7 +34,7 @@ Bu modül, uygulamanın Türkçe dil dosyalarından biridir ve sabit bir sözlü
 - **audit** (object) — `{
       actionTitle: 'İşlem',
       clear: 'Temizle',
-      details: 'İşlem D...`
+      colAction: 'Aksiy...`
 
 ---
 

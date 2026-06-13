@@ -21,5 +21,6 @@ export const common = {
       status: 'Durum',
       active: 'Aktif',
       passive: 'Pasif',
-      all: 'Tümü'
+      all: 'Tümü',
+      view: 'Görünüm'
 };

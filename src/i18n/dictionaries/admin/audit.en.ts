@@ -1,13 +1,18 @@
 export const audit = {
-      subtitle: 'Monitor all system changes and user activities.',
-      filterBatch: 'Filter: Batch',
-      viewMovements: 'View Movements',
-      clear: 'Clear',
-      searchPlaceholder: 'Search table, PK or note',
       actionTitle: 'Action',
-      history: 'Audit History',
+      clear: 'Clear',
+      colAction: 'Action',
+      colDate: 'Date',
+      colNote: 'Note',
+      colPk: 'PK',
+      colTable: 'Table',
       details: 'Action Details',
+      errorLoad: 'Logs could not be loaded',
+      filterBatch: 'Filter: Batch',
+      history: 'Audit History',
       noRecords: 'No Records Found',
       noRecordsDesc: 'No audit logs found matching your filters or search criteria.',
-      errorLoad: 'Logs could not be loaded'
+      searchPlaceholder: 'Search table, PK or note',
+      subtitle: 'Monitor all system changes and user activities.',
+      viewMovements: 'View Movements'
 };

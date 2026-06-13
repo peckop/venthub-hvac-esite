@@ -1,6 +1,11 @@
 export const audit = {
       actionTitle: 'İşlem',
       clear: 'Temizle',
+      colAction: 'Aksiyon',
+      colDate: 'Tarih',
+      colNote: 'Not',
+      colPk: 'PK',
+      colTable: 'Tablo',
       details: 'İşlem Detayları',
       errorLoad: 'Günlükler yüklenemedi',
       filterBatch: 'Filtre: Toplu İşlem',

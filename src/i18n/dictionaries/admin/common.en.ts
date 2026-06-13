@@ -21,5 +21,6 @@ export const common = {
       imageUrl: 'Image URL',
       imageUrlWithManual: 'Image URL (or Manual Entry)',
       no: 'No',
-      yes: 'Yes'
+      yes: 'Yes',
+      view: 'View'
 };
