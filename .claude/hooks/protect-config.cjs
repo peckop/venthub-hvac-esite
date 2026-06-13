@@ -1,12 +1,23 @@
 #!/usr/bin/env node
 /**
- * PreToolUse hook — guard (config-protection + içerik taraması).
+ * PreToolUse hook — KALİTE AĞI (config-protection + içerik taraması).
+ *
+ * Bu bir KALİTE AĞI'dır, jail DEĞİL: Claude Bash ile aşabilir; gerçek sınır
+ * kullanıcının commit incelemesidir. Amaç: kazara/dalgınlıkla kural ihlalini
+ * yazım anında yüzeye çıkarmak.
  *
  * İKİ KATMAN:
- *  A) Korunan config dosyalarını düzenlemeyi bloklar (kuralları zayıflatma karşıtı).
+ *  A) Lint/TS zorlayan config dosyalarını ajan-düzenlemesine kapatır (kuralı zayıflatma karşıtı):
+ *     eslint.config.cjs · tsconfig*.json · .lintstagedrc.json.
  *  B) Kod dosyalarına yazılan içerikte VentHub'ın YASAK kalıplarını bloklar
  *     (twin/CONTEXT.md kaynaklı): any kestirmeleri, @ts-ignore ailesi, eslint-disable,
  *     raw_user_meta_data (auth), PCFSoftShadowMap (3D).
+ *
+ * KALDIRILDI (ECC GateGuard dersi + güvenlik bulgusu):
+ *  - guard'ın KENDİNİ koruması (self-lock) → ters tepti, false-positive üretti.
+ *  - ON/OFF toggle (guard.state) → fail-open idi.
+ *  - .claude/settings.json kilidi → self-lock'un parçasıydı.
+ *  Hook'u/ayarı düzeltmek artık serbest; sınır = kullanıcının commit incelemesi.
  *
  * stdin: { tool_name, tool_input: { file_path, content?, new_string?, edits? }, ... }
  * Çıkış: exit 2 = blokla (stderr Claude'a döner) · exit 0 = izin ver.
@@ -29,28 +40,11 @@ if (!filePath) process.exit(0);
 const base = path.basename(filePath).toLowerCase();
 const rel = filePath.replace(/\\/g, '/').toLowerCase();
 
-/* ---- ON/OFF ANAHTARI: guard.state ('ON' / 'OFF') ---- */
-try {
-  const st = fs.readFileSync(path.join(__dirname, 'guard.state'), 'utf8');
-  const line = st.split('\n').map((l) => l.trim()).find((l) => /^(ON|OFF)$/i.test(l));
-  if (line && line.toUpperCase() === 'OFF') process.exit(0); // guard KAPALI -> her seye izin
-} catch {}
-
-/* ---- KATMAN 0: guard'ın kendini koruması (kelepçeyi açamayayım) ---- */
-if (rel.includes('.claude/hooks/')) {
-  process.stderr.write(
-    `[guard] "${path.basename(filePath)}" guard'ın KENDİSİ — Claude bunu değiştiremez.\n` +
-    `Kelepçeyi tutan ajan onu gevşetemez. Hook ayarı/düzeltmesi gerekiyorsa kullanıcı elle yapar.\n`
-  );
-  process.exit(2);
-}
-
-/* ---- KATMAN A: korunan config dosyaları ---- */
+/* ---- KATMAN A: lint/TS zorlayan config dosyaları (kuralı zayıflatma karşıtı) ---- */
 const protectedExact = new Set(['eslint.config.cjs', '.lintstagedrc.json']);
 const isTsconfig = /(^|\/)tsconfig(\.[\w.-]+)?\.json$/.test(rel);
-const isClaudeSettings = rel.endsWith('.claude/settings.json');
 
-if (protectedExact.has(base) || isTsconfig || isClaudeSettings) {
+if (protectedExact.has(base) || isTsconfig) {
   process.stderr.write(
     `[guard] "${path.basename(filePath)}" düzenlemesi BLOKLANDI.\n` +
     `Bu dosya VentHub kalite kurallarını zorluyor (DI, no-arbitrary-Tailwind, no-console, strict TS).\n` +
@@ -63,7 +57,7 @@ if (protectedExact.has(base) || isTsconfig || isClaudeSettings) {
 /* ---- KATMAN B: kod içeriği taraması ---- */
 const isCodeFile = /\.(ts|tsx|js|jsx|cjs|mjs)$/i.test(rel);
 const isUnderClaude = rel.includes('/.claude/') || rel.startsWith('.claude/');
-if (!isCodeFile || isUnderClaude) process.exit(0); // sadece kod dosyaları, .claude/ hariç (guard'ın kendisi)
+if (!isCodeFile || isUnderClaude) process.exit(0); // sadece kod dosyaları, .claude/ hariç
 
 // Yazılan içeriği topla (Write/Edit/MultiEdit)
 let incoming = '';
