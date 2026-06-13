@@ -73,6 +73,15 @@ Sıra = cetvel skoru × Avensair B2B değeri. **OrdersBoard ve Dashboard burada 
 **Paralel güvenlik:** her sayfa ayrı worktree+branch; **dalga sırasında TÜM paylaşımlı altyapı DONDURULUR** = {kit, BulkBar, adminUi.ts, tokens.js, eslint.config.cjs, sözlük barrel}. Sadece Mimar bunlara dokunur.
 **Bitti:** her sayfa ayrı branch + lint/tsc/test yeşil + cetvel ≥85.
 
+> **⚠️ Faz 1 KAPANIŞ görevi (Faz 0'dan ertelendi — UNUTMA):** 14 sayfa da göçtükten SONRA K1+K4 ESLint
+> kurallarını `eslint.config.cjs`'e **error** olarak aç. Faz 0'da WARN bile koymadık çünkü 18 göçmemiş sayfa
+> ham `<table>` + çıplak `.update/.insert/.delete` kullanıyor → repo kırılır/gürültü olur. Test-temelli K3/K4
+> (`mutateWithAudit` birim testi) zaten canlı; bu lint = ikinci ağ, ancak tüm sayfalar göçünce anlamlı.
+> Selector'lar: **K1** `JSXOpeningElement[name.name='table']` (`src/components/admin/data-table/**` muaf) ·
+> **K4** `CallExpression > MemberExpression[property.name=/^(update|insert|delete)$/]` (`src/views/admin/**` +
+> `src/lib/services/**` kapsamı; `mutateWithAudit`'in `fn` closure'ı için satır-bazlı allowlist). Config GUARD'lı
+> → Bash ile uygula, kullanıcı commit'te inceler.
+
 ## FAZ 2 — Rewrite + özel arketipler
 - **WebhookEvents (%3):** kit liste + HMAC/replay/idempotency görünür + audit (Kural 11).
 - **Inventory (%8):** kit-tabanlı; mutasyon RBAC+audit; tenant flag (kolon eklenince).
