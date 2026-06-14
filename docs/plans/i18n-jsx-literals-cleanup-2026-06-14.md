@@ -38,3 +38,25 @@ Her dalga:
 - i18n anahtar isimlendirme: mevcut `dictionaries/` deseni izlenir (ör. `admin.<page>.<key>`, `account.<page>.<key>`). Yeni üst-düzey alan açma; var olan ağaca otur.
 - tr/en parite testi mevcut (i18n parity) — eksik anahtar testi düşürür, merkezi kapıda yakalanır.
 - Bu iş **bayi pivotundan (memory `dealer-pivot-decision`) bağımsız**; sıralama kullanıcı kararı.
+
+## İLERLEME (branch `chore/i18n-jsx-literals`)
+
+Sayaç: başlangıç **845** jsx-literal. Hedef-dışı sabit: admin 256 + legal 235 (ertelendi).
+
+| Dalga | Commit | Durum |
+|---|---|---|
+| Validator — AccountOverview | `df9a6e10` | ✅ 23→0 |
+| Wave 1 — account (6 sayfa) | `c7943b8a` | ✅ ~59→0 |
+| Wave 2 — checkout (6 dosya) | `e4e548d3` | ✅ ~16→0 |
+
+**Kapsam-içi kalan ≈ 249** (calculators 35 · category ~91 · contact 18 · home ~30 · auth 14 · products/3d/navigation/ufak-kuyruk ~60).
+
+## MAKİNE (kanıtlandı — her dalga tekrarla)
+
+1. `.claude/skills/maestro/i18n-wave.mjs` — Workflow; **TARGETS + SURFACE'i düzenle**, çalıştır. Ajanlar yalnız kendi bileşenini düzenler + yeni anahtarları yapısal döndürür (tr/en). NOT: `args` global bağlanmıyor → TARGETS'i script'e **hardcode** et.
+2. Çıktı dosyasından: `node C:/tmp/parse-wave.js <out>` (anahtarları gör), `node C:/tmp/check-missing.js <out>` (judge.missing − raporlanan = gerçek eksik).
+3. **Merkezi merge:** `node C:/tmp/merge-generic.js <out> <SURFACE>` → tr.ts+en.ts'e ekler (mevcut alt-namespace'e key ekler / yeni alt-obje açar; anchor'ı SURFACE bloğuyla sınırlar, parite).
+4. **Kapı (orkestratör):** 6 dosya `eslint` (kalan literal=0; sembol/emoji/marka/ayraç → dict key, template literal YASAK — kural onu da yakalar), `type-check` (en: typeof tr parite zorlar), parite testi `src/i18n/__tests__/i18n.test.ts`, son `pnpm test -- --run`. Kaçanları elle düzelt.
+5. Commit (sadece N bileşen + 2 dict; **`.cc/memory.db`/system_tree/maestro HARİÇ**). Orion pre-commit doc hook'u .md üretir (normal).
+
+Dict edit'lerinde NOT: merge script harici yazdığı için Edit "not read" guard atar → önce ilgili bölgeyi Read et. Diagnostic'ler `en: typeof tr` için ara-durum gösterir; **tsc otoritedir**.
