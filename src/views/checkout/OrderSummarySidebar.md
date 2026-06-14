@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\OrderSummarySidebar.tsx
-skeleton_hash: c470ea53787aa68a
+skeleton_hash: 0b522a5451a86a43
 entity_hashes:
   func:OrderSummarySidebar: d1d455540c8e8d0c
   overview: ce3348034c2766ed
   style_tokens: ed45dfd73f706270
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-14T17:51:42Z
 ---
 
 ## Genel Bakış
@@ -53,6 +53,14 @@ Bu sipariş özeti kenar çubuğu bileşeni, ödeme sayfasında maliyet kalemler
 - `couponApp` — object | undefined — Uygulanan kupon bilgilerini içeren nesne (kupon kodu, indirim tutarı veya yüzdesi gibi detayları barındırır, kupon yoksa undefined olabilir)
 
 **Dönüş**: `React.FC<OrderSummarySidebarProps>` — Sipariş özetini gösteren JSX bileşeni döndürür. Bileşen, sipariş özeti panelini ve ilgili ödeme detaylarını render eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nContext::Lang
+- import: ../../i18n/format::formatCurrency
+- import: lucide-react::Lock
+- import: react::React
 
 ---
 

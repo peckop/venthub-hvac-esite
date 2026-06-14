@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx
-skeleton_hash: 5d6517bcf8ccfc58
+skeleton_hash: 384c426f4871e67e
 entity_hashes:
   func:StepAddressInfo: d5b5813fe5d1d5af
   overview: a2c2c2af4883e494
   style_tokens: 7a84088359f41f22
-generated_at: 2026-06-08T10:11:02Z
+generated_at: 2026-06-14T17:51:42Z
 ---
 
 ## Genel Bakış
@@ -51,6 +51,15 @@ Bu modül, üst bileşenden kontrol edilen state/prop çiftlerine bağımlı bir
 - `setBillingAddress`: (kodda `setBi` olarak kısaltılmıştır) `React.Dispatch<React.SetStateAction<object>>` — `billingAddress` state’ini güncellemek için kullanılan setter fonksiyonudur.
 
 **Dönüş**: `React.FC<StepAddressInfoProps>` — Bileşen, bir React fonksiyonel bileşeni (Functional Component) olarak tanımlanmıştır. Bu nedenle dönüş değeri, JSX formatında bir kullanıcı arayüzü öğesidir (React.ReactNode). Props’ları `StepAddressInfoProps` arayüzü ile tipleştirilmiştir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../utils/routes::Routes
+- import: @/types/ui-models::type { UserAddress }
+- import: lucide-react::MapPin
+- import: next/link::Link
+- import: react::React
 
 ---
 

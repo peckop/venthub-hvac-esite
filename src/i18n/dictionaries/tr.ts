@@ -1009,6 +1009,29 @@ export const tr = {
     itemTotal: 'Toplam'
   },
   checkout: {
+    securePayment: {
+      brand: 'Venthub HVAC',
+      iyzicoSecure: 'iyzico ile güvenli ödeme',
+    },
+    orderSummary: {
+      couponPlaceholder: 'Kupon kodu',
+      applyCoupon: 'Uygula',
+      removeCoupon: 'Kaldır',
+    },
+    invoiceModal: {
+      title: 'Kayıtlı Fatura Profilleri',
+    },
+    addressModal: {
+      defaultOpen: '(',
+      defaultClose: ')',
+      empty: '—',
+    },
+    addressStep: {
+      standardName: 'Standart',
+      standardEta: '3–5 iş günü',
+      expressName: 'Ekspres',
+      expressEta: '1–2 iş günü',
+    },
     saved: {
       title: 'Kayıtlı Adresler',
       address: 'Adres',
@@ -1123,6 +1146,10 @@ export const tr = {
       marketingText: 'Ticari elektronik ileti almayı kabul ediyorum (opsiyonel).'
     },
     review: {
+      tckn: 'TCKN: {{value}}',
+      cityLine: '{{district}}, {{city}} {{postal}}',
+      vkn: 'VKN: {{value}}',
+      eInvoice: 'e‑Fatura',
       title: 'Siparişi gözden geçir',
       edit: 'Düzenle'
     },

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\ReviewSummary.tsx
-skeleton_hash: 115795418e651b3a
+skeleton_hash: acffea334634549f
 entity_hashes:
   func:ReviewSummary: 5797ed029cce22ed
   overview: 34cecab9410c7f0c
   style_tokens: e50d4f5a19398e9d
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-14T17:51:42Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,12 @@ Bu modül, sipariş onay sayfasında müşteri, teslimat ve fatura bilgilerini g
 - `in` — Parametre listesi bu noktada kesilmiş, ek parametreler mevcut olabilir
 
 **Dönüş**: `React.FC<ReviewSummaryProps>` — ReviewSummaryProps tipinde prop alan ve JSX döndüren fonksiyonel React bileşeni
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: react::React
 
 ---
 

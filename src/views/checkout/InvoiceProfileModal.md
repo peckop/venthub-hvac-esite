@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\InvoiceProfileModal.tsx
-skeleton_hash: 66ab891d3cd337d9
+skeleton_hash: d57770cba4f2e82c
 entity_hashes:
   func:InvoiceProfileModal: de25b37c1a2260e8
   overview: 9a64ef3b1c56eb7b
   style_tokens: 7ba01f3f33eb1def
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-14T17:51:42Z
 ---
 
 ## Genel Bakış
@@ -46,6 +46,18 @@ Bu React modal bileşeni, fatura profillerinin görüntülenmesi ve seçilmesi i
 - `onSelect` : `(profile: InvoiceProfile) => void` — Kullanıcı bir profil seçtiğinde çağrılan ve seçilen profil objesini parametre olarak alan fonksiyon
 
 **Dönüş**: `React.FC<InvoiceProfileModalProps>` — React fonksiyonel bileşeni döner, modal yapısını ve profil seçim arayüzünü render eder
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: @/types/ui-models::type { InvoiceProfile }
+- import: lucide-react::Building2
+- import: lucide-react::CheckCircle
+- import: lucide-react::Landmark
+- import: lucide-react::User
+- import: lucide-react::X
+- import: react::React
 
 ---
 

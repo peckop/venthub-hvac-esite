@@ -97,16 +97,16 @@ const OrderSummarySidebar: React.FC<OrderSummarySidebarProps> = ({
                         type="text"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value)}
-                        placeholder="Kupon kodu"
+                        placeholder={t('checkout.orderSummary.couponPlaceholder')}
                         className="flex-1 border border-light-gray rounded px-3 py-2 text-sm"
                     />
                     <button
                         type="button"
                         className="px-3 py-2 rounded bg-primary-navy text-white text-sm"
                         onClick={onApplyCoupon}
-                    >Uygula</button>
+                    >{t('checkout.orderSummary.applyCoupon')}</button>
                     {couponApplied ? (
-                        <button type="button" className="px-3 py-2 rounded border text-sm" onClick={onRemoveCoupon}>Kaldır</button>
+                        <button type="button" className="px-3 py-2 rounded border text-sm" onClick={onRemoveCoupon}>{t('checkout.orderSummary.removeCoupon')}</button>
                     ) : null}
                 </div>
                 <hr className="border-light-gray" />

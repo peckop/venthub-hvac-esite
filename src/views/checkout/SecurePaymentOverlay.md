@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\SecurePaymentOverlay.tsx
-skeleton_hash: fe866119a7147af0
+skeleton_hash: 85f100f9701faee6
 entity_hashes:
   func:SecurePaymentOverlay: 2034f9e5c072e96b
   overview: abfd0850fbcc2e8a
   style_tokens: 5b40eb77343c895c
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-14T17:51:42Z
 ---
 
 ## Genel Bakış
@@ -43,6 +43,12 @@ Bu React tabanlı güvenli ödeme kaplama bileşeni, üst bileşen tarafından�
 - `t` — `(key: string) => string` — Çeviri fonksiyonu. Bileşen içindeki tüm kullanıcıya dönük metinlerin, bu fonksiyon aracılığıyla ilgili dil dosyasından çekilmesini sağlar. Örneğin `t('payment.processing')` çağrısı ile o anki dile göre "İşleniyor..." gibi bir metin döner.
 
 **Dönüş**: `React.FC<SecurePaymentOverlayProps>` — Bileşen, JSX elementi döndüren bir React fonksiyonel bileşenidir. Verilen prop değerlerine göre koşullu olarak overlay arayüzünü render eder veya `null` döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: lucide-react::Lock
+- import: react::React
 
 ---
 

@@ -57,7 +57,7 @@ const ReviewSummary: React.FC<ReviewSummaryProps> = ({
             <button type="button" className="text-xs text-primary-navy hover:underline" onClick={onEditShipping}>{t('checkout.review.edit')}</button>
           </div>
           <div className="text-sm text-steel-gray whitespace-pre-line">
-            {(shipping.fullAddress || shipping.full_address || '') + '\n' + shipping.district + ', ' + shipping.city + ' ' + (shipping.postalCode || shipping.postal_code || '')}
+            {(shipping.fullAddress || shipping.full_address || '') + '\n' + t('checkout.review.cityLine', { district: shipping.district, city: shipping.city, postal: (shipping.postalCode || shipping.postal_code || '') })}
           </div>
         </div>
         {!sameAsShipping && (
@@ -67,7 +67,7 @@ const ReviewSummary: React.FC<ReviewSummaryProps> = ({
               <button type="button" className="text-xs text-primary-navy hover:underline" onClick={onEditBilling}>{t('checkout.review.edit')}</button>
             </div>
             <div className="text-sm text-steel-gray whitespace-pre-line">
-              {(billing.fullAddress || billing.full_address || '') + '\n' + billing.district + ', ' + billing.city + ' ' + (billing.postalCode || billing.postal_code || '')}
+              {(billing.fullAddress || billing.full_address || '') + '\n' + t('checkout.review.cityLine', { district: billing.district, city: billing.city, postal: (billing.postalCode || billing.postal_code || '') })}
             </div>
           </div>
         )}
@@ -79,13 +79,13 @@ const ReviewSummary: React.FC<ReviewSummaryProps> = ({
           <div className="text-sm text-steel-gray">
             <div>{invoiceType === 'individual' ? t('checkout.invoice.individual') : t('checkout.invoice.corporate')}</div>
             {invoiceType === 'individual' ? (
-              <div>TCKN: {invoiceInfo.tckn || '-'}</div>
+              <div>{t('checkout.review.tckn', { value: invoiceInfo.tckn || '-' })}</div>
             ) : (
               <div>
                 <div>{invoiceInfo.companyName}</div>
-                <div>VKN: {invoiceInfo.vkn}</div>
+                <div>{t('checkout.review.vkn', { value: invoiceInfo.vkn })}</div>
                 <div>{invoiceInfo.taxOffice}</div>
-                {invoiceInfo.eInvoice ? <div>e‑Fatura</div> : null}
+                {invoiceInfo.eInvoice ? <div>{t('checkout.review.eInvoice')}</div> : null}
               </div>
             )}
           </div>

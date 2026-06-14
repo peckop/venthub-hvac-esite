@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressSelectModal.tsx
-skeleton_hash: 8a7fdbb5be0360d2
+skeleton_hash: c6634e963d1ed44b
 entity_hashes:
   func:AddressSelectModal: adfcf435f03c2db9
   overview: 55656091e9138090
   style_tokens: 0a79973eb6842aa3
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-14T17:51:41Z
 ---
 
 ## Genel Bakış
@@ -60,6 +60,12 @@ Bu modül için somut fonksiyon gövdesi mevcut değildir; yalnızca fonksiyon i
 - onEdit: (targetAddressId: string) => void — Kullanıcı mevcut bir adresi düzenlemek istediğinde tetiklenen, düzenlenecek adresin benzersiz kimliğini üst bileşene ileten geri çağırım fonksiyonu
 - onDel: (targetAddressId: string) => void — Kullanıcı mevcut bir adresi silmek istediğinde tetiklenen, silinecek adresin benzersiz kimliğini üst bileşene ileten geri çağırım fonksiyonu
 **Dönüş**: React.FC<AddressSelectModalProps> — Adres seçim, düzenleme ve silme işlemleri için tamamen etkileşimli bir modal arayüzü sunan React fonksiyonel bileşeni döndürür. Tüm tür denetimleri AddressSelectModalProps türü üzerinden gerçekleştirilen bu bileşen, projenin ödeme akışında kullanılmak üzere özel olarak geliştirilmiştir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/types/ui-models::type { UserAddress }
+- import: react::React
 
 ---
 

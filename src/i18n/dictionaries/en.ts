@@ -1498,6 +1498,29 @@ export const en: typeof tr = {
     autoClose: 'This window will close automatically in 5 seconds'
   },
   checkout: {
+    securePayment: {
+      brand: 'Venthub HVAC',
+      iyzicoSecure: 'Secure payment with iyzico',
+    },
+    orderSummary: {
+      couponPlaceholder: 'Coupon code',
+      applyCoupon: 'Apply',
+      removeCoupon: 'Remove',
+    },
+    invoiceModal: {
+      title: 'Saved Invoice Profiles',
+    },
+    addressModal: {
+      defaultOpen: '(',
+      defaultClose: ')',
+      empty: '—',
+    },
+    addressStep: {
+      standardName: 'Standard',
+      standardEta: '3–5 business days',
+      expressName: 'Express',
+      expressEta: '1–2 business days',
+    },
     saved: {
       title: 'Saved Addresses',
       address: 'Address',
@@ -1612,6 +1635,10 @@ export const en: typeof tr = {
       marketingText: 'I consent to receive commercial communications (optional).'
     },
     review: {
+      tckn: 'ID No: {{value}}',
+      cityLine: '{{district}}, {{city}} {{postal}}',
+      vkn: 'Tax No: {{value}}',
+      eInvoice: 'e‑Invoice',
       title: 'Review your order',
       edit: 'Edit'
     },

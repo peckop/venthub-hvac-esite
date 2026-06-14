@@ -40,13 +40,13 @@ const AddressSelectModal: React.FC<AddressSelectModalProps> = ({
             </div>
             <div className="p-5 overflow-y-auto">
                 {addresses.length === 0 ? (
-                    <div className="text-sm text-steel-gray">—</div>
+                    <div className="text-sm text-steel-gray">{t('checkout.addressModal.empty')}</div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {addresses.map((a) => (
                             <div key={a.id} className="border rounded-lg p-3 bg-white hover:shadow-sm transition">
                                 <div className="text-sm text-industrial-gray font-medium">
-                                    {a.label || t('checkout.saved.address')} {a.is_default_shipping && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
+                                    {a.label || t('checkout.saved.address')} {a.is_default_shipping && <span className="ml-1 text-xs text-primary-navy">{t('checkout.addressModal.defaultOpen')}{t('checkout.saved.default')}{t('checkout.addressModal.defaultClose')}</span>}
                                 </div>
                                 <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">{a.full_address}</div>
                                 <div className="mt-3 flex items-center justify-between">

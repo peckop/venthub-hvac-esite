@@ -34,7 +34,7 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
                 <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <h3 className="text-lg font-bold text-slate-900 flex items-center gap-3">
                         <Landmark size={20} className="text-primary-navy" />
-                        Kayıtlı Fatura Profilleri
+                        {t('checkout.invoiceModal.title')}
                     </h3>
                     <button onClick={onClose} className="p-2 hover:bg-white rounded-xl transition-colors">
                         <X size={20} className="text-slate-400" />
@@ -59,7 +59,7 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
                                         </h4>
                                         {p.is_default && (
                                             <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-widest text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
-                                                <CheckCircle size={8} /> Varsayılan
+                                                <CheckCircle size={8} /> {t('checkout.saved.default')}
                                             </span>
                                         )}
                                     </div>
@@ -84,7 +84,7 @@ export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, 
                         onClick={onClose}
                         className="px-8 py-3 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-100 transition-colors"
                     >
-                        Kapat
+                        {t('checkout.saved.close')}
                     </button>
                 </div>
             </div>
