@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\AddToProjectModal.tsx
-skeleton_hash: b523d4075dbe1bad
+skeleton_hash: b2a64aceeb5a1b87
 entity_hashes:
   func:AddToProjectModal: 27f66ff6372a1fa9
   overview: 4ec0a41f38191057
   style_tokens: 49ec4d1f3ff40796
-generated_at: 2026-06-08T10:09:31Z
+generated_at: 2026-06-14T22:19:48Z
 ---
 
 ## Genel Bakış
@@ -46,6 +46,22 @@ Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel aksiyom
 - `onClose`: unknown — modal kapatıldığında çalıştırılacak geri çağırma fonksiyonu.  
 
 **Dönüş**: `React.FC<AddToProjectModalProps>` — `AddToProjectModalProps` tipinde prop alan bir React fonksiyonel bileşeni.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useProjectLists::useProjectLists
+- import: @/components/ui/VentImage::VentImage
+- import: @/i18n/I18nProvider::useI18n
+- import: @/types/ui-models::type { Product }
+- import: framer-motion::motion
+- import: lucide-react::ChevronRight
+- import: lucide-react::FolderPlus
+- import: lucide-react::Loader2
+- import: lucide-react::Plus
+- import: lucide-react::X
+- import: react::React
+- import: react::useState
 
 ---
 

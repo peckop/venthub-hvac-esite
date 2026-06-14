@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\OrbitalProductsShowcase.tsx
-skeleton_hash: f448e7165b10c19e
+skeleton_hash: 1f79f84db54745c5
 entity_hashes:
   func:CarouselItems: 8743b05fe58c4b61
   func:MotionTransitionFix: 1a110cb52e216641
@@ -18,9 +18,9 @@ entity_hashes:
   func:handlePointerOut: 16e97883514593a3
   func:handlePointerOver: b0b11be743d1be3d
   func:handlePointerUp: 47dcb3f345fcf0ef
-  overview: 55890f7af7c29ff0
+  overview: 3b1b0b2113a03030
   style_tokens: 41b9c7751fc87745
-generated_at: 2026-06-11T16:17:20Z
+generated_at: 2026-06-14T22:21:39Z
 ---
 
 ## Genel Bakış
@@ -40,30 +40,15 @@ Sergileme sisteminin üst düzey yönetimini üstlenen ana bileşenleri barınd�
 - OrbitalCard, PlaceholderWireframe, SuspendedCardMaterial, MotionTransitionFix
 
 ### İşaretleyici Etkileşimleri
-Kullanıcının fare ile sahne üzerinde gerçekleştirdiği sürükleme, bırakma ve üzerine gelme işlemlerini yöneten olay işleyicilerini içerir. Tıklama, sürükleme ve serbest bırakma akışını koordine eder.
+Fare ve dokunmatik giriş olaylarını yöneterek kullanıcı etkileşimlerini merkezi olarak işler. Üzerine gelme, sürükleme ve bırakma işlemleri için olay işleyicileri içerir.
 - handlePointerOver, handlePointerOut, handlePointerDownFull, handlePointerMove, handlePointerUp
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, Three.js orbiter vitrin sistemi için aşağıdaki mimari varsayımlara dayanır:
-
-**[Aksiyom 1]**: Eğer `items` dizisi boşsa, `CarouselItems` bileşeni döngüsel yörünge hesaplamalarında tanımsız davranış gösterir (toplam kart sayısı sıfıra bölünme hatası oluşabilir).
-
-**[Aksiyom 2]**: Eğer `sharedState` objesi `Stage`, `OrbitalCard` ve `CarouselItems` arasında ortak olarak paylaşılmıyorsa, kartların konum ve dönüş senkronizasyonu bozulur.
-
-**[Aksiyom 3]**: Eğer `OrbitalCard`'a iletilen `total` parametresi, gerçek `items` dizisi uzunluğuyla eşleşmiyorsa, kartların yörüngesel açı dağılımı yanlış hesaplanır.
-
-**[Aksiyom 4]**: Eğer `SuspendedCardMaterial` bileşeninde `finalPath` null ise, kartın dokusu yüklenemez ve boş/varsayılan görünüm render edilir.
-
-**[Aksiyom 5]**: Eğer `OrbitalProductsShowcase` bir Three.js Canvas Contexti (React Three Fiber) dışındaysa, tüm pointer event'leri (`ThreeEvent<PointerEvent>`) çalışmayı durdurur.
-
-**[Aksiyom 6]**: Eğer `externalPause` true olarak ayarlanıksa ve `onFrontCardChange` callback'i sağlanmıyorsa, carousel duraklatıldığında odaklanan kart bilgisi dışarıya bildirilemez.
-
-**[Aksiyom 7]**: Eğer `onBringToFront` callback'i `OrbitalCard`'a iletilmiyorsa, kullanıcının bir karta tıklayarak onu öne getirme işlevi çalışmaz.
-
-**[Aksiyom 8]**: Eğer `PlaceholderWireframe` `scale` parametresi 1'den farklı bir değere ayarlanıksa, wireframe placeholder kartın orijinal boyutunda render edilir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -190,6 +175,39 @@ Bu modül, Three.js orbiter vitrin sistemi için aşağıdaki mimari varsayımla
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/routes::Routes
+- import: ./Category3DIcon::Category3DIcon
+- import: @/config::ORBITAL_CAROUSEL_CONFIG
+- import: @react-three/drei::Float
+- import: @react-three/drei::Html
+- import: @react-three/drei::Sparkles
+- import: @react-three/drei::useTexture
+- import: @react-three/fiber::Canvas
+- import: @react-three/fiber::ThreeEvent
+- import: @react-three/fiber::useFrame
+- import: @react-three/fiber::useThree
+- import: framer-motion::useInView
+- import: lucide-react::ChevronLeft
+- import: lucide-react::ChevronRight
+- import: lucide-react::MousePointerClick
+- import: next/navigation::useRouter
+- import: react::React
+- import: react::Suspense
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
+- import: three::DoubleSide
+- import: three::MathUtils
+- import: three::SRGBColorSpace
+- import: three::Vector3
+- import: three::type { Group, Mesh, MeshStandardMaterial }
+
+---
+
 ## INTERFACES
 
 ### ProductItem
@@ -216,6 +234,211 @@ Bu modül, Three.js orbiter vitrin sistemi için aşağıdaki mimari varsayımla
 - `pauseUntil: number`
 - `startTime: number`
 - `isReady: boolean`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::Stage
+- **params**: `{ sharedState: React.MutableRefObject<SharedState> }`
+- **ic_degiskenler**:
+  - `sharedState` — Ortak durum nesnesi, animasyon parametrelerini (rotation, target, velocity, pauseUntil, startTime, isReady) tutar
+  - `getRadius` — İç fonksiyon, mevcut animasyon süresine göre yarıçapı hesaplar
+  - `currentRadius` — Mevcut hesaplanmış yarıçap değeri
+- **Dönüş**: JSX (group elemanı - halka, zemin ve parçacıklar)
+
+### [N2_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::Stage::getRadius
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `sharedState` — Dış kapsamdan gelen ortak durum
+  - `elapsed` — Başlangıçtan itibaren geçen sürenin 2000ms'ye bölümü
+- **Dönüş**: `CONFIG.radius * (1 - Math.pow(1 - Math.min(1, Math.max(0, elapsed)), 3))` (sayı)
+
+### [N3_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::PlaceholderWireframe
+- **params**: `{ scale?: number }` (varsayılan: 1)
+- **ic_degiskenler**:
+  - `scale` — Wireframe mesh'in ölçeği
+  - `meshRef` — useRef<Mesh>, mesh referansını tutar
+  - `useFrame` callback'i:
+    - `state` — Three.js state nesnesi, clock.elapsedTime erişimi için
+- **Dönüş**: JSX (group > Float > mesh)
+
+### [N4_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::SuspendedCardMaterial
+- **params**: `{ finalPath: string | null, hovered: boolean }`
+- **ic_degiskenler**:
+  - `finalPath` — Texture dosya yolu (null ise placeholder kullanılır)
+  - `hovered` — Hover durumu
+  - `texture` — useTexture hook'u ile yüklenen texture
+- **Dönüş**: JSX (meshStandardMaterial)
+
+### [N5_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::OrbitalCard
+- **params**: `{ item, index, total, sharedState, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint, shouldShowDragHint, modelScale }`
+- **ic_degiskenler**:
+  - `item` — Ürün verisi (ProductItem)
+  - `index` — Ürün indeksi
+  - `total` — Toplam ürün sayısı
+  - `sharedState` — Ortak durum nesnesi
+  - `onHover` — Hover callback fonksiyonu
+  - `onBringToFront` — Kartı öne getirme callback fonksiyonu
+  - `setIsDragging` — Sürükleme durumunu ayarlama fonksiyonu
+  - `isDraggingRef` — Sürükleme durumu ref'i
+  - `onCardClick` — Kart tıklama callback fonksiyonu
+  - `onFocusedItemChange` — Odaklanan item değişikliği callback fonksiyonu
+  - `isFrontCard` — Kartın önde olup olmadığı
+  - `shouldShowTapHint` — Tıklama ipucu gösterilmeli mi
+  - `shouldShowDragHint` — Sürükleme ipucu gösterilmeli mi
+  - `modelScale` — Model ölçeği
+  - `router` — useRouter hook'u ile alınan router nesnesi
+  - `groupRef` — useRef<Group>, 3D grubu referans alır
+  - `meshRef` — useRef<Mesh>, mesh referansını tutar
+  - `hovered` — Hover durumu (useState)
+  - `isNearFront` — Kartın yakın planda olup olmadığı (useState)
+  - `targetScaleRef` — useRef<Vector3>, hedef ölçek vektörü
+  - `lastIsNearRef` — useRef<boolean>, son yakınlık durumu
+  - `pointerDownPos` — useRef, fare basma pozisyonu (x,y)
+  - `pointerDownTime` — useRef, fare basma zamanı
+  - `finalPath` — Hesaplanmış dosya yolu
+  - `triggerAction` — onClick handler içindeki mantık
+- **Dönüş**: JSX (group > mesh veya 3D icon)
+
+### [N6_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::OrbitalCard::handlePointerOver
+- **params**: `e: ThreeEvent<PointerEvent>`
+- **ic_degiskenler**:
+  - `e` — Three.js pointer event nesnesi
+  - `setHover` — useState'den gelen hover state setter
+  - `onHover` — Dış callback fonksiyonu
+- **Dönüş**: yok (yan etki: hover durumunu aktif eder)
+
+### [N7_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::OrbitalCard::handlePointerOut
+- **params**: `e: ThreeEvent<PointerEvent>`
+- **ic_degiskenler**:
+  - `e` — Three.js pointer event nesnesi
+  - `setHover` — useState'den gelen hover state setter
+  - `onHover` — Dış callback fonksiyonu
+- **Dönüş**: yok (yan etki: hover durumunu pasif eder)
+
+### [N8_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::CarouselItems
+- **params**: `{ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange, shouldShowTapHint, shouldShowDragHint, hintStage, onStageChange, modelScale, onReady }`
+- **ic_degiskenler**:
+  - `items` — Ürün listesi
+  - `isPaused` — Duraklatma durumu
+  - `onHover` — Hover callback fonksiyonu
+  - `dragDelta` — Sürükleme delta değeri
+  - `onInteract` — Etkileşim callback fonksiyonu
+  - `sharedState` — Ortak durum nesnesi
+  - `isDraggingRef` — Sürükleme durumu ref'i
+  - `setIsDragging` — Sürükleme durumunu ayarlama fonksiyonu
+  - `onCardClick` — Kart tıklama callback fonksiyonu
+  - `onFocusedItemChange` — Odaklanan item değişikliği callback fonksiyonu
+  - `onFrontCardChange` — Öndeki kart değişikliği callback fonksiyonu
+  - `shouldShowTapHint` — Tıklama ipucu gösterilmeli mi
+  - `shouldShowDragHint` — Sürükleme ipucu gösterilmeli mi
+  - `hintStage` — İpucu animasyon aşaması
+  - `onStageChange` — Aşama değişikliği callback fonksiyonu
+  - `modelScale` — Model ölçeği
+  - `onReady` — Hazır callback fonksiyonu
+  - `camera` — useThree() hook'u ile alınan kamera
+  - `lastFrontCardRef` — useRef<string|null>, son öndeki kart ID'si
+  - `frontCardId` — useState<string|null>, öndeki kart ID'si
+  - `frontCardChangeCountRef` — useRef<number>, kart değişim sayacı
+  - `hasBeenFocusedRef` — useRef<boolean>, odaklanma durumu
+  - `swayOffsetRef` — useRef<number>, sallantı ofseti
+  - `useFrame` callback'i:
+    - `state` — Three.js state
+    - `delta` — Frame delta zamanı
+    - `elapsedTime` — state.clock.elapsedTime
+    - `now` — Date.now()
+    - `elapsedSec` — Saniye cinsinden geçen süre
+    - `isEntryCompleted` — Giriş animasyonu tamamlandı mı
+    - `isPausedByClick` — Tıklama ile duraklatılmış mı
+    - `friction` — Sürtünme katsayısı
+    - `diff` — Hedef ile mevcut rotasyon farkı
+    - `dragSpeed` — Sürükleme hızı
+    - `currentSpeed` — Mevcut otomatik dönüş hızı
+    - `currentTime` — Mevcut zaman
+    - `isCarouselRotating` — Carousel dönüyor mu
+    - `total` — Toplam ürün sayısı
+    - `step` — Açı adımı
+    - `frontIndex` — Öndeki kart indeksi
+    - `frontItem` — Öndeki kart objesi
+    - `count` — Değişim sayacı
+- **Dönüş**: JSX (group > OrbitalCard listesi)
+
+### [N9_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::MotionTransitionFix
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `invalidate` — useThree() hook'u ile alınan invalidate fonksiyonu
+  - `useEffect` callback'i:
+    - `interval` — setInterval ile oluşturulan timer
+    - `clearInterval` — Timer'ı temizleme fonksiyonu
+    - `setTimeout` — 600ms sonra timer'ı durdurur
+- **Dönüş**: null (yan etki: invalidate çağrısı)
+
+### [N10_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::OrbitalProductsShowcase
+- **params**: `{ items, onCardClick, externalPause = false, onFocusedItemChange, onFrontCardChange, modelScale = 1.5, containerHeight = 500, skipHints = false }`
+- **ic_degiskenler**:
+  - `items` — Ürün listesi
+  - `onCardClick` — Kart tıklama callback fonksiyonu
+  - `externalPause` — Dışarıdan duraklatma
+  - `onFocusedItemChange` — Odaklanan item değişikliği callback fonksiyonu
+  - `onFrontCardChange` — Öndeki kart değişikliği callback fonksiyonu
+  - `modelScale` — Model ölçeği (varsayılan 1.5)
+  - `containerHeight` — Konteyner yüksekliği (varsayılan 500)
+  - `skipHints` — İpuçlarını atla
+  - `isPaused` — Duraklatma durumu (useState)
+  - `dragDelta` — Sürükleme delta değeri (useState)
+  - `focusedItemId` — Odaklanan item ID'si (useState)
+  - `containerRef` — useRef<HTMLDivElement>, konteyner referansı
+  - `isInView` — useInView hook'u ile alınan görünüm durumu
+  - `useEffect` callback'i (ResizeObserver):
+    - `observer` — ResizeObserver nesnesi
+  - `hintStage` — İpucu animasyon aşaması (useState)
+  - `isDraggingRef` — useRef<boolean>, sürükleme durumu
+  - `sharedState` — useRef<SharedState>, ortak durum
+  - `handleItemsReady` — useCallback ile tanımlanmış hazır handler
+  - `useEffect` callback'leri (stage transition):
+    - `timer` — setTimeout ile oluşturulan timer
+  - `shouldShowTapHint` — Tıklama ipucu gösterilmeli mi (derived state)
+  - `shouldShowDragHint` — Sürükleme ipucu gösterilmeli mi (derived state)
+  - `handleSetIsDragging` — useCallback ile tanımlanmış sürükleme handler
+  - `handleFocusedItemChangeInternal` — useCallback ile tanımlanmış odak handler
+  - `lastX` — useRef<number>, son fare pozisyonu
+  - `isDraggingState` — useState<boolean>, UI sürükleme durumu
+  - `handlePointerDownFull` — Fare basma handler
+  - `handlePointerMove` — Fare hareket handler
+  - `handlePointerUp` — Fare bırakma handler
+- **Dönüş**: JSX (div > Canvas + gradient elemanları)
+
+### [N11_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::OrbitalProductsShowcase::handlePointerDownFull
+- **params**: `e: React.PointerEvent`
+- **ic_degiskenler**:
+  - `e` — React pointer event nesnesi
+  - `focusedItemId` — Odaklanan item ID'si (useState'den)
+  - `isDraggingRef` — Sürükleme durumu ref'i
+  - `setIsDraggingState` — UI sürükleme durumu setter
+  - `lastX` — Son fare pozisyonu ref'i
+  - `setDragDelta` — Sürükleme delta setter
+- **Dönüş**: yok (yan etki: sürükleme başlatır)
+
+### [N12_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::OrbitalProductsShowcase::handlePointerMove
+- **params**: `e: React.PointerEvent`
+- **ic_degiskenler**:
+  - `e` — React pointer event nesnesi
+  - `isDraggingRef` — Sürükleme durumu ref'i
+  - `focusedItemId` — Odaklanan item ID'si (useState'den)
+  - `lastX` — Son fare pozisyonu ref'i
+  - `setDragDelta` — Sürükleme delta setter
+  - `delta` — Hareket mesafesi
+- **Dönüş**: yok (yan etki: sürükleme delta günceller)
+
+### [N13_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::OrbitalProductsShowcase::handlePointerUp
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `isDraggingRef` — Sürükleme durumu ref'i
+  - `setIsDraggingState` — UI sürükleme durumu setter
+  - `setDragDelta` — Sürükleme delta setter
+  - `setTimeout` — 50ms sonra delta'yı sıfırlar
+- **Dönüş**: yok (yan etki: sürükleme bitirir)
 
 ---
 

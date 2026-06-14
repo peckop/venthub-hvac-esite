@@ -42,8 +42,8 @@ const FAQPage: React.FC = () => {
               <div className="flex justify-center mb-4">
                 <WhatsAppIcon size={48} />
               </div>
-              <h3 className="text-xl font-semibold whatsapp-text mb-2">Aradığınız cevabı bulamadınız mı?</h3>
-              <p className="whatsapp-subtext mb-6">WhatsApp üzerinden direkt bizimle iletişime geçin, size yardımcı olalım.</p>
+              <h3 className="text-xl font-semibold whatsapp-text mb-2">{t('support.contactCta.title')}</h3>
+              <p className="whatsapp-subtext mb-6">{t('support.contactCta.subtitle')}</p>
               <a
                 href={whatsappLink}
                 target="_blank"
@@ -51,7 +51,7 @@ const FAQPage: React.FC = () => {
                 className="whatsapp-btn"
               >
                 <WhatsAppIcon size={18} />
-                WhatsApp'tan Sorun
+                {t('support.contactCta.button')}
               </a>
             </div>
           </div>

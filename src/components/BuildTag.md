@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BuildTag.tsx
-skeleton_hash: e41431e5b77ff240
+skeleton_hash: 859d858d16b6a190
 entity_hashes:
   func:BuildTag: 33fa67732a403b49
   overview: 5afd4a9c8d0105c9
   style_tokens: 9c295aa26dd24226
-generated_at: 2026-06-08T10:08:12Z
+generated_at: 2026-06-14T22:16:15Z
 ---
 
 ## Genel Bakış
@@ -36,6 +36,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**:  
 - Yok  
 **Dönüş**: React.FC türünde bir fonksiyonel component; bu component, render edildiğinde etiket görüntüsünü temsil eden JSX döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx
-skeleton_hash: 63602fb09ce96c2a
+skeleton_hash: 31a1af60ec95928f
 entity_hashes:
   func:BrandsPage: 7fe8abffb7e6dbf9
   overview: f92b067f7968b22a
   style_tokens: 583cff7322941abd
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-14T22:21:39Z
 ---
 
 ## Genel Bakış
@@ -42,6 +42,20 @@ Bu modül, bir React sayfa bileşeni olup, doğru çalışması için belirli ha
 - Fonksiyona ait açıkça belirtilmiş herhangi bir parametre yoktur. Bileşen, props almayan veya varsayılan değerlerle çalışan bağımsız bir sayfa yapısıdır.
 
 **Dönüş**: `React.FC` — Bileşen, React'ın Functional Component tipinde bir JSX yapısı döndürür. Bu yapı, Markalar sayfasının tamamını temsil eden kullanıcı arayüzünü içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../components/HVACIcons::BrandIcon
+- import: ../components/Seo::Seo
+- import: ../data/brands::HVAC_BRANDS
+- import: ../hooks/useScrollAnimation::scrollAnimationClasses
+- import: ../hooks/useScrollAnimation::useScrollAnimation
+- import: ../i18n/I18nProvider::useI18n
+- import: ../utils/routes::Routes
+- import: next/image::Image
+- import: next/link::Link
+- import: react::React
 
 ---
 

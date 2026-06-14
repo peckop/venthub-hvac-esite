@@ -13,6 +13,7 @@ export const en: typeof tr = {
     brandTagline: 'Ventilation & HVAC',
     brandLegalName: 'VentHub HVAC Solutions.',
     vortice: 'Vortice',
+    comma: ',',
     loadingApp: 'Loading VentHub... ',
     loading: 'Loading...',
     categories: 'Categories',
@@ -124,6 +125,12 @@ export const en: typeof tr = {
     yes: 'Yes'
   },
   search: {
+    overlay: {
+      enterKey: 'Enter ↵',
+      arrowUp: '↑',
+      arrowDown: '↓',
+      allResultsFor: 'View all results ("{{term}}")',
+    },
     recentSearches: 'Recent Searches',
     clearRecent: 'Clear',
     popularCategories: 'Popular Categories',
@@ -133,6 +140,7 @@ export const en: typeof tr = {
     keyboardHint: 'Navigate with arrow keys',
     enterHint: 'For all results',
     placeholder: 'Search products, categories, brands...',
+    placeholderAi: 'Search products, categories, or AI-powered search...',
     noResultsAdvice: 'Try different keywords',
     detailedSearchCta: 'Click for detailed search',
     brandPrefix: 'Brand: ',
@@ -179,6 +187,8 @@ export const en: typeof tr = {
       hrv: 'HRV/ERV'
     },
     topic: {
+      warnBadge: '!',
+      eyebrow: 'Technical Intelligence',
       notFoundTitle: 'Topic not found',
       notFoundDesc: 'The topic you are looking for may not be added yet.',
       backToHub: 'Back to hub',
@@ -770,6 +780,32 @@ export const en: typeof tr = {
     nextAria: 'Next'
   },
   products: {
+    categoryCard: {
+      seriesCount: '{{count}} series',
+    },
+    orbital: {
+      dragHint: 'Drag to Spin',
+    },
+    category3DIcon: {
+      dragHint: 'Hold to Rotate',
+    },
+    smartInference: {
+      aiInsightBadge: 'AI INSIGHT V2.1',
+    },
+    blueprint: {
+      scanning: 'Scanning Blueprint...',
+      objectReference: 'Object Reference: P-501',
+      cinematicMode: 'Cinematic Mode',
+    },
+    addToProject: {
+      closeModal: 'Close modal',
+      existingProjects: 'My Projects',
+      noProjects: 'You don\'t have any projects yet.',
+      createNewProject: 'Create New Project',
+      projectNamePlaceholder: 'Project Name (e.g. Hilton Hotel Renovation)',
+      cancel: 'Cancel',
+      footerHint: 'You can manage your projects from the my account page, download product lists as PDF, or request a quote.',
+    },
     breadcrumbDiscover: 'Discover',
     heroTitle: 'Discover HVAC products: engineering-led selection, fast quotes',
     heroSubtitle: 'Find the right product quickly with application-guided areas, popular categories and featured products.',
@@ -824,6 +860,20 @@ export const en: typeof tr = {
     }
   },
   megamenu: {
+    elite: {
+      defaultDescription: 'High-quality ventilation solutions.',
+      viewAll: 'View All',
+    },
+    classic: {
+      logoInitial: 'V',
+      title: 'Categories',
+    },
+    categoryHub: {
+      featuredTechnology: 'FEATURED TECHNOLOGY',
+      defaultDescription: 'High-performance, smart industrial solution.',
+      back: 'Go Back',
+      subCategoryCount: '{{count}} Subcategories',
+    },
     navigation: 'Navigation Menu',
     quickAccess: 'Quick Access',
     myCart: 'My Cart',
@@ -834,6 +884,10 @@ export const en: typeof tr = {
     more: 'more'
   },
   header: {
+    adminBar: {
+      brand: 'VH / ADMIN',
+      backToSite: 'Back to Site',
+    },
     syncing: 'Syncing',
     roleLabel: 'Role',
     account: 'My Account',
@@ -1358,6 +1412,18 @@ export const en: typeof tr = {
     }
   },
   pdp: {
+    videoAuthority: {
+      unsupportedProvider: 'Unsupported Provider',
+    },
+    authorityRenderer: {
+      unknownBlockType: 'Unknown Block Type:',
+    },
+    threeDAuthority: {
+      interactiveView: '3D Interactive View',
+      clickToInitialize: 'Click to Initialize Engine',
+      loadingModel: 'Loading 3D Model',
+      dragToRotate: 'Drag to Rotate',
+    },
     loading: 'Loading product...',
     productNotFound: 'Product Not Found',
     backHome: 'Back to home',
@@ -1563,6 +1629,11 @@ export const en: typeof tr = {
     itemTotal: 'Total'
   },
   orders: {
+    page: {
+      showingCount: 'Showing {{shown}} / {{total}} orders',
+      orderLabel: 'Order #',
+      demoBadge: 'DEMO',
+    },
     title: 'My Orders',
     subtitle: 'View and track your past orders',
     viewAll: 'View all',
@@ -1576,7 +1647,7 @@ export const en: typeof tr = {
     status: 'Status',
     all: 'All',
     pending: 'Pending',
-    pa_id: 'Paid',
+    paid: 'Paid',
     shipped: 'Shipped',
     delivered: 'Delivered',
     failed: 'Failed',
@@ -1940,6 +2011,9 @@ export const en: typeof tr = {
     unexpected: 'An unexpected error occurred'
   },
   brands: {
+    page: {
+      statGlobal: 'Global',
+    },
     sectionTitle: 'Premium HVAC Brands',
     sectionSubtitle: 'As the authorized distributor of leading global HVAC brands in Turkey, we offer top-quality ventilation solutions.',
     subtitlePart1: 'Trusted Partner of',
@@ -1963,6 +2037,7 @@ export const en: typeof tr = {
       imageAlt: 'Technical Infrastructure and HVAC Installation'
     },
     detail: {
+      curatedSolutions: 'Curated Solutions',
       heritage: 'Engineering Heritage',
       authorityTitle: 'Technological Authority of Engineering',
       globalVision: 'Global Vision',
@@ -1996,6 +2071,11 @@ export const en: typeof tr = {
     descFallback: 'Product description will be added soon.'
   },
   support: {
+    contactCta: {
+      title: 'Couldn\'t find the answer you were looking for?',
+      subtitle: 'Contact us directly via WhatsApp and we\'ll be happy to help.',
+      button: 'Ask on WhatsApp',
+    },
     links: {
       faq: 'FAQ',
       returns: 'Returns & Exchanges',

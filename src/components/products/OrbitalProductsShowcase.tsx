@@ -10,6 +10,7 @@ import { DoubleSide, MathUtils, SRGBColorSpace, Vector3 } from 'three'
 
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
 
+import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes'
 import Category3DIcon from './Category3DIcon'
 
@@ -152,6 +153,7 @@ const OrbitalCard: React.FC<{
     const groupRef = useRef<Group>(null)
     const meshRef = useRef<Mesh>(null)
     const router = useRouter()
+    const { t } = useI18n()
     const [hovered, setHover] = useState(false)
     const [isNearFront, setIsNearFront] = useState(false)
     const [showTapHint, setShowTapHint] = useState(false) // El ikonu görünürlüğü
@@ -455,7 +457,7 @@ const OrbitalCard: React.FC<{
                                 </div>
                             </div>
                             <div className="px-4 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/50 backdrop-blur-sm">
-                                <span className="text-sm font-medium text-slate-200 uppercase tracking-wider">Tut Çevir</span>
+                                <span className="text-sm font-medium text-slate-200 uppercase tracking-wider">{t('products.orbital.dragHint')}</span>
                             </div>
                         </div>
                     </Html>

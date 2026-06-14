@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx
-skeleton_hash: ac8082825c082a0f
+skeleton_hash: 94fc11a8f3e4a0d3
 entity_hashes:
   func:SearchOverlay: 5877a83b84daa2a4
   func:addToRecent: bf8c952c533ee587
@@ -16,7 +16,7 @@ entity_hashes:
   func:renderSuggestions: 8f7a31a904a04209
   overview: 7f4ffbd07796d9de
   style_tokens: dd6869457e23a7f7
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-14T22:16:29Z
 ---
 
 ## Genel Bakış
@@ -111,6 +111,21 @@ Bu modül, arama arayüzü akışını yöneten React bileşenidir. Aşağıdaki
 **Nasıl yapar**: (Kod içeriği verilmemiştir; genellikle sonuç dizisini map ederek her birini render eder.)  
 **Parametreler**: Yok.  
 **Dönüş**: void — Sonuç elemanlarını üretir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../contexts/CategoryContext::useCategories
+- import: ../i18n/I18nProvider::useI18n
+- import: ../lib/supabase/client::supabaseBrowserClient
+- import: ../types/db-rows::type { DbCategory }
+- import: ../utils/getCategoryIcon::getCategoryIcon
+- import: ../utils/routes::Routes
+- import: ../utils/searchHighlight::highlightMatch
+- import: @/types/ui-models::type { FtsProductResult, SearchSuggestion }
+- import: next/image::Image
+- import: next/navigation::useRouter
+- import: react::React
 
 ---
 
@@ -308,13 +323,13 @@ graph TD
     SearchOverlay_tsx__renderResults["renderResults"]
     SearchOverlay_tsx__renderSuggestion["renderSuggestion"]
     SearchOverlay_tsx__renderSuggestions["renderSuggestions"]
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
 ```
 
 ## NODE ID STANDARD

@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'
 import React, { useRef } from 'react'
 import type { Group } from 'three'
 
+import { useI18n } from '../../i18n/I18nProvider'
 import { FanRenderer } from './3d/FanRenderer'
 
 interface Category3DIconProps {
@@ -37,6 +38,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
     modelType,
     offsetContext
 }) => {
+    const { t } = useI18n()
     const meshRef = useRef<Group>(null)
 
     useFrame((state) => {
@@ -76,7 +78,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
                 <Html position={[0, 1.5, 0]} center>
                     <div className="flex items-center gap-4 bg-slate-900/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/10">
                         <ChevronLeft className="text-cyan-400 animate-pulse" />
-                        <span className="text-white text-xs font-bold uppercase tracking-widest">Tut Çevir</span>
+                        <span className="text-white text-xs font-bold uppercase tracking-widest">{t('products.category3DIcon.dragHint')}</span>
                         <ChevronRight className="text-cyan-400 animate-pulse" />
                     </div>
                 </Html>

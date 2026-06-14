@@ -5,6 +5,8 @@ import { Play, Volume2, VolumeX } from 'lucide-react'
 import Image from 'next/image'
 import React, { useState } from 'react'
 
+import { useI18n } from '@/i18n/I18nProvider'
+
 import type { VideoMetadata } from '../../types/media.types'
 
 interface VideoAuthorityProps {
@@ -18,6 +20,7 @@ interface VideoAuthorityProps {
  * gelen videoları tek bir standartta render eder.
  */
 export default function VideoAuthority({ metadata, className = '' }: VideoAuthorityProps) {
+    const { t } = useI18n()
     const [isLoaded, setIsLoaded] = useState(false)
     const [isMuted, setIsMuted] = useState(metadata.options?.muted ?? true)
 
@@ -46,7 +49,7 @@ export default function VideoAuthority({ metadata, className = '' }: VideoAuthor
             default:
                 return (
                     <div className="flex items-center justify-center bg-slate-100 h-full">
-                        <p className="text-xs font-bold text-slate-400 uppercase">Unsupported Provider</p>
+                        <p className="text-xs font-bold text-slate-400 uppercase">{t('pdp.videoAuthority.unsupportedProvider')}</p>
                     </div>
                 )
         }

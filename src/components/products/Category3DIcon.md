@@ -3,37 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\Category3DIcon.tsx
-skeleton_hash: 511a70b464c7831f
+skeleton_hash: bad05a2357385237
 entity_hashes:
   func:Category3DIcon: 183e6f04e3301ca0
-  overview: b7e45f97931594a0
+  overview: 2b291c273e3fc837
   style_tokens: b8d757c80f7b09fe
-generated_at: 2026-06-10T09:54:12Z
+generated_at: 2026-06-14T22:20:40Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin ürün bölümünde kategori bazlı 3D ikonları göstermek için kullanılan yeniden kullanılabilir bir React UI bileşenidir. Kategori tipi, üzerine gelme durumu, kart konumu ve dokunma ipucu gereksinimi gibi parametrelerle ikonun görünümünü dinamik olarak ayarlar.
+Bu modül, VentHub HVAC projesindeki ürün listeleme ekranlarında her bir kategori için üç boyutlu ve etkileşimli bir ikon göstermek üzere tasarlanmış, yeniden kullanılabilir bir React bileşenidir. Bileşen, gelen kategori tanımlayıcısına ve hover/yerleşim durumuna bağlı olarak dinamik bir 3D render işlemi yapar.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Modülün tek ve ana bileşeni olarak tüm sorumluluğu üstlenir, gelen parametrelere göre uygun 3D ikonu render eder.
+Modülün tek ve merkezi bileşenidir; gelen parametreleri işleyerek kategoriye özgü 3D ikonun durumuna (üzerine gelme, kart önü/arkası, dokunma ipucu gösterimi) göre nihai görünümü render eder.
 - Category3DIcon
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, kategori bazlı 3D ikon gösterimi için dört parametreye bağlı olarak çalışır.
-
-[Aksiyom 1]: Eğer `categorySlug` parametresi geçerli bir kategori tanımlayıcısı olarak sağlanmazsa, hangi kategori ikonunun gösterileceği belirlenemez ve bileşen anlamlı bir içerik üretemez.
-
-[Aksiyom 2]: Eğer `hovered` parametresi boolean türünde bir değer olarak sağlanmazsa, ikonun üzerine gelinme durumuna bağlı görsel geçiş (hover animasyonu/stili) doğru şekilde hesaplanamaz.
-
-[Aksiyom 3]: Eğer `isFrontCard` parametresi boolean türünde bir değer olarak sağlanmazsa, ikonun kartın ön yüzünde mi yoksa arka yüzünde mi konumlandığı bilinemez ve buna bağlı 3D perspective/rendering kararı verilemez.
-
-[Aksiyom 4]: Eğer `shouldShowTapHint` parametresi boolean türünde bir değer olarak sağlanmazsa, dokunma ipucu göstergesinin görünür olup olmadığı belirlenemez ve kullanıcıya sunulacak etkileşim yönlendirmesi yapılamaz.
-
-[Aksiyom 5]: Eğer fonksiyon imzasında hiç `default değer` tanımlanmamışsa, tüm parametreler调用yan taraf tarafından açıkça sağlanmalıdır; aksi halde `undefined` değerlerle çalışılması gerekir ve bileşen beklenmeyen davranış sergileyebilir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -48,6 +39,20 @@ Bu modül, kategori bazlı 3D ikon gösterimi için dört parametreye bağlı ol
 - isFrontCard: boolean — İkonun bulunduğu kartın kategori listesinde önde, ilk sırada yer alıp almadığını belirten prop'tur, öndeki kartlara özel 3B konumlandırma ve ölçekleme ayarlarını uygular.
 - shouldShowTapHint: boolean — Dokunmatik arayüzlerde kullanıcıya ikona tıklayabileceğini hatırlatmak için ipucu gösterilip gösterilmeyeceğini yöneten boolean değişkendir.
 **Dönüş**: React.ReactElement — Tüm durum ve kategori ayarları uygulanmış, kullanıcıya sunulmaya hazır 3D kategori ikonunu içeren geçerli bir React elementi döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ./3d/FanRenderer::FanRenderer
+- import: @react-three/drei::Html
+- import: @react-three/fiber::useFrame
+- import: lucide-react::ChevronLeft
+- import: lucide-react::ChevronRight
+- import: lucide-react::MousePointerClick
+- import: react::React
+- import: react::useRef
+- import: three::type { Group }
 
 ---
 
@@ -69,33 +74,13 @@ Bu modül, kategori bazlı 3D ikon gösterimi için dört parametreye bağlı ol
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: Category3DIcon.tsx::Category3DIcon
-- **params**: `categorySlug` — kategorinin URL dostu adı, FanRenderer'a slugs olarak geçer
+### [N1_NASIL] AST Pointer: src/components/products/Category3DIcon.tsx::Category3DIcon
+- **params**: (`categorySlug`, `hovered`, `isFrontCard`, `shouldShowTapHint`, `shouldShowDragHint`, `hintStage`, `DetailedModel`, `scale=1`, `modelType`, `offsetContext`)
 - **ic_degiskenler**:
-  - `meshRef` — useRef ile oluşturulmuş THREE.Group referansı, 3D sahnedeki grup elemanına erişmek için kullanılır
-  - `showTapHint` — shouldShowTapHint ve hintStage === 'tap' koşullarının birleşimi, dokunma ipucunun gösterilip gösterilmeyeceğini belirler
-- **Dönüş**: JSX elementi (React.ReactNode) — 3D sahne grubu ve koşullu UI hint bileşenlerini render eder
-
-### [N2_NASIL] AST Pointer: Category3DIcon.tsx::useFrame回调
-- **params**: `state` — useFrame'in sağladığı state objesi, state.clock.elapsedTime ile zaman bilgisine erişilir
-- **ic_degiskenler**:
-  - (parametre içinde değişken yok, doğrudan state.clock.elapsedTime kullanılır)
-- **Dönüş**: yok (yan etki: meshRef.current'ın rotation.y değerini değiştirir)
-
-### [N3_NASIL] AST Pointer: Category3DIcon.tsx::FanRenderer Kullanımı
-- **params**: (parametre yok, JSX içinde çağrı)
-- **ic_degiskenler**:
-  - `categorySlug` — props'tan gelen değer, FanRenderer'a `slug` prop'u olarak geçer
-  - `modelType` — props'tan gelen değer, FanRenderer'a `modelType` prop'u olarak geçer
-- **Dönüş**: yok (yan etki: FanRenderer bileşenini render eder)
-
-### [N4_NASIL] AST Pointer: Category3DIcon.tsx::Html Kullanımı
-- **params**: (parametre yok, JSX içinde çağrı)
-- **ic_degiskenler**:
-  - `isFrontCard` — props'tan gelen boolean, ön kartta olup olmadığınızı kontrol eder
-  - `shouldShowDragHint` — props'tan gelen boolean, sürükleme ipucunun gösterilip gösterilmeyeceğini belirler
-  - `hintStage` — props'tan gelen string, ipucu aşamasını belirtir ('tap' veya 'drag')
-- **Dönüş**: yok (yan etki: 3D sahne üzerine HTML overlay'leri yerleştirir)
+  - `t` — useI18n hookundan dönen çeviri fonksiyonu, UI metinleri için kullanılır
+  - `meshRef` — useRef ile oluşturulan Three.js Group referansı, rotasyon animasyonu için kullanılır
+  - `showTapHint` — shouldShowTapHint ve hintStage === 'tap' koşullarının AND mantıksal sonucu, tıklama ipucunun gösterilip gösterilmeyeceğini belirler
+- **Dönüş**: JSX elementi (React component) — 3D ikon container'ı, model gösterimi ve UI hint'leri içeren React bileşeni
 
 ---
 

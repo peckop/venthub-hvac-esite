@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\support\FAQPage.tsx
-skeleton_hash: a3fb8bdca859c605
+skeleton_hash: 60014e6004cd7977
 entity_hashes:
   func:FAQPage: 912e82de3e4ccdbe
   overview: 2138e252fedb352a
   style_tokens: 8147bd10a70e8b20
-generated_at: 2026-06-08T10:11:02Z
+generated_at: 2026-06-14T22:21:40Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,17 @@ Bu projenin frontend mimarisinde yer alan FAQ sayfası görünüm bileşeninin s
 **Parametreler**:
 Bu fonksiyon herhangi bir giriş parametresi almamaktadır, tanımında dış girdi olarak kullanılabilecek herhangi bir parametre tanımı bulunmaz.
 **Dönüş**: React.FC türünde bir React işlevsel bileşeni döndürür. Bu dönüş değeri, uygulamanın yönlendirme akışında FAQ sayfasının ilgili adres altında kullanıcıya sunulmasını sağlar.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/HVACIcons::WhatsAppIcon
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/whatsapp::getSupportLink
+- import: ../../utils/whatsapp::isWhatsAppAvailable
+- import: lucide-react::ArrowLeft
+- import: next/navigation::useRouter
+- import: react::React
 
 ---
 

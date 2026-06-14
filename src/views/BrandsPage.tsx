@@ -121,13 +121,13 @@ const BrandsPage: React.FC = () => {
               
               <div className="grid grid-cols-2 gap-8">
                 <div className="border-l border-white/10 pl-6">
-                  <div className="text-3xl font-bold mb-1">100%</div>
+                  <div className="text-3xl font-bold mb-1">{100}%</div>
                   <div className="text-xs font-black uppercase tracking-widest text-slate-500">
                     {t('brands.trust.original')}
                   </div>
                 </div>
                 <div className="border-l border-white/10 pl-6">
-                  <div className="text-3xl font-bold mb-1">Global</div>
+                  <div className="text-3xl font-bold mb-1">{t('brands.page.statGlobal')}</div>
                   <div className="text-xs font-black uppercase tracking-widest text-slate-500">
                     {t('brands.trust.standard')}
                   </div>

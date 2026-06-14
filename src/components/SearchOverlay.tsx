@@ -229,7 +229,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           )}
         </div>
         <div className={`transition-opacity flex items-center gap-1.5 ${isActive ? 'opacity-100 text-primary-navy' : 'opacity-0 text-primary-ocean group-hover:opacity-100'}`}>
-          <span className="text-xs font-semibold bg-white border border-slate-200 rounded px-1.5 py-0.5 hidden xs:inline-block shadow-sm">Enter ↵</span>
+          <span className="text-xs font-semibold bg-white border border-slate-200 rounded px-1.5 py-0.5 hidden xs:inline-block shadow-sm">{t('search.overlay.enterKey')}</span>
         </div>
       </button>
     )
@@ -327,7 +327,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           onClick={() => performFullSearch(debounced)}
           className="w-full text-center py-3 text-sm text-primary-ocean font-medium hover:bg-gray-50 border-t transition-colors focus:bg-air-blue/10 focus-visible:outline-none"
         >
-          {t('search.allResults')} ("{debounced}")
+          {t('search.overlay.allResultsFor', { term: debounced })}
         </button>
       </div>
     )
@@ -385,7 +385,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
                     </div>
                   </div>
                   <div className={`transition-opacity flex items-center gap-2 ${isActive ? 'opacity-100 text-primary-navy' : 'opacity-0 text-primary-ocean group-hover:opacity-100'}`}>
-                    <span className="text-xs font-semibold bg-white border border-slate-200 rounded px-1.5 py-0.5 hidden sm:inline-block shadow-sm">Enter ↵</span>
+                    <span className="text-xs font-semibold bg-white border border-slate-200 rounded px-1.5 py-0.5 hidden sm:inline-block shadow-sm">{t('search.overlay.enterKey')}</span>
                   </div>
                 </button>
               </li>
@@ -422,7 +422,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={t('search.placeholder_ai') || t('search.placeholder') || "Ürün, kategori veya AI destekli arama..."}
+              placeholder={t('search.placeholderAi')}
               className="flex-1 text-lg placeholder:text-gray-400 focus-visible:outline-none text-industrial-gray bg-transparent font-medium"
             />
             {loading && (
@@ -457,12 +457,12 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           {(viewState === 'SUGGESTING' || viewState === 'RESULTS') && (suggestions.length > 0 || results.length > 0) && (
             <div className="bg-slate-50 px-4 py-2.5 border-t border-slate-100 flex justify-between items-center text-xs text-steel-gray">
               <span className="flex items-center gap-1">
-                <span className="bg-white px-1 py-0.5 rounded border border-slate-200 shadow-sm leading-none">↑</span>
-                <span className="bg-white px-1 py-0.5 rounded border border-slate-200 shadow-sm leading-none">↓</span>
+                <span className="bg-white px-1 py-0.5 rounded border border-slate-200 shadow-sm leading-none">{t('search.overlay.arrowUp')}</span>
+                <span className="bg-white px-1 py-0.5 rounded border border-slate-200 shadow-sm leading-none">{t('search.overlay.arrowDown')}</span>
                 <span className="ml-1">{t('search.keyboardHint')}</span>
               </span>
               <span className="flex items-center gap-1">
-                {t('search.enterHint')} <strong className="bg-white px-1.5 py-0.5 rounded border border-slate-200 shadow-sm ml-1 text-slate-700">Enter ↵</strong>
+                {t('search.enterHint')} <strong className="bg-white px-1.5 py-0.5 rounded border border-slate-200 shadow-sm ml-1 text-slate-700">{t('search.overlay.enterKey')}</strong>
               </span>
             </div>
           )}

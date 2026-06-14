@@ -91,7 +91,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
           >
             <div className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8">
               <BookOpen size={14} className="text-cyan-400" />
-              <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-400">Technical Intelligence</span>
+              <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-400">{t('knowledge.topic.eyebrow')}</span>
             </div>
             
             <h1 className="text-5xl lg:text-7xl font-extralight tracking-tighter leading-tight mb-8 max-w-4xl">
@@ -112,7 +112,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
             {/* Steps Card */}
             <div className="p-12 rounded-hvac-3xl bg-slate-50 border border-slate-100">
               <h2 className="text-2xl font-bold text-slate-950 tracking-tight mb-10 flex items-center gap-4">
-                <span className="w-8 h-8 rounded-full bg-cyan-500 text-white flex items-center justify-center text-xs">1</span>
+                <span className="w-8 h-8 rounded-full bg-cyan-500 text-white flex items-center justify-center text-xs">{1}</span>
                 {t('knowledge.topic.stepsTitle')}
               </h2>
               <div className="space-y-6">
@@ -128,7 +128,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
             {/* Pitfalls Card */}
             <div className="p-12 rounded-hvac-3xl bg-amber-50/30 border border-amber-100/50">
               <h2 className="text-2xl font-bold text-slate-950 tracking-tight mb-10 flex items-center gap-4">
-                <span className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs">!</span>
+                <span className="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs">{t('knowledge.topic.warnBadge')}</span>
                 {t('knowledge.topic.pitfallsTitle')}
               </h2>
               <div className="space-y-6">

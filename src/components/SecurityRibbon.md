@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SecurityRibbon.tsx
-skeleton_hash: 5b31708d00170873
+skeleton_hash: 8868b245364bfa62
 entity_hashes:
   func:SecurityRibbon: a7c5f379d943c103
   overview: 08117376b2a86eee
   style_tokens: 3e379506fde07599
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-14T22:16:29Z
 ---
 
 ## Genel Bakış
@@ -45,6 +45,15 @@ Bu React UI bileşeni (SecurityRibbon), marka adı ve ödeme sağlayıcısı bil
 - providerName: string — Güvenlik hizmetini sunan üçüncü taraf sağlayıcının (genellikle ödeme sağlayıcısı) ismidir, varsayılan değeri 'iyzico'dur, ihtiyaç duyulması halinde farklı sağlayıcı isimleriyle kolayca özelleştirilebilir.
 - variant: string — Güvenlik şeridinin görsel görünümünü belirleyen, hangi banner tasarımıyla ekrana yansıtılacağını ayarlayan parametredir, farklı kullanım senaryoları için farklı tasarım seçenekleri sunulmasını sağlar.
 **Dönüş**: React.FC<SecurityRibbonProps> tipinde, işlenmeye hazır React bileşeni döndürür. Bu döndürülen element, uygulamadaki herhangi bir bileşen içinde import edilip kullanılabilir, kendisine iletilen tüm prop ve varsayılan değerlere göre dinamik olarak içeriğini ve görünümünü oluşturan güvenlik şeridi olarak çalışır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: lucide-react::CreditCard
+- import: lucide-react::Lock
+- import: lucide-react::ShieldCheck
+- import: react::React
 
 ---
 

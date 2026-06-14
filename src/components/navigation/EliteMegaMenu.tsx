@@ -6,6 +6,7 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import { Routes } from '../../utils/routes'
@@ -63,6 +64,7 @@ export const MobileMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNav
 
 const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate }) => {
     const { wrapCategory } = useCategoryViewModel()
+    const { t } = useI18n()
     const [isMounted, setIsMounted] = useState(false)
 
     useEffect(() => {
@@ -132,14 +134,14 @@ const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate })
                                                     {vm?.displayName}
                                                 </div>
                                                 <p className="text-sm leading-normal text-slate-600">
-                                                    {vm?.description || 'Yüksek kaliteli havalandırma çözümleri.'}
+                                                    {vm?.description || t('megamenu.elite.defaultDescription')}
                                                 </p>
                                                 <Link
                                                     href={Routes.category(category.slug)}
                                                     onClick={() => handleLinkClick(0, category.slug)}
                                                     className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-secondary-blue hover:text-primary-navy"
                                                 >
-                                                    Tümünü Gör <ExternalLink size={14} />
+                                                    {t('megamenu.elite.viewAll')} <ExternalLink size={14} />
                                                 </Link>
                                             </div>
                                         </div>

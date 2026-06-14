@@ -221,7 +221,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                 <div className="p-8 rounded-hvac-xl bg-slate-50 border border-slate-100">
                   <h3 className="text-lg font-bold text-slate-900 mb-4">{t('brands.detail.globalVision')}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed font-light">
-                    {brand.name}, {t('brands.detail.globalVisionDesc')}
+                    {brand.name}{t('common.comma')} {t('brands.detail.globalVisionDesc')}
                   </p>
                 </div>
                 <div className="p-8 rounded-hvac-xl bg-slate-50 border border-slate-100">
@@ -292,7 +292,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 text-center md:text-left">
             <div>
-              <div className="text-cyan-600 text-xs font-black uppercase tracking-hvac-wide mb-4">Curated Solutions</div>
+              <div className="text-cyan-600 text-xs font-black uppercase tracking-hvac-wide mb-4">{t('brands.detail.curatedSolutions')}</div>
               <h2 className="text-4xl font-light tracking-tighter text-slate-950">
                 {t('brands.detail.featuredSystems').split(' ').slice(0, 2).join(' ')} <span className="font-medium">{t('brands.detail.featuredSystems').split(' ').slice(2).join(' ')}</span>
               </h2>

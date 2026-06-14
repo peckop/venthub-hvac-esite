@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\BrandDetailPage.tsx
-skeleton_hash: 43d79df4a65a4873
+skeleton_hash: 56adefc5e6c04a09
 entity_hashes:
   func:BrandDetailPage: 658e62bc6ce56cad
   overview: c3e73e1bcf4512a9
   style_tokens: 4208267ad108784f
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-14T22:21:39Z
 ---
 
 ## Genel Bakış
@@ -47,6 +47,31 @@ Bu modül için temel mimari varsayımlar, bileşenin prop bağımlılığı ve 
 - `initialBrandSlug`: `string` — Sayfa yüklendiğinde görüntülenecek markanın başlangıç slug değerini (URL dostu tanımlayıcı) taşır. Bu değer genellikle sunucu tarafı yönlendirmelerden veya URL parametrelerinden gelir.
 
 **Dönüş**: `React.FC<BrandDetailPageProps>` — BrandDetailPageProps arabirimini implemente eden bir React fonksiyonel bileşeni döndürür. Bileşen, marka detay sayfasının tüm içeriğini render eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../components/HVACIcons::BrandIcon
+- import: ../components/Seo::Seo
+- import: ../components/navigation/Breadcrumb::Breadcrumb
+- import: ../data/brands::HVAC_BRANDS
+- import: ../hooks/useScrollAnimation::scrollAnimationClasses
+- import: ../hooks/useScrollAnimation::useScrollAnimation
+- import: ../i18n/I18nProvider::useI18n
+- import: ../lib/services/product.service::getProductsEnriched
+- import: ../types/ui-models::type { Product }
+- import: ../utils/routes::Routes
+- import: @/components/ui/VentImage::VentImage
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: lucide-react::ArrowRight
+- import: lucide-react::ExternalLink
+- import: lucide-react::Package
+- import: next/image::Image
+- import: next/link::Link
+- import: next/navigation::useParams
+- import: react::React
+- import: react::useEffect
+- import: react::useState
 
 ---
 

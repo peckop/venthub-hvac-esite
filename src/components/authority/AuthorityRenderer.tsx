@@ -5,6 +5,7 @@ import * as LucideIcons from 'lucide-react';
 import Image from 'next/image';
 import React from 'react';
 
+import { useI18n } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 import { 
   AuthorityContent, 
@@ -183,6 +184,7 @@ const CtaBannerBlock: React.FC<{ block: CtaBannerBlockType }> = ({ block }) => (
 // --- RENDERER ANA BİLEŞEN ---
 
 export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> = ({ content }) => {
+  const { t } = useI18n();
   if (!content || !Array.isArray(content) || content.length === 0) return null;
 
   return (
@@ -282,7 +284,7 @@ export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> =
           default:
             return (
               <div key={block.id} className="p-8 border-2 border-dashed border-red-100 text-red-300 text-xs text-center m-8 rounded-3xl">
-                Bilinmeyen Blok Tipi: {block.type}
+                {t('pdp.authorityRenderer.unknownBlockType')} {block.type}
               </div>
             );
         }

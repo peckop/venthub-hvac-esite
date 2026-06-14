@@ -12,6 +12,7 @@ export const tr = {
     brandTagline: 'Ventilation & HVAC',
     brandLegalName: 'VentHub HVAC Solutions.',
     vortice: 'Vortice',
+    comma: ',',
     addToProject: 'Proje Listesine Ekle',
     loadingApp: 'VentHub yükleniyor... ',
     loading: 'Yükleniyor...',
@@ -173,6 +174,32 @@ export const tr = {
     nextAria: 'Sonraki'
   },
   products: {
+    categoryCard: {
+      seriesCount: '{{count}} seri',
+    },
+    orbital: {
+      dragHint: 'Tut Çevir',
+    },
+    category3DIcon: {
+      dragHint: 'Tut Çevir',
+    },
+    smartInference: {
+      aiInsightBadge: 'YZ İÇGÖRÜ V2.1',
+    },
+    blueprint: {
+      scanning: 'Şablon taranıyor...',
+      objectReference: 'Nesne Referansı: P-501',
+      cinematicMode: 'Sinematik Mod',
+    },
+    addToProject: {
+      closeModal: 'Modalı kapat',
+      existingProjects: 'Mevcut Projelerim',
+      noProjects: 'Henüz bir projeniz bulunmuyor.',
+      createNewProject: 'Yeni Proje Oluştur',
+      projectNamePlaceholder: 'Proje Adı (Örn: Hilton Otel Renovasyonu)',
+      cancel: 'İptal Et',
+      footerHint: 'Projelerinizi hesabım sayfasından yönetebilir, ürün listelerini PDF olarak indirebilir veya teklif isteyebilirsiniz.',
+    },
     allProductsTitle: 'Tüm Ürünlerimiz',
     systemTotalPrefix: 'Sistemdeki tüm',
     viewGrid: 'Izgara',
@@ -205,6 +232,12 @@ export const tr = {
     clearFilters: 'Filtreleri Temizle'
   },
   search: {
+    overlay: {
+      enterKey: 'Enter ↵',
+      arrowUp: '↑',
+      arrowDown: '↓',
+      allResultsFor: 'Tüm sonuçları gör ("{{term}}")',
+    },
     recentSearches: 'Son Aramalar',
     clearRecent: 'Temizle',
     popularCategories: 'Popüler Kategoriler',
@@ -214,6 +247,7 @@ export const tr = {
     keyboardHint: 'Ok tuşları ile gezinebilirsiniz',
     enterHint: 'Tüm sonuçlar için',
     placeholder: 'Ürün, kategori veya marka ara...',
+    placeholderAi: 'Ürün, kategori veya yapay zeka destekli arama...',
     noResultsAdvice: 'Farklı anahtar kelimeler deneyin',
     detailedSearchCta: 'Detaylı arama için tıklayın',
     brandPrefix: 'Marka: ',
@@ -260,6 +294,8 @@ export const tr = {
       hrv: 'HRV/ERV'
     },
     topic: {
+      warnBadge: '!',
+      eyebrow: 'Teknik Bilgi',
       notFoundTitle: 'Bilgi bulunamadı',
       notFoundDesc: 'Aradığınız konu henüz eklenmemiş olabilir.',
       backToHub: 'Merkeze dön',
@@ -712,6 +748,20 @@ export const tr = {
     }
   },
   megamenu: {
+    elite: {
+      defaultDescription: 'Yüksek kaliteli havalandırma çözümleri.',
+      viewAll: 'Tümünü Gör',
+    },
+    classic: {
+      logoInitial: 'V',
+      title: 'Kategoriler',
+    },
+    categoryHub: {
+      featuredTechnology: 'ÖNE ÇIKAN TEKNOLOJİ',
+      defaultDescription: 'Yüksek performanslı, akıllı endüstriyel çözüm.',
+      back: 'Geri Dön',
+      subCategoryCount: '{{count}} Alt Kategori',
+    },
     navigation: 'Navigasyon Menüsü',
     quickAccess: 'Hızlı Erişim',
     myCart: 'Sepetim',
@@ -722,6 +772,10 @@ export const tr = {
     more: 'daha fazla'
   },
   header: {
+    adminBar: {
+      brand: 'VH / ADMIN',
+      backToSite: 'Siteye Dön',
+    },
     syncing: 'Senkronize ediliyor',
     roleLabel: 'Yetki',
     account: 'Hesabım',
@@ -873,6 +927,9 @@ export const tr = {
     }
   },
   brands: {
+    page: {
+      statGlobal: 'Küresel',
+    },
     sectionTitle: 'Premium HVAC Markaları',
     sectionSubtitle: 'Dünyanın önde gelen HVAC markalarının Türkiye distribütörü olarak en kaliteli havalandırma çözümlerini sunuyoruz.',
     subtitlePart1: 'Dünya Devlerinin',
@@ -896,6 +953,7 @@ export const tr = {
       imageAlt: 'Teknik Altyapı ve HVAC Kurulumu'
     },
     detail: {
+      curatedSolutions: 'Seçkin Çözümler',
       heritage: 'Mühendislik Mirası',
       authorityTitle: 'Mühendisliğin Teknolojik Otoritesi',
       globalVision: 'Küresel Vizyon',
@@ -1610,6 +1668,18 @@ export const tr = {
     }
   },
   pdp: {
+    videoAuthority: {
+      unsupportedProvider: 'Desteklenmeyen Sağlayıcı',
+    },
+    authorityRenderer: {
+      unknownBlockType: 'Bilinmeyen Blok Tipi:',
+    },
+    threeDAuthority: {
+      interactiveView: '3D Interaktif Görünüm',
+      clickToInitialize: 'Motoru Başlatmak İçin Tıklayın',
+      loadingModel: '3D Model Yükleniyor',
+      dragToRotate: 'Döndürmek İçin Sürükleyin',
+    },
     loading: 'Ürün yükleniyor...',
     productNotFound: 'Ürün Bulunamadı',
     backHome: 'Ana Sayfaya Dön',
@@ -1810,6 +1880,11 @@ export const tr = {
     descFallback: 'Ürün açıklaması yakında eklenecektir.'
   },
   support: {
+    contactCta: {
+      title: 'Aradığınız cevabı bulamadınız mı?',
+      subtitle: 'WhatsApp üzerinden direkt bizimle iletişime geçin, size yardımcı olalım.',
+      button: 'WhatsApp\'tan Sorun',
+    },
     links: {
       faq: 'SSS',
       returns: 'İade ve Değişim',
@@ -2142,6 +2217,11 @@ export const tr = {
     }
   },
   orders: {
+    page: {
+      showingCount: '{{shown}} / {{total}} sipariş gösteriliyor',
+      orderLabel: 'Sipariş #',
+      demoBadge: 'DEMO',
+    },
     title: 'Siparişlerim',
     empty: 'Henüz siparişiniz bulunmuyor.',
     orderDate: 'Sipariş Tarihi',
@@ -2200,7 +2280,7 @@ export const tr = {
     failed: 'Başarısız',
     filters: 'Filtreler',
     orderNumber: 'Sipariş No',
-    pa_id: 'Ödendi',
+    paid: 'Ödendi',
     partialRefunded: 'Kısmi İade Edildi',
     pending: 'Beklemede',
     refunded: 'İade Edildi',

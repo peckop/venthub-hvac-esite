@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\product\ProductSmartInference.tsx
-skeleton_hash: b09b21b419fb6a4c
+skeleton_hash: 2a98f6772ed015bb
 entity_hashes:
   overview: 18fbc67e6ef24df1
   style_tokens: 14ff5ff1bd6a1a02
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-14T22:19:48Z
 ---
 
 ## Genel Bakış
@@ -49,6 +49,18 @@ Bu modül, bir React bileşeni olup fonksiyon gövdesine ilişkin detaylı bilgi
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: @/types/ui-models::type { Product }
+- import: lucide-react::Activity
+- import: lucide-react::Cpu
+- import: lucide-react::ShieldCheck
+- import: lucide-react::Volume2
+- import: lucide-react::Zap
+- import: react::React
 
 ---
 

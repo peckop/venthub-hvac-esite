@@ -36,7 +36,7 @@ const SecurityRibbon: React.FC<SecurityRibbonProps> = ({
         <div className="flex items-center gap-2">
           <span className={badge}><ShieldCheck size={12}/> PCI DSS</span>
           <span className={badge}><CreditCard size={12}/> 3D Secure</span>
-          <span className={badge}><Lock size={12}/> 256‑bit SSL</span>
+          <span className={badge}><Lock size={12}/> 256-bit SSL</span>
         </div>
       </div>
     </div>

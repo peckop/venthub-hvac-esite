@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\knowledge\TopicPage.tsx
-skeleton_hash: fcebd7ec56cccae1
+skeleton_hash: 27110243906085c6
 entity_hashes:
   func:TopicPage: f0965ed8eda6ce60
   overview: e2c2f0ab8ac5351b
   style_tokens: cc78d049395b1cf9
-generated_at: 2026-06-08T10:11:02Z
+generated_at: 2026-06-14T22:21:39Z
 ---
 
 ## Genel Bakış
@@ -51,6 +51,24 @@ Bu modül için temel mimari varsayımlar aşağıdadır:
 **Parametreler**:
 - propSlug: string — Bileşene iletilen, görüntülenecek bilgi konusunun benzersiz tanımlayıcısı olan slug değeri
 **Dönüş**: React.FC<TopicPageProps> tipinde bir React fonksiyonel bileşeni döner. Bu dönüş tipi, bileşenin TopicPageProps arayüzü ile tanımlanan propsları kabul ettiğini ve geçerli JSX elemanları ürettiğini belirtir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/Seo::Seo
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/applicationLinks::getCategoryUrlFromTopic
+- import: ../../utils/routes::Routes
+- import: framer-motion::motion
+- import: lucide-react::AlertCircle
+- import: lucide-react::ArrowLeft
+- import: lucide-react::ArrowRight
+- import: lucide-react::BookOpen
+- import: lucide-react::CheckCircle2
+- import: next/image::Image
+- import: next/link::Link
+- import: next/navigation::useParams
+- import: react::React
 
 ---
 

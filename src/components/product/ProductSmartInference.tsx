@@ -49,7 +49,7 @@ export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = React
           {t('pdp.labels.engineeringAnalysis')}
         </div>
         <div className="px-2 py-0.5 bg-slate-100 rounded text-xs font-bold text-slate-500 uppercase tracking-widest">
-          AI INSIGHT V2.1
+          {t('products.smartInference.aiInsightBadge')}
         </div>
       </div>
       

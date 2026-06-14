@@ -62,7 +62,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
     >
       <motion.button
         type="button"
-        aria-label="Modalı kapat"
+        aria-label={t('products.addToProject.closeModal')}
         tabIndex={-1}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -102,11 +102,11 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
 
           {/* List existing projects */}
           <div className="space-y-3">
-            <label className="text-xs font-bold text-steel-gray uppercase tracking-widest">Mevcut Projelerim</label>
+            <label className="text-xs font-bold text-steel-gray uppercase tracking-widest">{t('products.addToProject.existingProjects')}</label>
             <div className="max-h-48 overflow-y-auto space-y-2 pr-1 scrollbar-thin scrollbar-thumb-light-gray">
               {projects.length === 0 ? (
                 <div className="text-sm text-steel-gray italic py-4 text-center border border-dashed border-light-gray rounded-xl">
-                  Henüz bir projeniz bulunmuyor.
+                  {t('products.addToProject.noProjects')}
                 </div>
               ) : (
                 projects.map(project => (
@@ -137,7 +137,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
               className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl bg-light-gray text-industrial-gray hover:bg-secondary-blue hover:text-white transition-colors font-bold text-sm"
             >
               <Plus size={18} />
-              <span>Yeni Proje Oluştur</span>
+              <span>{t('products.addToProject.createNewProject')}</span>
             </button>
           ) : (
             <motion.div
@@ -150,7 +150,7 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
                   type="text"
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
-                  placeholder="Proje Adı (Örn: Hilton Otel Renovasyonu)"
+                  placeholder={t('products.addToProject.projectNamePlaceholder')}
                   className="w-full px-4 py-3 rounded-xl border border-light-gray focus-visible:border-primary-navy focus-visible:ring-2 focus-visible:ring-primary-navy/10 outline-none text-sm transition-colors pr-12"
                   onKeyDown={(e) => e.key === 'Enter' && handleCreateAndAdd()}
                 />
@@ -166,14 +166,14 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
                 onClick={() => setIsCreating(false)}
                 className="text-xs text-steel-gray hover:text-primary-navy font-medium underline px-1"
               >
-                İptal Et
+                {t('products.addToProject.cancel')}
               </button>
             </motion.div>
           )}
         </div>
 
         <div className="px-6 py-4 bg-light-gray/30 text-xs text-steel-gray leading-relaxed">
-          Projelerinizi hesabım sayfasından yönetebilir, ürün listelerini PDF olarak indirebilir veya teklif isteyebilirsiniz.
+          {t('products.addToProject.footerHint')}
         </div>
       </motion.div>
     </div>

@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\OrdersPage.tsx
-skeleton_hash: 902246efbf6ef575
+skeleton_hash: 3ad475fd417d92dc
 entity_hashes:
   func:OrdersPage: 438a8bbd716fd9a1
   func:formatDate: cda2f023d87c7e9e
@@ -12,7 +12,7 @@ entity_hashes:
   func:getStatusText: 248f40bb51719423
   overview: 1d7002471970a13f
   style_tokens: 4894888e4850f9b4
-generated_at: 2026-06-08T10:10:59Z
+generated_at: 2026-06-14T22:21:39Z
 ---
 
 ## Genel Bakış
@@ -74,6 +74,28 @@ Bu modül için, sipariş verilerinin formatlanması ve sunulmasıyla ilgili tem
 **Parametreler**:  
 - `status`: `string` — durum bilgisini temsil eden metin.  
 **Dönüş**: Belirtilmemiştir (return tipi bilinmiyor).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../hooks/useAuth::useAuth
+- import: ../i18n/I18nProvider::useI18n
+- import: ../i18n/datetime::formatDateTime
+- import: ../i18n/format::formatCurrency
+- import: ../lib/type-converters::isRecord
+- import: ../utils/routes::Routes
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: lucide-react::Calendar
+- import: lucide-react::CreditCard
+- import: lucide-react::Eye
+- import: lucide-react::Package
+- import: lucide-react::ShoppingBag
+- import: next/navigation::useRouter
+- import: next/navigation::useSearchParams
+- import: react::React
+- import: react::useEffect
+- import: react::useState
+- import: sonner::toast
 
 ---
 
@@ -148,9 +170,9 @@ graph TD
     OrdersPage_tsx__getStatusColor["getStatusColor"]
     OrdersPage_tsx__getStatusText["getStatusText"]
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatPrice
-    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatDate
-    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
     OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusColor
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__getStatusText
+    OrdersPage_tsx__OrdersPage --> OrdersPage_tsx__formatDate
 ```
 
 ## NODE ID STANDARD

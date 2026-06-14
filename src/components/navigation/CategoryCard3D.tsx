@@ -6,6 +6,7 @@ import React, { Suspense } from 'react'
 const Category3DIcon = dynamic(() => import('../products/Category3DIcon'), { ssr: false, loading: () => null })
 import type { Category } from '@/types/ui-models'
 
+import { useI18n } from '../../i18n/I18nProvider'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 
 interface CategoryCard3DProps {
@@ -23,6 +24,7 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
     subCategoryCount,
     onClick
 }) => {
+    const { t } = useI18n()
     return (
         <div
             onClick={onClick}
@@ -72,7 +74,7 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
 
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-white/70">
-                        {subCategoryCount} seri
+                        {t('products.categoryCard.seriesCount', { count: subCategoryCount })}
                     </span>
                     <ChevronRight
                         className="w-5 h-5 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-transform"

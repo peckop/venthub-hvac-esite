@@ -7,6 +7,7 @@ import React, { Suspense,useCallback, useEffect, useState } from 'react'
 
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
 import type { CategoryMetadata } from '../../types/db-rows'
 import { Routes } from '../../utils/routes'
@@ -22,6 +23,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     onClose
 }) => {
     const router = useRouter()
+    const { t } = useI18n()
     const { categories, categoryTree: mainCategories } = useCategories()
     const { wrapCategory } = useCategoryViewModel()
     
@@ -135,13 +137,13 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                             <>
                                 <div className="relative z-10 animate-in fade-in slide-in-from-top-4 duration-500">
                                     <span className="inline-block mb-4 text-xs font-bold tracking-hvac-normal uppercase text-sky-400 font-mono border border-sky-400/20 bg-sky-400/10 rounded-sm px-2.5 py-1">
-                                        ÖNE ÇIKAN TEKNOLOJİ
+                                        {t('megamenu.categoryHub.featuredTechnology')}
                                     </span>
                                     <h3 className="text-3xl font-extrabold leading-none tracking-tight text-white mb-3" style={{ fontVariantNumeric: "tabular-nums" }}>
                                         {hoveredVm?.displayName}
                                     </h3>
                                     <p className="text-sm leading-relaxed text-slate-400 max-w-280px">
-                                        {hoveredVm?.description || 'Yüksek performanslı, akıllı endüstriyel çözüm.'}
+                                        {hoveredVm?.description || t('megamenu.categoryHub.defaultDescription')}
                                     </p>
                                 </div>
 
@@ -199,12 +201,12 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                         <div className="p-2 rounded-full bg-slate-800 group-hover:bg-slate-700 transition-colors">
                                             <ArrowLeft className="w-4 h-4" />
                                         </div>
-                                        <span className="text-sm font-bold tracking-wide uppercase">Geri Dön</span>
+                                        <span className="text-sm font-bold tracking-wide uppercase">{t('megamenu.categoryHub.back')}</span>
                                     </button>
                                 ) : (
                                     <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
                                         <Grid3X3 className="w-5 h-5 text-sky-400" />
-                                        Ürün Kategorileri
+                                        {t('megamenu.productCategories')}
                                     </h2>
                                 )}
                             </div>
@@ -234,7 +236,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                                     {vm?.displayName}
                                                 </div>
                                                 {!isSelected && subCount > 0 && (
-                                                    <div className="text-xs font-medium tracking-wide uppercase text-slate-500 mt-1.5">{subCount} Alt Kategori</div>
+                                                    <div className="text-xs font-medium tracking-wide uppercase text-slate-500 mt-1.5">{t('megamenu.categoryHub.subCategoryCount', { count: subCount })}</div>
                                                 )}
                                             </div>
                                             <div className="w-8 h-8 rounded-full border border-slate-700/50 bg-slate-800/50 flex items-center justify-center group-hover/item:bg-sky-500 group-hover/item:border-sky-400 group-hover/item:text-white text-slate-500 transition-transform duration-300 opacity-0 -translate-x-4 group-hover/item:opacity-100 group-hover/item:translate-x-0">

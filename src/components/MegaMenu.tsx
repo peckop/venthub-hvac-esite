@@ -3,6 +3,7 @@
 import React, { useEffect,useState } from 'react'
 
 import { useCategories } from '../contexts/CategoryContext'
+import { useI18n } from '../i18n/I18nProvider'
 import EliteMegaMenu, { MobileMegaMenu } from './navigation/EliteMegaMenu'
 
 interface MegaMenuProps {
@@ -12,6 +13,7 @@ interface MegaMenuProps {
 
 const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
   const { categories, loading } = useCategories()
+  const { t } = useI18n()
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -26,9 +28,9 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white sticky top-0 z-10">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary-navy rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xs">V</span>
+            <span className="text-white font-bold text-xs">{t('megamenu.classic.logoInitial')}</span>
           </div>
-          <span className="font-bold text-slate-900 tracking-tight text-lg">Kategoriler</span>
+          <span className="font-bold text-slate-900 tracking-tight text-lg">{t('megamenu.classic.title')}</span>
         </div>
         <button 
           onClick={onClose}

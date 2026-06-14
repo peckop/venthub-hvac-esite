@@ -3,32 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\MegaMenu.tsx
-skeleton_hash: a2f04b68f2a1f84f
+skeleton_hash: 94fd26e812855e91
 entity_hashes:
   func:MegaMenu: 73d16c7403c0be73
-  overview: f5fc7e413027361c
+  overview: 7b77f95abaa36af5
   style_tokens: 607cd2b8b83a451b
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-14T22:16:29Z
 ---
 
 ## Genel Bakış
-MegaMenu modülü, web sitesinin üst navigasyon bölümünde yer alan mega menü bileşenini tanımlar. Bileşen, `isOpen` ve `onClose` prop'ları aracılığıyla menünün açılıp kapanmasını dış bileşenlerden kontrol eder ve kullanıcılara geniş kapsamlı navigasyon seçenekleri sunar.
+MegaMenu, web sitesinin üst navigasyon çubuğunda yer alan ve kullanıcılara geniş kapsamlı, çok sütunlu bir navigasyon deneyimi sunan bir React bileşenidir. Bileşen, dışarıdan verilen durum ve kontrol fonksiyonları sayesinde açılıp kapanabilir ve üst bileşenlerle tam etkileşim içinde çalışır.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-Mega menünün görsel yapısını oluşturur ve görünürlük durumunu yönetir. Kullanıcı menüyü kapatmak istediğinde `onClose` callback'ini tetikleyerek üst bileşene bildirim gönderir.
+Mega menünün tamamını temsil eden ana React bileşenidir. Görünür durumunu `isOpen` prop'una göre koşullu olarak renderlar ve kullanıcı menüyü kapatmak istediğinde `onClose` callback'ini tetikleyerek üst bileşene durumu bildirir.
 - MegaMenu
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-MegaMenu modülünün doğru çalışması için `isOpen` ve `onClose` parametrelerinin sağlanması gerekmektedir. Her iki parametre de default değer içermediği için çağrı tarafında zorunlu olarak iletilmelidir.
 
-[Aksiyom 1]: Eğer `isOpen` parametresi verilmezse, menünün görünürlük durumu belirsizleşir ve bileşen açılıp kapanamaz.
+MegaMenu modülü, menünün görünürlük durumunu dışarıdan kontrol eden bir bileşendir ve doğru çalışması için belirli prop'ların sağlanması gerekmektedir.
 
-[Aksiyom 2]: Eğer `onClose` callback fonksiyonu verilmezse, kullanıcı menüyü kapatmaya çalıştığında hata oluşur veya kapatma işlemi çalışmaz.
+**[Aksiyom 1]:** Eğer `isOpen` prop'u sağlanmazsa, menünün açılıp kapanma durumu belirsiz olur ve bileşen tutarsız davranabilir.
 
-[Aksiyom 3]: Eğer `isOpen` `true` olarak ayarlanmazsa, menü hiç görünmez ve kullanıcı menü seçeneklerine erişemez.
+**[Aksiyom 2]:** Eğer `onClose` callback fonksiyonu sağlanmazsa, menü kapatma işlemi tetiklendiğinde üst bileşene bildirim gönderilemez ve menü kapanma akışı bozulur.
+
+**[Aksiyom 3]:** Eğer bileşen `isOpen: true` durumunda render edilir ve `onClose` geçerli bir fonksiyon değilse, kullanıcı menüyü kapatamaz ve navigasyon işlevsiz kalır.
 
 ---
 
@@ -50,6 +51,17 @@ MegaMenu modülünün doğru çalışması için `isOpen` ve `onClose` parametre
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../contexts/CategoryContext::useCategories
+- import: ../i18n/I18nProvider::useI18n
+- import: ./navigation/EliteMegaMenu::EliteMegaMenu
+- import: ./navigation/EliteMegaMenu::MobileMegaMenu
+- import: react::React
+- import: react::useEffect
+- import: react::useState
+
+---
+
 ## INTERFACES
 
 ### MegaMenuProps
@@ -60,20 +72,27 @@ MegaMenu modülünün doğru çalışması için `isOpen` ve `onClose` parametre
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/MegaMenu.tsx::MegaMenu (arrow function body)
-- **params**: `isOpen` — menünün açılıp kapanma durumu (boolean), `onClose` — menü kapatıldığında çağrılacak callback fonksiyonu
+### [N1_NASIL] AST Pointer: src/components/MegaMenu.tsx::MegaMenu
+- **params**: `{ isOpen, onClose }` — `isOpen`: boolean, mega menünün açık olup olmadığını belirtir; `onClose`: menüyü kapatma callback fonksiyonu
 - **ic_degiskenler**:
-  - `categories` — `useCategories()` hook'undan gelen kategoriler dizisi, EliteMegaMenu ve MobileMegaMenu bileşenlerine prop olarak aktarılır
-  - `loading` — `useCategories()` hook'undan gelen yükleme durumu boolean'ı, true olduğunda spinner gösterilir
-  - `isMounted` — `useState(false)` ile oluşturulan state, bileşenin ilk mount olup olmadığını takip eder, true olduğunda menü içeriği render edilir
-- **Dönüş**: Bileşen mount olmadan veya `isOpen` false ise `null`, aksi halde JSX (menü header,EliteMegaMenu veya MobileMegaMenu içeren tam ekran modal)
-- **Yan etkiler**: `useEffect(() => setIsMounted(true), [])` ile mount'ta `isMounted`'i true yapar
+  - `categories` — `useCategories()` hook'undan gelen kategori listesi, `EliteMegaMenu` ve `MobileMegaMenu` bileşenlerine props olarak geçirilir
+  - `loading` — `useCategories()` hook'undan gelen yükleme durumu boolean'ı, true ise spinner gösterilir
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu, `t('megamenu.classic.logoInitial')` ve `t('megamenu.classic.title')` çağrılarıyla kullanılır
+  - `isMounted` — `useState(false)` ile oluşturulan boolean state, bileşenin client-side olarak mount edilip edilmediğini takip eder (SSR guard)
+  - `setIsMounted` — `useState` setter'ı, `useEffect` callback'inde `true` olarak çağrılır
+- **Dönüş**: JSX (`null` veya mega menü DOM yapısı döner)
+- **Yan etkileri**: `useEffect` ile `isMounted` state'ini `true`'ya çeker; `onClose` callback'i button onClick ve alt bileşenlerin `onNavigate` prop'u aracılığıyla tetiklenir
+- **Kullanılan hook'lar**: `useCategories`, `useI18n`, `useState`, `useEffect`
+- **Kullanılan alt bileşenler**: `EliteMegaMenu` (`categories`, `onNavigate={onClose}`), `MobileMegaMenu` (`categories`, `onNavigate={onClose}`)
+- **Early return**: `!isMounted || !isOpen` koşulunda `null` döner
 
-### [N2_NASIL] AST Pointer: src/components/MegaMenu.tsx::useEffect callback (setIsMounted callback)
+---
+
+### [N2_NASIL] AST Pointer: src/components/MegaMenu.tsx::MegaMenu.useEffect_callback
 - **params**: (yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: yok
-- **Yan etkiler**: `setIsMounted(true)` çağırarak `isMounted` state'ini true'a set eder, bileşenin mounted olduğunu bildirir
+- **Dönüş**: yok (void)
+- **Yan etkileri**: `setIsMounted(true)` çağrısı ile bileşenin mount edildiğini işaretler
 
 ---
 

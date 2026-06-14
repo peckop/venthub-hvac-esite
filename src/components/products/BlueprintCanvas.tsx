@@ -6,6 +6,8 @@ import React, { useRef } from 'react'
 import type { Mesh, ShaderMaterial,Texture } from 'three'
 import { MathUtils } from 'three'
 
+import { useI18n } from '../../i18n/I18nProvider'
+
 // Custom Holographic Shader Material
 const HolographicMaterial = shaderMaterial(
     {
@@ -118,6 +120,7 @@ interface BlueprintCanvasProps {
 }
 
 const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
+    const { t } = useI18n()
     return (
         <div className="w-full h-full min-h-400px relative group overflow-hidden rounded-3xl bg-surface-darkest border border-white/5 shadow-2xl">
             {/* Dark Tech Grid Background */}
@@ -134,16 +137,16 @@ const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
             {/* Corner Tech Decor */}
             <div className="absolute top-6 left-6 flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                <span className="text-xs font-black text-cyan-500 uppercase tracking-widest leading-none">Scanning Blueprint...</span>
+                <span className="text-xs font-black text-cyan-500 uppercase tracking-widest leading-none">{t('products.blueprint.scanning')}</span>
             </div>
 
             <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
                 <div className="flex flex-col gap-1">
                     <div className="w-24 h-px bg-white/10" />
-                    <span className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none">Object Reference: P-501</span>
+                    <span className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none">{t('products.blueprint.objectReference')}</span>
                 </div>
                 <div className="text-right">
-                    <span className="text-xs font-black text-white uppercase tracking-widest leading-none">Cinematic Mode</span>
+                    <span className="text-xs font-black text-white uppercase tracking-widest leading-none">{t('products.blueprint.cinematicMode')}</span>
                     <div className="mt-1 flex gap-1 justify-end">
                         <div className="w-3 h-0.5 bg-cyan-500" />
                         <div className="w-1 h-0.5 bg-white/20" />

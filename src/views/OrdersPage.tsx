@@ -285,7 +285,7 @@ const OrdersPage: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{filtered.length} / {orders.length} sipariş gösteriliyor</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.page.showingCount', { shown: filtered.length, total: orders.length })}</span>
             <button onClick={() => { setStatusFilter('all'); setDateFrom(''); setDateTo(''); setSearchCode(''); setProductFilter('') }} className="text-sm font-bold text-slate-500 hover:text-primary-navy transition-colors">{t('orders.clearFilters')}</button>
           </div>
         </div>
@@ -343,10 +343,10 @@ const OrdersPage: React.FC = () => {
                       <div>
                         <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                           <Package className="text-primary-navy" size={20} />
-                          Sipariş #{order.order_number?.split('-').pop() || order.id.slice(-8).toUpperCase()}
+                          {t('orders.page.orderLabel')}{order.order_number?.split('-').pop() || order.id.slice(-8).toUpperCase()}
                           {order.is_demo && (
                             <span className="ml-2 px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-xs uppercase font-bold tracking-wider rounded-lg shadow-sm">
-                              DEMO
+                              {t('orders.page.demoBadge')}
                             </span>
                           )}
                         </h3>
