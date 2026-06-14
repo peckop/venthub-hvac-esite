@@ -11,3 +11,7 @@
 **Type Smell:** None.
 **Learning:** A comprehensive diagnostic sweep of the codebase for type escape hatches (`as any`, `as unknown as`, `// @ts-ignore`, `// @ts-expect-error`) returned zero results in production code. The codebase relies entirely on strong typing, type guards (`isRecord`), and Supabase generated types (`database.types.ts`).
 **Solution:** Clean sweep: zero type escape hatches found. Codebase health is optimal.
+## YYYY-MM-DD - Type Safety Improvements
+**Type Smell:** `as unknown as` double-casting to overcome missing typed tables in SupabaseClient and in dictionary access for i18n
+**Learning:** Extending the Supabase `Database` type (e.g., `ExtendedDatabase`) provides a safe, structurally valid interface to access missing tables like `tenants` without losing type safety or using double casts. For object traversal (like i18n dictionaries), standardizing on the `isRecord` type guard is far safer than casting generic `Dict` types.
+**Solution:** Replaced `SupabaseClientOverride` with `SupabaseClient<ExtendedDatabase>` and refactored the `get` helper in `I18nProvider` to accept `unknown` and rely strictly on `isRecord` type guarding.

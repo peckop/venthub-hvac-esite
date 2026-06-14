@@ -2,6 +2,8 @@
 
 import React, { useContext, useEffect,useMemo, useState } from 'react'
 
+import { isRecord } from '@/utils/type-converters'
+
 import { en } from './dictionaries/en'
 import { tr } from './dictionaries/tr'
 import { type AppDictionary, I18nContext, type Lang, type TranslationKeyInput } from './I18nContext'
@@ -11,13 +13,13 @@ export type { Lang }
 type Dict = Record<string, unknown>
 const DICTS: Record<Lang, Dict> = { en, tr }
 
-function get(obj: Dict, path: string): string {
+function get(obj: unknown, path: string): string {
   try {
     const keys = path.split('.')
     let current: unknown = obj
     for (const k of keys) {
-      if (current && typeof current === 'object' && k in (current as Record<string, unknown>)) {
-        current = (current as Record<string, unknown>)[k]
+      if (isRecord(current) && k in current) {
+        current = current[k]
       } else {
         current = undefined
         break
@@ -90,7 +92,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
   const t = useMemo(() => {
     return (key: TranslationKeyInput, paramsOrAlt?: Record<string, unknown> | string) => {
       const currentDict = dictionary || (DICTS[lang] as AppDictionary)
-      const translation = get(currentDict as unknown as Dict, key)
+      const translation = get(currentDict, key)
       const hasTranslation = translation !== key
       if (!hasTranslation && typeof paramsOrAlt === 'string') return paramsOrAlt
       return interpolate(translation, typeof paramsOrAlt === 'object' ? paramsOrAlt : undefined)
