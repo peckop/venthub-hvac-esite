@@ -99,6 +99,18 @@ Bölme word-order'ı bozacaksa (EN'de sıra farklıysa) tek interpolasyonlu anah
 {t('account.overview.wave')}
 ```
 
+**5. Paylaşılan birim/marka/boyut → `common` interpolasyon anahtarı.** Birim ve marka adları
+locale-NÖTR (TR=EN) ve çok yerde tekrar eder → tek tek dict'leme; `common`'a paylaşılan anahtar
+koy, TÜM çağıranlar reuse etsin (gelecek dalgalar dahil):
+```tsx
+// common: unitMeters:'{{v}} m'  unitCubicMeters:'{{v}} m³'  unitNewton:'{{v}} N'
+//         dimensions2D:'{{w}}m × {{h}}m'  dimensions3D:'{{l}}m × {{w}}m × {{h}}m'  brand:'VentHub'  vortice:'Vortice'
+{val} m³        →  {t('common.unitCubicMeters', { v: val })}
+{x}m × {y}m     →  {t('common.dimensions2D', { w: x, h: y })}
+// Marka-italik deseni: title.split('VentHub')[0] + <span>VentHub</span> + split[1]
+//   → JSX'teki marka text-düğümünü {t('common.brand')} yap (.split() JS çağrısı literal DEĞİL, dokunma).
+```
+
 ## Çakışma & Paylaşılan Metin Çözümü (kalite kritik)
 
 - **Çakışma:** Sayfa metni, **aynı isimli mevcut bir anahtardan FARKLI** ise (ör. sayfa H1'i
@@ -114,13 +126,28 @@ N dosyayı aynı anda göçürürken **paralel ajanlar `tr.ts`/`en.ts`'i AYNI AN
 (paylaşılan dosya). Doğru desen:
 
 1. **Ajan yalnız kendi bileşenini düzenler** + yeni anahtarları **yapısal döndürür**
-   (`{ keyName: { tr, en } }`); tr.ts/en.ts'e DOKUNMAZ.
-2. **Orkestratör sözlükleri MERKEZİ birleştirir** (mevcut namespace'e key ekler / yeni alt-obje açar;
-   çakışmaları yukarıdaki kuralla çözer).
+   (`{ keyName: { tr, en } }`); tr.ts/en.ts'e DOKUNMAZ. **DÜZ anahtar kuralı:** yeni anahtar
+   **tek-parça düz** olsun (`ns.pageTitle`), mevcut `form`/`results` alt-objesini GENİŞLETMESİN —
+   merge "alt-ns açılışından sonra düz ekle" olur, nested-merge derdi biter. (Mevcut nested anahtarı REUSE serbest.)
+2. **Orkestratör sözlükleri MERKEZİ birleştirir.** Disiplin: önce `merge-generic3.js <out>` (dry-run)
+   → raporu DOĞRULA (her alt-ns EXISTING/NEW + **0 çakışma**) → sonra `--apply`. Çoklu-yüzey: parent
+   her öğenin ns'inden (ilk segment) türer; `region()` `\n  parent: {` (tam 2-boşluk) ile anchor'lar →
+   8-boşluk nested aynı-isimli anahtarı (ör. `knowledge.calculators`) ASLA yakalamaz. Flat leaf
+   (`common.x`) merge3 ile değil ELLE eklenir (2 sözlük).
 3. **Merkezi kapı (orkestratör):** `pnpm run test:i18n` (parite) + her dosyada `eslint` (kalan literal=0)
    + `pnpm run type-check` (`en: typeof tr` parite-lock) + `pnpm test -- --run` (regresyon).
-   **Her t('...') anahtarının sözlükte çözüldüğünü doğrula** (yoksa ham anahtar render eder = bug).
-> Hazır makine ve script'ler: `docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md` (parse/merge-generic/check + Workflow).
+   **Her t('...') anahtarının sözlükte çözüldüğünü doğrula** (`keycheck.js`; yoksa ham anahtar render eder = bug).
+> Hazır makine ve script'ler: `docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md` (Workflow + merge-generic3 + keycheck).
+
+## EN Yerel-Deyim Pası (sadık ≠ doğru — merge sonrası kalite taraması)
+
+Ajan TR'yi **birebir** kopyalar (TR sadakati için doğru) ama EN'i **deyimsel** yapmak orkestratörün
+işidir. Merge'den sonra `en.ts`'i tara:
+- **Yüzde sırası:** TR `%30` doğru; EN `30%` olmalı (`%30` İngilizce'de yanlış). `grep -nE "%[0-9]" en.ts`.
+- **TR'ye İngilizce sızıntısı:** kaynak zaten İngilizceyse (ör. 'Technical Product Family') ajan TR=EN
+  bırakır → TR'yi Türkçeleştir ('Teknik Ürün Ailesi'). Tarama: `tr === en && metin İngilizce`
+  (birim/marka/SKU/ISO gibi gerçekten-nötr olanlar hariç).
+- **EN tipo:** mevcut sözlükte de gizli olabilir (ör. 'air curtain _specifications'); fırsatçı düzelt.
 
 ## Bileşende Kullanım
 
@@ -152,6 +179,9 @@ const { t, lang } = useI18n()
 - **Sessiz eksik-anahtar:** `t('x.y')` eksikse tsc geçer (loose-string tipi) ama UI ham 'x.y' gösterir. **Sadece parite testi + eksik-key kontrolü yakalar** — atla­ma.
 - **Template literal tuzağı:** `` {`metin`} `` kuralı GEÇMEZ, yakalanır. Sembol için bile dict kullan.
 - **Çakışan duplicate key:** Mevcut anahtarı körce yeniden-tanımlama; obje literalinde duplicate key = son değer kazanır, sessiz UX değişimi.
+- **Bayat `en: typeof tr` diagnostic'i:** merge ortasında IDE/LSP "en'de X anahtarı eksik" diyebilir ama `grep`'te VARDIR (satır no'ları kaymış). **Otorite = `tsc` + `grep`**, IDE diagnostic'i değil — panikleme, doğrula.
+- **aria-label ölü-anahtar:** `aria-label={t('common.reset')}` mevcut OLMAYAN bir anahtara işaret edebilir (ham key okunur, sessiz a11y bug). Migrasyonda aria'yı **görünür butonun anahtarıyla EŞİTLE**.
+- **Sadık-kopya yan etkisi:** ajan görünür Türkçe'yi t() yapar ama (a) "izinli sandığı" sembolleri (`CE`, `ISO 9001`, `✓`, emoji) KAÇIRIR, (b) İngilizce-kaynağı TR=EN kopyalar. Kapı bu yüzden **kalan-literal eslint pası + TR==EN/EN-deyim taraması** içermeli — "ajan bitirdi/pass dedi" YETMEZ.
 
 ## Hreflang (Uluslararası SEO — `/tr` & `/en`)
 
