@@ -3,26 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\FAQ.tsx
-skeleton_hash: 9a13a98a037d1e22
+skeleton_hash: e37ce1098854250f
 entity_hashes:
   func:FAQ: 09e0c00f56bbdf5d
-  overview: 46750effbb9bfa8b
+  overview: 2819faae975a53e8
   style_tokens: 44e8cc594d8dadd1
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T21:00:10Z
 ---
 
 ## Genel Bakış
-Bu modül, kategori sayfalarında sık sorulan sorular (FAQ) bölümünü gösteren bir React bileşeni tanımlar. Tek bir fonksiyonel bileşen üzerinden kullanıcıya soru‑cevap listesi sunar.
+Bu modül, kategori sayfalarında görünen Sık Sorulan Sorular (SSS) bölümünürender eden tek bir React bileşeni sunar. Bileşen, sabit bir soru-cevap listesini alır ve bunları akordiyon (accordion) yapısında sunarak kullanıcıların soruları tek tek açıp kapatabilmesini sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
-FAQ bölümünün görsel yapısını ve içeriğini oluşturur.
+Modülün tek ve temel bileşeni olan FAQ, SSS bölümünün tamamını (başlık, sorular ve cevaplar) oluşturur ve yönetir.
 - FAQ()
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -39,21 +41,36 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../../utils/routes::Routes
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::ChevronDown
+- import: lucide-react::ChevronUp
+- import: lucide-react::HelpCircle
+- import: react::React
+- import: react::useState
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/category/sections/FAQ.tsx::FAQ
 - **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `openIndex` — tutulan açık FAQ indeksi (number | null)
-  - `setOpenIndex` — openIndex'i güncelleyen setter fonksiyonu
-  - `faqs` — FAQ objelerinin dizisi, her objesi question ve answer stringlerinden oluşur
-- **Dönüş**: JSX element (React component render output)
+- **ic_degiskenler**:
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu; `t('category.faq.q1')` gibi anahtarlarla çok dilli çeviri dizesi üretir
+  - `openIndex` — useState ile tutulan state; hangi FAQ maddesinin açık olduğunu index olarak saklar; başlangıç değeri `0` (ilk madde açık), `null` ise hepsi kapalı
+  - `setOpenIndex` — openIndex state'ini güncelleyen setter fonksiyonu; tıklama ile openIndex değiştirilir
+  - `faqs` — 6 elemanlı array; her eleman `{ question: string, answer: string }` yapısındadır; `t()` çağrılarıyla çeviri anahtarlarından doldurulur
+  - `faq` — `faqs.map` callback'inde mevcut eleman; `{ question, answer }` yapısında
+  - `index` — `faqs.map` callback'inde mevcut elemanın dizin numarası (0-5 arası)
+  - `isOpen` — `openIndex === index` karşılaştırmasıyla hesaplanan boolean; ilgili maddenin açık olup olmadığını belirler; JSX'te koşullu className ve animasyon mantığını kontrol eder
+- **Dönüş**: JSX — `<section>` ile sarılmış FAQ bölümü; accordion yapısında soru-cevap listesi, üst başlık (`HelpCircle` ikonu + heading + subtitle), ve iletişim CTA linki (`Routes.contact()`) içeren React functional component; `setOpenIndex(isOpen ? null : index)` ile state güncellenir (yan etki)
 
-### [N2_NASIL] AST Pointer: src/components/category/sections/FAQ.tsx::(faq, index) => {...}
-- **params**: `faq` — tek FAQ objesi (question, answer), `index` — o FAQ'ın dizindeki indeksi
-- **ic_degiskenler**: 
-  - `isOpen` — o FAQ'ın açık olup olmadığını belirten boolean (openIndex === index)
-- **Dönüş**: JSX element (accordion item div)
+### [N2_NASIL] AST Pointer: src/components/category/sections/FAQ.tsx::(faq, index) => { ... } (map callback)
+- **params**: (`faq` — faqs dizisindeki mevcut eleman `{ question: string, answer: string }`, `index` — elemanın dizin numarası)
+- **ic_degiskenler**:
+  - `isOpen` — `openIndex === index` karşılaştırmasıyla hesaplanan boolean; akordeon maddesinin açık olup olmadığını belirler; JSX'te koşullu className (`border-blue-200 shadow-md` vs `border-gray-200`, `bg-blue-50` vs `bg-white hover:bg-gray-50`, `text-blue-700` vs `text-gray-900`) ve animasyon (`max-h-96` vs `max-h-0`) mantığını kontrol eder
+- **Dönüş**: JSX — tek bir FAQ maddesi `<div>` elementi; `<button>` ile tıklama handler'ı (`setOpenIndex(isOpen ? null : index)`), `ChevronUp`/`ChevronDown` ikon koşullu gösterimi, `faq.question` başlık içeriği, `faq.answer` cevap içeriği; `isOpen` durumuna göre border renk-gölge, arka plan rengi ve metin rengi koşullu olarak değişir
 
 ---
 

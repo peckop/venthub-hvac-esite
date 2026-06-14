@@ -11,7 +11,7 @@ import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useSc
  * Hava perdesinin çalışma prensibini görselleştirir
  */
 const HowItWorks: React.FC = () => {
-    const { dict } = useI18n()
+    const { dict, t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const [activeStep, setActiveStep] = useState(0)
 
@@ -82,7 +82,7 @@ const HowItWorks: React.FC = () => {
                                         <div className="flex-1">
                                             <div className="flex items-center justify-between">
                                                 <h3 className={`font-bold ${isActive ? 'text-blue-700' : 'text-gray-900'}`}>
-                                                    {index + 1}. {step.title}
+                                                    {t('category.howItWorks.stepNumberLabel', { number: index + 1, title: step.title })}
                                                 </h3>
                                                 {isActive ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                                             </div>
@@ -92,7 +92,7 @@ const HowItWorks: React.FC = () => {
                                                 className={`overflow-hidden transition-colors duration-300 ease-in-out ${isActive ? 'max-h-24 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'}`}
                                             >
                                                 <p className="text-sm text-blue-600 animate-fade-in">
-                                                    💡 {step.detail}
+                                                    {t('category.howItWorks.detailIcon')} {step.detail}
                                                 </p>
                                             </div>
                                         </div>

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\VorticeBrand.tsx
-skeleton_hash: e7b568aa0d2a584f
+skeleton_hash: 2a3c160b85303f52
 entity_hashes:
   func:VorticeBrand: a8d2715dd40c7de5
   overview: 0819e90fcacb5fea
   style_tokens: 751231d1b5ff9e5b
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T21:00:26Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,20 @@ Bu modül için fonksiyon gövdesi verilmediği için kapsamlı mimari varsayım
 **Nasıl yapar**: Fonksiyon, JSX ile bir `<section>` (veya benzeri kapsayıcı) döndürerek başlık, açıklama ve görsel öğeleri yerleştirir; dışarıdan prop almaz ve kendi iç durumunu yönetmez.  
 **Parametreler**: Yok  
 **Dönüş**: `React.FC` türünde bir fonksiyon bileşeni; render edildiğinde Vortice marka hikayesi bölümüyle ilgili JSX döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../hooks/useScrollAnimation::scrollAnimationClasses
+- import: ../../../hooks/useScrollAnimation::useScrollAnimation
+- import: @/components/ui/VentImage::VentImage
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::Award
+- import: lucide-react::Clock
+- import: lucide-react::Globe
+- import: lucide-react::Shield
+- import: lucide-react::Star
+- import: react::React
 
 ---
 

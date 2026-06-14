@@ -3,20 +3,20 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\TrustSignals.tsx
-skeleton_hash: 442496b377e8fd6e
+skeleton_hash: 19301e7b73166cb6
 entity_hashes:
   func:TrustSignals: 91fe7d8aaf9157d4
-  overview: a098e608084837ec
+  overview: bc5a93987b260832
   style_tokens: d8ec8f7dddeaa270
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T21:00:26Z
 ---
 
 ## Genel Bakış
-TrustSignals bileşeni, kategori sayfasında kullanıcılara markanın güvenilirliğini görsel olarak iletmek için tasarlanmış bir React bileşenidir. Sertifika logoları, garanti bilgileri ve müşteri yorumları gibi statik güven işaretlerini düzenli bir grid yapısında sunar.
+TrustSignals bileşeni, kategori sayfalarında markanın güvenilirliğini görsel olarak iletmek için tasarlanmış statik bir React bileşenidir. Sertifika logoları, garanti bilgileri ve müşteri yorumları gibi güven sinyallerini düzenli bir grid yapısında sunarak kullanıcıların markaya olan güvenini artırır.
 
 ## Fonksiyon Grupları
 ### Güven İşaretleri Bileşeni
-Kullanıcı arayüzünde güven sinyallerini içeren bölümü render eden statik bir bileşendir.
+Kullanıcı arayüzünde güven sinyallerini içeren bölümü render eden statik bir bileşendir. Herhangi bir state yönetimi veya dinamik mantık içermez; yalnızca JSX ile düzenlenmiş statik içerik sunar.
 - TrustSignals
 
 ---
@@ -37,19 +37,32 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::Award
+- import: lucide-react::CreditCard
+- import: lucide-react::Lock
+- import: lucide-react::Phone
+- import: lucide-react::Shield
+- import: lucide-react::Truck
+- import: react::React
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\components\category\sections\TrustSignals.tsx::TrustSignals
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/components/category/sections/TrustSignals.tsx::TrustSignals
+- **params**: ()
 - **ic_degiskenler**:
-  - `signals` — Vortice products için güven sinyallerini (özellikleri) tutan dizi. Her eleman icon, title ve description özellikleri içerir
-- **Dönüş**: `section` elementi (React JSX). TrustSignals bileşeninin rendered çıktısı.
+  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu, metinleri yerelleştirmek için kullanılır
+  - `signals` — Güven sinyallerini (ikon, başlık, açıklama) tutan dizi, 6 elemanlı
+- **Dönüş**: JSX yapısı (React bileşeni)
 
-### [N2_NASIL] AST Pointer: src\components\category\sections\TrustSignals.tsx::signal_callback (signals.map içindeki arrow fonksiyon)
-- **params**: (signal, index)
+### [N2_NASIL] AST Pointer: src/components/category/sections/TrustSignals.tsx::map_callback
+- **params**: `(signal, index)`
 - **ic_degiskenler**:
-  - `Icon` — signal objesinden alınan icon bileşeni (Award, Shield vb.). JSX'te <Icon> olarak render edilir
-- **Dönüş**: `div` elementi (React JSX). Her güven sinyalinin rendered kart görünümü.
+  - `Icon` — `signal.icon` değerini alan değişken, React bileşeni olarak kullanılır
+- **Dönüş**: JSX yapısı (her güven sinyali için bir div)
 
 ---
 

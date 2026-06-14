@@ -180,7 +180,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                             </button>
                         )}
                         <div>
-                            <h3 id="wizard-title" className="text-lg font-bold text-slate-900">İhtiyaç Analiz Sihirbazı</h3>
+                            <h3 id="wizard-title" className="text-lg font-bold text-slate-900">{t('needsWizard.enhanced.headerTitle')}</h3>
                             <div className="flex gap-1 mt-1">
                                 {[1, 2, 3, 4, 5, 6].map(s => (
                                     <div key={s} className={`h-1 rounded-full transition-colors duration-500 ${s <= state.step ? 'w-6 bg-cyan-500' : 'w-2 bg-slate-200'}`} />
@@ -239,7 +239,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                         onChange={(e) => setState(prev => ({ ...prev, doorWidth: parseFloat(e.target.value) }))}
                                         className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-cyan-500"
                                     />
-                                    <div className="text-5xl font-extralight tracking-tighter text-slate-900">{state.doorWidth.toFixed(1)} <span className="text-xl font-bold text-slate-300">m</span></div>
+                                    <div className="text-5xl font-extralight tracking-tighter text-slate-900">{state.doorWidth.toFixed(1)} <span className="text-xl font-bold text-slate-300">{t('needsWizard.enhanced.meterUnit')}</span></div>
                                 </div>
 
                                 <div className="space-y-6">
@@ -253,7 +253,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                         onChange={(e) => setState(prev => ({ ...prev, doorHeight: parseFloat(e.target.value) }))}
                                         className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-cyan-500"
                                     />
-                                    <div className="text-5xl font-extralight tracking-tighter text-slate-900">{state.doorHeight.toFixed(1)} <span className="text-xl font-bold text-slate-300">m</span></div>
+                                    <div className="text-5xl font-extralight tracking-tighter text-slate-900">{state.doorHeight.toFixed(1)} <span className="text-xl font-bold text-slate-300">{t('needsWizard.enhanced.meterUnit')}</span></div>
                                 </div>
                             </div>
 
@@ -268,17 +268,17 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                             <h2 className="text-3xl font-bold text-slate-900 mb-10 tracking-tight">{t('needsWizard.step3Title')}</h2>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                 <button type="button" onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'yes' })); nextStep() }} className="focus-ring p-8 rounded-hvac-2xl border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-colors">
-                                    <div className="text-4xl mb-4">🔥</div>
+                                    <div className="text-4xl mb-4">{t('needsWizard.enhanced.iconHeat')}</div>
                                     <div className="font-bold">{t('admin.common.yes')}</div>
                                     <div className="text-xs text-slate-400 mt-2">{t('needsWizard.heatingYesDesc')}</div>
                                 </button>
                                 <button type="button" onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'no' })); nextStep() }} className="focus-ring p-8 rounded-hvac-2xl border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-colors">
-                                    <div className="text-4xl mb-4">🌬️</div>
+                                    <div className="text-4xl mb-4">{t('needsWizard.enhanced.iconAmbient')}</div>
                                     <div className="font-bold">{t('admin.common.no')}</div>
                                     <div className="text-xs text-slate-400 mt-2">{t('needsWizard.heatingNoDesc')}</div>
                                 </button>
                                 <button type="button" onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'unsure' })); nextStep() }} className="focus-ring p-8 rounded-hvac-2xl border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-colors">
-                                    <div className="text-4xl mb-4">❓</div>
+                                    <div className="text-4xl mb-4">{t('needsWizard.enhanced.iconUnsure')}</div>
                                     <div className="font-bold">{t('needsWizard.notSure')}</div>
                                     <div className="text-xs text-slate-400 mt-2">{t('needsWizard.consultUs')}</div>
                                 </button>

@@ -1,6 +1,8 @@
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
 import React, { useState } from 'react'
 
+import { useI18n } from '@/i18n/I18nProvider'
+
 import { Routes } from '../../../utils/routes';
 
 
@@ -9,32 +11,33 @@ import { Routes } from '../../../utils/routes';
  * Hava perdeleri hakkında en çok sorulan sorular
  */
 const FAQ: React.FC = () => {
+    const { t } = useI18n()
     const [openIndex, setOpenIndex] = useState<number | null>(0)
 
     const faqs = [
         {
-            question: 'Hava perdesi gerçekten enerji tasarrufu sağlar mı?',
-            answer: 'Evet, hava perdesi kapı açıkken iç ortamın sıcaklığını koruyarak %30\'a varan enerji tasarrufu sağlayabilir. Özellikle sık kapı açılışı olan işletmelerde (mağaza, restoran, market) bu tasarruf çok belirgindir.'
+            question: t('category.faq.q1'),
+            answer: t('category.faq.a1')
         },
         {
-            question: 'Elektrikli mi yoksa ortam havalı mı tercih etmeliyim?',
-            answer: 'Bu, kullanım yerinize bağlıdır. Kış aylarında kapı önünde ısıtma istiyorsanız elektrikli isıtıcılı model idealdir. Soğuk hava deposu veya mevcut ısıtma sisteminiz varsa ortam havalı model yeterlidir ve daha ekonomiktir.'
+            question: t('category.faq.q2'),
+            answer: t('category.faq.a2')
         },
         {
-            question: 'Hava perdesi hangi boyutta olmalı?',
-            answer: 'Hava perdesi genişliği, kapı genişliğine eşit veya biraz daha geniş olmalıdır. Örneğin 120 cm\'lik bir kapı için 120 cm veya 150 cm\'lik model uygundur. Montaj yüksekliği de önemlidir - cihazın teknik özelliklerinde belirtilen maksimum yüksekliğe dikkat edin.'
+            question: t('category.faq.q3'),
+            answer: t('category.faq.a3')
         },
         {
-            question: 'Kurulum zor mu?',
-            answer: 'Hava perdeleri genellikle kapı üstüne asılarak monte edilir. Profesyonel montaj önerilir ancak temel elektrik bilgisi olan bir teknisyen kolayca kurabilir. Kurulum kiti ve montaj kılavuzu ürünle birlikte gelir.'
+            question: t('category.faq.q4'),
+            answer: t('category.faq.a4')
         },
         {
-            question: 'Bakım gerektirir mi?',
-            answer: 'Minimal bakım yeterlidir. Yılda 1-2 kez filtrelerin temizlenmesi ve fan kanatlarının toz alınması önerilir. Düzenli bakım, cihazın ömrünü uzatır ve performansını korur.'
+            question: t('category.faq.q5'),
+            answer: t('category.faq.a5')
         },
         {
-            question: 'Vortice garantisi ne kadar?',
-            answer: 'Vortice ürünleri 2 yıl üretici garantisi ile satılmaktadır. Garanti kapsamında üretim hatalarından kaynaklanan arızalar ücretsiz onarılır veya değiştirilir. Yetkili bayi olarak garanti işlemlerinizi hızlıca yönetiyoruz.'
+            question: t('category.faq.q6'),
+            answer: t('category.faq.a6')
         }
     ]
 
@@ -45,10 +48,10 @@ const FAQ: React.FC = () => {
                 <div className="text-center mb-12">
                     <HelpCircle className="mx-auto text-blue-500 mb-4" size={40} />
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Sık Sorulan Sorular
+                        {t('category.faq.heading')}
                     </h2>
                     <p className="text-lg text-gray-600">
-                        Hava perdeleri hakkında en çok merak edilenler
+                        {t('category.faq.subtitle')}
                     </p>
                 </div>
 
@@ -98,13 +101,13 @@ const FAQ: React.FC = () => {
                 {/* Contact CTA */}
                 <div className="mt-12 text-center p-6 bg-gray-50 rounded-xl">
                     <p className="text-gray-600 mb-4">
-                        Başka sorularınız mı var?
+                        {t('category.faq.moreQuestions')}
                     </p>
                     <a
                         href={Routes.contact()}
                         className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700"
                     >
-                        Bize ulaşın →
+                        {t('category.faq.contactUs')}
                     </a>
                 </div>
             </div>

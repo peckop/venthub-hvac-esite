@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\EnhancedNeedsWizard.tsx
-skeleton_hash: 5af54104606d4678
+skeleton_hash: 117a482e9986b090
 entity_hashes:
   func:EnhancedNeedsWizard: ca7bec73e049fe61
   func:getUsageLocations: 1e08ffb88dd30b7d
@@ -11,7 +11,7 @@ entity_hashes:
   func:prevStep: ac646de7f0306b72
   overview: 2782285f4578ab6b
   style_tokens: 4dfca29db2f1dc25
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T20:59:46Z
 ---
 
 ## Genel Bakış
@@ -73,6 +73,24 @@ Bu modül, bir React sihirbaz bileşeninin temel akışını ve dış bağımlı
 **Nasıl yapar**: Bileşenin içindeki adım sayacını (step index) bir azaltarak önceki adımı gösterir; gerekirse önceki adımın verilerini yeniden yükler veya form sıfırlama işlemi yapar.  
 **Parametreler**: (yok)  
 **Dönüş**: Dönüş tipi belirtilmemiştir; genellikle `void` olarak kabul edilir (bir değer döndürmez).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../lib/hvacCalculations::calculateAirCurtain
+- import: ../../lib/type-converters::toUIProductList
+- import: ../../lib/type-converters::type DomainProduct
+- import: ../../types/db-rows::DbJson
+- import: ../../types/db-rows::DbProduct
+- import: ../../utils/routes::Routes
+- import: @/i18n/I18nProvider::useI18n
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: next/image::Image
+- import: next/link::Link
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useState
 
 ---
 
@@ -151,8 +169,8 @@ graph TD
     EnhancedNeedsWizard_tsx__getUsageLocations["getUsageLocations"]
     EnhancedNeedsWizard_tsx__nextStep["nextStep"]
     EnhancedNeedsWizard_tsx__prevStep["prevStep"]
-    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__nextStep
     EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__getUsageLocations
+    EnhancedNeedsWizard_tsx__EnhancedNeedsWizard --> EnhancedNeedsWizard_tsx__nextStep
 ```
 
 ## NODE ID STANDARD

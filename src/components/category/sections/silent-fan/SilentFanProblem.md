@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanProblem.tsx
-skeleton_hash: 71ddba8df99b75f5
+skeleton_hash: 431687048424fe79
 entity_hashes:
   func:SilentFanProblem: f3ccc67c9bb4f247
   func:tr: b282b53f03d688a5
   overview: c3d80f54b946782d
   style_tokens: 3b3553271e7a0f67
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T21:00:26Z
 ---
 
 ## Genel Bakış
@@ -57,6 +57,19 @@ Modül, bir React bileşeni olup kullanıcı arayüzü sunar ve çeviri yardımc
 **Parametreler**:  
 - key: string — çevrilecek metnin anahtar kimliği  
 **Dönüş**: Fonksiyonun dönüş tipi belirsiz (void veya bilinmiyor); genellikle bir değer döndürmez, yerine yan etkiler üzerinden çeviri işlemini gerçekleştirir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/components/ui/VentImage::VentImage
+- import: @/hooks/useScrollAnimation::scrollAnimationClasses
+- import: @/hooks/useScrollAnimation::useScrollAnimation
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::Activity
+- import: lucide-react::Info
+- import: lucide-react::VolumeX
+- import: lucide-react::Zap
+- import: react::React
 
 ---
 

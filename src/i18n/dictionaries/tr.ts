@@ -9,6 +9,7 @@ export const tr = {
     dimensions3D: '{{l}}m × {{w}}m × {{h}}m',
     dimensions2D: '{{w}}m × {{h}}m',
     brand: 'VentHub',
+    vortice: 'Vortice',
     addToProject: 'Proje Listesine Ekle',
     loadingApp: 'VentHub yükleniyor... ',
     loading: 'Yükleniyor...',
@@ -1217,6 +1218,48 @@ export const tr = {
     unexpected: 'Beklenmedik bir hata oluştu'
   },
   category: {
+    howItWorks: {
+      stepNumberLabel: '{{number}}. {{title}}',
+      detailIcon: '💡',
+    },
+    faq: {
+      heading: 'Sık Sorulan Sorular',
+      subtitle: 'Hava perdeleri hakkında en çok merak edilenler',
+      moreQuestions: 'Başka sorularınız mı var?',
+      contactUs: 'Bize ulaşın →',
+      q1: 'Hava perdesi gerçekten enerji tasarrufu sağlar mı?',
+      a1: 'Evet, hava perdesi kapı açıkken iç ortamın sıcaklığını koruyarak %30\'a varan enerji tasarrufu sağlayabilir. Özellikle sık kapı açılışı olan işletmelerde (mağaza, restoran, market) bu tasarruf çok belirgindir.',
+      q2: 'Elektrikli mi yoksa ortam havalı mı tercih etmeliyim?',
+      a2: 'Bu, kullanım yerinize bağlıdır. Kış aylarında kapı önünde ısıtma istiyorsanız elektrikli isıtıcılı model idealdir. Soğuk hava deposu veya mevcut ısıtma sisteminiz varsa ortam havalı model yeterlidir ve daha ekonomiktir.',
+      q3: 'Hava perdesi hangi boyutta olmalı?',
+      a3: 'Hava perdesi genişliği, kapı genişliğine eşit veya biraz daha geniş olmalıdır. Örneğin 120 cm\'lik bir kapı için 120 cm veya 150 cm\'lik model uygundur. Montaj yüksekliği de önemlidir - cihazın teknik özelliklerinde belirtilen maksimum yüksekliğe dikkat edin.',
+      q4: 'Kurulum zor mu?',
+      a4: 'Hava perdeleri genellikle kapı üstüne asılarak monte edilir. Profesyonel montaj önerilir ancak temel elektrik bilgisi olan bir teknisyen kolayca kurabilir. Kurulum kiti ve montaj kılavuzu ürünle birlikte gelir.',
+      q5: 'Bakım gerektirir mi?',
+      a5: 'Minimal bakım yeterlidir. Yılda 1-2 kez filtrelerin temizlenmesi ve fan kanatlarının toz alınması önerilir. Düzenli bakım, cihazın ömrünü uzatır ve performansını korur.',
+      q6: 'Vortice garantisi ne kadar?',
+      a6: 'Vortice ürünleri 2 yıl üretici garantisi ile satılmaktadır. Garanti kapsamında üretim hatalarından kaynaklanan arızalar ücretsiz onarılır veya değiştirilir. Yetkili bayi olarak garanti işlemlerinizi hızlıca yönetiyoruz.',
+    },
+    trustSignals: {
+      ce: 'CE',
+      iso9001: 'ISO 9001',
+      authorizedDealerTitle: 'Yetkili Bayi',
+      authorizedDealerDesc: 'Vortice Türkiye yetkili satıcısı',
+      warrantyTitle: '2 Yıl Garanti',
+      warrantyDesc: 'Üretici garantisi',
+      securePaymentTitle: 'Güvenli Ödeme',
+      securePaymentDesc: 'SSL şifreli işlem',
+      fastShippingTitle: 'Hızlı Kargo',
+      fastShippingDesc: 'Stoktan teslimat',
+      installmentTitle: 'Taksit İmkanı',
+      installmentDesc: '12 aya varan taksit',
+      techSupportTitle: 'Teknik Destek',
+      techSupportDesc: 'Uzman danışmanlık',
+      certified: 'Sertifikalı',
+      quality: 'Kalite',
+      compassoDoro: 'Compasso d\'Oro',
+      designAward: 'Tasarım Ödülü',
+    },
     typeComparison: {
       sectionTitle: 'Hangi Tip Hava Perdesi Size Uygun?',
       sectionSubtitle: 'İhtiyacınıza göre doğru tipi seçin. İkisi de aynı kalitede, farklı amaçlar için tasarlandı.',
@@ -1452,6 +1495,7 @@ export const tr = {
       ]
     },
     vorticeBrand: {
+      compassoDoro: 'Compasso d\'Oro',
       italianEngineering: 'İtalyan Mühendisliği',
       whyVortice: 'Neden Vortice?',
       description1: '1954 yılında Milano\'da kurulan Vortice, 70 yılı aşkın süredir dünya genelinde havalandırma teknolojisinin öncüsü olmuştur.',
@@ -2466,6 +2510,8 @@ export const tr = {
   },
   categorySilentFan: {
     problem: {
+      withoutMark: '✕',
+      withMark: '✓',
       eyebrow: 'SES VE KONFOR',
       title: 'Huzurunuzu Bozan Seslere Son Verin',
       subtitle: 'Standart kanal fanları sadece havayı değil, gürültüyü de yaşam alanlarınıza taşır. Vortice Lineo Quiet ile sessizliğin yeni standardını keşfedin.',
@@ -2514,6 +2560,8 @@ export const tr = {
       ]
     },
     comparison: {
+      standardLabel: 'Standart:',
+      quietLabel: 'Quiet:',
       title: 'Neden Lineo Quiet?',
       standard: 'Standart Fanlar',
       quiet: 'Vortice Lineo Quiet',
@@ -2583,6 +2631,14 @@ export const tr = {
     }
   },
   needsWizard: {
+    stepOf: '/ {{total}}',
+    enhanced: {
+      iconHeat: '🔥',
+      iconAmbient: '🌬️',
+      iconUnsure: '❓',
+      headerTitle: 'İhtiyaç Analiz Sihirbazı',
+      meterUnit: 'm',
+    },
     coldStorage: 'Soğuk Hava Deposu',
     coldStorageDesc: 'Soğuk zincir koruması',
     coldStorageTip: 'Gıda güvenliği ve enerji tasarrufu sağlar',

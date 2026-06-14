@@ -10,6 +10,7 @@ export const en: typeof tr = {
     dimensions3D: '{{l}}m × {{w}}m × {{h}}m',
     dimensions2D: '{{w}}m × {{h}}m',
     brand: 'VentHub',
+    vortice: 'Vortice',
     loadingApp: 'Loading VentHub... ',
     loading: 'Loading...',
     categories: 'Categories',
@@ -1001,6 +1002,48 @@ export const en: typeof tr = {
     vision: 'Our Vision'
   },
   category: {
+    howItWorks: {
+      stepNumberLabel: '{{number}}. {{title}}',
+      detailIcon: '💡',
+    },
+    faq: {
+      heading: 'Frequently Asked Questions',
+      subtitle: 'The most common questions about air curtains',
+      moreQuestions: 'Do you have other questions?',
+      contactUs: 'Contact us →',
+      q1: 'Does an air curtain really save energy?',
+      a1: 'Yes, an air curtain preserves the indoor temperature while the door is open and can provide energy savings of up to 30%. This saving is especially pronounced in businesses with frequent door openings (stores, restaurants, markets).',
+      q2: 'Should I choose an electric or an ambient-air model?',
+      a2: 'This depends on where you use it. If you want heating at the doorway during winter, an electric heated model is ideal. If you have a cold storage room or an existing heating system, an ambient-air model is sufficient and more economical.',
+      q3: 'What size should the air curtain be?',
+      a3: 'The air curtain width should be equal to or slightly wider than the door width. For example, a 120 cm or 150 cm model is suitable for a 120 cm door. Installation height also matters - pay attention to the maximum height stated in the device\'s technical specifications.',
+      q4: 'Is installation difficult?',
+      a4: 'Air curtains are usually mounted by hanging them above the door. Professional installation is recommended, but a technician with basic electrical knowledge can easily install one. The installation kit and mounting guide come with the product.',
+      q5: 'Does it require maintenance?',
+      a5: 'Minimal maintenance is sufficient. Cleaning the filters and dusting the fan blades 1-2 times a year is recommended. Regular maintenance extends the device\'s lifespan and preserves its performance.',
+      q6: 'How long is the Vortice warranty?',
+      a6: 'Vortice products are sold with a 2-year manufacturer warranty. Under the warranty, faults arising from manufacturing defects are repaired or replaced free of charge. As an authorized dealer, we handle your warranty processes quickly.',
+    },
+    trustSignals: {
+      ce: 'CE',
+      iso9001: 'ISO 9001',
+      authorizedDealerTitle: 'Authorized Dealer',
+      authorizedDealerDesc: 'Official Vortice Türkiye distributor',
+      warrantyTitle: '2-Year Warranty',
+      warrantyDesc: 'Manufacturer warranty',
+      securePaymentTitle: 'Secure Payment',
+      securePaymentDesc: 'SSL-encrypted transaction',
+      fastShippingTitle: 'Fast Shipping',
+      fastShippingDesc: 'Ships from stock',
+      installmentTitle: 'Installment Options',
+      installmentDesc: 'Up to 12 installments',
+      techSupportTitle: 'Technical Support',
+      techSupportDesc: 'Expert consultation',
+      certified: 'Certified',
+      quality: 'Quality',
+      compassoDoro: 'Compasso d\'Oro',
+      designAward: 'Design Award',
+    },
     typeComparison: {
       sectionTitle: 'Which Type of Air Curtain Is Right for You?',
       sectionSubtitle: 'Choose the right type for your needs. Both offer the same quality, designed for different purposes.',
@@ -1065,7 +1108,7 @@ export const en: typeof tr = {
       withoutPoint4: 'Easy pest entry',
       withTitle: 'With an Air Curtain',
       withPoint1: 'Invisible energy barrier',
-      withPoint2: 'Up to %30 savings',
+      withPoint2: 'Up to 30% savings',
       withPoint3: 'Comfortable indoor environment',
       withPoint4: 'Shield against pests',
     },
@@ -1236,6 +1279,7 @@ export const en: typeof tr = {
       ]
     },
     vorticeBrand: {
+      compassoDoro: 'Compasso d\'Oro',
       italianEngineering: 'Italian Engineering',
       whyVortice: 'Why Vortice?',
       description1: 'Founded in Milan in 1954, Vortice has been the pioneer of ventilation technology worldwide for over 70 years.',
@@ -2578,6 +2622,8 @@ export const en: typeof tr = {
   },
   categorySilentFan: {
     problem: {
+      withoutMark: '✕',
+      withMark: '✓',
       eyebrow: 'SOUND AND COMFORT',
       title: 'End Noise That Disrupts Your Peace',
       subtitle: 'Standard duct fans don\'t just move air; they move noise into your living spaces. Discover the new standard of silence with Vortice Lineo Quiet.',
@@ -2626,6 +2672,8 @@ export const en: typeof tr = {
       ]
     },
     comparison: {
+      standardLabel: 'Standard:',
+      quietLabel: 'Quiet:',
       title: 'Why Lineo Quiet?',
       standard: 'Standard Fans',
       quiet: 'Vortice Lineo Quiet',
@@ -2719,6 +2767,14 @@ export const en: typeof tr = {
     devDetails: 'Error Details (Development)'
   },
   needsWizard: {
+    stepOf: '/ {{total}}',
+    enhanced: {
+      iconHeat: '🔥',
+      iconAmbient: '🌬️',
+      iconUnsure: '❓',
+      headerTitle: 'Needs Analysis Wizard',
+      meterUnit: 'm',
+    },
     ambient: 'Ambient (Unheated)',
     analyzing: 'Analyzing Models...',
     centralSystem: 'If central system is available',

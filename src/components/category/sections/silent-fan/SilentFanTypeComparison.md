@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanTypeComparison.tsx
-skeleton_hash: 2366ca82975f41a5
+skeleton_hash: d56564d6385ab917
 entity_hashes:
   func:SilentFanTypeComparison: d3f5f980a16f61d9
   func:tr: b282b53f03d688a5
   overview: bed9a48986deb76b
   style_tokens: fb4db20eff738486
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T21:00:26Z
 ---
 
 ## Genel Bakış
@@ -50,6 +50,17 @@ Bu modülün fonksiyon imzalara dayalı aksiyomları aşağıda verilmiştir.
 **Parametreler**:  
 - key: string — işleme konu olan anahtar metni  
 **Dönüş**: Belirtilmemiş (void veya bilinmeyen tip); dönüş değeri dokümantasyonda net olarak tanımlanmamıştır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/components/ui/VentImage::VentImage
+- import: @/hooks/useScrollAnimation::scrollAnimationClasses
+- import: @/hooks/useScrollAnimation::useScrollAnimation
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::Check
+- import: lucide-react::X
+- import: react::React
 
 ---
 

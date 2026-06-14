@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\NeedsAnalysisWizard.tsx
-skeleton_hash: 03811196895d365e
+skeleton_hash: efd340c374ff7881
 entity_hashes:
   func:NeedsAnalysisWizard: 21824b9940ba2474
   func:handleSelection: be5cfa5ce36fcdb3
   overview: 61691ddf4217f489
   style_tokens: 4b1fcd41d2094d58
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T20:59:46Z
 ---
 
 ## Genel Bakış
@@ -54,6 +54,17 @@ Bu modül, kullanıcı ihtiyaç analizi seçimlerini yöneten bir React bileşen
 - key: string — Güncellenecek state veya context alanının adı  
 - value: string | number — Seçilen öğenin değeri; metin veya sayı olabilir  
 **Dönüş**: Fonksiyon bir değer döndürmez; dönüş tipi `void` (veya `undefined`) olarak kabul edilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: lucide-react::Filter
+- import: lucide-react::Ruler
+- import: lucide-react::Settings
+- import: lucide-react::ThermometerSun
+- import: react::React
+- import: react::useState
 
 ---
 

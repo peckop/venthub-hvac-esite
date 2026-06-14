@@ -11,7 +11,7 @@ import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useSc
  * 70 yıllık İtalyan mühendisliği ve güvenilirlik
  */
 const VorticeBrand: React.FC = () => {
-    const { dict } = useI18n()
+    const { dict, t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
 
     const bDict = dict.category.vorticeBrand
@@ -52,7 +52,7 @@ const VorticeBrand: React.FC = () => {
 
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">
                             {bDict.whyVortice.split('Vortice')[0]}
-                            <span className="text-orange-400">Vortice</span>
+                            <span className="text-orange-400">{t('common.vortice')}</span>
                             {bDict.whyVortice.split('Vortice')[1] || ''}
                         </h2>
 
@@ -62,7 +62,7 @@ const VorticeBrand: React.FC = () => {
 
                         <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8 hidden sm:block">
                             {bDict.description2.split('Compasso d\'Oro')[0]}
-                            <strong className="text-orange-400">Compasso d'Oro</strong>
+                            <strong className="text-orange-400">{t('category.vorticeBrand.compassoDoro')}</strong>
                             {bDict.description2.split('Compasso d\'Oro')[1] || ''}
                         </p>
 
@@ -120,7 +120,7 @@ const VorticeBrand: React.FC = () => {
                 <div className={`mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/10 text-center ${scrollAnimationClasses.fadeIn(isVisible)}`} style={{ transitionDelay: '600ms' }}>
                     <p className="text-xs sm:text-sm text-gray-500">
                         {bDict.authorizedDealerNotice.split('Vortice')[0]}
-                        <strong className="text-white">Vortice</strong>
+                        <strong className="text-white">{t('common.vortice')}</strong>
                         {bDict.authorizedDealerNotice.split('Vortice')[1] || ''}
                     </p>
                 </div>

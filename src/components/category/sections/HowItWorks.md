@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\HowItWorks.tsx
-skeleton_hash: f939c5ab19313d86
+skeleton_hash: 2c3b664bd6729ee2
 entity_hashes:
   func:HowItWorks: 796882dbc75a0b9a
   overview: 543fb3742a61781d
   style_tokens: 86e780eada6c1862
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T21:00:10Z
 ---
 
 ## Genel Bakış
@@ -43,6 +43,22 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanır; içeriğinde görseller, açıklama metinleri ve gerekli durum yönetimi (state) kullanılarak kullanıcı etkileşimine yanıt veren animasyon veya açıklama kartları render edilir.  
 **Parametreler**: Yok  
 **Dönüş**: `React.FC` türünde bir fonksiyonel bileşen; JSX döndürerek “Nasıl Çalışır” bölümünün tamamını render eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../hooks/useScrollAnimation::scrollAnimationClasses
+- import: ../../../hooks/useScrollAnimation::useScrollAnimation
+- import: @/components/ui/VentImage::VentImage
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::ArrowDown
+- import: lucide-react::ChevronDown
+- import: lucide-react::ChevronUp
+- import: lucide-react::Shield
+- import: lucide-react::Thermometer
+- import: lucide-react::Wind
+- import: react::React
+- import: react::useState
 
 ---
 

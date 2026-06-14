@@ -92,11 +92,11 @@ const SilentFanTypeComparison: React.FC = () => {
                             <span className="text-xs uppercase font-bold text-slate-400 mb-2 block">{f.label}</span>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <span className="text-xs font-bold text-slate-400 uppercase">Standart:</span>
+                                    <span className="text-xs font-bold text-slate-400 uppercase">{String(tr('standardLabel'))}</span>
                                     <p className="text-sm font-medium text-slate-600">{f.standard}</p>
                                 </div>
                                 <div>
-                                    <span className="text-xs font-bold text-blue-500 uppercase">Quiet:</span>
+                                    <span className="text-xs font-bold text-blue-500 uppercase">{String(tr('quietLabel'))}</span>
                                     <p className="text-sm font-bold text-slate-900">{f.quiet}</p>
                                 </div>
                             </div>

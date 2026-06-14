@@ -138,7 +138,7 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
             )}
 
             <div className="mt-6 flex justify-between items-center text-xs text-gray-400">
-                <span>{t('needsWizard.step')} {step} / 3</span>
+                <span>{t('needsWizard.step')} {step} {t('needsWizard.stepOf', { total: 3 })}</span>
                 {step > 1 && <button onClick={() => setStep(step - 1)} className="focus-ring hover:text-gray-600 underline">{t('needsWizard.goBack')}</button>}
             </div>
         </div>
