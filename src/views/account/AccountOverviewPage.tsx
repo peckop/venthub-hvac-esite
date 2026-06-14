@@ -98,7 +98,7 @@ export default function AccountOverviewPage() {
 
   const defaultShipping = addresses.find(a => a.is_default_shipping)
   const defaultBilling = addresses.find(a => a.is_default_billing)
-  const fullName = user?.user_metadata?.full_name || 'Değerli İş Ortağımız'
+  const fullName = user?.user_metadata?.full_name || t('account.overview.defaultPartnerName')
 
   // İstatistik Hesaplamaları
   const totalVolume = orders.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0)
@@ -119,18 +119,18 @@ export default function AccountOverviewPage() {
   const activeShipStatusBadge = (status: 'delivered' | 'shipped' | 'preparing') => {
     switch (status) {
       case 'delivered':
-        return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-green-500/10 text-green-700 border border-green-500/20"><CheckCircle className="w-3.5 h-3.5" /> Teslim Edildi</span>
+        return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-green-500/10 text-green-700 border border-green-500/20"><CheckCircle className="w-3.5 h-3.5" /> {t('account.overview.shipStatus.delivered')}</span>
       case 'shipped':
-        return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-purple-500/10 text-purple-700 border border-purple-500/20"><Truck className="w-3.5 h-3.5" /> Kargoda</span>
+        return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-purple-500/10 text-purple-700 border border-purple-500/20"><Truck className="w-3.5 h-3.5" /> {t('account.overview.shipStatus.shipped')}</span>
       default:
-        return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-700 border border-amber-500/20"><Clock className="w-3.5 h-3.5" /> Hazırlanıyor</span>
+        return <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-700 border border-amber-500/20"><Clock className="w-3.5 h-3.5" /> {t('account.overview.shipStatus.preparing')}</span>
     }
   }
 
   const shipSteps = [
-    { key: 'preparing', label: 'Hazırlandı', icon: Package },
-    { key: 'shipped', label: 'Kargoda', icon: Truck },
-    { key: 'delivered', label: 'Teslim Edildi', icon: CheckCircle },
+    { key: 'preparing', label: t('account.overview.shipSteps.preparing'), icon: Package },
+    { key: 'shipped', label: t('account.overview.shipSteps.shipped'), icon: Truck },
+    { key: 'delivered', label: t('account.overview.shipSteps.delivered'), icon: CheckCircle },
   ]
 
   const getStepIndex = (status: 'delivered' | 'shipped' | 'preparing') => {
@@ -144,7 +144,7 @@ export default function AccountOverviewPage() {
     return (
       <div className="min-h-50vh flex flex-col items-center justify-center gap-4">
         <div className="w-12 h-12 rounded-full border-4 border-slate-100 border-t-primary-navy animate-spin"></div>
-        <div className="text-sm font-bold text-slate-500 uppercase tracking-wider animate-pulse">Dashboard Hazırlanıyor...</div>
+        <div className="text-sm font-bold text-slate-500 uppercase tracking-wider animate-pulse">{t('account.overview.loadingDashboard')}</div>
       </div>
     )
   }
@@ -167,7 +167,7 @@ export default function AccountOverviewPage() {
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4 pointer-events-none" />
 
           <div className="relative z-10">
-            <h2 className="text-3xl font-bold mb-2 tracking-tight">{t('account.overview.greeting')}<br />{fullName} 👋</h2>
+            <h2 className="text-3xl font-bold mb-2 tracking-tight">{t('account.overview.greeting')}<br />{fullName} {t('account.overview.wave')}</h2>
             <p className="text-white/80 text-sm font-medium">{t('account.overview.welcomeMessage')}</p>
           </div>
         </div>
@@ -198,7 +198,7 @@ export default function AccountOverviewPage() {
               <CreditCard className="w-6 h-6" />
             </div>
             <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight trunc">{totalVolume > 0 ? formatCurrency(totalVolume, lang, { maximumFractionDigits: 0 }) : '0 ₺'}</div>
-            <div className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider">Toplam Hacim</div>
+            <div className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider">{t('account.overview.totalVolume')}</div>
           </div>
         </div>
 
@@ -218,14 +218,14 @@ export default function AccountOverviewPage() {
                   <div className="w-8 h-8 rounded-lg bg-primary-navy/5 flex items-center justify-center text-primary-navy">
                     <Truck className="w-4 h-4" />
                   </div>
-                  Canlı Kargo Takibi
+                  {t('account.overview.liveTracking')}
                 </h3>
                 {activeShipment ? (
                   <p className="text-sm font-medium text-slate-500 mt-1">
-                    Sipariş <span className="font-bold text-slate-900">#{activeShipment.order_number?.split('-').pop() || activeShipment.id.slice(-8).toUpperCase()}</span> yolda.
+                    {t('account.overview.orderPrefix')} <span className="font-bold text-slate-900">{t('account.overview.orderHash', { code: activeShipment.order_number?.split('-').pop() || activeShipment.id.slice(-8).toUpperCase() })}</span> {t('account.overview.inTransitSuffix')}
                   </p>
                 ) : (
-                  <p className="text-sm font-medium text-slate-500 mt-1">Şu anda yolda olan aktif bir siparişiniz bulunmuyor.</p>
+                  <p className="text-sm font-medium text-slate-500 mt-1">{t('account.overview.noActiveShipment')}</p>
                 )}
               </div>
 
@@ -263,7 +263,7 @@ export default function AccountOverviewPage() {
 
                 <div className="mt-8 flex justify-center">
                   <button onClick={() => router.push(Routes.account.shipments())} className="h-10 px-6 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 hover:border-primary-navy hover:text-primary-navy transition-shadow shadow-sm">
-                    Tüm Kargoları Görüntüle
+                    {t('account.overview.viewAllShipments')}
                   </button>
                 </div>
               </div>
@@ -273,10 +273,10 @@ export default function AccountOverviewPage() {
                   <MapPin size={32} />
                 </div>
                 <p className="text-sm font-medium text-slate-500 max-w-sm">
-                  Aktif bir teslimatınız yok. Yeni bir sipariş verdiğinizde kargo süreçlerini buradan canlı olarak izleyebilirsiniz.
+                  {t('account.overview.noDeliveryHint')}
                 </p>
                 <button onClick={() => router.push(Routes.products())} className="mt-6 h-10 px-6 rounded-xl bg-primary-navy text-white text-sm font-bold hover:bg-industrial-gray transition-colors shadow-sm shadow-primary-navy/20">
-                  Kataloğu İncele
+                  {t('account.overview.browseCatalog')}
                 </button>
               </div>
             )}
@@ -289,16 +289,16 @@ export default function AccountOverviewPage() {
                 <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-600">
                   <Clock className="w-4 h-4" />
                 </div>
-                Son Siparişleriniz
+                {t('account.overview.recentOrders')}
               </h3>
               <Link href={Routes.account.orders()} className="text-sm font-bold text-primary-navy hover:underline inline-flex items-center gap-1">
-                Tümünü Gör <ArrowRight size={14} />
+                {t('account.overview.viewAll')} <ArrowRight size={14} />
               </Link>
             </div>
 
             {orders.length === 0 ? (
               <div className="p-8 text-center text-slate-500 text-sm font-medium">
-                Henüz geçmiş bir siparişiniz bulunmuyor.
+                {t('account.overview.noOrders')}
               </div>
             ) : (
               <div className="divide-y divide-slate-100">
@@ -313,7 +313,7 @@ export default function AccountOverviewPage() {
                         </div>
                         <div>
                           <Link href={Routes.account.orderDetail(o.id)} className="text-base font-bold text-slate-900 hover:text-primary-navy transition-colors">
-                            Sipariş {code}
+                            {t('account.overview.orderNumber', { code })}
                           </Link>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-sm font-bold text-slate-700">{formatCurrency(Number(o.total_amount), lang, { maximumFractionDigits: 0 })}</span>
@@ -351,32 +351,32 @@ export default function AccountOverviewPage() {
                   <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600">
                     <MapPinIcon className="w-4 h-4" />
                   </div>
-                  Teslimat & Fatura
+                  {t('account.overview.shippingBillingTitle')}
                 </h3>
               </div>
 
               <div className="space-y-4">
                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Truck size={12} /> Varsayılan Teslimat</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Truck size={12} /> {t('account.overview.defaultShipping')}</div>
                   {defaultShipping ? (
                     <div className="text-sm font-bold text-slate-700 leading-relaxed border-l-2 border-primary-navy pl-3 py-0.5">{defaultShipping.full_address}</div>
                   ) : (
-                    <div className="text-sm font-medium text-slate-400 italic">Tanımlı teslimat adresi yok.</div>
+                    <div className="text-sm font-medium text-slate-400 italic">{t('account.overview.noShippingAddress')}</div>
                   )}
                 </div>
 
                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><CreditCard size={12} /> Varsayılan Fatura</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><CreditCard size={12} /> {t('account.overview.defaultBilling')}</div>
                   {defaultBilling ? (
                     <div className="text-sm font-bold text-slate-700 leading-relaxed border-l-2 border-emerald-500 pl-3 py-0.5">{defaultBilling.full_address}</div>
                   ) : (
-                    <div className="text-sm font-medium text-slate-400 italic">Tanımlı fatura adresi yok.</div>
+                    <div className="text-sm font-medium text-slate-400 italic">{t('account.overview.noBillingAddress')}</div>
                   )}
                 </div>
               </div>
 
               <button onClick={() => router.push(Routes.account.addresses())} className="w-full mt-6 h-10 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-primary-navy hover:border-primary-navy transition-shadow shadow-sm">
-                Adresleri Yönet
+                {t('account.overview.manageAddressesBtn')}
               </button>
             </div>
           </div>
@@ -390,13 +390,13 @@ export default function AccountOverviewPage() {
               <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm border border-white/10">
                 <ShieldCheck className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Güvenlik Merkezi</h3>
+              <h3 className="text-xl font-bold mb-2">{t('account.overview.securityCenter')}</h3>
               <p className="text-sm text-slate-300 font-medium mb-8 leading-relaxed">
-                Şifrenizi, 2FA ayarlarınızı ve oturum bilgilerinizi güvenli bir şekilde yönetin.
+                {t('account.overview.securityCenterDesc')}
               </p>
 
               <button onClick={() => router.push(Routes.account.security())} className="w-full h-11 rounded-xl bg-white text-slate-900 border border-transparent hover:bg-slate-100 text-sm font-bold flex items-center justify-center gap-2 transition-colors">
-                Göz At <ArrowRight size={16} />
+                {t('account.overview.viewSecurity')} <ArrowRight size={16} />
               </button>
             </div>
           </div>
@@ -406,10 +406,10 @@ export default function AccountOverviewPage() {
             <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 mb-4 group-hover:scale-110 transition-transform">
               <AlertTriangle className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-slate-900 mb-1">Desteğe mi ihtiyacınız var?</h3>
-            <p className="text-xs font-medium text-slate-500 mb-4">Sipariş, iade veya bakiye konularında anında yardım alın.</p>
+            <h3 className="text-base font-bold text-slate-900 mb-1">{t('account.overview.needHelp')}</h3>
+            <p className="text-xs font-medium text-slate-500 mb-4">{t('account.overview.needHelpDesc')}</p>
             <a href="mailto:support@venthub.com" className="h-9 px-4 rounded-lg bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-primary-navy hover:border-primary-navy transition-shadow shadow-sm flex items-center justify-center">
-              Müşteri Hizmetleri
+              {t('account.overview.customerService')}
             </a>
           </div>
 

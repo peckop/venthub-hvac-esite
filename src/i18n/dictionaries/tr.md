@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
-skeleton_hash: 4042b8dd98c252fc
+skeleton_hash: c9267447c086f2fd
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-06-13T11:19:48Z
+generated_at: 2026-06-14T16:22:26Z
 ---
 
 ## Genel Bakış
@@ -23,23 +23,12 @@ Bu modül saf bir statik veri modülüdür (sözlük/taslak) — çalıştırıl
 
 ---
 
-**[Aksiyom 1]:** Eğer `tr` sabit nesnesi olarak dışa aktarılan bir nesne yoksa, Türkçe dil dosyası i18n yükleyici tarafından yüklenemez ve uygulama arayüzünde Türkçe metinler boş/hata durumunda kalır.
-
-**[Aksiyom 2]:** Eğer `tr` nesnesi bir JavaScript nesnesi (`object`) yapısında değilse (örn. `null`, `undefined`, bir dizi veya primitif tür olarak export edilmişse), i18n sözlük çözümleme aşamasında tip hatası oluşur.
-
-**[Aksiyom 3]:** Eğer `tr` nesnesindeki herhangi bir çeviri anahtarı için karşılık gelen değer bir `string` türünde değilse (örn. `number`, `undefined`, `null` olarak tanımlıysa), arayüzde o anahtarın bulunduğu noktada beklenmeyen gösterim hatası meydana gelir.
-
-**[Aksiyom 4]:** Eğer `tr` nesnesi proyectojecte tanımlı i18n anahtar yapısının beklediği zorunlu üst düzey anahtarları içermiyorsa (örn. sayfa adları, buton metinleri, hata mesajları), ilgili arayüz bileşenlerinde çeviri bulunamaz ve fallback mekanizması devreye girer veya hata görüntülenir.
-
-**[Aksiyom 5]:** Eğer bu dosya `import`/`export` sözdizimiyle модül olarak dışa aktarılmıyorsa (örn. `export const tr = {...}` şeklinde değilse), i18n yükleyici modülü bulamaz ve `tr` sözlüğü kullanılabilir hale gelmez.
-
----
-
-**Not:** Bu modülde herhangi bir fonksiyon gövdesi bulunmadığından, aksiyomlar yalnızca modülün yapısal ve dışa aktarım koşullarına yöneliktir. Modülün çalıştırma zamanı davranışı yoktur; salt veri sağlayıcıdır.
-
----
-
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./admin/tr::admin
 
 ---
 
@@ -68,10 +57,6 @@ Bu dosyada fonksiyon tanımlı değildir.
 **Fonksiyon gövdeleri**: Yok
 
 **Return**: Yok (nesne dışa aktarılır)
-
----
-
-**Not**: Bu dosya fonksiyon içermemektedir. Yalnızca `admin` modülünden import edilen çeviriler ve yerel Türkçe çeviri anahtarları bir `tr` nesnesinde toplanarak dışa aktarılır. AST Pointer üretimi için fonksiyon gövdesi gerekli olup, mevcut yapı bir modül dışa aktarma/nesne tanımıdır.
 
 ---
 
