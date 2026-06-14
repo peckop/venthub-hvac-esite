@@ -3,153 +3,73 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminErrorsPage.tsx
-skeleton_hash: 00849a212f4b65f7
+skeleton_hash: cafa7ed074ccc911
 entity_hashes:
-  func:AdminErrorsPage: a54e992b31a4d175
-  func:fmt: f911ea01809e8b2a
-  overview: b1c53ea2b726d7c3
-  style_tokens: a98ae3ae7fce0104
-generated_at: 2026-06-08T10:11:00Z
+  func:AdminErrorsPage: d26af9274e4d56dd
+  overview: 0655495a3be5f695
+  style_tokens: a7fe3ab3ca0c1259
+generated_at: 2026-06-13T17:00:37Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yönetici panelindeki hata yönetimi sayfasını sunar. Sistemde kaydedilen hata kayıtlarını yöneticilere listeleyerek inceleme olanağı sağlar ve tarihlerin okunabilir biçimde gösterilmesini destekler.
+Bu modül, VentHub HVAC yönetici panelindeki hata yönetimi sayfasını oluşturan temel React bileşenini ve tarih formatlama yardımcı fonksiyonunu içerir. Sistemde kaydedilen hata kayıtlarını merkezi bir arayüzde listeleyerek yöneticilerin incelemesini sağlar ve tarihlerin okunabilir biçimde sunulmasını destekler.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Tüm sayfa düzenini, veri çekme işlemlerini ve hata kayıtlarının kullanıcıya sunulmasını yöneten temel React bileşenidir.
+Sayfa düzeninin, veri çekme işlemlerinin ve hata kayıtlarının listelenmesinin tüm sorumluluğunu taşıyan ana React bileşenidir.
 - AdminErrorsPage
 
 ### Tarih Formatlama Yardımcıları
-Hata kayıtlarındaki tarih nesnelerini, arayüzde gösterilmek üzere okunabilir ve standart bir metin formatına dönüştürmekle sorumludur.
+Hata kayıtlarındaki tarih nesnelerini, arayüzde gösterilmek üzere okunabilir ve standart bir metin formatına dönüştürmekle sorumlu yardımcı fonksiyondur.
 - fmt
+
+### Fonksiyonlar Arası İlişkiler ve Bağımlılıklar
+`AdminErrorsPage` bileşeni, hata kayıtlarının tarih bilgilerini okunaklı göstermek için `fmt` fonksiyonuna bağımlıdır. Modül, veri çekme işlemleri için dış kaynaklara (React context, global state veya custom hook) ihtiyaç duyar ve bu bağımlılıklar bileşenin yaşam döngüsünde dinamik olarak çözümlenir. Mimari olarak, yönetici panelinin bir alt sayfası olarak yalın ve tek sorumluluklu bir yapıya sahiptir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için tanımlanan mimari varsayımlar, yalnızca fonksiyon imzalarından türetilmiştir.
+Bu modül için fonksiyon imzalarından çıkarılabilir kesin mimari varsayımlar sınırlıdır; yalnızca imza bilgisine dayalı varsayımlar aşağıda listelenmiştir.
 
-[Aksiyom 1]: `fmt` fonksiyonuna geçilen `d` parametresi geçerli bir `Date` nesnesi olmalıdır. Eğer `d` geçerli (NaN içermeyen) bir `Date` nesnesi yoksa, fonksiyon tanımsız veya geçersiz bir tarih dizesi döndürür.
+[Aksiyom 1]: Eğer React çalışma ortamı (React runtime/React DOM) yoksa, AdminErrorsPage bileşeni render edilemez ve uygulama hata fırlatır.
 
-[Aksiyom 2]: `AdminErrorsPage` fonksiyonu (React bileşeni) herhangi bir parametre almaz; dolayısıyla hata listesi verisini dış kaynaklardan (context, custom hook, global state vb.) almalıdır. Eğer bu veri kaynağı bileşen yaşam döngüsünde erişilebilir değilse, bileşen boş/bozuk bir arayüz render eder.
+[Aksiyom 2]: Eğer fmt fonksiyonu çağrıldığında geçerli bir tarih nesnesi parametre olarak sağlanmazsa, fonksiyonun dönüş değeri bilinmiyor.
+
+[Aksiyom 3]: Eğer AdminErrorsPage bileşeni React component ağacının dışında (örn. doğrudan DOM'a eklenerek) kullanılmaya çalışılırsa, bileşen düzgün çalışmaz.
+
+[Aksiyom 4]: Eğer fmt yardımcı fonksiyonu modül dışından erişilebilir olarak export edilmemişse, modül dışındaki tarih formatlama işlemleri bu fonksiyonu kullanamaz (iç modül bağımlılığı).
+
+[Aksiyom 5]: Eğer React_fc dönüş tipi geçersiz veya bozulmuş bir JSX döndürürse, React hata sınırı tetiklenir veya bileşen render edilemez.
+
+---
+
+**Not:** Fonksiyon imzalarında parametre listesi, varsayılan değer veya modül sabiti verilmediği için; hata kayıtlarının veri kaynağı, API çağrıları, hook kullanımı veya bileşen içi state yönetimi hakkında kesin aksiyom üretilmemiştir. Bu tür detaylar fonksiyon gövdesinden çıkarılmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminErrorsPage
-**Ne yapar**: VentHub HVAC sisteminin yönetici paneli için geliştirilmiş hata kayıtları sayfası React bileşenidir. Yöneticilerin sistemde oluşan tüm hataları tek bir merkezden görüntülemesine ve incelemesine olanak tanır.
-**Nasıl yapar**: Proje dizinindeki `src/views/admin/AdminErrorsPage.tsx` dosyası içinde tanımlanan React fonksiyonel bileşeni olarak çalışır. Yönetici arayüzünün hata yönetimi bölümünün tüm görsel ve işlevsel yapısını oluşturur, sayfa içindeki alt bileşenleri, hata listeleme mantığını ve kullanıcı etkileşimlerini bu ana bileşen üzerinden yönetir.
-**Parametreler**: Herhangi bir giriş parametresi almaz.
-**Dönüş**: React.FC tipinde bir React fonksiyonel bileşeni döndürür, bu bileşen yönetici panelinin rota yapısı içinde çağrılarak DOM'a eklenir ve hata sayfasını kullanıcıya sunar.
 
-### fmt
-**Ne yapar**: AdminErrorsPage bileşeni içinde kullanılmak üzere tasarlanmış tarih biçimlendirme yardımcı fonksiyonudur. Hata kayıtlarında yer alan tarihlerin kullanıcı tarafından okunabilir, anlaşılır bir formatta gösterilmesini sağlar.
-**Nasıl yapar**: Girdi olarak aldığı JavaScript Date nesnesini alır, sistemde tanımlı standart bir tarih formatına dönüştürerek ekranda gösterilmek üzere hazırlar. Sadece AdminErrorsPage içindeki tarih formatlama ihtiyacını karşılamak için özel olarak geliştirilmiştir.
+**Ne yapar**: İstemci hatalarının (client_errors) listelendiği admin sayfasını render eder. DataTableKit kütüphanesine göç edilmiş, sunucu tarafı (server-mode) çalışan bir hata yönetim sayfasıdır.
+
+**Nasıl yapar**: Sayfa yapısı iki katmandan oluşur: üst kısımda sayfa başlığı, altında ise `Suspense` ile sarılmış bir `ErrorsTableBody` bileşeni yer alır. `useSearchParams` hook'u doğrudan bu bileşen içinde tüketilmek yerine, `Suspense` boundary içine yerleştirilmiştir; bu tasarım CLAUDE.md Kural 5 / K2 gerekliliğine uygundur ve suspans ile ilgili potansiyel hataların önlenmesini sağlar. Veri çekme, URL senkronizasyonu ve filtre state yönetimi gibi tüm mantıksal sorumluluklar `ErrorsTableBody` bileşenine (içinde `useAdminTable` hook'unu kullanan) devredilmiştir; böylece bu üst düzey bileşen yalnızca görünüm yapısını ve Suspense sınırını tanımlar.
+
 **Parametreler**:
-- d: Date — Biçimlendirilecek geçerli bir JavaScript Date nesnesi, ilgili hata kaydının oluştuğu zaman bilgisini içerir.
-**Dönüş**: Dönüş tipi resmi olarak tanımlanmamıştır, herhangi bir değer döndürmediği veya dönüş türünün belirlenmediği bilgisi mevcuttur.
 
----
+Bu fonksiyon (React fonksiyonel bileşeni) herhangi bir parametre almaz.
 
-## INTERFACES
-
-### ErrorRow
-- `id: string`
-- `at: string`
-- `url?: string | null`
-- `message: string`
-- `stack?: string | null`
-- `user_agent?: string | null`
-- `release?: string | null`
-- `env?: string | null`
-- `level?: string | null`
+**Dönüş**: `React.FC` — Suspense ile sarılmış hata tablosu içeriğini ve sayfa başlığını render eden React fonksiyonel bileşeni.
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/AdminErrorsPage.tsx::AdminErrorsPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hac\src\views\admin\AdminErrorsPage.tsx::AdminErrorsPage
+- **params**: ()
 - **ic_degiskenler**:
-  - `tenantId` — Mevcut kiracının benzersiz kimliği, useTenant() hook'undan alınır
-  - `t` — Çeviri fonksiyonu, useI18n() hook'undan alınır
-  - `lang` — Mevcut dil kodu, useI18n() hook'undan alınır
-  - `dragScrollRef` — Sürükleme ile yatay kaydırma için ref, useDragScroll() hook'undan alınır
-  - `fmt` — Tarih nesnesini YYYY-MM-DD formatına çeviren yerel yardımcı fonksiyon
-  - `now` — Şu anki tarih ve saati temsil eden Date nesnesi
-  - `defaultToDate` — Bugün için oluşturulmuş tarih stringi (varsayılan bitiş tarihi)
-  - `defaultFromDate` — 6 gün öncesi için oluşturulmuş tarih stringi (varsayılan başlangıç tarihi)
-  - `rows` — Hata satırlarını tutan state değişkeni (ErrorRow[])
-  - `loading` — Veri yükleme durumunu tutan state değişkeni (boolean)
-  - `error` — Hata mesajını tutan state değişkeni (string | null)
-  - `total` — Toplam hata sayısını tutan state değişkeni (number)
-  - `page` — Mevcut sayfa numarasını tutan state değişkeni (number)
-  - `q` — Arama sorgusunu tutan state değişkeni (string)
-  - `debouncedQ` — Debounce edilmiş arama sorgusu (string)
-  - `fromDate` — Başlangıç tarih filtresini tutan state değişkeni (string)
-  - `toDate` — Bitiş tarih filtresini tutan state değişkeni (string)
-  - `level` — Hata seviyesi filtresini tutan state değişkeni (string)
-  - `env` — Ortam filtresini tutan state değişkeni (string)
-  - `fetchErrors` — Supabase'den hata verilerini çeken asenkron fonksiyon (useCallback ile sarılmış)
-  - `pathname` — Mevcut URL yolunu temsil eden değişken, usePathname() hook'undan alınır
-  - `fetchRef` — fetchErrors fonksiyonunu tutan ref değişkeni
-  - `refetchTimer` — Otomatik yenileme için zamanlayıcı ID'sini tutan ref değişkeni
-  - `scheduleRefetch` — Yenileme işlemini zamanlayan fonksiyon (useCallback ile sarılmış)
-  - `expandedId` — Genişletilmiş satırın ID'sini tutan state değişkeni (string | null)
-- **Dönüş**: React.FC (React Function Component)
-
-### [N2_NASIL] AST Pointer: src/views/admin/AdminErrorsPage.tsx::fmt
-- **params**: (d: Date)
-- **ic_degiskenler**:
-  - `y` — Yıl bilgisini tutan yerel değişken (d.getFullYear() çağrısıyla alınır)
-  - `m` — Ay bilgisini tutan yerel değişken (String(d.getMonth() + 1).padStart(2, '0') ile formatlanır)
-  - `day` — Gün bilgisini tutan yerel değişken (String(d.getDate()).padStart(2, '0') ile formatlanır)
-- **Dönüş**: `${y}-${m}-${day}` formatında tarih stringi
-
-### [N3_NASIL] AST Pointer: src/views/admin/AdminErrorsPage.tsx::debounceEffect
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — setTimeout ile oluşturulmuş zamanlayıcı ID'si, 300ms gecikmeyle debounce edilmiş sorguyu günceller
-- **Dönüş**: Temizleme fonksiyonu (clearTimeout ile timer'ı iptal eder)
-
-### [N4_NASIL] AST Pointer: src/views/admin/AdminErrorsPage.tsx::fetchErrors
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `query` — Supabase sorgu nesnesi, client_errors tablosunu sorgulamak için oluşturulur
-  - `like` — LIKE sorgusu için arama deseni, `%${debouncedQ}%` formatında oluşturulur
-  - `from` — Sayfalama için başlangıç indeksi, (page - 1) * PAGE_SIZE ile hesaplanır
-  - `to` — Sayfalama için bitiş indeksi, from + PAGE_SIZE - 1 ile hesaplanır
-  - `data` — Supabase sorgusundan dönen ham veri (ErrorRow[])
-  - `error` — Supabase sorgusundan dölen hata nesnesi
-  - `count` — Supabase sorgusundan dönen toplam kayıt sayısı
-- **Dönüş**: Promise<void> (setRows, setTotal, setError ve setLoading state güncellemeleri yapar)
-
-### [N5_NASIL] AST Pointer: src/views/admin/AdminErrorsPage.tsx::scheduleRefetch
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (refetchTimer.current zamanlayıcısını ayarlar veya temizler)
-
-### [N6_NASIL] AST Pointer: src/views/admin/AdminErrorsPage.tsx::setupRealtimeChannel
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `ch` — Supabase Realtime kanal nesnesi, `client-errors-${tenantId}` kanalına abone olur
-- **Dönüş**: Temizleme fonksiyonu (kanalı kaldırır ve zamanlayıcıyı temizler)
-
-### [N7_NASIL] AST Pointer: src/views/admin/AdminErrorsPage.tsx::onRealtimeChange
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (scheduleRefetch() fonksiyonunu çağırır)
-
-### [N8_NASIL] AST Pointer: src/views/admin/AdminErrorsPage.tsx::cleanupRealtimeChannel
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void (supabase.removeChannel() ve clearTimeout() ile temizlik yapar)
-
-### [N9_NASIL] AST Pointer: src/views/admin/AdminErrorsPage.tsx::renderRow
-- **params**: (r: ErrorRow)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: ReactJSX.Element (Her hata satırı için JSX fragment)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, component içindeki metinleri uluslararasılaştırmak için kullanılır.
+- **Dönüş**: React.ReactNode (JSX element) — `<div>` ile sarılmış bir header ve Suspense ile yüklenen ErrorsTableBody componentinden oluşan sayfa yapısı.
 
 ---
 
@@ -157,7 +77,6 @@ Bu modül için tanımlanan mimari varsayımlar, yalnızca fonksiyon imzalarınd
 
   file: src\views\admin\AdminErrorsPage.tsx
   function: src\views\admin\AdminErrorsPage.tsx::AdminErrorsPage
-  function: src\views\admin\AdminErrorsPage.tsx::fmt
 
 ---
 
@@ -172,10 +91,10 @@ Bu modül için tanımlanan mimari varsayımlar, yalnızca fonksiyon imzalarınd
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-50`, `bg-rose-50`, `bg-sky-50`, `bg-surface-deep`, `bg-surface-deep/40`, `bg-surface-deep/80`, `bg-white/3`, `bg-white/5`, `border-b`, `border-red-100`, `border-t`, `border-white/10`, `border-white/5`, `hover:bg-white/10`, `hover:bg-white/2`
-- **Layout:** `backdrop-blur-md`, `custom-scrollbar`, `flex`, `gap-2`, `gap-3`, `gap-6`, `grid`, `inline-flex`, `items-center`, `justify-between`, `justify-end`, `max-h-80`, `md:grid-cols-2`, `min-w-full`, `overflow-auto`
-- **Varyant/Responsive:** `:`, `disabled:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `${adminCardClass`, `${adminTableCellClass`, `${adminTableHeadCellClass`, `${r.level`, `:`, `===`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-30`, `error`, `font-black`, `font-bold`, `font-medium`, `font-mono`, `glass-strong`
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `pb-20`, `space-y-4`

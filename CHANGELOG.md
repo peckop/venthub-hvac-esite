@@ -1,5 +1,40 @@
 # Changelog
 
+### [2026-06-13 → 2026-06-14] Admin Panel Enterprise Standardizasyonu — DataTableKit Göçü (Faz 0 + Faz 1 TAMAM)
+
+**Özet:** Admin panelinin tüm liste sayfaları tek paylaşılan tablo motoruna (**DataTableKit**) taşındı. Faz 0'da kit altyapısı (`useAdminTable` hook + `DataTableKit` shell + `mutateWithAudit` yazma kapısı) kuruldu ve `AdminCouponsPage` ile doğrulandı; Faz 1'de kalan 9 sayfa göç ettirildi. Sonuç: tek standart, kapanan denetim (audit) boşlukları ve yapısal olarak imkânsız kılınan "sessiz sıralama" hatası.
+
+**Değişiklik Kapsamı:**
+- **Kit Altyapısı (Faz 0):**
+  - `useAdminTable<Row>` — server/client/none modları, URL-state senkron (sayfa/sort/filtre/arama), satır seçimi (shift-aralık), faceted filtre, `fetchAllForExport`. **Tek-yol sort** → eski server-pagination+client-sort sessiz bug'ı yapısal imkânsız.
+  - `DataTableKit` shell — 5 AYRI durum (skeleton / veri-yok / filtre-sıfır / yetkisiz / hata), slot'lar (`toolbarSlot` / `bulkBarSlot` / `renderExpandedRow`), `aria-sort`, `.content-auto` render kalkanı.
+  - `mutateWithAudit` — her admin yazması RBAC (K3) + audit (K4) kapısından geçer; `auditedByEdge` ile çift-log önlenir.
+- **Sayfa Göçleri (10 liste sayfası):** Coupons (Faz-0 doğrulayıcı) · Errors · AuditLog · Categories · Movements · ErrorGroups · Returns · Users · Orders · Products. Her sayfa = `<Sayfa>TableBody.tsx` (DI'lı fetcher + kolon SSOT + mutateWithAudit) + ince `Admin<Sayfa>Page.tsx` (`<Suspense>` wrapper) + per-page i18n (tr/en parity) + integration + axe-0 testi.
+- **Kapanan denetim boşlukları:** toplu işlemler (kargo/durum/vitrin/fiyat/silme), satır-içi düzenleme (fiyat/stok), sipariş notları — hepsi artık audit'li + RBAC-kapılı.
+- **Orkestrasyon:** zor sayfalar `maestro` skill'iyle (mimar-plan → paralel göç-ajanı → çürütücü yargıç paneli → merkezi tsc/lint/test/axe kapısı) parçala-böl-yönet ile göçtü.
+
+**Doğrulama:** `pnpm type-check` ✅ (0) | `pnpm lint` ✅ (0) | `pnpm test --run` ✅ (473 passed / 2 skipped) | axe ✅ (0 ihlal/sayfa)
+
+> **Ertelenen (K1/K4 lint):** K1 (kit-dışı `<table>` yasağı) + K4 (çıplak `.update/.insert/.delete` yasağı) `error`'a **henüz açılmadı** — şu an 0 gerçek ihlal / ~54 yanlış-pozitif (liste-olmayan admin yüzeyleri hâlâ ham tablo/yazma kullanıyor, ve etmeli). Faz 2'de admin yüzeyleri de kite geçince açılacak.
+
+---
+
+### [2026-06-11 → 2026-06-12] Bayi (B2B) Modülü Temeli + Kalite Altyapısı
+
+**Özet:** Çok-kiracılı SaaS'ın bayi-ağı katmanı için kanıta-dayalı standart + build-ready blueprint hazırlandı, canlı DB zemin-gerçeği denetlendi, R0 şema temeli atıldı. Ayrıca admin mutasyonlarına RBAC+audit eklendi, NotebookLM sync milestone modeline taşındı ve Claude Code kalite-omurgası hook'ları kuruldu.
+
+**Değişiklik Kapsamı:**
+- **Bayi Modülü Dokümantasyonu (`docs/standards/`, `docs/audits/`):** `dealer-network-standard.md` (B2B/PRM/CPQ domain cetveli, 4 otorite kaynaktan), `dealer-module-blueprint.md` (R0-R5 onarım + B1-B2 inşa spec'i), `dealer-data-ground-truth-2026-06-11.md` (canlı DB denetimi). **R1 kimlik-ekseni kararı:** organization-tabanlı (B-minimal) — bayi = şirket satırı, kullanıcı `organization_id` FK'siyle bağlanır, fiyat `tier_level`'a göre çözülür.
+- **R0 Şema Temeli (`supabase/`):** şema baseline snapshot + dealer-layer replay migration (VCS-dışı tabloları versiyonla + text→uuid drift reconcile).
+- **Admin Mutasyon Güvenliği:** admin yazmalarına RBAC guard + audit logging (kit göçünün ön-adımı).
+- **NotebookLM Sync (milestone modeli):** post-commit hook artık yerel-only; NLM sync = `notebooklm-sync` skill ile milestone'da (auth-tazele → sync → query-doğrula). Sessiz-kaçırma riski kapandı.
+- **Kalite-Omurgası Hook'ları (Tier-1):** Claude Code hook'ları — tur-başı typecheck/lint + config-koruma guard'ı.
+- **Şema Master:** `database_schema_master.md` tam RLS kapsamıyla (101 politika) yeniden üretildi.
+
+**Doğrulama:** `pnpm type-check` ✅ | `pnpm lint` ✅ | NLM sync query-doğrulandı ✅
+
+---
+
 ### [2026-06-10 - Follow-up] Performance Optimization, CLS & TBT Fixes, Network & Visual Alignment
 
 **Summary:** Follow-up performance sprint focusing on Cumulative Layout Shift (CLS) and Total Blocking Time (TBT) remediations. This includes resolving layout shifts using the `min-h-hvac-section` token, code-splitting heavy 3D elements, removing external network dependencies from Three.js environment maps, and syncing skeleton loading heights with 3D canvas heights.

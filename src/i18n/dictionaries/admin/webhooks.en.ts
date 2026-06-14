@@ -1,0 +1,33 @@
+export const webhooks = {
+      title: 'Webhook Events',
+      tabs: {
+        returns: 'Returns',
+        shipping: 'Shipping Emails'
+      },
+      search: {
+        returns: 'event_id, order_id, _return_id, carrier, status_mapped',
+        shipping: 'order_id, email, subject, provider'
+      },
+      tip: {
+        rowAction: 'Click a row to open details and reprocess menu.'
+      },
+      returnsTable: {
+        eventId: 'Event ID',
+        order: 'Order',
+        carrier: 'Carrier',
+        statusMapped: 'Status (mapped)',
+        received: 'Received'
+      },
+      emailsTable: {
+        order: 'Order',
+        to: 'To',
+        subject: 'Subject',
+        provider: 'Provider',
+        date: 'Date'
+      },
+      noEmails: 'No Email Activity Found',
+      noEmailsDesc: 'There is currently no recorded shipping/cargo email activity.',
+      noReturns: 'No Return Activity Found',
+      noReturnsDesc: 'There is currently no recorded return webhook activity.',
+      subtitle: 'Monitor data flow between systems and automatic notifications.'
+};

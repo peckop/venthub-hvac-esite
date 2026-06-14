@@ -2,6 +2,7 @@ import { Bell, Settings, ShieldAlert,Zap } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
+import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
@@ -60,13 +61,24 @@ const AdminInventorySettingsPage: React.FC = () => {
       setSuccess('')
       setError('')
       const value = (defaultThreshold === '' ? null : Number(defaultThreshold))
-      const { error } = await supabase.rpc('update_inventory_thresholds', { p_default: value as number, p_reset_overrides: resetAll })
-      if (error) throw error
+      await mutateWithAudit(supabase, {
+        resource: 'inventory_settings',
+        canWrite: hasWriteAccess,
+        action: 'UPDATE',
+        rowPk: null,
+        before: null,
+        after: { default_low_stock_threshold: value, reset_overrides: resetAll },
+        auditedByEdge: false,
+        fn: async () => {
+          const { error } = await supabase.rpc('update_inventory_thresholds', { p_default: value as number, p_reset_overrides: resetAll })
+          if (error) throw error
+        },
+      })
       setSuccess(resetAll ? 'Kaydedildi ve tüm ürünlere uygulandı' : 'Kaydedildi')
       await load()
     } catch (e: unknown) {
       console.error('update_inventory_thresholds error:', e)
-      const msg = e instanceof Error ? e.message : 'Kaydedilemedi'
+      const msg = e instanceof AdminPermissionError ? 'Bu işlem için yetkiniz yok' : e instanceof Error ? e.message : 'Kaydedilemedi'
       setError(msg)
     } finally {
       setSaving(false)
@@ -78,20 +90,35 @@ const AdminInventorySettingsPage: React.FC = () => {
       setSavingGeneral(true)
       setSuccess('')
       setError('')
-      const { error } = await supabase.from('inventory_settings')
-        .update({
+      await mutateWithAudit(supabase, {
+        resource: 'inventory_settings',
+        canWrite: hasWriteAccess,
+        action: 'UPDATE',
+        rowPk: null,
+        before: null,
+        after: {
           alert_email: alertEmail || null,
           alert_webhook_url: alertWebhook || null,
           reservation_timeout_hours: resTimeout || 24,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', true)
-      if (error) throw error
+        },
+        auditedByEdge: false,
+        fn: async () => {
+          const { error } = await supabase.from('inventory_settings')
+            .update({
+              alert_email: alertEmail || null,
+              alert_webhook_url: alertWebhook || null,
+              reservation_timeout_hours: resTimeout || 24,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', true)
+          if (error) throw error
+        },
+      })
       setSuccess('Genel ayarlar kaydedildi')
       await load()
     } catch (e: unknown) {
       console.error('saveGeneralSettings error:', e)
-      const msg = e instanceof Error ? e.message : 'Kaydedilemedi'
+      const msg = e instanceof AdminPermissionError ? 'Bu işlem için yetkiniz yok' : e instanceof Error ? e.message : 'Kaydedilemedi'
       setError(msg)
     } finally {
       setSavingGeneral(false)

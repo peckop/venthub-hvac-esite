@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import React, { useCallback,useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -109,19 +110,30 @@ export default function AdminLogisticsPage() {
         setSaving(true)
         let errCount = 0
         try {
-            const results = await Promise.all(targets.map(async (row) => {
-                const turl = generateTrackingUrl(row.carrier, row.tracking_number)
-                const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
-                    body: {
-                        order_id: row.id,
-                        carrier: row.carrier.trim(),
-                        tracking_number: row.tracking_number.trim(),
-                        tracking_url: turl,
-                        send_email: true
-                    }
-                })
-                return { id: row.id, ok: !fnErr }
-            }))
+            const results = await mutateWithAudit(supabase, {
+                resource: 'logistics',
+                canWrite: hasWriteAccess,
+                action: 'UPDATE',
+                rowPk: null,
+                before: null,
+                after: { status: 'shipped', ids: targets.map(r => r.id) },
+                auditedByEdge: false,
+                fn: async () => {
+                    return await Promise.all(targets.map(async (row) => {
+                        const turl = generateTrackingUrl(row.carrier, row.tracking_number)
+                        const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
+                            body: {
+                                order_id: row.id,
+                                carrier: row.carrier.trim(),
+                                tracking_number: row.tracking_number.trim(),
+                                tracking_url: turl,
+                                send_email: true
+                            }
+                        })
+                        return { id: row.id, ok: !fnErr }
+                    }))
+                },
+            })
 
             setRows(prev => prev.map(r => {
                 const res = results.find(x => x.id === r.id)
@@ -137,8 +149,8 @@ export default function AdminLogisticsPage() {
             } else {
                 toast.success(t('admin.logistics.toasts.bulkUpdateSuccess', { count: targets.length }))
             }
-        } catch {
-            toast.error(t('admin.logistics.toasts.criticalError'))
+        } catch (e) {
+            toast.error(e instanceof AdminPermissionError ? t('admin.logistics.toasts.noPermission') : t('admin.logistics.toasts.criticalError'))
         } finally {
             setSaving(false)
         }

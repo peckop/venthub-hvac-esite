@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import ts from 'typescript';
+import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,7 +17,6 @@ let leakages = [];
 
 // Sızıntı kontrolünde istisna tutulacak tag ve klasör isimleri
 const ignoredTags = ['code', 'pre', 'script', 'style', 'svg', 'path', 'div'];
-const r=/[A-Za-z]/; // En az bir harf icermeli ki sembol veya bosluktan ibaret metinler yakalanmasin.
 
 function isTurkishOrEnglishHardcoded(text) {
   // Sadece bosluk veya noktalama degilse, regex gecer.
@@ -94,7 +93,7 @@ function scanDirectory(dir) {
   }
 }
 
-console.log("[i18n AST Scanner] Tarama basliyor...");
+console.error("[i18n AST Scanner] Tarama basliyor...");
 dirsToScan.forEach(scanDirectory);
 
 if (leakages.length > 0) {
@@ -107,6 +106,6 @@ if (leakages.length > 0) {
   console.error("Lutfen useI18n() dictionary mantigina gecirin! (veya ignore icin yorum atin)");
   process.exit(1);
 } else {
-  console.log("Tertemiz! i18n sızıntısı bulunamadı.");
+  console.error("Tertemiz! i18n sızıntısı bulunamadı.");
   process.exit(0);
 }

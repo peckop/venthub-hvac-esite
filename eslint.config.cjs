@@ -1,4 +1,4 @@
- 
+
 const { FlatCompat } = require("@eslint/eslintrc");
 const js = require("@eslint/js");
 const tailwindcss = require("eslint-plugin-tailwindcss");
@@ -10,6 +10,58 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
   recommendedConfig: js.configs.recommended,
 });
+
+// ── Admin yüzeyinde paylaşılan JSX kısıtları ──────────────────────────────
+// Hem genel "warn" bloğu hem admin "error" bloğu bunu kullanır (tek kaynak,
+// kopya yok). Genel tsx'te warn; admin tsx'te (aşağıda) error olarak basılır.
+const sharedJsxRestrictions = [
+  {
+    selector: "TSAsExpression > TSAsExpression",
+    message: "Enterprise Kuralı: 'as unknown as Type' kullanılamaz. Güvenli dönüştürücüler (Type Converters) kullanın."
+  },
+  {
+    selector: "JSXAttribute[name.name='href'] > Literal[value^='/category']",
+    message: "Enterprise Kuralı: '/category' linklerini elle yazamazsınız. 'Routes.category()' yapısını kullanın."
+  },
+  {
+    selector: "JSXAttribute[name.name='href'] > Literal[value^='/products']",
+    message: "Enterprise Kuralı: '/products' linklerini elle yazamazsınız. 'Routes.product()' yapısını kullanın."
+  },
+  {
+    selector: "JSXAttribute[name.name='href'] > JSXExpressionContainer > TemplateLiteral > TemplateElement[value.raw^='/category']",
+    message: "Enterprise Kuralı: Template strings (`/category/...`) kullanılamaz. 'Routes' kütüphanesini kullanın."
+  },
+  {
+    selector: "JSXAttribute[name.name='href'] > JSXExpressionContainer > TemplateLiteral > TemplateElement[value.raw^='/products']",
+    message: "Enterprise Kuralı: Template strings (`/products/...`) kullanılamaz. 'Routes' kütüphanesini kullanın."
+  },
+  {
+    selector: "JSXAttribute[name.name='alt'] > Literal[value!=\"\"]",
+    message: "Enterprise Kuralı: 'alt' resim açıklamalarını hardcoded (sabit metin) olarak yazamazsınız. Lütfen i18n çeviri anahtarı kullanın."
+  },
+  {
+    selector: "JSXAttribute[name.name='alt'] > JSXExpressionContainer > Literal[value!=\"\"]",
+    message: "Enterprise Kuralı: 'alt' resim açıklamalarını hardcoded (sabit metin) olarak yazamazsınız. Lütfen i18n çeviri anahtarı kullanın."
+  }
+];
+
+// ── HEX-in-JSX yasağı (design-token kuralı / cetvel #8) ───────────────────
+// Ham HEX renk yerine tokens.js / CSS custom property (HSL). YALNIZ admin
+// yüzeyinde error: 3D materyal renkleri (R3F) ve storefront KAPSAM DIŞI.
+// Chart dosyaları (Recharts) Faz 2 token-göçüne kadar karantinalı (aşağıdaki
+// "ignores"). Selector 1 = JSX prop (fill/stroke/color/stopColor="#..."),
+// Selector 2 = obje/style değeri ({ color: '#...' }, chart config).
+const HEX_MSG = "Design-token Kuralı: Ham HEX renk (#rrggbb) yasak. Renkleri tokens.js / CSS custom property (HSL) üzerinden verin.";
+const hexJsxRestrictions = [
+  {
+    selector: "JSXAttribute > Literal[value=/^#[0-9a-fA-F]{3,8}$/]",
+    message: HEX_MSG
+  },
+  {
+    selector: "Property > Literal[value=/^#[0-9a-fA-F]{3,8}$/]",
+    message: HEX_MSG
+  }
+];
 
 module.exports = [
   ...compat.extends("next/core-web-vitals", "next/typescript", "plugin:jsx-a11y/recommended"),
@@ -46,13 +98,13 @@ module.exports = [
       "no-console": ["error", { "allow": ["warn", "error"] }],
       "no-empty": ["error", { "allowEmptyCatch": true }],
       "@typescript-eslint/no-empty-object-type": ["error", { "allowInterfaces": "with-single-extends" }],
-      "no-warning-comments": ["error", { 
+      "no-warning-comments": ["error", {
         "terms": [
           "eslint-disable-next-line @typescript-eslint/no-explicit-any",
           "eslint-disable @typescript-eslint/no-explicit-any",
           "eslint-disable-line @typescript-eslint/no-explicit-any"
         ],
-        "location": "anywhere" 
+        "location": "anywhere"
       }],
       "jsx-a11y/alt-text": ["error", {
         "img": ["Image"]
@@ -92,39 +144,21 @@ module.exports = [
     }
   },
   {
+    // GENEL tsx: paylaşılan JSX kısıtları "warn" (storefront dahil tüm yüzey).
     files: ["src/components/**/*.tsx", "src/views/**/*.tsx", "src/app/**/*.tsx"],
     rules: {
-      "no-restricted-syntax": [
-        "warn",
-        {
-          "selector": "TSAsExpression > TSAsExpression",
-          "message": "Enterprise Kuralı: 'as unknown as Type' kullanılamaz. Güvenli dönüştürücüler (Type Converters) kullanın."
-        },
-        {
-          "selector": "JSXAttribute[name.name='href'] > Literal[value^='/category']",
-          "message": "Enterprise Kuralı: '/category' linklerini elle yazamazsınız. 'Routes.category()' yapısını kullanın."
-        },
-        {
-          "selector": "JSXAttribute[name.name='href'] > Literal[value^='/products']",
-          "message": "Enterprise Kuralı: '/products' linklerini elle yazamazsınız. 'Routes.product()' yapısını kullanın."
-        },
-        {
-          "selector": "JSXAttribute[name.name='href'] > JSXExpressionContainer > TemplateLiteral > TemplateElement[value.raw^='/category']",
-          "message": "Enterprise Kuralı: Template strings (`/category/...`) kullanılamaz. 'Routes' kütüphanesini kullanın."
-        },
-        {
-          "selector": "JSXAttribute[name.name='href'] > JSXExpressionContainer > TemplateLiteral > TemplateElement[value.raw^='/products']",
-          "message": "Enterprise Kuralı: Template strings (`/products/...`) kullanılamaz. 'Routes' kütüphanesini kullanın."
-        },
-        {
-          "selector": "JSXAttribute[name.name='alt'] > Literal[value!=\"\"]",
-          "message": "Enterprise Kuralı: 'alt' resim açıklamalarını hardcoded (sabit metin) olarak yazamazsınız. Lütfen i18n çeviri anahtarı kullanın."
-        },
-        {
-          "selector": "JSXAttribute[name.name='alt'] > JSXExpressionContainer > Literal[value!=\"\"]",
-          "message": "Enterprise Kuralı: 'alt' resim açıklamalarını hardcoded (sabit metin) olarak yazamazsınız. Lütfen i18n çeviri anahtarı kullanın."
-        }
-      ]
+      "no-restricted-syntax": ["warn", ...sharedJsxRestrictions]
+    }
+  },
+  {
+    // ADMIN yüzeyi = daha yüksek çıta: paylaşılan kısıtlar ERROR + ham HEX yasağı.
+    // "ignores" = chart dosyaları (Recharts renkleri) Faz 2 token-göçüne kadar
+    // karantinalı; o dosyalar yukarıdaki "warn" bloğuna düşer (HEX hatası basmaz).
+    // Bu blok genel tsx bloğundan SONRA → admin (chart-dışı) dosyalarda kazanır.
+    files: ["src/components/admin/**/*.tsx", "src/views/admin/**/*.tsx", "src/app/admin/**/*.tsx"],
+    ignores: ["src/components/admin/dashboard/**", "src/views/admin/AdminInventoryReportPage.tsx"],
+    rules: {
+      "no-restricted-syntax": ["error", ...sharedJsxRestrictions, ...hexJsxRestrictions]
     }
   },
   {

@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminAuditLogPage.tsx
-skeleton_hash: 1a2e899b84ab1132
+skeleton_hash: e74a330a9f326f55
 entity_hashes:
-  func:AdminAuditLogPage: 50d17db2bc55805a
-  overview: e5218eb356c499d1
-  style_tokens: d2a1c3bee3a34f52
-generated_at: 2026-06-08T10:11:00Z
+  func:AdminAuditLogPage: 8228aa5d40a8a979
+  overview: 83860b5a121fa408
+  style_tokens: a7fe3ab3ca0c1259
+generated_at: 2026-06-13T18:03:10Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasının yönetici panelinde yer alan denetim günlüğü sayfasını sunan React bileşenidir. Sistem üzerinde gerçekleştirilen kullanıcı ve sistem aktivitelerinin kayıtlarını yetkili yöneticilere görüntüleme arayüzü sağlar. Projenin admin rotaları altında konumlandırılmış olup, yalnızca admin şablonu içinde render edilmek üzere tasarlanmıştır.
+VentHub HVAC uygulamasının yönetici panelinde yer alan denetim günlüğü sayfasını sunan React bileşenidir. Sistem üzerinde gerçekleştirilen kullanıcı ve sistem aktivitelerinin kayıtlarını yetkili yöneticilere görüntüleme arayüzü sağlar.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
@@ -24,59 +24,30 @@ Modülün tek sorumluluğu olan yönetici denetim günlüğü sayfasının kulla
 ## AXIOMS – Mimari Varsayımlar
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Not:** Verilen bilgiler (fonksiyon imzası, sabitler ve eski dokü
+**Not:** Verilen fonksiyon gövdesi bulunmamaktadır; yalnızca fonksiyon imzası (`AdminAuditLogPage() -> React.FC`) mevcuttur. Mimari varsayımların üretilmesi için fonksiyon gövdesindeki kod yapısına, bağımlılıklara, koşullara veya hata yönetimine ilişkin bilgilere ihtiyaç vardır. Mevcut bilgilerle üretilen aksiyomlar spekülatif olur ve bu durum aksiyomların güvenilirliğini zedeleyeceğinden, modül için aksiyom tanımlanmamıştır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AdminAuditLogPage
-**Ne yapar**: VentHub HVAC projesinin admin paneline ait sistem denetim günlükleri (audit log) sayfasını oluşturan React bileşenidir. Yalnızca yetkili yönetici kullanıcıların erişebildiği bu sayfa, platform üzerinde gerçekleştirilen tüm kullanıcı ve sistem aktivitelerinin kaydedildiği günlükleri görüntülemek amacıyla tasarlanmıştır. Projenin admin rotaları altında çağrılarak yönetici kullanıcıların karşısına denetim kayıtları arayüzünü çıkarır.
-**Nasıl yapar**: TypeScript ile yazılmış bir React fonksiyonel bileşeni olarak tanımlanmış, projenin src/views/admin dizini altında yer alan AdminAuditLogPage.tsx dosyasında barınmaktadır. React rota yönetim sistemi tarafından tetiklendiğinde ana admin şablonu içine yerleştirilerek ekrana render edilir, kendi iç yapısında gerekli veri yönetimi ve arayüz düzenleme işlemlerini yürüterek denetim kayıtlarını kullanıcıya sunar.
-**Parametreler**: Herhangi bir giriş parametresi almaz, standart React sayfa bileşeni olarak rota sistemi tarafından çağrılır, tüm ihtiyaç duyduğu verileri ve bağlamları içindeki araçlar ve servisler aracılığıyla kendi bünyesinde karşılar.
-**Dönüş**: React.FC türünde bir değer döndürür. Bu dönen değer, React tarafından işlenerek DOM'a eklenmek üzere hazırlanmış, denetim günlükleri sayfasının kullanıcı arayüzünü oluşturan React fonksiyonel bileşen instance'ıdır.
+**Ne yapar**: Bu fonksiyon, uygulamanın admin denetim kayıtları sayfasını.render eder. Denetim kayıtlarını (admin_audit_log) DataTableKit kullanarak server-mode'da gösteren bir sayfa oluşturur.
 
----
+**Nasıl yapar**: Sayfa, bir başlık ve Suspense bileşeni içerir. Veri, URL parametreleri ve filtre durumu AuditLogTableBody bileşeni tarafından useAdminTable özel kancasıyla yönetilir. useSearchParams kancası Suspense ile sarılmıştır, bu da CLAUDE.md kuralı 5 / K2'ye uygun şekilde yükleme durumlarının doğru işlenmesini sağlar.
 
-## INTERFACES
+**Parametreler**: Bu fonksiyon parametre almaz.
 
-### AuditRow
-- `id: string`
-- `at: string`
-- `actor: string | null`
-- `table_name: string`
-- `row_pk: string | null`
-- `action: string`
-- `comment: string | null`
-- `before: unknown`
-- `after: unknown`
+**Dönüş**: React.FC tipinde bir React fonksiyonel bileşeni döndürür. Bu bileşen, denetim kayıtları sayfasının tamamını temsil eder ve Suspense ile sarılmış bir yapıda veri yüklemeyi yönetir.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src\views\admin\AdminAuditLogPage.tsx::AdminAuditLogPage
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu, UI metinlerini uluslararasılaştırma için kullanılır
-  - `lang` — `useI18n()` hook'undan gelen dil kodu, `formatDateTime` fonksiyonuna tarih formatı için传递 edilir
-  - `dragScrollRef` — `useDragScroll<HTMLDivElement>()` hook'undan dönen ref, yatay kaydırılabilir tablo konteynerine bağlanır
-  - `router` — `useRouter()` hook'undan gelen Next.js yönlendirme nesnesi, URL manipülasyonu ve navigasyon için kullanılır
-  - `rows` — `AuditRow[]` tipinde state, Supabase'den çekilen denetim kayıtlarını tutar
-  - `loading` — `boolean` tipinde state, veri yükleme durumunu gösterir (skeleton gösterilip gösterilmeyeceğini belirler)
-  - `error` — `string | null` tipinde state, hata mesajını tutar, varsa ekranda rose renkli bant olarak gösterilir
-  - `total` — `number` tipinde state, filtrelenmiş toplam kayıt sayısını tutar, sayfalama hesaplamalarında kullanılır
-  - `page` — `number` tipinde state, aktif sayfa numarasını tutar, varsayılan 1
-  - `q` — `string` tipinde state, arama kutusunun ham değerini tutar (debounce öncesi)
-  - `debouncedQ` — `string` tipinde state, 300ms debounce sonucu oluşmuş arama terimini tutar, API sorgusunda kullanılır
-  - `fromDate` — `string` tipinde state, başlangıç tarih filtresi (YYYY-MM-DD formatında input'tan gelir)
-  - `toDate` — `string` tipinde state, bitiş tarih filtresi (YYYY-MM-DD formatında input'tan gelir)
-  - `action` — `string` tipinde state, seçilen aksiyon filtresi (INSERT/UPDATE/DELETE/CUSTOM)
-  - `batch` — `string` tipinde state, batch ID filtresi, URL search params'dan okunur
-  - `pathname` — `usePathname()` hook'undan gelen mevcut URL yolu, `fetchLogs` yeniden çağrıldığında tetikleyici olarak kullanılır
-  - `searchParams` — `useSearchParams()` hook'undan gelen URL parametreleri, `batch` parametreini okumak için kullanılır
-  - `expandedId` — `string | null` tipinde state, detayı genişletilmiş satırın ID'sini tutar
-- **Dönüş**: JSX — AdminAuditLogPage bileşeninin render ettiği JSX yapısı (header, filtre bannerı, toolbar, tablo, pagination, hata bantı)
+- **params**: (yok)
+- **ic_degiskenler**: 
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, JSX içinde admin sayfası başlık ve alt başlık metinlerini çevirmek için kullanılır (admin.titles.audit ve admin.audit.subtitle anahtarları ile)
+- **Dönüş**: JSX elementi — Admin denetim günlükleri sayfasını render eden React bileşeni, Suspense ile sarılmış AuditLogTableBody içeren bir div döndürür
 
 ---
 
@@ -98,10 +69,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 Yok — tüm stiller token'a geçirilmiş. ✅
 
 ### Kullanılan Token'lar (zaten token'a geçirilmiş)
-- `rounded-hvac-xl`, `tracking-hvac-normal`
+- (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500/5`, `bg-black/40`, `bg-cyan-400/3`, `bg-cyan-500/10`, `bg-emerald-500/10`, `bg-rose-500/10`, `bg-rose-500/5`, `bg-slate-500/10`, `bg-surface-deep/40`, `bg-surface-deep/60`, `bg-transparent`, `bg-white/2`, `border-amber-500/20`, `border-cyan-500/20`, `border-emerald-500/20`
-- **Layout:** `!h-10`, `!h-8`, `!p-0`, `!w-10`, `flex`, `gap-2`, `gap-3`, `gap-4`, `h-10`, `items-center`, `justify-between`, `justify-center`, `max-w-xs`, `overflow-hidden`, `overflow-x-auto`
-- **Varyant/Responsive:** `:`, `disabled:`, `focus-visible:`, `focus-within:`, `group-focus-within:`, `hover:` önekleri
-- **Yardımcı Sınıflar:** `!bg-white/5`, `!border-white/10`, `!px-3`, `!rounded-xl`, `$`, `${adminButtonSecondaryClass`, `${adminTableActionClass`, `${adminTableCellClass`, `${expandedId`, `:`, `===`, `DELETE`, `INSERT`, `UPDATE`, `animate-in`
+- **Renkler:** (yok)
+- **Layout:** (yok)
+- **Varyant/Responsive:** (yok)
+- **Yardımcı Sınıflar:** `pb-20`, `space-y-4`

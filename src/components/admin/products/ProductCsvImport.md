@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\products\ProductCsvImport.tsx
-skeleton_hash: 1330c8b076710dd1
+skeleton_hash: 2e8e1e1cb29892cd
 entity_hashes:
-  func:ProductCsvImport: 1375065d67decd2a
+  func:ProductCsvImport: b9e64cb88774e0d3
   overview: 19951cbd59cf400f
   style_tokens: d505eb2f0859ff7f
-generated_at: 2026-06-08T10:08:37Z
+generated_at: 2026-06-13T21:06:01Z
 ---
 
 ## Genel Bakış
@@ -55,12 +55,13 @@ Bu modül için aksiyomlar, verilen fonksiyon imzası ve eski dokümanın Genel 
 ## FONKSİYON DETAYLARI
 
 ### ProductCsvImport
-**Ne yapar**: Product CSV dosyasının içeri aktarımını yöneten bir React bileşenidir.  
-**Nasıl yapar**: `categories` prop'undan gelen kategori listesini kullanarak kullanıcıya gerekli eşleştirme seçeneklerini sunar ve işlem tamamlandığında `onSuccess` callback'ini tetikler.  
+**Ne yapar**: Bu React bileşeni, CSV dosyası kullanarak toplu ürün içe aktarma işlevini sağlar. Kullanıcının bir CSV dosyası seçmesini, ilk 10 satırı önizlemesini, olası hataları kontrol etmesini (dry run) ve nihayetinde veritabanına aktarmasını yöneten bir modal arayüzü sunar.
+**Nasıl yapar**: `useState` hook'ları ile `importPreview` (önizleme verisi), `importRows` (tüm satırlar) ve `isProcessing` (işlem durumu) durumlarını yönetir. `useI18n` hook'u ile çoklu dil desteği sağlar. Ana işlevsellik, `handleFileChange` (dosya okuma ve CSV ayrıştırma), `handleDryRun` (eksik sütun kontrolü) ve `handleImport` (veritabanına upsert) adlı üç iç fonksiyon tarafından gerçekleştirilir. `handleImport`, verileri 100 satırlık gruplara (chunk) bölerek `supabase.from('products').upsert` ile toplu olarak işler.
 **Parametreler**:
-- categories: any — Ürünlerin eşleştirilebileceği kategori listesi.  
-- onSuccess: () => void — CSV içeri aktarma başarılı olduğunda çağrılan geri çağırım fonksiyonu.  
-**Dönüş**: void (bir değer döndürmez, sadece UI render eder).
+- categories: `Category[]` — Mevcut ürün kategorilerinin listesi. `handleImport` içinde `category_slug` veya `category` alanından `category_id`'ye eşleştirmek için kullanılır.
+- onSuccess: `() => void` — Başarılı bir içe aktarma işlemi sonrasında çağrılacak geri çağıurma fonksiyonu. Bu, genellikle üst bileşenin veri listesini yenilemesi tetiklemek için kullanılır.
+
+**Dönüş**: JSX elementi döndürür (`<>...</>`). Bileşen, gizli bir dosya input'u, tetikleyici bir buton ve duruma bağlı olarak modal içeren bir önizleme arayüzü render eder.
 
 ---
 
@@ -78,60 +79,56 @@ Bu modül için aksiyomlar, verilen fonksiyon imzası ve eski dokümanın Genel 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/products/ProductCsvImport.tsx::ProductCsvImport
-- **params**: `{ categories, onSuccess }` — categories: mevcut kategoriler dizisi (prop), onSuccess: başarı callback'i (prop)
+### [N1_NASIL] AST Pointer: ProductCsvImport.tsx::ProductCsvImport
+- **params**: `{ categories, onSuccess }` — categories: kategori listesi (prop), onSuccess: içe aktarma başarılı olduğunda çağrılan callback (prop)
 - **ic_degiskenler**:
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
-  - `importPreview` / `setImportPreview` — React state: CSV önizleme verisi `{ header: string[], rows: Record<string,string>[], total: number }` veya null
-  - `importRows` / `setImportRows` — React state: CSV'den ayrıştırılmış tüm satırlar `Record<string,string>[]` veya null
-  - `isProcessing` / `setIsProcessing` — React state: içe aktarma işlemi devam ediyor mu flag'i
-- **Dönüş**: JSX element (React fragment — CSV dosya seçici butonu ve modal önizleme arayüzü)
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, UI metinlerini çevirir
+  - `importPreview` / `setImportPreview` — useState: CSV'nin ilk 10 satırının header+rows+total bilgisini tutan önizleme nesnesi, null ise modal gizli
+  - `importRows` / `setImportRows` — useState: CSV'den parse edilmiş tüm satırların Record<string,string> dizisi, içe aktarmada kullanılır
+  - `isProcessing` / `setIsProcessing` — useState: içe aktarma sırasında true olan yüklenme bayrağı, butonları devre dışı bırakır
+- **Dönüş**: JSX (React elementi) — dosya input butonu ve importPreview varsa modal önizleme UI'ı
 
-### [N2_NASIL] AST Pointer: src/components/admin/products/ProductCsvImport.tsx::handleFileChange
-- **params**: `e: React.ChangeEvent<HTMLInputElement>` — dosya input change olayı
+### [N2_NASIL] AST Pointer: ProductCsvImport.tsx::handleFileChange
+- **params**: `e: React.ChangeEvent<HTMLInputElement>` — dosya input change eventi
 - **ic_degiskenler**:
-  - `f` — seçilen dosya nesnesi, `e.target.files?.[0]` referansı, undefined ise fonksiyon erken döner
-  - `text` — dosyanın tam metin içeriği, `f.text()` asenkron okumasıyla elde edilir
-  - `lines` — BOM karakteri (`\ufeff`) kaldırıldıktan ve satır sonlarına göre split edildikten sonra boş satırları filtrelenmiş satır dizisi
-  - `split` — yerel CSV ayrıştırma fonksiyonu: virgülle split eder, tırnak işaretlerini ve çift tırnak kaçışlarını işler
-  - `header` — ilk satırdan elde edilen sütun başlıkları, küçük harfe dönüştürülmüş ve trim edilmiş `string[]`
-  - `rows` — her satırı `{ sütunAdı: hücreDeğeri }` objesine dönüştüren `Record<string,string>[]` dizisi; eksik hücreler boş string ile doldurulur
-- **Dönüş**: void (yan etkiler: `setImportRows(rows)`, `setImportPreview({...})`, `e.target.value = ''` ile input reset)
+  - `f` — e.target.files?.[0] — seçilen ilk dosya nesnesi, yoksa fonksiyon erken döner
+  - `text` — f.text() ile okunan dosya içeriğinin tamamı (string)
+  - `lines` — BOM temizliği yapılmış, boş satırları filtrelenmiş CSV satırları dizisi
+  - `split` — iç fonksiyon: virgülle ayırırken tırnak içi virgülleri koruyan CSV parser, her hücreden tırnak işaretlerini temizler
+  - `header` — ilk satırdan parse edilmiş, lowercase ve trim edilmiş sütun başlıkları dizisi
+  - `rows` — kalan satırları header sütunlarıyla eşleştirerek Record<string,string> dizisine dönüştüren parsed satırlar
+- **Dönüş**: yok (yan etki: setImportRows, setImportPreview, e.target.value = '' çağırır)
 
-### [N3_NASIL] AST Pointer: src/components/admin/products/ProductCsvImport.tsx::split
-- **params**: `s: string` — split edilecek ham CSV satırı veya başlık satırı
-- **ic_degiskenler**: (yok — tek satırlık inline fonksiyon)
-- **Dönüş**: `string[]` — tırnak-aware virgül split sonucu, her hücredeki baş/son tırnak işaretleri kaldırılmış, çift tırnak (`""`) tek tırnak (`"`) olarak değiştirilmiş
-
-### [N4_NASIL] AST Pointer: src/components/admin/products/ProductCsvImport.tsx::handleDryRun
-- **params**: (yok)
+### [N3_NASIL] AST Pointer: ProductCsvImport.tsx::handleDryRun
+- **params**: yok
 - **ic_degiskenler**:
-  - `h` — importPreview?.header dizisi, yoksa boş dizi; mevcut sütun başlıklarını tutar
-  - `required` — zorunlu sütun adları dizisi `['name', 'sku']`
-  - `hasRequired` — boolean, tüm zorunlu sütunların header'da bulunup bulunmadığını belirtir
-  - `okCount` — importPreview.rows içinden hem 'name' hem 'sku' alanına sahip satır sayısı
-- **Dönüş**: void (yan etki: `alert()` ile kuru çalıştırma sonucu gösterir)
+  - `h` — importPreview?.header || [] — mevcut CSV sütun başlıkları dizisi
+  - `required` — ['name', 'sku'] — zorunlu sütun isimleri sabit dizisi
+  - `hasRequired` — required dizisindeki her elemanın h içinde olup olmadığını kontrol eden boolean
+  - `okCount` — importPreview.rows içinden hem 'name' hem 'sku' alanı dolu olan satırların sayısı
+- **Dönüş**: yok (yan etki: alert ile kuru çalıştırma sonucunu gösterir)
 
-### [N5_NASIL] AST Pointer: src/components/admin/products/ProductCsvImport.tsx::handleImport
-- **params**: (yok)
+### [N4_NASIL] AST Pointer: ProductCsvImport.tsx::handleImport
+- **params**: yok
 - **ic_degiskenler**:
-  - `h` — importPreview.header, CSV sütun başlıkları dizisi
-  - `mapCategorySlugToId` — yerel fonksiyon: kategori slug'ını kategori ID'sine eşler
-  - `payloads` — `Database['public']['Tables']['products']['Insert'][]` tipinde, veritabanına yazılacak ürün objeleri dizisi
-  - `r` — for döngüsündeki her bir CSV satırı `Record<string,string>`
-  - `p` — her satır için inşa edilen `products.Insert` tipinde ürün objesi; `sku`, `name`, `slug`, `brand`, opsiyonel olarak `model_code`, `status`, `price`, `stock_qty`, `low_stock_threshold`, `category_id` alanlarını içerir
-  - `chunk` — payloads dizisinin 100'er elemanlık alt dizisi (toplu upsert için)
-  - `ok` — başarılı upsert sayısı sayacı, başlangıç 0
-  - `fail` — başarısız upsert sayısı sayacı, başlangıç 0
-  - `i` — chunk döngüsü indeksi, 100'er adım ilerler
-- **Dönüş**: void (yan etkiler: `supabase.from('products').upsert(chunk, { onConflict: 'sku' })` ile veritabanına yazar, `alert()` ile sonuç gösterir, `setImportPreview(null)`, `setImportRows(null)`, `onSuccess()`, `setIsProcessing(false)` çağırır)
+  - `h` — importPreview.header — CSV sütun başlıkları dizisi, SKU ve name zorunluluğunu kontrol eder
+  - `mapCategorySlugToId` — iç fonksiyon: kategori slug'ını categories prop'u içinden bularak category_id döner
+  - `payloads` — Database['public']['Tables']['products']['Insert'][] tipinde ürün ekleme nesneleri dizisi, toplu upsert için biriktirilir
+  - `r` — for döngüsü içindeki mevcut import satırı (Record<string,string>)
+  - `p` — her satır için oluşturulan tekil ürün insert nesnesi (sku, name, slug, brand, model_code, status, price, stock_qty, low_stock_threshold, category_id alanlarını doldurur)
+  - `ok` — başarılı upsert edilen ürün sayacı
+  - `fail` — hatalı upsert edilen ürün sayacı
+  - `i` — chunk döngüsü indeksi (100'erli gruplar)
+  - `chunk` — payloads.slice(i, i+100) ile elde edilen 100'lük upsert grubu
+  - `error` — supabase.from('products').upsert() sonucundaki hata nesnesi (destructured)
+- **Dönüş**: yok (yan etki: chunked upsert ile veritabanına yazar, alert gösterir, setImportPreview/setImportRows ile state temizler, onSuccess() callback'ini çağırır)
 
-### [N6_NASIL] AST Pointer: src/components/admin/products/ProductCsvImport.tsx::mapCategorySlugToId
-- **params**: `slug: string` — eşleştirilecek kategori slug'ı (ör: "klima", "ısı pompası")
+### [N5_NASIL] AST Pointer: ProductCsvImport.tsx::mapCategorySlugToId
+- **params**: `slug: string` — eşleştirilecek kategori slug'ı
 - **ic_degiskenler**:
-  - `s` — normalize edilmiş slug: null-safe, küçük harfe çevrilmiş ve trim edilmiş hali
-  - `found` — `categories` prop'u üzerinde `.find()` ile `c.name.toLowerCase() === s` eşleşmesiyle bulunan kategori objesi veya undefined
-- **Dönüş**: `string | null` — eşleşen kategorinin `id` değeri veya bulunamazsa `null`
+  - `s` — slug değerinin lowercase + trim edilmiş hali, karşılaştırma için normalize edilir
+  - `found` — categories prop'u içinde name.toLowerCase() === s eşleşmesiyle bulunan kategori nesnesi, eşleşme yoksa undefined
+- **Dönüş**: `found?.id || null` — bulunan kategorinin ID'si veya eşleşme yoksa null
 
 ---
 

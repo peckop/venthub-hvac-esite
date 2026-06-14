@@ -3,24 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts
-skeleton_hash: 5168b10c925e01aa
+skeleton_hash: 92f29717e0b69730
 entity_hashes:
-  overview: 9303b0df67433683
-generated_at: 2026-06-08T10:09:33Z
+  overview: ae56d958419ef214
+generated_at: 2026-06-13T11:19:33Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinin uluslararasılaştırma sistemindeki İngilizce dil sözlüğünü tanımlayan statik bir veri dosyasıdır. `en` adlı nesne, uygulamanın arayüzünde kullanılacak tüm İngilizce metinleri (buton etiketleri, hata mesajları, menü başlıkları vb.) merkezi olarak organize eder. Modül, yalnızca i18n çekirdek modülü tarafından içe aktarılan ve çeviri kaynağı olarak kullanılan saf bir sabitler kümesidir; herhangi bir işlevsel mantık, API çağrısı veya ortam değişkeni kullanımını içermez.
+
+Bu modül, VentHub HVAC projesinin uluslararasılaştırma (i18n) altyapısında kullanılan İngilizce dil sözlüğünü tanımlayan statik bir veri dosyasıdır. Uygulamanın tüm arayüz metinlerini — buton etiketleri, hata mesajları, menü başları ve benzeri kullanıcıya görünen tüm metinleri — tek bir `en` nesnesi altında merkezi olarak tanımlar. Modül herhangi bir işlevsel mantık, API çağrısı veya ortam değişkeni kullanmaz; yalnızca `i18n` çekirdek modülü tarafından içe aktarılan ve çeviri kaynağı olarak tüketilen saf bir sabitler kümesidir.
+
+---
 
 ## Fonksiyon Grupları
-Bu dosyada herhangi bir fonksiyon veya metod bulunmamaktadır. Modül, yalnızca dışa aktarılan (`en`) statik bir sözlük nesnesi içerir. Dolayısıyla, fonksiyon gruplaması yapılamaz.
+
+Bu dosyada herhangi bir fonksiyon veya metod bulunmamaktadır. Modül, yalnızca dışa aktarılan statik bir sözlük nesnesi içeren bir veri dosyasıdır; dolayısıyla fonksiyon gruplaması yapılamaz.
+
+---
+
+> **Not:** Dosya içeriği bir import bildirimi ve bir nesne tanımından ibarettir — çalıştırılabilir bir kod bloğu veya fonksiyon imzası yer almamaktadır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+
 Bu modül için özel aksiyom tanımlanmamıştır.
 
-**Açıklama:** Bu modül yalnızca statik bir `en` nesnesi (key-value sözlüğü) içeren bir veri dosyasıdır. Fonksiyon imzası, sabit tanımı veya çalıştırılabilir kod bloğu bulunmadığı için, fonksiyon gövdesinden çıkarılabilecek bir mimari varsayım üretmek mümkün değildir.
+**Neden:** Modül yalnızca statik bir çeviri sözlüğü (`en` nesnesi) içermekte olup herhangi bir fonksiyon, iş mantığı veya koşullu akış içermediğinden, fonksiyon gövdesinden türetilebilecek mimari varsayım bulunmamaktadır.
 
 ---
 
@@ -38,9 +47,34 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-Bu dosyada fonksiyon bulunmamaktadır.
+### Dosya Yapısı: `src/i18n/dictionaries/en.ts`
 
-> **Not:** `C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts` dosyası yalnızca bir import statement (`import { tr } from './tr'`) ve bir sabit nesne tanımı (`en object`) içermektedir. Fonksiyon imzası veya gövdesi yer almamaktadır; dolayısıyla AST Pointer üretilemez.
+**NOT**: Bu dosyada **fonksiyon tanımları bulunmamaktadır**. Dosya, import edilen nesneleri birleştiren bir TypeScript sözlük (dictionary/constant) dosyasıdır.
+
+---
+
+#### Import Edilen Bağımlılıklar
+
+| Import | Kaynak | Kullanım |
+|--------|--------|----------|
+| `admin` | `./admin/en` | İngilizce admin çeviri nesnesi |
+| `tr` | `./tr` | Türkçe çeviri nesnesi (fallback/referans) |
+
+---
+
+#### Sabit Tanımları
+
+| Sabit | Tip | Açıklama |
+|-------|-----|----------|
+| `en` | `object` | Ana İngilizce çeviri sözlüğü — tüm UI metinlerini içerir |
+
+---
+
+#### Fonksiyon Gövdeleri
+
+**Bu dosyada fonksiyon gövedesi bulunmamaktadır.**
+
+AST Pointer üretimi için en az bir fonksiyon tanımı gereklidir. Dosya salt veri tanımı (nesne/const) içerdiği için `ic_degiskenler`, `params` ve `Dönüş` analizi uygulanamaz.
 
 ---
 
