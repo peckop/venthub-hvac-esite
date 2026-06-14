@@ -393,6 +393,7 @@ export const tr = {
       }
     },
     cinematicShowcase: {
+      hudStatus: 'System.Data.Live',
       eyebrow: 'MÜHENDİSLİK ODAK NOKTASI',
       title: 'Vortice Lineo Quiet Serisi',
       subtitle: 'Aero-akustik gövde tasarımı ile sessizliğin yeni dijital standardı.',
@@ -435,6 +436,10 @@ export const tr = {
       }
     },
     guidedDiscovery: {
+      eyebrowLabel: 'DETERMİNİSTİK SİSTEMLER',
+      heading: 'Hava Akışının Mühendislik Estetiği',
+      intro: 'VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin.',
+      cardFallback: 'Profesyonel Havalandırma Çözümleri',
       eyebrow: 'DETERMİNİSTİK SİSTEMLER',
       title: 'Hava Akışının Mühendislik Estetiği',
       subtitle: 'VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin. Proje tipinize göre en verimli giriş noktasını seçin.',
@@ -503,6 +508,10 @@ export const tr = {
       }
     },
     featuredCommercial: {
+      gradeLabel: 'Sınıf',
+      gradeValue: 'A++',
+      standardLabel: 'Standart',
+      standardValue: 'ERP',
       eyebrow: 'Ürün Showroom',
       title: 'Endüstriyel Ürün Portföyü',
       subtitle: 'Sektörün en güvenilir ve verimli ürünlerini, teknik detayları ve uygulama avantajlarıyla birlikte keşfedin.',
@@ -565,6 +574,10 @@ export const tr = {
       subtitle: 'Marka alanını pasif logo vitrini olmaktan çıkarıp kalite, güven ve ürün yaklaşımının taşıyıcısı haline getiriyoruz.'
     },
     knowledge: {
+      headingPrefix: 'Mühendislik',
+      headingAccent: 'Katmanı',
+      statsPipelineLabel: 'Proje Hattı',
+      statsOptimization: '%92 Optimizasyon',
       eyebrow: 'Bilgi ve Destek Katmanı',
       title: 'Mühendislik Estetiği',
       subtitle: 'Rehberler, hesaplayıcılar ve destek merkezi sayesinde kullanıcı yalnızca ürüne değil, doğru karar ortamına da sonuçları saniyeler içinde ulaşır.',
@@ -864,6 +877,35 @@ export const tr = {
     }
   },
   contactPage: {
+    form: {
+      heroBadge: 'Küresel Bağlantı',
+      heroTitle: 'Projenizi',
+      heroTitleAccent: 'Birlikte Şekillendirelim',
+      heroDesc: 'Teknik dökümantasyon, ürün seçimi veya özel teklifler için uzman mühendislik kadromuzla doğrudan iletişime geçin.',
+      cardPhoneTitle: 'Mühendislik Hattı',
+      cardPhoneLabel: 'Şimdi Ara',
+      cardEmailTitle: 'Teknik Teklif',
+      cardEmailLabel: 'E-posta Gönder',
+      cardOfficeTitle: 'Merkez Ofis',
+      cardOfficeValue: 'Teknopark İstanbul, Pendik',
+      cardOfficeLabel: 'Yol Tarifi Al',
+      directAccessLabel: 'Doğrudan Erişim',
+      supportTitle: 'Teknik Destek',
+      supportTitleAccent: 'Her An Yanınızda',
+      supportDesc: 'Karmaşık HVAC projeleriniz için hızlı çözümler üretiyoruz. WhatsApp hattımız üzerinden teknik döküman isteyebilir veya anlık destek alabilirsiniz.',
+      whatsappCta: 'WhatsApp Mühendislik Hattı',
+      responseTime: 'Ortalama Yanıt Süresi: 15 Dakika',
+      successTitle: 'Mesajınız İletildi',
+      successDesc: 'Mühendislik ekibimiz en kısa sürede size dönüş yapacaktır.',
+      newMessage: 'Yeni Mesaj Gönder',
+      labelName: 'Ad Soyad',
+      labelEmail: 'E-posta',
+      labelSubject: 'Konu / Proje Adı',
+      labelMessage: 'Mesajınız',
+      subjectPlaceholder: 'Örn: Otopark Jet Fan Projesi',
+      messagePlaceholder: 'İhtiyaçlarınızı buraya yazın...',
+      submitButton: 'Talebi Gönder',
+    },
     title: 'İletişim',
     subtitle: 'Size her konuda yardımcı olmaktan mutluluk duyarız.',
     formTitle: 'Bize Mesaj Gönderin',

@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ContactPage.tsx
-skeleton_hash: a75cc095aa8a4a35
+skeleton_hash: 0763ea0be4a69f11
 entity_hashes:
   func:ArrowRight: 1546741fbe749202
   func:ContactPage: a5b3030a0864a814
   func:handleSubmit: 460293fdfa9263b6
   overview: 060d74556606246c
   style_tokens: 21b7b2d66d6de05a
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-14T21:14:42Z
 ---
 
 ## Genel Bakış
@@ -74,6 +74,23 @@ Bu modül için sınırlı sayıda aksiyom tanımlanabilir; çünkü fonksiyon g
 - size: number — Ok ikonunun genişlik ve yükseklik değerini belirler; varsayılan değer 16’dır.  
 
 **Dönüş**: Belirtilmemiş; genellikle bir React bileşeni (JSX) döndürür, ancak döndürdüğü tip açıkça tanımlanmamıştır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../components/HVACIcons::WhatsAppIcon
+- import: ../components/Seo::Seo
+- import: ../hooks/useScrollAnimation::scrollAnimationClasses
+- import: ../hooks/useScrollAnimation::useScrollAnimation
+- import: ../i18n/I18nProvider::useI18n
+- import: ../utils/whatsapp::getSupportLink
+- import: lucide-react::CheckCircle
+- import: lucide-react::Clock
+- import: lucide-react::Mail
+- import: lucide-react::MapPin
+- import: lucide-react::Phone
+- import: react::React
+- import: react::useState
 
 ---
 

@@ -4,6 +4,7 @@ import React from 'react'
 
 import { normalizeImageUrl } from '@/utils/imageUtils'
 
+import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes'
 
 export interface CategoryViewModelLite {
@@ -21,6 +22,7 @@ interface GuidedCategoryDiscoveryProps {
 const FALLBACK_CATEGORY_IMAGE = '/images/vortice_lineo_futuristic.webp'
 
 const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displayCategories = [] }) => {
+  const { t } = useI18n()
   return (
     <section id="categories" className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-8">
@@ -30,20 +32,20 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
               data-observe="fade-up"
               className="opacity-0 -translate-x-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-x-0 transition-opacity-transform duration-700 ease-out text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-600 mb-4"
             >
-              DETERMİNİSTİK SİSTEMLER
+              {t('home.guidedDiscovery.eyebrowLabel')}
             </div>
             <h2 
               data-observe="fade-up"
               className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out delay-200 text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
             >
-              Hava Akışının Mühendislik Estetiği
+              {t('home.guidedDiscovery.heading')}
             </h2>
           </div>
           <p 
             data-observe="fade-up"
             className="opacity-0 data-[in-view=true]:opacity-100 transition-opacity duration-700 ease-out delay-300 max-w-md text-lg text-slate-500 font-light leading-relaxed"
           >
-            VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin.
+            {t('home.guidedDiscovery.intro')}
           </p>
         </div>
 
@@ -88,7 +90,7 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displ
                       
                       <div className="mt-6 max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-700 overflow-hidden">
                         <p className="text-xs text-slate-200 font-light leading-relaxed tracking-wider mb-6 max-w-200px line-clamp-2">
-                          {category.description || 'Profesyonel Havalandırma Çözümleri'}
+                          {category.description || t('home.guidedDiscovery.cardFallback')}
                         </p>
                       </div>
                     </div>

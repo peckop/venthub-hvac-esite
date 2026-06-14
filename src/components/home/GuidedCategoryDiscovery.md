@@ -3,39 +3,26 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\GuidedCategoryDiscovery.tsx
-skeleton_hash: ba5d7c49596af173
+skeleton_hash: 8963a76c7b2fd7c8
 entity_hashes:
   func:GuidedCategoryDiscovery: 3b7f2bdef4872624
-  overview: a1eb122d99c941ad
+  overview: cc60fb76dc1f398d
   style_tokens: ba1e7efd5f41a7fe
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T21:14:41Z
 ---
 
 ## Genel Bakış
-Bu modül, ana sayfada kullanıcılara yönlendirilmiş bir kategori keşfi deneyimi sunan bir React bileşenini tanımlar. Bileşen, dışarıdan gelen kategori listesini alarak görsel ve metin tabanlı bir arayüz oluşturur ve kullanıcıları farklı HVAC ürünleri hakkında bilgilendirir.
+Bu modül, ana sayfada kullanıcılara yönelik rehberli bir kategori keşfi deneyimi sunan tek bir React bileşeninden oluşur. Bileşen, dışarıdan beslenen bir kategori listesini (displayCategories) alır ve bu listeyi kullanarak ürünleri görsel ve metin tabanlı bir arayüzde sunarak kullanıcıları bilgilendirir.
 
 ## Fonksiyon Grupları
-### Bileşen Tanımları
-Ana sayfada kategori keşfi arayüzünü oluşturarak ve kullanıcıya farklı HVAC ürün kategorilerini görsel ve metin öğeleriyle sunarak yönlendirici bir deneyim sağlar.
+### Ana Bileşen
+Modülün tek ve merkezi birimini oluşturarak, verilen kategori verisini kullanıcıya sunulan interaktif ve yönlendirici bir arayüze dönüştürür.
 - GuidedCategoryDiscovery
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için yalnızca fonksiyon imzalarından türetilebilen temel mimari varsayımlar tanımlanmıştır. `normalizeImageUrl` yardımcısının imzası verilmediğinden, ona ilişkin aksiyom belirlenememiştir.
-
-**[Aksiyom 1]:** Eğer `displayCategories` bir array (`Array`) tipinde değilse, bileşen render sırasında hata verir veya beklenmedik davranış gösterir.
-*Gerekçe:* Fonksiyon imzası `displayCategories = []` olarak tanımlıdır; varsayılan değer bir array olduğundan, prop'un da array olması beklenir.
-
-**[Aksiyom 2]:** Eğer `displayCategories` boş array (`[]`) olarak kalırsa (prop hiç verilmezse veya boş geçilirse), bileşen "boş durum" (empty state) gösterimi sunmalıdır.
-*Gerekçe:* Varsayılan değerin `[]` olarak ayarlanması, boş listenin geçerli ve ele alınması gereken bir durum olduğunu ima eder.
-
-**[Aksiyom 3]:** Eğer `displayCategories` içindeki elemanlar `null` veya `undefined` değerler içerirse, bileşen bu elemanları render ederken hata alır.
-*Gerekçe:* Fonksiyon imzasında elemanların filtrelenmesine veya null-check'e ilişkin bir zorunluluk belirtilmemiştir; bu nedenle array'in geçerli objelerden oluştuğu varsayılır.
-
-**[Aksiyom 4]:** Eğer `displayCategories` herhangi bir prop olarak hiç geçirilmezse, bileşen `[]` (boş array) ile başlatılır ve kendi başına veri üretmez.
-*Gerekçe:* Fonksiyon imzasında `displayCategories`'in供（sourcing）için bir mechanism tanımlanmamıştır; bileşen tamamen dışarıdan gelen veriye bağımlıdır (sunulan veriyi sunar, kendi başına fetch/db çağrısı yapmaz).
+Bu modül için fonksiyon gövdesi verilmediğinden, aksiyom üretilememektedir. Dolayısıyla, bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -47,6 +34,16 @@ Bu modül için yalnızca fonksiyon imzalarından türetilebilen temel mimari va
 **Parametreler**:
 - displayCategories: [] — Gösterilecek kategori nesnelerinin dizisi; belirtilmezse boş dizidir.  
 **Dönüş**: React.FC<GuidedCategoryDiscoveryProps> — Render edilmesi gereken kullanıcı arayüzünü tanımlayan fonksiyonel bileşen.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/routes::Routes
+- import: @/utils/imageUtils::normalizeImageUrl
+- import: next/image::Image
+- import: next/link::Link
+- import: react::React
 
 ---
 
@@ -67,17 +64,17 @@ Bu modül için yalnızca fonksiyon imzalarından türetilebilen temel mimari va
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/home/GuidedCategoryDiscovery.tsx::GuidedCategoryDiscovery
-- **params**: (`displayCategories = []`)
+- **params**: ( { displayCategories = [] } )
 - **ic_degiskenler**:
-  (yok)
-- **Dönüş**: JSX (React element) - Kategori kartlarını gösteren bölüm HTML'i
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, sayfadaki metinleri lokalize etmek için kullanılır
+- **Dönüş**: React elementi (section yapısı)
 
-### [N2_NASIL] AST Pointer: src/components/home/GuidedCategoryDiscovery.tsx::(category, idx) => { ... }
-- **params**: (`category`, `idx`)
+### [N2_NASIL] AST Pointer: src/components/home/GuidedCategoryDiscovery.tsx::(anonymous map callback)
+- **params**: ( category, idx )
 - **ic_degiskenler**:
-  - `finalSrc` — normalizeImageUrl ile elde edilen kategori görseli URL'si, FALLBACK_CATEGORY_IMAGE ile yedekleniyor
-  - `delayClass` — idx modulo 4'e göre animasyon gecikme sınıfı (delay-0, delay-100, delay-200, delay-300)
-- **Dönüş**: JSX (kategori kartı için React elementi)
+  - `finalSrc` — normalizeImageUrl fonksiyonu ile hesaplanan, kategori görselinin nihai URL'i
+  - `delayClass` — idx mod 4'e göre belirlenen, animasyon gecikme sınıfı (delay-0, delay-100, delay-200, delay-300)
+- **Dönüş**: React elementi (div yapısı)
 
 ---
 

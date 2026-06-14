@@ -312,6 +312,7 @@ export const en: typeof tr = {
       }
     },
     cinematicShowcase: {
+      hudStatus: 'System.Data.Live',
       eyebrow: 'ENGINEERING FOCUS',
       title: 'Vortice Lineo Quiet Series',
       subtitle: 'The new digital standard of silence with an aero-acoustic housing design.',
@@ -354,6 +355,10 @@ export const en: typeof tr = {
       }
     },
     guidedDiscovery: {
+      eyebrowLabel: 'DETERMINISTIC SYSTEMS',
+      heading: 'The Engineering Aesthetics of Airflow',
+      intro: 'Discover industrial-grade ventilation solutions curated by VentHub.',
+      cardFallback: 'Professional Ventilation Solutions',
       eyebrow: 'Primary Discovery Layer',
       title: 'See the core category structure at a glance and choose the right entry point.',
       subtitle: 'This section does not repeat the 3D hero. It presents the main product families in a simpler way and moves users toward category, series and product detail with more control.',
@@ -422,6 +427,10 @@ export const en: typeof tr = {
       }
     },
     featuredCommercial: {
+      gradeLabel: 'Grade',
+      gradeValue: 'A++',
+      standardLabel: 'Standard',
+      standardValue: 'ERP',
       eyebrow: 'Product Showroom',
       title: 'Industrial Product Portfolio',
       subtitle: 'Discover the most reliable and efficient products in the sector, along with technical details and application advantages.',
@@ -484,6 +493,10 @@ export const en: typeof tr = {
       subtitle: 'We turn the brand area from passive logo wallpaper into a carrier of quality, trust and product positioning.'
     },
     knowledge: {
+      headingPrefix: 'Engineering',
+      headingAccent: 'Layer',
+      statsPipelineLabel: 'Project Pipeline',
+      statsOptimization: '92% Optimization',
       eyebrow: 'Knowledge and Support Layer',
       title: 'Make technical decision paths visible and reachable.',
       subtitle: 'Guides, calculators and support-center routes help users reach not only products, but a better decision environment.',
@@ -876,6 +889,35 @@ export const en: typeof tr = {
     }
   },
   contactPage: {
+    form: {
+      heroBadge: 'Global Connectivity',
+      heroTitle: 'Let\'s Shape Your',
+      heroTitleAccent: 'Project Together',
+      heroDesc: 'Get in touch directly with our expert engineering team for technical documentation, product selection, or custom quotes.',
+      cardPhoneTitle: 'Engineering Line',
+      cardPhoneLabel: 'Call Now',
+      cardEmailTitle: 'Technical Quote',
+      cardEmailLabel: 'Send Email',
+      cardOfficeTitle: 'Head Office',
+      cardOfficeValue: 'Teknopark İstanbul, Pendik',
+      cardOfficeLabel: 'Get Directions',
+      directAccessLabel: 'Direct Access',
+      supportTitle: 'Technical Support',
+      supportTitleAccent: 'By Your Side Anytime',
+      supportDesc: 'We deliver fast solutions for your complex HVAC projects. Request technical documentation or get instant support via our WhatsApp line.',
+      whatsappCta: 'WhatsApp Engineering Line',
+      responseTime: 'Average Response Time: 15 Minutes',
+      successTitle: 'Your Message Has Been Sent',
+      successDesc: 'Our engineering team will get back to you as soon as possible.',
+      newMessage: 'Send a New Message',
+      labelName: 'Full Name',
+      labelEmail: 'Email',
+      labelSubject: 'Subject / Project Name',
+      labelMessage: 'Your Message',
+      subjectPlaceholder: 'e.g. Car Park Jet Fan Project',
+      messagePlaceholder: 'Write your requirements here...',
+      submitButton: 'Submit Request',
+    },
     title: 'Contact',
     subtitle: 'Contact us for your project or product questions. We will get back to you as soon as possible.',
     addressLabel: 'Address',

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx
-skeleton_hash: adc9bd4df4fca87e
+skeleton_hash: 0d9d81df1c65b148
 entity_hashes:
   func:FeaturedCommercialBlocks: 1889811721e866db
   overview: cdfdca949aa78f1f
   style_tokens: ff89a6880a24812d
-generated_at: 2026-06-09T06:46:02Z
+generated_at: 2026-06-14T21:14:22Z
 ---
 
 ## Genel Bakış
@@ -45,6 +45,22 @@ Bu modül, girdi olarak verilen `initialProducts` değerinin bir dizi (Array) ya
 **Parametreler**:  
 - initialProducts: [] — Gösterilecek ürünlerin listesi; varsayılan değer boş dizidir.  
 **Dönüş**: React.FC<FeaturedCommercialBlocksProps> — Özellikleri alarak UI'ı oluşturan fonksiyonel bileşen.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../ProductCard::ProductCard
+- import: @/types/ui-models::type { Category, Product }
+- import: @/utils/imageUtils::normalizeImageUrl
+- import: @/utils/routes::Routes
+- import: framer-motion::AnimatePresence
+- import: framer-motion::motion
+- import: next/image::Image
+- import: next/link::Link
+- import: react::React
+- import: react::useMemo
+- import: react::useState
 
 ---
 

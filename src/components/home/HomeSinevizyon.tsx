@@ -274,7 +274,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2">
                               <div className="h-1 w-1 bg-cyan-400 rounded-full" />
-                              <div className="text-xs font-black uppercase tracking-hvac-normal text-cyan-400/80">System.Data.Live</div>
+                              <div className="text-xs font-black uppercase tracking-hvac-normal text-cyan-400/80">{t('home.cinematicShowcase.hudStatus')}</div>
                             </div>
                             <div className="text-base font-bold text-white tracking-tight leading-tight">{t(p.labelKey)}</div>
                             <div className="flex items-center gap-2 mt-1">
@@ -328,7 +328,7 @@ const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
           ))}
         </div>
         <div className="h-px w-12 bg-white/10" />
-        <div className="text-xs font-bold text-white/40 tracking-hvac-relaxed">0{currentSlide + 1} / 0{slidesData.length}</div>
+        <div className="text-xs font-bold text-white/40 tracking-hvac-relaxed">{String(currentSlide + 1).padStart(2, '0')} / {String(slidesData.length).padStart(2, '0')}</div>
       </div>
     </section>
   )

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\KnowledgeBlock.tsx
-skeleton_hash: 6f7ef05f64566f7e
+skeleton_hash: a8dd331c5690f78a
 entity_hashes:
   func:KnowledgeBlock: 6d00cfd06aa7a00e
   overview: 558d6d867468cadc
   style_tokens: 45bee56ab9c18ab4
-generated_at: 2026-05-28T22:35:52Z
+generated_at: 2026-06-14T21:14:41Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `onQuoteClick`: function — Kullanıcının teklif butonuna tıklaması durumunda tetiklenecek geri çağırım fonksiyonu.
 
 **Dönüş**: `React.FC<KnowledgeBlockProps>` — Bileşenin kendisi bir React fonksiyonel bileşenidir; bu tür, bileşenin `KnowledgeBlockProps` tipinde proplar almasını sağlar. Kullanıldığında bir `JSX.Element` döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../utils/routes::Routes
+- import: ./ClientLeadButton::ClientLeadButton
+- import: next/link::Link
+- import: react::React
 
 ---
 

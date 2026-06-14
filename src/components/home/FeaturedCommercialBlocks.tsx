@@ -169,12 +169,12 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
 
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
-                    <div className="text-xs text-slate-500 uppercase mb-1 font-bold">Grade</div>
-                    <div className="text-xl font-black text-cyan-400">A++</div>
+                    <div className="text-xs text-slate-500 uppercase mb-1 font-bold">{t('home.featuredCommercial.gradeLabel')}</div>
+                    <div className="text-xl font-black text-cyan-400">{t('home.featuredCommercial.gradeValue')}</div>
                   </div>
                   <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
-                    <div className="text-xs text-slate-500 uppercase mb-1 font-bold">Standard</div>
-                    <div className="text-xl font-black text-white">ERP</div>
+                    <div className="text-xs text-slate-500 uppercase mb-1 font-bold">{t('home.featuredCommercial.standardLabel')}</div>
+                    <div className="text-xl font-black text-white">{t('home.featuredCommercial.standardValue')}</div>
                   </div>
                 </div>
 

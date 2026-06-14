@@ -47,6 +47,10 @@ interface KnowledgeBlockProps {
     eyebrow: string;
     subtitle: string;
     cta: string;
+    headingPrefix: string;
+    headingAccent: string;
+    statsPipelineLabel: string;
+    statsOptimization: string;
     items: Record<string, { title: string; description: string }>;
   };
   finalCtaDict: {
@@ -79,7 +83,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
               data-observe="fade-up"
               className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out delay-200 text-5xl lg:text-7xl font-extralight tracking-tighter leading-hvac-11 text-white"
             >
-              Mühendislik <span className="font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">Katmanı</span>
+              {t.headingPrefix}{' '}<span className="font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">{t.headingAccent}</span>
             </h2>
           </div>
           <p 
@@ -107,7 +111,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                   className="group relative block h-full overflow-hidden rounded-hvac-2xl border border-white/10 bg-white/2 p-10 backdrop-blur-md transition-colors duration-500 hover:border-cyan-500/40 hover:bg-white/5"
                 >
                   <div className="absolute top-8 right-10 text-4xl font-black text-white/5 transition-colors group-hover:text-cyan-500/10">
-                    0{index + 1}
+                    {String(index + 1).padStart(2, '0')}
                   </div>
 
                   <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-400 transition-colors duration-500 group-hover:bg-cyan-500 group-hover:text-slate-950">
@@ -158,8 +162,8 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
             <div className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out delay-200 relative rounded-hvac-xl border border-white/10 bg-white/2 p-8 backdrop-blur-3xl overflow-hidden max-w-md lg:ml-auto">
               <div className="flex items-center gap-8">
                 <div>
-                  <div className="text-xs font-bold uppercase tracking-hvac-loose text-cyan-400 mb-1">Project Pipeline</div>
-                  <div className="text-4xl font-black text-white tracking-tighter">15<span className="text-cyan-400">+</span></div>
+                  <div className="text-xs font-bold uppercase tracking-hvac-loose text-cyan-400 mb-1">{t.statsPipelineLabel}</div>
+                  <div className="text-4xl font-black text-white tracking-tighter">{15}<span className="text-cyan-400">+</span></div>
                   <div className="text-xs font-bold uppercase tracking-hvac-normal text-slate-500 mt-1">
                     {statsExperience}
                   </div>
@@ -168,7 +172,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                   <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                     <div className="h-full w-11/12 bg-gradient-to-r from-cyan-600 to-cyan-400" />
                   </div>
-                  <div className="text-xs font-bold uppercase tracking-widest text-slate-500">92% Optimization</div>
+                  <div className="text-xs font-bold uppercase tracking-widest text-slate-500">{t.statsOptimization}</div>
                 </div>
               </div>
             </div>
