@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\logistics.en.ts
-skeleton_hash: 4c6f4730e5d25e1e
+skeleton_hash: edc964078d21b26c
 entity_hashes:
   overview: 41df9c420e1d004e
-generated_at: 2026-06-13T11:12:45Z
+generated_at: 2026-06-14T13:27:06Z
 ---
 
 ## Genel Bakış
@@ -48,10 +48,6 @@ Dosya yapısı incelendiğinde:
 - **Import**: Yok
 - **Sınıf**: Yok
 - **Fonksiyon**: Yok
-
----
-
-**Not**: Bu dosya bir i18n (uluslararasılaştırma) sözlük dosyasıdır ve yalnızca `logistics` adında bir sabit nesne içerir. Fonksiyon gövdeleri veya imzaları mevcut değildir, dolayısıyla AST Pointer üretimi yapılamamaktadır.
 
 ---
 

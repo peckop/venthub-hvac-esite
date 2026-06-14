@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\logistics.tr.ts
-skeleton_hash: d04745aa35ce839e
+skeleton_hash: c36d52e19b018187
 entity_hashes:
   overview: 41df9c420e1d004e
-generated_at: 2026-06-13T11:13:10Z
+generated_at: 2026-06-14T13:27:07Z
 ---
 
 ## Genel Bakış
@@ -42,10 +42,6 @@ Bu dosyada herhangi bir **fonksiyon bulunmamaktadır**. Dosya, yalnızca bir i18
 - **params**: yok — bu bir fonksiyon değil, `const logistics = { ... }` şeklinde bir nesne tanımıdır
 - **ic_degiskenler**: yok — nesne içinde değişken tanımları yer almaz, yalnızca key-value çiftleri (çeviri dizeleri) bulunur
 - **Dönüş**: yok — modül sonunda `export default logistics` veya `export { logistics }` ile dışa aktarılır; bir dönüş değeri üretmez
-
----
-
-**Özet:** `logistics.tr.ts` dosyası, admin-lojistik sayfasının Türkçe çeviri anahtarlarını içeren pasif bir veri dosyasıdır. Çağrı ilişkisi, fonksiyon imzası veya sınıf tanımı barındırmaz.
 
 ---
 

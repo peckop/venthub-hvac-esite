@@ -20,6 +20,7 @@ export const logistics = {
         noNewTracking: 'No new shipping info found to save.',
         bulkUpdateFailed: 'Shipping update failed for {{count}} orders.',
         bulkUpdateSuccess: '{{count}} orders successfully marked as Shipped!',
-        criticalError: 'A critical error occurred during bulk update.'
+        criticalError: 'A critical error occurred during bulk update.',
+        noPermission: 'You do not have permission for this action.'
       }
 };

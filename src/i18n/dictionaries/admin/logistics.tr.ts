@@ -20,6 +20,7 @@ export const logistics = {
         noNewTracking: 'Kaydedilecek yeni kargo bilgisi bulunamadı.',
         bulkUpdateFailed: '{{count}} siparişte kargo güncellemesi başarısız oldu.',
         bulkUpdateSuccess: '{{count}} sipariş başarıyla Kargoda durumuna alındı!',
-        criticalError: 'Toplu güncelleme sırasında kritik bir hata oluştu.'
+        criticalError: 'Toplu güncelleme sırasında kritik bir hata oluştu.',
+        noPermission: 'Bu işlem için yetkiniz yok.'
       }
 };
