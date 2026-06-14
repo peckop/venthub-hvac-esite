@@ -91,7 +91,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                     </h1>
 
                     <p ref={heroTextRef} className={scrollAnimationClasses.fadeIn(heroTextVisible) + " max-w-2xl mx-auto text-xl text-slate-400 font-light leading-relaxed mb-12"}>
-                        {vm?.description || 'Yüksek performanslı, akıllı ve sürdürülebilir havalandırma sistemlerinin teknik otoritesi.'}
+                        {vm?.description || t('category.showcase.defaultDescription')}
                     </p>
 
                     {isAirCurtain && (
@@ -166,7 +166,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                             <h2 className="text-5xl font-light tracking-tight mb-12">
                                 {dict.category.showcase.whyVenthubTitle.split('VentHub')[0]}
                                 <span className="font-medium italic">
-                                    VentHub
+                                    {t('common.brand')}
                                     {dict.category.showcase.whyVenthubTitle.split('VentHub')[1] || ''}
                                 </span>
                             </h2>

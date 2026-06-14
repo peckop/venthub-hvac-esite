@@ -3,33 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\ProblemSection.tsx
-skeleton_hash: c1c1272ecfb3fd81
+skeleton_hash: d4e1011fa291157e
 entity_hashes:
   func:ProblemSection: 8fcd7b70f98a256d
-  overview: 691525b7605c18a4
+  overview: b61cb8f6c12ac577
   style_tokens: a37a5e86138e5e96
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T20:13:13Z
 ---
 
 ## Genel Bakış
-Bu modül, kategori sayfasında kullanıcıya "Problemi Tanı" başlıklı empati bölümünü sunan bir React bileşenidir. Dışarıdan prop almadan çalışır ve scroll animasyonları için gerekli durumları (örneğin görünürlük ve referans) kendi içinde yönetir. Bileşen, hava perdesi ihtiyacını vurgulayan metin ve görsel öğeleri içeren düzenli bir JSX yapısı döndürür.
+Bu modül, kategori sayfasında kullanıcının sorununu fark etmesini amaçlayan "Problemi Tanı" adlı empati bölümünü oluşturan bağımsız bir React bileşenidir. Dışarıdan herhangi bir prop veya veri kaynağı almadan çalışır ve tüm içeriği (metin, görseller ve layout) kendi içinde barındırır. Bileşen, sayfanın akışına entegre olarak dinamik bir şekilde render edilir.
 
 ## Fonksiyon Grupları
 ### Bileşen Renderlama
-Bu grup, sorun bölümünün kullanıcı arayüzünde oluşturulmasını ve dinamik olarak görüntülenmesini sağlar.
+Bu grup, modülün temel ve tek sorumluluğu olan ProblemSection bileşeninin, kategori sayfası içindeki belirlenen yerde kullanıcı arayüzünü oluşturmasını ve sunmasını ifade eder.
 - ProblemSection
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, parametresiz bir React bileşenidir ve dış bağımlılıkları minimum düzeyde tutulmalıdır.
-
-[Aksiyom 1]: Eğer bileşen prop almıyorsa, tüm gösterilecek içerik bileşen içinde tanımlı olmalıdır veya bir veri kaynağından (API, context vb.) bağımsız olarak erişilebilir olmalıdır.
-
-[Aksiyom 2]: Eğer React ortamı (DOM) mevcut değilse veya bileşen bir React ağacı içinde render edilmiyorsa, JSX döndürme işlemi başarısız olur.
-
-[Aksiyom 3]: Eğer bileşen kategori sayfasında "sorun" bölümü olarak kullanılmıyorsa, beklenen sayfa yapısı bozulur.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -44,19 +39,34 @@ Bu modül, parametresiz bir React bileşenidir ve dış bağımlılıkları mini
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../../hooks/useScrollAnimation::scrollAnimationClasses
+- import: ../../../hooks/useScrollAnimation::useScrollAnimation
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::Bug
+- import: lucide-react::DollarSign
+- import: lucide-react::Thermometer
+- import: lucide-react::Wind
+- import: react::React
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/category/sections/ProblemSection.tsx::ProblemSection
+### [N1_NASIL] AST Pointer: ProblemSection.tsx::ProblemSection
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `sectionRef` — useScrollAnimation hook'undan dönen ref objesi; section DOM elementine bağlanarak scroll izleme referansını sağlar
-  - `isVisible` — useScrollAnimation hook'undan dönen boolean değer; section'ın görünür olup olmadığını belirler, CSS animasyon sınıflarının aktifleşmesini kontrol eder
-  - `problems` — Problem kartlarının gösterildiği dizi; her eleman `{icon, title, stat, description, color, bgColor}` yapısındadır (DollarSign, Thermometer, Wind, Bug iconları, ilgili başlık, istatistik, açıklama, renk ve arka plan renkleri)
-  - `problems[0].icon` — DollarSign icon bileşeni, "Enerji Kaybı" kartı için kullanılır
-  - `problems[1].icon` — Thermometer icon bileşeni, "Sıcaklık Farkı" kartı için kullanılır
-  - `problems[2].icon` — Wind icon bileşeni, "Hava Akışı" kartı için kullanılır
-  - `problems[3].icon` — Bug icon bileşeni, "Zararlı Girişi" kartı için kullanılır
-- **Dönüş**: JSX — Scroll animasyonlu problem bölümü; başlık, 4 adet problem kartı grid'i ve hava perdesi karşılaştırma bölümü içeren React section elementi
+  - `t` — useI18n hook'undan alınan çeviri fonksiyonu, bileşen içindeki tüm metinleri uluslararası dilde göstermek için kullanılır
+  - `sectionRef` — useScrollAnimation hook'undan dönen ref nesnesi, section DOM elementine referans verir, animasyon kontrolü için kullanılır
+  - `isVisible` — useScrollAnimation hook'undan dönen boolean değer, section'ın görünüp görünmediğini belirler, animasyon sınıflarını koşullu olarak ekler
+  - `problems` — Dörtproblem nesnesinden oluşan dizi, her problem için icon, başlık, istatistik, açıklama ve renk bilgilerini tutar
+- **Dönüş**: JSX section elementi (problemleri ve karşılaştırmayı gösteren bileşen)
+
+### [N2_NASIL] AST Pointer: ProblemSection.tsx::(problem, index) => {...}
+- **params**: (problem, index) — problem: problems dizisindeki mevcut problem nesnesi, index: dizi indeks numarası
+- **ic_degiskenler**:
+  - `Icon` — problem.icon değerinden alınan icon bileşeni (DollarSign, Thermometer, Wind veya Bug), JSX içinde render edilir
+- **Dönüş**: JSX div elementi (problem kartını gösteren bileşen)
 
 ---
 

@@ -46,10 +46,12 @@ Sayaç: başlangıç **845** jsx-literal. Hedef-dışı sabit: admin 256 + legal
 | Dalga | Commit | Durum |
 |---|---|---|
 | Validator — AccountOverview | `df9a6e10` | ✅ 23→0 |
-| Wave 1 — account (6 sayfa) | `c7943b8a` | ✅ ~59→0 |
-| Wave 2 — checkout (6 dosya) | `e4e548d3` | ✅ ~16→0 |
+| Wave 1 — account (6 sayfa) | `c7943b8a` | ✅ ~59→0 (master `92cb011b`) |
+| Wave 2 — checkout (6 dosya) | `e4e548d3` | ✅ ~16→0 (master `92cb011b`) |
+| **Wave A — calculators (4 dosya)** | `32e746fa` | ✅ 35→0 · birimler `common.{unitMeters,unitCubicMeters,unitNewton,dimensions2D,dimensions3D}` interpolasyonuna katlandı |
 
-**Kapsam-içi kalan ≈ 249** (calculators 35 · category ~91 · contact 18 · home ~30 · auth 14 · products/3d/navigation/ufak-kuyruk ~60).
+**Ölçüm 2026-06-14 (post-A):** toplam 737 jsx-literal / 115 dosya. Hedef-dışı: admin 256 + legal 235.
+**Kapsam-içi kalan ≈ 211** (category ~91 · contact 18 · home ~16 · auth ~14 · tail ~66 [products/3d·navigation·authority·brands·knowledge·support·footer·search]).
 
 ## MAKİNE (kanıtlandı — her dalga tekrarla)
 
@@ -61,15 +63,17 @@ Sayaç: başlangıç **845** jsx-literal. Hedef-dışı sabit: admin 256 + legal
 
 Dict edit'lerinde NOT: merge script harici yazdığı için Edit "not read" guard atar → önce ilgili bölgeyi Read et. Diagnostic'ler `en: typeof tr` için ara-durum gösterir; **tsc otoritedir**.
 
-## ⚠️ TOOLING LİMİTİ (calculators dalgasında bulundu — DÜZELTİLMEDEN devam etme)
+## ✅ TOOLING LİMİTİ — DÜZELTİLDİ (2026-06-14, Wave A öncesi)
 
-**Sorun:** `merge-generic*.js`'in blok-sınırı tespiti **büyük namespace'lerde kırılıyor.** `region()` kapanışı `indexOf('\n  },')` ile buluyor; calculators gibi büyük blokta yanlış erken kapanış buluyor → mevcut alt-namespace'i (`jetFan`, satır ~2272, calculators 2126-2297 içinde) **"YENİ" sanıyor** → `--apply` etseydim **duplicate `jetFan`** yazıp sözlüğü bozardı. `{{count}}` brace'leri naive brace-sayımını da bozar.
+**Kök neden (teşhis edildi):** `merge-generic*.js`'in `region()`'ı `src.indexOf('  PARENT: {')` ile buluyordu — bu, **8-boşluk nested aynı-isimli anahtarı substring olarak** yakalıyordu. tr.ts'te `calculators:` HEM nested (satır 592, `knowledge.calculators`, 8-boşluk) HEM top-level (2126, 2-boşluk) var; indexOf ilk (yanlış, 592) olanı buluyordu → `--apply` etseydim alt-ns'leri yanlış bloğa yazıp sözlüğü bozardı. İkincil hata: `subBlock()` kapanışı `\n    },` (4-boşluk + virgül) arıyordu, ama bloğun SON alt-ns'i virgülsüz `    }` ile kapanır → collision-tarama aşırı uzardı.
 
-**Calculators dalgası ÇIKTISI hazır/cache'li** (run `wf_5aac0ed3-504`, output `wxnt88u0z.output`): ajanlar İYİ iş çıkardı — JetFan bu sefer `pageTitle`/`pageInfoText` kullanıp **çakışmayı kendi önledi** (önceki run `title` ile çakışıyordu). Yani sorun ajanlar değil, merge-aracı.
+**Düzeltme:**
+1. `region()` artık **`\n  PARENT: {`** ile anchor'lıyor (newline + TAM 2 boşluk) → yalnız top-level yüzeyi hedefler, nested'i asla.
+2. `subBlock()` kapanışı **`/\n {4}\}/`** ile (virgüllü/virgülsüz fark etmez; 6-boşluk iç kapanışları es geçer).
+3. **`C:/tmp/merge-generic3.js`** (YENİ, kanonik): PARENT'ı her öğenin `ns`'inden (ilk segment) türetir → bir dalga **çoklu-yüzeye** yayılabilir (tail için şart). Kullanım: `node C:/tmp/merge-generic3.js <out.json>` (dry-run) → rapor doğrula (EXISTING/NEW + 0 çakışma) → `--apply`.
+4. `i18n-wave.mjs`: ajan **DÜZ tek-parça yeni anahtar** üretir (form/results alt-obje GENİŞLETMEZ); migratePrompt yüzeyi `t.ns`'den türetir (çoklu-yüzey). Wave A'da kanıtlandı: dry-run jetFan/airCurtain=EXISTING, layout/stepIndicator=NEW, 0 çakışma; uygulama temiz.
 
-**DÜZELTİLMİŞ DEVAM YÖNTEMİ (sıradaki oturum):**
-1. **region() düzelt:** kapanışı "ilk `\n  },`" yerine **"bir sonraki 2-boşluk top-level `\n  <word>: {` anahtarından hemen önce"** olarak bul (ya da string-atlayan brace-aware tarama). VEYA basitçe: `    <ns>: {` benzersiz olduğu için **doğrudan o anchor'a** ekle, region'a hiç gerek yok.
-2. **Ajan talimatını sadeleştir** (`i18n-wave.mjs`): YENİ anahtarları **DÜZ** (page-namespace altında flat) üret — mevcut `form`/`results` alt-objelerini GENİŞLETME, yeni nested alt-obje açma. Böylece merge hep "namespace açılışından sonra flat ekle" = nested-merge derdi biter. (Mevcut anahtar reuse serbest; sadece YENİ'ler flat.)
-3. Kalan yüzeyler: **calculators (cache'den), category ~91, contact 18, home ~30, auth 14, kuyruk ~60.** Her biri: dalga → flat-merge → kapı (`pnpm run test:i18n` + eslint + tsc + test) → commit. Kalite çıtası: memory [[i18n-quality-is-enterprise-substance]] + bu skill `i18n-conventions`.
+**Kanonik dalga reçetesi (her yüzey için tekrarla):**
+`i18n-wave.mjs` TARGETS düzenle → Workflow çalıştır → `cp <task.output> C:/tmp/wave-X.json` → `node merge-generic3.js wave-X.json` (dry-run, doğrula) → `--apply` → eklenen bölgeyi gözle → `node C:/tmp/keycheck.js` (t() anahtarları çözülüyor mu) → kapı: 4-dosya eslint (literal=0) + `type-check` + `test:i18n` + `pnpm test -- --run` → kalan birim/sembol/aria'yı elle düzelt (birim → `common.unit*`; aria broken-key → görünür anahtara eşitle) → commit (yalnız wave dosyaları + 2 dict; Orion .md sidecar'ları normal).
 
-**Durum:** 3 dalga (account+checkout, ~98 literal) master'a HENÜZ bağlanmadı (branch `chore/i18n-jsx-literals`, 4 commit). `i18n-conventions` skill'i maks-fayda için geliştirildi.
+**Durum:** account+checkout master'da (`92cb011b`). Wave A (calculators) branch `chore/i18n-jsx-literals`'te commit `32e746fa`. Sıradaki: B1 category-views (çalışıyor) → B2 category-sections+wizards+silent-fan (çoklu-yüzey) → C contact+home → D auth → E tail. Kalite çıtası: [[i18n-quality-is-enterprise-substance]] + skill `i18n-conventions`.

@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\category\CategorySeriesView.tsx
-skeleton_hash: 1d687be0e465ed4c
+skeleton_hash: 7dba4980ddcfefc5
 entity_hashes:
   func:CategorySeriesView: 3515932791ff3914
   func:getSpec: bd8056751502e13f
   func:toggleViewMode: 812e9c6634a25d9c
   overview: 4d3493e9c6322fd0
   style_tokens: 7eddfe831f5ad8ff
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-14T20:13:41Z
 ---
 
 ## Genel Bakış
@@ -55,6 +55,29 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ### getSpec
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useCartHook::useCart
+- import: ../../hooks/useCategoryViewModel::useCategoryViewModel
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/format::formatCurrency
+- import: ../../lib/type-converters::DomainCategory
+- import: ../../lib/type-converters::DomainProduct
+- import: ../../utils/routes::Routes
+- import: ../../utils/type-converters::isRecord
+- import: @/components/ProductCard::ProductCard
+- import: @/components/navigation/Breadcrumb::Breadcrumb
+- import: framer-motion::motion
+- import: lucide-react::Activity
+- import: lucide-react::LayoutGrid
+- import: lucide-react::Table
+- import: lucide-react::Wind
+- import: lucide-react::Zap
+- import: next/image::Image
+- import: react::React
+- import: react::useState
 
 ---
 

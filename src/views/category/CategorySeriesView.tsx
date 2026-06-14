@@ -77,7 +77,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                         className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
                     >
                         <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                        <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-600">Technical Product Family</span>
+                        <span className="text-xs font-black uppercase tracking-hvac-loose text-cyan-600">{t('category.series.technicalFamily')}</span>
                     </motion.div>
 
                     <motion.h1
@@ -94,7 +94,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                         transition={{ delay: 0.2 }}
                         className="max-w-2xl mx-auto text-xl text-slate-500 font-light leading-relaxed"
                     >
-                        {vm?.description || 'Profesyonel havalandırma çözümlerini teknik serilerine göre inceleyin.'}
+                        {vm?.description || t('category.series.heroDefaultDesc')}
                     </motion.p>
                 </div>
             </section>
@@ -109,22 +109,22 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                                 <div className="max-w-2xl">
                                     <div className="flex items-center gap-4 mb-6">
                                         <span className="h-px w-12 bg-secondary-blue" />
-                                        <span className="text-sm font-black text-secondary-blue uppercase tracking-hvac-relaxed">Seri Detayı</span>
+                                        <span className="text-sm font-black text-secondary-blue uppercase tracking-hvac-relaxed">{t('category.series.seriesDetail')}</span>
                                     </div>
-                                    <h2 className="text-4xl md:text-5xl font-black text-industrial-gray mb-4 tracking-tighter">{series.name} SERİSİ</h2>
+                                    <h2 className="text-4xl md:text-5xl font-black text-industrial-gray mb-4 tracking-tighter">{t('category.series.seriesHeading', { name: series.name })}</h2>
                                     <p className="text-slate-500 font-medium text-lg leading-relaxed">
-                                        {series.products.length} farklı teknik konfigürasyon sunan yüksek verimli çözüm ailesi.
+                                        {t('category.series.seriesConfigCount', { count: series.products.length })}
                                     </p>
                                 </div>
                                 
                                 <div className="flex flex-wrap items-center gap-4">
                                     <div className="bg-slate-100 p-1 rounded-2xl flex border border-slate-200 shadow-inner">
-                                        <button onClick={() => toggleViewMode(series.name)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-colors ${!isMatrix ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}><LayoutGrid size={16} /> <span>VİTRİN</span></button>
-                                        <button onClick={() => toggleViewMode(series.name)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-colors ${isMatrix ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}><TableIcon size={16} /> <span>MATRİS</span></button>
+                                        <button onClick={() => toggleViewMode(series.name)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-colors ${!isMatrix ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}><LayoutGrid size={16} /> <span>{t('category.series.showcaseView')}</span></button>
+                                        <button onClick={() => toggleViewMode(series.name)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-colors ${isMatrix ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}><TableIcon size={16} /> <span>{t('category.series.matrixView')}</span></button>
                                     </div>
                                     <div className="bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-xl shadow-slate-900/20">
-                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Başlangıç</p>
-                                        <p className="text-xl font-black">{series.minPrice !== Infinity ? formatCurrency(series.minPrice, lang) : 'Teklif Alın'}</p>
+                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{t('category.series.startingFrom')}</p>
+                                        <p className="text-xl font-black">{series.minPrice !== Infinity ? formatCurrency(series.minPrice, lang) : t('category.series.requestQuote')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -138,12 +138,12 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                                     <table className="w-full text-left border-collapse min-w-1000px">
                                         <thead>
                                             <tr className="bg-slate-50">
-                                                <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Model</th>
-                                                <th className="px-6 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Debi (m³/h)</th>
-                                                <th className="px-6 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Ses (dB)</th>
-                                                <th className="px-6 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Güç (W)</th>
-                                                <th className="px-6 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">Fiyat</th>
-                                                <th className="px-8 py-6 text-right text-xs font-black text-slate-400 uppercase tracking-widest">İşlem</th>
+                                                <th className="px-8 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">{t('category.series.colModel')}</th>
+                                                <th className="px-6 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">{t('category.series.colAirflow')}</th>
+                                                <th className="px-6 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">{t('category.series.colNoise')}</th>
+                                                <th className="px-6 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">{t('category.series.colPower')}</th>
+                                                <th className="px-6 py-6 text-xs font-black text-slate-400 uppercase tracking-widest">{t('category.series.colPrice')}</th>
+                                                <th className="px-8 py-6 text-right text-xs font-black text-slate-400 uppercase tracking-widest">{t('category.series.colAction')}</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-50">
@@ -151,7 +151,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                                                 <tr key={p.id} className="hover:bg-slate-50/50 transition-colors group">
                                                     <td className="px-8 py-6 flex items-center gap-4">
                                                         <div className="relative w-12 h-12 rounded-xl bg-white border border-slate-100 overflow-hidden shrink-0"><Image src={p.image_url || heroImage} alt={p.name} fill className="object-contain p-1" /></div>
-                                                        <div><p className="text-sm font-black text-industrial-gray uppercase tracking-tight">{p.name}</p><p className="text-xs font-bold text-slate-400">SKU: {p.sku}</p></div>
+                                                        <div><p className="text-sm font-black text-industrial-gray uppercase tracking-tight">{p.name}</p><p className="text-xs font-bold text-slate-400">{t('category.series.skuLabel', { sku: p.sku })}</p></div>
                                                     </td>
                                                     <td className="px-6 py-6 font-bold text-industrial-gray">{getSpec(p, 'airflow_capacity') || getSpec(p, 'debi')}</td>
                                                     <td className="px-6 py-6 font-bold text-industrial-gray">{getSpec(p, 'noise_level') || getSpec(p, 'ses')}</td>
@@ -173,9 +173,9 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
             <div className="bg-slate-950 py-32 text-white overflow-hidden relative">
                 <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid md:grid-cols-3 gap-16 text-center">
-                        <div className="space-y-6"><Activity className="mx-auto text-cyan-400" size={40} /><h4 className="text-xl font-bold">Teknik Performans</h4><p className="text-slate-400 font-light">Tüm veriler fabrikasyon test raporlarıyla %100 doğrulanmıştır.</p></div>
-                        <div className="space-y-6"><Wind className="mx-auto text-cyan-400" size={40} /><h4 className="text-xl font-bold">Hassas Mühendislik</h4><p className="text-slate-400 font-light">Projeniz için en doğru hava debisi ve basınç eşleşmesi.</p></div>
-                        <div className="space-y-6"><Zap className="mx-auto text-cyan-400" size={40} /><h4 className="text-xl font-bold">Uzman Desteği</h4><p className="text-slate-400 font-light">Mühendislerimizden anlık teknik döküman ve seçim desteği.</p></div>
+                        <div className="space-y-6"><Activity className="mx-auto text-cyan-400" size={40} /><h4 className="text-xl font-bold">{t('category.series.trust1Title')}</h4><p className="text-slate-400 font-light">{t('category.series.trust1Desc')}</p></div>
+                        <div className="space-y-6"><Wind className="mx-auto text-cyan-400" size={40} /><h4 className="text-xl font-bold">{t('category.series.trust2Title')}</h4><p className="text-slate-400 font-light">{t('category.series.trust2Desc')}</p></div>
+                        <div className="space-y-6"><Zap className="mx-auto text-cyan-400" size={40} /><h4 className="text-xl font-bold">{t('category.series.trust3Title')}</h4><p className="text-slate-400 font-light">{t('category.series.trust3Desc')}</p></div>
                     </div>
                 </div>
             </div>

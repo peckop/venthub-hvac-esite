@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\category\CategoryShowcaseView.tsx
-skeleton_hash: 1f3eed0977479c76
+skeleton_hash: 4a86ea3614b86a02
 entity_hashes:
   func:CategoryShowcase: 29e2e90462204c33
   func:handleSubSelect: 0b68330f2c8fdb75
   overview: 170bc607329172b4
   style_tokens: 3074af738c3c5317
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-14T20:13:41Z
 ---
 
 ## Genel Bakış
@@ -53,6 +53,24 @@ Bu modül için aşağıdaki mimari varsayımlar geçerlidir:
 **Parametreler**:
 - subSlug: string — Kullanıcı tarafından seçilen alt kategorinin benzersiz kısa tanımlayıcısı (slug) değeridir, adresleme ve tanımlama işlemlerinde kullanılan benzersiz etikettir
 **Dönüş**: Herhangi bir değer döndürmez, sadece seçim olayını iletmek amacıyla çalıştığından return tipi void niteliğindedir, belirtilen tanıma göre ek bir dönüş değeri tanımlanmamıştır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useCategoryViewModel::useCategoryViewModel
+- import: ../../lib/type-converters::DomainCategory
+- import: ../../utils/getCategoryIcon::getCategoryIcon
+- import: ../../utils/routes::Routes
+- import: @/components/category/EnhancedNeedsWizard::EnhancedNeedsWizard
+- import: @/components/category/sections::BottomCTA
+- import: @/components/navigation/Breadcrumb::Breadcrumb
+- import: @/components/ui/VentImage::VentImage
+- import: @/hooks/useScrollAnimation::scrollAnimationClasses
+- import: @/hooks/useScrollAnimation::useScrollAnimation
+- import: @/i18n/I18nProvider::useI18n
+- import: next/navigation::useRouter
+- import: react::React
+- import: react::useState
 
 ---
 

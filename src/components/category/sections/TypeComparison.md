@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\TypeComparison.tsx
-skeleton_hash: af1d682b269e3679
+skeleton_hash: 365f88433736a949
 entity_hashes:
   func:TypeComparison: 4dc351c7c18b2642
   overview: 54025c31ff520977
   style_tokens: ef09d8c28bb43bb7
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-14T20:13:13Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,22 @@ Bu bileşen, `onOpenWizard` ve `onSelectType` prop'larının varlığına ve do�
 - onOpenWizard: kullanıcı henüz bir sistem türü seçmediğinde sihirbazı açmak için çağrılan callback fonksiyonu  
 - onSelectType: kullanıcı bir sistem türü (elektrikli veya ortam havalı) seçtiğinde bu seçimi üst componente iletmek için kullanılan callback fonksiyonu  
 **Dönüş**: `React.FC<TypeComparisonProps>` – bir React fonksiyon bileşeni olarak, JSX döndürerek karşılaştırma arayüzünü ve gerekli etkileşimleri render eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../hooks/useScrollAnimation::scrollAnimationClasses
+- import: ../../../hooks/useScrollAnimation::useScrollAnimation
+- import: @/components/ui/VentImage::VentImage
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::ArrowRight
+- import: lucide-react::Check
+- import: lucide-react::HelpCircle
+- import: lucide-react::Wind
+- import: lucide-react::X
+- import: lucide-react::Zap
+- import: react::React
+- import: react::useState
 
 ---
 
