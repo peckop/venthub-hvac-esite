@@ -112,13 +112,13 @@ export default function AccountReturnsPage() {
   }, [prefillOrderId])
   const reasonOptions = useMemo(() => (
     [
-      'Yanlış ürün/eksik parça',
-      'Hasarlı ürün',
-      'Uyumsuz/istenen özelliklerde değil',
-      'Fikrim değişti',
-      'Diğer'
+      t('account.returns.reasonWrongProduct'),
+      t('account.returns.reasonDamaged'),
+      t('account.returns.reasonIncompatible'),
+      t('account.returns.reasonChangedMind'),
+      t('account.returns.reasonOther')
     ]
-  ), [])
+  ), [t])
 
   const handleCreate = async () => {
     try {
@@ -185,17 +185,17 @@ export default function AccountReturnsPage() {
 
   const getReturnTimeline = (currentStatus: string): TimelineStep[] => {
     const allSteps = [
-      { key: 'requested', label: 'Talep Alındı' },
-      { key: 'approved', label: 'Onaylandı' },
-      { key: 'in_transit', label: 'Kargoda (İade)' },
-      { key: 'received', label: 'İade Teslim Alındı' },
-      { key: 'refunded', label: 'İade Ücreti Ödendi' }
+      { key: 'requested', label: t('account.returns.timelineRequested') },
+      { key: 'approved', label: t('account.returns.timelineApproved') },
+      { key: 'in_transit', label: t('account.returns.timelineInTransit') },
+      { key: 'received', label: t('account.returns.timelineReceived') },
+      { key: 'refunded', label: t('account.returns.timelineRefunded') }
     ]
 
     // Rejected/cancelled are terminal states that don't follow the normal flow
     if (currentStatus === 'rejected' || currentStatus === 'cancelled') {
       return [
-        { key: 'requested', label: 'Talep Alındı', completed: true },
+        { key: 'requested', label: t('account.returns.timelineRequested'), completed: true },
         { key: currentStatus, label: getStatusLabel(currentStatus), completed: true, isTerminal: true }
       ]
     }
@@ -219,7 +219,7 @@ export default function AccountReturnsPage() {
             </div>
             {t('returns.title')}
           </h1>
-          <p className="text-sm text-slate-500 mt-1">İade taleplerinizi oluşturun ve süreç durumunu takip edin.</p>
+          <p className="text-sm text-slate-500 mt-1">{t('account.returns.subtitle')}</p>
         </div>
         <button onClick={() => setOpenModal(true)} className="bg-primary-navy hover:bg-industrial-gray text-white font-bold h-10 px-6 rounded-lg shadow-sm shadow-primary-navy/20 transition-transform hover:scale-102 flex items-center gap-2 self-start sm:self-auto">
           {t('returns.new')}
@@ -230,14 +230,14 @@ export default function AccountReturnsPage() {
       {rows.length > 0 && (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 mb-6">
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><Filter size={12} /> Durum:</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><Filter size={12} /> {t('account.returns.filterStatus')}</span>
             {[
-              { value: 'all', label: `Tümü (${rows.length})` },
-              { value: 'requested', label: 'Talep Edildi' },
-              { value: 'approved', label: 'Onaylandı' },
-              { value: 'in_transit', label: 'Kargoda' },
-              { value: 'refunded', label: 'İade Edildi' },
-              { value: 'rejected', label: 'Reddedildi' },
+              { value: 'all', label: t('account.returns.filterAll', { count: rows.length }) },
+              { value: 'requested', label: t('returns.statusLabels.requested') },
+              { value: 'approved', label: t('returns.statusLabels.approved') },
+              { value: 'in_transit', label: t('returns.statusLabels.in_transit') },
+              { value: 'refunded', label: t('returns.statusLabels.refunded') },
+              { value: 'rejected', label: t('returns.statusLabels.rejected') },
             ].map(opt => (
               <button
                 key={opt.value}
@@ -263,7 +263,7 @@ export default function AccountReturnsPage() {
           <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <RefreshCw size={32} className="text-slate-300" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-1">Henüz hiç iade talebiniz yok</h3>
+          <h3 className="text-lg font-bold text-slate-900 mb-1">{t('account.returns.emptyTitle')}</h3>
           <p className="text-sm text-slate-500">{t('returns.empty')}</p>
         </div>
       ) : (
@@ -286,7 +286,7 @@ export default function AccountReturnsPage() {
                         onClick={() => router.push(Routes.account.orderDetail(r.order_id))}
                         className="text-lg font-bold text-slate-900 hover:text-primary-navy transition-colors"
                       >
-                        Sipariş {code}
+                        {t('account.returns.orderLabel', { code })}
                       </button>
                       <div className="text-sm font-medium text-slate-500 mt-0.5">{formatDate(r.created_at, lang)}</div>
                     </div>
@@ -300,12 +300,12 @@ export default function AccountReturnsPage() {
                 {/* Return Details */}
                 <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-4">
-                    <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">İade Sebebi</span>
+                    <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t('account.returns.reasonField')}</span>
                     <span className="font-bold text-slate-900">{r.reason}</span>
                   </div>
                   {r.description && (
                     <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-4">
-                      <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Açıklama</span>
+                      <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t('account.returns.descriptionField')}</span>
                       <span className="font-bold text-slate-900">{r.description}</span>
                     </div>
                   )}
@@ -313,7 +313,7 @@ export default function AccountReturnsPage() {
 
                 {/* Progress Timeline */}
                 <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-5 mt-4">
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-5">İade Süreci</div>
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-5">{t('account.returns.processTitle')}</div>
                   <div className="flex items-center justify-between max-w-2xl mx-auto">
                     {timeline.map((step, index) => (
                       <React.Fragment key={step.key}>

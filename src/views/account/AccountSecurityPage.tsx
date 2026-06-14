@@ -36,14 +36,14 @@ export default function AccountSecurityPage() {
   useEffect(() => { refreshIdentities() }, [])
 
   const passwordRules = [
-    { key: 'length',  label: 'En az 8 karakter',     test: (p: string) => p.length >= 8 },
-    { key: 'upper',   label: 'En az 1 büyük harf',   test: (p: string) => /[A-Z]/.test(p) },
-    { key: 'digit',   label: 'En az 1 rakam',        test: (p: string) => /[0-9]/.test(p) },
-    { key: 'special', label: 'En az 1 özel karakter', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+    { key: 'length',  label: t('account.security.ruleLength'),  test: (p: string) => p.length >= 8 },
+    { key: 'upper',   label: t('account.security.ruleUpper'),   test: (p: string) => /[A-Z]/.test(p) },
+    { key: 'digit',   label: t('account.security.ruleDigit'),   test: (p: string) => /[0-9]/.test(p) },
+    { key: 'special', label: t('account.security.ruleSpecial'), test: (p: string) => /[^A-Za-z0-9]/.test(p) },
   ]
   const passedRules = passwordRules.filter(r => r.test(password)).length
   const strengthColor = passedRules <= 1 ? 'bg-red-500' : passedRules === 2 ? 'bg-orange-400' : passedRules === 3 ? 'bg-yellow-400' : 'bg-green-500'
-  const strengthLabel = passedRules <= 1 ? 'Zayıf' : passedRules === 2 ? 'Orta' : passedRules === 3 ? 'İyi' : 'Güçlü'
+  const strengthLabel = passedRules <= 1 ? t('account.security.strengthWeak') : passedRules === 2 ? t('account.security.strengthMedium') : passedRules === 3 ? t('account.security.strengthGood') : t('account.security.strengthStrong')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -98,7 +98,7 @@ export default function AccountSecurityPage() {
           {t('account.security.title')}
         </h2>
         <p className="text-sm text-slate-500 mt-1">
-          Hesap güvenliğiniz için şifrenizi güncel tutun ve bağlı giriş yöntemlerinizi yönetin.
+          {t('account.security.pageSubtitle')}
         </p>
       </div>
 
@@ -108,14 +108,14 @@ export default function AccountSecurityPage() {
           <div className="p-6 sm:p-8">
             <h3 className="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2 border-b border-slate-100 pb-3">
               <Key className="w-5 h-5 text-slate-500" />
-              Şifre Değiştir
+              {t('account.security.title')}
             </h3>
-            <p className="text-sm text-slate-500 mb-6 pt-2">Hesap güvenliğiniz için harf, rakam ve özel karakter içeren güçlü bir şifre seçin.</p>
+            <p className="text-sm text-slate-500 mb-6 pt-2">{t('account.security.changePasswordDesc')}</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
-                  Mevcut Şifre
+                  {t('account.security.currentLabel')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -128,7 +128,7 @@ export default function AccountSecurityPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
-                    Yeni Şifre
+                    {t('account.security.newLabel')}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -146,7 +146,7 @@ export default function AccountSecurityPage() {
                           }`} />
                         ))}
                       </div>
-                      <p className="text-xs text-slate-500">Güvenlik: <span className="font-semibold">{strengthLabel}</span></p>
+                      <p className="text-xs text-slate-500">{t('account.security.strengthPrefix')} <span className="font-semibold">{strengthLabel}</span></p>
                       <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5">
                         {passwordRules.map(rule => (
                           <li key={rule.key} className={`flex items-center gap-1 text-xs ${
@@ -161,7 +161,7 @@ export default function AccountSecurityPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
-                    Yeni Şifre (Tekrar)
+                    {t('account.security.confirmLabel')}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -218,7 +218,7 @@ export default function AccountSecurityPage() {
                     <Chrome className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900">Google</h4>
+                    <h4 className="text-sm font-bold text-slate-900">{t('account.security.googleLabel')}</h4>
                     <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">{t('account.security.oneClickLogin')}</p>
                   </div>
                 </div>

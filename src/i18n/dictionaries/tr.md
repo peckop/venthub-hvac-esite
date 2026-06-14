@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
-skeleton_hash: c9267447c086f2fd
+skeleton_hash: 03a97cd77fe762bc
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-06-14T16:22:26Z
+generated_at: 2026-06-14T17:21:04Z
 ---
 
 ## Genel Bakış
@@ -35,8 +35,8 @@ Bu modül saf bir statik veri modülüdür (sözlük/taslak) — çalıştırıl
 ## SABİTLER
 - **tr** (object) — `{
   common: {
-    addToProject: 'Proje Listesine Ekle',
-    loadingApp: 'Vent...`
+    update: 'Güncelle',
+    addToProject: 'Proje Listesine Ekle...`
 
 ---
 

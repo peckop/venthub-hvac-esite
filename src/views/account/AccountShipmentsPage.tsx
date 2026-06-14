@@ -120,19 +120,19 @@ export default function AccountShipmentsPage() {
       case 'delivered':
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
-            <CheckCircle className="w-3.5 h-3.5" /> Teslim Edildi
+            <CheckCircle className="w-3.5 h-3.5" /> {t('account.shipments.statusDelivered')}
           </span>
         )
       case 'shipped':
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200 shadow-sm">
-            <Truck className="w-3.5 h-3.5" /> Kargoda
+            <Truck className="w-3.5 h-3.5" /> {t('account.shipments.statusShipped')}
           </span>
         )
       default:
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
-            <Clock className="w-3.5 h-3.5" /> Hazırlanıyor
+            <Clock className="w-3.5 h-3.5" /> {t('account.shipments.statusPreparing')}
           </span>
         )
     }
@@ -140,8 +140,8 @@ export default function AccountShipmentsPage() {
 
   const shipSteps = [
     { key: 'preparing', label: t('account.shipments.preparingLabel'), icon: Package },
-    { key: 'shipped', label: 'Kargoya Verildi', icon: Truck },
-    { key: 'delivered', label: 'Teslim Edildi', icon: MapPin },
+    { key: 'shipped', label: t('account.shipments.stepShipped'), icon: Truck },
+    { key: 'delivered', label: t('account.shipments.stepDelivered'), icon: MapPin },
   ]
 
   const getStepIndex = (status: 'delivered' | 'shipped' | 'preparing') => {
@@ -176,7 +176,7 @@ export default function AccountShipmentsPage() {
             </div>
             {t('orders.shippingInfo') || 'Kargo Takibi'}
           </h2>
-          <p className="text-sm text-slate-500 mt-1">Siparişlerinizin kargo durumunu ve takip bilgilerini buradan izleyebilirsiniz.</p>
+          <p className="text-sm text-slate-500 mt-1">{t('account.shipments.subtitle')}</p>
         </div>
       </div>
 
@@ -184,11 +184,11 @@ export default function AccountShipmentsPage() {
       {rows.length > 0 && (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 mb-6">
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Durum:</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('account.shipments.statusFilterLabel')}</span>
             {[
-              { value: 'all' as ShipFilter, label: `Tümü (${rows.length})` },
-              { value: 'shipped' as ShipFilter, label: `Kargoda (${rows.filter(r => getShipStatus(r) === 'shipped').length})` },
-              { value: 'delivered' as ShipFilter, label: `Teslim Edildi (${rows.filter(r => getShipStatus(r) === 'delivered').length})` },
+              { value: 'all' as ShipFilter, label: t('account.shipments.filterAll', { count: rows.length }) },
+              { value: 'shipped' as ShipFilter, label: t('account.shipments.filterShipped', { count: rows.filter(r => getShipStatus(r) === 'shipped').length }) },
+              { value: 'delivered' as ShipFilter, label: t('account.shipments.filterDelivered', { count: rows.filter(r => getShipStatus(r) === 'delivered').length }) },
             ].map(opt => (
               <button
                 key={opt.value}
@@ -211,7 +211,7 @@ export default function AccountShipmentsPage() {
           <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <Truck size={32} className="text-slate-300" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-1">Henüz kargo bilgisi yok</h3>
+          <h3 className="text-lg font-bold text-slate-900 mb-1">{t('account.shipments.emptyTitle')}</h3>
           <p className="text-sm text-slate-500 mb-6">{t('orders.noShippingInfo') || 'Siparişlerinize kargo bilgisi eklendiğinde burada görünecektir.'}</p>
           <button
             onClick={() => router.push(Routes.account.orders())}
@@ -222,7 +222,7 @@ export default function AccountShipmentsPage() {
         </div>
       ) : displayed.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-12 text-center">
-          <p className="text-sm text-slate-500">Bu filtreye uygun kargo bulunmuyor.</p>
+          <p className="text-sm text-slate-500">{t('account.shipments.noFilterMatch')}</p>
         </div>
       ) : (
         <div className="space-y-5">
@@ -245,7 +245,7 @@ export default function AccountShipmentsPage() {
                           onClick={() => router.push(Routes.account.orderDetail(o.id))}
                           className="text-base font-bold text-slate-900 hover:text-primary-navy transition-colors"
                         >
-                          Sipariş {orderCode}
+                          {t('account.shipments.orderTitle', { code: orderCode })}
                         </button>
                         <div className="text-xs font-medium text-slate-500 mt-0.5">{formatDate(o.created_at)} · {formatPrice(o.total_amount)}</div>
                       </div>
@@ -256,7 +256,7 @@ export default function AccountShipmentsPage() {
                         onClick={() => router.push(Routes.account.orderDetail(o.id))}
                         className="h-8 px-3 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 hover:border-primary-navy hover:text-primary-navy rounded-lg transition-shadow shadow-sm"
                       >
-                        Detay
+                        {t('account.shipments.detail')}
                       </button>
                     </div>
                   </div>
@@ -303,7 +303,7 @@ export default function AccountShipmentsPage() {
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-slate-900 break-all">{o.tracking_number || '-'}</span>
                         {o.tracking_number && (
-                          <button onClick={() => handleCopy(o.tracking_number)} className="p-1 text-slate-400 hover:text-primary-navy transition-colors rounded" title="Kopyala">
+                          <button onClick={() => handleCopy(o.tracking_number)} className="p-1 text-slate-400 hover:text-primary-navy transition-colors rounded" title={t('account.shipments.copy')}>
                             <Copy size={13} />
                           </button>
                         )}
@@ -315,7 +315,7 @@ export default function AccountShipmentsPage() {
                       <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{t('orders.trackingLink') || 'Takip Bağlantısı'}</span>
                       {o.tracking_url ? (
                         <a href={o.tracking_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary-navy hover:underline">
-                          <ExternalLink size={13} /> Kargoyu Takip Et
+                          <ExternalLink size={13} /> {t('account.shipments.trackShipment')}
                         </a>
                       ) : (
                         <span className="text-sm font-bold text-slate-400">-</span>

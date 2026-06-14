@@ -40,11 +40,11 @@ export default function AccountInvoicesPage() {
       setItems(data as InvoiceProfile[])
     } catch (e) {
       console.error(e)
-      toast.error('Fatura profilleri yüklenemedi')
+      toast.error(t('account.invoices.loadError'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => { load() }, [load])
 
@@ -80,7 +80,7 @@ export default function AccountInvoicesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!addressLine || !city || !district || !taxNumber) {
-      toast.error('Lütfen zorunlu alanları doldurun')
+      toast.error(t('account.invoices.requiredFields'))
       return
     }
 
@@ -104,41 +104,41 @@ export default function AccountInvoicesPage() {
 
       if (editingId) {
         await updateInvoiceProfile(supabaseBrowserClient, editingId, payload)
-        toast.success('Profil güncellendi')
+        toast.success(t('account.invoices.profileUpdated'))
       } else {
         await createInvoiceProfile(supabaseBrowserClient, payload)
-        toast.success('Profil oluşturuldu')
+        toast.success(t('account.invoices.profileCreated'))
       }
       resetForm()
       await load()
     } catch (e) {
       console.error(e)
-      toast.error('İşlem başarısız')
+      toast.error(t('account.invoices.operationFailed'))
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Silmek istediğinize emin misiniz?')) return
+    if (!confirm(t('account.invoices.confirmDeleteShort'))) return
     try {
       await deleteInvoiceProfile(supabaseBrowserClient, id)
-      toast.success('Profil silindi')
+      toast.success(t('account.invoices.profileDeleted'))
       await load()
     } catch (e) {
       console.error(e)
-      toast.error('Silme başarısız')
+      toast.error(t('account.invoices.deleteFailed'))
     }
   }
 
   const handleMakeDefault = async (id: string) => {
     try {
       await setDefaultInvoiceProfile(supabaseBrowserClient, id)
-      toast.success('Varsayılan profil yapıldı')
+      toast.success(t('account.invoices.madeDefault'))
       await load()
     } catch (e) {
       console.error(e)
-      toast.error('İşlem başarısız')
+      toast.error(t('account.invoices.operationFailed'))
     }
   }
 
@@ -148,43 +148,43 @@ export default function AccountInvoicesPage() {
         <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 sm:p-8 sticky top-100px">
           <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 border-b border-slate-100 pb-4">
             {editingId ? <Edit2 className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-            {editingId ? 'Profili Düzenle' : 'Yeni Fatura Profili'}
+            {editingId ? t('account.invoices.editProfile') : t('account.invoices.newProfile')}
           </h2>
           
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="flex p-1.5 bg-slate-100/80 rounded-xl border border-slate-200/50">
               <button type="button" onClick={() => setProfileType('individual')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-colors ${profileType === 'individual' ? 'bg-white text-primary-navy shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-700'}`}>
-                <User className="w-4 h-4" /> Bireysel
+                <User className="w-4 h-4" /> {t('account.invoices.individual')}
               </button>
               <button type="button" onClick={() => setProfileType('corporate')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-bold transition-colors ${profileType === 'corporate' ? 'bg-white text-primary-navy shadow-sm border border-slate-200/60' : 'text-slate-500 hover:text-slate-700'}`}>
-                <Building2 className="w-4 h-4" /> Kurumsal
+                <Building2 className="w-4 h-4" /> {t('account.invoices.corporate')}
               </button>
             </div>
 
             {profileType === 'individual' ? (
               <div className="grid grid-cols-2 gap-3">
-                <input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Ad" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
-                <input value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Soyad" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
+                <input value={firstName} onChange={e => setFirstName(e.target.value)} placeholder={t('account.invoices.firstNamePlaceholder')} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
+                <input value={lastName} onChange={e => setLastName(e.target.value)} placeholder={t('account.invoices.lastNamePlaceholder')} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
               </div>
             ) : (
-              <input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Firma Ünvanı" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
+              <input value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder={t('account.invoices.companyNamePlaceholder')} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <input value={taxNumber} onChange={e => setTaxNumber(e.target.value)} placeholder={profileType === 'individual' ? 'TCKN' : 'VKN'} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
-              <input value={taxOffice} onChange={e => setTaxOffice(e.target.value)} placeholder="Vergi Dairesi" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
+              <input value={taxNumber} onChange={e => setTaxNumber(e.target.value)} placeholder={profileType === 'individual' ? t('account.invoices.tcknPlaceholder') : t('account.invoices.vknPlaceholder')} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
+              <input value={taxOffice} onChange={e => setTaxOffice(e.target.value)} placeholder={t('account.invoices.taxOfficeLabel')} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <input value={city} onChange={e => setCity(e.target.value)} placeholder="İl" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
-              <input value={district} onChange={e => setDistrict(e.target.value)} placeholder="İlçe" className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
+              <input value={city} onChange={e => setCity(e.target.value)} placeholder={t('account.invoices.cityPlaceholder')} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
+              <input value={district} onChange={e => setDistrict(e.target.value)} placeholder={t('account.invoices.districtPlaceholder')} className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" required />
             </div>
 
-            <textarea value={addressLine} onChange={e => setAddressLine(e.target.value)} placeholder="Adres Detayı" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm h-24" required />
+            <textarea value={addressLine} onChange={e => setAddressLine(e.target.value)} placeholder={t('account.invoices.addressPlaceholder')} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm h-24" required />
 
             <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" checked={isDefault} onChange={e => setIsDefault(e.target.checked)} className="w-4 h-4 rounded text-primary-navy" />
-              <span className="text-sm font-medium text-slate-600">Varsayılan Profil Yap</span>
+              <span className="text-sm font-medium text-slate-600">{t('account.invoices.makeDefaultLabel')}</span>
             </label>
 
             <div className="flex gap-3 pt-4 border-t border-slate-100">
@@ -203,15 +203,15 @@ export default function AccountInvoicesPage() {
             <FileText size={24} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Fatura Profillerim</h1>
-            <p className="text-sm text-slate-500 mt-1">Fatura bilgilerini burada yönetebilirsiniz.</p>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('account.invoices.pageTitle')}</h1>
+            <p className="text-sm text-slate-500 mt-1">{t('account.invoices.pageSubtitle')}</p>
           </div>
         </div>
 
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary-navy" /></div>
         ) : items.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-20 text-center text-slate-400">Henüz profil eklenmemiş</div>
+          <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-20 text-center text-slate-400">{t('account.invoices.empty')}</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {items.map((p) => (
@@ -234,9 +234,9 @@ export default function AccountInvoicesPage() {
                 <div className="text-sm text-slate-500 mb-6 line-clamp-2">{p.address_line} {p.district}/{p.city}</div>
 
                 {p.is_default ? (
-                  <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-widest text-green-600 bg-green-50 px-3 py-1 rounded-full"><CheckCircle size={10} /> Varsayılan</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-widest text-green-600 bg-green-50 px-3 py-1 rounded-full"><CheckCircle size={10} /> {t('account.invoices.default')}</span>
                 ) : (
-                  <button onClick={() => handleMakeDefault(p.id)} className="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-primary-navy transition-colors underline">Varsayılan Yap</button>
+                  <button onClick={() => handleMakeDefault(p.id)} className="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-primary-navy transition-colors underline">{t('account.invoices.setDefault')}</button>
                 )}
               </div>
             ))}

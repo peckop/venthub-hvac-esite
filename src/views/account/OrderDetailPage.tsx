@@ -278,10 +278,10 @@ export default function OrderDetailPage() {
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
                   <Package size={24} className="text-primary-navy" />
-                  {t('orders.orderNumber')}: #{order.order_number?.split('-').pop() || order.id.slice(-8).toUpperCase()}
+                  {t('orders.orderNumber')}{t('account.orderDetail.orderNoSuffix', { code: order.order_number?.split('-').pop() || order.id.slice(-8).toUpperCase() })}
                   {order.is_demo && (
                     <span className="px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-xs uppercase font-bold tracking-wider rounded-lg shadow-sm">
-                      DEMO
+                      {t('account.orderDetail.demoBadge')}
                     </span>
                   )}
                 </h2>
@@ -379,8 +379,8 @@ export default function OrderDetailPage() {
                     </div>
                   )}
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <span className="font-bold text-slate-700">Teslimat Yöntemi</span>
-                    <span className="font-medium text-slate-900">{(order.shipping_method === 'express') ? 'Ekspres' : 'Standart'}</span>
+                    <span className="font-bold text-slate-700">{t('account.orderDetail.shippingMethod')}</span>
+                    <span className="font-medium text-slate-900">{(order.shipping_method === 'express') ? t('account.orderDetail.express') : t('account.orderDetail.standard')}</span>
                   </div>
                 </div>
               </div>
@@ -447,8 +447,8 @@ export default function OrderDetailPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-5">
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Teslimat Yöntemi</div>
-                  <div className="font-bold text-slate-900">{(order.shipping_method === 'express') ? 'Ekspres (1–2 iş günü)' : 'Standart (3–5 iş günü)'}</div>
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('account.orderDetail.shippingMethod')}</div>
+                  <div className="font-bold text-slate-900">{(order.shipping_method === 'express') ? t('account.orderDetail.expressDetail') : t('account.orderDetail.standardDetail')}</div>
                 </div>
                 <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-5">
                   <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('orders.carrier')}</div>
@@ -496,24 +496,24 @@ export default function OrderDetailPage() {
               {/* Invoice Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-6 shadow-sm">
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">Fatura Bilgileri</div>
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">{t('account.orderDetail.invoiceInfo')}</div>
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">Tip:</span> <span className="text-sm font-bold text-slate-900 bg-white px-2 py-1 rounded border border-slate-100">{order.invoice_type || '-'}</span></div>
+                    <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">{t('account.orderDetail.typeLabel')}</span> <span className="text-sm font-bold text-slate-900 bg-white px-2 py-1 rounded border border-slate-100">{order.invoice_type || '-'}</span></div>
                     {(() => {
                       const info = (order.invoice_info || {}) as Record<string, unknown>
                       const iv = (k: string) => (info?.[k] ? String(info[k]) : '-')
                       if ((order.invoice_type || '').toLowerCase() === 'corporate') {
                         return (
                           <div className="space-y-3">
-                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">Ünvan:</span> <span className="text-sm font-medium text-slate-900 text-right max-w-60% truncate" title={iv('companyName')}>{iv('companyName')}</span></div>
-                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">VKN:</span> <span className="text-sm font-medium text-slate-900">{iv('vkn')}</span></div>
-                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">Vergi Dairesi:</span> <span className="text-sm font-medium text-slate-900">{iv('taxOffice')}</span></div>
+                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">{t('account.orderDetail.companyTitleLabel')}</span> <span className="text-sm font-medium text-slate-900 text-right max-w-60% truncate" title={iv('companyName')}>{iv('companyName')}</span></div>
+                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">{t('account.orderDetail.vknLabel')}</span> <span className="text-sm font-medium text-slate-900">{iv('vkn')}</span></div>
+                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">{t('account.orderDetail.taxOfficeLabel')}</span> <span className="text-sm font-medium text-slate-900">{iv('taxOffice')}</span></div>
                           </div>
                         )
                       }
                       return (
                         <div className="space-y-3">
-                          <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">TCKN:</span> <span className="text-sm font-medium text-slate-900">{iv('tckn')}</span></div>
+                          <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">{t('account.orderDetail.tcknLabel')}</span> <span className="text-sm font-medium text-slate-900">{iv('tckn')}</span></div>
                         </div>
                       )
                     })()}
@@ -522,7 +522,7 @@ export default function OrderDetailPage() {
 
                 {/* Legal Consents */}
                 <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-6 shadow-sm">
-                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">Yasal Onaylar</div>
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">{t('account.orderDetail.legalConsents')}</div>
                   <div className="space-y-3">
                     {(() => {
                       const cons = (order.legal_consents || {}) as Record<string, { accepted?: boolean; ts?: string | null }>
@@ -535,7 +535,7 @@ export default function OrderDetailPage() {
                             <span className="text-sm font-bold text-slate-600 group-hover:text-primary-navy transition-colors">{label}</span>
                             <div className="flex items-center gap-3">
                               <span className="text-xs text-slate-400 font-medium">{ok ? ts : ''}</span>
-                              <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-md shadow-sm ${ok ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-slate-200 text-slate-500 border border-slate-300'}`}>{ok ? 'Kabul Edildi' : 'Onay Yok'}</span>
+                              <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-md shadow-sm ${ok ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-slate-200 text-slate-500 border border-slate-300'}`}>{ok ? t('account.orderDetail.consentAccepted') : t('account.orderDetail.consentNone')}</span>
                             </div>
                           </div>
                         )
@@ -543,10 +543,10 @@ export default function OrderDetailPage() {
                       return (
                         <>
                           {row('KVKK', 'kvkk')}
-                          {row('Mesafeli Satış', 'distanceSales')}
-                          {row('Ön Bilgilendirme', 'preInfo')}
-                          {row('Sipariş Onayı', 'orderConfirm')}
-                          {row('Pazarlama İzni', 'marketing')}
+                          {row(t('account.orderDetail.consentDistanceSales'), 'distanceSales')}
+                          {row(t('account.orderDetail.consentPreInfo'), 'preInfo')}
+                          {row(t('account.orderDetail.consentOrderConfirm'), 'orderConfirm')}
+                          {row(t('account.orderDetail.consentMarketing'), 'marketing')}
                         </>
                       )
                     })()}

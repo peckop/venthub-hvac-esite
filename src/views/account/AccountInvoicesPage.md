@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountInvoicesPage.tsx
-skeleton_hash: 878e58c2d29a64de
+skeleton_hash: 0ecef47af2b4eb9d
 entity_hashes:
-  func:AccountInvoicesPage: a5eec2500a7d38b0
+  func:AccountInvoicesPage: f5f2f51606b21a99
   overview: d0d3eb909783a960
   style_tokens: e9dde5d26cd429fb
-generated_at: 2026-06-08T10:10:59Z
+generated_at: 2026-06-14T17:22:32Z
 ---
 
 ## Genel Bakış
@@ -32,11 +32,42 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### AccountInvoicesPage
-**Ne yapar**: Kullanıcının fatura profillerini listeleme, oluşturma, düzenleme, silme ve varsayılan olarak belirleme işlemlerini yöneten React bileşenidir. Bu bileşen, kullanıcının fatura bilgilerini tutarlı ve düzenli bir şekilde yönetmesini sağlayan bir arayüz sunar.
-**Nasıl yapar**: `useAuth` hook'u ile mevcut kullanıcı bilgisini, `useI18n` hook'u ile çeviri fonksiyonlarını alır. `useState` hook'ları ile fatura profilleri listesi, yükleme/saklama durumları ve form alanları için durum yönetimi sağlar. `useEffect` ve `useCallback` kullanarak bileşen yüklendiğinde profilleri otomatik olarak çeker. Form gönderiminde (`handleSubmit`) zorunlu alanları doğrular, profile türüne (`individual` veya `corporate`) göre uygun veri yapısını oluşturur ve supabase istemcisi aracılığıyla CRUD işlemlerini gerçekleştirir. Hata yönetimi için `toast` bildirimleri kullanır.
+
+**Ne yapar**: Kullanıcının fatura profil bilgilerini (bireysel veya kurumsal) yönetmeye yarayan React sayfa bileşenidir. Profilleri listeleme, oluşturma, düzenleme, silme ve varsayılan olarak ayarlama işlemlerini tek bir sayfada sunar. İki ana bölümden oluşur: sol tarafta form alanı, sağ tarafta profil kartlarının listesi yer alır.
+
+**Nasıl yapar**: Bileşen, `useAuth` hook'u ile oturumdaki kullanıcıyı, `useI18n` hook'u ile çeviri fonksiyonunu (`t`) alır. `useState` ile hem profil listesi (`items`) hem de form alanı için çok sayıda state yönetimi yapar. Profil tipi (`individual` / `corporate`) seçimine göre form alanları dinamik olarak değişir — bireysel profilde `firstName` ve `lastName`, kurumsal profilde `companyName` alanları gösterilir. Veri işlemleri Supabase istemci üzerinden `listInvoiceProfiles`, `createInvoiceProfile`, `updateInvoiceProfile`, `deleteInvoiceProfile` ve `setDefaultInvoiceProfile` fonksiyonlarıyla gerçekleşir. Her işlem sonrası `load` callback'i çağrılıp liste yenilenir. Bileşen yüklenme aşamasında `useEffect` ile `load` fonksiyonunu otomatik olarak çağırarak mevcut profilleri yükler.
+
 **Parametreler**:
-- Bu bileşen doğrudan props almaz. İçinde `useAuth()` ve `useI18n()` hook'larını kullanarak gerekli bağımlılıkları sağlar.
-**Dönüş**: JSX.Element — İki ana bölümden oluşan bir arayüz döndürür: Sol tarafta profil oluşturma/düzenleme formu, sağ tarafta ise fatura profillerinin kartlar halinde listelendiği bir bölüm.
+- Bu bileşen dışarıdan parametre almaz. İç state yönetimi şu değişkenleri kapsar:
+  - `editingId: string | null` — Düzenlenmekte olan profilin ID'si. `null` ise yeni profil oluşturma modundadır.
+  - `profileType: InvoiceProfileType` — Profil tipi, `'individual'` veya `'corporate'` değerlerini alır.
+  - `firstName: string` — Bireysel profil için ad alanı.
+  - `lastName: string` — Bireysel profil için soyad alanı.
+  - `companyName: string` — Kurumsal profil için şirket adı alanı.
+  - `taxNumber: string` — TCKN (bireysel) veya VKN (kurumsal) numarası.
+  - `taxOffice: string` — Vergi dairesi bilgisi.
+  - `city: string` — Şehir bilgisi.
+  - `district: string` — İlçe bilgisi.
+  - `addressLine: string` — Açık adres satırı.
+  - `isDefault: boolean` — Profilin varsayılan fatura profili olarak işaretlenip işaretlenmediği.
+  - `loading: boolean` — Verilerin arka planda yüklenip yüklenmediği durumu takip eder.
+  - `saving: boolean` — Form gönderim işleminin devam edip etmediği durumu takip eder.
+  - `items: InvoiceProfile[]` — Sunucudan yüklenen fatura profillerinin listesi.
+
+**Dönüş**: JSX element döndürür (`JSX.Element`). Sol tarafta form, sağ tarafta profil kartları olmak üzere iki sütunlu responsive bir düzen (layout) render eder. `loading` durumunda merkezi bir spinner, `items` boşsa dashed kenarlıklı bir boş durum mesajı gösterir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useAuth::useAuth
+- import: ../../i18n/I18nProvider::useI18n
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @/types/ui-models::type { InvoiceProfile }
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useState
+- import: sonner::toast
 
 ---
 
@@ -52,63 +83,105 @@ type InvoiceProfileType = 'individual' | 'corporate'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::AccountInvoicesPage
-- **params**: (parametre yok)
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `user` — useAuth() hook'undan alınan kullanıcı bilgisi
-  - `t` — useI18n() hook'undan alınan çeviri fonksiyonu
-  - `items` — useState ile oluşturulan InvoiceProfile[] dizisi, fatura profillerini tutar
-  - `loading` — useState ile oluşturulan boolean, yükleme durumunu takip eder
-  - `saving` — useState ile oluşturulan boolean, kaydetme durumunu takip eder
-  - `editingId` — useState ile oluşturulan string|null, düzenlenecek profilin ID'sini tutar
-  - `profileType` — useState ile oluşturulan InvoiceProfileType, profil tipini tutar (individual/corporate)
-  - `firstName` — useState ile oluşturulan string, bireysel profil için ad alanı
-  - `lastName` — useState ile oluşturulan string, bireysel profil için soyad alanı
-  - `companyName` — useState ile oluşturulan string, kurumsal profil için firma adı
-  - `taxNumber` — useState ile oluşturulan string, vergi numarası (TCKN/VKN)
-  - `taxOffice` — useState ile oluşturulan string, vergi dairesi
-  - `city` — useState ile oluşturulan string, il
-  - `district` — useState ile oluşturulan string, ilçe
-  - `addressLine` — useState ile oluşturulan string, adres detayı
-  - `isDefault` — useState ile oluşturulan boolean, varsayılan profil durumu
-  - `load` — useCallback ile oluşturulan async fonksiyon, fatura profillerini yükler
-  - `resetForm` — useCallback ile oluşturulan fonksiyon, form alanlarını sıfırlar
-  - `startEdit` — useCallback ile oluşturulan fonksiyon, profili düzenleme moduna alır
-  - `handleSubmit` — useCallback ile oluşturulan async fonksiyon, form gönderimini işler
-  - `handleDelete` — useCallback ile oluşturulan async fonksiyon, profili siler
-  - `handleMakeDefault` — useCallback ile oluşturulan async fonksiyon, profili varsayılan yapar
-- **Dönüş**: JSX (React component)
+  - `user` — useAuth() hook'undan gelen mevcut kullanıcı nesnesi, user.id ile API çağrılarında kullanılır
+  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu, tüm metin gösterimlerinde kullanılır
+  - `items` — mevcut fatura profilleri listesi, useState ile yönetilir (InvoiceProfile[])
+  - `loading` — sayfa yükleme durumu bayrağı (boolean), true iken loader gösterilir
+  - `saving` — form kaydetme durumu bayrağı (boolean), true iken buton disabled olur
+  - `editingId` — düzenlenen profilin ID'si veya null (yeni profil modu)
+  - `profileType` — fatura profil tipi: 'individual' veya 'corporate' (InvoiceProfileType)
+  - `firstName` — bireysel profil için ad alanı
+  - `lastName` — bireysel profil için soyad alanı
+  - `companyName` — kurumsal profil için şirket adı alanı
+  - `taxNumber` — vergi numarası (TCKN veya VKN)
+  - `taxOffice` — vergi dairesi bilgisi
+  - `city` — il bilgisi
+  - `district` — ilçe bilgisi
+  - `addressLine` — açık adres satırı
+  - `isDefault` — bu profilin varsayılan fatura profülü olup olmadığı (boolean)
+  - `load` — useCallback ile sarılı asenkron fonksiyon, fatura profillerini API'den yükler
+  - `resetForm` — form alanlarını varsayılan değerlerine sıfırlayan fonksiyon
+  - `startEdit` — var olan bir profili düzenleme modunda açan fonksiyon, parametre olarak InvoiceProfile alır
+  - `handleSubmit` — form submit handler, profil oluşturur veya günceller
+  - `handleDelete` — belirli bir profilin silinmesini onaylayıp gerçekleştiren fonksiyon
+  - `handleMakeDefault` — bir profili varsayılan olarak ayarlayan fonksiyon
+  - `p` — items.map callback'inde her bir döngü elemanı (InvoiceProfile), JSX'te kart olarak render edilir
+- **Dönüş**: JSX (React bileşeni)
 
-### [N2_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::load
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::load (useCallback async inner)
+- **params**: (yok — useCallback ile sarılmış)
 - **ic_degiskenler**:
-  - `data` — listInvoiceProfiles(supabaseBrowserClient) ile yüklenen fatura profilleri dizisi
-- **Dönüş**: Promise<void>
+  - `data` — listInvoiceProfiles(supabaseBrowserClient) çağrısının dönüş değeri, fatura profilleri listesi
+- **Dönüş**: void (asenkron, state'leri yan etki olarak günceller: loading, items)
 
 ### [N3_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::resetForm
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void
+- **params**: (yok)
+- **ic_degiskenler**: (yok — sadece state setter'larını çağırır)
+- **Dönüş**: void (tüm form state'lerini sıfırlar: editingId, profileType, firstName, lastName, companyName, taxNumber, taxOffice, city, district, addressLine, isDefault)
 
 ### [N4_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::startEdit
-- **params**: `(p: InvoiceProfile)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void
+- **params**: `(p: InvoiceProfile)` — düzenlenecek fatura profili nesnesi
+- **ic_degiskenler**: (yok — doğrudan state setter'ları ve p'nin alanlarını kullanır)
+  - `p.id` — profile ait benzersiz tanımlayıcı, editingId'ye atanır
+  - `p.profile_type` — profil tipi (individual/corporate), profileType'a atanır
+  - `p.first_name` — ad, firstName'a atanır
+  - `p.last_name` — soyad, lastName'a atanır
+  - `p.company_name` — şirket adı, companyName'a atanır
+  - `p.tax_number` — vergi numarası, taxNumber'a atanır
+  - `p.tax_office` — vergi dairesi, taxOffice'a atanır
+  - `p.city` — il, city'ye atanır
+  - `p.district` — ilçe, district'e atanır
+  - `p.address_line` — adres, addressLine'a atanır
+  - `p.is_default` — varsayılan mı, isDefault'a atanır
+- **Dönüş**: void (form alanlarını doldurur ve sayfayı yukarı kaydırır)
 
 ### [N5_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::handleSubmit
-- **params**: `(e: React.FormEvent)`
+- **params**: `(e: React.FormEvent)` — form submit olay nesnesi
 - **ic_degiskenler**:
-  - `payload` — API'ye gönderilecek fatura profili verisi (object), user.id ve form alanlarından oluşur
-- **Dönüş**: Promise<void>
+  - `user` — useAuth'tan gelen kullanıcı, user.id payload'ta kullanılır; null ise hata fırlatılır
+  - `payload` — API'ye gönderilen fatura profili veri nesnesi, şu alanları içerir: user_id (user.id), profile_type, first_name, last_name, company_name, tax_number, tax_office, city, district, address_line, is_default, country ('TR' sabit)
+  - `editingId` — mevcut düzenleme modu durumu, varsa güncelleme yoksa oluşturma yapılır
+  - `addressLine` — validasyon kontrolü: boşsa hata verir
+  - `city` — validasyon kontrolü: boşsa hata verir
+  - `district` — validasyon kontrolü: boşsa hata verir
+  - `taxNumber` — validasyon kontrolü: boşsa hata verir
+  - `profileType` — payload'ta individual/corporate durumuna göre first_name/last_name veya company_name set edilir
+  - `firstName` — individual modda payload'a yazılır
+  - `lastName` — individual modda payload'a yazılır
+  - `companyName` — corporate modda payload'a yazılır
+  - `taxOffice` — payload'a yazılır
+  - `isDefault` — payload'a yazılır
+- **Dönüş**: void (API çağrısı + toast bildirimleri + form sıfırlama + listeyi yeniden yükleme)
 
 ### [N6_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::handleDelete
-- **params**: `(id: string)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: Promise<void>
+- **params**: `(id: string)` — silinecek fatura profilinin ID'si
+- **ic_degiskenler**:
+  - `id` — deleteInvoiceProfile API çağrısına传递 edilen profil ID'si
+- **Dönüş**: void (onay dialogu + API silme + toast + listeyi yeniden yükleme)
 
 ### [N7_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::handleMakeDefault
-- **params**: `(id: string)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: Promise<void>
+- **params**: `(id: string)` — varsayılan yapılacak fatura profilinin ID'si
+- **ic_degiskenler**:
+  - `id` — setDefaultInvoiceProfile API çağrısına传递 edilen profil ID'si
+- **Dönüş**: void (API çağrısı + toast + listeyi yeniden yükleme)
+
+### [N8_NASIL] AST Pointer: src/views/account/AccountInvoicesPage.tsx::items.map callback
+- **params**: `(p)` — items dizisindeki her bir InvoiceProfile elemanı
+- **ic_degiskenler**:
+  - `p.id` — elemanın benzersiz tanımlayıcısı, key ve handleDelete/handleMakeDefault/startEdit argümanı olarak kullanılır
+  - `p.profile_type` — individual/corporate kontrolü ile ikon ve renk belirlenir; JSX'te card içeriği koşullu render edilir
+  - `p.first_name` — bireysel profilde ad alanı, `${p.first_name} ${p.last_name}` birleşimi olarak gösterilir
+  - `p.last_name` — bireysel profilde soyad alanı
+  - `p.company_name` — kurumsal profilde şirket adı olarak gösterilir
+  - `p.tax_office` — vergi dairesi, `p.tax_office / p.tax_number` formatında gösterilir
+  - `p.tax_number` — vergi numarası
+  - `p.address_line` — açık adres, kart içinde truncated olarak gösterilir
+  - `p.district` — ilçe, `p.district/p.city` formatında gösterilir
+  - `p.city` — il
+  - `p.is_default` — true ise yeşil "Varsayılan" badge, false ise "Varsayılan Yap" butonu gösterilir
+- **Dönüş**: JSX (her eleman için bir fatura profil kartı)
 
 ---
 
