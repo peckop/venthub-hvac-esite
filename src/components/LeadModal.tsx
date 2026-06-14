@@ -5,6 +5,8 @@ import React, { useState } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
+const CONTACT_EMAIL = 'info@venthub.com.tr'
+
 interface LeadModalProps {
   open: boolean
   onClose: () => void
@@ -154,7 +156,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
               <div className="relative z-10 block mt-12 bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10">
                 <h4 className="font-semibold text-white mb-2">{t('lead.form.corporateContact')}</h4>
                 <a href="mailto:info@venthub.com.tr" className="text-blue-200 hover:text-white flex items-center gap-2 text-sm transition-colors">
-                  <Mail className="w-4 h-4" /> info@venthub.com.tr
+                  <Mail className="w-4 h-4" /> {CONTACT_EMAIL}
                 </a>
               </div>
             </div>

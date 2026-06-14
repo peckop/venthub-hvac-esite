@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx
-skeleton_hash: 1650fa7e88723541
+skeleton_hash: 9dc3340e0671ea8a
 entity_hashes:
   func:LeadModal: d62325f85f800f09
   func:handleClose: 63d7dd03089c88aa
@@ -11,7 +11,7 @@ entity_hashes:
   func:validate: 3e57d313017d2565
   overview: a3ddac6f1a67af59
   style_tokens: 671fc429a274af0c
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-14T22:50:17Z
 ---
 
 ## Genel Bakış
@@ -71,6 +71,15 @@ Bu modül için fonksiyon gövdeleri paylaşılmadığı için çıkarılabilir 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: ../utils/routes::Routes
+- import: next/link::Link
+- import: react::React
+- import: react::useState
+
+---
+
 ## INTERFACES
 
 ### LeadModalProps
@@ -122,8 +131,8 @@ graph TD
     LeadModal_tsx__handleClose["handleClose"]
     LeadModal_tsx__submit["submit"]
     LeadModal_tsx__validate["validate"]
-    LeadModal_tsx__LeadModal --> LeadModal_tsx__handleClose
     LeadModal_tsx__LeadModal --> LeadModal_tsx__validate
+    LeadModal_tsx__LeadModal --> LeadModal_tsx__handleClose
 ```
 
 ## NODE ID STANDARD

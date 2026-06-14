@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\QuickViewModal.tsx
-skeleton_hash: fc9d7ff94e251f3f
+skeleton_hash: 2173bd903827f440
 entity_hashes:
   func:QuickViewModal: debc62013d59b5ee
   func:handleAdd: 552a96581034d630
   overview: c04ebac1db5bee8d
   style_tokens: a0d16d1087294b08
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-14T22:50:17Z
 ---
 
 ## Genel Bakış
@@ -58,6 +58,20 @@ Bu modül, bir React bileşeni olup, belirli prop'ların ve bağımlılıkların
 **Parametreler**:
 - Hiçbir parametre almaz.
 **Dönüş**: void veya bilinmiyor — Herhangi bir değer döndürmez veya dönüş tipi belirtilmemiştir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../hooks/useCartHook::useCart
+- import: ../i18n/I18nProvider::useI18n
+- import: ../i18n/format::formatCurrency
+- import: ../utils/routes::Routes
+- import: @/types/ui-models::type { Product }
+- import: lucide-react::Eye
+- import: lucide-react::ShoppingCart
+- import: lucide-react::X
+- import: next/link::Link
+- import: react::React
 
 ---
 

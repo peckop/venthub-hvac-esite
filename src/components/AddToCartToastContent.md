@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToastContent.tsx
-skeleton_hash: 63eaa6ec0b60ed2a
+skeleton_hash: 3892b149426f53a7
 entity_hashes:
   func:AddToCartToastContent: da3886a1d2990a31
   overview: e02dd238d7a8dbce
   style_tokens: 5ac0b676517c4959
-generated_at: 2026-06-08T10:08:12Z
+generated_at: 2026-06-14T22:50:16Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,15 @@ Bu modül, sepete ekleme bildiriminin içeriğini render eden React fonksiyonel 
 - `onClose`: `() => void` — Toast bildiriminin kapatılması istendiğinde çağrılacak fonksiyon. Bu fonksiyon, bileşenin üst düzeydeki durumunu (örn. `isVisible`) değiştirerek bildirimin kaybolmasını sağlar.
 
 **Dönüş**: `React.FC<AddToCartToastContentProps>` — Bu bileşen, `AddToCartToastContentProps` arayüzüne uygun prop'ları alan ve JSX (React Element) döndüren bir React fonksiyonel bileşenidir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: ../utils/routes::Routes
+- import: @/types/ui-models::type { Product }
+- import: next/link::Link
+- import: react::React
 
 ---
 

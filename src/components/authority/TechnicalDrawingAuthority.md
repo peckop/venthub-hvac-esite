@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\authority\TechnicalDrawingAuthority.tsx
-skeleton_hash: 51d32304c1cae956
+skeleton_hash: e636671401ecbace
 entity_hashes:
-  func:TechnicalDrawingAuthority: fdb68a3fb07822eb
+  func:TechnicalDrawingAuthority: 9e9ee1c4c520dae4
   overview: 644a3bf371af42f4
   style_tokens: b07a83f8b2a17b2b
-generated_at: 2026-06-08T10:08:37Z
+generated_at: 2026-06-14T22:51:00Z
 ---
 
 ## Genel Bakış
@@ -30,14 +30,23 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar zorunludur.
 ## FONKSİYON DETAYLARI
 
 ### TechnicalDrawingAuthority
-**Ne yapar**: Teknik doküman ve çizimlerin otorite standartlarına uygun olarak görüntülenmesini sağlar; versiyon takibi ve format bazlı görsel ayrıştırma işlevini içerir.  
-**Nasıl yapar**: `drawings` prop’undan gelen teknik çizim listesini yineleyerek her bir çizimini versiyon bilgisi ve format türüne göre uygun stil ve bileşenlerle render eder; ayrıca `className` prop’uyla dış stil sınıflarını kabul ederek bileşenin görünümünü özelleştirmeye olanak tanır.  
-
+**Ne yapar**: Teknik çizim ve doküman listesini, belirli bir otorite standartlarına uygun, animasyonlu ve interaktif bir grid (ızgara) formatında gösterir. Her çizim için format bazlı renk kodlaması, versiyon takibi ve indirme bağlantısı sunar.
+**Nasıl yapar**: Gelen `drawings` dizisini haritalayarak her bir çizimi bir `motion.div` (animasyonlu div) içinde render eder. Her çizim kartı, sol tarafta format ikonu ve bilgileri, sağ tarafta ise indirme butonu içerir. `formatColors` nesnesi kullanılarak dosya formatına göre (PDF, DWG vb.) dinamik arka plan ve kenarlık renkleri uygulanır. Animasyonlar için `framer-motion` kütüphanesinin `motion` bileşeni ve `initial`, `animate`, `transition` prop'ları kullanılarak kademeli giriş efekti sağlanır.
 **Parametreler**:
-- drawings: type not specified — Görüntülenecek teknik çizimlerin koleksiyonu; her eleman versiyon ve format bilgisi içerir.  
-- className: string — Bileşene ek CSS sınıfları eklemek için kullanılan isteğe bağlı string; varsayılan değeri boş string ('') olup, stil özelleştirmesi sağlar.  
+- drawings: `Array<{id: string, title: string, format: string, url: string, category?: string, version?: string, lastUpdated?: string}>` — Görselleştirilecek teknik çizimlerin veya dokümanların dizisi. Her nesne benzersiz bir `id`, `title` ve indirme `url`'si içermelidir. `format` (ör. "pdf", "dwg"), opsiyonel `category`, `version` ve `lastUpdated` alanları zengin bilgi gösterimi için kullanılır.
+- className: `string` — Bileşenin dış sarıcı `div`'ine eklenecek ek CSS sınıfı. Varsayılan değeri boş stringdir.
+**Dönüş**: `JSX.Element` — Teknik çizimlerin grid içinde listelendiği, animasyonlu React bileşeni (JSX) döndürür.
 
-**Dönüş**: void (fonksiyon bir JSX elementi render eder ve açık bir değer döndürmez).
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../types/media.types::type { TechnicalDrawingMetadata }
+- import: framer-motion::motion
+- import: lucide-react::Clock
+- import: lucide-react::Download
+- import: lucide-react::FileText
+- import: lucide-react::Info
+- import: react::React
 
 ---
 
@@ -58,14 +67,20 @@ Bu modülün doğru çalışması için aşağıdaki varsayımlar zorunludur.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\components\authority\TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
-- **params**: ({ drawings, className = '' }: TechnicalDrawingAuthorityProps)
-- **ic_degiskenler**: 
-  - `drawings` — TechnicalDrawingAuthorityProps'tan gelen, çizim belgeleri dizisi. Her çizim doc nesnesi olarak map içinde iterate edilir.
-  - `className` — TechnicalDrawingAuthorityProps'tan gelen ek CSS sınıfı, varsayılan olarak boş string. Grid container'ına eklenir.
-  - `doc` — drawings dizisindeki her bir çizim nesnesi (TechnicalDrawingMetadata). map callback'inde her iterasyonda mevcut çizim öğesini temsil eder.
-  - `idx` — drawings dizisindeki her bir çizimin indeksi (sayı). Animasyon gecikme süresini hesaplamak için kullanılır.
-- **Dönüş**: JSX.Element (React bileşeni, JSX döndürür)
+### [N1_NASIL] AST Pointer: TechnicalDrawingAuthority.tsx::TechnicalDrawingAuthority
+- **params**: (drawings: TechnicalDrawingMetadata[], className: string = '')
+- **ic_degiskenler**:
+  - `doc` — drawings.map() içindeki her bir çizim metadata nesnesi (id, format, category, version, title, url, lastUpdated özelliklerine sahip)
+  - `idx` — drawings.map() içindeki her bir çizimin indeksi, geç animasyon gecikmesi için kullanılır
+- **Dönüş**: JSX elementi (çizim kartlarının grid yapısını render eder)
+
+**Notlar:**
+- `formatColors` sabit nesnesi, `doc.format` değerine göre CSS sınıflarını belirler
+- `VERSION_PREFIX` sabiti, `doc.version` ile birlikte kullanılarak versiyon etiketi oluşturur
+- `doc.id` anahtar olarak kullanılır
+- `doc.url` indirme bağlantısı olarak kullanılır
+- `doc.category`, `doc.format.toUpperCase()`, `doc.lastUpdated` gösterim amaçlı kullanılır
+- Animasyon: `initial={{ opacity: 0, y: 10 }}` → `animate={{ opacity: 1, y: 0 }}` dönüşümü, gecikme: `idx * 0.05`
 
 ---
 

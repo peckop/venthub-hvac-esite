@@ -18,6 +18,8 @@ import { useI18n } from '../../../i18n/I18nProvider'
 import { getModelPlacement } from '../../../utils/3dModelOffsets'
 import { FanRenderer } from './FanRenderer'
 
+const VIEWER_BRAND = 'VentHub 3D'
+
 function Loader() {
     const { progress } = useProgress()
     return <Html center><div className="text-primary-navy font-bold text-sm bg-white/80 px-2 py-1 rounded">{progress.toFixed(0)}%</div></Html>
@@ -217,7 +219,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
             <div className="absolute bottom-4 left-4 z-30">
                 <div className="bg-white/90 px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm flex items-center gap-2">
                     <Triangle size={14} className="text-primary-navy fill-current" />
-                    <span className="font-bold text-primary-navy text-xs">VentHub 3D</span>
+                    <span className="font-bold text-primary-navy text-xs">{VIEWER_BRAND}</span>
                 </div>
             </div>
         </div>

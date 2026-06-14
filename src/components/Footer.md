@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\Footer.tsx
-skeleton_hash: 6f896fbcf16d9062
+skeleton_hash: 91583130499c2de6
 entity_hashes:
   func:Footer: 1e0192e85e1f6373
   overview: 05f327193547be84
   style_tokens: 266d0ec5d4b33045
-generated_at: 2026-06-11T16:12:03Z
+generated_at: 2026-06-14T22:50:16Z
 ---
 
 ## Genel Bakış
@@ -33,6 +33,16 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Nasıl yapar**: Fonksiyon içindeki JSX döndürerek, genellikle telif hakkı metni, sosyal medya linkleri ve diğer altbilgi öğelerini içerir; bu JSX, React tarafından DOM'a monte edilerek görüntülenir.  
 **Parametreler**: Yok  
 **Dönüş**: React.FC türünde bir fonksiyonel bileşen; bu bileşen render edildiğinde footer JSX'ini döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../contexts/CategoryContext::useCategories
+- import: ../i18n/I18nProvider::useI18n
+- import: ../utils/routes::Routes
+- import: ./BuildTag::BuildTag
+- import: next/link::Link
+- import: react::React
 
 ---
 

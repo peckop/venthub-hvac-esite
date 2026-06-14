@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\Product3DViewer.tsx
-skeleton_hash: 925b26c5846b3276
+skeleton_hash: f105483000067d11
 entity_hashes:
   func:ErrorBoundary:constructor: 7de390ca1471a8c5
   func:ErrorBoundary:getDerivedStateFromError: 55b37af114c0da98
@@ -14,7 +14,7 @@ entity_hashes:
   func:handleViewChange: ea99a6a2d5d89bd3
   overview: 2769d8a94fb30e5c
   style_tokens: d2e480f938f25b44
-generated_at: 2026-06-11T16:14:55Z
+generated_at: 2026-06-14T22:51:00Z
 ---
 
 ## Genel Bakış
@@ -92,6 +92,23 @@ Bu modül, 3D ürün modeli görüntüleme bileşenlerinden oluşur. Aşağıdak
 **Parametreler**:
 - Bu method herhangi bir parametre almaz. `this.props` ve `this.state` erişimindedir.
 **Dönüş**: JSX.Element — Hata durumunda bir `Html` bileşeni, normal durumda ise `this.props.children` döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../i18n/I18nProvider::useI18n
+- import: ../../../utils/3dModelOffsets::getModelPlacement
+- import: ./FanRenderer::FanRenderer
+- import: @react-three/fiber::Canvas
+- import: @react-three/fiber::useThree
+- import: react::React
+- import: react::Suspense
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useRef
+- import: react::useState
+- import: three::Vector3
+- import: three::type { Group }
 
 ---
 

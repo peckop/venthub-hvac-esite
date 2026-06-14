@@ -6,6 +6,8 @@ import React from 'react'
 
 import type { TechnicalDrawingMetadata } from '../../types/media.types'
 
+const VERSION_PREFIX = 'v'
+
 interface TechnicalDrawingAuthorityProps {
     drawings: TechnicalDrawingMetadata[]
     className?: string
@@ -43,7 +45,7 @@ export default function TechnicalDrawingAuthority({ drawings, className = '' }: 
                             <div className="flex items-center space-x-2">
                                 <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{doc.category}</span>
                                 {doc.version && (
-                                    <span className="bg-slate-100 text-slate-500 text-xs font-bold px-1.5 py-0.5 rounded uppercase">v{doc.version}</span>
+                                    <span className="bg-slate-100 text-slate-500 text-xs font-bold px-1.5 py-0.5 rounded uppercase">{VERSION_PREFIX}{doc.version}</span>
                                 )}
                             </div>
                             <h4 className="text-sm font-black text-industrial-gray leading-tight group-hover:text-primary-navy transition-colors">

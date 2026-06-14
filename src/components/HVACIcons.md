@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\HVACIcons.tsx
-skeleton_hash: 059afd9c8aa61107
+skeleton_hash: ab3c3407e866ff6d
 entity_hashes:
   func:AccessoriesIcon: df362ba93a01a32a
   func:AirCurtainIcon: a991d6630fad3258
@@ -17,7 +17,7 @@ entity_hashes:
   func:WhatsAppIcon: e7d41d76023d8693
   overview: dff8b3ed99dcf496
   style_tokens: 3b0534c287cddb44
-generated_at: 2026-06-09T06:46:02Z
+generated_at: 2026-06-14T22:50:17Z
 ---
 
 ## Genel Bakış
@@ -128,6 +128,12 @@ Bu modül, prop tiplerinin ve varsayılan değerlerinin beklendiği şekilde sa�
 - brand: string — Gösterilecek markanın adı; bu değere göre ilgili logo seçilir.  
 - className: string (opsiyonel) — Ekstra stil sınıfları eklemek için kullanılır, varsayılan boş string.  
 **Dönüş**: `React.FC<{ brand: string; className?: string }>`; marka logosunu gösteren fonksiyonel bileşen.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next/image::Image
+- import: react::React
 
 ---
 

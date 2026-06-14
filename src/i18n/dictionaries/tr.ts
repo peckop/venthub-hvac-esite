@@ -13,6 +13,11 @@ export const tr = {
     brandLegalName: 'VentHub HVAC Solutions.',
     vortice: 'Vortice',
     comma: ',',
+    decrease: 'Azalt',
+    increase: 'Artır',
+    listingPrice: 'Liste Fiyatı',
+    quickDetails: 'Hızlı Detaylar',
+    scrollTo: 'bölümüne git',
     addToProject: 'Proje Listesine Ekle',
     loadingApp: 'VentHub yükleniyor... ',
     loading: 'Yükleniyor...',
@@ -1790,6 +1795,8 @@ export const tr = {
       verify: 'Sertifika Doğrulama'
     },
     certLabels: {
+      yearSuffix: '-2024',
+      standardValue: 'ISO/EN-STD',
       certificateNo: 'Sertifika No',
       validity: 'Geçerlilik',
       standard: 'Standart',

@@ -18,6 +18,8 @@ import { Path,Shape } from 'three'
 
 import { useFanMaterials } from "../materials/useFanMaterials"
 
+const VORTICE_LABEL = 'VORTICE'
+
 // ── HELPERS ───────────────────────────────────────────────
 
 /**
@@ -227,7 +229,7 @@ export function SilentChannelFanModel({ explode = 0, onPartClick, selectedPart, 
                             <mesh material={materials.vorticeGreen}>
                                 <planeGeometry args={[0.22, 0.1]} />
                             </mesh>
-                            <Text position={[0, 0, 0.001]} fontSize={0.045} color="#ffffff" anchorX="center" anchorY="middle">VORTICE</Text>
+                            <Text position={[0, 0, 0.001]} fontSize={0.045} color="#ffffff" anchorX="center" anchorY="middle">{VORTICE_LABEL}</Text>
                         </group>
                         {/* BOX */}
                         <group position={[0.10, 0, 0]}>

@@ -9,6 +9,10 @@ import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes'
 
+const FADE_IN_DOWN_CSS = `@keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }`
+const FADE_IN_CSS = `@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }`
+const SCALE_IN_CSS = `@keyframes scaleIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }`
+
 const OrbitalProductsShowcase = dynamic(() => import('./OrbitalProductsShowcase'), { ssr: false })
 
 // Helper to determine 3D model type based on slug
@@ -249,12 +253,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                         className="absolute top-4 left-0 right-0 z-40 container mx-auto px-4"
                         style={{ animation: 'fadeInDown 0.3s ease-out' }}
                     >
-                        <style>{`
-                            @keyframes fadeInDown {
-                                from { opacity: 0; transform: translateY(-10px); }
-                                to { opacity: 1; transform: translateY(0); }
-                            }
-                        `}</style>
+                        <style>{FADE_IN_DOWN_CSS}</style>
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                             <button
                                 onClick={handleBack}
@@ -284,12 +283,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                     className="text-center"
                     style={{ animation: 'fadeIn 0.3s ease-out', marginTop: level === 'subcategory' ? (isMobile ? '5.5rem' : '3rem') : 0 }}
                 >
-                    <style>{`
-                        @keyframes fadeIn {
-                            from { opacity: 0; transform: translateY(-5px); }
-                            to { opacity: 1; transform: translateY(0); }
-                        }
-                    `}</style>
+                    <style>{FADE_IN_CSS}</style>
                     <h2 className="text-xl md:text-3xl font-bold text-white/90">
                         {focusedItemTitle || frontCardTitle || (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.displayName} Alt Kategorileri`)}
                     </h2>
@@ -310,12 +304,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                     className="w-full max-w-page will-change-transform"
                     style={{ animation: 'scaleIn 0.4s ease-out' }}
                 >
-                    <style>{`
-                        @keyframes scaleIn {
-                            from { opacity: 0; transform: scale(0.98); }
-                            to { opacity: 1; transform: scale(1); }
-                        }
-                    `}</style>
+                    <style>{SCALE_IN_CSS}</style>
                     <React.Suspense fallback={<div className="flex items-center justify-center bg-surface-darker w-full" style={{ minHeight: responsiveHeight }} />}>
                         <OrbitalProductsShowcase
                             items={displayItems}

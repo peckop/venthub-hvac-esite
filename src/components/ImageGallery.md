@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ImageGallery.tsx
-skeleton_hash: dd8ff83e4103cbc6
+skeleton_hash: 701f6aa8838e4566
 entity_hashes:
   func:ImageGallery: ed5cc2a855b5b9b8
   func:handleMouseLeave: 60d41c470a6d0032
   func:handleMouseMove: b68c1278669bcb7a
   overview: f4654744ad74eeea
   style_tokens: 01bec99debdcd366
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-14T22:50:17Z
 ---
 
 ## Genel Bakış
@@ -69,6 +69,24 @@ Bu modül için, fonksiyon gövdesinden üretilen aksiyomlar aşağıdadır. Aks
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: ./ui/VentImage::VentImage
+- import: lucide-react::Box
+- import: lucide-react::ChevronLeft
+- import: lucide-react::ChevronRight
+- import: lucide-react::Maximize2
+- import: lucide-react::X
+- import: next/dynamic::dynamic
+- import: react-dom::createPortal
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useRef
+- import: react::useState
+
+---
+
 ## INTERFACES
 
 ### ImageGalleryProps
@@ -81,9 +99,7 @@ Bu modül için, fonksiyon gövdesinden üretilen aksiyomlar aşağıdadır. Aks
 
 ## SABİTLER
 - **Product3DViewer** (call) — `dynamic(
-
     () => import('./products/3d/Product3DViewer'),
-
     { ssr: fals...`
 
 ---

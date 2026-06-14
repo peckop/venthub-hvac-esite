@@ -6,6 +6,8 @@ import { createPortal } from 'react-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import VentImage from './ui/VentImage'
 
+const THREE_D_LABEL = '3D'
+
 const Product3DViewer = dynamic(
     () => import('./products/3d/Product3DViewer'),
     { ssr: false }
@@ -151,7 +153,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                         aria-label={t('common.view3D') || '3D Model'}
                     >
                         <Box size={18} className="text-blue-600" />
-                        <span className="text-xs font-bold">3D</span>
+                        <span className="text-xs font-bold">{THREE_D_LABEL}</span>
                     </button>
                 )}
 

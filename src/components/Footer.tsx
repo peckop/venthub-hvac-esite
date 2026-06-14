@@ -8,6 +8,13 @@ import { Routes } from '../utils/routes'
 import BuildTag from './BuildTag'
 // import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
+const FOOTER_ICON_ADDRESS = '@'
+const FOOTER_ICON_PHONE = 'P'
+const FOOTER_ICON_MAIL = 'M'
+const WEEKDAY_HOURS = '09:00 - 18:00'
+const SATURDAY_HOURS = '09:00 - 14:00'
+const HVAC_SUFFIX = 'HVAC.'
+
 const Footer: React.FC = () => {
   const { t } = useI18n()
   const { categories: globalCategories } = useCategories()
@@ -130,15 +137,15 @@ const Footer: React.FC = () => {
             <h3 className="font-semibold mb-4">{t('footer.contact')}</h3>
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
-                <span className="text-secondary-blue mt-1 flex-shrink-0">@</span>
+                <span className="text-secondary-blue mt-1 flex-shrink-0">{FOOTER_ICON_ADDRESS}</span>
                 <span className="text-gray-300 text-sm whitespace-pre-line">{t('footer.address')}</span>
               </div>
               <div className="flex items-center space-x-3">
-                <span className="text-secondary-blue flex-shrink-0">P</span>
+                <span className="text-secondary-blue flex-shrink-0">{FOOTER_ICON_PHONE}</span>
                 <span className="text-gray-300 text-sm">{t('footer.phone')}</span>
               </div>
               <div className="flex items-center space-x-3">
-                <span className="text-secondary-blue flex-shrink-0">M</span>
+                <span className="text-secondary-blue flex-shrink-0">{FOOTER_ICON_MAIL}</span>
                 <span className="text-gray-300 text-sm">{t('footer.email')}</span>
               </div>
             </div>
@@ -147,8 +154,8 @@ const Footer: React.FC = () => {
             <div className="mt-4 p-3 bg-white/5 rounded-lg">
               <h4 className="font-medium text-sm mb-2">{t('footer.workingHours')}</h4>
               <p className="text-gray-300 text-xs">
-                {t('footer.weekdays')}: 09:00 - 18:00<br />
-                {t('footer.saturday')}: 09:00 - 14:00
+                {t('footer.weekdays')}: {WEEKDAY_HOURS}<br />
+                {t('footer.saturday')}: {SATURDAY_HOURS}
               </p>
             </div>
           </div>
@@ -160,7 +167,7 @@ const Footer: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-gray-300 text-sm">
-              © {new Date().getFullYear()} {t('header.brandName')} HVAC. {t('footer.rights')}
+              © {new Date().getFullYear()} {t('header.brandName')} {HVAC_SUFFIX} {t('footer.rights')}
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm justify-center md:justify-end">
               {/* Build meta tag */}

@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\AirCurtainModel.tsx
-skeleton_hash: 360e9f31adddc87c
+skeleton_hash: 85bd3086c11114dc
 entity_hashes:
-  func:AirCurtainModel: bc60a72552c9c5ec
+  func:AirCurtainModel: 94f6ef0bc3eca7e4
   func:AirFlow: 253c176ab9eddc1a
   func:showHeatedParts: c81e416e4f17f4ca
   overview: 34a083ba34fa5d3a
   style_tokens: eb58aa6049595205
-generated_at: 2026-06-10T09:42:14Z
+generated_at: 2026-06-14T22:51:18Z
 ---
 
 ## Genel Bakış
@@ -40,15 +40,16 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### AirCurtainModel
-**Ne yapar**: Havaperdesi (Air Curtain) cihazının tam 3D modelini oluşturur ve sahneye yerleştirir. Cihazın gövdesini, iç tambur fanını, ısıtıcı bobinlerini, üfleme ızgarasını ve kontrol panelini bileşenler halinde render ederek animasyonlu bir görsel sunar.
 
-**Nasıl yapar**: React Three Fiber kullanarak bir `<group>` içine çoklu `<mesh>` ve bileşenler ekler. Cihazın temel yapısını oluşturan box geometrileri, yan panelleri, arka paneli ve üst paneli malzemelerle kaplar. İç tambur fanı (cross-flow drum) için bir ref ile animasyonlu döndürme (useFrame) ekler. `isHeated` prop'una bağlı olarak ısıtıcı bobinlerini ve IR sensöründeki durum LED rengini değiştirir. Son olarak, üfleme ızgarasının içine `AirFlow` animasyonlu bileşenini yerleştirerek hava akışı simülasyonunu başlatır.
+**Ne yapar**: VentHub hava perdesi (air curtain) ürününün Three.js tabanlı 3D modelini render eden React bileşenidir. Ana gövde, yan kapaklar, arka panel, iç tambur fan, opsiyonel ısıtıcı batarya, üfleme ızgarası, IR sensör ve kontrol paneli dahil olmak üzere fiziksel tüm bileşenleri sahneye yerleştirir. Prop'lara bağlı olarak ısıtıcılı/ısıtıcısız ve karışık akış simülasyonu görsellerini dinamik olarak yönetir.
+
+**Nasıl yapar**: Bileşen, `useRef` ile iç tambur fan grubuna referans alır ve `useFrame` kancasıyla her karede bu referansın `rotation.x` değerini `delta * 12` kadar azaltarak Cross-Flow fanın sürekli dönmesini sağlar. Malzemeler `useFanMaterials()` özel kancasından (custom hook) tek seferde çekilerek tüm mesh'lere atanır. Isıtıcı batarya grubunun görünürlüğü `isHeated` prop'u veya `showHeatedParts()` fonksiyonu ile kontrol edilir. Üfleme ızgarası altına yerleştirilen `AirFlow` bileşenine `isHeated` ve `showMixed` prop'ları aktarılarak hava akışı simülasyonunun türü belirlenir. IR sensör LED rengi ısıtıcılı modellerde turuncu (#f97316), aksi halde yeşil (#22c55e) olarak koşullu atanır. Tüm sahne `scale={[0.8, 0.8, 0.8]}` ve `rotation={[0, -Math.PI / 2, 0]}` ile normalize edilir. `BRAND_LABEL` sabiti, HTML overlay içinde VentHub marka etiketi olarak gövde üzerine bindirilir; bu etiket `Html` transform bileşeni ile 3D sahneye sabitlenir ve `select-none pointer-events-none` sınıflarıyla etkileşime kapatılır.
 
 **Parametreler**:
-- isHeated: boolean — Cihazın ısıtıcılı olup olmadığını belirtir. true olduğunda ısıtıcı bobinleri görünür ve sensör LED'i turuncu olur. Varsayılanı false'dur.
-- showMixed: boolean — Hava akışının "karışık" (hem sıcak hem soğuk) modda simüle edilip edilmeyeceğini belirtir. AirFlow bileşenine aktarılır. Varsayılanı false'dur.
+- `isHeated: boolean` — Modelin ısıtıcılı olup olmadığını belirler. `true` olduğunda ısıtıcı batarya bobinleri görünür hale gelir ve IR sensör LED'i turuncu renge döner. Varsayılan değeri `false`'tur.
+- `showMixed: boolean` — Karışık (mixed) hava akışı simülasyonunun gösterilip gösterilmeyeceğini belirler. `AirFlow` alt bileşenine aktarılarak akış görselleştirmesinin türünü değiştirir. Varsayılan değeri `false`'tur.
 
-**Dönüş**: JSX Element — 3D sahne içinde yerleştirilebilecek, cihazın tüm geometrik ve animasyonlu parçalarını içeren bir React Three Fiber bileşeni döndürür.
+**Dönüş**: JSX elementi (`JSX.Element`) — Hava perdesinin tüm 3B geometrik bileşenlerini, animasyonlarını ve interaktif unsurlarını içeren React Three Fiber sahne ağacı. Fonksiyon component yapısı gereği React element döndürür; `void` dönüşü değildir.
 
 ### AirFlow
 **Ne yapar**: Havaperdesinden çıkan hava akışını görsel olarak simüle eden animasyonlu bir 2D katmanlar (dilimler) serisi oluşturur. Dilimlerin renkleri, opaklıkları ve dalgalı hareketleri, cihazın çalışma moduna (ısıtmalı, soğuk veya karışık) göre dinamik olarak değişir.
@@ -69,6 +70,20 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../materials/useFanMaterials::useFanMaterials
+- import: @react-three/drei::Html
+- import: @react-three/fiber::useFrame
+- import: react::React
+- import: react::useMemo
+- import: react::useRef
+- import: three::AdditiveBlending
+- import: three::Color
+- import: three::DoubleSide
+- import: three::type { Group, Mesh, MeshBasicMaterial }
+
+---
+
 ## INTERFACES
 
 ### AirCurtainModelProps
@@ -79,34 +94,34 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AirCurtainModel.tsx::AirCurtainModel
-- **params**: ({ isHeated = false, showMixed = false }: AirCurtainModelProps)
+### [N1_NASIL] AST Pointer: 3d/types/AirCurtainModel.tsx::AirCurtainModel
+- **params**: `{ isHeated = false, showMixed = false }` — 3D modelin ısıtma ve karışık akış modunu belirten prop'lar
 - **ic_degiskenler**:
-  - `drumRef` — İç tambur fan (Cross-Flow) için React ref nesnesi, 3D grubun DOM referansını tutar
-  - `materials` — useFanMaterials() hook'undan gelen materyal nesnesi, tüm 3D mesh'lerin malzemelerini içerir (matteBlack, industrialSteel, safetyOrange)
-- **Dönüş**: JSX (React Three Fiber bileşenleri)
+  - `drumRef` — İç tambur fan (Cross-Flow) referansı, useFrame hook'u ile döndürmek için kullanılır
+  - `materials` — useFanMaterials hook'undan gelen malzeme nesneleri (matteBlack, industrialSteel, safetyOrange)
+- **Dönüş**: JSX (3D modelin tüm parçalarını render eden React component)
 
-### [N2_NASIL] AirCurtainModel.tsx::AirFlow
-- **params**: ({ isHeated, showMixed }: { isHeated: boolean, showMixed: boolean })
+### [N2_NASIL] AST Pointer: 3d/types/AirCurtainModel.tsx::AirFlow
+- **params**: `{ isHeated, showMixed }` — Akış animasyonunun ısıtma ve karışık mod parametreleri
 - **ic_degiskenler**:
-  - `meshRefs` — Her hava akışı dilimi için React ref dizisi, dilim mesh'lerinin DOM referanslarını tutar
-  - `SLICE_COUNT` — Sabit: Yatay dilim sayısı (28)
-  - `CURTAIN_WIDTH` — Sabit: Perde genişliği (2.32 birim)
-  - `CURTAIN_HEIGHT` — Sabit: Toplam akış mesafesi (1.6 birim)
-  - `SLICE_HEIGHT` — Sabit: Tek bir dilim yüksekliği (CURTAIN_HEIGHT / SLICE_COUNT * 1.05)
-  - `MAX_OPACITY` — Sabit: Üst dilimlerdeki maksimum opaklık (0.32)
-  - `WAVE_SPEED` — Sabit: Dalga hareket hızı (2.5)
-  - `WAVE_INTENSITY` — Sabit: Dalga genliği (0.12)
-  - `slices` — useMemo ile hesaplanan dilim verileri dizisi, her dilim için yPos, baseOpacity ve type değerlerini içerir
-  - `timeRef` — Animasyon zamanlayıcısı için React ref, geçen toplam süreyi tutar
-  - `hotColor` — Sıcak hava rengi (turuncu tonu #fb923c)
-  - `coldColor` — Soğuk hava rengi (mavi tonu #38bdf8)
-- **Dönüş**: JSX (React Three Fiber bileşenleri)
+  - `meshRefs` — Her dilim için Three.js Mesh referanslarını tutan dizi
+  - `SLICE_COUNT` — Yatay dilim sayısı (28)
+  - `CURTAIN_WIDTH` — Perde genişliği (2.32 birim)
+  - `CURTAIN_HEIGHT` — Toplam akış mesafesi (1.6 birim)
+  - `SLICE_HEIGHT` — Her bir dilimin yüksekliği (CURTAIN_HEIGHT / SLICE_COUNT * 1.05)
+  - `MAX_OPACITY` — Üst dilimlerdeki maksimum opacity değeri (0.32)
+  - `WAVE_SPEED` — Dalga hareket hızı (2.5)
+  - `WAVE_INTENSITY` — Dalga genliği (0.12)
+  - `slices` — useMemo ile memoize edilmiş dilim verileri dizisi (pozisyon, opacity, tip bilgileri)
+  - `timeRef` — Animasyon zaman referansı (useRef ile tutulan 0 başlangıçlı sayaç)
+  - `hotColor` — Sıcak akış rengi (turuncu, "#fb923c")
+  - `coldColor` — Soğuk akış rengi (mavi, "#38bdf8")
+- **Dönüş**: JSX (animasyonlu hava akışı dilimlerini render eden React component)
 
-### [N3_NASIL] AirCurtainModel.tsx::showHeatedParts
+### [N3_NASIL] AST Pointer: 3d/types/AirCurtainModel.tsx::showHeatedParts
 - **params**: (yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: boolean (her zaman true)
+- **Dönüş**: `true` — Her zaman true döndüren yardımcı fonksiyon, ısıtıcı parçaları göstermek için koşul kontrolünde kullanılır
 
 ---
 

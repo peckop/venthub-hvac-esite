@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\_components\ProductDetailPageView.tsx
-skeleton_hash: b7613a8983970228
+skeleton_hash: c30132303578d1f4
 entity_hashes:
   func:ProductDetailPage: e3b845e07eaace73
   overview: faf4f4f8b5575270
   style_tokens: 97bcb7e77cb5d07f
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-14T22:50:16Z
 ---
 
 ## Genel Bakış
@@ -44,6 +44,39 @@ Bu modülün doğru çalışması için `initialProduct` parametresinin sağlanm
 
 **İlişkili Tip Tanımı**:
 - `ProductDetailPageProps` — Bileşenin kabul ettiği prop'ların tanımlandığı arayüz. En az `initialProduct` alanını içermelidir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/HVACIcons::BrandIcon
+- import: ../../components/ImageGallery::ImageGallery
+- import: ../../components/LeadModal::LeadModal
+- import: ../../components/ProductCard::ProductCard
+- import: ../../components/Seo::Seo
+- import: ../../components/product/ProductSmartInference::ProductSmartInference
+- import: ../../components/products/RichTextRenderer::RichTextRenderer
+- import: ../../components/products::AddToProjectModal
+- import: ../../contexts/CategoryContext::useCategories
+- import: ../../hooks/useCartHook::useCart
+- import: ../../hooks/useProjectLists::useProjectLists
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/format::formatCurrency
+- import: ../../lib/services/product.service::getProductBySlug
+- import: ../../lib/services/product.service::getProductsEnriched
+- import: ../../lib/supabase/client::supabaseBrowserClient
+- import: ../../types/db-rows::type { CategoryMetadata }
+- import: ../../types/ui-models::type { Product }
+- import: ../../utils/routes::Routes
+- import: next/link::Link
+- import: next/navigation::useParams
+- import: next/navigation::useRouter
+- import: next::type { Route }
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
+- import: sonner::toast
 
 ---
 

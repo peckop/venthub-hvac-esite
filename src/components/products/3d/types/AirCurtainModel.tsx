@@ -7,6 +7,8 @@ import { AdditiveBlending,Color, DoubleSide } from 'three'
 
 import { useFanMaterials } from '../materials/useFanMaterials'
 
+const BRAND_LABEL = 'VentHub'
+
 export interface AirCurtainModelProps {
     isHeated?: boolean
     showMixed?: boolean
@@ -41,7 +43,7 @@ export function AirCurtainModel({ isHeated = false, showMixed = false }: AirCurt
                     <Html transform distanceFactor={0.5} position={[0, 0, 0.001]}>
                         <div className="flex items-center gap-1 bg-white px-2 py-0.5 rounded-sm shadow-inner select-none pointer-events-none border border-blue-200">
                             <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                            <span className="text-xs font-black text-primary-navy tracking-tighter">VentHub</span>
+                            <span className="text-xs font-black text-primary-navy tracking-tighter">{BRAND_LABEL}</span>
                         </div>
                     </Html>
                 </mesh>

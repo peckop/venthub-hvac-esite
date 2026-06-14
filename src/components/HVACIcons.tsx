@@ -1,6 +1,9 @@
 import Image from 'next/image'
 import React from 'react'
 
+const HRV_LABEL = 'HRV'
+const RPM_LABEL = 'RPM'
+
 interface IconProps {
   className?: string
   size?: number
@@ -61,7 +64,7 @@ export const HeatRecoveryIcon: React.FC<IconProps> = ({ className = '', size = 4
     <path d="M36 24 L42 24" stroke="#F59E0B" strokeWidth="2" markerEnd="url(#arrowOrange)" />
     <path d="M24 12 L24 16" stroke="currentColor" strokeWidth="1" />
     <path d="M24 32 L24 36" stroke="currentColor" strokeWidth="1" />
-    <text x="24" y="26" textAnchor="middle" fontSize="8" fill="currentColor">HRV</text>
+    <text x="24" y="26" textAnchor="middle" fontSize="8" fill="currentColor">{HRV_LABEL}</text>
     <defs>
       <marker id="arrowBlue" markerWidth="6" markerHeight="4" refX="6" refY="2" orient="auto">
         <polygon points="0,0 6,2 0,4" fill="#38BDF8" />
@@ -206,7 +209,7 @@ export const SpeedControlIcon: React.FC<IconProps> = ({ className = '', size = 4
     <rect x="30" y="18" width="6" height="2" rx="1" fill="#10B981" />
     <rect x="30" y="22" width="4" height="2" rx="1" fill="#F59E0B" />
     <rect x="30" y="26" width="2" height="2" rx="1" fill="#EF4444" />
-    <text x="33" y="32" textAnchor="middle" fontSize="6" fill="currentColor">RPM</text>
+    <text x="33" y="32" textAnchor="middle" fontSize="6" fill="currentColor">{RPM_LABEL}</text>
   </svg>
 )
 

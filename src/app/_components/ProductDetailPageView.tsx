@@ -429,7 +429,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       <div className={`w-1 h-1 rounded-full ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green' : 'bg-warning-orange'}`} />
                       <span>{typeof product.stock_qty === 'number' && product.stock_qty > 0 ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
                     </div>
-                    <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{`${t('pdp.labels.sku')}: ${product.sku}`}</span>
+                    <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.sku')}: {product.sku}</span>
                   </div>
                 </div>
               </div>
@@ -746,7 +746,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                               <div className="text-center">
                                 <FileText size={28} className="text-primary-navy/40 mx-auto mb-2" />
                                 <p className="text-industrial-gray font-black text-xs uppercase tracking-widest">{t(`pdp.diagramsExtra.${type}`)}</p>
-                                <p className="text-xs text-steel-gray font-bold mt-1 uppercase tracking-tighter">{`${t('common.pdf')} ${t('common.pdfDatasheet')}`}</p>
+                                <p className="text-xs text-steel-gray font-bold mt-1 uppercase tracking-tighter">{t('common.pdf')} {t('common.pdfDatasheet')}</p>
                               </div>
                             </div>
                           ))}
@@ -804,8 +804,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                           <div className="bg-slate-50 rounded-2xl p-5 mb-5 group-hover:bg-air-blue/10 transition-colors"><Award size={36} className="text-primary-navy/30 mx-auto" /></div>
                           <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-3">{t(`pdp.cert.${cert}`)}</h4>
                           <div className="text-xs text-steel-gray space-y-1 font-bold uppercase tracking-widest opacity-60">
-                            <p>{`${t('pdp.certLabels.certificateNo')}: ${cert.toUpperCase()}-2024`}</p>
-                            <p>{`${t('pdp.certLabels.standard')}: ISO/EN-STD`}</p>
+                            <p>{t('pdp.certLabels.certificateNo')}: {cert.toUpperCase()}{t('pdp.certLabels.yearSuffix')}</p>
+                            <p>{t('pdp.certLabels.standard')}: {t('pdp.certLabels.standardValue')}</p>
                           </div>
                         </div>
                       ))}

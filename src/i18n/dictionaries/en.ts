@@ -14,6 +14,11 @@ export const en: typeof tr = {
     brandLegalName: 'VentHub HVAC Solutions.',
     vortice: 'Vortice',
     comma: ',',
+    decrease: 'Decrease',
+    increase: 'Increase',
+    listingPrice: 'List Price',
+    quickDetails: 'Quick Details',
+    scrollTo: 'go to section',
     loadingApp: 'Loading VentHub... ',
     loading: 'Loading...',
     categories: 'Categories',
@@ -1534,6 +1539,8 @@ export const en: typeof tr = {
       verify: 'Certificate Verification'
     },
     certLabels: {
+      yearSuffix: '-2024',
+      standardValue: 'ISO/EN-STD',
       certificateNo: 'Certificate No',
       validity: 'Validity',
       standard: 'Standard',

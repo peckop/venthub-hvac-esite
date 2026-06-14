@@ -8,6 +8,8 @@ import type { Product } from '@/types/ui-models'
 import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
+const CLOSE_GLYPH = '×'
+
 interface AddToCartToastContentProps {
   product: Product
   onClose: () => void
@@ -38,7 +40,7 @@ const AddToCartToastContent: React.FC<AddToCartToastContentProps> = ({ product, 
           className="text-steel-gray hover:text-industrial-gray font-bold text-lg leading-none p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy rounded"
           aria-label={t('common.close')}
         >
-          ×
+          {CLOSE_GLYPH}
         </button>
       </div>
       <div className="px-3 md:px-4 pb-3 md:pb-4 pt-0">

@@ -9,6 +9,8 @@ import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
+const PLACEHOLDER_EMOJI = '🌪️'
+
 interface QuickViewModalProps {
   product: Product | null
   open: boolean
@@ -39,7 +41,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
         </div>
         <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="aspect-square bg-gradient-to-br from-air-blue to-light-gray rounded-xl flex items-center justify-center">
-            <div className="text-6xl text-secondary-blue/30">🌪️</div>
+            <div className="text-6xl text-secondary-blue/30">{PLACEHOLDER_EMOJI}</div>
           </div>
           <div className="flex flex-col">
             <h4 className="font-semibold text-industrial-gray mb-1 line-clamp-2">{product.name}</h4>
