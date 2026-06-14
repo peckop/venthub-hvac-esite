@@ -18,3 +18,7 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+
+## 2024-05-15 - Scribe Setup
+**Learning:** React Server Components (RSC) require careful hook execution documentation. Functions like `useTenant` strictly depend on specific runtime contexts, and failing to document these hard constraints (via `@throws`) leads to silent build or hydration failures.
+**Action:** When documenting custom React hooks, always explicitly document context constraints and expected server/client environments.

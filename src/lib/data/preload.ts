@@ -6,7 +6,16 @@ import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../types/db-rows'
 import { mapDatabaseCategoryToDomain } from '../type-converters'
 
-// Cached product fetcher
+/**
+ * Retrieves a product by its unique slug using React's `cache` to deduplicate requests.
+ * Ensures the database query is executed only once per render pass for the same slug.
+ *
+ * @param slug - The URL-friendly identifier of the product
+ * @returns A promise that resolves to the domain product object, or null if not found
+ *
+ * @example
+ * const product = await getCachedProductBySlug('axial-fan-500');
+ */
 export const getCachedProductBySlug = cache(async (slug: string) => {
   return getProductBySlug(supabase, slug)
 })
