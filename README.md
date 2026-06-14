@@ -22,6 +22,8 @@ HVAC sektörüne özel, B2B/B2C karma satış mimarisi üzerine kurulu premium e
 > **🤖 AI Otonom Yetenek Sayısı:** Projede **30+** uzmanlaşmış yetenek aktiftir (`.claude/skills/`; legacy `.agent/skills/`) — performans, güvenlik, mimari, i18n, NotebookLM entegrasyonu, multi-agent orkestrasyon vb. Güncel liste: `docs/venthub_skills_master.md`.
 
 ### 🆕 Son Geliştirmeler
+- 🗂️ **Admin Panel Standardizasyonu — DataTableKit Göçü (Faz 1 TAMAM, 13-14.06.2026):** 10 admin liste sayfası (Coupons → Products) tek paylaşılan tablo motoruna (`useAdminTable` + `DataTableKit` + `mutateWithAudit` yazma kapısı) taşındı. Server-mode pagination/sort/filter, RBAC+audit'li tüm yazmalar, kapanan denetim boşlukları, sayfa-başı i18n + axe-0 testleri. Zor sayfalar `maestro` orkestrasyon skill'iyle göçtü. (tsc 0 · lint 0 · 473 test)
+- 🤝 **Bayi (B2B) Modülü Temeli (12.06.2026):** Kanıta-dayalı bayi-ağı standardı (`dealer-network-standard.md`) + R0-B2 build blueprint + canlı-DB zemin denetimi; R1 kimlik-ekseni kararı org-tabanlı. R0 şema temeli atıldı. NotebookLM sync milestone modeline; Claude Code kalite-omurgası hook'ları (Tier-1).
 - 🚀 **Performans Optimizasyonu Sprinti (10.06.2026):**
   - **CLS Düzeltmeleri:** Footer kayması `min-h-hvac-section` tokeni ve sabit boyutlu varlıklarla çözüldü; ürün gridleri `content-visibility: auto` ile optimize edildi.
   - **TBT Düzeltmeleri:** Ağır 3D navigasyon katmanları ve dinamik arayüzler `next/dynamic` (`{ ssr: false }`) ile kod bölme işlemine tabi tutuldu; ekran dışı Three.js varlıkları `<LazyInView>` ile tembel yüklendi.
