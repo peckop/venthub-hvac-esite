@@ -2,6 +2,7 @@ import { AlertTriangle,ArrowLeft, Calculator, Info } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
+import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes';
 import Seo from '../Seo'
 
@@ -26,11 +27,12 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
     description,
     icon,
     backLink = '/products',
-    backLabel = 'Ürünlere Dön',
+    backLabel,
     infoText,
     warningText,
     children
 }) => {
+    const { t } = useI18n()
     return (
         <div className="min-h-screen bg-gradient-to-b from-light-gray to-white">
             <Seo
@@ -47,7 +49,7 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
                         className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-4 transition-colors"
                     >
                         <ArrowLeft size={16} />
-                        {backLabel}
+                        {backLabel ?? t('calculators.layout.backLabel')}
                     </Link>
 
                     <div className="flex items-center gap-4">
@@ -87,13 +89,12 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
                 <div className="text-center text-sm text-steel-gray border-t border-light-gray pt-6">
                     <p>
-                        Bu hesap makinesi ön boyutlandırma amaçlıdır.
-                        Kesin proje hesapları için bir HVAC mühendisine danışın.
+                        {t('calculators.layout.disclaimer')}
                     </p>
                     <p className="mt-1 text-xs">
-                        Teknik sorularınız için{' '}
+                        {t('calculators.layout.contactPrompt')}{' '}
                         <Link href={Routes.contact()} className="text-primary-navy hover:underline">
-                            iletişime geçin
+                            {t('calculators.layout.contactLink')}
                         </Link>
                     </p>
                 </div>

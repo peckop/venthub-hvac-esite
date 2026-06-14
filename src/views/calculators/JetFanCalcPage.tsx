@@ -8,34 +8,37 @@ import {
   Recommendations,
   ResultCard,
   ResultGrid} from '../../components/calculators'
+import { useI18n } from '../../i18n/I18nProvider'
 import {
   calculateJetFan,
   type JetFanApplicationType
 } from '../../lib/hvacCalculations'
 
-// Uygulama tipi seçenekleri
-const APPLICATION_OPTIONS = [
-  {
-    value: 'parking',
-    label: 'Otopark',
-    description: 'Kapalı otopark havalandırma',
-    icon: <Car size={24} />
-  },
-  {
-    value: 'tunnel',
-    label: 'Tünel',
-    description: 'Yol veya metro tüneli',
-    icon: <ArrowDownUp size={24} />
-  }
-]
-
-// Havalandırma modu seçenekleri
-const VENTILATION_MODE_OPTIONS = [
-  { value: 'normal', label: 'Normal', description: 'Günlük havalandırma' },
-  { value: 'smoke', label: 'Duman Tahliye', description: 'Yangın senaryosu' }
-]
-
 const JetFanCalcPage: React.FC = () => {
+  const { t } = useI18n()
+
+  // Uygulama tipi seçenekleri
+  const APPLICATION_OPTIONS = [
+    {
+      value: 'parking',
+      label: t('calculators.jetFan.form.parking'),
+      description: t('calculators.jetFan.parkingShortDesc'),
+      icon: <Car size={24} />
+    },
+    {
+      value: 'tunnel',
+      label: t('calculators.jetFan.form.tunnel'),
+      description: t('calculators.jetFan.tunnelShortDesc'),
+      icon: <ArrowDownUp size={24} />
+    }
+  ]
+
+  // Havalandırma modu seçenekleri
+  const VENTILATION_MODE_OPTIONS = [
+    { value: 'normal', label: t('calculators.jetFan.form.normal'), description: t('calculators.jetFan.form.normalDesc') },
+    { value: 'smoke', label: t('calculators.jetFan.form.smoke'), description: t('calculators.jetFan.form.smokeDesc') }
+  ]
+
   // Form durumu
   const [applicationType, setApplicationType] = useState<JetFanApplicationType>('parking')
   const [ventilationMode, setVentilationMode] = useState<'normal' | 'smoke'>('normal')
@@ -93,11 +96,11 @@ const JetFanCalcPage: React.FC = () => {
 
   return (
     <CalculatorLayout
-      title="Jet Fan Hesap Makinesi"
-      description="Otopark ve tünel jet fan itki ve havalandırma hesabı"
+      title={t('calculators.jetFan.pageTitle')}
+      description={t('calculators.jetFan.pageDescription')}
       icon={<Wind size={32} />}
-      infoText="Kapalı otopark veya tünellerde gerekli jet fan sayısı, itki kuvveti ve havalandırma debisini hesaplar. NFPA 502 ve BS 7346 standartlarına uygun."
-      warningText={ventilationMode === 'smoke' ? 'Duman tahliye hesabı ön tasarım amaçlıdır. Profesyonel yangın mühendisi danışmanlığı gereklidir.' : undefined}
+      infoText={t('calculators.jetFan.pageInfoText')}
+      warningText={ventilationMode === 'smoke' ? t('calculators.jetFan.smokeWarning') : undefined}
     >
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Sol Panel - Girdiler */}
@@ -109,14 +112,14 @@ const JetFanCalcPage: React.FC = () => {
                 <MapPin className="text-primary-navy" size={24} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-industrial-gray">Uygulama Tipi</h2>
-                <p className="text-sm text-steel-gray">Mekan türünü seçin</p>
+                <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.jetFan.appTypeTitle')}</h2>
+                <p className="text-sm text-steel-gray">{t('calculators.jetFan.appTypeSubtitle')}</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <RadioGroup
-                label="Uygulama"
+                label={t('calculators.jetFan.applicationLabel')}
                 value={applicationType}
                 onChange={(v) => setApplicationType(v as JetFanApplicationType)}
                 options={APPLICATION_OPTIONS}
@@ -124,7 +127,7 @@ const JetFanCalcPage: React.FC = () => {
               />
 
               <RadioGroup
-                label="Havalandırma Modu"
+                label={t('calculators.jetFan.form.mode')}
                 value={ventilationMode}
                 onChange={(v) => setVentilationMode(v as 'normal' | 'smoke')}
                 options={VENTILATION_MODE_OPTIONS}
@@ -140,15 +143,15 @@ const JetFanCalcPage: React.FC = () => {
                 <Gauge className="text-primary-navy" size={24} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-industrial-gray">Mekan Bilgileri</h2>
-                <p className="text-sm text-steel-gray">Boyut ve kapasite değerleri</p>
+                <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.jetFan.spaceInfoTitle')}</h2>
+                <p className="text-sm text-steel-gray">{t('calculators.jetFan.spaceInfoSubtitle')}</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <InputField
-                  label="Uzunluk"
+                  label={t('calculators.jetFan.lengthLabel')}
                   value={length}
                   onChange={setLength}
                   unit="m"
@@ -157,7 +160,7 @@ const JetFanCalcPage: React.FC = () => {
                   step={5}
                 />
                 <InputField
-                  label="Genişlik"
+                  label={t('calculators.jetFan.form.width')}
                   value={width}
                   onChange={setWidth}
                   unit="m"
@@ -166,7 +169,7 @@ const JetFanCalcPage: React.FC = () => {
                   step={1}
                 />
                 <InputField
-                  label="Yükseklik"
+                  label={t('calculators.jetFan.form.height')}
                   value={height}
                   onChange={setHeight}
                   unit="m"
@@ -179,24 +182,24 @@ const JetFanCalcPage: React.FC = () => {
               {applicationType === 'parking' && (
                 <div className="grid grid-cols-2 gap-4">
                   <InputField
-                    label="Araç Kapasitesi"
+                    label={t('calculators.jetFan.form.capacity')}
                     value={carCapacity}
                     onChange={setCarCapacity}
-                    unit="araç"
+                    unit={t('calculators.jetFan.unitVehicle')}
                     min={1}
                     max={5000}
                     step={1}
-                    tooltip="Toplam park yeri sayısı"
+                    tooltip={t('calculators.jetFan.capacityTooltip')}
                   />
                   <InputField
-                    label="Saatlik Trafik"
+                    label={t('calculators.jetFan.trafficLabel')}
                     value={trafficFlow}
                     onChange={setTrafficFlow}
-                    unit="araç/sa"
+                    unit={t('calculators.jetFan.unitVehiclePerHour')}
                     min={0}
                     max={1000}
                     step={5}
-                    tooltip="Pik saatteki araç hareketi"
+                    tooltip={t('calculators.jetFan.trafficTooltip')}
                   />
                 </div>
               )}
@@ -207,13 +210,13 @@ const JetFanCalcPage: React.FC = () => {
               className="flex items-center gap-2 text-sm text-steel-gray hover:text-industrial-gray transition-colors mt-4"
             >
               <RotateCcw size={16} />
-              Değerleri Sıfırla
+              {t('calculators.jetFan.resetValues')}
             </button>
           </div>
 
           {/* SVG Diagram */}
           <div className="bg-white rounded-2xl border border-light-gray shadow-sm p-6">
-            <h3 className="text-sm font-medium text-steel-gray mb-4">Yerleşim Şeması</h3>
+            <h3 className="text-sm font-medium text-steel-gray mb-4">{t('calculators.jetFan.layoutSchema')}</h3>
             <div className="flex justify-center">
               <svg viewBox="0 0 280 120" className="w-full max-w-md">
                 {/* Parking/Tunnel outline */}
@@ -232,7 +235,7 @@ const JetFanCalcPage: React.FC = () => {
 
                 {/* Dimensions */}
                 <text x="140" y="110" textAnchor="middle" className="text-xs fill-steel-gray">
-                  {length}m × {width}m × {height}m
+                  {t('common.dimensions3D', { l: length, w: width, h: height })}
                 </text>
 
                 {/* Cars (for parking) */}
@@ -257,7 +260,7 @@ const JetFanCalcPage: React.FC = () => {
 
                 {/* Legend */}
                 <circle cx="250" cy="35" r="5" fill="#0EA5E9" />
-                <text x="250" y="50" textAnchor="middle" className="text-7px fill-steel-gray">Jet Fan</text>
+                <text x="250" y="50" textAnchor="middle" className="text-7px fill-steel-gray">{t('calculators.jetFan.diagramLegend')}</text>
               </svg>
             </div>
           </div>
@@ -270,8 +273,8 @@ const JetFanCalcPage: React.FC = () => {
               <Wind className="text-success-green" size={24} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-industrial-gray">Hesaplama Sonuçları</h2>
-              <p className="text-sm text-steel-gray">Önerilen jet fan konfigürasyonu</p>
+              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.jetFan.resultsTitle')}</h2>
+              <p className="text-sm text-steel-gray">{t('calculators.jetFan.resultsSubtitle')}</p>
             </div>
           </div>
 
@@ -279,40 +282,40 @@ const JetFanCalcPage: React.FC = () => {
             <>
               {/* Ana Metrikler */}
               <div className="mb-6">
-                <h3 className="text-sm font-medium text-steel-gray mb-3">Havalandırma Metrikleri</h3>
+                <h3 className="text-sm font-medium text-steel-gray mb-3">{t('calculators.jetFan.ventilationMetrics')}</h3>
                 <ResultGrid>
                   <ResultCard
-                    title="Gerekli Debi"
+                    title={t('calculators.jetFan.requiredAirflow')}
                     value={result.requiredAirflow}
                     unit="m³/h"
                     status="optimal"
                     large
                   />
                   <ResultCard
-                    title="Hava Değişim Hızı"
+                    title={t('calculators.jetFan.airChangeRate')}
                     value={result.ach}
                     unit="ACH"
                     status={getACHStatus(result.ach)}
-                    description={applicationType === 'parking' ? 'Otopark: 6-10 ACH önerilen' : 'Tünel: 15+ ACH önerilen'}
+                    description={applicationType === 'parking' ? t('calculators.jetFan.achParkingHint') : t('calculators.jetFan.achTunnelHint')}
                   />
                 </ResultGrid>
               </div>
 
               {/* Jet Fan Hesabı */}
               <div className="mb-6">
-                <h3 className="text-sm font-medium text-steel-gray mb-3">Jet Fan Gereksinimleri</h3>
+                <h3 className="text-sm font-medium text-steel-gray mb-3">{t('calculators.jetFan.fanRequirements')}</h3>
                 <ResultGrid>
                   <ResultCard
-                    title="Toplam İtki Kuvveti"
+                    title={t('calculators.jetFan.results.totalThrust')}
                     value={result.totalThrust}
                     unit="N"
                     status="optimal"
                     large
                   />
                   <ResultCard
-                    title="Jet Fan Sayısı"
+                    title={t('calculators.jetFan.fanCountTitle')}
                     value={result.fanCount}
-                    unit="adet"
+                    unit={t('calculators.jetFan.unitPiece')}
                     status={result.fanCount <= 20 ? 'optimal' : 'acceptable'}
                   />
                 </ResultGrid>
@@ -320,26 +323,26 @@ const JetFanCalcPage: React.FC = () => {
 
               {/* Yerleşim Bilgisi */}
               <div className="mb-6 p-4 bg-secondary-blue/5 rounded-xl">
-                <h4 className="font-medium text-industrial-gray mb-3">Yerleşim Önerileri</h4>
+                <h4 className="font-medium text-industrial-gray mb-3">{t('calculators.jetFan.placementTitle')}</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-steel-gray">Önerilen Aralık:</span>
-                    <span className="font-medium text-industrial-gray ml-2">{result.recommendedSpacing} m</span>
+                    <span className="text-steel-gray">{t('calculators.jetFan.recommendedSpacing')}</span>
+                    <span className="font-medium text-industrial-gray ml-2">{t('common.unitMeters', { v: result.recommendedSpacing })}</span>
                   </div>
                   <div>
-                    <span className="text-steel-gray">Montaj Yüksekliği:</span>
-                    <span className="font-medium text-industrial-gray ml-2">{(parseFloat(height) - 0.5).toFixed(1)} m</span>
+                    <span className="text-steel-gray">{t('calculators.jetFan.mountingHeight')}</span>
+                    <span className="font-medium text-industrial-gray ml-2">{t('common.unitMeters', { v: (parseFloat(height) - 0.5).toFixed(1) })}</span>
                   </div>
                   <div>
-                    <span className="text-steel-gray">Hacim:</span>
+                    <span className="text-steel-gray">{t('calculators.jetFan.volume')}</span>
                     <span className="font-medium text-industrial-gray ml-2">
-                      {(parseFloat(length) * parseFloat(width) * parseFloat(height)).toLocaleString('tr-TR')} m³
+                      {t('common.unitCubicMeters', { v: (parseFloat(length) * parseFloat(width) * parseFloat(height)).toLocaleString('tr-TR') })}
                     </span>
                   </div>
                   <div>
-                    <span className="text-steel-gray">Fan Başına İtki:</span>
+                    <span className="text-steel-gray">{t('calculators.jetFan.thrustPerFan')}</span>
                     <span className="font-medium text-industrial-gray ml-2">
-                      {result.fanCount > 0 ? Math.round(result.totalThrust / result.fanCount) : 0} N
+                      {t('common.unitNewton', { v: result.fanCount > 0 ? Math.round(result.totalThrust / result.fanCount) : 0 })}
                     </span>
                   </div>
                 </div>
@@ -351,10 +354,9 @@ const JetFanCalcPage: React.FC = () => {
                   <div className="flex items-start gap-3">
                     <Wind className="text-warning-orange flex-shrink-0 mt-0.5" size={20} />
                     <div className="text-sm">
-                      <p className="font-medium text-industrial-gray">Duman Tahliye Sistemi</p>
+                      <p className="font-medium text-industrial-gray">{t('calculators.jetFan.smokeSystemTitle')}</p>
                       <p className="text-steel-gray mt-1">
-                        Bu hesaplama ön boyutlandırma amaçlıdır. Kesin tasarım için CFD analizi ve
-                        yangın güvenlik uzmanı danışmanlığı gereklidir.
+                        {t('calculators.jetFan.smokeSystemDesc')}
                       </p>
                     </div>
                   </div>
@@ -369,7 +371,7 @@ const JetFanCalcPage: React.FC = () => {
                 <Wind className="text-steel-gray" size={32} />
               </div>
               <p className="text-steel-gray">
-                Geçerli değerler girerek<br />sonuçları görüntüleyin
+                {t('calculators.jetFan.emptyStateLine1')}<br />{t('calculators.jetFan.emptyStateLine2')}
               </p>
             </div>
           )}

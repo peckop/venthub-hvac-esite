@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\calculators\AirCurtainCalcPage.tsx
-skeleton_hash: 23bfe1f3e256bf4d
+skeleton_hash: 446c621495a43c53
 entity_hashes:
   func:AirCurtainCalcPage: bdec5c3fc5c7251e
   func:canProceed: bc4e4a8101ac93b2
@@ -13,7 +13,7 @@ entity_hashes:
   func:reset: 16764b441f7bc7b6
   overview: a20024770a1672be
   style_tokens: 310141484625a6c4
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-14T19:44:11Z
 ---
 
 ## Genel Bakış
@@ -92,6 +92,25 @@ Bu modül için sadece fonksiyon imzalarından türetilebilecek temel mimari var
 **Parametreler**:
 - eff: string | undefined — Değerlendirilecek verimlilik değeri. String formatında bir sayı veya metin olabilir; undefined ise değerlendirilmeyen bir durumu temsil eder.
 **Dönüş**: 'optimal' | 'acceptable' | 'warning' — Değerin durumuna göre üç olası string değerden birini döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: lucide-react::ArrowLeft
+- import: lucide-react::ArrowRight
+- import: lucide-react::DoorOpen
+- import: lucide-react::RotateCcw
+- import: lucide-react::Thermometer
+- import: lucide-react::Wind
+- import: lucide-react::Zap
+- import: next/navigation::usePathname
+- import: next/navigation::useRouter
+- import: next/navigation::useSearchParams
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useState
 
 ---
 

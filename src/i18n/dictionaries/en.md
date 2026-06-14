@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts
-skeleton_hash: 556648fbf1b30708
+skeleton_hash: de699de0a4ed6723
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-06-14T17:51:41Z
+generated_at: 2026-06-14T19:44:11Z
 ---
 
 ## Genel Bakış
@@ -37,8 +37,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - **en** (object) — `{
   common: {
     update: 'Update',
-    loadingApp: 'Loading VentHub... ',
-  ...`
+    unitMeters: '{{v}} m',
+    unitCubicM...`
 
 ---
 

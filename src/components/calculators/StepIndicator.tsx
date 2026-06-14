@@ -1,6 +1,8 @@
 import { Check } from 'lucide-react'
 import React from 'react'
 
+import { useI18n } from '../../i18n/I18nProvider'
+
 interface Step {
     id: number
     label: string
@@ -22,6 +24,8 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
     currentStep,
     onStepClick
 }) => {
+    const { t } = useI18n()
+
     return (
         <div className="mb-8">
             {/* Desktop View */}
@@ -89,7 +93,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
             <div className="md:hidden">
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-primary-navy">
-                        Adım {currentStep} / {steps.length}
+                        {t('calculators.stepIndicator.progress', { current: currentStep, total: steps.length })}
                     </span>
                     <span className="text-sm text-steel-gray">
                         {steps.find(s => s.id === currentStep)?.label}

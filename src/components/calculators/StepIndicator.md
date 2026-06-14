@@ -3,34 +3,54 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\calculators\StepIndicator.tsx
-skeleton_hash: a5a084e8cd54b648
+skeleton_hash: 36265045b33ab050
 entity_hashes:
   func:StepIndicator: 203f6e11e7ae2ca6
-  overview: 4bdcabdf1533e7e3
+  overview: a00e439886770189
   style_tokens: a71e92d8d5570ada
-generated_at: 2026-06-08T10:08:47Z
+generated_at: 2026-06-14T19:44:11Z
 ---
 
 ## Genel Bakış
-`StepIndicator`, çok adımlı bir işlem akışında kullanıcının hangi adımda olduğunu görsel olarak gösterir ve adımlara tıklama ile geçiş yapmasını sağlayan bir React bileşenidir. Gelen `steps` dizisi, `currentStep` ve `onStepClick` callback’i ile dinamik ve etkileşimli bir adım göstergesi sunar.
+`StepIndicator`, çok adımlı işlem akışlarında kullanıcının mevcut konumunu görsel olarak takip etmesini sağlayan bir React bileşenidir. Adım listesini, aktif adımı ve tıklama callback'ini alarak interaktif bir navigasyon arayüzü sunar. Hesaplayıcı (calculator) modüllerinde adım bazlı formlarda kullanıcı deneyimini iyileştirmek için kullanılır.
 
 ## Fonksiyon Grupları
-### Görsel Oluşturma ve Render
-Bu grup, `steps` listesini alarak her adım için daire, etiket ve bağlantı çizgileri gibi UI elemanlarını oluşturur; `currentStep` değerine göre aktif, tamamlanmış ve bekleyen adımları farklı stillerle ayırarak kullanıcıya mevcut ilerlemeyi net bir şekilde gösterir.
+### Görsel Adım Gösterimi
+Adım dizisini alarak her bir adım için daire, etiket ve bağlantı çizgileri oluşturur; aktif, tamamlanmış ve bekleyen adımları farklı görsel stillerle ayrıştırarak ilerleme durumunu net biçimde sunar.
 - StepIndicator
 
-### Etkileşim ve Durum Yönetimi
-Kullanıcı bir adıma tıkladığında `onStepClick` callback’ini tetikleyerek dışarıdaki mantığın (örnek: sayfa yönlendirme, adım güncelleme) çalışmasını sağlar; bu sayede bileşen sadece görüntüleme yapmaz, aynı zamanda navigasyonu da yönetir.
-- StepIndicator (callback çağrısı)
+### Etkileşim Yönetimi
+Kullanıcı bir adıma tıkladığında dışarıdan gelen callback fonksiyonunu tetikleyerek adım geçiş mantığını üst katmana aktarır; bileşen kendi durumunu yönetmez, sadece etkileşim olaylarını iletir.
+- StepIndicator (onStepClick çağrısı)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-StepIndicator bileşeni, steps, currentStep ve onStepClick prop'larının belirli koşulları sağladığı sürece beklendiği şekilde çalışır.
 
-[Aksiyom 1]: Eğer steps prop'u tanımlı değilse veya boş bir dizi ise, bileşen hiçbir adım öğesi render etmez ve görsel çıktı boş olur.  
-[Aksiyom 2]: Eğer currentStep prop'u bir sayı değilse veya steps dizisinin geçerli indeks aralığı (0 ≤ currentStep < steps.length) dışındaysa, aktif adım gösterimi hatalı olur ve UI tutarsızlığı ortaya çıkar.  
-[Aksiyom 3]: Eğer onStepClick prop'u bir fonksiyon değilse, bir adıma tıklandığında çalışma zamanı hatası (örneğin "onStepClick is not a function") oluşur ve etkileşim kesilir.
+**[Aksiyom 1]:** `steps` prop'u boş veya tanımsız ise bileşen hiçbir şey render etmez, çıkış boş kalır.
+
+**[Aksiyom 2]:** `currentStep` geçerli indeks aralığı (0 ≤ currentStep < steps.length) dışındaysa aktif adım gösterimi tutarsız olur.
+
+**[Aksiyom 3]:** `onStepClick` bir fonksiyon olarak sağlanması zorunludur; aksi halde tıklama işleminde çalışma zamanı hatası oluşur.
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül için fonksiyon gövdesi (implementasyon) verilmemiştir; sadece fonksiyon imzası mevcuttur. Dolayısıyla doğru çalışması için gerekli mimari varsayımlar çıkarılamamaktadır.
+
+**Mevcut bilgiler (sadece imzadan):**
+- Fonksiyon `steps`, `currentStep` ve `onStepClick` parametreleri alır.
+- `React.FC<StepIndicatorProps>` tipinde bir bileşen döner.
+
+**Bilinmeyenler (imzadan belirlenemeyen):**
+- `steps` dizisinin beklenen iç yapısı ve minimum eleman sayısı
+- `currentStep` için geçerli aralık (örn. `0 <= currentStep < steps.length` koşulu olup olmadığı)
+- `steps` boş diziyken davranışı
+- `currentStep` negatif veya `steps.length`'e eşit/büyük olduğunda davranışı
+- `onStepClick` callback'inin hangi argümanlarla çağrıldığı
+
+Bu koşullar fonksiyon gövdesi incelendiğinde aksiyom olarak tanımlanabilir.
 
 ---
 
@@ -44,6 +64,13 @@ StepIndicator bileşeni, steps, currentStep ve onStepClick prop'larının belirl
 - currentStep: number — Şu anda aktif olan adımın sıfır tabanlı indeksi.  
 - onStepClick: (index: number) => void — Bir adım tıklandığında çağrılan geri çağırım fonksiyonu; tıklanan adımın indeksi parametre olarak geçirilir.  
 **Dönüş**: React.FC<StepIndicatorProps> — Bileşenin kendisi; adım göstergesini DOM’a ekleyen bir fonksiyonel React bileşeni döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: lucide-react::Check
+- import: react::React
 
 ---
 
@@ -64,17 +91,23 @@ StepIndicator bileşeni, steps, currentStep ve onStepClick prop'larının belirl
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/calculators/StepIndicator.tsx::StepIndicator
-- **params**: steps, currentStep, onStepClick
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX.Element
+- **params**: (`steps`, `currentStep`, `onStepClick`)
+  - `steps` — adım nesneleri dizisi; her eleman `id`, `label`, `description` alanlarına sahiptir
+  - `currentStep` — mevcut aktif adımın id'si (sayısal)
+  - `onStepClick` — tıklanabilir adımlarda çağrılan geri çağırma fonksiyonu; opsiyonel
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan elde edilen çeviri fonksiyonu; mobil görünümde `calculators.stepIndicator.progress` anahtarıyla ilerleme metni üretir (`current` ve `total` parametreleri ile)
+- **Dönüş**: JSX — masaüstü için adım daireleri + birleştirici çizgilerden oluşan yatay navigasyon; mobil için ilerleme çubuğu ve mevcut adım etiketi
 
-### [N2_NASIL] AST Pointer: src/components/calculators/StepIndicator.tsx::(anonymous map callback)
-- **params**: step, index
-- **ic_degiskenler**: 
-  - `isCompleted` — step.id < currentStep koşulunu sağlayıp sağlamadığını gösteren boolean (adım tamamlandı mı)
-  - `isActive` — step.id === currentStep koşulunu sağlayıp sağlamadığını gösteren boolean (şu anda aktif adım)
-  - `isClickable` — onStepClick fonksiyonunun varlığı ve step.id ≤ currentStep koşulunu sağlayıp sağlamadığını gösteren boolean (adım tıklanabilir mi)
-- **Dönüş**: JSX.Element
+### [N2_NASIL] AST Pointer: src/components/calculators/StepIndicator.tsx::(step, index) map callback
+- **params**: (`step`, `index`)
+  - `step` — `steps` dizisindeki tek bir adım nesnesi; `id`, `label`, `description` alanlarına sahiptir
+  - `index` — elemanın dizideki konumu; `steps.length - 1` ile karşılaştırılarak son adımda birleştirici çizginin gizlenmesi sağlanır
+- **ic_degiskenler**:
+  - `isCompleted` — `step.id < currentStep` — adımın tamamlanıp tamamlanmadığını belirler; tamamlandıysa `bg-success-green text-white` stili ve `<Check size={18} />` ikonu gösterilir
+  - `isActive` — `step.id === currentStep` — adımın aktif olup olmadığını belirler; aktifse `bg-primary-navy text-white ring-4 ring-primary-navy/20` stili uygulanır
+  - `isClickable` — `onStepClick && step.id <= currentStep` — adımın tıklanabilir olup olmadığını belirler; tıklanabilirse `cursor-pointer` ve `hover:scale-110` efektleri aktif olur; `onClick` handler'ı `onStepClick(step.id)` çağrısı ile tetiklenir
+- **Dönüş**: JSX — `<React.Fragment key={step.id}>` içinde adım daire butonu ve (son adım değilse) `width: isCompleted ? '100%' : '0%'` koşullu animasyonlu birleştirici çizgi
 
 ---
 

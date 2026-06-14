@@ -63,9 +63,9 @@ const AirCurtainCalcPage: React.FC = () => {
 
   // Dynamic Traffic Options
   const trafficOptions = useMemo(() => [
-    { value: 'low', label: t('calculators.airCurtain.conditions.traffic.low'), description: '< 50 geçiş/saat' },
-    { value: 'medium', label: t('calculators.airCurtain.conditions.traffic.medium'), description: '50-200 geçiş/saat' },
-    { value: 'high', label: t('calculators.airCurtain.conditions.traffic.high'), description: '> 200 geçiş/saat' }
+    { value: 'low', label: t('calculators.airCurtain.conditions.traffic.low'), description: t('calculators.airCurtain.trafficLowDesc') },
+    { value: 'medium', label: t('calculators.airCurtain.conditions.traffic.medium'), description: t('calculators.airCurtain.trafficMediumDesc') },
+    { value: 'high', label: t('calculators.airCurtain.conditions.traffic.high'), description: t('calculators.airCurtain.trafficHighDesc') }
   ], [t])
 
   // Form State
@@ -225,11 +225,11 @@ const AirCurtainCalcPage: React.FC = () => {
                   ))}
                   <line x1="35" y1="20" x2="35" y2="140" stroke="#6B7280" strokeWidth="1" />
                   <text x="20" y="85" textAnchor="middle" className="text-xs fill-steel-gray" transform="rotate(-90, 20, 85)">
-                    {doorHeight || '?'} m
+                    {t('common.unitMeters', { v: doorHeight || '?' })}
                   </text>
                   <line x1="40" y1="150" x2="160" y2="150" stroke="#6B7280" strokeWidth="1" />
                   <text x="100" y="158" textAnchor="middle" className="text-xs fill-steel-gray">
-                    {doorWidth || '?'} m
+                    {t('common.unitMeters', { v: doorWidth || '?' })}
                   </text>
                 </svg>
               </div>
@@ -320,7 +320,7 @@ const AirCurtainCalcPage: React.FC = () => {
               <h4 className="text-sm font-medium text-steel-gray mb-2">{t('calculators.airCurtain.form.inputSummary')}</h4>
               <div className="flex flex-wrap gap-4 text-sm">
                 <span className="px-3 py-1 bg-white rounded-full border border-light-gray">
-                  {t('calculators.airCurtain.diagram.unit')}: {doorWidth}m × {doorHeight}m
+                  {t('calculators.airCurtain.diagram.unit')}: {t('common.dimensions2D', { w: doorWidth, h: doorHeight })}
                 </span>
                 <span className="px-3 py-1 bg-white rounded-full border border-light-gray">
                   {applicationOptions.find(o => o.value === application)?.label}
@@ -420,12 +420,12 @@ const AirCurtainCalcPage: React.FC = () => {
                 : 'text-steel-gray hover:text-industrial-gray hover:bg-gray-100'}
             `}
             disabled={currentStep === 1}
-            aria-label={currentStep === 4 ? t('common.reset') : t('common.back')}
+            aria-label={currentStep === 4 ? t('calculators.airCurtain.newCalculation') : t('common.back')}
           >
             {currentStep === 4 ? (
               <>
                 <RotateCcw size={18} />
-                {t('common.reset') || 'Yeni Hesaplama'}
+                {t('calculators.airCurtain.newCalculation')}
               </>
             ) : (
               <>
@@ -445,9 +445,9 @@ const AirCurtainCalcPage: React.FC = () => {
                   ? 'bg-primary-navy text-white hover:bg-secondary-blue'
                   : 'bg-gray-200 text-steel-gray cursor-not-allowed'}
               `}
-              aria-label={currentStep === 3 ? t('common.calculate') : t('common.next')}
+              aria-label={currentStep === 3 ? t('calculators.airCurtain.calculate') : t('common.next')}
             >
-              {currentStep === 3 ? (t('common.calculate') || 'Hesapla') : t('common.next')}
+              {currentStep === 3 ? t('calculators.airCurtain.calculate') : t('common.next')}
               <ArrowRight size={18} />
             </button>
           )}

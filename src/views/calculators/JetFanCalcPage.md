@@ -3,18 +3,18 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\calculators\JetFanCalcPage.tsx
-skeleton_hash: 974456969d2694ef
+skeleton_hash: c0a312aaaa9e38f9
 entity_hashes:
   func:JetFanCalcPage: b83a7ef4e6b81401
   func:getACHStatus: e2c951766a2e003c
   func:reset: 16764b441f7bc7b6
-  overview: a617b1c822b90824
+  overview: e31fcf5cbdcfc47c
   style_tokens: 614f0725ca061dc9
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-14T19:44:28Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinde yer alan bu modül, jet fan havalandırma sistemleri için hesaplama yapan bir sayfa bileşenidir. Kullanıcıların jet fan parametrelerini girerek hesaplama yapmasını, formu sıfırlamasını ve hesaplanan hava değişim sayısının (ACH) performans durumunu görsel olarak değerlendirmesini sağlar.
+VentHub HVAC projesinde yer alan bu modül, jet fan havalandırma sistemleri için hesaplama yapan bir sayfa bileşenidir. Kullanıcıların jet fan parametrelerini girerek hesaplama yapmasını, formu sıfırlamasını ve hesaplanan hava değişim sayısının (ACH) performans durumunu görsel olarak değerlendirmesini sağlar. Modül, form durumu yönetimi ve hesaplama sonuçlarının yorumlanması gibi temel sorumlulukları tek bir yapıda birleştirir.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
@@ -31,17 +31,28 @@ Sayfa içindeki hesaplama ve durum değerlendirme işlemlerini destekleyen yard�
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, jet fan havalandırma hesaplayıcı bir React bileşenidir. Aşağıdaki mimari varsayımlar yalnızca fonksiyon imzalarından ve modül sabitlerinden çıkarılmıştır.
+Bu modül için minimum aksiyomlar fonksiyon imzalarından türetilebilir. Fonksiyon gövdeleri mevcut olmadığı için eşik değerleri ve iç mantık bilinmemektedir.
 
-**[Aksiyom 1]:** Eğer `ach` parametresi sayısal (`number`) türünde değilse, `getACHStatus` fonksiyonu beklenmeyen davranış gösterir.
+---
 
-**[Aksiyom 2]:** Eğer `APPLICATION_OPTIONS` sabiti dizi (`array`) olarak tanımlı değilse, sayfa bileşeni form alanlarını doğru şekilde oluşturamaz.
+**[Aksiyom 1]**: Eğer `getACHStatus` fonksiyonu çağrılacaksa, `ach` parametresi bir `number` (sayısal) değeri olmalıdır.
+*Eğer `ach` parametresi sayısal bir değer değilse, fonksiyon beklenmeyen bir davranış sergileyebilir veya hata üretebilir.*
 
-**[Aksiyom 3]:** Eğer `VENTILATION_MODE_OPTIONS` sabiti dizi (`array`) olarak tanımlı değilse, sayfa bileşeni havalandırma modu seçim alanını doğru şekilde oluşturamaz.
+**[Aksiyom 2]**: Eğer `getACHStatus` fonksiyonu başarılı şekilde çalışırsa, dönüş değeri yalnızca şu dört değerden biri olmalıdır: `'optimal'`, `'acceptable'`, `'warning'` veya `'critical'`.
+*Eğer dönüş değeri bu değerlerden biri değilse, UI bileşeninin durum gösterimi bozulur.*
 
-**[Aksiyom 4]:** Eğer `reset()` çağrıldığında form durumu (state) erişilebilir değilse, form alanları sıfırlanamaz ve önceki değerler korunur.
+**[Aksiyom 3]**: Eğer `JetFanCalcPage` bileşeni çağrılacaksa, geçerli bir React ortamının (React runtime) mevcut olması gerekir.
+*Eğer React ortamı yoksa, bileşen render edilemez.*
 
-**[Aksiyom 5]:** Eğer `JetFanCalcPage` bir React bileşeni olarak JSX bağlamında (`React Context`) çağrılmıyorsa, bileşen render edilemez.
+---
+
+### Bilinmeyenler / Doğrulanamayanlar
+| Değer | Durum |
+|-------|-------|
+| `getACHStatus` içindeki eşik değerleri (optimal/acceptable/warning/critical aralıkları) | **Bilinmiyor** — fonksiyon gövdesi mevcut değil |
+| `reset()` fonksiyonunun hangi state'leri sıfırladığı | **Bilinmiyor** — fonksiyon gövdesi mevcut değil |
+| `ach` parametresinin geçerli aralığı (min/max) | **Bilinmiyor** — fonksiyon gövdesi mevcut değil |
+| Formda hangi input alanlarının bulunduğu | **Bilinmiyor** — değişken tanımları mevcut değil |
 
 ---
 
@@ -72,36 +83,66 @@ Bu fonksiyon parametre almaz, çünkü bir React bileşenidir ve props üzerinde
 
 ---
 
-## SABİTLER
-- **APPLICATION_OPTIONS** (array) — `[
-
-  {
-
-    value: 'parking',
-
-    label: 'Otopark',
-
-    description: 'Kapal...`
-- **VENTILATION_MODE_OPTIONS** (array) — `[
-
-  { value: 'normal', label: 'Normal', description: 'Günlük havalandırma' }...`
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: lucide-react::ArrowDownUp
+- import: lucide-react::Car
+- import: lucide-react::Gauge
+- import: lucide-react::MapPin
+- import: lucide-react::RotateCcw
+- import: lucide-react::Wind
+- import: react::React
+- import: react::useMemo
+- import: react::useState
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/calculators/JetFanCalcPage.tsx::Hesaplama Callback (useMemo)
-- **params**: (parametre yok — useCallback/memo内部闭包, state değişkenleri closure'dan okunur)
+### [N1_NASIL] AST Pointer: JetFanCalcPage.tsx::useMemo_hesaplama_callback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `lenVal` — `parseFloat(length)` ile parse edilen oda uzunluğu, 0'a eşit veya küçükse `parseFloat` başarısız olursa 0'a düşer
-  - `widVal` — `parseFloat(width)` ile parse edilen oda genişliği
-  - `heiVal` — `parseFloat(height)` ile parse edilen oda yüksekliği
-  - `carVal` — `parseFloat(carCapacity)` ile parse edilen araç kapasitesi
-  - `trafficVal` — `parseFloat(trafficFlow)` ile parse edilen saatlik trafik akış değeri
-- **Closure'dan Okunan State**: `length`, `width`, `height`, `carCapacity`, `trafficFlow`, `applicationType`, `ventilationMode`
-- **Koşullar**: `lenVal/widVal/heiVal <= 0` ise `null` döner; `applicationType === 'parking'` ve `carVal <= 0` ise `null` döner
-- **API Çağrısı**: `calculateJetFan({ applicationType, ventilationMode, length: lenVal, width: widVal, height: heiVal, carCapacity: carVal, trafficFlowPerHour: trafficVal })`
-- **Dönüş**: `calculateJetFan`'in dönüş değeri veya `null`
+  - `lenVal` — `length` state'inin parseFloat karşılığı; hesaplamada kullanılmak üzere sayısal boyut
+  - `widVal` — `width` state'inin parseFloat karşılığı; hesaplamada kullanılmak üzere sayısal genişlik
+  - `heiVal` — `height` state'inin parseFloat karşılığı; hesaplamada kullanılmak üzere sayısal yükseklik
+  - `carVal` — `carCapacity` state'inin parseFloat karşılığı; otopark uygulaması için araç kapasitesi
+  - `trafficVal` — `trafficFlow` state'inin parseFloat karşılığı; tünel uygulaması için saatlik trafik akışı
+- **Erişilen state'ler**: `length`, `width`, `height`, `carCapacity`, `trafficFlow`, `applicationType`, `ventilationMode`
+- **Erişilen dış fonksiyon**: `calculateJetFan` — hesaplama sonuç nesnesini döndürür
+- **Dönüş**: `calculateJetFan({...})` sonucu veya `null` (geçersiz boyut/kapasite durumunda)
+
+---
+
+### [N2_NASIL] AST Pointer: JetFanCalcPage.tsx::reset
+- **params**: (parametre yok)
+- **ic_degiskenler**: (yok)
+- **Yan etkiler**: Tüm form state'lerini varsayılan değerlere sıfırlar:
+  - `setApplicationType('parking')`
+  - `setVentilationMode('normal')`
+  - `setLength('100')`
+  - `setWidth('30')`
+  - `setHeight('3')`
+  - `setCarCapacity('100')`
+  - `setTrafficFlow('50')`
+- **Dönüş**: yok (void)
+
+---
+
+### [N3_NASIL] AST Pointer: JetFanCalcPage.tsx::getACHStatus
+- **params**: `ach: number` — hesaplanan hava değişim sayısı
+- **ic_degiskenler**: (yok)
+- **Erişilen state**: `applicationType` — uygulama türüne göre eşik değerleri belirler
+- **Dönüş**: `'optimal' | 'acceptable' | 'warning' | 'critical'`
+  - `applicationType === 'parking'` için: `ach >= 6 && ach <= 10` → optimal, `ach >= 4 && ach <= 12` → acceptable, diğer → warning
+  - tünel (`else`) için: `ach >= 20` → optimal, `ach >= 15` → acceptable, diğer → warning
+
+---
+
+### [N4_NASIL] AST Pointer: JetFanCalcPage.tsx::svg_map_callback
+- **params**: `(_, i)` — `_`: dizgi elemanı (kullanılmıyor), `i`: indeks
+- **ic_degiskenler**:
+  - `x` — `40 + (i * 28)` ifadesinden hesaplanan her fan için yatay (x) koordinatı
+- **Dönüş**: JSX `<g>` elemanı — `ellipse` (fan sembolü) ve `line` (bağlantı çizgisi, `strokeDasharray` ile kesikli) elemanlarından oluşan SVG grubu
 
 ---
 
