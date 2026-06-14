@@ -151,7 +151,7 @@ const ForgotPasswordPage: React.FC = () => {
           {/* Info */}
           <div className="mt-6 p-4 bg-air-blue/20 rounded-lg">
             <p className="text-sm text-steel-gray text-center">
-              💡 E-posta gelmezse spam klasörünüzü kontrol etmeyi unutmayın
+              {t('auth.forgot.spamHint')}
             </p>
           </div>
         </div>

@@ -174,7 +174,7 @@ const RegisterPage: React.FC = () => {
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                {t('auth.name')} *
+                {t('auth.name')} {t('auth.registerForm.requiredMark')}
               </label>
               <div className="relative">
                 <User size={20} className="absolute left-3 top-3.5 text-steel-gray" />
@@ -193,7 +193,7 @@ const RegisterPage: React.FC = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                {t('auth.email')} *
+                {t('auth.email')} {t('auth.registerForm.requiredMark')}
               </label>
               <div className="relative">
                 <Mail size={20} className="absolute left-3 top-3.5 text-steel-gray" />
@@ -212,7 +212,7 @@ const RegisterPage: React.FC = () => {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                {t('auth.password')} *
+                {t('auth.password')} {t('auth.registerForm.requiredMark')}
               </label>
               <div className="relative">
                 <Lock size={20} className="absolute left-3 top-3.5 text-steel-gray" />
@@ -263,7 +263,7 @@ const RegisterPage: React.FC = () => {
             {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                {t('auth.confirmPassword')} *
+                {t('auth.confirmPassword')} {t('auth.registerForm.requiredMark')}
               </label>
               <div className="relative">
                 <Lock size={20} className="absolute left-3 top-3.5 text-steel-gray" />

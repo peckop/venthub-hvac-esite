@@ -5,9 +5,11 @@ import { toast } from 'sonner'
 
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
+import { useI18n } from '../i18n/I18nProvider'
 import { Routes } from '../utils/routes'
 
 const AuthCallbackPage: React.FC = () => {
+  const { t } = useI18n()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
   const router = useRouter()
@@ -35,8 +37,8 @@ const AuthCallbackPage: React.FC = () => {
             }
             if (newData.session) {
               setStatus('success')
-              setMessage('E-posta başarıyla doğrulandı! Anasayfaya yönlendiriliyorsunuz...')
-              toast.success('E-posta başarıyla doğrulandı!')
+              setMessage(t('auth.callback.successRedirect'))
+              toast.success(t('auth.callback.successToast'))
               setTimeout(() => {
                 router.push(Routes.home())
               }, 2000)
@@ -47,7 +49,7 @@ const AuthCallbackPage: React.FC = () => {
           if (error) {
             console.error('Error exchanging code for session:', error.message)
             setStatus('error')
-            setMessage('E-posta doğrulama sırasında hata oluştu: ' + error.message)
+            setMessage(t('auth.callback.verifyError', { message: error.message }))
             // Redirect to error page after 3 seconds
             setTimeout(() => {
               router.push(Routes.auth.login(undefined, error.message))
@@ -69,14 +71,14 @@ const AuthCallbackPage: React.FC = () => {
 
         // If we get here, something went wrong
         setStatus('error')
-        setMessage('Doğrulama linki geçersiz veya süresi dolmuş')
+        setMessage(t('auth.callback.invalidLink'))
         setTimeout(() => {
           router.push(Routes.auth.login(undefined, 'No session found'))
         }, 3000)
       } catch (error: unknown) {
         console.error('Auth callback error:', error)
         setStatus('error')
-        setMessage('Beklenmeyen bir hata oluştu')
+        setMessage(t('auth.unexpectedError'))
         setTimeout(() => {
           router.push(Routes.auth.login())
         }, 3000)
@@ -84,7 +86,7 @@ const AuthCallbackPage: React.FC = () => {
     }
 
     handleAuthCallback()
-  }, [router])
+  }, [router, t])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-air-blue via-clean-white to-light-gray flex items-center justify-center">
@@ -94,10 +96,10 @@ const AuthCallbackPage: React.FC = () => {
             <>
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy mx-auto mb-4" />
               <h1 className="text-xl font-bold text-industrial-gray mb-2">
-                E-posta Doğrulanıyor...
+                {t('auth.callback.loadingTitle')}
               </h1>
               <p className="text-steel-gray">
-                Lütfen bekleyin, hesabınız doğrulanıyor.
+                {t('auth.callback.loadingDesc')}
               </p>
             </>
           )}
@@ -108,7 +110,7 @@ const AuthCallbackPage: React.FC = () => {
                 <CheckCircle size={24} />
               </div>
               <h1 className="text-xl font-bold text-industrial-gray mb-2">
-                Doğrulama Başarılı!
+                {t('auth.callback.successTitle')}
               </h1>
               <p className="text-steel-gray">
                 {message}
@@ -122,7 +124,7 @@ const AuthCallbackPage: React.FC = () => {
                 <AlertCircle size={24} />
               </div>
               <h1 className="text-xl font-bold text-industrial-gray mb-2">
-                Doğrulama Hatası
+                {t('auth.callback.errorTitle')}
               </h1>
               <p className="text-steel-gray mb-4">
                 {message}
@@ -131,7 +133,7 @@ const AuthCallbackPage: React.FC = () => {
                 onClick={() => router.push(Routes.auth.login())}
                 className="bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-2 px-4 rounded-lg transition-colors"
               >
-                Giriş Sayfasına Dön
+                {t('auth.backToLogin')}
               </button>
             </>
           )}

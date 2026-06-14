@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ForgotPasswordPage.tsx
-skeleton_hash: b223d64b36d7551e
+skeleton_hash: 4161232de0f5572c
 entity_hashes:
   func:ForgotPasswordPage: 40bcbdf4b0d8dfc1
   func:handleSubmit: 460293fdfa9263b6
   overview: b6edcf7438326096
   style_tokens: 90202b3fc6cca016
-generated_at: 2026-06-08T10:10:59Z
+generated_at: 2026-06-14T21:38:28Z
 ---
 
 ## Genel Bakış
@@ -51,6 +51,20 @@ Bu modül, kullanıcının şifre sıfırlama talebini iletmek için bir form su
 **Parametreler**:
 - e: React.FormEvent — Form gönderildiğinde oluşan olay nesnesi.
 **Dönüş**: void — Herhangi bir değer döndürmez, sadece yan etkiler gerçekleştirir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../hooks/useAuth::useAuth
+- import: ../i18n/I18nProvider::useI18n
+- import: ../utils/routes::Routes
+- import: lucide-react::ArrowLeft
+- import: lucide-react::CheckCircle
+- import: lucide-react::Mail
+- import: next/link::Link
+- import: react::React
+- import: react::useState
+- import: sonner::toast
 
 ---
 

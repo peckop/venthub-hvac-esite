@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\LoginPage.tsx
-skeleton_hash: f69dae6e30d0c0d6
+skeleton_hash: 07456cedded7594e
 entity_hashes:
   func:LoginPage: c196ecbcf52f1c61
   func:handleGoogleSignIn: 0c49de53cd5a94df
   func:handleSubmit: 460293fdfa9263b6
   overview: 2f1d4c77ab1e1641
   style_tokens: 4dc86ff7a25fa026
-generated_at: 2026-06-08T10:10:59Z
+generated_at: 2026-06-14T21:38:28Z
 ---
 
 ## Genel Bakış
@@ -53,6 +53,26 @@ Bu modül, kimlik doğrulama işlemleri içeren bir React bileşeni olduğundan,
 
 ### handleGoogleSignIn
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../hooks/useAuth::useAuth
+- import: ../i18n/I18nProvider::useI18n
+- import: ../utils/routes::Routes
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: lucide-react::ArrowLeft
+- import: lucide-react::Eye
+- import: lucide-react::EyeOff
+- import: lucide-react::Loader2
+- import: lucide-react::Lock
+- import: lucide-react::Mail
+- import: next/link::Link
+- import: next/navigation::useRouter
+- import: next/navigation::useSearchParams
+- import: react::React
+- import: react::useState
+- import: sonner::toast
 
 ---
 

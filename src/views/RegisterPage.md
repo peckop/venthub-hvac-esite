@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\RegisterPage.tsx
-skeleton_hash: cf6d88db91320a28
+skeleton_hash: 475eab3bd0668799
 entity_hashes:
   func:RegisterPage: 595595bc145e81ea
   func:handleChange: c35710484665a43c
@@ -11,7 +11,7 @@ entity_hashes:
   func:validateForm: 35d7413c1db3ab00
   overview: 2ca2045aa485c913
   style_tokens: b4142733c6599819
-generated_at: 2026-06-08T10:10:59Z
+generated_at: 2026-06-14T21:38:28Z
 ---
 
 ## Genel Bakış
@@ -72,6 +72,25 @@ Bu modül, kullanıcı kayıt formunu yöneten bir React bileşenidir. Doğru ç
 **Parametreler**:
 - `e: React.FormEvent` — Formun submit olayını temsil eder. `preventDefault()` yöntemi ile varsayılan form gönderme davranışı durdurulur.
 **Dönüş**: Hiçbir değer döndürmez (void). Başarılı gönderimde kullanıcıyı başka bir sayfaya yönlendirebilir veya bir durum mesajı gösterebilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../hooks/useAuth::useAuth
+- import: ../i18n/I18nProvider::useI18n
+- import: ../utils/passwordSecurity::hibpPwnedCount
+- import: ../utils/routes::Routes
+- import: lucide-react::ArrowLeft
+- import: lucide-react::CheckCircle
+- import: lucide-react::Eye
+- import: lucide-react::EyeOff
+- import: lucide-react::Lock
+- import: lucide-react::Mail
+- import: lucide-react::User
+- import: next/link::Link
+- import: react::React
+- import: react::useState
+- import: sonner::toast
 
 ---
 
