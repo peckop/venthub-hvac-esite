@@ -1,9 +1,11 @@
 ---
 name: i18n-conventions
-description: Defines internationalization (i18n) conventions for VentHub. Use when
-  translating text, updating dictionary files, adding/modifying JSX labels, or performing
-  i18n dictionary updates. Do NOT use for styling fonts, database operations, or running
-  test suites.
+description: VentHub'ın TR/EN i18n kuralları ve çeviri/literal-çıkarım oyun kitabı. JSX'e
+  metin eklerken, hardcoded Türkçe literalleri sözlüğe taşırken, tr.ts/en.ts güncellerken,
+  react/jsx-no-literals uyarılarını temizlerken veya toplu i18n göçü yaparken KULLAN.
+  Hangi anahtar nereye gider, sembol/rich-text/interpolasyon nasıl çevrilir, çakışma
+  nasıl çözülür, çok-dosyalı dalga nasıl orkestre edilir — hepsi burada. Font/stil,
+  DB işlemleri veya test paketi çalıştırma için KULLANMA.
 category: guards
 metadata:
   triggers:
@@ -11,6 +13,10 @@ metadata:
   - çeviri yap
   - i18n
   - dictionary update
+  - jsx-no-literals
+  - hardcoded string
+  - literal çıkar
+  - hardcoded literal
   inputs:
   - JSX text string
   outputs:
@@ -18,186 +24,145 @@ metadata:
   - Routes usage
 depends_on: []
 next_steps: []
-run_last: false
-exclusions: []
 ---
 
 # i18n Conventions Skill
 
-Bu skill, VentHub'ın çok dilli (TR/EN) yapısını ve çeviri ekleme kurallarını tanımlar.
-Agent olarak UI'a yeni metin eklerken bu kurallara uymalıyım.
+VentHub çok dilli (TR/EN) bir **enterprise** üründür. Çeviri/copy kalitesi *cilanın* değil
+*cevherin* parçasıdır: İngilizce arayüzde Türkçe sızıntı veya ham anahtar = "profesyonel
+değil" damgası. Bu skill, UI'a metin eklerken / hardcoded literalleri sözlüğe taşırken
+**ilk seferde doğru** yapman için kuralları + sahada-öğrenilen taktikleri verir.
 
 ## Temel Prensipler
 
-1. **Hardcoded string YASAK** — Tüm kullanıcıya görünen metinler i18n üzerinden gelmeli
-2. **Türkçe öncelikli** — `tr.ts` ana sözlük, `en.ts` çeviri
-3. **Hiyerarşik anahtarlar** — `section.subsection.key` formatı
-4. **Proxy Hook Zorunluluğu:** Geliştiricilerin ve ajanların URL'leri elle birleştirmesi tamamen yasaktır. Rotalar kesinlikle `useLocalizedRoutes` hook'u üzerinden `Routes.category()` şeklinde çağrılmalıdır. Manuel string birleştirme (`/${lang}/...`) mimari ihlaldir.
-5. **JSONB Veri Çevirisi Kuralı:** Veritabanı tablolarında (categories, products) çeviri için ayrı ilişkisel (relational) tablolar oluşturulması yasaktır. Dil verisi kesinlikle JSONB (`metadata->>lang`) formatında tutulmalıdır.
-
-## Dosya Yapısı
-
-```
-src/i18n/
-├── I18nProvider.tsx    # Provider ve useI18n hook
-├── I18nContext.ts      # Context tanımı
-├── format.ts           # Para formatı (formatCurrency)
-├── datetime.ts         # Tarih formatı (formatDate, formatDateTime)
-└── dictionaries/
-    ├── tr.ts           # Türkçe sözlük (ana)
-    └── en.ts           # İngilizce sözlük
-```
-
-## Anahtar Ekleme Kuralları
-
-### Hiyerarşi Yapısı
-```typescript
-// ✅ DOĞRU: Hiyerarşik, anlamlı
-products: {
-  itemsListed: "ürün listeleniyor",
-  filters: {
-    priceRange: "Fiyat Aralığı"
-  }
-}
-
-// ❌ YANLIŞ: Düz, belirsiz
-productsItemsListed: "...",
-priceRange: "..."
-```
-
-### Mevcut Bölümler (Örnekler)
-| Bölüm | Kullanım |
-|-------|----------|
-| `common` | Genel: butonlar, navigasyon, loading |
-| `products` | Ürün listesi, filtreleme |
-| `home` | Ana sayfa blokları |
-| `admin` | Admin panel tüm metinleri |
-| `admin.orders` | Sipariş yönetimi |
-| `admin.products` | Ürün yönetimi |
-| `category` | Kategori sayfası |
-| `knowledge` | Bilgi merkezi |
-
-## Kullanım Örnekleri
-
-### Bileşende Kullanım
-```tsx
-import { useI18n } from '@/i18n/I18nProvider';
-
-function MyComponent() {
-  const { t, lang } = useI18n();
-  
-  return (
-    <div>
-      <h1>{t('products.heroTitle')}</h1>
-      <button>{t('common.getQuote')}</button>
-    </div>
-  );
-}
-```
-
-### Para Formatı
-```tsx
-import { formatCurrency } from '@/i18n/format';
-
-// Çıktı: "₺1.999,90" (TR) veya "₺1,999.90" (EN)
-formatCurrency(1999.90, lang);
-```
-
-### Tarih Formatı
-```tsx
-import { formatDate, formatDateTime } from '@/i18n/datetime';
-
-// formatDate: "23 Ocak 2026"
-// formatDateTime: "23 Ocak 2026, 14:30"
-```
-
-## Yeni Metin Ekleme Adımları
-
-1. **Anahtar belirle**: Mevcut hiyerarşiye uygun isim seç
-2. **`tr.ts`'ye ekle**: Türkçe metni yaz
-3. **`en.ts`'ye ekle**: İngilizce çevirisini yaz
-4. **Bileşende kullan**: `t('section.key')` ile çağır
-
-### Örnek: Yeni Buton Ekleme
-```typescript
-// src/i18n/dictionaries/tr.ts
-common: {
-  // ... mevcut anahtarlar
-  compareProducts: "Ürünleri Karşılaştır",  // YENİ
-}
-
-// src/i18n/dictionaries/en.ts
-common: {
-  // ... mevcut anahtarlar
-  compareProducts: "Compare Products",  // YENİ
-}
-
-// Bileşende
-<button>{t('common.compareProducts')}</button>
-```
+1. **Hardcoded string YASAK** — kullanıcıya görünen TÜM metin i18n'den gelir.
+2. **Türkçe öncelikli** — `tr.ts` ana sözlük (SSOT), `en.ts` sadık çeviri.
+3. **Hiyerarşik anahtar** — `section.subsection.key`. Düz/belirsiz isim yasak.
+4. **Rotalar `useLocalizedRoutes`** — `Routes.category()` ile; manuel `/${lang}/...` mimari ihlal.
+5. **DB çevirisi JSONB** — `metadata->>lang`; ayrı ilişkisel çeviri tablosu yasak.
 
 ## Karar Ağacı: Anahtar Nereye Gider?
 
-1. **Genel UI elementi mi?** (buton, başlık) → `common`
-2. **Admin panele özel mi?** → `admin.{module}`
-3. **Belirli bir sayfaya özel mi?** → `{pageName}` (örn: `category`, `products`)
-4. **Form alanı mı?** → `{module}.form` veya `{module}.edit`
-5. **Hata mesajı mı?** → `{module}.errors` veya `{module}.toasts`
+1. **Birçok yerde kullanılan genel metin** (Kaydet/İptal/Güncelle/Sil, "Yükleniyor") → **`common`**. *(Aynı metni iki sayfaya ayrı ayrı yazma — `common`'a al.)*
+2. **Admin'e özel** → `admin.{module}` (per-page dosya: `dictionaries/admin/*.ts`).
+3. **Belirli sayfaya özel** → `{pageName}` (ör. `category`, `account.overview`, `checkout.review`).
+4. **Form alanı/placeholder** → `{module}.form` / `{module}.placeholders`.
+5. **Hata/bildirim** → `{module}.toasts` / `{module}.errors`.
 
-## ⚠️ Dikkat Edilmesi Gerekenler
+> **Çoğul/dinamik:** `{{placeholder}}` kullan (`'{{count}} ürün'`). Çoğul için ayrı anahtar (`item` vs `items`).
 
-- Aynı metin farklı yerlerde kullanılıyorsa `common` altına al
-- Dinamik değerler için `{{placeholder}}` kullan: `"{{count}} ürün"`
-- Çoğul formlar için ayrı anahtar: `item` vs `items`
+## ESLint Gerçeği — `react/jsx-no-literals` (`noStrings: true`)
 
-## Hreflang Kuralları (Uluslararası SEO)
+Bu kural agresiftir: **JSX text düğümlerini, ifade içindeki string literallerini VE template
+literal'leri** yakalar. Yani `>Merhaba<`, `{'Merhaba'}` ve `` {`Merhaba`} `` üçü de uyarı verir.
+Kaçış yolu yoktur — metin **ya t()'den gelir ya da `allowedStrings`'tedir.**
 
-VentHub `/tr` ve `/en` yolları kullandığı için hreflang düzgün uygulanmalıdır:
+**`allowedStrings` (eslint.config.cjs — dokunma, çevirme, oldukları gibi bırak):**
+```
+-  +  :  /  %  x  X  •  ·  ©  VH  TR  EN  ESC  "PCI DSS"  "3D Secure"  "256-bit SSL"  " " " (tırnaklar)
+```
+Bu listede **OLMAYAN** her sembol/emoji/marka uyarı verir: `#`, `👋`, `—` (em-dash), `₺`,
+çıplak `,` , `(` `)` , `"DEMO"`, `"Google"` → bunları **sözlüğe key olarak koy** (template
+literal ile kaçma — o da yakalanır). `ignoreProps: true` olduğu için `className`/prop string'leri
+serbesttir; sadece **render edilen** metinle ilgilen.
 
-1. **Self-referencing zorunlu** — Her sayfa hreflang setinde kendini içermeli
-2. **Reciprocal links** — A→B varsa B→A da olmalı (yoksa Google ikisini de yok sayar)
-3. **ISO kodları** — `en-GB` ✅ | `en-UK` ❌ (ISO 3166-1 Alpha 2)
-4. **x-default** — Dil seçici veya varsayılan locale'e yönlenmeli
-5. **Hedef URL'ler** — Tümü 200 dönmeli, canonical ile eşleşmeli
-6. **Yerleştirme** — HTML `<link>`, HTTP Header veya XML Sitemap (10+ locale'de sitemap tercih)
+## Çıkarım Teknikleri (literal → t())
 
+**0. Önce YENİDEN KULLAN.** `tr.ts`'te ilgili namespace'i oku; metin **birebir** eşleşen anahtar
+varsa onu kullan, yeni üretme. (Tutarlı terminoloji = enterprise kalite.)
+
+**1. `t` nereden gelir.** Çoğu bileşen `const { t, lang } = useI18n()` (`@/i18n/I18nProvider`).
+Bazıları `t`'yi **prop** olarak alır (`t: (k) => string`) — o zaman `useI18n` EKLEME, mevcut prop'u
+kullan. `t`, bileşen gövdesindeki helper fonksiyon/`useMemo` dizilerinde de kapsamdadır.
+
+**2. Interpolasyon** — dinamik değer, birim, sayı:
 ```tsx
-// layout.tsx veya head bileşeninde
-<link rel="alternate" hreflang="tr" href="https://venthub.com/tr/urunler" />
-<link rel="alternate" hreflang="en" href="https://venthub.com/en/products" />
-<link rel="alternate" hreflang="x-default" href="https://venthub.com/tr/urunler" />
+// dict: orderNumber: 'Sipariş {{code}}'   |  meters: '{{value}} m'  |  filterAll: 'Tümü ({{count}})'
+{t('account.shipments.orderTitle', { code })}
+{t('calculators.jetFan.meters', { value: x })}
+```
+> Birim ekleri (`m`, `m³`, `N`, `₺`) ve sıra-no önekleri (`#`) → interpolasyonlu anahtara göm,
+> çıplak bırakma. `'#{{code}}'`, `': #{{code}}'` gibi.
+
+**3. Rich-text bölme** — metin + satır-içi JSX (`<span>`, `<Link>`, ikon) iç içeyse, satır-içi
+öğenin **etrafında ayrı t() çağrılarına böl**; kelime sırası **hem TR hem EN için geçerli kalsın**:
+```tsx
+// ÖNCE:  Sipariş <span>#{code}</span> yolda.
+{t('o.orderPrefix')} <span>{t('o.orderHash', { code })}</span> {t('o.inTransitSuffix')}
+// dict TR: orderPrefix:'Sipariş'  inTransitSuffix:'yolda.'   EN: 'Order' / 'is on the way.'
+```
+Bölme word-order'ı bozacaksa (EN'de sıra farklıysa) tek interpolasyonlu anahtar tercih et.
+
+**4. Sembol/emoji/marka → dict.** `allowedStrings`'te olmayanlar:
+```tsx
+// 👋 →  wave: '👋'   |   — → empty: '—'   |   "DEMO" → demoBadge: 'DEMO'   |   "Google" → googleLabel: 'Google'
+{t('account.overview.wave')}
 ```
 
-## i18n Doğrulama Checklist'i (Canlı Ortam)
+## Çakışma & Paylaşılan Metin Çözümü (kalite kritik)
 
-UI'da aşağıdaki hatalar asla görünmemelidir:
+- **Çakışma:** Sayfa metni, **aynı isimli mevcut bir anahtardan FARKLI** ise (ör. sayfa H1'i
+  'Jet Fan Hesap Makinesi' ama mevcut `jetFan.title` = 'Jet Fan Hesaplayıcı', başka yerde kullanılıyor)
+  → **üzerine YAZMA** (duplicate key + başka ekranı bozar). Ayrı ad kullan (`pageTitle`) ya da
+  gerçekten her yerde aynıysa `common`'a terfi ettir.
+- **Paylaşılan:** İki+ sayfada aynı metin → `common` (ör. adres satırı `common.cityLine:
+  '{{district}}, {{city}} {{postal}}'`). Sayfa-özel namespace'lerde tekrarlama.
 
-- [ ] Ham anahtar sızıntısı yok: `t('key')`, `('key')`, `KEY 'FOO.BAR'`
-- [ ] Çözülmemiş placeholder yok: `{{variable}}`, `{variable}`
-- [ ] Tarih/sayı formatı aktif locale ile eşleşiyor
-- [ ] Dil değiştirince tüm görünen metin güncelleniyor
-- [ ] `"NaN"`, `"undefined"`, `"null"` gibi ham değerler UI'da yok
-- [ ] Boş çeviri anahtarı yok (anahtar var ama değer boş string)
+## Toplu Çıkarım — Çok Dosyalı Dalga (maestro deseni)
 
-## Strict TypeScript Güvenliği & Otomasyon Standartları
+N dosyayı aynı anda göçürürken **paralel ajanlar `tr.ts`/`en.ts`'i AYNI ANDA düzenlerse çakışır**
+(paylaşılan dosya). Doğru desen:
 
-VentHub projesi enterprise seviyesinde dil güvenliğini sağlamak için şu iki mekanizmayı zorunlu tutar:
+1. **Ajan yalnız kendi bileşenini düzenler** + yeni anahtarları **yapısal döndürür**
+   (`{ keyName: { tr, en } }`); tr.ts/en.ts'e DOKUNMAZ.
+2. **Orkestratör sözlükleri MERKEZİ birleştirir** (mevcut namespace'e key ekler / yeni alt-obje açar;
+   çakışmaları yukarıdaki kuralla çözer).
+3. **Merkezi kapı (orkestratör):** `pnpm run test:i18n` (parite) + her dosyada `eslint` (kalan literal=0)
+   + `pnpm run type-check` (`en: typeof tr` parite-lock) + `pnpm test -- --run` (regresyon).
+   **Her t('...') anahtarının sözlükte çözüldüğünü doğrula** (yoksa ham anahtar render eder = bug).
+> Hazır makine ve script'ler: `docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md` (parse/merge-generic/check + Workflow).
 
-### 1. Sözlük Mühürleme (Type-Locking)
-* **İngilizce Sözlük (`en.ts`)** mutlaka Türkçe sözlüğün (`tr.ts`) tipini implemente etmelidir:
-  ```typescript
-  import { tr } from './tr'
-  export const en: typeof tr = { ... }
-  ```
-  Bu sayede herhangi bir dilde eksik veya fazla anahtar bırakılması durumunda TypeScript derleyicisi (`pnpm run type-check`) doğrudan derlemeyi durduracaktır.
+## Bileşende Kullanım
 
-### 2. Autocomplete & nested key desteği
-* `src/i18n/I18nContext.ts` içerisindeki `TranslationKeys` recursive tipi sayesinde `t()` fonksiyonuna yazılan anahtarlar kod editöründe otomatik tamamlanmalıdır.
-* Geçici dönüşümler için `TranslationKeyInput` tipi kullanılır.
+```tsx
+import { useI18n } from '@/i18n/I18nProvider'
+const { t, lang } = useI18n()
+<h1>{t('products.heroTitle')}</h1>
+{formatCurrency(1999.90, lang)}                 // ₺1.999,90 (TR) / ₺1,999.90 (EN) — '@/i18n/format'
+{formatDate(iso, lang)}                          // 23 Ocak 2026 — '@/i18n/datetime'
+```
 
-### 3. Otomatik Parite Testleri
-* Dil dosyaları arasındaki uyumu denetlemek için yazılmış olan `src/i18n/__tests__/i18n.test.ts` testi her zaman çalışabilir olmalıdır.
-* Geliştirme sürecinde pariteyi bozacak bir değişiklik yapıldığında:
-  - Git Commit atılırken (`lint-staged` sayesinde otomatik tetiklenir) commit engellenir.
-  - Proje derlenirken (`package.json`'daki `prebuild` hook'u sayesinde otomatik tetiklenir) build engellenir.
-* Manuel çalıştırmak için: `pnpm run test:i18n` kullanılabilir.
+## Doğrulama Checklist'i (canlı UI'da ASLA görünmemeli)
+
+- [ ] **Ham anahtar sızıntısı yok**: `account.orderDetail.shippingMethod` gibi nokta-yollu metin görünmüyor (eksik key = `get()` ham path döner).
+- [ ] Çözülmemiş placeholder yok: `{{variable}}`.
+- [ ] `NaN` / `undefined` / `null` ham değer yok; boş çeviri anahtarı yok.
+- [ ] Dil değişince TÜM görünen metin güncelleniyor; tarih/sayı formatı locale ile eşleşiyor.
+- [ ] Hiç hardcoded Türkçe/İngilizce literal kalmadı (izinli semboller hariç).
+
+## Strict TS & Otomasyon (enforcement)
+
+- **Sözlük mühürleme:** `export const en: typeof tr = {…}` → eksik/fazla anahtar = `type-check` derlemeyi durdurur.
+- **Autocomplete:** `I18nContext.ts` `TranslationKeys` recursive tipi; geçici için `TranslationKeyInput`.
+- **Parite testi:** `src/i18n/__tests__/i18n.test.ts` (`pnpm run test:i18n`). lint-staged commit'te, `prebuild` build'de pariteyi zorlar.
+
+## Sık Tuzaklar (sahada yakalandı)
+
+- **Kullanılmayan `useI18n`:** Hook ekleyip `t`'yi kullanmamak → `unused-imports` ERROR. Gerçekten literal değiştirdiysen kullan; değiştirmediysen hook ekleme.
+- **Sessiz eksik-anahtar:** `t('x.y')` eksikse tsc geçer (loose-string tipi) ama UI ham 'x.y' gösterir. **Sadece parite testi + eksik-key kontrolü yakalar** — atla­ma.
+- **Template literal tuzağı:** `` {`metin`} `` kuralı GEÇMEZ, yakalanır. Sembol için bile dict kullan.
+- **Çakışan duplicate key:** Mevcut anahtarı körce yeniden-tanımlama; obje literalinde duplicate key = son değer kazanır, sessiz UX değişimi.
+
+## Hreflang (Uluslararası SEO — `/tr` & `/en`)
+
+1. **Self-referencing** — her sayfa hreflang setinde kendini içerir.
+2. **Reciprocal** — A→B varsa B→A da olmalı (yoksa Google ikisini de yok sayar).
+3. **ISO kodları** — `en-GB` ✅ / `en-UK` ❌.
+4. **x-default** — dil seçici veya varsayılan locale'e.
+5. Hedef URL'ler 200 döner, canonical ile eşleşir. 10+ locale'de XML sitemap tercih.
+
+```tsx
+<link rel="alternate" hrefLang="tr" href="https://venthub.com/tr/urunler" />
+<link rel="alternate" hrefLang="en" href="https://venthub.com/en/products" />
+<link rel="alternate" hrefLang="x-default" href="https://venthub.com/tr/urunler" />
+```

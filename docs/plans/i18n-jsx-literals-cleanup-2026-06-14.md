@@ -60,3 +60,16 @@ Sayaç: başlangıç **845** jsx-literal. Hedef-dışı sabit: admin 256 + legal
 5. Commit (sadece N bileşen + 2 dict; **`.cc/memory.db`/system_tree/maestro HARİÇ**). Orion pre-commit doc hook'u .md üretir (normal).
 
 Dict edit'lerinde NOT: merge script harici yazdığı için Edit "not read" guard atar → önce ilgili bölgeyi Read et. Diagnostic'ler `en: typeof tr` için ara-durum gösterir; **tsc otoritedir**.
+
+## ⚠️ TOOLING LİMİTİ (calculators dalgasında bulundu — DÜZELTİLMEDEN devam etme)
+
+**Sorun:** `merge-generic*.js`'in blok-sınırı tespiti **büyük namespace'lerde kırılıyor.** `region()` kapanışı `indexOf('\n  },')` ile buluyor; calculators gibi büyük blokta yanlış erken kapanış buluyor → mevcut alt-namespace'i (`jetFan`, satır ~2272, calculators 2126-2297 içinde) **"YENİ" sanıyor** → `--apply` etseydim **duplicate `jetFan`** yazıp sözlüğü bozardı. `{{count}}` brace'leri naive brace-sayımını da bozar.
+
+**Calculators dalgası ÇIKTISI hazır/cache'li** (run `wf_5aac0ed3-504`, output `wxnt88u0z.output`): ajanlar İYİ iş çıkardı — JetFan bu sefer `pageTitle`/`pageInfoText` kullanıp **çakışmayı kendi önledi** (önceki run `title` ile çakışıyordu). Yani sorun ajanlar değil, merge-aracı.
+
+**DÜZELTİLMİŞ DEVAM YÖNTEMİ (sıradaki oturum):**
+1. **region() düzelt:** kapanışı "ilk `\n  },`" yerine **"bir sonraki 2-boşluk top-level `\n  <word>: {` anahtarından hemen önce"** olarak bul (ya da string-atlayan brace-aware tarama). VEYA basitçe: `    <ns>: {` benzersiz olduğu için **doğrudan o anchor'a** ekle, region'a hiç gerek yok.
+2. **Ajan talimatını sadeleştir** (`i18n-wave.mjs`): YENİ anahtarları **DÜZ** (page-namespace altında flat) üret — mevcut `form`/`results` alt-objelerini GENİŞLETME, yeni nested alt-obje açma. Böylece merge hep "namespace açılışından sonra flat ekle" = nested-merge derdi biter. (Mevcut anahtar reuse serbest; sadece YENİ'ler flat.)
+3. Kalan yüzeyler: **calculators (cache'den), category ~91, contact 18, home ~30, auth 14, kuyruk ~60.** Her biri: dalga → flat-merge → kapı (`pnpm run test:i18n` + eslint + tsc + test) → commit. Kalite çıtası: memory [[i18n-quality-is-enterprise-substance]] + bu skill `i18n-conventions`.
+
+**Durum:** 3 dalga (account+checkout, ~98 literal) master'a HENÜZ bağlanmadı (branch `chore/i18n-jsx-literals`, 4 commit). `i18n-conventions` skill'i maks-fayda için geliştirildi.
