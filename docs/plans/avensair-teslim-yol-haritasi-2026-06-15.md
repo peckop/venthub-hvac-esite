@@ -26,8 +26,8 @@ siteyi **kullanarak** ister. "Hazır" tanımını büyütmek = teslimi geciktirm
 | **C** | **Bayi modülü (çekirdek)** | **KIRIK** — R0-R5 onarım → B1-B2 inşa | `docs/standards/dealer-module-blueprint.md` · `docs/audits/dealer-data-ground-truth-2026-06-11.md` |
 | **D** | Lighthouse / performans | homepage ~75 → **hedef 90+** · products/categories (3D/three.js) | `docs/audits/lighthouse_diagnostic_2026-06-10.md` |
 | **E** | Ürün detayları | **altyapı hazır** (PDF + LLM çıkarımı denendi) · içerik bekliyor | (yeni — doc gerekebilir) |
-| **F** | SEO geçişi | blueprint var · Avensair input bekliyor | `docs/plans/seo-transition-blueprint.md` |
-| **G** | Analytics / GA4 | standart var · kurulum bekliyor | `docs/standards/analytics-standard.md` |
+| **F** | SEO geçişi (**7-8 yıllık site sıralaması** korunur) | blueprint var · Avensair input bekliyor | `docs/plans/seo-transition-blueprint.md` |
+| **G** | Analytics / GA4 + **raporlama** | standart var (config + olay taksonomisi + §Raporlama) · kurulum bekliyor | `docs/standards/analytics-standard.md` |
 | **H** | LLM danışman chatbot | **YENİ** — teknik satış danışmanı, tüm ürünleri bilir | (yeni) |
 | **I** | Teklif hazırlama modülü | **YENİ** — LLM + şablon, ciddi zaman kazancı | (yeni) |
 | **J** | CRM | **YENİ** — SaaS fazlarında vardı | `docs/plans/venthub_saas_master_roadmap.md` (ref) |
