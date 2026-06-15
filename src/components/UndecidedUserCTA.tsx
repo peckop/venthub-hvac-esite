@@ -2,12 +2,13 @@ import { ArrowRight,MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes';
 import { useI18n } from '../i18n/I18nProvider';
-import { Routes } from '../utils/routes';
 
 
 export const UndecidedUserCTA: React.FC = () => {
     const { t } = useI18n()
+    const Routes = useLocalizedRoutes()
 
     return (
         <div className="mt-8 mb-12 relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-navy to-secondary-blue p-6 sm:p-10 text-white shadow-xl">

@@ -50,6 +50,19 @@ const MANUAL_LANG_PREFIX = /\/\$\{\s*(?:lang|locale)\s*\}/
 const HARDCODED_APP_PATH =
   /\b(?:href|to)\s*[:=]\s*\{?\s*['"`]\/(?:category|products|account|legal|brands|checkout|cart|destek|contact|about|auth)\b/
 
+// 3) Ham Routes importu (utils/routes'tan { Routes }) AMA localize sarmalayıcı YOK.
+//    Client'ta Routes.x() dilsiz URL döndürür; useLocalizedRoutes proxy'si ya da localizedHref
+//    olmadan render edilirse dil öneki kaybolur (middleware redirect'e bel bağlar = fazladan hop + drift).
+const RAW_ROUTES_IMPORT = /import\s*\{[^}]*\bRoutes\b[^}]*\}\s*from\s*['"][^'"]*utils\/routes['"]/
+const HAS_LOCALIZER = /\b(?:localizedHref|useLocalizedRoutes)\b/
+// İstisna: /admin rotaları dil-öneki ALMAZ (localizeUrl admin'i atlar); R3F bileşeni React
+// context'i Canvas sınırını geçmediğinden hook kullanamaz (programatik push redirect'le çalışır).
+const RAW_ROUTES_ALLOWLIST = [
+  'components/admin/',
+  'views/admin/',
+  'components/products/BentPlaneGeometry.tsx',
+]
+
 /** Yorumları siler ki açıklayıcı yorumlardaki örnek desenler bekçiyi tetiklemesin. */
 function stripComments(source: string): string {
   return source
@@ -84,5 +97,24 @@ describe('INV-2 · localized-route SSOT conformance', () => {
         `  elle dil öneki : ${manualPrefix.join('\n                   ') || '—'}\n` +
         `  sabit app-yolu : ${hardcodedPath.join('\n                   ') || '—'}`,
     ).toEqual({ manualPrefix: [], hardcodedPath: [] })
+  })
+
+  it('client/RSC nav bileşeni ham Routes değil localize SSOT kullanmalı', () => {
+    const offenders: string[] = []
+
+    for (const [key, source] of Object.entries(SOURCES)) {
+      const rel = toRelPath(key)
+      if (rel.endsWith('.d.ts') || rel.includes('__tests__') || rel.includes('.test.')) continue
+      if (!SCOPE.some((s) => rel.startsWith(s))) continue
+      if (RAW_ROUTES_ALLOWLIST.some((a) => rel.startsWith(a))) continue
+
+      const clean = stripComments(source)
+      if (RAW_ROUTES_IMPORT.test(clean) && !HAS_LOCALIZER.test(clean)) offenders.push(rel)
+    }
+
+    expect(
+      offenders,
+      `Ham Routes (dilsiz) kullanan nav bileşeni — useLocalizedRoutes() ya da localizedHref kullan:\n  ${offenders.join('\n  ')}`,
+    ).toEqual([])
   })
 })
