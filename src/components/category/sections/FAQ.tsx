@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider'
 
-import { Routes } from '../../../utils/routes';
+import { useLocalizedRoutes } from '../../../hooks/useLocalizedRoutes';
 
 
 /**
@@ -12,6 +12,7 @@ import { Routes } from '../../../utils/routes';
  */
 const FAQ: React.FC = () => {
     const { t } = useI18n()
+    const Routes = useLocalizedRoutes()
     const [openIndex, setOpenIndex] = useState<number | null>(0)
 
     const faqs = [

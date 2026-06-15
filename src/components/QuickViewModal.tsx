@@ -5,9 +5,9 @@ import React from 'react'
 import type { Product } from '@/types/ui-models'
 
 import { useCart } from '../hooks/useCartHook'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
 
 const PLACEHOLDER_EMOJI = '🌪️'
 
@@ -20,6 +20,7 @@ interface QuickViewModalProps {
 const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose }) => {
   const { t, lang } = useI18n()
   const { addToCart } = useCart()
+  const Routes = useLocalizedRoutes()
 
   if (!open || !product) return null
 

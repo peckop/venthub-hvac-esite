@@ -7,9 +7,9 @@ import React from 'react'
 import { BrandIcon } from '../components/HVACIcons'
 import Seo from '../components/Seo'
 import { HVAC_BRANDS } from '../data/brands'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
 
 /**
  * BrandsPage - Premium "Markalar" sayfası
@@ -17,6 +17,7 @@ import { Routes } from '../utils/routes'
  */
 const BrandsPage: React.FC = () => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
   const brands = HVAC_BRANDS
   const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
   const [brandsGridRef, brandsGridVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.05 })

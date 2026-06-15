@@ -12,10 +12,10 @@ import type { Product } from '@/types/ui-models'
 
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes'
 
 interface ShippingAddress {
   fullAddress?: string
@@ -68,6 +68,7 @@ export default function OrderDetailPage() {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const { t, lang } = useI18n()
+  const Routes = useLocalizedRoutes()
   const { addToCart } = useCart()
 
   const [order, setOrder] = useState<Order | null>(null)
@@ -79,7 +80,7 @@ export default function OrderDetailPage() {
       router.push(Routes.auth.login(Routes.account.orderDetail(id)))
       return
     }
-  }, [authLoading, user, id, router])
+  }, [authLoading, user, id, router, Routes])
 
 
   useEffect(() => {

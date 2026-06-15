@@ -5,8 +5,8 @@ import React from 'react'
 
 import type { Product } from '@/types/ui-models'
 
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
 
 const CLOSE_GLYPH = '×'
 
@@ -17,6 +17,7 @@ interface AddToCartToastContentProps {
 
 const AddToCartToastContent: React.FC<AddToCartToastContentProps> = ({ product, onClose }) => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
 
   return (
     <div className="w-full md:w-360px max-w-92vw rounded-2xl shadow-2xl border border-light-gray bg-white ring-1 ring-black/5 overflow-hidden animate-slide-up">

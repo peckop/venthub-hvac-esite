@@ -7,8 +7,8 @@ import Link from 'next/link'
 import React, { useMemo,useState } from 'react'
 
 import Seo from '../../components/Seo'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes';
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes';
 
 
 const TOPIC_SLUGS = ['hava-perdesi', 'jet-fan', 'hrv'] as const
@@ -23,6 +23,7 @@ const TAGS: { key: TopicSlug | 'all'; labelKey: string }[] = [
 
 const HubPage: React.FC = () => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
   const [q, setQ] = useState('')
   const [activeTag, setActiveTag] = useState<TopicSlug | 'all'>('all')
 

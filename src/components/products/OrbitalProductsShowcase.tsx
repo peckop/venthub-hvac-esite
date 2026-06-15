@@ -10,8 +10,8 @@ import { DoubleSide, MathUtils, SRGBColorSpace, Vector3 } from 'three'
 
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
 
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes'
 import Category3DIcon from './Category3DIcon'
 
 const ANIM_STAGGER_DELAY = 0.12
@@ -154,6 +154,7 @@ const OrbitalCard: React.FC<{
     const meshRef = useRef<Mesh>(null)
     const router = useRouter()
     const { t } = useI18n()
+    const Routes = useLocalizedRoutes()
     const [hovered, setHover] = useState(false)
     const [isNearFront, setIsNearFront] = useState(false)
     const [showTapHint, setShowTapHint] = useState(false) // El ikonu görünürlüğü
@@ -254,7 +255,7 @@ const OrbitalCard: React.FC<{
         e.stopPropagation()
         // Çift tık: Direkt kategori sayfasına git
         router.push(Routes.category(item.id))
-    }, [router, item.id])
+    }, [router, item.id, Routes])
 
     const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation() // Sadece BU kart hover alsın, arkadakiler almasın

@@ -6,8 +6,8 @@ import React from 'react'
 
 import { normalizeImageUrl } from '@/utils/imageUtils'
 
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes'
 
 export interface CategoryViewModelLite {
   id: string;
@@ -25,6 +25,7 @@ const FALLBACK_CATEGORY_IMAGE = '/images/vortice_lineo_futuristic.webp'
 
 const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ displayCategories = [] }) => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
   return (
     <section id="categories" className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-8">

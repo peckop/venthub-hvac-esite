@@ -11,9 +11,9 @@ import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAni
 import { useI18n } from '@/i18n/I18nProvider'
 
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { DomainCategory } from '../../lib/type-converters'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
-import { Routes } from '../../utils/routes'
 
 interface CategoryShowcaseProps {
     category: DomainCategory
@@ -28,6 +28,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
 }) => {
     const router = useRouter()
     const { t, dict } = useI18n()
+    const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
     const [wizardOpen, setWizardOpen] = useState(false)
     

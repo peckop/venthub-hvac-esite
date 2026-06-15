@@ -9,10 +9,10 @@ import ProductCard from '@/components/ProductCard'
 
 import { useCart } from '../../hooks/useCartHook'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory, DomainProduct } from '../../lib/type-converters'
-import { Routes } from '../../utils/routes'
 import { isRecord } from '../../utils/type-converters'
 
 interface CategorySeriesViewProps {
@@ -28,6 +28,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
 }) => {
     const { lang, t } = useI18n()
     const { addToCart } = useCart()
+    const Routes = useLocalizedRoutes()
     const { wrapCategory, groupProductsBySeries } = useCategoryViewModel()
     const [viewModes, setViewModes] = useState<Record<string, 'grid' | 'matrix'>>({})
     

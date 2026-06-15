@@ -6,10 +6,10 @@ import { toast } from 'sonner'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useAuth } from '../../hooks/useAuth'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { formatDate as formatOnlyDate } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes'
 
 interface ShipmentRow {
   id: string
@@ -36,6 +36,7 @@ export default function AccountShipmentsPage() {
   const { user } = useAuth()
   const { t, lang } = useI18n()
   const router = useRouter()
+  const Routes = useLocalizedRoutes()
   const [rows, setRows] = useState<ShipmentRow[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<ShipFilter>('all')

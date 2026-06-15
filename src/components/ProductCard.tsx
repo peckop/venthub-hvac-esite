@@ -7,9 +7,9 @@ import React from 'react'
 import type { Product } from '@/types/ui-models'
 
 import { useCart } from '../hooks/useCartHook'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
 import { BrandIcon } from './HVACIcons'
 import VentImage from './ui/VentImage'
 
@@ -31,6 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
   compact = false
 }) {
   const { lang, t } = useI18n()
+  const Routes = useLocalizedRoutes()
   const isList = layout === 'list'
   const { addToCart } = useCart()
 

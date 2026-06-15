@@ -8,11 +8,11 @@ import { toast } from 'sonner'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useAuth } from '../hooks/useAuth'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { formatDateTime } from '../i18n/datetime'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import { isRecord } from '../lib/type-converters'
-import { Routes } from '../utils/routes'
 
 
 interface Order {
@@ -50,6 +50,7 @@ type StatusFilter = 'all' | 'pending' | 'paid' | 'shipped' | 'delivered' | 'fail
 const OrdersPage: React.FC = () => {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
+  const Routes = useLocalizedRoutes()
   const searchParams = useSearchParams()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -147,7 +148,7 @@ const OrdersPage: React.FC = () => {
     if (user) {
       fetchOrders()
     }
-  }, [user, authLoading, router, fetchOrders])
+  }, [user, authLoading, router, fetchOrders, Routes])
 
   const formatDate = (dateString: string) => {
     return formatDateTime(dateString, lang)

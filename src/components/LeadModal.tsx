@@ -2,8 +2,8 @@ import { Briefcase,Building2, CheckCircle2, ChevronRight, Mail, MapPin, Phone, X
 import Link from 'next/link'
 import React, { useState } from 'react'
 
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
 
 const CONTACT_EMAIL = 'info@venthub.com.tr'
 
@@ -16,7 +16,8 @@ interface LeadModalProps {
 
 const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _productId: __productId }) => {
   const { t } = useI18n()
-  
+  const Routes = useLocalizedRoutes()
+
   const applicationAreas = [
     t('lead.appAreas.parking'),
     t('lead.appAreas.kitchen'),

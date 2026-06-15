@@ -9,17 +9,18 @@ import { toast } from 'sonner'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useCart } from '../hooks/useCartHook'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { formatDateTime } from '../i18n/datetime'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import { reportError } from '../lib/errorReporter'
-import { Routes } from '../utils/routes'
 
 type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
 
 const PaymentSuccessPage: React.FC = () => {
   const searchParams = useSearchParams()
   const { t, lang } = useI18n()
+  const Routes = useLocalizedRoutes()
   const { clearCart } = useCart()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)

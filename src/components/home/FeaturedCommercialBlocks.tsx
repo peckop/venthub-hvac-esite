@@ -5,9 +5,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useMemo, useState } from 'react'
 
+import { useLocalizedRoutes } from '@/hooks/useLocalizedRoutes';
 import type { Category, Product } from '@/types/ui-models'
 import { normalizeImageUrl } from '@/utils/imageUtils'
-import { Routes } from '@/utils/routes';
 
 import { useI18n } from '../../i18n/I18nProvider'
 import ProductCard from '../ProductCard'
@@ -26,6 +26,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
   initialProducts = []
 }) => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
   const [activeTab, setActiveTab] = useState<CommercialTab>('featured')
 
   const productsByTab = useMemo(() => {

@@ -6,12 +6,12 @@ import React, { useState } from 'react'
 
 import VentImage from '@/components/ui/VentImage'
 
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
 import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
-import { Routes } from '../../utils/routes'
 import Breadcrumb from '../navigation/Breadcrumb'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
 import { BottomCTA } from './sections'
@@ -24,6 +24,7 @@ interface CategoryShowcaseProps {
 
 const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCategories, parentCategory }) => {
     const { t } = useI18n()
+    const Routes = useLocalizedRoutes()
     const [wizardOpen, setWizardOpen] = useState(false)
 
     // Check if this is special showcase categories

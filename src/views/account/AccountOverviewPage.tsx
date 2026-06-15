@@ -8,10 +8,10 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import type { UserAddress } from '@/types/ui-models'
 
 import { useAuth } from '../../hooks/useAuth'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes';
 import { formatDate } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes';
 
 
 interface OrderRecord {
@@ -33,6 +33,7 @@ export default function AccountOverviewPage() {
   const { user } = useAuth()
   const { lang, t } = useI18n()
   const router = useRouter()
+  const Routes = useLocalizedRoutes()
 
   const [addresses, setAddresses] = useState<UserAddress[]>([])
   const [orders, setOrders] = useState<ShipmentRecord[]>([])

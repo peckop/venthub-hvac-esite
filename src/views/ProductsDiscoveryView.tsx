@@ -20,9 +20,9 @@ import React, { useCallback, useRef,useState } from 'react'
 import type { Product } from '@/types/ui-models'
 
 import ProductCard from '../components/ProductCard'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
 import type { DomainCategory } from '../lib/type-converters'
-import { Routes } from '../utils/routes'
 
 const CategoryOrbitCarousel = dynamic(
     () => import('../components/products/CategoryOrbitCarousel'),
@@ -53,6 +53,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
 }) => {
     const router = useRouter()
     const { t } = useI18n()
+    const Routes = useLocalizedRoutes()
     const [viewMode, setViewMode] = useState<ViewMode>('grid')
     const productsRef = useRef<HTMLDivElement>(null)
 
@@ -66,7 +67,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
         } else {
             router.push(Routes.category(categorySlug))
         }
-    }, [router])
+    }, [router, Routes])
 
     return (
         <div className="bg-surface-darker min-h-screen relative pb-12 w-full pt-16 md:pt-24">

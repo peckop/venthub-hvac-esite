@@ -6,10 +6,10 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
-import { Routes } from '../../utils/routes'
 const MegaMenu3DBackground = dynamic(() => import('./MegaMenu3DBackground'), { ssr: false })
 
 interface EliteMegaMenuProps {
@@ -20,6 +20,7 @@ interface EliteMegaMenuProps {
 // MobileMegaMenu Export - Needed for MegaMenu.tsx
 export const MobileMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate }) => {
     const { wrapCategory } = useCategoryViewModel()
+    const Routes = useLocalizedRoutes()
     const mainCategories = categories.filter((c) => !c.parent_id)
     const getSubCategories = (parentId: string) => categories.filter((c) => c.parent_id === parentId)
 
@@ -65,6 +66,7 @@ export const MobileMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNav
 const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate }) => {
     const { wrapCategory } = useCategoryViewModel()
     const { t } = useI18n()
+    const Routes = useLocalizedRoutes()
     const [isMounted, setIsMounted] = useState(false)
 
     useEffect(() => {
