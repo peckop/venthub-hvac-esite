@@ -23,6 +23,8 @@
 | **Nasıl** inşa edilir, hangi sırada, bu DB'de? | `standards/dealer-module-blueprint.md` (R0→B2) |
 | Admin **sayfası** nasıl kurulur + nasıl ölçülür? | `standards/admin-standard.md` (+ §8 cetveli) |
 | Admin **ne** yapmalı, ne eksik, hangi öncelik? | `standards/admin-capabilities.md` (NE-envanteri) |
+| Eski siteden geçişte **SEO sıralaması** nasıl korunur? | `plans/seo-transition-blueprint.md` |
+| **Ne ölçülür** (analytics / GA4 / dönüşüm)? | `standards/analytics-standard.md` |
 | Şu an **gerçek** ne? | `audits/dealer-data-ground-truth-2026-06-11.md` |
 | **Niçin** / moat / vizyon? | `../VISION.md` |
 | Kapsamlı uçtan uca referans | `../CONTEXT.md` (NLM üretir) |

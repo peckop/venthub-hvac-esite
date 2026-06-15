@@ -1,5 +1,19 @@
 # Changelog
 
+### [2026-06-15] i18n RSC Düzeltmesi · Kategori-i18n Teşhisi · SEO + Analytics Strateji Dokümanları
+
+**Özet:** Anasayfa production build'ini kıran bir RSC sınır ihlali giderildi; TR sayfada kategori adlarının İngilizce sızması teşhis edildi; ve go-live için iki eksik strateji dokümanı (SEO geçişi, analytics ölçüm) mühürlendi.
+
+**Değişiklik Kapsamı:**
+- **i18n RSC Sınır Düzeltmesi (kod):** `GuidedCategoryDiscovery` server-render edilen bir bileşende `useI18n()` (client hook) çağırıyordu → `/tr` static prerender çöküşü → 2 prod deploy `● Error`. `'use client'` eklendi; bileşen yine SSR edilir (SEO korunur). Tam `pnpm build` yeşil; master'a push (`c4a10369`). **Ders:** `tsc`/`lint`/`test:i18n` RSC sınır ihlalini yakalamaz — yalnız `next build` (static prerender) yakalar → i18n göç gate'ine `pnpm build` eklenecek.
+- **Kategori-i18n Teşhisi:** TR anasayfada 10/12 kategori adı İngilizce — kök sebep anasayfa `page.tsx`'in `c.slug` ile sözlüğe bakması (`translation_key` köprüsünü atlaması); uygulamanın geri kalanı (`getCategoryDisplayName` / `mapCategoryWithLocale`) doğru çalışıyor. Entity-i18n JSONB mimarisi zaten aksiyom (CONTEXT §8). Hotfix: anasayfayı mevcut SSOT'a bağla (sırada).
+- **Yeni Strateji Dokümanları:** `docs/plans/seo-transition-blueprint.md` (eski siteden sıralama-koruyan geçiş: envanter → 301 haritası → içerik paritesi → Search Console) + `docs/standards/analytics-standard.md` (ölçüm kontratı: motor `analytics.ts` hazır; olay taksonomisi / huni / consent tanımlandı).
+- **Bilgi-altyapısı disiplini:** "önce-sor" ilkesi (twin'e sor → CodeGraph/DB ile doğrula; twin **"VAR" = güven, "YOK" = doğrula**) + sync-set kapsam denetimi başlatıldı (`.cc_docs.yaml`'a yeni doc'lar eklendi).
+
+**Doğrulama:** `pnpm build` ✅ (907 sayfa, `/tr` dahil) · prod deploy `Ready` ✅
+
+---
+
 ### [2026-06-13 → 2026-06-14] Admin Panel Enterprise Standardizasyonu — DataTableKit Göçü (Faz 0 + Faz 1 TAMAM)
 
 **Özet:** Admin panelinin tüm liste sayfaları tek paylaşılan tablo motoruna (**DataTableKit**) taşındı. Faz 0'da kit altyapısı (`useAdminTable` hook + `DataTableKit` shell + `mutateWithAudit` yazma kapısı) kuruldu ve `AdminCouponsPage` ile doğrulandı; Faz 1'de kalan 9 sayfa göç ettirildi. Sonuç: tek standart, kapanan denetim (audit) boşlukları ve yapısal olarak imkânsız kılınan "sessiz sıralama" hatası.
