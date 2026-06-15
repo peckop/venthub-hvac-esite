@@ -1,0 +1,115 @@
+---
+name: maestro
+description: >-
+  Orchestrate a large, DIVISIBLE code change — migrating or transforming many files/pages/modules to ONE
+  shared pattern (a kit, hook, component, API, or convention) — as PARALLEL subagent waves with quality
+  gates. Use maestro whenever a task means applying the SAME structural change across many independent
+  targets: "migrate the N admin pages to the shared table kit", "move every service onto the new client
+  factory", "refactor these 12 modules to the new error API", "convert all forms to the new validation
+  pattern", or any audit-then-fix that spans many files. It runs architect subagents to produce
+  piece-divided plans, then a Workflow pipeline of migrate→judge subagents IN PARALLEL (bounded, no
+  network), then the orchestrator (you) centrally verifies (typecheck + lint + test + a11y), fixes, and
+  commits per wave. Reach for maestro the moment you catch yourself about to do many similar migrations
+  one-by-one yourself — divide and parallelize instead, even when each one is "hard". DO NOT use for a
+  single-file edit, a one-off bug fix, pure read-only scanning (use agy-orchestrate / CodeGraph), or
+  anything one agent finishes in a couple of steps.
+category: orchestration
+allowed-tools: Agent, Workflow, Bash, Read, Write, Edit, Glob, Grep, TodoWrite
+metadata:
+  triggers:
+    - parçala böl yönet
+    - paralel göç
+    - dalga halinde göç
+    - migrate N pages
+    - çok sayıda dosyayı aynı kalıba taşı
+    - orchestrate migration
+---
+
+# maestro — Paralel Göç Orkestrasyonu (parçala böl yönet)
+
+Bir işi tek tek, sırayla, kendin yapma dürtüsü geldiğinde dur. "Zor" demek "solo yap" demek **değildir** —
+"iyi parçala, denetimi sıkı tut" demektir. maestro, **çok-hedefli yapısal değişikliği** (N sayfayı ortak
+motora, N modülü yeni API'ye…) bir **subagent filosuyla paralel** koşturur; sen orkestratör olarak
+plan + doğrulama + birleştirme + commit yaparsın.
+
+> **Çekirdek ilke:** Ajanlar **üretir** (paralel, hızlı, dar odak). Yargıç-ajan + **senin merkezi kapın**
+> (typecheck/lint/test/a11y) **kaliteyi korur.** "Tamamlandı" yazısına ASLA güvenme — çıktıyı kendin doğrula.
+> Worker subagent = dar/odaklı (az düşünür, çok net brief). Orkestratör = derin (plan + doğrula + sentez).
+
+## Ne zaman kullan / KULLANMA
+
+**Kullan:** aynı yapısal değişikliği **birçok bağımsız hedefe** uygulamak (göç, toplu refactor, kalıba
+oturtma, denetle-sonra-düzelt). İşaret: "şunu 14 yerde de yapmam lazım" diye düşünmek.
+
+**KULLANMA:** tek-dosya değişikliği · tek seferlik bug-fix · yalnız OKUMA/tarama (→ `agy-orchestrate` veya
+CodeGraph) · bir ajanın birkaç adımda bitirdiği iş · tek, sıkı-bağlı, bölünemez değişiklik.
+
+## Akış — 5 faz
+
+### Faz 0 — Kapsam & triyaj (önce gerçeği oku)
+Hedefleri **gerçekten oku** (gerekirse paralel salt-okunur keşif ajanlarıyla). Her hedefi sınıflandır:
+**TEMİZ** (kalıba düz oturur → paralelle) · **TASARIM-GEREK** (iş mantığı dolanık → dikkatli/sıralı) ·
+**ÖZEL ARKETİP** (kalıba zorlanmaz → ertele) · **SIRALI** (altyapıyı evrimleştirir → en son, tek tek).
+Nominal skora/sıraya değil **gerçek karmaşıklığa** göre sırala — özel arketipi paralel filoya sokma.
+
+### Faz 1 — Mimar (parça-bölünmüş plan)
+Her **zor** hedef için **bir Plan-tipi subagent** → kod YAZMADAN ayrıntılı göç planı: mod kararı, veri/fetch
+tasarımı (join/RPC/özel sorgu), her yazmanın denetim-kapısından geçişi, özel UX→hangi slot, **parça-bölünmesi**
+(sıralı küçük alt-görevler), riskler. **Kararları SEN kilitlersin** (ajan önerir, sen seçersin). Çıktı
+yapısal/öz olsun.
+
+### Faz 2 — Paralel göç + yargıç (Workflow)
+`Workflow` aracıyla `pipeline(göç-ajanı → yargıç-ajan)` her hedef için **paralel**. Göç-ajanı brifingi
+**DAR ve sert** olmalı (kaçağı kaynakta keser):
+- Sadece KENDİ dosyalarına dokun; ortak altyapıyı / barrel'ları / başka hedefi DEĞİŞTİRME.
+- İnternet/araç-dokümanı (context7/web) YOK — her şey repo'da.
+- Yasak desen yok (`as any` / `as unknown as` / `@ts-ignore` / `eslint-disable`).
+- pnpm/tsc/test KOŞMA (merkezi doğrulama orkestratörde). Yapısal sonuç döndür.
+**Yargıç-ajan** çürütücüdür: hedefe özel bir **kontrat** (kalıp kullanımı, yazma-kapısı, i18n parity, a11y,
+yasak desen, mod doğruluğu, test sadakati) üstünden "neyi YANLIŞ" arar; emin değilse FAIL der.
+
+### Faz 3 — Merkezi doğrulama kapısı (SEN)
+Yargıç verdiklerini **oku**, sonra **tüm ağacı KENDİN** geçir: `type-check` + `lint` + `test --run` + a11y(axe).
+Yakalanan her şeyi düzelt. Bu fazın varlık sebebi: ajanlar hata üretir; "tamamlandı" yanıltır. Tarihten ders:
+tip-hatası (union → Record), a11y heading-atlaması, eksik i18n anahtarı, test-mock eksikliği — hepsi burada yakalandı.
+
+### Faz 4 — Dalga başına commit
+Yalnız o dalganın dosyalarını sahnele (pipeline artefaktlarını/ilgisizleri HARİÇ tut). Conventional commit.
+Temiz, geri-alınır dönüm noktası → sonraki dalga buradan dallanır.
+
+## Dalga boyutlandırma
+- **TEMİZ** hedefler: 3–4'ü aynı anda paralel (her biri 1 ajan + yargıç).
+- **TASARIM-GEREK**: yine ajanla ama **iyi brief'li**, az sayıda; gerekirse parçalara böl.
+- **ÖZEL ARKETİP**: ertele (ayrı faz) ya da tek tek.
+- **SIRALI/altyapı-evrim** hedef: **en son, tek tek** — kit'i kırarsa geri dönebilesin.
+- Dalga sırasında **paylaşılan altyapıyı DONDUR** (yalnız orkestratör dokunur) → ajanlar çakışmaz.
+
+## Workflow iskeleti (kopyala-uyarla)
+`pipeline()` varsayılan: her hedef göç→yargıç'tan bağımsız akar (bariyer yok). Brief'leri kilitli plandan kur.
+```js
+export const meta = { name: 'maestro-wave-N', description: '...', phases: [{title:'Migrate'},{title:'Judge'}] }
+const TARGETS = [ { key: 'PageA', migratePrompt: '...DAR BRIEF...' }, /* ... */ ]
+const MIGRATE_SCHEMA = { type:'object', required:['page','filesWritten','mode','notes','selfChecks'], /* ... */ }
+const JUDGE_SCHEMA   = { type:'object', required:['page','pass','issues','severity'], /* ... */ }
+const results = await pipeline(
+  TARGETS,
+  (t) => agent(t.migratePrompt, { label:'migrate:'+t.key, phase:'Migrate', schema: MIGRATE_SCHEMA }),
+  (mr, t) => agent(buildJudgePrompt(t.key, mr), { label:'judge:'+t.key, phase:'Judge', schema: JUDGE_SCHEMA })
+               .then(verdict => ({ page: t.key, migrate: mr, verdict })),
+)
+return results.filter(Boolean)
+```
+Bittiğinde: verdiktleri oku → **Faz 3 merkezi doğrulama** → düzelt → **Faz 4 commit**.
+
+## Guardrail'ler (acıyla öğrenildi)
+- **Kaçak ajanı kaynakta kes:** brief'te internet/context7 YASAK + dosya allowlist + adım-sınırı. (Bir
+  ajan 36 dk context7 döngüsüne girip `parallel()`'i kilitlemişti, UI yanlış "tamamlandı" demişti.)
+- **Yargıç ≠ güven.** Yargıç çürütür ama **son söz senin merkezi kapın.** İkisi de olmadan birleştirme.
+- **Tek doğrulama pası / dalga:** N dosyayı tek `type-check`/`lint`/`test` ile geçir (ajan başına ağır tsc koşturma).
+- **Dosya disjoint'liği** paralel güvenliğin temeli: her ajan ayrı dosya kümesi yazsın; ortak dosya = çakışma.
+
+## Kanıtlanmış örnek (referans)
+VentHub admin panelinin **DataTableKit**'e göçü: 9 liste sayfası, kod-okumalı triyajla 4'ü Faz-2'ye ayrıldı;
+kalan **7 sayfa 3 dalgada** (Errors → AuditLog+Categories → Movements+ErrorGroups+Returns+Users) bu akışla
+göçtü. Yargıç + merkezi kapı her dalgada gerçek hata yakaladı; her dalga tsc 0 · lint 0 · test yeşil · axe 0
+ile commit'lendi. Planlar: `docs/plans/faz1-*.md`, `docs/plans/admin-enterprise-roadmap-*.md`.
