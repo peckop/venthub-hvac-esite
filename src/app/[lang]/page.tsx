@@ -10,7 +10,9 @@ import { CategoryViewModelLite } from '../../components/home/GuidedCategoryDisco
 import { SITE_URL } from '../../config/siteUrl'
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
+import { getDictValue } from '../../i18n/getDictValue'
 import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 import HomePage from '../../views/HomePage'
 
 export async function generateStaticParams() {
@@ -104,27 +106,22 @@ export default async function RootPage({ params }: Props) {
     console.warn('SSR Data Fetch Error:', error)
   }
 
+  // SSOT: kategori adı DAİMA getCategoryDisplayName üzerinden çözülür
+  // (translation_key → menu_label → name). Server Component olduğumuz için useI18n yok;
+  // t'yi aktif dilin sözlüğünden kuruyoruz. Doğrudan categoryList[slug] indekslemek
+  // translation_key'i atlar ve yanlış/karışık dil üretirdi (2026-06 anasayfa bug'ı).
+  const t = (key: string) => getDictValue(dict, key)
+
   const displayCategories: CategoryViewModelLite[] = categories
     .filter((c) => !c.parent_id)
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map(c => {
-      type CategoryDict = Record<string, string | Record<string, string>>;
-      const categoryListDict = dict.common?.categoryList as CategoryDict | undefined;
-      const subListDict = categoryListDict?.sub as Record<string, string> | undefined;
-
-      let translatedName = categoryListDict?.[c.slug] as string | undefined;
-      if (!translatedName && typeof subListDict?.[c.slug] === 'string') {
-        translatedName = subListDict[c.slug];
-      }
-
-      return {
-        id: c.id,
-        slug: c.slug,
-        displayName: translatedName || c.menu_label || c.name,
-        description: c.description || '',
-        image_url: c.image_url
-      }
-    })
+    .map(c => ({
+      id: c.id,
+      slug: c.slug,
+      displayName: getCategoryDisplayName(c, t),
+      description: c.description || '',
+      image_url: c.image_url
+    }))
 
   const siteUrl = SITE_URL
 
