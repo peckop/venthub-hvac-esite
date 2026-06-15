@@ -64,12 +64,18 @@ mcp_config_for_claude_code.json
 .agents/
 .agent/cache/
 .agent/scratch/
+.agent/call_graph.json
 scratch/
 !scratch/compile_skills.py
 
 # Auto-generated caches
 .codegraph/
 __pycache__/
+
+# CodeGraph/Orion SQLite WAL yan-dosyaları — çalışma anında üretilir, asla commitlenmez
+# (memory.db kasıtlı tracked snapshot kalır; -shm/-wal ephemeral'dır)
+.cc/*.db-shm
+.cc/*.db-wal
 
 # Claude Code: sadece makineye özel yerel ayar repoya girmez.
 # Skill'ler (.claude/skills) git'te kalır — cihaz çökerse kaybolmasın (.agent gibi).
