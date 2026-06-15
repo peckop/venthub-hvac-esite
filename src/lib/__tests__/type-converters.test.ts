@@ -3,6 +3,7 @@ import { describe, expect,it } from 'vitest'
 import type { DbCategory, DbProduct } from '../../types/db-rows'
 import {
     isRecord,
+    mapCategoryWithLocale,
     mapDatabaseCategoryToDomain,
     mapDatabaseProductToDomain,
     toSupabaseJson,
@@ -117,6 +118,58 @@ describe('type-converters', () => {
             expect(results.length).toBe(2)
             expect(results[0].name).toBe('Prod1')
             expect(results[1].name).toBe('Prod2')
+        })
+    })
+
+    describe('mapCategoryWithLocale', () => {
+        const baseCat: Partial<DbCategory> = {
+            id: '1',
+            name: 'Klima',
+            slug: 'klima',
+            translation_key: 'ac',
+        }
+
+        it('aktif dilin (en) yerelleştirilmiş metadata alanlarını üste taşır', () => {
+            const dbCat: Partial<DbCategory> = {
+                ...baseCat,
+                metadata: {
+                    hero_title: 'Varsayılan',
+                    tr: { hero_title: 'TR Başlık' },
+                    en: { hero_title: 'EN Title' },
+                },
+            }
+            const result = mapCategoryWithLocale(dbCat as DbCategory, 'en')
+            expect(result.metadata?.hero_title).toBe('EN Title')
+        })
+
+        it('istenen dil yoksa tr metadatasına düşer', () => {
+            const dbCat: Partial<DbCategory> = {
+                ...baseCat,
+                metadata: {
+                    tr: { hero_title: 'TR Başlık' },
+                },
+            }
+            const result = mapCategoryWithLocale(dbCat as DbCategory, 'en')
+            expect(result.metadata?.hero_title).toBe('TR Başlık')
+        })
+
+        it('lang verilmezse varsayılan olarak tr kullanır', () => {
+            const dbCat: Partial<DbCategory> = {
+                ...baseCat,
+                metadata: {
+                    tr: { hero_title: 'TR Başlık' },
+                    en: { hero_title: 'EN Title' },
+                },
+            }
+            const result = mapCategoryWithLocale(dbCat as DbCategory)
+            expect(result.metadata?.hero_title).toBe('TR Başlık')
+        })
+
+        it('metadata yoksa base kategoriyi döndürür (metadata null)', () => {
+            const dbCat: Partial<DbCategory> = { ...baseCat, metadata: null }
+            const result = mapCategoryWithLocale(dbCat as DbCategory, 'en')
+            expect(result.name).toBe('Klima')
+            expect(result.metadata).toBeNull()
         })
     })
 })
