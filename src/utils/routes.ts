@@ -154,6 +154,8 @@ export const Routes = {
  */
 export function localizedHref(url: string, lang: string): Route {
   if (url.startsWith('/admin') || url.startsWith('/api')) return url as Route;
-  if (url.startsWith('/tr') || url.startsWith('/en')) return url as Route;
+  // Zaten locale-önekli mi? Yalnız TAM segment ('/tr', '/en', '/tr/...', '/en/...').
+  // startsWith('/tr') KULLANMA — '/trends' gibi yolları yanlışlıkla localize-dışı bırakır.
+  if (url === '/tr' || url === '/en' || url.startsWith('/tr/') || url.startsWith('/en/')) return url as Route;
   return `/${lang}${url === '/' ? '' : url}` as Route;
 }
