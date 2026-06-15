@@ -29,7 +29,7 @@ const KVKKPage: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6 space-y-6 text-steel-gray prose dark:prose-invert max-w-prose">
-        {lang === 'en' ? <KvkkContentEn /> : <KvkkContentTr />}
+        {lang === 'en' ? <KvkkContentEn lang={lang} /> : <KvkkContentTr lang={lang} />}
       </div>
 
       <p className="text-xs text-steel-gray mt-4">

@@ -5,10 +5,10 @@ import React, { Suspense, useEffect, useMemo } from 'react'
 
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useAuth } from '../../hooks/useAuth'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useRole } from '../../hooks/useRole'
 import { useI18n } from '../../i18n/I18nProvider'
 import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
-import { Routes } from '../../utils/routes'
 import AdminUsersTableBody from './AdminUsersTableBody'
 
 /**
@@ -21,6 +21,7 @@ const AdminUsersPage: React.FC = () => {
   const { role } = useRole()
   const router = useRouter()
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
 
   const isAdmin = useMemo(() => !!role && (role === 'super_admin' || role === 'admin'), [role])
 
@@ -28,7 +29,7 @@ const AdminUsersPage: React.FC = () => {
     if (!loading && !user) {
       router.push(Routes.auth.login('/admin/users'))
     }
-  }, [user, loading, router])
+  }, [user, loading, router, Routes])
 
   return (
     <div className="space-y-6 pb-20">

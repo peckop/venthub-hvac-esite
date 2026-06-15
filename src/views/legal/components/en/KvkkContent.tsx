@@ -2,9 +2,9 @@ import Link from 'next/link'
 import React from 'react'
 
 import legalConfig from '@/config/legal'
-import { Routes } from '@/utils/routes'
+import { localizedHref, Routes } from '@/utils/routes'
 
-export const KvkkContentEn: React.FC = () => {
+export const KvkkContentEn: React.FC<{ lang: string }> = ({ lang }) => {
   return (
     <>
       <section>
@@ -70,7 +70,7 @@ export const KvkkContentEn: React.FC = () => {
 
       <section>
         <h2 className="text-xl font-semibold text-industrial-gray mb-3">7) Cookies</h2>
-        <p>For detailed information about cookies and similar technologies, please review our <Link className="text-primary-navy underline" href={Routes.legal.cerez()}>Cookie Policy</Link> text.</p>
+        <p>For detailed information about cookies and similar technologies, please review our <Link className="text-primary-navy underline" href={localizedHref(Routes.legal.cerez(), lang)}>Cookie Policy</Link> text.</p>
       </section>
 
       <section>

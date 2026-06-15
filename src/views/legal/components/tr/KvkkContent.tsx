@@ -2,9 +2,9 @@ import Link from 'next/link'
 import React from 'react'
 
 import legalConfig from '@/config/legal'
-import { Routes } from '@/utils/routes'
+import { localizedHref, Routes } from '@/utils/routes'
 
-export const KvkkContentTr: React.FC = () => {
+export const KvkkContentTr: React.FC<{ lang: string }> = ({ lang }) => {
   return (
     <>
       <section>
@@ -70,7 +70,7 @@ export const KvkkContentTr: React.FC = () => {
 
       <section>
         <h2 className="text-xl font-semibold text-industrial-gray mb-3">7) Çerezler</h2>
-        <p>Çerezler ve benzer teknolojiler hakkında detaylı bilgi için <Link className="text-primary-navy underline" href={Routes.legal.cerez()}>Çerez Politikası</Link> metnimizi inceleyiniz.</p>
+        <p>Çerezler ve benzer teknolojiler hakkında detaylı bilgi için <Link className="text-primary-navy underline" href={localizedHref(Routes.legal.cerez(), lang)}>Çerez Politikası</Link> metnimizi inceleyiniz.</p>
       </section>
 
       <section>

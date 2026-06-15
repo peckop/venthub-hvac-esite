@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-import { Routes } from '@/utils/routes';
+import { localizedHref, Routes } from '@/utils/routes';
 
 import { BrandIcon } from '../components/HVACIcons'
 import { ScrollReveal } from '../components/ScrollReveal'
@@ -220,14 +220,14 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
             <span className="font-medium italic">{t('aboutPage.ctaTitleItalic')}</span>
           </h2>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link 
-              href={Routes.contact()} 
+            <Link
+              href={localizedHref(Routes.contact(), lang)}
               className="bg-slate-950 text-white px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-600 transition-shadow shadow-xl"
             >
               {t('aboutPage.ctaContact')}
             </Link>
-            <Link 
-              href={Routes.products()} 
+            <Link
+              href={localizedHref(Routes.products(), lang)}
               className="bg-white text-slate-950 border border-slate-200 px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 transition-colors"
             >
               {t('aboutPage.ctaExplore')}

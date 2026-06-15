@@ -2,9 +2,9 @@ import Link from 'next/link'
 import React, { useMemo } from 'react'
 
 import { useCategories } from '../contexts/CategoryContext'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { DomainCategory } from '../lib/type-converters'
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
-import { Routes } from '../utils/routes'
 
 interface SubcategoryCardProps {
     subcategory: DomainCategory
@@ -12,6 +12,7 @@ interface SubcategoryCardProps {
 }
 
 function SubcategoryCard({ subcategory, parentSlug }: SubcategoryCardProps) {
+    const Routes = useLocalizedRoutes()
     return (
         <Link
             href={Routes.category(parentSlug, subcategory.slug)}

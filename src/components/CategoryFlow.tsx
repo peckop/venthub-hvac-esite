@@ -6,9 +6,9 @@ import Link from 'next/link'
 import React, { useMemo } from 'react'
 
 import { useCategories } from '../contexts/CategoryContext'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { DomainCategory } from '../lib/type-converters'
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
-import { Routes } from '../utils/routes'
 
 // Kategori ikonları - slug bazlı eşleme
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
@@ -35,6 +35,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 }
 
 function CategoryCard({ category }: { category: DomainCategory }) {
+    const Routes = useLocalizedRoutes()
     const Icon = CATEGORY_ICONS[category.slug] || Package
     const gradient = CATEGORY_COLORS[category.slug] || 'from-gray-500 to-gray-700'
 
