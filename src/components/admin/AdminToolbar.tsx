@@ -2,6 +2,7 @@ import * as Switch from '@radix-ui/react-switch'
 import { Search,SlidersHorizontal } from 'lucide-react'
 import React, { useEffect,useRef, useState } from 'react'
 
+import { formatNumber } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { adminSelectClass, adminSelectStyle } from '../../utils/adminUi'
 
@@ -66,7 +67,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
   persist,
   className
 }) => {
-  const { t: _t } = useI18n()
+  const { t: _t, lang } = useI18n()
   const hydratedRef = useRef(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -267,7 +268,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
               <div className="flex flex-col items-end px-4 border-l border-white/10">
                 <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal">{_t('admin.toolbar.records') || 'Kayıt'}</span>
                 <span className="text-base font-black text-cyan-400 font-mono tracking-tighter" aria-live="polite">
-                    {recordCount.toLocaleString()}
+                    {formatNumber(recordCount, lang)}
                 </span>
               </div>
             )}
@@ -367,7 +368,7 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
               {typeof recordCount === 'number' && (
                 <div className="text-right">
                   <span className="block text-xs font-black text-slate-500 uppercase tracking-widest opacity-50">{_t('admin.toolbar.records') || 'Toplam Kayıt'}</span>
-                  <span className="text-lg font-black text-cyan-400 font-mono" aria-live="polite">{recordCount.toLocaleString()}</span>
+                  <span className="text-lg font-black text-cyan-400 font-mono" aria-live="polite">{formatNumber(recordCount, lang)}</span>
                 </div>
               )}
             </div>

@@ -175,7 +175,6 @@ export default function OrderDetailPage() {
         import('jspdf-autotable')
       ])
       const doc = new jsPDF({ unit: 'pt', format: 'a4' })
-      const nf = new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US', { style: 'currency', currency: 'TRY' })
       const orderNo = o.order_number ? o.order_number.split('-')[1] : o.id.slice(-8).toUpperCase()
       doc.setFont('helvetica', 'bold'); doc.setFontSize(16)
       doc.text('PROFORMA', 40, 40)
@@ -187,11 +186,11 @@ export default function OrderDetailPage() {
       doc.text(`${o.customer_name}`, 350, 58)
       if (o.customer_email) doc.text(`${o.customer_email}`, 350, 72)
       const head = [[t('orders.productCol'), t('orders.qtyCol'), t('orders.unitPriceCol'), t('orders.totalCol')]]
-      const body = (o.order_items || []).map(it => [it.product_name || '-', String(it.quantity ?? 0), nf.format(Number(it.unit_price) || 0), nf.format(Number(it.total_price) || 0)])
+      const body = (o.order_items || []).map(it => [it.product_name || '-', String(it.quantity ?? 0), formatCurrency(Number(it.unit_price) || 0, lang, { currency: 'TRY' }), formatCurrency(Number(it.total_price) || 0, lang, { currency: 'TRY' })])
       autoTable(doc, { startY: 100, head, body, styles: { font: 'helvetica', fontSize: 10 }, headStyles: { fillColor: [245, 247, 250], textColor: 20 }, columnStyles: { 1: { halign: 'center' }, 2: { halign: 'right' }, 3: { halign: 'right' } } })
       const after = (doc as { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY || 100
       doc.setFont('helvetica', 'bold'); doc.setFontSize(12)
-      doc.text(`${t('orders.grandTotal')}: ${nf.format(o.total_amount)}`, 40, after + 24)
+      doc.text(`${t('orders.grandTotal')}: ${formatCurrency(o.total_amount, lang, { currency: 'TRY' })}`, 40, after + 24)
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100)
       doc.text('Bu belge resmî fatura değildir; bilgilendirme amaçlıdır.', 40, after + 42)
       doc.save(`Proforma-${orderNo}.pdf`)

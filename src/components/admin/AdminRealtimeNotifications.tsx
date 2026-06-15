@@ -9,6 +9,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useTenant } from '../../hooks/useTenant'
 import { formatDateTime } from '../../i18n/datetime'
+import { formatCurrency } from '../../i18n/format'
 
 interface AppNotification {
     id: string
@@ -113,7 +114,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                 (payload) => {
                     const newOrder = payload.new as Record<string, unknown>
                     const totalAmt = Number(newOrder.total_amount || 0)
-                    const amt = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalAmt)
+                    const amt = formatCurrency(totalAmt, 'tr', { currency: 'TRY' })
 
                     const orderId = String(newOrder.id || '')
                     const orderNumber = newOrder.order_number ? String(newOrder.order_number) : orderId.slice(0, 8)

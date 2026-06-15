@@ -10,7 +10,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
 import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
-import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { getCategoryDescription, getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import Breadcrumb from '../navigation/Breadcrumb'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
@@ -75,7 +75,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                                 {getCategoryDisplayName(category)}
                             </h1>
                             <p className="text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed">
-                                {category.metadata?.hero_description || category.description}
+                                {getCategoryDescription(category)}
                             </p>
 
                             {/* Quick Start Wizard Button (only for air curtains) */}

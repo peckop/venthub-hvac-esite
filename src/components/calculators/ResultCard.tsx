@@ -1,5 +1,10 @@
+'use client'
+
 import { AlertTriangle, CheckCircle, Info, TrendingUp } from 'lucide-react'
 import React from 'react'
+
+import { formatNumber } from '../../i18n/format'
+import { useI18n } from '../../i18n/I18nProvider'
 
 type ResultStatus = 'optimal' | 'acceptable' | 'warning' | 'critical' | 'info'
 
@@ -26,6 +31,7 @@ const ResultCard: React.FC<ResultCardProps> = ({
     icon,
     large = false
 }) => {
+    const { lang } = useI18n()
     const getStatusConfig = () => {
         switch (status) {
             case 'optimal':
@@ -89,7 +95,7 @@ const ResultCard: React.FC<ResultCardProps> = ({
           font-bold text-industrial-gray
           ${large ? 'text-3xl' : 'text-2xl'}
         `}>
-                    {typeof value === 'number' ? value.toLocaleString('tr-TR') : value}
+                    {typeof value === 'number' ? formatNumber(value, lang) : value}
                 </span>
                 {unit && (
                     <span className="text-sm text-steel-gray">{unit}</span>

@@ -8,6 +8,7 @@ import {
   Recommendations,
   ResultCard,
   ResultGrid} from '../../components/calculators'
+import { formatNumber } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
   calculateJetFan,
@@ -15,7 +16,7 @@ import {
 } from '../../lib/hvacCalculations'
 
 const JetFanCalcPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   // Uygulama tipi seçenekleri
   const APPLICATION_OPTIONS = [
@@ -336,7 +337,7 @@ const JetFanCalcPage: React.FC = () => {
                   <div>
                     <span className="text-steel-gray">{t('calculators.jetFan.volume')}</span>
                     <span className="font-medium text-industrial-gray ml-2">
-                      {t('common.unitCubicMeters', { v: (parseFloat(length) * parseFloat(width) * parseFloat(height)).toLocaleString('tr-TR') })}
+                      {t('common.unitCubicMeters', { v: formatNumber(parseFloat(length) * parseFloat(width) * parseFloat(height), lang) })}
                     </span>
                   </div>
                   <div>
