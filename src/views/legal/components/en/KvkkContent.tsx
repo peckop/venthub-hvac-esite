@@ -74,7 +74,7 @@ export const KvkkContentEn: React.FC<{ lang: string }> = ({ lang }) => {
       </section>
 
       <section>
-        <h2 className="text-xl font-semibold text-industrial-gray mb-3">8) Yürürlük</h2>
+        <h2 className="text-xl font-semibold text-industrial-gray mb-3">8) Effective Date</h2>
         <p>This clarification text was updated on <strong>{legalConfig.lastUpdated}</strong>.</p>
       </section>
     </>
