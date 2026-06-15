@@ -35,35 +35,39 @@ siteyi **kullanarak** ister. "Hazır" tanımını büyütmek = teslimi geciktirm
 
 ---
 
-## 2. Katmanlar (öncelik)
+## 2. Katmanlar (öncelik) — 2026-06-15 TİCARİ REVİZE
 
-### 🔴 P0 — Avensair teslim-blokeri (EVET'i geciktiren)
-Yalnız bunlar teslimi engeller:
-- **C** Bayi çekirdeği çalışır (R0-R5 onarım, en az **B2 seed**) — *asıl ürün, twin'e göre #1 açık*
-- **A** Utandıran görünür bug yok
-- **D** *Kabul edilebilir* performans (kritik sayfalar makul; "her yerde 90+" değil, **"utandırmayan"** yeter)
-- **E** Katalogda ürün detayları (Avensair ürünlerini görsün)
-- **F** SEO korunur (7-8 yıllık sıralamalar dağılmaz)
-- **G** Temel analytics (ziyaretçi/dönüşüm görünür)
+> **Revize:** Distribütörü kazandıran şey yarı-bitmiş bayi paneli değil, arzu-yaratan **VİTRİN**
+> (hız+3D+LLM danışman+teklif). Bayi yönetimi = satıştan SONRA *"bunu bayilerime de yayayım"*
+> diye istenecek upsell. Commerce-first tezle birebir uyumlu (çekirdek=ticaret, bayi=modül).
+>
+> **KRİTİK koruma:** WOW'u yaratan **H (LLM danışman)** + **I (teklif)** aynı zamanda en BÜYÜK
+> yeni inşalar. Gerçek soru "hangi katman önce" değil → **"bu ikisini WOW'u bozmadan ne kadar
+> İNCE MVP'ye sıkıştırırız?"** Kötü MVP'lenirse "P1 önce" = mükemmelliyetçilik tuzağı, teslim aylara kayar.
 
-### 🟡 P1 — Hızlı-takip (teslimden HEMEN sonra, Avensair kullanırken)
-- **H** LLM danışman chatbot (teknik satış)
-- **I** Teklif hazırlama modülü
-- **B** admin + legal i18n tamamlanması
-- **D** Lighthouse 90+ tüm sayfalarda (cila katmanı)
-- conformance Faz 2/3 (RSC build gate + render smoke + living inventory)
+### 🔴 P0 — Avensair'i KAZANAN vitrin (teslim hedefi)
+Arzu yaratan demo + onu "içi dolu" kılan enabler'lar. Her kalem **DEMO-KIVAMINDA MVP** (tam ürün değil):
+- **D** Hız + 3D: vitrin sayfaları (home/products/category/ürün-detay) hızlı + çarpıcı (her yer 90+ DEĞİL)
+- **H** LLM danışman — MVP: çekirdek katalogda teknik satış
+- **I** Teklif modülü — MVP: temiz şablon çıktısı (tam CRM-entegre değil)
+- **E** Ürün detayları — danışman+teklif için veri (PDF→LLM altyapı hazır)
+- **G** Temel analytics — müşteri trafiği görünür
+- **A** Utandıran bug yok · **F** SEO korunur (mevcut sıralamalar = gerçek para)
 
-### ⚪ P2 — SaaS ölçek (sonra)
-- **J** CRM
-- Multi-tenant white-label, tenant billing (SaaS Faz 2-3 — `venthub_saas_master_roadmap.md`)
+### 🟡 P1 — Satıştan SONRA (Avensair "bayilerime de yayayım" deyince)
+- **C** Bayi modülü (R0-R5→B2) — artık AÇILIŞ değil **UPSELL**
+- **B** admin + legal i18n · Lighthouse 90+ heryerde (cila) · conformance Faz 2/3
+
+### ⚪ P2 — SaaS ölçek
+- **J** CRM (tam) · multi-tenant white-label · billing (`venthub_saas_master_roadmap.md`)
 
 ---
 
 ## 3. Açık Kararlar (girdi bekliyor)
-- **Bayi kimlik ekseni (R1)** — blueprint §2 kararı (teslim öncesi netleşmeli)
+- **Teslim tipi:** "Avensair'i KAZANAN vitrin" mi / "1. günden ÜZERİNDE iş yapılan sistem" mi? → P0'daki ticaret-backend derinliğini belirler (vitrin=minimal sipariş, sistem=gerçek sipariş+ödeme akışı)
+- **H/I MVP sınırı:** LLM danışman + teklif ne kadar ince olacak? (WOW yeter, "tam ürün" değil) — **teslim süresini esas bu belirler**
 - **SEO:** eski site erişimi · domain stratejisi · cutover tarihi → **Avensair input**
-- **Teslim minimum kapsamı:** yukarıdaki P0 listesi onayı
-- **H/I (LLM danışman + teklif):** hangi model · şablon seti · hangi faz
+- **Bayi kimlik ekseni (R1):** blueprint §2 kararı — artık **P1'de** (satış sonrası), teslim öncesi değil
 
 ---
 
