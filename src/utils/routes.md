@@ -3,30 +3,39 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\routes.ts
-skeleton_hash: 4325be468f760ec9
+skeleton_hash: 19d656f32362cddc
 entity_hashes:
   func:assertProductSlug: 7cc00756c332a6af
-  overview: d85c95fb607dc832
-generated_at: 2026-05-28T22:38:49Z
+  func:localizedHref: db9bfc84894b2a32
+  overview: 8cbb4744a23035a6
+generated_at: 2026-06-15T17:04:15Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin rota yönetim süreçlerini destekleyen bir yardımcı program modülüdür. Uygulama içi rotalarda kullanılan ürün tanımlayıcılarının geçerliliğini denetleyerek rota bütünlüğünü korumak için temel doğrulama işlevleri sunar. Beklenmedik tanımlayıcı kaynaklı hataları rota seviyesinde önlemeye yardımcı olur.
+VentHub HVAC projesinin rota yönetimi altyapısını destekleyen yardımcı bir modüldür. Ürün rotalarının temel yapısını ve bütünlüğünü korumak için rota sabitlerini merkezi olarak tanımlar, ürün tanımlayıcılarının (slug) doğrulanması ve çok dilli rotaların oluşturulması gibi kritik rota işlemleri sağlar. Mimari olarak, uygulama genelinde tutarlı rota yapısının sürdürülmesi ve rota ile ilgili hataların önlenmesi için kritik bir katman görevi görür.
 
 ## Fonksiyon Grupları
 ### Ürün Slug Doğrulama İşlevleri
-Rotalarda kullanılan ürün benzersiz tanımlayıcılarının (slug) standartlara uygunluğunu kontrol etmekle sorumludur. Gelen slug değerlerini doğrulayarak geçersiz tanımlayıcıların rotalarda kullanılmasını engeller.
+Rotalarda kullanılan ürün benzersiz tanımlayıcılarının (slug) geçerliliğini ve bütünlüğünü kontrol etmekle sorumludur. Bu işlev, rota yapısını korumak için gerekli temel doğrulama adımlarını gerçekleştirir.
 - assertProductSlug
+
+### Yerelleştirilmiş Rota Oluşturma İşlevleri
+Çok dilli uygulama yapısında, dil koduna göre rota adreslerini (URL'leri) dinamik olarak oluşturmak veya dönüştürmekle sorumludur.
+- localizedHref
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu rota yönetimi modülü, VentHub HVAC sistemindeki ürün rotalarını yönetmek ve ürün slug'larının geçerliliğini doğrulamak amacıyla tasarlanmıştır, doğru ve hatasız çalışması için aşağıdaki mimari koşulların sürekli olarak sağlanması zorunludur.
 
-[Aksiyom 1]: Eğer assertProductSlug fonksiyonuna gönderilen giriş parametresi string tipinde değilse, slug doğrulama işlemi başarısız olur, tüm ürün rotası yönlendirmeleri hatalı çalışır.
-[Aksiyom 2]: Eğer modül sabiti olarak tanımlanan Routes nesnesi tanımlı değilse veya içinde tüm geçerli ürün slug'larını barındırmıyorsa, assertProductSlug fonksiyonu geçerli slug'ları dahi reddeder, var olan ürünlere kullanıcı erişimi engellenir.
-[Aksiyom 3]: Eğer assertProductSlug fonksiyonu herhangi bir ürün rotasına gelen istek işlenmeden önce çağrılmazsa, geçersiz slug'lı istekler sistemde işlenemeyen sunucu veya yönlendirme hatalarına yol açar.
-[Aksiyom 4]: Eğer kullanıcı isteğinden gelen slug formatı, Routes nesnesinde tanımlı slug anahtarlarının formatıyla (büyük/küçük harf, özel karakter uyumu) uyuşmuyorsa, geçerli bir ürün slug'ı dahi doğrulanamaz, ürün erişimi engellenir.
+Bu modül, uygulama rotalarında kullanılan ürün tanımlayıcılarının doğruluğunu sağlamak ve dil bazlı rota URL'leri üretmek için çalışır.
+
+**[Aksiyom 1 - Slug Doğrulama Zorunluluğu]:** Eğer `assertProductSlug` fonksiyonuna geçirilen `slug` parametresi geçersiz bir ürün tanımlayıcısı Formatındaysa veya rota kurallarına uymuyorsa, fonksiyon bir hata fırlatır — aksi durumda standartlaştırılmış slug döner.
+
+**[Aksiyom 2 - Dil Kodu Gereksinimi]:** Eğer `localizedHref` fonksiyonuna geçirilen `lang` parametresi geçerli bir dil kodu değilse veya desteklenen diller arasında yer almıyorsa, beklenmeyen bir rota sonucu oluşur.
+
+**[Aksiyom 3 - URL Bütünlüğü]:** Eğer `localizedHref` fonksiyonuna geçirilen `url` parametresi geçerli bir rota yolu formatında değilse, oluşturulan `Route` nesnesi geçersiz bir hedefe işaret eder.
+
+**[Aksiyom 4 - Routes Sabit Tanımlılığı]:** Eğer `Routes` objesi modül içerisinde tanımlı değilse veya rota tanımları eksikse, uygulama içi navigasyon işlevleri çalışamaz hale gelir.
 
 ---
 
@@ -38,6 +47,23 @@ Bu rota yönetimi modülü, VentHub HVAC sistemindeki ürün rotalarını yönet
 **Parametreler**:
 - name: slug, type: string — Doğrulanması gereken ürün odaklı URL tanımlayıcısı (slug) değeri; hatalı kullanım durumunda ID veya UUID formatında da fonksiyona iletilebilir.
 **Dönüş**: string tipi değer döndürür. Doğrulama başarılı olursa orijinal geçerli slug değerini her ortamda iletir. Doğrulama başarısız olsa bile üretim ortamında orijinal gelen değeri, Middleware'in yönlendirme mekanizmasını tetikleyebilmesi için geri iletir.
+
+### localizedHref
+
+**Ne yapar**: Dilsiz bir taban URL'e aktif dil önekini ekleyen saf (pure) bir yardımcı fonksiyondur. `useLocalizedRoutes` hook'unun sunucu-güvenli (RSC) çekirdeği olarak çalışır ve dil önekini URL'e dinamik olarak ekler.
+
+**Nasıl yapar**: Fonksiyon, gelen URL'in zaten belirli bir dil öneki (`/tr` veya `/en`) veya özel bir yol (`/admin`, `/api`) ile başlayıp başlamadığını kontrol eder. Eğer URL bu özel yollardan biriyle başlıyorsa, URL doğrudan olduğu gibi döndürülerek dil ekleme işlemi atlanır. Aksi halde, verilen `lang` parametresini URL'in başına ekler; eğer URL kök dizin (`/`) ise sadece dil öneki, aksi halde dil öneki ile birlikte mevcut URL yolu döndürülür. Bu yaklaşım, sunucu taraflı render süreçlerinde (Server Components, route handler'lar) ve hook kullanılamayan bileşenlerde (Breadcrumb gibi paylaşılan render bileşenleri) güvenli bir şekilde dil önekini eklemeyi sağlar.
+
+**Parametreler**:
+- `url`: `string` — Dil öneki eklenmesi gereken taban yol. Genellikle `/` veya `/dashboard` gibi bir rota yolu olarak verilir.
+- `lang`: `string` — Eklenecek dil kodu. Genellikle `tr` veya `en` değerlerinden biri olur.
+
+**Dönüş**: `Route` — Dil öneki eklenmiş veya olduğu gibi bırakılmış güvenli rota dizesi. Dönüş tipi `Route` olarak tip güvenliği sağlanmıştır ve `as Route` ile assert edilerek döndürülür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next::type { Route }
 
 ---
 
@@ -53,14 +79,81 @@ Bu rota yönetimi modülü, VentHub HVAC sistemindeki ürün rotalarını yönet
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/utils/routes.ts::assertProductSlug
-- **params**: [slug: string]
+- **params**: `slug: string`
 - **ic_degiskenler**:
-  - `slug` — Doğrulanması gereken ürün slug girişi
-  - `uuidRegex` — UUID formatını tanımlayan, slug'ın UUID olup olmadığını kontrol etmek için kullanılan regex deseni
-  - `process.env.NODE_ENV` — Çalışma ortamının üretim olup olmadığını tespit etmek için kullanılan ortam değişkeni
-  - `Error` — Geliştirme ortamında UUID kullanımı tespit edildiğinde fırlatılan özel hata nesnesi
-  - `console.error` — Üretim ortamında UUID sızıntısını loglamak için kullanılan konsol methodu
-- **Dönüş**: string (doğrulanmış geçerli slug veya boş string)
+  - `uuidRegex` — UUID formatını doğrulan RegExp nesnesi (`/^[0-9a-f]{8}-...$/i`), slug'ın geçerli bir UUID olup olmadığını test etmek için kullanılır
+- **Erişimler**:
+  - `process.env.NODE_ENV` — Ortam değişkeni okunur, production olup olmadığı kontrol edilir
+- **Dönüş**: `string` — slug aynen geri döner; UUID tespit edilirse production'da fallback ile aynı slug döner,非production'da Error fırlatır
+
+---
+
+### [N2_NASIL] AST Pointer: src/utils/routes.ts::Routes.productSlug *(anonim arrow)*
+- **params**: `slug: string`
+- **ic_degiskenler**:
+  - `validSlug` — `assertProductSlug(slug)` çağrısının sonucu; slug'ın doğrulanmış/temizlenmiş hali
+- **Cagri**: `assertProductSlug(slug)` → iç fonksiyon çağrısı
+- **Cagri**: `encodeURIComponent(validSlug)` → URL-safe encode
+- **Dönüş**: `Route` — `/products/{validSlug}` formatında rota stringi
+
+---
+
+### [N3_NASIL] AST Pointer: src/utils/routes.ts::Routes.productList *(anonim arrow)*
+- **params**: `params?: { brand?: string, limit?: number }`
+- **ic_degiskenler**:
+  - `query` — `new URLSearchParams()` instance'ı, query string birleştirmek için kullanılır
+  - `qs` — `query.toString()` sonucu; birleştirilmiş query string
+- **Dönüş**: `Route` — params yoksa `/products`, varsa `/products?brand=...&limit=...` formatında rota
+
+---
+
+### [N4_NASIL] AST Pointer: src/utils/routes.ts::Routes.productDetail *(anonim arrow)*
+- **params**: `idOrSlug: string`
+- **ic_degiskenler**: *(yok)*
+- **Cagri**: `encodeURIComponent(idOrSlug)` → parametre URL-safe encode edilir
+- **Dönüş**: `Route` — boşsa `/products` fallback, doluysa `/products/{idOrSlug}` formatında rota
+
+---
+
+### [N5_NASIL] AST Pointer: src/utils/routes.ts::Routes.categoryPage *(anonim arrow)*
+- **params**: `slug: string, subSlug?: string`
+- **ic_degiskenler**: *(yok)*
+- **Cagri**: `encodeURIComponent(slug)` ve `encodeURIComponent(subSlug)` → her iki parametre URL-safe encode edilir
+- **Kosul**: `subSlug && subSlug !== slug && subSlug !== 'undefined'` — subSlug geçerli ve slug'dan farklıysa alt kategori rotası oluşturulur
+- **Dönüş**: `Route` — subSlug varsa `/category/{slug}/{subSlug}`, yoksa `/category/{slug}` formatında rota
+
+---
+
+### [N6_NASIL] AST Pointer: src/utils/routes.ts::Routes.brandPage *(anonim arrow)*
+- **params**: `slug: string`
+- **ic_degiskenler**: *(yok)*
+- **Cagri**: `encodeURIComponent(slug)` → parametre URL-safe encode edilir
+- **Dönüş**: `Route` — `/brands/{slug}` formatında rota
+
+---
+
+### [N7_NASIL] AST Pointer: src/utils/routes.ts::Routes.paymentSuccess *(anonim arrow)*
+- **params**: `orderId?: string, status?: string`
+- **ic_degiskenler**:
+  - `query` — `new URLSearchParams()` instance'ı, orderId ve status bilgilerini query string'e eklemek için kullanılır
+- **Dönüş**: `Route` — orderId yoksa `/payment-success` fallback, varsa `/payment-success?orderId=...&status=...` formatında rota
+
+---
+
+### [N8_NASIL] AST Pointer: src/utils/routes.ts::Routes.login *(anonim arrow)*
+- **params**: `redirect?: string, error?: string`
+- **ic_degiskenler**:
+  - `url` — Sabit login rotası, değeri `'/auth/login'`
+  - `params` — `new URLSearchParams()` instance'ı, redirect ve error parametrelerini eklemek için kullanılır
+  - `qs` — `params.toString()` sonucu; birleştirilmiş query string
+- **Dönüş**: `Route` — params yoksa `/auth/login`, varsa `/auth/login?redirect=...&error=...` formatında rota
+
+---
+
+### [N9_NASIL] AST Pointer: src/utils/routes.ts::localizedHref
+- **params**: `url: string, lang: string`
+- **ic_degiskenler**: *(yok)*
+- **Dönüş**: `Route` — `/admin` veya `/api` ile başlıyorsa url aynen döner; `/tr` veya `/en` ile başlıyorsa url aynen döner; aksi halde `/{lang}{url}` formatında locale prefix eklenmiş rota döner
 
 ---
 
@@ -68,9 +161,11 @@ Bu rota yönetimi modülü, VentHub HVAC sistemindeki ürün rotalarını yönet
 
   file: src\utils\routes.ts
   function: src\utils\routes.ts::assertProductSlug
+  function: src\utils\routes.ts::localizedHref
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Routes
   export: assertProductSlug
+  export: localizedHref

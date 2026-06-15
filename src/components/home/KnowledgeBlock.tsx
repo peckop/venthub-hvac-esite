@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { Routes } from '../../utils/routes'
+import { localizedHref, Routes } from '../../utils/routes'
 import { ClientLeadButton } from './ClientLeadButton'
 
 interface KnowledgeItem {
@@ -22,7 +22,7 @@ const knowledgeItems: KnowledgeItem[] = [
   },
   { 
     id: 'calculators', 
-    href: '/destek/hesaplayicilar/hrv',
+    href: Routes.destek.hesaplayicilar('hrv'),
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <rect x="4" y="4" width="16" height="16" rx="2" />
@@ -58,10 +58,11 @@ interface KnowledgeBlockProps {
     secondaryCta: string;
   };
   statsExperience: string;
+  lang: string;
   onQuoteClick?: () => void;
 }
 
-const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCtaDict, statsExperience, onQuoteClick }) => {
+const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCtaDict, statsExperience, lang, onQuoteClick }) => {
   return (
     <section className="relative overflow-hidden bg-slate-950 py-24 sm:py-32 text-white">
       {/* Background Elements */}
@@ -107,7 +108,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                 className={`opacity-0 translate-y-8 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass}`}
               >
                 <Link
-                  href={item.href as import('next').Route}
+                  href={localizedHref(item.href, lang)}
                   className="group relative block h-full overflow-hidden rounded-hvac-2xl border border-white/10 bg-white/2 p-10 backdrop-blur-md transition-colors duration-500 hover:border-cyan-500/40 hover:bg-white/5"
                 >
                   <div className="absolute top-8 right-10 text-4xl font-black text-white/5 transition-colors group-hover:text-cyan-500/10">

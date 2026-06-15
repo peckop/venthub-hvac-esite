@@ -1,8 +1,12 @@
+'use client'
+
 import { ChevronRight, Home } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
 import { SITE_URL } from '@/config/siteUrl'
+import { useI18n } from '@/i18n/I18nProvider'
+import { localizedHref } from '@/utils/routes'
 
 export interface BreadcrumbItem {
     label: string
@@ -34,6 +38,8 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
     variant = 'white',
     className = ''
 }) => {
+    const { lang } = useI18n()
+
     if (!items || items.length === 0) return null
 
     const bgClasses = {
@@ -69,7 +75,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
             "@type": "ListItem",
             "position": index + 1,
             "name": item.label,
-            "item": item.href ? `${SITE_URL}${item.href}` : undefined
+            "item": item.href ? `${SITE_URL}${localizedHref(item.href, lang)}` : undefined
         }))
     };
 
@@ -110,7 +116,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
                                     </span>
                                 ) : (
                                     <Link
-                                        href={item.href as import('next').Route}
+                                        href={localizedHref(item.href, lang)}
                                         className={`${styles.link} transition-colors flex items-center`}
                                     >
                                         {isFirst && <Home size={14} className="inline mr-1.5 -mt-0.5" aria-hidden="true" />}

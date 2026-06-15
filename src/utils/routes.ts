@@ -91,6 +91,8 @@ export const Routes = {
     shipments: () => '/account/shipments' as Route,
     returns: (newOrderId?: string) => (newOrderId ? `/account/returns?new=${encodeURIComponent(newOrderId)}` : '/account/returns') as Route,
     addresses: () => '/account/addresses' as Route,
+    invoices: () => '/account/invoices' as Route,
+    profile: () => '/account/profile' as Route,
     favorites: () => '/account/favorites' as Route,
     security: () => '/account/security' as Route
   },
@@ -107,7 +109,7 @@ export const Routes = {
   // Destek / Bilgi Merkezi
   destek: {
     home: () => '/destek/merkez' as Route,
-    hesaplayicilar: () => '/destek/hesaplayicilar' as Route,
+    hesaplayicilar: (slug?: string) => (slug ? `/destek/hesaplayicilar/${encodeURIComponent(slug)}` : '/destek/hesaplayicilar') as Route,
     konular: (slug?: string) => (slug ? `/destek/konular/${encodeURIComponent(slug)}` : '/destek/konular') as Route,
     sss: () => '/destek/sss' as Route,
     iadeDegisim: () => '/destek/iade-degisim' as Route,
@@ -140,3 +142,18 @@ export const Routes = {
     callback: () => '/auth/callback' as Route
   }
 };
+
+/**
+ * Dilsiz bir taban URL'e aktif dil önekini ekleyen SAF fonksiyon — `useLocalizedRoutes`
+ * proxy'sinin sunucu-güvenli (RSC) çekirdeği. Hook kullanamayan Server Component'ler,
+ * route handler'lar ve paylaşılan render bileşenleri (Breadcrumb gibi) dil önekini bununla
+ * ekler; böylece elle `/${lang}/...` birleştirme (SSOT kaçağı) gerekmez.
+ *
+ * Idempotent ve güvenli: zaten `/tr`/`/en` ile başlayan URL'lere mükerrer önek eklemez,
+ * `/admin` ve `/api` rotalarına hiç dokunmaz. (Aynı kural `useLocalizedRoutes`'taki proxy'de.)
+ */
+export function localizedHref(url: string, lang: string): Route {
+  if (url.startsWith('/admin') || url.startsWith('/api')) return url as Route;
+  if (url.startsWith('/tr') || url.startsWith('/en')) return url as Route;
+  return `/${lang}${url === '/' ? '' : url}` as Route;
+}

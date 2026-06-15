@@ -1,32 +1,21 @@
 import { useMemo } from 'react'
 
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
+import { localizedHref, Routes } from '../utils/routes'
 
 type RouteFunction = (...args: unknown[]) => string
 
-function localizeUrl(url: string, lang: string): string {
-  // Admin ve API rotaları dil segmenti almaz
-  if (url.startsWith('/admin') || url.startsWith('/api')) {
-    return url
-  }
-  // Eğer url zaten /tr veya /en ile başlıyorsa, mükerrer ön ek eklememek için direkt döndür
-  if (url.startsWith('/tr') || url.startsWith('/en')) {
-    return url
-  }
-  // Kök sayfa /tr veya /en olacaktır
-  return `/${lang}${url === '/' ? '' : url}`
-}
-
+// Dil-önekleme mantığı tek kaynakta: utils/routes.ts'teki localizedHref (SSOT).
+// Proxy onu sarar; RSC/route-handler/Breadcrumb ise localizedHref'i doğrudan çağırır.
 function createLocalizedProxy<T extends object>(target: T, lang: string): T {
   return new Proxy(target, {
     get(t, prop) {
       const value = Reflect.get(t, prop)
-      
+
       if (typeof value === 'function') {
         return (...args: unknown[]) => {
           const originalUrl = (value as RouteFunction)(...args)
-          return localizeUrl(originalUrl, lang)
+          return localizedHref(originalUrl, lang)
         }
       }
       

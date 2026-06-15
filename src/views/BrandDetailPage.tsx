@@ -13,11 +13,11 @@ import { BrandIcon } from '../components/HVACIcons'
 import Breadcrumb from '../components/navigation/Breadcrumb'
 import Seo from '../components/Seo'
 import { HVAC_BRANDS } from '../data/brands'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import { useI18n } from '../i18n/I18nProvider'
 import { getProductsEnriched } from '../lib/services/product.service'
 import type { Product } from '../types/ui-models'
-import { Routes } from '../utils/routes'
 
 const BRAND_DETAILS: Record<string, {
   founded?: number
@@ -89,6 +89,8 @@ export interface BrandDetailPageProps {
 
 const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) => {
   const { t } = useI18n()
+  // Localize Routes proxy'si: bileşendeki TÜM Routes.x() çağrıları dil-önekli olur (SSOT).
+  const Routes = useLocalizedRoutes()
   const params = useParams()
   const slug = (initialBrandSlug || params?.slug) as string
 
@@ -127,8 +129,8 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
   }, [brand])
 
   const breadcrumbItems = [
-    { label: t('category.breadcrumbHome'), href: '/' },
-    { label: t('brands.title') || 'Markalar', href: '/brands' },
+    { label: t('category.breadcrumbHome'), href: Routes.home() },
+    { label: t('brands.title') || 'Markalar', href: Routes.brands() },
     { label: brand?.name || slug }
   ]
 

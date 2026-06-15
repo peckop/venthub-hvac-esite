@@ -160,11 +160,12 @@ export default async function RootPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ld).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
         />
       ))}
-      <HomePage 
-        initialCategories={displayCategories} 
+      <HomePage
+        initialCategories={displayCategories}
         rawCategories={categories}
-        initialProducts={products} 
+        initialProducts={products}
         dictionary={dict.home}
+        lang={lang}
       />
     </TenantProvider>
   )

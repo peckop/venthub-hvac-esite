@@ -21,13 +21,15 @@ interface HomePageProps {
   rawCategories?: DomainCategory[]
   initialProducts?: Product[]
   dictionary: typeof import('../i18n/dictionaries/tr').tr.home
+  lang: string
 }
 
-const HomePage: React.FC<HomePageProps> = ({ 
-  initialCategories = [], 
+const HomePage: React.FC<HomePageProps> = ({
+  initialCategories = [],
   rawCategories = [],
   initialProducts = [],
-  dictionary
+  dictionary,
+  lang
 }) => {
   return (
     <div className="min-h-screen bg-white text-slate-900 selection:bg-cyan-100 selection:text-cyan-900">
@@ -49,7 +51,7 @@ const HomePage: React.FC<HomePageProps> = ({
             <CinematicProductShowcase />
           </RevealSection>
 
-          <ApplicationSolutions dictionary={dictionary.applicationSolutions} />
+          <ApplicationSolutions dictionary={dictionary.applicationSolutions} lang={lang} />
 
           <TrustProofSection dictionary={dictionary.trustProof} trustStripDict={dictionary.hero.trustStrip} />
 
@@ -59,10 +61,11 @@ const HomePage: React.FC<HomePageProps> = ({
 
           <StrategicBrands dictionary={dictionary.strategicBrands} />
 
-          <KnowledgeBlock 
-            dictionary={dictionary.knowledge} 
+          <KnowledgeBlock
+            dictionary={dictionary.knowledge}
             finalCtaDict={dictionary.finalCta}
             statsExperience={dictionary.stats?.yearsExperience || ''}
+            lang={lang}
           />
         </div>
       </HomePageClientWrapper>
