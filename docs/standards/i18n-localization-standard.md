@@ -26,6 +26,7 @@
 | **Entity adı (display)** | `getCategoryDisplayName(cat, t)` (`translation_key`→dict) | `src/utils/categoryHelpers.ts` |
 | **DB JSONB çeviri** | `mapCategoryWithLocale(dbCat, lang)` (`metadata[lang]`) | `src/lib/type-converters.ts` |
 | **Para** | `formatCurrency(value, lang)` | `@/i18n/format` |
+| **Sayı (para-dışı)** | `formatNumber(value, lang)` (adet, hacim m³, hesap sonucu) | `@/i18n/format` |
 | **Tarih** | `formatDate(iso, lang)` / `formatDateTime` | `@/i18n/datetime` |
 | Rota tabanı (dilsiz authority) | `Routes.x()` — **render'da daima localize edilir** | `src/utils/routes.ts` |
 
@@ -38,7 +39,7 @@
 3. **Client'ta ham `Routes` YASAK** — `import { Routes }` tek başına nav render eden bileşende olmaz; `useLocalizedRoutes()` proxy'si ya da `localizedHref` zorunlu. (İstisna: `/admin*` dil-öneki almaz; R3F Canvas context'i geçmez.)
 4. **Entity adı SSOT'tan** — `categoryList` sözlüğünü `slug` ile doğrudan indeksleme yasak (slug ≠ `translation_key`); `getCategoryDisplayName` kullan.
 5. **DB JSONB çeviri locale-mapper'dan** — `metadata.hero_description` vb. ham okuma yasak; `mapCategoryWithLocale` / `getCategoryDescription` kullan.
-6. **Para/tarih format helper'dan** — `toLocaleString`/`Intl.*`/elle `₺` birleştirme yasak; `formatCurrency`/`formatDate`.
+6. **Para/sayı/tarih format helper'dan** — ham `Intl.*Format`/`toLocale*String`/elle `₺` birleştirme yasak; `formatCurrency`/`formatNumber`/`formatDate`. (Tek muaf: SSOT'un kendisi — `i18n/format.ts`, `i18n/datetime.ts`.)
 7. **Hiyerarşik anahtar** — `section.subsection.key`. Paylaşılan metin → `common`. Çakışan anahtarı körlemesine yeniden-tanımlama.
 8. **Hreflang** — self-referencing + reciprocal (A→B ⇒ B→A) + ISO kodları (`en-GB` ✓) + `x-default`. Canonical, locale URL'i ile eşleşir.
 
@@ -53,8 +54,8 @@
 | A | Entity-adı (display) | `getCategoryDisplayName` | **INV-1** `category-name-ssot.test.ts` | ✅ KAPALI |
 | B | Localize-rota | `useLocalizedRoutes`/`localizedHref` | **INV-2** `localized-route-ssot.test.ts` (3 kural: elle önek · sabit app-yolu · ham Routes) | ✅ KAPALI (54 dosya migrate) |
 | C | i18n literal → t() | `t()` + `en: typeof tr` | eslint `react/jsx-no-literals` + `test:i18n` parite + `prebuild` | ⚠️ KISMÎ — kapsam-içi kapalı; **admin (~256) + legal (~235) ertelendi** |
-| D | **Para/tarih biçimi** | `formatCurrency`/`formatDate` | — **YOK** | ❌ AÇIK (admin bildirimi elle `₺`, hesap makineleri `tr-TR` sabit) |
-| E | **DB JSONB çeviri** | `mapCategoryWithLocale` | — **YOK** | ❌ AÇIK (latent: `CategoryShowcase` ham `hero_description`) |
+| D | Para/sayı/tarih biçimi | `formatCurrency`/`formatNumber`/`formatDate` | **INV-3** `numeric-format-ssot.test.ts` (ham `Intl.*Format` · `toLocale*String` yasak; muaf = SSOT 2 dosya) | ✅ KAPALI (6 saha migrate) |
+| E | DB JSONB çeviri (display) | `getCategoryDescription` / `mapCategoryWithLocale` | **INV-4** `category-metadata-i18n-ssot.test.ts` (ham `hero_*` / `technical_summary` okuması yasak) | ✅ KAPALI (`CategoryShowcase` helper'a bağlandı) |
 | F | Hreflang/SEO | hreflang seti | — manuel denetim | ⚠️ blueprint var (`seo-transition-blueprint.md`) |
 
 **Açık eksenleri kapatma yöntemi:** drift denetimi (ajan) → maestro paralel göç → merkezi kapı (type+lint+test+build) → **yeni INV-x conformance testi** → commit. (B ekseninin yaptığı gibi.)
@@ -75,6 +76,6 @@
 ## 5. İlgili
 
 - **Playbook (nasıl):** `.claude/skills/i18n-conventions` · toplu göç makinesi `docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md`
-- **Kapı kaynak:** `src/__tests__/conformance/` (INV-1, INV-2)
+- **Kapı kaynak:** `src/__tests__/conformance/` (INV-1 entity-adı · INV-2 localize-rota · INV-3 sayısal/zamansal biçim · INV-4 metadata JSONB-çeviri)
 - **Komşu cetveller:** `admin-standard.md`, `dealer-network-standard.md` · **SEO:** `docs/plans/seo-transition-blueprint.md`
 - **CLAUDE.md** Kural #7 (i18n) bu cetvelin özetidir.
