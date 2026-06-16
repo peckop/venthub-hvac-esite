@@ -1,4 +1,8 @@
+'use client'
+
 import React from 'react'
+
+import { useI18n } from '@/i18n/I18nProvider'
 
 interface JsonDiffViewerProps {
     before: unknown
@@ -6,6 +10,7 @@ interface JsonDiffViewerProps {
 }
 
 const JsonDiffViewer: React.FC<JsonDiffViewerProps> = ({ before, after }) => {
+    const { t } = useI18n()
     const bObj = (typeof before === 'object' && before !== null) ? before as Record<string, unknown> : {}
     const aObj = (typeof after === 'object' && after !== null) ? after as Record<string, unknown> : {}
 
@@ -23,11 +28,11 @@ const JsonDiffViewer: React.FC<JsonDiffViewerProps> = ({ before, after }) => {
             <div className="flex text-xs font-semibold text-slate-400 bg-slate-800/80 border-b border-slate-700">
                 <div className="flex-1 p-3 border-r border-slate-700 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-rose-500"></div>
-                    Eski Değer (Before)
+                    {t('admin.common.oldValueBefore')}
                 </div>
                 <div className="flex-1 p-3 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    Yeni Değer (After)
+                    {t('admin.common.newValueAfter')}
                 </div>
             </div>
             <div className="p-3 text-xs font-mono leading-relaxed overflow-x-auto max-h-400px">
@@ -61,19 +66,19 @@ const JsonDiffViewer: React.FC<JsonDiffViewerProps> = ({ before, after }) => {
                             {/* Before Column */}
                             <div className={`flex-1 px-2 py-1 border-r border-slate-800 truncate ${isAdded ? 'bg-slate-800/30' : (isRemoved || isChanged ? 'bg-rose-500/10 text-rose-300' : 'text-slate-500')}`}>
                                 <span className="text-slate-500 mr-2 opacity-70">{key}:</span>
-                                {isAdded ? <span className="text-slate-600 italic">Eklendi</span> : <span title={strB}>{strB}</span>}
+                                {isAdded ? <span className="text-slate-600 italic">{t('admin.common.added')}</span> : <span title={strB}>{strB}</span>}
                             </div>
 
                             {/* After Column */}
                             <div className={`flex-1 px-2 py-1 truncate ${isRemoved ? 'bg-slate-800/30' : (isAdded || isChanged ? 'bg-emerald-500/10 text-emerald-300' : 'text-slate-500')}`}>
                                 <span className="text-slate-500 mr-2 opacity-70">{key}:</span>
-                                {isRemoved ? <span className="text-slate-600 italic">Silindi</span> : <span title={strA}>{strA}</span>}
+                                {isRemoved ? <span className="text-slate-600 italic">{t('admin.common.deleted')}</span> : <span title={strA}>{strA}</span>}
                             </div>
                         </div>
                     )
                 })}
                 {allKeys.length === 0 && (
-                    <div className="text-center py-4 text-slate-500 italic">Değişiklik detayı bulunmuyor.</div>
+                    <div className="text-center py-4 text-slate-500 italic">{t('admin.common.noChangeDetails')}</div>
                 )}
             </div>
         </div>

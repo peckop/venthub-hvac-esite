@@ -226,11 +226,14 @@ const ErrorGroupExpandedRow: React.FC<ExpandedRowProps> = ({ group, hasWriteAcce
               <div key={block.title}>
                 <div className="text-slate-500 font-bold mb-1">{block.title}</div>
                 <ul className="space-y-1 list-disc pl-4">
-                  {block.items.map(([k, c]) => (
-                    <li key={k} className="text-xs break-all">
-                      <span className="text-slate-300">{k}</span> <span className="text-slate-500">{`(${c})`}</span>
-                    </li>
-                  ))}
+                  {block.items.map(([k, c]) => {
+                    const countStr = `(${c})`
+                    return (
+                      <li key={k} className="text-xs break-all">
+                        <span className="text-slate-300">{k}</span> <span className="text-slate-500">{countStr}</span>
+                      </li>
+                    )
+                  })}
                   {block.items.length === 0 && <li className="text-xs text-slate-500">-</li>}
                 </ul>
               </div>
@@ -457,14 +460,17 @@ const ErrorGroupsTableBody: React.FC = () => {
         key: 'signature',
         header: t('admin.errorGroups.table.signature'),
         hideable: true,
-        cell: (r) => (
-          <div className="flex flex-col gap-1">
-            <span className="font-black text-slate-100 uppercase tracking-tight line-clamp-1">{r.signature}</span>
-            <code className="text-xs font-black text-slate-500 uppercase tracking-widest opacity-60 font-mono">
-              {`ID: ${r.id.slice(0, 8)}`}
-            </code>
-          </div>
-        ),
+        cell: (r) => {
+          const idStr = `ID: ${r.id.slice(0, 8)}`
+          return (
+            <div className="flex flex-col gap-1">
+              <span className="font-black text-slate-100 uppercase tracking-tight line-clamp-1">{r.signature}</span>
+              <code className="text-xs font-black text-slate-500 uppercase tracking-widest opacity-60 font-mono">
+                {idStr}
+              </code>
+            </div>
+          )
+        },
       },
       {
         key: 'last_message',

@@ -42,4 +42,9 @@ export const common = {
   selectDateRange: 'Tarih Aralığı Seçiniz',
   discard: 'Vazgeç',
   apply: 'Uygula',
+  oldValueBefore: 'Eski Değer (Before)',
+  newValueAfter: 'Yeni Değer (After)',
+  added: 'Eklendi',
+  deleted: 'Silindi',
+  noChangeDetails: 'Değişiklik detayı bulunmuyor.',
 };

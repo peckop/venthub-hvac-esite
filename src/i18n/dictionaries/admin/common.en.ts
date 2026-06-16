@@ -42,4 +42,9 @@ export const common = {
   selectDateRange: 'Select Date Range',
   discard: 'Cancel',
   apply: 'Apply',
+  oldValueBefore: 'Old Value (Before)',
+  newValueAfter: 'New Value (After)',
+  added: 'Added',
+  deleted: 'Deleted',
+  noChangeDetails: 'No change details found.',
 };
