@@ -22,7 +22,7 @@ siteyi **kullanarak** ister. "Hazır" tanımını büyütmek = teslimi geciktirm
 | # | İş | Durum (2026-06-15) | Detay / kaynak |
 |---|---|---|---|
 | **A** | Görünür bug'lar / kalite | kategori-i18n ✓ · conformance Faz 1 ✓ (INV-1) | `src/__tests__/conformance/category-name-ssot.test.ts` |
-| **B** | i18n literal göçü | kapsam-içi ✓ · **admin (~256) + legal (~235) bekliyor** | `docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md` |
+| **B** | i18n literal göçü | kapsam-içi ✓ · **admin ✓ (master #364/#363/#365, 0 uyarı) + INV-5 kapısı ✓** · legal prose/EN açık (avukat) · ~55 rota + 17 borç-anahtar bekliyor | `docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md` · `docs/legal/en-yasal-ceviri-inceleme-2026-06-16.md` |
 | **C** | **Bayi modülü (çekirdek)** | **KIRIK** — R0-R5 onarım → B1-B2 inşa | `docs/standards/dealer-module-blueprint.md` · `docs/audits/dealer-data-ground-truth-2026-06-11.md` |
 | **D** | Lighthouse / performans | homepage ~75 → **hedef 90+** · products/categories (3D/three.js) | `docs/audits/lighthouse_diagnostic_2026-06-10.md` |
 | **E** | Ürün detayları | **altyapı hazır** (PDF + LLM çıkarımı denendi) · içerik bekliyor | (yeni — doc gerekebilir) |
@@ -32,6 +32,7 @@ siteyi **kullanarak** ister. "Hazır" tanımını büyütmek = teslimi geciktirm
 | **I** | Teklif hazırlama modülü | **YENİ** — LLM + şablon, ciddi zaman kazancı | (yeni) |
 | **J** | CRM | **YENİ** — SaaS fazlarında vardı | `docs/plans/venthub_saas_master_roadmap.md` (ref) |
 | **K** | Güvenlik / bağımlılık | audit 0 ✓ (2026-06-15) · rutin | commit `8e74d8c5` |
+| **L** | **3D ürün showroom (vizyon)** | **YENİ** — kullanıcının 3D ürünlerin yanına gidip incelediği, teknik özellikleri gördüğü sanal showroom; selection→commerce köprüsü + P0 vitrin "wow". Çökmeyen 3D viewer = ÖN KOŞUL (3D crash-fix = 0. adım) | `3d-roadmap-crash-then-standards` memory · ilham: Three.js tiny-planet site |
 
 ---
 
@@ -68,6 +69,7 @@ Arzu yaratan demo + onu "içi dolu" kılan enabler'lar. Her kalem **DEMO-KIVAMIN
 - **H/I MVP sınırı:** LLM danışman + teklif ne kadar ince olacak? (WOW yeter, "tam ürün" değil) — **teslim süresini esas bu belirler**
 - **SEO:** eski site erişimi · domain stratejisi · cutover tarihi → **Avensair input**
 - **Bayi kimlik ekseni (R1):** blueprint §2 kararı — artık **P1'de** (satış sonrası), teslim öncesi değil
+- **EN yasal metin (LLM çevirisi, prod'da CANLI, avukat onaysız):** disclaimer'la mı tutalım / profesyonel çeviri mi / kaldıralım mı? + checkout onayı TR sözleşmeye bağlanmalı → **avukat girdisi bekliyor** · brief + yapılacaklar: `docs/legal/en-yasal-ceviri-inceleme-2026-06-16.md`
 
 ---
 
