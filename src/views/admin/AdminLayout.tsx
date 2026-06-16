@@ -31,6 +31,10 @@ import { useRole } from '../../hooks/useRole'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes';
 
+const globalStyles = `
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.1); border-radius: 10px; }
+`
 
 const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -39,6 +43,8 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   const { role, canAccess, loading: roleLoading } = useRole()
   const router = useRouter()
   const { t } = useI18n()
+  const brandNameVent = 'Vent'
+  const brandNameHub = 'Hub'
 
   const loading = authLoading || roleLoading
 
@@ -123,7 +129,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
             <div className="w-9 h-9 rounded-xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center">
               <Webhook size={20} className="text-cyan-400" />
             </div>
-            <h1 className="text-lg font-bold text-white">Vent<span className="text-slate-500">Hub</span></h1>
+            <h1 className="text-lg font-bold text-white">{brandNameVent}<span className="text-slate-500">{brandNameHub}</span></h1>
           </Link>
         </div>
         <div className="flex items-center gap-4">
@@ -170,18 +176,15 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
                 {children}
             </div>
             <footer className="px-8 py-6 text-slate-600 text-xs font-bold uppercase tracking-widest flex justify-between opacity-50 border-t border-white/5">
-                <span>Â© 2026 VentHub Platinum</span>
-                <span className="text-cyan-400/40">Secure Node</span>
+                <span>{t('admin.common.copyright')}</span>
+                <span className="text-cyan-400/40">{t('admin.common.secureNode')}</span>
             </footer>
         </main>
       </div>
       
       <CommandPalette />
       
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.1); border-radius: 10px; }
-      `}</style>
+      <style jsx global>{globalStyles}</style>
     </div>
   )
 }

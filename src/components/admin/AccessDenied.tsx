@@ -1,3 +1,5 @@
+'use client'
+
 import { ArrowLeft,ShieldAlert } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
@@ -5,6 +7,8 @@ import React from 'react'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes';
 
+
+const SECURITY_PROTOCOL_TEXT = 'VentHub Security Protocol 7.1'
 
 const AccessDenied: React.FC = () => {
     const { t } = useI18n()
@@ -17,12 +21,14 @@ const AccessDenied: React.FC = () => {
                 </div>
 
                 <h1 className="text-3xl font-black text-white mb-4 tracking-tight uppercase">
-                    Erişim Engellendi
+                    {t('admin.ui.accessDeniedTitle')}
                 </h1>
 
                 <p className="text-slate-400 mb-10 leading-relaxed font-medium">
-                    Bu protokolü izlemek için gerekli güvenlik yetkilerine sahip değilsiniz. <br/>
-                    <span className="text-xs font-bold text-slate-600 uppercase tracking-widest mt-4 block italic">Lütfen sistem yöneticinizle iletişime geçin.</span>
+                    {t('admin.authority.insufficientPermissions')} <br/>
+                    <span className="text-xs font-bold text-slate-600 uppercase tracking-widest mt-4 block italic">
+                        {t('admin.authority.contactAdmin')}
+                    </span>
                 </p>
 
                 <div className="flex flex-col gap-4">
@@ -31,11 +37,11 @@ const AccessDenied: React.FC = () => {
                         className="inline-flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-2xl font-bold transition-colors border border-white/5 group"
                     >
                         <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
-                        {t('admin.ui.backToDashboard') || 'Ana Panele Dön'}
+                        {t('admin.ui.backToDashboard')}
                     </Link>
                     
                     <div className="text-xs font-bold text-slate-700 uppercase tracking-hvac-relaxed mt-2">
-                        VentHub Security Protocol 7.1
+                        {SECURITY_PROTOCOL_TEXT}
                     </div>
                 </div>
             </div>
@@ -44,3 +50,4 @@ const AccessDenied: React.FC = () => {
 }
 
 export default AccessDenied
+

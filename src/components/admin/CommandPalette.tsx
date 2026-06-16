@@ -16,9 +16,12 @@ import React from 'react'
 
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
+import { useI18n } from '../../i18n/I18nProvider'
+
 interface SearchResult { id: string; name: string; sku: string }
 
 const CommandPalette: React.FC = () => {
+    const { t } = useI18n()
     const [open, setOpen] = React.useState(false)
     const [search, setSearch] = React.useState('')
     const [products, setProducts] = React.useState<SearchResult[]>([])
@@ -29,13 +32,13 @@ const CommandPalette: React.FC = () => {
 
     // Static nav items
     const navItems = React.useMemo(() => [
-        { label: 'Panel (Dashboard)', icon: LayoutDashboard, href: '/admin' },
-        { label: 'Sipariş Yönetimi', icon: ShoppingCart, href: '/admin/orders' },
-        { label: 'Ürün Kataloğu', icon: Package, href: '/admin/products' },
-        { label: 'Stok Durumu', icon: TrendingUp, href: '/admin/inventory' },
-        { label: 'Kullanıcı Yönetimi', icon: Users, href: '/admin/users' },
-        { label: 'Ayarlar', icon: Settings, href: '/admin/inventory/settings' },
-    ], [])
+        { label: t('admin.menu.dashboard') || 'Panel (Dashboard)', icon: LayoutDashboard, href: '/admin' },
+        { label: t('admin.menu.orders') || 'Sipariş Yönetimi', icon: ShoppingCart, href: '/admin/orders' },
+        { label: t('admin.menu.products') || 'Ürün Kataloğu', icon: Package, href: '/admin/products' },
+        { label: t('admin.menu.inventory') || 'Stok Durumu', icon: TrendingUp, href: '/admin/inventory' },
+        { label: t('admin.menu.users') || 'Kullanıcı Yönetimi', icon: Users, href: '/admin/users' },
+        { label: t('admin.menu.settings') || 'Ayarlar', icon: Settings, href: '/admin/inventory/settings' },
+    ], [t])
 
     // Total selectable items
     const totalItems = React.useMemo(() => {
@@ -134,19 +137,25 @@ const CommandPalette: React.FC = () => {
         ? navItems.filter(n => n.label.toLowerCase().includes(search.toLowerCase()))
         : navItems
 
+    const noResultsMsg = t('admin.ui.noResultsForTerm', { term: search })
+    const skuLabel = 'SKU:'
+    const enterKeySymbol = '⏎'
+    const arrowKeysSymbol = '↑↓'
+    const aiSearchEngineLabel = 'VentHub AI Search Engine'
+
     return (
         <div 
             className="fixed inset-0 z-modal" 
             role="dialog"
             aria-modal="true"
-            aria-label="Komut Paleti"
+            aria-label={t('admin.ui.commandPalette')}
         >
             {/* Backdrop */}
             <button
                 type="button"
                 className="absolute inset-0 w-full h-full bg-surface-deep/60 backdrop-blur-md cursor-default border-none outline-none"
                 onClick={() => setOpen(false)}
-                aria-label="Arama penceresini kapat"
+                aria-label={t('admin.ui.closeSearch')}
                 tabIndex={-1}
             />
 
@@ -161,14 +170,14 @@ const CommandPalette: React.FC = () => {
                         <input
                             ref={inputRef}
                             onKeyDown={handleKeyDown}
-                            placeholder="Bir komut veya ürün ara..."
+                            placeholder={t('admin.ui.searchCommandPlaceholder')}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-slate-500 text-lg font-medium"
                         />
                         <div className="flex items-center gap-2 ml-auto shrink-0">
                             <kbd className="px-2.5 py-1 text-xs font-black text-cyan-400 bg-cyan-400/10 rounded-lg border border-cyan-400/20 shadow-glow-sm">ESC</kbd>
-                            <button onClick={() => setOpen(false)} className="p-2 rounded-xl hover:bg-white/5 transition-colors" aria-label="Kapat">
+                            <button onClick={() => setOpen(false)} className="p-2 rounded-xl hover:bg-white/5 transition-colors" aria-label={t('admin.ui.close')}>
                                 <X size={20} className="text-slate-500 hover:text-white" aria-hidden="true" />
                             </button>
                         </div>
@@ -179,14 +188,14 @@ const CommandPalette: React.FC = () => {
                         {loading && (
                             <div className="p-8 text-center">
                                 <Activity className="animate-spin text-cyan-400 mx-auto mb-2" size={24} />
-                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest italic tracking-widest">Sistem Taranıyor...</p>
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest italic tracking-widest">{t('admin.ui.scanningSystem')}</p>
                             </div>
                         )}
 
                         {/* Navigation Group */}
                         {filteredNav.length > 0 && (
                             <div className="mb-4">
-                                <div className="px-4 mb-3 text-xs font-bold text-slate-500 uppercase tracking-hvac-normal">Navigasyon</div>
+                                <div className="px-4 mb-3 text-xs font-bold text-slate-500 uppercase tracking-hvac-normal">{t('admin.ui.navigation')}</div>
                                 <div className="space-y-1">
                                     {filteredNav.map((item, idx) => {
                                         const Icon = item.icon
@@ -216,7 +225,7 @@ const CommandPalette: React.FC = () => {
                         {/* Products Group */}
                         {products.length > 0 && (
                             <div className="mt-2">
-                                <div className="px-4 my-3 text-xs font-bold text-slate-500 uppercase tracking-hvac-normal">Ürün Kataloğu</div>
+                                <div className="px-4 my-3 text-xs font-bold text-slate-500 uppercase tracking-hvac-normal">{t('admin.ui.productCatalog')}</div>
                                 <div className="space-y-1">
                                     {products.map((p, idx) => {
                                         const globalIdx = filteredNav.length + idx
@@ -236,7 +245,7 @@ const CommandPalette: React.FC = () => {
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="truncate">{p.name}</div>
-                                                    <div className={`text-xs font-mono mt-0.5 ${isActive ? 'text-surface-deep/60' : 'text-slate-500'}`}>SKU: {p.sku}</div>
+                                                    <div className={`text-xs font-mono mt-0.5 ${isActive ? 'text-surface-deep/60' : 'text-slate-500'}`}>{skuLabel} {p.sku}</div>
                                                 </div>
                                                 {isActive && <ArrowRight size={16} className="text-surface-deep" />}
                                             </button>
@@ -252,8 +261,8 @@ const CommandPalette: React.FC = () => {
                                 <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 border border-white/5">
                                     <Search size={32} className="text-slate-600" />
                                 </div>
-                                <p className="text-sm font-bold text-slate-400">"{search}" için sonuç bulunamadı.</p>
-                                <p className="text-xs text-slate-600 mt-2 font-medium">Lütfen farklı anahtar kelimeler deneyin.</p>
+                                <p className="text-sm font-bold text-slate-400">{noResultsMsg}</p>
+                                <p className="text-xs text-slate-600 mt-2 font-medium">{t('admin.ui.tryDifferentKeywords')}</p>
                             </div>
                         )}
                     </div>
@@ -262,17 +271,17 @@ const CommandPalette: React.FC = () => {
                     <div className="bg-white/5 px-6 py-4 flex items-center justify-between border-t border-white/5">
                         <div className="flex items-center gap-4">
                              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest">
-                                <kbd className="px-1.5 py-0.5 glass rounded border border-white/10 text-white">⏎</kbd>
-                                Seç
+                                <kbd className="px-1.5 py-0.5 glass rounded border border-white/10 text-white">{enterKeySymbol}</kbd>
+                                {t('admin.ui.select')}
                             </div>
                             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-widest">
-                                <kbd className="px-1.5 py-0.5 glass rounded border border-white/10 text-white">↑↓</kbd>
-                                Gezin
+                                <kbd className="px-1.5 py-0.5 glass rounded border border-white/10 text-white">{arrowKeysSymbol}</kbd>
+                                {t('admin.ui.navigate')}
                             </div>
                         </div>
                         <div className="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
                              <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></div>
-                             VentHub AI Search Engine
+                             {aiSearchEngineLabel}
                         </div>
                     </div>
                 </div>
