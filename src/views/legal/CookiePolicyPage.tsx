@@ -13,7 +13,7 @@ const CookiePolicyPage: React.FC<{ lang: string }> = ({ lang }) => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl font-bold text-industrial-gray mb-6">
-        {t('legal.cookiePolicyTitle')}
+        {t('legal.cookieTitle')}
       </h1>
 
       <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4 mb-6 text-sm">
