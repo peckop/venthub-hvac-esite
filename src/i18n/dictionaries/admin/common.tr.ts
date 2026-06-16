@@ -47,4 +47,12 @@ export const common = {
   added: 'Eklendi',
   deleted: 'Silindi',
   noChangeDetails: 'Değişiklik detayı bulunmuyor.',
+  experimentalModeDisabled: 'Deneysel mod: Kaydetme pasif.',
+  tabGeneral: 'Genel',
+  tabPayment: 'Ödeme',
+  tabAdmins: 'Yöneticiler',
+  tabSystemStatus: 'Sistem Durumu',
+  saving: 'Kaydediliyor...',
+  settingsLoading: 'Ayarlar içeriği yükleniyor...',
+  invalidCategory: 'Geçersiz Kategori Kimliği (ID Not Found)',
 };

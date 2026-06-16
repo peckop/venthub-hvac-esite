@@ -14,7 +14,7 @@ import { type AppSettings,useSettings } from '../../hooks/useSettings'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const AdminSettingsPage: React.FC = () => {
-  const { t: _t } = useI18n()
+  const { t } = useI18n()
   const [activeTab, setActiveTab] = useState<'general' | 'payment' | 'admins' | 'system'>('general')
   const { settings, loading } = useSettings()
   const [saving] = useState(false)
@@ -44,14 +44,14 @@ const AdminSettingsPage: React.FC = () => {
 
   const handleSave = async () => {
     // Logic for saving settings
-    setSaveStatus({ type: 'success', message: 'Deneysel mod: Kaydetme pasif.' })
+    setSaveStatus({ type: 'success', message: t('admin.common.experimentalModeDisabled') })
   }
 
   const tabs = [
-    { id: 'general' as const, label: _t('admin.settings.tabs.general') || 'Genel', icon: Globe },
-    { id: 'payment' as const, label: _t('admin.settings.tabs.payment') || 'Ödeme', icon: CreditCard },
-    { id: 'admins' as const, label: _t('admin.settings.tabs.admins') || 'Yöneticiler', icon: ShieldCheck },
-    { id: 'system' as const, label: _t('admin.settings.tabs.system') || 'Sistem Durumu', icon: Activity },
+    { id: 'general' as const, label: t('admin.common.tabGeneral'), icon: Globe },
+    { id: 'payment' as const, label: t('admin.common.tabPayment'), icon: CreditCard },
+    { id: 'admins' as const, label: t('admin.common.tabAdmins'), icon: ShieldCheck },
+    { id: 'system' as const, label: t('admin.common.tabSystemStatus'), icon: Activity },
   ]
 
   return (
@@ -61,10 +61,10 @@ const AdminSettingsPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs tracking-hvac-normal uppercase mb-2">
             <span className="w-8 h-0.5 bg-cyan-400/30"></span>
-            {_t('admin.menu.groupSystem')}
+            {t('admin.menu.groupSystem')}
           </div>
           <h2 className="text-4xl font-black text-white tracking-tight">
-            {_t('admin.titles.settings')}
+            {t('admin.titles.settings')}
           </h2>
         </div>
         
@@ -75,7 +75,7 @@ const AdminSettingsPage: React.FC = () => {
             className="group relative flex items-center justify-center gap-2 px-8 py-3 bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-700 text-surface-deep rounded-xl font-bold transition-transform hover:scale-102 active:scale-98 shadow-admin-orders-glow-2"
           >
             {saving ? <Activity className="animate-spin" size={18} /> : <Save size={18} />}
-            <span>{saving ? (_t('common.saving') || 'Kaydediliyor...') : (_t('common.saveChanges') || 'Değişiklikleri Kaydet')}</span>
+            <span>{saving ? t('admin.common.saving') : t('admin.common.saveChanges')}</span>
           </button>
         </div>
       </div>
@@ -111,7 +111,7 @@ const AdminSettingsPage: React.FC = () => {
       <div className="grid grid-cols-1 gap-8">
         {/* Placeholder for actual content to pass lint */}
         <div className="glass-md rounded-3xl p-8 border border-white/5">
-           <p className="text-slate-400">Ayarlar içeriği yükleniyor...</p>
+           <p className="text-slate-400">{t('admin.common.settingsLoading')}</p>
         </div>
       </div>
     </div>

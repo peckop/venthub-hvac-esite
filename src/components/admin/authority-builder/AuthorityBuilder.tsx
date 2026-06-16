@@ -12,6 +12,7 @@ import {
   Trash2} from 'lucide-react';
 import React, { useState } from 'react';
 
+import { useI18n } from '@/i18n/I18nProvider';
 import { 
   AuthorityBlock, 
   AuthorityBlockType, 
@@ -33,20 +34,32 @@ interface AuthorityBuilderProps {
   onChange: (value: AuthorityContent) => void;
 }
 
-const BLOCK_TYPES: Array<{ type: AuthorityBlockType; label: string; icon: LucideIcon }> = [
-  { type: 'hero', label: 'Hero / Banner', icon: Layers },
-  { type: 'specs', label: 'Teknik Özellikler', icon: Code },
-  { type: 'media', label: 'Medya (Video/3D)', icon: Eye },
-  { type: 'rich-text', label: 'Zengin Metin', icon: Code },
-  { type: 'features-grid', label: 'Özellik Tablosu', icon: Layers },
-  { type: 'comparison', label: 'Karşılaştırma', icon: Layers },
-  { type: 'cta-banner', label: 'CTA Banner', icon: Plus },
+const BLOCK_TYPES: Array<{ type: AuthorityBlockType; labelKey: string; icon: LucideIcon }> = [
+  { type: 'hero', labelKey: 'admin.authority.blockTypeHero', icon: Layers },
+  { type: 'specs', labelKey: 'admin.authority.blockTypeSpecs', icon: Code },
+  { type: 'media', labelKey: 'admin.authority.blockTypeMedia', icon: Eye },
+  { type: 'rich-text', labelKey: 'admin.authority.blockTypeRichText', icon: Code },
+  { type: 'features-grid', labelKey: 'admin.authority.blockTypeFeaturesGrid', icon: Layers },
+  { type: 'comparison', labelKey: 'admin.authority.blockTypeComparison', icon: Layers },
+  { type: 'cta-banner', labelKey: 'admin.authority.blockTypeCtaBanner', icon: Plus },
 ];
+
+const blockTypeLabels: Record<AuthorityBlockType, string> = {
+  hero: 'admin.authority.blockTypeHero',
+  specs: 'admin.authority.blockTypeSpecs',
+  media: 'admin.authority.blockTypeMedia',
+  performance: 'admin.authority.blockTypePerformance',
+  'rich-text': 'admin.authority.blockTypeRichText',
+  'features-grid': 'admin.authority.blockTypeFeaturesGrid',
+  comparison: 'admin.authority.blockTypeComparison',
+  'cta-banner': 'admin.authority.blockTypeCtaBanner',
+};
 
 export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({ 
   value = [], 
   onChange 
 }) => {
+  const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<'editor' | 'preview' | 'json'>('editor');
   const blocks = Array.isArray(value) ? value : [];
 
@@ -91,15 +104,15 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
             <Layers className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900">Authority Builder</h3>
-            <p className="text-sm text-slate-500">Blok tabanlı sayfa oluşturucu</p>
+            <h3 className="text-lg font-bold text-slate-900">{t('admin.authority.builderTitle')}</h3>
+            <p className="text-sm text-slate-500">{t('admin.authority.builderSubtitle')}</p>
           </div>
         </div>
 
         <div className="flex bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
-          <button type="button" className={activeTab === 'editor' ? btnSecondary : btnGhost} onClick={() => setActiveTab('editor')}>Editör</button>
-          <button type="button" className={activeTab === 'preview' ? btnSecondary : btnGhost} onClick={() => setActiveTab('preview')}>Önizleme</button>
-          <button type="button" className={activeTab === 'json' ? btnSecondary : btnGhost} onClick={() => setActiveTab('json')}>JSON</button>
+          <button type="button" className={activeTab === 'editor' ? btnSecondary : btnGhost} onClick={() => setActiveTab('editor')}>{t('admin.authority.tabEditor')}</button>
+          <button type="button" className={activeTab === 'preview' ? btnSecondary : btnGhost} onClick={() => setActiveTab('preview')}>{t('admin.authority.tabPreview')}</button>
+          <button type="button" className={activeTab === 'json' ? btnSecondary : btnGhost} onClick={() => setActiveTab('json')}>{t('admin.authority.tabJson')}</button>
         </div>
       </div>
 
@@ -114,7 +127,7 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
                 onClick={() => addBlock(bt.type)}
               >
                 <bt.icon className="w-5 h-5 text-slate-400" />
-                <span className="text-xs font-medium uppercase tracking-wider">{bt.label}</span>
+                <span className="text-xs font-medium uppercase tracking-wider">{t(bt.labelKey)}</span>
               </button>
             ))}
           </div>
@@ -122,15 +135,15 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
           <div className="space-y-3 mt-8">
             {blocks.length === 0 ? (
               <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl bg-white">
-                <p className="text-slate-400 italic">Henüz blok eklenmemiş.</p>
+                <p className="text-slate-400 italic">{t('admin.authority.noBlocks')}</p>
               </div>
             ) : (
               blocks.map((block, index) => (
                 <div key={block.id} className={`${cardClass} group overflow-hidden border-slate-200 shadow-sm hover:shadow-md transition-shadow`}>
                   <div className="flex items-center bg-slate-50/80 px-4 py-2 border-b border-slate-100">
                     <GripVertical className="w-4 h-4 text-slate-300 mr-2 cursor-grab" />
-                    <span className={badgeClass}>{block.type}</span>
-                    <div className="flex-1 px-4 truncate text-xs font-medium text-slate-500">ID: {block.id.slice(0, 8)}</div>
+                    <span className={badgeClass}>{t(blockTypeLabels[block.type])}</span>
+                    <div className="flex-1 px-4 truncate text-xs font-medium text-slate-500">{t('admin.authority.idLabel')} {block.id.slice(0, 8)}</div>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button type="button" className="h-8 w-8 flex items-center justify-center hover:bg-slate-200 rounded" onClick={(e) => { e.preventDefault(); e.stopPropagation(); moveBlock(index, 'up'); }}><ChevronUp className="w-4 h-4" /></button>
                       <button type="button" className="h-8 w-8 flex items-center justify-center hover:bg-slate-200 rounded" onClick={(e) => { e.preventDefault(); e.stopPropagation(); moveBlock(index, 'down'); }}><ChevronDown className="w-4 h-4" /></button>

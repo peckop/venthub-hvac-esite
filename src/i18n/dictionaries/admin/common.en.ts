@@ -47,4 +47,12 @@ export const common = {
   added: 'Added',
   deleted: 'Deleted',
   noChangeDetails: 'No change details found.',
+  experimentalModeDisabled: 'Experimental mode: Saving is disabled.',
+  tabGeneral: 'General',
+  tabPayment: 'Payment',
+  tabAdmins: 'Administrators',
+  tabSystemStatus: 'System Status',
+  saving: 'Saving...',
+  settingsLoading: 'Loading settings content...',
+  invalidCategory: 'Invalid Category ID (ID Not Found)',
 };

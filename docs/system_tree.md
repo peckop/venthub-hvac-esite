@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-16T11:10:07.536763+00:00
+compiled_at: 2026-06-16T13:31:09.523971+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-16T11:10:07.536763+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-16T13:31:09.523971+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -714,9 +714,19 @@ Bu belge, otonom derleyici tarafından 2026-06-16T11:10:07.536763+00:00 tarihind
 │       │   ├── ✅ `TermsOfUsePage.tsx`
 │       │   └── 📂 **components/**
 │       │       ├── 📂 **en/**
-│       │       │   └── ✅ `KvkkContent.tsx`
+│       │       │   ├── ✅ `CookiePolicyContent.tsx`
+│       │       │   ├── ✅ `DistanceSalesAgreementContent.tsx`
+│       │       │   ├── ✅ `KvkkContent.tsx`
+│       │       │   ├── ✅ `PreInformationContent.tsx`
+│       │       │   ├── ✅ `PrivacyPolicyContent.tsx`
+│       │       │   └── ✅ `TermsOfUseContent.tsx`
 │       │       └── 📂 **tr/**
-│       │           └── ✅ `KvkkContent.tsx`
+│       │           ├── ✅ `CookiePolicyContent.tsx`
+│       │           ├── ✅ `DistanceSalesAgreementContent.tsx`
+│       │           ├── ✅ `KvkkContent.tsx`
+│       │           ├── ✅ `PreInformationContent.tsx`
+│       │           ├── ✅ `PrivacyPolicyContent.tsx`
+│       │           └── ✅ `TermsOfUseContent.tsx`
 │       └── 📂 **support/**
 │           ├── ✅ `FAQPage.tsx`
 │           ├── ✅ `ReturnsPage.tsx`
