@@ -58,7 +58,7 @@
 | D | Para/sayı/tarih biçimi | `formatCurrency`/`formatNumber`/`formatDate` | **INV-3** `numeric-format-ssot.test.ts` (ham `Intl.*Format` · `toLocale*String` yasak; muaf = SSOT 2 dosya) | ✅ KAPALI (6 saha migrate) |
 | E | DB JSONB çeviri (display) | `getCategoryDescription` / `mapCategoryWithLocale` | **INV-4** `category-metadata-i18n-ssot.test.ts` (ham `hero_*` / `technical_summary` okuması yasak) | ✅ KAPALI (`CategoryShowcase` helper'a bağlandı) |
 | F | Hreflang/SEO | hreflang seti | — manuel denetim | ⚠️ blueprint var (`seo-transition-blueprint.md`) |
-| G | **i18n key-çözünürlük** | `getDictValue` nested-only | **INV-5** `i18n-key-resolution.test.ts` (her statik `t('a.b.c')` sözlükte çözülmeli; içinde-nokta düz anahtar = ham-key render) | ✅ KAPALI (ratchet: 2026-06-16 itibarı 32 pre-existing debt donduruldu, yeni kırılma kırar) |
+| G | **i18n key-çözünürlük** | `getDictValue` nested-only | **INV-5** `i18n-key-resolution.test.ts` (her statik `t('a.b.c')` sözlükte çözülmeli; içinde-nokta düz anahtar = ham-key render) | ✅ KAPALI (ratchet: 2026-06-16'da 32 debt donduruldu → admin literal batch #364 15'ini çözünce 32→17 sıkıştı; yeni kırılma kırar) |
 
 **Açık eksenleri kapatma yöntemi:** drift denetimi (ajan) → maestro paralel göç → merkezi kapı (type+lint+test+build) → **yeni INV-x conformance testi** → commit. (B ekseninin yaptığı gibi.)
 

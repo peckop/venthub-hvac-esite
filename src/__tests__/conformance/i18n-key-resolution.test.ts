@@ -64,18 +64,13 @@ function toRelPath(globKey: string): string {
 }
 
 /**
- * RATCHET (debt freeze): 2026-06-16 itibarıyla master'da zaten çözülmeyen anahtarlar.
- * Bunlar GERÇEK pre-existing bug (başka hiçbir gate yakalamamıştı) — tek tek düzeltilip
- * buradan SİLİNECEK. YENİ entry EKLEME: yeni çözülmeyen anahtar = anahtarı düzelt, allowlist'leme.
+ * RATCHET (debt freeze): 2026-06-16'da master'da çözülmeyen anahtarlar. admin literal
+ * batch (PR#364) bunlardan 15'ini (6 admin + 6 common + 3 products) çözdü → buradan SİLİNDİ
+ * (ratchet 32→17 sıkıştı). Kalan 17 GERÇEK pre-existing bug — tek tek düzeltilip buradan
+ * SİLİNECEK. YENİ entry EKLEME: yeni çözülmeyen anahtar = anahtarı düzelt, allowlist'leme.
  * (Aşağıdaki ikinci test, düzelen bir anahtar hâlâ listede kalırsa uyarır → liste bayatlamaz.)
  */
 const KNOWN_UNRESOLVED = new Set<string>([
-  'admin.common.save',
-  'admin.common.total',
-  'admin.orders.board.stepper.paid',
-  'admin.orders.orderDetails',
-  'admin.ui.backToDashboard',
-  'admin.ui.ready',
   'brands.title',
   'cart.errors.paymentError',
   'category.filters.title',
@@ -89,18 +84,9 @@ const KNOWN_UNRESOLVED = new Set<string>([
   'category.view.list',
   'checkout.errors.emailInvalid',
   'checkout.errors.locationRequired',
-  'common.fastDelivery',
-  'common.officialGuarantee',
-  'common.requestQuote',
-  'common.reset',
-  'common.series',
-  'common.share',
   'orders.fetchError',
   'pdp.details',
   'product.starting_from',
-  'products.heroAlt',
-  'products.searchAriaLabel',
-  'products.searchHelp',
   'series.premium_desc',
 ])
 
