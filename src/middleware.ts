@@ -9,7 +9,7 @@ import { Routes } from './utils/routes'
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|images|fonts|.*\\.(?:svg|png|jpg|webp|ico|ttf|woff|woff2|otf)).*)',
+    '/((?!_next/static|_next/image|favicon.ico|images|fonts|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|ttf|woff|woff2|otf|hdr|exr|glb|gltf|mp4|webm)).*)',
   ],
 }
 
