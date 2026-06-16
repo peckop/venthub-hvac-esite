@@ -127,8 +127,11 @@ N dosyayı aynı anda göçürürken **paralel ajanlar `tr.ts`/`en.ts`'i AYNI AN
 
 1. **Ajan yalnız kendi bileşenini düzenler** + yeni anahtarları **yapısal döndürür**
    (`{ keyName: { tr, en } }`); tr.ts/en.ts'e DOKUNMAZ. **DÜZ anahtar kuralı:** yeni anahtar
-   **tek-parça düz** olsun (`ns.pageTitle`), mevcut `form`/`results` alt-objesini GENİŞLETMESİN —
+   **tek-SEGMENT** olsun (`pageTitle` — içinde nokta YOK), mevcut `form`/`results` alt-objesini GENİŞLETMESİN —
    merge "alt-ns açılışından sonra düz ekle" olur, nested-merge derdi biter. (Mevcut nested anahtarı REUSE serbest.)
+   ⚠️ **İçinde-nokta DÜZ anahtar YASAK** (`'table.productCol'`, `'settings.title'`): çözücü `getDictValue`
+   **NESTED-ONLY** — `path.split('.')` ile iner, düz noktalı anahtarı ASLA bulamaz → **ham-key render** (INV-5
+   kırar). Çok-segment gerekiyorsa **gerçek nested obje** aç (`table: { productCol }`), düz `'table.x'` DEĞİL.
 2. **Orkestratör sözlükleri MERKEZİ birleştirir.** Disiplin: önce `merge-generic3.js <out>` (dry-run)
    → raporu DOĞRULA (her alt-ns EXISTING/NEW + **0 çakışma**) → sonra `--apply`. Çoklu-yüzey: parent
    her öğenin ns'inden (ilk segment) türer; `region()` `\n  parent: {` (tam 2-boşluk) ile anchor'lar →
@@ -136,7 +139,8 @@ N dosyayı aynı anda göçürürken **paralel ajanlar `tr.ts`/`en.ts`'i AYNI AN
    (`common.x`) merge3 ile değil ELLE eklenir (2 sözlük).
 3. **Merkezi kapı (orkestratör):** `pnpm run test:i18n` (parite) + her dosyada `eslint` (kalan literal=0)
    + `pnpm run type-check` (`en: typeof tr` parite-lock) + `pnpm test -- --run` (regresyon).
-   **Her t('...') anahtarının sözlükte çözüldüğünü doğrula** (`keycheck.js`; yoksa ham anahtar render eder = bug).
+   **Her t('...') anahtarının sözlükte çözüldüğünü doğrula — artık ZORUNLU gate: INV-5
+   `src/__tests__/conformance/i18n-key-resolution.test.ts`** (çözülmeyen statik `t('...')` = ham-key render = FAIL).
 > Hazır makine ve script'ler: `docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md` (Workflow + merge-generic3 + keycheck).
 
 ## EN Yerel-Deyim Pası (sadık ≠ doğru — merge sonrası kalite taraması)
@@ -176,7 +180,7 @@ const { t, lang } = useI18n()
 ## Sık Tuzaklar (sahada yakalandı)
 
 - **Kullanılmayan `useI18n`:** Hook ekleyip `t`'yi kullanmamak → `unused-imports` ERROR. Gerçekten literal değiştirdiysen kullan; değiştirmediysen hook ekleme.
-- **Sessiz eksik-anahtar:** `t('x.y')` eksikse tsc geçer (loose-string tipi) ama UI ham 'x.y' gösterir. **Sadece parite testi + eksik-key kontrolü yakalar** — atla­ma.
+- **Sessiz eksik-anahtar:** `t('x.y')` eksikse/yanlış-namespace'teyse tsc+lint+parity+build GEÇER ama UI ham 'x.y' gösterir. **INV-5 keycheck yakalar** (`pnpm test`'te koşar) — "bitti" demeden çözüldüğünü gör.
 - **Template literal tuzağı:** `` {`metin`} `` kuralı GEÇMEZ, yakalanır. Sembol için bile dict kullan.
 - **Çakışan duplicate key:** Mevcut anahtarı körce yeniden-tanımlama; obje literalinde duplicate key = son değer kazanır, sessiz UX değişimi.
 - **Bayat `en: typeof tr` diagnostic'i:** merge ortasında IDE/LSP "en'de X anahtarı eksik" diyebilir ama `grep`'te VARDIR (satır no'ları kaymış). **Otorite = `tsc` + `grep`**, IDE diagnostic'i değil — panikleme, doğrula.

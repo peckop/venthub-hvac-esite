@@ -42,6 +42,7 @@
 6. **Para/sayı/tarih format helper'dan** — ham `Intl.*Format`/`toLocale*String`/elle `₺` birleştirme yasak; `formatCurrency`/`formatNumber`/`formatDate`. (Tek muaf: SSOT'un kendisi — `i18n/format.ts`, `i18n/datetime.ts`.)
 7. **Hiyerarşik anahtar** — `section.subsection.key`. Paylaşılan metin → `common`. Çakışan anahtarı körlemesine yeniden-tanımlama.
 8. **Hreflang** — self-referencing + reciprocal (A→B ⇒ B→A) + ISO kodları (`en-GB` ✓) + `x-default`. Canonical, locale URL'i ile eşleşir.
+9. **Anahtar yapısı: tek-segment düz YA DA gerçek nested** — çözücü `getDictValue` **NESTED-ONLY** (`path.split('.')` + iç içe iner, bulamazsa ham path döner). İçinde-nokta **düz** anahtar (`'table.productCol'`, `'settings.title'`) çözülmez → **ham-key render** (sessiz bug; tsc/lint/parity/build yakalamaz). Yeni anahtar ya `'pageTitle'` (tek-segment) ya `table: { productCol }` (gerçek nested) olmalı; içinde-nokta düz anahtar **YASAK**. Anahtarı doğru namespace'te tanımla (`t('common.share')` çağrılıyorsa `share` gerçekten `common` altında olmalı).
 
 ---
 
@@ -57,6 +58,7 @@
 | D | Para/sayı/tarih biçimi | `formatCurrency`/`formatNumber`/`formatDate` | **INV-3** `numeric-format-ssot.test.ts` (ham `Intl.*Format` · `toLocale*String` yasak; muaf = SSOT 2 dosya) | ✅ KAPALI (6 saha migrate) |
 | E | DB JSONB çeviri (display) | `getCategoryDescription` / `mapCategoryWithLocale` | **INV-4** `category-metadata-i18n-ssot.test.ts` (ham `hero_*` / `technical_summary` okuması yasak) | ✅ KAPALI (`CategoryShowcase` helper'a bağlandı) |
 | F | Hreflang/SEO | hreflang seti | — manuel denetim | ⚠️ blueprint var (`seo-transition-blueprint.md`) |
+| G | **i18n key-çözünürlük** | `getDictValue` nested-only | **INV-5** `i18n-key-resolution.test.ts` (her statik `t('a.b.c')` sözlükte çözülmeli; içinde-nokta düz anahtar = ham-key render) | ✅ KAPALI (ratchet: 2026-06-16'da 32 debt donduruldu → admin literal batch #364 15'ini çözünce 32→17 sıkıştı; yeni kırılma kırar) |
 
 **Açık eksenleri kapatma yöntemi:** drift denetimi (ajan) → maestro paralel göç → merkezi kapı (type+lint+test+build) → **yeni INV-x conformance testi** → commit. (B ekseninin yaptığı gibi.)
 
@@ -64,7 +66,7 @@
 
 ## 4. DoD — Canlı UI'da ASLA görünmemeli
 
-- [ ] Ham anahtar sızıntısı yok (`account.x.y` gibi nokta-yollu metin).
+- [ ] Ham anahtar sızıntısı yok (`account.x.y` gibi nokta-yollu metin) — **INV-5 keycheck** otomatik tutar; her statik `t('...')` sözlükte çözülmeli.
 - [ ] Çözülmemiş `{{placeholder}}` / `NaN` / `undefined` yok.
 - [ ] Dil değişince TÜM metin + tarih/para biçimi güncelleniyor.
 - [ ] Dilsiz URL yok (her iç link `/tr|/en` önekli render ediliyor).
@@ -76,6 +78,6 @@
 ## 5. İlgili
 
 - **Playbook (nasıl):** `.claude/skills/i18n-conventions` · toplu göç makinesi `docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md`
-- **Kapı kaynak:** `src/__tests__/conformance/` (INV-1 entity-adı · INV-2 localize-rota · INV-3 sayısal/zamansal biçim · INV-4 metadata JSONB-çeviri)
+- **Kapı kaynak:** `src/__tests__/conformance/` (INV-1 entity-adı · INV-2 localize-rota · INV-3 sayısal/zamansal biçim · INV-4 metadata JSONB-çeviri · INV-5 key-çözünürlük/keycheck)
 - **Komşu cetveller:** `admin-standard.md`, `dealer-network-standard.md` · **SEO:** `docs/plans/seo-transition-blueprint.md`
 - **CLAUDE.md** Kural #7 (i18n) bu cetvelin özetidir.
