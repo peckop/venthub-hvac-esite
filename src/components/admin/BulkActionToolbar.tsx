@@ -2,6 +2,8 @@
 
 import React from 'react'
 
+import { useI18n } from '@/i18n/I18nProvider'
+
 import { adminButtonPrimaryClass } from '../../utils/adminUi'
 
 interface BulkActionToolbarProps {
@@ -13,6 +15,11 @@ interface BulkActionToolbarProps {
     onClearSelection: () => void
 }
 
+const PRICE_ICON = '💰 '
+const PERCENT_ICON = '% '
+const LIRA_ICON = '₺ '
+const DELETE_ICON = '🗑 '
+
 const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
     selectedCount,
     onStatusChange,
@@ -21,6 +28,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
     onPriceAdjust,
     onClearSelection,
 }) => {
+    const { t } = useI18n()
     const [showPricePanel, setShowPricePanel] = React.useState(false)
     const [priceMode, setPriceMode] = React.useState<'percent' | 'fixed'>('percent')
     const [priceValue, setPriceValue] = React.useState('')
@@ -35,9 +43,9 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                     <div className="bg-white/20 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                         {selectedCount}
                     </div>
-                    <span className="text-sm font-medium">ürün seçili</span>
+                    <span className="text-sm font-medium">{t('admin.toolbar.itemsSelected')}</span>
                     <button onClick={onClearSelection} className="text-white/60 hover:text-white text-xs ml-1 underline">
-                        Temizle
+                        {t('admin.toolbar.clear')}
                     </button>
                 </div>
 
@@ -48,13 +56,13 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                     onClick={() => onStatusChange('active')}
                     className="px-3 py-1.5 rounded-lg bg-emerald-500/80 hover:bg-emerald-500 text-xs font-medium transition-colors"
                 >
-                    Aktif Yap
+                    {t('admin.toolbar.makeActive')}
                 </button>
                 <button
                     onClick={() => onStatusChange('inactive')}
                     className="px-3 py-1.5 rounded-lg bg-gray-400/80 hover:bg-gray-400 text-xs font-medium transition-colors"
                 >
-                    Pasif Yap
+                    {t('admin.toolbar.makePassive')}
                 </button>
 
                 <div className="h-6 w-px bg-white/20" />
@@ -64,7 +72,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                     onClick={() => onFeatureToggle(true)}
                     className="px-3 py-1.5 rounded-lg bg-yellow-500/80 hover:bg-yellow-500 text-xs font-medium transition-colors"
                 >
-                    Vitrine Çıkar
+                    {t('admin.toolbar.feature')}
                 </button>
 
                 <div className="h-6 w-px bg-white/20" />
@@ -75,23 +83,23 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                         onClick={() => setShowPricePanel(!showPricePanel)}
                         className="px-3 py-1.5 rounded-lg bg-blue-400/80 hover:bg-blue-400 text-xs font-medium transition-colors"
                     >
-                        💰 Fiyat Güncelle
+                        {PRICE_ICON}{t('admin.toolbar.updatePrice')}
                     </button>
                     {showPricePanel && (
                         <div className="absolute bottom-full mb-2 left-0 bg-white text-gray-800 rounded-xl shadow-2xl p-4 min-w-280px border border-gray-200">
-                            <div className="text-sm font-semibold mb-3 text-primary-navy">Toplu Fiyat Güncelleme</div>
+                            <div className="text-sm font-semibold mb-3 text-primary-navy">{t('admin.toolbar.bulkPriceUpdate')}</div>
                             <div className="flex gap-2 mb-3">
                                 <button
                                     onClick={() => setPriceMode('percent')}
                                     className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${priceMode === 'percent' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-gray-50 border-gray-200 hover:border-primary-navy'}`}
                                 >
-                                    % Yüzde
+                                    {PERCENT_ICON}{t('admin.toolbar.percentage')}
                                 </button>
                                 <button
                                     onClick={() => setPriceMode('fixed')}
                                     className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${priceMode === 'fixed' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-gray-50 border-gray-200 hover:border-primary-navy'}`}
                                 >
-                                    ₺ Sabit Tutar
+                                    {LIRA_ICON}{t('admin.toolbar.fixedAmount')}
                                 </button>
                             </div>
                             <div className="flex gap-2 items-center">
@@ -99,26 +107,26 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                                     type="number"
                                     value={priceValue}
                                     onChange={(e) => setPriceValue(e.target.value)}
-                                    placeholder={priceMode === 'percent' ? 'Örn: 15 (zam) veya -10 (indirim)' : 'Örn: 500 (ekle) veya -200 (düş)'}
+                                    placeholder={priceMode === 'percent' ? t('admin.toolbar.placeholderPercent') : t('admin.toolbar.placeholderFixed')}
                                     className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/30"
                                 />
                                 <button
                                     onClick={() => {
                                         const v = parseFloat(priceValue)
-                                        if (isNaN(v)) return alert('Geçerli bir sayı giriniz.')
+                                        if (isNaN(v)) return alert(t('admin.toolbar.invalidNumberAlert'))
                                         onPriceAdjust(priceMode, v)
                                         setShowPricePanel(false)
                                         setPriceValue('')
                                     }}
                                     className={`${adminButtonPrimaryClass} !py-2 !text-xs`}
                                 >
-                                    Uygula
+                                    {t('admin.common.apply')}
                                 </button>
                             </div>
                             <div className="text-xs text-gray-400 mt-2">
                                 {priceMode === 'percent'
-                                    ? 'Pozitif değer = Zam, Negatif değer = İndirim'
-                                    : 'Pozitif değer = Fiyata Ekle, Negatif değer = Fiyattan Düş'}
+                                    ? t('admin.toolbar.priceHintPercent')
+                                    : t('admin.toolbar.priceHintFixed')}
                             </div>
                         </div>
                     )}
@@ -131,7 +139,7 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                     onClick={onDelete}
                     className="px-3 py-1.5 rounded-lg bg-red-500/80 hover:bg-red-500 text-xs font-medium transition-colors"
                 >
-                    🗑 Sil
+                    {DELETE_ICON}{t('admin.common.delete')}
                 </button>
             </div>
         </div>

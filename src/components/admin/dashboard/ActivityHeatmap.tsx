@@ -1,3 +1,5 @@
+'use client'
+
 import { Activity } from 'lucide-react'
 import {
     Cell,
@@ -8,6 +10,8 @@ import {
     XAxis,
     YAxis,
     ZAxis} from 'recharts'
+
+import { useI18n } from '@/i18n/I18nProvider'
 
 import AdminEmptyState from '../AdminEmptyState'
 
@@ -23,11 +27,21 @@ interface ActivityHeatmapProps {
 }
 
 const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
+    const { t } = useI18n()
+
     // Transform data for the chart
     // JS getDay(): 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
     // Our chart Y axis: 0=Mon, 1=Tue, ..., 6=Sun (to keep Monday on top or bottom)
 
-    const dayNames = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
+    const dayNames = [
+        t('admin.dashboard.days.mon'),
+        t('admin.dashboard.days.tue'),
+        t('admin.dashboard.days.wed'),
+        t('admin.dashboard.days.thu'),
+        t('admin.dashboard.days.fri'),
+        t('admin.dashboard.days.sat'),
+        t('admin.dashboard.days.sun')
+    ]
 
     // Transform data for the chart
     const chartData = data.map(d => {
@@ -49,11 +63,12 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
     const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { payload: HeatmapData & { dayName: string } }[] }) => {
         if (active && payload && payload.length) {
             const data = payload[0].payload
+            const formattedTime = `${data.dayName}, ${String(data.hour).padStart(2, '0')}:00`
             return (
                 <div className="glass-strong border border-white/5 py-3 px-5 rounded-2xl z-50 shadow-elevation-4 animate-in fade-in zoom-in-95 duration-200">
-                    <p className="text-sm font-black text-white mb-2 uppercase tracking-wider">{data.dayName}, {String(data.hour).padStart(2, '0')}:00</p>
+                    <p className="text-sm font-black text-white mb-2 uppercase tracking-wider">{formattedTime}</p>
                     <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
-                        Sipariş: <span className="text-cyan-400 drop-shadow-heatmap-glow">{data.count}</span>
+                        {t('admin.dashboard.heatmap.order')}: <span className="text-cyan-400 drop-shadow-heatmap-glow">{data.count}</span>
                     </p>
                 </div>
             )
@@ -84,8 +99,8 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
                 <div className="flex-1 flex flex-col items-center justify-center">
                     <AdminEmptyState 
                         icon={Activity} 
-                        title="Aktivite Bulunamadı" 
-                        description="Seçili aralıkta henüz aktivite kaydı bulunmuyor." 
+                        title={t('admin.dashboard.heatmap.noActivity')} 
+                        description={t('admin.dashboard.heatmap.noActivityDesc')} 
                         compact 
                     />
                 </div>
@@ -99,7 +114,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
                             <XAxis
                                 type="number"
                                 dataKey="hour"
-                                name="Saat"
+                                name={t('admin.dashboard.heatmap.hour')}
                                 domain={[0, 23]}
                                 tickCount={24}
                                 tick={{ fontSize: 9, fill: '#64748B', fontWeight: 900 }}
@@ -112,13 +127,13 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
                             <YAxis
                                 type="number"
                                 dataKey="dayIndex"
-                                name="Gün"
+                                name={t('admin.dashboard.heatmap.day')}
                                 domain={[0, 6]}
                                 tickCount={7}
                                 tick={{ fontSize: 10, fill: '#64748B', fontWeight: 900 }}
                                 axisLine={false}
                                 tickLine={false}
-                                tickFormatter={(val) => dayNames[val].toUpperCase()}
+                                tickFormatter={(val) => dayNames[val]?.toUpperCase()}
                                 reversed // Monday at the top
                             />
                             <ZAxis
@@ -157,7 +172,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
 
             {chartData.length > 0 && (
                 <div className="mt-8 flex items-center justify-end gap-4 px-6 relative z-10">
-                    <span className="text-xs text-slate-600 font-black uppercase tracking-hvac-normal italic">Yoğunluk Skalası</span>
+                    <span className="text-xs text-slate-600 font-black uppercase tracking-hvac-normal italic">{t('admin.dashboard.heatmap.densityScale')}</span>
                     <div className="flex items-center gap-2 p-1.5 glass rounded-full border border-white/5">
                         <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-20 border border-white/10"></div>
                         <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-50 border border-white/10"></div>

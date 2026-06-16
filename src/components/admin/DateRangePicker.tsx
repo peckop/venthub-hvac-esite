@@ -17,7 +17,7 @@ interface DateRangePickerProps {
 }
 
 const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, placeholder, className = '' }) => {
-    const { lang } = useI18n()
+    const { lang, t } = useI18n()
     const locale = lang === 'en' ? enUS : tr
 
     const [isOpen, setIsOpen] = useState(false)
@@ -40,38 +40,38 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
 
     const presets = [
         {
-            label: 'Bugün',
+            label: t('admin.common.today'),
             getRange: () => ({ from: startOfDay(new Date()), to: endOfDay(new Date()) })
         },
         {
-            label: 'Dün',
+            label: t('admin.common.yesterday'),
             getRange: () => ({ from: startOfDay(subDays(new Date(), 1)), to: endOfDay(subDays(new Date(), 1)) })
         },
         {
-            label: 'Son 7 Gün',
+            label: t('admin.common.last7Days'),
             getRange: () => ({ from: startOfDay(subDays(new Date(), 6)), to: endOfDay(new Date()) })
         },
         {
-            label: 'Son 30 Gün',
+            label: t('admin.common.last30Days'),
             getRange: () => ({ from: startOfDay(subDays(new Date(), 29)), to: endOfDay(new Date()) })
         },
         {
-            label: 'Bu Hafta',
+            label: t('admin.common.thisWeek'),
             getRange: () => ({ from: startOfWeek(new Date(), { weekStartsOn: 1 }), to: endOfWeek(new Date(), { weekStartsOn: 1 }) })
         },
         {
-            label: 'Bu Ay',
+            label: t('admin.common.thisMonth'),
             getRange: () => ({ from: startOfMonth(new Date()), to: endOfMonth(new Date()) })
         },
         {
-            label: 'Geçen Ay',
+            label: t('admin.common.lastMonth'),
             getRange: () => {
                 const lp = subMonths(new Date(), 1)
                 return { from: startOfMonth(lp), to: endOfMonth(lp) }
             }
         },
         {
-            label: 'Bu Yıl',
+            label: t('admin.common.thisYear'),
             getRange: () => ({ from: startOfYear(new Date()), to: endOfYear(new Date()) })
         }
     ]
@@ -92,7 +92,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
 
     const triggerLabel = value?.from
         ? `${format(value.from, 'dd MMM yyyy', { locale })} ${value.to ? `- ${format(value.to, 'dd MMM yyyy', { locale })}` : ''}`
-        : (placeholder || 'Tarih Aralığı Seçiniz')
+        : (placeholder || t('admin.common.selectDateRange'))
 
     // Tailwind CSS override for react-day-picker
     const dayPickerClassNames = {
@@ -145,7 +145,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
 
                     {/* Preset Buttons - Left Sidebar */}
                     <div className="md:w-48 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200/60 p-3 overflow-y-auto max-h-60vh">
-                        <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">Hızlı Seçim</div>
+                        <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">{t('admin.common.quickSelect')}</div>
                         <div className="flex flex-col gap-1">
                             {presets.map((preset, idx) => {
                                 const isSelected =
@@ -187,25 +187,25 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
                             <span className="text-xs text-slate-500 font-medium">
                                 {selectedRange?.from ? (
                                     <>
-                                        Aralık: <b className="text-slate-700">{format(selectedRange.from, 'dd MMM', { locale })}</b>
+                                        {t('admin.common.range')}: <b className="text-slate-700">{format(selectedRange.from, 'dd MMM', { locale })}</b>
                                         {selectedRange.to ? (
                                             <>
                                                 {' '} - <b className="text-slate-700">{format(selectedRange.to, 'dd MMM', { locale })}</b>
                                             </>
                                         ) : ' - '}
                                     </>
-                                ) : 'Tarih aralığı seçin'}
+                                ) : t('admin.common.selectDateRange')}
                             </span>
                             <div className="flex items-center gap-2">
                                 <button onClick={cancelSelection} className="px-5 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
-                                    Vazgeç
+                                    {t('admin.common.discard')}
                                 </button>
                                 <button
                                     onClick={applySelection}
                                     disabled={!selectedRange?.from}
                                     className="px-6 py-2 text-sm font-bold bg-primary-navy text-white hover:bg-primary-navy/90 rounded-lg shadow-md shadow-primary-navy/20 active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
                                 >
-                                    Uygula
+                                    {t('admin.common.apply')}
                                 </button>
                             </div>
                         </div>

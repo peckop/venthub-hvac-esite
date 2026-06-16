@@ -91,6 +91,8 @@ const RETURNS_SELECT =
 
 const STATUS_VALUES = ['requested', 'approved', 'rejected', 'in_transit', 'received', 'refunded', 'cancelled'] as const
 
+const EMPTY_DASH = '—'
+
 /* ---- fetcher: client-mode (sayfa-bağımsız, limit 500) ---- */
 async function returnsFetcher(
   supabase: SupabaseClient<Database>,
@@ -352,7 +354,7 @@ const ReturnsTableBody: React.FC = () => {
         cell: (r) => {
           const next = allowedNextStatuses(r.status)
           if (!hasWriteAccess || next.length === 0) {
-            return <span className="text-xs text-slate-400">{'—'}</span>
+            return <span className="text-xs text-slate-400">{EMPTY_DASH}</span>
           }
           return (
             <div className="flex gap-1.5">

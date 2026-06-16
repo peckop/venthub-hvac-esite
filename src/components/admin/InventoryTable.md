@@ -3,81 +3,88 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryTable.tsx
-skeleton_hash: 082d9c9b95cc1a84
+skeleton_hash: d63c221ac89c815d
 entity_hashes:
-  func:InventoryTable: 056840a2667ef544
-  overview: 163a93a3c7286734
+  func:InventoryTable: 5588b8e97a6e44fb
+  overview: 0718ce22af046921
   style_tokens: 4bf1cdbb52b9f224
-generated_at: 2026-06-08T10:08:37Z
+generated_at: 2026-06-16T10:18:09Z
 ---
 
 ## Genel Bakış
-InventoryTable, yönetim panelinde envanter verilerini tablo formatında gösteren bir React bileşenidir. Gelen satır verileri, yükleme ve hata durumları ile seçili satır ve görünür sütun bilgilerini işleyerek kullanıcıya etkileşimli bir tablo sunar.
+InventoryTable, yönetim panelinde envanter verilerini düzenli bir tablo formatında sergileyen React bileşenidir. Yüklenme, hata ve boş veri durumlarını akıllıca yöneterek kullanıcıya kesintisiz bir deneyim sunar ve satır seçimleri ile sütun görünürlüğü üzerinden etkileşim imkanı sağlar.
 
 ## Fonksiyon Grupları
-### UI Render ve Tablo Oluşturma
-Bileşen, gelen verilere göre tablo başlıklarını, satırlarını ve hücre yapısını oluşturarak görsel düzeni üretir.
+### Veri Görselleştirme ve Tablo Yapısı
+Gelen envanter satırlarını ve görünür sütun tanımlarını alarak tablo başlıklarını, satır satırlarını ve hücre düzenini oluşturur. Temel render sorumluluğu bu grup tarafından üstlenilir.
 - InventoryTable
 
-### Durum Yönetimi ve Koşullu Renderlama
-Yükleme, hata ve boş veri durumlarını kontrol ederek uygun gösterge veya mesajları tablo ile birlikte veya yerine render eder.
-- InventoryTable (iç mantıkta)
+### Durum Yönetimi ve Koşullu Gösterim
+Yüklenme süreci, hata oluşumu veya verinin hiç bulunmaması gibi durumları kontrol ederek uygun arayüz mesajlarını veya göstergelerini tablonun önüne veya yerine render eder.
+- InventoryTable
 
-### Etkileşim ve Seçim Yönetimi
-Kullanıcının satır seçimini ve sütun görünürlüğünü yönetir; ilgili callback fonksiyonlarını kullanarak üst bileşenlerle durum paylaşımını sağlar.
-- InventoryTable (prop kullanımında)
+### Etkileşim Koordinasyonu
+Kullanıcı tarafından yapılan satır seçimlerini ve sütun görünürlük tercihlerini üst bileşenlere iletmek üzere yönetir; bu sayede tablonun durumu uygulama geneliyle senkronize kalır.
+- InventoryTable
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu bir React bileşeni (InventoryTable) olup, belirli prop'ların varlığı ve tipleri üzerine kuruludur. Aşağıdaki aksiyomlar, fonksiyon imzasından çıkarılmıştır.
 
-Bu modül için fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzası temelinde sınırlı aksiyomlar üretilebilir.
-
-**[Aksiyom 1]:** Eğer `rows` prop'u undefined veya null olarak sağlanırsa, tablonun veri satırları gösterilemeyeceği veya boş duruma geçeceği varsayılır.
-
-**[Aksiyom 2]:** Eğer `loading` prop'u true olarak sağlanırsa, tablonun veri yüklenme sürecinde olduğunu ve muhtemelen bir yüklenme göstergesi sunacağı varsayılır.
-
-**[Aksiyom 3]:** Eğer `error` prop'u truthy bir değer olarak sağlanırsa, tablonun hata durumunu gösterdiği ve veri göstermeyi askıya alabileceği varsayılır.
-
-**[Aksiyom 4]:** Eğer `visibleCols` prop'u boş bir dizi olarak sağlanırsa, tabloda hiçbir sütunun görüntülenmeyeceği varsayılır.
-
-**[Aksiyom 5]:** `den` prop'unun rolü ve türü fonksiyon imzasından net olarak anlaşılamamaktadır — davranışı belirsizdir.
+[Aksiyom 1]: Eğer `rows` prop'u verilmemiş veya `undefined` ise, bileşen tabloyu hiçbir satır göstermeden render eder veya `loading`/`error` durumuna göre davranır.
+[Aksiyom 2]: Eğer `loading` prop'u `true` değilse (veya `undefined` ise), bileşen yükleme göstergesini render etmez.
+[Aksiyom 3]: Eğer `error` prop'u `undefined` veya `null` ise, bileşen hata mesajını göstermez.
+[Aksiyom 4]: Eğer `selected` prop'u bir `Set` veya `Array` içermiyorsa (veya `undefined` ise), bileşen hiçbir satırı seçili olarak işaretleyemez.
+[Aksiyom 5]: Eğer `visibleCols` prop'u geçerli bir sütun listesi içermiyorsa (veya `undefined` ise), bileşen tüm potansiyel sütunları (veri yapısından çıkarılarak) veya hiçbirini gösteremeyebilir.
+[Aksiyom 6]: Eğer `den` prop'u `InventoryTableProps` arayüzüne uymayan bir değer ise, TypeScript çalışma zamanında hata verebilir veya bileşen beklenmedik davranış sergileyebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### InventoryTable
-**Ne yapar**: Kullanıcı arayüzünde envanter verilerini tablo biçiminde gösterir. Tablo, ürün bilgileri, stok durumları, konum ve tedarikçi gibi alanları dinamik olarak görüntüler ve sıralama, seçme, güncelleme gibi etkileşimleri destekler.  
-**Nasıl yapar**:  
-- `useDragScroll` ile yatay kaydırma desteği eklenir.  
-- `density` parametresiyle hücre ve başlık boşlukları ayarlanır.  
-- `sortIndicator` fonksiyonu, geçerli sıralama anahtarına göre ok işaretini döndürür.  
-- `statusBadge` fonksiyonu, stok miktarına ve eşik değerine göre renkli durum etiketleri üretir.  
-- `TableRow` bileşeni, her satır için görünür sütunları kontrol eder, hücreleri biçimlendirir ve tıklama olaylarını yönlendirir.  
-- Tablo başlıkları, sıralama fonksiyonunu tetikleyen butonlar içerir ve açıklama balonları (`InfoTooltip`) sunar.  
-- Yükleme, hata ve boş veri durumları için uygun yer tutucu, hata mesajı veya boşluk bileşenleri gösterilir.  
-- `groupByCategory` aktifse, satırlar kategori başlıklarıyla gruplanır; aksi halde tek bir liste halinde gösterilir.  
+**Ne yapar**: Envanter tablosunu gösteren ana React bileşenidir. Stok verilerini, sıralama, gruplama, durum gösterimi ve düzenleme yetkisine göre düzenlenebilir hücrelerle birlikte sunar.
+**Nasıl yapar**: `InventoryTableProps` aracılığıyla aldığı parametreleri kullanarak, tablonun başlığını ve gövdesini oluşturur. `useI18n` hook'u ile uluslararasılaştırma sağlar. `useDragScroll` hook'u ile yatay sürükleme yeteneği ekler. `density` parametresine göre sıkışık veya normal yoğunlukta hücre dolguları ayarlar. `sortIndicator` ve `statusBadge` yardımcı fonksiyonlarını kullanarak sıralama göstergeleri ve durum rozetleri oluşturur. `visibleCols` parametresine göre hangi sütunların görüneceğini belirler. `hasWriteAccess` durumuna göre düzenlenebilir hücreleri (`EditableCell`) veya salt okunur metinleri gösterir. `groupByCategory` ve `groupedRows` kullanarak kategorilere göre gruplanmış satırlar veya düz satırlar gösterir. Yüklenme durumunda `AdminSkeleton`, hata durumunda hata mesajı, boş durumda `AdminEmptyState` gösterir.
 **Parametreler**:
-- rows: InventoryRow[] — Gösterilecek envanter satırları dizisi  
-- loading: LoadState — Yükleme durumunu belirten enum (Loading, Success, Error)  
-- error: string | null — Hata mesajı, varsa  
-- selected: InventoryRow | null — Şu an seçili olan satır  
-- visibleCols: { [key: string]: boolean } — Görünür sütunları tanımlayan nesne  
-- density: 'compact' | 'comfortable' — Hücre boşluk yoğunluğu  
-- sortKey: SortKey — Şu anki sıralama anahtarı  
-- sortDir: 'asc' | 'desc' — Sıralama yönü  
-- groupByCategory: boolean — Kategorilere göre grupla  
-- groupedRows: GroupedInventoryRow[] — Kategorilere ayrılmış satırlar  
-- onSort: (key: SortKey) => void — Sıralama değiştiğinde çağrılan fonksiyon  
-- onSelect: (row: InventoryRow) => void — Satır seçildiğinde çağrılan fonksiyon  
-- onUpdateLocation: (productId: string, location: string) => void — Konum güncellendiğinde çağrılan fonksiyon  
-- onUpdateSupplier: (productId: string, supplier: string) => void — Tedarikçi güncellendiğinde çağrılan fonksiyon  
-- hasWriteAccess: boolean — Yazma izni olup olmadığını belirler  
-- thresholdMap: { [productId: string]: number } — Ürün bazlı eşik değerleri  
-- defaultThreshold: number | null — Varsayılan eşik değeri  
-- effectiveThreshold: (productId: string) => number | null — Ürün için geçerli eşik değerini döndürür  
-**Dönüş**: void (React bileşeni, JSX döndürür)
+- rows: `InventoryRow[]` — Görüntülenecek envanter satırları dizisi.
+- loading: `LoadState` — Veri yükleme durumunu belirten enum değeri (ör. `LoadState.Loading`).
+- error: `string` — Hata durumunda gösterilecek hata mesajı.
+- selected: `InventoryRow | null` — Seçili satır nesnesi; seçili satırın vurgulanmasını sağlar.
+- visibleCols: `Record<string, boolean>` — Hangi sütunların görüneceğini belirten bir nesne (ör. `{ name: true, physical: false }`).
+- density: `'compact' | 'normal'` — Hücre yoğunluğu; sıkışık modda daha az dolgu uygulanır.
+- sortKey: `SortKey` — Aktif sıralama sütununu belirten anahtar.
+- sortDir: `'asc' | 'desc'` — Sıralama yönü (artan veya azalan).
+- groupByCategory: `boolean` — Kategorilere göre gruplama yapılsın mı?
+- groupedRows: `GroupedRows[]` — Kategorilere göre gruplanmış satırlar dizisi; her grup bir `_c_id`, `name` ve `items` içerir.
+- onSort: `(key: SortKey) => void` — Sütun başlığına tıklandığında çağrılan sıralama işlevi.
+- onSelect: `(row: InventoryRow) => void` — Satır seçildiğinde çağrılan işlev.
+- onUpdateLocation: `(productId: string, value: string) => void` — Depo konumu düzenlendiğinde çağrılan işlev.
+- onUpdateSupplier: `(productId: string, value: string) => void` — Tedarikçi adı düzenlendiğinde çağrılan işlev.
+- hasWriteAccess: `boolean` — Kullanıcının yazma yetkisi olup olmadığını belirtir; düzenleme hücrelerinin etkinliğini kontrol eder.
+- thresholdMap: `Record<string, number>` — Ürün kimliğine göre eşik değerlerini eşleyen harita.
+- defaultThreshold: `number` — Eşik haritasında bulunmayan ürünler için varsayılan eşik değeri.
+- effectiveThreshold: `(productId: string) => number | null` — Ürün için geçerli eşik değerini hesaplayan fonksiyon; ürün kimliğini alır ve eşik değerini veya null döndürür.
+**Dönüş**: `JSX.Element` — Envanter tablosunu içeren React bileşeni (bir `<div>` ve içinde `<table>` yapısı).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useDragScroll::useDragScroll
+- import: ../../types/inventory::Density
+- import: ../../types/inventory::InventoryRow
+- import: ../../types/inventory::LoadState
+- import: ../../types/inventory::SortKey
+- import: ../../types/inventory::VisibleCols
+- import: ../../utils/adminUi::adminTableCellClass
+- import: ../../utils/adminUi::adminTableHeadCellClass
+- import: ./AdminEmptyState::AdminEmptyState
+- import: ./AdminSkeleton::AdminSkeleton
+- import: ./EditableCell::EditableCell
+- import: ./InfoTooltip::InfoTooltip
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::SearchX
+- import: react::React
 
 ---
 
@@ -108,35 +115,34 @@ Bu modül için fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzası t
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: InventoryTable.tsx::InventoryTable
-- **params**: (rows, loading, error, selected, visibleCols, density, sortKey, sortDir, groupByCategory, groupedRows, onSort, onSelect, onUpdateLocation, onUpdateSupplier, hasWriteAccess, thresholdMap, defaultThreshold, effectiveThreshold)
+- **params**: rows, loading, error, selected, visibleCols, density, sortKey, sortDir, groupByCategory, groupedRows, onSort, onSelect, onUpdateLocation, onUpdateSupplier, hasWriteAccess, thresholdMap, defaultThreshold, effectiveThreshold
 - **ic_degiskenler**:
-  - `dragScrollRef` — useDragScroll hook'unun oluşturduğu DOM referansı, sürükleme ile yatay kaydırma için kullanılır
-  - `headPad` — density 'compact' ise 'px-2 py-2', değilse boş string; tablo başlık hücreleri için padding belirler
-  - `cellPad` — density 'compact' ise 'px-2 py-2', değilse boş string; tablo veri hücreleri için padding belirler
-  - `sortIndicator` — SortKey parametresi alan iç fonksiyon, sıralama yönüne göre ok karakteri (▲/▼) döndürür
-  - `statusBadge` — InventoryRow parametresi alan iç fonksiyon, stok durumuna göre JSX badge döndürür
-  - `TableRow` — InventoryRow parametresi alan React bileşeni, tek bir tablo satırını render eder
-- **Dönüş**: JSX (div > table yapısı, dragScrollRef ile sarmalanmış)
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, metinleri dil için kullanılır
+  - `dragScrollRef` — useDragScroll hook'undan gelen ref, sürükleme ile yatay kaydırma için kullanılır
+  - `headPad` — density compact ise tablo başlık hücresi için padding className'i
+  - `cellPad` — density compact ise tablo gövde hücresi için padding className'i
+  - `sortIndicator` — iç fonksiyon, sortKey ve sortDir'e göre sıralama göstergesi döndürür
+  - `statusBadge` — iç fonksiyon, InventoryRow'a göre durum rozeti döndürür
+  - `TableRow` — iç bileşen, tek bir tablo satırını render eder
+- **Dönüş**: JSX element (tablo yapısı)
 
 ### [N2_NASIL] AST Pointer: InventoryTable.tsx::sortIndicator
-- **params**: (key: SortKey)
-- **ic_degiskenler**:
-  - (yok — parametre ve closure değişkenleri kullanır)
-- **Dönüş**: string (empty, '▲', veya '▼')
+- **params**: key
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string (sıralama göstergesi karakteri veya boş string)
 
 ### [N3_NASIL] AST Pointer: InventoryTable.tsx::statusBadge
-- **params**: (r: InventoryRow)
+- **params**: r
 - **ic_degiskenler**:
-  - `net` — r.available_stock değerini temsil eder, mevcut stok miktarı
-  - `th` — effectiveThreshold(r.product_id) çağrısıyla elde edilen eşik değeri, null veya number olabilir
-  - `base` — ortak CSS sınıf dizisi, tüm badge varyantları için temel stil tanımlar
-- **Dönüş**: JSX (span elementi, duruma göre farklı CSS sınıfları ve metin)
+  - `net` — Ürünün mevcut stok miktarı (r.available_stock)
+  - `th` — Ürün için eşik değeri (effectiveThreshold fonksiyonu ile hesaplanır)
+  - `base` — Rozet için ortak CSS className'i
+- **Dönüş**: JSX element (span içinde durum rozeti)
 
 ### [N4_NASIL] AST Pointer: InventoryTable.tsx::TableRow
-- **params**: ({ r }: { r: InventoryRow })
-- **ic_degiskenler**:
-  - (yok — sadece parametre r kullanılır, dış kapsamdaki visibleCols, selected, cellPad, onSelect, vb. kullanılır)
-- **Dönüş**: JSX (tr elementi, ürün verisini gösteren satır)
+- **params**: r
+- **ic_degiskenler**: (yok, sadece parametre ve closure değişkenleri kullanılır)
+- **Dönüş**: JSX element (tr içinde tek satır)
 
 ---
 

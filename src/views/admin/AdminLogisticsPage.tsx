@@ -1,9 +1,12 @@
  
-import { CheckCircle2, RefreshCw,Truck } from 'lucide-react'
+'use client'
+
+import { CheckCircle2, RefreshCw, Truck } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import React, { useCallback,useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useI18n } from '@/i18n/I18nProvider'
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
@@ -11,7 +14,6 @@ import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useDragScroll } from '../../hooks/useDragScroll'
 import { useRole } from '../../hooks/useRole'
-import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { 
     adminButtonPrimaryClass, 
@@ -24,6 +26,9 @@ import {
     adminSubtitleClass,
     adminTableCellClass,
     adminTableHeadCellClass} from '../../utils/adminUi'
+
+const HASH = '#'
+const SLASH_SEPARATOR = ' / '
 
 // Sadece kargo ataması bekleyen siparişler (confirmed)
 interface LogisticsRow {
@@ -241,7 +246,7 @@ export default function AdminLogisticsPage() {
                                     >
                                         <td className={`${adminTableCellClass} font-mono text-xs font-black text-cyan-400`}>
                                             <span className="bg-cyan-500/10 px-2 py-1 rounded-lg border border-cyan-500/20">
-                                                #{row.order_number}
+                                                {HASH}{row.order_number}
                                             </span>
                                         </td>
                                         <td className={`${adminTableCellClass} font-black text-white uppercase tracking-tight`}>{row.customer_name}</td>
@@ -278,7 +283,7 @@ export default function AdminLogisticsPage() {
                                                     <CheckCircle2 size={10} /> {t('admin.common.success')}
                                                 </span>
                                             ) : (
-                                                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest opacity-40">Ready</span>
+                                                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest opacity-40">{t('admin.ui.ready')}</span>
                                             )}
                                         </td>
                                     </tr>
@@ -291,7 +296,13 @@ export default function AdminLogisticsPage() {
                 {rows.length > 0 && (
                     <div className="p-6 bg-white/2 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-0 z-10 backdrop-blur-xl">
                         <div className="text-sm font-bold text-slate-400">
-                            <span className="text-cyan-400 font-black text-base">{rows.filter(r => r.tracking_number).length}</span> / {rows.length} {t('admin.titles.orders')} {t('admin.ui.ready') || 'Ready'}
+                            <span className="text-cyan-400 font-black text-base">{rows.filter(r => r.tracking_number).length}</span>
+                            {SLASH_SEPARATOR}
+                            {rows.length}
+                            {' '}
+                            {t('admin.titles.orders')}
+                            {' '}
+                            {t('admin.ui.ready')}
                         </div>
                         {hasWriteAccess && (
                             <button

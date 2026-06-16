@@ -335,20 +335,23 @@ const MovementsTableBody: React.FC = () => {
         sortable: true,
         hideable: true,
         align: 'right',
-        cell: (m) => (
-          <span
-            className={`inline-flex items-center gap-1 text-xs font-black font-mono px-3 py-1.5 rounded-xl border uppercase tracking-widest ${
-              m.delta > 0
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : m.delta < 0
-                  ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                  : 'bg-white/5 text-slate-500 border-white/5'
-            }`}
-          >
-            {m.delta > 0 ? <ArrowUpRight size={10} strokeWidth={3} /> : m.delta < 0 ? <ArrowDownRight size={10} strokeWidth={3} /> : null}
-            {m.delta > 0 ? `+${m.delta}` : m.delta}
-          </span>
-        ),
+        cell: (m) => {
+          const deltaText = m.delta > 0 ? `+${m.delta}` : `${m.delta}`
+          return (
+            <span
+              className={`inline-flex items-center gap-1 text-xs font-black font-mono px-3 py-1.5 rounded-xl border uppercase tracking-widest ${
+                m.delta > 0
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : m.delta < 0
+                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                    : 'bg-white/5 text-slate-500 border-white/5'
+              }`}
+            >
+              {m.delta > 0 ? <ArrowUpRight size={10} strokeWidth={3} /> : m.delta < 0 ? <ArrowDownRight size={10} strokeWidth={3} /> : null}
+              {deltaText}
+            </span>
+          )
+        },
       },
       {
         key: 'reason',
@@ -367,14 +370,16 @@ const MovementsTableBody: React.FC = () => {
         header: t('admin.movements.table.ref'),
         sortable: true,
         hideable: true,
-        cell: (m) =>
-          m.order_id ? (
+        cell: (m) => {
+          const orderRef = m.order_id ? `#${m.order_id.slice(-8).toUpperCase()}` : ''
+          return m.order_id ? (
             <span className="bg-white/5 px-2 py-1 rounded border border-white/5 font-black font-mono text-white/60 text-xs uppercase tracking-hvac-tight">
-              {`#${m.order_id.slice(-8).toUpperCase()}`}
+              {orderRef}
             </span>
           ) : (
             <span className="font-black font-mono text-white/60 text-xs">-</span>
-          ),
+          )
+        },
       },
     ],
     [t, lang],

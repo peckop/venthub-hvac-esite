@@ -1,22 +1,14 @@
-'use client'
-
-import dynamic from 'next/dynamic'
 import React from 'react'
 
-import { useI18n } from '../../i18n/I18nProvider'
+import { en } from '../../i18n/dictionaries/en'
+import { tr } from '../../i18n/dictionaries/tr'
+import { getDictValue } from '../../i18n/getDictValue'
+import { KvkkContentEn } from './components/en/KvkkContent'
+import { KvkkContentTr } from './components/tr/KvkkContent'
 
-const KvkkContentTr = dynamic(() => import('./components/tr/KvkkContent').then(m => m.KvkkContentTr), {
-  loading: () => <div className="animate-pulse h-96 bg-slate-100/50 rounded-lg" />,
-  ssr: true
-})
-
-const KvkkContentEn = dynamic(() => import('./components/en/KvkkContent').then(m => m.KvkkContentEn), {
-  loading: () => <div className="animate-pulse h-96 bg-slate-100/50 rounded-lg" />,
-  ssr: true
-})
-
-const KVKKPage: React.FC = () => {
-  const { lang, t } = useI18n()
+const KVKKPage: React.FC<{ lang: string }> = ({ lang }) => {
+  const dict = lang === 'en' ? en : tr
+  const t = (key: string) => getDictValue(dict, key)
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -40,6 +32,7 @@ const KVKKPage: React.FC = () => {
 }
 
 export default KVKKPage
+
 
 
 

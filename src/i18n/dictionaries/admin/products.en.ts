@@ -1,146 +1,159 @@
 export const products = {
-      subtitle: 'Manage the entire product catalog and track stock and price updates in real time.',
-      emptyTitle: 'No products yet',
-      emptyDescription: 'Add your first product to start building your catalog.',
-      filterEmptyDescription: 'No products match your search criteria. Please adjust the filters or add a new product.',
-      brandless: 'No brand',
-      noImage: 'No Img',
-      expand: {
-        title: 'Technical Product Parameters',
-        empty: 'No additional technical specifications defined for this product.'
-      },
-      bulk: {
-        statusConfirm: 'Are you sure you want to update the status of {{count}} selected products to "{{status}}"?',
-        statusFailed: 'Bulk update error',
-        featureFailed: 'Featured update error',
-        deleteConfirm: 'Are you sure you want to DELETE {{count}} selected products? This action cannot be undone!',
-        deleteFailed: 'Bulk delete error',
-        priceConfirm: 'A price update will be applied to {{count}} selected products. Do you confirm?',
-        priceFailed: 'Price update error'
-      },
-      toolbar: {
-        categoryTitle: 'Category',
-        allCategories: 'All Categories'
-      },
-      toggles: {
-        featuredOnly: 'Only: Featured'
-      },
-      statusLabels: {
-        active: 'Active',
-        inactive: 'Inactive',
-        out_of_stock: 'Out of Stock'
-      },
-      table: {
-        image: 'Image',
-        name: 'Name',
-        sku: 'SKU',
-        category: 'Category',
-        status: 'Status',
-        health: 'Performance',
-        price: 'Price',
-        stock: 'Stock',
-        actions: 'Actions'
-      },
-      export: {
-        csvLabel: 'CSV (UTF-8 BOM)'
-      },
-      import: {
-        button: 'Import (beta)',
-        previewTitle: 'CSV Preview (first 10 rows) — Total: {{total}}',
-        close: 'Close',
-        dryRun: 'Dry-run',
-        dryRunResult: 'Dry-run: required fields are {{status}}. Valid rows: {{ok}}/{{total}}',
-        statusComplete: 'complete',
-        statusMissing: 'missing',
-        writeButton: 'Write (upsert by SKU)',
-        needCsv: 'Select a CSV first',
-        minColumns: 'At least sku and name columns are required',
-        noneFound: 'No valid rows found',
-        done: 'Import finished: {{ok}} rows processed, {{fail}} rows failed',
-        error: 'Import error: {{msg}}'
-      },
-      edit: {
-        editing: 'Editing',
-        new: 'New Product',
-        tabs: {
-          info: 'Info',
-          pricing: 'Pricing',
-          stock: 'Stock',
-          images: 'Images',
-          seo: 'SEO'
-        },
-        actions: {
-          new: 'New',
-          save: 'Save',
-          delete: 'Delete'
-        },
-        info: {
-          name: 'Name',
-          sku: 'SKU',
-          modelCode: 'Model Code (MPN)',
-          modelPlaceholder: 'e.g., AD-H-900-T',
-          brand: 'Brand',
-          status: 'Status',
-          category: 'Category',
-          categoryUnset: '(Not selected)',
-          featured: 'Featured'
-        },
-        pricing: {
-          salePrice: 'Sale Price',
-          purchasePrice: 'Purchase Cost',
-          salePlaceholder: 'e.g., 1999.90',
-          purchasePlaceholder: 'e.g., 1499.50'
-        },
-        stock: {
-          stock: 'Stock',
-          lowThreshold: 'Low Stock Threshold',
-          stockPlaceholder: 'e.g., 50',
-          lowPlaceholder: 'e.g., 5',
-          hintBase: 'If empty, default threshold in Settings is used',
-          defaultSuffix: ' (Default: {{default}})'
-        },
-        images: {
-          saveFirst: 'Save the product first.',
-          none: 'No images yet. Select files to upload.',
-          altPlaceholder: 'Alt text',
-          up: 'Up',
-          down: 'Down',
-          makeCover: 'Make Cover',
-          delete: 'Delete'
-        },
-        seo: {
-          slug: 'Slug',
-          slugPlaceholder: 'sample-product',
-          slugRequired: 'Slug cannot be empty',
-          slugInUse: 'This slug is already in use',
-          metaTitle: 'Meta Title',
-          metaDesc: 'Meta Description',
-          chars: '{{count}} characters'
-        }
-      },
-      toasts: {
-        loadFailed: 'Could not load',
-        noPermission: 'You do not have permission for this action',
-        altSaveFailed: 'Could not save alt text: {{msg}}',
-        imagesSaved: 'Images saved',
-        imagesSaveFailed: 'Could not save images: {{msg}}',
-        orderNotChanged: 'Order not changed',
-        seoSaveFailed: 'Could not save SEO: {{msg}}',
-        productLoadFailed: 'Could not load product: {{msg}}',
-        saveFailed: 'Could not save: {{msg}}',
-        priceSaveFailed: 'Could not save price: {{msg}}',
-        stockSaveFailed: 'Could not save stock: {{msg}}',
-        deleteFailed: 'Could not delete: {{msg}}'
-      },
-      confirm: {
-        deleteImage: 'Do you want to delete the image?',
-        deleteProduct: 'Do you want to delete this product?'
-      },
-      form: {
-        category: 'Category',
-        name: 'Product Name',
-        outOfStock: 'Out of Stock',
-        price: 'Price',
-        select: 'Select'
-      }
+  subtitle: 'Manage the entire product catalog and track stock and price updates in real time.',
+  emptyTitle: 'No products yet',
+  emptyDescription: 'Add your first product to start building your catalog.',
+  filterEmptyDescription: 'No products match your search criteria. Please adjust the filters or add a new product.',
+  brandless: 'No brand',
+  noImage: 'No Img',
+  expand: {
+    title: 'Technical Product Parameters',
+    empty: 'No additional technical specifications defined for this product.',
+  },
+  bulk: {
+    statusConfirm: 'Are you sure you want to update the status of {{count}} selected products to "{{status}}"?',
+    statusFailed: 'Bulk update error',
+    featureFailed: 'Featured update error',
+    deleteConfirm: 'Are you sure you want to DELETE {{count}} selected products? This action cannot be undone!',
+    deleteFailed: 'Bulk delete error',
+    priceConfirm: 'A price update will be applied to {{count}} selected products. Do you confirm?',
+    priceFailed: 'Price update error',
+  },
+  toolbar: {
+    categoryTitle: 'Category',
+    allCategories: 'All Categories',
+  },
+  toggles: {
+    featuredOnly: 'Only: Featured',
+  },
+  statusLabels: {
+    active: 'Active',
+    inactive: 'Inactive',
+    out_of_stock: 'Out of Stock',
+  },
+  table: {
+    image: 'Image',
+    name: 'Name',
+    sku: 'SKU',
+    category: 'Category',
+    status: 'Status',
+    health: 'Performance',
+    price: 'Price',
+    stock: 'Stock',
+    actions: 'Actions',
+  },
+  export: {
+    csvLabel: 'CSV (UTF-8 BOM)',
+  },
+  import: {
+    button: 'Import (beta)',
+    previewTitle: 'CSV Preview (first 10 rows) — Total: {{total}}',
+    close: 'Close',
+    dryRun: 'Dry-run',
+    dryRunResult: 'Dry-run: required fields are {{status}}. Valid rows: {{ok}}/{{total}}',
+    statusComplete: 'complete',
+    statusMissing: 'missing',
+    writeButton: 'Write (upsert by SKU)',
+    needCsv: 'Select a CSV first',
+    minColumns: 'At least sku and name columns are required',
+    noneFound: 'No valid rows found',
+    done: 'Import finished: {{ok}} rows processed, {{fail}} rows failed',
+    error: 'Import error: {{msg}}',
+    closeSymbol: '✕',
+    moreRows: '... and {{count}} more rows.',
+    processing: 'Processing...',
+  },
+  edit: {
+    editing: 'Editing',
+    new: 'New Product',
+    tabs: {
+      info: 'Info',
+      pricing: 'Pricing',
+      stock: 'Stock',
+      images: 'Images',
+      seo: 'SEO',
+    },
+    actions: {
+      new: 'New',
+      save: 'Save',
+      delete: 'Delete',
+    },
+    info: {
+      name: 'Name',
+      sku: 'SKU',
+      modelCode: 'Model Code (MPN)',
+      modelPlaceholder: 'e.g., AD-H-900-T',
+      brand: 'Brand',
+      status: 'Status',
+      category: 'Category',
+      categoryUnset: '(Not selected)',
+      featured: 'Featured',
+    },
+    pricing: {
+      salePrice: 'Sale Price',
+      purchasePrice: 'Purchase Cost',
+      salePlaceholder: 'e.g., 1999.90',
+      purchasePlaceholder: 'e.g., 1499.50',
+    },
+    stock: {
+      stock: 'Stock',
+      lowThreshold: 'Low Stock Threshold',
+      stockPlaceholder: 'e.g., 50',
+      lowPlaceholder: 'e.g., 5',
+      hintBase: 'If empty, default threshold in Settings is used',
+      defaultSuffix: ' (Default: {{default}})',
+    },
+    images: {
+      saveFirst: 'Save the product first.',
+      none: 'No images yet. Select files to upload.',
+      altPlaceholder: 'Alt text',
+      up: 'Up',
+      down: 'Down',
+      makeCover: 'Make Cover',
+      delete: 'Delete',
+    },
+    seo: {
+      slug: 'Slug',
+      slugPlaceholder: 'sample-product',
+      slugRequired: 'Slug cannot be empty',
+      slugInUse: 'This slug is already in use',
+      metaTitle: 'Meta Title',
+      metaDesc: 'Meta Description',
+      chars: '{{count}} characters',
+    },
+  },
+  toasts: {
+    loadFailed: 'Could not load',
+    noPermission: 'You do not have permission for this action',
+    altSaveFailed: 'Could not save alt text: {{msg}}',
+    imagesSaved: 'Images saved',
+    imagesSaveFailed: 'Could not save images: {{msg}}',
+    orderNotChanged: 'Order not changed',
+    seoSaveFailed: 'Could not save SEO: {{msg}}',
+    productLoadFailed: 'Could not load product: {{msg}}',
+    saveFailed: 'Could not save: {{msg}}',
+    priceSaveFailed: 'Could not save price: {{msg}}',
+    stockSaveFailed: 'Could not save stock: {{msg}}',
+    deleteFailed: 'Could not delete: {{msg}}',
+    updateSuccess: 'Product updated successfully',
+    createSuccess: 'Product created successfully',
+  },
+  confirm: {
+    deleteImage: 'Do you want to delete the image?',
+    deleteProduct: 'Do you want to delete this product?',
+  },
+  form: {
+    category: 'Category',
+    name: 'Product Name',
+    outOfStock: 'Out of Stock',
+    price: 'Price',
+    select: 'Select',
+    sku: 'SKU',
+  },
+  errors: {
+    nameMin: 'Name must be at least 3 characters',
+    skuRequired: 'SKU is required',
+    brandRequired: 'Please select a brand',
+    categoryRequired: 'Please select a category',
+    loadFailed: 'Failed to load product',
+  },
 };

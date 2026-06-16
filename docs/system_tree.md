@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-12T10:45:34.762172+00:00
+compiled_at: 2026-06-16T11:10:07.536763+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-12T10:45:34.762172+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-16T11:10:07.536763+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -44,12 +44,22 @@ Bu belge, otonom derleyici tarafından 2026-06-12T10:45:34.762172+00:00 tarihind
 │   │   ├── ⚪ `plan-and-tasklist.md`
 │   │   └── ⚪ `project_state_and_skills_audit.md`
 │   ├── 📂 **audits/**
+│   │   ├── ⚪ `admin-cetvel-scores-2026-06-13.md`
 │   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
 │   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
+│   │   ├── ⚪ `legal-i18n-scope-antigravity-2026-06-16.md`
 │   │   └── ⚪ `lighthouse_diagnostic_2026-06-10.md`
 │   ├── ⚪ `database_schema_master.md`
 │   ├── ⚪ `design_system_config.md`
 │   ├── 📂 **plans/**
+│   │   ├── ⚪ `admin-enterprise-roadmap-2026-06-13.md`
+│   │   ├── ⚪ `avensair-teslim-yol-haritasi-2026-06-15.md`
+│   │   ├── ⚪ `faz0-kit-contract-2026-06-13.md`
+│   │   ├── ⚪ `faz1-migration-playbook-2026-06-13.md`
+│   │   ├── ⚪ `faz1-remaining-divided-2026-06-13.md`
+│   │   ├── ⚪ `faz2-admin-backlog.md`
+│   │   ├── ⚪ `i18n-jsx-literals-cleanup-2026-06-14.md`
+│   │   ├── ⚪ `seo-transition-blueprint.md`
 │   │   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
 │   │   ├── ⚪ `venthub_saas_faz1_prompt.md`
 │   │   └── ⚪ `venthub_saas_master_roadmap.md`
@@ -69,8 +79,10 @@ Bu belge, otonom derleyici tarafından 2026-06-12T10:45:34.762172+00:00 tarihind
 │   │   ├── ⚪ `SOURCES.md`
 │   │   ├── ⚪ `admin-capabilities.md`
 │   │   ├── ⚪ `admin-standard.md`
+│   │   ├── ⚪ `analytics-standard.md`
 │   │   ├── ⚪ `dealer-module-blueprint.md`
-│   │   └── ⚪ `dealer-network-standard.md`
+│   │   ├── ⚪ `dealer-network-standard.md`
+│   │   └── ⚪ `i18n-localization-standard.md`
 │   ├── ⚪ `supabase_functions_master.md`
 │   ├── ⚪ `system_tree.md`
 │   ├── ⚪ `venthub_hvac_master.md`
@@ -299,6 +311,13 @@ Bu belge, otonom derleyici tarafından 2026-06-12T10:45:34.762172+00:00 tarihind
 │   │   │   │   ├── ✅ `RecentOrdersTable.tsx`
 │   │   │   │   ├── ✅ `SalesChart.tsx`
 │   │   │   │   └── ✅ `StatCard.tsx`
+│   │   │   ├── 📂 **data-table/**
+│   │   │   │   ├── ✅ `BulkBar.tsx`
+│   │   │   │   ├── ✅ `DataTableHead.tsx`
+│   │   │   │   ├── ✅ `DataTableKit.tsx`
+│   │   │   │   ├── ✅ `FacetedFilter.tsx`
+│   │   │   │   ├── ✅ `persist.ts`
+│   │   │   │   └── ✅ `types.ts`
 │   │   │   └── 📂 **products/**
 │   │   │       ├── ✅ `ProductCsvImport.tsx`
 │   │   │       ├── ✅ `ProductFormModal.tsx`
@@ -450,6 +469,7 @@ Bu belge, otonom derleyici tarafından 2026-06-12T10:45:34.762172+00:00 tarihind
 │   │   └── ✅ `tokens.js`
 │   ├── 📂 **hooks/**
 │   │   ├── ✅ `use-mobile.tsx`
+│   │   ├── ✅ `useAdminTable.ts`
 │   │   ├── ✅ `useApiCall.ts`
 │   │   ├── ✅ `useAuth.ts`
 │   │   ├── ✅ `useCartHook.ts`
@@ -475,10 +495,65 @@ Bu belge, otonom derleyici tarafından 2026-06-12T10:45:34.762172+00:00 tarihind
 │   │   ├── ✅ `I18nProvider.tsx`
 │   │   ├── ✅ `datetime.ts`
 │   │   ├── 📂 **dictionaries/**
+│   │   │   ├── 📂 **admin/**
+│   │   │   │   ├── ✅ `a11y.en.ts`
+│   │   │   │   ├── ✅ `a11y.tr.ts`
+│   │   │   │   ├── ✅ `audit.en.ts`
+│   │   │   │   ├── ✅ `audit.tr.ts`
+│   │   │   │   ├── ✅ `authority.en.ts`
+│   │   │   │   ├── ✅ `authority.tr.ts`
+│   │   │   │   ├── ✅ `categories.en.ts`
+│   │   │   │   ├── ✅ `categories.tr.ts`
+│   │   │   │   ├── ✅ `common.en.ts`
+│   │   │   │   ├── ✅ `common.tr.ts`
+│   │   │   │   ├── ✅ `coupons.en.ts`
+│   │   │   │   ├── ✅ `coupons.tr.ts`
+│   │   │   │   ├── ✅ `dashboard.en.ts`
+│   │   │   │   ├── ✅ `dashboard.tr.ts`
+│   │   │   │   ├── ✅ `dataTable.en.ts`
+│   │   │   │   ├── ✅ `dataTable.tr.ts`
+│   │   │   │   ├── ✅ `en.ts`
+│   │   │   │   ├── ✅ `errorGroups.en.ts`
+│   │   │   │   ├── ✅ `errorGroups.tr.ts`
+│   │   │   │   ├── ✅ `errors.en.ts`
+│   │   │   │   ├── ✅ `errors.tr.ts`
+│   │   │   │   ├── ✅ `inventory.en.ts`
+│   │   │   │   ├── ✅ `inventory.tr.ts`
+│   │   │   │   ├── ✅ `logistics.en.ts`
+│   │   │   │   ├── ✅ `logistics.tr.ts`
+│   │   │   │   ├── ✅ `menu.en.ts`
+│   │   │   │   ├── ✅ `menu.tr.ts`
+│   │   │   │   ├── ✅ `movements.en.ts`
+│   │   │   │   ├── ✅ `movements.tr.ts`
+│   │   │   │   ├── ✅ `orders.en.ts`
+│   │   │   │   ├── ✅ `orders.tr.ts`
+│   │   │   │   ├── ✅ `products.en.ts`
+│   │   │   │   ├── ✅ `products.tr.ts`
+│   │   │   │   ├── ✅ `returns.en.ts`
+│   │   │   │   ├── ✅ `returns.tr.ts`
+│   │   │   │   ├── ✅ `search.en.ts`
+│   │   │   │   ├── ✅ `search.tr.ts`
+│   │   │   │   ├── ✅ `settings.en.ts`
+│   │   │   │   ├── ✅ `settings.tr.ts`
+│   │   │   │   ├── ✅ `titles.en.ts`
+│   │   │   │   ├── ✅ `titles.tr.ts`
+│   │   │   │   ├── ✅ `toolbar.en.ts`
+│   │   │   │   ├── ✅ `toolbar.tr.ts`
+│   │   │   │   ├── ✅ `tr.ts`
+│   │   │   │   ├── ✅ `ui.en.ts`
+│   │   │   │   ├── ✅ `ui.tr.ts`
+│   │   │   │   ├── ✅ `users.en.ts`
+│   │   │   │   ├── ✅ `users.tr.ts`
+│   │   │   │   ├── ✅ `webhooks.en.ts`
+│   │   │   │   └── ✅ `webhooks.tr.ts`
 │   │   │   ├── ✅ `en.ts`
 │   │   │   └── ✅ `tr.ts`
-│   │   └── ✅ `format.ts`
+│   │   ├── ✅ `format.ts`
+│   │   └── ✅ `getDictValue.ts`
 │   ├── 📂 **lib/**
+│   │   ├── 📂 **admin/**
+│   │   │   ├── ✅ `mutateWithAudit.ts`
+│   │   │   └── ✅ `returnStatusMachine.ts`
 │   │   ├── ✅ `audit.ts`
 │   │   ├── 📂 **data/**
 │   │   │   └── ✅ `preload.ts`
@@ -593,8 +668,18 @@ Bu belge, otonom derleyici tarafından 2026-06-12T10:45:34.762172+00:00 tarihind
 │       │   ├── ✅ `AdminReturnsPage.tsx`
 │       │   ├── ✅ `AdminSettingsPage.tsx`
 │       │   ├── ✅ `AdminUsersPage.tsx`
+│       │   ├── ✅ `AdminUsersTableBody.tsx`
 │       │   ├── ✅ `AdminWebhookEventsPage.tsx`
-│       │   └── ✅ `CategoryBuilderView.tsx`
+│       │   ├── ✅ `AuditLogTableBody.tsx`
+│       │   ├── ✅ `CategoriesTableBody.tsx`
+│       │   ├── ✅ `CategoryBuilderView.tsx`
+│       │   ├── ✅ `CouponsTableBody.tsx`
+│       │   ├── ✅ `ErrorGroupsTableBody.tsx`
+│       │   ├── ✅ `ErrorsTableBody.tsx`
+│       │   ├── ✅ `MovementsTableBody.tsx`
+│       │   ├── ✅ `OrdersTableBody.tsx`
+│       │   ├── ✅ `ProductsTableBody.tsx`
+│       │   └── ✅ `ReturnsTableBody.tsx`
 │       ├── 📂 **calculators/**
 │       │   ├── ✅ `AirCurtainCalcPage.tsx`
 │       │   ├── ✅ `DuctCalcPage.tsx`

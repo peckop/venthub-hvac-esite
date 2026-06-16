@@ -105,6 +105,12 @@ export const en: typeof tr = {
     pdf: 'PDF',
     sku: 'SKU',
     pdfDatasheet: 'Technical Datasheet',
+    share: 'Share',
+    requestQuote: 'Request Quote',
+    officialGuarantee: 'Official Guarantee',
+    fastDelivery: 'Fast Delivery',
+    series: 'Series',
+    reset: 'Reset',
     whatsapp: {
       faqSupportMessage: 'I could not find the answer I was looking for on the FAQ page...',
       supportMessageDefault: 'Hello, I would like to contact the VentHub HVAC support team.',
@@ -835,6 +841,9 @@ export const en: typeof tr = {
     noResults: 'No Results Found',
     noResultsDesc: 'Please clear filters or try a different term.',
     clearFilters: 'Clear Filters',
+    heroAlt: 'HVAC Products Discovery Image',
+    searchAriaLabel: 'Search Products',
+    searchHelp: 'Start typing for detailed filters.',
     allProductsTitle: 'All Our Products',
     emptyDesc: 'Select one of the categories to see more products.',
     emptyTitle: 'No Products Found',
@@ -928,7 +937,12 @@ export const en: typeof tr = {
   legal: {
     kvkkTitle: 'KVKK Clarification Text (Draft)',
     draftWarning: 'This text is a draft and for testing purposes. Please update it with your company\'s actual details and confirm with a legal expert before going live.',
-    disclaimer: 'This text does not constitute legal advice. It is recommended to seek professional counsel for the final text.'
+    disclaimer: 'This text does not constitute legal advice. It is recommended to seek professional counsel for the final text.',
+    privacyTitle: 'Privacy Policy (Draft)',
+    cookieTitle: 'Cookie Policy (Draft)',
+    distanceSalesTitle: 'Distance Sales Agreement (Draft)',
+    preInformationTitle: 'Pre-Information Form (Draft)',
+    termsTitle: 'Terms of Use (Draft)'
   },
   admin,
   footer: {

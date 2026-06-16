@@ -3,69 +3,93 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx
-skeleton_hash: 76556bec65c58e2a
+skeleton_hash: 84f66d0b325761e6
 entity_hashes:
-  func:Page: 02ee67f324c336e5
-  overview: 881824b0262b6c42
+  func:Page: 851f6a31795db41b
+  func:generateStaticParams: 42ae72125a484b5f
+  overview: c6e80b9884dd71c2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-16T11:52:56Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın yasal bilgilendirme formu sayfasını temsil eden tek bir React bileşenini dışa aktarır. Sayfa, yasal zorunluluklar gereği kullanıcıya ön bilgilendirme içeriğini sunar ve gerekli onay akışını yönetir.
+Bu modül, uygulamanın yasal bilgilendirme formu sayfasını temsil eden bir Next.js sayfa bileşenidir. Modül, yasal zorunluluklar gereği kullanıcılara ön bilgilendirme içeriğini sunar ve dil parametresine göre dinamik olarak render edilir.
 
 ## Fonksiyon Grupları
-### Sayfa Oluşturma ve Sunma
-Modülün tek sorumluluğu, yasal bilgilendirme formu sayfasının kullanıcı arayüzünü oluşturmaktır. Sayfa, ilgili yasal metinleri, form alanlarını ve onay mekanizmasını bir araya getirerek son kullanıcının karşısına çıkar.
+### Statik Yolların Üretimi
+Bu grup, sayfanın statik yollarını oluşturarak Next.js'in önceden render edebileceği sayfaları belirler.
+- generateStaticParams
+
+### Sayfa Bileşeni
+Bu grup, yasal bilgilendirme formu sayfasının ana React bileşenini ve sayfa yapısını tanımlar.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, Next.js App Router yapısında çalışan bir sayfa bileşenidir; çalışması için ortam ve rota yapılandırmasına ihtiyaç duyar.
 
-Bu modül, Next.js App Router yapısında çalışan bir sayfa bileşenidir; çalışması için ortam ve rota yapılandırmasına ilişkin aşağıdaki varsayımlar geçerlidir.
+[Aksiyom 1]: Eğer `params` parametresi verilmemişse veya `lang` alanı içermiyorsa, sayfa doğru yüklenemez ve hata oluşur.
 
-[Aksiyom 1]: Eğer Next.js runtime ortağı (App Router) yoksa, bileşen sayfa olarak render edilmez ve istemci tarafında rota eşleştirmesi gerçekleşmez.
+[Aksiyom 2]: Eğer `generateStaticParams()`fonksiyonu geçerli dil (lang) değerleri içermeyen bir dizi döndürürse, statik sayfa oluşturma başarısız olur ve ilgili rotalar için buildsnapshots oluşturulamaz.
 
-[Aksiyom 2]: Eğer dinamik `[lang]` rota parametresi sağlanmazsa (ör. geçersiz bir dil kodu ile çağrılmışsa), bileşen varsayılan dil içeriğini gösteremeyebilir veya hata üretebilir — bileşenin kendi imzasında (`Page()`) bu parametre doğrudan alınmadığından, dil bilgisinin sağlanması bir üst rota katmanının sorumluluğundadır.
+[Aksiyom 3]: Eğer `lang` parametresi desteklenmeyen bir dil kodu (örn: "xx") ise, sayfa içeriği doğru yüklenemez veya fallback mekanizması devreye giremez.
 
-[Aksiyom 3]: Eğer modül, yasal bilgilendirme içeriğini harici bir kaynaktan (API, statik dosya, sabit) yüklüyorsa, söz konu kaynağa erişim olmadan sayfa boş veya eksik içerikle görüntülenir — ancak bu kaynağın konumu ve yapısı fonksiyon imzasında belirtilmediğinden, yükleme mekanizması bilinmiyor.
+[Aksiyom 4]: Eğer `params`Promise'i çözülemez veya reddedilirse, sayfa bileşeni render edilemez ve kullanıcı hata ekranı görür.
 
-[Aksiyom 4]: Eğer bileşen, tarayıcı tarafında (`"use client"`) render edilmiyor ve sunucu tarafında statik olarak üretiliyorsa, istemci etkileşimine dayalı davranışlar (form gönderimi, etc.) çalışmaz — ancak bileşenin client/server ayrımı imza düzeyinde belirtilmediğinden, hangi tarafta çalıştığı bilinmiyor.
+[Aksiyom 5]: Eğer uygulama dil destek mekanizması (i18n) yapılandırması yanlışsa, `generateStaticParams()`调用 başarısız olur ve statik sayfalar oluşturulamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### Page
-**Ne yapar**: Bu fonksiyon, ilgili sayfanın ana React bileşenini (PageComponent) render ederek kullanıcı arayüzünü oluşturur. Next.js uygulamasında bir sayfa rotasının temel yapısını ve içeriğini tanımlayan üst düzey bir sarmalayıcıdır.
-
-**Nasıl yapar**: Fonksiyon, doğrudan ve yalnızca `<PageComponent />` JSX ifadesini döndürür. Herhangi bir veri işleme, durum yönetimi veya mantık içermez; temelde bir wrapper (sarmalayıcı) bileşeni olarak davranır ve asıl sunumu `PageComponent`'e devreder.
-
+### generateStaticParams
+**Ne yapar**: Next.js uygulaması için statik olarak oluşturulabilecek sayfa yollarının (path) parametrelerini üretir. Bu durumda, uygulamanın iki dil versiyonu (`tr` ve `en`) olduğunu tanımlar.
+**Nasıl yapar**: Fonksiyon, içeriği önceden tanımlanmış sabit bir dizi olan `Promise` döndürür. Bu dizi, her biri bir dil kodunu (`lang` anahtarıyla) temsil eden iki nesne içerir. Next.js, bu bilgiyi build zamanında kullanarak belirtilen parametrelerle (`/tr/...`, `/en/...`) önceden oluşturulmuş HTML sayfaları üretir.
 **Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+**Dönüş**: `Promise<Array<{ lang: string }>>` — Dönen değer, `Promise` ile sarılmış ve iki nesnenin bulunduğu bir dizidir. Her nesne `{ lang: 'tr' }` veya `{ lang: 'en' }` formatındadır.
 
-**Dönüş**: `JSX.Element` (veya `ReactElement`). `PageComponent` bileşeninin oluşturulmuş (render edilmiş) halini döndürür.
+### Page
+**Ne yapar**: Belirli bir dil (`lang`) parametresi ile Legal On-Bilgilendirme Formu sayfasını render eden ana React sayfa bileşenidir.
+**Nasıl yapar**: Fonksiyon, bir `Promise` türünde olan `params` prop'unu alır. Fonksiyon gövdesinde `await params` ifadesi kullanılarak Promise çözülür ve içinden `lang` değeri提取edilir. Bu `lang` değeri, asıl sayfa içeriğini oluşturan `PageComponent` bileşenine prop olarak geçirilerek sayfa dilinin ayarlanması sağlanır.
+**Parametreler**:
+- `params`: `Promise<{ lang: string }>` — Next.js tarafından sunulan ve sayfa yolundaki dinamik parametreleri (burada `lang`) bir `Promise` içinde sunan nesne. Bu Promise, bileşen içinde `await` ile çözümlenerek gerçek parametre değerine erişilir.
+**Dönüş**: `Promise<JSX.Element>` — `PageComponent` bileşeninin oluşturduğu JSX yapısını içeren bir `Promise`. Next.js, bu JSX'i alarak istemci tarafında render edecektir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../views/legal/PreInformationPage::PageComponent
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/[lang]/legal/on-bilgilendirme-formu/page.tsx::Page
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `JSX.Element` — `PageComponent` bileşenini render eder. Fonksiyonda herhangi bir değişken tanımı veya API çağrısı yoktur; doğrudan import edilen `PageComponent` JSX elemanını döndürür.
+### [N1_NASIL] AST Pointer: [lang]/legal/on-bilgilendirme-formu/page.tsx::generateStaticParams
+- **params**: yok
+- **ic_degiskenler**:
+  - `{ lang: 'tr' }, { lang: 'en' }` — Statik parametre nesneleri; Next.js'in önceden oluşturma (SSG) aşamasında hangi dil değerleri için sayfa üretileceğini tanımlar
+- **Dönüş**: `{ lang: string }[]` — Dil dizisi (tr ve en), her biri `generateStaticParams` çağrıldığında sayfanın derlenmesini tetikler
+
+### [N2_NASIL] AST Pointer: [lang]/legal/on-bilgilendirme-formu/page.tsx::Page
+- **params**: `{ params: Promise<{ lang: string }> }` — Next.js App Router tarafından sağlanan asenkron parametre objesi; `lang` alanını barındırır
+- **ic_degiskenler**:
+  - `lang` — `await params` ile çözümlenmiş dil kodu string'i ('tr' veya 'en'); `PageComponent`'e prop olarak传递传递传递
+- **Dönüş**: JSX — `PageComponent` bileşeninin `lang` prop'u ile render ettiği React JSX düğümü
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx
+  function: src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx::generateStaticParams
   function: src\app\[lang]\legal\on-bilgilendirme-formu\page.tsx::Page
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+  export: generateStaticParams
 
 ---
 

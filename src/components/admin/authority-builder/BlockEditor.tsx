@@ -44,7 +44,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
         return (
           <div className="grid gap-4">
             <div className="grid gap-1">
-              <label className={labelClass}>Ana Başlık</label>
+              <label className={labelClass}>{t('admin.authority.mainTitle')}</label>
               <input 
                 className={inputClass} 
                 value={heroContent.title || ''} 
@@ -52,7 +52,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
               />
             </div>
             <div className="grid gap-1">
-              <label className={labelClass}>Alt Başlık</label>
+              <label className={labelClass}>{t('admin.authority.subtitle')}</label>
               <input 
                 className={inputClass} 
                 value={heroContent.subtitle || ''} 
@@ -60,7 +60,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
               />
             </div>
             <div className="grid gap-1">
-              <label className={labelClass}>Açıklama</label>
+              <label className={labelClass}>{t('admin.authority.description')}</label>
               <textarea 
                 className={textareaClass} 
                 value={heroContent.description || ''} 
@@ -92,7 +92,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
         return (
           <div className="space-y-6">
             <div className="grid gap-1">
-              <label className={labelClass}>Tablo Başlığı</label>
+              <label className={labelClass}>{t('admin.authority.tableTitle')}</label>
               <input 
                 className={inputClass} 
                 value={specsContent.title || ''} 
@@ -102,7 +102,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-black uppercase tracking-hvac-normal text-indigo-400">Teknik Satırlar</label>
+                <label className="text-xs font-black uppercase tracking-hvac-normal text-indigo-400">{t('admin.authority.technicalRows')}</label>
                 <button 
                   type="button" 
                   onClick={addRow}
@@ -117,20 +117,20 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                   <div key={i} className="flex gap-2 items-start group bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
                     <div className="flex-1 grid gap-2">
                         <input 
-                        placeholder="Özellik (Örn: Ses Seviyesi)" 
+                        placeholder={t('admin.authority.featurePlaceholder')} 
                         className={inputClass} 
                         value={row.label} 
                         onChange={(e) => updateRow(i, 'label', e.target.value)} 
                         />
                         <div className="flex gap-2">
                             <input 
-                            placeholder="Değer" 
+                            placeholder={t('admin.authority.valuePlaceholder')} 
                             className={`${inputClass} flex-1`} 
                             value={row.value} 
                             onChange={(e) => updateRow(i, 'value', e.target.value)} 
                             />
                             <input 
-                            placeholder="Birim" 
+                            placeholder={t('admin.authority.unitPlaceholder')} 
                             className={`${inputClass} w-20`} 
                             value={row.unit || ''} 
                             onChange={(e) => updateRow(i, 'unit', e.target.value)} 
@@ -173,7 +173,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
         return (
           <div className="space-y-6">
             <div className="grid gap-1">
-              <label className={labelClass}>Grup Başlığı</label>
+              <label className={labelClass}>{t('admin.authority.groupTitle')}</label>
               <input 
                 className={inputClass} 
                 value={fgContent.title || ''} 
@@ -183,7 +183,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-black uppercase tracking-hvac-normal text-indigo-400">Özellik Kartları</label>
+                <label className="text-xs font-black uppercase tracking-hvac-normal text-indigo-400">{t('admin.authority.featureCards')}</label>
                 <button 
                   type="button" 
                   onClick={addItem}
@@ -206,7 +206,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                     
                     <div className="grid gap-3">
                         <div className="grid gap-1">
-                            <label className="text-xs font-bold text-slate-400 uppercase">İkon Adı (Lucide)</label>
+                            <label className="text-xs font-bold text-slate-400 uppercase">{t('admin.authority.iconName')}</label>
                             <input 
                                 className={inputClass} 
                                 value={item.icon || 'zap'} 
@@ -214,7 +214,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                             />
                         </div>
                         <div className="grid gap-1">
-                            <label className="text-xs font-bold text-slate-400 uppercase">Başlık</label>
+                            <label className="text-xs font-bold text-slate-400 uppercase">{t('admin.authority.title')}</label>
                             <input 
                                 className={inputClass} 
                                 value={item.title || ''} 
@@ -222,7 +222,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                             />
                         </div>
                         <div className="grid gap-1">
-                            <label className="text-xs font-bold text-slate-400 uppercase">Açıklama</label>
+                            <label className="text-xs font-bold text-slate-400 uppercase">{t('admin.authority.description')}</label>
                             <textarea 
                                 className={textareaClass} 
                                 value={item.description || ''} 
@@ -243,7 +243,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
         return (
           <div className="space-y-6">
             <div className="grid gap-1">
-              <label className={labelClass}>Karşılaştırma Başlığı</label>
+              <label className={labelClass}>{t('admin.authority.comparisonTitle')}</label>
               <input 
                 className={inputClass} 
                 value={compContent.title || ''} 
@@ -276,20 +276,20 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
         return (
           <div className="grid gap-4">
             <div className="grid gap-1">
-              <label className={labelClass}>CTA Başlığı</label>
+              <label className={labelClass}>{t('admin.authority.ctaTitle')}</label>
               <input className={inputClass} value={ctaContent.title || ''} onChange={(e) => handleContentChange({ title: e.target.value })} />
             </div>
             <div className="grid gap-1">
-              <label className={labelClass}>Açıklama</label>
+              <label className={labelClass}>{t('admin.authority.description')}</label>
               <textarea className={textareaClass} value={ctaContent.description || ''} onChange={(e) => handleContentChange({ description: e.target.value })} />
             </div>
             <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-1">
-                    <label className={labelClass}>Buton Metni</label>
+                    <label className={labelClass}>{t('admin.authority.buttonText')}</label>
                     <input className={inputClass} value={ctaContent.buttonLabel || ''} onChange={(e) => handleContentChange({ buttonLabel: e.target.value })} />
                 </div>
                 <div className="grid gap-1">
-                    <label className={labelClass}>Buton Linki</label>
+                    <label className={labelClass}>{t('admin.authority.buttonLink')}</label>
                     <input className={inputClass} value={ctaContent.buttonLink || ''} onChange={(e) => handleContentChange({ buttonLink: e.target.value })} />
                 </div>
             </div>
@@ -302,20 +302,20 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
         return (
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <label className={labelClass}>Medya Tipi</label>
+              <label className={labelClass}>{t('admin.authority.mediaType')}</label>
               <select 
                 className={selectClass} 
                 value={mediaContent.mediaType || 'video'}
                 onChange={(e) => handleContentChange({ mediaType: e.target.value })}
               >
-                <option value="video">Video</option>
-                <option value="3d">3D Model</option>
-                <option value="drawing">Teknik Çizim</option>
-                <option value="image">Görsel</option>
+                <option value="video">{t('admin.authority.mediaTypeVideo')}</option>
+                <option value="3d">{t('admin.authority.mediaType3d')}</option>
+                <option value="drawing">{t('admin.authority.mediaTypeDrawing')}</option>
+                <option value="image">{t('admin.authority.mediaTypeImage')}</option>
               </select>
             </div>
             <div className="grid gap-2">
-              <label className={labelClass}>Medya ID / URL</label>
+              <label className={labelClass}>{t('admin.authority.mediaIdUrl')}</label>
               <input 
                 className={inputClass} 
                 value={mediaContent.mediaId || ''} 
@@ -330,7 +330,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
         const rtContent = block.content as RichTextBlock['content'];
         return (
           <div className="grid gap-2">
-            <label className={labelClass}>HTML İçerik</label>
+            <label className={labelClass}>{t('admin.authority.htmlContent')}</label>
             <textarea 
               className={`${textareaClass} font-mono h-32 text-xs`}
               value={rtContent.html || ''} 
@@ -343,7 +343,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
       default:
         return (
           <div className="p-4 bg-slate-50 rounded text-slate-500 text-center italic text-sm">
-            Bu blok tipi ({block.type}) için henüz editör arayüzü eklenmedi.
+            {t('admin.authority.noEditorForType', { type: block.type })}
           </div>
         );
     }

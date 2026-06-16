@@ -1,8 +1,8 @@
 'use client';
 
-import { Activity, Bell, Box, Check, Clock,ShoppingBag, X } from 'lucide-react'
+import { Activity, Bell, Box, Check, Clock, ShoppingBag, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useRef,useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
@@ -10,6 +10,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { useTenant } from '../../hooks/useTenant'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
+import { useI18n } from '../../i18n/I18nProvider'
 
 interface AppNotification {
     id: string
@@ -23,6 +24,7 @@ interface AppNotification {
 
 const AdminRealtimeNotifications: React.FC = () => {
     const { id: tenantId } = useTenant()
+    const { t, lang } = useI18n()
     const [notifications, setNotifications] = useState<AppNotification[]>([])
     const [isOpen, setIsOpen] = useState(false)
     const [unreadCount, setUnreadCount] = useState(0)
@@ -52,11 +54,12 @@ const AdminRealtimeNotifications: React.FC = () => {
 
                 if (oData) {
                     oData.forEach(o => {
+                        const formattedAmount = formatCurrency(o.total_amount || 0, lang, { currency: 'TRY' })
                         combined.push({
                             id: `order_${o.id}`,
                             type: 'order',
-                            title: 'Yeni Sipariş',
-                            message: `₺${o.total_amount} tutarında sipariş alındı.`,
+                            title: t('admin.dashboard.newOrder'),
+                            message: t('admin.dashboard.orderReceivedAmount', { amount: formattedAmount }),
                             timestamp: o.created_at,
                             isRead: true, // past ones are considered read
                             link: `/admin/orders?q=${o.order_number || o.id}`
@@ -67,17 +70,17 @@ const AdminRealtimeNotifications: React.FC = () => {
                 if (sData) {
                     sData.forEach((s: Record<string, unknown>) => {
                         const products = s.products as Record<string, unknown> | null
-                        const pName = products?.name || 'Bilinmeyen Ürün'
+                        const pName = products?.name || t('admin.dashboard.unknownProduct')
                         const pSku = products?.sku || ''
                         const delta = Number(s.delta || 0)
-                        const movementType = delta > 0 ? 'Giriş' : 'Çıkış'
+                        const movementType = delta > 0 ? t('admin.inventory.incomingLabel') : t('admin.inventory.outgoingLabel')
                         const absQty = Math.abs(delta)
 
                         combined.push({
                             id: `stock_${String(s.id)}`,
                             type: 'stock',
-                            title: 'Stok Hareketi',
-                            message: `${String(pName)} için ${movementType}: ${absQty} Adet`,
+                            title: t('admin.dashboard.stockMovement'),
+                            message: t('admin.dashboard.stockMovementDetail', { productName: String(pName), movementType, qty: absQty }),
                             timestamp: s.created_at as string,
                             isRead: true,
                             link: pSku ? `/admin/products?q=${String(pSku)}` : `/admin/products`
@@ -101,7 +104,7 @@ const AdminRealtimeNotifications: React.FC = () => {
         }
 
         return () => { active = false }
-    }, [])
+    }, [lang, t])
 
     // Realtime subscriptions
     useEffect(() => {
@@ -114,7 +117,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                 (payload) => {
                     const newOrder = payload.new as Record<string, unknown>
                     const totalAmt = Number(newOrder.total_amount || 0)
-                    const amt = formatCurrency(totalAmt, 'tr', { currency: 'TRY' })
+                    const amt = formatCurrency(totalAmt, lang, { currency: 'TRY' })
 
                     const orderId = String(newOrder.id || '')
                     const orderNumber = newOrder.order_number ? String(newOrder.order_number) : orderId.slice(0, 8)
@@ -122,8 +125,8 @@ const AdminRealtimeNotifications: React.FC = () => {
                     const notif: AppNotification = {
                         id: `order_rt_${orderId}`,
                         type: 'order',
-                        title: '🚀 Yeni Sipariş Alındı!',
-                        message: `Sipariş No: #${orderNumber} - Tutar: ${amt}`,
+                        title: t('admin.dashboard.newOrderReceived'),
+                        message: t('admin.dashboard.orderNotificationMessage', { orderNumber, amount: amt }),
                         timestamp: (newOrder.created_at as string) || new Date().toISOString(),
                         isRead: false,
                         link: `/admin/orders?q=${orderNumber}`
@@ -175,14 +178,14 @@ const AdminRealtimeNotifications: React.FC = () => {
                 (payload) => {
                     const m = payload.new as Record<string, unknown>
                     const delta = Number(m.delta || 0)
-                    const movementType = delta > 0 ? 'Giriş' : 'Çıkış'
+                    const movementType = delta > 0 ? t('admin.inventory.incomingLabel') : t('admin.inventory.outgoingLabel')
                     const absQty = Math.abs(delta)
 
                     const notif: AppNotification = {
                         id: `stock_rt_${String(m.id)}`,
                         type: 'stock',
-                        title: '📦 Stok Güncellendi',
-                        message: `${movementType}: ${absQty} Adet (${String(m.reason || 'Sistem')})`,
+                        title: t('admin.dashboard.stockUpdated'),
+                        message: t('admin.dashboard.stockNotificationMessage', { movementType, qty: absQty, reason: String(m.reason || t('admin.common.system')) }),
                         timestamp: (m.created_at as string) || new Date().toISOString(),
                         isRead: false,
                         link: `/admin/products` // Default products page for RT stock, ideally we'd fetch SKU here but payload doesn't have it
@@ -227,7 +230,7 @@ const AdminRealtimeNotifications: React.FC = () => {
             supabase.removeChannel(ordersChannel)
             supabase.removeChannel(stockChannel)
         }
-    }, [router, tenantId])
+    }, [router, tenantId, lang, t])
 
     // Close dropdown
     useEffect(() => {
@@ -279,18 +282,20 @@ const AdminRealtimeNotifications: React.FC = () => {
                     {/* Header */}
                     <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                         <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                            Bildirim Merkezi
+                            {t('admin.dashboard.notificationCenter')}
                             {unreadCount > 0 && (
-                                <span className="bg-rose-100 text-rose-700 text-xs px-2 py-0.5 rounded-full font-bold">{unreadCount} Yeni</span>
+                                <span className="bg-rose-100 text-rose-700 text-xs px-2 py-0.5 rounded-full font-bold">
+                                    {t('admin.dashboard.unreadCount', { count: unreadCount })}
+                                </span>
                             )}
                         </h3>
                         <div className="flex items-center gap-2">
                             {notifications.length > 0 && (
                                 <button onClick={clearAll} className="text-xs font-medium text-slate-500 hover:text-primary-navy transition-colors">
-                                    Tümünü Temizle
+                                    {t('admin.dashboard.clearAll')}
                                 </button>
                             )}
-                            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label="Bildirimleri kapat">
+                            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label={t('admin.dashboard.closeNotifications')}>
                                 <X size={16} aria-hidden="true" />
                             </button>
                         </div>
@@ -303,8 +308,8 @@ const AdminRealtimeNotifications: React.FC = () => {
                                 <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-3">
                                     <Check size={24} />
                                 </div>
-                                <p className="text-sm font-medium text-slate-500">Tümü okundu</p>
-                                <p className="text-xs text-slate-400 mt-1">Yeni bir aktivite bulunmuyor.</p>
+                                <p className="text-sm font-medium text-slate-500">{t('admin.dashboard.allRead')}</p>
+                                <p className="text-xs text-slate-400 mt-1">{t('admin.dashboard.noNewActivity')}</p>
                             </div>
                         ) : (
                             <div className="flex flex-col">
@@ -342,7 +347,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                                             </p>
                                             <div className="flex items-center gap-1 mt-2 text-xs text-slate-400 font-medium">
                                                 <Clock size={10} />
-                                                {formatDateTime(notif.timestamp, 'tr')}
+                                                {formatDateTime(notif.timestamp, lang)}
                                             </div>
                                         </div>
                                         {!notif.isRead && (
@@ -359,7 +364,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                     {/* Footer */}
                     {notifications.length > 0 && (
                         <div className="bg-slate-50/80 p-3 text-center border-t border-slate-100">
-                            <span className="text-xs font-medium text-slate-500">Sadece son 20 bildirim gösterilir.</span>
+                            <span className="text-xs font-medium text-slate-500">{t('admin.dashboard.onlyLast20Notifications')}</span>
                         </div>
                     )}
                 </div>

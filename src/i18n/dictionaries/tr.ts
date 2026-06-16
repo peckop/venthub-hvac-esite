@@ -122,6 +122,12 @@ export const tr = {
     pdf: 'PDF',
     sku: 'SKU',
     pdfDatasheet: 'Teknik Döküman',
+    share: 'Paylaş',
+    requestQuote: 'Teklif İste',
+    officialGuarantee: 'Distribütör Garantili',
+    fastDelivery: 'Hızlı Teslimat',
+    series: 'Seri',
+    reset: 'Sıfırla',
     whatsapp: {
       faqSupportMessage: 'Sıkça Sorulan Sorular sayfasında aradığım cevabı bulamadım...',
       supportMessageDefault: 'Merhaba, VentHub HVAC destek ekibiyle iletişime geçmek istiyorum.',
@@ -234,7 +240,10 @@ export const tr = {
     searchPlaceholder: 'Ürün veya model ara...',
     noResults: 'Sonuç Bulunamadı',
     noResultsDesc: 'Lütfen filtreleri temizleyin veya farklı bir terim deneyin.',
-    clearFilters: 'Filtreleri Temizle'
+    clearFilters: 'Filtreleri Temizle',
+    heroAlt: 'HVAC Ürünleri Keşif Görseli',
+    searchAriaLabel: 'Ürün Arama',
+    searchHelp: 'Detaylı filtreler için yazmaya başlayın.'
   },
   search: {
     overlay: {
@@ -816,7 +825,12 @@ export const tr = {
   legal: {
     kvkkTitle: 'KVKK Aydınlatma Metni (Taslak)',
     draftWarning: 'Bu metin taslaktır ve test amaçlıdır. Canlıya çıkmadan önce şirketinizin gerçek bilgileri ile güncelleyiniz ve bir hukukçudan teyit alınız.',
-    disclaimer: 'Bu metin hukuki danışmanlık niteliği taşımaz. Nihai metin için uzman görüşü almanız tavsiye edilir.'
+    disclaimer: 'Bu metin hukuki danışmanlık niteliği taşımaz. Nihai metin için uzman görüşü almanız tavsiye edilir.',
+    privacyTitle: 'Gizlilik Politikası (Taslak)',
+    cookieTitle: 'Çerez Politikası (Taslak)',
+    distanceSalesTitle: 'Mesafeli Satış Sözleşmesi (Taslak)',
+    preInformationTitle: 'Ön Bilgilendirme Formu (Taslak)',
+    termsTitle: 'Kullanım Koşulları (Taslak)'
   },
   footer: {
     quickLinks: 'Hızlı Linkler',

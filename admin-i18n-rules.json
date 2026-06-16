@@ -1,0 +1,82 @@
+{
+  "scope": {
+    "expectedFiles": [
+      "src/components/admin/authority-builder/BlockEditor.tsx",
+      "src/views/admin/AdminInventoryReportPage.tsx",
+      "src/components/admin/InventoryCsvImport.tsx",
+      "src/views/admin/AdminInventorySettingsPage.tsx",
+      "src/components/admin/InventoryTable.tsx",
+      "src/components/admin/InventoryDetailDrawer.tsx",
+      "src/views/admin/AdminWebhookEventsPage.tsx",
+      "src/components/admin/BulkActionToolbar.tsx",
+      "src/components/admin/CommandPalette.tsx",
+      "src/views/admin/CategoryBuilderView.tsx",
+      "src/components/admin/dashboard/RecentOrdersTable.tsx",
+      "src/components/admin/authority-builder/AuthorityBuilder.tsx",
+      "src/components/admin/AdminRealtimeNotifications.tsx",
+      "src/views/admin/AdminOrdersBoard.tsx",
+      "src/components/admin/JsonDiffViewer.tsx",
+      "src/views/admin/AdminLayout.tsx",
+      "src/components/admin/AccessDenied.tsx",
+      "src/components/admin/DateRangePicker.tsx",
+      "src/components/admin/dashboard/ActivityHeatmap.tsx",
+      "src/views/admin/AdminInventoryPage.tsx",
+      "src/components/admin/InventoryMovementHistory.tsx",
+      "src/components/admin/InventoryReservedTable.tsx",
+      "src/components/admin/InventoryStockAdjust.tsx",
+      "src/components/admin/dashboard/SalesChart.tsx",
+      "src/components/admin/products/ProductCsvImport.tsx",
+      "src/views/admin/AdminDashboardPage.tsx",
+      "src/views/admin/AdminLogisticsPage.tsx",
+      "src/views/admin/ErrorGroupsTableBody.tsx",
+      "src/app/admin/audit-logs/page.tsx",
+      "src/app/admin/categories/[id]/builder/page.tsx",
+      "src/app/admin/categories/page.tsx",
+      "src/app/admin/coupons/page.tsx",
+      "src/app/admin/error-groups/page.tsx",
+      "src/app/admin/errors/page.tsx",
+      "src/app/admin/inventory/report/page.tsx",
+      "src/app/admin/logistics/page.tsx",
+      "src/app/admin/orders/page.tsx",
+      "src/app/admin/page.tsx",
+      "src/app/admin/products/page.tsx",
+      "src/app/admin/returns/page.tsx",
+      "src/app/admin/users/page.tsx",
+      "src/app/admin/webhook-events/page.tsx",
+      "src/components/admin/dashboard/AbcPieChart.tsx",
+      "src/components/admin/products/ProductFormModal.tsx",
+      "src/views/admin/AdminSettingsPage.tsx",
+      "src/views/admin/MovementsTableBody.tsx",
+      "src/views/admin/OrdersTableBody.tsx",
+      "src/views/admin/ReturnsTableBody.tsx"
+    ]
+  },
+  "cliValidation": {
+    "commandTemplate": "pnpm exec eslint {files} --format json",
+    "parserType": "eslint-jsx-literals",
+    "exactKey": "exactLiteralCount"
+  },
+  "arithmetic": [
+    {
+      "equation": "chromeLiteralCount + proseLiteralCount === exactLiteralCount"
+    }
+  ],
+  "enums": {
+    "archetype": ["ALREADY_CLIENT_I18N", "NEEDS_USE_CLIENT", "RSC_SERVER", "TR_EN_SPLIT_CONTENT", "THIN_WRAPPER"],
+    "contentType": ["LONG_FORM_LEGAL_PROSE", "UI_CHROME", "MIXED"],
+    "recommendation": ["DICT", "KEEP_SPLIT", "RESTRUCTURE", "ALREADY_DONE", "TRIVIAL"]
+  },
+  "summation": [
+    {
+      "findingKey": "exactLiteralCount",
+      "planKey": "totalLiteralEstimate"
+    },
+    {
+      "findingKey": "chromeLiteralCount",
+      "planKey": "totalChromeLiteralEstimate"
+    }
+  ],
+  "exclusions": {
+    "recommendations": ["TRIVIAL", "ALREADY_DONE"]
+  }
+}

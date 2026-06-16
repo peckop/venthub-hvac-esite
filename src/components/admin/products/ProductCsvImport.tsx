@@ -1,8 +1,8 @@
 import React from 'react'
 
+import { useI18n } from '@/i18n/I18nProvider'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
-import { useI18n } from '../../../i18n/I18nProvider'
 import type { Database } from '../../../types/database.types'
 import { adminButtonPrimaryClass, adminButtonSecondaryClass, adminCardClass } from '../../../utils/adminUi'
 
@@ -47,14 +47,19 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
         const required = ['name', 'sku']
         const hasRequired = required.every(k => h.includes(k))
         const okCount = (importPreview?.rows || []).filter(r => r['name'] && r['sku']).length
-        alert(t('admin.products.import.dryRunResult', { status: t(`admin.products.import.${hasRequired ? 'statusComplete' : 'statusMissing'}`), ok: okCount, total: importPreview?.total || 0 }) || `Kuru Çalıştırma Sonucu:\nDurum: ${hasRequired ? 'Gerekli kolonlar var' : 'Gerekli kolonlar EKSİK'}\nGeçerli Satır: ${okCount}\nToplam Satır: ${importPreview?.total || 0}`)
+        const statusKey = hasRequired ? 'admin.products.import.statusComplete' : 'admin.products.import.statusMissing'
+        alert(t('admin.products.import.dryRunResult', {
+            status: t(statusKey),
+            ok: okCount,
+            total: importPreview?.total || 0
+        }))
     }
 
     const handleImport = async () => {
-        if (!importRows || !importPreview) return alert(t('admin.products.import.needCsv') || 'Lütfen önce CSV dosyası seçin.')
+        if (!importRows || !importPreview) return alert(t('admin.products.import.needCsv'))
         const h = importPreview.header
         if (!h.includes('sku') || !h.includes('name')) {
-            alert(t('admin.products.import.minColumns') || 'CSV dosyasında en az "sku" ve "name" sütunları bulunmalıdır.')
+            alert(t('admin.products.import.minColumns'))
             return
         }
 
@@ -88,7 +93,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
         }
 
         if (payloads.length === 0) {
-            alert(t('admin.products.import.noneFound') || 'İçe aktarılacak geçerli ürün bulunamadı.')
+            alert(t('admin.products.import.noneFound'))
             setIsProcessing(false)
             return
         }
@@ -106,12 +111,12 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                     ok += chunk.length
                 }
             }
-            alert(t('admin.products.import.done', { ok, fail }) || `İçe aktarma tamamlandı. Başarılı: ${ok}, Hatalı: ${fail}`)
+            alert(t('admin.products.import.done', { ok, fail }))
             setImportPreview(null)
             setImportRows(null)
             onSuccess()
         } catch (e) {
-            alert(t('admin.products.import.error', { msg: ((e as Error).message || String(e)) }) || `Hata oluştu: ${((e as Error).message || String(e))}`)
+            alert(t('admin.products.import.error', { msg: ((e as Error).message || String(e)) }))
         } finally {
             setIsProcessing(false)
         }
@@ -124,7 +129,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                 onClick={() => document.getElementById('prod-import-input')?.click()}
                 className={`${adminButtonSecondaryClass}`}
             >
-                {t('admin.products.import.button') || 'CSV İçe Aktar'}
+                {t('admin.products.import.button')}
             </button>
 
             {importPreview && (
@@ -133,14 +138,14 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
 
                         <div className="p-4 border-b border-slate-200 flex items-center justify-between">
                             <h3 className="font-semibold text-slate-800">
-                                {t('admin.products.import.previewTitle', { total: importPreview.total }) ?? `CSV Önizleme (ilk 10 satır) — Toplam: ${importPreview.total}`}
+                                {t('admin.products.import.previewTitle', { total: importPreview.total })}
                             </h3>
                             <button
                                 onClick={() => { setImportPreview(null); setImportRows(null) }}
                                 className="text-slate-400 hover:text-slate-600 transition-colors"
                                 disabled={isProcessing}
                             >
-                                ✕
+                                {t('admin.products.import.closeSymbol')}
                             </button>
                         </div>
 
@@ -158,7 +163,11 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                                         </tr>
                                     ))}
                                     {importPreview.total > 10 && (
-                                        <tr><td colSpan={importPreview.header.length} className="p-3 text-center text-slate-500 italic">... ve {importPreview.total - 10} satır daha.</td></tr>
+                                        <tr>
+                                            <td colSpan={importPreview.header.length} className="p-3 text-center text-slate-500 italic">
+                                                {t('admin.products.import.moreRows', { count: importPreview.total - 10 })}
+                                            </td>
+                                        </tr>
                                     )}
                                 </tbody>
                             </table>
@@ -170,7 +179,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                                 onClick={() => { setImportPreview(null); setImportRows(null); }}
                                 disabled={isProcessing}
                             >
-                                {t('admin.products.import.close') || 'İptal'}
+                                {t('admin.products.import.close')}
                             </button>
 
                             <button
@@ -178,7 +187,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                                 onClick={handleDryRun}
                                 disabled={isProcessing}
                             >
-                                {t('admin.products.import.dryRun') || 'Hata Kontrolü'}
+                                {t('admin.products.import.dryRun')}
                             </button>
 
                             <button
@@ -186,7 +195,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                                 onClick={handleImport}
                                 disabled={isProcessing}
                             >
-                                {isProcessing ? 'İşleniyor...' : (t('admin.products.import.writeButton') || 'İçe Aktar')}
+                                {isProcessing ? t('admin.products.import.processing') : t('admin.products.import.writeButton')}
                             </button>
                         </div>
                     </div>

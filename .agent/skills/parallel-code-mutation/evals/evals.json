@@ -1,0 +1,31 @@
+{
+  "should_trigger": [
+    "paralel mutasyon başlat",
+    "kod dönüştürme kampanyası",
+    "parallel code mutation",
+    "PMCM orkestrasyonu",
+    "parallel refactoring campaign",
+    "kod tabanında paralel mutasyon başlat",
+    "admin panelindeki literalleri parallel code mutation ile taşı",
+    "PMCM orkestrasyonu kullanarak refactoring yapalım",
+    "tüm modüller için paralel mutasyon başlatır mısın",
+    "dosyaları disjoint waves halinde parallel refactoring campaign ile düzenle",
+    "yeni tip tanımlarını paralel mutasyon başlat diyerek orkestre et",
+    "hata göçünü parallel code mutation kullanarak çözelim",
+    "bu refactoring kampanyasını PMCM orkestrasyonu ile yürüt",
+    "paralel kod dönüştürme kampanyası başlat",
+    "disjoint workers ile paralel mutasyon başlat"
+  ],
+  "should_not_trigger": [
+    "git commit at",
+    "pnpm run dev çalıştır",
+    "database migration oluştur",
+    "css font stilini değiştir",
+    "eslint hatalarını otomatik düzelt",
+    "npm run build testi yap",
+    "tip kontrolü tsc çalıştır",
+    "yeni component kodunu yaz",
+    "git branch feature/i18n aç",
+    "context.md dosyasını NotebookLM ile senkronize et"
+  ]
+}

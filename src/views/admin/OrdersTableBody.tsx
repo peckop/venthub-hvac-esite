@@ -593,14 +593,17 @@ const OrdersTableBody: React.FC = () => {
         key: 'id',
         header: t('admin.orders.table.orderId'),
         sortable: true,
-        cell: (r) => (
-          <div className="flex flex-col gap-1">
-            <span className="font-black text-white uppercase tracking-wider text-xs">
-              {r.order_number || r.id.slice(0, 8)}
-            </span>
-            {r.order_number && <span className="text-xs text-slate-500 font-mono">{`${r.id.slice(0, 8)}...`}</span>}
-          </div>
-        ),
+        cell: (r) => {
+          const shortId = `${r.id.slice(0, 8)}...`
+          return (
+            <div className="flex flex-col gap-1">
+              <span className="font-black text-white uppercase tracking-wider text-xs">
+                {r.order_number || r.id.slice(0, 8)}
+              </span>
+              {r.order_number && <span className="text-xs text-slate-500 font-mono">{shortId}</span>}
+            </div>
+          )
+        },
       },
       {
         key: 'status',

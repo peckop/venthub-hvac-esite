@@ -12,6 +12,8 @@ import {
     XAxis,
     YAxis} from 'recharts'
 
+import { useI18n } from '@/i18n/I18nProvider'
+
 import AdminEmptyState from '../AdminEmptyState'
 
 interface SalesChartProps {
@@ -20,21 +22,22 @@ interface SalesChartProps {
 }
 
 const SalesChart: React.FC<SalesChartProps> = ({ data, title }) => {
+    const { t } = useI18n()
     return (
         <div className="flex flex-col h-hvac-panel w-full group/chart">
             <div className="flex items-center justify-between mb-10">
                 <div>
                     <h3 className="text-xl font-black text-white tracking-tighter uppercase leading-none group-hover/chart:text-cyan-400 transition-colors">{title}</h3>
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed mt-3 italic opacity-60">Operasyonel Performans Trendi</p>
+                    <p className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed mt-3 italic opacity-60">{t('admin.dashboard.charts.operationalPerformanceTrend')}</p>
                 </div>
                 <div className="flex items-center gap-4 glass p-1.5 rounded-2xl border border-white/5 backdrop-blur-2xl shadow-2xl">
                     <div className="flex items-center gap-2 px-4 py-2 hover:bg-white/5 rounded-xl transition-colors">
                         <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-glow-md" />
-                        <span className="text-xs font-black text-slate-300 uppercase tracking-widest">Sipariş</span>
+                        <span className="text-xs font-black text-slate-300 uppercase tracking-widest">{t('admin.dashboard.charts.order')}</span>
                     </div>
                     <div className="flex items-center gap-2 px-4 py-2 border-l border-white/10 hover:bg-white/5 rounded-xl transition-colors">
                         <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-glow-md" />
-                        <span className="text-xs font-black text-slate-300 uppercase tracking-widest">İade</span>
+                        <span className="text-xs font-black text-slate-300 uppercase tracking-widest">{t('admin.dashboard.charts.return')}</span>
                     </div>
                 </div>
             </div>
@@ -43,8 +46,8 @@ const SalesChart: React.FC<SalesChartProps> = ({ data, title }) => {
                 <div className="flex-1 flex flex-col items-center justify-center p-8">
                     <AdminEmptyState 
                         icon={TrendingUp} 
-                        title="Veri Bulunamadı" 
-                        description="Seçili aralıkta satış verisi bulunmuyor." 
+                        title={t('admin.dashboard.charts.noDataTitle')} 
+                        description={t('admin.dashboard.charts.noDataDesc')} 
                         compact 
                     />
                 </div>
@@ -93,6 +96,7 @@ const SalesChart: React.FC<SalesChartProps> = ({ data, title }) => {
                             <Area
                                 type="monotone"
                                 dataKey="orders"
+                                name={t('admin.dashboard.charts.order')}
                                 stroke="#22d3ee"
                                 strokeWidth={5}
                                 fillOpacity={1}
@@ -104,6 +108,7 @@ const SalesChart: React.FC<SalesChartProps> = ({ data, title }) => {
                             <Area
                                 type="monotone"
                                 dataKey="returns"
+                                name={t('admin.dashboard.charts.return')}
                                 stroke="#F43F5E"
                                 strokeWidth={3}
                                 strokeDasharray="6 4"

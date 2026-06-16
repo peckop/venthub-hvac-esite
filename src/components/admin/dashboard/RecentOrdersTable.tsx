@@ -27,7 +27,7 @@ interface RecentOrdersTableProps {
 }
 
 const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) => {
-    const { lang } = useI18n()
+    const { lang, t } = useI18n()
     const dragScrollRef = useDragScroll<HTMLDivElement>()
 
     const getStatusStyles = (status: string) => {
@@ -42,10 +42,10 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
 
     const getStatusLabel = (s: string) => {
         switch (s) {
-            case 'completed': return 'Tamamlandı'
-            case 'pending': return 'Teklif/Bekleniyor'
-            case 'processing': return 'İşleniyor'
-            case 'cancelled': return 'İptal'
+            case 'completed': return t('admin.dashboard.statusLabels.completed')
+            case 'pending': return t('admin.dashboard.statusLabels.pending')
+            case 'processing': return t('admin.dashboard.statusLabels.processing')
+            case 'cancelled': return t('admin.dashboard.statusLabels.cancelled')
             default: return s
         }
     }
@@ -57,11 +57,11 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                     <h3 className="text-xl font-black text-white tracking-tighter uppercase leading-none group-hover/table:text-cyan-400 transition-colors uppercase">{title}</h3>
                     <div className="flex items-center gap-2 mt-3 italic opacity-60">
                         <div className="h-0.5 w-8 bg-cyan-500 rounded-full" />
-                        <p className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed italic opacity-80">Son İşlemler</p>
+                        <p className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed italic opacity-80">{t('admin.dashboard.recent.transactions')}</p>
                     </div>
                 </div>
                 <Link href={Routes.admin.orders()} className="text-xs font-black text-white uppercase tracking-widest px-8 py-3 rounded-2xl glass-strong hover:bg-cyan-500 hover:text-surface-deep hover:scale-105 active:scale-95 border border-white/5 transition-transform duration-300 flex items-center gap-3 group/btn shadow-2xl">
-                    Tümünü Gör <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
+                    {t('admin.dashboard.recent.viewAll')} <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
                 </Link>
             </div>
             
@@ -73,10 +73,10 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                     <table className="w-full text-sm text-left whitespace-nowrap border-collapse">
                         <thead>
                             <tr className="bg-white/2">
-                                <th className={`${adminTableHeadCellClass} py-6 first:pl-8`}>Sipariş / Teklif No</th>
-                                <th className={adminTableHeadCellClass}>Tarih</th>
-                                <th className={`${adminTableHeadCellClass} text-right`}>Tutar</th>
-                                <th className={adminTableHeadCellClass}>Durum</th>
+                                <th className={`${adminTableHeadCellClass} py-6 first:pl-8`}>{t('admin.dashboard.table.orderOrQuoteNo')}</th>
+                                <th className={adminTableHeadCellClass}>{t('admin.dashboard.table.date')}</th>
+                                <th className={`${adminTableHeadCellClass} text-right`}>{t('admin.dashboard.table.amount')}</th>
+                                <th className={adminTableHeadCellClass}>{t('admin.dashboard.table.status')}</th>
                                 <th className={`${adminTableHeadCellClass} last:pr-8`}></th>
                             </tr>
                         </thead>
@@ -86,24 +86,26 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                                     <td className="px-5 py-24 text-center" colSpan={5}>
                                         <AdminEmptyState 
                                             icon={PackageSearch} 
-                                            title="Sipariş Bulunmuyor" 
-                                            description="Henüz herhangi bir sipariş veya teklif kaydı bulunmuyor." 
+                                            title={t('admin.dashboard.recent.emptyTitle')} 
+                                            description={t('admin.dashboard.recent.emptyDesc')} 
                                             compact 
                                         />
                                     </td>
                                 </tr>
-                            ) : orders.map((r, index) => (
-                                <tr 
-                                    key={r.id} 
-                                    className="group/row hover:bg-white/3 transition-colors duration-500 animate-in fade-in slide-in-from-left-4 duration-500"
-                                    style={{ animationDelay: `${index * 50}ms` }}
-                                >
-                                    <td className={`${adminTableCellClass} py-6 first:pl-8 font-black text-xs text-cyan-400/90 tracking-wider group-hover/row:text-white transition-colors`}>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-1.5 h-6 bg-cyan-500/0 group-hover/row:bg-cyan-500 transition-colors rounded-full -ml-8 mr-6 duration-500" />
-                                            #{(r.order_number || r.id).toString().slice(-8).toUpperCase()}
-                                        </div>
-                                    </td>
+                            ) : orders.map((r, index) => {
+                                const orderNo = `#${(r.order_number || r.id).toString().slice(-8).toUpperCase()}`
+                                return (
+                                    <tr 
+                                        key={r.id} 
+                                        className="group/row hover:bg-white/3 transition-colors duration-500 animate-in fade-in slide-in-from-left-4 duration-500"
+                                        style={{ animationDelay: `${index * 50}ms` }}
+                                    >
+                                        <td className={`${adminTableCellClass} py-6 first:pl-8 font-black text-xs text-cyan-400/90 tracking-wider group-hover/row:text-white transition-colors`}>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-1.5 h-6 bg-cyan-500/0 group-hover/row:bg-cyan-500 transition-colors rounded-full -ml-8 mr-6 duration-500" />
+                                                {orderNo}
+                                            </div>
+                                        </td>
                                     <td className={adminTableCellClass}>
                                         <span className="text-slate-400 font-black text-xs tracking-wider uppercase opacity-80 group-hover/row:opacity-100 transition-opacity">{formatDateTime(r.created_at, lang)}</span>
                                     </td>
@@ -123,11 +125,12 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                                             href={`/admin/orders/${r.id}` as import('next').Route} 
                                             className="inline-flex items-center gap-3 text-white text-xs font-black uppercase tracking-hvac-normal bg-white/5 px-6 py-3 rounded-xl hover:bg-cyan-500 hover:text-surface-deep border border-white/5 transition-shadow duration-500 shadow-lg"
                                         >
-                                            Detay <ExternalLink size={14} className="opacity-60 group-hover/link:opacity-100" />
+                                            {t('admin.dashboard.table.detail')} <ExternalLink size={14} className="opacity-60 group-hover/link:opacity-100" />
                                         </Link>
                                     </td>
                                 </tr>
-                            ))}
+                                )
+                            })}
                         </tbody>
                     </table>
                 </div>
