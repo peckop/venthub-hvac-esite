@@ -3,48 +3,52 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventorySettingsPage.tsx
-skeleton_hash: 5be4d919cbacabd3
+skeleton_hash: 4951bc8903437c34
 entity_hashes:
   func:AdminInventorySettingsPage: 19119fa4d0915cd3
-  func:save: 891905cd600e5f0f
-  func:saveGeneralSettings: 6b9720e9033c1a78
-  overview: 4b0bb1cf59b519c7
+  func:save: f665f70eecd0464b
+  func:saveGeneralSettings: 8c4e593571ba8563
+  overview: 9323d0a1247c733d
   style_tokens: 114083f4641bd38f
-generated_at: 2026-06-14T13:27:50Z
+generated_at: 2026-06-16T10:20:03Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelindeki envanter ayarları sayfasını oluşturan React bileşenini ve ilgili kaydetme mantığını içerir. Sayfa, stok konfigürasyonlarının görüntülenmesini ve düzenlemesini sağlarken, kaydetme fonksiyonları değişikliklerin sunucuya iletilmesini yönetir.
+Bu modül, yönetici panelinde envanter ile ilgili ayarların görüntülenmesini ve değiştirilmesini sağlayan bir React sayfa bileşenidir. Sayfa, genel stok ayarları ve konfigürasyonları için bir form arayüzü sunarken, yapılan değişikliklerin sunucuya kaydedilmesi için asenkron işlemler yürütür. Modül, envanter yönetimi politikalarının ve limitlerin merkezi olarak yapılandırılmasını mümkün kılar.
 
 ## Fonksiyon Grupları
 
 ### Sayfa Bileşeni
-Envanter ayarları sayfasının ana yapısını ve kullanıcı arayüzünü tanımlar. Form elemanlarını, durum yönetimini ve kullanıcı etkileşimlerini koordine eder.
+Ana sayfa yapısını ve kullanıcı arayüzünü tanımlayan React bileşenidir. Form alanlarını, durum yönetimini ve kullanıcı etkileşimlerini koordine ederek yöneticiye envanter ayarları panelini sunar.
 - AdminInventorySettingsPage
 
 ### Kaydetme İşlemleri
-Stok ayarlarının güncellenmesi ve kalıcı depolamaya aktarılması için kullanılan asenkron fonksiyonları kapsar. Hem genel ayarlar hem de spesifik veri setleri için ayrı kaydetme süreçleri sunar.
+Yapılan değişikliklerin sunucuya iletilmesini ve kalıcı olarak saklanmasını sağlayan asenkron fonksiyonları kapsar. Genel ayarlar için özel bir kaydetme akışı mevcuttur.
 - save, saveGeneralSettings
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için verilen fonksiyon imzaları ve eski doküman yapısı temelinde aşağıdaki mimari varsayımlar belirlenmiştir.
-
-**[Aksiyom 1]:** Eğer `AdminInventorySettingsPage` bir React bileşeni olarak çağrılmıyorsa (React component tree içinde değilse), bileşen hiç render edilmez.
-
-**[Aksiyom 2]:** Eğer `save()` veya `saveGeneralSettings()` fonksiyonları çağrıldığında geçerli bir oturum veya kimlik doğrulama bilgisi (auth token vb.) yoksa, bu fonksiyonların asenkron çağrısı başarısız olur veya yetkisiz hata döner.
-
-**[Aksiyom 3]:** Eğer `saveGeneralSettings()` fonksiyonu çalışıyorsa, genel envanter ayarları için bir dışservis (API endpoint) erişilebilir olmalıdır; aksi takdirde kalıcı depolama işlemi gerçekleşmez.
-
-**[Aksiyom 4]:** Eğer `AdminInventorySettingsPage` içinde form durum state'i tutuluyorsa ve bu state başlangıçta başlatılmamışsa (örn: `undefined`), bileşen hatalı render edilir veya kullanıcı arayüzünde eksik veri görüntülenir.
-
-**[Aksiyom 5]:** Eğer `save()` fonksiyonu çağrıldığında form geçerlilik kontrolleri (validation) başarılı değilse, kaydetme işlemi başlatılmamalıdır; aksi takdirde geçersiz veri depolanabilir.
+Bu modül, yönetici panelindeki envanter ayarları sayfasını ve ilişkili kaydetme mantığını içeren bir React bileşenidir. Aşağıdaki mimari varsayımlar fonksiyon imzalarından türetilmiştir.
 
 ---
 
-> **Not:** Fonksiyon gövdeleri (body) sağlandığında, API endpoint'leri, state management mekanizması ve bağımlılıklar netleştirilerek aksiyomlar daha spesifik hale getirilebilir.
+**[Aksiyom 1]:** Eğer React runtime ortamı (React context, DOM) yoksa, `AdminInventorySettingsPage` bileşeni render edilemez ve hata oluşur.
+
+**[Aksiyom 2]:** Eğer backend API erişilebilir durumda değilse (sunucu, ağ bağlantısı), `save()` fonksiyonu asenkron çalışırken başarısız olur ve hata fırlatır — bileşenin hata yönetim mekanizması bu durumu yakalamalıdır.
+
+**[Aksiyom 3]:** Eğer `save()` çağrılmadan önce kaydedilecek geçerli bir envanter ayar verisi (state/form verisi) mevcut değilse, fonksiyon geçersiz veya boş veri gönderir; bunun sunucu tarafında ne tür bir davranışa yol açacağı bilinmiyor.
+
+**[Aksiyom 4]:** Eğer `saveGeneralSettings()` çağrılmadan önce genel ayarlarla ilgili geçerli veri mevcut değilse, fonksiyon geçersiz veya boş veri gönderir; bunun sunucu tarafında ne tür bir davranışa yol açacağı bilinmiyor.
+
+**[Aksiyom 5]:** Eğer `save()` ile `saveGeneralSettings()` eş zamanlı (parallel) olarak çağrılırsa, race condition veya veri tutarsızlığı oluşabilir — çünkü her iki fonksiyon da asenkron olup paylaşımlı kaynakları (state, API) etkileyebilir.
+
+**[Aksiyom 6]:** Eğer modül bir admin panelinin parçasıysa, kullanıcıyetik doğrulama/otorizasyon mekanizması modül dışından sağlanmalıdır — fonksiyon imzalarında auth kontrolüne dair herhangi bir parametre veya bağımlılık tanımlı değildir.
+
+---
+
+**Not:** Fonksiyon imzalarında parametre tanımları ve return tipleri minimal düzeyde verildiği için, bu aksiyomlar yalnızca imza yapılarından çıkarılabilen temel bağımlılıkları içermektedir. Fonksiyon gövdelerine erişim olmadığından, detaylı veri akışı ve doğrulama kuralları bilinmemektedir.
 
 ---
 
@@ -58,18 +62,38 @@ Bu modül için verilen fonksiyon imzaları ve eski doküman yapısı temelinde 
 **Dönüş**: `React.FC` — Bileşen tipinde bir fonksiyonel React bileşeni döndürür.
 
 ### save
-**Ne yapar**: Envandre ait genel ayarları (bildirim e-posta adresi, webhook URL'i ve rezervasyon zaman aşımı süresini) Supabase veritabanında günceller ve audit kaydı oluşturur. İşlem başarılı olursa başarı, hata olursa hata mesajını UI'da gösterir.
-**Nasıl yapar**: Fonksiyon, bir `try-catch-finally` bloğu içinde çalışır. Önce `savingGeneral` durumunu `true`'ya ayarlayarak yükleme göstergesini aktif eder, başarı ve hata mesajlarını temizler. Ardından `mutateWithAudit` fonksiyonunu çağırarak veritabanı işlemini audit korumasıyla başlatır. Audit koruması sayesinde, yetki kontrolü (`hasWriteAccess`) yapılarak gerekli loglama çalıştırılır. Audit sonrası asıl veritabanı güncelleme (`fn` parametresi içinde) çalıştırılır. İşlem成功a erişirse kullanıcıya "Genel ayarlar kaydedildi" başarı mesajını atar ve `load()` fonksiyonunu çağırarak sayfadaki verileri yeniler. Herhangi bir hata oluşursa, hatanın türüne göre (`AdminPermissionError` veya genel `Error`) anlamlı bir hata mesajı set edilir. `finally` bloğunda her durumda `savingGeneral` durumu `false`'a dönerek yükleme göstergesi kapatılır.
-**Parametreler**:
-- (Parametre almaz)
-**Dönüş**: void (dönüş değeri yoktur)
+**Ne yapar**: Envanter ayarlarını (bildirim e-postası, webhook URL'i, ayırma zaman aşımı süresini) Supabase veritabanına kaydeder ve denetim (audit) kaydı oluşturur.
+
+**Nasıl yapar**: Bu fonksiyon bir React asenkron olay işleyicisidir. İlk olarak `setSavingGeneral(true)` çağrısıyla arayüzde kaydetme işlemi sürdüğünü belirtir, ardından başarı ve hata mesajlarını temizler. `mutateWithAudit` fonksiyonunu kullanarak veritabanı güncellemesini ve denetim kaydını birlikte yürütür. `mutateWithAudit` içinde, `canWrite` izni kontrol edilir, ardından `fn` parametresi ile verilen asenkron fonksiyon çalıştırılır. Bu fonksiyon, `supabase.from('inventory_settings').update()` çağrısıyla ilgili satırı günceller ve `eq('id', true)` koşuluyla tüm satırları hedefler. İşlem başarılı olursa success mesajı ayarlanır ve `load()` fonksiyonuyla veriler yeniden yüklenir. Hata oluşursa, hatanın türüne göre (`AdminPermissionError` veya standart `Error`) uygun hata mesajı ayarlanır. İşlem sonunda `finally` bloğu ile kaydetme durumu sıfırlanır.
+
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz. Fonksiyon içindeki state değerleri (`alertEmail`, `alertWebhook`, `resTimeout`, `hasWriteAccess`) ve bağımlılıklar (`supabase`, `mutateWithAudit`, `t`, `load`) React hook'ları ve kapsama alanından (closure) erişilir.
+
+**Dönüş**: Fonksiyon `void` döndürür. Sonuç, React state'leri (`setSuccess`, `setError`) aracılığıyla arayüze yansıtılır.
 
 ### saveGeneralSettings
-**Ne yapar**: Envandre ait genel ayarları (bildirim e-posta adresi, webhook URL'i ve rezervasyon zaman aşımı süresini) Supabase veritabanında günceller ve audit kaydı oluşturur. İşlem başarılı olursa başarı, hata olursa hata mesajını UI'da gösterir. Bu fonksiyon, `save` fonksiyonunun tam ve açık isimli karşılığıdır.
-**Nasıl yapar**: Fonksiyon, bir `try-catch-finally` bloğu içinde çalışır. Önce `savingGeneral` durumunu `true`'ya ayarlayarak yükleme göstergesini aktif eder, başarı ve hata mesajlarını temizler. Ardından `mutateWithAudit` fonksiyonunu çağırarak veritabanı işlemini audit korumasıyla başlatır. Audit koruması sayesinde, yetki kontrolü (`hasWriteAccess`) yapılarak gerekli loglama çalıştırılır. Audit sonrası asıl veritabanı güncelleme (`fn` parametresi içinde) çalıştırılır. İşlem成功a erişirse kullanıcıya "Genel ayarlar kaydedildi" başarı mesajını atar ve `load()` fonksiyonunu çağırarak sayfadaki verileri yeniler. Herhangi bir hata oluşursa, hatanın türüne göre (`AdminPermissionError` veya genel `Error`) anlamlı bir hata mesajı set edilir. `finally` bloğunda her durumda `savingGeneral` durumu `false`'a dönerek yükleme göstergesi kapatılır.
-**Parametreler**:
-- (Parametre almaz)
-**Dönüş**: void (dönüş değeri yoktur)
+**Ne yapar**: `save` fonksiyonuyla aynı işlevi görür; envanter ayarlarını Supabase veritabanına kaydeder ve denetim kaydı tutar.
+
+**Nasıl yapar**: Tam olarak `save` fonksiyonunun uygulama mantığını paylaşır. `setSavingGeneral`, `setSuccess`, `setError` state setter'larını kullanarak arayüz durumunu yönetir. Merkezi olarak `mutateWithAudit` fonksiyonunu çağırarak hem veritabanı güncellemesini (`supabase.from('inventory_settings').update(...)`) hem de denetim logunu tek bir atomik işlemde yürütür. Güncelleme, `updated_at` alanını da mevcut zaman damgasıyla set eder. İşlem başarıyla tamamlanırsa, uluslararasılaştırma fonksiyonu `t()` ile success mesajı gösterilir ve `load()` ile tablo verileri yenilenir. Hata yönetimi, `AdminPermissionError` izin hatalarını standart hatalardan ayırt ederek kullanıcıya anlamlı mesajlar sunar.
+
+**Parametreler**: Bu fonksiyon da parametre almaz. Gerekli tüm değerler (`alertEmail`, `alertWebhook`, `resTimeout`, `hasWriteAccess`) ve servisler (`supabase`, `mutateWithAudit`, `t`, `load`) React component'in state'inden ve kapsamından alınır.
+
+**Dönüş**: Fonksiyon `void` döndürür. Herhangi bir değer dönmez; yan etkileri (state güncellemeleri ve veritabanı işlemleri) vardır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../hooks/useRole::useRole
+- import: @/i18n/I18nProvider::useI18n
+- import: @/lib/admin/mutateWithAudit::AdminPermissionError
+- import: @/lib/admin/mutateWithAudit::mutateWithAudit
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: lucide-react::Bell
+- import: lucide-react::Settings
+- import: lucide-react::ShieldAlert
+- import: lucide-react::Zap
+- import: next/navigation::usePathname
+- import: react::React
 
 ---
 
@@ -84,55 +108,108 @@ Bu modül için verilen fonksiyon imzaları ve eski doküman yapısı temelinde 
 
 ## AST POINTERS
 
-### [N1_NASIL] AdminInventorySettingsPage AST Pointer: `src/views/admin/AdminInventorySettingsPage.tsx`::AdminInventorySettingsPage
-- **params**: (yok — React fonksiyonel bileşeni)
+### [N1_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::AdminInventorySettingsPage
+- **params**: ()
 - **ic_degiskenler**:
-  - `pathname` — `usePathname()` hook'undan gelen mevcut URL yolu, `load` effect'inde dependency olarak kullanılır
-  - `defaultThreshold` / `setDefaultThreshold` — `React.useState<number | ''>('')` ile tanımlı, varsayılan düşük stok eşiği değeri; input'tan okunur, `save()` içinde `value`'ya dönüştürülerek RPC'ye gönderilir
-  - `resetAll` / `setResetAll` — `React.useState<boolean>(false)` ile tanımlı, checkbox'tan gelen "tüm ürünlere uygula" flag'i; `save()` içinde `after.reset_overrides` olarak mutateWithAudit'e verilir
-  - `loading` / `setLoading` — `React.useState<LoadState>(LoadState.Idle)` ile tanımlı, sayfa yükleme durumu; `load()` içinde `LoadState.Loading`/`LoadState.Idle`/`LoadState.Error` olarak ayarlanır, JSX'te skeleton/error gösterimi için kontrol edilir
-  - `saving` / `setSaving` — `React.useState<boolean>(false)` ile tanımlı, eşik kaydetme işleminin devam ettiğini gösterir; button disabled durumunu ve metnini kontrol eder
-  - `savingGeneral` / `setSavingGeneral` — `React.useState<boolean>(false)` ile tanımlı, genel ayar kaydetme işleminin devam ettiğini gösterir; genel kaydet button disabled/metin kontrolü
-  - `error` / `setError` — `React.useState<string>('')` ile tanımlı, hata mesajı; catch bloklarında doldurulur, JSX'te hata bildirimi olarak gösterilir
-  - `success` / `setSuccess` — `React.useState<string>('')` ile tanımlı, başarı mesajı; `save()` ve `saveGeneralSettings()` sonunda doldurulur, JSX'te yeşil bildirim olarak gösterilir
-  - `alertEmail` / `setAlertEmail` — `React.useState<string>('')` ile tanımlı, kritik stok alarm e-posta adresi; input'tan okunur, `saveGeneralSettings()` içinde `after.alert_email` olarak gönderilir
-  - `alertWebhook` / `setAlertWebhook` — `React.useState<string>('')` ile tanımlı, webhook URL'i; input'tan okunur, `saveGeneralSettings()` içinde `after.alert_webhook_url` olarak gönderilir
-  - `resTimeout` / `setResTimeout` — `React.useState<number>(24)` ile tanımlı, rezervasyon iptal süresi (saat); input'tan okunur, `saveGeneralSettings()` içinde `after.reservation_timeout_hours` olarak gönderilir
-  - `canWrite` — `useRole()` hook'undan dönen write izni kontrol fonksiyonu
-  - `hasWriteAccess` — `canWrite('inventory_settings')` çağrısının boolean sonucu; hem button'ları disabled yapar hem de `mutateWithAudit`'e `canWrite` parametresi olarak geçer
-  - `load` — `React.useCallback` ile tanımlı, supabase'den `inventory_settings` tablosunu çeken ve state'leri dolduran async fonksiyon
-  - `save` — eşik değerini supabase RPC ile kaydeden async fonksiyon
-  - `saveGeneralSettings` — genel ayarları (email, webhook, timeout) supabase direct update ile kaydeden async fonksiyon
-- **Dönüş**: JSX — `return (...)` bloğunda iki ana kart: Stok Eşik Ayarları kartı (input + checkbox + save) ve Alarm/Otomasyon + Rezervasyon Kuralları kartı (email input + webhook input + timeout input + save). `hasWriteAccess` false ise rose renkli uyarı banner'ı. `loading === LoadState.Loading` iken `AdminSkeleton` gösterilir.
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, tüm metinleri çevirir
+  - `pathname` — usePathname hook'undan gelen mevcut URL yolu, efektleri tetikler
+  - `defaultThreshold` — Stok uyarı eşiği değeri (sayı veya boş string), form input'unun değeri
+  - `setDefaultThreshold` — defaultThreshold state setter'ı
+  - `resetAll` — Tüm ürünlere eşik değerini uygulayıp uygulamayacağını belirten boolean
+  - `setResetAll` — resetAll state setter'ı
+  - `loading` — Veri yükleme durumu (LoadState enum)
+  - `setLoading` — loading state setter'ı
+  - `saving` — Eşik formunun kaydetme durumu
+  - `setSaving` — saving state setter'ı
+  - `savingGeneral` — Genel ayarlar formunun kaydetme durumu
+  - `setSavingGeneral` — savingGeneral state setter'ı
+  - `error` — Hata mesajı string'i
+  - `setError` — error state setter'ı
+  - `success` — Başarı mesajı string'i
+  - `setSuccess` — success state setter'ı
+  - `alertEmail` — Alarm e-posta adresi, form input'unun değeri
+  - `setAlertEmail` — alertEmail state setter'ı
+  - `alertWebhook` — Webhook URL'i, form input'unun değeri
+  - `setAlertWebhook` — alertWebhook state setter'ı
+  - `resTimeout` — Rezervasyon zaman aşımı süresi (saat), varsayılan 24
+  - `setResTimeout` — resTimeout state setter'ı
+  - `canWrite` — useRole hook'undan gelen izin kontrol fonksiyonu
+  - `hasWriteAccess` — canWrite('inventory_settings') ile hesaplanan yazma izni boolean'ı
+  - `load` — React.useCallback ile tanımlı, veritabanından ayarları yükleyen async fonksiyon
+  - `save` — Stok eşiği ayarlarını kaydeden async fonksiyon
+  - `saveGeneralSettings` — Genel alarm ve rezervasyon ayarlarını kaydeden async fonksiyon
+- **Dönüş**: JSX element (React component)
 
----
-
-### [N2_NASIL] AdminInventorySettingsPage AST Pointer: `src/views/admin/AdminInventorySettingsPage.tsx`::load
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::load
+- **params**: ()
 - **ic_degiskenler**:
-  - `data` — `supabase.from('inventory_settings').select('*').maybeSingle()` sonucundan dönen satır verisi; `data.default_low_stock_threshold`, `data.alert_email`, `data.alert_webhook_url`, `data.reservation_timeout_hours` alanları okunur
-  - `error` — supabase select sorgusundan dönen hata nesnesi;truthy ise `throw error` ile catch'e düşer
-  - `val` — `data?.default_low_stock_threshold as number | null` olarak alınan eşik değeri; `null` ise boş string, değilse `Number(val)` olarak `defaultThreshold`'a set edilir
-- **Dönüş**: `void` — state'leri set eder: `setDefaultThreshold`, `setAlertEmail`, `setAlertWebhook`, `setResTimeout`, `setError('')`, `setLoading`. Hata olursa `setError('Ayarlar yüklenemedi')` ve `setLoading(LoadState.Error)`
+  - `setLoading` — Dış kapsamdan gelen loading state setter'ı
+  - `supabase` — Dış kapsamdan gelen Supabase istemcisi
+  - `data` — supabase.from('inventory_settings').select('*').maybeSingle() yanıtının data alanı
+  - `error` — supabase.from('inventory_settings').select('*').maybeSingle() yanıtının error alanı
+  - `val` — data.default_low_stock_threshold değerini number veya null olarak çıkaran geçici değişken
+  - `setDefaultThreshold` — Dış kapsamdan gelen setter
+  - `setAlertEmail` — Dış kapsamdan gelen setter
+  - `setAlertWebhook` — Dış kapsamdan gelen setter
+  - `setResTimeout` — Dış kapsamdan gelen setter
+  - `setError` — Dış kapsamdan gelen setter
+  - `t` — Dış kapsamdan gelen çeviri fonksiyonu
+- **Dönüş**: void (Promise)
 
----
-
-### [N3_NASIL] AdminInventorySettingsPage AST Pointer: `src/views/admin/AdminInventorySettingsPage.tsx`::save
-- **params**: (yok)
+### [N3_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::save
+- **params**: ()
 - **ic_degiskenler**:
-  - `value` — `(defaultThreshold === '' ? null : Number(defaultThreshold))` ifadesinden elde edilen sayısal eşik değeri veya null; hem `mutateWithAudit`'in `after` objesine hem de `supabase.rpc` çağrısına `p_default` parametresi olarak geçilir
-  - `e` — catch bloğundaki `unknown` tipinde hata nesnesi; `AdminPermissionError` veya `Error` instance kontrolü yapılır
-  - `msg` — `e` objesinden çıkarılan kullanıcıya gösterilecek hata mesajı stringi
-- **Dönüş**: `void` — state'leri set eder: `setSaving(true)`, `setSuccess`, `setError`, `setSaving(false)`. `mutateWithAudit` çağrısı ile `supabase.rpc('update_inventory_thresholds', { p_default: value, p_reset_overrides: resetAll })` çalıştırılır, ardından `load()` çağrılarak veriler yenilenir
+  - `setSaving` — Dış kapsamdan gelen saving state setter'ı
+  - `setSuccess` — Dış kapsamdan gelen success state setter'ı
+  - `setError` — Dış kapsamdan gelen error state setter'ı
+  - `defaultThreshold` — Dış kapsamdan gelen stok eşiği değeri
+  - `value` — defaultThreshold'u number veya null'a dönüştüren yerel değişken
+  - `mutateWithAudit` — Dış kapsamdan gelen audit korumalı mutasyon fonksiyonu
+  - `supabase` — Dış kapsamdan gelen Supabase istemcisi
+  - `hasWriteAccess` — Dış kapsamdan gelen yazma izni boolean'ı
+  - `resetAll` — Dış kapsamdan gelen toplu uygulama boolean'ı
+  - `t` — Dış kapsamdan gelen çeviri fonksiyonu
+  - `load` — Dış kapsamdan gelen veri yükleme fonksiyonu
+  - `e` — catch bloğundaki hata nesnesi
+  - `msg` — e nesnesinden türetilen kullanıcıya gösterilecek hata mesajı string'i
+- **Dönüş**: void (Promise)
 
----
-
-### [N4_NASIL] AdminInventorySettingsPage AST Pointer: `src/views/admin/AdminInventorySettingsPage.tsx`::saveGeneralSettings
-- **params**: (yok)
+### [N4_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::save.fn
+- **params**: ()
 - **ic_degiskenler**:
-  - `e` — catch bloğundaki `unknown` tipinde hata nesnesi; `AdminPermissionError` veya `Error` instance kontrolü yapılır
-  - `msg` — `e` objesinden çıkarılan kullanıcıya gösterilecek hata mesajı stringi
-- **Dönüş**: `void` — state'leri set eder: `setSavingGeneral(true)`, `setSuccess`, `setError`, `setSavingGeneral(false)`. `mutateWithAudit` çağrısı ile `supabase.from('inventory_settings').update({ alert_email, alert_webhook_url, reservation_timeout_hours, updated_at: new Date().toISOString() }).eq('id', true)` çalıştırılır, ardından `load()` çağrılarak veriler yenilenir. `after` objesinde `alert_email: alertEmail || null`, `alert_webhook_url: alertWebhook || null`, `reservation_timeout_hours: resTimeout || 24` gönderilir
+  - `supabase` — Dış kapsamdan (save fonksiyonu) gelen Supabase istemcisi
+  - `value` — Dış kapsamdan (save fonksiyonu) gelen sayısal eşik değeri
+  - `resetAll` — Dış kapsamdan (save fonksiyonu) gelen toplu uygulama boolean'ı
+  - `error` — supabase.rpc() yanıtının hata alanı
+- **Dönüş**: void (Promise)
+
+### [N5_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::saveGeneralSettings
+- **params**: ()
+- **ic_degiskenler**:
+  - `setSavingGeneral` — Dış kapsamdan gelen savingGeneral state setter'ı
+  - `setSuccess` — Dış kapsamdan gelen success state setter'ı
+  - `setError` — Dış kapsamdan gelen error state setter'ı
+  - `mutateWithAudit` — Dış kapsamdan gelen audit korumalı mutasyon fonksiyonu
+  - `supabase` — Dış kapsamdan gelen Supabase istemcisi
+  - `hasWriteAccess` — Dış kapsamdan gelen yazma izni boolean'ı
+  - `alertEmail` — Dış kapsamdan gelen e-posta adresi string'i
+  - `alertWebhook` — Dış kapsamdan gelen webhook URL string'i
+  - `resTimeout` — Dış kapsamdan gelen zaman aşımı süresi (saat)
+  - `t` — Dış kapsamdan gelen çeviri fonksiyonu
+  - `load` — Dış kapsamdan gelen veri yükleme fonksiyonu
+  - `e` — catch bloğundaki hata nesnesi
+  - `msg` — e nesnesinden türetilen kullanıcıya gösterilecek hata mesajı string'i
+- **Dönüş**: void (Promise)
+
+### [N6_NASIL] AST Pointer: src/views/admin/AdminInventorySettingsPage.tsx::saveGeneralSettings.fn
+- **params**: ()
+- **ic_degiskenler**:
+  - `supabase` — Dış kapsamdan (saveGeneralSettings fonksiyonu) gelen Supabase istemcisi
+  - `alertEmail` — Dış kapsamdan (saveGeneralSettings fonksiyonu) gelen e-posta adresi
+  - `alertWebhook` — Dış kapsamdan (saveGeneralSettings fonksiyonu) gelen webhook URL'i
+  - `resTimeout` — Dış kapsamdan (saveGeneralSettings fonksiyonu) gelen zaman aşımı süresi
+  - `error` — supabase.from().update().eq() yanıtının hata alanı
+- **Dönüş**: void (Promise)
 
 ---
 

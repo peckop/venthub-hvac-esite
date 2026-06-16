@@ -2,6 +2,7 @@ import { CheckCircle2, FileUp, Info,Search, X } from 'lucide-react'
 import React, { useRef,useState } from 'react'
 import { toast } from 'sonner'
 
+import { useI18n } from '@/i18n/I18nProvider'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
@@ -24,6 +25,7 @@ interface InventoryCsvImportProps {
 }
 
 export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effectiveThreshold }: InventoryCsvImportProps) {
+    const { t } = useI18n()
     const [csvPreview, setCsvPreview] = useState<CsvPreviewRow[]>([])
     const [csvProcessing, setCsvProcessing] = useState<boolean>(false)
     const [dryRun, setDryRun] = useState<boolean>(true)
@@ -213,18 +215,18 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                 <div className="glass-strong rounded-2xl border border-white/10 shadow-2xl p-4 flex flex-col gap-4 animate-in slide-in-from-bottom-5 duration-300 pointer-events-auto">
                     <div className="flex items-center gap-3">
                         <CheckCircle2 className="text-emerald-400" size={20} />
-                        <span className="text-sm font-bold text-white">{successCount} ürün güncellendi.</span>
+                        <span className="text-sm font-bold text-white">{t('admin.inventory.import.productsUpdated', { count: successCount })}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <a
                             href={`/admin/movements?batch=${batchId}`}
                             className="px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-xl bg-cyan-400 text-surface-deep hover:bg-cyan-300 transition-colors"
-                        >Hareketleri Gör</a>
+                        >{t('admin.inventory.import.viewMovements')}</a>
                         {errors.length > 0 && (
                             <button
                                 className="px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-xl glass border border-white/10 text-white hover:bg-white/10"
                                 onClick={() => { downloadErrors(); toast.dismiss(id) }}
-                            >Hataları İndir</button>
+                            >{t('admin.inventory.import.downloadErrors')}</button>
                         )}
                         <button
                             className="px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/20 hover:bg-rose-500/30 transition-colors font-bold ml-auto"
@@ -245,7 +247,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                     toast.dismiss(id)
                                 }
                             }}
-                        >Tümünü Geri Al</button>
+                        >{t('admin.inventory.import.undoAll')}</button>
                     </div>
                 </div>
             ), { duration: 15000 })
@@ -265,7 +267,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                 type="button"
                 className="fixed inset-0 w-full h-full bg-black/60 z-50 backdrop-blur-sm cursor-default border-none outline-none" 
                 onClick={onClose}
-                aria-label="Kapat"
+                aria-label={t('admin.inventory.import.close')}
                 tabIndex={-1}
             />
             <div 
@@ -280,7 +282,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                             <div className="p-2.5 rounded-2xl bg-cyan-400 shadow-glow-md">
                                 <FileUp size={20} className="text-surface-deep" />
                             </div>
-                            <h2 id="csv-import-title" className="text-xl font-black text-white uppercase tracking-tight">CSV Stok İçe Aktarma</h2>
+                            <h2 id="csv-import-title" className="text-xl font-black text-white uppercase tracking-tight">{t('admin.inventory.import.title')}</h2>
                         </div>
                         <button className="w-10 h-10 flex items-center justify-center rounded-full glass border border-white/10 text-slate-400 hover:text-white transition-colors hover:bg-white/5" onClick={onClose}>
                             <X size={20} />
@@ -289,7 +291,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                     
                     <div className="p-8 space-y-8 overflow-y-auto custom-scrollbar">
                         <div className="space-y-4">
-                            <label className="block text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1">CSV Dosyası Seç</label>
+                            <label className="block text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1">{t('admin.inventory.import.selectFile')}</label>
                             <div className="border-2 border-dashed border-white/10 rounded-hvac-xl p-12 text-center hover:border-cyan-400/40 hover:bg-cyan-400/2 transition-colors group cursor-pointer relative bg-surface-deep/20">
                                 <input
                                     type="file"
@@ -305,8 +307,8 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                         <FileUp size={24} className="text-slate-400 group-hover:text-surface-deep" />
                                     </div>
                                     <div className="text-slate-500 group-hover:text-slate-300 transition-colors">
-                                        <p className="text-sm font-bold">Dosyayı buraya sürükleyin veya <span className="text-cyan-400 underline decoration-cyan-400/30 underline-offset-4">bilgisayarınızdan seçin</span></p>
-                                        <p className="text-xs uppercase font-black tracking-widest mt-2 opacity-50">Format: SKU, Miktar (örn: PRD001, 25)</p>
+                                        <p className="text-sm font-bold">{t('admin.inventory.import.dragDropText')} <span className="text-cyan-400 underline decoration-cyan-400/30 underline-offset-4">{t('admin.inventory.import.browseText')}</span></p>
+                                        <p className="text-xs uppercase font-black tracking-widest mt-2 opacity-50">{t('admin.inventory.import.formatInfo')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -321,7 +323,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                             </div>
                             <div className="flex-1">
                                 <label htmlFor="dryRun" className="text-sm font-bold text-slate-300 select-none cursor-pointer flex items-center gap-2">
-                                    Simülasyon Modu (Kuru Çalıştırma)
+                                    {t('admin.inventory.import.dryRunMode')}
                                     <input
                                         type="checkbox"
                                         id="dryRun"
@@ -330,13 +332,13 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                         className="sr-only"
                                     />
                                 </label>
-                                <p className="text-xs font-bold text-slate-500 uppercase tracking-tight mt-0.5">Veritabanını güncellemeden önce sonuçları önizleyin.</p>
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-tight mt-0.5">{t('admin.inventory.import.dryRunHint')}</p>
                             </div>
                             <button
                                 type="button"
                                 role="switch"
                                 aria-checked={dryRun}
-                                aria-label="Simülasyon modu aç kapa"
+                                aria-label={t('admin.inventory.import.toggleSimulation')}
                                 tabIndex={0}
                                 className={`w-12 h-6 rounded-full relative cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 ${dryRun ? 'bg-amber-400' : 'bg-white/10'}`}
                                 onClick={() => setDryRun(!dryRun)}
@@ -356,7 +358,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                 <div className="flex items-center justify-between ml-1">
                                     <h3 className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal flex items-center gap-2">
                                         <Search size={12} />
-                                        Önizleme ({csvPreview.length} Ürün)
+                                        {t('admin.inventory.import.previewCount', { count: csvPreview.length })}
                                     </h3>
                                 </div>
                                 <div className="glass rounded-hvac-xl border border-white/5 overflow-hidden shadow-2xl">
@@ -364,10 +366,10 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                         <table className="w-full text-xs border-separate border-spacing-0">
                                             <thead className="sticky top-0 bg-surface-midnight z-10">
                                                 <tr>
-                                                    <th className="px-5 py-4 text-left font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">Ürün Bilgisi</th>
-                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">Mevcut</th>
-                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">Yeni</th>
-                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">Değişim</th>
+                                                    <th className="px-5 py-4 text-left font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">{t('admin.inventory.table.productInfo')}</th>
+                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">{t('admin.inventory.import.table.current')}</th>
+                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">{t('admin.inventory.import.table.new')}</th>
+                                                    <th className="px-5 py-4 text-right font-black text-slate-500 uppercase tracking-widest text-xs border-b border-white/5">{t('admin.inventory.import.table.delta')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-transparent">
@@ -397,7 +399,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                             onClick={onClose}
                             className="h-12 px-8 rounded-2xl glass border border-white/5 text-slate-400 text-xs font-black uppercase tracking-widest hover:text-white transition-colors"
                         >
-                            İptal
+                            {t('admin.common.cancel')}
                         </button>
                         <button
                             onClick={processCSV}
@@ -407,10 +409,9 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                             {csvProcessing ? (
                                 <div className="flex items-center gap-2">
                                     <div className="w-3 h-3 border-2 border-surface-deep/20 border-t-surface-deep rounded-full animate-spin" />
-                                    {Math.round(csvProgress * 100)}%
-                                Montaj yapılıyor.
+                                    {t('admin.inventory.import.processing', { progress: Math.round(csvProgress * 100) })}
                                 </div>
-                            ) : (dryRun ? 'Sadece Test Et' : 'Verileri İçe Aktar')}
+                            ) : (dryRun ? t('admin.inventory.import.testOnly') : t('admin.inventory.import.importData'))}
                         </button>
                     </footer>
                 </div>

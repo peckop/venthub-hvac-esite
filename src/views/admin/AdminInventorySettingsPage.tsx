@@ -1,7 +1,10 @@
+'use client'
+
 import { Bell, Settings, ShieldAlert,Zap } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
+import { useI18n } from '@/i18n/I18nProvider'
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
@@ -18,6 +21,7 @@ import {
 enum LoadState { Idle, Loading, Error }
 
 const AdminInventorySettingsPage: React.FC = () => {
+  const { t } = useI18n()
   const pathname = usePathname()
   const [defaultThreshold, setDefaultThreshold] = React.useState<number | ''>('')
   const [resetAll, setResetAll] = React.useState<boolean>(false)
@@ -48,10 +52,10 @@ const AdminInventorySettingsPage: React.FC = () => {
       setError('')
       setLoading(LoadState.Idle)
     } catch {
-      setError('Ayarlar yüklenemedi')
+      setError(t('admin.inventory.settings.loadError'))
       setLoading(LoadState.Error)
     }
-  }, [])
+  }, [t])
 
   React.useEffect(() => { load() }, [load, pathname])
 
@@ -74,11 +78,11 @@ const AdminInventorySettingsPage: React.FC = () => {
           if (error) throw error
         },
       })
-      setSuccess(resetAll ? 'Kaydedildi ve tüm ürünlere uygulandı' : 'Kaydedildi')
+      setSuccess(resetAll ? t('admin.inventory.settings.saveSuccessReset') : t('admin.inventory.settings.saveSuccess'))
       await load()
     } catch (e: unknown) {
       console.error('update_inventory_thresholds error:', e)
-      const msg = e instanceof AdminPermissionError ? 'Bu işlem için yetkiniz yok' : e instanceof Error ? e.message : 'Kaydedilemedi'
+      const msg = e instanceof AdminPermissionError ? t('admin.inventory.settings.noPermission') : e instanceof Error ? e.message : t('admin.inventory.settings.saveError')
       setError(msg)
     } finally {
       setSaving(false)
@@ -114,11 +118,11 @@ const AdminInventorySettingsPage: React.FC = () => {
           if (error) throw error
         },
       })
-      setSuccess('Genel ayarlar kaydedildi')
+      setSuccess(t('admin.inventory.settings.saveGeneralSuccess'))
       await load()
     } catch (e: unknown) {
       console.error('saveGeneralSettings error:', e)
-      const msg = e instanceof AdminPermissionError ? 'Bu işlem için yetkiniz yok' : e instanceof Error ? e.message : 'Kaydedilemedi'
+      const msg = e instanceof AdminPermissionError ? t('admin.inventory.settings.noPermission') : e instanceof Error ? e.message : t('admin.inventory.settings.saveError')
       setError(msg)
     } finally {
       setSavingGeneral(false)
@@ -128,15 +132,15 @@ const AdminInventorySettingsPage: React.FC = () => {
   return (
     <div className="space-y-10 max-w-5xl animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header className="space-y-1">
-        <h1 className={adminSectionTitleClass}>Eşik & Ayarlar</h1>
-        <p className={adminSubtitleClass}>Envanter otomasyonu, stok alarmları ve rezervasyon kurallarını yapılandırın.</p>
+        <h1 className={adminSectionTitleClass}>{t('admin.inventory.settings.title')}</h1>
+        <p className={adminSubtitleClass}>{t('admin.inventory.settings.subtitle')}</p>
       </header>
 
       {!hasWriteAccess && (
         <div className="glass-strong border border-rose-500/20 bg-rose-500/5 p-6 rounded-hvac-xl flex items-center gap-4 text-rose-500">
           <ShieldAlert size={24} />
           <div className="text-sm font-black uppercase tracking-widest">
-            Bu sayfada değişiklik yapmak için yetkiniz bulunmuyor.
+            {t('admin.inventory.settings.noWritePermission')}
           </div>
         </div>
       )}
@@ -151,12 +155,12 @@ const AdminInventorySettingsPage: React.FC = () => {
             <div className="relative z-10 space-y-6">
               <div className="flex items-center gap-3 border-b border-white/5 pb-4">
                 <Settings className="text-cyan-400" size={20} />
-                <h2 className="text-lg font-black text-white uppercase tracking-tight">Stok Eşik Ayarları</h2>
+                <h2 className="text-lg font-black text-white uppercase tracking-tight">{t('admin.inventory.settings.stockThresholdSettings')}</h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
-                  <label className={adminSettingsLabelClass}>Varsayılan Düşük Stok Eşiği</label>
+                  <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.defaultLowStockThreshold')}</label>
                   <div className="flex items-center gap-3">
                     <input 
                       type="number" 
@@ -170,13 +174,13 @@ const AdminInventorySettingsPage: React.FC = () => {
                       disabled={saving || !hasWriteAccess} 
                       onClick={save}
                     >
-                      {saving ? 'İşleniyor...' : 'Güncelle'}
+                      {saving ? t('admin.inventory.settings.processing') : t('common.update')}
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <label className={adminSettingsLabelClass}>Toplu Uygulama</label>
+                  <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.bulkApply')}</label>
                   <label className="flex items-start gap-4 p-4 rounded-2xl bg-surface-deep/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
                     <input 
                       type="checkbox" 
@@ -185,9 +189,9 @@ const AdminInventorySettingsPage: React.FC = () => {
                       onChange={(e) => setResetAll(e.target.checked)} 
                     />
                     <div className="space-y-1">
-                      <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">Tüm Ürünlere Uygula</span>
+                      <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">{t('admin.inventory.settings.applyToAll')}</span>
                       <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
-                        Ürün bazlı özel eşikleri temizleyerek her şeyde varsayılanı kullanır.
+                        {t('admin.inventory.settings.bulkApplyHelp')}
                       </span>
                     </div>
                   </label>
@@ -196,7 +200,7 @@ const AdminInventorySettingsPage: React.FC = () => {
 
               <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
                 <p className="text-xs font-bold text-amber-500/80 leading-relaxed uppercase tracking-widest text-center">
-                  Bu işlem ürün veritabanında toplu güncelleme yapar ve geri alınamaz.
+                  {t('admin.inventory.settings.bulkApplyWarning')}
                 </p>
               </div>
             </div>
@@ -213,14 +217,14 @@ const AdminInventorySettingsPage: React.FC = () => {
         <section className="space-y-8 relative z-10">
           <div className="flex items-center gap-3 border-b border-white/5 pb-4">
             <Bell className="text-violet-400" size={20} />
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Alarm ve Otomasyon</h2>
+            <h2 className="text-lg font-black text-white uppercase tracking-tight">{t('admin.inventory.settings.alarmAutomation')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div className="space-y-4">
-              <label className={adminSettingsLabelClass}>E-Posta Bildirimleri</label>
+              <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.emailNotifications')}</label>
               <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">Kritik Stok Alıcı Adresi</label>
+                <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">{t('admin.inventory.settings.alertEmailLabel')}</label>
                 <input
                   type="email"
                   className={adminInputClass}
@@ -228,14 +232,14 @@ const AdminInventorySettingsPage: React.FC = () => {
                   value={alertEmail}
                   onChange={e => setAlertEmail(e.target.value)}
                 />
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Kritik seviyelerde bu adrese mail gönderilir.</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.inventory.settings.alertEmailHelp')}</p>
               </div>
             </div>
 
             <div className="space-y-4">
-              <label className={adminSettingsLabelClass}>Webhook Entegrasyonu</label>
+              <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.webhookIntegration')}</label>
               <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">Webhook URL (Slack/ERP)</label>
+                <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">{t('admin.inventory.settings.webhookUrlLabel')}</label>
                 <input
                   type="url"
                   className={adminInputClass}
@@ -243,7 +247,7 @@ const AdminInventorySettingsPage: React.FC = () => {
                   value={alertWebhook}
                   onChange={e => setAlertWebhook(e.target.value)}
                 />
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Anlık veri iletimi için HTTP POST endpoint.</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.inventory.settings.webhookUrlHelp')}</p>
               </div>
             </div>
           </div>
@@ -252,11 +256,11 @@ const AdminInventorySettingsPage: React.FC = () => {
         <section className="space-y-8 relative z-10 pt-6 border-t border-white/5">
           <div className="flex items-center gap-3">
             <Zap className="text-amber-400" size={20} />
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">Rezervasyon Kuralları</h2>
+            <h2 className="text-lg font-black text-white uppercase tracking-tight">{t('admin.inventory.settings.reservationRules')}</h2>
           </div>
 
           <div className="max-w-md space-y-4">
-            <label className={adminSettingsLabelClass}>Otomatik Rezervasyon İptal Süresi (Saat)</label>
+            <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.reservationTimeoutLabel')}</label>
             <div className="flex items-end gap-6">
               <div className="flex-1 space-y-2">
                 <input
@@ -270,7 +274,7 @@ const AdminInventorySettingsPage: React.FC = () => {
               </div>
               <div className="flex-1 pb-1">
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
-                  Ödemesi tamamlanmayan ürünlerin stoktan düşme süresidir.
+                  {t('admin.inventory.settings.reservationTimeoutHelp')}
                 </p>
               </div>
             </div>
@@ -283,7 +287,7 @@ const AdminInventorySettingsPage: React.FC = () => {
             onClick={saveGeneralSettings}
             className={`${adminButtonPrimaryClass} px-12 h-14 bg-violet-500 text-white hover:bg-violet-400 shadow-lg shadow-violet-500/20`}
           >
-            {savingGeneral ? 'Kaydediliyor...' : 'Tüm Ayarları Kaydet'}
+            {savingGeneral ? t('admin.inventory.settings.saving') : t('admin.inventory.settings.saveAll')}
           </button>
         </div>
       </div>

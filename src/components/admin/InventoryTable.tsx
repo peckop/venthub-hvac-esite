@@ -1,6 +1,8 @@
 import { SearchX } from 'lucide-react'
 import React from 'react'
 
+import { useI18n } from '@/i18n/I18nProvider'
+
 import { useDragScroll } from '../../hooks/useDragScroll'
 import { Density, InventoryRow, LoadState, SortKey, VisibleCols } from '../../types/inventory'
 import { adminTableCellClass,adminTableHeadCellClass } from '../../utils/adminUi'
@@ -50,6 +52,7 @@ export default function InventoryTable({
     defaultThreshold,
     effectiveThreshold
 }: InventoryTableProps) {
+    const { t } = useI18n()
     const dragScrollRef = useDragScroll<HTMLDivElement>()
     const headPad = density === 'compact' ? 'px-2 py-2' : ''
     const cellPad = density === 'compact' ? 'px-2 py-2' : ''
@@ -64,10 +67,10 @@ export default function InventoryTable({
         const th = effectiveThreshold(r.product_id)
         const base = "px-3 py-1 text-xs font-black uppercase tracking-widest rounded-full border shadow-sm transition-colors"
         
-        if (net <= 0) return <span className={`${base} bg-rose-500/10 text-rose-400 border-rose-500/20`}>Tükendi</span>
-        if (th != null && net <= th) return <span className={`${base} bg-amber-500/10 text-amber-400 border-amber-500/20 animate-pulse`}>Kritik</span>
-        if (r.reserved_stock > 0) return <span className={`${base} bg-blue-500/10 text-blue-400 border-blue-500/20`}>Rezervli</span>
-        return <span className={`${base} bg-emerald-500/10 text-emerald-400 border-emerald-500/20`}>Uygun</span>
+        if (net <= 0) return <span className={`${base} bg-rose-500/10 text-rose-400 border-rose-500/20`}>{t('admin.inventory.status.depleted')}</span>
+        if (th != null && net <= th) return <span className={`${base} bg-amber-500/10 text-amber-400 border-amber-500/20 animate-pulse`}>{t('admin.inventory.status.criticalBadge')}</span>
+        if (r.reserved_stock > 0) return <span className={`${base} bg-blue-500/10 text-blue-400 border-blue-500/20`}>{t('admin.inventory.status.reservedBadge')}</span>
+        return <span className={`${base} bg-emerald-500/10 text-emerald-400 border-emerald-500/20`}>{t('admin.inventory.status.availableBadge')}</span>
     }
 
     const TableRow = ({ r }: { r: InventoryRow }) => (
@@ -133,11 +136,11 @@ export default function InventoryTable({
             {visibleCols.days && (
                 <td className={adminTableCellClass + " " + cellPad + " text-right"}>
                     {r.days_until_empty === 9999 ? (
-                        <span className="text-xs text-slate-600 uppercase font-black tracking-widest">SABİT</span>
+                        <span className="text-xs text-slate-600 uppercase font-black tracking-widest">{t('admin.inventory.table.stable')}</span>
                     ) : (
                         <div className={`text-xs font-black uppercase tracking-widest ${r.days_until_empty && r.days_until_empty <= 7 ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`}>
                             {r.days_until_empty && r.days_until_empty <= 7 && '🔥 '}
-                            {r.days_until_empty} GÜN
+                            {t('admin.inventory.table.daysCount', { count: r.days_until_empty })}
                         </div>
                     )}
                 </td>
@@ -154,70 +157,70 @@ export default function InventoryTable({
                         {visibleCols.name && (
                             <th className={adminTableHeadCellClass + " " + headPad}>
                                 <button onClick={() => onSort('name')} className="hover:text-cyan-400 transition-colors flex items-center gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    Ürün {sortIndicator('name')}
+                                    {t('admin.inventory.table.productCol')} {sortIndicator('name')}
                                 </button>
                             </th>
                         )}
                         {visibleCols.physical && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
                                 <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    <button onClick={() => onSort('physical')} className="hover:text-cyan-400 transition-colors">Fiziksel {sortIndicator('physical')}</button>
-                                    <InfoTooltip text="Depodaki gerçekte sayılan mevcut ürün adedi." />
+                                    <button onClick={() => onSort('physical')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.physicalCol')} {sortIndicator('physical')}</button>
+                                    <InfoTooltip text={t('admin.inventory.tooltip.physical')} />
                                 </div>
                             </th>
                         )}
                         {visibleCols.reserved && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
                                 <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    <button onClick={() => onSort('reserved')} className="hover:text-cyan-400 transition-colors">Rezerve {sortIndicator('reserved')}</button>
-                                    <InfoTooltip text="Henüz kargolanmamış ama parası ödenmiş ürün miktarı." />
+                                    <button onClick={() => onSort('reserved')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.reservedCol')} {sortIndicator('reserved')}</button>
+                                    <InfoTooltip text={t('admin.inventory.tooltip.reserved')} />
                                 </div>
                             </th>
                         )}
                         {visibleCols.available && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
                                 <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal text-cyan-400">
-                                    <button onClick={() => onSort('available')} className="hover:opacity-80">Müsait {sortIndicator('available')}</button>
-                                    <InfoTooltip text="Satılabilir durumdaki net stok. (Fiziksel - Rezerve)" />
+                                    <button onClick={() => onSort('available')} className="hover:opacity-80">{t('admin.inventory.table.availableCol')} {sortIndicator('available')}</button>
+                                    <InfoTooltip text={t('admin.inventory.tooltip.available')} />
                                 </div>
                             </th>
                         )}
                         {visibleCols.threshold && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
                                 <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    <button onClick={() => onSort('threshold')} className="hover:text-cyan-400 transition-colors">Eşik {sortIndicator('threshold')}</button>
-                                    <InfoTooltip text="Stok bu rakamın altına indiğinde uyarı verilir." />
+                                    <button onClick={() => onSort('threshold')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.thresholdCol')} {sortIndicator('threshold')}</button>
+                                    <InfoTooltip text={t('admin.inventory.tooltip.threshold')} />
                                 </div>
                             </th>
                         )}
                         {visibleCols.location && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-xs font-black tracking-hvac-normal"}>
-                                <button onClick={() => onSort('location')} className="hover:text-cyan-400 transition-colors">Raf {sortIndicator('location')}</button>
+                                <button onClick={() => onSort('location')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.locationCol')} {sortIndicator('location')}</button>
                             </th>
                         )}
                         {visibleCols.supplier && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-xs font-black tracking-hvac-normal"}>
-                                <button onClick={() => onSort('supplier')} className="hover:text-cyan-400 transition-colors">Tedarikçi {sortIndicator('supplier')}</button>
+                                <button onClick={() => onSort('supplier')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.supplierCol')} {sortIndicator('supplier')}</button>
                             </th>
                         )}
                         {visibleCols.abc && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-center"}>
                                 <div className="flex items-center justify-center gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    <button onClick={() => onSort('abc')} className="hover:text-cyan-400 transition-colors">Sınıf {sortIndicator('abc')}</button>
-                                    <InfoTooltip text="A (En Popüler), B (Orta), C (Az Satan)." />
+                                    <button onClick={() => onSort('abc')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.abcCol')} {sortIndicator('abc')}</button>
+                                    <InfoTooltip text={t('admin.inventory.tooltip.abc')} />
                                 </div>
                             </th>
                         )}
                         {visibleCols.days && (
                             <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
                                 <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    <button onClick={() => onSort('days_empty')} className="hover:text-cyan-400 transition-colors">Tükenme {sortIndicator('days_empty')}</button>
-                                    <InfoTooltip text="Eldeki stoğun kaç gün içinde biteceği tahmini." />
+                                    <button onClick={() => onSort('days_empty')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.daysCol')} {sortIndicator('days_empty')}</button>
+                                    <InfoTooltip text={t('admin.inventory.tooltip.days')} />
                                 </div>
                             </th>
                         )}
                         {visibleCols.status && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase text-xs font-black tracking-hvac-normal"}>Durum</th>
+                            <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase text-xs font-black tracking-hvac-normal"}>{t('admin.inventory.table.statusCol')}</th>
                         )}
                     </tr>
                 </thead>
@@ -235,8 +238,8 @@ export default function InventoryTable({
                             <td colSpan={10} className="p-0 border-b-0">
                                 <AdminEmptyState
                                     icon={SearchX}
-                                    title="Ürün Bulunamadı"
-                                    description="Arama kriterlerinize uygun envanter kaydı bulunamadı."
+                                    title={t('admin.inventory.empty.title')}
+                                    description={t('admin.inventory.empty.description')}
                                 />
                             </td>
                         </tr>
@@ -247,7 +250,7 @@ export default function InventoryTable({
                                     <th colSpan={10} className={`text-left ${density === 'compact' ? 'px-4 py-2' : 'px-8 py-4'} text-cyan-400 font-black uppercase text-xs tracking-hvac-relaxed border-y border-white/5`}>
                                         <div className="flex items-center gap-3">
                                             <span className="w-1 h-4 bg-cyan-400 rounded-full shadow-glow-sm"></span>
-                                            {g.name || 'Kategorisiz'} <span className="text-slate-500 ml-2">({g.items.length})</span>
+                                            {g.name || t('admin.inventory.table.uncategorized')} <span className="text-slate-500 ml-2">{t('admin.inventory.table.groupCount', { count: g.items.length })}</span>
                                         </div>
                                     </th>
                                 </tr>

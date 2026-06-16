@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\inventory.en.ts
-skeleton_hash: b336057c1402a57b
+skeleton_hash: 6452cb687053ddc3
 entity_hashes:
   overview: 18ed3f6f33fcd066
-generated_at: 2026-06-13T11:12:06Z
+generated_at: 2026-06-16T10:18:09Z
 ---
 
 ## Genel Bakış
@@ -31,7 +31,7 @@ Bu dosyada herhangi bir fonksiyon veya metod bulunmamaktadır. Dosya, salt veri 
 ## SABİTLER
 - **inventory** (object) — `{
       subtitle: 'Real-Time Stock Tracking',
-      allCategories: 'ALL CATEG...`
+      allCategories: 'ALL CAT...`
 
 ---
 

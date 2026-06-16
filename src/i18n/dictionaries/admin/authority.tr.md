@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\authority.tr.ts
-skeleton_hash: eed4834c315b5165
+skeleton_hash: adf6e51757d1c5ca
 entity_hashes:
   overview: d75139dd453d58b5
-generated_at: 2026-06-13T11:08:22Z
+generated_at: 2026-06-16T10:18:09Z
 ---
 
 ## Genel Bakış
@@ -34,7 +34,7 @@ Bu modül için fonksiyonel aksiyom tanımlanmamıştır.
 ## SABİTLER
 - **authority** (object) — `{
       leftSideEski: 'Sol Taraf (Eski)',
-      labelTraditional: 'Etiket (Ör...`
+      labelTraditional: 'Etiket (...`
 
 ---
 
@@ -49,10 +49,6 @@ Bu dosya **i18n sözlük dosyası**dır ve **fonksiyon içermez**.
 - **Amaç**: Admin panelindeki "Yetki/Authority" ile ilgili arayüz metinlerinin Türkçe çevirilerini tutar
 - **Kullanım**: uygulamada `t('authority.xxx')` çağrısıyla erişilir
 - **Erişim türü**: `export` ile dışa açık sabit
-
----
-
-**Sonuç**: Bu dosyada analiz edilecek fonksiyon bulunmamaktadır. Dosya salt veri (translation dictionary) içerir. AST Pointer oluşturma gerektirecek fonksiyon gövdesi, method veya class tanımı mevcut değildir.
 
 ---
 

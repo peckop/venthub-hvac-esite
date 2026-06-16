@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\authority-builder\BlockEditor.tsx
-skeleton_hash: cfab5611e3d1584a
+skeleton_hash: 64a64a5a4ef0c335
 entity_hashes:
   func:BlockEditor: 214d29bf0d4fb6bd
   overview: 451c6f0d8f51e9a4
   style_tokens: bc113824a6724140
-generated_at: 2026-06-08T10:08:37Z
+generated_at: 2026-06-16T10:18:09Z
 ---
 
 ## Genel Bakış
@@ -41,6 +41,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `onChange`: BlockEditorProps — Blok verisinde meydana gelen değişiklikleri dışarıya bildirmek için kullanılan zorunlu callback prop. Yeni blok verisini parametre olarak alır.
 
 **Dönüş**: React.FC<BlockEditorProps> — Bir React fonksiyonel bileşeni döndürür. Bileşen, belirtilen prop'lar ile çağrıldığında bir JSX ağacı üretir ve blok düzenleme arayüzünü kullanıcıya sunar.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::Plus
+- import: lucide-react::Trash2
+- import: react::React
 
 ---
 

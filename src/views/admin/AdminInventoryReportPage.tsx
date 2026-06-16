@@ -1,3 +1,5 @@
+'use client'
+
 import { eachDayOfInterval,endOfDay, format, startOfDay, subDays } from 'date-fns'
 import { Activity, ArrowDownRight, ArrowUpRight, Download, MinusCircle,PackageMinus, PlusCircle, TrendingUp } from 'lucide-react'
 import { usePathname } from 'next/navigation'
@@ -5,6 +7,7 @@ import React from 'react'
 import { DateRange } from 'react-day-picker'
 import { Area, AreaChart, Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer,Tooltip as RechartsTooltip, XAxis, YAxis } from 'recharts'
 
+import { useI18n } from '@/i18n/I18nProvider'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -16,6 +19,7 @@ import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { adminButtonSecondaryClass,adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass } from '../../utils/adminUi'
 
 export default function AdminInventoryReportPage() {
+    const { t } = useI18n()
     const pathname = usePathname()
     const dragScrollRefIn = useDragScroll<HTMLDivElement>()
     const dragScrollRefOut = useDragScroll<HTMLDivElement>()
@@ -105,10 +109,10 @@ export default function AdminInventoryReportPage() {
         setStats({ totalIn: tIn, totalOut: tOut, net: tIn - tOut })
 
         const rData = [
-            { name: 'Satış (Çıkış)', value: reasonMap.sale, color: '#F43F5E' },
-            { name: 'İade (Giriş)', value: reasonMap.return, color: '#10B981' },
-            { name: 'Tedarik (Giriş)', value: reasonMap.restock, color: '#3B82F6' },
-            { name: 'Manuel / Düzeltme', value: reasonMap.manual_in + reasonMap.manual_out + reasonMap.adjustment, color: '#8B5CF6' },
+            { name: t('admin.inventory.reasons.sale'), value: reasonMap.sale, color: '#F43F5E' },
+            { name: t('admin.inventory.reasons.return'), value: reasonMap.return, color: '#10B981' },
+            { name: t('admin.inventory.reasons.restock'), value: reasonMap.restock, color: '#3B82F6' },
+            { name: t('admin.inventory.reasons.manualOrAdjustment'), value: reasonMap.manual_in + reasonMap.manual_out + reasonMap.adjustment, color: '#8B5CF6' },
         ].filter(d => d.value > 0)
         setReasonData(rData)
 
@@ -119,7 +123,7 @@ export default function AdminInventoryReportPage() {
         setTopProducts(sortedProds)
 
         setTrendData(Object.values(trendMap))
-    }, [movementsData, searchQuery, dateRange])
+    }, [movementsData, searchQuery, dateRange, t])
 
     const exportCsv = () => {
         if (movementsData.length === 0) return
@@ -171,15 +175,15 @@ export default function AdminInventoryReportPage() {
         <div className="space-y-6 max-w-page">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className={adminSectionTitleClass}>Stok Hareket Raporu</h1>
-                    <p className="text-slate-500 text-sm mt-1">Depo giriş/çıkış trendleri ve ürün bazlı analizler.</p>
+                    <h1 className={adminSectionTitleClass}>{t('admin.inventory.reportTitle')}</h1>
+                    <p className="text-slate-500 text-sm mt-1">{t('admin.inventory.reportSubtitle')}</p>
                 </div>
                 <button
                     onClick={exportCsv}
                     className={`${adminButtonSecondaryClass} flex items-center gap-2 !px-4 !py-2.5 !rounded-xl shadow-sm`}
                 >
                     <Download size={18} />
-                    <span>CSV İndir</span>
+                    <span>{t('admin.inventory.downloadCsv')}</span>
                 </button>
             </div>
 
@@ -188,7 +192,7 @@ export default function AdminInventoryReportPage() {
                 search={{
                     value: searchQuery,
                     onChange: setSearchQuery,
-                    placeholder: 'Ürün adına göre filtrele...',
+                    placeholder: t('admin.inventory.filterPlaceholder'),
                     focusShortcut: '/'
                 }}
                 rightExtra={<DateRangePicker value={dateRange} onChange={setDateRange} />}
@@ -200,26 +204,26 @@ export default function AdminInventoryReportPage() {
                     <div className={`${adminCardClass} p-6 border-l-4 border-l-emerald-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <ArrowDownRight className="w-5 h-5 text-emerald-500" />
-                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">Toplam Giriş</h3>
+                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">{t('admin.inventory.totalIn')}</h3>
                         </div>
-                        <div className="text-3xl font-black text-slate-800">{stats.totalIn} <span className="text-xs font-medium text-slate-400">adet</span></div>
+                        <div className="text-3xl font-black text-slate-800">{stats.totalIn} <span className="text-xs font-medium text-slate-400">{t('admin.inventory.pieces')}</span></div>
                     </div>
 
                     <div className={`${adminCardClass} p-6 border-l-4 border-l-rose-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <ArrowUpRight className="w-5 h-5 text-rose-500" />
-                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">Toplam Çıkış</h3>
+                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">{t('admin.inventory.totalOut')}</h3>
                         </div>
-                        <div className="text-3xl font-black text-slate-800">{stats.totalOut} <span className="text-xs font-medium text-slate-400">adet</span></div>
+                        <div className="text-3xl font-black text-slate-800">{stats.totalOut} <span className="text-xs font-medium text-slate-400">{t('admin.inventory.pieces')}</span></div>
                     </div>
 
                     <div className={`${adminCardClass} p-6 border-l-4 border-l-indigo-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                             <Activity className="w-5 h-5 text-indigo-500" />
-                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">Net Değişim</h3>
+                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">{t('admin.inventory.netChange')}</h3>
                         </div>
                         <div className={`text-3xl font-black ${stats.net > 0 ? 'text-emerald-600' : stats.net < 0 ? 'text-rose-600' : 'text-slate-800'}`}>
-                            {stats.net > 0 ? '+' : ''}{stats.net} <span className="text-xs font-medium text-slate-400">adet</span>
+                            {stats.net > 0 ? '+' : ''}{stats.net} <span className="text-xs font-medium text-slate-400">{t('admin.inventory.pieces')}</span>
                         </div>
                     </div>
                 </div>
@@ -228,7 +232,8 @@ export default function AdminInventoryReportPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-5 duration-600 delay-100">
                     <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100`}>
                         <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 mb-6 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-cyan-500" /> Stok Akış Trendi
+                            <TrendingUp className="w-4 h-4 text-cyan-500" />
+                            {t('admin.inventory.stockFlowTrend')}
                         </h2>
                         {movementsData.length > 0 ? (
                             <div className="h-72 w-full">
@@ -247,21 +252,22 @@ export default function AdminInventoryReportPage() {
                                         <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
                                         <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
                                         <RechartsTooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                                        <Area type="monotone" dataKey="incoming" name="Giriş" stroke="#10B981" fillOpacity={1} fill="url(#colorIn)" strokeWidth={2} />
-                                        <Area type="monotone" dataKey="outgoing" name="Çıkış" stroke="#F43F5E" fillOpacity={1} fill="url(#colorOut)" strokeWidth={2} />
+                                        <Area type="monotone" dataKey="incoming" name={t('admin.inventory.incomingChartLabel')} stroke="#10B981" fillOpacity={1} fill="url(#colorIn)" strokeWidth={2} />
+                                        <Area type="monotone" dataKey="outgoing" name={t('admin.inventory.outgoingChartLabel')} stroke="#F43F5E" fillOpacity={1} fill="url(#colorOut)" strokeWidth={2} />
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
                         ) : (
                             <div className="h-72 flex items-center justify-center">
-                                <AdminEmptyState icon={PackageMinus} title="Trend Verisi Yok" description="Seçilen aralıkta veri bulunmuyor." compact />
+                                <AdminEmptyState icon={PackageMinus} title={t('admin.inventory.empty.noTrendDataTitle')} description={t('admin.inventory.empty.noTrendDataDesc')} compact />
                             </div>
                         )}
                     </div>
 
                     <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100`}>
                         <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 mb-6 flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-cyan-500" /> İşlem Türü Analizi
+                            <Activity className="w-4 h-4 text-cyan-500" />
+                            {t('admin.inventory.actionTypeAnalysis')}
                         </h2>
                         {reasonData.length > 0 ? (
                             <div className="h-72 flex items-center justify-center relative">
@@ -274,13 +280,13 @@ export default function AdminInventoryReportPage() {
                                     </PieChart>
                                 </ResponsiveContainer>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span className="text-xs text-slate-400 font-bold uppercase tracking-tight">Toplam</span>
+                                    <span className="text-xs text-slate-400 font-bold uppercase tracking-tight">{t('admin.ui.total')}</span>
                                     <span className="text-xl font-black text-slate-800">{movementsData.length}</span>
                                 </div>
                             </div>
                         ) : (
                             <div className="h-72 flex items-center justify-center">
-                                <AdminEmptyState icon={Activity} title="Analiz Verisi Yok" description="İşlem kaydı bulunamadı." compact />
+                                <AdminEmptyState icon={Activity} title={t('admin.inventory.empty.noAnalysisDataTitle')} description={t('admin.inventory.empty.noAnalysisDataDesc')} compact />
                             </div>
                         )}
                     </div>
@@ -289,7 +295,8 @@ export default function AdminInventoryReportPage() {
                 {/* Orta Bölüm: En Çok Hareket Görenler (Geniş Grafik) */}
                 <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200`}>
                     <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 mb-6 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-cyan-500" /> En Çok Hareket Gören Ürünler
+                        <TrendingUp className="w-4 h-4 text-cyan-500" />
+                        {t('admin.inventory.topMovingProducts')}
                     </h2>
                     <div className="h-80">
                         {topProducts.length > 0 ? (
@@ -306,7 +313,7 @@ export default function AdminInventoryReportPage() {
                             </ResponsiveContainer>
                         ) : (
                             <div className="h-full flex items-center justify-center">
-                                <AdminEmptyState icon={PackageMinus} title="Veri Bulunamadı" description="Yeterli hareket kaydı bulunmuyor." compact />
+                                <AdminEmptyState icon={PackageMinus} title={t('admin.inventory.empty.noDataTitle')} description={t('admin.inventory.empty.noDataDesc')} compact />
                             </div>
                         )}
                     </div>
@@ -318,18 +325,19 @@ export default function AdminInventoryReportPage() {
                     <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-emerald-100/10`}>
                         <div className="p-4 bg-emerald-500/5 border-b border-emerald-500/10 flex items-center justify-between">
                             <h2 className="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                                <PlusCircle className="w-4 h-4" /> Son Stok Girişleri
+                                <PlusCircle className="w-4 h-4" />
+                                {t('admin.inventory.recentIncoming')}
                             </h2>
-                            <span className="text-xs font-black text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md border border-emerald-400/20 uppercase tracking-tighter">Incoming</span>
+                            <span className="text-xs font-black text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md border border-emerald-400/20 uppercase tracking-tighter">{t('admin.inventory.incomingLabel')}</span>
                         </div>
                         <div ref={dragScrollRefIn} className="overflow-x-auto max-h-400px">
                             {inboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
                                     <thead className="bg-slate-50 sticky top-0 z-10">
                                         <tr>
-                                            <th className={adminTableHeadCellClass + " py-2"}>Tarih</th>
-                                            <th className={adminTableHeadCellClass + " py-2"}>Ürün</th>
-                                            <th className={adminTableHeadCellClass + " py-2"}>Miktar</th>
+                                            <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.date')}</th>
+                                            <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.product')}</th>
+                                            <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.amount')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -344,7 +352,7 @@ export default function AdminInventoryReportPage() {
                                 </table>
                             ) : (
                                 <div className="p-12">
-                                    <AdminEmptyState icon={PackageMinus} title="Giriş Yok" description="Henüz bir giriş hareketi kaydedilmemiş." compact />
+                                    <AdminEmptyState icon={PackageMinus} title={t('admin.inventory.empty.noIncomingTitle')} description={t('admin.inventory.empty.noIncomingDesc')} compact />
                                 </div>
                             )}
                         </div>
@@ -354,18 +362,19 @@ export default function AdminInventoryReportPage() {
                     <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-rose-100/10`}>
                         <div className="p-4 bg-rose-500/5 border-b border-rose-500/10 flex items-center justify-between">
                             <h2 className="text-xs font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
-                                <MinusCircle className="w-4 h-4" /> Son Stok Çıkışları
+                                <MinusCircle className="w-4 h-4" />
+                                {t('admin.inventory.recentOutgoing')}
                             </h2>
-                            <span className="text-xs font-black text-rose-400 bg-rose-400/10 px-2 py-0.5 rounded-md border border-rose-400/20 uppercase tracking-tighter">Outgoing</span>
+                            <span className="text-xs font-black text-rose-400 bg-rose-400/10 px-2 py-0.5 rounded-md border border-rose-400/20 uppercase tracking-tighter">{t('admin.inventory.outgoingLabel')}</span>
                         </div>
                         <div ref={dragScrollRefOut} className="overflow-x-auto max-h-400px">
                             {outboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
                                     <thead className="bg-slate-50 sticky top-0 z-10">
                                         <tr>
-                                            <th className={adminTableHeadCellClass + " py-2"}>Tarih</th>
-                                            <th className={adminTableHeadCellClass + " py-2"}>Ürün</th>
-                                            <th className={adminTableHeadCellClass + " py-2"}>Miktar</th>
+                                            <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.date')}</th>
+                                            <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.product')}</th>
+                                            <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.amount')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -380,7 +389,7 @@ export default function AdminInventoryReportPage() {
                                 </table>
                             ) : (
                                 <div className="p-12">
-                                    <AdminEmptyState icon={PackageMinus} title="Çıkış Yok" description="Henüz bir çıkış hareketi kaydedilmemiş." compact />
+                                    <AdminEmptyState icon={PackageMinus} title={t('admin.inventory.empty.noOutgoingTitle')} description={t('admin.inventory.empty.noOutgoingDesc')} compact />
                                 </div>
                             )}
                         </div>

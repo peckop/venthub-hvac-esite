@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\authority.en.ts
-skeleton_hash: 47c3067bcf3877a2
+skeleton_hash: 87181bc1ad9053f3
 entity_hashes:
   overview: d75139dd453d58b5
-generated_at: 2026-06-13T11:08:09Z
+generated_at: 2026-06-16T10:18:09Z
 ---
 
 ## Genel Bakış
@@ -23,10 +23,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
-**Açıklama:** Bu dosya bir i18n (uluslararasılaştırma) sözlüğü/çeviri dosyasıdır (`authority.en.ts`). Modül sabitleri olarak sadece `authority (object)` belirtilmiş olup, fonksiyon imzası veya fonksiyon gövdesi bulunmamaktadır. Mimari varsayımlar yalnızca fonksiyon imzaları ve gövdelerinden üretilmelidir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ---
@@ -34,7 +30,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## SABİTLER
 - **authority** (object) — `{
       labelTraditional: 'Label (e.g. Traditional)',
-      labelVenthub: 'La...`
+      labelVenthub: '...`
 
 ---
 
