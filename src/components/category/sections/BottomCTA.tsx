@@ -4,7 +4,7 @@ import React from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider'
 
-import { Routes } from '../../../utils/routes';
+import { useLocalizedRoutes } from '../../../hooks/useLocalizedRoutes';
 
 
 interface BottomCTAProps {
@@ -33,6 +33,7 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
     categoryName = 'Ürünler'
 }) => {
     const { t } = useI18n()
+    const Routes = useLocalizedRoutes()
     const scrollToTop = () => {
         if (typeof window !== 'undefined') {
             window.scrollTo({ top: 0, behavior: 'smooth' })

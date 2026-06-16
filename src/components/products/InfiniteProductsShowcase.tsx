@@ -16,7 +16,7 @@ import React, { Suspense,useMemo, useRef, useState } from 'react'
 import type { Group, Mesh, MeshStandardMaterial } from 'three'
 import { MathUtils } from 'three'
 
-import { Routes } from '../../utils/routes'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 
 interface ProductItem {
     id: string
@@ -58,6 +58,7 @@ const ProductCard: React.FC<{
     const groupRef = useRef<Group>(null)
     const imageRef = useRef<Mesh>(null)
     const router = useRouter()
+    const Routes = useLocalizedRoutes()
     const [hovered, setHover] = useState(false)
 
     // Optimized URL for texture

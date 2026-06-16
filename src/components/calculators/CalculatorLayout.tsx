@@ -2,8 +2,8 @@ import { AlertTriangle,ArrowLeft, Calculator, Info } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes';
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes';
 import Seo from '../Seo'
 
 
@@ -33,6 +33,7 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
     children
 }) => {
     const { t } = useI18n()
+    const Routes = useLocalizedRoutes()
     return (
         <div className="min-h-screen bg-gradient-to-b from-light-gray to-white">
             <Seo

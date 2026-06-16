@@ -21,10 +21,10 @@ import Breadcrumb from '@/components/navigation/Breadcrumb'
 import ProductCard from '@/components/ProductCard'
 
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { type DomainProduct } from '../../lib/type-converters'
 import { DomainCategory } from '../../lib/type-converters'
-import { Routes } from '../../utils/routes'
 
 interface CategoryLandingProps {
     category: DomainCategory
@@ -34,6 +34,7 @@ interface CategoryLandingProps {
 
 const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, subCategories = [] }) => {
     const { t } = useI18n()
+    const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
     const [showProducts, setShowProducts] = useState(false)
     const [activeFilter, setActiveFilter] = useState<string>('all')

@@ -6,8 +6,8 @@ import React from 'react'
 
 import type { UserAddress } from '@/types/ui-models'
 
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { CheckoutAddressInfo, CheckoutInvoiceInfo, CheckoutLegalConsents } from '../../types/db-rows'
-import { Routes } from '../../utils/routes'
 
 interface StepAddressInfoProps {
     shippingAddress: CheckoutAddressInfo
@@ -52,6 +52,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
     t,
     tf
 }) => {
+    const Routes = useLocalizedRoutes()
     return (
         <div className="space-y-8">
             {/* Shipping Method */}

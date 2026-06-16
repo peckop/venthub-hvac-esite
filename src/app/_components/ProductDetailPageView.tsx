@@ -17,7 +17,6 @@ import {
   ShoppingCart,
   Star,
   Truck} from 'lucide-react'
-import type { Route } from 'next'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useEffect, useMemo,useRef, useState } from 'react'
@@ -46,7 +45,7 @@ import {
   groupTechnicalSpecs,
   SPEC_SORT_ORDER,
   translateSpecKey} from '../../utils/productHelpers'
-import { Routes } from '../../utils/routes'
+import { localizedHref, Routes } from '../../utils/routes'
 
 export interface ProductDetailPageProps {
   initialProduct?: Product | null
@@ -271,7 +270,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
         <div className="text-center">
           <h1 className="text-xl font-bold text-industrial-gray mb-4">{t('pdp.productNotFound')}</h1>
-          <Link href={"/" as Route} className="text-primary-navy hover:text-secondary-blue font-bold text-sm uppercase tracking-widest">
+          <Link href={localizedHref('/', lang)} className="text-primary-navy hover:text-secondary-blue font-bold text-sm uppercase tracking-widest">
             {t('pdp.backHome')}
           </Link>
         </div>
@@ -290,19 +289,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       <div className="relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
           <nav className="flex items-center space-x-2 text-xs sm:text-xs uppercase tracking-widest font-bold text-steel-gray/60">
-            <Link href={"/" as Route} className="hover:text-primary-navy transition-colors">
+            <Link href={localizedHref('/', lang)} className="hover:text-primary-navy transition-colors">
               {t('category.breadcrumbHome')}
             </Link>
             <ChevronRight size={10} className="flex-shrink-0" />
             {mainCategory && (
               <>
-                <Link href={Routes.category(mainCategory.slug)} className="hover:text-primary-navy transition-colors">
+                <Link href={localizedHref(Routes.category(mainCategory.slug), lang)} className="hover:text-primary-navy transition-colors">
                   {mainCategory.name}
                 </Link>
                 {subCategory && subCategory.slug !== mainCategory.slug && (
                   <>
                     <ChevronRight size={10} className="flex-shrink-0" />
-                    <Link href={Routes.category(mainCategory.slug, subCategory.slug)} className="hover:text-primary-navy transition-colors">
+                    <Link href={localizedHref(Routes.category(mainCategory.slug, subCategory.slug), lang)} className="hover:text-primary-navy transition-colors">
                       {subCategory.name}
                     </Link>
                   </>
@@ -325,10 +324,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             let stack: string[] = [];
             try { stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : []; } catch { stack = []; }
             const lastSafeStop = stack[stack.length - 1];
-            if (lastSafeStop) { router.push(lastSafeStop as import('next').Route, { scroll: false }); }
-            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(Routes.category(mainCategory.slug, subCategory.slug), { scroll: false }) }
-            else if (mainCategory) { router.push(Routes.category(mainCategory.slug), { scroll: false }) }
-            else { router.push('/' as import('next').Route, { scroll: false }) }
+            if (lastSafeStop) { router.push(localizedHref(lastSafeStop, lang), { scroll: false }); }
+            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(localizedHref(Routes.category(mainCategory.slug, subCategory.slug), lang), { scroll: false }) }
+            else if (mainCategory) { router.push(localizedHref(Routes.category(mainCategory.slug), lang), { scroll: false }) }
+            else { router.push(localizedHref('/', lang), { scroll: false }) }
           }}
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 sm:mb-8 transition-colors group font-bold text-xs uppercase tracking-widest"
         >

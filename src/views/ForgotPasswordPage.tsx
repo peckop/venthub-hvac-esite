@@ -1,11 +1,13 @@
+'use client'
+
 import { ArrowLeft, CheckCircle,Mail } from 'lucide-react'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useAuth } from '../hooks/useAuth'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -13,6 +15,7 @@ const ForgotPasswordPage: React.FC = () => {
   const [emailSent, setEmailSent] = useState(false)
   const { resetPassword } = useAuth()
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

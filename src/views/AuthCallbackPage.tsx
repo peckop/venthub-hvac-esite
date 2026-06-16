@@ -1,3 +1,5 @@
+'use client'
+
 import { AlertCircle,CheckCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -5,11 +7,12 @@ import { toast } from 'sonner'
 
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
 
 const AuthCallbackPage: React.FC = () => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
   const router = useRouter()
@@ -86,7 +89,7 @@ const AuthCallbackPage: React.FC = () => {
     }
 
     handleAuthCallback()
-  }, [router, t])
+  }, [router, t, Routes])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-air-blue via-clean-white to-light-gray flex items-center justify-center">

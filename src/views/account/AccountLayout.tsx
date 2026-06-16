@@ -4,8 +4,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
 
 import { useAuth } from '../../hooks/useAuth'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes'
 
 type TabItem = { to: string; label: string; icon: React.ReactNode }
 type TabGroup = { label: string; items: TabItem[] }
@@ -13,31 +13,34 @@ type TabGroup = { label: string; items: TabItem[] }
 export default function AccountLayout({ children }: { children?: React.ReactNode }) {
   const router = useRouter()
   const { t } = useI18n()
+  const routes = useLocalizedRoutes()
   const { user, loading } = useAuth()
   const pathname = usePathname()
 
+  // Nav hedefleri localize Routes proxy'sinden gelir (SSOT); böylece href dil-önekli olur
+  // VE aktif-sekme kontrolü (pathname === tab.to) dil-önekli pathname ile eşleşir.
   const navGroups: TabGroup[] = [
     {
       label: t('account.tabs.overview') || 'Özet',
       items: [
-        { to: '/account', label: t('account.tabs.overview') || 'Hesap Özeti', icon: <LayoutDashboard size={18} className="shrink-0" /> },
+        { to: routes.account.overview(), label: t('account.tabs.overview') || 'Hesap Özeti', icon: <LayoutDashboard size={18} className="shrink-0" /> },
       ]
     },
     {
       label: 'Sipariş & Kargo',
       items: [
-        { to: '/account/orders', label: t('account.tabs.orders') || 'Siparişler', icon: <Package size={18} className="shrink-0" /> },
-        { to: '/account/shipments', label: t('account.tabs.shipments') || 'Kargo Takibi', icon: <Truck size={18} className="shrink-0" /> },
-        { to: '/account/returns', label: t('account.tabs.returns') || 'İadeler', icon: <RefreshCcw size={18} className="shrink-0" /> },
+        { to: routes.account.orders(), label: t('account.tabs.orders') || 'Siparişler', icon: <Package size={18} className="shrink-0" /> },
+        { to: routes.account.shipments(), label: t('account.tabs.shipments') || 'Kargo Takibi', icon: <Truck size={18} className="shrink-0" /> },
+        { to: routes.account.returns(), label: t('account.tabs.returns') || 'İadeler', icon: <RefreshCcw size={18} className="shrink-0" /> },
       ]
     },
     {
       label: 'Hesap Yönetimi',
       items: [
-        { to: '/account/profile', label: t('account.tabs.profile') || 'Kişisel Bilgiler', icon: <User size={18} className="shrink-0" /> },
-        { to: '/account/addresses', label: t('account.tabs.addresses') || 'Adreslerim', icon: <MapPin size={18} className="shrink-0" /> },
-        { to: '/account/invoices', label: t('account.tabs.invoices') || 'Fatura Bilgileri', icon: <FileText size={18} className="shrink-0" /> },
-        { to: '/account/security', label: t('account.tabs.security') || 'Güvenlik', icon: <Shield size={18} className="shrink-0" /> },
+        { to: routes.account.profile(), label: t('account.tabs.profile') || 'Kişisel Bilgiler', icon: <User size={18} className="shrink-0" /> },
+        { to: routes.account.addresses(), label: t('account.tabs.addresses') || 'Adreslerim', icon: <MapPin size={18} className="shrink-0" /> },
+        { to: routes.account.invoices(), label: t('account.tabs.invoices') || 'Fatura Bilgileri', icon: <FileText size={18} className="shrink-0" /> },
+        { to: routes.account.security(), label: t('account.tabs.security') || 'Güvenlik', icon: <Shield size={18} className="shrink-0" /> },
       ]
     }
   ]
@@ -49,10 +52,10 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
     if (process.env.NODE_ENV === 'development') return
 
     if (!loading && !user && active) {
-      router.replace(Routes.auth.login())
+      router.replace(routes.auth.login())
     }
     return () => { active = false }
-  }, [user, loading, router])
+  }, [user, loading, router, routes])
 
   // Geliştirme modunda user null olsa bile render et
   const shouldRender = (process.env.NODE_ENV === 'development') || (!loading && user)

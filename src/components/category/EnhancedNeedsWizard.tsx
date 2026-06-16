@@ -10,10 +10,10 @@ import React, { useCallback,useEffect, useState } from 'react'
 import { useI18n } from '@/i18n/I18nProvider';
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { calculateAirCurtain } from '../../lib/hvacCalculations'
 import { type DomainProduct,toUIProductList } from '../../lib/type-converters'
 import { DbJson,DbProduct } from '../../types/db-rows'
-import { Routes } from '../../utils/routes'
 
 // Types
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6
@@ -77,6 +77,7 @@ const getUsageLocations = (t: (key: string) => string) => [
 
 const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, parentSlug }) => {
     const { t } = useI18n();
+    const Routes = useLocalizedRoutes()
     const [state, setState] = useState<WizardState>({
         step: 1,
         usageLocation: null,

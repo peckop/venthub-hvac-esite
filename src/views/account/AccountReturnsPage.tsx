@@ -6,9 +6,9 @@ import { toast } from 'sonner'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useAuth } from '../../hooks/useAuth'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { formatDate } from '../../i18n/datetime'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes'
 
 interface ReturnRow {
   id: string
@@ -30,6 +30,7 @@ interface SupabaseError {
 export default function AccountReturnsPage() {
   const { user } = useAuth()
   const { t, lang } = useI18n()
+  const Routes = useLocalizedRoutes()
   const [rows, setRows] = useState<ReturnRow[]>([])
   const [orders, setOrders] = useState<OrderLite[]>([])
   const [loading, setLoading] = useState(true)

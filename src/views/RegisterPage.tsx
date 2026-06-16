@@ -6,9 +6,9 @@ import React, { useState } from 'react'
 import { toast } from 'sonner'
 
 import { useAuth } from '../hooks/useAuth'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
 import { hibpPwnedCount } from '../utils/passwordSecurity'
-import { Routes } from '../utils/routes'
 
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -23,6 +23,7 @@ const RegisterPage: React.FC = () => {
   const [registrationComplete, setRegistrationComplete] = useState(false)
   const { signUp } = useAuth()
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({

@@ -6,8 +6,8 @@ import React, { useCallback,useEffect, useMemo, useState } from 'react'
 
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes'
 
 const FADE_IN_DOWN_CSS = `@keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }`
 const FADE_IN_CSS = `@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }`
@@ -58,7 +58,8 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
     const { categories, loading: categoriesLoading } = useCategories()
     const { wrapCategory } = useCategoryViewModel()
     const { t } = useI18n()
-    
+    const Routes = useLocalizedRoutes()
+
     const [level, setLevel] = useState<'main' | 'subcategory'>('main')
     const [activeMainCategorySlug, setActiveMainCategorySlug] = useState<string | null>(null)
     const [isTransitioning, setIsTransitioning] = useState(false)
@@ -203,7 +204,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                 }
             }
         }
-    }, [level, mainCategoriesMap, subcategoriesMap, activeMainCategorySlug, categories, router, onSubcategorySelect])
+    }, [level, mainCategoriesMap, subcategoriesMap, activeMainCategorySlug, categories, router, onSubcategorySelect, Routes])
 
     const handleBack = useCallback(() => {
         setIsTransitioning(true)
@@ -218,7 +219,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
         if (activeMainCategorySlug) {
             router.push(Routes.category(activeMainCategorySlug))
         }
-    }, [activeMainCategorySlug, router])
+    }, [activeMainCategorySlug, router, Routes])
 
     const [isMobile, setIsMobile] = useState(false)
     useEffect(() => {

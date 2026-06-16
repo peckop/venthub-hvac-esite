@@ -15,10 +15,10 @@ import { useCart } from '../hooks/useCartHook'
 import { useCheckoutCoupon } from '../hooks/useCheckoutCoupon'
 import { useCheckoutOrchestrator } from '../hooks/useCheckoutOrchestrator'
 import { useCheckoutPayment } from '../hooks/useCheckoutPayment'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
 import { CheckoutAddressInfo } from '../types/db-rows'
 import { getTranslationWithFallback } from '../utils/checkoutHelpers'
-import { Routes } from '../utils/routes'
 import AddressFormModal from './checkout/AddressFormModal'
 import AddressSelectModal from './checkout/AddressSelectModal'
 import CheckoutProgress from './checkout/CheckoutProgress'
@@ -35,6 +35,7 @@ const CheckoutPage: React.FC = () => {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const { t, lang } = useI18n()
+  const Routes = useLocalizedRoutes()
 
   const [editingAddress, setEditingAddress] = useState<UserAddress | null>(null)
   const [showAddressFormModal, setShowAddressFormModal] = useState<boolean>(false)
@@ -116,7 +117,7 @@ const CheckoutPage: React.FC = () => {
     if (!authLoading && !user) {
       router.push(Routes.auth.login('/checkout'))
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading, router, Routes])
 
   const onNextStep = () => handleNextStep(payment.initiatePayment)
 

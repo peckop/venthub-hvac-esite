@@ -4,11 +4,11 @@ import Link from 'next/link'
 import React from 'react'
 
 import type { CategoryFilters as FilterState } from '../../hooks/useCategoryGateway'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { DomainCategory } from '../../lib/type-converters'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
-import { Routes } from '../../utils/routes'
 
 interface CategoryFiltersProps {
   category: DomainCategory
@@ -28,6 +28,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
   onUpdateFilters
 }) => {
   const { t, lang } = useI18n()
+  const Routes = useLocalizedRoutes()
 
   const toggleBrand = (brand: string) => {
     onUpdateFilters({

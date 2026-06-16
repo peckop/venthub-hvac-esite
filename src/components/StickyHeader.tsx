@@ -18,6 +18,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { trackEvent } from '../utils/analytics'
 import { NAVIGATION_PRIMARY_ITEMS, NAVIGATION_SECONDARY_ITEMS } from '../utils/navigationConfig'
 import { prefetchProductsPage } from '../utils/prefetch'
+import { localizedHref } from '../utils/routes'
 import NavActionButton from './navigation/NavActionButton'
 import NavBrand from './navigation/NavBrand'
 import NavPrimaryRail from './navigation/NavPrimaryRail'
@@ -157,14 +158,16 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
     router.push(Routes.home())
   }, [closeUserMenu, router, signOut, Routes])
 
+  // Nav config ham (dilsiz) yol tutar; dil öneki burada SSOT localizedHref ile eklenir.
+  // href opsiyonel olabildiğinden undefined-geçişi korunur (yalnız tanımlıysa localize).
   const primaryItems = useMemo(
-    () => NAVIGATION_PRIMARY_ITEMS.map((item) => ({ id: item.id, href: item.href, label: t(item.labelKey) })),
-    [t]
+    () => NAVIGATION_PRIMARY_ITEMS.map((item) => ({ id: item.id, href: item.href ? localizedHref(item.href, lang) : item.href, label: t(item.labelKey) })),
+    [t, lang]
   )
 
   const secondaryItems = useMemo(
-    () => NAVIGATION_SECONDARY_ITEMS.map((item) => ({ id: item.id, href: item.href, label: t(item.labelKey) })),
-    [t]
+    () => NAVIGATION_SECONDARY_ITEMS.map((item) => ({ id: item.id, href: item.href ? localizedHref(item.href, lang) : item.href, label: t(item.labelKey) })),
+    [t, lang]
   )
 
   // --- DEV BYPASS LOGIC ---

@@ -6,32 +6,40 @@ source_path: C:\Users\alize\venthub-hvac\src\views\BrandDetailPage.tsx
 skeleton_hash: 56adefc5e6c04a09
 entity_hashes:
   func:BrandDetailPage: 658e62bc6ce56cad
-  overview: c3e73e1bcf4512a9
+  overview: 7d5e530ae391a667
   style_tokens: 4208267ad108784f
-generated_at: 2026-06-14T22:21:39Z
+generated_at: 2026-06-15T17:04:46Z
 ---
 
 ## Genel Bakış
-BrandDetailPage modülü, VentHub HVAC platformunda belirli bir markanın detay sayfasını sunan React bileşenidir. Prop olarak aldığı initialBrandSlug değerini kullanarak ilgili markanın ürünleri, özellikleri ve içerikleri gibi bilgileri kullanıcıya sunar. Sayfa, dinamik olarak marka verisine göre oluşturulur ve marka bazlı bir tüketici deneyimi sağlar.
+BrandDetailPage modülü, VentHub HVAC platformunda belirli bir markanın detay sayfasını sunan React bileşenidir. Prop olarak aldığı `initialBrandSlug` değerini kullanarak marka bilgilerini `BRAND_DETAILS` sabit objesinden çeker ve kullanıcıya sunar. Bileşen, sunucu tarafı render (SSR) uyumlu olacak şekilde tasarlanmıştır.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Bu grup, marka detay sayfasının ana bileşenini içerir. Kullanıcıya belirli bir markanın detaylarını göstermek için gerekli olan içeriği render eder.
+Marka detay sayfasının ana React görünüm bileşenini içerir. Verilen marka slug'ına göre ilgili markanın bilgilerini render eder.
 - BrandDetailPage
+
+## Dış Bağımlılıklar
+- `BRAND_DETAILS` sabit objesi (marka verilerinin tanımlı olduğu yerel sabit)
+- React framework (SSR ve bileşen yapısı için)
+- Sayfa yönlendirme/bileşen sistemi (Next.js veya benzeri bir SSR çerçeve)
+
+## Mimari Notlar
+Bu modül, marka bazlı sayfaların temel yapı taşlarından biridir. Dinamik bir API çağrısı yerine statik/sabit bir veri objesine bağımlı olması, performans ve SEO açısından avantaj sağlar ancak marka verilerinin güncellenmesinde dış bağımlılık oluşturur.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için temel mimari varsayımlar, bileşenin prop bağımlılığı ve sabit veri yapısı üzerine kuruludur.
+Bu bileşen, bir markanın detay sayfasını initialBrandSlug prop'u ile render eder ve module-level BRAND_DETAILS sabitinden marka bilgisini çözümler.
 
-**[Aksiyom 1]:** Eğer `initialBrandSlug` prop'u sağlanmazsa, bileşen geçerli bir marka sayfası oluşturamaz.
+**[Aksiyom 1]:** Eğer `initialBrandSlug` prop'u yoksa veya undefined传则, bileşen hangi markanın detayının gösterileceğini bilemez ve doğru marka içeriği render edilemez.
 
-**[Aksiyom 2]:** Eğer `BRAND_DETAILS` sabit objesi boş veya tanımsız ise, sayfa içerikleri kullanıcıya gösterilemez.
+**[Aksiyom 2]:** Eğer `BRAND_DETAILS` modül sabiti yoksa veya boş/undefined ise, verilen `initialBrandSlug` değerine karşılık gelen marka bilgisi bulunamaz ve bileşen içerik üretemez.
 
-**[Aksiyom 3]:** Eğer `initialBrandSlug` değeri `BRAND_DETAILS` objesindeki hiçbir marka ile eşleşmiyorsa, bileşen geçerli bir marka detayı sunamaz.
+**[Aksiyom 3]:** Eğer `initialBrandSlug` değeri `BRAND_DETAILS` objesindeki anahtarlardan biriyle eşleşmiyorsa, bileşen geçersiz bir marka ile karşılaşır ve uygun bir durum (404 veya boş sayfa) sergilemelidir.
 
-**[Aksiyom 4]:** Eğer `initialBrandSlug` boş string veya geçersiz bir değer olarak gelirse, bileşen anlamlı bir marka adı display edemez.
+**[Aksiyom 4]:** Eğer `BRAND_DETAILS` objesi `{}` (boş obje) ise, hiçbir marka slug'ı için içerik bulunamaz ve bileşen tüm markalar için aynı boş durumu gösterir.
 
 ---
 
@@ -55,12 +63,12 @@ Bu modül için temel mimari varsayımlar, bileşenin prop bağımlılığı ve 
 - import: ../components/Seo::Seo
 - import: ../components/navigation/Breadcrumb::Breadcrumb
 - import: ../data/brands::HVAC_BRANDS
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../hooks/useScrollAnimation::scrollAnimationClasses
 - import: ../hooks/useScrollAnimation::useScrollAnimation
 - import: ../i18n/I18nProvider::useI18n
 - import: ../lib/services/product.service::getProductsEnriched
 - import: ../types/ui-models::type { Product }
-- import: ../utils/routes::Routes
 - import: @/components/ui/VentImage::VentImage
 - import: @/lib/supabase/client::supabaseBrowserClient
 - import: lucide-react::ArrowRight
@@ -93,27 +101,51 @@ Bu modül için temel mimari varsayımlar, bileşenin prop bağımlılığı ve 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: BrandDetailPage.tsx::BrandDetailPage
-- **params**: `(initialBrandSlug)` — URL'den gelen veya üst bileşenden verilen marka slug'ı
+### [N1_NASIL] AST Pointer: `src/views/BrandDetailPage.tsx`::BrandDetailPage
+- **params**: `{ initialBrandSlug }` — URL'den veya üst bileşenden gelen marka slug'ı (opsiyonel)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, sayfa içindeki tüm metinlerin lokalizasyonunda kullanılır
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, sayfa genelinde anahtar tabanlı metin çevirileri için kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen dil-önekli rota proxy nesnesi; `Routes.home()`, `Routes.brands()`, `Routes.contact()`, `Routes.products()`, `Routes.product()` çağrıları yapılır
   - `params` — `useParams()` hook'undan dönen URL parametreleri nesnesi
-  - `slug` — `initialBrandSlug` veya `params?.slug` değerinden elde edilen normalized marka tanımlayıcı string
-  - `heroIconRef` — `useScrollAnimation<HTMLDivElement>` ile oluşturulan scroll tetikleme reference'ı, hero ikonunun DOM referansını tutar
-  - `heroIconVisible` — hero ikonunun scroll animasyonu görünürlük durumu (boolean), scroll animasyon sınıflarını tetikler
-  - `heroTitleRef` — `useScrollAnimation<HTMLHeadingElement>` ile oluşturulan scroll tetikleme reference'ı, hero başlığının DOM referansını tutar
-  - `heroTitleVisible` — hero başlığının scroll animasyonu görünürlük durumu (boolean)
-  - `heroMetaRef` — `useScrollAnimation<HTMLDivElement>` ile oluşturulan scroll tetikleme reference'ı, hero meta section'ının DOM referansını tutar
-  - `heroMetaVisible` — hero meta section'ının scroll animasyonu görünürlük durumu (boolean)
-  - `brand` — `HVAC_BRANDS` array'inde `slug` ile eşleşen (veya `'nicotra'` özel durumunda `'nicotra-gebhardt'` eşlemesi ile) marka objesi; tüm sayfa veri kaynağı olarak kullanılır
-  - `detail` — `BRAND_DETAILS[brand.slug]` erişiminden elde edilen marka detay nesnesi (story, stats içerir), `brand` mevcutsa tanımlıdır
-  - `products` — `useState<Product[]>` ile yönetilen markaya ait zenginleştirilmiş ürün listesi, `getProductsEnriched` API çağrısıyla doldurulur
-  - `loading` — `useState<boolean>` ile yönetilen ürün yükleme durumu flag'i, true iken skeleton placeholder gösterilir
-  - `loadProducts` — `useEffect` içinde tanımlanan async fonksiyon; `getProductsEnriched(supabaseBrowserClient, { brand: brand.name, limit: 8 })` çağrısıyla ürünleri yükler, `setProducts` ile state'i günceller, hata durumunda `console.error` loglar
-  - `breadcrumbItems` — breadcrumb navigasyon dizisi; ev (`/`), markalar listesi (`/brands`), mevcut marka adı olmak üzere üç öğe içerir
-  - `e` — `loadProducts` içindeki `catch` bloğu tarafından yakalanan hata nesnesi
-  - `data` — `getProductsEnriched` API çağrısının başarıyla döndürülen ürün verisi dizisi
-- **Dönüş**: JSX — `brand` bulunamazsa "Marka bulunamadı" hata sayfası, bulunursa tam marka detay sayfası (Seo, Breadcrumb, Hero section, Marka vizyonu & kurumsal bilgi paneli, Ürün grid'i)
+  - `slug` — `(initialBrandSlug || params?.slug) as string` ifadesinden türeyen, normalize edilmiş marka slug'ı; `brand` aramasında ve `detail` erişiminde kullanılır
+  - `heroIconRef` — `useScrollAnimation<HTMLDivElement>()` hook'undan dönen ref, hero ikon bölümü için scroll tetikleme referansı
+  - `heroIconVisible` — `useScrollAnimation()` hook'undan dönen boolean, hero ikonunun viewport'a girip girmediğini belirtir
+  - `heroTitleRef` — `useScrollAnimation<HTMLHeadingElement>()` hook'undan dönen ref, hero başlık için scroll referansı
+  - `heroTitleVisible` — `useScrollAnimation()` hook'undan dönen boolean, hero başlığının görünürlük durumu
+  - `heroMetaRef` — `useScrollAnimation<HTMLDivElement>()` hook'undan dönen ref, hero meta bölümü için scroll referansı
+  - `heroMetaVisible` — `useScrollAnimation()` hook'undan dönen boolean, hero meta bölümünün görünürlük durumu
+  - `brand` — `HVAC_BRANDS.find()` ile `slug` eşleşmesiyle bulunan marka nesnesi (特殊: `slug === 'nicotra'` ise `nicotra-gebhardt` eşlemesi yapılır); tüm JSX render'ında `brand.name`, `brand.country`, `brand.founded`, `brand.specialty`, `brand.description`, `brand.headquarters`, `brand.website` alanları kullanılır
+  - `detail` — `BRAND_DETAILS[brand.slug]` ile erişilen marka detay nesnesi; `detail.story` ve `detail.stats` alanları JSX'te kullanılır
+  - `products` — `useState<Product[]>([])` ile tanımlı state; `getProductsEnriched` API çağrısından dönen ürün listesi tutulur
+  - `loading` — `useState(true)` ile tanımlı state; ürün yükleme durumunu tutar, JSX'te skeleton/loading gösterimi için kontrol edilir
+  - `breadcrumbItems` — Breadcrumb bileşenine geçirilen öğeler dizisi; `Routes.home()`, `Routes.brands()` href'leri ve `brand?.name` label'ı içerir
+- **Dönüş**: JSX element (React.ReactNode) — Marka bulunamazsa "not found" fallback JSX, bulunursa tam sayfa JSX'i (Seo, Breadcrumb, Hero, Identity/Vision, Products Grid bölümleri dahil)
+
+### [N2_NASIL] AST Pointer: `src/views/BrandDetailPage.tsx`::useEffect callback (loadProducts trigger)
+- **params**: yok
+- **ic_degiskenler**:
+  - `loadProducts` — inner async fonksiyon; `brand` mevcutsa `getProductsEnriched` API'sini çağırıp `products` state'ini günceller
+- **Dönüş**: yok (yan etki: useEffect içinde `loadProducts()` çağrılır; `brand` dependency değiştiğinde tetiklenir)
+
+### [N3_NASIL] AST Pointer: `src/views/BrandDetailPage.tsx`::loadProducts (async inner)
+- **params**: yok
+- **ic_degiskenler**:
+  - `data` — `getProductsEnriched(supabaseBrowserClient, { brand: brand.name, limit: 8 })` async çağrısından dönen zenginleştirilmiş ürün verisi; `setProducts(data)` ile products state'ine yazılır
+  - `e` — catch bloğu yakaladığı hata nesnesi; `console.error('Error loading brand products:', e)` ile loglanır
+- **Dönüş**: yok (yan etkiler: `setLoading(true)` → API çağrısı → `setProducts(data)` → `setLoading(false)`)
+- **not**: `brand` objesi closure ile erişilir (`brand.name`), `supabaseBrowserClient` import'tan gelen Supabase istemcisi, `setLoading` ve `setProducts` React state setter'ları closure ile erişilir
+
+### [N4_NASIL] AST Pointer: `src/views/BrandDetailPage.tsx`::stats map callback `(stat, i)`
+- **params**: `stat, i`
+  - `stat` — `detail?.stats` dizisindeki tek bir istatistik nesnesi; `stat.label` (üst bilgi etiketi) ve `stat.value` (değer) alanları JSX'te render edilir
+  - `i` — dizi indeksi; React `key={i}` prop'u olarak kullanılır
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element — `<div>` içinde `stat.label` ve `stat.value` gösterimi
+
+### [N5_NASIL] AST Pointer: `src/views/BrandDetailPage.tsx`::products map callback `(product)`
+- **params**: `product` — `products` dizisindeki tek bir `Product` nesnesi; `product.id` (React key), `product.slug!` (Routes.product href), `product.name` (aria-label ve h3), `product.image_url` (VentImage src), `product.sku` (alt bilgi metni) alanları JSX'te kullanılır
+- **ic_degiskenler**: yok
+- **Dönüş**: JSX element — `<Link>` içinde `VentImage`, ürün adı ve SKU gösterimi; hover animasyonları ile ürün kartı
 
 ---
 

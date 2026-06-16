@@ -7,11 +7,11 @@ import React from 'react'
 import type { FtsProductResult, SearchSuggestion } from '@/types/ui-models'
 
 import { useCategories } from '../contexts/CategoryContext'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
 import { supabaseBrowserClient } from '../lib/supabase/client'
 import type { DbCategory } from '../types/db-rows'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
-import { Routes } from '../utils/routes'
 import { highlightMatch } from '../utils/searchHighlight'
 
 interface SearchOverlayProps {
@@ -26,6 +26,7 @@ const RECENT_SEARCHES_KEY = 'venthub_recent_searches'
 const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const { t } = useI18n()
   const { categories: globalCategories } = useCategories()
+  const Routes = useLocalizedRoutes()
   const [q, setQ] = React.useState('')
   const [debounced, setDebounced] = React.useState('')
   const [loading, setLoading] = React.useState(false)

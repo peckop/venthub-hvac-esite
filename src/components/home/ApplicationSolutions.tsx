@@ -2,37 +2,43 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-import { Routes } from '@/utils/routes';
+import { localizedHref, Routes } from '@/utils/routes';
 
 interface SolutionItem {
   id: 'parking' | 'kitchen' | 'entrance' | 'comfort'
-  href: string
+  categorySlug: string
+  subSlug?: string
   image: string
   span: string
 }
 
+// Yollar Routes.category() builder'ından kurulur (SSOT); dil öneki render anında
+// localizedHref ile eklenir. Sabit '/category/...' string'i = SSOT + localize kaçağı.
 const solutions: SolutionItem[] = [
-  { 
-    id: 'parking', 
-    href: '/category/industrial-ventilation/jet-fans', 
+  {
+    id: 'parking',
+    categorySlug: 'industrial-ventilation',
+    subSlug: 'jet-fans',
     image: '/images/bento/parking.jpg',
     span: 'sm:col-span-2 lg:col-span-2'
   },
-  { 
-    id: 'kitchen', 
-    href: '/category/industrial-ventilation/duct-type-fans', 
+  {
+    id: 'kitchen',
+    categorySlug: 'industrial-ventilation',
+    subSlug: 'duct-type-fans',
     image: '/images/bento/kitchen.jpg',
     span: 'sm:col-span-1 lg:col-span-1'
   },
-  { 
-    id: 'entrance', 
-    href: '/category/commercial-ventilation/air-curtains', 
+  {
+    id: 'entrance',
+    categorySlug: 'commercial-ventilation',
+    subSlug: 'air-curtains',
     image: '/images/bento/entrance.jpg',
     span: 'sm:col-span-1 lg:col-span-1'
   },
-  { 
-    id: 'comfort', 
-    href: '/category/heat-recovery-vmc', 
+  {
+    id: 'comfort',
+    categorySlug: 'heat-recovery-vmc',
     image: '/images/bento/comfort.jpg',
     span: 'sm:col-span-2 lg:col-span-2'
   }
@@ -54,9 +60,10 @@ interface LocalizedDict {
 
 interface ApplicationSolutionsProps {
   dictionary: LocalizedDict;
+  lang: string;
 }
 
-const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary: t }) => {
+const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary: t, lang }) => {
   return (
     <section className="relative py-24 lg:py-32 overflow-hidden bg-white">
       {/* Background Decorative Elements */}
@@ -106,7 +113,7 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
                 data-observe="fade-up"
                 className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass} group relative overflow-hidden rounded-3xl bg-slate-100 h-300px sm:h-400px lg:h-450px ${item.span}`}
               >
-                <Link href={item.href as import('next').Route} className="block w-full h-full relative">
+                <Link href={localizedHref(Routes.category(item.categorySlug, item.subSlug), lang)} className="block w-full h-full relative">
                   <Image
                     src={item.image}
                     alt={itemDict.title}
@@ -155,8 +162,8 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
         </div>
 
         <div className="mt-16 text-center">
-          <Link 
-            href={Routes.products()}
+          <Link
+            href={localizedHref(Routes.products(), lang)}
             className="inline-flex items-center gap-4 group"
           >
             <span className="text-sm font-bold uppercase tracking-widest text-slate-400 group-hover:text-cyan-600 transition-colors">

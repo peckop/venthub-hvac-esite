@@ -2,9 +2,9 @@ import Link from 'next/link'
 import React from 'react'
 
 import legalConfig from '../../config/legal'
-import { Routes } from '../../utils/routes'
+import { localizedHref, Routes } from '../../utils/routes'
 
-const PrivacyPolicyPage: React.FC = () => {
+const PrivacyPolicyPage: React.FC<{ lang: string }> = ({ lang }) => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl font-bold text-industrial-gray mb-6">Gizlilik Politikası (Taslak)</h1>
@@ -52,7 +52,7 @@ const PrivacyPolicyPage: React.FC = () => {
 
         <section>
           <h2 className="text-xl font-semibold text-industrial-gray mb-3">5) Çerezler</h2>
-          <p>Detaylar için <Link className="text-primary-navy underline" href={Routes.legal.cerez()}>Çerez Politikası</Link> sayfasını inceleyiniz.</p>
+          <p>Detaylar için <Link className="text-primary-navy underline" href={localizedHref(Routes.legal.cerez(), lang)}>Çerez Politikası</Link> sayfasını inceleyiniz.</p>
         </section>
 
         <section>

@@ -1,6 +1,6 @@
 import { afterEach,beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { Routes } from '../routes';
+import { localizedHref, Routes } from '../routes';
 
 describe('Routes', () => {
   beforeEach(() => {
@@ -131,5 +131,43 @@ describe('Routes', () => {
     it('should append both redirect and error params', () => {
       expect(Routes.auth.login('/home', 'expired')).toBe('/auth/login?redirect=%2Fhome&error=expired');
     });
+  });
+});
+
+// SSOT kilit taşı: tüm nav linkleri buna dayanır. Davranış (kapı DEĞİL) testi.
+describe('localizedHref', () => {
+  it('normal yola dil öneki ekler', () => {
+    expect(localizedHref('/category/x', 'tr')).toBe('/tr/category/x');
+    expect(localizedHref('/category/x', 'en')).toBe('/en/category/x');
+  });
+
+  it('kök yolu (/) dil köküne çevirir, sondaki slash olmadan', () => {
+    expect(localizedHref('/', 'tr')).toBe('/tr');
+    expect(localizedHref('/', 'en')).toBe('/en');
+  });
+
+  it('/admin ve /api rotalarına dokunmaz (dil-öneki almazlar)', () => {
+    expect(localizedHref('/admin/users', 'tr')).toBe('/admin/users');
+    expect(localizedHref('/admin', 'en')).toBe('/admin');
+    expect(localizedHref('/api/health', 'en')).toBe('/api/health');
+  });
+
+  it('zaten locale-önekli URL\'e mükerrer önek eklemez (idempotent)', () => {
+    expect(localizedHref('/tr/category/x', 'tr')).toBe('/tr/category/x');
+    expect(localizedHref('/en/category/x', 'tr')).toBe('/en/category/x');
+    expect(localizedHref('/tr', 'en')).toBe('/tr');
+    expect(localizedHref('/en', 'tr')).toBe('/en');
+  });
+
+  it('locale-prefix gibi GÖRÜNEN ama olmayan yolları yine de localize eder (/trends tuzağı)', () => {
+    expect(localizedHref('/trends', 'tr')).toBe('/tr/trends');
+    expect(localizedHref('/enterprise', 'en')).toBe('/en/enterprise');
+  });
+
+  it('Routes builder ile SSOT zinciri doğru localize URL üretir', () => {
+    expect(localizedHref(Routes.category('hvac', 'fans'), 'tr')).toBe('/tr/category/hvac/fans');
+    expect(localizedHref(Routes.products(), 'en')).toBe('/en/products');
+    expect(localizedHref(Routes.legal.cerez(), 'tr')).toBe('/tr/legal/cerez-politikasi');
+    expect(localizedHref(Routes.account.profile(), 'en')).toBe('/en/account/profile');
   });
 });

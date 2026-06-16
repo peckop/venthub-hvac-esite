@@ -3,10 +3,12 @@
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 
 export default function CookieConsent() {
   const { lang } = useI18n()
+  const routes = useLocalizedRoutes()
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -78,8 +80,8 @@ export default function CookieConsent() {
         </div>
 
         <div className="flex items-center justify-between gap-4 pt-2 border-t border-white/5">
-          <Link 
-            href={`/${lang}/legal/cerez-politikasi`} 
+          <Link
+            href={routes.legal.cerez()}
             className="text-xs text-slate-400 hover:text-cyan-400 font-bold underline underline-offset-4 transition-colors uppercase tracking-wider"
           >
             {policyText}

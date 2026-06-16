@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { lazy, Suspense, useEffect, useState } from 'react'
 
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useScrollThrottle } from '../../hooks/useScrollThrottle'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Routes } from '../../utils/routes';
 import BackToTopButton from '../BackToTopButton'
 import Footer from '../Footer'
 import LanguageSwitcher from '../LanguageSwitcher'
@@ -27,6 +27,7 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
     const { t } = useI18n()
+    const Routes = useLocalizedRoutes()
     const pathname = usePathname()
     const isAdmin = pathname?.startsWith('/admin')
     

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { Routes } from '../../utils/routes';
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes';
 
 
 interface NavBrandProps {
@@ -9,6 +9,7 @@ interface NavBrandProps {
 }
 
 const NavBrand: React.FC<NavBrandProps> = React.memo(({ brandName }) => {
+    const Routes = useLocalizedRoutes()
     return (
         <Link
             href={Routes.home()}

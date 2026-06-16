@@ -3,8 +3,8 @@ import Link from 'next/link'
 import React from 'react'
 
 import { useCategories } from '../contexts/CategoryContext'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
 import BuildTag from './BuildTag'
 // import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
@@ -17,8 +17,9 @@ const HVAC_SUFFIX = 'HVAC.'
 
 const Footer: React.FC = () => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
   const { categories: globalCategories } = useCategories()
-  
+
   const mainCategories = React.useMemo(() => {
     return globalCategories.filter(c => !c.parent_id).slice(0, 8);
   }, [globalCategories]);

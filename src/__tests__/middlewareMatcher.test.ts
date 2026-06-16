@@ -13,8 +13,8 @@ describe('Middleware Matcher Config', () => {
     const matcherPattern = config.matcher[0]
     expect(typeof matcherPattern).toBe('string')
 
-    // Next.js custom matcher pattern:
-    // '/((?!_next/static|_next/image|favicon.ico|images|fonts|.*\\.(?:svg|png|jpg|webp|ico|ttf|woff|woff2|otf)).*)'
+    // Next.js custom matcher pattern (statik asset uzantıları locale-redirect'ten muaf):
+    // '/((?!_next/static|_next/image|favicon.ico|images|fonts|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|ttf|woff|woff2|otf|hdr|exr|glb|gltf|mp4|webm)).*)'
     // Let's compile it into a standard JS RegExp that tests the path (starting with /)
     const regexSource = matcherPattern.slice(1) // Remove leading slash to convert to RegExp source
     const regex = new RegExp(`^/${regexSource}$`)
@@ -46,6 +46,17 @@ describe('Middleware Matcher Config', () => {
       '/logo.svg',
       '/hero.webp',
       '/font.otf',
+      // 3D / env asset'leri — locale-redirect prod bug'ının regression guard'ı
+      '/env/city_256.hdr',
+      '/env/studio.exr',
+      '/models/fan.glb',
+      '/models/fan.gltf',
+      // eklenen image/video uzantıları
+      '/hero.jpeg',
+      '/icon.gif',
+      '/hero.avif',
+      '/promo.mp4',
+      '/promo.webm',
     ]
 
     for (const testPath of matchCases) {

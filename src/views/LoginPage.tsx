@@ -10,7 +10,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useAuth } from '../hooks/useAuth'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
+import { localizedHref, Routes } from '../utils/routes'
 
 const LoginPage: React.FC = () => {
   const [isPending, setIsPending] = useState(false)
@@ -21,7 +21,7 @@ const LoginPage: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(true)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const from = searchParams?.get('redirect') || '/'
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +34,7 @@ const LoginPage: React.FC = () => {
       } else {
         toast.success(t('auth.loginSuccess'))
         router.refresh()
-        router.push(from as import('next').Route)
+        router.push(localizedHref(from, lang))
       }
     } catch {
       toast.error(t('auth.genericLoginError'))
@@ -66,7 +66,7 @@ const LoginPage: React.FC = () => {
 
       <div className="relative max-w-md mx-auto px-4 py-8">
         <Link
-          href={from as import('next').Route}
+          href={localizedHref(from, lang)}
           className="inline-flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-colors"
         >
           <ArrowLeft size={20} />
@@ -145,7 +145,7 @@ const LoginPage: React.FC = () => {
                 <span className="text-sm text-steel-gray">{t('auth.rememberMe')}</span>
               </label>
               <Link
-                href={Routes.auth.forgotPassword()}
+                href={localizedHref(Routes.auth.forgotPassword(), lang)}
                 className="text-sm font-medium text-primary-ocean hover:text-primary-navy transition-colors"
               >
                 {t('auth.forgotPassword')}
@@ -205,7 +205,7 @@ const LoginPage: React.FC = () => {
             <p className="text-sm text-steel-gray">
               {t('auth.noAccount')}{' '}
               <Link
-                href={Routes.auth.register()}
+                href={localizedHref(Routes.auth.register(), lang)}
                 className="font-bold text-primary-ocean hover:text-primary-navy transition-colors"
               >
                 {t('auth.registerNow')}
@@ -216,7 +216,7 @@ const LoginPage: React.FC = () => {
 
         {/* Brand Footer        */}
         <div className="mt-8 text-center">
-          <Link href={Routes.home()} className="group inline-flex items-center gap-3 transition-colors duration-500">
+          <Link href={localizedHref(Routes.home(), lang)} className="group inline-flex items-center gap-3 transition-colors duration-500">
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-primary-navy to-secondary-blue text-white shadow-login-btn px-4 py-3 transition-transform-shadow duration-500 group-hover:-translate-y-1 group-hover:shadow-login-btn-hover">
               <div className="absolute inset-0 bg-login-radial opacity-80" />
               <span className="relative block text-sm font-bold tracking-hvac-25">VH</span>

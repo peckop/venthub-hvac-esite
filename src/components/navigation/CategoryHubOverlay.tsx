@@ -7,10 +7,10 @@ import React, { Suspense,useCallback, useEffect, useState } from 'react'
 
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
 import type { CategoryMetadata } from '../../types/db-rows'
-import { Routes } from '../../utils/routes'
 import Category3DIcon from '../products/Category3DIcon'
 
 interface CategoryHubOverlayProps {
@@ -26,7 +26,8 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     const { t } = useI18n()
     const { categories, categoryTree: mainCategories } = useCategories()
     const { wrapCategory } = useCategoryViewModel()
-    
+    const Routes = useLocalizedRoutes()
+
     const [isAnimating, setIsAnimating] = useState(false)
     const [isVisible, setIsVisible] = useState(false)
     const [hoveredCategory, setHoveredCategory] = useState<DomainCategory | null>(null)

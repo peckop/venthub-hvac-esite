@@ -7,14 +7,15 @@ import React from 'react'
 import { BrandIcon } from '../components/HVACIcons'
 import SecurityRibbon from '../components/SecurityRibbon'
 import { useCart } from '../hooks/useCartHook'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes'
 
 const CartPage: React.FC = () => {
   const { items, updateQuantity, removeFromCart, clearCart, getCartTotal, getCartCount } = useCart()
 
   const { t, lang } = useI18n()
+  const Routes = useLocalizedRoutes()
 
   if (items.length === 0) {
     return (

@@ -5,12 +5,13 @@ import Link from 'next/link'
 import React, { useMemo } from 'react'
 
 import { HVAC_BRANDS } from '../data/brands'
+import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
-import { Routes } from '../utils/routes';
 import { BrandIcon } from './HVACIcons'
 
 
 const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ items, durationSec = 50 }) => {
+  const Routes = useLocalizedRoutes()
   const repeated = useMemo(() => [...items, ...items, ...items], [items])
 
   return (
@@ -52,6 +53,7 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
 
 const BrandsShowcase: React.FC = () => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
   const brands = HVAC_BRANDS
 
   return (

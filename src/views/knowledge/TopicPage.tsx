@@ -8,9 +8,9 @@ import { useParams } from 'next/navigation'
 import React from 'react'
 
 import Seo from '../../components/Seo'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes';
 import { useI18n } from '../../i18n/I18nProvider'
 import { getCategoryUrlFromTopic } from '../../utils/applicationLinks'
-import { Routes } from '../../utils/routes';
 
 
 interface TopicPageProps {
@@ -19,6 +19,7 @@ interface TopicPageProps {
 
 const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
   const params = useParams()
   const currentSlug = propSlug || (params?.slug as string)
   const base = currentSlug ? `knowledge.topics.${currentSlug}` : ''

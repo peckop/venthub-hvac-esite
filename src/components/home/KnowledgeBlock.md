@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\KnowledgeBlock.tsx
-skeleton_hash: a8dd331c5690f78a
+skeleton_hash: 9ccd30d03e330950
 entity_hashes:
-  func:KnowledgeBlock: 6d00cfd06aa7a00e
-  overview: 558d6d867468cadc
+  func:KnowledgeBlock: 7e6b19d8803336cc
+  overview: 2af91bd05b5de4f2
   style_tokens: 45bee56ab9c18ab4
-generated_at: 2026-06-14T21:14:41Z
+generated_at: 2026-06-15T17:02:53Z
 ---
 
 ## Genel Bakış
-Bu modül, ana sayfada bilgi birikimi ve deneyim istatistiklerini sergileyen React bileşenini içerir. Kullanıcıya yerelleştirilmiş içerikler sunarak, teklif alma sürecini başlatan bir eylem çağrısı (CTA) görüntüler.
+Bu modül, ana sayfada bilgi birikimi ve deneyim istatistiklerini sergileyen bir React bileşenini tanımlar. Kullanıcıya yerelleştirilmiş içerikler sunarak, teklif alma sürecini başlatan bir eylem çağrısı (CTA) görüntüler.
 
 ## Fonksiyon Grupları
 ### Ana Bileşen
@@ -22,29 +22,46 @@ Bilgi bloğu, istatistik verileri ve son eylem çağrısını içeren arayüzü 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+
+Bu modül, bir React bileşeni olup, fonksiyon imzası ve modül sabitlerine dayalı mimari varsayımlar aşağıdadır:
+
+**[Aksiyom 1]**: Eğer `dictionary: t` parametresi verilmezse veya geçerli bir çeviri nesnesi içermiyorsa, bileşenin UI metinleri doğru şekilde render edilemez.
+
+**[Aksiyom 2]**: Eğer `lang` parametresi verilmezse, bileşen içeriği hangi dilde gösterileceğini bilemez ve yerelleştirme başarısız olur.
+
+**[Aksiyom 3]**: Eğer `onQuoteClick` fonksiyonu verilmezse veya bir fonksiyon türünde değilse, teklif alma butonuna tıklama eylemi çalışmaz.
+
+**[Aksiyom 4]**: Eğer `statsExperience` verisi verilmezse veya beklenen istatistik alanlarını içermiyorsa, deneyim istatistikleri bölümü eksik veya hatalı render edilir.
+
+**[Aksiyom 5]**: Eğer `finalCtaDict` parametresi verilmezse veya geçerli bir sözlük nesnesi içermiyorsa, son eylem çağrısı (CTA) bölümü doğru içerik gösteremez.
+
+**[Aksiyom 6]**: `knowledgeItems` modül sabiti (array) her zaman mevcut ve geçerli bir dizi olmalıdır; eğer bu sabit boş veya tanımsız olursa, bilgi bloğu içerikleri gösterilemez.
+
+**[Aksiyom 7]**: Eğer `statsExperience` içindeki sayısal değerler `knowledgeItems` dizisindeki öğe sayısıyla uyumlu değilse (örn: dizi 4 elemanlı ama istatistik 3 elemanlı), render sırasında eşleşme hataları oluşur.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### KnowledgeBlock
-**Ne yapar**: `KnowledgeBlock` bir React fonksiyonel bileşenidir ve "Bilgi Bloğu" adı verilen bir kullanıcı arayüzü bileşenini oluşturur. Bu bileşen, çeviri sözlüğü, çağrı eylem metinleri, istatistik/deneyim verileri ve bir teklif butonu tıklama işleyicisi alarak ilgili içeriği görüntüler.
+**Ne yapar**: Bu fonksiyon, bir React bileşeni olan `KnowledgeBlock`'u tanımlar. Bileşen, HVAC领域的知识 içeriğini, istatistikleri ve bir çağrı (CTA) bölümünü göstererek kullanıcılara bilgilendirici bir blok sunar.
 
-**Nasıl yapar**: Bileşen, kendisine iletilen propları (dictionary, finalCtaDict, statsExperience, onQuoteClick) kullanarak bir bilgi bloğu render eder. İç mantığı verilen kod parçacığında detaylandırılmamıştır; ancak tipik olarak bu propları uygun JSX elementlerine dönüştürür ve bir React bileşeni olarak döndürür.
+**Nasıl yapar**: Fonksiyon, bir `React.FC` (Functional Component) olarak tanımlanmıştır ve `KnowledgeBlockProps` arayüzüne uygun bir `dictionary` (yerelleştirme sözlüğü) alır. Bileşen, verilen props'ları kullanarak içeriği dilbilgisel ve istatistiksel olarak yapılandırır. `onQuoteClick` prop'u, kullanıcının bir teklif butonuna tıklaması durumunda çalışacak bir olay işleyicisini temsil eder. `lang` prop'u ise içeriğin hangi dilde gösterileceğini belirler.
 
 **Parametreler**:
-- `dictionary`: object (props içinde `t` olarak aliaslanmış) — Çeviri anahtarlarını içeren sözlük nesnesi. Uygulamanın dil desteği için kullanılır.
-- `finalCtaDict`: object — Son çağrı eylemi (Call to Action) metinlerini ve yapılandırmasını içeren sözlük.
-- `statsExperience`: any — Görüntülenecek istatistik veya deneyim verileri. Türü belirtilmemiştir.
-- `onQuoteClick`: function — Kullanıcının teklif butonuna tıklaması durumunda tetiklenecek geri çağırım fonksiyonu.
+- `dictionary: t` — Bileşen içindeki tüm metinlerin, çevirilerin ve yerelleştirme dizelerinin tutulduğu sözlük nesnesi. Genellikle bir çeviri yardımcısı (i18n helper) tarafından sağlanır.
+- `finalCtaDict` — Bileşenin alt kısmındaki çağrı (Call-to-Action) bölümü için gerekli metinleri ve yapılandırma bilgilerini içeren sözlük.
+- `statsExperience` — Bileşende gösterilecek istatistiksel verileri (örneğin, tecrübe yılları, proje sayıları) temsil eden bir veri yapısı veya prop.
+- `lang` — Bileşenin içeriğini hangi dilde sunacağını belirten dil kodu (örn: 'tr', 'en'). Bu değer, `dictionary` içeriğinin hangi dile ait olduğunu doğrulamak veya içeriği dinamik olarak değiştirmek için kullanılır.
+- `onQuoteClick` — Kullanıcı teklif (quote) butonuna tıkladığında çağrılacak olan bir işlev (callback function). Genellikle bir form açma veya yönlendirme işlemi tetikler.
 
-**Dönüş**: `React.FC<KnowledgeBlockProps>` — Bileşenin kendisi bir React fonksiyonel bileşenidir; bu tür, bileşenin `KnowledgeBlockProps` tipinde proplar almasını sağlar. Kullanıldığında bir `JSX.Element` döndürür.
+**Dönüş**: `React.FC<KnowledgeBlockProps>` tipinde bir React fonksiyonel bileşeni döndürür. Bu bileşen, `KnowledgeBlockProps` arayüzünde tanımlı tüm prop'ları alabilir ve React tarafından render edilebilir bir JSX (veya React elementi) içeriği üretir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../utils/routes::Routes
+- import: ../../utils/routes::localizedHref
 - import: ./ClientLeadButton::ClientLeadButton
 - import: next/link::Link
 - import: react::React
@@ -62,6 +79,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `dictionary: {`
 - `finalCtaDict: {`
 - `statsExperience: string`
+- `lang: string`
 - `onQuoteClick?: () => void`
 
 ---
@@ -73,27 +91,6 @@ Bu modül için özel aksiyom tanımlanmamıştır.
     href: Routes.destek.home(),
     icon: (
   ...`
-
----
-
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/components/home/KnowledgeBlock.tsx::KnowledgeBlock
-- **params**:
-  - `t` — dictionary alias, çeviri metinlerini içeren obje (parametre adı: dictionary)
-  - `finalCtaDict` — son CTA buton metinlerini içeren obje (primaryCta, secondaryCta alanları)
-  - `statsExperience` — istatistik alanında gösterilecek deneyim metni
-  - `onQuoteClick` — teklif butonu tıklama callback fonksiyonu
-- **ic_degiskenler**: (fonksiyon gövdesinde değişken tanımı bulunmamaktadır)
-- **Dönüş**: JSX elementi (React bileşeni) — section, grid layout, final action layer içeren yapı
-
-### [N2_NASIL] AST Pointer: src/components/home/KnowledgeBlock.tsx::(item, index) => {} (knowledgeItems.map callback)
-- **params**:
-  - `item` — knowledgeItems dizisinin elemanı; id, href, icon alanlarını içerir
-  - `index` — dizideki sıra numarası (0‑based)
-- **ic_degiskenler**:
-  - `delayClass` — `['delay-0', 'delay-100', 'delay-200'][index % 3]` ifadesiyle hesaplanan gecikme CSS sınıfı
-- **Dönüş**: JSX elementi — div wrapper içinde Link (numara, icon, başlık, açıklama, CTA)
 
 ---
 

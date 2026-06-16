@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React, { useCallback, useEffect, useRef,useState } from 'react'
 
-import { Routes } from '@/utils/routes';
+import { useLocalizedRoutes } from '@/hooks/useLocalizedRoutes';
 
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -54,6 +54,7 @@ const slidesData: SlideData[] = [
 
 const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
   const { t } = useI18n()
+  const Routes = useLocalizedRoutes()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isMounted, setIsMounted] = useState(false)
   const touchStartX = useRef<number | null>(null)
