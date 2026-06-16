@@ -155,7 +155,7 @@ export const orders = {
         },
         stepper: {
           received: 'Alındı',
-          pa_id: 'Ödendi',
+          paid: 'Ödendi',
           prep: 'Hazırlanıyor',
           shipped: 'Kargoda',
           delivered: 'Teslim'
@@ -166,11 +166,12 @@ export const orders = {
           updateError: 'Durum güncellenirken hata oluştu.'
         }
       },
-      tooltips: {
-        cancelBulkShipping: 'Seçilenlerin sevkiyatını iptal et (yalnızca sevk edilenler)',
-        cancelShipping: 'Sevkiyatı iptal et',
-        logs: 'E-posta günlüklerini görüntüle',
-        notes: 'Sipariş notlarını görüntüle/ekle',
-        shipping: 'Kargo bilgisi ekle / düzenle'
-      }
-};
+        tooltips: {
+          cancelBulkShipping: 'Seçilenlerin sevkiyatını iptal et (yalnızca sevk edilenler)',
+          cancelShipping: 'Sevkiyatı iptal et',
+          logs: 'E-posta günlüklerini görüntüle',
+          notes: 'Sipariş notlarını görüntüle/ekle',
+          shipping: 'Kargo bilgisi ekle / düzenle'
+        },
+        orderDetails: 'Sipariş Detayları'
+  };

@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\inventory.tr.ts
-skeleton_hash: 031b3e1a92daf07c
+skeleton_hash: 0542426d192a25d8
 entity_hashes:
   overview: 18ed3f6f33fcd066
-generated_at: 2026-06-16T10:18:09Z
+generated_at: 2026-06-16T11:09:10Z
 ---
 
 ## Genel Bakış
@@ -33,8 +33,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **inventory** (object) — `{
-      subtitle: 'Ürün stok seviyelerini ve depo hareketlerini izleyin.',
-...`
+  subtitle: 'Ürün stok seviyelerini ve depo hareketlerini izleyin.',
+  summ...`
 
 ---
 

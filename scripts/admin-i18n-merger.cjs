@@ -15,6 +15,42 @@ if (!fs.existsSync(deltasPath)) {
 const deltas = JSON.parse(fs.readFileSync(deltasPath, 'utf8'));
 const repoRoot = path.resolve(__dirname, '..');
 
+function setNestedValue(obj, pathStr, value) {
+  const parts = pathStr.split('.');
+  let current = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const part = parts[i];
+    if (!(part in current) || typeof current[part] !== 'object' || current[part] === null) {
+      current[part] = {};
+    }
+    current = current[part];
+  }
+  current[parts[parts.length - 1]] = value;
+}
+
+function stringify(obj, indent = '  ') {
+  if (typeof obj === 'string') {
+    return `'${obj.replace(/'/g, "\\'")}'`;
+  }
+  if (typeof obj !== 'object' || obj === null) {
+    return String(obj);
+  }
+  if (Array.isArray(obj)) {
+    return `[\n` + obj.map(item => `${indent}  ${stringify(item, indent + '  ')}`).join(',\n') + `\n${indent}]`;
+  }
+  
+  const entries = Object.entries(obj);
+  if (entries.length === 0) return '{}';
+  
+  let res = '{\n';
+  for (const [key, val] of entries) {
+    const formattedKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key) ? key : `'${key}'`;
+    res += `${indent}  ${formattedKey}: ${stringify(val, indent + '  ')},\n`;
+  }
+  res += `${indent}}`;
+  return res;
+}
+
 function mergeKeys(moduleName, lang, deltaObj) {
   const filePath = path.join(repoRoot, 'src/i18n/dictionaries/admin', `${moduleName}.${lang}.ts`);
   if (!fs.existsSync(filePath)) {
@@ -23,46 +59,55 @@ function mergeKeys(moduleName, lang, deltaObj) {
   }
   let content = fs.readFileSync(filePath, 'utf8');
   
-  // Find the last index of };
-  const lastIndex = content.lastIndexOf('};');
-  if (lastIndex === -1) {
-    console.error(`Could not find closing }; in ${filePath}`);
+  // Find the object definition
+  const objRegex = new RegExp(`export\\s+const\\s+${moduleName}\\s*=\\s*(\\{[\\s\\S]*\\});?`);
+  const match = content.match(objRegex);
+  if (!match) {
+    console.error(`Could not parse object definition for "${moduleName}" in ${filePath}`);
     return;
   }
   
-  let insertion = '';
+  const objStr = match[1];
+  let obj = {};
+  try {
+    obj = eval(`(${objStr})`);
+  } catch (e) {
+    console.error(`Failed to eval object for "${moduleName}" in ${filePath}:`, e);
+    return;
+  }
+  
+  let mergedCount = 0;
   for (const [key, val] of Object.entries(deltaObj)) {
-    // Check if key already exists (simple string check or regex)
-    const escapedKey = key.replace(/\./g, '\\.');
-    const keyRegex = new RegExp(`(?:\\b${escapedKey}\\s*:|['"]${escapedKey}['"]\\s*:)`);
-    if (keyRegex.test(content)) {
+    // Check if the key already exists inside the nested path
+    const parts = key.split('.');
+    let exists = true;
+    let curr = obj;
+    for (const part of parts) {
+      if (curr && typeof curr === 'object' && part in curr) {
+        curr = curr[part];
+      } else {
+        exists = false;
+        break;
+      }
+    }
+    
+    if (exists && typeof curr === 'string') {
       console.log(`[SKIPPED] Key "${key}" already exists in ${moduleName}.${lang}.ts`);
       continue;
     }
-    // Escape single quotes in value
-    const escapedVal = String(val).replace(/'/g, "\\'");
-    insertion += `      '${key}': '${escapedVal}',\n`;
+    
+    setNestedValue(obj, key, val);
+    mergedCount++;
   }
   
-  if (insertion) {
-    const before = content.slice(0, lastIndex);
-    const after = content.slice(lastIndex);
-    
-    const trimmedBefore = before.trim();
-    const needsComma = trimmedBefore.length > 0 && 
-                        !trimmedBefore.endsWith(',') && 
-                        !trimmedBefore.endsWith('{');
-    
-    let newContent = before;
-    if (needsComma) {
-      newContent += ',';
-    }
-    if (!newContent.endsWith('\n')) {
-      newContent += '\n';
-    }
-    newContent += insertion + after;
+  if (mergedCount > 0) {
+    const stringified = `export const ${moduleName} = ${stringify(obj, '')};\n`;
+    // Replace the entire object definition
+    const newContent = content.replace(objRegex, stringified.trim());
     fs.writeFileSync(filePath, newContent, 'utf8');
-    console.log(`[MERGED] Added ${Object.keys(deltaObj).length} keys to ${moduleName}.${lang}.ts`);
+    console.log(`[MERGED] Added/updated ${mergedCount} keys in ${moduleName}.${lang}.ts`);
+  } else {
+    console.log(`[NO CHANGES] All keys already exist in ${moduleName}.${lang}.ts`);
   }
 }
 

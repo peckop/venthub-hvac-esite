@@ -21,5 +21,7 @@ export const ui = {
       endDate: 'End Date',
       failed: 'Operation failed',
       accessDeniedTitle: 'Access Denied',
-      accessDeniedDesc: 'Admin privileges are required to access this page.'
+      accessDeniedDesc: 'Admin privileges are required to access this page.',
+      backToDashboard: 'Back to Dashboard',
+      ready: 'Ready'
 };

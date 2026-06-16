@@ -22,5 +22,7 @@ export const common = {
       active: 'Aktif',
       passive: 'Pasif',
       all: 'Tümü',
-      view: 'Görünüm'
+      view: 'Görünüm',
+      save: 'Kaydet',
+      total: 'Toplam'
 };

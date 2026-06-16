@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
-skeleton_hash: adb27ebbc07c7d53
+skeleton_hash: 65ce2531e18b662b
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-06-14T22:51:53Z
+generated_at: 2026-06-16T11:09:10Z
 ---
 
 ## Genel Bakış
@@ -37,7 +37,7 @@ Bu modül saf bir statik veri modülüdür (sözlük/taslak) — çalıştırıl
   common: {
     update: 'Güncelle',
     unitMeters: '{{v}} m',
-    unitCubi...`
+    unit...`
 
 ---
 

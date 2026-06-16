@@ -21,5 +21,7 @@ export const ui = {
       refresh: 'Yenile',
       save: 'Kaydet',
       startDate: 'Başlangıç Tarihi',
-      total: 'Toplam'
+      total: 'Toplam',
+      backToDashboard: 'Ana Panele Dön',
+      ready: 'Hazır'
 };

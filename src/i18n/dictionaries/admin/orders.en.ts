@@ -162,7 +162,7 @@ export const orders = {
         },
         stepper: {
           received: 'Received',
-          pa_id: 'Paid',
+          paid: 'Paid',
           prep: 'Preparing',
           shipped: 'Shipped',
           delivered: 'Delivered'
@@ -172,5 +172,6 @@ export const orders = {
           updateSuccess: 'Order status updated successfully.',
           updateError: 'Error occurred while updating status.'
         }
-      }
+      },
+      orderDetails: 'Order Details'
 };

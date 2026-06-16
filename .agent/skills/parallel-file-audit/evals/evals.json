@@ -1,0 +1,31 @@
+{
+  "should_trigger": [
+    "kör analiz başlat",
+    "paralel denetim kur",
+    "blind audit",
+    "parallel file audit",
+    "dosyalar üzerinde kör analiz başlatır mısın",
+    "eslint verileri ile paralel denetim kur",
+    "legal dizini için blind audit yapalım",
+    "hukuk sayfalarını parallel file audit ile analiz et",
+    "bu dosyaları kör analiz başlat diyerek takıma ver",
+    "dosyaları paralel denetim kur komutuyla analiz et",
+    "şimdi blind audit takımını tetikle",
+    "kod tabanını parallel file audit ile tara",
+    "validator entegrasyonu ile paralel denetim kur",
+    "validate findings with rules via blind audit",
+    "generic validator kullanarak kör analiz başlat"
+  ],
+  "should_not_trigger": [
+    "git commit at",
+    "pnpm run dev çalıştır",
+    "database migration oluştur",
+    "css font stilini değiştir",
+    "eslint hatalarını otomatik düzelt",
+    "npm run build testi yap",
+    "tip kontrolü tsc çalıştır",
+    "yeni component kodunu yaz",
+    "validator.js kodundaki syntax hatasını düzelt",
+    "unit testleri validator.js ile çalıştır"
+  ]
+}

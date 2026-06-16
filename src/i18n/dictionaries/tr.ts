@@ -122,6 +122,12 @@ export const tr = {
     pdf: 'PDF',
     sku: 'SKU',
     pdfDatasheet: 'Teknik Döküman',
+    share: 'Paylaş',
+    requestQuote: 'Teklif İste',
+    officialGuarantee: 'Distribütör Garantili',
+    fastDelivery: 'Hızlı Teslimat',
+    series: 'Seri',
+    reset: 'Sıfırla',
     whatsapp: {
       faqSupportMessage: 'Sıkça Sorulan Sorular sayfasında aradığım cevabı bulamadım...',
       supportMessageDefault: 'Merhaba, VentHub HVAC destek ekibiyle iletişime geçmek istiyorum.',
@@ -234,7 +240,10 @@ export const tr = {
     searchPlaceholder: 'Ürün veya model ara...',
     noResults: 'Sonuç Bulunamadı',
     noResultsDesc: 'Lütfen filtreleri temizleyin veya farklı bir terim deneyin.',
-    clearFilters: 'Filtreleri Temizle'
+    clearFilters: 'Filtreleri Temizle',
+    heroAlt: 'HVAC Ürünleri Keşif Görseli',
+    searchAriaLabel: 'Ürün Arama',
+    searchHelp: 'Detaylı filtreler için yazmaya başlayın.'
   },
   search: {
     overlay: {
