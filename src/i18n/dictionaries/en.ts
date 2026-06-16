@@ -937,7 +937,12 @@ export const en: typeof tr = {
   legal: {
     kvkkTitle: 'KVKK Clarification Text (Draft)',
     draftWarning: 'This text is a draft and for testing purposes. Please update it with your company\'s actual details and confirm with a legal expert before going live.',
-    disclaimer: 'This text does not constitute legal advice. It is recommended to seek professional counsel for the final text.'
+    disclaimer: 'This text does not constitute legal advice. It is recommended to seek professional counsel for the final text.',
+    privacyTitle: 'Privacy Policy (Draft)',
+    cookieTitle: 'Cookie Policy (Draft)',
+    distanceSalesTitle: 'Distance Sales Agreement (Draft)',
+    preInformationTitle: 'Pre-Information Form (Draft)',
+    termsTitle: 'Terms of Use (Draft)'
   },
   admin,
   footer: {

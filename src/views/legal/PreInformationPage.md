@@ -3,50 +3,84 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\legal\PreInformationPage.tsx
-skeleton_hash: 47f4bda80ce59bb6
+skeleton_hash: cbb37270fce40d75
 entity_hashes:
-  func:PreInformationPage: 3746fdd57fa8f528
-  overview: 9f7c71a3d1be24be
-  style_tokens: f624520e4dc7da19
-generated_at: 2026-06-08T10:11:02Z
+  func:PreInformationPage: 6c512329d936b02b
+  func:t: 82e524c2f79ad389
+  overview: a88c970a8f2231d2
+  style_tokens: 06829f9d93bd4397
+generated_at: 2026-06-16T11:54:06Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıya yasal ön bilgilendirme metnini sunan `PreInformationPage` adlı React bileşenini tanımlar. Bileşen, kullanıcı onayı veya bilgilendirme gerektiren durumlar için kullanılır ve sayfanın görünümünü ve etkileşimlerini yönetir.
+Bu modül, kullanıcıya yasal ön bilgilendirme içeriğini sunan tek sayfalık bir React bileşenini tanımlar. Modül, çok dilli destek sağlayarak dil bazlı metinlerin gösterilmesini yönetir ve basit bir bilgilendirme sayfası sunar.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
-Ana sayfa bileşenini oluşturur. Bileşen içinde JSX yapısı, state yönetimi ve olası alt bileşenler birleştirilerek eksiksiz bir ön bilgilendirme sayfası sunulur.
+Ana React bileşenini oluşturarak sayfanın tamamını render eder.
 - PreInformationPage
+
+### Yardımcı Fonksiyonlar
+Çeviri ve metin erişimi için kullanılan yardımcı fonksiyonları barındırır.
+- t
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+Bu modül için, fonksiyon gövdesi paylaşılmadığından, yalnızca imza bilgisinden çıkarılabilecek minimum varsayımlar aşağıdadır.
+
+[Aksiyom 1]: Eğer `lang` prop'u bileşene iletilmezse, bileşen düzgün render edilemeyebilir veya varsayılan/boş bir dil değeri ile çalışabilir.
+
+[Aksiyom 2]: Eğer `t(key: string)` çeviri fonksiyonu çalışması için gerekli çeviri sözlüğü/JSON dosyası yüklenmemişse veya `lang` ile uyumlu çeviri anahtarı (`key`) bulunamazsa, çevrilmemiş ham anahtar dizesi veya boş bir değer dönebilir.
+
+---
+
+**Not:** Fonksiyon gövdesi (`PreInformationPage` ve `t` implementasyonu) paylaşılmadığından, bileşenin hangi JSX yapısını render ettiği, hangi state'leri yönettiği, hangi alt bileşenleri kullandığı veya hangi eşik değerleri/kabul kriterlerini uyguladığı gibi detaylı mimari varsayımlar **belirlenememiştir**. Daha kapsamlı aksiyon üretmek için fonksiyon gövdelerinin incelenmesi gereklidir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### PreInformationPage
-**Ne yapar**: `PreInformationPage` fonksiyonu, bir React fonksiyonel bileşeni (React.FC) tanımlayarak ön bilgi sayfasının UI yapısını oluşturur.  
+**Ne yapar**: VentHub HVAC uygulamasının yasal bilgilendirme sayfasını render eden React bileşenidir. Kullanıcıya dil seçimine göre (Türkçe/İngilizce) ön bilgi içeriğini sunar.
 
-**Nasıl yapar**: Fonksiyon, JSX içinde gerekli HTML elemanlarını ve stil sınıflarını düzenleyerek, sayfanın başlık, açıklama ve ilgili yasal metin bölümlerini render eder.  
+**Nasıl yapar**: Fonksiyon, bir React functional component olarak tanımlanmıştır ve `lang` prop'unu alır. Önce `lang` değerine bağlı olarak sözlük nesnesini (`dict`) seçer. Ardından bu sözlük üzerinden `t` adlı bir çeviri fonksiyonu oluşturur. JSX içinde; sayfa başlığı, sarı uyarı kutusu, dil bazlı içerik bileşeni (`PreInformationContentEn` veya `PreInformationContentTr`) ve sorumluluk reddi metnini render eder. Tüm metinler `t()` fonksiyonu ile sözlükten dinamik olarak çekilir.
 
-**Parametreler**:  
-- *Yok* — Bu fonksiyon herhangi bir dış parametre almaz; bileşen içindeki sabit içerik ve stil tanımlarıyla çalışır.  
+**Parametreler**:
+- lang: string — Sayfanın görüntüleneceği dil kodu. 'en' ise İngilizce içeriği, başka bir değer (örn: 'tr') ise Türkçe içeriği gösterir.
 
-**Dönüş**: React.FC — Fonksiyon, bir React fonksiyonel bileşeni döndürür; bu bileşen, uygulama içinde `<PreInformationPage />` şeklinde kullanılabilir.
+**Dönüş**: React.FC<{ lang: string }> tipinde, lang prop'unu alan bir React functional component döndürür.
+
+### t
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/dictionaries/en::en
+- import: ../../i18n/dictionaries/tr::tr
+- import: ../../i18n/getDictValue::getDictValue
+- import: ./components/en/PreInformationContent::PreInformationContentEn
+- import: ./components/tr/PreInformationContent::PreInformationContentTr
+- import: react::React
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\legal\PreInformationPage.tsx::PreInformationPage
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - *hiç yok* — fonksiyon içinde tanımlı yerel değişken bulunmamaktadır; sadece `legalConfig` importu üzerinden değerler okunmaktadır.
-- **Dönüş**: `React.ReactElement` – fonksiyon, JSX içinde tanımlı bir React bileşen ağacını döndürür.
+### [N1_NASIL] AST Pointer: src/views/legal/PreInformationPage.tsx::PreInformationPage
+- **params**: `({ lang })` — dil kodu ('en' veya 'tr') taşıyan React props nesnesi
+- **ic_degiskenler**:
+  - `dict` — `lang === 'en'` koşuluna göre `en` ya da `tr` sözlük nesnesini seçer; çeviri anahtarlarının çözülmesinde kullanılır
+  - `t` — `getDictValue(dict, key)` partial uygulamasıyla oluşturulan çeviri fonksiyonu; JSX içinde `t('legal.preInformationTitle')`, `t('legal.draftWarning')`, `t('legal.disclaimer')` çağrılarıyla metinlerin dil bazlı değerlerini döndürür
+- **Kosullu Dal**: `lang === 'en'` olduğunda `<PreInformationContentEn lang={lang} />`, aksi halde `<PreInformationContentTr lang={lang} />` render edilir
+- **Dönüş**: JSX (`<div>` üst öğeli React elemanı) — sayfa yapısını, uyarı kutusunu, içerik bileşenini ve feragatname metnini döndürür
+
+### [N2_NASIL] src/views/legal/PreInformationPage.tsx::t
+- **params**: `key: string` — sözlükte çözülecek çeviri anahtarı (ör. `'legal.preInformationTitle'`)
+- **ic_degiskenler**:
+  - (yok)
+- **Dönüş**: `getDictValue(dict, key)` sonucu — seçili sözlükteki karşılık gelen çeviri string değeri
 
 ---
 
@@ -54,6 +88,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
   file: src\views\legal\PreInformationPage.tsx
   function: src\views\legal\PreInformationPage.tsx::PreInformationPage
+  function: src\views\legal\PreInformationPage.tsx::t
 
 ---
 
@@ -71,7 +106,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xl`, `text-xs`, `text-yellow-800`
+- **Renkler:** `bg-white`, `bg-yellow-50`, `border-light-gray`, `border-yellow-200`, `text-3xl`, `text-industrial-gray`, `text-sm`, `text-steel-gray`, `text-xs`, `text-yellow-800`
 - **Layout:** `bg-yellow-50`, `border-yellow-200`, `max-w-4xl`, `max-w-prose`, `p-4`, `p-6`, `shadow-sm`, `text-yellow-800`
 - **Varyant/Responsive:** `dark:`, `lg:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `font-semibold`, `lg:px-8`, `list-disc`, `mb-3`, `mb-6`, `mt-2`, `mt-4`, `mx-auto`, `pl-6`, `prose`, `px-4`, `py-10`
+- **Yardımcı Sınıflar:** `border`, `dark:prose-invert`, `font-bold`, `lg:px-8`, `mb-6`, `mt-4`, `mx-auto`, `prose`, `px-4`, `py-10`, `rounded-lg`, `rounded-xl`, `sm:px-6`, `space-y-6`
