@@ -9,7 +9,7 @@ entity_hashes:
   func:toRelPath: 5935533af5852617
   func:verifyNoDotsInPropertyNames: a519de51991e6b08
   overview: bb07ef4f3b6396d0
-generated_at: 2026-06-16T11:09:09Z
+generated_at: 2026-06-16T11:13:53Z
 ---
 
 ## Genel Bakış
@@ -107,47 +107,6 @@ Bu modül, i18n anahtarlarının mimari doğrulamasını sağlayan yardımcı fo
   - `key` — `Object.entries` ile dönen mevcut sözlük anahtarı
   - `value` — `key`'e karşılık gelen sözlük değeri
 - **Dönüş**: `string[]` — noktalı key bulunan tam path'lerin listesi
-
----
-
-### [N2_NASIL] AST Pointer: `__tests__/conformance/i18n-keys.test.ts`::stripComments
-- **params**: `(source: string)`
-- **ic_degiskenler**: yok
-- **Dönüş**: `string` — yorum satırları (`/* */` ve `//`) çıkarılmış kaynak kod stringi
-
----
-
-### [N3_NASIL] AST Pointer: `__tests__/conformance/i18n-keys.test.ts`::toRelPath
-- **params**: `(globKey: string)`
-- **ic_degiskenler**:
-  - `marker` — path分割자 olarak kullanılan `/src/` literal stringi
-  - `idx` — `globKey` içinde `/src/` marker'ının bulunduğu indeks (-1 ise bulunamadı)
-- **Dönüş**: `string` — `/src/` prefix'inden sonraki göreli yol, backslash'ler forwardslash'e çevrilmiş
-
----
-
-### [N4_NASIL] AST Pointer: `__tests__/conformance/i18n-keys.test.ts`::(it callback: "nested-only")
-- **params**: yok
-- **ic_degiskenler**:
-  - `trOffenders` — `verifyNoDotsInPropertyNames(tr)` çağrısının döndüğü noktalı key path listesi
-- **Dönüş**: yok (assertion ile test sonucu üretir)
-
----
-
-### [N5_NASIL] AST Pointer: `__tests__/conformance/i18n-keys.test.ts`::(it callback: "keycheck")
-- **params**: yok
-- **ic_degiskenler**:
-  - `missingKeys` — `{ file: string; key: string }` tipli dizide çözümlenemeyen key'lerin kaydı
-  - `staticKeyRegex` — `t('...')` çağrılarını yakalayan正则表现式 (`/\bt\(\s*['"]([a-zA-Z0-9_.-]+)['"]\s*[),]/g`)
-  - `key` — `Object.entries(SOURCES)` ile dönen kaynak dosya glob yolu
-  - `source` — ilgili dosyanın ham kaynak kodu
-  - `rel` — `toRelPath(key)` ile elde edilmiş göreli dosya yolu
-  - `clean` — `stripComments(source)` ile yorumları temizlenmiş kaynak kod
-  - `match` — regex.exec() ile bulunan her eşleşme sonucu (array)
-  - `tKey` — `match[1]`'den elde edilen çeviri key stringi
-  - `resolved` — `getDictValue(tr, tKey)` ile sözlükten çözümlenen değer
-  - `uniqueMissing` — `missingKeys` dizisinden `file -> key` formatında tekrarsız liste
-- **Dönüş**: yok (assertion ile test sonucu üretir)
 
 ---
 
