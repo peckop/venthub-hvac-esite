@@ -1,3 +1,5 @@
+'use client'
+
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd'
 import { CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock, GripVertical, LucideIcon,Mail, MessageSquare, Package, RotateCcw, Truck, X, XCircle } from 'lucide-react'
 import { usePathname } from 'next/navigation'
@@ -17,6 +19,11 @@ import {
     adminButtonPrimaryClass,
     adminInputClass
 } from '../../utils/adminUi'
+
+// --- Constants ---
+const HASH_SYMBOL = '#'
+const OPEN_PAREN = '('
+const CLOSE_PAREN = ')'
 
 // --- Types ---
 interface AdminOrderRow {
@@ -206,7 +213,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                 {/* Header */}
                 <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
                     <div>
-                        <div className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal mb-1">#{order.order_number || order.id.substring(0, 8)}</div>
+                        <div className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal mb-1">{HASH_SYMBOL}{order.order_number || order.id.substring(0, 8)}</div>
                         <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">{order.customer_name || t('common.none')}</h3>
                     </div>
                     <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10">
@@ -256,7 +263,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
 
                             <section className="space-y-4">
                                 <h4 className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal mb-2 ml-1 flex items-center gap-2">
-                                    <MessageSquare size={14} className="text-indigo-400" /> {t('admin.orders.actions.notes')} ({detail.notes.length})
+                                    <MessageSquare size={14} className="text-indigo-400" /> {t('admin.orders.actions.notes')} {OPEN_PAREN}{detail.notes.length}{CLOSE_PAREN}
                                 </h4>
                                 <div className="space-y-3">
                                     {detail.notes.map(n => (
@@ -287,7 +294,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
 
                             <section className="space-y-4">
                                 <h4 className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal mb-2 ml-1 flex items-center gap-2">
-                                    <Mail size={14} className="text-amber-400" /> {t('admin.orders.modals.logs.title')} ({detail.emailLogs.length})
+                                    <Mail size={14} className="text-amber-400" /> {t('admin.orders.modals.logs.title')} {OPEN_PAREN}{detail.emailLogs.length}{CLOSE_PAREN}
                                 </h4>
                                 <div className="space-y-2">
                                     {detail.emailLogs.map((l, i) => (
@@ -556,7 +563,7 @@ export default function AdminOrdersBoard() {
                                                                     <div className="flex-1 min-w-0">
                                                                         <div className={`flex items-center gap-2 text-xs font-black uppercase tracking-hvac-normal mb-2 ${snapshot.isDragging ? 'text-surface-deep/60' : 'text-slate-500'}`}>
                                                                             <GripVertical size={12} className="opacity-30" />
-                                                                            #{order.order_number || order.id.substring(0, 8)}
+                                                                            {HASH_SYMBOL}{order.order_number || order.id.substring(0, 8)}
                                                                         </div>
                                                                         <h4 className={`font-black uppercase tracking-tight text-xs truncate ${snapshot.isDragging ? 'text-surface-deep' : 'text-white'}`}>
                                                                             {order.customer_name || t('common.none')}

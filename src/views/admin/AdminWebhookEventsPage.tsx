@@ -2,7 +2,7 @@
 
 import { SupabaseClient } from '@supabase/supabase-js';
 import { format } from 'date-fns';
-import { tr } from 'date-fns/locale';
+import { enUS, tr } from 'date-fns/locale';
 import { 
   Activity, 
   CheckCircle2, 
@@ -12,6 +12,7 @@ import {
   XCircle} from 'lucide-react';
 import React, { useEffect,useState } from 'react';
 
+import { useI18n } from '@/i18n/I18nProvider';
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import { Database } from '@/types/database.types';
 import { DbWebhookEvent } from '@/types/db-rows';
@@ -34,6 +35,8 @@ interface AdminDatabase extends Omit<Database, 'public'> {
 }
 
 const AdminWebhookEventsPage = () => {
+  const { t, lang } = useI18n();
+  const locale = lang === 'en' ? enUS : tr;
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<WebhookEventRow[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<WebhookEventRow | null>(null);
@@ -72,9 +75,9 @@ const AdminWebhookEventsPage = () => {
         <div>
           <h1 className="text-2xl font-bold text-industrial-gray flex items-center gap-2">
             <Activity className="text-primary-navy" />
-            Webhook Olayları
+            {t('admin.webhooks.eventsTitle')}
           </h1>
-          <p className="text-steel-gray text-sm">Sistem dışı gelen API bildirimlerini takip edin.</p>
+          <p className="text-steel-gray text-sm">{t('admin.webhooks.eventsSubtitle')}</p>
         </div>
         <button onClick={fetchEvents} className="p-2 text-steel-gray hover:text-primary-navy rounded-lg">
           <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
@@ -86,10 +89,10 @@ const AdminWebhookEventsPage = () => {
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 border-b border-slate-100 text-steel-gray uppercase text-xs font-bold">
               <tr>
-                <th className="px-4 py-3">Olay Tipi</th>
-                <th className="px-4 py-3">Kaynak</th>
-                <th className="px-4 py-3">Durum</th>
-                <th className="px-4 py-3 text-right">Tarih</th>
+                <th className="px-4 py-3">{t('admin.webhooks.eventType')}</th>
+                <th className="px-4 py-3">{t('admin.webhooks.source')}</th>
+                <th className="px-4 py-3">{t('admin.webhooks.status')}</th>
+                <th className="px-4 py-3 text-right">{t('admin.webhooks.date')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -104,20 +107,20 @@ const AdminWebhookEventsPage = () => {
                   <td className="px-4 py-4">
                     {event.status === 'processed' ? (
                       <span className="flex items-center gap-1 text-success-green font-bold text-xs">
-                        <CheckCircle2 size={14} /> İşlendi
+                        <CheckCircle2 size={14} /> {t('admin.webhooks.statusProcessed')}
                       </span>
                     ) : event.status === 'failed' ? (
                       <span className="flex items-center gap-1 text-red-500 font-bold text-xs">
-                        <XCircle size={14} /> Hata
+                        <XCircle size={14} /> {t('admin.webhooks.statusFailed')}
                       </span>
                     ) : (
                       <span className="flex items-center gap-1 text-warning-orange font-bold text-xs">
-                        <Clock size={14} /> Bekliyor
+                        <Clock size={14} /> {t('admin.webhooks.statusPending')}
                       </span>
                     )}
                   </td>
                   <td className="px-4 py-4 text-right text-steel-gray font-medium text-xs">
-                    {format(new Date(event.created_at), 'd MMM HH:mm', { locale: tr })}
+                    {format(new Date(event.created_at), 'd MMM HH:mm', { locale })}
                   </td>
                 </tr>
               ))}
@@ -128,7 +131,7 @@ const AdminWebhookEventsPage = () => {
         <div className="bg-white rounded-xl border border-light-gray shadow-sm p-6">
           <h3 className="text-lg font-bold text-industrial-gray mb-4 flex items-center gap-2">
             <Code size={18} className="text-primary-navy" />
-            Olay Detayı
+            {t('admin.webhooks.eventDetail')}
           </h3>
           {selectedEvent ? (
             <div className="space-y-4">
@@ -139,14 +142,14 @@ const AdminWebhookEventsPage = () => {
               </div>
               {selectedEvent.error_message && (
                 <div className="p-3 bg-red-50 border border-red-100 rounded-lg">
-                  <p className="text-xs font-bold text-red-600 mb-1 uppercase">Hata Mesajı</p>
+                  <p className="text-xs font-bold text-red-600 mb-1 uppercase">{t('admin.webhooks.errorMessage')}</p>
                   <p className="text-xs text-red-500">{selectedEvent.error_message}</p>
                 </div>
               )}
             </div>
           ) : (
             <div className="py-20 text-center text-slate-400 text-sm italic">
-              İncelemek için listeden bir olay seçin.
+              {t('admin.webhooks.selectEventToView')}
             </div>
           )}
         </div>

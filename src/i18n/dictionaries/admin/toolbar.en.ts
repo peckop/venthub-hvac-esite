@@ -1,5 +1,18 @@
 export const toolbar = {
-      searchPlaceholder: 'Search',
-      clear: 'Clear',
-      records: 'records'
+  searchPlaceholder: 'Search',
+  clear: 'Clear',
+  records: 'records',
+  itemsSelected: 'items selected',
+  makeActive: 'Make Active',
+  makePassive: 'Make Inactive',
+  feature: 'Feature',
+  updatePrice: 'Update Price',
+  bulkPriceUpdate: 'Bulk Price Update',
+  percentage: 'Percentage',
+  fixedAmount: 'Fixed Amount',
+  placeholderPercent: 'e.g. 15 (increase) or -10 (discount)',
+  placeholderFixed: 'e.g. 500 (add) or -200 (subtract)',
+  invalidNumberAlert: 'Please enter a valid number.',
+  priceHintPercent: 'Positive value = Markup, Negative value = Discount',
+  priceHintFixed: 'Positive value = Add to price, Negative value = Subtract from price',
 };
