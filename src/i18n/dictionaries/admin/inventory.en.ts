@@ -189,4 +189,10 @@ export const inventory = {
   recentMovements: 'Recent Movements',
   undoing: 'Undoing...',
   undoLast: 'Undo Last',
+  fetchFailed: 'Failed to load data',
+  unnamedProduct: 'Unnamed Product',
+  title: 'Inventory Management',
+  description: 'Manage stock statuses.',
+  stockMovement: 'Stock Movement',
+  searchPlaceholder: 'Search by product name...',
 };

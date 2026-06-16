@@ -6,7 +6,7 @@ import {
   Plus,
   RefreshCw, 
   Search} from 'lucide-react';
-import React, { useEffect, useMemo,useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
@@ -20,7 +20,7 @@ type InventorySummaryRow = Database['public']['Views']['inventory_summary']['Row
 type Category = Database['public']['Tables']['categories']['Row'];
 
 const AdminInventoryPage: React.FC = () => {
-  const { t: _t } = useI18n();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<InventorySummaryRow[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -28,7 +28,7 @@ const AdminInventoryPage: React.FC = () => {
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterStockStatus] = useState<'all' | 'low' | 'out'>('all');
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const [invRes, catRes] = await Promise.all([
@@ -43,15 +43,15 @@ const AdminInventoryPage: React.FC = () => {
       setCategories(catRes.data || []);
     } catch (err: unknown) {
       console.error('Inventory fetch error:', err);
-      toast.error('Veriler yüklenemedi');
+      toast.error(t('admin.inventory.fetchFailed'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const filteredData = useMemo(() => {
     return data.filter(item => {
@@ -68,14 +68,14 @@ const AdminInventoryPage: React.FC = () => {
       return matchesSearch && matchesCategory && matchesStock;
     }).map(item => ({
       product_id: item.product_id || '',
-      name: item.name || 'İsimsiz Ürün',
+      name: item.name || t('admin.inventory.unnamedProduct'),
       physical_stock: item.physical_stock || 0,
       reserved_stock: item.reserved_stock || 0,
       available_stock: item.available_stock || 0,
       warehouse_location: item.warehouse_location,
       supplier_name: item.supplier_name
     }));
-  }, [data, searchTerm, filterCategory, filterStockStatus]);
+  }, [data, searchTerm, filterCategory, filterStockStatus, t]);
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -83,9 +83,9 @@ const AdminInventoryPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-industrial-gray flex items-center gap-2">
             <Package className="text-primary-navy" />
-            Envanter Yönetimi
+            {t('admin.inventory.title')}
           </h1>
-          <p className="text-steel-gray text-sm">Stok durumlarını yönetin.</p>
+          <p className="text-steel-gray text-sm">{t('admin.inventory.description')}</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={fetchData} className="p-2 text-steel-gray hover:text-primary-navy rounded-lg">
@@ -93,7 +93,7 @@ const AdminInventoryPage: React.FC = () => {
           </button>
           <button className="flex items-center gap-2 bg-primary-navy text-white px-4 py-2 rounded-lg font-bold">
             <Plus size={20} />
-            <span>Stok Hareketi</span>
+            <span>{t('admin.inventory.stockMovement')}</span>
           </button>
         </div>
       </div>
@@ -103,7 +103,7 @@ const AdminInventoryPage: React.FC = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-steel-gray" size={18} />
           <input 
             type="text"
-            placeholder="Ürün adı ile ara..."
+            placeholder={t('admin.inventory.searchPlaceholder')}
             className="w-full pl-10 pr-4 py-2 bg-gray-50 border-gray-200 rounded-lg focus-visible:outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -115,7 +115,7 @@ const AdminInventoryPage: React.FC = () => {
             value={filterCategory || ''}
             onChange={(e) => setFilterCategory(e.target.value || null)}
           >
-            <option value="">Tüm Kategoriler</option>
+            <option value="">{t('admin.inventory.allCategories')}</option>
             {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>

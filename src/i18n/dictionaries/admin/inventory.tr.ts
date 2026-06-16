@@ -189,4 +189,10 @@ export const inventory = {
   recentMovements: 'Son Hareketler',
   undoing: 'Geri Alınıyor...',
   undoLast: 'Sonuncuyu Geri AL',
+  fetchFailed: 'Veriler yüklenemedi',
+  unnamedProduct: 'İsimsiz Ürün',
+  title: 'Envanter Yönetimi',
+  description: 'Stok durumlarını yönetin.',
+  stockMovement: 'Stok Hareketi',
+  searchPlaceholder: 'Ürün adı ile ara...',
 };
