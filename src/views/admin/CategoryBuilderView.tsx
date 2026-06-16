@@ -17,10 +17,21 @@ import { toast } from 'sonner';
 import { AuthorityBuilder } from '@/components/admin/authority-builder/AuthorityBuilder';
 import { AuthorityRenderer } from '@/components/authority/AuthorityRenderer';
 import { useRole } from '@/hooks/useRole';
+import { useI18n } from '@/i18n/I18nProvider';
 import { logAdminAction } from '@/lib/audit';
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import { AuthorityBlock, SpecsBlock } from '@/types/authority';
 import { CategoryMetadata, DbCategory, DbJson } from '@/types/db-rows';
+
+const BRAND_NAME = 'VentHub';
+const ENGINE_VERSION = 'v2.4';
+
+const globalStyles = `
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+  .custom-scrollbar-light::-webkit-scrollbar { width: 4px; }
+  .custom-scrollbar-light::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 10px; }
+`;
 
 interface CategoryBuilderViewProps {
   categoryId: string;
@@ -29,6 +40,7 @@ interface CategoryBuilderViewProps {
 const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId }) => {
   const router = useRouter();
   const { canWrite } = useRole();
+  const { t } = useI18n();
   const hasWriteAccess = canWrite('categories');
   const [category, setCategory] = useState<DbCategory | null>(null);
   const [blocks, setBlocks] = useState<AuthorityBlock[] | null>(null);
@@ -72,11 +84,11 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
           if (meta.metric2?.label) rows.push({ label: meta.metric2.label, value: meta.metric2.value || '' });
           
           if (rows.length > 0) {
-            legacyBlocks.push({
+            legacyBlocks.push({ 
               id: 'legacy-specs',
               type: 'specs',
               order: 1,
-              content: { title: 'Teknik Özet', rows } as SpecsBlock['content'],
+              content: { title: t('admin.categories.technicalSummary'), rows } as SpecsBlock['content'],
               config: { theme: 'light', padding: 'medium' }
             } as AuthorityBlock);
           }
@@ -84,24 +96,24 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
         
         if (legacyBlocks.length > 0) {
           initialBlocks = legacyBlocks;
-          toast.success('Eski veriler bloklara dönüştürüldü. Kaydetmeyi unutmayın.');
+          toast.success(t('admin.categories.toasts.legacyMigrationSuccess'));
         }
       }
 
       setBlocks(initialBlocks);
     } catch (e) {
       console.error('Builder load error:', e);
-      toast.error('Veriler yüklenemedi.');
+      toast.error(t('admin.categories.toasts.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [categoryId]);
+  }, [categoryId, t]);
 
   useEffect(() => { load(); }, [load]);
 
   const handleSave = async () => {
     if (!hasWriteAccess) {
-      toast.error('Bu işlem için yetkiniz yok.');
+      toast.error(t('admin.categories.toasts.noWritePermission'));
       return;
     }
     setSaving(true);
@@ -111,7 +123,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
         .from('categories')
         .update({ authority_content: blocks as DbJson })
         .eq('id', categoryId);
-      if (error) throw error;
+      if (error) throw error;      
       // Audit log (hata UI'ı bloklamasın)
       try {
         await logAdminAction(supabase, {
@@ -122,10 +134,10 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
           comment: 'authority content kaydedildi',
         });
       } catch { /* swallow */ }
-      toast.success('Değişiklikler sisteme mühürlendi.');
+      toast.success(t('admin.categories.toasts.saveSuccess'));
     } catch (e) {
       console.error('Save error:', e);
-      toast.error('Kaydetme hatası!');
+      toast.error(t('admin.categories.toasts.saveError'));
     } finally {
       setSaving(false);
     }
@@ -135,7 +147,9 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-surface-deep space-y-6">
         <div className="w-12 h-12 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin" />
-        <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-loose animate-pulse">Studio Initialization...</span>
+        <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-loose animate-pulse">
+          {t('admin.categories.studioInitialization')}
+        </span>
       </div>
     );
   }
@@ -150,7 +164,9 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                 <ChevronLeft size={18} />
             </div>
             <div className="flex flex-col">
-                <span className="text-xs font-black text-slate-600 uppercase tracking-widest leading-none">Geri Dön</span>
+                <span className="text-xs font-black text-slate-600 uppercase tracking-widest leading-none">
+                  {t('admin.common.goBack')}
+                </span>
                 <span className="text-xs font-bold text-white mt-1">{category?.name}</span>
             </div>
           </button>
@@ -163,18 +179,18 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                 className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-colors ${showPreview ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20' : 'text-slate-500 hover:text-slate-300'}`}
              >
                 <Eye size={14} />
-                {showPreview ? 'Önizleme Açık' : 'Önizleme Kapalı'}
+                {showPreview ? t('admin.categories.previewOn') : t('admin.categories.previewOff')}
              </button>
           </div>
 
           <button
             onClick={handleSave}
             disabled={saving || !hasWriteAccess}
-            title={!hasWriteAccess ? 'Bu işlem için yetkiniz yok' : undefined}
-            className="flex items-center gap-3 bg-white text-slate-900 hover:bg-cyan-400 hover:text-white disabled:opacity-50 px-8 py-2.5 rounded-xl text-xs font-black tracking-widest shadow-xl transition-transform active:scale-95"
+            title={!hasWriteAccess ? t('admin.categories.toasts.noWritePermission') : undefined}
+            className="flex items-center gap-3 bg-white text-slate-900 hover:bg-cyan-400 hover:text-white disabled:opacity-50 px-8 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase shadow-xl transition-transform active:scale-95"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-            DEĞİŞİKLİKLERİ KAYDET
+            {t('admin.common.saveChanges')}
           </button>
         </div>
       </header>
@@ -186,13 +202,19 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
             <div className="max-w-content mx-auto py-12 px-6">
                 <div className="mb-12 flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-black text-white tracking-tight italic">Page Studio</h2>
-                        <p className="text-sm text-slate-500 mt-1">Blokları yönetin, içerikleri düzenleyin ve sayfanızı inşa edin.</p>
+                        <h2 className="text-2xl font-black text-white tracking-tight italic">
+                          {t('admin.categories.pageStudio')}
+                        </h2>
+                        <p className="text-sm text-slate-500 mt-1">
+                          {t('admin.categories.pageStudioDesc')}
+                        </p>
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">Live Sync Active</span>
+                            <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">
+                              {t('admin.categories.liveSyncActive')}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -203,7 +225,9 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
 
                 {/* Bottom Guide */}
                 <div className="mt-20 pt-12 border-t border-white/5 text-center">
-                    <p className="text-xs font-bold text-slate-600 uppercase tracking-hvac-relaxed">VentHub Content Authority Engine v2.4</p>
+                    <p className="text-xs font-bold text-slate-600 uppercase tracking-hvac-relaxed">
+                      {BRAND_NAME} {t('admin.categories.engineTitle')} {ENGINE_VERSION}
+                    </p>
                 </div>
             </div>
         </main>
@@ -214,7 +238,9 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
             <div className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-white/2">
                 <div className="flex items-center gap-2">
                     <PanelRight size={16} className="text-cyan-400" />
-                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Canlı Önizleme</span>
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                      {t('admin.categories.livePreview')}
+                    </span>
                 </div>
                 <div className="flex bg-black/40 p-1 rounded-lg border border-white/5 scale-75">
                     <button onClick={() => setPreviewMode('desktop')} className={`p-2 rounded-md transition-colors ${previewMode === 'desktop' ? 'bg-white/10 text-cyan-400' : 'text-slate-500'}`}>
@@ -238,7 +264,9 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                     {(!blocks || blocks.length === 0) && (
                         <div className="flex flex-col items-center justify-center h-full text-slate-300 space-y-4">
                             <Layout size={32} className="opacity-10" />
-                            <p className="text-xs uppercase font-bold tracking-widest opacity-20 text-center px-8">İçerik bekleniyor...</p>
+                            <p className="text-xs uppercase font-bold tracking-widest opacity-20 text-center px-8">
+                              {t('admin.categories.waitingForContent')}
+                            </p>
                         </div>
                     )}
                 </div>
@@ -247,12 +275,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
         )}
       </div>
 
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
-        .custom-scrollbar-light::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar-light::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 10px; }
-      `}</style>
+      <style jsx global>{globalStyles}</style>
     </div>
   );
 };

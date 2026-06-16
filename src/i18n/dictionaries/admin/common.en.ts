@@ -28,4 +28,5 @@ export const common = {
   copyright: '© 2026 VentHub Platinum',
   secureNode: 'Secure Node',
   system: 'System',
+  goBack: 'Go Back',
 };

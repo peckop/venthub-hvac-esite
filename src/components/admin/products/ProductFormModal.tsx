@@ -14,12 +14,12 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import type { DbCategory, DbJson,DbProductInsert, DbProductUpdate } from '../../../types/db-rows'
 
 // Form schema
-const productSchema = z.object({
-    name: z.string().min(3, 'İsim en az 3 karakter olmalı'),
-    sku: z.string().min(3, 'SKU gereklidir'),
-    brand: z.string().min(1, 'Marka seçiniz'),
+const getProductSchema = (t: (key: string) => string) => z.object({
+    name: z.string().min(3, t('admin.products.errors.nameMin')),
+    sku: z.string().min(3, t('admin.products.errors.skuRequired')),
+    brand: z.string().min(1, t('admin.products.errors.brandRequired')),
     model_code: z.string().optional(),
-    category_id: z.string().min(1, 'Kategori seçiniz'),
+    category_id: z.string().min(1, t('admin.products.errors.categoryRequired')),
     status: z.enum(['active', 'out_of_stock', 'inactive']),
     price: z.number().min(0),
     purchase_price: z.number().optional(),
@@ -29,7 +29,7 @@ const productSchema = z.object({
     technical_specs: z.record(z.unknown()).optional()
 })
 
-type ProductFormValues = z.infer<typeof productSchema>
+type ProductFormValues = z.infer<ReturnType<typeof getProductSchema>>
 
 interface ProductFormModalProps {
     _productId?: string | null
@@ -42,6 +42,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
     const { t } = useI18n();
     const [loading, setLoading] = useState(false)
     const [categories, setCategories] = useState<DbCategory[]>([])
+
+    const productSchema = React.useMemo(() => getProductSchema(t), [t])
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema),
@@ -74,11 +76,11 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                 technical_specs: (product.technical_specs as Record<string, unknown>) || {}
             })
         } catch {
-            toast.error('Ürün yüklenemedi')
+            toast.error(t('admin.products.errors.loadFailed'))
         } finally {
             setLoading(false)
         }
-    }, [reset])
+    }, [reset, t])
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -120,7 +122,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                 if (error) throw error
             }
 
-            toast.success(_productId ? 'Ürün güncellendi' : 'Ürün oluşturuldu')
+            toast.success(_productId ? t('admin.products.toasts.updateSuccess') : t('admin.products.toasts.createSuccess'))
             onSuccess()
             onClose()
         } catch {
@@ -154,7 +156,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                                 {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
                             </div>
                             <div className="space-y-1">
-                                <label className="text-xs font-bold text-slate-500 uppercase">SKU</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.products.form.sku')}</label>
                                 <input {...register('sku')} className="w-full px-4 py-2 border rounded-lg focus-visible:outline-none" />
                                 {errors.sku && <p className="text-red-500 text-xs">{errors.sku.message}</p>}
                             </div>
