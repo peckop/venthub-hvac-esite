@@ -161,7 +161,7 @@ const AdminDashboardPage: React.FC = () => {
           loading={loading}
         />
         <StatCard 
-          title="Sistem Sağlığı"
+          title={t('admin.dashboard.charts.systemHealth')}
           value={100}
           icon={<TrendingUp />}
           loading={loading}
@@ -170,12 +170,12 @@ const AdminDashboardPage: React.FC = () => {
 
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="glass-card p-8 rounded-hvac-2xl border border-white/5 bg-surface-deep/40">
-          <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-8">Son Siparişler</h3>
-          <RecentOrdersTable orders={recentOrders} title="Son Siparişler" />
+          <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-8">{t('admin.dashboard.charts.recentOrders')}</h3>
+          <RecentOrdersTable orders={recentOrders} title={t('admin.dashboard.charts.recentOrders')} />
         </div>
         <div className="glass-card p-8 rounded-hvac-2xl border border-white/5 bg-surface-deep/40">
-          <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-8">Sipariş Akışı</h3>
-          <SalesChart data={chartData} title="Satış Trendi" />
+          <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-8">{t('admin.dashboard.charts.orderFlow')}</h3>
+          <SalesChart data={chartData} title={t('admin.dashboard.charts.salesTrend')} />
         </div>
       </div>
     </div>

@@ -1,5 +1,9 @@
+'use client'
+
 import { PieChart as PieIcon } from 'lucide-react'
-import { Cell, Legend,Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
+
+import { useI18n } from '@/i18n/I18nProvider'
 
 import AdminEmptyState from '../AdminEmptyState'
 
@@ -9,18 +13,20 @@ interface AbcPieChartProps {
 }
 
 export default function AbcPieChart({ data, title }: AbcPieChartProps) {
+    const { t } = useI18n()
+
     if (!data || data.length === 0 || data.every(d => d.value === 0)) {
         return (
             <div className="flex flex-col h-full bg-slate-900/40 rounded-hvac-2xl border border-white/5 p-10 group/pie">
                 <div className="mb-10">
-                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed group-hover/pie:text-cyan-400 transition-colors uppercase">{title || "ABC Ürün Sınıflandırması"}</h3>
+                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed group-hover/pie:text-cyan-400 transition-colors uppercase">{title || t('admin.dashboard.abcProductClassification')}</h3>
                     <div className="h-0.5 w-12 bg-cyan-500/30 mt-2 rounded-full group-hover/pie:w-20 transition-colors duration-700" />
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center">
                     <AdminEmptyState 
                         icon={PieIcon} 
-                        title="Analiz Verisi Yok" 
-                        description="Stok sınıflandırması için yeterli veri bulunmuyor." 
+                        title={t('admin.dashboard.noAnalysisData')} 
+                        description={t('admin.dashboard.insufficientDataForClassification')} 
                         compact 
                     />
                 </div>
@@ -33,7 +39,7 @@ export default function AbcPieChart({ data, title }: AbcPieChartProps) {
     return (
         <div className="flex flex-col h-full group/pie">
             <div className="mb-10">
-                <h3 className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed group-hover/pie:text-cyan-400 transition-colors uppercase">{title || "ABC Ürün Sınıflandırması"}</h3>
+                <h3 className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed group-hover/pie:text-cyan-400 transition-colors uppercase">{title || t('admin.dashboard.abcProductClassification')}</h3>
                 <div className="h-0.5 w-12 bg-cyan-500/30 mt-2 rounded-full group-hover/pie:w-20 transition-colors duration-700" />
             </div>
 
@@ -71,7 +77,10 @@ export default function AbcPieChart({ data, title }: AbcPieChartProps) {
                                 backdropFilter: 'blur(16px)' 
                             }}
                             itemStyle={{ fontSize: '11px', fontWeight: '900', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em' }}
-                            formatter={(value: number, name: string) => [`${value} Ürün`, `${name} Sınıfı`]}
+                            formatter={(value: number, name: string) => [
+                                t('admin.dashboard.productCount', { count: value }),
+                                t('admin.dashboard.productClass', { name })
+                            ]}
                         />
                         <Legend 
                             verticalAlign="bottom" 
@@ -92,7 +101,9 @@ export default function AbcPieChart({ data, title }: AbcPieChartProps) {
                     <span className="text-4xl font-black text-white tracking-tighter drop-shadow-pie-chart-glow relative z-10">
                         {totalValue}
                     </span>
-                    <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed mt-1 relative z-10 italic">Toplam Stok</span>
+                    <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed mt-1 relative z-10 italic">
+                        {t('admin.dashboard.totalStock')}
+                    </span>
                 </div>
             </div>
         </div>
