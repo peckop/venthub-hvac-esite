@@ -70,7 +70,7 @@ Bu modül, uygulama rotalarında kullanılan ürün tanımlayıcılarının doğ
 ## SABİTLER
 - **Routes** (object) — `{
   home: () => '/' as Route,
-  
+
   // Eşsiz Link Yönetimi
   product: (slu...`
 

@@ -11,3 +11,7 @@
 **Type Smell:** None.
 **Learning:** A comprehensive diagnostic sweep of the codebase for type escape hatches (`as any`, `as unknown as`, `// @ts-ignore`, `// @ts-expect-error`) returned zero results in production code. The codebase relies entirely on strong typing, type guards (`isRecord`), and Supabase generated types (`database.types.ts`).
 **Solution:** Clean sweep: zero type escape hatches found. Codebase health is optimal.
+## 2026-06-17 - Tenant Server Database Type Extended
+**Type Smell:** Double-casting SupabaseClient with 'as unknown as SupabaseClientOverride' for an internal 'tenants' table that is not in database.types.ts
+**Learning:** Internal tables missing from auto-generated types cause double-cast escape hatches. Creating an ExtendedDatabase type intersecting missing tables with Omit allows type safe SupabaseClient.
+**Solution:** Defined 'ExtendedDatabase = Omit<Database, "public"> & { public: Omit<Database["public"], "Tables"> & { Tables: Database["public"]["Tables"] & { tenants: ... } } }' and used 'as SupabaseClient<ExtendedDatabase>'.

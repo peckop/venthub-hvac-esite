@@ -86,8 +86,8 @@ Bu modül, bir React bileşeni olup, fonksiyon imzası ve modül sabitlerine day
 
 ## SABİTLER
 - **knowledgeItems** (array) — `[
-  { 
-    id: 'guides', 
+  {
+    id: 'guides',
     href: Routes.destek.home(),
     icon: (
   ...`
