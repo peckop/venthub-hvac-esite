@@ -1,19 +1,17 @@
 'use client'
 
-import { 
+import {
     ContactShadows,
-    Environment, 
     Html,
-    OrbitControls, 
-    PerspectiveCamera, 
+    OrbitControls,
     useGLTF} from '@react-three/drei'
-import { Canvas } from '@react-three/fiber'
 import { motion } from 'framer-motion'
 import React, { Suspense } from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider'
 
 import type { ThreeDMetadata } from '../../types/media.types'
+import { VentHubCanvas } from '../products/3d/core'
 
 interface ThreeDAuthorityProps {
     metadata: ThreeDMetadata
@@ -86,12 +84,11 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
             style={{ minHeight: '400px' }}
         >
             {/* Use 'always' when autoRotate needs continuous rendering, 'demand' for static scenes */}
-            <Canvas shadows="percentage" frameloop={metadata.config?.autoRotate ? 'always' : 'demand'} dpr={[1, 1.5]}>
-                <PerspectiveCamera makeDefault position={[0, 0, metadata.config?.initialZoom ?? 5]} fov={45} />
-                
-                <ambientLight intensity={0.5} />
-                <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-                
+            <VentHubCanvas
+                preset="authority"
+                frameloop={metadata.config?.autoRotate ? 'always' : 'demand'}
+                camera={{ position: [0, 0, metadata.config?.initialZoom ?? 5], fov: 45 }}
+            >
                 <Suspense fallback={
                     <Html center>
                         <div className="flex flex-col items-center">
@@ -101,9 +98,7 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
                     </Html>
                 }>
                     <Model url={metadata.modelUrl} hotspots={metadata.hotspots} />
-                    
-                    <Environment preset={metadata.config?.environment ?? 'studio'} />
-                    
+
                     {metadata.config?.shadows !== false && (
                         <ContactShadows 
                             position={[0, -1.5, 0]} 
@@ -122,7 +117,7 @@ export default function ThreeDAuthority({ metadata, className = '' }: ThreeDAuth
                     maxPolarAngle={Math.PI / 1.5}
                     autoRotate={metadata.config?.autoRotate ?? false}
                 />
-            </Canvas>
+            </VentHubCanvas>
 
             {/* Help Overlay */}
             <div className="absolute bottom-4 left-4 pointer-events-none">
