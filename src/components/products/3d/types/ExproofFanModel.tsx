@@ -1,16 +1,15 @@
 "use client";
-import React, { useMemo, useEffect } from 'react'
-import {
-    Shape,
-    CylinderGeometry,
-    BoxGeometry,
-    PlaneGeometry,
-    ExtrudeGeometry,
-    RingGeometry,
-    TorusGeometry,
-    SphereGeometry
-} from 'three'
+import React, { useEffect,useMemo } from 'react'
 import type { Material } from 'three'
+import {
+    BoxGeometry,
+    CylinderGeometry,
+    ExtrudeGeometry,
+    PlaneGeometry,
+    RingGeometry,
+    Shape,
+    SphereGeometry,
+    TorusGeometry} from 'three'
 
 import { useResolveMaterials } from '../core'
 

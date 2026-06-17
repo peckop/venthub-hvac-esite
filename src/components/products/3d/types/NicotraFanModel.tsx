@@ -2,7 +2,7 @@
 import { useFrame } from '@react-three/fiber'
 import React, { useEffect, useMemo, useRef } from 'react'
 import type { Group } from 'three'
-import { Path, Shape, BoxGeometry, CylinderGeometry, ExtrudeGeometry } from 'three'
+import { BoxGeometry, CylinderGeometry, ExtrudeGeometry,Path, Shape } from 'three'
 
 import { useResolveMaterials } from '../core'
 

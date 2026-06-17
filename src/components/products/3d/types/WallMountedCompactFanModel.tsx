@@ -3,13 +3,13 @@ import { useFrame } from '@react-three/fiber'
 import React, { useEffect, useMemo, useRef } from 'react'
 import type { Group } from 'three'
 import {
+    BoxGeometry,
+    CylinderGeometry,
     ExtrudeGeometry,
     Path,
-    Shape,
-    CylinderGeometry,
-    BoxGeometry,
-    RingGeometry
-} from 'three'
+    RingGeometry,
+    Shape} from 'three'
+
 import { useResolveMaterials } from '../core'
 
 export const WallMountedCompactFanModel: React.FC = () => {
