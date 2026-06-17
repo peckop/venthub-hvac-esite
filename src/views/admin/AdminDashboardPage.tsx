@@ -56,24 +56,90 @@ const AdminDashboardPage: React.FC = () => {
       setOrdersCount(oCount)
       setSalesTotal(ordersData?.reduce((acc, curr) => acc + (curr.total_amount || 0), 0) || 0)
       setRecentOrders((ordersData as DbOrder[] | null)?.slice(0, 5) || [])
-      
-      // Dummy chart data for now to pass build
-      setChartData([
-        { date: 'Pzt', orders: 4, returns: 0 },
-        { date: 'Sal', orders: 7, returns: 1 },
-        { date: 'Çar', orders: 5, returns: 0 },
-        { date: 'Per', orders: 9, returns: 2 },
-        { date: 'Cum', orders: 12, returns: 1 }
-      ])
 
-      const [returnsRes, shipRes, productsRes] = await Promise.all([
+      const sevenDaysAgo = new Date()
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
+      sevenDaysAgo.setHours(0, 0, 0, 0)
+      const sevenDaysAgoISO = sevenDaysAgo.toISOString()
+
+      const [returnsRes, shipRes, productsRes, chartReturnsRes] = await Promise.all([
         supabase.from('venthub_returns').select('id', { count: 'exact', head: true }).in('status', ['requested', 'approved']),
         supabase.from('venthub_orders').select('id', { count: 'exact', head: true }).is('shipped_at', null).in('status', ['confirmed', 'processing']),
-        supabase.from('products').select('purchase_price, price, stock_qty, low_stock_threshold')
+        supabase.from('products').select('purchase_price, price, stock_qty, low_stock_threshold'),
+        supabase.from('venthub_returns').select('id, created_at').gte('created_at', sevenDaysAgoISO)
       ])
+
+      if (returnsRes.error) throw returnsRes.error
+      if (shipRes.error) throw shipRes.error
+      if (productsRes.error) throw productsRes.error
+      if (chartReturnsRes.error) throw chartReturnsRes.error
 
       setPendingReturns(returnsRes.count)
       setPendingShipments(shipRes.count)
+
+      const chartDays: { dateString: string; label: string; orders: number; returns: number }[] = []
+      const weekdayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date()
+        d.setDate(d.getDate() - i)
+        const year = d.getFullYear()
+        const month = String(d.getMonth() + 1).padStart(2, '0')
+        const day = String(d.getDate()).padStart(2, '0')
+        const dateString = `${year}-${month}-${day}`
+
+        const dayOfWeekIndex = d.getDay()
+        const dayOfWeekKey = weekdayKeys[dayOfWeekIndex]
+        const label = t(`admin.dashboard.days.${dayOfWeekKey}` as never)
+
+        chartDays.push({
+          dateString,
+          label,
+          orders: 0,
+          returns: 0
+        })
+      }
+
+      if (ordersData) {
+        for (let i = 0; i < ordersData.length; i++) {
+          const order = ordersData[i]
+          const orderDate = new Date(order.created_at)
+          const oYear = orderDate.getFullYear()
+          const oMonth = String(orderDate.getMonth() + 1).padStart(2, '0')
+          const oDay = String(orderDate.getDate()).padStart(2, '0')
+          const oDateString = `${oYear}-${oMonth}-${oDay}`
+
+          const dayObj = chartDays.find((cd) => cd.dateString === oDateString)
+          if (dayObj) {
+            dayObj.orders++
+          }
+        }
+      }
+
+      if (chartReturnsRes.data) {
+        const returnsData = chartReturnsRes.data as { id: string; created_at: string }[]
+        for (let i = 0; i < returnsData.length; i++) {
+          const ret = returnsData[i]
+          const retDate = new Date(ret.created_at)
+          const rYear = retDate.getFullYear()
+          const rMonth = String(retDate.getMonth() + 1).padStart(2, '0')
+          const rDay = String(retDate.getDate()).padStart(2, '0')
+          const rDateString = `${rYear}-${rMonth}-${rDay}`
+
+          const dayObj = chartDays.find((cd) => cd.dateString === rDateString)
+          if (dayObj) {
+            dayObj.returns++
+          }
+        }
+      }
+
+      setChartData(
+        chartDays.map((cd) => ({
+          date: cd.label,
+          orders: cd.orders,
+          returns: cd.returns
+        }))
+      )
 
       if (productsRes.data) {
         const rawProducts = productsRes.data as import('../../types/db-rows').DbProduct[]
@@ -103,7 +169,7 @@ const AdminDashboardPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadKPIs()
