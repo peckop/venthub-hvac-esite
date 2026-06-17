@@ -115,6 +115,7 @@ TSL vertex-displacement shader → §6.4.)
 | **3D-4** | **Merkezi-config** | SSOT §1 | `3d-central-config.test` — ham `<Canvas>` / ad-hoc `<Environment files>` / sihirli-metalness / **CDN decoder yolu** yasak → paylaşılan sistem | statik | 🟡 kısmen — `3d-procedural-env.test.ts` canlı; tam central-config açık |
 | **3D-5** | **CSP/origin** | D1 | `3d-csp.test` — dış 3D origin `next.config.mjs` whitelist'inde | statik config | ✅ canlı (`3d-csp.test.ts` — stale-guard zorunlu host + drift-catch) |
 | **3D-6** | **Perf-bütçe** | B1–B6 | `renderer.info` draw-call/triangle bütçe izleme (runtime proxy) — **ödünç eşikleri burada ölçümle kalibre et** | runtime/build | ⚠️ açık borç (zor; başta uyarı) |
+| **3D-7** | **Model-recipe** | B3 / C3 / §1 | `3d-model-recipe.test` — model/part'ta `useFrame` içi `new` allocate + inline sihirli `metalness:/roughness:` YASAK (RATCHET) | statik kaynak tarama | ✅ canlı (2 ratchet: FlexibleDuct useFrame-geo · DuctFan magic-PBR = worker'ın atladığı = sonraki punch-list) |
 
 **Açık eksenleri kapatma yöntemi:** ajan **paralel audit** (`audit/3d-surfaces`, mevcut envanter) → merkezi sistem
 (`<VentHubCanvas>` + prosedürel environment + yerel decoder) inşası → bileşen göçü → **yeni INV-3D testi** → commit.
