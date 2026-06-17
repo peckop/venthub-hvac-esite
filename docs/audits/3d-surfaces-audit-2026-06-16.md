@@ -4,6 +4,32 @@ This document presents the complete WebGL/Three.js audit results for VentHub HVA
 
 ---
 
+## 0. RE-AUDIT RECONCILIATION (2026-06-17) — GÜNCEL GERÇEK
+
+> Aşağıdaki §1-3 = **2026-06-16 snapshot'ı** ve artık **drift etti**. Dalga 1-6 + 2026-06-17 recipe
+> işleri (FlexibleDuct in-place · DuctFan merkezi materyal · FanRenderer→ProductModelRenderer rename)
+> bu ihlallerin **neredeyse tamamını kapattı**. 2026-06-17'de 36 dosya **şu anki master'a karşı**
+> paralel read-only ajan filosuyla yeniden denetlendi (her iddia OPEN/RESOLVED/REFUTED + legit-local eleme).
+
+**Güncel sonuç: conformance yüzeyi TEMİZ (34 / 36 dosya).**
+- Kanıt örnekleri: `DomesticFanModel` 144-box grid → **InstancedMesh**; tüm modeller useMemo geometri +
+  unmount `dispose`; showcase/nav metalleri **SceneLightingRig prosedürel Environment**'tan IBL alıyor
+  (C1 çözüldü); per-frame allocate yok (B3 temiz); tüm Canvas yüzeyleri `VentHubCanvas` →
+  ResilientCanvasBoundary (ErrorBoundary) altında (A1/A2 çözüldü).
+- **Yanlış-pozitif elendi (uydurma iş yok):** LED/airflow-viz/logo-texture materyalleri **legit-local**
+  (C3 ihlali değil); paylaşılan `useResolveMaterials` cache materyalleri **dispose edilmez** (A4 ihlali değil);
+  leaf model/part'ta `<Environment>` beklenmez (C1 sahne-sahibinin işi). `CategoryCard3D` ·
+  `CategorySpotlightScene` → **silinmiş** (artık yok).
+- **Kalan 2 açık:**
+  - 🔴 **BlueprintCanvas.tsx — A1**: `useTexture` `<Suspense>` dışındaydı → bu reconciliation PR'ında
+    düzeltildi (CinematicCard `<Suspense fallback={null}>` ile sarıldı).
+  - 🟡 **CategoryHubOverlay.tsx — B3 minor**: `frameloop="demand"` + `autoRotate` — tartışmalı
+    (drei OrbitControls autoRotate zaten `invalidate` eder); kontrolör doğrulayacak, muhtemelen iş değil.
+
+**Sonuç:** 3D **conformance** katmanı kapandı. Sıradaki 3D işi = **görsel/showroom** (tasarım-güdümlü), conformance değil.
+
+---
+
 ## 1. Executive Summary & Audit Statistics
 
 The audit evaluated **39 files** across the 3D rendering pipeline. The final metrics are:
