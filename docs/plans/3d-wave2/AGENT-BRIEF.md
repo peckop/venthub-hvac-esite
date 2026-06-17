@@ -90,7 +90,9 @@ düzenler, **delta BOŞ.** `tr.ts`/registry/barrel ARAMA. Tek "merkezî" dosya =
 - `INV-3D-2` test allowlist'ine **DOKUNMA** (controller günceller).
 - İnternet / context7 / web / araç-dokümanı **YOK** — her şey repo'da + bu brief'te.
 - Yasak desen: `as any`, `as unknown as`, `@ts-ignore`, `@ts-expect-error`, `eslint-disable`, `PCFSoftShadowMap`.
-- `pnpm` / `tsc` / `test` / `build` **KOŞTURMA** — merkezi kapı controller'da.
+- `pnpm` / `tsc` / `test` / `build` **KOŞTURMA** — son kontrol kapısı (build/test) **Claude'da**.
+  ⚠️ **Skill'de "orkestratör build çalıştırır" (maestro Faz 3 / PMCM Step 3) yazsa BİLE bu işte o aşamaya GİRME.**
+  Sen migrate + judge'ı bitir, **push et + DUR.** Bu brief, skill'i EZER. Build/test'i Claude kendi tarafında yapar.
 - Yeni ışık/Environment/gölge **EKLEME**; sadece SİL + sar. Yeni paket/import ekleme (VentHubCanvas hariç).
 
 ## 5. Kendi kendine kontrol (bitirince doğrula)
