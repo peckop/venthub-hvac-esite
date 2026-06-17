@@ -135,11 +135,15 @@ TSL vertex-displacement shader → §6.4.)
 
 ## 5. Mevcut Durum (ajan audit'i tamamlayacak) + İlgili
 
-**Şu anki 3D yüzeyleri (ilk harita — `2026-06-16`; tam envanter `audit/3d-surfaces` ile gelecek):**
-- `Product3DViewer` — `<Environment files="/env/city_256.hdr">` **bozuk dummy** + Suspense/ErrorBoundary DIŞINDA → **çökme** (A1/A2 ihlali). FanRenderer yüksek metalness.
-- `OrbitalProductsShowcase` · `InfiniteProductsShowcase` — **environment YOK**, sadece düz ışık → metaller kararık (C1 ihlali).
-- `ThreeDAuthority` — `<Environment preset="studio">` (CDN) → çalışır ama dış bağımlılık (A2 risk).
-- 6 nav 3D (CategoryCard3D, MegaMenu3DBackground...) — perf sprint'inde Environment söküldü.
+**Şu anki 3D yüzeyleri (re-audit `2026-06-17` — `docs/audits/3d-surfaces-audit-2026-06-16.md` §0; conformance TEMİZ):**
+- ✅ 36 dosya re-audit → **34 temiz**. Dalga 1-6 + 06-17 recipe işleri kapattı:
+  - `Product3DViewer` · `ThreeDAuthority` · `OrbitalProductsShowcase` · `InfiniteProductsShowcase` ·
+    `CategoryHubOverlay` · `MegaMenu3DBackground` → hepsi `VentHubCanvas` kabuğu (ResilientCanvasBoundary
+    ErrorBoundary + prosedürel `SceneLightingRig` Environment) altında → A1/A2/C1/B4/B5 **çözüldü**.
+  - Tüm leaf model/parça: useMemo geometri + unmount dispose + paylaşılan materyal (B3/A4/C3 temiz);
+    `DomesticFanModel` → InstancedMesh. `CategoryCard3D` · `CategorySpotlightScene` **silinmiş**.
+- ⚠️ Kalan: BlueprintCanvas A1 (Suspense — düzeltildi) · CategoryHubOverlay B3 minor (tartışmalı, doğrulanacak).
+- ➡️ Conformance bitti; sıradaki 3D ekseni = **görsel/showroom** (tasarım-güdümlü), bu cetvelin §0 WOW + §6.4 tiny-planet vizyonu.
 > **Ajanın `parallel-file-audit` skill'i** (39 dosya, `audit-rules.json` deterministik kapısı) tam envanteri +
 > merkezîleştirme dalga-roadmap'ini üretecek; sonuç buraya (§5) işlenir + B6/INV-3D-6 sayıları **gerçek asset
 > ölçümüyle kalibre edilir.**
