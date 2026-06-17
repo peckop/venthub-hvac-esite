@@ -67,20 +67,15 @@ const NEW_ALLOC = /new\s+(?:THREE\.)?(Vector2|Vector3|Box3|Matrix4|Quaternion|Eu
 const MAGIC_PBR = /\b(?:metalness|roughness)\s*:\s*[0-9]/
 
 /**
- * Ratchet — worker'ın (Antigravity Wave 3) ATLADIĞI 2 recipe maddesi = sonraki worker'ın punch-list'i.
- * Bu gate tam bu 2'yi yakaladı (type-check/test/build göremedi) → testin değeri kanıtlı.
- * Düzelince stale-guard SİLDİRİR → liste sıfıra iner.
+ * Ratchet — **KAPALI** (2026-06-17): her iki recipe borcu da temizlendi.
+ *  - FlexibleDuctModel: useFrame'de per-frame `new TubeGeometry` → tek-seferlik geometri +
+ *    yerinde (in-place) vertex-buffer güncelleme (computeBoundingBox/Sphere ile culling-safe).
+ *  - DuctFanModel: inline sihirli metalness/roughness → merkezi `ductFanBladeRose` (useFanMaterials SSOT).
+ * İki liste de BOŞ = kapı tam kilitli; yeni ihlal anında fail eder. Yeniden DOLDURMA — gerçek
+ * regresyonu allowlist'lemek yerine düzelt.
  */
-const KNOWN_USEFRAME_ALLOC = new Set<string>([
-  // Batch H: useFrame'de her frame `new TubeGeometry` (eski geo dispose ediliyor ama yine per-frame alloc).
-  // Düzeltme: önceden-allocate geometri + setPositions/morph, ya da düşük-frekans rebuild. GÖRSEL-DIFF judge şart.
-  'src/components/products/3d/types/FlexibleDuctModel.tsx',
-])
-const KNOWN_MAGIC_PBR = new Set<string>([
-  // localBladeColor: useMemo'lu custom-renk materyali ama inline metalness:0.6/roughness:0.4 (sihirli-sayı).
-  // Düzeltme: shared materyalden türet (clone + color set) ya da merkezi token. Düşük öncelik (zaten memoized).
-  'src/components/products/3d/types/DuctFanModel.tsx',
-])
+const KNOWN_USEFRAME_ALLOC = new Set<string>([])
+const KNOWN_MAGIC_PBR = new Set<string>([])
 
 const FILES: ReadonlyArray<readonly [string, string]> = Object.entries(SOURCES)
   .map(([k, v]) => [k.replace(/^\//, ''), stripComments(v)] as const)

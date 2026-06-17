@@ -17,7 +17,7 @@ import { Vector3 } from 'three'
 import { useI18n } from '../../../i18n/I18nProvider'
 import { getModelPlacement } from '../../../utils/3dModelOffsets'
 import { VentHubCanvas } from './core'
-import { FanRenderer } from './FanRenderer'
+import { ProductModelRenderer } from './ProductModelRenderer'
 
 const VIEWER_BRAND = 'VentHub 3D'
 
@@ -168,7 +168,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
                             <group position={[0, 0, 0]}>
                                 <ModelRotator enabled={rotationMode === 'free'} rotationRef={modelGroupRef}>
                                     <group position={placement.position} rotation={placement.rotation}>
-                                        <FanRenderer slug={slug} modelType={modelType} scale={1} />
+                                        <ProductModelRenderer slug={slug} modelType={modelType} scale={1} />
                                     </group>
                                 </ModelRotator>
                             </group>

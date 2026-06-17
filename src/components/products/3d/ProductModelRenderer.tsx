@@ -24,7 +24,7 @@ import { SnailFanModel } from './types/SnailFanModel'
 import { SpeedControlModel } from './types/SpeedControlModel'
 import { WallMountedCompactFanModel } from './types/WallMountedCompactFanModel'
 
-interface FanRendererProps {
+interface ProductModelRendererProps {
     slug: string
     modelType?: string  // Veritabanından gelen model tipi
     scale?: number
@@ -79,7 +79,7 @@ const MODEL_COMPONENTS: Record<string, React.ComponentType<BaseModelProps>> = {
     'FlexibleDuctModel': FlexibleDuctModel as React.ComponentType<BaseModelProps>,
 }
 
-export const FanRenderer: React.FC<FanRendererProps> = ({
+export const ProductModelRenderer: React.FC<ProductModelRendererProps> = ({
     slug,
     modelType,
     scale = 1,
@@ -93,7 +93,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
     position = [0, 0, 0]
 }) => {
 
-    const renderFan = () => {
+    const renderModel = () => {
         const s = slug ? slug.toLowerCase() : '';
 
         // 1. ÖNCELİK: Veritabanı model_type
@@ -230,7 +230,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
 
     return (
         <group scale={scale} position={position}>
-            {renderFan()}
+            {renderModel()}
         </group>
     )
 }

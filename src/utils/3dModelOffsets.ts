@@ -207,7 +207,7 @@ export function getModelPlacement(
     let config: ModelConfig = DEFAULT_CONFIG;
 
     // Precise matching based on Category Registry slugs
-    // Hiyerarşi: FanRenderer.tsx ile BİREBİR SENKRONİZE
+    // Hiyerarşi: ProductModelRenderer.tsx ile BİREBİR SENKRONİZE
     // ---------------------------------------------------------
 
     // DEBUG: Hangi modelin seçildiğini görmek için

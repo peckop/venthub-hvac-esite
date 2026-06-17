@@ -2,7 +2,7 @@
 import { useFrame } from '@react-three/fiber'
 import React, { useEffect, useMemo, useRef } from 'react'
 import type { Group } from 'three'
-import { BoxGeometry, CylinderGeometry, MeshStandardMaterial } from 'three'
+import { BoxGeometry, CylinderGeometry } from 'three'
 
 import { useResolveMaterials } from '../core'
 
@@ -18,12 +18,6 @@ export function DuctFanModel() {
         }
     })
 
-    // Localized specialized materials using useMemo for lifecycle safety
-    const localBladeColor = useMemo(() => new MeshStandardMaterial({
-        color: '#be123c',
-        metalness: 0.6,
-        roughness: 0.4
-    }), [])
 
     // Memoize geometries
     const geometries = useMemo(() => {
@@ -54,9 +48,8 @@ export function DuctFanModel() {
     useEffect(() => {
         return () => {
             Object.values(geometries).forEach(geo => geo.dispose())
-            localBladeColor.dispose()
         }
-    }, [geometries, localBladeColor])
+    }, [geometries])
 
     return (
         // SCALE: 0.6 (Diğer fanlarla uyumlu olması için küçültüldü)
@@ -88,10 +81,10 @@ export function DuctFanModel() {
 
             {/* 4. PERVANE */}
             <group ref={fanRef} position={[0, 0.4, 0]}>
-                <mesh geometry={geometries.impellerHubGeo} material={localBladeColor} />
+                <mesh geometry={geometries.impellerHubGeo} material={materials.ductFanBladeRose} />
                 {[0, 45, 90, 135, 180, 225, 270, 315].map((rot, i) => (
                     <group key={i} rotation={[0, rot * Math.PI / 180, 0]}>
-                        <mesh position={[0.2, 0, 0]} rotation={[0.4, 0, 0]} geometry={geometries.bladeGeo} material={localBladeColor} />
+                        <mesh position={[0.2, 0, 0]} rotation={[0.4, 0, 0]} geometry={geometries.bladeGeo} material={materials.ductFanBladeRose} />
                     </group>
                 ))}
             </group>
