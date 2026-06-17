@@ -71,7 +71,11 @@ export function FlexibleDuctModel() {
         // Dinamik geometri güncelleme
         updateWaveCurve(timeRef.current, pool.points)
 
-        const pos = initialTubeGeo.attributes.position
+        // Geometriyi ref üzerinden mutasyona uğrat (React Compiler useMemo değerini
+        // immutable sayar; ref.current = kaçış kapısı — Three.js buffer'ı useFrame'de
+        // güncellenir, F2/AX-05). meshRef.current === initialTubeGeo (JSX geometry prop).
+        const geom = meshRef.current.geometry
+        const pos = geom.attributes.position
         const posArray = pos.array as Float32Array
         for (let i = 0; i <= 64; i++) {
             const u = i / 64
@@ -90,9 +94,9 @@ export function FlexibleDuctModel() {
             }
         }
         pos.needsUpdate = true
-        initialTubeGeo.computeVertexNormals()
-        initialTubeGeo.computeBoundingBox()      // ŞART: yoksa kamera oynayınca kanal kaybolur (culling)
-        initialTubeGeo.computeBoundingSphere()
+        geom.computeVertexNormals()
+        geom.computeBoundingBox()      // ŞART: yoksa kamera oynayınca kanal kaybolur (culling)
+        geom.computeBoundingSphere()
 
         // Spiral halkaları eğri boyunca diz
         const spiralCount = spiralRef.current.children.length
