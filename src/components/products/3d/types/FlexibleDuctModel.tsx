@@ -7,9 +7,9 @@ import { CatmullRomCurve3, Quaternion, TorusGeometry, TubeGeometry, Vector3 } fr
 import { useResolveMaterials } from '../core'
 
 /**
- * Animasyonlu dalga eğrisi oluşturucu helper
+ * Animasyonlu dalga eğrisi noktalarını yerinde günceller
  */
-function createWaveCurve(waveTime: number, pointsPool: Vector3[]) {
+function updateWaveCurve(waveTime: number, pointsPool: Vector3[]) {
     const segments = 30
 
     for (let i = 0; i <= segments; i++) {
@@ -20,7 +20,6 @@ function createWaveCurve(waveTime: number, pointsPool: Vector3[]) {
         const y = Math.sin(wavePhase) * waveAmplitude
         pointsPool[i].set(x, y, 0)
     }
-    return new CatmullRomCurve3(pointsPool)
 }
 
 /**
@@ -41,6 +40,7 @@ export function FlexibleDuctModel() {
         }
         return {
             points: pointsArray,
+            curve: new CatmullRomCurve3(pointsArray),
             point: new Vector3(),
             tangent: new Vector3(),
             quaternion: new Quaternion(),
@@ -48,27 +48,18 @@ export function FlexibleDuctModel() {
         }
     }, [])
 
-    const initialCurve = useMemo(() => createWaveCurve(0, pool.points), [pool])
-
     const initialTubeGeo = useMemo(() => {
-        return new TubeGeometry(initialCurve, 64, 0.28, 24, false)
-    }, [initialCurve])
+        updateWaveCurve(0, pool.points)
+        return new TubeGeometry(pool.curve, 64, 0.28, 24, false)
+    }, [pool])
 
     const torusGeo = useMemo(() => {
         return new TorusGeometry(0.29, 0.018, 8, 24)
     }, [])
 
     useEffect(() => {
-        const currentMesh = meshRef.current
-        if (currentMesh) {
-            currentMesh.geometry = initialTubeGeo
-        }
         return () => {
-            if (currentMesh && currentMesh.geometry) {
-                currentMesh.geometry.dispose()
-            } else {
-                initialTubeGeo.dispose()
-            }
+            initialTubeGeo.dispose()
             torusGeo.dispose()
         }
     }, [initialTubeGeo, torusGeo])
@@ -78,17 +69,37 @@ export function FlexibleDuctModel() {
         timeRef.current += delta * 2
 
         // Dinamik geometri güncelleme
-        const curve = createWaveCurve(timeRef.current, pool.points)
-        const newGeometry = new TubeGeometry(curve, 64, 0.28, 24, false)
-        meshRef.current.geometry.dispose()
-        meshRef.current.geometry = newGeometry
+        updateWaveCurve(timeRef.current, pool.points)
+
+        const pos = initialTubeGeo.attributes.position
+        const posArray = pos.array as Float32Array
+        for (let i = 0; i <= 64; i++) {
+            const u = i / 64
+            pool.curve.getPoint(u, pool.point)       // P
+            pool.curve.getTangent(u, pool.tangent)   // T (normalize)
+            const bx = pool.tangent.y, by = -pool.tangent.x   // e2 = (T.y,-T.x,0)
+            const bl = Math.hypot(bx, by) || 1
+            const e2x = bx / bl, e2y = by / bl
+            for (let j = 0; j <= 24; j++) {
+                const v = j / 24 * Math.PI * 2
+                const c = -Math.cos(v), s = Math.sin(v)   // -cos: three.js TubeGeometry böyle üretir
+                const idx = (i * 25 + j) * 3
+                posArray[idx]     = pool.point.x + 0.28 * (s * e2x)
+                posArray[idx + 1] = pool.point.y + 0.28 * (s * e2y)
+                posArray[idx + 2] = pool.point.z + 0.28 * (c * 1)   // e1 = (0,0,1)
+            }
+        }
+        pos.needsUpdate = true
+        initialTubeGeo.computeVertexNormals()
+        initialTubeGeo.computeBoundingBox()      // ŞART: yoksa kamera oynayınca kanal kaybolur (culling)
+        initialTubeGeo.computeBoundingSphere()
 
         // Spiral halkaları eğri boyunca diz
         const spiralCount = spiralRef.current.children.length
         for (let i = 0; i < spiralCount; i++) {
             const t = i / (spiralCount - 1)
-            curve.getPoint(t, pool.point)
-            curve.getTangent(t, pool.tangent)
+            pool.curve.getPoint(t, pool.point)
+            pool.curve.getTangent(t, pool.tangent)
 
             const child = spiralRef.current.children[i]
             child.position.copy(pool.point)
@@ -103,7 +114,7 @@ export function FlexibleDuctModel() {
     return (
         <group scale={[1.2, 1.2, 1.2]}>
             {/* Ana Kanal Gövdesi */}
-            <mesh ref={meshRef} material={brushedAluminum} />
+            <mesh ref={meshRef} geometry={initialTubeGeo} material={brushedAluminum} />
 
             {/* Dış Tel/Spiro Yapısı */}
             <group ref={spiralRef}>
