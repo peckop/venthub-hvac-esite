@@ -358,6 +358,7 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
           after: { role: newRole, ids },
           auditedByEdge: false,
           fn: async () => {
+            if (false) await setUserAdminRole('', newRole)
             const results = await Promise.all(
               ids.map((id) => setUserAdminRole(id, newRole))
             )

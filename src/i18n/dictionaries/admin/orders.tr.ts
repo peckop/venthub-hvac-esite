@@ -145,6 +145,7 @@ export const orders = {
         noRecords: 'Kayıt bulunamadı'
       },
       board: {
+        limitWarning: 'Yalnızca ilk {{shown}} sipariş gösterilmektedir (Toplamda {{total}} siparişten {{remaining}} adet daha var). Bulamadığınız siparişler için lütfen liste görünümünü veya filtreleri kullanın.',
         columns: {
           new: 'Yeni / Bekliyor',
           prep: 'Hazırlanıyor',

@@ -274,18 +274,18 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                                     ))}
                                     {detail.notes.length === 0 && <div className="text-xs text-slate-600 font-black uppercase tracking-hvac-normal text-center py-6 italic">{t('admin.orders.modals.notes.noRecords')}</div>}
                                 </div>
-                                 <div className="flex gap-3 mt-6">
+                                <div className="flex gap-3 mt-6">
                                     <input
                                         value={noteInput}
                                         onChange={e => setNoteInput(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && addNote()}
                                         placeholder={t('admin.orders.modals.notes.inputPlaceholder')}
-                                        className={adminInputClass}
+                                        className={`${adminInputClass} h-10`}
                                     />
                                     <button 
                                         onClick={addNote} 
                                         disabled={saving || !hasWriteAccess} 
-                                        className={`${adminButtonPrimaryClass} !px-5 !h-42px`}
+                                        className={`${adminButtonPrimaryClass} !px-6 !h-10`}
                                     >
                                         {t('admin.orders.modals.notes.add')}
                                     </button>
@@ -324,6 +324,7 @@ export default function AdminOrdersBoard() {
     const { canWrite } = useRole()
     const hasWriteAccess = canWrite('orders')
     const [orders, setOrders] = useState<AdminOrderRow[]>([])
+    const [totalCount, setTotalCount] = useState<number | null>(null)
     const [loading, setLoading] = useState(true)
     const [selectedOrder, setSelectedOrder] = useState<AdminOrderRow | null>(null)
     const [expandedCol, setExpandedCol] = useState<ColumnId | null>('col_new')
@@ -342,14 +343,15 @@ export default function AdminOrdersBoard() {
         setLoading(true)
         try {
             await ensureSessionFresh()
-            const { data, error } = await supabase
+            const { data, error, count } = await supabase
                 .from('view_admin_orders')
-                .select('id,status,user_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone,payment_status')
+                .select('id,status,user_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone,payment_status', { count: 'exact' })
                 .order('created_at', { ascending: false })
                 .limit(200)
 
             if (error) throw error
             setOrders(data as AdminOrderRow[])
+            setTotalCount(count)
         } catch (err: unknown) {
             toast.error(t('admin.orders.toasts.loadError') + ': ' + (err as Error).message)
         } finally {
@@ -362,7 +364,7 @@ export default function AdminOrdersBoard() {
 
     const scrollBoard = (direction: 'left' | 'right') => {
         if (!scrollRef.current) return
-        const amount = 340 
+        const amount = 320 
         scrollRef.current.scrollBy({
             left: direction === 'left' ? -amount : amount,
             behavior: 'smooth',
@@ -467,6 +469,20 @@ export default function AdminOrdersBoard() {
                 </div>
             </div>
 
+            {/* Limit Warning Banner */}
+            {totalCount !== null && totalCount > orders.length && (
+                <div className="mb-6 p-4 rounded-hvac-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3 text-amber-400 backdrop-blur-md shrink-0">
+                    <Clock size={16} className="shrink-0" />
+                    <div className="text-xs font-bold leading-normal">
+                        {t('admin.orders.board.limitWarning', {
+                            shown: String(orders.length),
+                            total: String(totalCount),
+                            remaining: String(totalCount - orders.length)
+                        })}
+                    </div>
+                </div>
+            )}
+
             {/* Mobile Tabs Switcher */}
             <div className="flex md:hidden overflow-x-auto gap-3 pb-4 mb-2 no-scrollbar -mx-1 px-1 shrink-0 snap-x">
                 {COLUMNS.map(col => {
@@ -532,7 +548,7 @@ export default function AdminOrdersBoard() {
                                                 ref={provided.innerRef}
                                                 {...provided.droppableProps}
                                                 className={`flex-1 p-4 space-y-4 transition-colors custom-scrollbar ${snapshot.isDraggingOver ? 'bg-cyan-500/5' : ''} ${isExpanded ? 'block' : 'hidden md:block'}`}
-                                                style={{ overflowY: 'auto', minHeight: isExpanded ? 150 : 80 }}
+                                                style={{ overflowY: 'auto', minHeight: isExpanded ? 160 : 80 }}
                                             >
                                                 {colOrders.map((order, index) => (
                                                     <Draggable key={order.id} draggableId={order.id} index={index}>
