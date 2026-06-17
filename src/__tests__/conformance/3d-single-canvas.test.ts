@@ -33,15 +33,13 @@ const CANVAS_RE = /<Canvas[\s/>]/
 const CANONICAL = 'src/components/products/3d/core/VentHubCanvas.tsx'
 
 /**
- * Wave 2-3'te VentHubCanvas'a taşınacak yüzeyler — göç edince buradan SİLİNECEK.
- * PARK notu: InfiniteProductsShowcase şu an hiçbir yerden import EDİLMİYOR (ölü) ama BİLİNÇLİ
- * saklanıyor — ana sayfa "öne çıkan ürünler" şeridi adayı. Silinmedi; yayına bağlanınca göç eder.
- * (CategoryCard3D + CategorySpotlightScene 2026-06-17'de ölü-kod olarak SİLİNDİ — git'te durur.)
+ * RATCHET BOŞ: tüm 3D yüzeyler VentHubCanvas'a taşındı → ham <Canvas> yalnız CANONICAL'da.
+ * Yeni bir yüzey ham <Canvas> ekler ama henüz göç etmediyse GEÇİCİ olarak buraya eklenir;
+ * göç edince stale-guard SİLMEYE zorlar → liste tekrar 0'a iner.
+ * Geçmiş: Orbital/CategoryHub/MegaMenu (PR#374) · ThreeDAuthority (PR#375) ·
+ * BlueprintCanvas + InfiniteProductsShowcase (bu dalga). CategoryCard3D + CategorySpotlightScene ölü-kod SİLİNDİ.
  */
-const LEGACY_RAW_CANVAS = new Set<string>([
-  'src/components/products/InfiniteProductsShowcase.tsx', // PARK EDİLDİ — ana sayfa adayı, henüz bağlı değil
-  'src/components/products/BlueprintCanvas.tsx',
-])
+const LEGACY_RAW_CANVAS = new Set<string>([])
 
 function stripComments(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
