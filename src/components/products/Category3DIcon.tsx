@@ -7,7 +7,7 @@ import React, { useRef } from 'react'
 import type { Group } from 'three'
 
 import { useI18n } from '../../i18n/I18nProvider'
-import { FanRenderer } from './3d/FanRenderer'
+import { ProductModelRenderer } from './3d/ProductModelRenderer'
 
 interface Category3DIconProps {
     categorySlug: string
@@ -24,7 +24,7 @@ interface Category3DIconProps {
 
 /**
  * @component Category3DIcon
- * @description Kategori bazlı 3D modelleri (FanRenderer üzerinden) orbital sistem içinde sergiler.
+ * @description Kategori bazlı 3D modelleri (ProductModelRenderer üzerinden) orbital sistem içinde sergiler.
  */
 const Category3DIcon: React.FC<Category3DIconProps> = ({
     categorySlug,
@@ -57,7 +57,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
                         
             <group scale={[scale, scale, scale]}>
                 {DetailedModel ? <DetailedModel /> : (
-                    <FanRenderer
+                    <ProductModelRenderer
                         slug={categorySlug}
                         modelType={modelType}
                         scale={1}
