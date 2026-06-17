@@ -97,7 +97,8 @@ bu cetvelin "geriye-denetleyen + geleceği-kilitleyen" ayağıdır (`standard-pl
 İş bu kuralı zorluyorsa kapı bunları görür:
 - **INV-2** `localized-route-ssot` — yol localize SSOT. ⚠️ **`/admin` rotaları dil-önekinden MUAF** (admin istisnası).
 - **INV-5** `i18n-key-resolution` — her statik `t('a.b')` **namespaced (≥2 segment)** + sözlükte çözülmeli; düz-anahtar-içi-nokta (`t('table.x')`) sessiz ham-key render = YASAK.
-- `category-*-ssot` · `numeric-format-ssot` · `legal-en-leftover` · `3d-single-canvas`/`asset`/`procedural-env` (ilgili şeritlerde).
+- **INV-6** `admin-mutate-real-write` — her `mutateWithAudit` `fn` gövdesi GERÇEK yazma (`.insert/.update/.upsert/.delete/.rpc/.functions.invoke`) ya da awaited servis çağrısı içermeli; no-op `Promise.resolve()` + başarı bildirimi = **sahte-success** = YASAK (admin şeridi; `admin-standard §8`).
+- `category-*-ssot` · `numeric-format-ssot` · `legal-en-leftover` · `3d-single-canvas`/`asset`/`procedural-env` · `3d-csp`/`3d-model-recipe` (ilgili şeritlerde).
 - **DI** (servis/searcher ilk-param `supabase`, modül-düzeyi client importu yok) = `pnpm lint` (`no-restricted-imports`) zorlar.
 > Yeni page-crash/SSOT sınıfı bulgu → yeni bir **INV-*** test'ine terfi eder (kalıcı bekçi olur).
 
