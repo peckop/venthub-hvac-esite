@@ -21,7 +21,7 @@ import {
 
 const AdminSettingsPage: React.FC = () => {
   const { t } = useI18n()
-  const { role, canWrite } = useRole()
+  const { canWrite } = useRole()
   const hasWriteAccess = canWrite('settings')
   const { settings, loading, error: fetchError } = useSettings()
 
@@ -150,8 +150,15 @@ const AdminSettingsPage: React.FC = () => {
           before: null,
           after: payload,
           fn: async () => {
-            // Skeleton save, actual database save can be wired when table rows are ready
-            return Promise.resolve()
+            const { error } = await supabase
+              .from('site_settings')
+              .upsert({
+                key: 'admins',
+                value: payload,
+                updated_by: userId,
+                updated_at: new Date().toISOString(),
+              })
+            if (error) throw error
           },
         })
         toast.success(t('admin.inventory.settings.saveSuccess') || 'Yönetici politikaları başarıyla kaydedildi.')
@@ -168,8 +175,15 @@ const AdminSettingsPage: React.FC = () => {
           before: null,
           after: payload,
           fn: async () => {
-            // Skeleton save
-            return Promise.resolve()
+            const { error } = await supabase
+              .from('site_settings')
+              .upsert({
+                key: 'system',
+                value: payload,
+                updated_by: userId,
+                updated_at: new Date().toISOString(),
+              })
+            if (error) throw error
           },
         })
         toast.success(t('admin.inventory.settings.saveSuccess') || 'Sistem yapılandırması başarıyla kaydedildi.')

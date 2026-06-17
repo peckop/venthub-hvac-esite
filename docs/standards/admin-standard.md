@@ -282,12 +282,17 @@ Her admin sayfası için işaretle. **Skor = ✓ / 24.** Bu, "refactor mı rewri
 - [ ] RBAC Katman 1 (UI guard)
 - [ ] RBAC Katman 2 (fonksiyon-içi guard)
 - [ ] RBAC Katman 3 (sunucu RLS — yazma yolları)
-- [ ] Her mutasyonda `logAdminAction`
+- [ ] Her mutasyonda `logAdminAction` **+ gerçek kalıcılaştırma** (no-op `fn` + başarı bildirimi = **sahte-success YASAK**)
 - [ ] Realtime (tenant-scoped)
 - [ ] i18n (fallback yok)
 - [ ] a11y (aria-label/label/aria-sort/focus-visible)
 - [ ] Design token (arbitrary yok)
 - [ ] 4 arketipten birine oturuyor (sistem-dışı değil)
+
+> **Zorlayan testler (INV-*, `src/__tests__/conformance/`):** cetvelin "geriye-denetleyen + geleceği-kilitleyen"
+> ayağı. **INV-6 `admin-mutate-real-write`** = sahte-success bekçisi: her `mutateWithAudit` `fn` gövdesi
+> gerçek yazma (`.insert/.update/.upsert/.delete/.rpc/.functions.invoke`) ya da awaited servis çağrısı
+> içermeli; no-op `Promise.resolve()` = FAIL. (Kontrol = cetvel + onu zorlayan test — `standard-plus-enforcing-test-is-control`.)
 
 ---
 
