@@ -1,11 +1,11 @@
 # AJAN BRİEFİ — 3D Wave 2: 3 Canvas yüzeyini VentHubCanvas'a taşı
 
 > # ⛔ ÖNCE BUNU OKU — KODA DALMA, "PAT DİYE" BAŞLAMA.
-> **ÇALIŞTIRMA YÖNTEMİ = `/paralel-code-mutation` (paralel kod mutasyonu).** Bu iş **paralel ajanlarla** yapılır:
-> **her dosyaya AYRI bir ajan** (3 dosya = 3 paralel ajan), her ajan §3'ten **yalnız kendi dosyasının** kontratını alır.
-> 3 dosya birbirinden bağımsız (disjoint) → paralel güvenli.
+> **ÇALIŞTIRMA YÖNTEMİ = `parallel-code-mutation` (PMCM) skill'i.** Bu iş **paralel disjoint worker'larla** yapılır:
+> **her worker TEK dosya** (§3'ten yalnız kendi dosyasının kontratı). Dosyalar bağımsız → paralel güvenli.
+> **Kaç worker/dalga → SKILL karar verir (Step 0 seeding).** Ajan sayısını sen tayin etme, brief de etmez.
 > **❌ Bireysel / tek-ajan / elle / sırayla TAŞIMA. ❌ "Başla" der demez koda dalma.**
-> Önce paralel orkestrasyonu KUR → her ajana dar brief ver → SONRA göçü başlat.
+> Önce PMCM Step 0–1'i KUR → her worker'a dar brief ver → SONRA göçü başlat.
 
 > **Bu dosya GEÇİCİ** (iş bitince silinir). Ajan: SADECE aşağıdaki kurallara uy, internet/araç-dokümanı
 > kullanma, kendi dosyandan başkasına dokunma. Doğrulamayı (test/build) controller yapar — sen ÇALIŞTIRMA.
@@ -76,6 +76,14 @@ Bu dosya Wave 1'de aynen bu şekilde taşındı. **Birebir bu deseni kopyala.** 
 
 ---
 
+## 3.5. PMCM özel notu (bu dalga) — merkezî-merge YOK
+PMCM normalde worker'ların paylaşılan merkezî dosyaya (ör. `tr.ts`, type index) gidecek **JSON-delta'sını** toplayıp
+Step 2'de merkezde birleştirir. **Bu dalgada paylaşılan merkezî dosya YOK** — her worker yalnız kendi bileşenini
+düzenler, **delta BOŞ.** `tr.ts`/registry/barrel ARAMA. Tek "merkezî" dosya = `INV-3D-2` test allowlist'i; ona
+**controller** dokunur (worker DEĞİL). Yani PMCM Step 2 (merge) bu dalgada **no-op**.
+
+---
+
 ## 4. KESİN YASAKLAR (ihlal = ret)
 - Sadece **kendi dosyana** dokun. `core/` klasörü, barrel/index, `tr.ts`/`en.ts`, test dosyaları, diğer 2
   hedef → **DEĞİŞTİRME.**
@@ -102,6 +110,6 @@ Bu dosya Wave 1'de aynen bu şekilde taşındı. **Birebir bu deseni kopyala.** 
 ---
 
 > # ⛔ SON HATIRLATMA — YÖNTEM
-> Bu iş **`/paralel-code-mutation` ile, PARALEL ajanlarla** yapılır — **her dosyaya ayrı ajan.**
-> **❌ Bireysel / tek-ajan / elle sırayla YAPMA. ❌ "Başla" der demez koda dalma.**
-> Önce paralel orkestrasyonu kur → her ajana yalnız kendi dosyasının §3 kontratını ver → sonra koştur.
+> Bu iş **`parallel-code-mutation` (PMCM) ile, paralel disjoint worker'larla** yapılır — **her worker tek dosya.**
+> Kaç worker → skill karar verir (Step 0). **❌ Bireysel / tek-ajan / elle sırayla YAPMA. ❌ "Başla" der demez koda dalma.**
+> Önce orkestrasyonu kur → her worker'a yalnız kendi dosyasının §3 kontratını ver → sonra koştur.
