@@ -39,7 +39,10 @@ export const returns = {
         statusUpdated: 'İade durumu "{{status}}" olarak güncellendi',
         emailNotifySent: 'Müşteri bilgilendirme e-postası gönderildi',
         emailNotifyFailed: 'E-posta gönderilemedi ancak durum güncellendi',
-        statusUpdateFailed: 'İade durumu güncellenemedi'
+        statusUpdateFailed: 'İade durumu güncellenemedi',
+        noValidTransitions: 'Seçilen iade talepleri için geçerli durum geçişi bulunamadı',
+        bulkStatusUpdated: 'Seçilen {{count}} iade talebinin durumu "{{status}}" olarak güncellendi',
+        noPermission: 'Bu işlem için yetkiniz bulunmuyor'
       },
       statusLabels: {
         requested: 'Talep Edildi',
@@ -49,5 +52,20 @@ export const returns = {
         received: 'Teslim Alındı',
         refunded: 'İade Edildi',
         cancelled: 'İptal Edildi'
+      },
+      bulk: {
+        statusConfirm: 'Seçilen {{count}} iade talebinin durumunu "{{status}}" olarak güncellemek istediğinize emin misiniz?',
+        statusTitle: 'Toplu Durum Güncelle',
+        selectedCount: '{{count}} iade talebi seçildi',
+        clear: 'Seçimi temizle',
+        apply: 'Uygula'
+      },
+      detail: {
+        title: 'İade Talebi Detayı',
+        id: 'İade ID',
+        orderId: 'Sipariş ID',
+        userId: 'Kullanıcı ID',
+        description: 'Açıklama',
+        updatedAt: 'Son Güncelleme'
       }
 };

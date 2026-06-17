@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\__tests__\AdminReturnsPage.integration.test.tsx
-skeleton_hash: 982aa24053345287
+source_path: C:\Users\alize\vh-returns\src\views\admin\__tests__\AdminReturnsPage.integration.test.tsx
+skeleton_hash: 3db7f1c2234c6816
 entity_hashes:
   overview: dde320738cd8b6fd
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-13T19:01:19Z
+generated_at: 2026-06-17T19:26:08Z
 ---
 
 ## Genel Bakış
@@ -33,12 +33,25 @@ Bu modül için açıkça tanımlanmış fonksiyon imzası bulunmamaktadır. Yal
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../AdminReturnsPage::AdminReturnsPage
+- import: @/utils/testA11y::testA11y
+- import: @testing-library/react::render
+- import: @testing-library/react::screen
+- import: react::React
+- import: vitest::describe
+- import: vitest::expect
+- import: vitest::it
+- import: vitest::vi
+
+---
+
 ## SABİTLER
 - **sb** (call) — `vi.hoisted(() => {
   const returnsData = [
     {
       id: 'r1',
-      order_...`
+      or...`
 
 ---
 

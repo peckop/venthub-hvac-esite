@@ -3,15 +3,16 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { CheckCircle, ChevronRight, Clock, Package, RefreshCw, SearchX, Truck, Undo2, XCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
 import { allowedNextStatuses } from '@/lib/admin/returnStatusMachine'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import { type BulkAction, BulkBar } from '../../components/admin/data-table/BulkBar'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import { FacetedFilter } from '../../components/admin/data-table/FacetedFilter'
 import type { AdminColumn, DataTableFacet } from '../../components/admin/data-table/types'
@@ -24,7 +25,13 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { syncOrderFromReturn } from '../../lib/orderStatusService'
 import type { Database } from '../../types/database.types'
-import { adminTableActionPrimaryClass } from '../../utils/adminUi'
+import {
+  adminButtonPrimaryClass,
+  adminSelectClass,
+  adminSelectStyle,
+  adminTableActionPrimaryClass,
+  glassStrongClass,
+} from '../../utils/adminUi'
 
 /* ---- modeller ---- */
 interface ReturnRow {
@@ -86,6 +93,50 @@ function flatten(row: RawReturnRow): ReturnRow {
   }
 }
 
+const ReturnDetailRow: React.FC<{ row: ReturnRow }> = ({ row }) => {
+  const { t, lang } = useI18n()
+  return (
+    <div className="max-w-4xl mx-auto space-y-4 py-4 animate-in fade-in slide-in-from-top-2 duration-300">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-8 h-0.5 bg-cyan-400" />
+        <h4 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+          {t('admin.returns.detail.title')}
+        </h4>
+      </div>
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="space-y-3 bg-surface-deep/40 p-4 rounded-2xl border border-white/5">
+          <div className="flex justify-between items-center border-b border-white/5 pb-2">
+            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.id')}</span>
+            <span className="text-slate-300 font-mono text-xs select-all">{row.id}</span>
+          </div>
+          <div className="flex justify-between items-center border-b border-white/5 pb-2">
+            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.orderId')}</span>
+            <span className="text-slate-300 font-mono text-xs select-all">{row.order_id}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.userId')}</span>
+            <span className="text-slate-300 font-mono text-xs select-all">{row.user_id}</span>
+          </div>
+        </div>
+        <div className="space-y-3 bg-surface-deep/40 p-4 rounded-2xl border border-white/5">
+          <div className="flex flex-col gap-1 border-b border-white/5 pb-2">
+            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.table.reason')}</span>
+            <span className="text-slate-200 text-xs font-black uppercase tracking-wider">{row.reason}</span>
+          </div>
+          <div className="flex flex-col gap-1 border-b border-white/5 pb-2">
+            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.description')}</span>
+            <span className="text-slate-300 text-xs font-semibold normal-case leading-relaxed break-words">{row.description || '—'}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.updatedAt')}</span>
+            <span className="text-slate-300 font-black text-xs uppercase tracking-widest">{formatDateTime(row.updated_at, lang)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const RETURNS_SELECT =
   'id, order_id, user_id, reason, description, status, created_at, updated_at, venthub_orders!inner(order_number, customer_name, customer_email, total_amount)'
 
@@ -93,21 +144,64 @@ const STATUS_VALUES = ['requested', 'approved', 'rejected', 'in_transit', 'recei
 
 const EMPTY_DASH = '—'
 
-/* ---- fetcher: client-mode (sayfa-bağımsız, limit 500) ---- */
+/* ---- fetcher: server-mode (arama, süzme, sıralama, range) ---- */
 async function returnsFetcher(
   supabase: SupabaseClient<Database>,
-  _params: FetchParams,
+  params: FetchParams,
 ): Promise<FetchResult<ReturnRow>> {
   await ensureSessionFresh()
-  const { data, error } = await supabase
+
+  let query = supabase
     .from('venthub_returns')
-    .select(RETURNS_SELECT)
-    .order('created_at', { ascending: false })
-    .limit(500)
+    .select(RETURNS_SELECT, { count: 'exact' })
+
+  // 1. Status filters
+  const statuses = params.filters.status ?? []
+  if (statuses.length === 1) {
+    query = query.eq('status', statuses[0])
+  } else if (statuses.length > 1) {
+    query = query.in('status', statuses)
+  }
+
+  // 2. Global search query (term)
+  const term = params.query.trim()
+  if (term) {
+    query = query.or(
+      `reason.ilike.%${term}%,` +
+      `venthub_orders.customer_name.ilike.%${term}%,` +
+      `venthub_orders.customer_email.ilike.%${term}%,` +
+      `venthub_orders.order_number.ilike.%${term}%`
+    )
+  }
+
+  // 3. Sorting
+  const sortKey = params.sort?.key
+  const ascending = params.sort?.dir === 'asc'
+  
+  if (sortKey === 'order_number') {
+    query = query.order('order_number', { ascending, foreignTable: 'venthub_orders' })
+  } else if (sortKey === 'customer_name') {
+    query = query.order('customer_name', { ascending, foreignTable: 'venthub_orders' })
+  } else if (sortKey === 'reason') {
+    query = query.order('reason', { ascending })
+  } else if (sortKey === 'status') {
+    query = query.order('status', { ascending })
+  } else if (sortKey === 'created_at') {
+    query = query.order('created_at', { ascending })
+  } else {
+    query = query.order('created_at', { ascending: false })
+  }
+
+  // 4. Pagination
+  const offset = (params.page - 1) * params.pageSize
+  const { data, error, count } = await query.range(offset, offset + params.pageSize - 1)
   if (error) throw error
+
   const raw: RawReturnRow[] = data ?? []
   const rows = raw.map(flatten)
-  return { rows, totalMatched: rows.length }
+  const totalMatched = typeof count === 'number' ? count : rows.length
+
+  return { rows, totalMatched }
 }
 
 function orderLabel(r: ReturnRow): string {
@@ -125,13 +219,37 @@ const ReturnsTableBody: React.FC = () => {
     resource: 'returns',
     rowId: (r) => r.id,
     fetcher: returnsFetcher,
-    paginationMode: 'none',
-    sortMode: 'client',
+    paginationMode: 'server',
+    sortMode: 'server',
+    pageSize: 50,
     initialSort: { key: 'created_at', dir: 'desc' },
     syncUrl: true,
   })
 
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({})
+
+  const fetchStatusCounts = useCallback(async () => {
+    try {
+      const { data, error } = await supabaseBrowserClient
+        .from('venthub_returns')
+        .select('status')
+      if (error) throw error
+      const counts: Record<string, number> = {}
+      for (const row of data || []) {
+        counts[row.status] = (counts[row.status] || 0) + 1
+      }
+      setStatusCounts(counts)
+    } catch (err) {
+      console.warn('Failed to fetch status counts:', err)
+    }
+  }, [])
+
+  useEffect(() => {
+    void fetchStatusCounts()
+  }, [fetchStatusCounts, table.isLoading])
+
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
+  const [bulkStatus, setBulkStatus] = useState<string>('approved')
 
   /* ---- statü etiket/renk/ikon (eski sayfadan taşındı, i18n) ---- */
   const getStatusLabel = useCallback(
@@ -260,6 +378,114 @@ const ReturnsTableBody: React.FC = () => {
     [hasWriteAccess, t, getStatusLabel, table],
   )
 
+  /* ---- toplu statü güncelleme — UPDATE, mutateWithAudit kapısından ---- */
+  const bulkStatusChange = useCallback(
+    async (targetStatus: string) => {
+      if (!hasWriteAccess) {
+        toast.error(t('admin.returns.toasts.statusUpdateFailed'))
+        return
+      }
+
+      const selected = table.selection.selectedIds
+      const targets = table.rows.filter(
+        (r) => selected.includes(r.id) && allowedNextStatuses(r.status).includes(targetStatus)
+      )
+
+      if (targets.length === 0) {
+        toast.error(t('admin.returns.toasts.noValidTransitions'))
+        return
+      }
+
+      if (
+        !window.confirm(
+          t('admin.returns.bulk.statusConfirm', {
+            count: String(targets.length),
+            status: getStatusLabel(targetStatus),
+          })
+        )
+      ) {
+        return
+      }
+
+      try {
+        await mutateWithAudit(supabaseBrowserClient, {
+          resource: 'returns',
+          canWrite: hasWriteAccess,
+          action: 'UPDATE',
+          rowPk: null,
+          before: null,
+          after: { status: targetStatus, ids: targets.map((r) => r.id) },
+          auditedByEdge: false,
+          fn: async () => {
+            const dbUpdates = targets.map(async (row) => {
+              // (1) asıl mutasyon
+              const { error } = await supabaseBrowserClient
+                .from('venthub_returns')
+                .update({ status: targetStatus })
+                .eq('id', row.id)
+              if (error) throw error
+
+              // (2) Orders senkronizasyonu — best-effort
+              try {
+                await syncOrderFromReturn(row.order_id, targetStatus)
+              } catch {
+                /* swallow */
+              }
+
+              // (3) refunded → mock iade — best-effort
+              if (targetStatus === 'refunded') {
+                try {
+                  await supabaseBrowserClient.functions.invoke('refund-order-mock', {
+                    body: { order_id: row.order_id, reason: `return:${row.id}` },
+                  })
+                } catch {
+                  /* swallow */
+                }
+              }
+
+              // (4) müşteri bildirimi — best-effort
+              try {
+                await supabaseBrowserClient.functions.invoke('return-status-notification', {
+                  body: {
+                    _return_id: row.id,
+                    order_id: row.order_id,
+                    order_number: row.order_number,
+                    customer_email: row.customer_email,
+                    customer_name: row.customer_name,
+                    old_status: row.status,
+                    new_status: targetStatus,
+                    reason: row.reason,
+                    description: row.description,
+                  },
+                })
+              } catch {
+                /* swallow */
+              }
+            })
+
+            await Promise.all(dbUpdates)
+          },
+        })
+
+        toast.success(
+          t('admin.returns.toasts.bulkStatusUpdated', {
+            count: String(targets.length),
+            status: getStatusLabel(targetStatus),
+          })
+        )
+        table.selection.clear()
+        await table.reload()
+      } catch (e) {
+        toast.error(
+          e instanceof AdminPermissionError
+            ? t('admin.returns.toasts.noPermission')
+            : t('admin.returns.toasts.statusUpdateFailed')
+        )
+      }
+    },
+    [hasWriteAccess, table, t, getStatusLabel],
+  )
+
   /* ---- kolonlar (SSOT) ---- */
   const columns = useMemo<AdminColumn<ReturnRow>[]>(
     () => [
@@ -386,12 +612,8 @@ const ReturnsTableBody: React.FC = () => {
     [t, lang, router, hasWriteAccess, updatingStatus, handleStatusUpdate, getStatusLabel, getStatusColor, getStatusIcon],
   )
 
-  /* ---- status facet — count'lar filtre-öncesi allRows'tan ---- */
+  /* ---- status facet — count'lar server'dan dynamic olarak ---- */
   const facets = useMemo<DataTableFacet[]>(() => {
-    const counts = new Map<string, number>()
-    for (const r of table.allRows) {
-      counts.set(r.status, (counts.get(r.status) ?? 0) + 1)
-    }
     return [
       {
         key: 'status',
@@ -399,11 +621,11 @@ const ReturnsTableBody: React.FC = () => {
         options: STATUS_VALUES.map((value) => ({
           value,
           label: getStatusLabel(value),
-          count: counts.get(value) ?? 0,
+          count: statusCounts[value] ?? 0,
         })),
       },
     ]
-  }, [table.allRows, t, getStatusLabel])
+  }, [statusCounts, t, getStatusLabel])
 
   /* ---- export (csv + xls) — fetchAllForExport, eski BOM/XLS builder'ları korur ---- */
   const exportCsv = useCallback(async () => {
@@ -480,6 +702,44 @@ const ReturnsTableBody: React.FC = () => {
     URL.revokeObjectURL(url)
   }, [table, t, lang, getStatusLabel])
 
+  const bulkActions = useMemo<BulkAction[]>(
+    () => [
+      {
+        key: 'apply-status',
+        label: t('admin.returns.bulk.statusTitle'),
+        tone: 'default',
+        panel: (close) => (
+          <div className={`${glassStrongClass} rounded-2xl p-3 flex items-center gap-2`}>
+            <select
+              value={bulkStatus}
+              onChange={(e) => setBulkStatus(e.target.value)}
+              className={`${adminSelectClass} !pl-3 !h-10`}
+              style={adminSelectStyle}
+              aria-label={t('admin.returns.bulk.statusTitle')}
+            >
+              {['approved', 'in_transit', 'received', 'refunded', 'cancelled', 'rejected'].map((s) => (
+                <option key={s} value={s} className="bg-surface-deep">
+                  {getStatusLabel(s)}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => {
+                void bulkStatusChange(bulkStatus)
+                close()
+              }}
+              className={`${adminButtonPrimaryClass} !h-10`}
+            >
+              {t('admin.returns.bulk.apply')}
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [t, bulkStatus, bulkStatusChange, getStatusLabel],
+  )
+
   return (
     <div className="space-y-6">
       <DataTableKit
@@ -503,6 +763,8 @@ const ReturnsTableBody: React.FC = () => {
           />
         }
         columnsButtonLabel={t('admin.returns.columnsButton')}
+        expandLabel={t('admin.ui.details')}
+        renderExpandedRow={(r) => <ReturnDetailRow row={r} />}
         toolbarSlot={
           <AdminToolbar
             storageKey="toolbar:returns"
@@ -534,6 +796,17 @@ const ReturnsTableBody: React.FC = () => {
               </div>
             }
           />
+        }
+        bulkBarSlot={
+          hasWriteAccess ? (
+            <BulkBar
+              selectedCount={table.selection.selectedIds.length}
+              selectedLabel={t('admin.returns.bulk.selectedCount', { count: table.selection.selectedIds.length })}
+              clearLabel={t('admin.returns.bulk.clear')}
+              actions={bulkActions}
+              onClear={table.selection.clear}
+            />
+          ) : null
         }
       />
     </div>

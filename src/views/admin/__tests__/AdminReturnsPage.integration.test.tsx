@@ -42,14 +42,17 @@ const sb = vi.hoisted(() => {
       },
     },
   ]
-  // client-mode zinciri: select(...).order(...).limit() → {data, error}
-  const selectChain = {
-    order() {
-      return selectChain
-    },
-    limit() {
-      return Promise.resolve({ data: returnsData, error: null })
-    },
+  // client-mode / server-mode zinciri
+  const selectChain: any = {
+    eq() { return selectChain },
+    in() { return selectChain },
+    or() { return selectChain },
+    order() { return selectChain },
+    range() { return Promise.resolve({ data: returnsData, error: null, count: returnsData.length }) },
+    limit() { return Promise.resolve({ data: returnsData, error: null }) },
+    then(onfulfilled: any) {
+      return Promise.resolve({ data: returnsData, error: null, count: returnsData.length }).then(onfulfilled)
+    }
   }
   const updateChain = {
     eq() {
@@ -59,7 +62,10 @@ const sb = vi.hoisted(() => {
   const client = {
     from() {
       return {
-        select() {
+        select(projection?: string) {
+          if (projection === 'status') {
+            return Promise.resolve({ data: returnsData.map(r => ({ status: r.status })), error: null })
+          }
           return selectChain
         },
         update() {
