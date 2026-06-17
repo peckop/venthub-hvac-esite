@@ -1,5 +1,6 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { 
   ChevronLeft, 
   Eye,
@@ -12,13 +13,15 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback,useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { z } from 'zod';
 
 import { AuthorityBuilder } from '@/components/admin/authority-builder/AuthorityBuilder';
 import { AuthorityRenderer } from '@/components/authority/AuthorityRenderer';
 import { useRole } from '@/hooks/useRole';
 import { useI18n } from '@/i18n/I18nProvider';
-import { logAdminAction } from '@/lib/audit';
+import { mutateWithAudit } from '@/lib/admin/mutateWithAudit';
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import { AuthorityBlock, SpecsBlock } from '@/types/authority';
 import { CategoryMetadata, DbCategory, DbJson } from '@/types/db-rows';
@@ -37,6 +40,15 @@ interface CategoryBuilderViewProps {
   categoryId: string;
 }
 
+interface CategoryFormValues {
+  name: string;
+  slug: string;
+  parent_id: string | null;
+  sort_order: number;
+  description: string;
+  is_active: boolean;
+}
+
 const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId }) => {
   const router = useRouter();
   const { canWrite } = useRole();
@@ -48,6 +60,42 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
   const [saving, setSaving] = useState(false);
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [showPreview, setShowPreview] = useState(true);
+  const [parentIdOptions, setParentIdOptions] = useState<{ id: string, name: string }[]>([]);
+
+  const categorySchema = React.useMemo(() => z.object({
+    name: z.string().min(1, t('admin.categories.nameRequired') || 'Kategori adı zorunludur'),
+    slug: z.string().min(1, t('admin.categories.slugRequired') || 'Slug zorunludur'),
+    parent_id: z.string().optional().nullable(),
+    sort_order: z.number().int().optional().default(0),
+    description: z.string().optional().nullable(),
+    is_active: z.boolean().optional().default(true),
+  }), [t]);
+
+  const form = useForm<CategoryFormValues>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: '',
+      slug: '',
+      parent_id: null,
+      sort_order: 0,
+      description: '',
+      is_active: true,
+    }
+  });
+
+  // Fetch parent category options
+  useEffect(() => {
+    const fetchParents = async () => {
+      const { data } = await supabase
+        .from('categories')
+        .select('id, name')
+        .is('parent_id', null)
+        .neq('id', categoryId);
+      
+      if (data) setParentIdOptions(data);
+    };
+    fetchParents();
+  }, [categoryId]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -56,6 +104,15 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
       if (error) throw error;
       const cat = data as DbCategory;
       setCategory(cat);
+      
+      form.reset({
+        name: cat.name || '',
+        slug: cat.slug || '',
+        parent_id: cat.parent_id,
+        sort_order: cat.sort_order || 0,
+        description: cat.description || '',
+        is_active: cat.is_active ?? true,
+      });
       
       let initialBlocks: AuthorityBlock[] = (cat.authority_content as AuthorityBlock[]) || [];
 
@@ -107,33 +164,98 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
     } finally {
       setLoading(false);
     }
-  }, [categoryId, t]);
+  }, [categoryId, t, form]);
 
   useEffect(() => { load(); }, [load]);
 
-  const handleSave = async () => {
+  const isFormDirty = form.formState.isDirty || JSON.stringify(blocks) !== JSON.stringify(category?.authority_content || []);
+  const isSaveDisabled = !isFormDirty || saving || !hasWriteAccess;
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isFormDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isFormDirty]);
+
+  const handleBack = () => {
+    if (isFormDirty) {
+      if (window.confirm(t('admin.categories.unsavedChangesConfirm'))) {
+        router.back();
+      }
+    } else {
+      router.back();
+    }
+  };
+
+  const onSubmit = async (values: CategoryFormValues) => {
     if (!hasWriteAccess) {
       toast.error(t('admin.categories.toasts.noWritePermission'));
       return;
     }
     setSaving(true);
     try {
-      // Use DbJson (re-exported Json) to satisfy Supabase requirement without 'any'
-      const { error } = await supabase
-        .from('categories')
-        .update({ authority_content: blocks as DbJson })
-        .eq('id', categoryId);
-      if (error) throw error;      
-      // Audit log (hata UI'ı bloklamasın)
-      try {
-        await logAdminAction(supabase, {
-          table_name: 'categories',
-          row_pk: categoryId,
-          action: 'UPDATE',
-          after: { block_count: blocks?.length ?? 0 },
-          comment: 'authority content kaydedildi',
-        });
-      } catch { /* swallow */ }
+      await mutateWithAudit(supabase, {
+        resource: 'categories',
+        canWrite: hasWriteAccess,
+        action: 'UPDATE',
+        rowPk: categoryId,
+        before: {
+          name: category?.name,
+          slug: category?.slug,
+          parent_id: category?.parent_id,
+          sort_order: category?.sort_order,
+          description: category?.description,
+          is_active: category?.is_active,
+          authority_content: category?.authority_content,
+        },
+        after: {
+          name: values.name,
+          slug: values.slug,
+          parent_id: values.parent_id,
+          sort_order: values.sort_order,
+          description: values.description,
+          is_active: values.is_active,
+          authority_content: blocks,
+        },
+        auditedByEdge: false,
+        fn: async () => {
+          const { error } = await supabase
+            .from('categories')
+            .update({
+              name: values.name,
+              slug: values.slug,
+              parent_id: values.parent_id,
+              sort_order: values.sort_order,
+              description: values.description,
+              is_active: values.is_active,
+              authority_content: blocks as DbJson,
+            })
+            .eq('id', categoryId);
+          if (error) throw error;
+        },
+      });
+
+      const updatedCategory: DbCategory = {
+        ...(category as DbCategory),
+        name: values.name,
+        slug: values.slug,
+        parent_id: values.parent_id,
+        sort_order: values.sort_order,
+        description: values.description,
+        is_active: values.is_active,
+        authority_content: blocks,
+      };
+      setCategory(updatedCategory);
+      form.reset(values);
+
       toast.success(t('admin.categories.toasts.saveSuccess'));
     } catch (e) {
       console.error('Save error:', e);
@@ -159,7 +281,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
       {/* --- PLATINUM HEADER --- */}
       <header className="h-16 border-b border-white/5 flex items-center justify-between px-6 bg-surface-deep z-50">
         <div className="flex items-center gap-6">
-          <button onClick={() => router.back()} className="group flex items-center gap-2 text-slate-500 hover:text-white transition-colors">
+          <button onClick={handleBack} type="button" className="group flex items-center gap-2 text-slate-500 hover:text-white transition-colors">
             <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors">
                 <ChevronLeft size={18} />
             </div>
@@ -176,6 +298,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
           <div className="flex items-center gap-2 mr-4 bg-white/5 p-1 rounded-xl border border-white/5">
              <button 
                 onClick={() => setShowPreview(!showPreview)} 
+                type="button"
                 className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-colors ${showPreview ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20' : 'text-slate-500 hover:text-slate-300'}`}
              >
                 <Eye size={14} />
@@ -184,8 +307,9 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
           </div>
 
           <button
-            onClick={handleSave}
-            disabled={saving || !hasWriteAccess}
+            type="submit"
+            form="category-builder-form"
+            disabled={isSaveDisabled}
             title={!hasWriteAccess ? t('admin.categories.toasts.noWritePermission') : undefined}
             className="flex items-center gap-3 bg-white text-slate-900 hover:bg-cyan-400 hover:text-white disabled:opacity-50 px-8 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase shadow-xl transition-transform active:scale-95"
           >
@@ -199,7 +323,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
         
         {/* --- CENTER: MAIN EDITOR (Studio Area) --- */}
         <main className="flex-1 overflow-y-auto bg-surface-darkest custom-scrollbar relative">
-            <div className="max-w-content mx-auto py-12 px-6">
+            <form id="category-builder-form" onSubmit={form.handleSubmit(onSubmit)} className="max-w-content mx-auto py-12 px-6">
                 <div className="mb-12 flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-black text-white tracking-tight italic">
@@ -219,6 +343,113 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                     </div>
                 </div>
 
+                {/* --- CATEGORY BASIC INFO FORM --- */}
+                <div className="bg-white/2 border border-white/5 rounded-2xl p-6 mb-8 space-y-6">
+                    <div className="flex items-center gap-2 pb-4 border-b border-white/5">
+                        <div className="w-1 h-4 bg-cyan-500 rounded-full" />
+                        <h3 className="text-xs font-black text-white uppercase tracking-widest">
+                            {t('admin.categories.tabGeneral')}
+                        </h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Name */}
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                                {t('admin.categories.formName')}
+                            </label>
+                            <input 
+                                {...form.register('name')}
+                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 text-white"
+                                placeholder={t('admin.categories.formName') + '...'}
+                            />
+                            {form.formState.errors.name && (
+                                <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">
+                                    {form.formState.errors.name.message}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Slug */}
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                                {t('admin.categories.formSlug')}
+                            </label>
+                            <input 
+                                {...form.register('slug')}
+                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 font-mono text-white"
+                                placeholder="slug..."
+                            />
+                            {form.formState.errors.slug && (
+                                <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">
+                                    {form.formState.errors.slug.message}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Parent ID */}
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                                {t('admin.categories.formParent')}
+                            </label>
+                            <select 
+                                {...form.register('parent_id')}
+                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer text-white"
+                            >
+                                <option value="" className="bg-surface-deep">{t('admin.categories.parentNone')}</option>
+                                {parentIdOptions.map(p => (
+                                    <option key={p.id} value={p.id} className="bg-surface-deep">{p.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Sort Order */}
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                                {t('admin.categories.formSortOrder')}
+                            </label>
+                            <input 
+                                type="number"
+                                {...form.register('sort_order', { valueAsNumber: true })}
+                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors text-white"
+                            />
+                        </div>
+
+                        {/* Is Active */}
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                                {t('admin.common.status') || 'Durum'}
+                            </label>
+                            <div className="flex items-center py-3 bg-white/2 px-4 rounded-xl border border-white/10">
+                                <input 
+                                    type="checkbox"
+                                    {...form.register('is_active')}
+                                    id="is_active"
+                                    className="w-5 h-5 rounded border-white/10 bg-white/5 text-cyan-500 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0 cursor-pointer"
+                                />
+                                <label htmlFor="is_active" className="text-xs font-bold text-slate-400 ml-3 cursor-pointer select-none">
+                                    {t('admin.categories.statusLabels.active') || 'Aktif'}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="space-y-2">
+                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                            {t('admin.categories.formDescription')}
+                        </label>
+                        <textarea 
+                            {...form.register('description')}
+                            rows={3}
+                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 resize-none text-white"
+                            placeholder={t('admin.categories.formDescription') + '...'}
+                        />
+                    </div>
+                </div>
+
                 <div className="space-y-8">
                     <AuthorityBuilder value={blocks || []} onChange={setBlocks} />
                 </div>
@@ -229,7 +460,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                       {BRAND_NAME} {t('admin.categories.engineTitle')} {ENGINE_VERSION}
                     </p>
                 </div>
-            </div>
+            </form>
         </main>
 
         {/* --- RIGHT: FLOATING PREVIEW SIDEBAR --- */}

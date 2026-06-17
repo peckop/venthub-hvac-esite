@@ -107,5 +107,8 @@ export const categories = {
   export: {
     csvLabel: 'CSV Olarak Dışa Aktar',
   },
+  nameRequired: 'Kategori adı zorunludur',
+  slugRequired: 'Slug alanı zorunludur',
+  unsavedChangesConfirm: 'Kaydedilmemiş değişiklikleriniz var. Sayfadan ayrılmak istediğinizden emin misiniz?',
 };
 
