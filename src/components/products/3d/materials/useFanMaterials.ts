@@ -105,6 +105,11 @@ const MATERIALS_CACHE = {
         roughness: 0.4,
         metalness: 0.2
     }),
+    ductFanBladeRose: new MeshStandardMaterial({
+        color: '#be123c',
+        metalness: 0.6,
+        roughness: 0.4
+    }),
     jetOrange: new MeshStandardMaterial({
         color: '#FF6600',
         metalness: 0.6,
