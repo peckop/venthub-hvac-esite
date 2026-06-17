@@ -3,6 +3,22 @@
 > Tek "neredeyiz?" kaynağı. Daldan dala geçince buraya bak. Her önemli adımda güncellenir.
 > **Son güncelleme: 2026-06-17** — admin cetvel YENİDEN ölçüldü (~%40→%63, 3 keep; `docs/audits/admin-cetvel-scores-2026-06-17.md`); doc konsolidasyonu (`admin-capabilities.md` = tek SSOT, §4.5 enterprise açık registry; mükerrer `admin-feature-recommendations` silindi); ve **yeni sıralama kararı: ADMIN-ÖNCE, BAYİ-SON** (aşağıda).
 
+## 🚦 Şerit Panosu (append-only — her Controller YALNIZ kendi bölümüne yazar)
+
+> Kural: `collaboration-protocol.md §0.5 (K1/K2)`. İşe başlamadan **claim**, bitince **release**.
+> Eş Controller'ın bölümüne **DOKUNMA** — yoksa pano çakışma noktası olur.
+
+### Controller #1 — admin şeridi
+- **Aktif:** Admin shell E1 (federe komut paleti) + `collaboration-protocol.md` (sahip)
+- **Dal:** `feat/admin-shell` (lokal, push yok)
+- **Kilit dosyalar:** `admin-standard.md §10`, `admin-capabilities.md §4.5`, `collaboration-protocol.md`, `docs/plans/admin-shell-e1-command-palette-brief.md`, `CLAUDE.md` doc-map, bu pano
+- **Durum:** 🟡 E1 brief hazır → worker'a verilmeyi bekliyor
+
+### Controller #2 — 3D şeridi
+- _(ikiz #2 kendi satırlarını buraya yazar — origin/master'daki #374/#375 onun işi)_
+
+---
+
 ## Büyük Resim (zincir)
 
 ```
@@ -19,7 +35,7 @@
 ### A) Standartlar (cetvel) — ✅ büyük ölçüde bitti
 - `docs/standards/admin-standard.md` (admin NASIL — **§10 shell standardı + §10.4 17-madde cetvel** dahil), `admin-capabilities.md` (admin NE — **§4.5 enterprise açık registry** dahil)
 - `docs/standards/dealer-network-standard.md` (B2B domain), `dealer-module-blueprint.md` (R0→B2)
-- 🆕 `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (Controller/Worker, bir-iş-bir-dal, deterministik kapı, doküman SSOT). Tüm ajanlar (Claude + Antigravity + diğer LLM) buna uyar; brief'ler buna referans verir.
+- 🆕 `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller'lar + ortak Antigravity worker; controller↔controller şerit sahipliği + worktree izolasyonu; bir-iş-bir-dal; deterministik kapı; doküman SSOT). Tüm ajanlar buna uyar; brief'ler buna referans verir.
 - ❌ **EKSİK STANDART:** müşteri-hesap / storefront-UX cetveli YOK → `docs/standards/customer-account-standard.md` yazılacak (yeni domain, admin-standard'ın müşteri-tarafı karşılığı)
 
 ### B) ANALİZ (cetvelle mevcut uygulamayı ölç)

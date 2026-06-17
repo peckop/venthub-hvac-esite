@@ -1,11 +1,18 @@
 # Çok-Ajan İşbirliği Protokolü
 
-> **Bu dosya nedir?** Bu repoda birden fazla LLM/ajan aynı anda çalışıyor
-> (**Claude Code = Controller**; **Antigravity CLI + diğer LLM'ler = Worker**). Bu dosya
-> hepsinin uyduğu **ortak kural setidir** — ki herkes aynı doğrultuda çalışsın.
+> **Bu dosya nedir?** Bu repoda **birden fazla EŞİT Claude Code Controller** aynı anda çalışıyor
+> (ben + "ikiz"), ve **ortak bir Antigravity CLI worker**'a kod yaptırıyorlar. Bu dosya hepsinin
+> uyduğu **ortak kural setidir** — ki herkes aynı doğrultuda, **çarpışmadan** çalışsın.
 > **Brief'ler bu kuralları TEKRAR ETMEZ, buraya REFERANS verir.**
 >
-> İlgili: `CLAUDE.md` (VentHub mutlak kuralları) · `docs/DURUM-TAKIP.md` (canlı "neredeyiz" panosu).
+> İlgili: `CLAUDE.md` (VentHub mutlak kuralları) · `docs/DURUM-TAKIP.md` (canlı şerit panosu).
+
+```
+Recep (Human) — her Controller'ı AYRI denetler, aralarında relay yapar
+├── Claude Code #1 (Controller, eş) ──┐
+│                                       ├──> Antigravity CLI = ORTAK kodlama worker'ı
+└── Claude Code #2 (Controller, eş) ──┘
+```
 
 ---
 
@@ -13,18 +20,53 @@
 
 | Rol | Kim | Yetki |
 |---|---|---|
-| **Controller** | Claude Code | Brief yazar · deterministik kapıyı **kendi** vurur · commit/PR/**merge** · **tek "içeri alma" yetkisi** |
-| **Worker** | Antigravity CLI / diğer LLM | İşi/brief'i uygular · **kendi dalında** üretir · push eder · **DURUR** · master'a merge **ETMEZ** |
-| **Human** | Recep | Ajanlar arası relay + onay · **production'a uygulama yalnız onun açık komutuyla** |
+| **Controller (EŞİT / çoğul)** | Claude Code örnekleri (#1, #2, …) | Her biri **kendi şeridini** brief'ler · kendi deterministik kapısını **kendi** vurur · **kendi** dalını commit/PR/merge eder. **Tek üst-kapıcı YOK.** |
+| **Worker (ORTAK)** | Antigravity CLI | Controller'lardan **herhangi biri** iş verebilir · kendi dalında üretir · push eder · **DURUR** · master'a merge **ETMEZ** |
+| **Human** | Recep | Her Controller'ı **ayrı** denetler + aralarında relay · **production'a uygulama yalnız onun açık komutuyla** |
+
+> ⚠️ İkinci Claude Code **bir worker DEĞİL** — benimle **eş Controller**. Onun çıktısını ben gate'lemem; o kendi gate'ler. Antigravity = ikimizin de iş verdiği **ortak** worker.
+
+---
+
+## 0.5 Controller↔Controller koordinasyonu (EN KRİTİK — tangle'ın gerçek sebebi)
+
+> Asıl risk worker'ı yönetmek değil; **iki EŞİT Controller'ın aynı klasörü/dosyayı/işi paylaşması.**
+> Bugünkü tangle iki kökten çıktı: (1) **paylaşılan çalışma klasörü** — ikizin dalı checkout'tayken
+> öbür Controller edit yaptı; (2) ikimiz de ayrı collaboration standardı yazdık (#376 + bu dosya).
+
+**K0 — Worktree/klasör izolasyonu (BİRİNCİL kural).** İki eş-Controller + ortak worker **tek çalışma
+klasörünü PAYLAŞAMAZ.** Her Controller **kendi checkout'unda / git worktree'sinde** çalışır → iki dal
+aynı anda canlı olur, dosyalar karışmaz. (Paylaşılan klasörde başkasının dalı checkout'tayken edit =
+bugünkü çarpışmanın kökü. — ikiz #2'nin worktree deltası.)
+
+**K1 — Şerit sahipliği.** Her konu **tek Controller'ın** şeridi. Şu an:
+**admin = #1 · 3D = #2 · `collaboration-protocol.md` = #1 (bu Controller).** Eş Controller'ın şeridine
+**GİRME** (dalını merge etme, dosyasına dokunma, paralel düzenleme). Eş Controller yalnız **gözden geçirir
++ delta iletir**; yazan = sahip.
+
+**K2 — `DURUM-TAKIP.md` = append-only şerit panosu.** Her Controller **yalnız KENDİ bölümüne** yazar
+(aktif konu + dal + dokunduğu kilit dosyalar); başkasının satırına **dokunmaz** — yoksa panonun kendisi
+çakışma noktası olur. İşe başlamadan **claim**, bitince **release**.
+
+**K3 — Ortak/cross-cutting dosya** (`CLAUDE.md` doc-map, `DURUM-TAKIP.md`, paylaşılan SSOT, bu dosya)
+= çakışma sıcak-noktası. İki Controller **aynı anda düzenlemez** → ya **tek-sahip-serileştirir** ya da
+**append-only bölüm**. Düzenlemeden önce **"ikiz bunu zaten açtı mı?"** (`git fetch` + PR/dal). Açtıysa →
+**rakip PR yok**, tek canon, deltayı sahibine ilet.
+
+**K4 — Ortak worker (Antigravity).** İkisi de iş verebilir; ama her iş **tek Controller'a aittir** —
+o Controller işini kendi dalına alır, kendi gate'ler ve merge eder.
+
+**K5 — Merge hijyeni.** Her zaman **`git fetch` + en güncel `origin/master`'dan dallan**; merge'den önce
+geride kaldıysan **rebase et** → eş-zamanlı master-merge race'i önlenir.
 
 ---
 
 ## 1. Bir-İş-Bir-Dal (ZORUNLU)
 
 - Her iş **master'dan TAZE dal** açar. İsim: `feat/<konu>` (kod) · `docs/<konu>` (yalnız doküman) · `fix/<konu>`.
-- Bir ajan **SADECE kendi işine** dokunur. **Başka ajanın dosyasına DOKUNMA** — paylaşılan working-tree'de çakışma = felaket. Yalnız kendi dosyalarını stage'le/commit'le.
-- İki ajan aynı anda = **iki AYRI dal**. Yığma yasak (hızlı producer controller'ı geçse bile her bağımsız iş master'dan taze dala → tangled mega-PR yok).
-- **Master'a yalnız Controller**, kapı yeşilse merge eder.
+- Bir ajan **SADECE kendi işine** dokunur. Yalnız kendi dosyalarını stage'le/commit'le.
+- İki iş aynı anda = **iki AYRI dal**. Yığma yasak — hızlı producer controller'ı geçse bile her bağımsız iş master'dan taze dala (tangled mega-PR yok).
+- **Master'a yalnız o şeridin sahibi Controller**, kapı yeşilse merge eder.
 
 ---
 
@@ -32,7 +74,7 @@
 
 ```
 iş/brief → Worker üretir → push → DURUR
-        → Controller: deterministik kapı + ilgili cetvel → diff'ten DOĞRULA
+        → şerit-sahibi Controller: deterministik kapı + ilgili cetvel → diff'ten DOĞRULA
         → yeşilse: commit + PR + master'a merge
 ```
 
@@ -41,7 +83,7 @@ iş/brief → Worker üretir → push → DURUR
 
 ---
 
-## 3. Deterministik Kapı (Controller vurur)
+## 3. Deterministik Kapı (şerit-sahibi Controller vurur)
 
 - **Kod:** `pnpm type-check` 0 · `pnpm lint` 0 · `pnpm test -- --run` geçer · `pnpm build` yeşil (RSC/prerender sınırı) · axe 0
 - **+ İşin cetveli:** admin sayfası → `admin-standard.md §8` · admin shell → `§10.4` · (yeni domain → kendi standardı)
@@ -51,41 +93,41 @@ iş/brief → Worker üretir → push → DURUR
 
 ## 4. Standart-Önce (No-Standard-No-Code)
 
-- **Cetvel olmadan kod yok.** Cetvel **gerçek kaynaktan** üretilir (provenance tablosu), Claude'un/Worker'ın uydurması değil.
+- **Cetvel olmadan kod yok.** Cetvel **gerçek kaynaktan** üretilir (provenance), uydurma değil.
 - Yeni domain → önce `docs/standards/*` standardı → ölç (`docs/audits/*`) → uygula.
-- Kontrol = **cetvel (docs/standards) + onu zorlayan conformance testi** (INV-*). Page-crash sınıfı bulgular INV testine terfi eder.
+- Kontrol = **cetvel (docs/standards) + onu zorlayan conformance testi** (INV-*).
 
 ---
 
 ## 5. Mükerrerlik Yasağı
 
-- Eklemeden önce **"bu zaten var mı?"** → CodeGraph/grep ile kontrol et. Var olanı **SAR**, kopya sorgu/komponent yazma.
+- Eklemeden önce **"bu zaten var mı?"** → CodeGraph/grep + (cross-cutting ise) **"ikiz açtı mı?"** (§0.5). Var olanı **SAR**, kopya yazma.
 - Yeni dosya = **dağınıklığı toplama / eksik doldurma**; mevcut bir şeyin kopyası DEĞİL.
 
 ---
 
-## 6. Doküman Kuralları (MD üreten HER ajan için — özellikle doküman Worker'ları)
+## 6. Doküman Kuralları (MD üreten HER Controller için)
 
 - **Her konunun TEK SSOT'u var** (drift önlemi). Diğer dosyalar **referans** verir, içeriği tekrar etmez.
 
 | Konu | SSOT |
 |---|---|
 | Admin **NASIL** kurulur (yapısal cetvel) | `docs/standards/admin-standard.md` |
-| Admin **NE** olmalı (yetenek/enterprise açık) | `docs/standards/admin-capabilities.md` |
+| Admin **NE** olmalı (yetenek/açık) | `docs/standards/admin-capabilities.md` |
 | Bayi domain / blueprint | `docs/standards/dealer-network-standard.md` · `dealer-module-blueprint.md` |
 | Müşteri-hesap UX (yazılacak) | `docs/standards/customer-account-standard.md` |
-| Canlı durum ("neredeyiz") | `docs/DURUM-TAKIP.md` |
+| Canlı durum + **şerit panosu** | `docs/DURUM-TAKIP.md` |
 | **İşbirliği kuralları (bu dosya)** | `docs/standards/collaboration-protocol.md` |
 | Uçtan-uca kapsamlı referans | `CONTEXT.md` (**NotebookLM üretir — elle yeniden yazma**) |
 
-- **Gereksiz dosya yasak.** Yeni MD açmadan önce: konunun SSOT'u **var mı?** Varsa oraya **bölüm ekle**, yeni dosya açma.
-- İş bitince **`DURUM-TAKIP.md` güncellenir** (tek "neredeyiz" panosu).
-- Türkçe birincil, İngilizce ikincil. Commit mesajı **konvansiyonel + Türkçe** (`docs(...)`, `feat(...)`, `fix(...)`).
-- **NLM twin sync = MILESTONE** (her commit değil): auth tazele → sync → `notebook_query` ile **DOĞRULA**. Yeni önemli standart/audit `.cc_docs.yaml` `standalone_files`'a eklenmeli, yoksa twin görmez.
+- **Gereksiz dosya yasak.** Yeni MD açmadan önce: konunun SSOT'u **var mı?** Varsa oraya **bölüm ekle**.
+- İş bitince **`DURUM-TAKIP.md` güncellenir**.
+- Türkçe birincil. Commit mesajı **konvansiyonel + Türkçe** (`docs(...)`, `feat(...)`, `fix(...)`).
+- **NLM twin sync = MILESTONE** (her commit değil): auth tazele → sync → `notebook_query` ile **DOĞRULA**. Yeni önemli standart/audit `.cc_docs.yaml` `standalone_files`'a eklenmeli.
 
 ---
 
-## 7. VentHub Mutlak Kuralları (her ajan için bağlayıcı)
+## 7. VentHub Mutlak Kuralları (her Controller + worker için bağlayıcı)
 
 - `CLAUDE.md` #1–12: **No-Plan-No-Code · DI** (servisler ilk param `supabase`) **· no-`any`** · RSC-öncelik · PPR/Suspense · i18n (metin sözlükten, URL `useLocalizedRoutes`) · **design-token** (arbitrary Tailwind/HEX yasak) · 3D = R3F+Drei · **RLS/tenant-scope** · webhook HMAC + monoton durum · admin `admin_audit_log`. **İhlal = ret.**
 
@@ -94,9 +136,9 @@ iş/brief → Worker üretir → push → DURUR
 ## 8. Branch Hijyeni
 
 - post-commit `docs/system_tree.md` churn'ü **commit'e ALINMAZ** (`git checkout -- docs/system_tree.md`).
-- Bir iş bitmeden ikincisine başlama; **dallar karışmasın**.
-- `.agent/skills/` (Antigravity) ile `.claude/skills/` (Claude Code) **ayrı ve kasıtlı** — birini diğerine dokundurma/birleştirme.
+- Bir iş bitmeden ikincisine başlama; **dallar/şeritler karışmasın**.
+- `.agent/skills/` (Antigravity) ile `.claude/skills/` (Claude Code) **ayrı ve kasıtlı** — birleştirme/karıştırma yok.
 
 ---
 
-*SSOT: bu dosya. Controller = Claude Code · Worker = Antigravity CLI / diğer LLM · onay & relay = Recep.*
+*SSOT: bu dosya. Controller'lar = Claude Code (eş, çoğul) · ortak Worker = Antigravity CLI · onay & relay = Recep.*

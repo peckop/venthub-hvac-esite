@@ -86,7 +86,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 
 - `CONTEXT.md` — uçtan uca kapsamlı referans (mimari, DB, akışlar, kurallar). **İlk buraya bak.**
 - `docs/README.md` — doküman sistemi haritası ("hangi soru → hangi dosya"). `docs/standards/` = cetveller (admin/bayi standartları, blueprint), `docs/audits/` = ölçümler, `docs/plans/` = roadmap.
-- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (Controller=Claude / Worker=Antigravity·diğer LLM; bir-iş-bir-dal; deterministik kapı; doküman SSOT disiplini). · `docs/DURUM-TAKIP.md` — canlı "neredeyiz" panosu.
+- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` — canlı "neredeyiz" + **şerit panosu**.
 - `PROJECT.md` — DI & güvenlik milestone kayıtları + arayüz kontratları.
 - `RECOMMENDATIONS.md` · `CHANGELOG.md` — durum ve değişiklik geçmişi.
 - `docs/` (kök) — **üretilmiş** master MD'ler (frontend, edge functions, DB şema) — elle düzenleme.
