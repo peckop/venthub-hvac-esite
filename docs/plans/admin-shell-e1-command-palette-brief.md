@@ -6,6 +6,8 @@
 > Kapsam: **YALNIZ E1** (federe komut paleti). E2/E8/nav-redesign = ayrı brief (§8 kapsam-dışı).
 >
 > **Worker harness:** `maestro-feature` (DİKEY özellik: registry + searchers + palette + i18n + test = tek özellik × çok katman). **Bu brief skill'i EZER.** Akış: worker paralel ÜRETİR → push → **DURUR**. Deterministik kapı (type-check · lint · test · `pnpm build` · axe) + commit/PR/merge = **Controller (Claude)**, worker DEĞİL. "Ajan geçti" ≠ güven → diff'ten doğrulanır.
+>
+> **Cetvel (standart-önce):** Bu brief `admin-standard.md §10` (shell standardı — kaynak-bağlı, §10.5 provenance) cetveline UYAR. **Kabul ölçütü = §10.4 17-madde shell cetveli ≥ 15/17** + §9 deterministik kapı. Brief = §10'un uygulama izdüşümü; controller hem kapıyı hem **§10.4 cetvelini** kendi vurur.
 
 ---
 
