@@ -41,7 +41,6 @@ const CANONICAL = 'src/components/products/3d/core/VentHubCanvas.tsx'
 const LEGACY_RAW_CANVAS = new Set<string>([
   'src/components/products/InfiniteProductsShowcase.tsx', // PARK EDİLDİ — ana sayfa adayı, henüz bağlı değil
   'src/components/products/BlueprintCanvas.tsx',
-  'src/components/authority/ThreeDAuthority.tsx',
 ])
 
 function stripComments(source: string): string {
