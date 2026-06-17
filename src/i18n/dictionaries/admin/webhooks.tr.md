@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\webhooks.tr.ts
-skeleton_hash: bf4979211057016c
+skeleton_hash: d8bcc9cc2a4f4043
 entity_hashes:
   overview: a695b1bd72d402b4
-generated_at: 2026-06-13T11:19:23Z
+generated_at: 2026-06-17T13:23:01Z
 ---
 
 ## Genel Bakış
@@ -40,19 +40,13 @@ Bu modül bir i18n (uluslararasılaştırma) sözlük dosyasıdır ve sadece sta
 
 ## SABİTLER
 - **webhooks** (object) — `{
-      subtitle: 'Sistemler arası veri akışını ve otomatik bildirimleri izle...`
+  subtitle: 'Sistemler arası veri akışını ve otomatik bildirimleri izleyin...`
 
 ---
 
 ## AST POINTERS
 
 Bu dosyada fonksiyon bulunmamaktadır. Dosya, `webhooks` adında bir sabit (constant) nesne içermektedir.
-
----
-
-**Dosya Yapısı Özeti:**
-
-- **`webhooks`** (object) — Webhook ile ilgili Türkçe dil dosyası (i18n sözlük nesnesi). UI metinleri, başlıklar, buton etiketleri gibi localized string değerleri içerir. Fonksiyon değil, doğrudan bir sabit nesne tanımıdır.
 
 ---
 

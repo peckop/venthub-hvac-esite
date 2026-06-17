@@ -1,36 +1,30 @@
 'use client'
 
-import { useEffect,useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 export interface AppSettings {
-  id: string
-  site_title: string
-  site_description: string
-  contact_email: string
-  contact_phone: string
-  contact_address: string
-  social_links: Record<string, string>
-  maintenance_mode: boolean
-  google_analytics_id: string | null
-  footer_text: string
-  header_announcement: string | null
-  default_meta_image: string | null
-  brand_logo_url: string | null
-  whatsapp_number: string | null
-  updated_at: string
+  general: {
+    site_name: string
+    tagline: string
+    contact_email: string
+    support_phone: string
+    headquarters: string
+    logo_url: string | null
+  }
+  payment: {
+    iyzico_enabled: boolean
+    iyzico_mode: string
+    iyzico_api_key: string
+  }
 }
 
 /**
- * Custom hook to fetch and hold the global application settings from the `app_settings` Supabase table.
+ * Custom hook to fetch and hold the global application settings from the `site_settings` Supabase table.
  * Manages loading, error, and the settings state.
  *
  * @returns An object containing the fetched settings, loading boolean, and error string
- *
- * @example
- * const { settings, loading } = useSettings()
- * if (!loading && settings) console.log(settings.site_title)
  */
 export function useSettings() {
   const [settings, setSettings] = useState<AppSettings | null>(null)
@@ -41,12 +35,31 @@ export function useSettings() {
     async function fetchSettings() {
       try {
         const { data, error: fetchError } = await supabase
-          .from('app_settings' as never)
-          .select('*')
-          .single()
+          .from('site_settings')
+          .select('key, value')
 
         if (fetchError) throw (fetchError as Error)
-        setSettings(data as Partial<AppSettings> as AppSettings)
+
+        const generalRow = data?.find((r) => r.key === 'general')
+        const paymentRow = data?.find((r) => r.key === 'payment')
+
+        setSettings({
+          general: {
+            site_name: String((generalRow?.value as Record<string, unknown>)?.site_name || ''),
+            tagline: String((generalRow?.value as Record<string, unknown>)?.tagline || ''),
+            contact_email: String((generalRow?.value as Record<string, unknown>)?.contact_email || ''),
+            support_phone: String((generalRow?.value as Record<string, unknown>)?.support_phone || ''),
+            headquarters: String((generalRow?.value as Record<string, unknown>)?.headquarters || ''),
+            logo_url: (generalRow?.value as Record<string, unknown>)?.logo_url
+              ? String((generalRow?.value as Record<string, unknown>)?.logo_url)
+              : null,
+          },
+          payment: {
+            iyzico_enabled: !!(paymentRow?.value as Record<string, unknown>)?.iyzico_enabled,
+            iyzico_mode: String((paymentRow?.value as Record<string, unknown>)?.iyzico_mode || 'sandbox'),
+            iyzico_api_key: String((paymentRow?.value as Record<string, unknown>)?.iyzico_api_key || ''),
+          },
+        })
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : String(err))
       } finally {

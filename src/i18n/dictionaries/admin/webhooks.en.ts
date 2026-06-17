@@ -42,4 +42,7 @@ export const webhooks = {
   eventDetail: 'Event Detail',
   errorMessage: 'Error Message',
   selectEventToView: 'Select an event from the list to inspect.',
+  noEvents: 'No Webhook Events',
+  noEventsDesc: 'No webhook events have been recorded.',
+  filterEmptyDescription: 'No matching webhook events found.',
 };

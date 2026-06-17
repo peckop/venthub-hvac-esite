@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\search.en.ts
-skeleton_hash: 1fbcf725a9f1c9ba
+skeleton_hash: bb494dbf43a43a58
 entity_hashes:
   overview: fc6cf9147f6079c3
-generated_at: 2026-06-13T11:16:23Z
+generated_at: 2026-06-17T13:23:01Z
 ---
 
 ## Genel Bakış
@@ -35,10 +35,6 @@ Bu modül bir i18n (uluslararasılaştırma) sözlük dosyasıdır ve statik çe
 
 ---
 
-**Not:** Bu modül fonksiyonel bir yapıya sahip değildir; sadece statik çeviri verisi (nesne) içerir. Bu nedenle çalışma zamanı koşullarından ziyade, veri bütünlüğü ve yapısal tutarlılık varsayımları geçerlidir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ---
@@ -46,7 +42,7 @@ Bu modül bir i18n (uluslararasılaştırma) sözlük dosyasıdır ve statik çe
 ## SABİTLER
 - **search** (object) — `{
       audit: 'Search by table, PK or note',
-      errors: 'Search by URL or...`
+      errors: 'Search by URL ...`
 
 ---
 
