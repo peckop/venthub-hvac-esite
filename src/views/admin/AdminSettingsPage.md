@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminSettingsPage.tsx
-skeleton_hash: c112fa5d25de286e
+source_path: C:\Users\alize\vh-settings-i18n\src\views\admin\AdminSettingsPage.tsx
+skeleton_hash: b9807eb7cfdd5d7d
 entity_hashes:
   func:AdminSettingsPage: d7abe5daa414ecdd
   func:handleSave: e32c68904d8a419f
   overview: 7bfa420fad4577a6
   style_tokens: 6047f3ed12c6d671
-generated_at: 2026-06-17T13:24:08Z
+generated_at: 2026-06-17T20:39:44Z
 ---
 
 ## Genel Bakış
@@ -105,41 +105,6 @@ Bu bileşen parametre almaz — React.FC olarak tanımlı, stateles veya kendi i
   - `setActiveTab` — aktif sekme değiştirme fonksiyonu; her sekme butonunun `onClick`'inde çağrılır
   - `tabs` — sekme tanımları dizisi; her elemanın `tab.id`, `tab.label`, `tab.icon` özellikleri JSX'te kullanılır
 - **Dönüş**: `React.FC` — JSX içeren React bileşeni; ayarlar formunu sekmeli arayüzde render eder
-
----
-
-### [N2_NASIL] AST Pointer: `AdminSettingsPage.tsx`::handleSave
-- **params**: `tab` — `'general' | 'payment' | 'admins' | 'system'` literal union tipi; hangi ayarlar sekmesinin kaydedileceğini belirtir
-- **ic_degiskenler**:
-  - `saving` — kaydetme işleminin devam edip etmediğini belirten boolean loading durumu
-  - `setSaving` — loading durumu setter'ı; fonksiyon başında `true`, `finally` bloğunda `false` yapılır
-  - `supabase` — Supabase browser client'ı; `supabase.auth.getUser()` ve `supabase.from('site_settings').upsert()` çağrıları için kullanılır
-  - `authData` — `supabase.auth.getUser()` yanıtından dönen nesne; `authData.user?.id` ile mevcut kullanıcı ID'si alınır
-  - `userId` — mevcut oturum açmış kullanıcının ID'si; `authData.user?.id`'den gelir, `null` fallback'li
-  - `hasWriteAccess` — write izni boolean'ı; `mutateWithAudit`'e `canWrite` parametresi olarak geçilir
-  - `settings` — mevcut ayarlar nesnesi; `before` parametresi olarak kullanılır (`settings.general`, `settings.payment` veya `null`)
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu; `t('admin.inventory.settings.saveSuccess')` ve `t('admin.inventory.settings.noPermission')` çağrılır
-  - `toast` — sonner toast bildirim fonksiyonu; `toast.success()` ve `toast.error()` ile kullanıcıya bildirim gösterir
-  - `mutateWithAudit` — audit log'lu veri değiştirme wrapper fonksiyonu; `resource`, `canWrite`, `action`, `rowPk`, `before`, `after`, `fn` parametreleriyle çağrılır
-  - `payload` (general sekmesi) — `{ site_name, tagline, contact_email, support_phone, headquarters, logo_url }` — general ayarları için upsert edilecek nesne; `siteName`, `tagline`, `contactEmail`, `supportPhone`, `headquarters`, `logoUrl` state değişkenlerinden oluşur; `logo_url` null fallback'li
-  - `siteName` — general payload içinde site adı değeri
-  - `tagline` — general payload içinde slogan değeri
-  - `contactEmail` — general payload içinde e-posta değeri
-  - `supportPhone` — general payload içinde telefon değeri
-  - `headquarters` — general payload içinde merkez adresi değeri
-  - `logoUrl` — general payload içinde logo URL değeri (boş string ise `null` fallback)
-  - `payload` (payment sekmesi) — `{ iyzico_enabled, iyzico_mode, iyzico_api_key }` — ödeme ayarları için upsert edilecek nesne; `iyzicoEnabled`, `iyzicoMode`, `iyzicoApiKey` state değişkenlerinden oluşur
-  - `iyzicoEnabled` — payment payload içinde iyzico aktiflik durumu
-  - `iyzicoMode` — payment payload içinde iyzico modu (test/live)
-  - `iyzicoApiKey` — payment payload içinde iyzico API anahtarı
-  - `payload` (admins sekmesi) — `{ admin_sessions_timeout, mfa_required }` — yönetici politikaları için nesne; `adminSessionsTimeout` ve `mfaRequired` state değişkenlerinden oluşur
-  - `adminSessionsTimeout` — admins payload içinde oturum zaman aşımı değeri
-  - `mfaRequired` — admins payload içinde çok faktörlü doğrulama zorunluluk durumu
-  - `payload` (system sekmesi) — `{ system_log_level, debug_mode }` — sistem yapılandırması için nesne; `systemLogLevel` ve `debugMode` state değişkenlerinden oluşur
-  - `systemLogLevel` — system payload içinde log seviyesi değeri
-  - `debugMode` — system payload içinde hata ayıklama modu durumu
-  - `e` — `catch` bloğunda yakalanan hata nesnesi; `AdminPermissionError` instanceof kontrolü ile izin hatası ayrımı yapılır; `Error` instanceof kontrolü ile standart hata mesajı alınır
-- **Dönüş**: `yok` (Promise<void>) — asenkron fonksiyon; yan etki olarak veritabanına upsert yapar, audit log yazar ve toast bildirimi gösterir; `tab` paramteresine göre `'general'`, `'payment'`, `'admins'` veya `'system'` key'ine karşılık gelen `site_settings` satırını upsert eder; hata durumunda `toast.error()` ile kullanıcıya bildirim gösterir; her durumda `setSaving(false)` ile loading durumunu sonlandırır
 
 ---
 

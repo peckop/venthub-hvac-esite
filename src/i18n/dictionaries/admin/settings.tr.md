@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\settings.tr.ts
-skeleton_hash: 45dd0295ed92a9bc
+source_path: C:\Users\alize\vh-settings-i18n\src\i18n\dictionaries\admin\settings.tr.ts
+skeleton_hash: f4b6402a7b815dbf
 entity_hashes:
   overview: a6820ef6861612f2
-generated_at: 2026-06-13T11:16:57Z
+generated_at: 2026-06-17T20:39:43Z
 ---
 
 ## Genel Bakış
@@ -40,10 +40,6 @@ Bu modül için fonksiyon gövdesi bulunmadığından, fonksiyon tabanlı mimari
 
 ---
 
-**Not:** Bu modül veri-ihracat (data-export) modülüdür; herhangi bir işlevsel mantık, doğrulama kuralı veya eşik değeri barındırmadığı için domain-specific kurallar tanımlanamamıştır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ---
@@ -51,7 +47,7 @@ Bu modül için fonksiyon gövdesi bulunmadığından, fonksiyon tabanlı mimari
 ## SABİTLER
 - **settings** (object) — `{
       addAdmin: 'Yeni Yönetici Ekle',
-      adminsDesc: 'Platform yöneticil...`
+      adminsDesc: 'Platform yönetic...`
 
 ---
 
