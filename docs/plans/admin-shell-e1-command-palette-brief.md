@@ -2,7 +2,8 @@
 
 > **Bu dosya nedir?** Antigravity (agy) CLI'nin uygulayacağı **tam, self-contained iş-akış brief'i.**
 > Yazan: Claude (mimar) — canlı koddan doğrulanmış (`verify-live-state-before-cross-tool-brief`).
-> Denetleyen: Claude (yargıç) — §9 checklist'iyle. Dal: **`feat/admin-shell`** (master'dan taze).
+> Denetleyen: Claude (yargıç) — §9 checklist'iyle.
+> **Dal kuralı (`collaboration-protocol.md §1`):** Worker **master'dan TAZE kendi kod dalını** açar (öneri: `feat/admin-e1-command-palette`); SADECE §4 dosyalarına dokunur, başka ajanın dosyasına DOKUNMAZ. Bu brief + `§10` cetveli ayrı docs bazında (master'da referans). **Son kontrol + master'a merge = Controller (Claude), Worker DEĞİL.**
 > Kapsam: **YALNIZ E1** (federe komut paleti). E2/E8/nav-redesign = ayrı brief (§8 kapsam-dışı).
 >
 > **Worker harness:** `maestro-feature` (DİKEY özellik: registry + searchers + palette + i18n + test = tek özellik × çok katman). **Bu brief skill'i EZER.** Akış: worker paralel ÜRETİR → push → **DURUR**. Deterministik kapı (type-check · lint · test · `pnpm build` · axe) + commit/PR/merge = **Controller (Claude)**, worker DEĞİL. "Ajan geçti" ≠ güven → diff'ten doğrulanır.

@@ -17,8 +17,9 @@
 ## Üç İş Kolu (thread)
 
 ### A) Standartlar (cetvel) — ✅ büyük ölçüde bitti
-- `docs/standards/admin-standard.md` (admin NASIL), `admin-capabilities.md` (admin NE — **§4.5 enterprise açık registry** dahil)
+- `docs/standards/admin-standard.md` (admin NASIL — **§10 shell standardı + §10.4 17-madde cetvel** dahil), `admin-capabilities.md` (admin NE — **§4.5 enterprise açık registry** dahil)
 - `docs/standards/dealer-network-standard.md` (B2B domain), `dealer-module-blueprint.md` (R0→B2)
+- 🆕 `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (Controller/Worker, bir-iş-bir-dal, deterministik kapı, doküman SSOT). Tüm ajanlar (Claude + Antigravity + diğer LLM) buna uyar; brief'ler buna referans verir.
 - ❌ **EKSİK STANDART:** müşteri-hesap / storefront-UX cetveli YOK → `docs/standards/customer-account-standard.md` yazılacak (yeni domain, admin-standard'ın müşteri-tarafı karşılığı)
 
 ### B) ANALİZ (cetvelle mevcut uygulamayı ölç)
