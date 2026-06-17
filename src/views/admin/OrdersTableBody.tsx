@@ -3,7 +3,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { endOfDay } from 'date-fns'
 import { Info, ShoppingCart, X } from 'lucide-react'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import type { DateRange } from 'react-day-picker'
 import { toast } from 'sonner'
 
@@ -67,6 +67,17 @@ const SORT_COLUMN_MAP: Record<string, string> = {
   conversation: 'conversation_id',
   amount: 'total_amount',
 }
+
+const ORDER_STATUS_KEYS = [
+  'pending',
+  'paid',
+  'confirmed',
+  'shipped',
+  'delivered',
+  'cancelled',
+  'refunded',
+  'partial_refunded',
+] as const
 
 /* ---- helper'lar (module-level) ---- */
 function formatAmount(v?: number | null, lang: Lang = 'tr'): string {
@@ -166,10 +177,12 @@ async function ordersFetcher(
   if (q) query = query.ilike('search_text', `%${q}%`)
 
   /* durum filtresi */
-  const status = params.filters.status?.[0]
+  const statuses = params.filters.status ?? []
   const preset = params.filters.preset?.[0]
-  if (status) {
-    query = query.eq('status', status)
+  if (statuses.length === 1) {
+    query = query.eq('status', statuses[0])
+  } else if (statuses.length > 1) {
+    query = query.in('status', statuses)
   } else if (preset === 'pendingShipments') {
     query = query.in('status', ['confirmed', 'processing']).is('shipped_at', null)
   }
@@ -184,6 +197,302 @@ async function ordersFetcher(
   const { data, error, count } = await query.range(offset, offset + params.pageSize - 1)
   if (error) throw error
   return { rows: (data ?? []) as AdminOrderRow[], totalMatched: typeof count === 'number' ? count : 0 }
+}
+
+interface DetailOrderItem {
+  id: string
+  product_id?: string | null
+  product_name: string
+  quantity: number
+  price_at_time: number
+  product_image_url?: string | null
+}
+
+interface DetailOrder {
+  id: string
+  total_amount: number | null
+  status: string
+  payment_status?: string | null
+  created_at: string
+  customer_name?: string | null
+  customer_email?: string | null
+  shipping_address?: unknown
+  order_number?: string | null
+  conversation_id?: string | null
+  carrier?: string | null
+  tracking_number?: string | null
+  tracking_url?: string | null
+  shipped_at?: string | null
+  delivered_at?: string | null
+  shipping_method?: string | null
+  invoice_type?: string | null
+  invoice_info?: unknown
+  legal_consents?: unknown
+  venthub_order_items: DetailOrderItem[]
+}
+
+interface ShippingAddress {
+  fullAddress?: string
+  street?: string
+  city?: string
+  district?: string
+  state?: string
+  postalCode?: string
+  postal_code?: string
+}
+
+interface InvoiceInfo {
+  companyName?: string
+  company_name?: string
+  taxOffice?: string
+  tax_office?: string
+  taxNumber?: string
+  tax_no?: string
+  tcNo?: string
+  tc_no?: string
+  national_id?: string
+}
+
+/* ---- lazy genişleyen satır: sipariş kalemi ve detayları ---- */
+interface OrderSpecsRowProps {
+  orderId: string
+}
+
+const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
+  const { t, lang } = useI18n()
+  const [loading, setLoading] = useState(true)
+  const [order, setOrder] = useState<DetailOrder | null>(null)
+
+  useEffect(() => {
+    let active = true
+    void (async () => {
+      try {
+        const { data, error } = await supabaseBrowserClient
+          .from('venthub_orders')
+          .select(`
+            id, total_amount, status, payment_status, created_at, 
+            customer_name, customer_email, shipping_address, order_number, 
+            conversation_id, carrier, tracking_number, tracking_url, 
+            shipped_at, delivered_at, shipping_method, invoice_type, 
+            invoice_info, legal_consents,
+            venthub_order_items (
+              id, product_id, product_name, quantity, price_at_time, product_image_url
+            )
+          `)
+          .eq('id', orderId)
+          .maybeSingle()
+
+        if (!active) return
+        if (error) throw error
+        if (data) {
+          const rawItems = (data.venthub_order_items as Array<{
+            id: string
+            product_id: string | null
+            product_name: string
+            quantity: number
+            price_at_time: number
+            product_image_url: string | null
+          }> | undefined) || []
+
+          const mappedItems: DetailOrderItem[] = rawItems.map((it) => ({
+            id: it.id,
+            product_id: it.product_id,
+            product_name: it.product_name,
+            quantity: it.quantity,
+            price_at_time: it.price_at_time,
+            product_image_url: it.product_image_url,
+          }))
+
+          setOrder({
+            id: data.id,
+            total_amount: data.total_amount != null ? Number(data.total_amount) : null,
+            status: data.status || 'pending',
+            payment_status: data.payment_status,
+            created_at: data.created_at,
+            customer_name: data.customer_name,
+            customer_email: data.customer_email,
+            shipping_address: data.shipping_address,
+            order_number: data.order_number,
+            conversation_id: data.conversation_id,
+            carrier: data.carrier,
+            tracking_number: data.tracking_number,
+            tracking_url: data.tracking_url,
+            shipped_at: data.shipped_at,
+            delivered_at: data.delivered_at,
+            shipping_method: data.shipping_method,
+            invoice_type: data.invoice_type,
+            invoice_info: data.invoice_info,
+            legal_consents: data.legal_consents,
+            venthub_order_items: mappedItems,
+          })
+        }
+      } catch (err) {
+        console.error('Order fetch error:', err)
+      } finally {
+        if (active) setLoading(false)
+      }
+    })()
+    return () => {
+      active = false
+    }
+  }, [orderId])
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 gap-4">
+        <div className="animate-spin w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
+        <span className="text-xs font-black uppercase tracking-hvac-relaxed text-slate-500">
+          {t('admin.common.loading')}
+        </span>
+      </div>
+    )
+  }
+
+  if (!order) {
+    return (
+      <div className="glass p-8 rounded-2xl border border-white/5 text-center">
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+          {t('admin.orders.states.noRecords')}
+        </p>
+      </div>
+    )
+  }
+
+  const items = order.venthub_order_items || []
+  const addr = order.shipping_address as ShippingAddress | null
+  const invoice = order.invoice_info as InvoiceInfo | null
+
+  return (
+    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-300">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-0.5 bg-cyan-400" />
+        <h4 className="text-xs font-black text-cyan-400 uppercase tracking-hvac-relaxed">
+          {t('admin.orders.orderDetails')}
+        </h4>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Sol Kolon: Ürünler */}
+        <div className="lg:col-span-2 space-y-4">
+          <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">
+            {t('common.products')}
+          </h5>
+          <div className="glass rounded-2xl border border-white/5 overflow-hidden">
+            <table className="min-w-full text-xs divide-y divide-white/5">
+              <thead className="bg-white/3">
+                <tr>
+                  <th className="px-6 py-4 text-left font-black text-slate-500 uppercase tracking-wider">
+                    {t('orders.productCol')}
+                  </th>
+                  <th className="px-6 py-4 text-center font-black text-slate-500 uppercase tracking-wider w-20">
+                    {t('orders.qtyCol')}
+                  </th>
+                  <th className="px-6 py-4 text-right font-black text-slate-500 uppercase tracking-wider w-32">
+                    {t('orders.unitPriceCol')}
+                  </th>
+                  <th className="px-6 py-4 text-right font-black text-slate-500 uppercase tracking-wider w-32">
+                    {t('orders.totalCol')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/2">
+                {items.map((it: DetailOrderItem) => {
+                  const qty = Number(it.quantity) || 0
+                  const unitPrice = Number(it.price_at_time) || 0
+                  const totalPrice = qty * unitPrice
+                  return (
+                    <tr key={it.id} className="hover:bg-white/2 transition-colors">
+                      <td className="px-6 py-4 font-bold text-slate-200">
+                        {it.product_name}
+                      </td>
+                      <td className="px-6 py-4 text-center text-slate-300 font-bold">
+                        {qty}
+                      </td>
+                      <td className="px-6 py-4 text-right text-slate-300 font-mono">
+                        {formatCurrency(unitPrice, lang)}
+                      </td>
+                      <td className="px-6 py-4 text-right text-cyan-400 font-mono font-bold">
+                        {formatCurrency(totalPrice, lang)}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Sağ Kolon: Teslimat & Fatura */}
+        <div className="space-y-6">
+          {/* Müşteri & Teslimat */}
+          <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
+            <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">
+              {t('orders.shippingInfo')}
+            </h5>
+            <div className="space-y-3 text-xs">
+              <div>
+                <span className="text-slate-500 font-bold block">{t('orders.name')}:</span>
+                <span className="text-slate-200 font-bold block">{order.customer_name}</span>
+                <span className="text-slate-400 font-medium block">{order.customer_email}</span>
+              </div>
+              {addr && (
+                <div>
+                  <span className="text-slate-500 font-bold block">{t('orders.deliveryAddress')}:</span>
+                  <p className="text-slate-300 mt-1 font-medium leading-relaxed">
+                    {addr.fullAddress || addr.street}<br />
+                    {[addr.city, addr.district || addr.state].filter(Boolean).join(', ')}<br />
+                    {addr.postalCode || addr.postal_code}
+                  </p>
+                </div>
+              )}
+              {order.shipping_method && (
+                <div>
+                  <span className="text-slate-500 font-bold block">{t('account.orderDetail.shippingMethod')}:</span>
+                  <span className="text-slate-300 font-bold uppercase">
+                    {order.shipping_method === 'express'
+                      ? t('account.orderDetail.express')
+                      : t('account.orderDetail.standard')}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Fatura Bilgileri */}
+          <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
+            <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">
+              {t('account.orderDetail.invoiceInfo')}
+            </h5>
+            <div className="space-y-3 text-xs">
+              <div>
+                <span className="text-slate-500 font-bold block">{t('account.orderDetail.typeLabel')}</span>
+                <span className="text-slate-200 font-bold block uppercase">
+                  {order.invoice_type === 'corporate'
+                    ? t('checkout.invoice.corporate')
+                    : t('checkout.invoice.individual')}
+                </span>
+              </div>
+              {invoice && (
+                <div className="space-y-2 text-slate-300 font-medium leading-relaxed">
+                  {order.invoice_type === 'corporate' ? (
+                    <>
+                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.companyTitleLabel')}</span> {invoice.companyName || invoice.company_name}</p>
+                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.taxOfficeLabel')}</span> {invoice.taxOffice || invoice.tax_office}</p>
+                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.vknLabel')}</span> {invoice.taxNumber || invoice.tax_no}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.tcknLabel')}</span> {invoice.tcNo || invoice.tc_no || invoice.national_id}</p>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 const OrdersTableBody: React.FC = () => {
@@ -204,8 +513,27 @@ const OrdersTableBody: React.FC = () => {
 
   const { setFilter, setQuery } = table.filtering
   const filters = table.filtering.filters
-  const statusVal = filters.status?.[0] ?? ''
   const presetActive = filters.preset?.[0] === 'pendingShipments'
+  const activeStatuses = useMemo(() => filters.status ?? [], [filters.status])
+
+  const statusChips = useMemo(
+    () =>
+      ORDER_STATUS_KEYS.map((s) => ({
+        key: s,
+        label: t(`admin.orders.statusLabels.${s}`),
+        active: activeStatuses.includes(s),
+        onToggle: () => {
+          const next = activeStatuses.includes(s)
+            ? activeStatuses.filter((x) => x !== s)
+            : [...activeStatuses, s]
+          setFilter('status', next)
+          if (next.length > 0) {
+            setFilter('preset', [])
+          }
+        },
+      })),
+    [t, activeStatuses, setFilter],
+  )
 
   /* ---- modal state: kargo ---- */
   const [shipOpen, setShipOpen] = useState(false)
@@ -226,19 +554,7 @@ const OrdersTableBody: React.FC = () => {
   const [noteInput, setNoteInput] = useState('')
   const [notes, setNotes] = useState<OrderNote[]>([])
 
-  /* ---- status filtre seçenekleri ---- */
-  const statusOptions = useMemo(
-    () => [
-      { value: '', label: t('admin.orders.statusLabels.all') },
-      { value: 'paid', label: t('admin.orders.statusLabels.paid') },
-      { value: 'confirmed', label: t('admin.orders.statusLabels.confirmed') },
-      { value: 'shipped', label: t('admin.orders.statusLabels.shipped') },
-      { value: 'cancelled', label: t('admin.orders.statusLabels.cancelled') },
-      { value: 'refunded', label: t('admin.orders.statusLabels.refunded') },
-      { value: 'partial_refunded', label: t('admin.orders.statusLabels.partialRefunded') },
-    ],
-    [t],
-  )
+
 
   /* ---- kargo modalı: tekil prefill (READ) ---- */
   const openShipModal = useCallback(async (id: string) => {
@@ -727,6 +1043,8 @@ const OrdersTableBody: React.FC = () => {
           />
         }
         columnsButtonLabel={t('admin.common.view')}
+        expandLabel={t('admin.orders.orderDetails')}
+        renderExpandedRow={(r) => <OrderSpecsRow orderId={r.id} />}
         toolbarSlot={
           <AdminToolbar
             storageKey="toolbar:orders"
@@ -736,12 +1054,7 @@ const OrdersTableBody: React.FC = () => {
               placeholder: t('admin.search.orders'),
               focusShortcut: '/',
             }}
-            select={{
-              value: statusVal,
-              onChange: (v) => setFilter('status', v ? [v] : []),
-              title: t('admin.orders.filters.status'),
-              options: statusOptions,
-            }}
+            chips={statusChips}
             toggles={[
               {
                 key: 'pendingShipments',
