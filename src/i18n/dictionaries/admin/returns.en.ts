@@ -39,7 +39,10 @@ export const returns = {
         statusUpdated: 'Return status updated to "{{status}}"',
         emailNotifySent: 'Customer notification email sent',
         emailNotifyFailed: 'Email could not be sent, but the status was updated',
-        statusUpdateFailed: 'Could not update return status'
+        statusUpdateFailed: 'Could not update return status',
+        noValidTransitions: 'No valid status transitions found for selected return requests',
+        bulkStatusUpdated: 'Status of {{count}} return requests updated to "{{status}}"',
+        noPermission: 'You do not have permission for this action'
       },
       statusLabels: {
         requested: 'Requested',
@@ -49,5 +52,20 @@ export const returns = {
         received: 'Received',
         refunded: 'Refunded',
         cancelled: 'Cancelled'
+      },
+      bulk: {
+        statusConfirm: 'Are you sure you want to update the status of {{count}} selected return requests to "{{status}}"?',
+        statusTitle: 'Bulk Status Update',
+        selectedCount: '{{count}} return requests selected',
+        clear: 'Clear selection',
+        apply: 'Apply'
+      },
+      detail: {
+        title: 'Return Request Details',
+        id: 'Return ID',
+        orderId: 'Order ID',
+        userId: 'User ID',
+        description: 'Description',
+        updatedAt: 'Last Update'
       }
 };
