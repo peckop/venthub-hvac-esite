@@ -60,12 +60,28 @@ export const users = {
         admins: 'Admin Users ({{count}})',
         all: 'All Users ({{count}})'
       },
+      expand: {
+        title: 'User Details',
+        id: 'User ID (UUID)',
+        fullName: 'Full Name',
+        phone: 'Phone',
+        organizationId: 'Organization ID'
+      },
+      bulk: {
+        changeRole: 'Change Role',
+        selectRole: 'Select Target Role',
+        confirm: 'Are you sure you want to change the role of the selected {{count}} users to "{{role}}"?'
+      },
+      export: {
+        csvLabel: 'Export as CSV'
+      },
       toasts: {
         adminsLoadFailed: 'Failed to load admin users',
         allLoadFailed: 'Failed to load users',
         roleNotUpdated: 'Role could not be updated',
         roleUpdateError: 'Role update error',
         noPermission: 'You do not have permission to change user roles.',
-        roleUpdated: 'User role updated to "{{role}}"'
+        roleUpdated: 'User role updated to "{{role}}"',
+        bulkRoleUpdated: 'Role updated to "{{role}}" for {{count}} selected users'
       }
 };
