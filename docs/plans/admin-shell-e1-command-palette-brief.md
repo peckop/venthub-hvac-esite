@@ -99,17 +99,29 @@ export type AdminSearcher =
 ## 8. KAPSAM DIŞI (ayrı brief — yapma)
 - E2 bildirim inbox · E8 gelişmiş klavye-nav (`g+o`) · modern sidebar **görsel** redesign · AdminLayout sidebar'ın registry'ye göçü (opsiyonel) · hızlı-create aksiyonları (ops. minimal bırak) · yeni RPC gerektiren kaynaklar için DB migration (gerekirse AYRI iş — bu brief mevcut tablolara `ilike`/select ile arar).
 
-## 9. Kabul kriterleri + Claude'un son-denetim checklist'i
-**Antigravity teslimden önce yeşil olmalı:**
-- [ ] `pnpm type-check` 0 · `pnpm lint` 0 · `pnpm test -- --run` geçer · **`pnpm build`** yeşil (RSC sınır kontrolü) · axe 0
+## 9. Kabul kriterleri + kapı sorumluluğu (iki katman)
+
+> Kapı bölüşümü `collaboration-protocol.md §2-§3`'e tabi. **`pnpm build` worker'ın işi DEĞİL** —
+> skill "build" dese de worker build **ÇALIŞTIRMAZ** (bkz. `230345df` 3D dersi: ajan build koşmaz).
+> Build = **Controller** kapısı; çünkü `'use client'` paleti + yeni modül importları RSC/prerender
+> sınırını zorlar ve bunu **yalnız `pnpm build` yakalar** (tsc/lint/test YAKALAMAZ — bkz. RSC boundary gap).
+
+**A) Worker (maestro-feature) teslimden ÖNCE yeşil yapar — HIZLI kapı (build YOK):**
+- [ ] `pnpm type-check` 0 · `pnpm lint` 0 · `pnpm test -- --run` geçer · axe 0
 - [ ] Palet ≥8 kaynakta federe arıyor (paralel, `allSettled`)
 - [ ] RBAC: `sales` rolü yalnız kendi kaynaklarını görür/aratır (testle kanıt)
 - [ ] Searcher'lar DI'lı + RLS-client (service_role yok) — AST/lint geçer
 - [ ] i18n TR/EN parite (keycheck) + hardcoded string yok
 - [ ] a11y combobox/aria-activedescendant + axe 0
 - [ ] `any` yok · arbitrary Tailwind yok
+> Worker bitince push eder ve **DURUR** — build/PR/merge'e dokunmaz.
 
-**Claude (yargıç) ek manuel denetim:** federe kapsama tam mı · tenant-leak riski (her searcher RLS'e mi dayanıyor) · keyboard nav tüm gruplarda · mevcut ürün-arama regresyonu yok · registry SSOT temiz.
+**B) Controller (Claude) deterministik kapı — worker'a GÜVENMEden diff'ten kendi vurur:**
+- [ ] A listesini tekrar koş + diff'ten doğrula (type-check/lint/test/axe)
+- [ ] **`pnpm build` yeşil** (RSC/prerender sınırı — paletin `'use client'` + yeni importlar)
+- [ ] **§10.4 17-madde shell cetveli ≥ 15/17** (kabul eşiği)
+- [ ] Manuel denetim: federe kapsam tam mı · tenant-leak (her searcher RLS'e mi dayanıyor) · keyboard nav tüm gruplarda · ürün-arama regresyon yok · registry SSOT temiz
+- [ ] Yeşilse → commit + PR + master'a merge (K5: fetch+rebase-if-behind)
 
 ---
 
