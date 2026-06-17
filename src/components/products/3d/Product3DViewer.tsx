@@ -1,7 +1,7 @@
 "use client"
 
-import { ContactShadows, Environment, GizmoHelper, GizmoViewcube, Grid, Html, OrbitControls, useProgress } from '@react-three/drei'
-import { Canvas, useThree } from '@react-three/fiber'
+import { ContactShadows, GizmoHelper, GizmoViewcube, Grid, Html, OrbitControls, useProgress } from '@react-three/drei'
+import { useThree } from '@react-three/fiber'
 import {
     BoxSelect,
     ChevronLeft,
@@ -16,9 +16,14 @@ import { Vector3 } from 'three'
 
 import { useI18n } from '../../../i18n/I18nProvider'
 import { getModelPlacement } from '../../../utils/3dModelOffsets'
+import { VentHubCanvas } from './core'
 import { FanRenderer } from './FanRenderer'
 
 const VIEWER_BRAND = 'VentHub 3D'
+
+// B3/AX-10 — modül-seviye temp havuz (ModelRotator pointer-move içinde `new Vector3()` YASAK).
+const _camRight = new Vector3()
+const _camUp = new Vector3()
 
 function Loader() {
     const { progress } = useProgress()
@@ -67,10 +72,10 @@ function ModelRotator({ children, enabled, rotationRef }: { children: React.Reac
             const dy = e.clientY - previousMouse.current.y
             previousMouse.current = { x: e.clientX, y: e.clientY }
             const speed = 0.005
-            const camRight = new Vector3(1, 0, 0).applyQuaternion(camera.quaternion)
-            const camUp = new Vector3(0, 1, 0).applyQuaternion(camera.quaternion)
-            rotationRef.current.rotateOnWorldAxis(camUp, dx * speed)
-            rotationRef.current.rotateOnWorldAxis(camRight, dy * speed)
+            _camRight.set(1, 0, 0).applyQuaternion(camera.quaternion)
+            _camUp.set(0, 1, 0).applyQuaternion(camera.quaternion)
+            rotationRef.current.rotateOnWorldAxis(_camUp, dx * speed)
+            rotationRef.current.rotateOnWorldAxis(_camRight, dy * speed)
         }
         canvas.addEventListener('pointerdown', handlePointerDown)
         window.addEventListener('pointerup', handlePointerUp)
@@ -156,10 +161,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
 
     return (
         <div className={`relative w-full h-full bg-product-3d-radial ${isFullscreen ? 'fixed inset-0 z-toast' : 'rounded-xl overflow-hidden border border-light-gray'}`}>
-            <Canvas shadows="percentage" frameloop="always" dpr={[1, 2]} camera={{ position: [2, 2, 2.8], fov: 40 }} gl={{ alpha: true }}>
-                <ambientLight intensity={0.7} />
-                <directionalLight position={[10, 15, 10]} intensity={1.5} castShadow shadow-mapSize={2048} />
-                <Environment files="/env/city_256.hdr" />
+            <VentHubCanvas preset="product" frameloop="always" camera={{ position: [2, 2, 2.8], fov: 40 }}>
                 <Suspense fallback={<Loader />}>
                     <ErrorBoundary t={t}>
                         {slug && (
@@ -181,7 +183,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
                     <GizmoViewcube font="bold 50px Inter, sans-serif" opacity={0.9} color="#ffffff" hoverColor="#f8fafc" textColor="#475569" strokeColor="#cbd5e1" faces={[t('product3d.right'), t('product3d.left'), t('product3d.top'), t('product3d.bottom'), t('product3d.front'), t('product3d.backLabel')]} />
                 </GizmoHelper>
                 <OrbitControls ref={controlsRef} makeDefault enableRotate={rotationMode === 'orbit'} enableZoom={true} enablePan={true} maxPolarAngle={Math.PI} autoRotate={autoRotate} autoRotateSpeed={0.5} />
-            </Canvas>
+            </VentHubCanvas>
 
             <div className={`absolute ${tb.top} left-1/2 -translate-x-1/2 z-modal pointer-events-auto`}>
                 <div className={`flex items-center gap-1 bg-white/95 backdrop-blur-md p-1 rounded-lg border border-gray-300 shadow-xl`}>
