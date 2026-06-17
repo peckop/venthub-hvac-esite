@@ -15,7 +15,10 @@
 - **Durum:** 🟡 E1 brief hazır → worker'a verilmeyi bekliyor
 
 ### Controller #2 — 3D şeridi
-- _(ikiz #2 kendi satırlarını buraya yazar — origin/master'daki #374/#375 onun işi)_
+- **Aktif:** 3D standartlaştırma — INV-3D-2 **tek-Canvas KİLİTLİ** (allowlist boş); sıradaki = kapsamlı 3D cetveli (standart-önce) + eski borç süpürmesi
+- **Dal:** (şu an) `docs/durum-takip-3d-lane`; iş dalları master'dan **taze** açılır (worktree izole — K0)
+- **Kilit dosyalar:** `src/components/products/3d/core/VentHubCanvas.tsx`, `src/__tests__/conformance/3d-single-canvas.test.ts`, (yazılacak) `docs/standards/3d-standard.md`, bu pano (yalnız bu bölüm)
+- **Durum:** 🟢 tek-Canvas kilitlendi (#374/#375/#379 — tüm 3D yüzeyleri VentHubCanvas'a taşındı) → 🟡 sıradaki: kapsamlı **3D cetveli** + eski borç (Wave 3 = 23 model · FanRenderer→Product3DViewer rename · INV-3D-5 CSP · INV-3D-6 perf) — standart-önce/worker-judge akışıyla
 
 ---
 
