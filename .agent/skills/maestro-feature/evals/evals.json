@@ -1,0 +1,30 @@
+{
+  "should_trigger": [
+    "delegasyon",
+    "multi-agent run",
+    "sprint start",
+    "yeni özellik kur",
+    "maestro-feature",
+    "delegasyon ile yeni stripe entegrasyonunu başlatalım",
+    "multi-agent run koşturarak otonom takım kuralım",
+    "sprint start: veritabanı migration ve RLS kurallarını hazırlayalım",
+    "yeni özellik kur: SaaS multi-tenancy desteği",
+    "maestro-feature kullanarak fatura modülü geliştirelim",
+    "can you initiate a maestro-feature run for category pages?",
+    "yeni özellik kur komutu ile dashboard grafiklerini entegre et",
+    "sprint start diyerek subagent ekibiyle kodlamaya başla",
+    "delegasyon yaparak test geliştirici ve hakem ajanları spawn et"
+  ],
+  "should_not_trigger": [
+    "parçala böl yönet ile sayfaları DataTableKit'e göç et",
+    "paralel göç başlat",
+    "dalga halinde göç ile formları taşı",
+    "git branch oluştur",
+    "vitest ile birim testleri çalıştır",
+    "font stilini değiştir",
+    "veritabanı tablosu oluştur",
+    "lighthouse performansı ölç",
+    "bug-fix yap",
+    "explain how this class works"
+  ]
+}

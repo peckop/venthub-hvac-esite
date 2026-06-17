@@ -1,14 +1,14 @@
 ---
-name: parallel-code-mutation
-description: Executes a multi-agent parallel code transformation or refactoring campaign (e.g. i18n migrations, TypeScript typings, styling upgrades) on disjoint files using a deterministic count seed, mapping mutations to parallel blind subagents that return structured JSON deltas, merging them centrally, and validating outcomes via a multi-stage deterministic gate.
+name: maestro-combine
+description: Coordinates parallel code changes from disjoint files and combines them centrally using JSON deltas to prevent Git merge conflicts on shared central files (maestro-combine, paralel birleştirme, PMCM).
 category: orchestration
 metadata:
   triggers:
-    - paralel mutasyon başlat
-    - kod dönüştürme kampanyası
-    - parallel code mutation
+    - paralel birleştirme
+    - çakışmasız birleştirme
+    - maestro-combine
+    - parallel combine changes
     - PMCM orkestrasyonu
-    - parallel refactoring campaign
   inputs:
     - target-files
     - seed-command
@@ -27,7 +27,7 @@ run_last: false
 exclusions: []
 ---
 
-# Parallel Code Mutation & Central Merge (PMCM) Skill
+# maestro-combine — Paralel Çakışmasız Değişiklik Birleştirme (PMCM) Skill
 
 This skill defines a robust, conflict-free, multi-agent refactoring methodology. It coordinates parallel code mutations across multiple files without creating Git merge conflicts on shared central files (like routes, dictionary index files, type indices, or style sheets).
 

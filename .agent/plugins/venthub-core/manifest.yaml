@@ -8,17 +8,47 @@ rules:
   critical_asset_protection: true
 skills:
   orchestration:
-  - name: enterprise-multiagent
-    path: .agent/skills/enterprise-multiagent/SKILL.md
+  - name: maestro-combine
+    path: .agent/skills/maestro-combine/SKILL.md
+    description: Coordinates parallel code changes from disjoint files and combines
+      them centrally using JSON deltas to prevent Git merge conflicts on shared central
+      files (maestro-combine, paralel birleştirme, PMCM).
+    triggers_on:
+    - paralel birleştirme
+    - çakışmasız birleştirme
+    - maestro-combine
+    - parallel combine changes
+    - PMCM orkestrasyonu
+    inputs:
+    - target-files
+    - seed-command
+    - worker-prompt-template
+    - merge-rules-or-script
+    - verification-gate-commands
+    outputs:
+    - mutated-files
+    - merged-central-files
+    - gate-verdict
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
+    commands:
+      validate: node -e "const fs = require('fs'); if (!fs.existsSync('scripts/admin-i18n-merger.cjs'))
+        throw new Error('Merge script missing'); console.log('Parallel code mutation
+        ready.');"
+  - name: maestro-feature
+    path: .agent/skills/maestro-feature/SKILL.md
     description: Orchestrates specialized worker-judge multi-agent teams for VentHub
-      HVAC developments complying with strict quality baselines. Trigger when delegating
-      tasks, starting a sprint, or managing multi-agent runs. Do NOT use for database
-      resets, general git branch creation, text formatting, or running unit tests
-      directly.
+      HVAC vertical feature developments (maestro-feature, yeni özellik kur, sprint
+      start, delegasyon, multi-agent run). Do NOT use for database resets, general
+      git branch creation, text formatting, or running unit tests directly.
     triggers_on:
     - delegasyon
     - multi-agent run
     - sprint start
+    - yeni özellik kur
+    - maestro-feature
     inputs:
     - prompt_draft.md
     outputs:
@@ -29,6 +59,38 @@ skills:
     run_last: false
     exclusions:
     - multi-agent-research
+    commands: {}
+  - name: maestro-refactor
+    path: .agent/skills/maestro-refactor/SKILL.md
+    description: 'Orchestrate a large, DIVISIBLE code change — migrating or transforming
+      many files/pages/modules to ONE shared pattern (a kit, hook, component, API,
+      or convention) — as PARALLEL subagent waves with quality gates. Use maestro-refactor
+      whenever a task means applying the SAME structural change across many independent
+      targets: "migrate the N admin pages to the shared table kit", "move every service
+      onto the new client factory", "refactor these 12 modules to the new error API",
+      "convert all forms to the new validation pattern", or any audit-then-fix that
+      spans many files. It runs architect subagents to produce piece-divided plans,
+      then a pipeline of migrate→judge subagents IN PARALLEL (bounded, no network),
+      then the orchestrator (you) centrally verifies (typecheck + lint + test + a11y),
+      fixes, and commits per wave. Reach for maestro-refactor the moment you catch
+      yourself about to do many similar migrations one-by-one yourself — divide and
+      parallelize instead, even when each one is "hard". DO NOT use for a single-file
+      edit, a one-off bug fix, pure read-only scanning, or anything one agent finishes
+      in a couple of steps.'
+    triggers_on:
+    - parçala böl yönet
+    - paralel göç
+    - dalga halinde göç
+    - migrate N pages
+    - çok sayıda dosyayı aynı kalıba taşı
+    - orchestrate migration
+    - maestro-refactor
+    inputs: []
+    outputs: []
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
     commands: {}
   - name: multi-agent-research
     path: .agent/skills/multi-agent-research/SKILL.md
@@ -45,6 +107,30 @@ skills:
     - research query
     outputs:
     - research_notes.md
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
+    commands: {}
+  - name: parallel-file-audit
+    path: .agent/skills/parallel-file-audit/SKILL.md
+    description: Runs a multi-agent parallel audit on a list of files or directories
+      using a deterministic count tool (like ESLint, grep, or AST parsers), mapping
+      analysis to blind subagents, and reducing and validating outputs via a Synthesizer
+      and a rule-driven deterministic Validator.
+    triggers_on:
+    - kör analiz başlat
+    - paralel denetim kur
+    - blind audit
+    - parallel file audit
+    inputs:
+    - target-files
+    - audit-command
+    - json-schema
+    - audit-rules
+    outputs:
+    - synthesized-scope-plan
+    - validator-verdict
     depends_on: []
     next_steps: []
     run_last: false
@@ -182,7 +268,7 @@ skills:
     exclusions: []
     commands: {}
     recovery:
-      on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+      on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
   - name: notebooklm-sync
     path: .agent/skills/notebooklm-sync/SKILL.md
     description: Projedeki Markdown (.md) dosyalarını NotebookLM ile senkronize (nlm
