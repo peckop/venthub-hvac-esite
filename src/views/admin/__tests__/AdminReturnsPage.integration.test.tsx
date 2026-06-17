@@ -42,17 +42,27 @@ const sb = vi.hoisted(() => {
       },
     },
   ]
-  // client-mode / server-mode zinciri
-  const selectChain: any = {
+  // client-mode / server-mode zinciri (self-referans → açık tip; any yok)
+  type Resolved = { data: typeof returnsData; error: null; count?: number }
+  interface SelectChain {
+    eq(): SelectChain
+    in(): SelectChain
+    or(): SelectChain
+    order(): SelectChain
+    range(): Promise<Resolved>
+    limit(): Promise<Resolved>
+    then(onfulfilled: (value: Resolved) => unknown): Promise<unknown>
+  }
+  const selectChain: SelectChain = {
     eq() { return selectChain },
     in() { return selectChain },
     or() { return selectChain },
     order() { return selectChain },
     range() { return Promise.resolve({ data: returnsData, error: null, count: returnsData.length }) },
     limit() { return Promise.resolve({ data: returnsData, error: null }) },
-    then(onfulfilled: any) {
+    then(onfulfilled) {
       return Promise.resolve({ data: returnsData, error: null, count: returnsData.length }).then(onfulfilled)
-    }
+    },
   }
   const updateChain = {
     eq() {

@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\vh-returns\src\i18n\dictionaries\admin\returns.tr.ts
-skeleton_hash: 4a58a2457d78c54a
+source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\returns.tr.ts
+skeleton_hash: 44a92297eaac8348
 entity_hashes:
   overview: f74c60dbdfef5408
-generated_at: 2026-06-17T19:24:46Z
+generated_at: 2026-06-13T18:54:46Z
 ---
 
 ## Genel Bakış
@@ -34,7 +34,7 @@ Bu modül için fonksiyon gövdesi verilmediğinden, spefisifik aksiyom üretile
 ## SABİTLER
 - **returns** (object) — `{
       total: 'Toplam: {{count}} iade talebi yönetiliyor.',
-      subtitle...`
+      subtitle: ...`
 
 ---
 
