@@ -48,23 +48,36 @@ context-loss recovery (A3), prosedürel environment (A2/C1), tenant context. **H
 
 ---
 
-## 3. DALGA 2 — Canvas-sahibi 8 yüzey (PARALEL)
+## 3. DALGA 2 — Canvas-sahibi yüzeyler (triyaj YAPILDI 2026-06-17)
 
-Hepsi environment kazanır → **C1 metal-kararması çözülür**. Her bağımsız dosya **master'dan TAZE dal** (yığma=tangle).
+> **Triyaj sonucu:** plandaki "8 yüzey paralel" YANLIŞ çıktı. CodeGraph `callers` + grep ile doğrulandı —
+> 8 dosya 4 gruba ayrıldı. Ajan filosuna **yalnız TEMİZ grup** gider; aykırılar + park controller'da.
+
+Temiz grup environment kazanır → **C1 metal-kararması çözülür**. Her bağımsız dosya **master'dan TAZE dal** (yığma=tangle).
 Göç edince **INV-3D-2 `LEGACY_RAW_CANVAS` allowlist'inden SİL** (stale-guard zorlar).
 
+### 🟢 TEMİZ — ajan paraleli tam bunlar (düz `<Canvas>` → `<VentHubCanvas>` swap)
 | Dosya | Preset | ⚠️ Özel kontrat |
 |---|---|---|
 | `OrbitalProductsShowcase` | showcase | **frameloop `isInView?'always':'demand'` KORUNUR** (davranış, default değil) |
-| `InfiniteProductsShowcase` | showcase | **frameloop `'always'` KORUNUR** · ⚠️ **sıfır-importer (ölü kod?) → SİL/doğrula** |
 | `CategoryHubOverlay` | nav | overlay açılınca mount |
-| `CategoryCard3D` | nav | ⚠️ **sıfır-importer (ölü kod?) → SİL/doğrula** |
-| `CategorySpotlightScene` | nav | ⚠️ **sıfır-importer (ölü kod?) → SİL/doğrula** |
 | `MegaMenu3DBackground` | nav | dropdown açıkken mount |
-| `ThreeDAuthority` | authority | **CDN `<Environment preset="studio">` → prosedürel 'authority' rig'e** (A2) · click-to-load korunur |
-| `BlueprintCanvas` | (SAPAN) | **ham GLSL `shaderMaterial` (holografik, IBL semantiği YOK)** → preset enum'a SIĞMAZ; ÖNCE oku, 4. preset/override fiyatla |
 
-**Ölü-kod kararı:** 3 sıfır-importer dosya **TAŞINMAZ** — CodeGraph `codegraph_callers` ile doğrula, gerçekten ölüyse SİL (göç kapsamından çıkar).
+> Göç şablonu = **`Product3DViewer`'ın Wave 1 git diff'i** (aynı taşıma zaten yapıldı; ajan birebir kopyalar).
+
+### 🟡 AYKIRI — controller (ben) tasarlar, fleet'e GİTMEZ
+| Dosya | Neden aykırı |
+|---|---|
+| `ThreeDAuthority` | CDN `<Environment preset>` ürün-başına `metadata.config.environment` ile override ediliyor + OrbitControls/ContactShadows/hotspot → taşınır AMA override korunmalı, prosedürel 'authority' rig'e (A2) |
+| `BlueprintCanvas` | kendi holografik GLSL `shaderMaterial`'i; IBL/environment HİÇ kullanmıyor → preset enum'a sığmaz; allowlist'te dokümante-istisna kalsın ya da ayrı kararla |
+
+### ⏸️ PARK — `InfiniteProductsShowcase`
+Sonsuz kayan 3D ürün şeridi. Şu an **sıfır-importer (ölü)** ama BİLİNÇLİ saklandı (kullanıcı kararı 2026-06-17):
+**ana sayfa "öne çıkan ürünler" şeridi adayı.** Silinmedi; allowlist'te "PARK EDİLDİ" işaretli. Yayına
+bağlanınca VentHubCanvas'a göç eder. (İçinde ham TR literal var — i18n göçü de bağlanırken yapılmalı.)
+
+### 🔴 SİLİNDİ (2026-06-17, git'te kurtarılabilir)
+`CategoryCard3D` + `CategorySpotlightScene` — sıfır-importer, yerine geçen var. `.tsx` + `.md` aynaları silindi.
 
 ---
 
