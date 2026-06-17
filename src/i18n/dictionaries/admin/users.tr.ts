@@ -60,12 +60,28 @@ export const users = {
         admins: 'Yönetici Kullanıcılar ({{count}})',
         all: 'Tüm Kullanıcılar ({{count}})'
       },
+      expand: {
+        title: 'Kullanıcı Detayları',
+        id: 'Kullanıcı ID (UUID)',
+        fullName: 'Ad Soyad',
+        phone: 'Telefon',
+        organizationId: 'Organizasyon ID'
+      },
+      bulk: {
+        changeRole: 'Rol Değiştir',
+        selectRole: 'Hedef Rol Seçin',
+        confirm: 'Seçilen {{count}} kullanıcının rolünü "{{role}}" olarak değiştirmek istediğinize emin misiniz?'
+      },
+      export: {
+        csvLabel: 'CSV Olarak Aktar'
+      },
       toasts: {
         adminsLoadFailed: 'Yönetici kullanıcılar yüklenemedi',
         allLoadFailed: 'Kullanıcılar yüklenemedi',
         roleNotUpdated: 'Rol güncellenemedi',
         roleUpdateError: 'Rol güncelleme hatası',
         noPermission: 'Kullanıcı rolleri değiştirme yetkiniz yok.',
-        roleUpdated: 'Kullanıcı rolü "{{role}}" olarak güncellendi'
+        roleUpdated: 'Kullanıcı rolü "{{role}}" olarak güncellendi',
+        bulkRoleUpdated: 'Seçilen {{count}} kullanıcının rolü "{{role}}" olarak güncellendi'
       }
 };

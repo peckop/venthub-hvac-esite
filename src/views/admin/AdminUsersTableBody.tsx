@@ -2,7 +2,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { AlertCircle, Crown, Eye, Package, SearchX, Shield, ShieldCheck, Tag, Users } from 'lucide-react'
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
@@ -12,6 +12,7 @@ import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
+import ExportMenu from '../../components/admin/ExportMenu'
 import { listAdminUsers, setUserAdminRole } from '../../config/admin'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useAuth } from '../../hooks/useAuth'
@@ -68,6 +69,157 @@ const ROLE_BUTTON_TONE: Record<UserRoleCode, string> = {
   sales: 'text-blue-400 hover:bg-blue-400/10 hover:border-blue-400/50',
   viewer: 'text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/50',
   user: 'text-slate-400 hover:bg-white/10 hover:border-white/20',
+}
+
+const ROLE_KEYS: UserRoleCode[] = ['super_admin', 'admin', 'warehouse', 'sales', 'viewer', 'user']
+
+/* ---- lazy genişleyen satır ---- */
+interface UserSpecsRowProps {
+  userRow: UserRow
+}
+
+const UserSpecsRow: React.FC<UserSpecsRowProps> = ({ userRow }) => {
+  const { t } = useI18n()
+  const [profile, setProfile] = useState<{
+    phone?: string | null
+    organization_id?: string | null
+    updated_at?: string | null
+  } | null>(null)
+
+  useEffect(() => {
+    let active = true
+    void (async () => {
+      const { data } = await supabaseBrowserClient
+        .from('user_profiles')
+        .select('phone, organization_id, updated_at')
+        .eq('id', userRow.id)
+        .maybeSingle()
+      if (!active) return
+      if (data) {
+        setProfile(data)
+      } else {
+        setProfile({})
+      }
+    })()
+    return () => {
+      active = false
+    }
+  }, [userRow.id])
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-8 h-0.5 bg-cyan-400" />
+        <h4 className="text-xs font-black text-cyan-400 uppercase tracking-hvac-relaxed">
+          {t('admin.users.expand.title')}
+        </h4>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
+          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+            {t('admin.users.expand.id')}
+          </div>
+          <div className="text-xs font-mono text-slate-200 break-all select-all">{userRow.id}</div>
+        </div>
+
+        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
+          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+            {t('admin.users.expand.fullName')}
+          </div>
+          <div className="text-xs font-black text-slate-200 uppercase">{userRow.full_name || '—'}</div>
+        </div>
+
+        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
+          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+            {t('admin.users.expand.phone')}
+          </div>
+          <div className="text-xs font-black text-slate-200">{profile?.phone || '—'}</div>
+        </div>
+
+        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
+          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+            {t('admin.users.expand.organizationId')}
+          </div>
+          <div className="text-xs font-black text-slate-200">{profile?.organization_id || '—'}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ---- toplu işlem araç çubuğu ---- */
+interface UserBulkActionToolbarProps {
+  selectedCount: number
+  onRoleChange: (role: UserRoleCode) => void
+  onClearSelection: () => void
+}
+
+const UserBulkActionToolbar: React.FC<UserBulkActionToolbarProps> = ({
+  selectedCount,
+  onRoleChange,
+  onClearSelection,
+}) => {
+  const { t } = useI18n()
+  const [showRolePanel, setShowRolePanel] = useState(false)
+
+  if (selectedCount === 0) return null
+
+  return (
+    <div className="sticky bottom-4 z-40 mx-auto max-w-4xl animate-slide-up">
+      <div className="bg-primary-navy text-white rounded-xl shadow-2xl px-5 py-3 flex items-center gap-3 flex-wrap">
+        {/* Selection Info */}
+        <div className="flex items-center gap-2 mr-2">
+          <div className="bg-white/20 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+            {selectedCount}
+          </div>
+          <span className="text-sm font-medium">{t('admin.toolbar.itemsSelected')}</span>
+          <button onClick={onClearSelection} className="text-white/60 hover:text-white text-xs ml-1 underline">
+            {t('admin.toolbar.clear')}
+          </button>
+        </div>
+
+        <div className="h-6 w-px bg-white/20" />
+
+        {/* Change Role Button & Dropdown/Panel */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowRolePanel(!showRolePanel)}
+            className="px-4 py-2 rounded-lg bg-cyan-500/80 hover:bg-cyan-500 text-xs font-black uppercase tracking-wider transition-colors flex items-center gap-2"
+          >
+            <span>{t('admin.users.bulk.changeRole')}</span>
+          </button>
+          {showRolePanel && (
+            <div className="absolute bottom-full mb-2 left-0 bg-surface-deep text-slate-200 rounded-xl shadow-2xl p-4 min-w-240px border border-white/10 glass-strong">
+              <div className="text-xs font-black uppercase tracking-widest mb-3 text-cyan-400">
+                {t('admin.users.bulk.selectRole')}
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {ROLE_KEYS.map((targetRole) => (
+                  <button
+                    key={targetRole}
+                    type="button"
+                    onClick={() => {
+                      onRoleChange(targetRole)
+                      setShowRolePanel(false)
+                    }}
+                    className="flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-slate-300 rounded-xl hover:bg-white/5 hover:text-white text-left transition-colors"
+                  >
+                    <div className="text-slate-400 shrink-0">
+                      {ROLE_BUTTON_ICON[targetRole]}
+                    </div>
+                    <span className="uppercase tracking-widest text-xs">
+                      {t(`roles.${targetRole}`)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
@@ -135,6 +287,10 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
     syncUrl: true,
   })
 
+  const { setFilter } = table.filtering
+  const filters = table.filtering.filters
+  const activeRoles = useMemo(() => filters.role ?? [], [filters.role])
+
   const switchTab = useCallback(
     (next: UsersTab) => {
       if (tabRef.current === next) return
@@ -181,6 +337,73 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
     },
     [hasWriteAccess, t, table],
   )
+
+  /* ---- (b) toplu rol değişimi — UPDATE, mutateWithAudit kapısından ---- */
+  const bulkRoleChange = useCallback(
+    async (newRole: UserRoleCode) => {
+      if (!hasWriteAccess) {
+        toast.error(t('admin.users.toasts.noPermission'))
+        return
+      }
+      const ids = table.selection.selectedIds
+      if (ids.length === 0) return
+      if (!window.confirm(t('admin.users.bulk.confirm', { count: String(ids.length), role: t(`roles.${newRole}`) }))) return
+      try {
+        await mutateWithAudit(supabaseBrowserClient, {
+          resource: 'users',
+          canWrite: hasWriteAccess,
+          action: 'UPDATE',
+          rowPk: null,
+          before: null,
+          after: { role: newRole, ids },
+          auditedByEdge: false,
+          fn: async () => {
+            const results = await Promise.all(
+              ids.map((id) => setUserAdminRole(id, newRole))
+            )
+            const failedIdx = results.findIndex((success) => !success)
+            if (failedIdx !== -1) {
+              throw new Error(`role_update_failed_for_${ids[failedIdx]}`)
+            }
+          },
+        })
+        table.selection.clear()
+        await table.reload()
+        toast.success(t('admin.users.toasts.bulkRoleUpdated', { count: String(ids.length), role: t(`roles.${newRole}`) }))
+      } catch (e) {
+        toast.error(
+          e instanceof AdminPermissionError
+            ? t('admin.users.toasts.noPermission')
+            : t('admin.users.toasts.roleUpdateError'),
+        )
+      }
+    },
+    [hasWriteAccess, t, table],
+  )
+
+  /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
+  const exportCsv = useCallback(async () => {
+    const rows = await table.fetchAllForExport()
+    const cols = ['id', 'email', 'full_name', 'role', 'created_at']
+    const header = cols.join(',')
+    const lines = rows.map((r) =>
+      [
+        r.id,
+        r.email ? `"${r.email.replace(/"/g, '""')}"` : '',
+        r.full_name ? `"${r.full_name.replace(/"/g, '""')}"` : '',
+        r.role,
+        r.created_at || '',
+      ].join(','),
+    )
+    const csv = '\uFEFF' + [header, ...lines].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'users.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [table])
 
   const getRoleIcon = useCallback((roleCode: string) => {
     switch (roleCode) {
@@ -313,6 +536,22 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
     [t, lang, role, user?.id, updatingRole, hasWriteAccess, UserAvatar, getRoleIcon, RoleButton],
   )
 
+  const roleChips = useMemo(
+    () =>
+      ROLE_KEYS.map((r) => ({
+        key: r,
+        label: t(`roles.${r}`),
+        active: activeRoles.includes(r),
+        onToggle: () => {
+          const next = activeRoles.includes(r)
+            ? activeRoles.filter((x) => x !== r)
+            : [...activeRoles, r]
+          setFilter('role', next)
+        },
+      })),
+    [t, activeRoles, setFilter],
+  )
+
   // Sayaç yalnız AKTİF sekme için (kit'in totalMatched'i = yüklü sekme).
   const activeCount = table.totalMatched
 
@@ -381,6 +620,8 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
           />
         }
         columnsButtonLabel={t('admin.users.columnsButton')}
+        expandLabel={t('admin.ui.details')}
+        renderExpandedRow={(r) => <UserSpecsRow userRow={r} />}
         toolbarSlot={
           <AdminToolbar
             storageKey="toolbar:users"
@@ -391,9 +632,28 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
               placeholder: t('admin.users.searchPlaceholder'),
               focusShortcut: '/',
             }}
+            chips={roleChips}
             recordCount={table.totalMatched}
             onClear={table.filtering.clearAll}
+            rightExtra={
+              <div className="flex items-center gap-2">
+                <ExportMenu
+                  items={[
+                    { key: 'csv', label: t('admin.users.export.csvLabel'), onSelect: () => void exportCsv() },
+                  ]}
+                />
+              </div>
+            }
           />
+        }
+        bulkBarSlot={
+          hasWriteAccess ? (
+            <UserBulkActionToolbar
+              selectedCount={table.selection.selectedIds.length}
+              onRoleChange={(targetRole) => void bulkRoleChange(targetRole)}
+              onClearSelection={table.selection.clear}
+            />
+          ) : null
         }
       />
 
