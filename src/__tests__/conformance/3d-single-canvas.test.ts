@@ -32,14 +32,17 @@ const CANVAS_RE = /<Canvas[\s/>]/
 /** Tek izinli ham <Canvas> yeri = merkezi kabuk. */
 const CANONICAL = 'src/components/products/3d/core/VentHubCanvas.tsx'
 
-/** Wave 2-3'te VentHubCanvas'a taşınacak yüzeyler — göç edince buradan SİLİNECEK. */
+/**
+ * Wave 2-3'te VentHubCanvas'a taşınacak yüzeyler — göç edince buradan SİLİNECEK.
+ * PARK notu: InfiniteProductsShowcase şu an hiçbir yerden import EDİLMİYOR (ölü) ama BİLİNÇLİ
+ * saklanıyor — ana sayfa "öne çıkan ürünler" şeridi adayı. Silinmedi; yayına bağlanınca göç eder.
+ * (CategoryCard3D + CategorySpotlightScene 2026-06-17'de ölü-kod olarak SİLİNDİ — git'te durur.)
+ */
 const LEGACY_RAW_CANVAS = new Set<string>([
   'src/components/products/OrbitalProductsShowcase.tsx',
-  'src/components/products/InfiniteProductsShowcase.tsx',
+  'src/components/products/InfiniteProductsShowcase.tsx', // PARK EDİLDİ — ana sayfa adayı, henüz bağlı değil
   'src/components/products/BlueprintCanvas.tsx',
   'src/components/navigation/CategoryHubOverlay.tsx',
-  'src/components/navigation/CategoryCard3D.tsx',
-  'src/components/navigation/CategorySpotlightScene.tsx',
   'src/components/navigation/MegaMenu3DBackground.tsx',
   'src/components/authority/ThreeDAuthority.tsx',
 ])
