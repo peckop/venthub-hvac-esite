@@ -50,7 +50,21 @@ const sb = vi.hoisted(() => {
       return Promise.resolve({ error: null })
     },
   }
+  const channelMock = {
+    on() {
+      return channelMock
+    },
+    subscribe() {
+      return channelMock
+    },
+  }
   const client = {
+    channel() {
+      return channelMock
+    },
+    removeChannel() {
+      return Promise.resolve()
+    },
     from() {
       return {
         select() {
@@ -83,6 +97,9 @@ vi.mock('@/lib/audit', () => ({ logAdminAction: vi.fn().mockResolvedValue(undefi
 vi.mock('@/lib/ensureSessionFresh', () => ({ ensureSessionFresh: () => Promise.resolve() }))
 vi.mock('@/hooks/useRole', () => ({
   useRole: () => ({ canWrite: () => true, canAccess: () => true, isReadOnly: false, role: 'admin', loading: false, roleLoading: false }),
+}))
+vi.mock('@/hooks/useTenant', () => ({
+  useTenant: () => ({ id: 'tenant-test-id', name: 'Test Tenant', subdomain: 'test', custom_domain: null, is_active: true, features: {}, styles: {} }),
 }))
 vi.mock('@/i18n/I18nProvider', () => ({
   useI18n: () => ({ t: (k: string) => k, lang: 'tr' }),

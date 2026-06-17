@@ -54,7 +54,10 @@ export const coupons = {
       validation: {
         codeLength: 'Kupon kodu en az 3 karakter olmalı',
         typeRequired: 'İndirim türü seçilmeli',
-        valuePositive: 'Değer sıfırdan büyük olmalı'
+        valuePositive: 'Değer sıfırdan büyük olmalı',
+        limitPositive: 'Kullanım limiti sıfırdan büyük olmalıdır',
+        percentLimit: 'Yüzde indirim değeri 100\'den büyük olamaz',
+        dateRange: 'Bitiş tarihi başlangıç tarihinden sonra olmalıdır'
       },
       emptyTitle: 'Kupon bulunamadı',
       emptyDescription: 'Henüz hiç kupon oluşturulmadı. İlk kuponunuzu oluşturarak başlayın.',
