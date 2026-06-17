@@ -1,5 +1,19 @@
 # Changelog
 
+### [2026-06-17] Admin Cetvel Re-Score · Doküman Konsolidasyonu · Revize Yol Haritası (Admin-Önce, Bayi-Son)
+
+**Özet:** Admin paneli DataTableKit göçü + i18n sonrası §8 cetveline 6 paralel ajanla yeniden ölçüldü (~%40→%63, ilk kez 3 "keep"). Enterprise kapsam-açığı (komut paleti / rol-editörü / çeviri-UI / rapor-builder vb.) NLM + CodeGraph ile çıkarılıp `admin-capabilities.md §4.5`'e tek-SSOT olarak gömüldü; mükerrer öneri dosyası silindi. Sıralama kararı revize edildi: **admin paneli (temel) + yeni özellikler + müşteri-UX ÖNCE, bayi modülü EN SON.**
+
+**Değişiklik Kapsamı (yalnız doküman — kod değişikliği yok):**
+- **Admin cetvel re-score:** `docs/audits/admin-cetvel-scores-2026-06-17.md` — 19 sayfa, dosya:satır kanıtlı; 3 keep (Products %94 / Movements %93 / ErrorGroups %92), 3 rewrite hâlâ açık (Inventory / Settings / WebhookEvents).
+- **Doc konsolidasyonu:** `admin-capabilities.md` = tek "NE olmalı" SSOT (§4.5 enterprise açık registry: N1-N4 HİÇ YOK + E1-E10 embriyon); `admin-feature-recommendations-2026-06-17.md` foldlanıp silindi (disk + twin).
+- **Revize yol haritası (admin-önce, bayi-son):** enterprise admin shell → yeni admin özellikleri → müşteri-hesap standardı + cetvel → bayi R1-B2 (son). `dealer-pivot-decision`'ı tersine çevirir (`DURUM-TAKIP.md`).
+- **Tespitler:** `AdminDashboardPage` SalesChart hâlâ dummy veri (`:60-67`) + rota `ssr:false`; README tenant "%100 sızdırmaz" fazla-iddiası gerçekle hizalandı (izolasyon enforce edilmedi → R4).
+
+**Doğrulama:** Twin'e `admin-capabilities` + `admin-cetvel-scores-2026-06-17` source_add + query-doğrulandı.
+
+---
+
 ### [2026-06-15] i18n RSC Düzeltmesi · Kategori-i18n Teşhisi · SEO + Analytics Strateji Dokümanları
 
 **Özet:** Anasayfa production build'ini kıran bir RSC sınır ihlali giderildi; TR sayfada kategori adlarının İngilizce sızması teşhis edildi; ve go-live için iki eksik strateji dokümanı (SEO geçişi, analytics ölçüm) mühürlendi.

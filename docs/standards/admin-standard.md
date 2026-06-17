@@ -311,3 +311,81 @@ eklenince RAG ile "X sayfası standarda uyuyor mu?" sorulabilir.
 
 *Kaynak: 5 otorite (Refine/Polaris/Medusa/Saleor/shadcn-admin) paralel araştırma → VentHub mevcut yapısına
 uyarlandı. Strateji: memory `standard-first-strategy`, boru hattı `knowledge-infra-pipeline`.*
+
+---
+
+## 10. Admin Shell Standardı (komut paleti + global arama + navigasyon + klavye)
+
+> **Bu bölüm neyi standartlaştırır?** Her admin sayfasının içine oturduğu **kabuğu (shell):** üst-bar, sol-nav,
+> komut paleti (⌘K), global arama, klavye sistemi. §1-§8 *sayfaların* standardıydı; **§10 *çerçevenin*.**
+> **Kaynaklar:** cmdk/kbar · Linear · Vercel Dashboard · Stripe Dashboard · Raycast · Shopify Polaris (top-bar+nav).
+> Yakınsama: dünya-standardı admin'ler arama + komut + navigasyonu **tek klavye-öncelikli kabukta** birleştirir.
+> İlgili yetenek açığı: `admin-capabilities.md §4.5` (E1/E2/E8). Bu = onların **NASIL'ı**.
+
+### S-Kanunları (shell — pazarlık konusu değil)
+
+| # | Kanun | Sade açıklama |
+|---|---|---|
+| **S1** | **Tek kaynak/komut registry (SSOT)** | Nav öğeleri + aranabilir kaynaklar + hızlı aksiyonlar **tek listeden**. Sidebar + komut paleti aynı registry'yi tüketir → **kopya nav listesi yasak.** |
+| **S2** | **Komut paleti = federe + klavye-öncelikli** | ⌘K her yerden; **tüm kaynaklarda** arar (sipariş/ürün/iade/bayi…); gruplu sonuç; navigasyon **ve** aksiyon; RBAC-scoped; tenant-safe. |
+| **S3** | **Global arama typeahead** | Debounced (≥250ms), ranked, kaynağa göre gruplu; Enter → detaya deep-link; yükleniyor/sonuç/boş/hata durumları ilan edilir. |
+| **S4** | **Klavye-öncelikli + tutarlı** | ⌘K (palet), `/` (arama focus), oklar (gez), Enter (seç), Esc (kapat). Power-user kısayolu (`g o`=orders) opsiyonel ama **tutarlı + keşfedilebilir** (palet footer'ında gösterilir). |
+| **S5** | **Modern nav kabuğu** | Gruplu + **RBAC-filtreli** sidebar (aktif-durum, collapse, mobil drawer) + üst-bar (arama girişi, bildirim, kullanıcı). Responsive; her sayfa bu kabuğa oturur. |
+
+### 10.1 Komut paleti anatomisi (S2)
+- **Giriş:** ⌘/Ctrl+K her admin sayfasından; üst-bar arama kutusu da paleti açar.
+- **Federe arama:** erişilebilir + aranabilir kaynakların searcher'ları **paralel** (`Promise.allSettled`); bir kaynak patlarsa diğerleri görünür.
+- **Sonuç modeli:** `{ resourceKey, id, title, subtitle?, route }`; kaynağa göre gruplu başlık.
+- **Aksiyonlar:** navigasyon + (yetkiye bağlı) hızlı-create ("Yeni ürün"), opsiyonel tema/çıkış.
+- **RBAC:** yalnız `canAccess` kaynaklar listelenir/aranır; aksiyon `canWrite`'a bağlı.
+
+### 10.2 Searcher sözleşmesi (S1+S2)
+- **DI:** `(supabase, query, limit) => Promise<CommandResult[]>`; modül-düzeyi statik client importu yasak.
+- **Mükerrerlik YASAĞI:** var olan servis fonksiyonunu (ör. `adminSearchProducts`) **yeniden kullan**; sıfırdan kopya sorgu yazma.
+- **Tenant-safe:** RLS-korumalı client; `service_role` bypass yasak.
+
+### 10.3 Navigasyon kabuğu (S5)
+- Sidebar grupları + öğeleri **registry'den** (S1); aktif = route eşleşmesi; RBAC-filtreli.
+- Üst-bar: marka + global arama girişi (⌘K ipucu) + bildirim (E2) + kullanıcı menüsü.
+- Mobil: drawer; a11y: `<nav>` + `aria-current="page"`; her interaktif öğede focus-visible.
+
+### 10.4 Shell Uygunluk Kontrol Listesi (CETVEL — ölçüm aracı) · Skor = ✓ / 17
+- [ ] S1 Tek registry; sidebar + palet aynı kaynaktan (kopya nav yok) **[kbar]**
+- [ ] S2 ⌘K her admin sayfasından **açar ve kapatır** **[Linear]**
+- [ ] S2 Palet ≥6 kaynakta federe arar (paralel, `allSettled`)
+- [ ] S2 Sonuçlar kaynağa göre **gruplu + ranked** **[Stripe]**
+- [ ] S2 **Bağlam-duyarlı sıralama** (açıldığı görünüme göre ilgili önce) **[Linear]**
+- [ ] S2 Navigasyon **+ aksiyon** (yalnız nav değil) **[Raycast/kbar]**
+- [ ] S2 RBAC-scoped (yetkisiz kaynak listelenmez)
+- [ ] S2 Tenant-safe searcher (RLS-client, `service_role` yok)
+- [ ] S3 Debounced typeahead + 4 durum (yükleniyor/sonuç/boş/hata) **[cmdk]**
+- [ ] S3 **Boşken recent/öneri** gösterilir **[Stripe]**
+- [ ] S3 Enter → detaya deep-link; (ops.) güç-sözdizimi `is:`/alan:değer **[Stripe]**
+- [ ] S4 ⌘K / `/` / ok / Enter / Esc + `?` yardım + (ops.) `g`-önek go-to **[Linear]**
+- [ ] S5 Sidebar RBAC-filtreli + aktif-durum (`selected`) **[Polaris]**
+- [ ] S5 Üst-bar: arama + bildirim + kullanıcı — **global nav DEĞİL** (nav ayrı) **[Polaris]**
+- [ ] S5 Responsive (mobil drawer / `showNavigationToggle`) **[Polaris]**
+- [ ] S2 **Minimal yüzey** — iş bitince kapanır, odak görevde **[Raycast]**
+- [ ] a11y: palet `combobox`/`aria-activedescendant`, nav `aria-current`, **axe-0** **[cmdk/WAI-ARIA]**
+
+> §6 çapraz-kesen zorunluluklar (DI, i18n-fallback-yok, design token, a11y, tenant-scope) bu kabuğun **da** üstüne oturur. "Refactor mı rewrite mı" yerine burada soru: kabuk bu **17 maddeyi** karşılıyor mu?
+
+### 10.5 Provenance (§10 neye dayanıyor — §9 gibi, gerçek kaynaktan)
+
+| Kaynak | Ne kanıtladı (dokümante / koddan) | Tür |
+|---|---|---|
+| **cmdk** (pacocoursey/cmdk, Vercel) | Headless composable combobox (`Command/Input/List/Group/Item/Empty`); `filter(value,search,keywords)→skor` sözleşmesi; erişilebilir combobox a11y; `Command.Loading`/async; nested "pages"; açılış kısayolunu KASITLI uygulamaya bırakır | D |
+| **kbar** | Veri-merkezli **action registry** (`id/name/shortcut/keywords/section/priority/perform/parent`); `useRegisterActions` ile **async/dinamik kayıt** (`#`→issue, `@`→user); section+Priority sıralama; shortcut dizileri (`g i`); virtualized results | D |
+| **Stripe Dashboard** | Federe arama **tipe-göre-gruplu + ranked**; güç-kullanıcı sözdizimi (`is:` / alan:değer / aralık / negasyon), URL-encoded (paylaşılabilir); sidebar grupları (Primary/Shortcuts/Products/Settings); `?` kısayol listesi | D |
+| **Shopify Polaris** | **Frame** kabuk iskeleti; **TopBar ≠ global nav** (TopBar = arama + kullanıcı menüsü; global nav AYRI `Navigation`); `Navigation.Section`/`selected`/`showNavigationToggle`; WCAG 2.0 kontrast | D |
+| **Linear** | ⌘K **açar VE kapatır**; **bağlam-duyarlı** komut sıralaması (açıldığı görünüme göre); `g`-önek go-to (`g i`/`g p`); `?` yardım | D |
+| **Raycast** | Search-then-act tek yüzey; **minimal** — hotkey'le gelir, iş bitince kaybolur; Action Panel (⌘K) | D |
+| Combobox/listbox ARIA + boş-state recent/öneri | WAI-ARIA combobox pattern + yaygın palet deseni | GP |
+
+> **D = resmi doküman/koddan doğrulandı · GP = genel-iyi-pratik (tek otorite açık spec'lemiyor).** Araştırma: 2026-06-17, 2 paralel ajan, context7 + GitHub repo + resmi UX dokümanları. Erişilemeyen kaynaklar (Mobbin 403, bazı Linear sayfaları 404) yerine erişilebilen resmi kaynaklardan doğrulandı; üçüncü-taraf shortcut sitelerine dayanılmadı.
+>
+> **Bu provenance ışığında eklenen/sağlamlaşan yasalar:** TopBar≠global-nav (Polaris) → S5'te netleşti · arama sözdizimi `is:`/alan:değer (Stripe) → S3 güç-kullanıcı maddesi · bağlam-duyarlı sıralama + `g`-önek (Linear) → S2/S4 · minimal-kaybolan yüzey (Raycast) → S2 · action-registry+section/priority (kbar) → S1 · headless combobox+filter sözleşmesi (cmdk) → 10.2.
+
+---
+
+*§10 = **sentez değil, kaynaktan**: cmdk + kbar (kütüphane API/kod) + Stripe/Polaris/Linear/Raycast (resmi UX dokümanı), 2026-06-17 araştırması. Yetenek açığı `admin-capabilities.md §4.5`; uygulama brief'i `docs/plans/admin-shell-e1-command-palette-brief.md` bu cetvele uyar.*

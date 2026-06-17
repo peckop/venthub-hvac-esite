@@ -73,6 +73,49 @@ DoD'si için şart değil.
 
 ---
 
+## 4.5 Enterprise admin-platform yetenekleri — dünya standardı, bizde yok/embriyon
+
+> **Kaynak/karar:** Shopify · Stripe · Linear · Vercel · Retool · Medusa · Saleor enterprise admin desenleri
+> → NLM ikiz **kapsam-açığı denetimi** → **CodeGraph mevcut-durum doğrulaması** (2026-06-17). Bu bölüm,
+> `admin-feature-recommendations-2026-06-17.md`'nin net-new kısmını **tek SSOT** olarak buraya taşır (o dosya
+> silindi — mükerrerdi).
+> **SINIR:** Bunlar platformu enterprise yapan **ikinci kat** — Avensair DoD P0'ı DEĞİL (o = §3 bayi A1-A4).
+> Sıralama: bayi P0 → bunlar. Scope creep panzehiri.
+
+### Grup 1 — HİÇ YOK (CodeGraph-doğrulandı)
+
+| # | Yetenek | Mevcut durum (kanıt) | Neden değerli | Boyut |
+|---|---|---|---|---|
+| **N1** | Özel rol + granüler izin-matrisi editörü | Roller `src/lib/rbac.ts` kod-sabiti (`ROLE_WRITE_ACCESS`, `ADMIN_ROLES`) — UI/şema yok | Avensair "bu temsilci sadece şunu görsün" diyemez | L |
+| **N2** | Uygulama-içi çeviri/lokalizasyon yönetimi | Sadece statik `i18n/dictionaries/admin/{tr,en}.ts` — admin editörü yok | Yeni dil/metin için deploy gerekiyor; i18n'i operasyona açar | M |
+| **N3** | Rapor oluşturucu + kayıtlı/zamanlanmış raporlar | Statik dashboard + CSV export var; kullanıcı-tanımlı şablon/zamanlama yok | "Her Pazartesi şu raporu e-postala" = enterprise standart | L |
+| **N4** | API anahtarı / PAT yönetimi | Sadece edge-fn iç `apiKey` config; admin yüzeyi/tablosu yok | Entegrasyon + SaaS için şart; üret/iptal/scope + audit | M |
+
+### Grup 2 — EMBRİYON (kodda tohum var → dünya-standardına çıkar; en yüksek kaldıraç)
+
+| # | Yetenek | Mevcut (doğrulandı) | Dünya-standardına ne lazım | Boyut |
+|---|---|---|---|---|
+| **E1** | Komut paleti (⌘K) + global federe arama | `components/admin/CommandPalette.tsx` (nav+ürün) | Tüm kaynaklarda (sipariş/iade/bayi/SKU) typeahead + aksiyon | M |
+| **E2** | Aksiyon-alınabilir bildirim inbox'ı | `AdminRealtimeNotifications` (toast) | Atanabilir/okundu/çözüldü merkezi inbox | M |
+| **E3** | Onay / maker-checker iş akışı motoru | sadece deal-reg planı | Eşik-üstü iade/iskonto/cari → çok-seviyeli onay (jenerik) | L |
+| **E4** | Kayıt-başı aktivite zaman-tüneli | global `admin_audit_log` | "Bu siparişe ne oldu" birleşik kronoloji (diff+not+durum) | M |
+| **E5** | Medya/varlık kütüphanesi (DAM) | storage bucket'lar | Merkezi ara/etiketle/yeniden-kullan görsel yönetimi | M |
+| **E6** | Toplu grid editörü | `EditableCell` (tek hücre) | Excel-vari çoklu-satır toplu düzenle/yapıştır | M |
+| **E7** | Impersonation / "şu rol/müşteri gözüyle gör" | bayi masquerade (planlı) | Support için genel impersonation modu | M |
+| **E8** | Klavye-nav sistemi + kısayollar | ⌘K, `/`, Esc | `g+o`/`g+p` power-user navigasyon haritası | S |
+| **E9** | Kayıt-içi dahili not + @bahsetme | sipariş notu | @mention + kayıt-içi işbirliği katmanı | M |
+| **E10** | CSV içe-aktarma sihirbazı | `ProductCsvImport` (katı şablon) | Kolon→şema drag-drop eşleme + önizleme | M |
+
+> **Enterprise admin shell (UI/menü modernizasyonu):** **E1 + E2 + E8 + modern sol-nav** = Linear/Vercel/Stripe
+> hissi. "Menü sistemini yenilikçi bulmuyorum" derdinin doğrudan karşılığı. Görsel yön = **VENTHUB DESIGN SYSTEM**
+> defteri (`a1ca5476-c6c6-42aa-b5b8-3eb565b3f100`). Build edilince her birinin **yapısal kontratı `admin-standard.md`'ye** eklenir (NASIL).
+
+> **Ayrıca bekleyen veri-doğruluk borcu:** AdminDashboardPage `SalesChart` hâlâ **dummy** veri besliyor
+> (`src/views/admin/AdminDashboardPage.tsx:60-67`, "to pass build" yorumu) + rota `ssr:false` (kural 4) →
+> gerçek `venthub_orders` zaman-serisine bağla.
+
+---
+
 ## 5. Avensair-önce yol haritası (sıralı)
 
 > ⚠️ **Bayi modülü sıralaması `dealer-module-blueprint.md §3`'e tabidir:** B1-B2 (panel/seed) ÖNCESİ
