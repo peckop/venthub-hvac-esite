@@ -1,7 +1,7 @@
 # DURUM TAKİP — Canlı Çalışma Panosu
 
 > Tek "neredeyiz?" kaynağı. Daldan dala geçince buraya bak. Her önemli adımda güncellenir.
-> **Son güncelleme: 2026-06-17** — admin cetvel YENİDEN ölçüldü (~%40→%63, 3 keep; `docs/audits/admin-cetvel-scores-2026-06-17.md`); doc konsolidasyonu (`admin-capabilities.md` = tek SSOT, §4.5 enterprise açık registry; mükerrer `admin-feature-recommendations` silindi); ve **yeni sıralama kararı: ADMIN-ÖNCE, BAYİ-SON** (aşağıda).
+> **Son güncelleme: 2026-06-17** — admin cetvel YENİDEN ölçüldü (~%40→%63, 3 keep; `docs/audits/admin-cetvel-scores-2026-06-17.md`); doc konsolidasyonu (`admin-capabilities.md` = tek SSOT, §4.5 enterprise açık registry; mükerrer `admin-feature-recommendations` silindi); ve **yeni sıralama kararı: ADMIN-ÖNCE, BAYİ-SON** (aşağıda); + **standart-önce alt-kararı:** §8 açıkları (3 fake rewrite: Inventory/Settings/Webhook) E1 shell'den ÖNCE dünya-standardına getirilir.
 
 ## 🚦 Şerit Panosu (append-only — her Controller YALNIZ kendi bölümüne yazar)
 
@@ -9,10 +9,10 @@
 > Eş Controller'ın bölümüne **DOKUNMA** — yoksa pano çakışma noktası olur.
 
 ### Controller #1 — admin şeridi
-- **Aktif:** Admin shell E1 (federe komut paleti) + `collaboration-protocol.md` (sahip)
-- **Dal:** `feat/admin-shell` (lokal, push yok)
-- **Kilit dosyalar:** `admin-standard.md §10`, `admin-capabilities.md §4.5`, `collaboration-protocol.md`, `docs/plans/admin-shell-e1-command-palette-brief.md`, `CLAUDE.md` doc-map, bu pano
-- **Durum:** 🟡 E1 brief hazır → worker'a verilmeyi bekliyor
+- **Aktif:** §8 açık-kapatma — 3 fake rewrite (Inventory/Settings/Webhook → §8 kit standardı). **E1 shell SONRAYA kaydı** (standart-önce).
+- **Dal:** `feat/admin-page-rewrites` (worker = Antigravity üretir+push+DURUR; gate+merge = #1) · brief = `docs/plans/admin-page-rewrites-brief.md`
+- **Kilit dosyalar (worker):** `src/views/admin/{AdminInventoryPage,AdminSettingsPage,AdminWebhookEventsPage}.tsx` (+ ilgili TableBody/servis/kit-tüketim) · **DOKUNMA:** diğer admin sayfaları, 3D şeridi, `.agent/skills`
+- **Durum:** 🟡 brief yazıldı → worker'a verilmeyi bekliyor (sonra ben gate: type/lint/test/**build**/§8/INV-*)
 
 ### Controller #2 — 3D şeridi
 - **Aktif:** 3D standartlaştırma — INV-3D-2 **tek-Canvas KİLİTLİ** (allowlist boş); sıradaki = kapsamlı 3D cetveli (standart-önce) + eski borç süpürmesi
@@ -58,14 +58,22 @@
 > dünya-standardı olur; **bayi EN SONA gelir.**
 > ⚠️ **Bu, `dealer-pivot-decision` (bayi-önce / admin-Faz2-atla) kararını TERSİNE çevirir — supersedes.**
 > Bilinen ödün: Avensair geliri geriye kayar (kabul edildi).
+>
+> 🔄 **Alt-karar (2026-06-17, standart-önce):** Yeni özellikle (E1 shell) BAŞLAMAK standart-önce ilkesiyle çelişir
+> ("zayıf/sahte admin üstüne yeni kat"). Önce ÖLÇÜLEN §8 açıkları dünya-standardına getirilir
+> (cetvel = `docs/audits/admin-cetvel-scores-2026-06-17.md`), SONRA shell + yeni özellikler. Sıra buna göre güncellendi (gaps-önce).
 
 | Sıra | İş | Durum | Detay |
 |---|---|---|---|
-| **0** | Takip dosyalarını güncelle (bu pano + README + CHANGELOG) | ⏳ bu oturum | — |
-| **1** | **Enterprise admin shell** — E1 komut paleti federe + E8 klavye-nav + modern sol-nav + E2 bildirim inbox | ⬜ | mevcut `CommandPalette.tsx` + `AdminLayout.tsx` üstüne |
-| **2** | **Yeni admin özellikleri** — N1-N4 (rol-editörü/çeviri-UI/rapor-builder/API-key) + E3-E10 + dashboard-dummy düzelt | ⬜ | `admin-capabilities.md §4.5` |
-| **3** | **Müşteri-hesap standardı + cetvel + en zayıf yüzeyleri düzelt** (profil/adres/sipariş self-service) | ⬜ | önce `customer-account-standard.md`, sonra ölç→düzelt |
-| **4** | **Bayi R1→B2 — EN SON** (artık altyapı = dünya-standardı admin) | ⬜ | R0 dosya hazır; tablo aşağıda |
+| **0** | Takip dosyalarını güncelle (bu pano + brief) | ✅ bu oturum | — |
+| **1** | **§8 AÇIK-KAPATMA — admin sayfalarını dünya-standardına getir** | ⏳ aktif | gaps-önce; cetvel = `admin-cetvel-scores-2026-06-17.md` |
+| 1a | 3 fake rewrite: Inventory(%21)/Settings(%19)/Webhook(%14) → §8 kit standardı | ⏳ worker'a veriliyor | `feat/admin-page-rewrites` · brief = `docs/plans/admin-page-rewrites-brief.md` |
+| 1b | Dashboard SalesChart dummy → gerçek veri (`AdminDashboardPage.tsx:60-67`) | ⬜ | sonraki batch |
+| 1c | Son-metre kit-config sweep (faceted/CSV-export/rowHref/bulk — 11 refactor sayfa) | ⬜ | mekanik, sayfa-başı küçük |
+| **2** | **Enterprise admin shell** — E1 federe komut paleti + E8 klavye-nav + sol-nav + E2 inbox | ⬜ | brief HAZIR (master) → §8 sonrası |
+| **3** | **Yeni admin özellikleri** — N1-N4 (rol-editörü/çeviri-UI/rapor-builder/API-key) + E3-E10 | ⬜ | `admin-capabilities.md §4.5` |
+| **4** | **Müşteri-hesap standardı + cetvel + en zayıf yüzeyleri düzelt** (profil/adres/sipariş self-service) | ⬜ | önce `customer-account-standard.md`, sonra ölç→düzelt |
+| **5** | **Bayi R1→B2 — EN SON** (artık altyapı = dünya-standardı admin) | ⬜ | R0 dosya hazır; tablo aşağıda |
 
 ---
 
