@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-16T13:31:09.523971+00:00
+compiled_at: 2026-06-17T09:48:39.999343+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-16T13:31:09.523971+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -25,6 +25,9 @@ Bu belge, otonom derleyici tarafından 2026-06-16T13:31:09.523971+00:00 tarihind
 ├── ⚠️ `TEST_READY.md`
 ├── ⚪ `VISION.md`
 ├── 📂 **cache/**
+├── 📂 **design-system/**
+│   └── 📂 **venthub-hvac/**
+│       └── 📂 **pages/**
 ├── 📂 **docs/**
 │   ├── ⚪ `DURUM-TAKIP.md`
 │   ├── ⚪ `README.md`
@@ -44,14 +47,19 @@ Bu belge, otonom derleyici tarafından 2026-06-16T13:31:09.523971+00:00 tarihind
 │   │   ├── ⚪ `plan-and-tasklist.md`
 │   │   └── ⚪ `project_state_and_skills_audit.md`
 │   ├── 📂 **audits/**
+│   │   ├── ⚪ `3d-surfaces-audit-2026-06-16.md`
 │   │   ├── ⚪ `admin-cetvel-scores-2026-06-13.md`
+│   │   ├── ⚪ `admin-cetvel-scores-2026-06-17.md`
 │   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
 │   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
 │   │   ├── ⚪ `legal-i18n-scope-antigravity-2026-06-16.md`
 │   │   └── ⚪ `lighthouse_diagnostic_2026-06-10.md`
 │   ├── ⚪ `database_schema_master.md`
 │   ├── ⚪ `design_system_config.md`
+│   ├── 📂 **legal/**
+│   │   └── ⚪ `en-yasal-ceviri-inceleme-2026-06-16.md`
 │   ├── 📂 **plans/**
+│   │   ├── ⚪ `3d-migration-waves-2026-06-17.md`
 │   │   ├── ⚪ `admin-enterprise-roadmap-2026-06-13.md`
 │   │   ├── ⚪ `avensair-teslim-yol-haritasi-2026-06-15.md`
 │   │   ├── ⚪ `faz0-kit-contract-2026-06-13.md`
@@ -76,6 +84,7 @@ Bu belge, otonom derleyici tarafından 2026-06-16T13:31:09.523971+00:00 tarihind
 │   ├── 📂 **screenshots/**
 │   │   └── ⚪ `README.md`
 │   ├── 📂 **standards/**
+│   │   ├── ⚪ `3d-webgl-standard.md`
 │   │   ├── ⚪ `SOURCES.md`
 │   │   ├── ⚪ `admin-capabilities.md`
 │   │   ├── ⚪ `admin-standard.md`
@@ -374,9 +383,7 @@ Bu belge, otonom derleyici tarafından 2026-06-16T13:31:09.523971+00:00 tarihind
 │   │   │   └── ✅ `PageShell.tsx`
 │   │   ├── 📂 **navigation/**
 │   │   │   ├── ✅ `Breadcrumb.tsx`
-│   │   │   ├── ✅ `CategoryCard3D.tsx`
 │   │   │   ├── ✅ `CategoryHubOverlay.tsx`
-│   │   │   ├── ✅ `CategorySpotlightScene.tsx`
 │   │   │   ├── ✅ `EliteMegaMenu.tsx`
 │   │   │   ├── ✅ `MegaMenu3DBackground.tsx`
 │   │   │   ├── ✅ `NavActionButton.tsx`
@@ -394,6 +401,15 @@ Bu belge, otonom derleyici tarafından 2026-06-16T13:31:09.523971+00:00 tarihind
 │   │   │   │   ├── ✅ `FanRenderer.tsx`
 │   │   │   │   ├── ✅ `Product3DViewer.tsx`
 │   │   │   │   ├── ✅ `SmartCenterScale.tsx`
+│   │   │   │   ├── 📂 **core/**
+│   │   │   │   │   ├── ❌ `ContextLossRecovery.tsx`
+│   │   │   │   │   ├── ❌ `ResilientCanvasBoundary.tsx`
+│   │   │   │   │   ├── ❌ `SceneLightingRig.tsx`
+│   │   │   │   │   ├── ❌ `VentHubCanvas.tsx`
+│   │   │   │   │   ├── ❌ `assetRegistry.ts`
+│   │   │   │   │   ├── ❌ `disposeSceneObject.ts`
+│   │   │   │   │   ├── ❌ `tenantScene.tsx`
+│   │   │   │   │   └── ❌ `useDeviceDpr.ts`
 │   │   │   │   ├── 📂 **factory/**
 │   │   │   │   │   ├── ✅ `Assembler.tsx`
 │   │   │   │   │   ├── ✅ `VorticeLineoModel.tsx`
@@ -617,6 +633,7 @@ Bu belge, otonom derleyici tarafından 2026-06-16T13:31:09.523971+00:00 tarihind
 │   │   ├── ✅ `router.ts`
 │   │   ├── ✅ `routes.ts`
 │   │   ├── ✅ `searchHighlight.tsx`
+│   │   ├── ❌ `tenantConstants.ts`
 │   │   ├── ✅ `tenantServer.ts`
 │   │   ├── ✅ `testA11y.tsx`
 │   │   ├── ✅ `type-converters.ts`
@@ -779,7 +796,24 @@ Bu belge, otonom derleyici tarafından 2026-06-16T13:31:09.523971+00:00 tarihind
 ```
 
 ## Eksik Dokümantasyonlar
-Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
+- [ ] `src\components\products\3d\core\ContextLossRecovery.tsx`
+- [ ] `src\components\products\3d\core\ResilientCanvasBoundary.tsx`
+- [ ] `src\components\products\3d\core\SceneLightingRig.tsx`
+- [ ] `src\components\products\3d\core\VentHubCanvas.tsx`
+- [ ] `src\components\products\3d\core\assetRegistry.ts`
+- [ ] `src\components\products\3d\core\disposeSceneObject.ts`
+- [ ] `src\components\products\3d\core\tenantScene.tsx`
+- [ ] `src\components\products\3d\core\useDeviceDpr.ts`
+- [ ] `src\utils\tenantConstants.ts`
+- [ ] `src\components\products\3d\core\ContextLossRecovery.tsx`
+- [ ] `src\components\products\3d\core\ResilientCanvasBoundary.tsx`
+- [ ] `src\components\products\3d\core\SceneLightingRig.tsx`
+- [ ] `src\components\products\3d\core\VentHubCanvas.tsx`
+- [ ] `src\components\products\3d\core\assetRegistry.ts`
+- [ ] `src\components\products\3d\core\disposeSceneObject.ts`
+- [ ] `src\components\products\3d\core\tenantScene.tsx`
+- [ ] `src\components\products\3d\core\useDeviceDpr.ts`
+- [ ] `src\utils\tenantConstants.ts`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
