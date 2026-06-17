@@ -85,4 +85,27 @@ export const categories = {
   engineTitle: 'İçerik Yetki Motoru',
   livePreview: 'Canlı Önizleme',
   waitingForContent: 'İçerik bekleniyor...',
+  toolbar: {
+    allParents: 'Tüm Üst Kategoriler',
+    parentTitle: 'Üst Kategori',
+    allStatuses: 'Tüm Durumlar',
+    statusTitle: 'Durum',
+  },
+  statusLabels: {
+    active: 'Aktif',
+    inactive: 'Pasif',
+  },
+  bulk: {
+    statusConfirm: 'Seçili {count} kategorinin durumunu "{status}" olarak değiştirmek istediğinize emin misiniz?',
+    statusFailed: 'Toplu durum güncellemesi başarısız oldu.',
+    deleteConfirm: 'Seçili {count} kategoriyi silmek istediğinize emin misiniz? Alt kategorileri varsa silinemeyebilir.',
+    deleteFailed: 'Toplu silme işlemi başarısız oldu.',
+    deleteAction: 'Sil',
+    activeAction: 'Aktif Yap',
+    inactiveAction: 'Pasif Yap',
+  },
+  export: {
+    csvLabel: 'CSV Olarak Dışa Aktar',
+  },
 };
+

@@ -85,4 +85,27 @@ export const categories = {
   engineTitle: 'Content Authority Engine',
   livePreview: 'Live Preview',
   waitingForContent: 'Waiting for content...',
+  toolbar: {
+    allParents: 'All Parent Categories',
+    parentTitle: 'Parent Category',
+    allStatuses: 'All Statuses',
+    statusTitle: 'Status',
+  },
+  statusLabels: {
+    active: 'Active',
+    inactive: 'Inactive',
+  },
+  bulk: {
+    statusConfirm: 'Are you sure you want to change the status of the selected {count} categories to "{status}"?',
+    statusFailed: 'Bulk status update failed.',
+    deleteConfirm: 'Are you sure you want to delete the selected {count} categories? They may not be deletable if they have subcategories.',
+    deleteFailed: 'Bulk deletion failed.',
+    deleteAction: 'Delete',
+    activeAction: 'Make Active',
+    inactiveAction: 'Make Inactive',
+  },
+  export: {
+    csvLabel: 'Export as CSV',
+  },
 };
+
