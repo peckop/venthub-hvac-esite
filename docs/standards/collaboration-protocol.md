@@ -80,6 +80,9 @@ iş/brief → Worker üretir → push → DURUR
 
 - **"Worker geçti dedi" ≠ güven.** Controller her zaman diff + kapıyı **kendi** doğrular.
 - Kırmızıysa → aynı dala düzeltme commit'i; **merge YOK**.
+- **Worker "DURUR"u dinlemese de** (ezip geçer, kendi PR'ını açar) güvenlik **talimata** değil **yapıya** dayanır:
+  worker **kendi izole dalında** (master değil) + **master-merge yetkisi worker'da DEĞİL** (branch protection) +
+  Controller gate'i geçmeden master'a hiçbir şey girmez + girdiyse **revert**. Yani "durmaması" felaket değil, sadece gürültü.
 
 ---
 
@@ -88,6 +91,15 @@ iş/brief → Worker üretir → push → DURUR
 - **Kod:** `pnpm type-check` 0 · `pnpm lint` 0 · `pnpm test -- --run` geçer · `pnpm build` yeşil (RSC/prerender sınırı) · axe 0
 - **+ İşin cetveli:** admin sayfası → `admin-standard.md §8` · admin shell → `§10.4` · (yeni domain → kendi standardı)
 - Cetvel eşiği **brief'te yazılı** (ör. §10.4 ≥ 15/17). Brief = ilgili standardın uygulama izdüşümü.
+
+**Kuralları-zorlayan testler (INV-*, `src/__tests__/conformance/`) — ayrı değil, `pnpm test` ile koşar:**
+bu cetvelin "geriye-denetleyen + geleceği-kilitleyen" ayağıdır (`standard-plus-enforcing-test-is-control`).
+İş bu kuralı zorluyorsa kapı bunları görür:
+- **INV-2** `localized-route-ssot` — yol localize SSOT. ⚠️ **`/admin` rotaları dil-önekinden MUAF** (admin istisnası).
+- **INV-5** `i18n-key-resolution` — her statik `t('a.b')` **namespaced (≥2 segment)** + sözlükte çözülmeli; düz-anahtar-içi-nokta (`t('table.x')`) sessiz ham-key render = YASAK.
+- `category-*-ssot` · `numeric-format-ssot` · `legal-en-leftover` · `3d-single-canvas`/`asset`/`procedural-env` (ilgili şeritlerde).
+- **DI** (servis/searcher ilk-param `supabase`, modül-düzeyi client importu yok) = `pnpm lint` (`no-restricted-imports`) zorlar.
+> Yeni page-crash/SSOT sınıfı bulgu → yeni bir **INV-*** test'ine terfi eder (kalıcı bekçi olur).
 
 ---
 

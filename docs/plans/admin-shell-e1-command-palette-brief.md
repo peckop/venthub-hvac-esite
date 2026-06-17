@@ -85,6 +85,8 @@ export type AdminSearcher =
 
 ## 6. i18n & a11y
 - **i18n:** Tüm metin sözlükten (`admin.menu.*`, `admin.search.*`, `admin.ui.*`); `_t('x') || 'Fallback'` ve hardcoded string YASAK; **TR/EN parite** zorunlu (keycheck geçer).
+- **INV-5 (`i18n-key-resolution`) zorlar:** her statik `t('a.b')` **namespaced (≥2 segment)** + sözlükte çözülmeli; **düz-anahtar-içi-nokta** (`t('search.table.x')` gibi nested olmayan) sessiz ham-key render eder → YASAK. (`pnpm test` ile koşar; tsc/lint/build YAKALAMAZ.)
+- **INV-2 (`localized-route-ssot`) — admin istisnası:** `/admin` rotaları **dil-öneki ALMAZ**; palet `router.push('/admin/...')` yapar, **localize ETME** (`useLocalizedRoutes`/`localizedHref` admin'de gerekmez, yanlış kullanım INV-2'yi tetiklemez ama tutarsızlık yaratır).
 - **a11y:** Palet `role="combobox"`/`listbox` + `aria-activedescendant` + `aria-label`; sonuç öğeleri `role="option"`; `focus-visible` halkası; Esc kapatır; focus trap Dialog'da. **axe = 0 ihlal.**
 
 ## 7. Kısıtlar (VentHub mutlak kuralları — ihlal = ret)
