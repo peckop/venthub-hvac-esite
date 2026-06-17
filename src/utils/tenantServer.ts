@@ -3,6 +3,8 @@ import { cache } from 'react';
 
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static';
 
+import { DEFAULT_TENANT_ID } from './tenantConstants';
+
 export interface TenantConfig {
   id: string;
   name: string;
@@ -23,7 +25,7 @@ export interface TenantConfig {
   };
 }
 
-export const DEFAULT_TENANT_ID = 'd3b07384-d113-495f-a558-8c38634e0000';
+export { DEFAULT_TENANT_ID };
 
 export const DEFAULT_TENANT_CONFIG: TenantConfig = {
   id: DEFAULT_TENANT_ID,
