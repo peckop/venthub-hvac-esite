@@ -1,10 +1,17 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
-import React, { useMemo,useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import type { Group } from 'three'
-import { ExtrudeGeometry,Shape } from 'three'
+import {
+    BoxGeometry,
+    CircleGeometry,
+    CylinderGeometry,
+    ExtrudeGeometry,
+    RingGeometry,
+    Shape
+} from 'three'
 
-import { useFanMaterials } from '../materials/useFanMaterials'
+import { useResolveMaterials } from '../core'
 import { Silencer } from '../parts/Silencer'
 
 interface AxialFanModelProps {
@@ -18,7 +25,7 @@ export function AxialFanModel({
     silencerRadius = 0.58,
     silencerLength = 0.7
 }: AxialFanModelProps) {
-    const materials = useFanMaterials()
+    const materials = useResolveMaterials()
     const fanRef = useRef<Group>(null)
 
     // BVN REFERENCE STYLE REDESIGN
@@ -54,6 +61,52 @@ export function AxialFanModel({
         return new ExtrudeGeometry(shape, extrudeSettings)
     }, [])
 
+    const casingGeometry = useMemo(() => new CylinderGeometry(0.55, 0.55, 0.5, 64, 1, true), [])
+    const flangeGeometry = useMemo(() => new RingGeometry(0.55, 0.60, 64), [])
+    const hubGeometry = useMemo(() => new CylinderGeometry(0.16, 0.16, 0.06, 32), [])
+    const logoGeometry = useMemo(() => new CircleGeometry(0.08, 32), [])
+    const motorGeometry = useMemo(() => new CylinderGeometry(0.18, 0.18, 0.25, 32), [])
+    const motorFootGeometry = useMemo(() => new BoxGeometry(0.04, 0.25, 0.02), [])
+
+    const concentricRingGeometries = useMemo(() => {
+        return Array(8).fill(0).map((_, i) => {
+            const r = 0.1 + (i * 0.065)
+            return new RingGeometry(r, r + 0.008, 64)
+        })
+    }, [])
+
+    const radialWireGeometry = useMemo(() => new BoxGeometry(1.1, 0.008, 0.005), [])
+    const klemensBoxGeometry = useMemo(() => new BoxGeometry(0.12, 0.15, 0.08), [])
+    const klemensCylinderGeometry = useMemo(() => new CylinderGeometry(0.015, 0.015, 0.04, 8), [])
+
+    useEffect(() => {
+        return () => {
+            bladeGeometry.dispose()
+            casingGeometry.dispose()
+            flangeGeometry.dispose()
+            hubGeometry.dispose()
+            logoGeometry.dispose()
+            motorGeometry.dispose()
+            motorFootGeometry.dispose()
+            concentricRingGeometries.forEach((geo) => geo.dispose())
+            radialWireGeometry.dispose()
+            klemensBoxGeometry.dispose()
+            klemensCylinderGeometry.dispose()
+        }
+    }, [
+        bladeGeometry,
+        casingGeometry,
+        flangeGeometry,
+        hubGeometry,
+        logoGeometry,
+        motorGeometry,
+        motorFootGeometry,
+        concentricRingGeometries,
+        radialWireGeometry,
+        klemensBoxGeometry,
+        klemensCylinderGeometry
+    ])
+
     return (
         <group position={[0, 0, 0]} scale={[0.85, 0.85, 0.85]} rotation={[0, -Math.PI / 4, 0]}>
 
@@ -70,17 +123,12 @@ export function AxialFanModel({
 
             {/* 1. SİLİNDİRİK KOVAN (Black Casing) */}
             <group rotation={[Math.PI / 2, 0, 0]}>
-                <mesh material={materials.glossyBlack}>
-                    <cylinderGeometry args={[0.55, 0.55, 0.5, 64, 1, true]} />
-                </mesh>
+                <mesh material={materials.glossyBlack} geometry={casingGeometry} />
 
                 {/* Ön ve Arka Flanşlar (Kıvrımlar) */}
                 {[0.25, -0.25].map((y, i) => (
                     <group key={i} position={[0, y, 0]}>
-                        <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.glossyBlack}>
-                            {/* Dışa doğru genişleyen flanş */}
-                            <ringGeometry args={[0.55, 0.60, 64]} />
-                        </mesh>
+                        <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.glossyBlack} geometry={flangeGeometry} />
                     </group>
                 ))}
             </group>
@@ -91,14 +139,10 @@ export function AxialFanModel({
                 {/* --- PERVANE GRUBU (Dönen Kısım) --- */}
                 <group ref={fanRef} position={[0, 0, 0.05]}>
                     {/* Pervane Göbeği (Siyah) */}
-                    <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.bladeBlack}>
-                        <cylinderGeometry args={[0.16, 0.16, 0.06, 32]} />
-                    </mesh>
+                    <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.bladeBlack} geometry={hubGeometry} />
 
                     {/* Marka Logosu (Kırmızı Daire) */}
-                    <mesh position={[0, 0, 0.031]} rotation={[Math.PI / 2, 0, 0]} material={materials.logoRed}>
-                        <circleGeometry args={[0.08, 32]} />
-                    </mesh>
+                    <mesh position={[0, 0, 0.031]} rotation={[Math.PI / 2, 0, 0]} material={materials.logoRed} geometry={logoGeometry} />
 
                     {/* 7 ADET SİYAH ORAK KANAT */}
                     {Array(7).fill(0).map((_, i) => (
@@ -115,14 +159,10 @@ export function AxialFanModel({
 
                 {/* Sabit Motor (Arka) */}
                 <group position={[0, 0, -0.1]}>
-                    <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.glossyBlack}>
-                        <cylinderGeometry args={[0.18, 0.18, 0.25, 32]} />
-                    </mesh>
+                    <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.glossyBlack} geometry={motorGeometry} />
                     {/* Motor Ayakları (3 Kollu) */}
                     {[0, 120, 240].map((angle, i) => (
-                        <mesh key={i} rotation={[0, 0, (angle * Math.PI) / 180]} position={[0, 0.28, 0]} material={materials.glossyBlack}>
-                            <boxGeometry args={[0.04, 0.25, 0.02]} />
-                        </mesh>
+                        <mesh key={i} rotation={[0, 0, (angle * Math.PI) / 180]} position={[0, 0.28, 0]} material={materials.glossyBlack} geometry={motorFootGeometry} />
                     ))}
                 </group>
             </group>
@@ -131,30 +171,19 @@ export function AxialFanModel({
             {/* Resimdeki gibi çok sayıda halka */}
             <group position={[0, 0, 0.26]}>
                 {/* Konsantrik Halkalar (8 Adet) */}
-                {Array(8).fill(0).map((_, i) => {
-                    const r = 0.1 + (i * 0.065) // 0.1'den 0.55'e kadar
-                    return (
-                        <mesh key={`ring-${i}`} material={materials.matteBlack}>
-                            <ringGeometry args={[r, r + 0.008, 64]} />
-                        </mesh>
-                    )
-                })}
+                {Array(8).fill(0).map((_, i) => (
+                    <mesh key={`ring-${i}`} material={materials.matteBlack} geometry={concentricRingGeometries[i]} />
+                ))}
                 {/* Radyal Teller (Haç şeklinde veya yıldız) */}
                 {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, j) => (
-                    <mesh key={`radial-${j}`} rotation={[0, 0, angle * Math.PI / 180]} material={materials.matteBlack}>
-                        <boxGeometry args={[1.1, 0.008, 0.005]} />
-                    </mesh>
+                    <mesh key={`radial-${j}`} rotation={[0, 0, angle * Math.PI / 180]} material={materials.matteBlack} geometry={radialWireGeometry} />
                 ))}
             </group>
 
             {/* 4. KLEMENS KUTUSU (Üstte Siyah) */}
             <group position={[0.4, 0.35, 0.1]} rotation={[0, 0, 0.2]}>
-                <mesh material={materials.glossyBlack}>
-                    <boxGeometry args={[0.12, 0.15, 0.08]} />
-                </mesh>
-                <mesh position={[0, -0.08, 0]} material={materials.glossyBlack}>
-                    <cylinderGeometry args={[0.015, 0.015, 0.04, 8]} />
-                </mesh>
+                <mesh material={materials.glossyBlack} geometry={klemensBoxGeometry} />
+                <mesh position={[0, -0.08, 0]} material={materials.glossyBlack} geometry={klemensCylinderGeometry} />
             </group>
 
         </group>

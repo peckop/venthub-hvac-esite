@@ -11,12 +11,12 @@
    - Phase 37: Pro-level hover highlight, 3D tooltip, useMemo materials
 */
 
-import { Edges,Html, RoundedBox, Text, useCursor } from "@react-three/drei"
-import React, { useMemo, useState } from "react"
+import { Edges, Html, RoundedBox, Text, useCursor } from "@react-three/drei"
+import React, { useEffect, useMemo, useState } from "react"
 import type { Material } from 'three'
-import { Path,Shape } from 'three'
+import { CylinderGeometry, ExtrudeGeometry, Path, PlaneGeometry, Shape, SphereGeometry } from 'three'
 
-import { useFanMaterials } from "../materials/useFanMaterials"
+import { useResolveMaterials } from "../core"
 
 const VORTICE_LABEL = 'VORTICE'
 
@@ -82,21 +82,34 @@ function MountingChassis({ bodyHalfLen, neckLen, neckRad, bRad, material, displa
         return s
     }, [chassisWidth, wallHeight, neckRad])
 
+    // Memoized Geometries
+    const baseGeometry = useMemo(() => new ExtrudeGeometry(baseShape, baseExtrudeSettings), [baseShape, baseExtrudeSettings])
+    const wallGeometry = useMemo(() => new ExtrudeGeometry(wallShape, wallExtrudeSettings), [wallShape, wallExtrudeSettings])
+
+    useEffect(() => {
+        return () => {
+            baseGeometry.dispose()
+        }
+    }, [baseGeometry])
+
+    useEffect(() => {
+        return () => {
+            wallGeometry.dispose()
+        }
+    }, [wallGeometry])
+
     return (
         <group position={[0, -bRad, 0]}>
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, baseThick / 2, 0]} material={material}>
-                <extrudeGeometry args={[baseShape, baseExtrudeSettings]} />
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, baseThick / 2, 0]} material={material} geometry={baseGeometry}>
                 <EdgeOverlay displayStyle={displayStyle} />
             </mesh>
             <group position={[0, 0, wallZ]}>
-                <mesh position={[0, 0, wallThick]} material={material}>
-                    <extrudeGeometry args={[wallShape, wallExtrudeSettings]} />
+                <mesh position={[0, 0, wallThick]} material={material} geometry={wallGeometry}>
                     <EdgeOverlay displayStyle={displayStyle} />
                 </mesh>
             </group>
             <group position={[0, 0, -wallZ]} rotation={[0, Math.PI, 0]}>
-                <mesh position={[0, 0, wallThick]} material={material}>
-                    <extrudeGeometry args={[wallShape, wallExtrudeSettings]} />
+                <mesh position={[0, 0, wallThick]} material={material} geometry={wallGeometry}>
                     <EdgeOverlay displayStyle={displayStyle} />
                 </mesh>
             </group>
@@ -158,7 +171,7 @@ interface SilentChannelFanModelProps {
 }
 
 export function SilentChannelFanModel({ explode = 0, onPartClick, selectedPart, isolatedPart, hiddenParts = [], displayStyle = 'shaded', enableTooltip = false }: SilentChannelFanModelProps) {
-    const materials = useFanMaterials()
+    const materials = useResolveMaterials()
     const [hoveredPart, setHoveredPart] = useState<string | null>(null)
 
     // DIMENSIONS
@@ -170,6 +183,41 @@ export function SilentChannelFanModel({ explode = 0, onPartClick, selectedPart, 
     const phiLimit = Math.asin(sphereEndRad / bRad)
     const naturalHeight = bRad * Math.cos(phiLimit)
     const compensatoryStretch = naturalHeight > 0.01 ? bodyHalfLen / naturalHeight : 1
+
+    // Memoized Geometries
+    const sphereGeometry = useMemo(
+        () => new SphereGeometry(bRad, 64, 32, 0, Math.PI * 2, phiLimit, Math.PI - 2 * phiLimit),
+        [bRad, phiLimit]
+    )
+
+    const cylinderGeometry = useMemo(
+        () => new CylinderGeometry(neckRad - 0.006, neckRad - 0.012, internalAssemblyLen, 64, 1, true),
+        [neckRad, internalAssemblyLen]
+    )
+
+    const planeGeometry = useMemo(
+        () => new PlaneGeometry(0.22, 0.1),
+        []
+    )
+
+    // Clean up VRAM on unmount
+    useEffect(() => {
+        return () => {
+            sphereGeometry.dispose()
+        }
+    }, [sphereGeometry])
+
+    useEffect(() => {
+        return () => {
+            cylinderGeometry.dispose()
+        }
+    }, [cylinderGeometry])
+
+    useEffect(() => {
+        return () => {
+            planeGeometry.dispose()
+        }
+    }, [planeGeometry])
 
     return (
         <group>
@@ -203,8 +251,7 @@ export function SilentChannelFanModel({ explode = 0, onPartClick, selectedPart, 
                 {/* 2. OUTER SHELL */}
                 <InteractivePart name="Dış Gövde (Plastik)" onPartClick={onPartClick} selectedPart={selectedPart} isolatedPart={isolatedPart} hiddenParts={hiddenParts} onHover={setHoveredPart}>
                     <group position={[0, 0, explode * 0.5]}>
-                        <mesh scale={[1, compensatoryStretch, 1]} material={materials.matteBlack}>
-                            <sphereGeometry args={[bRad, 64, 32, 0, Math.PI * 2, phiLimit, Math.PI - 2 * phiLimit]} />
+                        <mesh scale={[1, compensatoryStretch, 1]} material={materials.matteBlack} geometry={sphereGeometry}>
                             <EdgeOverlay displayStyle={displayStyle} />
                         </mesh>
                     </group>
@@ -214,8 +261,7 @@ export function SilentChannelFanModel({ explode = 0, onPartClick, selectedPart, 
                 <group position={[0, explode * 1.5, 0]}>
                     {/* YELLOW INSULATION */}
                     <InteractivePart name="Akustik İzolasyon (Sarı Sünger)" onPartClick={onPartClick} selectedPart={selectedPart} isolatedPart={isolatedPart} hiddenParts={hiddenParts} onHover={setHoveredPart}>
-                        <mesh material={materials.jetOrange}> {/* Using jetOrange as representative for insulation if exact missing */}
-                            <cylinderGeometry args={[neckRad - 0.006, neckRad - 0.012, internalAssemblyLen, 64, 1, true]} />
+                        <mesh material={materials.jetOrange} geometry={cylinderGeometry}> {/* Using jetOrange as representative for insulation if exact missing */}
                             <EdgeOverlay displayStyle={displayStyle} />
                         </mesh>
                     </InteractivePart>
@@ -226,8 +272,7 @@ export function SilentChannelFanModel({ explode = 0, onPartClick, selectedPart, 
                     <group position={[bRad - 0.04 + explode * 0.5, 0, 0]}>
                         {/* BRANDING PLATE */}
                         <group position={[0.03, 0, 0]} rotation={[0, Math.PI / 2, -Math.PI / 2]}>
-                            <mesh material={materials.vorticeGreen}>
-                                <planeGeometry args={[0.22, 0.1]} />
+                            <mesh material={materials.vorticeGreen} geometry={planeGeometry}>
                             </mesh>
                             <Text position={[0, 0, 0.001]} fontSize={0.045} color="#ffffff" anchorX="center" anchorY="middle">{VORTICE_LABEL}</Text>
                         </group>

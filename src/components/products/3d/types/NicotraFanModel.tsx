@@ -1,13 +1,13 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
-import React, { useMemo,useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import type { Group } from 'three'
-import { Path,Shape } from 'three'
+import { Path, Shape, BoxGeometry, CylinderGeometry, ExtrudeGeometry } from 'three'
 
-import { useFanMaterials } from '../materials/useFanMaterials'
+import { useResolveMaterials } from '../core'
 
 export const NicotraFanModel: React.FC = () => {
-    const materials = useFanMaterials()
+    const materials = useResolveMaterials()
     const fanRef = useRef<Group>(null)
 
     // Nicotra Gebhardt DD Serisi - CORRECTED AXIS
@@ -41,19 +41,46 @@ export const NicotraFanModel: React.FC = () => {
         return shape
     }, [])
 
+    const baseFrameGeometry = useMemo(() => new BoxGeometry(1.0, 0.05, 1.0), [])
+    const vibrationMountGeometry = useMemo(() => new BoxGeometry(0.1, 0.05, 0.1), [])
+    const sideShapeGeometry = useMemo(() => new ExtrudeGeometry(sideShape, { depth: 0.02, bevelEnabled: false }), [sideShape])
+    const scrollWrapperGeometry = useMemo(() => new CylinderGeometry(0.6, 0.6, 0.6, 32, 1, true, 0, 4.5), [])
+    const dischargeGeometry = useMemo(() => new BoxGeometry(0.5, 0.02, 0.64), [])
+    const wheelGeometry = useMemo(() => new CylinderGeometry(0.38, 0.38, 0.58, 32, 1, true), [])
+    const bladeGeometry = useMemo(() => new BoxGeometry(0.02, 0.58, 0.1), [])
+    const motorGeometry = useMemo(() => new CylinderGeometry(0.18, 0.18, 0.3, 32), [])
+
+    useEffect(() => {
+        return () => {
+            baseFrameGeometry.dispose()
+            vibrationMountGeometry.dispose()
+            sideShapeGeometry.dispose()
+            scrollWrapperGeometry.dispose()
+            dischargeGeometry.dispose()
+            wheelGeometry.dispose()
+            bladeGeometry.dispose()
+            motorGeometry.dispose()
+        }
+    }, [
+        baseFrameGeometry,
+        vibrationMountGeometry,
+        sideShapeGeometry,
+        scrollWrapperGeometry,
+        dischargeGeometry,
+        wheelGeometry,
+        bladeGeometry,
+        motorGeometry
+    ])
+
     return (
         <group scale={[0.7, 0.7, 0.7]} rotation={[0, Math.PI / 4, 0]}>
 
             {/* 1. X-ŞASİ (Base Frame) */}
             <group position={[0, -0.5, 0]}>
-                <mesh material={materials.galvanizedSteel}>
-                    <boxGeometry args={[1.0, 0.05, 1.0]} />
-                </mesh>
+                <mesh geometry={baseFrameGeometry} material={materials.galvanizedSteel} />
                 {/* Titreşim Takozları */}
                 {[0.4, -0.4].map(x => [0.4, -0.4].map(z => (
-                    <mesh key={`${x}-${z}`} position={[x, -0.05, z]} material={materials.matteBlack}>
-                        <boxGeometry args={[0.1, 0.05, 0.1]} />
-                    </mesh>
+                    <mesh key={`${x}-${z}`} position={[x, -0.05, z]} geometry={vibrationMountGeometry} material={materials.matteBlack} />
                 )))}
             </group>
 
@@ -61,23 +88,15 @@ export const NicotraFanModel: React.FC = () => {
             <group position={[0, 0.2, 0]} rotation={[0, Math.PI / 2, 0]}> {/* Y ekseninde çevir ki X eksenine baksın */}
 
                 {/* Yan Saclar */}
-                <mesh position={[0, 0, 0.3]} material={materials.galvanizedSteel}>
-                    <extrudeGeometry args={[sideShape, { depth: 0.02, bevelEnabled: false }]} />
-                </mesh>
-                <mesh position={[0, 0, -0.32]} material={materials.galvanizedSteel}>
-                    <extrudeGeometry args={[sideShape, { depth: 0.02, bevelEnabled: false }]} />
-                </mesh>
+                <mesh position={[0, 0, 0.3]} geometry={sideShapeGeometry} material={materials.galvanizedSteel} />
+                <mesh position={[0, 0, -0.32]} geometry={sideShapeGeometry} material={materials.galvanizedSteel} />
 
                 {/* Sırt Sacı (Wrapper) - Basit Silindir Parçası */}
-                <mesh rotation={[0, 0, Math.PI / 2]} material={materials.galvanizedSteel}>
-                    <cylinderGeometry args={[0.6, 0.6, 0.6, 32, 1, true, 0, 4.5]} />
-                </mesh>
+                <mesh rotation={[0, 0, Math.PI / 2]} geometry={scrollWrapperGeometry} material={materials.galvanizedSteel} />
 
                 {/* Atış Ağzı */}
                 <group position={[0.4, 0.5, 0]}>
-                    <mesh material={materials.industrialSteel}>
-                        <boxGeometry args={[0.5, 0.02, 0.64]} />
-                    </mesh>
+                    <mesh geometry={dischargeGeometry} material={materials.industrialSteel} />
                 </group>
 
             </group>
@@ -85,28 +104,24 @@ export const NicotraFanModel: React.FC = () => {
             {/* 3. ROTOR (Fan Wheel) - X Ekseninde Dönüyor */}
             <group ref={fanRef} position={[0, 0.2, 0]} rotation={[0, 0, Math.PI / 2]}>
                 {/* Sık Kanatlı Çark */}
-                <mesh material={materials.galvanizedSteel}>
-                    <cylinderGeometry args={[0.38, 0.38, 0.58, 32, 1, true]} />
-                </mesh>
+                <mesh geometry={wheelGeometry} material={materials.galvanizedSteel} />
                 {/* Kanatlar */}
                 {Array(24).fill(0).map((_, i) => (
-                    <mesh key={i} rotation={[0, (i / 24) * Math.PI * 2, 0]} position={[0.36, 0, 0]}>
-                        <boxGeometry args={[0.02, 0.58, 0.1]} />
-                    </mesh>
+                    <mesh
+                        key={i}
+                        rotation={[0, (i / 24) * Math.PI * 2, 0]}
+                        position={[0.36, 0, 0]}
+                        geometry={bladeGeometry}
+                        material={materials.galvanizedSteel}
+                    />
                 ))}
             </group>
 
             {/* 4. MOTOR (Direkt Akuple - Yan Tarafta) */}
             <group position={[-0.6, 0.2, 0]} rotation={[0, 0, Math.PI / 2]}>
-                <mesh material={materials.ral5010}>
-                    <cylinderGeometry args={[0.18, 0.18, 0.3, 32]} />
-                </mesh>
+                <mesh geometry={motorGeometry} material={materials.ral5010} />
             </group>
 
         </group>
     )
 }
-
-
-
-

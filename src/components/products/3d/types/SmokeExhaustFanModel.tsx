@@ -1,13 +1,13 @@
 "use client";
 import { useFrame } from '@react-three/fiber'
-import React, { useMemo,useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import type { Group } from 'three'
-import { ExtrudeGeometry,Shape } from 'three'
+import { BoxGeometry, CylinderGeometry, ExtrudeGeometry, RingGeometry, Shape } from 'three'
 
-import { useFanMaterials } from '../materials/useFanMaterials'
+import { useResolveMaterials } from '../core'
 
 export function SmokeExhaustFanModel() {
-    const materials = useFanMaterials()
+    const materials = useResolveMaterials()
     const rotorRef = useRef<Group>(null)
 
     // DUMAN EGZOZ FANI (MAX FILL UPDATE)
@@ -50,57 +50,81 @@ export function SmokeExhaustFanModel() {
         return new ExtrudeGeometry(shape, extrudeSettings)
     }, [])
 
+    const casingGeometry = useMemo(() => new CylinderGeometry(0.7, 0.7, 0.8, 64, 1, true), [])
+    const flangeRingGeometry = useMemo(() => new RingGeometry(0.7, 0.82, 64), [])
+    const flangeCylinderGeometry = useMemo(() => new CylinderGeometry(0.82, 0.82, 0.04, 64, 1, true), [])
+    const boltGeometry = useMemo(() => new CylinderGeometry(0.012, 0.012, 0.02, 6), [])
+    const standLegGeometry = useMemo(() => new BoxGeometry(0.08, 0.4, 0.04), [])
+    const standFootGeometry = useMemo(() => new BoxGeometry(0.1, 0.05, 1.2), [])
+    const hubGeometry = useMemo(() => new CylinderGeometry(0.18, 0.18, 0.12, 16), [])
+    const hubCapGeometry = useMemo(() => new CylinderGeometry(0.08, 0.14, 0.08, 32), [])
+    const motorBodyGeometry = useMemo(() => new CylinderGeometry(0.25, 0.25, 0.45, 32), [])
+    const motorJunctionBoxGeometry = useMemo(() => new BoxGeometry(0.12, 0.12, 0.08), [])
+
+    useEffect(() => {
+        return () => {
+            bladeGeometry.dispose()
+            casingGeometry.dispose()
+            flangeRingGeometry.dispose()
+            flangeCylinderGeometry.dispose()
+            boltGeometry.dispose()
+            standLegGeometry.dispose()
+            standFootGeometry.dispose()
+            hubGeometry.dispose()
+            hubCapGeometry.dispose()
+            motorBodyGeometry.dispose()
+            motorJunctionBoxGeometry.dispose()
+        }
+    }, [
+        bladeGeometry,
+        casingGeometry,
+        flangeRingGeometry,
+        flangeCylinderGeometry,
+        boltGeometry,
+        standLegGeometry,
+        standFootGeometry,
+        hubGeometry,
+        hubCapGeometry,
+        motorBodyGeometry,
+        motorJunctionBoxGeometry
+    ])
+
     return (
         <group scale={[0.65, 0.65, 0.65]} rotation={[0, -Math.PI / 4, 0]}>
 
             {/* FRAME & STANDS (Preserved) */}
             <group rotation={[Math.PI / 2, 0, 0]}>
-                <mesh material={materials.smokeCoating}>
-                    <cylinderGeometry args={[0.7, 0.7, 0.8, 64, 1, true]} />
-                </mesh>
+                <mesh material={materials.smokeCoating} geometry={casingGeometry} />
             </group>
             {[0.38, -0.38].map((zPos, i) => (
                 <group key={`flange-${i}`} position={[0, 0, zPos]}>
-                    <mesh material={materials.smokeCoating}>
-                        <ringGeometry args={[0.7, 0.82, 64]} />
-                    </mesh>
-                    <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.smokeCoating}>
-                        <cylinderGeometry args={[0.82, 0.82, 0.04, 64, 1, true]} />
-                    </mesh>
+                    <mesh material={materials.smokeCoating} geometry={flangeRingGeometry} />
+                    <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.smokeCoating} geometry={flangeCylinderGeometry} />
                     {Array(16).fill(0).map((_, b) => (
                         <mesh key={b}
                             position={[0.76 * Math.cos(b * Math.PI / 8), 0.76 * Math.sin(b * Math.PI / 8), (i === 0 ? 0.025 : -0.025)]}
                             rotation={[Math.PI / 2, 0, 0]}
-                            material={materials.boltMaterial}>
-                            <cylinderGeometry args={[0.012, 0.012, 0.02, 6]} />
-                        </mesh>
+                            material={materials.boltMaterial}
+                            geometry={boltGeometry} />
                     ))}
                     <group position={[0, -0.75, 0]}>
-                        <mesh position={[-0.55, 0, 0]} material={materials.smokeCoating}>
-                            <boxGeometry args={[0.08, 0.4, 0.04]} />
-                        </mesh>
-                        <mesh position={[0.55, 0, 0]} material={materials.smokeCoating}>
-                            <boxGeometry args={[0.08, 0.4, 0.04]} />
-                        </mesh>
+                        <mesh position={[-0.55, 0, 0]} material={materials.smokeCoating} geometry={standLegGeometry} />
+                        <mesh position={[0.55, 0, 0]} material={materials.smokeCoating} geometry={standLegGeometry} />
                     </group>
                 </group>
             ))}
             <group position={[-0.55, -0.92, 0]}>
-                <mesh material={materials.smokeCoating}><boxGeometry args={[0.1, 0.05, 1.2]} /></mesh>
+                <mesh material={materials.smokeCoating} geometry={standFootGeometry} />
             </group>
             <group position={[0.55, -0.92, 0]}>
-                <mesh material={materials.smokeCoating}><boxGeometry args={[0.1, 0.05, 1.2]} /></mesh>
+                <mesh material={materials.smokeCoating} geometry={standFootGeometry} />
             </group>
 
             {/* ROTOR (Long Blades) */}
             <group ref={rotorRef} position={[0, 0, 0.2]}>
                 <group rotation={[Math.PI / 2, 0, 0]}>
-                    <mesh material={materials.castBladeMat}>
-                        <cylinderGeometry args={[0.18, 0.18, 0.12, 16]} />
-                    </mesh>
-                    <mesh position={[0, 0.065, 0]} material={materials.matteBlack}>
-                        <cylinderGeometry args={[0.08, 0.14, 0.08, 32]} />
-                    </mesh>
+                    <mesh material={materials.castBladeMat} geometry={hubGeometry} />
+                    <mesh position={[0, 0.065, 0]} material={materials.matteBlack} geometry={hubCapGeometry} />
                 </group>
 
                 {/* 6 Blades */}
@@ -118,14 +142,10 @@ export function SmokeExhaustFanModel() {
             {/* MOTOR */}
             <group position={[0, 0, -0.2]}>
                 <group rotation={[Math.PI / 2, 0, 0]}>
-                    <mesh material={materials.smokeCoating}>
-                        <cylinderGeometry args={[0.25, 0.25, 0.45, 32]} />
-                    </mesh>
+                    <mesh material={materials.smokeCoating} geometry={motorBodyGeometry} />
                 </group>
                 <group position={[0, 0.3, 0.1]}>
-                    <mesh material={materials.smokeCoating}>
-                        <boxGeometry args={[0.12, 0.12, 0.08]} />
-                    </mesh>
+                    <mesh material={materials.smokeCoating} geometry={motorJunctionBoxGeometry} />
                 </group>
             </group>
         </group>
