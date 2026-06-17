@@ -311,3 +311,63 @@ eklenince RAG ile "X sayfası standarda uyuyor mu?" sorulabilir.
 
 *Kaynak: 5 otorite (Refine/Polaris/Medusa/Saleor/shadcn-admin) paralel araştırma → VentHub mevcut yapısına
 uyarlandı. Strateji: memory `standard-first-strategy`, boru hattı `knowledge-infra-pipeline`.*
+
+---
+
+## 10. Admin Shell Standardı (komut paleti + global arama + navigasyon + klavye)
+
+> **Bu bölüm neyi standartlaştırır?** Her admin sayfasının içine oturduğu **kabuğu (shell):** üst-bar, sol-nav,
+> komut paleti (⌘K), global arama, klavye sistemi. §1-§8 *sayfaların* standardıydı; **§10 *çerçevenin*.**
+> **Kaynaklar:** cmdk/kbar · Linear · Vercel Dashboard · Stripe Dashboard · Raycast · Shopify Polaris (top-bar+nav).
+> Yakınsama: dünya-standardı admin'ler arama + komut + navigasyonu **tek klavye-öncelikli kabukta** birleştirir.
+> İlgili yetenek açığı: `admin-capabilities.md §4.5` (E1/E2/E8). Bu = onların **NASIL'ı**.
+
+### S-Kanunları (shell — pazarlık konusu değil)
+
+| # | Kanun | Sade açıklama |
+|---|---|---|
+| **S1** | **Tek kaynak/komut registry (SSOT)** | Nav öğeleri + aranabilir kaynaklar + hızlı aksiyonlar **tek listeden**. Sidebar + komut paleti aynı registry'yi tüketir → **kopya nav listesi yasak.** |
+| **S2** | **Komut paleti = federe + klavye-öncelikli** | ⌘K her yerden; **tüm kaynaklarda** arar (sipariş/ürün/iade/bayi…); gruplu sonuç; navigasyon **ve** aksiyon; RBAC-scoped; tenant-safe. |
+| **S3** | **Global arama typeahead** | Debounced (≥250ms), ranked, kaynağa göre gruplu; Enter → detaya deep-link; yükleniyor/sonuç/boş/hata durumları ilan edilir. |
+| **S4** | **Klavye-öncelikli + tutarlı** | ⌘K (palet), `/` (arama focus), oklar (gez), Enter (seç), Esc (kapat). Power-user kısayolu (`g o`=orders) opsiyonel ama **tutarlı + keşfedilebilir** (palet footer'ında gösterilir). |
+| **S5** | **Modern nav kabuğu** | Gruplu + **RBAC-filtreli** sidebar (aktif-durum, collapse, mobil drawer) + üst-bar (arama girişi, bildirim, kullanıcı). Responsive; her sayfa bu kabuğa oturur. |
+
+### 10.1 Komut paleti anatomisi (S2)
+- **Giriş:** ⌘/Ctrl+K her admin sayfasından; üst-bar arama kutusu da paleti açar.
+- **Federe arama:** erişilebilir + aranabilir kaynakların searcher'ları **paralel** (`Promise.allSettled`); bir kaynak patlarsa diğerleri görünür.
+- **Sonuç modeli:** `{ resourceKey, id, title, subtitle?, route }`; kaynağa göre gruplu başlık.
+- **Aksiyonlar:** navigasyon + (yetkiye bağlı) hızlı-create ("Yeni ürün"), opsiyonel tema/çıkış.
+- **RBAC:** yalnız `canAccess` kaynaklar listelenir/aranır; aksiyon `canWrite`'a bağlı.
+
+### 10.2 Searcher sözleşmesi (S1+S2)
+- **DI:** `(supabase, query, limit) => Promise<CommandResult[]>`; modül-düzeyi statik client importu yasak.
+- **Mükerrerlik YASAĞI:** var olan servis fonksiyonunu (ör. `adminSearchProducts`) **yeniden kullan**; sıfırdan kopya sorgu yazma.
+- **Tenant-safe:** RLS-korumalı client; `service_role` bypass yasak.
+
+### 10.3 Navigasyon kabuğu (S5)
+- Sidebar grupları + öğeleri **registry'den** (S1); aktif = route eşleşmesi; RBAC-filtreli.
+- Üst-bar: marka + global arama girişi (⌘K ipucu) + bildirim (E2) + kullanıcı menüsü.
+- Mobil: drawer; a11y: `<nav>` + `aria-current="page"`; her interaktif öğede focus-visible.
+
+### 10.4 Shell Uygunluk Kontrol Listesi (CETVEL — ölçüm aracı) · Skor = ✓ / 14
+- [ ] S1 Tek registry; sidebar + palet aynı kaynaktan (kopya nav yok)
+- [ ] S2 ⌘K her admin sayfasından açılır
+- [ ] S2 Palet ≥6 kaynakta federe arar (paralel, `allSettled`)
+- [ ] S2 Sonuçlar kaynağa göre gruplu
+- [ ] S2 Navigasyon **+ aksiyon** (yalnız nav değil)
+- [ ] S2 RBAC-scoped (yetkisiz kaynak listelenmez)
+- [ ] S2 Tenant-safe searcher (RLS-client, `service_role` yok)
+- [ ] S3 Debounced typeahead + 4 durum (yükleniyor/sonuç/boş/hata)
+- [ ] S3 Enter → detaya deep-link
+- [ ] S4 ⌘K / `/` / ok / Enter / Esc tutarlı + footer'da gösterilir
+- [ ] S5 Sidebar RBAC-filtreli + aktif-durum
+- [ ] S5 Üst-bar: arama girişi + bildirim + kullanıcı menüsü
+- [ ] S5 Responsive (mobil drawer)
+- [ ] a11y: palet `combobox`/`aria-activedescendant`, nav `aria-current`, **axe-0**
+
+> §6 çapraz-kesen zorunluluklar (DI, i18n-fallback-yok, design token, a11y, tenant-scope) bu kabuğun **da** üstüne oturur. "Refactor mı rewrite mı" yerine burada soru: kabuk bu 14 maddeyi karşılıyor mu?
+
+---
+
+*§10 kaynak: cmdk/kbar · Linear · Vercel · Stripe · Raycast · Polaris damıtımı → VentHub'a uyarlandı (2026-06-17).
+Yetenek açığı `admin-capabilities.md §4.5`; uygulama brief'i `docs/plans/admin-shell-e1-command-palette-brief.md` bu cetvele uyar.*
