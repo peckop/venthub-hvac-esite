@@ -1,5 +1,12 @@
 # AJAN BRİEFİ — 3D Wave 2: 3 Canvas yüzeyini VentHubCanvas'a taşı
 
+> # ⛔ ÖNCE BUNU OKU — KODA DALMA, "PAT DİYE" BAŞLAMA.
+> **ÇALIŞTIRMA YÖNTEMİ = `/paralel-code-mutation` (paralel kod mutasyonu).** Bu iş **paralel ajanlarla** yapılır:
+> **her dosyaya AYRI bir ajan** (3 dosya = 3 paralel ajan), her ajan §3'ten **yalnız kendi dosyasının** kontratını alır.
+> 3 dosya birbirinden bağımsız (disjoint) → paralel güvenli.
+> **❌ Bireysel / tek-ajan / elle / sırayla TAŞIMA. ❌ "Başla" der demez koda dalma.**
+> Önce paralel orkestrasyonu KUR → her ajana dar brief ver → SONRA göçü başlat.
+
 > **Bu dosya GEÇİCİ** (iş bitince silinir). Ajan: SADECE aşağıdaki kurallara uy, internet/araç-dokümanı
 > kullanma, kendi dosyandan başkasına dokunma. Doğrulamayı (test/build) controller yapar — sen ÇALIŞTIRMA.
 
@@ -91,3 +98,10 @@ Bu dosya Wave 1'de aynen bu şekilde taşındı. **Birebir bu deseni kopyala.** 
 - 3 dosya gelince: `INV-3D-2 LEGACY_RAW_CANVAS`'tan bu 3 satırı sil (stale-guard zorlar) → 6'dan 3'e iner.
 - Merkezi kapı: `type-check` + `lint` + `test --run` (INV-3D dahil) + **`pnpm build`** (RSC/`'use client'` sınırı) + axe.
 - Yeşilse: bu `docs/plans/3d-wave2/` klasörünü sil + tek PR → master.
+
+---
+
+> # ⛔ SON HATIRLATMA — YÖNTEM
+> Bu iş **`/paralel-code-mutation` ile, PARALEL ajanlarla** yapılır — **her dosyaya ayrı ajan.**
+> **❌ Bireysel / tek-ajan / elle sırayla YAPMA. ❌ "Başla" der demez koda dalma.**
+> Önce paralel orkestrasyonu kur → her ajana yalnız kendi dosyasının §3 kontratını ver → sonra koştur.
