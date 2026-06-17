@@ -12,10 +12,12 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
 import CategoryFormModal from '../../components/admin/categories/CategoryFormModal'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import EditableCell from '../../components/admin/EditableCell'
+import ExportMenu from '../../components/admin/ExportMenu'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -63,6 +65,11 @@ const CategoriesTableBody: React.FC = () => {
     initialSort: { key: 'sort_order', dir: 'asc' },
     syncUrl: true,
   })
+
+  const { setFilter, setQuery } = table.filtering
+  const filters = table.filtering.filters
+  const parentVal = filters.parent_id?.[0] ?? ''
+  const activeStatuses = useMemo(() => filters.is_active ?? [], [filters.is_active])
 
   // modal state (bu bileşende; CategoryFormModal create/edit'i taşır)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -188,6 +195,180 @@ const CategoriesTableBody: React.FC = () => {
     },
     [hasWriteAccess, t, table],
   )
+
+  /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
+  const exportCsv = useCallback(async () => {
+    const rows = await table.fetchAllForExport()
+    const cols = ['id', 'name', 'slug', 'parent_id', 'is_active', 'sort_order', 'description']
+    const header = cols.join(',')
+    const lines = rows.map((r) =>
+      [
+        r.id,
+        `"${(r.name || '').replace(/"/g, '""')}"`,
+        r.slug || '',
+        r.parent_id || '',
+        r.is_active ? 'true' : 'false',
+        r.sort_order != null ? String(r.sort_order) : '',
+        `"${(r.description || '').replace(/"/g, '""')}"`,
+      ].join(','),
+    )
+    const csv = '\ufeff' + [header, ...lines].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'categories.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [table])
+
+  /* ---- toplu durum güncelleme — UPDATE, mutateWithAudit kapısından ---- */
+  const bulkStatusChange = useCallback(
+    async (status: string) => {
+      const ids = table.selection.selectedIds
+      if (ids.length === 0) return
+      const isActive = status === 'active'
+      if (
+        !window.confirm(
+          t('admin.categories.bulk.statusConfirm', {
+            count: String(ids.length),
+            status: t(`admin.categories.statusLabels.${status}`),
+          }),
+        )
+      )
+        return
+      try {
+        await mutateWithAudit(supabaseBrowserClient, {
+          resource: 'categories',
+          canWrite: hasWriteAccess,
+          action: 'UPDATE',
+          rowPk: null,
+          before: null,
+          after: { is_active: isActive, ids },
+          auditedByEdge: false,
+          fn: async () => {
+            const { error } = await supabaseBrowserClient
+              .from('categories')
+              .update({ is_active: isActive })
+              .in('id', ids)
+            if (error) throw error
+          },
+        })
+        table.selection.clear()
+        await table.reload()
+      } catch (e) {
+        toast.error(
+          e instanceof AdminPermissionError
+            ? t('admin.categories.toasts.noPermission')
+            : t('admin.categories.bulk.statusFailed'),
+        )
+      }
+    },
+    [hasWriteAccess, t, table],
+  )
+
+  /* ---- toplu öne çıkarma — UPDATE, mutateWithAudit kapısından ---- */
+  const bulkFeatureToggle = useCallback(
+    async (featured: boolean) => {
+      const ids = table.selection.selectedIds
+      if (ids.length === 0) return
+      try {
+        await mutateWithAudit(supabaseBrowserClient, {
+          resource: 'categories',
+          canWrite: hasWriteAccess,
+          action: 'UPDATE',
+          rowPk: null,
+          before: null,
+          after: { is_featured: featured, ids },
+          auditedByEdge: false,
+          fn: async () => {
+            const { error } = await supabaseBrowserClient
+              .from('categories')
+              .update({ is_featured: featured })
+              .in('id', ids)
+            if (error) throw error
+          },
+        })
+        table.selection.clear()
+        await table.reload()
+      } catch (e) {
+        toast.error(
+          e instanceof AdminPermissionError
+            ? t('admin.categories.toasts.noPermission')
+            : t('admin.categories.toasts.saveError'),
+        )
+      }
+    },
+    [hasWriteAccess, t, table],
+  )
+
+  /* ---- toplu silme — DELETE, mutateWithAudit kapısından ---- */
+  const bulkDelete = useCallback(async () => {
+    const ids = table.selection.selectedIds
+    if (ids.length === 0) return
+    if (!window.confirm(t('admin.categories.bulk.deleteConfirm', { count: String(ids.length) }))) return
+    try {
+      await mutateWithAudit(supabaseBrowserClient, {
+        resource: 'categories',
+        canWrite: hasWriteAccess,
+        action: 'DELETE',
+        rowPk: null,
+        before: { ids },
+        after: null,
+        auditedByEdge: false,
+        fn: async () => {
+          const { error } = await supabaseBrowserClient.from('categories').delete().in('id', ids)
+          if (error) throw error
+        },
+      })
+      table.selection.clear()
+      await table.reload()
+    } catch (e) {
+      toast.error(
+        e instanceof AdminPermissionError
+          ? t('admin.categories.toasts.noPermission')
+          : t('admin.categories.bulk.deleteFailed'),
+      )
+    }
+  }, [hasWriteAccess, t, table])
+
+  /* ---- status chip'leri (is_active) ---- */
+  const statusChips = useMemo(
+    () =>
+      [
+        { key: 'true', label: t('admin.categories.statusLabels.active') },
+        { key: 'false', label: t('admin.categories.statusLabels.inactive') },
+      ].map((s) => ({
+        key: s.key,
+        label: s.label,
+        active: activeStatuses.includes(s.key),
+        onToggle: () => {
+          const next = activeStatuses.includes(s.key)
+            ? activeStatuses.filter((x) => x !== s.key)
+            : [...activeStatuses, s.key]
+          setFilter('is_active', next)
+        },
+      })),
+    [t, activeStatuses, setFilter],
+  )
+
+  /* ---- parent category select options ---- */
+  const parentOptions = useMemo(
+    () => [
+      { value: '', label: t('admin.categories.toolbar.allParents') },
+      ...table.allRows
+        .filter((c) => !c.parent_id)
+        .map((c) => ({ value: c.id, label: c.name.toUpperCase() })),
+    ],
+    [table.allRows, t],
+  )
+
+  /* ---- filtre sıfırlama ---- */
+  const resetFilters = useCallback(() => {
+    setQuery('')
+    setFilter('parent_id', [])
+    setFilter('is_active', [])
+  }, [setQuery, setFilter])
 
   /* ---- kolonlar (SSOT) ---- */
   const columns = useMemo<AdminColumn<DbCategory>[]>(
@@ -394,13 +575,41 @@ const CategoriesTableBody: React.FC = () => {
             sticky
             search={{
               value: table.filtering.query,
-              onChange: table.filtering.setQuery,
+              onChange: setQuery,
               placeholder: t('admin.categories.searchPlaceholder'),
               focusShortcut: '/',
             }}
+            select={{
+              value: parentVal,
+              onChange: (v) => setFilter('parent_id', v ? [v] : []),
+              title: t('admin.categories.toolbar.parentTitle'),
+              options: parentOptions,
+            }}
+            chips={statusChips}
             recordCount={table.totalMatched}
-            onClear={table.filtering.clearAll}
+            onClear={resetFilters}
+            rightExtra={
+              <ExportMenu
+                items={[
+                  { key: 'csv', label: t('admin.categories.export.csvLabel'), onSelect: () => void exportCsv() },
+                ]}
+              />
+            }
           />
+        }
+        bulkBarSlot={
+          hasWriteAccess ? (
+            <BulkActionToolbar
+              selectedCount={table.selection.selectedIds.length}
+              onStatusChange={(status) => void bulkStatusChange(status)}
+              onFeatureToggle={(featured) => void bulkFeatureToggle(featured)}
+              onDelete={() => void bulkDelete()}
+              onPriceAdjust={() => {
+                toast.error('Categories do not support price adjustments')
+              }}
+              onClearSelection={table.selection.clear}
+            />
+          ) : null
         }
       />
 
