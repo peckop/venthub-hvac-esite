@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useEffect } from 'react'
+import React, { useEffect,useMemo } from 'react'
 import * as THREE from 'three'
 
 import { useResolveMaterials } from '../core'
