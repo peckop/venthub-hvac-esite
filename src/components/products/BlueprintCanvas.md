@@ -3,33 +3,33 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\BlueprintCanvas.tsx
-skeleton_hash: 0c0485d514a77465
+skeleton_hash: 4608b975f17d14cc
 entity_hashes:
   func:BlueprintCanvas: b871a8b848648d7b
   func:CinematicCard: 7fb3fd44dcd5e71f
-  overview: 46250552be4be13b
+  overview: 385e4d7ea58dcd13
   style_tokens: 31f4acfd42638e52
-generated_at: 2026-06-14T22:20:14Z
+generated_at: 2026-06-17T20:01:18Z
 ---
 
 ## Genel Bakış
-Bu modül, ürün bileşenleri içinde yer alan iki bağımsız React bileşenini barındırır. Ürün görsellerini ve mavi baskıları, farklı kullanım senaryolarına göre (örneğin ana galeri veya öne çıkan kartlar) görsel açıdan zengin ve çekici bir şekilde sunmak için tasarlanmıştır.
+Bu modül, ürünlerin görsel sunumunu güçlendirmek için kullanılan iki bağımsız ve odaklı React bileşenini içerir. Birincil amacı, ürün görsellerini farklı bağlamlarda (ana ürün vitrini veya öne çıkan kartlar) görsel olarak çekici ve etkileşimli bir şekilde sunmaktır.
 
 ## Fonksiyon Grupları
-### Ana Ürün Görseli Gösterimi
-Ürünün temel görselini veya mavi baskı resmini, genellikle ürün detay sayfalarında ana odak noktası olarak sunmak için kullanılan temel bileşendir.
+### Odaklanmış Ürün Görseli Bileşeni
+Ürünün ana görselini veya teknik çizimini, genellikle ürün detay sayfalarında büyük ve temiz bir şekilde sergilemek için kullanılan temel bileşendir.
 - BlueprintCanvas
 
-### Sinematik Vurgu Kartı
-Görselleri, animasyonlar ve holografik efektlerle zenginleştirerek, ürünün belirli özelliklerini veya promosyon görsellerini estetik bir kart formatında öne çıkarmak için kullanılan yardımcı bileşendir.
+### Etkileşimsel Vurgu Kartı
+Ürün görsellerini veya promosyon görsellerini, 3D derinlik, animasyon ve holografik efektlerle zenginleştirerek öne çıkaran ve estetik bir vurgu yapan yardımcı bileşendir.
 - CinematicCard
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+Bu modül, ürün görsellerini ve holografik efektleri sunmak için iki React bileşeni (CinematicCard ve BlueprintCanvas) kullanır.
+
+[Aksiyom 1]: Eğer `CinematicCard` bileşenine geçilen `image` parametresi geçerli bir görsel URL'si (string) değilse, bileşen düzgün çalışmay
 
 ---
 
@@ -59,13 +59,14 @@ Görselleri, animasyonlar ve holografik efektlerle zenginleştirerek, ürünün 
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../i18n/I18nProvider::useI18n
+- import: ./3d/core::VentHubCanvas
 - import: @react-three/drei::Float
 - import: @react-three/drei::shaderMaterial
 - import: @react-three/drei::useTexture
-- import: @react-three/fiber::Canvas
 - import: @react-three/fiber::extend
 - import: @react-three/fiber::useFrame
 - import: react::React
+- import: react::Suspense
 - import: react::useRef
 - import: three::MathUtils
 - import: three::type { Mesh, ShaderMaterial,Texture }
@@ -90,20 +91,33 @@ Görselleri, animasyonlar ve holografik efektlerle zenginleştirerek, ürünün 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/products/BlueprintCanvas.tsx::CinematicCard
-- **params**: `{ image }` — Render edilecek ürün görselinin URL/path'i
+### [N1_NASIL] AST Pointer: `src/components/products/BlueprintCanvas.tsx`::CinematicCard
+- **params**: `{ image }` — `image: string`, 3D kart üzerinde gösterilecek görselin URL/yolu
 - **ic_degiskenler**:
-  - `texture` — `useTexture(image)` ile yüklenen Three.js texture nesnesi, holographic malzemeye `uTexture` uniform olarak bağlanır
-  - `meshRef` — `useRef<Mesh>(null)` ile oluşturulan referans, ana kart mesh'ine bağlanır; `useFrame` içinde rotation ve material erişimi için kullanılır
-- **Dönüş**: JSX — `Float` sarıcısı içinde holographic malzemeli bir düzlem kart (4×3 planeGeometry) ve arkasında ambient glow mesh'i (`[0, 0, -0.1]` pozisyonunda, `#0066ff` renkli, `0.1` opacity) içeren Three.js sahne düğümü; `useFrame` callback'i her frame'de `state.mouse` ile paralaks tilt uygular ve `material.uniforms.uTime.value`'i `state.clock.getElapsedTime()` ile günceller
+  - `texture` — `useTexture(image)` hook'undan dönen THREE.Texture nesnesi; holographic malzemeye (`holographicMaterial`) `uTexture` uniform'u olarak bağlanan görsel dokudur
+  - `meshRef` — `useRef<Mesh>(null)` ile oluşturulan React ref nesnesi; ana kart mesh'ine (`<mesh ref={meshRef}>`) referans verir, `useFrame` callback'i içinde rotasyon ve material erişimi için kullanılır
+  - `x` — `state.mouse` destructuring'inden elde edilen yatay mouse pozisyonu (-1 ile 1 arası); `meshRef.current.rotation.y` hesaplamasında `MathUtils.lerp` ile yumuşak döndürme sağlamak için kullanılır
+  - `y` — `state.mouse` destructuring'inden elde edilen dikey mouse pozisyonu (-1 ile 1 arası); `meshRef.current.rotation.x` hesaplamasında parallax tilt efekti yaratmak için kullanılır
+  - `material` — `meshRef.current.material` ifadesinin `ShaderMaterial` olarak cast edilmiş hali; shader'ın `uTime` uniform'una erişerek frame bazlı zaman değerini güncellemek için kullanılır
+- **Dönüş**: JSX — `<Float>` sarmalayıcısı içinde holographic image kartı ve arkasında ambient glow plane'inden oluşan 3D sahne
 
 ---
 
-### [N2_NASIL] AST Pointer: src/components/products/BlueprintCanvas.tsx::BlueprintCanvas
-- **params**: `{ image }` — CinematicCard'a geçirilen ürün görselinin URL/path'i
+### [N2_NASIL] AST Pointer: `src/components/products/BlueprintCanvas.tsx`::BlueprintCanvas
+- **params**: `{ image }` — `image: string`, ürün blueprint görselinin URL/yolu; `CinematicCard` bileşenine prop olarak iletilir
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan alınan çeviri fonksiyonu; `t('products.blueprint.scanning')`, `t('products.blueprint.objectReference')`, `t('products.blueprint.cinematicMode')` çağrılarıyla çok dilli UI metinleri render eder
-- **Dönüş**: JSX — Tam kapsamlı overlay yapısı: koyu tech-grid arka plan (`radial-gradient` dot pattern, `opacity-20`), `Canvas` içeren `CinematicCard` (kamera `position={[0,0,5]}`, `fov=45`, `dpr={[1,1.5]}`), köşe HUD dekoratif elemanları (sol üst: pulsing cyan dot + "scanning" etiketi, sol alt: çizgi + "objectReference" etiketi, sağ alt: "cinematicMode" etiketi + indicator bar), ve `shadow-inset-deep` vignette overlay'i
+  - `t` — `useI18n()` hook'undan destructure edilen çeviri fonksiyonu; `t('products.blueprint.scanning')`, `t('products.blueprint.objectReference')`, `t('products.blueprint.cinematicMode')` çağrılarıyla UI üzerinde çoklu dil desteği sağlanan metinleri renderlamak için kullanılır
+- **Dönüş**: JSX — tam sayfa genişliğinde, karanlıktech grid arka planlı, `VentHubCanvas` üzerinde `CinematicCard`'ı sarmalayan, köşelerde tech dekoratif HUD elemanları (tarama göstergesi, referans etiketi, cinematic mode etiketi) ve vignette overlay içeren Responsive container
+
+---
+
+### [N3_NASIL] AST Pointer: `src/components/products/BlueprintCanvas.tsx`::CinematicCard::useFrame_callback
+- **params**: `{ state }` — `@react-three/fiber` tarafından her frame'de sunulan ` RootState` nesnesi; `state.mouse` ( fare pozisyonu) ve `state.clock` (animasyon saati) erişimi sağlar
+- **ic_degiskenler**:
+  - `x` — `state.mouse` destructuring'inden elde edilen yatay mouse pozisyonu; parallax Y-rotation hesaplamasında kullanılır
+  - `y` — `state.mouse` destructuring'inden elde edilen dikey mouse pozisyonu; parallax X-rotation hesaplamasında kullanılır
+  - `material` — `meshRef.current.material`'ın `ShaderMaterial` cast'ı; `material.uniforms.uTime.value` alanına `state.clock.getElapsedTime()` sonucu yazılarak shader zaman animasyonu güncellenir
+- **Dönüş**: yok (side-effect: `meshRef.current.rotation.x`, `meshRef.current.rotation.y`, `material.uniforms.uTime.value` değerlerini her frame'de mutation ile günceller)
 
 ---
 
