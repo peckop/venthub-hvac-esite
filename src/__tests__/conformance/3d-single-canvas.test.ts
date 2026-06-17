@@ -39,11 +39,8 @@ const CANONICAL = 'src/components/products/3d/core/VentHubCanvas.tsx'
  * (CategoryCard3D + CategorySpotlightScene 2026-06-17'de ölü-kod olarak SİLİNDİ — git'te durur.)
  */
 const LEGACY_RAW_CANVAS = new Set<string>([
-  'src/components/products/OrbitalProductsShowcase.tsx',
   'src/components/products/InfiniteProductsShowcase.tsx', // PARK EDİLDİ — ana sayfa adayı, henüz bağlı değil
   'src/components/products/BlueprintCanvas.tsx',
-  'src/components/navigation/CategoryHubOverlay.tsx',
-  'src/components/navigation/MegaMenu3DBackground.tsx',
   'src/components/authority/ThreeDAuthority.tsx',
 ])
 

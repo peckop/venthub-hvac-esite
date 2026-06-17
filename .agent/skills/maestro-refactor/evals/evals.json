@@ -1,0 +1,30 @@
+{
+  "should_trigger": [
+    "parçala böl yönet",
+    "paralel göç",
+    "dalga halinde göç",
+    "migrate N pages",
+    "çok sayıda dosyayı aynı kalıba taşı",
+    "orchestrate migration",
+    "maestro-refactor",
+    "parçala böl yönet kullanarak admin sayfalarını DataTableKit bileşenine taşıyalım",
+    "paralel göç başlatarak tüm servis modüllerini yeni DI yapısına geçir",
+    "dalga halinde göç ile 12 form sayfasını validation şablonuna al",
+    "migrate N pages of our webapp to next/dynamic",
+    "çok sayıda dosyayı aynı kalıba taşı ve subagent orkestrasyonu yap",
+    "orchestrate migration for categories view models",
+    "maestro-refactor kullanarak RLS kurallarını kontrol edelim"
+  ],
+  "should_not_trigger": [
+    "yeni özellik kur: stripe ödeme modülü ekle",
+    "sprint start: test suite oluştur",
+    "git branch oluştur",
+    "vitest ile birim testleri çalıştır",
+    "font stilini değiştir",
+    "veritabanı tablosu oluştur",
+    "lighthouse performansı ölç",
+    "bug-fix yap",
+    "explain how this class works",
+    "delegasyon kullanarak dikey geliştirme takımı kur"
+  ]
+}

@@ -1,6 +1,5 @@
 'use client'
 import { OrbitControls } from '@react-three/drei'
-import { Canvas } from '@react-three/fiber'
 import { ArrowLeft, ChevronRight,Grid3X3, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { Suspense,useCallback, useEffect, useState } from 'react'
@@ -11,6 +10,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
 import type { CategoryMetadata } from '../../types/db-rows'
+import { VentHubCanvas } from '../products/3d/core'
 import Category3DIcon from '../products/Category3DIcon'
 
 interface CategoryHubOverlayProps {
@@ -155,21 +155,17 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                         aria-hidden="true"
                                     />
                                     <div className="w-full h-full absolute inset-0 pointer-events-none">
-                                        <Canvas 
+                                        <VentHubCanvas 
+                                            preset="nav"
                                             camera={{ position: [0, 0, 2.2], fov: 40 }} 
-                                            style={{ background: 'transparent' }} 
-                                            gl={{ antialias: false, alpha: true }}
-                                            dpr={[1, 1.5]}
                                             frameloop="demand"
                                             className="animate-in fade-in zoom-in-95 duration-700"
                                         >
                                             <Suspense fallback={null}>
-                                                <ambientLight intensity={0.8} />
-                                                <directionalLight position={[5, 5, 5]} intensity={1} />
                                                 <Category3DIcon categorySlug={hoveredCategory.slug} scale={1.2} />
                                                 <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={2} />
                                             </Suspense>
-                                        </Canvas>
+                                        </VentHubCanvas>
                                     </div>
                                 </div>
 

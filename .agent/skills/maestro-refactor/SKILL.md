@@ -1,15 +1,15 @@
 ---
-name: maestro
+name: maestro-refactor
 description: >-
   Orchestrate a large, DIVISIBLE code change — migrating or transforming many files/pages/modules to ONE
   shared pattern (a kit, hook, component, API, or convention) — as PARALLEL subagent waves with quality
-  gates. Use maestro whenever a task means applying the SAME structural change across many independent
+  gates. Use maestro-refactor whenever a task means applying the SAME structural change across many independent
   targets: "migrate the N admin pages to the shared table kit", "move every service onto the new client
   factory", "refactor these 12 modules to the new error API", "convert all forms to the new validation
   pattern", or any audit-then-fix that spans many files. It runs architect subagents to produce
   piece-divided plans, then a pipeline of migrate→judge subagents IN PARALLEL (bounded, no
   network), then the orchestrator (you) centrally verifies (typecheck + lint + test + a11y), fixes, and
-  commits per wave. Reach for maestro the moment you catch yourself about to do many similar migrations
+  commits per wave. Reach for maestro-refactor the moment you catch yourself about to do many similar migrations
   one-by-one yourself — divide and parallelize instead, even when each one is "hard". DO NOT use for a
   single-file edit, a one-off bug fix, pure read-only scanning, or anything one agent finishes in a couple of steps.
 category: orchestration
@@ -21,22 +21,10 @@ metadata:
     - migrate N pages
     - çok sayıda dosyayı aynı kalıba taşı
     - orchestrate migration
+    - maestro-refactor
 ---
 
-> # ⚠️ UYARLAMA NOTU — Antigravity (BU LLM, ÖNCE BUNU OKU)
-> Bu skill **Claude Code'un `Workflow` aracı** için yazıldı. **Faz 2**'deki `Workflow` / `pipeline()` /
-> `agent()` / `parallel()` ve "## Workflow iskeleti"ndeki `.js` örnek **Antigravity'de YOK.**
->
-> **Uyarlaman gereken TEK şey = "çalıştırma motoru":** Faz 2'yi kendi subagent mekanizmanla yeniden yaz —
-> `invoke_subagent` ile **paralel worker spawn** → her worker bitince **ayrı bir judge subagent spawn** →
-> yapısal JSON (verdict) topla. ".js iskeleti" tam olarak bunun Claude karşılığı; onu Antigravity primitifine çevir.
->
-> **GERİSİ aynen geçerli (tool-agnostik), DEĞİŞTİRME:** Faz 0 triyaj · Faz 1 mimar-plan · worker→**YARGIÇ**
-> deseni · Faz 3 merkezî kapı (typecheck/lint/test/build/axe) · Faz 4 dalga-commit · guardrail'ler · dalga boyutlandırma.
-> **Çekirdek felsefe DEĞİŞMEZ:** worker ÜRETİR (dar/sert brief) → yargıç ÇÜRÜTÜR → merkezî kapı KORUR.
-> "tamamlandı" yazısına ASLA güvenme; çıktıyı deterministik doğrula.
-
-# maestro — Paralel Göç Orkestrasyonu (parçala böl yönet)
+# maestro-refactor — Paralel Göç ve Kod Düzenleme Orkestrasyonu (parçala böl yönet)
 
 Bir işi tek tek, sırayla, kendin yapma dürtüsü geldiğinde dur. "Zor" demek "solo yap" demek **değildir** —
 "iyi parçala, denetimi sıkı tut" demektir. maestro, **çok-hedefli yapısal değişikliği** (N sayfayı ortak
@@ -73,18 +61,20 @@ tasarımı (join/RPC/özel sorgu), her yazmanın denetim-kapısından geçişi, 
 (sıralı küçük alt-görevler), riskler. **Kararları SEN kilitlersin** (ajan önerir, sen seçersin). Çıktı
 yapısal/öz olsun.
 
-### Faz 2 — Paralel göç + yargıç (çalıştırma motoru: Antigravity için `invoke_subagent`)
-Her hedef için **göç-ajanı → yargıç-ajanı** zinciri **paralel** koşar. (Claude'da `Workflow.pipeline()`;
-Antigravity'de `invoke_subagent` ile paralel worker + ayrı judge spawn — UYARLAMA NOTU'na bak.)
-Göç-ajanı brifingi **DAR ve sert** olmalı (kaçağı kaynakta keser):
-- **ALTIN ÖRNEK göm:** brief'e aynı repodan ÇALIŞAN bir before/after örnek koy (önceden taşınmış bir
-  dosyanın diff'i). Ajan uydurmaz, birebir kopyalar — "ilk seferde doğru"nun en yüksek getirili tek kuralı.
+### Faz 2 — Paralel göç + yargıç (Antigravity `invoke_subagent` ile orkestrasyon)
+Her bağımsız hedef için bir **göç/refactor subagent'ı** (worker) ve ardından bir **yargıç subagent'ı** (judge) zincir halinde koşar. Antigravity ortamında bu akış şu şekilde yönetilir:
+1. **Dinamik Tanımlama ve Paralel Çağrı**: Orkestratör, `define_subagent` ile hedefe veya göreve uygun özel subagent tiplerini (worker ve judge) tanımlar. Ardından, `invoke_subagent` kullanarak tüm worker subagent'ları tek bir paralel dalga (wave) olarak başlatır.
+2. **Asenkron Takip ve Reaktif Uyandırma**: Alt ajanlar arka planda çalışırken orkestratör bekleme moduna geçer (UI'da sürekli döngüye girmek veya periyodik durum sorgulamak gerekmez). Bir subagent görevini tamamlayıp mesaj gönderdiğinde veya bir arka plan görevi sonlandığında sistem orkestratörü reaktif olarak uyandırır.
+3. **Ardışık Yargı Adımı**: Her bir worker tamamlandığında, orkestratör o worker'ın çıktısını (veya ürettiği diff'i) değerlendirmek üzere bağımsız bir yargıç subagent'ı (`invoke_subagent`) tetikler. Yargıç, hedefe özel kontrat doğrultusunda kodu inceler ve yapılandırılmış bir JSON verdict (hüküm) döndürür.
+
+Göç-ajanı (worker) brifingi **DAR ve sert** olmalı (kaçağı kaynakta keser):
+- **ALTIN ÖRNEK göm:** brief'e aynı repodan ÇALIŞAN bir before/after örnek koy (önceden taşınmış bir dosyanın diff'i). Ajan uydurmaz, birebir kopyalar — "ilk seferde doğru"nun en yüksek getirili tek kuralı.
 - Sadece KENDİ dosyalarına dokun; ortak altyapıyı / barrel'ları / başka hedefi DEĞİŞTİRME.
 - İnternet/araç-dokümanı (context7/web) YOK — her şey repo'da.
 - Yasak desen yok (`as any` / `as unknown as` / `@ts-ignore` / `eslint-disable`).
 - pnpm/tsc/test KOŞMA (merkezi doğrulama orkestratörde). Yapısal sonuç döndür.
-**Yargıç-ajan** çürütücüdür: hedefe özel bir **kontrat** (kalıp kullanımı, yazma-kapısı, i18n parity, a11y,
-yasak desen, mod doğruluğu, test sadakati) üstünden "neyi YANLIŞ" arar; emin değilse FAIL der.
+
+**Yargıç-ajan** çürütücüdür: hedefe özel bir **kontrat** (kalıp kullanımı, yazma-kapısı, i18n parity, a11y, yasak desen, mod doğruluğu, test sadakati) üstünden "neyi YANLIŞ" arar; emin değilse FAIL der.
 
 ### Faz 3 — Merkezi doğrulama kapısı (SEN)
 Yargıç verdiklerini **oku**, sonra **tüm ağacı KENDİN** geçir: `type-check` + `lint` + `test --run`
@@ -105,16 +95,64 @@ Temiz, geri-alınır dönüm noktası → sonraki dalga buradan dallanır.
 - **SIRALI/altyapı-evrim** hedef: **en son, tek tek** — kit'i kırarsa geri dönebilesin.
 - Dalga sırasında **paylaşılan altyapıyı DONDUR** (yalnız orkestratör dokunur) → ajanlar çakışmaz.
 
-## Akış iskeleti (kavramsal — motoru Antigravity primitifine çevir)
-Her hedef göç→yargıç'tan **bağımsız** akar (bariyer yok). Brief'leri kilitli plandan kur. Kavramsal şema:
+## Akış iskeleti (Antigravity Orchestration Skeleton)
 
+Antigravity ortamında paralel subagent dalgalarını yönetmek ve reaktif uyandırma döngüsünü kurmak için aşağıdaki kodlama/adımlama desenini takip et:
+
+```typescript
+// 1. Subagent Tiplerini Tanımla (Gerekirse)
+define_subagent({
+  name: "migration_worker",
+  description: "Bileşenleri DataTableKit formatına taşıyan refactor işçisi",
+  system_prompt: "... system prompt ...",
+  enable_write_tools: true,
+  toolSummary: "Define migration worker subagent",
+  toolAction: "Defining subagent"
+});
+
+define_subagent({
+  name: "migration_judge",
+  description: "Göç edilen bileşeni DataTableKit kurallarına göre denetleyen yargıç",
+  system_prompt: "... system prompt ...",
+  enable_write_tools: false,
+  toolSummary: "Define migration judge subagent",
+  toolAction: "Defining subagent"
+});
+
+// 2. Paralel Worker Ajanlarını Başlat
+const targets = ["page1.tsx", "page2.tsx", "page3.tsx"];
+const workers = invoke_subagent({
+  Subagents: targets.map(file => ({
+    TypeName: "migration_worker",
+    Role: `${file} Refactorer`,
+    Prompt: `Refactor ${file} to use DataTableKit. Before/after example: ...`
+  })),
+  toolSummary: "Spawn parallel migration workers",
+  toolAction: "Invoking subagents"
+});
+// Her worker için bir conversationId döner.
+
+// 3. Reaktif Bekleme ve Yanıt Toplama
+// Sistem, subagent'lardan mesaj geldikçe orkestratörü reaktif olarak uyandıracaktır.
+// Gelen mesajlardan worker tamamlanma durumunu ve çıktılarını (JSON veya diff) topla.
+
+// 4. Her Worker Tamamlandığında Yargıç Ajanını Spawn Et
+const judges = invoke_subagent({
+  Subagents: workers.map(w => ({
+    TypeName: "migration_judge",
+    Role: `${w.file} Reviewer`,
+    Prompt: `Review changes made by worker in ${w.file}. Verdict: ...`
+  })),
+  toolSummary: "Spawn parallel migration judges",
+  toolAction: "Invoking subagents"
+});
+
+// 5. Tüm Yargıçlardan Verdict (JSON) Topla
+// Verdict formatı: { pass: boolean, issues: string[], classification: "CLEAN" | "FIX" | "CRITICAL" }
+// Eğer tüm yargıçlar PASS verirse veya bulunan FIX'ler düzeltilirse:
+// -> Faz 3 Merkezî Kapı doğrulamalarına geç (type-check, lint, test, build).
+// -> Faz 4 Commit & Push.
 ```
-HER hedef için PARALEL:
-  1) worker  = invoke_subagent(göç_brief[hedef])      → { filesWritten, mode, selfChecks } (yapısal JSON)
-  2) judge   = invoke_subagent(yargıç_brief[hedef, workerÇıktısı]) → { pass, issues[], severity }
-TÜMÜ bitince: verdiktleri topla → Faz 3 merkezî kapı → düzelt → Faz 4 commit
-```
-> (Claude karşılığı `Workflow.pipeline(migrate, judge)` idi; aynı mantık, farklı primitif.)
 
 ## Guardrail'ler (acıyla öğrenildi)
 - **Kaçak ajanı kaynakta kes:** brief'te internet/context7 YASAK + dosya allowlist + adım-sınırı.

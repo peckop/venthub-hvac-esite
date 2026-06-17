@@ -1,13 +1,10 @@
 ---
-name: enterprise-multiagent
-description: Orchestrates specialized worker-judge multi-agent teams for VentHub HVAC
-  developments complying with strict quality baselines. Trigger when delegating tasks,
-  starting a sprint, or managing multi-agent runs. Do NOT use for database resets,
-  general git branch creation, text formatting, or running unit tests directly.
+name: maestro-feature
+description: Orchestrates specialized worker-judge multi-agent teams for VentHub HVAC vertical feature developments (maestro-feature, yeni özellik kur, sprint start, delegasyon, multi-agent run). Do NOT use for database resets, general git branch creation, text formatting, or running unit tests directly.
 when_to_use: 'Kullan: Multi-agent ekibi kurarak enterprise seviyede is dagilimi yapilmak
   istendiginde, planlama ve kodlama calismalarinda bagimsiz denetim gerektiginde.
   Ornekler: ''Ajan takimi kur'', ''Multi-agent gorev dagilimi yap'', ''Ajanlari organize
-  et'', ''Enterprise ekibi cagir''.
+  et'', ''Enterprise ekibi cagir'', ''yeni özellik kur'', ''maestro-feature''.
 
   '
 allowed-tools:
@@ -24,6 +21,8 @@ metadata:
   - delegasyon
   - multi-agent run
   - sprint start
+  - yeni özellik kur
+  - maestro-feature
   inputs:
   - prompt_draft.md
   outputs:
@@ -36,7 +35,7 @@ exclusions:
 - multi-agent-research
 ---
 
-# Enterprise Multi-Agent Orchestration Skill (VentHub HVAC)
+# maestro-feature — Otonom Dikey Yeni Özellik Geliştirme Orkestrasyonu (VentHub HVAC)
 
 Bu skill, **VentHub HVAC** projesinin kurumsal (enterprise) standartlarına uygun olarak, karmaşık ve hassas görevleri otonom, uzmanlaşmış ve birbirini denetleyen alt ajan takımları (Worker-Judge / Çalışan-Denetçi) arasında mükemmel şekilde dağıtmak ve yönetmek için tasarlanmıştır.
 

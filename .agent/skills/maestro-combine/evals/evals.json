@@ -1,0 +1,30 @@
+{
+  "should_trigger": [
+    "paralel birleştirme",
+    "çakışmasız birleştirme",
+    "maestro-combine",
+    "parallel combine changes",
+    "PMCM orkestrasyonu",
+    "paralel birleştirme başlatarak dosyaları bir araya getirelim",
+    "çakışmasız birleştirme kullanarak admin kelimelerini toplayalım",
+    "maestro-combine orkestrasyonu ile merkezi merge yap",
+    "run parallel combine changes on selected target files",
+    "PMCM orkestrasyonu ile çakışmasız birleştirme koştur",
+    "maestro-combine kullanarak JSON deltalarını birleştirelim",
+    "paralel birleştirme algoritması ile çakışmaları engelleyelim",
+    "çakışmasız birleştirme ile i18n anahtarlarını yaz",
+    "PMCM orkestrasyonu kullanarak routes dosyasını birleştir"
+  ],
+  "should_not_trigger": [
+    "git commit at",
+    "pnpm run dev çalıştır",
+    "database migration oluştur",
+    "css font stilini değiştir",
+    "eslint hatalarını otomatik düzelt",
+    "npm run build testi yap",
+    "tip kontrolü tsc çalıştır",
+    "yeni component kodunu yaz",
+    "git branch feature/i18n aç",
+    "context.md dosyasını NotebookLM ile senkronize et"
+  ]
+}

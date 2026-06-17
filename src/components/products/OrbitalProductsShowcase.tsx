@@ -1,6 +1,6 @@
 "use client"
 import { Float, Html, Sparkles, useTexture } from '@react-three/drei'
-import { Canvas, ThreeEvent,useFrame, useThree } from '@react-three/fiber'
+import { ThreeEvent,useFrame, useThree } from '@react-three/fiber'
 import { useInView } from 'framer-motion'
 import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -12,6 +12,7 @@ import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
+import { VentHubCanvas } from './3d/core'
 import Category3DIcon from './Category3DIcon'
 
 const ANIM_STAGGER_DELAY = 0.12
@@ -832,20 +833,15 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             onPointerLeave={handlePointerUp}
             style={{ backgroundColor: CONFIG.backgroundColor, height: containerHeight }}
         >
-            <Canvas
-                shadows="percentage"
-                gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+            <VentHubCanvas
+                preset="showcase"
                 frameloop={isInView ? "always" : "demand"}
-                dpr={typeof window !== 'undefined' ? Math.min(1.5, window.devicePixelRatio) : [1, 1.5]}
                 camera={{
                     position: [0, (CONFIG.cameraHeight * (typeof containerHeight === 'number' && containerHeight < 400 ? 0.8 : 1)), CONFIG.cameraDistance],
                     fov: (CONFIG.cameraFOV * (typeof containerHeight === 'number' && containerHeight < 400 ? 1.15 : 1))
                 }}
             >
                 <MotionTransitionFix />
-                <ambientLight intensity={0.8} />
-                <directionalLight position={[5, 5, 5]} intensity={1} />
-                <spotLight position={[10, 12, 10]} angle={0.3} penumbra={1} intensity={1} castShadow />
 
                 {/* Zemin ve Sparkles - HEMEN GÖRÜNÜR */}
                 <Stage sharedState={sharedState} />
@@ -870,7 +866,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     modelScale={modelScale}
                     onReady={handleItemsReady}
                 />
-            </Canvas>
+            </VentHubCanvas>
 
             {/* Sol-Sağ Gradient */}
             <div className="absolute inset-y-0 left-0 w-12 sm:w-16 bg-gradient-to-r from-surface-darker to-transparent pointer-events-none" />
