@@ -1,12 +1,13 @@
 'use client'
 
 import { Float, shaderMaterial, useTexture } from '@react-three/drei'
-import { Canvas, extend,useFrame } from '@react-three/fiber'
+import { extend,useFrame } from '@react-three/fiber'
 import React, { useRef } from 'react'
 import type { Mesh, ShaderMaterial,Texture } from 'three'
 import { MathUtils } from 'three'
 
 import { useI18n } from '../../i18n/I18nProvider'
+import { VentHubCanvas } from './3d/core'
 
 // Custom Holographic Shader Material
 const HolographicMaterial = shaderMaterial(
@@ -128,11 +129,9 @@ const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
                  style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)', backgroundSize: '24px 24px' }} 
             />
             
-            <Canvas frameloop="always" dpr={[1, 1.5]} camera={{ position: [0, 0, 5], fov: 45 }}>
-                <ambientLight intensity={0.5} />
-                <pointLight position={[10, 10, 10]} />
+            <VentHubCanvas preset="showcase" frameloop="always" camera={{ position: [0, 0, 5], fov: 45 }}>
                 <CinematicCard image={image} />
-            </Canvas>
+            </VentHubCanvas>
 
             {/* Corner Tech Decor */}
             <div className="absolute top-6 left-6 flex items-center gap-2">
