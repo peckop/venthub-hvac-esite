@@ -109,11 +109,11 @@ TSL vertex-displacement shader → §6.4.)
 
 | # | Eksen | SSOT | Kapı (bekçi) | Tür | Durum |
 |---|---|---|---|---|---|
-| **3D-1** | **Asset-geçerlilik** | asset registry | `3d-asset-validity.test` — her referans `.hdr/.glb` gerçek + geçerli + parse-edilebilir (boş/dummy/404 yakalanır) | statik + dosya-parse | 🔜 (dummy HDR'ı yakalardı) |
-| **3D-2** | **Tek-Canvas** | `<VentHubCanvas>` | `3d-single-canvas.test` — bir route ağacında >1 `<Canvas>` yasak | statik kaynak tarama | 🔜 |
+| **3D-1** | **Asset-geçerlilik** | asset registry | `3d-asset-validity.test` — her referans `.hdr/.glb` gerçek + geçerli + parse-edilebilir (boş/dummy/404 yakalanır) | statik + dosya-parse | ✅ canlı (`3d-asset-validity.test.ts`) |
+| **3D-2** | **Tek-Canvas** | `<VentHubCanvas>` | `3d-single-canvas.test` — bir route ağacında >1 `<Canvas>` yasak | statik kaynak tarama | ✅ **KİLİTLİ** — allowlist boş (#374/#375/#379) |
 | **3D-3** | **Dayanıklılık** | A1 | `3d-resilience.test` — asset-yükleyen her 3D bileşen Suspense+ErrorBoundary sarmalı | statik | 🔜 |
-| **3D-4** | **Merkezi-config** | SSOT §1 | `3d-central-config.test` — ham `<Canvas>` / ad-hoc `<Environment files>` / sihirli-metalness / **CDN decoder yolu** yasak → paylaşılan sistem | statik | 🔜 |
-| **3D-5** | **CSP/origin** | D1 | `3d-csp.test` — dış 3D origin `next.config.mjs` whitelist'inde | statik config | 🔜 |
+| **3D-4** | **Merkezi-config** | SSOT §1 | `3d-central-config.test` — ham `<Canvas>` / ad-hoc `<Environment files>` / sihirli-metalness / **CDN decoder yolu** yasak → paylaşılan sistem | statik | 🟡 kısmen — `3d-procedural-env.test.ts` canlı; tam central-config açık |
+| **3D-5** | **CSP/origin** | D1 | `3d-csp.test` — dış 3D origin `next.config.mjs` whitelist'inde | statik config | 🔜 (controller sıradaki) |
 | **3D-6** | **Perf-bütçe** | B1–B6 | `renderer.info` draw-call/triangle bütçe izleme (runtime proxy) — **ödünç eşikleri burada ölçümle kalibre et** | runtime/build | ⚠️ açık borç (zor; başta uyarı) |
 
 **Açık eksenleri kapatma yöntemi:** ajan **paralel audit** (`audit/3d-surfaces`, mevcut envanter) → merkezi sistem
