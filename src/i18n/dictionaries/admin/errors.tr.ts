@@ -17,5 +17,19 @@ export const errors = {
         level: 'Seviye',
         message: 'Mesaj',
         url: 'URL'
+      },
+      export: {
+        csvLabel: 'CSV (UTF-8 BOM)',
+        filename: 'istemci_hatalari.csv',
+        headers: {
+          id: 'ID',
+          at: 'Tarih',
+          level: 'Seviye',
+          message: 'Mesaj',
+          url: 'URL',
+          userAgent: 'UA',
+          release: 'Sürüm',
+          env: 'Ortam'
+        }
       }
 };

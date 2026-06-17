@@ -14,5 +14,18 @@ export const audit = {
       noRecordsDesc: 'Filtreleriniz veya arama kriterlerinizle eşleşen denetim günlüğü bulunamadı.',
       searchPlaceholder: 'Tablo, birincil anahtar veya not ara',
       subtitle: 'Tüm sistem değişikliklerini ve kullanıcı aktivitelerini izleyin.',
-      viewMovements: 'Hareketleri Görüntüle'
+      viewMovements: 'Hareketleri Görüntüle',
+      export: {
+        csvLabel: 'CSV (UTF-8 BOM)',
+        filename: 'denetim_gunlugu.csv',
+        headers: {
+          id: 'ID',
+          at: 'Tarih',
+          actor: 'Aktör',
+          action: 'Aksiyon',
+          tableName: 'Tablo',
+          rowPk: 'PK',
+          comment: 'Not'
+        }
+      }
 };
