@@ -90,6 +90,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 - `RECOMMENDATIONS.md` · `CHANGELOG.md` — durum ve değişiklik geçmişi.
 - `docs/` (kök) — **üretilmiş** master MD'ler (frontend, edge functions, DB şema) — elle düzenleme.
 - `.claude/skills/` — Claude Code yetenekleri (aktif). `.agent/skills/` = legacy Antigravity (faz-out).
+- `docs/standards/collaboration-method.md` — **Claude (controller) ↔ Antigravity (worker)** ortak çalışma yöntemi (cetvel-önce + iş-başına-tek-dal/worktree + controller doğrular→PR→merge). İki araç da master'dan okur.
 
 ## Bilgi Kaynağı İş Akışı (üç katman)
 
