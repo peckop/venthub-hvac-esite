@@ -10,6 +10,7 @@ import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
+import ExportMenu from '../../components/admin/ExportMenu'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useTenant } from '../../hooks/useTenant'
 import { formatDateTime } from '../../i18n/datetime'
@@ -130,6 +131,42 @@ const ErrorsTableBody: React.FC = () => {
     setFilter('from', [defaultFrom])
     setFilter('to', [defaultTo])
   }, [setQuery, setFilter, defaultFrom, defaultTo])
+
+  /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
+  const exportCsv = useCallback(async () => {
+    const rows = await table.fetchAllForExport()
+    const header = [
+      t('admin.errors.export.headers.id'),
+      t('admin.errors.export.headers.at'),
+      t('admin.errors.export.headers.level'),
+      t('admin.errors.export.headers.message'),
+      t('admin.errors.export.headers.url'),
+      t('admin.errors.export.headers.userAgent'),
+      t('admin.errors.export.headers.release'),
+      t('admin.errors.export.headers.env'),
+    ].join(',')
+
+    const lines = rows.map((r) =>
+      [
+        r.id,
+        r.at,
+        r.level || 'error',
+        `"${(r.message || '').replace(/"/g, '""')}"`,
+        `"${(r.url || '').replace(/"/g, '""')}"`,
+        `"${(r.user_agent || '').replace(/"/g, '""')}"`,
+        `"${(r.release || '').replace(/"/g, '""')}"`,
+        `"${(r.env || '').replace(/"/g, '""')}"`,
+      ].join(','),
+    )
+    const csv = '\ufeff' + [header, ...lines].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = t('admin.errors.export.filename')
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [table, t])
 
   // env seçenekleri — etiketler JS ifadesi (JSX-literal değil); 'env' adları teknik (çeviri yok)
   const envOptions = useMemo(
@@ -278,6 +315,11 @@ const ErrorsTableBody: React.FC = () => {
                 className={adminInputClass}
                 aria-label={t('admin.ui.endDate') as string}
                 title={t('admin.ui.endDate') as string}
+              />
+              <ExportMenu
+                items={[
+                  { key: 'csv', label: t('admin.errors.export.csvLabel'), onSelect: () => void exportCsv() },
+                ]}
               />
             </div>
           }

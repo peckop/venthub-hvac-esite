@@ -8,6 +8,7 @@ import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
+import ExportMenu from '../../components/admin/ExportMenu'
 import JsonDiffViewer from '../../components/admin/JsonDiffViewer'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { formatDateTime } from '../../i18n/datetime'
@@ -94,6 +95,40 @@ const AuditLogTableBody: React.FC = () => {
   const clearBatch = useCallback(() => {
     setFilter('batch', [])
   }, [setFilter])
+
+  /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
+  const exportCsv = useCallback(async () => {
+    const rows = await table.fetchAllForExport()
+    const header = [
+      t('admin.audit.export.headers.id'),
+      t('admin.audit.export.headers.at'),
+      t('admin.audit.export.headers.actor'),
+      t('admin.audit.export.headers.action'),
+      t('admin.audit.export.headers.tableName'),
+      t('admin.audit.export.headers.rowPk'),
+      t('admin.audit.export.headers.comment'),
+    ].join(',')
+
+    const lines = rows.map((r) =>
+      [
+        r.id,
+        r.at,
+        `"${(r.actor || '').replace(/"/g, '""')}"`,
+        r.action,
+        r.table_name,
+        `"${(r.row_pk || '').replace(/"/g, '""')}"`,
+        `"${(r.comment || '').replace(/"/g, '""')}"`,
+      ].join(','),
+    )
+    const csv = '\ufeff' + [header, ...lines].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = t('admin.audit.export.filename')
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [table, t])
 
   /* ---- kolonlar (SSOT) ---- */
   const columns = useMemo<AdminColumn<AuditRow>[]>(
@@ -252,6 +287,11 @@ const AuditLogTableBody: React.FC = () => {
                   className={adminInputClass}
                   aria-label={t('admin.ui.endDate')}
                   title={t('admin.ui.endDate')}
+                />
+                <ExportMenu
+                  items={[
+                    { key: 'csv', label: t('admin.audit.export.csvLabel'), onSelect: () => void exportCsv() },
+                  ]}
                 />
               </div>
             }

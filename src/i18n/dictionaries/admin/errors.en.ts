@@ -17,5 +17,19 @@ export const errors = {
         level: 'Level',
         message: 'Message',
         url: 'URL'
+      },
+      export: {
+        csvLabel: 'CSV (UTF-8 BOM)',
+        filename: 'client_errors.csv',
+        headers: {
+          id: 'ID',
+          at: 'Date',
+          level: 'Level',
+          message: 'Message',
+          url: 'URL',
+          userAgent: 'UA',
+          release: 'Release',
+          env: 'Env'
+        }
       }
 };
