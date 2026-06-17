@@ -2,7 +2,7 @@
 
 import { Float, shaderMaterial, useTexture } from '@react-three/drei'
 import { extend,useFrame } from '@react-three/fiber'
-import React, { useRef } from 'react'
+import React, { useRef, Suspense } from 'react'
 import type { Mesh, ShaderMaterial,Texture } from 'three'
 import { MathUtils } from 'three'
 
@@ -130,7 +130,9 @@ const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
             />
             
             <VentHubCanvas preset="showcase" frameloop="always" camera={{ position: [0, 0, 5], fov: 45 }}>
-                <CinematicCard image={image} />
+                <Suspense fallback={null}>
+                    <CinematicCard image={image} />
+                </Suspense>
             </VentHubCanvas>
 
             {/* Corner Tech Decor */}
