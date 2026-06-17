@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\webhooks.en.ts
-skeleton_hash: c6195031ec0a78f9
+skeleton_hash: db3b4cf8d08a87ca
 entity_hashes:
   overview: a695b1bd72d402b4
-generated_at: 2026-06-13T11:19:12Z
+generated_at: 2026-06-17T13:23:01Z
 ---
 
 ## Genel Bakış
@@ -34,28 +34,16 @@ Bu modül bir i18n sözlük dosyasıdır (translation dictionary) ve yalnızca s
 
 ---
 
-**[Aksiyom 1 – Sözlük Yapısı Varlığı]:** Eğer `webhooks` objesi tanımlı değilse veya `{}` boş nesne olarak kalırsa, webhook ile ilgili admin paneli arayüzünde tüm metin alanları boş/çevrilmemiş (raw key) görünür olur; kullanıcıya anlam ifade etmeyen anahtar isimleri gösterilir.
-
-**[Aksiyom 2 – Anahtar Tutarlılığı]:** Eğer `webhooks` objesindeki anahtar isimlerden biri uygulama kodunda beklenen key ile eşleşmiyorsa (örn: `webhooks.someKey` olarak erişilen key sözlükte yoksa), ilgili UI bileşeni fallback dil metni yerine `undefined` veya boş string gösterir.
-
-**[Aksiyom 3 – Dil Dosyası Eşlenmesi]:** Eğer bu `.en.ts` dosyası diğer dil dosyalarıyla (örn: `.tr.ts`, `.de.ts`) aynı anahtar setini içermiyorsa, dil değiştirme sırasında eksik çevirili alanlar oluşur ve eksik key'ler İngilizce fallback'e düşer (veya hiç düşmez, uygulama davranışına bağlı — bilinmiyor).
-
----
-
-> **Not:** Bu modülde herhangi bir fonksiyon imzası, parametre, return tipi veya working logic yoktur; dolayısıyla klasik anlamda fonksiyonel aksiyom üretilemez. Varsayımlar yalnızca veri yapısının varlığı ve tutarlılığı üzerinedir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ---
 
 ## SABİTLER
 - **webhooks** (object) — `{
-      title: 'Webhook Events',
-      tabs: {
-        returns: 'Returns',
-  ...`
+  title: 'Webhook Events',
+  tabs: {
+    returns: 'Returns',
+    shippi...`
 
 ---
 
@@ -66,10 +54,6 @@ Bu modül bir i18n sözlük dosyasıdır (translation dictionary) ve yalnızca s
 - **ic_degiskenler**:
   - `webhooks` — i18n çeviri sözlüğü objesi; webhooksayfasına ait tüm İngilizce metinleri (başlıklar, etiketler, hata mesajları, onay metinleri vb.) içerir; `admin/webhooks` modülünde UI gösteriminde kullanılır
 - **Dönüş**: (yok — const object tanımı, ihracat (export) ile modül dışına sunulur)
-
----
-
-**Not:** Bu dosyada herhangi bir fonksiyon gövdesi bulunmamaktadır. Dosya yalnızca bir `webhooks` adlı sabit (constant) nesne tanımı içerir ve i18n (uluslararasılaştırma) amaçlı statik bir sözlük yapısıdır.
 
 ---
 

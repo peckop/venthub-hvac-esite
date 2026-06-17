@@ -4,5 +4,6 @@ export const search = {
       coupons: 'Search by code or type',
       movements: 'Search by product name/SKU',
       orders: 'Search by Order ID or Conversation ID',
-      products: 'Search by product name/SKU/brand/slug'
+      products: 'Search by product name/SKU/brand/slug',
+      webhookEvents: 'Search by type or source...'
 };

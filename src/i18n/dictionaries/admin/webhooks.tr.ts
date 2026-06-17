@@ -42,4 +42,7 @@ export const webhooks = {
   eventDetail: 'Olay Detayı',
   errorMessage: 'Hata Mesajı',
   selectEventToView: 'İncelemek için listeden bir olay seçin.',
+  noEvents: 'Webhook Olayı Bulunamadı',
+  noEventsDesc: 'Şu an için kaydedilmiş herhangi bir webhook olayı bulunmuyor.',
+  filterEmptyDescription: 'Eşleşen herhangi bir webhook olayı bulunamadı.',
 };

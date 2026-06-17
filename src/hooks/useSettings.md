@@ -3,99 +3,110 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useSettings.ts
-skeleton_hash: be620be3010306bc
+skeleton_hash: 72e586f5fd2c3fa3
 entity_hashes:
-  func:useSettings: 0139115fd60135da
-  overview: a5fd51a59ccbf3f0
-generated_at: 2026-06-08T10:09:33Z
+  func:useSettings: b2a936a9fb8b37f7
+  overview: 79dfda5e45940bd8
+generated_at: 2026-06-17T13:23:01Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesindeki React uygulamasının tüm bileşenlerinden erişilebilen küresel uygulama ayarlarını merkezi olarak yöneten bir custom hook sunar. Tek bir `useSettings` fonksiyonu, ayarların Supabase veritabanından çekilmesi, yüklenme ve hata durumlarının yönetilmesi işlemlerini kapsar, böylece uygulama genelinde veri tutarlılığı ve tekil kaynak prensibini sağlar.
+Bu modül, VentHub HVAC projesindeki React uygulamasının ayarlarını (birim tercihleri, tema ayarları vb.) merkezi bir noktadan yöneten bir custom hook sunar. `useSettings` fonksiyonu, ayar verilerinin Supabase veritabanından çekilmesi, yükleme durumu (loading) ve hata yönetimi (error handling) süreçlerini kapsar; böylece tüm bileşenler tutarlı ve güncel ayar verilerine tek bir kaynaktan erişir.
 
 ## Fonksiyon Grupları
-### Merkezi Ayar Yönetim Katmanı
-Uygulama genelindeki ayar değerlerinin (ör. birim tercihleri, tema) tek bir kaynaktan okunmasını ve güncellenmesini sağlayarak bileşenler arası veri tutarlılığını garanti altına alan, ortak bir erişim arayüzü sunar.
+
+### Merkezi Ayar Erişim Katmanı
+Uygulama genelindeki ayarların okunması ve yönetilmesi için tekil bir erişim noktası oluşturarak bileşenler arası veri tutarlılığını ve basitliği garanti altına alır.
 - useSettings
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için tanımlı bir fonksiyon gövdesi (fonksiyon implementasyonu) bulunmamaktadır, bu nedenle fonksiyonel aksiyomlar türetilememektedir. Modülün yapısına ilişkin aşağıdaki yapısal varsayımlar belirtilebilir:
 
-[Aksiyom 1]: Eğer `useSettings` fonksiyonu bir React bileşeni veya özel hook içinde çağrılmazsa (React Hook kurallarını ihlal ederse), React çalışma zamanı hatası oluşur.
+Bu modül, Supabase bağlantısı gerektiren bir React custom hook'udur.
 
-[Aksiyom 2]: Eğer `useSettings` fonksiyonu, ayar verilerinin tutulduğu merkezi bir bağlam (Context) veya durum yönetimi (State) kaynağı tarafından desteklenmiyorsa, fonksiyon geçerli veya tutarlı ayar verisi döndüremez.
+[Aksiyom 1]: Eğer Supabase istemcisi (client) doğru yapılandırılmamışsa veya Supabase servisine erişilemiyorsa, ayarlar yüklenemez ve hata durumu oluşur.
 
-[Aksiyom 3]: Eğer `useSettings` fonksiyonunun çağrıldığı bileşen ağacı içinde ayarlar için gerekli sağlayıcı (Provider) bileşeni mevcut değilse, fonksiyon varsayılan değerler döndüremez veya hata fırlatır.
+[Aksiyom 2]: Eğer `useSettings` bir React bileşeni dışında (ör. normal bir fonksiyon veya sınıfta) çağrılırsa, React hooks kuralları ihlal edilir ve çalışma zamanı hatası oluşur.
 
-[Aksiyom 4]: Eğer `useSettings` hook'u dışarıdan bir parametre almıyorsa, döndürdüğü ayar nesnesinin yapısı ve içeriği tamamen içsel tanımlara bağlıdır ve dışarıdan müdahale edilemez.
+[Aksiyom 3]: Eğer Supabase'deki ayarlar tablosu/mevcut değilse veya beklenen şemaya sahip değilse, fonksiyon hata döner veya boş/beklenmeyen veri yapısı ile karşılaşır.
+
+[Aksiyom 4]: Eğer ağ bağlantısı kesikse veya istek zaman aşımına uğrarsa, `loading` durumu sonsuza kadar `true` kalabilir veya hata durumu tetiklenir (yeniden deneme mekanizması bilinmiyor).
+
+[Aksiyom 5]: Eğer fonksiyon parametre almıyorsa (`useSettings()`), tüm ayarlar sabit bir kaynaktan (Supabase tablosu) çekilir — kullanıcıya özel filtreleme veya parametreli sorgulama yapılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### useSettings
-**Ne yapar**: Supabase veritabanında yer alan `app_settings` tablosundan global uygulama ayarlarını çekip state'te tutan, React uygulamaları için tasarlanmış özel bir custom hook'tur. Ayarların alınma sürecindeki yükleme durumu, oluşabilecek hatalar ve ayarların kendisini yöneterek uygulamanın tüm bölümlerinden güvenli bir şekilde global ayarlara erişilmesini sağlar. Tek bir merkezden yönetilen ayarların tutarlı bir şekilde tüm uygulama genelinde kullanılmasını garanti eder.
-**Nasıl yapar**: Hook çağrıldığı anda öncelikle yükleme (loading) durumunu aktif hale getirerek Supabase üzerinden `app_settings` tablosundan veri çekme isteğini başlatır. İstek başarılı bir şekilde sonuçlandığında gelen ayar verilerini yerel state'e kaydeder ve yükleme durumunu devre dışı bırakır. Eğer veri çekme işlemi sırasında herhangi bir sorun oluşursa hata mesajını error state'ine kaydeder ve yükleme durumunu sonlandırır, tüm bu durumları uygulamaya kullanımına sunar.
-**Parametreler**:
-- Herhangi bir giriş parametresi almaz: Doğrudan çağrılarak kullanılır, herhangi bir giriş değeri talep etmez.
-**Dönüş**: İçerisinde üç ana değer barındıran bir JavaScript nesnesi döndürür. Nesnenin içerdiği değerler şunlardır: `settings`: `app_settings` tablosundan çekilen tüm global uygulama ayarlarını içeren nesne, `loading`: ayarların çekilme sürecinin devam edip etmediğini belirten boolean değer (true ise işlem devam ediyor, false ise işlem tamamlanmış anlamına gelir), `error`: veri çekme işlemi sırasında oluşan hatayı içeren string değer, herhangi bir hata oluşmaması halinde boş veya null değer alır.
+**Ne yapar**: Uygulama genelindeki ayarları Supabase veritabanından çekip yöneten bir React custom hook'udur. Bu hook, site ayarlarını (`site_settings` tablosu) yüklerken oluşabilecek yükleme durumunu, hataları ve elde edilen ayarları bir state nesnesi içinde tutar ve bileşene sunar.
+
+**Nasıl yapar**: Fonksiyon, `useState` hook'ları ile `settings`, `loading` ve `error` state'lerini oluşturur. Ardından, `useEffect` hook'u içinde tanımlanan ve boş bir bağımlılık dizisine (`[]`) sahip olduğu için sadece bileşen ilk yüklendiğinde çalışan bir `fetchSettings` asenkron fonksiyonunu çağırır. Bu fonksiyon, Supabase istemcisi (`supabase`) kullanarak `site_settings` tablosundaki tüm satırların `key` ve `value` alanlarını sorgular. Gelen veri içinde `key` değeri `'general'` ve `'payment'` olan satırları ayrı ayrı bularak, bu satırların `value` alanındaki karmaşık nesne yapısını (`Record<string, unknown>` olarak tip-lenmiş) önceden tanımlı ve tipli bir `AppSettings` objesine dönüştürür. Dönüşüm sırasında tüm alanlar `String()` veya `Boolean()` kullanılarak zorunlu tiplere dönüştürülür; eksik veya undefined değerler için varsayılan değerler atanır. Veri çekme işlemi başarılı olursa `settings` state'i güncellenir; bir hata fırlatılırsa `catch` bloğu hatanın mesajını `error` state'ine yazar. İşlem her durumda (`finally` bloğu ile) `loading` state'ini `false` yaparak tamamlanır.
+
+**Parametreleri**:
+- Parametre almaz.
+
+**Dönüş**: `{ settings, loading, error }` yapısında bir nesne döndürür.
+  - `settings`: `AppSettings | null` tipinde. Veritabanından başarıyla çekilen ve dönüştürülmüş ayarları temsil eder. Veri henüz yüklenmediyse veya bir hata oluştuysa `null` olabilir. `AppSettings` yapısı şu alt nesneleri içerir:
+    - `general`: `site_name`, `tagline`, `contact_email`, `support_phone`, `headquarters` (hepsi `string`) ve `logo_url` (`string | null`) alanlarını barındırır.
+    - `payment`: `iyzico_enabled` (`boolean`), `iyzico_mode` (`string`, varsayılan `'sandbox'`), `iyzico_api_key` (`string`) alanlarını barındırır.
+  - `loading`: `boolean` tipinde. Veri çekilme işleminin devam ettiğini belirtir. `true` ise veri henüz hazır değildir, `false` ise işlem tamamlanmıştır (başarılı veya hatalı).
+  - `error`: `string | null` tipinde. İşlem sırasında bir hata oluştuysa hata mesajını, oluşmadıysa `null` değerini içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: react::useEffect
+- import: react::useState
 
 ---
 
 ## INTERFACES
 
 ### AppSettings
-- `id: string`
-- `site_title: string`
-- `site_description: string`
-- `contact_email: string`
-- `contact_phone: string`
-- `contact_address: string`
-- `social_links: Record<string, string>`
-- `maintenance_mode: boolean`
-- `google_analytics_id: string | null`
-- `footer_text: string`
-- `header_announcement: string | null`
-- `default_meta_image: string | null`
-- `brand_logo_url: string | null`
-- `whatsapp_number: string | null`
-- `updated_at: string`
+- `general: {`
+- `payment: {`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/hooks/useSettings.ts::useSettings
-- **params**: (yok)
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `settings` — Uygulama ayarlarını tutan state, başlangıçta `null`, `setSettings` ile güncellenir, tipi `AppSettings | null`
-  - `setSettings` — `settings` state'ini güncellemek için React setter fonksiyonu
-  - `loading` — Veri yükleme durumunu takip eden boolean state, başlangıçta `true`
-  - `setLoading` — `loading` state'ini güncellemek için React setter fonksiyonu, `finally` bloğunda `false` yapılır
-  - `error` — Hata mesajını tutan string veya null state, başlangıçta `null`
-  - `setError` — `error` state'ini güncellemek için React setter fonksiyonu
-  - `fetchSettings` — `useEffect` içinde tanımlı nested async fonksiyon, Supabase'den `app_settings` tablosundan tek satır veri çeker
-  - `supabase` — Import edilen Supabase browser client instance'ı, `.from().select().single()` zincirinde kullanılır
-  - `data` — `supabase.from('app_settings').select('*').single()` response'undan destructure edilen veri nesnesi, `setSettings` argumenti olarak cast edilerek kullanılır
-  - `fetchError` — Supabase response'undan destructure edilen hata nesnesi, `if (fetchError)` ile kontrol edilip throw edilir
-  - `err` — `catch` bloğu parametresi, `unknown` tipinde, `instanceof Error` kontrolü ile message'e erişilir
-- **Dönüş**: `{ settings, loading, error }` object — settings verisi, yükleme durumu ve hata mesajını döner
+  - `settings` — useState ile yönetilen AppSettings | null tipinde state, site genel ayarlarını (site_name, tagline, contact_email, support_phone, headquarters, logo_url) ve ödeme ayarlarını (iyzico_enabled, iyzico_mode, iyzico_api_key) barındırır, başlangıçta null
+  - `setSettings` — settings state'ini güncellemek için kullanılan setter fonksiyonu, fetchSettings içinde supabase verisi ile çağrılır
+  - `loading` — boolean state, supabase verisi yüklenirken true, yükleme tamamlanınca false olur
+  - `setLoading` — loading state'ini güncellemek için kullanılan setter fonksiyonu, finally bloğunda false olarak çağrılır
+  - `error` — string | null tipinde state, hata olduğunda hata mesajını, olmadığında null tutar
+  - `setError` — error state'ini güncellemek için kullanılan setter fonksiyonu, catch bloğunda hata mesajı ile çağrılır
+  - `fetchSettings` — asenkron iç fonksiyon, useEffect callback'i içinde tanımlanır ve hemen çağrılır; supabase'den site_settings tablosunu sorgular
+- **Dönüş**: `{ settings: AppSettings | null, loading: boolean, error: string | null }`
 
-### [N2_NASIL] AST Pointer: src/hooks/useSettings.ts::useSettings::useEffect_callback
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: src/hooks/useSettings.ts::useSettings/anonymous/useEffect_callback
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `fetchSettings` — useCallback yok, her render'da yeniden oluşturulan async fonksiyon, Supabase'den ayar verisini çeker ve state'lere yazar
-- **Dönüş**: yok (yan etki: `fetchSettings()` çağrısı ile state'leri mutate eder)
+  - `fetchSettings` — asenkron fonksiyon, useEffect içinde tanımlanıp hemen invok edilir; supabase API'si üzerinden `site_settings` tablosundan `key, value` sütunlarını çeker
+  - `data` — supabase.from('site_settings').select('key, value') çağrısından dönen satır dizisi, her satır {key: string, value: unknown} yapısındadır
+  - `fetchError` — supabase sorgusundan dönen hata nesnesi, Error'a cast edilip throw edilir
+  - `generalRow` — `data?.find((r) => r.key === 'general')` ile bulunan satır; value alanı Record<string, unknown> olarak cast edilir, site_name, tagline, contact_email, support_phone, headquarters, logo_url alanları String() ile string'e dönüştürülerek okunur, logo_url için null kontrolü yapılır
+  - `paymentRow` — `data?.find((r) => r.key === 'payment')` ile bulunan satır; value alanı Record<string, unknown> olarak cast edilir, iyzico_enabled !! ile boolean'a, iyzico_mode String() ile 'sandbox' varsayılanıyla, iyzico_api_key String() ile string'e dönüştürülür
+  - `r` — Array.find callback parametresi, her bir satır objesini temsil eder, `r.key` özelliği ile filtreleme yapılır
+  - `err` — catch bloğunda yakalanan unknown tip hata, `instanceof Error` kontrolü ile `err.message` veya `String(err)` dönüşümü yapılır
+- **Dönüş**: yok (yan etkiler: setSettings, setError, setLoading state setter'ları çağrılır)
 
-### [N3_NASIL] AST Pointer: src/hooks/useSettings.ts::useSettings::useEffect_callback::fetchSettings
-- **params**: (yok)
+### [N3_NASIL] AST Pointer: src/hooks/useSettings.ts::useSettings/anonymous/useEffect_callback::fetchSettings
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — Supabase `.single()` response'undan destructure edilen ham ayar verisi, `Partial<AppSettings>` ve ardından `AppSettings` tipine cast edilerek `setSettings`'e passed edilir
-  - `fetchError` — Supabase `.single()` response'undan destructure edilen hata objesi, truthy ise `throw` ile catch bloğuna aktarılır
-  - `err` — Catch bloğu yakaladığı `unknown` tipindeki hata, `instanceof Error` kontrolü ile `err.message` veya `String(err)` formatında `setError`'e passed edilir
-- **Dönüş**: yok (yan etkiler: `setSettings(data)` başarılı durumda, `setError(err)` hata durumunda, `setLoading(false)` her durumda finally bloğunda çağrılır)
+  - `data` — supabase.from('site_settings').select('key, value') çağrısından dönen satır dizisi
+  - `fetchError` — supabase sorgusu başarısızsa dönen hata nesnesi, `Error`'a cast edilir ve throw edilir
+  - `generalRow` — `data?.find((r) => r.key === 'general')` ile bulunan satır; `generalRow?.value` Record<string, unknown> olarak cast edilip `site_name`, `tagline`, `contact_email`, `support_phone`, `headquarters`, `logo_url` alanları okunur; logo_url varsa String() ile string'e, yoksa null döner
+  - `paymentRow` — `data?.find((r) => r.key === 'payment')` ile bulunan satır; `paymentRow?.value` Record<string, unknown> olarak cast edilip `iyzico_enabled` (!!), `iyzico_mode` (String, varsayılan 'sandbox'), `iyzico_api_key` (String) alanları okunur
+  - `r` — Array.find callback'indeki her bir satır parametresi, `r.key` özelliği 'general' veya 'payment' değerleri için kontrol edilir
+  - `err` — try-catch bloğunda yakalanan hata nesnesi (unknown tip); `instanceof Error` ile kontrol edilip `err.message` veya `String(err)` olarak string'e dönüştürülür
+- **Dönüş**: yok (yan etkiler: `setSettings({...})` ile settings state'i güncellenir, `setError(err.message)` ile hata state'i güncellenir, `setLoading(false)` ile yükleme durumu kapatılır)
 
 ---
 

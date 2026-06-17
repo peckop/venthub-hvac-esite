@@ -4,5 +4,6 @@ export const search = {
       errors: 'URL veya mesaja göre ara',
       movements: 'Ürün adı/SKU\'ya göre ara',
       orders: 'Sipariş ID veya Görüşme ID\'ye göre ara',
-      products: 'Ürün adı/SKU/marka/URL adına göre ara'
+      products: 'Ürün adı/SKU/marka/URL adına göre ara',
+      webhookEvents: 'Olay tipi veya kaynağa göre ara...'
 };

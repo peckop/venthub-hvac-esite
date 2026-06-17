@@ -3,19 +3,15 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\search.tr.ts
-skeleton_hash: f709d45e4eac5837
+skeleton_hash: db5cddc6fa364e6a
 entity_hashes:
   overview: fc6cf9147f6079c3
-generated_at: 2026-06-13T11:16:33Z
+generated_at: 2026-06-17T13:23:01Z
 ---
 
 ## Genel Bakış
 
 Bu modül, VentHub HVAC yöneticip panelindeki arama bileşeninin Türkçe çevirilerini içeren bir sözlük dosyasıdır. Modül, arama arayüzündeki etiketler,.placeholder metinleri, hata mesajları ve diğer metin içeriklerini `search` sabiti altında yapılandırılmış olarak tanımlar.Uluslararasılaştırma (i18n) altyapısı tarafından yüklenerek, kullanıcı arayüzünün Türkçeleştirilmesinde kullanılır.
-
----
-
-> **Not:** Bu dosya yalnızca veri (sözlük) içerdiğinden, fonksiyon gruplandırması yapılmamıştır. Dosya içinde fonksiyon veya metod bulunmamaktadır.
 
 ---
 
@@ -33,7 +29,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## SABİTLER
 - **search** (object) — `{
       audit: 'Tablo, birincil anahtar veya nota göre ara',
-      coupons: '...`
+      coupons:...`
 
 ---
 
