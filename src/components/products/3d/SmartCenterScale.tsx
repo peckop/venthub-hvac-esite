@@ -13,6 +13,11 @@ interface SmartCenterScaleProps {
     alignment?: 'center' | 'bottom' // Hizalama tipi
 }
 
+// Module-level pooled variables to avoid per-frame allocations inside useFrame
+const tempBox = new Box3()
+const tempCenter = new Vector3()
+const tempSize = new Vector3()
+
 /**
  * SmartCenterScale: Profesyonel 3D Normalizasyon Bileşeni
  * 
@@ -49,36 +54,32 @@ export const SmartCenterScale: React.FC<SmartCenterScaleProps> = ({
         groupRef.current.updateMatrixWorld(true)
 
         // 2. Bounding Box hesapla
-        const box = new Box3().setFromObject(groupRef.current)
-        if (box.isEmpty()) {
+        tempBox.setFromObject(groupRef.current)
+        if (tempBox.isEmpty()) {
             console.warn('[SmartCenterScale] Empty bounding box for object', groupRef.current)
             return
         }
 
         // 3. Merkez ve Boyut bilgisi al
-        const center = new Vector3()
-        const size = new Vector3()
-        box.getCenter(center)
-        box.getSize(size)
-
-        // console.warn('[SmartCenterScale] Box Size:', size)
+        tempBox.getCenter(tempCenter)
+        tempBox.getSize(tempSize)
 
         // 4. Normalizasyon Ölçeği (En büyük kenarı baz al)
-        const maxDim = Math.max(size.x, size.y, size.z)
+        const maxDim = Math.max(tempSize.x, tempSize.y, tempSize.z)
         const scaleFactor = maxDim > 0 ? targetSize / maxDim : 1
 
         // 5. Hizalama Offset'i
-        let yOffset = -center.y
+        let yOffset = -tempCenter.y
         if (alignment === 'bottom') {
-            yOffset = -center.y + (size.y / 2)
+            yOffset = -tempCenter.y + (tempSize.y / 2)
         }
 
         // 6. Uygulama
         // Merkeze/Tabana çek, shift ekle
         groupRef.current.position.set(
-            -center.x + shift[0],
+            -tempCenter.x + shift[0],
             yOffset + shift[1],
-            -center.z + shift[2]
+            -tempCenter.z + shift[2]
         )
         groupRef.current.scale.set(scaleFactor, scaleFactor, scaleFactor)
 
@@ -99,6 +100,7 @@ export const SmartCenterScale: React.FC<SmartCenterScaleProps> = ({
         </group>
     )
 }
+
 
 
 

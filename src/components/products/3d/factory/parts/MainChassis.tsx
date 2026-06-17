@@ -1,8 +1,8 @@
 "use client"
-import React, { useMemo } from "react"
-import { BoxGeometry,LatheGeometry, TorusGeometry, Vector2 } from "three"
+import React, { useEffect,useMemo } from "react"
+import { BoxGeometry, LatheGeometry, TorusGeometry, Vector2 } from "three"
 
-import { useFanMaterials } from "../../materials/useFanMaterials"
+import { useResolveMaterials } from "../../core"
 
 interface MainChassisProps {
     isSelected?: boolean
@@ -39,19 +39,21 @@ const MainChassis: React.FC<MainChassisProps> = ({
     isHidden,
     onClick
 }) => {
-  const { galvanizedSteel, chassisInnerMat, safetyOrange } = useFanMaterials()
+  const { galvanizedSteel, chassisInnerMat, safetyOrange } = useResolveMaterials()
 
   const outerGeo = useMemo(() => new LatheGeometry(buildLathePoints(), 72), [])
   const innerGeo = useMemo(() => new LatheGeometry(buildInnerLathePoints(), 72), [])
   const flangeGeo = useMemo(() => new TorusGeometry(0.493, 0.012, 12, 72), [])
+  const ribGeo = useMemo(() => new BoxGeometry(0.008, 1.44, 0.008), [])
 
-  const ribGeos = useMemo(() => {
-    const ribs: BoxGeometry[] = []
-    for (let i = 0; i < 4; i++) {
-      ribs.push(new BoxGeometry(0.008, 1.44, 0.008))
+  useEffect(() => {
+    return () => {
+      outerGeo.dispose()
+      innerGeo.dispose()
+      flangeGeo.dispose()
+      ribGeo.dispose()
     }
-    return ribs
-  }, [])
+  }, [outerGeo, innerGeo, flangeGeo, ribGeo])
 
   if (isHidden || (isIsolated === false)) return null
 
@@ -70,10 +72,10 @@ const MainChassis: React.FC<MainChassisProps> = ({
       <mesh geometry={flangeGeo} material={mainMaterial} position={[0, 0.72, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow />
       <mesh geometry={flangeGeo} material={mainMaterial} position={[0, -0.72, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow />
 
-      {ribGeos.map((geo, i) => (
+      {[0, 1, 2, 3].map((i) => (
         <mesh
           key={i}
-          geometry={geo}
+          geometry={ribGeo}
           material={mainMaterial}
           position={[
             Math.cos((i * Math.PI) / 2) * 0.485,

@@ -1,11 +1,11 @@
-import { useCursor,useScroll } from '@react-three/drei'
+import { useCursor, useScroll } from '@react-three/drei'
 import { shaderMaterial } from '@react-three/drei'
-import { ThreeEvent,useFrame } from '@react-three/fiber'
+import { ThreeEvent, useFrame } from '@react-three/fiber'
 import { extend } from '@react-three/fiber'
 import { useRouter } from 'next/navigation'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { Mesh, ShaderMaterial } from 'three'
-import { Color, DoubleSide,MathUtils, SRGBColorSpace, Texture, TextureLoader } from 'three'
+import { Color, DoubleSide, MathUtils, PlaneGeometry, SRGBColorSpace, Texture, TextureLoader } from 'three'
 
 import { Routes } from '../../utils/routes'
 
@@ -94,6 +94,9 @@ interface BentPlaneGeometryProps {
     position?: [number, number, number]
 }
 
+// Module-level TextureLoader to avoid instantiating it inside components
+const textureLoader = new TextureLoader()
+
 /**
  * BentPlaneGeometry - Individual curved product card
  * Note: Position is now controlled by parent ProductCard component
@@ -110,22 +113,50 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
     useCursor(hovered)
 
     // Load texture
-    const texture = useMemo(() => new TextureLoader().load(image), [image])
-    texture.colorSpace = SRGBColorSpace
+    const texture = useMemo(() => {
+        const tex = textureLoader.load(image)
+        tex.colorSpace = SRGBColorSpace
+        return tex
+    }, [image])
 
-    useFrame(() => {
+    // Move inline geometry to useMemo to prevent re-creation on every render
+    const geometry = useMemo(() => new PlaneGeometry(3, 4, 32, 32), [])
+
+    // Clean up VRAM on unmount
+    useEffect(() => {
+        return () => {
+            geometry.dispose()
+        }
+    }, [geometry])
+
+    useEffect(() => {
+        return () => {
+            texture.dispose()
+        }
+    }, [texture])
+
+    useFrame((_, delta) => {
         if (!meshRef.current || !materialRef.current) return
+
+        // Clamp delta to prevent massive jumps when tab is inactive/lagging
+        const clampedDelta = Math.min(delta, 0.1)
+        // Lerp factor adjusted to match ~0.1 speed at 60 FPS in a frame-independent way
+        const lerpFactor = 1 - Math.exp(-6.32 * clampedDelta)
 
         // Update shader uniforms
         if (materialRef.current.uniforms.uScrollOffset) {
             materialRef.current.uniforms.uScrollOffset.value = scroll.offset
         }
-        materialRef.current.uniforms.uHover.value = MathUtils.lerp(materialRef.current.uniforms.uHover.value, hovered ? 1 : 0, 0.1)
+        materialRef.current.uniforms.uHover.value = MathUtils.lerp(
+            materialRef.current.uniforms.uHover.value,
+            hovered ? 1 : 0,
+            lerpFactor
+        )
 
-        // Scale on hover for zoom effect
+        // Scale on hover for zoom effect (frame-independent)
         const targetScale = hovered ? 1.1 : 1.0
-        meshRef.current.scale.x = MathUtils.lerp(meshRef.current.scale.x, targetScale, 0.1)
-        meshRef.current.scale.y = MathUtils.lerp(meshRef.current.scale.y, targetScale, 0.1)
+        meshRef.current.scale.x = MathUtils.lerp(meshRef.current.scale.x, targetScale, lerpFactor)
+        meshRef.current.scale.y = MathUtils.lerp(meshRef.current.scale.y, targetScale, lerpFactor)
     })
 
     const handleClick = (e: ThreeEvent<MouseEvent>) => {
@@ -140,8 +171,8 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
             onClick={handleClick}
             onPointerOver={() => setHover(true)}
             onPointerOut={() => setHover(false)}
+            geometry={geometry}
         >
-            <planeGeometry args={[3, 4, 32, 32]} />
             <bentPlaneMaterial
                 ref={materialRef}
                 uTexture={texture}

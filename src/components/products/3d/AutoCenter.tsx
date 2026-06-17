@@ -19,6 +19,9 @@ import { Box3, Vector3 } from 'three'
  * 
  * @param shift - [x, y, z] Manuel kaydırma (Opsiyonel). Otomatik merkezleme üzerine eklenir.
  */
+const tempBox = new Box3()
+const tempCenter = new Vector3()
+
 export const AutoCenter: React.FC<{ children: React.ReactNode; enabled?: boolean; shift?: [number, number, number] }> = ({ children, enabled = true, shift = [0, 0, 0] }) => {
     const groupRef = useRef<Group>(null)
     const isLocked = useRef(false)
@@ -39,16 +42,15 @@ export const AutoCenter: React.FC<{ children: React.ReactNode; enabled?: boolean
         groupRef.current.updateMatrixWorld(true)
 
         // 2. Bounding Box hesapla
-        const box = new Box3().setFromObject(groupRef.current)
+        tempBox.setFromObject(groupRef.current)
 
         // 3. Box geçerli mi kontrol et
-        if (box.isEmpty()) return
+        if (tempBox.isEmpty()) return
 
-        const center = new Vector3()
-        box.getCenter(center)
+        tempBox.getCenter(tempCenter)
 
         // 4. Offset hesapla ve uygula
-        const yOffset = -center.y + shift[1]
+        const yOffset = -tempCenter.y + shift[1]
         const xOffset = shift[0]
         const zOffset = shift[2]
 
