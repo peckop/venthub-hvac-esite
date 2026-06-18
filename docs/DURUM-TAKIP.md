@@ -15,10 +15,10 @@
 - **Durum:** 🟡 brief yazıldı → worker'a verilmeyi bekliyor (sonra ben gate: type/lint/test/**build**/§8/INV-*)
 
 ### Controller #2 — 3D şeridi
-- **Aktif:** 3D standartlaştırma — INV-3D-2 **tek-Canvas KİLİTLİ** (allowlist boş); sıradaki = kapsamlı 3D cetveli (standart-önce) + eski borç süpürmesi
-- **Dal:** (şu an) `docs/durum-takip-3d-lane`; iş dalları master'dan **taze** açılır (worktree izole — K0)
-- **Kilit dosyalar:** `src/components/products/3d/core/VentHubCanvas.tsx`, `src/__tests__/conformance/3d-single-canvas.test.ts`, (yazılacak) `docs/standards/3d-standard.md`, bu pano (yalnız bu bölüm)
-- **Durum:** 🟢 tek-Canvas kilitlendi (#374/#375/#379 — tüm 3D yüzeyleri VentHubCanvas'a taşındı) → 🟡 sıradaki: kapsamlı **3D cetveli** + eski borç (Wave 3 = 23 model · FanRenderer→Product3DViewer rename · INV-3D-5 CSP · INV-3D-6 perf) — standart-önce/worker-judge akışıyla
+- **Aktif:** 3D **görsel kalite** fazı (conformance BİTTİ). Işık rig **v3 front-lit** master'da → Recep'in görsel onayı bekleniyor (orbit showcase ekran görüntüsü = gözüm).
+- **Dal:** iş dalları master'dan **taze**, izole worktree gate (`C:/tmp/vh-gate`, gerçek install); **görsel inceleme MASTER üzerinden** (Recep feature-branch açamaz) → merge-et-göster, beğenmezse revert.
+- **Kilit dosyalar:** `src/components/products/3d/core/SceneLightingRig.tsx` (ışık), `src/config/orbitalCarouselConfig.ts` + `OrbitalProductsShowcase.tsx`→`Category3DIcon`→`ProductModelRenderer` (framing/boyut), bu pano (yalnız bu bölüm)
+- **Durum:** ✅ conformance kapandı (re-audit 36 dosya/34 temiz · INV-3D-1/2/5/7 canlı · BlueprintCanvas Suspense #396 · audit §0 reconciliation) + Wave3-6 + recipe (FlexibleDuct/DuctFan) + ProductModelRenderer rename hepsi master'da → 🟡 GÖRSEL: ışık v3 #399 (onay bekliyor) → sıradaki: (2) ürün çok-yakın framing · (3) per-model boyut normalizasyon · sonra materyal/post + ordu cila. Tam durum → memory `3d-visual-quality-phase`.
 
 ---
 
