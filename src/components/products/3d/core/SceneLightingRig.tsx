@@ -26,19 +26,20 @@ export function SceneLightingRig({ env = 'product' }: { env?: EnvPresetKey }) {
   const k = RIG_INTENSITY[env]
   return (
     <>
-      {/* Gerçek-zamanlı (B5 bütçesi): ambient + 1 gölge-veren key directional. */}
-      <ambientLight intensity={0.3 * k} />
-      <directionalLight position={[8, 14, 8]} intensity={1.35 * k} castShadow shadow-mapSize={1024} />
+      {/* Gerçek-zamanlı (B5 bütçesi): ambient + 1 gölge-veren key. Key TEPEDEN değil ÖN-üstten →
+          ürünün kameraya bakan yüzünü aydınlatır (eski [8,14,8] tepeden vurup zemini parlatıyordu, ön yüz karanlıktı). */}
+      <ambientLight intensity={0.4 * k} />
+      <directionalLight position={[4, 6, 11]} intensity={1.5 * k} castShadow shadow-mapSize={1024} />
       {/* IBL — prosedürel stüdyo (512 = keskin metal yansıması; frames={1} → tek-sefer render). */}
       <Environment resolution={512} frames={1}>
-        {/* KEY — büyük yumuşak, ön-sağ, hafif SICAK (premium ürün-shot tonu). */}
-        <Lightformer form="rect" intensity={2.6 * k} position={[5, 5, 5]} scale={[10, 10, 1]} color="#fff4e6" />
-        {/* FILL — SOĞUK, zayıf, ön-sol (gölge yumuşatma + renk-kontrast). */}
-        <Lightformer form="rect" intensity={0.85 * k} position={[-6, 3, -2]} scale={[8, 8, 1]} color="#dbeafe" />
-        {/* RIM/BACK — arkadan parlak dar şerit: kenar ayrımı = "pahalı" pop (3-nokta'nın eksik ayağı). */}
-        <Lightformer form="rect" intensity={3.2 * k} position={[0, 4, -7]} scale={[7, 2.5, 1]} color="#ffffff" />
+        {/* KEY — ön-sağ, KAMERA tarafından (ürünün ÖN yüzünü aydınlatır), hafif SICAK. */}
+        <Lightformer form="rect" intensity={2.8 * k} position={[4, 4, 9]} scale={[10, 10, 1]} color="#fff4e6" />
+        {/* FILL — ön-sol, SOĞUK (ön yüzün diğer yarısını yumuşatır). */}
+        <Lightformer form="rect" intensity={1.2 * k} position={[-6, 2, 6]} scale={[8, 8, 1]} color="#dbeafe" />
+        {/* RIM/BACK — arkadan-üstten HAFİF kenar ışığı (silüet yapmasın diye 3.2→1.5 azaltıldı). */}
+        <Lightformer form="rect" intensity={1.5 * k} position={[0, 6, -6]} scale={[6, 2.5, 1]} color="#ffffff" />
         {/* TOP — tepe yumuşak çember, genel ortam. */}
-        <Lightformer form="circle" intensity={1.1 * k} position={[0, 8, 0]} scale={[6, 6, 1]} color="#ffffff" />
+        <Lightformer form="circle" intensity={1.0 * k} position={[0, 8, 0]} scale={[6, 6, 1]} color="#ffffff" />
       </Environment>
     </>
   )

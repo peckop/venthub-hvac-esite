@@ -54,6 +54,12 @@ const WRITE_TOKENS = [
 // `Promise.resolve()`/`Promise.reject()` HARİÇ (no-op sahteyi geçirmez).
 const SERVICE_AWAIT = /await\s+(?!Promise\b)[A-Za-z_$][\w$.]*\s*\(/
 
+// Toplu servise-delege: `await Promise.all(ids.map(id => servis(id)))` gibi kombinatör-sarmalı
+// gerçek operasyonlar. Kör nokta: SERVICE_AWAIT `await Promise`'i (no-op sahteyi yakalamak için)
+// dışlıyordu → meşru `Promise.all`/`allSettled`/`race` desenini de tanımıyordu. No-op sahte
+// `Promise.resolve()`/`reject()` kullanır, ASLA bu kombinatörleri değil → güvenle gerçek-etki sayılır.
+const PROMISE_COMBINATOR = /await\s+Promise\.(all|allSettled|race)\s*\(/
+
 function toRelPath(globKey: string): string {
   const marker = '/src/'
   const idx = globKey.indexOf(marker)
@@ -122,7 +128,8 @@ describe('INV-6 · admin-write real-effect conformance', () => {
       for (const body of extractMutateFnBodies(clean)) {
         const hasWrite = WRITE_TOKENS.some((tok) => body.includes(tok))
         const hasServiceAwait = SERVICE_AWAIT.test(body)
-        if (!hasWrite && !hasServiceAwait) {
+        const hasPromiseCombinator = PROMISE_COMBINATOR.test(body)
+        if (!hasWrite && !hasServiceAwait && !hasPromiseCombinator) {
           offenders.push({ file: rel, snippet: body.replace(/\s+/g, ' ').slice(0, 120) })
         }
       }
