@@ -130,7 +130,7 @@ const AdminInventorySettingsPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-10 max-w-5xl animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-12 max-w-5xl animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header className="space-y-1">
         <h1 className={adminSectionTitleClass}>{t('admin.inventory.settings.title')}</h1>
         <p className={adminSubtitleClass}>{t('admin.inventory.settings.subtitle')}</p>
@@ -145,150 +145,204 @@ const AdminInventorySettingsPage: React.FC = () => {
         </div>
       )}
 
-      <div className={`${adminCardClass} p-8 lg:p-10 space-y-8 relative overflow-hidden group`}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-cyan-500/10" />
-        
-        {loading === LoadState.Loading ? (
-          <AdminSkeleton variant="form" fields={3} />
-        ) : (
-          <>
-            <div className="relative z-10 space-y-6">
-              <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                <Settings className="text-cyan-400" size={20} />
-                <h2 className="text-lg font-black text-white uppercase tracking-tight">{t('admin.inventory.settings.stockThresholdSettings')}</h2>
-              </div>
+      <div className="space-y-12">
+        {/* Grup 1: Stok Eşik Ayarları */}
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-8 pt-8 first:pt-0 border-t border-white/5 first:border-t-0">
+          {/* Sol Kolon: Başlık ve Açıklama (2fr) */}
+          <div className="md:col-span-2 space-y-3">
+            <div className="flex items-center gap-3">
+              <Settings className="text-cyan-400" size={20} />
+              <h2 className="text-lg font-black text-white uppercase tracking-tight">
+                {t('admin.inventory.settings.stockThresholdSettings')}
+              </h2>
+            </div>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+              {t('admin.inventory.settings.thresholdDescription')}
+            </p>
+          </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.defaultLowStockThreshold')}</label>
-                  <div className="flex items-center gap-3">
-                    <input 
-                      type="number" 
-                      className={`${adminInputClass} max-w-120px !h-12 !text-center !text-lg !font-black`}
-                      value={defaultThreshold} 
-                      onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} 
-                      placeholder="0" 
-                    />
-                    <button 
-                      className={`${adminButtonPrimaryClass} flex-1 shadow-lg shadow-cyan-400/10`} 
-                      disabled={saving || !hasWriteAccess} 
-                      onClick={save}
+          {/* Sağ Kolon: Form Alanları Card (5fr) */}
+          <div className="md:col-span-5">
+            <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-cyan-500/10" />
+              
+              {loading === LoadState.Loading ? (
+                <AdminSkeleton variant="form" fields={2} />
+              ) : (
+                <div className="relative z-10 space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.defaultLowStockThreshold')}</label>
+                      <div className="flex items-center gap-3">
+                        <input 
+                          type="number" 
+                          className={`${adminInputClass} max-w-120px !h-12 !text-center !text-lg !font-black`}
+                          value={defaultThreshold} 
+                          onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} 
+                          placeholder="0" 
+                        />
+                        <button 
+                          className={`${adminButtonPrimaryClass} flex-1 shadow-lg shadow-cyan-400/10`} 
+                          disabled={saving || !hasWriteAccess} 
+                          onClick={save}
+                        >
+                          {saving ? t('admin.inventory.settings.processing') : t('common.update')}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.bulkApply')}</label>
+                      <label className="flex items-start gap-4 p-4 rounded-2xl bg-surface-deep/40 border border-white/5 cursor-pointer group/item hover:border-white/10 transition-colors">
+                        <input 
+                          type="checkbox" 
+                          className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors" 
+                          checked={resetAll} 
+                          onChange={(e) => setResetAll(e.target.checked)} 
+                        />
+                        <div className="space-y-1">
+                          <span className="block text-sm font-black text-white group-hover/item:text-cyan-400 transition-colors">{t('admin.inventory.settings.applyToAll')}</span>
+                          <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
+                            {t('admin.inventory.settings.bulkApplyHelp')}
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                    <p className="text-xs font-bold text-amber-500/80 leading-relaxed uppercase tracking-widest text-center">
+                      {t('admin.inventory.settings.bulkApplyWarning')}
+                    </p>
+                  </div>
+
+                  {loading === LoadState.Error && <div className="text-sm font-black text-rose-500 text-center uppercase tracking-widest">{error}</div>}
+                  {!!success && <div className="text-sm font-black text-emerald-400 text-center uppercase tracking-widest">{success}</div>}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Grup 2: Alarm Otomasyonu */}
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-8 pt-8 border-t border-white/5">
+          {/* Sol Kolon: Başlık ve Açıklama (2fr) */}
+          <div className="md:col-span-2 space-y-3">
+            <div className="flex items-center gap-3">
+              <Bell className="text-violet-400" size={20} />
+              <h2 className="text-lg font-black text-white uppercase tracking-tight">
+                {t('admin.inventory.settings.alarmAutomation')}
+              </h2>
+            </div>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+              {t('admin.inventory.settings.alarmDescription')}
+            </p>
+          </div>
+
+          {/* Sağ Kolon: Form Alanları Card (5fr) */}
+          <div className="md:col-span-5">
+            <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-violet-500/10" />
+              
+              {loading === LoadState.Loading ? (
+                <AdminSkeleton variant="form" fields={2} />
+              ) : (
+                <div className="relative z-10 space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.emailNotifications')}</label>
+                      <div className="space-y-2">
+                        <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">{t('admin.inventory.settings.alertEmailLabel')}</label>
+                        <input
+                          type="email"
+                          className={adminInputClass}
+                          placeholder="ornek@sirket.com"
+                          value={alertEmail}
+                          onChange={e => setAlertEmail(e.target.value)}
+                        />
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.inventory.settings.alertEmailHelp')}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.webhookIntegration')}</label>
+                      <div className="space-y-2">
+                        <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">{t('admin.inventory.settings.webhookUrlLabel')}</label>
+                        <input
+                          type="url"
+                          className={adminInputClass}
+                          placeholder="https://api.sirketiniz.com/stok-alarm"
+                          value={alertWebhook}
+                          onChange={e => setAlertWebhook(e.target.value)}
+                        />
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.inventory.settings.webhookUrlHelp')}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Grup 3: Rezervasyon Kuralları */}
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-8 pt-8 border-t border-white/5">
+          {/* Sol Kolon: Başlık ve Açıklama (2fr) */}
+          <div className="md:col-span-2 space-y-3">
+            <div className="flex items-center gap-3">
+              <Zap className="text-amber-400" size={20} />
+              <h2 className="text-lg font-black text-white uppercase tracking-tight">
+                {t('admin.inventory.settings.reservationRules')}
+              </h2>
+            </div>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+              {t('admin.inventory.settings.reservationDescription')}
+            </p>
+          </div>
+
+          {/* Sağ Kolon: Form Alanları Card (5fr) */}
+          <div className="md:col-span-5">
+            <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-amber-500/10" />
+              
+              {loading === LoadState.Loading ? (
+                <AdminSkeleton variant="form" fields={1} />
+              ) : (
+                <div className="relative z-10 space-y-6">
+                  <div className="max-w-md space-y-4">
+                    <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.reservationTimeoutLabel')}</label>
+                    <div className="flex items-end gap-6">
+                      <div className="flex-1 space-y-2">
+                        <input
+                          type="number"
+                          min="1"
+                          max="720"
+                          className={`${adminInputClass} !h-12 text-lg font-black`}
+                          value={resTimeout}
+                          onChange={e => setResTimeout(parseInt(e.target.value) || 24)}
+                        />
+                      </div>
+                      <div className="flex-1 pb-1">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+                          {t('admin.inventory.settings.reservationTimeoutHelp')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-8 flex justify-end relative z-10 border-t border-white/5">
+                    <button
+                      disabled={savingGeneral || !hasWriteAccess}
+                      onClick={saveGeneralSettings}
+                      className={`${adminButtonPrimaryClass} px-12 h-14 bg-violet-500 text-white hover:bg-violet-400 shadow-lg shadow-violet-500/20`}
                     >
-                      {saving ? t('admin.inventory.settings.processing') : t('common.update')}
+                      {savingGeneral ? t('admin.inventory.settings.saving') : t('admin.inventory.settings.saveAll')}
                     </button>
                   </div>
                 </div>
-
-                <div className="space-y-3">
-                  <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.bulkApply')}</label>
-                  <label className="flex items-start gap-4 p-4 rounded-2xl bg-surface-deep/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
-                    <input 
-                      type="checkbox" 
-                      className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors" 
-                      checked={resetAll} 
-                      onChange={(e) => setResetAll(e.target.checked)} 
-                    />
-                    <div className="space-y-1">
-                      <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">{t('admin.inventory.settings.applyToAll')}</span>
-                      <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
-                        {t('admin.inventory.settings.bulkApplyHelp')}
-                      </span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
-                <p className="text-xs font-bold text-amber-500/80 leading-relaxed uppercase tracking-widest text-center">
-                  {t('admin.inventory.settings.bulkApplyWarning')}
-                </p>
-              </div>
-            </div>
-
-            {loading === LoadState.Error && <div className="text-sm font-black text-rose-500 text-center uppercase tracking-widest">{error}</div>}
-            {!!success && <div className="text-sm font-black text-emerald-400 text-center uppercase tracking-widest">{success}</div>}
-          </>
-        )}
-      </div>
-
-      <div className={`${adminCardClass} p-8 lg:p-10 space-y-10 relative overflow-hidden group`}>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-violet-500/10" />
-
-        <section className="space-y-8 relative z-10">
-          <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-            <Bell className="text-violet-400" size={20} />
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">{t('admin.inventory.settings.alarmAutomation')}</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="space-y-4">
-              <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.emailNotifications')}</label>
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">{t('admin.inventory.settings.alertEmailLabel')}</label>
-                <input
-                  type="email"
-                  className={adminInputClass}
-                  placeholder="ornek@sirket.com"
-                  value={alertEmail}
-                  onChange={e => setAlertEmail(e.target.value)}
-                />
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.inventory.settings.alertEmailHelp')}</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.webhookIntegration')}</label>
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">{t('admin.inventory.settings.webhookUrlLabel')}</label>
-                <input
-                  type="url"
-                  className={adminInputClass}
-                  placeholder="https://api.sirketiniz.com/stok-alarm"
-                  value={alertWebhook}
-                  onChange={e => setAlertWebhook(e.target.value)}
-                />
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.inventory.settings.webhookUrlHelp')}</p>
-              </div>
+              )}
             </div>
           </div>
-        </section>
-
-        <section className="space-y-8 relative z-10 pt-6 border-t border-white/5">
-          <div className="flex items-center gap-3">
-            <Zap className="text-amber-400" size={20} />
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">{t('admin.inventory.settings.reservationRules')}</h2>
-          </div>
-
-          <div className="max-w-md space-y-4">
-            <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.reservationTimeoutLabel')}</label>
-            <div className="flex items-end gap-6">
-              <div className="flex-1 space-y-2">
-                <input
-                  type="number"
-                  min="1"
-                  max="720"
-                  className={`${adminInputClass} !h-12 text-lg font-black`}
-                  value={resTimeout}
-                  onChange={e => setResTimeout(parseInt(e.target.value) || 24)}
-                />
-              </div>
-              <div className="flex-1 pb-1">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
-                  {t('admin.inventory.settings.reservationTimeoutHelp')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div className="pt-8 flex justify-end relative z-10">
-          <button
-            disabled={savingGeneral || !hasWriteAccess}
-            onClick={saveGeneralSettings}
-            className={`${adminButtonPrimaryClass} px-12 h-14 bg-violet-500 text-white hover:bg-violet-400 shadow-lg shadow-violet-500/20`}
-          >
-            {savingGeneral ? t('admin.inventory.settings.saving') : t('admin.inventory.settings.saveAll')}
-          </button>
         </div>
       </div>
     </div>
