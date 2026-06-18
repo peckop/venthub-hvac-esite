@@ -32,3 +32,10 @@ export const adminSettingsLabelClass = 'block text-xs font-black text-slate-500 
 
 export const adminTableScrollAreaClass = 'overflow-y-auto max-h-400px'
 
+// DataTableKit Inventory Column Tokens to avoid arbitrary Tailwind classes
+export const adminTableMinWidthClass = 'min-w-[1000px]'
+export const adminSupplierMaxWidthClass = 'max-w-[120px]'
+export const adminInputWidthLocationClass = 'w-20'
+export const adminInputWidthSupplierClass = 'w-24'
+
+

@@ -1,7 +1,7 @@
 'use client'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import React, { useCallback, useMemo,useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
@@ -9,13 +9,17 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database.types'
 
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import ExportMenu from '../../components/admin/ExportMenu'
 import InventoryTable from '../../components/admin/InventoryTable'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Density, InventoryRow, LoadState, SortKey } from '../../types/inventory'
+import type { InventoryRow } from '../../types/inventory'
 
-type InventoryRowWithCategory = InventoryRow & { category_id?: string | null }
+type InventoryRowWithCategory = InventoryRow & {
+  category_id?: string | null
+  low_stock_threshold?: number | null
+}
 
 const PAGE_SIZE = 50
 
@@ -28,8 +32,7 @@ async function inventoryFetcher(
   supabase: SupabaseClient<Database>,
   params: FetchParams,
 ): Promise<FetchResult<InventoryRowWithCategory>> {
-  // Veritabanındaki gerçek view 'inventory_velocity' tablosudur. 
-  // TS tipleri ile veri tabanı kolonları yer değiştirdiği için 'as never' kullanılarak gerçek view sorgulanır.
+  // Veritabanındaki gerçek view 'inventory_velocity' tablosudur.
   let query = supabase
     .from('inventory_velocity' as never)
     .select('product_id, name, physical_stock, reserved_stock, available_stock, warehouse_location, supplier_name')
@@ -68,31 +71,36 @@ async function inventoryFetcher(
     .map((r) => String((r as Record<string, unknown>).product_id || ''))
     .filter(Boolean)
 
-  // View üzerinde category_id olmadığı için products tablosundan eşleştirme yapılır
+  // View üzerinde category_id ve low_stock_threshold olmadığı için products tablosundan eşleştirme yapılır
   const categoryMap: Record<string, string> = {}
+  const thresholdMap: Record<string, number> = {}
+
   if (productIds.length > 0) {
     const { data: productsData } = await supabase
       .from('products')
-      .select('id, category_id')
+      .select('id, category_id, low_stock_threshold')
       .in('id', productIds)
     if (productsData) {
       productsData.forEach((p) => {
         if (p.category_id) categoryMap[p.id] = p.category_id
+        if (typeof p.low_stock_threshold === 'number') thresholdMap[p.id] = p.low_stock_threshold
       })
     }
   }
 
   const rows: InventoryRowWithCategory[] = items.map((r) => {
     const item = r as Record<string, unknown>
+    const pId = String(item.product_id || '')
     return {
-      product_id: String(item.product_id || ''),
+      product_id: pId,
       name: String(item.name || ''),
       physical_stock: Number(item.physical_stock || 0),
       reserved_stock: Number(item.reserved_stock || 0),
       available_stock: Number(item.available_stock || 0),
       warehouse_location: item.warehouse_location ? String(item.warehouse_location) : null,
       supplier_name: item.supplier_name ? String(item.supplier_name) : null,
-      category_id: String(item.product_id || '') ? categoryMap[String(item.product_id)] || null : null,
+      category_id: pId ? categoryMap[pId] || null : null,
+      low_stock_threshold: pId ? thresholdMap[pId] ?? null : null,
     }
   })
 
@@ -116,7 +124,6 @@ const InventoryTableBody: React.FC = () => {
   const hasWriteAccess = canWrite('inventory')
 
   const [categories, setCategories] = useState<Category[]>([])
-  const [selectedRow, setSelectedRow] = useState<InventoryRow | null>(null)
 
   // Fetch categories for the filter select
   React.useEffect(() => {
@@ -135,16 +142,7 @@ const InventoryTableBody: React.FC = () => {
     }
   }, [])
 
-  const {
-    rows,
-    totalMatched,
-    isLoading,
-    error,
-    reload,
-    pagination,
-    sorting,
-    filtering,
-  } = useAdminTable<InventoryRowWithCategory>({
+  const table = useAdminTable<InventoryRowWithCategory>({
     resource: 'inventory',
     rowId: (r) => r.product_id,
     fetcher: inventoryFetcher,
@@ -155,7 +153,7 @@ const InventoryTableBody: React.FC = () => {
   const handleUpdateLocation = useCallback(
     async (productId: string, val: string) => {
       try {
-        const row = rows.find((r) => r.product_id === productId)
+        const row = table.rows.find((r) => r.product_id === productId)
         const before = { warehouse_location: row?.warehouse_location || null }
         const after = { warehouse_location: val || null }
 
@@ -175,7 +173,7 @@ const InventoryTableBody: React.FC = () => {
           },
         })
         toast.success(t('admin.inventory.toasts.locationUpdated') || 'Konum güncellendi.')
-        await reload()
+        await table.reload()
       } catch (e: unknown) {
         console.error('Update location error:', e)
         const msg =
@@ -187,13 +185,13 @@ const InventoryTableBody: React.FC = () => {
         toast.error(msg)
       }
     },
-    [rows, hasWriteAccess, reload, t],
+    [table, hasWriteAccess, t],
   )
 
   const handleUpdateSupplier = useCallback(
     async (productId: string, val: string) => {
       try {
-        const row = rows.find((r) => r.product_id === productId)
+        const row = table.rows.find((r) => r.product_id === productId)
         const before = { supplier_name: row?.supplier_name || null }
         const after = { supplier_name: val || null }
 
@@ -213,7 +211,7 @@ const InventoryTableBody: React.FC = () => {
           },
         })
         toast.success(t('admin.inventory.toasts.supplierUpdated') || 'Tedarikçi güncellendi.')
-        await reload()
+        await table.reload()
       } catch (e: unknown) {
         console.error('Update supplier error:', e)
         const msg =
@@ -225,7 +223,7 @@ const InventoryTableBody: React.FC = () => {
         toast.error(msg)
       }
     },
-    [rows, hasWriteAccess, reload, t],
+    [table, hasWriteAccess, t],
   )
 
   const categoryOptions = useMemo(
@@ -237,89 +235,80 @@ const InventoryTableBody: React.FC = () => {
     [categories],
   )
 
+  const exportCsv = useCallback(async () => {
+    const allRows = await table.fetchAllForExport()
+    const cols = [
+      t('admin.inventory.table.productCol'),
+      t('admin.inventory.table.physicalCol'),
+      t('admin.inventory.table.reservedCol'),
+      t('admin.inventory.table.availableCol'),
+      t('admin.inventory.table.thresholdCol'),
+      t('admin.inventory.table.locationCol'),
+      t('admin.inventory.table.supplierCol'),
+    ]
+    const header = cols.join(',')
+    const lines = allRows.map((r) =>
+      [
+        `"${(r.name || '').replace(/"/g, '""')}"`,
+        r.physical_stock,
+        r.reserved_stock,
+        r.available_stock,
+        r.low_stock_threshold ?? 5,
+        `"${(r.warehouse_location || '').replace(/"/g, '""')}"`,
+        `"${(r.supplier_name || '').replace(/"/g, '""')}"`,
+      ].join(','),
+    )
+    const csv = '\uFEFF' + [header, ...lines].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `inventory_${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [table, t])
+
   return (
     <div className="space-y-4">
       <AdminToolbar
         storageKey="toolbar:inventory"
         sticky
         search={{
-          value: filtering.query,
-          onChange: filtering.setQuery,
+          value: table.filtering.query,
+          onChange: table.filtering.setQuery,
           placeholder: t('admin.inventory.searchPlaceholder') || 'Ürünlerde ara...',
           focusShortcut: '/',
         }}
         select={{
-          value: filtering.filters.category?.[0] || '',
-          onChange: (v) => filtering.setFilter('category', v ? [v] : []),
+          value: table.filtering.filters.category?.[0] || '',
+          onChange: (v) => table.filtering.setFilter('category', v ? [v] : []),
           title: t('admin.inventory.allCategories') || 'Tüm Kategoriler',
           options: [
             { value: '', label: t('admin.inventory.allCategories') || 'Tüm Kategoriler' },
             ...categoryOptions,
           ],
         }}
-        onClear={filtering.clearAll}
-        recordCount={totalMatched}
+        onClear={table.filtering.clearAll}
+        recordCount={table.totalMatched}
+        rightExtra={
+          <ExportMenu
+            items={[
+              {
+                key: 'csv',
+                label: t('admin.inventory.export.csv') || 'Sayfa Verilerini İndir (.csv)',
+                onSelect: () => void exportCsv(),
+              },
+            ]}
+          />
+        }
       />
 
       <InventoryTable
-        rows={rows}
-        loading={isLoading ? LoadState.Loading : LoadState.Idle}
-        error={error || ''}
-        selected={selectedRow}
-        visibleCols={{
-          name: true,
-          physical: true,
-          reserved: true,
-          available: true,
-          threshold: true,
-          status: true,
-          location: true,
-          supplier: true,
-          abc: false,
-          days: false,
-        }}
-        density={'comfortable' as Density}
-        sortKey={(sorting.sort?.key as SortKey) || 'name'}
-        sortDir={sorting.sort?.dir || 'asc'}
-        groupByCategory={false}
-        groupedRows={[]}
-        onSort={sorting.toggleSort}
-        onSelect={setSelectedRow}
+        table={table}
+        hasWriteAccess={hasWriteAccess}
         onUpdateLocation={handleUpdateLocation}
         onUpdateSupplier={handleUpdateSupplier}
-        hasWriteAccess={hasWriteAccess}
-        thresholdMap={{}}
-        defaultThreshold={5}
-        effectiveThreshold={() => 5}
       />
-
-      {/* Pagination controls */}
-      {totalMatched > PAGE_SIZE && (
-        <div className="flex items-center justify-between border-t border-white/5 pt-4">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
-            {t('admin.common.total')}: <span className="text-cyan-400">{totalMatched}</span>
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => pagination.setPage(pagination.page - 1)}
-              disabled={pagination.page <= 1}
-              className="px-4 py-2 bg-slate-900 border border-white/5 text-xs font-bold text-white rounded-lg disabled:opacity-50 hover:bg-slate-800 transition-colors uppercase tracking-widest"
-            >
-              {t('admin.ui.prev') || 'Önceki'}
-            </button>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-              {pagination.page} / {pagination.pageCount}
-            </span>
-            <button
-              onClick={() => pagination.setPage(pagination.page + 1)}
-              disabled={pagination.page >= pagination.pageCount}
-              className="px-4 py-2 bg-slate-900 border border-white/5 text-xs font-bold text-white rounded-lg disabled:opacity-50 hover:bg-slate-800 transition-colors uppercase tracking-widest"
-            >
-              {t('admin.ui.next') || 'Sonraki'}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
