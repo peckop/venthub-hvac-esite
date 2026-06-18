@@ -86,7 +86,7 @@ Dinamik gölgeler, sahnenin her karede ışık gözünden tekrar çizilmesini (r
 - **ContactShadows:** Pahalı geometri gölgeleri yerine, zemin seviyesinde sahte gölge oluşturmak için Drei'nin `<ContactShadows />` bileşenini tercih edin.
   ```tsx
   <ContactShadows 
-    position={[0, -1.5, 0]} 
+    position={[0, -0.5, 0]} 
     opacity={0.4} 
     scale={10} 
     blur={2} 
@@ -96,7 +96,7 @@ Dinamik gölgeler, sahnenin her karede ışık gözünden tekrar çizilmesini (r
 
 ### D. Dinamik Ölçekleme & DPR (Device Pixel Ratio) Yönetimi
 Mobil ekranlar yüksek piksel yoğunluğuna (retina/3x) sahiptir. Mobil cihazlarda DPR'ı 3 olarak ayarlamak, GPU'nun işlemesi gereken piksel sayısını 9 kat artırır.
-- **Kural:** DPR değerini mobil cihazlarda en fazla 1.5 veya 2 ile sınırlandırın.
+- **Kural:** DPR değerini mobil cihazlarda en fazla 1.5 ile sınırlandırın (WebGL Standardı B4 maddesiyle uyumlu).
 - **Çözüm:** `<Canvas dpr={[1, 1.5]}>` kullanarak mobil cihazlarda çözünürlüğü düşürün.
 - **PerformanceMonitor (Drei):** FPS düştüğünde çözünürlüğü dinamik olarak düşüren yapıyı kurun:
   ```tsx

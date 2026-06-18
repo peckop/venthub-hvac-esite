@@ -1,9 +1,9 @@
 'use client'
 
-import { createBrowserClient } from '@supabase/ssr'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import React, { createContext, useContext, useMemo,useState } from 'react'
+import React, { createContext, useContext, useMemo, useState } from 'react'
 
+import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database.types'
 
 type SupabaseContextType = {
@@ -13,12 +13,11 @@ type SupabaseContextType = {
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined)
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  const [supabase] = useState(() =>
-    createBrowserClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
-    )
-  )
+  // Tekil browser client'ı SAĞLA — kendi createBrowserClient'ını çağırma.
+  // İkinci bir GoTrueClient örneği aynı storage key'i paylaşır → navigator.locks
+  // deadlock'u (admin paneli "yükleniyor"da donar). AuthContext (statik import) ve
+  // bu provider artık AYNI tekil instance'ı kullanır. DI/test/multi-tenant korunur.
+  const [supabase] = useState(() => supabaseBrowserClient)
 
   const contextValue = useMemo(() => ({ supabase }), [supabase])
 
