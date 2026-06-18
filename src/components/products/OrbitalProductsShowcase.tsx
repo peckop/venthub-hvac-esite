@@ -76,12 +76,14 @@ const Stage: React.FC<{
             </mesh>
 
             {/* Zemin - LIFTED to -1.6 (relative deeper) */}
+            {/* Stüdyo zemini: kapkara ayna (#050a15) yerine hafif açık + daha mat (roughness↑) →
+                ürün bir yüzeyin üstünde oturuyormuş gibi okunur, "kara boşlukta yüzme" biter. */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.6, 0]}>
                 <circleGeometry args={[12, 64]} />
                 <meshStandardMaterial
-                    color="#050a15"
+                    color="#0b1626"
                     metalness={CONFIG.floorMetalness}
-                    roughness={0.3}
+                    roughness={0.55}
                 />
             </mesh>
             <Sparkles count={CONFIG.particleCount} scale={16} size={2} speed={0.2} opacity={0.3} color={CONFIG.glowColor} />
@@ -831,7 +833,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}
-            style={{ backgroundColor: CONFIG.backgroundColor, height: containerHeight }}
+            style={{ background: CONFIG.backgroundGradient, height: containerHeight }}
         >
             <VentHubCanvas
                 preset="showcase"

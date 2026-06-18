@@ -91,11 +91,19 @@ export const ORBITAL_CAROUSEL_CONFIG = {
     /** Parçacık efekti sayısı */
     particleCount: 100,
 
-    /** Arka plan rengi */
+    /** Arka plan rengi (degrade desteklenmeyen yerler için yedek) */
     backgroundColor: '#020617',
 
-    /** Zemin yansıması metalikliği */
-    floorMetalness: 0.9,
+    /**
+     * Sahne arka planı — yumuşak "stüdyo kovuğu" radyal degrade.
+     * Merkez-üst hafif aydınlık (ürün bir ışık havuzunda durur) → kenarlara doğru koyu.
+     * Düz siyah void yerine derinlik/sahne hissi verir (kara boşlukta yüzme sorununu çözer).
+     */
+    backgroundGradient:
+        'radial-gradient(ellipse 95% 80% at 50% 30%, #1b2a45 0%, #0c1626 44%, #05080f 100%)',
+
+    /** Zemin yansıması metalikliği — 0.9 ayna çok sert; 0.5 = yumuşak stüdyo zemini */
+    floorMetalness: 0.5,
 }
 
 export type OrbitalCarouselConfig = typeof ORBITAL_CAROUSEL_CONFIG
