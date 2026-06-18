@@ -92,4 +92,11 @@ export const dashboard = {
   allRead: 'Tümü okundu',
   noNewActivity: 'Yeni bir aktivite bulunmuyor.',
   onlyLast20Notifications: 'Sadece son 20 bildirim gösterilir.',
+  inbox: {
+    title: 'İlgi Bekleyenler',
+    pendingReturns: 'Bekleyen İadeler',
+    pendingShipments: 'Sevk Bekleyen Siparişler',
+    lowStock: 'Kritik Stok Alarmları',
+    unresolvedErrors: 'Çözülmemiş Hatalar',
+  },
 };
