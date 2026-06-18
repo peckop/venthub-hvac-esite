@@ -5,17 +5,15 @@
 > niçin/ne) · Kapı = zorlayıcı (makine: nasıl-doğru-kalır). "Güzel görünüyor" demez, **ölçer.**
 > Oluşturma: 2026-06-16 · Sahibi: Recep · Nasıl-yapılır oyun kitabı → `.claude/skills/threejs-webgl-performance`
 >
-> **v1.1 (2026-06-16) — birleştirme:** Bu cetvel artık **tek 3D SSOT**. İkinci bir LLM'in bağımsız
-> ürettiği `world_class_design_standards.md` **PART I** (WebGPU/TSL · BatchedMesh/InstancedMesh ·
-> `gltf-transform` pipeline · recursive dispose kodu · AX-01..12 aksiyomları) **buraya emildi**: kural/eşik/kapı
-> §0–§4'te (otorite), somut kod §6'da (uygulama). Örtüşen teknikler iki kaynakta **hemfikir** çıktı
-> (InstancedMesh/BatchedMesh · Draco+KTX2 · dispose · `frameloop` · `shadows="percentage"`) → yön çift-doğrulandı.
-> *(Not: o dokümanın PART II'si = UI/UX tasarım alanı, AYRI cetvel; buraya dahil DEĞİL.)*
+> **v1.2 (2026-06-18) — Sahne, Işık & Showroom UX entegrasyonu:** Bu sürümde, 3D stüdyo showroom
+> kalitesi için belirlenen kamera-tabanlı stüdyo ışık değerleri, prosedürel environment/lightformer şeması
+> ve rasyonel HVAC alıcı kararlarını hedefleyen bilgi paneli UX kuralları bu SSOT cetveline entegre edilmiştir.
 >
 > **Kaynaklar (bu cetvel hafızadan değil bunlardan damıtıldı):** NLM "4. THREE.JS / WEBGPU / AI 3D" defteri
 > (three.js docs · @react-three/drei · **WebGPU W3C spec** · MDN) + web: [utsubo 100 tips](https://www.utsubo.com/blog/threejs-best-practices-100-tips) ·
 > [Codrops efficient three.js](https://tympanus.net/codrops/2025/02/11/building-efficient-three-js-scenes-optimize-performance-while-maintaining-quality/) ·
 > [threedium e-commerce](https://threedium.io/3d-model/web-ecommerce) · [cylindo mobil](https://blog.cylindo.com/optimizing-3d-viewer-load-speed-for-mobile-first-shoppers) · [pmndrs drei `<View>`](http://drei.docs.pmnd.rs/portals/view)
+> + W3C WCAG 2.2 ve CIE aydınlatma standartları + Nielsen Norman Group (3D Configurator Heuristics)
 > + **ikinci kaynak damıtması:** `world_class_design_standards.md` PART I (gltf-transform CLI · TSL node API · BatchedMesh).
 >
 > **Eşik kalibrasyonu (dürüstlük notu):** Aşağıdaki sayısal bütçeler (draw call <100, ilk yük <4MB, üçgen
@@ -47,9 +45,12 @@ TSL vertex-displacement shader → §6.4.)
 | Alan | Tek Doğru Kaynak | Niçin |
 |---|---|---|
 | **Canvas/renderer config** | tek `<VentHubCanvas>` sarmalayıcı (DPR · shadow · frameloop · colorSpace · toneMapping tek yerden) | her bileşenin kendi config'i = drift + tutarsız görsel |
-| **Işık & Environment** | tek **prosedürel** environment (drei `<Environment>` + `<Lightformer>` rig) + ortak ışık preset'i | dosya/CDN bağımlılığı = çökme/yavaşlık; metal IBL'siz kararır |
+| **Işık & Environment** | kamera-tabanlı 3-nokta ışık ve prosedürel environment rig'i (drei `<Environment>` + `<Lightformer>` + `frames={1}`) | arkada gölge/kararma kalmasını önler; CDN bağımlılığı ve render VRAM yükü sıfırlanır |
 | **PBR materyal** | merkezi metalness/roughness **token'ları** | per-ürün sihirli-sayı = tutarsız + bakımsız |
 | **Asset** | tek model/asset **registry** (yol + Draco/KTX2 + geçerlilik); **decoder'lar YEREL** (`/public/decoders/…`) | dağınık string path → bozuk/eksik asset (dummy HDR); CDN decoder = CSP + çökme riski |
+| **Kamera Geometrisi** | kilitli `cameraFOV: 45°` + mesafe `14` + yükseklik `1.5` | perspektif distorsiyonunu önler ve tüm vitrinde görsel parite sağlar |
+| **Boyut Normalizasyonu** | otomatik bounding-box tabanlı `scale` normalizasyonu + `3dModelOffsets.ts` | HVAC ünitelerinin fiziksel boyut farklarını sanal ortamda dengeler |
+| **Arayüz Kontrastı** | Glassmorphic arayüz paneli (`backdrop-filter: blur(16px)` + `%40 dark opacity`) | W3C WCAG 2.2 kontrast şartlarını 3D dinamik arka planlar önünde korur |
 | **Çoklu yüzey** | **TEK** `<Canvas>` + drei `<View>` (gl.scissor) | çoklu Canvas → context limiti → Safari en eskiyi atar → çökme |
 
 ---
@@ -75,18 +76,30 @@ TSL vertex-displacement shader → §6.4.)
   vitrin tekstürleri için **drei `<Image>`** (basit texture loader değil; AX-06). Karar matrisi + kod → §6.2.
   Draw call **üçgenden daha kritik.** *([utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips) · [threedium](https://threedium.io/3d-model/web-ecommerce) · PART I §2)*
 - **B2 — Üçgen bütçesi:** mobil 1–2k · web LOD 5–15k · konfigüratör ≤50k · adaptif 500–50k (cihaza göre); mutlak tavan <1–2M. LOD: drei `<Detailed>` (büyük sahnede +%30-40 FPS), mesafe 0/50/100m. *([threedium](https://threedium.io/3d-model/web-ecommerce) · [utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
-- **B3 — `frameloop="demand"`** (statik sahne; `invalidate()` ile tetikle). Tab gizliyse render dur (`visibilitychange`). `useFrame` içinde **allocate YASAK** (`new Vector3()` yok) → **modül-seviye temp nesne havuzu** (AX-10, §6.5); animasyon React state ile değil `useFrame` mutasyonuyla; daima `delta`. *([Codrops](https://tympanus.net/codrops/2025/02/11/building-efficient-three-js-scenes-optimize-performance-while-maintaining-quality/) · [utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
+- **B3 — `frameloop="demand"` ve Geçiş Animasyonları:** Statik sahnelerde `frameloop="demand"` zorunludur (`invalidate()` ile tetiklenir). Ancak kamera pürüzsüz takip/lerp animasyonları yaparken (`lerp speed: 0.1` vb.), animasyon süresince `frameloop` geçici olarak reaktif şekilde `always` moduna alınmalı veya her karede `invalidate()` tetiklenmeli, animasyon bittiğinde tekrar `demand` moduna dönülmelidir. Tab gizliyse render durur. `useFrame` içinde nesne allocate etmek kesinlikle yasaktır (`new Vector3()` yok, temp nesne havuzu kullanılır). *([Codrops](https://tympanus.net/codrops/2025/02/11/building-efficient-three-js-scenes-optimize-performance-while-maintaining-quality/) · [utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
 - **B4 — DPR cap: masaüstü 1.0 · mobil 1.5.** Drop'ta `AdaptiveDpr` + `PerformanceMonitor` ile DPR ×0.8. *(Mevcut `Product3DViewer` `dpr={[1,2]}` → mobilde fazla, düşürülecek.)* *([Codrops](https://tympanus.net/codrops/2025/02/11/building-efficient-three-js-scenes-optimize-performance-while-maintaining-quality/))*
-- **B5 — Gölge:** `shadows="percentage"` (**`PCFSoftShadowMap` YASAK** — CLAUDE.md #9 / AX-02); ≤ **3 gerçek-zamanlı ışık**; statik gölge **bake** (`BakeShadows`/`ContactShadows`); dinamik shadow-map recalc 0–1. Shadow map: mobil 512–1024 · masaüstü 1024–2048 · kritik 4096. PointLight gölgesi = 6 render. *(Mevcut kod `shadow-mapSize={2048}` masaüstü-tamam/mobil-ağır.)* *([utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
+- **B5 — Gölge & Kamera-Tabanlı Işık:** `shadows="percentage"` (**`PCFSoftShadowMap` YASAK** — CLAUDE.md #9 / AX-02); ≤ **3 gerçek-zamanlı ışık**; statik gölge **bake** (`BakeShadows`/`<ContactShadows position={[0, -0.5, 0]} opacity={0.6} blur={2.5} far={2} scale={10} />` — B10 uyarınca normalize model tabanı `y = -0.5`'e yerleştirilmelidir). Dönen carousel'de ön yüz kararmasını önlemek için **ışıklar kamera aksına bağlı (camera-relative)** olmalıdır. Shadow map: mobil 512–1024 · masaüstü 1024–2048. *([utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
 - **B6 — Asset boyutu:** ürün başı ≤ 5–10MB · **ilk yük < 4MB**. **Draco** (geometri %80–95) + **KTX2/Basis** (GPU bellek %75–85, yük %40–50). Tekstür power-of-2, ≤4096 (mobil 256–512); texture memory < 100MB/ürün ailesi (tek 4K = 64MB VRAM). Pipeline: `gltf-transform` resize 2048 → UASTC (normal/ORM) → ETC1S (baseColor) → Draco edgebreaker → §6.3. **Decoder'lar yerel** (B6 ⊃ A2). *([threedium](https://threedium.io/3d-model/web-ecommerce) · [utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips) · PART I §3)*
 - **B7 — Yükleme:** below-fold **lazy** (`IntersectionObserver` / `content-visibility: auto` → `.content-auto`; AX-03); **progressive** (low-res 200–500ms içinde, high-res arka planda); model yüklenirken **PlaceholderWireframe** (CLS önler; AX-09); `useGLTF.preload`. Hedef: ilk render 150ms · 4G < 3s · terk eşiği 3.8s · dokunma gecikmesi < 20ms. *([threedium](https://threedium.io/3d-model/web-ecommerce) · [cylindo](https://blog.cylindo.com/optimizing-3d-viewer-load-speed-for-mobile-first-shoppers))*
 - **B8 — Click-to-Load (ilk yük maliyeti = 0).** Ağır GLB modelleri sayfa açılışında **otomatik yüklenmez**; ancak kullanıcı etkileşimiyle (ör. "3D'yi yükle" butonu) indirilir → **LCP korunur**. *(AX-01; `ThreeDAuthority` deseni)*
 - **B9 — Raycast hızlandırma.** Etkileşimli (tıklanan/hover) karmaşık mesh → drei `<Bvh>`; basit geometri → `meshBounds`. Ham raycast ana-thread'i kilitler. *(AX-11; drei `<Bvh>`)*
+- **B10 — Bounding Box Normalizasyonu:** Farklı boyutlardaki HVAC modellerini vitrinde görsel olarak eşitlemek için yükleme anında modelin sınır kutusu (Bounding Box) hesaplanmalı ve çapı `1` birim olan sanal küreye sığacak şekilde otomatik ölçeklenmelidir. Ayrı ayrı scale çarpanları `3dModelOffsets.ts` üzerinden verilmelidir.
 
 ### C. Görsel Kalite / PBR
 - **C1 — MeshStandard/MeshPhysical kullanan sahne → IBL/environment ZORUNLU.** Yoksa metalik (yüksek metalness) materyaller ortamdan ışık alamaz, **tamamen kararır.** *(three.js docs · drei `<Environment>`; canlı kanıt: Orbital/Infinite vitrinlerde environment yok → metaller donuk.)*
-- **C2 — Color management:** sRGB output + ACESFilmic tone mapping; texture `colorSpace` doğru. *(WebGPU spec: `getPreferredCanvasFormat` `rgba8unorm`/`bgra8unorm`; three.js Color Management)*
+- **C2 — Color management & ACES Exposure:** sRGB output + ACESFilmic tone mapping; texture `colorSpace` doğru. ACES altında oluşan kararmayı telafi etmek için global **`toneMappingExposure: 1.3 - 1.5`** arasında ayarlanmalıdır. *(WebGPU spec: `getPreferredCanvasFormat` `rgba8unorm`/`bgra8unorm`; three.js Color Management)*
 - **C3 — Materyal instance paylaş; shader variant minimize.** Aynı özellikteki tüm nesneler tek materyal referansı. *([utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
+- **C4 — Üç-Noktalı Stüdyo Işık Konfigürasyonu:**
+  * **Key Light:** Şiddet `1.8`, 4500K-5000K sıcak spot (`#FFF4E6`). Konum: `[5.5, 7.5, 9.5]` (Azimut: 30°, Yükseklik: 38°).
+  * **Fill Light:** Şiddet `0.9`, 6500K-7500K soğuk dolgu (`#DBEAFE`). Konum: `[-7.0, 3.5, 7.5]` (Azimut: -43°, Yükseklik: 22°).
+  * **Ambient Light:** Şiddet `0.85`, `#FFFFFF`.
+  * **Key:Fill Şiddet Oranı:** 2:1.
+- **C5 — Prosedürel Environment (IBL) Şeması:** CDN bağımlılığı olmaksızın yansımaları sağlamak için 4 adet Lightformer (Key, Fill, Rim, Top) rig'i kullanılmalıdır. GPU optimizasyonu için `<Environment>` bileşeninde `frames={1}` set edilmelidir.
+- **C6 — Showroom UX & Bilgi Kartları:** 3D aydınlatma ve arayüz bütünüyle rasyonel B2B/B2C alım kararlarını tetiklemelidir:
+  * Kademeli Açıklama (Progressive Disclosure) ve interaktif hotspots kullanımı esastır.
+  * Bilgi panelinde öncelikli olarak **4 kilit HVAC metriği** gösterilmelidir: Hava Debisi ($m^3/h$), Toplam Verim (% / COP), Ses Güç Seviyesi ($dB(A)$), Elektriksel Güç ($kW$).
+  * Panel arka planı metin okunabilirliğini garanti etmek için Glassmorphic (`backdrop-filter: blur(16px)` + `%40 dark opacity`) olmalıdır (W3C WCAG 2.2 uyumlu).
+- **C7 — Mobil Arayüz ve Dokunma Sınırları:** Mobilde arayüz dikey kayan bir Bottom Sheet olarak açılmalı; 3D orbital döndürme alanı ile Bottom Sheet gestural alanları çakışmayacak şekilde touch collision sınırları ayrılmalıdır.
 
 ### D. Güvenlik
 - **D1 — Dış GLTF/GLB/image origin-clean + CORS + HTTPS.** `crossOrigin` etiketi; CSP `connect-src` whitelist (`raw.githubusercontent.com`, `raw.githack.com` — CLAUDE.md #9 / AX-04 ile uyumlu, **kaldırma**). WebGPU origin-clean olmayan kaynakta `SecurityError` fırlatır. *(WebGPU W3C spec §3.9)*
@@ -128,6 +141,12 @@ TSL vertex-displacement shader → §6.4.)
 - [ ] Metalik materyaller environment'lı (kararmıyor).
 - [ ] Draw call < 100 · mobil DPR ≤ 1.5 · ilk yük < 4MB · ≤3 dinamik ışık.
 - [ ] Ağır model **click-to-load** (otomatik LCP'yi bozmuyor); decoder'lar **yerel**.
+- [ ] Işıklar kameraya bağlı (camera-relative), orbital carousel dönüşlerinde ön yüz kararmıyor.
+- [ ] Key:Fill şiddet oranı 2:1 ve Kelvin renk sıcaklıkları stüdyo standartlarında (`#FFF4E6` / `#DBEAFE`).
+- [ ] Modeller sınır kutusu (Bounding Box) ile çapı `1` birim olan sanal küreye normalize edilip `3dModelOffsets.ts` ile ölçeklenmiş.
+- [ ] Bilgi kartı glassmorphism (blur 16px, opacity %40) ile WCAG 2.2 contrast paritesine uygun.
+- [ ] Showroom panelinde 4 temel HVAC metriği (Debi, Verim, Ses, Elektrik Gücü) öncelikli listelenmiş.
+- [ ] Mobilde Bottom Sheet kullanılmış, touch gesture çakışmaları engellenmiş.
 - [ ] `dispose` temiz (`<primitive>`/`useGLTF` elle) — `renderer.info` üzerinde sızıntı (artan geometries/textures) yok.
 - [ ] Dış asset CSP whitelist + CORS + HTTPS; CDN decoder yolu yok.
 
@@ -241,4 +260,131 @@ const waveNode = Fn(() => {                          // tiny-planet/curved-world
 const _tmpVec3 = new THREE.Vector3()
 const _tmpBox3 = new THREE.Box3()
 export const getMeshBounds = (mesh: THREE.Mesh) => _tmpBox3.setFromObject(mesh)
+```
+
+### 6.6 Kamera-Tabanlı Stüdyo Işık Rig'i ve Prosedürel Environment (B5 / C1 / C4 / C5)
+```tsx
+import React, { useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { Environment, Lightformer, ContactShadows, BakeShadows } from '@react-three/drei'
+import * as THREE from 'three'
+
+export function SceneLightingRig() {
+  const lightGroupRef = useRef<THREE.Group>(null)
+
+  // Işıkların yönünün kamerayla birlikte dönmesini veya kameraya bağlı kalmasını sağlar
+  useFrame(({ camera }) => {
+    if (lightGroupRef.current) {
+      // Işıkları kameranın pozisyonu ve rotasyonuna kilitler (Camera-Relative)
+      lightGroupRef.current.position.copy(camera.position)
+      lightGroupRef.current.rotation.copy(camera.rotation)
+    }
+  })
+
+  return (
+    <>
+      {/* Nötr ortam ışığı */}
+      <ambientLight intensity={0.85} color="#ffffff" />
+
+      {/* Kamera eksenine bağlı stüdyo 3-nokta ışıkları */}
+      <group ref={lightGroupRef}>
+        {/* Key Light (Sağ-Üst-Ön). FPS kaybını önlemek için castShadow=false seçilip
+            gölgeler ContactShadows ile verilir ya da castShadow=true ile birlikte BakeShadows kullanılır */}
+        <directionalLight
+          castShadow
+          intensity={1.8}
+          position={[5.5, 7.5, 9.5]}
+          color="#fff4e6" // 4500K warm hex
+          shadow-mapSize={[1024, 1024]}
+        />
+        {/* Fill Light (Sol-Orta-Ön) */}
+        <directionalLight
+          intensity={0.9}
+          position={[-7.0, 3.5, 7.5]}
+          color="#dbeafe" // 6500K cool hex
+        />
+      </group>
+
+      {/* B10 Bounding Box Normalizasyonu uyarınca zemin ve gölge y = -0.5 seviyesindedir */}
+      <ContactShadows
+        position={[0, -0.5, 0]}
+        opacity={0.6}
+        blur={2.5}
+        far={2}
+        scale={10}
+      />
+
+      {/* Gerçek zamanlı shadow map hesaplamasını dondurur ve tek karede sabitler (bake) */}
+      <BakeShadows />
+
+      {/* Prosedürel Environment / IBL (Tek seferlik bake: frames={1}) */}
+      <Environment resolution={512} frames={1}>
+        <Lightformer form="rect" intensity={2.0} position={[5, 4, 9]} scale={[10, 10, 1]} color="#fff4e6" />
+        <Lightformer form="rect" intensity={1.6} position={[-6, 2, 6]} scale={[8, 8, 1]} color="#dbeafe" />
+        <Lightformer form="rect" intensity={1.2} position={[0, 6, -6]} scale={[6, 2.5, 1]} color="#ffffff" />
+        <Lightformer form="circle" intensity={1.0} position={[0, 8, 0]} scale={[6, 6, 1]} color="#ffffff" />
+      </Environment>
+    </>
+  )
+}
+```
+
+### 6.7 Model Boyut Normalizasyonu (B10)
+```tsx
+import * as THREE from 'three'
+
+export function normalizeModelScale(scene: THREE.Group): number {
+  const box = new THREE.Box3().setFromObject(scene)
+  const sphere = new THREE.Sphere()
+  box.getBoundingSphere(sphere)
+  
+  const diameter = sphere.radius * 2
+  if (diameter === 0) return 1
+  
+  // Modeli 1 birimlik sanal bir küre içine sığacak şekilde ölçeklendir
+  const scaleFactor = 1.0 / diameter
+  scene.scale.setScalar(scaleFactor)
+  
+  // Modeli merkezle (pivot noktasını orta noktaya kaydır)
+  const center = new THREE.Vector3()
+  box.getCenter(center)
+  scene.position.sub(center.multiplyScalar(scaleFactor))
+  
+  return scaleFactor;
+}
+```
+
+### 6.8 Glassmorphic Showroom Arayüz Paneli (C6 / C7)
+```css
+/* Glassmorphism CSS standardı (3D Canvas üstünde yüksek kontrast ve okunabilirlik sağlar) */
+.showroom-info-panel {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 380px;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.4); /* Koyu arkaplan + %40 saydamlık */
+  backdrop-filter: blur(16px); /* 16px Blur ile W3C kontrast paritesi */
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  color: #f8fafc;
+  z-index: 10;
+  pointer-events: auto; /* Tıklanabilir olmalı */
+}
+
+/* Mobilde Bottom Sheet tasarımı */
+@media (max-width: 768px) {
+  .showroom-info-panel {
+    right: 0;
+    bottom: 0;
+    top: auto;
+    transform: none;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(15, 23, 42, 0.65); /* Mobilde daha fazla yansıma kontrastı */
+  }
+}
 ```
