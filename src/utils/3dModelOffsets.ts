@@ -108,7 +108,7 @@ const MODEL_CONFIGS: Record<string, ModelConfig> = {
     'RoofFanModel': { // Çatı Tipi Fan Modeli
         grounded: { position: [0, -1.0, 0], scale: 1 },
         centered: { position: [0, -0.1, 0], scale: 1 },
-        orbital: { position: [0, -0.6, 0], scale: 1 }
+        orbital: { position: [0, 0.1, 0], scale: 1 } // normalizasyon sonrası -0.6 modeli yere indiriyordu → komşularla hizala
     },
     'RoundDuctFanModel': { // Yuvarlak Kanal Tipi Fan Modeli
         grounded: { position: [0, 0.1, 0], scale: 1 },
