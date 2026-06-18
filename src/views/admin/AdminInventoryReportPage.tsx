@@ -68,7 +68,7 @@ function InventoryReportContent() {
         const currentQs = searchParams?.toString() ?? ''
         const nextQs = params.toString()
         if (currentQs !== nextQs) {
-            router.replace(`${pathname}?${nextQs}`, { scroll: false })
+            router.replace(`${pathname}?${nextQs}` as import('next').Route, { scroll: false })
         }
     }, [debouncedQuery, dateRange, pathname, router, searchParams])
 
