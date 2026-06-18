@@ -76,9 +76,9 @@ TSL vertex-displacement shader → §6.4.)
   vitrin tekstürleri için **drei `<Image>`** (basit texture loader değil; AX-06). Karar matrisi + kod → §6.2.
   Draw call **üçgenden daha kritik.** *([utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips) · [threedium](https://threedium.io/3d-model/web-ecommerce) · PART I §2)*
 - **B2 — Üçgen bütçesi:** mobil 1–2k · web LOD 5–15k · konfigüratör ≤50k · adaptif 500–50k (cihaza göre); mutlak tavan <1–2M. LOD: drei `<Detailed>` (büyük sahnede +%30-40 FPS), mesafe 0/50/100m. *([threedium](https://threedium.io/3d-model/web-ecommerce) · [utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
-- **B3 — `frameloop="demand"`** (statik sahne; `invalidate()` ile tetikle). Tab gizliyse render dur (`visibilitychange`). `useFrame` içinde **allocate YASAK** (`new Vector3()` yok) → **modül-seviye temp nesne havuzu** (AX-10, §6.5); animasyon React state ile değil `useFrame` mutasyonuyla; daima `delta`. *([Codrops](https://tympanus.net/codrops/2025/02/11/building-efficient-three-js-scenes-optimize-performance-while-maintaining-quality/) · [utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
+- **B3 — `frameloop="demand"` ve Geçiş Animasyonları:** Statik sahnelerde `frameloop="demand"` zorunludur (`invalidate()` ile tetiklenir). Ancak kamera pürüzsüz takip/lerp animasyonları yaparken (`lerp speed: 0.1` vb.), animasyon süresince `frameloop` geçici olarak reaktif şekilde `always` moduna alınmalı veya her karede `invalidate()` tetiklenmeli, animasyon bittiğinde tekrar `demand` moduna dönülmelidir. Tab gizliyse render durur. `useFrame` içinde nesne allocate etmek kesinlikle yasaktır (`new Vector3()` yok, temp nesne havuzu kullanılır). *([Codrops](https://tympanus.net/codrops/2025/02/11/building-efficient-three-js-scenes-optimize-performance-while-maintaining-quality/) · [utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
 - **B4 — DPR cap: masaüstü 1.0 · mobil 1.5.** Drop'ta `AdaptiveDpr` + `PerformanceMonitor` ile DPR ×0.8. *(Mevcut `Product3DViewer` `dpr={[1,2]}` → mobilde fazla, düşürülecek.)* *([Codrops](https://tympanus.net/codrops/2025/02/11/building-efficient-three-js-scenes-optimize-performance-while-maintaining-quality/))*
-- **B5 — Gölge & Kamera-Tabanlı Işık:** `shadows="percentage"` (**`PCFSoftShadowMap` YASAK** — CLAUDE.md #9 / AX-02); ≤ **3 gerçek-zamanlı ışık**; statik gölge **bake** (`BakeShadows`/`<ContactShadows opacity={0.6} blur={2.5} far={2} scale={10} />`); dinamik shadow-map recalc 0–1. Dönen carousel'de ön yüz kararmasını önlemek için **ışıklar kamera aksına bağlı (camera-relative)** olmalıdır. Shadow map: mobil 512–1024 · masaüstü 1024–2048. *([utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
+- **B5 — Gölge & Kamera-Tabanlı Işık:** `shadows="percentage"` (**`PCFSoftShadowMap` YASAK** — CLAUDE.md #9 / AX-02); ≤ **3 gerçek-zamanlı ışık**; statik gölge **bake** (`BakeShadows`/`<ContactShadows position={[0, -0.5, 0]} opacity={0.6} blur={2.5} far={2} scale={10} />` — B10 uyarınca normalize model tabanı `y = -0.5`'e yerleştirilmelidir). Dönen carousel'de ön yüz kararmasını önlemek için **ışıklar kamera aksına bağlı (camera-relative)** olmalıdır. Shadow map: mobil 512–1024 · masaüstü 1024–2048. *([utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips))*
 - **B6 — Asset boyutu:** ürün başı ≤ 5–10MB · **ilk yük < 4MB**. **Draco** (geometri %80–95) + **KTX2/Basis** (GPU bellek %75–85, yük %40–50). Tekstür power-of-2, ≤4096 (mobil 256–512); texture memory < 100MB/ürün ailesi (tek 4K = 64MB VRAM). Pipeline: `gltf-transform` resize 2048 → UASTC (normal/ORM) → ETC1S (baseColor) → Draco edgebreaker → §6.3. **Decoder'lar yerel** (B6 ⊃ A2). *([threedium](https://threedium.io/3d-model/web-ecommerce) · [utsubo](https://www.utsubo.com/blog/threejs-best-practices-100-tips) · PART I §3)*
 - **B7 — Yükleme:** below-fold **lazy** (`IntersectionObserver` / `content-visibility: auto` → `.content-auto`; AX-03); **progressive** (low-res 200–500ms içinde, high-res arka planda); model yüklenirken **PlaceholderWireframe** (CLS önler; AX-09); `useGLTF.preload`. Hedef: ilk render 150ms · 4G < 3s · terk eşiği 3.8s · dokunma gecikmesi < 20ms. *([threedium](https://threedium.io/3d-model/web-ecommerce) · [cylindo](https://blog.cylindo.com/optimizing-3d-viewer-load-speed-for-mobile-first-shoppers))*
 - **B8 — Click-to-Load (ilk yük maliyeti = 0).** Ağır GLB modelleri sayfa açılışında **otomatik yüklenmez**; ancak kullanıcı etkileşimiyle (ör. "3D'yi yükle" butonu) indirilir → **LCP korunur**. *(AX-01; `ThreeDAuthority` deseni)*
@@ -266,7 +266,7 @@ export const getMeshBounds = (mesh: THREE.Mesh) => _tmpBox3.setFromObject(mesh)
 ```tsx
 import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Environment, Lightformer } from '@react-three/drei'
+import { Environment, Lightformer, ContactShadows, BakeShadows } from '@react-three/drei'
 import * as THREE from 'three'
 
 export function SceneLightingRig() {
@@ -288,7 +288,8 @@ export function SceneLightingRig() {
 
       {/* Kamera eksenine bağlı stüdyo 3-nokta ışıkları */}
       <group ref={lightGroupRef}>
-        {/* Key Light (Sağ-Üst-Ön) */}
+        {/* Key Light (Sağ-Üst-Ön). FPS kaybını önlemek için castShadow=false seçilip
+            gölgeler ContactShadows ile verilir ya da castShadow=true ile birlikte BakeShadows kullanılır */}
         <directionalLight
           castShadow
           intensity={1.8}
@@ -303,6 +304,18 @@ export function SceneLightingRig() {
           color="#dbeafe" // 6500K cool hex
         />
       </group>
+
+      {/* B10 Bounding Box Normalizasyonu uyarınca zemin ve gölge y = -0.5 seviyesindedir */}
+      <ContactShadows
+        position={[0, -0.5, 0]}
+        opacity={0.6}
+        blur={2.5}
+        far={2}
+        scale={10}
+      />
+
+      {/* Gerçek zamanlı shadow map hesaplamasını dondurur ve tek karede sabitler (bake) */}
+      <BakeShadows />
 
       {/* Prosedürel Environment / IBL (Tek seferlik bake: frames={1}) */}
       <Environment resolution={512} frames={1}>

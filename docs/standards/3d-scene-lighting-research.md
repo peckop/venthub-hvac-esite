@@ -68,11 +68,11 @@ HDR dosyası veya CDN bağımlılığı olmadan, metalik/parlak yüzeylere (örn
 
 * **Sonsuzluk Havuzu Arka Fonu (Backdrop):** Tam karanlık bir boşluk hissi (void) yerine stüdyo hissi vermek için CSS ile yumuşak bir radyal degrade vinyet kullanılır: `radial-gradient(ellipse 110% 95% at 50% 38%, #2c4163 0%, #14233e 45%, #070c18 100%)`. Merkezin hafif açık renk olması ürünün arkasında bir "ışık havuzu" oluşturur.
 * **Mat Stüdyo Zemini:** Zemin plakası (`circleGeometry`) için `floorMetalness: 0.5` ve `roughness: 0.55` kullanılarak, ürünün altında yumuşak ve flulaştırılmış yansımalar elde edilir.
-* **Temas Gölgesi (Contact Shadow):** Havada uçma hissini yok etmek için zemin seviyesine (`y = -1.6`) `drei` `<ContactShadows>` yerleştirilir:
+* **Temas Gölgesi (Contact Shadow):** Havada uçma hissini yok etmek için zemin seviyesine Drei `<ContactShadows>` yerleştirilir. Model B10 kuralına göre 1 birimlik sanal küreye normalize edilip `(0,0,0)` merkezine oturtulduğundan, taban noktası `y = -0.5` seviyesine denk gelecektir. Bu nedenle zemin ve gölge plakası **`y = -0.5`** (veya model offset çarpanı eklenerek) konumlandırılmalıdır (sabit `-1.6` değeri normalize modellerin havada uçmasına sebep olur):
   ```tsx
-  <ContactShadows opacity={0.6} blur={2.5} far={2} scale={10} />
+  <ContactShadows position={[0, -0.5, 0]} opacity={0.6} blur={2.5} far={2} scale={10} />
   ```
-  Bu sayede ürünlerin altına yumuşak ve fiziksel olarak doğru bir temas gölgesi düşürülür.
+  Bu sayede ürünlerin altına yumuşak ve fiziksel olarak doğru bir temas gölgesi düşürülür. Key Light real-time shadow-map hesaplamaları FPS kaybını önlemek için `<BakeShadows />` ile statik hale getirilmeli veya tamamen kapatılıp gölge Drei `<ContactShadows>` ile çözülmelidir.
 
 ---
 
@@ -97,8 +97,8 @@ HDR dosyası veya CDN bağımlılığı olmadan, metalik/parlak yüzeylere (örn
 | Parametre Sınıfı | Değer Adı | Başlangıç Ayarı | Renk / Kelvin | Açı / Koordinat |
 | :--- | :--- | :--- | :--- | :--- |
 | **Işıklar** | Ambient Light | `0.85` | `#FFFFFF` (Nötr Beyaz) | Yok |
-| | Key Light (Direc.) | `1.8` | `#FFF4E6` (4500K) | Pozisyon: `[5.5, 7.5, 9.5]` (Azimut: 30°, Yükseklik: 38°) |
-| | Fill Light (Direc.) | `0.9` | `#DBEAFE` (6500K) | Pozisyon: `[-7.0, 3.5, 7.5]` (Azimut: -43°, Yükseklik: 22°) |
+| | Key Light (Direc.) | `1.8` | `#FFF4E6` (4500K) | Pozisyon: `[5.5, 7.5, 9.5]` (Kamera-Lokal Koordinatları; Azimut: 30°, Yükseklik: 38°) |
+| | Fill Light (Direc.) | `0.9` | `#DBEAFE` (6500K) | Pozisyon: `[-7.0, 3.5, 7.5]` (Kamera-Lokal Koordinatları; Azimut: -43°, Yükseklik: 22°) |
 | **Environment (IBL)** | Key Softbox | `2.0` | `#FFF4E6` (4500K) | Pozisyon: `[5, 4, 9]` |
 | | Fill Softbox | `1.6` | `#DBEAFE` (6500K) | Pozisyon: `[-6, 2, 6]` |
 | | Rim Softbox | `1.2` | `#FFFFFF` (6000K) | Pozisyon: `[0, 6, -6]` |
