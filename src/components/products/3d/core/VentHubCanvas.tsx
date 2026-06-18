@@ -76,6 +76,9 @@ export function VentHubCanvas({
           // C2 — sRGB output + ACESFilmic tone mapping, tek yerden.
           state.gl.toneMapping = ACESFilmicToneMapping
           state.gl.outputColorSpace = SRGBColorSpace
+          // C2 — ACES sahneyi koyulaştırır; pozlama telafisi (standart §C2: 1.3–1.5).
+          // Sahnenin kök karanlık sebebi buydu (pozlama varsayılan 1.0'daydı).
+          state.gl.toneMappingExposure = 1.35
         }}
       >
         <ContextLossRecovery />
