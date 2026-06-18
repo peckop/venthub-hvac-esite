@@ -2,16 +2,20 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\vh-settings-i18n\src\i18n\dictionaries\admin\settings.en.ts
-skeleton_hash: b04646c246c311dc
+source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\settings.en.ts
+skeleton_hash: b018c49f0ceb881c
 entity_hashes:
   overview: a6820ef6861612f2
-generated_at: 2026-06-17T20:39:43Z
+generated_at: 2026-06-13T11:16:46Z
 ---
 
 ## Genel Bakış
 
 Bu modül, admin panelindeki ayarlar sayfası için İngilizce çeviri sözlüğü içermektedir. Dosya, `settings` adlı bir nesne tanımlayarak kullanıcay arayüzündeki tüm ayarlar sayfası metinlerini (başlıklar, etiketler, mesajlar, hata uyarıları vb.) merkezi bir yapıda sunar. Internationalization (i18n) altyapısı tarafından içe aktarılır ve uygulama genelinde İngilizce dil desteği için kullanılır.
+
+---
+
+> **Not:** Bu dosyada herhangi bir fonksiyon veya metot bulunmamaktadır. Yalnızca statik bir çeviri sözlüğü yapısı (`settings` sabiti) içermektedir. Dolayısıyla "Fonksiyon Grupları" bölümü üretilememiştir.
 
 ---
 
@@ -29,6 +33,10 @@ Bu modül bir i18n sözlük dosyasıdır (admin/settings.en.ts) ve `settings` ad
 
 ---
 
+> **Not:** Bu modül statik bir veri yapısı (i18n sözlüğü) olduğundan, fonksiyon imzası veya fonksiyon gövdesi mevcut değildir. Detaylı fonksiyonel aksiyom üretimi için modülde çalışan işlevsel kodların incelenmesi gerekir.
+
+---
+
 ## FONKSİYON DETAYLARI
 
 ---
@@ -37,7 +45,7 @@ Bu modül bir i18n sözlük dosyasıdır (admin/settings.en.ts) ve `settings` ad
 - **settings** (object) — `{
       siteName: 'Site Name',
       tagline: 'Tagline',
-      contactEmai...`
+      contactEmail: ...`
 
 ---
 
