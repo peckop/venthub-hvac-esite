@@ -32,10 +32,12 @@ export function SceneLightingRig({ env = 'product' }: { env?: EnvPresetKey }) {
           ambient'i belirgin YÜKSELT (0.55→0.85) + KEY'i geri GÜÇLENDİR (1.0→1.7) + GERÇEK ikinci
           directional FILL ekle (sol-ön) → mat ürünler parlak ve iki yanı dolu (yarı-karanlık biter). */}
       <ambientLight intensity={0.85 * k} />
-      {/* KEY — ön-sağ-üst: ana ışık + gölge (form/derinlik). */}
-      <directionalLight position={[5, 8, 10]} intensity={1.7 * k} castShadow shadow-mapSize={1024} />
+      {/* KEY — ÖN-merkez, hafif sağ-üst (kameraya yakın taraftan): öndeki ürünün KAMERAYA BAKAN
+          ÖN YÜZÜNÜ aydınlatır. v6 (2026-06-18): [5,8,10]→[3,5,12] (daha ÖN, daha az tepeden/yandan;
+          tepeden ışık ön yüzü gölgede bırakıyordu) + 1.7→1.8. Hafif yan-offset (x=3) düz/yassı bırakmaz. */}
+      <directionalLight position={[3, 5, 12]} intensity={1.8 * k} castShadow shadow-mapSize={1024} />
       {/* FILL — sol-ön: gölge yüzünü GERÇEKTEN doldurur (IBL değil, gerçek ışık); gölge yok = ucuz. */}
-      <directionalLight position={[-7, 4, 8]} intensity={1.0 * k} />
+      <directionalLight position={[-7, 4, 9]} intensity={1.0 * k} />
       {/* IBL — prosedürel stüdyo: yalnız metal yansıması/pop (mat aydınlatma yukarıdaki gerçek ışıklardan). */}
       <Environment resolution={512} frames={1}>
         {/* KEY env — ön-sağ, hafif SICAK. */}
