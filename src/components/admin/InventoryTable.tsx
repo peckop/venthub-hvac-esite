@@ -1,267 +1,322 @@
-import { SearchX } from 'lucide-react'
-import React from 'react'
+'use client'
+
+import { Pencil, SearchX } from 'lucide-react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider'
 
-import { useDragScroll } from '../../hooks/useDragScroll'
-import { Density, InventoryRow, LoadState, SortKey, VisibleCols } from '../../types/inventory'
-import { adminTableCellClass,adminTableHeadCellClass } from '../../utils/adminUi'
+import type { UseAdminTableResult } from '../../hooks/useAdminTable'
+import type { InventoryRow } from '../../types/inventory'
+import {
+  adminInputWidthLocationClass,
+  adminInputWidthSupplierClass,
+  adminSupplierMaxWidthClass,
+} from '../../utils/adminUi'
 import AdminEmptyState from './AdminEmptyState'
-import AdminSkeleton from './AdminSkeleton'
-import EditableCell from './EditableCell'
-import InfoTooltip from './InfoTooltip'
+import { DataTableKit } from './data-table/DataTableKit'
+import type { AdminColumn } from './data-table/types'
+
+type InventoryRowWithCategory = InventoryRow & {
+  category_id?: string | null
+  low_stock_threshold?: number | null
+}
 
 interface InventoryTableProps {
-    rows: InventoryRow[]
-    loading: LoadState
-    error: string
-    selected: InventoryRow | null
-    visibleCols: VisibleCols
-    density: Density
-    sortKey: SortKey
-    sortDir: 'asc' | 'desc'
-    groupByCategory: boolean
-    groupedRows: { _c_id: string | null; name: string; items: InventoryRow[] }[]
-    onSort: (key: SortKey) => void
-    onSelect: (r: InventoryRow) => void
-    onUpdateLocation: (_productId: string, val: string) => Promise<void>
-    onUpdateSupplier: (_productId: string, val: string) => Promise<void>
-    hasWriteAccess: boolean
-    thresholdMap: Record<string, number | null>
-    defaultThreshold: number | null
-    effectiveThreshold: (_productId: string) => number | null
+  table: UseAdminTableResult<InventoryRowWithCategory>
+  hasWriteAccess: boolean
+  onUpdateLocation: (productId: string, val: string) => Promise<void>
+  onUpdateSupplier: (productId: string, val: string) => Promise<void>
+}
+
+/* ---- Inline Text Edit Cell (location / supplier) ---- */
+interface InlineTextCellProps {
+  value: string
+  widthClass: string
+  ariaLabel?: string
+  placeholder?: string
+  extraSpanClass?: string
+  onSave: (val: string) => Promise<void>
+}
+
+const InlineTextCell: React.FC<InlineTextCellProps> = ({
+  value,
+  widthClass,
+  ariaLabel,
+  placeholder = '-',
+  extraSpanClass = '',
+  onSave,
+}) => {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(value)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!editing) setDraft(value)
+  }, [value, editing])
+
+  useEffect(() => {
+    if (editing) inputRef.current?.focus()
+  }, [editing])
+
+  const commit = useCallback(async () => {
+    setEditing(false)
+    if (draft === value) return
+    try {
+      await onSave(draft)
+    } catch {
+      setDraft(value)
+    }
+  }, [draft, value, onSave])
+
+  if (editing) {
+    return (
+      <div className="relative inline-block animate-in fade-in zoom-in duration-300">
+        <input
+          ref={inputRef}
+          type="text"
+          value={draft}
+          aria-label={ariaLabel}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={() => void commit()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') void commit()
+            if (e.key === 'Escape') {
+              setDraft(value)
+              setEditing(false)
+            }
+          }}
+          className={`${widthClass} bg-surface-deep border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-xs text-cyan-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400/10 font-bold`}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      className="group/btn relative px-3 py-1.5 rounded-xl border border-white/5 bg-white/3 hover:bg-white/8 hover:border-white/10 transition-colors duration-300 flex items-center gap-1.5 text-left"
+    >
+      <span className={`text-xs font-bold text-slate-300 group-hover/btn:text-cyan-400 transition-colors truncate block ${extraSpanClass}`}>
+        {value || <span className="text-slate-500">{placeholder}</span>}
+      </span>
+      <Pencil size={8} className="text-slate-600 group-hover/btn:text-cyan-400 transition-colors flex-shrink-0" />
+    </button>
+  )
 }
 
 export default function InventoryTable({
-    rows,
-    loading,
-    error,
-    selected,
-    visibleCols,
-    density,
-    sortKey,
-    sortDir,
-    groupByCategory,
-    groupedRows,
-    onSort,
-    onSelect,
-    onUpdateLocation,
-    onUpdateSupplier,
-    hasWriteAccess,
-    thresholdMap,
-    defaultThreshold,
-    effectiveThreshold
+  table,
+  hasWriteAccess,
+  onUpdateLocation,
+  onUpdateSupplier,
 }: InventoryTableProps) {
-    const { t } = useI18n()
-    const dragScrollRef = useDragScroll<HTMLDivElement>()
-    const headPad = density === 'compact' ? 'px-2 py-2' : ''
-    const cellPad = density === 'compact' ? 'px-2 py-2' : ''
+  const { t } = useI18n()
 
-    const sortIndicator = (key: SortKey) => {
-        if (sortKey !== key) return ''
-        return sortDir === 'asc' ? '▲' : '▼'
+  const statusBadge = useCallback((r: InventoryRowWithCategory) => {
+    const net = r.available_stock
+    const th = r.low_stock_threshold ?? 5
+    const base = 'px-3 py-1 text-xs font-black uppercase tracking-widest rounded-full border shadow-sm transition-colors'
+
+    if (net <= 0) {
+      return (
+        <span className={`${base} bg-rose-500/10 text-rose-400 border-rose-500/20`}>
+          {t('admin.inventory.status.depleted')}
+        </span>
+      )
     }
-
-    const statusBadge = (r: InventoryRow) => {
-        const net = r.available_stock
-        const th = effectiveThreshold(r.product_id)
-        const base = "px-3 py-1 text-xs font-black uppercase tracking-widest rounded-full border shadow-sm transition-colors"
-        
-        if (net <= 0) return <span className={`${base} bg-rose-500/10 text-rose-400 border-rose-500/20`}>{t('admin.inventory.status.depleted')}</span>
-        if (th != null && net <= th) return <span className={`${base} bg-amber-500/10 text-amber-400 border-amber-500/20 animate-pulse`}>{t('admin.inventory.status.criticalBadge')}</span>
-        if (r.reserved_stock > 0) return <span className={`${base} bg-blue-500/10 text-blue-400 border-blue-500/20`}>{t('admin.inventory.status.reservedBadge')}</span>
-        return <span className={`${base} bg-emerald-500/10 text-emerald-400 border-emerald-500/20`}>{t('admin.inventory.status.availableBadge')}</span>
+    if (th != null && net <= th) {
+      return (
+        <span className={`${base} bg-amber-500/10 text-amber-400 border-amber-500/20 animate-pulse`}>
+          {t('admin.inventory.status.criticalBadge')}
+        </span>
+      )
     }
-
-    const TableRow = ({ r }: { r: InventoryRow }) => (
-        <tr
-            key={r.product_id}
-            className={`group hover:bg-white/3 cursor-pointer transition-colors border-b border-white/5 last:border-0 ${selected?.product_id === r.product_id ? 'bg-cyan-500/5' : ''}`}
-            onClick={() => onSelect(r)}
-        >
-            {visibleCols.name && (
-                <td className={adminTableCellClass + " " + cellPad}>
-                    <div className="flex flex-col">
-                        <span className="font-black text-white group-hover:text-cyan-400 transition-colors uppercase tracking-tight text-xs">{r.name}</span>
-                        <span className="text-xs font-mono text-slate-500 uppercase tracking-tighter mt-0.5">{r.product_id.slice(0, 8)}</span>
-                    </div>
-                </td>
-            )}
-            {visibleCols.physical && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono font-bold text-slate-300"}>{r.physical_stock}</td>}
-            {visibleCols.reserved && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono text-slate-500"}>{r.reserved_stock}</td>}
-            {visibleCols.available && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono font-black text-cyan-400"}>{r.available_stock}</td>}
-            {visibleCols.threshold && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono text-slate-500"}>{thresholdMap[r.product_id] ?? defaultThreshold ?? 10}</td>}
-            {visibleCols.location && (
-                <td className={adminTableCellClass + " " + cellPad} onClick={e => e.stopPropagation()}>
-                    {hasWriteAccess ? (
-                        <EditableCell
-                            value={r.warehouse_location || ''}
-                            placeholder="-"
-                            inputWidth="w-20"
-                            className="text-slate-400 font-bold"
-                            onSave={(val) => onUpdateLocation(r.product_id, val)}
-                        />
-                    ) : (
-                        <span className="text-slate-500 text-xs font-bold">{r.warehouse_location || '-'}</span>
-                    )}
-                </td>
-            )}
-            {visibleCols.supplier && (
-                <td className={adminTableCellClass + " " + cellPad} onClick={e => e.stopPropagation()}>
-                    {hasWriteAccess ? (
-                        <EditableCell
-                            value={r.supplier_name || ''}
-                            placeholder="-"
-                            inputWidth="w-24"
-                            className="max-w-120px truncate text-slate-400"
-                            onSave={(val) => onUpdateSupplier(r.product_id, val)}
-                        />
-                    ) : (
-                        <span className="text-slate-500 max-w-120px truncate block text-xs">{r.supplier_name || '-'}</span>
-                    )}
-                </td>
-            )}
-            {visibleCols.abc && (
-                <td className={adminTableCellClass + " " + cellPad + " text-center"}>
-                    {r.abc_class ? (
-                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg font-black text-xs border shadow-sm ${r.abc_class === 'A' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                            r.abc_class === 'B' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                                'bg-slate-500/10 text-slate-400 border-slate-500/20'
-                            }`}>
-                            {r.abc_class}
-                        </span>
-                    ) : '-'}
-                </td>
-            )}
-            {visibleCols.days && (
-                <td className={adminTableCellClass + " " + cellPad + " text-right"}>
-                    {r.days_until_empty === 9999 ? (
-                        <span className="text-xs text-slate-600 uppercase font-black tracking-widest">{t('admin.inventory.table.stable')}</span>
-                    ) : (
-                        <div className={`text-xs font-black uppercase tracking-widest ${r.days_until_empty && r.days_until_empty <= 7 ? 'text-rose-500 animate-pulse' : 'text-slate-400'}`}>
-                            {r.days_until_empty && r.days_until_empty <= 7 && '🔥 '}
-                            {t('admin.inventory.table.daysCount', { count: r.days_until_empty })}
-                        </div>
-                    )}
-                </td>
-            )}
-            {visibleCols.status && <td className={adminTableCellClass + " " + cellPad + " text-center"}>{statusBadge(r)}</td>}
-        </tr>
-    )
-
+    if (r.reserved_stock > 0) {
+      return (
+        <span className={`${base} bg-blue-500/10 text-blue-400 border-blue-500/20`}>
+          {t('admin.inventory.status.reservedBadge')}
+        </span>
+      )
+    }
     return (
-        <div ref={dragScrollRef} className="overflow-x-auto w-full content-auto-table">
-            <table className="w-full min-w-1000px border-separate border-spacing-0">
-                <thead className="sticky top-0 z-10 backdrop-blur-xl">
-                    <tr>
-                        {visibleCols.name && (
-                            <th className={adminTableHeadCellClass + " " + headPad}>
-                                <button onClick={() => onSort('name')} className="hover:text-cyan-400 transition-colors flex items-center gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    {t('admin.inventory.table.productCol')} {sortIndicator('name')}
-                                </button>
-                            </th>
-                        )}
-                        {visibleCols.physical && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    <button onClick={() => onSort('physical')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.physicalCol')} {sortIndicator('physical')}</button>
-                                    <InfoTooltip text={t('admin.inventory.tooltip.physical')} />
-                                </div>
-                            </th>
-                        )}
-                        {visibleCols.reserved && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    <button onClick={() => onSort('reserved')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.reservedCol')} {sortIndicator('reserved')}</button>
-                                    <InfoTooltip text={t('admin.inventory.tooltip.reserved')} />
-                                </div>
-                            </th>
-                        )}
-                        {visibleCols.available && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal text-cyan-400">
-                                    <button onClick={() => onSort('available')} className="hover:opacity-80">{t('admin.inventory.table.availableCol')} {sortIndicator('available')}</button>
-                                    <InfoTooltip text={t('admin.inventory.tooltip.available')} />
-                                </div>
-                            </th>
-                        )}
-                        {visibleCols.threshold && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    <button onClick={() => onSort('threshold')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.thresholdCol')} {sortIndicator('threshold')}</button>
-                                    <InfoTooltip text={t('admin.inventory.tooltip.threshold')} />
-                                </div>
-                            </th>
-                        )}
-                        {visibleCols.location && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-xs font-black tracking-hvac-normal"}>
-                                <button onClick={() => onSort('location')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.locationCol')} {sortIndicator('location')}</button>
-                            </th>
-                        )}
-                        {visibleCols.supplier && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase text-xs font-black tracking-hvac-normal"}>
-                                <button onClick={() => onSort('supplier')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.supplierCol')} {sortIndicator('supplier')}</button>
-                            </th>
-                        )}
-                        {visibleCols.abc && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-center"}>
-                                <div className="flex items-center justify-center gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    <button onClick={() => onSort('abc')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.abcCol')} {sortIndicator('abc')}</button>
-                                    <InfoTooltip text={t('admin.inventory.tooltip.abc')} />
-                                </div>
-                            </th>
-                        )}
-                        {visibleCols.days && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-right"}>
-                                <div className="flex items-center justify-end gap-1 uppercase text-xs font-black tracking-hvac-normal">
-                                    <button onClick={() => onSort('days_empty')} className="hover:text-cyan-400 transition-colors">{t('admin.inventory.table.daysCol')} {sortIndicator('days_empty')}</button>
-                                    <InfoTooltip text={t('admin.inventory.tooltip.days')} />
-                                </div>
-                            </th>
-                        )}
-                        {visibleCols.status && (
-                            <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase text-xs font-black tracking-hvac-normal"}>{t('admin.inventory.table.statusCol')}</th>
-                        )}
-                    </tr>
-                </thead>
-                <tbody className="bg-transparent">
-                    {loading === LoadState.Loading && rows.length === 0 ? (
-                        <tr>
-                            <td colSpan={10} className="p-0">
-                                <AdminSkeleton variant="table" count={10} rows={10} />
-                            </td>
-                        </tr>
-                    ) : error ? (
-                        <tr><td colSpan={10} className="p-12 text-center text-rose-500 font-black uppercase tracking-widest">{error}</td></tr>
-                    ) : rows.length === 0 ? (
-                        <tr>
-                            <td colSpan={10} className="p-0 border-b-0">
-                                <AdminEmptyState
-                                    icon={SearchX}
-                                    title={t('admin.inventory.empty.title')}
-                                    description={t('admin.inventory.empty.description')}
-                                />
-                            </td>
-                        </tr>
-                    ) : groupByCategory ? (
-                        groupedRows.map(g => (
-                            <React.Fragment key={g._c_id ?? 'null'}>
-                                <tr className="bg-white/2 group">
-                                    <th colSpan={10} className={`text-left ${density === 'compact' ? 'px-4 py-2' : 'px-8 py-4'} text-cyan-400 font-black uppercase text-xs tracking-hvac-relaxed border-y border-white/5`}>
-                                        <div className="flex items-center gap-3">
-                                            <span className="w-1 h-4 bg-cyan-400 rounded-full shadow-glow-sm"></span>
-                                            {g.name || t('admin.inventory.table.uncategorized')} <span className="text-slate-500 ml-2">{t('admin.inventory.table.groupCount', { count: g.items.length })}</span>
-                                        </div>
-                                    </th>
-                                </tr>
-                                {g.items.map(r => <TableRow key={r.product_id} r={r} />)}
-                            </React.Fragment>
-                        ))
-                    ) : (
-                        rows.map(r => <TableRow key={r.product_id} r={r} />)
-                    )}
-                </tbody>
-            </table>
-        </div>
+      <span className={`${base} bg-emerald-500/10 text-emerald-400 border-emerald-500/20`}>
+        {t('admin.inventory.status.availableBadge')}
+      </span>
     )
+  }, [t])
+
+  const columns = useMemo<AdminColumn<InventoryRowWithCategory>[]>(
+    () => [
+      {
+        key: 'name',
+        header: t('admin.inventory.table.productCol'),
+        sortable: true,
+        cell: (r) => (
+          <div className="flex flex-col">
+            <span className="font-black text-white group-hover:text-cyan-400 transition-colors uppercase tracking-tight text-xs">
+              {r.name}
+            </span>
+            <span className="text-xs font-mono text-slate-500 uppercase tracking-tighter mt-0.5">
+              {r.product_id.slice(0, 8)}
+            </span>
+          </div>
+        ),
+      },
+      {
+        key: 'physical',
+        header: t('admin.inventory.table.physicalCol'),
+        sortable: true,
+        align: 'right',
+        cell: (r) => <span className="font-mono font-bold text-slate-300">{r.physical_stock}</span>,
+      },
+      {
+        key: 'reserved',
+        header: t('admin.inventory.table.reservedCol'),
+        sortable: true,
+        align: 'right',
+        cell: (r) => <span className="font-mono text-slate-500">{r.reserved_stock}</span>,
+      },
+      {
+        key: 'available',
+        header: t('admin.inventory.table.availableCol'),
+        sortable: true,
+        align: 'right',
+        cellClassName: 'text-cyan-400',
+        cell: (r) => <span className="font-mono font-black">{r.available_stock}</span>,
+      },
+      {
+        key: 'threshold',
+        header: t('admin.inventory.table.thresholdCol'),
+        sortable: true,
+        align: 'right',
+        cell: (r) => <span className="font-mono text-slate-500">{r.low_stock_threshold ?? 5}</span>,
+      },
+      {
+        key: 'location',
+        header: t('admin.inventory.table.locationCol'),
+        sortable: true,
+        align: 'left',
+        cell: (r) =>
+          hasWriteAccess ? (
+            <InlineTextCell
+              value={r.warehouse_location || ''}
+              placeholder="-"
+              widthClass={adminInputWidthLocationClass}
+              ariaLabel={t('admin.inventory.table.locationCol')}
+              onSave={(val) => onUpdateLocation(r.product_id, val)}
+            />
+          ) : (
+            <span className="text-slate-500 text-xs font-bold">{r.warehouse_location || '-'}</span>
+          ),
+      },
+      {
+        key: 'supplier',
+        header: t('admin.inventory.table.supplierCol'),
+        sortable: true,
+        align: 'left',
+        cell: (r) =>
+          hasWriteAccess ? (
+            <InlineTextCell
+              value={r.supplier_name || ''}
+              placeholder="-"
+              widthClass={adminInputWidthSupplierClass}
+              extraSpanClass={adminSupplierMaxWidthClass}
+              ariaLabel={t('admin.inventory.table.supplierCol')}
+              onSave={(val) => onUpdateSupplier(r.product_id, val)}
+            />
+          ) : (
+            <span className={`text-slate-500 text-xs block ${adminSupplierMaxWidthClass} truncate`}>
+              {r.supplier_name || '-'}
+            </span>
+          ),
+      },
+      {
+        key: 'abc',
+        header: t('admin.inventory.table.abcCol'),
+        sortable: true,
+        align: 'center',
+        hideable: true,
+        defaultHidden: true,
+        cell: (r) =>
+          r.abc_class ? (
+            <span
+              className={`inline-flex items-center justify-center w-6 h-6 rounded-lg font-black text-xs border shadow-sm ${
+                r.abc_class === 'A'
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : r.abc_class === 'B'
+                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                  : 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+              }`}
+            >
+              {r.abc_class}
+            </span>
+          ) : (
+            '-'
+          ),
+      },
+      {
+        key: 'days',
+        header: t('admin.inventory.table.daysCol'),
+        sortable: true,
+        align: 'right',
+        hideable: true,
+        defaultHidden: true,
+        cell: (r) => {
+          if (r.days_until_empty === 9999) {
+            return (
+              <span className="text-xs text-slate-600 uppercase font-black tracking-widest">
+                {t('admin.inventory.table.stable')}
+              </span>
+            )
+          }
+          const isWarning = typeof r.days_until_empty === 'number' && r.days_until_empty <= 7
+          return (
+            <div
+              className={`text-xs font-black uppercase tracking-widest ${
+                isWarning ? 'text-rose-500 animate-pulse' : 'text-slate-400'
+              }`}
+            >
+              {isWarning && '🔥 '}
+              {t('admin.inventory.table.daysCount', { count: r.days_until_empty })}
+            </div>
+          )
+        },
+      },
+      {
+        key: 'status',
+        header: t('admin.inventory.table.statusCol'),
+        sortable: false,
+        align: 'center',
+        cell: (r) => statusBadge(r),
+      },
+    ],
+    [t, hasWriteAccess, onUpdateLocation, onUpdateSupplier, statusBadge],
+  )
+
+  return (
+    <DataTableKit
+      columns={columns}
+      table={table}
+      rowId={(r) => r.product_id}
+      persistKey="inventory"
+      hasWriteAccess={hasWriteAccess}
+      totalLabel={t('admin.common.total') || 'Toplam'}
+      emptyState={
+        <AdminEmptyState
+          icon={SearchX}
+          title={t('admin.inventory.empty.title')}
+          description={t('admin.inventory.empty.description')}
+        />
+      }
+      filterEmptyState={
+        <AdminEmptyState
+          icon={SearchX}
+          title={t('admin.inventory.empty.title')}
+          description={t('admin.inventory.empty.description')}
+        />
+      }
+      columnsButtonLabel={t('admin.common.view')}
+    />
+  )
 }
