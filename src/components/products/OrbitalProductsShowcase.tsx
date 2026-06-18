@@ -1,5 +1,5 @@
 "use client"
-import { Float, Html, Sparkles, useTexture, ContactShadows } from '@react-three/drei'
+import { ContactShadows,Float, Html, Sparkles, useTexture } from '@react-three/drei'
 import { ThreeEvent,useFrame, useThree } from '@react-three/fiber'
 import { useInView } from 'framer-motion'
 import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'

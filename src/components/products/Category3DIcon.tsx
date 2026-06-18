@@ -6,9 +6,10 @@ import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'
 import React, { useRef } from 'react'
 import type { Group } from 'three'
 
+import { getModelPlacement, ModelContext } from '@/utils/3dModelOffsets'
+
 import { useI18n } from '../../i18n/I18nProvider'
 import { ProductModelRenderer } from './3d/ProductModelRenderer'
-import { getModelPlacement, ModelContext } from '@/utils/3dModelOffsets'
 import { SmartCenterScale } from './3d/SmartCenterScale'
 
 interface Category3DIconProps {

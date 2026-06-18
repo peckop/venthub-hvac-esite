@@ -2,7 +2,7 @@
 import { useFrame } from '@react-three/fiber'
 import React, { useRef, useState } from 'react'
 import type { Group } from 'three'
-import { Box3, Vector3, Sphere, Matrix4, Mesh } from 'three'
+import { Box3, Matrix4, Mesh,Sphere, Vector3 } from 'three'
 
 interface SmartCenterScaleProps {
     children: React.ReactNode
@@ -37,7 +37,9 @@ function getLocalBoundingBox(root: Group, targetBox: Box3) {
                 if (!mesh.geometry.boundingBox) {
                     mesh.geometry.computeBoundingBox()
                 }
-                tempMeshBox.copy(mesh.geometry.boundingBox)
+                const bb = mesh.geometry.boundingBox
+                if (!bb) return
+                tempMeshBox.copy(bb)
                 tempMatrix.copy(mesh.matrixWorld).premultiply(tempInverse)
                 tempMeshBox.applyMatrix4(tempMatrix)
                 targetBox.union(tempMeshBox)
