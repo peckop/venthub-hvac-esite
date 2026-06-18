@@ -26,6 +26,10 @@ exclusions: []
 
 Bu yetenek, VentHub HVAC projesinde yer alan 3D modellerin (özellikle kategori gösterimleri ve ürün detay stüdyolarındaki fan/cihaz modelleri) render performansını maksimize etmek ve Lighthouse mobil skorlarını (30-40 aralığından 90+ seviyesine) yükseltmek amacıyla tasarlanmıştır.
 
+> **TEK DOĞRU KAYNAK (SSOT) = `docs/standards/3d-webgl-standard.md` (v1.2).** Bu skill = *nasıl-yapılır
+> oyun kitabı* (uygulama adımları + performans). Kural/değer çelişirse **standart kazanır** — sayıları burada
+> tekrar tutup drift ettirme, standarda bak. Sahne/ışık/showroom değerlerinin v1.2 özeti → §2.F.
+
 ---
 
 ## 1. Ne Zaman Tetiklenmeli?
@@ -85,14 +89,11 @@ Dinamik gölgeler, sahnenin her karede ışık gözünden tekrar çizilmesini (r
 - **BakeShadows (Drei):** Işıklar ve nesneler hareket etmiyorsa, Drei'nin `<BakeShadows />` bileşenini kullanarak gölgeleri ilk karede hesaplayıp dondurun.
 - **ContactShadows:** Pahalı geometri gölgeleri yerine, zemin seviyesinde sahte gölge oluşturmak için Drei'nin `<ContactShadows />` bileşenini tercih edin.
   ```tsx
-  <ContactShadows 
-    position={[0, -1.5, 0]} 
-    opacity={0.4} 
-    scale={10} 
-    blur={2} 
-    far={3} 
-  />
+  <ContactShadows position={[0, -0.5, 0]} opacity={0.6} scale={10} blur={2.5} far={2} />
   ```
+  > ⚠️ **`y = -0.5` modelin B10-normalize edildiğini (1-birim sanal küre, merkez `(0,0,0)`) VARSAYAR.**
+  > Model normalize DEĞİLSE (ör. orbit'te ürün `y=0.8`, zemin `y=-1.6`) bu değeri körlemesine koyma:
+  > gölge ürünle `far` mesafesini aşar → kopuk/kaybolur. Önce B10 normalizasyon, SONRA `y=-0.5`. (Standart §B10/§B5.)
 
 ### D. Dinamik Ölçekleme & DPR (Device Pixel Ratio) Yönetimi
 Mobil ekranlar yüksek piksel yoğunluğuna (retina/3x) sahiptir. Mobil cihazlarda DPR'ı 3 olarak ayarlamak, GPU'nun işlemesi gereken piksel sayısını 9 kat artırır.
@@ -112,6 +113,15 @@ Mobil ekranlar yüksek piksel yoğunluğuna (retina/3x) sahiptir. Mobil cihazlar
 Özellikle kategori veya liste sayfalarında birden fazla aynı nesne çizileceği zaman Draw Call sayısını düşürmek gerekir.
 - **Instances (Drei):** Aynı mesh'ten yüzlerce adet çizilecekse `<Instances>` ve `<Instance>` bileşenlerini kullanın.
 - **Merged (Drei):** Farklı geometrileri tek bir çizim pass'inde birleştirmek için kullanın.
+
+### F. Sahne, Işık & Showroom Kalitesi (v1.2 — premium stüdyo)
+> Tam gerekçe + kaynaklar: standart §C2/C4/C5/C6/C7 + §B10. Burada **uygulanabilir özet** var.
+
+- **ACES pozlama (kök karanlık çözümü):** ACESFilmic tonlama sahneyi koyulaştırır → `gl.toneMappingExposure = 1.3–1.5` (VentHubCanvas `onCreated`'da, merkezi). *Bu ayar yapılmazsa ışık şiddetleri yetse bile sahne karanlık görünür.*
+- **Üç-nokta stüdyo ışığı (kameraya bağlı):** Key `1.8` sıcak (`#FFF4E6`, ~4500K) + Fill `0.9` soğuk (`#DBEAFE`, ~6500K) + Ambient `0.85` beyaz; **Key:Fill = 2:1**. Dönen carousel'de öne gelen ürünün ön yüzü kararmasın diye ışıklar kamera aksına göre konumlanır.
+- **Prosedürel environment (dosya/CDN YOK):** drei `<Environment frames={1}>` içinde 4 `<Lightformer>` (Key/Fill/Rim/Top) → metallerde yansıma, sıfır VRAM maliyeti (tek-sefer bake).
+- **Boyut normalizasyonu (B10):** Farklı boyuttaki HVAC modellerini eşitlemek için yüklemede bounding-box → 1-birim küreye otomatik ölçekle; per-model ince ayar `3dModelOffsets.ts`. Temas gölgesi + zemin bunun ÜZERİNE kurulur (yukarıdaki ⚠️).
+- **Showroom UX / bilgi paneli (satış katmanı):** Öne gelen ürün için **4 kilit HVAC metriği** (hava debisi m³/h, verim %/COP, ses dB(A), güç kW) + ad/kategori + stok/teslim + CTA. Panel = **glassmorphic** (`backdrop-filter: blur(16px)` + %40 koyu opacity) → 3D üstünde okunabilirlik (WCAG 2.2). Mobilde **bottom sheet**; 3D döndürme alanı ile panel dokunuşu çakışmaz.
 
 ---
 
