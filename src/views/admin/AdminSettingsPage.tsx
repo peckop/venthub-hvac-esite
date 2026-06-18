@@ -109,7 +109,7 @@ const AdminSettingsPage: React.FC = () => {
             if (error) throw error
           },
         })
-        toast.success(t('admin.inventory.settings.saveSuccess') || 'Ayarlar başarıyla kaydedildi.')
+        toast.success(t('admin.settings.saveSuccess'))
       } else if (tab === 'payment') {
         const payload = {
           iyzico_enabled: iyzicoEnabled,
@@ -136,7 +136,7 @@ const AdminSettingsPage: React.FC = () => {
             if (error) throw error
           },
         })
-        toast.success(t('admin.inventory.settings.saveSuccess') || 'Ödeme ayarları başarıyla kaydedildi.')
+        toast.success(t('admin.settings.paymentSaveSuccess'))
       } else if (tab === 'admins') {
         const payload = {
           admin_sessions_timeout: adminSessionsTimeout,
@@ -161,7 +161,7 @@ const AdminSettingsPage: React.FC = () => {
             if (error) throw error
           },
         })
-        toast.success(t('admin.inventory.settings.saveSuccess') || 'Yönetici politikaları başarıyla kaydedildi.')
+        toast.success(t('admin.settings.adminsSaveSuccess'))
       } else if (tab === 'system') {
         const payload = {
           system_log_level: systemLogLevel,
@@ -186,16 +186,16 @@ const AdminSettingsPage: React.FC = () => {
             if (error) throw error
           },
         })
-        toast.success(t('admin.inventory.settings.saveSuccess') || 'Sistem yapılandırması başarıyla kaydedildi.')
+        toast.success(t('admin.settings.systemSaveSuccess'))
       }
     } catch (e: unknown) {
       console.error('Save settings error:', e)
       const msg =
         e instanceof AdminPermissionError
-          ? t('admin.inventory.settings.noPermission') || 'Bu işlemi gerçekleştirmek için yetkiniz yok.'
+          ? t('admin.settings.noPermission')
           : e instanceof Error
           ? e.message
-          : 'Ayarlar kaydedilirken hata oluştu.'
+          : t('admin.settings.saveError')
       toast.error(msg)
     } finally {
       setSaving(false)
@@ -203,10 +203,10 @@ const AdminSettingsPage: React.FC = () => {
   }
 
   const tabs = [
-    { id: 'general' as const, label: t('admin.common.tabGeneral') || 'Genel', icon: Globe },
-    { id: 'payment' as const, label: t('admin.common.tabPayment') || 'Ödemeler', icon: CreditCard },
-    { id: 'admins' as const, label: t('admin.common.tabAdmins') || 'Yöneticiler', icon: ShieldCheck },
-    { id: 'system' as const, label: t('admin.common.tabSystemStatus') || 'Sistem Durumu', icon: Activity },
+    { id: 'general' as const, label: t('admin.settings.tabGeneral'), icon: Globe },
+    { id: 'payment' as const, label: t('admin.settings.tabPayment'), icon: CreditCard },
+    { id: 'admins' as const, label: t('admin.settings.tabAdmins'), icon: ShieldCheck },
+    { id: 'system' as const, label: t('admin.settings.tabSystem'), icon: Activity },
   ]
 
   return (
@@ -255,7 +255,7 @@ const AdminSettingsPage: React.FC = () => {
               <div className="flex items-center gap-3 border-b border-white/5 pb-4">
                 <Globe className="text-cyan-400" size={20} />
                 <h2 className="text-lg font-black text-white uppercase tracking-tight">
-                  {t('admin.common.tabGeneral') || 'Genel Ayarlar'}
+                  {t('admin.settings.generalSettingsTitle')}
                 </h2>
               </div>
 
@@ -263,70 +263,70 @@ const AdminSettingsPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Site Adı</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.siteName')}</label>
                     <input
                       type="text"
                       className={adminInputClass}
                       value={siteName}
                       onChange={(e) => setSiteName(e.target.value)}
-                      placeholder="VentHub HVAC"
+                      placeholder={t('admin.settings.siteNamePlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Slogan / Tagline</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.tagline')}</label>
                     <input
                       type="text"
                       className={adminInputClass}
                       value={tagline}
                       onChange={(e) => setTagline(e.target.value)}
-                      placeholder="Premium HVAC Solutions"
+                      placeholder={t('admin.settings.taglinePlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Logo URL</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.logoUrl')}</label>
                     <input
                       type="text"
                       className={adminInputClass}
                       value={logoUrl}
                       onChange={(e) => setLogoUrl(e.target.value)}
-                      placeholder="https://example.com/logo.png"
+                      placeholder={t('admin.settings.logoUrlPlaceholder')}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>İletişim E-postası</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.contactEmail')}</label>
                     <input
                       type="email"
                       className={adminInputClass}
                       value={contactEmail}
                       onChange={(e) => setContactEmail(e.target.value)}
-                      placeholder="info@venthub.com"
+                      placeholder={t('admin.settings.contactEmailPlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Destek Telefonu</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.supportPhone')}</label>
                     <input
                       type="text"
                       className={adminInputClass}
                       value={supportPhone}
                       onChange={(e) => setSupportPhone(e.target.value)}
-                      placeholder="+90 212 555 0100"
+                      placeholder={t('admin.settings.supportPhonePlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Genel Merkez / Adres</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.headquarters')}</label>
                     <input
                       type="text"
                       className={adminInputClass}
                       value={headquarters}
                       onChange={(e) => setHeadquarters(e.target.value)}
-                      placeholder="Istanbul, Turkey"
+                      placeholder={t('admin.settings.headquartersPlaceholder')}
                     />
                   </div>
                 </div>
@@ -339,7 +339,7 @@ const AdminSettingsPage: React.FC = () => {
                   className={`${adminButtonPrimaryClass} px-8 py-3 bg-cyan-400 text-slate-950 hover:bg-cyan-300 flex items-center gap-2`}
                 >
                   <Save size={16} />
-                  <span>{saving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}</span>
+                  <span>{saving ? t('admin.settings.saving') : t('admin.settings.saveChanges')}</span>
                 </button>
               </div>
             </div>
@@ -354,14 +354,14 @@ const AdminSettingsPage: React.FC = () => {
               <div className="flex items-center gap-3 border-b border-white/5 pb-4">
                 <CreditCard className="text-cyan-400" size={20} />
                 <h2 className="text-lg font-black text-white uppercase tracking-tight">
-                  {t('admin.common.tabPayment') || 'Ödeme Ayarları'}
+                  {t('admin.settings.paymentSettingsTitle')}
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Iyzico Aktif</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.iyzicoActive')}</label>
                     <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-950/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
                       <input
                         type="checkbox"
@@ -371,47 +371,46 @@ const AdminSettingsPage: React.FC = () => {
                       />
                       <div className="space-y-1">
                         <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">
-                          Iyzico Gateway Etkinleştir
+                          {t('admin.settings.iyzicoEnable')}
                         </span>
                         <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
-                          Müşterilerin Iyzico ile ödeme yapabilmesini sağlar.
+                          {t('admin.settings.iyzicoEnableDesc')}
                         </span>
                       </div>
                     </label>
                   </div>
 
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Iyzico Çalışma Modu</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.iyzicoMode')}</label>
                     <select
                       className={`${adminInputClass} !bg-slate-950 !border-white/5`}
                       value={iyzicoMode}
                       onChange={(e) => setIyzicoMode(e.target.value)}
                     >
-                      <option value="sandbox">Sandbox (Test)</option>
-                      <option value="production">Production (Canlı)</option>
+                      <option value="sandbox">{t('admin.settings.iyzicoSandbox')}</option>
+                      <option value="production">{t('admin.settings.iyzicoProduction')}</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Iyzico API Key (Public)</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.iyzicoApiKey')}</label>
                     <input
                       type="text"
                       className={adminInputClass}
                       value={iyzicoApiKey}
                       onChange={(e) => setIyzicoApiKey(e.target.value)}
-                      placeholder="sandbox-api-key"
+                      placeholder={t('admin.settings.iyzicoApiKeyPlaceholder')}
                     />
                   </div>
 
                   <div className="p-4 rounded-2xl bg-slate-950/40 border border-white/5">
                     <p className="text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-widest">
-                      🔒 Güvenlik Uyarısı
+                      {t('admin.settings.securityWarningTitle')}
                     </p>
                     <p className="text-xs font-medium text-slate-400 mt-2 leading-relaxed">
-                      İstemci tarafı güvenliğini korumak amacıyla Iyzico Secret Key bu panel üzerinden düzenlenemez
-                      veya görüntülenemez. Gizli anahtarlarınızı Edge fonksiyonu çevre değişkenlerinde (env) güvenle saklamaya devam edin.
+                      {t('admin.settings.securityWarningDesc')}
                     </p>
                   </div>
                 </div>
@@ -424,7 +423,7 @@ const AdminSettingsPage: React.FC = () => {
                   className={`${adminButtonPrimaryClass} px-8 py-3 bg-cyan-400 text-slate-950 hover:bg-cyan-300 flex items-center gap-2`}
                 >
                   <Save size={16} />
-                  <span>{saving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}</span>
+                  <span>{saving ? t('admin.settings.saving') : t('admin.settings.saveChanges')}</span>
                 </button>
               </div>
             </div>
@@ -439,14 +438,14 @@ const AdminSettingsPage: React.FC = () => {
               <div className="flex items-center gap-3 border-b border-white/5 pb-4">
                 <ShieldCheck className="text-cyan-400" size={20} />
                 <h2 className="text-lg font-black text-white uppercase tracking-tight">
-                  {t('admin.common.tabAdmins') || 'Yönetici Politikaları'}
+                  {t('admin.settings.adminsPolicyTitle')}
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Yönetici Oturum Zaman Aşımı (Saat)</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.adminSessionTimeout')}</label>
                     <input
                       type="number"
                       className={adminInputClass}
@@ -460,7 +459,7 @@ const AdminSettingsPage: React.FC = () => {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Zorunlu Çok Aşamalı Doğrulama (MFA)</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.mfaRequired')}</label>
                     <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-950/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
                       <input
                         type="checkbox"
@@ -470,10 +469,10 @@ const AdminSettingsPage: React.FC = () => {
                       />
                       <div className="space-y-1">
                         <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">
-                          MFA'i Tüm Yöneticilere Zorunlu Kıl
+                          {t('admin.settings.mfaRequiredLabel')}
                         </span>
                         <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
-                          Admin panel erişimi için MFA kurulumunu mecbur kılar.
+                          {t('admin.settings.mfaRequiredDesc')}
                         </span>
                       </div>
                     </label>
@@ -488,7 +487,7 @@ const AdminSettingsPage: React.FC = () => {
                   className={`${adminButtonPrimaryClass} px-8 py-3 bg-cyan-400 text-slate-950 hover:bg-cyan-300 flex items-center gap-2`}
                 >
                   <Save size={16} />
-                  <span>{saving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}</span>
+                  <span>{saving ? t('admin.settings.saving') : t('admin.settings.saveChanges')}</span>
                 </button>
               </div>
             </div>
@@ -503,30 +502,30 @@ const AdminSettingsPage: React.FC = () => {
               <div className="flex items-center gap-3 border-b border-white/5 pb-4">
                 <Activity className="text-cyan-400" size={20} />
                 <h2 className="text-lg font-black text-white uppercase tracking-tight">
-                  {t('admin.common.tabSystemStatus') || 'Sistem Yapılandırması'}
+                  {t('admin.settings.systemConfigTitle')}
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Sistem Günlük Seviyesi (Log Level)</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.systemLogLevel')}</label>
                     <select
                       className={`${adminInputClass} !bg-slate-950 !border-white/5`}
                       value={systemLogLevel}
                       onChange={(e) => setSystemLogLevel(e.target.value)}
                     >
-                      <option value="debug">Hata Ayıklama (Debug)</option>
-                      <option value="info">Bilgi (Info)</option>
-                      <option value="warn">Uyarı (Warning)</option>
-                      <option value="error">Hata (Error)</option>
+                      <option value="debug">{t('admin.settings.logLevelDebug')}</option>
+                      <option value="info">{t('admin.settings.logLevelInfo')}</option>
+                      <option value="warn">{t('admin.settings.logLevelWarn')}</option>
+                      <option value="error">{t('admin.settings.logLevelError')}</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>Geliştirici Hata Ayıklama Modu (Debug Mode)</label>
+                    <label className={adminSettingsLabelClass}>{t('admin.settings.debugMode')}</label>
                     <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-950/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
                       <input
                         type="checkbox"
@@ -536,10 +535,10 @@ const AdminSettingsPage: React.FC = () => {
                       />
                       <div className="space-y-1">
                         <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">
-                          Debug Modunu Etkinleştir
+                          {t('admin.settings.debugModeEnable')}
                         </span>
                         <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
-                          İstemci tarafında detaylı log çıktısı verilmesini sağlar.
+                          {t('admin.settings.debugModeDesc')}
                         </span>
                       </div>
                     </label>
@@ -554,7 +553,7 @@ const AdminSettingsPage: React.FC = () => {
                   className={`${adminButtonPrimaryClass} px-8 py-3 bg-cyan-400 text-slate-950 hover:bg-cyan-300 flex items-center gap-2`}
                 >
                   <Save size={16} />
-                  <span>{saving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}</span>
+                  <span>{saving ? t('admin.settings.saving') : t('admin.settings.saveChanges')}</span>
                 </button>
               </div>
             </div>
