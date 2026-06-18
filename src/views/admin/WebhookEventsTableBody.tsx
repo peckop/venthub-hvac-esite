@@ -10,6 +10,7 @@ import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
+import ExportMenu from '../../components/admin/ExportMenu'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { formatDateTime } from '../../i18n/datetime'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -101,6 +102,38 @@ const WebhookEventsTableBody: React.FC = () => {
     },
     [table.selection],
   )
+
+  const exportCsv = useCallback(async () => {
+    const rows = await table.fetchAllForExport()
+    const header = [
+      t('admin.webhooks.export.headers.id'),
+      t('admin.webhooks.export.headers.eventType'),
+      t('admin.webhooks.export.headers.source'),
+      t('admin.webhooks.export.headers.status'),
+      t('admin.webhooks.export.headers.date'),
+      t('admin.webhooks.export.headers.errorMessage'),
+    ].join(',')
+
+    const lines = rows.map((r) =>
+      [
+        r.id,
+        `"${(r.event_type || '').replace(/"/g, '""')}"`,
+        `"${(r.provider || '').replace(/"/g, '""')}"`,
+        r.status,
+        r.created_at,
+        `"${(r.error_message || '').replace(/"/g, '""')}"`,
+      ].join(','),
+    )
+    const csv = '\ufeff' + [header, ...lines].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = t('admin.webhooks.export.filename')
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [table, t])
+
 
   const columns = useMemo<AdminColumn<DbWebhookEvent>[]>(
     () => [
@@ -222,15 +255,15 @@ const WebhookEventsTableBody: React.FC = () => {
           emptyState={
             <AdminEmptyState
               icon={Activity}
-              title={t('admin.webhooks.noEvents') || 'No Webhook Events'}
-              description={t('admin.webhooks.noEventsDesc') || 'No webhook events have been recorded.'}
+              title={t('admin.webhooks.noEvents')}
+              description={t('admin.webhooks.noEventsDesc')}
             />
           }
           filterEmptyState={
             <AdminEmptyState
               icon={SearchX}
-              title={t('admin.webhooks.noEvents') || 'No Webhook Events'}
-              description={t('admin.webhooks.filterEmptyDescription') || 'No matching webhook events found.'}
+              title={t('admin.webhooks.noEvents')}
+              description={t('admin.webhooks.filterEmptyDescription')}
             />
           }
           columnsButtonLabel={t('admin.common.view')}
@@ -241,14 +274,26 @@ const WebhookEventsTableBody: React.FC = () => {
               search={{
                 value: table.filtering.query,
                 onChange: setQuery,
-                placeholder: t('admin.search.webhookEvents') || 'Search by type or source...',
+                placeholder: t('admin.search.webhookEvents'),
                 focusShortcut: '/',
               }}
               chips={statusChips}
               onClear={resetFilters}
               recordCount={table.totalMatched}
+              rightExtra={
+                <ExportMenu
+                  items={[
+                    {
+                      key: 'csv',
+                      label: t('admin.dataTable.export.csv'),
+                      onSelect: () => void exportCsv(),
+                    },
+                  ]}
+                />
+              }
             />
           }
+
         />
       </div>
 

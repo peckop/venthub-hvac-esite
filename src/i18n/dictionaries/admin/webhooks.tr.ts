@@ -45,4 +45,17 @@ export const webhooks = {
   noEvents: 'Webhook Olayı Bulunamadı',
   noEventsDesc: 'Şu an için kaydedilmiş herhangi bir webhook olayı bulunmuyor.',
   filterEmptyDescription: 'Eşleşen herhangi bir webhook olayı bulunamadı.',
+  export: {
+    csvLabel: 'CSV Olarak Dışa Aktar',
+    filename: 'webhook_olaylari.csv',
+    headers: {
+      id: 'Olay ID',
+      eventType: 'Olay Tipi',
+      source: 'Kaynak',
+      status: 'Durum',
+      date: 'Tarih',
+      errorMessage: 'Hata Mesajı',
+    },
+  },
 };
+

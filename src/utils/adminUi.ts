@@ -32,3 +32,6 @@ export const adminSettingsLabelClass = 'block text-xs font-black text-slate-500 
 
 export const adminTableScrollAreaClass = 'overflow-y-auto max-h-400px'
 
+export const adminSidebarWidthClass = 'w-480px'
+export const adminMobilePreviewClass = 'w-320px h-568px'
+export const adminContentMaxWidthClass = 'max-w-content'

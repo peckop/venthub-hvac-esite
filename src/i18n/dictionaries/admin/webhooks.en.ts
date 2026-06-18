@@ -45,4 +45,17 @@ export const webhooks = {
   noEvents: 'No Webhook Events',
   noEventsDesc: 'No webhook events have been recorded.',
   filterEmptyDescription: 'No matching webhook events found.',
+  export: {
+    csvLabel: 'Export as CSV',
+    filename: 'webhook_events.csv',
+    headers: {
+      id: 'Event ID',
+      eventType: 'Event Type',
+      source: 'Source',
+      status: 'Status',
+      date: 'Date',
+      errorMessage: 'Error Message',
+    },
+  },
 };
+
