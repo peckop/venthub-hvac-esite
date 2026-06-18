@@ -1,10 +1,12 @@
 'use client';
 
-import { Activity, Bell, Box, Check, Clock, ShoppingBag, X } from 'lucide-react'
+import { Activity, AlertTriangle, Bell, Box, Bug, Check, Clock, RefreshCw, ShoppingBag, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { useRole } from '@/hooks/useRole'
+import { fetchInboxCounts, InboxCounts } from '@/lib/admin/inboxCounts'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useTenant } from '../../hooks/useTenant'
@@ -25,11 +27,78 @@ interface AppNotification {
 const AdminRealtimeNotifications: React.FC = () => {
     const { id: tenantId } = useTenant()
     const { t, lang } = useI18n()
+    const { canWrite } = useRole()
     const [notifications, setNotifications] = useState<AppNotification[]>([])
     const [isOpen, setIsOpen] = useState(false)
     const [unreadCount, setUnreadCount] = useState(0)
     const dropdownRef = useRef<HTMLDivElement>(null)
     const router = useRouter()
+
+    const [inboxCounts, setInboxCounts] = useState<InboxCounts>({
+        pendingReturnsCount: 0,
+        pendingShipmentsCount: 0,
+        lowStockAlarmsCount: 0,
+        unresolvedErrorsCount: 0
+    })
+
+    const loadInboxCounts = React.useCallback(async () => {
+        const hasAnyAccess = 
+            canWrite('returns') || 
+            canWrite('orders') || 
+            canWrite('inventory') || 
+            canWrite('error_groups')
+
+        if (!hasAnyAccess) return
+
+        try {
+            const counts = await fetchInboxCounts(supabase)
+            setInboxCounts(counts)
+        } catch (err) {
+            console.error("Failed to fetch inbox counts", err)
+        }
+    }, [canWrite])
+
+    // Fetch inbox counts on mount, when open transitions to true, and periodically
+    useEffect(() => {
+        loadInboxCounts()
+    }, [loadInboxCounts])
+
+    useEffect(() => {
+        if (isOpen) {
+            loadInboxCounts()
+        }
+    }, [isOpen, loadInboxCounts])
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            loadInboxCounts()
+        }, 30000)
+        return () => clearInterval(interval)
+    }, [loadInboxCounts])
+
+    // Close dropdown on click outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
+    // Close dropdown on Escape key
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setIsOpen(false)
+            }
+        }
+        if (isOpen) {
+            document.addEventListener('keydown', handleKeyDown)
+        }
+        return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [isOpen])
 
     // Initial fetch of recent activity
     useEffect(() => {
@@ -135,6 +204,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                     // Add to dropdown
                     setNotifications(prev => [notif, ...prev].slice(0, 20))
                     setUnreadCount(prev => prev + 1)
+                    loadInboxCounts()
 
                     // Show Toast
                     toast.custom((id) => (
@@ -193,6 +263,7 @@ const AdminRealtimeNotifications: React.FC = () => {
 
                     setNotifications(prev => [notif, ...prev].slice(0, 20))
                     setUnreadCount(prev => prev + 1)
+                    loadInboxCounts()
 
                     toast.custom((id) => (
                         <div
@@ -230,18 +301,7 @@ const AdminRealtimeNotifications: React.FC = () => {
             supabase.removeChannel(ordersChannel)
             supabase.removeChannel(stockChannel)
         }
-    }, [router, tenantId, lang, t])
-
-    // Close dropdown
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false)
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [])
+    }, [router, tenantId, lang, t, loadInboxCounts])
 
     const toggleDropdown = () => {
         setIsOpen(!isOpen)
@@ -263,22 +323,72 @@ const AdminRealtimeNotifications: React.FC = () => {
         return <div className="p-2 rounded-full bg-slate-500/10 text-slate-600"><Activity size={16} /></div>
     }
 
+    const attentionItems = [
+        {
+            type: 'return',
+            count: inboxCounts.pendingReturnsCount,
+            label: t('admin.dashboard.inbox.pendingReturns' as never),
+            link: '/admin/returns',
+            icon: <RefreshCw size={16} className="text-amber-600" />,
+            bgColor: 'bg-amber-500/10',
+            hasAccess: canWrite('returns')
+        },
+        {
+            type: 'shipment',
+            count: inboxCounts.pendingShipmentsCount,
+            label: t('admin.dashboard.inbox.pendingShipments' as never),
+            link: '/admin/logistics',
+            icon: <ShoppingBag size={16} className="text-blue-600" />,
+            bgColor: 'bg-blue-500/10',
+            hasAccess: canWrite('orders')
+        },
+        {
+            type: 'stock',
+            count: inboxCounts.lowStockAlarmsCount,
+            label: t('admin.dashboard.inbox.lowStock' as never),
+            link: '/admin/inventory',
+            icon: <AlertTriangle size={16} className="text-rose-600" />,
+            bgColor: 'bg-rose-500/10',
+            hasAccess: canWrite('inventory')
+        },
+        {
+            type: 'error',
+            count: inboxCounts.unresolvedErrorsCount,
+            label: t('admin.dashboard.inbox.unresolvedErrors' as never),
+            link: '/admin/error-groups',
+            icon: <Bug size={16} className="text-purple-600" />,
+            bgColor: 'bg-purple-500/10',
+            hasAccess: canWrite('error_groups')
+        }
+    ].filter(item => item.hasAccess && item.count > 0)
+
     return (
         <div className="relative z-50" ref={dropdownRef}>
             {/* Bell Trigger */}
             <button
                 onClick={toggleDropdown}
-                className="relative p-2.5 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow hover:bg-slate-50 transition-shadow text-slate-600 hover:text-primary-navy"
+                aria-label={t('admin.dashboard.notificationCenter')}
+                aria-expanded={isOpen}
+                aria-haspopup="true"
+                className="relative p-2.5 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow hover:bg-slate-50 transition-shadow text-slate-600 hover:text-primary-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20"
             >
                 <Bell size={20} />
                 {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 h-2.5 w-2.5 bg-rose-500 rounded-full border-2 border-white ring-2 ring-rose-500/30 animate-pulse"></span>
+                    <span className="absolute top-0 right-0 h-2.5 w-2.5 bg-rose-500 rounded-full border-2 border-white ring-2 ring-rose-500/30 animate-pulse">
+                        <span className="sr-only">
+                            {t('admin.dashboard.unreadCount', { count: unreadCount })}
+                        </span>
+                    </span>
                 )}
             </button>
 
             {/* Dropdown Panel */}
             {isOpen && (
-                <div className="absolute top-12 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col transform origin-top-right transition-colors animate-in fade-in zoom-in-95">
+                <div 
+                    role="menu"
+                    aria-label={t('admin.dashboard.notificationCenter')}
+                    className="absolute top-12 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col transform origin-top-right transition-colors animate-in fade-in zoom-in-95"
+                >
                     {/* Header */}
                     <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                         <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
@@ -303,6 +413,59 @@ const AdminRealtimeNotifications: React.FC = () => {
 
                     {/* Notification List */}
                     <div className="max-h-70vh overflow-y-auto w-full">
+                        {/* 1. İlgi Bekleyenler Section */}
+                        {attentionItems.length > 0 && (
+                            <div className="border-b border-slate-100 bg-slate-50/30 p-3">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 px-1 mb-2">
+                                    {t('admin.dashboard.inbox.title' as never)}
+                                </h4>
+                                <div className="grid grid-cols-1 gap-1.5" role="none">
+                                    {attentionItems.map((item) => (
+                                        <div
+                                            key={item.type}
+                                            role="menuitem"
+                                            tabIndex={0}
+                                            onClick={() => {
+                                                setIsOpen(false)
+                                                router.push(item.link as import('next').Route)
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault()
+                                                    setIsOpen(false)
+                                                    router.push(item.link as import('next').Route)
+                                                }
+                                            }}
+                                            className="group flex items-center justify-between p-2 rounded-xl bg-white border border-slate-100 hover:border-primary-navy/20 hover:shadow-sm transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20"
+                                        >
+                                            <div className="flex items-center gap-2.5 min-w-0">
+                                                <div className={`p-2 rounded-lg ${item.bgColor} flex items-center justify-center shrink-0`}>
+                                                    {item.icon}
+                                                </div>
+                                                <span className="text-xs font-semibold text-slate-700 group-hover:text-primary-navy transition-colors truncate">
+                                                    {item.label}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-xs font-bold ring-1 ring-rose-500/10">
+                                                    {item.count}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Recent Activity Divider/Title if we have attention items and notifications */}
+                        {attentionItems.length > 0 && notifications.length > 0 && (
+                            <div className="px-4 py-2 bg-slate-50/10 border-b border-slate-100">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                    {t('admin.dashboard.recent.transactions')}
+                                </h4>
+                            </div>
+                        )}
+
                         {notifications.length === 0 ? (
                             <div className="flex flex-col items-center justify-center p-8 text-center bg-slate-50/30">
                                 <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-3">
@@ -312,11 +475,11 @@ const AdminRealtimeNotifications: React.FC = () => {
                                 <p className="text-xs text-slate-400 mt-1">{t('admin.dashboard.noNewActivity')}</p>
                             </div>
                         ) : (
-                            <div className="flex flex-col">
+                            <div className="flex flex-col" role="none">
                                 {notifications.map((notif) => (
                                     <div
                                         key={notif.id}
-                                        role="button"
+                                        role="menuitem"
                                         tabIndex={0}
                                         onClick={() => {
                                             if (notif.link) {

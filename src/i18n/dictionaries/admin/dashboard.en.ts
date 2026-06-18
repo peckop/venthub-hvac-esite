@@ -92,4 +92,11 @@ export const dashboard = {
   allRead: 'All read',
   noNewActivity: 'There is no new activity.',
   onlyLast20Notifications: 'Only the last 20 notifications are shown.',
+  inbox: {
+    title: 'Items Requiring Attention',
+    pendingReturns: 'Pending Returns',
+    pendingShipments: 'Pending Shipments',
+    lowStock: 'Critical Stock Alarms',
+    unresolvedErrors: 'Unresolved Errors',
+  },
 };
