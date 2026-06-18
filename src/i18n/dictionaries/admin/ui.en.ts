@@ -34,4 +34,6 @@ export const ui = {
   tryDifferentKeywords: 'Please try different keywords.',
   select: 'Select',
   navigate: 'Navigate',
+  aiSearchEngine: 'VentHub AI Search Engine',
+  skuLabel: 'SKU:',
 };

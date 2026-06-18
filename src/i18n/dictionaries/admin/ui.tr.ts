@@ -34,4 +34,6 @@ export const ui = {
   tryDifferentKeywords: 'Lütfen farklı anahtar kelimeler deneyin.',
   select: 'Seç',
   navigate: 'Gezin',
+  aiSearchEngine: 'VentHub Yapay Zeka Arama Motoru',
+  skuLabel: 'SKU:',
 };
