@@ -16,8 +16,16 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { updateOrderStatus } from '../../lib/orderStatusService'
 import {
+    adminBgWhite3Class,
     adminButtonPrimaryClass,
-    adminInputClass
+    adminColumnContainerClass,
+    adminInputClass,
+    adminModalScrollAreaClass,
+    adminNoteItemClass,
+    adminOrderBoardItemClass,
+    adminOrderCardClass,
+    adminStepperLineBgClass,
+    adminStepperLineFillClass
 } from '../../utils/adminUi'
 
 // --- Constants ---
@@ -104,8 +112,8 @@ function OrderStepper({ status }: { status: string }) {
 
     return (
         <div className="flex items-center justify-between relative mt-4 mb-6 px-2">
-            <div className="absolute left-10% right-10% top-1/2 -translate-y-1/2 h-0.5 bg-white/5 -z-10 rounded-full"></div>
-            <div className="absolute left-10% top-1/2 -translate-y-1/2 h-0.5 bg-cyan-400 -z-10 transition-transform duration-700 rounded-full shadow-glow-sm" style={{ width: `${(Math.min(currentIndex, 4) / 4) * 80}%` }}></div>
+            <div className={adminStepperLineBgClass}></div>
+            <div className={adminStepperLineFillClass} style={{ width: `${(Math.min(currentIndex, 4) / 4) * 80}%` }}></div>
 
             {steps.map((step, idx) => {
                 const isPast = idx < currentIndex
@@ -189,7 +197,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
             if (error) throw error
             setDetail(prev => prev ? { ...prev, notes: [data as OrderDetail['notes'][0], ...prev.notes] } : prev)
             setNoteInput('')
-            toast.success(t('admin.orders.toasts.shippingUpdateSuccess')) // Placeholder for note success
+            toast.success(t('admin.orders.toasts.noteAddSuccess'))
         } catch {
             toast.error(t('admin.orders.toasts.noteAddFailed'))
         } finally {
@@ -221,7 +229,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                     </button>
                 </div>
 
-                <div className="p-10 space-y-8 max-h-70vh overflow-y-auto custom-scrollbar">
+                <div className={adminModalScrollAreaClass}>
                     {loading ? (
                         <div className="p-10 flex flex-col items-center gap-4">
                             <div className="animate-spin w-10 h-10 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
@@ -234,7 +242,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                                 <OrderStepper status={getEffectiveStatus(order)} />
                             </section>
 
-                            <section className="bg-white/2 border border-white/5 rounded-hvac-xl p-6 space-y-4">
+                            <section className={adminOrderCardClass}>
                                 <h4 className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal mb-2">{t('admin.orders.orderDetails')}</h4>
                                 <div className="space-y-3">
                                     {order.customer_email && <div className="flex items-center gap-3 text-xs text-slate-300"><Mail size={14} className="text-cyan-500" /> {order.customer_email}</div>}
@@ -267,7 +275,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                                 </h4>
                                 <div className="space-y-3">
                                     {detail.notes.map(n => (
-                                        <div key={n.id} className="p-4 bg-white/3 rounded-2xl border border-white/5 group hover:border-white/10 transition-colors">
+                                        <div key={n.id} className={adminNoteItemClass}>
                                             <div className="text-xs text-slate-200 font-medium leading-relaxed">{n.note}</div>
                                             <div className="text-xs text-slate-500 mt-2 font-black uppercase tracking-hvac-normal">{formatDateTime(n.created_at, lang)}</div>
                                         </div>
@@ -521,7 +529,7 @@ export default function AdminOrdersBoard() {
                             const isExpanded = expandedCol === col.id
 
                             return (
-                                <div key={col.id} className={`flex flex-col w-full md:w-320px shrink-0 glass-strong border border-white/5 rounded-hvac-2xl overflow-hidden transition-colors duration-300 ${!isExpanded ? 'h-auto md:h-full opacity-60 grayscale hover:opacity-100 hover:grayscale-0' : 'opacity-100 grayscale-0 shadow-2xl bg-white/3'}`} style={{ maxHeight: '100%' }}>
+                                <div key={col.id} className={`${adminColumnContainerClass} max-h-full ${!isExpanded ? 'h-auto md:h-full opacity-60 grayscale hover:opacity-100 hover:grayscale-0' : `opacity-100 grayscale-0 shadow-2xl ${adminBgWhite3Class}`}`}>
                                     {/* Sütun Başlık */}
                                     <button
                                         className={`w-full text-left p-6 border-b border-white/5 flex items-center justify-between ${isExpanded ? `${col.bgClass} backdrop-blur-xl` : 'bg-transparent'} transition-colors cursor-pointer md:cursor-default`}
@@ -547,8 +555,8 @@ export default function AdminOrdersBoard() {
                                             <div
                                                 ref={provided.innerRef}
                                                 {...provided.droppableProps}
-                                                className={`flex-1 p-4 space-y-4 transition-colors custom-scrollbar ${snapshot.isDraggingOver ? 'bg-cyan-500/5' : ''} ${isExpanded ? 'block' : 'hidden md:block'}`}
-                                                style={{ overflowY: 'auto', minHeight: isExpanded ? 160 : 80 }}
+                                                className={`flex-1 p-4 space-y-4 transition-colors custom-scrollbar ${snapshot.isDraggingOver ? 'bg-cyan-500/5' : ''} ${isExpanded ? 'block min-h-40' : 'hidden md:block min-h-20'}`}
+                                                style={{ overflowY: 'auto' }}
                                             >
                                                 {colOrders.map((order, index) => (
                                                     <Draggable key={order.id} draggableId={order.id} index={index}>
@@ -569,7 +577,7 @@ export default function AdminOrdersBoard() {
                                                                 className={`p-5 rounded-hvac-xl border transition-colors duration-300 cursor-pointer group relative overflow-hidden
                                                                     ${snapshot.isDragging 
                                                                         ? 'bg-cyan-400 text-surface-deep border-cyan-300 shadow-admin-orders-board-glow scale-105 z-50' 
-                                                                        : 'bg-white/3 border-white/5 hover:border-white/20 hover:bg-white/6 shadow-sm'}`}
+                                                                        : `${adminOrderBoardItemClass}`}`}
                                                                 style={{ ...provided.draggableProps.style }}
                                                             >
                                                                 {/* Accent Glow */}

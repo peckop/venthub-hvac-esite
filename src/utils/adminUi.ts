@@ -38,4 +38,27 @@ export const adminSupplierMaxWidthClass = 'max-w-[120px]'
 export const adminInputWidthLocationClass = 'w-20'
 export const adminInputWidthSupplierClass = 'w-24'
 
+// Stepper
+export const adminStepperLineBgClass = 'absolute left-10% right-10% top-1/2 -translate-y-1/2 h-0.5 bg-white/5 -z-10 rounded-full'
+export const adminStepperLineFillClass = 'absolute left-10% top-1/2 -translate-y-1/2 h-0.5 bg-cyan-400 -z-10 transition-transform duration-700 rounded-full shadow-glow-sm'
+
+// Modal
+export const adminModalScrollAreaClass = 'p-10 space-y-8 max-h-70vh overflow-y-auto custom-scrollbar'
+
+// Opacities & Layout for Kanban Board
+export const adminBgWhite2Class = 'bg-white/2'
+export const adminBgWhite3Class = 'bg-white/3'
+export const adminBgWhite6Class = 'bg-white/6'
+
+export const adminColumnContainerClass = 'flex flex-col w-full md:w-320px shrink-0 glass-strong border border-white/5 rounded-hvac-2xl overflow-hidden transition-colors duration-300'
+export const adminOrderCardClass = 'bg-white/2 border border-white/5 rounded-hvac-xl p-6 space-y-4'
+export const adminNoteItemClass = 'p-4 bg-white/3 rounded-2xl border border-white/5 group hover:border-white/10 transition-colors'
+export const adminOrderBoardItemClass = 'bg-white/3 border-white/5 hover:border-white/20 hover:bg-white/6 shadow-sm'
+
+// Report & Settings
+export const adminTableCellTruncate150Class = 'max-w-150px'
+export const adminInputThresholdClass = 'max-w-120px !h-12 !text-center !text-lg !font-black'
+export const adminInputTimeoutClass = '!h-12 text-lg font-black'
+export const adminBlurBlobClass = 'absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -mr-32 -mt-32 transition-colors'
+
 

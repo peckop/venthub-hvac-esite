@@ -126,6 +126,7 @@ export const orders = {
         emailLogsFailed: 'E-posta kayıtları yüklenemedi',
         notesFailed: 'Notlar yüklenemedi',
         noteAddFailed: 'Not eklenemedi',
+        noteAddSuccess: 'Not başarıyla eklendi',
         noteDeleteSuccess: 'Not silindi',
         noteDeleteFailed: 'Not silinemedi',
         noPermission: 'Bu işlem için yetkiniz yok',
