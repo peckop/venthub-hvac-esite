@@ -2,45 +2,53 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminInventoryReportPage.tsx
-skeleton_hash: 93c0417d33f23b41
+source_path: C:\Users\alize\vh-invreport\src\views\admin\AdminInventoryReportPage.tsx
+skeleton_hash: 3bdc447fefc2db5d
 entity_hashes:
-  func:AdminInventoryReportPage: 826a3de74f7e982f
-  overview: d98a4eff9e18adc6
-  style_tokens: 23d781c8192db1b8
-generated_at: 2026-06-16T10:19:04Z
+  func:AdminInventoryReportPage: a23c742740baa316
+  func:InventoryReportContent: 4005cf17ab3151b4
+  overview: 13a120399f1afc85
+  style_tokens: 9b13f3522b9ce8c7
+generated_at: 2026-06-18T16:22:15Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC yönetici arayüzünde envanter verilerini raporlayan bir React sayfasıdır. Tek bileşenli bir yapıya sahip olup, yalnızca yetkili admin kullanıcıların erişimine açıktır ve projenin envanter yönetim sisteminin görsel raporlama arayüzünü sunar.
+Bu modül, VentHub HVAC yönetici arayüzünde envanter verilerini raporlayan bir React sayfasıdır. Ana bileşen olarak sayfa yapısını ve erişim kontrolünü yöneten bir üst bileşen ile içindeki rapor detaylarını, grafikleri ve verileri gösteren bir alt bileşenden oluşur. Modül, yetkili admin kullanıcıların erişimine açıktır ve envanter yönetim sisteminin görsel raporlama arayüzünü sunar; fonksiyon gövdesi paylaşılmadığı için iç bağımlılıklar hakkında kesin bilgi olmamakla birlikte, React bileşen modeli gereği JSX döndürmeli ve geçersiz durumlarda hata yönetimi sağlanmalıdır.
 
 ## Fonksiyon Grupları
-### Ana Rapor Bileşeni
-Bu grup, tüm sayfa yapısını, veri akışını ve kullanıcı arayüzünü yöneten tek bir üst düzey React bileşeninden oluşur.
-- AdminInventoryReportPage
+### Ana Sayfa Bileşeni
+Bu grup, sayfa yapısını, erişim kontrolünü ve alt bileşenlerin yerleşimini yöneten üst düzey React
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, parametre almayan bir React bileşenidir; fonksiyon gövdesine erişilmediği için iç bağımlılıklar ve çalışma koşulları belirlenememiştir.
-
-[Aksiyom 1]: Eğer bileşen JSX döndüremezse (örn: render hatası), React bileşen ağacı bozulur ve hata sınırı yakalayıcısına kadar üst bileşenler etkilenebilir.
-
-[Aksiyom 2]: Eğer bileşen içinde tüketilen veri kaynakları (API servisleri, context vb.) kullanılabilir değilse, bileşen geçersiz/boş durumda görüntülenir.
-
----
-
-**Not:** Fonksiyon imzası `AdminInventoryReportPage()` olarak verilmiş olup parametre almamaktadır. Fonksiyon gövdesi paylaşılmadığı için içsel bağımlılıklar (state hook'ları, context tüketimleri, API çağrıları) hakkında kesin çıkarım yapılamamıştır. Mevcut aksiyomlar yalnızca React bileşen modelinin zorunlu gerekliliklerine dayanmaktadır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
+### InventoryReportContent
+**Ne yapar**: Stok hareketleri raporunu gösteren, filtreleyen ve görselleştiren ana React bileşenidir. Arama filtresi, tarih aralığı seçimi, istatistik kartları, grafikler ve detaylı hareket tabloları sunar.
+
+**Nasıl yapar**: Bileşen, Next.js'in `useRouter` ve `useSearchParams` hook'larını kullanarak URL parametrelerini okur/yazar. `useSupabaseClient` ile Supabase bağlantısı alıp `getInventoryMovements` fonksiyonu ile veri çeker. `useDragScroll` hook'u tablolar için yatay sürükleme sağlar. `React.useEffect` ile debounce arama, URL senkronizasyonu ve veri yükleme işlemleri yönetilir. `React.useMemo` ile filtrelenmiş veriler hesaplanır. `recharts` kütüphanesi kullanılarak alan, pasta ve çubuk grafikler oluşturulur.
+
+**Parametreler**:
+- Bu fonksiyon parametre almaz (React bileşeni olarak).
+
+**Dönüş**: JSX element döndürür. Yüklenme durumunda skeleton, yüklenme sonrası rapor içeriğini (kartlar, grafikler, tablolar) render eder.
+
 ### AdminInventoryReportPage
-**Ne yapar**: Bu fonksiyon, admin panelinde envanter hareketleri için interaktif bir rapor sayfası oluşturur. Sayfa, stok giriş/çıkış verilerini çeker, işler ve grafikler, tablolar ile istatistiksel kartlar aracılığıyla görselleştirir.
-**Nasıl yapar**: Fonksiyon, bir React fonksiyonel bileşenidir. `useI18n` ile çevirileri, `usePathname` ile mevcut URL'yi, `useDragScroll` ile sürükleme ile kaydırılabilir alanları yönetir. `useState` ile loading durumu, tarih araması, arama sorgusu ve çeşitli veri dizileri için durumlar tutulur. `loadData` adlı `useCallback` ile sarılmış asenkron fonksiyon, `supabase.from('inventory_movements')` sorgusuyla veritabanından veri çeker ve `dateRange` durumuna göre filtreleme uygular. Çekilen veriler, bir `useEffect` içinde `movementsData` durumuna kaydedilir. Veriler işlenirken, toplam giriş/çıkış miktarları, sebep bazlı dağılım, en çok hareket gören ürünler ve günlük trend verileri hesaplanır. Son olarak, bu işlenmiş veriler JSX ile grafik (AreaChart, PieChart, BarChart) ve tablo bileşenleri kullanarak render edilir. `exportCsv` fonksiyonu, `movementsData` dizisini CSV formatına dönüştürerek tarayıcıda bir dosya indirme işlemi başlatır.
-**Parametreler**: Parametre almaz (React bileşeni olarak çağrılır).
-**Dönüş**: JSX.Element — Render edilmiş admin rapor sayfası bileşenini döndürür.
+**Ne yapar**: `InventoryReportContent` bileşenini `React.Suspense` ile sarmalayan üst seviye sayfa bileşenidir.
+
+**Nasıl yapar**: `React.Suspense` bileşeni, `InventoryReportContent` yüklenene kadar `fallback` prop'unda verilen skeleton yükleme göstergesini render eder. Bu, Next.js app router'daki streaming/server component özelliklerini destekler.
+
+**Parametreler**:
+- Bu fonksiyon parametre almaz (React bileşeni olarak).
+
+**Dönüş**: JSX element döndürür. `Suspense` ile sarılmış `InventoryReportContent` bileşenini render eder.
 
 ---
 
@@ -52,137 +60,86 @@ Bu modül, parametre almayan bir React bileşenidir; fonksiyon gövdesine erişi
 - import: ../../hooks/useDragScroll::useDragScroll
 - import: ../../lib/ensureSessionFresh::ensureSessionFresh
 - import: @/i18n/I18nProvider::useI18n
-- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @/providers/SupabaseProvider::useSupabaseClient
 - import: date-fns::eachDayOfInterval
 - import: date-fns::endOfDay
 - import: date-fns::format
 - import: date-fns::startOfDay
 - import: date-fns::subDays
 - import: next/navigation::usePathname
+- import: next/navigation::useRouter
+- import: next/navigation::useSearchParams
 - import: react-day-picker::DateRange
 - import: react::React
+- import: react::Suspense
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::loadData
-- **params**: (yok)
+### [N1_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::InventoryReportContent
+- **params**: ()
 - **ic_degiskenler**:
-  - `query` — Supabase veritabanı sorgusunu temsil eder, `inventory_movements` tablosundan veri çeker
-  - `dateRange?.from` — Filtreleme için başlangıç tarihi
-  - `dateRange?.to` — Filtreleme için bitiş tarihi
-  - `movements` — Veritabanından dönen ham hareket verileri dizisi
-  - `movementsError` — Veritabanı sorgusunda oluşabilecek hata nesnesi
-- **Dönüş**: yok (state setter'ları çağırır)
+  - `urlFrom` — URL parametresinden alınan başlangıç tarihi (string), Date objesine dönüştürülür
+  - `urlTo` — URL parametresinden alınan bitiş tarihi (string), Date objesine dönüştürülür
+  - `from` — Hesaplanan başlangıç tarihi (Date), varsayılan olarak 30 gün öncesi
+  - `to` — Hesaplanan bitiş tarihi (Date), gün sonu ile
+  - `t` — setTimeout ile oluşturulan timer ID'si (debounce için)
+  - `debouncedQuery` — Gecikmeli arama sorgusu (state)
+  - `searchQuery` — Anlık arama sorgusu (state)
+  - `params` — URLSearchParams nesnesi, arama parametrelerini tutar
+  - `currentQs` — Mevcut URL query string'i
+  - `nextQs` — Yeni URL query string'i
+  - `q` — URL'den alınan arama parametresi
+  - `fromStr` — URL'den alınan başlangıç tarihi string'i
+  - `toStr` — URL'den alınan bitiş tarihi string'i
+  - `nextFrom` — URL'den hesaplanan başlangıç tarihi
+  - `nextTo` — URL'den hesaplanan bitiş tarihi
+  - `currentFromTime` — Mevcut başlangıç tarihi timestamp'i (sayısal)
+  - `currentToTime` — Mevcut bitiş tarihi timestamp'i (sayısal)
+  - `nextFromTime` — Yeni başlangıç tarihi timestamp'i (sayısal)
+  - `nextToTime` — Yeni bitiş tarihi timestamp'i (sayısal)
+  - `data` — API'den gelen inventar hareket verisi (InventoryMovementRow[])
+  - `movementsData` — Inventar hareketleri veri dizisi (state)
+  - `loading` — Yükleme durumu bayrağı (state, boolean)
+  - `tIn` — Toplam gelen ürün miktarı (sayısal)
+  - `tOut` — Toplam giden ürün miktarı (sayısal)
+  - `reasonMap` — Hareket sebeplerine göre miktarları tutan obje (Record<string, number>)
+  - `productSales` — Ürün bazlı satış verilerini tutan obje (Record<string, {name: string, out: number}>)
+  - `trendMap` — Günlük trend verilerini tutan obje (Record<string, {date: string, incoming: number, outgoing: number}>)
+  - `term` — Küçük harfe çevrilmiş arama terimi
+  - `filtered` — Arama terimine göre filtrelenmiş hareket verileri
+  - `days` — Seçilen tarih aralığındaki tüm günlerin dizisi
+  - `dateKey` — Tarihin 'yyyy-MM-dd' formatında string karşılığı
+  - `deltaAbs` — Miktarın mutlak değeri
+  - `pname` — Ürün adı
+  - `rData` — Grafik için sebep verileri dizisi
+  - `sortedProds` — Sıralanmış ve kısaltılmış ürün adlarıyla top ürün listesi
+  - `csvRows` — CSV satırları dizisi
+  - `csvString` — Oluşturulan CSV metni
+  - `blob` — CSV dosyası için Blob nesnesi
+  - `url` — Blob için oluşturulmuş URL
+  - `a` — Dosya indirme linki için oluşturulan HTMLAnchorElement
+- **Dönüş**: React JSX (InventoryReportContent bileşeni)
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::useEffectLoadData
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `loadData` — loadData asenkron fonksiyonu, veri yükleme işlemini başlatır
-- **Dönüş**: yok (yan etki: loadData çağırır)
-
-### [N3_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::computeStats
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `tIn` — Toplam giren ürün sayısını hesaplar
-  - `tOut` — Toplam çıkan ürün sayısını hesaplar
-  - `reasonMap` — Her sebep türü için (sale, return, restock vb.) ürün sayısını tutar
-  - `productSales` — Ürün bazlı satış/çıkış verilerini depolar
-  - `trendMap` — Günlük trend verilerini (giren/çıkan) tutar
-  - `term` — Arama sorgusunun küçük harf ve boşluk temizlenmiş hali
-  - `filtered` — Arama filtresi uygulanmış hareketler dizisi
-  - `days` — Tarih aralığındaki tüm günlerin dizisi
-  - `dateKey` — Hareket tarihinin 'yyyy-MM-dd' formatındaki anahtarı
-  - `deltaAbs` — delta değerinin mutlak değeri
-  - `pname` — Ürün adı (veya product_id yedek)
-  - `rData` — Pasta grafik için sebep verisi dizisi
-  - `sortedProds` — En çok satan ürünlerin sıralanmış dizisi
-- **Dönüş**: yok (state setter'ları çağırır: setStats, setReasonData, setTopProducts, setTrendData)
-
-### [N4_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::initializeDayInTrend
-- **params**: `d` — Date nesnesi (forEach iterasyon parametresi)
-- **ic_degiskenler**:
-  - `k` — Günün 'yyyy-MM-dd' formatındaki anahtarı
-- **Dönüş**: yok (yan etki: trendMap'e yeni gün ekler)
-
-### [N5_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::processMovement
-- **params**: `m` — Tek bir hareket nesnesi (forEach iterasyon parametresi)
-- **ic_degiskenler**:
-  - `dateKey` — Hareket tarihinin 'yyyy-MM-dd' formatındaki anahtarı
-  - `deltaAbs` — delta değerinin mutlak değeri
-  - `pname` — Ürün adı (veya product_id yedek)
-- **Dönüş**: yok (yan etki: tIn, tOut, trendMap, reasonMap, productSales değişkenlerini günceller)
-
-### [N6_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::mapProductForTop
-- **params**: `p` — productSales objesinden bir ürün nesnesi
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `{ name: string, amount: number }` — Grafik için formatlanmış ürün verisi
-
-### [N7_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::exportCSV
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `movementsData` — Dışarıdan gelen hareket verileri dizisi (state)
-  - `header` — CSV başlık satırı dizisi
-  - `csvRows` — Her hareketi CSV satırına dönüştürülmüş dizi
-  - `csvString` — Tüm CSV içeriği (BOM karakteri ile)
-  - `blob` — CSV verisi için Blob nesnesi
-  - `url` — Blob için oluşturulan nesne URL'i
-  - `a` — Dinamik olarak oluşturulan <a> elementi (indirme için)
-- **Dönüş**: yok (yan etki: CSV dosyasını indirir)
-
-### [N8_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::mapMovementToCSVRow
-- **params**: `m` — Tek bir hareket nesnesi (map iterasyon parametresi)
-- **ic_degiskenler**:
-  - `m.id` — Hareket ID'si
-  - `m.created_at` — Hareket tarih/saat bilgisi
-  - `m.products?.name` — Ürün adı (veya product_id fallback)
-  - `m.delta` — Miktar değişimi
-  - `m.reason` — Hareket sebebi
-  - `m.product_id` — Ürün ID'si
-- **Dönüş**: `string` — Virgülle ayrılmış, tırnak işaretli CSV satırı
-
-### [N9_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::getFilteredMovements
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `searchQuery` — Dışarıdan gelen arama sorgusu (state)
-  - `movementsData` — Dışarıdan gelen hareket verileri dizisi (state)
-  - `term` — Arama sorgusunun küçük harf ve boşluk temizlenmiş hali
-- **Dönüş**: `Array` — Filtrelenmiş hareketler dizisi (JSX'te kullanılır)
-
-### [N10_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::renderIncomingRow
-- **params**: `m` — Tek bir hareket nesnesi (JSX map iterasyon parametresi)
-- **ic_degiskenler**:
-  - `adminTableCellClass` — Tablo hücreleri için CSS sınıfı
-  - `m.id` — Hareket ID'si (key olarak kullanılır)
-  - `m.created_at` — Hareket tarihi (formatlanır)
-  - `m.products?.name` — Ürün adı
-  - `m.product_id` — Ürün ID'si (fallback)
-  - `m.delta` — Pozitif miktar değişimi
-- **Dönüş**: `JSX.Element` — Giren ürün satırı (HTML tablosu satırı)
-
-### [N11_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::renderOutgoingRow
-- **params**: `m` — Tek bir hareket nesnesi (JSX map iterasyon parametresi)
-- **ic_degiskenler**:
-  - `adminTableCellClass` — Tablo hücreleri için CSS sınıfı
-  - `m.id` — Hareket ID'si (key olarak kullanılır)
-  - `m.created_at` — Hareket tarihi (formatlanır)
-  - `m.products?.name` — Ürün adı
-  - `m.product_id` — Ürün ID'si (fallback)
-  - `m.delta` — Negatif miktar değişimi (çıkış)
-- **Dönüş**: `JSX.Element` — Çıkan ürün satırı (HTML tablosu satırı)
+### [N2_NASIL] AST Pointer: src/views/admin/AdminInventoryReportPage.tsx::AdminInventoryReportPage
+- **params**: ()
+- **ic_degiskenler**: (yok — sadece JSX döndürür, iç değişken yok)
+- **Dönüş**: React JSX (Suspense ile sarılmış InventoryReportContent bileşeni)
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\views\admin\AdminInventoryReportPage.tsx
+  function: src\views\admin\AdminInventoryReportPage.tsx::InventoryReportContent
   function: src\views\admin\AdminInventoryReportPage.tsx::AdminInventoryReportPage
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: AdminInventoryReportPage
+  export: InventoryReportContent
 
 ---
 
@@ -198,4 +155,4 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Renkler:** `bg-emerald-400/10`, `bg-emerald-500/5`, `bg-rose-400/10`, `bg-rose-500/5`, `bg-slate-100`, `bg-slate-200`, `bg-slate-50`, `border-b`, `border-emerald-100/10`, `border-emerald-400/20`, `border-emerald-500/10`, `border-l-4`, `border-l-emerald-500`, `border-l-indigo-500`, `border-l-rose-500`
 - **Layout:** `absolute`, `flex`, `flex-col`, `gap-2`, `gap-4`, `gap-6`, `grid`, `grid-cols-1`, `h-4`, `h-5`, `h-72`, `h-8`, `h-80`, `h-full`, `items-center`
 - **Varyant/Responsive:** `:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `!px-4`, `!py-2.5`, `!rounded-2xl`, `!rounded-3xl`, `!rounded-xl`, `${adminButtonSecondaryClass`, `${adminCardClass`, `${stats.net`, `0`, `:`, `<`, `>`, `animate-in`, `animate-pulse`, `border`
+- **Yardımcı Sınıflar:** `!px-4`, `!py-2.5`, `!rounded-2xl`, `!rounded-3xl`, `!rounded-xl`, `${adminButtonSecondaryClass`, `${adminCardClass`, `${adminTableScrollAreaClass`, `${stats.net`, `0`, `:`, `<`, `>`, `animate-in`, `animate-pulse`

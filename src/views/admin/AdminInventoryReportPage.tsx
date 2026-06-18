@@ -1,14 +1,15 @@
 'use client'
 
-import { eachDayOfInterval,endOfDay, format, startOfDay, subDays } from 'date-fns'
-import { Activity, ArrowDownRight, ArrowUpRight, Download, MinusCircle,PackageMinus, PlusCircle, TrendingUp } from 'lucide-react'
-import { usePathname } from 'next/navigation'
-import React from 'react'
+import { eachDayOfInterval, endOfDay, format, startOfDay, subDays } from 'date-fns'
+import { Activity, ArrowDownRight, ArrowUpRight, Download, MinusCircle, PackageMinus, PlusCircle, TrendingUp } from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import React, { Suspense } from 'react'
 import { DateRange } from 'react-day-picker'
-import { Area, AreaChart, Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer,Tooltip as RechartsTooltip, XAxis, YAxis } from 'recharts'
+import { Area, AreaChart, Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from 'recharts'
 
 import { useI18n } from '@/i18n/I18nProvider'
-import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
+import { getInventoryMovements, type InventoryMovementRow } from '@/lib/services/inventoryReport.service'
+import { useSupabaseClient } from '@/providers/SupabaseProvider'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
@@ -16,49 +17,102 @@ import AdminToolbar from '../../components/admin/AdminToolbar'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { useDragScroll } from '../../hooks/useDragScroll'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { adminButtonSecondaryClass,adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass } from '../../utils/adminUi'
+import { adminButtonSecondaryClass, adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass, adminTableScrollAreaClass } from '../../utils/adminUi'
 
-export default function AdminInventoryReportPage() {
+function InventoryReportContent() {
     const { t } = useI18n()
+    const { supabase } = useSupabaseClient()
+    const router = useRouter()
     const pathname = usePathname()
+    const searchParams = useSearchParams()
+
     const dragScrollRefIn = useDragScroll<HTMLDivElement>()
     const dragScrollRefOut = useDragScroll<HTMLDivElement>()
 
-    const [loading, setLoading] = React.useState(true)
-    const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
-        from: subDays(startOfDay(new Date()), 30),
-        to: endOfDay(new Date())
+    // Read initial values from URL search params
+    const urlQuery = searchParams?.get('q') ?? ''
+    const urlFrom = searchParams?.get('from')
+    const urlTo = searchParams?.get('to')
+
+    const [searchQuery, setSearchQuery] = React.useState(() => urlQuery)
+    const [debouncedQuery, setDebouncedQuery] = React.useState(() => urlQuery)
+
+    const [dateRange, setDateRange] = React.useState<DateRange | undefined>(() => {
+        const from = urlFrom ? new Date(urlFrom) : subDays(startOfDay(new Date()), 30)
+        const to = urlTo ? endOfDay(new Date(urlTo)) : endOfDay(new Date())
+        return { from, to }
     })
-    const [searchQuery, setSearchQuery] = React.useState('')
-    const [movementsData, setMovementsData] = React.useState<Record<string, unknown>[]>([])
+
+    const [loading, setLoading] = React.useState(true)
+    const [movementsData, setMovementsData] = React.useState<InventoryMovementRow[]>([])
     const [stats, setStats] = React.useState({ totalIn: 0, totalOut: 0, net: 0 })
     const [reasonData, setReasonData] = React.useState<{ name: string, value: number, color: string }[]>([])
     const [topProducts, setTopProducts] = React.useState<{ name: string, amount: number }[]>([])
     const [trendData, setTrendData] = React.useState<Record<string, unknown>[]>([])
+
+    // Debounce search query
+    React.useEffect(() => {
+        const t = setTimeout(() => {
+            setDebouncedQuery(searchQuery.trim())
+        }, 350)
+        return () => clearTimeout(t)
+    }, [searchQuery])
+
+    // Write state back to URL
+    React.useEffect(() => {
+        const params = new URLSearchParams()
+        if (debouncedQuery) params.set('q', debouncedQuery)
+        if (dateRange?.from) params.set('from', dateRange.from.toISOString())
+        if (dateRange?.to) params.set('to', dateRange.to.toISOString())
+
+        const currentQs = searchParams?.toString() ?? ''
+        const nextQs = params.toString()
+        if (currentQs !== nextQs) {
+            router.replace(`${pathname}?${nextQs}`, { scroll: false })
+        }
+    }, [debouncedQuery, dateRange, pathname, router, searchParams])
+
+    // Sync URL changes to state (e.g. Back/Forward navigation)
+    React.useEffect(() => {
+        const q = searchParams?.get('q') ?? ''
+        const fromStr = searchParams?.get('from')
+        const toStr = searchParams?.get('to')
+
+        if (q !== searchQuery) {
+            setSearchQuery(q)
+            setDebouncedQuery(q)
+        }
+
+        const nextFrom = fromStr ? new Date(fromStr) : subDays(startOfDay(new Date()), 30)
+        const nextTo = toStr ? endOfDay(new Date(toStr)) : endOfDay(new Date())
+
+        const currentFromTime = dateRange?.from?.getTime()
+        const currentToTime = dateRange?.to?.getTime()
+        const nextFromTime = nextFrom?.getTime()
+        const nextToTime = nextTo?.getTime()
+
+        if (currentFromTime !== nextFromTime || currentToTime !== nextToTime) {
+            setDateRange({ from: nextFrom, to: nextTo })
+        }
+    }, [searchParams])
 
     const loadData = React.useCallback(async () => {
         try {
             setLoading(true)
             await ensureSessionFresh()
 
-            let query = supabase
-                .from('inventory_movements')
-                .select('id, delta, reason, created_at, product_id, products(name)')
-                .order('created_at', { ascending: false })
-
-            if (dateRange?.from) query = query.gte('created_at', dateRange.from.toISOString())
-            if (dateRange?.to) query = query.lte('created_at', endOfDay(dateRange.to).toISOString())
-
-            const { data: movements, error: movementsError } = await query
-            if (movementsError) throw movementsError
-            setMovementsData(movements || [])
+            const data = await getInventoryMovements(supabase, {
+                from: dateRange?.from ?? undefined,
+                to: dateRange?.to ?? undefined
+            })
+            setMovementsData(data)
 
         } catch (err) {
             console.error('Report fetch error:', err)
         } finally {
             setLoading(false)
         }
-    }, [dateRange])
+    }, [dateRange, supabase])
 
     React.useEffect(() => {
         void loadData()
@@ -330,7 +384,7 @@ export default function AdminInventoryReportPage() {
                             </h2>
                             <span className="text-xs font-black text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md border border-emerald-400/20 uppercase tracking-tighter">{t('admin.inventory.incomingLabel')}</span>
                         </div>
-                        <div ref={dragScrollRefIn} className="overflow-x-auto max-h-400px">
+                        <div ref={dragScrollRefIn} className={`overflow-x-auto ${adminTableScrollAreaClass}`}>
                             {inboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
                                     <thead className="bg-slate-50 sticky top-0 z-10">
@@ -367,7 +421,7 @@ export default function AdminInventoryReportPage() {
                             </h2>
                             <span className="text-xs font-black text-rose-400 bg-rose-400/10 px-2 py-0.5 rounded-md border border-rose-400/20 uppercase tracking-tighter">{t('admin.inventory.outgoingLabel')}</span>
                         </div>
-                        <div ref={dragScrollRefOut} className="overflow-x-auto max-h-400px">
+                        <div ref={dragScrollRefOut} className={`overflow-x-auto ${adminTableScrollAreaClass}`}>
                             {outboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
                                     <thead className="bg-slate-50 sticky top-0 z-10">
@@ -397,5 +451,27 @@ export default function AdminInventoryReportPage() {
                 </div>
             </>
         </div>
+    )
+}
+
+export default function AdminInventoryReportPage() {
+    return (
+        <Suspense fallback={
+            <div className="space-y-6 max-w-page">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <div className="h-8 w-64 bg-slate-200 animate-pulse rounded mb-2"></div>
+                        <div className="h-4 w-96 bg-slate-100 animate-pulse rounded"></div>
+                    </div>
+                </div>
+                <AdminSkeleton variant="cards" count={3} />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="h-80 bg-slate-100 animate-pulse rounded-2xl border border-slate-200/60 w-full" />
+                    <div className="h-80 bg-slate-100 animate-pulse rounded-2xl border border-slate-200/60 w-full" />
+                </div>
+            </div>
+        }>
+            <InventoryReportContent />
+        </Suspense>
     )
 }

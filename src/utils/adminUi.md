@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\adminUi.ts
-skeleton_hash: 3ae172a5374fdd7a
+source_path: C:\Users\alize\vh-invreport\src\utils\adminUi.ts
+skeleton_hash: 7555b6e469d69f26
 entity_hashes:
   overview: f513c1020f198680
-generated_at: 2026-05-28T22:38:44Z
+generated_at: 2026-06-18T16:20:59Z
 ---
 
 ## Genel Bakış
@@ -45,16 +45,6 @@ Bu modül, yalnızca sabit değerler (CSS sınıfları ve stil nesnesi) içeren 
 ## AST POINTERS
 
 Bu dosyada fonksiyon bulunmamaktadır.
-
----
-
-### Sabitler (Fonksiyon Dışı Tanımlar)
-
-| Sabit | Tür | Açıklama |
-|-------|-----|----------|
-| `adminCardClass` | `string` (template) | Admin paneli kartları için CSS class string'i |
-| `adminCardPaddedClass` | `string` (template) | Padding içeren admin kartları için CSS class string'i |
-| `adminSelectStyle` | `object` | Admin select elementleri için inline stil objesi |
 
 ---
 
