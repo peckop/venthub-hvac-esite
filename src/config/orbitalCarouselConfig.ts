@@ -100,7 +100,7 @@ export const ORBITAL_CAROUSEL_CONFIG = {
      * Düz siyah void yerine derinlik/sahne hissi verir (kara boşlukta yüzme sorununu çözer).
      */
     backgroundGradient:
-        'radial-gradient(ellipse 95% 80% at 50% 30%, #1b2a45 0%, #0c1626 44%, #05080f 100%)',
+        'radial-gradient(ellipse 110% 95% at 50% 38%, #2c4163 0%, #14233e 45%, #070c18 100%)',
 
     /** Zemin yansıması metalikliği — 0.9 ayna çok sert; 0.5 = yumuşak stüdyo zemini */
     floorMetalness: 0.5,

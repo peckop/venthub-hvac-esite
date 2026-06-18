@@ -81,7 +81,7 @@ const Stage: React.FC<{
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.6, 0]}>
                 <circleGeometry args={[12, 64]} />
                 <meshStandardMaterial
-                    color="#0b1626"
+                    color="#162a45"
                     metalness={CONFIG.floorMetalness}
                     roughness={0.55}
                 />
