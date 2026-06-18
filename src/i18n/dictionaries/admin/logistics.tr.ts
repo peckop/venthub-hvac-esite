@@ -6,6 +6,13 @@ export const logistics = {
       shipOrders: 'Kargoya Ver',
       updating: 'Güncelleniyor...',
       noCarrierSelected: 'Lütfen bir kargo firması seçin.',
+      carriers: {
+        yurtici: 'Yurtiçi',
+        aras: 'Aras',
+        mng: 'MNG',
+        ptt: 'PTT',
+        ups: 'UPS'
+      },
       table: {
         order: 'Sipariş',
         customer: 'Müşteri',

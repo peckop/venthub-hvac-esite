@@ -6,6 +6,13 @@ export const logistics = {
       shipOrders: 'Ship Selected',
       updating: 'Updating...',
       noCarrierSelected: 'Please select a carrier.',
+      carriers: {
+        yurtici: 'Yurtiçi',
+        aras: 'Aras',
+        mng: 'MNG',
+        ptt: 'PTT',
+        ups: 'UPS'
+      },
       table: {
         order: 'Order',
         customer: 'Customer',
