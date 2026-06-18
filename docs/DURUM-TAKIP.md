@@ -9,11 +9,12 @@
 > Eş Controller'ın bölümüne **DOKUNMA** — yoksa pano çakışma noktası olur.
 
 ### Controller #1 — admin şeridi
-- **Aktif:** §8 açık-kapatma **TAM BİTTİ** — 1. dalga (7 PR) + 2. dalga (5 PR) + INV-6 keystone hepsi **PRODUCTION'da** (master `a4a8bce4`). Sıradaki: E1 enterprise shell (brief master'da hazır).
+- **Aktif:** §8 açık-kapatma **TAM BİTTİ** + **E1 shell başladı** — 1.dalga (7) + 2.dalga (5) + INV-6 keystone + **3.dalga: E1 komut-paleti #408 · J12 Logistics #411 · J13 InventoryReport #410** hepsi **PRODUCTION'da** (master `a4bbba0d`). Sıradaki: E2 inbox (brief hazır) · E8/sidebar (E1 sonrası, çakışma).
 - **Biten — 1. dalga (§8 çekirdek, merged):** #387 = 3 rewrite (Inventory/Settings/Webhook)+**INV-6** sahte-success bekçisi+Settings RLS migration · J1 Dashboard · J3 CSV · J4 Orders · J5 Categories · J6 Users · J7 Returns.
 - **Biten — 2. dalga (§8 cila, 2026-06-18, merged):** **#398** INV-6 sertleştirme (Promise.all/allSettled/race = gerçek-etki; J6 kör noktasını kapatır, keystone) · **#400** J9 CategoryBuilder (Zod+dirty-guard) · **#401** J10 InventorySettings (iki-kolon+token) · **#402** J11 OrdersBoard (limit-200 sessiz-tavan→görünür uyarı; worker dummy-await'i gate'te temizlendi) · **#403** J8 Coupons (realtime tenant-scoped+Zod; bundle'lı 369-satır types-regen gate'te ayrıldı) · **#404** J2 Settings-i18n (27 literal).
 - **Gate dersleri (2. dalga):** worker'lar gate'i kandıran/şişiren artıklar üretti — INV-6 dead-code dummy (J11), bundle'lı types-regen (J8), .md companion churn (J2). Controller force-push'la worker dalını bozmadı; düzeltilmiş `gate/*` dallarından PR açtı, worker orijinalleri korundu. Bkz. [[admin-section8-wave-shipped]].
-- **Durum:** ✅ §8 kapandı → 🟡 sıradaki = E1 shell. **Açık iş:** J8'den ayrılan `database.types.ts` regen'i (tenant_id/graphql_public prod-DB drift'i) ayrı bir types-sync PR'ı olarak ele alınmalı.
+- **Biten — 3. dalga (E1 shell + son §8 yüzeyleri, 2026-06-18, merged):** **#408** E1 federe komut paleti (registry SSOT + 10 DI'lı RLS-searcher + RBAC + allSettled) · **#411** J12 Logistics→DataTableKit · **#410** J13 InventoryReport URL-state+DI+token. **Gate dersi:** J12/J13 CI-yeşildi ama Vercel `next build` PATLADI (J12 import-sort=error, J13 typedRoutes tsc'de görünmez) → Controller yerelde gerçek `pnpm build`'le düzeltti; **CI≠Vercel, admin PR'da Vercel ZORUNLU**. Bkz. [[ci-not-equal-vercel-build-gate]]. (J13 worker push'u ulaşmamıştı + .md churn → worktree'den kurtarıldı.)
+- **Durum:** ✅ §8 + E1 production'da → 🟡 sıradaki = E2 inbox (brief hazır), sonra E8/sidebar (E1 bağımlı). **Açık iş:** J8'den ayrılan `database.types.ts` regen'i (tenant_id/graphql_public prod-DB drift'i) ayrı types-sync PR'ı — Controller işi.
 
 ### Controller #2 — 3D şeridi
 - **Aktif:** 3D **görsel kalite** fazı (conformance BİTTİ). Işık rig **v3 front-lit** master'da → Recep'in görsel onayı bekleniyor (orbit showcase ekran görüntüsü = gözüm).
