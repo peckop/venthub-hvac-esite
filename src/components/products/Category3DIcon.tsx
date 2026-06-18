@@ -6,8 +6,11 @@ import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'
 import React, { useRef } from 'react'
 import type { Group } from 'three'
 
+import { getModelPlacement, ModelContext } from '@/utils/3dModelOffsets'
+
 import { useI18n } from '../../i18n/I18nProvider'
 import { ProductModelRenderer } from './3d/ProductModelRenderer'
+import { SmartCenterScale } from './3d/SmartCenterScale'
 
 interface Category3DIconProps {
     categorySlug: string
@@ -40,6 +43,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
 }) => {
     const { t } = useI18n()
     const meshRef = useRef<Group>(null)
+    const placement = getModelPlacement(modelType, categorySlug, (offsetContext as ModelContext) || 'orbital')
 
     useFrame((state) => {
         if (meshRef.current) {
@@ -52,17 +56,25 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
 
     const showTapHint = shouldShowTapHint && hintStage === 'tap'
 
+
     return (
         <group ref={meshRef} name={`icon-container-${offsetContext || 'default'}`}>
                         
-            <group scale={[scale, scale, scale]}>
-                {DetailedModel ? <DetailedModel /> : (
-                    <ProductModelRenderer
-                        slug={categorySlug}
-                        modelType={modelType}
-                        scale={1}
-                    />
-                )}
+            <group scale={[scale, scale, scale]} rotation={placement.rotation}>
+                <SmartCenterScale
+                    enabled={true}
+                    targetSize={1.0 * (placement.scale || 1.0)}
+                    shift={placement.position}
+                    alignment="center"
+                >
+                    {DetailedModel ? <DetailedModel /> : (
+                        <ProductModelRenderer
+                            slug={categorySlug}
+                            modelType={modelType}
+                            scale={1}
+                        />
+                    )}
+                </SmartCenterScale>
             </group>
 
             {/* UI Hints */}

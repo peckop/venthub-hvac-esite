@@ -1,5 +1,5 @@
 "use client"
-import { Float, Html, Sparkles, useTexture } from '@react-three/drei'
+import { ContactShadows,Float, Html, Sparkles, useTexture } from '@react-three/drei'
 import { ThreeEvent,useFrame, useThree } from '@react-three/fiber'
 import { useInView } from 'framer-motion'
 import { ChevronLeft, ChevronRight,MousePointerClick } from 'lucide-react'
@@ -409,6 +409,17 @@ const OrbitalCard: React.FC<{
                             modelType={item.modelType}
                         />
                     </Suspense>
+
+                    {/* PART B Grounding Shadow Prototype: Card-level soft shadow plane */}
+                    <ContactShadows
+                        position={[0, -0.5, 0]}
+                        opacity={0.65}
+                        scale={2.2}
+                        blur={2.4}
+                        far={2.0}
+                        resolution={256}
+                        color="#000000"
+                    />
                 </group>
             ) : (
                 <mesh ref={meshRef}>

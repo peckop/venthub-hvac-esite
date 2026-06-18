@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\3dModelOffsets.ts
-skeleton_hash: daea88c8e1af2853
+skeleton_hash: b3a408f47684b4ab
 entity_hashes:
-  func:getModelPlacement: 590e61b55bfb4fa0
+  func:getModelPlacement: 52ef620921a90fe6
   overview: ed4492b80664afe2
-generated_at: 2026-05-28T22:38:44Z
+generated_at: 2026-06-18T19:47:20Z
 ---
 
 ## Genel Bakış
@@ -39,17 +39,16 @@ Bu modül, 3D model yerleştirme konumlandırması için konfigürasyon tabanlı
 ## FONKSİYON DETAYLARI
 
 ### getModelPlacement
+**Ne yapar**: Verilen bir 3D model bileşeni için kesin yerleşim yapılandırmasını (pozisyon, döndürme ve ölçek faktörünü) belirler. Fonksiyon, modelin tipine veya ürün slug'ına göre uygun 3D yerleştirme parametrelerini hesaplar.
 
-**Ne yapar**: Verilen bir 3D model türü (veya ürün slug'ı) ve kullanım bağlamına göre, modelin 3D sahnedeki yerleştirilme yapılandırmasını (konum, rotasyon, ölçek) belirler. Fonksiyon, önce `modelType` parametresiyle doğrudan eşleşme arar; bulunamazsa `slug` parametresindeki alt dize eşleme stratejisiyle modeli otomatik olarak algılar.
-
-**Nasıl yapar**: Fonksiyon iki aşamalı bir çözümleme stratejisi kullanır. Birinci aşamada `MODEL_CONFIGS` sözlüğünde `modelType` ile doğrudan eşleşme kontrol edilir ve bulunursa ilgili bağlama karşılık gelen yapılandırma döndürülür. İkinci aşamada, `modelType` bulunamadığında veya tanımsız olduğunda `slug` parametresi küçük harfe çevrilerek bir dizi `includes()` kontrolü gerçekleştirilir. Bu kontroller belirli bir öncelik sırasıyla (örneğin exproof modeller Roof ve Snail fanlardan önce kontrol edilir) çalışır ve eşleşen ilk kategoriye ait `MODEL_CONFIGS` girdisi seçilir. Hiçbir eşleşme bulunamazsa `DEFAULT_CONFIG` kullanılır. Seçilen yapılandırma nesnesinin ilgili bağlama (grounded, floating vb.) karşılık gelen alt nesnesinden position, rotation ve scale değerleri çıkarılarak bir `ModelPlacement` nesnesi döndürülür.
+**Nasıl yapar**: Fonksiyon iki aşamalı bir arama stratejisi kullanır. Öncelikle, doğrudan `modelType` parametresini kullanarak `MODEL_CONFIGS` nesnesinde kesin bir eşleşme arar. Eğer bu eşleşme başarısız olursa, ikinci bir strateji olarak `slug` parametresinin küçük harfe çevrilmiş halini kullanarak karmaşık bir alt dize eşleştirmesi (substring matching) yürütür. Bu eşleştirmesi, Product3DViewer bileşeni ile birebir senkronize olan ve kategorilere göre tanımlanmış bir hiyerarşi izler. Eşleşme bulunduğunda, ilgili model yapılandırmasını (`MODEL_CONFIGS` içindeki bir `ModelConfig` nesnesini) alır ve ardından `context` parametresine göre (`'grounded'`, `'wall'` vb.) yerleştirme varyantını seçer. Son olarak, yapılandırma nesnesinden `position`, `rotation` (varsa) ve `scale` (varsa) değerlerini çıkararak standart bir `ModelPlacement` nesnesi döndürür.
 
 **Parametreler**:
-- `modelType` : `string | undefined` — 3D model bileşeninin açıklayıcı tanımlayıcısıdır (örn. `'AirCurtainModel'`, `'JetFanModel'`). Bu değer doğrudan `MODEL_CONFIGS` sözlüğünde aranır; eğer geçerli bir tanımlayıcıysa slug tabanlı eşleme atlanır. Tanımsız bırakılabilir, bu durumda slug eşlemesine geçilir.
-- `slug` : `string | undefined` — Ürün sayfasının URL dostu kısa adıdır (örn. `'perde-fani-atex'`, `'kanal-tipi-sessiz-fan'`). Fonksiyon bu dizgi içinde geçen belirli anahtar kelimeleri kontrol ederek hangi model yapılandırılmasının uygulanacağını çıkarım yoluyla belirler. `modelType` geçerli olmadığında birincil dayanak noktasıdır.
-- `context` : `ModelContext` — Modelin render edileceği bağlamı belirtir (varsayılan değer `'grounded'`). Bu parametre, seçilen model yapılandırması içindeki hangi konum/rotasyon/ölçek varyantının kullanılacağını kontrol eder; örneğin model yerde mi duruyor, havada mı süzülüyor gibi senaryoları tanımlar.
+- `modelType`: `string | undefined` — 3D model bileşeninin açıklayıcı tanımlayıcısı (örn: 'AirCurtainModel'). Doğrudan model eşleştirmesi için kullanılır; eğer tanımlı ise slug tabanlı arama atlanır.
+- `slug`: `string | undefined` — Ürünün URL uyumlu tanımlayıcısı. `modelType` başarısız olduğunda, modelin türünü tahmin etmek için alt dize eşleştirmesi bu parametre üzerinde yapılır.
+- `context`: `ModelContext` — Modelin render edileceği bağlamı belirtir (örn: 'grounded', 'wall'). Fonksiyon, belirli bir model için bu bağlama karşılık gelen yerleşim varyantını seçer. Varsayılan değeri `'grounded'`'dir.
 
-**Dönüş**: `ModelPlacement` — Modelin 3D sahnedeki nihai yerleştirilme bilgisini içeren bir nesne döndürür. Bu nesne şu alanları içerir: `position` (modelin 3D koordinatlarındaki konumu, bir sayı dizisi), `rotasyon` (modelin eksene göre döndürme açıları, tanımsızsa `[0, 0, 0]` varsayılanı kullanılır) ve `scale` (modelin boyut çarpanı, tanımsızsa `1` yani orijinal boyut kullanılır). Dönüş değeri her zaman bu üç alanı barındırır ve çağrı tarafında modelin sahneye nasıl yerleştirileceğini doğrudan tanımlar.
+**Dönüş**: `ModelPlacement` — Resolve edilmiş model yerleşimini temsil eden bir nesne. İçerdiği alanlar: `position` (pozisyon koordinatları), `rotation` (döndürme açıları, varsayılan `[0, 0, 0]`) ve `scale` (ölçek faktörü, varsayılan `1`).
 
 ---
 
@@ -94,14 +93,16 @@ type ModelContext = 'grounded' | 'centered' | 'orbital'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/utils/3dModelOffsets.ts::getModelPlacement
-- **params**: `modelType: string | undefined` — Ürünün model tipi (ör. 'DuctFanModel'), `slug: string | undefined` — Ürünün URL slug'ı, `context: ModelContext` — Yerleşim bağlamı, varsayılan 'grounded'
+### [N1_NASIL] AST Pointer: utils/3dModelOffsets.ts::getModelPlacement
+- **params**: `(modelType: string | undefined, slug: string | undefined, context: ModelContext = 'grounded')`
 - **ic_degiskenler**:
-  - `p` — MODEL_CONFIGS[modelType] objesinden verilen context'e karşılık gelen yerleşim verisi (position, rotation, scale)
-  - `s` — Slug'un küçük harfe çevrilmiş hali; eşleştirme mantığında kullanılır, slug yoksa boş string olur
-  - `config` — Seçilen modelin tüm context'lerini içeren ModelConfig objesi, başlangıçta DEFAULT_CONFIG olarak atanır
-  - `placement` — Slug tabanlı eşleştirmeler sonucunda seçilen config objesinin verilen context'e karşılık gelen yerleşim verisi
-- **Dönüş**: `ModelPlacement` — `{ position: [x,y,z], rotation: [x,y,z], scale: number }` yapısında model yerleşim bilgisi. Fonksiyon iki yol ile çalışır: (1) modelType doğrudan verilmişse MODEL_CONFIGS içinden direkt eşleşme, (2) eşleşme yoksa slug'daki anahtar kelimeler aracılığıyla hiyerarşik eşleştirme yapılarak uygun config seçilir. Her iki durumda da rotation tanımsızsa [0,0,0], scale tanımsızsa 1 olarak varsayılır.
+  - `p` — `MODEL_CONFIGS[modelType][context]` erişiminden dönen model yapılandırma nesnesi; explicit modelType eşleşmesinde pozisyon, rotasyon ve scale değerlerini barındırır
+  - `s` — `slug` parametresinin lowercase'e çevrilmiş hali; tüm slug bazlı eşleştirme kontrollerinde kullanılır (null/undefined durumunda boş string fallback'i)
+  - `config` — `DEFAULT_CONFIG` ile başlatılan `ModelConfig` değişkeni; slug içeriğine göre `MODEL_CONFIGs` içerisinden seçilen model yapılandırmasını tutar; her `if/else if` bloğunda farklı bir model ile güncellenir
+  - `placement` — `config[context]` erişiminden dönen yerleştirme nesnesi; fonksiyonun nihai return değerini oluşturmak için position, rotation ve scale alanlarını sağlar
+- **Dönüş**: `ModelPlacement` nesnesi — `{ position: [x, y, z], rotation: [x, y, z] (fallback: [0,0,0]), scale: number (fallback: 1) }`
+- **Yan Etkileri**: Yok. Saf hesaplama (pure function).
+- **Dinamik Erişimler**: `MODEL_CONFIGS[modelType]` — parametreye bağlı dinamik key erişimi; `MODEL_CONFIGS[modelType][context]` — iç içe dinamik key erişimi; `MODEL_CONFIGS['AirCurtainModel']`, `MODEL_CONFIGS['DuctFanModel']`, `MODEL_CONFIGS['JetFanModel']`, `MODEL_CONFIGS['ExproofFanModel']`, `MODEL_CONFIGS['RoofFanModel']`, `MODEL_CONFIGS['RectangularDuctFanModel']`, `MODEL_CONFIGS['WallMountedCompactFanModel']`, `MODEL_CONFIGS['DomesticFanModel']`, `MODEL_CONFIGS['AirPurifierModel']`, `MODEL_CONFIGS['SnailFanModel']`, `MODEL_CONFIGS['SmokeExhaustFanModel']`, `MODEL_CONFIGS['AxialFanModel']`, `MODEL_CONFIGS['PlugFanModel']`, `MODEL_CONFIGS['NicotraFanModel']`, `MODEL_CONFIGS['DehumidifierModel']`, `MODEL_CONFIGS['HRVModel']`, `MODEL_CONFIGS['FlexibleDuctModel']`, `MODEL_CONFIGS['AccessoryModel']`, `MODEL_CONFIGS['SpeedControlModel']` — sabit string key ile erişim; `config[context]` — parametreye bağlı dinamik key erişimi
 
 ---
 
