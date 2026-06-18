@@ -86,7 +86,7 @@ Dinamik gölgeler, sahnenin her karede ışık gözünden tekrar çizilmesini (r
 - **ContactShadows:** Pahalı geometri gölgeleri yerine, zemin seviyesinde sahte gölge oluşturmak için Drei'nin `<ContactShadows />` bileşenini tercih edin.
   ```tsx
   <ContactShadows 
-    position={[0, -1.5, 0]} 
+    position={[0, -0.5, 0]} 
     opacity={0.4} 
     scale={10} 
     blur={2} 
