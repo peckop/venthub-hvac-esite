@@ -107,5 +107,8 @@ export const categories = {
   export: {
     csvLabel: 'Export as CSV',
   },
+  nameRequired: 'Category name is required',
+  slugRequired: 'Slug is required',
+  unsavedChangesConfirm: 'You have unsaved changes. Are you sure you want to leave this page?',
 };
 
