@@ -17,7 +17,7 @@ import AdminToolbar from '../../components/admin/AdminToolbar'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { useDragScroll } from '../../hooks/useDragScroll'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { adminButtonSecondaryClass, adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass, adminTableScrollAreaClass } from '../../utils/adminUi'
+import { adminButtonSecondaryClass, adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableCellTruncate150Class,adminTableHeadCellClass, adminTableScrollAreaClass } from '../../utils/adminUi'
 
 function InventoryReportContent() {
     const { t } = useI18n()
@@ -42,6 +42,11 @@ function InventoryReportContent() {
         const to = urlTo ? endOfDay(new Date(urlTo)) : endOfDay(new Date())
         return { from, to }
     })
+
+    const stateRef = React.useRef({ searchQuery, dateRange })
+    React.useEffect(() => {
+        stateRef.current = { searchQuery, dateRange }
+    }, [searchQuery, dateRange])
 
     const [loading, setLoading] = React.useState(true)
     const [movementsData, setMovementsData] = React.useState<InventoryMovementRow[]>([])
@@ -78,7 +83,7 @@ function InventoryReportContent() {
         const fromStr = searchParams?.get('from')
         const toStr = searchParams?.get('to')
 
-        if (q !== searchQuery) {
+        if (q !== stateRef.current.searchQuery) {
             setSearchQuery(q)
             setDebouncedQuery(q)
         }
@@ -86,8 +91,8 @@ function InventoryReportContent() {
         const nextFrom = fromStr ? new Date(fromStr) : subDays(startOfDay(new Date()), 30)
         const nextTo = toStr ? endOfDay(new Date(toStr)) : endOfDay(new Date())
 
-        const currentFromTime = dateRange?.from?.getTime()
-        const currentToTime = dateRange?.to?.getTime()
+        const currentFromTime = stateRef.current.dateRange?.from?.getTime()
+        const currentToTime = stateRef.current.dateRange?.to?.getTime()
         const nextFromTime = nextFrom?.getTime()
         const nextToTime = nextTo?.getTime()
 
@@ -181,7 +186,14 @@ function InventoryReportContent() {
 
     const exportCsv = () => {
         if (movementsData.length === 0) return
-        const header = ['ID', 'Tarih', 'Ürün', 'Miktar', 'Sebep', 'Ürün ID']
+        const header = [
+            t('admin.inventory.export.headers.id'),
+            t('admin.inventory.export.headers.date'),
+            t('admin.inventory.export.headers.product'),
+            t('admin.inventory.export.headers.amount'),
+            t('admin.inventory.export.headers.reason'),
+            t('admin.inventory.export.headers.productId')
+        ]
         const csvRows = movementsData.map(m => [
             m.id,
             format(new Date(m.created_at as string), 'yyyy-MM-dd HH:mm'),
@@ -398,7 +410,7 @@ function InventoryReportContent() {
                                         {inboundMovements.map((m) => (
                                             <tr key={m.id as string} className="hover:bg-emerald-50/30 transition-colors">
                                                 <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at as string), 'dd.MM HH:mm')}</td>
-                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-150px"}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
+                                                <td className={`${adminTableCellClass} py-2 font-medium truncate ${adminTableCellTruncate150Class}`}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
                                                 <td className={adminTableCellClass + " py-2 font-bold text-emerald-600"}>+{m.delta as number}</td>
                                             </tr>
                                         ))}
@@ -435,7 +447,7 @@ function InventoryReportContent() {
                                         {outboundMovements.map((m) => (
                                             <tr key={m.id as string} className="hover:bg-rose-50/30 transition-colors">
                                                 <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at as string), 'dd.MM HH:mm')}</td>
-                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-150px"}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
+                                                <td className={`${adminTableCellClass} py-2 font-medium truncate ${adminTableCellTruncate150Class}`}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
                                                 <td className={adminTableCellClass + " py-2 font-bold text-rose-600"}>{m.delta as number}</td>
                                             </tr>
                                         ))}

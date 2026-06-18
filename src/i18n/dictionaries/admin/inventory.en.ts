@@ -41,6 +41,14 @@ export const inventory = {
   export: {
     csv: 'Download Page Data (.csv)',
     template: 'Sample CSV Template (sku,qty)',
+    headers: {
+      id: 'ID',
+      date: 'Date',
+      product: 'Product',
+      amount: 'Quantity',
+      reason: 'Reason',
+      productId: 'Product ID'
+    }
   },
   table: {
     productInfo: 'Product Info',
@@ -137,6 +145,7 @@ export const inventory = {
     noPermission: 'You do not have permission for this action',
     saveError: 'Failed to save',
     saveGeneralSuccess: 'General settings saved',
+    unsavedChangesConfirm: 'You have unsaved changes. Are you sure you want to leave?',
   },
   import: {
     productsUpdated: '{{count}} products updated.',
