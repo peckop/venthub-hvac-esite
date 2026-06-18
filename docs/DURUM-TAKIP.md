@@ -1,7 +1,7 @@
 # DURUM TAKİP — Canlı Çalışma Panosu
 
 > Tek "neredeyiz?" kaynağı. Daldan dala geçince buraya bak. Her önemli adımda güncellenir.
-> **Son güncelleme: 2026-06-17** — admin cetvel YENİDEN ölçüldü (~%40→%63, 3 keep; `docs/audits/admin-cetvel-scores-2026-06-17.md`); doc konsolidasyonu (`admin-capabilities.md` = tek SSOT, §4.5 enterprise açık registry; mükerrer `admin-feature-recommendations` silindi); ve **yeni sıralama kararı: ADMIN-ÖNCE, BAYİ-SON** (aşağıda); + **standart-önce alt-kararı:** §8 açıkları (3 fake rewrite: Inventory/Settings/Webhook) E1 shell'den ÖNCE dünya-standardına getirilir.
+> **Son güncelleme: 2026-06-18** — Admin §8 **2. dalga** (5 PR #400-#404 + INV-6 keystone #398) production'a alındı → §8 TAM kapandı (admin şeridi sıradaki = E1 shell). Önceki (2026-06-17): admin cetvel YENİDEN ölçüldü (~%40→%63, 3 keep; `docs/audits/admin-cetvel-scores-2026-06-17.md`); doc konsolidasyonu (`admin-capabilities.md` = tek SSOT, §4.5 enterprise açık registry; mükerrer `admin-feature-recommendations` silindi); ve **yeni sıralama kararı: ADMIN-ÖNCE, BAYİ-SON** (aşağıda); + **standart-önce alt-kararı:** §8 açıkları (3 fake rewrite: Inventory/Settings/Webhook) E1 shell'den ÖNCE dünya-standardına getirilir.
 
 ## 🚦 Şerit Panosu (append-only — her Controller YALNIZ kendi bölümüne yazar)
 
@@ -9,10 +9,11 @@
 > Eş Controller'ın bölümüne **DOKUNMA** — yoksa pano çakışma noktası olur.
 
 ### Controller #1 — admin şeridi
-- **Aktif:** §8 açık-kapatma — 3 fake rewrite (Inventory/Settings/Webhook → §8 kit standardı). **E1 shell SONRAYA kaydı** (standart-önce).
-- **Dal:** `feat/admin-page-rewrites` (worker = Antigravity üretir+push+DURUR; gate+merge = #1) · brief = `docs/plans/admin-page-rewrites-brief.md`
-- **Kilit dosyalar (worker):** `src/views/admin/{AdminInventoryPage,AdminSettingsPage,AdminWebhookEventsPage}.tsx` (+ ilgili TableBody/servis/kit-tüketim) · **DOKUNMA:** diğer admin sayfaları, 3D şeridi, `.agent/skills`
-- **Durum:** 🟡 brief yazıldı → worker'a verilmeyi bekliyor (sonra ben gate: type/lint/test/**build**/§8/INV-*)
+- **Aktif:** §8 açık-kapatma **TAM BİTTİ** — 1. dalga (7 PR) + 2. dalga (5 PR) + INV-6 keystone hepsi **PRODUCTION'da** (master `a4a8bce4`). Sıradaki: E1 enterprise shell (brief master'da hazır).
+- **Biten — 1. dalga (§8 çekirdek, merged):** #387 = 3 rewrite (Inventory/Settings/Webhook)+**INV-6** sahte-success bekçisi+Settings RLS migration · J1 Dashboard · J3 CSV · J4 Orders · J5 Categories · J6 Users · J7 Returns.
+- **Biten — 2. dalga (§8 cila, 2026-06-18, merged):** **#398** INV-6 sertleştirme (Promise.all/allSettled/race = gerçek-etki; J6 kör noktasını kapatır, keystone) · **#400** J9 CategoryBuilder (Zod+dirty-guard) · **#401** J10 InventorySettings (iki-kolon+token) · **#402** J11 OrdersBoard (limit-200 sessiz-tavan→görünür uyarı; worker dummy-await'i gate'te temizlendi) · **#403** J8 Coupons (realtime tenant-scoped+Zod; bundle'lı 369-satır types-regen gate'te ayrıldı) · **#404** J2 Settings-i18n (27 literal).
+- **Gate dersleri (2. dalga):** worker'lar gate'i kandıran/şişiren artıklar üretti — INV-6 dead-code dummy (J11), bundle'lı types-regen (J8), .md companion churn (J2). Controller force-push'la worker dalını bozmadı; düzeltilmiş `gate/*` dallarından PR açtı, worker orijinalleri korundu. Bkz. [[admin-section8-wave-shipped]].
+- **Durum:** ✅ §8 kapandı → 🟡 sıradaki = E1 shell. **Açık iş:** J8'den ayrılan `database.types.ts` regen'i (tenant_id/graphql_public prod-DB drift'i) ayrı bir types-sync PR'ı olarak ele alınmalı.
 
 ### Controller #2 — 3D şeridi
 - **Aktif:** 3D **görsel kalite** fazı (conformance BİTTİ). Işık rig **v3 front-lit** master'da → Recep'in görsel onayı bekleniyor (orbit showcase ekran görüntüsü = gözüm).
@@ -29,7 +30,7 @@
    → 4. DOSYA YAZ (uygulamadan) → 5. UYGULA (yalnız kullanıcı komutuyla)
 ```
 
-**Production'a bu güne kadar HİÇBİR ŞEY uygulanmadı.** Tüm migration'lar yalnız git'te dosya + ispat.
+**⚠️ GÜNCELLENDİ 2026-06-18:** Admin §8 dalgası (1. dalga 7 PR + 2. dalga 5 PR + INV-6 keystone) master'a merge edildi → **production'da CANLI** (Vercel master'ı deploy eder). Settings RLS migration de `supabase-migrate.yml` ile **prod DB'ye otomatik uygulandı** (#387 merge tetikledi). **Ders:** master'a migration-içeren dal merge'i = otomatik DB apply; "sadece komutla" istiyorsan migration'ı merge ETME (bkz. [[migration-merge-auto-applies]]). **Bayi (R0/R1) ve diğer migration'lar hâlâ yalnız git'te.**
 
 ---
 
@@ -66,10 +67,11 @@
 | Sıra | İş | Durum | Detay |
 |---|---|---|---|
 | **0** | Takip dosyalarını güncelle (bu pano + brief) | ✅ bu oturum | — |
-| **1** | **§8 AÇIK-KAPATMA — admin sayfalarını dünya-standardına getir** | ⏳ aktif | gaps-önce; cetvel = `admin-cetvel-scores-2026-06-17.md` |
-| 1a | 3 fake rewrite: Inventory(%21)/Settings(%19)/Webhook(%14) → §8 kit standardı | ⏳ worker'a veriliyor | `feat/admin-page-rewrites` · brief = `docs/plans/admin-page-rewrites-brief.md` |
-| 1b | Dashboard SalesChart dummy → gerçek veri (`AdminDashboardPage.tsx:60-67`) | ⬜ | sonraki batch |
-| 1c | Son-metre kit-config sweep (faceted/CSV-export/rowHref/bulk — 11 refactor sayfa) | ⬜ | mekanik, sayfa-başı küçük |
+| **1** | **§8 AÇIK-KAPATMA — admin sayfalarını dünya-standardına getir** | ✅ **TAM BİTTİ (12 PR + keystone PRODUCTION'da)** | master `a4a8bce4`; INV-6 sahte-success bekçisi sertleştirildi |
+| 1a | 3 fake rewrite: Inventory(%21)/Settings(%19)/Webhook(%14) → §8 kit standardı | ✅ #387 merged (+INV-6 +RLS migration uygulandı) | — |
+| 1b | Dashboard SalesChart dummy → gerçek son-7-gün | ✅ J1 #394 merged | — |
+| 1c | Son-metre sweep (CSV/faceted/bulk/detay/server-pagination) | ✅ J3/J4/J5/J6/J7 merged (AuditLog+Errors/Orders/Categories/Users/Returns) | — |
+| 1d | **2. dalga §8 cila** | ✅ **5 PR + keystone merged (2026-06-18)** | #398 INV-6-harden · #400 J9 CategoryBuilder · #401 J10 InvSettings · #402 J11 OrdersBoard · #403 J8 Coupons · #404 J2 Settings-i18n |
 | **2** | **Enterprise admin shell** — E1 federe komut paleti + E8 klavye-nav + sol-nav + E2 inbox | ⬜ | brief HAZIR (master) → §8 sonrası |
 | **3** | **Yeni admin özellikleri** — N1-N4 (rol-editörü/çeviri-UI/rapor-builder/API-key) + E3-E10 | ⬜ | `admin-capabilities.md §4.5` |
 | **4** | **Müşteri-hesap standardı + cetvel + en zayıf yüzeyleri düzelt** (profil/adres/sipariş self-service) | ⬜ | önce `customer-account-standard.md`, sonra ölç→düzelt |
