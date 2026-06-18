@@ -31,6 +31,14 @@ export const inventory = {
   export: {
     csv: 'Sayfa Verilerini İndir (.csv)',
     template: 'Örnek CSV Şablonu (sku, miktar)',
+    headers: {
+      id: 'ID',
+      date: 'Tarih',
+      product: 'Ürün',
+      amount: 'Miktar',
+      reason: 'Sebep',
+      productId: 'Ürün ID'
+    }
   },
   status: {
     criticalLevel: 'Kritik Seviye',
@@ -137,6 +145,7 @@ export const inventory = {
     noPermission: 'Bu işlem için yetkiniz yok',
     saveError: 'Kaydedilemedi',
     saveGeneralSuccess: 'Genel ayarlar kaydedildi',
+    unsavedChangesConfirm: 'Kaydedilmemiş değişiklikleriniz var. Ayrılmak istediğinize emin misiniz?',
   },
   import: {
     productsUpdated: '{{count}} ürün güncellendi.',

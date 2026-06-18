@@ -133,6 +133,7 @@ export const orders = {
         emailLogsFailed: 'Failed to load email logs',
         notesFailed: 'Failed to load notes',
         noteAddFailed: 'Could not add note',
+        noteAddSuccess: 'Note added successfully',
         noteDeleteSuccess: 'Note deleted',
         noteDeleteFailed: 'Could not delete note',
         noPermission: 'You do not have permission for this action',

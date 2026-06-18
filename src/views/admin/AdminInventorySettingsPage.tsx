@@ -11,9 +11,11 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useRole } from '../../hooks/useRole'
 import { 
-  adminButtonPrimaryClass,
+  adminBlurBlobClass,  adminButtonPrimaryClass,
   adminCardClass, 
   adminInputClass,
+  adminInputThresholdClass,
+  adminInputTimeoutClass,
   adminSectionTitleClass, 
   adminSettingsLabelClass,
   adminSubtitleClass} from '../../utils/adminUi'
@@ -36,6 +38,14 @@ const AdminInventorySettingsPage: React.FC = () => {
   const [alertWebhook, setAlertWebhook] = React.useState<string>('')
   const [resTimeout, setResTimeout] = React.useState<number>(24)
 
+  const [initialValues, setInitialValues] = React.useState<{
+    defaultThreshold: number | '';
+    resetAll: boolean;
+    alertEmail: string;
+    alertWebhook: string;
+    resTimeout: number;
+  } | null>(null)
+
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('inventory_settings')
 
@@ -45,11 +55,26 @@ const AdminInventorySettingsPage: React.FC = () => {
       const { data, error } = await supabase.from('inventory_settings').select('*').maybeSingle()
       if (error) throw error
       const val = (data?.default_low_stock_threshold as number | null)
-      setDefaultThreshold(val == null ? '' : Number(val))
-      setAlertEmail(data?.alert_email || '')
-      setAlertWebhook(data?.alert_webhook_url || '')
-      setResTimeout(data?.reservation_timeout_hours || 24)
+      const thresholdVal = val == null ? '' : Number(val)
+      const emailVal = data?.alert_email || ''
+      const webhookVal = data?.alert_webhook_url || ''
+      const timeoutVal = data?.reservation_timeout_hours || 24
+
+      setDefaultThreshold(thresholdVal)
+      setAlertEmail(emailVal)
+      setAlertWebhook(webhookVal)
+      setResTimeout(timeoutVal)
+      setResetAll(false)
       setError('')
+
+      setInitialValues({
+        defaultThreshold: thresholdVal,
+        resetAll: false,
+        alertEmail: emailVal,
+        alertWebhook: webhookVal,
+        resTimeout: timeoutVal
+      })
+
       setLoading(LoadState.Idle)
     } catch {
       setError(t('admin.inventory.settings.loadError'))
@@ -58,6 +83,28 @@ const AdminInventorySettingsPage: React.FC = () => {
   }, [t])
 
   React.useEffect(() => { load() }, [load, pathname])
+
+  const isFormDirty = initialValues ? (
+    defaultThreshold !== initialValues.defaultThreshold ||
+    resetAll !== initialValues.resetAll ||
+    alertEmail !== initialValues.alertEmail ||
+    alertWebhook !== initialValues.alertWebhook ||
+    resTimeout !== initialValues.resTimeout
+  ) : false
+
+  React.useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isFormDirty) {
+        e.preventDefault()
+        e.returnValue = ''
+        return ''
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    };
+  }, [isFormDirty])
 
   async function save() {
     try {
@@ -164,7 +211,7 @@ const AdminInventorySettingsPage: React.FC = () => {
           {/* Sağ Kolon: Form Alanları Card (5fr) */}
           <div className="md:col-span-5">
             <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-cyan-500/10" />
+              <div className={`${adminBlurBlobClass} bg-cyan-500/5 group-hover:bg-cyan-500/10`} />
               
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={2} />
@@ -176,7 +223,7 @@ const AdminInventorySettingsPage: React.FC = () => {
                       <div className="flex items-center gap-3">
                         <input 
                           type="number" 
-                          className={`${adminInputClass} max-w-120px !h-12 !text-center !text-lg !font-black`}
+                          className={`${adminInputClass} ${adminInputThresholdClass}`}
                           value={defaultThreshold} 
                           onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} 
                           placeholder="0" 
@@ -242,7 +289,7 @@ const AdminInventorySettingsPage: React.FC = () => {
           {/* Sağ Kolon: Form Alanları Card (5fr) */}
           <div className="md:col-span-5">
             <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-              <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-violet-500/10" />
+              <div className={`${adminBlurBlobClass} bg-violet-500/5 group-hover:bg-violet-500/10`} />
               
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={2} />
@@ -303,7 +350,7 @@ const AdminInventorySettingsPage: React.FC = () => {
           {/* Sağ Kolon: Form Alanları Card (5fr) */}
           <div className="md:col-span-5">
             <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-              <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-amber-500/10" />
+              <div className={`${adminBlurBlobClass} bg-amber-500/5 group-hover:bg-amber-500/10`} />
               
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={1} />
@@ -317,7 +364,7 @@ const AdminInventorySettingsPage: React.FC = () => {
                           type="number"
                           min="1"
                           max="720"
-                          className={`${adminInputClass} !h-12 text-lg font-black`}
+                          className={`${adminInputClass} ${adminInputTimeoutClass}`}
                           value={resTimeout}
                           onChange={e => setResTimeout(parseInt(e.target.value) || 24)}
                         />
