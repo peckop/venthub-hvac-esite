@@ -12,7 +12,14 @@ export const supabaseStaticClient = createClient<Database>(
     auth: {
       persistSession: false,
       autoRefreshToken: false,
-      detectSessionInUrl: false
+      detectSessionInUrl: false,
+      // AYRI storageKey ZORUNLU: bu statik istemci (SSG/public read) tarayıcıda da
+      // import ediliyor (lib/supabase.ts compat + config/admin getUserRole). Varsayılan
+      // storageKey (`sb-<ref>-auth-token`) supabaseBrowserClient ile AYNI olunca iki
+      // GoTrueClient aynı navigator.locks kilidini paylaşır → "Multiple GoTrueClient
+      // instances" + deadlock (admin paneli "yükleniyor"da donar). Ayrı key → ayrı kilit.
+      // persistSession:false olduğu için bu key hiçbir zaman storage'a yazılmaz (yan etki yok).
+      storageKey: 'sb-static-noauth'
     }
   }
 )
