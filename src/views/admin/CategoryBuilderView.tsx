@@ -25,16 +25,15 @@ import { mutateWithAudit } from '@/lib/admin/mutateWithAudit';
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client';
 import { AuthorityBlock, SpecsBlock } from '@/types/authority';
 import { CategoryMetadata, DbCategory, DbJson } from '@/types/db-rows';
+import {
+  adminContentMaxWidthClass,
+  adminMobilePreviewClass,
+  adminSidebarWidthClass,
+} from '@/utils/adminUi';
 
 const BRAND_NAME = 'VentHub';
 const ENGINE_VERSION = 'v2.4';
 
-const globalStyles = `
-  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-  .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
-  .custom-scrollbar-light::-webkit-scrollbar { width: 4px; }
-  .custom-scrollbar-light::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 10px; }
-`;
 
 interface CategoryBuilderViewProps {
   categoryId: string;
@@ -63,8 +62,8 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
   const [parentIdOptions, setParentIdOptions] = useState<{ id: string, name: string }[]>([]);
 
   const categorySchema = React.useMemo(() => z.object({
-    name: z.string().min(1, t('admin.categories.nameRequired') || 'Kategori adı zorunludur'),
-    slug: z.string().min(1, t('admin.categories.slugRequired') || 'Slug zorunludur'),
+    name: z.string().min(1, t('admin.categories.nameRequired')),
+    slug: z.string().min(1, t('admin.categories.slugRequired')),
     parent_id: z.string().optional().nullable(),
     sort_order: z.number().int().optional().default(0),
     description: z.string().optional().nullable(),
@@ -323,7 +322,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
         
         {/* --- CENTER: MAIN EDITOR (Studio Area) --- */}
         <main className="flex-1 overflow-y-auto bg-surface-darkest custom-scrollbar relative">
-            <form id="category-builder-form" onSubmit={form.handleSubmit(onSubmit)} className="max-w-content mx-auto py-12 px-6">
+            <form id="category-builder-form" onSubmit={form.handleSubmit(onSubmit)} className={`${adminContentMaxWidthClass} mx-auto py-12 px-6`}>
                 <div className="mb-12 flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-black text-white tracking-tight italic">
@@ -420,7 +419,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                         {/* Is Active */}
                         <div className="space-y-2">
                             <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
-                                {t('admin.common.status') || 'Durum'}
+                                {t('admin.common.status')}
                             </label>
                             <div className="flex items-center py-3 bg-white/2 px-4 rounded-xl border border-white/10">
                                 <input 
@@ -430,7 +429,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                                     className="w-5 h-5 rounded border-white/10 bg-white/5 text-cyan-500 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0 cursor-pointer"
                                 />
                                 <label htmlFor="is_active" className="text-xs font-bold text-slate-400 ml-3 cursor-pointer select-none">
-                                    {t('admin.categories.statusLabels.active') || 'Aktif'}
+                                    {t('admin.categories.statusLabels.active')}
                                 </label>
                             </div>
                         </div>
@@ -465,7 +464,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
 
         {/* --- RIGHT: FLOATING PREVIEW SIDEBAR --- */}
         {showPreview && (
-          <aside className="w-480px border-l border-white/5 flex flex-col bg-surface-deep animate-in slide-in-from-right duration-500">
+          <aside className={`${adminSidebarWidthClass} border-l border-white/5 flex flex-col bg-surface-deep animate-in slide-in-from-right duration-500`}>
             <div className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-white/2">
                 <div className="flex items-center gap-2">
                     <PanelRight size={16} className="text-cyan-400" />
@@ -488,7 +487,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                 <div 
                     className={`
                     bg-white shadow-2xl transition-colors duration-500 overflow-y-auto custom-scrollbar-light relative
-                    ${previewMode === 'mobile' ? 'w-320px h-568px rounded-hvac-xl border-8 border-slate-800' : 'w-full h-full rounded-lg'}
+                    ${previewMode === 'mobile' ? `${adminMobilePreviewClass} rounded-hvac-xl border-8 border-slate-800` : 'w-full h-full rounded-lg'}
                     `}
                 >
                     <AuthorityRenderer content={blocks || []} />
@@ -505,8 +504,6 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
           </aside>
         )}
       </div>
-
-      <style jsx global>{globalStyles}</style>
     </div>
   );
 };

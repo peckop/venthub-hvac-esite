@@ -61,4 +61,7 @@ export const adminInputThresholdClass = 'max-w-120px !h-12 !text-center !text-lg
 export const adminInputTimeoutClass = '!h-12 text-lg font-black'
 export const adminBlurBlobClass = 'absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -mr-32 -mt-32 transition-colors'
 
-
+// CategoryBuilder layout tokens
+export const adminSidebarWidthClass = 'w-480px'
+export const adminMobilePreviewClass = 'w-320px h-568px'
+export const adminContentMaxWidthClass = 'max-w-content'
