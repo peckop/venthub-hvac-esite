@@ -29,3 +29,6 @@ export const adminSelectStyle = {
 
 // Admin Settings Page specific "Pro Max" UI Tokens
 export const adminSettingsLabelClass = 'block text-xs font-black text-slate-500 uppercase tracking-hvac-normal mb-3 ml-1'
+
+export const adminTableScrollAreaClass = 'overflow-y-auto max-h-400px'
+
