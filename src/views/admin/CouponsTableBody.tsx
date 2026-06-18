@@ -2,8 +2,9 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { SearchX, Ticket } from 'lucide-react'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
@@ -17,6 +18,7 @@ import type { AdminColumn, DataTableFacet } from '../../components/admin/data-ta
 import ExportMenu from '../../components/admin/ExportMenu'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
+import { useTenant } from '../../hooks/useTenant'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -92,9 +94,57 @@ async function couponsFetcher(
   return { rows, totalMatched: rows.length }
 }
 
+const createCouponSchema = z.object({
+  code: z
+    .string()
+    .min(3, { message: 'admin.coupons.validation.codeLength' })
+    .max(50, { message: 'admin.coupons.validation.codeLength' })
+    .refine((val) => val.trim().length >= 3, {
+      message: 'admin.coupons.validation.codeLength',
+    }),
+  type: z.enum(['percent', 'fixed'], {
+    errorMap: () => ({ message: 'admin.coupons.validation.typeRequired' }),
+  }),
+  value: z
+    .number({ invalid_type_error: 'admin.coupons.validation.valuePositive' })
+    .positive({ message: 'admin.coupons.validation.valuePositive' }),
+  starts_at: z.string().nullable().optional(),
+  ends_at: z.string().nullable().optional(),
+  active: z.boolean().default(true),
+  usage_limit: z
+    .number()
+    .int()
+    .positive({ message: 'admin.coupons.validation.limitPositive' })
+    .nullable()
+    .optional(),
+}).refine(
+  (data) => {
+    if (data.type === 'percent') {
+      return data.value <= 100
+    }
+    return true
+  },
+  {
+    message: 'admin.coupons.validation.percentLimit',
+    path: ['value'],
+  }
+).refine(
+  (data) => {
+    if (data.starts_at && data.ends_at) {
+      return new Date(data.starts_at) < new Date(data.ends_at)
+    }
+    return true
+  },
+  {
+    message: 'admin.coupons.validation.dateRange',
+    path: ['ends_at'],
+  }
+)
+
 const CouponsTableBody: React.FC = () => {
   const { t, lang } = useI18n()
   const { canWrite } = useRole()
+  const { id: tenantId } = useTenant()
   const hasWriteAccess = canWrite('coupons')
 
   const table = useAdminTable<CouponRow>({
@@ -109,7 +159,35 @@ const CouponsTableBody: React.FC = () => {
 
   // create-form state
   const [form, setForm] = useState<Partial<CouponRow>>({ type: 'percent', active: true })
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
+
+  /* ---- realtime: coupons değişiminde reload ---- */
+  const reloadRef = useRef(table.reload)
+  reloadRef.current = table.reload
+  const refetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    const ch = supabaseBrowserClient
+      .channel(`coupons-${tenantId}`, { config: { private: true } })
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'coupons',
+          filter: `tenant_id=eq.${tenantId}`,
+        },
+        () => {
+          if (refetchTimer.current) clearTimeout(refetchTimer.current)
+          refetchTimer.current = setTimeout(() => void reloadRef.current(), 400)
+        },
+      )
+      .subscribe()
+    return () => {
+      supabaseBrowserClient.removeChannel(ch)
+      if (refetchTimer.current) clearTimeout(refetchTimer.current)
+    }
+  }, [tenantId])
 
   /* ---- mutasyonlar (K3+K4 mutateWithAudit kapısından) ---- */
   const toggleActive = useCallback(
@@ -170,16 +248,34 @@ const CouponsTableBody: React.FC = () => {
   )
 
   const saveCoupon = useCallback(async () => {
-    const codeTrim = String(form.code || '').trim()
-    const issues: string[] = []
-    if (codeTrim.length < 3 || codeTrim.length > 50) issues.push(t('admin.coupons.validation.codeLength'))
-    if (!isAllowedCouponType(form.type)) issues.push(t('admin.coupons.validation.typeRequired'))
-    const val = Number(form.value)
-    if (!val || val <= 0) issues.push(t('admin.coupons.validation.valuePositive'))
-    if (issues.length > 0) {
-      toast.error(issues.join(' • '))
+    const parsedValue = form.value === undefined || String(form.value).trim() === '' ? undefined : Number(form.value)
+    const parsedLimit = form.usage_limit === null || form.usage_limit === undefined || String(form.usage_limit).trim() === '' ? null : Number(form.usage_limit)
+    const result = createCouponSchema.safeParse({
+      code: String(form.code || '').trim(),
+      type: form.type,
+      value: parsedValue,
+      starts_at: form.starts_at || null,
+      ends_at: form.ends_at || null,
+      active: !!form.active,
+      usage_limit: parsedLimit,
+    })
+
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {}
+      result.error.issues.forEach((issue) => {
+        const path = issue.path[0]
+        if (path) {
+          fieldErrors[path] = issue.message
+        }
+      })
+      setErrors(fieldErrors)
+      toast.error(t('admin.coupons.toasts.createFailed'))
       return
     }
+
+    setErrors({})
+    const validatedData = result.data
+
     try {
       setSaving(true)
       await mutateWithAudit(supabaseBrowserClient, {
@@ -188,18 +284,18 @@ const CouponsTableBody: React.FC = () => {
         action: 'INSERT',
         rowPk: null,
         before: null,
-        after: { code: codeTrim, type: form.type, value: val },
+        after: { code: validatedData.code, type: validatedData.type, value: validatedData.value },
         auditedByEdge: false, // edge audit yazmıyor → client loglar (K4 boşluğu kapanır)
         fn: async () => {
           const response = await supabaseBrowserClient.functions.invoke('admin-create-coupon', {
             body: {
-              code: codeTrim,
-              type: form.type as AllowedCouponType,
-              value: val,
-              starts_at: (form.starts_at as string) || null,
-              ends_at: (form.ends_at as string) || null,
-              active: !!form.active,
-              usage_limit: form.usage_limit && form.usage_limit > 0 ? form.usage_limit : null,
+              code: validatedData.code,
+              type: validatedData.type as AllowedCouponType,
+              value: validatedData.value,
+              starts_at: validatedData.starts_at || null,
+              ends_at: validatedData.ends_at || null,
+              active: validatedData.active,
+              usage_limit: validatedData.usage_limit,
             },
           })
           const { data, error }: { data: DbCouponRow | null; error: unknown | null } = response
@@ -374,9 +470,6 @@ const CouponsTableBody: React.FC = () => {
     URL.revokeObjectURL(url)
   }, [table])
 
-  const canSubmit =
-    String(form.code || '').trim().length >= 3 && isAllowedCouponType(form.type) && Number(form.value) > 0
-
   return (
     <div className="space-y-6">
       {/* create-form (inline, hardened, i18n) */}
@@ -394,10 +487,18 @@ const CouponsTableBody: React.FC = () => {
               <input
                 id="coupon-code"
                 value={form.code || ''}
-                onChange={(e) => setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
+                onChange={(e) => {
+                  setForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))
+                  setErrors((errs) => ({ ...errs, code: '' }))
+                }}
                 placeholder={t('admin.coupons.create.codePlaceholder')}
-                className={`${adminInputClass} font-mono`}
+                className={`${adminInputClass} font-mono ${errors.code ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
               />
+              {errors.code && (
+                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                  {t(errors.code)}
+                </span>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="coupon-type" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
@@ -406,12 +507,20 @@ const CouponsTableBody: React.FC = () => {
               <select
                 id="coupon-type"
                 value={form.type as string}
-                onChange={(e) => setForm((f) => ({ ...f, type: e.target.value as AllowedCouponType }))}
-                className={adminSelectClass}
+                onChange={(e) => {
+                  setForm((f) => ({ ...f, type: e.target.value as AllowedCouponType }))
+                  setErrors((errs) => ({ ...errs, type: '' }))
+                }}
+                className={`${adminSelectClass} ${errors.type ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
               >
                 <option value="percent">{t('admin.coupons.create.typePercent')}</option>
                 <option value="fixed">{t('admin.coupons.create.typeFixed')}</option>
               </select>
+              {errors.type && (
+                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                  {t(errors.type)}
+                </span>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="coupon-value" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
@@ -421,10 +530,18 @@ const CouponsTableBody: React.FC = () => {
                 id="coupon-value"
                 type="number"
                 value={(form.value as number | undefined) ?? ''}
-                onChange={(e) => setForm((f) => ({ ...f, value: e.target.value ? Number(e.target.value) : undefined }))}
+                onChange={(e) => {
+                  setForm((f) => ({ ...f, value: e.target.value ? Number(e.target.value) : undefined }))
+                  setErrors((errs) => ({ ...errs, value: '' }))
+                }}
                 placeholder="0"
-                className={adminInputClass}
+                className={`${adminInputClass} ${errors.value ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
               />
+              {errors.value && (
+                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                  {t(errors.value)}
+                </span>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="coupon-starts" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
@@ -434,9 +551,17 @@ const CouponsTableBody: React.FC = () => {
                 id="coupon-starts"
                 type="datetime-local"
                 value={(form.starts_at as string | undefined) ?? ''}
-                onChange={(e) => setForm((f) => ({ ...f, starts_at: e.target.value }))}
-                className={adminInputClass}
+                onChange={(e) => {
+                  setForm((f) => ({ ...f, starts_at: e.target.value }))
+                  setErrors((errs) => ({ ...errs, starts_at: '', ends_at: '' }))
+                }}
+                className={`${adminInputClass} ${errors.starts_at ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
               />
+              {errors.starts_at && (
+                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                  {t(errors.starts_at)}
+                </span>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="coupon-ends" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
@@ -446,15 +571,23 @@ const CouponsTableBody: React.FC = () => {
                 id="coupon-ends"
                 type="datetime-local"
                 value={(form.ends_at as string | undefined) ?? ''}
-                onChange={(e) => setForm((f) => ({ ...f, ends_at: e.target.value }))}
-                className={adminInputClass}
+                onChange={(e) => {
+                  setForm((f) => ({ ...f, ends_at: e.target.value }))
+                  setErrors((errs) => ({ ...errs, ends_at: '', starts_at: '' }))
+                }}
+                className={`${adminInputClass} ${errors.ends_at ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
               />
+              {errors.ends_at && (
+                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                  {t(errors.ends_at)}
+                </span>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="coupon-active" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
                 {t('admin.coupons.create.status')}
               </label>
-              <div className="flex items-center gap-3 px-4 h-42px glass-strong border-white/10 rounded-xl">
+              <div className="flex items-center gap-3 px-4 h-10 glass-strong border-white/10 rounded-xl">
                 <input
                   id="coupon-active"
                   type="checkbox"
@@ -477,19 +610,25 @@ const CouponsTableBody: React.FC = () => {
                 onChange={(e) =>
                   setForm((f) => {
                     const raw = e.target.value ? Number(e.target.value) : null
+                    setErrors((errs) => ({ ...errs, usage_limit: '' }))
                     return { ...f, usage_limit: raw && raw > 0 ? raw : null }
                   })
                 }
                 placeholder={t('admin.coupons.create.usageLimitPlaceholder')}
-                className={adminInputClass}
+                className={`${adminInputClass} ${errors.usage_limit ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
               />
+              {errors.usage_limit && (
+                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                  {t(errors.usage_limit)}
+                </span>
+              )}
             </div>
             <div className="md:col-span-2 flex flex-col gap-2 justify-end">
               <button
                 type="button"
                 onClick={saveCoupon}
-                disabled={saving || !canSubmit}
-                className={`${adminButtonPrimaryClass} w-full h-42px`}
+                disabled={saving}
+                className={`${adminButtonPrimaryClass} w-full h-10`}
               >
                 {saving ? t('admin.coupons.create.submitting') : t('admin.coupons.create.submit')}
               </button>

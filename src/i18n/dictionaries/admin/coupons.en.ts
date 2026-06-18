@@ -54,7 +54,10 @@ export const coupons = {
       validation: {
         codeLength: 'Coupon code must be at least 3 characters',
         typeRequired: 'Discount type is required',
-        valuePositive: 'Value must be greater than zero'
+        valuePositive: 'Value must be greater than zero',
+        limitPositive: 'Usage limit must be a positive integer',
+        percentLimit: 'Percentage discount value cannot exceed 100',
+        dateRange: 'End date must be after start date'
       },
       emptyTitle: 'No coupons found',
       emptyDescription: 'No coupons have been created yet. Get started by creating your first coupon.',
