@@ -152,6 +152,7 @@ export const orders = {
         noRecords: 'No records found'
       },
       board: {
+        limitWarning: 'Only the first {{shown}} of {{total}} orders are displayed ({{remaining}} more exist). Please use list view or specific filters to locate older orders.',
         columns: {
           new: 'New / Pending',
           prep: 'Processing',
