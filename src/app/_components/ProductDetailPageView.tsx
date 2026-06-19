@@ -460,6 +460,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   ) : (
                     <button
                       onClick={handleAddToCart}
+                      data-testid="pdp-add-to-cart"
                       disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
                       className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-black py-3.5 px-6 rounded-xl transition-transform shadow-lg hover:shadow-primary-navy/20 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-98"
                     >
