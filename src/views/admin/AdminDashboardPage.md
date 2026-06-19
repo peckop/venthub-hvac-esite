@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminDashboardPage.tsx
-skeleton_hash: 15a9e97775c5ce01
+skeleton_hash: cd83751551ea4237
 entity_hashes:
   func:AdminDashboardPage: d9f200a1ae3a63e1
   overview: 98a75f3d9ee8aa18
   style_tokens: 12dd6d905c26f46b
-generated_at: 2026-06-08T10:11:00Z
+generated_at: 2026-06-19T07:57:44Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,23 @@ Bu modül için fonksiyon gövdesine erişilemediği için, sadece fonksiyon imz
 **Nasıl yapar**: React tabanlı fonksiyonel bileşen mimarisi ile geliştirilmiştir. Sayfa ilk yüklendiğinde yerel kimlik doğrulama servisi üzerinden kullanıcının yönetici yetkisine sahip olup olmadığını kontrol eder, yetkisiz tespit edildiğinde otomatik olarak giriş sayfasına yönlendirme tetikler. Sistem genelindeki verileri ilgili API servisleri üzerinden çekerek, sayfa içinde kullandığı alt bileşenlere (istatistik kartları, aktif cihaz listesi, işlem kaydı arayüzü vb.) iletir. Responsive tasarım prensiplerine uygun olarak farklı ekran boyutlarında arayüz düzenini dinamik olarak ayarlar.
 **Parametreler**: Bu fonksiyonel bileşen herhangi bir harici parametre almaz, tüm ihtiyaç duyduğu verileri React Context API ve yerel state yapıları üzerinden yönetir.
 **Dönüş**: React.FC tipi React fonksiyonel bileşeni döndürür. Bu dönüş değeri, uygulamanın yönlendirme sistemi tarafından yönetici paneli için tanımlanan rota eşleştiğinde ekrana render edilmek üzere kullanılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/dashboard/RecentOrdersTable::RecentOrdersTable
+- import: ../../components/admin/dashboard/SalesChart::SalesChart
+- import: ../../components/admin/dashboard/StatCard::StatCard
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../lib/ensureSessionFresh::ensureSessionFresh
+- import: ../../types/db-rows::type { DbOrder }
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useState
 
 ---
 
