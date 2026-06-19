@@ -1,5 +1,23 @@
 # Changelog
 
+### [2026-06-19] Checkout Funnel Runtime Smoke — Satınalma Hunisi Kapısı (Ödeme-Öncesi)
+
+**Özet:** Runtime kalite kapısının **ikinci ayağı** (#431, master `52343a1f`): admin smoke ile aynı sınıf, ama **satınalma hunisi** için. Gerçek bir kullanıcı gibi `login → ürün listesi → sepete ekle → checkout → müşteri bilgisi → adres → özet` adımlarını gerçek tarayıcıda sürer ve hunin **donmadığını / interaktif** olduğunu doğrular.
+
+**Güvenlik sınırı (kritik tasarım):** Test **"Ödemeye Geç" butonuna ASLA basmaz.** O buton (step 3) `initiatePayment`'ı tetikler → **İyzico**'ya gider ve **bekleyen `venthub_orders` kaydı** yaratır (canlıda geri alınamaz). Bu yüzden review (özet) adımına ulaşıp butonun **varlığını** doğrular ve **durur**. Sonuç: hiçbir sipariş/ödeme oluşmaz; sadece test hesabının sepetine 1 ürün eklenir (zararsız). Tam sandbox-ödeme akışı (Option B) ayrı/sonraya.
+
+**Ne var:**
+- `e2e/checkout-smoke.e2e.ts` — yeni spec. `e2e-smoke.yml` workflow `**/*.e2e.ts`'i **otomatik toplar** (workflow değişmedi).
+- Checkout adım bileşenlerine kalıcı `data-testid` çapaları (i18n/CSS'ten bağımsız, `admin-dashboard` deseniyle aynı inert kanca): `checkout-root`, `checkout-step-customer`, `checkout-customer-{name,email,phone}`, `checkout-ship-{address,city,district}`, `checkout-review`, `checkout-next-btn`. `ProductCard` `@generated` olduğu için dokunulmadı → mevcut `title="Sepete Ekle"` çapası kullanıldı.
+
+**Yol boyu çözülen iki harness sorunu (UX-bug değil, deterministik yeşil için):**
+- **Kart hover-transform intercept:** add butonu görünür ama `click()` kartın `hover:-translate-y-1` transform'u yüzünden "stable değil / intercept" diye takılıyordu → `dispatchEvent('click')` (React onClick'i doğrudan tetikler; buton `stopPropagation` ile Link navigasyonunu zaten keser).
+- **Hidrasyon yarışı (flaky):** `toBeVisible` yalnız SSR DOM'unu görür; React onClick henüz bağlı olmayabilir → erken dispatch sessizce no-op olur, sepet dolmaz (ilk deneme FAIL, retry PASS) → sepet `localStorage`'a yazılana kadar **poll içinde yeniden tıkla** (aynı ürün → qty++, satır=1, idempotent). Artık **ilk denemede** geçer.
+
+**Doğrulama:** CI'da `admin-smoke + checkout-smoke = 2 passed` (ilk deneme, retry yok); `type-check` + `eslint` + Vercel yeşil; PR #431 merge edildi. **Sıradaki:** cetvel-hizalı admin son-metre (J14 Inventory→kit + cila) + worker'a paralel e2e/cila fan-out; tam sandbox-ödeme (Option B).
+
+---
+
 ### [2026-06-19] Admin Donması Kök Çözüm + 3-Katman Runtime Kalite Kapısı
 
 **Özet:** Production admin panelinin "Yükleniyor"da donup tamamen tıklanamaz hâle geldiği bir regresyon kök sebebiyle çözüldü; ardından aynı SINIFI kalıcı kapatan üç katman (yapısal + davranışsal + gerçek-tarayıcı runtime) eklenip **kanıtlandı**.
