@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\e2e\checkout-smoke.e2e.ts
 skeleton_hash: fade75568c3fc639
 entity_hashes:
   overview: 529d691256ce33bd
-generated_at: 2026-06-19T09:24:15Z
+generated_at: 2026-06-19T11:14:07Z
 ---
 
 ## Genel Bakış
