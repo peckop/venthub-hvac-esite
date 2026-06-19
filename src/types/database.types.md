@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\database.types.ts
-skeleton_hash: 067e4acdd662f151
+skeleton_hash: da2982eeacc188d4
 entity_hashes:
   overview: ce3fb4ce44f2949f
-generated_at: 2026-06-19T11:59:19Z
+generated_at: 2026-06-19T12:03:07Z
 ---
 
 ## Genel Bakış
@@ -130,12 +130,9 @@ type CompositeTypes = <
 
 ## SABİTLER
 - **Constants** (as_expression) — `{
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
-      cont...`
+      contact_department: ["sales", "support", "co...`
 
 ---
 
