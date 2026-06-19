@@ -139,7 +139,7 @@ const CheckoutPage: React.FC = () => {
   const finalAmount = Number((totalAmount - (couponApplied?.discount || 0)).toFixed(2))
 
   return (
-    <div className="min-h-screen bg-light-gray">
+    <div className="min-h-screen bg-light-gray" data-testid="checkout-root">
       <SecurePaymentOverlay
         overlayVisible={step === 4 && !payment.formReady}
         overlayStep={payment.loading ? 1 : 2}
@@ -244,7 +244,7 @@ const CheckoutPage: React.FC = () => {
                     <button onClick={() => setStep(step - 1)} disabled={step === 1} className="px-6 py-3 border-2 border-light-gray rounded-lg disabled:opacity-50">
                       {t('checkout.nav.back')}
                     </button>
-                    <button onClick={onNextStep} className="px-8 py-3 bg-primary-navy text-white font-semibold rounded-lg">
+                    <button onClick={onNextStep} data-testid="checkout-next-btn" className="px-8 py-3 bg-primary-navy text-white font-semibold rounded-lg">
                       {step === 3 ? t('checkout.nav.proceedPayment') : t('checkout.nav.next')}
                     </button>
                   </>

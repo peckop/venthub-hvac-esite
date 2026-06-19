@@ -8,7 +8,7 @@ entity_hashes:
   func:ReviewSummary: 5797ed029cce22ed
   overview: 34cecab9410c7f0c
   style_tokens: e50d4f5a19398e9d
-generated_at: 2026-06-14T17:51:42Z
+generated_at: 2026-06-19T09:04:41Z
 ---
 
 ## Genel Bakış

@@ -37,7 +37,7 @@ const ReviewSummary: React.FC<ReviewSummaryProps> = ({
 }) => {
   const { t } = useI18n()
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="checkout-review">
       <h2 className="text-xl font-semibold text-industrial-gray">{t('checkout.review.title')}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="border rounded-lg p-4 bg-white/90">
