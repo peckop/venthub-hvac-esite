@@ -11,3 +11,7 @@
 **Type Smell:** None.
 **Learning:** A comprehensive diagnostic sweep of the codebase for type escape hatches (`as any`, `as unknown as`, `// @ts-ignore`, `// @ts-expect-error`) returned zero results in production code. The codebase relies entirely on strong typing, type guards (`isRecord`), and Supabase generated types (`database.types.ts`).
 **Solution:** Clean sweep: zero type escape hatches found. Codebase health is optimal.
+## 2025-05-18 - Batch escape hatch replacement using QueryData
+**Type Smell:** `as unknown as` used across `resourceSearchers.ts` and `inventoryReport.service.ts` for queries where standard return types fell short.
+**Learning:** Hardcasting to manual interfaces completely undermines the type safety of database queries, particularly when queries use `!inner` joins or views. By leveraging `QueryData<ReturnType<typeof queryFn>>[0]` from `@supabase/supabase-js`, we can dynamically infer the EXACT query shape without escape hatches.
+**Solution:** Removed manual type interfaces and substituted them with `QueryData` inferred types directly extracted from the query implementations. Used the `ExtendedDatabase` intersection strategy to properly inject types for tables missing from `database.types.ts` (like `tenants`).

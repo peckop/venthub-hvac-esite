@@ -1,4 +1,4 @@
-import { SupabaseClient } from '@supabase/supabase-js'
+import { type QueryData,type SupabaseClient } from '@supabase/supabase-js'
 
 import { adminSearchProducts } from '@/lib/services/product.service'
 import type { Database } from '@/types/database.types'
@@ -17,28 +17,15 @@ export type AdminSearcher = (
   limit: number
 ) => Promise<CommandResult[]>
 
-interface VenthubReturnJoinedRow {
-  id: string
-  reason: string
-  status: string
-  venthub_orders: { order_number: string | null; customer_name: string | null } | { order_number: string | null; customer_name: string | null }[] | null
-}
+const returnsQueryFn = (supabase: SupabaseClient<Database>) => supabase.from('venthub_returns').select('id, reason, status, venthub_orders!inner(order_number, customer_name)')
+type VenthubReturnJoinedRow = QueryData<ReturnType<typeof returnsQueryFn>>[0]
 
-interface InventoryMovementJoinedRow {
-  id: string
-  reason: string
-  delta: number
-  products: { name: string; sku: string } | { name: string; sku: string }[] | null
-}
+const movementsQueryFn = (supabase: SupabaseClient<Database>) => supabase.from('inventory_movements').select('id, reason, delta, products!inner(name, sku)')
+type InventoryMovementJoinedRow = QueryData<ReturnType<typeof movementsQueryFn>>[0]
 
-interface InventoryVelocityRow {
-  product_id: string
-  name: string | null
-  physical_stock: number | null
-  available_stock: number | null
-  warehouse_location: string | null
-  supplier_name: string | null
-}
+type ExtendedDatabaseForInventory = Omit<Database, 'public'> & { public: Omit<Database['public'], 'Views'> & { Views: Database['public']['Views'] & { inventory_velocity: { Row: { product_id: string; name: string | null; physical_stock: number | null; available_stock: number | null; warehouse_location: string | null; supplier_name: string | null } } } } }
+const inventoryQueryFn = (supabase: SupabaseClient<Database>) => (supabase as SupabaseClient<ExtendedDatabaseForInventory>).from('inventory_velocity').select('product_id, name, physical_stock, available_stock, warehouse_location, supplier_name')
+type InventoryVelocityRow = QueryData<ReturnType<typeof inventoryQueryFn>>[0]
 
 export const searchProducts: AdminSearcher = async (supabase, query, limit) => {
   if (!query || query.trim().length < 2) return []
@@ -71,14 +58,12 @@ export const searchOrders: AdminSearcher = async (supabase, query, limit) => {
 
 export const searchReturns: AdminSearcher = async (supabase, query, limit) => {
   if (!query || query.trim().length < 2) return []
-  const { data, error } = await supabase
-    .from('venthub_returns')
-    .select('id, reason, status, venthub_orders!inner(order_number, customer_name)')
+  const { data, error } = await returnsQueryFn(supabase)
     .or(`reason.ilike.%${query}%,venthub_orders.order_number.ilike.%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as VenthubReturnJoinedRow[]
-  return rows.map((r) => {
+  const rows = data || []
+  return rows.map((r: VenthubReturnJoinedRow) => {
     const order = Array.isArray(r.venthub_orders) ? r.venthub_orders[0] : r.venthub_orders
     const orderNum = order?.order_number || ''
     return {
@@ -144,14 +129,12 @@ export const searchCoupons: AdminSearcher = async (supabase, query, limit) => {
 
 export const searchMovements: AdminSearcher = async (supabase, query, limit) => {
   if (!query || query.trim().length < 2) return []
-  const { data, error } = await supabase
-    .from('inventory_movements')
-    .select('id, reason, delta, products!inner(name, sku)')
+  const { data, error } = await movementsQueryFn(supabase)
     .or(`reason.ilike.%${query}%,products.name.ilike.%${query}%,products.sku.ilike.%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as InventoryMovementJoinedRow[]
-  return rows.map((m) => {
+  const rows = data || []
+  return rows.map((m: InventoryMovementJoinedRow) => {
     const prod = Array.isArray(m.products) ? m.products[0] : m.products
     const prodName = prod?.name || ''
     return {
@@ -200,14 +183,12 @@ export const searchAudit: AdminSearcher = async (supabase, query, limit) => {
 
 export const searchInventory: AdminSearcher = async (supabase, query, limit) => {
   if (!query || query.trim().length < 2) return []
-  const { data, error } = await supabase
-    .from('inventory_velocity' as never)
-    .select('product_id, name, physical_stock, available_stock, warehouse_location, supplier_name')
+  const { data, error } = await inventoryQueryFn(supabase)
     .or(`name.ilike.%${query}%,warehouse_location.ilike.%${query}%,supplier_name.ilike.%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as InventoryVelocityRow[]
-  return rows.map((i) => ({
+  const rows = data || []
+  return rows.map((i: InventoryVelocityRow) => ({
     resourceKey: 'inventory',
     id: String(i.product_id),
     title: i.name || '',
