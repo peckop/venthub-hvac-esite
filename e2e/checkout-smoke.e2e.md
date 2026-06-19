@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\e2e\checkout-smoke.e2e.ts
 skeleton_hash: fade75568c3fc639
 entity_hashes:
   overview: 529d691256ce33bd
-generated_at: 2026-06-19T09:03:18Z
+generated_at: 2026-06-19T09:16:23Z
 ---
 
 ## Genel Bakış
@@ -62,33 +62,6 @@ Bu modül, bir E2E (End-to-End) test dosyasıdır ve checkout akışı için sig
 - **ic_degiskenler**:
   _(değişken yok — yalnız `test.skip(...)` ve iç `test(...)` çağrısı içerir)_
 - **Dönüş**: yok (Playwright test registrasyon yan etkisi)
-
----
-
-### [N2_NASIL] AST Pointer: e2e/checkout-smoke.e2e.ts::inner-test-callback
-- **params**: `({ page })` — Playwright `test` fixture'ından destructured `Page` nesnesi
-- **ic_degiskenler**:
-  - `addBtn` — `page.getByTitle('Sepete Ekle', { exact: true }).first()` ile bulunan ilk "Sepete Ekle" butonu locator'ı; ürün kartındaki add butonunu temsil eder
-  - `email` — `page.getByTestId('checkout-customer-email')` ile elde edilen müşteri e-posta input locator'ı; hem görünürlük kontrolü hem `fill()` ile doldurma için kullanılır
-  - `city` — `page.getByTestId('checkout-ship-city')` ile elde edilen şehir input locator'ı; hem görünürlük kontrolü hem `fill()` ile doldurma için kullanılır
-- **Dönüş**: yok (async test callback — tüm işlevsellik Playwright assertion/interaction yan etkileri üzerinedir; test sonucu `expect`'ler ile belirlenir)
-
----
-
-### [N3_NASIL] AST Pointer: e2e/checkout-smoke.e2e.ts::poll-evaluate-callback
-- **params**: () — anonim async arrow, `expect.poll()` içine verilen callback
-- **ic_degiskenler**:
-  _(değişken yok — doğrudan `page.evaluate()` sonucunu return eder)_
-- **Dönüş**: `Promise<number>` — localStorage'daki `venthub-cart` anahtarının JSON parse edilmiş halinin dizi uzunluğu (0 veya pozitif tamsayı)
-
----
-
-### [N4_NASIL] AST Pointer: e2e/checkout-smoke.e2e.ts::browser-evaluate-inner
-- **params**: () — anonim arrow, `page.evaluate()` içinde tarayıcı tarafında çalışır
-- **ic_degiskenler**:
-  - `raw` — `localStorage.getItem('venthub-cart')` sonucu; sepet verisinin ham JSON string'i veya `null`
-  - `arr` — `JSON.parse(raw)` sonucu; ham string'in parse edilmiş hali (beklenen tür: dizi)
-- **Dönüş**: `number` — `null` ise `0`, parse sonrası dizi ise `arr.length`, dizi değilse `0`; `catch` bloğunda herhangi bir hata durumunda `0`
 
 ---
 

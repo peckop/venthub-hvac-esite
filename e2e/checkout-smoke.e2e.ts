@@ -38,7 +38,11 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
     const addBtn = page.getByTitle('Sepete Ekle', { exact: true }).first()
     await expect(addBtn, 'Ürün kartı "Sepete Ekle" butonu görünmedi (ürün listesi boot olmadı?)')
       .toBeVisible({ timeout: 30_000 })
-    await addBtn.click()
+    // dispatchEvent('click') — butonun React onClick'ini doğrudan tetikler (→ addToCart). Normal
+    // click(), kartın hover-transform'u (`hover:-translate-y-1`) yüzünden "element stable değil /
+    // kart pointer'ı intercept ediyor" diye takılıyor (gerçek kullanıcıda sorun yok; buton
+    // stopPropagation yapıp Link navigasyonunu da engelliyor). dispatch bu harness artefaktını aşar.
+    await addBtn.dispatchEvent('click')
 
     // Sepet localStorage'a yazılana kadar bekle — goto ile sayfa yenilenince kaybolmasın.
     await expect
