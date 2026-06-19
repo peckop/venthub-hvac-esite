@@ -17,6 +17,7 @@ import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import ExportMenu from '../../components/admin/ExportMenu'
+import OrderFormModal from '../../components/admin/orders/OrderFormModal'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { formatDateTime } from '../../i18n/datetime'
@@ -535,6 +536,15 @@ const OrdersTableBody: React.FC = () => {
     [t, activeStatuses, setFilter],
   )
 
+  /* ---- modal state: düzenle (CRUD) ---- */
+  const [editOpen, setEditOpen] = useState(false)
+  const [editOrderId, setEditOrderId] = useState<string | null>(null)
+
+  const openEditModal = useCallback((id: string) => {
+    setEditOrderId(id)
+    setEditOpen(true)
+  }, [])
+
   /* ---- modal state: kargo ---- */
   const [shipOpen, setShipOpen] = useState(false)
   const [shipId, setShipId] = useState<string>('')
@@ -965,13 +975,22 @@ const OrdersTableBody: React.FC = () => {
         cell: (r) => (
           <div className="flex gap-2">
             {hasWriteAccess && (
-              <button
-                type="button"
-                onClick={() => void openShipModal(r.id)}
-                className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors"
-              >
-                {t('admin.orders.actions.shipping')}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => openEditModal(r.id)}
+                  className="px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-xs font-black uppercase text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors"
+                >
+                  {t('admin.common.edit')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void openShipModal(r.id)}
+                  className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors"
+                >
+                  {t('admin.orders.actions.shipping')}
+                </button>
+              </>
             )}
             <button
               type="button"
@@ -991,7 +1010,7 @@ const OrdersTableBody: React.FC = () => {
         ),
       },
     ],
-    [t, lang, hasWriteAccess, openShipModal, openLogsModal, openNotesModal],
+    [t, lang, hasWriteAccess, openShipModal, openLogsModal, openNotesModal, openEditModal],
   )
 
   /* ---- bulk actions ---- */
@@ -1348,6 +1367,17 @@ const OrdersTableBody: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {editOpen && (
+        <OrderFormModal
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          orderId={editOrderId}
+          onSuccess={async () => {
+            await table.reload()
+          }}
+        />
       )}
     </>
   )
