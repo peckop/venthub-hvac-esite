@@ -2211,6 +2211,13 @@ export type Database = {
     }
     Functions: {
       _normalize_rls_expr: { Args: { expr: string }; Returns: string }
+      get_category_counts: {
+        Args: never
+        Returns: {
+          category_id: string
+          product_count: number
+        }[]
+      }
       adjust_stock:
         | {
             Args: { p_delta: number; p_product_id: string; p_reason: string }
