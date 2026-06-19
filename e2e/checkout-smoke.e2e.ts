@@ -38,7 +38,12 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
     await page.goto('/tr/products')
     const productCardLink = page.locator('a[href*="/products/"]').filter({ hasNotText: 'Teklif İste' }).first()
     await expect(productCardLink, 'Satın alınabilir ürün kartı linki görünmedi').toBeVisible({ timeout: 30_000 })
-    await productCardLink.click()
+    // Karta click() YERİNE href'i alıp DOĞRUDAN git: kartın hover-transform'u / üstteki katman
+    // click()'i "stable değil / pointer intercept" diye 60sn timeout'a sokuyordu (master'da flaky).
+    // goto deterministiktir — actionability beklemesi yok.
+    const productHref = await productCardLink.getAttribute('href')
+    if (!productHref) throw new Error('Ürün kartı href alınamadı (liste boot olmadı?)')
+    await page.goto(productHref)
 
     // Detay sayfasına geçişi doğrula
     await page.waitForURL(/\/products\//, { timeout: 25_000 })
