@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "planı çürüt",
+    "şu planı çürüt: docs/plans/avensair-teslim-yol-haritasi.md",
+    "red team denetle",
+    "bu mimari planı uygulamadan önce red team denetle",
+    "plan challenge",
+    "pricing altyapısı için plan challenge yap",
+    "planı stress-test et",
+    "migration planı stress-test et, prod riski var mı",
+    "varsayımları çürüt",
+    "plandaki varsayımları çürüt ve koddan kanıtla",
+    "plan red team",
+    "plan red team raporu çıkar (red_team_report.md)"
+  ],
+  "should_not_trigger": [
+    "kodu commit et",
+    "bu bileşeni stille ve renk seç",
+    "vitest testlerini çalıştır",
+    "veritabanını sıfırla",
+    "yeni React bileşeni oluştur",
+    "kod integrity check, bütünlük denetle",
+    "enterprise teslim denetimi yap (10/10 check)",
+    "PDF kataloğunu tara ve CSV çıkar"
+  ]
+}

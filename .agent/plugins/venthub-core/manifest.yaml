@@ -606,6 +606,31 @@ skills:
     run_last: false
     exclusions: []
     commands: {}
+  - name: plan-challenger
+    path: .agent/skills/plan-challenger/SKILL.md
+    description: 'VentHub teknik PLANLARINI (docs/plans/*.md) uygulamadan ÖNCE bağımsız
+      red-team denetiminden geçirir: plandaki varsayımları somut koda dayanarak ÇÜRÜTÜR
+      (RLS/tenant izolasyon, RSC/use-client sınırı, PPR/Suspense, Edge runtime kısıtları,
+      webhook idempotency, migration auto-apply, DI, i18n parity) ve red_team_report.md
+      üretir. Tetik: planı çürüt, red team denetle, plan challenge, planı stress-test
+      et. Kod integrity check için venthub-auditor, enterprise teslim denetimi için
+      venthub-enterprise-audit, git/test/db işlemleri için KULLANMA.'
+    triggers_on:
+    - planı çürüt
+    - red team denetle
+    - plan challenge
+    - planı stress-test et
+    - varsayımları çürüt
+    - plan red team
+    inputs:
+    - docs/plans/implementation_plan.md
+    outputs:
+    - red_team_report.md
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
+    commands: {}
   - name: venthub-auditor
     path: .agent/skills/venthub-auditor/SKILL.md
     description: VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, pre-commit
