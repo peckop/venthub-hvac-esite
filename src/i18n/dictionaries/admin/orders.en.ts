@@ -176,5 +176,25 @@ export const orders = {
           updateError: 'Error occurred while updating status.'
         }
       },
-      orderDetails: 'Order Details'
+      orderDetails: 'Order Details',
+      form: {
+        descEdit: 'View and update order details.',
+        tabShipping: 'Shipping',
+        tabItems: 'Order Items',
+        customerName: 'Customer Name',
+        customerEmail: 'Customer Email',
+        customerPhone: 'Customer Phone',
+        orderStatus: 'Order Status',
+        carrier: 'Carrier',
+        trackingNumber: 'Tracking Number',
+        shippingMethod: 'Shipping Method',
+        shippingStandard: 'Standard Shipping',
+        shippingExpress: 'Express Shipping',
+        itemsTableProduct: 'Product Name',
+        itemsTableQuantity: 'Quantity',
+        itemsTableUnitPrice: 'Unit Price',
+        itemsTableTotal: 'Total',
+        errorPrefix: 'Error: ',
+        unknownError: 'Unknown error'
+      }
 };

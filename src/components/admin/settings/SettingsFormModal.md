@@ -3,76 +3,60 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\settings\SettingsFormModal.tsx
-skeleton_hash: 33e782eec4d17c75
+skeleton_hash: 010b688aa07bc3a1
 entity_hashes:
-  func:SettingsFormModal: 7e2e8bd7d5b386db
+  func:SettingsFormModal: c24cb91e033d6d4b
   func:getSectionTitle: bc295f0afa8615b4
-  func:handleClose: f1f507928306929a
+  func:handleClose: b985b474034243a8
   func:handleOpenChange: b7949752bd032233
   func:onSubmit: 36d88356bd3272ee
-  overview: 50d8e88875d8e7b5
+  overview: 5a17b2b7a2c5a922
   style_tokens: 631fa82b70a5654d
-generated_at: 2026-06-19T11:53:15Z
+generated_at: 2026-06-19T13:18:57Z
 ---
 
 ## Genel Bakış
-
-Bu modül, admin panelindeki ayarlar sayfasında kullanılan bir form modal bileşenidir. Bölüm bazlı (section) ayarların düzenlenmesi için açılır pencere sunar, form gönderimlerini yönetir ve ilgili bölüm başlıklarını dinamik olarak gösterir. Bileşen, kontrollü (controlled) bir modal yapısıyla açılıp kapanma durumlarını üst bileşen yönetir.
+Bu modül, admin panelindeki ayarlar bölümünde bölüm bazlı yapılandırma düzenlemeleri için kullanılan kontrollü bir form modal bileşenidir. Modal penceresinin açılıp kapanmasını yönetir, form gönderimlerini işler ve ilgili bölüm başlıklarını dinamik olarak belirler.
 
 ## Fonksiyon Grupları
-
-### Modal Yönetim Korumaları
-
-Modal penceresinin açılıp kapanma akışını kontrol eden işleyiciler. Dışarıdan gelen open durumunu işler ve kapanma taleplerini üst bileşene iletir.
-
+### Modal Durum Yönetimi
+Modal penceresinin açılıp kapanma akışını kontrol eder ve üst bileşen ile iletişim kurarak durum değişikliklerini yönetir.
 - handleClose, handleOpenChange
 
-### Form Gönderim İşleme
-
-Kullanıcının doldurduğu form verilerini alarak ilgili ayarları kaydetme işlemini başlatır. Asenkron yapıda çalışarak API çağrılarını yönetir.
-
+### Form İşlemleri
+Kullanıcıdan toplanan form verilerini alır ve sunucuya göndererek ayarların güncellenmesi işlemini başlatır. Bu işlem asenkron bir yapıda çalışır.
 - onSubmit
 
-### Arayüz Yardımcıları
-
-Mevcut section prop'una göre modal içinde gösterilecek başlık metnini belirler. Kullanıcıya hangi ayar bölümünde olduğunu gösterir.
-
+### Yardımcı İşlevler
+Modal başlığını, mevcut ayar bölümüne göre dinamik olarak belirler ve bileşen içi okunabilirliği artırır.
 - getSectionTitle
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül bir React form modal bileşeni olup, ayarlar bölümünü yönetir ve validasyon şemalarını kullanır.
+Bu modül, ayarlar formunu section bazlı olarak yöneten kontrollü bir modal bileşenidir.
 
-[Aksiyom 1]: Eğer `open` prop'u `true` olarak ayarlanmamışsa, modal görünür olmaz.
-[Aksiyom 2]: Eğer `onOpenChange` fonksiyonu çağrılmazsa, modal'ın açılıp kapanması kontrol edilemez.
-[Aksiyom 3]: Eğer `section` prop'u geçerli bir bölüm adı içermiyorsa, ilgili form şeması yüklenemez ve form boş kalır.
-[Aksiyom 4]: Eğer `initialValues` prop'u `undefined` veya `null` olarak geçilirse, form alanları varsayılan değerlerle başlatılır.
-[Aksiyom 5]: Eğer `onSuccess` fonksiyonu çağrılmazsa, form başarıyla gönderildiğinde dışarıya bildirim yapılamaz.
-[Aksiyom 6]: Eğer `handleClose()` fonksiyonu çağrılmadan önce `onOpenChange` ile modal kapatılmamışsa, modal'ın kapanması tetiklenemez.
-[Aksiyom 7]: Eğer `onSubmit` fonksiyonu asynchronous olarak çalışırken hata oluşursa ve bu hata yakalanmamışsa, form gönderme işlemi başarısız olur.
-[Aksiyom 8]: Eğer `section` değerine karşılık gelen validasyon şeması çağrılamıyorsa, form verileri validasyondan geçemez.
-[Aksiyom 9]: Eğer `getSectionTitle()` fonksiyonu `section` propuna karşılık gelen başlığı bulamıyorsa, modal başlığı boş kalır.
-[Aksiyom 10]: Eğer `handleOpenChange(openVal)` fonksiyonu `openVal` parametresi olarak `false` alırsa ve bu değer `onOpenChange` prop'una iletilmezse, modal kapatılamaz.
+[Aksiyom 1]: Eğer `section` parametresi `generalSchema`, `paymentSchema`, `adminsSchema` veya `systemSchema` değerlerinden biri değilse, form_Validasyon şeması seçilemez ve form gönderimi hatalı çalışır.
+
+[Aksiyom 2]: Eğer `initialValues` prop'u sağlanmazsa, form boş değerlerle
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### SettingsFormModal
+**Ne yapar**: Admin panelindeki ayarlar sayfası için form içeren bir modal bileşenidir. Kullanıcının ayar formunu görüntülemesini, düzenlemesini ve kaydetmesini sağlar.
 
-**Ne yapar**: Ayarlar formunu gösteren modal bileşenidir. Belirli bir ayar section'ına ait form alanlarını açar, kullanıcının değerleri düzenlemesini sağlar ve başarılı kaydetme sonrasında callbacks'leri tetikler.
-
-**Nasıl yapar**: React fonksiyonel bileşeni olarak tanımlanmıştır ve `SettingsFormModalProps` arayüzünden gelen props'ları alır. Bileşen, modal açık/kapalı durumunu (`open`) kontrol eder, bölüm bazlı form alanlarını `section` parametresine göre render eder, başlangıç değerlerini `initialValues` ile alır ve form başarıyla gönderildiğinde `onSuccess` callback'ini çağırarak üst bileşene bildirimde bulunur. Modalın kapanma/açılma sürecini ise `onOpenChange` ile yönetir.
+**Nasıl yapar**: React functional component (FC) olarak tanımlanmıştır ve `SettingsFormModalProps` arabirimi ile belirlenen prop'ları alır. Modal'ın açık/kapalı durumunu, hangi ayar bölümünün gösterileceğini, başlangıç değerlerini ve başarı durumunda çalışacak callback fonksiyonunu yönetir. Bileşen, form submit işlemleri ve validasyon mantığını içerebilir.
 
 **Parametreler**:
-- `open: boolean` — Modalın görünürlük durumunu belirtir. `true` olduğunda modal açılır, `false` olduğunda kapanır.
-- `onOpenChange: (open: boolean) => void` — Modalın açık/kapalı durumu değiştiğinde çağrılan callback fonksiyonu. Üst bileşenin modal durumunu yönetmesini sağlar.
-- `section: string` — Hangi ayar section'ının gösterileceğini belirten bölüm tanımlayıcısı. Form alanları bu değere göre filtrelenir veya section'a özgü render mantığı devreye girer.
-- `initialValues: Record<string, unknown>` — Form alanlarının başlangıç değerlerini tutan nesne. Düzenleme modunda mevcut ayar değerlerini taşır.
-- `onSuccess: () => void` — Form başarıyla gönderildikten ve kaydedildikten sonra çağrılan callback fonksiyonu. Üst bileşenin listeyi yenilemesi veya bildirim göstermesi için tetikleyici görevi görür.
+- open: boolean — Modal'ın açık olup olmadığını belirten durum bayrağı. Modal'ın render edilip edilmeyeceğini kontrol eder.
+- onOpenChange: (open: boolean) => void — Modal'ın açık/kapalı durumu değiştiğinde çağrılan callback fonksiyonu. Parent bileşenin modal durumunu güncellemesini sağlar.
+- section: string — Hangi ayar bölümünün formunun gösterileceğini belirten tanımlayıcı. Form alanlarının ve değerlerinin section'a göre değişmesini sağlar.
+- initialValues: Record<string, any> — Form alanlarının başlangıç değerlerini içeren nesne. Düzenleme modunda mevcut verilerin form alanlarına doldurulması için kullanılır.
+- onSuccess: () => void — Form başarıyla gönderildiğinde ve kaydedildiğinde çağrılan callback fonksiyonu. Parent bileşenin verileri yenilemesini veya bildirim göstermesini tetikler.
 
-**Dönüş**: `React.FC<SettingsFormModalProps>` — Props tanımlı bir React fonksiyonel bileşeni döndürür.
+**Dönüş**: `React.FC<SettingsFormModalProps>` tipinde bir React functional component döndürür. Bu, React JSX elementleri üreten bir bileşendir.
 
 ### handleClose
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -132,25 +116,103 @@ type SettingsSection = 'general' | 'payment' | 'admins' | 'system'
 ## SABİTLER
 - **generalSchema** (call) — `z.object({
   site_name: z.string().min(1, 'Site adı zorunludur'),
-  tagline: ...`
+  tagline...`
 - **paymentSchema** (call) — `z.object({
   iyzico_enabled: z.boolean(),
-  iyzico_mode: z.enum(['sandbox', '...`
+  iyzico_mode: z.enum(['sandbox',...`
 - **adminsSchema** (call) — `z.object({
-  admin_sessions_timeout: z.string().min(1, 'Oturum süresi zorunlu...`
+  admin_sessions_timeout: z.string().min(1, 'Oturum süresi zorunl...`
 - **systemSchema** (call) — `z.object({
   system_log_level: z.enum(['debug', 'info', 'warn', 'error']),
-  ...`
+...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: SettingsFormModal::getSchema (anonim)
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: SettingsFormModal.tsx::getSchema (anonim)
+- **params**: () — parametre yok
+- **ic_degiskenler**: yok
+- **Kullanılan closure değişkenleri**: `section` — hangi ayarlar bölümünün aktif olduğunu belirten string; `generalSchema`, `paymentSchema`, `adminsSchema`, `systemSchema` — bölüm bazlı Zod doğrulama şemaları
+- **Dönüş**: ZodSchema — `section` değerine göre ilgili şemayı döndürür; `section` falsy ise `generalSchema` döner
+
+---
+
+### [N2_NASIL] AST Pointer: SettingsFormModal.tsx::useEffect initializer (anonim)
+- **params**: () — parametre yok
+- **ic_degiskenler**: yok
+- **Kullanılan closure değişkenleri**: `open` — diyalogun açık/kapalı durumu (boolean); `initialValues` — mevcut ayar değerleri (object); `form` — react-hook-form instance'ı
+- **Dönüş**: yok — yan etki: diyalog açıldığında ve `initialValues` mevcutsa formu bu değerlerle resetler
+
+---
+
+### [N3_NASIL] AST Pointer: SettingsFormModal.tsx::handleClose
+- **params**: () — parametre yok
+- **ic_degiskenler**: yok
+- **Kullanılan closure değişkenleri**: `form` — react-hook-form instance'ı (`form.formState.isDirty` ile kirli form kontrolü); `t` — useI18n'den gelen çeviri fonksiyonu; `onOpenChange` — diyalog durumunu dışarıya bildiren callback
+- **Dönüş**: yok — yan etki: form kirliyse `window.confirm` ile onay alır, onaylanırsa diyalogu kapatır; form temizse doğrudan kapatır
+
+---
+
+### [N4_NASIL] AST Pointer: SettingsFormModal.tsx::handleOpenChange
+- **params**: `openVal` — boolean, diyalogun açılma/kapanma isteği
+- **ic_degiskenler**: yok
+- **Kullanılan closure değişkenleri**: `handleClose` — kapanış mantığını yöneten fonksiyon; `onOpenChange` — diyalog durumunu dışarıya bildiren callback
+- **Dönüş**: yok — yan etki: `openVal` false ise `handleClose()` çağırır; true ise `onOpenChange(true)` ile diyalogu açar
+
+---
+
+### [N5_NASIL] AST Pointer: SettingsFormModal.tsx::useEffect beforeunload (anonim)
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `section` — props'tan gelen bölüm adı, hangi şemanın döneceğini belirler
-- **Dönüş**: Zod schema nesnesi (`generalSchema | paymentSchema | adminsSchema | systemSchema`)
+  - `handleBeforeUnload` — `BeforeUnloadEvent` handler callback'i; form kirliyse tarayıcı kapatma/dolaşma olayını engeller
+- **Kullanılan closure değişkenleri**: `form` — react-hook-form instance'ı (`form.formState.isDirty` kontrolü)
+- **Dönüş**: Cleanup fonksiyonu — `beforeunload` event listener'ı `window`'dan kaldırır
+- **Yan etki**: `window.addEventListener('beforeunload', handleBeforeUnload)` ile listener ekler
+
+---
+
+### [N6_NASIL] AST Pointer: SettingsFormModal.tsx::handleBeforeUnload (N5 içinde inner function)
+- **params**: `e` — BeforeUnloadEvent, tarayıcı sayfa kapatma/navigasyon olayı
+- **ic_degiskenler**: yok
+- **Kullanılan closure değişkenleri**: `form` — react-hook-form instance'ı (`form.formState.isDirty` kontrolü)
+- **Dönüş**: `''` (string boş) — form kirliyse tarayıcı navigasyon engeli tetiklenir; `e.preventDefault()` ve `e.returnValue = ''` ile engelleme yapılır
+
+---
+
+### [N7_NASIL] AST Pointer: SettingsFormModal.tsx::beforeunload cleanup (N5 içinde inner function)
+- **params**: () — parametre yok
+- **ic_degiskenler**: yok
+- **Kullanılan closure değişkenleri**: `handleBeforeUnload` — kaldırılacak olan event handler referansı
+- **Dönüş**: yok — yan etki: `window.removeEventListener('beforeunload', handleBeforeUnload)` ile listener temizler
+
+---
+
+### [N8_NASIL] AST Pointer: SettingsFormModal.tsx::onSubmit
+- **params**: `values` — Record<string, unknown>, form submit edilen değerler sözlüğü
+- **ic_degiskenler**:
+  - `authData` — `supabase.auth.getUser()` yanıt nesnesi; `.user` altındaki kimlik doğrulama bilgilerini içerir
+  - `userId` — `authData.user?.id || null` ifadesinden türetilen, kimliği doğrulanmış kullanıcının UUID'si veya null
+  - `msg` — catch bloğunda oluşturulan hata mesajı string'i; `AdminPermissionError`, `Error` veya genel hata durumuna göre `t()` ile çevrilir
+- **Kullanılan closure değişkenleri**: `section` — aktif ayarlar bölümü anahtarı; `setSaving` — loading state setter'ı; `supabase` — Supabase client instance'ı; `hasWriteAccess` — yazma izni flag'i (useRole'den); `initialValues` — değişiklik öncesi mevcut değerler (audit için); `t` — çeviri fonksiyonu; `onSuccess` — başarı callback'i; `onOpenChange` — diyalog kapatma callback'i; `mutateWithAudit` — audit loglu mutasyon fonksiyonu; `toSupabaseJson` — JSON dönüştürme yardımcı fonksiyonu
+- **Dönüş**: yok — yan etki: `setSaving(true)` ile loading başlatır, `mutateWithAudit` ile site_settings tablosuna upsert yapar, `toast.success` ile başarı bildirimi gösterir, `onSuccess()` + `onOpenChange(false)` ile callback ve kapanış tetikler; hata durumunda `toast.error` ile hata bildirimi gösterir
+
+---
+
+### [N9_NASIL] AST Pointer: SettingsFormModal.tsx::mutateWithAudit inner fn (N8 içinde callback)
+- **params**: () — parametre yok (mutateWithAudit'a `fn` parametresi olarak verilen callback)
+- **ic_degiskenler**:
+  - `error` — `supabase.from('site_settings').upsert()` yanıtından destructured hata nesnesi; başarı durumunda `undefined`
+- **Kullanılan closure değişkenleri**: `section` — upsert'in `key` alanı olarak kullanılır; `values` — form değerleri, `toSupabaseJson` ile JSON'a dönüştürülerek `value` alanına yazılır; `userId` — `updated_by` alanına yazılan kullanıcı ID'si; `supabase` — Supabase client instance'ı; `toSupabaseJson` — JavaScript objesini Supabase JSON formatına dönüştüren yardımcı fonksiyon
+- **Dönüş**: yok — yan etki: `site_settings` tablosuna `(key=section, value, updated_by, updated_at)` satırı upsert eder; `error` varsa fırlatır
+
+---
+
+### [N10_NASIL] AST Pointer: SettingsFormModal.tsx::getSectionTitle
+- **params**: () — parametre yok
+- **ic_degiskenler**: yok
+- **Kullanılan closure değişkenleri**: `section` — aktif ayarlar bölümü anahtarı; `t` — useI18n'den gelen çeviri fonksiyonu
+- **Dönüş**: string — `section` değerine göre çevrilmiş başlık metni (`generalSettingsTitle`, `paymentSettingsTitle`, `adminsPolicyTitle`, `systemConfigTitle`); `section` falsy ise boş string `''` döner
 
 ---
 

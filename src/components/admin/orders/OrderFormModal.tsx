@@ -302,7 +302,8 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
       toast.error(
         error instanceof AdminPermissionError
           ? t('admin.orders.toasts.noPermission')
-          : 'Hata: ' + (error instanceof Error ? error.message : 'Bilinmeyen hata'),
+          : t('admin.orders.form.errorPrefix') +
+            (error instanceof Error ? error.message : t('admin.orders.form.unknownError')),
       )
     } finally {
       setSaving(false)
@@ -323,7 +324,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                 {order ? `${t('admin.orders.orderDetails')} — ${order.order_number || order.id.slice(0, 8)}` : ''}
               </Dialog.Title>
               <Dialog.Description className="text-sm text-slate-400 mt-1">
-                Sipariş detaylarını görüntüleyin ve güncelleyin.
+                {t('admin.orders.form.descEdit')}
               </Dialog.Description>
             </div>
             <Dialog.Close className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white">
@@ -351,13 +352,13 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                   value="shipping"
                   className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors"
                 >
-                  Sevkiyat
+                  {t('admin.orders.form.tabShipping')}
                 </Tabs.Trigger>
                 <Tabs.Trigger
                   value="items"
                   className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors animate-in fade-in"
                 >
-                  Sipariş Kalemleri
+                  {t('admin.orders.form.tabItems')}
                 </Tabs.Trigger>
               </Tabs.List>
 
@@ -367,7 +368,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
-                          Müşteri Adı
+                          {t('admin.orders.form.customerName')}
                         </label>
                         <input
                           {...form.register('customer_name')}
@@ -382,7 +383,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
 
                       <div className="space-y-2">
                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
-                          Müşteri E-posta
+                          {t('admin.orders.form.customerEmail')}
                         </label>
                         <input
                           {...form.register('customer_email')}
@@ -399,7 +400,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
-                          Müşteri Telefon
+                          {t('admin.orders.form.customerPhone')}
                         </label>
                         <input
                           {...form.register('customer_phone')}
@@ -409,7 +410,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
 
                       <div className="space-y-2">
                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
-                          Sipariş Durumu
+                          {t('admin.orders.form.orderStatus')}
                         </label>
                         <select
                           {...form.register('status')}
@@ -448,7 +449,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
-                          Kargo Firması
+                          {t('admin.orders.form.carrier')}
                         </label>
                         <input
                           {...form.register('carrier')}
@@ -458,7 +459,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
 
                       <div className="space-y-2">
                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
-                          Takip Numarası
+                          {t('admin.orders.form.trackingNumber')}
                         </label>
                         <input
                           {...form.register('tracking_number')}
@@ -470,17 +471,17 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
-                          Gönderim Yöntemi
+                          {t('admin.orders.form.shippingMethod')}
                         </label>
                         <select
                           {...form.register('shipping_method')}
                           className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer"
                         >
                           <option value="standard" className="bg-surface-deep">
-                            Standart Kargo
+                            {t('admin.orders.form.shippingStandard')}
                           </option>
                           <option value="express" className="bg-surface-deep">
-                            Hızlı Kargo (Express)
+                            {t('admin.orders.form.shippingExpress')}
                           </option>
                         </select>
                       </div>
@@ -493,16 +494,16 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                         <thead className="bg-white/3">
                           <tr>
                             <th className="px-6 py-4 text-left font-black text-slate-500 uppercase tracking-wider">
-                              Ürün Adı
+                              {t('admin.orders.form.itemsTableProduct')}
                             </th>
                             <th className="px-6 py-4 text-center font-black text-slate-500 uppercase tracking-wider w-20">
-                              Adet
+                              {t('admin.orders.form.itemsTableQuantity')}
                             </th>
                             <th className="px-6 py-4 text-right font-black text-slate-500 uppercase tracking-wider w-32">
-                              Birim Fiyat
+                              {t('admin.orders.form.itemsTableUnitPrice')}
                             </th>
                             <th className="px-6 py-4 text-right font-black text-slate-500 uppercase tracking-wider w-32">
-                              Toplam Tutar
+                              {t('admin.orders.form.itemsTableTotal')}
                             </th>
                           </tr>
                         </thead>

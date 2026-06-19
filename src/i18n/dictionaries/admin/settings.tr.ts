@@ -75,5 +75,10 @@ export const settings = {
       generalSettingsTitle: 'Genel Ayarlar',
       paymentSettingsTitle: 'Ödeme Ayarları',
       adminsPolicyTitle: 'Yönetici Politikaları',
-      systemConfigTitle: 'Sistem Yapılandırması'
+      systemConfigTitle: 'Sistem Yapılandırması',
+
+      // Form modal
+      form: {
+        descEdit: 'Ayarları güncelleyin. Kaydetmeden önce alanları doğrulayın.'
+      }
 };

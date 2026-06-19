@@ -176,5 +176,25 @@ export const orders = {
           notes: 'Sipariş notlarını görüntüle/ekle',
           shipping: 'Kargo bilgisi ekle / düzenle'
         },
-        orderDetails: 'Sipariş Detayları'
+        orderDetails: 'Sipariş Detayları',
+      form: {
+        descEdit: 'Sipariş detaylarını görüntüleyin ve güncelleyin.',
+        tabShipping: 'Sevkiyat',
+        tabItems: 'Sipariş Kalemleri',
+        customerName: 'Müşteri Adı',
+        customerEmail: 'Müşteri E-posta',
+        customerPhone: 'Müşteri Telefon',
+        orderStatus: 'Sipariş Durumu',
+        carrier: 'Kargo Firması',
+        trackingNumber: 'Takip Numarası',
+        shippingMethod: 'Gönderim Yöntemi',
+        shippingStandard: 'Standart Kargo',
+        shippingExpress: 'Hızlı Kargo (Express)',
+        itemsTableProduct: 'Ürün Adı',
+        itemsTableQuantity: 'Adet',
+        itemsTableUnitPrice: 'Birim Fiyat',
+        itemsTableTotal: 'Toplam Tutar',
+        errorPrefix: 'Hata: ',
+        unknownError: 'Bilinmeyen hata'
+      }
   };

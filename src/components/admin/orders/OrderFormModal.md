@@ -12,7 +12,7 @@ entity_hashes:
   func:onSubmit: 1b223598d4c15756
   overview: 35854364cd5ee97e
   style_tokens: 7adecce3d1ad5282
-generated_at: 2026-06-19T13:09:15Z
+generated_at: 2026-06-19T13:17:41Z
 ---
 
 ## Genel Bakış
@@ -198,95 +198,6 @@ type OrderFormValues = z.infer<typeof orderFormSchema>
 
 ---
 
-### [N2_NASIL] AST Pointer: OrderFormModal.tsx::OrderFormModal
-- **params**: `({ open, onOpenChange, orderId, onSuccess })`
-  - `open` — modal'ın açık olup olmadığını belirten boolean
-  - `onOpenChange` — modal'ın open durumunu dışarıya bildiren callback
-  - `orderId` — düzenlenecek siparişin UUID'si; null ise veri çekilmez
-  - `onSuccess` — başarıyla kayıt sonrası dışarıya bildirim callback'i
-- **ic_degiskenler**:
-  - `active` — useEffect cleanup flag'i; bileşen unmount edildiğinde async işlemin devam etmesini engeller
-  - `data` — Supabase `venthub_orders` tablosundan dönen tek satır ham veri (order + order_items ilişkisi)
-  - `error` — Supabase sorgusundan dönen hata nesnesi; non-null ise `throw` edilir
-  - `mappedItems` — `data.venthub_order_items` array'inden `DetailOrderItem[]` formatına dönüştürülmüş sipariş kalemleri
-  - `detailOrder` — `DetailOrder` tipinde, tüm sipariş alanlarını bir araya getiren tam nesne; `setOrder` ve `form.reset` için kaynak oluşturur
-  - `values` — `OrderFormValues` formdan submit edilen normalize edilmiş değerler
-  - `statusRes` — `updateOrderStatus` servis çağrısının sonucu; `ok` alanı false ise hata fırlatılır
-  - `handleBeforeUnload` — `beforeunload` event handler'ı; form kirliyken tarayıcı kapatılmasını engeller
-  - `it` — `venthub_order_items` array iterasyonunda her bir sipariş kalemi (map callback içinde)
-  - `qty` — `it.quantity`'den Number'a çevrilmiş miktar; toplam tutar hesabında kullanılır
-  - `unitPrice` — `it.price_at_time`'dan Number'a çevrilmiş birim fiyat
-  - `totalPrice` — `qty * unitPrice` çarpımı; sipariş kaleminin toplam fiyatı
-- **Dönüş**: JSX bileşeni (React.FC) — modal dialog markup'ı
-
----
-
-### [N3_NASIL] AST Pointer: OrderFormModal.tsx::handleClose
-- **params**: `()`
-- **ic_degiskenler**:
-  - (dahili erişim) `form.formState.isDirty` — formda kaydedilmemiş değişiklik olup olmadığını sorgular
-- **Dönüş**: `void` — doğrudan `onOpenChange(false)` çağırarak modal'ı kapatır; kirli form varsa `window.confirm` ile onay alır
-
----
-
-### [N4_NASIL] AST Pointer: OrderFormModal.tsx::handleOpenChange
-- **params**: `(openVal: boolean)`
-- **ic_degiskenler**: (yok — doğrudan parametre ve closure erişimi)
-- **Dönüş**: `void` — `openVal` false ise `handleClose()`, true ise `onOpenChange(true)` çağırır
-
----
-
-### [N5_NASIL] AST Pointer: OrderFormModal.tsx::onSubmit
-- **params**: `(values: OrderFormValues)`
-- **ic_degiskenler**:
-  - `order` — mevcut sipariş durumu (closure'dan); statü geçiş kontrolünde `order.status` referans olarak kullanılır
-  - `statusRes` — `updateOrderStatus` servis çağrısının sonucu; `ok` alanı false ise `Error` fırlatılır
-  - `error` — `catch` bloğundaki hata; `AdminPermissionError` ise izin hatası toast'ı, değilse genel hata toast'ı gösterilir
-- **Dönüş**: `void` — yan etkiler: Supabase update, audit log, toast bildirimleri, `onSuccess()` ve `onOpenChange(false)` çağrıları
-
----
-
-### [N6_NASIL] AST Pointer: OrderFormModal.tsx::mutateWithAudit fn callback
-- **params**: `()` (async no-arg callback — `mutateWithAudit` içinde çalışır)
-- **ic_degiskenler**:
-  - `values` — parent `onSubmit` closure'ından gelen form değerleri
-  - `order` — parent closure'dan mevcut sipariş nesnesi
-  - `statusRes` — `updateOrderStatus` çağrısının `{ ok, error }` sonucu
-  - `error` — `supabase.from('venthub_orders').update(...)` çağrısından dönen hata
-- **Dönüş**: `void` — statü değişikliği varsa `updateOrderStatus` servisini, ardından alan güncellemesini `supabase.update` ile çalıştırır
-
----
-
-### [N7_NASIL] AST Pointer: OrderFormModal.tsx::useEffect data fetch callback
-- **params**: `()` (immediately-invoked async function — useEffect içinde)
-- **ic_degiskenler**:
-  - `active` — cleanup flag; bileşen unmount edildiğinde state güncellemelerini iptal eder
-  - `data` — Supabase'den dönen sipariş + ilişkili item verisi (`.maybeSingle()`)
-  - `error` — Supabase sorgu hatası; varsa `throw` edilir
-  - `mappedItems` — `data.venthub_order_items`'i `DetailOrderItem[]` formatına map eden array
-  - `detailOrder` — `DetailOrder` tipinde birleştirilmiş sipariş nesnesi
-  - `it` — item map callback parametresi; her bir `venthub_order_items` satırı
-- **Dönüş**: cleanup fonksiyonu `() => { active = false }` — async devam eden isteği iptal eder
-
----
-
-### [N8_NASIL] AST Pointer: OrderFormModal.tsx::handleBeforeUnload
-- **params**: `(e: BeforeUnloadEvent)`
-- **ic_degiskenler**: (yok — `form.formState.isDirty` closure erişimi)
-- **Dönüş**: `string | undefined` — form kirliyken tarayıcı kapatma/onay dialog'u açılmasını zorunlu kılar
-
----
-
-### [N9_NASIL] AST Pointer: OrderFormModal.tsx::orderItemMapCallback
-- **params**: `(it)` — `DetailOrderItem` tipinde sipariş kalemi
-- **ic_degiskenler**:
-  - `qty` — `it.quantity`'den `Number()` ile elde edilmiş miktar; 0 ise fallback
-  - `unitPrice` — `it.price_at_time`'dan `Number()` ile elde edilmiş birim fiyat; 0 ise fallback
-  - `totalPrice` — `qty * unitPrice` çarpımı; satır toplam tutarı
-- **Dönüş**: `<tr>` JSX elementi — sipariş kaleminin tablo satırı (`product_name`, `qty`, `unitPrice`, `totalPrice` hücreleri)
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -296,8 +207,8 @@ graph TD
     OrderFormModal_tsx__handleOpenChange["handleOpenChange"]
     OrderFormModal_tsx__isStatusTransitionAllowed["isStatusTransitionAllowed"]
     OrderFormModal_tsx__onSubmit["onSubmit"]
-    OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__handleClose
     OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__isStatusTransitionAllowed
+    OrderFormModal_tsx__OrderFormModal --> OrderFormModal_tsx__handleClose
 ```
 
 ## NODE ID STANDARD

@@ -200,7 +200,7 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
                 {getSectionTitle()}
               </Dialog.Title>
               <Dialog.Description className="text-sm text-slate-400 mt-1">
-                Ayarları güncelleyin. Kaydetmeden önce alanları doğrulayın.
+                {t('admin.settings.form.descEdit')}
               </Dialog.Description>
             </div>
             <Dialog.Close className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white">

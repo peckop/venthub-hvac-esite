@@ -75,5 +75,10 @@ export const settings = {
       generalSettingsTitle: 'General Settings',
       paymentSettingsTitle: 'Payment Settings',
       adminsPolicyTitle: 'Administrator Policies',
-      systemConfigTitle: 'System Configuration'
+      systemConfigTitle: 'System Configuration',
+
+      // Form modal
+      form: {
+        descEdit: 'Update settings. Validate the fields before saving.'
+      }
 };
