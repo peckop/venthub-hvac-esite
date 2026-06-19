@@ -45,6 +45,46 @@ Onaylı CSV → loader(--target supabase|local) → DB
 **yeniden çıkarmadan**; (c) CSV insan-okunur + versiyonlanabilir + tek gerçek. Eski skill'in "çıkar→JSON→doğrudan DB"
 **füzyonu** bu yüzden ikiye bölünür — kaynak (PDF) ile hedef (DB) birbirine bağlı kalmaz.
 
+### 📁 Workspace klasör yapısı (kırılımlı tree — TEMPLATE, örnek alın)
+
+Klasörler **kaynağa göre** düzenlenir (marka → katalog); CSV'deki `category_slug` ise **hedefe göre**
+(Avensair kategorisi). Source ile target **ayrı eksenler** — klasörü Avensair kategorisine göre değil
+**markaya/kataloğa** göre kır. Bir katalog = bir klasör → kendi input + output'u izlenir, re-run temiz, batch karışmaz.
+
+```
+venthub/                                   # workspace kökü (ingestor projesi içinde)
+│
+├── markalar/                              # SPEC kaynakları — üretici markaları
+│   ├── vortice/
+│   │   ├── konut-fanlari/
+│   │   │   ├── 01-input/                  # ham PDF (Vortice-Konut-Fanlari.pdf)
+│   │   │   ├── 02-work/                   # sayfa PNG'leri + scratch (ara çıktı)
+│   │   │   └── 03-output/                 # spec CSV (vortice-konut.csv)
+│   │   ├── endustriyel-fan-serisi/        { 01-input · 02-work · 03-output }
+│   │   ├── isi-geri-kazanim/              { 01-input · 02-work · 03-output }
+│   │   └── hava-perdesi/                  { 01-input · 02-work · 03-output }
+│   ├── nicotra-gebhardt/
+│   │   └── radyal-fanlar/                 { 01-input · 02-work · 03-output }   # DD/AT/ADH/RDH
+│   ├── danfoss/
+│   │   └── frekans-konvertorleri/         { 01-input · 02-work · 03-output }   # VLT FC101/FC102
+│   └── avens/                             # AVenS kendi üretimi
+│       ├── siginak-bvu/                   { 01-input · 02-work · 03-output }
+│       ├── hucreli-aspirator/             { 01-input · 02-work · 03-output }
+│       └── isi-geri-kazanim/              { 01-input · 02-work · 03-output }
+│
+├── ticaret/                              # COMMERCE kaynağı — bayi (markalar-üstü, çapraz keser)
+│   └── avensair-fiyat-listesi-2026/
+│       ├── 01-input/                      # Avensair 2026 fiyat listesi PDF
+│       └── 03-output/                     # avensair-fiyat.csv (model_code → KOD + € fiyat)
+│
+└── _birlesik/                            # MERGE — Kademe 2 (yükleme) girdisi
+    └── venthub-products-master.csv        # spec + ticaret, model_code ile birleşmiş, yüklemeye hazır
+```
+> `{ 01-input · 02-work · 03-output }` = aynı 3 alt-klasör (yer için kısaltıldı).
+
+**Kurallar:** klasör adı kebab-case + **ASCII** (ş/ı/ç/ğ → s/i/c/g); `01/02/03` önekleri pipeline sırasına dizer
+(ham→ara→final); `markalar/`=spec · `ticaret/`=Avensair € fiyat · `_birlesik/`=birleşmiş final (`_` öneki en üste sıralar).
+
 ---
 
 ## 3. CSV şeması (SÖZLEŞME — worker tam bunu üretir)
