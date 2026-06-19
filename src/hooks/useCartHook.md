@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCartHook.ts
-skeleton_hash: 65924fd41c1d17d7
+skeleton_hash: 83483c8bf6e92f1f
 entity_hashes:
-  func:useCart: 24a780c5d0077b33
+  func:useCart: 809254743b71e846
   overview: a6bb925fcf63c562
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T06:52:05Z
 ---
 
 ## Genel Bakış
@@ -31,16 +31,29 @@ Fonksiyon gövdesi (function body) sağlanmadığından, bu modüle özgü somut
 ## FONKSİYON DETAYLARI
 
 ### useCart
-**Ne yapar**: React uygulamasında alışveriş sepeti bağlamını (context) güvenli bir şekilde tüketerek sepetteki ürünler, toplamlar ve sepet üzerinde yapılabilecek işlemleri sağlar. Fonksiyon, CartProvider dışında (örneğin statik build'lerde veya izole test ortamlarında) kullanıldığında runtime hatalarını önlemek için güvenli, boş (no-op) fallback nesnesi döndürür.
+**Ne yapar**: React uygulamasının alışveriş sepeti durumunu ve sepet üzerinde gerçekleştirilabilecek eylemleri (ürün ekleme, çıkarma, miktar değiştirme vb.) sağlayan React Context'i tüketir. Fonksiyon, çağrıldığı ortamda CartProvider mevcut değilse bile uygulamanın çökmesini engelleyerek güvenli bir şekilde çalışmaya devam etmesini sağlar.
 
-**Nasıl yapar**: React'in `useContext` hook'unu kullanarak `CartContext` değerini alır. Eğer context değeri `null` veya `undefined` ise (yani bileşen bir CartProvider içinden render edilmiyorsa), sepet işlevselliğini taklit eden ancak hiçbir yan etkisi olmayan boş fonksiyonlar içeren bir nesne döndürür. Bu sayede uygulama bütünlüğü korunur ve.sepetsiz ortamlarda bile hata fırlatılmaz.
+**Nasıl yapar**: `useContext` hook'unu kullanarak `CartContext` değerini alır. Eğer bu değer `null` veya `undefined` ise (örneğin, fonksiyon bir `CartProvider` ağacı dışındaki bir bileşende veya izole bir test ortamında çağrıldığında), varsayılan olarak tanımlı ve tüm sepet yöntemlerini (ekle, çıkar, temizle vb.) boş işlem yapan (`no-op`) bir nesne olan `CART_FALLBACK` sabitini döndürür. Bu, bileşenin hata almadan normal şekilde render edilmesini garanti altına alır. Eğer geçerli bir context mevcutsa, sepetin güncel durumu (items, totals) ve bu durumu değiştiren fonksiyonları içeren nesnenin kendisini döndürür.
 
 **Parametreler**:
-Bu fonksiyon herhangi bir parametre almaz.
+- Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: 
-- Type: `CartContext` veya `FallbackCartObject`
-- Dönüş değeri, `items` (ürün dizisi), `syncing` (senkronizasyon durumu), `addToCart` (ürün ekleme), `removeFromCart` (ürün kaldırma), `updateQuantity` (miktar güncelleme), `clearCart` (sepeti temizleme), `getCartTotal` (toplam tutarı hesaplama), `getCartCount` (ürün sayısını hesaplama) ve `applyServerPricing` (sunucu fiyatlandırmasını uygulama) içerir. CartProvider mevcut değilse tüm fonksiyonlar no-op olarak çalışır ve sayısal değerler sıfır döner.
+**Dönüş**: `CartContextType | typeof CART_FALLBACK`. Geçerli bir context varsa, sepet öğelerini (`items`), toplamları (`totals`) ve bu sepeti değiştirecek eylem fonksiyonlarını (ör. `addItem`, `removeItem`) içeren bir nesne döndürür. Context yoksa, tüm bu alanları tanımlı ancak boş işlem yapan (`() => {}`) fonksiyonlarla güvenli bir fallback nesnesi döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../contexts/CartContext::CartContext
+- import: react::useContext
+
+---
+
+## SABİTLER
+- **CART_FALLBACK** (object) — `{
+  items: [],
+  syncing: false,
+  addToCart: () => { },
+  removeFromCart...`
 
 ---
 
@@ -49,8 +62,8 @@ Bu fonksiyon herhangi bir parametre almaz.
 ### [N1_NASIL] AST Pointer: src/hooks/useCartHook.ts::useCart
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `context` — `useContext(CartContext)` çağrısıyla elde edilen sepet context değeri; CartContext provider içindeyse gerçek seket state ve metodlarını, değilse `null/undefined` döner
-- **Dönüş**: CartContext nesnesi veya fallback nesne — `context` truthy ise doğrudan `context` döner; falsy ise `{ items: [], syncing: false, addToCart: () => {}, removeFromCart: () => {}, updateQuantity: () => {}, clearCart: () => {}, getCartTotal: () => 0, getCartCount: () => 0, applyServerPricing: () => {} }` yapısı döner (statik build/izole ortam güvenli fallback)
+  - `context` — `useContext(CartContext)` ile alınan sepet context nesnesi; sepet verilerini ve metodlarını içerir
+- **Dönüş**: `context` (CartContext tipinde) veya `CART_FALLBACK` (context erişilemezse Statik build/izole ortam fallback'i)
 
 ---
 
