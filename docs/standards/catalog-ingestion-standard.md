@@ -9,6 +9,19 @@
 
 ---
 
+## 0. Hızlı başlangıç — worker ilk işler (proje: `venthub-pdf-ingestor`)
+
+1. **PDF'leri indir → `avensair.com/kataloglar`** (24 katalog: Vortice broşürleri **+** Avensair fiyat listesi, **hepsi burada**).
+   Klasör yapısına yerleştir (§2 workspace tree): spec katalogları `markalar/<marka>/<katalog>/01-input/`,
+   fiyat listesi `ticaret/avensair-fiyat-listesi-2026/01-input/`.
+   *(Vortice.com orijinalleri **opsiyonel** — yalnız azami spec hassasiyeti gerekirse; Avensair kopyaları sadıktır.)*
+2. **Skill'i güncelle** (§3 + §4): çıktı **CSV** (JSON değil), **DB-yazımını ATLA**, CSV'ye ticaret kolonları ekle.
+3. **Pilot ile başla:** TEK katalog (ör. `vortice/konut-fanlari`) + fiyat listesi → 1 CSV → Recep teyit eder. Tuttuysa kalanı batch-batch.
+
+> Tüm kurallar aşağıda (§1–§8) — **tekrar yok.** Kademe 1'de DB'ye **YAZMA** (Kademe 2 = controller).
+
+---
+
 ## 1. Çekirdek model: Vortice (üretici) → Avensair (bayi)
 
 | Ne | Kaynak | Defter ID |
