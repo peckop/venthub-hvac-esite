@@ -1,5 +1,10 @@
 # Worker Dispatch — Admin Cetvel Son-Metre Fan-Out (J14/J15/J16)
 
+> ⛔ **GEÇERSİZ / DAĞITMA — BU İŞLER ZATEN BİTMİŞ.** Bu brief 2026-06-19'da hatalı yazıldı:
+> J14 (`#413`), J15 (`#421`), J16 (`#415`) ve E2 (`49c9ca84`) **2026-06-18'de zaten master'a girmişti.**
+> Eski (dağıtım öncesi) audit'e bakılıp yazıldığı için bitmiş iş "yapılacak" sanıldı → worker'a boşuna
+> dağıtıldı, saatler kayboldu. Tarihsel kayıt olarak duruyor; **kimse bunu worker'a vermesin.**
+
 > **Tarih:** 2026-06-19 · **Controller:** #1 (admin şeridi) · **Worker:** Antigravity CLI (ortak)
 > **Kaynak cetvel/ölçüm:** `docs/audits/admin-cetvel-scores-2026-06-18.md` (dosya:satır kanıtlı) · `docs/standards/admin-standard.md` §8
 > **Amaç:** Admin cetvel %83.5 → daha çok sayfayı **≥%85 ("keep")** üstüne çıkar. Hiçbiri yeni mimari gerektirmez; mekanik cila + bir kit göçü.
