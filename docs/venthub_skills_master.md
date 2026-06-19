@@ -2125,7 +2125,129 @@ Bu skill, VentHub HVAC projesinde veya herhangi bir enterprise yazılım projesi
 
 ---
 
-## 17. Yetenek: skills-creator
+## 17. Yetenek: plan-challenger
+> **Açıklama:** VentHub teknik PLANLARINI (docs/plans/*.md) uygulamadan ÖNCE bağımsız red-team denetiminden geçirir: plandaki varsayımları somut koda dayanarak ÇÜRÜTÜR (RLS/tenant izolasyon, RSC/use-client sınırı, PPR/Suspense, Edge runtime kısıtları, webhook idempotency, migration auto-apply, DI, i18n parity) ve red_team_report.md üretir. Tetik: planı çürüt, red team denetle, plan challenge, planı stress-test et. Kod integrity check için venthub-auditor, enterprise teslim denetimi için venthub-enterprise-audit, git/test/db işlemleri için KULLANMA.
+
+**Klasör Yolu:** `.agent/skills/plan-challenger/`
+
+# Plan Challenger — VentHub Plan Çürütme & Red-Team Denetimi
+
+Bu yetenek, VentHub'da önerilen teknik planların, mimari tasarımların ve özellik/göç planlarının
+zayıf noktalarını, **çalışma-zamanı (runtime) risklerini**, platform uyumsuzluklarını ve
+multi-tenant veri sızıntısı (data bleeding) gibi açıkları **uygulamadan önce** tespit etmek için
+bağımsız ve muhalif bir denetim süreci işletir.
+
+## Kullanım Amacı
+
+VentHub planlarındaki varsayımlar ("RSC içinde useI18n çalışır", "bu sorgu zaten tenant-scoped",
+"migration'ı merge etmek prod'a dokunmaz", "lint/tsc geçti = güvenli") çoğunlukla gerçek sistem
+kısıtlarıyla çelişir. Bu yetenek "Şeytanın Avukatı" rolünü üstlenerek bu varsayımları **somut koda
+dayanarak** çürütür ve daha dayanıklı bir plan oluşturulmasını sağlar. **Rapor üretir; kod yazmaz/silmez.**
+
+> **Altın kural:** Plan varsayımı ile kod çelişirse **KOD KAZANIR.** Hiçbir plan iddiasını
+> "doğrudur" kabul etme — `view_file` / `list_dir` / grep / CodeGraph ile yerel kaynaktan doğrula.
+
+## İşletim Adımları
+
+### Adım 1 — Planı ve Kod Tabanını Okuma
+1. Hedef planı (`docs/plans/*.md` veya önerilen taslak) detaylıca `view_file` ile incele.
+2. Planda adı geçen **dosya, fonksiyon, tablo, RLS politikası, Edge Function ve i18n anahtarlarını**
+   yerel kaynaktan doğrula (`view_file`, `list_dir`, grep, CodeGraph `codegraph_explore`/`impact`).
+   Plandaki hiçbir varsayımı doğrulamadan geçme. CLAUDE.md'deki **Mutlak Kurallar (31 madde)** ve
+   `CONTEXT.md §14` planın uyması gereken cetveldir — plan bunları ihlal ediyor mu, ölç.
+
+### Adım 2 — Zayıf Noktaları Arama ve Zorlama (Red-Teaming)
+Planı şu **beş VentHub-özel** başlık altında eleştir. Her başlıkta listelenen tuzaklar sahada
+yaşanmış gerçek olaylardır — plan bunlardan birine düşüyorsa **Kritik** işaretle.
+
+**1. RLS / Tenant İzolasyon & Data Bleeding (felaket sınıfı)**
+   * Plandaki **her okuma/yazma, Edge API ve Realtime kanalı tenant-scoped mı?** Tek bir scope'suz
+     sorgu = tenant'lar arası veri sızıntısı. `tenant_id` filtresi / RLS politikası eksik mi?
+   * Yetki kararı **`app_metadata`** üzerinden mi alınıyor? **`raw_user_meta_data` kullanımı yasak**
+     (kullanıcı kendi düzenleyebilir → yetki yükseltme). Plan hangisini varsayıyor?
+   * `unstable_cache` / `revalidateTag` anahtarları **`lang` VE `tenantId`** içeriyor mu? Eksikse
+     bir tenant'ın cache'i diğerine servis edilir.
+   * Yeni RLS politikası `auth.uid()` / JWT claim'lerini doğru kaynaktan mı okuyor?
+
+**2. RSC / `'use client'` Sınırı & PPR/Suspense (sessiz prerender çökmesi)**
+   * Plan bir Server Component'e (`page.tsx` veya altındaki RSC) **hook** (`useI18n`, `useState`,
+     `useSearchParams`, context) ekliyor mu? → `'use client'` gerekir. **tsc/lint/test bunu YAKALAMAZ,
+     yalnız `next build` (prerender) patlar.** (Yaşandı: i18n RSC sınır boşluğu.)
+   * `useSearchParams` kullanan bileşen `<Suspense fallback={<Skeleton/>}>` ile sarılı mı? Sarılmazsa
+     PPR derlemesi çöker / tüm sayfa CSR'a zehirlenir.
+   * Ana rotalarda `ssr: false` (dynamic import) var mı? → **yasak.**
+   * Plan "lint/tsc geçti → güvenli" diyorsa bu **yanlış**: kapıya **`pnpm build`** dahil edilmiş mi?
+     (CI'daki `build:ci` Vercel'in `next build`'ini eşitlemez — typedRoutes ve import-sort farkları.)
+
+**3. Edge Runtime Kısıtları (middleware'de patlar)**
+   * Plan `middleware.ts` içinde **DB sorgusu / Supabase çağrısı** yapıyor mu? → Edge'de **yasak**.
+     Tenant çözümü header / Edge Config ile olmalı, DB ile değil.
+   * Edge'de çalışacak kod Node-only API (fs, crypto native, Buffer'a bağımlı kütüphane) kullanıyor mu?
+
+**4. Webhook HMAC + Replay/Idempotency + Durum Monotonluğu (para/sipariş bütünlüğü)**
+   * Webhook (İyzico/Resend/Twilio) **HMAC-SHA256 imza doğrulaması** + **replay guard**
+     (timestamp/idempotency anahtarı) içeriyor mu? Eksikse sahte/tekrarlı çağrı riski.
+   * Sipariş/iade durum geçişleri **monoton (yalnız ileri)** mı? Terminal→aktif geri-alma engelli mi?
+     Plan bir durumu geri sarıyorsa **Kritik**.
+   * Admin işlemleri `admin_audit_log`'a yazılıyor mu?
+
+**5. Sessiz Prod Etkisi & Statik-Kapı Kör Noktaları (yapı runtime'ı görmez)**
+   * **Migration auto-apply:** Plan `supabase/migrations/*.sql` içeren bir dalı **master'a merge**
+     ediyor mu? → `supabase-migrate.yml` **otomatik prod DB'ye uygular.** "Sadece komutla uygula"
+     isteniyorsa migration'ı merge ETMEMELİ. Plan bunu ayırt ediyor mu?
+   * **DI ihlali:** `lib/services/*` fonksiyonları ilk parametre olarak `supabase: SupabaseClient`
+     alıyor mu? Modül-düzeyi statik client importu = ESLint `no-restricted-imports` + AST testi ihlali.
+   * **i18n sessiz ham-key:** Yeni anahtar **nokta içeren düz key** (`'table.x'`) mı? `getDictValue`
+     **NESTED-ONLY** → ham key render eder. tsc/lint/parity/build YAKALAMAZ, yalnız `keycheck`.
+     Plan TR/EN parite (`en: typeof tr`) ve keycheck'i hesaba katıyor mu?
+   * **Paylaşılan-primitif runtime instabilitesi:** Plan `useRole`/context gibi paylaşılan hook'tan
+     her render **yeni nesne/fonksiyon** döndürüp bir effect-dep'e koyuyor mu? → sonsuz render döngüsü
+     (admin donması yaşandı). **Statik kapı (tsc/lint) bunu görmez** → plan bir **runtime smoke**
+     (Playwright e2e) kapısı öngörüyor mu?
+   * **Design token:** Arbitrary Tailwind değeri (`w-[92vw]`), HEX renk, `PCFSoftShadowMap` var mı?
+
+### Adım 3 — Teknik Çürütme Raporu Hazırlama
+Analizleri içeren bir markdown raporu üret. **Her zaman** şu şablona göre oluştur ve `red_team_report.md`
+olarak yaz:
+
+```markdown
+# Red Team Mimari Denetim Raporu: [Plan Adı]
+
+## 1. Giriş ve Metodoloji
+[Denetimin amacı + incelenen dosya/şema/RLS/Edge Function/i18n anahtarlarının kısa özeti]
+
+## 2. Detaylı Teknik Analiz ve Çürütmeler
+[Zayıf noktaları kategori bazında detaylandır. Her itirazı dosya yolu, fonksiyon/tablo adı ve
+mümkünse satır numarasıyla SOMUT kanıta dayandır.]
+
+### 2.1. [Zayıf Nokta Başlığı]
+* **Bulgu:** ...
+* **Somut Kanıt:** [filename](file:///c:/Users/alize/venthub-hvac/path/to/file#L123)
+* **Hangi Kural:** [CLAUDE.md #N / CONTEXT.md §14 maddesi]
+* **Risk Derecesi:** [Kritik / Yüksek / Orta / Düşük]
+
+## 3. Stratejik Öneriler ve Aksiyon Planı
+[Çürütülen her zayıf nokta için somut, dayanıklı iyileştirme veya fallback mekanizması öner.
+Mümkünse "şu cetvele/INV-* conformance testine bağla" diye kalıcı katman öner — hand-patch değil.]
+
+## 4. Sonuç
+[Planın mevcut haliyle uygulanmasının genel risk analizi: PASS / KOŞULLU / BLOK.]
+```
+
+## AXIOMS (Kesin Kurallar)
+
+- **A1:** Her itiraz **somut kod/DB/şema kanıtına** dayanmalıdır; havada kalan genel teorik itiraz geçersizdir.
+- **A2:** Bağımsızlığı korumak için denetim, planı **yazan ajandan FARKLI** bir subagent (Red Team rolünde)
+  ile yapılmalıdır. (Üretici ≠ yargıç.)
+- **A3:** Rapordaki kod referansları **tıklanabilir link** (`file:///...#L<satır>`) formatında olmalıdır.
+- **A4:** Plan varsayımı kod ile çelişirse **KOD KAZANIR.** İddiayı koddan/CodeGraph'tan doğrulamadan
+  "geçerli" sayma.
+- **A5:** Statik kapı (tsc/lint/test) bir riski **görmüyorsa**, bunu rapor et ve plana **runtime kapısı**
+  (`next build` prerender, Playwright e2e smoke, keycheck) ekletmeyi öner — "yapı runtime davranışını görmez".
+
+---
+
+## 18. Yetenek: skills-creator
 > **Açıklama:** Automatically creates, updates, and optimizes modular agent skills. Trigger for creating new skills (yeni skill oluştur, skill yarat/optimize et), adding capabilities (yetenek ekle/oluştur), or compiling the manifest. Do NOT use for database operations, font formatting, or running general unit tests.
 
 **Klasör Yolu:** `.agent/skills/skills-creator/`
@@ -2215,7 +2337,7 @@ orion doc tree --nlm-sync --force-sync
 
 ---
 
-## 18. Yetenek: supabase
+## 19. Yetenek: supabase
 > **Açıklama:** Use when doing tasks involving Supabase products, client libraries, database client, writing services (servis yaz), or database queries (db query). Do NOT use for styling fonts, creating git branches, running unit tests, or formatting markdown tables.
 
 **Klasör Yolu:** `.agent/skills/supabase/`
@@ -2468,7 +2590,7 @@ Do NOT use `apply_migration` to change a local database schema — it writes a m
 
 ---
 
-## 19. Yetenek: supabase-security
+## 20. Yetenek: supabase-security
 > **Açıklama:** Defines RLS policies, database migrations (migration yaz), policies (policy oluştur), and security redirection middleware (middleware redirect). Do NOT use for font/typography adjustments, creating git branches, running unit tests, or general text formatting.
 
 **Klasör Yolu:** `.agent/skills/supabase-security/`
@@ -2693,7 +2815,7 @@ export async function POST(request: Request) {
 
 ---
 
-## 20. Yetenek: teamwork-director
+## 21. Yetenek: teamwork-director
 > **Açıklama:** Teamwork-preview prompt hazırlama yöneticisi. "takıma iş ver", "sprint başlat", "/teamwork-preview" veya teamwork-preview istendiğinde zenginleştirilmiş prompt hazırlar ve takıma delege eder. Veritabanı sıfırlama, git branch oluşturma, birim testi çalıştırma veya metin formatlama durumlarında KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/teamwork-director/`
@@ -3194,7 +3316,7 @@ Artifact status'unu ayarla: `Launched`.
 
 ---
 
-## 21. Yetenek: threejs-webgl-performance
+## 22. Yetenek: threejs-webgl-performance
 > **Açıklama:** Three.js ve React Three Fiber (R3F) tabanlı 3D render performansını optimize etmek, draw call'ları azaltmak, gölge işlemeyi yönetmek ve Lighthouse mobil skorlarını yükseltmek için pratik kuralları sunar.
 
 **Klasör Yolu:** `.agent/skills/threejs-webgl-performance/`
@@ -3263,7 +3385,7 @@ Dinamik gölgeler, sahnenin her karede ışık gözünden tekrar çizilmesini (r
 - **ContactShadows:** Pahalı geometri gölgeleri yerine, zemin seviyesinde sahte gölge oluşturmak için Drei'nin `<ContactShadows />` bileşenini tercih edin.
   ```tsx
   <ContactShadows 
-    position={[0, -1.5, 0]} 
+    position={[0, -0.5, 0]} 
     opacity={0.4} 
     scale={10} 
     blur={2} 
@@ -3273,7 +3395,7 @@ Dinamik gölgeler, sahnenin her karede ışık gözünden tekrar çizilmesini (r
 
 ### D. Dinamik Ölçekleme & DPR (Device Pixel Ratio) Yönetimi
 Mobil ekranlar yüksek piksel yoğunluğuna (retina/3x) sahiptir. Mobil cihazlarda DPR'ı 3 olarak ayarlamak, GPU'nun işlemesi gereken piksel sayısını 9 kat artırır.
-- **Kural:** DPR değerini mobil cihazlarda en fazla 1.5 veya 2 ile sınırlandırın.
+- **Kural:** DPR değerini mobil cihazlarda en fazla 1.5 ile sınırlandırın (WebGL Standardı B4 maddesiyle uyumlu).
 - **Çözüm:** `<Canvas dpr={[1, 1.5]}>` kullanarak mobil cihazlarda çözünürlüğü düşürün.
 - **PerformanceMonitor (Drei):** FPS düştüğünde çözünürlüğü dinamik olarak düşüren yapıyı kurun:
   ```tsx
@@ -3498,7 +3620,7 @@ Three.js r165+ ile gelen `WebGPURenderer` ve TSL (Three.js Shading Language) des
 
 ---
 
-## 22. Yetenek: to-issues
+## 23. Yetenek: to-issues
 > **Açıklama:** Breaks a plan, specification, or PRD into structured issues or tasks. Trigger for creating issues (issue oluştur), dividing plans (planı böl), or tasks to issues. Do NOT use for general git operations, styling fonts, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/to-issues/`
@@ -3515,7 +3637,7 @@ Break a plan or PRD into vertical slices (tracer bullets) and write them as a ch
 
 ---
 
-## 23. Yetenek: to-prd
+## 24. Yetenek: to-prd
 > **Açıklama:** Turns the current conversation transcript or context into a structured PRD (Product Requirements Document). Trigger for generating a PRD (prd üret, prd oluştur, chat to prd). Do NOT use for git commands, styling fonts, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/to-prd/`
@@ -3538,7 +3660,7 @@ This skill takes the current conversation context and codebase understanding and
 
 ---
 
-## 24. Yetenek: typography
+## 25. Yetenek: typography
 > **Açıklama:** Applies typography principles for fonts, readability, text styling, type scales, and line spacing. Trigger for font modification (font değiştir), readability (okunabilirlik), or text styling. Do NOT use for general git operations, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/typography/`
@@ -3985,7 +4107,7 @@ See [tailwind-integration.md](references/tailwind-integration.md) for complete p
 
 ---
 
-## 25. Yetenek: ui-ux-pro-max
+## 26. Yetenek: ui-ux-pro-max
 > **Açıklama:** Provides UI/UX design recommendations, Tailwind styling, HSL colors, design patterns, and palettes. Trigger for UI design (tasarım yap), color selection (renk seç), styling fixes (style fix), and Tailwind styling. Do NOT use for git branch creation, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/ui-ux-pro-max/`
@@ -4306,7 +4428,7 @@ Before delivering UI code, verify these items:
 
 ---
 
-## 26. Yetenek: venthub-architecture
+## 27. Yetenek: venthub-architecture
 > **Açıklama:** Defines VentHub architecture, component patterns, and Next.js App Router rules. Trigger for creating new components (yeni bileşen oluştur), React Server Components (RSC render), or PPR configuration (PPR config). Do NOT use for git commands, database resets, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/venthub-architecture/`
@@ -4390,7 +4512,7 @@ E-ticaret sayfalarında aşağıdaki yapılandırılmış veriler zorunludur:
 
 ---
 
-## 27. Yetenek: venthub-auditor
+## 28. Yetenek: venthub-auditor
 > **Açıklama:** VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, pre-commit kontrolleri, bütünlük denetimi (bütünlük denetle) ve integrity check gerçekleştirir. Birim testlerini çalıştırmak (Vitest), git branch oluşturmak veya veritabanı sıfırlamak için KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-auditor/`
@@ -4479,7 +4601,7 @@ Bir görev ancak `check_integrity.py` V5 üzerinden 0 (sıfır) BLOCKER aldığ�
 
 ---
 
-## 28. Yetenek: venthub-catalog-importer
+## 29. Yetenek: venthub-catalog-importer
 > **Açıklama:** Ingests and validates HVAC catalog PDFs. Trigger for importing catalogs (katalog oku), scanning PDFs (pdf scan), and HVAC catalog imports. Do NOT use for running unit tests, creating git branches, or database resets.
 
 **Klasör Yolu:** `.agent/skills/venthub-catalog-importer/`
@@ -4549,7 +4671,7 @@ Ana Ajan (Proje Şefi), PDF işleme sürecini başlatırken sırasıyla şu alt 
 
 ---
 
-## 29. Yetenek: venthub-enterprise-audit
+## 30. Yetenek: venthub-enterprise-audit
 > **Açıklama:** Proje teslimi öncesi "10/10 Onay" denetim motorudur. L1-L12 adımlarını çalıştırıp PASS/FAIL raporu üretir. Tetikleyicileri: enterprise audit, 10/10 check, sprint delivery check. Genel linter denetimi, veritabanı sıfırlama veya git işlemleri için KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-enterprise-audit/`
@@ -4816,7 +4938,7 @@ BLOCKED    → Herhangi bir 🔴 STRICT kontrol FAIL → teslim yapılamaz
 
 ---
 
-## 30. Yetenek: venthub-global-rontgen
+## 31. Yetenek: venthub-global-rontgen
 > **Açıklama:** Proje genelini radar ve rontgen komutlarıyla fiziki olarak tarar. Tetikleyicileri: rontgen, radar, global scan, linter check. Veritabanı sıfırlama, genel git işlemleri veya sadece birim testleri çalıştırmak amacıyla KULLANMAYIN.
 
 **Klasör Yolu:** `.agent/skills/venthub-global-rontgen/`
@@ -4948,7 +5070,7 @@ Sisteme yalan söyleyemezsin. Gözle baktığın hiçbir şeye `PASS` verme, yal
 
 ---
 
-## 31. Yetenek: vercel-composition-patterns
+## 32. Yetenek: vercel-composition-patterns
 > **Açıklama:** React composition patterns that scale, including compound component design, context providers, and component refactoring. Trigger for component refactoring (component refactor) and compound component design. Do NOT use for general git operations, running unit tests, or database resets.
 
 **Klasör Yolu:** `.agent/skills/vercel-composition-patterns/`
@@ -5031,7 +5153,7 @@ For the complete guide with all rules expanded: `AGENTS.md`
 
 ---
 
-## 32. Yetenek: vercel-react-best-practices
+## 33. Yetenek: vercel-react-best-practices
 > **Açıklama:** React and Next.js performance optimization guidelines from Vercel. Trigger for performance optimization (performans optimize et), waterfall fixes (waterfall fix), or RSC optimization. Do NOT use for git branch creation, database resets, or formatting markdown tables.
 
 **Klasör Yolu:** `.agent/skills/vercel-react-best-practices/`
@@ -5179,7 +5301,7 @@ For the complete guide with all rules expanded: `AGENTS.md`
 
 ---
 
-## 33. Yetenek: web-design-guidelines
+## 34. Yetenek: web-design-guidelines
 > **Açıklama:** Reviews UI code for Web Interface Guidelines and design compliance. Trigger for accessibility checks (erişilebilirlik denetle, a11y check), or design guidelines checks. Do NOT use for git commands, styling fonts, or running unit tests.
 
 **Klasör Yolu:** `.agent/skills/web-design-guidelines/`
