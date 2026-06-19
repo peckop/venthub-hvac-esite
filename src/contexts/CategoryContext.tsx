@@ -26,16 +26,25 @@ const CategoryContext = createContext<CategoryContextType | undefined>(undefined
  */
 export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { supabase } = useSupabaseClient();
-  const [categories, setCategories] = useState<DomainCategory[]>([]);
+  const [allCategories, setAllCategories] = useState<DomainCategory[]>([]);
+  const [countMap, setCountMap] = useState<Map<string, number>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const loadCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getCategories(supabase);
+      const [data, countRes] = await Promise.all([
+        getCategories(supabase),
+        supabase.rpc('get_category_counts'),
+      ]);
       const domainCats = toUICategoryList(data);
-      setCategories(domainCats);
+      const map = new Map<string, number>();
+      for (const row of countRes.data ?? []) {
+        map.set(row.category_id, row.product_count ?? 0);
+      }
+      setAllCategories(domainCats);
+      setCountMap(map);
     } catch (err) {
       console.error('Failed to load global categories:', err);
       setError('Kategoriler yüklenemedi.');
@@ -48,6 +57,16 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     loadCategories();
   }, [loadCategories]);
 
+  // Müşteriye yalnız ÜRÜNÜ OLAN kategoriler gösterilir. Boş iskele kategoriler (gelecekteki ürün
+  // ailesi için bilinçli oluşturulmuş) DB'de KALIR ama navigasyonda gizlenir. Filtre TEK NOKTADA
+  // burada; tüm tüketici yüzeyleri (mega menü, footer, kategori hub, arama, anasayfa) otomatik
+  // miras alır — admin bu context'i kullanmaz. Slug lookup'ı TAM set üzerinden (aşağıda) → boş bir
+  // kategoriye direkt-URL ile gidilse bile çözülür, sayfa kırılmaz; yalnız gezinmede görünmez.
+  const categories = useMemo(
+    () => allCategories.filter((c) => (countMap.get(c.id) ?? 0) > 0),
+    [allCategories, countMap]
+  );
+
   // Yardımcı: Ağaç Yapısını Oluştur (Memoized)
   const categoryTree = useMemo(() => {
     const mainCats = categories.filter(c => !c.parent_id);
@@ -59,16 +78,17 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   }, [categories]);
 
-  // Lookup maps for O(1) access
+  // Lookup maps for O(1) access. Slug lookup TAM set üzerinden (allCategories) — boş kategoriye
+  // direkt-URL ile gelindiğinde de kategori çözülsün (sayfa boş-durum gösterir, kırılmaz).
   const categoriesSlugMap = useMemo(() => {
     const map = new Map<string, DomainCategory>();
-    for (const c of categories) {
+    for (const c of allCategories) {
       if (c.slug) {
         map.set(c.slug, c);
       }
     }
     return map;
-  }, [categories]);
+  }, [allCategories]);
 
   const categoriesParentMap = useMemo(() => {
     const map = new Map<string, DomainCategory[]>();
