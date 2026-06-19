@@ -23,14 +23,27 @@
 
 ---
 
-## 2. Akış (4 adım — insan kapılı, DB en sonda)
+## 2. İKİ KADEME — çıkarım ↔ yükleme (CSV = DB-agnostik sınır)
 
+Süreç **iki bağımsız kademeye** ayrılır. Aralarındaki **CSV/Excel = sözleşme + tek kaynak gerçeği.**
+Bir kademe diğerini bilmez → ayrı ayrı tekrar-koşulur veya değiştirilir.
+
+**KADEME 1 — ÇIKARIM (PDF → CSV).** Ingestor projesi (Python runtime). **DB'ye DOKUNMAZ.**
+İstenen seviyeye gelene kadar **tekrar koşulur**; Recep CSV'yi **onaylar/iterasyonlar.** Çıktı = kanonik CSV.
 ```
-[1] PDF  →  [2] Worker: görsel çıkarım + çapraz-sorgu  →  [3] CSV/Excel  →  [Recep teyit]  →  [4] Controller: Supabase yükleme
-                                                                              ▲ DB'ye hiçbir şey CSV onaylanmadan yazılmaz
+PDF → görsel çıkarım + çapraz-sorgu → CSV/Excel → [Recep teyit ↻ iterasyon]
 ```
-- **Adım 2–3 DB'ye DOKUNMAZ** → güvenle, ön-koşulları beklemeden yapılabilir.
-- **Adım 4 (yükleme)** taksonomi + fiyat altyapısı kilitliyken yapılır (controller).
+
+**KADEME 2 — YÜKLEME (CSV → DB).** Ayrı çalıştırma, **yalnız onaydan sonra.** DB hedefi = **ADAPTÖR/parametre:**
+bugün **Supabase** (MCP / `supabase_writer`), yarın **yerel Postgres** veya başka — **CSV değişmez, yalnız hedef değişir.**
+Controller yapar; fiyat + taksonomi modeli **burada** uygulanır (taksonomi+fiyat kilitliyken).
+```
+Onaylı CSV → loader(--target supabase|local) → DB
+```
+
+**Neden böyle:** (a) Kademe 1'i DB'ye hiç dokunmadan defalarca koş; (b) DB hedefini değiştir (Supabase ↔ yerel)
+**yeniden çıkarmadan**; (c) CSV insan-okunur + versiyonlanabilir + tek gerçek. Eski skill'in "çıkar→JSON→doğrudan DB"
+**füzyonu** bu yüzden ikiye bölünür — kaynak (PDF) ile hedef (DB) birbirine bağlı kalmaz.
 
 ---
 
