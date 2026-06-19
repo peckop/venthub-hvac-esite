@@ -17,12 +17,10 @@ import { expect,test } from '@playwright/test'
 const EMAIL = process.env.E2E_ADMIN_EMAIL
 const PASSWORD = process.env.E2E_ADMIN_PASSWORD
 
-// ⚠️ KARANTİNA (2026-06-19): Sepete-ekleme adımı (CI'da yüklü koşullarda localStorage'a sepet
-// yazılması) KARARSIZ — aynı commit push'ta geçip PR'da timeout atıyor. Kararsız test = yalan-kırmızı,
-// güveni/dikkati yer (testsizlikten beter). Sağlam `admin-smoke` çalışmaya devam ediyor. Bu test,
-// sepet seed'i deterministik hale getirilene kadar (ör. ürün-detay sayfasından ya da doğrudan
-// güvenilir bir mekanizmayla) `describe.skip` ile çalışmaz. Mantık aşağıda korunuyor.
-test.describe.skip('checkout funnel smoke (pre-payment)', () => {
+// ⚠️ KARARLI HALE GETİRİLDİ (2026-06-19): Sepete-ekleme adımı artık ürün detay sayfasından
+// data-testid="pdp-add-to-cart" butonuyla gerçekleştiriliyor. Böylece hover-transform / pointer
+// intercepting gibi liste sayfası sorunları elenmiştir.
+test.describe('checkout funnel smoke (pre-payment)', () => {
   // Secret/credential yoksa atla (CI'ı kırma) — admin smoke ile aynı kimlik.
   test.skip(!EMAIL || !PASSWORD, 'E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD gerekli (CI var+secret).')
 
@@ -36,25 +34,24 @@ test.describe.skip('checkout funnel smoke (pre-payment)', () => {
       .waitForURL((u) => !u.pathname.includes('/auth/login'), { timeout: 25_000 })
       .catch(() => { /* yine de devam; aşağıda net patlar */ })
 
-    // 2) Ürün listesi → ilk ürünü sepete ekle (gerçek kullanıcı yolu).
-    //    title sabit çapadır: ProductCard @generated olduğu için data-testid ekleyemeyiz,
-    //    ama add butonu title="Sepete Ekle" taşır (header'da title=Sepet YOK → çakışmaz).
+    // 2) Ürün listesi → teklif isteme gerektirmeyen ilk satın alınabilir ürünün detay sayfasına git → sepete ekle
     await page.goto('/tr/products')
-    const addBtn = page.getByTitle('Sepete Ekle', { exact: true }).first()
-    await expect(addBtn, 'Ürün kartı "Sepete Ekle" butonu görünmedi (ürün listesi boot olmadı?)')
-      .toBeVisible({ timeout: 30_000 })
-    // Sepet localStorage'a yazılana kadar HER TURDA yeniden tıkla.
-    // Neden dispatchEvent: normal click(), kartın hover-transform'u (`hover:-translate-y-1`)
-    //   yüzünden "stable değil / kart pointer intercept ediyor" diye takılır (gerçek kullanıcıda
-    //   sorun yok; buton stopPropagation ile Link navigasyonunu da keser). dispatch onClick'i
-    //   doğrudan tetikler.
-    // Neden poll içinde tekrar: toBeVisible yalnız SSR DOM'unu görür; React onClick henüz BAĞLI
-    //   olmayabilir (hidrasyon yarışı) → erken dispatch sessizce düşer. Sepet dolana kadar yeniden
-    //   tıklarız (aynı ürün → qty++, satır sayısı 1 kalır = idempotent, length>0 yeterli).
+    const productCardLink = page.locator('a[href*="/products/"]').filter({ hasNotText: 'Teklif İste' }).first()
+    await expect(productCardLink, 'Satın alınabilir ürün kartı linki görünmedi').toBeVisible({ timeout: 30_000 })
+    await productCardLink.click()
+
+    // Detay sayfasına geçişi doğrula
+    await page.waitForURL(/\/products\//, { timeout: 25_000 })
+
+    // Ürün detay sayfasındaki "Sepete Ekle" butonu
+    const addToCartBtn = page.getByTestId('pdp-add-to-cart')
+    await expect(addToCartBtn, 'Detay sayfasındaki "Sepete Ekle" butonu görünmedi').toBeVisible({ timeout: 20_000 })
+
+    // Sepet localStorage'a yazılana kadar hidrasyon/bağlanma yarışını tolere ederek yeniden tıkla.
     await expect
       .poll(
         async () => {
-          await addBtn.dispatchEvent('click').catch(() => { /* detached/yeniden render: bir sonraki tur */ })
+          await addToCartBtn.click().catch(() => { /* detached veya yeniden render */ })
           return page.evaluate(() => {
             try {
               const raw = localStorage.getItem('venthub-cart')
