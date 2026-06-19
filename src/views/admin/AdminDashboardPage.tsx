@@ -176,7 +176,7 @@ const AdminDashboardPage: React.FC = () => {
   }, [loadKPIs])
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10" data-testid="admin-dashboard">
       <header>
         <h1 className={adminSectionTitleClass}>{t('admin.titles.dashboard')}</h1>
         <p className={adminSubtitleClass}>{t('admin.dashboard.subtitle')}</p>
