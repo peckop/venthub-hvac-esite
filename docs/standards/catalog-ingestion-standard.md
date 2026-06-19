@@ -15,7 +15,7 @@
    Klasör yapısına yerleştir (§2 workspace tree): spec katalogları `markalar/<marka>/<katalog>/01-input/`,
    fiyat listesi `ticaret/avensair-fiyat-listesi-2026/01-input/`.
    *(Vortice.com orijinalleri **opsiyonel** — yalnız azami spec hassasiyeti gerekirse; Avensair kopyaları sadıktır.)*
-2. **Skill'i güncelle** (§3 + §4): çıktı **CSV** (JSON değil), **DB-yazımını ATLA**, CSV'ye ticaret kolonları ekle.
+2. **Skill HAZIR** — `<ingestor>/.agent/skills/venthub-catalog-importer/` zaten **CSV-akışına güncel** (controller yaptı, standartla birebir). Düzenleme gerekmez; sadece çalıştır.
 3. **Pilot ile başla:** TEK katalog (ör. `vortice/konut-fanlari`) + fiyat listesi → 1 CSV → Recep teyit eder. Tuttuysa kalanı batch-batch.
 
 > Tüm kurallar aşağıda (§1–§8) — **tekrar yok.** Kademe 1'de DB'ye **YAZMA** (Kademe 2 = controller).
