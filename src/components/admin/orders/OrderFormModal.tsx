@@ -29,6 +29,24 @@ const orderFormSchema = z.object({
 
 type OrderFormValues = z.infer<typeof orderFormSchema>
 
+// --- İleri-yön statü kuralı (CLAUDE.md Kural 11: sipariş durumu monoton) ---
+// Happy-path sırası; terminal statülere (cancelled/refunded/partial_refunded) gelindiyse GERİ dönülemez.
+const STATUS_FLOW = ['pending', 'paid', 'confirmed', 'shipped', 'delivered'] as const
+const TERMINAL_STATUSES = ['cancelled', 'refunded', 'partial_refunded'] as const
+
+function isStatusTransitionAllowed(current: string, target: string): boolean {
+  if (current === target) return true
+  // Terminal bir statüdeyse artık değiştirilemez (iptal/iade geri alınamaz)
+  if ((TERMINAL_STATUSES as readonly string[]).includes(current)) return false
+  // Terminal statüye (iptal/iade) her aktif statüden geçilebilir
+  if ((TERMINAL_STATUSES as readonly string[]).includes(target)) return true
+  // Happy-path: yalnız ileri
+  const ci = (STATUS_FLOW as readonly string[]).indexOf(current)
+  const ti = (STATUS_FLOW as readonly string[]).indexOf(target)
+  if (ci === -1 || ti === -1) return false
+  return ti >= ci
+}
+
 interface DetailOrderItem {
   id: string
   product_id?: string | null
@@ -224,6 +242,11 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
 
   const onSubmit = async (values: OrderFormValues) => {
     if (!order) return
+    // İleri-yön statü koruması: UI seçeneği engellense de burada da reddet (monoton invariant — geri/terminal-sonrası yasak)
+    if (values.status !== order.status && !isStatusTransitionAllowed(order.status, values.status)) {
+      toast.error(t('admin.orders.toasts.invalidStatusTransition'))
+      return
+    }
     setSaving(true)
     try {
       await mutateWithAudit(supabase, {
@@ -287,6 +310,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
   }
 
   const items = order?.venthub_order_items || []
+  const currentStatus = order?.status ?? ''
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
@@ -391,28 +415,28 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                           {...form.register('status')}
                           className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer"
                         >
-                          <option value="pending" className="bg-surface-deep">
+                          <option value="pending" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'pending')}>
                             {t('admin.orders.statusLabels.pending')}
                           </option>
-                          <option value="paid" className="bg-surface-deep">
+                          <option value="paid" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'paid')}>
                             {t('admin.orders.statusLabels.paid')}
                           </option>
-                          <option value="confirmed" className="bg-surface-deep">
+                          <option value="confirmed" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'confirmed')}>
                             {t('admin.orders.statusLabels.confirmed')}
                           </option>
-                          <option value="shipped" className="bg-surface-deep">
+                          <option value="shipped" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'shipped')}>
                             {t('admin.orders.statusLabels.shipped')}
                           </option>
-                          <option value="delivered" className="bg-surface-deep">
+                          <option value="delivered" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'delivered')}>
                             {t('admin.orders.statusLabels.delivered')}
                           </option>
-                          <option value="cancelled" className="bg-surface-deep">
+                          <option value="cancelled" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'cancelled')}>
                             {t('admin.orders.statusLabels.cancelled')}
                           </option>
-                          <option value="refunded" className="bg-surface-deep">
+                          <option value="refunded" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'refunded')}>
                             {t('admin.orders.statusLabels.refunded')}
                           </option>
-                          <option value="partial_refunded" className="bg-surface-deep">
+                          <option value="partial_refunded" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'partial_refunded')}>
                             {t('admin.orders.statusLabels.partialRefunded')}
                           </option>
                         </select>

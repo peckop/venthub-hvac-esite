@@ -137,6 +137,7 @@ export const orders = {
         noteDeleteSuccess: 'Note deleted',
         noteDeleteFailed: 'Could not delete note',
         noPermission: 'You do not have permission for this action',
+        invalidStatusTransition: 'Invalid status change: order status can only move forward; cancel/refund cannot be undone.',
         shippingCancelConfirm: 'Cancel shipping? This will set status to "Confirmed" and remove tracking.',
         shippingCancelSuccess: 'Shipping cancelled',
         shippingCancelFailed: 'Could not cancel shipping',

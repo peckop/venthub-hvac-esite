@@ -130,6 +130,7 @@ export const orders = {
         noteDeleteSuccess: 'Not silindi',
         noteDeleteFailed: 'Not silinemedi',
         noPermission: 'Bu işlem için yetkiniz yok',
+        invalidStatusTransition: 'Geçersiz durum değişikliği: sipariş durumu yalnızca ileri alınabilir; iptal/iade geri alınamaz.',
         shippingCancelConfirm: 'Kargoyu iptal etmek üzeresiniz. Durum "Onaylandı"ya dönecek ve takip no silinecek.',
         shippingCancelSuccess: 'Kargo iptal edildi',
         shippingCancelFailed: 'Kargo iptal edilemedi',
