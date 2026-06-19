@@ -230,8 +230,40 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
         }
     }
 
+    const handleClose = () => {
+        if (form.formState.isDirty) {
+            if (window.confirm(t('admin.categories.unsavedChangesConfirm') || 'Kaydedilmemiş değişiklikleriniz var. Ayrılmak istediğinizden emin misiniz?')) {
+                onOpenChange(false)
+            }
+        } else {
+            onOpenChange(false)
+        }
+    }
+
+    const handleOpenChange = (openVal: boolean) => {
+        if (!openVal) {
+            handleClose()
+        } else {
+            onOpenChange(true)
+        }
+    }
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (form.formState.isDirty) {
+                e.preventDefault()
+                e.returnValue = ''
+                return ''
+            }
+        }
+        window.addEventListener('beforeunload', handleBeforeUnload)
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload)
+        }
+    }, [form.formState.isDirty])
+
     return (
-        <Dialog.Root open={open} onOpenChange={onOpenChange}>
+        <Dialog.Root open={open} onOpenChange={handleOpenChange}>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
                 <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-90vh overflow-hidden bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col">
@@ -481,7 +513,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                         <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/2">
                             <button 
                                 type="button" 
-                                onClick={() => onOpenChange(false)}
+                                onClick={handleClose}
                                 className="px-6 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors"
                             >
                                 {t('admin.categories.cancel')}

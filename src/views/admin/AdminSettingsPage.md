@@ -3,33 +3,45 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminSettingsPage.tsx
-skeleton_hash: c112fa5d25de286e
+skeleton_hash: 6f4e81ef99cd3f0d
 entity_hashes:
   func:AdminSettingsPage: d7abe5daa414ecdd
-  func:handleSave: e32c68904d8a419f
-  overview: 7bfa420fad4577a6
-  style_tokens: 6047f3ed12c6d671
-generated_at: 2026-06-17T13:24:08Z
+  func:openModal: 742557352e2b120f
+  overview: a93bc9c56cdba4e0
+  style_tokens: f388bdfece87d34c
+generated_at: 2026-06-19T11:49:52Z
 ---
 
 ## Genel Bakış
-AdminSettingsPage, VentHub HVAC yönetim panelinde yönetici ayarlarının görüntülendiği ve düzenlendiği merkezi React bileşenidir. Genel, ödeme, yönetici yönetimi ve sistem olmak üzere dört kategorideki ayarları sekmeli bir arayüzde sunar ve yapılan değişikliklerin sunucuda kalıcı hale getirilmesini sağlar.
+AdminSettingsPage, VentHub HVAC yönetim panelinde yönetici ayarlarının görüntülendiği ve düzenlendiği merkezi React bileşenidir. Sistem yapılandırmalarını, tercihleri ve yönetim seçeneklerini kullanıcılara sunarak bu ayarların değiştirilmesine ve güncellenmesine olanak tanır.
 
 ## Fonksiyon Grupları
-### Arayüz ve Bileşen Sunumu
-Yönetici ayarlarının sekmeli yapıda kullanıcılara sunulmasını, form alanlarının oluşturulmasını ve yerel durum yönetimini içerir. Sayfa yapısını tanımlayarak kullanıcı etkileşimine olanak tanır.
+### Sayfa Bileşeni ve Arayüz
+Modülün ana React bileşenini ve temel arayüz yapısını oluşturur. Sayfanın yüklenmesi, sekmeler arası geçiş ve yerel durum yönetimi bu grupta ele alınır.
 - AdminSettingsPage
 
-### Veri Kalıcılığı
-Düzenlenen ayarların ilgili sekme kategorisine göre asenkron olarak sunucuya gönderilmesini ve veritabanına kaydedilmesini sağlar.
-- handleSave
+### Modal Etkileşimi
+Kullanıcı arayüzünde belirli bir ayar bölümünü düzenlemek için modal penceresi açma işlevini yönetir. Seçilen bölüme göre modal içeriğini ve durumunu kontrol eder.
+- openModal
+
+## Dış Bağımlılıklar
+- React kütüphanesi ve bileşen yaşam döngüsü
+- Proje içindeki tipler (SettingsSection, RenderableSettings)
+- Muhtemelen merkezi durum yönetimi (Context veya Store) ve API çağrıları
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, yönetici ayarlarının sekmeli bir arayüzde görüntülenmesini ve düzenlenmesini sağlayan React bileşenidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
+
+[Aksiyom 1]: Eğer geçerli bir SettingsSection (örn: 'general', 'payment', 'admin', 'system') değeri sağlanmazsa, openModal fonksiyonu uygun modalı açamaz veya bileşen doğru ayar kategorisini gösteremez.
+
+[Aksiyom 2]: Eğer openModal fonksiyonu null değerinde values parametresi ile çağrılırsa, modal varsayılan boş/default değerlerle açılır.
+
+[Aksiyom 3]: Eğer AdminSettingsPage bileşeni React çerçeve ortamında (React.FC olarak) çalışmıyorsa, bileşen render edilemez veya hata fırlatır.
+
+[Aksiyom 4]: Eğer bir ayar kategorisi için RenderableSettings yapısı geçerli alanları içermiyorsa, form alanları yanlış değerler gösterebilir veya doldurulamaz.
 
 ---
 
@@ -46,100 +58,85 @@ Bu bileşen parametre almaz — React.FC olarak tanımlı, stateles veya kendi i
 
 **Dönüş**: `React.ReactNode` — JSX ile oluşturulmuş bir React bileşen döndürür. Sayfanın tüm HTML yapısını ve interaktif öğelerini içerir.
 
-### handleSave
-**Ne yapar**: Admin ayarları sayfasında, belirli bir sekme (tab) için yapılan değişiklikleri kaydeder.
+### openModal
+**Ne yapar**: Belirtilen ayarlar bölümünü ve ilgili değerleri kullanarak modal penceresini açar. Kullanıcının belirli bir ayarlar kategorisinde düzenleme yapabilmesi için gerekli olan arayüzü aktif hale getirir.
 
-**Nasıl yapar**: Fonksiyon, bir `tab` parametresi alır ve muhtemelen bu sekmeye ait form verilerini veya ayarları bir API'ye göndererek sunucuda güncelleme işlemi başlatır. Verilen kod bloğunda, bir arrow fonksiyonunun `handleSave('general')` çağrısı yaptığı görülmektedir; bu, varsayılan olarak "general" sekmesinin kaydedilme işlemini tetiklediğini gösterir. Fonksiyonun `async` olması, içeriğinde asenkron bir işlem (örn. `fetch`, `axios.post`) yürütüleceğini ve bir `Promise` döndürebileceğini ima eder.
+**Nasıl yapar**: Fonksiyon, verilen `section` parametresi ile hangi ayarlar kategorisinin açılacağını belirler ve `values` parametresi ile o kategorideki mevcut ayar değerlerini modal içeriğine aktarır. Bu sayede kullanıcı, ilgili ayarları düzenleyebilmek için açılan modalda doğru bilgilerle karşılaşır. Fonksiyonun return tipi `void` olarak belirlenmiştir, bu nedenle herhangi bir değer dönmez.
 
 **Parametreler**:
-- `tab`: `'general' | 'payment' | 'admins' | 'system'` — Kaydedilecek ayarların bulunduğu sekmeyi belirten bir union type. Sadece bu dört değerden birini alabilir.
-- **Dönüş**: `Promise<void>` (veya muhtemelen `Promise<any>`). Fonksiyon bir `async` bloğu olduğu için bir `Promise` döndürür; ancak kesin dönüş tipi kaynak kodunda belirtilmediği için `void` veya bilinmeyen bir veri olabilir.
+- `section`: `SettingsSection` — Modalda açılacak ayarlar bölümünü belirtir. Bu tip muhtemelen `'general'`, `'notifications'`, `'security'` gibi string literal union türünden oluşmaktadır.
+- `values`: `RenderableSettings | null` — Modalda gösterilecek ve düzenlenecek olan mevcut ayar değerlerini temsil eder. `null` değer gönderildiğinde modal boş değerlerle açılabilir veya varsayılan değerler kullanılabilir.
+
+**Dönüş**: `void` — Fonksiyon herhangi bir değer dönmez, yalnızca modal penceresinin açılması gibi bir yan etki gerçekleştirir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminSkeleton::AdminSkeleton
-- import: ../../hooks/useRole::useRole
-- import: ../../hooks/useSettings::useSettings
-- import: ../../i18n/I18nProvider::useI18n
-- import: ../../lib/admin/mutateWithAudit::AdminPermissionError
-- import: ../../lib/admin/mutateWithAudit::mutateWithAudit
-- import: ../../lib/supabase/client::supabaseBrowserClient
+- import: @/hooks/useRole::useRole
+- import: @/i18n/I18nProvider::useI18n
+- import: @/lib/supabase/client::supabaseBrowserClient
 - import: lucide-react::Activity
 - import: lucide-react::CreditCard
 - import: lucide-react::Globe
-- import: lucide-react::Save
 - import: lucide-react::ShieldCheck
 - import: react::React
+- import: react::useCallback
 - import: react::useEffect
 - import: react::useState
-- import: sonner::toast
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `AdminSettingsPage.tsx`::AdminSettingsPage
-- **params**: (yok — React fonksiyonel bileşen, parametre almaz)
-- **ic_degiskenler** (state setter'lar ve JSX'te erişilen değişkenler — fonksiyon gövdesinden çıkarılmıştır):
-  - `settings` — useSettings() hook'undan gelen mevcut site ayarları nesnesi; `settings.general.*` ve `settings.payment.*` alt nesnelerine erişilir
-  - `siteName` — site adı input değeri; `settings.general.site_name`'den doldurulur, `setSiteName` ile güncellenir
-  - `setSiteName` — site adı state setter'ı
-  - `tagline` — site sloganı input değeri; `settings.general.tagline`'dan doldurulur
-  - `setTagline` — slogan state setter'ı
-  - `contactEmail` — iletişim e-posta adresi input değeri; `settings.general.contact_email`'den doldurulur
-  - `setContactEmail` — e-posta state setter'ı
-  - `supportPhone` — destek telefonu input değeri; `settings.general.support_phone`'dan doldurulur
-  - `setSupportPhone` — telefon state setter'ı
-  - `headquarters` — merkez adresi input değeri; `settings.general.headquarters`'dan doldurulur
-  - `setHeadquarters` — merkez state setter'ı
-  - `logoUrl` — logo URL input değeri; `settings.general.logo_url`'den doldurulur (fallback boş string)
-  - `setLogoUrl` — logo URL state setter'ı
-  - `iyzicoEnabled` — iyzico ödeme sistemi aktiflik durumu; `settings.payment.iyzico_enabled`'den doldurulur
-  - `setIyzicoEnabled` — iyzico aktiflik state setter'ı
-  - `iyzicoMode` — iyzico test/live modu; `settings.payment.iyzico_mode`'dan doldurulur
-  - `setIyzicoMode` — iyzico mod state setter'ı
-  - `iyzicoApiKey` — iyzico API anahtarı; `settings.payment.iyzico_api_key`'den doldurulur
-  - `setIyzicoApiKey` — iyzico API anahtarı state setter'ı
-  - `activeTab` — şu an seçili olan ayarlar sekmesi ID'si; JSX'te `activeTab === tab.id` karşılaştırması ile sekmeler arası geçiş kontrol edilir
-  - `setActiveTab` — aktif sekme değiştirme fonksiyonu; her sekme butonunun `onClick`'inde çağrılır
-  - `tabs` — sekme tanımları dizisi; her elemanın `tab.id`, `tab.label`, `tab.icon` özellikleri JSX'te kullanılır
-- **Dönüş**: `React.FC` — JSX içeren React bileşeni; ayarlar formunu sekmeli arayüzde render eder
-
----
-
-### [N2_NASIL] AST Pointer: `AdminSettingsPage.tsx`::handleSave
-- **params**: `tab` — `'general' | 'payment' | 'admins' | 'system'` literal union tipi; hangi ayarlar sekmesinin kaydedileceğini belirtir
+### [N1_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::AdminSettingsPage
+- **params**: () (parametre yok)
 - **ic_degiskenler**:
-  - `saving` — kaydetme işleminin devam edip etmediğini belirten boolean loading durumu
-  - `setSaving` — loading durumu setter'ı; fonksiyon başında `true`, `finally` bloğunda `false` yapılır
-  - `supabase` — Supabase browser client'ı; `supabase.auth.getUser()` ve `supabase.from('site_settings').upsert()` çağrıları için kullanılır
-  - `authData` — `supabase.auth.getUser()` yanıtından dönen nesne; `authData.user?.id` ile mevcut kullanıcı ID'si alınır
-  - `userId` — mevcut oturum açmış kullanıcının ID'si; `authData.user?.id`'den gelir, `null` fallback'li
-  - `hasWriteAccess` — write izni boolean'ı; `mutateWithAudit`'e `canWrite` parametresi olarak geçilir
-  - `settings` — mevcut ayarlar nesnesi; `before` parametresi olarak kullanılır (`settings.general`, `settings.payment` veya `null`)
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu; `t('admin.inventory.settings.saveSuccess')` ve `t('admin.inventory.settings.noPermission')` çağrılır
-  - `toast` — sonner toast bildirim fonksiyonu; `toast.success()` ve `toast.error()` ile kullanıcıya bildirim gösterir
-  - `mutateWithAudit` — audit log'lu veri değiştirme wrapper fonksiyonu; `resource`, `canWrite`, `action`, `rowPk`, `before`, `after`, `fn` parametreleriyle çağrılır
-  - `payload` (general sekmesi) — `{ site_name, tagline, contact_email, support_phone, headquarters, logo_url }` — general ayarları için upsert edilecek nesne; `siteName`, `tagline`, `contactEmail`, `supportPhone`, `headquarters`, `logoUrl` state değişkenlerinden oluşur; `logo_url` null fallback'li
-  - `siteName` — general payload içinde site adı değeri
-  - `tagline` — general payload içinde slogan değeri
-  - `contactEmail` — general payload içinde e-posta değeri
-  - `supportPhone` — general payload içinde telefon değeri
-  - `headquarters` — general payload içinde merkez adresi değeri
-  - `logoUrl` — general payload içinde logo URL değeri (boş string ise `null` fallback)
-  - `payload` (payment sekmesi) — `{ iyzico_enabled, iyzico_mode, iyzico_api_key }` — ödeme ayarları için upsert edilecek nesne; `iyzicoEnabled`, `iyzicoMode`, `iyzicoApiKey` state değişkenlerinden oluşur
-  - `iyzicoEnabled` — payment payload içinde iyzico aktiflik durumu
-  - `iyzicoMode` — payment payload içinde iyzico modu (test/live)
-  - `iyzicoApiKey` — payment payload içinde iyzico API anahtarı
-  - `payload` (admins sekmesi) — `{ admin_sessions_timeout, mfa_required }` — yönetici politikaları için nesne; `adminSessionsTimeout` ve `mfaRequired` state değişkenlerinden oluşur
-  - `adminSessionsTimeout` — admins payload içinde oturum zaman aşımı değeri
-  - `mfaRequired` — admins payload içinde çok faktörlü doğrulama zorunluluk durumu
-  - `payload` (system sekmesi) — `{ system_log_level, debug_mode }` — sistem yapılandırması için nesne; `systemLogLevel` ve `debugMode` state değişkenlerinden oluşur
-  - `systemLogLevel` — system payload içinde log seviyesi değeri
-  - `debugMode` — system payload içinde hata ayıklama modu durumu
-  - `e` — `catch` bloğunda yakalanan hata nesnesi; `AdminPermissionError` instanceof kontrolü ile izin hatası ayrımı yapılır; `Error` instanceof kontrolü ile standart hata mesajı alınır
-- **Dönüş**: `yok` (Promise<void>) — asenkron fonksiyon; yan etki olarak veritabanına upsert yapar, audit log yazar ve toast bildirimi gösterir; `tab` paramteresine göre `'general'`, `'payment'`, `'admins'` veya `'system'` key'ine karşılık gelen `site_settings` satırını upsert eder; hata durumunda `toast.error()` ile kullanıcıya bildirim gösterir; her durumda `setSaving(false)` ile loading durumunu sonlandırır
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, metinleri uluslararasılaştırmak için kullanılır
+  - `canWrite` — useRole hook'undan gelen yetki kontrol fonksiyonu, belirli alanlarda yazma izni olup olmadığını kontrol eder
+  - `hasWriteAccess` — Boolean, canWrite('settings') çağrısının sonucu, ayarlar alanında yazma izni olup olmadığını tutar
+  - `loading` — Boolean state, veri yüklenirken true, yükleme tamamlanınca false olur
+  - `error` — String|null state, oluşabilecek hata mesajlarını tutar
+  - `RenderableSettings` — Type alias, ayar değerlerinin tutulduğu Record tipi (string|number|boolean|null|undefined değerleri kabul eder)
+  - `generalValues` — RenderableSettings|null state, genel ayar değerlerini tutar (site_name, tagline, contact_email, support_phone, headquarters, logo_url)
+  - `paymentValues` — RenderableSettings|null state, ödeme ayar değerlerini tutar (iyzico_enabled, iyzico_mode, iyzico_api_key)
+  - `adminsValues` — Record<string,unknown> state, yönetici politika ayarlarını tutar (admin_sessions_timeout, mfa_required)
+  - `systemValues` — Record<string,unknown> state, sistem yapılandırma ayarlarını tutar (system_log_level, debug_mode)
+  - `modalOpen` — Boolean state, modal penceresinin açık olup olmadığını kontrol eder
+  - `modalSection` — SettingsSection|null state, hangi ayar bölümünün düzenleneceğini tutar
+  - `modalInitialValues` — RenderableSettings|null state, modal'a gönderilecek başlangıç değerlerini tutar
+  - `fetchAllSettings` — useCallback ile sarılmış async fonksiyon, supabase'den site_settings tablosundan tüm ayarları çeker ve ilgili state'leri günceller
+- **Dönüş**: JSX element (React component) — Admin ayarları sayfasını gösteren React bileşeni
+
+### [N2_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::fetchAllSettings
+- **params**: [] (parametre yok)
+- **ic_degiskenler**:
+  - `data` — Supabase'den gelen site_settings tablosu satırları (key ve value alanları)
+  - `fetchError` — Supabase sorgusu sırasında oluşan hata nesnesi
+  - `gen` — RenderableSettings, data içinden key='general' olan satırın value değeri, genel ayarları tutar
+  - `pay` — RenderableSettings, data içinden key='payment' olan satırın value değeri, ödeme ayarlarını tutar
+  - `adm` — Record<string,unknown>, data içinden key='admins' olan satırın value değeri, yönetici politika ayarlarını tutar
+  - `sys` — Record<string,unknown>, data içinden key='system' olan satırın value değeri, sistem yapılandırma ayarlarını tutar
+  - `gen.site_name` — Genel ayarlar içindeki site adı değeri
+  - `gen.tagline` — Genel ayarlar içindeki slogan değeri
+  - `gen.contact_email` — Genel ayarlar içindeki iletişim emaili değeri
+  - `gen.support_phone` — Genel ayarlar içindeki destek telefonu değeri
+  - `gen.headquarters` — Genel ayarlar içindeki merkez adresi değeri
+  - `gen.logo_url` — Genel ayarlar içindeki logo URL'si değeri
+  - `pay.iyzico_enabled` — Ödeme ayarları içindeki iyzico etkinlik durumu
+  - `pay.iyzico_mode` — Ödeme ayarları içindeki iyzico modu (production/sandbox)
+  - `pay.iyzico_api_key` — Ödeme ayarları içindeki iyzico API anahtarı
+  - `adm.admin_sessions_timeout` — Yönetici politika ayarları içindeki oturum zaman aşımı süresi
+  - `adm.mfa_required` — Yönetici politika ayarları içindeki çok faktörlü kimlik doğrulama zorunluluğu
+  - `sys.system_log_level` — Sistem yapılandırma ayarları içindeki log seviyesi
+  - `sys.debug_mode` — Sistem yapılandırma ayarları içindeki hata ayıklama modu durumu
+  - `err` — Catch bloğunda yakalanan hata nesnesi (Error tipi veya bilinmeyen tip)
+- **Dönüş**: void (async fonksiyon, state'leri günceller ve yan etkileri vardır)
+
+### [N3_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::openModal
+- **params**: (section: SettingsSection, values: RenderableSettings | null) — section: Düzenlenecek ayar bölümü, values: Modal'a gönderilecek başlangıç değerleri
+- **ic_degiskenler**: (yok, sadece state güncelleme işlemleri yapar)
+- **Dönüş**: void (modal'ı açar ve state'leri günceller)
 
 ---
 
@@ -147,7 +144,7 @@ Bu bileşen parametre almaz — React.FC olarak tanımlı, stateles veya kendi i
 
   file: src\views\admin\AdminSettingsPage.tsx
   function: src\views\admin\AdminSettingsPage.tsx::AdminSettingsPage
-  function: src\views\admin\AdminSettingsPage.tsx::handleSave
+  function: src\views\admin\AdminSettingsPage.tsx::openModal
 
 ---
 
@@ -165,7 +162,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-cyan-500/5`, `bg-rose-500/10`, `bg-slate-900`, `bg-slate-950/40`, `bg-transparent`, `border-b`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `group-hover:bg-cyan-500/10`, `group-hover:text-cyan-400`, `hover:bg-cyan-300`, `hover:bg-white/5`
-- **Layout:** `absolute`, `block`, `flex`, `flex-col`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `h-5`, `h-64`, `items-center`, `items-start`
-- **Varyant/Responsive:** `:`, `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `!bg-slate-950`, `!border-white/5`, `$`, `${adminButtonPrimaryClass`, `${adminCardClass`, `${adminInputClass`, `-mr-32`, `-mt-32`, `:`, `===`, `activeTab`, `animate-in`, `blur-3xl`, `border`, `cursor-pointer`
+- **Renkler:** `bg-cyan-400/10`, `bg-cyan-500/5`, `bg-rose-500/10`, `border-b`, `border-cyan-400/20`, `border-rose-500/20`, `border-t`, `border-white/5`, `group-hover:bg-cyan-500/10`, `hover:bg-cyan-400`, `hover:text-slate-950`, `text-amber-400`, `text-cyan-400`, `text-emerald-400`, `text-lg`
+- **Layout:** `absolute`, `block`, `flex`, `flex-col`, `gap-3`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `h-64`, `items-center`, `justify-between`, `lg:p-10`, `md:flex-row`, `md:grid-cols-2`
+- **Varyant/Responsive:** `:`, `disabled:`, `group-hover:`, `hover:`, `lg:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `${adminCardClass`, `-mr-32`, `-mt-32`, `:`, `animate-in`, `blur-3xl`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-300`, `duration-700`, `fade-in`, `font-black`, `font-bold`, `font-mono`
