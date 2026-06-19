@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useAuth.ts
-skeleton_hash: a4e9e5fa01c34aa4
+skeleton_hash: 8bee269d3e6af457
 entity_hashes:
-  func:useAuth: b070102d665df675
+  func:useAuth: d77303020f71d360
   overview: 71c8310fd4b630c4
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T06:51:50Z
 ---
 
 ## Genel Bakış
@@ -35,24 +35,29 @@ Bu modül için fonksiyon gövdesi verilmediği için mimari aksiyom üretilemem
 ## FONKSİYON DETAYLARI
 
 ### useAuth
-**Ne yapar**: useAuth, React bileşenlerinden kimlik doğrulama bağlamını (AuthContext) güvenli bir şekilde tüketen özel bir React kancasıdır (hook). Fonksiyon, AuthProvider bileşeninin dışında (örneğin, statik site oluşturma procesleri veya izole test ortamları gibi) çağrıldığında bile uygulamanın çökmesini önleyen, no-op (işlem yapmayan) bir geri dönüş nesnesi sağlar.
+**Ne yapar**: `useAuth`, React bileşenlerinden kimlik doğrulama bağlamını (AuthContext) güvenli bir şekilde tüketen bir custom hook'tur. Bileşenin AuthProvider kapsamı dışında kaldığı durumlarda (örneğin statik build'ler veya izole test ortamları) çalışmayı bozan hataların önüne geçmek için güvenli bir yedek nesne döndürür.
 
-**Nasıl yapar**: Fonksiyon, `useContext` hook'unu kullanarak en yakın `AuthContext` sağlayıcısından mevcut değerleri alır. Eğer `useContext` sonucu `undefined` ise, yani çağrının yapıldığı yer bir `AuthProvider` içinde değilse, tanımlı bir fallback (geri dönüş) nesnesi döndürür. Bu fallback nesnesi, tüm durum alanlarını (`user`, `session`, vb.) null veya false olarak başlatır ve tüm işlevleri (`signIn`, `signUp`, vb.) hata mesajı döndüren asenkron fonksiyonlar olarak tanımlar. Bağlam mevcutsa, doğrudan gerçek kimlik doğrulama bağlamı nesnesi döndürülür.
+**Nasıl yapar**: Fonksiyon, React'ın `useContext` hook'unu kullanarak `AuthContext` değerine erişir. Bağlamın `undefined` olup olmadığını kontrol eder — bu durum bileşenin AuthProvider ağacının dışında kaldığını gösterir. Eğer bağlam tanımsızsa, önceden tanımlanmış `AUTH_FALLBACK` sabitini döndürür; aksi takdirde orijinal bağlam nesnesini döndürür. Bu sayede hiçbir zaman `undefined` bir değerle çalışılmaz ve runtime hataları engellenir.
 
-**Parametreler**:
-- Fonksiyon herhangi bir parametre almaz.
+**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
 
-**Dönüş**: `AuthContext` tipinde bir nesne. Bu nesne şu alan ve işlevleri içerir:
-- `user`: Mevcut oturum açmış kullanıcının bilgileri veya kimlik doğrulama yapılmamışsa `null`.
-- `session`: Aktif oturumun detayları veya `null`.
-- `role`: Kullanıcının rolü veya `null`.
-- `loading`: Kullanıcı bilgilerinin yüklenme durumu (`true`/`false`).
-- `roleLoading`: Kullanıcı rolünün yüklenme durumu (`true`/`false`).
-- `signIn`: E-posta ve şifre ile giriş yapan asenkron fonksiyon.
-- `signUp`: Yeni kullanıcı kaydı yapan asenkron fonksiyon.
-- `signOut`: Oturumu sonlandıran fonksiyon.
-- `resetPassword`: Şifre sıfırlama isteği gönderen asenkron fonksiyon.
-- `refreshSession`: Mevcut oturumu yenilemeye çalışan ve sonuç döndüren asenkron fonksiyon.
+**Dönüş**: `context` — `AuthContext` tipinde bir nesne döndürür. Bu nesne kullanıcı bilgisi (user info), oturum (session), rol (role), yükleme durumları (loading states) ve kimlik doğrulama fonksiyonlarını (auth functions) içerir. Bağlam tanımsız olduğunda `AUTH_FALLBACK` sabiti döndürülür; bu nesne tüm bu alanları güvenli, no-op (işlem yapmayan) değerlerle doldurulmuştur.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../contexts/AuthContextDefinition::AuthContext
+- import: react::useContext
+
+---
+
+## SABİTLER
+- **AUTH_FALLBACK** (object) — `{
+  user: null,
+  session: null,
+  role: null,
+  loading: false,
+  roleL...`
 
 ---
 
@@ -61,8 +66,8 @@ Bu modül için fonksiyon gövdesi verilmediği için mimari aksiyom üretilemem
 ### [N1_NASIL] AST Pointer: src/hooks/useAuth.ts::useAuth
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `context` — React Context API ile AuthContext'ten alınan değer. Kimlik doğrulama durumu, kullanıcı bilgileri ve oturum yönetim fonksiyonlarını içerir.
-- **Dönüş**: `context` nesnesi veya fallback nesnesi. Context tanımsızsa (statik build/izole ortam) `{ user, session, role, loading, roleLoading, signIn, signUp, signOut, resetPassword, refreshSession }` properties'leri ile varsayılan nesne döner. Değilse doğrudan context değeri döner.
+  - `context` — React AuthContext değerini useContext hook'u ile sağlayan değişken
+- **Dönüş**: `context` (AuthContext nesnesi) veya `AUTH_FALLBACK` (statik fallback nesnesi)
 
 ---
 

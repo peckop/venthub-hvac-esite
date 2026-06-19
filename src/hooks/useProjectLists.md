@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useProjectLists.ts
-skeleton_hash: feee7340f861ea3d
+skeleton_hash: ec9603d0175eb421
 entity_hashes:
-  func:useProjectLists: e3790c9d8b328813
+  func:useProjectLists: e1f5d498634d6db5
   overview: b42bbc25ae784887
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-06-19T06:52:15Z
 ---
 
 ## Genel Bakış
@@ -32,21 +32,46 @@ Bu custom React hook olan useProjectLists, proje listelerinin uygulamada sorunsu
 ## FONKSİYON DETAYLARI
 
 ### useProjectLists
-**Ne yapar**: React tabanlı proje yönetim sisteminde ProjectContext'i güvenli bir şekilde tüketerek, proje listesi durumunu ve tüm proje yönetim aksiyonlarını tüketici bileşenlere sunar. Eğer ProjectProvider bileşeninin sarmaladığı alanın dışında, örneğin statik derleme süreçlerinde veya izole test ortamlarında kullanılırsa, çalışma zamanı hatalarını tamamen önlemek için hiçbir işlem yapmayan (no-op) güvenli bir geri dönüş nesnesi döndürür. Kullanıcı projeleri, yükleme durumu ve yönetim fonksiyonlarını tek bir bağlam nesnesi üzerinden erişilebilir kılar.
-**Nasıl yapar**: Öncelikle React context API'sini kullanarak tanımlı ProjectContext'e erişim sağlar ve bağlamın geçerliliğini kontrol eder. Eğer bağlam bulunamazsa, yani hook ProjectProvider'ın sağladığı ağacın dışında çağrılmışsa, proje yönetimi için tanımlı tüm fonksiyonları no-op olarak ayarladığı, durum değerlerini güvenli varsayılanlarla başlattığı bir geri dönüş nesnesi oluşturur. Bağlamın mevcut olduğu doğru kullanım senaryolarında ise orijinal ProjectContext içindeki tüm değerleri ve fonksiyonları olduğu gibi iletir, bu sayede tüketici bileşenler proje verilerine ve yönetim aksiyonlarına sorunsuzca erişir.
+
+**Ne yapar**: React uygulaması içinde proje listesi verisini ve proje yönetim fonksiyonlarını tüketmek için kullanılan özel bir React hook'udur. ProjectProvider kapsamında olmadığında bile uygulamanın çökmesini engelleyen güvenli bir fallback (yedek) mekanizması sunar. Bu sayede statik build'lerde veya izole test ortamlarında bile hatasız çalışabilir.
+
+**Nasıl yapar**: React'ın `useContext` hook'unu kullanarak `ProjectContext` değerini okur. Eğer okunan bağlam değeri (`context`) `null` veya `undefined` ise — yani hook bir `ProjectProvider` kapsamında çağrılmamışsa — önceden tanımlanmış sabit bir `PROJECT_FALLBACK` nesnesini döndürür. Bu fallback nesnesi, tüm proje listesi özelliklerini ve yönetim fonksiyonlarını güvenli, işlem yapmayan (no-op) karşılıklarla (boş arrays, noop fonksiyonlar vb.) içerir. Bağlam mevcutsa doğrudan orijinal context nesnesini döndürerek proje verilerine, yükleme durumuna ve yönetim fonksiyonlarına erişim sağlar.
+
 **Parametreler**:
-Bu fonksiyon herhangi bir girdi parametresi almaz.
-**Dönüş**: Proje bağlamı (context) tipinde bir nesne döndürür. Bu nesne; sistemdeki kullanıcıya ait tüm projelerin listesini, proje verilerinin yüklenme sürecini belirten loading durumunu ve projeler üzerinde işlem yapmak için gereken tüm proje yönetim fonksiyonlarını barındırır. Eğer hook geçersiz bir şekilde ProjectProvider dışında çağrılmışsa, hiçbir yan etki yaratmayan no-op yönetim fonksiyonları ve güvenli varsayılan durum değerleri içeren hata önleyici geri dönüş nesnesi iletilir.
+
+Bu fonksiyon herhangi bir parametre almamaktadır.
+
+**Dönüş**: `ProjectContext` tipinde bir nesne döndürür. Bu nesne şu bileşenleri içerir:
+- Proje listesi verisi (kullanıcının projeleri)
+- Yükleme durumu (`loading state`)
+- Proje yönetim fonksiyonları (oluştur, düzenle, sil vb.)
+
+Bağlam bulunamadığında ise `PROJECT_FALLBACK` sabiti döndürülür; bu değer aynı tipte ancak tüm fonksiyonları no-op (işlem yapmayan) karşılıklarla dolu güvenli bir nesnedir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../contexts/ProjectContext::ProjectContext
+- import: react::useContext
+
+---
+
+## SABİTLER
+- **PROJECT_FALLBACK** (object) — `{
+  projects: [],
+  loading: false,
+  refreshProjects: async () => {},
+  ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\hooks\useProjectLists.ts::useProjectLists
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/hooks/useProjectLists.ts::useProjectLists
+- **params**: ()
 - **ic_degiskenler**:
-  - `context` — useContext hook'u ile ProjectContext'ten alınan, proje verilerini ve ilgili işlevleri barındıran context nesnesi; null olup olmadığı kontrol edilerek işleme alınır
-- **Dönüş**: Context nesnesi mevcut değilse boş proje listesi, yükleme bayrağı ve boş asenkron işlevler içeren fallback nesnesi, mevcutsa ProjectContext nesnesi döndürülür
+  - `context` — `useContext(ProjectContext)` hook çağrısıyla ProjectContext'ten alınan değer; Proje verisini veya bağlam nesnesini tutar, eğer bağlam tanımsızsa `null`/`undefined` olabilir
+- **Dönüş**: `context` (ProjectContext değeri) veya `PROJECT_FALLBACK` sabiti; bağlam mevcutsa bağlam nesnesi, aksi halde fallback nesne döner
 
 ---
 
