@@ -8,11 +8,11 @@ entity_hashes:
   func:OrderFormModal: dfc366e8224d3a5a
   func:handleClose: b985b474034243a8
   func:handleOpenChange: b7949752bd032233
-  func:isStatusTransitionAllowed: b389247b6622fc78
+  func:isStatusTransitionAllowed: 1ef3dddfbfa2cf57
   func:onSubmit: 1b223598d4c15756
   overview: 35854364cd5ee97e
   style_tokens: 7adecce3d1ad5282
-generated_at: 2026-06-19T13:17:41Z
+generated_at: 2026-06-19T13:28:39Z
 ---
 
 ## Genel Bakış
@@ -60,15 +60,15 @@ Bu modül, admin sipariş yönetimi için bir modal form bileşeni olup, durum g
 ## FONKSİYON DETAYLARI
 
 ### isStatusTransitionAllowed
-**Ne yapar**: Bir siparişin mevcut durumundan hedef durumuna geçiş yapılabileceğini doğrulayan durum makinesi mantığını uygular. Geçerli olmayan veya geriye dönük durum değişimlerini engeller.
+**Ne yapar**: Sipariş statü geçişlerinin izin verilip verilmediğini belirler. Mevcut statü ile hedef statü arasındaki geçişin iş kurallarına uygun olup olmadığını kontrol ederek, geçersiz statü değişimlerini engeller. Bu fonksiyon sipariş yönetim sisteminde durum makinesi (state machine) mantığını uygular.
 
-**Nasıl yapar**: Fonksiyon, dört aşamalı bir kontrol sırası izler. Önce mevcut ve hedef durumların aynı olup olmadığını kontrol eder; eğer aynıysa zaten geçiş gerekmediği için `true` döner. Ardından mevcut durumun bir terminal statü (iptal/iade) olup olmadığını kontrol eder; terminal statüdeki bir siparişin durumu değiştirilemeyeceği için `false` döner. Üçüncü adımda hedef durumun terminal olup olmadığını test eder; herhangi bir aktif durumdan terminal duruma geçiş serbesttir. Son olarak `STATUS_FLOW` dizisi üzerindeki indeks karşılaştırmasıyla yalnızca ileri yönlü (veya aynı) geçişlere izin verir; indeks `-1` döndüğünde durum akışta bulunamadığı için geçersiz sayılır.
+**Nasıl yapar**: Fonksiyon öncelikle aynı statüye geçiş durumunu (current === target) kontrol ederek başlar ve bu durumda her zaman izin verir. Ardından hem mevcut hem de hedef statünün `TERMINAL_STATUSES` (terminal/kapanış statüleri, örneğin iptal ve iade) kümesinde yer alıp almadığını belirler. Terminal durumdan aktif (non-terminal) bir duruma geçişin kesinlikle yasak olduğunu kontrol eder — bu, iptal veya iade işleminden sonra siparişin tekrar aktif hale getirilmesini önleyerek para ve stok kayıtlarının tutarlılığını korur. İki terminal statü arasındaki geçiş (örneğin iptal → iade veya kısmi iade → tam iade) serbesttir. Aktif bir durumdan herhangi bir terminal duruma geçiş her zaman izin verilir (müşteri iptal/iade talebi). Son olarak, aktif durumlar arasındaki geçişler için `STATUS_FLOW` dizisindeki sıralamayı kullanarak yalnızca ileri yönlü (happy-path) geçişlere izin verir; geriye doğru geçiş yasaktır.
 
 **Parametreler**:
-- `current`: `string` — Siparişin o anki durumu (örn: `"pending"`, `"shipped"`, `"cancelled"`)
-- `target`: `string` — Geçilmek istenen hedef durum
+- current: string — Siparişin o anki mevcut durumunu (statü) temsil eder. `STATUS_FLOW` veya `TERMINAL_STATUSES` listelerinde yer alan geçerli bir statü değeri olmalıdır (örn: "pending", "confirmed", "cancelled", "refunded" gibi).
+- target: string — Siparişin geçilmek istenen hedef durumunu (statü) temsil eder. Yine geçerli bir statü değeri olmalıdır ve mevcut durumdan bu duruma geçişin iş kurallarına uygunluğu kontrol edilir.
 
-**Dönüş**: `boolean` — Geçiş izni varsa `true`, geçersiz veya engellenmiş bir geçişse `false` döner.
+**Dönüş**: boolean — `true` dönerse geçiş izinlidir ve statü güncellenebilir. `false` dönerse geçiş iş kurallarına aykırıdır ve engellenmelidir. Terminal statüler `TERMINAL_STATUSES` olarak readonly string[] cast edilerek kontrol edilir; statü akış sıralaması `STATUS_FLOW` readonly string[] dizisi üzerinden belirlenir.
 
 ### OrderFormModal
 **Ne yapar**: Sipariş formunu açıp düzenleyen modal bileşenidir. Yeni bir sipariş oluşturmak veya mevcut bir siparişi düzenlemek için bir form gösterir ve yönetici arayüzünden formun açılıp kapanmasını kontrol eder.
@@ -189,12 +189,64 @@ type OrderFormValues = z.infer<typeof orderFormSchema>
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: OrderFormModal.tsx::isStatusTransitionAllowed
-- **params**: `(current: string, target: string)`
+### [N1_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::isStatusTransitionAllowed
+- **params**: (current: string, target: string)
 - **ic_degiskenler**:
-  - `ci` — `current` değerinin `STATUS_FLOW` array'indeki indeksi; ilerleme yönünü belirlemek için kullanılır
-  - `ti` — `target` değerinin `STATUS_FLOW` array'indeki indeksi; `ci` ile karşılaştırılarak geçişin ileri yönlü olup olmadığı kontrol edilir
-- **Dönüş**: `boolean` — geçişin geçerli olup olmadığı (true: izin ver, false: reddet)
+  - `currentTerminal` — Mevcut durumun terminal (iptal/iade) durumu olup olmadığını belirler
+  - `targetTerminal` — Hedef durumun terminal (iptal/iade) durumu olup olmadığını belirler
+  - `ci` — Mevcut durumun STATUS_FLOW dizisindeki indeksi
+  - `ti` — Hedef durumun STATUS_FLOW dizisindeki indeksi
+- **Dönüş**: boolean (durum geçişinin izin verilip verilmediğini belirler)
+
+### [N2_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::OrderFormModal
+- **params**: ({ open, onOpenChange, orderId, onSuccess })
+- **ic_degiskenler**:
+  - `orderId` — Düzenlenecek siparişin benzersiz tanımlayıcısı
+  - `open` — Modal'ın açık olup olmadığını belirleyen boolean state
+  - `onOpenChange` — Modal durumunu güncelleyen callback fonksiyon
+  - `onSuccess` — Başarılı kayıt sonrası çağrılan callback fonksiyon
+  - `order` — Yüklenen sipariş verisini tutan state (DetailOrder tipinde)
+  - `loadingOrder` — Sipariş yüklenirken loading durumunu gösteren boolean state
+  - `saving` — Kaydetme işlemi sırasında loading durumunu gösteren boolean state
+  - `hasWriteAccess` — Kullanıcının yazma izni olup olmadığını belirleyen boolean
+  - `form` — react-hook-form form instance'ı (OrderFormValues tipinde)
+  - `handleClose` — Modal kapatma mantığını içeren fonksiyon
+  - `handleOpenChange` — Modal açma/kapatma mantığını içeren fonksiyon
+  - `onSubmit` — Form gönderme işlemini yöneten async fonksiyon
+  - `t` —Uluslararasılaştırma fonksiyonu
+  - `lang` —Mevcut dil ayarı
+  - `supabase` —Supabase client instance'ı
+- **Dönüş**: React.FC<OrderFormModalProps> (React bileşen dönüşü)
+
+### [N3_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::handleClose
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `form.formState.isDirty` — Formda kaydedilmemiş değişiklik olup olmadığını kontrol eder
+  - `onOpenChange` — Modal durumunu güncelleyen callback fonksiyonu
+- **Dönüş**: yok (yan etki: modal'ı kapatır veya onay penceresi gösterir)
+
+### [N4_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::handleOpenChange
+- **params**: (openVal: boolean)
+- **ic_degiskenler**:
+  - `openVal` — Modal'ın yeni durumu (true/false)
+  - `handleClose` — Modal kapatma mantığını içeren fonksiyon
+  - `onOpenChange` — Modal durumunu güncelleyen callback fonksiyon
+- **Dönüş**: yok (yan etki: handleClose veya onOpenChange çağırır)
+
+### [N5_NASIL] AST Pointer: src/components/admin/orders/OrderFormModal.tsx::onSubmit
+- **params**: (values: OrderFormValues)
+- **ic_degiskenler**:
+  - `order` — Mevcut sipariş verisi (DetailOrder tipinde)
+  - `values` — Form verileri (OrderFormValues tipinde)
+  - `isStatusTransitionAllowed` — Durum geçişinin izin verilip verilmediğini kontrol eden fonksiyon
+  - `setSaving` — Saving state'ini güncelleyen fonksiyon
+  - `mutateWithAudit` — Audit korumalı veri güncelleme fonksiyonu
+  - `hasWriteAccess` — Kullanıcının yazma izni olup olmadığını belirleyen boolean
+  - `supabase` —Supabase client instance'ı
+  - `updateOrderStatus` — Sipariş durumunu güncelleyen servis fonksiyonu
+  - `statusRes` — updateOrderStatus sonucu (ok ve error alanları)
+  - `error` — Hata nesnesi (unknown tipinde)
+- **Dönüş**: yok (yan etki: toast mesajları gösterir, onSuccess ve onOpenChange çağırır)
 
 ---
 

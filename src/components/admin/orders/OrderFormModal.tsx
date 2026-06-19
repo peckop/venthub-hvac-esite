@@ -36,11 +36,16 @@ const TERMINAL_STATUSES = ['cancelled', 'refunded', 'partial_refunded'] as const
 
 function isStatusTransitionAllowed(current: string, target: string): boolean {
   if (current === target) return true
-  // Terminal bir statüdeyse artık değiştirilemez (iptal/iade geri alınamaz)
-  if ((TERMINAL_STATUSES as readonly string[]).includes(current)) return false
-  // Terminal statüye (iptal/iade) her aktif statüden geçilebilir
-  if ((TERMINAL_STATUSES as readonly string[]).includes(target)) return true
-  // Happy-path: yalnız ileri
+  const currentTerminal = (TERMINAL_STATUSES as readonly string[]).includes(current)
+  const targetTerminal = (TERMINAL_STATUSES as readonly string[]).includes(target)
+  // İptal/iade (terminal) → tekrar AKTİF statü YASAK. Asıl "geri alma" budur:
+  // iptal/iade parayı + stoğu geri işler, menüyle geri almak kayıtları bozar.
+  if (currentTerminal && !targetTerminal) return false
+  // İptal/iade İÇİNDE ilerleme (ör. iptal → iade, kısmi iade → tam iade) SERBEST.
+  if (currentTerminal && targetTerminal) return true
+  // Aktif → iptal/iade (müşteri iptal/iade talebi) her aktif statüden SERBEST.
+  if (targetTerminal) return true
+  // Aktif → aktif: yalnız ileri (happy-path; geri dönüş yasak).
   const ci = (STATUS_FLOW as readonly string[]).indexOf(current)
   const ti = (STATUS_FLOW as readonly string[]).indexOf(target)
   if (ci === -1 || ti === -1) return false
