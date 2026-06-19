@@ -38,17 +38,19 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
     const addBtn = page.getByTitle('Sepete Ekle', { exact: true }).first()
     await expect(addBtn, 'Ürün kartı "Sepete Ekle" butonu görünmedi (ürün listesi boot olmadı?)')
       .toBeVisible({ timeout: 30_000 })
-    // dispatchEvent('click') — butonun React onClick'ini doğrudan tetikler (→ addToCart). Normal
-    // click(), kartın hover-transform'u (`hover:-translate-y-1`) yüzünden "element stable değil /
-    // kart pointer'ı intercept ediyor" diye takılıyor (gerçek kullanıcıda sorun yok; buton
-    // stopPropagation yapıp Link navigasyonunu da engelliyor). dispatch bu harness artefaktını aşar.
-    await addBtn.dispatchEvent('click')
-
-    // Sepet localStorage'a yazılana kadar bekle — goto ile sayfa yenilenince kaybolmasın.
+    // Sepet localStorage'a yazılana kadar HER TURDA yeniden tıkla.
+    // Neden dispatchEvent: normal click(), kartın hover-transform'u (`hover:-translate-y-1`)
+    //   yüzünden "stable değil / kart pointer intercept ediyor" diye takılır (gerçek kullanıcıda
+    //   sorun yok; buton stopPropagation ile Link navigasyonunu da keser). dispatch onClick'i
+    //   doğrudan tetikler.
+    // Neden poll içinde tekrar: toBeVisible yalnız SSR DOM'unu görür; React onClick henüz BAĞLI
+    //   olmayabilir (hidrasyon yarışı) → erken dispatch sessizce düşer. Sepet dolana kadar yeniden
+    //   tıklarız (aynı ürün → qty++, satır sayısı 1 kalır = idempotent, length>0 yeterli).
     await expect
       .poll(
-        async () =>
-          page.evaluate(() => {
+        async () => {
+          await addBtn.dispatchEvent('click').catch(() => { /* detached/yeniden render: bir sonraki tur */ })
+          return page.evaluate(() => {
             try {
               const raw = localStorage.getItem('venthub-cart')
               if (!raw) return 0
@@ -57,8 +59,9 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
             } catch {
               return 0
             }
-          }),
-        { timeout: 15_000, message: 'Sepet kaydedilmedi (addToCart calismadi?)' },
+          })
+        },
+        { timeout: 30_000, intervals: [400, 800, 1500], message: 'Sepet kaydedilmedi (addToCart hidrasyon/handler?)' },
       )
       .toBeGreaterThan(0)
 
