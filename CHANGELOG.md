@@ -12,7 +12,9 @@
 
 **Yol boyu çözülen iki harness sorunu (UX-bug değil, deterministik yeşil için):**
 - **Kart hover-transform intercept:** add butonu görünür ama `click()` kartın `hover:-translate-y-1` transform'u yüzünden "stable değil / intercept" diye takılıyordu → `dispatchEvent('click')` (React onClick'i doğrudan tetikler; buton `stopPropagation` ile Link navigasyonunu zaten keser).
-- **Hidrasyon yarışı (flaky):** `toBeVisible` yalnız SSR DOM'unu görür; React onClick henüz bağlı olmayabilir → erken dispatch sessizce no-op olur, sepet dolmaz (ilk deneme FAIL, retry PASS) → sepet `localStorage`'a yazılana kadar **poll içinde yeniden tıkla** (aynı ürün → qty++, satır=1, idempotent). Artık **ilk denemede** geçer.
+- **Hidrasyon yarışı (flaky):** `toBeVisible` yalnız SSR DOM'unu görür; React onClick henüz bağlı olmayabilir → erken dispatch sessizce no-op olur, sepet dolmaz (ilk deneme FAIL, retry PASS) → sepet `localStorage`'a yazılana kadar **poll içinde yeniden tıkla** (aynı ürün → qty++, satır=1, idempotent).
+
+**⚠️ GÜNCELLEME (2026-06-19, aynı gün):** Bu fix bir koşuda geçirdi AMA checkout smoke CI yükü altında **yine kararsız (flaky)** kaldı (sepet-seed yarışı tam çözülmedi; aynı commit push'ta geçip PR'da timeout attı) → **#438 ile KARANTİNAYA alındı** (`describe.skip`). **Sağlam runtime kapı = admin smoke** (aktif). Checkout smoke seed'i deterministik hale getirilince (ör. ürün-detay sayfasından ekleme / doğrudan seed) geri açılacak. **Ders: kararsız test = yalan-kırmızı, dikkat/güven israfı — testsizlikten beterdir.**
 
 **Doğrulama:** CI'da `admin-smoke + checkout-smoke = 2 passed` (ilk deneme, retry yok); `type-check` + `eslint` + Vercel yeşil; PR #431 merge edildi. **Sıradaki:** cetvel-hizalı admin son-metre (J14 Inventory→kit + cila) + worker'a paralel e2e/cila fan-out; tam sandbox-ödeme (Option B).
 
