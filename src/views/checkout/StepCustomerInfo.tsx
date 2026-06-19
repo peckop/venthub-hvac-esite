@@ -13,7 +13,7 @@ interface StepCustomerInfoProps {
 
 const StepCustomerInfo: React.FC<StepCustomerInfoProps> = ({ customerInfo, setCustomerInfo, t }) => {
     return (
-        <div className="space-y-6">
+        <div className="space-y-6" data-testid="checkout-step-customer">
             <div className="flex items-center space-x-3 mb-6">
                 <div className="bg-primary-navy text-white p-2 rounded-lg">
                     <User size={20} />
@@ -30,6 +30,7 @@ const StepCustomerInfo: React.FC<StepCustomerInfoProps> = ({ customerInfo, setCu
                     </label>
                     <input
                         type="text"
+                        data-testid="checkout-customer-name"
                         value={customerInfo.name}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
                         className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
@@ -42,6 +43,7 @@ const StepCustomerInfo: React.FC<StepCustomerInfoProps> = ({ customerInfo, setCu
                     </label>
                     <input
                         type="email"
+                        data-testid="checkout-customer-email"
                         value={customerInfo.email}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
                         className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
@@ -54,6 +56,7 @@ const StepCustomerInfo: React.FC<StepCustomerInfoProps> = ({ customerInfo, setCu
                     </label>
                     <input
                         type="tel"
+                        data-testid="checkout-customer-phone"
                         value={customerInfo.phone}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
                         className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"

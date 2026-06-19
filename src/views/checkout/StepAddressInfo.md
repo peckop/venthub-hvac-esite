@@ -3,37 +3,36 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\StepAddressInfo.tsx
-skeleton_hash: 384c426f4871e67e
+skeleton_hash: db11764911d1f16c
 entity_hashes:
   func:StepAddressInfo: d5b5813fe5d1d5af
-  overview: a2c2c2af4883e494
+  overview: 4a44d69bf10e19a2
   style_tokens: 7a84088359f41f22
-generated_at: 2026-06-14T17:51:42Z
+generated_at: 2026-06-19T09:05:04Z
 ---
 
 ## Genel Bakış
-Bu modül, ödeme sürecinin (checkout) adres bilgisi adımını yöneten bir React bileşenidir. Kullanıcının teslimat ve fatura adresi bilgilerini girebilmesi için gerekli form arayüzünü sağlar ve bu verilerin üst bileşen tarafından kontrol edilen state’lerle senkronize edilmesini yönetir.
+Bu modül, ödeme sürecinin (checkout) adres bilgisi adımını yöneten bir React bileşenidir. Kullanıcının teslimat ve fatura adresi bilgilerini girebilmesi için gerekli form arayüzünü sağlar ve bu verilerin üst bileşen tarafından kontrol edilen state’lerle senkronize edilmesini yönetir. Bileşen, dışarıdan gelen adres nesnelerine ve bunları güncelleyebilmek için setter fonksiyonlarına bağımlıdır.
 
 ## Fonksiyon Grupları
-### Adres Formu Yönetimi
-Ödeme akışı sırasında teslimat ve fatura adresi verilerinin kullanıcıya sunulmasını ve bu verilerin güncellenmesini sağlayan ana bileşendir.
+### Adres Formu Bileşeni (Ana İş Birimi)
+Ödeme adımında kullanıcıya sunulan adres giriş formunun ana konteynerıdır. Tüm form alanlarını ve ilgili mantığı bir arada barındırır.
 - StepAddressInfo
+
+### Üst Bileşenle Entegrasyon ve Durum Yönetimi
+Üst bileşenden gelen adres durum nesnelerini (shippingAddress, billingAddress) form alanlarına bağlar ve kullanıcının girişleriyle bu durumları günceller. Bu grup, veri akışının giriş ve çıkış noktalarını yönetir.
+- shippingAddress, setShippingAddress, billingAddress, setBillingAddress (setBi) prop'ları ile etkileşim.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
 Bu modül, üst bileşenden kontrol edilen state/prop çiftlerine bağımlı bir React form bileşenidir.
 
-[Aksiyom 1]: Eğer `setShippingAddress` fonksiyonu çağrılamaz (undefined veya non-function) yoksa, kullanıcının teslimat adresi bilgilerini günclemesi mümkün olmaz ve üst bileşenin state'i değişmez.
-
-[Aksiyom 2]: Eğer `setBillingAddress` (imzada kesik olarak `setBi` görünen) fonksiyonu çağrılamaz yoksa, kullanıcının fatura adresi bilgilerini güncellemesi mümkün olmaz ve üst bileşenin state'i değişmez.
-
-[Aksiyom 3]: Eğer `shippingAddress` objesi üst bileşen tarafından başlatılmamış (undefined/null) yoksa, form alanlarının varsayılan değerleri boş/görünmez olur ve kullanıcı mevcut bir adres bilgisiyle başlamaz.
-
-[Aksiyom 4]: Eğer `billingAddress` objesi üst bileşen tarafından başlatılmamış (undefined/null) yoksa, form alanlarının varsayılan değerleri boş/görünmez olur ve kullanıcı mevcut bir adres bilgisiyle başlamaz.
-
-[Aksiyom 5]: Eğer üst bileşen, `setShippingAddress` ve `setBillingAddress` setter'larını aynı state yönetim bağlamında (örn:同一 useCallback/useState) sağlamazsa, bileşen içinde yapılan adres güncellemeleri üst seviyeye yansımayabilir.
+[Aksiyom 1]: Eğer `shippingAddress` prop'u verilmemişse, teslimat adresi formu doğru başlatılamaz ve boş/hatalı değerlerle doldurulabilir.
+[Aksiyom 2]: Eğer `setShippingAddress` fonksiyonu verilmemişse, teslimat adresi formu güncellenemez ve kullanıcı değişiklikleri kaydedilmez.
+[Aksiyom 3]: Eğer `billingAddress` prop'u verilmemişse, fatura adresi formu doğru başlatılamaz ve boş/hatalı değerlerle doldurulabilir.
+[Aksiyom 4]: Eğer `setBillingAddress` fonksiyonu verilmemişse, fatura adresi formu güncellenemez ve kullanıcı değişiklikleri kaydedilmez.
+[Aksiyom 5]: Eğer üst bileşen tarafından kontrol edilen state'ler (shippingAddress/billingAddress) ile form alanları eşzamanlı güncellenmezse, form verileri üst bileşen ile tutarsız hale gelir.
 
 ---
 
@@ -55,7 +54,7 @@ Bu modül, üst bileşenden kontrol edilen state/prop çiftlerine bağımlı bir
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../../utils/routes::Routes
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: @/types/ui-models::type { UserAddress }
 - import: lucide-react::MapPin
 - import: next/link::Link
@@ -90,14 +89,32 @@ Bu modül, üst bileşenden kontrol edilen state/prop çiftlerine bağımlı bir
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `StepAddressInfo.tsx`::StepAddressInfo
-- **params**:
-  - `shippingAddress` — Kullanıcının seçtiği teslimat adresi nesnesi (CheckoutAddressInfo tipinde)
-  - `setShippingAddress` — shippingAddress durumunu güncelleyen React state setter fonksiyonu
-  - `billingAddress` — Kullanıcının seçtiği fatura adresi nesnesi (CheckoutAddressInfo tipinde)
-  - `setBillingAddress` — billingAddress durumunu güncelleyen React state setter fonksiyonu
-- **ic_degiskenler**: *(gövde verilmemiş — sadece imza bilgisi mevcut)*
-- **Dönüş**: `React.FC<StepAddressInfoProps>` (JSX bileşeni)
+### [N1_NASIL] AST Pointer: src/views/checkout/StepAddressInfo.tsx::StepAddressInfo
+- **params**: `{ shippingAddress, setShippingAddress, billingAddress, setBillingAddress, ... }` — destructured React component props (imza kesik/bozuk, tam liste çıkarılamaz; kesin olarak `shippingAddress`, `setShippingAddress`, `billingAddress`, `setBillingAddress` mevcut)
+- **ic_degiskenler**: Tam gövde sağlanmadığı için çıkarılamaz
+- **Dönüş**: `React.FC<StepAddressInfoProps>` — JSX döndüren fonksiyonel bileşen
+
+---
+
+### [N2_NASIL] AST Pointer: src/views/checkout/StepAddressInfo.tsx::StepAddressInfo → inline handler (shipping postalCode)
+- **params**: `e` — React `ChangeEvent<HTMLInputElement>` event nesnesi, input değer değişimini taşır
+- **ic_degiskenler**:
+  - `e.target.value` — kullanıcının input alanına girdiği ham string değer
+  - `v` — ham input değerinden `\D` (rakam dışı) karakterlerin kaldırılıp en fazla 10 karakter olarak kırpılmış, yalnızca rakamlardan oluşan postal kodu temsil eder; `shippingAddress.postalCode` alanına atanmak üzere hazırlanır
+- **Dönüş**: `void` — doğrudan `setShippingAddress` yan etkisi ile state günceller
+
+---
+
+### [N3_NASIL] AST Pointer: src/views/checkout/StepAddressInfo.tsx::StepAddressInfo → inline handler (billing postalCode)
+- **params**: `e` — `ChangeEvent<HTMLInputElement>` event nesnesi, input değişimini taşır
+- **ic_degiskenler**:
+  - `e.target.value` — kullanıcının billing postal kodu input alanına yazdığı ham string
+  - `v` — `e.target.value`'den rakam dışı karakterlerin temizlenip `slice(0,10)` ile maksimum 10 karaktere kırpılmış, yalnızca rakamlardan oluşan postal kodu; `billingAddress.postalCode` alanına yazılacak değer
+- **Dönüş**: `void` — `setBillingAddress` çağrısı ile billing address state'ini günceller (yan etki)
+
+---
+
+**Not**: Sağlanan veride `StepAddressInfo` bileşeninin tam gövdesi, JSX return bloğu ve diğer prop/değişken tanımları mevcut değildir; yalnızca iki inline arrow function handler analiz edilebilmiştir. Bileşen gövdesinin tamamı sağlandığında ilave değişken, API çağrısı ve koşul blokları eklenecektir.
 
 ---
 

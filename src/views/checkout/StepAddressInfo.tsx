@@ -105,6 +105,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             {t('checkout.shipping.addressLabel')}
                         </label>
                         <textarea
+                            data-testid="checkout-ship-address"
                             value={shippingAddress.fullAddress || shippingAddress.full_address || ''}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, fullAddress: e.target.value })}
                             className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
@@ -118,6 +119,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                         </label>
                         <input
                             type="text"
+                            data-testid="checkout-ship-city"
                             value={shippingAddress.city || ''}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
                             className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
@@ -130,6 +132,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                         </label>
                         <input
                             type="text"
+                            data-testid="checkout-ship-district"
                             value={shippingAddress.district || ''}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, district: e.target.value })}
                             className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
