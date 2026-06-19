@@ -1,5 +1,21 @@
 # Changelog
 
+### [2026-06-19] Admin Donması Kök Çözüm + 3-Katman Runtime Kalite Kapısı
+
+**Özet:** Production admin panelinin "Yükleniyor"da donup tamamen tıklanamaz hâle geldiği bir regresyon kök sebebiyle çözüldü; ardından aynı SINIFI kalıcı kapatan üç katman (yapısal + davranışsal + gerçek-tarayıcı runtime) eklenip **kanıtlandı**.
+
+**Kök sebep & düzeltme (#427):** `useRole()` her render'da YENİ referanslı `canAccess`/`canWrite` fonksiyonları döndürüyordu. Son admin dalgasında eklenen `CommandPalette` (#408) ve `AdminRealtimeNotifications` (#416) bunları `useEffect`/`useMemo` bağımlılığı olarak kullanınca → her render bağımlılık değişti → effect yeniden çalıştı → `setState` → **sonsuz re-render döngüsü**. Async (inbox-count) döngü olduğu için "Maximum update depth" hatası bile vermeden **sessizce** dondu; iki bileşen de `AdminLayout`'ta her admin rotasında mount olduğundan TÜM admin kilitlendi. Düzeltme: `useRole`'u memoize et (`useCallback([role])` + `useMemo`) — tek nokta, 17 tüketiciyi birden onarır. (Not: önceki "dual-GoTrueClient deadlock" teşhisi YANLIŞTI; o ayrı bir console-warning'di, donmanın sebebi değildi.)
+
+**Kalıcı kapılar:**
+- **#428 — yapısal + davranışsal:** `src/__tests__/conformance/hook-referential-stability.test.ts` (TS-AST: her `use*` hook'u tarar; memoize edilmemiş, inline-fonksiyon içeren object/array döndüren hook'u FAIL eder — vacuous-pass korumalı) + `useRole.effect-stability.test.tsx` (gerçek `useRole`'u effect-dep olarak kullanır; memoizasyon regrese olursa kırılır). Aynı sınıftan 3 latent ihlal (`useAuth`/`useCartHook`/`useProjectLists` provider-dışı no-op fallback'leri) **modül-sabitine** taşındı → conformance allowlist'siz 0 ihlal.
+- **#429 — runtime browser smoke:** Playwright e2e gerçek email+şifre login → `/admin` → (sidebar mount + dashboard `data-testid` görünür + menüye tıkla→navigasyon) ile donmayı yakalar. Ayrı/non-blocking workflow (`e2e-smoke.yml`); gerçek Supabase env = repo **variable**, login şifresi = **secret** (read-only). **KANITLANDI:** demo dalına yapay donma enjekte edildi → **e2e FAIL / CI SUCCESS** (statik kapılar runtime donmasını görmedi); sağlıklı master'da yeşil.
+
+**META ders:** Tüm mevcut kapılarımız (cetvel/INV/tsc/lint/build) **STATİK** — kodun ŞEKLİNİ ölçer, çalışırken DAVRANIŞINI değil. Bu üç katman eksik **runtime** eksenini kapatır.
+
+**Doğrulama:** #427/#428/#429 production'da (master `a878a9ad`); CI + E2E Smoke + Vercel yeşil; kullanıcı prod admin'i doğruladı. **Sıradaki:** satınalma/checkout funnel smoke (İyzico test modu; selektör haritası hazır).
+
+---
+
 ### [2026-06-17] Admin Cetvel Re-Score · Doküman Konsolidasyonu · Revize Yol Haritası (Admin-Önce, Bayi-Son)
 
 **Özet:** Admin paneli DataTableKit göçü + i18n sonrası §8 cetveline 6 paralel ajanla yeniden ölçüldü (~%40→%63, ilk kez 3 "keep"). Enterprise kapsam-açığı (komut paleti / rol-editörü / çeviri-UI / rapor-builder vb.) NLM + CodeGraph ile çıkarılıp `admin-capabilities.md §4.5`'e tek-SSOT olarak gömüldü; mükerrer öneri dosyası silindi. Sıralama kararı revize edildi: **admin paneli (temel) + yeni özellikler + müşteri-UX ÖNCE, bayi modülü EN SON.**
