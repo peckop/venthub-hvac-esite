@@ -80,7 +80,9 @@ Kural başına: `method ∈ {cost_plus, fixed, percent_off_list}`, `base ∈ {co
 
 - **Base (operasyon/muhasebe) para birimi = TRY.** Fatura, KDV, tahsilat TL; muhasebe gerçeği TL.
 - **İki ayrı kur rolü (birleştirme):**
-  1. **Tedarik kuru** (alış→TL maliyet): alış kaydedildiğinde **TCMB Döviz Satış** snapshot'lanır, donar.
+  1. **Tedarik kuru** (alış→TL maliyet): alış kaydedildiğinde **TCMB Efektif Satış** snapshot'lanır, donar.
+     (Avensair fiyat listesi EUR'u **TCMB Efektif Satış Kuru** ile faturalar → maliyet bu kurla TL'ye sabitlenmeli;
+     "Döviz Satış" DEĞİL — efektif=fiziki/banknot satış, Avensair'in ticari konvansiyonu.)
   2. **Gösterim kuru** (TL base→USD/EUR vitrin): canlı TCMB + admin **spread** (marka payı), yuvarlamadan önce.
 - **Çapraz işlem** (EUR alış → TL veya USD satış): EUR maliyet → ×tedarik_kuru → TL maliyet → ×(1+marj) → TL net
   → vitrin için TL→USD canlı çevrim. **Marj TEK para biriminde (TL) bir kez hesaplanır** — EUR'da ve TL'de iki
