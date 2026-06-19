@@ -60,4 +60,35 @@ describe('useRole', () => {
         expect(result.current.canAccess('/admin/users')).toBe(true);
         expect(result.current.canWrite('users')).toBe(true);
     });
+
+    // REGRESYON BEKÇİSİ: canAccess/canWrite ve dönen nesne, role DEĞİŞMEDİĞİ sürece
+    // re-render'lar arasında REFERANS olarak STABİL kalmalı. Aksi halde bunları
+    // useEffect/useMemo/useCallback bağımlılığı olarak kullanan bileşenler (CommandPalette,
+    // AdminRealtimeNotifications) sonsuz re-render döngüsüne girer → admin paneli donar.
+    it('returns referentially STABLE functions/object across re-renders (no infinite loop)', () => {
+        (useAuth as Mock).mockReturnValue({ role: 'super_admin', loading: false, roleLoading: false });
+
+        const { result, rerender } = renderHook(() => useRole());
+
+        const first = result.current;
+        rerender();
+        rerender();
+        const second = result.current;
+
+        expect(second.canAccess).toBe(first.canAccess);
+        expect(second.canWrite).toBe(first.canWrite);
+        expect(second).toBe(first); // memoized object identity preserved
+    });
+
+    it('recomputes the bound functions when the role CHANGES', () => {
+        (useAuth as Mock).mockReturnValue({ role: 'viewer', loading: false, roleLoading: false });
+        const { result, rerender } = renderHook(() => useRole());
+        const viewerCanWrite = result.current.canWrite;
+
+        (useAuth as Mock).mockReturnValue({ role: 'super_admin', loading: false, roleLoading: false });
+        rerender();
+
+        expect(result.current.canWrite).not.toBe(viewerCanWrite);
+        expect(result.current.canWrite('users')).toBe(true);
+    });
 });

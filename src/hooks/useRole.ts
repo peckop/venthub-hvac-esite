@@ -1,4 +1,6 @@
-import { canAccessPage, canWrite, isReadOnly } from '../lib/rbac'
+import { useCallback, useMemo } from 'react'
+
+import { canAccessPage, canWrite as canWriteRbac, isReadOnly } from '../lib/rbac'
 import { useAuth } from './useAuth'
 
 /**
@@ -33,12 +35,20 @@ export function useRole() {
     const { role, loading: authLoading, roleLoading } = useAuth()
     const loading = authLoading || roleLoading
 
-    return {
+    // KRİTİK: Bu fonksiyonlar REFERANS olarak STABİL olmalı. useRole'u tüketen
+    // bileşenler (CommandPalette, AdminRealtimeNotifications) bunları useMemo/useCallback/
+    // useEffect bağımlılığı olarak kullanıyor. Her render'da yeni fonksiyon dönersek
+    // o bağımlılıklar sürekli değişir → effect'ler her render'da yeniden çalışır →
+    // setState → re-render → SONSUZ DÖNGÜ (admin paneli donar). role değişmedikçe sabit kal.
+    const canAccess = useCallback((path: string) => canAccessPage(role, path), [role])
+    const canWrite = useCallback((entity: string) => canWriteRbac(role, entity), [role])
+
+    return useMemo(() => ({
         role,
         loading,
         roleLoading,
-        canAccess: (path: string) => canAccessPage(role, path),
-        canWrite: (entity: string) => canWrite(role, entity),
+        canAccess,
+        canWrite,
         isReadOnly: isReadOnly(role)
-    }
+    }), [role, loading, roleLoading, canAccess, canWrite])
 }
