@@ -26,6 +26,18 @@
 - **Kilit dosyalar:** `src/components/products/3d/core/SceneLightingRig.tsx` (ışık), `src/config/orbitalCarouselConfig.ts` + `OrbitalProductsShowcase.tsx`→`Category3DIcon`→`ProductModelRenderer` (framing/boyut), bu pano (yalnız bu bölüm)
 - **Durum:** ✅ conformance kapandı (re-audit 36 dosya/34 temiz · INV-3D-1/2/5/7 canlı · BlueprintCanvas Suspense #396 · audit §0 reconciliation) + Wave3-6 + recipe (FlexibleDuct/DuctFan) + ProductModelRenderer rename hepsi master'da → 🟡 GÖRSEL: ışık v3 #399 (onay bekliyor) → sıradaki: (2) ürün çok-yakın framing · (3) per-model boyut normalizasyon · sonra materyal/post + ordu cila. Tam durum → memory `3d-visual-quality-phase`.
 
+### Controller #3 — katalog/ticaret şeridi
+- **Aktif (2026-06-19) — FİYAT CETVELİ YAZILDI, Recep incelemesinde:** Bu şerit = ürün kataloğunu **doğru kategori + doğru fiyatla** doldurma (full ürün yüklemesinin ön-koşulları). Yürüten: ben (Controller) + Antigravity worker (ürün çıkarım). **İzole worktree'de çalışılır** (`docs/catalog-commerce-foundation` dalı) — paylaşılan ana dizin ikiz tarafından dal-değiştirildiğinden burada commit'lenmemiş iş kaybolur (yaşandı).
+- **Yapıldı:** boş kategori gizleme `#435` (`get_category_counts` RPC + CategoryContext tek-nokta filtre, SaaS-uyumlu) · ürün kategorizasyon düzeltme `#436` (67 `category_id=alt` normalize + 12 orphan; prod'a uygulandı; 0 tutarsızlık) · Avensair NLM defteri **24/24** (web kataloğuyla doğrulandı) · kategori cetveli `category-taxonomy-standard.md` v1.1 · **fiyat cetveli `pricing-standard.md` v1.0** (3 paralel araştırma ajanı: Odoo/SAP/Salesforce CPQ + çoklu-para/KDV + canlı yer-gerçeği).
+- **ZORUNLU SIRA (her biri öncekine BAĞIMLI — bu yüzden ürün yükleme EN SONDA):**
+  1. **Taksonomi** Avensair'e oturt (hâlâ Vortice-şekilli) + TR render doğrula + HRV slug + çatı-fan böl
+  2. **Fiyat altyapısı build** (`pricing-standard.md §15`): F0 maliyet+parite (products kolonları + `currency_rates` + TCMB günlük job) → F1 marj motoru (`pricing_rule` + `resolvePrice`, = bayi **R2**) → R0–R5 → B1 admin panel → B2 seed → 359 ürün göç
+  3. **Ürün yükleme** (PDF→Supabase, Antigravity worker — araç=skill `.agent/skills/venthub-catalog-importer` HAZIR, **RUN bekliyor**)
+  4. **29 borç-ürün** modele oturt (sabit ×46,83 TL sil → € alış + marj + kur + KDV)
+- **Bağımlılık kuralı:** ürün yükleme yanlış kategori/fiyatla koşarsa = 29-ürün fiyat borcunun **×100'ü**. Taksonomi + fiyat **ÖNCE**, yükleme **SONRA**. (Worker'ın işi doğru sırada bekliyor; "el atma" değil ön-koşul.)
+- **Fiyat kararları (cetvel kilidi):** fiyat **TÜRETİLİR** (cache; elle-yazma yok) · marj merdiveni **ürün > MARKA > kategori > global** (en-özel-kazanır) · base=TRY + **iki kur** (tedarik=snapshot / gösterim=canlı) + TCMB · **NET sakla**, B2C-dahil / B2B-hariç. INV-PRICE-1..4 conformance tanımlı.
+- **İlişki:** bu şerit admin/3D şeritlerine ⟂ (dik); fiyat build'i bayi **R2/R5/B2** ile ÖRTÜŞÜR (`pricing-standard §15` entegre). ⚠️ `catalog-ingestion-standard.md` hafızada "var" sanılıyordu, tree'de **YOK** (skill var: `.agent/skills/venthub-catalog-importer`) → yazılacak. Memory: `pricing-currency-requirements` · `category-taxonomy-state` · `catalog-ingestion-system` · `documents-are-the-decision` · `avensair-delivery-roadmap`.
+
 ---
 
 ## Büyük Resim (zincir)
@@ -45,6 +57,7 @@
 - `docs/standards/admin-standard.md` (admin NASIL — **§10 shell standardı + §10.4 17-madde cetvel** dahil), `admin-capabilities.md` (admin NE — **§4.5 enterprise açık registry** dahil)
 - `docs/standards/dealer-network-standard.md` (B2B domain), `dealer-module-blueprint.md` (R0→B2)
 - 🆕 `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller'lar + ortak Antigravity worker; controller↔controller şerit sahipliği + worktree izolasyonu; bir-iş-bir-dal; deterministik kapı; doküman SSOT). Tüm ajanlar buna uyar; brief'ler buna referans verir.
+- 🆕 **Katalog/ticaret kolu (2026-06-19):** `docs/standards/category-taxonomy-standard.md` (kategori taksonomisi v1.1) + `docs/standards/pricing-standard.md` (**fiyat/para-birimi/marj v1.0** — maliyet-artı motor, ürün>marka>kategori>global marj merdiveni, çoklu-para/parite/KDV, R0–R5 entegre build sırası). ⚠️ `catalog-ingestion-standard.md` (worker ürün-çıkarım cetveli) tree'de **YOK** — skill var, cetvel yazılacak.
 - ❌ **EKSİK STANDART:** müşteri-hesap / storefront-UX cetveli YOK → `docs/standards/customer-account-standard.md` yazılacak (yeni domain, admin-standard'ın müşteri-tarafı karşılığı)
 
 ### B) ANALİZ (cetvelle mevcut uygulamayı ölç)
