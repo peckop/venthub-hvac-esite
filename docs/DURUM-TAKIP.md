@@ -110,6 +110,12 @@
 | B1 | bayi/fiyat admin paneli (admin-standard'a göre) | ⬜ |
 | B2 | product_prices seed + uçtan-uca kanıt = "Avensair-hazır" | ⬜ |
 
+> 🔒 **İzolasyon ön-koşulu (denetim 2026-06-20):** R4 (`organizations`/`user_projects`/`project_items` `tenant_id` + RLS)
+> ve R5, bayi-CPQ iş mantığından (B1/B2) **bağımsız bir güvenlik işidir.** Bugün tek kiracı (`DEFAULT_TENANT_ID`)
+> olduğu için sızıntı **YOK**; ama **2. kiracı (Avensair white-label / SaaS Faz 2) eklenmeden ÖNCE R4 zorunludur**
+> (data-bleeding kapısı). Yani R4'ü bayi modülünün en-son sırasına **rehin bırakma** — gerektiğinde bayi-CPQ'yu
+> beklemeden öne çekilebilir.
+
 ---
 
 ## Sabit Kararlar (gerekçeli)

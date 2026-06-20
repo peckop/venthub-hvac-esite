@@ -88,6 +88,10 @@ düşen contract-maddelerini toplu çözdü:
 - **Stratejik bağlam:** `faz2-admin-backlog` + `dealer-pivot-decision` gereği bu kalan iş **bilinçli
   ertelendi**; öncelik bayi modülü (R0→B2). Bu skor o kararı çürütmüyor — "admin yeterince iyi, bayiye geç" tezini güçlendiriyor.
 
+> ⚠️ **DÜZELTME (aynı gün, sonradan — 2026-06-17 akşamı):** Yukarıdaki "bayiye geç / öncelik bayi modülü"
+> tezi **tersine çevrildi** → güncel karar **admin-önce, bayi-son** (`docs/DURUM-TAKIP.md`). Skorun yükselişi
+> "bayiye geç"i değil, **admin'i sıfır-hata kaleye tamamlama** önceliğini besliyor; bayi (R1–B2) EN SON.
+
 ---
 
 *Kaynak: 6 paralel Claude alt-ajanı (dosya:satır kanıtlı) + §8 cetvel + CodeGraph (kit-tüketici doğrulama)

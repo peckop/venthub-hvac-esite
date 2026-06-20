@@ -6,6 +6,12 @@
 >
 > **Çapa kararlar:** Avensair-önce (tek-kiracı, bayi-ağı) → sonra SaaS-hazır. Farklılaşma = domain moat.
 > Strateji memory: `avensair-dealer-focus`, `standard-first-strategy`, `venthub-vision`.
+>
+> ⛔ **SIRALAMA GÜNCELLENDİ (2026-06-17 · SSOT = `docs/DURUM-TAKIP.md`):** Yürütme önceliği artık
+> **admin-önce, bayi-son** (enterprise admin shell → yeni admin özellikleri → müşteri-hesap standardı →
+> **bayi R1–B2 EN SON**). Bu, `dealer-pivot-decision`'ı tersine çevirir. Bu dosyadaki "önce Avensair / §5
+> Avensair-önce yol haritası" **yürütme sırası olarak HÜKÜMSÜZDÜR**; içerik *ne-olmalı yetenek envanteri*
+> olarak geçerli kalır.
 
 ---
 
@@ -116,8 +122,11 @@ DoD'si için şart değil.
 
 ---
 
-## 5. Avensair-önce yol haritası (sıralı)
+## 5. Avensair-önce yol haritası (sıralı) — ⛔ YÜRÜTME SIRASI HÜKÜMSÜZ (2026-06-17)
 
+> ⛔ **SUPERSEDED (yürütme sırası):** Güncel öncelik **admin-önce, bayi-son** (`docs/DURUM-TAKIP.md`).
+> Aşağıdaki numaralı "bayi-önce" sıra **artık geçerli değil** — madde **içerikleri** referans kalır, **sırası** değil.
+>
 > ⚠️ **Bayi modülü sıralaması `dealer-module-blueprint.md §3`'e tabidir:** B1-B2 (panel/seed) ÖNCESİ
 > R0–R5 ONARIM şarttır. Aşağıdaki "bayi modülü" maddesi, blueprint'in onarım-sonra-inşa sırasına göre
 > okunmalı — kırık altyapı üstüne inşa olarak değil.
