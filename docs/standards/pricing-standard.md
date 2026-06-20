@@ -143,8 +143,10 @@ TL faturası **yasal otorite**; USD/EUR açıkça "tahmini" gösterim.
 ## 8. Segment overlay — mevcut `price_lists`/`product_prices` (R0–R5 onarır)
 
 - **Bu katman ZATEN VAR ama bozuk.** `price_lists` (3 satır, `user_type` segment) + `product_prices`
-  (**0 satır**) + `organizations.tier_level`. Çözücü `user_profiles.role`'u (staff-yetkisi) segmente bağlıyor →
-  asla tutmuyor → düz `products.price`.
+  (**0 satır**) + `organizations.tier_level`. Çözücü (= `getEffectivePriceInfo`/`getEffectiveUnitPrice` @
+  `src/lib/services/pricing.service.ts`, DI-uyumlu) `user_profiles.role`'u (staff-yetkisi) segmente bağlıyor →
+  asla tutmuyor → düz `products.price`. (Motor VAR; sale_price/discount_percentage/effective-dating dahil —
+  yeniden yazma, tier_level'a çevir + §3–5 katmanlarını ekle.)
 - **Doğru sözleşme:** segment = `organizations.tier_level` (role DEĞİL). `user → organization → tier_level →
   price_list → product_prices` → bulunamazsa maliyet-artı motor çıktısı (§3). (Karar: dealer-blueprint §2, B-minimal.)
 - **`product_prices` = motor çıktısının materialize cache'i:** `(product, price_list, currency)` başına net+gross.
