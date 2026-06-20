@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\products\page.tsx
-skeleton_hash: 25247ca60bdf661a
+skeleton_hash: 9f5bef9cd7a1d5bc
 entity_hashes:
   func:Page: 92a39fc420a9c185
   func:getCachedProducts: 13bd3816d5356001
   overview: 21dc1b0e4ca1a720
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -64,6 +64,20 @@ Bu modül, Next.js dil bazlı ürün listesi sayfasını sunucu tarafında yöne
 - `params`: `Promise<{ lang: string }>` — URL parametrelerini içeren asenktron nesne. Resolve edildiğinde lang (dil kodu) değerini döndürür.
 
 **Dönüş**: `React.JSX.Element` — CategoryMasterView bileşenini içeren Suspense sarmalı JSX yapısı döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../hooks/useTenant::TenantProvider
+- import: ../../../lib/type-converters::type { DomainProduct }
+- import: ../../../utils/tenantServer::getTenantConfig
+- import: ../../../views/CategoryMasterView::CategoryMasterView
+- import: @/i18n/dictionaries/en::en
+- import: @/i18n/dictionaries/tr::tr
+- import: @/lib/services/product.service::getProductsEnriched
+- import: @/lib/supabase/static::supabaseStaticClient
+- import: next/cache::unstable_cache
+- import: react::React
 
 ---
 

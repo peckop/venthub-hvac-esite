@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\CinematicProductShowcase.tsx
-skeleton_hash: bd9295ba809a1a28
+skeleton_hash: b257c0119503781f
 entity_hashes:
   func:CinematicProductShowcase: 3aa8752ddebafcfc
   func:Hotspot: de57d250f854e416
@@ -11,7 +11,7 @@ entity_hashes:
   func:handleMouseMove: 717aaec7fdab40a5
   overview: 543d609da89f6ecb
   style_tokens: f822c8b8db2eb0c1
-generated_at: 2026-06-09T06:46:02Z
+generated_at: 2026-06-19T20:47:08Z
 ---
 
 ## Genel Bakış
@@ -85,6 +85,20 @@ Bu modül, ürün görselleri üzerinde sinematik bir etkileşim deneyimi sunar.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: framer-motion::AnimatePresence
+- import: framer-motion::motion
+- import: framer-motion::useMotionValue
+- import: framer-motion::useSpring
+- import: framer-motion::useTransform
+- import: next/image::Image
+- import: react::React
+- import: react::useRef
+- import: react::useState
+
+---
+
 ## INTERFACES
 
 ### HotspotProps
@@ -99,11 +113,8 @@ Bu modül, ürün görselleri üzerinde sinematik bir etkileşim deneyimi sunar.
 
 ## SABİTLER
 - **productImages** (array) — `[
-
   { 
-
     src: '/images/vortice_lineo_futuristic.webp', 
-
     label: 'Futu...`
 
 ---

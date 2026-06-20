@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\supabase.ts
-skeleton_hash: b896a177a93a8a4e
+skeleton_hash: d0b01bf4098a6681
 entity_hashes:
   overview: 8a47b4c00ad1c0ec
-generated_at: 2026-06-08T08:57:37Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış
@@ -47,6 +47,12 @@ Bu modül, Supabase istemcisini conditional (koşullu) olarak başlatmak için t
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./supabase/client::supabaseBrowserClient
+- import: ./supabase/static::supabaseStaticClient
 
 ---
 

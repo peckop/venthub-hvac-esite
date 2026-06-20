@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\config\siteUrl.ts
-skeleton_hash: 983ce403cd9ecad5
+skeleton_hash: 9433c118e7c584d4
 entity_hashes:
   func:getSiteUrl: d80f85481d8cb42c
   overview: 90b68bbba66e5b1c
-generated_at: 2026-05-28T22:37:17Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış

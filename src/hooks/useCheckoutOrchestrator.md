@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutOrchestrator.ts
-skeleton_hash: 412e20bbf706ee7a
+skeleton_hash: 72f54dc5d3bb3c5f
 entity_hashes:
   func:useCheckoutOrchestrator: 6b4ccd36fef055f6
   overview: ac952b0f8fb06046
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -36,6 +36,20 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**:
 - Bu hook herhangi bir giriş parametresi almamaktadır, doğrudan import edildiği yerde çağrılarak kullanılır.
 **Dönüş**: Resmi olarak tanımlanmış bir dönüş tipi bulunmamaktadır. İçerisinde yönettiği tüm checkout sürecine ait durum değişkenleri, adım geçiş işleyicileri, hata yönetimi fonksiyonları ve servis entegrasyon metotlarını hook'u kullanan tüm bileşenlere erişime sunar, böylece checkout akışına dahil olan her alt bileşen bu merkezi yönetim araçlarını sorunsuz bir şekilde kullanabilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: ../lib/services/invoice.service::listInvoiceProfiles
+- import: ./useAuth::useAuth
+- import: @/lib/services/address.service::listAddresses
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @/types/ui-models::type { InvoiceProfile,UserAddress }
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useState
+- import: sonner::toast
 
 ---
 

@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\config\applications.ts
-skeleton_hash: cffc3542d82ab37c
+skeleton_hash: 84fb188054b08725
 entity_hashes:
   overview: 2544d4d89196ebc3
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış

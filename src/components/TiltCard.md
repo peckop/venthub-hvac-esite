@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\TiltCard.tsx
-skeleton_hash: 11168335cd8d8a31
+skeleton_hash: 5e75a79e673d1227
 entity_hashes:
   func:TiltCard: bfd1d2a43ccba8c3
   func:clamp: 6b6f2a3bb4b3c92e
@@ -12,7 +12,7 @@ entity_hashes:
   func:onMove: 855a2394d5f31485
   overview: 49812a020a38dab5
   style_tokens: 9c70068ed275c69c
-generated_at: 2026-06-12T10:19:16Z
+generated_at: 2026-06-19T20:47:39Z
 ---
 
 ## Genel Bakış
@@ -88,6 +88,13 @@ Bu modül, fare hareketleriyle 3D eğilme efekti yaratan bir React bileşeni old
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: react::React
+- import: react::useRef
+- import: react::useState
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: TiltCard.tsx::clamp
@@ -106,8 +113,8 @@ graph TD
     TiltCard_tsx__onEnter["onEnter"]
     TiltCard_tsx__onLeave["onLeave"]
     TiltCard_tsx__onMove["onMove"]
-    TiltCard_tsx__TiltCard --> TiltCard_tsx__onMove
     TiltCard_tsx__TiltCard --> TiltCard_tsx__clamp
+    TiltCard_tsx__TiltCard --> TiltCard_tsx__onMove
 ```
 
 ## NODE ID STANDARD

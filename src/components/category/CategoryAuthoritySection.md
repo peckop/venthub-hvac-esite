@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\CategoryAuthoritySection.tsx
-skeleton_hash: 905505f73911b038
+skeleton_hash: cf3869705441c5ed
 entity_hashes:
   func:CategoryAuthoritySection: 9f02783a8649aa44
   overview: d22be28e083a031c
   style_tokens: 5f18a598ea81d3a4
-generated_at: 2026-06-08T10:08:47Z
+generated_at: 2026-06-19T20:47:06Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,13 @@ Bu modül, `content` propunun sağlanması ve belirli bir yapıda olması üzeri
 **Parametreler**:
 - content: any — Kategori sayfasında gösterilecek otorite bloklarını içeren veri yapısı (örneğin blokların dizisi veya nesnesi).  
 **Dönüş**: React elementi (JSX) olarak render edilen otorite bölümü; işlev bir `React.FC` tipinde olduğu için null veya geçerli bir JSX döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/components/authority/AuthorityRenderer::AuthorityRenderer
+- import: @/types/authority::AuthorityContent
+- import: react::React
 
 ---
 

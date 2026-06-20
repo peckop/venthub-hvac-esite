@@ -3,58 +3,65 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SubcategoryFlow.tsx
-skeleton_hash: 2ba496ffc2012924
+skeleton_hash: fc18bc9a6d3cb242
 entity_hashes:
   func:ScrollingLane: f84481d0c85d01e8
-  func:SubcategoryCard: cd96e8043ed6039d
+  func:SubcategoryCard: 8d03ff04e35ca36b
   func:SubcategoryFlow: 9dafb4b55b36d1b9
-  overview: 55b8eed097840887
+  overview: 880820013b14bb80
   style_tokens: 329d32771128cbd3
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformunda ana kategorilere bağlı alt kategorileri etkileşimli bir akış (kaydırılabilir kartlar) olarak sunan React modülüdür. Modül, alt kategorileri bireysel kartlar halinde gösteren ve bu kartları belirli bir yönde kaydıran bileşenlerden oluşur. Kullanıcılar, bu akış sayesinde ilgili alt kategorilere kolayca göz atabilir ve erişebilir.
+VentHub HVAC platformunda, ana kategorilere bağlı alt kategorileri etkileşimli bir kaydırılabilir akış olarak sunan React modülüdür. Modül, alt kategorileri bireysel kartlar halinde görselleştirir ve bu kartları belirli bir yönde ve hızda kaydırarak kullanıcıların ilgili ürünlere kolayca göz atmasını sağlar. Üst düzey yapılandırma ve başlık gibi genel ayarları merkezi bir bileşen üzerinden yönetir.
 
 ## Fonksiyon Grupları
-### Akış Kontrolcüsü
-Modülün üst düzey bileşeni olarak, tüm alt kategori akışının yapılandırmasını ve başlık gibi genel ayarlarını yönetir. Diğer alt bileşenleri bir araya getirerek tutarlı bir arayüz sunar.
+### Akış Yapısı ve Konfigürasyonu
+Modülün üst düzey giriş bileşeni olarak, tüm akışın başlığını ve yapılandırmasını yönetir. Diğer alt bileşenleri bir araya getirerek veri akışını ve genel görünümü koordine eder.
 - SubcategoryFlow
 
-### Kaydırma ve Kart Gösterimi
-Alt kategorilerin kaydırılabilir bir şerit (kanal) içinde düzenlenmesini ve her bir alt kategorinin kart olarak görselleştirilmesini sağlar. Kaydırma yönü ve hızı gibi parametrelerle akışın akıcılığı ve kullanıcı deneyimi kontrol edilebilir.
-- ScrollingLane, SubcategoryCard
+### Görsel Kartlar ve Kaydırma Mekanizması
+Alt kategorilerin bireysel kartlar olarak görselleştirilmesini ve bu kartların otomatik kaydırılan bir şerit içinde sunulmasını sağlar. Kaydırma yönü ve hızı gibi dinamik parametrelerle kullanıcı deneyimini özelleştirir.
+- SubcategoryCard, ScrollingLane
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için temel mimari varsayımlar, bileşenlerin doğru veri tiplerine ve işlevsel parametrelere dayanır.
+Bu modül, bir kart gösterim sistemi ve üzerinde kaydırma sağlayan bir lane yapısından oluşur. Aşağıdaki varsayımlar fonksiyon imzalarından türetilmiştir.
 
-**[Aksiyom 1]:** `SubcategoryCard` bileşeni için `subcategory` prop'u sağlanmazsa, bileşen düzgün render edilemez ve olası bir hataya yol açar (bu durum, parent bileşenin `subcategories` dizisindeki her eleman için bu bileşeni çağırmasıyla yönetilir).
+[Aksiyom 1]: Eğer `SubcategoryCard` bileşenine `subcategory` prop'u sağlanmazsa, kart doğru bilgi gösteremez.
 
-**[Aksiyom 2]:** `ScrollingLane` bileşeni için `direction` parametresi `'left'` veya `'right'` değerlerinden biri olarak belirtilmezse, bileşen beklenmeyen bir yönde kaydırma yaparak kullanıcı arayüzünde tutarsızlığa neden olur.
+[Aksiyom 2]: Eğer `SubcategoryCard` bileşenine `parentSlug` prop'u sağlanmazsa, üst kategori referansı kaybolur ve navigasyon tutarsız olur.
 
-**[Aksiyom 3]:** `ScrollingLane` bileşeni için `speed` parametresi, kaydırma hızını belirleyen pozitif bir sayısal değer olarak sağlanmazsa, animasyonun süresi veya hızı tanımsız olur ve kaydırma efekti çalışmaz.
+[Aksiyom 3]: Eğer `ScrollingLane` bileşenine `subcategories` prop'u (`DomainCategory[]` dizisi) sağlanmazsa, kaydırılacak kart oluşturulamaz.
 
-**[Aksiyom 4]:** `SubcategoryFlow` ana bileşeni, `SubcategoryCard` bileşenini çağırırken her bir `subcategory` objesinin `ScrollingLane` bileşeninin beklediği `DomainCategory` tipine uygun verileri içermesi gerekir; aksi halde bileşenler arası veri akışı bozulur.
+[Aksiyom 4]: Eğer `ScrollingLane` bileşenine `parentSlug` prop'u sağlanmazsa, lane içindeki kartlar üst kategori bağlamından kopuk kalır.
 
-**[Aksiyom 5]:** `SubcategoryFlow` bileşeni, `title` prop'u verilmediğinde varsayılan `'Alt Kategoriler'` değerini kullanır; bu değer, akışın üst kısmında görüntülenecek metin için bir gerekliliktir.
+[Aksiyom 5]: Eğer `ScrollingLane` bileşenine `direction` prop'u sağlanmazsa, varsayılan olarak `'left'` yönünde kaydırma uygulanır.
+
+[Aksiyom 6]: Eğer `ScrollingLane` bileşenine `speed` prop'u sağlanmazsa, varsayılan olarak `25` hız değerinde kaydırma uygulanır.
+
+[Aksiyom 7]: Eğer `SubcategoryFlow` bileşenine `title` prop'u sağlanmazsa, başlık olarak `'Alt Kategoriler'` metni kullanılır.
+
+[Aksiyom 8]: Eğer `ScrollingLane`'e geçilen `direction` değeri `'left'` veya `'right'` değerlerinden biri değilse, kaydırma yönü tanımsız olur.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### SubcategoryCard
-**Ne yapar**: Tek bir alt kategoriyi tıklanabilir bir kart olarak render eder. Kullanıcı bu karta tıklandığında ilgili kategori sayfasına yönlendirilir. Kart, ikon, başlık ve hover durumunda ok ikonu gibi görsel elemanları içerir.
 
-**Nasıl yapar**: `Link` bileşeni içinde `div` yapısı oluşturarak kartı tasarlar. Hover durumunda ölçeklendirme, gölge ve renk geçiş efektleri uygulanır. `getCategoryDisplayName` fonksiyonu ile kategorinin gösterilecek adını alır ve ilk harfi ikon dairesinde, tamamı başlık alanında gösterilir.
+**Ne yapar**: Bu bileşen, bir alt kategoriyi kart olarak görsel şekilde sunar. Kullanıcı bu karta tıkladığında ilgili alt kategorinin detay sayfasına yönlendirilir. Kart içinde kategorinin baş harfi bir daire içinde gösterilir ve kategorinin tam adı altında yer alır.
+
+**Nasıl yapar**: Bileşen, `useLocalizedRoutes` hook'unu kullanarak yerelleştirilmiş rota nesnesini alır ve `Routes.category` metoduyla parent slug ile alt kategori slug'ını birleştirerek dinamik bir URL oluşturur. Oluşturulan URL, Next.js'in `Link` bileşeni ile sarmalanır. Kartın görsel tasarımı tamamen Tailwind CSS sınıflarıyla yapılır; hover durumunda ölçeklenme (`hover:scale-105`), gölge artışı ve kenarlık rengi değişimi ile interaktif bir deneyim sunulur. Kategorinin.display adının ilk harfi, gradient arka planlı dairesel bir ikon alanında render edilir. `getCategoryDisplayName` yardımcı fonksiyonu ile kategorinin kullanıcıya gösterilecek metin adı alınır. Kartın sağ alt köşesinde, fare üzerine gelindiğinde beliren bir ok ikonu ile navigasyon ipucu verilir.
 
 **Parametreler**:
-- subcategory: `DomainCategory` — Gösterilecek alt kategori nesnesi, id ve slug gibi bilgileri içerir
-- parentSlug: `string` — Üst kategorinin URL slug'ı, link oluşturma için kullanılır
+- `subcategory` — `Subcategory` tipinde (SubcategoryCardProps interface'i içinden) — Görsel olarak sunulacak alt kategori nesnesi. İçerisinde `slug` gibi rota oluşturmada kullanılan ve `getCategoryDisplayName` fonksiyonuna gerekli bilgileri sağlayan alanları barındırır.
+- `parentSlug` — `string` tipinde (SubcategoryCardProps interface'i içinden) — Alt kategorinin bağlı olduğu üst kategorinin URL parçacığı. Rota oluştururken `Routes.category` metoduna birinci parametre olarak geçilir ve tam navigasyon yolunun bir parçası olur.
 
-**Dönüş**: `React.JSX.Element` — Oluşturulan kart JSX'i döner
+**Dönüş**: `JSX.Element` — Bileşen, bir `Link` içinde sarılmış bir `div` yapısını döndürür. Bu yapı, tıklanabilir bir kart layout'u oluşturur ve alt kategoriyi temsil eden görsel kartı render eder.
 
 ### ScrollingLane
 **Ne yapar**: Birden fazla alt kategori öğesini kaydırılabilir bir yatay şerit içinde sunan React bileşenidir. Kullanıcıların çok sayıda alt kategori arasında kolayca gezinebilmesini sağlar, kaydırma yönü ve hızı gibi özellikler isteğe bağlı olarak özelleştirilebilir. Genellikle ekran alanını verimli kullanmak için yatay kaydırılabilir liste ihtiyacını karşılar.
@@ -75,6 +82,17 @@ Bu modül için temel mimari varsayımlar, bileşenlerin doğru veri tiplerine v
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../contexts/CategoryContext::useCategories
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: ../lib/type-converters::DomainCategory
+- import: ../utils/categoryHelpers::getCategoryDisplayName
+- import: next/link::Link
+- import: react::React
+- import: react::useMemo
+
+---
+
 ## INTERFACES
 
 ### SubcategoryCardProps
@@ -89,31 +107,40 @@ Bu modül için temel mimari varsayımlar, bileşenlerin doğru veri tiplerine v
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: SubcategoryFlow.tsx::SubcategoryCard
-- **params**: `(subcategory: SubcategoryCardProps['subcategory'], parentSlug: string)`
-- **ic_degiskenler**: (yok — saf render fonksiyonu, yerel değişken yok)
-- **Dönüş**: JSX (Link bileşeni sarmaladığı bir div kart yapısı)
+- **params**:
+  - `subcategory` — Tek bir alt kategorinin DomainCategory verisi, kart üzerinde ad ve ikon bilgisi olarak kullanılır
+  - `parentSlug` — Üst kategorinin URL slug'ı, Link href oluşturmak için kullanılır
+- **ic_degiskenler**:
+  - `Routes` — `useLocalizedRoutes()` hook çağrısından dönen lokalize rota yardımcı nesnesi; `Routes.category(parentSlug, subcategory.slug)` ile Link href'i üretilir
+- **Dönüş**: yok (JSX döner — Link > div yapısı içinde kategori kartı render eder; ikon dairesi, başlık ve hover ok göstergesi)
+
+---
 
 ### [N2_NASIL] AST Pointer: SubcategoryFlow.tsx::ScrollingLane
-- **params**: `(subcategories: DomainCategory[], parentSlug: string, direction: 'left' | 'right' (varsayılan 'left'), speed: number (varsayılan 25))`
+- **params**:
+  - `subcategories` — `DomainCategory[]` türünde alt kategori dizisi, lane içindeki kartlar olarak render edilir
+  - `parentSlug` — Üst kategorinin URL slug'ı, her SubcategoryCard'a prop olarak iletilir
+  - `direction` — `'left'` veya `'right'` (varsayılan `'left'`); hangi yönde kaydırma animasyonu uygulanacağını belirler
+  - `speed` — `number` türünde (varsayılan `25`); kaydırma animasyon süresini saniye cinsinden belirler
 - **ic_degiskenler**:
-  - `items` — `subcategories` dizisinin 3 kez tekrarlanarak birleştirilmiş hali (`[...subcategories, ...subcategories, ...subcategories]`); kesintisiz döngüsel kaydırma animasyonu sağlamak için kullanılır
-- **Dönüş**: JSX (overflow-hidden container içinde `flex gap-3` ile kaydırma animasyonlu `SubcategoryCard` listesi)
+  - `items` — `subcategories` dizisinin 3 kez tekrarıyla oluşturulur (`[...subcategories, ...subcategories, ...subcategories]`); sonsuz döngü kaydırma efekti için seamless loop sağlar
+- **Dönüş**: yok (JSX döner — overflow-hidden container içinde `items.map()` ile SubcategoryCard bileşenlerini render eder; animasyon sınıfı ve süresi direction/speed'e göre ayarlanır)
+
+---
 
 ### [N3_NASIL] AST Pointer: SubcategoryFlow.tsx::SubcategoryFlow
-- **params**: `(title: string (varsayılan 'Alt Kategoriler'))`
+- **params**:
+  - `title` — `string` (varsayılan `'Alt Kategoriler'`); bölüm başlığında gösterilecek metin
 - **ic_degiskenler**:
-  - `allCategories` — `useCategories()` hook'undan gelen tüm kategoriler dizisi (`categories` destructured alanı)
-  - `loading` — `useCategories()` hook'undan gelen yükleme durumu boolean değeri
-  - `subcategoriesWithParent` — `useMemo` ile hesaplanan; her alt kategorinin `parentSlug` eşlik ettiği `{ subcategory, parentSlug }` nesnelerinden oluşan dizi; `allCategories` bağımlılığı ile memoize edilir
-  - `mainCategories` — (useMemo içi) `parent_id`'si olmayan üst kategoriler (`allCategories.filter(c => !c.parent_id)`)
-  - `subCategories` — (useMemo içi) `parent_id`'si olan alt kategoriler (`allCategories.filter(c => !!c.parent_id)`)
-  - `mainCategoryMap` — (useMemo içi) üst kategorilerin `id` Anahtarlı `Map` yapısı; alt kategorilerin parent'ını bulmak için kullanılır
-  - `sub` — (useMemo map callback'i) o an işlenen alt kategori nesnesi
-  - `parent` — (useMemo map callback'i) `mainCategoryMap.get(sub.parent_id || '')` ile bulunan üst kategori nesnesi; `parent?.slug` değeri `parentSlug` olarak döndürülür
-  - `s` — (useMemo filter callback'i) her bir `{ subcategory, parentSlug }` çifti; `s.parentSlug` dolu olan ve `s.subcategory.slug !== s.parentSlug` koşulunu sağlayanlar filtrelenir
-  - `lane1` — `useMemo` ile `subcategoriesWithParent` dizisinin çift indeksli (`i % 2 === 0`) elemanları; birinci kaydırma şeridi için kullanılır
-  - `lane2` — `useMemo` ile `subcategoriesWithParent` dizisinin tek indeksli (`i % 2 === 1`) elemanları; ikinci kaydırma şeridi için kullanılır
-- **Dönüş**: `React.FC<SubcategoryFlowProps>` — JSX (`<section>` içinde başlık, animasyon `<style>` bloğu, iki adet `ScrollingLane` ve gradient overlay'ler) veya `loading` durumunda skeleton placeholder JSX'i veya `subcategoriesWithParent.length < 4` koşulunda `null`
+  - `allCategories` — `useCategories()` hook'undan `{ categories, loading }` destructuring ile alınan tüm kategoriler dizisi; alt ve üst kategorileri ayırmak için kullanılır
+  - `loading` — `useCategories()` hook'undan gelen boolean; true ise skeleton/pulse placeholder render edilir
+  - `subcategoriesWithParent` — `useMemo` ile hesaplanan `{ subcategory: DomainCategory, parentSlug: string }[]` dizisi; parent_id'si olmayanları (main) Map'e koyup, parent_id'si olanları (sub) parent slug eşleştirmesiyle birleştirir, `parentSlug` boş olanları ve kendi slug'ını parent slug olarak kullananları filtreler
+  - `mainCategories` — `subcategoriesWithParent` memo içinde: `allCategories.filter(c => !c.parent_id)` ile elde edilen üst kategoriler dizisi
+  - `subCategories` — `subcategoriesWithParent` memo içinde: `allCategories.filter(c => !!c.parent_id)` ile elde edilen alt kategoriler dizisi
+  - `mainCategoryMap` — `mainCategories` dizisinden oluşturulan `Map<string|number, DomainCategory>`; `id` -> kategori eşlemesi yaparak parent slug lookup'ını hızlandırır
+  - `lane1` — `useMemo` ile `subcategoriesWithParent`'ın çift indekslilerini (`i % 2 === 0`) içeren ilk şerit dizisi
+  - `lane2` — `useMemo` ile `subcategoriesWithParent`'ın tek indekslilerini (`i % 2 === 1`) içeren ikinci şerit dizisi
+- **Dönüş**: `React.FC<SubcategoryFlowProps>` — loading ise skeleton pulse div döner; `subcategoriesWithParent.length < 4` ise `null` döner (yeterli alt kategori yoksa render etmez); aksi halde `<style>` (inline CSS keyframe animasyonları: `subcat-scroll-left`, `subcat-scroll-right`, hover'da `animation-play-state: paused`) ve `<section>` (başlık + gradient overlay'ler + iki adet `ScrollingLane` bileşeni, lane2 varsa ikinci lane de eklenir) JSX'i döner
 
 ---
 

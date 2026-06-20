@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SearchOverlay.tsx
-skeleton_hash: 94fc11a8f3e4a0d3
+skeleton_hash: eae5fa6223b78c04
 entity_hashes:
   func:SearchOverlay: 5877a83b84daa2a4
   func:addToRecent: bf8c952c533ee587
@@ -14,9 +14,9 @@ entity_hashes:
   func:renderResults: e506feef4e55d367
   func:renderSuggestion: 843bcfdde37f5fbe
   func:renderSuggestions: 8f7a31a904a04209
-  overview: 7f4ffbd07796d9de
+  overview: ceaa8c1ba8de6a35
   style_tokens: dd6869457e23a7f7
-generated_at: 2026-06-14T22:16:29Z
+generated_at: 2026-06-19T20:48:58Z
 ---
 
 ## Genel Bakış
@@ -44,7 +44,23 @@ Bileşenin farklı durumlarını (boş ekran, öneriler listesi, sonuç görün�
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, arama arayüzü akışını yöneten React bileşenidir. Aşağıdaki mimari varsayımlar, fonksiyon imzalarından türetilmiştir.
+Bu modül, arama overlay'ının durum yönetimi ve arama akışını kontrol eden bir React bileşenidir.
+
+[Aksiyom 1]: Eğer `open` prop'u verilmemiş veya `onClose` callback tanımlı değilse, SearchOverlay bileşeni arama overlay'ını gösteremez veya kapatma akışını yönetemez.
+
+[Aksiyom 2]: Eğer `addToRecent` fonksiyonu boş bir string (`""`) ile çağrılırsa, recent arama geçmişine geçersiz bir terim eklenir.
+
+[Aksiyom 3]: Eğer `performFullSearch` çalıştırıldığında geçerli bir `term` string'i sağlanmazsa, async arama işlemi anlamsız bir sorgu ile çalışır veya başarısız olur.
+
+[Aksiyom 4]: Eğer `performFullSearch` sırasında network isteği veya arama motoru erişilemez durumdaysa, fonksiyon promise reject veya hata fırlatır ve bileşenin hata yönetimine devretmesi gerekir.
+
+[Aksiyom 5]: Eğer `renderSuggestion` fonksiyonu `SearchSuggestion` tipinde geçerli bir nesne yerine `null` veya `undefined` alırsa, suggestion render edilemez ve index (`idx`) değeri anlamsız olur.
+
+[Aksiyom 6]: Eğer `handleKeyDown` fonksiyonu geçerli bir `React.KeyboardEvent` yerine geçersiz bir event ile çağrılırsa, tuş bazlı arama akış kontrolü (Enter ile arama, Escape ile kapatma vb.) çalışamaz.
+
+[Aksiyom 7]: Bileşenin iç durumu (idle / suggestions / results)之间 geçiş, `performFullSearch` sonucuna veya kullanıcının arama terimi girişine bağlıdır — eğer bu geçiş mekanizması bozulursa, `renderIdle`, `renderSuggestions` veya `renderResults` fonksiyonları yanlış durumda render edilir.
+
+[Aksiyom 8]: Eğer `onClose` callback'i çalışmazsa veya bileşen bu callback'i tetiklemezse, kullanıcı arama overlay'ından çıkamaz ve bileşen açık kalır.
 
 ---
 
@@ -116,11 +132,11 @@ Bu modül, arama arayüzü akışını yöneten React bileşenidir. Aşağıdaki
 
 ## İTHALATLAR (IMPORTS)
 - import: ../contexts/CategoryContext::useCategories
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
 - import: ../lib/supabase/client::supabaseBrowserClient
 - import: ../types/db-rows::type { DbCategory }
 - import: ../utils/getCategoryIcon::getCategoryIcon
-- import: ../utils/routes::Routes
 - import: ../utils/searchHighlight::highlightMatch
 - import: @/types/ui-models::type { FtsProductResult, SearchSuggestion }
 - import: next/image::Image
@@ -148,165 +164,226 @@ type ViewState = 'IDLE' | 'SUGGESTING' | 'RESULTS'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/SearchOverlay.tsx::SearchOverlay
-- **params**: `{ open, onClose }` — overlay açılır/kapalı durumu ve kapanma callback'i
+### [N1_NASIL] AST Pointer: SearchOverlay.tsx::SearchOverlay
+- **params**: `{ open, onClose }`
 - **ic_degiskenler**:
-  - `router` — Next.js navigation hook'u, sayfa yönlendirme için
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
-  - `listRef` — useRef ile oluşturulan liste DOM referansı, scroll kontrolü için
-  - `inputRef` — useRef ile oluşturulan input DOM referansı, otomatik odaklama için
-  - `q` — useState, kullanıcının arama giriş değeri
-  - `debounced` — useState, gecikmeli arama terimi (200ms debounce)
-  - `viewState` — useState<'IDLE' | 'SUGGESTING' | 'RESULTS'>, mevcut görünüm durumu
-  - `suggestions` — useState<SearchSuggestion[]>[], öneri listesi
-  - `results` — useState<FtsProductResult[]>[], tam arama sonuçları
-  - `recentSearches` — useState<string>[], son arama terimleri listesi
-  - `loading` — useState<boolean>, yükleme durumu
-  - `error` — useState<string | null>, hata mesajı
-  - `activeIndex` — useState<number>, klavye ile seçili öğe indeksi (-1 = hiçbirini seçili değil)
-  - `globalCategories` — useCategories() hook'undan gelen tüm kategoriler
-  - `supabaseBrowserClient` — Supabase istemci instance'ı
+  - `open` — overlay'in açılıp açılmadığını kontrol eden boolean prop
+  - `onClose` — overlay kapatma callback'i prop
+  - `router` — `useRouter()` hook'tan gelen Next.js router örneği, sayfa yönlendirmeleri için
+  - `categories` — `useCategories()` hook'tan gelen tüm kategoriler dizisi
+  - `t` — `useI18n()` hook'tan gelen çeviri fonksiyonu
+  - `localizedRoutes` — `useLocalizedRoutes()` hook'tan gelen lokalize rota yardımcıları
+  - `q` — kullanıcının arama inputuna yazdığı ham arama metni (state)
+  - `debounced` — `q`'nun debounce edilmiş hali, API çağrıları için kullanılır
+  - `recentSearches` — localStorage'dan yüklenen son arama terimleri dizisi (state)
+  - `suggestions` — arama önerileri dizisi, `getSearchSuggestions` API sonucu (state)
+  - `results` — tam arama sonuçları dizisi, `ftsSearchProducts` API sonucu (state)
+  - `viewState` — mevcut görünüm durumu: `'IDLE'` | `'SUGGESTING'` | `'RESULTS'` (state)
+  - `activeIndex` — klavye navigasyonunda aktif öğe indeksi, `-1` ise none (state)
+  - `loading` — API isteği sırasında true olan yükleme durumu flag'i (state)
+  - `error` — arama sırasında oluşan hata mesajı veya null (state)
+  - `inputRef` — arama input elementine ref, odaklama için (`inputRef.current?.focus()`)
+  - `listRef` — öneri/sonuç listesi container elementine ref, scrollIntoView için
+  - `RECENT_SEARCHES_KEY` — localStorage anahtarı sabiti, son aramaları saklar
+  - `popularCategories` — useMemo ile `globalCategories.filter(c => !c.parent_id).slice(0, 5)` hesaplanan ilk 5 üst kategori
+  - `globalCategories` — `categories`'den türetilen tüm kategoriler (useCategories'ten)
+  - `supabaseBrowserClient` — import edilen Supabase istemci örneği, tüm veritabanı sorgularında kullanılır
+  - `getCategoryIcon` — import edilen kategori ikonu yardımcı fonksiyonu
+  - `highlightMatch` — arama terimini sonuçlarda vurgulayan helper fonksiyonu
+  - `Routes` — lokalize rota yardımcı objesi (`Routes.product()`, `Routes.category()`)
+  - `FtsProductResult` — arama sonuçlarının tipi (import edilen)
+  - `SearchSuggestion` — arama önerilerinin tipi (import edilen)
+  - `DbCategory` — kategori satır tipi (import edilen)
+- **Dönüş**: `React.FC<SearchOverlayProps>` — JSX markup döndürür, search overlay UI'ını render eder
+
+### [N2_NASIL] AST Pointer: SearchOverlay.tsx::SearchOverlay::useEffect_debounce
+- **params**: yok
+- **ic_degiskenler**:
+  - `t_id` — `setTimeout` dönüş değeri, temizlik için `clearTimeout(t_id)` çağrılır
+  - `q` — inputtaki ham arama metni, debounce kaynağını oluşturur
+  - `setDebounced` — debounce sonucunu state'e yazan setter
+- **Dönüş**: cleanup fonksiyonu döndürür → `() => clearTimeout(t_id)`
+
+### [N3_NASIL] AST Pointer: SearchOverlay.tsx::SearchOverlay::useEffect_suggestions
+- **params**: yok
+- **ic_degiskenler**:
+  - `active` — cleanup ile `false` yapılan flag, bileşen unmount sonrası state güncellemelerini engeller
+  - `open` — overlay açıkken arama yapılması kontrolü
+  - `debounced` — arama yapılacak terim, boşsa state'leri temizler
+  - `setViewState` — görünüm durumunu `'SUGGESTING'` yapan setter
+  - `setSuggestions` — API'den dönen önerileri state'e yazan setter
+  - `setResults` — temizlik için results'ı boş diziye ayarlayan setter
+  - `setLoading` — yükleme durumunu true/false yapan setter
+  - `getSearchSuggestions` — **dinamik import**: `'../lib/services/product.service'` modülünden lazy import edilen arama önerisi API fonksiyonu
+  - `supabaseBrowserClient` — Supabase istemci, API fonksiyonuna parametre olarak verilir
+  - `debounced` — API'ye gönderilen arama terimi
+  - `6` — öneri sayısı limiti (sabit)
+  - `err` — catch bloğunda yakalanan hata, `console.error(err)` ile loglanır
+- **Dönüş**: cleanup fonksiyonu → `() => { active = false }`
+
+### [N4_NASIL] AST Pointer: SearchOverlay.tsx::SearchOverlay::useEffect_focus
+- **params**: yok
+- **ic_degiskenler**:
+  - `open` — overlay açıldığında input'a odaklanma tetikleyicisi
+  - `setQ` — input değerini sıfırlayan setter
+  - `inputRef` — input element ref'i, `inputRef.current?.focus()` ile 50ms gecikmeyle odaklanır
+- **Dönüş**: yok
+
+### [N5_NASIL] AST Pointer: SearchOverlay.tsx::SearchOverlay::useEffect_resetActiveIndex
+- **params**: yok
+- **ic_degiskenler**:
+  - `setActiveIndex` — aktif indeksi `-1`'e sıfırlayan setter (arama terimi değiştiğinde tetiklenir)
+- **Dönüş**: yok
+
+### [N6_NASIL] AST Pointer: SearchOverlay.tsx::SearchOverlay::useEffect_scrollSync
+- **params**: yok
+- **ic_degiskenler**:
+  - `activeIndex` — şu anki aktif öğe indeksi, `-1`den büyükse scroll tetiklenir
+  - `listRef` — list container ref'i, `listRef.current.children[activeIndex]` ile aktif element alınır
+  - `activeEl` — `listRef.current.children[activeIndex]` olarak elde edilen aktif HTML elementi
+- **Dönüş**: yok (yan etki: `activeEl.scrollIntoView({ block: 'nearest' })` çağrısı)
+
+### [N7_NASIL] AST Pointer: SearchOverlay.tsx::handleClose
+- **params**: yok
+- **ic_degiskenler**:
+  - `setQ` — arama inputunu boş string'e sıfırlayan setter
+  - `setResults` — sonuçları boş diziye sıfırlayan setter
+  - `setSuggestions` — önerileri boş diziye sıfırlayan setter
+  - `setViewState` — görünüm durumunu `'IDLE'` yapan setter
+  - `setActiveIndex` — aktif indeksi `-1`'e sıfırlayan setter
+  - `onClose` — prop'tan gelen kapatma callback'i, overlay'in ana bileşeni tarafından yönetilir
+- **Dönüş**: yok (yan etki: tüm state'leri sıfırlar ve `onClose()` çağırır)
+
+### [N8_NASIL] AST Pointer: SearchOverlay.tsx::addToRecent
+- **params**: `(term: string)`
+- **ic_degiskenler**:
+  - `term` — kaydedilecek arama terimi, trim edilmiş hali boşsa fonksiyon erken return eder
+  - `recentSearches` — mevcut son aramalar dizisi, terim bu diziden filtrelenerek tekrar önlenir
+  - `next` — `[term, ...recentSearches.filter(x => x !== term)].slice(0, 5)` ile hesaplanan güncellenmiş liste, en fazla 5 öğe
   - `RECENT_SEARCHES_KEY` — localStorage anahtarı sabiti
-  - `popularCategories` — useMemo ile hesaplanan, parent_id olmayan ilk 5 kategori
-  - `handleClose` — inner fonksiyon, state sıfırlar ve onClose çağırır
-  - `addToRecent` — inner fonksiyon, arama terimini recent listesine ekler
-  - `performFullSearch` — inner async fonksiyon, tam FTS araması yapar
-  - `handleKeyDown` — inner fonksiyon, klavye olaylarını yönetir
-  - `renderSuggestion` — inner fonksiyon, tek bir suggestion öğesi render eder
-  - `renderIdle` — inner fonksiyon, boş durum görünümünü render eder
-  - `renderSuggestions` — inner fonksiyon, öneri listesi görünümünü render eder
-  - `renderResults` — inner fonksiyon, sonuç listesi görünümünü render eder
-- **Dönüş**: React.FC<SearchOverlayProps> — SearchOverlay bileşeni JSX
+  - `JSON.stringify(next)` — diziyi JSON string'e çevirerek localStorage'a yazılır
+- **Dönüş**: yok (yan etki: state günceller ve localStorage'a yazar)
 
-### [N2_NASIL] AST Pointer: src/components/SearchOverlay.tsx::handleClose
+### [N9_NASIL] AST Pointer: SearchOverlay.tsx::performFullSearch
+- **params**: `(term: string)`
+- **ic_degiskenler**:
+  - `term` — aranacak terim, trim edilmiş hali boşsa erken return
+  - `setLoading` — yükleme durumunu true yapan setter
+  - `setError` — hata durumunu temizleyen setter (başlangıçta `null`)
+  - `setViewState` — görünüm durumunu `'RESULTS'` yapan setter
+  - `addToRecent` — bu terimi son aramalara ekleyen iç fonksiyon çağrısı
+  - `setActiveIndex` — aktif indeksi `-1`'e sıfırlayan setter
+  - `ftsSearchProducts` — **dinamik import**: `'../lib/services/product.service'` modülünden lazy import edilen FTS arama API fonksiyonu
+  - `supabaseBrowserClient` — Supabase istemci, API fonksiyonuna parametre olarak verilir
+  - `term` — API'ye gönderilen arama terimi
+  - `20` — sonuç sayısı limiti (sabit)
+  - `setResults` — API'den dönen sonuçları state'e yazan setter
+  - `t` — çeviri fonksiyonu, hata mesajı için `t('search.noResults')` çağrısı
+- **Dönüş**: Promise<void> (async fonksiyon, doğrudan değer döndürmez)
+
+### [N10_NASIL] AST Pointer: SearchOverlay.tsx::handleKeyDown
+- **params**: `(e: React.KeyboardEvent)`
+- **ic_degiskenler**:
+  - `e` — klavye olayı objesi, `e.key` ile tuş adı, `e.preventDefault()` ile varsayılan davranış engellenir
+  - `viewState` — mevcut görünüm durumu, `suggestions` veya `results` listesinin uzunluğunu belirler
+  - `maxIndex` — navigasyon yapılabilecek maksimum indeks: `viewState === 'SUGGESTING' ? suggestions.length - 1 : viewState === 'RESULTS' ? results.length - 1 : -1`
+  - `suggestions` — mevcut arama önerileri dizisi, `viewState === 'SUGGESTING'` olduğunda kullanılır
+  - `results` — mevcut arama sonuçları dizisi, `viewState === 'RESULTS'` olduğunda kullanılır
+  - `activeIndex` — şu anki aktif öğe indeksi
+  - `setActiveIndex` — aktif indeksi güncelleyen setter, `prev => (prev < maxIndex ? prev + 1 : prev)` formunda
+  - `s` — `suggestions[activeIndex]` ile elde edilen aktif suggestion objesi (Enter + SUGGESTING durumunda)
+  - `s.url` — suggestion'ın yönlendirme URL'i, `'#'` fallback ile
+  - `s.label` — suggestion etiketi, `addToRecent`'e gönderilir
+  - `router` — Next.js router, `router.push()` ile sayfa yönlendirmesi yapılır
+  - `res` — `results[activeIndex]` ile elde edilen aktif sonuç objesi (Enter + RESULTS durumunda)
+  - `res.slug` — ürün slug'ı, `Routes.product(res.slug!)` ile ürün sayfasına yönlendirme yapılır
+  - `addToRecent` — son aramalara terimi ekleyen fonksiyon
+  - `handleClose` — overlay'i kapatan fonksiyon
+  - `q` — mevcut arama inputu metni, `performFullSearch(q)` ile tam arama tetiklenir
+  - `performFullSearch` — tam arama fonksiyonu, Enter basıldığında aktif öğe yoksa çağrılır
+- **Dönüş**: yok (yan etki: state günceller, router.push çağırır, handleClose çağırır)
+
+### [N11_NASIL] AST Pointer: SearchOverlay.tsx::renderSuggestion
+- **params**: `(s: SearchSuggestion, idx: number)`
+- **ic_degiskenler**:
+  - `s` — tek bir arama önerisi objesi, `type`, `label`, `url`, `metadata` alanlarını içerir
+  - `idx` — bu suggestion'ın listedeki indeksi
+  - `activeIndex` — mevcut aktif indeks, `idx === activeIndex` karşılaştırması ile aktiflik belirlenir
+  - `isActive` — `idx === activeIndex` hesaplanan boolean, aktif öğenin stilini belirler
+  - `debounced` — arama terimi, `highlightMatch` fonksiyonuna gönderilerek eşleşmeler vurgulanır
+  - `s.type` — suggestion tipi: `'product'` | `'category'` | `'brand'`, ikon seçimini belirler
+  - `s.metadata` — product tipi için ek alanlar: `image_url`, `sku`, `brand` (Record<string, string> olarak cast edilir)
+  - `s.metadata.image_url` — ürün görseli URL'i, Image bileşeninde kullanılır (yoksa fallback SVG gösterilir)
+  - `s.metadata.sku` — ürün SKU kodu, `highlightMatch` ile vurgulanır
+  - `s.metadata.brand` — ürün markası, `highlightMatch` ile vurgulanır
+  - `icon` — `s.type`'a göre koşullu JSX: product için görsel veya kutu ikonu, category için grid ikonu, brand için etiket ikonu
+  - `label` — `s.type === 'brand'` ise `t('search.brandPrefix') + s.label`, değilse `s.label`
+  - `t` — çeviri fonksiyonu, `t('search.brandPrefix')` ve `t('search.overlay.enterKey')` çağrılır
+  - `highlightMatch` — arama terimini label, brand, SKU içinde vurgulayan fonksiyon
+  - `setActiveIndex` — `onMouseEnter` ile `setActiveIndex(idx)` çağrılır
+  - `router` — suggestion tıklanınca `router.push(s.url)` ile yönlendirme yapılır
+  - `addToRecent` — tıklanınca `addToRecent(q)` ile son aramalara eklenir
+  - `handleClose` — tıklanınca overlay kapatılır
+  - `q` — mevcut arama terimi, `addToRecent`'e gönderilir
+- **Dönüş**: JSX element (buton bileşeni)
+
+### [N12_NASIL] AST Pointer: SearchOverlay.tsx::renderIdle
 - **params**: yok
 - **ic_degiskenler**:
-  - `q` — setQ('') ile sıfırlanan arama giriş değeri
-  - `results` — setResults([]) ile sıfırlanan sonuç listesi
-  - `suggestions` — setSuggestions([]) ile sıfırlanan öneri listesi
-  - `viewState` — setViewState('IDLE') ile idle durumuna ayarlanan görünüm
-  - `activeIndex` — setActiveIndex(-1) ile sıfırlanan seçili indeks
-  - `onClose` — prop'tan gelen kapanma callback'i
-- **Dönüş**: yok — overlay'i kapatır ve tüm state'i sıfırlar
+  - `recentSearches` — son aramalar dizisi, `recentSearches.length > 0` kontrolü ile gösterilir
+  - `setRecentSearches` — son aramaları temizleyen setter, "Temizle" butonunda çağrılır
+  - `RECENT_SEARCHES_KEY` — localStorage anahtarı, temizleme但onunda `localStorage.removeItem` ile silinir
+  - `t` — çeviri fonksiyonu: `t('search.recentSearches')`, `t('search.clearRecent')`, `t('search.popularCategories')`, `t('home.hero.quickChips.fans')`, `t('home.hero.quickChips.airCurtains')`, `t('home.hero.quickChips.heatRecovery')`
+  - `term` — `recentSearches.map` callback'indeki her bir arama terimi
+  - `setQ` — arama inputunu terimle dolduran setter
+  - `performFullSearch` — terimle tam arama başlatan fonksiyon
+  - `popularCategories` — useMemo ile hesaplanan üst kategoriler dizisi
+  - `cat` — `popularCategories.map` callback'indeki her bir kategori objesi (`id`, `slug`, `name` alanları)
+  - `cat.id` — kategori ID'si, `String(cat.id)` ile key olarak kullanılır
+  - `cat.slug` — kategori slug'ı, `Routes.category(String(cat.slug))` ile rota oluşturulur
+  - `cat.name` — kategori adı, buton içinde gösterilir
+  - `router` — `router.push(Routes.category(...))` ile kategori sayfasına yönlendirme yapılır
+  - `handleClose` — kategori tıklanınca overlay kapatılır
+  - `getCategoryIcon` — `getCategoryIcon(String(cat.slug), { size: 14 })` ile kategori ikonu render edilir
+  - `Routes` — rota yardımcı objesi, `Routes.category()` kullanılır
+- **Dönüş**: JSX element (idle durumu UI'ı: son aramalar + popüler kategoriler)
 
-### [N3_NASIL] AST Pointer: src/components/SearchOverlay.tsx::addToRecent
-- **params**: `(term: string)` — eklenecek arama terimi
-- **ic_degiskenler**:
-  - `term` — parametre, eklenecek arama terimi
-  - `recentSearches` — mevcut son aramalar listesi
-  - `next` — term'i başa ekleyen, mükerrerleri temizleyen ve 5 ile sınırlayan filtrelenmiş liste
-  - `RECENT_SEARCHES_KEY` — localStorage anahtarı
-  - `setRecentSearches` — state güncelleme fonksiyonu
-- **Dönüş**: yok — term'i localStorage'a ve state'e kaydeder
-
-### [N4_NASIL] AST Pointer: src/components/SearchOverlay.tsx::performFullSearch
-- **params**: `(term: string)` — aranacak terim
-- **ic_degiskenler**:
-  - `term` — parametre, arama terimi
-  - `setLoading` — yükleme durumunu true yapan state setter
-  - `setError` — hata durumunu null yapan state setter
-  - `setViewState` — viewState'i 'RESULTS' yapan state setter
-  - `setActiveIndex` — activeIndex'i -1 yapan state setter
-  - `ftsSearchProducts` — dinamik import ile yüklenen FTS arama servisi fonksiyonu
-  - `supabaseBrowserClient` — Supabase istemci instance'ı
-  - `rows` — ftsSearchProducts() çağrısından dönen arama sonuçları
-  - `setResults` — sonuçları state'e yazan setter
-  - `addToRecent` — inner fonksiyon, terimi son aramalara ekler
-  - `t` — çeviri fonksiyonu, hata mesajı için
-- **Dönüş**: yok — tam metin araması yapar, sonuçları state'e yazar
-
-### [N5_NASIL] AST Pointer: src/components/SearchOverlay.tsx::handleKeyDown
-- **params**: `(e: React.KeyboardEvent)` — klavye olay nesnesi
-- **ic_degiskenler**:
-  - `e` — parametre, KeyboardEvent nesnesi
-  - `suggestions` — mevcut öneriler listesi
-  - `results` — mevcut sonuçlar listesi
-  - `viewState` — mevcut görünüm durumu
-  - `maxIndex` — hesaplanan maksimum indeks (suggestions veya results uzunluğuna göre)
-  - `activeIndex` — mevcut seçili indeks
-  - `s` — Enter tuşunda suggestions[activeIndex] ile alınan seçili öneri
-  - `res` — Enter tuşunda results[activeIndex] ile alınan seçili sonuç
-  - `router` — Next.js yönlendirme fonksiyonu
-  - `addToRecent` — inner fonksiyon
-  - `handleClose` — inner fonksiyon
-  - `performFullSearch` — inner async fonksiyon
-  - `q` — mevcut arama terimi
-  - `Routes` — rota yardımcı fonksiyonları
-- **Dönüş**: yok — Escape ile kapatma, ok tuşlarıyla gezinme, Enter ile seçim/arama
-
-### [N6_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderSuggestion
-- **params**: `(s: SearchSuggestion, idx: number)` — öneri nesnesi ve listedeki indeksi
-- **ic_degiskenler**:
-  - `s` — parametre, SearchSuggestion nesnesi
-  - `idx` — parametre, listenin sırası
-  - `isActive` — idx === activeIndex hesaplanan boolean, öğe seçili mi
-  - `icon` — s.type'a göre render edilen SVG veya Image bileşeni (product/category/brand)
-  - `label` — brand ise t('search.brandPrefix') eklenen, diğer durumlarda s.label
-  - `s.metadata` — Record<string, string> olarak cast edilen metadata (image_url, sku, brand)
-  - `debounced` — highlightMatch için kullanılan gecikmeli arama terimi
-  - `highlightMatch` — import edilen vurgulama yardımcı fonksiyonu
-  - `router` — Next.js yönlendirme
-  - `addToRecent` — inner fonksiyon
-  - `handleClose` — inner fonksiyon
-- **Dönüş**: yok (JSX — <button> elemanı render eder)
-
-### [N7_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderIdle
+### [N13_NASIL] AST Pointer: SearchOverlay.tsx::renderSuggestions
 - **params**: yok
 - **ic_degiskenler**:
-  - `recentSearches` — son arama terimleri listesi, length kontrolü ve map için
-  - `t` — çeviri fonksiyonu (search.recentSearches, search.clearRecent, search.popularCategories)
-  - `setRecentSearches` —_recentSearches'i [] ile sıfırlayan setter
-  - `RECENT_SEARCHES_KEY` — localStorage.removeItem için anahtar
-  - `setQ` — q state'ini term yapan setter (recentSearch tıklamasında)
-  - `performFullSearch` — inner async fonksiyon (recentSearch tıklamasında)
-  - `term` — map callback parametresi, her bir recent arama terimi
-  - `popularCategories` — popüler kategoriler listesi (length kontrolü ve map için)
-  - `router` — Next.js yönlendirme
-  - `handleClose` — inner fonksiyon
-  - `cat` — map callback parametresi, her bir kategori nesnesi
-  - `getCategoryIcon` — import edilen kategori ikon yardımcı fonksiyonu
-  - `String(cat.id)` — kategori ID'si (key için)
-  - `String(cat.slug)` — kategori slug'ı (routelama ve ikon için)
-  - `String(cat.name)` — kategori adı (görünen metin)
-  - `Routes` — rota yardımcı fonksiyonları (Routes.category)
-- **Dönüş**: yok (JSX — idle durum görünümünü render eder)
+  - `suggestions` — arama önerileri dizisi, `suggestions.length === 0` kontrolü ile boş durum yönetilir
+  - `t` — çeviri fonksiyonu: `t('search.noResults')`, `t('search.detailedSearch')`, `t('search.overlay.allResultsFor')`
+  - `debounced` — debounce edilmiş arama terimi, boş durum但onunda ve tüm sonuçlar但onunda gösterilir
+  - `performFullSearch` — "tüm sonuçları ara" butonunda tam arama tetiklenir
+  - `listRef` — liste container ref'i, `<div ref={listRef}>` ile bağlanır
+  - `renderSuggestion` — her bir suggestion'ı render eden iç fonksiyon, `suggestions.map((s, idx) => renderSuggestion(s, idx))` çağrılır
+- **Dönüş**: JSX element (öneri listesi veya boş durum mesajı)
 
-### [N8_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderSuggestions
+### [N14_NASIL] AST Pointer: SearchOverlay.tsx::renderResults
 - **params**: yok
 - **ic_degiskenler**:
-  - `suggestions` — öneriler listesi (length kontrolü ve map için)
-  - `t` — çeviri fonksiyonu (search.noResults, search.detailedSearch, search.allResults)
-  - `debounced` — vurgulama ve "aramaya devam et" butonu için gecikmeli terim
-  - `performFullSearch` — inner async fonksiyon (buton onClick için)
-  - `listRef` — ref={listRef} ile bağlanan DOM referansı
-  - `s` — suggestions.map callback parametresi, tek bir SearchSuggestion
-  - `idx` — suggestions.map callback indeks parametresi
-  - `renderSuggestion` — inner fonksiyon, tek suggestion render eder
-- **Dönüş**: yok (JSX — öneri listesi görünümünü render eder)
-
-### [N9_NASIL] AST Pointer: src/components/SearchOverlay.tsx::renderResults
-- **params**: yok
-- **ic_degiskenler**:
-  - `results` — arama sonuçları listesi (length kontrolü, some() ve map için)
-  - `t` — çeviri fonksiyonu (search.noResults, search.noResultsAdvice, search.fuzzyMatchNotice)
-  - `hasFuzzy` — results.some(r => r.is_fuzzy_match) hesaplanan boolean, fuzzy eşleşme var mı
-  - `listRef` — ref={listRef} ile bağlanan DOM referansı
-  - `r` — results.map callback parametresi, tek bir FtsProductResult
-  - `idx` — results.map callback indeks parametresi
-  - `isActive` — idx === activeIndex hesaplanan boolean, öğe seçili mi
-  - `highlightMatch` — import edilen vurgulama yardımcı fonksiyonu
-  - `debounced` — highlightMatch için gecikmeli arama terimi
-  - `r.id` — ürün ID'si (key için)
-  - `r.name` — ürün adı (görünen metin ve vurgulama için)
-  - `r.brand` — ürün markası (opsiyonel, vurgulama için)
-  - `r.sku` — ürün SKU'su (görünen metin ve vurgulama için)
-  - `r.slug` — ürün slug'ı (Routes.product için, ! ile non-null assertion)
-  - `r.image_url` — ürün görsel URL'i (opsiyonel, Image component için)
-  - `r.is_fuzzy_match` — fuzzy eşleşme bayrağı (hasFuzzy hesaplaması için)
-  - `router` — Next.js yönlendirme
-  - `handleClose` — inner fonksiyon
-  - `Routes` — rota yardımcı fonksiyonları (Routes.product)
-- **Dönüş**: yok (JSX — sonuç listesi görünümünü render eder)
+  - `results` — tam arama sonuçları dizisi, `results.length === 0` kontrolü ile boş durum yönetilir
+  - `t` — çeviri fonksiyonu: `t('search.noResults')`, `t('search.noResultsAdvice')`, `t('search.fuzzyMatchNotice')`, `t('search.overlay.enterKey')`
+  - `hasFuzzy` — `results.some(r => r.is_fuzzy_match)` ile hesaplanan boolean, fuzzy eşleşme uyarısı gösterilip gösterilmeyeceğini belirler
+  - `listRef` — liste container ref'i, `<div ref={listRef}>` ile bağlanır
+  - `r` — `results.map` callback'indeki her bir `FtsProductResult` sonucu
+  - `r.id` — sonucun benzersiz ID'si, `key` prop'u olarak kullanılır
+  - `r.slug` — ürün slug'ı, `Routes.product(r.slug!)` ile rota oluşturulur
+  - `r.name` — ürün adı, `highlightMatch(r.name, debounced)` ile vurgulanır
+  - `r.image_url` — ürün görseli URL'i, Image bileşeninde kullanılır (yoksa fallback SVG)
+  - `r.brand` — ürün markası, `highlightMatch(r.brand, debounced)` ile vurgulanır
+  - `r.sku` — ürün SKU kodu, `highlightMatch(r.sku, debounced)` ile vurgulanır
+  - `r.is_fuzzy_match` — fuzzy eşleşme flag'i, `hasFuzzy` hesaplamasında kullanılır
+  - `idx` — sonuç indeksi, `results.map` callback'inde
+  - `activeIndex` — mevcut aktif indeks, `idx === activeIndex` karşılaştırması ile aktiflik belirlenir
+  - `isActive` — `idx === activeIndex` boolean değeri
+  - `debounced` — highlightMatch için arama terimi
+  - `highlightMatch` — arama terimini sonuç alanlarında vurgulayan fonksiyon
+  - `router` — `router.push(Routes.product(r.slug!))` ile ürün sayfasına yönlendirme
+  - `handleClose` — tıklanınca overlay kapatılır
+  - `setActiveIndex` — `onMouseEnter` ile aktif indeks güncellenir
+  - `Routes` — `Routes.product()` rota yardımcı fonksiyonu
+- **Dönüş**: JSX element (sonuç listesi veya boş durum mesajı, fuzzy uyarı banner'ı dahil)
 
 ---
 
@@ -323,13 +400,13 @@ graph TD
     SearchOverlay_tsx__renderResults["renderResults"]
     SearchOverlay_tsx__renderSuggestion["renderSuggestion"]
     SearchOverlay_tsx__renderSuggestions["renderSuggestions"]
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__addToRecent
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__performFullSearch
     SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderResults
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__handleClose
-    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestions
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderIdle
+    SearchOverlay_tsx__SearchOverlay --> SearchOverlay_tsx__renderSuggestion
 ```
 
 ## NODE ID STANDARD

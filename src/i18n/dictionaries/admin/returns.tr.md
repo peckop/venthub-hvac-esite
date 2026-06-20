@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\returns.tr.ts
-skeleton_hash: 44a92297eaac8348
+skeleton_hash: 640ba6521f48c60b
 entity_hashes:
   overview: f74c60dbdfef5408
-generated_at: 2026-06-13T18:54:46Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -34,7 +34,7 @@ Bu modül için fonksiyon gövdesi verilmediğinden, spefisifik aksiyom üretile
 ## SABİTLER
 - **returns** (object) — `{
       total: 'Toplam: {{count}} iade talebi yönetiliyor.',
-      subtitle: ...`
+      subtitle...`
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\data\preload.ts
-skeleton_hash: a55c7e077252a69f
+skeleton_hash: cb1cc3612d6dbaef
 entity_hashes:
   func:preloadCategory: 5c31b78ecaccbf15
   func:preloadProduct: ffb09955ca2af5e6
   overview: 429cab0c1f1eaff7
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış
@@ -52,6 +52,15 @@ Bu modül, ürünlerin ve kategorilerin tarayıcı tarafında önceden yüklenme
 **Parametreler**:
 - slug: string — Yüklenmek istenen kategorinin URL yapısındaki benzersiz tanımlayıcısı.
 **Dönüş**: void
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../types/db-rows::type { AuthorityContent,CategoryMetadata, DbCategory }
+- import: ../type-converters::mapDatabaseCategoryToDomain
+- import: @/lib/services/product.service::getProductBySlug
+- import: @/lib/supabase/static::supabaseStaticClient
+- import: react::cache
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\ExportMenu.tsx
-skeleton_hash: a10b677ea8364439
+skeleton_hash: 795929f00f599bec
 entity_hashes:
   func:ExportMenu: 9e536638b7cdf449
   overview: fcef70276d80a8c4
   style_tokens: 7659c3683121a964
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - buttonLabel: string (opsiyonel) — Menüyü açan düğmenin üzerindeki metin. Belirtilmezse varsayılan bir etiket kullanılır.
 
 **Dönüş**: React bileşeni (React.FC) — Oluşturulan dışa aktarma menüsünü render eden bir React bileşeni. Bileşen, ExportMenuItem[] dizisi ve opsiyonel buttonLabel string'i alır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminButtonSecondaryClass
+- import: @radix-ui/react-dropdown-menu
+- import: lucide-react::Download
+- import: lucide-react::FileDown
+- import: lucide-react::Table
+- import: react::React
 
 ---
 

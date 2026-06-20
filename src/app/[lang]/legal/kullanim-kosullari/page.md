@@ -3,37 +3,56 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\legal\kullanim-kosullari\page.tsx
-skeleton_hash: 41dbb73c198eb1fa
+skeleton_hash: 3d46a45450b5913b
 entity_hashes:
-  func:Page: 02ee67f324c336e5
-  overview: cd80401a4fd4c8ec
+  func:Page: 851f6a31795db41b
+  func:generateStaticParams: 42ae72125a484b5f
+  overview: 5231a61d2c38b252
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:46:33Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın Kullanım Koşulları sayfasını sunar. Tek bir React bileşeni olan Page, sayfanın tüm içeriğini ve düzenini oluşturarak kullanıcılara yasal koşulları sunmakla sorumludur.
+Bu modül, VentHub HVAC uygulamasının "Kullanım Koşulları" yasal sayfasını sunmakla sorumludur. Next.js'in statik sayfa oluşturma altyapısını kullanarak, farklı dil sürümleri için statik parametreler üretir ve sayfa içeriğini render eder. Modül, yasal içeriği sunmaya odaklanan, veri bağımlılığı olmayan bir statik sayfa yapısına sahiptir.
 
 ## Fonksiyon Grupları
-### Sayfa Sunumu
-Sayfanın kullanıcı arayüzünü oluşturan ve tarayıcıya ileten temel bileşeni tanımlar.
+### Statik Sayfa Üretimi
+Next.js'in statik site oluşturma (SSG) sürecini yönetir; sayfanın verschiedenen dil sürümleri için gerekli statik parametreleri üretir.
+- generateStaticParams
+
+### Sayfa Renderlama
+Kullanım Koşulları sayfasının React bileşenini oluşturur ve sunucu tarafından render edilen HTML içeriğini tarayıcıya iletir.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, parametre almayan statik bir React sayfa bileşenidir; fonksiyon gövdesi verilmediği için aksiyonlar fonksiyon imzası ve dönüş tipine dayalı çıkarımlardır.
+Bu modül, çok dilli (i18n) bir Next.js sayfasıdır. Aksiyonlar fonksiyon imzalarından ve dosya yolu yapısından çıkarılmıştır.
 
-[Aksiyom 1]: Eğer `Page()` fonksiyonu geçerli bir JSX elementi (React.ReactNode) döndürmezse veya `undefined` / `null` döndürürse, React render hatası oluşur ve kullanıcıya Kullanım Koşulları sayfası gösterilemez.
+---
 
-[Aksiyom 2]: Eğer `Page()` fonksiyonu dışa aktarılmamış veya default export olarak tanımlanmamışsa, Next.js sayfa yönlendirme sistemi bu bileşeni bulamaz ve 404 hatası döner.
+[Aksiyom 1]: Eğer `generateStaticParams()` fonksiyonu `{ lang: string }` formatında bir dizi döndürmezse, statik sayfa oluşturma (build) aşamasında hata oluşur ve sayfalar önceden derlenemez.
 
-[Aksiyom 3]: Bu bir legal/durus sayfası olduğundan, bileşen dinamik API çağrısı veya harici veri kaynağına bağımlı olmamalıdır; eğer bağımlılık varsa ve servis erişilemez durumdaysa, sayfa içerik göstermeksizin boş kalır (fallback içeriği tanımlanmamıştır).
+[Aksiyom 2]: Eğer `Page` bileşenine geçirilen `params` promise'i `{ lang: string }` yapısında çözümlenmezse (resolve/reject olursa), bileşen geçerli dil parametresine erişemez ve sayfa içeriği doğru dille gösterilemez.
+
+[Aksiyom 3]: Eğer `lang` parametresi uygulamanın desteklediği dil listesinde (örn: 'tr', 'en') yer almıyorsa, sayfa geçersiz bir dil ile oluşturulur veya 404 hatası döndürülür.
+
+[Aksiyom 4]: Eğer `Page` bileşeni geçerli bir JSX/React elementi (`React.ReactNode`) döndürmezse veya `undefined`/`null` döndürse, tarayıcıda boş sayfa veya React hata sınırı (error boundary) tetiklenir.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### generateStaticParams
+
+**Ne yapar**: Bu fonksiyon, Next.js'in statik Site Oluşturma (Static Site Generation) mekanizması için desteklenen dil parametrelerini tanımlar. Yalnızca 'tr' (Türkçe) ve 'en' (İngilizce) olmak üzere iki dil seçeneği için önceden oluşturulacak sayfa yollarını belirler.
+
+**Nasıl yapar**: Fonksiyon asenkron (async) olarak tanımlanmıştır, ancak mevcut gövdesinde herhangi bir asenkron işlem gerçekleştirmemektedir. Doğrudan bir nesne dizisi döndürerek, Next.js'in build aşamasında `/tr/legal/kullanim-kosullari` ve `/en/legal/kullanim-kosullari` yollarını Statik Olarak Oluşturulmuş (SSG) sayfalar olarak işlemesini sağlar. Bu, Next.js App Router'da `generateStaticParams` adı verilen özel bir API'ye ait bir fonksiyondur.
+
+**Parametreler**: Bu fonksiyon herhangi bir parametre almamaktadır.
+
+**Dönüş**: `Array<{ lang: 'tr' | 'en' }>` — Sadece 'tr' veya 'en' değerlerini içeren `lang` anahtarına sahip nesnelerden oluşan bir dizi döndürür. Bu dizi, Next.js tarafından derleme aşamasında hangi parametrelerle sayfa oluşturacağını belirtmek için kullanılır.
 
 ### Page
 
@@ -48,24 +67,37 @@ Bu fonksiyon herhangi bir parametre almamaktadır. Next.js'in app router yapıs�
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../../../views/legal/TermsOfUsePage::PageComponent
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/[lang]/legal/kullanim-kosullari/page.tsx::Page
+### [N1_NASIL] AST Pointer: app/[lang]/legal/kullanim-kosullari/page.tsx::generateStaticParams
 - **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `<PageComponent />` JSX elemanı — `../../../../views/legal/TermsOfUsePage` import'undan gelen `PageComponent` bileşeninininstance'ını döndürür. Sayfa içeriği tamamen alt bileşene devredilmiştir; yönlendirme/kullanım koşulları sayfası render edilir.
+- **ic_degiskenler**: (değişken yok)
+- **Dönüş**: `{ lang: string }[]` — Statik sayfa parametreleri listesi. Sadece 'tr' ve 'en' dilleri için nesne dizisi döndürür.
+
+### [N2_NASIL] AST Pointer: app/[lang]/legal/kullanim-kosullari/page.tsx::Page
+- **params**: (`{ params }: { params: Promise<{ lang: string }> }`)
+- **ic_degiskenler**:
+  - `lang` — Await edilmiş params objesinden çıkarılan dil kodu string'i
+- **Dönüş**: JSX — `PageComponent` bileşenini `lang` prop'u ile render eder
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\app\[lang]\legal\kullanim-kosullari\page.tsx
+  function: src\app\[lang]\legal\kullanim-kosullari\page.tsx::generateStaticParams
   function: src\app\[lang]\legal\kullanim-kosullari\page.tsx::Page
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: Page
+  export: generateStaticParams
 
 ---
 

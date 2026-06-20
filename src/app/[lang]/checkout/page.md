@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\checkout\page.tsx
-skeleton_hash: 52ba201233f367d6
+skeleton_hash: dc76e2fab76b588a
 entity_hashes:
   func:Page: 752ea1d46a136aae
   overview: cbc240f327cf6544
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -44,6 +44,13 @@ Bu modül için doğrulanabilir mimari varsayımlar çok sınırlıdır; `Page()
 Bu fonksiyon herhangi bir parametre almamaktadır (propsuz bir React Server Component yapısındadır).
 
 **Dönüş**: JSX elementi döndürür — `Suspense` ile sarılmış `CheckoutPage` bileşeninin render sonucunu verir. Suspense yüklenme esnasında animasyonlu bir spinner div'i, yükleme tamamlandığında ise CheckoutPage içeriğini gösterir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../views/CheckoutPage::CheckoutPage
+- import: react::React
+- import: react::Suspense
 
 ---
 

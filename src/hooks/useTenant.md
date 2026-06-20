@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useTenant.tsx
-skeleton_hash: 3d8ee542900cffd2
+skeleton_hash: 4add17cbaad071c4
 entity_hashes:
   func:TenantProvider: 55e323a184679af4
   func:useTenant: 1b557639af7ddf07
   overview: ea8d03008ab03037
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -58,6 +58,14 @@ Bu modül, React Context API kullanarak tenant (kiracı) bilgisini alt bileşenl
 
 ### useTenant
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../utils/tenantServer::type { TenantConfig }
+- import: react::React
+- import: react::createContext
+- import: react::useContext
 
 ---
 

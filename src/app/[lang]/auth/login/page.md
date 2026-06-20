@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\login\page.tsx
-skeleton_hash: 3761898d33630ea7
+skeleton_hash: cfb0f612047668fb
 entity_hashes:
   func:Page: 83ffb23295a76d3b
   overview: 86b7320436f9e263
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-08T10:08:10Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -37,6 +37,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - (Yok) — Fonksiyon dışarıdan herhangi bir argüman almaz.
 
 **Dönüş**: JSX/React element – `Suspense` içinde `LoginPage` bileşenini içeren bir yapı döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../views/LoginPage::LoginPage
+- import: react::React
+- import: react::Suspense
 
 ---
 

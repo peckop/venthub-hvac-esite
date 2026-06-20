@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\components\admin\data-table\types.t
 skeleton_hash: d6719ae1220d4b24
 entity_hashes:
   overview: ddbf04dea1d9de40
-generated_at: 2026-06-13T15:01:57Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -25,6 +25,11 @@ Bu dosyada herhangi bir fonksiyon veya metot bulunmamaktadır. Dosya, modül sev
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::type { ReactNode }
 
 ---
 

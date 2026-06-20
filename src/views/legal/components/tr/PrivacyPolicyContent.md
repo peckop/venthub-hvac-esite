@@ -8,7 +8,7 @@ entity_hashes:
   func:PrivacyPolicyContentTr: 6b0fd40aa0eb2227
   overview: 2458658c904596d0
   style_tokens: 4e890ff82c62079d
-generated_at: 2026-06-16T11:57:39Z
+generated_at: 2026-06-19T20:50:47Z
 ---
 
 ## Genel Bakış
@@ -30,10 +30,6 @@ Bu modül, yasal gizlilik politikası içeriğini Türkçe olarak render eden bi
 **[Aksiyom 2]:** Eğer `lang` prop'u geçerli bir string değeri almazsa, içerik diline göre doğru render edilemeyebilir.
 
 **[Aksiyom 3]:** Eğer React çalışma ortamı (React runtime) mevcut değilse, bileşen hiç oluşturulamaz.
-
----
-
-> **Not:** Bu modül minimal bir imzaya sahiptir — `lang` prop'u dışında herhangi bir parametre, varsayılan değer veya sabit tanımlanmamıştır. Fonksiyon gövdesi verilmediği için bileşenin hangi içeriği render ettiği ve `lang` değerine bağlı olarak ne tür bir mantık yürüttüğü bilinmemektedir. Ek aksiyomlar, fonksiyon gövdesi incelendikten sonra eklenebilir.
 
 ---
 

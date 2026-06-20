@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useScrollAnimation.ts
-skeleton_hash: 99d2f3e7dcd66a94
+skeleton_hash: 27cee276d7d1c833
 entity_hashes:
   func:useScrollAnimation: 82da0eb2280833d9
   overview: d9bfa1798829a924
-generated_at: 2026-05-28T22:37:49Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,14 @@ Bu modül, tarayıcı tabanlı uygulamalarda kullanılmak üzere tasarlanmış, 
 **Parametreler**:
 - name: options, type: UseScrollAnimationOptions — Hook'un ve IntersectionObserver'ın davranışını yapılandırmak için kullanılan seçenekler nesnesidir. İçerisinde IntersectionObserver için standart root, rootMargin, threshold gibi görünürlük tetikleme koşullarını içeren tüm ayarları barındırır.
 **Dönüş**: [React.RefObject<T | null>, boolean] türünde bir dizi döndürür. Dizinin ilk elemanı, animasyon uygulanacak hedef DOM elemanına bağlanması gereken React referansıdır. İkinci eleman ise hedef elemanın IntersectionObserver kurallarına göre görünür olup olmadığını belirten boolean state'tir; eleman görünür durumdayken true, görünmüyorken false değerini alır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
+- import: react::useEffect
+- import: react::useRef
+- import: react::useState
 
 ---
 

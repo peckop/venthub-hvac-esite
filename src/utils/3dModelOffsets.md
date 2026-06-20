@@ -7,7 +7,7 @@ skeleton_hash: b3a408f47684b4ab
 entity_hashes:
   func:getModelPlacement: 52ef620921a90fe6
   overview: ed4492b80664afe2
-generated_at: 2026-06-18T19:47:20Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış

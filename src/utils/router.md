@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\router.ts
-skeleton_hash: e9ecfccf339fa630
+skeleton_hash: 44163c2c76a39492
 entity_hashes:
   func:clearClaimsCacheCookie: baefb8519ef63f63
   func:createRedirectResponse: 05310081a4cd5ade
@@ -13,7 +13,7 @@ entity_hashes:
   func:resolveUserClaims: d4caa44069b031aa
   func:setClaimsCacheCookie: ec602be634499d82
   overview: efa2eee8e5e3339c
-generated_at: 2026-06-07T14:03:33Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -141,6 +141,12 @@ Bu modül, kullanıcı kimlik doğrulama claim'lerini (yetkilendirme bilgilerini
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: next/server::NextRequest
+- import: next/server::NextResponse
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/utils/router.ts::getCryptoKey
@@ -214,10 +220,10 @@ graph TD
     router_ts__getCryptoKey["getCryptoKey"]
     router_ts__resolveUserClaims["resolveUserClaims"]
     router_ts__setClaimsCacheCookie["setClaimsCacheCookie"]
-    router_ts__decryptClaims --> router_ts__getCryptoKey
-    router_ts__resolveUserClaims --> router_ts__encryptClaims
     router_ts__resolveUserClaims --> router_ts__decryptClaims
+    router_ts__decryptClaims --> router_ts__getCryptoKey
     router_ts__encryptClaims --> router_ts__getCryptoKey
+    router_ts__resolveUserClaims --> router_ts__encryptClaims
     router_ts__resolveUserClaims --> router_ts__setClaimsCacheCookie
 ```
 

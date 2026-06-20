@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\logistics.en.ts
-skeleton_hash: edc964078d21b26c
+skeleton_hash: a9d0aa08d79f1413
 entity_hashes:
   overview: 41df9c420e1d004e
-generated_at: 2026-06-14T13:27:06Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -32,7 +32,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## SABİTLER
 - **logistics** (object) — `{
       title: 'Bulk Shipping Board',
-      subtitle: 'Quickly enter tracking...`
+      subtitle: 'Quickly enter tracki...`
 
 ---
 

@@ -8,13 +8,13 @@ entity_hashes:
   func:CategoryLanding: b0e985c1d7bd0b2f
   func:handleScrollToTarget: ca9eaec6204d6f95
   func:handleShowProducts: 47b7e50dc0139438
-  overview: 5e2776e15cfc1ca9
+  overview: 3f982c24108f342f
   style_tokens: 8da382602e458dce
-generated_at: 2026-06-14T20:13:41Z
+generated_at: 2026-06-19T20:50:47Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC platformunda belirli bir ürün kategorisinin ana sayfasını (landing page) oluşturan React bileşenidir. Kategori bilgileri, ilgili ürünler ve alt kategori yapısını alarak kullanıcıya düzenli bir arayüz sunar ve temel sayfa içi gezinme etkileşimlerini yönetir. Modül, bir kategori sayfasının görünüm ve akışını merkezi olarak kontrol eder.
+Bu modül, Venthub HVAC platformunda belirli bir ürün kategorisi için landing page (karşılama sayfası) oluşturur. Kategori adı, ürün listesi ve alt kategori yapısı gibi verileri alarak kullanıcıya düzenli bir arayüz sunar ve temel sayfa içi gezinme etkileşimlerini yönetir.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
@@ -22,15 +22,20 @@ Kategori, ürün ve alt kategori verilerini alarak sayfanın temel yapısını v
 - CategoryLanding
 
 ### Kullanıcı Etkileşim İşleyicileri
-Sayfa içindeki kullanıcı aksiyonlarına yanıt vererek belirli bölümlere kaydırma ve ürün listesinin görünürlüğünü değiştirme gibi navigasyon ve görüntüleme mantığını yöneten yardımcı işlevlerdir.
+Sayfa içindeki kullanıcı eylemlerine yanıt vererek belirli bölümlere kaydırma ve ürün listesinin görünürlüğünü değiştirme gibi navigasyon ve görüntüleme mantığını yöneten yardımcı işlevlerdir.
 - handleScrollToTarget, handleShowProducts
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+Bu modül, bir kategori landing sayfasını render eden bir React bileşenidir. Doğru çalışması için aşağıdaki veri yapılarının ve koşulların var olması gerekir.
+
+[Aksiyom 1]: Eğer `category` parametresi `null` veya `undefined` ise, bileşen ana içeriği render edemez ve bir hata durumuna geçer.
+[Aksiyom 2]: Eğer `category` nesnesi geçerli bir `name` alanı içermiyorsa, sayfa başlığı boş veya tanımsız görünür.
+[Aksiyom 3]: Eğer `products` boş bir dizi (`[]`) ise, "Ürün bulunamadı" gibi bir durum mesajı gösterilir ve ürün listesi bölümü boş render edilir.
+[Aksiyom 4]: Eğer `subCategories` parametresi `null` veya `undefined` olarak传递 edilirse bileşen hata verir, çünkü varsayılan değeri (`[]`) sadece parametre hiç gönderilmediğinde geçerlidir.
+[Aksiyom 5]: Eğer `handleScrollToTarget` fonksiyonu geçerli olmayan bir `targetId` (sayfada var olmayan bir ID) ile çağrılırsa, kaydırma işlemi gerçekleştirilmez.
+[Aksiyom 6]: Eğer `handleShowProducts` çağrıldığında ilgili "ürünler" bölümü sayfada mevcut değilse, kaydırma işlemi başarısız olur.
 
 ---
 
@@ -62,10 +67,10 @@ Sayfa içindeki kullanıcı aksiyonlarına yanıt vererek belirli bölümlere ka
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../hooks/useCategoryViewModel::useCategoryViewModel
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
 - import: ../../lib/type-converters::DomainCategory
 - import: ../../lib/type-converters::type DomainProduct
-- import: ../../utils/routes::Routes
 - import: @/components/ProductCard::ProductCard
 - import: @/components/category/EnhancedNeedsWizard::EnhancedNeedsWizard
 - import: @/components/navigation/Breadcrumb::Breadcrumb
@@ -92,49 +97,55 @@ Sayfa içindeki kullanıcı aksiyonlarına yanıt vererek belirli bölümlere ka
 ### [N1_NASIL] AST Pointer: CategoryLandingView.tsx::CategoryLanding
 - **params**: (category, products, subCategories = [])
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini uluslararasılaştırmak için kullanılır.
-  - `wrapCategory` — useCategoryViewModel hook'undan gelen, category nesnesini view model formatına dönüştüren fonksiyon.
-  - `showProducts` — Ürün listesinin gösterilip gizleneceğini kontrol eden state (boolean).
-  - `activeFilter` — Ürün listesinde aktif olan filtre değerini tutan state (varsayılan: 'all').
-  - `wizardOpen` — EnhancedNeedsWizard bileşeninin açık/kapalı durumunu kontrol eden state (boolean).
-  - `disableAnimation` — Sayfa yükleme animasyonunu başlangıçta devre dışı bırakmak için kullanılan state, 300ms sonra false olur.
-  - `productListRef` — Ürün listesinin DOM elementine referans vermek için useRef, scroll kontrolü için kullanılır.
-  - `vm` — `wrapCategory(category)` çağrısıyla elde edilen, ana kategorinin view modeli.
-  - `parentVm` — `wrapCategory(subCategories.find(...))` ile bulunan üst kategorinin view modeli (yoksa undefined).
-  - `isAirCurtain` — `category.slug === 'air-curtains'` kontrolüyle belirlenen, hava perdesi kategorisi olup olmadığının boolean değeri.
-  - `isSilentFan` — `category.slug === 'quiet-duct-fans'` kontrolüyle belirlenen, sessiz fan kategorisi olup olmadığının boolean değeri.
-  - `isDehumidifier` — `category.slug === 'dehumidifiers'` kontrolüyle belirlenen, nem alıcı kategorisi olup olmadığının boolean değeri.
-  - `breadcrumbItems` — Breadcrumb bileşenine geçirilecek, navigasyon yolunu temsil eden nesne dizisi.
-  - `heroImage` — `category.image_url` veya varsayılan bir görsel yolunu içeren string, hero bölümünde gösterilir.
-  - `filteredProducts` — `products` dizisinin `activeFilter` durumuna göre filtrelenmiş hali (DomainProduct[]).
-- **Dönüş**: React.ReactNode (JSX). Ana sayfa yapısını, hero bölümünü, kategoriye özel içerikleri, filtrelenmiş ürün listesini ve alt bileşenleri render eder.
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, metinlerin lokalizasyonu için kullanılır
+  - `Routes` — useLocalizedRoutes hook'undan gelen lokalize rota fonksiyonları, kategori URL'lerini oluşturmak için kullanılır
+  - `wrapCategory` — useCategoryViewModel hook'undan gelen fonksiyon, ham kategori verisini view model'e dönüştürmek için kullanılır
+  - `showProducts` — Ürünlerin gösterilip gösterilmeyeceğini kontrol eden boolean state
+  - `activeFilter` — Ürün filtreleme durumunu tutan string state ("all" veya "quiet")
+  - `wizardOpen` — EnhancedNeedsWizard'ın açık olup olmadığını kontrol eden boolean state
+  - `disableAnimation` — İlk yüklemede animasyonları devre dışı bırakan boolean state
+  - `productListRef` — Ürün listesi div'ine referans veren useRef nesnesi
+  - `vm` — wrapCategory(category) ile oluşturulmuş ana kategorinin view model'i
+  - `parentVm` — wrapCategory(subCategories.find(...)) ile oluşturulmuş üst kategorinin view model'i (eğer varsa)
+  - `isAirCurtain` — Kategorinin "air-curtains" olup olmadığını kontrol eden boolean
+  - `isSilentFan` — Kategorinin "quiet-duct-fans" olup olmadığını kontrol eden boolean
+  - `isDehumidifier` — Kategorinin "dehumidifiers" olup olmadığını kontrol eden boolean
+  - `breadcrumbItems` — Breadcrumb navigasyonu için dizi, t() ile çevrilmiş label'lar ve href'ler içerir
+  - `heroImage` — Kategori görseli veya varsayılan görsel yolu
+  - `filteredProducts` — activeFilter durumuna göre filtrelenmiş ürünler dizisi
+- **Dönüş**: React.FC<CategoryLandingProps> (JSX döndürür)
 
-### [N2_NASIL] AST Pointer: CategoryLandingView.tsx::handleScrollToTarget
+### [N2_NASIL] AST Pointer: CategoryLandingView.tsx::useEffectCallback
+- **params**: () (parametre yok)
+- **ic_degiskenler**:
+  - `animTimer` — 300ms sonra disableAnimation'ı false yapacak timeout nesnesi
+- **Dönüş**: clearTimeout(animTimer) yapan cleanup fonksiyonu
+
+### [N3_NASIL] AST Pointer: CategoryLandingView.tsx::handleScrollToTarget
 - **params**: (targetId: string)
 - **ic_degiskenler**:
-  - `anchor` — `document.getElementById(targetId)` ile bulunan, verilen ID'ye sahip DOM elementi (HTMLElement | null).
-- **Dönüş**: yok. Sayfayı belirli bir ID'ye sahip elemente kaydırır (smooth scroll).
+  - `anchor` — document.getElementById(targetId) ile bulunan DOM elementi
+- **Dönüş**: yok (void)
 
-### [N3_NASIL] AST Pointer: CategoryLandingView.tsx::handleShowProducts
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok. Ürün listesinin gösterilmesini sağlar (`setShowProducts(true)`) ve 100ms gecikmeyle `handleScrollToTarget`'i çağırarak products-anchor'a kaydırır.
+### [N4_NASIL] AST Pointer: CategoryLandingView.tsx::handleShowProducts
+- **params**: () (parametre yok)
+- **ic_degiskenler**: (yok, sadece setShowProducts ve handleScrollToTarget çağrılır)
+- **Dönüş**: yok (void)
 
-### [N4_NASIL] AST Pointer: CategoryLandingView.tsx::filteredProducts_callback
+### [N5_NASIL] AST Pointer: CategoryLandingView.tsx::filterProducts
 - **params**: (p: DomainProduct)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: boolean. `activeFilter` durumuna göre `p` ürününün filtrelenip filtrelenmeyeceğini belirler.
+- **ic_degiskenler**: (yok, sadece parametre ve outer scope değişkeni activeFilter kullanılır)
+- **Dönüş**: boolean (ürünün filtreleme durumuna göre true/false)
 
-### [N5_NASIL] AST Pointer: CategoryLandingView.tsx::filterButton_map_callback
-- **params**: (f)
-- **ic_degiskenler**:
-  - `f` — Filtre seçeneklerinden birini temsil eden nesne, `key` ve `label` özellikleri taşır.
-- **Dönüş**: JSX (button elementi). Her filtre seçeneği için bir buton döner, tıklanırsa `setActiveFilter` çağrılır.
+### [N6_NASIL] AST Pointer: CategoryLandingView.tsx::mapButton
+- **params**: (f) — f nesnesi { key: string, label: string } yapısındadır
+- **ic_degiskenler**: (yok, sadece parametre ve outer scope değişkenleri activeFilter, setActiveFilter kullanılır)
+- **Dönüş**: JSX (<button> elementi)
 
-### [N6_NASIL] AST Pointer: CategoryLandingView.tsx::productCard_map_callback
-- **params**: (p)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX (ProductCard bileşeni). Her `filteredProducts` elemanı için bir ProductCard döner.
+### [N7_NASIL] AST Pointer: CategoryLandingView.tsx::mapProduct
+- **params**: (p) — p DomainProduct tipindedir
+- **ic_degiskenler**: (yok, sadece parametre kullanılır)
+- **Dönüş**: JSX (<ProductCard> elementi)
 
 ---
 

@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\address.service.ts
-skeleton_hash: 59806fac7b16585a
+skeleton_hash: ee1024a7169d1ac6
 entity_hashes:
   func:createAddress: 58bfa83da20b8ccd
   func:deleteAddress: 9e5cf23e8c132105
@@ -11,7 +11,7 @@ entity_hashes:
   func:setDefaultAddress: 369fe22c82c4c3ee
   func:updateAddress: 7395bc16ccf7b629
   overview: 9816bb84388067d9
-generated_at: 2026-06-08T10:09:34Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış
@@ -94,6 +94,13 @@ Bu modül, kullanıcı adresleri için temel CRUD (Oluştur, Listele, Güncelle,
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../types/database.types::type { Database }
+- import: ../../types/db-rows::type { DbUserAddress, DbUserAddressInsert, DbUserAddressUpdate }
+- import: @supabase/supabase-js::type { SupabaseClient }
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: address.service.ts::listAddresses
@@ -114,8 +121,8 @@ graph TD
     address_service_ts__listAddresses["listAddresses"]
     address_service_ts__setDefaultAddress["setDefaultAddress"]
     address_service_ts__updateAddress["updateAddress"]
-    address_service_ts__updateAddress --> address_service_ts__setDefaultAddress
     address_service_ts__createAddress --> address_service_ts__setDefaultAddress
+    address_service_ts__updateAddress --> address_service_ts__setDefaultAddress
 ```
 
 ## NODE ID STANDARD

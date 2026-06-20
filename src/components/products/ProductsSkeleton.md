@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\ProductsSkeleton.tsx
-skeleton_hash: 301cb056fb6b24f1
+skeleton_hash: 3b7a7745ebc22ad1
 entity_hashes:
   func:ProductsSkeleton: c84366c03612870d
   overview: 3d054fd83bb81226
   style_tokens: b29c323410064a82
-generated_at: 2026-05-28T22:36:53Z
+generated_at: 2026-06-19T20:47:27Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,11 @@ Bu React tabanlı ürün listesi yükleme iskeleti (ProductsSkeleton) bileşeni,
 **Parametreler**:
 - Bu fonksiyon herhangi bir giriş parametresi almaz
 **Dönüş**: Fonksiyona ait açıkça belirtilmiş return tipi bilinmemekle birlikte, React bileşeni yapısı gereği tarayıcıda render edilebilen JSX elementi döndürür. Bu dönüş değeri, yükleme durumunu temsil eden iskelet öğelerini içerir ve ana ürün bileşeni tarafından yükleme sürecinde ekrana basılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
 
 ---
 

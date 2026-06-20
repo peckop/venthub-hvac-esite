@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\errors.en.ts
-skeleton_hash: 67dec44f3421ad12
+skeleton_hash: bce7d646f19e5be8
 entity_hashes:
   overview: 0cabb6ce3dc6888f
-generated_at: 2026-06-13T17:00:13Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -32,7 +32,7 @@ Bu modül, admin paneli için İngilizce dilinde hata mesajları içeren statik 
 ## SABİTLER
 - **errors** (object) — `{
       subtitle: 'Monitor, filter and inspect client-side errors.',
-      le...`
+      ...`
 
 ---
 

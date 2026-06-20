@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\teslimat-kargo\page.tsx
-skeleton_hash: be5a4a7e70d89475
+skeleton_hash: 64ea44e3df29105d
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: eeb2664f8ef21a75
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 Bu fonksiyon herhangi bir parametre almamaktadır.
 
 **Dönüş**: `JSX.Element` — `PageComponent` bileşeninin render edilmiş JSX yapısını döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../views/support/ShippingPage::PageComponent
 
 ---
 

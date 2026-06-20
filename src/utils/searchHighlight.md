@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\searchHighlight.tsx
-skeleton_hash: 9a7ae38ff9331cf8
+skeleton_hash: bc185a9476eba1ec
 entity_hashes:
   func:highlightMatch: 6d9d01916ecad5ec
   overview: 57ecd39f68f023ec
   style_tokens: 9f79124e858dad58
-generated_at: 2026-05-28T22:38:50Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,12 @@ Bu TSX modülü, React tabanlı projelerde verilen metin içindeki arama sorgusu
 - text: string — Vurgulama işleminin uygulanacağı ana metin, arama teriminin üzerinde aranacağı ve eşleşmelerin vurgulanacağı temel içerik
 - query: string — Metin içinde aranacak olan terim, eşleşmelerin bu değere göre belirlenmesini sağlayan arama sorgusu
 **Dönüş**: ReactNode — React uygulamalarında doğrudan görüntülenebilecek işlenmiş metin. Arama terimiyle eşleşen kısımlar <mark> etiketi ile vurgulanmış olarak sunulur, eşleşme olmaması veya geçersiz sorgu durumunda orijinal metin olduğu gibi döndürülür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
+- import: react::ReactNode
 
 ---
 

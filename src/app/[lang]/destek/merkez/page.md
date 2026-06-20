@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\merkez\page.tsx
-skeleton_hash: d9eb9bbb94564e0d
+skeleton_hash: 44ff75aca702a312
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 77d1db6b23de9b07
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - Fonksiyon herhangi bir parametre almamaktadır
 
 **Dönüş**: `<PageComponent />` JSX bileşeni döndürür. Bu bileşen, destek merkezi sayfasının tüm içeriğini barındıran ana bileşendir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../views/knowledge/HubPage::PageComponent
 
 ---
 

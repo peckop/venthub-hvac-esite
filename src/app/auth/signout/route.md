@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\auth\signout\route.ts
-skeleton_hash: 2beec7f26f4fd0e8
+skeleton_hash: be6286006ba44974
 entity_hashes:
   func:POST: c85301a22b3fe20e
   overview: fa888e32d3000f25
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:34Z
 ---
 
 ## Genel Bakış
@@ -42,6 +42,15 @@ Bu modül, kullanıcı oturumunu sonlandıran bir API endpoint'idir.
 - `request`: Request — Next.js tarafından sağlanan HTTP istek nesnesi, isteğin URL bilgisini ve diğer header verilerini içerir
 
 **Dönüş**: `NextResponse` — Kullanıcıyı `/{lang}/auth/login` adresine yönlendiren 302 HTTP yanıt döner. Yanıt aynı zamanda claims cache cookie'sini temizleme işlemini de içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/supabase/server::createSupabaseServerClient
+- import: @/utils/router::clearClaimsCacheCookie
+- import: next/cache::revalidatePath
+- import: next/headers::cookies
+- import: next/server::NextResponse
 
 ---
 

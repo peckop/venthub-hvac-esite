@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\analytics.ts
-skeleton_hash: 850bc2150819ea68
+skeleton_hash: 7c0f7517f6c55f7a
 entity_hashes:
   func:trackEvent: a39f838e00080681
   overview: 6ae77f9a934c8a05
-generated_at: 2026-06-12T10:23:55Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış

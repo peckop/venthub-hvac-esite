@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\CartContext.tsx
-skeleton_hash: fcecd9351d5bed43
+skeleton_hash: 9b6e17e844b96d03
 entity_hashes:
   overview: 5c2e2a3fcb9d0dde
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -31,6 +31,13 @@ Bu modül, yalnızca bir React Context tanımı içererek alışveriş sepeti du
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../types/cart::type { CartItem }
+- import: ../types/ui-models::type { Product }
+- import: react::createContext
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\cart\page.tsx
-skeleton_hash: a0383d6424d2f48f
+skeleton_hash: 4e8781721b6dc8a0
 entity_hashes:
   func:Page: caa361dd303c55cf
   overview: 77749cbbbd217b97
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-08T10:08:10Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -34,6 +34,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**:  
 - (fonksiyon parametresi yok)  
 **Dönüş**: Fonksiyon bir JSX elementi döndürür; dönüş tipi `void` olarak kabul edilir (React render çıktısı).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../views/CartPage::CartPage
+- import: react::React
+- import: react::Suspense
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\payment-success\page.tsx
-skeleton_hash: 71f4cd2ed7c52473
+skeleton_hash: 9a405f8d33a1ddeb
 entity_hashes:
   func:Page: bf48e1a50cafa3b0
   overview: c57cfc349133b98c
   style_tokens: fca21e5c46ce3029
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -36,6 +36,12 @@ Bu modül için fonksiyon gövdesi verilmediği için mimari varsayımlar üreti
 **Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
 
 **Dönüş**: JSX elementi döndürür. Suspense ile sarılmış PageComponent bileşenini içeren React elementi. Dönüş tipi JSX.Element olarak tanımlanabilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../views/PaymentSuccessPage::PageComponent
+- import: react::Suspense
 
 ---
 

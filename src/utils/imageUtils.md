@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\imageUtils.ts
-skeleton_hash: 52b8f3fce4575628
+skeleton_hash: a4358d1be8e85f5b
 entity_hashes:
   func:compressImage: 52ddf4e7747053ca
   func:normalizeImageUrl: a7c1782886d55260
   overview: 3edb070ce8076b34
-generated_at: 2026-06-07T20:34:31Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış

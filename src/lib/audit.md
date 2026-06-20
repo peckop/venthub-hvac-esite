@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\audit.ts
-skeleton_hash: 7826bc787cad34e3
+skeleton_hash: 9ad955496d105f1f
 entity_hashes:
   func:logAdminAction: 83ab9f1273deee6a
   overview: beb3974c7555e069
-generated_at: 2026-05-28T22:38:01Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,11 @@ Bu modül, yönetici eylemlerinin denetim kaydını oluşturmak ve saklamak içi
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @supabase/supabase-js::type { SupabaseClient }
+
+---
+
 ## INTERFACES
 
 ### AdminAuditLogInput
@@ -67,6 +72,22 @@ Bu modül, yönetici eylemlerinin denetim kaydını oluşturmak ve saklamak içi
 ```typescript
 type AdminAuditAction = 'INSERT' | 'UPDATE' | 'DELETE' | 'CUSTOM'
 ```
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/lib/audit.ts::logAdminAction
+- **params**: `(client: SupabaseClient, input: AdminAuditLogInput | AdminAuditLogInput[])`
+- **ic_degiskenler**:
+  - `rows` — input'un array olup olmadığını kontrol eder; array değilse tek elemanlı array'e sarar. Supabase insert işlemi için her zaman array Formatında hazırlanır
+  - `userId` — mevcut oturum açmış kullanıcının ID'si; input içinde `actor` alanı belirtilmemişse `actor` olarak kullanılacak fallback değer. `null` ile başlatılır, auth çağrılarıyla doldurulmaya çalışılır
+  - `sessData` — `client.auth.getSession()` çağrısının sonucu; oturum verisi ve session user ID bilgisini içerir
+  - `prepared` — `rows` dizisinin her elemanına map işlemi uygulanmış hali. Her satırda `actor` alanı mevcutsa dokunulmaz, yoksa `userId` değeri ile `actor` alanı eklenerek yeni bir obje oluşturulur
+  - `hasActor` — map callback'i içinde her bir satır `r` için, `r.actor` alanının var olup olmadığını ve `null` olmadığını kontrol eden boolean ifade
+  - `r` — `rows.map()` callback'indeki her bir `AdminAuditLogInput` elemanı; tek tek işlenerek `prepared` dizisine dönüştürülür
+  - `error` — `client.from('admin_audit_log').insert(prepared).select('id')` çağrısının döndürdüğü hata nesnesi; `null` değilse insert başarısız olmuştur ve `console.warn` ile loglanır
+- **Dönüş**: `Promise<void>` — fonksiyon değer döndürmez; yan etki olarak `admin_audit_log` tablosuna insert işlemi yapar ve hata durumunda `console.warn` ile konsola uyarı basar. Outer `try-catch` ile auth çağrıları ve insert işlemi exception'ları yakalanır, fonksiyon asla throw etmez
 
 ---
 

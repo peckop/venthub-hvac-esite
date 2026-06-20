@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminErrorsPage: d26af9274e4d56dd
   overview: 0655495a3be5f695
   style_tokens: a7fe3ab3ca0c1259
-generated_at: 2026-06-13T17:00:37Z
+generated_at: 2026-06-19T20:48:41Z
 ---
 
 ## Genel Bakış
@@ -43,10 +43,6 @@ Bu modül için fonksiyon imzalarından çıkarılabilir kesin mimari varsayıml
 
 ---
 
-**Not:** Fonksiyon imzalarında parametre listesi, varsayılan değer veya modül sabiti verilmediği için; hata kayıtlarının veri kaynağı, API çağrıları, hook kullanımı veya bileşen içi state yönetimi hakkında kesin aksiyom üretilmemiştir. Bu tür detaylar fonksiyon gövdesinden çıkarılmalıdır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### AdminErrorsPage
@@ -60,6 +56,17 @@ Bu modül için fonksiyon imzalarından çıkarılabilir kesin mimari varsayıml
 Bu fonksiyon (React fonksiyonel bileşeni) herhangi bir parametre almaz.
 
 **Dönüş**: `React.FC` — Suspense ile sarılmış hata tablosu içeriğini ve sayfa başlığını render eden React fonksiyonel bileşeni.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: ./ErrorsTableBody::ErrorsTableBody
+- import: react::React
+- import: react::Suspense
 
 ---
 

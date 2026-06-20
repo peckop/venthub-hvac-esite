@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavPrimaryRail.tsx
-skeleton_hash: 678838c89ffec9b3
+skeleton_hash: c356d196fdd45e23
 entity_hashes:
   overview: 4d24cdf1272dfd45
   style_tokens: ab3a3305965e5539
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-19T20:47:10Z
 ---
 
 ## Genel Bakış
@@ -22,6 +22,14 @@ Bu modül, props tabanlı bir React bileşenidir; girdilerin interface tanımlar
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/utils::cn
+- import: next/link::Link
+- import: next/navigation::useRouter
+- import: react::React
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\settings\page.tsx
-skeleton_hash: c922527cfbd0de6e
+skeleton_hash: 5cc0fb075ff4ab37
 entity_hashes:
   func:Page: 9367d1f0b801970c
   overview: a5dfa30287607de2
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:46:32Z
 ---
 
 ## Genel Bakış
@@ -41,6 +41,11 @@ Bu modül, bir React sayfa bileşeninin en basit formunda olup, yalnızca başka
 - Fonksiyon herhangi bir parametre almamaktadır (`function Page()`).
 
 **Dönüş**: React JSX elementi döndürür. Dönen değer, admin ayarları sayfasının tüm kullanıcı arayüzünü temsil eden `<AdminSettingsPage />` bileşenidir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../views/admin/AdminSettingsPage::AdminSettingsPage
 
 ---
 

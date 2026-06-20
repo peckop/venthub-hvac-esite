@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\productsApi.ts
-skeleton_hash: abf7f572746ed92f
+skeleton_hash: c2b099484e3c807d
 entity_hashes:
   func:fetchHomeProducts: 71fca451ebe96a52
   func:srf: 8a471a81c6ce4ef0
   overview: 0f31af6086d3c14d
-generated_at: 2026-05-28T22:38:07Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış

@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\dashboard.tr.ts
-skeleton_hash: 1d2d17b6068bdf31
+skeleton_hash: 0960a1d2a65f7fb0
 entity_hashes:
   overview: 978b08ca21df4d0c
-generated_at: 2026-06-13T11:10:37Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -28,8 +28,9 @@ Bu modül, bir admin dashboard için Türkçe çeviri sözlüğünü içeren bir
 
 ## SABİTLER
 - **dashboard** (object) — `{
-      subtitle: 'Hızlı bakış ve son hareketler',
-      rangeToday: 'Bugün',...`
+  subtitle: 'Hızlı bakış ve son hareketler',
+  rangeToday: 'Bugün',
+  ra...`
 
 ---
 

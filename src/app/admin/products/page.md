@@ -3,39 +3,43 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx
-skeleton_hash: 6642fc411885f100
+skeleton_hash: de02d609fb6878b2
 entity_hashes:
+  func:Loading: 657ee72781ec51d8
   func:Page: 50c72d14cf6e5d39
-  overview: 2907a29989d3f1d8
+  overview: ad893d1e0e0b6ff3
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
-Bu modül, Next.js tabanlı yönetim panelindeki (admin) ürünler sayfasının giriş noktasıdır. Tek bir `Page` bileşeni ile sayfanın temel yapısını oluşturarak, ürün yönetimi arayüzünün render edilmesi işlemini ilgili alt bileşene devreder.
+Bu modül, Next.js tabanlı yönetim panelindeki ürünler sayfasının giriş noktasıdır. Sayfa yüklenirken gösterilecek yükleme durumunu (`Loading`) ve sayfanın asıl içeriğini (`Page`) sunarak, ürün yönetimi arayüzünün render edilmesi işlemini ilgili alt bileşenlere devreder.
 
 ## Fonksiyon Grupları
+### Sayfa Yükleme Durumu
+Sayfa içeriği henüz hazır değilken kullanıcıya gösterilecek yükleme göstergesini veya iskelet (skeleton) arayüzünü yönetir. Bu, Next.js'in dinamik yükleme özelliğinin kullanıcı deneyimini iyileştirmek amacıyla sunduğu bir mekanizmadır.
+- Loading
+
 ### Sayfa Girişi ve Render
-Bu grup, yönetim panelindeki ürünler sayfasının yüklenme ve görünür kılınma sürecini yönetir. Modülün tek fonksiyonu olan `Page`, herhangi bir iş mantığı veya durum yönetimi içermeksizin, ilgili sayfa arayüz bileşenini döndürerek sayfayı oluşturur.
+Yönetim panelindeki ürünler sayfasının temel yapısını oluşturarak ilgili sayfa arayüz bileşeninin render edilmesini sağlar. Herhangi bir iş mantığı veya durum yönetimi içermeksizin, sayfayı ilgili alt bileşene devreder.
 - Page
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, `Page()` fonksiyonunun `AdminProductsPage` bileşenini çağırarak render etmesine dayanan basit bir Next.js sayfa girişi modülüdür.
-
-**[Aksiyom 1 - Bağımlılık Zorunluluğu]:** Eğer `AdminProductsPage` bileşeni modülün erişim alanında (import scope) mevcut değilse, `Page` bileşeninin render işlemi `ReferenceError` veya `undefined is not a function` hatasıyla başarısız olur.
-
-**[Aksiyom 2 - Bileşen Uyumluluğu]:** Eğer `AdminProductsPage` bir React/JSX bileşeni (fonksiyonel veyasınıf) olarak tanımlanmamışsa, `Page` bileşeni geçerli bir React node döndüremeyeceği için React çalışma zamanı hatası (örn: "Element type is invalid") oluşur.
-
-**[Aksiyom 3 - Parametresiz Çağrı Sözleşmesi]:** `Page()` fonksiyonu parametresiz olarak çağrılmalıdır. Eğer `AdminProductsPage` bileşeni prop'lar bekliyorsa ancak `Page` bileşeni bu prop'ları iletmiyorsa, `AdminProductsPage` içinde beklenmeyen `undefined` değer erişimleri veya eksik veri hataları oluşur.
-
-> **Not:** `AdminProductsPage` bileşeninin hangi prop'ları beklediği, hangi veri kaynaklarına eriştiği ve iç bileşen yapısı bu modülün fonksiyon gövdesinde tanımlı değildir; bu nedenle bu kapsamdaki varsayımlar belirlenememiştir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### Loading
+**Ne yapar**: Bu fonksiyon, bir yükleme durumunu (loading state) temsil eden bir UI bileşeni veya durumu döndürür. Tipik olarak, bir veri çekilirken veya bir işlem yürütülürken kullanıcıya gösterilen bir loading indicator'ı veya placeholder bileşeni olabilir.
+**Nasıl yapar**: Fonksiyonun iç mantığı veya dekoratörleri hakkında verilen bir dokümantasyon (docstring) bulunmamaktadır. Dolayısıyla, çağrıldığında ne tür bir nesne veya bileşen döndürdüğü, hangi mantığı uyguladığı bilinmemektedir. Yalnızca fonksiyonun adı, yükleme durumuyla ilişkilendirildiğini ima etmektedir.
+**Parametreler**: Fonksiyonun herhangi bir parametresi belirtilmemiştir.
+**Dönüş**: Fonksiyonun dönüş tipi `void` veya belirsiz olarak belirtilmiştir. Fonksiyonun bir UI bileşeni (örn. React bileşeni) döndürmesi beklenirken, verilen bilgi kesin bir tip içermemektedir.
 
 ### Page
 
@@ -50,6 +54,14 @@ Bu modül, `Page()` fonksiyonunun `AdminProductsPage` bileşenini çağırarak r
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: next/dynamic::nextDynamic
+- import: react::React
+- import: react::Suspense
+
+---
+
 ## SABİTLER
 - **AdminProductsPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminProductsPage'),
@@ -59,22 +71,30 @@ Bu modül, `Page()` fonksiyonunun `AdminProductsPage` bileşenini çağırarak r
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/products/page.tsx::Page
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx::Loading
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan destructured çeviri fonksiyonu; `t('common.loading')` şeklinde Suspense fallback içinde yüklenme metni için kullanılır
-- **Dönüş**: JSX — `<Suspense>` sarmalayıcısı içinde `AdminProductsPage` component'ini döndürür; fallback olarak animasyonlu "yükleniyor" mesajı gösterir
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini yerelleştirmek için kullanılır
+- **Dönüş**: React JSX elementi (loading durumu için animasyonlu mesaj)
+
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\app\admin\products\page.tsx::Page
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, UI metinlerini yerelleştirmek için kullanılır
+- **Dönüş**: React JSX elementi (Suspense ile sarılmış AdminProductsPage bileşeni)
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\app\admin\products\page.tsx
+  function: src\app\admin\products\page.tsx::Loading
   function: src\app\admin\products\page.tsx::Page
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: Loading
   export: Page
 
 ---

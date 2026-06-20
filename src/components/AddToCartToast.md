@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToast.tsx
-skeleton_hash: 9a8701d25a4ae6cf
+skeleton_hash: df3d9a7b91ba0e22
 entity_hashes:
   func:AddToCartToast: 581f14d900d31bb4
   overview: 4631aecdd4e1b7b7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:08:12Z
+generated_at: 2026-06-19T20:46:34Z
 ---
 
 ## Genel Bakış
@@ -43,6 +43,14 @@ Bu modül için mimari varsayımlar, yalnızca sağlanan fonksiyon imzaları ve 
 **Parametreler**:
 - Bu fonksiyon herhangi bir parametre almaz.
 **Dönüş**: React.FC — Sepete ekleme bildirimini temsil eden bir React fonksiyonel bileşeni döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./AddToCartToastContent::AddToCartToastContent
+- import: @/types/ui-models::type { Product }
+- import: react::React
+- import: sonner::toast
 
 ---
 

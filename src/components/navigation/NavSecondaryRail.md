@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavSecondaryRail.tsx
-skeleton_hash: 4b02899ddd689514
+skeleton_hash: cc95f594826a9731
 entity_hashes:
   func:getIconForId: 81e46f9f714fe65d
   overview: 6f5924a947fecbc3
   style_tokens: 9b60048869298a29
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-19T20:47:10Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,12 @@ Bu modül için, fonksiyon imzası ve modül bağlamından çıkarılabilecek mi
 - id: string — İcon ile ilişkilendirilmek istenen öğenin tanımlayıcısı. Navigation menüsündeki her bir öğe için benzersiz bir kimlik değeri beklenir.
 
 **Dönüş**: Fonksiyonun dönüş tipi dokümantasyonda belirtilmemiştir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next/link::Link
+- import: react::React
 
 ---
 

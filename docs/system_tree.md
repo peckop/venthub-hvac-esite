@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-17T09:48:39.999343+00:00
+compiled_at: 2026-06-20T05:03:16.023651+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-06-20T05:03:16.023651+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -25,9 +25,6 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 ├── ⚠️ `TEST_READY.md`
 ├── ⚪ `VISION.md`
 ├── 📂 **cache/**
-├── 📂 **design-system/**
-│   └── 📂 **venthub-hvac/**
-│       └── 📂 **pages/**
 ├── 📂 **docs/**
 │   ├── ⚪ `DURUM-TAKIP.md`
 │   ├── ⚪ `README.md`
@@ -50,6 +47,7 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │   │   ├── ⚪ `3d-surfaces-audit-2026-06-16.md`
 │   │   ├── ⚪ `admin-cetvel-scores-2026-06-13.md`
 │   │   ├── ⚪ `admin-cetvel-scores-2026-06-17.md`
+│   │   ├── ⚪ `admin-cetvel-scores-2026-06-18.md`
 │   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
 │   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
 │   │   ├── ⚪ `legal-i18n-scope-antigravity-2026-06-16.md`
@@ -60,13 +58,34 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │   │   └── ⚪ `en-yasal-ceviri-inceleme-2026-06-16.md`
 │   ├── 📂 **plans/**
 │   │   ├── ⚪ `3d-migration-waves-2026-06-17.md`
+│   │   ├── ⚪ `3d-wave3-models-brief.md`
+│   │   ├── ⚪ `admin-cila-fan-out-2026-06-19.md`
 │   │   ├── ⚪ `admin-enterprise-roadmap-2026-06-13.md`
+│   │   ├── ⚪ `admin-page-rewrites-brief.md`
+│   │   ├── ⚪ `admin-shell-e1-command-palette-brief.md`
+│   │   ├── ⚪ `admin-shell-e2-notification-inbox-brief.md`
 │   │   ├── ⚪ `avensair-teslim-yol-haritasi-2026-06-15.md`
 │   │   ├── ⚪ `faz0-kit-contract-2026-06-13.md`
 │   │   ├── ⚪ `faz1-migration-playbook-2026-06-13.md`
 │   │   ├── ⚪ `faz1-remaining-divided-2026-06-13.md`
 │   │   ├── ⚪ `faz2-admin-backlog.md`
 │   │   ├── ⚪ `i18n-jsx-literals-cleanup-2026-06-14.md`
+│   │   ├── ⚪ `j1-dashboard-data-brief.md`
+│   │   ├── ⚪ `j10-inventorysettings-refactor-brief.md`
+│   │   ├── ⚪ `j11-ordersboard-refactor-brief.md`
+│   │   ├── ⚪ `j12-logistics-refactor-brief.md`
+│   │   ├── ⚪ `j13-inventoryreport-refactor-brief.md`
+│   │   ├── ⚪ `j14-inventory-kit-brief.md`
+│   │   ├── ⚪ `j15-cila-group-a-brief.md`
+│   │   ├── ⚪ `j16-cila-group-b-brief.md`
+│   │   ├── ⚪ `j2-settings-i18n-brief.md`
+│   │   ├── ⚪ `j3-csv-export-pair-brief.md`
+│   │   ├── ⚪ `j4-orders-refactor-brief.md`
+│   │   ├── ⚪ `j5-categories-refactor-brief.md`
+│   │   ├── ⚪ `j6-users-refactor-brief.md`
+│   │   ├── ⚪ `j7-returns-refactor-brief.md`
+│   │   ├── ⚪ `j8-coupons-refactor-brief.md`
+│   │   ├── ⚪ `j9-categorybuilder-refactor-brief.md`
 │   │   ├── ⚪ `seo-transition-blueprint.md`
 │   │   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
 │   │   ├── ⚪ `venthub_saas_faz1_prompt.md`
@@ -84,11 +103,15 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │   ├── 📂 **screenshots/**
 │   │   └── ⚪ `README.md`
 │   ├── 📂 **standards/**
+│   │   ├── ⚪ `3d-scene-lighting-research.md`
+│   │   ├── ⚪ `3d-showroom-ux-research.md`
 │   │   ├── ⚪ `3d-webgl-standard.md`
 │   │   ├── ⚪ `SOURCES.md`
 │   │   ├── ⚪ `admin-capabilities.md`
 │   │   ├── ⚪ `admin-standard.md`
 │   │   ├── ⚪ `analytics-standard.md`
+│   │   ├── ⚪ `category-taxonomy-standard.md`
+│   │   ├── ⚪ `collaboration-protocol.md`
 │   │   ├── ⚪ `dealer-module-blueprint.md`
 │   │   ├── ⚪ `dealer-network-standard.md`
 │   │   └── ⚪ `i18n-localization-standard.md`
@@ -96,17 +119,20 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │   ├── ⚪ `system_tree.md`
 │   ├── ⚪ `venthub_hvac_master.md`
 │   └── ⚪ `venthub_skills_master.md`
+├── 📂 **e2e/**
+│   ├── ✅ `admin-smoke.e2e.ts`
+│   └── ✅ `checkout-smoke.e2e.ts`
 ├── 📂 **explorer_m2_3/**
 │   └── ⚠️ `analysis.md`
 ├── ⚠️ `implementation_plan.md`
 ├── 📂 **memory-engine/**
 │   └── ⚪ `README.md`
 ├── ⚠️ `next.config.md`
+├── ✅ `playwright.config.ts`
 ├── ✅ `sentry.client.config.ts`
 ├── ✅ `sentry.edge.config.ts`
 ├── ✅ `sentry.server.config.ts`
 ├── 📂 **src/**
-│   ├── 📂 **actions/**
 │   ├── 📂 **app/**
 │   │   ├── 📂 **[lang]/**
 │   │   │   ├── 📂 **about/**
@@ -327,10 +353,14 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │   │   │   │   ├── ✅ `FacetedFilter.tsx`
 │   │   │   │   ├── ✅ `persist.ts`
 │   │   │   │   └── ✅ `types.ts`
-│   │   │   └── 📂 **products/**
-│   │   │       ├── ✅ `ProductCsvImport.tsx`
-│   │   │       ├── ✅ `ProductFormModal.tsx`
-│   │   │       └── ✅ `ProductHealthBadge.tsx`
+│   │   │   ├── 📂 **orders/**
+│   │   │   │   └── ✅ `OrderFormModal.tsx`
+│   │   │   ├── 📂 **products/**
+│   │   │   │   ├── ✅ `ProductCsvImport.tsx`
+│   │   │   │   ├── ✅ `ProductFormModal.tsx`
+│   │   │   │   └── ✅ `ProductHealthBadge.tsx`
+│   │   │   └── 📂 **settings/**
+│   │   │       └── ✅ `SettingsFormModal.tsx`
 │   │   ├── 📂 **authority/**
 │   │   │   ├── ✅ `AuthorityRenderer.tsx`
 │   │   │   ├── ⚪ `README.md`
@@ -398,18 +428,19 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │   │   ├── 📂 **products/**
 │   │   │   ├── 📂 **3d/**
 │   │   │   │   ├── ✅ `AutoCenter.tsx`
-│   │   │   │   ├── ✅ `FanRenderer.tsx`
+│   │   │   │   ├── ⚠️ `FanRenderer.md`
 │   │   │   │   ├── ✅ `Product3DViewer.tsx`
+│   │   │   │   ├── ✅ `ProductModelRenderer.tsx`
 │   │   │   │   ├── ✅ `SmartCenterScale.tsx`
 │   │   │   │   ├── 📂 **core/**
-│   │   │   │   │   ├── ❌ `ContextLossRecovery.tsx`
-│   │   │   │   │   ├── ❌ `ResilientCanvasBoundary.tsx`
-│   │   │   │   │   ├── ❌ `SceneLightingRig.tsx`
-│   │   │   │   │   ├── ❌ `VentHubCanvas.tsx`
-│   │   │   │   │   ├── ❌ `assetRegistry.ts`
-│   │   │   │   │   ├── ❌ `disposeSceneObject.ts`
-│   │   │   │   │   ├── ❌ `tenantScene.tsx`
-│   │   │   │   │   └── ❌ `useDeviceDpr.ts`
+│   │   │   │   │   ├── ✅ `ContextLossRecovery.tsx`
+│   │   │   │   │   ├── ✅ `ResilientCanvasBoundary.tsx`
+│   │   │   │   │   ├── ✅ `SceneLightingRig.tsx`
+│   │   │   │   │   ├── ✅ `VentHubCanvas.tsx`
+│   │   │   │   │   ├── ✅ `assetRegistry.ts`
+│   │   │   │   │   ├── ✅ `disposeSceneObject.ts`
+│   │   │   │   │   ├── ✅ `tenantScene.tsx`
+│   │   │   │   │   └── ✅ `useDeviceDpr.ts`
 │   │   │   │   ├── 📂 **factory/**
 │   │   │   │   │   ├── ✅ `Assembler.tsx`
 │   │   │   │   │   ├── ✅ `VorticeLineoModel.tsx`
@@ -466,6 +497,7 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │   │       ├── ✅ `Skeleton.tsx`
 │   │       └── ✅ `VentImage.tsx`
 │   ├── 📂 **config/**
+│   │   ├── ✅ `admin-resources.ts`
 │   │   ├── ✅ `admin.ts`
 │   │   ├── ✅ `applications.ts`
 │   │   ├── ✅ `legal.ts`
@@ -568,8 +600,11 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │   │   └── ✅ `getDictValue.ts`
 │   ├── 📂 **lib/**
 │   │   ├── 📂 **admin/**
+│   │   │   ├── ✅ `inboxCounts.ts`
 │   │   │   ├── ✅ `mutateWithAudit.ts`
-│   │   │   └── ✅ `returnStatusMachine.ts`
+│   │   │   ├── ✅ `returnStatusMachine.ts`
+│   │   │   └── 📂 **search/**
+│   │   │       └── ✅ `resourceSearchers.ts`
 │   │   ├── ✅ `audit.ts`
 │   │   ├── 📂 **data/**
 │   │   │   └── ✅ `preload.ts`
@@ -586,6 +621,7 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │   │   │   ├── ✅ `address.service.ts`
 │   │   │   ├── ✅ `cart.service.ts`
 │   │   │   ├── ✅ `category.service.ts`
+│   │   │   ├── ✅ `inventoryReport.service.ts`
 │   │   │   ├── ✅ `invoice.service.ts`
 │   │   │   ├── ✅ `pricing.service.ts`
 │   │   │   ├── ✅ `product.service.ts`
@@ -633,7 +669,7 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │   │   ├── ✅ `router.ts`
 │   │   ├── ✅ `routes.ts`
 │   │   ├── ✅ `searchHighlight.tsx`
-│   │   ├── ❌ `tenantConstants.ts`
+│   │   ├── ✅ `tenantConstants.ts`
 │   │   ├── ✅ `tenantServer.ts`
 │   │   ├── ✅ `testA11y.tsx`
 │   │   ├── ✅ `type-converters.ts`
@@ -678,6 +714,7 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │       │   ├── ✅ `AdminInventorySettingsPage.tsx`
 │       │   ├── ✅ `AdminLayout.tsx`
 │       │   ├── ✅ `AdminLogisticsPage.tsx`
+│       │   ├── ✅ `AdminLogisticsTableBody.tsx`
 │       │   ├── ✅ `AdminMovementsPage.tsx`
 │       │   ├── ✅ `AdminOrdersBoard.tsx`
 │       │   ├── ✅ `AdminOrdersPage.tsx`
@@ -693,10 +730,12 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 │       │   ├── ✅ `CouponsTableBody.tsx`
 │       │   ├── ✅ `ErrorGroupsTableBody.tsx`
 │       │   ├── ✅ `ErrorsTableBody.tsx`
+│       │   ├── ✅ `InventoryTableBody.tsx`
 │       │   ├── ✅ `MovementsTableBody.tsx`
 │       │   ├── ✅ `OrdersTableBody.tsx`
 │       │   ├── ✅ `ProductsTableBody.tsx`
-│       │   └── ✅ `ReturnsTableBody.tsx`
+│       │   ├── ✅ `ReturnsTableBody.tsx`
+│       │   └── ✅ `WebhookEventsTableBody.tsx`
 │       ├── 📂 **calculators/**
 │       │   ├── ✅ `AirCurtainCalcPage.tsx`
 │       │   ├── ✅ `DuctCalcPage.tsx`
@@ -796,24 +835,7 @@ Bu belge, otonom derleyici tarafından 2026-06-17T09:48:39.999343+00:00 tarihind
 ```
 
 ## Eksik Dokümantasyonlar
-- [ ] `src\components\products\3d\core\ContextLossRecovery.tsx`
-- [ ] `src\components\products\3d\core\ResilientCanvasBoundary.tsx`
-- [ ] `src\components\products\3d\core\SceneLightingRig.tsx`
-- [ ] `src\components\products\3d\core\VentHubCanvas.tsx`
-- [ ] `src\components\products\3d\core\assetRegistry.ts`
-- [ ] `src\components\products\3d\core\disposeSceneObject.ts`
-- [ ] `src\components\products\3d\core\tenantScene.tsx`
-- [ ] `src\components\products\3d\core\useDeviceDpr.ts`
-- [ ] `src\utils\tenantConstants.ts`
-- [ ] `src\components\products\3d\core\ContextLossRecovery.tsx`
-- [ ] `src\components\products\3d\core\ResilientCanvasBoundary.tsx`
-- [ ] `src\components\products\3d\core\SceneLightingRig.tsx`
-- [ ] `src\components\products\3d\core\VentHubCanvas.tsx`
-- [ ] `src\components\products\3d\core\assetRegistry.ts`
-- [ ] `src\components\products\3d\core\disposeSceneObject.ts`
-- [ ] `src\components\products\3d\core\tenantScene.tsx`
-- [ ] `src\components\products\3d\core\useDeviceDpr.ts`
-- [ ] `src\utils\tenantConstants.ts`
+Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
@@ -826,6 +848,8 @@ Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `
 - [⚠️] `explorer_m2_3\analysis.md`
 - [⚠️] `implementation_plan.md`
 - [⚠️] `next.config.md`
+- [⚠️] `src\components\products\3d\FanRenderer.md`
+- [⚠️] `src\components\products\3d\FanRenderer.md`
 
 ## Geçersiz Şablon (Invalid Format)
 Harika! Tüm MD belgeleri Enterprise-Ready (5N1K + Axioms) şablonuna uygun. ✅

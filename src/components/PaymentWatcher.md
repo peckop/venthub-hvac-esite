@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\PaymentWatcher.tsx
-skeleton_hash: 9d41c497ac981f87
+skeleton_hash: 043ce5cffec8a10b
 entity_hashes:
   func:PaymentWatcher: 0d799bcd7a7c68f4
   overview: cac0a3def1dcd9ec
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-19T20:47:10Z
 ---
 
 ## Genel Bakış
@@ -45,6 +45,16 @@ PaymentWatcher modülü, parametre almayan bir React bileşenidir ve sadece fonk
 - Parametre almamaktadır (props tanımlı değildir).
 
 **Dönüş**: `React.FC` - Standart bir React işlevsel bileşeni olarak render edilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next/navigation::usePathname
+- import: next/navigation::useRouter
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useRef
 
 ---
 

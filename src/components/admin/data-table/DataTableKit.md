@@ -8,7 +8,7 @@ entity_hashes:
   func:DataTableKit: b347880aa55601d4
   overview: d2067d408f32c534
   style_tokens: 9dee7412768159f1
-generated_at: 2026-06-13T15:00:37Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -31,10 +31,6 @@ Bu modül için mimari varsayımlar, yalnızca sağlanan fonksiyon imzasından �
 **[Aksiyom 2]**: Eğer generic tip parametresi `T` çağrı noktasında doğru bir şekilde belirtilmemişse veya `T`'nin karşılık geldiği veri yapısı uygun değilse, bileşen beklenmeyen veri tipleriyle karşılaşır ve runtime hataları oluşur.
 
 **[Aksiyom 3]**: Eğer `props` parametresi olarak `undefined` veya `null` geçilirse (React bileşen çağrım kurallarının ihlali), bileşen render sırasında hata verir.
-
----
-
-> **Not:** `DataTableKitProps<T>` tip tanımı, modül sabitleri ve fonksiyon gövdesi sağlandığında, sütun tanımları, veri kaynakları, sayfalama eşik değerleri, filtreme zorunlulukları gibi detaylı mimari varsayımlar eklenebilir.
 
 ---
 
@@ -72,6 +68,30 @@ Bu modül için mimari varsayımlar, yalnızca sağlanan fonksiyon imzasından �
 - renderPageLabel: `(page: number, pageCount: number) => string` — Sayfalama göstergesi için özel format fonksiyonu.
 
 **Dönüş**: `ReactNode` — Render edilmiş tam bir tablo bileşeni döndürür. Tablo, araç çubuğu, üst bilgi çubuğu, tablo başlığı, satırlar ve toplu işlem barından oluşur.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../utils/adminUi::adminTableCellClass
+- import: ../../../utils/adminUi::adminTableContainerClass
+- import: ../AdminSkeleton::AdminSkeleton
+- import: ../ColumnsMenu::ColumnsMenu
+- import: ../ColumnsMenu::type ColumnToggle
+- import: ./DataTableHead::DataTableHead
+- import: ./persist::loadColumnVisibility
+- import: ./persist::loadDensity
+- import: ./persist::saveColumnVisibility
+- import: ./persist::saveDensity
+- import: ./types::type { AdminColumn }
+- import: @/hooks/useAdminTable::type { UseAdminTableResult }
+- import: @/types/admin-shared::type { Density }
+- import: lucide-react::ChevronRight
+- import: next/link::Link
+- import: react::Fragment
+- import: react::type { ReactNode }
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useState
 
 ---
 

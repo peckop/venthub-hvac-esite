@@ -3,42 +3,41 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\AboutPage.tsx
-skeleton_hash: 6d7ff9843f8624af
+skeleton_hash: 045c65bd8217683b
 entity_hashes:
   func:AboutPage: 7a07cf459964f7ab
   func:t: 470aecfc62464333
-  overview: 1c6f01c6be3af64e
+  overview: 81b35718fe56b07f
   style_tokens: 6526e41f4914ea4c
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:48:37Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin "Hakkında" sayfasını sunan, dil destekli bir React bileşenidir. Modülün temel sorumluluğu, sayfanın arayüz yapısını oluşturmak ve belirli bir dile göre çevrilmiş metin içeriğini göstermektir.
+VentHub HVAC projesinin "Hakkında" sayfasını sunan, çok dilli destek sağlayan bir React bileşen modülüdür. Modül, belirli bir dile göre çevrilmiş metin içeriğini göstererek sayfa yapısını oluşturur ve kullanıcıya dil seçimine uygun bilgilendirme sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Oluşturma ve Görüntüleme
-Bu grup, "Hakkında" sayfasının ana yapısını ve bileşenini oluşturur.
-- AboutPage
 
-### Çeviri ve Yerelleştirme Yönetimi
-Bu grup, sayfa içindeki dinamik metinlerin farklı dillere göre çevrilmesini ve gösterilmesini sağlar.
-- t
+### Sayfa Oluşturma ve Görüntüleme
+Bu grup, "Hakkında" sayfasının ana yapısını ve bileşen hiyerarşisini oluşturarak kullanıcı arayüzünü tarayıcıda render eder.
+- `AboutPage`
+
+### Çeviri ve Yerelleştirme
+Bu grup, sayfa içindeki dinamik metinlerin farklı dillere göre çevrilmesini sağlar ve dil bağlamına göre doğru içeriği döndürür.
+- `t`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, çeviri destekli bir React bileşenidir ve `lang` parametresi ile dil seçimini, `t` fonksiyonu ile çok dilli metin gösterimini yönetir.
+Bu modül, çeviri destekli bir React bileşenidir ve `lang` parametresi ile dil seçimini, `t` fonksiyonu ile çok dilli metin gösterimini sağlar.
 
-[Aksiyom 1]: Eğer `t` çeviri fonksiyonu (veya bağlı olduğu çeviri sistemi) çağrılamazsa veya geçerli bir çeviri anahtarı döndüremezse, sayfanın metin içeriği eksik veya hatalı görünür.
+[Aksiyom 1]: Eğer `t` fonksiyonu modülün erişim alanında (import, context veya prop yoluyla) mevcut değilse, bileşen doğru çevrilmiş metinleri gösteremez ve hata alır.
 
-[Aksiyom 2]: Eğer `lang` parametresi olarak sağlanan değer, çeviri sistemi tarafından desteklenmeyen bir dil kodu ise, `t` fonksiyonu geçerli bir çeviri sağlayamaz ve sayfa içeriği hatalı olur.
+[Aksiyom 2]: Eğer `t` fonksiyonu, `lang` propertisi tarafından belirlenen dili desteklemiyorsa, bileşen yanlış veya eksik çeviriler gösterebilir.
 
-[Aksiyom 3]: Eğer `lang` parametresi hiç sağlanmazsa, varsayılan değer olarak `'tr'` kullanılır ve sayfa Türkçe içerikle gösterilir.
+[Aksiyom 3]: Eğer `t` fonksiyonuna geçilen anahtarlar (key) ilgili dil için çeviri sözlüğünde yoksa, bileşen boş veya hedeflenen metin yerine anahtarı gösterebilir (veya hata fırlatabilir, bu `t` fonksiyonunun tasarımına bağlıdır).
 
-[Aksiyom 4]: `t` fonksiyonu çağrılmadan önce, bir dil bağlamı (`lang`) ile ilişkilendirilmiş olmalıdır; aksi halde geçerli bir çeviri döndüremez.
-
-[Aksiyom 5]: Eğer `lang` parametresi `null`, `undefined` veya boş string (`''`) olarak atanırsa, çeviri sistemi geçerli bir dil algılayamaz ve metin gösterimi başarısız olur.
+[Aksiyom 4]: Eğer `lang` propertisi geçilmezse, bileşen varsayılan olarak 'tr' (Türkçe) dilini kullanır.
 
 ---
 
@@ -66,6 +65,21 @@ Bu modül, çeviri destekli bir React bileşenidir ve `lang` parametresi ile dil
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../components/HVACIcons::BrandIcon
+- import: ../components/ScrollReveal::ScrollReveal
+- import: ../components/Seo::Seo
+- import: ../data/brands::HVAC_BRANDS
+- import: ../i18n/dictionaries/en::en
+- import: ../i18n/dictionaries/tr::tr
+- import: @/utils/routes::Routes
+- import: @/utils/routes::localizedHref
+- import: next/image::Image
+- import: next/link::Link
+- import: react::React
+
+---
+
 ## INTERFACES
 
 ### AboutPageProps
@@ -75,22 +89,23 @@ Bu modül, çeviri destekli bir React bileşenidir ve `lang` parametresi ile dil
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/AboutPage.tsx::AboutPage
-- **params**: `lang` — sayfanın dilini belirler, varsayılan 'tr'
+### [N1_NASIL] AST Pointer: AboutPage.tsx::AboutPage
+- **params**: `{ lang = 'tr' }` — Sayfa dili, varsayılan olarak 'tr' (Türkçe)
 - **ic_degiskenler**:
-  - `dict` — Lang parametresine göre ('tr' veya 'en') kullanılacak dil sözlüğünü tutar
-  - `t` — Verilen bir anahtar ile (örn: 'aboutPage.heroTitle') dil sözlüğünden karşılık gelen metni döndüren çeviri fonksiyonudur. Anahtar bulunamazsa anahtarın kendisini döndürür.
-  - `stats` — Sayfadaki istatistik bölümünde gösterilecek 4 veri nesnesi (değer, etiket, ikon) dizisi
-  - `coreValues` — Sayfadaki temel değerler bölümünde gösterilecek 3 değer nesnesi (başlık, açıklama, ikon) dizisi
-- **Dönüş**: Sayfanın tamamını temsil eden bir React JSX elementi (min-h-screen bg-white class'lı div). Sayfa; bir hero bölümü, istatistik ızgarası, hikaye/felsefe bölümü, yetkili marka şeridi, değerler ızgarası ve bir çağrı (CTA) bölümü içerir.
+  - `dict` — Seçilen dile göre sözlük objesi; lang === 'en' ise `en` import'u, aksi halde `tr` kullanılır
+  - `t` — Çeviri helper fonksiyonu; dot-notation ile key split edip sözlük içinde gezinerek string değer döner; bulunamazsa key'in kendisini döner
+  - `stats` — İstatistik verileri dizisi; 4 elemanlı, her biri `{ value, label, icon }` yapısında (deneyim: '15+', distribütörlük: '5', tamamlanan proje: '500+', nakliye ağı: '81')
+  - `coreValues` — Temel değerler dizisi; 3 elemanlı, her biri `{ title, description, icon }` yapısında (precision, standards, trust)
+- **Dönüş**: JSX — Sayfanın tam HTML yapısı (hero, istatistikler, hikaye, markalar, değerler, CTA bölümleri dahil)
 
-### [N2_NASIL] AST Pointer: src/views/AboutPage.tsx::t
-- **params**: `key` — Çevirisi istenen metnin nokta ile ayrılmış anahtarı (örn: 'aboutPage.heroTitle')
+### [N2_NASIL] AST Pointer: AboutPage.tsx::t
+- **params**: `(key: string)` — Nokta ile ayrılmış çeviri anahtarı (örn: 'aboutPage.title')
 - **ic_degiskenler**:
-  - `parts` — Anahtarın nokta (`.`) karakterine göre bölünmüş hali (dizi)
-  - `current` — Sözlük içinde gezinirken mevcut seviyeyi tutan değişken. Başlangıçta `dict` nesnesidir
-  - `obj` — `current` değişkeninin `Record<string, unknown>` tipine zorlanmış hali, bir sonraki seviyeye geçmek için kullanılır
-- **Dönüş**: string — `key` anahtarının sözlükteki karşılığı veya bulunamadığında `key`'nin kendisi.
+  - `parts` — `key.split('.')` ile oluşturulmuş nokta-parçaları dizisi; her biri sözlük hiyerarşisinde bir seviyeyi temsil eder
+  - `current` — Sözlük içinde gezinirken mevcut değer; başlangıçta `dict` objesi, döngü ilerledikçe iç içe objelere girer
+  - `obj` — `current`'ın `Record<string, unknown>` olarak tip dönüşümü (cast); her döngü adımında erişim için kullanılır
+  - `part` — For-of döngüsünün mevcut parçası; `parts` dizisinden sırayla alınan sözlük seviye anahtarı
+- **Dönüş**: `string` — Çeviri sözlüğünden bulunan string değer veya bulunamazsa orijinal `key`字符串i
 
 ---
 

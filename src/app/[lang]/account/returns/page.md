@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\returns\page.tsx
-skeleton_hash: c58db07ae1dfe3ec
+skeleton_hash: dd5db32d712b3c61
 entity_hashes:
   func:Page: 9c08060caeb88969
   overview: 9db8b446a5775015
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-08T10:08:10Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -49,6 +49,13 @@ Bu fonksiyon herhangi bir parametre almamaktadır.
 - `min-h-screen` sınıfı fallback ekranının tüm viewport yüksekliğini kaplamasını sağlar.
 - `border-primary-navy` ve `border-b-2` sınıfları yüklenme spinner'ının alt kısmında renkli border animasyonu oluşturur.
 - `animate-spin` sınıfı CSS tabanlı sürekli döndürme animasyonu uygular.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../views/account/AccountReturnsPage::PageComponent
+- import: react::React
+- import: react::Suspense
 
 ---
 

@@ -8,7 +8,7 @@ entity_hashes:
   func:DistanceSalesAgreementContentTr: 03bf5fa5238f63e7
   overview: 5da2b46d10bebf39
   style_tokens: 083693da379aea89
-generated_at: 2026-06-16T11:56:51Z
+generated_at: 2026-06-19T20:50:52Z
 ---
 
 ## Genel Bakış
@@ -47,6 +47,28 @@ Mesafeli satış sözleşmesinin Türkçe yasal metnini sayfada sunan bileşenin
 ## İTHALATLAR (IMPORTS)
 - import: @/config/legal::legalConfig
 - import: react::React
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/views/legal/components/tr/DistanceSalesAgreementContent.tsx::DistanceSalesAgreementContentTr
+- **params**: (parametre yok — bileşen imzası `{ lang: string }` olarak tanımlı ancak fonksiyon gövdesinde `lang` hiçbir yerde okunmaz)
+- **ic_degiskenler**:
+  - `legalConfig` — `@/config/legal` import'undan gelen yapılandırma nesnesi; sözleşme metnindeki dinamik değerlerin tamamını sağlar
+  - `legalConfig.sellerTitle` — Satıcı unvanını "Taraflar" maddesinde gösterir
+  - `legalConfig.websiteUrl` — E-ticaret sitesinin alan adını "Taraflar" ve "Tanımlar" maddelerinde referans olarak kullanır
+  - `legalConfig.sellerAddress` — Satıcının fiziksel adresini iletişim bilgileri paragrafında gösterir
+  - `legalConfig.sellerEmail` — Satıcının e-posta adresini iletişim bilgileri ve cayma bildirimi bölümlerinde kullanır
+  - `legalConfig.sellerPhone` — Satıcının telefon numarasını iletişim bilgileri paragrafında gösterir
+  - `legalConfig.taxOffice` — Satıcının vergi dairesi bilgisini iletişim bilgilerinde gösterir
+  - `legalConfig.taxNumber` — Satıcının vergi numarasını iletişim bilgilerinde gösterir
+  - `legalConfig.deliveryTime` — Teslimat süresini "Teslimat" maddesinde belirtir
+  - `legalConfig.returnAddress` — İade ürünlerin gönderileceği adresi "Cayma Hakkının Kullanımı ve İade" maddesinde gösterir
+  - `legalConfig.cargoCompanies` — İade kargo firması bilgisini iade maddesinde belirtir
+  - `legalConfig.refundTime` — Ücret iadesi süresini iade maddesinde gösterir
+  - `legalConfig.lastUpdated` — Sözleşmenin son güncelleme tarihini "Yürürlük" maddesinde belirtir
+- **Dönüş**: JSX elementi (`React.ReactNode`) — 12 maddelik Mesafeli Satış Sözleşmesi içeriği `<>...</>` fragment içinde render edilir; `lang` prop'u tanımlı olmasına rağmen hiçbir yerde okunmaz
 
 ---
 

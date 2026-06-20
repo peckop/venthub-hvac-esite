@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\orders\page.tsx
-skeleton_hash: bc4635546982ea45
+skeleton_hash: 724856e28fd1364d
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-06T19:23:22Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -35,6 +35,11 @@ Bu modül, bir Next.js üst‑seviye sayfa bileşenidir ve sadece bir JSX öğes
 **Nasıl yapar**: Fonksiyon, herhangi bir ara mantık, durum yönetimi, veri çekme veya yan etki işlemi gerçekleştirmeden doğrudan PageComponent bileşenini döndüren basit bir sarmalayıcı (wrapper) olarak çalışır. İçerisinde sadece bileşen render işlemi için gerekli olan tek bir return ifadesi bulunur.
 **Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
 **Dönüş**: React JSX formatında PageComponent bileşenini döndürür. Dönüş tipi, React bileşenlerinin render sonucu olan bir React elementidir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next/dynamic::nextDynamic
 
 ---
 

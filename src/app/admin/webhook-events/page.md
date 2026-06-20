@@ -3,41 +3,57 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\webhook-events\page.tsx
-skeleton_hash: fad447b6edb0cff9
+skeleton_hash: ead8258fd66480e1
 entity_hashes:
+  func:Loading: 657ee72781ec51d8
   func:Page: 03bf0c7eea267025
-  overview: c697ddf7c92cfa4f
+  overview: 5b1a16aab3aba293
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-12T10:19:00Z
+generated_at: 2026-06-19T20:46:45Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetim panelindeki webhook olayları sayfasını sunan bir React giriş noktasıdır. Tek bir bileşeni (`Page`) dışa aktararak, sayfanın asıl içeriğini dinamik olarak yüklenen `AdminWebhookEventsPage` alt bileşenine devreder.
+Bu modül, yönetim panelindeki webhook olayları sayfasını sunan bir Next.js App Router giriş noktasıdır. `Page` bileşeni, sayfa içeriğini dinamik olarak yüklenen `AdminWebhookEventsPage` alt bileşenine devrederken, `Loading` bileşeni yüklenme sırasında kullanıcıya geçici bir arayüz sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni
-Modülün dışa açık tek bileşenini tanımlar. Bu bileşen, Next.js App Router yapısında ilgili rotaya bağlanır ve kullanıcıya sayfa arayüzünü sunar.
-- Page
+### Sayfa Bileşenleri
+Modülün Next.js rota yapısına bağlı olan ve kullanıcıya sayfa arayüzünü sunan temel bileşenleri içerir. Bu bileşenler, App Router'ın otomatik olarak tanıyıp挂载 ettiği standart React bileşenleridir.
+- Page, Loading
+
+---
+
+**Bağımlılıklar:**
+- **Dış Bağımlılık:** `AdminWebhookEventsPage` — dinamik olarak yüklenen ana iş bileşeni (import yoluyla)
+- **Çerçeve:** Next.js App Router yapısı (dosya tabanlı rotlama)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için belirli aksiyom tanımlanması güçtür çünkü fonksiyon gövdesi verilmemiştir. Ancak mevcut bilgilere dayanarak:
+Bu modül, Next.js App Router yapısında bir sayfa giriş noktasıdır. Fonksiyon gövdeleri verilmediği için çıkarım sınırlıdır; yalnızca fonksiyon imzası yapısına ve modül sabitlerine dayanan minimal aksiyomlar sunulmuştur.
 
-**[Aksiyom 1]:** Eğer `AdminWebhookEventsPage` modülü/ bileşeni import edilebilir konumda değilse (modül yolu tanımsız veya dosya mevcut değilse), `Page` bileşeni render edilemez ve çalışma zamanı hatası oluşur.
+**[Aksiyom 1]:** Eğer `AdminWebhookEventsPage` modülü/içe aktarımı çözülemiyorsa, `Page` bileşeni render hatası ile karşılaşır ve sayfa hiç显示 edilemez.
 
-**[Aksiyom 2]:** Eğer Next.js App Router yapısı (dosya tabanlı rotlama) mevcut değilse, bu bileşen `/admin/webhook-events` rotasına otomatik olarak bağlanmaz.
-
-**[Aksiyom 3]:** Eğer `AdminWebhookEventsPage` bileşeni geçersiz bir React elemanı döndürüyorsa (null, undefined veya geçersiz JSX), `Page` bileşeni hata verir.
+**[Aksiyom 2]:** Eğer `Loading` bileşeni `Suspense` sınırı içinde kullanılmıyorsa, dinamik yükleme sırasında kullanıcıya geçici yükleme durumu gösterilmez.
 
 ---
 
-**Not:** Bu modül tek bir sayfa giriş noktası olup, tüm iş mantığını `AdminWebhookEventsPage` bileşenine devretmektedir. Bileşen içeriği (props alımı, durum yönetimi, yan etkiler vb.) bu modül kapsamında değildikten bilinmemektedir. Detaylı aksiyomlar için `AdminWebhookEventsPage` modülünün analiz edilmesi gerekir.
+**Not:** Fonksiyon gövdeleri (implementasyon detayları) verilmediği için, further varsayımlar (örneğin veri bağımlılıkları, hata yönetimi, prop传递) çıkarılamamıştır. Tam aksiyon listesi için `Page` ve `Loading` fonksiyonlarının gövde kodları gereklidir.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### Loading
+
+**Ne yapar**: Bu fonksiyon, admin panelindeki webhook-events sayfasının yüklenme durumunda gösterilen bir React bileşenidir. Sayfa içeriği henüz hazır değilken kullanıcıya bir yükleme göstergesi sunarak geçici bir arayüz sağlar.
+
+**Nasıl yapar**: Next.js App Router yapısında sayfa bileşenlerinin Suspense sınırı içinde kullanılmak üzere tanımlanmış bir fonksiyonel React bileşenidir. Fonksiyon bir JSX döndürerek kullanıcı arayüzünde yüklenme durumunu temsil eden bir görünüm oluşturur. Bu tür bileşenler genellikle `loading.tsx` dosyalarında veya sayfa içeresinde Suspense fallback'i olarak tanımlanır ve asenkron veri yüklemeleri sırasında devreye girer.
+
+**Parametreler**:
+Bu bileşen herhangi bir parametre almamaktadır.
+
+**Dönüş**: `JSX.Element` — Yüklenme durumunu temsil eden React bileşen JSX'ini döndürür. Boş bir `<div>` veya yükleme animasyonu içeren bir yapı olabilir, ancak kesin içeriği kaynak kodunda belirtilmediği için spesifik bir implementasyon detayı verilememektedir.
 
 ### Page
 **Ne yapar**: Admin panelindeki webhook olayları sayfasını render eder. Bu fonksiyon, Next.js App Router yapısında `/admin/webhook-events` rotasının sayfa bileşenini tanımlar ve tarayıcıda webhook olaylarının görüntülenmesini sağlar.
@@ -51,6 +67,12 @@ Bu modül için belirli aksiyom tanımlanması güçtür çünkü fonksiyon göv
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: next/dynamic::nextDynamic
+
+---
+
 ## SABİTLER
 - **AdminWebhookEventsPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminWebhookEventsPage'),...`
@@ -59,22 +81,31 @@ Bu modül için belirli aksiyom tanımlanması güçtür çünkü fonksiyon göv
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/webhook-events/page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde hiçbir değişken tanımlanmamış)
-- **Dis Bilesenler**: `AdminWebhookEventsPage` — import edilmiş React bileşeni, fonksiyon içinde `<AdminWebhookEventsPage />` şeklinde JSX olarak render ediliyor
-- **Dönüş**: JSX Element (`<AdminWebhookEventsPage />`) — bir sonraki React bileşeninin render edeceği UI yapısını döndürüyor
+### [N1_NASIL] AST Pointer: src/app/admin/webhook-events/page.tsx::Loading
+- **params**: ()
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('admin.common.loading')` çağrısıyla loading metnini uluslararası dil desteği ile üretir
+- **Dönüş**: JSX — animasyonlu pulsing loading göstergesi (`div` içinde `animate-pulse` ile `t('admin.common.loading')` metni)
+
+---
+
+### [N2_NASIL] AST Pointer: src/app/admin/webhook-events/page.tsx::Page
+- **params**: ()
+- **ic_degiskenler**: (yok — doğrudan JSX return eder)
+- **Dönüş**: JSX — `AdminWebhookEventsPage` component'ini render eder; bu component `next/dynamic` ile dynamic import yoluyla `import nextDynamic` kullanılarak lazy-loading ile yüklenen admin webhook-events sayfasıdır
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\app\admin\webhook-events\page.tsx
+  function: src\app\admin\webhook-events\page.tsx::Loading
   function: src\app\admin\webhook-events\page.tsx::Page
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: Loading
   export: Page
 
 ---

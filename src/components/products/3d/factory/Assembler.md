@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\Assembler.tsx
-skeleton_hash: c8cc58b4d1c21209
+skeleton_hash: 20d5e4edc9857de5
 entity_hashes:
   func:Assembler: fce0437dc1401eb7
   overview: 1319e0e67eee55ba
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-12T10:20:27Z
+generated_at: 2026-06-19T20:47:11Z
 ---
 
 ## Genel Bakış
@@ -54,6 +54,12 @@ Bu modül, bir React bileşeni olup 3D ürün montajını render eder. Aşağıd
 - `selectedPart` — `string | null` — Şu anda seçili olan parçanın kimliğini belirtir. `null` değerinde hiçbir parça seçili değildir. Seçili parça, görsel olarak vurgulanır (highlight) veya farklı renklendirilerek kullanıcıya geri bildirim sağlanır.
 
 **Dönüş**: `React.FC<AssemblerProps>` — Montaj görüntülemesini içeren bir React fonksiyonel bileşeni döndürür. Bu bileşen, 3D sahneyi (scene), kamerayı, ışıklandırmayı ve parçaları içeren tam bir montaj görüntüleyiciyi render eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
+- import: react::Suspense
 
 ---
 

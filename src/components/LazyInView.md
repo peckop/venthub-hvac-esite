@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LazyInView.tsx
-skeleton_hash: 1f246a34a210785e
+skeleton_hash: e06566b45d2ed847
 entity_hashes:
   func:LazyInView: a6cf07d9fd7df258
   overview: dcd89aaa1940f652
   style_tokens: 884aa794c8b33f43
-generated_at: 2026-05-28T22:36:24Z
+generated_at: 2026-06-19T20:47:09Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,11 @@ Bu modül için temel mimari varsayımlar tanımlanmıştır.
 - `T`: Generic tip parametresi — Bileşenin işleyebileceği veri tipini belirler. Lazy yüklenecek içeriğin türünü tanımlamak için kullanılır
 
 **Dönüş**: JSX.Element — Lazy yükleme mantığı uygulanmış React bileşeni döndürür. Bileşen, placeholder'ı veya yüklenmiş içeriği render eder
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
 
 ---
 

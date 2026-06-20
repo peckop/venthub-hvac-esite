@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx
-skeleton_hash: 51d749e54813ce29
+skeleton_hash: 8e26739368c014fb
 entity_hashes:
   func:HRVCalcPage: f6b36b28ed5f44cd
   func:reset: 16764b441f7bc7b6
   overview: e0997b7ffb0ae1d0
   style_tokens: 27adff48ed74fee3
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-19T20:50:08Z
 ---
 
 ## Genel Bakış
@@ -57,6 +57,18 @@ Bu modül için temel aksiyomlar, bir React hesaplama bileşeninin doğru çalı
 **Parametreler**:
 - Herhangi bir giriş parametresi almaz, doğrudan sayfa içi durumları değiştirmek üzere çağrılır.
 **Dönüş**: void tipindedir, herhangi bir değer döndürmez; sadece sayfa içi state güncellemeleri yaparak arayüzün yeniden render edilmesini tetikler.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: next/navigation::usePathname
+- import: next/navigation::useRouter
+- import: next/navigation::useSearchParams
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useState
 
 ---
 

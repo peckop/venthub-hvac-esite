@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\tr.ts
 skeleton_hash: b6dc563b6dd8a8de
 entity_hashes:
   overview: e77595acec187e79
-generated_at: 2026-06-13T15:04:52Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -25,6 +25,34 @@ Dosya, statik bir key-value veri yapısıdır ve herhangi bir iş mantığı vey
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./a11y.tr::a11y
+- import: ./audit.tr::audit
+- import: ./authority.tr::authority
+- import: ./categories.tr::categories
+- import: ./common.tr::common
+- import: ./coupons.tr::coupons
+- import: ./dashboard.tr::dashboard
+- import: ./dataTable.tr::dataTable
+- import: ./errorGroups.tr::errorGroups
+- import: ./errors.tr::errors
+- import: ./inventory.tr::inventory
+- import: ./logistics.tr::logistics
+- import: ./menu.tr::menu
+- import: ./movements.tr::movements
+- import: ./orders.tr::orders
+- import: ./products.tr::products
+- import: ./returns.tr::returns
+- import: ./search.tr::search
+- import: ./settings.tr::settings
+- import: ./titles.tr::titles
+- import: ./toolbar.tr::toolbar
+- import: ./ui.tr::ui
+- import: ./users.tr::users
+- import: ./webhooks.tr::webhooks
 
 ---
 
@@ -59,10 +87,6 @@ Bu dosya **fonksiyon içermeyen bir dictionary/modül dosyasıdır**. Sadece imp
   - `errors` — Hata mesajları çevirilerini içeren import
   - `admin` — Tüm çevirileri birleştiren ana dictionary nesnesi (export edilen)
 - **Dönüş**: yok (yan etki: `admin` nesnesini export eder)
-
----
-
-**Not**: Bu dosya bir `dictionary` dosyasıdır ve herhangi bir fonksiyon gövdesi içermemektedir. `admin` nesnesi muhtemelen tüm import edilen çeviri nesnelerini birleştiren bir `export const admin = { ...a11y, ...audit, ...authority, ...categories, ...common, ...coupons, ...dashboard, ...dataTable, ...errorGroups, ...errors }` yapısına sahiptir.
 
 ---
 

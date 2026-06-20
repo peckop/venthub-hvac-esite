@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\utils.ts
-skeleton_hash: bf2da76717d645d4
+skeleton_hash: bf9dd00541d5ca81
 entity_hashes:
   func:buildWhatsAppLink: 5a13d41915079738
   func:cn: 2cda58c352da4d7c
   overview: 0d255118ec884be0
-generated_at: 2026-06-08T10:10:57Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış
@@ -55,6 +55,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - text: string — WhatsApp'ta otomatik olarak açılacak ön-doldurulmuş mesaj. Fonksiyon tarafından URL kodlamasına tabi tutulur.
 
 **Dönüş**: string — Oluşturulan, tarayıcıda veya uygulamalarda doğrudan açılabilir WhatsApp bağlantı linki (örn. `https://wa.me/905551234567?text=Merhaba`).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: clsx::ClassValue
+- import: clsx::clsx
+- import: tailwind-merge::twMerge
 
 ---
 

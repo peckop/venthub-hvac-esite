@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\materials\useFanMaterials.ts
-skeleton_hash: ac08a6998abfba65
+skeleton_hash: 6466d4ac50f77cff
 entity_hashes:
   func:useFanMaterials: 61fbb447cfb5105d
   overview: 6254e91c186b694f
-generated_at: 2026-06-12T10:20:58Z
+generated_at: 2026-06-19T20:47:11Z
 ---
 
 ## Genel Bakış
@@ -42,6 +42,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: three::DoubleSide
+- import: three::MeshBasicMaterial
+- import: three::MeshPhysicalMaterial
+- import: three::MeshStandardMaterial
+
+---
+
 ## TYPE ALIASES
 
 ### FanMaterials
@@ -55,7 +63,7 @@ type FanMaterials = ReturnType<typeof useFanMaterials>
 - **MATERIALS_CACHE** (object) — `{
     matteBlack: new MeshStandardMaterial({
         color: '#1a1a1a',
-      ...`
+   ...`
 
 ---
 

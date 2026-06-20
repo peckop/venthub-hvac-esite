@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\CaseStudySection.tsx
-skeleton_hash: c9cb07153aed4f00
+skeleton_hash: 7631420c6a87f664
 entity_hashes:
   func:CaseStudySection: 30e263b0ef69a0a4
   func:openLead: 3d89ba2774c36aa2
   overview: 5af9581c1e08259f
   style_tokens: de735ee559e96a8f
-generated_at: 2026-06-08T10:08:12Z
+generated_at: 2026-06-19T20:47:06Z
 ---
 
 ## Genel Bakış
@@ -50,6 +50,13 @@ Bu modülün doğru çalışması için React ortamı ve ilgili UI bağımlılı
 **Nasıl yapar**: İç mantığı belgelenmemiştir.  
 **Parametreler**: Yok  
 **Dönüş**: Dönüş tipi void veya bilinmiyor; fonksiyon bir değer döndürmez.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../utils/analytics::trackEvent
+- import: @/i18n/I18nProvider::useI18n
+- import: react::React
 
 ---
 

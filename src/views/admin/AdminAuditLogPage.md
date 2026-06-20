@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminAuditLogPage: 8228aa5d40a8a979
   overview: 83860b5a121fa408
   style_tokens: a7fe3ab3ca0c1259
-generated_at: 2026-06-13T18:03:10Z
+generated_at: 2026-06-19T20:48:40Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,17 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**: Bu fonksiyon parametre almaz.
 
 **Dönüş**: React.FC tipinde bir React fonksiyonel bileşeni döndürür. Bu bileşen, denetim kayıtları sayfasının tamamını temsil eder ve Suspense ile sarılmış bir yapıda veri yüklemeyi yönetir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: ./AuditLogTableBody::AuditLogTableBody
+- import: react::React
+- import: react::Suspense
 
 ---
 

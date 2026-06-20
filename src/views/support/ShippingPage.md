@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\support\ShippingPage.tsx
-skeleton_hash: 7787ed67a458a2c5
+skeleton_hash: 3d36f2d960a8c9ee
 entity_hashes:
   func:ShippingPage: 321c885e2ea88a49
   overview: 2fb078273ffdbcdc
   style_tokens: f66481541679296a
-generated_at: 2026-06-08T10:11:02Z
+generated_at: 2026-06-19T20:51:03Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,14 @@ Bu modül için fonksiyon gövdesi, parametre veya sabit değeri verilmediğinde
 - Bu bileşen herhangi bir props (özellik) almaz.
 
 **Dönüş**: JSX elementini (`JSX.Element`) döndürür. Sayfa yapısını temsil eden bir React bileşeni ağacı (React component tree)返回 eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: lucide-react::ArrowLeft
+- import: next/navigation::useRouter
+- import: react::React
 
 ---
 

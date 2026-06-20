@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\layout.tsx
-skeleton_hash: 69edc232c5d80fa7
+skeleton_hash: 08532cbef7ed49e5
 entity_hashes:
   func:Layout: 835aeffc7f64a977
   overview: e7251b7df76c3216
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:27Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - children: React.ReactNode — Admin panelinde render edilecek sayfa içeriği ve alt bileşenler. Bu parametre, layout içinde görüntülenecek tüm çocuk React elemanlarını temsil eder.
 
 **Dönüş**: JSX.Element — TenantProvider ile sarılmış LayoutComponent içinde child'ları barındıran React bileşeni döndürür. Tenant yapılandırması tüm alt bileşenlere context aracılığıyla dağıtılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useTenant::TenantProvider
+- import: ../../utils/tenantServer::getTenantConfig
+- import: ../../views/admin/AdminLayout::LayoutComponent
 
 ---
 

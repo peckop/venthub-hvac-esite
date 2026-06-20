@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\VisualShowcase.tsx
-skeleton_hash: aff37f07cc40274b
+skeleton_hash: e83138a57f7df82e
 entity_hashes:
   func:ChevronLeftIcon: 528282355948f0bf
   func:ChevronRightIcon: eee2ea0200791ea6
@@ -15,7 +15,7 @@ entity_hashes:
   func:usePrefersReducedMotion: 11085ad489b48f61
   overview: 7e4ec691259cb85e
   style_tokens: 2f11e16677a4f30c
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:47:48Z
 ---
 
 ## Genel Bakış
@@ -102,6 +102,16 @@ Gezinme ve oynatma/duraklatma kontrolleri için kullanılan, boyut ve stil özel
 - `size`: `number` — İkonun genişlik ve yükseklik değerini belirler; varsayılan 18.  
 - `className`: `string` — İkonun CSS sınıflarını eklemek için kullanılır; varsayılan boş string.  
 **Dönüş**: JSX içinde bir `<svg>` elementi; React bileşeni olarak render edilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
 
 ---
 

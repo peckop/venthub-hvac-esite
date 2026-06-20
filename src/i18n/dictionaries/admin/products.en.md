@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\products.en.ts
-skeleton_hash: 948f847f034305bd
+skeleton_hash: cd3949f74cf7c3cc
 entity_hashes:
   overview: b4058d53edae1644
-generated_at: 2026-06-13T21:06:01Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -35,7 +35,7 @@ Bu modül, ürünlerle ilgili İngilizce çeviri anahtarlarını içeren bir i18
 
 ## SABİTLER
 - **products** (object) — `{
-      subtitle: 'Manage the entire product catalog and track stock and pric...`
+  subtitle: 'Manage the entire product catalog and track stock and price u...`
 
 ---
 

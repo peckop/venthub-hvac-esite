@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\dashboard.en.ts
-skeleton_hash: 9d15c360a6c2f6e7
+skeleton_hash: 57aa901e6ec286d5
 entity_hashes:
   overview: 978b08ca21df4d0c
-generated_at: 2026-06-13T11:10:12Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -31,8 +31,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **dashboard** (object) — `{
-      subtitle: 'Quick glance and latest activity',
-      rangeToday: 'Toda...`
+  subtitle: 'Quick glance and latest activity',
+  rangeToday: 'Today',
+ ...`
 
 ---
 

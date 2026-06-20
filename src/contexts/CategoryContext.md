@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\CategoryContext.tsx
-skeleton_hash: 0885da6c7869cb8d
+skeleton_hash: 71f3f2d0cbdb978b
 entity_hashes:
   func:CategoryProvider: 664f5248857922aa
   func:useCategories: bc181eebe7b5a618
   overview: 0e5af7c9035631ab
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -46,6 +46,22 @@ Bu modül, React Context yapısına dayalı bir kategori veri paylaşım mekaniz
 **Nasıl yapar**: CategoryProvider tarafından oluşturulan özel context nesnesini tüketerek, context içindeki tüm değerleri çağrıldığı bileşene sunar. Eğer yanlışlıkla CategoryProvider dışında çağrılırsa geçerli bir bağlam olmadığı için hata fırlatarak yanlış kullanımı önler.
 **Parametreler**: Hiçbir giriş parametresi almaz.
 **Dönüş**: Kaynak kodda dönüş tipi açıkça tanımlanmamış, void veya bilinmiyor olarak belirtilmiştir. Çalışma prensibi gereği CategoryProvider tarafından yönetilen kategori hiyerarşisi ve ilgili yönetim işlevlerini içeren bir nesne döndürmesi amaçlanmıştır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../lib/type-converters::DomainCategory
+- import: ../lib/type-converters::toUICategoryList
+- import: ../types/db-rows::type { CategoryMetadata }
+- import: @/lib/services/category.service::getCategories
+- import: @/providers/SupabaseProvider::useSupabaseClient
+- import: react::React
+- import: react::createContext
+- import: react::useCallback
+- import: react::useContext
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useState
 
 ---
 

@@ -8,7 +8,7 @@ entity_hashes:
   func:ApplicationSolutions: 93f4bfc3e2d056b5
   overview: 26527ace9a268eaa
   style_tokens: a60445c0b91a13d5
-generated_at: 2026-06-15T17:02:32Z
+generated_at: 2026-06-19T20:47:08Z
 ---
 
 ## Genel Bakış
@@ -48,8 +48,6 @@ Bu modülün doğru çalışması için aşağıdaki koşulların sağlanması g
 - `lang` : `string` — Aktif dil kodunu belirtir (örn: "tr", "en", "de"). Sözlük içeriğinin hangi dilde sunulacağını ve olası dil bazlı yönlendirme mantığını belirler.
 
 **Dönüş**: `React.FC<ApplicationSolutionsProps>` tipinde bir fonksiyonel React component döndürür. Bu component, `ApplicationSolutionsProps` arayüzünde tanımlı tüm prop'ları destekler ve React JSX elementi (ReactElement veya JSX.Element) olarak render edilebilir yapıdadır.
-
----
 
 ---
 

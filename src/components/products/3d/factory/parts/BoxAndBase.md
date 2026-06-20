@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\BoxAndBase.tsx
-skeleton_hash: 4168a44472e1f65d
+skeleton_hash: da95a04dbfd26fb3
 entity_hashes:
   func:BoxAndBase: af353be0b7cd10d8
   overview: 1776944b67282716
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:30Z
+generated_at: 2026-06-19T20:47:11Z
 ---
 
 ## Genel Bakış
@@ -52,6 +52,12 @@ Bu modül, 3B ürün görselleştirmesinde kutu ve taban bileşenini render eden
 - explode: number (varsayılan: 0) — Bileşenler arasındaki ayrılma mesafesini kontrol eden sayısal değer. 0'da bileşenler birleşik, artan değerlerde birbirinden uzaklaşır.
 
 **Dönüş**: React.FC<BoxAndBaseProps> — BoxAndBaseProps arayüzü ile tanımlı özelliklere sahip React fonksiyonel bileşeni döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../materials/useFanMaterials::useFanMaterials
+- import: react::React
 
 ---
 

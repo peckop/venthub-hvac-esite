@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\coupons.en.ts
-skeleton_hash: 7f7e280190c8eb13
+skeleton_hash: f5b43b114e0a73ee
 entity_hashes:
   overview: e01c0e2ade1a4912
-generated_at: 2026-06-13T15:03:14Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -36,7 +36,7 @@ Bu modül, bir i18n sözlüğü olarak coupons ile ilgili çevirileri içerir. D
 ## SABİTLER
 - **coupons** (object) — `{
       subtitle: 'Manage discount coupons and track usage statistics',
-     ...`
+   ...`
 
 ---
 

@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminReturnsPage: cbbe5a033114e25a
   overview: 31f520fe97f78c88
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-13T18:56:06Z
+generated_at: 2026-06-19T20:49:04Z
 ---
 
 ## Genel Bakış
@@ -49,6 +49,17 @@ Bu modül için fonksiyon gövdesi verilmediğinden, mimari varsayımlar çıkar
 Bu bileşen parametre almaz.
 
 **Dönüş**: `React.FC` — Fonksiyonel React bileşeni döndürür; Suspense ile sarılmış bir sayfa yapısı (başlık + ReturnsTableBody) içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: ./ReturnsTableBody::ReturnsTableBody
+- import: react::React
+- import: react::Suspense
 
 ---
 

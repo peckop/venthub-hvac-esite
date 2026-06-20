@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCategoryGateway.ts
-skeleton_hash: f7fb006be0a43495
+skeleton_hash: 07791d75306c6b16
 entity_hashes:
   func:useCategoryGateway: 7b8285c822bab503
   overview: 129d55f8e47e2bd2
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -59,6 +59,26 @@ Nesne yapısı döndürür:
 - **Alt Kategori Sıralaması**: Alt kategoriler `metadata.sort_order` alanına göre artan sırada, eşitlik durumunda alfabetik sıraya göre sıralanır.
 - **Ürün Fiyat Aralığı Hesaplama**: Hem initial hem fetch edilen ürünlerden maksimum fiyat bulunur ve `priceRange` filtresinin üst sınırı, mevcut değerden büyükse güncellenir.
 - **URL Senkronizasyonu**: `updateFilters` fonksiyonu, varsayılan değerlere sahip filtreleri URL'den kaldırarak temiz URL politikası uygular. Varsayılan değerler: `sortBy: 'name'`, `viewMode: 'grid'`, `priceRange: [0, 1000000]`.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../contexts/CategoryContext::useCategories
+- import: ../hooks/useManualScrollRestoration::useManualScrollRestoration
+- import: ../lib/type-converters::DomainCategory
+- import: ./useIsMounted::useIsMounted
+- import: @/lib/services/product.service::getProductsEnriched
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @/types/ui-models::type { Product }
+- import: next/navigation::useParams
+- import: next/navigation::usePathname
+- import: next/navigation::useRouter
+- import: next/navigation::useSearchParams
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
 
 ---
 

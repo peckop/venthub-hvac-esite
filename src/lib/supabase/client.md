@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\supabase\client.ts
-skeleton_hash: af393b98f3ea3dda
+skeleton_hash: 49185df368b7acd2
 entity_hashes:
   overview: 34e9332f051f8980
-generated_at: 2026-06-08T10:10:57Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış
@@ -36,6 +36,12 @@ Bu modül, Supabase istemcisini yapılandıran ve dışa aktaran bir başlatma (
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../types/database.types::type { Database }
+- import: @supabase/ssr::createBrowserClient
 
 ---
 

@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\layout\PageShell.tsx
-skeleton_hash: 7ca98b70fc84e47d
+skeleton_hash: a57a4d0cf068f731
 entity_hashes:
   overview: 09c986d2dcf8a577
   style_tokens: f9c95184ddfe4989
-generated_at: 2026-06-12T10:19:17Z
+generated_at: 2026-06-19T20:47:09Z
 ---
 
 ## Genel Bakış
@@ -32,6 +32,12 @@ Bu modül, saf bir sunum katmanı bileşeni olup, harici servisler veya durum y�
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
+- import: react::forwardRef
 
 ---
 

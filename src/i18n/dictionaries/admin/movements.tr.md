@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\movements.t
 skeleton_hash: e79560ab4ea296d0
 entity_hashes:
   overview: 913c3c44e13878f9
-generated_at: 2026-06-13T18:54:46Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış

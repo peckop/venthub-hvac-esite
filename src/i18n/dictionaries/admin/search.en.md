@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\search.en.ts
-skeleton_hash: bb494dbf43a43a58
+skeleton_hash: ebd8a4cc857be165
 entity_hashes:
   overview: fc6cf9147f6079c3
-generated_at: 2026-06-17T13:23:01Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -41,8 +41,8 @@ Bu modül bir i18n (uluslararasılaştırma) sözlük dosyasıdır ve statik çe
 
 ## SABİTLER
 - **search** (object) — `{
-      audit: 'Search by table, PK or note',
-      errors: 'Search by URL ...`
+  audit: 'Search by table, PK or note',
+  categories: 'Search by category...`
 
 ---
 

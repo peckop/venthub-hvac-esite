@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\use-mobile.tsx
-skeleton_hash: 093da8115e24847a
+skeleton_hash: 979674ac2716239b
 entity_hashes:
   func:useIsMobile: a6742235a7536cbb
   overview: e7e6eb331c36bd56
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:37:37Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -47,6 +47,11 @@ Bu React hook modülü, mobil cihaz tespiti işlevini tarayıcı pencere boyutu 
 - Parametre almaz
 
 **Dönüş**: `boolean` — Viewport genişliği 768px'in altında ise `true`, değilse `false` değerini döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react
 
 ---
 

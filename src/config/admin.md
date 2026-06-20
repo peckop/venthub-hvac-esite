@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\config\admin.ts
-skeleton_hash: 18e39c650595c52a
+skeleton_hash: 2cc0382d2782b947
 entity_hashes:
   func:checkAdminAccess: 0195cef58edf96a2
-  func:getUserRole: dc4585911f66490b
+  func:getUserRole: 638c917cdcbbb2e5
   func:isAdminByEmail: 97d57e6b9c4cf9a2
   func:isDevAdmin: 527f404e6ee96806
-  func:listAdminUsers: 808d0c796a469da9
-  func:setUserAdminRole: 34515a99f07fc282
+  func:listAdminUsers: d933c96b85d7b147
+  func:setUserAdminRole: 8d3b86f7b7baaf3b
   overview: 3d7af3e502cf1294
-generated_at: 2026-05-28T22:37:31Z
+generated_at: 2026-06-19T20:48:16Z
 ---
 
 ## Genel Bakış
@@ -45,15 +45,15 @@ Bu modül, VentHub HVAC sisteminin yönetici erişim kontrolünü ve rol yöneti
 
 ### getUserRole
 
-**Ne yapar**: Belirli bir kullanıcının rolünü (super_admin, admin, user vb.) belirler. Fonksiyon, veritabanından rol bilgisini çekerken aynı zamanda e-posta tabanlı bir güvenlik ağı sunar. Bu sayede veritabanı erişiminin olmadığı veya hata oluştuğu durumlarda bile admin kullanıcıların doğru şekilde tanımlanmasını sağlar.
+**Ne yapar**: Verilen kullanıcı ID'sine ait rol bilgisini Supabase veritabanından asenkron olarak çeker. Kullanıcı veritabanında kayıtlı değilse veya bir hata oluşursa, opsiyonel olarak verilen email adresi üzerinden fallback mekanizmasıyla rol belirleme yapar.
 
-**Nasıl yapar**: Fonksiyon öncelikle opsiyonel olarak gelen e-posta adresini kontrol eder. Eğer e-posta adresi `isAdminByEmail` fonksiyonu tarafından onaylanırsa, özel super_admin e-postaları (`recep.varlik@gmail.com`, `recepvarlk@gmail.com`) için `'super_admin'`, diğer onaylı e-postalar için `'admin'` döner. E-posta kontrolü başarısız olursa veya sağlanmamışsa, Supabase veritabanından `user_profiles` tablosunda ilgili kullanıcının `role` alanını sorgular. Sorgu sonucunda hata oluşursa veya veri bulunamazsa varsayılan olarak `'user'` rolü döner. Tüm işlemler sırasında异常 durumları yakalanır ve konsola uyarı yazdırılarak `'user'` rolüyle devam edilir.
+**Nasıl yapar**: Fonksiyon öncelikle opsiyonel `userEmail` parametresini kontrol eder ve bu email'in hardcoded superadmin listesinde (`recep.varlik@gmail.com`, `recepvarlk@gmail.com`) olup olmadığına bakar; bu listeye uyan email'ler için `'super_admin'`, `isAdminByEmail()` yardımcısı tarafından tanımlanan diğer admin email'leri için `'admin'` rolünü doğrudan döndürerek veritabanı sorgusunu atlatabilir. Ardından `window` nesnesinin varlığına göre tarayıcı taraflı (`supabaseBrowserClient`) veya statik taraflı (`supabaseStaticClient`) Supabase istemcisini dinamik import ile yükler ve `user_profiles` tablosundan ilgili kullanıcının `role` alanını `maybeSingle()` ile çeker. Sorgu başarılı olup `data.role` mevcutsa bu değer döndürülür; veritabanında kayıt bulunamaması durumunda tekrar email fallback kontrolü yapılarak admin olup olmadığı kontrol edilir. Herhangi bir hata veya istisna durumunda `console.warn` ile log yazdırarak varsayılan `'user'` rolünü döndürür.
 
 **Parametreler**:
-- `userId`: `string` — Kimliği doğrulanmış kullanıcının benzersiz tanımlayıcısı. Veritabanında `user_profiles` tablosundaki `id` alanıyla eşleşir.
-- `userEmail`: `string` (opsiyonel) — Kullanıcının e-posta adresi. Veritabanı sorgusu başarısız olduğunda veya kullanıcı kaydı henüz oluşturulmamışken devreye giren fallback mekanizması için kullanılır.
+- `userId`: `string` — Sorgulanacak kullanıcının benzersiz tanımlayıcısı. `user_profiles` tablosundaki `id` alanıyla eşleşir.
+- `userEmail`: `string | undefined` — Opsiyonel. Kullanıcının email adresi. Veritabanı sorgusu başarısız olduğunda veya kayıt bulunamadığında rol belirleme için fallback olarak kullanılır.
 
-**Dönüş**: `Promise<string>` — Kullanıcının rolü olarak bir string döner. Olası değerler: `'super_admin'`, `'admin'`, `'user'`. Herhangi bir hata veya belirsizlik durumunda `'user'` döner.
+**Dönüş**: `Promise<string>` — Kullanıcının rolünü temsil eden dize. Olası değerler: `'super_admin'`, `'admin'`, `'user'`. Veritabanı hatası, istisna veya tanımsız durumlarda varsayılan olarak `'user'` döner.
 
 ### isAdminByEmail
 **Ne yapar**: E-posta adresi bazlı olarak kullanıcının admin yetkisine sahip olup olmadığını kontrol eden senkron fallback kontrol fonksiyonudur. Genellikle ana rol sorgusu çalışmadığında veya önbellekte rol bilgisi bulunamadığında yetki doğrulamak için kullanılır.
@@ -107,13 +107,9 @@ Admin user interface for type safety
 
 ## SABİTLER
 - **FALLBACK_ADMIN_EMAILS** (array) — `[
-
   'admin@venthub.com',
-
   'info@venthub.com',
-
   'alize@venthub.com',
-
   '...`
 
 ---
@@ -121,45 +117,55 @@ Admin user interface for type safety
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/config/admin.ts::getUserRole
-- **params**: `userId` (string), `userEmail` (optional string)
+- **params**: `userId: string`, `userEmail?: string`
 - **ic_degiskenler**:
-  - `data` — supabase'den `user_profiles` tablosundan sorgulanan kullanıcının `role` alanını tutar
-  - `error` — supabase sorgusundan dönen hata nesnesi; varsa hata yönetimi yapılır
-- **Dönüş**: `Promise<string>` — `'super_admin'`, `'admin'` veya `'user'`
+  - `supabase` — Ortam koşuluna göre browser veya static supabase client; `typeof window !== 'undefined'` kontrolü ile seçilir
+  - `supabaseBrowserClient` — Dinamik import ile yüklenen tarayıcı tarafı supabase istemcisi (`'../lib/supabase/client'`)
+  - `supabaseStaticClient` — Dinamik import ile yüklenen statik/sunucu tarafı supabase istemcisi (`'../lib/supabase/static'`)
+  - `data` — `user_profiles` tablosundan `role` alanı ile getirilen satır sonucu
+  - `error` — Supabase sorgusu sırasında oluşabilecek hata nesnesi
+- **Dönüş**: `Promise<string>` — Kullanıcının rolü (`'super_admin'`, `'admin'` veya `'user'`)
 
 ### [N2_NASIL] AST Pointer: src/config/admin.ts::isAdminByEmail
-- **params**: `email` (optional string)
-- **ic_degiskenler**: yok
-- **Dönüş**: `boolean` — email `FALLBACK_ADMIN_EMAILS` listesinde yer alıyorsa `true`
+- **params**: `email?: string`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `boolean` — E-posta adresi `FALLBACK_ADMIN_EMAILS` listesinde küçük harfe çevrilmiş haliyle varsa `true`
 
 ### [N3_NASIL] AST Pointer: src/config/admin.ts::isDevAdmin
-- **params**: parametre yok
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `isDev` — `process.env.NODE_ENV` değerinin `'development'` olup olmadığını kontrol eder
-  - `isLocalhost` — tarayıcı ortamında `window.location.hostname` değerinin `'localhost'` olup olmadığını kontrol eder
-- **Dönüş**: `boolean` — hem development modu hem localhost ortamı aynı anda aktifse `true`
+  - `isDev` — `process.env.NODE_ENV === 'development'` kontrolü ile development ortamında olunduğunu belirtir
+  - `isLocalhost` — `window.location.hostname === 'localhost'` kontrolü ile yerel sunucuda olunduğunu belirtir
+- **Dönüş**: `boolean` — Hem development ortamı hem localhost ise `true`
 
 ### [N4_NASIL] AST Pointer: src/config/admin.ts::checkAdminAccess
-- **params**: `user` — `{ email?: string; user_metadata?: { role?: string } } | null` türünde nesne veya null
+- **params**: `user: { email?: string; user_metadata?: { role?: string } } | null`
 - **ic_degiskenler**:
-  - `lowerEmail` — `user.email` değerinin küçük harfe dönüştürülmüş hali; email karşılaştırmalarında kullanılır
-  - `metadataRole` — `user.user_metadata?.role` erişiminden elde edilen Supabase metadata rolü; izin verilen roller listesiyle kontrol edilir
-- **Dönüş**: `boolean` — kullanıcı admin erişimine sahipse `true`
+  - `lowerEmail` — `user.email` değerinin küçük harfe çevrilmiş hali; email karşılaştırmalarında kullanılır
+  - `metadataRole` — Supabase user metadata'sından okunan `role` alanı; izin verilen roller listesinde (`super_admin`, `admin`, `moderator`, `warehouse`, `sales`, `viewer`) kontrol edilir
+- **Dönüş**: `boolean` — Kullanıcının admin erişimine sahip olup olmadığı; email fallback, metadata rol veya local dev fallback ile belirlenir
 
 ### [N5_NASIL] AST Pointer: src/config/admin.ts::setUserAdminRole
-- **params**: `userId` (string), `role` (string)
+- **params**: `userId: string`, `role: string`
 - **ic_degiskenler**:
-  - `data` — `supabase.rpc('set_user_admin_role')` çağrısının başarılı sonucu; `true` ise atama başarılı demektir
-  - `error` — rpc çağrısından dönen hata nesnesi; varsa `false` döner
-- **Dönüş**: `Promise<boolean>` — rol ataması başarılıysa `true`, değilse `false`
+  - `supabase` — Ortam koşuluna göre browser veya static supabase client; `typeof window !== 'undefined'` kontrolü ile seçilir
+  - `supabaseBrowserClient` — Dinamik import ile yüklenen tarayıcı tarafı supabase istemcisi (`'../lib/supabase/client'`)
+  - `supabaseStaticClient` — Dinamik import ile yüklenen statik/sunucu tarafı supabase istemcisi (`'../lib/supabase/static'`)
+  - `data` — `set_user_admin_role` RPC çağrısının dönüş değeri; `true` ise atama başarılı
+  - `error` — RPC çağrısı sırasında oluşabilecek hata nesnesi
+- **Dönüş**: `Promise<boolean>` — Rol ataması başarılıysa `true`, hata oluşursa `false`
 
 ### [N6_NASIL] AST Pointer: src/config/admin.ts::listAdminUsers
-- **params**: parametre yok
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `rpcRes` — `supabase.rpc('admin_list_users')` çağrısının ham sonucu; hata ve data alanları barındırır
-  - `rpcErr` — `rpcRes` objesinden çıkarılan `error` alanı; varsa hata yönetimi yapılır
-  - `rpcData` — `rpcRes.data` alanından elde edilen `AdminUser[]` dizisi; RPC verisi boşsa boş dizi fallback'i kullanılır
-- **Dönüş**: `Promise<AdminUser[]>` — admin kullanıcıların listesi; hata durumunda boş dizi
+  - `ensureSessionFresh` — Dinamik import ile yüklenen oturum tazeleme fonksiyonu (`'../lib/ensureSessionFresh'`); çağrılarak session'un güncel olmasını sağlar
+  - `supabase` — Ortam koşuluna göre browser veya static supabase client; `typeof window !== 'undefined'` kontrolü ile seçilir
+  - `supabaseBrowserClient` — Dinamik import ile yüklenen tarayıcı tarafı supabase istemcisi (`'../lib/supabase/client'`)
+  - `supabaseStaticClient` — Dinamik import ile yüklenen statik/sunucu tarafı supabase istemcisi (`'../lib/supabase/static'`)
+  - `rpcRes` — `admin_list_users` RPC çağrısınınham sonucu; `.data` ve `.error` alanları ayrıştırılır
+  - `rpcErr` — RPC sonucundaki `.error` alanı; hata varsa `true` döner ve boş dizi döner
+  - `rpcData` — RPC başarıyla döndüğünde `AdminUser[]` tipindeki kullanıcı listesi; `data` alanı `null` olabilir, bu durumda boş dizi kullanılır
+- **Dönüş**: `Promise<AdminUser[]>` — Admin kullanıcıların listesi; hata durumunda boş dizi `[]` döner
 
 ---
 

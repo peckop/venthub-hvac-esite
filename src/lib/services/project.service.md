@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\project.service.ts
-skeleton_hash: 705bee3111f9355b
+skeleton_hash: db9d252a0d8e17dc
 entity_hashes:
   func:addProductToProject: 3ad72ee68e6e1dbb
   func:createProject: f04be25a87702fe5
@@ -12,7 +12,7 @@ entity_hashes:
   func:listUserProjects: 01a071f49edbfd8e
   func:removeProductFromProject: a5c4e58b38ee1a14
   overview: 82cdf1fb2dbcb93a
-generated_at: 2026-06-08T10:09:34Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış
@@ -101,6 +101,16 @@ Bu modül, Supabase veritabanı üzerinden proje ve proje-ürün ilişkilerini y
 - `supabase`: SupabaseClient<Database> — Etkin Supabase istemci örneği.
 - `projectId`: string — Hedef projenin benzersiz tanımlayıcısı.
 **Dönüş**: `Promise<ProjectItem[]>` — Her biri tam ürün detaylarıyla zenginleştirilmiş proje öğelerinin bir dizisi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../types/database.types::type { Database }
+- import: ../../types/database.types::type { TablesInsert }
+- import: ../../types/db-rows::type { DbProduct,DbProjectItem, DbUserProject }
+- import: ../../types/ui-models::type { ProjectItem }
+- import: ../type-converters::mapDatabaseProductToDomain
+- import: @supabase/supabase-js::type { SupabaseClient }
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\category\CategoryGridView.tsx
-skeleton_hash: 56885ae50d938e31
+skeleton_hash: 32abbfdef3326d64
 entity_hashes:
   func:CategoryGridView: 7b1f2c5723260534
   overview: bbed19dee4115a19
   style_tokens: 9b61cf001b5ee023
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-19T20:50:11Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,20 @@ Bu modül, bir kategori ızgara görünümü sunan bir React bileşenidir ve dı
 - availableBrands: Brand[] — Mevcut kategori ile ilişkili tüm markaları içeren dizi, kullanıcıların marka bazında filtreleme yapması için seçenekler sunar.
 - pro: boolean — Mevcut kullanıcının pro abonelik durumunu belirten mantıksal değer, pro özel indirimler veya içeriklerin gösterilip gösterilmeyeceğine karar vermek için kullanılır.
 **Dönüş**: React.FC<CategoryGridViewProps> türünde bir React bileşeni döndürür. Bu döndürülen bileşen, alınan tüm propsları kullanarak render edilmiş grid arayüzünü sunar ve kategori gezintisi, alt kategori listeleme, marka filtreleme ve pro içerik erişimi gibi temel işlevleri barındırır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/ProductCard::ProductCard
+- import: ../../components/category/CategoryFilters::CategoryFiltersComponent
+- import: ../../components/layout/PageShell::PageShell
+- import: ../../hooks/useCategoryGateway::type { CategoryFilters }
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../lib/type-converters::type { DomainCategory }
+- import: @/types/ui-models::type { Product }
+- import: lucide-react::Grid
+- import: lucide-react::List
+- import: react::React
 
 ---
 

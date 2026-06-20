@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminInventoryPage: 66c4abfcbc4634eb
   overview: 116f551d87e89286
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-17T13:23:29Z
+generated_at: 2026-06-19T20:48:41Z
 ---
 
 ## Genel Bakış
@@ -24,18 +24,6 @@ Yönetici paneli envanter sayfasının genel yapısını ve arayüzünü tanıml
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül için somut fonksiyon gövdesi (implementation body) paylaşılmadığı için, sadece verilen fonksiyon imzasından çıkarılabilecek minimum varsayımlar tanımlanmıştır.
-
----
-
-**[Aksiyom 1]:** Eğer `AdminInventoryPage` bir React bileşeni olarak kullanılmıyorsa (örn. doğrudan HTML'de veya React dışı bir bağlamda çağrılırsa), bileşen doğru çalışmaz ve render hatası oluşur.
-
-**[Aksiyom 2]:** Eğer `AdminInventoryPage` bileşeni JSX içinde `<>` (React Fragment) veya bir wrapper element içine yerleştirilmeksizin kullanılıyorsa ve bileşen birden fazla üst düzey element döndürüyorsa, render hatası oluşur.
-
-**[Aksiyom 3]:** Fonksiyon imzasında parametre veya prop tanımlı olmadığından (`def AdminInventoryPage() -> React.FC`), bileşen dışarıdan bağımlılık enjeksiyonu (prop drilling) almamaktadır; veri bağımlılıkları (örn. fetchData) modül içi hook'lar veya context'ler üzerinden sağlanmalıdır — sağlanamıyorsa bileşen boş/bozuk veri ile render olur.
-
----
-
-> **Not:** Bu modül için paylaşılan bilgiler sadece fonksiyon imzası ve eski dokümanın üst seviye özetidir. Fonksiyon gövdesi, `fetchData` fonksiyonunun imzası, hook çağrıları, state tanımları ve JSX yapısı paylaşılmadığından, daha spesifik aksiyomlar (örn. API endpoint bağımlılıkları, beklenen veri formatı, eşik değerleri) **bilinmiyor** olarak işaretlenmiştir.
 
 ---
 

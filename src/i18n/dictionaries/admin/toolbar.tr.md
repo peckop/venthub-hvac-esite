@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\toolbar.tr.ts
-skeleton_hash: 978c4eed7677beff
+skeleton_hash: a3e3de16ea3f2de8
 entity_hashes:
   overview: 3efab1f125273943
-generated_at: 2026-06-13T11:17:51Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -32,9 +32,10 @@ Bu modül bir çeviri sözlüğü (dictionary) modülüdür ve minimal mimari va
 
 ## SABİTLER
 - **toolbar** (object) — `{
-      searchPlaceholder: 'Ara',
-      clear: 'Temizle',
-      records: 'kay...`
+  searchPlaceholder: 'Ara',
+  clear: 'Temizle',
+  records: 'kayıt',
+  i...`
 
 ---
 
@@ -43,13 +44,6 @@ Bu modül bir çeviri sözlüğü (dictionary) modülüdür ve minimal mimari va
 Bu dosyada herhangi bir fonksiyon bulunmamaktadır.
 
 `toolbar.tr.ts` dosyası, yalnızca bir `toolbar` sabit nesnesi içeren bir i18n (uluslararasılaştırma) sözlük dosyasıdır. Fonksiyon imzası veya fonksiyon gövdesi mevcut değildir; dolayısıyla AST Pointer üretilemez.
-
----
-
-### [N1] Sabit Nesne: `toolbar`
-- **Tür**: Object literal (nesne sabiti)
-- **Özellik**: `toolbar` — Admin paneli araç çubuğu metinlerinin Türkçe karşılıklarını tutan i18n sözlük nesnesi
-- **Fonksiyon**: Yok —salt veri yapısı, çalışma zamanı mantığı içermez
 
 ---
 

@@ -3,43 +3,46 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\knowledge\TopicPage.tsx
-skeleton_hash: 27110243906085c6
+skeleton_hash: 89dc924cf7ee0cc8
 entity_hashes:
   func:TopicPage: f0965ed8eda6ce60
-  overview: e2c2f0ab8ac5351b
+  overview: 6055c95ad4a87f00
   style_tokens: cc78d049395b1cf9
-generated_at: 2026-06-14T22:21:39Z
+generated_at: 2026-06-19T20:50:58Z
 ---
 
 ## Genel Bakış
-TopicPage bileşeni, VentHub HVAC platformunda bilgi tabanındaki konuların detaylı sayfa görünümünü sağlayan ana React bileşenidir. URL'den gelen benzersiz bir tanımlayıcı ile (slug) ilgili konunun tüm içeriğini, başlığını ve ilişkili verilerini çekerek kullanıcıya sunar.
+TopicPage bileşeni, VentHub HVAC platformunda bilgi tabanındaki belirli bir konunun kapsamlı sayfa görünümünü sağlayan temel React bileşenidir. URL yapısından gelen benzersiz `slug` parametresini kullanarak ilgili konunun tüm içeriğini, başlığını ve ilişkili verilerini dinamik olarak çeker, yönetir ve kullanıcılara sunar. Bileşen, veri çekme sürecindeki yükleme, hata ve kısmi veri durumlarını ele alarak dayanıklı bir kullanıcı deneyimi hedefler.
 
 ## Fonksiyon Grupları
 ### Sayfa Verisi Yönetimi ve Koordinasyon
-Bileşen, aldığı slug parametresini kullanarak ilgili konu verisini çeker, yükleme ve hata durumlarını yönetir ve render işlemi için gerekli verileri hazırlar.
+Bu grup, bileşenin temel yaşam döngüsünü ve veri akışını yönetir. Alınan `slug` parametresinin geçerliliğini kontrol eder, ilgili konu verisini bir API veya veri kaynağından asenkron olarak çeker ve bu sürecin yaratacağı farklı durumları (yükleme, hata, başarı) koordine eder.
 - TopicPage
 
-### Kullanıcı Arayüzü Oluşturma
-Hazırlanan veriler kullanılarak konu sayfasının başlığı, ana içeriği, meta bilgileri ve ilişkili konu kartları gibi UI bileşenleri render edilerek tam bir sayfa oluşturulur.
+### Kullanıcı Arayüzü Oluşturma ve Render
+Veri çekme sürecinin başarılı olması durumunda, elde edilen veriler kullanılarak konu sayfasının tamamı oluşturulur. Bu, sayfanın başlığı, ana zengin içeriği, meta bilgileri ve potansiyel olarak ilişkili diğer konulara bağlantılar sunan kartlar gibi UI bileşenlerinin render edilmesini kapsar.
 - TopicPage
+
+## Mimari Önem ve Bağımlılıklar
+Bu modül, bilgi tabanı alt sisteminin görünüm katmanında kritik bir noktadır ve doğrudan URL rotasyonuna bağlıdır. Dış bağımlılık olarak, ilgili konu verisini sağlayan bir API servisine veya veri kaynağına bağlanır; bu bağlantı koptuğunda veya veri eksik olduğunda bileşenin kendi başına hata yönetimi ve yeniden deneme mekanizması sunması beklenir. İçeride, potansiyel olarak yükleme göstergesi (spinner), hata bileşeni ve zengin içerik editörü gibi alt bileşenlere bağımlıdır; bu alt bileşenler genellikle lazy (tembel) veya dinamik olarak yüklenebilir. Bileşen, slug parametresinin değişmesine tepki vererek state'i sıfırlamalı ve yeni veri çekme döngüsünü başlatmalıdır; aksi takdirde eski veriyle hatalı bir render oluşabilir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için temel mimari varsayımlar aşağıdadır:
+Bu modül için mimari varsayımlar, yalnızca fonksiyon imzası ve modül sabitlerinden çıkarılmıştır.
 
-[Aksiyom 1]: Eğer `propSlug` parametresi geçerli bir değer (boş string veya undefined/null değil) yoksa, sayfa içeriği düzgün yüklenemez ve hata/yükleme durumu sonsuz döngüde kalabilir.
+---
 
-[Aksiyom 2]: Eğer `slug` değerine karşılık gelen konu verisi API veya yerel veri kaynağında mevcut değilse, bileşen bir hata durumu render etmelidir (veri bulunamadı).
+[Aksiyom 1]: Eğer `slug` parametresi çağrıya sağlanmazsa, bileşen ilgili konu verisini çekemez ve sayfa içeriği render edilemez.
 
-[Aksiyom 3]: Eğer veri kaynağı (API) erişilemez durumdaysa veya network bağlantısı kopuksa, bileşen-network/hata durumunu göstermeli ve yeniden deneme mekanizması sunmalıdır.
+[Aksiyom 2]: Eğer `slug` parametresi geçersiz veya sistemde eşleşmeyen bir değer içeriyorsa, veri çekme işlemi başarısız olur ve bileşen hata durumuna geçer.
 
-[Aksiyom 4]: Eğer veri başarıyla çekildi ancak zorunlu alanlar (başlık, içerik bölümü) eksikse, bileşen kısmi render veya hata durumuna geçmelidir.
+[Aksiyom 3]: Eğer `slug` parametresi `null`, `undefined` veya boş string olarak iletilirse, veri isteği anlamsız bir sorgu ile gönderilir veya hiç gönderilmez; bileşen kararlı bir durumda kalamaz (ne yükleme ne de hata durumu tetiklenir; davranış belirsizdir).
 
-[Aksiyom 5]: Eğer `slug` parametresi değişir (örn: kullanıcı farklı bir konuya geçerse), bileşen mevcut veriyi temizlemeli ve yeni slug için tekrar veri çekme işlemi başlatmalıdır.
+---
 
-[Aksiyom 6]: Eğer veri çekme işlemi devam ediyorsa (yükleniyor durumu), bileşen bir skeleton/loading göstergesi render etmeli, eski veriyi göstermemelidir.
+**Not:** Fonksiyon imzasında `slug` parametresi için herhangi bir default değer tanımlanmamıştır; bu nedenle çağrıcı tarafından zorunlu olarak sağlanmalıdır. Modül sabitleri tanımlı değildir. Bileşen iç veri çekme mantığı, API uç noktaları ve hata yönetimi detayları fonksiyon gövdesinden çıkarılamadığından bu konularda aksiyom üretilmemiştir.
 
 ---
 
@@ -56,9 +59,9 @@ Bu modül için temel mimari varsayımlar aşağıdadır:
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/Seo::Seo
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
 - import: ../../utils/applicationLinks::getCategoryUrlFromTopic
-- import: ../../utils/routes::Routes
 - import: framer-motion::motion
 - import: lucide-react::AlertCircle
 - import: lucide-react::ArrowLeft
@@ -81,30 +84,39 @@ Bu modül için temel mimari varsayımlar aşağıdadır:
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: TopicPage.tsx::TopicPage
-- **params**: `(propSlug)` — Sayfaya dışarıdan gelen opsiyonel topic slug'ı
+### [N1_NASIL] AST Pointer: `src/views/knowledge/TopicPage.tsx`::TopicPage
+- **params**: `{ slug: propSlug }` —父组件den gelen topic slug'u, opsiyonel olarak doğrudan verilebilir
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan dönen çeviri fonksiyonu, sayfadaki tüm metinleri çevirir
-  - `params` — useParams hook'undan dönen URL parametreleri nesnesi
-  - `currentSlug` — Aktif topic slug'ı; propSlug varsa onu, yoksa params.slug'ı kullanır
-  - `base` — Çeviri anahtarı için temel yol; "knowledge.topics.{currentSlug}" formatında
-  - `title` — Mevcut topic'in çevirisi ile elde edilen başlık
-  - `exists` — Topic'in var olup olmadığını belirleyen boolean; currentSlug ve title kontrolü
-  - `rawSteps` — Topic'in adım listesini içeren hammadde veri (dizi veya string olabilir)
-  - `steps` — İşlenmiş adım listesi; rawSteps dizi ise onu, değilse boş dizi kullanır
-  - `rawPitfalls` — Topic'in tuzak listesini içeren hammadde veri (dizi veya string olabilir)
-  - `pitfalls` — İşlenmiş tuzak listesi; rawPitfalls dizi ise onu, değilse boş dizi kullanır
-- **Dönüş**: JSX elementi (React.FC) — Topic içeriği veya "bulunamadı" sayfası
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, tüm metinler bu ile çekilir
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen lokalize rota nesnesi, `.destek.home()` ve `.contact()` çağrılır
+  - `params` — `useParams()` ile elde edilen Next.js parametre nesnesi, `params?.slug` erişimi yapılır
+  - `currentSlug` — `propSlug` varsa onu, yoksa `params?.slug`'ı string olarak alan birleşik slug değişkeni
+  - `base` — çeviri key prefix'i, formatı `knowledge.topics.${currentSlug}`; `currentSlug` yoksa boş string
+  - `title` — `${base}.title` ile çekilen çevirilmiş konu başlığı metni
+  - `exists` — boolean; `currentSlug` mevcut VE `title`'ın hala çeviri key'ine eşit olmadığı durumda `true` (yani konu bulunabilir)
+  - `rawSteps` — `${base}.steps` ile çekilen hammadde adım dizisi (array veya string/diğer olabilir)
+  - `steps` — `rawSteps` bir dizi ise onu, değilse boş dizi `[]` dönen güvenli adım listesi
+  - `rawPitfalls` — `${base}.pitfalls` ile çekilen hammadde tuzak/tuzaklar dizisi
+  - `pitfalls` — `rawPitfalls` bir dizi ise onu, değilse boş dizi `[]` dönen güvenli tuzak listesi
+- **Dönüş**: JSX — `exists` `false` ise "konu bulunamadı" uyarı sayfası JSX'i erken return ile döner; `true` ise `<Seo>` + hero section + steps/pitfalls grid + aksiyon footer içeren tam topic sayfası JSX'i döner
 
-### [N2_NASIL] AST Pointer: TopicPage.tsx::stepsCallback
-- **params**: `(s: string, i: number)` — `s`: Tek bir adım metni, `i`: Adımın dizideki indeks numarası
-- **ic_degiskenler**: (yok — parametreler doğrudan JSX'te kullanılır)
-- **Dönüş**: JSX elementi — Her adım için gösterilecek div bileşeni
+---
 
-### [N3_NASIL] AST Pointer: TopicPage.tsx::pitfallsCallback
-- **params**: `(s: string, i: number)` — `s`: Tek bir tuzak/tavsiye metni, `i`: Tuzak listesindeki indeks numarası
-- **ic_degiskenler**: (yok — parametreler doğrudan JSX'te kullanılır)
-- **Dönüş**: JSX elementi — Her tuzak için gösterilecek div bileşeni
+### [N2_NASIL] AST Pointer: `src/views/knowledge/TopicPage.tsx`::steps.map callback
+- **params**: `(s: string, i: number)` — `s`: mevcut adım metni, `i`: dizi index'i (key olarak kullanılır)
+- **ic_degiskenler**:
+  - `s` — `$steps` dizisinden gelen tek bir adım metni, `<p>` içinde render edilir
+  - `i` — dizi index'i, `key={i}` olarak React key'e ve nokta göstergesi için kullanılır
+- **Dönüş**: JSX — her adım için cyan nokta + metin paragrafı içeren flex satır div'i
+
+---
+
+### [N3_NASIL] AST Pointer: `src/views/knowledge/TopicPage.tsx`::pitfalls.map callback
+- **params**: `(s: string, i: number)` — `s`: mevcut tuzak/tavsiye metni, `i`: dizi index'i (key olarak kullanılır)
+- **ic_degiskenler**:
+  - `s` — `$pitfalls` dizisinden gelen tek bir tuzak/tavsiye metni, `<p>` içinde render edilir
+  - `i` — dizi index'i, `key={i}` olarak React key'e kullanılır
+- **Dönüş**: JSX — her tuzak için amber `CheckCircle2` ikonu + metin paragrafı içeren flex satır div'i
 
 ---
 

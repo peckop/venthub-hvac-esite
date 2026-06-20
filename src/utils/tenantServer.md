@@ -3,32 +3,36 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\tenantServer.ts
-skeleton_hash: 8a002d69b08c384d
+skeleton_hash: 69eb81e10061f69f
 entity_hashes:
-  overview: 3d351754b3018bf8
-generated_at: 2026-06-08T10:10:58Z
+  overview: 5ef2b4c70f7b5fe7
+generated_at: 2026-06-19T20:48:40Z
 ---
 
 ## Genel Bakış
-Bu yardımcı modül, sunucu tarafında çok kiracılı (multi-tenant) yapılandırma yönetimini merkezileştirir. Next.js istek başlıkları ve React cache mekanizmasını kullanarak, geçerli kiracının yapılandırma nesnesini (`getTenantConfig`) sunar ve eksik durumlarda `DEFAULT_TENANT_CONFIG` sabitini varsayılan değer olarak döndürür. Modül, Supabase ile kiracı verilerini okumak için statik bir istemci kullanır.
+Bu yardımcı modül, sunucu tarafında çok kiracılı (multi-tenant) yapılandırma yönetimini merkezileştirir. Next.js istek başlıkları ve React cache mekanizmasını kullanarak, geçerli kiracının yapılandırma nesnesini sunar. Eksik durumlarda `DEFAULT_TENANT_CONFIG` sabitini varsayılan değer olarak döndürür ve kiracı verilerini okumak için statik bir Supabase istemcisi kullanır.
 
-## Modül Yapısı
-Bu dosya, tanımlı bir sınıf veya modül-içi fonksiyon içermeyen, üst düzey (top-level) ifadelerden oluşur. Temel bileşenleri şunlardır:
-- `DEFAULT_TENANT_CONFIG`: Geçerli kiracıya ait yapılandırma bulunamadığında kullanılacak varsayılan yapılandırma nesnesi.
-- `getTenantConfig`: Modülün dışa açtığı ana API. Bu bir fonksiyon değil, modülün üst seviyesinde hesaplanan ve dışa aktarılan bir değerdir; muhtemelen bir fonksiyon referansı veya asenkron bir değerdir. Kiracıya özel yapılandırma verilerini (örneğin veritabanı ayarları, özellik bayrakları) temin eder.
-
-## Kullanım Bağlamı
-Modül, `next/headers` paketinden `headers` import ederek HTTP istek bağlamını (kiracı tanımlayıcısı gibi bilgiler) çözer. `@/lib/supabase/static` içinden import edilen statik Supabase istemcisi (`supabase`) ile kiracıya ait yapılandırma satırlarını veritabanından sorgular. React'ın `cache` fonksiyonu kullanılarak, aynı istek kapsamında çoklu çağrıların optimize edilmesi ve veri tutarlılığı sağlanır.
+## Modülün Kullanım Bağlamı ve Bağımlılıklar
+Modül, `next/headers` paketinden gelen `headers` fonksiyonu ile HTTP istek bağlamını (kiracı tanımlayıcısı gibi bilgileri) çözer. `react` kütüphanesinden alınan `cache` fonksiyonu ile aynı istek kapsamında performans optimizasyonu ve veri tutarlılığı sağlanır. `@/lib/supabase/static` içinden import edilen statik Supabase istemcisi (`supabase`) ile `tenant_config` veya benzeri bir veritabanı tablosunda kiracıya ait yapılandırma satırları sorgulanır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, çok kiracılı (multi-tenant) mimaride kiracı yapılandırma bilgisini sağlayan bir yardımcı modüldür. Aşağıdaki varsayımlar, mevcut modül sabitlerine dayanarak çıkarılmıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./tenantConstants::DEFAULT_TENANT_ID
+- import: @/lib/supabase/static::supabaseStaticClient
+- import: next/headers::headers
+- import: react::cache
 
 ---
 
@@ -60,12 +64,12 @@ Bu modül, çok kiracılı (multi-tenant) mimaride kiracı yapılandırma bilgis
 
 ## AST POINTERS
 
-Bu dosyada (`tenantServer.ts`) **fonksiyon gövdesi bulunmamaktadır**. Dosya sadece şunları içermektedir:
+Bu dosyada (`src/utils/tenantServer.ts`) **fonksiyon gövdesi bulunmamaktadır**. Dosya sadece şu bileşenleri içerir:
 
-- **Import tanımlamaları**: `headers`, `supabase`, `cache`
-- **Sabit tanımlamaları**: `DEFAULT_TENANT_CONFIG` (nesne), `getTenantConfig` (çağrı)
+- **Import'lar**: `headers`, `cache`, `supabaseStaticClient`, `DEFAULT_TENANT_ID`
+- **Sabit/Tanımlar**: `DEFAULT_TENANT_CONFIG` (object), `getTenantConfig` (call)
 
-Fonksiyon gövdesi verilmediği için AST Pointer üretilememektedir.
+Hiçbir fonksiyon imzası veya gövdesi sağlanmadığından, AST Pointer üretilemez.
 
 ---
 

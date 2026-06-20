@@ -12,7 +12,7 @@ entity_hashes:
   func:saveColumnVisibility: cc3ab7f7e3952cf6
   func:saveDensity: c63bcc94a80cc55d
   overview: 4087fb32a2109943
-generated_at: 2026-06-13T15:01:30Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -91,6 +91,11 @@ Bu modül, veri tablosu yapılandırmasını (yoğunluk ve sütun görünürlü�
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @/types/admin-shared::type { Density }
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/components/admin/data-table/persist.ts::densityKey
@@ -146,9 +151,9 @@ graph TD
     persist_ts__saveColumnVisibility["saveColumnVisibility"]
     persist_ts__saveDensity["saveDensity"]
     persist_ts__loadDensity --> persist_ts__densityKey
+    persist_ts__loadColumnVisibility --> persist_ts__colsKey
     persist_ts__saveColumnVisibility --> persist_ts__colsKey
     persist_ts__saveDensity --> persist_ts__densityKey
-    persist_ts__loadColumnVisibility --> persist_ts__colsKey
 ```
 
 ## NODE ID STANDARD

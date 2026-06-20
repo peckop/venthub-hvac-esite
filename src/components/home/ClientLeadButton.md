@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\ClientLeadButton.tsx
-skeleton_hash: a7e6116d26640e96
+skeleton_hash: 60d29a8f84354f11
 entity_hashes:
   func:ClientLeadButton: 8f87f454fa733cb3
   overview: 5fd9adef525bec13
   style_tokens: 3a5eed4082aa65a0
-generated_at: 2026-05-28T22:36:02Z
+generated_at: 2026-06-19T20:47:08Z
 ---
 
 ## Genel Bakış
@@ -43,6 +43,11 @@ Bileşenin temel görünümünü ve tıklama davranışını tanımlar; gerekli 
 - `className`: string — Bileşene uygulanacak ek CSS sınıfı; mevcut stilleri override etmek veya üzerine eklemek için kullanılır
 
 **Dönüş**: `React.FC<ClientLeadButtonProps>` — JSX element döndürür; render edilmiş bir React buton bileşeni.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
 
 ---
 

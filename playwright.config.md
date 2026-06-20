@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\playwright.config.ts
 skeleton_hash: c2a3f634c02b669d
 entity_hashes:
   overview: e72aa38ff0954fb5
-generated_at: 2026-06-19T07:57:44Z
+generated_at: 2026-06-19T20:51:03Z
 ---
 
 ## Genel Bakış
@@ -22,20 +22,6 @@ Dosyada fonksiyon bulunmamaktadır — bu bir modül değil, üst seviye yapıla
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül (Playwright konfigürasyon dosyası) için fonksiyon gövdesi bulunmadığından, yalnızca modül sabitlerinin kullanımına dayalı mimari varsayımlar tanımlanabilir.
-
----
-
-**[Aksiyom 1]**: Eğer **PORT sabitinin değeri** tanımlı ve erişilebilir bir port numarası değilse, Playwright test sunucusu başlatılamaz ve tüm testler bağlantı hatası ile başarısız olur.
-
-**[Aksiyom 2]**: Eğer **BASE_URL sabitinin değeri** geçerli bir HTTP/HTTPS URL'si olarak yapılandırılmamışsa, Playwright tarayıcı navigasyonları hedef sunucuya ulaşamaz ve tüm sayfa tabanlı testler timeout ile sonuçlanır.
-
-**[Aksiyom 3]**: Eğer **PORT ile BASE_URL'deki port bilgisi tutarsız** ise (farklı portlar referans ediliyorsa), test istemcisi yanlış adrese yönlendirilir ve bağlantı reddedilir.
-
-**[Aksiyom 4]**: Eğer **BASE_URL**, çalıştırma ortamında (development, staging, production) erişilebilir bir sunucuyu işaret etmiyor ise, tüm Playwright tarayıcı senaryoları `ECONNREFUSED` veya benzeri ağ hatası ile başarısız olur.
-
----
-
-> **Not:** Bu dosya bir Playwright konfigürasyon dosyası olduğundan, fonksiyon gövdesi içermemektedir. Aksiyomlar yalnızca tespit edilen sabitlerin (PORT, BASE_URL) mimari bağımlılıklarına dayanmaktadır. Sabitlerin somut değerleri analiz materyalinde verilmediği için değerler hakkında beyanda bulunulmamıştır.
 
 ---
 
@@ -77,10 +63,6 @@ Bu dosya **Playwright yapılandırma dosyasıdır** (`playwright.config.ts`) ve 
 
 - **`defineConfig`** — `@playwright/test` modülünden; config nesnesini tip-güvenli olarak sarmalar
 - **`devices`** — `@playwright/test` modülünden; cihaz boyutlandırma listesi (örn. `'iPhone 13'`, `'Desktop Chrome'`)
-
----
-
-> **Not:** Bu dosyada analiz edilebilecek herhangi bir fonksiyon gövdesi (`FONKSIYON GÖVDELERI`) yer almamaktadır. Tüm yapılandırma `defineConfig()` çağrı içinde nesne literal olarak tanımlanmıştır; bu nedenle AST Pointer oluşturma kriterine uyan fonksiyon bulunmamaktadır.
 
 ---
 

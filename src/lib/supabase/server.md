@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\supabase\server.ts
-skeleton_hash: 69987a90f70b7197
+skeleton_hash: f4e30b8090c51d71
 entity_hashes:
   func:createSupabaseServerClient: e1abcfb101f22d63
   overview: 32f6efa96dd36ed3
-generated_at: 2026-06-08T10:10:57Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,13 @@ Supabase sunucu istemcisi oluşturma modülü için temel mimari varsayımlar:
 
 **Dönüş**:
 Fonksiyon, `SupabaseClient<Database>` tipinde bir nesne döndürür. Bu nesne, sunucu tarafında veritabanı sorguları yapmak ve kullanıcı oturumunu yönetmek için kullanılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../types/database.types::type { Database }
+- import: @supabase/ssr::createServerClient
+- import: next/headers::cookies
 
 ---
 
