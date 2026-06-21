@@ -97,7 +97,15 @@ varsayımı kırık çıktı (PS-001); "updated_at çalışıyor" varsayımı ya
 |---|---|---|---|
 | **PS-005** | `inventory_movements` → `products` FK ilişkisi **CASCADE DELETE** | 🔍 `pg_trigger` → `RI_FKey_cascade_del` | Ürün silinince stok hareket geçmişi geri dönüşsüz yok olur → muhasebe denetim kaybı |
 
-### 2.7 Performans
+### 2.7 Kategori-Ürün İlişki Yapısı
+
+| # | Bulgu | Kanıt | Etki |
+|---|---|---|---|
+| **PS-036** | `categories.level` kolonu tutarsız — **2 alt-kategori `level=0`** olarak kayıtlı: "Ex-Proof (ATEX) Fanlar" ve "Sığınak Havalandırma Sistemleri" (`parent_id` = Industrial Ventilation ama `level=0`) | ✅ `SELECT name, level, parent_id FROM categories WHERE parent_id IS NOT NULL AND level = 0` → 2 row | `level` kolonuna güvenen sorgu (admin, sitemap, breadcrumb) bu ikisini **üst kategori sanır.** Frontend `!c.parent_id` ile ayırdığı için şu an patlamamış — ama `level` kolonuna bağlanan herhangi bir yeni kod **yanlış sonuç verir** |
+| **PS-037** | `categories.parent_id` → `categories.id` FK ilişkisi **CASCADE DELETE** | ✅ `referential_constraints` → `delete_rule = 'CASCADE'`. Aynı zamanda `products.category_id` → `categories.id` = **SET NULL** | Üst kategori silinirse tüm alt-kategoriler **otomatik silinir** → `products.category_id` SET NULL olur → ürünler **kategorisiz kalır**, sitede görünmez olur. Ör. "Industrial Ventilation" silinirse 7 alt-kategori + 195 ürün etkilenir. Enterprise'da **RESTRICT** olmalı |
+| **PS-038** | Ürün-kategori ilişkisi **sabit 2-seviye modele kilitli** — `products.category_id` (üst) + `products.subcategory_id` (alt) iki ayrı FK kolon. `categories` tablosu recursive self-referencing FK'ya sahip ama ürünler bunu **kullanamıyor** | ✅ `max_depth` = 1 (recursive CTE). Frontend hardcoded: `!c.parent_id` / `c.parent_id === parentId` ayrımı 20+ dosyada. URL: `/category/[slug]/[subSlug]` — 2 seviye route | 3\. seviye kategori eklenemez (ör. "Industrial > Radyal > Yüksek Basınç"). 1 ürün birden fazla kategoride olamaz (cross-listing yok). Ölçekleme için hem DB modeli hem frontend hem URL yeniden yazılmalı |
+
+### 2.8 Performans
 
 | # | Bulgu | Kanıt | Etki |
 |---|---|---|---|
@@ -134,7 +142,7 @@ Bu tespit raporu **yeni standart yazmaz**, mevcut standartların ürün şeması
 | `admin-standard.md` | K4 (audit trail) ürün tablosunda **kırık** — updated_at trigger yok. K3 (yetki kapısı) SECURITY DEFINER fonksiyonlarında delinmiş. |
 | `catalog-ingestion-standard.md` | Kademe-2 loader'ın bağlanacağı köprü (`model_code`) %86 eksik. Loader çalışsa bile 334 ürünü eşleştiremez. |
 | `i18n-localization-standard.md` | Ürün katmanında çeviri altyapısı sıfır. Description bile tek dil, tek alan. |
-| `category-taxonomy-standard.md` | Kategori yapısı sağlam (25 kategori, hiyerarşi tutarlı), ama `tenant_id` eksik. |
+| `category-taxonomy-standard.md` | Kategori yapısı **kısmen sağlam** — hiyerarşi FK'ları tutarlı ama `level` kolonu 2 alt-kategoride bozuk (PS-036), parent FK CASCADE DELETE tehlikeli (PS-037), 2-seviye model enterprise ölçeklemeyi engelliyor (PS-038), `tenant_id` eksik. |
 | `dealer-module-blueprint.md` | Bayi fiyatlandırma hattı product_prices üzerinden çalışacaktı ama tablo 0 satır. Aynı zemin sorunu. |
 
 ---
@@ -165,6 +173,6 @@ Bu tespit raporu **yeni standart yazmaz**, mevcut standartların ürün şeması
 
 Supabase canlı DB (tnofewwkwlyjsqgwjjga) · Supabase MCP `get_advisors` (security + performance) ·
 `execute_sql` 28+ sorgu · `pg_trigger`/`pg_proc`/`pg_policies`/`information_schema` · Mevcut standartlarla
-çapraz-eşleştirme. PS-001→PS-035 kodlu 35 bulgu, hepsi sorgu kanıtlı.
+çapraz-eşleştirme. PS-001→PS-038 kodlu **38 bulgu**, hepsi sorgu kanıtlı.
 İlgili: `pricing-standard.md`, `admin-standard.md`, `catalog-ingestion-standard.md`, `i18n-localization-standard.md`,
-`dealer-data-ground-truth-2026-06-11.md`.
+`category-taxonomy-standard.md`, `dealer-data-ground-truth-2026-06-11.md`.
