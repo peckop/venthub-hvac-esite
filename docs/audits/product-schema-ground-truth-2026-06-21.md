@@ -1,12 +1,13 @@
 # Ürün Veritabanı Şeması Denetimi — Doğrulanmış Gerçek Zemin (2026-06-21)
 
 > **Bu dosya nedir?** Ürün ekosisteminin (`products`, `categories`, `product_images`,
-> `product_prices`, `price_lists` + bağlı tablolar) **kanıtlı zemini.** 3 kaynaktan okundu
-> (Supabase canlı DB · Supabase MCP Advisor güvenlik+performans · `pg_trigger`/`pg_proc` sorguları),
+> `product_prices`, `price_lists` + bağlı tablolar) **kanıtlı zemini.** 4 kaynaktan okundu
+> (Supabase canlı DB · Supabase MCP Advisor güvenlik+performans · `pg_trigger`/`pg_proc` sorguları ·
+> NLM danışman planı `hvac_relations_migration_plan.md`),
 > **çapraz-eşleştirildi.** Çelişkide **canlı DB kazanır.**
 > Bu, tahmin değil; her olgu kaynaklı + sorguyla kanıtlanmış.
 >
-> **Doğrulama lejantı:** ✅ canlı DB sorgusuyla teyit · ⚠️ Supabase Advisor uyarısı · 🔍 pg_catalog sorgusu
+> **Doğrulama lejantı:** ✅ canlı DB sorgusuyla teyit · ⚠️ Supabase Advisor uyarısı · 🔍 pg_catalog sorgusu · 📓 NLM danışman planı
 
 İnceleme alanı: `public` şemasında ürün merkezli tablolar · Canlı DB: 388 ürün
 
@@ -106,7 +107,19 @@ varsayımı kırık çıktı (PS-001); "updated_at çalışıyor" varsayımı ya
 | **PS-038** | Ürün-kategori ilişkisi **sabit 2-seviye modele kilitli** — `products.category_id` (üst) + `products.subcategory_id` (alt) iki ayrı FK kolon. `categories` tablosu recursive self-referencing FK'ya sahip ama ürünler bunu **kullanamıyor** | ✅ `max_depth` = 1 (recursive CTE). Frontend hardcoded: `!c.parent_id` / `c.parent_id === parentId` ayrımı 20+ dosyada. URL: `/category/[slug]/[subSlug]` — 2 seviye route | 3\. seviye kategori eklenemez (ör. "Industrial > Radyal > Yüksek Basınç"). 1 ürün birden fazla kategoride olamaz (cross-listing yok). Ölçekleme için hem DB modeli hem frontend hem URL yeniden yazılmalı |
 | **PS-039** | Ürün URL'sinde **kategori yolu kayboluyor** — kategori sayfasından ürüne geçişte URL yapısı kopuyor | ✅ Canlı site ekran görüntüsü: Kategori = `/tr/category/residential-ventilation/banyo-ve-tuvalet-fanlari` → Ürün = `/tr/products/vortice-me-100-4-ll-giallo-yellow-gold`. Breadcrumb kategoriyi gösteriyor ama URL yansıtmıyor | SEO: Google kategori→ürün hiyerarşisini URL'den okuyamıyor, ürün "yetim" görünüyor. Breadcrumb ile URL uyumsuz. Kullanıcı ürün linkini paylaşırsa kaynak kategori bilinmez. Analytics: kategori bazlı funnel analizi yapılamaz |
 
-### 2.8 Performans
+### 2.8 Ürün Ailesi / Varyant Mimari Eksikliği (NLM danışman planı çapraz-doğrulaması)
+
+> Kaynak: `docs/plans/hvac_relations_migration_plan.md` — NLM danışmanı tarafından hazırlanmış,
+> bağımsız olarak bu raporla aynı yapısal sorunları tespit etmiş + ek riskler belirlemiştir.
+
+| # | Bulgu | Kanıt | Etki |
+|---|---|---|---|
+| **PS-040** | **Sayfalama (pagination) kırık** — düz `products` tablosunda `LIMIT 20` ile sayfalandığında 18/20 ürün aynı modelin farklı varyantları olabiliyor, frontend grupladığında ekranda 20 yerine 2-3 kart görünüyor | 📓 NLM planı §1.A + frontend `groupProductsBySeries` helper'ının varlığı (client-side workaround) | Sayfa başına kart sayısı düzensiz, CLS riski, server-side pagination ile client-side grouping karışması = sessiz sıralama bug'ı |
+| **PS-041** | **Over-fetching (aşırı veri çekimi)** — kategori sayfasında 10 seri kartı göstermek için altındaki tüm varyantların `technical_specs` JSONB, görsel ve fiyat verileri frontend'e taşınıyor | 📓 NLM planı §1.B: "10 ana serinin 200 varyantı varsa, 10 kart için 200 ürünün tüm spec'leri API payload'una yüklenir" | Mobil TBT bütçesini aşar, Lighthouse performans skorunu düşürür. `product_families` tablosu olmadan çözülemez |
+| **PS-042** | **Cache thrashing** — tek bir varyantın stoğu/fiyatı değiştiğinde Supabase Webhook `products-discovery-${tenantId}` cache tag'ini temizliyor, düz tablodaki tüm SKU'lar aynı cache bloğunda | 📓 NLM planı §1.C + `unstable_cache` + Supabase Webhook On-Demand ISR entegrasyonu | Ufacık stok hareketi devasa kategori/keşif önbelleğinin sıfırdan hesaplanmasına yol açar. Family-variant ayrımı olmadan varyant güncellemesi parent cache'ini bozmaz |
+| **PS-043** | **SEO duplicate content** — her SKU düz ürün satırı olduğundan `sitemap.ts` ve `generateStaticParams` neredeyse aynı içeriğe sahip 15-20 varyant sayfası üretiyor | 📓 NLM planı §1.D: "`/products/punto-mex-100` ve `/products/punto-mex-120` = neredeyse aynı içerik" | Google Search Console **Duplicate Content cezası** + crawl budget israfı. Canonical parent URL + parametrik varyant yapısı gerekiyor |
+
+### 2.9 Performans
 
 | # | Bulgu | Kanıt | Etki |
 |---|---|---|---|
@@ -130,6 +143,7 @@ varsayımı kırık çıktı (PS-001); "updated_at çalışıyor" varsayımı ya
 | `admin-standard.md` K4 | "Her değişiklik iz bırakır" | ❌ `products`'ta `updated_at` trigger bile yok (PS-002) |
 | `catalog-ingestion-standard.md` §1 | "Köprü = model kodu" | ⚠️ `model_code` %14 dolu (PS-028) |
 | `dealer-data-ground-truth` §2.8 | "3 tablo `tenant_id` taşımıyor" | 🔴 Artık **4 ürün tablosu daha** aynı durumda (PS-001) |
+| `hvac_relations_migration_plan.md` | Family-variant ayrımı + 4 faz çözüm | ✅ Plan mevcut ama **hiçbiri uygulanmamış** — düz tablo hala aktif, `product_families` yok, `groupProductsBySeries` workaround hala çalışıyor |
 
 ---
 
@@ -145,6 +159,7 @@ Bu tespit raporu **yeni standart yazmaz**, mevcut standartların ürün şeması
 | `i18n-localization-standard.md` | Ürün katmanında çeviri altyapısı sıfır. Description bile tek dil, tek alan. |
 | `category-taxonomy-standard.md` | Kategori yapısı **kısmen sağlam** — hiyerarşi FK'ları tutarlı ama `level` kolonu 2 alt-kategoride bozuk (PS-036), parent FK CASCADE DELETE tehlikeli (PS-037), 2-seviye model enterprise ölçeklemeyi engelliyor (PS-038), `tenant_id` eksik. |
 | `dealer-module-blueprint.md` | Bayi fiyatlandırma hattı product_prices üzerinden çalışacaktı ama tablo 0 satır. Aynı zemin sorunu. |
+| `hvac_relations_migration_plan.md` | Planın 4 yapısal riski (PS-040→043) bağımsız olarak doğrulandı. Planın çözüm önerileri (family-variant ayrımı, server-side grouping, SEO segmentasyonu, SaaS izolasyonu) **standart oluşturma** aşamasında değerlendirilecek. |
 
 ---
 
@@ -174,6 +189,10 @@ Bu tespit raporu **yeni standart yazmaz**, mevcut standartların ürün şeması
 
 Supabase canlı DB (tnofewwkwlyjsqgwjjga) · Supabase MCP `get_advisors` (security + performance) ·
 `execute_sql` 28+ sorgu · `pg_trigger`/`pg_proc`/`pg_policies`/`information_schema` · Mevcut standartlarla
-çapraz-eşleştirme + canlı site ekran görüntüleri. PS-001→PS-039 kodlu **39 bulgu**, hepsi sorgu veya görsel kanıtlı.
+çapraz-eşleştirme + canlı site ekran görüntüleri + NLM danışman planı çapraz-doğrulaması.
+PS-001→PS-043 kodlu **43 bulgu**, hepsi sorgu, görsel veya NLM planı kanıtlı.
 İlgili: `pricing-standard.md`, `admin-standard.md`, `catalog-ingestion-standard.md`, `i18n-localization-standard.md`,
-`category-taxonomy-standard.md`, `dealer-data-ground-truth-2026-06-11.md`.
+`category-taxonomy-standard.md`, `dealer-data-ground-truth-2026-06-11.md`, `hvac_relations_migration_plan.md`.
+
+> **Sonraki adım:** Bu genişletilmiş rapor NLM defterine yüklenerek doğrulatılacak,
+> ardından dünya standartları araştırmasına dayalı ürün veritabanı şeması cetveli oluşturulacak.
