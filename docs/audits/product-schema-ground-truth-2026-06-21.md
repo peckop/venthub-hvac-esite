@@ -104,6 +104,7 @@ varsayımı kırık çıktı (PS-001); "updated_at çalışıyor" varsayımı ya
 | **PS-036** | `categories.level` kolonu tutarsız — **2 alt-kategori `level=0`** olarak kayıtlı: "Ex-Proof (ATEX) Fanlar" ve "Sığınak Havalandırma Sistemleri" (`parent_id` = Industrial Ventilation ama `level=0`) | ✅ `SELECT name, level, parent_id FROM categories WHERE parent_id IS NOT NULL AND level = 0` → 2 row | `level` kolonuna güvenen sorgu (admin, sitemap, breadcrumb) bu ikisini **üst kategori sanır.** Frontend `!c.parent_id` ile ayırdığı için şu an patlamamış — ama `level` kolonuna bağlanan herhangi bir yeni kod **yanlış sonuç verir** |
 | **PS-037** | `categories.parent_id` → `categories.id` FK ilişkisi **CASCADE DELETE** | ✅ `referential_constraints` → `delete_rule = 'CASCADE'`. Aynı zamanda `products.category_id` → `categories.id` = **SET NULL** | Üst kategori silinirse tüm alt-kategoriler **otomatik silinir** → `products.category_id` SET NULL olur → ürünler **kategorisiz kalır**, sitede görünmez olur. Ör. "Industrial Ventilation" silinirse 7 alt-kategori + 195 ürün etkilenir. Enterprise'da **RESTRICT** olmalı |
 | **PS-038** | Ürün-kategori ilişkisi **sabit 2-seviye modele kilitli** — `products.category_id` (üst) + `products.subcategory_id` (alt) iki ayrı FK kolon. `categories` tablosu recursive self-referencing FK'ya sahip ama ürünler bunu **kullanamıyor** | ✅ `max_depth` = 1 (recursive CTE). Frontend hardcoded: `!c.parent_id` / `c.parent_id === parentId` ayrımı 20+ dosyada. URL: `/category/[slug]/[subSlug]` — 2 seviye route | 3\. seviye kategori eklenemez (ör. "Industrial > Radyal > Yüksek Basınç"). 1 ürün birden fazla kategoride olamaz (cross-listing yok). Ölçekleme için hem DB modeli hem frontend hem URL yeniden yazılmalı |
+| **PS-039** | Ürün URL'sinde **kategori yolu kayboluyor** — kategori sayfasından ürüne geçişte URL yapısı kopuyor | ✅ Canlı site ekran görüntüsü: Kategori = `/tr/category/residential-ventilation/banyo-ve-tuvalet-fanlari` → Ürün = `/tr/products/vortice-me-100-4-ll-giallo-yellow-gold`. Breadcrumb kategoriyi gösteriyor ama URL yansıtmıyor | SEO: Google kategori→ürün hiyerarşisini URL'den okuyamıyor, ürün "yetim" görünüyor. Breadcrumb ile URL uyumsuz. Kullanıcı ürün linkini paylaşırsa kaynak kategori bilinmez. Analytics: kategori bazlı funnel analizi yapılamaz |
 
 ### 2.8 Performans
 
@@ -173,6 +174,6 @@ Bu tespit raporu **yeni standart yazmaz**, mevcut standartların ürün şeması
 
 Supabase canlı DB (tnofewwkwlyjsqgwjjga) · Supabase MCP `get_advisors` (security + performance) ·
 `execute_sql` 28+ sorgu · `pg_trigger`/`pg_proc`/`pg_policies`/`information_schema` · Mevcut standartlarla
-çapraz-eşleştirme. PS-001→PS-038 kodlu **38 bulgu**, hepsi sorgu kanıtlı.
+çapraz-eşleştirme + canlı site ekran görüntüleri. PS-001→PS-039 kodlu **39 bulgu**, hepsi sorgu veya görsel kanıtlı.
 İlgili: `pricing-standard.md`, `admin-standard.md`, `catalog-ingestion-standard.md`, `i18n-localization-standard.md`,
 `category-taxonomy-standard.md`, `dealer-data-ground-truth-2026-06-11.md`.
