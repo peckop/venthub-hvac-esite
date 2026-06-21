@@ -130,6 +130,16 @@ varsayımı kırık çıktı (PS-001); "updated_at çalışıyor" varsayımı ya
 | **PS-033** | Fosil kolonlar: `airflow_capacity` (2/388), `noise_level` (2/388), `pressure_rating` (0/388) | ✅ sayım sorguları | `technical_specs` JSONB ile çakışıyor |
 | **PS-034** | `technical_specs` JSONB key yapısı tutarsız — 30+ farklı key | ✅ `jsonb_object_keys` dağılımı | Filtreleme/karşılaştırma tablosu standardize değil |
 
+### 2.10 Edge Function / Kod Katmanı Sonuçları (NLM iddiası + bağımsız doğrulama)
+
+> NLM danışmanının öne sürdüğü 3 iddia, kod ve canlı DB üzerinden bağımsız olarak doğrulandı.
+
+| # | Bulgu | Kanıt | Etki |
+|---|---|---|---|
+| **PS-044** | **10 Edge fonksiyonda çift `const cors` bildirimi** — aynı scope'ta iki kez `const cors` tanımlanmış = SyntaxError, **derlenmez** | ✅ `order-validate/index.ts` satır 19+21: `const cors = corsHeaders;` ardından `const cors = {`. Aynı pattern: `admin-iyzico-reconcile`, `admin-order-inspect`, `admin-orders-latest`, `admin-update-order`, `apply-coupon`, `iyzico-callback`, `iyzico-refund`, `log-client-error`, `order-housekeeping` = **toplam 10 fonksiyon** | Sistematik copy-paste hatası. Bu fonksiyonlar canlıda çağrıldığında **500 Internal Server Error** döner. `order-validate` ölü = sipariş doğrulama yok |
+| **PS-045** | **`iyzico-payment` sipariş snapshot'u kısmi** — ürün meta (name, sku, image) fetch ediliyor ama 6 snapshot kolonundan sadece `subtotal_snapshot` ve kısmen `product_name`/`product_image_url` yazılıyor | ✅ `iyzico-payment/index.ts` satır 289: `subtotal_snapshot` yazılıyor. Satır 362-400: ürün meta fetch + fallback map var. Ama `price_at_time`, `sku_snapshot` gibi kolonlar **yazılmıyor veya koşula bağlı** | Fiyat değiştiğinde geçmiş siparişler yanlış görünür. Muhasebe denetiminde sipariş anındaki fiyat kanıtlanamaz |
+| **PS-046** | **`is_user_admin()` fonksiyonunda rol eşleşme hatası** — DB fonksiyonu `role IN ('admin','superadmin')` arıyor ama CHECK constraint **`super_admin`** (alt çizgili) kabul ediyor | ✅ `pg_proc.prosrc`: `role IN ('admin','superadmin')`. `user_profiles_role_check` constraint: `ARRAY['super_admin', 'admin', ...]`. DB'ye `superadmin` yazılamaz (çünkü constraint reddeder) → fonksiyon super_admin için **asla true dönmez** | İlk super_admin atandığında tüm admin yetkilendirme akışı **kilitlenir**. Fonksiyon sadece `admin` rolünü tanır |
+
 ---
 
 ## 3. DRIFT — Mevcut dokümanlar vs gerçek
@@ -189,10 +199,9 @@ Bu tespit raporu **yeni standart yazmaz**, mevcut standartların ürün şeması
 
 Supabase canlı DB (tnofewwkwlyjsqgwjjga) · Supabase MCP `get_advisors` (security + performance) ·
 `execute_sql` 28+ sorgu · `pg_trigger`/`pg_proc`/`pg_policies`/`information_schema` · Mevcut standartlarla
-çapraz-eşleştirme + canlı site ekran görüntüleri + NLM danışman planı çapraz-doğrulaması.
-PS-001→PS-043 kodlu **43 bulgu**, hepsi sorgu, görsel veya NLM planı kanıtlı.
+çapraz-eşleştirme + canlı site ekran görüntüleri + NLM danışman planı çapraz-doğrulaması + Edge function kaynak kod incelemesi.
+PS-001→PS-046 kodlu **46 bulgu**, hepsi sorgu, görsel, NLM planı veya kaynak kod kanıtlı.
 İlgili: `pricing-standard.md`, `admin-standard.md`, `catalog-ingestion-standard.md`, `i18n-localization-standard.md`,
 `category-taxonomy-standard.md`, `dealer-data-ground-truth-2026-06-11.md`, `hvac_relations_migration_plan.md`.
 
-> **Sonraki adım:** Bu genişletilmiş rapor NLM defterine yüklenerek doğrulatılacak,
-> ardından dünya standartları araştırmasına dayalı ürün veritabanı şeması cetveli oluşturulacak.
+> **Sonraki adım:** Dünya standartları araştırmasına dayalı ürün veritabanı şeması cetveli oluşturulacak.
