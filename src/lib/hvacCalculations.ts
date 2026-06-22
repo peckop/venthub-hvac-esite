@@ -422,11 +422,15 @@ function getClimateDeltaT(zone: ClimateZone): { heating: number; cooling: number
 }
 
 /**
- * HRV Isı Geri Kazanımı Hesaplaması
- * 
- * Formül: Q = ṁ × Cp × ΔT × η
- * Q (W) = Debi (m³/h) × 0.34 × ΔT × Verimlilik
- * 0.34 = ρ × Cp / 3600 = 1.2 × 1005 / 3600
+ * Calculates the required airflow and energy savings for a Heat Recovery Ventilator (HRV) or Energy Recovery Ventilator (ERV).
+ * Evaluates performance based on climate zone, sensible/latent efficiency, and building type to determine payback periods.
+ *
+ * @param input - Configuration object detailing the building parameters and environmental conditions
+ * @returns An object containing the required airflow (m³/h), expected energy savings, efficiency factors, and investment payback estimation
+ *
+ * @example
+ * calculateHRV({ recoveryType: 'erv', buildingType: 'office', climateZone: 'moderate', occupancy: 50, area: 200, sensibleEfficiency: 80, latentEfficiency: 60, operatingHoursPerDay: 10, electricityCostPerKWh: 2.5 })
+ * // returns calculated HRV sizing and payback metrics
  */
 export function calculateHRV(input: HRVInput): HRVResult {
     const {

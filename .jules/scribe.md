@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2026-06-22 - [TSDoc Existing Blocks]
+**Learning:** When attempting to document functions with TSDoc, some functions might already have existing JSDoc/TSDoc blocks containing custom logic/formulas (e.g. `calculateHRV`). Overwriting them blindly can result in loss of context.
+**Action:** When using `replace_with_git_merge_diff` to add TSDoc, always read and preserve the existing descriptive logic or formulas in the new TSDoc block.

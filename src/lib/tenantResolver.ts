@@ -3,6 +3,18 @@ export interface TenantInfo {
   slug: string;
 }
 
+/**
+ * Resolves the tenant context (ID and slug) based on the HTTP host header.
+ * Designed to extract subdomain slugs from custom domains or localhost aliases.
+ * Defaults to the primary system tenant if no subdomain is present, or if 'www'/'api' is used.
+ *
+ * @param host - The raw HTTP host string (e.g., 'tenant1.venthub.com', 'localhost:3000')
+ * @returns An object containing the resolved `tenantId` and string `slug`
+ *
+ * @example
+ * resolveTenant('tenant1.venthub.com') // returns { tenantId: 'd3b0...', slug: 'tenant1' }
+ * resolveTenant('www.venthub.com') // returns { tenantId: 'd3b0...', slug: 'default' }
+ */
 export function resolveTenant(host: string | null | undefined): TenantInfo {
   const DEFAULT_TENANT_ID = 'd3b07384-d113-495f-a558-8c38634e0000';
   const DEFAULT_SLUG = 'default';
