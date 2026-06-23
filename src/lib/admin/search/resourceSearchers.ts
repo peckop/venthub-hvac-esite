@@ -77,7 +77,7 @@ export const searchReturns: AdminSearcher = async (supabase, query, limit) => {
     .or(`reason.ilike.%${query}%,venthub_orders.order_number.ilike.%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as VenthubReturnJoinedRow[]
+  const rows = (data || []) as VenthubReturnJoinedRow[]
   return rows.map((r) => {
     const order = Array.isArray(r.venthub_orders) ? r.venthub_orders[0] : r.venthub_orders
     const orderNum = order?.order_number || ''
@@ -150,7 +150,7 @@ export const searchMovements: AdminSearcher = async (supabase, query, limit) => 
     .or(`reason.ilike.%${query}%,products.name.ilike.%${query}%,products.sku.ilike.%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as InventoryMovementJoinedRow[]
+  const rows = (data || []) as InventoryMovementJoinedRow[]
   return rows.map((m) => {
     const prod = Array.isArray(m.products) ? m.products[0] : m.products
     const prodName = prod?.name || ''
@@ -206,7 +206,7 @@ export const searchInventory: AdminSearcher = async (supabase, query, limit) => 
     .or(`name.ilike.%${query}%,warehouse_location.ilike.%${query}%,supplier_name.ilike.%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as InventoryVelocityRow[]
+  const rows = (data || []) as InventoryVelocityRow[]
   return rows.map((i) => ({
     resourceKey: 'inventory',
     id: String(i.product_id),

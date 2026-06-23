@@ -10,7 +10,7 @@ export interface InventoryMovementRow {
   product_id: string
   products: {
     name: string
-  } | null | Record<string, unknown>
+  } | null | { name: string }[]
 }
 
 export async function getInventoryMovements(
@@ -34,5 +34,5 @@ export async function getInventoryMovements(
     throw error
   }
 
-  return (data || []) as unknown as InventoryMovementRow[]
+  return (data || []) as InventoryMovementRow[]
 }

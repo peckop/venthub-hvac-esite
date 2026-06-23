@@ -11,3 +11,7 @@
 **Type Smell:** None.
 **Learning:** A comprehensive diagnostic sweep of the codebase for type escape hatches (`as any`, `as unknown as`, `// @ts-ignore`, `// @ts-expect-error`) returned zero results in production code. The codebase relies entirely on strong typing, type guards (`isRecord`), and Supabase generated types (`database.types.ts`).
 **Solution:** Clean sweep: zero type escape hatches found. Codebase health is optimal.
+## 2024-05-18 - Avoid mocked Supabase interfaces for internal tables
+**Type Smell:** Hardcoding custom mocked interfaces (`SupabaseClientOverride`) and applying double-casts (`as unknown as ...`) to bypass type checking for internal tables like `tenants` that are excluded from public generated types.
+**Learning:** This approach completely circumvents Supabases strong typing and often requires double-casting, hiding potential future schema drift and violating strict TypeScript rules.
+**Solution:** Locally extend the generated `Database` type (e.g., via `type ExtendedDatabase = Omit<Database, "public"> & { public: ... }`) to properly register the internal table schema, then safely cast the standard SupabaseClient using a single, validated type (`as SupabaseClient<ExtendedDatabase>`).
