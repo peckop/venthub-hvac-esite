@@ -11,3 +11,8 @@
 **Type Smell:** None.
 **Learning:** A comprehensive diagnostic sweep of the codebase for type escape hatches (`as any`, `as unknown as`, `// @ts-ignore`, `// @ts-expect-error`) returned zero results in production code. The codebase relies entirely on strong typing, type guards (`isRecord`), and Supabase generated types (`database.types.ts`).
 **Solution:** Clean sweep: zero type escape hatches found. Codebase health is optimal.
+## 2023-11-09 - QueryData Inference
+
+**Type Smell:** Double cast `as unknown as Type` used for Supabase queries where `QueryData` or direct `Database` inference should be used.
+**Learning:** Complex Supabase joins (`!inner(..)`) can be typed automatically by the SDK using `QueryData<typeof query>` rather than manually creating an interface and double-casting the result.
+**Solution:** Replaced double casts with explicit type definitions matching `database.types.ts` utilizing the query's inferred return type using `QueryData`. Removed `SupabaseClientOverride` for `tenants` and replaced it with `ExtendedDatabase` mapping.
