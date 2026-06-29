@@ -2560,7 +2560,8 @@ export const tr = {
         efficiencyWarningDesc: 'Daha güçlü bir model veya ek önlemler gerekebilir'
       },
       diagram: {
-        unit: 'Hava Perdesi'
+        unit: 'Hava Perdesi',
+        doorDimensions: 'Kapı ölçüleri diyagramı'
       }
     },
     duct: {
@@ -2613,7 +2614,10 @@ export const tr = {
         commercial: 'Ticari',
         occupancy: 'Kişi Sayısı',
         workingHours: 'Günlük Çalışma',
-        electricityPrice: 'Elektrik Birim Fiyatı'
+        electricityPrice: 'Elektrik Birim Fiyatı',
+        sensibleEfficiency: 'Duyulur Verim',
+        latentEfficiency: 'Gizli Verim',
+        area: 'Alan (m²)'
       },
       results: {
         heatingGain: 'Isıtma Kazancı',

@@ -2672,7 +2672,8 @@ export const en: typeof tr = {
         efficiencyWarningDesc: 'A more powerful model or additional measures may be required'
       },
       diagram: {
-        unit: 'Air Curtain'
+        unit: 'Air Curtain',
+        doorDimensions: 'Door dimensions diagram'
       }
     },
     duct: {
@@ -2725,7 +2726,10 @@ export const en: typeof tr = {
         commercial: 'Commercial',
         occupancy: 'Number of People',
         workingHours: 'Daily Operation',
-        electricityPrice: 'Electricity Unit Price'
+        electricityPrice: 'Electricity Unit Price',
+        sensibleEfficiency: 'Sensible Efficiency',
+        latentEfficiency: 'Latent Efficiency',
+        area: 'Area (m²)'
       },
       results: {
         heatingGain: 'Heating Gain',
