@@ -1,17 +1,15 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { QueryData } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
 
-export interface InventoryMovementRow {
-  id: string
-  delta: number
-  reason: string
-  created_at: string
-  product_id: string
-  products: {
-    name: string
-  } | null | Record<string, unknown>
-}
+// We create a dummy query to extract the return type using QueryData
+const inventoryMovementsQuery = (supabase: SupabaseClient<Database>) =>
+  supabase
+    .from('inventory_movements')
+    .select('id, delta, reason, created_at, product_id, products(name)')
+
+export type InventoryMovementRow = QueryData<ReturnType<typeof inventoryMovementsQuery>>[number]
 
 export async function getInventoryMovements(
   supabase: SupabaseClient<Database>,
@@ -34,5 +32,5 @@ export async function getInventoryMovements(
     throw error
   }
 
-  return (data || []) as unknown as InventoryMovementRow[]
+  return (data || []) as InventoryMovementRow[]
 }

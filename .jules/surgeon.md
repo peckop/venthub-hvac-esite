@@ -11,3 +11,12 @@
 **Type Smell:** None.
 **Learning:** A comprehensive diagnostic sweep of the codebase for type escape hatches (`as any`, `as unknown as`, `// @ts-ignore`, `// @ts-expect-error`) returned zero results in production code. The codebase relies entirely on strong typing, type guards (`isRecord`), and Supabase generated types (`database.types.ts`).
 **Solution:** Clean sweep: zero type escape hatches found. Codebase health is optimal.
+## 2025-05-19 - Supabase QueryData Utility for Nested Joins
+**Type Smell:** Using \`as unknown as ManualInterface\` to cast complex Supabase queries containing nested joins (e.g., \`!inner()\`).
+**Learning:** Manual interfaces for nested relationships are brittle and often fail to capture the \`T | T[] | null\` union correctly. Supabase provides a \`QueryData\` utility type that perfectly infers the exact return shape directly from the query builder.
+**Solution:** Create a dummy query function (e.g., \`const q = (supabase) => supabase.from('...').select('...')\`) and infer the type using \`type Row = QueryData<ReturnType<typeof q>>[number]\`.
+
+## 2025-05-19 - Extending Supabase Database Types for Missing Tables
+**Type Smell:** Creating a massive manual interface representing the entire \`SupabaseClient\` and double-casting \`(supabase as unknown as SupabaseClientOverride)\` just to query a table missing from the generated \`Database\` type (like \`tenants\`).
+**Learning:** Directly extending the \`Database\` type using \`Omit\` allows you to safely inject missing tables into the \`public.Tables\` schema without losing the type safety of the client or the rest of the generated types. Simple intersections (\`Database & ...\`) cause generic overlap errors.
+**Solution:** Create an \`ExtendedDatabase\` type: \`type ExtendedDatabase = Omit<Database, 'public'> & { public: Omit<Database['public'], 'Tables'> & { Tables: Database['public']['Tables'] & { tenants: { Row: ... } } } }\` and cast the client \`(supabase as SupabaseClient<ExtendedDatabase>)\`.

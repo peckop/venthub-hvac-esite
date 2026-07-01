@@ -1,4 +1,4 @@
-import { SupabaseClient } from '@supabase/supabase-js'
+import { type QueryData,SupabaseClient } from '@supabase/supabase-js'
 
 import { adminSearchProducts } from '@/lib/services/product.service'
 import type { Database } from '@/types/database.types'
@@ -17,28 +17,17 @@ export type AdminSearcher = (
   limit: number
 ) => Promise<CommandResult[]>
 
-interface VenthubReturnJoinedRow {
-  id: string
-  reason: string
-  status: string
-  venthub_orders: { order_number: string | null; customer_name: string | null } | { order_number: string | null; customer_name: string | null }[] | null
-}
+// Dummy queries for type extraction
+const dummyReturnsQuery = (supabase: SupabaseClient<Database>) =>
+  supabase.from('venthub_returns').select('id, reason, status, venthub_orders!inner(order_number, customer_name)')
 
-interface InventoryMovementJoinedRow {
-  id: string
-  reason: string
-  delta: number
-  products: { name: string; sku: string } | { name: string; sku: string }[] | null
-}
+const dummyMovementsQuery = (supabase: SupabaseClient<Database>) =>
+  supabase.from('inventory_movements').select('id, reason, delta, products!inner(name, sku)')
 
-interface InventoryVelocityRow {
-  product_id: string
-  name: string | null
-  physical_stock: number | null
-  available_stock: number | null
-  warehouse_location: string | null
-  supplier_name: string | null
-}
+type VenthubReturnJoinedRow = QueryData<ReturnType<typeof dummyReturnsQuery>>[number]
+type InventoryMovementJoinedRow = QueryData<ReturnType<typeof dummyMovementsQuery>>[number]
+// inventory_velocity is a view. we must type it explicitly instead of using QueryData with 'never'
+type InventoryVelocityRow = Database['public']['Views']['inventory_velocity']['Row']
 
 export const searchProducts: AdminSearcher = async (supabase, query, limit) => {
   if (!query || query.trim().length < 2) return []
@@ -77,7 +66,7 @@ export const searchReturns: AdminSearcher = async (supabase, query, limit) => {
     .or(`reason.ilike.%${query}%,venthub_orders.order_number.ilike.%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as VenthubReturnJoinedRow[]
+  const rows = (data || []) as VenthubReturnJoinedRow[]
   return rows.map((r) => {
     const order = Array.isArray(r.venthub_orders) ? r.venthub_orders[0] : r.venthub_orders
     const orderNum = order?.order_number || ''
@@ -150,7 +139,7 @@ export const searchMovements: AdminSearcher = async (supabase, query, limit) => 
     .or(`reason.ilike.%${query}%,products.name.ilike.%${query}%,products.sku.ilike.%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as InventoryMovementJoinedRow[]
+  const rows = (data || []) as InventoryMovementJoinedRow[]
   return rows.map((m) => {
     const prod = Array.isArray(m.products) ? m.products[0] : m.products
     const prodName = prod?.name || ''
@@ -206,7 +195,7 @@ export const searchInventory: AdminSearcher = async (supabase, query, limit) => 
     .or(`name.ilike.%${query}%,warehouse_location.ilike.%${query}%,supplier_name.ilike.%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as InventoryVelocityRow[]
+  const rows = (data || []) as InventoryVelocityRow[]
   return rows.map((i) => ({
     resourceKey: 'inventory',
     id: String(i.product_id),
