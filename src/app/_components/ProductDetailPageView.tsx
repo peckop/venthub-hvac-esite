@@ -661,7 +661,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             {[
                               { label: t('pdp.brand'), value: product.brand },
                               { label: t('pdp.model'), value: product.model_code ?? product.sku },
-                              { label: t('pdp.labels.category'), value: mainCategory?.name || '-' }
+                              { label: t('pdp.labels.category'), value: getCategoryDisplayName(mainCategory, t) || '-' }
                             ].map((item, i) => (
                               <div key={i} className="flex justify-between items-center py-3 border-b border-light-gray/30 group">
                                 <span className="text-xs font-bold text-steel-gray uppercase tracking-widest">{item.label}</span>
