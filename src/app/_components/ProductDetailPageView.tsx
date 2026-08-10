@@ -40,7 +40,7 @@ import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
 import type { Product } from '../../types/ui-models'
 // import { DomainCategory } from '../../lib/type-converters'
-import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { 
   formatSpecValue, 
   groupTechnicalSpecs,
@@ -296,13 +296,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             <ChevronRight size={10} className="flex-shrink-0" />
             {mainCategory && (
               <>
-                <Link href={localizedHref(Routes.category(mainCategory.slug), lang)} className="hover:text-primary-navy transition-colors">
+                <Link href={localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang)), lang)} className="hover:text-primary-navy transition-colors">
                   {getCategoryDisplayName(mainCategory, t)}
                 </Link>
                 {subCategory && subCategory.slug !== mainCategory.slug && (
                   <>
                     <ChevronRight size={10} className="flex-shrink-0" />
-                    <Link href={localizedHref(Routes.category(mainCategory.slug, subCategory.slug), lang)} className="hover:text-primary-navy transition-colors">
+                    <Link href={localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang), getLocalizedCategorySlug(subCategory, lang)), lang)} className="hover:text-primary-navy transition-colors">
                       {getCategoryDisplayName(subCategory, t)}
                     </Link>
                   </>
@@ -326,8 +326,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             try { stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : []; } catch { stack = []; }
             const lastSafeStop = stack[stack.length - 1];
             if (lastSafeStop) { router.push(localizedHref(lastSafeStop, lang), { scroll: false }); }
-            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(localizedHref(Routes.category(mainCategory.slug, subCategory.slug), lang), { scroll: false }) }
-            else if (mainCategory) { router.push(localizedHref(Routes.category(mainCategory.slug), lang), { scroll: false }) }
+            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang), getLocalizedCategorySlug(subCategory, lang)), lang), { scroll: false }) }
+            else if (mainCategory) { router.push(localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang)), lang), { scroll: false }) }
             else { router.push(localizedHref('/', lang), { scroll: false }) }
           }}
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 sm:mb-8 transition-colors group font-bold text-xs uppercase tracking-widest"

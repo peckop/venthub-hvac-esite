@@ -7,8 +7,9 @@ import React, { useMemo } from 'react'
 
 import { useCategories } from '../contexts/CategoryContext'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
+import { useI18n } from '../i18n/I18nProvider'
 import { DomainCategory } from '../lib/type-converters'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { getCategoryDisplayName, getLocalizedCategorySlug } from '../utils/categoryHelpers'
 
 // Kategori ikonları - slug bazlı eşleme
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
@@ -36,12 +37,13 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 function CategoryCard({ category }: { category: DomainCategory }) {
     const Routes = useLocalizedRoutes()
+    const { lang } = useI18n()
     const Icon = CATEGORY_ICONS[category.slug] || Package
     const gradient = CATEGORY_COLORS[category.slug] || 'from-gray-500 to-gray-700'
 
     return (
         <Link
-            href={Routes.category(category.slug)}
+            href={Routes.category(getLocalizedCategorySlug(category, lang))}
             className="group flex-shrink-0 w-48 sm:w-56 md:w-64"
         >
             <div className={`

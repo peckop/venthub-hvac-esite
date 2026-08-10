@@ -67,6 +67,12 @@ export type CategoryMetadata = {
   metric1?: { label: string; value: string };
   metric2?: { label: string; value: string };
   sort_order?: number;
+  /**
+   * Dile göre görünen kategori slug'ı. Kanonik kimlik daima `categories.slug`
+   * kolonudur (= EN); burada tutulan `en` onun kopyasıdır, `tr` ise TR URL'idir.
+   * Migration uygulanmamışsa alan yoktur → kanonik slug'a düşülür.
+   */
+  slug?: { tr?: string; en?: string };
   [key: string]: Json | AuthorityContent | undefined; 
 }
 

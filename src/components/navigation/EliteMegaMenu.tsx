@@ -9,6 +9,7 @@ import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
+import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 const MegaMenu3DBackground = dynamic(() => import('./MegaMenu3DBackground'), { ssr: false })
 
@@ -20,6 +21,7 @@ interface EliteMegaMenuProps {
 // MobileMegaMenu Export - Needed for MegaMenu.tsx
 export const MobileMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate }) => {
     const { wrapCategory } = useCategoryViewModel()
+    const { lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const mainCategories = categories.filter((c) => !c.parent_id)
     const getSubCategories = (parentId: string) => categories.filter((c) => c.parent_id === parentId)
@@ -32,7 +34,7 @@ export const MobileMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNav
                 return (
                     <div key={category.id} className="space-y-2">
                         <Link 
-                            href={Routes.category(category.slug)}
+                            href={Routes.category(getLocalizedCategorySlug(category, lang))}
                             onClick={() => onNavigate?.()}
                             className="font-bold text-slate-900 flex items-center gap-2"
                         >
@@ -46,7 +48,7 @@ export const MobileMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNav
                                     return (
                                         <Link 
                                             key={sub.id} 
-                                            href={Routes.category(category.slug, sub.slug)}
+                                            href={Routes.category(getLocalizedCategorySlug(category, lang), getLocalizedCategorySlug(sub, lang))}
                                             onClick={() => onNavigate?.()}
                                             className="text-sm text-slate-600"
                                         >
@@ -65,7 +67,7 @@ export const MobileMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNav
 
 const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate }) => {
     const { wrapCategory } = useCategoryViewModel()
-    const { t } = useI18n()
+    const { t, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const [isMounted, setIsMounted] = useState(false)
 
@@ -95,7 +97,7 @@ const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate })
                         return (
                             <NavigationMenu.Item key={category.id}>
                                 <Link
-                                    href={Routes.category(category.slug)}
+                                    href={Routes.category(getLocalizedCategorySlug(category, lang))}
                                     onClick={() => handleLinkClick(0, category.slug)}
                                     className="block select-none rounded px-3 py-2 text-base font-medium leading-none text-slate-700 outline-none hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-slate-300 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer flex items-center gap-2"
                                 >
@@ -139,7 +141,7 @@ const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate })
                                                     {vm?.description || t('megamenu.elite.defaultDescription')}
                                                 </p>
                                                 <Link
-                                                    href={Routes.category(category.slug)}
+                                                    href={Routes.category(getLocalizedCategorySlug(category, lang))}
                                                     onClick={() => handleLinkClick(0, category.slug)}
                                                     className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-secondary-blue hover:text-primary-navy"
                                                 >
@@ -156,7 +158,7 @@ const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate })
                                                 return (
                                                     <li key={sub.id}>
                                                         <Link
-                                                            href={Routes.category(category.slug, sub.slug)}
+                                                            href={Routes.category(getLocalizedCategorySlug(category, lang), getLocalizedCategorySlug(sub, lang))}
                                                             onClick={() => handleLinkClick(1, sub.slug)}
                                                             className="block select-none rounded p-3 text-sm font-medium leading-none text-slate-700 no-underline outline-none hover:bg-slate-50 transition-colors"
                                                         >

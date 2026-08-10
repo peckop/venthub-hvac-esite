@@ -13,6 +13,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory, DomainProduct } from '../../lib/type-converters'
+import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { isRecord } from '../../utils/type-converters'
 
 interface CategorySeriesViewProps {
@@ -46,7 +47,7 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
     // Breadcrumb (VENTHUB SIGNATURE - FIXED LOCATION)
     const breadcrumbItems = [
         { label: t('category.breadcrumbHome'), href: '/' },
-        ...(parentVm ? [{ label: parentVm.displayName, href: Routes.category(parentVm.slug) }] : []),
+        ...(parentVm ? [{ label: parentVm.displayName, href: Routes.category(getLocalizedCategorySlug(parentVm.raw, lang)) }] : []),
         { label: vm?.displayName || category.name, href: '' }
     ]
 

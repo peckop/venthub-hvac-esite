@@ -13,6 +13,7 @@ import { useI18n } from '@/i18n/I18nProvider'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { DomainCategory } from '../../lib/type-converters'
+import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 
 interface CategoryShowcaseProps {
@@ -27,7 +28,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     onSubcategorySelect
 }) => {
     const router = useRouter()
-    const { t, dict } = useI18n()
+    const { t, dict, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
     const [wizardOpen, setWizardOpen] = useState(false)
@@ -45,14 +46,14 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
         if (onSubcategorySelect) {
             onSubcategorySelect(subSlug)
         } else {
-            router.push(Routes.category(category.slug, subSlug))
+            router.push(Routes.category(getLocalizedCategorySlug(category, lang), subSlug))
         }
     }
 
     // Breadcrumb (VENTHUB SIGNATURE - FIXED LOCATION)
     const breadcrumbItems = [
         { label: t('category.breadcrumbHome'), href: '/' },
-        { label: vm?.displayName || category.name, href: Routes.category(category.slug) }
+        { label: vm?.displayName || category.name, href: Routes.category(getLocalizedCategorySlug(category, lang)) }
     ]
 
     // Hero image logic
@@ -137,7 +138,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                 key={sub.id}
                                 className="group relative bg-white rounded-hvac-2xl p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-hvac-card-hover transition-shadow duration-700 cursor-pointer overflow-hidden max-w-modal text-left block"
                                 style={{ width: typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'calc(33.33% - 1.5rem)' : typeof window !== 'undefined' && window.innerWidth >= 768 ? 'calc(50% - 1rem)' : '100%' }}
-                                onClick={() => handleSubSelect(sub.slug)}
+                                onClick={() => handleSubSelect(getLocalizedCategorySlug(sub, lang))}
                             >
                                 <div className="relative z-10">
                                     <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900 mb-10 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500">

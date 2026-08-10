@@ -73,7 +73,11 @@ export const tr = {
         roof: 'Çatı Tipi Fanlar',
         'axial-ind': 'Aksiyel Sanayi Fanları',
         'air-curtain': 'Hava Perdeleri',
-        conditioning: 'İklimlendirme Çözümleri'
+        conditioning: 'İklimlendirme Çözümleri',
+        'rect-duct': 'Dikdörtgen Kanal Tipi Fanlar',
+        'round-duct': 'Yuvarlak Kanal Tipi Fanlar',
+        exproof: 'Ex-Proof (ATEX) Fanlar',
+        shelter: 'Sığınak Havalandırma Sistemleri'
       }
     },
     byApplication: 'Uygulamaya Göre Çözümler',

@@ -1,4 +1,15 @@
 import type { DbCategory } from '../types/db-rows'
+import type { DomainCategory } from '../types/ui-models'
+
+/**
+ * Minimal shape needed to resolve a category URL slug: both `DbCategory` and
+ * `DomainCategory` satisfy it, as do raw Supabase rows whose `metadata` is still
+ * untyped (e.g. inside `generateStaticParams`).
+ */
+export type CategorySlugSource = {
+    slug: string | null
+    metadata?: unknown
+}
 
 /**
  * Determines the most appropriate localized display name for a given category.
@@ -33,6 +44,43 @@ export const getCategoryDisplayName = (category: DbCategory | null | undefined, 
 
     // 3. Last resort: Original name
     return category.name
+}
+
+/**
+ * Resolves the language-specific (visible) slug of a category.
+ *
+ * Canonical identity always lives in the `slug` column (English). The localized
+ * slugs live in `metadata.slug = { tr, en }` (added by the localized-slug
+ * migration). If the migration has NOT been applied yet — or the category has no
+ * entry — the canonical slug is returned, so link generation never breaks.
+ *
+ * @param category - The category (DB row or UI domain model)
+ * @param lang - Active language ('tr' | 'en')
+ * @returns The slug that should appear in the URL for that language
+ *
+ * @example
+ * getLocalizedCategorySlug(cat, 'tr') // 'banyo-ve-tuvalet-fanlari'
+ * getLocalizedCategorySlug(cat, 'en') // 'bathroom-toilet-fans'
+ */
+export const getLocalizedCategorySlug = (
+    category: DbCategory | DomainCategory | CategorySlugSource | null | undefined,
+    lang: string
+): string => {
+    if (!category) return ''
+
+    const canonical = category.slug || ''
+    const meta = category.metadata
+
+    if (meta && typeof meta === 'object' && 'slug' in meta) {
+        const localized = (meta as { slug?: unknown }).slug
+        if (localized && typeof localized === 'object') {
+            const key = lang === 'en' ? 'en' : 'tr'
+            const value = (localized as Record<string, unknown>)[key]
+            if (typeof value === 'string' && value.length > 0) return value
+        }
+    }
+
+    return canonical
 }
 
 /**

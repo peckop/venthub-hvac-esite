@@ -69,7 +69,11 @@ export const en: typeof tr = {
         roof: 'Roof Fans',
         'axial-ind': 'Industrial Axial Fans',
         'air-curtain': 'Air Curtains',
-        conditioning: 'Air Conditioning Solutions'
+        conditioning: 'Air Conditioning Solutions',
+        'rect-duct': 'Rectangular Duct Fans',
+        'round-duct': 'Circular Duct Fans',
+        exproof: 'Ex-Proof (ATEX) Fans',
+        shelter: 'Shelter Ventilation Systems'
       }
     },
     byApplication: 'Solutions by Application',
