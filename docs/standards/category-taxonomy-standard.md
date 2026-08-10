@@ -45,13 +45,16 @@ Kategori sistemi **bilinçli olarak genişletilebilir** tasarlandı (admin `Cate
 - `category_mapping_rules` + `fn_auto_categorize_products()` motoru duruyor; **mevcut veride büyük iş yok** —
   asıl faydası **yeni full-load'da** otomatik yerleştirme.
 
-## 4. Dil: TR gösterimi render'da, slug EN kalır
+## 4. Dil: KANONİK slug EN, görünen URL dile göre, TR gösterim render'da
 
-- ❌ Dil sorunu DB taksonomi sorunu DEĞİL — render `c.slug` ile sözlüğe bakıp `translation_key` köprüsünü
-  atlıyor → TR anasayfada 12'den 10'u İngilizce sızıyor.
-- **Slug'lar İngilizce kalır** (URL stabilitesi). TR isim = `translation_key`/`metadata.tr` + `getCategoryDisplayName`
-  SSOT. **`c.slug` ile sözlüğe bakmak YASAK** (Aksiyom 5: çeviri JSONB `metadata->>lang`).
-- **Yapılacak:** eksik `translation_key`/`metadata.tr` doldur + render hotfix.
+> ⭐ **2026-08-10 GÜNCELLEME:** Bu bölümün "yapılacak"ları KAPANDI ve kural genişledi —
+> tam SSOT: `docs/plans/slug-localization-2026-08-10.md`.
+- **Kanonik kimlik = EN slug** (`categories.slug`; DB/CSV/kod hep bunu konuşur). **Görünen URL dile göre:**
+  `metadata.slug={tr,en}` → `/tr/` Türkçe, `/en/` İngilizce slug; yanlış-dil URL'si **308** (PR #457, prod'da).
+- Kategori ADI daima `translation_key` + `getCategoryDisplayName` SSOT'undan. **Ham `c.name`/`c.slug` render YASAK**
+  (Aksiyom 5: çeviri JSONB `metadata->>lang`).
+- ✅ TR sızıntı düzeltildi (PR #456: PDP breadcrumb+özellik, Footer, kategori SEO metadata) ·
+  ✅ eksik/bozuk `translation_key`'ler onarıldı (PR #457 migration).
 
 ## 5. HRV slug tekilleştir + seed
 
