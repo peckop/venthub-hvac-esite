@@ -2,7 +2,9 @@
 
 > **SSOT.** Ürün kategori iskeleti + yerleşim + gösterim kuralları. Full ürün yüklemesinin OMURGASI.
 > Çelişirse kod/DB kazanır; bu cetvel niçin/nasıl'ı sabitler.
-> v1.1 · 2026-06-19 — **canlı DB ile yeniden doğrulandı; §3'teki önceki yanlış "üste yığılı / altlar boş / oto-motor hiç çalışmadı" önermesi düzeltildi.**
+> v1.2 · 2026-08-10 — **ingestor fork'u kapatıldı:** §6 kanonik ağaç 11→**12 dal** (`parking-jet-fan` eklendi),
+> §6.1 katalog-hattı yeni kategorileri (acid-resistant-fans / frequency-converters / electric-duct-heaters) karara bağlandı.
+> (v1.1 · 2026-06-19 — canlı DB ile yeniden doğrulandı; §3'teki yanlış "üste yığılı" önermesi düzeltildi.)
 
 ---
 
@@ -59,10 +61,35 @@ Kategori sistemi **bilinçli olarak genişletilebilir** tasarlandı (admin `Cate
 
 ## 6. Kanonik ağaç referansı (Vortice ne var × Avensair ne satıyor, TR)
 
-11 ana dal (Avensair TR isim tabanı + Vortice ürün-aile derinliği): Konut Havalandırma · Ticari Havalandırma ·
+**12 ana dal** (Avensair TR isim tabanı + Vortice ürün-aile derinliği): Konut Havalandırma · Ticari Havalandırma ·
 Endüstriyel Havalandırma · Çatı Fanları (yatay/dikey/F400 ayrı) · **Isı Geri Kazanım (boş→doldur)** ·
-Hava Perdeleri · Yaz Vantilatörleri · Endüstriyel Tavan Vant. · Hava Şartlandırma · Aksesuar · (+ az-dolu:
-hijyen/elektrikli-ısıtma/akıllı-ev = iskele, gelecek). Tam aile listesi → [[catalog-ingestion-system]] hafıza + NLM Vortice/Avensair defterleri.
+Hava Perdeleri · Yaz Vantilatörleri · Endüstriyel Tavan Vant. · **Otopark Jet Fanları (`parking-jet-fan`)** ·
+Hava Şartlandırma · Aksesuar · (+ az-dolu: hijyen/elektrikli-ısıtma/akıllı-ev = iskele, gelecek).
+Tam aile listesi → [[catalog-ingestion-system]] hafıza + NLM Vortice/Avensair defterleri.
+
+> `parking-jet-fan` gerekçesi (ingestor cetvelinden devralındı, 2026-08-10): Vortice VORT JET R / JET-A gibi
+> gerçek indüksiyon jet fanları için bağımsız üst dal. Avensair listesinde olmasalar da SaaS vizyonu
+> (marka-nötr taksonomi, diğer HVAC markalarının listelemeleri) bu ayrımı zorunlu kılar; fiyatsız girişler
+> `confidence=missing` + `purchase_price_eur=NULL` ile aktarılır.
+
+### 6.1 Katalog-hattı kategori kararları (2026-08-10 — CSV normalizasyonu ile kilitli)
+
+Ingestor CSV'lerindeki 230 satırlık slug sapması canlı DB'ye hizalandı; karara bağlanan **yeni** kategoriler
+(hepsi EN slug + `translation_key` kuralıyla, DB'de Kademe-2 loader öncesi migration ile açılacak):
+
+| Yeni kategori | Slug (üst/alt) | Kapsam | Gerekçe |
+|---|---|---|---|
+| Asit-dayanımlı fanlar | `industrial-ventilation` / `acid-resistant-fans` | Seat/Storm/Jet, 81 ürün | 81 ürün tek alt'a (`radyal-fanlar`) yığılmaz; kimyasal/asit ortam = net alıcı niyeti |
+| Frekans konvertörleri | `accessories` / `frequency-converters` | Danfoss FC101/FC102, 34 ürün | Fan kontrol cihazı = aksesuar doğası; yeni ana dal gerektirmez |
+| Elektrikli kanal ısıtıcıları | `electric-heating` / `electric-duct-heaters` | Avens, 14 ürün | Mevcut `electric-heating` iskeleti tam bu iş için bekliyordu; HRV'ye gömmek yanlış raf |
+
+Mekanik hizalamalar (karar değil): hücreli aspiratör + davlumbaz → `industrial-ventilation/radyal-fanlar`
+(Avensair Bölüm 28/36 haritası) · Nicotra → `industrial-ventilation/radyal-fanlar` · banyo fanları →
+`banyo-ve-tuvalet-fanlari` · Lineo → `residential-ventilation/kanal-ici-hayalet-fanlar` · sığınak →
+`industrial-ventilation/siginak-havalandirma` · HRV/smart-home alt-slug'sız. `tier_c` (yerel icat) → `missing`.
+
+**Slug dili kuralı (teyit):** mevcut TR alt-slug'lar yerinde kalır (301 normalizasyonu ertelendi, ithalatı
+bloklamaz); **her YENİ slug İngilizce açılır** + `translation_key` zorunlu (§4).
 
 ## 7. AÇIK UYGULAMA GÖREVLERİ (compact sonrası — TAM yap, yarım değil)
 
