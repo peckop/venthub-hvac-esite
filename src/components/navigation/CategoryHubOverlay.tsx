@@ -10,6 +10,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
 import type { CategoryMetadata } from '../../types/db-rows'
+import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { VentHubCanvas } from '../products/3d/core'
 import Category3DIcon from '../products/Category3DIcon'
 
@@ -23,7 +24,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     onClose
 }) => {
     const router = useRouter()
-    const { t } = useI18n()
+    const { t, lang } = useI18n()
     const { categories, categoryTree: mainCategories } = useCategories()
     const { wrapCategory } = useCategoryViewModel()
     const Routes = useLocalizedRoutes()
@@ -88,16 +89,16 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
             setSelectedParentCategory(category)
             setHoveredCategory(category)
         } else {
-            router.push(Routes.category(category.slug))
+            router.push(Routes.category(getLocalizedCategorySlug(category, lang)))
             onClose()
         }
     }
 
     const handleSubCategoryClick = (subCategory: DomainCategory) => {
         if (selectedParentCategory) {
-            router.push(Routes.category(selectedParentCategory.slug, subCategory.slug))
+            router.push(Routes.category(getLocalizedCategorySlug(selectedParentCategory, lang), getLocalizedCategorySlug(subCategory, lang)))
         } else {
-            router.push(Routes.category(subCategory.slug))
+            router.push(Routes.category(getLocalizedCategorySlug(subCategory, lang)))
         }
         onClose()
     }

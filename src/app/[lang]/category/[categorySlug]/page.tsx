@@ -1,3 +1,4 @@
+import { permanentRedirect } from 'next/navigation'
 import React, { cache } from 'react'
 
 import { en } from '@/i18n/dictionaries/en'
@@ -5,7 +6,7 @@ import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
 import { getProductsEnriched } from '@/lib/services/product.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
-import { getCategoryDisplayName } from '@/utils/categoryHelpers'
+import { getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
 
 import { SITE_URL } from '../../../../config/siteUrl'
 import { getCachedCategoryData, preloadCategory } from '../../../../lib/data/preload'
@@ -23,13 +24,14 @@ const _getCachedSupabaseData = cache((id: string) => {
 export async function generateStaticParams() {
   const { data } = await supabase
     .from('categories')
-    .select('slug')
+    .select('slug, metadata')
     .eq('is_active', true)
-    
-  const categoriesList = (data || []) as { slug: string | null }[]
+
+  const categoriesList = (data || []) as { slug: string | null, metadata: unknown }[]
+  // Her dil için O DİLİN görünen slug'ı üretilir (tr → metadata.slug.tr, en → kanonik).
   return categoriesList.flatMap((c) => [
-    { lang: 'tr', categorySlug: c.slug || '' },
-    { lang: 'en', categorySlug: c.slug || '' }
+    { lang: 'tr', categorySlug: getLocalizedCategorySlug(c, 'tr') },
+    { lang: 'en', categorySlug: getLocalizedCategorySlug(c, 'en') }
   ])
 }
 
@@ -55,16 +57,26 @@ export async function generateMetadata({ params }: { params: Promise<{ categoryS
     ? `Explore the highest quality and most economical ventilation products in the ${displayName} category.`
     : `${displayName} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`
 
+  // hreflang: her dil kendi görünen slug'ıyla bildirilir; x-default = TR.
+  const trUrl = `${SITE_URL}/tr/category/${getLocalizedCategorySlug(category, 'tr')}`
+  const enUrl = `${SITE_URL}/en/category/${getLocalizedCategorySlug(category, 'en')}`
+  const canonicalUrl = lang === 'en' ? enUrl : trUrl
+
   return {
     title: `${displayName} | VentHub`,
     description: desc,
     alternates: {
-      canonical: `${SITE_URL}/category/${categorySlug}`,
+      canonical: canonicalUrl,
+      languages: {
+        tr: trUrl,
+        en: enUrl,
+        'x-default': trUrl,
+      },
     },
     openGraph: {
       title: `${displayName} | VentHub`,
       description: desc,
-      url: `${SITE_URL}/category/${categorySlug}`,
+      url: canonicalUrl,
       siteName: 'VentHub',
       images: [
         {
@@ -83,6 +95,16 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
   const { categorySlug, lang } = await params
   preloadCategory(categorySlug)
   const category = await getCachedCategoryData(categorySlug)
+
+  // Gelen slug aktif dilin görünen slug'ı değilse (ör. kanonik EN slug /tr/ altında,
+  // ya da eski TR kanonik slug) doğru dil URL'ine 308 ile kalıcı yönlendir.
+  if (category) {
+    const expectedSlug = getLocalizedCategorySlug(category, lang)
+    if (expectedSlug && expectedSlug !== categorySlug) {
+      permanentRedirect(`/${lang}/category/${expectedSlug}`)
+    }
+  }
+
   const dict = lang === 'en' ? en : tr
   // SSOT: JSON-LD adı da sözlükten çözülür (bkz. generateMetadata yorumu)
   const t = (key: string) => getDictValue(dict, key)
@@ -125,7 +147,7 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
     "@type": "CollectionPage",
     "name": displayName,
     "description": lang === 'en' ? `Products in category ${displayName}` : `${displayName} kategorisindeki ürünler`,
-    "url": `${SITE_URL}/category/${categorySlug}`,
+    "url": `${SITE_URL}/${lang}/category/${categorySlug}`,
     "numberOfItems": products.length,
     "itemListElement": products
       .filter((prod) => prod.slug)

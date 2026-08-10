@@ -5,6 +5,7 @@ import { HVAC_BRANDS } from '../data/brands'
 import { getCategories } from '../lib/services/category.service'
 import { getAllProducts } from '../lib/services/product.service'
 import { supabaseStaticClient } from '../lib/supabase/static'
+import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import { Routes } from '../utils/routes'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -46,17 +47,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   )
 
-  // 2. Category Routes
+  // 2. Category Routes (URL'ler dile göre yerelleştirilmiş slug ile üretilir)
   const categoryRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     categories.map((cat) => ({
-      url: `${baseUrl}/${lang}${Routes.category(cat.slug)}`,
+      url: `${baseUrl}/${lang}${Routes.category(getLocalizedCategorySlug(cat, lang))}`,
       lastModified: new Date(cat.updated_at || new Date()),
       changefreq: 'weekly',
       priority: 0.7,
       alternates: {
         languages: {
-          tr: `${baseUrl}/tr${Routes.category(cat.slug)}`,
-          en: `${baseUrl}/en${Routes.category(cat.slug)}`,
+          tr: `${baseUrl}/tr${Routes.category(getLocalizedCategorySlug(cat, 'tr'))}`,
+          en: `${baseUrl}/en${Routes.category(getLocalizedCategorySlug(cat, 'en'))}`,
         }
       }
     }))

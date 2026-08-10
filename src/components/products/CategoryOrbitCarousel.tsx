@@ -8,6 +8,7 @@ import { useCategories } from '../../contexts/CategoryContext'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
+import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 
 const FADE_IN_DOWN_CSS = `@keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }`
 const FADE_IN_CSS = `@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }`
@@ -57,7 +58,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
     const router = useRouter()
     const { categories, loading: categoriesLoading } = useCategories()
     const { wrapCategory } = useCategoryViewModel()
-    const { t } = useI18n()
+    const { t, lang } = useI18n()
     const Routes = useLocalizedRoutes()
 
     const [level, setLevel] = useState<'main' | 'subcategory'>('main')
@@ -80,6 +81,12 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
     const activeMainCategory = useMemo(() => {
         return mainCategories.find(c => c.slug === activeMainCategorySlug) || null
     }, [mainCategories, activeMainCategorySlug])
+
+    // State kanonik slug tutar; URL'e giden değer aktif dilin görünen slug'ıdır.
+    const activeMainUrlSlug = useMemo(() => {
+        if (!activeMainCategory) return activeMainCategorySlug
+        return getLocalizedCategorySlug(activeMainCategory.raw, lang) || activeMainCategorySlug
+    }, [activeMainCategory, activeMainCategorySlug, lang])
 
     // 2. Prepare Subcategories for Active Main
     const subcategories = useMemo(() => {
@@ -187,24 +194,26 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                         setIsTransitioning(false)
                     }, 400)
                 } else {
+                    const categoryUrlSlug = getLocalizedCategorySlug(categoryVm.raw, lang)
                     if (onSubcategorySelect) {
-                        onSubcategorySelect(categoryVm.slug)
+                        onSubcategorySelect(categoryUrlSlug)
                     } else {
-                        router.push(Routes.category(categoryVm.slug))
+                        router.push(Routes.category(categoryUrlSlug))
                     }
                 }
             }
         } else if (level === 'subcategory') {
             const subVm = subcategoriesMap.get(itemId)
-            if (subVm && activeMainCategorySlug) {
+            if (subVm && activeMainUrlSlug) {
+                const subUrlSlug = getLocalizedCategorySlug(subVm.raw, lang)
                 if (onSubcategorySelect) {
-                    onSubcategorySelect(activeMainCategorySlug, subVm.slug)
+                    onSubcategorySelect(activeMainUrlSlug, subUrlSlug)
                 } else {
-                    router.push(Routes.category(activeMainCategorySlug, subVm.slug))
+                    router.push(Routes.category(activeMainUrlSlug, subUrlSlug))
                 }
             }
         }
-    }, [level, mainCategoriesMap, subcategoriesMap, activeMainCategorySlug, categories, router, onSubcategorySelect, Routes])
+    }, [level, mainCategoriesMap, subcategoriesMap, activeMainUrlSlug, lang, categories, router, onSubcategorySelect, Routes])
 
     const handleBack = useCallback(() => {
         setIsTransitioning(true)
@@ -216,10 +225,10 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
     }, [])
 
     const handleViewAllProducts = useCallback(() => {
-        if (activeMainCategorySlug) {
-            router.push(Routes.category(activeMainCategorySlug))
+        if (activeMainUrlSlug) {
+            router.push(Routes.category(activeMainUrlSlug))
         }
-    }, [activeMainCategorySlug, router, Routes])
+    }, [activeMainUrlSlug, router, Routes])
 
     const [isMobile, setIsMobile] = useState(false)
     useEffect(() => {

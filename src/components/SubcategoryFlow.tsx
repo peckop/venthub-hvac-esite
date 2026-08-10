@@ -3,8 +3,9 @@ import React, { useMemo } from 'react'
 
 import { useCategories } from '../contexts/CategoryContext'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
+import { useI18n } from '../i18n/I18nProvider'
 import { DomainCategory } from '../lib/type-converters'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { getCategoryDisplayName, getLocalizedCategorySlug } from '../utils/categoryHelpers'
 
 interface SubcategoryCardProps {
     subcategory: DomainCategory
@@ -13,9 +14,10 @@ interface SubcategoryCardProps {
 
 function SubcategoryCard({ subcategory, parentSlug }: SubcategoryCardProps) {
     const Routes = useLocalizedRoutes()
+    const { lang } = useI18n()
     return (
         <Link
-            href={Routes.category(parentSlug, subcategory.slug)}
+            href={Routes.category(parentSlug, getLocalizedCategorySlug(subcategory, lang))}
             className="group flex-shrink-0"
         >
             <div className="
@@ -100,6 +102,7 @@ const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
     title = 'Alt Kategoriler'
 }) => {
     const { categories: allCategories, loading } = useCategories()
+    const { lang } = useI18n()
 
     // Alt kategorileri parent slugları ile birlikte hazırla
     const subcategoriesWithParent = useMemo(() => {
@@ -112,10 +115,10 @@ const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
             const parent = mainCategoryMap.get(sub.parent_id || '')
             return {
                 subcategory: sub,
-                parentSlug: parent?.slug || ''
+                parentSlug: getLocalizedCategorySlug(parent, lang)
             }
-        }).filter(s => s.parentSlug && s.subcategory.slug !== s.parentSlug) // Sadece parent'ı olanlar ve kendi kendini tekrarlamayanlar
-    }, [allCategories])
+        }).filter(s => s.parentSlug && getLocalizedCategorySlug(s.subcategory, lang) !== s.parentSlug) // Sadece parent'ı olanlar ve kendi kendini tekrarlamayanlar
+    }, [allCategories, lang])
 
     // İki lane için alt kategorileri böl
     const lane1 = useMemo(() =>

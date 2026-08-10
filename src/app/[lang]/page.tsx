@@ -12,7 +12,7 @@ import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
 import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
-import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import HomePage from '../../views/HomePage'
 
 export async function generateStaticParams() {
@@ -117,7 +117,8 @@ export default async function RootPage({ params }: Props) {
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(c => ({
       id: c.id,
-      slug: c.slug,
+      // Görünen slug dile göre (kanonik EN kolon → TR sayfada TR slug)
+      slug: getLocalizedCategorySlug(c, lang),
       displayName: getCategoryDisplayName(c, t),
       description: c.description || '',
       image_url: c.image_url

@@ -11,6 +11,7 @@ import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
 import { supabaseBrowserClient } from '../lib/supabase/client'
 import type { DbCategory } from '../types/db-rows'
+import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { highlightMatch } from '../utils/searchHighlight'
 
@@ -24,7 +25,7 @@ type ViewState = 'IDLE' | 'SUGGESTING' | 'RESULTS'
 const RECENT_SEARCHES_KEY = 'venthub_recent_searches'
 
 const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { categories: globalCategories } = useCategories()
   const Routes = useLocalizedRoutes()
   const [q, setQ] = React.useState('')
@@ -275,7 +276,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           {popularCategories.length > 0 ? popularCategories.map(cat => (
             <button
               key={String(cat.id)}
-              onClick={() => { router.push(Routes.category(String(cat.slug))); handleClose(); }}
+              onClick={() => { router.push(Routes.category(getLocalizedCategorySlug({ slug: cat.slug ?? null, metadata: cat.metadata }, lang))); handleClose(); }}
               className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-colors flex items-center gap-1.5"
             >
               {getCategoryIcon(String(cat.slug), { size: 14 })}

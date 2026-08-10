@@ -5,7 +5,7 @@ import React from 'react'
 import { useCategories } from '../contexts/CategoryContext'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { getCategoryDisplayName, getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import BuildTag from './BuildTag'
 
 const FOOTER_ICON_ADDRESS = '@'
@@ -16,7 +16,7 @@ const SATURDAY_HOURS = '09:00 - 14:00'
 const HVAC_SUFFIX = 'HVAC.'
 
 const Footer: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const Routes = useLocalizedRoutes()
   const { categories: globalCategories } = useCategories()
 
@@ -123,7 +123,7 @@ const Footer: React.FC = () => {
               {mainCategories.slice(0, 6).map((category) => (
                 <li key={category.slug}>
                   <Link
-                    href={Routes.category(category.slug)}
+                    href={Routes.category(getLocalizedCategorySlug(category, lang))}
                     className="text-gray-300 hover:text-white transition-colors text-sm"
                   >
                     {getCategoryDisplayName(category, t)}

@@ -8,7 +8,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { DomainCategory } from '../../lib/type-converters'
-import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 
 interface CategoryFiltersProps {
   category: DomainCategory
@@ -66,7 +66,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             {subCategories.map((sub) => (
               <Link
                 key={sub.id}
-                href={Routes.category(parentCategory?.slug || category.slug, sub.slug)}
+                href={Routes.category(getLocalizedCategorySlug(parentCategory || category, lang), getLocalizedCategorySlug(sub, lang))}
                 className="block px-3 py-2 text-sm text-slate-600 hover:text-primary-navy hover:bg-slate-50 rounded-lg transition-colors font-medium"
               >
                 {getCategoryDisplayName(sub)}
