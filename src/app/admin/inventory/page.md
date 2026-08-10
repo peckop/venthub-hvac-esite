@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\inventory\page.tsx
-skeleton_hash: 0609cf90231b1356
+skeleton_hash: fdcd9ebe1feeb814
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-06T21:53:51Z
+generated_at: 2026-06-19T20:46:15Z
 ---
 
 ## Genel Bakış
@@ -29,10 +29,6 @@ Bu modül için, yalnızca fonksiyon imzası ve modül sabitleri temelinde sın�
 
 ---
 
-**Not:** Bu modül için yalnızca fonksiyon imzası (`Page()`) ve bir adet callable modül sabiti (`PageComponent`) bilgisi mevcuttur. Fonksiyon gövdesine erişilmediği için ek aksiyom üretilememektedir. Tam aksiyon listesi için fonksiyon gövdesinin analiz edilmesi gerekmektedir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### Page
@@ -43,6 +39,11 @@ Bu modül için, yalnızca fonksiyon imzası ve modül sabitleri temelinde sın�
 **Parametreler**: (yok)
 
 **Dönüş**: `PageComponent` — Tüm envanter sayfası arayüzünü temsil eden bir React JSX öğesi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next/dynamic::nextDynamic
 
 ---
 
@@ -59,14 +60,6 @@ Bu modül için, yalnızca fonksiyon imzası ve modül sabitleri temelinde sın�
 - **ic_degiskenler**:
   - (yok — JSX içinde harici class isimleri dışında değişken kullanılmamış)
 - **Dönüş**: JSX — `min-h-screen` container içinde spin animasyonlu loading spinner döndürür. `next/dynamic` ile sayfa yüklenirken gösterilen fallback bileşendir.
-
----
-
-### [N2_NASIL] AST Pointer: admin/inventory/page.tsx::Page
-- **params**: () — parametre yok
-- **ic_degiskenler**:
-  - (yok — `PageComponent` harici sabit olarak kullanılmış, yerel değişken değildir)
-- **Dönüş**: JSX — `<PageComponent />` bileşenini doğrudan döndürür. Sayfa yüklemesi için `next/dynamic` ile sarılmıştır.
 
 ---
 

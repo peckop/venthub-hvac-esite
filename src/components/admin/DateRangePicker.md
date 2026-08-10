@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\DateRangePicker.tsx
-skeleton_hash: 91af87f18aef0d6b
+skeleton_hash: 34c0d72798eb13e6
 entity_hashes:
   func:DateRangePicker: ed79aaef040a5b25
   func:applySelection: 68dcb4d14b5cc83c
@@ -11,7 +11,7 @@ entity_hashes:
   func:handleSelect: fdeacf6bd5ee123e
   overview: 3490e076ad65f967
   style_tokens: 8f057de8409875ea
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -83,6 +83,21 @@ Bu modül için sadece fonksiyon imzalarından türetilebilen temel mimari varsa
 **Nasıl yapar**: Seçim sürecini sonlandırarak geçici değişiklikleri temizler; iç mantık kodda yer almamaktadır.  
 **Parametreler**: Yok.  
 **Dönüş**: Belirtilmemiş (void veya bilinmiyor).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: @radix-ui/react-popover
+- import: date-fns/locale::enUS
+- import: date-fns/locale::tr
+- import: lucide-react::Calendar
+- import: lucide-react::Check
+- import: lucide-react::ChevronDown
+- import: react-day-picker::DateRange
+- import: react-day-picker::DayPicker
+- import: react::React
+- import: react::useState
 
 ---
 

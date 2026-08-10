@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminUsersPage.tsx
-skeleton_hash: 3f2c51cde3b926c8
+skeleton_hash: 8152ed3568ca718b
 entity_hashes:
   func:AdminUsersPage: 451e88fd6557b257
-  overview: f04a0cbe1268cde5
+  overview: 5d4f94424fb6fbfb
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-13T18:56:35Z
+generated_at: 2026-06-19T20:49:23Z
 ---
 
 ## Genel Bakış
-AdminUsersPage, VentHub HVAC yönetici panelinin kullanıcı yönetimi sayfasını oluşturan ana React bileşenidir. Yetkili yöneticilerin platformdaki tüm kullanıcı hesaplarını görüntülemesini, filtrelemesini ve temel bilgilerini düzenleyebilmesini sağlayan merkezi bir bileşendir. Bileşen, oturum ve yetki doğrulama için useAuth ve useRole hook'larına bağımlıdır ve kullanıcı listesi ile rol güncelleme işlemleri için arka plan API servisleriyle doğrudan etkileşime girer.
+AdminUsersPage, VentHub HVAC yönetici panelinin kullanıcı yönetimi sayfasını oluşturan ana React bileşenidir. Yetkili yöneticilerin platformdaki tüm kullanıcı hesaplarını görüntülemesini, filtrelemesini ve temel bilgilerini düzenleyebilmesini sağlayan merkezi bir bileşendir. Sayfa, yetkilendirme kontrolü, Suspense sarmalayıcısı ve DataTableKit tabanlı bir arayüz sunar.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
@@ -23,9 +23,19 @@ Kullanıcı yönetimi arayüzünü, veri akışını ve yöneticiye özgü işle
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için mimari varsayımlar, yalnızca fonksiyon gövdesinden üretilmelidir. Ancak fonksiyon gövdesi verilmemiştir; bu nedenle güvenilir bir aksiyom çıkarılamamaktadır.
+Bu modül için fonksiyon gövdesi paylaşılmamıştır; dolayısıyla fonksiyon gövdesinden çıkarılabilir mimari varsayım üretilememektedir. Aşağıda yalnızca fonksiyon imzasından (```AdminUsersPage() -> React.FC```) güvenle çıkarılabilecek minimal varsayımlar yer almaktadır.
 
-[Aksiyom 1]: Eğer AdminUsersPage fonksiyon gövdesinde kullanıcı verilerini sağlayan bir kaynak (API servisi, Context, hook veya global state) çağrılmıyorsa, bileşen kullanıcı verisi olmadan render olur ve yönetici panelinde boş veya hatalı bir sayfa görüntülenir.
+---
+
+**[Aksiyom 1]:** Eğer `AdminUsersPage` bileşeni React dışında bir ortamda (ör. Node.js sunucu tarafı) çağrılacak olursa, React render motoru olmadığından bileşen geçerli bir JSX/React elementi üretemez ve çağrı hata ile sonuçlanır.
+
+**[Aksiyom 2]:** Eğer `AdminUsersPage` bileşeninin dönüş tipi (`React.FC`) ile uyumsuz bir değer (ör. `null`, `undefined`, `string`, `number`) döndürülecek olursa, TypeScript derleme zamanı hatası oluşur veya React çalışma zamanında geçersiz çocuk hatası verir.
+
+**[Aksiyom 3]:** Bileşen parametre almamaktadır (imzada prop tanımı yoktur); eğer bileşen içinden harici veriye ihtiyaç duyulursa, bu veri hooks veya bağlam (context) aracılığıyla temin edilmelidir. Prop aracılığı veri sağlanamaz.
+
+---
+
+> **Not:** `useAuth`, `useRole`, API servis bağımlılıkları, rol filtreleme, kullanıcı listesi yükleme gibi konularda fonksiyon gövdesianaliz edilmediğinden (paylaşılmadığından) aksiyom üretilememiştir. Fonksiyon gövdesi sağlandığında kapsamlı mimari varsayımlar oluşturulabilir.
 
 ---
 
@@ -43,30 +53,45 @@ Bu fonksiyon bir React fonksiyonel bileşenidir (`React.FC`) ve herhangi bir par
 
 ---
 
-## AST POINTERS
-
-### [N1_NASIL] AST Pointer: src/views/admin/AdminUsersPage.tsx::AdminUsersPage
-- **params**: (parametre yok — React arrow component, `() => { ... }`)
-- **ic_degiskenler**:
-  - `{ user, loading }` — `useAuth()` hook'unun destructured sonucu; `user` oturumdaki mevcut kullanıcı objesi, `user` null ise çıkış sayfasına yönlendirme tetikler; `loading` auth durumunun henüz yüklenmekte olup olmadığını belirtir, true iken render engellenir
-  - `{ role }` — `useRole()` hook'unun destructured sonucu; kullanıcının rol stringi (`'super_admin'`, `'admin'` veya diğer); `isAdmin` hesaplamasında kullanılır
-  - `router` — `useRouter()` hook'unun返回值; Next.js navigasyon nesnesi; `useEffect` içinde `router.push()` ile `/admin/users` login sayfasına yönlendirme yapılır
-  - `{ t }` — `useI18n()` hook'unun destructured sonucu; çeviri fonksiyonu; header içinde `t('admin.titles.users')` ve `t('admin.users.subtitle')` çağrılarıyla localized metin üretir
-  - `isAdmin` — `useMemo` ile hesaplanan boolean; `!!role && (role === 'super_admin' || role === 'admin')` ifadesinden türetilir; `role` değiştiğinde yeniden hesaplanır; `AdminUsersTableBody` componentine prop olarak iletilir
-- **Dönüş**: `JSX.Element` — `<div className="space-y-6 pb-20">` sarmalayan; `<header>` (başlık + alt başlık) ve `<Suspense>` sarmalı içinde `<AdminUsersTableBody>` içeren React node
-- **Yan etkiler (useEffect)**: `loading === false` VE `user === null` ise `router.push(Routes.auth.login('/admin/users'))` çağrısıyla admin kullanıcılar sayfasına erişimi olmayan kullanıcıları login sayfasına yönlendirir
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../hooks/useAuth::useAuth
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: ../../hooks/useRole::useRole
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: ./AdminUsersTableBody::AdminUsersTableBody
+- import: next/navigation::useRouter
+- import: react::React
+- import: react::Suspense
+- import: react::useEffect
+- import: react::useMemo
 
 ---
 
-### [N2_NASIL] AST Pointer: src/views/admin/AdminUsersPage.tsx::useEffect callback (yönlendirme efekti)
-- **params**: (parametre yok — useEffect callback)
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/views/admin/AdminUsersPage.tsx::AdminUsersPage
+- **params**: () — parametre yok (React fonksiyonel bileşeni)
 - **ic_degiskenler**:
-  - `loading` — closure'dan gelen auth yükleme durumu; `false` olduğunda kontrol tetiklenir
-  - `user` — closure'dan gelen kullanıcı objesi; `null` olduğunda yönlendirme yapılır
-  - `router` — closure'dan gelen Next.js router nesnesi; `router.push()` ile navigasyon tetiklenir
-  - `Routes.auth.login('/admin/users')` — login sayfası URL'sini üreten fonksiyon çağrısı; parametre olarak yönlendirme sonrası geri dönüş URL'i verilir
-- **Dönüş**: yok (useEffect side-effect callback)
-- **Yan etkiler**: Koşul sağlanırsa `router.push(...)` çağrısı ile tarayıcı navigasyonu tetiklenir
+  - `user` — `useAuth()` hook'undan destructured, mevcut oturum açmış kullanıcı nesnesi; kimlik doğrulama durumunu temsil eder
+  - `loading` — `useAuth()` hook'undan destructured, kimlik doğrulama durumunun hâlâ yüklenmekte olduğunu belirten boolean bayrak
+  - `role` — `useRole()` hook'undan destructured, kullanıcının rol dizesi (ör. `'super_admin'`, `'admin'`, `'user'`)
+  - `router` — `useRouter()` ile elde edilen Next.js yönlendirici nesnesi; programlı sayfa geçişleri için kullanılır
+  - `t` — `useI18n()` hook'undan destructured, çevirileri döndüren uluslararasılaştırma fonksiyonu
+  - `Routes` — `useLocalizedRoutes()` hook'undan elde edilen lokalize rota tanımları nesnesi; `Routes.auth.login(...)` gibi erişimlerle kullanılır
+  - `isAdmin` — `useMemo` ile hesaplanan boolean; `role` değerinin `'super_admin'` veya `'admin'` olup olmadığını kontrol eder, `AdminUsersTableBody` bileşenine prop olarak geçilir
+- **Dönüş**: JSX — `<div>` sarmalayıcısı içinde `<header>` (başlık + alt başlık) ve `<Suspense>` sarmalı içinde `AdminUsersTableBody` bileşeni döndürülür
+
+### [N2_NASIL] AST Pointer: src/views/admin/AdminUsersPage.tsx::AdminUsersPage/useEffect callback
+- **params**: () — parametre yok (arrow function)
+- **ic_degiskenler**:
+  - `loading` — useEffect closure'undan erişilen üst kapsam değişkeni, auth yükleme durumu
+  - `user` — useEffect closure'undan erişilen üst kapsam değişkeni, oturum açmış kullanıcı nesnesi
+  - `router` — useEffect closure'undan erişilen üst kapsam değişkeni, Next.js yönlendirici
+  - `Routes` — useEffect closure'undan erişilen üst kapsam değişkeni, lokalize rota tanımları
+- **Dönüş**: yok — yan etki olarak `router.push(Routes.auth.login('/admin/users'))` çağrısıyla admin kullanıcılar giriş sayfasına yönlendirme yapılır; `loading` false ve `user` falsy olduğunda tetiklenir
 
 ---
 

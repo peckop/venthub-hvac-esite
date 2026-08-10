@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\webhooks.tr.ts
-skeleton_hash: d8bcc9cc2a4f4043
+skeleton_hash: 44ea5b993477b065
 entity_hashes:
   overview: a695b1bd72d402b4
-generated_at: 2026-06-17T13:23:01Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış

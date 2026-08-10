@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\pdfGenerator.ts
-skeleton_hash: d6cf907668b941a8
+skeleton_hash: 9a0d463b06abe5e4
 entity_hashes:
   func:arrayBufferToBase64: ac0cb07b30bf5c01
   func:generateProductDatasheet: eac5e07d950d7a2e
   overview: 8f2e14b413976ba5
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış
@@ -70,6 +70,18 @@ Eğer `Product` tipi modülün çalıştığı bağlamda tanımlı değilse veya
 **Parametreler**:
 - buffer: ArrayBuffer — Base64 formatına dönüştürülecek olan ham binary veriyi içeren ArrayBuffer nesnesi, genellikle ürün görseli gibi PDF'e gömülecek dosya içeriklerini barındırır
 **Dönüş**: string — Dönüştürülen Base64 kodlu metin değeri, bu değer doğrudan veri URI'si olarak veya PDF içerisine gömülmek üzere kullanılabilir
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../config/siteUrl::SITE_URL
+- import: ./pdfAssets::PDF_COLORS
+- import: ./pdfAssets::PDF_FONTS
+- import: ./pdfAssets::getAbsoluteAssetUrl
+- import: ./pdfAssets::getBase64ImageFromUrl
+- import: @/types/ui-models::type { Product }
+- import: jspdf-autotable::autoTable
+- import: jspdf::jsPDF
 
 ---
 

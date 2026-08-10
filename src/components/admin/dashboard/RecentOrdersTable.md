@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\RecentOrdersTable.tsx
-skeleton_hash: 2a29aef5a4c8635a
+skeleton_hash: 9e10cb2ca8227901
 entity_hashes:
   func:RecentOrdersTable: 74faabf4e70dfa3a
   func:getStatusLabel: 2edd561db46db1dc
   func:getStatusStyles: 419f18093a05eeeb
   overview: 42e11c3335b98d9f
   style_tokens: ec5c1233acb1b783
-generated_at: 2026-06-08T10:08:37Z
+generated_at: 2026-06-19T20:46:51Z
 ---
 
 ## Genel Bakış
@@ -56,6 +56,21 @@ RecentOrdersTable modülü, sipariş listesini tablo formatında gösteren bir R
 **Parametreler**:
 - s: `string` — Çevrilecek sipariş durum kodu.
 **Dönüş**: `string` — Görüntülenecek insan tarafından okunabilir etiket metni. Durum eşleşmesi bulunamazsa, büyük harflerle düzenlenmiş ham durum dizesini döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../hooks/useDragScroll::useDragScroll
+- import: ../../../i18n/I18nProvider::useI18n
+- import: ../../../i18n/datetime::formatDateTime
+- import: ../../../i18n/format::formatCurrency
+- import: ../../../utils/routes::Routes
+- import: ../AdminEmptyState::AdminEmptyState
+- import: lucide-react::ChevronRight
+- import: lucide-react::ExternalLink
+- import: lucide-react::PackageSearch
+- import: next/link::Link
+- import: react::React
 
 ---
 
@@ -126,8 +141,8 @@ graph TD
     RecentOrdersTable_tsx__RecentOrdersTable["RecentOrdersTable"]
     RecentOrdersTable_tsx__getStatusLabel["getStatusLabel"]
     RecentOrdersTable_tsx__getStatusStyles["getStatusStyles"]
-    RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusLabel
     RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusStyles
+    RecentOrdersTable_tsx__RecentOrdersTable --> RecentOrdersTable_tsx__getStatusLabel
 ```
 
 ## NODE ID STANDARD

@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\RadialActionMenu.tsx
-skeleton_hash: 6f446c1ce62d7044
+skeleton_hash: df870f368d2b5426
 entity_hashes:
   func:RadialActionMenu: 0b7a99200882ee32
   func:getItemPosition: fe5533094bc4f10c
   func:getSubcategoryPosition: baca01aa62eeaa95
   overview: d9d0bbf865eea128
   style_tokens: 398c177ac8f627cc
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:27Z
 ---
 
 ## Genel Bakış
@@ -78,6 +78,21 @@ Bu modül, radyal (dairesel) menü yerleşimi hesaplayan matematiksel yardımcı
 - index: number — Konumu hesaplanacak alt kategori öğesinin listedeki sıralı indeks değeri, alt kategori listesindeki sıra numarasıdır
 - total: number — İkinci seviye menüde yer alan toplam alt kategori öğesi sayısı, öğeler arasındaki açı aralığını belirlemek için kullanılır
 **Dönüş**: Fonksiyonun dönüş tipi belirtilmemiştir, hesapladığı alt kategori konumunu menünün görüntüleme katmanına iletmek üzere tasarlanmıştır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: framer-motion::AnimatePresence
+- import: framer-motion::motion
+- import: lucide-react::ArrowLeft
+- import: lucide-react::Eye
+- import: lucide-react::Layers
+- import: lucide-react::MessageSquareText
+- import: lucide-react::Package
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useState
 
 ---
 

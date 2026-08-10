@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\categoryHelpers.ts
-skeleton_hash: b52c89accc9fb1f4
+skeleton_hash: c76700fb140c022c
 entity_hashes:
   func:getCategoryDescription: 59a2fb71a2f4949e
   func:getCategoryDisplayName: 403835a175ba4a6a
   func:getCategoryMarketingTitle: 72c2aaa786c01ff4
   func:parsePriceToNumber: 42be44b6c84206bc
   overview: 61e31d74a200c4af
-generated_at: 2026-06-08T08:57:54Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -63,6 +63,11 @@ Bu modül, veritabanından gelen kategori nesnelerini kullanıcı arayüzü içi
 
 ### parsePriceToNumber
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../types/db-rows::type { DbCategory }
 
 ---
 

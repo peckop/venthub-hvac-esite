@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\breadcrumbUtils.ts
-skeleton_hash: 5887cccc1e7f23ab
+skeleton_hash: e98f8f14c33e5a6b
 entity_hashes:
   func:buildCategoryBreadcrumb: 75f26731c077f8ae
   overview: f70a9db5a198b67e
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,14 @@ Bu modül, domain kategori nesnelerinden ekmek kırıntısı (breadcrumb) listel
 - name: parentCategory, type: DomainCategory | null | undefined — Mevcut kategorinin hiyerarşideki bir üst kategori nesnesi, opsiyonel olarak iletilir ve null değerini alabilir
 - name: homeLabel, type: any — Breadcrumb listesinin en başında yer alacak anasayfa öğesinin görünen etiketi olarak kullanılacak değer
 **Dönüş**: BreadcrumbItem[] — Kullanılmaya hazır, sıralanmış navigasyon öğeleri dizisi. Tüm geçersiz veri durumlarında bile sadece var olan geçerli öğeleri içeren veya gerektiğinde boş bir dizi olarak güvenli bir şekilde döndürülür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../components/navigation/Breadcrumb::type { BreadcrumbItem }
+- import: ../lib/type-converters::DomainCategory
+- import: ../utils/routes::Routes
+- import: ./categoryHelpers::getCategoryDisplayName
 
 ---
 

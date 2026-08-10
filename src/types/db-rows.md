@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\db-rows.ts
-skeleton_hash: 81fe6cabdb792d03
+skeleton_hash: ea01e9f166ac2421
 entity_hashes:
   overview: 28a0ac4ea1b0e18d
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,12 @@ Bununla birlikte, modülün doğru çalışması için aşağıdaki yapısal var
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./authority::type { AuthorityContent
+- import: ./database.types::type { Database, Json }
 
 ---
 

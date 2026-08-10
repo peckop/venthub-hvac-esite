@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\hvacCalculations.ts
-skeleton_hash: 4dfecdf42960200e
+skeleton_hash: bd5979f680af079c
 entity_hashes:
   func:calculateAirCurtain: a16a461c41fc6be9
   func:calculateArea: 8b777758444530fa
@@ -23,7 +23,7 @@ entity_hashes:
   func:getTargetFloorVelocity: ac55d84b1e23d51e
   func:suggestDimensions: 0e515a416eadfe3b
   overview: 1438a322df9d869e
-generated_at: 2026-05-28T22:38:32Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış
@@ -353,11 +353,8 @@ type JetFanMode = 'normal' | 'smoke'
 
 ## SABİTLER
 - **TYPICAL_JET_FAN** (object) — `{
-
     thrust: 25,       // N (tek fan)
-
     airflow: 3500,    // m³/h
-
     p...`
 
 ---
@@ -370,214 +367,6 @@ type JetFanMode = 'normal' | 'smoke'
   - `baselineHeight` — referans montaj yüksekliği sabiti (2.5m), heightFactor hesabında kullanılır
   - `heightFactor` — kap yüksekliğine göre çıkış hızını ölçeklendiren çarpan, `Math.max(1.0, 1.0 + (doorHeight - baselineHeight) * 0.2)` ile hesaplanır
 - **Dönüş**: `{ min: number; max: number; target: number }` — nozül çıkış hızı aralığı ve hedefi
-
----
-
-### [N2_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::getTargetFloorVelocity`
-- **params**: `application: AirCurtainApplication`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `number` — uygulama türüne göre zemin hedef hızı (m/s)
-
----
-
-### [N3_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::getAdjustmentFactor`
-- **params**: `wind: WindCondition`, `traffic: TrafficIntensity`
-- **ic_degiskenler**:
-  - `factor` — başlangıçta 1.0 olan ve rüzgar ile trafik koşullarına göre çarpılarak artan toplam ayarlama katsayısı
-- **Dönüş**: `number` — çevresel koşullara göre toplam düzeltme katsayısı
-
----
-
-### [N4_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::calculateAirCurtain`
-- **params**: `input: AirCurtainInput`
-- **ic_degiskenler**:
-  - `doorWidth` — input'tan destructure edilen kapı genişliği (m)
-  - `doorHeight` — input'tan destructure edilen kapı yüksekliği (m)
-  - `application` — input'tan destructure edilen uygulama türü (comfort/insect/coldRoom)
-  - `windCondition` — input'tan destructure edilen rüzgar koşulu
-  - `trafficIntensity` — input'tan destructure edilen trafik yoğunluğu
-  - `nozzleWidth` — nozül genişliği, doorWidth'a eşittir
-  - `nozzleDepth` — nozül derinliği sabiti 0.042m (42mm)
-  - `nozzleArea` — nozül kesit alanı (m²), nozzleWidth × nozzleDepth
-  - `velocityRange` — `getNozzleVelocityRange(application, doorHeight)` çağrısı ile elde edilen hız aralığı objesi
-  - `adjustmentFactor` — `getAdjustmentFactor(windCondition, trafficIntensity)` çağrısı ile elde edilen ayarlama katsayısı
-  - `nozzleVelocity` — gerekli çıkış hızı (m/s), velocityRange.target × adjustmentFactor
-  - `airflowM3s` — nozül çıkış hava debisi (m³/s), nozzleVelocity × nozzleArea
-  - `requiredAirflow` — gerekli hava debisi (m³/h), airflowM3s × 3600, yuvarlanmış
-  - `floorVelocity` — tahmini zemin hızı (m/s), jet sönümleme formülü ile hesaplanır
-  - `targetFloor` — `getTargetFloorVelocity(application)` çağrısı ile elde edilen zemin hedef hızı
-  - `suggestedPower` — önerilen motor gücü (W), AMP_POW功率 formülü ile (0.5 × AIR_DENSITY × V² × Q / 0.55)
-  - `efficiency` — fiziksel bariyer yeterlilik durumu ('optimal' | 'acceptable' | 'marginal'), floorVelocity ile targetFloor karşılaştırması ile belirlenir
-  - `recommendations` — öneri stringleri dizisi, kapı yüksekliği, rüzgar şiddeti ve genişlik koşullarına göre doldurulur
-- **Dönüş**: `AirCurtainResult` — requiredAirflow, nozzleVelocity, floorVelocity, suggestedPower, nozzleWidth, nozzleHeight, efficiency, recommendations
-
----
-
-### [N5_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::getRoughness`
-- **params**: `material: DuctMaterial`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `number` — malzemeye göre pürüzlülük katsayısı (mm)
-
----
-
-### [N6_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::calculateEquivalentDiameter`
-- **params**: `width: number`, `height: number`
-- **ic_degiskenler**:
-  - `w` — genişliğin metre cinsinden değeri (width / 1000)
-  - `h` — yüksekliğin metre cinsinden değeri (height / 1000)
-  - `deq` — eşdeğer çap (m), formül: (1.30 × (w×h)^0.625) / (w+h)^0.25
-- **Dönüş**: `number` — eşdeğer çap (mm), deq × 1000
-
----
-
-### [N7_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::calculateArea`
-- **params**: `ductType: DuctType`, `diameter?: number`, `width?: number`, `height?: number`
-- **ic_degiskenler**:
-  - `r` — yarıçap (m), diameter / 2000, sadece circular dalda hesaplanır
-- **Dönüş**: `number` — kanal kesit alanı (m²), circular veya rectangular için hesaplanır, koşul sağlanmazsa 0
-
----
-
-### [N8_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::calculatePressureLoss`
-- **params**: `velocity: number`, `diameter: number`, `roughness: number`
-- **ic_degiskenler**:
-  - `D` — çapın metre cinsinden değeri (diameter / 1000)
-  - `f` — basitleştirilmiş sürtünme faktörü, 0.02 + (roughness / 1000) × 0.1
-  - `deltaP` — basınç kaybı (Pa/m), f × (AIR_DENSITY × v²) / (2 × D)
-- **Dönüş**: `number` — basınç kaybı (Pa/m)
-
----
-
-### [N9_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::evaluateVelocity`
-- **params**: `velocity: number`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `{ status: 'low' | 'optimal' | 'high' | 'critical'; message: string }` — hız durumu ve Türkçe açıklama mesajı
-
----
-
-### [N10_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::suggestDimensions`
-- **params**: `airflow: number`, `targetVelocity: number` (varsayılan: 6)
-- **ic_degiskenler**:
-  - `Q` — hava debisi m³/s cinsinden (airflow / 3600)
-  - `targetArea` — hedef kesit alanı (m²), Q / targetVelocity
-  - `suggestions` — önerilen genişlik-yükseklik çiftlerinin dizisi, filtrelenmiş sonuçlar buraya push edilir
-  - `standardSizes` — standart kanal ebatları dizisi [100, 150, 200, 250, 300, 400, 500, 600, 800, 1000]
-  - `w` — döngüdeki mevcut standart genişlik değeri (mm)
-  - `h` — hesaplanan gerekli yükseklik (mm), (targetArea × 1000000) / w
-  - `closestH` — standardSizes içinden h'ye en yakın değer, reduce ile bulunur
-  - `actualArea` — gerçek kesit alanı (m²), (w/1000) × (closestH/1000)
-  - `actualVelocity` — gerçek hız (m/s), Q / actualArea, 4-8 m/s aralığında filtreleme yapılır
-- **Dönüş**: `{ width: number; height: number }[]` — en fazla 3 adet önerilen kanal boyutu
-
----
-
-### [N11_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::calculateDuct`
-- **params**: `input: DuctInput`
-- **ic_degiskenler**:
-  - `airflow` — input'tan destructure edilen hava debisi (m³/h)
-  - `ductType` — input'tan destructure edilen kanal tipi (circular/rectangular)
-  - `diameter` — input'tan destructure edilen çap (mm), sadece circular için
-  - `width` — input'tan destructure edilen genişlik (mm), sadece rectangular için
-  - `height` — input'tan destructure edilen yükseklik (mm), sadece rectangular için
-  - `length` — input'tan destructure edilen kanal uzunluğu (m)
-  - `material` — input'tan destructure edilen malzeme türü
-  - `Q` — hava debisi m³/s cinsinden (airflow / 3600)
-  - `area` — `calculateArea(ductType, diameter, width, height)` çağrısı ile hesaplanan kesit alanı (m²)
-  - `velocity` — akışkanlık hızı (m/s), area > 0 ise Q / area, aksi halde 0
-  - `velocityStatus` — `evaluateVelocity(velocity)` çağrısından gelen hız durumu
-  - `velocityMessage` — `evaluateVelocity(velocity)` çağrısından gelen durum mesajı
-  - `equivalentDiameter` — dikdörtgen kanal için `calculateEquivalentDiameter(width, height)` ile hesaplanan eşdeğer çap (mm), circular ise undefined kalır
-  - `effectiveDiameter` — basınç kaybı hesabında kullanılan efektif çap (mm), circular'da diameter, rectangular'da equivalentDiameter, diğer durumda 200 (default)
-  - `roughness` — `getRoughness(material)` çağrısı ile elde edilen pürüzlülük katsayısı
-  - `pressureLossPerMeter` — `calculatePressureLoss(velocity, effectiveDiameter, roughness)` çağrısı ile metre başına basınç kaybı (Pa/m)
-  - `totalPressureLoss` — toplam basınç kaybı (Pa), pressureLossPerMeter × length
-  - `suggestedDimensions` — `suggestDimensions(airflow)` çağrısı ile önerilen alternatif kanal boyutları
-  - `recommendations` — öneri stringleri dizisi, hız durumu, malzeme ve basınç kaybına göre doldurulur
-- **Dönüş**: `DuctResult` — velocity, velocityStatus, velocityMessage, pressureLossPerMeter, totalPressureLoss, equivalentDiameter, suggestedDimensions, recommendations
-
----
-
-### [N12_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::getAirflowPerPerson`
-- **params**: `buildingType: BuildingType`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `number` — bina türüne göre kişi başına gereken hava debisi (m³/h)
-
----
-
-### [N13_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::getAirflowPerArea`
-- **params**: `buildingType: BuildingType`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `number` — bina türüne göre birim alana gereken hava debisi (m³/h·m²)
-
----
-
-### [N14_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::getClimateDeltaT`
-- **params**: `zone: ClimateZone`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `{ heating: number; cooling: number }` — iklim bölgesine göre ısıtma ve soğutma sıcaklık farkları (ΔT)
-
----
-
-### [N15_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::calculateHRV`
-- **params**: `input: HRVInput`
-- **ic_degiskenler**:
-  - `recoveryType` — input'tan destructure edilen geri kazanım cihazı tipi (hrv/erv)
-  - `buildingType` — input'tan destructure edilen bina tipi
-  - `climateZone` — input'tan destructure edilen iklim bölgesi
-  - `occupancy` — input'tan destructure edilen kişi sayısı
-  - `area` — input'tan destructure edilen alan (m²)
-  - `sensibleEfficiency` — input'tan destructure edilen duyulur ısı geri kazanım verimi (%)
-  - `latentEfficiency` — input'tan destructure edilen gizli ısı geri kazanım verimi (%)
-  - `operatingHoursPerDay` — input'tan destructure edilen günlük çalışma saati
-  - `electricityCostPerKWh` — input'tan destructure edilen kWh başına elektrik maliyeti
-  - `airflowPerPerson` — `getAirflowPerPerson(buildingType)` çağrısı ile kişi başına hava debisi
-  - `airflowPerArea` — `getAirflowPerArea(buildingType)` çağrısı ile birim alana hava debisi
-  - `requiredAirflow` — gerekli toplam hava debisi (m³/h), kişi bazlı ve alan bazlı değerlerin max'u
-  - `deltaT` — `getClimateDeltaT(climateZone)` çağrısı ile iklim bazlı sıcaklık farkları
-  - `sensEff` — duyulur verimin ondalıklı gösterimi (sensibleEfficiency / 100)
-  - `latEff` — gizli verimin ondalıklı gösterimi (latentEfficiency / 100)
-  - `heatingRecovery` — ısıtma modunda geri kazanılan ısı (W), requiredAirflow × 0.34 × deltaT.heating × sensEff
-  - `coolingEfficiency` — soğutma modunda kullanılan toplam verim, ERV'de sensEff + (latEff × 0.4), HRV'de sadece sensEff
-  - `coolingRecovery` — soğutma modunda geri kazanılan ısı (W), requiredAirflow × 0.34 × deltaT.cooling × coolingEfficiency
-  - `heatingHours` — yıllık ısıtma çalışma saati, operatingHoursPerDay × 180
-  - `coolingHours` — yıllık soğutma çalışma saati, operatingHoursPerDay × 120
-  - `annualEnergySaving` — yıllık enerji tasarrufu (kWh), (heatingRecovery × heatingHours + coolingRecovery × coolingHours) / 1000
-  - `annualCostSaving` — yıllık maliyet tasarrufu (₺), annualEnergySaving × electricityCostPerKWh
-  - `co2Reduction` — yıllık CO₂ azaltımı (kg), annualEnergySaving × 0.45
-  - `baseCost` — cihaz maliyeti için taban değer (10000)
-  - `capacityFactor` — kapasiteye bağlı maliyet çarpanı, baseCost ile birlikte estimatedDeviceCost'u oluşturur
-  - `estimatedDeviceCost` — tahmini cihaz maliyeti (₺), baseCost + capacityFactor
-  - `paybackPeriod` — geri ödeme süresi (yıl), estimatedDeviceCost / annualCostSaving, annualCostSaving ≤ 100 ise 99
-  - `recommendations` — öneri stringleri dizisi, verimlilik, cihaz tipi ve geri ödeme süresine göre doldurulur
-- **Dönüş**: `HRVResult` — requiredAirflow, airflowPerPerson, heatingRecovery, coolingRecovery, totalEfficiency, annualEnergySaving, annualCostSaving, co2Reduction, paybackPeriod, recommendations
-
----
-
-### [N16_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::getRequiredACH`
-- **params**: `application: JetFanApplication`, `mode: JetFanMode`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `number` — uygulama ve moda göre gerekli hava değişim sayısı (ACH)
-
----
-
-### [N17_NASIL] AST Pointer: `src/lib/hvacCalculations.ts::calculateJetFan`
-- **params**: `input: JetFanInput`
-- **ic_degiskenler**:
-  - `length` — input'tan destructure edilen alan uzunluğu (m)
-  - `width` — input'tan destructure edilen alan genişliği (m)
-  - `height` — input'tan destructure edilen alan yüksekliği (m)
-  - `applicationType` — input'tan destructure edilen uygulama tipi (parking/tunnel)
-  - `ventilationMode` — input'tan destructure edilen havalandırma modu (normal/smoke)
-  - `volume` — toplam alan hacmi (m³), length × width × height
-  - `ach` — `getRequiredACH(applicationType, ventilationMode)` çağrısı ile gerekli hava değişim sayısı
-  - `requiredAirflow` — gerekli hava debisi (m³/h), volume × ach
-  - `targetVelocity` — hedef akışkanlık hızı (m/s), smoke modunda 2.0, normal modda 1.5
-  - `massFlowRate` — kütle debisi (kg/s), AIR_DENSITY × (requiredAirflow / 3600)
-  - `totalThrust` — gerekli toplam itki kuvveti (N), massFlowRate × targetVelocity
-  - `installationFactor` — kurulum kayıp faktörü sabiti (0.75)
-  - `fanCount` — önerilen jet fan sayısı, Math.ceil ile (totalThrust / installationFactor) / TYPICAL_JET_FAN.thrust
-  - `recommendedSpacing` — önerilen fan aralığı (m), fanCount > 1 ise length / (fanCount + 1), aksi halde length / 2
-- **Dönüş**: `JetFanResult` — volume, requiredAirflow, ach, totalThrust, fanCount, recommendedSpacing, installationFactor, recommendations
 
 ---
 
@@ -602,17 +391,17 @@ graph TD
     hvacCalculations_ts__getRoughness["getRoughness"]
     hvacCalculations_ts__getTargetFloorVelocity["getTargetFloorVelocity"]
     hvacCalculations_ts__suggestDimensions["suggestDimensions"]
-    hvacCalculations_ts__calculateDuct --> hvacCalculations_ts__calculatePressureLoss
-    hvacCalculations_ts__calculateHRV --> hvacCalculations_ts__getClimateDeltaT
+    hvacCalculations_ts__calculateHRV --> hvacCalculations_ts__getAirflowPerPerson
     hvacCalculations_ts__calculateJetFan --> hvacCalculations_ts__getRequiredACH
-    hvacCalculations_ts__calculateDuct --> hvacCalculations_ts__evaluateVelocity
     hvacCalculations_ts__calculateDuct --> hvacCalculations_ts__getRoughness
     hvacCalculations_ts__calculateDuct --> hvacCalculations_ts__suggestDimensions
-    hvacCalculations_ts__calculateAirCurtain --> hvacCalculations_ts__getTargetFloorVelocity
-    hvacCalculations_ts__calculateDuct --> hvacCalculations_ts__calculateArea
+    hvacCalculations_ts__calculateDuct --> hvacCalculations_ts__calculatePressureLoss
+    hvacCalculations_ts__calculateDuct --> hvacCalculations_ts__evaluateVelocity
     hvacCalculations_ts__calculateAirCurtain --> hvacCalculations_ts__getAdjustmentFactor
+    hvacCalculations_ts__calculateHRV --> hvacCalculations_ts__getClimateDeltaT
+    hvacCalculations_ts__calculateDuct --> hvacCalculations_ts__calculateArea
+    hvacCalculations_ts__calculateAirCurtain --> hvacCalculations_ts__getTargetFloorVelocity
     hvacCalculations_ts__calculateAirCurtain --> hvacCalculations_ts__getNozzleVelocityRange
-    hvacCalculations_ts__calculateHRV --> hvacCalculations_ts__getAirflowPerPerson
     hvacCalculations_ts__calculateHRV --> hvacCalculations_ts__getAirflowPerArea
     hvacCalculations_ts__calculateDuct --> hvacCalculations_ts__calculateEquivalentDiameter
 ```

@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\about\page.tsx
-skeleton_hash: 0764930d9f5459d2
+skeleton_hash: 5b26b94087063b88
 entity_hashes:
   func:Page: 32fe3fdb17787a5b
   func:generateStaticParams: 6d1b3e72f8b2da9f
   overview: 8dff6fca298bde81
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-12T10:17:31Z
+generated_at: 2026-06-19T20:46:27Z
 ---
 
 ## Genel Bakış
@@ -32,58 +32,26 @@ Bu modül, Next.js App Router yapısında çoklu dil destekli "Hakkında" sayfas
 
 ---
 
-**[Aksiyom 1]**: Eğer `Page` fonksiyonuna geçirilen `params` nesnesi `lang` alanı içermiyorsa, sayfa içeriği istenen dilde render edilemez.
-
-> Next.js App Router'da `[lang]` bir dinamik rotadır ve `params.lang` zorunlu olarak beslenmelidir.
-
----
-
-**[Aksiyom 2]**: Eğer `generateStaticParams()` fonksiyonu boş bir dizi döndürüyorsa, hiçbir dil için statik sayfa önceden oluşturulamaz ve istek üzerine (on-demand) render edilmesi gerekir.
-
-> Fonksiyon, desteklenen dil kodlarının listesini döndürerek hangi varyantların build aşamasında oluşturulacağını belirler.
-
----
-
-**[Aksiyom 3]**: Eğer `generateStaticParams()` tarafından döndürülen dil kodları ile `Page` fonksiyonunun beklediği `params.lang` değerleri tutarsızsa, geçersiz bir rotaya erişim denenir ve hata oluşur.
-
-> Örneğin, `generateStaticParams` yalnızca `["tr", "en"]` döndürüyor ama runtime'da `params.lang === "de"` isteği geliyorsa, bu geçersizdir.
-
----
-
-**[Aksiyom 4]**: Eğer `Page` bileşeni `params` parametresi olmadan (veya `params.lang` alanına erişilmeden) çağrılırsa, bileşen düzgün render edilemez.
-
-> Fonksiyon imzası `Page({ params }: PageProps)` şeklindedir; `params` bağımlılığı zorunludur.
-
----
-
-**[Aksiyom 5]**: Eğer bu modül bir "Hakkında" sayfasıysa ve `generateStaticParams` desteklenen dilleri dış kaynaktan (ör. yapılandırma dosyası, API) alıyorsa, o kaynağın erişilebilir ve tutarlı olması gerekir; aksi halde build aşamasında hata oluşur.
-
-> Bu modülde `generateStaticParams` gövdesi verilmediği için kaynağın doğası bilinmemektedir, ancak herhangi bir dış bağımlılık varsa erişilebilir olmalıdır.
-
----
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### Page
-**Ne yapar**: Bu fonksiyon, bir Next.js sayfa bileşeni olarak davranır ve belirli bir dile ait "Hakkımızda" sayfasının içeriğini sunar. Fonksiyon asenkrondur ve URL'den gelen dil parametresini alarak ilgili bileşeni render eder.
 
-**Nasıl yapar**: Fonksiyon, `params` nesnesinden asenkron olarak `lang` değerini çözer. Çözülen bu dil kodu, sayfa içeriğini ve çevirilerini yöneten `PageComponent` bileşenine prop olarak iletilir. Bu sayede aynı sayfa yapısı farklı diller için içeriğini dinamik olarak günceller.
+**Ne yapar**: Bu fonksiyon, Next.js uygulamasındaki "/about" sayfasının ana sayfa bileşenidir. Dinamik dil parametresini alarak ilgili dilde About sayfasını render eder.
+
+**Nasıl yapar**: Fonksiyon, `params` prop'unu await ederek asenkron olarak dil parametrelerini çıkarır. Elde edilen `lang` değerini `PageComponent` bileşenine prop olarak geçirir ve sayfanın ilgili dilde görüntülenmesini sağlar. Bu yapı, Next.js App Router'ın dinamik rotaları için standart bir yaklaşımdır.
 
 **Parametreler**:
-- `params`: `Promise<PageProps>` — URL'den gelen ve `lang` anahtarını içeren asenkron parametre nesnesi. Next.js tarafından sayfa yolundaki dinamik segmentlerden otomatik olarak oluşturulur.
+- `params` : `PageProps` — Sayfanın dinamik parametrelerini içeren nesne. `{ lang: string }` yapısına sahiptir ve URL segmentinden gelen dil kodunu barındırır.
 
-**Dönüş**: `JSX.Element` — `PageComponent` bileşeninin döndürdüğü ve ilgili dil için hazırlanmış "Hakkımızda" sayfasının JSX yapısı.
+**Dönüş**: JSX elementi döndürür. `PageComponent` bileşeninin `lang` prop'u ile birlikte render edilmiş halini返回 eder.
 
 ### generateStaticParams
-**Ne yapar**: Bu fonksiyon, Next.js'in statik site oluşturma (SSG) sürecinde kullanılacak olan tüm olası `lang` parametre değerlerini döndürür. Temel amacı, build esnasında hangi diller için statik HTML dosyası oluşturulacağını sisteme bildirmektir.
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
-**Nasıl yapar**: Fonksiyon, önceden tanımlı bir array döndürür. Her bir obje, bir `lang` parametre değeri temsil eder. Next.js bu listeyi iterasyona uğratır ve her bir `lang` değeri için `Page` fonksiyonunu ayrı ayrı çalıştırarak statik HTML dosyaları üretir. Bu mekanizma, uygulama performansını artırır ve sayfaların önceden derlenmesini sağlar.
+---
 
-**Parametreler**: Bu fonksiyonun herhangi bir parametresi yoktur.
-
-**Dönüş**: `Array<{ lang: string }>` — Statik olarak oluşturulacak sayfalar için gerekli dil kodlarını içeren bir nesne dizisi. Mevcut yapıda `tr` (Türkçe) ve `en` (İngilizce) olmak üzere iki dil desteği tanımlıdır.
+## İTHALATLAR (IMPORTS)
+- import: ../../../views/AboutPage::PageComponent
 
 ---
 
@@ -96,16 +64,17 @@ Bu modül, Next.js App Router yapısında çoklu dil destekli "Hakkında" sayfas
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `[lang]/about/page.tsx::Page`
-- **params**: `{ params: PageProps }` — Next.js sayfası prop'ları, `lang` parametresini içerir
+### [N1_NASIL] AST Pointer: `src/app/[lang]/about/page.tsx`::Page
+- **params**: `{ params }: PageProps` — Next.js route params objesi, `lang` parametresini içerir
 - **ic_degiskenler**:
-  - `lang` — `await params` sonucu destructure edilen dil kodu ('tr' veya 'en'), `PageComponent`'e prop olarak geçirilir
-- **Dönüş**: JSX (`<PageComponent lang={lang} />`) — About sayfasının dil bazlı bileşeni
+  - `lang` — `params` objesinden `await` ile çözülüp destructure edilen dil kodu (ör. `'tr'` veya `'en'`); `PageComponent`'e prop olarak iletilir
+- **Dönüş**: JSX — `<PageComponent lang={lang} />` bileşeni döner
 
-### [N2_NASIL] AST Pointer: `[lang]/about/page.tsx::generateStaticParams`
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `Array<{ lang: string }>` — Statik olarak üretilecek sayfa dil varyasyonları listesi (`tr` ve `en`)
+### [N2_NASIL] AST Pointer: `src/app/[lang]/about/page.tsx`::generateStaticParams
+- **params**: (yok)
+- **ic_degiskenler**:
+  - (yok)
+- **Dönüş**: `Array<{ lang: string }>` — `[ { lang: 'tr' }, { lang: 'en' } ]` statik olarak oluşturulmuş dil parametreleri listesi; Next.js'in statik site oluşturmada hangi `[lang]` değerleri için sayfa üretileceğini tanımlar
 
 ---
 

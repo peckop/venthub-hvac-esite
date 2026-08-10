@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\AccessDenied.tsx
-skeleton_hash: ce06faa120043b3d
+skeleton_hash: 4191c98afe89986a
 entity_hashes:
   func:AccessDenied: ea91e56a2eab80b9
   overview: c138e2727c8c240f
   style_tokens: 07b65f88bee816f7
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:46:38Z
 ---
 
 ## Genel Bakış
@@ -43,6 +43,16 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Dönüş**: `React.FC` — Erişim reddedildiğinde gösterilecek hata bileşenini döndürür. Bileşen, kullanıcıya yetkisiz erişim durumunu bildiren arayüz elemanlarını içeren JSX yapısıdır.
 
 **Kullanım Bağlamı**: `C:\Users\alize\venthub-hvac\src\components\admin\AccessDenied` yolunda yer alan bu bileşen, admin panelinde yetkilendirme kontrolü başarısız olduğunda kullanıcıya yönlendirilir. HVAC-VentHub projesinin admin modülünde erişim kontrol mekanizmasının bir parçasıdır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/routes::Routes
+- import: lucide-react::ArrowLeft
+- import: lucide-react::ShieldAlert
+- import: next/link::Link
+- import: react::React
 
 ---
 

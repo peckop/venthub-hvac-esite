@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\orders\detail\page.tsx
-skeleton_hash: 6936e402ae673469
+skeleton_hash: 9ddea9e996ab6175
 entity_hashes:
   func:Page: 9e0b3aa05006aa66
   overview: c1af68d41814429f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:08:10Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -37,6 +37,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - *Yok* — Fonksiyon dışarıdan herhangi bir argüman almaz.
 
 **Dönüş**: JSX (React element) – `<Suspense>` içinde `fallback` ve `PageComponent` içeren bir React bileşeni döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../../i18n/dictionaries/tr::tr
+- import: ../../../../../views/account/OrderDetailPage::PageComponent
+- import: react::React
+- import: react::Suspense
 
 ---
 

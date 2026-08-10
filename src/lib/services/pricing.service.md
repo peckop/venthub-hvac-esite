@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\pricing.service.ts
-skeleton_hash: 9c4f272125d6bd7e
+skeleton_hash: 462d51a0433dffca
 entity_hashes:
   func:getEffectivePriceInfo: 66025d14e9527581
   func:getEffectiveUnitPrice: cf8d140432bff796
   func:nowIso: 7121138d8247572d
   overview: 8fa776710b49f603
-generated_at: 2026-06-08T10:09:34Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış
@@ -63,6 +63,13 @@ Fiyatlandırma süreçlerinde zaman damgası üretmek ve fiyat geçerlilik kontr
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../types/database.types::type { Database }
+- import: ../../types/ui-models::type { Product }
+- import: @supabase/supabase-js::type { SupabaseClient }
+
+---
+
 ## INTERFACES
 
 ### UserProfileLight
@@ -102,8 +109,8 @@ graph TD
     pricing_service_ts__getEffectivePriceInfo["getEffectivePriceInfo"]
     pricing_service_ts__getEffectiveUnitPrice["getEffectiveUnitPrice"]
     pricing_service_ts__nowIso["nowIso"]
-    pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__nowIso
     pricing_service_ts__getEffectiveUnitPrice --> pricing_service_ts__getEffectivePriceInfo
+    pricing_service_ts__getEffectivePriceInfo --> pricing_service_ts__nowIso
 ```
 
 ## NODE ID STANDARD

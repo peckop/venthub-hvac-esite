@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutCoupon.ts
-skeleton_hash: 579864aa3c6d26bc
+skeleton_hash: 5021539ea4527d9d
 entity_hashes:
   func:useCheckoutCoupon: 4495b524ff78f42b
   overview: f730ef6cfe5f4c6f
-generated_at: 2026-05-29T18:47:48Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -34,10 +34,6 @@ Bu modül, `totalAmount` parametresine bağımlı çalışan bir React hook'udur
 
 ---
 
-**Not:** Bu modül için yalnızca fonksiyon imzası (`useCheckoutCoupon(totalAmount: number)`) bilinmektedir. Hook'un döndürdüğü değerler, içinde yönettiği state'ler, kupon doğrulama mantığı, API çağrıları ve eşik değerleri fonksiyon gövdesi olmadan belirlenemez.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### useCheckoutCoupon
@@ -49,6 +45,12 @@ Bu modül, `totalAmount` parametresine bağımlı çalışan bir React hook'udur
 - `totalAmount`: number — Sepetin mevcut toplam tutarı (Türk Lirası cinsinden). Bu değer, Edge Function'a gönderilerek indirimin doğru hesaplanmasında kullanılır.
 
 **Dönüş**: Nesne (Object) — Kupon yönetimine ilişkin durum ve fonksiyonları içeren bir nesne döner. Bu nesnenin yapısı bilinmemekle birlikte, dokümantasyondan kupon durumu (state), bu durumu güncelleyici setter fonksiyonları ve kuponu uygulamak veya kaldırmak için işlevler içerdiği çıkarılabilir. Kesin dönüş tipi ve özellikleri, kaynak kodunun implementasyonuna bağlıdır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::useState
+- import: sonner::toast
 
 ---
 
@@ -64,25 +66,6 @@ Bu modül, `totalAmount` parametresine bağımlı çalışan bir React hook'udur
   - `applyCoupon` — kupon kodunu Edge Function'a göndererek doğrulayan ve uygulayan async fonksiyon
   - `removeCoupon` — kuponu kaldırıp formu sıfırlayan fonksiyon
 - **Dönüş**: `{ couponCode, setCouponCode, couponApplied, applyCoupon, removeCoupon }` — kupon yönetim arayüzü
-
----
-
-### [N2_NASIL] AST Pointer: useCheckoutCoupon.ts::applyCoupon
-- **params**: yok
-- **ic_degiskenler**:
-  - `code` — `couponCode.trim()` ile elde edilen, baş/son boşlukları temizlenmiş kupon kodu
-  - `base` — `process.env.NEXT_PUBLIC_SUPABASE_URL || ''` Supabase API base URL'i, Edge Function çağrıları için kullanılır
-  - `anon` — `process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''` Supabase anon公众 key'i, API authentication header'ında kullanılır
-  - `resp` — `fetch()` ile `/functions/v1/apply-coupon` endpoint'ine POST isteği sonucu dönen Response nesnesi
-  - `json` — `resp.json()` ile parse edilen yanıt gövdesi; parse hatasında boş obje `{}` döner; `json?.valid` kupon geçerliliğini, `json?.error` hata mesajını, `json.normalized_code` normalize edilmiş kupon kodunu, `json.discount_amount` indirim tutarını içerir
-- **Dönüş**: yok (yan etkiler: `setCouponApplied` ile state günceller, `toast.success`/`toast.error` ile bildirim gösterir)
-
----
-
-### [N3_NASIL] AST Pointer: useCheckoutCoupon.ts::removeCoupon
-- **params**: yok
-- **ic_degiskenler**: yok
-- **Dönüş**: yok (yan etkiler: `setCouponApplied(null)` ile kupon bilgisini temizler, `setCouponCode('')` ile input alanını sıfırlar)
 
 ---
 

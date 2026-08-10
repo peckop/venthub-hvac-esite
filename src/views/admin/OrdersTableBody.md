@@ -16,7 +16,7 @@ entity_hashes:
   func:safeDate: 8162cc570bcd435b
   overview: af787ede72d62e9a
   style_tokens: 6a197b4b11103108
-generated_at: 2026-06-19T11:50:31Z
+generated_at: 2026-06-19T20:49:43Z
 ---
 
 ## Genel Bakış
@@ -418,12 +418,12 @@ graph TD
     OrdersTableBody_tsx__ordersFetcher["ordersFetcher"]
     OrdersTableBody_tsx__prettyStatus["prettyStatus"]
     OrdersTableBody_tsx__safeDate["safeDate"]
-    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__formatAmount
-    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__generateTrackingUrl
     OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__downloadBlob
-    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__badgeClass
-    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__safeDate
     OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__prettyStatus
+    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__generateTrackingUrl
+    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__formatAmount
+    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__safeDate
+    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__badgeClass
 ```
 
 ## NODE ID STANDARD

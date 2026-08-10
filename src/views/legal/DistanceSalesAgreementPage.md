@@ -9,7 +9,7 @@ entity_hashes:
   func:t: 281688e1734ee99d
   overview: 2a142a6874192776
   style_tokens: 06829f9d93bd4397
-generated_at: 2026-06-16T11:53:30Z
+generated_at: 2026-06-19T20:50:48Z
 ---
 
 ## Genel Bakış
@@ -35,10 +35,6 @@ Bu modül, dil-destekli bir yasal sözleşme sayfa görünümü sunan minimal bi
 **[Aksiyom 2 - Çeviri Fonksiyonu]:** Eğer `t(key)` fonksiyonu çağrılmadan önce modül bağlamında tanımlanmamışsa (bağımlılık olarak enjekte edilmemişse), çeviri beklenmeyen şekilde başarısız olur.
 
 **[Aksiyom 3 - Parametre Gerekliliği]:** Eğer `lang` parametresi opsiyonel olarak işaretlenmemişse (fonksiyon imzasında default değer verilmemiştir), bileşen çağrısında bu parametre zorunludur; aksi halde TypeScript derleme hatası oluşur.
-
----
-
-**Not:** Bu modül sadece UI renderlama yaptığı ve fonksiyon gövdesinde durum yönetimi, API çağrısı veya hesaplama mantığı içermediği için, modül içi ek mimari varsayımlar belirlenememiştir. Tüm işlevsellik `lang` parametresine ve dışarıdan sağlanan `t` çeviri fonksiyonuna bağlıdır.
 
 ---
 

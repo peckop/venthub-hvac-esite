@@ -8,7 +8,7 @@ entity_hashes:
   func:PreInformationContentTr: 98660646f84fea87
   overview: 7175f4ccbd30c8a8
   style_tokens: 5c1748e6c54f7f63
-generated_at: 2026-06-16T11:57:25Z
+generated_at: 2026-06-19T20:50:47Z
 ---
 
 ## Genel Bakış
@@ -30,10 +30,6 @@ Bu modül için minimum sayıda mimari varsayım tanımlanmıştır, çünkü fo
 [Aksiyom 1]: Eğer `lang` prop'u bileşene sağlanmazsa, bileşen tanımsız (`undefined`) dil değerine sahip olur ve içerik gösterimi hatalı çalışır.
 
 [Aksiyom 2]: Eğer `lang` prop'u `"tr"` değerinden farklı bir değer olarak sağlanısa, bileşen yine de Türkçe içerik döndürebilir (bileşin adı `Tr` suffix'i içermektedir).
-
----
-
-**Not:** Bu modül için yalnızca fonksiyon imzası verildiğinden, bileşenin içinde hangi koşullara göre içerik render ettiği, hangi veri yapılarını beklediği veya hangi alt bileşenleri kullandığı bilinmemektedir. Tam aksiyon kümesi için bileşen gövdesinin analiz edilmesi gereklidir.
 
 ---
 

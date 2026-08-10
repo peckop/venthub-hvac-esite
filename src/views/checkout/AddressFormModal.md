@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\AddressFormModal.tsx
-skeleton_hash: df90862fa528993d
+skeleton_hash: 3cfbdf84abb3aa03
 entity_hashes:
   func:AddressFormModal: 22dcfc4163aec036
   func:handleSave: 51987ec8847e1d2c
   overview: d6c90c44e9a5f962
   style_tokens: 4fa16246087d5121
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-19T20:50:27Z
 ---
 
 ## Genel Bakış
@@ -64,6 +64,18 @@ Bu modül, ödeme sürecindeki adres formu modalıdır ve aşağıdaki mimari va
 **Parametreler**:
 - name: e — type: React.FormEvent — Adres formunun gönderim olayını taşıyan olay nesnesi, form davranışını kontrol etmek için kullanılır
 **Dönüş**: Herhangi bir değer döndürmez, sadece form gönderim sürecini yönetir ve ilgili aksiyonları tetikler.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../lib/services/address.service::createAddress
+- import: ../../lib/services/address.service::updateAddress
+- import: ../../lib/supabase/client::supabaseBrowserClient
+- import: ../../types/db-rows::type { DbUserAddressInsert }
+- import: @/types/ui-models::type { UserAddress }
+- import: react::React
+- import: react::useState
+- import: sonner::toast
 
 ---
 

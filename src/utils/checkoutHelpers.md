@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\checkoutHelpers.ts
-skeleton_hash: 62a9fd0e67da535d
+skeleton_hash: 48d47ef3a66cd735
 entity_hashes:
   func:getPriceHashLocal: 13f64c7a6218a753
   func:getPriceHashServer: 9916fbf1157483b4
   func:getTranslationWithFallback: 017e759a3be126ab
   func:to2: b98feff70eaa59fa
   overview: 72cc4065bdd6058b
-generated_at: 2026-06-06T21:57:04Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -84,51 +84,17 @@ Bu modül, checkout sürecinde fiyat tutarlılığı, veri formatlama ve çeviri
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @/types/cart::type { CartItem }
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: checkoutHelpers.ts::to2
 - **params**: `(n: number)`
 - **ic_degiskenler**: (gövde verilmemiş — sadece imza mevcut)
 - **Dönüş**: tipi imzada belirtilmemiş; kullanım bağlamından (`to2(Number(...))`) number döndüğü anlaşılıyor
-
----
-
-### [N2_NASIL] AST Pointer: checkoutHelpers.ts::getPriceHashLocal
-- **params**: `(items: CartItem[])`
-- **ic_degiskenler**:
-  - `norm` — `items` dizisinin her elemanını `{ id, qty, unit }` formatına map edip `id` alanına göre alfabetik sıralanmış hali
-  - Map callback içindeki `i` — o an işlenen CartItem elemanı
-  - `i.id` — ürünün benzersiz kimliği
-  - `i.quantity` — ürün miktarı
-  - `i.unitPrice` — ürünün birim fiyatı (number olup olmadığı kontrol edilir; number değilse `i.product.price` kullanılır, `to2()` ile 2 ondalığa yuvarlanır)
-  - Sort callback içindeki `a`, `b` — sıralama karşılaştırmasında kullanılan iki eleman; `a.id.localeCompare(b.id)` ile string karşılaştırma yapılır
-- **Dönüş**: `JSON.stringify(norm)` — string (normalize edilmiş sepetin JSON temsili)
-
----
-
-### [N3_NASIL] AST Pointer: checkoutHelpers.ts::getPriceHashServer
-- **params**: `(serverItems: Array<{ product_id: string; quantity?: number; unit_price: number }> | undefined | null, localItems: CartItem[])`
-- **ic_degiskenler**:
-  - `arr` — `serverItems`'ın array olup olmadığının kontrolü; array ise kendisi kullanılır, değilse boş dizi (`[]`) atanır
-  - `norm` — `arr` dizisinin her elemanını `{ id, qty, unit }` formatına map edip `id` alanına göre alfabetik sıralanmış hali
-  - Map callback içindeki `i` — o an işlenen server item elemanı
-  - `i.product_id` — sunucudaki ürün kimliği (String'e çevrilerek kullanılır)
-  - `i.quantity` — sunucudaki ürün miktarı; `undefined` ise fallback olarak `localItems` içinde aynı `product_id`'ye sahip elemanın `quantity`'si aranır, o da yoksa `0` kullanılır
-  - `i.unit_price` — sunucudaki birim fiyat; `to2(Number(...))` ile 2 ondalığa yuvarlanır
-  - `localItems.find(it => it.id === String(i.product_id))?.quantity` — localItems dizisinde `product_id` eşleşmesi arayan vequantity değerini döndüren arama ifadesi
-  - Sort callback içindeki `a`, `b` — sıralama karşılaştırmasında kullanılan iki eleman
-- **Dönüş**: `JSON.stringify(norm)` — string (normalize edilmiş sepetin JSON temsili)
-
----
-
-### [N4_NASIL] AST Pointer: checkoutHelpers.ts::getTranslationWithFallback
-- **params**: `(t: (key: string) => string, key: string, fallback: string)`
-- **ic_degiskenler**:
-  - `t` — çeviri fonksiyonu; verilen key'e karşılık gelen çeviriyi döndürür
-  - `key` — çevrilmesi istenen anahtar kelime/dize
-  - `fallback` — çeviri bulunamadığında veya hata oluştuğunda kullanılacak varsayılan metin
-  - `v` — `t(key)` çağrısının sonucu; çeviri metni. Eğer `v === key` ise çeviri bulunamamıştır (t fonksiyonu key'in kendisini döndürmüş), bu durumda `fallback` döner; değilse `v` döner
-- **Dönüş**: string — çeviri metni (`v`) veya `fallback`
 
 ---
 

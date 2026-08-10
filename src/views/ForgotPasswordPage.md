@@ -3,37 +3,44 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ForgotPasswordPage.tsx
-skeleton_hash: 4161232de0f5572c
+skeleton_hash: 6ea6012ad0441c18
 entity_hashes:
   func:ForgotPasswordPage: 40bcbdf4b0d8dfc1
   func:handleSubmit: 460293fdfa9263b6
-  overview: b6edcf7438326096
+  overview: 68b3d66ebfb335b8
   style_tokens: 90202b3fc6cca016
-generated_at: 2026-06-14T21:38:28Z
+generated_at: 2026-06-19T20:50:42Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcıların şifre sıfırlama talebini iletmek için kullanılan tek sayfalık bir React bileşenidir. Kullanıcıya e-posta adresi girişi sunarak, gizli bir servisi aracılığıyla şifre yenileme sürecini başlatır.
+Bu modül, kullanıcıların şifrelerini sıfırlamaları için bir e-posta adresi girmelerini gerektiren tek sayfalık bir React bileşenidir. Kullanıcı formu gönderdiğinde, e-posta adresi sunucudaki şifre sıfırlama servisine asenkron olarak iletilerek süreç başlatılır.
 
 ## Fonksiyon Grupları
 ### Sayfa Yapısı ve Görünüm
-Modülün ana bileşenini tanımlar; sayfa düzenini, form elemanlarını ve kullanıcı arayüzünü oluşturarak şifre sıfırlama akışının görsel çerçevesini sağlar.
+Modülün ana React bileşenini tanımlar; sayfa düzenini, form elemanlarını ve kullanıcı arayüzünü oluşturarak şifre sıfırlama akışının görsel çerçevesini sağlar.
 - ForgotPasswordPage
 
 ### Form Veri İşleme ve Etkileşim
-Kullanıcının formu gönderme eylemini yakalar, varsayılan tarayıcı davranışını engeller ve toplanan verileri (e-posta) şifre sıfırlama servisine asenkron olarak iletir.
+Kullanıcının formu gönderme eylemini yakalar, varsayılan tarayıcı davranışını engeller ve toplanan e-posta verisini şifre sıfırlama servisine asenkron olarak iletir.
 - handleSubmit
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, kullanıcının şifre sıfırlama talebini iletmek için bir form sunar ve bu sürecin doğru işleyişi için aşağıdaki varsayımlar gereklidir.
 
-[Aksiyom 1]: Eğer form gönderme olayı (`e`) doğru şekilde engellenmezse (örn. `e.preventDefault()` çağrılmazsa), tarayıcının varsayılan form gönderme davranışı tetiklenir ve sayfa yeniden yüklenerek istek gönderilemez.
+Bu modül için verilen bilgiler (fonksiyon imzaları) çok sınırlıdır; fonksiyon gövdesi mevcut olmadığından çıkarılabilecek mimari varsayımlar kısıtlıdır.
 
-[Aksiyom 2]: Eğer kullanıcının girdiği e-posta adresi sunucu tarafında geçerli ve kayıtlı bir kullanıcıya ait değilse, şifre sıfırlama isteği sunucu tarafından reddedilir (hata mesajı döner).
+[Aksiyom 1]: Eğer React çalışma ortamı (runtime) yoksa, ForgotPasswordPage bileşeni render edilemez ve uygulama çalışması başarısız olur.
 
-[Aksiyom 3]: Eğer modülün çalıştığı ortamda ağ bağlantısı (internet) yoksa, şifre sıfırlama isteği sunucuya iletilemez ve istek başarısız olur.
+[Aksiyom 2]: Eğer handleSubmit fonksiyonu bir form SubmitEvent ile çağrılmazsa (örn. doğrudan çağrı veya geçersiz event objesi), form gönderme işlemi beklenmeyen şekilde davranır.
+
+[Aksiyom 3]: Eğer handleSubmit içerisinde yapılan asenkron işlem (muhtemelen API çağrısı) zaman aşımına uğrar veya network bağlantısı yoksa, kullanıcıya uygun bir hata bildirimi yapılması beklenir ancak bu davranış fonksiyon imzasından doğrulanamaz.
+
+[Aksiyom 4]: Eğer handleSubmit successful bir yanıt aldıktan sonra kullanıcıyı yönlendirecek bir navigasyon mekanizması (örn. useNavigate, window.location) mevcut değilse, kullanıcı şifre sıfırlama sonrası sayfada takılı kalır.
+
+---
+
+**Not:** Bu modül için eksiksiz aksiyon üretmek üzere fonksiyon gövdelerinin (`ForgotPasswordPage` ve `handleSubmit` için) tam koduna ihtiyaç vardır. Mevcut çıktı yalnızca fonksiyon imzalarından çıkarılabilecek minimum varsayımları içermektedir.
 
 ---
 
@@ -56,8 +63,8 @@ Bu modül, kullanıcının şifre sıfırlama talebini iletmek için bir form su
 
 ## İTHALATLAR (IMPORTS)
 - import: ../hooks/useAuth::useAuth
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
-- import: ../utils/routes::Routes
 - import: lucide-react::ArrowLeft
 - import: lucide-react::CheckCircle
 - import: lucide-react::Mail
@@ -70,30 +77,35 @@ Bu modül, kullanıcının şifre sıfırlama talebini iletmek için bir form su
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/ForgotPasswordPage.tsx::ForgotPasswordPage
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: ForgotPasswordPage.tsx::ForgotPasswordPage
+- **params**: () — parametre yok
 - **ic_degiskenler**:
-  - `email` — useState hook'u ile oluşturulmuş state değişkeni, kullanıcının girdiği e-posta adresini tutar
-  - `setEmail` — email state'ini güncellemek için kullanılan setter fonksiyonu
-  - `loading` — useState hook'u ile oluşturulmuş state değişkeni, yükleme durumunu (true/false) tutar
-  - `setLoading` — loading state'ini güncellemek için kullanılan setter fonksiyonu
-  - `emailSent` — useState hook'u ile oluşturulmuş state değişkeni, şifre sıfırlama e-postasının gönderilip gönderilmediğini tutar
-  - `setEmailSent` — emailSent state'ini güncellemek için kullanılan setter fonksiyonu
-  - `resetPassword` — useAuth hook'undan gelen, şifre sıfırlama işlemini yapan asenkron fonksiyon
-  - `t` — useI18n hook'undan gelen, çeviri yapmak için kullanılan fonksiyon
-  - `handleSubmit` — form gönderildiğinde çalışan asenkron olay işleyici fonksiyon
-- **Dönüş**: JSX elementi (React FC bileşeni)
+  - `email` — useState ile oluşturulan state, kullanıcının girdiği e-posta adresini tutar
+  - `setEmail` — email state'inin setter'ı, input değişimlerinde çağrılır
+  - `loading` — useState ile oluşturulan state, şifre sıfırlama isteği sırasında true olur
+  - `setLoading` — loading state'inin setter'ı, istek başlamasında ve bitmesinde çağrılır
+  - `emailSent` — useState ile oluşturulan state, sıfırlama e-postası başarıyla gönderildiğinde true olur
+  - `setEmailSent` — emailSent state'inin setter'ı, başarılı gönderimde true yapılır
+  - `resetPassword` — useAuth() hook'undan destructured, Supabase auth ile şifre sıfırlama e-postası gönderen async fonksiyon
+  - `t` — useI18n() hook'undan destructured, çevirileri getiren fonksiyon
+  - `Routes` — useLocalizedRoutes() hook'undan alınan, lokalize edilmiş rota nesnesi; `Routes.auth.login()` çağrısı ile login sayfası URL'i üretilir
+  - `handleSubmit` — inner async fonksiyon, form submit olayını yönetir
+- **Dönüş**: JSX element — `emailSent` true ise başarı ekranını, false ise form ekranını render eder
 
-### [N2_NASIL] AST Pointer: src/views/ForgotPasswordPage.tsx::handleSubmit
-- **params**: (e: React.FormEvent — form submit olayı)
+---
+
+### [N2_NASIL] AST Pointer: ForgotPasswordPage.tsx::handleSubmit
+- **params**: `(e: React.FormEvent)` — form submit olay nesnesi
 - **ic_degiskenler**:
-  - `e` — React form olayı nesnesi, preventDefault() ile varsayılan davranışı engellenir
-  - `email` — ForgotPasswordPage kapsamından gelen e-posta state'i, sıfırlama isteği için kullanılır
-  - `resetPassword` — ForgotPasswordPage kapsamından gelen, şifre sıfırlama API'sini çağıran fonksiyon
-  - `t` — ForgotPasswordPage kapsamından gelen çeviri fonksiyonu, hata/success mesajlarını çevirir
-  - `error` — resetPassword() çağrısından dönen hata nesnesi (try bloğunda)
-  - `error` — catch bloğunda yakalanan beklenmedik hata nesnesi
-- **Dönüş**: void (asenkron fonksiyon, promise döner)
+  - `email` — closure'dan gelen input değeri; boşsa toast hatası ile fonksiyon erken döner
+  - `t` — closure'dan gelen çeviri fonksiyonu; hata ve başarı mesajlarını lokalize eder
+  - `resetPassword` — closure'dan gelen şifre sıfırlama fonksiyonu; `await resetPassword(email)` ile çağrılır
+  - `setLoading` — closure'dan gelen state setter'ı; istek öncesi `true`, finally bloğunda `false` yapılır
+  - `setEmailSent` — closure'dan gelen state setter'ı; hata yoksa `true` yapılır
+  - `error` (try bloğu) — `resetPassword` çağrısından dönen `{ error }` destructured nesne; `error.message` içinde hata açıklaması bulunur
+  - `error` (catch bloğu) — try-catch ile yakalanan beklenmeyen hata nesnesi; `console.error` ile loglanır
+  - `toast` — import edilen sonner toast API'si; `toast.error()`, `toast.success()` ile bildirim gösterir
+- **Dönüş**: yok (void) — yan etkiler: toast bildirimleri gösterir, emailSent ve loading state'lerini değiştirir
 
 ---
 

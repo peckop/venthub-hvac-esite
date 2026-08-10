@@ -11,7 +11,7 @@ entity_hashes:
   func:getCachedHomeData: 3cdedf9dace01d81
   overview: 6ebd40932befbbea
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-15T17:01:38Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -123,59 +123,6 @@ type Props = {
 - **params**: yok
 - **ic_degiskenler**: (yok — sadece literal array döner)
 - **Dönüş**: `Array<{ lang: string }>` — statik olarak `tr` ve `en` dil parametrelerini döner; Next.js build'te iki dil için sayfa üretir
-
----
-
-### [N2_NASIL] AST Pointer: `src/app/[lang]/page.tsx`::generateMetadata
-- **params**: `{ params }: Props` — `params` bir Promise'tir; `await` ile çözülür
-- **ic_degiskenler**:
-  - `lang` — `await params` sonucu elde edilen dil kodu (`'tr'` veya `'en'`); sözlük seçiminde ve URL'lerde kullanılır
-  - `dict` — `lang === 'en'` koşuluna göre `en` veya `tr` sözlük nesnesi; SEO başlık/açıklama değerlerini sağlar
-  - `siteUrl` — `SITE_URL` sabitinden gelen site kök URL'i; canonical, OG ve Twitter URL'lerinde kullanılır
-  - `canonical` — Sayfanın canonical URL'i; `${siteUrl}/${lang}` formatında oluşturulur
-- **Dönüş**: `Promise<Metadata>` — Next.js metadata nesnesi (title, description, alternates, openGraph, twitter, robots)
-
----
-
-### [N3_NASIL] AST Pointer: `src/app/[lang]/page.tsx`::getCachedHomeData
-- **params**: `(lang: string, tenantId: string)` — dil kodu ve kiracı ID'si; cache key bileşenleri olarak kullanılır
-- **ic_degiskenler**:
-  - `catData` — `Promise.all` ile `getCategories(supabaseStaticClient)` çağrısından dönen kategori verisi; `Promise.all` destructuring'inin ilk elemanı
-  - `prodData` — `Promise.all` ile `getProducts(supabaseStaticClient, 12)` çağrısından dönen ürün verisi (maksimum 12 ürün); `Promise.all` destructuring'inin ikinci elemanı
-- **Dönüş**: `{ catData, prodData }` — `unstable_cache` ile sarılmış; `['home-page-data', lang, tenantId]` key'inde, `['home-data', 'home-data-${tenantId}']` tag'leri ile cache'lenir; `revalidate: false` ile stale-while-revalidate kapatılmıştır
-
----
-
-### [N4_NASIL] AST Pointer: `src/app/[lang]/page.tsx`::RootPage
-- **params**: `{ params }: Props` — `params` bir Promise'tir; `await` ile çözülür
-- **ic_degiskenler**:
-  - `lang` — `await params` sonucu elde edilen dil kodu; sözlük seçiminde, URL'lerde ve bileşen prop'unda kullanılır
-  - `dict` — `lang === 'en'` koşuluna göre `en` veya `tr` sözlük nesnesi; SEO değerleri, `dict.home` alt yapısı ve `t()` fonksiyonu için kaynaktır
-  - `tenantConfig` — `await getTenantConfig()` ile çekilen kiracı konfigürasyon nesnesi; `.id` alanı `tenantId` olarak, kendisi `TenantProvider` value prop'u olarak kullanılır
-  - `tenantId` — `tenantConfig.id`; cache key bileşeni olarak `getCachedHomeData`'ya passed edilir
-  - `categories` — `DomainCategory[]` tipinde başlangıçta boş array; `getCachedHomeData`'dan gelen `catData` → `toUICategoryList(catData)` dönüşümüyle doldurulur; hata durumunda boş kalır
-  - `products` — `Product[]` tipinde başlangıçta boş array; `getCachedHomeData`'dan gelen `prodData` dökülür; `as Product[]` ile tip dönüşümü yapılır; hata durumunda boş kalır
-  - `error` — `try/catch` bloğu yakaladığında `console.warn('SSR Data Fetch Error:', error)` ile loglanan hata nesnesi
-  - `t` — `(key: string) => getDictValue(dict, key)` imzasıyla arrow function; çeviri key'lerini sözlükten çözer, `getCategoryDisplayName`'e passed edilir (SSOT: translation_key → menu_label → name zinciri)
-  - `displayCategories` — `CategoryViewModelLite[]` tipinde; `categories` → `.filter((c) => !c.parent_id)` ile üst seviye kategoriler seçilir → `.sort((a, b) => a.name.localeCompare(b.name))` ile alfabetik sıralanır → `.map(c => ({...}))` ile dönüştürülür; her eleman `c.id`, `c.slug`, `getCategoryDisplayName(c, t)`, `c.description || ''`, `c.image_url` alanlarını içerir
-  - `siteUrl` — `SITE_URL` sabitinden gelen site kök URL'i; JSON-LD yapılandırmalarında ve `jsonLds` içinde kullanılır
-  - `jsonLds` — JSON-LD schema.org yapılandırmaları dizisi; iki eleman içerir: (1) `"@type": "WebSite"` — site adı, URL, SearchAction potansiyel eylemi; (2) `"@type": "Organization"` — site adı, URL, logo, contactPoint telefon bilgisi
-- **Dönüş**: JSX — `<TenantProvider>` sarmalayıcısı içinde JSON-LD scriptleri ve `<HomePage>` bileşeni; `initialCategories`, `rawCategories`, `initialProducts`, `dictionary`, `lang` prop'ları ile
-
----
-
-### [N5_NASIL] AST Pointer: `src/app/[lang]/page.tsx`::displayCategories_map_callback (inline arrow)
-- **params**: `c` — `DomainCategory` tipinde tek bir kategori nesnesi; `.map()` iterasyonuyla her üst seviye kategori için çağrılır
-- **ic_degiskenler**:
-  - `c` — filtreleme ve sıralama sonrası kalan üst seviye kategori nesnesi; `.id`, `.slug`, `.name`, `.description`, `.image_url` alanları erişilir
-- **Dönüş**: `CategoryViewModelLite` nesnesi — `{ id, slug, displayName, description, image_url }` yapısında
-
----
-
-### [N6_NASIL] AST Pointer: `src/app/[lang]/page.tsx`::jsonLds_script_callback (inline arrow)
-- **params**: `(ld, i)` — `ld` JSON-LD nesnesi, `i` dizi indeksi
-- **ic_degiskenler**: (yok — parametreler dışında ek değişken yok; `ld` doğrudan `JSON.stringify(ld)` içinde kullanılır, `i` `key={i}` prop'unda kullanılır)
-- **Dönüş**: JSX `<script>` elementi — `type="application/ld+json"`, `dangerouslySetInnerHTML` ile XSS koruması amacıyla `<` ve `>` karakterleri escape edilmiş JSON-LD içeriği
 
 ---
 

@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\tailwind.config.js
-skeleton_hash: 75b6ff9dabb79078
+skeleton_hash: 65698e287ab938cc
 entity_hashes:
   overview: b1c731813de023aa
-generated_at: 2026-06-08T10:11:02Z
+generated_at: 2026-06-19T20:51:04Z
 ---
 
 ## Genel Bakış
@@ -26,6 +26,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @tailwindcss/typography::typography
 
 ---
 

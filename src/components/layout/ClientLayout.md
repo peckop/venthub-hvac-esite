@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\layout\ClientLayout.tsx
-skeleton_hash: 5ca35bb911077749
+skeleton_hash: 20611eaa2b02286d
 entity_hashes:
   func:ClientLayout: 6950fd4597251d25
   func:ClientLayoutInner: 51b8420900083527
@@ -11,7 +11,7 @@ entity_hashes:
   func:Providers: 3400c1a5354d979d
   overview: 1cb24898c372f6f1
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-19T20:47:09Z
 ---
 
 ## Genel Bakış
@@ -76,6 +76,23 @@ Bu modül, istemci tarafı uygulamanın temel yapı taşlarını bir araya getir
 **Parametreler**:  
 - children: React.ReactNode — Düzen içinde gösterilecek içerik  
 **Dönüş**: JSX elementi – `<ClientLayoutInner>{children}</ClientLayoutInner>` şeklinde bir ağaç döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../contexts/AuthContext::AuthProvider
+- import: ../../contexts/CartProvider::CartProvider
+- import: ../../contexts/CategoryContext::CategoryProvider
+- import: ../../contexts/ProjectProvider::ProjectProvider
+- import: ../../i18n/I18nProvider::I18nProvider
+- import: ./CookieConsent::CookieConsent
+- import: ./MainLayout::MainLayout
+- import: @/providers/SupabaseProvider::SupabaseProvider
+- import: next/navigation::usePathname
+- import: next/navigation::useSearchParams
+- import: react::React
+- import: react::Suspense
+- import: react::useEffect
 
 ---
 

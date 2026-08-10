@@ -9,7 +9,7 @@ entity_hashes:
   func:generateStaticParams: 42ae72125a484b5f
   overview: 0f7f79057de13ae8
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-16T11:52:41Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -74,25 +74,6 @@ Bu modül, Next.js'in App Router yapısında yer alan bir sayfa bileşenidir; `g
 - **ic_degiskenler**:
   - `lang` — Params promise'inden çözülen dil kodu (örn. 'tr' veya 'en'), sayfanın dil sürümünü belirler
 - **Dönüş**: JSX bileşeni — `PageComponent`'in `lang` prop'u ile render edilmiş React bileşeni
-
----
-
-**Fonksiyon İlişkileri:**
-- `generateStaticParams` → `Page` (statik parametreleri sağlar)
-- `Page` → `PageComponent` (görüntüleme bileşenini çağırır)
-
-**Yan Etkiler:**
-- Fonksiyonlar saf fonksiyondur, herhangi bir yan etki oluşturmazlar
-
-**Değişken Yaşam Döngüsü:**
-- `lang`: Fonksiyon içinde tanımlanıp hemen `PageComponent`'e prop olarak iletilir, harici etkisi yoktur
-
-**Import Bağımlılıkları:**
-- `PageComponent`: `../../../../views/legal/DistanceSalesAgreementPage` yolundan içe aktarılır
-
-**Veri Akışı:**
-- `generateStaticParams` → statik parametreler → `Page` fonksiyonu
-- `params` → `lang` değişkeni → `PageComponent` prop'u
 
 ---
 

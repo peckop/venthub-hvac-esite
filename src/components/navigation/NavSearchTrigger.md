@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavSearchTrigger.tsx
-skeleton_hash: 9df73cfd82f6a5f2
+skeleton_hash: 3fd500eca04776e8
 entity_hashes:
   func:NavSearchTrigger: 685a255257840b8c
   overview: f880d1849bdfe091
   style_tokens: 76073a5206e1d6d6
-generated_at: 2026-05-28T22:36:19Z
+generated_at: 2026-06-19T20:47:10Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `onClick`: () => void (opsiyonel) — Kullanıcı tıkladığında çalıştırılacak geri çağırma fonksiyonu.
 
 **Dönüş**: React.FC\<NavSearchTriggerProps\> — Tanımlanan propsları kullanan bir React fonksiyonel bileşeni.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/utils::cn
+- import: react::React
 
 ---
 

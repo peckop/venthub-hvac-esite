@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\SeriesCard.tsx
-skeleton_hash: ea5f0023d6cb79d7
+skeleton_hash: bd3a185721788a46
 entity_hashes:
   func:SeriesCard: cf8b7a8f3470f163
   overview: d4236c58f6d08940
   style_tokens: f167f421a986922b
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:27Z
 ---
 
 ## Genel Bakış
@@ -42,6 +42,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - href: string — Ürün serisinin detay sayfasına yönlendirme linkini belirtir, kart tıklandığında bu adrese navigasyon sağlanır
 
 **Dönüş**: `React.FC<SeriesCardProps>` — SeriesCardProps arayüzüne uygun olarak yapılandırılmış bir React fonksiyonel bileşeni döndürür. Bu bileşen, verilen prop'lara göre render edilmiş bir ürün serisi kartı sunar.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/format::formatCurrency
+- import: next/image::Image
+- import: next/link::Link
+- import: react::React
 
 ---
 

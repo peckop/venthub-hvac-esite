@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ProductsDiscoveryView.tsx
-skeleton_hash: a62e2580bbc279b4
+skeleton_hash: 9208f5b30d054206
 entity_hashes:
   func:ProductsDiscoveryView: 6785edea688433d2
-  overview: 7231c6a1b74d8b9e
+  overview: d4f91980915340a3
   style_tokens: 8ab4f603b12ea696
-generated_at: 2026-06-11T16:17:49Z
+generated_at: 2026-06-19T20:51:24Z
 ---
 
 ## Genel Bakış
@@ -19,19 +19,15 @@ Bu modül, Venthub HVAC platformunun ana ürün keşif sayfasını oluşturan Re
 Modülün tek ve temel bileşenini oluşturur. Dışarıdan iletilen `products` ve `isLoading` verilerine bağlı olarak, kullanıcıya ürünleri CategoryOrbitCarousel aracılığıyla sunar veya yükleme/boş durum arayüzlerini gösterir.
 - ProductsDiscoveryView
 
+### Dış Bağımlılıklar ve Mimari Bağlam
+Bileşen, `CategoryOrbitCarousel` iç angebenen bileşene güçlü bir bağımlılık gösterir. Bu, bileşenin veri sunum mantığını ayrı bir görünüme devrettiğini ve modülün kendi içinde veri işlevselliğinden ziyade arayüz orkestasyonuna odaklandığını gösterir. Bileşen, props aracılığıyla dış veriye (ürün listesi) ve durum yönetimine (yükleniyor bayrağı) tamamen açıktır.
+
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, dışarıdan verilen ürün listesi ve yükleme durumuna bağlı olarak bir keşif arayüzü render eden bir React görünüm bileşenidir.
-
-**[Aksiyom 1]:** Eğer `CategoryOrbitCarousel` bileşeni模ül içine dahil edilmemiş veya tanımlanmamışsa, ProductsDiscoveryView bileşeni render edilemez ve çalışma zamanı hatası oluşur.
-
-**[Aksiyom 2]:** Eğer `products` prop'u sağlanmazsa, bileşen varsayılan olarak boş bir dizi (`[]`) kullanır; bu durumda ürün listesi boş görünür ancak bileşon hata vermez.
-
-**[Aksiyom 3]:** Eğer `isLoading` prop'u sağlanmazsa, bileşen varsayılan olarak `false` değerini kullanır; bu durumda yükleme göstergesi görüntülenmez.
-
-**[Aksiyom 4]:** Eğer `products` boş dizi (`[]`) ve `isLoading` `false` ise, bileşen boş bir durum (muhtemelen "ürün bulunamadı" veya benzeri) gösterir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -47,6 +43,25 @@ Bu modül, dışarıdan verilen ürün listesi ve yükleme durumuna bağlı olar
 - isLoading: boolean — Verinin yüklenip yüklenmediğini belirten durum bayrağı. true olduğunda yükleme animasyonu gösterilir. Varsayılan olarak false değerini alır.
 
 **Dönüş**: React.FC<ProductsDiscoveryViewProps> — React fonksiyonel bileşeni olarak products dizisini ve isLoading durumunu işleyen bir arayüz bileşeni döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../components/ProductCard::ProductCard
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: ../i18n/I18nProvider::useI18n
+- import: ../lib/type-converters::type { DomainCategory }
+- import: @/types/ui-models::type { Product }
+- import: framer-motion::AnimatePresence
+- import: framer-motion::motion
+- import: lucide-react::LayoutGrid
+- import: lucide-react::List
+- import: next/dynamic::dynamic
+- import: next/navigation::useRouter
+- import: react::React
+- import: react::useCallback
+- import: react::useRef
+- import: react::useState
 
 ---
 
@@ -78,9 +93,49 @@ type ViewMode = 'grid' | 'list'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: ProductsDiscoveryView.tsx::LoadingPlaceholder
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: JSX — nebula glow animasyonlu yükleme placeholder div'i (w-full h-hvac-section, cyan blur pulse animasyonu)
+- **params**: (parametre yok — anonim arrow function)
+- **ic_degiskenler**:
+  (iç değişken yok — doğrudan JSX döner)
+- **Dönüş**: JSX — loading durumunda gösterilen nebula glow placeholder div; spinner yerine animasyonlu blur efekti sunar
+
+---
+
+### [N2_NASIL] AST Pointer: ProductsDiscoveryView.tsx::ProductsDiscoveryView
+- **params**: `{ products = [], isLoading = false }` — `products`: Product dizisi, gösterilecek ürün listesi; `isLoading`: boolean, yükleme durumu
+- **ic_degiskenler**:
+  - `router` — `useRouter()` hook'undan dönen Next.js router nesnesi; sayfa yönlendirmeleri için kullanılır
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('products.allProductsTitle')`, `t('products.systemTotalPrefix')`, `t('products.itemsListed')`, `t('products.emptyTitle')`, `t('products.emptyDesc')`, `t('products.viewGrid')`, `t('products.viewList')` çağrılarında kullanılır
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen localized route builder nesnesi; `Routes.category(categorySlug, subcategorySlug)` ve `Routes.category(categorySlug)` çağrılarıyla URL üretilir
+  - `[viewMode, setViewMode]` — `useState<ViewMode>('grid')` state'i; mevcut görünüm modunu tutar ('grid' veya 'list')
+  - `productsRef` — `useRef<HTMLDivElement>(null)` ref'i; `motion.section` elementine bağlanır, ürün grid konteynerine referans tutar
+  - `handleSubcategorySelect` — `useCallback` ile tanımlanan callback fonksiyonu; `CategoryOrbitCarousel` bileşenine `onSubcategorySelect` prop'u olarak geçilir
+  - `viewMode` — mevcut görünüm modu; `viewMode === 'grid'` koşuluyla grid/list CSS sınıfları ve buton aktiflik durumları belirlenir, `ProductCard` bileşenine `layout` prop'u olarak geçilir
+  - `products.length` — ürün sayısını tutar; `products.length === 0 && !isLoading` koşuluyla boş durum gösterilir, `products.length` span içinde kullanıcıya ürün sayısı olarak sunulur
+  - `products.map((product, index) => {...})` — ürün dizisi üzerinde döngü; her ürün için `ProductCard` bileşeni oluşturulur
+  - `ESTIMATED_3D_ITEMS` — sabit `8`; tahmini 3D animasyonlu ürün sayısı
+  - `TOTAL_3D_DURATION` — `ESTIMATED_3D_ITEMS * 0.18 + 1.2`; toplam 3D animasyon süresi (saniye)
+  - `GRID_ENTRY_DELAY` — `TOTAL_3D_DURATION * 0.6`; grid giriş animasyonu gecikme süresi
+  - `isInitialView` — `index < 12` boolean; ürünün ilk ekranda görünüp görünmediğini belirler, `GRID_ENTRY_DELAY + (index * 0.05)` delay hesaplamasında kullanılır
+- **Dönüş**: JSX — tam sayfa ürün keşif görünümü; CategoryOrbitCarousel, başlık, view mode butonları, ürün grid/listesi veya boş durum mesajını render eder
+
+---
+
+### [N3_NASIL] AST Pointer: ProductsDiscoveryView.tsx::handleSubcategorySelect
+- **params**: `(categorySlug: string, subcategorySlug?: string)` — `categorySlug`: kategori slug'ı; `subcategorySlug`: opsiyonel alt kategori slug'ı
+- **ic_degiskenler**:
+  (iç değişken yok — closure içinde `router` ve `Routes` yukarı kapsamdan kullanılır)
+- **Dönüş**: yok — `router.push()` ile yan etki olarak sayfa yönlendirmesi yapar; `subcategorySlug` varsa `Routes.category(categorySlug, subcategorySlug)`, yoksa `Routes.category(categorySlug)` URL'ine yönlendirir
+
+---
+
+### [N4_NASIL] AST Pointer: ProductsDiscoveryView.tsx::mapCallback (product, index)
+- **params**: `(product, index)` — `product`: Product nesnesi; `index`: ürünün dizideki indeksi
+- **ic_degiskenler**:
+  - `ESTIMATED_3D_ITEMS` — sabit `8`; tahmini 3D animasyonlu ürün sayısı
+  - `TOTAL_3D_DURATION` — `ESTIMATED_3D_ITEMS * 0.18 + 1.2`; toplam 3D animasyon süresi hesaplanır
+  - `GRID_ENTRY_DELAY` — `TOTAL_3D_DURATION * 0.6`; grid entry animasyonu için hesaplanan gecikme süresi
+  - `isInitialView` — `index < 12` boolean; ürünün ilk ekranda olup olmadığını belirler; `true` ise `GRID_ENTRY_DELAY + (index * 0.05)` delay uygulanır, `false` ise `0` delay ile hemen görünür
+- **Dönüş**: `motion.div` JSX — `ProductCard` bileşenini sarmalayan animasyonlu div; `product.id` key, `whileInView` ile viewport'a girince opacity ve y hareketi ile fade-in, `isInitialView` durumuna göre kademeli gecikme ile giriş animasyonu; `ProductCard`'a `product` ve `layout={viewMode}` prop'ları geçilir
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\types\AccessoryModel.tsx
-skeleton_hash: 94f95d667c5d4783
+skeleton_hash: 2ea1d104b160c5fd
 entity_hashes:
   func:AccessoryModel: 5a654d447c80c9c1
   overview: af9a58f742b9d985
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:30Z
+generated_at: 2026-06-19T20:47:12Z
 ---
 
 ## Genel Bakış
@@ -34,6 +34,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**:  
 - (parametre yok)  
 **Dönüş**: Geri dönüş tipi `void` veya belirtilmemiş olarak işaretlenmiştir; net bir dönüş değeri bilgisi yoktur.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../materials/useFanMaterials::useFanMaterials
+- import: react::React
 
 ---
 

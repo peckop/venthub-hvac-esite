@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\inventory.ts
-skeleton_hash: e42c63a5e284355e
+skeleton_hash: 4de39d1a5466acad
 entity_hashes:
   overview: 8013fdfdc560f88e
-generated_at: 2026-06-08T08:57:37Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -29,6 +29,13 @@ Bu modül salt bir TypeScript tip tanımı (type definition) modülüdür. Doğr
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./admin-shared::Density
+- import: ./admin-shared::LoadState
+- import: ./ui-models::Category
 
 ---
 

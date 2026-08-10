@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\addresses\page.tsx
-skeleton_hash: 09aed64513c67e34
+skeleton_hash: 46e74f8e737d3adb
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-12T10:17:59Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,11 @@ Modülün tek bileşeni olan `Page`, adres yönetim sayfasının içerik bölüm
 
 **Dönüş**:  
 - `JSX.Element` — `<PageComponent />` bileşenini temsil eden JSX elemanı döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next/dynamic::nextDynamic
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\AuthContext.tsx
-skeleton_hash: fe990562a185e84d
+skeleton_hash: f4d5ced51ff2d848
 entity_hashes:
   func:AuthProvider: 8a171b0bec808d24
   overview: 367d05e5814d0229
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -43,6 +43,21 @@ Bu modül için yalnızca fonksiyon imzası (`AuthProvider({ children })`) mevcu
 - `children`: React.ReactNode — Provider bileşeninin içine yerleştirilen tüm alt React bileşenleri. Bu prop, kimlik doğrulama durumuna erişmesi gereken tüm alt bileşenleri kapsar.
 
 **Dönüş**: `React.FC<{ children: React.ReactNode }>` — React Fonksiyonel Bileşeni döndürür. AuthContext.Provider ile sarmalanmış children bileşenlerini render eden bir React bileşeni sonucu verir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../config/admin::getUserRole
+- import: ../lib/rbac::type { UserRole }
+- import: ./AuthContextDefinition::AuthContext
+- import: ./AuthContextDefinition::type AuthError
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @supabase/supabase-js::type { Session,User }
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useState
 
 ---
 

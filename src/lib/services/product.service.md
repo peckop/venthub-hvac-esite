@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\product.service.ts
-skeleton_hash: 44d049374770bbaa
+skeleton_hash: 76f023301976b85f
 entity_hashes:
   func:adminSearchProducts: 8d062d9b98a5adbd
   func:fetchProductBy: 801cc0baf830919f
@@ -20,7 +20,7 @@ entity_hashes:
   func:getSearchSuggestions: c869859ad564f520
   func:searchProducts: 21df141aa66cf1d1
   overview: 92f56a383d3f3250
-generated_at: 2026-06-08T10:09:34Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış
@@ -205,6 +205,15 @@ Bu modül, Supabase üzerinden ürün verilerine erişim sağlayan bir veri eri�
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../types/database.types::type { Database }
+- import: ../../types/db-rows::type { DbAdminSearchResult,DbProduct }
+- import: ../type-converters::mapDatabaseProductToDomain
+- import: ../type-converters::toUIProductList
+- import: @supabase/supabase-js::type { SupabaseClient }
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/services/product.service.ts::getProductsEnriched
@@ -330,9 +339,9 @@ graph TD
     product_service_ts__getProductsEnriched["getProductsEnriched"]
     product_service_ts__getSearchSuggestions["getSearchSuggestions"]
     product_service_ts__searchProducts["searchProducts"]
-    product_service_ts__getProductBySlugOrId --> product_service_ts__fetchProductBy
     product_service_ts__getProductById --> product_service_ts__fetchProductBy
     product_service_ts__getProductBySlug --> product_service_ts__fetchProductBy
+    product_service_ts__getProductBySlugOrId --> product_service_ts__fetchProductBy
 ```
 
 ## NODE ID STANDARD

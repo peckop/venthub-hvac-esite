@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\categories.tr.ts
-skeleton_hash: 9fa7d0cd5d2a4762
+skeleton_hash: d77a8e3eb70a8db4
 entity_hashes:
   overview: e1ad358253fda567
-generated_at: 2026-06-13T18:02:39Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -35,7 +35,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **categories** (object) — `{
-      subtitle: 'Ürün hiyerarşisini ve kategori ağacını buradan yönetebilir...`
+  subtitle: 'Ürün hiyerarşisini ve kategori ağacını buradan yönetebilirsin...`
 
 ---
 

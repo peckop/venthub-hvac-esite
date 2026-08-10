@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useDragScroll.ts
-skeleton_hash: 453dab1aa88bd1a0
+skeleton_hash: 2a55c71344021da6
 entity_hashes:
   func:useDragScroll: 285567f9f95bbe2e
   overview: 65551040518f5649
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,12 @@ Bu hook parametresiz olarak çağrılmalıdır; hiçbir bağımsız değişken k
 **Parametreler**:
 - Bu fonksiyon herhangi bir giriş parametresi kabul etmez.
 **Dönüş**: Kaydırılabilir konteyner DOM elementine atanmak üzere tasarlanmış bir callback referansı döndürür. Bu referans, drag-scroll işlevselliğinin ilgili elemente tanımlanmasını sağlar ve tüm fare olay dinleyicilerini işlevselliğin kullanıldığı element ile ilişkilendirir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::useCallback
+- import: react::useRef
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\shipments\page.tsx
-skeleton_hash: f252b5d33929db96
+skeleton_hash: c56caae0a95c55b9
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 196d231af4e46298
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -33,6 +33,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Nasıl yapar**: Doğrudan `<PageComponent />` JSX ifadesini döndürerek `PageComponent` bileşenini çağırır. Herhangi bir state yönetimi veya iş mantığı içermez, yalnızca bir sarmalayıcı (wrapper) görevi üstlenir.
 **Parametreler**: Parametre almaz.
 **Dönüş**: `<PageComponent />` — Sayfanın kullanıcı arayüzünü oluşturan React JSX bileşeni.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../views/account/AccountShipmentsPage::PageComponent
 
 ---
 

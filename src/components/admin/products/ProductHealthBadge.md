@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\products\ProductHealthBadge.tsx
-skeleton_hash: 86fcda867d26a586
+skeleton_hash: 1dd9494cac97bf20
 entity_hashes:
   func:ProductHealthBadge: 7149ab2cdd96084d
   overview: 300c84dd02e2dca2
   style_tokens: ee784aad25800471
-generated_at: 2026-05-28T22:35:38Z
+generated_at: 2026-06-19T20:47:05Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - isFeatured: as defined in ProductHealthProps — Ürünün öne çıkan ürün olarak işaretlenip işaretlenmediğini gösteren bir bayraktır.
 
 **Dönüş**: React.FC<ProductHealthProps> — Bir React fonksiyonel bileşeni döndürür; bu bileşen, verilen props'lara göre ürün sağlık rozetini render eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
 
 ---
 

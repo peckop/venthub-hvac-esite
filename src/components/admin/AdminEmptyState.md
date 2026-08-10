@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\AdminEmptyState.tsx
-skeleton_hash: 431d118c1d7d127a
+skeleton_hash: 1e2d88f61e876a8e
 entity_hashes:
   func:AdminEmptyState: 0a5636f5d0d24f8e
   overview: a8e9e23763cc1b0a
   style_tokens: 18a94c8091a667ca
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:46:38Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,12 @@ Ancak bu parametrelerin zorunlu olup olmadığı, hangi durumlarda hata fırlat�
 - `compact`: boolean (opsiyonel) — `true` olduğunda, bileşen daha kompakt ve küçük bir görünümle render edilir. Varsayılan olarak `false` veya tanımsız kabul edilerek tam boyutlu görünüm gösterilir.
 
 **Dönüş**: JSX.Element — Bileşen, her iki durumda (compact veya normal) da bir React JSX yapısı döndürür ve doğrudan bir React bileşeni olarak kullanılabilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: lucide-react::LucideIcon
+- import: react::React
 
 ---
 

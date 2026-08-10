@@ -3,30 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\BulkActionToolbar.tsx
-skeleton_hash: 7bf65b45d538cf54
+skeleton_hash: 8d306dcdeac63716
 entity_hashes:
   func:BulkActionToolbar: ba39222c0aa88e73
-  overview: e440025fef007b62
+  overview: f47185db4076328f
   style_tokens: 812207303bb8adc3
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:47:03Z
 ---
 
 ## Genel Bakış
-`BulkActionToolbar` bileşeni, yönetim panelinde birden fazla öğe seçildiğinde toplu işlemler (durum güncelleme, özellik değiştirme, silme) yapabilmek için kullanılan bir araç çubuğu sağlar. Seçili öğe sayısını gösterir ve ilgili eylemlerin tetiklenmesi için dışarıdan gelen callback fonksiyonlarını yönetir.
+BulkActionToolbar bileşeni, yönetim panelinde toplu seçim işlemlerini yönetmek için kullanılan bir araç çubuğudur. Seçili öğe sayısını görüntüler ve durum güncelleme, özellik değiştirme veya silme gibi toplu eylemleri tetiklemek için dışarıdan sağlanan callback fonksiyonlarını arayüz üzerinden sunar.
 
 ## Fonksiyon Grupları
-### UI Render ve Görsel Düzen
-Bu grup, seçili öğe sayısını gösteren etiket, eylem butonları ve araç çubuğunun genel görünümünü oluşturur.  
+### Toplu İşlem Arayüzü ve Eylem Tetikleme
+Bu grup, seçili öğe sayısını gösteren etiketi ve toplu işlem butonlarını (durum güncelleme, özellik açma/kapama, silme) oluşturarak kullanıcı etkileşimlerini üst bileşene aktarır.
 - BulkActionToolbar
-
-### Eylem Tetikleme ve Callback Yönetimi
-Bu grup, buton tıklamalarıyla gelen kullanıcı etkileşimlerini alır, ilgili parametreleri (ör. yeni durum, özellik anahtarı) hazırlayarak dışarıdan sağlanan `onStatusChange`, `onFeatureToggle` ve `onDelete` callback’lerini çağırır.  
-- BulkActionToolbar (içindeki event handler mantığı)
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -47,6 +45,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../utils/adminUi::adminButtonPrimaryClass
+- import: @/i18n/I18nProvider::useI18n
+- import: react::React
+
+---
+
 ## INTERFACES
 
 ### BulkActionToolbarProps
@@ -61,29 +66,24 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src\components\admin\BulkActionToolbar.tsx::BulkActionToolbar
-- **params**: selectedCount, onStatusChange, onFeatureToggle, onDelete, onPriceAdjust, onClearSelection
-- **ic_degiskenler**:
-  - `showPricePanel` — Fiyat güncelleme panelinin görünürlüğünü kontrol eden boolean React state değeri
-  - `setShowPricePanel` — showPricePanel state'ini güncellemek için kullanılan setState fonksiyonu
-  - `priceMode` — Fiyat güncelleme modunu tutan state, 'percent' (yüzde) veya 'fixed' (sabit) değerlerini alır
-  - `setPriceMode` — priceMode state'ini güncelleyen setState fonksiyonu
-  - `priceValue` — Kullanıcının girdiği fiyat değerini string olarak tutan React state değeri
-  - `setPriceValue` — priceValue state'ini güncelleyen setState fonksiyonu
-  - `adminButtonPrimaryClass` — Import edilen, butonlara stil vermek için kullanılan CSS sınıfı
-- **Dönüş**: null | JSX.Element; seçili ürün sayısı 0 ise null, aksi halde toolbar JSX yapısını döndürür
+### [N1_NASIL] AST Pointer: src/components/admin/BulkActionToolbar.tsx::BulkActionToolbar
 
-### [N2_NASIL] AST Pointer: src\components\admin\BulkActionToolbar.tsx::fiyatGuncelleUygulaOnClick
-- **params**: (parametre yok)
+- **params**:
+  - `selectedCount` — Seçili ürün/hizmet sayısını belirtir; 0 ise bileşen render edilmez (early return)
+  - `onStatusChange` — Seçili öğelerin durumunu ('active'/'inactive') değiştirmek için çağrılan callback fonksiyonu
+  - `onFeatureToggle` — Seçili öğelerin öne çıkarma durumunu değiştirmek için çağrılan callback fonksiyonu
+  - `onDelete` — Seçili öğeleri silmek için çağrılan callback fonksiyonu
+  - `onPriceAdjust` — Toplu fiyat güncelleme işlemi tetiklemek için çağrılan callback fonksiyonu; priceMode ve numeric değeri parametre olarak alır
+  - `onClearSelection` — Tüm seçimleri temizlemek için çağrılan callback fonksiyonu
+
 - **ic_degiskenler**:
-  - `v` — Kullanıcının girdiği string tipindeki priceValue'nin float'a dönüştürülmüş sayısal hali
-  - `priceValue` — Üst kapsamdan erişilen, kullanıcının girdiği fiyat değerini tutan state
-  - `priceMode` — Üst kapsamdan erişilen, seçili fiyat güncelleme modunu tutan state
-  - `onPriceAdjust` — Üst parametrelerden alınan, toplu fiyat güncelleme işlemini tetikleyen callback fonksiyonu
-  - `setShowPricePanel` — Fiyat panelini kapatmak için kullanılan üst kapsamdaki setState fonksiyonu
-  - `setPriceValue` - İşlem sonrası fiyat girişini sıfırlamak için kullanılan üst kapsamdaki setState fonksiyonu
-  - `alert` — Tarayıcının yerleşik uyarı fonksiyonu, geçersiz sayısal giriş durumunda çağrılır
-- **Dönüş**: void | number; geçersiz giriş durumunda alert() dönüş değerini döndürür, başarılı işlemde hiçbir değer döndürmez
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; UI metinlerini çoklu dil desteğiyle render etmek için kullanılır
+  - `showPricePanel` — Fiyat güncelleme panelinin açılıp kapanma durumunu tutar (boolean state); toggle ile yönetilir
+  - `priceMode` — Fiyat güncelleme modunu belirler: `'percent'` (yüzde) veya `'fixed'` (sabit tutar); varsayılan `'percent'`
+  - `priceValue` — Fiyat güncelleme panelindeki input alanına girilen ham metin değerini tutar (string state); submit'te `parseFloat` ile number'a dönüştürülür
+  - `v` — `parseFloat(priceValue)` ile elde edilen sayısal fiyat değeri; `isNaN` kontrolünden geçer, geçemezse `alert` ile hata gösterilir ve fonksiyon durdurulur; geçerse `onPriceAdjust(priceMode, v)` ile üst bileşene iletilir
+
+- **Dönüş**: JSX (React elementi) — Seçili öğe sayısına göre toplu işlem toolbar'ı render eder; `selectedCount === 0` ise `null` döner (nothing rendered). Toolbar içinde durum değiştirme, öne çıkarma, toplu fiyat güncelleme ve silme butonları; fiyat paneli input'u ve seçim bilgisi bulunur. Yan etkiler: `setShowPricePanel(false)` ve `setPriceValue('')` ile fiyat paneli submit sonrası kapanır ve input temizlenir; geçersiz sayıda `alert()` çağrılır.
 
 ---
 

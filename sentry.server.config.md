@@ -3,8 +3,8 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\sentry.server.config.ts
-skeleton_hash: db3cd721d7dc97c7
-generated_at: 2026-06-12T10:45:33.441048+00:00
+skeleton_hash: d8820e7178110ab1
+generated_at: 2026-06-19T20:51:04.348971+00:00
 ---
 
 ## Genel Bakış

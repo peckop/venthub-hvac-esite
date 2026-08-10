@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\api\health\route.ts
-skeleton_hash: 0f2343958cb843a8
+skeleton_hash: edc5a3c3f240642c
 entity_hashes:
   func:GET: 3a9b2c312d190949
   overview: c73ec3ea3e37e6ac
-generated_at: 2026-05-29T12:17:34Z
+generated_at: 2026-06-19T20:46:34Z
 ---
 
 ## Genel Bakış
@@ -34,10 +34,6 @@ Bu modül, Next.js App Router yapısında bir API sağlık kontrolü endpoint'id
 
 ---
 
-**Not:** Fonksiyon gövdesi (implementasyon) paylaşılmadığından, response body yapısı, durum kodu değerleri veya iç bağımlılıklar hakkında kesin aksiyom üretilememektedir. Bu aksiyomlar yalnızca `GET()` fonksiyon imzası ve Next.js App Router sözleşme gereksinimlerine dayanmaktadır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### GET
@@ -52,6 +48,11 @@ Bu modül, Next.js App Router yapısında bir API sağlık kontrolü endpoint'id
 - `NextResponse` — JSON formatında yanıt içeren HTTP response nesnesi
   - `status`: string — Servisin durumunu belirtir, her zaman "ok" değerini döndürür
   - `timestamp`: string — ISO 8601 formatında UTC zaman damgası (örnek: "2024-01-15T10:30:00.000Z")
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next/server::NextResponse
 
 ---
 

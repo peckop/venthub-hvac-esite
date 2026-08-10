@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\Category3DIcon.tsx
-skeleton_hash: 830ba24147fdb570
+skeleton_hash: 64226a2189957df2
 entity_hashes:
   func:Category3DIcon: 80d3b8dc7d8aee4c
   overview: ea7403f0eb8a8cd0
   style_tokens: b8d757c80f7b09fe
-generated_at: 2026-06-18T19:45:12Z
+generated_at: 2026-06-19T20:47:27Z
 ---
 
 ## Genel Bakış
@@ -76,6 +76,19 @@ Modülün tek ve merkezi bileşenidir; gelen parametreleri işleyerek kategoriye
 - `scale?: number`
 - `modelType?: string`
 - `offsetContext?: string`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: Category3DIcon.tsx::Category3DIcon
+- **params**: (`categorySlug`, `hovered`, `isFrontCard`, `shouldShowTapHint`, `shouldShowDragHint`, `hintStage`, `DetailedModel`, `scale`, `modelType`, `offsetContext`)
+- **ic_degiskenler**:
+  - `t` — useI18n hook'unun döndürdüğü çeviri fonksiyonu, HTML içindeki metinleri uluslararasılaştırmak için kullanılır (örn. `t('products.category3DIcon.dragHint')`).
+  - `meshRef` — useRef ile oluşturulmuş bir referans, Three.js Group nesnesini tutar. useFrame içinde rotation güncellemeleri için kullanılır.
+  - `placement` — getModelPlacement fonksiyonuyla hesaplanan konumlandırma bilgisi nesnesi. rotation, position ve scale özelliklerini içerir, SmartCenterScale ve group elemanlarının pozisyonunu belirler.
+  - `showTapHint` — shouldShowTapHint ve hintStage === 'tap' koşullarının birleşimiyle hesaplanan mantıksal değer, tıklama ipucunun gösterilip gösterilmeyeceğini belirler.
+- **Dönüş**: JSX Elemanı (React.ReactNode) — Category3DIcon bileşeninin render ettiği 3D sahne ve UI hint elemanları.
 
 ---
 

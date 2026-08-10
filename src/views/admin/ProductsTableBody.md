@@ -12,7 +12,7 @@ entity_hashes:
   func:productsFetcher: 44e6549fbd97ce20
   overview: 8d046931e8fa02e4
   style_tokens: 747b965cceb90b06
-generated_at: 2026-06-13T21:06:50Z
+generated_at: 2026-06-19T20:49:43Z
 ---
 
 ## Genel Bakış
@@ -70,6 +70,48 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve sabitlerin yap
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminEmptyState::AdminEmptyState
+- import: ../../components/admin/AdminToolbar::AdminToolbar
+- import: ../../components/admin/BulkActionToolbar::BulkActionToolbar
+- import: ../../components/admin/ExportMenu::ExportMenu
+- import: ../../components/admin/data-table/DataTableKit::DataTableKit
+- import: ../../components/admin/data-table/types::type { AdminColumn }
+- import: ../../components/admin/products/ProductCsvImport::ProductCsvImport
+- import: ../../components/admin/products/ProductFormModal::ProductFormModal
+- import: ../../components/admin/products/ProductHealthBadge::ProductHealthBadge
+- import: ../../hooks/useAdminTable::type FetchParams
+- import: ../../hooks/useAdminTable::type FetchResult
+- import: ../../hooks/useAdminTable::useAdminTable
+- import: ../../hooks/useRole::useRole
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/format::formatCurrency
+- import: ../../lib/ensureSessionFresh::ensureSessionFresh
+- import: ../../lib/type-converters::toUIProductList
+- import: ../../lib/type-converters::type DomainProduct
+- import: ../../types/database.types::type { Database }
+- import: ../../types/db-rows::type { DbProduct }
+- import: @/components/ui/VentImage::VentImage
+- import: @/lib/admin/mutateWithAudit::AdminPermissionError
+- import: @/lib/admin/mutateWithAudit::mutateWithAudit
+- import: @/lib/services/product.service::adminSearchProducts
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @/types/db-rows::type { DbAdminSearchResult }
+- import: @supabase/supabase-js::type { SupabaseClient }
+- import: lucide-react::PackageSearch
+- import: lucide-react::Pencil
+- import: lucide-react::Plus
+- import: lucide-react::SearchX
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
+- import: sonner::toast
+
+---
+
 ## INTERFACES
 
 ### CategoryOpt
@@ -121,78 +163,6 @@ type ProductRow = DomainProduct & { cover_path?: string }
   - `results` — `Promise.all` ile paralel çalıştırılan `product_images` sorgularının sonuç dizisi; her eleman `{ data }` yapısındadır
   - `map` — `Record<string, string>`; `product_id` → `cover_path` eşlemesi, her ürünün ilk görselini tutar
 - **Dönüş**: `Promise<ProductRow[]>` — Orijinal satırlara `cover_path` alanı eklenmiş olarak döner; hata durumunda orijinal satırlar değişiksiz döner
-
----
-
-### [N2_NASIL] AST Pointer: `src/views/admin/ProductsTableBody.tsx`::productsFetcher
-- **params**: `(supabase: SupabaseClient<Database>, params: FetchParams)`
-- **ic_degiskenler**:
-  - `category` — `params.filters.category?.[0]` değerinden çıkarılan ilk kategori ID'si; filtreleme için kullanılır
-  - `featured` — `params.filters.featured?.[0] === '1'` karşılaştırmasıyla elde edilen boolean; öne çıkan ürün filtresi
-  - `statuses` — `params.filters.status ?? []` ile alınan durum filtresi dizisi; boşsa tüm durumlar dahil
-  - `term` — `params.query.trim()` ile temizlenmiş arama terimi; boşsa normal query yolu, doluysa FTS yolu seçilir
-  - `offset` — `(params.page - 1) * params.pageSize` hesaplamasıyla elde edilen sayfalama başlangıç indeksi
-  - `results` — `adminSearchProducts` API çağrısının sonucu; full-text arama modunda kullanılır
-  - `filtered` — `results` dizisinin durum ve öne çıkan filtrelerinden geçirilmiş hali; FTS yolunda client-süzme uygulanır
-  - `rows` — `filtered` dizisinin `toUIProductList` ile `ProductRow[]` formatına dönüştürülmüş hali
-  - `totalMatched` — `results[0].total_count` veya `results.length` değerinden hesaplanan toplam eşleşme sayısı; yaklaşık olabilir
-  - `withCovers` — `attachCovers` ile görselleri eklenmiş nihai satır dizisi
-  - `query` — `supabase.from('products').select(...)` ile oluşturulan sorgu oluşturucu; filtre, sıralama ve sayfalama zincirlenir
-  - `sortKey` — `params.sort?.key` sıralama anahtarı
-  - `col` — `SORT_COLUMN_MAP[sortKey]` ile haritalanan veritabanı sütun adı; sıralama için kullanılır
-  - `ascending` — `params.sort?.dir === 'asc'` karşılaştırmasıyla belirlenen sıralama yönü
-  - `data` — Supabase sorgusundan dönen ham veri dizisi
-  - `error` — Sorgu hatası; varsa `throw` edilir
-  - `count` — Supabase'den dönen toplam satır sayısı; sayfalama için kullanılır
-- **Dönüş**: `Promise<FetchResult<ProductRow>>` — `{ rows: ProductRow[], totalMatched: number }` yapısı
-
----
-
-### [N3_NASIL] AST Pointer: `src/views/admin/ProductsTableBody.tsx`::ProductSpecsRow
-- **params**: `({ productId })` — Tek bir `productId` string parametresi alır
-- **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; UI metinlerini çevirir
-  - `specs` — `useState<Record<string, unknown> | null>` state'i; ürünün `technical_specs` alanını tutar
-  - `entries` — `specs` nesnesinin `Object.entries()` ile diziye dönüştürülmüş hali; `[key, val]` çiftleri olarak render edilir
-  - `active` — useEffect içindeki cleanup flag'i; bileşen unmount edildiğinde state güncellemesini engeller
-  - `data` — `supabaseBrowserClient.from('products').select('technical_specs')...` sorgusundan dönen `technical_specs` verisi
-- **Dönüş**: `React.FC` — Teknik özellikleri grid formatında gösteren JSX; boşsa boş durum mesajı gösterir
-
----
-
-### [N4_NASIL] AST Pointer: `src/views/admin/ProductsTableBody.tsx`::InlineNumberCell
-- **params**: `({ value, display, widthClass, low, ariaLabel, onSave })` — Düzenlenebilir sayı hücresi için props
-- **ic_degiskenler**:
-  - `editing` — `useState(false)` boolean state'i; hücrenin düzenleme modunda olup olmadığını tutar
-  - `draft` — `useState(value)` string state'i; input'taki geçerli düzenleme değerini tutar
-  - `inputRef` — `useRef<HTMLInputElement>(null)` referansı; düzenleme moduna geçildiğinde input'a odaklanmak için kullanılır
-  - `num` — `parseFloat(draft)` ile parse edilmiş sayısal değer; commit sırasında `isNaN` kontrolü yapılır
-- **Dönüş**: `React.FC` — Düzenleme modunda input, normal modda button JSX'i döner
-
----
-
-### [N5_NASIL] AST Pointer: `src/views/admin/ProductsTableBody.tsx`::ProductsTableBody
-- **params**: Yok
-- **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; tüm UI metinleri için kullanılır
-  - `supabase` — `supabaseBrowserClient` global client instance'ı; tüm veritabanı işlemleri için kullanılır
-  - `cats` — `useState<CategoryOpt[]>` state'i; kategoriler listesini tutar
-  - `setCats` — Kategori listesini güncelleyen setter fonksiyonu
-  - `catsMap` — `useMemo` ile oluşturulan `Map<string, string>`; kategori ID → kategori adı eşlemesi; tablo hücrelerinde isim gösterimi için kullanılır
-  - `activeStatuses` — Durum filtresinde aktif olan durumların dizisi
-  - `setFilter` — Filtreleri güncelleyen setter fonksiyonu; parametre olarak filtre adı ve değer alır
-  - `setQuery` — Arama sorgusunu sıfırlayan setter fonksiyonu
-  - `hasWriteAccess` — Boolean; kullanıcının yazma izni olup olmadığını belirler, hücre editörlerini ve silme butonlarını gösterir
-  - `table` — Tablo instance'ı; `reload()`, `fetchAllForExport()`, `selection.selectedIds`, `selection.clear()` metodları kullanılır
-  - `isModalOpen` — Boolean state; ürün ekleme/düzenleme modalının açık olup olmadığını tutar
-  - `setIsModalOpen` — Modal durumunu güncelleyen setter
-  - `editingId` — `string | null` state; düzenlenen ürünün ID'sini tutar
-  - `setEditingId` — Düzenlenen ürün ID'sini güncelleyen setter
-  - `cancelled` — useEffect cleanup flag'i; kategori yükleme async işleminin iptal durumunu tutar
-  - `data` — Kategori listesi sorgusundan dönen `id, name` verisi
-  - `error` — Kategori listesi sorgu hatası
-  - `removed` — `removeSingle` handler içindeki silme işlemi sonucu
-- **Dönüş**: `React.FC` — Ürün tablosunu, filtreleri, toplu işlem butonlarını ve modal'ı içeren ana admin paneli JSX'i
 
 ---
 

@@ -8,7 +8,7 @@ entity_hashes:
   func:BulkBar: ba30c4958f369a2e
   overview: 3bff9d3fdbf00dd5
   style_tokens: dd2e832a7f2c05f0
-generated_at: 2026-06-13T14:59:22Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -61,6 +61,11 @@ Bu modül, seçili öğeler için toplu işlem çubuğu (bulk action bar) göste
 - `onClear`: `() => void` — Seçimi temizleme butonuna tıklandığında çağrılan geri çağırma fonksiyonu. Seçili tüm öğelerin seçimini kaldırmak için kullanılır.
 
 **Dönüş**: `React.ReactNode` — Seçim sayısına bağlı olarak `null` veya JSX ile oluşturulmuş bir React düğümü döner. Seçim sayısı sıfır olduğunda `null`, sıfırdan farklı olduğunda sticky araç çubuğu JSX'i döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
 
 ---
 

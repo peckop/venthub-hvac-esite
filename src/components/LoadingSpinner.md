@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LoadingSpinner.tsx
-skeleton_hash: 1429988b8b8756c2
+skeleton_hash: 22d19cd5aa2d4cf9
 entity_hashes:
   func:LoadingSpinner: 420e244c3ab22ba8
   overview: 055c22213f5fb1f9
   style_tokens: b21c3354ed86bc3e
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-19T20:47:09Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - size: string — Spinner'ın boyutunu belirler; varsayılan değer `'md'` (medium) olur.  
 - fullScreen: boolean — Spinner'ın ekranı kaplayıp kaplamayacağını belirler; varsayılan değer `true` olur.  
 **Dönüş**: React.FC<LoadingSpinnerProps> — JSX elementi olarak render edilebilir bir React fonksiyonel bileşeni döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: react::React
 
 ---
 

@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\sitemap.ts
-skeleton_hash: a821b6a29a446127
+skeleton_hash: 926aac49c080c5ba
 entity_hashes:
   func:sitemap: 6471d8775000e352
   overview: 9af1926cebf28d0e
-generated_at: 2026-06-08T10:08:12Z
+generated_at: 2026-06-19T20:46:34Z
 ---
 
 ## Genel Bakış
@@ -58,6 +58,17 @@ Bu fonksiyon herhangi bir parametre almaz. Tüm yapılandırma değerleri fonksi
 - `changefreq`: `string` — Arama motorlarına sayfanın güncellenme sıklığını bildirir. Statik rotalar için `daily`, kategori ve marka rotaları için `weekly`, ürün rotaları için `daily` olarak ayarlanmıştır.
 - `priority`: `number` — Sayfanın göreli önceliğini belirtir. Anasayfa `1.0` ile en yüksek önceliğe sahiptir; ürün rotaları `0.9`, statik rotalar `0.8`, kategoriler `0.7` ve markalar `0.6` değerlerine sahiptir.
 - `alternates.languages`: `Record<string, string>` — Her URL'in Türkçe (`tr`) ve İngilizce (`en`) karşılıklarını içeren dil haritası. Arama motorlarına alternatif dil sürümlerini bildirmek için kullanılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../config/siteUrl::SITE_URL
+- import: ../data/brands::HVAC_BRANDS
+- import: ../lib/services/category.service::getCategories
+- import: ../lib/services/product.service::getAllProducts
+- import: ../lib/supabase/static::supabaseStaticClient
+- import: ../utils/routes::Routes
+- import: next::MetadataRoute
 
 ---
 

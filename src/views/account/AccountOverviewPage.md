@@ -5,59 +5,53 @@ namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountOverviewPage.tsx
 skeleton_hash: e641cd80fb2ebb0a
 entity_hashes:
-  func:AccountOverviewPage: 2fd2e5b9d82d2f19
-  overview: 55e40bf9d68b1dff
+  func:AccountOverviewPage: e6c9a31f87c7387a
+  overview: 0705893c7853ddb8
   style_tokens: 98f0536966ac7e31
-generated_at: 2026-06-14T16:23:06Z
+generated_at: 2026-06-19T20:48:51Z
 ---
 
 ## Genel Bakış
-VentHub HVAC uygulamasının Account modülü içinde yer alan AccountOverviewPage, kullanıcının kişisel hesap yönetimine dair tüm temel bilgileri görselleştirdiği merkezi dashboard sayfasıdır. Profil bilgileri, sipariş geçmişi, aktif kargo durumları ve kayıtlı adreslerini tek bir entegre arayüzde sunarak kullanıcıya kapsamlı bir hesap özeti sağlar. Sayfa, hesapla ilgili kritik verileri sunucudan çekip düzenleyerek bilgiye hızlı erişimi amaçlar.
+AccountOverviewPage, VentHub HVAC uygulamasında kullanıcının kişisel hesap yönetimine dair tüm temel bilgileri görselleştirdiği merkezi dashboard sayfasıdır. Profil bilgileri, sipariş geçmişi, aktif kargo durumları ve kayıtlı adreslerini tek bir entegre arayüzde sunarak kullanıcıya kapsamlı bir hesap özeti sağlar. Bu sayfa, kimlik doğrulama, backend API'ları ve yönlendirme bağlamı gibi kritik dış sistemlere bağımlı olup, verileri işleyerek ve hata durumlarını yöneterek kullanıcıya bilgiye hızlı erişimi amaçlar.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni
-Kullanıcının hesap özetini oluşturan ve tarayıcıda render edilen temel React bileşenidir. Verileri işler, hata ve yükleme durumlarını yönetir ve düzenli bir dashboard aracılığıyla kullanıcıya sunar.
+### Sayfa Bileşeni (Dashboard)
+Kullanıcının hesap özetini oluşturan ve tarayıcıda render edilen temel React bileşenidir. Verileri işler, yükleme ve hata durumlarını yönetir ve düzenli bir dashboard aracılığıyla profil, sipariş, kargo ve adres bilgilerini sunar. Kimlik doğrulama durumuna göre içerik gösterir veya yönlendirme yapar.
 - AccountOverviewPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Fonksiyon gövdesi paylaşılmadığı için, sadece fonksiyon imzası ve modül bağlamına dayalı çıkarılabilecek minimum mimari varsayımlar şunlardır:
 
-Bu modül, parametresiz bir React sayfa bileşeni olup, çalışması için aşağıdaki mimari varsayımlara ihtiyaç duyar:
+[Aksiyom 1]: Eğer AccountOverviewPage fonksiyonu çağrıldığında geçerli bir React bileşen döndürülmez veya JSX içeriği oluşturulamazsa, sayfa render edilemez ve uygulama hata verir.
 
-[Aksiyom 1]: Eğer kullanıcı kimlik doğrulaması (authentication) yapılmamışsa, hesap özet sayfasının verilerini göstermesi beklenemez — kullanıcı oturumu yoksa sayfa içerikleri boş kalır veya yönlendirme yapılır.
+[Aksiyom 2]: Eğer bu fonksiyon bir React bileşeni olarak kullanılacaksa, React veya türevi bir UI kütüphanesi ortamda mevcut olmalıdır; yoksa bileşen çalışmaz.
 
-[Aksiyom 2]: Eğer hesap özet verilerini sağlayan backend API uç noktaları (sipariş geçmişi, profil bilgileri, adres listesi) erişilebilir değilse, ilgili dashboard bileşenleri veri gösteremez.
-
-[Aksiyom 3]: Eğer React Router veya eşdeğeri yönlendirme bağlamı (routing context) mevcut değilse, sayfa içi navigasyon linkleri (sipariş detayı, adres yönetimi vb.) çalışmaz.
-
-[Aksiyom 4]: Eğer kullanıcı oturum bilgilerini sağlayan auth context/provider üst seviyede bağlanmamışsa, bileşen kullanıcının profil bilgilerine erişemez.
-
-[Aksiyom 5]: Eğer modül Tailwind CSS veya stil sistemi (style_tokens) yüklenmemişse, dashboard arayüzü beklenen görsel formatta render edilmez.
+**Not:** Fonksiyon gövdesi (implementasyon) paylaşılmadığı için, içindeki state kullanımı, veri çekme mekanizması, hata yönetimi, prop bağımlılıkları veya alt bileşen ihtiyacı gibi detaylar hakkında kesin aksiyomlar üretilememektedir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### AccountOverviewPage
+**Ne yapar**: Kullanıcının hesap özetini, siparişlerini, aktif kargo durumunu ve profil bilgilerini tek bir sayfada gösteren React bileşenidir. Kullanıcı girişinin ardından tüm hesap verilerini çekip düzenli bir arayüzde sunar.
 
-**Ne yapar**: Kullanıcının hesap özet sayfasını render eder. Kullanıcının aktif ve tamamlanmış siparişlerini, toplam sipariş hacmini, varsayılan adreslerini ve kargo durumunu gösteren bir dashboard bileşenidir.
-
-**Nasıl yapar**: Bileşen, `useAuth` hook'u ile oturum açmış kullanıcı bilgisini, `useI18n` hook'u ile dil ve çeviri fonksiyonunu, `useRouter` hook'u ile sayfa yönlendirmesini alır. `useState` ile adresler, siparişler ve yükleme durumu için state'ler oluşturur. `useEffect` hook'u içinde `listAddresses` fonksiyonu ile kullanıcı adreslerini, Supabase veritabanından `venthub_orders` tablosunu sorgulayarak siparişleri çeker. İlk sorgu başarısız olursa fallback olarak daha az alanla tekrar dener. Siparişler üzerinden aktif sipariş sayısı, tamamlanmış sipariş sayısı ve toplam hacim hesaplamaları yapılır. `getShipStatus` yardımcı fonksiyonu ile kargo durumu belirlenir, `activeShipStatusBadge` fonksiyonu ile duruma göre renkli rozet JSX'i üretilir. Yükleme durumunda animasyonlu spinner, yükleme tamamlandığında ise Bento Grid yapısında metric kartları, kargo takip widget'ı, son siparişler listesi, adres kartı, güvenlik merkezi ve destek kartı render edilir.
+**Nasıl yapar**: Fonksiyon, React hooks (useState, useEffect) ve Supabase client kullanarak veritabanından asenkron veri çeker. `useEffect` içinde `mounted` flag ile bellek sızıntısını önler. Siparişleri çekerken ilk istek başarısız olursa fallback bir sorgu ile daha az alan döndürerek hata toleransı sağlar. Adres ve sipariş verilerini state'e kaydeder, ardından istatistikleri (toplam ciro, aktif sipariş sayısı, tamamlanan sipariş sayısı) hesaplar. En son aktif siparişin kargo durumunu belirler ve buna göre UI bileşenlerini (rozetler, adım göstericileri) dinamik olarak render eder. `useI18n` ile çoklu dil desteği, `useRouter` ile yönlendirme sağlar.
 
 **Parametreler**:
-- Bu bileşen herhangi bir props almaz. Veri ihtiyacını React hook'ları (`useAuth`, `useI18n`, `useRouter`) ve doğrudan Supabase istemcisi üzerinden karşilar.
+- Fonksiyon parametre almaz (React bileşeni).
 
-**Dönüş**: `JSX.Element` — Yükleme durumunda animasyonlu spinner içeren bir `div`, yükleme tamamlandığında ise tam sayfa dashboard JSX'ini döndürür. Dashboard; karşılama kartı, üç metric kartı (aktif sipariş, tamamlanan sipariş, toplam hacim), kargo takip widget'ı, son siparişler listesi, adres özeti kartı, güvenlik merkezi kartı ve destek kartı bölümlerinden oluşur.
+**Dönüş**: JSX (React elementi) — Yüklenme durumunda spinner, yükleme tamamlandığında ise hesap özetini gösteren kartlar, sipariş listesi, adres kartları ve hızlı işlem düğmelerinden oluşan tam sayfa düzeni.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../hooks/useAuth::useAuth
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
 - import: ../../i18n/datetime::formatDate
 - import: ../../i18n/format::formatCurrency
-- import: ../../utils/routes::Routes
 - import: @/lib/services/address.service::listAddresses
 - import: @/lib/supabase/client::supabaseBrowserClient
 - import: @/types/ui-models::type { UserAddress }
@@ -88,79 +82,100 @@ Bu modül, parametresiz bir React sayfa bileşeni olup, çalışması için aşa
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::useEffectCallback
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::useEffect callback
+- **params**: (yok — useEffect callback, parametre almaz)
 - **ic_degiskenler**:
-  - `mounted` — lifecycle flag; async state update'lerin component unmount sonrası gerçekleşmemesini sağlar, cleanup'ta `false` yapılır
+  - `mounted` — cleanup flag; useEffect unmount edildiğinde false yapılır, state güncellemelerini engeller
+  - `load` — asenkron fonksiyon; adres ve sipariş verilerini yükler
+  - `user` — useAuth'tan gelen mevcut kullanıcı nesnesi; yoksa load erken döner
+  - `setLoading` — yükleme durumunu güncelleyen state setter
+  - `setAddresses` — adres listesini state'e yazan setter
+  - `setOrders` — sipariş listesini state'e yazan setter
+  - `orderData` — `ShipmentRecord[]` tipinde; çekilen sipariş verilerini tutar, başlangıçta boş dizi
 - **Dönüş**: cleanup fonksiyonu döner → `() => { mounted = false }`
 
 ---
 
-### [N2_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::load
-- **params**: (parametre yok)
+### [N2_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::load (iç fonksiyon)
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `addrData` — `listAddresses(supabase)` çağrısının sonucu; kullanıcının adres listesi, `setAddresses` ile state'e yazılır
-  - `orderData` — `ShipmentRecord[]` tipinde akümülatör; supabase sorgusundan gelen veya fallback'ten elde edilen sipariş kayıtları tutulur, başlangıçta boş dizi `[]`
-  - `data` — supabase `venthub_orders` tablosundan gelen birincil sorgu sonucu (satırlar)
-  - `error` — supabase birincil sorgu hatası; `PGRST100` kodu ile kontrol edilip throw edilir
-  - `fallback` — birincil sorgu başarısız olduğunda çalıştırılan yedek supabase sorgusu sonucu; sadece temel alanları (`id`, `created_at`, `total_amount`, `status`, `order_number`) çeker
-  - `e` — üst düzey catch'te yakalanan hata nesnesi; `console.error('Overview load error', e)` ile loglanır
-- **Erişim Dış Değişkenler**: `user` (auth objesi, `user.id` kullanılır), `setLoading`, `setAddresses`, `setOrders` (state setter'ları), `supabase` (browser client), `mounted` (lifecycle flag)
-- **Dönüş**: yok (void; tüm işlemler side-effect olarak state setter'ları üzerinden gerçekleşir)
+  - `user` — outer scope'tan gelen kullanıcı nesnesi; yoksa fonksiyon erken döner
+  - `setLoading` — state setter, yükleme durumunu true yapar
+  - `addrData` — `listAddresses(supabase)` çağrısından dönen adres verisi
+  - `setAddresses` — outer scope state setter, adresleri yazar
+  - `orderData` — `ShipmentRecord[]`, boş dizi ile başlar; supabase sorgusundan dönen veri veya fallback verisi atanır
+  - `supabase` — Supabase browser client instance'ı
+  - `data` — supabase `.from('venthub_orders').select(...)` sorgusundan dönen satırlar
+  - `error` — supabase sorgusundan dönen hata nesnesi; `error.code === 'PGRST100'` kontrolü yapılır
+  - `fallback` — birincil sorgu hata verdiğinde alternatif sorgu sonucu (daraltılmış select ile)
+  - `d` — fallback.map callback parametresi; `Record<string, unknown>` tipinde tek bir sipariş satırı
+  - `e` — catch bloğu hata nesnesi; `console.error` ile loglanır
+- **Dönüş**: yok (void; state'leri side-effect olarak günceller)
 
 ---
 
-### [N3_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::fallbackMapCallback
-- **params**: `d` — `Record<string, unknown>` tipinde tek bir fallback sipariş satırı
-- **ic_degiskenler**:
-  - (ek değişken yok)
-- **Erişim Dış Değişkenler**: yok
-- **Dönüş**: `{ ...d, carrier: null, tracking_number: null, shipped_at: null, delivered_at: null }` — orijinal satıra eksik kargo alanlarını `null` olarak ekleyerek `ShipmentRecord` formatına dönüştürür
+### [N3_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::fallback map callback
+- **params**: `d` — `Record<string, unknown>` tipinde, fallback sorgusundan gelen tek bir sipariş satırı
+- **ic_degiskenler**: (yok — inline spread ile nesne oluşturulur)
+- **Dönüş**: `ShipmentRecord` — orijinal `d` nesnesini spread edip `carrier: null`, `tracking_number: null`, `shipped_at: null`, `delivered_at: null` alanlarını ekler
 
 ---
 
 ### [N4_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::getShipStatus
-- **params**: `row` — `ShipmentRecord | undefined`, opsiyonel sipariş satırı
+- **params**: `row?: ShipmentRecord` — opsiyonel sipariş satırı
 - **ic_degiskenler**:
-  - (ek değişken yok; tüm kontroller parametre üzerinden yapılır)
-- **Dönüş**: `'delivered' | 'shipped' | 'preparing'` — siparişin teslimat durumu string'ini döner; `row` tanımsızsa `'preparing'`, `delivered_at` varsa veya status `'delivered'` ise `'delivered'`, `shipped_at`/`tracking_number` varsa veya status `'shipped'` ise `'shipped'`, aksi halde `'preparing'`
+  - `row.delivered_at` — teslimat tarihi; truthy ise `'delivered'` döner
+  - `row.status` — sipariş durum stringi; `.toLowerCase()` ile `'delivered'` kontrol edilir
+  - `row.shipped_at` — kargoya verilme tarihi; truthy ise `'shipped'` döner
+  - `row.tracking_number` — kargo takip numarası; truthy ise `'shipped'` döner
+- **Dönüş**: `'delivered' | 'shipped' | 'preparing'`
 
 ---
 
-### [N5_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::statusBadge
-- **params**: `status` — `'delivered' | 'shipped' | 'preparing'`
+### [N5_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::activeShipStatusBadge
+- **params**: `status: 'delivered' | 'shipped' | 'preparing'` — sipariş durumu
 - **ic_degiskenler**:
-  - (ek değişken yok; switch-case ile doğrudan JSX döner)
-- **Erişim Dış Değişkenler**: `t` (i18n çeviri fonksiyonu), `CheckCircle`, `Truck`, `Clock` (ikon bileşenleri import'tan)
-- **Dönüş**: JSX `<span>` elemanı — duruma göre renk ve ikon ile sipariş durum rozeti (yeşil/turuncu/mor badge)
+  - `t` — i18n çeviri fonksiyonu (useTranslation veya benzeri hook'tan gelir); `t('account.overview.shipStatus.delivered')`, `t('account.overview.shipStatus.shipped')`, `t('account.overview.shipStatus.preparing')` çağrıları yapılır
+  - `CheckCircle` — import edilen ikon bileşeni; delivered durumunda kullanılır
+  - `Truck` — import edilen ikon bileşeni; shipped durumunda kullanılır
+  - `Clock` — import edilen ikon bileşeni; preparing durumunda kullanılır
+- **Dönüş**: JSX `<span>` elementi — renk kodlu durum rozeti
 
 ---
 
-### [N6_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::getShipStepIndex
-- **params**: `status` — `'delivered' | 'shipped' | 'preparing'`
-- **ic_degiskenler**:
-  - (ek değişken yok)
-- **Dönüş**: `number` — `'delivered'` → `2`, `'shipped'` → `1`, diğer → `0`; siparişin hangi adımda olduğunu indeks olarak döner
+### [N6_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::getActiveStepIdx
+- **params**: `status: 'delivered' | 'shipped' | 'preparing'` — sipariş durumu
+- **ic_degiskenler**: (yok — doğrudan koşul kontrolleri)
+- **Dönüş**: `number` — `'delivered'` → 2, `'shipped'` → 1, diğer → 0
 
 ---
 
-### [N7_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::shipStepsMapCallback
-- **params**: `step` — `{ key: string, icon: ComponentType, label: string }` tipinde adım nesnesi; `idx` — `number` dizin indeksi
+### [N7_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::shipSteps map callback
+- **params**: `step` — tek bir adım nesnesi (`{ key, icon, label }` yapısında`); `idx` — dizi indeksi
 - **ic_degiskenler**:
-  - `active` — `boolean`, bu adımın aktif olup olmadığı; `idx <= activeStepIdx` koşulu ile belirlenir
-  - `StepIcon` — `step.icon` referansı; adım ikonu bileşeni, `<StepIcon size={20} />` olarak render edilir
-- **Erişim Dış Değişkenler**: `activeStepIdx` (mevcut aktif adım indeksi), `shipSteps` (tüm adımlar dizisi, uzunluk kontrolünde `shipSteps.length - 1` kullanılır)
-- **Dönüş**: `<React.Fragment>` — adım ikonu + label + aradaki bağlayıcı çizgi JSX'ini döner; aktifliğe göre renk/scale değişimi uygulanır
+  - `active` — `boolean`; `idx <= activeStepIdx` koşulu ile adımın aktif olup olmadığını belirler
+  - `StepIcon` — `step.icon` değerinden alınan ikon bileşeni; JSX'te `<StepIcon size={20} />` olarak render edilir
+  - `activeStepIdx` — outer scope'tan gelen aktif adım indeksi; hangi adımların aktif olduğunu belirler
+  - `shipSteps` — outer scope'tan gelen adım dizisi; `.length` ile toplam adım sayısı alınır (son adımda ayırıcı çizgi render edilmez)
+- **Dönüş**: `<React.Fragment>` — adım ikonu, etiketi ve adım ayırıcı çizgi barındırır
 
 ---
 
-### [N8_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::ordersMapCallback
-- **params**: `o` — `ShipmentRecord` tipinde tek bir sipariş kaydı
+### [N8_NASIL] AST Pointer: src/views/account/AccountOverviewPage.tsx::orders map callback
+- **params**: `o` — `ShipmentRecord` tipinde tek bir sipariş nesnesi
 - **ic_degiskenler**:
-  - `isDelivered` — `boolean`, siparişin teslim edilip edilmediğini `o.status.toLowerCase() === 'delivered'` kontrolü ile belirler
-  - `code` — `string`, sipariş numarası; `o.order_number` varsa `#${o.order_number.split('-')[1]}`, yoksa `#${o.id.slice(-8).toUpperCase()}` formatında oluşturulur
-- **Erişim Dış Değişkenler**: `t` (i18n çeviri), `formatCurrency` (para birimi formatlama), `formatDate` (tarih formatlama), `lang` (dil kodu), `router` (next/navigation useRouter), `activeShipStatusBadge` (durum rozeti render fonksiyonu), `getShipStatus` (durum hesaplama), `Routes` (yönlendirme route'ları)
-- **Dönüş**: JSX `<div>` — sipariş satırı kartı; sipariş ikonu, numara, tutar, tarih, durum rozeti ve detay butonu içeren tam bir liste elemanı
+  - `isDelivered` — `boolean`; `o.status.toLowerCase() === 'delivered'` ile siparişin teslim edilip edilmediğini kontrol eder
+  - `code` — `string`; sipariş gösterim kodu — `o.order_number` varsa `#${o.order_number.split('-')[1]}` oluşturulur, yoksa `#${o.id.slice(-8).toUpperCase()}`
+  - `formatCurrency` — import edilen para birimi formatlama fonksiyonu; `formatCurrency(Number(o.total_amount), lang, { maximumFractionDigits: 0 })` çağrılır
+  - `lang` — outer scope'tan gelen mevcut dil kodu; formatCurrency ve formatDate'e传递 edilir
+  - `formatDate` — import edilen tarih formatlama fonksiyonu; `formatDate(o.created_at, lang)` çağrılır
+  - `Routes` — outer scope'tan gelen route nesnesi; `Routes.account.orderDetail(o.id)` ile sipariş detay URL'i oluşturulur
+  - `router` — `useRouter()` hook'undan gelen Next.js router nesnesi; `router.push(...)` ile navigasyon yapılır
+  - `t` — i18n çeviri fonksiyonu; `t('account.overview.orderNumber', { code })` çağrılır
+  - `activeShipStatusBadge` — outer scope'tan gelen fonksiyon; `getShipStatus(o)` sonucunu badge'e dönüştürür
+  - `getShipStatus` — outer scope'tan gelen fonksiyon; sipariş satırından durum stringi çıkarır
+  - `Package` — import edilen ikon bileşeni; sipariş kart ikonu olarak render edilir
+- **Dönüş**: JSX `<div>` — sipariş kartı; sipariş numarası, tutar, tarih, durum rozeti ve detay butonu içerir
 
 ---
 

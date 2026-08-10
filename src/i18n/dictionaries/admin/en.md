@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\en.ts
 skeleton_hash: 0fc6f1eeba141f7a
 entity_hashes:
   overview: 3d02093c393d55b1
-generated_at: 2026-06-13T15:04:26Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -27,11 +27,35 @@ Bu modül veri ihracatı (data export) yapan bir sözlük modülüdür. Fonksiyo
 
 ---
 
-*Not: Bu modül salt veri (dictionary) modülü olduğundan, iş mantığı veya hesaplama varsayımı içermemektedir. Aksiyomlar yalnızca dışa aktarım yapısına ve veri bütünlüğüne yöneliktir.*
+## FONKSİYON DETAYLARI
 
 ---
 
-## FONKSİYON DETAYLARI
+## İTHALATLAR (IMPORTS)
+- import: ./a11y.en::a11y
+- import: ./audit.en::audit
+- import: ./authority.en::authority
+- import: ./categories.en::categories
+- import: ./common.en::common
+- import: ./coupons.en::coupons
+- import: ./dashboard.en::dashboard
+- import: ./dataTable.en::dataTable
+- import: ./errorGroups.en::errorGroups
+- import: ./errors.en::errors
+- import: ./inventory.en::inventory
+- import: ./logistics.en::logistics
+- import: ./menu.en::menu
+- import: ./movements.en::movements
+- import: ./orders.en::orders
+- import: ./products.en::products
+- import: ./returns.en::returns
+- import: ./search.en::search
+- import: ./settings.en::settings
+- import: ./titles.en::titles
+- import: ./toolbar.en::toolbar
+- import: ./ui.en::ui
+- import: ./users.en::users
+- import: ./webhooks.en::webhooks
 
 ---
 
@@ -50,33 +74,6 @@ Bu modül veri ihracatı (data export) yapan bir sözlük modülüdür. Fonksiyo
 ## AST POINTERS
 
 Bu dosyada **fonksiyon gövdesi bulunmamaktadır**. Dosya, sadece import edilen sözlük nesnelerini bir araya getiren bir i18n sözlük birleştirme dosyasıdır.
-
----
-
-### Dosya Yapısı Özeti
-
-**Dosya**: `src/i18n/dictionaries/admin/en.ts`
-
-**İçerik**: Sadece import deklarasyonları ve bir `admin` sabit nesnesi export'u bulunmaktadır.
-
-**Import'lar**:
-- `a11y` — from `./a11y.en`
-- `audit` — from `./audit.en`
-- `authority` — from `./authority.en`
-- `categories` — from `./categories.en`
-- `common` — from `./common.en`
-- `coupons` — from `./coupons.en`
-- `dashboard` — from `./dashboard.en`
-- `dataTable` — from `./dataTable.en`
-- `errorGroups` — from `./errorGroups.en`
-- `errors` — from `./errors.en`
-
-**Sabitler**:
-- `admin` (object) — Tüm import edilen sözlüklerin birleştirildiği ana admin sözlük nesnesi
-
----
-
-> **Not**: Bu dosya `"use strict"` veya herhangi bir fonksiyon/barındırmamaktadır. AST Pointer üretimi için fonksiyon gövdesi gerekli olup, bu dosyada analiz edilecek fonksiyon bulunmamaktadır.
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\brands\page.tsx
-skeleton_hash: 56cf925189ffdcca
+skeleton_hash: ff04888e91ee860f
 entity_hashes:
   func:Page: 766296f80aeb6522
   overview: c73bb90923c0bd87
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-08T10:08:10Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,13 @@ React bileşeni `Page`, `BrandsPage` bileşenini `Suspense` ile sarmalayarak, `B
 
 **Dönüş**:  
 `void` (React bileşeni JSX döndürür, ancak fonksiyonun dönüş tipi `void` olarak kabul edilir).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../views/BrandsPage::BrandsPage
+- import: react::React
+- import: react::Suspense
 
 ---
 

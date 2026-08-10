@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\CartProvider.tsx
-skeleton_hash: af91028fa486d3bb
+skeleton_hash: b6505b7c5c0605ec
 entity_hashes:
   func:CartProvider: 2c15a5ccde773496
   overview: 37930ba7d9f73804
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,22 @@ Bu modül için aksiyon tanımlanamamaktır. Fonksiyon gövdesi verilmemiştir; 
 - children: ReactNode — Provider tarafından sarılacak olan alt bileşenler.
 
 **Dönüş**: CartContext.Provider bileşeni, `children`'ı sararak ve `value` prop'u ile sepet değerlerini ve fonksiyonlarını sağlayarak döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../contexts/CartContext::CartContext
+- import: ../hooks/useAuth::useAuth
+- import: @/providers/SupabaseProvider::useSupabaseClient
+- import: @/types/cart::type { CartItem }
+- import: @/types/ui-models::type { Product }
+- import: react::React
+- import: react::ReactNode
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
 
 ---
 

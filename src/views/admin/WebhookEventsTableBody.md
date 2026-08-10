@@ -7,42 +7,38 @@ skeleton_hash: 281e943f1b76ab3b
 entity_hashes:
   func:WebhookEventsTableBody: 08758a783f258c2e
   func:webhookEventsFetcher: 6dbdd61167243534
-  overview: f1febf0756389550
+  overview: ef1b01ec610a06ac
   style_tokens: b14d0e3316338d3b
-generated_at: 2026-06-17T13:26:10Z
+generated_at: 2026-06-19T20:50:29Z
 ---
 
 ## Genel Bakış
-
-WebhookEventsTableBody modülü, admin panelindeki webhook olayları tablosunun gövdesini (satırlarını) oluşturan React bileşenini ve bu verileri Supabase'den çeken asenkron veri getiriciyi barındırır. Modül, webhook olaylarının listelenmesi için gerekli veri akışını ve görsel sunumu tek bir bileşen yapısında birleştirir.
+Bu modül, admin panelindeki webhook olayları tablosunun satırlarını oluşturmak için tasarlanmış bir React bileşeni ve bu verileri Supabase veritabanından asenkron olarak çekmek için gerekli veri getiriciyi içerir. Modül, veri kaynağını (fetcher) ve verinin kullanıcı arayüzündeki sunumunu (bileşen) bir arada tutan tek bir modülden oluşur.
 
 ## Fonksiyon Grupları
-
-### Veri Getirme
-Bu grup, webhook olaylarının Supabase veritabanından asenkron olarak getirilmesinden sorumludur. Tablonun içerik beslemesini sağlayan temel veri kaynağı işlevini görür.
+### Veri Erişimi ve İşleme
+Bu grup, webhook olaylarının Supabase veritabanından filtreleme ve sayfalama parametreleri ile birlikte asenkron olarak getirilmesiyle ilgilenir. Tablonun besleneceği ham veriyi sağlayan iş mantığını barındırır.
 - webhookEventsFetcher
 
-### Tablo Bileşeni
-Bu grup, getirilen webhook olaylarını tablo satırları olarak ekrana dizen React fonksiyonel bileşenini içerir. Veri getirme fonksiyonunu tetikler ve sonucu kullanıcıya sunar.
+### Arayüz Sunumu
+Bu grup, getirilen webhook olaylarını tablo satırları olarak kullanıcıya sunan React fonksiyonel bileşenini kapsar. Veri getirme işlemini tetikler ve sonucu tablo formatında render eder.
 - WebhookEventsTableBody
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, webhook olaylarını Supabase veritabanından çekip bir React tablosunda gösteren sunucu tarafı veri çekme ve UI bileşenlerinden oluşur.
+Bu modül, webhook olaylarının veritabanından çekilmesi ve tablo gövdesi olarak sunulması süreçlerini kapsar.
 
-**[Aksiyom 1 - Veritabanı Bağımlılığı]:** Eğer `webhookEventsFetcher` fonksiyonuna geçilen `supabase` parametresi `SupabaseClient<Database>` tipinde bir Supabase istemcisi değilse, veritabanı sorgusu başarısız olur ve `FetchResult<DbWebhookEvent>` döndürülemez.
+[Aksiyom 1]: Eğer `webhookEventsFetcher` fonksiyonuna geçerli bir `SupabaseClient<Database>` nesnesi sağlanmazsa, Supabase veritabanına bağlantı kurulamaz ve veri getirme işlemi başarısız olur.
 
-**[Aksiyom 2 - Parametre Gerekliliği]:** Eğer `webhookEventsFetcher` fonksiyonuna geçilen `params` parametresi `FetchParams` tipinde değilse veya gerekli alanları içermiyorsa, veri çekme işlemi tanımsız davranış sergiler.
+[Aksiyom 2]: Eğer `webhookEventsFetcher` fonksiyonuna geçerli bir `FetchParams` nesnesi sağlanmazsa, sorgu parametreleri tanımsız kalır ve beklenen `DbWebhookEvent` kayıtları getirilemez.
 
-**[Aksiyom 3 - Dönüş Tipi Tutarlılığı]:** Eğer `webhookEventsFetcher` başarıyla çalışırsa, dönüş değeri `FetchResult<DbWebhookEvent>` formatında olmalıdır; aksi takdirde `WebhookEventsTableBody` bileşeni veriyi işleyemez ve tablo gövdesi boş kalır.
+[Aksiyom 3]: Eğer Supabase veritabanında `DbWebhookEvent` türünde karşılık gelen tablo veya görünüm yoksa, `webhookEventsFetcher` fonksiyonunun döndürdüğü `FetchResult<DbWebhookEvent>` yapısında geçerli veri bulunmaz.
 
-**[Aksiyom 4 - Database Şema Eşleşmesi]:** Eğer Supabase veritabanında `DbWebhookEvent` tipiyle eşleşen `webhook_events` tablosu (veya karşılık gelen tablo) yoksa veya tablo yapısı farklıysa, `webhookEventsFetcher` tip uyumsuzluğu hatası verir.
+[Aksiyom 4]: Eğer `WebhookEventsTableBody` React bileşeni, geçerli bir React uygulama bağlamı (React Context / Provider yapısı) dışında kullanılırsa, bileşen hükmettiği veriyi alamaz ve doğru render edilemez.
 
-**[Aksiyom 5 - React Bağlamı]:** Eğer `WebhookEventsTableBody` bileşeni geçerli bir React bağlamı (RenderTree) dışında çağrılırsa, React bileşen olarak değerlendirilmez ve hata fırlatır.
-
-> **Not:** Fonksiyon gövdeleri paylaşılmadığından, saysal eşik değerleri, sayfalama parametreleri, filtreleme koşulları veya hata yönetimi ile ilgili spesifik aksiyomlar tanımlanamamıştır.
+[Aksiyom 5]: Eğer `FetchParams` içindeki sayfalama, filtreleme veya sıralama parametreleri veritabanı şemasıyla uyumsuz değerler içerirse, `webhookEventsFetcher` beklenen `FetchResult` yapısını tutarlı biçimde dolduramaz.
 
 ---
 
@@ -70,6 +66,7 @@ Bu modül, webhook olaylarını Supabase veritabanından çekip bir React tablos
 ## İTHALATLAR (IMPORTS)
 - import: ../../components/admin/AdminEmptyState::AdminEmptyState
 - import: ../../components/admin/AdminToolbar::AdminToolbar
+- import: ../../components/admin/ExportMenu::ExportMenu
 - import: ../../components/admin/data-table/DataTableKit::DataTableKit
 - import: ../../components/admin/data-table/types::type { AdminColumn }
 - import: ../../hooks/useAdminTable::type FetchParams
@@ -96,78 +93,65 @@ Bu modül, webhook olaylarını Supabase veritabanından çekip bir React tablos
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/WebhookEventsTableBody.tsx::webhookEventsFetcher
-- **params**: `supabase: SupabaseClient<Database>`, `params: FetchParams`
+### [N1_NASIL] AST Pointer: `src/views/admin/WebhookEventsTableBody.tsx`::`webhookEventsFetcher`
+- **params**:
+  - `supabase: SupabaseClient<Database>` — Supabase istemcisi, veritabanı sorgularını yürütür
+  - `params: FetchParams` — sayfalama, sıralama, arama ve filtre parametreleri
 - **ic_degiskenler**:
-  - `query` — Supabase sorgu nesnesi; webhook_events tablosundan select, sıralama, filtreleme ve sayfalama uygulanır
-  - `sortKey` — params.sort?.key değeri veya varsayılan 'created_at'; sıralama sütunu anahtarı
-  - `ascending` — params.sort?.dir === 'asc' ise true; sıralama yönü
-  - `colMap` — Record<string, string>; frontend sort anahtarlarını veritabanı sütun adlarına eşler (event_type, provider, status, created_at)
-  - `orderCol` — colMap'ten eşleşen sütun adı veya varsayılan 'created_at'; sorguda kullanılacak sıralama sütunu
-  - `like` — `%${params.query}%` formatında arama kalıbı; event_type ve provider üzerinde ilike araması
-  - `statusFilter` — params.filters.status ?? []; seçili durum filtreleri dizisi
-  - `offset` — sayfalama için hesaplanan satır başlangıç indeksi: (params.page - 1) * params.pageSize
-  - `data` — Supabase sorgu sonucu dönen ham satır verisi
-  - `error` — Supabase sorgu hatası varsa dönen hata nesnesi
+  - `query` — Supabase sorgu builder'ı; `supabase.from('webhook_events').select('*', { count: 'exact })` ile başlatılır, zincirleme `.order()`, `.or()`, `.in()`, `.range()` eklenerek filtrelenir
+  - `sortKey` — sıralama sütun anahtarı; `params.sort?.key` varsa o, yoksa `'created_at'` kullanılır
+  - `ascending` — sıralama yönü; `params.sort?.dir === 'asc'` ise true
+  - `colMap` — sort anahtarlarını gerçek veritabanı sütun adlarına eşleyen sözlük; `event_type`, `provider`, `status`, `created_at` eşlemeleri içerir
+  - `orderCol` — eşlenmiş sütun adı; `colMap[sortKey]` eşleşmezse `'created_at'` fallback kullanılır
+  - `like` — LIKE arama kalıbı; `%${params.query}%` formatında
+  - `statusFilter` — filtrelenmek istenen durum değerleri dizisi; `params.filters.status ?? []` alınır
+  - `offset` — sayfalama ofseti; `(params.page - 1) * params.pageSize` hesaplanır
+  - `data` — Supabase'den dönen satır verisi
+  - `error` — Supabase sorgu hatası; varsa `throw error` ile fırlatılır
   - `count` — toplam eşleşen satır sayısı (exact count)
-  - `rows` — DbWebhookEvent[] tipinde dönüştürülmüş ve tip güvenliği sağlanmış satırlar dizisi
-  - `row` — map içindeki her bir ham satır; Record<string, unknown> olarak cast edilir
-  - `r` — row as Record<string, unknown> ile elde edilen tip güvenliği sağlanmış kayıt
-- **Dönüş**: `Promise<FetchResult<DbWebhookEvent>>` — `{ rows: DbWebhookEvent[], totalMatched: number }`
+  - `rows` — ham satırların `DbWebhookEvent` tipine dönüştürülmüş hali; `.map()` ile her `row` işlenir
+  - `row` — `.map()` callback'indeki her bir ham satır
+  - `r` — `row`'un `Record<string, unknown>` olarak cast edilmiş hali; `r.id`, `r.event_type`, `r.provider`, `r.status`, `r.payload`, `r.request_body`, `r.response_body`, `r.error_message`, `r.created_at` alanlarına erişilir
+- **Dönüş**: `Promise<FetchResult<DbWebhookEvent>>` — `{ rows, totalMatched }` nesnesi döner; `totalMatched` `count` sayısal ise `count`, değilse `0`
 
-### [N2_NASIL] AST Pointer: src/views/admin/WebhookEventsTableBody.tsx::WebhookEventsTableBody
-- **params**: (yok — React functional component)
-- **ic_degiskenler**:
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu; UI metinlerinin uluslararasılaştırılması
-  - `lang` — useI18n() hook'undan gelen dil kodu; tarih formatlama için kullanılır
-  - `selectedEvent` — useState ile yönetilen DbWebhookEvent | null; detay panelinde gösterilecek seçili webhook olayı
-  - `table` — useAdminTable<DbWebhookEvent>() hook'undan dönen tablo yönetim nesnesi; sayfalama, sıralama, filtreleme, seçim durumu yönetimi
-  - `setQuery` — table.filtering.query değerini güncelleyen fonksiyon; arama sorgusunu ayarlar
-  - `setFilter` — table.filtering.filters değerini güncelleyen fonksiyon; belirli bir filtre anahtarının değerini değiştirir
-  - `filters` — table.filtering.filters mevcut filtre değerleri nesnesi
-  - `activeStatuses` — useMemo ile hesaplanan aktif durum filtreleri dizisi (filters.status ?? [])
-  - `onRowClick` — useCallback ile memoize edilmiş satır tıklama handler'ı; selectedEvent'i ayarlar, seçimi temizler ve toggle eder
-  - `columns` — useMemo ile memoize edilmiş AdminColumn<DbWebhookEvent>[] dizisi; tablo sütun tanımları (event_type, provider, status, created_at)
-  - `statusChips` — useMemo ile memoize edilmiş durum filtre çip tanımları dizisi; processed/failed/pending için aktif durum ve toggle davranışları
-  - `resetFilters` — useCallback ile memoize edilmiş filtreleri sıfırlama fonksiyonu; query'yi '' ve status'ü [] yapar
-  - `selectedEvent` JSX'te kullanılır: `selectedEvent?.payload`, `selectedEvent?.error_message`
-- **Dönüş**: JSX — grid layout içinde DataTableKit (sol sütun) ve detay paneli (sağ sütun) içeren React elementi; yan etki olarak table hook'u URL senkronizasyonu yapar
+---
 
-### [N3_NASIL] AST Pointer: src/views/admin/WebhookEventsTableBody.tsx::onRowClick (arrow callback)
-- **params**: `row: DbWebhookEvent`
+### [N2_NASIL] AST Pointer: `src/views/admin/WebhookEventsTableBody.tsx`::`WebhookEventsTableBody`
+- **params**: (yok — parametresiz React fonksiyonel bileşeni)
 - **ic_degiskenler**:
-  - (yok — doğrudan state ve tablo seçim nesnelerini kullanır)
-- **Dönüş**: void — setSelectedEvent(row) ile seçili olayı günceller, table.selection.clear() ile mevcut seçimi temizler, table.selection.toggle(row.id) ile satır seçimini açar/kapar
-
-### [N4_NASIL] AST Pointer: src/views/admin/WebhookEventsTableBody.tsx::columns (useMemo callback)
-- **params**: (yok — useMemo callback)
-- **ic_degiskenler**:
-  - (yok — doğrudan t, lang ve formatDateTime kullanılarak sütun tanımları döndürülür)
-- **Dönüş**: `AdminColumn<DbWebhookEvent>[]` — 4 sütun: event_type (font-bold uppercase), provider (text-slate-300), status (processed/failed/pending durumuna göre icon ve badge), created_at (formatDateTime ile formatlanmış tarih)
-
-### [N5_NASIL] AST Pointer: src/views/admin/WebhookEventsTableBody.tsx::statusChips (useMemo callback)
-- **params**: (yok — useMemo callback)
-- **ic_degiskenler**:
-  - (yok — doğrudan activeStatuses, setFilter ve t kullanılarak çip tanımları döndürülür)
-- **Dönüş**: Array — 3 çip nesnesi (processed, failed, pending); her biri key, label, active durumu ve onToggle callback içerir; onToggle içinde `next` adlı geçici dizi hesaplanarak setFilter('status', next) çağrılır
-
-### [N6_NASIL] AST Pointer: src/views/admin/WebhookEventsTableBody.tsx::statusChip onToggle (arrow callback — processed/failed/pending için ortak yapı)
-- **params**: (yok — inline callback)
-- **ic_degiskenler**:
-  - `next` — activeStatuses dizisinin filter veya spread ile oluşturulmuş güncel hali; ilgili durum mevcutsa çıkarılır, yoksa eklenir
-- **Dönüş**: void — setFilter('status', next) çağrısı ile durum filtresini günceller
-
-### [N7_NASIL] AST Pointer: src/views/admin/WebhookEventsTableBody.tsx::resetFilters (useCallback callback)
-- **params**: (yok — useCallback callback)
-- **ic_degiskenler**:
-  - (yok — doğrudan setQuery ve setFilter çağrıları yapar)
-- **Dönüş**: void — setQuery('') ile arama sorgusunu temizler, setFilter('status', []) ile durum filtresini boş diziye ayarlar
-
-### [N8_NASIL] AST Pointer: src/views/admin/WebhookEventsTableBody.tsx::webhookEventsFetcher (row map callback)
-- **params**: `row` — Record<string, unknown> tipinde ham Supabase satırı
-- **ic_degiskenler**:
-  - `r` — row as Record<string, unknown> ile tip güvenliği sağlanmış kayıt; tüm alanlara erişim için kullanılır
-- **Dönüş**: DbWebhookEvent — id (String), event_type (String), provider (String), status (processed/failed/pending union veya 'pending' fallback), payload (Json cast), request_body (Json cast), response_body (Json cast), error_message (String veya undefined), created_at (String)
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('admin.webhooks.eventType')` gibi anahtarlarla çeviri metinleri alınır
+  - `lang` — `useI18n()` hook'undan dönen dil kodu (`'tr' | 'en'`); `formatDateTime` fonksiyonuna passed
+  - `selectedEvent` — `useState<DbWebhookEvent | null>(null)` ile oluşturulan state; tıklanan webhook olayını tutar, sağ panelde detay göstermek için kullanılır
+  - `setSelectedEvent` — `selectedEvent` state'ini güncelleyen setter fonksiyonu
+  - `table` — `useAdminTable<DbWebhookEvent>({...})` hook'undan dönen tablo controller nesnesi; `table.filtering`, `table.selection`, `table.totalMatched`, `table.fetchAllForExport()` erişimleri yapılır
+    - `resource: 'webhook_events'` — Supabase tablo adı
+    - `rowId: (r) => r.id` — her satırın benzersiz tanımlayıcısı
+    - `fetcher: webhookEventsFetcher` — veri çekme fonksiyonu referansı
+    - `paginationMode: 'server'` — sunucu taraflı sayfalama
+    - `sortMode: 'server'` — sunucu taraflı sıralama
+    - `pageSize: 50` — sayfa başına satır sayısı
+    - `initialSort: { key: 'created_at', dir: 'desc' }` — varsayılan sıralama
+    - `syncUrl: true` — URL parametreleri ile senkronizasyon
+  - `setQuery` — `table.filtering.setQuery`; arama sorgusunu günceller
+  - `setFilter` — `table.filtering.setFilter`; filtre değerlerini günceller; `setFilter('status', next)` çağrılır
+  - `filters` — `table.filtering.filters`; mevcut filtre durumu nesnesi; `filters.status` erişimi yapılır
+  - `activeStatuses` — `useMemo()` ile türetilen, o anda aktif olan durum filtresi değerleri dizisi; `filters.status ?? []` hesaplanır
+  - `onRowClick` — `useCallback()` ile sarılı satır tıklama işleyicisi; parametre olarak `row: DbWebhookEvent` alır, `setSelectedEvent(row)`, `table.selection.clear()`, `table.selection.toggle(row.id)` çağırır
+  - `exportCsv` — `useCallback()` ile sarılı asfonksiyon; CSV dışa aktarma işlemini yürütür
+    - `rows` — `await table.fetchAllForExport()` ile çekilen tüm filtrelenmiş satırlar
+    - `header` — CSV başlık satırı; `t('admin.webhooks.export.headers.id')` vb. ile 6 sütun başlığı `join(',')` ile birleştirilir
+    - `lines` — `rows.map((r) => ...)` ile her satırın CSV satırına dönüştürülmüş hali; `r.id`, `r.event_type`, `r.provider`, `r.status`, `r.created_at`, `r.error_message` alanları kullanılır; `r` map callback parametresidir; string alanlar `'"'` escape'li formatlanır
+    - `csv` — BOM (`\ufeff`) ile başlayan tam CSV metni; `[header, ...lines].join('\n')`
+    - `blob` — `new Blob([csv], { type: 'text/csv;charset=utf-8;' })` ile oluşturulan dosya nesnesi
+    - `url` — `URL.createObjectURL(blob)` ile oluşturulan indirme URL'i
+    - `a` — `document.createElement('a')` ile oluşturulan görünmez link elemanı; `a.href = url`, `a.download = t('admin.webhooks.export.filename')`, `a.click()`, `URL.revokeObjectURL(url)` ile tetiklenir
+  - `columns` — `useMemo<AdminColumn<DbWebhookEvent>[]>(...)` ile tanımlanan sütun dizisi; 4 sütun içerir:
+    - `e` — her sütunun `cell` callback parametresi; `e.event_type`, `e.provider`, `e.status`, `e.created_at` alanlarına erişilir
+    - `formatDateTime` — `e.created_at` ve `lang` parametreleri ile tarih formatlama fonksiyonu çağrısı
+  - `statusChips` — `useMemo()` ile tanımlanan durum filtre çipi yapılandırma dizisi; 3 çip (`'processed'`, `'failed'`, `'pending'`) içerir
+    - `next` — her `onToggle` callback içinde hesaplanan bir sonraki durum filtresi dizisi; `activeStatuses.includes(x)` kontrolü ile ekleme/çıkarma yapılır
+  - `resetFilters` — `useCallback()` ile sarılı; `setQuery('')` ve `setFilter('status', [])` çağrısı ile tüm filtreleri sıfırlar
+- **Dönüş**: JSX — sol tarafta `DataTableKit` (tablo + toolbar + filtreler + boş durum state'leri + dışa aktarma menüsü) ve sağ tarafta seçili olayın payload JSON'unu ve hata mesajını gösteren detay paneli içeren React elementi
 
 ---
 

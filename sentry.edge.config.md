@@ -3,8 +3,8 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\sentry.edge.config.ts
-skeleton_hash: 6bb47373261ddf9c
-generated_at: 2026-06-12T10:45:31.823471+00:00
+skeleton_hash: d107e137159a3077
+generated_at: 2026-06-19T20:51:04.344971+00:00
 ---
 
 ## Genel Bakış

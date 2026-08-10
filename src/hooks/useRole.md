@@ -7,7 +7,7 @@ skeleton_hash: fc1011af39009897
 entity_hashes:
   func:useRole: 86c3bf52308dd229
   overview: 90cbd0f7f32b7b04
-generated_at: 2026-06-19T06:24:01Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -28,10 +28,6 @@ Bu modül için verilen bilgiler (fonksiyon gövdesi kodu) yetersiz olduğundan,
 [Aksiyom 2]: Eğer hook'un bağlı olduğu React bileşeni bileşen hiyerarşisinde bir React.Provider (context) içinde yer almıyorsa, hook'un bağımlı olduğu context değeri (`undefined` veya `null`) olur.
 
 [Aksiyom 3]: Eğer `useRole()` fonksiyonu parametre almıyorsa, fonksiyon çağrılırken herhangi bir argüman geçilirse TypeScript derleme hatası olur.
-
----
-
-**Not:** Bu modül için fonksiyon gövdesi kodu paylaşılmamıştır. Yukarıdaki aksiyomlar yalnızca fonksiyon imzası (`useRole()` — parametresiz) ve React hook yapısının standart kurallarından türetilmiştir. Hook'un hangi context'i tükettiği, hangi değerleri döndürdüğü veya hangi iç mantığı barındırdığı bilinmediğinden, fonksiyona özgü iş aksiyomları tanımlanamamıştır.
 
 ---
 

@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\tenantResolver.ts
-skeleton_hash: c473c318a31b7bc6
+skeleton_hash: 8062e9abd5eb49d4
 entity_hashes:
   func:resolveTenant: c08cc2e05c8a4513
   overview: 7802d22f60606102
-generated_at: 2026-05-30T21:35:44Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\EditableCell.tsx
-skeleton_hash: 6bceb8c2f03611c7
+skeleton_hash: c8931401a80d9dd5
 entity_hashes:
   func:EditableCell: c69e143b78ab0750
   overview: e0ead7dc16886f70
   style_tokens: 2f2ada2707ada249
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -54,6 +54,16 @@ Bu modül, bir React bileşeni olup hücre düzenleme işlevi için aşağıdaki
 - `clas`: string — Bileşene uygulanacak ek CSS sınıf adı.
 
 **Dönüş**: `React.FC<EditableCellProps>` — `EditableCellProps` arayüzüne sahip prop'lar bekleyen bir React fonksiyonel bileşeni döndürür. Bu bileşen, hücre düzenleme arayüzünü oluşturmak için kullanılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useRef
+- import: react::useState
+- import: sonner::toast
 
 ---
 

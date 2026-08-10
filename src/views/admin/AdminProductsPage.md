@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminProductsPage: c722f6b673f81dbe
   overview: cbed9cc55e7501a7
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-13T21:06:16Z
+generated_at: 2026-06-19T20:49:19Z
 ---
 
 ## Genel Bakış
@@ -42,10 +42,6 @@ Bu modül için verilen fonksiyon gövdesi ve detaylı implementasyon bilgisi me
 
 ---
 
-> **Not**: Modül sabitleri, fonksiyon gövdeleri ve detaylı implementasyon bilgisi (örn: API çağrıları, state yönetimi, prop bağımlılıkları) paylaşılmadığı için kapsamlı aksiyon üretilememektedir. Daha detaylı mimari varsayımlar için fonksiyon gövdeleri ile birlikte yeniden analiz yapılması gerekmektedir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### AdminProductsPage
@@ -59,6 +55,27 @@ Bu modül için verilen fonksiyon gövdesi ve detaylı implementasyon bilgisi me
 Bileşen props almaz (React.FC tanımı ile parametresiz bir functional component olarak tanımlanmıştır).
 
 **Dönüş**: `React.FC` — İşlevsel React bileşeni. Ürünler yönetim sayfasının JSX yapısını döndürür; sayfa başlığı, Suspense ile sarılmış `ProductsTableBody`, "Yeni Ürün" tetikleyici butonu, `ProductFormModal` ve CSV import bileşenlerini içeren bir arayüz yapısı oluşturur.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: ./ProductsTableBody::ProductsTableBody
+- import: react::React
+- import: react::Suspense
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\admin\AdminProductsPage.tsx::AdminProductsPage
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, UI stringlerini çevirir
+- **Dönüş**: JSX elementi — Admin ürünleri sayfasını header ve Suspense ile birlikte render eder
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\HomePageClientWrapper.tsx
-skeleton_hash: 32ed487f472e7203
+skeleton_hash: ebd9a0b777f9ba09
 entity_hashes:
   func:HomePageClientWrapper: feb3517aa1583d9b
   overview: e9b94ab20ec42ba0
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:35:52Z
+generated_at: 2026-06-19T20:47:09Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**:  
 - children: React.ReactNode — Sarmalanacak içerik veya alt bileşenler.  
 **Dönüş**: React.FC<Props> — `children` propunu alıp onu render eden bir fonksiyonel bileşen.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
+- import: react::Suspense
+- import: react::useEffect
+- import: react::useState
 
 ---
 

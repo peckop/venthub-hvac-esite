@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\movements\page.tsx
-skeleton_hash: be12c177ee7c260d
+skeleton_hash: 1a1e4ed3c0375a2e
 entity_hashes:
   func:Page: 9c08060caeb88969
   overview: 9da4b48a024a6a7c
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:27Z
 ---
 
 ## Genel Bakış
@@ -45,6 +45,13 @@ Bu modül, Next.js `app` router yapısında yer alan bir sayfa bileşenidir. Ver
 - Parametre almaz (propsuz fonksiyonel bileşen)
 
 **Dönüş**: `React.ReactNode` — Suspense ile sarılmış JSX yapısı döndürür. İçerisinde loading fallback'i ve `PageComponent` bileşenini barındırır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next/dynamic::nextDynamic
+- import: react::React
+- import: react::Suspense
 
 ---
 

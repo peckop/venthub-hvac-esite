@@ -3,33 +3,40 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountShipmentsPage.tsx
-skeleton_hash: 764fc176dff7e29a
+skeleton_hash: 2d09cdf9752740aa
 entity_hashes:
-  func:AccountShipmentsPage: bc07b3dabd4c38e0
-  overview: ca709958064b6e53
+  func:AccountShipmentsPage: 1db7c37db50f9af1
+  overview: b5a4627ef1ed88f1
   style_tokens: 0076231c43efae4d
-generated_at: 2026-06-14T17:24:38Z
+generated_at: 2026-06-19T20:49:10Z
 ---
 
 ## Genel Bakış
-VentHub HVAC projesinin hesap yönetimi modülüne ait, kullanıcıların kendi sevkiyat ve kargo bilgilerini görüntüleyebildiği tek sayfalık bir arayüz bileşenidir. Modül, hesap section altında yer alan sevkiyatlar sayfasının ana giriş noktasını oluşturarak kullanıcıya ilgili verileri sunar.
+VentHub HVAC projesinin hesap yönetimi modülü bünyesinde yer alan bu bileşen, kullanıcının kendi sevkiyat ve kargo bilgilerini görüntüleyebildiği tek sayfalık bir arayüz sağlar. Supabase veritabanından sipariş verilerini çekerek kargo durumlarına göre filtreleme ve görsel gösterim yapar. Bileşen, kullanıcının oturum durumunu ve dil tercihini bağımlılıklarından alarak sayfayı buna göre yapılandırır.
 
 ## Fonksiyon Grupları
-### Sayfa Bileşeni
-Hesap gönderileri sayfasının tüm arayüz yapısını ve temel altyapısını oluşturan ana bileşendir.
+
+### Sayfa Yapısı ve Yönlendirme
+Sayfanın temel altyapısını ve rota yapısını oluşturarak, kullanıcının hesap section'u altında doğru konumda render edilmesini sağlar. Oturum kontrolü ve sayfa yönlendirme mantığını barındırır.
+
+- AccountShipmentsPage
+
+### Veri Yönetimi ve İş Mantığı
+Supabase bağlantısı üzerinden kullanıcının siparişlerini çeker, kargo durumuna göre filtreleme ve veri işleme adımlarını yönetir.
+
 - AccountShipmentsPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, hesap yönetimi altındaki sevkiyatlar sayfasını oluşturan bir React fonksiyonel bileşenidir. Fonksiyon gövdesi kodu sağlanmadığından, mimari varsayımlar yalnızca fonksiyon imzası ve yapısal bağlam temelinde çıkarılmıştır.
+Bu modül, fonksiyon imzası ve sabitler incelenerek çıkarılabilecek mimari varsayımlar açısından sınırlı bilgi içermektedir.
 
-**[Aksiyom 1]:** Eğer React çalışma ortamı (React context/provider zinciri) mevcut değilse, bileşen挂钩 (hooks) kullanamaz ve hata fırlatır.
+**[Aksiyom 1]:** Fonksiyon imzasında parametre tanımı yoksa, bileşen props aracılığıyla dış veri almaz veya veri kaynakları tamamen iç bileşen hiyerarşisi/state yönetiminden beslenir.
 
-**[Aksiyom 2]:** Eğer bileşen bir hesap (account) route yapısı altında render edilmiyorsa, ilgili layout ve navigasyon bileşenleri tarafından sarmalanmamış olur ve sayfa yapısı tutarsız çalışır.
+---
 
-**[Aksiyom 3]:** Eğer kullanıcı oturum açmamış (authenticated) değilse, bileşen sevkiyat verilerini getiremez veya boş/uygunsuz durum gösterir.
+**Not:** Fonksiyon gövdesi kodu sağlanmadığı için, veri çekme mekanizması, state yönetimi, hata yönetimi veya bağımlılıklar hakkında somut aksiyom üretilememektedir. Mevcut bilgi (fonksiyon imzası + modül sabitleri) yalnızca yukarıdaki çıkarımı desteklemektedir.
 
 ---
 
@@ -37,23 +44,24 @@ Bu modül, hesap yönetimi altındaki sevkiyatlar sayfasını oluşturan bir Rea
 
 ### AccountShipmentsPage
 
-**Ne yapar**: Kullanıcının kargo takibi yapabileceği sipariş gönderim sayfasını render eden React fonksiyonel bileşenidir. Supabase veritabanından kullanıcının siparişlerini çeker, kargo durumuna göre filtreleme ve görsel gösterim sağlar.
+**Ne yapar**: Kullanıcının siparişlerine ait kargo bilgilerini ve takip süreçlerini gösteren React bileşenidir. Kullanıcı oturum açmış hesabındaki tüm kargolanmış siparişleri listeler, filtreleme imkanı sunar ve her sipariş için kargo durumu, takip numarası, takip bağlantısı gibi bilgileri görsel olarak sunar.
 
-**Nasıl yapar**: `useAuth` hook'u ile mevcut kullanıcıyı, `useI18n` hook'u ile çeviri fonksiyonunu ve dil bilgisini, `useRouter` hook'u ile yönlendirme nesnesini alır. `useState` ile satır verileri, yükleme durumu ve filtre seçimi için state'ler tutar. `useEffect` içinde asenkron bir `load` fonksiyonu çalıştırarak Supabase'den `venthub_orders` tablosundan kullanıcının siparişlerini çeker. Veritabanında kargo kolonları henüz yoksa (PGRST100/400 hatası) fallback bir sorgu ile temel alanları getirip eksik kargo alanlarını null olarak doldurur. Sadece kargo bilgisi olan siparişleri filtreler. Sayfa, yükleme durumuna göre spinner, boş duruma göre bilgilendirme kartı veya dolu duruma göre kart listesi ile render olur. Her sipariş kartında kargo durum badge'i, ilerleme adımları (preparing/shipped/delivered), kargo firması, takip numarası, takip linki, kargoya verilme ve teslim tarihi detayları gösterilir.
+**Nasıl yapar**: Bileşen ilk olarak useAuth hook'uyla mevcut kullanıcıyı alır ve Supabase veritabanından `venthub_orders` tablosunu sorgular. Sorguda shipping kolonları bulunamadığında (400 hatası) fallback bir sorgu ile temel alanları çeker ve eksik alanları null olarak doldurur. Gelen verileri `ShipmentRow` tipine dönüştürür ve herhangi bir kargo bilgisi içerenleri filtreler. Bileşen duruma göre üç ana görünüm sunar: yükleniyor spinner'ı, boş durum kartı veya kargo listesi. Her kargo kartı içinde stepler (hazırlanıyor → kargoda → teslim edildi) ve detay bilgileri gösterilir.
 
 **Parametreler**:
-Bu bileşen parametre almaz — props'suz bir React fonksiyonel bileşenidir.
 
-**Dönüş**: `JSX.Element` — Kullanıcının kargo takibi yapabileceği tam sayfa görünümü.
+Bu bileşen parametre almaz — tüm verileri iç state ve Supabase sorgularından sağlar.
+
+**Dönüş**: `JSX.Element` — Kullanıcının kargo bilgilerini gösteren tam sayfa düzenle
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../hooks/useAuth::useAuth
+- import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
 - import: ../../i18n/datetime::formatDate
 - import: ../../i18n/format::formatCurrency
-- import: ../../utils/routes::Routes
 - import: @/lib/supabase/client::supabaseBrowserClient
 - import: lucide-react::CheckCircle
 - import: lucide-react::Clock
@@ -102,108 +110,79 @@ type ShipFilter = 'all' | 'shipped' | 'delivered'
 
 ## AST POINTERS
 
-### [N1_NASIL] AccountShipmentsPage::AccountShipmentsPage
-- **params**: () — parametre yok
+### [N1_NASIL] AST Pointer: AccountShipmentsPage.tsx::AccountShipmentsPage
+- **params**: ()
 - **ic_degiskenler**:
-  - `mounted` — component unmount kontrolü için bayrak
-  - `setLoading` — loading state güncelleme fonksiyonu
-  - `user` — useAuth hook'undan gelen kullanıcı bilgisi
-  - `setRows` — sipariş satırlarını state'e yazan fonksiyon
-  - `supabase` — Supabase istemci nesnesi
-  - `toast` — bildirim gösterme fonksiyonu
-  - `t` — çeviri fonksiyonu
-  - `formatOnlyDate` — tarih formatlama fonksiyonu
-  - `formatCurrency` — para birimi formatlama fonksiyonu
-  - `router` — Next.js yönlendirme nesnesi
-- **Dönüş**: React bileşeni (JSX)
+  - `mounted` — Asenkron operasyonların bileşen mounted iken çalışıp çalışmadığını takip eder, temizleme fonksiyonunda false yapılır
+- **Dönüş**: Cleanup fonksiyonu döndürür (mounted'ı false yapar)
 
-### [N1_NASIL] AccountShipmentsPage::load
-- **params**: () — parametre yok
+### [N2_NASIL] AST Pointer: AccountShipmentsPage.tsx::load
+- **params**: ()
 - **ic_degiskenler**:
-  - `setLoading` — loading state güncelleme fonksiyonu
-  - `baseSelect` — Supabase select sorgusu için kolon listesi
-  - `user?.id` — mevcut kullanıcının ID'si
-  - `data` — Supabase'den dönen veri dizisi
-  - `error` — Supabase hatası
-  - `fallback` — hata durumunda yapılan yedek sorgu sonucu
-  - `items` — ham veriyi işlenmiş ShipmentRow formatına dönüştüren dizi
-  - `filtered` — kargo bilgisi olan siparişleri filtreleyen dizi
-  - `e` — yakalanan hata nesnesi
-- **Dönüş**: void (yan etki: setRows ile rows state'ini günceller)
+  - `baseSelect` — Supabase sorgusunda seçilecek kolonların listesi (string)
+  - `data` — Supabase'den gelen ham sipariş verisi (ShipmentRow[] veya null)
+  - `error` — Supabase sorgusu hata dönerse hata nesnesi
+  - `fallback` — Ana sorgu 400/PGRST100 hatası verdiğinde kullanılan yedek sorgu sonucu
+  - `items` — Sipariş verisi, order_number yoksa id ile doldurulmuş hali
+  - `filtered` — Kargo bilgisi olan (carrier, tracking_number, tracking_url, shipped_at, delivered_at alanlarından en az biri dolu) siparişler
+- **Dönüş**: yok (state setter'ları çağırarak UI'ı günceller)
 
-### [N2_NASIL] AccountShipmentsPage::formatDate
+### [N3_NASIL] AST Pointer: AccountShipmentsPage.tsx::formatDate
 - **params**: (d?: string | null)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: string — formatlanmış tarih veya '-' karakteri
+- **Dönüş**: Formatlanmış tarih stringi veya '-'
 
-### [N3_NASIL] AccountShipmentsPage::formatPrice
+### [N4_NASIL] AST Pointer: AccountShipmentsPage.tsx::formatPrice
 - **params**: (price: number | string)
 - **ic_degiskenler**:
-  - `n` — price değerini sayıya dönüştüren değişken
-- **Dönüş**: string — formatlanmış para birimi
+  - `n` — price değerinin number karşılığı, dönüşemezse 0
+- **Dönüş**: Formatlanmış para birimi stringi
 
-### [N4_NASIL] AccountShipmentsPage::handleCopy
+### [N5_NASIL] AST Pointer: AccountShipmentsPage.tsx::handleCopy
 - **params**: (text?: string | null)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: Promise<void> (yan etki: clipboard'a yazar ve toast bildirimi gösterir)
+- **Dönüş**: Promise<void> (clipboard.writeText ile asenkron)
 
-### [N5_NASIL] AccountShipmentsPage::getShipStatus
+### [N6_NASIL] AST Pointer: AccountShipmentsPage.tsx::getShipStatus
 - **params**: (row: ShipmentRow)
 - **ic_degiskenler**: (yok)
 - **Dönüş**: 'delivered' | 'shipped' | 'preparing'
 
-### [N6_NASIL] AccountShipmentsPage::getShipStatusBadge
-- **params**: (status: 'delivered' | 'shipped' | 'preparing')
-- **ic_degiskenler**:
-  - `CheckCircle` — lucide-react'ten gelen teslim edildi ikonu
-  - `Truck` — lucide-react'ten gelen kargoya verildi ikonu
-  - `Clock` — lucide-react'ten gelen hazırlanıyor ikonu
-  - `t` — çeviri fonksiyonu
-- **Dönüş**: JSX.Element — duruma göre renkli badge
-
-### [N7_NASIL] AccountShipmentsPage::getStepIndex
+### [N7_NASIL] AST Pointer: AccountShipmentsPage.tsx::getShipStatusBadge
 - **params**: (status: 'delivered' | 'shipped' | 'preparing')
 - **ic_degiskenler**: (yok)
-- **Dönüş**: number — adım indeksi (2, 1 veya 0)
+- **Dönüş**: JSX span elementi (badge)
 
-### [N8_NASIL] AccountShipmentsPage::filteredOrders
-- **params**: (r) — ShipmentRow tipinde parametre
-- **ic_degiskenler**:
-  - `filter` — mevcut filtre durumu (state)
-  - `getShipStatus` — sipariş durumunu döndüren fonksiyon
-- **Dönüş**: boolean — sipariş filtreleniyorsa true
+### [N8_NASIL] AST Pointer: AccountShipmentsPage.tsx::getStepIndex
+- **params**: (status: 'delivered' | 'shipped' | 'preparing')
+- **ic_degiskenler**: (yok)
+- **Dönüş**: number (0, 1 veya 2)
 
-### [N9_NASIL] AccountShipmentsPage::renderFilterButton
-- **params**: (opt) — filtre seçeneği nesnesi (value ve label içerir)
+### [N9_NASIL] AST Pointer: AccountShipmentsPage.tsx::filterOrders
+- **params**: (r: ShipmentRow)
 - **ic_degiskenler**:
-  - `filter` — mevcut filtre durumu (state)
-  - `setFilter` — filtre durumunu güncelleyen fonksiyon
-  - `t` — çeviri fonksiyonu
-- **Dönüş**: JSX.Element — filtre butonu
+  - `s` — Satırın kargo durumu ('delivered', 'shipped' veya 'preparing')
+- **Dönüş**: boolean (filtreye uygunsa true)
 
-### [N10_NASIL] AccountShipmentsPage::renderOrderCard
-- **params**: (o) — ShipmentRow tipinde sipariş nesnesi
-- **ic_degiskenler**:
-  - `getShipStatus` — sipariş durumunu döndüren fonksiyon
-  - `getStepIndex` — adım indeksini döndüren fonksiyon
-  - `orderCode` — sipariş kodu (formatlanmış)
-  - `router` — Next.js yönlendirme nesnesi
-  - `Routes` — rota sabitleri nesnesi
-  - `formatDate` — tarih formatlama fonksiyonu
-  - `formatPrice` — para birimi formatlama fonksiyonu
-  - `shipSteps` — kargo adımları dizisi
-  - `handleCopy` — kopyalama fonksiyonu
-  - `t` — çeviri fonksiyonu
-  - `activeStepIdx` — aktif adım indeksi
-- **Dönüş**: JSX.Element — sipariş kartı
+### [N10_NASIL] AST Pointer: AccountShipmentsPage.tsx::renderFilterButton
+- **params**: (opt: {value: string, label: string})
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX button elementi
 
-### [N11_NASIL] AccountShipmentsPage::renderStep
-- **params**: (step, idx) — adım nesnesi ve indeks
+### [N11_NASIL] AST Pointer: AccountShipmentsPage.tsx::renderOrderCard
+- **params**: (o: ShipmentRow)
 - **ic_degiskenler**:
-  - `activeStepIdx` — aktif adım indeksi (state)
-  - `active` — adımın aktif olup olmadığı boolean
-  - `StepIcon` — adım ikonu bileşeni
-- **Dönüş**: JSX.Fragment — kargo adımı göstergesi
+  - `shipStatus` — Siparişin kargo durumu (getShipStatus çağrısıyla)
+  - `activeStepIdx` — Aktif adım indeksi (getStepIndex çağrısıyla)
+  - `orderCode` — Görüntülenecek sipariş kodu (o.order_number son parçası veya o.id'nin son 8 karakteri)
+- **Dönüş**: JSX div elementi (sipariş kartı)
+
+### [N12_NASIL] AST Pointer: AccountShipmentsPage.tsx::renderStep
+- **params**: (step: {key: string, icon: Component, label: string}, idx: number)
+- **ic_degiskenler**:
+  - `active` — Bu adımın aktif olup olmadığı (idx <= activeStepIdx)
+  - `StepIcon` — Adımın ikonu (step.icon)
+- **Dönüş**: JSX fragment (adım göstergesi)
 
 ---
 

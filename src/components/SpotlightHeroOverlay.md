@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\SpotlightHeroOverlay.tsx
-skeleton_hash: d3aa76214edd8a36
+skeleton_hash: c731b7c5e5d0a9b8
 entity_hashes:
   func:SpotlightHeroOverlay: 3df6afb4a4a31d8f
   overview: 1f157560c005aa84
   style_tokens: 2d403f9b7fca7034
-generated_at: 2026-05-28T22:37:00Z
+generated_at: 2026-06-19T20:47:34Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,13 @@ Bu React bileşeni, web arayüzünde kullanıcının imlecinin olduğu bölgeyi 
 - radius: number — Opsiyonel parametre, spot ışığının piksel cinsinden yarıçapını belirler, varsayılan değeri 240'tır. Bileşene özel değer gönderilerek ışığın boyutu ihtiyaca göre ayarlanabilir.
 - intensity: number — Opsiyonel parametre, spot ışığının şiddetini yani odak alanı dışındaki kaplamanın saydamlık/koyuluk derecesini ayarlar, genellikle 0 ile 1 arasında normalize edilmiş değer alır, varsayılan değeri 0.35'tir.
 **Dönüş**: React.FC<{ radius?: number; intensity?: number }> tipinde bir React fonksiyonel bileşeni döndürür. Bu dönen bileşen, kendisine iletilen tüm prop'ları ve çocuk içerikleri alarak spotlight efektini ekrana uygun şekilde render eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
+- import: react::useEffect
+- import: react::useState
 
 ---
 

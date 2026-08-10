@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\invoice.service.ts
-skeleton_hash: 06876ad3e7dd6d14
+skeleton_hash: cefdf01a9abcce88
 entity_hashes:
   func:createInvoiceProfile: 5e5a37f5f764d379
   func:deleteInvoiceProfile: 65d9f6fe10df813f
@@ -12,7 +12,7 @@ entity_hashes:
   func:setDefaultInvoiceProfile: 5969056d403828fd
   func:updateInvoiceProfile: 978db19027a5f5be
   overview: a257728e512b389b
-generated_at: 2026-06-08T10:09:34Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış
@@ -95,6 +95,12 @@ Bu modül, fatura profillerinin CRUD işlemlerini ve varsayılan profil yönetim
 **Parametreler**:
 - `supabase`: `SupabaseClient<Database>` — Supabase veritabanı bağlantısı için kullanılan istemci nesnesi.
 **Dönüş**: `Promise<DbInvoiceProfile | null>` — Kullanıcının varsayılan fatura profili nesnesi veya profil bulunamadıysa `null`.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../types/database.types::type { Database }
+- import: @supabase/supabase-js::type { SupabaseClient }
 
 ---
 

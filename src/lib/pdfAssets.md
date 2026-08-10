@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\pdfAssets.ts
-skeleton_hash: 50c3c8bad0980bbb
+skeleton_hash: 36cb34f8803d1e9d
 entity_hashes:
   func:getAbsoluteAssetUrl: 96c03e7f744b3527
   func:getBase64ImageFromUrl: ca8a45fdefa4e7ed
   overview: 4faa1d63c142f598
-generated_at: 2026-06-07T15:51:30Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış
@@ -56,6 +56,11 @@ Bu modül, PDF belgeleri için medya varlıklarını getirip dönüştürürken 
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../config/siteUrl::SITE_URL
+
+---
+
 ## SABİTLER
 - **PDF_FONTS** (object) — `{
     Roboto: {
@@ -74,20 +79,6 @@ Bu modül, PDF belgeleri için medya varlıklarını getirip dönüştürürken 
 - **ic_degiskenler**:
   - `base` — Tarayıcı ortamındaysa `window.location.origin`, değilse `SITE_URL` kullanılarak hesaplanan temel URL
 - **Dönüş**: `string` — path ve base birleştirilerek oluşturulmuş tam URL
-
----
-
-### [N2_NASIL] AST Pointer: src/lib/pdfAssets.ts::getBase64ImageFromUrl
-- **params**: `imageUrl: string` — Dönüştürülecek görselin URL adresi
-- **ic_degiskenler**:
-  - `response` — `fetch(imageUrl)` çağrısının döndüğü HTTP yanıt nesnesi
-  - `blob` — `response.blob()` ile elde edilen ham ikili veri
-  - `objectUrl` — `URL.createObjectURL(blob)` ile oluşturulan geçici nesne URL'i
-  - `img` — Tarayıcıda yüklenen görseli temsil eden `Image` nesnesi
-  - `canvas` — Görseli çizmek için `document.createElement('canvas')` ile oluşturulan HTML Canvas
-  - `ctx` — `canvas.getContext('2d')` ile elde edilen 2D çizim bağlamı
-  - `dataURL` — `canvas.toDataURL('image/jpeg', 0.95)` ile elde edilen Base64 formatlı JPEG görsel verisi
-- **Dönüş**: `Promise<string>` — Başarılı olursa Base64 dataURL, başarısızsa boş string (`''`)
 
 ---
 

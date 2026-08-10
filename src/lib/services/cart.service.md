@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\cart.service.ts
-skeleton_hash: 017cd5f7c528c1d2
+skeleton_hash: 641ca9ecde90c413
 entity_hashes:
   func:clearCartItems: 972204eb8a36e659
   func:ensureUserProfile: 6312a911845ce8e2
@@ -13,7 +13,7 @@ entity_hashes:
   func:removeCartItem: eb9a13492089563b
   func:upsertCartItem: 9fca062a94d78c4c
   overview: 72bb9110dad5d4a2
-generated_at: 2026-06-08T10:09:34Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış
@@ -124,6 +124,15 @@ Bu modül, Supabase tabanlı bir alışveriş sepeti yönetim servisi olup aşa�
 - `supabase`: `any` (isteğe bağlı) — Varsayılan olarak `defaultClient` kullanılır, Supabase istemcisi.
 **Dönüş**: `Promise<boolean>` — Sepet başarıyla temizlendiyse `true`.
 **Fırlatır**: `Error` — Veritabanı silme işlemi başarısız olursa.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../types/database.types::type { Database }
+- import: ../../types/db-rows::type { DbCartItem, DbProduct,DbShoppingCart }
+- import: ../../types/ui-models::type { Product }
+- import: ../type-converters::mapDatabaseProductToDomain
+- import: @supabase/supabase-js::type { SupabaseClient }
 
 ---
 

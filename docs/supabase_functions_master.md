@@ -2,7 +2,7 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-12T06:30:06.099637+00:00
+compiled_at: 2026-06-19T20:52:21.511305+00:00
 total_compiled_files: 30
 source: supabase/functions
 ---
@@ -59,7 +59,6 @@ Bu modül için fonksiyon gövdesi (implementation body) paylaşılmadığından
 
 ## SABİTLER
 - **corsHeaders** (object) — `{
-
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
 
 ---
@@ -751,47 +750,31 @@ Bu modül, HTTP istekleri üzerinden kupon kodu doğrulama ve uygulama işlevsel
 ### CouponRow
 ```typescript
 type CouponRow = {
-
   code: string
-
   discount_type: 'percentage' | 'fixed_amount'
-
   discount_value: number
-
   minimum_order_amount: number | null
-
   valid_from: string | null
-
   valid_until: string | null
-
   is_acti
 ```
 
 ### ApplyCouponReq
 ```typescript
 type ApplyCouponReq = {
-
   code: string
-
   subtotal: number
-
 }
 ```
 
 ### ApplyCouponResp
 ```typescript
 type ApplyCouponResp = {
-
   val_id: boolean
-
   reason?: string
-
   discount_amount?: number
-
   final_total?: number
-
   normalized_code?: string
-
 }
 ```
 
@@ -1141,21 +1124,13 @@ Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel varsay�
 ### CheckoutRetrieveResponse
 ```typescript
 type CheckoutRetrieveResponse = {
-
   paymentStatus?: string;
-
   conversationId?: string;
-
   errorMessage?: string;
-
   paymentId?: string;
-
   cardFamily?: string;
-
   binNumber?: string;
-
   lastFourDigits?: string;
-
   [k: string]: unk
 ```
 
@@ -1340,15 +1315,10 @@ type PaymentTransaction = { paymentTransactionId?: string }
 ### PaymentDebug
 ```typescript
 type PaymentDebug = {
-
   refunded_total?: number;
-
   paymentId?: string;
-
   raw?: { paymentId?: string; itemTransactions?: PaymentTransaction[] };
-
   partial_refunds?: { amount: number; at: string }[];
-
   [k: string]: un
 ```
 
@@ -1365,21 +1335,13 @@ type IyziRefundResponse = { status?: string; [k: string]: unknown }
 ### IyziSdk
 ```typescript
 type IyziSdk = {
-
   cancel: {
-
     create: (
-
       req: { locale?: unknown; paymentId: string | null; ip: string },
-
       cb: (err: unknown, res: IyziCancelResponse) => void
-
     ) => void;
-
   };
-
   refund: {
-
    
 ```
 
@@ -1525,9 +1487,7 @@ Bu modül, istemci hatalarını toplayan bir Supabase Edge Function olup, HTTP i
 
 ## SABİTLER
 - **clientErrorSchema** (call) — `z.object({
-
   msg: z.string().default(''),
-
   stack: z.string().default(''),
 ...`
 
@@ -2444,7 +2404,6 @@ Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyicis
 
 ## SABİTLER
 - **corsHeaders** (object) — `{
-
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
 
 ---

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\getCategoryIcon.tsx
-skeleton_hash: 33a55071e2999970
+skeleton_hash: 3ebb541d03aef2e0
 entity_hashes:
   func:getCategoryIcon: e7e3d3061db761f5
   overview: c7c53a125873016e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,11 @@ Bu modül, verilen kategori slug'ına uygun ikon bileşeni döndürmek üzere ta
 - name: categorySlug, type: string — HVAC kategorisinin benzersiz metin tabanlı tanımlayıcısı, hangi ikonun seçileceğini belirleyen anahtar değer olarak kullanılır
 - name: props, type: IconProps — İkonun boyutu, rengi, tıklama olayları gibi tüm görsel ve işlevsel niteliklerini barındıran nesne, doğrudan seçilen ikon bileşenine aktarılır
 **Dönüş**: Tanımlanmış bir dönüş tipi yoktur, React bileşeni yapısında tasarlanmıştır, doğrudan ilgili ikon bilezenini ekrana render etmek üzere çalışır, ek bir değer döndürmez.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::React
 
 ---
 

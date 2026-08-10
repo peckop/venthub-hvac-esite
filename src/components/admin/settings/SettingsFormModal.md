@@ -12,7 +12,7 @@ entity_hashes:
   func:onSubmit: 36d88356bd3272ee
   overview: 5a17b2b7a2c5a922
   style_tokens: 631fa82b70a5654d
-generated_at: 2026-06-19T13:18:57Z
+generated_at: 2026-06-19T20:47:05Z
 ---
 
 ## Genel Bakış
@@ -138,84 +138,6 @@ type SettingsSection = 'general' | 'payment' | 'admins' | 'system'
 
 ---
 
-### [N2_NASIL] AST Pointer: SettingsFormModal.tsx::useEffect initializer (anonim)
-- **params**: () — parametre yok
-- **ic_degiskenler**: yok
-- **Kullanılan closure değişkenleri**: `open` — diyalogun açık/kapalı durumu (boolean); `initialValues` — mevcut ayar değerleri (object); `form` — react-hook-form instance'ı
-- **Dönüş**: yok — yan etki: diyalog açıldığında ve `initialValues` mevcutsa formu bu değerlerle resetler
-
----
-
-### [N3_NASIL] AST Pointer: SettingsFormModal.tsx::handleClose
-- **params**: () — parametre yok
-- **ic_degiskenler**: yok
-- **Kullanılan closure değişkenleri**: `form` — react-hook-form instance'ı (`form.formState.isDirty` ile kirli form kontrolü); `t` — useI18n'den gelen çeviri fonksiyonu; `onOpenChange` — diyalog durumunu dışarıya bildiren callback
-- **Dönüş**: yok — yan etki: form kirliyse `window.confirm` ile onay alır, onaylanırsa diyalogu kapatır; form temizse doğrudan kapatır
-
----
-
-### [N4_NASIL] AST Pointer: SettingsFormModal.tsx::handleOpenChange
-- **params**: `openVal` — boolean, diyalogun açılma/kapanma isteği
-- **ic_degiskenler**: yok
-- **Kullanılan closure değişkenleri**: `handleClose` — kapanış mantığını yöneten fonksiyon; `onOpenChange` — diyalog durumunu dışarıya bildiren callback
-- **Dönüş**: yok — yan etki: `openVal` false ise `handleClose()` çağırır; true ise `onOpenChange(true)` ile diyalogu açar
-
----
-
-### [N5_NASIL] AST Pointer: SettingsFormModal.tsx::useEffect beforeunload (anonim)
-- **params**: () — parametre yok
-- **ic_degiskenler**:
-  - `handleBeforeUnload` — `BeforeUnloadEvent` handler callback'i; form kirliyse tarayıcı kapatma/dolaşma olayını engeller
-- **Kullanılan closure değişkenleri**: `form` — react-hook-form instance'ı (`form.formState.isDirty` kontrolü)
-- **Dönüş**: Cleanup fonksiyonu — `beforeunload` event listener'ı `window`'dan kaldırır
-- **Yan etki**: `window.addEventListener('beforeunload', handleBeforeUnload)` ile listener ekler
-
----
-
-### [N6_NASIL] AST Pointer: SettingsFormModal.tsx::handleBeforeUnload (N5 içinde inner function)
-- **params**: `e` — BeforeUnloadEvent, tarayıcı sayfa kapatma/navigasyon olayı
-- **ic_degiskenler**: yok
-- **Kullanılan closure değişkenleri**: `form` — react-hook-form instance'ı (`form.formState.isDirty` kontrolü)
-- **Dönüş**: `''` (string boş) — form kirliyse tarayıcı navigasyon engeli tetiklenir; `e.preventDefault()` ve `e.returnValue = ''` ile engelleme yapılır
-
----
-
-### [N7_NASIL] AST Pointer: SettingsFormModal.tsx::beforeunload cleanup (N5 içinde inner function)
-- **params**: () — parametre yok
-- **ic_degiskenler**: yok
-- **Kullanılan closure değişkenleri**: `handleBeforeUnload` — kaldırılacak olan event handler referansı
-- **Dönüş**: yok — yan etki: `window.removeEventListener('beforeunload', handleBeforeUnload)` ile listener temizler
-
----
-
-### [N8_NASIL] AST Pointer: SettingsFormModal.tsx::onSubmit
-- **params**: `values` — Record<string, unknown>, form submit edilen değerler sözlüğü
-- **ic_degiskenler**:
-  - `authData` — `supabase.auth.getUser()` yanıt nesnesi; `.user` altındaki kimlik doğrulama bilgilerini içerir
-  - `userId` — `authData.user?.id || null` ifadesinden türetilen, kimliği doğrulanmış kullanıcının UUID'si veya null
-  - `msg` — catch bloğunda oluşturulan hata mesajı string'i; `AdminPermissionError`, `Error` veya genel hata durumuna göre `t()` ile çevrilir
-- **Kullanılan closure değişkenleri**: `section` — aktif ayarlar bölümü anahtarı; `setSaving` — loading state setter'ı; `supabase` — Supabase client instance'ı; `hasWriteAccess` — yazma izni flag'i (useRole'den); `initialValues` — değişiklik öncesi mevcut değerler (audit için); `t` — çeviri fonksiyonu; `onSuccess` — başarı callback'i; `onOpenChange` — diyalog kapatma callback'i; `mutateWithAudit` — audit loglu mutasyon fonksiyonu; `toSupabaseJson` — JSON dönüştürme yardımcı fonksiyonu
-- **Dönüş**: yok — yan etki: `setSaving(true)` ile loading başlatır, `mutateWithAudit` ile site_settings tablosuna upsert yapar, `toast.success` ile başarı bildirimi gösterir, `onSuccess()` + `onOpenChange(false)` ile callback ve kapanış tetikler; hata durumunda `toast.error` ile hata bildirimi gösterir
-
----
-
-### [N9_NASIL] AST Pointer: SettingsFormModal.tsx::mutateWithAudit inner fn (N8 içinde callback)
-- **params**: () — parametre yok (mutateWithAudit'a `fn` parametresi olarak verilen callback)
-- **ic_degiskenler**:
-  - `error` — `supabase.from('site_settings').upsert()` yanıtından destructured hata nesnesi; başarı durumunda `undefined`
-- **Kullanılan closure değişkenleri**: `section` — upsert'in `key` alanı olarak kullanılır; `values` — form değerleri, `toSupabaseJson` ile JSON'a dönüştürülerek `value` alanına yazılır; `userId` — `updated_by` alanına yazılan kullanıcı ID'si; `supabase` — Supabase client instance'ı; `toSupabaseJson` — JavaScript objesini Supabase JSON formatına dönüştüren yardımcı fonksiyon
-- **Dönüş**: yok — yan etki: `site_settings` tablosuna `(key=section, value, updated_by, updated_at)` satırı upsert eder; `error` varsa fırlatır
-
----
-
-### [N10_NASIL] AST Pointer: SettingsFormModal.tsx::getSectionTitle
-- **params**: () — parametre yok
-- **ic_degiskenler**: yok
-- **Kullanılan closure değişkenleri**: `section` — aktif ayarlar bölümü anahtarı; `t` — useI18n'den gelen çeviri fonksiyonu
-- **Dönüş**: string — `section` değerine göre çevrilmiş başlık metni (`generalSettingsTitle`, `paymentSettingsTitle`, `adminsPolicyTitle`, `systemConfigTitle`); `section` falsy ise boş string `''` döner
-
----
-
 
 ## MERMAID CALL GRAPH
 ```mermaid
@@ -225,8 +147,8 @@ graph TD
     SettingsFormModal_tsx__handleClose["handleClose"]
     SettingsFormModal_tsx__handleOpenChange["handleOpenChange"]
     SettingsFormModal_tsx__onSubmit["onSubmit"]
-    SettingsFormModal_tsx__SettingsFormModal --> SettingsFormModal_tsx__getSectionTitle
     SettingsFormModal_tsx__SettingsFormModal --> SettingsFormModal_tsx__handleClose
+    SettingsFormModal_tsx__SettingsFormModal --> SettingsFormModal_tsx__getSectionTitle
 ```
 
 ## NODE ID STANDARD

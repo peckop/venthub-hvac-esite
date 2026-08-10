@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\datetime.ts
-skeleton_hash: 3517abf8a058c0b3
+skeleton_hash: d0372a159f925bd8
 entity_hashes:
   func:formatDate: 14e0f22f55add348
   func:formatDateTime: bca9df36994c09a4
   func:formatTime: ffcc8071ca9c075f
   overview: 3b7d66dc5c8cd5fa
-generated_at: 2026-05-28T22:37:50Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış

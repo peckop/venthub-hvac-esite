@@ -8,7 +8,7 @@ entity_hashes:
   func:TermsOfUseContentEn: fa6bb0a6f0f85b35
   overview: 964d7e1b007c0dbd
   style_tokens: 6460a848de07bdf3
-generated_at: 2026-06-16T11:56:13Z
+generated_at: 2026-06-19T20:50:36Z
 ---
 
 ## Genel Bakış
@@ -24,30 +24,6 @@ Bu grup, uygulamanın yasal metinlerini ve zorunlu koşullarını kullanıcıya 
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül için özel aksiyom tanımlanmamıştır.
-
----
-
-### Neden Aksiyom Üretilmedi
-
-**1. Fonksiyon gövdesi (body) verilmemiştir.**
-Mevcut bilgiler sadece fonksiyon imzası (`TermsOfUseContentEn`) ve dosya yoludur. Aksiyomlar yalnızca **fonksiyon gövdesindeki** mantıksal akıştan, koşullardan ve bağımlılıklardan üretilebilir. Gövde olmadan varsayım türetmek **kehanet** olur; mimari aksiyom değildir.
-
-**2. Modül sabitleri (constants) tanımı boş verilmiştir.**
-
-**3. Fonksiyon imzası tek parametre (`lang: string`) almasına rağmen, bileşen adı zaten `...En` (İngilizce) suffix'i taşımaktadır.**
-Bu çelişki, `lang` parametresinin fonksiyon gövdesinde nasıl kullanıldığını (ör. hiyerarşik bir yapıda alt dil mi, yoksa doğrudan mı kullanılıyor) belirsiz kılar. Gövde olmadan bu ilişkiye dair güvenilir bir aksiyom üretilemez.
-
----
-
-### Beklenen Aksiyom Türleri (gövde mevcut olsaydı üretilebilecekler)
-
-| Aksiyom Türü | Örnek (gövde ile üretilecek tür) |
-|---|---|
-| **Dil doğrulama** | `lang` parametresinin geçerli bir dil kodu olması |
-| **İçerik varlığı** | Render edilen metin/dökümanın boş olmaması |
-| **Bağımlılık** | Kullanılan alt bileşenlerin (varsa) mevcudiyeti |
-
-> **Not:** Mimari Hakem olarak, gövde verilmeden aksiyon uydurmak yerine "bilinmiyor" durumunu açıkça beyan etmeyi tercih ederim.
 
 ---
 

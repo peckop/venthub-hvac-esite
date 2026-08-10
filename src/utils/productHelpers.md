@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\productHelpers.ts
-skeleton_hash: 37c2c0abc7820f85
+skeleton_hash: 50a1877aa6ab9215
 entity_hashes:
   func:formatSpecValue: 0b8f9bc746e92a72
   func:groupTechnicalSpecs: 51db2787f818ddff
   func:translateSpecKey: 29d8d7c9441eed5b
   overview: d7a104403f7d2f6a
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -66,13 +66,17 @@ Bu modül, ürün teknik özelliklerinin dönüştürülmesi ve biçimlendirilme
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: lucide-react::Ruler
+- import: lucide-react::Settings
+- import: react::React
+
+---
+
 ## SABİTLER
 - **SPEC_SORT_ORDER** (object) — `{
-
   // Performance Group Priority
-
   'number_of_speeds': 1,
-
   'max_ambient_...`
 
 ---

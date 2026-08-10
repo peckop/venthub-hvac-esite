@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\ui.en.ts
-skeleton_hash: f814e0d092e43a44
+skeleton_hash: aa752355f1524b3a
 entity_hashes:
   overview: 1ca0cb4cc145d139
-generated_at: 2026-06-16T11:09:10Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -37,10 +37,10 @@ Bu modül, uluslararasılaştırma (i18n) sözlük verisi içeren bir kaynaktır
 
 ## SABİTLER
 - **ui** (object) — `{
-      prev: 'Previous',
-      next: 'Next',
-      refresh: 'Refresh',
-     ...`
+  prev: 'Previous',
+  next: 'Next',
+  refresh: 'Refresh',
+  loading: 'L...`
 
 ---
 

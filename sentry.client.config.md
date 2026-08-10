@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\sentry.client.config.ts
-skeleton_hash: ff75e94a761e823f
+skeleton_hash: b4613cefcec1f422
 entity_hashes:
   overview: b30de304c94c2910
-generated_at: 2026-06-08T09:00:20Z
+generated_at: 2026-06-19T20:51:04Z
 ---
 
 ## Genel Bakış
@@ -28,6 +28,11 @@ Bu modül için fonksiyon gövdesi içeriği mevcut değildir; yalnızca modül 
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @sentry/nextjs
 
 ---
 

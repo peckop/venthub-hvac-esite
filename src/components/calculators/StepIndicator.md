@@ -8,7 +8,7 @@ entity_hashes:
   func:StepIndicator: 203f6e11e7ae2ca6
   overview: a00e439886770189
   style_tokens: a71e92d8d5570ada
-generated_at: 2026-06-14T19:44:11Z
+generated_at: 2026-06-19T20:47:06Z
 ---
 
 ## Genel Bakış
@@ -22,16 +22,6 @@ Adım dizisini alarak her bir adım için daire, etiket ve bağlantı çizgileri
 ### Etkileşim Yönetimi
 Kullanıcı bir adıma tıkladığında dışarıdan gelen callback fonksiyonunu tetikleyerek adım geçiş mantığını üst katmana aktarır; bileşen kendi durumunu yönetmez, sadece etkileşim olaylarını iletir.
 - StepIndicator (onStepClick çağrısı)
-
----
-
-## AXIOMS – Mimari Varsayımlar
-
-**[Aksiyom 1]:** `steps` prop'u boş veya tanımsız ise bileşen hiçbir şey render etmez, çıkış boş kalır.
-
-**[Aksiyom 2]:** `currentStep` geçerli indeks aralığı (0 ≤ currentStep < steps.length) dışındaysa aktif adım gösterimi tutarsız olur.
-
-**[Aksiyom 3]:** `onStepClick` bir fonksiyon olarak sağlanması zorunludur; aksi halde tıklama işleminde çalışma zamanı hatası oluşur.
 
 ---
 

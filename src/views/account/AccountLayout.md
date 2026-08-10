@@ -8,7 +8,7 @@ entity_hashes:
   func:AccountLayout: d9966002287f3c91
   overview: 29bdf5b29582877d
   style_tokens: cca55516cfe981ad
-generated_at: 2026-06-15T17:05:45Z
+generated_at: 2026-06-19T20:48:21Z
 ---
 
 ## Genel Bakış
@@ -28,10 +28,6 @@ Bu modül, hesap yönetim arayüzünün layout konteyner bileşenidir ve childre
 **[Aksiyom 1]:** Eğer `children` prop'u sağlanmamışsa, bileşen yine de hata vermeden render edilmelidir (çünkü `children` opsiyonel `React.ReactNode` tipindedir).
 
 **[Aksiyom 2]:** Eğer `children` sağlanmışsa, bu değer doğrudan layout içinde render edilmelidir (bileşen bir wrapper/container yapısındadır).
-
----
-
-> **Not:** Bu modül, opsiyonel `children` dışında hiçbir prop, state veya hook kullanmamaktadır. Fonksiyon gövdesinde iş mantığı, eşik değeri veya doğrulama kuralı bulunmadığından, additional domain-specific aksiyom tanımlanmamıştır.
 
 ---
 

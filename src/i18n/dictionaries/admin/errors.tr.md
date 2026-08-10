@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\errors.tr.ts
-skeleton_hash: 3daecaebdfc21ebb
+skeleton_hash: 825d9e0cd25c876f
 entity_hashes:
   overview: 0cabb6ce3dc6888f
-generated_at: 2026-06-13T17:00:13Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -31,7 +31,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **errors** (object) — `{
-      subtitle: 'İstemci tarafı hataları izleyin, filtreleyin ve ayrıntılar...`
+      subtitle: 'İstemci tarafı hataları izleyin, filtreleyin ve ayrıntıla...`
 
 ---
 

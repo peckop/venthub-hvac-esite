@@ -8,7 +8,7 @@ entity_hashes:
   func:DataTableHead: 6c9fd15265777c11
   overview: 8a2e4ee22e36046d
   style_tokens: f757e445b6e3cc07
-generated_at: 2026-06-13T14:59:47Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -37,10 +37,6 @@ Bu modül için fonksiyon gövdesi paylaşılmadığından, mimari varsayımlar 
 
 ---
 
-> **Not:** Detaylı aksiyom üretimi için `DataTableHead` fonksiyonunun gövdesi (function body) paylaşılmalıdır. Mevcut bilgiler yalnızca fonksiyon imzasından ibarettir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### DataTableHead
@@ -62,6 +58,14 @@ Bu modül için fonksiyon gövdesi paylaşılmadığından, mimari varsayımlar 
     - `compact`: `boolean` — Kompakt (sıkışık) bir görünüm için hücre içi boşlukları küçültülüp küçültülmeyeceğini belirtir.
 
 **Dönüş**: `ReactNode` — Bu bileşen, `<thead>` etiketi içinde bir `<tr>` satırını ve içindeki tüm başlık hücrelerini (`<th>`) içeren bir React düğümü (node) döndürür. Döndürülen yapı, bir HTML tablosunun başlık bölümünü temsil eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../utils/adminUi::adminTableHeadCellClass
+- import: ./types::type { AdminColumn }
+- import: @/hooks/useAdminTable::type { SortState }
+- import: react::type { ReactNode }
 
 ---
 

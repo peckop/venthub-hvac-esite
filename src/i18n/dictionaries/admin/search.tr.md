@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\search.tr.ts
-skeleton_hash: db5cddc6fa364e6a
+skeleton_hash: 857fe11e6f48d537
 entity_hashes:
   overview: fc6cf9147f6079c3
-generated_at: 2026-06-17T13:23:01Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -28,8 +28,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **search** (object) — `{
-      audit: 'Tablo, birincil anahtar veya nota göre ara',
-      coupons:...`
+  audit: 'Tablo, birincil anahtar veya nota göre ara',
+  categories: 'Kat...`
 
 ---
 

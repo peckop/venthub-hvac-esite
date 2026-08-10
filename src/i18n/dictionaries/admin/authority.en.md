@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\authority.en.ts
-skeleton_hash: 87181bc1ad9053f3
+skeleton_hash: cbe174ff2a5a63a5
 entity_hashes:
   overview: d75139dd453d58b5
-generated_at: 2026-06-16T10:18:09Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -29,8 +29,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **authority** (object) — `{
-      labelTraditional: 'Label (e.g. Traditional)',
-      labelVenthub: '...`
+  labelTraditional: 'Label (e.g. Traditional)',
+  labelVenthub: 'Label (e...`
 
 ---
 

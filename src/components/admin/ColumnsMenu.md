@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\ColumnsMenu.tsx
-skeleton_hash: 0b60e261dadfb14d
+skeleton_hash: 55890a95487cfde8
 entity_hashes:
   func:ColumnsMenu: acb58bb1e295bcab
   overview: b2310e22f90d9a39
   style_tokens: f68608c28260c039
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:46:46Z
 ---
 
 ## Genel Bakış
@@ -43,6 +43,19 @@ Bu modül, sütunların görünürlüğünü ve satır yoğunluğunu yöneten bi
 - `buttonLabel`: `string | undefined` — Opsiyonel. Menüyü açan buton üzerinde görüntülenecek özel etiket metni. Sağlanmadığında varsayılan metin kullanılır.
 
 **Dönüş**: `React.FC` — JSX ile render edilen bir React fonksiyonel bileşeni döndürür. Bileşen, sütun toggle'larını ve yoğunluk seçim kontrolünü içeren bir menü arayüzü sunar.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../types/admin-shared::Density
+- import: ../../utils/adminUi::adminButtonSecondaryClass
+- import: @radix-ui/react-dropdown-menu
+- import: lucide-react::Check
+- import: lucide-react::Layout
+- import: lucide-react::Maximize2
+- import: lucide-react::Settings2
+- import: react::React
 
 ---
 

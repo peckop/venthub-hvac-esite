@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminOrdersPage: e43c6c3c6f2a0c99
   overview: cd2f2af45ddb107c
   style_tokens: cfe5ac8098e12bb2
-generated_at: 2026-06-13T20:07:54Z
+generated_at: 2026-06-19T20:48:58Z
 ---
 
 ## Genel Bakış
@@ -72,6 +72,20 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - Bu bileşenin tanımlı prop parametresi yoktur. Bileşen, iç state'ini ve verilerini hook'lar (useAdminTable) ile URL arama parametreleri (useSearchParams) üzerinden yönetir.
 
 **Dönüş**: `React.FC` — Siparişler yönetim sayfasını oluşturan React fonksiyonel bileşeni. Bileşen, header ve sipariş tablosu/kanban görünümü arasındaki geçiş anahtarını (toggle) içeren JSX döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: ./AdminOrdersBoard::AdminOrdersBoard
+- import: ./OrdersTableBody::OrdersTableBody
+- import: lucide-react::KanbanSquare
+- import: lucide-react::LayoutList
+- import: react::React
+- import: react::Suspense
 
 ---
 

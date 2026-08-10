@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\design-system\tokens.js
-skeleton_hash: 49c7465326318d5b
+skeleton_hash: e9e8335ba0e85e39
 entity_hashes:
   overview: 604c676f787fff08
-generated_at: 2026-06-12T10:23:25Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış  
@@ -37,56 +37,54 @@ Bu modül, tasarım sisteminin temel yapı taşlarını (design tokens) tanımla
   'raised':   '10',
   'dropdown': '50',
   'sticky':   '90',
-  'modal':    '...`
+  'modal': ...`
 - **maxWidth** (object) — `{
   'page':    '100rem',     // 1600px
-  'content': '56.25rem',   // 900px
-  ...`
+  'content': '56.25rem',   // 900px...`
 - **borderRadius** (object) — `{
   'hvac-sm':  '0.375rem',  // 6px
   'hvac-md':  '1rem',      // 16px
-  'hva...`
+  '...`
 - **fontSize** (object) — `{
   'display': ['var(--font-size-display)', { lineHeight: '1.1' }],
-  '7px': ...`
+  '7px'...`
 - **boxShadow** (object) — `{
   // Mevcut korunanlar
-  'hvac':                  '0 4px 6px -1px rgba(30,6...`
+  'hvac':                  '0 4px 6px -1px rgba(30...`
 - **height** (object) — `{
   'hvac-input':   '40px',   // 5×8
   'hvac-thumb':   '72px',   // 9×8
-  'hv...`
+  ...`
 - **minHeight** (object) — `{
   'hvac-input':   '40px',
   'hvac-card':    '160px',  // 20×8
-  'hvac-panel...`
+  'hvac-pa...`
 - **maxHeight** (object) — `{
   'hvac-menu':    '300px',
   'hvac-panel':   '480px',  // 60×8
-  'hvac-moda...`
+  'hvac-m...`
 - **width** (object) — `{
   'hvac-menu':    '360px',  // 45×8 (toast, küçük panel)
-  'hvac-modal':   ...`
+  'hvac-modal': ...`
 - **minWidth** (object) — `{
   'hvac-btn':     '120px',  // 15×8
   'hvac-menu':    '140px',
-  'hvac-sele...`
+  'hvac-s...`
 - **transitionDuration** (object) — `{
   'hvac-fast':   '150ms',
   'hvac-normal': '250ms',
-  'hvac-slow':   '600ms...`
+  'hvac-slow':   '60...`
 - **transitionTimingFunction** (object) — `{
   'hvac-ease':   'cubic-bezier(0.16, 1, 0.3, 1)',
-  'hvac-spring': 'cubic-b...`
+  'hvac-spring': 'cubic...`
 - **blur** (object) — `{
   '80':  '80px',
   '100': '100px',
   '120': '120px',
-  '150': '150px',
-  '2...`
+  '150': '150px',...`
 - **transitionProperty** (object) — `{
   'opacity-transform':           'opacity, transform',
-  'opacity-only':   ...`
+  'opacity-only': ...`
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\WhatsAppFloat.tsx
-skeleton_hash: f9391033c10cb376
+skeleton_hash: 4ae1d616306c21ed
 entity_hashes:
   func:WhatsAppFloat: 594fe2409e378878
   overview: 27f525e3029fcecb
   style_tokens: fb346cbde40036cb
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:47:48Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,15 @@ Bu React TypeScript ile geliştirilmiş WhatsApp iletişim float butonu bileşen
 **Parametreler**:
 - Bu fonksiyon herhangi bir giriş parametresi almaz, bağımsız olarak çalışmak üzere tasarlanmıştır, tüm yapılandırma, stil ve işlevselliğini kendi bünyesinde barındırır.
 **Dönüş**: React.FC tipinde bir React fonksiyonel bileşeni döndürür. Bu döndürülen bileşen, tüm içerik, stil ve tıklama olay yönetimleri tanımlı WhatsApp butonunu ekrana render etmeye olanak tanır, React'in bileşen çalışma mantığıyla tam uyumlu olarak proje içinde kullanılabilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: ../utils/whatsapp::getSupportLink
+- import: ../utils/whatsapp::isWhatsAppAvailable
+- import: ./HVACIcons::WhatsAppIcon
+- import: react::React
 
 ---
 

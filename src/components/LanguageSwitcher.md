@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\LanguageSwitcher.tsx
-skeleton_hash: 81fcd9fee11ddf92
+skeleton_hash: d6dfc9a8a72992f9
 entity_hashes:
   func:LanguageSwitcher: e20e68a6d834aa54
   func:switchLanguage: ceec0990f90068b4
   overview: 2f23c86896c74c04
   style_tokens: 819c78943fe15425
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-19T20:47:09Z
 ---
 
 ## Genel Bakış
@@ -54,6 +54,15 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**:  
 - newLang: `'tr' | 'en'` — Değiştirilecek hedef dil kodu.  
 **Dönüş**: Belirtilmemiş — Fonksiyonun dönüş tipi dokümantasyonda tanımlı değildir (muhtemelen `void`).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: next/navigation::usePathname
+- import: next/navigation::useRouter
+- import: next::type { Route }
+- import: react::React
 
 ---
 

@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminErrorGroupsPage: 8cf21adc3f3ff52a
   overview: 74c77915b531bc1a
   style_tokens: a7fe3ab3ca0c1259
-generated_at: 2026-06-13T18:55:24Z
+generated_at: 2026-06-19T20:48:41Z
 ---
 
 ## Genel Bakış
@@ -53,10 +53,6 @@ Eğer React ortamı veya routing altyapısı yoksa, bileşen render edilemez.
 
 ---
 
-> **Not:** Fonksiyon imzalarında parametre detayları, varsayılan değerler veya modül sabitleri belirtilmediğinden, eşik değerleri, filtre kriterleri, API endpoint adresleri gibi spesifik değerler **bilinmiyor** olarak bırakılmıştır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### AdminErrorGroupsPage
@@ -68,6 +64,17 @@ Eğer React ortamı veya routing altyapısı yoksa, bileşen render edilemez.
 Bu bileşen `React.FC` tipi ile tanımlanmıştır ve herhangi bir props almamaktadır. Bileşen içindeki tüm state yönetimi URL parametreleri ve alt bileşenler aracılığıyla yürütülür.
 
 **Dönüş**: `React.FC` — Hata gruplarını DataTableKit tablosu formatında gösteren, Suspense ile sarılmış bir React sayfa bileşeni döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: ./ErrorGroupsTableBody::ErrorGroupsTableBody
+- import: react::React
+- import: react::Suspense
 
 ---
 

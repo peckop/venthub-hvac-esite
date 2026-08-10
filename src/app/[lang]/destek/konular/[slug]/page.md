@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\konular\[slug]\page.tsx
-skeleton_hash: a57903678e35d28e
+skeleton_hash: 718e91b7fb8eaa10
 entity_hashes:
   func:Page: 2d510b14b2c5d81b
   func:generateStaticParams: f1cbfd553f9fcd39
   overview: 379a6c4a34f8235e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -56,6 +56,12 @@ Bu modül için yalnızca fonksiyon imzalarından çıkarılabilecek minimum mim
 **Dönüş**: Bir JSX elementi (React bileşeni) döndürür.specifically, `<PageComponent slug={slug} />` ifadesi.
 
 **Kaynak Dosya**: `src\app\[lang]\destek\konular\[slug]\page.tsx`
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../../i18n/dictionaries/tr::tr
+- import: ../../../../../views/knowledge/TopicPage::PageComponent
 
 ---
 

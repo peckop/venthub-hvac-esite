@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InventoryQrLabel.tsx
-skeleton_hash: ebe773dcc2c30493
+skeleton_hash: fe505da59f1230cb
 entity_hashes:
   func:printQrLabel: 68158948d578d02a
   overview: ddf13ce18f5512aa
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-29T18:45:03Z
+generated_at: 2026-06-19T20:47:03Z
 ---
 
 ## Genel Bakış
@@ -35,6 +35,11 @@ Bu modül, QR etiket yaz
 - r: QrLabelProps — Yazdırılacak QR etiketinin özelliklerini içeren nesne.  
 - setPrintingQr: (v: boolean) => void — Yazdırma işleminin başlatılıp bitirilmesini gösteren durum güncelleyici fonksiyonu.  
 **Dönüş**: void — Fonksiyon bir değer döndürmez.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: sonner::toast
 
 ---
 

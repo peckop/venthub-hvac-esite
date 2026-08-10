@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\ensureSessionFresh.ts
-skeleton_hash: f34dd9fb935a7aac
+skeleton_hash: 17deb46f64faae1d
 entity_hashes:
   func:ensureSessionFresh: 28037b5d7337277a
   overview: 7e306322f9d1fbb3
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış
@@ -45,6 +45,11 @@ Bu modül için verilen bilgiler (fonksiyon imzası ve modül sabitleri) aksiyom
 Bu fonksiyon herhangi bir parametre almamaktadır.
 
 **Dönüş**: `Promise<void>` — Fonksiyon asenkron çalışır ve anlamlı bir değer dönmez. Yenileme işlemi başarılı olsa da olmasa da çağrıyı tamamlar.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./supabase::supabase
 
 ---
 

@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminCouponsPage: e1c124663ca9483b
   overview: 4ef12aeba405f39c
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-13T15:27:18Z
+generated_at: 2026-06-19T20:48:41Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,17 @@ Sunucu tarafında yeni kupon kaydetme ve mevcut kuponların aktif/pasif durumunu
 **Parametreler**:
 - (Parametre yok)
 **Dönüş**: `React.FC` — Fonksiyonel bir React bileşeni. Doğrudan bir JSX yapısı (sayfa düzeni) döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: ./CouponsTableBody::CouponsTableBody
+- import: react::React
+- import: react::Suspense
 
 ---
 

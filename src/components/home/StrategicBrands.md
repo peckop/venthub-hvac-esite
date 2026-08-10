@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\StrategicBrands.tsx
-skeleton_hash: c335ec57d52a12da
+skeleton_hash: 6988c29fc80f9eda
 entity_hashes:
   func:StrategicBrands: cf2c83a7b060b93b
   overview: 3329d9ad42f18a85
   style_tokens: 908950a4b058f189
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-19T20:47:09Z
 ---
 
 ## Genel Bakış  
@@ -53,6 +53,12 @@ Bu aksiyomlar, StrategicBrands bileşeninin **çevrim (i18n) fonksiyonuna bağı
 - dictionary: `t` (veya `StrategicBrandsProps` içindeki karşılığı) — Bileşenin render edeceği metinleri veya çevirileri içeren bir nesne. Bu nesne, üst bileşen tarafından sağlanan sözlük yapısına bağlıdır.
 
 **Dönüş**: `React.FC<StrategicBrandsProps>` — React fonksiyonel bileşeni döndürür. Dönüş tipi, `StrategicBrandsProps` arayüzüne uygun bir fonksiyonel bileşendir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../BrandsShowcase::BrandsShowcase
+- import: react::React
 
 ---
 

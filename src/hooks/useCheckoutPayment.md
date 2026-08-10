@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCheckoutPayment.ts
-skeleton_hash: f8d5db6ffdf7b4b1
+skeleton_hash: 379d063c216d7045
 entity_hashes:
   func:useCheckoutPayment: a8bb41b15d097162
   overview: 62578f63e914fc17
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -58,6 +58,20 @@ Bu modül, ödeme sürecini yöneten bir React hook'u olup, çalışması için 
 - `or`: UseCheckoutPaymentProps — Tüm parametreleri kapsayan tip tanımı (props nesnesi).
 
 **Dönüş**: object — `{ loading: boolean, token: string, url: string, initiatePayment: function, ... }` şeklinde, ödeme durumunu (yükleme, token, yönlendirme URL’si) ve ödeme başlatma işlevini içeren bir nesne.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../lib/order::validateServerCart
+- import: ../utils/checkoutHelpers::getPriceHashLocal
+- import: ../utils/checkoutHelpers::getPriceHashServer
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @/types/cart::type { CartItem }
+- import: @supabase/supabase-js::type { User }
+- import: next/navigation::useRouter
+- import: react::useEffect
+- import: react::useState
+- import: sonner::toast
 
 ---
 

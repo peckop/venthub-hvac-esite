@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\RichTextRenderer.tsx
-skeleton_hash: 97032baf78cc63f8
+skeleton_hash: 8cca6770e365ed7f
 entity_hashes:
   func:RichTextRenderer: 827584ed75053437
   overview: c7751cfdcd10bdc7
   style_tokens: 95b6c3607cdf0117
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:27Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,12 @@ React tabanlı bu zengin metin renderlayıcı bileşen, yalnızca üst bileşen 
 **Parametreler**:
 - name: content, type: string — RichTextRendererProps tipi altında tanımlanan, render edilecek ham HTML formatlı zengin metin içeriği. Genellikle platformun backend sisteminden veya içerik yönetim sisteminden alınan metin verisini taşır.
 **Dönüş**: React.ReactElement — Tüm güvenlik kontrollerinden geçirilmiş, işlenmiş zengin metin içeriğini içeren, doğrudan sayfa içinde görüntülenmeye hazır bir React elemanı döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: lucide-react::Check
+- import: react::React
 
 ---
 

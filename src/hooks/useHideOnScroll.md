@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useHideOnScroll.ts
-skeleton_hash: 571ee459764116bd
+skeleton_hash: 487831d2e25b9a1a
 entity_hashes:
   func:useHideOnScroll: 8147a4dacc20e5ab
   overview: 12bcf4529d8cd3f7
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,13 @@ Bu React hook'u, kaydırma olaylarını dinleyerek UI elemanlarının görünür
 - options: UseHideOnScrollOptions — Hook'un çalışma prensibini yapılandırmak için kullanılan tek konfigürasyon nesnesi, opsiyonel olarak tanımlanabilir, içindeki tüm özellikler isteğe bağlıdır.
 - options.threshold: number — Scroll durumunun güncellenmeden önce kullanıcının ne kadar piksel scroll yapması gerektiğini belirten eşik değeri, varsayılan olarak 50 piksel olarak ayarlanmıştır, isteğe bağlı olarak proje ihtiyacına göre farklı bir değer atanabilir.
 **Dönüş**: HideOnScrollState türünde boolean tipinde durum bayrakları içeren bir nesne döndürür. Bu nesne içindeki bayraklar; kullanıcının scroll yönü, belirtilen eşik değeri geçip geçmediği ve sayfanın en üstünde olup olmama gibi tüm gerekli scroll durumlarını barındırır, UI elemanlarının görünürlüğünü yönetmek için doğrudan kullanılabilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::useEffect
+- import: react::useRef
+- import: react::useState
 
 ---
 

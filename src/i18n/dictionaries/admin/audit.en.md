@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\audit.en.ts
-skeleton_hash: 83669633f05a5b0a
+skeleton_hash: d31f7e6d3869f15c
 entity_hashes:
   overview: 296262cb85b992c0
-generated_at: 2026-06-13T18:02:39Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -41,7 +41,7 @@ Bu modül, i18n (uluslararasılaştırma) amaçlı salt veri yapısı içerir; d
 - **audit** (object) — `{
       actionTitle: 'Action',
       clear: 'Clear',
-      colAction: 'Action...`
+      colAction: 'Act...`
 
 ---
 

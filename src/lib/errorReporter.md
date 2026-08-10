@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\errorReporter.ts
-skeleton_hash: a9a1ef9b05b73e77
+skeleton_hash: f9df7b79905c62af
 entity_hashes:
   func:reportError: 08ffee8a5f783d08
   overview: 99b24f9de09b5423
-generated_at: 2026-05-28T22:37:58Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış

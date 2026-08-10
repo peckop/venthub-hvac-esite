@@ -9,8 +9,8 @@ entity_hashes:
   func:save: f665f70eecd0464b
   func:saveGeneralSettings: 8c4e593571ba8563
   overview: 9323d0a1247c733d
-  style_tokens: 114083f4641bd38f
-generated_at: 2026-06-16T10:20:03Z
+  style_tokens: 4fdace2e7c9567fa
+generated_at: 2026-06-19T20:48:46Z
 ---
 
 ## Genel Bakış
@@ -31,24 +31,6 @@ Yapılan değişikliklerin sunucuya iletilmesini ve kalıcı olarak saklanmasın
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, yönetici panelindeki envanter ayarları sayfasını ve ilişkili kaydetme mantığını içeren bir React bileşenidir. Aşağıdaki mimari varsayımlar fonksiyon imzalarından türetilmiştir.
-
----
-
-**[Aksiyom 1]:** Eğer React runtime ortamı (React context, DOM) yoksa, `AdminInventorySettingsPage` bileşeni render edilemez ve hata oluşur.
-
-**[Aksiyom 2]:** Eğer backend API erişilebilir durumda değilse (sunucu, ağ bağlantısı), `save()` fonksiyonu asenkron çalışırken başarısız olur ve hata fırlatır — bileşenin hata yönetim mekanizması bu durumu yakalamalıdır.
-
-**[Aksiyom 3]:** Eğer `save()` çağrılmadan önce kaydedilecek geçerli bir envanter ayar verisi (state/form verisi) mevcut değilse, fonksiyon geçersiz veya boş veri gönderir; bunun sunucu tarafında ne tür bir davranışa yol açacağı bilinmiyor.
-
-**[Aksiyom 4]:** Eğer `saveGeneralSettings()` çağrılmadan önce genel ayarlarla ilgili geçerli veri mevcut değilse, fonksiyon geçersiz veya boş veri gönderir; bunun sunucu tarafında ne tür bir davranışa yol açacağı bilinmiyor.
-
-**[Aksiyom 5]:** Eğer `save()` ile `saveGeneralSettings()` eş zamanlı (parallel) olarak çağrılırsa, race condition veya veri tutarsızlığı oluşabilir — çünkü her iki fonksiyon da asenkron olup paylaşımlı kaynakları (state, API) etkileyebilir.
-
-**[Aksiyom 6]:** Eğer modül bir admin panelinin parçasıysa, kullanıcıyetik doğrulama/otorizasyon mekanizması modül dışından sağlanmalıdır — fonksiyon imzalarında auth kontrolüne dair herhangi bir parametre veya bağımlılık tanımlı değildir.
-
----
-
-**Not:** Fonksiyon imzalarında parametre tanımları ve return tipleri minimal düzeyde verildiği için, bu aksiyomlar yalnızca imza yapılarından çıkarılabilen temel bağımlılıkları içermektedir. Fonksiyon gövdelerine erişim olmadığından, detaylı veri akışı ve doğrulama kuralları bilinmemektedir.
 
 ---
 
@@ -245,7 +227,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - `rounded-hvac-xl`
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-amber-500/5`, `bg-cyan-500/5`, `bg-rose-500/5`, `bg-surface-deep/40`, `bg-transparent`, `bg-violet-500`, `bg-violet-500/5`, `border-amber-500/10`, `border-b`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `group-hover:bg-cyan-500/10`, `group-hover:bg-violet-500/10`
-- **Layout:** `!h-12`, `absolute`, `block`, `flex`, `flex-1`, `gap-10`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `h-14`, `h-5`, `h-64`
-- **Varyant/Responsive:** `focus-visible:`, `group-hover:`, `hover:`, `lg:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `!font-black`, `!text-center`, `!text-lg`, `${adminButtonPrimaryClass`, `${adminCardClass`, `${adminInputClass`, `-mr-32`, `-mt-32`, `animate-in`, `blur-3xl`, `border`, `cursor-pointer`, `duration-700`, `fade-in`, `focus-visible:ring-cyan-400/20`
+- **Renkler:** `bg-amber-500/5`, `bg-cyan-500/5`, `bg-rose-500/5`, `bg-surface-deep/40`, `bg-transparent`, `bg-violet-500`, `bg-violet-500/5`, `border-amber-500/10`, `border-rose-500/20`, `border-t`, `border-white/10`, `border-white/5`, `first:border-t-0`, `group-hover/item:text-cyan-400`, `group-hover:bg-amber-500/10`
+- **Layout:** `block`, `flex`, `flex-1`, `gap-3`, `gap-4`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `h-14`, `h-5`, `items-center`, `items-end`, `items-start`, `justify-end`
+- **Varyant/Responsive:** `first:`, `focus-visible:`, `group-hover/item:`, `group-hover:`, `hover:`, `lg:`, `md:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${adminBlurBlobClass`, `${adminButtonPrimaryClass`, `${adminCardClass`, `${adminInputClass`, `${adminInputThresholdClass`, `${adminInputTimeoutClass`, `animate-in`, `border`, `cursor-pointer`, `duration-700`, `fade-in`, `first:pt-0`, `focus-visible:ring-cyan-400/20`, `font-black`, `font-bold`

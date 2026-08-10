@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ProductsPage.tsx
-skeleton_hash: f1a75c549871cdc5
+skeleton_hash: 52f45f397249bcd2
 entity_hashes:
   func:ProductsPage: 6bc2b4f1a097b21a
   overview: d5a8d0a1df0adbe7
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:10:59Z
+generated_at: 2026-06-19T20:51:02Z
 ---
 
 ## Genel Bakış
@@ -47,6 +47,13 @@ Bu modül, bir React sayfa bileşeni olup dışarıdan başlatma verileri alarak
 - `initialCategories` — SSR sürecinde sunucu tarafından hazırlanmış kategori verilerini içerir. Bu veriler ProductsDiscoveryView bileşenine aktarılarak sayfanın ilk durumunun oluşturulmasını sağlar.
 
 **Dönüş**: `React.FC<ProductsPageProps>` tipinde bir React fonksiyonel bileşeni döndürür. Bileşen, ProductsPageProps arayüzünde tanımlanan özellikler dahilinde çalışır ve React fragment veya JSX elementi olarak ProductsDiscoveryView'ı render eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../lib/type-converters::type { DomainCategory }
+- import: ./ProductsDiscoveryView::ProductsDiscoveryView
+- import: react::React
 
 ---
 

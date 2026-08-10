@@ -8,7 +8,7 @@ entity_hashes:
   func:StepAddressInfo: d5b5813fe5d1d5af
   overview: 4a44d69bf10e19a2
   style_tokens: 7a84088359f41f22
-generated_at: 2026-06-19T09:05:04Z
+generated_at: 2026-06-19T20:50:27Z
 ---
 
 ## Genel Bakış
@@ -93,28 +93,6 @@ Bu modül, üst bileşenden kontrol edilen state/prop çiftlerine bağımlı bir
 - **params**: `{ shippingAddress, setShippingAddress, billingAddress, setBillingAddress, ... }` — destructured React component props (imza kesik/bozuk, tam liste çıkarılamaz; kesin olarak `shippingAddress`, `setShippingAddress`, `billingAddress`, `setBillingAddress` mevcut)
 - **ic_degiskenler**: Tam gövde sağlanmadığı için çıkarılamaz
 - **Dönüş**: `React.FC<StepAddressInfoProps>` — JSX döndüren fonksiyonel bileşen
-
----
-
-### [N2_NASIL] AST Pointer: src/views/checkout/StepAddressInfo.tsx::StepAddressInfo → inline handler (shipping postalCode)
-- **params**: `e` — React `ChangeEvent<HTMLInputElement>` event nesnesi, input değer değişimini taşır
-- **ic_degiskenler**:
-  - `e.target.value` — kullanıcının input alanına girdiği ham string değer
-  - `v` — ham input değerinden `\D` (rakam dışı) karakterlerin kaldırılıp en fazla 10 karakter olarak kırpılmış, yalnızca rakamlardan oluşan postal kodu temsil eder; `shippingAddress.postalCode` alanına atanmak üzere hazırlanır
-- **Dönüş**: `void` — doğrudan `setShippingAddress` yan etkisi ile state günceller
-
----
-
-### [N3_NASIL] AST Pointer: src/views/checkout/StepAddressInfo.tsx::StepAddressInfo → inline handler (billing postalCode)
-- **params**: `e` — `ChangeEvent<HTMLInputElement>` event nesnesi, input değişimini taşır
-- **ic_degiskenler**:
-  - `e.target.value` — kullanıcının billing postal kodu input alanına yazdığı ham string
-  - `v` — `e.target.value`'den rakam dışı karakterlerin temizlenip `slice(0,10)` ile maksimum 10 karaktere kırpılmış, yalnızca rakamlardan oluşan postal kodu; `billingAddress.postalCode` alanına yazılacak değer
-- **Dönüş**: `void` — `setBillingAddress` çağrısı ile billing address state'ini günceller (yan etki)
-
----
-
-**Not**: Sağlanan veride `StepAddressInfo` bileşeninin tam gövdesi, JSX return bloğu ve diğer prop/değişken tanımları mevcut değildir; yalnızca iki inline arrow function handler analiz edilebilmiştir. Bileşen gövdesinin tamamı sağlandığında ilave değişken, API çağrısı ve koşul blokları eklenecektir.
 
 ---
 

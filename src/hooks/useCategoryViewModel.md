@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useCategoryViewModel.ts
-skeleton_hash: 9eca81db7f1ae739
+skeleton_hash: 4f967cc6f066d807
 entity_hashes:
   func:useCategoryViewModel: 0b861ef832c74aa2
   overview: f10ffa8b681cd8b5
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -37,6 +37,16 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**: Yok (parametresiz bir hook).
 
 **Dönüş**: `{ wrapCategory, groupProductsBySeries }` — UI temsili için kullanılacak iki memoize edilmiş işlev nesnesi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: ../lib/type-converters::DomainCategory
+- import: ../lib/type-converters::DomainProduct
+- import: ../lib/type-converters::mapCategoryWithLocale
+- import: ../types/db-rows::type { DbCategory }
+- import: react::useMemo
 
 ---
 

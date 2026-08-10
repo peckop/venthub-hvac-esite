@@ -8,7 +8,7 @@ entity_hashes:
   func:CookiePolicyContentEn: 2826dfb8331957d4
   overview: 253c2705d1e569f2
   style_tokens: 6460a848de07bdf3
-generated_at: 2026-06-16T11:55:03Z
+generated_at: 2026-06-19T20:50:35Z
 ---
 
 ## Genel Bakış
@@ -28,10 +28,6 @@ Bu modül için fonksiyon gövdesi paylaşılmadığı için sadece fonksiyon im
 [Aksiyom 1]: Eğer `lang` prop'u sağlanmazsa veya `undefined`/boş string olarak geçilirse, bileşen doğru dilde içerik üretemeyebilir veya geçersiz bir duruma düşebilir.
 
 [Aksiyom 2]: Bileşen `React.FC<{ lang: string }>` tipiyle tanımlandığından, `lang` prop'u çağrımcı tarafından her durumda sağlanmalıdır; opsiyonel (`?`) olarak işaretlenmemiştir.
-
----
-
-**Not:** Bu modül (CookiePolicyContent) bir React bileşeni olup, sadece English içeriği göstermek üzere tasarlanmış görünmektedir. Ancak bileşen gövdesi paylaşılmadığı için; hangi hardcoded metinlerin olduğu, herhangi bir context/hooks bağımlılığı olup olmadığı, veya `lang` prop'unun gerçekten kullanılıp kullanılmadığı hakkında kesin yargıya varılamamıştır.
 
 ---
 

@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\whatsapp.ts
-skeleton_hash: c727517c04e461de
+skeleton_hash: b6956ce3e0acc724
 entity_hashes:
   func:createWhatsAppLink: 48e63882e6e926f6
   func:formatPhoneNumber: d061dc961d242dd9
@@ -17,7 +17,7 @@ entity_hashes:
   func:getWhatsAppNumber: 1b0300022a29e138
   func:isWhatsAppAvailable: 424fa5ec202a97c6
   overview: 3ca7064f9419922a
-generated_at: 2026-06-08T08:58:02Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -139,6 +139,11 @@ Bu modül, WhatsApp iletişimi için telefon numarası formatlama, şablonlu mes
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../lib/utils::buildWhatsAppLink
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: whatsapp.ts::getWhatsAppNumber
@@ -148,83 +153,6 @@ Bu modül, WhatsApp iletişimi için telefon numarası formatlama, şablonlu mes
   - `raw` — envWa string ve boş değilse_trim'lenmiş hali, değilse boş string; normalize öncesi ham değer
   - `normalized` — raw değerinden `\D` (rakam dışı) karakterleri temizler; sadece rakamlar kalır
 - **Dönüş**: `string | null` — normalize edilmiş numara 10+ haneliyse string, değilse null
-
----
-
-### [N2_NASIL] AST Pointer: whatsapp.ts::formatPhoneNumber
-- **params**: `phone: string` — biçimlendirilecek ham telefon numarası
-- **ic_degiskenler**: (yok — doğrudan return)
-- **Dönüş**: `string` — phone içinden rakam dışı tüm karakterlerin kaldırılmış hali
-
----
-
-### [N3_NASIL] AST Pointer: whatsapp.ts::createWhatsAppLink
-- **params**: `phone: string` — WhatsApp numarası, `message: string` — gönderilecek mesaj metni
-- **ic_degiskenler**: (yok — doğrudan return)
-- **Dönüş**: `string` — `buildWhatsAppLink(phone, message)` import'lu lib/utils fonksiyonunun dönüşü; WhatsApp deep-link URL'i
-
----
-
-### [N4_NASIL] AST Pointer: whatsapp.ts::generateStockInquiryMessage
-- **params**: `productName: string` — ürün adı, `sku?: string` — opsiyonel SKU kodu
-- **ic_degiskenler**: (yok — template literal doğrudan return)
-- **Dönüş**: `string` — stok sorgulama mesajı; productName her zaman, SKU sadece varsa mesaja dahil edilir
-
----
-
-### [N5_NASIL] AST Pointer: whatsapp.ts::generateSupportMessage
-- **params**: `subject?: string` — opsiyonel destek konusu
-- **ic_degiskenler**:
-  - `baseMessage` — sabit selamlama metni: `'Merhaba! Size nasıl yardımcı olabilirim?'`
-- **Dönüş**: `string` — subject varsa baseMessage'a `\n\nKonu: {subject}` eklenir, yoksa sadece baseMessage döner
-
----
-
-### [N6_NASIL] AST Pointer: whatsapp.ts::generateTechnicalQuoteMessage
-- **params**: `productName?: string` — opsiyonel ürün adı, `projectInfo?: string` — opsiyonel proje bilgisi
-- **ic_degiskenler**:
-  - `message` — `'Merhaba! Teknik teklif talebi:'` ile başlar, koşullara göre追加_satırlarla genişletilir
-- **Dönüş**: `string` — productName varsa `\nÜrün: {productName}`, projectInfo varsa `\nProje Bilgileri: {projectInfo}`, yoksa varsayılan proje detay talebi eklenir
-
----
-
-### [N7_NASIL] AST Pointer: whatsapp.ts::generateFAQSupportMessage
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — doğrudan return)
-- **Dönüş**: `string` — SSS destek talep mesajı sabit metin olarak döner
-
----
-
-### [N8_NASIL] AST Pointer: whatsapp.ts::generateContactMessage
-- **params**: `name?: string` — opsiyonel kullanıcı adı, `subject?: string` — opsiyonel mesaj konusu
-- **ic_degiskenler**:
-  - `message` — `'Merhaba!'` ile başlar, koşullara göre追加_satırlarla genişletilir; son olarak yardim talep satırı eklenir
-- **Dönüş**: `string` — name varsa ` Ben {name}.`, subject varsa `\n\nKonu: {subject}` eklenir, her durumda `\n\nSize nasıl yardımcı olabilirim ? ` ile biter
-
----
-
-### [N9_NASIL] AST Pointer: whatsapp.ts::isWhatsAppAvailable
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — doğrudan return)
-- **Dönüş**: `boolean` — `getWhatsAppNumber()` null değilse true, null ise false
-
----
-
-### [N10_NASIL] AST Pointer: whatsapp.ts::getStockInquiryLink
-- **params**: `productName: string` — ürün adı, `sku?: string` — opsiyonel SKU kodu
-- **ic_degiskenler**:
-  - `phone` — `getWhatsAppNumber()` dönüşü; ENV'den okunan normalize edilmiş WhatsApp numarası veya null
-  - `message` — `generateStockInquiryMessage(productName, sku)` dönüşü; stok sorgulama mesajı metni
-- **Dönüş**: `string | null` — phone null ise null döner; değilse `createWhatsAppLink(phone, message)` ile WhatsApp linki döner
-
----
-
-### [N11_NASIL] AST Pointer: whatsapp.ts::getSupportLink
-- **params**: `subject?: string` — opsiyonel destek konusu
-- **ic_degiskenler**:
-  - `phone` — `getWhatsAppNumber()` dönüşü; ENV'den okunan normalize edilmiş WhatsApp numarası veya null
-  - `message` — `generateSupportMessage(subject)` dönüşü; destek mesajı metni
-- **Dönüş**: `string | null` — phone null ise null döner; değilse `createWhatsAppLink(phone, message)` ile WhatsApp linki döner
 
 ---
 
@@ -243,13 +171,13 @@ graph TD
     whatsapp_ts__getSupportLink["getSupportLink"]
     whatsapp_ts__getWhatsAppNumber["getWhatsAppNumber"]
     whatsapp_ts__isWhatsAppAvailable["isWhatsAppAvailable"]
-    whatsapp_ts__getSupportLink --> whatsapp_ts__getWhatsAppNumber
-    whatsapp_ts__isWhatsAppAvailable --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__createWhatsAppLink
     whatsapp_ts__getSupportLink --> whatsapp_ts__generateSupportMessage
     whatsapp_ts__getStockInquiryLink --> whatsapp_ts__getWhatsAppNumber
-    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__generateStockInquiryMessage
     whatsapp_ts__getSupportLink --> whatsapp_ts__createWhatsAppLink
-    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__createWhatsAppLink
+    whatsapp_ts__getSupportLink --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__generateStockInquiryMessage
+    whatsapp_ts__isWhatsAppAvailable --> whatsapp_ts__getWhatsAppNumber
 ```
 
 ## NODE ID STANDARD

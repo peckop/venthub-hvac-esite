@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ScrollReveal.tsx
-skeleton_hash: 1d5c6fded933b5c6
+skeleton_hash: 5e6a31137dce1c9b
 entity_hashes:
   func:ScrollReveal: 5164aa702775b185
   overview: 7c3e9f948c132ef9
   style_tokens: fce5caac08f51876
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-19T20:47:32Z
 ---
 
 ## Genel Bakış
@@ -54,6 +54,13 @@ ScrollReveal bileşeni, kaydırma tabanlı animasyonları çocuklar için uygula
 - `as` — `ElementType` — Bileşenin hangi HTML elementi olarak render edileceğini belirler. Varsayılan olarak `div` kullanılır; `section`, `article`, `span` gibi farklı elementler atanabilir.
 
 **Dönüş**: `React.FC<ScrollRevealProps>` — Bileşen, children'ı sarmalayan ve scroll tabanlı animasyon uygulayan bir React fonksiyonel bileşeni döndürür. Render edilen eleman, belirlenen HTML elementi (`as` prop'u) içinde animasyon durumuna göre stil değişiklikleri uygulanmış şekilde döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../hooks/useScrollAnimation::scrollAnimationClasses
+- import: ../hooks/useScrollAnimation::useScrollAnimation
+- import: react::React
 
 ---
 
