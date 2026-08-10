@@ -40,6 +40,7 @@ import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
 import type { Product } from '../../types/ui-models'
 // import { DomainCategory } from '../../lib/type-converters'
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { 
   formatSpecValue, 
   groupTechnicalSpecs,
@@ -296,13 +297,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             {mainCategory && (
               <>
                 <Link href={localizedHref(Routes.category(mainCategory.slug), lang)} className="hover:text-primary-navy transition-colors">
-                  {mainCategory.name}
+                  {getCategoryDisplayName(mainCategory, t)}
                 </Link>
                 {subCategory && subCategory.slug !== mainCategory.slug && (
                   <>
                     <ChevronRight size={10} className="flex-shrink-0" />
                     <Link href={localizedHref(Routes.category(mainCategory.slug, subCategory.slug), lang)} className="hover:text-primary-navy transition-colors">
-                      {subCategory.name}
+                      {getCategoryDisplayName(subCategory, t)}
                     </Link>
                   </>
                 )}
