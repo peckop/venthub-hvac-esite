@@ -15,7 +15,7 @@ metadata:
   outputs:
   - rag response text
   recovery:
-    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
+    on_auth_expired: powershell -File .agent/scripts/nlm-headless-refresh.ps1  # oturum öldüyse: nlm login --clear (bkz. gövde)
 depends_on: []
 next_steps: []
 run_last: false
@@ -133,7 +133,12 @@ NotebookLM sadece statik bir doküman arşivi değil, kod tabanının ve mimarin
 - Notebook'tan gelen cevap projedeki lokal kodlarla uyuşmuyorsa, her zaman **lokal kodu referans alın**; NotebookLM sadece bir rehber ve konsept danışmanıdır.
 - **Authentication Expired Hatası:** Durumu kullanıcıya BİLDİRMEYİN. Penceresiz (headless) otomatik yenileme aktiftir. Windows'ta oturumu yenilemek için doğrudan şu PowerShell **headless** scriptini çalıştırın (pencere AÇMAZ, ~15 sn, ESET'i de atlar):
   ```bash
-  powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
+  powershell -File .agent/scripts/nlm-headless-refresh.ps1
+# (⚠️ 2026-08-10: -ExecutionPolicy Bypass bu ortamda DENY; -File yeterli. Script yalnız profildeki
+#  Google oturumu CANLIYSA işe yarar. Oturum ölmüşse / "Chrome is already running" / beyaz-donuk
+#  pencere görürsen → kalıcı çözüm: `nlm login --clear` (görünür, tek sefer; tüm chrome.exe kapalı).
+#  Paket: notebooklm-mcp-cli ≥0.9.8 — notebooklm-py KURMA (Gemini Notebook rebrand'ini bilmez).
+#  Detay: memory `nlm-auth-issue`.)
   ```
   Script bittikten sonra MCP'nin taze token'ı görmesi için **`refresh_auth`** aracını çağırın; ardından başarısız olan sorguyu otonom olarak tekrar tetikleyin.
   - ⚠️ Düz `nlm login` ÇALIŞTIRMAYIN — bu makinede bozuk/yavaş görünür Chrome penceresi açar (ESET SSL gecikmesi → timeout → beyaz ekran). Daima headless scripti kullanın.

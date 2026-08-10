@@ -67,6 +67,9 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 6. **React.cache():** RSC ağacında tekrarlanabilen Supabase sorguları `React.cache()` ile tekilleştirilir.
 7. **i18n:** Kullanıcıya görünen metin sözlükten gelir; URL'ler `useLocalizedRoutes`
    ile (manuel `/tr/` ekleme yasak); DB çevirileri JSONB (`metadata->>lang`).
+   **Kategori slug:** kanonik = EN (`categories.slug`); görünen URL dile göre `metadata.slug={tr,en}`
+   (`getLocalizedCategorySlug`); kategori ADI daima `getCategoryDisplayName` — ham `c.name`/`c.slug`
+   render YASAK. (SSOT: `docs/plans/slug-localization-2026-08-10.md`)
 8. **Design token:** Arbitrary Tailwind değeri yasak (`w-[92vw]` vb.) — `tokens.js` kullan.
    Renkler HEX değil CSS custom property (HSL). A11y için `focus-visible:` kullan.
 9. **3D:** Sadece R3F + Drei (saf Three.js DOM yasak); gölge `'percentage'`
@@ -80,6 +83,10 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
     `unstable_cache`/`revalidateTag` anahtarlarına `lang` **ve** `tenantId` dahil.
     `middleware.ts` Edge'de DB sorgusu **yasak** (header/Edge Config ile tenant resolution).
 
+13. **Migration = prod:** migration içeren dal master'a merge edilince `supabase-migrate.yml`
+    prod DB'ye **OTOMATİK uygular**. Migration'lı PR'ı yalnız kullanıcı onayıyla merge et; "sadece
+    komutla uygulanacaksa" migration'ı merge ETME.
+
 > Kuralların tam listesi (31 madde, detaylı gerekçeli) → `CONTEXT.md §14`.
 
 ## Doküman Haritası
@@ -89,8 +96,12 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 - `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` — canlı "neredeyiz" + **şerit panosu**.
 - `PROJECT.md` — DI & güvenlik milestone kayıtları + arayüz kontratları.
 - `RECOMMENDATIONS.md` · `CHANGELOG.md` — durum ve değişiklik geçmişi.
+- **Katalog→ticaret hattı SSOT:** `docs/plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan-uca pano)
+  + `docs/standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`.
+  Veri deposu: `C:/Users/alize/venthub-pdf-ingestor` (CSV'ler). NLM auth bozulursa → memory `nlm-auth-issue`
+  (Gemini Notebook rebrand; çözüm `nlm login --clear`, paket `notebooklm-mcp-cli` ≥0.9.8).
 - `docs/` (kök) — **üretilmiş** master MD'ler (frontend, edge functions, DB şema) — elle düzenleme.
-- `.claude/skills/` — Claude Code yetenekleri (aktif). `.agent/skills/` = legacy Antigravity (faz-out).
+- `.claude/skills/` = Claude Code yetenekleri · `.agent/skills/` = Antigravity/worker yetenekleri — **İKİSİ DE AKTİF ve KASITLI** (çift ağaç); birleştirme/silme ÖNERME.
 
 ## Bilgi Kaynağı İş Akışı (üç katman)
 
