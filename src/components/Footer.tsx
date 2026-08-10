@@ -5,8 +5,8 @@ import React from 'react'
 import { useCategories } from '../contexts/CategoryContext'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
 import BuildTag from './BuildTag'
-// import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 const FOOTER_ICON_ADDRESS = '@'
 const FOOTER_ICON_PHONE = 'P'
@@ -126,7 +126,7 @@ const Footer: React.FC = () => {
                     href={Routes.category(category.slug)}
                     className="text-gray-300 hover:text-white transition-colors text-sm"
                   >
-                    {category.name}
+                    {getCategoryDisplayName(category, t)}
                   </Link>
                 </li>
               ))}

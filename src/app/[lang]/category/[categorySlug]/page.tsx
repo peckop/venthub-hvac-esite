@@ -2,8 +2,10 @@ import React, { cache } from 'react'
 
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
+import { getDictValue } from '@/i18n/getDictValue'
 import { getProductsEnriched } from '@/lib/services/product.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+import { getCategoryDisplayName } from '@/utils/categoryHelpers'
 
 import { SITE_URL } from '../../../../config/siteUrl'
 import { getCachedCategoryData, preloadCategory } from '../../../../lib/data/preload'
@@ -42,18 +44,25 @@ export async function generateMetadata({ params }: { params: Promise<{ categoryS
     }
   }
 
+  // SSOT: kategori adı DAİMA getCategoryDisplayName üzerinden çözülür
+  // (translation_key → menu_label → name). Server Component olduğumuz için useI18n yok;
+  // t'yi aktif dilin sözlüğünden kuruyoruz — aksi halde TR sayfada ham İngilizce DB adı sızar.
+  const dict = lang === 'en' ? en : tr
+  const t = (key: string) => getDictValue(dict, key)
+  const displayName = getCategoryDisplayName(category, t)
+
   const desc = lang === 'en'
-    ? `Explore the highest quality and most economical ventilation products in the ${category.name} category.`
-    : `${category.name} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`
+    ? `Explore the highest quality and most economical ventilation products in the ${displayName} category.`
+    : `${displayName} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`
 
   return {
-    title: `${category.name} | VentHub`,
+    title: `${displayName} | VentHub`,
     description: desc,
     alternates: {
       canonical: `${SITE_URL}/category/${categorySlug}`,
     },
     openGraph: {
-      title: `${category.name} | VentHub`,
+      title: `${displayName} | VentHub`,
       description: desc,
       url: `${SITE_URL}/category/${categorySlug}`,
       siteName: 'VentHub',
@@ -75,7 +84,10 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
   preloadCategory(categorySlug)
   const category = await getCachedCategoryData(categorySlug)
   const dict = lang === 'en' ? en : tr
-  
+  // SSOT: JSON-LD adı da sözlükten çözülür (bkz. generateMetadata yorumu)
+  const t = (key: string) => getDictValue(dict, key)
+  const displayName = getCategoryDisplayName(category, t) || categorySlug
+
   let products: DomainProduct[] = []
   let subCategories: DomainCategory[] = []
 
@@ -111,8 +123,8 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": category?.name || categorySlug,
-    "description": lang === 'en' ? `Products in category ${category?.name || categorySlug}` : `${category?.name || categorySlug} kategorisindeki ürünler`,
+    "name": displayName,
+    "description": lang === 'en' ? `Products in category ${displayName}` : `${displayName} kategorisindeki ürünler`,
     "url": `${SITE_URL}/category/${categorySlug}`,
     "numberOfItems": products.length,
     "itemListElement": products

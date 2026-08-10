@@ -40,6 +40,7 @@ import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
 import type { Product } from '../../types/ui-models'
 // import { DomainCategory } from '../../lib/type-converters'
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { 
   formatSpecValue, 
   groupTechnicalSpecs,
@@ -296,13 +297,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             {mainCategory && (
               <>
                 <Link href={localizedHref(Routes.category(mainCategory.slug), lang)} className="hover:text-primary-navy transition-colors">
-                  {mainCategory.name}
+                  {getCategoryDisplayName(mainCategory, t)}
                 </Link>
                 {subCategory && subCategory.slug !== mainCategory.slug && (
                   <>
                     <ChevronRight size={10} className="flex-shrink-0" />
                     <Link href={localizedHref(Routes.category(mainCategory.slug, subCategory.slug), lang)} className="hover:text-primary-navy transition-colors">
-                      {subCategory.name}
+                      {getCategoryDisplayName(subCategory, t)}
                     </Link>
                   </>
                 )}
@@ -660,7 +661,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             {[
                               { label: t('pdp.brand'), value: product.brand },
                               { label: t('pdp.model'), value: product.model_code ?? product.sku },
-                              { label: t('pdp.labels.category'), value: mainCategory?.name || '-' }
+                              { label: t('pdp.labels.category'), value: getCategoryDisplayName(mainCategory, t) || '-' }
                             ].map((item, i) => (
                               <div key={i} className="flex justify-between items-center py-3 border-b border-light-gray/30 group">
                                 <span className="text-xs font-bold text-steel-gray uppercase tracking-widest">{item.label}</span>
