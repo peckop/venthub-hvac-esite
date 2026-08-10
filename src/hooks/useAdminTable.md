@@ -12,7 +12,7 @@ entity_hashes:
   func:parseSortParam: 3867522697dd2aa2
   func:useAdminTable: d02ad4d320c7db38
   overview: 49bdd6c4749aaa1d
-generated_at: 2026-06-13T17:00:13Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -116,6 +116,22 @@ Tüm yardımcı fonksiyonları bir araya getirerek tablonun sıralama, filtrelem
 - `sorting: { sort: SortState | null; toggleSort: (key: string) => void }` — Sıralama durumu ve kontrol fonksiyonları. `toggleSort` aynı sütuna tekrar basıldığında yönü tersine çevirir; farklı sütuna basıldığında artan sıralama ile başlar. `sortMode` `'none'` ise fonksiyon hiçbir şey yapmaz.
 - `filtering: { query: string; setQuery: (q: string) => void; filters: Record<string, string[]>; setFilter: (facetKey: string, values: string[]) => void; clearAll: () => void; hasActiveFilters: boolean }` — Filtreleme durumu ve kontrol fonksiyonları. `setQuery` debounce edilmiş arama girdisini yönetir; `setFilter` belirli bir faceted alanı ayarlar ve sayfayı 1'e döndürür; `clearAll` tüm arama ve filtreleri sıfırlar; `hasActiveFilters` herhangi bir aktif filtre veya arama olup olmadığını belirtir.
 - `selection: { selectedIds: string[]; isSelected: (id: string) => boolean; toggle: (id: string, opts?: { shiftKey?: boolean }) => void; toggleAll: () => void; clear: () => void; allSelected: boolean }` — Satır seçim durumu ve kontrol fonksiyonları. `toggle` normal tıklamada tek satır seçimini değiştirir; `shiftKey: true` seçeneğinde ise son ankordan (lastIndex) mevcut indeks arasındaki tüm satırları ekler. `toggleAll` mevcut sayfadaki tüm satırları seçer veya seçimini kaldırır (mevcut sayfada hepsi seçiliyse kaldırır). `allSelected` mevcut sayfadaki tüm satırların seçili olup olmadığını belirtir. `clear` tüm seçimleri sıfırlar.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @/types/admin-shared::type { TableSortDir }
+- import: @/types/database.types::type { Database }
+- import: @supabase/supabase-js::type { SupabaseClient }
+- import: next/navigation::usePathname
+- import: next/navigation::useRouter
+- import: next/navigation::useSearchParams
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
 
 ---
 
@@ -425,10 +441,10 @@ graph TD
     useAdminTable_ts__parseFiltersFromParams["parseFiltersFromParams"]
     useAdminTable_ts__parseSortParam["parseSortParam"]
     useAdminTable_ts__useAdminTable["useAdminTable"]
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseSortParam
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseFiltersFromParams
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__defaultCompare
     useAdminTable_ts__useAdminTable --> useAdminTable_ts__getCell
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseSortParam
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__defaultCompare
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseFiltersFromParams
     useAdminTable_ts__useAdminTable --> useAdminTable_ts__matchesQuery
 ```
 

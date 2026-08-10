@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\crypto.ts
-skeleton_hash: 6a2e1234506f9cf6
+skeleton_hash: 78f986a735ad3900
 entity_hashes:
   func:generateId: b72c75acd1bdb8bf
   overview: 3748b737e825394a
-generated_at: 2026-05-28T22:38:45Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış

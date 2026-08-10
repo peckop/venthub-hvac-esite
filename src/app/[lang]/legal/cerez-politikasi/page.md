@@ -9,7 +9,7 @@ entity_hashes:
   func:generateStaticParams: 42ae72125a484b5f
   overview: dbefcec9367e9b65
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-16T11:51:40Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -33,10 +33,6 @@ Bu modül, Next.js App Router yapısında uluslararası dil destekli bir sayfa b
 [Aksiyom 1]: Eğer `params.lang` parametresi sağlanmazsa veya string türünde değilse, sayfa doğru şekilde render edilemez ve hata oluşur.
 
 [Aksiyom 2]: Eğer `generateStaticParams()` fonksiyonu geçerli dil parametrelerini (lang) döndürmezse, build aşamasında statik sayfa üretimi başarısız olur.
-
----
-
-**Not:** Bu modül, çerez politikası gibi sabit yasal içerik sunan basit bir sayfa bileşeni olduğundan, iş mantığına yönelik ek aksiyomlar bulunmamaktadır. Fonksiyon gövdeleri içeriği hakkında bilgi vermediğinden, sayfa içeriğinin yapısı veya formatı hakkında varsayımda bulunulmamıştır.
 
 ---
 
@@ -77,15 +73,6 @@ Bu fonksiyon herhangi bir parametre almaz.
 - **params**: (yok)
 - **ic_degiskenler**: (yok)
 - **Dönüş**: `Array<{ lang: string }>` — statik olarak üretilen `[tr, en]` dil parametreleri listesi
-
----
-
-### [N2_NASIL] AST Pointer: `[lang]/legal/cerez-politikasi/page.tsx::Page`
-- **params**: `params: Promise<{ lang: string }>` — Next.js tarafından sağlanan, dil bilgisini içeren promise parametresi
-- **ic_degiskenler**:
-  - `lang` — `await params` ile çözümlenmiş olan `lang` string'i, `PageComponent`'e prop olarak geçirilir
-- **Dönüş**: JSX — `<PageComponent lang={lang} />` bileşeni; `CookiePolicyPage` view'ını lang prop'u ile render eder
-- **notlar**: `params` bir `Promise` olduğu için `await` ile çözümlenir; `lang` destructuring ile çıkarılır
 
 ---
 

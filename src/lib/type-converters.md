@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\type-converters.ts
-skeleton_hash: e21d31f12838b8e3
+skeleton_hash: 7c65acae69068099
 entity_hashes:
   func:isRecord: 9a2880b352f34e74
   func:mapCategoryWithLocale: b422ccbc9ea334f8
@@ -13,7 +13,7 @@ entity_hashes:
   func:toUICategoryList: 9721c9c2f6b7b799
   func:toUIProductList: a473c58e2b2833ca
   overview: d299bc1749a66082
-generated_at: 2026-06-08T10:10:57Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış
@@ -111,6 +111,12 @@ Bu modül, veritabanı tiplerinden uygulama içi domain tiplerine veri dönüş�
 - dbCat: DbCategory — Dönüştürülecek veritabanı kategori satırı
 - lang: `'tr' | 'en'` — Kullanılacak aktif dil (Türkçe veya İngilizce)
 **Dönüş**: `DomainCategory` — UI için hazırlanmış ve yerelleştirilmiş domain kategorisi modeli
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../types/database.types::type { Json }
+- import: ../types/ui-models::type { DomainCategory, DomainProduct }
 
 ---
 

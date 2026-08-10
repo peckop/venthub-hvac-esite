@@ -6,10 +6,10 @@ source_path: C:\Users\alize\venthub-hvac\src\views\legal\TermsOfUsePage.tsx
 skeleton_hash: 030d91eb108c27ac
 entity_hashes:
   func:TermsOfUsePage: c46efeb3b2b3ab6b
-  func:t: e65551393640c9e9
+  func:t: 429ceff97c59b722
   overview: 83f5e8529a5aed52
   style_tokens: 06829f9d93bd4397
-generated_at: 2026-06-16T11:54:48Z
+generated_at: 2026-06-19T20:51:45Z
 ---
 
 ## Genel Bakış
@@ -37,10 +37,6 @@ Bu modül için tanımlanan mimari varsayımlar aşağıdadır:
 **[Aksiyom 3]**: Eğer `lang` geçerli bir dil kodu değilse (örn. `"tr"`, `"en"` gibi tanımlı bir değer değilse), `t()` fonksiyonu eşleşen çeviri kümesini bulamaz ve varsayılan/fallback dil içeriği gösterilir veya `undefined` döner.
 
 **[Aksiyom 4]**: Eğer bileşen yasal sayfa rotası altında (örn. `/legal/terms-of-use`) çağrılmazsa, kullanıcının beklediği yasal içerik sayfası sunulmaz ve platformun yasal sorumluluk bildirimleri görüntülenemez.
-
----
-
-> **Not**: Bu modül statik bir yasal metin sayfasıdır; iç state yönetimi, API çağrısı veya yan etkisi yoktur. Temel bağımlılıklar `lang` prop'u ve `t()` çeviri fonksiyonundan ibarettir. Fonksiyon gövdesi detayları paylaşılmadığından, `t()` için desteklenen anahtar listesi ve fallback dil davranışı hakkında kesin bir aksiyom tanımlanamamıştır.
 
 ---
 
@@ -74,19 +70,17 @@ Bu modül için tanımlanan mimari varsayımlar aşağıdadır:
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/legal/TermsOfUsePage.tsx::TermsOfUsePage`
-- **params**: `{ lang }` — destructure edilmiş React prop, kullanıcı dil tercihini belirtir (`'en'` veya `'tr'`)
+### [N1_NASIL] AST Pointer: src/views/legal/TermsOfUsePage.tsx::TermsOfUsePage
+- **params**: ({ lang })
 - **ic_degiskenler**:
-  - `dict` — `lang` değerine koşullu olarak `en` veya `tr` sözlük objesini seçer; çeviri fonksiyonuna kaynak olarak kullanılır
-  - `t` — `getDictValue(dict, key)` çağrısı yapan inline arrow fonksiyon; JSX içinde `t('legal.termsTitle')`, `t('legal.draftWarning')`, `t('legal.disclaimer')` çağrılarıyla çeviri değerlerini üretir; closure ile `dict` değişkenini referans alır
-- **Dönüş**: JSX — `div` wrapper içinde başlık (`h1`), draft uyarısı (`div.bg-yellow-50`), koşullu içerik bileşeni (`TermsOfUseContentEn` veya `TermsOfUseContentTr`), ve disclaimer paragrafı (`p`)
+  - `dict` — Dil seçimine göre İngilizce veya Türkçe sözlük nesnesini depolar (lang === 'en' ? en : tr)
+  - `t` — Sözlükten değer almak için kullanılan fonksiyon (getDictValue(dict, key) çağrısı yapar)
+- **Dönüş**: JSX elementi (React bileşeni, div, h1 ve conditionally rendered TermsOfUseContentEn/Tr bileşenlerini içerir)
 
----
-
-### [N2_NASIL] AST Pointer: `src/views/legal/TermsOfUsePage.tsx::t`
-- **params**: `key` — string, sözlükte aranacak çeviri anahtarı (örn. `'legal.termsTitle'`)
-- **ic_degiskenler**: yok
-- **Dönüş**: string — `getDictValue(dict, key)` çağrısının döndürdüğü çevrilmiş metin; `dict` outer scope'taki `TermsOfUsePage` closure'undan referans alınır
+### [N2_NASIL] AST Pointer: src/views/legal/TermsOfUsePage.tsx::t
+- **params**: (key: string)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `getDictValue(dict, key)` çağrısının dönüş değeri (sözlükten alınan string değer)
 
 ---
 

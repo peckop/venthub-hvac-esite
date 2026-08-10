@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\engineeringIntelligence.ts
-skeleton_hash: bca291779aac5534
+skeleton_hash: ef6aac028f6d1ec4
 entity_hashes:
   func:generateEngineeringSummary: e027e9800497ecbe
   func:getEfficiencyInference: 05c710f909e9d6a9
   func:getMotorInference: ef91c03ee063a82d
   func:getNoiseInference: 9266c31de55779b5
   overview: 9ce3d52a464cda5e
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -86,6 +86,12 @@ Bu modül, HVAC ürün teknik parametrelerinden mühendislik çıkarımları ür
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ./type-converters::isRecord
+- import: @/types/ui-models::type { Product }
+
+---
+
 ## INTERFACES
 
 ### EngineeringInference
@@ -139,8 +145,8 @@ graph TD
     engineeringIntelligence_ts__getEfficiencyInference["getEfficiencyInference"]
     engineeringIntelligence_ts__getMotorInference["getMotorInference"]
     engineeringIntelligence_ts__getNoiseInference["getNoiseInference"]
-    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getEfficiencyInference
     engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getMotorInference
+    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getEfficiencyInference
     engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getNoiseInference
 ```
 

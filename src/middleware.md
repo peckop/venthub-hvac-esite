@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\middleware.ts
-skeleton_hash: b384cc334926dde6
+skeleton_hash: 8e898fad767b847f
 entity_hashes:
   func:detectLocale: 5c19d05a4ba76afe
   func:middleware: 40d52344cd7722d0
   overview: 94128ae24c53fc1c
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:48:10Z
 ---
 
 ## Genel Bakış
@@ -70,6 +70,17 @@ Bu modül, dil tespiti ve yönlendirme ile UUID tabanlı URL eşleme ve erişim 
 - `request`: `NextRequest` — Next.js tarafından middleware'e iletilen HTTP istek nesnesi. İstek başlıkları, URL'si, çerezleri ve diğer meta bilgileri içerir. Fonksiyon bu nesne üzerinden okuma yapar ve yanıt oluştururken header'ları korur.
 
 **Dönüş**: `NextResponse` — Fonksiyon her durumda bir `NextResponse` nesnesi döndürür. Bu yanıt bir yönlendirme (redirect, 302/307/308), normal devam yanıtı (`NextResponse.next()`) veya tenant cookie'si set edilmiş bir yanıt olabilir. Yanıtın `cookies` ve `headers` alanları, istek zincirinin sürekliliğini sağlamak üzere kopyalanır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./lib/tenantResolver::resolveTenant
+- import: ./utils/routes::Routes
+- import: @/utils/router::createRedirectResponse
+- import: @/utils/router::resolveUserClaims
+- import: @supabase/ssr::createServerClient
+- import: next/server::NextResponse
+- import: next/server::type { NextRequest }
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\ProductsHero.tsx
-skeleton_hash: 1919306813c30043
+skeleton_hash: 51a5a550b335e4df
 entity_hashes:
   func:ProductsHero: 23bf6f05c6d119a9
   overview: 9bf8d11aa62d961e
   style_tokens: e2ac21d82aa84114
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:27Z
 ---
 
 ## Genel Bakış  
@@ -53,6 +53,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `searchInputRef`: React.RefObject\<HTMLInputElement\> — Arama girişine doğrudan erişim sağlamak için kullanılan ref nesnesi.
 
 **Dönüş**: React.FC\<ProductsHeroProps\> — Tanımlanan props tipine sahip bir fonksiyonel React bileşeni.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: lucide-react::Search
+- import: next/image::Image
+- import: react::React
 
 ---
 

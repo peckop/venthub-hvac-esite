@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\I18nContext.ts
-skeleton_hash: e6d6e8b6a44ec265
+skeleton_hash: 78be8abf262fb6a0
 entity_hashes:
   overview: 0ce19631cc889ffb
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -29,6 +29,12 @@ Bu modül bir React Context tanımıdır ve doğrudan fonksiyon gövdesi içerme
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./dictionaries/tr::tr
+- import: react::createContext
 
 ---
 

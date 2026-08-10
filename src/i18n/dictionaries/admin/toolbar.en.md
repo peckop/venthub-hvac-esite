@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\toolbar.en.ts
-skeleton_hash: 2aea371c1480b4d9
+skeleton_hash: 12a56541c6d987f7
 entity_hashes:
   overview: 3efab1f125273943
-generated_at: 2026-06-13T11:17:40Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -31,19 +31,16 @@ Bu modül, bir toolbar çeviri sözlüğü olup fonksiyon içermemektedir. Dolay
 
 ---
 
-**Not:** Bu modül saf bir veri sözlüğü (i18n dictionary) olduğu için, fonksiyonel akışa ilişkin aksiyom üretilememiştir. Tüm çıkarımlar yalnızca veri yapısının varlığına dayanmaktadır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ---
 
 ## SABİTLER
 - **toolbar** (object) — `{
-      searchPlaceholder: 'Search',
-      clear: 'Clear',
-      records: 're...`
+  searchPlaceholder: 'Search',
+  clear: 'Clear',
+  records: 'records',
+...`
 
 ---
 
@@ -54,10 +51,6 @@ Bu dosya (`toolbar.en.ts`) bir **i18n sözlük dosyasıdır** ve **hiçbir fonks
 ### Sadece Sabit Tanımları Mevcut
 
 - **`toolbar`** — `object` türünde bir sabit; admin paneli araç çubuğu metinlerini (İngilizce) tutar. String değerlerden oluşan bir key-value yapısındadır. Fonksiyon değil, doğrudan export edilen bir nesnedir.
-
----
-
-Fonksiyon gövdesi bulunmadığı için, herhangi bir params, iç değişken veya dönüş analizi yapılamaz. Dosya salt veri (metin sözlüğü) dosyasıdır.
 
 ---
 

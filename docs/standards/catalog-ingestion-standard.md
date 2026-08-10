@@ -100,27 +100,20 @@ venthub/                                   # workspace kökü (ingestor projesi 
 
 ---
 
-## 3. CSV şeması (SÖZLEŞME — worker tam bunu üretir)
+## 3. CSV şeması (SÖZLEŞME) → **`csv-import-export-standard.md` (FORMAT SSOT)**
 
-Tek satır = tek ürün (renk/varyant ayrı satır). UTF-8, virgül ayraç, başlık satırı zorunlu.
+> ⚠️ **CSV'nin biçimi bu cetvelde TANIMLANMAZ — tek SSOT `csv-import-export-standard.md`.** Bu dosya *yöntem*
+> cetvelidir (kaynak, hakem, kategori-harita, kapılar); CSV'nin kolonları/kodlaması/kalite-kapısı **format
+> cetvelinindir.** Mükerrerlik = drift = kontrol kaybı; o yüzden burada şema **tekrarlanmaz**, oraya bakılır.
 
-| Kolon | Tip | Kaynak | Açıklama / kural |
-|---|---|---|---|
-| `model_code` | text **(zorunlu)** | köprü | Vortice cod. = Avensair KOD. Boşsa satır **flag**. |
-| `name` | text | Avensair | Ürün adı (TR isim Avensair'e hizalı). |
-| `brand` | text | Avensair | Vortice / Nicotra Gebhardt / Danfoss / AVenS. |
-| `avensair_kod` | text | Avensair | TR satış kodu. |
-| `avensair_section` | text | Avensair | 27-bölüm no+ad (ör. "08 Mini Aksiyal"). |
-| `category_slug` | text | **Avensair taksonomi** | üst kategori (§4 harita). Vortice-şekilli DEĞİL. |
-| `subcategory_slug` | text | **Avensair taksonomi** | alt kategori (§4). |
-| `purchase_price_eur` | numeric | **Avensair** | **€ alış. TL GÖMME YOK.** Yoksa **flag**, 0 yazma. |
-| `currency` | text | sabit | daima `EUR`. |
-| `specs_json` | json | **Vortice** | `{airflow_m3h, pressure_pa, power_w, noise_db, diameter_mm, dims_mm, ...}`. |
-| `description_tr` / `description_en` | text | Vortice→üretilmiş | i18n; TR Türkçeleştirilmiş, EN deyimsel. |
-| `image_url` | text | Vortice | opsiyonel. |
-| `src_vortice` | text | atıf | Vortice sayfa/citation. |
-| `src_avensair` | text | atıf | Avensair fiyat listesi citation. |
-| `confidence` | enum | worker | `ok` / `conflict` / `missing` → `ok` dışı = **insana işaretli**. |
+Worker'ın üreteceği CSV'nin **tam kolon listesi + kodlama (`utf-8-sig`, `;` ayraç) + flat `spec_` mimarisi +
+slug kuralı + Jidoka kalite kapısı** → **`csv-import-export-standard.md`**. Özet hatırlatma (otorite orada):
+
+- **Teknik özellikler flat `spec_` kolonları** halinde yazılır (DB'de JSONB; loader Kademe-2'de flat→JSON katlar).
+  *(Eski "tek `specs_json` kolonu" önerisi emekli — gerekçe format cetveli §0.)*
+- `model_code` = köprü (zorunlu); `purchase_price_eur` = **€ alış, TL gömme yok** (fiyat motoru → `pricing-standard.md`).
+- `category_slug`/`subcategory_slug` = **canlı DB slug'ı, birebir** (icat etme; eşleme anahtarı `avensair_section`, bkz format §3).
+- `confidence` (`ok`/`conflict`/`missing`) → `ok` dışı = insana işaretli.
 
 ---
 

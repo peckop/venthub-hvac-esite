@@ -15,7 +15,7 @@ metadata:
   outputs:
   - docs/*.md
   recovery:
-    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+    on_auth_expired: powershell -File .agent/scripts/nlm-clean-login.ps1
   prerequisites:
   - OPENROUTER_API_KEY
   - nlm login (NotebookLM sync için)

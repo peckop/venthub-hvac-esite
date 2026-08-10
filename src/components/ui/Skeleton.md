@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ui\Skeleton.tsx
-skeleton_hash: 6901832b3f563348
+skeleton_hash: af8394547a4d87ff
 entity_hashes:
   func:Skeleton: b70faa0883864e7c
   overview: dd78551ca6caccba
   style_tokens: 9afb047eb7d0beac
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:39Z
 ---
 
 ## Genel Bakış
@@ -41,6 +41,12 @@ Bu React tabanlı UI yükleme iskeleti (Skeleton) bileşeninin doğru görsel ve
 - variant: string | undefined — Kullanılacak skeleton görünüm varyantıdır, varsayılan değeri "default" olarak tanımlanmıştır. Önceden tanımlanmış farklı varyant stillerinden birini seçmek için kullanılır.
 - ...props: React.HTMLAttributes<HTMLDivElement> — HTML div elementlerine uygulanabilen tüm standart React DOM özellikleri, olay dinleyicileri ve diğer ek parametrelerdir, isteğe bağlı olarak iletilir ve doğrudan render edilen div elementine aktarılır.
 **Dönüş**: JSX.Element — Tüm aktarılan ve birleştirilen stillere, özelliklere sahip bir div elementi olarak, React ağacında render edilmek üzere bir JSX öğesi döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/utils::cn
+- import: react::React
 
 ---
 

@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\ui-models.ts
-skeleton_hash: 9e808fb0ab3fea56
+skeleton_hash: 5caf209aa3f87f6d
 entity_hashes:
   overview: cdd1d441caa7d556
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -32,6 +32,11 @@ Bu modül yalnızca TypeScript tip tanımları (interfaces ve type aliases) içe
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./database.types::type { Json }
 
 ---
 

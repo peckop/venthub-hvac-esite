@@ -3,43 +3,67 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\admin\users\page.tsx
-skeleton_hash: c5a526e3700ed168
+skeleton_hash: 40f2846223fe5a83
 entity_hashes:
+  func:Loading: 657ee72781ec51d8
   func:Page: c68e4a7cc2b89422
-  overview: c697ddf7c92cfa4f
+  overview: 5b1a16aab3aba293
   style_tokens: f00e706f0d7166cc
-generated_at: 2026-06-06T21:54:10Z
+generated_at: 2026-06-19T20:46:46Z
 ---
 
 ## Genel Bakış
-Yönetim panelindeki kullanıcı yönetimi sayfasının Next.js App Router üzerindeki giriş noktasıdır. Tek bir React bileşeni olan Page fonksiyonu, istemci tarafında dinamik olarak yüklediği AdminUsersPage görünümünü render ederek kullanıcı listeleme ve yönetim arayüzünü sunar.
+Next.js App Router yapısında yer alan kullanıcı yönetimi sayfasının giriş noktasıdır. Minimal bir yapıyla, istemci tarafında dinamik olarak yüklenen AdminUsersPage bileşenini render ederek yönetim panelinden kullanıcı listeleme ve işlem arayüzünü sunar.
 
 ## Fonksiyon Grupları
-### Sayfa Giriş Noktası
-Rota karşılama sorumluluğunu üstlenen minimal giriş bileşenidir. Dış bağımlılığı olan AdminUsersPage modülünü dinamik olarak yükleyip tarayıcıya taşıyarak kullanıcı yönetim arayüzünün görünür hale gelmesini sağlar.
-- Page
+
+### Sayfa Bileşenleri
+Rota karşılama ve durum göstergesi sorumluluklarını üstlenen temel sayfa bileşenleridir.
+- Page, Loading
+
+---
+
+## Mimari Notlar
+
+**Bağımlılıklar:**
+- AdminUsersPage bileşeni (dinamik import ile yüklenen dış bağımlılık)
+
+**Mimari Önemi:**
+- `/admin/users` rotasının tekil giriş noktası
+- SSR yerine istemci tarafı dinamik yükleme stratejisi benimsemiş
+- Loading bileşeni ile Suspense uyumlu yükleme durumu sunuyor
+
+**Aksiyomlar:**
+- AdminUsersPage modülü mevcut değilse sayfa çalışmaz
+- Next.js App Router yapısı bu dosyayı tanımıyorsa rota erişilemez olur
+- Dynamic import mekanizması bozuksa ana içerik render edilmez
+- Page varsayılan export ile dışa aktarılmazsa Next.js bileşeni tanıyamaz
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Next.js App Router yapısı içinde tanımlanmış bir sayfa giriş noktasıdır. Fonksiyon gövdesi kodu sağlanmadığı için aksiyomlar, modülün yapısından ve Next.js App Router varsayımlarından türetilmiştir.
+Bu modül, Next.js App Router yapısında tanımlanmış minimal bir sayfa giriş noktasıdır. Fonksiyon gövdelerinde karmaşık bir mantık bulunmamakla birlikte, dış bağımlılıklar ve çerçeve varsayımları aksiyomların temelini oluşturur.
 
-[Aksiyom 1]: Eğer `AdminUsersPage` bileşeni import edilemez veya mevcut değilse, `Page` fonksiyonu çalışırken derleme/runtime hatası oluşur.
+[Aksiyom 1]: Eğer `AdminUsersPage` modülü (import edilebilir/nitelikli bir bileşen) yoksa, `Page` fonksiyonu çalışırken derleme zamanı veya çalışma zamanı hatası oluşur ve kullanıcı yönetimi arayüzü hiç görüntülenemez.
 
-[Aksiyom 2]: Eğer Next.js App Router yapısı bu dosyayı `/admin/users` rotasının giriş noktası olarak tanımıyorsa, bu sayfa tarayıcıda hiçbir zaman yüklenemez.
+[Aksiyom 2]: Eğer bu bileşen Next.js App Router yapısı dışında (örn: geleneksel SPA veya farklı bir framework) çalıştırılmaya çalışılırsa, `page.tsx` dosyasının otomatik rota eşleme mekanizması devre dışı kalır ve `/admin/users` rotası yanıt vermez.
 
-[Aksiyom 3]: Eğer istemci tarafı (client-side) bileşen yükleme mekanizması (örn: `dynamic()` import) çalışır durumda değilse, `AdminUsersPage` render edilmez ve sayfa boş kalır.
-
-[Aksiyom 4]: Eğer `Page` fonksiyonu varsayılan olarak `export default` ile dışa aktarılmıyorsa, Next.js bu dosyayı geçerli bir sayfa bileşeni olarak algılamaz.
-
----
-
-**Not:** Fonksiyon gövdesi kodu doğrudan sağlanmadığı için, bu aksiyomlar yalnızca Next.js App Router sayfa bileşenlerinin zorunlu yapısal gereksinimlerine dayanmaktadır. Modülün kendi iç mantığına (state yönetimi, veri çekme, hata işleme vb.) dair aksiyomlar, fonksiyon gövdesi olmadan üretilemez.
+[Aksiyom 3]: Eğer istemci (tarayıcı) ortamı mevcut değilse (örn: statik HTML çıktısı alma süreci), `AdminUsersPage`'in dinamik olarak yüklenme mekanizması çalışmaz ve sayfa boş kalır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### Loading
+**Ne yapar**: Bu fonksiyon, bir React component'idir ve büyük harfle başlaması onu bir bileşen (component) olarak tanımlar. Genellikle bir sayfa veya veri yüklenirken kullanıcıya yükleme durumunu göstermek için skeleton, spinner veya benzeri bir yükleme arayüzü sunmak amacıyla kullanılır.
+
+**Nasıl yapar**: Fonksiyonun docstring'i boş bırakılmış ve dönüş tipi `void veya bilinmiyor` olarak belirtilmiştir. Bu bilgiler ışığında, fonksiyonun iç mantığı ve uyguladığı spesifik bir algoritma hakkında kesin bir yargıya varılamaz. Ancak fonksiyon adı ve bulunduğu dosya yolu (`src/app/admin/users/page.tsx`) dikkate alındığında, bu fonksiyonun admin paneli altındaki kullanıcılar sayfasının yüklenme durumu için bir arayüz bileşeni olarak tanımlandığı söylenebilir.
+
+**Parametreler**:
+- Parametre belirtilmemiştir.
+
+**Dönüş**: Return tipi `void veya bilinmiyor` olarak verilmiştir. Bir React component'i olduğundan JSX (React elementi) döndürmesi beklenir, ancak sağlanan bilgide dönüş tipine dair kesin bir annotation bulunmamaktadır.
 
 ### Page
 
@@ -54,6 +78,12 @@ Bu modül, Next.js App Router yapısı içinde tanımlanmış bir sayfa giriş n
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: @/i18n/I18nProvider::useI18n
+- import: next/dynamic::nextDynamic
+
+---
+
 ## SABİTLER
 - **AdminUsersPage** (call) — `nextDynamic(
   () => import('../../../views/admin/AdminUsersPage'),
@@ -63,21 +93,31 @@ Bu modül, Next.js App Router yapısı içinde tanımlanmış bir sayfa giriş n
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/admin/users/page.tsx::Page
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde hiçbir değişken tanımlanmamıştır)
-- **Dönüş**: JSX — `AdminUsersPage` bileşeninin dinamik olarak yüklenmiş halini render eder. `nextDynamic` ile import edilen `AdminUsersPage` çağrısı sonucu elde edilen React bileşeni doğrudan return ile döndürülür.
+### [N1_NASIL] AST Pointer: admin/users/page.tsx::Loading
+- **params**: ()
+- **ic_degiskenler**:
+  - `t` — useI18n() hook'undan destructuring ile alınan çeviri fonksiyonu; `admin.common.loading` key'ine karşılık gelen localized metni döndürür
+- **Dönüş**: JSX (`<div>` loading animasyonu, pulse efektli slate-400 renkli metin)
+
+---
+
+### [N2_NASIL] AST Pointer: admin/users/page.tsx::Page
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `<AdminUsersPage />` JSX componenti
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\app\admin\users\page.tsx
+  function: src\app\admin\users\page.tsx::Loading
   function: src\app\admin\users\page.tsx::Page
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: Loading
   export: Page
 
 ---

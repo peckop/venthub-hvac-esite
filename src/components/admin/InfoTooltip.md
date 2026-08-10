@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\InfoTooltip.tsx
-skeleton_hash: 15689fb19f78cf40
+skeleton_hash: 979bd18efdbbfccc
 entity_hashes:
   func:InfoTooltip: 183c7d447a0090ba
   overview: aa0bb37988421fc0
   style_tokens: 15a027a0bab7a2ef
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - className: string (varsayılan: '') — Bileşene eklenecek ek CSS sınıfları
 
 **Dönüş**: React.FC<InfoTooltipProps> — Bileşen, InfoTooltipProps arayüzünü kullanan bir React fonksiyonel bileşeni olarak döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: lucide-react::Info
+- import: react::React
 
 ---
 

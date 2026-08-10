@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavActionButton.tsx
-skeleton_hash: c67cb47a2d2bd1e8
+skeleton_hash: 792f17d7ff38f976
 entity_hashes:
   func:NavActionButton: 9e352ab0f1dc93af
   overview: 42d52b47442e736b
   style_tokens: 7a26081e3b2c4d09
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-19T20:47:10Z
 ---
 
 ## Genel Bakış
@@ -46,6 +46,13 @@ Bu navigasyon eylem butonu bileşeninin doğru şekilde render edilmesi, kullan�
 - ariaLabel: string | undefined — Ekran okuyucular tarafından okunacak erişilebilirlik etiketi, butonun amacını ek metinle açıklar, erişilebilirliği artırır
 - title: string | undefined — Buton üzerine fare imleci ile gelindiğinde açılan küçük ipucu metni, kullanıcıya ek bilgi sunar
 **Dönüş**: React.FC<NavActionButtonProps> — Projenin navigasyon menülerinde veya navigasyon ile ilgili alanlarda kullanılmaya hazır, tüm özellikleri yapılandırılmış React fonksiyonel bileşeni döndürür
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/utils::cn
+- import: next/link::Link
+- import: react::React
 
 ---
 

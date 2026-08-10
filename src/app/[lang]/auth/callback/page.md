@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\callback\page.tsx
-skeleton_hash: 6e36ae82a71d4b65
+skeleton_hash: d7753f00949ae2f0
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 796eb654597451ee
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -34,6 +34,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**:  
 - (fonksiyon parametresi almaz)  
 **Dönüş**: JSX elemanı olan `<PageComponent />` döner; bu, sayfanın gerçek içeriğini içeren başka bir bileşendir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../views/AuthCallbackPage::PageComponent
 
 ---
 

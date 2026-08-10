@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\CategoryHero.tsx
-skeleton_hash: 41f5573c50d8e1df
+skeleton_hash: 918b4e19ffd9da91
 entity_hashes:
   func:CategoryHero: e691a6ccb1379798
   func:handleBack: 7a67af4e5dfa77e4
   overview: 4b47da32e01e754d
   style_tokens: 6910b683995fc9aa
-generated_at: 2026-06-08T10:08:47Z
+generated_at: 2026-06-19T20:47:06Z
 ---
 
 ## Genel Bakış
@@ -58,6 +58,24 @@ CategoryHero bileşeninin render edilmesi ve `handleBack()` fonksiyonunun çağr
 **Parametreler**: (yok)  
 
 **Dönüş**: Geriye bir değer döndürmez; dönüş tipi `void` olarak kabul edilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../lib/type-converters::type { DomainCategory }
+- import: ../../utils/categoryHelpers::getCategoryDisplayName
+- import: ../../utils/getCategoryIcon::getCategoryIcon
+- import: ../ui/VentImage::VentImage
+- import: @/hooks/useScrollAnimation::scrollAnimationClasses
+- import: @/hooks/useScrollAnimation::useScrollAnimation
+- import: @/lib/utils::cn
+- import: lucide-react::ArrowLeft
+- import: lucide-react::Layers
+- import: lucide-react::ShieldCheck
+- import: lucide-react::Zap
+- import: next/navigation::useRouter
+- import: react::React
 
 ---
 

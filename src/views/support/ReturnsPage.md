@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\support\ReturnsPage.tsx
-skeleton_hash: 4374c37626f1d952
+skeleton_hash: 0ab6f26cdfcef25f
 entity_hashes:
   func:ReturnsPage: 58d2fb57da45461b
   overview: 95b133e51b479d65
   style_tokens: f66481541679296a
-generated_at: 2026-06-08T10:11:02Z
+generated_at: 2026-06-19T20:51:03Z
 ---
 
 ## Genel Bakış
@@ -44,6 +44,14 @@ Bu React tabanlı iade işlemleri sayfa modülü, VentHub HVAC platformunun dest
 - Bileşen prop almamaktadır (props-free bileşen)
 
 **Dönüş**: `React.FC` — React Fonksiyonel Bileşeni döndürür. Bu bileşen, iade sayfasının tam HTML/JSX yapısını render ederek tarayıcıda görüntülenen arayüzü oluşturur.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: lucide-react::ArrowLeft
+- import: next/navigation::useRouter
+- import: react::React
 
 ---
 

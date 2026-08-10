@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\categories.en.ts
-skeleton_hash: 7bb25cc23af40cc0
+skeleton_hash: 16829408b1b5412b
 entity_hashes:
   overview: e1ad358253fda567
-generated_at: 2026-06-13T18:02:39Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -34,7 +34,8 @@ Bu modül, i18n sistemi tarafından kullanılan statik bir dil sözlüğü dosya
 
 ## SABİTLER
 - **categories** (object) — `{
-      subtitle: 'Manage the product hierarchy and category tree from here.'...`
+  subtitle: 'Manage the product hierarchy and category tree from here.',
+...`
 
 ---
 

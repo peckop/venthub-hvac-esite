@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\CheckoutProgress.tsx
-skeleton_hash: d1eb6163a4658ba4
+skeleton_hash: a6cb30e6317c75a5
 entity_hashes:
   func:CheckoutProgress: 49b0cf86a525644a
   overview: 9c6eb086dfed68a0
   style_tokens: 755270530bcb7865
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-19T20:50:27Z
 ---
 
 ## Genel Bakış
@@ -49,6 +49,13 @@ Bu React bileşeni, ödeme sürecinde mevcut adımı göstermek ve sepete geri d
 - `onBackToCart` — () => void — Kullanıcı "Sepete Dön" işlemi yapmak istediğinde çağrılan geri çağıurma fonksiyonu. Checkout sürecini iptal edip kullanıcıyı alışveriş sepetine yönlendirir
 
 **Dönüş**: `React.FC<CheckoutProgressProps>` — CheckoutProgressProps arayüzüne uygun özellikler alan ve JSX element döndüren React fonksiyonel bileşeni
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/SecurityRibbon::SecurityRibbon
+- import: lucide-react::ArrowLeft
+- import: react::React
 
 ---
 

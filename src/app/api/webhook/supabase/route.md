@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\api\webhook\supabase\route.ts
-skeleton_hash: 2fd2103c27a09b70
+skeleton_hash: 6e0db33d4f730461
 entity_hashes:
   func:POST: b4117100eb99acd2
   overview: f01f3fd680e913b2
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:34Z
 ---
 
 ## Genel Bakış
@@ -53,6 +53,15 @@ Bu modül, Supabase webhook olaylarını HMAC ile doğrulayıp önbellek yenilem
 - **Başarılı (200)**: `{ revalidated: true, event: { table, type }, revalidatedPaths: string[], revalidatedTags: string[], timestamp: string }` formatında yanıt döner. Yeniden doğrulanan tüm sayfa yolları ve etiket listeleri dahil edilir.
 - **Kayıt bulunamadı (200)**: Payload içinde `record` ve `old_record` alanlarının her ikisi de yoksa `{ revalidated: false, message: 'No record found in payload' }` döner.
 - **Hata (401 veya 500)**: Geçersiz webhook secret için `{ error: 'Unauthorized' }` (401), yakalanan beklenmedik istisnalar için `{ error: string }` (500) formatında hata yanıtı döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/supabase/static::supabaseStaticClient
+- import: next/cache::revalidatePath
+- import: next/cache::revalidateTag
+- import: next/server::NextRequest
+- import: next/server::NextResponse
 
 ---
 

@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\ProjectContext.tsx
-skeleton_hash: 27a16878530613c5
+skeleton_hash: 59a9172118b3d007
 entity_hashes:
   overview: f1d38a9d20d9fa96
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -28,6 +28,12 @@ Bu modül, veri paylaşımı için temel React Context tanımını içerir. Doğ
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/types/ui-models::type { Product,ProjectItem, UserProject }
+- import: react::createContext
 
 ---
 

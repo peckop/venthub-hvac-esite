@@ -6,9 +6,9 @@ source_path: C:\Users\alize\venthub-hvac\src\utils\routes.ts
 skeleton_hash: 19d656f32362cddc
 entity_hashes:
   func:assertProductSlug: 7cc00756c332a6af
-  func:localizedHref: db9bfc84894b2a32
+  func:localizedHref: e1a2d461bb32d4d4
   overview: 8cbb4744a23035a6
-generated_at: 2026-06-15T17:04:15Z
+generated_at: 2026-06-19T20:48:41Z
 ---
 
 ## Genel Bakış
@@ -50,15 +50,15 @@ Bu modül, uygulama rotalarında kullanılan ürün tanımlayıcılarının doğ
 
 ### localizedHref
 
-**Ne yapar**: Dilsiz bir taban URL'e aktif dil önekini ekleyen saf (pure) bir yardımcı fonksiyondur. `useLocalizedRoutes` hook'unun sunucu-güvenli (RSC) çekirdeği olarak çalışır ve dil önekini URL'e dinamik olarak ekler.
+**Ne yapar**: Dilsiz bir taban URL'e aktif dil önekini ekleyen saf (pure) fonksiyondur. `useLocalizedRoutes` proxy'sinin sunucu-güvenli (React Server Component) çekirdeğini oluşturur; böylece hook kullanamayan Server Component'ler, route handler'lar ve paylaşılan render bileşenleri (ör. Breadcrumb) tarafından dil öneki eklenmesi için kullanılır.
 
-**Nasıl yapar**: Fonksiyon, gelen URL'in zaten belirli bir dil öneki (`/tr` veya `/en`) veya özel bir yol (`/admin`, `/api`) ile başlayıp başlamadığını kontrol eder. Eğer URL bu özel yollardan biriyle başlıyorsa, URL doğrudan olduğu gibi döndürülerek dil ekleme işlemi atlanır. Aksi halde, verilen `lang` parametresini URL'in başına ekler; eğer URL kök dizin (`/`) ise sadece dil öneki, aksi halde dil öneki ile birlikte mevcut URL yolu döndürülür. Bu yaklaşım, sunucu taraflı render süreçlerinde (Server Components, route handler'lar) ve hook kullanılamayan bileşenlerde (Breadcrumb gibi paylaşılan render bileşenleri) güvenli bir şekilde dil önekini eklemeyi sağlar.
+**Nasıl yapar**: Fonksiyon, gelen URL'in durumuna göre üç aşamalı bir karar süreci izler. Öncelikle `/admin` veya `/api` ile başlayan yolları hiçbir dönüşüme uğratmadan doğrudan `Route` tipine dönüştürerek geri döner — çünkü bu yollar dil öneki gerektirmez. Ardından URL'in zaten bir dil öneki içerip içermediğini kontrol eder; bunu yaparken yalnızca tam segment eşleşmeleri (`/tr`, `/en`, `/tr/...`, `/en/...`) dikkate alınır. Burada `startsWith('/tr')` tek başına kullanılmaz; çünkü bu durumda `/trends` gibi tamamen farklı yollar yanlışlıkla localize-dışı kalmaz, ancak localizer-dışı da kalmaz — sorun şudur ki `startsWith('/tr')` kullanılsaydı `/trends` gibi yolların localize edilmesi engellenemezdi. Kontrollerin hiçbirisi eşleşmediğinde ise `/${lang}` önekini URL'in başına ekler; eğer URL `/` ise yalnızca dil öneki döner, aksi halde dil önekinin ardından orijinal URL eklenir. Dönüş değeri her durumda `Route` tipine (`as Route`) dönüştürülür.
 
 **Parametreler**:
-- `url`: `string` — Dil öneki eklenmesi gereken taban yol. Genellikle `/` veya `/dashboard` gibi bir rota yolu olarak verilir.
-- `lang`: `string` — Eklenecek dil kodu. Genellikle `tr` veya `en` değerlerinden biri olur.
+- `url`: `string` — Dilsiz taban URL. Örneğin `/`, `/dashboard`, `/admin/settings`, `/api/health` gibi değerler alabilir. Fonksiyon bu URL'e göre dil öneki eklenip eklenmeyeceğine karar verir.
+- `lang`: `string` — Aktif dil kodu. Fonksiyonun URL başına ekleyeceği dil öneki olarak kullanılır (ör. `"tr"`, `"en"`). Zaten lokalize edilmiş URL'lerde kullanılmaz因为 kontrollerden erken dönüş yapılır.
 
-**Dönüş**: `Route` — Dil öneki eklenmiş veya olduğu gibi bırakılmış güvenli rota dizesi. Dönüş tipi `Route` olarak tip güvenliği sağlanmıştır ve `as Route` ile assert edilerek döndürülür.
+**Dönüş**: `Route` — Dil öneki eklenmiş (veya gerekli durumlarda aynen bırakılmış) tam URL string'i. Return type olarak `Route` tipi belirtilmiştir ve her dönüş değerinde `as Route` ile tip güvenliği sağlanmıştır. Fonksiyon saf olduğundan (same input → same output), herhangi bir yan etkisi yoktur.
 
 ---
 
@@ -78,82 +78,79 @@ Bu modül, uygulama rotalarında kullanılan ürün tanımlayıcılarının doğ
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/utils/routes.ts::assertProductSlug
-- **params**: `slug: string`
+### [N1_NASIL] AST Pointer: `utils/routes.ts::assertProductSlug`
+- **params**: `(slug: string)`
 - **ic_degiskenler**:
-  - `uuidRegex` — UUID formatını doğrulan RegExp nesnesi (`/^[0-9a-f]{8}-...$/i`), slug'ın geçerli bir UUID olup olmadığını test etmek için kullanılır
-- **Erişimler**:
-  - `process.env.NODE_ENV` — Ortam değişkeni okunur, production olup olmadığı kontrol edilir
-- **Dönüş**: `string` — slug aynen geri döner; UUID tespit edilirse production'da fallback ile aynı slug döner,非production'da Error fırlatır
+  - `uuidRegex` — UUID formatını eşleştiren RegExp nesnesi (`/^[0-9a-f]{8}-...$/i`), slug'ın geçerli bir UUID olup olmadığını test etmek için kullanılır
+- **Dis erisimleri**:
+  - `process.env.NODE_ENV` — Ortam değişkeni, production olup olmadığını kontrol eder; production dışıysa hata fırlatır, production'daysa graceful fallback yapar
+- **Yan etkiler**: Production dışı ortamda `throw new Error(...)` ile istisna fırlatır; production'da `console.error(...)` ile log basar
+- **Dönüş**: `string` — slug'ı olduğu gibi veya boş string döner
 
 ---
 
-### [N2_NASIL] AST Pointer: src/utils/routes.ts::Routes.productSlug *(anonim arrow)*
-- **params**: `slug: string`
+### [N2_NASIL] AST Pointer: `utils/routes.ts::Routes.product`
+- **params**: `(slug: string)`
 - **ic_degiskenler**:
-  - `validSlug` — `assertProductSlug(slug)` çağrısının sonucu; slug'ın doğrulanmış/temizlenmiş hali
-- **Cagri**: `assertProductSlug(slug)` → iç fonksiyon çağrısı
-- **Cagri**: `encodeURIComponent(validSlug)` → URL-safe encode
-- **Dönüş**: `Route` — `/products/{validSlug}` formatında rota stringi
+  - `validSlug` — `assertProductSlug(slug)` çağrısının dönüş değeri; UUID tespit edildiyse hata/log yapan ve slug'ı doğrulayan ara tampon
+- **Dönüş**: `Route` — `/products/{validSlug}` formatında URL, `encodeURIComponent` ile encode edilmiş
 
 ---
 
-### [N3_NASIL] AST Pointer: src/utils/routes.ts::Routes.productList *(anonim arrow)*
-- **params**: `params?: { brand?: string, limit?: number }`
+### [N3_NASIL] AST Pointer: `utils/routes.ts::Routes.products`
+- **params**: `(params?: { brand?: string, limit?: number })`
 - **ic_degiskenler**:
-  - `query` — `new URLSearchParams()` instance'ı, query string birleştirmek için kullanılır
-  - `qs` — `query.toString()` sonucu; birleştirilmiş query string
-- **Dönüş**: `Route` — params yoksa `/products`, varsa `/products?brand=...&limit=...` formatında rota
+  - `query` — `URLSearchParams` nesnesi; `brand` ve `limit` parametrelerini query string'e eklemek için biriktirici olarak kullanılır
+  - `qs` — `query.toString()` sonucu; oluşturulan query string'in ham halidir, boşsa `/products` döner, doluysa `?` eklenir
+- **Dönüş**: `Route` — `/products` veya `/products?brand=...&limit=...` formatında URL
 
 ---
 
-### [N4_NASIL] AST Pointer: src/utils/routes.ts::Routes.productDetail *(anonim arrow)*
-- **params**: `idOrSlug: string`
-- **ic_degiskenler**: *(yok)*
-- **Cagri**: `encodeURIComponent(idOrSlug)` → parametre URL-safe encode edilir
-- **Dönüş**: `Route` — boşsa `/products` fallback, doluysa `/products/{idOrSlug}` formatında rota
+### [N4_NASIL] AST Pointer: `utils/routes.ts::Routes.productDetail`
+- **params**: `(idOrSlug: string)`
+- **ic_degiskenler**: yok
+- **Dönüş**: `Route` — `/products/{idOrSlug}` formatında URL, `encodeURIComponent` ile encode edilmiş; boşsa `/products` döner
 
 ---
 
-### [N5_NASIL] AST Pointer: src/utils/routes.ts::Routes.categoryPage *(anonim arrow)*
-- **params**: `slug: string, subSlug?: string`
-- **ic_degiskenler**: *(yok)*
-- **Cagri**: `encodeURIComponent(slug)` ve `encodeURIComponent(subSlug)` → her iki parametre URL-safe encode edilir
-- **Kosul**: `subSlug && subSlug !== slug && subSlug !== 'undefined'` — subSlug geçerli ve slug'dan farklıysa alt kategori rotası oluşturulur
-- **Dönüş**: `Route` — subSlug varsa `/category/{slug}/{subSlug}`, yoksa `/category/{slug}` formatında rota
+### [N5_NASIL] AST Pointer: `utils/routes.ts::Routes.category`
+- **params**: `(slug: string, subSlug?: string)`
+- **ic_degiskenler**: yok
+- **Koşul mantığı**: `subSlug` varsa, `slug`'dan farklıysa ve `'undefined'` string'ine eşleşmiyorsa alt kategori URL'i üretir
+- **Dönüş**: `Route` — `/category/{slug}` veya `/category/{slug}/{subSlug}` formatında URL, her segment `encodeURIComponent` ile encode edilmiş
 
 ---
 
-### [N6_NASIL] AST Pointer: src/utils/routes.ts::Routes.brandPage *(anonim arrow)*
-- **params**: `slug: string`
-- **ic_degiskenler**: *(yok)*
-- **Cagri**: `encodeURIComponent(slug)` → parametre URL-safe encode edilir
-- **Dönüş**: `Route` — `/brands/{slug}` formatında rota
+### [N6_NASIL] AST Pointer: `utils/routes.ts::Routes.brand`
+- **params**: `(slug: string)`
+- **ic_degiskenler**: yok
+- **Dönüş**: `Route` — `/brands/{slug}` formatında URL, `encodeURIComponent` ile encode edilmiş
 
 ---
 
-### [N7_NASIL] AST Pointer: src/utils/routes.ts::Routes.paymentSuccess *(anonim arrow)*
-- **params**: `orderId?: string, status?: string`
+### [N7_NASIL] AST Pointer: `utils/routes.ts::Routes.paymentSuccess`
+- **params**: `(orderId?: string, status?: string)`
 - **ic_degiskenler**:
-  - `query` — `new URLSearchParams()` instance'ı, orderId ve status bilgilerini query string'e eklemek için kullanılır
-- **Dönüş**: `Route` — orderId yoksa `/payment-success` fallback, varsa `/payment-success?orderId=...&status=...` formatında rota
+  - `query` — `URLSearchParams` nesnesi; `orderId` zorunlu olarak, `status` ise opsiyonel olarak query string'e eklenir
+- **Dönüş**: `Route` — `/payment-success?orderId=...&status=...` formatında URL; `orderId` yoksa doğrudan `/payment-success` döner
 
 ---
 
-### [N8_NASIL] AST Pointer: src/utils/routes.ts::Routes.login *(anonim arrow)*
-- **params**: `redirect?: string, error?: string`
+### [N8_NASIL] AST Pointer: `utils/routes.ts::Routes.login`
+- **params**: `(redirect?: string, error?: string)`
 - **ic_degiskenler**:
-  - `url` — Sabit login rotası, değeri `'/auth/login'`
-  - `params` — `new URLSearchParams()` instance'ı, redirect ve error parametrelerini eklemek için kullanılır
-  - `qs` — `params.toString()` sonucu; birleştirilmiş query string
-- **Dönüş**: `Route` — params yoksa `/auth/login`, varsa `/auth/login?redirect=...&error=...` formatında rota
+  - `url` — Sabit string `'/auth/login'`, login sayfasının temel yolu
+  - `params` — `URLSearchParams` nesnesi; `redirect` ve `error` opsiyonel parametreleri query string'e eklemek için kullanılır
+  - `qs` — `params.toString()` sonucu; oluşturulan query string'in ham halidir
+- **Dönüş**: `Route` — `/auth/login` veya `/auth/login?redirect=...&error=...` formatında URL
 
 ---
 
-### [N9_NASIL] AST Pointer: src/utils/routes.ts::localizedHref
-- **params**: `url: string, lang: string`
-- **ic_degiskenler**: *(yok)*
-- **Dönüş**: `Route` — `/admin` veya `/api` ile başlıyorsa url aynen döner; `/tr` veya `/en` ile başlıyorsa url aynen döner; aksi halde `/{lang}{url}` formatında locale prefix eklenmiş rota döner
+### [N9_NASIL] AST Pointer: `utils/routes.ts::localizedHref`
+- **params**: `(url: string, lang: string)`
+- **ic_degiskenler**: yok
+- **Koşul mantığı**: URL `/admin` veya `/api` ile başlıyorsa olduğu gibi döner; zaten `/tr`, `/en`, `/tr/...` veya `/en/...` ile başlıyorsa locale eklenmeden döner; aksi halde `/{lang}` prefix'i eklenir
+- **Dönüş**: `Route` — Locale-önekli veya öneksiz URL string'i
 
 ---
 

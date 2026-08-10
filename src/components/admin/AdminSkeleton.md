@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\AdminSkeleton.tsx
-skeleton_hash: 3d64d8f079258cce
+skeleton_hash: a34791c328f8d809
 entity_hashes:
   func:AdminSkeleton: 586d38b8378960eb
   overview: d5fffe3d7ed9f7eb
   style_tokens: 9ebeaa83a2aaeb97
-generated_at: 2026-06-08T10:08:36Z
+generated_at: 2026-06-19T20:46:39Z
 ---
 
 ## Genel Bakış
@@ -47,6 +47,12 @@ Bu modülün doğru çalışması için temel mimari varsayımlar fonksiyonun pa
 - `fields`: `number` — Varsayılan form varyantında alan sayısını belirler (varsayılan: 6)
 
 **Dönüş**: `JSX.Element` — Seçilen varyanta göre animasyonlu skeleton yapısını temsil eden React JSX bileşeni döndürür. Her varyant farklı bir layout yapısına sahiptir: tablo varyantı `<div>` içinde `<table>` yapısı, kart varyantı grid düzeninde çoklu `<div>` kartları, form varyantı ise input alanlarını simüle eden çoklu `<div>` blokları içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../utils/adminUi::glassStrongClass
+- import: react::React
 
 ---
 

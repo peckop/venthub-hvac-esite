@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\config\orbitalCarouselConfig.ts
-skeleton_hash: a8316a8cfcf9cfd2
+skeleton_hash: 42378e633ba440af
 entity_hashes:
   overview: eca02fed19b4de2a
-generated_at: 2026-06-12T10:23:05Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\ProjectProvider.tsx
-skeleton_hash: 16c82486b7616aed
+skeleton_hash: 57f57f8691d6baa3
 entity_hashes:
   func:ProjectProvider: 48fd4159fdf830c0
   overview: 56739bf2be524198
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,20 @@ ProjectProvider, React Context kullanarak proje verilerini alt bileşenlere ilet
 **Dönüş**: `React.FC<{ children: React.ReactNode }>` — JSX döndüren bir React Fonksiyonel Bileşeni. Children prop'unu alır ve sağlayıcı sarmalayıcısı içinde render eder.
 
 **Notlar**: Bu bileşen, React Context deseninin temel yapısını izleyerek proje verilerinin bileşen ağacının derinliklerine prop drilling ihtiyacı olmadan iletilmesini sağlar. Tipik olarak React.createContext ile oluşturulan bir Context nesnesinin Provider bileşeni olarak kullanılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../hooks/useAuth::useAuth
+- import: @/providers/SupabaseProvider::useSupabaseClient
+- import: @/types/ui-models::type { ProjectItem,UserProject }
+- import: react::React
+- import: react::createContext
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useState
+- import: sonner::toast
 
 ---
 

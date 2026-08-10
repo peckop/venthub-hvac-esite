@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\applicationUi.tsx
-skeleton_hash: 7e0879c26b026cb4
+skeleton_hash: 857b9dfeb4799369
 entity_hashes:
   func:accentOverlayClass: d8ef037541c09389
   func:iconFor: 8ef77854d85af42b
   overview: bbb9266e1effc225
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -64,6 +64,12 @@ Bu modül, VentHub HVAC uygulamasında ikon gösterimi ve vurgu rengi CSS sını
 - accent: `ApplicationAccent` — Hangi vurgu renginin gradyanının seçileceğini belirten枚ger tipindeki değer (örn. 'blue', 'navy', 'emerald').
 
 **Dönüş**: `string` — Seçilen renge karşılık gelen, opaklığı ayarlanmış bir Tailwind CSS gradyan başlangıç sınıf adı.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../config/applications::type { ApplicationAccent, ApplicationIcon }
+- import: react::React
 
 ---
 

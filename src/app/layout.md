@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\layout.tsx
-skeleton_hash: ec7afc7631488d32
+skeleton_hash: 7ef49de769913f08
 entity_hashes:
   func:RootLayout: b91efb59fd6362f0
   overview: 49bead2b697f0509
   style_tokens: eebc13a3fedd1bcb
-generated_at: 2026-06-10T09:12:03Z
+generated_at: 2026-06-19T20:46:34Z
 ---
 
 ## Genel Bakış
@@ -45,6 +45,16 @@ Bu modül, Next.js App Router kök layout bileşenidir ve tüm sayfaları saran 
 - `children`: React.ReactNode — Layout bileşeninin içinde render edilecek olan alt sayfa veya bileşen içeriği. Next.js'de her sayfa bu parametre aracılığıyla root layout'a传递 edilir.
 
 **Dönüş**: `JSX.Element` — Tüm HTML yapısını, provider sarmalını, client layout'u ve children içeriğini içeren JSX yapısı döndürülür. Return ifadesinde `<html>` elementi kök olarak verilmiştir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../components/layout/ClientLayout::ClientLayout
+- import: ../components/layout/ClientLayout::Providers
+- import: ../index.css
+- import: @/config/siteUrl::SITE_URL
+- import: next/font/google::Inter
+- import: next::type { Metadata }
 
 ---
 

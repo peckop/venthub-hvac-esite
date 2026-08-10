@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useNavigationState.ts
-skeleton_hash: f3e59739ac20c686
+skeleton_hash: 8625c236e971e1a7
 entity_hashes:
   func:useNavigationState: 312ef38a3d9c5c5d
   overview: cee2f65a2ff09739
-generated_at: 2026-05-28T22:37:47Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -37,6 +37,14 @@ Bu React özel hook'u olan useNavigationState, yalnızca React runtime ortamınd
 **Parametreler**:
 - name: options, type: UseNavigationStateOptions — Navigasyon durumunu yapılandırmak için kullanılan konfigürasyon nesnesi. İçerisinde sayfanın kaydırılıp kaydırılmadığını belirten `isScrolled` bayrağını barındırır, bu bayrak ile navigasyonun kompakt modda çalışması tetiklenir.
 **Dönüş**: Tüm navigasyon yüzeylerinin mevcut durumunu gösteren durum bayraklarını ve tüm bu durumları yönetmek için kullanılan ayarlama callback fonksiyonlarını içeren bir nesne döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../utils/navigationConfig::type { NavigationMode }
+- import: react::useCallback
+- import: react::useMemo
+- import: react::useState
 
 ---
 

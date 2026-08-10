@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\parts\GreenClamps.tsx
-skeleton_hash: c0acb58013af37d2
+skeleton_hash: 4304705d1ca03ada
 entity_hashes:
   func:GreenClamps: 957b30489f158a33
   overview: 56ea2345484e125a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:30Z
+generated_at: 2026-06-19T20:47:11Z
 ---
 
 ## Genel Bakış
@@ -44,6 +44,12 @@ Bu modülün çalışması için aşağıdaki varsayımlar geçerlidir.
 - onClick: function — Klemens üzerine tıklandığında çağrılacak olay işleyici.  
 - explode: number (varsayılan değer belirtilmemiş) — Klemensin patlama efekti için uzaklık/ofset değeri.  
 **Dönüş**: React.FC<GreenClampsProps> — JSX elementi döndüren fonksiyonel React bileşeni.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../materials/useFanMaterials::useFanMaterials
+- import: react::React
 
 ---
 

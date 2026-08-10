@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\CategoryPage.tsx
-skeleton_hash: c7c26ce889db5076
+skeleton_hash: b8953d96c057712b
 entity_hashes:
   func:CategoryPage: 58a326ade322bfe1
   overview: 4a1165b4bde9da1a
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:50:27Z
 ---
 
 ## Genel Bakış
@@ -52,6 +52,13 @@ Bu bir React view bileşeni olup, fonksiyon gövdesi verilmediğinden yalnızca 
 - `initialSubCategories` — Başlangıç alt kategorileri. Kategori hiyerarşisindeki alt kategorilerin verisini barındırır
 
 **Dönüş**: `React.FC<CategoryPageProps>` — CategoryPageProps tipinde tanımlı props'ları kabul eden fonksiyonel bir React bileşeni döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../lib/type-converters::type { DomainCategory, DomainProduct }
+- import: ./CategoryMasterView::CategoryMasterView
+- import: react::React
 
 ---
 

@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\buildPaymentRequest.ts
-skeleton_hash: 3f264fd968a9e810
+skeleton_hash: b2ce3c5b2d66e94c
 entity_hashes:
   func:buildPaymentRequest: 874080c807e1dee1
   overview: d55be1ad42d13d7e
-generated_at: 2026-06-08T10:11:02Z
+generated_at: 2026-06-19T20:50:27Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,12 @@ Bu modül için özel aksiyom tanımlanmıştır.
 **Parametreler**:
 - name: args, type: BuildPaymentArgs — Ödeme talebi oluşturmak için gereken tüm sipariş, müşteri ve ödeme yöntemi bilgilerini içeren yapılandırılmış girdi nesnesi. Checkout adımında kullanıcıdan ve iç sistemden toplanan sipariş tutarı, teslimat adresi, müşteri kimliği, seçilen taksit planı gibi tüm işlem verilerini barındırır.
 **Dönüş**: req türünde ödeme talebi nesnesi döndürür. Bu nesne, tüm zorunlu alanları doldurulmuş, harici ödeme API'lerine gönderilmek üzere standart formatta yapılandırılmıştır, doğrudan ödeme işlemini başlatmak için kullanılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../utils/type-converters::safeNumber
+- import: @/types/ui-models::type { UserAddress }
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\garanti-servis\page.tsx
-skeleton_hash: 67986d249a76e351
+skeleton_hash: 6d3d2ab8d6b93195
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: 6c2c809acf8ab283
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -46,6 +46,11 @@ Bu modül, Next.js App Router yapısında konumlanmış bir sayfa bileşenidir. 
 - Fonksiyon herhangi bir parametre almaz.
 
 **Dönüş**: `JSX.Element` — Sayfanın tamamını temsil eden `PageComponent` bileşenini döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../views/support/WarrantyPage::PageComponent
 
 ---
 

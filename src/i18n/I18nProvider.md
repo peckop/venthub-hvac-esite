@@ -10,7 +10,7 @@ entity_hashes:
   func:useI18n: 7f95c6a8fb408f61
   overview: 7eca34d148d2fa1f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-15T11:40:56Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -126,33 +126,6 @@ type Dict = Record<string, unknown>
   - `p1` — regex grubundan yakalanan parametre adı (ör: `{{ name }}` → `"name"`)
   - `v` — `params` dict'inden `p1` anahtarıyla erişilen değer
 - **Dönüş**: `string` — şablon içindeki `{{ parametre }}`lerin değerlerle değiştirilmiş hali; parametre bulunamazsa boş string
-
----
-
-### [N2_NASIL] AST Pointer: I18nProvider.tsx::I18nProvider
-- **params**: `{ children, lang: initialLang, dictionary }`
-- **ic_degiskenler**:
-  - `lang` — `useState<Lang>` hook'unun state değeri, aktif dil kodu (`'tr'` veya `'en'`)
-  - `setLangState` — `useState`'ten dönen state güncelleme fonksiyonu
-  - `initialLang` — prop'tan gelen başlangıç dili, useEffect bağımlılıklarında ve koşullarda kullanılır
-  - `saved` — `localStorage.getItem('lang')` çağrısından okunan kayıtlı dil tercihi
-  - `nav` — `navigator.language?.toLowerCase() || 'tr'` ifadesinden elde edilen tarayıcı dili küçük harf string'i
-  - `setLang` — `React.useCallback` ile sarılmış, dışarıya sunulan dil değiştirme fonksiyonu
-  - `t` — `useMemo` ile memoize edilmiş çeviri fonksiyonu; `(key, paramsOrAlt?)` alır
-  - `currentDict` — `t` callback'i içinde hesaplanan aktif sözlük, `dictionary` prop'u varsa onu kullanır yoksa `DICTS[lang]` kullanır
-  - `translation` — `getDictValue(currentDict, key)` çağrısıyla sözlükten çekilmiş çeviri metni
-  - `hasTranslation` — `translation !== key` kontrolü; çevirinin bulunup bulunmadığını boolean olarak belirtir
-  - `dict` — `useMemo` ile memoize edilmiş tam sözlük objesi
-  - `value` — `useMemo` ile memoize edilmiş context value objesi; `{ lang, setLang, t, dict }` içerir
-- **Dönüş**: JSX — `<I18nContext.Provider value={value}>{children}</I18nContext.Provider>`; children'ı sarmalayan context provider bileşeni
-
----
-
-### [N3_NASIL] AST Pointer: I18nProvider.tsx::useI18n
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `ctx` — `useContext(I18nContext)` çağrısından elde edilen context değeri; null olabilir
-- **Dönüş**: `{ lang, setLang, t, dict }` objesi — context mevcutsa doğrudan ctx döner; context yoksa fallback obje döner (`lang: 'tr'`, boş `setLang`, passthrough `t`, `tr` sözlüğü)
 
 ---
 

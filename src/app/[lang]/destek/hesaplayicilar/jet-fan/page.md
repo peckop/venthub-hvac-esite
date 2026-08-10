@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\hesaplayicilar\jet-fan\page.tsx
-skeleton_hash: bb8025f9b95570ef
+skeleton_hash: 3cd9525d6e558de0
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: ed78a418e47b7805
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -37,6 +37,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - Bu fonksiyon herhangi bir parametre almaz.
 
 **Dönüş**: `JSX.Element` (React bileşeni). `PageComponent` bileşeninin oluşturduğu React ağacı (virtual DOM) yapısını döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../../views/calculators/JetFanCalcPage::PageComponent
 
 ---
 

@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\calculators\InputField.tsx
-skeleton_hash: 0743c22f96e8b325
+skeleton_hash: e7def4df7bf66638
 entity_hashes:
   func:InputField: 67cc20ea60eef576
   func:RadioGroup: 3547a0581eb094b6
   overview: 886525d7c102a6da
   style_tokens: d04e77e09b4ac40e
-generated_at: 2026-06-08T10:08:47Z
+generated_at: 2026-06-19T20:47:06Z
 ---
 
 ## Genel Bakış  
@@ -78,6 +78,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `error`: string (opsiyonel) — Doğrulama hatası durumunda gösterilecek mesaj.  
 - `columns`: number (opsiyonel) — Radyo butonlarının kaç sütun içinde yer alacağını belirler.  
 **Dönüş**: React.FC<RadioGroupProps> — Tanımlanan prop tipleriyle uyumlu bir fonksiyonel React bileşeni.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: lucide-react::HelpCircle
+- import: react::React
 
 ---
 

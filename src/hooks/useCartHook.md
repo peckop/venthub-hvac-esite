@@ -7,7 +7,7 @@ skeleton_hash: 83483c8bf6e92f1f
 entity_hashes:
   func:useCart: 809254743b71e846
   overview: a6bb925fcf63c562
-generated_at: 2026-06-19T06:52:05Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\support\WarrantyPage.tsx
-skeleton_hash: 78c857c6989a2419
+skeleton_hash: 36d1ed89a33153dd
 entity_hashes:
   func:WarrantyPage: 10b812b014f5f78b
   overview: 24646a95fed0395f
   style_tokens: f66481541679296a
-generated_at: 2026-06-08T10:11:02Z
+generated_at: 2026-06-19T20:51:03Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - Prop parametresi almaz (React.FC olarak tanımlıdır)
 
 **Dönüş**: `React.JSX.Element` — Garanti sayfasının tamamını içeren JSX yapısı döndürür. Sayfa, uygulamanın destek bölümünde yer alan garanti bilgilendirme içeriğini sergiler.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: lucide-react::ArrowLeft
+- import: next/navigation::useRouter
+- import: react::React
 
 ---
 

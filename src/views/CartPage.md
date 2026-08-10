@@ -3,29 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\CartPage.tsx
-skeleton_hash: ca71369579fe42a0
+skeleton_hash: eba64aa94f0699af
 entity_hashes:
   func:CartPage: 47b501309afc6903
-  overview: 388900e6d926d87f
+  overview: b9847bc86b863737
   style_tokens: 0ec1062a71699875
-generated_at: 2026-06-08T10:10:58Z
+generated_at: 2026-06-19T20:50:25Z
 ---
 
 ## Genel Bakış
-CartPage, VentHub HVAC projesinin alışveriş sepeti sayfasını render eden tek bir React bileşenidir. Kullanıcıların sepetteki ürünleri görmesini, miktar değiştirmesini ve sipariş sürecine geçmesini sağlayan arayüzü sunar. Bileşen, bağımlılıklarını iç hook'lar veya global state yönetimi ile sağlar ve doğrudan prop almaz.
+CartPage, VentHub HVAC projesinin alışveriş sepeti sayfasını render eden tek bir React bileşenidir. Kullanıcıların sepetteki ürünleri görüntülemesini, miktar değiştirmesini ve sipariş sürecine geçmesini sağlayan arayüzü sunar. Bileşen, bağımlılıklarını iç hook'lar veya global state yönetimi ile sağlar ve doğrudan prop almaz.
 
 ## Fonksiyon Grupları
-### Ana Sayfa Görünümü Bileşeni
-Modülün tek fonksiyonu olan CartPage, sepet sayfasının tüm görünümünü, veri gösterimini ve kullanıcı etkileşimlerini yöneten kök React bileşenidir.
+### Ana Sayfa Görünümü
+Modülün tek bileşeni olan CartPage, sepet sayfasının tüm görünümünü, veri gösterimini ve kullanıcı etkileşimlerini yöneten kök React bileşenidir.
 - CartPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için fonksiyon gövdesi (source code) paylaşılmadığından, yalnızca fonksiyon imzasından çıkarılabilecek minimum aksiyomlar tanımlanmıştır.
-
-[Aksiyom 1]: Eğer `CartPage` bileşeninin props aracılığıyla veri alması gerekseydi, fonksiyon imzasında parametre tanımı olurdu; ancak `CartPage()` imzası parametresizdir — bu durum, bileşenin tüm veri ihtiyacını prop'lar dışında (global state, hook, context vb.) karşılaması gerektiğini ima eder.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -45,26 +44,46 @@ Bu bileşen için belgelenmiş parametre bulunmamaktadır.
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../components/HVACIcons::BrandIcon
+- import: ../components/SecurityRibbon::SecurityRibbon
+- import: ../hooks/useCartHook::useCart
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: ../i18n/I18nProvider::useI18n
+- import: ../i18n/format::formatCurrency
+- import: lucide-react::ArrowLeft
+- import: lucide-react::Minus
+- import: lucide-react::Plus
+- import: lucide-react::ShoppingBag
+- import: lucide-react::Trash2
+- import: next/link::Link
+- import: react::React
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/CartPage.tsx::CartPage
-- **params**: (parametre yok)
-- **ic_degiskenler**: 
-  - `items` — useCart hook'undan gelen sepet öğeleri dizisi, sepetteki ürünleri temsil eder
-  - `updateQuantity` — useCart hook'undan gelen, ürün miktarını güncellemek için fonksiyon
-  - `removeFromCart` — useCart hook'undan gelen, sepetten ürün kaldırmak için fonksiyon
-  - `clearCart` — useCart hook'undan gelen, sepeti tamamen temizlemek için fonksiyon
-  - `getCartTotal` — useCart hook'undan gelen, sepet toplamını hesaplayan fonksiyon
-  - `getCartCount` — useCart hook'undan gelen, sepet öğe sayısını döndüren fonksiyon
-  - `t` — useI18n hook'undan gelen, çeviri fonksiyonu
-  - `lang` — useI18n hook'undan gelen, mevcut dil kodu
-- **Dönüş**: JSX elementi (React.FC)
+- **params**: ()
+- **ic_degiskenler**:
+  - `items` — sepet içindeki ürün listesi, useCart hook'undan gelir; boşsa boş sepet UI'ı, doluysa ürün listesi render edilir
+  - `updateQuantity` — sepetteki bir ürünün miktarını güncelleyen fonksiyon; artırma/azaltma butonlarında çağrılır
+  - `removeFromCart` — sepetten belirli bir ürünü kaldıran fonksiyon; sil butonunda çağrılır
+  - `clearCart` — tüm sepeti boşaltan fonksiyon; "sepeti temizle" butonunda çağrılır
+  - `getCartTotal` — sepetin toplam tutarını döndüren fonksiyon; sipariş özeti bölümünde ve KDV hesaplamada kullanılır
+  - `getCartCount` — sepetteki toplam ürün sayısını döndüren fonksiyon; başlık altındaki sayacı gösterir
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu; tüm UI metinleri için kullanılır (ör. `t('cart.title')`, `t('cart.emptyTitle')`, `t('cart.checkout')` vb.)
+  - `lang` — useI18n hook'undan gelen mevcut dil kodu; formatCurrency fonksiyonuna para birimi formatı için aktarılır
+  - `Routes` — useLocalizedRoutes hook'undan gelen lokalize rota üreteci; `Routes.home()`, `Routes.product(slug)`, `Routes.checkout()` çağrılır
+- **Dönüş**: JSX (React element) — sepet boşsa boş sepet ekranı, doluysa ürün listesi + sipariş özeti ekranı
 
-### [N2_NASIL] AST Pointer: src/views/CartPage.tsx::renderCartItem (anonim map callback)
-- **params**: (item — sepet öğesini temsil eden nesne)
-- **ic_degiskenler**: 
-  (Değişken bildirimi yok, sadece parametre ve JSX döndürülüyor)
-- **Dönüş**: JSX elementi (React element)
+---
+
+### [N2_NASIL] AST Pointer: src/views/CartPage.tsx::CartPage::mapCallback
+- **params**: `item` — items dizisi içindeki tek bir sepet kalemi nesnesi, map iterasyonu sırasında her ürün için çağrılır
+- **ic_degiskenler**:
+  - (explicit değişken yok; `item` parametresinin özellikleri doğrudan kullanılır: `item.id`, `item.product.brand`, `item.product.slug`, `item.product.name`, `item.product.sku`, `item.unitPrice`, `item.product.price`, `item.quantity`, `item.product.id`)
+- **Dönüş**: JSX (React element) — tek bir sepet kaleminin kart görünümü (görsel, bilgi, miktar kontrolleri, sil butonu)
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ui\VentImage.tsx
-skeleton_hash: 3d81ecfd4042178c
+skeleton_hash: c33c889cb5e7319a
 entity_hashes:
   func:VentImage: 5527f2e63e5e22a5
   overview: ed4ba88e88a612db
   style_tokens: 1d628435b48e7258
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:39Z
 ---
 
 ## Genel Bakış
@@ -55,6 +55,14 @@ Bu modül, görsel gösterimi ve yedek görsel mekanizması üzerine kurulu bir 
 - className: string — Bileşene özel CSS sınıfları eklemek için kullanılan isteğe bağlı string parametresidir, özel stil tanımlamaları için kullanılır
 - ...props: any — React görüntü elementine veya Next.js Image bileşenine iletilecek tüm ek standart veya özel props'ları toplar, bileşenin farklı kullanım senaryolarına uyum sağlamasını sağlar
 **Dönüş**: React.FC<VentImageProps> — VentImageProps türündeki giriş parametrelerini alan, sayfada sorunsuz şekilde render edilen React fonksiyonel bileşenini döndürür
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/utils/imageUtils::normalizeImageUrl
+- import: next/image::Image
+- import: next/image::ImageProps
+- import: react::React
 
 ---
 

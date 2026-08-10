@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\EducationalGuide.tsx
-skeleton_hash: ca18e2b43a0d6fc3
+skeleton_hash: 1be5adad71edb301
 entity_hashes:
   func:EducationalGuide: 062bdc9e16ff212e
   overview: b0535ec50facf114
   style_tokens: dfe57f52c58ea755
-generated_at: 2026-06-08T10:08:47Z
+generated_at: 2026-06-19T20:47:07Z
 ---
 
 ## Genel Bakış
@@ -45,6 +45,15 @@ Bu modül, `categorySlug` propunun dışarıdan sağlanması gerekliliğine daya
 **Parametreler**:  
 - categorySlug: string — Eğitim kılavuzunun hangi kategoriye ait olduğunu belirten slug değeri.  
 **Dönüş**: React.FC<EducationalGuideProps> — `categorySlug` prop'ını kabul eden ve JSX döndüren bir React fonksiyon bileşeni.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: lucide-react::CheckCircle2
+- import: lucide-react::Sun
+- import: lucide-react::Wind
+- import: react::React
 
 ---
 

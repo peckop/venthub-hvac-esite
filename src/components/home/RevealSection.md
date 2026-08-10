@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\RevealSection.tsx
-skeleton_hash: 1f8a96e34b715af3
+skeleton_hash: f1c38d93e81e4119
 entity_hashes:
   func:RevealSection: ba33115191e442f1
   overview: 83509008900591e6
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-19T20:47:09Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - children: React.ReactNode — Gösterilecek içeriği temsil eden React düğümleri. Bu, tek bir eleman, birden fazla eleman ya da boş olabilir.
 
 **Dönüş**: React.FC — `children` prop'ını render eden ve başka bir prop almayan bir React fonksiyonel bileşeni. Dönen değer, JSX olarak kullanılarak başka bileşenlerin içinde yer alabilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: framer-motion::motion
+- import: react::React
 
 ---
 

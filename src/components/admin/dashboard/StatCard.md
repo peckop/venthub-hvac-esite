@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\dashboard\StatCard.tsx
-skeleton_hash: 4636899e30bd1727
+skeleton_hash: 9cf0d06b5caf4b52
 entity_hashes:
   func:StatCard: 42faa1e1d38b732c
   overview: d5fe2f564e9e4393
   style_tokens: 3b396ad8fb25d2f9
-generated_at: 2026-06-08T10:08:37Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - `lan`: `string` — Para birimi formatlamasında kullanılacak dil ve bölge ayarını belirler. `Intl.NumberFormat` içinde dil kodu olarak kullanılır, örneğin `"tr-TR"` Türkçe format veya `"en-US"` İngilizce format için.
 
 **Dönüş**: `React.FC<StatCardProps>` — JSX elementi döndürür. StatCardProps arayüzüne uygun olarak yapılandırılmış bir React fonksiyonel bileşenidir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../i18n/format::formatCurrency
+- import: next/link::Link
+- import: react::React
 
 ---
 

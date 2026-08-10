@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\calculators\DuctCalcPage.tsx
-skeleton_hash: 2f798e3361126451
+skeleton_hash: 6ee6416b7d6a035d
 entity_hashes:
   func:DuctCalcPage: 531002b319923b38
   func:reset: 16764b441f7bc7b6
   overview: 1f3bf3c7f06ebe09
   style_tokens: 002582f3ef540f0d
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-19T20:50:07Z
 ---
 
 ## Genel Bakış
@@ -56,6 +56,19 @@ Bu modül için fonksiyon gövdesinden türetilebilecek net mimari varsayımlar 
 **Parametreler**:
 - Parametre belirtilmemiş
 **Dönüş**: void veya bilinmiyor — Fonksiyonun dönüş tipi kesin olarak belirtilmemiştir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: lucide-react::Circle
+- import: lucide-react::RotateCcw
+- import: lucide-react::Ruler
+- import: lucide-react::Square
+- import: lucide-react::Wind
+- import: react::React
+- import: react::useMemo
+- import: react::useState
 
 ---
 

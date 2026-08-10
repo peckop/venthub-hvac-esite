@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\order.ts
-skeleton_hash: 34310d9d2c13f2a6
+skeleton_hash: d6995e6a1730f7a1
 entity_hashes:
   func:validateServerCart: 5d44a017c1d324c4
   overview: 24f5c5f866f2e17e
-generated_at: 2026-05-28T22:38:02Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış

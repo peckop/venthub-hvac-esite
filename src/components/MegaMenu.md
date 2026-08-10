@@ -8,7 +8,7 @@ entity_hashes:
   func:MegaMenu: 73d16c7403c0be73
   overview: 7b77f95abaa36af5
   style_tokens: 607cd2b8b83a451b
-generated_at: 2026-06-14T22:16:29Z
+generated_at: 2026-06-19T20:47:09Z
 ---
 
 ## Genel Bakış
@@ -85,14 +85,6 @@ MegaMenu modülü, menünün görünürlük durumunu dışarıdan kontrol eden b
 - **Kullanılan hook'lar**: `useCategories`, `useI18n`, `useState`, `useEffect`
 - **Kullanılan alt bileşenler**: `EliteMegaMenu` (`categories`, `onNavigate={onClose}`), `MobileMegaMenu` (`categories`, `onNavigate={onClose}`)
 - **Early return**: `!isMounted || !isOpen` koşulunda `null` döner
-
----
-
-### [N2_NASIL] AST Pointer: src/components/MegaMenu.tsx::MegaMenu.useEffect_callback
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (void)
-- **Yan etkileri**: `setIsMounted(true)` çağrısı ile bileşenin mount edildiğini işaretler
 
 ---
 

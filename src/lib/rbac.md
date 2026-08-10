@@ -9,7 +9,7 @@ entity_hashes:
   func:canWrite: 289f50aba94e238a
   func:isReadOnly: 4b13d0168f4b164b
   overview: e7f0da41b26e494f
-generated_at: 2026-06-17T13:23:01Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış

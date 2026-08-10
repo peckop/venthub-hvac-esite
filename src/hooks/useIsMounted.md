@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useIsMounted.ts
-skeleton_hash: a2364f930e9df71b
+skeleton_hash: fdf80a90dd99e7ec
 entity_hashes:
   func:useIsMounted: ae14f2fca3691906
   overview: 050973256d3540a7
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -42,6 +42,12 @@ Bu modül, React'ın hooks mekanizması ve yaşam döngüsüne temel dayalı bir
 **Parametreler**:
 - Bu fonksiyon herhangi bir giriş parametresi kabul etmez, bağımsız olarak çalışır
 **Dönüş**: Boolean tipinde bir değer döndürür. Sunucu tarafı ilk render sırasında ve istemcide bileşen henüz mount olmadan false, bileşen istemcide başarıyla mount edildikten sonra kalıcı olarak true değerini döndürür. Döndürülen bu değer, yalnızca istemci tarafında çalıştırılması gereken bileşenlerin render koşulunu belirlemek için kullanılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::useEffect
+- import: react::useState
 
 ---
 

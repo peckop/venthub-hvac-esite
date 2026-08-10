@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\errorGroups
 skeleton_hash: dfcf2527d8350dc0
 entity_hashes:
   overview: 38d648bd807c5d10
-generated_at: 2026-06-13T18:54:37Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\account\AccountProfilePage.tsx
-skeleton_hash: 919c47b8d7379b5e
+skeleton_hash: 3c6a16a7851521bc
 entity_hashes:
   func:AccountProfilePage: 754183d7e2ba9791
   overview: e09379a678d9fa90
   style_tokens: d7513d5d715e48fe
-generated_at: 2026-06-08T10:10:59Z
+generated_at: 2026-06-19T20:48:28Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,19 @@ Bu modül için kod gövdesi paylaşılmadığından, sadece fonksiyon imzası v
 - (parametre almaz)
 
 **Dönüş**: JSX.Element — Kullanıcı profili düzenleme formunu içeren bir React bileşeni döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../hooks/useAuth::useAuth
+- import: @/i18n/I18nProvider::useI18n
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: lucide-react::Check
+- import: lucide-react::Loader2
+- import: lucide-react::Phone
+- import: lucide-react::User
+- import: react::React
+- import: sonner::toast
 
 ---
 

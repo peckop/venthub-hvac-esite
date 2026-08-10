@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminLayout.tsx
-skeleton_hash: 22caa40e7a23907b
+skeleton_hash: fbb8db31a50f65d4
 entity_hashes:
   func:AdminLayout: f3d3a8a9833ef080
   overview: 877e95444b1fd98a
   style_tokens: dab87eff3332d515
-generated_at: 2026-06-08T10:11:00Z
+generated_at: 2026-06-19T20:48:46Z
 ---
 
 ## Genel Bakış
@@ -39,6 +39,31 @@ Bu modül, VentHub HVAC yönetici panelinin ortak düzen (layout) yapısını sa
 **Parametreler**:
 - name: children, type: React.ReactNode | opsiyonel — AdminLayout tarafından sağlanan ortak düzenin içerisine yerleştirilecek olan, her admin sayfasına özel React tarafından işlenebilen her türlü içerik (bileşen, metin, DOM elementleri vb.)
 **Dönüş**: React tarafından DOM'a eklenmeye uygun bir JSX elementi döndürür. Bu dönen değer, admin paneli için tasarlanmış tüm ortak düzen öğelerini ve kendisine iletilen children prop'undaki sayfaya özel içeriği bir arada barındırır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AccessDenied::AccessDenied
+- import: ../../components/admin/AdminRealtimeNotifications::AdminRealtimeNotifications
+- import: ../../components/admin/CommandPalette::CommandPalette
+- import: ../../config/admin::isAdminByEmail
+- import: ../../hooks/useAuth::useAuth
+- import: ../../hooks/useRole::useRole
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/routes::Routes
+- import: next/link::Link
+- import: next/navigation::usePathname
+- import: next/navigation::useRouter
+- import: react::React
+- import: react::useEffect
+- import: react::useState
+
+---
+
+## SABİTLER
+- **globalStyles** (template) — ``
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+  .custom-scrollba...`
 
 ---
 

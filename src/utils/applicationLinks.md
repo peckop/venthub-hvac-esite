@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\utils\applicationLinks.ts
-skeleton_hash: a3f89a40a70ad803
+skeleton_hash: 57d78bbfb155ef37
 entity_hashes:
   func:getCategoryUrlFromTopic: 179f53035c1027b6
   overview: e1865700dc78efd4
-generated_at: 2026-05-28T22:38:50Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış

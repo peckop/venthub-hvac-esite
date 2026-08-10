@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\BackToTopButton.tsx
-skeleton_hash: 2b4b594c3539f330
+skeleton_hash: fc970852e5b16423
 entity_hashes:
   func:BackToTopButton: c8f2538093a58334
   func:handleScrollToTop: 94e0754193bc122d
   overview: cab9522d3717ffc4
   style_tokens: b29c0a49231e465f
-generated_at: 2026-06-08T10:08:12Z
+generated_at: 2026-06-19T20:47:06Z
 ---
 
 ## Genel Bakış
@@ -48,6 +48,13 @@ Bu modül için verilen fonksiyon gövdesi bulunamadığından, mimari varsayım
 **Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
 
 **Dönüş**: `void` — Fonksiyon herhangi bir değer döndürmez, sadece pencere konumunu değiştirir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../hooks/useScrollThrottle::useScrollThrottle
+- import: ../i18n/I18nProvider::useI18n
+- import: react::React
 
 ---
 

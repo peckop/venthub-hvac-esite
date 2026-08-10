@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\services\category.service.ts
-skeleton_hash: df5c1b64f5ac1b6f
+skeleton_hash: 6fc863c61335ac6c
 entity_hashes:
   func:getCategories: 7d5e8e0b45de974e
   overview: 094095f1defe0e5b
-generated_at: 2026-06-08T10:09:34Z
+generated_at: 2026-06-19T20:48:09Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,15 @@ Bu modül için aksiyomlar, yalnızca fonksiyon imzasından çıkarılabilen ko�
 - `supabase`: `SupabaseClient<Database>` — Yetkilendirilmiş ve tip güvenli Supabase istemcisi. Veritabanı bağlantısı ve sorgulama işlemleri için kullanılır. Database generic tipi, veritabanı şemasını ve tablo yapılarını tanımlar.
 
 **Dönüş**: `Promise<Category[]>` — Asenkron olarak çözünen ve UI tarafında kullanıma hazır kategorilerin dizisini döndürür. Her bir Category nesnesi, kategorinin ID'si, üst kategori ID'si, adı, slug'ı, görsel URL'i, seviyesi, aktiflik durumu, metaverisi, oluşturulma/güncellenme tarihleri, menü etiketi, pazarlama başlığı, çeviri anahtarı, açıklama, otorite içeriği, gösterim modu, öne çıkan durumu, SEO açıklaması/başlığı ve sıralama düzeni gibi alanları içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../types/database.types::type { Database }
+- import: ../../types/db-rows::type { DbCategory }
+- import: ../../types/ui-models::type { Category }
+- import: ../type-converters::toUICategoryList
+- import: @supabase/supabase-js::type { SupabaseClient }
 
 ---
 

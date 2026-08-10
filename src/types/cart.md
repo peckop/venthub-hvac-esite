@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\cart.ts
-skeleton_hash: 46dc29d150f0a1fa
+skeleton_hash: 736fc80fce7f7d0a
 entity_hashes:
   overview: 54581459c744006e
-generated_at: 2026-06-08T08:57:37Z
+generated_at: 2026-06-19T20:48:16Z
 ---
 
 ## Genel Bakış
@@ -24,6 +24,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./ui-models::type { Product }
 
 ---
 

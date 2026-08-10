@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\checkout\PaymentIframeContainer.tsx
-skeleton_hash: 69a0f3097b8ce0d3
+skeleton_hash: b4adceabfe9b242d
 entity_hashes:
   func:PaymentIframeContainer: a26b3523d4f0ca84
   overview: 63cea4293d180d15
   style_tokens: aa1cb9d92aed5506
-generated_at: 2026-06-08T10:11:01Z
+generated_at: 2026-06-19T20:50:27Z
 ---
 
 ## Genel Bakış
@@ -49,6 +49,14 @@ Bu modül için, sadece fonksiyon gövdesinden (bu durumda prop imzasından) ç�
 - setShowHelp: (value: boolean) => void — Yardım paneli durumunu güncellemek için kullanılan state setter fonksiyonudur
 
 **Dönüş**: React.FC<PaymentIframeContainerProps> — PaymentIframeContainerProps arabirimine uygun olarak tanımlanmış bir React fonksiyonel bileşeni döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: lucide-react::CheckCircle
+- import: lucide-react::CreditCard
+- import: lucide-react::Lock
+- import: react::React
 
 ---
 

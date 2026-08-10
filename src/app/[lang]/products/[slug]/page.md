@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\products\[slug]\page.tsx
-skeleton_hash: a0fed4356ba5895c
+skeleton_hash: 69f3a2054f9a9899
 entity_hashes:
   func:Page: 23ecda9f387402f7
   func:generateMetadata: c086561deb8aad58
   func:generateStaticParams: 10793e6b52b39af0
   overview: 6d2c8f1d1305f6ba
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -78,6 +78,16 @@ Bu modül, Next.js App Router yapısında çok dilli ürün detay sayfalarını 
 - `params`: `{ lang: string; slug: string }` — Sayfaya ait URL parametrelerini içeren bir nesne. `slug` alanı, gösterilecek ürünün benzersiz tanımlayıcısıdır.
 
 **Dönüş**: `JSX.Element`. Sayfanın HTML yapısını temsil eden bir React elemanı döner. İçeriğinde bir JSON-LD `<script>` etiketi ve `PageComponent` bileşeni bulunur.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../config/siteUrl::SITE_URL
+- import: ../../../../lib/data/preload::getCachedProductBySlug
+- import: ../../../../lib/data/preload::preloadProduct
+- import: ../../../_components/ProductDetailPageView::ProductDetailPage
+- import: @/lib/supabase/static::supabaseStaticClient
+- import: @/types/ui-models::type { Product }
 
 ---
 

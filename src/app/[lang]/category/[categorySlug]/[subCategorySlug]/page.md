@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\category\[categorySlug]\[subCategorySlug]\page.tsx
-skeleton_hash: 47fc18fd53558a56
+skeleton_hash: 25570da0f12ff211
 entity_hashes:
   func:Page: e8d158c2a4a762ae
   func:generateStaticParams: 28452401205f49a6
   func:getCategoryData: e78b546d8d1e7e91
   overview: 14f78cd372aea5cf
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-06-08T10:08:10Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -73,6 +73,19 @@ Bu modül, Next.js App Router'da dinamik kategori/alt kategori sayfalarını sun
 - `params`: `Promise<{ categorySlug: string, subCategorySlug: string, lang: string }>` — Sayfa route parametrelerini içeren asenkron bir nesne. `categorySlug`, `subCategorySlug` ve `lang` (dil kodu) alanlarını barındırır. `await` ile çözümlenerek kullanım için hazır hale getirilir.
 
 **Dönüş**: `JSX.Element` — Asenkron olarak hazırlanmış, `PageComponent`'i `React.Suspense` ile sarmalayan bir JSX bileşeni döndürür. `PageComponent`, başlangıç kategori verisi ve ürün listesi ile beslenerek istemci tarafında render edilmeye hazır hale getirilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../../lib/type-converters::mapDatabaseCategoryToDomain
+- import: ../../../../../lib/type-converters::type { DomainProduct }
+- import: ../../../../../types/db-rows::type { AuthorityContent,CategoryMetadata, DbCategory }
+- import: ../../../../../views/CategoryPage::PageComponent
+- import: @/i18n/dictionaries/en::en
+- import: @/i18n/dictionaries/tr::tr
+- import: @/lib/services/product.service::getProductsEnriched
+- import: @/lib/supabase/static::supabaseStaticClient
+- import: react::React
 
 ---
 

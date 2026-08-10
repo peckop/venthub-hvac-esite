@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\media.types.ts
-skeleton_hash: 123cc93a1fc43c33
+skeleton_hash: 5efcacfd36f33ae3
 entity_hashes:
   overview: c22dcf353dfe0240
-generated_at: 2026-05-28T22:38:53Z
+generated_at: 2026-06-19T20:48:17Z
 ---
 
 ## Genel Bakış
@@ -22,17 +22,6 @@ Modülün temel amacı, medya nesneleri (örneğin videolar) için merkezi ve tu
 Bu modül yalnızca TypeScript tip tanımları (type/interface) içeren, çalıştırılabilir kod barındırmayan saf bir tür modülüdür. Fonksiyon gövdesi, modül sabiti veya varsayılan değerli imza bulunmadığından, fonksiyon tabanlı mimari varsayım üretilememektedir.
 
 **Bu modül için aksiyom tanımlanamaz.**
-
----
-
-**Gerekçe:** Mimari varsayımlar, yalnızca verilen fonksiyon imzaları ve modül sabitlerinden türetilebilir. Bu modül `media.types.ts` olup:
-
-- ✗ Fonksiyon içermiyor
-- ✗ Çalıştırılabilir kod içermiyor  
-- ✗ Modül sabiti içermiyor
-- ✗ Default değere sahip parametre içermiyor
-
-**Not:** Tip tanımlama modülleri, derleme zamanında TypeScript derleyicisi tarafından zorunlu tutulan yapısal kurallar (type-checking) dışında mimicari varsayım gerektirmez. Bu modülün doğru kullanımı, projede reference eden bileşenlerin TypeScript derleyici ayarlarına (strict mode vb.) bağımlıdır.
 
 ---
 

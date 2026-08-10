@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanFAQ.tsx
-skeleton_hash: 1db8d98a09e6c4cc
+skeleton_hash: 403265d46c0abcf5
 entity_hashes:
   func:SilentFanFAQ: 514de334aa5d1d84
   func:tr: b282b53f03d688a5
   overview: b16446a0ec91f7da
   style_tokens: 325897ca39ea7e85
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-19T20:47:07Z
 ---
 
 ## Genel Bakış
@@ -55,6 +55,18 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve modülün gene
 **Parametreler**:  
 - `key`: string — çevrilecek metnin anahtar kimliği.  
 **Dönüş**: Açıklama dokümantasyonda dönüş tipi belirtilmemiştir; genellikle `void` (yan etkili bir güncelleme) veya çevrilen `string` döndürülebilir. Gerçek dönüş tipi projeye özel i18n yapılandırmasına bağlıdır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/hooks/useScrollAnimation::scrollAnimationClasses
+- import: @/hooks/useScrollAnimation::useScrollAnimation
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::HelpCircle
+- import: lucide-react::Minus
+- import: lucide-react::Plus
+- import: react::React
+- import: react::useState
 
 ---
 

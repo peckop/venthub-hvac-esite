@@ -18,7 +18,7 @@ metadata:
   outputs:
   - synced NotebookLM source
   recovery:
-    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
+    on_auth_expired: powershell -File .agent/scripts/nlm-headless-refresh.ps1  # oturum öldüyse: nlm login --clear (bkz. gövde)
   prerequisites:
   - nlm-headless-refresh.ps1
 depends_on: []
@@ -54,7 +54,12 @@ doğrula**, (d) dürüst raporla. Bu yüzden:
 ### Adım 0 — Auth TAZELE (her sync'in ZORUNLU ilk adımı)
 
 ```bash
-powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
+powershell -File .agent/scripts/nlm-headless-refresh.ps1
+# (⚠️ 2026-08-10: -ExecutionPolicy Bypass bu ortamda DENY; -File yeterli. Script yalnız profildeki
+#  Google oturumu CANLIYSA işe yarar. Oturum ölmüşse / "Chrome is already running" / beyaz-donuk
+#  pencere görürsen → kalıcı çözüm: `nlm login --clear` (görünür, tek sefer; tüm chrome.exe kapalı).
+#  Paket: notebooklm-mcp-cli ≥0.9.8 — notebooklm-py KURMA (Gemini Notebook rebrand'ini bilmez).
+#  Detay: memory `nlm-auth-issue`.)
 ```
 
 Penceresiz (~15sn), şifre girişi yok — kayıtlı Chrome profilinden taze cookie çeker.

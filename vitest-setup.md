@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\vitest-setup.tsx
-skeleton_hash: 9ad8e71f46cf8a70
+skeleton_hash: f1130d6c28363baf
 entity_hashes:
   overview: ac4b8a364cf9e637
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:11:02Z
+generated_at: 2026-06-19T20:51:04Z
 ---
 
 ## Genel Bakış
@@ -27,6 +27,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @testing-library/jest-dom
+- import: react::React
+- import: vitest::vi
 
 ---
 

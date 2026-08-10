@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\contexts\AuthContextDefinition.ts
-skeleton_hash: d6530f0fb124bc6c
+skeleton_hash: 1a3aacb930b82ccf
 entity_hashes:
   overview: f2f5edb4e854ff35
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -26,6 +26,13 @@ Bu modül, bir React Context nesnesi tanımlayan ve dışa aktaran bir tiptir.
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../lib/rbac::type { UserRole }
+- import: @supabase/supabase-js::type { Session,User }
+- import: react::createContext
 
 ---
 

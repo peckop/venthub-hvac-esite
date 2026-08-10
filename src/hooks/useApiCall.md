@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts
-skeleton_hash: ddd0a293abdaecae
+skeleton_hash: 67bf426da710b5dd
 entity_hashes:
   func:useApiCall: ad3857eabf77c233
   overview: 73b0eea2296f391a
-generated_at: 2026-06-08T10:09:32Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -49,6 +49,13 @@ Bu hook, React bileşenleri içinde asenkron API çağrılarını yönetmek içi
 - `defaultOptions`: `UseApiCallOptions | undefined` — Tüm execute çağrılarına uygulanacak varsayılan ayarlar. `showToast`, `successMessage` ve `errorMessage` özelliklerini içerebilir. Tanımlanmazsa herhangi bir varsayılan toast ayarı uygulanmaz.
 
 **Dönüş**: `{ data: T | null, loading: boolean, error: Error | null, execute: (apiFunc: () => Promise<T>, options?: UseApiCallOptions) => Promise<T | null>, reset: () => void }` — Mevcut durumu (`data`, `loading`, `error`) ve iki methods (`execute`, `reset`) içeren bir nesne. `data` başarılı çağrı sonucunu, `loading` devam eden bir işlem olup olmadığını, `error` ise son hatayı temsil eder.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::useCallback
+- import: react::useState
+- import: sonner::toast
 
 ---
 

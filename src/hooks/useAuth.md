@@ -7,7 +7,7 @@ skeleton_hash: 8bee269d3e6af457
 entity_hashes:
   func:useAuth: d77303020f71d360
   overview: 71c8310fd4b630c4
-generated_at: 2026-06-19T06:51:50Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useScrollThrottle.tsx
-skeleton_hash: 5184d4b744012e60
+skeleton_hash: 0e7d47f75c967d05
 entity_hashes:
   func:useScrollThrottle: 8c5a736c0985619d
   overview: 780bbb29a8b9d01e
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -46,6 +46,14 @@ Bu hook, React fonksiyonel bileşenleri veya diğer hook'lar içinde çalışaca
 - name: thresholdOrOptions, type: number | ScrollThrottleOptions — Scroll tetiklemesinin devreye gireceği piksel cinsinden eşik değeri ya da throttle davranışını özelleştirmek için kullanılan gelişmiş ayarları içeren ScrollThrottleOptions türünde nesnedir
 - name: throttleMsParam, type: number — Scroll olayları arasında uygulanacak minimum bekleme süresi, milisaniye cinsinden tanımlanır, bu süre dolmadan yeni bir scroll tetiklemesinin çalışmasını engelleyen temel sınır değeridir
 **Dönüş**: Tanımında açık bir dönüş tipi belirtilmemiştir, özel React hook olarak scroll olaylarını yönetmek için gerekli tüm yan etkileri çalıştırır, harici olarak tüketilebilecek bir değer döndürmez, davranışı void tipe uyumludur.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useRef
+- import: react::useState
 
 ---
 

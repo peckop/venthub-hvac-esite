@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\MagneticCTA.tsx
-skeleton_hash: daf29ed42019c3f1
+skeleton_hash: cf3c8c9c62c08336
 entity_hashes:
   func:MagneticCTA: 45285325a7d3c355
   func:onLeave: 47432f2c7853fc8a
   func:onMove: 0f9106ce87047fd0
   overview: 798bbdff09c682bc
   style_tokens: dfcd3a7af18b6331
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-19T20:47:09Z
 ---
 
 ## Genel Bakış
@@ -62,6 +62,14 @@ Bu modül için temel varsayım: `onMove` ve `onLeave` olay işleyicilerinin, fa
 **Nasıl yapar**: Fonksiyon, fare öğeden çıktığında çağrılır ve manyetik efekti sıfırlayıp öğeyi varsayılan durumuna döndürmek için kullanılır.  
 **Parametreler**: yok  
 **Dönüş**: void (veya belirtilmemiş) — fonksiyon bir değer döndürmez.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: react::React
+- import: react::useRef
+- import: react::useState
 
 ---
 

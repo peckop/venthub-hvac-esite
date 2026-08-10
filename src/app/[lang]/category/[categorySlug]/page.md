@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\category\[categorySlug]\page.tsx
-skeleton_hash: 1c2ed38d721721fc
+skeleton_hash: bba4900fbc686234
 entity_hashes:
   func:Page: aad69a98915a6349
   func:generateMetadata: 4d17d1a49159075f
   func:generateStaticParams: 5124c4ce610dd009
   overview: df8cee5ef37d3a87
   style_tokens: e37a0cb8a67ff36f
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -75,9 +75,25 @@ Bu modül, Next.js App Router yapısında dinamik kategori sayfaları için para
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../../../config/siteUrl::SITE_URL
+- import: ../../../../lib/data/preload::getCachedCategoryData
+- import: ../../../../lib/data/preload::preloadCategory
+- import: ../../../../lib/type-converters::mapDatabaseCategoryToDomain
+- import: ../../../../lib/type-converters::type { DomainCategory, DomainProduct }
+- import: ../../../../types/db-rows::type { AuthorityContent,CategoryMetadata, DbCategory }
+- import: ../../../../views/CategoryPage::PageComponent
+- import: @/i18n/dictionaries/en::en
+- import: @/i18n/dictionaries/tr::tr
+- import: @/lib/services/product.service::getProductsEnriched
+- import: @/lib/supabase/static::supabaseStaticClient
+- import: react::React
+- import: react::cache
+
+---
+
 ## SABİTLER
 - **_getCachedSupabaseData** (call) — `cache((id: string) => {
-
   return supabase.from('categories').select('*').eq(...`
 
 ---

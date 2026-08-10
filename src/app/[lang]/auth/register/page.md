@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\auth\register\page.tsx
-skeleton_hash: 72fc541941e01b71
+skeleton_hash: aa1699d089f8a4d1
 entity_hashes:
   func:Page: bc1b43d61a04fc17
   overview: d837ef1ff30aab7f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-08T10:08:10Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -37,6 +37,13 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - (parametre yok)
 
 **Dönüş**: Fonksiyon bir JSX elementi döndürür; dönüş tipi `void` olarak kabul edilir (React bileşeni olduğu için doğrudan bir değer döndürmez).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../views/RegisterPage::RegisterPage
+- import: react::React
+- import: react::Suspense
 
 ---
 

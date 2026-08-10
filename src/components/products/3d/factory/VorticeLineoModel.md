@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\3d\factory\VorticeLineoModel.tsx
-skeleton_hash: 5c05f2726698f5c8
+skeleton_hash: b75b21682463c72d
 entity_hashes:
   func:VorticeLineoModel: 4d32037362a7371d
   overview: 36c6bcc733eabf66
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T10:09:30Z
+generated_at: 2026-06-19T20:47:11Z
 ---
 
 ## Genel Bakış
@@ -43,6 +43,16 @@ VorticeLineoModel componentinin beklendiği gibi çalışabilmesi için aşağı
 - isolatedPart: string | null — İzole edilmek istenen parça adı; null ise izolasyon uygulanmaz.  
 - hiddenParts: string[] — Görünmez tutulacak parçaların adı listesi; bu listedeki parçalar render edilmez.  
 **Dönüş**: React.FC — Props'u kabul eden ve Vortice Lineo 100 fanının 3D modelini render eden bir fonksiyonel React bileşeni.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./Assembler::Assembler
+- import: ./parts/BoxAndBase::BoxAndBase
+- import: ./parts/GreenClamps::GreenClamps
+- import: ./parts/InternalFanRotor::InternalFanRotor
+- import: ./parts/MainChassis::MainChassis
+- import: react::React
 
 ---
 

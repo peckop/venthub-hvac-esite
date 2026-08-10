@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\layout.tsx
-skeleton_hash: 98955b5d231542eb
+skeleton_hash: f682ac63af07c487
 entity_hashes:
   func:Layout: f1cd59870391c992
   overview: 3aba322b2667e63f
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -55,6 +55,11 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**:
 - children: React.ReactNode — Layout içinde görüntülenecek içerik (JSX elemanları, metin veya başka React bileşenleri).  
 **Dönüş**: JSX elementi — `LayoutComponent` içinde `children` içeren bir React elementi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../views/account/AccountLayout::LayoutComponent
 
 ---
 

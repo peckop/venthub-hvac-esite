@@ -7,70 +7,69 @@ skeleton_hash: 272f1168b83e2820
 entity_hashes:
   func:ErrorGroupExpandedRow: 73dbe783ba9bebc7
   func:ErrorGroupsTableBody: 1655c4825361675b
-  func:errorGroupsFetcher: 2f70aefc2ddf62d3
-  func:isErrorStatus: 3c9e4f62d539eca3
-  func:topN: e0a3a0200929baab
-  func:userLabel: a6270aa703ffbe53
-  overview: b3b20101c708ad59
+  func:errorGroupsFetcher: a9cc418d3cb35cfd
+  func:isErrorStatus: fb6253bba15c83c5
+  func:topN: 42c201e999c284f3
+  func:userLabel: efb0992ed65ed686
+  overview: d3c36da9ae173c2b
   style_tokens: 834c1e16e5eac9b8
-generated_at: 2026-06-13T18:58:03Z
+generated_at: 2026-06-19T20:49:53Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC admin arayüzünde hata gruplarını gösteren ana tablo bileşenini ve ilişkili yardımcı fonksiyonlarını tanımlar. Supabase'den hata verilerini çekip düzenler, gruplar halinde sunar ve yönetici kullanıcıların hata detaylarını görüntülemesine ve not eklemesine olanak tanır.
+Bu modül, VentHub HVAC admin panelinde hata gruplarını yönetmek için kullanılan tablo arayüzünü ve ilgili yardımcı fonksiyonları tanımlar. Supabase veritabanından hata kayıtlarını çekip gruplar, yönetici kullanıcılara bu verileri filtreleme, detaylı görüntüleme ve not ekleme imkanı sunar.
 
 ## Fonksiyon Grupları
-### Veri İşleme Yardımcıları
-Bu fonksiyonlar, hata durumlarını kontrol etme ve kullanıcı bilgilerini metne dönüştürme gibi temel yardımcı işlemler sağlar.
+### Yardımcı Fonksiyonlar
+Temel veri dönüştürme ve kontrol işlemleri sağlar.
 - isErrorStatus, userLabel
 
-### Veri Çekme ve Toplama
-Bu grup, Supabase'den hata gruplarını asenkron olarak çeker ve istatistiksel analiz (örn. en sık görülen hatalar) için verileri işler.
+### Veri İşleme ve Çekme
+Supabase'den hata gruplarını asenkron olarak çeker ve gerekli veri toplama/analiz işlemlerini yapar.
 - errorGroupsFetcher, topN
 
 ### Bileşenler
-React bileşenleri, hata gruplarının tablo içinde gösterimi için yapıyı ve genişletilebilir satır detaylarını oluşturur.
+Ana tablo yapısını ve genişletilebilir satır detaylarını oluşturan React bileşenleri.
 - ErrorGroupExpandedRow, ErrorGroupsTableBody
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Supabase üzerinden hata gruplarını çekip tablo halinde gösteren bir admin paneli bileşenidir.
+Bu modül, hata gruplarını Supabase'den çekip tabloda gösteren bir admin bileşenidir.
 
-[Aksiyom 1]: Eğer `SupabaseClient<Database>` bağlantısı yoksa, `errorGroupsFetcher` fonksiyonu veri çekemez ve tablo veri gösteremez.
+**[Aksiyom 1]**: Eğer `errorGroupsFetcher` çağrısında `supabase` parametresi geçerli bir Supabase bağlantısı değilse, fetch işlemi başarısız olur.
 
-[Aksiyom 2]: Eğer `FetchParams` parametresi geçerli bir sayfalama/filtre yapısı içermiyorsa, `errorGroupsFetcher` beklenmeyen sonuç döner.
+**[Aksiyom 2]**: Eğer `topN` fonksiyonuna boş bir `arr` dizisi verilirse veya `n` 0 veya negatif bir değer ise, sonuç boş bir dizi olur.
 
-[Aksiyom 3]: Eğer `GROUP_SELECT` sabiti Supabase sorgusunda kullanılacak alanları tanımlamıyorsa, hata grupları eksik veya hatalı alanlarla döner.
+**[Aksiyom 3]**: Eğer `userLabel` fonksiyonuna `null` veya `undefined` değerinde bir `AdminUserOpt` verilse, fonksiyonun dönüş davranışı bilinmiyor (varsayılan olarak bir fallback string döndürmesi beklenir).
 
-[Aksiyom 4]: Eğer `ClientErrorRow[]` boş bir dizi ise, `topN` boş bir `[string, number][]` döner.
+**[Aksiyom 4]**: Eğer `isErrorStatus` fonksiyonuna geçerli bir durum stringi yerine `null`, `undefined` veya boş string verilirse, fonksiyonun dönüş davranışı bilinmiyor.
 
-[Aksiyom 5]: Eğer `topN` parametresi olan `n` geçerli bir pozitif sayı değilse, sonuç tanımsız olur.
+**[Aksiyom 5]**: Eğer `ErrorGroupExpandedRow` bileşenine `group` prop'u verilmezse, bileşen doğru çalışmaz.
 
-[Aksiyom 6]: Eğer `AdminUserOpt` nesnesi `undefined` veya alanları eksik ise, `userLabel` fonksiyonu geçerli bir etiket üretemez.
+**[Aksiyom 6]**: Eğer `ErrorGroupExpandedRow` bileşenine `onSaveNotes` callback'i verilmezse, not kaydetme işlevi çalışmaz.
 
-[Aksiyom 7]: Eğer `hasWriteAccess` `false` ise, `ErrorGroupExpandedRow` bileşeni kaydetme işlemlerine izin vermemelidir.
+**[Aksiyom 7]**: `ErrorGroupsTableBody` bileşeni, `GROUP_SELECT` sabitine bağımlıdır; bu sabit tanımlı değilse bileşen düzgün çalışamaz.
 
-[Aksiyom 8]: Eğer `onSaveNotes` callback'i tanımlı değilse, kullanıcının not kaydetme işlemi başarısız olur.
+**[Aksiyom 8]**: Eğer `hasWriteAccess` `false` ise, `ErrorGroupExpandedRow` içinde not kaydetme arayüzü kullanıcıya sunulmamalıdır.
 
-[Aksiyom 9]: Eğer `ErrorGroupRow` (sunucu tarafı) ile `ClientErrorRow` (istemci tarafı) yapıları arasında alan eşleşmesi sağlanamazsa, veri dönüşümü hata verir.
-
-[Aksiyom 10]: Eğer `group` prop'u `ErrorGroupExpandedRow` bileşenine geçirilmiyorsa, genişletilmiş satır boş gösterilir.
+**[Aksiyom 9]**: `topN` fonksiyonundaki `key` parametresi, her `ClientErrorRow` için string döndüren bir fonksiyon olmalıdır; eğer key fonksiyonu bir eleman için hata fırlatırsa, tüm sonuç etkilenir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### isErrorStatus
-**Ne yapar**: Verilen string değerin geçerli bir hata durumu olup olmadığını kontrol eden bir type guard fonksiyonudur. `x is ErrorStatus` dönüş tipi sayesinde TypeScript derleyicisi, bu fonksiyon true döndüğünde parametrenin `ErrorStatus` tipinde olduğunu garanti altına alır.
 
-**Nasıl yapar**: Girdi olarak aldığı string değerini, izin verilen üç durum sabitine (`'open'`, `'resolved'`, `'ignored'`) eşitlik operatörü (`===`) ile sırasıyla karşılaştırır. Herhangi birine eşitse `true`, aksi halde `false` döner. JavaScript'in短路 (short-circuit) `||` operatörünü kullanarak ilk eşleşmede durur.
+**Ne yapar**: Verilen bir string değerinin geçerli bir hata durumu (ErrorStatus) olup olmadığını kontrol eden bir tip koruma (type guard) fonksiyonudur. TypeScript'in `x is ErrorStatus` dönüş tipi sayesinde, fonksiyon çağrıldıktan sonra `if (isErrorStatus(val))` bloğu içinde `val`'ın `ErrorStatus` tipinde olduğu garanti edilir.
+
+**Nasıl yapar**: Fonksiyon, gelen `x` parametresinin `'open'`, `'resolved'` veya `'ignored'` değerlerinden birine eşit olup olmadığını doğrudan bir OR (||) zinciriyle test eder. Herhangi bir dönüşüm veya hesaplama yapmaz; saf bir karşılaştırma gerçekleştirilir. JavaScript/TypeScript'te string karşılaştırmaları case-sensitive olduğundan, büyük/küçük harf duyarlılığı mevcuttur.
 
 **Parametreler**:
-- `x: string` — Kontrol edilecek durum değeri. Bir hata grubunun durumunu temsil eden string beklenir.
+- `x: string` — Kontrol edilecek değer. Bir hata durumu durumunu temsil ettiği varsayılan bir string ifadesidir.
 
-**Dönüş**: `x is ErrorStatus` — Boolean bir type guard dönüşü. `true` olduğunda TypeScript, `x` parametresinin `'open' | 'resolved' | 'ignored'` literal birleşik tipi olduğunu bilir.
+**Dönüş**: `x is ErrorStatus` — Boolean döner. `true` dönerse TypeScript derleyicisi `x`'in `ErrorStatus` tipinde (yani `'open' | 'resolved' | 'ignored'`) olduğunu statik olarak garanti eder. `false` dönerse değer bu tiplerden biri değildir.
 
 ### userLabel
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -86,6 +85,38 @@ Bu modül, Supabase üzerinden hata gruplarını çekip tablo halinde gösteren 
 
 ### ErrorGroupsTableBody
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminEmptyState::AdminEmptyState
+- import: ../../components/admin/AdminToolbar::AdminToolbar
+- import: ../../components/admin/ExportMenu::ExportMenu
+- import: ../../components/admin/data-table/BulkBar::BulkBar
+- import: ../../components/admin/data-table/BulkBar::type BulkAction
+- import: ../../components/admin/data-table/DataTableKit::DataTableKit
+- import: ../../components/admin/data-table/types::type { AdminColumn }
+- import: ../../hooks/useAdminTable::type FetchParams
+- import: ../../hooks/useAdminTable::type FetchResult
+- import: ../../hooks/useAdminTable::useAdminTable
+- import: ../../hooks/useRole::useRole
+- import: ../../hooks/useTenant::useTenant
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/datetime::formatDateTime
+- import: ../../types/database.types::type { Database }
+- import: @/lib/admin/mutateWithAudit::AdminPermissionError
+- import: @/lib/admin/mutateWithAudit::mutateWithAudit
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @supabase/supabase-js::type { SupabaseClient }
+- import: lucide-react::SearchX
+- import: lucide-react::ShieldAlert
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
+- import: sonner::toast
 
 ---
 
@@ -146,91 +177,79 @@ type ErrorStatus = 'open' | 'resolved' | 'ignored'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `ErrorGroupsTableBody.tsx::isErrorStatus`
-- **params**: `(x: string)`
-- **ic_degiskenler**:
-  - `x` — fonksiyona giren string, bir hata durumunu temsil eder (örn: 'open', 'resolved', 'ignored').
-- **Dönüş**: `boolean` — `x`'in ('open', 'resolved', 'ignored') değerlerinden biri olup olmadığını kontrol eden predicate.
+### [N1_NASIL] AST Pointer: ErrorGroupsTableBody.tsx::isErrorStatus
+- **params**: `(x: string)` - Kontrol edilecek string değer
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `x is ErrorStatus` - x'in ErrorStatus türünde olduğunu belirten type guard
 
-### [N2_NASIL] AST Pointer: `ErrorGroupsTableBody.tsx::userLabel`
-- **params**: `(u: AdminUserOpt)`
-- **ic_degiskenler**:
-  - `u` — bir kullanıcının tam adı ve e-posta adresini içeren optsiyonel nesne.
-- **Dönüş**: `string` — `u` nesnesinden oluşturulmuş kullanıcı etiketi (örn: "Ad Soyad <eposta>").
+### [N2_NASIL] AST Pointer: ErrorGroupsTableBody.tsx::userLabel
+- **params**: `(u: AdminUserOpt)` - Kullanıcı nesnesi (full_name ve email alanları içerir)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string` - Kullanıcının formatlanmış etiketi (full_name varsa "Full Name <email>", yoksa sadece email)
 
-### [N3_NASIL] AST Pointer: `ErrorGroupsTableBody.tsx::errorGroupsFetcher`
-- **params**: `(supabase: SupabaseClient<Database>, params: FetchParams)`
+### [N3_NASIL] AST Pointer: ErrorGroupsTableBody.tsx::errorGroupsFetcher
+- **params**: `(supabase: SupabaseClient<Database>, params: FetchParams)` - Supabase istemcisi ve filtreleme/sayfalama parametreleri
 - **ic_degiskenler**:
-  - `supabase` — Supabase istemcisi, veritabanı sorguları için kullanılır.
-  - `params` — filtreleme, sıralama ve sayfalama parametrelerini içeren nesne.
-  - `level` — `params.filters.level` dizisinden alınan ilk eleman, hata seviyesi filtresi.
-  - `status` — `params.filters.status` dizisinden alınan ilk eleman, durum filtresi.
-  - `from` — `params.filters.from` dizisinden alınan ilk eleman, başlangıç tarihi filtresi.
-  - `to` — `params.filters.to` dizisinden alınan ilk eleman, bitiş tarihi filtresi.
-  - `assigned` — `params.filters.assigned` dizisinden alınan ilk eleman, atanan kullanıcı filtresi.
-  - `query` — `params.query` alanından gelen arama metni, imza ve son mesajda eşleşme arar.
-  - `like` — `query` metnini `%` ile sarılmış hali, veritabanı `LIKE` operatörü için hazırlanır.
-  - `sortKey` — sıralama anahtarı: `params.sort?.key` 'count' ise 'count', değilse 'last_seen' olur.
-  - `offset` — sayfalama için hesaplanan satır başlangıç indeksi.
-  - `query` (devam) — `supabase.from('error_groups').select(...)` ile başlayan zincir sorgu nesnesi.
-- **Dönüş**: `Promise<FetchResult<ErrorGroupRow>>` — `rows` ve `totalMatched` içeren nesne.
+  - `level` — params.filters.level[0] değerinden çıkarılan hata seviyesi filtresi (ör: 'error', 'warn')
+  - `status` — params.filters.status[0] değerinden çıkarılan durum filtresi (ör: 'open', 'resolved')
+  - `from` — params.filters.from[0] değerinden çıkarılan başlangıç tarihi filtresi
+  - `to` — params.filters.to[0] değerinden çıkarılan bitiş tarihi filtresi
+  - `assigned` — params.filters.assigned[0] değerinden çıkarılan atanan kullanıcı filtresi
+  - `query` — params.query değerinden çıkarılan metin arama sorgusu
+  - `query` — Supabase sorgu nesnesi (select, order, filtreler ve sayfalama uygulanır)
+  - `sortKey` — Sıralama anahtarı ('count' veya 'last_seen')
+  - `offset` — Sayfalama için hesaplanan başlangıç indeksi
+  - `data` — Sorgu sonucu döndürülen veri satırları (ErrorGroupRow[])
+  - `error` — Sorgu hatası (varsa)
+  - `count` — Toplam eşleşen satır sayısı
+- **Dönüş**: `Promise<FetchResult<ErrorGroupRow>>` - rows (ErrorGroupRow[]) ve totalMatched (toplam eşleşme sayısı) içeren nesne
 
-### [N4_NASIL] AST Pointer: `ErrorGroupsTableBody.tsx::topN`
-- **params**: `(arr: ClientErrorRow[], key: (e: ClientErrorRow) => string, n = 5)`
+### [N4_NASIL] AST Pointer: ErrorGroupsTableBody.tsx::topN
+- **params**: `(arr: ClientErrorRow[], key: (e: ClientErrorRow) => string, n = 5)` - Dizi, anahtar fonksiyonu ve üst N limiti
 - **ic_degiskenler**:
-  - `arr` — elemanları sayılacak hata satırları dizisi.
-  - `key` — her satırdan sayılacak anahtarı (string) çıkaran fonksiyon.
-  - `n` — döndürülecek maksimum eleman sayısı, varsayılanı 5.
-  - `m` — elemanların frekansını sayan `Map<string, number>` nesnesi.
-  - `it` — `arr` dizisi üzerindeki döngüdeki mevcut satır.
-  - `k` — `key` fonksiyonuyla elde edilen veya fallback olarak '-' olan anahtar.
-- **Dönüş**: `[string, number][]` — en yüksek frekanslı `n` çiftinin (anahtar, sayacı) dizisi.
+  - `m` — Anahtar-sayı sayacı için Map nesnesi (her anahtarın occurrence sayısını tutar)
+  - `it` — Dizideki her bir ClientErrorRow öğesi
+  - `k` — Mevcut öğenin key fonksiyonu ile hesaplanan anahtarı
+- **Dönüş**: `[string, number][]` - En çok tekrar eden N anahtar-çiftini içeren dizi (azalan sırayla)
 
-### [N5_NASIL] AST Pointer: `ErrorGroupsTableBody.tsx::ErrorGroupExpandedRow`
-- **params**: `({ group, hasWriteAccess, onSaveNotes })` — prop'tan destructure.
+### [N5_NASIL] AST Pointer: ErrorGroupsTableBody.tsx::ErrorGroupExpandedRow
+- **params**: `({ group, hasWriteAccess, onSaveNotes })` - Genişletilmiş satır verileri: group (hata grubu nesnesi), hasWriteAccess (yazma izni flag'i), onSaveNotes (not kaydetme callback fonksiyonu)
 - **ic_degiskenler**:
-  - `group` — genişletilen hata grubu nesnesi (ID, notlar, URL örneği vb. içerir).
-  - `hasWriteAccess` — kullanıcının yazma izni olup olmadığını belirten boolean.
-  - `onSaveNotes` — notları kaydetmek için çağrılacak asenkron fonksiyon.
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu.
-  - `lang` — useI18n hook'undan gelen mevcut dil kodu.
-  - `errors` — `useState` ile yönetilen, bu gruba ait hata satırları dizisi (ClientErrorRow[]).
-  - `aggregations` — `useMemo` ile hesaplanan, URL, release, env ve user_agent için en çok tekrar eden 5'li aggregasyonlar dizisi.
-  - `active` — `useEffect` içindeki asenkron işlemin hâlâ geçerli olup olmadığını takip eden boolean (cleanup için).
-  - `data` — Supabase sorgusundan dönen hata satırları.
-  - `error` — Supabase sorgusundan dönen hata nesnesi.
-- **Dönüş**: `React.JSX.Element` — hata grubu detaylarını gösteren React bileşeni (JSX).
+  - `t, lang` — useI18n hook'undan alınan çeviri fonksiyonu ve dil bilgisi
+  - `errors` — useState ile yönetilen hata satırları dizisi (ClientErrorRow[])
+  - `aggregations` — useMemo ile hesaplanan aggregation verileri (URL, release, env, user_agent için top N istatistikleri)
+  - `e` — errors.map içindeki her bir hata satırı (ClientErrorRow)
+  - `block` — aggregations.map içindeki her bir aggregation bloğu (title ve items içerir)
+  - `k, c` — block.items.map destructuring ile açılan anahtar-değer çifti
+- **Dönüş**: `React.FC` - Genişletilmiş hata grubu satırının JSX içeriğini döndüren React fonksiyonel bileşeni
 
-### [N6_NASIL] AST Pointer: `ErrorGroupsTableBody.tsx::ErrorGroupsTableBody`
-- **params**: `(yok)`
+### [N6_NASIL] AST Pointer: ErrorGroupsTableBody.tsx::ErrorGroupsTableBody
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu.
-  - `lang` — useI18n hook'undan gelen mevcut dil kodu.
-  - `hasWriteAccess` — kullanıcının yazma izni olup olmadığını belirten boolean.
-  - `users` — `useState` ile yönetilen, tüm admin kullanıcılarının dizisi (AdminUserOpt[]).
-  - `bulkStatus` — `useState` ile yönetilen, toplu işlem panelinde seçilen durum (ErrorStatus).
-  - `table` — `useState` ile yönetilen, `DataTableKit` instance'ı (satır verisi, seçim, yeniden yükleme, dışa aktarma metodları içerir).
-  - `reloadRef` — `useRef` ile tutulan, tabloyu yeniden yükleme fonksiyonuna referans.
-  - `refetchTimer` — `useRef` ile tutulan, real-time yeniden yükleme zamanlayıcısı.
-  - `tenantId` — `useTenant` hook'undan gelen kiracı (tenant) ID'si.
-  - `active` — `useEffect` içindeki asenkron işlemin hâlâ geçerli olup olmadığını takip eden boolean.
-  - `data` — `admin_list_users` RPC'sinden dönen kullanıcı verisi.
-  - `error` — `admin_list_users` RPC'sinden dönen hata nesnesi.
-  - `ch` — Supabase real-time kanal aboneliği.
-  - `row` — `updateStatus` callback'ine giren hata grubu satırı.
-  - `next` — `updateStatus` callback'ine giren yeni durum stringi.
-  - `notes` — `saveNotes` callback'ine giren not metni.
-  - `ids` — `bulkApplyStatus` callback'inde, `table.selection.selectedIds` ile alınan seçili satır ID'leri dizisi.
-  - `next` — `bulkApplyStatus` callback'ine giren toplu durum güncelleme değeri.
-  - `rows` — `exportToCsv` callback'inde, `table.fetchAllForExport()` ile alınan tüm satırlar.
-  - `cols` — CSV sütun başlıkları dizisi.
-  - `escape` — CSV hücresi için değerleri temizleyen ve sarmalayan fonksiyon.
-  - `lines` — `rows` dizisini CSV satırlarına dönüştüren `map` sonucu.
-  - `csv` — tam CSV metni, BOM ile başlar.
-  - `blob` — CSV verisinden oluşturulan `Blob` nesnesi.
-  - `url` — Blob için oluşturulan URL.
-  - `a` — indirme tetiklemek için oluşturulan `<a>` DOM elemanı.
-- **Dönüş**: `React.JSX.Element` — ana hata grupları tablosu arayüzünü döndüren React bileşeni (JSX).
+  - `table` — DataTableKit tarafından sağlanan tablo kontrol nesnesi (selection, reload, fetchAllForExport metodlarını içerir)
+  - `tenantId` — Kiracı ID'si (Supabase real-time kanal adı için kullanılır)
+  - `users` — useState ile yönetilen kullanıcı listesi (AdminUserOpt[])
+  - `bulkStatus` — useState ile yönetilen toplu işlem durum değeri (ErrorStatus türünde)
+  - `hasWriteAccess` — Yazma izni flag'i
+  - `refetchTimer` — useRef ile yönetilen yeniden getirme zamanlayıcı ID'si
+  - `reloadRef` — useRef ile yönetilen reload fonksiyonu referansı
+  - `updateStatus` — useCallback ile tanımlanan durum güncelleme fonksiyonu (satır ve yeni durum alır)
+  - `updateAssignedTo` — useCallback ile tanımlanan atama güncelleme fonksiyonu (satır ve kullanıcı ID alır)
+  - `saveNotes` — useCallback ile tanımlanan not kaydetme fonksiyonu (satır ve not metni alır)
+  - `bulkApplyStatus` — useCallback ile tanımlanan toplu durum uygulama fonksiyonu (yeni durum alır)
+  - `columns` — useMemo ile hesaplanan tablo sütun tanımları dizisi
+  - `bulkActions` — useMemo ile hesaplanan toplu işlem tanımları dizisi
+  - `expandedRow` — useCallback ile tanımlanan genişletilmiş satır render fonksiyonu
+  - `handleExport` — useCallback ile tanımlanan CSV dışa aktarma fonksiyonu
+  - `escape` — handleExport içinde tanımlanan CSV kaçış fonksiyonu
+  - `rows` — handleExport içinde tablodan alınan tüm satırlar
+  - `cols` — handleExport içinde tanımlanan sütun adları dizisi
+  - `csv` — handleExport içinde oluşturulan CSV dizesi
+  - `blob` — handleExport içinde oluşturulan Blob nesnesi
+  - `url` — handleExport içinde oluşturulan nesne URL'i
+  - `a` — handleExport içinde oluşturulan download link elementi
+  - `s, u` — bulkActions ve columns içindeki map callback parametreleri
+- **Dönüş**: `React.FC` - Ana tablo bileşeninin JSX içeriğini döndüren React fonksiyonel bileşeni
 
 ---
 
@@ -244,8 +263,8 @@ graph TD
     ErrorGroupsTableBody_tsx__isErrorStatus["isErrorStatus"]
     ErrorGroupsTableBody_tsx__topN["topN"]
     ErrorGroupsTableBody_tsx__userLabel["userLabel"]
-    ErrorGroupsTableBody_tsx__ErrorGroupExpandedRow --> ErrorGroupsTableBody_tsx__topN
     ErrorGroupsTableBody_tsx__ErrorGroupsTableBody --> ErrorGroupsTableBody_tsx__isErrorStatus
+    ErrorGroupsTableBody_tsx__ErrorGroupExpandedRow --> ErrorGroupsTableBody_tsx__topN
     ErrorGroupsTableBody_tsx__ErrorGroupsTableBody --> ErrorGroupsTableBody_tsx__userLabel
 ```
 

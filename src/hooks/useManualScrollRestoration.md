@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\hooks\useManualScrollRestoration.ts
-skeleton_hash: 419f22409352fc82
+skeleton_hash: 7e697c3523ec0619
 entity_hashes:
   func:useManualScrollRestoration: c36f5fe9ca492bf5
   overview: fbb89d52cd2f5084
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -38,6 +38,13 @@ Bu modül, React tabanlı web uygulamalarında sayfa yönlendirmeleri veya yenid
 **Parametreler**:
 - name: loading — type: boolean — Sayfadaki verinin yüklenme durumunu belirtir. True değeri yükleme işleminin hala devam ettiğini, bu nedenle scroll restorasyonunun beklemede tutulması gerektiğini ifade eder. False değeri yüklemenin başarıyla tamamlandığını ve scroll pozisyonunun güvenli bir şekilde geri yüklenebileceğini belirtir.
 **Dönüş**: Belirli bir dönüş değeri yoktur, void tipindedir. Sadece scroll pozisyonu geri yükleme işlemini gerçekleştirmek için yan etki oluşturur, herhangi bir değer döndürmez.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next/navigation::usePathname
+- import: react::useEffect
+- import: react::useRef
 
 ---
 

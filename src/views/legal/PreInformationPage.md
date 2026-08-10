@@ -9,7 +9,7 @@ entity_hashes:
   func:t: 82e524c2f79ad389
   overview: a88c970a8f2231d2
   style_tokens: 06829f9d93bd4397
-generated_at: 2026-06-16T11:54:06Z
+generated_at: 2026-06-19T20:50:49Z
 ---
 
 ## Genel Bakış
@@ -32,10 +32,6 @@ Bu modül için, fonksiyon gövdesi paylaşılmadığından, yalnızca imza bilg
 [Aksiyom 1]: Eğer `lang` prop'u bileşene iletilmezse, bileşen düzgün render edilemeyebilir veya varsayılan/boş bir dil değeri ile çalışabilir.
 
 [Aksiyom 2]: Eğer `t(key: string)` çeviri fonksiyonu çalışması için gerekli çeviri sözlüğü/JSON dosyası yüklenmemişse veya `lang` ile uyumlu çeviri anahtarı (`key`) bulunamazsa, çevrilmemiş ham anahtar dizesi veya boş bir değer dönebilir.
-
----
-
-**Not:** Fonksiyon gövdesi (`PreInformationPage` ve `t` implementasyonu) paylaşılmadığından, bileşenin hangi JSX yapısını render ettiği, hangi state'leri yönettiği, hangi alt bileşenleri kullandığı veya hangi eşik değerleri/kabul kriterlerini uyguladığı gibi detaylı mimari varsayımlar **belirlenememiştir**. Daha kapsamlı aksiyon üretmek için fonksiyon gövdelerinin incelenmesi gereklidir.
 
 ---
 

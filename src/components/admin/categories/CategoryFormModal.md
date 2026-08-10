@@ -3,46 +3,56 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\categories\CategoryFormModal.tsx
-skeleton_hash: ca5e53b3a39d55b0
+skeleton_hash: a2215e897001cb8a
 entity_hashes:
   func:CategoryFormModal: 45e70a4b9811a0d5
+  func:handleClose: 6beebce42cda488b
   func:handleImageUpload: 633c0036d64f1044
+  func:handleOpenChange: b7949752bd032233
   func:onSubmit: c1bb6fdd37c1f2b9
-  overview: daffa2ac9ebc83ae
+  overview: f50dcc0c0b0318cb
   style_tokens: 6073b78732e76f74
-generated_at: 2026-06-08T10:08:37Z
+generated_at: 2026-06-19T20:47:14Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelinde kategorilerin eklenmesi ve düzenlenmesi için kullanılan bir form modalı bileşenidir. Kullanıcıdan kategori adı, açıklama ve görsel bilgilerini toplayarak doğrulama işleminden geçirir ve API aracılığıyla sunucuya gönderir. Modal, dışarıdan kontrol edilen açılıp kapanma durumu ve mevcut kategori verisiyle esnek bir yapı sunarak hem yeni ekleme hem de düzenleme senaryolarını destekler.
+Bu modül, yönetici panelinde kategorileri eklemek veya düzenlemek için kullanılan kontrollü bir form modalı bileşenidir. Kullanıcıdan kategori adı, açıklama ve görsel bilgilerini toplayarak doğrulama sürecinden geçirir ve sunucuya API aracılığıyla gönderir. Modal, dışarıdan kontrol edilen durumu ve mevcut kategori verisiyle esnek bir yapı sunarak hem yeni ekleme hem de düzenleme senaryolarını destekler.
 
 ## Fonksiyon Grupları
 
-### Bileşenin Ana Yapısı
-Modal penceresinin tüm görünümünü, form alanlarını, başlık ve buton düzenini oluşturan ana React bileşenidir. Prop'lar aracılığıyla dışarıdan kontrol edilir ve form durumunu yönetir.
+### Ana Bileşen
+Modal penceresinin tüm görünümünü, form alanlarını, butonlarını ve temel iş akışını oluşturan ana React bileşenidir. Prop'lar aracılığıyla dışarıdan kontrol edilir ve form durumunu yöneterek kullanıcı etkileşimini orkestra eder.
 - CategoryFormModal
 
 ### Form İşlemleri ve Veri Yönetimi
-Kullanıcının yüklediği görselleri işleyen ve form verilerini doğruladıktan sonra API isteklerini başlatan iş mantığını içerir. Görsel yükleme ve form gönderimi gibi asenkron işlemleri yürütür.
+Kullanıcının yüklediği görselleri işleyen ve form verilerini doğruladıktan sonra API isteklerini başlatan asenkron iş mantığını içerir. Görsel yükleme ve form gönderimi gibi işlemleri yürüterek veri bütünlüğünü sağlar.
 - handleImageUpload, onSubmit
+
+### Modal Kontrol Mekanizmaları
+Modalın açılıp kapanma durumunu yöneten, pencereler arası geçişleri kontrol eden ve kullanıcı arayüzünün tutarlılığını sağlayan yardımcı işlevleri içerir. Dış bileşenlerle senkronize çalışarak modal yaşam döngüsünü yönlendirir.
+- handleClose, handleOpenChange
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kontrolcülü (controlled) bir form modalı bileşeni olup dış bağımlılıklara ve prop yapılandırmasına dayalı mimari varsayımlar içerir.
+Bu modülün doğru çalışması için aşağıdaki mimari varsayımlar (aksiyomlar) geçerlidir:
 
-**[Aksiyom 1]:** Eğer `open` ve `onOpenChange` prop'ları dış bileşen tarafından doğru yönetilmezse, modal açılıp kapanamaz veya tutarsız bir UI durumu oluşur.
+[Aksiyom 1]: Eğer `open` prop'u verilmemiş veya `onOpenChange` prop'u sağlanmamışsa, modal'ın açılıp kapanma durumu kontrol edilemez, bileşen çalışamaz.
 
-**[Aksiyom 2]:** Eğer `categorySchema` geçerli bir Zod (veya eşdeğer) validasyon şeması olarak çağrılamazsa, form değerleri `CategoryFormValues` tipine dönüştürülemez ve `onSubmit` fonksiyonu geçersiz veri ile çağrılır.
+[Aksiyom 2]: Eğer `onSuccess` prop'u verilmemişse, form başarıyla gönderildiğinde üst bileşene bildirim yapılamaz, üst bileşenin listeyi yenilemesi veya bildirim göstermesi sağlanamaz.
 
-**[Aksiyom 3]:** Eğer `category` prop'u `undefined`/`null` olarak geçilirse, modal "yeni kategori oluşturma" modunda çalışır; Eğer geçilirse, mevcut kategori verisi ile "düzenleme" moduna geçer — bu durum form alanlarının önceden doldurulmasını gerektirir.
+[Aksiyom 3]: Eğer `category` prop'u `null` veya `undefined` ise, modal "yeni kategori ekleme" modunda çalışır; aksi halde "kategori düzenleme" modunda çalışır.
 
-**[Aksiyom 4]:** Eğer `handleImageUpload` fonksiyonu bir `HTMLInputElement` change event'i dışındaki bir event ile çağrılırsa, `e.target.files` erişimi başarısız olur veya `undefined` döner.
+[Aksiyom 4]: Eğer `categorySchema` fonksiyonu çağrılamıyorsa veya geçerli bir Zod şeması döndürmüyorsa, form alanları (kategori adı, açıklama vb.) doğrulanamaz.
 
-**[Aksiyom 5]:** Eğer `onSuccess` callback'i başarıyla tetiklenmezse (örn. API hatası, promise reddedilmesi), dış bileşen başarılı işlem sonrasını bilemez ve UI güncellenmez.
+[Aksiyom 5]: Eğer `handleImageUpload` fonksiyonu dosya input change olayını (`React.ChangeEvent<HTMLInputElement>`) alamıyorsa, kullanıcı görsel yükleyemez.
 
-**[Aksiyom 6]:** Eğer `categorySchema` çağrılabilir (callable) bir referans değilse (örn. modül yükleme hatası), form submission aşamasında runtime hatası oluşur.
+[Aksiyom 6]: Eğer `onSubmit` fonksiyonu form verilerini (`CategoryFormValues`) alamıyorsa, API'ye gönderme işlemi başlatılamaz.
+
+[Aksiyom 7]: Eğer `handleClose` veya `handleOpenChange` fonksiyonları `onOpenChange` prop'unu çağirmazsa, modal'ın kapanma eylemi üst bileşene yansıtılamaz.
+
+[Aksiyom 8]: Eğer `open` prop'u `false` iken `onOpenChange(true)` çağrılmazsa, modal görünür hale gelemez.
 
 ---
 
@@ -71,6 +81,45 @@ Bu modül, kontrolcülü (controlled) bir form modalı bileşeni olup dış bağ
 **Parametreler**:
 - `values`: CategoryFormValues — Formda toplanan kategori adı, açıklama, görsel vb. alanların değerlerini içeren nesne.  
 **Dönüş**: Belirtilmemiş; fonksiyonun dönüş tipi mevcut dokümantasyonda tanımlı değildir.
+
+### handleClose
+**Ne yapar**: Bu fonksiyon, bir modal'ın kapatılma eylemini yönetmek için bir arrow function döndürür.
+**Nasıl yapar**: Fonksiyon, parametresiz olarak çağrıldığında, bir boolean parametre alan ve işlev döndüren bir arrow function'ı return eder. Döndürülen bu arrow function, `openVal` parametresi false ise kendi kendini (`handleClose()`) çağırarak kapatma işlemini başlatır; true ise `onOpenChange(true)` çağrısı ile modal'ın açık kalmasını sağlar.
+**Parametreler**: Parametre yoktur.
+**Dönüş**: `(openVal: boolean) => void` tipinde bir arrow function döndürür.
+
+### handleOpenChange
+**Ne yapar**: Modal'ın açılıp kapatılma durumunu değiştirmek için bir işlevi tetikler.
+**Nasıl yapar**: Fonksiyon, bir boolean alarak modal'ın görünür durumunu güncelleyen bir state değişimini veya callback'i çağırarak modal'ın açılış/kapatış mantığını yönetir. Detaylı iç mantık verilmemiştir, ancak isimlendirmesi ve kullanım amacı doğrultusunda bir kontrol mekanizması sağladığı açıktır.
+**Parametreler**:
+- openVal: boolean — Modal'ın yeni açılıp kapatma durumunu belirtir. `true` değerini alırsa modal açılır, `false` değerini alırsa modal kapanır.
+**Dönüş**: Bilinmiyor (muhtemelen void).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../lib/type-converters::toSupabaseJson
+- import: ../../../types/database.types::type { Database }
+- import: ../../../types/db-rows::type { CategoryMetadata,DbCategory }
+- import: ../../../utils/adminUi::adminButtonPrimaryClass
+- import: ../../../utils/imageUtils::compressImage
+- import: ../../ui/VentImage::VentImage
+- import: @/i18n/I18nProvider::useI18n
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @hookform/resolvers/zod::zodResolver
+- import: @radix-ui/react-dialog
+- import: @radix-ui/react-tabs
+- import: lucide-react::Loader2
+- import: lucide-react::Save
+- import: lucide-react::Trash2
+- import: lucide-react::Upload
+- import: lucide-react::X
+- import: react-hook-form::useForm
+- import: react::React
+- import: react::useEffect
+- import: react::useState
+- import: sonner::toast
+- import: zod::z
 
 ---
 
@@ -105,20 +154,137 @@ type CategoryFormValues = z.infer<typeof categorySchema>
 
 ## SABİTLER
 - **categorySchema** (call) — `z.object({
-
     name: z.string().min(1, 'Kategori adı zorunludur'),
-
     slug...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/admin/categories/CategoryFormModal.tsx::CategoryFormModal
-- **params**: `{ open, onOpenChange, category, onSuccess }`
+### [N1_NASIL] AST Pointer: CategoryFormModal.tsx::useEffect_fetchParents
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `fetchParents` — Supabase'den parent_id'si null olan kategorileri çeken async fonksiyon; modal açıldığında parent seçim listesini doldurur
-- **Dönüş**: JSX (React bileşeni)
+  - `fetchParents` — parent_id'si null olan kategorileri (mevcut kategori hariç) Supabase'den çeken async fonksiyon; parentIdOptions state'ini günceller
+- **Dönüş**: yok (side effect: parentIdOptions state'ini set eder)
+
+---
+
+### [N2_NASIL] AST Pointer: CategoryFormModal.tsx::fetchParents
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `data` — supabase.from('categories').select('id, name') sorgusundan dönen kategori listesi; parent adaylarını tutar
+- **Dönüş**: yok (side effect: parentIdOptions state'ini günceller)
+
+---
+
+### [N3_NASIL] AST Pointer: CategoryFormModal.tsx::useEffect_formReset
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `category` — prop'tan gelen mevcut kategori nesnesi; varsa form doldurulur, yoksa sıfırlanır
+  - `form` — react-hook-form instance'ı; reset() ile form alanları doldurulur/sıfırlanır
+  - `setPreviewImage` — previewImage state setter'ı; kategori görselini veya null'ı ayarlar
+  - `category.name` — kategori adı, form.name alanına yazılır
+  - `category.slug` — kategori slug'ı, form.slug alanına yazılır
+  - `category.parent_id` — üst kategori ID'si, form.parent_id alanına yazılır
+  - `category.description` — kategori açıklaması, form.description alanına yazılır
+  - `category.seo_title` — SEO başlığı, form.seo_title alanına yazılır
+  - `category.seo_desc` — SEO açıklaması, form.seo_desc alanına yazılır
+  - `category.is_featured` — öne çıkan kategori bayrağı, form.is_featured alanına yazılır
+  - `category.sort_order` — sıralama değeri, form.sort_order alanına yazılır
+  - `category.image_url` — kategori görseli URL'i, form.image_url alanına yazılır ve setPreviewImage ile gösterilir
+  - `category.metadata?.metric1?.value` — metadata metric1 değeri, form.metric1_value alanına yazılır
+  - `category.metadata?.metric1?.label` — metadata metric1 etiketi, form.metric1_label alanına yazılır
+  - `category.metadata?.metric2?.value` — metadata metric2 değeri, form.metric2_value alanına yazılır
+  - `category.metadata?.metric2?.label` — metadata metric2 etiketi, form.metric2_label alanına yazılır
+- **Dönüş**: yok (side effect: form alanlarını doldurur/sıfırlar)
+
+---
+
+### [N4_NASIL] AST Pointer: CategoryFormModal.tsx::handleImageUpload
+- **params**: `(e: React.ChangeEvent<HTMLInputElement>)` — dosya seçim input change eventi
+- **ic_degiskenler**:
+  - `file` — input'tan seçilen ilk dosya (e.target.files[0]); yoksa fonksiyon erken döner
+  - `compressedFile` — compressImage() ile sıkıştırılmış dosya nesnesi; Supabase storage'a yüklenir
+  - `fileExt` — dosya uzantısı (örn "png", "jpg");点 dosya adından split ile çıkarılır
+  - `fileName` — crypto.randomUUID() ile oluşturulan benzersiz dosya adı + uzantı
+  - `filePath` — Supabase storage'daki tam yol: `category-images/${fileName}`
+  - `uploadError` — supabase.storage.from('products').upload() sonucundaki hata nesnesi; varsa fırlatılır
+  - `publicUrl` — supabase.storage.from('products').getPublicUrl(filePath) ile alınan herkese açık görsel URL'i
+- **Dönüş**: yok (side effect: form.image_url alanını ve previewImage state'ini günceller; toast gösterir)
+
+---
+
+### [N5_NASIL] AST Pointer: CategoryFormModal.tsx::onSubmit
+- **params**: `(values: CategoryFormValues)` — formdan gelen doğrulanmış form değerleri
+- **ic_degiskenler**:
+  - `metadata` — CategoryMetadata nesnesi; metric1 ve metric2 label/value çiftlerini tutar, Supabase JSON formatına dönüştürülerek kaydedilir
+  - `updateData` — CategoryUpdate nesnesi; mevcut kategoriyi güncellerken kullanılacak tüm alanları barındırır
+  - `insertData` — CategoryInsert nesnesi; yeni kategori eklenirken kullanılacak tüm alanları barındırır (authority_content: [] ek olarak eklenir)
+  - `values.name` — formdan gelen kategori adı
+  - `values.slug` — formdan gelen kategori slug'ı
+  - `values.parent_id` — formdan gelen üst kategori ID'si
+  - `values.description` — formdan gelen açıklama metni
+  - `values.seo_title` — formdan gelen SEO başlığı
+  - `values.seo_desc` — formdan gelen SEO açıklaması
+  - `values.is_featured` — formdan gelen öne çıkan bayrağı
+  - `values.sort_order` — formdan gelen sıralama değeri
+  - `values.image_url` — formdan gelen görsel URL'i
+  - `values.metric1_label` — formdan gelen metric1 etiketi
+  - `values.metric1_value` — formdan gelen metric1 değeri
+  - `values.metric2_label` — formdan gelen metric2 etiketi
+  - `values.metric2_value` — formdan gelen metric2 değeri
+  - `error` — supabase.from('categories').update() veya .insert() sonucundaki hata nesnesi; varsa fırlatılır
+- **Dönüş**: yok (side effect: Supabase'de kategori oluşturur/günceller; toast gösterir; onSuccess() ve onOpenChange(false) çağırır)
+
+---
+
+### [N6_NASIL] AST Pointer: CategoryFormModal.tsx::handleClose
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `form.formState.isDirty` — formda kaydedilmemiş değişiklik olup olmadığını boolean olarak tutar
+  - `t('admin.categories.unsavedChangesConfirm')` — i18n çeviri fonksiyonu; onay mesajını döndürür
+- **Dönüş**: yok (side effect: modal'ı kapatır veya onay dialog'u gösterir)
+
+---
+
+### [N7_NASIL] AST Pointer: CategoryFormModal.tsx::handleOpenChange
+- **params**: `(openVal: boolean)` — modal'ın açılma/kapanma durumu
+- **ic_degiskenler**: (yok — parametre doğrudan kullanılır)
+- **Dönüş**: yok (side effect: openVal false ise handleClose çağırır, true ise onOpenChange(true) çağırır)
+
+---
+
+### [N8_NASIL] AST Pointer: CategoryFormModal.tsx::useEffect_beforeunload
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `handleBeforeUnload` — beforeunload event handler'ı; formDirty ise tarayıcı kapatma/onay dialog'u gösterir
+  - `form.formState.isDirty` — formda kaydedilmemiş değişiklik olup olmadığını boolean olarak tutar
+- **Dönüş**: cleanup fonksiyonu döndürür (event listener'ı kaldırır)
+
+---
+
+### [N9_NASIL] AST Pointer: CategoryFormModal.tsx::handleBeforeUnload
+- **params**: `(e: BeforeUnloadEvent)` — tarayıcı kapatma/toggle event nesnesi
+- **ic_degiskenler**:
+  - `form.formState.isDirty` — formda kaydedilmemiş değişiklik olup olmadığını boolean olarak tutar
+- **Dönüş**: string boş dize (`''`) veya undefined (side effect: e.preventDefault() ve e.returnValue ile onay dialog'u tetikler)
+
+---
+
+### [N10_NASIL] AST Pointer: CategoryFormModal.tsx::cleanup_beforeunload
+- **params**: (parametre yok)
+- **ic_degiskenler**:
+  - `window.removeEventListener` — beforeunload event listener'ını kaldırır
+- **Dönüş**: yok (side effect: event listener'ı temizler)
+
+---
+
+### [N11_NASIL] AST Pointer: CategoryFormModal.tsx::renderParentOption
+- **params**: `p` — parentIdOptions dizisindeki tek bir kategori nesnesi ({id, name})
+- **ic_degiskenler**:
+  - `p.id` — üst kategori ID'si; option'un value değeri olarak kullanılır
+  - `p.name` — üst kategori adı; option içinde görüntülenen metin olarak kullanılır
+- **Dönüş**: JSX `<option>` elementi (key=p.id, value=p.id, className="bg-surface-deep")
 
 ---
 
@@ -127,8 +293,11 @@ type CategoryFormValues = z.infer<typeof categorySchema>
 ```mermaid
 graph TD
     CategoryFormModal_tsx__CategoryFormModal["CategoryFormModal"]
+    CategoryFormModal_tsx__handleClose["handleClose"]
     CategoryFormModal_tsx__handleImageUpload["handleImageUpload"]
+    CategoryFormModal_tsx__handleOpenChange["handleOpenChange"]
     CategoryFormModal_tsx__onSubmit["onSubmit"]
+    CategoryFormModal_tsx__CategoryFormModal --> CategoryFormModal_tsx__handleClose
 ```
 
 ## NODE ID STANDARD
@@ -137,6 +306,8 @@ graph TD
   function: src\components\admin\categories\CategoryFormModal.tsx::CategoryFormModal
   function: src\components\admin\categories\CategoryFormModal.tsx::handleImageUpload
   function: src\components\admin\categories\CategoryFormModal.tsx::onSubmit
+  function: src\components\admin\categories\CategoryFormModal.tsx::handleClose
+  function: src\components\admin\categories\CategoryFormModal.tsx::handleOpenChange
 
 ---
 

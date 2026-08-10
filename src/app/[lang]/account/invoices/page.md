@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\account\invoices\page.tsx
-skeleton_hash: df4e5591ff5aa6e8
+skeleton_hash: 0cb1a9f445e42d79
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: c697ddf7c92cfa4f
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-12T10:18:20Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -27,20 +27,6 @@ Bu modül, minimal bir React sarmalayıcı (wrapper) bileşenidir; fonksiyon gö
 
 ---
 
-**[Aksiyom 1]:** Eğer `PageComponent` modülü çalış zamanında içe aktarılamazsa (import başarısız olursa), `Page` bileşeni render edilemez ve uygulama bu sayfada hata verir.
-
-**[Aksiyom 2]:** Eğer React/JSX çalışma ortamı (runtime) mevcut değilse, `Page` fonksiyonu geçerli bir React elementi döndüremez ve bileşen ağaç (component tree) oluşturulamaz.
-
-**[Aksiyom 3]:** Eğer `PageComponent`自身i bağımlılık gerektiriyorsa (prop, context vb.) ve bunlar sağlanmamışsa, `PageComponent`'in kendi iç hata oluşumu beklenebilir; ancak `Page` fonksiyonu bu bağımlılıkları doğrudan yönetmez.
-
-**[Aksiyom 4]:** `Page` fonksiyonu parametre almaz; dolayısıyla调用侧 (caller) bu bileşene prop geçirme yetkisine sahip değildir — tüm veri akışı `PageComponent` içinde veya üst bileşen zincirinden (context, layout vb.) sağlanmalıdır.
-
----
-
-> **Not:** Bu modül, yalnızca bir çocuğu (child) sarmalayan ince bir zar (thin wrapper) yapısındadır. Fonksiyon gövdesinde koşullu mantık, veri dönüştürme veya hata işleme bulunmamaktadır; bu nedenle yukarıdaki varsayımlar modülün minimum zorunluluklarını yansıtmaktadır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### Page
@@ -52,6 +38,11 @@ Bu modül, minimal bir React sarmalayıcı (wrapper) bileşenidir; fonksiyon gö
 - (hiç parametre almaz)
 
 **Dönüş**: JSX.Element — `<PageComponent />` bileşenini temsil eden React öğesi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: next/dynamic::nextDynamic
 
 ---
 

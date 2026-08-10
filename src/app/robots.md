@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\robots.ts
-skeleton_hash: d7f5ac351db900a3
+skeleton_hash: 59e37004f4c9248c
 entity_hashes:
   func:robots: 04938e582a28c5d6
   overview: f391529836fd465a
-generated_at: 2026-06-08T10:08:12Z
+generated_at: 2026-06-19T20:46:34Z
 ---
 
 ## Genel Bakış
@@ -50,6 +50,12 @@ Bu fonksiyon herhangi bir parametre almamaktadır.
 - `sitemap`: Site haritası dosyasının tam URL'i (`${SITE_URL}/sitemap.xml` formatında)
 
 **Notlar**: `disallow` listesinde yer alan dizinler, kullanıcının oturum açmasını veya yetkilendirme gerektiren bölümlerdir. Bu alanların botlar tarafından indekslenmesi engellenerek, hassas sayfaların arama sonuçlarında görünmesi ve duplicate content sorunları önlenir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../config/siteUrl::SITE_URL
+- import: next::MetadataRoute
 
 ---
 

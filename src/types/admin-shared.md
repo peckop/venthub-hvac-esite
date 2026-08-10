@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\admin-shared.ts
-skeleton_hash: dc0c5778aaf0e7ba
+skeleton_hash: 6686f6184710e8c7
 entity_hashes:
   overview: 050ebb9fda579a9b
-generated_at: 2026-05-28T22:38:30Z
+generated_at: 2026-06-19T20:48:16Z
 ---
 
 ## Genel Bakış
@@ -22,10 +22,6 @@ Bu modül için fonksiyon gövdesi, sabit veya çalıştırılabilir kod bulunma
 [Aksiyom 1]: Eğer bu dosyada runtime'da değerlendirilen herhangi bir değer (sabit, değişken, fonksiyon) tanımlanırsa, bu yalnızca TypeScript derleme zamanı tip kontrolüne etki eder; üretim (production) ortamında herhangi bir JavaScript çıktısı üretmez.
 
 [Aksiyom 2]: Eğer bu dosya `import` veya `export` içermiyorsa, modül herhangi bir dış bağımlılık oluşturmadan boş bir modül olarak davranır ve başka modüller üzerinde yan etkisi yoktur.
-
----
-
-**Not:** Bu dosya (`admin-shared.ts`) mevcut durumda boş bir paylaşımlı tip tanım modülüdür. Çalıştırılabilir mantık, sabit değer veya fonksiyon gövdesi bulunmadığı için, fonksiyon imzası tabanlı detaylı aksiyom üretimi mümkün değildir. İleride bu dosyaya tip tanımları eklendiğinde, tanımların yapısına göre yeniden değerlendirilmelidir.
 
 ---
 

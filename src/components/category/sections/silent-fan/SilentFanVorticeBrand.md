@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\category\sections\silent-fan\SilentFanVorticeBrand.tsx
-skeleton_hash: bdb180c4a8fae5fb
+skeleton_hash: 0a921b4267d5feb0
 entity_hashes:
   func:SilentFanVorticeBrand: e07a3a521f52112d
   func:tr: b282b53f03d688a5
   overview: 754a28961314bbb7
   style_tokens: 40e58eb2e4f109bb
-generated_at: 2026-06-08T10:08:48Z
+generated_at: 2026-06-19T20:47:07Z
 ---
 
 ## Genel Bakış
@@ -55,6 +55,19 @@ Bu modül için minimalist aksiyomlar, yalnızca fonksiyon imzalarından türeti
 **Parametreler**:  
 - key: string — Çevirilecek metnin anahtarını tanımlar.  
 **Dönüş**: Belirtilmemiş; fonksiyonun dönüş tipi belirsiz olduğu için net bir açıklama yapılamaz. Gerçekte bir string, void veya başka bir tip döndürebilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/components/ui/VentImage::VentImage
+- import: @/hooks/useScrollAnimation::scrollAnimationClasses
+- import: @/hooks/useScrollAnimation::useScrollAnimation
+- import: @/i18n/I18nProvider::useI18n
+- import: lucide-react::Award
+- import: lucide-react::Clock
+- import: lucide-react::Globe
+- import: lucide-react::Star
+- import: react::React
 
 ---
 

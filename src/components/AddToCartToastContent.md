@@ -3,27 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\AddToCartToastContent.tsx
-skeleton_hash: 3892b149426f53a7
+skeleton_hash: 852817141636c428
 entity_hashes:
   func:AddToCartToastContent: da3886a1d2990a31
-  overview: e02dd238d7a8dbce
+  overview: a72a624e0dfb150e
   style_tokens: 5ac0b676517c4959
-generated_at: 2026-06-14T22:50:16Z
+generated_at: 2026-06-19T20:46:47Z
 ---
 
 ## Genel Bakış
-Bu modül, bir ürün sepete eklendiğinde kullanıcıya kısa süreli bir bildirim (toast) gösteren tek bir React bileşenini tanımlar. Bileşen,_sepetteki ürünün temel bilgilerini sunar ve bildirimi kapatma olanağı sağlayarak kullanıcı deneyimini tamamlar.
+Bu modül, bir ürün sepete eklendiğinde kullanıcıya kısa süreli bildirim gösteren tek bir React bileşeninden oluşur. Ürünün temel bilgilerini sunar ve bildirimi kapatma olanağı sağlayarak kullanıcı deneyimini tamamlar.
 
 ## Fonksiyon Grupları
 ### Toast Bildirim İçeriği
-Sepete ekleme işlemi sonrasında kullanıcılara bilgilendirme amaçlı gösterilen geçici bildirim penceresinin içeriğini ve etkileşimlerini yöneten UI bileşeni.
+Sepete ekleme işlemi sonrasında geçici olarak gösterilen bildirim penceresinin içeriğini ve kapatma etkileşimini yöneten UI bileşeni.
 - AddToCartToastContent
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, sepete ekleme bildiriminin içeriğini render eden React fonksiyonel bileşenidir. Aşağıdaki varsayımlar **fonksiyon imzasından** çıkarılmıştır; fonksiyon gövdesine erişim olmadığından gövde bazlı aksiyomlar üretilememiştir.
+Bu modül, sepete ekleme işleminin ardından kısa süreli bildirim (toast) içeriğini render eden bir React bileşenidir. Aşağıdaki varsayımlar **fonksiyon imzasından** türetilmiştir.
+
+[Aksiyom 1]: Eğer `product` prop'u sağlanmazsa, bileşen sepetteki ürün bilgilerini gösteremez ve render edeceği içerik bilinmez.
+
+[Aksiyom 2]: Eğer `onClose` prop'u sağlanmazsa, kullanıcı bildirimi kapatamaz ve toast bileşeninin kapanma tetikleme mekanizması çalışmaz.
+
+[Aksiyom 3]: Eğer `onClose` çağrıldığında bileşenin mounted durumu değiştiyse (örn. parent bileşen koşullu render ediyorsa), React geçerlilik uyarıları (warning) oluşur.
+
+[Aksiyom 4]: Eğer `product` prop'u `undefined` veya `null` olarak verilirse, bileşen içinde product objesinin alanlarına erişim `TypeError` ile sonuçlanabilir.
+
+[Aksiyom 5]: Eğer bileşen bir `toast` veya `snackbar` konteynırının çocuğu olarak kullanılmıyorsa, bileşenin ekranda görünür hale gelmesi için gerekli UI bağlamı (konteynır, pozisyonlama, animasyon) eksik olur.
 
 ---
 
@@ -43,8 +53,8 @@ Bu modül, sepete ekleme bildiriminin içeriğini render eden React fonksiyonel 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
-- import: ../utils/routes::Routes
 - import: @/types/ui-models::type { Product }
 - import: next/link::Link
 - import: react::React
@@ -61,11 +71,12 @@ Bu modül, sepete ekleme bildiriminin içeriğini render eden React fonksiyonel 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: components/AddToCartToastContent.tsx::AddToCartToastContent
-- **params**: `product`, `onClose`
-- **ic_degiskenler**:
-  - `t` — useI18n() hook'undan dönen çeviri fonksiyonu, bileşen içindeki metinleri uluslararasılaştırmak için kullanılır
-- **Dönüş**: React.FC<AddToCartToastContentProps> (JSX ile toast içeriği döndürür)
+### [N1_NASIL] AST Pointer: AddToCartToastContent.tsx::AddToCartToastContent
+- **params**: `{ product, onClose }`
+- **ic_degiskenler**: 
+  - `t` — useI18n hook'unun sagladigi ceviri fonksiyonu, JSX icindeki tum metinleri lokalize eder (ornegin `t('cartToast.added')`).
+  - `Routes` — useLocalizedRoutes hook'unun dondurlu rotalar nesnesi, Link bileşeninde `Routes.cart()` ile sepet sayfasinin URL'sini uretir.
+- **Dönüş**: `{product.name}` ve `onClose` callback'ini iceren, sepete urun eklendigini bildiren bir React bileşeni (JSX). Bilesen, iki buton ve bir Link iceren bir toast bildirim UI'yi render eder.
 
 ---
 

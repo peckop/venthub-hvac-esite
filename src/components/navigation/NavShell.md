@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\navigation\NavShell.tsx
-skeleton_hash: 59c4f8aaf19879e8
+skeleton_hash: 0c60bc38ac4baa40
 entity_hashes:
   func:NavShell: 6b1b48f5c901dde6
   overview: 5c6cc2484e8ea784
   style_tokens: fe546e0bed477a10
-generated_at: 2026-06-08T10:08:49Z
+generated_at: 2026-06-19T20:47:10Z
 ---
 
 ## Genel Bakış
@@ -52,6 +52,12 @@ NavShell, dışarıdan yapılandırılan parametrelerle çalışan bir navigasyo
 - isScrol: Parametre listesi kaynak kodda kesilmiş durumdadır, tam değeri doğrulanamamıştır
 
 **Dönüş**: `React.FC<NavShellProps>` tipinde bir fonksiyonel React bileşeni döndürür. `NavShellProps` arayüzü, bileşenin kabul ettiği tüm prop tanımlamalarını içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/utils::cn
+- import: react::React
 
 ---
 

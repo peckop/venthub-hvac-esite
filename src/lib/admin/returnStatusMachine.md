@@ -7,7 +7,7 @@ skeleton_hash: d38dc01210646ffc
 entity_hashes:
   func:allowedNextStatuses: 2cc7c349dc1ea2c6
   overview: eb1dc3e13feb0c1b
-generated_at: 2026-06-13T18:55:01Z
+generated_at: 2026-06-19T20:47:59Z
 ---
 
 ## Genel Bakış
@@ -33,10 +33,6 @@ Bu modül, return (iade) durum makinesi için mevcut durumdan izin verilen sonra
 **[Aksiyom 4]**: Eğer `current` boş string (`""`) olarak verilirse ve `TRANSITIONS` içinde böyle bir anahtar yoksa, sonuç boş dizi olur.
 
 **[Aksiyom 5]**: Fonksiyon her zaman `string[]` (dizi) döndürür — null veya undefined değil.
-
----
-
-> **Not:** `TRANSITIONS` nesnesinin içeriği (hangi durumlar tanımlı, hangi geçişler mevcut) verilmediğinden, durum isimleri ve geçiş grafı hakkında spesifik aksiyom üretilememiştir. Durum değerleri `TRANSITIONS` sabitinden türetilecektir.
 
 ---
 

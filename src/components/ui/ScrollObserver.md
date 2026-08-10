@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ui\ScrollObserver.tsx
-skeleton_hash: 5ac84f8d2580c8f3
+skeleton_hash: 164c78147076aa40
 entity_hashes:
   func:ScrollObserver: 862e0356d80495a5
   overview: 165bc7baf7c13a58
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-05-28T22:37:29Z
+generated_at: 2026-06-19T20:47:39Z
 ---
 
 ## Genel Bakış
@@ -33,10 +33,6 @@ ScrollObserver modulu icin mimari varsayimlar, fonksiyon imzasindan (parametresi
 
 ---
 
-> **Not:** Bu modulun fonksiyon imzasi `ScrollObserver()` seklinde parametresiz tanimlanmistir. Fonksiyon gobdesine erisim olmadigindan, iceriksel varsayimlar (ornegin hangi DOM elementlerini hedefledigi, IntersectionObserver esik degerleri, callback yapisi gibi) hakkinda kesin tespit yapilmamistir. Belirtilen varsayimlar, modulun **var olmasi icin zorunlu olan en dusuk kosullari** yansitmaktadir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### ScrollObserver
@@ -48,6 +44,11 @@ ScrollObserver modulu icin mimari varsayimlar, fonksiyon imzasindan (parametresi
 - Parametreler hakkında kaynak kodunda veya docstring'de belirli bir bilgi bulunmamaktadır. Bileşenin aldığı prop'lar, kullanıldığı bağlama göre değişiklik gösterebilir.
 
 **Dönüş**: `React.FC` tipinde bir React bileşeni döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: react::useEffect
 
 ---
 

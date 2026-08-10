@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\authority.tr.ts
-skeleton_hash: adf6e51757d1c5ca
+skeleton_hash: 0a21746b687c9e49
 entity_hashes:
   overview: d75139dd453d58b5
-generated_at: 2026-06-16T10:18:09Z
+generated_at: 2026-06-19T20:47:53Z
 ---
 
 ## Genel Bakış
@@ -33,8 +33,8 @@ Bu modül için fonksiyonel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **authority** (object) — `{
-      leftSideEski: 'Sol Taraf (Eski)',
-      labelTraditional: 'Etiket (...`
+  leftSideEski: 'Sol Taraf (Eski)',
+  labelTraditional: 'Etiket (Örn: Gel...`
 
 ---
 

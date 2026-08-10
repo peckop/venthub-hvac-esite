@@ -8,13 +8,13 @@ entity_hashes:
   func:LoginPage: c196ecbcf52f1c61
   func:handleGoogleSignIn: 0c49de53cd5a94df
   func:handleSubmit: 460293fdfa9263b6
-  overview: 2f1d4c77ab1e1641
+  overview: 7b61ab089a04c74b
   style_tokens: 4dc86ff7a25fa026
-generated_at: 2026-06-14T21:38:28Z
+generated_at: 2026-06-19T20:51:13Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC uygulamasının giriş sayfasını sunan ana React bileşenidir. Kullanıcıların e-posta/şifre bilgileriyle veya Google OAuth hesabıyla oturum açmasına olanak tanıyan bir kimlik doğrulama arayüzü sağlar. Form gönderimi ve Google OAuth akışı gibi asenkron işlemleri yöneterek kullanıcı kimlik doğrulama deneyimini koordine eder.
+Bu modül, VentHub HVAC uygulamasının giriş sayfasını oluşturan temel React bileşenidir. Kullanıcıların e-posta ve şifre bilgileriyle veya Google OAuth hesabıyla oturum açmalarını sağlayan bir kimlik doğrulama arayüzü sunar. Form gönderimi ve Google OAuth gibi asenkron işlemleri yöneterek kullanıcı girişinin güvenli ve sorunsuz bir şekilde gerçekleştirilmesini koordine eder.
 
 ## Fonksiyon Grupları
 ### Sayfa Bileşeni
@@ -29,17 +29,21 @@ Kullanıcının e-posta/şifre bilgilerini sunucuya göndererek veya Google OAut
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kimlik doğrulama işlemleri içeren bir React bileşeni olduğundan, bazı temel mimari varsayımlar mevcuttur. Varsayımlar, sadece fonksiyon imzaları ve modülün amacından yola çıkarak belirlenmiştir.
+Bu modül, bir React giriş sayfası bileşeni olup fonksiyon imzalarına dayalı mimari varsayımlar aşağıdadır.
 
-[Aksiyom 1]: Eğer `LoginPage` bileşeni dış bir kimlik doğrulama servisi veya context ile bağımlılık enjeksiyonu yoluyla bağımlılıklarını (örneğin, `login` ve `googleSignIn` fonksiyonları) almıyorsa, bileşen kendi içinde bu servisleri import ederek kullanıyordur. Aksi halde, form gönderimi veya Google OAuth işlemleri çağrılamaz.
+**[Aksiyom 1]:** Eğer `handleSubmit` fonksiyonuna geçerli bir `React.FormEvent` nesnesi sağlanmazsa, form gönderimi doğru işlenemez ve kimlik doğrulama akışı başlatılamaz.
 
-[Aksiyom 2]: Eğer `handleSubmit` fonksiyonu `React.FormEvent` parametresi almıyorsa, formun varsayılan提交 davranışı (sayfa yenileme) engellenemez ve bu durum istenmeyen bir kullanıcı deneyimine yol açar.
+**[Aksiyom 2]:** Eğer `handleGoogleSignIn` fonksiyonu çağrıldığında harici Google OAuth servis yapılandırması (client ID, redirect URI vb.) mevcut değilse, Google ile giriş işlemi başarısız olur.
 
-[Aksiyom 3]: Eğer `handleGoogleSignIn` fonksiyonu bir OAuth akışını tetiklemiyorsa (örneğin, bir `authClient` nesnesi veya `signInWithPopup` methodu kullanmıyorsa), kullanıcı Google hesabıyla giriş yapamaz. Bu durum, kimlik doğrulama seçeneğinin işlevsiz kalmasına neden olur.
+**[Aksiyom 3]:** Eğer `LoginPage` bileşeni React bileşen ağacı içinde bir `<form>` elementi ile kullanılmazsa, `handleSubmit` fonksiyonu tetiklenemez ve kullanıcı e-posta/şifre ile giriş yapamaz.
 
-[Aksiyom 4]: Eğer bileşen içinde bir `useNavigate` veya `useHistory` hook'u kullanılmıyorsa, başarılı bir giriş işleminden sonra kullanıcı otomatik olarak başka bir sayfaya (örneğin dashboard'a) yönlendirilemez. Kullanıcı giriş sayfasında kalır.
+**[Aksiyom 4]:** Eğer `handleSubmit` veya `handleGoogleSignIn` asenkron işlemleri sırasında bir hata yakalanmazsa (try-catch veya .catch), kullanıcıya hata geri bildirimi sunulmaz ve uygulama beklenmedik şekilde başarısız olur.
 
-[Aksiyom 5]: Eğer bileşenin state yönetimi (örneğin `useState` hook'ları) email, şifre ve hata durumları için tanımlı değilse, form alanlarının değerleri takip edilemez ve kullanıcıya hata mesajları gösterilemez. Bu durum formun hiçbir zaman submit edilemeyeceği anlamına gelir.
+**[Aksiyom 5]:** Eğer `handleSubmit` fonksiyonu çağrıldığında form içindeki e-posta ve şifre alanları boş veya geçersiz değerler içeriyorsa, sunucu tarafı kimlik doğrulaması başarısız olur (bu alanların doğrulaması bu modülün dışında gerçekleşir).
+
+---
+
+> **Not:** Bu aksiyomlar yalnızca fonksiyon imzalarından türetilmiştir. Fonksiyon gövdelerinin içeriği, state yönetimi, API çağrı detayları ve hata işleme stratejileri hakkında bilinmeyenler mevcuttur; bunlar hakkında varsayımda bulunulmamıştır.
 
 ---
 
@@ -60,6 +64,7 @@ Bu modül, kimlik doğrulama işlemleri içeren bir React bileşeni olduğundan,
 - import: ../hooks/useAuth::useAuth
 - import: ../i18n/I18nProvider::useI18n
 - import: ../utils/routes::Routes
+- import: ../utils/routes::localizedHref
 - import: @/lib/supabase/client::supabaseBrowserClient
 - import: lucide-react::ArrowLeft
 - import: lucide-react::Eye
@@ -78,37 +83,58 @@ Bu modül, kimlik doğrulama işlemleri içeren bir React bileşeni olduğundan,
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: LoginPage.tsx::LoginPage
+### [N1_NASIL] AST Pointer: src/views/LoginPage.tsx::LoginPage
+- **params**: (parametre yok — React fonksiyon bileşeni)
+- **ic_degiskenler**:
+  - `isPending` — useState hook'u, form gönderimi sırasında loading durumunu takip eder, true olduğunda buton spinner gösterir
+  - `setIsPending` — isPending durumunu güncellemek için setter
+  - `signIn` — useAuth hook'undan gelen kimlik doğrulama fonksiyonu, email/şifre ile giriş yapar
+  - `email` — useState hook'u, kullanıcı email giriş alanının değeri
+  - `setEmail` — email değerini güncellemek için setter
+  - `password` — useState hook'u, kullanıcı şifre giriş alanının değeri
+  - `setPassword` — password değerini güncellemek için setter
+  - `showPassword` — useState hook'u, şifre alanının görünür/gizli durumunu kontrol eder
+  - `setShowPassword` — showPassword durumunu toggle eden setter
+  - `rememberMe` — useState hook'u, "beni hatırla" checkbox durumu, başlangıç değeri true
+  - `setRememberMe` — rememberMe değerini güncelleyen setter
+  - `router` — useRouter hook'undan gelen Next.js router, sayfa yönlendirme ve yenileme için kullanılır
+  - `searchParams` — useSearchParams hook'undan gelen URLSearchParams, redirect parametresini okumak için kullanılır
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, tüm metinlerin uluslararasılaştırılması için kullanılır
+  - `lang` — useI18n hook'undan gelen güncel dil kodu, localizedHref içinde URL dilini belirler
+  - `from` — searchParams'dan `redirect` query parametresi alınarak oluşturulur, fallback olarak `'/'` kullanılır; giriş sonrası yönlendirme hedefini tutar
+  - `handleSubmit` — form submit handler, inner function olarak tanımlanır
+  - `handleGoogleSignIn` — Google OAuth giriş handler'ı, inner function olarak tanımlanır
+- **Dönüş**: JSX — Tam login sayfası görünümü (form, Google sign-in butonu, register linki, brand footer)
+
+---
+
+### [N2_NASIL] AST Pointer: src/views/LoginPage.tsx::handleSubmit
+- **params**: `(e: React.FormEvent)` — form submit olay nesnesi, e.preventDefault() ile varsayılan davranış engellenir
+- **ic_degiskenler**:
+  - `result` — signIn(email, password) asenkron çağrısının dönüş değeri, `.error` alanı varsa hata olduğunu gösterir, başarılıysa kullanıcı giriş yapmıştır
+  - `email` — dış kapsamdan (LoginPage) erişilen useState değeri, kullanıcının girdiği email adresi
+  - `password` — dış kapsamdan erişilen useState değeri, kullanıcının girdiği şifre
+  - `signIn` — dış kapsamdan erişilen useAuth fonksiyonu, supabase auth ile email/şifre girişi yapar
+  - `setIsPending` — dış kapsamdan erişilen setter, loading durumunu true/false yapar
+  - `toast` — sonner kütüphanesinden import edilen bildirim fonksiyonu, success/error mesajları gösterir
+  - `t` — dış kapsamdan erişilen çeviri fonksiyonu, auth.loginSuccess ve auth.genericLoginError anahtarlarından çevirileri alır
+  - `router` — dış kapsamdan erişilen Next.js router, .refresh() ile sayfayı yeniler, .push() ile yönlendirme yapar
+  - `from` — dış kapsamdan erişilen değişken, yönlendirme hedef URL'si
+  - `lang` — dış kapsamdan erişilen dil kodu, localizedHref içinde URL oluşturmak için kullanılır
+- **Dönüş**: yok — Yan etkiler: toast bildirimleri gösterir, başarılı girişte sayfayı yeniler ve yönlendirir, finally bloğunda isPending'i false yapar
+
+---
+
+### [N3_NASIL] AST Pointer: src/views/LoginPage.tsx::handleGoogleSignIn
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `isPending` — Login isteği devam edip etmediğini takip eden boolean state
-  - `signIn` — useAuth hook'undan gelen giriş fonksiyonu
-  - `email` — Kullanıcının email adresi için string state
-  - `password` — Kullanıcının şifresi için string state
-  - `showPassword` — Şifre alanının görünür olup olmadığını kontrol eden boolean state
-  - `rememberMe` — "Beni hatırla" seçeneği için boolean state
-  - `router` — Next.js yönlendirme hook'u
-  - `searchParams` — URL arama parametrelerini okumak için hook
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
-  - `from` — Redirect parametresinden gelen veya '/' olan yönlendirme yolu
-  - `handleSubmit` — Form gönderme işlevi (iç fonksiyon)
-  - `handleGoogleSignIn` — Google ile giriş işlevi (iç fonksiyon)
-- **Dönüş**: React JSX elementi (login sayfası formu)
-
-### [N2_NASIL] AST Pointer: LoginPage.tsx::handleSubmit
-- **params**: (e: React.FormEvent)
-- **ic_degiskenler**:
-  - `e` — Form submit event nesnesi, preventDefault ile varsayılan davranış engellenir
-  - `result` — signIn fonksiyonunun dönüş değeri (error veya success durumunu içerir)
-- **Dönüş**: yok (async void, yan etkiler: toast bildirimleri, yönlendirme)
-
-### [N3_NASIL] AST Pointer: LoginPage.tsx::handleGoogleSignIn
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `origin` — Tarayıcı kök URL'i veya localhost fallback
-  - `redirectTo` — OAuth sonrası yönlendirilecek tam URL
-  - `error` — supabase.auth.signInWithOAuth çağrısından dönen hata nesnesi
-- **Dönüş**: yok (async void, yan etkiler: console.error, toast bildirimleri)
+  - `origin` — tarayıcı tarafında `window.location.origin` değerini alır; sunucu tarafında (SSR) `'http://localhost:3000'` fallback'i kullanılır; OAuth redirect URL'sinin kök DOMAIN kısmını oluşturur
+  - `redirectTo` — origin ve `Routes.auth.callback()` birleştirilerek oluşturulan tam callback URL'si, Google OAuth'tan sonra yönlendirme yapılacak adres
+  - `error` — `supabase.auth.signInWithOAuth()` çağrısının destructuring ile alınan hata nesnesi; null ise başarılı, değilse hata olduğunu gösterir
+  - `e` — catch bloğunda yakalanan istisna nesnesi, Google sign-in sırasında beklenmeyen bir hata oluştuğunda loglanır
+  - `supabase` — dış kapsamdan import edilen supabase browser client, Supabase API'sine istek yapar
+  - `t` — dış kapsamdan erişilen çeviri fonksiyonu, auth.googleSignInFail ve auth.googleSignInError çevirilerini alır
+- **Dönüş**: yok — Yan etkiler: Google OAuth akışını başlatır (tarayıcıyı Google yetkilendirme sayfasına yönlendirir), hata oluşursa console'a log yazar ve toast bildirimi gösterir
 
 ---
 

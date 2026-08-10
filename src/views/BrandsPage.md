@@ -3,31 +3,28 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx
-skeleton_hash: 31a1af60ec95928f
+skeleton_hash: bbdc152371d7327d
 entity_hashes:
   func:BrandsPage: 7fe8abffb7e6dbf9
-  overview: f92b067f7968b22a
+  overview: 3003d757bf1d8636
   style_tokens: 583cff7322941abd
-generated_at: 2026-06-14T22:21:39Z
+generated_at: 2026-06-19T20:50:29Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC platformundaki tüm markaları listeleyen ve kullanıcıya sunan tek bir React sayfası bileşenini içermektedir. Temel bir gezinme noktası olarak işlev görerek, markaları görsel ve interaktif bir arayüzle sergiler. Bileşen, i18n, erişilebilirlik ve performans optimizasyonları ile donatılmıştır.
+BrandsPage, Venthub HVAC platformunda markaları listleyen tek bileşenli bir React sayfa modülüdür. Sayfa, markaları görsel ve interaktif bir arayüzle kullanıcılara sunarak navigasyon ve keşif deneyimini destekler. Uluslararasılaştırma, erişilebilirlik ve performans optimizasyonları gibi modern web standartlarına uygun olarak tasarlanmıştır.
 
 ## Fonksiyon Grupları
 ### Marka Sayfası Görünümü
-Modülün tek ve temel sorumluluğu, ana sayfa bileşenini oluşturarak markaların listelendiği arayüzü sunmaktır.
+Modülün tek bileşeni olan BrandsPage, markaların listelendiği premium seviye arayüzü render eder.
 - BrandsPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, bir React sayfa bileşeni olup, doğru çalışması için belirli harici bağımlılıklara ve veri koşullarına ihtiyaç duyar.
-
-[Aksiyom 1]: Eğer React uygulama ortamı (DOM ve React kütüphanesi) yoksa, bileşen render edilemez olur.
-[Aksiyom 2]: Eğer yönlendirme (routing) altyapısı (React Router veya benzeri) yapılandırılmamışsa, bu bileşen harici bir rotaya (örn: `/brands`) atanamaz ve URL üzerinden erişilemez olur.
-[Aksiyom 3]: Eğer marka verilerini sağlayan bir veri kaynağı (API, statik veri, vb.) veya bu verileri işleyen bir üst bileşen/context (örn: `BrandsProvider`) mevcut değilse, bileşen içinde marka listesi görüntülenemez olur.
-[Aksiyom 4]: Eğer bileşenin bağımlı olduğu ortak UI bileşenleri (örn: `Card`, `Layout`, `LoadingSpinner`) veya stil tanımları (CSS/SCSS) içe aktarılmamışsa, arayüz bozuk veya eksik render olur.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -49,10 +46,10 @@ Bu modül, bir React sayfa bileşeni olup, doğru çalışması için belirli ha
 - import: ../components/HVACIcons::BrandIcon
 - import: ../components/Seo::Seo
 - import: ../data/brands::HVAC_BRANDS
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../hooks/useScrollAnimation::scrollAnimationClasses
 - import: ../hooks/useScrollAnimation::useScrollAnimation
 - import: ../i18n/I18nProvider::useI18n
-- import: ../utils/routes::Routes
 - import: next/image::Image
 - import: next/link::Link
 - import: react::React
@@ -64,27 +61,14 @@ Bu modül, bir React sayfa bileşeni olup, doğru çalışması için belirli ha
 ### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx::BrandsPage
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — useI18n hookundan alınan çeviri fonksiyonu, sayfa içindeki tüm metinleri çevirir
-  - `brands` — HVAC_BRANDS sabitinin referansı, marka listesini tutar
-  - `heroBadgeRef` — useScrollAnimation hookundan dönen ref, hero badge bölümü için scroll animasyonu reference'ı
-  - `heroBadgeVisible` — useScrollAnimation hookundan dönen boolean, hero badge bölümünün görünür olup olmadığını tutar
-  - `brandsGridRef` — useScrollAnimation hookundan dönen ref, markalar grid bölümü için scroll animasyonu reference'ı
-  - `brandsGridVisible` — useScrollAnimation hookundan dönen boolean, markalar grid bölümünün görünür olup olmadığını tutar
-- **Dönüş**: JSX elementi (React.FC) - tüm sayfa yapısını içeren React componenti
-
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx::splitMapCallback
-- **params**: (word, i) — split() ile bölünmüş her kelime ve index
-- **ic_degiskenler**:
-  - `word` — t('brands.eyebrow') metninin split() ile bölünmüş her bir kelimesi
-  - `i` — kelimenin index numarası, 2. kelimeyi special styling için kontrol eder
-- **Dönüş**: React.Fragment elementi, kelimeyi conditional olarak stillendirir
-
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\src\views\BrandsPage.tsx::brandsMapCallback
-- **params**: (brand, index) — brands.map() içindeki her marka objesi ve index
-- **ic_degiskenler**:
-  - `brand` — brands array'inden gelen tek bir marka objesi (slug, name, country, specialty, description properties)
-  - `index` — markanın index numarası, staggerChild animasyonu için kullanılır
-- **Dönüş**: JSX div elementi - marka kartını oluşturan React componenti
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; sayfa içindeki tüm metinleri lokalize etmek için kullanılır.
+  - `Routes` — `useLocalizedRoutes()` hook'undan dönen rota nesnesi; marka sayfası URL'lerini lokalize olarak oluşturur (örn. `Routes.brand(brand.slug)`).
+  - `brands` — `HVAC_BRANDS` sabitinden atanan, tüm HVAC markalarını içeren dizi; harita içinde dönülerek her marka kartı oluşturulur.
+  - `heroBadgeRef` — Hero bölümündeki badge elemanı için React ref; `useScrollAnimation` hook'una bağlanarak scroll animasyonu tetiklemek için kullanılır.
+  - `heroBadgeVisible` — Hero badge'in görünürlük durumu布尔; scroll animasyonu için belirlenen eşik değer (0.2) aşıldığında `true` olur ve animasyon sınıflarını tetikler.
+  - `brandsGridRef` — Brands grid bölümü için React ref; `useScrollAnimation` hook'una bağlanarak scroll animasyonu tetiklemek için kullanılır.
+  - `brandsGridVisible` — Brands grid'in görünürlük durumu布尔; scroll animasyonu için belirlenen eşik değer (0.05) aşıldığında `true` olur ve animasyon sınıflarını tetikler.
+- **Dönüş**: JSX elemanı (React.FC); tüm sayfa yapısını (hero, marka gridi, güven bölümü) içeren bir React bileşeni.
 
 ---
 

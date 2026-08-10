@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\contact\page.tsx
-skeleton_hash: dc08580a33236244
+skeleton_hash: ec76b7a76e7ee380
 entity_hashes:
   func:Page: 02ee67f324c336e5
   overview: a07fce05e4917c91
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-08T08:57:36Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -42,6 +42,11 @@ Next.js App Router yapısında tanımlanmış bir sayfa bileşenidir. Fonksiyon 
 
 **Dönüş**:
 - `JSX.Element` — İletişim sayfasının tüm içeriğini temsil eden `PageComponent` bileşeninin JSX çıktısıdır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../views/ContactPage::PageComponent
 
 ---
 

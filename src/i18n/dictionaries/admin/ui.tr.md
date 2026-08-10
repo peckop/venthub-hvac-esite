@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\ui.tr.ts
-skeleton_hash: 80b2bf35cd156f5b
+skeleton_hash: ce6d91c5802465d2
 entity_hashes:
   overview: 1ca0cb4cc145d139
-generated_at: 2026-06-16T11:09:10Z
+generated_at: 2026-06-19T20:47:54Z
 ---
 
 ## Genel Bakış
@@ -26,7 +26,7 @@ Bu modül, bir uluslararasılaştırma (i18n) sözlük dosyasıdır ve `ui` nesn
 
 ## SABİTLER
 - **ui** (object) — `{
-      accessDeniedDesc: 'Bu sayfaya erişmek için yönetici yetkileri gerekli...`
+  accessDeniedDesc: 'Bu sayfaya erişmek için yönetici yetkileri gereklidir...`
 
 ---
 

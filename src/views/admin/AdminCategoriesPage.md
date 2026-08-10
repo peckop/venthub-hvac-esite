@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminCategoriesPage: 2946cca3392b7941
   overview: a42b51d530c2f063
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-13T18:03:37Z
+generated_at: 2026-06-19T20:48:48Z
 ---
 
 ## Genel Bakış
@@ -45,6 +45,33 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - Bu bileşen herhangi bir props almaz; bağımsız bir üst düzey sayfa bileşenidir.
 
 **Dönüş**: `React.FC` — Return type olarak belirtilen React.FunctionComponent, bileşenin props almayan (veya boş props alan) fonksiyonel bir React bileşeni olduğunu ve JSX döndürdüğünü belirtir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: ./CategoriesTableBody::CategoriesTableBody
+- import: react::React
+- import: react::Suspense
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/views/admin/AdminCategoriesPage.tsx::AdminCategoriesPage
+- **params**: () — parametre yok (React fonksiyonel bileşeni)
+- **ic_degiskenler**:
+  - `t` — `useI18n()` hook'undan destructuring ile elde edilen çeviri fonksiyonu; `t('admin.titles.categories')` ve `t('admin.categories.subtitle')` çağrılarıyla UI metinlerini uluslararası dil destekli olarak render eder
+- **Dönüş**: JSX — `<div>` sarmalayıcısı içinde `<header>` (başlık + alt başlık) ve `<Suspense>` sarmalayıcısı içinde `<CategoriesTableBody />` bileşeninden oluşan ReactElement
+- **Yan Etkiler / Bileşen Kullanımları**:
+  - `adminSectionTitleClass` — import edilmiş CSS class sabiti, `<h1>` elementine `className` olarak uygulanır
+  - `adminSubtitleClass` — import edilmiş CSS class sabiti, `<p>` elementine `className` olarak uygulanır
+  - `Suspense` — React Suspense sınırı; `fallback` prop'u ile `AdminSkeleton` bileşeni (`variant="table" count={7} rows={6}` parametreleriyle) gösterilir
+  - `AdminSkeleton` — Suspense fallback'inde yüklenme durumunda tablo iskeleti render eder
+  - `CategoriesTableBody` — Suspense içinde lazy yüklenen kategori tablosu gövde bileşeni
 
 ---
 

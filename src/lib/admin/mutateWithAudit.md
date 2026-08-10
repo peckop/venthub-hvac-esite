@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminPermissionError:constructor: f2c82c82a313c617
   func:mutateWithAudit: 6fd7e78effa72486
   overview: f4a791bb090e6115
-generated_at: 2026-06-13T15:05:33Z
+generated_at: 2026-06-19T20:47:59Z
 ---
 
 ## Genel Bakış
@@ -28,24 +28,6 @@ Yönetici yetki hatalarını temsil eden özel durum sınıfını tanımlar.
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül veritabanı mutation işlemlerini audit (denetim) kaydıyla birlikte yürütür. Aşağıdaki varsayımlar fonksiyon imzalarına dayanarak çıkarılmıştır.
-
----
-
-**[Aksiyom 1]:** Eğer `supabase` parametresi geçerli bir Supabase bağlantısı içermiyorsa, fonksiyon veritabanı işlemlerini başlatamaz ve hata fırlatır.
-
-**[Aksiyom 2]:** Eğer `Database` generic tip parametresi ile gerçek Supabase şeması uyuşmuyorsa, tip kontrolüCompile-time'da veya runtime'da hata verir.
-
-**[Aksiyom 3]:** Eğer `args` (MutateWithAuditArgs) parametresi gerekli mutation bilgilerini (hangi tablo, hangi işlem, hangi veri) içermiyorsa, mutation başarısız olur.
-
-**[Aksiyom 4]:** Eğer isteği yapan kullanıcı Admin yetkisine sahip değilse, `AdminPermissionError` fırlatılır ve mutation gerçekleştirilmez.
-
-**[Aksiyom 5]:** Eğer audit kaydı tutulacak sistem (audit tablosu/mekanizması) kullanılamıyorsa, asıl mutation işleminin akışı etkilenir (bilinmiyor: audit hata olursa transaction rollback olup olmadığı).
-
-**[Aksiyom 6]:** Fonksiyon `async` olduğu için, çağrııcı tarafın `await` ile sonucu beklemesi gerekir; aksi halde Promise未dönen değer kullanılmaya çalışılır.
-
----
-
-> **Not:** Modül gövdesi (fonksiyon implementasyonu) paylaşılmadığı için, audit mekanizmasının hangi tabloya yazdığı, transaction scope'u ve hata yönetimi detayları tam olarak bilinmemektedir.
 
 ---
 
@@ -71,6 +53,13 @@ Bu modül veritabanı mutation işlemlerini audit (denetim) kaydıyla birlikte y
 - `resource`: `string` — Yazma yetkisi olmayan kaydın (örn: tablonun) adı. Bu bilgi, hata mesajında kullanıcıya hangi kaynakta yetki problemi olduğu açıkça belirtilmesini sağlar.
 
 **Dönüş**: Yok (yapısal bir sınıftır, doğrudan değer döndürmez).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: @/lib/audit::logAdminAction
+- import: @/types/database.types::type { Database }
+- import: @supabase/supabase-js::type { SupabaseClient }
 
 ---
 
@@ -106,26 +95,6 @@ type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE'
 - **ic_degiskenler**:
   - *(yok — sadece super çağrısı ve this.name ataması var)*
 - **Dönüş**: yok *(constructor — instance döndürür)*
-
----
-
-### [N2_NASIL] AST Pointer: src/lib/admin/mutateWithAudit.ts::mutateWithAudit
-- **params**: `(supabase: SupabaseClient<Database>, args: MutateWithAuditArgs<R>)` — supabase: veritabanı istemcisi; args: mutasyon parametreleri (yetki, fonksiyon, audit bilgileri)
-- **ic_degiskenler**:
-  - `result` — `args.fn()` çağrısının dönüş değeri; mutasyon işleminin sonucunu tutar
-  - `e` — try/catch bloğundaki yakalanan hata nesnesi; audit log başarısız olduğunda console.error'a yazdırılır
-- **Dönüş**: `Promise<R>` — `args.fn()` sonucu (`result`) döndürülür
-
-**Not — Args içeriğine yapılan erişimler:**
-- `args.canWrite` — yazma yetkisi flag'i, false ise AdminPermissionError fırlatılır
-- `args.resource` — kaynak adı, hem hata mesajında hem `logAdminAction`'ın `table_name` parametresinde kullanılır
-- `args.fn()` — mutasyon işlemini yapan fonksiyon, `await` ile çağrılır
-- `args.auditedByEdge` — true ise audit loglama atlanır (edge tarafında loglanıyor demektir)
-- `args.rowPk` — değişiklik yapılan satırın birincil anahtarı
-- `args.action` — yapılan işlem türü (insert/update/delete vb.)
-- `args.before` — değişiklik öncesi satır verisi
-- `args.after` — değişiklik sonrası satır verisi
-- `args.comment` — opsiyonel yorum/metin
 
 ---
 

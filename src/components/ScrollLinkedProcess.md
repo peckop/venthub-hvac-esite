@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ScrollLinkedProcess.tsx
-skeleton_hash: c25957b394b2bf51
+skeleton_hash: e46f34b3024a1c91
 entity_hashes:
   func:ScrollLinkedProcess: 5a92a40886643dd7
   func:scrollTo: ee292d22ad2f3df1
   overview: a4bd4fd5da1416a4
   style_tokens: dffb84eddfacefbd
-generated_at: 2026-06-08T10:08:35Z
+generated_at: 2026-06-19T20:47:32Z
 ---
 
 ## Genel Bakış
@@ -50,6 +50,15 @@ Bu React tabanlı ScrollLinkedProcess modülü, aynı sayfa içindeki sıralı s
 **Parametreler**:
 - i: number — Kaydırma işleminin hedefi olan süreç adımının sıfır tabanlı sıra numarasını (indeks) tutan sayı tipi değer
 **Dönüş**: void, herhangi bir değer döndürmez, yalnızca kaydırma işlemini ve ilgili durum güncellemelerini gerçekleştirir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
+- import: react::React
+- import: react::useEffect
+- import: react::useRef
+- import: react::useState
 
 ---
 

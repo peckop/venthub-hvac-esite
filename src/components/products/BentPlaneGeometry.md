@@ -3,17 +3,17 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\products\BentPlaneGeometry.tsx
-skeleton_hash: 6c4c6bb1b0f73109
+skeleton_hash: a1afc85f10d943e1
 entity_hashes:
   func:BentPlaneGeometry: 925b96f61263e22a
   func:handleClick: bffc3b12eebc550c
-  overview: 8878452264c689a5
+  overview: d44152fef8988bad
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-12T10:22:31Z
+generated_at: 2026-06-19T20:48:16Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinde Three.js ve React-three-fiber kullanılarak oluşturulmuş, 3 boyutlu sahalarda eğilmiş düzlem geometrisi gösteren bir React bileşenini tanımlar. Bileşen, görsel bir dokuya sahip, konumlandırılabilir ve tıklama etkileşimine açık bir 3B nesne sunar. Temel olarak, ürün görselleştirmeleri için interaktif ve estetik bir 3B bileşen sağlamakla sorumludur.
+Bu modül, Three.js ve React-three-fiber kullanılarak oluşturulmuş, 3 boyutlu sahalarda eğilmiş düzlem geometrisi gösteren bir React bileşenini tanımlar. Bileşen, görsel bir dokuya sahip, konumlandırılabilir ve tıklama etkileşimine açık bir 3B nesne sunarak ürün görselleştirmeleri için interaktif ve estetik bir bileşen sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Geometri Bileşeni
@@ -27,9 +27,24 @@ Bükülmüş düzlem geometrisini Three.js sahasında oluşturup render eden ana
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, Three.js tabanlı eğilmiş düzlem geometrisi gösteren bir React bileşeni için aşağıdaki mimari varsayımlara dayanır.
+
+---
+
+**[Aksiyom 1]:** Eğer `image` parametresi sağlanmazsa, `textureLoader` kullanılarak doku oluşturulamaz ve bileşen geçersiz dokuya sahip geometri render eder.
+
+**[Aksiyom 2]:** Eğer `id` parametresi sağlanmazsa, bileşenin Three.js sahasında benzersiz tanımlaması yapılamaz ve potansiyel kimlik çakışmaları oluşur.
+
+**[Aksiyom 3]:** Eğer `BentPlaneMaterial` fonksiyonu çağrılamazsa (modül yüklenemezse), geometri için uygun materyal atanamaz ve nesne görünür hale gelmez.
+
+**[Aksiyom 4]:** Eğer `textureLoader` nesnesi oluşturulamazsa, `image` parametresinden doku yüklenemez ve geometri boş/varsayılan doku ile render edilir.
+
+**[Aksiyom 5]:** Eğer `position` parametresi geçersiz bir dizi formatındaysa (örn: 3 elemanlı değilse), Three.js sahasında beklenmeyen konumlandırma davranışı oluşur.
+
+---
+
+**Not:** Fonksiyon gövdeleri verilmediği için, `handleClick` işleyicisinin gerçekleştirdiği spesifik eylemler (örn: yönlendirme, durum güncelleme) hakkında mimari varsayım üretilememektedir. Sadece fonksiyon imzası ve modül sabitlerine dayalı varsayımlar tanımlanmıştır.
 
 ---
 
@@ -56,6 +71,25 @@ Bükülmüş düzlem geometrisini Three.js sahasında oluşturup render eden ana
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../utils/routes::Routes
+- import: @react-three/drei::shaderMaterial
+- import: @react-three/drei::useCursor
+- import: @react-three/drei::useScroll
+- import: @react-three/fiber::ThreeEvent
+- import: @react-three/fiber::extend
+- import: @react-three/fiber::type { ThreeElements
+- import: @react-three/fiber::useFrame
+- import: next/navigation::useRouter
+- import: react::React
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
+- import: three::type { Mesh, ShaderMaterial }
+
+---
+
 ## INTERFACES
 
 ### BentPlaneGeometryProps
@@ -71,48 +105,64 @@ Bükülmüş düzlem geometrisini Three.js sahasında oluşturup render eden ana
         uTime: 0,
         uTexture: new Texture(),
 ...`
+- **textureLoader** (new_expression) — `new TextureLoader()`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: BentPlaneGeometry.tsx::BentPlaneGeometry
-- **params**: `{ image, id, position = [0, 0, 0] }`
-  - `image` — texture image source URL, TextureLoader ile yüklenir
-  - `id` — ürün/kategori ID'si, tıklanınca navigasyonda kullanılır
-  - `position` — mesh'in 3D pozisyonu, varsayılan [0, 0, 0]
+- **params**: `image`, `id`, `position = [0, 0, 0]`
 - **ic_degiskenler**:
-  - `router` — Next.js useRouter hook'u, sayfa yönlendirmesi için
-  - `meshRef` — useRef<Mesh>(null), Three.js mesh elementine referans, scale animasyonu için
-  - `materialRef` — useRef<ShaderMaterial>(null), shader material'a referans, uniform güncellemeleri için
-  - `scroll` — useScroll() drei hook'u, sayfa kaydırma offset'ini takip eder
-  - `hovered` — useState(false), fare üstüne gelme durumu boolean state
-  - `texture` — useMemo(() => new TextureLoader().load(image), [image]), yüklenen Three.js Texture nesnesi
-  - `texture.colorSpace` — SRGBColorSpace değerine atanır, doğru renk uzayı için
-  - `handleClick` — tıklama olayı handler fonksiyonu
-- **Dönüş**: JSX element (mesh bileşeni)
+  - `router` — Next.js navigasyon hook'u, programatik sayfa yönlendirmesi için kullanılır
+  - `meshRef` — Three.js mesh referansı, 3D objeye erişim sağlar
+  - `materialRef` — Shader material referansı, shader uniform değerlerini güncellemek için kullanılır
+  - `scroll` — drei scroll hook'u, sayfa kaydırma offset'ini takip eder
+  - `hovered` — Boolean state, mouse'un 3D obje üzerinde olup olmadığını belirtir
+  - `setHover` — hovered state'ini güncellemek için setter fonksiyonu
+  - `texture` — useMemo ile oluşturulmuş doküman, image parametresinden yüklenen doku
+  - `geometry` — useMemo ile oluşturulmuş PlaneGeometry, 3x4 boyutunda 32x32 segmentli düzlem
+  - `handleClick` — Click event handler, obje tıklandığında çalışır
+- **Dönüş**: JSX (mesh elementi ve içinde bentPlaneMaterial component)
 
-### [N2_NASIL] AST Pointer: BentPlaneGeometry.tsx::useFrame callback
-- **params**: yok (anonim arrow function)
+### [N2_NASIL] AST Pointer: BentPlaneGeometry.tsx::useMemo_texture
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `meshRef.current` — varsa mesh referansı, erişim guard kontrolü yapılır
-  - `materialRef.current` — varsa material referansı, erişim guard kontrolü yapılır
-  - `materialRef.current.uniforms.uScrollOffset` — shader uniform'u, scroll offset değeri atanır
-  - `materialRef.current.uniforms.uHover` — shader uniform'u, hover durumu lerp ile interpolasyon yapılır
-  - `scroll.offset` — mevcut sayfa kaydırma offset değeri
-  - `hovered` — hover state boolean değeri, 1 veya 0'a lerp edilir
-  - `targetScale` — const, hovered durumuna göre 1.1 veya 1.0 ölçek değeri
-  - `meshRef.current.scale.x` — mesh'in X ekseni ölçeği, lerp ile animasyon
-  - `meshRef.current.scale.y` — mesh'in Y ekseni ölçeği, lerp ile animasyon
-- **Dönüş**: yok (her frame çağrılır, uniform ve scale güncelleme yan etkisi)
+  - `tex` — textureLoader.load(image) ile yüklenen doküman, SRGB renk uzayına ayarlanır
+- **Dönüş**: texture (Texture objesi)
 
-### [N3_NASIL] AST Pointer: BentPlaneGeometry.tsx::handleClick
-- **params**: `(e: ThreeEvent<MouseEvent>)` — Three.js farenin tıklama olayı
+### [N3_NASIL] AST Pointer: BentPlaneGeometry.tsx::useEffect_geometry_cleanup
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: cleanup fonksiyonu (geometry.dispose() çağrısı)
+
+### [N4_NASIL] AST Pointer: BentPlaneGeometry.tsx::geometry_dispose
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (geometry.dispose() yan etkisi var)
+
+### [N5_NASIL] AST Pointer: BentPlaneGeometry.tsx::useEffect_texture_cleanup
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: cleanup fonksiyonu (texture.dispose() çağrısı)
+
+### [N6_NASIL] AST Pointer: BentPlaneGeometry.tsx::texture_dispose
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (texture.dispose() yan etkisi var)
+
+### [N7_NASIL] AST Pointer: BentPlaneGeometry.tsx::useFrame_callback
+- **params**: `(_, delta)` — frame bilgisi ve delta zamanı
 - **ic_degiskenler**:
-  - `e` — ThreeEvent<MouseEvent> nesnesi, tıklama eventi
-  - `router` — component scope'tan kapanır, Next.js yönlendirme için
-  - `id` — prop'tan kapanır, category route oluşturmada kullanılır
-- **Dönüş**: yok (e.stopPropagation() ile olay yayılımını durdurur, router.push ile navigasyon yan etkisi)
+  - `clampedDelta` — delta değerinin 0.1 ile sınırlanmış hali, sekme arka plandayken büyük sıçramaları önler
+  - `lerpFactor` — frame-independent yumuşatma faktörü, ~60 FPS'de 0.1 hızla eşleşecek şekilde ayarlanmış
+  - `targetScale` — hover durumuna göre hedef ölçek (1.0 veya 1.1)
+- **Dönüş**: yok (side effect: meshRef ve materialRef değerlerini günceller)
+
+### [N8_NASIL] AST Pointer: BentPlaneGeometry.tsx::handleClick
+- **params**: `e: ThreeEvent<MouseEvent>` — Three.js mouse event objesi
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (router.push ile navigasyon yan etkisi var)
 
 ---
 

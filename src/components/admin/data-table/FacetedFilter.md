@@ -8,7 +8,7 @@ entity_hashes:
   func:FacetedFilter: 03176f4a9f27a70c
   overview: d3bf186543b0d057
   style_tokens: 66a24146db2b557f
-generated_at: 2026-06-13T15:00:58Z
+generated_at: 2026-06-19T20:47:00Z
 ---
 
 ## Genel Bakış
@@ -35,13 +35,6 @@ Bu modül için fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzasına
 
 ---
 
-**Notlar:**
-- Fonksiyon gövdesi verilmediğinden, bileşenin iç mantığı (hangi HTML elemanlarını render ettiği, hangi event handler'ları bağladığı) **bilinmiyor**.
-- `FacetedFilterProps` tip tanımı kaynakta verilmediğinden, `facet` ve `selected`'ın iç yapısı **bilinmiyor**.
-- Modül sabitleri (sabit eşik değerleri, sabit listeler vb.) belirtilmemiştir.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### FacetedFilter
@@ -56,6 +49,17 @@ Bu modül için fonksiyon gövdesi verilmemiştir; yalnızca fonksiyon imzasına
 - clearLabel: `string` — Filtreleri temizleme butonunda görüntülenecek metin (ör. "Temizle", "Tümünü kaldır").
 
 **Dönüş**: `ReactNode` — Bileşen, Radix UI Popover içinde filtreleme arayüzünü oluşturan React JSX elemanlarını döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../utils/adminUi::adminButtonSecondaryClass
+- import: ./types::type { DataTableFacet }
+- import: @radix-ui/react-popover
+- import: lucide-react::Check
+- import: lucide-react::Filter
+- import: lucide-react::X
+- import: react::type { ReactNode }
 
 ---
 

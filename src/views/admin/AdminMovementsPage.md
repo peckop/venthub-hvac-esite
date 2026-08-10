@@ -8,7 +8,7 @@ entity_hashes:
   func:AdminMovementsPage: 1f83a4be333ac82c
   overview: 19839cf14aa3d647
   style_tokens: 5e9d7754f938f018
-generated_at: 2026-06-13T18:55:40Z
+generated_at: 2026-06-19T20:48:51Z
 ---
 
 ## Genel Bakış
@@ -62,6 +62,17 @@ Bu modül, AdminMovementsPage React bileşeninin doğru çalışması için aşa
 Bu bileşen `React.FC` tipi ile tanımlanmış olup herhangi bir props parametresi almamaktadır. Boş bir props nesnesi (`{}`) ile çağrılır.
 
 **Dönüş**: `React.FC` tipinde bir React functional component'i olup, JSX elementi (React.ReactNode) döndürür. Sayfa yapısını oluşturan başlık ve Suspense içindeki tablo bileşenlerini içeren bir React bileşen ağacı 반환ır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminSkeleton::AdminSkeleton
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/adminUi::adminSectionTitleClass
+- import: ../../utils/adminUi::adminSubtitleClass
+- import: ./MovementsTableBody::MovementsTableBody
+- import: react::React
+- import: react::Suspense
 
 ---
 

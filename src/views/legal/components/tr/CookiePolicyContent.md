@@ -8,7 +8,7 @@ entity_hashes:
   func:CookiePolicyContentTr: 0284b5d72d7677e5
   overview: 7744e91e555544e5
   style_tokens: 6460a848de07bdf3
-generated_at: 2026-06-16T11:56:27Z
+generated_at: 2026-06-19T20:50:50Z
 ---
 
 ## Genel Bakış
@@ -25,27 +25,9 @@ Bu modül, VentHub platformunun Türkçe çerez politikası sayfası için gerek
 
 ---
 
-**Not:** Modül yapısı son derece basittir — tek bir sunucu tarafı (stateless) React bileşeninden oluşur. Harici bağımlılığı sadece React kütüphanesidir; herhangi bir API çağrısı, state yönetimi veya alt bileşen kullanımı bulunmamaktadır.
-
----
-
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, VentHub HVAC uygulamasının yasal sayfalarında görüntülenen statik bir bileşen (content component) olup, cookie policy içeriğini sunar.
-
----
-
-**[Aksiyom 1]:** Eğer `lang` prop'u (`string` tipinde) sağlanmazsa, bileşen React tarafından derleme/zaman hatası verir; bileşen düzgün render edilemez.
-
-**[Aksiyom 2]:** Eğer `lang` prop'u geçerli bir string değeri içermiyorsa (örn. `undefined`, `null`), bileşen beklenmeyen davranış gösterebilir veya boş/eksik içerik döndürür.
-
-**[Aksiyom 3]:** Bileşen statik cookie policy içeriği sunduğu için, bileşen içinde API çağrısı veya dış bağımlılık bulunduğu varsayılmaz; tüm içerik bileşen içinde tanımlıdır.
-
-**[Aksiyom 4]:** Bileşenin adındaki `Tr` soneki, bu bileşenin **Türkçe** dilinde cookie policy içeriğini görüntülediğini belirtir; `lang` prop'u ile dil seçimi arasında bir bağlantı olup olmadığı bilinmemektedir (fonksiyon gövdesinde doğrulanmamıştır).
-
----
-
-> **Not:** Bu dosya `source_type: doc` olarak işaretlendiğinden, bileşenin gerçek kod gövdesi analiz edilmemiştir. Yukarıdaki aksiyomlar yalnızca fonksiyon imzasından türetilmiştir.
 
 ---
 
@@ -66,6 +48,18 @@ Bu modül, VentHub HVAC uygulamasının yasal sayfalarında görüntülenen stat
 ## İTHALATLAR (IMPORTS)
 - import: @/config/legal::legalConfig
 - import: react::React
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: src/views/legal/components/tr/CookiePolicyContent.tsx::CookiePolicyContentTr
+- **params**: `{ lang: string }` — component props'u olarak tanımlı; fonksiyon gövdesinde kullanılmıyor
+- **ic_degiskenler**: yok (hiçbir local değişken tanımlanmamış, sadece JSX return ediliyor)
+- **Dict Access**:
+  - `legalConfig.sellerEmail` — `@/config/legal` import'undan gelen config nesnesinden iletişim e-posta adresi çekilir, 5. section'daki `<strong>` içinde render edilir
+  - `legalConfig.lastUpdated` — `@/config/legal` import'undan gelen config nesnesinden politika güncelleme tarihi çekilir, 6. section'daki `<strong>` içinde render edilir
+- **Dönüş**: JSX — React Fragment (`<>`) içinde 6 adet `<section>` elementi; çerez politikasının Türkçe metin içeriğini (tanım, türler, üçüncü taraf çerezleri, yönetim, iletişim, yürürlük tarihi) statik olarak render eden React element
 
 ---
 

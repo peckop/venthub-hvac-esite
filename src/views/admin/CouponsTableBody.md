@@ -3,15 +3,15 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\CouponsTableBody.tsx
-skeleton_hash: ebe333943248b16d
+skeleton_hash: 7fe61328927e5abd
 entity_hashes:
   func:CouponsTableBody: 23d12459633c7a42
-  func:couponsFetcher: 2b7ce5f5a00d38c1
-  func:dbToUi: 33bde355b0b8b0b0
-  func:isAllowedCouponType: f90f52ac15528f1b
-  overview: ec7dd7992ad4848f
-  style_tokens: 56db14377b0ff48f
-generated_at: 2026-06-13T15:28:57Z
+  func:couponsFetcher: 07d4dca875cd8885
+  func:dbToUi: c92f28b112f4d513
+  func:isAllowedCouponType: af4b48320744b9de
+  overview: b965208a3d823556
+  style_tokens: f68ed89694927157
+generated_at: 2026-06-19T20:50:07Z
 ---
 
 ## Genel Bakış
@@ -34,30 +34,45 @@ Bu grup, kupon tablosunun gövdesini oluşturan ana React fonksiyonel bileşenid
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kupon listeleme ve filtreleme职能ini yerine getiren bir tablo bileşenidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir:
+Bu modül, kupon listeleme ve filtreleme fonksiyonunu yerine getiren bir tablo bileşenidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir:
 
-**[Aksiyom 1]:** Eğer Supabase client (`Database` tipi ile) düzgün başlatılmamış ve kupon tablosuna erişilebilir durumda değilse, `couponsFetcher` fonksiyonu Promise reddetme (rejection) ile sonuçlanır ve kuponlar hiç yüklenemez.
+**[Aksiyom 1]:** Eğer Supabase client (`Database` tipi ile) düzgün başlatılmamış ve kupon tablosuna erişilebilir durumda değilse, `couponsFetcher` fonksiyonu Promise reddetme ile sonuçlanır ve kuponlar hiç yüklenemez.
 
 **[Aksiyom 2]:** Eğer Supabase `Database` tipindeki şema, `DbCouponRow` yapısının beklediği alanları (en azından filtre ve dönüşüm için gerekli alanları) içermiyorsa, `couponsFetcher` çalışma zamanında tip uyumsuzluğu hatası verir veya `dbToUi` beklenmeyen alan erişimiyle başarısız olur.
 
-**[Aksiyom 3]:** Eğer `FetchParams` yapısı, `couponsFetcher` içindeki Supabase sorgu parametreleriyle (ör. sayfalama, filtre, sıralama) uyumlu değilse, veriler eksik/yanlış getirilir veya sorgu hata verir.
+**[Aksiyom 3]:** Eğer `FetchParams` yapısı, `couponsFetcher` içindeki Supabase sorgu parametreleriyle uyumlu değilse, kupon verisi filtrelenemez veya sayfalanamaz, bu da bileşenin boş veya hatalı veri göstermesine neden olur.
 
-**[Aksiyom 4]:** Eğer `DbCouponRow` yapısı `dbToUi` fonksiyonunun beklediği alanları (dönüştürme için gerekli tüm alanlar) içermiyorsa, UI katmanına geçiş sırasında veri kaybı veya `undefined`/`null` değer hatası oluşur.
+---
 
-**[Aksiyom 5]:** Eğer `isAllowedCouponType` fonksiyonunun dayandığı izin verilen kupon tipleri listesi tanımsız veya boş bırakılmışsa, tüm tipler reddedilebilir veya tüm tipler kabul edilebilir — hangisi olduğu uygulama mantığına bağlıdır, modül içinden bilinmiyor.
+## AXIOMS – Mimari Varsayımlar
 
-**[Aksiyom 6]:** Eğer `CouponsTableBody` bileşeni, üst bileşen tarafından `CouponRow[]` tipinde veri almıyorsa veya veri henüz yüklenmemiş (yükleme durumunda) ise bileşenin boş/bozuk render etmesi beklenir — bu durumun üst bileşen tarafından ele alınması gerekir.
+Bu modül, veritabanı kupon verilerini UI formatına dönüştürerek admin panelinde listeleyen bir React bileşenidir. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir:
+
+**[Aksiyom 1 - Kupon Tipi Doğrulama Kapsamı]:** Eğer `isAllowedCouponType` tarafından kabul edilmeyen bir kupon tipi `dbToUi` fonksiyonuna girerse, beklenmeyen bir UI dönüşümü veya hata oluşur.
+
+**[Aksiyom 2 - Veritabanı Şema Uyumluluğu]:** Eğer `DbCouponRow` tipi ile Supabase veritabanındaki gerçek kupon tablosu yapısı uyumlu değilse, `couponsFetcher` çalışma zamanında hata fırlatır veya eksik alanlarla sonuç döner.
+
+**[Aksiyom 3 - Supabase Bağlantı Zorunluluğu]:** Eğer `couponsFetcher` fonksiyonuna geçersiz veya yapılandırılmamış bir `SupabaseClient<Database>` nesnesi verilirse, kupon verileri çekilemez ve `FetchResult<CouponRow>` geçersiz bir sonuç döner.
+
+**[Aksiyom 4 - Kupon Oluşturma Şeması Varlığı]:** Eğer `createCouponSchema` modülde tanımlı değilse, kupon oluşturma/flitreleme işlemleri için doğrulama yapılamaz ve invalid veri UI'a sızabilir.
+
+**[Aksiyom 5 - DB-to-UI Alan Eşleşme Zorunluluğu]:** Eğer `DbCouponRow` ile `CouponRow` tipleri arasındaki alan dönüşümleri tam eşleşmiyorsa (örn: `dbToUi` mapping'i eksik alan bırakıyorsa), `CouponsTableBody` bileşeni render sırasında hata verir veya eksik veri gösterir.
+
+**[Aksiyom 6 - FetchParams Yapısı]:** Eğer `couponsFetcher`'a geçilen `_params: FetchParams` yapısı Supabase sorgusu tarafından beklenen filtreleme/sayfalama parametrelerini içermiyorsa, istenen kayıt kümesiyle sonuç dönmez.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### isAllowedCouponType
-**Ne yapar**: Verilen bir değerin (`x`) izin verilen kupon türlerinden biri olup olmadığını kontrol eden bir **type guard** fonksiyonudur.
-**Nasıl yapar**: Fonksiyon, `x` parametresinin `'percent'` veya `'fixed'` literal değerlerine eşit olup olmadığını test eder. Eşleşme durumunda `true` döndürür ve TypeScript'e `x` parametresinin `AllowedCouponType` tipi olduğunu guarantee eder (bu, bir *type narrowing* işlemidir).
+**Ne yapar**: Verilen bir değerin, izin verilen kupon türlerinden biri olup olmadığını doğrular. Bu bir "type guard" fonksiyonudur ve TypeScript'in type narrowing özelliğini kullanarak TypeScript derleyicisine, koşul sağlanırsa `x` parametresinin `AllowedCouponType` türünde olduğunu bildirir.
+
+**Nasıl yapar**: Fonksiyon, gelen `x` parametresinin `'percent'` veya `'fixed'` string değerlerinden birine eşit olup olmadığını basit bir eşitlik kontrolü ile test eder. Eşleşme durumunda `true` döner, aksi halde `false` döner. Bu kontrol, TypeScript'te bir literal union tipini doğrulamak için tipik bir kalıp kullanır.
+
 **Parametreler**:
-- x: unknown — Kontrol edilecek değer. Herhangi bir tipte olabilir ancak fonksiyon sadece belirli string değerleri kabul eder.
-**Dönüş**: boolean — Değer `'percent'` veya `'fixed'` ise `true`, aksi halde `false`. Fonksiyonun dönüş tipi teknik olarak `x is AllowedCouponType` olarak belirtilmiştir; bu, bir type guard olduğunu gösterir.
+- `x`: `unknown` — Doğrulanacak değer. Fonksiyon, bu değerin `AllowedCouponType` (muhtemelen `'percent' | 'fixed'` union tipi) olup olmadığını test eder.
+
+**Dönüş**: `x is AllowedCouponType` — Boolean döner. `true` dönüşü, `x` parametresinin aslında `AllowedCouponType` tipinde olduğunu garanti eder.
 
 ### dbToUi
 **Ne yapar**: Veritabanından (`DbCouponRow`) gelen bir kupon satırını, arayüz tarafında kullanılacak olan (`CouponRow`) formata dönüştürür.
@@ -79,6 +94,42 @@ Bu modül, kupon listeleme ve filtreleme职能ini yerine getiren bir tablo bile�
 **Nasıl yapar**: Fonksiyonun gövdesi verilmemiştir, ancak isminden ve dönüş tipinden (`React.FC`), bir React Fonksiyonel Bileşeni olduğu anlaşılmaktadır. Bu bileşen muhtemelen `couponsFetcher` hook'unu kullanarak verileri çeker ve her bir kupon satırı için bir `<tr>` veya benzeri bir tablo satırı oluşturur.
 **Parametreler**: Parametre almamaktadır (React bileşenleri props alabilir ancak bu tanımda belirtilmemiştir).
 **Dönüş**: React.FC — React Fonksiyonel Bileşeni. Bileşenin render edeceği JSX'i döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../components/admin/AdminEmptyState::AdminEmptyState
+- import: ../../components/admin/AdminToolbar::AdminToolbar
+- import: ../../components/admin/ExportMenu::ExportMenu
+- import: ../../components/admin/data-table/BulkBar::BulkBar
+- import: ../../components/admin/data-table/BulkBar::type BulkAction
+- import: ../../components/admin/data-table/DataTableKit::DataTableKit
+- import: ../../components/admin/data-table/FacetedFilter::FacetedFilter
+- import: ../../components/admin/data-table/types::type { AdminColumn, DataTableFacet }
+- import: ../../hooks/useAdminTable::type FetchParams
+- import: ../../hooks/useAdminTable::type FetchResult
+- import: ../../hooks/useAdminTable::useAdminTable
+- import: ../../hooks/useRole::useRole
+- import: ../../hooks/useTenant::useTenant
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/datetime::formatDateTime
+- import: ../../i18n/format::formatCurrency
+- import: ../../lib/ensureSessionFresh::ensureSessionFresh
+- import: ../../types/database.types::type { Database }
+- import: @/lib/admin/mutateWithAudit::AdminPermissionError
+- import: @/lib/admin/mutateWithAudit::mutateWithAudit
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @supabase/supabase-js::type { SupabaseClient }
+- import: lucide-react::SearchX
+- import: lucide-react::Ticket
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useMemo
+- import: react::useRef
+- import: react::useState
+- import: sonner::toast
+- import: zod::z
 
 ---
 
@@ -119,62 +170,40 @@ type AllowedCouponType = 'percent' | 'fixed'
 
 ---
 
+## SABİTLER
+- **createCouponSchema** (call) — `z.object({
+  code: z
+    .string()
+    .min(3, { message: 'admin.coupons.v...`
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/admin/CouponsTableBody.tsx`::isAllowedCouponType
-- **params**: `(x: unknown)`
-- **ic_degiskenler**: (yok — parametre üzerinde doğrudan kontrol yapılır)
-- **Dönüş**: `boolean` — type guard; `x`'in `'percent'` veya `'fixed'` değerlerinden biri olup olmadığını test eder
+### [N1_NASIL] AST Pointer: CouponsTableBody.tsx::isAllowedCouponType
+- **params**: (x: unknown)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: boolean — x değerinin 'percent' veya 'fixed' olup olmadığını kontrol eden type guard
 
----
+### [N2_NASIL] AST Pointer: CouponsTableBody.tsx::dbToUi
+- **params**: (row: DbCouponRow)
+- **ic_degiskenler**: (yok — doğrudan return edilen object literal içinde tüm dönüşümler yapılır)
+- **Dönüş**: CouponRow — Veritabanı satırını UI formatına dönüştürülmüş kupon nesnesi
 
-### [N2_NASIL] AST Pointer: `src/views/admin/CouponsTableBody.tsx`::dbToUi
-- **params**: `(row: DbCouponRow)`
+### [N3_NASIL] AST Pointer: CouponsTableBody.tsx::couponsFetcher
+- **params**: (supabase: SupabaseClient<Database>, _params: FetchParams)
 - **ic_degiskenler**:
-  - `row.id` — DB'den gelen kupon benzersiz kimliği, `CouponRow.id`'ye doğrudan eşlenir
-  - `row.code` — DB'den gelen kupon kodu, `CouponRow.code`'a doğrudan eşlenir
-  - `row.discount_type` — DB'deki indirim türü (`'percentage'` vs diğer); `'percentage'` ise `'percent'`, aksi halde `'fixed'` değerine dönüştürülür
-  - `row.discount_value` — DB'deki indirim değeri (string/numeric); `Number()` ile sayıya çevrilerek `value`'ye atanır
-  - `row.valid_from` — geçerlilik başlangıç tarihi; `?? null` ile nullish coalescing uygulanır → `starts_at`
-  - `row.valid_until` — geçerlilik bitiş tarihi; `?? null` ile nullish coalescing uygulanır → `ends_at`
-  - `row.is_active` — DB'deki aktiflik durumu (boolean veya truthy); `!!` ile kesin boolean'a çevrilir → `active`
-  - `row.usage_limit` — kupon kullanım limiti; `?? null` ile nullish coalescing uygulanır → `usage_limit`
-  - `row.used_count` — kuponun kaç kez kullanıldığı; `?? 0` ile varsayılan 0 atanır → `used_count`
-  - `row.created_at` — kuponun oluşturulma zaman damgası → `created_at`
-- **Dönüş**: `CouponRow` — DB satırını UI formatına dönüştüren mapped obje; `{ id, code, type, value, starts_at, ends_at, active, usage_limit, used_count, created_at }`
+  - `data` — Supabase sorgusundan dönen kupon verileri
+  - `error` — Supabase sorgusu hata nesnesi
+  - `rows` — dbToUi ile dönüştürülmüş kupon satırları dizisi
+- **Dönüş**: Promise<FetchResult<CouponRow>> — Kupon listesi ve toplam eşleşme sayısı
 
----
-
-### [N3_NASIL] AST Pointer: `src/views/admin/CouponsTableBody.tsx`::couponsFetcher
-- **params**: `(supabase: SupabaseClient<Database>, _params: FetchParams)`
+### [N4_NASIL] AST Pointer: CouponsTableBody.tsx::CouponsTableBody
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `data` — `supabase.from('coupons').select(...)` sorgusundan dönen ham satır verisi; `null` olabilir
-  - `error` — Supabase sorgu hatası; `throw error` ile yukarı fırlatılır
-  - `rows` — `(data || []).map((d) => dbToUi(d as DbCouponRow))` ile dönüştürülmüş `CouponRow[]` dizisi; boş dizi fallback'i uygulanır
-- **Kullanılan dış bağımlılıklar**: `ensureSessionFresh()` — oturum tazeliği kontrolü (sorgudan önce çağrılır)
-- **API çağrıları**: `supabase.from('coupons').select('id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at').order('created_at', { ascending: false }).limit(200)`
-- **Dönüş**: `Promise<FetchResult<CouponRow>>` — `{ rows: CouponRow[], totalMatched: number }` objesi; `totalMatched` her zaman `rows.length`'e eşittir (sayfalama yapılmadığından)
-
----
-
-### [N4_NASIL] AST Pointer: `src/views/admin/CouponsTableBody.tsx`::CouponsTableBody (toggleActive handler)
-- **params**: `(row: CouponRow)`
-- **ic_degiskenler**: (yerel değişken yok — tüm mantık `try/catch` ve closure değişkenleri üzerindendir)
-- **Closure değişkenleri**:
-  - `hasWriteAccess` — boolean, kuponlar üzerinde yazma izni olup olmadığını belirler; `!hasWriteAccess` ise `toast.error` ile hata gösterilir
-  - `toast` — `sonner` kütüphanesinden import edilen toast bildirim fonksiyonu
-  - `t` — i18n çeviri fonksiyonu; `admin.coupons.toasts.noPermission`, `admin.coupons.toasts.activated`, `admin.coupons.toasts.deactivated` anahtarları kullanılır
-  - `mutateWithAudit` — audit loglu mutasyon yardımcısı; `'coupons'` resource'u, `'UPDATE'` action'ı ile çağrılır
-  - `supabaseBrowserClient` — tarayıcı tarafı Supabase istemcisi; `mutateWithAudit`'e ve inner `fn`'deki `update` sorgusuna verilir
-  - `table` — DataTable instance; `table.reload()` ile veri yenilenir
-- **API çağrıları**: `mutateWithAudit(supabaseBrowserClient, { resource: 'coupons', canWrite: hasWriteAccess, action: 'UPDATE', rowPk: row.id, before: { is_active: row.active }, after: { is_active: !row.active }, auditedByEdge: false, fn: ... })`
-- **Inner fn API çağrısı**: `supabaseBrowserClient.from('coupons').update({ is_active: !row.active }).eq('id', row.id)`
-- **Hata yönetimi**: `catch (e)` bloğu; `e instanceof AdminPermissionError` kontrolü ile `noPermission` veya `statusFailed` toast gösterilir
-- **Dönüş**: `void` — yan etki: toast bildirimi + kupon durumu toggling + tablo reload
-
----
-
-### [N5_NASIL] AST Pointer: `src/views/admin/C
+  - `ch` — Supabase real-time kanalı, kupon tablosundaki değişiklikleri dinler
+  - `refetchTimer` — useRef ile oluşturulan timer, yeniden yükleme için debounce yapar
+- **Dönüş**: React.FC — Kupon tablosunu gösteren React bileşeni (yan etkiler: Supabase real-time aboneliği, toast bildirimleri, veritabanı güncellemeleri)
 
 ---
 
@@ -186,7 +215,6 @@ graph TD
     CouponsTableBody_tsx__couponsFetcher["couponsFetcher"]
     CouponsTableBody_tsx__dbToUi["dbToUi"]
     CouponsTableBody_tsx__isAllowedCouponType["isAllowedCouponType"]
-    CouponsTableBody_tsx__CouponsTableBody --> CouponsTableBody_tsx__isAllowedCouponType
     CouponsTableBody_tsx__couponsFetcher --> CouponsTableBody_tsx__dbToUi
 ```
 
@@ -217,7 +245,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-500`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-emerald-500/10`, `bg-gradient-to-r`, `bg-slate-500`, `bg-slate-500/10`, `bg-slate-800`, `bg-white/5`, `border-cyan-500/20`, `border-emerald-500/20`, `border-white/10`, `border-white/5`, `from-cyan-500`, `hover:bg-white/5`
-- **Layout:** `flex`, `flex-col`, `from-cyan-500`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-5`, `grid`, `grid-cols-1`, `h-1`, `h-1.5`, `h-4`, `h-42px`, `h-full`
-- **Varyant/Responsive:** `:`, `focus-visible:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `$`, `${adminButtonPrimaryClass`, `${adminCardPaddedClass`, `${adminInputClass`, `${hasWriteAccess`, `${r.active`, `${r.type`, `:`, `===`, `border`, `cursor-default`, `cursor-pointer`, `duration-1000`, `focus-visible:ring-cyan-500/20`, `font-black`
+- **Renkler:** `bg-cyan-500`, `bg-cyan-500/10`, `bg-emerald-500`, `bg-emerald-500/10`, `bg-gradient-to-r`, `bg-slate-500`, `bg-slate-500/10`, `bg-slate-800`, `bg-white/5`, `border-cyan-500/20`, `border-emerald-500/20`, `border-rose-500/50`, `border-white/10`, `border-white/5`, `focus:border-rose-500/50`
+- **Layout:** `flex`, `flex-col`, `from-cyan-500`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-5`, `grid`, `grid-cols-1`, `h-1`, `h-1.5`, `h-10`, `h-4`, `h-full`
+- **Varyant/Responsive:** `:`, `focus-visible:`, `focus:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `$`, `${adminButtonPrimaryClass`, `${adminCardPaddedClass`, `${adminInputClass`, `${adminSelectClass`, `${errors.code`, `${errors.ends_at`, `${errors.starts_at`, `${errors.type`, `${errors.usage_limit`, `${errors.value`, `${hasWriteAccess`, `${r.active`, `${r.type`, `:`

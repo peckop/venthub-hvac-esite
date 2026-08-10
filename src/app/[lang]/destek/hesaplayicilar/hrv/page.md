@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\destek\hesaplayicilar\hrv\page.tsx
-skeleton_hash: 7b7606be1adbdf90
+skeleton_hash: 13bcdfaec4698e95
 entity_hashes:
   func:Page: 3f2298054a9d2ba4
   overview: 92457a7c21ad9373
   style_tokens: 9144ece4bffe7964
-generated_at: 2026-06-08T10:08:11Z
+generated_at: 2026-06-19T20:46:14Z
 ---
 
 ## Genel Bakış
@@ -42,6 +42,12 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 Bu fonksiyon herhangi bir parametre almamaktadır. Sıfır argümanlı bir React fonksiyonel bileşenidir.
 
 **Dönüş**: JSX elementi döndürür. Suspense ile sarılmış `PageComponent` bileşenini veya yükleme sırasında fallback olarak animasyonlu bir spinner div'ini render eder. Doğrudan return ifadesi ile JSX ağacı dışa aktarılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../../../../views/calculators/HRVCalcPage::PageComponent
+- import: react::Suspense
 
 ---
 
