@@ -5,7 +5,8 @@ import { buildCategoryBreadcrumb } from '../breadcrumbUtils'
 
 // Mock dependencies
 vi.mock('../categoryHelpers', () => ({
-  getCategoryDisplayName: vi.fn((cat: DomainCategory) => cat.name || cat.slug)
+  getCategoryDisplayName: vi.fn((cat: DomainCategory) => cat.name || cat.slug),
+  getLocalizedCategorySlug: vi.fn((cat: DomainCategory) => cat.slug)
 }))
 
 vi.mock('../../utils/routes', () => ({
@@ -17,6 +18,7 @@ vi.mock('../../utils/routes', () => ({
 describe('buildCategoryBreadcrumb', () => {
   const parentCategory: DomainCategory = {
     id: '1',
+    tenant_id: 'd3b07384-d113-495f-a558-8c38634e0000',
     slug: 'hvac',
     name: 'HVAC Systems',
     description: '',
@@ -40,6 +42,7 @@ describe('buildCategoryBreadcrumb', () => {
 
   const category: DomainCategory = {
     id: '2',
+    tenant_id: 'd3b07384-d113-495f-a558-8c38634e0000',
     slug: 'air-curtains',
     name: 'Air Curtains',
     description: '',

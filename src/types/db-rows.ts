@@ -81,9 +81,28 @@ export type LocalizedCategoryMetadata = {
   en?: CategoryMetadata;
 } & CategoryMetadata;
 
+/**
+ * Yerelleştirilmiş ürün açıklaması. Kolon 2026-08-11'de `products` tablosuna
+ * eklendi; `database.types.ts` henüz yeniden üretilmediği için burada
+ * yapısal olarak tanımlanır (generated dosya elle düzenlenmez).
+ */
+export type ProductDescriptionI18n = {
+  tr?: string | null;
+  en?: string | null;
+} | null;
+
 // Common Table Row Aliases
-export type DbProduct = Omit<Tables['products']['Row'], 'technical_specs'> & {
+// NOT: family_id / description_i18n her zaman Omit+re-add ile tanımlanır — bu,
+// database.types.ts henüz yeniden üretilmemişken (alanlar Row'da yok) VEYA
+// üretildikten sonra (alanlar Row'da var, description_i18n jenerik Json tipinde)
+// her iki durumda da güvenli çalışır; ham intersection (`&`) generated tipte
+// aynı alan zaten varsa tip çakışmasına yol açabilirdi.
+export type DbProduct = Omit<Tables['products']['Row'], 'technical_specs' | 'family_id' | 'description_i18n'> & {
   technical_specs: Record<string, Json> | null;
+  /** Ürün ailesi kimliği (varyant gruplama). */
+  family_id: string | null;
+  /** Çok dilli ürün açıklaması ({tr,en}). */
+  description_i18n: ProductDescriptionI18n;
 };
 
 // Refine DbCategory to ensure 'name' and 'description' are strings, and metadata is typed
@@ -177,7 +196,7 @@ export interface DbFtsSearchResult extends DbProduct {
   is_fuzzy_match?: boolean;
 }
 
-export interface DbAdminSearchResult extends DbProduct {
+export interface DbAdminSearchResult extends Omit<DbProduct, 'purchase_price'> {
   rank: number;
   total_count: number;
   purchase_price: number | null;

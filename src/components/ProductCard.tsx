@@ -34,10 +34,12 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
   const Routes = useLocalizedRoutes()
   const isList = layout === 'list'
   const { addToCart } = useCart()
+  const quoteMode = hidePrice || product.price == null || Number(product.price) <= 0
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (quoteMode) return
     addToCart(product)
   }
 
@@ -68,20 +70,22 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             </h3>
             <div className="mt-2 flex items-baseline gap-3">
               <div className="text-xl font-bold text-primary-navy">
-                {hidePrice ? (
+                {quoteMode ? (
                   <span className="text-sm font-medium text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
                 ) : (
-                  formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
+                  formatCurrency(product.price ?? 0, lang, { maximumFractionDigits: 0 })
                 )}
               </div>
-              {!hidePrice && <span className="text-xs text-steel-gray font-medium uppercase">{t('pdp.vatIncluded') || 'KDV Dahil'}</span>}
+              {!quoteMode && <span className="text-xs text-steel-gray font-medium uppercase">{t('pdp.vatIncluded') || 'KDV Dahil'}</span>}
             </div>
           </div>
 
-          <button 
-            onClick={handleAddToCart} 
-            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-11 h-11 rounded-xl bg-primary-navy text-white flex items-center justify-center hover:bg-secondary-blue transition-transform shadow-md active:scale-95 ml-4 flex-shrink-0"
-            title={t('common.addToCart') || 'Sepete Ekle'}
+          <button
+            onClick={handleAddToCart}
+            disabled={quoteMode}
+            aria-disabled={quoteMode}
+            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-11 h-11 rounded-xl bg-primary-navy text-white flex items-center justify-center hover:bg-secondary-blue transition-transform shadow-md active:scale-95 ml-4 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-navy"
+            title={quoteMode ? (t('common.requestQuote') || 'Teklif İste') : (t('common.addToCart') || 'Sepete Ekle')}
           >
             <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v16m8-8H4" />
@@ -138,18 +142,20 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
           <div className="mt-auto pt-3 border-t border-light-gray flex items-center justify-between">
             <div className="flex flex-col">
               <div className="text-lg font-bold text-primary-navy tracking-tight">
-                {hidePrice ? (
+                {quoteMode ? (
                   <span className="text-xs font-semibold text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
                 ) : (
-                  formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
+                  formatCurrency(product.price ?? 0, lang, { maximumFractionDigits: 0 })
                 )}
               </div>
             </div>
-            
-            <button 
-              onClick={handleAddToCart} 
-              className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-9 h-9 rounded-lg bg-primary-navy text-white flex items-center justify-center transition-transform hover:bg-secondary-blue hover:shadow-lg active:scale-95"
-              title={t('common.addToCart') || 'Sepete Ekle'}
+
+            <button
+              onClick={handleAddToCart}
+              disabled={quoteMode}
+              aria-disabled={quoteMode}
+              className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-9 h-9 rounded-lg bg-primary-navy text-white flex items-center justify-center transition-transform hover:bg-secondary-blue hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-navy"
+              title={quoteMode ? (t('common.requestQuote') || 'Teklif İste') : (t('common.addToCart') || 'Sepete Ekle')}
             >
               <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v16m8-8H4" />

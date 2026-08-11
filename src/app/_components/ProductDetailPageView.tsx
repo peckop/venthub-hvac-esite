@@ -87,6 +87,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     return { mainCategory: mc, subCategory: sc }
   }, [product, categories])
 
+  // Satış fiyatı olmayan (null/0) ürünlerde vitrin "Teklif Alın" moduna geçer;
+  // kategori bazlı hide_price bayrağı da aynı moda düşürür.
+  const quoteMode = Boolean((mainCategory?.metadata as CategoryMetadata | null)?.hide_price) ||
+    product == null || product.price == null || Number(product.price) <= 0
+
   const toggleSpecSection = (sectionKey: string) => {
     setOpenSpecSections(prev =>
       prev.includes(sectionKey)
@@ -280,7 +285,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   }
 
   const canonicalUrl = `${origin}${Routes.product(product.slug!)}`
-  const metaDesc = product.description || t('pdp.descFallback')
+  const metaDesc = product.description_i18n?.[lang] || product.description || t('pdp.descFallback')
 
   return (
     <div className="min-h-screen bg-slate-50/30">
@@ -412,23 +417,25 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
-                      {(mainCategory?.metadata as CategoryMetadata | null)?.hide_price ? (
+                      {quoteMode ? (
                         <span className="text-xl text-industrial-gray font-bold">{t('pdp.techQuote')}</span>
                       ) : (
-                        formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
+                        formatCurrency(product.price ?? 0, lang, { maximumFractionDigits: 0 })
                       )}
                     </div>
-                    {!(mainCategory?.metadata as CategoryMetadata | null)?.hide_price && (
+                    {!quoteMode && (
                       <span className="text-xs font-bold text-steel-gray uppercase mt-1">
                         {t('pdp.vatIncluded')}
                       </span>
                     )}
                   </div>
                   <div className="flex flex-col items-end">
-                    <div className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green/10 text-success-green border border-success-green/20' : 'bg-warning-orange/10 text-warning-orange border border-warning-orange/20'}`}>
-                      <div className={`w-1 h-1 rounded-full ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green' : 'bg-warning-orange'}`} />
-                      <span>{typeof product.stock_qty === 'number' && product.stock_qty > 0 ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
-                    </div>
+                    {!quoteMode && (
+                      <div className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green/10 text-success-green border border-success-green/20' : 'bg-warning-orange/10 text-warning-orange border border-warning-orange/20'}`}>
+                        <div className={`w-1 h-1 rounded-full ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green' : 'bg-warning-orange'}`} />
+                        <span>{typeof product.stock_qty === 'number' && product.stock_qty > 0 ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
+                      </div>
+                    )}
                     <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.sku')}: {product.sku}</span>
                   </div>
                 </div>
@@ -450,9 +457,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
                 {/* Primary Actions */}
                 <div className="flex flex-col gap-2">
-                  {(mainCategory?.metadata as CategoryMetadata | null)?.hide_price ? (
+                  {quoteMode ? (
                     <button
                       onClick={() => setLeadOpen(true)}
+                      data-testid="pdp-add-to-cart"
                       className="w-full bg-industrial-gray hover:bg-primary-navy text-white font-black py-3.5 px-6 rounded-xl transition-shadow shadow-md flex items-center justify-center space-x-3 group"
                     >
                       <Settings size={16} className="group-hover:rotate-90 transition-transform duration-500" />
@@ -599,17 +607,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <div className="flex flex-col items-end mr-2">
                 <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px uppercase tracking-tight">{product.name}</span>
                 <span className="text-xs text-primary-navy font-black tracking-widest">
-                  {(mainCategory?.metadata as CategoryMetadata)?.hide_price ? t('pdp.techQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                  {quoteMode ? t('pdp.techQuote') : formatCurrency(product.price ?? 0, lang, { maximumFractionDigits: 0 })}
                 </span>
               </div>
-              
+
               <button
-                onClick={handleAddToCart}
-                disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                className="bg-primary-navy hover:bg-secondary-blue text-white text-xs font-black uppercase tracking-widest py-2.5 px-5 rounded-xl transition-transform shadow-md active:scale-95 flex items-center space-x-2"
+                onClick={quoteMode ? () => setLeadOpen(true) : handleAddToCart}
+                disabled={!quoteMode && (typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
+                className="bg-primary-navy hover:bg-secondary-blue text-white text-xs font-black uppercase tracking-widest py-2.5 px-5 rounded-xl transition-transform shadow-md active:scale-95 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ShoppingCart size={14} />
-                <span>{t('pdp.addToCart')}</span>
+                {quoteMode ? <Settings size={14} /> : <ShoppingCart size={14} />}
+                <span>{quoteMode ? t('pdp.techQuote') : t('pdp.addToCart')}</span>
               </button>
             </div>
           )}
@@ -649,7 +657,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             {t('pdp.labels.productDescription')}
                           </h4>
                           <div className="prose prose-slate max-w-none text-steel-gray leading-relaxed text-sm font-medium">
-                            <RichTextRenderer content={product.description || t('pdp.descFallback')} />
+                            <RichTextRenderer content={product.description_i18n?.[lang] || product.description || t('pdp.descFallback')} />
                           </div>
                         </div>
                       </div>
@@ -671,7 +679,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
                               <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal">{t('common.listingPrice')}</span>
                               <span className="text-lg font-black text-primary-navy">
-                                {(mainCategory?.metadata as CategoryMetadata | null)?.hide_price ? t('pdp.techQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                                {quoteMode ? t('pdp.techQuote') : formatCurrency(product.price ?? 0, lang, { maximumFractionDigits: 0 })}
                               </span>
                             </div>
                           </div>
@@ -691,7 +699,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             <h4 className="font-black text-industrial-gray mb-1 text-sm uppercase tracking-tight">{product.sku}-{variant}</h4>
                             <p className="text-steel-gray text-xs font-medium mb-4">{t('pdp.variantDetails')}</p>
                             <div className="flex items-center justify-between pt-3 border-t border-light-gray/50">
-                              <div className="text-primary-navy font-black text-sm">{formatCurrency((product.price + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}</div>
+                              <div className="text-primary-navy font-black text-sm">{formatCurrency(((product.price ?? 0) + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}</div>
                               <button className="p-1.5 bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white rounded-lg transition-colors" aria-label={t('common.next')}><ChevronRight size={14} /></button>
                             </div>
                           </div>

@@ -11,7 +11,7 @@ export interface OrderSummaryItem {
     product: {
         name: string
         image_url?: string | null
-        price: number
+        price: number | null
     }
     quantity: number
     unitPrice?: number | string
