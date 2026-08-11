@@ -15,13 +15,7 @@ interface MismatchItem { product_id: string; had: unknown; expected: number; pri
 interface StockIssue { product_id: string; requested: number; available: number }
 
 Deno.serve(async (req) => {
-  const corsHeaders = getCorsHeaders(req);
-  const cors = corsHeaders;
-  
-  const cors = {
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
-};
+  const cors = getCorsHeaders(req);
 
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 200, headers: cors });

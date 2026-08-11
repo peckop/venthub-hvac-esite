@@ -16,16 +16,11 @@ declare const Deno: {
 
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
-  const cors = corsHeaders;
-  
+
     const origin = req.headers.get('origin') || '';
     const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean);
     const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin));
     const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now());
-    const corsHeaders = {
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
-} as Record<string, string>;
 
     if (req.method === 'OPTIONS') {
         return new Response(null, { status: 200, headers: corsHeaders });
