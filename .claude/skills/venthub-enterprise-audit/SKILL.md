@@ -15,7 +15,7 @@ metadata:
   outputs:
   - L1-L12 pass/fail report
   commands:
-    validate: python -c "import pathlib; assert pathlib.Path('.agent/skills/venthub-enterprise-audit/run_enterprise_audit.py').exists(), 'Audit script missing'; print('Enterprise audit skill ready.')"
+    validate: python -c "import pathlib; assert pathlib.Path('.claude/skills/venthub-enterprise-audit/run_enterprise_audit.py').exists(), 'Audit script missing'; print('Enterprise audit skill ready.')"
 depends_on:
 - venthub-auditor
 - venthub-global-rontgen
@@ -60,12 +60,12 @@ exclusions:
 ## Dosya Yapısı
 
 ```
-.agent/skills/venthub-enterprise-audit/
+.claude/skills/venthub-enterprise-audit/
 ├── SKILL.md                           # Bu dosya (talimatlar)
 ├── enterprise-audit-template.json     # 11 katmanlı JSON şablonu
 └── run_enterprise_audit.py            # Python otonom motor (v1.1)
 
-.agent/reports/
+docs/audits/
 ├── enterprise-audit-YYYY-MM-DD.json   # Ham sonuç (kanıtlarla)
 └── enterprise-audit-YYYY-MM-DD.md     # Okunabilir rapor
 ```
@@ -76,7 +76,7 @@ exclusions:
 
 ### Tam Denetim (Teslim Öncesi — 11 Katman)
 ```powershell
-$env:PYTHONIOENCODING="utf-8"; python .agent/skills/venthub-enterprise-audit/run_enterprise_audit.py
+$env:PYTHONIOENCODING="utf-8"; python .claude/skills/venthub-enterprise-audit/run_enterprise_audit.py
 ```
 
 ### Sadece Belirli Katmanlar
@@ -263,7 +263,7 @@ BLOCKED    → Herhangi bir 🔴 STRICT kontrol FAIL → teslim yapılamaz
 
 - Bu skill kodu **değiştirmez** — sadece denetler ve raporlar
 - Her kontrol **terminal çıktısıyla kanıtlanmalıdır**
-- Rapor `.agent/reports/` altına kaydedilir — tarihle versiyonlanır
+- Rapor `docs/audits/` altına kaydedilir — tarihle versiyonlanır
 
 ### Eklenen Denetim Maddeleri (Enrichment v2)
 
@@ -276,8 +276,8 @@ BLOCKED    → Herhangi bir 🔴 STRICT kontrol FAIL → teslim yapılamaz
 | Column GRANT SELECT uyuşmazlığı (yeni sütun, eksik GRANT) | 🔴 STRICT |
 
 #### L7 Ürün Ek
-| Stripe idempotencyKey (checkout.sessions.create) | 🔴 STRICT |
-| Webhook Signature doğrulaması (Stripe-Signature) | 🔴 STRICT |
+| İyzico ödeme akışında idempotency/replay guard (conversationId + timestamp) | 🔴 STRICT |
+| Webhook HMAC-SHA256 imza doğrulaması (İyzico/kargo webhook'ları) | 🔴 STRICT |
 | UI veri sızıntısı ("NaN", "undefined", "[object Object]") | 🟡 WARNING |
 
 #### L8 Performans Ek

@@ -28,31 +28,18 @@ Agent olarak yeni dosya oluştururken veya mevcut kodu nereye koyacağıma karar
 
 ## Proje Yapısı
 
-```
-src/
-├── components/     # React bileşenleri (alt klasörlerle organize)
-│   ├── navigation/ # Header, MegaMenu, Footer
-│   ├── products/   # Ürün kartları, listeler, vitrinler
-│   ├── admin/      # Admin panel bileşenleri
-│   └── ui/         # Genel UI primitives (Button, Dialog, etc.)
-├── pages/          # Sayfa bileşenleri (route başına bir dosya)
-│   ├── admin/      # Admin sayfaları
-│   └── calculators/# Hesaplayıcı sayfaları
-├── hooks/          # Custom React hooks
-├── contexts/       # React context providers
-├── lib/            # Utility libraries (supabase client, analytics)
-├── utils/          # Helper functions
-├── config/         # Configuration files (categoryRegistry, etc.)
-├── i18n/           # Internationalization
-└── types/          # TypeScript type definitions
-```
+Dizin yapısı ve "yeni dosya nereye?" kararının SSOT'u = **CLAUDE.md** (her oturumda yüklü).
+
+Özet: rota → `src/app/` (`page.tsx` = RSC) · sayfa görünümü → `src/views/` · tekrar kullanılır UI →
+`src/components/` · veri/servis → `src/lib/services/` (DI) · hook → `src/hooks/` · DB → `supabase/migrations/`.
 
 ## Dosya Adlandırma Kuralları
 
 | Tür | Format | Örnek |
 |-----|--------|-------|
 | React Component | PascalCase.tsx | `ProductCard.tsx` |
-| Page Component | PascalCase.tsx | `HomePage.tsx` |
+| Rota dosyası (`app/`) | küçük harf, Next.js konvansiyonu | `page.tsx`, `layout.tsx` |
+| Sayfa görünümü (`views/`) | PascalCase.tsx | `CategoryMasterView.tsx` |
 | Hook | camelCase.ts, `use` prefix | `useCart.ts` |
 | Utility | camelCase.ts | `formatCurrency.ts` |
 | Config | camelCase.ts | `categoryRegistry.ts` |
@@ -66,16 +53,6 @@ src/
 4. **Layout Shift (CLS) Koruması:** Resimlere (`<Image />`) mutlaka `width` ve `height` (veya `aspect-ratio`) verilmelidir. Dinamik yüklenen alanlar için `min-h-[value]` (minimum yükseklik) rezerve edilmelidir.
 5. **Hibrit PPR (Partial Prerendering) Sınırları:** Arama, filtreleme gibi sayfalarda `useSearchParams` hook'unu kullanan tüm bileşenler kesinlikle ve istisnasız `<Suspense fallback={<ProductGridSkeleton />}>` sınırı içerisine alınmalıdır. useSearchParams'ın direkt sayfa kabuğuna sızması engellenerek SSR zehirlenmesi önlenir.
 6. **Adaptör (Adapter) Deseni ve Saf Metrik Motor Kuralı:** Uygulamanın çekirdek mühendislik hesaplamalarını barındıran `src/lib/hvacCalculations.ts` gibi saf (pure) fonksiyonların iç mantığına emperyal birim (CFM, Fahrenheit, in-wg vb.) dönüşümleri KESİNLİKLE eklenemez. Yabancı ölçü birimi gereksinimleri, UI katmanı ile iş mantığı katmanı arasına çekilecek bir `useEngineeringAdapter` gibi bir "Gateway" hook'u üzerinden (Adaptör Deseni ile) çözülmelidir.
-
-## Karar Ağacı: Dosya Nereye Gider?
-
-1. **Sayfa mı?** → `src/pages/`
-2. **Tekrar kullanılabilir UI mi?** → `src/components/ui/`
-3. **Ürünle ilgili mi?** → `src/components/products/`
-4. **Admin panele özel mi?** → `src/components/admin/` veya `src/pages/admin/`
-5. **Hook mu?** → `src/hooks/`
-6. **Veritabanı değişikliği mi?** → `supabase/migrations/`
-7. **Tek seferlik script mi?** → `scripts/`
 
 ## SEO Mimari Kuralları
 

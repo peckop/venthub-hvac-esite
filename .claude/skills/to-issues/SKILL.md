@@ -16,8 +16,7 @@ metadata:
   - structured issues list
 depends_on:
 - to-prd
-next_steps:
-- teamwork-director
+next_steps: []
 run_last: false
 exclusions: []
 ---
