@@ -19,7 +19,7 @@
 |---|---|---|---|
 | 0 | **Kaynaklar** | Vortice spec + Avensair € fiyat (NLM defterleri + cetvel) | ✅ Hazır |
 | 1 | **Kademe 1: PDF → flat CSV** | Worker (ingestor) görsel ajan → NLM hakem → CSV | ✅ **Pilot bitti** (`vortice-konut.csv`, 4 ürün) |
-| 2 | **Kademe 2: CSV → DB** | Onaylı CSV'yi DB'ye yaz/zenginleştir (controller) | ❌ **YOK — inşa edilecek (Faz A)** |
+| 2 | **Kademe 2: CSV → DB** | Onaylı CSV'yi DB'ye yaz (controller) | ✅ **BİTTİ (2026-08-11)** — temiz yeniden kuruluş: `scripts/kademe2-load/` loader'ı ile 374 ürün / 32 aile / 5 marka prod'da (`kademe2-clean-rebuild-2026-08-11.md`) |
 | 3a | **Fiyat seçimi** | Rol/liste/indirime göre geçerli fiyatı oku | ✅ VAR (`pricing.service.ts` + `price_lists` + `product_prices`) |
 | 3b | **Fiyat hesabı** | € alış → kur × KDV × kâr → satış (çok-para-birimi) | ❌ **YOK — inşa edilecek (Faz B)**; cetveli (`pricing-standard.md`) var, kodu yok |
 | 4 | **Sitede gösterim** | Spec + fiyat + görsel + i18n | ⬜ 1–3'e bağlı |
