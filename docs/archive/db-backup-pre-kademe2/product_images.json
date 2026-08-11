@@ -1,0 +1,234 @@
+[
+ {
+  "id": "1d45efc9-46da-4f16-98d2-c85ebcdcf183",
+  "product_id": "223a2658-46a6-42d6-b3d1-5c384cb0c992",
+  "path": "products/AVE-VOR-00012-18945dc5.png",
+  "alt": "Vortice AIR DOOR H AD 900 T ( Elektrikli Isıtıcılı Hava Perdesi)",
+  "sort_order": 1,
+  "created_at": "2025-10-01T08:31:12.703023+00:00"
+ },
+ {
+  "id": "6ecd22c4-764f-4e59-9107-316b16bcf281",
+  "product_id": "a7e331de-4256-4500-a5de-863409e51622",
+  "path": "products/AVE-VOR-00029-ec2feddf.png",
+  "alt": "Vortice AIR DOOR H AD 1200 T  ( Elektrikli Isıtıcılı Hava Perdesi)",
+  "sort_order": 1,
+  "created_at": "2025-10-01T08:31:14.835074+00:00"
+ },
+ {
+  "id": "59486c81-2586-4c8a-a8f8-fb1c53964b7a",
+  "product_id": "01f65842-5415-4220-ac7a-627234edf435",
+  "path": "products/AVE-VOR-00030-eff07002.png",
+  "alt": "Vortice AIR DOOR AD 1200 (Ortam Havalı Hava Perdesi)",
+  "sort_order": 1,
+  "created_at": "2025-10-01T08:31:15.859431+00:00"
+ },
+ {
+  "id": "8724989e-9b16-47b7-bbc4-7d2233445e02",
+  "product_id": "d9a15adb-949e-4960-ba0f-3417117e2cdd",
+  "path": "products/AVE-VOR-00046-a4229a8f.png",
+  "alt": "Vortice AIR DOOR H AD 1500 T  ( Elektrikli Isıtıcılı Hava Perdesi)",
+  "sort_order": 1,
+  "created_at": "2025-10-01T08:31:16.951379+00:00"
+ },
+ {
+  "id": "11d29127-739f-4af1-89c2-4f4e8dad71c5",
+  "product_id": "7744e869-ac69-4992-9c6c-3ef3df994ca7",
+  "path": "products/AVE-VOR-00047-39a2bd10.png",
+  "alt": "Vortice AIR DOOR AD 1500 (Ortam Havalı Hava Perdesi)",
+  "sort_order": 1,
+  "created_at": "2025-10-01T08:31:17.960989+00:00"
+ },
+ {
+  "id": "b3d9fb9f-19d9-4be1-a782-e104653342be",
+  "product_id": "19850ed5-2eb9-4b7d-a9d8-da94d5ba4f45",
+  "path": "products/AVE-VOR-00060-27773170.png",
+  "alt": "Vortice AIR DOOR H AD 900 M ( Elektrikli Isıtıcılı Hava Perdesi)",
+  "sort_order": 1,
+  "created_at": "2025-10-01T08:31:19.003054+00:00"
+ },
+ {
+  "id": "00f0cd7d-9ac5-497d-a1b2-fd0f705c9ffa",
+  "product_id": "e3dbf81c-a8de-46a1-9b91-f95dcad77f70",
+  "path": "products/AVE-VOR-00061-c6da0be9.png",
+  "alt": "Vortice AIR DOOR AD 2000 (Ortam Havalı Hava Perdesi)",
+  "sort_order": 1,
+  "created_at": "2025-10-01T08:31:20.004098+00:00"
+ },
+ {
+  "id": "4b4f1b7b-1c2f-4928-ae56-957b3330b7c4",
+  "product_id": "bae6c13f-bdc8-410f-8ba6-072f4d75e0e8",
+  "path": "products/AVE-VOR-00010-01.png",
+  "alt": "Vortice ME 100/4\" LL GIALLO - YELLOW GOLD",
+  "sort_order": 1,
+  "created_at": "2025-10-01T08:53:15.777007+00:00"
+ },
+ {
+  "id": "4a8f41ed-a3f9-42bd-b603-395811af9222",
+  "product_id": "bae6c13f-bdc8-410f-8ba6-072f4d75e0e8",
+  "path": "products/AVE-VOR-00010-02.png",
+  "alt": "Vortice ME 100/4\" LL GIALLO - YELLOW GOLD",
+  "sort_order": 2,
+  "created_at": "2025-10-01T08:53:16.688707+00:00"
+ },
+ {
+  "id": "c7f98992-2f3c-4161-b455-378b59bff6da",
+  "product_id": "bae6c13f-bdc8-410f-8ba6-072f4d75e0e8",
+  "path": "products/AVE-VOR-00010-03.png",
+  "alt": "Vortice ME 100/4\" LL GIALLO - YELLOW GOLD",
+  "sort_order": 3,
+  "created_at": "2025-10-01T08:53:18.443903+00:00"
+ },
+ {
+  "id": "ed054850-8795-4fe2-868c-13c604a03d80",
+  "product_id": "bae6c13f-bdc8-410f-8ba6-072f4d75e0e8",
+  "path": "products/AVE-VOR-00010-04.PNG",
+  "alt": "Vortice ME 100/4\" LL GIALLO - YELLOW GOLD",
+  "sort_order": 4,
+  "created_at": "2025-10-01T08:53:19.426761+00:00"
+ },
+ {
+  "id": "eada945d-fd5c-43be-b7eb-088477b99cfd",
+  "product_id": "bae6c13f-bdc8-410f-8ba6-072f4d75e0e8",
+  "path": "products/AVE-VOR-00010-05.png",
+  "alt": "Vortice ME 100/4\" LL GIALLO - YELLOW GOLD",
+  "sort_order": 5,
+  "created_at": "2025-10-01T08:53:20.017551+00:00"
+ },
+ {
+  "id": "a0b420fa-1173-4a5b-8c23-e950f2dc4cbd",
+  "product_id": "bae6c13f-bdc8-410f-8ba6-072f4d75e0e8",
+  "path": "products/AVE-VOR-00010-06.png",
+  "alt": "Vortice ME 100/4\" LL GIALLO - YELLOW GOLD",
+  "sort_order": 6,
+  "created_at": "2025-10-01T08:53:20.62172+00:00"
+ },
+ {
+  "id": "9cac4dd8-7b98-4223-b6d8-860483487c84",
+  "product_id": "bae6c13f-bdc8-410f-8ba6-072f4d75e0e8",
+  "path": "products/AVE-VOR-00010-07.png",
+  "alt": "Vortice ME 100/4\" LL GIALLO - YELLOW GOLD",
+  "sort_order": 7,
+  "created_at": "2025-10-01T08:53:21.372904+00:00"
+ },
+ {
+  "id": "8c549fd8-95a9-404c-b34c-fd38e9431bf6",
+  "product_id": "b3cbfd5f-2587-4d7b-a7ae-7508e1988f7e",
+  "path": "product/b3cbfd5f-2587-4d7b-a7ae-7508e1988f7e/prod_b3cbfd5f-2587-4d7b-a7ae-7508e1988f7e_1765286749608_3ecpb.webp",
+  "alt": "Vortice AIR DOOR AD 900 (Ortam Havalı Hava Perdesi)",
+  "sort_order": 1,
+  "created_at": "2025-12-09T13:25:51.60268+00:00"
+ },
+ {
+  "id": "ab1e52c4-ac61-46c3-bd34-4ae4969dd817",
+  "product_id": "b3cbfd5f-2587-4d7b-a7ae-7508e1988f7e",
+  "path": "product/b3cbfd5f-2587-4d7b-a7ae-7508e1988f7e/prod_b3cbfd5f-2587-4d7b-a7ae-7508e1988f7e_1765286751388_64xkek.webp",
+  "alt": "Vortice AIR DOOR AD 900 (Ortam Havalı Hava Perdesi)",
+  "sort_order": 2,
+  "created_at": "2025-12-09T13:25:52.81457+00:00"
+ },
+ {
+  "id": "5297080d-a0fb-487c-bcf7-09a995479a83",
+  "product_id": "b3cbfd5f-2587-4d7b-a7ae-7508e1988f7e",
+  "path": "product/b3cbfd5f-2587-4d7b-a7ae-7508e1988f7e/prod_b3cbfd5f-2587-4d7b-a7ae-7508e1988f7e_1765286752699_w4bnsn.webp",
+  "alt": "Vortice AIR DOOR AD 900 (Ortam Havalı Hava Perdesi)",
+  "sort_order": 3,
+  "created_at": "2025-12-09T13:25:54.667608+00:00"
+ },
+ {
+  "id": "93f02305-eb00-46a5-b4b5-9343ae65eaba",
+  "product_id": "e8176d55-e734-4b55-9d43-9605e4142271",
+  "path": "/images/vortice_lineo_futuristic.png",
+  "alt": "Vortice Lineo Quiet Premium",
+  "sort_order": 1,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "9baed9fa-bc5e-4347-b034-7a0c1b71914b",
+  "product_id": "b17d88b9-1035-4f03-8943-90345eb38310",
+  "path": "/images/vortice_lineo_futuristic.png",
+  "alt": "Vortice Lineo Quiet Premium",
+  "sort_order": 1,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "90d29c60-ebf2-4641-94b7-d0a7da0c0b0f",
+  "product_id": "c563d250-6153-4a59-ac6a-32f2c89aea82",
+  "path": "/images/vortice_lineo_futuristic.png",
+  "alt": "Vortice Lineo Quiet Premium",
+  "sort_order": 1,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "a8397d83-ac23-4f9c-9945-c5b9033b4c93",
+  "product_id": "a81c67a6-9a60-465f-90bb-1ed16b78b84f",
+  "path": "/images/vortice_lineo_futuristic.png",
+  "alt": "Vortice Lineo Quiet Premium",
+  "sort_order": 1,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "1b07cbed-0f28-432b-9c21-e571644e5193",
+  "product_id": "d325e10b-6468-460b-9f10-8ef3382fc2be",
+  "path": "/images/vortice_lineo_futuristic.png",
+  "alt": "Vortice Lineo Quiet Premium",
+  "sort_order": 1,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "adf4c9c0-2e3d-4edd-914a-97a8a10dce85",
+  "product_id": "15655c27-49d4-4747-87db-71cbf7c2a293",
+  "path": "/images/vortice_lineo_futuristic.png",
+  "alt": "Vortice Lineo Quiet Premium",
+  "sort_order": 1,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "c8a60305-ac3d-4fd5-af54-fd4a91e86ae2",
+  "product_id": "e8176d55-e734-4b55-9d43-9605e4142271",
+  "path": "/images/products/vortice_lineo_360.png",
+  "alt": "Vortice Lineo Quiet 360",
+  "sort_order": 4,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "05383a3b-a159-42d7-a412-73f9f93f90fb",
+  "product_id": "b17d88b9-1035-4f03-8943-90345eb38310",
+  "path": "/images/products/vortice_lineo_360.png",
+  "alt": "Vortice Lineo Quiet 360",
+  "sort_order": 4,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "cc19c93a-cded-4b2d-9ea9-50438c3f1c19",
+  "product_id": "c563d250-6153-4a59-ac6a-32f2c89aea82",
+  "path": "/images/products/vortice_lineo_360.png",
+  "alt": "Vortice Lineo Quiet 360",
+  "sort_order": 4,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "d7a0c92c-368a-4ac9-9a59-5a202c8ae93f",
+  "product_id": "a81c67a6-9a60-465f-90bb-1ed16b78b84f",
+  "path": "/images/products/vortice_lineo_360.png",
+  "alt": "Vortice Lineo Quiet 360",
+  "sort_order": 4,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "1c95d7c1-d87c-4b08-a5c6-a332ae6fcaab",
+  "product_id": "d325e10b-6468-460b-9f10-8ef3382fc2be",
+  "path": "/images/products/vortice_lineo_360.png",
+  "alt": "Vortice Lineo Quiet 360",
+  "sort_order": 4,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ },
+ {
+  "id": "bbf81131-99cb-4218-831e-2979be37a49c",
+  "product_id": "15655c27-49d4-4747-87db-71cbf7c2a293",
+  "path": "/images/products/vortice_lineo_360.png",
+  "alt": "Vortice Lineo Quiet 360",
+  "sort_order": 4,
+  "created_at": "2026-03-12T15:56:10.692389+00:00"
+ }
+]

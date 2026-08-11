@@ -1,0 +1,13 @@
+[
+ {
+  "id": "c3ec8cce-f73b-4a96-a6b3-046b1de15343",
+  "cart_id": "0523f44c-4d85-4ea6-81cd-2dbbf780ea37",
+  "product_id": "e3dbf81c-a8de-46a1-9b91-f95dcad77f70",
+  "quantity": 1,
+  "unit_price": 43537.27,
+  "created_at": "2026-03-06T06:55:40.079872+00:00",
+  "updated_at": "2026-03-06T06:55:40.079872+00:00",
+  "price_list_id": "d9d138d8-2844-4144-b8a7-99fb16f28b67",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ }
+]
