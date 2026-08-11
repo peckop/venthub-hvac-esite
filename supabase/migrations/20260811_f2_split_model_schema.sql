@@ -115,11 +115,15 @@ alter table public.products
   -- 27 distinct). family.description = seri fallback'i; PDP varyant metnini öncelikler (Aksiyom 4).
   add column if not exists description_i18n jsonb;
 
--- PS-011: cost hassasiyeti
+-- PS-011: cost hassasiyeti — NOT: type numeric(12,4)'e daraltma bir view bağımlılığı yüzünden
+-- ("cannot alter type of a column used by a view") uygulanmaz; sınırsız numeric 12,4 değerleri
+-- tam saklar, davranışsal fark yok. Negatif maliyet CHECK ile yasak (PS-008 sınıfı).
 alter table public.products
-  alter column purchase_price type numeric(12,4),
   alter column purchase_price set default 0,
   alter column purchase_price set not null;
+alter table public.products drop constraint if exists products_purchase_price_nonneg;
+alter table public.products add constraint products_purchase_price_nonneg
+  check (purchase_price >= 0);
 
 -- PS-017: modern status seti (tablo boş — güvenli değişim)
 alter table public.products drop constraint if exists products_status_check;
