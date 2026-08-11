@@ -22,7 +22,9 @@ begin
     where n.nspname = 'public'
       and (p.prosrc ilike '%superadmin%' or p.prosrc ilike '%moderater%')
   loop
-    newdef := replace(replace(r.def, '''superadmin''', '''super_admin'''), '''moderater''', '''moderator''');
+    -- Düz replace bilinçli: 'superadmin'/'moderater' yalnız rol adı olarak geçer (yorumlar dahil);
+    -- 'super_admin' zaten kanonik olduğundan çifte-dönüşüm riski yok (substring değil).
+    newdef := replace(replace(r.def, 'superadmin', 'super_admin'), 'moderater', 'moderator');
     execute newdef;
   end loop;
 end $$;
@@ -62,6 +64,29 @@ end $$;
 
 -- === 1c. site_settings: mükerrer/karmaşık INSERT politikasını düşür (temiz eşdeğeri zaten var) ===
 drop policy if exists merged_site_settings_authenticated_insert on public.site_settings;
+
+-- === 1d. enforce_role_change — whitelist constraint listesiyle eşitlenir (warehouse/sales/viewer
+--         ataması eski 4'lü listede engelleniyordu) ===
+create or replace function public.enforce_role_change()
+returns trigger
+language plpgsql
+security definer
+set search_path to 'pg_catalog', 'public'
+as $function$
+begin
+  -- Aktör kendi rolünü değiştiriyorsa yalnız super_admin'e izin ver
+  if new.id = auth.uid() then
+    if not exists (select 1 from public.user_profiles where id = auth.uid() and role = 'super_admin') then
+      raise exception 'not authorized to change own role';
+    end if;
+  end if;
+  -- Hedef rol whitelist'i = user_profiles_role_check constraint listesi
+  if new.role not in ('user','moderator','admin','super_admin','warehouse','sales','viewer') then
+    raise exception 'invalid role %', new.role;
+  end if;
+  return new;
+end;
+$function$;
 
 -- === 2. set_user_admin_role — yalnız super_admin/admin rol atayabilir; rol listesi = constraint listesi ===
 create or replace function public.set_user_admin_role(user_id uuid, new_role text)
