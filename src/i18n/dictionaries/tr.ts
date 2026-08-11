@@ -63,6 +63,7 @@ export const tr = {
       hvls: 'Endüstriyel Tavan Vantilatörleri',
       accessories: 'Aksesuarlar ve Bileşenler',
       'smart-home': 'Akıllı Ev Sistemleri',
+      'parking-jet': 'Otopark Jet Fanları',
       sub: {
         bathroom: 'Banyo ve Tuvalet Fanları',
         window: 'Cam ve Pencere Tipi Fanlar',
@@ -77,7 +78,10 @@ export const tr = {
         'rect-duct': 'Dikdörtgen Kanal Tipi Fanlar',
         'round-duct': 'Yuvarlak Kanal Tipi Fanlar',
         exproof: 'Ex-Proof (ATEX) Fanlar',
-        shelter: 'Sığınak Havalandırma Sistemleri'
+        shelter: 'Sığınak Havalandırma Sistemleri',
+        'acid-fans': 'Asit Dayanımlı Fanlar',
+        'freq-converters': 'Frekans Konvertörleri',
+        'duct-heaters': 'Elektrikli Kanal Isıtıcıları'
       }
     },
     byApplication: 'Uygulamaya Göre Çözümler',
