@@ -82,9 +82,15 @@ Onaylı flat CSV'yi okuyup DB'yi güncelleyen kod **yok.** Hat şu an CSV'de tı
 
 ---
 
-## 5. Açık kararlar (senin girdin gerekiyor — silently karar vermem)
+## 5. Açık kararlar — ✅ ÇÖZÜLDÜ (2026-08-11)
 
-| # | Karar | Seçenekler / not |
+> Beş karar da `kademe2-clean-rebuild-2026-08-11.md` §0b'de cetvel referanslarıyla kapatıldı:
+> D1=JSONB i18n (family.description {tr,en}) · D2=EUR as-is + purchase_currency · D3=base TRY,
+> USD/EUR vitrin Fiyat Motoru fazında · D4=materialize cache (product_prices) · D5=taksonomi bitti,
+> 4 yeni kategori F2 migration'ında. Ayrıca kullanıcı kararı: mevcut 388 ürün + test siparişleri
+> **tasfiye**, Kademe-2 artık ENRICH değil **temiz yeniden kuruluş** (şema-önce, PS Wave 1-3 dahil).
+
+| # | Karar | Seçenekler / not (tarihsel) |
 |---|---|---|
 | **D1** | `description_tr` + `description_en` DB'de nereye? | `products.description` tek alan. i18n kuralı = çeviri JSONB (`metadata->>lang`) ama products'ta öyle bir kolon yok. → (a) description=TR + EN'i yeni JSONB/kolona, (b) technical_specs içine, (c) çeviri tablosu. |
 | **D2** | `purchase_price` para birimi? | `products.purchase_price` var ama **currency yok.** → (a) € as-is sakla + `currency` kolonu ekle (temiz, B1 ile uyumlu), (b) load'da TRY'ye çevir (kur'a bağımlı, geri-dönülmez). Öneri: (a). |
