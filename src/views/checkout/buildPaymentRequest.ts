@@ -5,7 +5,7 @@ import { safeNumber } from '../../utils/type-converters'
 export interface CartItemInput {
   id: string
   quantity: number
-  product: { id: string; name: string; price: number; image_url?: string | null }
+  product: { id: string; name: string; price: number | null; image_url?: string | null }
 }
 
 export interface CustomerInput { 

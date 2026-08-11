@@ -59,6 +59,7 @@ export const en: typeof tr = {
       hvls: 'Industrial Ceiling Fans',
       accessories: 'Accessories and Components',
       'smart-home': 'Smart Home',
+      'parking-jet': 'Car Park Jet Fans',
       sub: {
         bathroom: 'Bathroom and Toilet Fans',
         window: 'Window and Wall Fans',
@@ -73,7 +74,10 @@ export const en: typeof tr = {
         'rect-duct': 'Rectangular Duct Fans',
         'round-duct': 'Circular Duct Fans',
         exproof: 'Ex-Proof (ATEX) Fans',
-        shelter: 'Shelter Ventilation Systems'
+        shelter: 'Shelter Ventilation Systems',
+        'acid-fans': 'Acid-Resistant Fans',
+        'freq-converters': 'Frequency Converters',
+        'duct-heaters': 'Electric Duct Heaters'
       }
     },
     byApplication: 'Solutions by Application',

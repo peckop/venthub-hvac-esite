@@ -78,11 +78,23 @@ describe('generateProductDatasheet Fallback Handling', () => {
     meta_title: null,
     noise_level: null,
     pressure_rating: null,
-    purchase_price: null,
+    purchase_price: 0,
     created_at: '2026-06-07T00:00:00Z',
     updated_at: '2026-06-07T00:00:00Z',
     warehouse_location: 'A-1',
-    supplier_name: 'Test Supplier'
+    supplier_name: 'Test Supplier',
+    tenant_id: 'd3b07384-d113-495f-a558-8c38634e0000',
+    deleted_at: null,
+    barcode: null,
+    depth_mm: null,
+    height_mm: null,
+    width_mm: null,
+    weight_kg: null,
+    purchase_currency: 'TRY',
+    tax_rate: 20,
+    is_taxable: true,
+    description_i18n: null,
+    family_id: null
   }
 
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>

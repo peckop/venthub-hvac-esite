@@ -61,6 +61,41 @@ export type Database = {
           },
         ]
       }
+      brands: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brands_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cart_items: {
         Row: {
           cart_id: string
@@ -160,6 +195,7 @@ export type Database = {
           seo_title: string | null
           slug: string
           sort_order: number | null
+          tenant_id: string
           translation_key: string | null
           updated_at: string
         }
@@ -182,6 +218,7 @@ export type Database = {
           seo_title?: string | null
           slug: string
           sort_order?: number | null
+          tenant_id?: string
           translation_key?: string | null
           updated_at?: string
         }
@@ -204,6 +241,7 @@ export type Database = {
           seo_title?: string | null
           slug?: string
           sort_order?: number | null
+          tenant_id?: string
           translation_key?: string | null
           updated_at?: string
         }
@@ -213,6 +251,13 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "categories_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -1004,6 +1049,7 @@ export type Database = {
           id: string
           product_id: string
           rating: number | null
+          tenant_id: string
           updated_at: string | null
         }
         Insert: {
@@ -1016,6 +1062,7 @@ export type Database = {
           id?: string
           product_id: string
           rating?: number | null
+          tenant_id?: string
           updated_at?: string | null
         }
         Update: {
@@ -1028,6 +1075,7 @@ export type Database = {
           id?: string
           product_id?: string
           rating?: number | null
+          tenant_id?: string
           updated_at?: string | null
         }
         Relationships: [
@@ -1052,6 +1100,99 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "product_authorities_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_families: {
+        Row: {
+          brand_id: string
+          category_id: string | null
+          created_at: string
+          deleted_at: string | null
+          description: Json
+          id: string
+          is_description_manual: boolean
+          meta_description: Json | null
+          meta_title: Json | null
+          name: string
+          series_code: string | null
+          slug: string
+          sort_order: number
+          subcategory_id: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          brand_id: string
+          category_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: Json
+          id?: string
+          is_description_manual?: boolean
+          meta_description?: Json | null
+          meta_title?: Json | null
+          name: string
+          series_code?: string | null
+          slug: string
+          sort_order?: number
+          subcategory_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Update: {
+          brand_id?: string
+          category_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: Json
+          id?: string
+          is_description_manual?: boolean
+          meta_description?: Json | null
+          meta_title?: Json | null
+          name?: string
+          series_code?: string | null
+          slug?: string
+          sort_order?: number
+          subcategory_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_families_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_families_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_families_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_families_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
         ]
       }
       product_images: {
@@ -1062,6 +1203,7 @@ export type Database = {
           path: string
           product_id: string
           sort_order: number
+          tenant_id: string
         }
         Insert: {
           alt?: string | null
@@ -1070,6 +1212,7 @@ export type Database = {
           path: string
           product_id: string
           sort_order?: number
+          tenant_id?: string
         }
         Update: {
           alt?: string | null
@@ -1078,6 +1221,7 @@ export type Database = {
           path?: string
           product_id?: string
           sort_order?: number
+          tenant_id?: string
         }
         Relationships: [
           {
@@ -1099,6 +1243,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_images_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -1187,14 +1338,21 @@ export type Database = {
       products: {
         Row: {
           airflow_capacity: number | null
+          barcode: string | null
           brand: string
           category_id: string | null
           created_at: string
+          deleted_at: string | null
+          depth_mm: number | null
           description: string | null
+          description_i18n: Json | null
+          family_id: string | null
+          height_mm: number | null
           id: string
           image_url: string | null
           is_category_manual: boolean | null
           is_featured: boolean
+          is_taxable: boolean
           low_stock_override: boolean
           low_stock_threshold: number | null
           meta_description: string | null
@@ -1203,28 +1361,40 @@ export type Database = {
           name: string
           noise_level: number | null
           pressure_rating: number | null
-          price: number
-          purchase_price: number | null
+          price: number | null
+          purchase_currency: string
+          purchase_price: number
           sku: string
           slug: string | null
           status: string
           stock_qty: number | null
           subcategory_id: string | null
           supplier_name: string | null
+          tax_rate: number
           technical_specs: Json | null
+          tenant_id: string
           updated_at: string
           warehouse_location: string | null
+          weight_kg: number | null
+          width_mm: number | null
         }
         Insert: {
           airflow_capacity?: number | null
+          barcode?: string | null
           brand: string
           category_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          depth_mm?: number | null
           description?: string | null
+          description_i18n?: Json | null
+          family_id?: string | null
+          height_mm?: number | null
           id?: string
           image_url?: string | null
           is_category_manual?: boolean | null
           is_featured?: boolean
+          is_taxable?: boolean
           low_stock_override?: boolean
           low_stock_threshold?: number | null
           meta_description?: string | null
@@ -1233,28 +1403,40 @@ export type Database = {
           name: string
           noise_level?: number | null
           pressure_rating?: number | null
-          price?: number
-          purchase_price?: number | null
+          price?: number | null
+          purchase_currency?: string
+          purchase_price?: number
           sku: string
           slug?: string | null
           status?: string
           stock_qty?: number | null
           subcategory_id?: string | null
           supplier_name?: string | null
+          tax_rate?: number
           technical_specs?: Json | null
+          tenant_id?: string
           updated_at?: string
           warehouse_location?: string | null
+          weight_kg?: number | null
+          width_mm?: number | null
         }
         Update: {
           airflow_capacity?: number | null
+          barcode?: string | null
           brand?: string
           category_id?: string | null
           created_at?: string
+          deleted_at?: string | null
+          depth_mm?: number | null
           description?: string | null
+          description_i18n?: Json | null
+          family_id?: string | null
+          height_mm?: number | null
           id?: string
           image_url?: string | null
           is_category_manual?: boolean | null
           is_featured?: boolean
+          is_taxable?: boolean
           low_stock_override?: boolean
           low_stock_threshold?: number | null
           meta_description?: string | null
@@ -1263,17 +1445,22 @@ export type Database = {
           name?: string
           noise_level?: number | null
           pressure_rating?: number | null
-          price?: number
-          purchase_price?: number | null
+          price?: number | null
+          purchase_currency?: string
+          purchase_price?: number
           sku?: string
           slug?: string | null
           status?: string
           stock_qty?: number | null
           subcategory_id?: string | null
           supplier_name?: string | null
+          tax_rate?: number
           technical_specs?: Json | null
+          tenant_id?: string
           updated_at?: string
           warehouse_location?: string | null
+          weight_kg?: number | null
+          width_mm?: number | null
         }
         Relationships: [
           {
@@ -1284,10 +1471,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "products_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "product_families"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "products_subcategory_id_fkey"
             columns: ["subcategory_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]

@@ -46,17 +46,21 @@ export async function getProductsEnriched(
     if (resolvedCategoryIds && resolvedCategoryIds.length > 0) {
         const { data: fallbackData } = await supabase
           .from('products')
-          .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+          .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
           .or(`category_id.in.(${resolvedCategoryIds.join(',')}),subcategory_id.in.(${resolvedCategoryIds.join(',')})`)
+          .eq('status', 'active')
+          .is('deleted_at', null)
           .limit(params.limit || 50)
         return toUIProductList((fallbackData as DbProduct[]) || [])
     }
 
     const { data: fallbackData } = await supabase
       .from('products')
-      .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+      .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+      .eq('status', 'active')
+      .is('deleted_at', null)
       .limit(params.limit || 50)
-    
+
     return toUIProductList((fallbackData as DbProduct[]) || [])
   }
 
@@ -64,8 +68,20 @@ export async function getProductsEnriched(
     ...p,
     meta_description: null,
     meta_title: null,
-    purchase_price: null,
-    is_category_manual: null
+    purchase_price: 0,
+    purchase_currency: 'TRY',
+    is_category_manual: null,
+    description_i18n: null,
+    family_id: null,
+    barcode: null,
+    deleted_at: null,
+    depth_mm: null,
+    height_mm: null,
+    width_mm: null,
+    weight_kg: null,
+    tax_rate: 20,
+    is_taxable: true,
+    tenant_id: ''
   })) as DbProduct[]
 
   return toUIProductList(enrichedProducts)
@@ -105,8 +121,9 @@ export async function ftsSearchProducts(
 export async function getProducts(supabase: SupabaseClient<Database>, limit?: number): Promise<Product[]> {
   let query = supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
     .eq('status', 'active')
+    .is('deleted_at', null)
     .order('is_featured', { ascending: false })
     .order('name', { ascending: true })
 
@@ -123,8 +140,9 @@ export async function getProducts(supabase: SupabaseClient<Database>, limit?: nu
 export async function getAllProducts(supabase: SupabaseClient<Database>): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
     .eq('status', 'active')
+    .is('deleted_at', null)
     .order('is_featured', { ascending: false })
     .order('name', { ascending: true })
 
@@ -135,9 +153,10 @@ export async function getAllProducts(supabase: SupabaseClient<Database>): Promis
 export async function getProductsByCategory(supabase: SupabaseClient<Database>, categoryId: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
     .or(`category_id.eq.${categoryId}, subcategory_id.eq.${categoryId}`)
     .eq('status', 'active')
+    .is('deleted_at', null)
     .order('is_featured', { ascending: false })
     .order('name', { ascending: true })
 
@@ -148,9 +167,10 @@ export async function getProductsByCategory(supabase: SupabaseClient<Database>, 
 export async function getProductsBySubcategory(supabase: SupabaseClient<Database>, subcategoryId: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
     .eq('subcategory_id', subcategoryId)
     .eq('status', 'active')
+    .is('deleted_at', null)
     .order('is_featured', { ascending: false })
     .order('name', { ascending: true })
 
@@ -166,8 +186,10 @@ async function fetchProductBy(
 ): Promise<Product | null> {
   const query = supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
     .eq(column, value)
+    .eq('status', 'active')
+    .is('deleted_at', null)
     .maybeSingle()
 
   const { data, error } = await query
@@ -192,9 +214,10 @@ export async function getProductBySlug(supabase: SupabaseClient<Database>, slug:
 export async function getFeaturedProducts(supabase: SupabaseClient<Database>): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
     .eq('is_featured', true)
     .eq('status', 'active')
+    .is('deleted_at', null)
     .limit(6)
 
   if (error) throw error
@@ -204,9 +227,10 @@ export async function getFeaturedProducts(supabase: SupabaseClient<Database>): P
 export async function searchProducts(supabase: SupabaseClient<Database>, query: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
     .or(`name.ilike.%${query}%, brand.ilike.%${query}%, sku.ilike.%${query}%, model_code.ilike.%${query}%, description.ilike.%${query}%`)
     .eq('status', 'active')
+    .is('deleted_at', null)
     .limit(20)
 
   if (error) throw error
