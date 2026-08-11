@@ -110,7 +110,10 @@ alter table public.products
   add column if not exists width_mm numeric(10,1),
   add column if not exists height_mm numeric(10,1),
   add column if not exists depth_mm numeric(10,1),
-  add column if not exists deleted_at timestamptz;  -- PS-012 soft delete
+  add column if not exists deleted_at timestamptz,  -- PS-012 soft delete
+  -- Varyant-düzeyi i18n açıklama: CSV'lerde açıklamalar model-başına farklı (punto-evo: 27 satır
+  -- 27 distinct). family.description = seri fallback'i; PDP varyant metnini öncelikler (Aksiyom 4).
+  add column if not exists description_i18n jsonb;
 
 -- PS-011: cost hassasiyeti
 alter table public.products

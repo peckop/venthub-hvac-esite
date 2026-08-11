@@ -1,0 +1,37 @@
+# Kademe-2 loader — aile (product_families) eşleme haritası (SSOT: kademe2-clean-rebuild-2026-08-11.md F4)
+# Anahtar = aile slug'ı. Kural: aile = CSV × (category/subcategory) çifti.
+# Tek-çiftli CSV'de slug = CSV taban adı; çok-çiftli CSV'de slug = taban + alt-kategori öneki
+# (circular/rectangular/roof/smoke/axial). Bu dosya insan-onaylı addır; loader buradan okur, üretmez.
+
+avens-davlumbaz-fanlar:            { name_tr: "AVenS Davlumbaz Fanları",              name_en: "AVenS Hood Extract Fans" }
+avens-elektrikli-isiticilar:       { name_tr: "AVenS Elektrikli Kanal Isıtıcıları",   name_en: "AVenS Electric Duct Heaters" }
+avens-hucreli-aspiratorler:        { name_tr: "AVenS Hücreli Aspiratörler",           name_en: "AVenS Box-Type Extract Units" }
+avens-isi-geri-kazanim:            { name_tr: "AVenS Isı Geri Kazanım Cihazları",     name_en: "AVenS Heat Recovery Units" }
+avens-plug-fanlar:                 { name_tr: "AVenS Plug Fanlar",                    name_en: "AVenS Plug Fans" }
+avens-siginak-havalandirma-uniteleri: { name_tr: "AVenS Sığınak Havalandırma Üniteleri", name_en: "AVenS Shelter Ventilation Units" }
+danfoss-fc101:                     { name_tr: "Danfoss VLT HVAC Basic Drive FC 101",  name_en: "Danfoss VLT HVAC Basic Drive FC 101", series_code: "FC101" }
+danfoss-fc102:                     { name_tr: "Danfoss VLT HVAC Drive FC 102",        name_en: "Danfoss VLT HVAC Drive FC 102", series_code: "FC102" }
+nicotra-gebhardt-dd:               { name_tr: "Nicotra Gebhardt DD Direkt Akuple Radyal Fanlar", name_en: "Nicotra Gebhardt DD Direct-Driven Centrifugal Fans", series_code: "DD" }
+nicotra-gebhardt-at:               { name_tr: "Nicotra Gebhardt AT Çift Emişli Radyal Fanlar",   name_en: "Nicotra Gebhardt AT Double-Inlet Centrifugal Fans", series_code: "AT" }
+nicotra-gebhardt-rdh:              { name_tr: "Nicotra Gebhardt RDH Seyrek Kanatlı Radyal Fanlar", name_en: "Nicotra Gebhardt RDH Centrifugal Fans", series_code: "RDH" }
+nicotra-gebhardt-adh:              { name_tr: "Nicotra Gebhardt ADH Sık Kanatlı Radyal Fanlar",  name_en: "Nicotra Gebhardt ADH Centrifugal Fans", series_code: "ADH" }
+seat-storm-jet:                    { name_tr: "SEAT Storm Jet Asit Dayanımlı Fanlar", name_en: "SEAT Storm Jet Acid-Resistant Fans", series_code: "STORM-JET" }
+vortice-vort-e-atex:               { name_tr: "Vortice VORT-E ATEX Fanlar",           name_en: "Vortice VORT-E ATEX Fans", series_code: "VORT-E" }
+vortice-vort-nordik-hvls:          { name_tr: "Vortice Nordik HVLS Hyperblade",       name_en: "Vortice Nordik HVLS Hyperblade", series_code: "NORDIK" }
+vortice-vort-qbk-sal-kc-evo:       { name_tr: "Vortice VORT QBK SAL KC Evo",          name_en: "Vortice VORT QBK SAL KC Evo", series_code: "QBK" }
+vortice-hava-perdesi:              { name_tr: "Vortice AIR DOOR Hava Perdeleri",      name_en: "Vortice AIR DOOR Air Curtains", series_code: "AIR-DOOR" }
+vortice-isi-geri-kazanim:          { name_tr: "Vortice VORT HR Isı Geri Kazanım",     name_en: "Vortice VORT HR Heat Recovery", series_code: "VORT-HR" }
+vortice-deumido-range:             { name_tr: "Vortice Deumido Nem Alma Cihazları",   name_en: "Vortice Deumido Dehumidifiers", series_code: "DEUMIDO" }
+vortice-lineo-quiet:               { name_tr: "Vortice Lineo Quiet Kanal Fanları",    name_en: "Vortice Lineo Quiet Inline Fans", series_code: "LINEO" }
+vortice-punto-evo-flexo:           { name_tr: "Vortice Punto Evo / Flexo Banyo Fanları", name_en: "Vortice Punto Evo / Flexo Bathroom Fans", series_code: "PUNTO" }
+vortice-radon-range-circular:      { name_tr: "Vortice Radon Serisi Kanal Fanları",   name_en: "Vortice Radon Range Duct Fans", series_code: "RADON" }
+vortice-radon-range-roof:          { name_tr: "Vortice Radon Serisi Çatı Fanları",    name_en: "Vortice Radon Range Roof Fans", series_code: "RADON" }
+vortice-vort-mono:                 { name_tr: "Vortice VORT Mono",                    name_en: "Vortice VORT Mono", series_code: "MONO" }
+vortice-vort-quadro-evo:           { name_tr: "Vortice VORT Quadro Evo",              name_en: "Vortice VORT Quadro Evo", series_code: "QUADRO" }
+vortice-vortice-bravo-s:           { name_tr: "Vortice Bravo S",                      name_en: "Vortice Bravo S", series_code: "BRAVO" }
+vortice-vort-commercial-in-line-circular:    { name_tr: "Vortice VORT Commercial In-Line Yuvarlak Kanal Fanları", name_en: "Vortice VORT Commercial In-Line Circular Duct Fans", series_code: "CIL" }
+vortice-vort-commercial-in-line-rectangular: { name_tr: "Vortice VORT Commercial In-Line Dikdörtgen Kanal Fanları", name_en: "Vortice VORT Commercial In-Line Rectangular Duct Fans", series_code: "CIL" }
+vortice-vort-heatmaster-slimroof-roof:       { name_tr: "Vortice Slimroof Çatı Fanları",       name_en: "Vortice Slimroof Roof Fans", series_code: "SLIMROOF" }
+vortice-vort-heatmaster-slimroof-smoke:      { name_tr: "Vortice Heatmaster Duman Egzoz Fanları", name_en: "Vortice Heatmaster Smoke Exhaust Fans", series_code: "HEATMASTER" }
+vortice-vort-industrial-ventilation-axial:   { name_tr: "Vortice Aksiyel Endüstriyel Fanlar",  name_en: "Vortice Axial Industrial Fans", series_code: "VORTICEL" }
+vortice-vort-industrial-ventilation-roof:    { name_tr: "Vortice Endüstriyel Çatı Fanları",    name_en: "Vortice Industrial Roof Fans", series_code: "VORTICEL" }
