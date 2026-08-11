@@ -9,7 +9,8 @@
 
 | Dosya | Ne | Durum |
 |---|---|---|
-| `catalog-commerce-pipeline-master-2026-06-20.md` | Katalog→ticaret hattının uçtan-uca panosu | **AKTİF SSOT** — sıradaki: Kademe-2 loader |
+| `kademe2-clean-rebuild-2026-08-11.md` | Temiz yeniden kuruluş: şema-önce (PS W1-3) + tasfiye + CSV yükleme + kod dalgası | **AKTİF — yürütülüyor** |
+| `catalog-commerce-pipeline-master-2026-06-20.md` | Katalog→ticaret hattının uçtan-uca panosu | **AKTİF SSOT** — D1-D5 çözüldü, Kademe-2 → clean-rebuild planında |
 | `product-schema-master-implementation-plan.md` | Ürün şeması 6-dalga onarım yol haritası (PS-001…046) | **AKTİF** — dalga sırası: Split-Model → fiyat motoru |
 | `slug-localization-2026-08-10.md` | Dile-göre-slug mimarisi + eşleme tablosu | **UYGULANDI** (PR #455-457) — kalıcı referans |
 | `avensair-teslim-yol-haritasi-2026-06-15.md` | Ticari teslim sırası (P0 vitrin → P1 bayi → P2 CRM) | **AKTİF** yol haritası |
