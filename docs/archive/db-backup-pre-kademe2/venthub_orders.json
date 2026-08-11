@@ -1,0 +1,2816 @@
+[
+ {
+  "id": "37a1136e-e70e-43ea-9d36-34fdfea67662",
+  "order_number": "VH-20250903-4752",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "confirmed",
+  "total_amount": 3250,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1756904752037",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-03T13:05:52.093168+00:00",
+  "updated_at": "2025-09-03T13:08:28.770936+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 3250,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-03T13:05:48.665Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-03T13:05:48.665Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-03T13:05:48.665Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-03T13:05:48.665Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12345678963",
+   "type": "individual"
+  },
+  "payment_token": "242c3656-b3d8-40e5-a49a-bfed1f110f25",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": null,
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "7d307ff3-fce6-4336-ab18-9339e238d3cf",
+  "order_number": "VH-20250903-3775",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "confirmed",
+  "total_amount": 1250,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1756903774984",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-03T12:49:35.02835+00:00",
+  "updated_at": "2025-09-03T13:03:42.778871+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 1250,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-03T12:49:31.711Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-03T12:49:31.711Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-03T12:49:31.711Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-03T12:49:31.711Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12345678963",
+   "type": "individual"
+  },
+  "payment_token": "1b0fa13e-5d1a-451b-afb5-0359496a921a",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": null,
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "3fb9d4e9-fa01-41be-a3a0-371943fa8e0f",
+  "order_number": "VH-20250903-4973",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "shipped",
+  "total_amount": 3250,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1756904973154",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": "2025-09-03T19:23:22.619+00:00",
+  "delivered_at": null,
+  "created_at": "2025-09-03T13:09:33.203663+00:00",
+  "updated_at": "2025-09-03T19:23:25.039594+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": "Yurtiçi Kargo",
+  "tracking_url": "https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=1234567890",
+  "subtotal_snapshot": 3250,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-03T13:09:29.673Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-03T13:09:29.673Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-03T13:09:29.673Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-03T13:09:29.673Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12345678963",
+   "type": "individual"
+  },
+  "payment_token": "94f72feb-7c0a-4d79-ab3a-6c873206ca63",
+  "customer_phone": "+905313441813",
+  "tracking_number": "1234567890",
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 3250,
+    "token": "94f72feb-7c0a-4d79-ab3a-6c873206ca63",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "593266",
+    "basketId": "VH-1756904973154-a4bv8k",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 3250,
+    "paymentId": "25270207",
+    "signature": "75bce2f49820ea445d84e746883946407c84f97e1484f46ae1bf7d607c486bb4",
+    "cardFamily": "Paraf",
+    "systemTime": 1756905061276,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=3fb9d4e9-fa01-41be-a3a0-371943fa8e0f&conversationId=CONV-1756904973154&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1756904973154",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 3250,
+      "itemId": "dd21d974-d96f-43ad-9af7-9dd4b0931a98",
+      "paidPrice": 3250,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 3250,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 3136.325,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 113.425,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-11 00:00:00",
+      "merchantPayoutAmount": 3136.325,
+      "paymentTransactionId": "27256630",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 113.425,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 113.425,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "25270207",
+   "cardFamily": "Paraf",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "lastFourDigits": "0008",
+   "stock_processed": true,
+   "stock_processed_at": "2025-09-03T13:11:01.536Z"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "a70f8482-fa78-4a0f-8ae0-e34aa12f3de2",
+  "order_number": "VH-20250903-7490",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "confirmed",
+  "total_amount": 3250,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1756927489575",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-03T19:24:49.620024+00:00",
+  "updated_at": "2025-09-04T18:14:16.348276+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 3250,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-03T19:24:45.113Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-03T19:24:45.113Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-03T19:24:45.113Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-03T19:24:45.113Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12345678965",
+   "type": "individual"
+  },
+  "payment_token": "ef26c13b-2bab-4630-b0d4-d9c34dba2ccb",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 3250,
+    "token": "ef26c13b-2bab-4630-b0d4-d9c34dba2ccb",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "390059",
+    "basketId": "VH-1756927489575-15n4du",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 3250,
+    "paymentId": "25272061",
+    "signature": "85c903b53cc0055540bda5ff33beeb1ad61ea0b6e39fce80c506af9a4e08685e",
+    "cardFamily": "Paraf",
+    "systemTime": 1757009656156,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=a70f8482-fa78-4a0f-8ae0-e34aa12f3de2&conversationId=CONV-1756927489575&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 3250,
+      "itemId": "dd21d974-d96f-43ad-9af7-9dd4b0931a98",
+      "paidPrice": 3250,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 3250,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 3136.325,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 113.425,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-11 00:00:00",
+      "merchantPayoutAmount": 3136.325,
+      "paymentTransactionId": "27258253",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 113.425,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 113.425,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "25272061",
+   "cardFamily": "Paraf",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "lastFourDigits": "0008"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "d9713642-1a08-4a0a-ad1d-e1ba582f11c1",
+  "order_number": "VH-20250903-0061",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "shipped",
+  "total_amount": 3250,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1756930060885",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-03T20:07:40.926783+00:00",
+  "updated_at": "2026-03-07T15:54:29.651707+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 3250,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-03T20:07:35.993Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-03T20:07:35.993Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-03T20:07:35.993Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-03T20:07:35.993Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478965",
+   "type": "individual"
+  },
+  "payment_token": "d8436ab7-d921-461f-bb77-f87d07c90334",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 3250,
+    "token": "d8436ab7-d921-461f-bb77-f87d07c90334",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "003270",
+    "basketId": "VH-1756930060885-oqcmci",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 3250,
+    "paymentId": "25272169",
+    "signature": "f6fce13526407e3ea1017e061df55bdf57cf47da4a80a62cec7127bba16e4e4d",
+    "cardFamily": "Paraf",
+    "systemTime": 1757009623076,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=d9713642-1a08-4a0a-ad1d-e1ba582f11c1&conversationId=CONV-1756930060885&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 3250,
+      "itemId": "dd21d974-d96f-43ad-9af7-9dd4b0931a98",
+      "paidPrice": 3250,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 3250,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 3136.325,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 113.425,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-11 00:00:00",
+      "merchantPayoutAmount": 3136.325,
+      "paymentTransactionId": "27258361",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 113.425,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 113.425,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "25272169",
+   "cardFamily": "Paraf",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "lastFourDigits": "0008"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "c5c61fed-c9bc-43e4-8a4a-625fcb34c8ce",
+  "order_number": "VH-20250904-7684",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "pending",
+  "total_amount": 1250,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "pending",
+  "conversation_id": "CONV-1756967683812",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-04T06:34:43.907953+00:00",
+  "updated_at": "2025-09-04T06:34:43.907953+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 1250,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-04T06:34:39.861Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-04T06:34:39.861Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-04T06:34:39.861Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-04T06:34:39.861Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12345678963",
+   "type": "individual"
+  },
+  "payment_token": null,
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": null,
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "524db11b-9801-4c7a-89e4-f23f394f75bb",
+  "order_number": "VH-20250904-7685",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "pending",
+  "total_amount": 1250,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "pending",
+  "conversation_id": "CONV-1756967684769",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-04T06:34:44.847759+00:00",
+  "updated_at": "2025-09-04T06:34:44.847759+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 1250,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-04T06:34:39.861Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-04T06:34:39.861Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-04T06:34:39.861Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-04T06:34:39.861Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12345678963",
+   "type": "individual"
+  },
+  "payment_token": null,
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": null,
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "3c45e254-4dd3-4ba8-816b-1bd41712e80c",
+  "order_number": "VH-20250903-3301",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "pending",
+  "total_amount": 3250,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1756933300670",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-03T21:01:40.712309+00:00",
+  "updated_at": "2026-02-27T07:40:57.542612+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 3250,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-03T21:01:36.081Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-03T21:01:36.081Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-03T21:01:36.081Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-03T21:01:36.081Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": "bcf8398f-9986-4dd4-a648-88fc84c1c661",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 3250,
+    "token": "bcf8398f-9986-4dd4-a648-88fc84c1c661",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "144659",
+    "basketId": "VH-1756933300670-flvqdh",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 3250,
+    "paymentId": "25272309",
+    "signature": "2eeeeeb90e1014fe983d4320d40b5be6e256467edc1c84c99079aa6bf57acb1e",
+    "cardFamily": "Paraf",
+    "systemTime": 1756933327374,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=3c45e254-4dd3-4ba8-816b-1bd41712e80c&conversationId=CONV-1756933300670&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1756933300670",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 3250,
+      "itemId": "dd21d974-d96f-43ad-9af7-9dd4b0931a98",
+      "paidPrice": 3250,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 3250,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 3136.325,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 113.425,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-12 00:00:00",
+      "merchantPayoutAmount": 3136.325,
+      "paymentTransactionId": "27258484",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 113.425,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 113.425,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "25272309",
+   "cardFamily": "Paraf",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "lastFourDigits": "0008",
+   "stock_processed": true,
+   "stock_processed_at": "2025-09-03T21:02:07.650Z",
+   "manual_stock_reduced": true,
+   "manual_stock_reduced_at": "2025-09-04T06:23:35.444187+00:00"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "77eb69e3-1968-4405-b94b-d5276e9703e8",
+  "order_number": "VH-20250904-4477",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "pending",
+  "total_amount": 750,
+  "shipping_method": "express",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1757004476461",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-04T16:47:56.510508+00:00",
+  "updated_at": "2026-02-27T07:40:54.928147+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 750,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-04T16:47:52.408Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-04T16:47:52.408Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-04T16:47:52.408Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-04T16:47:52.408Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": "f0eea657-5e2d-42cb-a336-432ed6be41ff",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": {
+   "manual_marked_paid": true,
+   "manual_marked_paid_at": "2025-09-04T17:09:59.996388+00:00"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "3715b1d7-2af4-42ae-b76e-9f960a061630",
+  "order_number": "VH-20250904-9470",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "delivered",
+  "total_amount": 4721.25,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "refunded",
+  "conversation_id": "CONV-1756969469501",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-04T07:04:29.543126+00:00",
+  "updated_at": "2026-02-27T07:41:14.396956+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 4721.25,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-04T07:04:23.991Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-04T07:04:23.991Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-04T07:04:23.991Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-04T07:04:23.991Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": "a5de2aae-5d2e-4277-8ccf-261eeae3afc6",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 4721.25,
+    "token": "a5de2aae-5d2e-4277-8ccf-261eeae3afc6",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "603733",
+    "basketId": "VH-1756969469501-7d94em",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 4721.25,
+    "paymentId": "25275568",
+    "signature": "6d4769e682041c5ff3f903fe35a039dfaf9385faaab4564f79407488e70ac834",
+    "cardFamily": "Paraf",
+    "systemTime": 1756969496562,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=3715b1d7-2af4-42ae-b76e-9f960a061630&conversationId=CONV-1756969469501&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1756969469501",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 890.5,
+      "itemId": "836c5fe9-da4c-413f-8569-f74e06c9d851",
+      "paidPrice": 890.5,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 890.5,
+       "iyziCommissionFee": 0.04715383,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 859.37439617,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 31.07845,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.04715383,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-12 00:00:00",
+      "merchantPayoutAmount": 859.37439617,
+      "paymentTransactionId": "27260586",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 31.07845,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     },
+     {
+      "price": 1850,
+      "itemId": "d3122aed-3550-4853-95f7-0cb7f3d3f439",
+      "paidPrice": 1850,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 1850,
+       "iyziCommissionFee": 0.09796134,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 1785.33703866,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 64.565,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.09796134,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-12 00:00:00",
+      "merchantPayoutAmount": 1785.33703866,
+      "paymentTransactionId": "27260588",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 64.565,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     },
+     {
+      "price": 1980.75,
+      "itemId": "471d7cfe-6fb6-47dc-877c-ef196f0cc584",
+      "paidPrice": 1980.75,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 1980.75,
+       "iyziCommissionFee": 0.10488483,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 1911.51694017,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 69.128175,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.10488483,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-12 00:00:00",
+      "merchantPayoutAmount": 1911.51694017,
+      "paymentTransactionId": "27260587",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 69.128175,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 164.771625,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "25275568",
+   "cardFamily": "Paraf",
+   "refund_type": "refund",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "refund_amount": 100,
+   "refund_result": {
+    "price": 100,
+    "locale": "tr",
+    "status": "success",
+    "authCode": "482531",
+    "currency": "TRY",
+    "paymentId": "25275568",
+    "retryable": false,
+    "signature": "4102d3007b6dea44252aa2dcd41c6280b0b68ae0c200d72fb6bc9f5d99d47a99",
+    "systemTime": 1756969557081,
+    "hostReference": "mock00001iyzihostrfn",
+    "refundHostReference": "mock00001iyzihostrfn",
+    "paymentTransactionId": "27260586"
+   },
+   "lastFourDigits": "0008",
+   "stock_processed": true,
+   "stock_processed_at": "2025-09-04T07:04:57.062Z",
+   "manual_refund_applied": true,
+   "manual_refund_applied_at": "2025-09-04T07:05:57.496Z"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "bbe120a4-bd02-4da5-958e-420b206434e2",
+  "order_number": "VH-20250904-7887",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "delivered",
+  "total_amount": 1250,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "refunded",
+  "conversation_id": "CONV-1756967887090",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-04T06:38:07.139157+00:00",
+  "updated_at": "2026-02-27T07:41:17.670765+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 1250,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-04T06:38:01.271Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-04T06:38:01.271Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-04T06:38:01.271Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-04T06:38:01.271Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": "5e96b7ed-a6dc-4aae-a396-8d24e4d824ba",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 1250,
+    "token": "5e96b7ed-a6dc-4aae-a396-8d24e4d824ba",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "875427",
+    "basketId": "VH-1756967887090-sz5tkd",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 1250,
+    "paymentId": "25275438",
+    "signature": "7c391394886dc65dd318c77a75014b70e7b869a49789db668ad79280e73759e1",
+    "cardFamily": "Paraf",
+    "systemTime": 1756967914781,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=bbe120a4-bd02-4da5-958e-420b206434e2&conversationId=CONV-1756967887090&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1756967887090",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 1250,
+      "itemId": "810276f1-3943-4525-9a2d-579552250677",
+      "paidPrice": 1250,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 1250,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 1206.125,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 43.625,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-12 00:00:00",
+      "merchantPayoutAmount": 1206.125,
+      "paymentTransactionId": "27260460",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 43.625,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 43.625,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "25275438",
+   "cardFamily": "Paraf",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "lastFourDigits": "0008",
+   "stock_processed": true,
+   "stock_processed_at": "2025-09-04T06:38:35.143Z",
+   "manual_refund_applied": true,
+   "manual_refund_applied_at": "2025-09-04T06:47:25.702351+00:00"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "afbf1a5f-0284-4e99-b5ea-90dce57e2aff",
+  "order_number": "VH-20250913-1442",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "delivered",
+  "total_amount": 950,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "refunded",
+  "conversation_id": "CONV-1757791441908",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": "2025-09-16T11:37:44.816+00:00",
+  "delivered_at": null,
+  "created_at": "2025-09-13T19:24:01.946175+00:00",
+  "updated_at": "2026-02-27T07:41:10.556646+00:00",
+  "customer_name": "recep varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": "Yurtiçi",
+  "tracking_url": "https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=12365487899",
+  "subtotal_snapshot": 950,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-13T19:23:59.837Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-13T19:23:59.838Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-13T19:23:59.838Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-13T19:23:59.838Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": "0fecc7ae-04ea-47b2-88c5-2d0077e0e66d",
+  "customer_phone": "+905313441813",
+  "tracking_number": "12365487899",
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 950,
+    "token": "0fecc7ae-04ea-47b2-88c5-2d0077e0e66d",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "616864",
+    "basketId": "VH-1757791441908-3ngb7q",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 950,
+    "paymentId": "26169416",
+    "signature": "7f8e048e46439eeeb16ac3230486b4113999fb9945ea3514e4ce1973235f87f0",
+    "cardFamily": "Paraf",
+    "systemTime": 1757791490635,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=afbf1a5f-0284-4e99-b5ea-90dce57e2aff&conversationId=CONV-1757791441908&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1757791441908",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 950,
+      "itemId": "85aa5b65-65b1-4754-b495-a98d70194231",
+      "paidPrice": 950,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 950,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 916.595,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 33.155,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-21 00:00:00",
+      "merchantPayoutAmount": 916.595,
+      "paymentTransactionId": "28152961",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 33.155,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "maturityChargeAmount": 0,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 33.155,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "26169416",
+   "cardFamily": "Paraf",
+   "mock_refund": true,
+   "refund_type": "cancel",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "refund_amount": 950,
+   "lastFourDigits": "0008",
+   "refunded_total": 950,
+   "partial_refunds": [],
+   "mock_refund_reason": "return:2faf363d-d4f5-4c3e-b5af-f6d4a7f31887"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "63b21c1e-0147-49a8-a89d-6c196f2615f0",
+  "order_number": "VH-20250907-4778",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "shipped",
+  "total_amount": 320,
+  "shipping_method": "express",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1757244778412",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": "2025-09-13T08:41:59.949+00:00",
+  "delivered_at": null,
+  "created_at": "2025-09-07T11:32:58.448035+00:00",
+  "updated_at": "2025-09-13T08:42:00.00396+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": "MNG",
+  "tracking_url": "https://www.mngkargo.com.tr/kargotakip?kargono=136987450",
+  "subtotal_snapshot": 320,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-07T11:32:54.661Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-07T11:32:54.661Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-07T11:32:54.661Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-07T11:32:54.661Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": "c16510a9-0865-40d7-b4d7-20d8caa8f448",
+  "customer_phone": null,
+  "tracking_number": "136987450",
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 320,
+    "token": "c16510a9-0865-40d7-b4d7-20d8caa8f448",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "596852",
+    "basketId": "VH-1757244778412-nzm2l4",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 320,
+    "paymentId": "25292422",
+    "signature": "3449d7cdcec4456d26e71e54a53dfcca957959459e053a05b644185a03e35498",
+    "cardFamily": "Paraf",
+    "systemTime": 1757244807244,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=63b21c1e-0147-49a8-a89d-6c196f2615f0&conversationId=CONV-1757244778412&successUrl=http%3A%2F%2Flocalhost%3A5173%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1757244778412",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 320,
+      "itemId": "a40d799d-982a-4a40-8faa-a16c4b674290",
+      "paidPrice": 320,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 320,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 308.582,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 11.168,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-15 00:00:00",
+      "merchantPayoutAmount": 308.582,
+      "paymentTransactionId": "27277282",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 11.168,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 11.168,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "25292422",
+   "cardFamily": "Paraf",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "lastFourDigits": "0008"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "a430a9b5-d453-48be-8182-70f401dcdbc4",
+  "order_number": "VH-20250904-6104",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "shipped",
+  "total_amount": 750,
+  "shipping_method": "express",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1757006104256",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": "2025-09-13T08:54:05.033+00:00",
+  "delivered_at": null,
+  "created_at": "2025-09-04T17:15:04.332887+00:00",
+  "updated_at": "2025-09-13T08:54:05.164668+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": "Aras",
+  "tracking_url": "https://kargotakip.araskargo.com.tr/tarama.aspx?code=321456987",
+  "subtotal_snapshot": 750,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-04T17:15:00.311Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-04T17:15:00.311Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-04T17:15:00.311Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-04T17:15:00.311Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478965",
+   "type": "individual"
+  },
+  "payment_token": "e28acedf-175a-4641-89ab-dc66111892e9",
+  "customer_phone": "+905313441813",
+  "tracking_number": "321456987",
+  "payment_debug": {
+   "manual_marked_paid": true,
+   "manual_marked_paid_at": "2025-09-04T17:21:49.843466+00:00"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "a180fe02-1785-40a2-a1f3-93c070f4937a",
+  "order_number": "VH-20250916-5005",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "pending",
+  "total_amount": 12500,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1758025004457",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-16T12:16:44.50552+00:00",
+  "updated_at": "2026-02-27T07:40:47.047107+00:00",
+  "customer_name": "recep varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 12500,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-16T12:16:41.900Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-16T12:16:41.900Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-16T12:16:41.900Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-16T12:16:41.900Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": "62257814-e08c-4ab9-a721-eeee3925373a",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": null,
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "49b04b8c-6b78-4db3-bfdc-935bab66ad78",
+  "order_number": "VH-20250912-9647",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "delivered",
+  "total_amount": 950,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1757699646710",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": "2025-09-13T16:48:42.273+00:00",
+  "delivered_at": null,
+  "created_at": "2025-09-12T17:54:06.758098+00:00",
+  "updated_at": "2026-02-27T07:25:53.762917+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": "Aras",
+  "tracking_url": "https://kargotakip.araskargo.com.tr/tarama.aspx?code=264984981981",
+  "subtotal_snapshot": 950,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-12T17:54:00.815Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-12T17:54:00.815Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-12T17:54:00.815Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-12T17:54:00.815Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12345678963",
+   "type": "individual"
+  },
+  "payment_token": "9517907e-b139-4ff5-acb9-bc47dca650b7",
+  "customer_phone": "+905313441813",
+  "tracking_number": "264984981981",
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 950,
+    "token": "9517907e-b139-4ff5-acb9-bc47dca650b7",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "769772",
+    "basketId": "VH-1757699646710-jz3dfx",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 950,
+    "paymentId": "26164752",
+    "signature": "a75db2ef5ac25315cd2e899754210415eb08f52c28c8e883c6a01cdeee86a6f4",
+    "cardFamily": "Paraf",
+    "systemTime": 1757699676415,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=49b04b8c-6b78-4db3-bfdc-935bab66ad78&conversationId=CONV-1757699646710&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1757699646710",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 950,
+      "itemId": "85aa5b65-65b1-4754-b495-a98d70194231",
+      "paidPrice": 950,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 950,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 916.595,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 33.155,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-20 00:00:00",
+      "merchantPayoutAmount": 916.595,
+      "paymentTransactionId": "28149082",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 33.155,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "maturityChargeAmount": 0,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 33.155,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "26164752",
+   "cardFamily": "Paraf",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "lastFourDigits": "0008"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "f5aaeea3-96f2-473d-8208-82f792839189",
+  "order_number": "VH-20250911-1042",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "pending",
+  "total_amount": 750,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1757621041684",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-11T20:04:01.725317+00:00",
+  "updated_at": "2026-02-27T07:40:50.771964+00:00",
+  "customer_name": "recep varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 750,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-11T20:03:56.541Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-11T20:03:56.541Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-11T20:03:56.541Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-11T20:03:56.541Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12345678965",
+   "type": "individual"
+  },
+  "payment_token": "bd34fd74-5e98-41e4-aac0-9181a199738d",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 750,
+    "token": "bd34fd74-5e98-41e4-aac0-9181a199738d",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "040869",
+    "basketId": "VH-1757621041684-weqhwf",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 750,
+    "paymentId": "26151912",
+    "signature": "f0da3313484ea8aec331ee821bf2d10081713d55c6984173809fbefeab02114a",
+    "cardFamily": "Paraf",
+    "systemTime": 1757621077612,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=f5aaeea3-96f2-473d-8208-82f792839189&conversationId=CONV-1757621041684&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1757621041684",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 750,
+      "itemId": "19a3d95a-8a73-4c46-a07f-5f426088bb41",
+      "paidPrice": 750,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 750,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 723.575,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 26.175,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-19 00:00:00",
+      "merchantPayoutAmount": 723.575,
+      "paymentTransactionId": "28137495",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 26.175,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "maturityChargeAmount": 0,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 26.175,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "26151912",
+   "cardFamily": "Paraf",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "lastFourDigits": "0008"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "0f5beb54-0dec-45ba-b686-499e208079b6",
+  "order_number": "VH-20250916-5049",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "pending",
+  "total_amount": 12500,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1758025049439",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-16T12:17:29.475381+00:00",
+  "updated_at": "2026-02-27T07:40:45.709388+00:00",
+  "customer_name": "recep varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 12500,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-16T12:17:28.551Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-16T12:17:28.551Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-16T12:17:28.551Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-16T12:17:28.551Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": "bc99c4be-0e9f-46fe-85f7-7b714a1e813e",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 12500,
+    "token": "bc99c4be-0e9f-46fe-85f7-7b714a1e813e",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "708776",
+    "basketId": "VH-1758025049439-sqivac",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 12500,
+    "paymentId": "26185217",
+    "signature": "755928771ec371d58cbc867857c87df32d70ac40b887aa886770a0afe67143cf",
+    "cardFamily": "Paraf",
+    "systemTime": 1758025348106,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=0f5beb54-0dec-45ba-b686-499e208079b6&conversationId=CONV-1758025049439&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1758025049439",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 12500,
+      "itemId": "24537f60-2431-4770-881b-5a9952ce1761",
+      "paidPrice": 12500,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 12500,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 12063.5,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 436.25,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-24 00:00:00",
+      "merchantPayoutAmount": 12063.5,
+      "paymentTransactionId": "28168270",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 436.25,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "maturityChargeAmount": 0,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 436.25,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "26185217",
+   "cardFamily": "Paraf",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "lastFourDigits": "0008"
+  },
+  "coupon_code": "FALL10",
+  "coupon_discount": 1250,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "7796f8c2-5033-475f-8695-53d4f9dfffb5",
+  "order_number": "VH-20250913-7306",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "pending",
+  "total_amount": 950,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1757787305743",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-13T18:15:05.787953+00:00",
+  "updated_at": "2026-02-27T07:40:49.067933+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 950,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-13T18:15:03.704Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-13T18:15:03.704Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-13T18:15:03.704Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-13T18:15:03.704Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": "7cf9ba81-8197-44fd-a994-c697c9898241",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": null,
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "599bff03-b87d-403b-a0be-7414890adc8e",
+  "order_number": "VH-20250904-4356",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "pending",
+  "total_amount": 4721.25,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "TEST-1756974356",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2025-09-04T08:25:55.822507+00:00",
+  "updated_at": "2026-02-27T07:40:55.568479+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 4721.25,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-04T07:04:23.991Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-04T07:04:23.991Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-04T07:04:23.991Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-04T07:04:23.991Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": null,
+  "customer_phone": null,
+  "tracking_number": null,
+  "payment_debug": null,
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "5b6c115a-e36e-48d3-80a2-22b86d3416da",
+  "order_number": "VH-20250904-4616",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "delivered",
+  "total_amount": 10800,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "partial_refunded",
+  "conversation_id": "CONV-1756974615754",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": "2025-09-04T13:13:35.993+00:00",
+  "delivered_at": null,
+  "created_at": "2025-09-04T08:30:15.801676+00:00",
+  "updated_at": "2026-02-27T07:41:12.149638+00:00",
+  "customer_name": "Recep Varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": "Yurtiçi",
+  "tracking_url": "https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=123000123",
+  "subtotal_snapshot": 10800,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2025-09-04T08:30:10.451Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2025-09-04T08:30:10.451Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2025-09-04T08:30:10.451Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2025-09-04T08:30:10.451Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "12365478963",
+   "type": "individual"
+  },
+  "payment_token": "edc04a5c-e08c-4ef2-9a47-8b64daca7838",
+  "customer_phone": "+905313441813",
+  "tracking_number": "123000123",
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 10800,
+    "token": "edc04a5c-e08c-4ef2-9a47-8b64daca7838",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "826248",
+    "basketId": "VH-1756974615754-pp97qh",
+    "cardType": "CREDIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "552879",
+    "paidPrice": 10800,
+    "paymentId": "25276318",
+    "signature": "14a29710297bfbdcec05badb8ce46c47e08b786aa552a9c6c096fb658adb5621",
+    "cardFamily": "Paraf",
+    "systemTime": 1756974645336,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=5b6c115a-e36e-48d3-80a2-22b86d3416da&conversationId=CONV-1756974615754&successUrl=https%3A%2F%2Fventhub-hvac-esite.pages.dev%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00001iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1756974615754",
+    "lastFourDigits": "0008",
+    "cardAssociation": "MASTER_CARD",
+    "itemTransactions": [
+     {
+      "price": 3250,
+      "itemId": "85b339e5-b2b7-48b9-9044-8406d5b32fbf",
+      "paidPrice": 3250,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 3250,
+       "iyziCommissionFee": 0.07523148,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 3136.49976852,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 113.425,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.07523148,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-12 00:00:00",
+      "merchantPayoutAmount": 3136.49976852,
+      "paymentTransactionId": "27261291",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 113.425,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     },
+     {
+      "price": 1050,
+      "itemId": "830e94bb-86d7-48cb-879a-a6d381da0bb0",
+      "paidPrice": 1050,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 1050,
+       "iyziCommissionFee": 0.02430556,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 1013.33069444,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 36.645,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.02430556,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-12 00:00:00",
+      "merchantPayoutAmount": 1013.33069444,
+      "paymentTransactionId": "27261266",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 36.645,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     },
+     {
+      "price": 6500,
+      "itemId": "bc700dce-bc1a-454f-a81f-744dba1107a8",
+      "paidPrice": 6500,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 6500,
+       "iyziCommissionFee": 0.15046296,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 6272.99953704,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 226.85,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.15046296,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2025-09-12 00:00:00",
+      "merchantPayoutAmount": 6272.99953704,
+      "paymentTransactionId": "27261292",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 226.85,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 376.92,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "552879",
+   "errorCode": null,
+   "paymentId": "25276318",
+   "cardFamily": "Paraf",
+   "refund_type": "refund",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "refund_amount": 3250,
+   "refund_result": {
+    "price": 3250,
+    "locale": "tr",
+    "status": "success",
+    "authCode": "184413",
+    "currency": "TRY",
+    "paymentId": "25276318",
+    "retryable": false,
+    "signature": "b1c152a8f3c34dbf64dc912ac2baa87cfaef92490265a1026a8ee351a9de7adc",
+    "systemTime": 1756974753557,
+    "hostReference": "mock00001iyzihostrfn",
+    "refundHostReference": "mock00001iyzihostrfn",
+    "paymentTransactionId": "27261291"
+   },
+   "lastFourDigits": "0008",
+   "refunded_total": 3250,
+   "partial_refunds": [
+    {
+     "at": "2025-09-04T08:32:33.595Z",
+     "amount": 3250
+    }
+   ],
+   "stock_processed": true,
+   "stock_processed_at": "2025-09-04T08:30:47.321Z",
+   "stock_returned_for": {
+    "85b339e5-b2b7-48b9-9044-8406d5b32fbf": true,
+    "d3122aed-3550-4853-95f7-0cb7f3d3f439": true
+   }
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "ae8fe7ab-5b98-4e2f-a52b-98c24b710c8f",
+  "order_number": "VH-20260101-7656",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "delivered",
+  "total_amount": 43537.27,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1767287656304",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2026-01-01T17:14:16.385919+00:00",
+  "updated_at": "2026-02-27T07:22:05.754906+00:00",
+  "customer_name": "recep varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 43537.27,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2026-01-01T17:14:06.220Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2026-01-01T17:14:06.220Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": null,
+    "accepted": false
+   },
+   "orderConfirm": {
+    "ts": "2026-01-01T17:14:06.220Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2026-01-01T17:14:06.220Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "42517950430",
+   "type": "individual"
+  },
+  "payment_token": "680e7d62-7ee9-4803-9927-11460929372a",
+  "customer_phone": null,
+  "tracking_number": null,
+  "payment_debug": null,
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "7f088da6-e7da-475f-9060-1e768310127c",
+  "order_number": "VH-20260307-6293",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "confirmed",
+  "total_amount": 43537.27,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "paid",
+  "conversation_id": "CONV-1772916292874",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2026-03-07T20:44:52.903567+00:00",
+  "updated_at": "2026-03-07T20:45:39.332753+00:00",
+  "customer_name": "recep varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 43537.27,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2026-03-07T20:44:51.948Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2026-03-07T20:44:51.948Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": "2026-03-07T20:44:51.948Z",
+    "accepted": true
+   },
+   "orderConfirm": {
+    "ts": "2026-03-07T20:44:51.948Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2026-03-07T20:44:51.948Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "42517950430",
+   "type": "individual"
+  },
+  "payment_token": "7bb31508-744e-47ae-8217-ca928fc46ea8",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": {
+   "raw": {
+    "phase": "AUTH",
+    "price": 43537.27,
+    "token": "7bb31508-744e-47ae-8217-ca928fc46ea8",
+    "locale": "tr",
+    "status": "success",
+    "authCode": "468280",
+    "basketId": "VH-1772916292874-iu2vdk",
+    "cardType": "DEBIT_CARD",
+    "currency": "TRY",
+    "mdStatus": 1,
+    "binNumber": "476662",
+    "paidPrice": 43537.27,
+    "paymentId": "28792214",
+    "signature": "a89d017647e160ea0d71f9daa851fe8c111e97574e9312d5ced009c61db33f58",
+    "cardFamily": "Denizbank DC",
+    "systemTime": 1772916339175,
+    "callbackUrl": "https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback?orderId=7f088da6-e7da-475f-9060-1e768310127c&conversationId=CONV-1772916292874&successUrl=https%3A%2F%2Fventhub-hvac-esite.vercel.app%2Fpayment-success",
+    "fraudStatus": 1,
+    "installment": 1,
+    "hostReference": "mock00032iyzihostrfn",
+    "paymentStatus": "SUCCESS",
+    "conversationId": "CONV-1772916292874",
+    "lastFourDigits": "0001",
+    "cardAssociation": "VISA",
+    "itemTransactions": [
+     {
+      "price": 43537.27,
+      "itemId": "e3dbf81c-a8de-46a1-9b91-f95dcad77f70",
+      "paidPrice": 43537.27,
+      "blockageRate": 0,
+      "convertedPayout": {
+       "currency": "TRY",
+       "paidPrice": 43537.27,
+       "iyziCommissionFee": 0.25,
+       "iyziConversionRate": 0,
+       "merchantPayoutAmount": 43058.11003,
+       "subMerchantPayoutAmount": 0,
+       "iyziCommissionRateAmount": 478.90997,
+       "iyziConversionRateAmount": 0,
+       "blockageRateAmountMerchant": 0,
+       "blockageRateAmountSubMerchant": 0
+      },
+      "subMerchantPrice": 0,
+      "iyziCommissionFee": 0.25,
+      "transactionStatus": 2,
+      "blockageResolvedDate": "2026-03-15 00:00:00",
+      "merchantPayoutAmount": 43058.11003,
+      "paymentTransactionId": "30759744",
+      "subMerchantPayoutRate": 0,
+      "merchantCommissionRate": 0,
+      "subMerchantPayoutAmount": 0,
+      "iyziCommissionRateAmount": 478.90997,
+      "blockageRateAmountMerchant": 0,
+      "merchantCommissionRateAmount": 0,
+      "blockageRateAmountSubMerchant": 0
+     }
+    ],
+    "iyziCommissionFee": 0.25,
+    "maturityChargeAmount": 0,
+    "merchantCommissionRate": 0,
+    "iyziCommissionRateAmount": 478.90997,
+    "merchantCommissionRateAmount": 0
+   },
+   "mdStatus": 1,
+   "binNumber": "476662",
+   "errorCode": null,
+   "paymentId": "28792214",
+   "cardFamily": "Denizbank DC",
+   "errorMessage": null,
+   "paymentStatus": "SUCCESS",
+   "lastFourDigits": "0001"
+  },
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ },
+ {
+  "id": "6dc6cebd-1142-42c9-8eca-cbd819c658e0",
+  "order_number": "VH-20260307-5471",
+  "user_id": "357f4f40-2334-4a99-a156-013603df3914",
+  "status": "pending",
+  "total_amount": 43537.27,
+  "shipping_method": "standard",
+  "shipping_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "billing_address": {
+   "city": "İSTANBUL",
+   "district": "KÜÇÜKÇEKMECE",
+   "postalCode": "34295",
+   "fullAddress": "Söğütlüçeşme Mh. Kavak Sk. No:14 D:2"
+  },
+  "invoice_profile": null,
+  "payment_method": "iyzico",
+  "payment_status": "pending",
+  "conversation_id": "CONV-1772915470750",
+  "shipping_carrier": null,
+  "shipping_tracking_number": null,
+  "shipped_at": null,
+  "delivered_at": null,
+  "created_at": "2026-03-07T20:31:10.783568+00:00",
+  "updated_at": "2026-03-07T20:42:47.290294+00:00",
+  "customer_name": "recep varlık",
+  "customer_email": "recep.varlik@gmail.com",
+  "carrier": null,
+  "tracking_url": null,
+  "subtotal_snapshot": 43537.27,
+  "legal_consents": {
+   "kvkk": {
+    "ts": "2026-03-07T20:31:08.037Z",
+    "accepted": true
+   },
+   "preInfo": {
+    "ts": "2026-03-07T20:31:08.037Z",
+    "accepted": true
+   },
+   "marketing": {
+    "ts": "2026-03-07T20:31:08.037Z",
+    "accepted": true
+   },
+   "orderConfirm": {
+    "ts": "2026-03-07T20:31:08.037Z",
+    "accepted": true
+   },
+   "distanceSales": {
+    "ts": "2026-03-07T20:31:08.037Z",
+    "accepted": true
+   }
+  },
+  "invoice_type": "individual",
+  "invoice_info": {
+   "tckn": "42517950430",
+   "type": "individual"
+  },
+  "payment_token": "d744715d-751c-4656-98fc-7e6b55a30739",
+  "customer_phone": "+905313441813",
+  "tracking_number": null,
+  "payment_debug": null,
+  "coupon_code": null,
+  "coupon_discount": 0,
+  "locale": "tr",
+  "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000"
+ }
+]
