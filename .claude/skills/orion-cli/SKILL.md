@@ -15,7 +15,8 @@ metadata:
   outputs:
   - docs/*.md
   recovery:
-    on_auth_expired: powershell -File .agent/scripts/nlm-clean-login.ps1
+    on_auth_expired: 'NLM auth: notebooklm-sync skill Adim 0 (nlm-headless-refresh.ps1
+      -> refresh_auth; oturum olmusse: nlm login --clear)'
   prerequisites:
   - OPENROUTER_API_KEY
   - nlm login (NotebookLM sync için)
@@ -171,7 +172,7 @@ orion doc tree --nlm-sync --force-sync
 | Hata | Çözüm |
 |------|-------|
 | LLM rate limit | `--force` olmadan tekrar çalıştır (tamamlananları atlar) |
-| Auth expired (NLM) | `nlm login` çalıştır, sonra tekrar dene |
+| Auth expired (NLM) | notebooklm-sync skill Adım 0'ı uygula (headless refresh → `refresh_auth`; oturum ölmüşse `nlm login --clear`) |
 | 0 dosya derlendi | `.cc_docs.yaml` source_dirs kontrol et |
 | Mükerrer NLM kaynağı | `nlm source list <notebook_id> --json` ile kontrol et, fazlaları sil |
 | system_tree encoding bozuk | PowerShell değil Python ile oku, dosya UTF-8 |

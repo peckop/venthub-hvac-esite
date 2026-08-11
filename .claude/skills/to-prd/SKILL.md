@@ -29,7 +29,7 @@ This skill takes the current conversation context and codebase understanding and
 
 1. Explore the repo to understand the current state of the codebase. Use the project's domain glossary vocabulary throughout the PRD.
 2. Sketch out the seams at which you're going to test the feature.
-3. Write the PRD using the template below and save it to `artifacts/superpowers/prd.md`.
+3. Write the PRD using the template below and save it to `docs/plans/prd-<konu>-<YYYY-AA-GG>.md`.
 
 ### Template:
 - **Problem Statement**: The problem from the user's perspective.

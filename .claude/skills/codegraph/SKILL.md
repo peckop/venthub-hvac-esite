@@ -40,11 +40,11 @@ exclusions: []
 
 # CodeGraph — Codebase Intelligence Skill
 
-## Overview
+CodeGraph is a SQLite-backed AST knowledge graph of every symbol, edge, and file in the workspace. Reads are sub-millisecond; the index lags file writes by ~1 second. Consult it **before** writing or editing code — for any structural question ("who calls X", "what breaks if I change Y", "where is Z"), go to CodeGraph **before** grep.
 
-CodeGraph is a SQLite-backed knowledge graph that indexes every symbol, edge, and file in the workspace. It provides sub-millisecond read access to structural relationships (callers, callees, dependencies, impact) that would otherwise require expensive grep + file-read loops. Use CodeGraph **before** writing or editing code to understand blast radius, dependency chains, and symbol locations.
+**Tool selection and usage rules are loaded every session via the MCP server's own instructions — follow those.** Default entry point: `codegraph_explore` (one call answers most questions).
 
-### When to Use
+## When to Use
 
 - **Pre-refactoring**: Understand what will break before you touch anything
 - **Architecture questions**: "How does X work?", "What calls Y?"
@@ -52,175 +52,12 @@ CodeGraph is a SQLite-backed knowledge graph that indexes every symbol, edge, an
 - **Dead code detection**: Find components or functions with zero callers
 - **Change propagation**: Know which files a modification will ripple through
 
-### When NOT to Use
+## When NOT to Use
 
 - Database operations (migrations, queries, RLS policies)
 - Git commands (commit, branch, merge)
 - Running tests (Vitest, Playwright, Lighthouse)
 - Font styling or typography adjustments
-
----
-
-## Available Tools
-
-All tools are called via the `codegraph` MCP server using `call_mcp_tool`.
-
-| Tool | Description | Key Parameters | When to Use |
-|------|-------------|----------------|-------------|
-| `codegraph_explore` | **PRIMARY** — Returns verbatim source of relevant symbols grouped by file. Usually the ONLY call needed. | `query` (natural language or symbol names), `maxFiles` (default 12) | Almost any question: "how does X work", architecture, bugs, surveying an area |
-| `codegraph_search` | Quick symbol search by name. Returns locations only (no code). | `query`, `kind` (function/method/class/interface/type/variable/route/component), `limit` | Finding a symbol's location before deeper analysis |
-| `codegraph_callers` | Lists all functions/components that call a given symbol. | `symbol`, `limit` (default 20) | "Who calls this?", "Who imports this?" |
-| `codegraph_callees` | Lists all functions/components that a given symbol calls. | `symbol`, `limit` (default 20) | "What does this function depend on?" |
-| `codegraph_impact` | Lists symbols affected by changing a given symbol. Traverses dependency levels. | `symbol`, `depth` (default 2) | Pre-refactor blast radius analysis |
-| `codegraph_node` | Full detail for ONE symbol — location, signature, callers/callees trail, optional verbatim body. Handles overloaded names. | `symbol`, `includeCode` (default false), `file`, `line` | When `codegraph_explore` trimmed a body you need, or disambiguating overloaded names |
-| `codegraph_files` | Indexed file tree with language + symbol counts. Faster than glob for project layout. | `path`, `pattern`, `format` (tree/flat/grouped), `maxDepth` | Understanding project structure, filtering by directory or glob |
-| `codegraph_status` | Index health check: file counts, node counts, edge counts. | `projectPath` | Debugging index freshness issues |
-
-### Example MCP Call
-
-```
-call_mcp_tool(
-  ServerName: "codegraph",
-  ToolName: "codegraph_callers",
-  Arguments: { "symbol": "OrbitalProductsShowcase" }
-)
-```
-
----
-
-## Use Cases
-
-### 1. Pre-Refactoring Impact Analysis
-
-Before renaming, moving, or restructuring a symbol, understand the full blast radius:
-
-```
-Step 1: codegraph_impact → symbol: "Footer", depth: 3
-Step 2: Review all affected symbols and files
-Step 3: Plan migration path based on dependency graph
-```
-
-### 2. Finding All Consumers of a Component
-
-Discover every place a React component or hook is imported and used:
-
-```
-Step 1: codegraph_callers → symbol: "useCategories"
-Step 2: Review caller locations and usage patterns
-```
-
-### 3. Understanding Import / Dependency Chains
-
-Trace the full dependency chain of any module or page:
-
-```
-Step 1: codegraph_explore → query: "products page data flow CategoryMasterView"
-Step 2: Follow the callee chain for deeper understanding
-```
-
-### 4. Dead Code Detection
-
-Find components, functions, or hooks with zero callers:
-
-```
-Step 1: codegraph_files → path: "src/components", pattern: "*.tsx"
-Step 2: For each symbol, codegraph_callers → check for 0 results
-Step 3: Flag unreferenced symbols as potential dead code
-```
-
-### 5. Change Propagation Analysis
-
-Understand the ripple effect of modifying a shared utility:
-
-```
-Step 1: codegraph_impact → symbol: "cn", depth: 2
-Step 2: Group affected files by feature area
-Step 3: Create a scoped test plan covering all impacted areas
-```
-
----
-
-## Workflow Examples
-
-### "Who imports OrbitalProductsShowcase?"
-
-```
-Tool:   codegraph_callers
-Args:   { "symbol": "OrbitalProductsShowcase" }
-Result: List of all files and functions that reference this component
-```
-
-### "What will break if I change Footer.tsx?"
-
-```
-Tool:   codegraph_impact
-Args:   { "symbol": "Footer", "depth": 3 }
-Result: Full dependency tree of symbols affected by changes to Footer
-```
-
-### "Find all THREE.js usage"
-
-```
-Tool:   codegraph_search
-Args:   { "query": "THREE", "limit": 20 }
-Result: All symbols referencing THREE.js with their locations and kinds
-```
-
-### "Show dependency chain for the products page"
-
-```
-Tool:   codegraph_explore
-Args:   { "query": "products page route CategoryMasterView data fetching" }
-Result: Verbatim source of relevant symbols grouped by file, showing the full data flow
-```
-
-### "What does the useCategories hook depend on?"
-
-```
-Tool:   codegraph_callees
-Args:   { "symbol": "useCategories" }
-Result: All functions, services, and APIs that useCategories calls internally
-```
-
-### "Show me the project structure under src/components"
-
-```
-Tool:   codegraph_files
-Args:   { "path": "src/components", "format": "tree", "maxDepth": 3 }
-Result: Hierarchical file tree with language tags and symbol counts
-```
-
----
-
-## Common Tool Chains
-
-| Goal | Chain |
-|------|-------|
-| Flow / "how does X reach Y" | ONE `codegraph_explore` with symbol names spanning the flow |
-| Onboarding / understanding an area | ONE `codegraph_explore` (follow up with `codegraph_node` if needed) |
-| Refactor planning | `codegraph_search` → `codegraph_callers` → `codegraph_impact` |
-| Debugging a regression | `codegraph_callers` of suspected symbol; widen with `codegraph_impact` |
-| Project layout overview | `codegraph_files` with desired format and depth |
-
----
-
-## Integration with Other Skills
-
-### multi-agent-research
-
-CodeGraph answers structural code queries (callers, callees, dependency chains) that research subagents would otherwise need grep + read loops to resolve. Use `codegraph_explore` as the primary source for code structure questions in research workflows.
-
-### diff-review
-
-Before committing, use `codegraph_impact` on each modified symbol to verify the blast radius matches expectations. Combines well with the diff-review skill's pre-commit checks.
-
-### venthub-auditor
-
-CodeGraph's caller analysis enables dead-code detection at the symbol level. The auditor can flag components with zero callers as candidates for removal, complementing the auditor's integrity checks.
-
-### fallow
-
-CodeGraph provides symbol-level dependency data that complements Fallow's module-level analysis. Use CodeGraph for fine-grained "who calls this function" queries and Fallow for broader unused-dependency and circular-dependency detection.
 
 ---
 
@@ -236,9 +73,9 @@ CodeGraph provides symbol-level dependency data that complements Fallow's module
 
 ## AXIOMS
 
-1. **CodeGraph is always the first tool for structural queries.** Before using grep, file-read, or manual search, check if CodeGraph can answer the question directly.
-2. **`codegraph_explore` is the primary entry point.** Start with explore for any "how does X work" or "what is X" question. Only reach for specialized tools (`callers`, `callees`, `impact`) when you need a specific relationship.
-3. **Trust AST over text.** CodeGraph's index is built from full AST parsing. Its results are more reliable than regex-based search for structural relationships.
-4. **Index freshness matters.** The index lags file writes by ~1 second. After edits, check the staleness banner and use `codegraph_status` if debugging freshness.
-5. **Cross-file resolution is best-effort.** Ambiguous calls may return multiple candidates. Use the `file` and `line` parameters on `codegraph_node` to disambiguate.
-6. **CodeGraph supplements, not replaces.** TypeScript compiler, test suites, and linters still own correctness validation. CodeGraph provides structural context they don't have.
+1. **CodeGraph is the first tool for structural queries** — before grep, file-read, or manual search.
+2. **`codegraph_explore` is the primary entry point.** Reach for `callers`/`callees`/`impact` only when you need one specific relationship.
+3. **Trust AST over text** for structural relationships.
+4. **Index freshness matters** — ~1s lag after writes; check the staleness banner, use `codegraph_status` when debugging.
+5. **Cross-file resolution is best-effort** — disambiguate overloaded names with `codegraph_node`'s `file`/`line` params.
+6. **CodeGraph supplements, not replaces** — tsc, tests, and linters still own correctness.
