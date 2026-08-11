@@ -63,8 +63,14 @@ tasarımı (join/RPC/özel sorgu), her yazmanın denetim-kapısından geçişi, 
 yapısal/öz olsun.
 
 ### Faz 2 — Paralel göç + yargıç (Workflow)
-`Workflow` aracıyla `pipeline(göç-ajanı → yargıç-ajan)` her hedef için **paralel**. Göç-ajanı brifingi
-**DAR ve sert** olmalı (kaçağı kaynakta keser):
+`Workflow` aracıyla `pipeline(göç-ajanı → yargıç-ajan)` her hedef için **paralel**.
+
+> **Model katmanı (fiyat/performans, 2026-08):** net brief'li mekanik **worker/göç-ajanı = `sonnet`**
+> (Sonnet 5 — coding'de near-Opus, ~%40 maliyet, daha hızlı; merkezi kapı zaten hatayı yakalar).
+> **Yargıç / mimar-plan / TASARIM-GEREK hedef = `opus`.** Workflow `agent(..., {model})` ve Agent
+> aracı `model` parametresiyle geçilir; emin değilsen worker'da sonnet varsayılandır.
+
+Göç-ajanı brifingi **DAR ve sert** olmalı (kaçağı kaynakta keser):
 - **ALTIN ÖRNEK göm:** brief'e aynı repodan ÇALIŞAN bir before/after örnek koy (önceden taşınmış bir
   dosyanın diff'i). Ajan uydurmaz, birebir kopyalar — "ilk seferde doğru"nun en yüksek getirili tek kuralı.
 - Sadece KENDİ dosyalarına dokun; ortak altyapıyı / barrel'ları / başka hedefi DEĞİŞTİRME.

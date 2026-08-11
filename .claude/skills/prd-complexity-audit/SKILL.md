@@ -29,8 +29,8 @@ ne kesilir/birleştirilir, ne tutulur" sorusuna **PRD satırına bağlı kanıtl
 kullanıcı raporu okuyup neyi uygulayacağına karar verir.
 
 > Motor zaten mevcut (Workflow/ultracode). Bu skill = o motoru bu denetime yönlendiren kayıtlı reçete.
-> Doğrulama/sentez adımlarını **en güçlü modele** yönlendir (Opus 4.8 / seçiliyse Fable 5); mekanik
-> fan-out daha hafif modelde olabilir.
+> **Model katmanı:** doğrulama/sentez (Faz 4-5) = `opus` (veya seçiliyse Fable 5); mekanik fan-out
+> okuyucular (Faz 1-3) = `sonnet` (Sonnet 5 — near-Opus okuma/tarama, ~%40 maliyet).
 
 ## ⚠️ Ön-koşul: keskin non-goal'lar (en değerli girdi)
 Denetimin gücü, **açık non-goal listesine** (kasıtlı YAPILMAYACAKLAR) bağlıdır. VentHub'da tıkız bir PRD
