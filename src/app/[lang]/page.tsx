@@ -85,7 +85,9 @@ const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
     return { catData, prodData }
   },
   ['home-page-data', lang, tenantId],
-  { tags: ['home-data', `home-data-${tenantId}`], revalidate: false }
+  // revalidate: 3600 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)
+  // ana sayfa en fazla 1 saat bayat kalabilir. Sinyalli tazeleme (revalidateTag) aynen çalışır.
+  { tags: ['home-data', `home-data-${tenantId}`], revalidate: 3600 }
 )()
 
 export default async function RootPage({ params }: Props) {
