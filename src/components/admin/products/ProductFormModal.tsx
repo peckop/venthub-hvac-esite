@@ -117,6 +117,9 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                 low_stock_threshold: 5,
                 price: 0
             })
+            // Modal parent'ta kosulsuz render edilir (unmount olmaz) — onceki
+            // urunun EN cevirisi state'te kalip yeni urune sizmasin.
+            setDescriptionI18n({})
         }
     }, [open, _productId, reset, loadProduct])
 
