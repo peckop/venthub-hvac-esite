@@ -116,6 +116,16 @@ export type DbCategory = Omit<Tables['categories']['Row'], 'name' | 'description
   authority_content: AuthorityContent | null;
 };
 
+// Ürün ailesi (Split-Model otoritesi) — description/meta_* JSONB {tr,en} yapısına daraltılır.
+export type DbProductFamily = Omit<
+  Tables['product_families']['Row'],
+  'description' | 'meta_title' | 'meta_description'
+> & {
+  description: ProductDescriptionI18n;
+  meta_title: ProductDescriptionI18n;
+  meta_description: ProductDescriptionI18n;
+};
+
 export type DbUserAddress = Tables['user_addresses']['Row'];
 export type DbInvoiceProfile = Tables['user_invoice_profiles']['Row'];
 export type DbShoppingCart = Tables['shopping_carts']['Row'];

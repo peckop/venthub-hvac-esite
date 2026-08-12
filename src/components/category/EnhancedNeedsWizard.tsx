@@ -12,6 +12,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { calculateAirCurtain } from '../../lib/hvacCalculations'
+import { VARIANT_DETAIL_COLUMNS } from '../../lib/services/product.columns'
 import { type DomainProduct,toUIProductList } from '../../lib/type-converters'
 import { DbJson,DbProduct } from '../../types/db-rows'
 
@@ -99,7 +100,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
         setLoading(true)
         try {
             const { data, error } = await supabase
-                .from('products').select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+                .from('products').select(VARIANT_DETAIL_COLUMNS)
                 .eq('status', 'active')
                 .contains('category_slugs', [parentSlug])
 

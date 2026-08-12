@@ -63,6 +63,32 @@ D4 SIRALI-SON: W4.1 DROP — AYRI PR, KULLANICI ONAYI   kapı: DO-guard · gen t
 
 Kritik yol: W0.1 → W0.2 → W2.1 → W3.1 → W4.1.
 
+## 4b. Vitrin tutarlılık taraması (2026-08-12, D0 öncesi) → dalga eşlemesi
+
+Paralel salt-okunur taramanın 18 bulgusu. F5-B dalgasına oturanlar ilgili brief'e girer;
+oturmayanlar **EK-x** olarak D3 sonrası küçük düzeltme dalgasında (veya bağımsız PR) kapanır.
+
+| Bulgu | Önem | Nereye |
+|---|---|---|
+| Arama önerisi ürünü `/products/<UUID>` + dilsiz URL'e götürüyor → boş PDP (`get_search_suggestions` SQL + SearchOverlay) | YÜKSEK | **EK1** — bağımsız fix (RPC slug döndürür + overlay lang prefix); W2.2 slug modeline uyumlu yapılır |
+| Arama önerisi kategorileri `is_active`/count>0/localized-slug filtresiz | YÜKSEK | **EK1** (aynı RPC) |
+| Kategori SSR alt-kategorileri count>0 filtresiz → hydration'da kart zıplaması | YÜKSEK | **W2.1** brief'ine girer |
+| `SearchOverlay.tsx:283` ham `cat.name` render (TR'ye EN sızar) | YÜKSEK | **EK2** — tek satır, `getCategoryDisplayName` |
+| `sitemap.ts` boş kategorileri indeksliyor + alt-kategori rotaları hiç yok | ORTA-YÜKSEK | **W1.3** brief'ine girer |
+| `useCategoryGateway` ham slug lookup (TR SPA geçişinde yanlış kategori riski) | ORTA | **W2.1** (gateway zaten yeniden yazılıyor) |
+| `get_products_enriched` + `get_category_counts` + FTS `deleted_at` süzmüyor | ORTA | W2.1'de aile RPC'sine geçişle ölür; sayaç RPC'si için **EK3** migration (W4.1'e not) |
+| Marka detay kartı fiyat/Teklif modelini hiç uygulamıyor | ORTA | **EK4** — ProductCard'a geçir (W1.1 resolver'ından sonra) |
+| Ürün JSON-LD fiyatsıza `"0.00"` yazıyor (2 kopya) | ORTA | **W3.1** (fiyat yoksa offers hiç yazılmaz — planda var) |
+| Ana sayfa kategori sırası ham `name.localeCompare` (nav `sort_order` ile çelişir) | ORTA | **EK5** — tek satır, sort_order'a geç |
+| `EnhancedNeedsWizard` ham `parentSlug`→`category_slugs` (TR'de 0 sonuç) | ORTA | **EK6** — kanonik slug çevirisi (W2.1 alanı, brief'e not) |
+| Fiyat/marka/spec filtreleri UI'da var ama listeye uygulanmıyor (sahte) | DÜŞÜK-ORTA | **W2.1** planda: spec filtreleri kalkar; faceted-search ayrı plan |
+| `/products` `revalidate:false` (süresiz-bayat riski) | DÜŞÜK-ORTA | **W1.2** brief'ine girer (3600 emniyet kemeri) |
+| Sayfalama hiçbir yüzeyde yok (100 tavanı, sessiz kayıp) | DÜŞÜK | **W2.1** çekirdeği (?page= + 24) |
+| Hardcoded kategori slug'ları (ApplicationSolutions/CategoryShowcase/SearchOverlay chip) | DÜŞÜK | **EK7** — registry'den türet |
+| PDP breadcrumb boş-kategori kümesinde kopuyor | DÜŞÜK | **W2.2** yeniden yazımı kapsar |
+| `p_sort_by` hiç gönderilmiyor + RPC-hata fallback'i sırasız | DÜŞÜK | W2.1 ile ölür (eski RPC emekli) |
+| Ölü kod: `productsApi.ts`, `HomePage initialCategories` prop | BİLGİ | **W3.2** temizlik listesine |
+
 ## 5. Açık riskler
 
 1. database.types.ts bayatlığı sessiz any düşürür → D0 kapısı sert (regen ✅).

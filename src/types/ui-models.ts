@@ -38,6 +38,28 @@ export interface FtsProductResult extends DomainProduct {
   is_fuzzy_match?: boolean;
 }
 
+/**
+ * FamilyListItem: get_product_families_enriched RPC'sinin satır modeli (F5-B W0.2).
+ * Aile-bazlı vitrin listelerinin (W2.1) veri birimi; varyant satırı listeye girmez.
+ */
+export interface FamilyListItem {
+  id: string;
+  name: string;
+  slug: string;
+  series_code: string | null;
+  description: { tr?: string | null; en?: string | null } | null;
+  brand_name: string | null;
+  category_id: string | null;
+  subcategory_id: string | null;
+  /** product_images.path (Storage yolu) — URL'e çevirme W1.1 resolver'ının işi. */
+  cover_image_path: string | null;
+  variant_count: number;
+  /** Fiyat Motoru açılana dek fiilen hep null (Teklif Alın modeli). */
+  min_price: number | null;
+  /** Window count — sayfalama toplamı (her satırda aynı değer). */
+  total_count: number;
+}
+
 export interface GetProductsParams {
   categoryIds?: string[];
   searchQuery?: string;

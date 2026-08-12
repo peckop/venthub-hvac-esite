@@ -4,6 +4,7 @@ import type { Database } from '../../types/database.types'
 import type { DbAdminSearchResult,DbProduct } from '../../types/db-rows'
 import type { FtsProductResult, GetProductsParams,Product, SearchSuggestion } from '../../types/ui-models'
 import { mapDatabaseProductToDomain,toUIProductList } from '../type-converters'
+import { VARIANT_DETAIL_COLUMNS } from './product.columns'
 
 export async function getProductsEnriched(
   supabase: SupabaseClient<Database>,
@@ -46,7 +47,7 @@ export async function getProductsEnriched(
     if (resolvedCategoryIds && resolvedCategoryIds.length > 0) {
         const { data: fallbackData } = await supabase
           .from('products')
-          .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+          .select(VARIANT_DETAIL_COLUMNS)
           .or(`category_id.in.(${resolvedCategoryIds.join(',')}),subcategory_id.in.(${resolvedCategoryIds.join(',')})`)
           .eq('status', 'active')
           .is('deleted_at', null)
@@ -56,7 +57,7 @@ export async function getProductsEnriched(
 
     const { data: fallbackData } = await supabase
       .from('products')
-      .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+      .select(VARIANT_DETAIL_COLUMNS)
       .eq('status', 'active')
       .is('deleted_at', null)
       .limit(params.limit || 50)
@@ -121,7 +122,7 @@ export async function ftsSearchProducts(
 export async function getProducts(supabase: SupabaseClient<Database>, limit?: number): Promise<Product[]> {
   let query = supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select(VARIANT_DETAIL_COLUMNS)
     .eq('status', 'active')
     .is('deleted_at', null)
     .order('is_featured', { ascending: false })
@@ -140,7 +141,7 @@ export async function getProducts(supabase: SupabaseClient<Database>, limit?: nu
 export async function getAllProducts(supabase: SupabaseClient<Database>): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select(VARIANT_DETAIL_COLUMNS)
     .eq('status', 'active')
     .is('deleted_at', null)
     .order('is_featured', { ascending: false })
@@ -153,7 +154,7 @@ export async function getAllProducts(supabase: SupabaseClient<Database>): Promis
 export async function getProductsByCategory(supabase: SupabaseClient<Database>, categoryId: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select(VARIANT_DETAIL_COLUMNS)
     .or(`category_id.eq.${categoryId}, subcategory_id.eq.${categoryId}`)
     .eq('status', 'active')
     .is('deleted_at', null)
@@ -167,7 +168,7 @@ export async function getProductsByCategory(supabase: SupabaseClient<Database>, 
 export async function getProductsBySubcategory(supabase: SupabaseClient<Database>, subcategoryId: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select(VARIANT_DETAIL_COLUMNS)
     .eq('subcategory_id', subcategoryId)
     .eq('status', 'active')
     .is('deleted_at', null)
@@ -186,7 +187,7 @@ async function fetchProductBy(
 ): Promise<Product | null> {
   const query = supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select(VARIANT_DETAIL_COLUMNS)
     .eq(column, value)
     .eq('status', 'active')
     .is('deleted_at', null)
@@ -214,7 +215,7 @@ export async function getProductBySlug(supabase: SupabaseClient<Database>, slug:
 export async function getFeaturedProducts(supabase: SupabaseClient<Database>): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select(VARIANT_DETAIL_COLUMNS)
     .eq('is_featured', true)
     .eq('status', 'active')
     .is('deleted_at', null)
@@ -227,7 +228,7 @@ export async function getFeaturedProducts(supabase: SupabaseClient<Database>): P
 export async function searchProducts(supabase: SupabaseClient<Database>, query: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, description_i18n, family_id, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price')
+    .select(VARIANT_DETAIL_COLUMNS)
     .or(`name.ilike.%${query}%, brand.ilike.%${query}%, sku.ilike.%${query}%, model_code.ilike.%${query}%, description.ilike.%${query}%`)
     .eq('status', 'active')
     .is('deleted_at', null)

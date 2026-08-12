@@ -16,6 +16,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
+import { VARIANT_DETAIL_COLUMNS } from '../../lib/services/product.columns'
 
 interface ShippingAddress {
   fullAddress?: string
@@ -206,12 +207,12 @@ export default function OrderDetailPage() {
       const names = Array.from(new Set((o.order_items || []).filter(it => !it.product_id && it.product_name).map(it => it.product_name)))
       const productMap: Record<string, Product> = {}
       if (ids.length > 0) {
-        const { data, error } = await supabase.from('products').select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price').in('id', ids)
+        const { data, error } = await supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('id', ids)
         if (error) throw error
           ; ((data || []) as Product[]).forEach((p) => { productMap[p.id] = p })
       }
       if (names.length > 0) {
-        const { data, error } = await supabase.from('products').select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price').in('name', names)
+        const { data, error } = await supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('name', names)
         if (error) throw error
           ; ((data || []) as Product[]).forEach((p) => { productMap[p.name] = p })
       }
