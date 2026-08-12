@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation'
  * 4. Sabit (sticky) küçülmüş moddayken üstüne tıklanırsa YERİNDE genişler.
  * 5. Kullanıcı ekranın en tepesine döndüğünde eski büyük haline döner.
  */
-import React, { useCallback, useRef,useState } from 'react'
+import React, { Suspense, useCallback, useRef, useState } from 'react'
 
 import type { FamilyListItem } from '@/types/ui-models'
 
@@ -81,10 +81,22 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                 bg-surface-darker border-b border-white/5 shadow-2xl relative
             `}>
                 <div className="relative w-full">
-                    <CategoryOrbitCarousel
-                        onSubcategorySelect={handleSubcategorySelect}
-                        compact={false}
-                    />
+                    {/* ssr:false dynamic import en yakın Suspense sınırını CSR'a düşürür
+                        (BAILOUT_TO_CLIENT_SIDE_RENDERING). Bu Suspense o bailout'u karuselle
+                        SINIRLAR — aksi halde tüm keşif görünümü (aile grid'i dahil) SSR HTML'inden
+                        düşüyordu (SEO/LCP zehirlenmesi; master'da da vardı, burada kapatıldı). */}
+                    <Suspense
+                        fallback={
+                            <div className="w-full h-hvac-section bg-surface-darker flex items-center justify-center overflow-hidden">
+                                <div className="w-300px h-300px bg-cyan-500/5 blur-100 rounded-full animate-pulse" />
+                            </div>
+                        }
+                    >
+                        <CategoryOrbitCarousel
+                            onSubcategorySelect={handleSubcategorySelect}
+                            compact={false}
+                        />
+                    </Suspense>
                 </div>
             </div>
 

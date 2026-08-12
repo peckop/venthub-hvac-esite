@@ -1,6 +1,6 @@
 'use client'
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useCategories } from '../contexts/CategoryContext'
@@ -44,26 +44,30 @@ export function useCategoryGateway(
   const isMounted = useIsMounted()
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const { categories: globalCategories, loading: categoriesLoading } = useCategories()
 
   const [filters, setFilters] = useState<CategoryFilters>(DEFAULT_FILTERS)
 
   const category = initialCategory ?? null
 
+  // useSearchParams BİLİNÇLİ kullanılmıyor: bu hook CategoryMasterView'ın kökünde
+  // çağrılır; useSearchParams orada tüm sayfayı Suspense fallback'ine (CSR bailout)
+  // düşürüp SSR HTML'ini boşaltıyordu (Kural 5). Görünüm tercihleri deep-link'i yalnız
+  // mount'ta window.location'dan okunur — SSR çıktısı hiç etkilenmez.
   useEffect(() => {
-    if (!isMounted || !searchParams) return
+    if (!isMounted || typeof window === 'undefined') return
 
-    const spBrands = searchParams.get('brands')
-    const viewModeParam = searchParams.get('viewMode')
+    const sp = new URLSearchParams(window.location.search)
+    const spBrands = sp.get('brands')
+    const viewModeParam = sp.get('viewMode')
 
     setFilters({
-      sortBy: searchParams.get('sortBy') || 'name',
+      sortBy: sp.get('sortBy') || 'name',
       viewMode: (viewModeParam === 'grid' || viewModeParam === 'list') ? viewModeParam : 'grid',
       selectedBrands: spBrands ? spBrands.split(',') : [],
-      catSearch: searchParams.get('catSearch') || ''
+      catSearch: sp.get('catSearch') || ''
     })
-  }, [isMounted, searchParams])
+  }, [isMounted])
 
   const updateFilters = useCallback((updates: Partial<CategoryFilters>) => {
     setFilters(prev => {
