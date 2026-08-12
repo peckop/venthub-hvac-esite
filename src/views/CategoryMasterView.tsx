@@ -9,11 +9,16 @@ import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
 import type { DomainCategory } from '../lib/type-converters'
 import type { FamilyListItem } from '../types/ui-models'
 
-const CategoryGridView = dynamic(() => import('./category/CategoryGridView'), { ssr: false })
-const CategoryLandingView = dynamic(() => import('./category/CategoryLandingView'), { ssr: false })
-const CategorySeriesView = dynamic(() => import('./category/CategorySeriesView'), { ssr: false })
-const CategoryShowcaseView = dynamic(() => import('./category/CategoryShowcaseView'), { ssr: false })
-const ProductsDiscoveryView = dynamic(() => import('./ProductsDiscoveryView'), { ssr: false })
+// ssr:false BİLİNÇLİ KALDIRILDI (SSR boş-kabuk kök sebebiydi): client bileşende
+// ssr:false, SSR sırasında en yakın Suspense sınırını komple CSR'a düşürür —
+// kategori//products sayfaları Haziran'dan beri bota/LCP'ye boş <main> sunuyordu.
+// dynamic() code-splitting için kalır; ağır 3D (CategoryOrbitCarousel) kendi
+// izole Suspense'inde ssr:false olarak ProductsDiscoveryView içinde durur.
+const CategoryGridView = dynamic(() => import('./category/CategoryGridView'))
+const CategoryLandingView = dynamic(() => import('./category/CategoryLandingView'))
+const CategorySeriesView = dynamic(() => import('./category/CategorySeriesView'))
+const CategoryShowcaseView = dynamic(() => import('./category/CategoryShowcaseView'))
+const ProductsDiscoveryView = dynamic(() => import('./ProductsDiscoveryView'))
 
 interface CategoryMasterViewProps {
   initialCategory?: DomainCategory | null

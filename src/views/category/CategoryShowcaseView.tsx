@@ -130,14 +130,15 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                 </div>
 
                 {/* Subcategories Grid - CENTERED */}
-                <div className="flex flex-wrap justify-center gap-8">
+                {/* window.innerWidth inline-style kaldırıldı (SSR'da yoktu, hydration
+                    uyumsuzluğu riski) — aynı kırılımlar responsive grid ile. */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
                     {subCategories.map((sub) => {
                         const subVm = wrapCategory(sub)
                         return (
                             <button
                                 key={sub.id}
-                                className="group relative bg-white rounded-hvac-2xl p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-hvac-card-hover transition-shadow duration-700 cursor-pointer overflow-hidden max-w-modal text-left block"
-                                style={{ width: typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'calc(33.33% - 1.5rem)' : typeof window !== 'undefined' && window.innerWidth >= 768 ? 'calc(50% - 1rem)' : '100%' }}
+                                className="group relative bg-white rounded-hvac-2xl p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-hvac-card-hover transition-shadow duration-700 cursor-pointer overflow-hidden max-w-modal text-left block w-full"
                                 onClick={() => handleSubSelect(getLocalizedCategorySlug(sub, lang))}
                             >
                                 <div className="relative z-10">

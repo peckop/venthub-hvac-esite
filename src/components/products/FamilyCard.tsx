@@ -54,6 +54,7 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
     return (
       <Link
         href={Routes.product(family.slug)}
+        data-ssr="family-card"
         className="block w-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2"
       >
         <div className="group relative flex items-center bg-white rounded-2xl border border-light-gray p-4 transition-transform duration-300 hover:shadow-hvac-lg hover:-translate-y-0.5 overflow-hidden">
@@ -94,6 +95,7 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
   return (
     <Link
       href={Routes.product(family.slug)}
+      data-ssr="family-card"
       className="block h-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2"
     >
       <div className={`group relative flex flex-col h-full bg-white rounded-2xl border border-light-gray transition-transform duration-300 hover:shadow-hvac-lg hover:-translate-y-1 overflow-hidden ${compact ? 'p-3' : 'p-4'}`}>
