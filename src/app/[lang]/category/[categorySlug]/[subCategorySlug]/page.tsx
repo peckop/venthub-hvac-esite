@@ -1,17 +1,49 @@
+import { unstable_cache } from 'next/cache'
 import { permanentRedirect } from 'next/navigation'
 import React, { cache } from 'react'
 
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
-import { getProductsEnriched } from '@/lib/services/product.service'
+import { getFamiliesEnriched } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
 
 import { SITE_URL } from '../../../../../config/siteUrl'
+import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../../../../lib/cache/tags'
 import { getCachedCategoryData } from '../../../../../lib/data/preload'
-import type { DomainProduct } from '../../../../../lib/type-converters'
+import type { FamilyListItem } from '../../../../../types/ui-models'
+import { getTenantConfig } from '../../../../../utils/tenantServer'
 import PageComponent from '../../../../../views/CategoryPage'
+
+/** F5-B W2.1 — sunucu sayfalaması: sayfa başına AİLE sayısı (üst kategori sayfasıyla aynı). */
+const PAGE_SIZE = 24
+
+/**
+ * Alt kategori aile listesi önbelleği. Anahtar: lang + tenantId + kategori + sayfa (kural 12),
+ * etiketler KEŞİF (discovery) alanı — ana sayfa (home-data) tag'i KULLANILMAZ (PS-042).
+ */
+const getCachedFamilies = (
+  lang: string,
+  tenantId: string,
+  categoryId: string,
+  page: number
+) => unstable_cache(
+  async () => getFamiliesEnriched(supabase, {
+    categoryIds: [categoryId],
+    limit: PAGE_SIZE,
+    offset: (page - 1) * PAGE_SIZE
+  }),
+  ['subcategory-families', lang, tenantId, categoryId, String(page)],
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+)()
+
+/** `?page=` değerini 1-tabanlı güvenli tam sayıya çevirir. */
+function parsePageParam(raw: string | string[] | undefined): number {
+  const value = Array.isArray(raw) ? raw[0] : raw
+  const parsed = Number.parseInt(value ?? '1', 10)
+  return Number.isFinite(parsed) && parsed > 1 ? parsed : 1
+}
 
 // Üst kategorinin slug/metadata'sı (yönlendirme + hreflang için) — RSC ağacında tekilleştirilir.
 const getParentSlugSource = cache(async (parentId: string) => {
@@ -114,8 +146,16 @@ export async function generateMetadata({ params }: { params: Promise<{ categoryS
   }
 }
 
-export default async function Page({ params }: { params: Promise<{ categorySlug: string, subCategorySlug: string, lang: string }> }) {
+export default async function Page({
+  params,
+  searchParams
+}: {
+  params: Promise<{ categorySlug: string, subCategorySlug: string, lang: string }>
+  searchParams: Promise<{ page?: string | string[] }>
+}) {
   const { categorySlug, subCategorySlug, lang } = await params
+  const { page: pageParam } = await searchParams
+  const page = parsePageParam(pageParam)
 
   const category = await getCachedCategoryData(subCategorySlug)
   const dict = lang === 'en' ? en : tr
@@ -128,17 +168,24 @@ export default async function Page({ params }: { params: Promise<{ categorySlug:
     }
   }
 
-  let products: DomainProduct[] = []
+  let families: FamilyListItem[] = []
+  let total = 0
   if (category) {
-    products = await getProductsEnriched(supabase, {
-      categoryIds: [category.id],
-      limit: 100
-    })
+    const tenantId = (await getTenantConfig()).id
+    const familiesPage = await getCachedFamilies(lang, tenantId, category.id, page)
+    families = familiesPage.items
+    total = familiesPage.total
   }
 
   return (
     <React.Suspense fallback={<div className="container mx-auto py-12 px-4 text-center text-slate-500">{dict.common.loading}</div>}>
-      <PageComponent initialCategory={category} initialProducts={products} />
+      <PageComponent
+        initialCategory={category}
+        families={families}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+      />
     </React.Suspense>
   )
 }

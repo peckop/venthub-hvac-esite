@@ -3,11 +3,11 @@
 import { Grid, List } from 'lucide-react'
 import React from 'react'
 
-import type { Product } from '@/types/ui-models'
+import type { FamilyListItem } from '@/types/ui-models'
 
 import CategoryFiltersComponent from '../../components/category/CategoryFilters'
 import PageShell from '../../components/layout/PageShell'
-import ProductCard from '../../components/ProductCard'
+import FamilyCard from '../../components/products/FamilyCard'
 import type { CategoryFilters } from '../../hooks/useCategoryGateway'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { DomainCategory } from '../../lib/type-converters'
@@ -17,21 +17,22 @@ interface CategoryGridViewProps {
   parentCategory?: DomainCategory | null
   subCategories: DomainCategory[]
   availableBrands: string[]
-  products: Product[]
+  /** F5-B W2.1: liste birimi AİLE. */
+  families: FamilyListItem[]
   filters: CategoryFilters
   onUpdateFilters: (updates: Partial<CategoryFilters>) => void
   loading?: boolean
 }
 
-const CategoryGridView: React.FC<CategoryGridViewProps> = ({ 
-  category, 
+const CategoryGridView: React.FC<CategoryGridViewProps> = ({
+  category,
   parentCategory,
   subCategories,
   availableBrands,
-  products, 
-  filters, 
+  families,
+  filters,
   onUpdateFilters,
-  loading 
+  loading
 }) => {
   const { t } = useI18n()
 
@@ -58,7 +59,7 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
           {/* Toolbar */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 pb-6 border-b border-slate-100">
             <p className="text-sm font-medium text-slate-500">
-              <span className="text-slate-900 font-bold">{products.length}</span> {t('category.productsCount')}
+              {t('category.family.count', { count: families.length })}
             </p>
             
             <div className="flex items-center gap-6">
@@ -85,9 +86,9 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
                 className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus-visible:ring-primary-ocean/20 transition-colors shadow-sm"
                 aria-label={t('category.sort.title') || 'Sıralama'}
               >
+                {/* Fiyat sıralaması gizli: min_price Fiyat Motoru açılana dek ~hep NULL (F5-B §5.3). */}
                 <option value="name">{t('category.sort.name')}</option>
-                <option value="price-low">{t('category.sort.priceLow')}</option>
-                <option value="price-high">{t('category.sort.priceHigh')}</option>
+                <option value="variants">{t('category.sort.variantCount')}</option>
               </select>
             </div>
           </div>
@@ -97,16 +98,16 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
             ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8" 
             : "flex flex-col gap-6"
           }>
-            {products.map(product => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                layout={filters.viewMode} 
+            {families.map(family => (
+              <FamilyCard
+                key={family.id}
+                family={family}
+                layout={filters.viewMode}
               />
             ))}
           </div>
 
-          {products.length === 0 && !loading && (
+          {families.length === 0 && !loading && (
             <div className="py-32 text-center bg-white rounded-hvac-3xl border border-dashed border-slate-200">
               <p className="text-slate-400 font-medium">{t('category.noProductsFound')}</p>
             </div>

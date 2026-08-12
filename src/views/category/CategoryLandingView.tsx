@@ -18,27 +18,27 @@ import {
     TypeComparison,
     VorticeBrand} from '@/components/category/sections'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
-import ProductCard from '@/components/ProductCard'
+import FamilyCard from '@/components/products/FamilyCard'
+import type { FamilyListItem } from '@/types/ui-models'
 
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
-import { type DomainProduct } from '../../lib/type-converters'
 import { DomainCategory } from '../../lib/type-converters'
 import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 
 interface CategoryLandingProps {
     category: DomainCategory
-    products: DomainProduct[]
+    /** F5-B W2.1: liste birimi AİLE (varyant kartı basılmaz). */
+    families: FamilyListItem[]
     subCategories?: DomainCategory[]
 }
 
-const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, subCategories = [] }) => {
+const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, subCategories = [] }) => {
     const { t, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
     const [showProducts, setShowProducts] = useState(false)
-    const [activeFilter, setActiveFilter] = useState<string>('all')
     const [wizardOpen, setWizardOpen] = useState(false)
     
     const [disableAnimation, setDisableAnimation] = useState(true)
@@ -76,11 +76,8 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         setTimeout(() => handleScrollToTarget('products-anchor'), 100)
     }
 
-    const filteredProducts = (products || []).filter((p: DomainProduct) => {
-        if (activeFilter === 'all') return true
-        if (activeFilter === 'quiet') return (Number(p.noise_level) || 100) <= 50
-        return true
-    })
+    // "En sessiz" çipi KALDIRILDI (F5-B W2.1): legacy products.noise_level kolonuna dayanıyordu
+    // ve aile satırında spec yoktur. Spec bazlı daraltma faceted-search planına ait.
 
     return (
         <div className="bg-white">
@@ -183,26 +180,12 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-4 border-b border-slate-100 pb-8">
                         <div>
                             <h2 className="text-3xl font-black text-industrial-gray uppercase tracking-tighter">{vm?.displayName} {t('category.landing.modelsSuffix')}</h2>
-                            <p className="text-sm text-steel-gray mt-2 font-bold uppercase tracking-widest">{t('category.landing.solutionsListed', { count: filteredProducts.length })}</p>
-                        </div>
-                        <div className="flex flex-wrap gap-2 bg-slate-100 p-1.5 rounded-2xl">
-                            {[
-                                { key: 'all', label: t('category.landing.filterAll') },
-                                { key: 'quiet', label: t('category.landing.filterQuiet') }
-                            ].map((f) => (
-                                <button
-                                    key={f.key}
-                                    onClick={() => setActiveFilter(f.key)}
-                                    className={`px-6 py-2 rounded-xl text-xs font-black transition-colors ${activeFilter === f.key ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
-                                >
-                                    {f.label}
-                                </button>
-                            ))}
+                            <p className="text-sm text-steel-gray mt-2 font-bold uppercase tracking-widest">{t('category.family.count', { count: families.length })}</p>
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                        {(filteredProducts || []).map(p => (
-                            <ProductCard key={p.id} product={p} layout="grid" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 content-auto">
+                        {families.map(family => (
+                            <FamilyCard key={family.id} family={family} layout="grid" />
                         ))}
                     </div>
                 </div>

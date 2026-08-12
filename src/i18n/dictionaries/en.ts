@@ -3,6 +3,10 @@ import { tr } from './tr'
 
 export const en: typeof tr = {
   common: {
+    paginationLabel: 'Pagination',
+    paginationPrevious: 'Previous',
+    paginationNext: 'Next',
+    paginationStatus: 'Page {{page}} of {{pageCount}}',
     update: 'Update',
     unitMeters: '{{v}} m',
     unitCubicMeters: '{{v}} m³',
@@ -1127,6 +1131,14 @@ export const en: typeof tr = {
     vision: 'Our Vision'
   },
   category: {
+    family: {
+      variantCount: '{{count}} variants',
+      count: '{{count}} product families',
+      viewFamily: 'Explore',
+    },
+    sort: {
+      variantCount: 'Variant count',
+    },
     howItWorks: {
       stepNumberLabel: '{{number}}. {{title}}',
       detailIcon: '💡',
@@ -1439,6 +1451,21 @@ export const en: typeof tr = {
     }
   },
   pdp: {
+    variant: {
+      heading: 'Model Selection',
+      count: '{{count}} models',
+      searchPlaceholder: 'Search model (SKU / code)',
+      noMatch: 'No matching model',
+      viewList: 'List',
+      viewMatrix: 'Compare',
+      colModel: 'Model',
+      colPrice: 'Price',
+      quote: 'Quote',
+      selectAria: 'Select model: {{model}}',
+      selectedModel: 'Selected model',
+      showAll: 'View all models ({{count}})',
+      singleModel: 'This family has a single model.',
+    },
     videoAuthority: {
       unsupportedProvider: 'Unsupported Provider',
     },

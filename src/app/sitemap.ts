@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next'
 import { SITE_URL } from '../config/siteUrl'
 import { HVAC_BRANDS } from '../data/brands'
 import { getCategories } from '../lib/services/category.service'
-import { getAllProducts } from '../lib/services/product.service'
+import { getAllFamilySlugs } from '../lib/services/family.service'
 import { supabaseStaticClient } from '../lib/supabase/static'
 import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import { Routes } from '../utils/routes'
@@ -12,10 +12,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL
   const locales = ['tr', 'en']
 
-  // Fetch all categories, products and per-category product counts
-  const [categories, products, countRes] = await Promise.all([
+  // Fetch all categories, product families and per-category product counts
+  const [categories, familySlugs, countRes] = await Promise.all([
     getCategories(supabaseStaticClient).catch(() => []),
-    getAllProducts(supabaseStaticClient).catch(() => []),
+    getAllFamilySlugs(supabaseStaticClient).catch(() => []),
     // Supabase builder reject etmez; hata {error} alanında döner — data ?? [] yeterli
     supabaseStaticClient.rpc('get_category_counts'),
   ])
@@ -123,19 +123,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   )
 
-  // 4. Product Routes (Sadece slug değerine sahip olanlar)
+  // 4. Product Routes — F5-B W2.2: AİLE tabanlı (32 aile × 2 dil).
+  // Varyant URL'i sitemap'e ASLA girmez; varyant `?sku=` ile aynı aile sayfasında
+  // seçilir ve kanonik adres daima aile slug'ıdır.
   const productRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
-    products
-      .filter((prod) => !!prod.slug)
-      .map((prod) => ({
-        url: `${baseUrl}/${lang}${Routes.product(prod.slug!)}`,
-        lastModified: new Date(prod.updated_at || new Date()),
+    familySlugs
+      .filter((f) => !!f.slug)
+      .map((f) => ({
+        url: `${baseUrl}/${lang}${Routes.product(f.slug)}`,
+        lastModified: new Date(),
         changefreq: 'daily',
         priority: 0.9,
         alternates: {
           languages: {
-            tr: `${baseUrl}/tr${Routes.product(prod.slug!)}`,
-            en: `${baseUrl}/en${Routes.product(prod.slug!)}`,
+            tr: `${baseUrl}/tr${Routes.product(f.slug)}`,
+            en: `${baseUrl}/en${Routes.product(f.slug)}`,
           }
         }
       }))

@@ -2,6 +2,10 @@ import { admin } from './admin/tr'
 
 export const tr = {
   common: {
+    paginationLabel: 'Sayfalama',
+    paginationPrevious: 'Önceki',
+    paginationNext: 'Sonraki',
+    paginationStatus: 'Sayfa {{page}} / {{pageCount}}',
     update: 'Güncelle',
     unitMeters: '{{v}} m',
     unitCubicMeters: '{{v}} m³',
@@ -1383,6 +1387,14 @@ export const tr = {
     unexpected: 'Beklenmedik bir hata oluştu'
   },
   category: {
+    family: {
+      variantCount: '{{count}} varyant',
+      count: '{{count}} ürün ailesi',
+      viewFamily: 'İncele',
+    },
+    sort: {
+      variantCount: 'Varyant sayısı',
+    },
     howItWorks: {
       stepNumberLabel: '{{number}}. {{title}}',
       detailIcon: '💡',
@@ -1695,6 +1707,21 @@ export const tr = {
     }
   },
   pdp: {
+    variant: {
+      heading: 'Model Seçimi',
+      count: '{{count}} model',
+      searchPlaceholder: 'Model ara (SKU / kod)',
+      noMatch: 'Eşleşen model yok',
+      viewList: 'Liste',
+      viewMatrix: 'Karşılaştır',
+      colModel: 'Model',
+      colPrice: 'Fiyat',
+      quote: 'Teklif',
+      selectAria: 'Modeli seç: {{model}}',
+      selectedModel: 'Seçili model',
+      showAll: 'Tüm modelleri gör ({{count}})',
+      singleModel: 'Bu ailede tek model bulunuyor.',
+    },
     videoAuthority: {
       unsupportedProvider: 'Desteklenmeyen Sağlayıcı',
     },

@@ -1,5 +1,6 @@
 import { cache } from 'react'
 
+import { getFamilyDetail } from '@/lib/services/family.service'
 import { getProductBySlug } from '@/lib/services/product.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 
@@ -10,6 +11,39 @@ import { mapDatabaseCategoryToDomain } from '../type-converters'
 export const getCachedProductBySlug = cache(async (slug: string) => {
   return getProductBySlug(supabase, slug)
 })
+
+/**
+ * F5-B W2.2 — PDP kanonik çözümü: AİLE detayı (aile + aktif varyantlar).
+ * RSC ağacında generateMetadata + Page aynı veriyi ister; React.cache tekilleştirir.
+ */
+export const getCachedFamilyDetail = cache(async (slug: string, lang: string) => {
+  try {
+    return await getFamilyDetail(supabase, slug, lang)
+  } catch (e) {
+    console.warn('getCachedFamilyDetail error:', e)
+    return null
+  }
+})
+
+/**
+ * Varyant slug'ından aile slug'ına köprü — yalnız 308 yönlendirmesi için kullanılır
+ * (products.slug DB'de kalır, 308 penceresi). Aile bulunamazsa null.
+ */
+export const getCachedFamilySlugById = cache(async (familyId: string) => {
+  const { data, error } = await supabase
+    .from('product_families')
+    .select('slug')
+    .eq('id', familyId)
+    .limit(1)
+    .maybeSingle()
+
+  if (error || !data) return null
+  return data.slug
+})
+
+export function preloadFamily(slug: string, lang: string) {
+  void getCachedFamilyDetail(slug, lang)
+}
 
 const CATEGORY_COLUMNS = 'id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content'
 
