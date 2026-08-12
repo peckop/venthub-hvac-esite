@@ -6,6 +6,7 @@ import React, { useState } from 'react'
 
 import VentImage from '@/components/ui/VentImage'
 import { useI18n } from '@/i18n/I18nProvider';
+import { resolveProductImageUrl } from '@/lib/images/productImage'
 import type { Product } from '@/types/ui-models'
 
 import { useProjectLists } from '../../hooks/useProjectLists'
@@ -89,8 +90,9 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
         <div className="p-6 space-y-6">
           <div className="flex items-start space-x-4">
             <div className="w-16 h-16 bg-light-gray rounded-lg flex-shrink-0 overflow-hidden border border-light-gray">
-              <VentImage src={product.image_url || '/images/vortice_lineo_futuristic.webp'} 
-                alt={product.name} 
+              <VentImage src={resolveProductImageUrl(product)}
+                alt={product.name}
+                fallbackType="product"
                 className="w-full h-full object-contain p-1"
                />
             </div>

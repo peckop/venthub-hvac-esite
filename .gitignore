@@ -83,6 +83,9 @@ __pycache__/
 
 # Yerel scratch / cache / ekran görüntüleri
 cache/
+# src/lib/cache kaynak kodudur (F5-B cache tag SSOT) — genel cache/ kuralından muaf
+!src/lib/cache/
+!src/lib/cache/**
 explorer_m2_3/
 explorer_m4_*/
 docs/screenshots/*.png
