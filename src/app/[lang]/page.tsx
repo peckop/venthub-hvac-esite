@@ -78,11 +78,18 @@ import { getTenantConfig } from '../../utils/tenantServer'
 
 const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
   async () => {
-    const [catData, prodData] = await Promise.all([
+    const [catData, prodData, countRes] = await Promise.all([
       getCategories(supabaseStaticClient),
-      getProducts(supabaseStaticClient, 12)
+      getProducts(supabaseStaticClient, 12),
+      supabaseStaticClient.rpc('get_category_counts')
     ])
-    return { catData, prodData }
+    // Boş-kategori gizleme navigasyonla AYNI kural (CategoryContext ile tutarlı):
+    // ürünü olmayan iskele kategoriler ana sayfa ızgarasında da görünmez.
+    const productCounts: Record<string, number> = {}
+    for (const row of countRes.data ?? []) {
+      productCounts[row.category_id] = row.product_count ?? 0
+    }
+    return { catData, prodData, productCounts }
   },
   ['home-page-data', lang, tenantId],
   // revalidate: 3600 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)
@@ -99,11 +106,13 @@ export default async function RootPage({ params }: Props) {
 
   let categories: DomainCategory[] = []
   let products: Product[] = []
+  let productCounts: Record<string, number> = {}
 
   try {
-    const { catData, prodData } = await getCachedHomeData(lang, tenantId)
-    categories = toUICategoryList(catData)
-    products = (prodData as Product[]) || []
+    const data = await getCachedHomeData(lang, tenantId)
+    categories = toUICategoryList(data.catData)
+    products = (data.prodData as Product[]) || []
+    productCounts = data.productCounts
   } catch (error) {
     console.warn('SSR Data Fetch Error:', error)
   }
@@ -115,7 +124,7 @@ export default async function RootPage({ params }: Props) {
   const t = (key: string) => getDictValue(dict, key)
 
   const displayCategories: CategoryViewModelLite[] = categories
-    .filter((c) => !c.parent_id)
+    .filter((c) => !c.parent_id && (productCounts[c.id] ?? 0) > 0)
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(c => ({
       id: c.id,
