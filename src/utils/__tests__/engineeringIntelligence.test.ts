@@ -136,12 +136,15 @@ describe('engineeringIntelligence', () => {
   });
 
   describe('generateEngineeringSummary', () => {
+    // F5-B W3.2: legacy noise_level/airflow_capacity kolonları her zaman NULL —
+    // generateEngineeringSummary artık technical_specs.noise_level_db_a /
+    // technical_specs.max_delivery_m3h anahtarlarını okuyor (prod key envanteri).
     const mockProduct = {
       id: '1',
       name: 'Test Fan',
-      noise_level: 35,
-      airflow_capacity: 1200,
       technical_specs: {
+        noise_level_db_a: 35,
+        max_delivery_m3h: 1200,
         efficiency: 85,
         motor_tipi: 'EC'
       }
@@ -162,7 +165,7 @@ describe('engineeringIntelligence', () => {
     it('identifies industrial airflow capacity', () => {
       const industrialProduct = {
         ...mockProduct,
-        airflow_capacity: 2500
+        technical_specs: { ...mockProduct.technical_specs, max_delivery_m3h: 2500 }
       } as Partial<Product> as Product;
 
       const inferences = generateEngineeringSummary(industrialProduct);

@@ -8,7 +8,9 @@ describe('buildPaymentRequest', () => {
     const payload = buildPaymentRequest({
       amount: 1234,
       items: [
-        { id: 'c1', quantity: 2, product: { id: 'p1', name: 'Ürün', price: 100.50, image_url: 'x' } },
+        // F5-B W3.2: product_image_url artık resolveProductImageUrl üzerinden gelir —
+        // resolver yalnız tam http(s) URL'i veya cover_image_path'i kabul eder.
+        { id: 'c1', quantity: 2, product: { id: 'p1', name: 'Ürün', price: 100.50, image_url: 'https://example.com/x.webp' } },
       ],
       customer: { name: 'Ali', email: 'ali@example.com', phone: '+90...' },
       shipping: { fullAddress: 'A', city: 'İstanbul', district: 'Kadıköy', postalCode: '34000' },
@@ -26,7 +28,7 @@ describe('buildPaymentRequest', () => {
       quantity: 2,
       price: 100.5,
       product_name: 'Ürün',
-      product_image_url: 'x',
+      product_image_url: 'https://example.com/x.webp',
     })
     expect(payload.shippingAddress.city).toBe('İstanbul')
     expect(payload.billingAddress.city).toBe('İstanbul') // same as shipping
