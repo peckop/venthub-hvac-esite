@@ -172,35 +172,6 @@ export interface DbWebhookEvent {
   created_at: string;
 }
 
-// RPC Return Types
-export interface DbProductEnrichedRow {
-  id: string;
-  name: string;
-  brand: string;
-  price: number;
-  sku: string;
-  slug: string;
-  model_code: string;
-  category_id: string;
-  subcategory_id: string;
-  status: string;
-  is_featured: boolean;
-  description: string;
-  image_url: string;
-  image_alt: string;
-  stock_qty: number;
-  low_stock_threshold: number;
-  low_stock_override: boolean;
-  technical_specs: Record<string, Json>;
-  airflow_capacity: number;
-  noise_level: number;
-  pressure_rating: number;
-  created_at: string;
-  updated_at: string;
-  warehouse_location: string;
-  supplier_name: string;
-}
-
 export interface DbFtsSearchResult extends DbProduct {
   rank: number;
   is_fuzzy_match?: boolean;

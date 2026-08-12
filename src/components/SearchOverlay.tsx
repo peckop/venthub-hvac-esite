@@ -9,6 +9,7 @@ import type { FtsProductResult, SearchSuggestion } from '@/types/ui-models'
 import { useCategories } from '../contexts/CategoryContext'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
+import { resolveProductImageUrl } from '../lib/images/productImage'
 import { supabaseBrowserClient } from '../lib/supabase/client'
 import type { DbCategory } from '../types/db-rows'
 import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
@@ -360,6 +361,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         <ul className="divide-y">
           {results.map((r, idx) => {
             const isActive = idx === activeIndex
+            const rImgUrl = resolveProductImageUrl(r)
             return (
               <li key={r.id}>
                 <button
@@ -368,9 +370,9 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
                   onMouseEnter={() => setActiveIndex(idx)}
                 >
                   <div className="flex items-center gap-4">
-                    {r.image_url ? (
+                    {rImgUrl ? (
                       <div className="w-10 h-10 relative rounded-md overflow-hidden bg-white border border-gray-100 flex-shrink-0 shadow-sm">
-                        <Image src={r.image_url} alt={r.name} fill sizes="40px" className="object-cover" />
+                        <Image src={rImgUrl} alt={r.name} fill sizes="40px" className="object-cover" />
                       </div>
                     ) : (
                       <div className="w-10 h-10 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">

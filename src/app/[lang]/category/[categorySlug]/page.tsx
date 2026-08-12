@@ -5,6 +5,7 @@ import React, { cache } from 'react'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
+import { assertNoUuid, buildCategoryJsonLd } from '@/lib/seo/jsonld'
 import { getFamiliesEnriched } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
@@ -200,19 +201,21 @@ export default async function Page({
     total = familiesPage.total
   }
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "name": displayName,
-    "description": lang === 'en' ? `Products in category ${displayName}` : `${displayName} kategorisindeki ürünler`,
-    "url": `${SITE_URL}/${lang}/category/${categorySlug}`,
-    "numberOfItems": total,
-    "itemListElement": families.map((family, index) => ({
-      "@type": "ListItem",
-      "position": (page - 1) * PAGE_SIZE + index + 1,
-      "url": `${SITE_URL}/products/${family.slug}`
-    }))
-  }
+  // W3.1 (B9): itemListElement URL'lerine /${lang} prefix'i buildCategoryJsonLd
+  // içinde garanti edilir (eski kod dilsiz `${SITE_URL}/products/${slug}` yazıyordu).
+  const jsonLd = buildCategoryJsonLd({
+    lang,
+    baseUrl: SITE_URL,
+    categorySlug,
+    name: displayName,
+    description: lang === 'en' ? `Products in category ${displayName}` : `${displayName} kategorisindeki ürünler`,
+    total,
+    page,
+    pageSize: PAGE_SIZE,
+    families,
+  })
+
+  assertNoUuid(jsonLd)
 
   return (
     <>

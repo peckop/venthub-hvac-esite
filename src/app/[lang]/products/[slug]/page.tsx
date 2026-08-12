@@ -2,6 +2,7 @@ import type { Route } from 'next'
 import { permanentRedirect } from 'next/navigation'
 
 import { storagePathToUrl } from '@/lib/images/productImage'
+import { assertNoUuid, buildProductGroupJsonLd } from '@/lib/seo/jsonld'
 import { getAllFamilySlugs } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 
@@ -137,41 +138,23 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
   // 3) Ne aile ne varyant → mevcut "bulunamadı" davranışı (görünüm katmanında).
   const family = detail?.family ?? null
   const variants = detail?.variants ?? []
-  const primaryVariant = variants[0] ?? null
 
-  // W3.1 ProductGroup JSON-LD'sini yeniden yazacak — burada yalnız alan beslemesi
-  // aile modeline uyarlandı, yapı KASITLI olarak korundu.
-  const canonicalPath = family?.slug || 'generic'
-  const coverPath = variants.find((v) => v.images.length > 0)?.images[0]?.path
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "productID": canonicalPath,
-    "name": family?.name || "Product Details",
-    "description": pickLang(family?.description ?? null, lang) || "VentHub Product Details",
-    "url": `${SITE_URL}/products/${canonicalPath}`,
-    ...(coverPath && { "image": storagePathToUrl(coverPath) }),
-    ...(family?.brand_name && {
-      "brand": {
-        "@type": "Brand",
-        "name": family.brand_name
-      }
-    }),
-    "offers": {
-      "@type": "Offer",
-      "availability": (primaryVariant?.stock_qty ?? 0) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      "price": primaryVariant?.price || "0.00",
-      "priceCurrency": "TRY",
-      "url": `${SITE_URL}/products/${canonicalPath}`
-    }
-  }
+  // W3.1: aile bulunamadıysa (not-found) JSON-LD hiç yazılmaz — tanımlanacak bir
+  // ürün yok; ProductGroup + hasVariant[] (fiyatsız varyanta offers HİÇ yazılmaz).
+  const jsonLd = family
+    ? buildProductGroupJsonLd({ family, variants, lang, baseUrl: SITE_URL })
+    : null
+
+  if (jsonLd) assertNoUuid(jsonLd)
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
-      />
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
+        />
+      )}
       <PageComponent family={family} variants={variants} />
     </>
   )

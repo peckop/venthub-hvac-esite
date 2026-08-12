@@ -67,17 +67,14 @@ function toRelPath(globKey: string): string {
  * RATCHET (debt freeze): 2026-06-16'da master'da çözülmeyen anahtarlar. admin literal
  * batch (PR#364) bunlardan 15'ini (6 admin + 6 common + 3 products) çözdü → buradan SİLİNDİ
  * (ratchet 32→17 sıkıştı). 2026-08-12 dead-key sweep'i kalan 15'ini düzeltti (sözlüğe ekle /
- * çağırana mevcut anahtar eşitle) → buradan SİLİNDİ (ratchet 17→2 sıkıştı). Kalan 2 GERÇEK
- * ölü-anahtar: `SeriesCard.tsx` hiçbir yerden import edilmiyor (ölü bileşen, çağıranı yok)
- * — anahtarları o yüzden kasıtlı ÇÖZÜLMEMİŞ bırakıldı; bileşen canlanırsa (bir importer
- * eklenirse) o zaman sözlüğe eklenip buradan silinmeli. YENİ entry EKLEME: yeni çözülmeyen
- * anahtar = anahtarı düzelt, allowlist'leme.
+ * çağırana mevcut anahtar eşitle) → buradan SİLİNDİ (ratchet 17→2 sıkıştı). Kalan 2 anahtar
+ * (`product.starting_from`, `series.premium_desc`) `SeriesCard.tsx`'e aitti — F5-B W3.2'de
+ * bileşenin kendisi ölü kod olarak SİLİNDİ (importer'ı hiç olmadı), dolayısıyla anahtarlar
+ * artık kaynak taramasında hiç görünmüyor → ratchet 2→0 sıkıştı. YENİ entry EKLEME: yeni
+ * çözülmeyen anahtar = anahtarı düzelt, allowlist'leme.
  * (Aşağıdaki ikinci test, düzelen bir anahtar hâlâ listede kalırsa uyarır → liste bayatlamaz.)
  */
-const KNOWN_UNRESOLVED = new Set<string>([
-  'product.starting_from', // SeriesCard.tsx — ölü bileşen, importer yok
-  'series.premium_desc', // SeriesCard.tsx — ölü bileşen, importer yok
-])
+const KNOWN_UNRESOLVED = new Set<string>([])
 
 describe('INV-5 · i18n key-resolution conformance', () => {
   it("her statik t('...') anahtarı sözlükte çözülmeli (ham-key render yasak)", () => {

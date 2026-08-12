@@ -123,10 +123,18 @@ export const generateEngineeringSummary = (product: Product): EngineeringInferen
   const inferences: EngineeringInference[] = [];
   const specs = isRecord(product.technical_specs) ? (product.technical_specs as Record<string, unknown>) : {};
 
-  // 1. Ses Analizi
-  if (product.noise_level) {
-    const noise = getNoiseInference(product.noise_level);
-    if (noise) inferences.push(noise);
+  // 1. Ses Analizi (F5-B W3.2: legacy products.noise_level kolonu her zaman NULL —
+  // gerçek veri technical_specs.noise_level_db_a anahtarında, bkz. prod key envanteri)
+  const noiseValue = specs.noise_level_db_a;
+  if (noiseValue !== undefined && noiseValue !== null) {
+    const numericNoise = typeof noiseValue === 'string'
+      ? parseFloat(noiseValue.replace(/[^0-9.]/g, ''))
+      : Number(noiseValue);
+
+    if (!isNaN(numericNoise)) {
+      const noise = getNoiseInference(numericNoise);
+      if (noise) inferences.push(noise);
+    }
   }
 
   // 2. Verimlilik Analizi (technical_specs içinden)
@@ -149,16 +157,24 @@ export const generateEngineeringSummary = (product: Product): EngineeringInferen
     if (motor) inferences.push(motor);
   }
 
-  // 4. Kapasite (Debi) Analizi
-  if (product.airflow_capacity && product.airflow_capacity > 500) {
-    const isIndustrial = product.airflow_capacity > 2000;
-    inferences.push({
-      labelKey: isIndustrial ? 'pdp.engineering.capacity.industrialFlow.label' : 'pdp.engineering.capacity.highFlow.label',
-      value: `${product.airflow_capacity} m³/h`,
-      type: 'power',
-      descriptionKey: isIndustrial ? 'pdp.engineering.capacity.industrialFlow.desc' : 'pdp.engineering.capacity.highFlow.desc',
-      isI18n: true
-    });
+  // 4. Kapasite (Debi) Analizi (F5-B W3.2: legacy products.airflow_capacity kolonu her
+  // zaman NULL — gerçek veri technical_specs.max_delivery_m3h anahtarında)
+  const airflowValue = specs.max_delivery_m3h;
+  if (airflowValue !== undefined && airflowValue !== null) {
+    const numericAirflow = typeof airflowValue === 'string'
+      ? parseFloat(airflowValue.replace(/[^0-9.]/g, ''))
+      : Number(airflowValue);
+
+    if (!isNaN(numericAirflow) && numericAirflow > 500) {
+      const isIndustrial = numericAirflow > 2000;
+      inferences.push({
+        labelKey: isIndustrial ? 'pdp.engineering.capacity.industrialFlow.label' : 'pdp.engineering.capacity.highFlow.label',
+        value: `${numericAirflow} m³/h`,
+        type: 'power',
+        descriptionKey: isIndustrial ? 'pdp.engineering.capacity.industrialFlow.desc' : 'pdp.engineering.capacity.highFlow.desc',
+        isI18n: true
+      });
+    }
   }
 
   return inferences;

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import React, { useMemo, useState } from 'react'
 
 import { useLocalizedRoutes } from '@/hooks/useLocalizedRoutes';
+import { resolveProductImageUrl } from '@/lib/images/productImage'
 import type { Category, Product } from '@/types/ui-models'
 import { normalizeImageUrl } from '@/utils/imageUtils'
 
@@ -154,7 +155,7 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
 
                 <div className="aspect-square relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 mb-8 p-8">
                   <Image
-                    src={normalizeImageUrl(activeProducts[0]?.image_url)}
+                    src={normalizeImageUrl(activeProducts[0] ? resolveProductImageUrl(activeProducts[0]) : null)}
                     alt={activeProducts[0]?.name || "Product Focus"}
                     fill
                     sizes="300px"

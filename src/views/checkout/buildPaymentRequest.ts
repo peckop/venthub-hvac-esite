@@ -1,3 +1,4 @@
+import { resolveProductImageUrl } from '@/lib/images/productImage'
 import type { UserAddress } from '@/types/ui-models'
 
 import { safeNumber } from '../../utils/type-converters'
@@ -5,7 +6,7 @@ import { safeNumber } from '../../utils/type-converters'
 export interface CartItemInput {
   id: string
   quantity: number
-  product: { id: string; name: string; price: number | null; image_url?: string | null }
+  product: { id: string; name: string; price: number | null; image_url?: string | null; cover_image_path?: string | null }
 }
 
 export interface CustomerInput { 
@@ -52,7 +53,8 @@ export function buildPaymentRequest(args: BuildPaymentArgs) {
     quantity: it.quantity,
     price: safeNumber(it.product.price),
     product_name: it.product.name,
-    product_image_url: it.product.image_url || null,
+    // F5-B W3.2: legacy products.image_url doğrudan okunmuyor — tek-kaynak resolver.
+    product_image_url: resolveProductImageUrl(it.product),
   }))
 
   const normalizeAddress = (addr: AddressInput | UserAddress | null) => {
