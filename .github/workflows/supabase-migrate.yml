@@ -9,9 +9,11 @@ on:
       - '.github/workflows/supabase-migrate.yml'
   workflow_dispatch:
 
+# cancel-in-progress KAPALI: bir migration koşusu iptal edilirse o push'un migration'ı
+# hiç uygulanmadan kaybolabilir. Koşular sıraya girer, iptal edilmez.
 concurrency:
   group: supabase-migrate-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   migrate:
@@ -29,28 +31,63 @@ jobs:
 
       - name: Test DB connection
         run: |
-          psql "$DB_URL" -c "select 1;"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -c "select 1;"
 
-      - name: Apply migrations via psql
+      # Ledger modeli: her migration dosyası DB'ye BİR KEZ uygulanır ve
+      # public._migration_ledger'a kaydedilir. Kayıtlı dosya atlanır.
+      # Yeni dosyada hata = koşu KIRMIZI (eski "hata yutma" davranışı bilinçli kaldırıldı;
+      # 2026-08-11'de F1/F2 sessiz rollback'leri bu yüzden ancak elle DB doğrulamayla yakalanmıştı).
+      - name: Ensure migration ledger
         run: |
-          shopt -s nullglob
-          files=(supabase/migrations/*.sql)
-          if [ ${#files[@]} -eq 0 ]; then
-             echo "No migrations found."
-             exit 0
+          psql "$DB_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          create table if not exists public._migration_ledger (
+            name text primary key,
+            applied_at timestamptz not null default now()
+          );
+          alter table public._migration_ledger enable row level security;
+          SQL
+
+      # İlk koşu baseline'ı: ledger boşsa, repodaki TÜM mevcut dosyalar zaten prod'a
+      # uygulanmış kabul edilir (bu workflow'un devraldığı tarihsel durum) ve yalnız
+      # kaydedilir, YENİDEN UYGULANMAZ. Sonraki koşularda ledger tek otorite.
+      - name: Baseline ledger (first run only)
+        run: |
+          set -euo pipefail
+          COUNT=$(psql "$DB_URL" -tAc "select count(*) from public._migration_ledger;")
+          if [ "$COUNT" != "0" ]; then
+            echo "Ledger dolu ($COUNT kayıt) — baseline atlandı."
+            exit 0
           fi
-          
-          failed=0
+          echo "Ledger boş — mevcut ${GITHUB_SHA:0:8} anındaki tüm dosyalar baseline'lanıyor."
+          for f in supabase/migrations/*.sql; do
+            base=$(basename "$f")
+            psql "$DB_URL" -v ON_ERROR_STOP=1 -c \
+              "insert into public._migration_ledger(name) values ('$base') on conflict do nothing;"
+          done
+
+      - name: Apply new migrations
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          applied=0
+          skipped=0
           for f in $(ls -1 supabase/migrations/*.sql | sort); do
-            echo "Applying $f"
-            if psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f" 2>&1; then
-              echo "✅ $f applied successfully"
+            base=$(basename "$f")
+            seen=$(psql "$DB_URL" -tAc "select 1 from public._migration_ledger where name = '$base' limit 1;")
+            if [ "$seen" = "1" ]; then
+              skipped=$((skipped + 1))
+              continue
+            fi
+            echo "▶ Uygulanıyor: $base"
+            if psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f"; then
+              psql "$DB_URL" -v ON_ERROR_STOP=1 -c \
+                "insert into public._migration_ledger(name) values ('$base');"
+              echo "✅ $base uygulandı ve ledger'a kaydedildi"
+              applied=$((applied + 1))
             else
-              echo "⚠️ $f had errors (may already be applied)"
-              failed=$((failed + 1))
+              echo "::error file=$f::Migration BAŞARISIZ: $base — koşu kırmızı, DB'de uygulanmadı (dosya kendi begin/commit'i ile atomik olmalı)."
+              exit 1
             fi
           done
-          
-          echo "✅ Migration process completed. Files with errors: $failed"
-
-
+          echo "### Supabase Migrate" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Uygulanan: $applied · Atlanan (ledger'da): $skipped" >> "$GITHUB_STEP_SUMMARY"
