@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
 import VentImage from '@/components/ui/VentImage'
+import { resolveProductImageUrl } from '@/lib/images/productImage'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import { BrandIcon } from '../components/HVACIcons'
@@ -323,7 +324,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                   className="group block bg-white rounded-hvac-2xl p-8 border border-white transition-shadow duration-700 hover:border-cyan-500/20 hover:shadow-hvac-card-hover"
                 >
                   <div className="aspect-square relative flex items-center justify-center mb-8 grayscale group-hover:grayscale-0 transition-transform duration-700 group-hover:scale-105">
-                    <VentImage src={product.image_url} alt={product.name} className="w-full h-full object-contain" />
+                    <VentImage src={resolveProductImageUrl(product)} alt={product.name} fallbackType="product" className="w-full h-full object-contain" />
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-2 line-clamp-2">{product.name}</h3>
                   <div className="text-xs font-bold uppercase tracking-widest text-slate-400">{product.sku}</div>

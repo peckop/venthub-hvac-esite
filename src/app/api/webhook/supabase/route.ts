@@ -1,9 +1,35 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 
+import {
+  discoveryTag,
+  familyTag,
+  HOME_DATA_TAG,
+  homeDataTag,
+  PRODUCTS_DISCOVERY_TAG,
+  variantStockTag,
+} from '@/lib/cache/tags'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 
 export const dynamic = 'force-dynamic'
+
+// PS-042: products UPDATE'inde keşif (discovery) tag'lerini yalnız bu alanlardan
+// biri değiştiyse tetikleriz. old_record yoksa (bkz. hasOldRecord) karşılaştırma
+// yapılamaz ve mevcut davranış (her zaman tetikle) korunur.
+const PRODUCT_DISCOVERY_SENSITIVE_FIELDS = [
+  'status',
+  'family_id',
+  'category_id',
+  'subcategory_id',
+  'deleted_at',
+] as const
+
+function hasDiscoverySensitiveChange(
+  record: Record<string, unknown>,
+  oldRecord: Record<string, unknown>
+): boolean {
+  return PRODUCT_DISCOVERY_SENSITIVE_FIELDS.some((field) => record[field] !== oldRecord[field])
+}
 
 interface SupabaseWebhookPayload {
   type: 'INSERT' | 'UPDATE' | 'DELETE'
@@ -38,11 +64,31 @@ export async function POST(request: NextRequest) {
 
     const revalidatedPaths: string[] = []
     const revalidatedTags: string[] = []
+    // PS-042: products UPDATE'inde alan-bazlı karşılaştırma yapılıp yapılamadığını
+    // (old_record var mı) yanıtta raporlamak için.
+    let discoveryComparisonSkipped = false
 
-    if (tenantId) {
-      revalidateTag(`home-data-${tenantId}`)
-      revalidateTag(`products-discovery-${tenantId}`)
-      revalidatedTags.push(`home-data-${tenantId}`, `products-discovery-${tenantId}`)
+    // PS-042: keşif (discovery) tag'leri yalnız keşfi etkileyen değişimde tetiklenir.
+    // products UPDATE'inde bu, duyarlı alan (status/family_id/category_id/subcategory_id/
+    // deleted_at) karşılaştırmasıyla belirlenir; old_record yoksa karşılaştırma yapılamaz
+    // ve mevcut davranış (her zaman tetikle) korunur. Bu karar hem global hem
+    // tenant-scoped keşif tag'lerine AYNI şekilde uygulanır — stok-only UPDATE
+    // tenant tag'i üzerinden de cache thrash edemez.
+    let shouldRevalidateDiscovery = true
+    if (table === 'inventory_movements') {
+      shouldRevalidateDiscovery = false
+    } else if (table === 'products' && type === 'UPDATE') {
+      if (record && old_record) {
+        shouldRevalidateDiscovery = hasDiscoverySensitiveChange(record, old_record)
+      } else {
+        discoveryComparisonSkipped = true
+      }
+    }
+
+    if (tenantId && shouldRevalidateDiscovery) {
+      revalidateTag(homeDataTag(tenantId))
+      revalidateTag(discoveryTag(tenantId))
+      revalidatedTags.push(homeDataTag(tenantId), discoveryTag(tenantId))
     }
 
     // 1. Table: products
@@ -55,10 +101,11 @@ export async function POST(request: NextRequest) {
         revalidatedPaths.push(`/tr/products/${productSlug}`, `/en/products/${productSlug}`)
       }
 
-      // Revalidate listing caches
-      revalidateTag('products-discovery')
-      revalidateTag('home-data')
-      revalidatedTags.push('products-discovery', 'home-data')
+      if (shouldRevalidateDiscovery) {
+        revalidateTag(PRODUCTS_DISCOVERY_TAG)
+        revalidateTag(HOME_DATA_TAG)
+        revalidatedTags.push(PRODUCTS_DISCOVERY_TAG, HOME_DATA_TAG)
+      }
 
       // If category has changed or is associated, we also revalidate the category path
       const categoryId = activeRecord.category_id as string | undefined
@@ -87,9 +134,9 @@ export async function POST(request: NextRequest) {
       }
 
       // Revalidate listing caches since categorization structure changed
-      revalidateTag('home-data')
-      revalidateTag('products-discovery')
-      revalidatedTags.push('home-data', 'products-discovery')
+      revalidateTag(HOME_DATA_TAG)
+      revalidateTag(PRODUCTS_DISCOVERY_TAG)
+      revalidatedTags.push(HOME_DATA_TAG, PRODUCTS_DISCOVERY_TAG)
     }
 
     // 3. Table: inventory_movements (Real-time stock movement tracking)
@@ -127,10 +174,26 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Stocks change means home page featured items and discovery list might change stock badges
-      revalidateTag('home-data')
-      revalidateTag('products-discovery')
-      revalidatedTags.push('home-data', 'products-discovery')
+      // PS-042: stok hareketi (inventory_movements) artık keşif (home-data/products-discovery)
+      // tag'lerini invalide ETMEZ — yalnız izole variantStockTag() invalide edilir, böylece
+      // stok hareketi discovery cache'ini thrash etmez.
+      revalidateTag(variantStockTag())
+      revalidatedTags.push(variantStockTag())
+    }
+
+    // 4. Table: product_families (YENİ — PS-042)
+    else if (table === 'product_families') {
+      const familySlug = activeRecord.slug as string | undefined
+
+      // Aile değişikliği keşif listelerini de etkileyebilir (aile bazlı gruplama/filtreleme)
+      revalidateTag(HOME_DATA_TAG)
+      revalidateTag(PRODUCTS_DISCOVERY_TAG)
+      revalidatedTags.push(HOME_DATA_TAG, PRODUCTS_DISCOVERY_TAG)
+
+      if (familySlug) {
+        revalidateTag(familyTag(familySlug))
+        revalidatedTags.push(familyTag(familySlug))
+      }
     }
 
     return NextResponse.json({
@@ -138,6 +201,9 @@ export async function POST(request: NextRequest) {
       event: { table, type },
       revalidatedPaths,
       revalidatedTags,
+      // PS-042: products UPDATE'inde old_record yoksa alan-bazlı karşılaştırma yapılamadı —
+      // bu durumda mevcut davranış (her zaman keşif tag'i tetikle) korunur.
+      discoveryComparisonSkipped,
       timestamp: new Date().toISOString()
     })
   } catch (error: unknown) {

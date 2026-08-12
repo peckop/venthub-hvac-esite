@@ -7,6 +7,7 @@ import { getProductsEnriched } from '@/lib/services/product.service'
 import { supabaseStaticClient } from '@/lib/supabase/static'
 
 import { TenantProvider } from '../../../hooks/useTenant'
+import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../../lib/cache/tags'
 import type { DomainProduct } from '../../../lib/type-converters'
 import { getTenantConfig } from '../../../utils/tenantServer'
 import CategoryMasterView from '../../../views/CategoryMasterView'
@@ -14,7 +15,10 @@ import CategoryMasterView from '../../../views/CategoryMasterView'
 const getCachedProducts = (lang: string, tenantId: string) => unstable_cache(
   async () => getProductsEnriched(supabaseStaticClient, { limit: 100 }),
   ['products-discovery', lang, tenantId],
-  { tags: ['products-discovery', `products-discovery-${tenantId}`], revalidate: false }
+  // revalidate: 3600 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)
+  // liste en fazla 1 saat bayat kalabilir. Sinyalli tazeleme (revalidateTag) aynen çalışır.
+  // (Ana sayfadaki (src/app/[lang]/page.tsx) desenle aynı emniyet kemeri.)
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
 )()
 
 /**

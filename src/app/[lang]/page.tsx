@@ -74,6 +74,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 import { unstable_cache } from 'next/cache'
 
 import { TenantProvider } from '../../hooks/useTenant'
+import { HOME_DATA_TAG, homeDataTag } from '../../lib/cache/tags'
 import { getTenantConfig } from '../../utils/tenantServer'
 
 const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
@@ -94,7 +95,7 @@ const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
   ['home-page-data', lang, tenantId],
   // revalidate: 3600 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)
   // ana sayfa en fazla 1 saat bayat kalabilir. Sinyalli tazeleme (revalidateTag) aynen çalışır.
-  { tags: ['home-data', `home-data-${tenantId}`], revalidate: 3600 }
+  { tags: [HOME_DATA_TAG, homeDataTag(tenantId)], revalidate: 3600 }
 )()
 
 export default async function RootPage({ params }: Props) {

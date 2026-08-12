@@ -4,6 +4,7 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { resolveProductImageUrl } from '@/lib/images/productImage'
 import type { Product } from '@/types/ui-models'
 
 import { useCart } from '../hooks/useCartHook'
@@ -50,7 +51,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
         <div className="group relative flex items-center bg-white rounded-2xl border border-light-gray p-4 transition-transform duration-300 hover:shadow-hvac-lg hover:-translate-y-0.5 overflow-hidden">
           <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 bg-light-gray/50 rounded-xl overflow-hidden p-2">
             <VentImage
-              src={product.image_url}
+              src={resolveProductImageUrl(product)}
               alt={product.name}
               fallbackType="product"
               fill
@@ -116,7 +117,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
         {/* Product Image */}
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-light-gray/30 mb-4 group-hover:bg-light-gray/50 transition-colors">
           <VentImage
-            src={product.image_url}
+            src={resolveProductImageUrl(product)}
             alt={product.name}
             fallbackType="product"
             fill

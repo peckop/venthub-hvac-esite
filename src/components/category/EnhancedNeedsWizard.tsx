@@ -8,6 +8,7 @@ import Link from 'next/link'
 import React, { useCallback,useEffect, useState } from 'react'
 
 import { useI18n } from '@/i18n/I18nProvider';
+import { productImagePlaceholder,resolveProductImageUrl } from '@/lib/images/productImage'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
@@ -306,9 +307,9 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                             className="group block p-6 rounded-hvac-2xl bg-white border border-slate-100 hover:border-cyan-500/20 hover:shadow-2xl transition-shadow duration-500"
                                         >
                                             <div className="aspect-square relative mb-6 grayscale group-hover:grayscale-0 transition-transform">
-                                                <Image 
-                                                    src={p.image_url || '/images/placeholder.png'} 
-                                                    alt={p.name || ''} 
+                                                <Image
+                                                    src={resolveProductImageUrl(p) ?? productImagePlaceholder(p.id)}
+                                                    alt={p.name || ''}
                                                     fill 
                                                     sizes="(max-width: 768px) 100vw, 33vw"
                                                     className="object-contain" 
