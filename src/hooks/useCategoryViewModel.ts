@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 
 import { useI18n } from '../i18n/I18nProvider'
-import { DomainCategory, DomainProduct, mapCategoryWithLocale } from '../lib/type-converters'
+import { DomainCategory, mapCategoryWithLocale } from '../lib/type-converters'
 import type { DbCategory } from '../types/db-rows'
 
 export interface CategoryViewModel {
@@ -17,13 +17,6 @@ export interface CategoryViewModel {
   level: number
   displayMode: 'showcase' | 'landing' | 'series' | 'grid'
   raw: DomainCategory
-}
-
-export interface SeriesGroup {
-  name: string
-  products: DomainProduct[]
-  image?: string
-  minPrice: number
 }
 
 /**
@@ -82,25 +75,7 @@ export function useCategoryViewModel() {
     }
   }, [t, lang])
 
-  const groupProductsBySeries = useMemo(() => (products: DomainProduct[]): SeriesGroup[] => {
-    const seriesMap: Record<string, SeriesGroup> = {}
-    products.forEach(product => {
-      const meta = ('metadata' in product && typeof product.metadata === 'object' && product.metadata !== null) ? (product.metadata as Record<string, unknown>) : {}
-      let seriesName = (meta.series as string) || product.name.split(' ')[0]
-      if (['Vortice', 'Avens', 'Soler', 'Casals', 'Vorticel'].includes(seriesName)) {
-        seriesName = product.name.split(' ')[1] || seriesName
-      }
-      if (!seriesMap[seriesName]) {
-        seriesMap[seriesName] = { name: seriesName, products: [], image: product.image_url || undefined, minPrice: Infinity }
-      }
-      seriesMap[seriesName].products.push(product)
-      if (product.price && product.price < seriesMap[seriesName].minPrice) seriesMap[seriesName].minPrice = product.price
-    })
-    return Object.values(seriesMap).sort((a, b) => a.name.localeCompare(b.name))
-  }, [])
-
   return {
-    wrapCategory,
-    groupProductsBySeries
+    wrapCategory
   }
 }

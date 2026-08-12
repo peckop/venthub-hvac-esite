@@ -32,10 +32,12 @@ import type { Route } from 'next';
 export const Routes = {
   home: () => '/' as Route,
   
-  // Eşsiz Link Yönetimi
-  product: (slug: string) => {
+  // Eşsiz Link Yönetimi — F5-B: slug artık AİLE slug'ıdır; sku verilirse ?sku= ile
+  // belirli varyant ön-seçilir (canonical'a girmez, VariantSelector okur).
+  product: (slug: string, sku?: string) => {
     const validSlug = assertProductSlug(slug);
-    return `/products/${encodeURIComponent(validSlug)}` as Route;
+    const base = `/products/${encodeURIComponent(validSlug)}`;
+    return (sku ? `${base}?sku=${encodeURIComponent(sku)}` : base) as Route;
   },
   
   // Tüm Ürünler ve Filtreleme

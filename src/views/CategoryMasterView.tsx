@@ -3,10 +3,11 @@
 import dynamic from 'next/dynamic'
 import React, { useMemo } from 'react'
 
+import Pagination from '../components/ui/Pagination'
 import { useCategoryGateway } from '../hooks/useCategoryGateway'
 import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
 import type { DomainCategory } from '../lib/type-converters'
-import { DomainProduct } from '../lib/type-converters'
+import type { FamilyListItem } from '../types/ui-models'
 
 const CategoryGridView = dynamic(() => import('./category/CategoryGridView'), { ssr: false })
 const CategoryLandingView = dynamic(() => import('./category/CategoryLandingView'), { ssr: false })
@@ -16,21 +17,34 @@ const ProductsDiscoveryView = dynamic(() => import('./ProductsDiscoveryView'), {
 
 interface CategoryMasterViewProps {
   initialCategory?: DomainCategory | null
-  initialProducts?: DomainProduct[]
+  /** F5-B W2.1: liste birimi artık varyant değil AİLE satırıdır. */
+  families?: FamilyListItem[]
+  /** Sunucu sayfalaması: filtre setine göre toplam aile sayısı. */
+  total?: number
+  /** 1-tabanlı aktif sayfa (?page=). */
+  page?: number
+  /** Sunucu tarafındaki sayfa boyutu (24). */
+  pageSize?: number
   initialSubCategories?: DomainCategory[]
 }
 
-const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory, initialProducts, initialSubCategories }) => {
-  // 1. Pure Data Layer (Gateway)
+const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
+  initialCategory,
+  families = [],
+  total = 0,
+  page = 1,
+  pageSize = 24,
+  initialSubCategories
+}) => {
+  // 1. Pure Data Layer (Gateway) — veri çekmez; kategori/alt kategori bağlamı + görünüm tercihleri
   const {
     category: rawCategory,
     parentCategory: rawParentCategory,
     subCategories: rawSubCategories,
-    products,
     loading,
     filters,
     updateFilters
-  } = useCategoryGateway(initialCategory, initialProducts, initialSubCategories)
+  } = useCategoryGateway(initialCategory, initialSubCategories)
 
   // 2. Presentation Layer (ViewModel)
   const { wrapCategory } = useCategoryViewModel()
@@ -38,14 +52,48 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
   // 3. Derived UI State via ViewModel
   const category = useMemo(() => wrapCategory(rawCategory), [rawCategory, wrapCategory])
   const parentCategory = useMemo(() => wrapCategory(rawParentCategory), [rawParentCategory, wrapCategory])
-  const availableBrands = useMemo(() => Array.from(new Set(products.map(p => p.brand).filter(Boolean))), [products])
+  const availableBrands = useMemo(
+    () => Array.from(new Set(families.map(f => f.brand_name).filter((b): b is string => !!b))),
+    [families]
+  )
 
+  // Sayfa-içi (client) daraltma: sunucudan gelen 24'lük aile sayfası üzerinde çalışır.
+  // Spec/fiyat filtreleri kaldırıldı — kalanlar aile satırında GERÇEKTEN uygulanabilir alanlar.
+  const visibleFamilies = useMemo(() => {
+    const query = filters.catSearch.trim().toLocaleLowerCase()
+    let list = families
 
+    if (query) {
+      list = list.filter(f =>
+        f.name.toLocaleLowerCase().includes(query) ||
+        (f.brand_name ?? '').toLocaleLowerCase().includes(query) ||
+        (f.series_code ?? '').toLocaleLowerCase().includes(query)
+      )
+    }
+    if (filters.selectedBrands.length > 0) {
+      list = list.filter(f => !!f.brand_name && filters.selectedBrands.includes(f.brand_name))
+    }
+
+    const sorted = [...list]
+    if (filters.sortBy === 'variants') {
+      sorted.sort((a, b) => b.variant_count - a.variant_count)
+    } else {
+      sorted.sort((a, b) => a.name.localeCompare(b.name))
+    }
+    return sorted
+  }, [families, filters])
+
+  const pagination = (
+    <React.Suspense fallback={<div className="py-10" />}>
+      <Pagination page={page} pageSize={pageSize} total={total} />
+    </React.Suspense>
+  )
 
   if (!category && !loading) {
     return (
       <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy" /></div>}>
-        <ProductsDiscoveryView products={products} isLoading={loading} />
+        <ProductsDiscoveryView families={visibleFamilies} total={total} isLoading={loading} />
+        {pagination}
       </React.Suspense>
     )
   }
@@ -57,58 +105,58 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
     switch (category.displayMode) {
       case 'showcase':
         return (
-          <CategoryShowcaseView 
-            category={category.raw} 
+          <CategoryShowcaseView
+            category={category.raw}
             subCategories={rawSubCategories}
           />
         )
       case 'landing':
         return (
-          <CategoryLandingView 
+          <CategoryLandingView
             category={category.raw}
             subCategories={rawSubCategories}
-            products={products as DomainProduct[]}
+            families={visibleFamilies}
           />
         )
       case 'series':
         // Gelişmiş Beyaz Tasarım (Series)
         return (
-          <CategorySeriesView 
+          <CategorySeriesView
             category={category.raw}
             parentCategory={parentCategory?.raw}
-            products={products as DomainProduct[]}
+            families={visibleFamilies}
           />
         )
       default:
         // Eğer alt kategoriyse Series, ana kategoriyse Grid (Fallback)
         if (category.parentId) {
             return (
-                <CategorySeriesView 
+                <CategorySeriesView
                   category={category.raw}
                   parentCategory={parentCategory?.raw}
-                  products={products as DomainProduct[]}
+                  families={visibleFamilies}
                 />
             )
         }
-        
+
         // Eğer ana kategori ise ve alt kategorileri varsa Landing görünümü (alt kategorileri göstermek için)
         if (rawSubCategories && rawSubCategories.length > 0) {
             return (
-              <CategoryLandingView 
+              <CategoryLandingView
                 category={category.raw}
                 subCategories={rawSubCategories}
-                products={products as DomainProduct[]}
+                families={visibleFamilies}
               />
             )
         }
 
         return (
-          <CategoryGridView 
+          <CategoryGridView
             category={category.raw}
             parentCategory={parentCategory?.raw}
             subCategories={rawSubCategories}
             availableBrands={availableBrands}
-            products={products}
+            families={visibleFamilies}
             filters={filters}
             onUpdateFilters={updateFilters}
             loading={loading}
@@ -121,6 +169,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
     <div className="min-h-screen">
       <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy" /></div>}>
         {renderView()}
+        {category?.displayMode !== 'showcase' && pagination}
       </React.Suspense>
     </div>
   )

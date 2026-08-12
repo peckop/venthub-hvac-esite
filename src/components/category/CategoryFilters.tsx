@@ -5,7 +5,6 @@ import React from 'react'
 
 import type { CategoryFilters as FilterState } from '../../hooks/useCategoryGateway'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
-import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { DomainCategory } from '../../lib/type-converters'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
@@ -76,26 +75,9 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
         </div>
       )}
 
-      {/* Price Range */}
-      <div className="mb-8">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
-          {t('category.priceRange') || 'Fiyat Aralığı'}
-        </h4>
-        <div className="space-y-4 px-2">
-          <input
-            type="range"
-            min="0"
-            max={Math.max(100000, filters.priceRange[1] || 100000)}
-            value={filters.priceRange[1] || 0}
-            onChange={(e) => onUpdateFilters({ priceRange: [filters.priceRange[0], parseInt(e.target.value)] })}
-            className="w-full accent-primary-ocean"
-          />
-          <div className="flex justify-between text-xs font-bold text-slate-400">
-            <span>{formatCurrency(0, lang, { maximumFractionDigits: 0 })}</span>
-            <span className="text-slate-900">{formatCurrency(filters.priceRange[1], lang, { maximumFractionDigits: 0 })}</span>
-          </div>
-        </div>
-      </div>
+      {/* Fiyat aralığı ve teknik (debi/basınç/ses) filtreleri KALDIRILDI (F5-B W2.1):
+          listeye hiç uygulanmıyordu (sahte filtre) ve aile satırında spec/fiyat yok.
+          Gerçek faceted-search ayrı plandır. */}
 
       {/* Brands */}
       {availableBrands.length > 0 && (
@@ -129,65 +111,6 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
         </div>
       )}
 
-      {/* Tech Filters */}
-      <div className="space-y-6">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
-          {t('category.techFilters') || 'Teknik Özellikler'}
-        </h4>
-        
-        <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-2">{t('category.airflow') || 'Hava Debisi (m³/h)'}</label>
-          <div className="flex items-center gap-2">
-            <input 
-              type="number" 
-              placeholder="Min" 
-              value={filters.airflowMin} 
-              onChange={e => onUpdateFilters({ airflowMin: e.target.value })} 
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ocean/20 placeholder:text-slate-300" 
-            />
-            <span className="text-slate-300">-</span>
-            <input 
-              type="number" 
-              placeholder="Max" 
-              value={filters.airflowMax} 
-              onChange={e => onUpdateFilters({ airflowMax: e.target.value })} 
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ocean/20 placeholder:text-slate-300" 
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-2">{t('category.pressure') || 'Basınç (Pa)'}</label>
-          <div className="flex items-center gap-2">
-            <input 
-              type="number" 
-              placeholder="Min" 
-              value={filters.pressureMin} 
-              onChange={e => onUpdateFilters({ pressureMin: e.target.value })} 
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ocean/20 placeholder:text-slate-300" 
-            />
-            <span className="text-slate-300">-</span>
-            <input 
-              type="number" 
-              placeholder="Max" 
-              value={filters.pressureMax} 
-              onChange={e => onUpdateFilters({ pressureMax: e.target.value })} 
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ocean/20 placeholder:text-slate-300" 
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-2">{t('category.noise') || 'Maks. Ses (dB)'}</label>
-          <input 
-            type="number" 
-            placeholder="Max dB" 
-            value={filters.noiseMax} 
-            onChange={e => onUpdateFilters({ noiseMax: e.target.value })} 
-            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-ocean/20 placeholder:text-slate-300" 
-          />
-        </div>
-      </div>
     </div>
   )
 }

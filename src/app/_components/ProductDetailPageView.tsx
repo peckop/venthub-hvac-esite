@@ -1,5 +1,5 @@
 'use client'
-import { 
+import {
   ArrowLeft,
   Award,
   ChevronDown,
@@ -17,9 +17,10 @@ import {
   ShoppingCart,
   Star,
   Truck} from 'lucide-react'
+import type { Route } from 'next'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
-import React, { useEffect, useMemo,useRef, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import React, { Suspense, useCallback, useEffect, useMemo,useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { BrandIcon } from '../../components/HVACIcons'
@@ -29,42 +30,67 @@ import { ProductSmartInference } from '../../components/product/ProductSmartInfe
 import ProductCard from '../../components/ProductCard'
 import { AddToProjectModal } from '../../components/products'
 import RichTextRenderer from '../../components/products/RichTextRenderer'
+import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import Seo from '../../components/Seo'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCart } from '../../hooks/useCartHook'
 import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
-import { getProductBySlug, getProductsEnriched } from '../../lib/services/product.service'
+import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
+import type { FamilyDetail, FamilyVariant } from '../../lib/services/family.service'
+import { getProductById, getProductsEnriched } from '../../lib/services/product.service'
 import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
 import type { Product } from '../../types/ui-models'
-// import { DomainCategory } from '../../lib/type-converters'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
-import { 
-  formatSpecValue, 
+import {
+  formatSpecValue,
   groupTechnicalSpecs,
   SPEC_SORT_ORDER,
   translateSpecKey} from '../../utils/productHelpers'
 import { localizedHref, Routes } from '../../utils/routes'
+import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
+
+/**
+ * F5-B W2.2 — PDP artık AİLE kanoniktir.
+ *
+ * Veri modeli: `family` (product_families) + `variants` (aktif varyantlar,
+ * get_family_detail RPC'sinden dil çözülmüş olarak gelir). Seçili varyant
+ * `?sku=` arama parametresiyle taşınır; yoksa ilk varyant seçilidir.
+ *
+ * Sepet/PDF/proje gibi EYLEMLER tam `Product` satırına ihtiyaç duyar; bu satır
+ * seçili varyant için tembel (lazy) çekilir — GÖRÜNÜM asla ona bağlı değildir.
+ */
 
 export interface ProductDetailPageProps {
-  initialProduct?: Product | null
+  family: FamilyDetail['family'] | null
+  variants: FamilyVariant[]
 }
 
-export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct }) => {
+interface ProductDetailBodyProps extends ProductDetailPageProps {
+  /** `?sku=` — sunucu ön-render'ında (searchParams okunamadığında) null. */
+  selectedSku: string | null
+}
+
+type LocalizedText = { tr?: string | null; en?: string | null } | null
+
+function pickLang(value: LocalizedText, lang: string): string | null {
+  if (!value) return null
+  const preferred = lang === 'en' ? value.en : value.tr
+  return preferred || value.tr || value.en || null
+}
+
+const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants, selectedSku: skuParam }) => {
   const { t, lang } = useI18n()
-  const params = useParams()
-  const currentSlug = (params?.slug as string)?.replace(/cc$/, '')
   const router = useRouter()
+  const pathname = usePathname()
   const { addToCart } = useCart()
   const { refreshProjects } = useProjectLists()
   const { categories } = useCategories()
-  
-  const [product, setProduct] = useState<Product | null>(initialProduct || null)
+
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(!initialProduct)
-  const [images, setImages] = useState<{ path: string; alt?: string | null }[]>([])
+  const [actionProduct, setActionProduct] = useState<Product | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [activeSection, setActiveSection] = useState('general')
   const [isWishlisted, setIsWishlisted] = useState(false)
@@ -73,24 +99,34 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const [isNavSticky, setIsNavSticky] = useState(false)
   const [openSpecSections, setOpenSpecSections] = useState<string[]>(['performance'])
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
-  
+
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const navTriggerRef = useRef<HTMLDivElement>(null)
 
-  // --- GATEWAY ADAPTATION: CENTRAL CATEGORY DISPATCH ---
-  const { mainCategory, subCategory } = useMemo(() => {
-    if (!product) return { mainCategory: null, subCategory: null }
-    
-    const sc = categories.find(c => c.id === product.subcategory_id) || null
-    const mc = categories.find(c => c.id === product.category_id) || null
-    
-    return { mainCategory: mc, subCategory: sc }
-  }, [product, categories])
+  // Seçili varyant: ?sku= → yoksa ailenin ilk varyantı.
+  const selectedVariant = useMemo(
+    () => variants.find((v) => v.sku === skuParam) ?? variants[0] ?? null,
+    [variants, skuParam]
+  )
+  const selectedVariantId = selectedVariant?.id ?? null
 
-  // Satış fiyatı olmayan (null/0) ürünlerde vitrin "Teklif Alın" moduna geçer;
-  // kategori bazlı hide_price bayrağı da aynı moda düşürür.
-  const quoteMode = Boolean((mainCategory?.metadata as CategoryMetadata | null)?.hide_price) ||
-    product == null || product.price == null || Number(product.price) <= 0
+  // --- GATEWAY ADAPTATION: CENTRAL CATEGORY DISPATCH (aile üzerinden) ---
+  // useCategories listesi count-filtreli olabilir; kategori çözülemezse breadcrumb
+  // kategorisiz KISALIR (kopma/boşluk yok).
+  const { mainCategory, subCategory } = useMemo(() => {
+    if (!family) return { mainCategory: null, subCategory: null }
+    const sc = categories.find((c) => c.id === family.subcategory_id) || null
+    const mc = categories.find((c) => c.id === family.category_id) || null
+    return { mainCategory: mc, subCategory: sc }
+  }, [family, categories])
+
+  // Fiyatı olmayan varyant (null/0) "Teklif Alın" moduna düşer; kategori bazlı
+  // hide_price bayrağı da aynı moda düşürür. quoteMode'da sepete-ekle HİÇ render edilmez.
+  const quoteMode =
+    Boolean((mainCategory?.metadata as CategoryMetadata | null)?.hide_price) ||
+    selectedVariant == null ||
+    selectedVariant.price == null ||
+    Number(selectedVariant.price) <= 0
 
   const toggleSpecSection = (sectionKey: string) => {
     setOpenSpecSections(prev =>
@@ -104,57 +140,38 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     refreshProjects()
   }, [refreshProjects])
 
+  // Seçili varyantın tam Product satırı — yalnız EYLEMLER için (sepet/PDF/proje).
   useEffect(() => {
-    async function fetchProduct() {
-      if (!currentSlug) return
-      
-      // If we already have the correct product (from initialProduct or previous fetch), don't fetch again
-      if (product && (product.id === currentSlug || product.sku === currentSlug || product.slug === currentSlug)) {
-        return
-      }
-
-      if (initialProduct && (currentSlug === initialProduct.id || currentSlug === initialProduct.sku || currentSlug === initialProduct.slug)) {
-        setProduct(initialProduct)
-        setLoading(false)
-        return
-      }
-
-      try {
-        setLoading(true)
-        const productData = await getProductBySlug(supabase, currentSlug)
-        if (!productData) {
-          setProduct(null)
-          return
-        }
-        setProduct(productData)
-        // Fetch Images
-        try {
-          const { data: imgs } = await supabase
-            .from('product_images')
-            .select('path, alt, sort_order')
-            .eq('product_id', productData.id)
-            .order('sort_order', { ascending: true })
-          const list = (imgs || []) as { path: string; alt?: string | null }[]
-          setImages(list)
-        } catch { }
-
-        // Related Products (GATEWAY ADAPTATION)
-        if (productData.subcategory_id) {
-          const related = await getProductsEnriched(supabase, { 
-            categoryIds: [productData.subcategory_id],
-            limit: 10
-          })
-          setRelatedProducts(related.filter(p => p.id !== productData.id).slice(0, 4))
-        }
-      } catch (error) {
-        console.warn('Error fetching product:', error)
-        setProduct(null)
-      } finally {
-        setLoading(false)
-      }
+    if (!selectedVariantId) {
+      setActionProduct(null)
+      return
     }
-    fetchProduct()
-  }, [currentSlug, initialProduct, product]) // Included product to satisfy lint, but fetch logic is guarded
+    let cancelled = false
+    setActionProduct(null)
+    getProductById(supabase, selectedVariantId)
+      .then((p) => { if (!cancelled) setActionProduct(p) })
+      .catch((err) => { console.warn('Error fetching variant product row:', err) })
+    return () => { cancelled = true }
+  }, [selectedVariantId])
+
+  // İlgili ürünler — ailenin alt kategorisinden, kendi varyantları hariç.
+  useEffect(() => {
+    if (!family?.subcategory_id) {
+      setRelatedProducts([])
+      return
+    }
+    let cancelled = false
+    // get_products_enriched family_id taşımaz (RPC null döner) → kendi varyantlarını
+    // id kümesiyle ele; aksi halde aile kendi kendine "ilgili ürün" olarak görünür.
+    const ownIds = new Set(variants.map((v) => v.id))
+    getProductsEnriched(supabase, { categoryIds: [family.subcategory_id], limit: 12 })
+      .then((list) => {
+        if (cancelled) return
+        setRelatedProducts(list.filter((p) => !ownIds.has(p.id)).slice(0, 4))
+      })
+      .catch((err) => { console.warn('Error fetching related products:', err) })
+    return () => { cancelled = true }
+  }, [family?.subcategory_id, variants])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -167,7 +184,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     window.addEventListener('scroll', handleScroll)
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [product])
+  }, [family])
 
   useEffect(() => {
     const handleScrollSpy = () => {
@@ -188,9 +205,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     window.addEventListener('scroll', handleScrollSpy)
     handleScrollSpy()
     return () => window.removeEventListener('scroll', handleScrollSpy)
-  }, [product, activeSection])
+  }, [family, activeSection])
 
-  const scrollToSection = (sectionId: string) => {
+  const scrollToSection = useCallback((sectionId: string) => {
     const element = sectionRefs.current[sectionId]
     if (element) {
       const navEl = document.getElementById('pdp-sticky-nav')
@@ -199,18 +216,37 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       const y = element.getBoundingClientRect().top + window.pageYOffset - currentNavHeight - extraGap
       window.scrollTo({ top: y, behavior: 'smooth' })
     }
-  }
+  }, [])
 
-  const handleAddToCart = () => { if (product) addToCart(product, quantity) }
+  // Varyant seçimi yalnız ?sku='yı günceller — sayfa yeniden yüklenmez, kaydırma korunur.
+  const handleSelectVariant = useCallback((sku: string) => {
+    // Tıklama yalnız istemcide olur — mevcut query'yi konumdan okumak useSearchParams
+    // bağımlılığını (ve tüm gövdenin Suspense'e düşmesini) gereksiz kılar.
+    const next = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search)
+    next.set('sku', sku)
+    router.replace(`${pathname}?${next.toString()}` as Route, { scroll: false })
+  }, [pathname, router])
+
+  // Galeri: seçili varyantın görselleri → yoksa ailedeki ilk görselli varyant.
+  const galleryImages = useMemo(() => {
+    const own = selectedVariant?.images ?? []
+    const source = own.length > 0 ? own : (variants.find((v) => v.images.length > 0)?.images ?? [])
+    return source.map((img) => ({ path: img.path, alt: img.alt }))
+  }, [selectedVariant, variants])
+
+  const handleAddToCart = () => { if (actionProduct) addToCart(actionProduct, quantity) }
 
   const handleDownloadPdf = async () => {
-    if (!product || isGeneratingPdf) return
+    if (!actionProduct || isGeneratingPdf) return
     setIsGeneratingPdf(true)
     try {
       const { generateProductDatasheet } = await import('../../lib/pdfGenerator')
+      const coverUrl = galleryImages[0]
+        ? storagePathToUrl(galleryImages[0].path)
+        : resolveProductImageUrl(actionProduct)
       await generateProductDatasheet(
-        product,
-        product.image_url || undefined,
+        actionProduct,
+        coverUrl || undefined,
         translateSpecKey,
         lang
       )
@@ -225,9 +261,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
   const handleShare = async () => {
     if (typeof window === 'undefined') return
-    if (navigator.share && product) {
+    if (navigator.share && family) {
       try {
-        await navigator.share({ title: product.name, text: `${product.brand} - ${product.name}`, url: window.location.href })
+        await navigator.share({ title: family.name, text: `${family.brand_name ?? ''} - ${family.name}`.trim(), url: window.location.href })
       } catch (err) {
         if ((err as Error).name !== 'AbortError') console.warn('Share error:', err)
       }
@@ -260,18 +296,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const [origin, setOrigin] = useState('')
   useEffect(() => { if (typeof window !== 'undefined') setOrigin(window.location.origin) }, [])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy mx-auto mb-4" />
-          <p className="text-steel-gray text-xs font-bold uppercase tracking-widest">{t('pdp.loading')}</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!product) {
+  if (!family || !selectedVariant) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
         <div className="text-center">
@@ -284,13 +309,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     )
   }
 
-  const canonicalUrl = `${origin}${Routes.product(product.slug!)}`
-  const metaDesc = product.description_i18n?.[lang] || product.description || t('pdp.descFallback')
+  // ?sku= canonical'a GİRMEZ — aile URL'i tek kanonik adrestir.
+  const canonicalUrl = `${origin}${Routes.product(family.slug)}`
+  const variantDescription = selectedVariant.description || pickLang(family.description, lang)
+  const metaDesc = variantDescription || t('pdp.descFallback')
+  const variantLabel = selectedVariant.model_code || selectedVariant.sku
+  const hasMultipleVariants = variants.length > 1
+  const inlineSelector = hasMultipleVariants && variants.length <= VARIANT_PILL_MAX
+  const stockQty = selectedVariant.stock_qty
+  const inStock = typeof stockQty === 'number' && stockQty > 0
 
   return (
     <div className="min-h-screen bg-slate-50/30">
-      <Seo title={`${product.brand} ${product.name} | ${t('header.brandName') || 'VentHub'}`} description={metaDesc} canonical={canonicalUrl} />
-      
+      <Seo title={`${family.brand_name ?? ''} ${family.name} | ${t('header.brandName') || 'VentHub'}`.trim()} description={metaDesc} canonical={canonicalUrl} />
+
       {/* Seamless Integrated Breadcrumb */}
       <div className="relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
@@ -316,7 +348,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               </>
             )}
             <span className="text-industrial-gray truncate max-w-150px sm:max-w-none">
-              {product.name}
+              {family.name}
             </span>
           </nav>
         </div>
@@ -346,10 +378,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           <div className="lg:col-span-7 xl:col-span-8 sticky top-24 self-start z-10">
             <div className="relative group bg-white rounded-3xl border border-light-gray/50 shadow-sm overflow-hidden p-2">
               <ImageGallery
-              key={product.id}
-              images={images}
-              productName={product.name}
-              slug={product.slug || product.name}
+              key={selectedVariant.id}
+              images={galleryImages}
+              productName={selectedVariant.name}
+              slug={family.slug}
               modelType={(mainCategory?.metadata as CategoryMetadata | null)?.model_type}
               />
 
@@ -374,13 +406,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             {/* Brand & Badge */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2.5">
-                <BrandIcon brand={product.brand || ''} className="w-8 h-8" />
+                <BrandIcon brand={family.brand_name || ''} className="w-8 h-8" />
                 <div className="flex flex-col">
-                  <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">{product.brand}</span>
+                  <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">{family.brand_name}</span>
                   <span className="text-steel-gray text-xs font-medium tracking-hvac-normal">{t('pdp.officialDistributor')}</span>
                 </div>
               </div>
-              {product.is_featured && (
+              {actionProduct?.is_featured && (
                 <div className="bg-gold-accent/10 text-gold-accent px-2.5 py-1 rounded-lg text-xs font-bold flex items-center space-x-1 border border-gold-accent/20">
                   <Star size={10} fill="currentColor" />
                   <span>{t('pdp.featured')}</span>
@@ -388,13 +420,18 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               )}
             </div>
 
-            {/* Product Name - Refined Size */}
-            <h1 className="text-2xl sm:text-3xl font-black text-industrial-gray leading-hvac-11 mb-4 tracking-tight">
-              {product.name}
+            {/* Family Name (kanonik başlık) + seçili varyant */}
+            <h1 className="text-2xl sm:text-3xl font-black text-industrial-gray leading-hvac-11 mb-2 tracking-tight">
+              {family.name}
             </h1>
+            {hasMultipleVariants && (
+              <p className="text-xs font-bold text-steel-gray uppercase tracking-widest mb-4">
+                {t('pdp.variant.selectedModel')}: <span className="text-primary-navy">{variantLabel}</span>
+              </p>
+            )}
 
-            {/* Smart Engineering Inference */}
-            <ProductSmartInference product={product} />
+            {/* Smart Engineering Inference (tam Product satırı gerektirir) */}
+            {actionProduct && <ProductSmartInference product={actionProduct} />}
 
             {/* Quick Specs Jump - Accessibility Feature */}
             <div className="flex flex-wrap gap-1.5 mb-6">
@@ -410,6 +447,34 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               ))}
             </div>
 
+            {/* Varyant seçimi — az varyantta yerinde, çoğunda "Modeller" bölümünde */}
+            {inlineSelector && (
+              <div className="mb-6">
+                <VariantSelector
+                  variants={variants}
+                  selectedSku={selectedVariant.sku}
+                  onSelect={handleSelectVariant}
+                  quoteMode={quoteMode}
+                />
+              </div>
+            )}
+            {hasMultipleVariants && !inlineSelector && (
+              <button
+                onClick={() => scrollToSection('models')}
+                className="mb-6 w-full flex items-center justify-between px-5 py-4 bg-white rounded-2xl border border-light-gray hover:border-primary-navy transition-colors group"
+              >
+                <span className="flex flex-col text-left">
+                  <span className="text-xs font-bold text-steel-gray uppercase tracking-widest opacity-60">
+                    {t('pdp.variant.heading')}
+                  </span>
+                  <span className="text-sm font-black text-industrial-gray uppercase tracking-tight">
+                    {t('pdp.variant.showAll', { count: variants.length })}
+                  </span>
+                </span>
+                <ChevronRight size={16} className="text-primary-navy opacity-40 group-hover:opacity-100 transition-opacity" />
+              </button>
+            )}
+
             {/* Price Area - Elegant & Technical */}
             <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
               <div className="flex flex-col relative z-10">
@@ -420,7 +485,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       {quoteMode ? (
                         <span className="text-xl text-industrial-gray font-bold">{t('pdp.techQuote')}</span>
                       ) : (
-                        formatCurrency(product.price ?? 0, lang, { maximumFractionDigits: 0 })
+                        formatCurrency(Number(selectedVariant.price ?? 0), lang, { maximumFractionDigits: 0 })
                       )}
                     </div>
                     {!quoteMode && (
@@ -431,12 +496,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   </div>
                   <div className="flex flex-col items-end">
                     {!quoteMode && (
-                      <div className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green/10 text-success-green border border-success-green/20' : 'bg-warning-orange/10 text-warning-orange border border-warning-orange/20'}`}>
-                        <div className={`w-1 h-1 rounded-full ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green' : 'bg-warning-orange'}`} />
-                        <span>{typeof product.stock_qty === 'number' && product.stock_qty > 0 ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
+                      <div className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 ${inStock ? 'bg-success-green/10 text-success-green border border-success-green/20' : 'bg-warning-orange/10 text-warning-orange border border-warning-orange/20'}`}>
+                        <div className={`w-1 h-1 rounded-full ${inStock ? 'bg-success-green' : 'bg-warning-orange'}`} />
+                        <span>{inStock ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
                       </div>
                     )}
-                    <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.sku')}: {product.sku}</span>
+                    <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.sku')}: {selectedVariant.sku}</span>
                   </div>
                 </div>
               </div>
@@ -445,15 +510,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             {/* Action Buttons Area - Compact & Unified */}
             <div className="space-y-4">
               <div className="bg-white rounded-2xl border border-light-gray p-5 space-y-5">
-                {/* Quantity Control */}
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-industrial-gray uppercase tracking-widest">{t('pdp.qty')}</span>
-                  <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-light-gray/50">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-lg font-bold text-industrial-gray" aria-label={t('common.decrease')}>-</button>
-                    <span className="w-10 text-center font-black text-primary-navy text-sm">{quantity}</span>
-                    <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-lg font-bold text-industrial-gray" aria-label={t('common.increase')}>+</button>
+                {/* Quantity Control — yalnız satın alınabilir (fiyatlı) varyantta */}
+                {!quoteMode && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-industrial-gray uppercase tracking-widest">{t('pdp.qty')}</span>
+                    <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-light-gray/50">
+                      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-lg font-bold text-industrial-gray" aria-label={t('common.decrease')}>-</button>
+                      <span className="w-10 text-center font-black text-primary-navy text-sm">{quantity}</span>
+                      <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-lg font-bold text-industrial-gray" aria-label={t('common.increase')}>+</button>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Primary Actions */}
                 <div className="flex flex-col gap-2">
@@ -470,17 +537,18 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <button
                       onClick={handleAddToCart}
                       data-testid="pdp-add-to-cart"
-                      disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
+                      disabled={!actionProduct || !inStock}
                       className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-black py-3.5 px-6 rounded-xl transition-transform shadow-lg hover:shadow-primary-navy/20 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-98"
                     >
                       <ShoppingCart size={16} className="group-hover:translate-x-1 transition-transform" />
                       <span className="text-xs uppercase tracking-hvac-snug">{t('pdp.addToCart')}</span>
                     </button>
                   )}
-                  
+
                   <button
                     onClick={() => setIsProjectModalOpen(true)}
-                    className="w-full bg-white border-2 border-primary-navy/10 hover:border-primary-navy text-primary-navy font-bold py-3.5 px-6 rounded-xl transition-transform flex items-center justify-center space-x-2 group active:scale-98"
+                    disabled={!actionProduct}
+                    className="w-full bg-white border-2 border-primary-navy/10 hover:border-primary-navy text-primary-navy font-bold py-3.5 px-6 rounded-xl transition-transform flex items-center justify-center space-x-2 group active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <FolderPlus size={16} className="group-hover:scale-110 transition-transform" />
                     <span className="text-xs uppercase tracking-hvac-snug">{t('pdp.actions.addToProject')}</span>
@@ -531,7 +599,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               {/* Quick Tech PDF Link */}
               <button
                 onClick={handleDownloadPdf}
-                disabled={isGeneratingPdf}
+                disabled={isGeneratingPdf || !actionProduct}
                 className="w-full bg-slate-900 hover:bg-primary-navy text-white font-bold py-3.5 px-6 rounded-xl transition-opacity flex items-center justify-between group disabled:opacity-50"
               >
                 <div className="flex items-center space-x-3 text-left">
@@ -548,34 +616,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         </div>
       </div>
 
-      <AddToProjectModal 
-        product={product} 
-        isOpen={isProjectModalOpen} 
-        onClose={() => setIsProjectModalOpen(false)} 
-      />
+      {actionProduct && (
+        <AddToProjectModal
+          product={actionProduct}
+          isOpen={isProjectModalOpen}
+          onClose={() => setIsProjectModalOpen(false)}
+        />
+      )}
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: product.name,
-            brand: product.brand,
-            sku: product.sku,
-            image: product.image_url ? [product.image_url] : [],
-            mpn: product.model_code ?? undefined,
-            description: metaDesc,
-            offers: {
-              '@type': 'Offer',
-              priceCurrency: 'TRY',
-              price: product.price || 0,
-              availability: product.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-              url: canonicalUrl,
-            },
-          }).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')
-        }}
-      />
+      {/* NOT: İstemci tarafı Product JSON-LD bloğu W2.2'de SİLİNDİ —
+          tek kaynak sunucu tarafındaki blok (W3.1 ProductGroup'a çevirecek). */}
 
       <div ref={navTriggerRef} className="h-0" />
 
@@ -605,20 +655,30 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           {isNavSticky && (
             <div className="hidden lg:flex items-center space-x-3 pl-6 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-8 duration-500">
               <div className="flex flex-col items-end mr-2">
-                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px uppercase tracking-tight">{product.name}</span>
+                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px uppercase tracking-tight">{family.name}</span>
                 <span className="text-xs text-primary-navy font-black tracking-widest">
-                  {quoteMode ? t('pdp.techQuote') : formatCurrency(product.price ?? 0, lang, { maximumFractionDigits: 0 })}
+                  {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { maximumFractionDigits: 0 })}
                 </span>
               </div>
 
-              <button
-                onClick={quoteMode ? () => setLeadOpen(true) : handleAddToCart}
-                disabled={!quoteMode && (typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                className="bg-primary-navy hover:bg-secondary-blue text-white text-xs font-black uppercase tracking-widest py-2.5 px-5 rounded-xl transition-transform shadow-md active:scale-95 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {quoteMode ? <Settings size={14} /> : <ShoppingCart size={14} />}
-                <span>{quoteMode ? t('pdp.techQuote') : t('pdp.addToCart')}</span>
-              </button>
+              {quoteMode ? (
+                <button
+                  onClick={() => setLeadOpen(true)}
+                  className="bg-primary-navy hover:bg-secondary-blue text-white text-xs font-black uppercase tracking-widest py-2.5 px-5 rounded-xl transition-transform shadow-md active:scale-95 flex items-center space-x-2"
+                >
+                  <Settings size={14} />
+                  <span>{t('pdp.techQuote')}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!actionProduct || !inStock}
+                  className="bg-primary-navy hover:bg-secondary-blue text-white text-xs font-black uppercase tracking-widest py-2.5 px-5 rounded-xl transition-transform shadow-md active:scale-95 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ShoppingCart size={14} />
+                  <span>{t('pdp.addToCart')}</span>
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -648,7 +708,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-                  {section.id === 'genel' && (
+                  {section.id === 'general' && (
                     <>
                       <div className="lg:col-span-7 xl:col-span-8 space-y-8">
                         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm hover:shadow-md transition-shadow">
@@ -657,7 +717,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             {t('pdp.labels.productDescription')}
                           </h4>
                           <div className="prose prose-slate max-w-none text-steel-gray leading-relaxed text-sm font-medium">
-                            <RichTextRenderer content={product.description_i18n?.[lang] || product.description || t('pdp.descFallback')} />
+                            {/* RPC dil çözümünü ve aile fallback'ini zaten yaptı. */}
+                            <RichTextRenderer content={metaDesc} />
                           </div>
                         </div>
                       </div>
@@ -667,8 +728,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                           <h4 className="font-black text-industrial-gray mb-6 text-xs uppercase tracking-hvac-normal opacity-60">{t('common.quickDetails')}</h4>
                           <div className="space-y-4">
                             {[
-                              { label: t('pdp.brand'), value: product.brand },
-                              { label: t('pdp.model'), value: product.model_code ?? product.sku },
+                              { label: t('pdp.brand'), value: family.brand_name ?? '-' },
+                              { label: t('pdp.model'), value: variantLabel },
                               { label: t('pdp.labels.category'), value: getCategoryDisplayName(mainCategory, t) || '-' }
                             ].map((item, i) => (
                               <div key={i} className="flex justify-between items-center py-3 border-b border-light-gray/30 group">
@@ -679,7 +740,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
                               <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal">{t('common.listingPrice')}</span>
                               <span className="text-lg font-black text-primary-navy">
-                                {quoteMode ? t('pdp.techQuote') : formatCurrency(product.price ?? 0, lang, { maximumFractionDigits: 0 })}
+                                {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { maximumFractionDigits: 0 })}
                               </span>
                             </div>
                           </div>
@@ -690,29 +751,26 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
                   {section.id === 'models' && (
                     <div className="col-span-full">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[1, 2, 3].map((variant) => (
-                          <div key={variant} className="bg-white rounded-2xl p-6 border border-light-gray shadow-sm hover:shadow-md transition-shadow group overflow-hidden relative">
-                            <div className="aspect-square bg-slate-50 rounded-xl mb-4 flex items-center justify-center border border-light-gray/30 group-hover:bg-air-blue/10 transition-colors">
-                              <BrandIcon brand={product.brand} className="scale-125 grayscale group-hover:grayscale-0 transition-transform duration-500" />
-                            </div>
-                            <h4 className="font-black text-industrial-gray mb-1 text-sm uppercase tracking-tight">{product.sku}-{variant}</h4>
-                            <p className="text-steel-gray text-xs font-medium mb-4">{t('pdp.variantDetails')}</p>
-                            <div className="flex items-center justify-between pt-3 border-t border-light-gray/50">
-                              <div className="text-primary-navy font-black text-sm">{formatCurrency(((product.price ?? 0) + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}</div>
-                              <button className="p-1.5 bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white rounded-lg transition-colors" aria-label={t('common.next')}><ChevronRight size={14} /></button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      {hasMultipleVariants ? (
+                        <VariantSelector
+                          variants={variants}
+                          selectedSku={selectedVariant.sku}
+                          onSelect={handleSelectVariant}
+                          quoteMode={quoteMode}
+                        />
+                      ) : (
+                        <p className="text-steel-gray italic font-medium py-10 text-center text-xs uppercase tracking-widest">
+                          {t('pdp.variant.singleModel')}
+                        </p>
+                      )}
                     </div>
                   )}
 
                   {section.id === 'specs' && (
                     <div className="col-span-full bg-white rounded-3xl p-6 sm:p-10 border border-light-gray shadow-sm">
-                      {product.technical_specs ? (
+                      {selectedVariant.technical_specs ? (
                         <div className="space-y-4">
-                          {Object.entries(groupTechnicalSpecs(product.technical_specs) || {}).map(([groupKey, group]) => {
+                          {Object.entries(groupTechnicalSpecs(selectedVariant.technical_specs) || {}).map(([groupKey, group]) => {
                             const isOpen = openSpecSections.includes(groupKey);
                             const Icon = group.icon;
                             return (
@@ -720,7 +778,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                                 <button onClick={() => toggleSpecSection(groupKey)} className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-air-blue/10 transition-colors group">
                                   <div className="flex items-center space-x-3">
                                     <div className="p-1.5 bg-white rounded-lg shadow-xs group-hover:shadow-sm border border-light-gray/50"><Icon size={18} className="text-primary-navy" /></div>
-                                    <span className="font-black text-industrial-gray text-xs uppercase tracking-widest">{t(`pdp.specGroups.${groupKey}`) || groupKey}</span>
+                                    <span className="font-black text-industrial-gray text-xs uppercase tracking-widest">{specGroupLabel(groupKey, t, group.label)}</span>
                                   </div>
                                   <div className={`p-1.5 rounded-full transition-transform duration-300 ${isOpen ? 'rotate-180 bg-primary-navy text-white' : 'bg-white text-primary-navy'}`}><ChevronDown size={16} /></div>
                                 </button>
@@ -728,7 +786,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                                   <div className="p-5 bg-white grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-1">
                                     {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
                                       <div key={key} className="flex justify-between items-center py-2.5 border-b border-light-gray/20 last:border-0 md:last:border-b group hover:bg-slate-50 px-2 rounded-lg transition-colors">
-                                        <span className="text-xs font-bold text-steel-gray uppercase tracking-wider">{t(`pdp.specs.${key}`) || translateSpecKey(key)}</span>
+                                        <span className="text-xs font-bold text-steel-gray uppercase tracking-wider">{specFieldLabel(key, t)}</span>
                                         <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val)}</span>
                                       </div>
                                     ))}
@@ -841,7 +899,26 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           )}
         </div>
       </div>
-      <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} productName={product.name} _productId={product.id} />
+      <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} productName={selectedVariant.name} _productId={selectedVariant.id} />
     </div>
   )
 }
+
+/** `?sku=` köprüsü — useSearchParams YALNIZ burada; Suspense sınırı bunu sarar. */
+const PdpSkuBridge: React.FC<ProductDetailPageProps> = (props) => {
+  const searchParams = useSearchParams()
+  return <ProductDetailBody {...props} selectedSku={searchParams.get('sku')} />
+}
+
+/**
+ * useSearchParams kullanan ağaç Suspense ile sarılır (PPR/SSR zehirlenme kuralı).
+ *
+ * Fallback bilinçli olarak boş bir iskelet DEĞİL, VARSAYILAN varyantla render edilmiş
+ * tam gövdedir: statik ön-render'da HTML gerçek ürün içeriğiyle çıkar (SEO/LCP),
+ * istemci hidrasyonunda ?sku= seçimi devralır.
+ */
+export const ProductDetailPage: React.FC<ProductDetailPageProps> = (props) => (
+  <Suspense fallback={<ProductDetailBody {...props} selectedSku={null} />}>
+    <PdpSkuBridge {...props} />
+  </Suspense>
+)

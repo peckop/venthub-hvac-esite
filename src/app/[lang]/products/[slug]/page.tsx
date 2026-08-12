@@ -1,70 +1,94 @@
+import type { Route } from 'next'
+import { permanentRedirect } from 'next/navigation'
+
+import { storagePathToUrl } from '@/lib/images/productImage'
+import { getAllFamilySlugs } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
-import type { Product } from '@/types/ui-models'
 
 import { SITE_URL } from '../../../../config/siteUrl'
-import { getCachedProductBySlug, preloadProduct } from '../../../../lib/data/preload'
+import {
+  getCachedFamilyDetail,
+  getCachedFamilySlugById,
+  getCachedProductBySlug,
+  preloadFamily,
+} from '../../../../lib/data/preload'
 import { ProductDetailPage as PageComponent } from '../../../_components/ProductDetailPageView'
 
+/**
+ * F5-B W2.2 — PDP artık AİLE (product_families) kanoniktir.
+ * `/[lang]/products/[slug]` slug'ı bir AİLE slug'ıdır; belirli varyant `?sku=` ile
+ * ön-seçilir (canonical/metadata URL'lerine GİRMEZ). Eski varyant slug'ları
+ * 308 (permanentRedirect) ile aile URL'ine taşınır.
+ */
+
+type LocalizedText = { tr?: string | null; en?: string | null } | null
+
+function pickLang(value: LocalizedText, lang: string): string | null {
+  if (!value) return null
+  const preferred = lang === 'en' ? value.en : value.tr
+  return preferred || value.tr || value.en || null
+}
 
 export async function generateStaticParams() {
   try {
-    const { data: products } = await supabase
-      .from('products')
-      .select('slug')
-      .eq('status', 'active')
-      .not('slug', 'is', null)
+    // Yalnız AİLE slug'ları prerender edilir — varyant slug'ı statik yol üretmez.
+    const families = await getAllFamilySlugs(supabase)
 
-    const paths = (products || [])
-      .filter((p: { slug: string | null }) => !!p.slug)
-      .flatMap((p: { slug: string | null }) => [
-        { lang: 'tr', slug: p.slug! },
-        { lang: 'en', slug: p.slug! }
+    return families
+      .filter((f) => !!f.slug)
+      .flatMap((f) => [
+        { lang: 'tr', slug: f.slug },
+        { lang: 'en', slug: f.slug },
       ])
-
-    if (paths.length === 0) {
-      return []
-    }
-    return paths
   } catch (e) {
-    console.warn('generateStaticParams error for products:', e)
+    console.warn('generateStaticParams error for product families:', e)
     return []
   }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string, slug: string }> }) {
-  const { slug } = await params
-  // Preload the product data as soon as params are resolved
-  preloadProduct(slug)
-  try {
-    const product = await getCachedProductBySlug(slug)
+  const { lang, slug } = await params
+  preloadFamily(slug, lang)
 
-    if (product && product.slug) {
-      const canonicalPath = product.slug
+  try {
+    const detail = await getCachedFamilyDetail(slug, lang)
+
+    if (detail) {
+      const { family, variants } = detail
+      // ?sku= canonical'a GİRMEZ — aile URL'i tek kanonik adrestir.
+      const canonicalUrl = `${SITE_URL}/products/${family.slug}`
+      const title = pickLang(family.meta_title, lang) || `${family.name} | VentHub`
+      const description =
+        pickLang(family.meta_description, lang) ||
+        pickLang(family.description, lang)?.substring(0, 160) ||
+        'VentHub Ürün Detayı'
+      const coverPath = variants.find((v) => v.images.length > 0)?.images[0]?.path
+
       return {
-        title: `${product.name} | VentHub`,
-        description: product.description?.substring(0, 160) || 'VentHub Ürün Detayı',
+        title,
+        description,
         alternates: {
-          canonical: `${SITE_URL}/products/${canonicalPath}`,
+          canonical: canonicalUrl,
         },
         openGraph: {
-          title: `${product.name} | VentHub`,
-          description: product.description?.substring(0, 160) || 'VentHub Ürün Detayı',
-          url: `${SITE_URL}/products/${canonicalPath}`,
+          title,
+          description,
+          url: canonicalUrl,
           siteName: 'VentHub',
           images: [
             {
-              url: product.image_url || '/images/og-default.jpg',
+              url: coverPath ? storagePathToUrl(coverPath) : '/images/og-default.jpg',
               width: 1200,
               height: 630,
             },
           ],
-          locale: 'tr_TR',
+          locale: lang === 'en' ? 'en_US' : 'tr_TR',
           type: 'website',
         },
       }
     }
   } catch (e) {
-    console.warn('generateMetadata error for product:', e)
+    console.warn('generateMetadata error for product family:', e)
   }
 
   return {
@@ -74,46 +98,69 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 }
 
 export default async function Page({ params }: { params: Promise<{ lang: string, slug: string }> }) {
-  const { slug } = await params
-  // Preload the product data as soon as params are resolved
-  preloadProduct(slug)
-  let productData: Product | null = null
-  
+  const { lang, slug } = await params
+  preloadFamily(slug, lang)
+
+  let detail: Awaited<ReturnType<typeof getCachedFamilyDetail>> = null
+  // Aile bulunamazsa: slug bir VARYANT slug'ı olabilir → 308 hedefi.
+  let redirectTo: Route | null = null
+
   try {
-    // If we are prerendering 'generic' or the database is down, handle it gracefully
+    // 'generic' prerender tohumu veya Supabase env yoksa nazikçe geç.
     if (slug !== 'generic') {
-      productData = await getCachedProductBySlug(slug)
+      // 1) ÖNCE aile aranır → aile slug'ı asla redirect üretmez (döngü yok).
+      detail = await getCachedFamilyDetail(slug, lang)
+
+      if (!detail) {
+        // 2) Varyant slug'ı mı? Ailesi varsa kanonik aile URL'ine 308.
+        const variant = await getCachedProductBySlug(slug)
+        if (variant?.family_id) {
+          const familySlug = await getCachedFamilySlugById(variant.family_id)
+          if (familySlug && familySlug !== slug) {
+            redirectTo = `/${lang}/products/${familySlug}?sku=${encodeURIComponent(variant.sku)}` as Route
+          }
+        }
+      }
     }
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err)
     if (errorMsg.includes('fetch failed')) {
-      console.warn(`Network fetch failed for product ${slug} (expected if Supabase env is missing)`)
+      console.warn(`Network fetch failed for family ${slug} (expected if Supabase env is missing)`)
     } else {
-      console.warn(`Error fetching product data for ${slug}:`, err)
+      console.warn(`Error fetching family data for ${slug}:`, err)
     }
   }
 
+  // permanentRedirect bir istisna fırlatır — try/catch DIŞINDA çağrılmalı.
+  if (redirectTo) permanentRedirect(redirectTo)
 
-  // SEO Kanonik Kilidi: Eğer cleanId (UUID) geçerse kanonik her zaman asıl route'u göstersin
-  const canonicalPath = productData?.slug || 'generic'
+  // 3) Ne aile ne varyant → mevcut "bulunamadı" davranışı (görünüm katmanında).
+  const family = detail?.family ?? null
+  const variants = detail?.variants ?? []
+  const primaryVariant = variants[0] ?? null
+
+  // W3.1 ProductGroup JSON-LD'sini yeniden yazacak — burada yalnız alan beslemesi
+  // aile modeline uyarlandı, yapı KASITLI olarak korundu.
+  const canonicalPath = family?.slug || 'generic'
+  const coverPath = variants.find((v) => v.images.length > 0)?.images[0]?.path
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     "productID": canonicalPath,
-    "name": productData?.name || "Product Details",
-    "description": productData?.description || "VentHub Product Details",
+    "name": family?.name || "Product Details",
+    "description": pickLang(family?.description ?? null, lang) || "VentHub Product Details",
     "url": `${SITE_URL}/products/${canonicalPath}`,
-    ...(productData?.image_url && { "image": productData.image_url }),
-    ...(productData?.brand && {
+    ...(coverPath && { "image": storagePathToUrl(coverPath) }),
+    ...(family?.brand_name && {
       "brand": {
         "@type": "Brand",
-        "name": productData.brand
+        "name": family.brand_name
       }
     }),
     "offers": {
       "@type": "Offer",
-      "availability": (productData?.stock_qty ?? 0) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      "price": productData?.price || "0.00",
+      "availability": (primaryVariant?.stock_qty ?? 0) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "price": primaryVariant?.price || "0.00",
       "priceCurrency": "TRY",
       "url": `${SITE_URL}/products/${canonicalPath}`
     }
@@ -125,7 +172,7 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
       />
-      <PageComponent initialProduct={productData} />
+      <PageComponent family={family} variants={variants} />
     </>
   )
 }

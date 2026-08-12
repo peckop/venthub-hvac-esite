@@ -12,8 +12,48 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
+      _migration_ledger: {
+        Row: {
+          applied_at: string
+          name: string
+        }
+        Insert: {
+          applied_at?: string
+          name: string
+        }
+        Update: {
+          applied_at?: string
+          name?: string
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -2877,7 +2917,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      fn_auto_categorize_products: { Args: never; Returns: undefined }
       fn_enrich_product_specs: { Args: never; Returns: undefined }
       fts_search_products: {
         Args: { p_filters?: Json; p_limit?: number; p_q: string }
@@ -2906,6 +2945,33 @@ export type Database = {
         Returns: {
           category_id: string
           product_count: number
+        }[]
+      }
+      get_family_detail: {
+        Args: { p_lang?: string; p_slug: string }
+        Returns: Json
+      }
+      get_product_families_enriched: {
+        Args: {
+          p_brand?: string
+          p_category_ids?: string[]
+          p_limit?: number
+          p_offset?: number
+          p_search_query?: string
+        }
+        Returns: {
+          brand_name: string
+          category_id: string
+          cover_image_path: string
+          description: Json
+          id: string
+          min_price: number
+          name: string
+          series_code: string
+          slug: string
+          subcategory_id: string
+          total_count: number
+          variant_count: number
         }[]
       }
       get_products_enriched: {
@@ -3137,6 +3203,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       contact_department: ["sales", "support", "consulting"],

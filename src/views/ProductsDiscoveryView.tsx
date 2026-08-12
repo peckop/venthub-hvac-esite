@@ -15,11 +15,11 @@ import { useRouter } from 'next/navigation'
  * 4. Sabit (sticky) küçülmüş moddayken üstüne tıklanırsa YERİNDE genişler.
  * 5. Kullanıcı ekranın en tepesine döndüğünde eski büyük haline döner.
  */
-import React, { useCallback, useRef,useState } from 'react'
+import React, { Suspense, useCallback, useRef, useState } from 'react'
 
-import type { Product } from '@/types/ui-models'
+import type { FamilyListItem } from '@/types/ui-models'
 
-import ProductCard from '../components/ProductCard'
+import FamilyCard from '../components/products/FamilyCard'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
 import type { DomainCategory } from '../lib/type-converters'
@@ -39,7 +39,10 @@ const CategoryOrbitCarousel = dynamic(
 
 interface ProductsDiscoveryViewProps {
     initialCategories?: DomainCategory[]
-    products?: Product[]
+    /** F5-B W2.1: keşif listesi de AİLE satırı basar (mükerrer varyant kartı yok). */
+    families?: FamilyListItem[]
+    /** Sunucu sayfalamasının toplamı — başlık sayacı sayfa uzunluğunu değil TOPLAMI gösterir. */
+    total?: number
     isLoading?: boolean
 }
 
@@ -47,8 +50,9 @@ type ViewMode = 'grid' | 'list'
 
 
 
-const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({ 
-    products = [],
+const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
+    families = [],
+    total,
     isLoading = false
 }) => {
     const router = useRouter()
@@ -77,10 +81,22 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                 bg-surface-darker border-b border-white/5 shadow-2xl relative
             `}>
                 <div className="relative w-full">
-                    <CategoryOrbitCarousel
-                        onSubcategorySelect={handleSubcategorySelect}
-                        compact={false}
-                    />
+                    {/* ssr:false dynamic import en yakın Suspense sınırını CSR'a düşürür
+                        (BAILOUT_TO_CLIENT_SIDE_RENDERING). Bu Suspense o bailout'u karuselle
+                        SINIRLAR — aksi halde tüm keşif görünümü (aile grid'i dahil) SSR HTML'inden
+                        düşüyordu (SEO/LCP zehirlenmesi; master'da da vardı, burada kapatıldı). */}
+                    <Suspense
+                        fallback={
+                            <div className="w-full h-hvac-section bg-surface-darker flex items-center justify-center overflow-hidden">
+                                <div className="w-300px h-300px bg-cyan-500/5 blur-100 rounded-full animate-pulse" />
+                            </div>
+                        }
+                    >
+                        <CategoryOrbitCarousel
+                            onSubcategorySelect={handleSubcategorySelect}
+                            compact={false}
+                        />
+                    </Suspense>
                 </div>
             </div>
 
@@ -103,7 +119,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                                 </h2>
                                 {!isLoading && (
                                     <p className="text-slate-500 font-medium text-sm">
-                                        {t('products.systemTotalPrefix')} <span className="text-cyan-600 font-bold px-1">{products.length}</span> {t('products.itemsListed')}
+                                        {t('products.systemTotalPrefix')} <span className="text-cyan-600 font-bold px-1">{total ?? families.length}</span> {t('products.itemsListed')}
                                     </p>
                                 )}
                             </div>
@@ -129,7 +145,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                         </div>
 
                         {/* Sonuçlar */}
-                        {products.length === 0 && !isLoading ? (
+                        {families.length === 0 && !isLoading ? (
                             <div className="py-32 flex flex-col items-center justify-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200 text-center">
                                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
                                     <LayoutGrid className="w-8 h-8 text-slate-300" />
@@ -143,7 +159,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                                     ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
                                     : 'flex flex-col gap-6 max-w-5xl mx-auto'
                             }`}>
-                                {products.map((product, index) => {
+                                {families.map((family, index) => {
                                     // SADECE ilk yüklenen görünür (veya ilk sayfa) ürünleri 3D animasyonunu beklesin.
                                     // Aşağıda kalan ürünler zaten scroll edildikçe belirecek, onlar için bekleme (delay) gereksizdir.
                                     const ESTIMATED_3D_ITEMS = 8;
@@ -154,7 +170,7 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
 
                                     return (
                                         <motion.div
-                                            key={product.id}
+                                            key={family.id}
                                             initial={{ opacity: 0, y: 30 }}
                                             whileInView={{ opacity: 1, y: 0 }}
                                             viewport={{ once: true, margin: "50px" }}
@@ -164,8 +180,8 @@ const ProductsDiscoveryView: React.FC<ProductsDiscoveryViewProps> = ({
                                                 ease: [0.16, 1, 0.3, 1]
                                             }}
                                         >
-                                            <ProductCard
-                                                product={product}
+                                            <FamilyCard
+                                                family={family}
                                                 layout={viewMode}
                                             />
                                         </motion.div>

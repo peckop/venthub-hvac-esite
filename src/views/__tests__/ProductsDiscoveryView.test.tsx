@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { Product } from '@/types/ui-models'
+import type { FamilyListItem } from '@/types/ui-models'
 
 import ProductsDiscoveryView from '../ProductsDiscoveryView'
 
@@ -24,25 +24,25 @@ vi.mock('../../components/products/CategoryOrbitCarousel', () => ({
   default: () => <div data-testid="category-orbit-carousel" />
 }))
 
-vi.mock('../../components/ProductCard', () => ({
-  default: ({ product }: { product: { id: string; name: string } }) => (
-    <div data-testid={`product-card-${product.id}`}>{product.name}</div>
+vi.mock('../../components/products/FamilyCard', () => ({
+  default: ({ family }: { family: { id: string; name: string } }) => (
+    <div data-testid={`family-card-${family.id}`}>{family.name}</div>
   )
 }))
 
 describe('ProductsDiscoveryView', () => {
   it('should render products list container with content-auto class for CLS optimization', () => {
-    const rawProducts: unknown = [
-      { id: '1', name: 'Product 1', slug: 'p1', price: 100, original_price: 120, images: [], brand: 'vortice', description: 'desc1' },
-      { id: '2', name: 'Product 2', slug: 'p2', price: 200, original_price: 220, images: [], brand: 'vortice', description: 'desc2' }
+    const rawFamilies: unknown = [
+      { id: '1', name: 'Family 1', slug: 'f1', brand_name: 'vortice', variant_count: 3, min_price: null, cover_image_path: null, total_count: 2 },
+      { id: '2', name: 'Family 2', slug: 'f2', brand_name: 'vortice', variant_count: 5, min_price: null, cover_image_path: null, total_count: 2 }
     ]
-    const mockProducts = rawProducts as Product[]
+    const mockFamilies = rawFamilies as FamilyListItem[]
 
     render(
-      <ProductsDiscoveryView products={mockProducts} isLoading={false} />
+      <ProductsDiscoveryView families={mockFamilies} total={2} isLoading={false} />
     )
 
-    const cards = screen.getAllByTestId(/product-card-/)
+    const cards = screen.getAllByTestId(/family-card-/)
     expect(cards).toHaveLength(2)
 
     // cards[0].parentElement is the motion.div wrapper
