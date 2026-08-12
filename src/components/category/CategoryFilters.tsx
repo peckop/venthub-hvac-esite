@@ -41,7 +41,7 @@ const CategoryFilters: React.FC<CategoryFiltersProps> = ({
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
       <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-6 flex items-center gap-3 border-b border-slate-100 pb-4">
         <Filter size={16} className="text-primary-ocean" />
-        {t('category.filters.title') || 'Filtreler'}
+        {t('category.filters') || 'Filtreler'}
       </h3>
 
       {/* Local Search */}

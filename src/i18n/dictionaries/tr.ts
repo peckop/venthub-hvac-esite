@@ -1346,9 +1346,10 @@ export const tr = {
     errors: {
       paymentError: 'Ödeme sırasında bir hata oluştu',
       nameRequired: 'Ad Soyad gereklidir',
-      emailInval_id: 'Lütfen geçerli bir e-posta adresi girin',
+      emailInvalid: 'Lütfen geçerli bir e-posta adresi girin',
       phoneRequired: 'Telefon numarası gereklidir',
       addressRequired: 'Adres gereklidir',
+      locationRequired: 'Lütfen şehir ve ilçe bilgilerini girin',
       cityRequired: 'Şehir gereklidir',
       districtRequired: 'İlçe gereklidir',
       postalRequired: 'Posta kodu gereklidir',
@@ -1392,9 +1393,16 @@ export const tr = {
       count: '{{count}} ürün ailesi',
       viewFamily: 'İncele',
     },
+    view: {
+      grid: 'Izgara Görünümü',
+      list: 'Liste Görünümü',
+    },
     sort: {
+      title: 'Sıralama',
+      name: 'İsme Göre',
       variantCount: 'Varyant sayısı',
     },
+    noProductsFound: 'Bu kriterlere uygun ürün bulunamadı',
     howItWorks: {
       stepNumberLabel: '{{number}}. {{title}}',
       detailIcon: '💡',
@@ -2288,6 +2296,7 @@ export const tr = {
     orderCodePlaceholder: 'Örn: 7016DD05',
     noImage: 'Görsel Yok',
     unexpectedError: 'Beklenmedik bir hata oluştu',
+    fetchError: 'Siparişler alınamadı',
     product: 'Ürün',
     productSearchPlaceholder: 'Ürün adına göre ara',
     clearFilters: 'Filtreleri Temizle',
@@ -2592,7 +2601,9 @@ export const tr = {
         efficiencyWarning: 'Sınırda',
         efficiencyOptimalDesc: 'Hesaplanan parametreler ideal performans sağlayacaktır',
         efficiencyAcceptableDesc: 'Performans yeterlidir, ihtiyaç halinde iyileştirme düşünülebilir',
-        efficiencyWarningDesc: 'Daha güçlü bir model veya ek önlemler gerekebilir'
+        efficiencyWarningDesc: 'Daha güçlü bir model veya ek önlemler gerekebilir',
+        efficiencyMarginal: 'Sınırda',
+        efficiencyMarginalDesc: 'Daha güçlü bir model düşünülmesi önerilir'
       },
       diagram: {
         unit: 'Hava Perdesi'

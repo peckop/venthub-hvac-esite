@@ -201,7 +201,7 @@ const PaymentSuccessPage: React.FC = () => {
             {t('payment.failedTitle')}
           </h2>
           <p className="text-steel-gray mb-6">
-            {paymentInfo?.errorMessage || t('cart.errors.paymentError')}
+            {paymentInfo?.errorMessage || t('checkout.errors.paymentError')}
           </p>
           <div className="space-y-3">
             <Link

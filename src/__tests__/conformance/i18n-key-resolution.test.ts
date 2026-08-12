@@ -66,28 +66,17 @@ function toRelPath(globKey: string): string {
 /**
  * RATCHET (debt freeze): 2026-06-16'da master'da çözülmeyen anahtarlar. admin literal
  * batch (PR#364) bunlardan 15'ini (6 admin + 6 common + 3 products) çözdü → buradan SİLİNDİ
- * (ratchet 32→17 sıkıştı). Kalan 17 GERÇEK pre-existing bug — tek tek düzeltilip buradan
- * SİLİNECEK. YENİ entry EKLEME: yeni çözülmeyen anahtar = anahtarı düzelt, allowlist'leme.
+ * (ratchet 32→17 sıkıştı). 2026-08-12 dead-key sweep'i kalan 15'ini düzeltti (sözlüğe ekle /
+ * çağırana mevcut anahtar eşitle) → buradan SİLİNDİ (ratchet 17→2 sıkıştı). Kalan 2 GERÇEK
+ * ölü-anahtar: `SeriesCard.tsx` hiçbir yerden import edilmiyor (ölü bileşen, çağıranı yok)
+ * — anahtarları o yüzden kasıtlı ÇÖZÜLMEMİŞ bırakıldı; bileşen canlanırsa (bir importer
+ * eklenirse) o zaman sözlüğe eklenip buradan silinmeli. YENİ entry EKLEME: yeni çözülmeyen
+ * anahtar = anahtarı düzelt, allowlist'leme.
  * (Aşağıdaki ikinci test, düzelen bir anahtar hâlâ listede kalırsa uyarır → liste bayatlamaz.)
  */
 const KNOWN_UNRESOLVED = new Set<string>([
-  'brands.title',
-  'cart.errors.paymentError',
-  'category.filters.title',
-  'category.noProductsFound',
-  'category.productsCount',
-  'category.sort.name',
-  'category.sort.priceHigh',
-  'category.sort.priceLow',
-  'category.sort.title',
-  'category.view.grid',
-  'category.view.list',
-  'checkout.errors.emailInvalid',
-  'checkout.errors.locationRequired',
-  'orders.fetchError',
-  'pdp.details',
-  'product.starting_from',
-  'series.premium_desc',
+  'product.starting_from', // SeriesCard.tsx — ölü bileşen, importer yok
+  'series.premium_desc', // SeriesCard.tsx — ölü bileşen, importer yok
 ])
 
 describe('INV-5 · i18n key-resolution conformance', () => {

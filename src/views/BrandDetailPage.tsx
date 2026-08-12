@@ -131,7 +131,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
 
   const breadcrumbItems = [
     { label: t('category.breadcrumbHome'), href: Routes.home() },
-    { label: t('brands.title') || 'Markalar', href: Routes.brands() },
+    { label: t('brands.pageTitle') || 'Markalar', href: Routes.brands() },
     { label: brand?.name || slug }
   ]
 
@@ -320,7 +320,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                 <Link 
                   key={product.id} 
                   href={Routes.product(product.slug!)}
-                  aria-label={`${product.name} ${t('pdp.details')}`}
+                  aria-label={`${product.name} ${t('pdp.variantDetails')}`}
                   className="group block bg-white rounded-hvac-2xl p-8 border border-white transition-shadow duration-700 hover:border-cyan-500/20 hover:shadow-hvac-card-hover"
                 >
                   <div className="aspect-square relative flex items-center justify-center mb-8 grayscale group-hover:grayscale-0 transition-transform duration-700 group-hover:scale-105">
