@@ -2,91 +2,9 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
 import type { DbAdminSearchResult,DbProduct } from '../../types/db-rows'
-import type { FtsProductResult, GetProductsParams,Product, SearchSuggestion } from '../../types/ui-models'
+import type { FtsProductResult, Product, SearchSuggestion } from '../../types/ui-models'
 import { mapDatabaseProductToDomain,toUIProductList } from '../type-converters'
 import { VARIANT_DETAIL_COLUMNS } from './product.columns'
-
-export async function getProductsEnriched(
-  supabase: SupabaseClient<Database>,
-  params: GetProductsParams = {}
-): Promise<Product[]> {
-  let resolvedCategoryIds = params.categoryIds;
-
-  // If we have category IDs that are actually SLUGS (from CATEGORY_REGISTRY), resolve them to IDs first
-  if (resolvedCategoryIds && resolvedCategoryIds.length > 0) {
-    const potentialSlugs = resolvedCategoryIds.filter(id => id && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
-    
-    if (potentialSlugs.length > 0) {
-      const { data: categories } = await supabase
-        .from('categories')
-        .select('id, slug')
-        .in('slug', potentialSlugs);
-      
-      if (categories && categories.length > 0) {
-        const slugToIdMap = new Map(categories.map(c => [c.slug, c.id]));
-        resolvedCategoryIds = resolvedCategoryIds.map(id => slugToIdMap.get(id) || id);
-      }
-    }
-  }
-
-  const { data, error } = await supabase.rpc('get_products_enriched', {
-    p_category_ids: resolvedCategoryIds,
-    p_limit: params.limit || 50,
-    p_offset: params.offset || 0,
-    p_search_query: params.searchQuery,
-    p_brand: params.brand,
-    p_min_price: params.minPrice,
-    p_max_price: params.maxPrice
-  })
-
-  if (error) {
-    console.error('getProductsEnriched error:', error)
-    
-    // If there was an error with filtering, don't just return 50 random products
-    // Instead return empty or a more specific fallback
-    if (resolvedCategoryIds && resolvedCategoryIds.length > 0) {
-        const { data: fallbackData } = await supabase
-          .from('products')
-          .select(VARIANT_DETAIL_COLUMNS)
-          .or(`category_id.in.(${resolvedCategoryIds.join(',')}),subcategory_id.in.(${resolvedCategoryIds.join(',')})`)
-          .eq('status', 'active')
-          .is('deleted_at', null)
-          .limit(params.limit || 50)
-        return toUIProductList((fallbackData as DbProduct[]) || [])
-    }
-
-    const { data: fallbackData } = await supabase
-      .from('products')
-      .select(VARIANT_DETAIL_COLUMNS)
-      .eq('status', 'active')
-      .is('deleted_at', null)
-      .limit(params.limit || 50)
-
-    return toUIProductList((fallbackData as DbProduct[]) || [])
-  }
-
-  const enrichedProducts = (data || []).map(p => ({
-    ...p,
-    meta_description: null,
-    meta_title: null,
-    purchase_price: 0,
-    purchase_currency: 'TRY',
-    is_category_manual: null,
-    description_i18n: null,
-    family_id: null,
-    barcode: null,
-    deleted_at: null,
-    depth_mm: null,
-    height_mm: null,
-    width_mm: null,
-    weight_kg: null,
-    tax_rate: 20,
-    is_taxable: true,
-    tenant_id: ''
-  })) as DbProduct[]
-
-  return toUIProductList(enrichedProducts)
-}
 
 export async function getSearchSuggestions(
   supabase: SupabaseClient<Database>,
@@ -220,19 +138,6 @@ export async function getFeaturedProducts(supabase: SupabaseClient<Database>): P
     .eq('status', 'active')
     .is('deleted_at', null)
     .limit(6)
-
-  if (error) throw error
-  return toUIProductList((data as DbProduct[]) || [])
-}
-
-export async function searchProducts(supabase: SupabaseClient<Database>, query: string): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from('products')
-    .select(VARIANT_DETAIL_COLUMNS)
-    .or(`name.ilike.%${query}%, brand.ilike.%${query}%, sku.ilike.%${query}%, model_code.ilike.%${query}%, description.ilike.%${query}%`)
-    .eq('status', 'active')
-    .is('deleted_at', null)
-    .limit(20)
 
   if (error) throw error
   return toUIProductList((data as DbProduct[]) || [])

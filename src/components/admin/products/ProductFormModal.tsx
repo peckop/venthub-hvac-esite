@@ -43,6 +43,9 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
     const { t } = useI18n();
     const [loading, setLoading] = useState(false)
     const [categories, setCategories] = useState<DbCategory[]>([])
+    // D4: legacy description kolonu DROP edildi; form TR açıklamayı düzenler,
+    // mevcut EN çevirisi (varsa) kaybolmasın diye yüklenen JSONB burada tutulur.
+    const [descriptionI18n, setDescriptionI18n] = useState<{ tr?: string | null; en?: string | null }>({})
 
     const productSchema = React.useMemo(() => getProductSchema(t), [t])
 
@@ -73,9 +76,22 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                 purchase_price: Number(product.purchase_price) || 0,
                 stock_qty: product.stock_qty || 0,
                 low_stock_threshold: product.low_stock_threshold || 5,
-                description: product.description || '',
+                description: (() => {
+                    // Ham sorgu satırında description_i18n jenerik Json tipindedir — runtime daralt.
+                    const raw = product.description_i18n
+                    const obj = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {}
+                    return typeof obj.tr === 'string' ? obj.tr : ''
+                })(),
                 technical_specs: (product.technical_specs as Record<string, unknown>) || {}
             })
+            {
+                const raw = product.description_i18n
+                const obj = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {}
+                setDescriptionI18n({
+                    tr: typeof obj.tr === 'string' ? obj.tr : null,
+                    en: typeof obj.en === 'string' ? obj.en : null,
+                })
+            }
         } catch {
             toast.error(t('admin.products.errors.loadFailed'))
         } finally {
@@ -107,16 +123,23 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
     const onSubmit = async (values: ProductFormValues) => {
         setLoading(true)
         try {
+            // D4: legacy description kolonu yok — form değeri description_i18n.tr'ye
+            // yazılır, mevcut EN çevirisi korunur.
+            const { description, ...rest } = values
+            const description_i18n = { ...descriptionI18n, tr: description ?? '' } as DbJson
+
             if (_productId) {
                 const payload: DbProductUpdate = {
-                    ...values,
+                    ...rest,
+                    description_i18n,
                     technical_specs: values.technical_specs as DbJson
                 }
                 const { error } = await supabase.from('products').update(payload).eq('id', _productId)
                 if (error) throw error
             } else {
                 const payload: DbProductInsert = {
-                    ...values,
+                    ...rest,
+                    description_i18n,
                     technical_specs: values.technical_specs as DbJson
                 }
                 const { error } = await supabase.from('products').insert([payload])

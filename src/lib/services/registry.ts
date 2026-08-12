@@ -41,9 +41,7 @@ import {
   getProducts,
   getProductsByCategory,
   getProductsBySubcategory,
-  getProductsEnriched,
-  getSearchSuggestions,
-  searchProducts} from './product.service'
+  getSearchSuggestions} from './product.service'
 import {
   addProductToProject,
   createProject,
@@ -155,10 +153,6 @@ export class PricingService {
 export class ProductService {
   constructor(private supabase: SupabaseClient<Database>) {}
 
-  async getProductsEnriched(options: Parameters<typeof getProductsEnriched>[1]) {
-    return getProductsEnriched(this.supabase, options)
-  }
-
   async getSearchSuggestions(query: string, limit?: number) {
     return getSearchSuggestions(this.supabase, query, limit)
   }
@@ -197,10 +191,6 @@ export class ProductService {
 
   async getFeaturedProducts() {
     return getFeaturedProducts(this.supabase)
-  }
-
-  async searchProducts(query: string) {
-    return searchProducts(this.supabase, query)
   }
 
   async adminSearchProducts(query: string) {

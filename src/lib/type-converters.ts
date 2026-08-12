@@ -43,10 +43,9 @@ export const mapDatabaseProductToDomain = (dbProd: DbProduct): DomainProduct => 
   return {
     ...dbProd,
     name: String(dbProd.name || ''),
-    // F5-B W3.2: legacy `description` kolonu D4'te DROP edilecek; description_i18n
-    // (JSONB {tr,en}) kanonik kaynak. `dbProd.description` yalnız geçiş dönemi
-    // fallback'i (bugün 374/374 satırda description_i18n.tr'nin birebir kopyası).
-    description: String(dbProd.description_i18n?.tr ?? dbProd.description ?? ''),
+    // F5-B D4: legacy `description` kolonu DROP edildi — description_i18n (JSONB
+    // {tr,en}) tek kaynak. (DROP öncesi 374/374 satırda birebir kopyaydı.)
+    description: String(dbProd.description_i18n?.tr ?? ''),
     brand: String(dbProd.brand || 'Venthub'),
   }
 }

@@ -97,12 +97,34 @@ export type ProductDescriptionI18n = {
 // üretildikten sonra (alanlar Row'da var, description_i18n jenerik Json tipinde)
 // her iki durumda da güvenli çalışır; ham intersection (`&`) generated tipte
 // aynı alan zaten varsa tip çakışmasına yol açabilirdi.
-export type DbProduct = Omit<Tables['products']['Row'], 'technical_specs' | 'family_id' | 'description_i18n'> & {
+// F5-B D4: legacy kolonlar DB'den DROP edildi; tip düzeyinde de Omit'lenir ki
+// generated types yeniden üretilene dek bile hiçbir okuyucu derlenemesin
+// (zorlayıcı). Regen sonrası Omit listesi no-op'a düşer, zarar vermez.
+type DroppedLegacyProductColumns =
+  | 'description'
+  | 'image_url'
+  | 'airflow_capacity'
+  | 'noise_level'
+  | 'pressure_rating'
+  | 'meta_title'
+  | 'meta_description'
+  | 'is_category_manual';
+
+export type DbProduct = Omit<
+  Tables['products']['Row'],
+  'technical_specs' | 'family_id' | 'description_i18n' | DroppedLegacyProductColumns
+> & {
   technical_specs: Record<string, Json> | null;
   /** Ürün ailesi kimliği (varyant gruplama). */
   family_id: string | null;
   /** Çok dilli ürün açıklaması ({tr,en}). */
   description_i18n: ProductDescriptionI18n;
+  /**
+   * Ürün görseli D4 sonrası yalnız product_images'tan gelir; liste sorgusu kapak
+   * join'i taşıyorsa bu alan dolar, resolver (resolveProductImageUrl) bunu okur.
+   * Kolon products tablosunda YOKTUR — sorgu-zamanı zenginleştirme alanıdır.
+   */
+  cover_image_path?: string | null;
 };
 
 // Refine DbCategory to ensure 'name' and 'description' are strings, and metadata is typed
