@@ -521,7 +521,7 @@ const OrdersTableBody: React.FC = () => {
     () =>
       ORDER_STATUS_KEYS.map((s) => ({
         key: s,
-        label: t(`admin.orders.statusLabels.${s}`),
+        label: prettyStatus(s, t),
         active: activeStatuses.includes(s),
         onToggle: () => {
           const next = activeStatuses.includes(s)

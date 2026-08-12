@@ -1136,9 +1136,16 @@ export const en: typeof tr = {
       count: '{{count}} product families',
       viewFamily: 'Explore',
     },
+    view: {
+      grid: 'Grid View',
+      list: 'List View',
+    },
     sort: {
+      title: 'Sort',
+      name: 'By Name',
       variantCount: 'Variant count',
     },
+    noProductsFound: 'No products found matching these criteria',
     howItWorks: {
       stepNumberLabel: '{{number}}. {{title}}',
       detailIcon: '💡',
@@ -1717,6 +1724,7 @@ export const en: typeof tr = {
     orderCodePlaceholder: 'e.g. 7016DD05',
     noImage: 'No Image',
     unexpectedError: 'An unexpected error occurred',
+    fetchError: 'Failed to load orders',
     product: 'Product',
     productSearchPlaceholder: 'Search by product name',
     clearFilters: 'Clear Filters',
@@ -2025,9 +2033,10 @@ export const en: typeof tr = {
     },
     errors: {
       nameRequired: 'Full name is required',
-      emailInval_id: 'Please enter a valid email address',
+      emailInvalid: 'Please enter a valid email address',
       phoneRequired: 'Phone number is required',
       addressRequired: 'Address is required',
+      locationRequired: 'Please enter your city and district',
       cityRequired: 'City is required',
       districtRequired: 'District is required',
       postalRequired: 'Postal code is required',
@@ -2704,7 +2713,9 @@ export const en: typeof tr = {
         efficiencyWarning: 'Borderline',
         efficiencyOptimalDesc: 'Calculated parameters will provide ideal performance',
         efficiencyAcceptableDesc: 'Performance is acceptable, improvement can be considered if needed',
-        efficiencyWarningDesc: 'A more powerful model or additional measures may be required'
+        efficiencyWarningDesc: 'A more powerful model or additional measures may be required',
+        efficiencyMarginal: 'Marginal',
+        efficiencyMarginalDesc: 'Consider a more powerful model for better performance'
       },
       diagram: {
         unit: 'Air Curtain'
