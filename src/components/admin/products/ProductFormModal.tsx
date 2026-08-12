@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useI18n } from '@/i18n/I18nProvider';
+import { VARIANT_DETAIL_COLUMNS } from '@/lib/services/product.columns'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import type { DbCategory, DbJson,DbProductInsert, DbProductUpdate } from '../../../types/db-rows'
@@ -58,7 +59,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
     const loadProduct = useCallback(async (id: string) => {
         setLoading(true)
         try {
-            const { data: product, error } = await supabase.from('products').select('id, name, brand, price, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description, image_url, stock_qty, low_stock_threshold, low_stock_override, technical_specs, airflow_capacity, noise_level, pressure_rating, created_at, updated_at, warehouse_location, supplier_name, is_category_manual, meta_description, meta_title, purchase_price').eq('id', id).single()
+            const { data: product, error } = await supabase.from('products').select(VARIANT_DETAIL_COLUMNS).eq('id', id).single()
             if (error) throw error
 
             reset({
