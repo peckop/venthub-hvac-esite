@@ -31,10 +31,11 @@ interface CategoryLandingProps {
     category: DomainCategory
     /** F5-B W2.1: liste birimi AİLE (varyant kartı basılmaz). */
     families: FamilyListItem[]
-    subCategories?: DomainCategory[]
+    /** Breadcrumb hiyerarşisi için üst kategori (gateway'den gelir). */
+    parentCategory?: DomainCategory | null
 }
 
-const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, subCategories = [] }) => {
+const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, parentCategory }) => {
     const { t, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
@@ -46,7 +47,10 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, s
     
 
     const vm = wrapCategory(category)
-    const parentVm = wrapCategory(subCategories.find(s => s.id === category.parent_id)) // Attempt to find parent if any
+    // subCategories içinde parent aramak ÖLÜ mantıktı (leaf'te o liste kendi alt
+    // kategorileri = boş) → breadcrumb üst katmanı hiç basamıyordu; gateway'in
+    // parentCategory'si kullanılır.
+    const parentVm = wrapCategory(parentCategory ?? undefined)
     
     const isAirCurtain = category.slug === 'air-curtains'
     const isSilentFan = category.slug === 'quiet-duct-fans'

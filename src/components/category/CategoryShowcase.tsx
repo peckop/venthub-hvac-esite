@@ -131,7 +131,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
                         {/* Comparison Image */}
                         <div className="flex justify-center mb-12">
-                            <VentImage src="/images/category/electric-vs-ambient.png"
+                            <VentImage src="/images/category/electric-vs-ambient.jpg"
                                 alt={t('category.electricVsAmbientAlt')}
                                 className="max-w-full md:max-w-3xl rounded-xl shadow-lg"
                              />
@@ -273,7 +273,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                         <div className="flex justify-center">
                             <div className="relative w-full max-w-4xl aspect-video rounded-xl overflow-hidden shadow-2xl">
                                 <Image
-                                    src={isQuietFan ? '/images/vortice/vortice_lineo_technical.png' : '/images/category/air-curtain-diagram.png'}
+                                    src={isQuietFan ? '/images/vortice/vortice_lineo_technical.png' : '/images/category/air-curtain-diagram.jpg'}
                                     alt={isQuietFan ? t('category.lineoTechnicalAlt') : t('category.airCurtainDiagramAlt')}
                                     fill
                                     sizes="(max-width: 1024px) 100vw, 900px"

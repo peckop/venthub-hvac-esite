@@ -119,7 +119,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
         return (
           <CategoryLandingView
             category={category.raw}
-            subCategories={rawSubCategories}
+            parentCategory={parentCategory?.raw}
             families={visibleFamilies}
           />
         )
@@ -149,7 +149,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
             return (
               <CategoryLandingView
                 category={category.raw}
-                subCategories={rawSubCategories}
+                parentCategory={parentCategory?.raw}
                 families={visibleFamilies}
               />
             )

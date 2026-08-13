@@ -48,11 +48,11 @@ const HowItWorks: React.FC = () => {
                 <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     {/* Technical Diagram Image */}
                     <div className={`relative rounded-2xl overflow-hidden shadow-xl ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
-                        <VentImage src="/images/category/air-curtain-diagram.png"
+                        <VentImage src="/images/category/air-curtain-diagram.jpg"
                             alt={diagramAltVal}
                             className="w-full h-auto"
-                            width={1200}
-                            height={800}
+                            width={1024}
+                            height={1024}
                             loading="lazy"
                          />
                     </div>
