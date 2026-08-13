@@ -3,37 +3,25 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\db-rows.ts
-skeleton_hash: ea01e9f166ac2421
+skeleton_hash: ed3ebdafcfc05c8b
 entity_hashes:
-  overview: 28a0ac4ea1b0e18d
-generated_at: 2026-06-19T20:48:17Z
+  overview: 700f37bc5a714626
+generated_at: 2026-08-13T08:54:02Z
 ---
 
 ## Genel Bakış
-`src/types/db-rows.ts` modülü, VentHub HVAC projesinde veritabanı satırlarının TypeScript'te temsil edilmesini sağlayan tip tanımlarını içerir. Dosyada çalıştırılabilir kod veya fonksiyon bulunmaz; yalnızca arayüz tanımları yer alır. Bu tipler, `database.types` ve `authority` modüllerinden import edilen temel tipler üzerine inşa edilerek veritabanı tablolarının satır yapılarını yansıtır.
+`db-rows.ts` modülü, VentHub HVAC projesindeki veritabanı tablolarının satır yapılarını temsil eden TypeScript arayüz (interface) tanımlarını içerir. Dosya yalnızca tip (type) ve arayüz tanımlarından oluşur; çalıştırılabilir kod, fonksiyon veya değişken barındırmaz. Bu modül, `database.types` ve `authority` modüllerinden import edilen temel tipleri genişleterek projenin veri modelini tanımlar.
 
-## Tanımlanan Arayüzler
-Bu modül aşağıdaki veritabanı tablo yapılarına karşılık gelen arayüzleri tanımlar:
-
-- **DbUserProject** — Kullanıcılara ait projelerin (id, isim, açıklama, zaman damgaları) yapısını temsil eder.
-- **DbProjectItem** — Projelerdeki tekil kalemleri (miktar, ürün referansı) ve opsiyonel ürün ilişkisini tanımlar.
-- **DbAppSettings** — Uygulama ayarlarını key-value yapısında (JSON değeri ile) saklayan yapıyı temsil eder.
-- **DbWebhookEvent** — Webhook olaylarının durumunu (beklemede/işlendi/hata), sağlayıcı bilgisini ve payload verisini tutar.
-- **DbProductEnrichedRow** — Ürünlerin zenginleştirilmiş veri yapısını (fiyat, stok, teknik özellikler, hava debisi kapasitesi dahil) tanımlar.
+## Fonksiyon Grupları
+Bu modülde fonksiyon bulunmamaktadır. Dosya, derleme zamanı tip güvenliği sağlamak üzere saf arayüz tanımlarından oluşur.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, yalnızca TypeScript tip tanımları içeren derleme zamanı (compile-time) bir modüldür. Çalıştırılabilir kod, fonksiyon veya sabit barındırmaz. Dolayısıyla fonksiyon gövdesinden çıkarılabilir aksiyom bulunmamaktadır.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
-Bununla birlikte, modülün doğru çalışması için aşağıdaki yapısal varsayımlar geçerlidir:
-
-[Aksiyom 1]: Eğer `database.types` veya `authority` modüllerinde referans verilen tipler tanımlı değilse, derleme zamanı tip hatası oluşur.
-
-[Aksiyom 2]: Eğer veritabanı şeması değiştirilip ilgili tablo alanları eklenip çıkarılmışsa ancak bu tipler güncellenmemişse, çalışma zamanında beklenmeyen `undefined` veya `null` değer erişimleri oluşur.
-
-[Aksiyom 3]: Eğer `DbUserProject` gibi tanımlanan tiplerde `description: string | null` olarak nullable alan mevcutsa, bu alanların kullanımında调用 tarafında null kontrolü yapılması gerekir; aksi halde runtime hatası oluşur.
+**Gerekçe:** `db-rows.ts` dosyası yalnızca TypeScript arayüz (interface) tanımları içeren, çalıştırılabilir kod barındırmayan bir tip modülüdür. Mimari aksiyomlar yalnızca fonksiyon gövdelerinden türetilebilir; bu modülde herhangi bir fonksiyon imzası veya gövdesi bulunmadığından çıkarılabilir koşul-sonuç ilişkisi mevcut değildir.
 
 ---
 
@@ -83,38 +71,11 @@ Bununla birlikte, modülün doğru çalışması için aşağıdaki yapısal var
 - `error_message?: string`
 - `created_at: string`
 
-### DbProductEnrichedRow
-- `id: string`
-- `name: string`
-- `brand: string`
-- `price: number`
-- `sku: string`
-- `slug: string`
-- `model_code: string`
-- `category_id: string`
-- `subcategory_id: string`
-- `status: string`
-- `is_featured: boolean`
-- `description: string`
-- `image_url: string`
-- `image_alt: string`
-- `stock_qty: number`
-- `low_stock_threshold: number`
-- `low_stock_override: boolean`
-- `technical_specs: Record<string, Json>`
-- `airflow_capacity: number`
-- `noise_level: number`
-- `pressure_rating: number`
-- `created_at: string`
-- `updated_at: string`
-- `warehouse_location: string`
-- `supplier_name: string`
-
 ### DbFtsSearchResult extends DbProduct
 - `rank: number`
 - `is_fuzzy_match?: boolean`
 
-### DbAdminSearchResult extends DbProduct
+### DbAdminSearchResult
 - `rank: number`
 - `total_count: number`
 - `purchase_price: number | null`
@@ -215,11 +176,35 @@ type LocalizedCategoryMetadata = {
 } & CategoryMetadata
 ```
 
+### ProductDescriptionI18n
+Yerelleştirilmiş ürün açıklaması. Kolon 2026-08-11'de `products` tablosuna eklendi; `database.types.ts` henüz yeniden üretilmediği için burada yapısal olarak tanımlanır (generated dosya elle düzenlenmez).
+```typescript
+type ProductDescriptionI18n = {
+  tr?: string | null;
+  en?: string | null;
+} | null
+```
+
+### DroppedLegacyProductColumns
+```typescript
+type DroppedLegacyProductColumns = | 'description'
+  | 'image_url'
+  | 'airflow_capacity'
+  | 'noise_level'
+  | 'pressure_rating'
+  | 'meta_title'
+  | 'meta_description'
+  | 'is_category_manual'
+```
+
 ### DbProduct
 ```typescript
-type DbProduct = Omit<Tables['products']['Row'], 'technical_specs'> & {
+type DbProduct = Omit<
+  Tables['products']['Row'],
+  'technical_specs' | 'family_id' | 'description_i18n' | DroppedLegacyProductColumns
+> & {
   technical_specs: Record<string, Json> | null;
-}
+  /** Ürün ailesi kim
 ```
 
 ### DbCategory
@@ -229,6 +214,17 @@ type DbCategory = Omit<Tables['categories']['Row'], 'name' | 'description' | 'me
   menu_label: string | null;
   marketing_title: string | null;
   translation_key: s
+```
+
+### DbProductFamily
+```typescript
+type DbProductFamily = Omit<
+  Tables['product_families']['Row'],
+  'description' | 'meta_title' | 'meta_description'
+> & {
+  description: ProductDescriptionI18n;
+  meta_title: ProductDescriptionI18n;
+  meta_descripti
 ```
 
 ### DbUserAddress
@@ -302,10 +298,25 @@ type DbInvoiceProfileUpdate = Tables['user_invoice_profiles']['Update']
 
 ## AST POINTERS
 
-Bu dosyada herhangi bir fonksiyon gövdesi bulunmamaktadır. Dosya yalnızca TypeScript type import'ları içermektedir:
+Bu dosya **(`db-rows.ts`)** bir **TypeScript tip tanımlama dosyasıdır** (`import type` ifadelerinden anlaşılmaktadır). Dosyada:
 
-- `Database`, `Json` → `./database.types`
-- `AuthorityContent` (as `DynamicAuthorityContent`) → `./authority`
+- **Fonksiyon gövdesi bulunmamaktadır**
+- **Sadece tip tanımları (type/interface) yer almaktadır**
+- **Hiçbir çalıştırılabilir kod içermemektedir**
+
+---
+
+### Sonuç
+
+| Kategori | Durum |
+|----------|-------|
+| Fonksiyon sayısı | 0 |
+| AST Pointer üretimi | Yapılamaz |
+| Neden | Dosya sadece type tanımlarından oluşmaktadır;fonksiyon gövdesi, parametre veya iç değişken bulunmamaktadır |
+
+---
+
+**Not:** Bu dosya `db-rows.ts` olarak adlandırılmış olup muhtemelen veritabanı satırları için tip tanımları (`DbRow`, `UserRow`, `OrderRow` gibi interface/type tanımları) içermektedir. Çalıştırılabilir fonksiyon barındırmadığı için AST Pointer analizi uygulanamaz.
 
 ---
 
@@ -335,7 +346,7 @@ Bu dosyada herhangi bir fonksiyon gövdesi bulunmamaktadır. Dosya yalnızca Typ
   export: DbOrder
   export: DbOrderItem
   export: DbProduct
-  export: DbProductEnrichedRow
+  export: DbProductFamily
   export: DbProductInsert
   export: DbProductUpdate
   export: DbProjectItem
@@ -348,6 +359,7 @@ Bu dosyada herhangi bir fonksiyon gövdesi bulunmamaktadır. Dosya yalnızca Typ
   export: Enums
   export: LegacyAuthorityContent
   export: LocalizedCategoryMetadata
+  export: ProductDescriptionI18n
   export: PublicSchema
   export: Tables
 

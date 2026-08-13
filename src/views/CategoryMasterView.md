@@ -3,39 +3,52 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\CategoryMasterView.tsx
-skeleton_hash: 675d5fb17f81b1ea
+skeleton_hash: 12f7702a5e8c3d9e
 entity_hashes:
-  func:CategoryMasterView: 8d66cf8f4164e6f6
+  func:CategoryMasterView: cd0cf7095117dcee
   func:renderView: 7ee81c09fd482844
-  overview: 9cd4c9c276b969d6
-  style_tokens: 196a053d563de9bf
-generated_at: 2026-06-11T16:17:49Z
+  overview: 7988138c42a591a9
+  style_tokens: a9eeb190f981b67b
+generated_at: 2026-08-13T08:56:27Z
 ---
 
 ## Genel Bakış
-CategoryMasterView, VentHub HVAC uygul
+CategoryMasterView, VentHub HVAC uygulamasında ürün kategorilerinin yönetimini ve görüntülenmesini sağlayan üst düzey React bileşenidir. Başlangıç verileri (kategori bilgisi, aileler, sayfalama) alarak, mevcut duruma göre farklı alt bileşenleri (ızgara, landing, vitrin) dinamik olarak render eden ana sayfa yapısını yönetir.
+
+## Fonksiyon Grupları
+### Ana Bileşen Yapısı
+Modülün temel giriş noktasını ve state yönetimini tanımlar; başlatma verilerini alır ve üst düzey bileşen işlevselliğini sağlar.
+- `CategoryMasterView`
+
+### Görünüm Render Mantığı
+İç duruma veya prop değerlerine bağlı olarak hangi alt bileşenin (CategoryGridView, CategoryLandingView vb.) görüntüleneceğine karar veren koşullu render mantığını barındırır.
+- `renderView`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için temel mimari varsayım, dış kaynaklardan gelen başlangıç verilerinin varlığı ve iç bileşenlerin doğru veri yapısıyla çağrılmasıdır.
-
-[Aksiyom 1]: Eğer `initialCategory` parametresi (`{name: string, id: string}` yapısında bir nesne) sağlanmazsa, `CategoryMasterView` bileşeni ana kategori verisi olmadan başlatılır ve `renderView()` içindeki ilgili alt bileşenlere (`CategoryGridView`, `CategoryLandingView`) geçersiz veya eksik veri aktarımı riski oluşur.
-[Aksiyom 2]: Eğer `initialProducts` parametresi (bir ürün nesneleri dizisi, `[{id: string, ...}, ...]` yapısında) sağlanmazsa, `CategorySeriesView` ve `CategoryShowcaseView` bileşenlerine gösterilecek ürün listesi传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递传递
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### CategoryMasterView
-**Ne yapar**: Bu fonksiyon, bir React bileşenidir ve bir kategori yönetimi arayüzünü (örneğin, bir kategorinin adını, alt kategorilerini ve ürünlerini düzenleyen bir sayfayı) oluşturur.
-**Nasıl yapar**: Fonksiyon, bir React bileşeni (`React.FC`) döndürür. Bileşenin iç mantığı, dışarıdan gelen başlangıç verilerine (`initialCategory`, `initialProducts`, `initialSubCategories`) dayanarak ilgili kategori master sayfasının görünümünü ve işlevselliğini oluşturur.
+
+**Ne yapar**: CategoryMasterView, HVAC sistemleri için kategori yönetimi arayüzünü görüntüleyen bir React fonksiyonel bileşenidir. Kategori listeleme, sayfalama ve filtreleme gibi işlemleri kullanıcıya sunar.
+
+**Nasıl yapar**: Bileşen, CategoryMasterViewProps arayüzünden türetilmiş props'ları kabul eder. Sayfalama mantığı için page ve size parametrelerini kullanır. Families dizisi varsayılan olarak boş dizi, total sıfır, page bir olarak başlatılır. Bileşen, React.FC<CategoryMasterViewProps> tipini döndürür.
+
 **Parametreler**:
-- `initialCategory`: `Category` (veya benzeri bir tip) — Bileşenin başlangıçta göstermesi ve düzenlemesi gereken kategori verisi.
-- `initialProducts`: `Product[]` (veya benzeri bir dizi tipi) — Bu kategoriye ait başlangıç ürünleri listesi.
-- `initialSubCategories`: `SubCategory[]` (veya benzeri bir dizi tipi) — Bu kategorinin alt kategorilerinin başlangıç listesi.
-**Dönüş**: `React.FC<CategoryMasterViewProps>` tipinde bir React bileşeni. Bileşen, verilen props'lara göre render edilen bir JSX yapısı döndürür.
+- `initialCategory`: any — Başlangıç kategori verisini temsil eder. Bileşen ilk yüklendiğinde görüntülenecek varsayılan kategoriyi belirtir.
+- `families`: Array — Kategori ailelerinin listesini tutar. Varsayılan değer boş bir dizidir (`[]`). Bu dizi, kategorilerin hiyerarşik yapısını veya gruplamasını gösterir.
+- `total`: number — Toplam kategori sayısını belirtir. Sayfalama bileşeninde toplam kayıt sayısını göstermek için kullanılır. Varsayılan değer `0`'dır.
+- `page`: number — Mevcut sayfa numarasını gösterir. Sayfalama kontrollerinde aktif sayfayı belirler. Varsayılan değer `1`'dir.
+- `pageSize`: number — Sayfa başına düşen kategori sayısını belirter. Sayfalama aralığını kontrol eder.
+
+**Dönüş**: `React.FC<CategoryMasterViewProps>` — Fonksiyonel React bileşeni döndürür. CategoryMasterViewProps tipindeki tüm özellikleri kabul eden bir bileşen yapısıdır.
 
 ### renderView
 **Ne yapar**: Bu fonksiyon, `CategoryMasterView` bileşeninin iç mantığını veya belirli bir durum için görünüm oluşturmayı gerçekleştiren yardımcı bir iç fonksiyondur.
@@ -45,54 +58,81 @@ Bu modül için temel mimari varsayım, dış kaynaklardan gelen başlangıç ve
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../components/ui/Pagination::Pagination
+- import: ../hooks/useCategoryGateway::useCategoryGateway
+- import: ../hooks/useCategoryViewModel::useCategoryViewModel
+- import: ../lib/type-converters::type { DomainCategory }
+- import: ../types/ui-models::type { FamilyListItem }
+- import: next/dynamic::dynamic
+- import: react::React
+- import: react::useMemo
+
+---
+
 ## INTERFACES
 
 ### CategoryMasterViewProps
 - `initialCategory?: DomainCategory | null`
-- `initialProducts?: DomainProduct[]`
+- `families?: FamilyListItem[]`
+- `total?: number`
+- `page?: number`
+- `pageSize?: number`
 - `initialSubCategories?: DomainCategory[]`
 
 ---
 
 ## SABİTLER
-- **CategoryGridView** (call) — `dynamic(() => import('./category/CategoryGridView'), { ssr: false })`
-- **CategoryLandingView** (call) — `dynamic(() => import('./category/CategoryLandingView'), { ssr: false })`
-- **CategorySeriesView** (call) — `dynamic(() => import('./category/CategorySeriesView'), { ssr: false })`
-- **CategoryShowcaseView** (call) — `dynamic(() => import('./category/CategoryShowcaseView'), { ssr: false })`
-- **ProductsDiscoveryView** (call) — `dynamic(() => import('./ProductsDiscoveryView'), { ssr: false })`
+- **CategoryGridView** (call) — `dynamic(() => import('./category/CategoryGridView'))`
+- **CategoryLandingView** (call) — `dynamic(() => import('./category/CategoryLandingView'))`
+- **CategorySeriesView** (call) — `dynamic(() => import('./category/CategorySeriesView'))`
+- **CategoryShowcaseView** (call) — `dynamic(() => import('./category/CategoryShowcaseView'))`
+- **ProductsDiscoveryView** (call) — `dynamic(() => import('./ProductsDiscoveryView'))`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: CategoryMasterView.tsx::CategoryMasterView
-- **params**: `initialCategory, initialProducts, initialSubCategories`
+- **params**: (`initialCategory`, `families = []`, `total = 0`, `page = 1`, `pageSize = 24`, `initialSubCategories`)
 - **ic_degiskenler**:
-  - `rawCategory` — useCategoryGateway'den dönen ham kategori verisi, wrapCategory ile sarmalanmadan önce kullanılır
-  - `rawParentCategory` — useCategoryGateway'den dönen ham üst kategori verisi, wrapCategory ile sarmalanmadan önce kullanılır
-  - `rawSubCategories` — useCategoryGateway'den dönen ham alt kategoriler dizisi, view bileşenlerine doğrudan aktarılır
-  - `products` — useCategoryGateway'den dönen ürün listesi, view bileşenlerine ve marka çıkarımına kullanılır
-  - `loading` — useCategoryGateway'den dönen boolean yükleme durumu, ProductsDiscoveryView ve CategoryGridView'e aktarılır
-  - `filters` — useCategoryGateway'den dönen filtre durum nesnesi, CategoryGridView'e aktarılır
-  - `updateFilters` — useCategoryGateway'den dönen filtre güncelleme fonksiyonu, CategoryGridView'e onUpdateFilters olarak aktarılır
-  - `wrapCategory` — useCategoryViewModel'den gelen fonksiyon, ham kategori verisini ViewModel formatına sarmalar
-  - `category` — useMemo ile wrapCategory(rawCategory) sonucu, kategorinin ViewModel sarmalı; displayMode ve parentId erişimi ile hangi view'ın render edileceğini belirler
-  - `parentCategory` — useMemo ile wrapCategory(rawParentCategory) sonucu, üst kategorinin ViewModel sarmalı; raw özelliği CategorySeriesView ve CategoryGridView'e aktarılır
-  - `availableBrands` — useMemo ile products dizisinden p.brand değerlerinin benzersiz kümesi; CategoryGridView'e aktarılır
-- **Dönüş**: JSX element (React.FC) — category yüklenmemişse ProductsDiscoveryView, aksi halde renderView() sonucunu Suspense ile saran div
+  - `rawCategory` — `useCategoryGateway` hookundan dönen ham kategori nesnesi; `wrapCategory` ile sarılır
+  - `rawParentCategory` — `useCategoryGateway` hookundan dönen üst kategori nesnesi; `wrapCategory` ile sarılır
+  - `rawSubCategories` — `useCategoryGateway` hookundan dönen alt kategoriler dizisi; view bileşenlerine doğrudan aktarılır
+  - `loading` — `useCategoryGateway` hookundan dönen yükleme durumu boolean'ı; `ProductsDiscoveryView` ve `CategoryGridView`'e aktarılır
+  - `filters` — `useCategoryGateway` hookundan dönen filtre state nesnesi; `catSearch`, `selectedBrands`, `sortBy` alanlarını içerir
+  - `updateFilters` — `useCategoryGateway` hookundan dönen filtre güncelleme callback'i; `CategoryGridView`'e `onUpdateFilters` prop'u olarak verilir
+  - `wrapCategory` — `useCategoryViewModel` hookundan dönen kategori sarmalama fonksiyonu; `useMemo` içinde `rawCategory` ve `rawParentCategory`'i sarar
+  - `category` — `useMemo` ile `wrapCategory(rawCategory)` sonucu; `displayMode`, `raw`, `parentId` alanlarına erişilir
+  - `parentCategory` — `useMemo` ile `wrapCategory(rawParentCategory)` sonucu; optional zincirleme `parentCategory?.raw` ile erişilir
+  - `availableBrands` — `useMemo` ile `families` dizisinden `brand_name` alanlarının benzersiz değerlerinden oluşan dizi; `CategoryGridView`'e aktarılır
+  - `visibleFamilies` — `useMemo` callback'i tarafından filtrelenip sıralanan aile listesi; tüm görünüm bileşenlerine aktarılır
+  - `pagination` — `<Pagination>` JSX elementi; `React.Suspense` ile sarılmıştır, `page`, `pageSize`, `total` prop'ları bağlanır
+- **Dönüş**: JSX — `<div className="min-h-screen">` içine sarılmış `React.Suspense` ile `renderView()` ve koşullu `pagination`
 
-### [N2_NASIL] AST Pointer: CategoryMasterView.tsx::renderView
+---
+
+### [N2_NASIL] AST Pointer: CategoryMasterView.tsx::visibleFamilies (useMemo callback)
 - **params**: yok
 - **ic_degiskenler**:
-  - `category` — closure'dan erişilen ViewModel sarmalı; null ise null döner, displayMode alanına göre switch ile hangi view bileşeninin render edileceğini belirler, parentId alanı ile alt/ana kategori ayrımı yapar
-  - `rawSubCategories` — closure'dan erişilen ham alt kategoriler dizisi; CategoryShowcaseView, CategoryLandingView ve CategoryGridView bileşenlerine subCategories prop'u olarak aktarılır
-  - `parentCategory` — closure'dan erişilen üst kategori ViewModel sarmalı; optional zincirle ?.raw erişimi ile CategorySeriesView ve CategoryGridView'e parentCategory prop'u olarak aktarılır
-  - `products` — closure'dan erişilen ürün listesi; CategoryLandingView, CategorySeriesView ve CategoryGridView'e products prop'u olarak aktarılır
-  - `availableBrands` — closure'dan erişilen benzersiz marka listesi; CategoryGridView'e availableBrands prop'u olarak aktarılır
-  - `filters` — closure'dan erişilen filtre durum nesnesi; CategoryGridView'e filters prop'u olarak aktarılır
-  - `updateFilters` — closure'dan erişilen filtre güncelleme fonksiyonu; CategoryGridView'e onUpdateFilters prop'u olarak aktarılır
-  - `loading` — closure'dan erişilen boolean yükleme durumu; CategoryGridView'e loading prop'u olarak aktarılır
-- **Dönüş**: JSX element | null — category.displayMode değerine göre CategoryShowcaseView, CategoryLandingView, CategorySeriesView veya CategoryGridView bileşeninden birini döner; category null ise null döner
+  - `query` — `filters.catSearch` değerinin `.trim().toLocaleLowerCase()` ile normalize edilmiş hali; boşluklu arama sorgusu
+  - `list` — başlangıçta `families` parametresine eşitlenen, ardından sorgu ve marka filtresiyle daraltılan geçici aile listesi
+  - `sorted` — `list` dizisinin shallow kopyası (`[...list]`); `filters.sortBy` değerine göre sıralanır
+- **Dönüş**: `FamilyListItem[]` — filtrelenmiş ve sıralanmış aile dizisi
+
+---
+
+### [N3_NASIL] AST Pointer: CategoryMasterView.tsx::visibleFamilies filter callback (f =>)
+- **params**: (`f: FamilyListItem`)
+- **ic_degiskenler**: yok
+- **Dönüş**: `boolean` — `f.name`, `f.brand_name`, `f.series_code` alanlarının `query` ile eşleşip eşleşmediği
+
+---
+
+### [N4_NASIL] AST Pointer: CategoryMasterView.tsx::renderView
+- **params**: yok
+- **ic_degiskenler**: yok (dış scope'daki `category`, `rawSubCategories`, `parentCategory`, `visibleFamilies`, `availableBrands`, `filters`, `updateFilters`, `loading` değişkenlerine closure ile erişir)
+- **Dönüş**: `JSX.Element | null` — `category.displayMode` değerine göre `CategoryShowcaseView`, `CategoryLandingView`, `CategorySeriesView` veya `CategoryGridView` bileşenlerinden birini döner
 
 ---
 
@@ -121,4 +161,4 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - **Renkler:** `bg-white`, `border-b-2`, `border-primary-navy`
 - **Layout:** `flex`, `h-8`, `items-center`, `justify-center`, `min-h-screen`, `w-8`
 - **Varyant/Responsive:** (yok)
-- **Yardımcı Sınıflar:** `animate-spin`, `rounded-full`
+- **Yardımcı Sınıflar:** `animate-spin`, `py-10`, `rounded-full`
