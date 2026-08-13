@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-create-coupon\index.ts
-skeleton_hash: b33a5fa4ac98e4a4
+skeleton_hash: fd99acff0bd75a61
 entity_hashes:
   func:admin-create-coupon_handler: 72913923d4da4715
   overview: e7791c38f1685aef
-generated_at: 2026-05-30T21:36:13Z
+generated_at: 2026-08-13T07:40:08Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,13 @@ Bu modül için fonksiyon gövdesi (implementation body) paylaşılmadığından
 **Dönüş**: Response — İşlem sonucunu içeren HTTP yanıt nesnesi. Başarılı oluşturma durumunda onay, hata durumunda ise uygun hata mesajını döndürür.
 
 **Not**: Fonksiyon docstring'i boş bırakılmış olup, detaylı iç mantık ve implementasyon bilgileri kaynak kodda mevcuttur. Belgeleme için kaynak kod incelenerek parametre şeması, validasyon kuralları ve hata yönetimi detayları eklenmelidir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 

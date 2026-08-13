@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\notification-service\index.ts
-skeleton_hash: 2b730a85f4a94145
+skeleton_hash: fc7dd8f3a0f6d4a5
 entity_hashes:
   func:formatTemplate: 77c1ba2f1d414d11
   func:notification-service_handler: dc7fd5d96878185c
@@ -11,7 +11,7 @@ entity_hashes:
   func:sendSMS: 569d0e2e89431898
   func:sendWhatsApp: 79c6e69b836b3ef4
   overview: 71e4dfd3d4c33151
-generated_at: 2026-05-30T21:36:25Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -102,6 +102,15 @@ Bu modül için varsayımlar, fonksiyon imzaları ve modül sabitlerinden yola �
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::getTenantBranding
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
+- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
+
+---
+
 ## INTERFACES
 
 ### NotificationRequest
@@ -137,13 +146,9 @@ type TemplateData = Record<string, string | number | boolean>
 
 ## SABİTLER
 - **_stockAlertTemplates** (object) — `{
-
   whatsapp: {
-
     low_stock: `🚨 STOK UYARISI 🚨
-
     
-
 📦 Ürün: {{productNa...`
 
 ---
@@ -199,8 +204,8 @@ graph TD
     index_ts__sendEmail["sendEmail"]
     index_ts__sendSMS["sendSMS"]
     index_ts__sendWhatsApp["sendWhatsApp"]
-    index_ts__sendEmail --> index_ts__formatTemplate
     index_ts__sendWhatsApp --> index_ts__formatTemplate
+    index_ts__sendEmail --> index_ts__formatTemplate
 ```
 
 ## NODE ID STANDARD

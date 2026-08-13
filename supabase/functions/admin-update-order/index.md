@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-update-order\index.ts
-skeleton_hash: 2aae01d91a254e30
+skeleton_hash: 80d50e92ff44be65
 entity_hashes:
   func:admin-update-order_handler: 046f5c7fec17e235
   overview: 236389b6147671e5
-generated_at: 2026-05-30T21:36:15Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -50,6 +50,13 @@ Bu modül, Supabase Edge Function ortamında çalışan bir HTTP handler'ıdır.
 - `req`: Request — İşlenecek HTTP istek nesnesi. İstemciden gelen HTTP method, header, body ve query parametrelerini içerir. Admin tarafından gönderilen sipariş güncelleme talimatlarını taşır.
 
 **Dönüş**: Response — İşlem sonucunu içeren HTTP yanıt nesnesi. Başarı durumunda güncellenen sipariş bilgilerini, hata durumunda ise hata mesajını ve uygun HTTP durum kodunu döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 

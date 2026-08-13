@@ -3,14 +3,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\sentry.ts
-skeleton_hash: bf17e002e85319b5
+skeleton_hash: 4a1eb17c4a08a475
 entity_hashes:
   func:parseDsn: de6e6bd80de1e473
   func:postStore: baa7d375e0588daa
   func:sentryCaptureException: d3efed22b661b471
   func:sentryCaptureMessage: f1e4a7cbdea35542
   overview: a0aac1a163270d41
-generated_at: 2026-05-30T21:17:11Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -151,8 +151,8 @@ graph TD
     sentry_ts__sentryCaptureException["sentryCaptureException"]
     sentry_ts__sentryCaptureMessage["sentryCaptureMessage"]
     sentry_ts__sentryCaptureException --> sentry_ts__postStore
-    sentry_ts__sentryCaptureMessage --> sentry_ts__postStore
     sentry_ts__postStore --> sentry_ts__parseDsn
+    sentry_ts__sentryCaptureMessage --> sentry_ts__postStore
 ```
 
 ## NODE ID STANDARD

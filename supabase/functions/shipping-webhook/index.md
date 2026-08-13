@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-webhook\index.ts
-skeleton_hash: c43bc501d6918281
+skeleton_hash: 878d3a1d8a42845a
 entity_hashes:
   func:hmacValid: e5f4d85423ceba98
   func:jsonResponse: d167d2178aa5b5dd
@@ -12,7 +12,7 @@ entity_hashes:
   func:sha256Base64: 0784b35c5d8e45cb
   func:shipping-webhook_handler: b6676fdc25219168
   overview: 408836261e4028d5
-generated_at: 2026-05-30T21:36:34Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -101,6 +101,12 @@ Bu modül, kargo webhook'larını HMAC-SHA256 imza doğrulamasıyla işleyen bir
 **Parametreler**:
 - req: Request — Webhook çağrısını temsil eden HTTP isteği nesnesi.  
 **Dönüş**: Response — İşlem sonucunu içeren HTTP yanıtı.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://esm.sh/@supabase/supabase-js@2::createClient
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-status\index.ts
-skeleton_hash: bdf4bb8403cfeacb
+skeleton_hash: 3b569cae7979ec9d
 entity_hashes:
   func:jsonResponse: 60e54d50747b3229
   func:shipping-status_handler: d099b53accac2970
   overview: 695bc1e855ae9226
-generated_at: 2026-05-30T21:17:01Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -52,6 +52,11 @@ Bu modül, kargo durumu sorgularını işleyen bir Supabase Edge Function olarak
 **Parametreler**:
 - name: req, type: Request — İstemciden gelen HTTP isteğinin tüm detaylarını (url, istek metodu, başlıklar, gövde verisi) içeren standart web Request nesnesi
 **Dönüş**: İşlenen isteğe ait tüm bilgileri ve kargo durumu verisini içeren standart HTTP Response nesnesi döndürür, bu cevap istemciye iletilmek üzere kullanılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: https://esm.sh/@supabase/supabase-js@2::createClient
 
 ---
 

@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\healthz\index.ts
-skeleton_hash: 2f2f8d8c33239d20
+skeleton_hash: 4693e10412249aa1
 entity_hashes:
   func:healthz_handler: 680c3be8d7d51d07
   overview: 7d9308860fa3cc5c
-generated_at: 2026-05-30T21:16:00Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış

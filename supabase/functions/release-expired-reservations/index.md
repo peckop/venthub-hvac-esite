@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\release-expired-reservations\index.ts
-skeleton_hash: 7b8da6bd0f25e4d8
+skeleton_hash: 0b2ab56d5062791b
 entity_hashes:
   func:release-expired-reservations_handler: 2ee83a2fc9a11645
   overview: d6e6683c81c36dd3
-generated_at: 2026-05-30T21:16:46Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -46,6 +46,13 @@ Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyicis
 - `req`: Request — Gelen HTTP istek nesnesi. İstek ile ilgili bilgileri (metot, gövde, başlıklar vb.) içerir ve fonksiyonun çalıştırılması için gerekli parametreleri taşır.
 
 **Dönüş**: Response — İşlem sonucuna göre HTTP yanıt nesnesi döndürür. Başarı veya hata durumunu belirten durum kodu ve opsiyonel mesaj içerebilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://deno.land/std@0.177.0/http/server.ts::serve
+- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
 
 ---
 

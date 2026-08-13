@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\cors.ts
-skeleton_hash: 1151b66ec188024e
+skeleton_hash: 00381c65f282efb4
 entity_hashes:
   func:getCorsHeaders: 1360a70a0a4d6694
   overview: 8eaad34e6f15ad7c
-generated_at: 2026-05-30T21:17:01Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
