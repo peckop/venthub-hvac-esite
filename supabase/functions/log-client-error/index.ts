@@ -101,7 +101,10 @@ Deno.serve(async (req: Request) => {
       const { data: upsertRow } = await supabase
         .from('error_groups')
         .upsert(groupPayload, { onConflict: 'signature' })
-        .select('id, _count')
+        // INV-8 yakaladı: kolon adı `count`tur, `_count` değil — PostgREST tüm select'i
+        // 400'lüyor ve kod her seferinde sessizce aşağıdaki yedek sorguya düşüyordu.
+        // Sadece id okunuyor; count'u RPC (increment_error_group_count) yönetir.
+        .select('id')
         .maybeSingle()
       groupId = upsertRow?.id ?? null
       if (!groupId) {
