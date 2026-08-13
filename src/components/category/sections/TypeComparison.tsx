@@ -98,10 +98,12 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
 
                 {/* Comparison Visual */}
                 <div className={`flex justify-center mb-8 sm:mb-12 ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
-                    <div className="relative w-full max-w-3xl aspect-video">
-                        <VentImage src="/images/category/electric-vs-ambient.png"
+                    {/* Görselin içinde gömülü metin var: kare (1024×1024) kaynak kare kapta,
+                        object-contain ile — object-cover kırpması metni ortadan biçiyordu. */}
+                    <div className="relative w-full max-w-xl aspect-square">
+                        <VentImage src="/images/category/electric-vs-ambient.jpg"
                             alt={t('category.electricVsAmbientAlt')}
-                            className="rounded-xl shadow-lg object-cover"
+                            className="rounded-xl shadow-lg object-contain"
                             fill
                         />
                     </div>
