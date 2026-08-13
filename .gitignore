@@ -92,3 +92,9 @@ docs/screenshots/*.png
 
 # Guard ON/OFF anahtari (yerel toggle, commitlenmez)
 .claude/hooks/guard.state
+
+# Orion/cc yerel hafiza DB — 225MB'a sisti, repo'da yeri yok (yerel kalir)
+.cc/memory.db
+
+# Kok dizin scratch scriptleri (oturum kalintilari)
+/_*.py
