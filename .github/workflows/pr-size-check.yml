@@ -12,6 +12,27 @@ jobs:
       pull-requests: write
 
     steps:
+      # Büyük-dosya guard'ı: 225MB'lik .cc/memory.db sessizce şişip GitHub'ın 100MB
+      # push limitine çarpmadan yakalansın (code-review bulgusu, 2026-08-13).
+      # Tüm takipli ağaç taranır (yalnız diff değil) — sınır 50MB.
+      - name: Checkout (büyük-dosya taraması için)
+        uses: actions/checkout@v4
+
+      - name: Büyük dosya taraması (>50MB = FAIL)
+        shell: bash
+        run: |
+          LIMIT=$((50 * 1024 * 1024))
+          FAIL=0
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue
+            size=$(stat -c%s "$f")
+            if [ "$size" -gt "$LIMIT" ]; then
+              echo "::error file=$f::Takipli dosya ${size} bayt (>50MB) — repo'ya girmemeli (gitignore/untrack)."
+              FAIL=1
+            fi
+          done < <(git ls-files)
+          exit $FAIL
+
       - name: PR satır sayısını kontrol et
         uses: actions/github-script@v7
         with:

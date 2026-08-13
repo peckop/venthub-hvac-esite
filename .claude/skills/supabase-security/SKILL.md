@@ -240,3 +240,16 @@ export async function POST(request: Request) {
   return NextResponse.redirect(new URL('/auth/login', request.url), 302)
 }
 ```
+
+## Yıkıcı Migration Preflight (DROP/RENAME — ZORUNLU cetvel)
+
+Kolon/tablo/fonksiyon DROP'u veya RENAME içeren bir migration yazmadan ÖNCE
+**`docs/standards/migration-safety-standard.md`** cetvelini uygula. Özet:
+
+1. **TS süpürmesi:** `db-rows.ts`'te tip-Omit zorlayıcı ekle → `pnpm type-check` kalan okuyucuları gösterir.
+2. **DB-içi kod süpürmesi (EN SIK ATLANAN):** `pg_proc` + `pg_views`'u kolon adına karşı CANLI SQL ile tara — Postgres plpgsql gövdelerini bağımlılık olarak İZLEMEZ, DROP sessiz geçer, ilk çağrıda patlar. Bulunan fonksiyonları aynı migration'da DROP'tan önce `create or replace` ile geçir.
+3. **Edge süpürmesi:** REST `select=` string'leri tsc için opaktır; `INV-8` (`edge-select-columns.test.ts`) yakalar ama yine de grep'le doğrula — PostgREST bilinmeyen kolonda TÜM sorguyu 400'ler.
+4. **Guard şablonu:** migration'a ön-guard (veri + pg_proc taraması) ve son-guard (kritik RPC'leri GERÇEKTEN çağıran duman testi) ekle — standarttaki şablonu kopyala.
+
+> Doğuş: F5-B D4 (#480) — iki arama RPC'si + iyzico-payment bu süpürmeler yapılmadığı
+> için kırılacaktı; bağımsız inceleme merge'den saatler önce yakaladı.
