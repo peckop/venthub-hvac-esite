@@ -50,6 +50,10 @@ Sonuç: motor kurulduğunda **348 ürün otomatik fiyatlanır**; alış maliyeti
 ### W3 — Admin paneli B1 (kod-only, migration yok)
 - **Ayarlar:** para birimleri, parite görünümü (oto TCMB + elle ezme + spread), KDV modu, yuvarlama/charm politikası.
 - **Marj kuralları:** scope-bazlı CRUD + **etkin-marj matris önizleme** (kural değişince hangi ürünler etkilenir).
+- **Kural giriş biçimleri (Recep gereksinimi, 2026-08-13):** kullanıcı kuralı **yüzde** (%40), **katsayı**
+  (×2 → alış 1.000 TL = satış 2.000 TL) veya **sabit fiyat** olarak girebilir; katsayı k girildiğinde motor
+  `margin_pct=(k−1)×100` olarak saklar (tek kanonik biçim, çift gerçek yok — panel iki yönde çevirir).
+  Sabit fiyat girişinde **KDV dahil / +KDV seçimi** kural başına (`price_is_vat_inclusive`, cetvel §10'da mevcut).
 - **Ürün başına:** alış + para birimi + canlı hesaplanan satış önizleme (her para biriminde, trace'li).
 - admin-standard K1–K5 zorunlu (table-kit, URL-state, RBAC+RLS, `logAdminAction`, 5 durum); §8 skor ≥20/24.
 
@@ -76,7 +80,8 @@ Sonuç: motor kurulduğunda **348 ürün otomatik fiyatlanır**; alış maliyeti
 
 ## 3. Recep'ten karar girdileri (plan onayıyla birlikte veya W4'ten önce)
 
-1. **Başlangıç global marjı** (%? — tek sayı yeter; marka/kategori istisnaları sonra panelden).
+1. **Başlangıç global kâr oranı** — tek değer yeter, biçim serbest: yüzde ("%40") YA DA katsayı ("×1,4").
+   Marka/kategori/ürün istisnaları sonra panelden; hiçbir oran koda gömülmez, hepsi admin-konfigüre.
 2. **Segment farkları:** dealer/corporate listeleri için başlangıç iskonto oranı (ör. bayi %X eksik) — ya da
    "şimdilik hepsi aynı, bayi farkı R2/bayi fazında".
 3. **Yuvarlama politikası:** öneri = düz kuruş yuvarlama, charm (`,90`) kapalı başla (panelden açılır).
