@@ -357,10 +357,13 @@ Deno.serve(async (req: Request) => {
         // Fetch product metadata for snapshots
         const ids = authoritativeItems.map((it) => it.product_id)
         const uniqIds = Array.from(new Set(ids))
-        let prodMap = new Map<string, { id: string; name?: string; sku?: string; image_url?: string | null }>()
+        // F5-B D4: products.image_url kolonu DROP edildi — select listesine geri ekleme
+        // (PostgREST bilinmeyen kolonda TUM sorguyu 400 ile reddeder, prodMap bos kalir).
+        // Gorsel snapshot'i client-side imageMap'ten gelir; ad/SKU sunucudan dogrulanir.
+        let prodMap = new Map<string, { id: string; name?: string; sku?: string }>()
         try {
             if (uniqIds.length > 0) {
-                const pRes = await fetch(`${supabaseUrl}/rest/v1/products?select=id,name,sku,image_url&id=in.(${uniqIds.map(encodeURIComponent).join(',')})`, {
+                const pRes = await fetch(`${supabaseUrl}/rest/v1/products?select=id,name,sku&id=in.(${uniqIds.map(encodeURIComponent).join(',')})`, {
                     headers: {
                         'Authorization': `Bearer ${serviceRoleKey}`,
                         'apikey': serviceRoleKey,
@@ -370,7 +373,7 @@ Deno.serve(async (req: Request) => {
                 if (pRes.ok) {
                     const rows = await pRes.json().catch(() => [])
                     if (Array.isArray(rows)) {
-                        prodMap = new Map((rows as Array<{ id: string; name?: string; sku?: string; image_url?: string | null }>).map((p) => [p.id, p]))
+                        prodMap = new Map((rows as Array<{ id: string; name?: string; sku?: string }>).map((p) => [p.id, p]))
                     }
                 }
             }
@@ -400,7 +403,7 @@ Deno.serve(async (req: Request) => {
             const p = _productId ? (prodMap.get(_productId) as Record<string, unknown> || {}) : {};
             const fid = String(_productId || '')
             const fallbackName = (p.name as string) || nameMap.get(fid) || 'Ürün';
-            const fallbackImage = (p.image_url as string | null) || imageMap.get(fid) || null;
+            const fallbackImage = imageMap.get(fid) || null;
             return {
                 order_id: dbOrderId,
                 product_id: _productId,

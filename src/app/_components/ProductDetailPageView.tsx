@@ -27,8 +27,8 @@ import { BrandIcon } from '../../components/HVACIcons'
 import ImageGallery from '../../components/ImageGallery'
 import LeadModal from '../../components/LeadModal'
 import { ProductSmartInference } from '../../components/product/ProductSmartInference'
-import ProductCard from '../../components/ProductCard'
 import { AddToProjectModal } from '../../components/products'
+import FamilyCard from '../../components/products/FamilyCard'
 import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import Seo from '../../components/Seo'
@@ -39,10 +39,11 @@ import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
 import type { FamilyDetail, FamilyVariant } from '../../lib/services/family.service'
-import { getProductById, getProductsEnriched } from '../../lib/services/product.service'
+import { getFamiliesEnriched } from '../../lib/services/family.service'
+import { getProductById } from '../../lib/services/product.service'
 import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
-import type { Product } from '../../types/ui-models'
+import type { FamilyListItem,Product } from '../../types/ui-models'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import {
   formatSpecValue,
@@ -89,7 +90,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants,
   const { refreshProjects } = useProjectLists()
   const { categories } = useCategories()
 
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
+  const [relatedFamilies, setRelatedFamilies] = useState<FamilyListItem[]>([])
   const [actionProduct, setActionProduct] = useState<Product | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [activeSection, setActiveSection] = useState('general')
@@ -154,24 +155,23 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants,
     return () => { cancelled = true }
   }, [selectedVariantId])
 
-  // İlgili ürünler — ailenin alt kategorisinden, kendi varyantları hariç.
+  // İlgili aileler — bu ailenin alt kategorisinden (yoksa ana kategoriden), kendisi hariç.
+  const relatedCategoryId = family?.subcategory_id ?? family?.category_id ?? null
   useEffect(() => {
-    if (!family?.subcategory_id) {
-      setRelatedProducts([])
+    if (!relatedCategoryId || !family) {
+      setRelatedFamilies([])
       return
     }
     let cancelled = false
-    // get_products_enriched family_id taşımaz (RPC null döner) → kendi varyantlarını
-    // id kümesiyle ele; aksi halde aile kendi kendine "ilgili ürün" olarak görünür.
-    const ownIds = new Set(variants.map((v) => v.id))
-    getProductsEnriched(supabase, { categoryIds: [family.subcategory_id], limit: 12 })
-      .then((list) => {
+    const ownFamilyId = family.id
+    getFamiliesEnriched(supabase, { categoryIds: [relatedCategoryId], limit: 12 })
+      .then(({ items }) => {
         if (cancelled) return
-        setRelatedProducts(list.filter((p) => !ownIds.has(p.id)).slice(0, 4))
+        setRelatedFamilies(items.filter((f) => f.id !== ownFamilyId).slice(0, 4))
       })
-      .catch((err) => { console.warn('Error fetching related products:', err) })
+      .catch((err) => { console.warn('Error fetching related families:', err) })
     return () => { cancelled = true }
-  }, [family?.subcategory_id, variants])
+  }, [relatedCategoryId, family])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -887,13 +887,13 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants,
 
       <div className="bg-white py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {relatedProducts.length > 0 && (
+          {relatedFamilies.length > 0 && (
             <>
               <h2 className="text-xl sm:text-2xl font-black text-industrial-gray mb-10 uppercase tracking-tight">
                 {t('pdp.relatedProducts')}
               </h2>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                {relatedProducts.map((p) => <ProductCard key={p.id} product={p} compact />)}
+                {relatedFamilies.map((f) => <FamilyCard key={f.id} family={f} compact />)}
               </div>
             </>
           )}

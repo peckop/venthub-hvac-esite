@@ -85,7 +85,7 @@ describe('type-converters', () => {
             const dbProd: Partial<DbProduct> = {
                 id: '1',
                 name: 'Jet Fan',
-                description: 'Fast fan',
+                description_i18n: { tr: 'Fast fan' },
                 brand: 'SuperCool'
             }
             const result = mapDatabaseProductToDomain(dbProd as DbProduct)

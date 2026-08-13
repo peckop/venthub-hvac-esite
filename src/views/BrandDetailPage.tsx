@@ -6,19 +6,18 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
-import VentImage from '@/components/ui/VentImage'
-import { resolveProductImageUrl } from '@/lib/images/productImage'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import { BrandIcon } from '../components/HVACIcons'
 import Breadcrumb from '../components/navigation/Breadcrumb'
+import FamilyCard from '../components/products/FamilyCard'
 import Seo from '../components/Seo'
 import { HVAC_BRANDS } from '../data/brands'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import { useI18n } from '../i18n/I18nProvider'
-import { getProductsEnriched } from '../lib/services/product.service'
-import type { Product } from '../types/ui-models'
+import { getFamiliesEnriched } from '../lib/services/family.service'
+import type { FamilyListItem } from '../types/ui-models'
 
 const BRAND_DETAILS: Record<string, {
   founded?: number
@@ -106,27 +105,27 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
   
   const detail = brand ? BRAND_DETAILS[brand.slug] : null
   
-  const [products, setProducts] = useState<Product[]>([])
+  const [families, setFamilies] = useState<FamilyListItem[]>([])
   const [loading, setLoading] = useState(true)
 
-  // --- GATEWAY ADAPTATION: CENTRAL PRODUCT ENGINE ---
+  // --- GATEWAY ADAPTATION: CENTRAL FAMILY ENGINE (F5-B) ---
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadFamilies = async () => {
       if (!brand) return
       setLoading(true)
       try {
-        const data = await getProductsEnriched(supabaseBrowserClient, {
+        const { items } = await getFamiliesEnriched(supabaseBrowserClient, {
           brand: brand.name,
-          limit: 8
+          limit: 12
         })
-        setProducts(data)
+        setFamilies(items)
       } catch (e) {
-        console.error('Error loading brand products:', e)
+        console.error('Error loading brand families:', e)
       } finally {
         setLoading(false)
       }
     }
-    loadProducts()
+    loadFamilies()
   }, [brand])
 
   const breadcrumbItems = [
@@ -314,21 +313,10 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {[1, 2, 3, 4].map(i => <div key={i} className="aspect-square bg-slate-200 rounded-hvac-xl animate-pulse" />)}
             </div>
-          ) : products.length > 0 ? (
+          ) : families.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {products.map((product) => (
-                <Link 
-                  key={product.id} 
-                  href={Routes.product(product.slug!)}
-                  aria-label={`${product.name} ${t('pdp.variantDetails')}`}
-                  className="group block bg-white rounded-hvac-2xl p-8 border border-white transition-shadow duration-700 hover:border-cyan-500/20 hover:shadow-hvac-card-hover"
-                >
-                  <div className="aspect-square relative flex items-center justify-center mb-8 grayscale group-hover:grayscale-0 transition-transform duration-700 group-hover:scale-105">
-                    <VentImage src={resolveProductImageUrl(product)} alt={product.name} fallbackType="product" className="w-full h-full object-contain" />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-2 line-clamp-2">{product.name}</h3>
-                  <div className="text-xs font-bold uppercase tracking-widest text-slate-400">{product.sku}</div>
-                </Link>
+              {families.map((family) => (
+                <FamilyCard key={family.id} family={family} layout="grid" />
               ))}
             </div>
           ) : (

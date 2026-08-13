@@ -60,16 +60,6 @@ export interface FamilyListItem {
   total_count: number;
 }
 
-export interface GetProductsParams {
-  categoryIds?: string[];
-  searchQuery?: string;
-  brand?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  limit?: number;
-  offset?: number;
-}
-
 // Project types moved from src/lib/supabase.ts
 export type UserProject = DbUserProject;
 export type ProjectItem = DbProjectItem & { product?: Product };
