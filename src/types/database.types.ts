@@ -1377,30 +1377,22 @@ export type Database = {
       }
       products: {
         Row: {
-          airflow_capacity: number | null
           barcode: string | null
           brand: string
           category_id: string | null
           created_at: string
           deleted_at: string | null
           depth_mm: number | null
-          description: string | null
           description_i18n: Json | null
           family_id: string | null
           height_mm: number | null
           id: string
-          image_url: string | null
-          is_category_manual: boolean | null
           is_featured: boolean
           is_taxable: boolean
           low_stock_override: boolean
           low_stock_threshold: number | null
-          meta_description: string | null
-          meta_title: string | null
           model_code: string | null
           name: string
-          noise_level: number | null
-          pressure_rating: number | null
           price: number | null
           purchase_currency: string
           purchase_price: number
@@ -1419,30 +1411,22 @@ export type Database = {
           width_mm: number | null
         }
         Insert: {
-          airflow_capacity?: number | null
           barcode?: string | null
           brand: string
           category_id?: string | null
           created_at?: string
           deleted_at?: string | null
           depth_mm?: number | null
-          description?: string | null
           description_i18n?: Json | null
           family_id?: string | null
           height_mm?: number | null
           id?: string
-          image_url?: string | null
-          is_category_manual?: boolean | null
           is_featured?: boolean
           is_taxable?: boolean
           low_stock_override?: boolean
           low_stock_threshold?: number | null
-          meta_description?: string | null
-          meta_title?: string | null
           model_code?: string | null
           name: string
-          noise_level?: number | null
-          pressure_rating?: number | null
           price?: number | null
           purchase_currency?: string
           purchase_price?: number
@@ -1461,30 +1445,22 @@ export type Database = {
           width_mm?: number | null
         }
         Update: {
-          airflow_capacity?: number | null
           barcode?: string | null
           brand?: string
           category_id?: string | null
           created_at?: string
           deleted_at?: string | null
           depth_mm?: number | null
-          description?: string | null
           description_i18n?: Json | null
           family_id?: string | null
           height_mm?: number | null
           id?: string
-          image_url?: string | null
-          is_category_manual?: boolean | null
           is_featured?: boolean
           is_taxable?: boolean
           low_stock_override?: boolean
           low_stock_threshold?: number | null
-          meta_description?: string | null
-          meta_title?: string | null
           model_code?: string | null
           name?: string
-          noise_level?: number | null
-          pressure_rating?: number | null
           price?: number | null
           purchase_currency?: string
           purchase_price?: number
@@ -2972,45 +2948,6 @@ export type Database = {
           subcategory_id: string
           total_count: number
           variant_count: number
-        }[]
-      }
-      get_products_enriched: {
-        Args: {
-          p_brand?: string
-          p_category_ids?: string[]
-          p_limit?: number
-          p_max_price?: number
-          p_min_price?: number
-          p_offset?: number
-          p_search_query?: string
-          p_sort_by?: string
-        }
-        Returns: {
-          airflow_capacity: number
-          brand: string
-          category_id: string
-          created_at: string
-          description: string
-          id: string
-          image_alt: string
-          image_url: string
-          is_featured: boolean
-          low_stock_override: boolean
-          low_stock_threshold: number
-          model_code: string
-          name: string
-          noise_level: number
-          pressure_rating: number
-          price: number
-          sku: string
-          slug: string
-          status: string
-          stock_qty: number
-          subcategory_id: string
-          supplier_name: string
-          technical_specs: Json
-          updated_at: string
-          warehouse_location: string
         }[]
       }
       get_search_suggestions: {
