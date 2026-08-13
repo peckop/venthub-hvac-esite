@@ -1,0 +1,2 @@
+[functions.tcmb-rates-sync]
+verify_jwt = false
