@@ -34,14 +34,6 @@ type IyziCtor = new (args: { apiKey: string; secretKey: string; uri: string }) =
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
-  const cors = corsHeaders;
-  
-  const corsHeaders: Record<string, string> = {
-    "Access-Control-Allow-Origin": allowed ? origin : 'https://venthub-hvac-esite.vercel.app',
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Max-Age": "86400",
-  };
 
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });

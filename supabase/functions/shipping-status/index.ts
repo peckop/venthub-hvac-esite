@@ -1,5 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 // Supabase Edge Function: shipping-status
 // Returns shipping status for a given order_id or tracking_number
 // Env required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (read-only is okay but service role simplifies policies in sandbox)
@@ -32,8 +31,8 @@ Deno.serve(async (req: Request) => {
     try {
       const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')
       const { result } = await checkRateLimit(key, SUPABASE_URL, SERVICE_KEY, {
-        _limit: Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_PER_MINUTE') || 30),
-        _windowSec: Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_WINDOW_SEC') || 60)
+        limit: Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_PER_MINUTE') || 30),
+        windowSec: Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_WINDOW_SEC') || 60)
       })
       if (!result.allowed) {
         const rlHeaders = rateLimitHeaders(Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_PER_MINUTE') || 30), result.remaining, result.resetAt)

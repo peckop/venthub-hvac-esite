@@ -7,7 +7,6 @@ export type NotifyField = { title: string; value: string; short?: boolean };
 // Deno specific env access
 const getEnv = (key: string): string => {
   try {
-    // @ts-expect-error: Deno is available in Edge Functions
     return Deno.env.get(key) || '';
   } catch {
     return '';

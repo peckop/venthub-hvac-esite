@@ -126,7 +126,7 @@ serve(async (req) => {
       body: JSON.stringify({ payment_status: newPaymentStatus, status: newOrderStatus, payment_debug: newDebug })
     })
     if (!upd.ok) {
-      const txt = await upd._text().catch(()=> '')
+      const txt = await upd.text().catch(()=> '')
       return new Response(JSON.stringify({ error: 'order_update_failed', status: upd.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 

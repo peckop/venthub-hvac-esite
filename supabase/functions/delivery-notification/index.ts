@@ -138,7 +138,7 @@ serve(async (req) => {
       body: JSON.stringify({ from: emailFrom, to: [customer_email], subject, html })
     })
     if (!resp.ok) {
-      const t = await resp._text().catch(()=> '')
+      const t = await resp.text().catch(()=> '')
       return new Response(JSON.stringify({ error: 'send_failed', body: t }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
     const result = await resp.json().catch(()=>({}))

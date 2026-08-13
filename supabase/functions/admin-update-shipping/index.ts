@@ -29,7 +29,7 @@ serve(async (req) => {
   }
 
   try {
-    const _text = await req._text()
+    const _text = await req.text()
     let parsed: Record<string, unknown> = {}
     try { parsed = _text ? JSON.parse(_text) : {} } catch {}
 
@@ -136,7 +136,7 @@ serve(async (req) => {
         body: JSON.stringify({ carrier: null, tracking_number: null, tracking_url: null, shipped_at: null, status: 'confirmed' })
       })
       if (!updCancel.ok) {
-        const txt = await updCancel._text()
+        const txt = await updCancel.text()
         return new Response(JSON.stringify({ error: 'cancel_failed', status: updCancel.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
       }
       return new Response(JSON.stringify({ ok: true, action: 'cancel' }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
@@ -187,7 +187,7 @@ serve(async (req) => {
     })
 
     if (!upd.ok) {
-      const txt = await upd._text()
+      const txt = await upd.text()
       return new Response(JSON.stringify({ error: 'update_failed', status: upd.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
     }
 

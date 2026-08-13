@@ -16,12 +16,8 @@ const clientErrorSchema = z.object({
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   const cors = corsHeaders;
-  
+
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
-  const cors = {
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
-} as Record<string,string>
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
 
@@ -117,7 +113,7 @@ Deno.serve(async (req: Request) => {
         groupId = (q.data as { id?: string } | null)?.id || null
       }
       if (groupId) {
-        await supabase.rpc('increment_error_group_count', { p_grou_p_id: groupId }).catch(()=>{})
+        await supabase.rpc('increment_error_group_count', { p_group_id: groupId }).then(()=>{}, ()=>{})
       }
     } catch {
       // ignore grouping errors
@@ -132,9 +128,9 @@ Deno.serve(async (req: Request) => {
         const { data: recent } = await supabase
           .from('client_errors')
           .select('id, at')
-          .eq('grou_p_id', groupId)
+          .eq('group_id', groupId)
           .gte('at', since)
-          ._limit(1)
+          .limit(1)
         if (Array.isArray(recent) && recent.length > 0) {
           return new Response('ok', { status: 200, headers: cors })
         }
@@ -154,8 +150,8 @@ Deno.serve(async (req: Request) => {
       level: mask(String(payload.level || 'error')),
       extra: (typeof payload.extra === 'object' && payload.extra !== null) ? payload.extra : null,
     }
-    // Only include grou_p_id if available; avoid failures if column doesn't exist
-    if (groupId) (row as Record<string, unknown>).grou_p_id = groupId
+    // Only include group_id if available; avoid failures if column doesn't exist
+    if (groupId) (row as Record<string, unknown>).group_id = groupId
 
     const { error } = await supabase.from('client_errors').insert(row)
     if (error) {

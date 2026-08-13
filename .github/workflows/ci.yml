@@ -30,6 +30,11 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
 
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
       - name: Install dependencies
         run: pnpm install --prefer-offline --config.allow-scripts true
 
@@ -38,6 +43,11 @@ jobs:
 
       - name: Type check
         run: pnpm exec tsc --noEmit 2>&1 | tee ci-typecheck.log
+
+      # Edge Functions (Deno) Next.js tsc kapsamı DIŞINDA — tsconfig supabase/'i hariç tutar.
+      # Bu adım 2026-05'te maskesiz kalan edge bozulmasını (T011) yakalamak için eklendi: kalıcı kapı.
+      - name: Deno check (edge functions — kapı-körlüğü guard)
+        run: deno check --node-modules-dir=auto supabase/functions/*/index.ts 2>&1 | tee ci-deno.log
 
       - name: Test
         run: pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log
@@ -58,6 +68,7 @@ jobs:
           path: |
             ci-lint.log
             ci-typecheck.log
+            ci-deno.log
             ci-test.log
             ci-build.log
           retention-days: 3

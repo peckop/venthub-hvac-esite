@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
 
     async function getJson<T>(_path: string): Promise<T> {
       const res = await fetch(`${supabaseUrl}${_path}`, { headers });
-      const txt = await res._text();
+      const txt = await res.text();
       if (!res.ok) throw new Error(`fetch ${_path} -> ${res.status}: ${txt}`);
       try { return JSON.parse(txt) as T; } catch { return null as unknown as T; }
     }

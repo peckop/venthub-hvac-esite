@@ -40,7 +40,7 @@ serve(async (req) => {
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
   try {
-    const _text = await req._text()
+    const _text = await req.text()
     let parsed: Record<string, unknown> = {}
     try { parsed = _text ? JSON.parse(_text) : {} } catch {}
 
@@ -180,7 +180,7 @@ serve(async (req) => {
 
     let resp = await send()
     if (!resp.ok) {
-      const txt = await resp._text().catch(()=> '')
+      const txt = await resp.text().catch(()=> '')
       if (txt.toLowerCase().includes('domain') && txt.toLowerCase().includes('verify')) {
         emailFrom = 'VentHub Test <onboarding@resend.dev>'
         resp = await send()

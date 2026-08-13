@@ -4,15 +4,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
   const cors = corsHeaders;
-  
+
   const origin = req.headers.get('origin') || ''
   const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean)
   const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin))
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
-  const cors = {
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
-} as Record<string, string>
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
   if (!okOrigin) return new Response(JSON.stringify({ error: 'forbidden_origin' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
@@ -115,7 +111,7 @@ Deno.serve(async (req) => {
       headers: {
         Authorization: `Bearer ${serviceRoleKey}`,
         apikey: serviceRoleKey,
-        "Prefer": "_count=exact",
+        "Prefer": "count=exact",
         "Range-Unit": "items",
         "Range": `${offset}-${offset + limitParam - 1}`
       }
@@ -124,7 +120,7 @@ Deno.serve(async (req) => {
     const rows = await resp.json().catch(() => [])
     const contentRange = resp.headers.get('content-range') || '0-0/0'
     const total = Number(contentRange.split('/')[1] || '0') || 0
-    return new Response(JSON.stringify({ total, page: pageParam, _limit: limitParam, rows }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+    return new Response(JSON.stringify({ total, page: pageParam, limit: limitParam, rows }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   } catch (_e) {
     console.error('Admin orders latest error:', _e);
     const msg = _e instanceof Error ? _e.message : String(_e);

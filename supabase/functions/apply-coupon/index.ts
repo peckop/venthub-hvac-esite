@@ -1,4 +1,3 @@
-import { getCorsHeaders } from '../_shared/cors.ts'
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
@@ -32,17 +31,15 @@ type ApplyCouponReq = {
 }
 
 type ApplyCouponResp = {
-  val_id: boolean
+  valid: boolean
   reason?: string
   discount_amount?: number
   final_total?: number
   normalized_code?: string
+  details?: string
 }
 
 Deno.serve(async (req: Request) => {
-  const corsHeaders = getCorsHeaders(req);
-  const cors = corsHeaders;
-  
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
   const cors = buildCors(req)
   if (req.method === 'OPTIONS') {
@@ -91,24 +88,24 @@ Deno.serve(async (req: Request) => {
     const code = String(body?.code || '').trim()
     const subtotal = Number(body?.subtotal || 0)
     if (!code || code.length < 3) {
-      return new Response(JSON.stringify({ val_id: false, reason: 'invalid_code' } satisfies ApplyCouponResp), { status: 400, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
+      return new Response(JSON.stringify({ valid: false, reason: 'invalid_code' } satisfies ApplyCouponResp), { status: 400, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
     }
     if (!Number.isFinite(subtotal) || subtotal <= 0) {
-      return new Response(JSON.stringify({ val_id: false, reason: 'invalid_subtotal' } satisfies ApplyCouponResp), { status: 400, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
+      return new Response(JSON.stringify({ valid: false, reason: 'invalid_subtotal' } satisfies ApplyCouponResp), { status: 400, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
     }
 
-    const { _data, error } = await supabase
+    const { data, error } = await supabase
       .from('coupons')
       .select('code,discount_type,discount_value,minimum_order_amount,valid_from,valid_until,is_active,usage_limit,used_count')
       .eq('code', code)
       .maybeSingle()
 
     if (error) {
-      return new Response(JSON.stringify({ val_id: false, reason: 'db_error' }), { status: 500, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
+      return new Response(JSON.stringify({ valid: false, reason: 'db_error' }), { status: 500, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
     }
-    const row = _data as CouponRow | null
+    const row = data as CouponRow | null
     if (!row) {
-      return new Response(JSON.stringify({ val_id: false, reason: 'not_found' }), { status: 404, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
+      return new Response(JSON.stringify({ valid: false, reason: 'not_found' }), { status: 404, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
     }
 
     const now = Date.now()
@@ -119,7 +116,7 @@ Deno.serve(async (req: Request) => {
     const minOk = row.minimum_order_amount == null || subtotal >= Number(row.minimum_order_amount)
 
     if (!(startsOk && endsOk && activeOk && limitOk && minOk)) {
-      return new Response(JSON.stringify({ val_id: false, reason: 'not_applicable' } satisfies ApplyCouponResp), { status: 200, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
+      return new Response(JSON.stringify({ valid: false, reason: 'not_applicable' } satisfies ApplyCouponResp), { status: 200, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
     }
 
     let discount = 0
@@ -129,15 +126,15 @@ Deno.serve(async (req: Request) => {
       discount = Number(row.discount_value)
     }
     if (!Number.isFinite(discount) || discount <= 0) {
-      return new Response(JSON.stringify({ val_id: false, reason: 'zero_discount' } satisfies ApplyCouponResp), { status: 200, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
+      return new Response(JSON.stringify({ valid: false, reason: 'zero_discount' } satisfies ApplyCouponResp), { status: 200, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
     }
     if (discount > subtotal) discount = subtotal
     const finalTotal = Number((subtotal - discount).toFixed(2))
 
-    const resp: ApplyCouponResp = { val_id: true, discount_amount: Number(discount.toFixed(2)), final_total: finalTotal, normalized_code: row.code }
+    const resp: ApplyCouponResp = { valid: true, discount_amount: Number(discount.toFixed(2)), final_total: finalTotal, normalized_code: row.code }
     return new Response(JSON.stringify(resp), { status: 200, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
   } catch (_e) {
     const msg = _e instanceof Error ? _e.message : String(_e)
-    return new Response(JSON.stringify({ val_id: false, reason: 'internal', details: msg } satisfies ApplyCouponResp), { status: 500, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
+    return new Response(JSON.stringify({ valid: false, reason: 'internal', details: msg } satisfies ApplyCouponResp), { status: 500, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
   }
 })

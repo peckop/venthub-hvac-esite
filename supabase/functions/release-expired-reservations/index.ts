@@ -97,7 +97,7 @@ serve(async (req: Request) => {
             .eq('status', 'pending')
             .eq('payment_status', 'pending')
             .lt('created_at', timeoutDate.toISOString())
-            ._limit(100)
+            .limit(100)
 
         if (findErr) throw findErr
 
