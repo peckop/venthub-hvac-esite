@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\lib\__tests__\pdfGeneratorFallback.test.ts
-skeleton_hash: e20b2defe8361434
+skeleton_hash: 1f638c760f511bb6
 entity_hashes:
   overview: 637a7320dc445949
-generated_at: 2026-06-08T10:09:33Z
+generated_at: 2026-08-13T19:37:07Z
 ---
 
 ## Genel Bakış
@@ -36,6 +36,18 @@ Bu modül, bir **test dosyası** olup gerçek fonksiyon imzası içermemektedir.
 ---
 
 ## FONKSİYON DETAYLARI
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../pdfGenerator::generateProductDatasheet
+- import: @/types/ui-models::type { Product }
+- import: vitest::afterEach
+- import: vitest::beforeEach
+- import: vitest::describe
+- import: vitest::expect
+- import: vitest::it
+- import: vitest::vi
 
 ---
 

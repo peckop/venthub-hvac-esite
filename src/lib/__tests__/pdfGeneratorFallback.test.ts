@@ -84,6 +84,8 @@ describe('generateProductDatasheet Fallback Handling', () => {
     width_mm: null,
     weight_kg: null,
     purchase_currency: 'TRY',
+    purchase_rate_to_base: null,
+    cost_in_base: null,
     tax_rate: 20,
     is_taxable: true,
     description_i18n: null,

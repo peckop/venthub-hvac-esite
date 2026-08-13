@@ -507,6 +507,50 @@ export type Database = {
           },
         ]
       }
+      currency_rates: {
+        Row: {
+          base_ccy: string
+          effective_date: string
+          fetched_at: string
+          id: string
+          quote_ccy: string
+          rate: number
+          source: string
+          spread_pct: number
+          tenant_id: string
+        }
+        Insert: {
+          base_ccy?: string
+          effective_date: string
+          fetched_at?: string
+          id?: string
+          quote_ccy: string
+          rate: number
+          source: string
+          spread_pct?: number
+          tenant_id?: string
+        }
+        Update: {
+          base_ccy?: string
+          effective_date?: string
+          fetched_at?: string
+          id?: string
+          quote_ccy?: string
+          rate?: number
+          source?: string
+          spread_pct?: number
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "currency_rates_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       error_groups: {
         Row: {
           assigned_to: string | null
@@ -1078,6 +1122,146 @@ export type Database = {
           },
         ]
       }
+      pricing_rule: {
+        Row: {
+          base: string
+          brand_id: string | null
+          category_id: string | null
+          charm_ending: number | null
+          created_at: string
+          currency: string | null
+          fixed_price: number | null
+          id: string
+          is_exclusive: boolean
+          margin_pct: number | null
+          max_margin_abs: number | null
+          method: string
+          min_margin_abs: number | null
+          min_quantity: number
+          price_book_id: string | null
+          price_is_vat_inclusive: boolean
+          priority: number
+          product_id: string | null
+          round_to: number | null
+          scope: number
+          surcharge: number
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          valid_from: string | null
+          valid_to: string | null
+          vat_rate_pct: number
+        }
+        Insert: {
+          base?: string
+          brand_id?: string | null
+          category_id?: string | null
+          charm_ending?: number | null
+          created_at?: string
+          currency?: string | null
+          fixed_price?: number | null
+          id?: string
+          is_exclusive?: boolean
+          margin_pct?: number | null
+          max_margin_abs?: number | null
+          method: string
+          min_margin_abs?: number | null
+          min_quantity?: number
+          price_book_id?: string | null
+          price_is_vat_inclusive?: boolean
+          priority?: number
+          product_id?: string | null
+          round_to?: number | null
+          scope: number
+          surcharge?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          valid_from?: string | null
+          valid_to?: string | null
+          vat_rate_pct?: number
+        }
+        Update: {
+          base?: string
+          brand_id?: string | null
+          category_id?: string | null
+          charm_ending?: number | null
+          created_at?: string
+          currency?: string | null
+          fixed_price?: number | null
+          id?: string
+          is_exclusive?: boolean
+          margin_pct?: number | null
+          max_margin_abs?: number | null
+          method?: string
+          min_margin_abs?: number | null
+          min_quantity?: number
+          price_book_id?: string | null
+          price_is_vat_inclusive?: boolean
+          priority?: number
+          product_id?: string | null
+          round_to?: number | null
+          scope?: number
+          surcharge?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          valid_from?: string | null
+          valid_to?: string | null
+          vat_rate_pct?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pricing_rule_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_rule_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_rule_price_book_id_fkey"
+            columns: ["price_book_id"]
+            isOneToOne: false
+            referencedRelation: "price_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_rule_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "pricing_rule_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_velocity"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "pricing_rule_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_rule_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_authorities: {
         Row: {
           badge_text: string | null
@@ -1380,6 +1564,7 @@ export type Database = {
           barcode: string | null
           brand: string
           category_id: string | null
+          cost_in_base: number | null
           created_at: string
           deleted_at: string | null
           depth_mm: number | null
@@ -1396,6 +1581,7 @@ export type Database = {
           price: number | null
           purchase_currency: string
           purchase_price: number
+          purchase_rate_to_base: number | null
           sku: string
           slug: string | null
           status: string
@@ -1414,6 +1600,7 @@ export type Database = {
           barcode?: string | null
           brand: string
           category_id?: string | null
+          cost_in_base?: number | null
           created_at?: string
           deleted_at?: string | null
           depth_mm?: number | null
@@ -1430,6 +1617,7 @@ export type Database = {
           price?: number | null
           purchase_currency?: string
           purchase_price?: number
+          purchase_rate_to_base?: number | null
           sku: string
           slug?: string | null
           status?: string
@@ -1448,6 +1636,7 @@ export type Database = {
           barcode?: string | null
           brand?: string
           category_id?: string | null
+          cost_in_base?: number | null
           created_at?: string
           deleted_at?: string | null
           depth_mm?: number | null
@@ -1464,6 +1653,7 @@ export type Database = {
           price?: number | null
           purchase_currency?: string
           purchase_price?: number
+          purchase_rate_to_base?: number | null
           sku?: string
           slug?: string | null
           status?: string
