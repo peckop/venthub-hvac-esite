@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-20T05:03:16.023651+00:00
+compiled_at: 2026-08-11T06:40:37.764493+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-06-20T05:03:16.023651+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -51,7 +51,8 @@ Bu belge, otonom derleyici tarafından 2026-06-20T05:03:16.023651+00:00 tarihind
 │   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
 │   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
 │   │   ├── ⚪ `legal-i18n-scope-antigravity-2026-06-16.md`
-│   │   └── ⚪ `lighthouse_diagnostic_2026-06-10.md`
+│   │   ├── ⚪ `lighthouse_diagnostic_2026-06-10.md`
+│   │   └── ⚪ `product-schema-ground-truth-2026-06-21.md`
 │   ├── ⚪ `database_schema_master.md`
 │   ├── ⚪ `design_system_config.md`
 │   ├── 📂 **legal/**
@@ -59,16 +60,19 @@ Bu belge, otonom derleyici tarafından 2026-06-20T05:03:16.023651+00:00 tarihind
 │   ├── 📂 **plans/**
 │   │   ├── ⚪ `3d-migration-waves-2026-06-17.md`
 │   │   ├── ⚪ `3d-wave3-models-brief.md`
+│   │   ├── ⚪ `README.md`
 │   │   ├── ⚪ `admin-cila-fan-out-2026-06-19.md`
 │   │   ├── ⚪ `admin-enterprise-roadmap-2026-06-13.md`
 │   │   ├── ⚪ `admin-page-rewrites-brief.md`
 │   │   ├── ⚪ `admin-shell-e1-command-palette-brief.md`
 │   │   ├── ⚪ `admin-shell-e2-notification-inbox-brief.md`
 │   │   ├── ⚪ `avensair-teslim-yol-haritasi-2026-06-15.md`
+│   │   ├── ⚪ `catalog-commerce-pipeline-master-2026-06-20.md`
 │   │   ├── ⚪ `faz0-kit-contract-2026-06-13.md`
 │   │   ├── ⚪ `faz1-migration-playbook-2026-06-13.md`
 │   │   ├── ⚪ `faz1-remaining-divided-2026-06-13.md`
 │   │   ├── ⚪ `faz2-admin-backlog.md`
+│   │   ├── ⚪ `hvac_relations_migration_plan.md`
 │   │   ├── ⚪ `i18n-jsx-literals-cleanup-2026-06-14.md`
 │   │   ├── ⚪ `j1-dashboard-data-brief.md`
 │   │   ├── ⚪ `j10-inventorysettings-refactor-brief.md`
@@ -86,7 +90,11 @@ Bu belge, otonom derleyici tarafından 2026-06-20T05:03:16.023651+00:00 tarihind
 │   │   ├── ⚪ `j7-returns-refactor-brief.md`
 │   │   ├── ⚪ `j8-coupons-refactor-brief.md`
 │   │   ├── ⚪ `j9-categorybuilder-refactor-brief.md`
+│   │   ├── ⚪ `product-schema-master-implementation-plan.md`
+│   │   ├── ⚪ `product-schema-standard-brief.md`
+│   │   ├── ⚪ `saas-funding-and-packaging-2026-06.md`
 │   │   ├── ⚪ `seo-transition-blueprint.md`
+│   │   ├── ⚪ `slug-localization-2026-08-10.md`
 │   │   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
 │   │   ├── ⚪ `venthub_saas_faz1_prompt.md`
 │   │   └── ⚪ `venthub_saas_master_roadmap.md`
@@ -110,11 +118,16 @@ Bu belge, otonom derleyici tarafından 2026-06-20T05:03:16.023651+00:00 tarihind
 │   │   ├── ⚪ `admin-capabilities.md`
 │   │   ├── ⚪ `admin-standard.md`
 │   │   ├── ⚪ `analytics-standard.md`
+│   │   ├── ⚪ `catalog-ingestion-standard.md`
 │   │   ├── ⚪ `category-taxonomy-standard.md`
 │   │   ├── ⚪ `collaboration-protocol.md`
+│   │   ├── ⚪ `csv-import-export-standard.md`
 │   │   ├── ⚪ `dealer-module-blueprint.md`
 │   │   ├── ⚪ `dealer-network-standard.md`
-│   │   └── ⚪ `i18n-localization-standard.md`
+│   │   ├── ⚪ `i18n-localization-standard.md`
+│   │   ├── ⚪ `pricing-standard.md`
+│   │   ├── ⚪ `product-schema-standard.md`
+│   │   └── ⚪ `work-tracking-ssot-standard.md`
 │   ├── ⚪ `supabase_functions_master.md`
 │   ├── ⚪ `system_tree.md`
 │   ├── ⚪ `venthub_hvac_master.md`

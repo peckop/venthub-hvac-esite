@@ -31,12 +31,17 @@
           {
             "type": "command",
             "command": "node .claude/hooks/verify-on-stop.cjs",
-            "async": true,
             "timeout": 120,
-            "statusMessage": "verify (eslint --fix + tsc)"
+            "statusMessage": "verify (eslint --fix + tsc)",
+            "async": true
           }
         ]
       }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(gh run *)"
     ]
   }
 }
