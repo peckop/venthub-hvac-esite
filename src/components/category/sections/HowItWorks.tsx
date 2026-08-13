@@ -46,13 +46,15 @@ const HowItWorks: React.FC = () => {
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                    {/* Technical Diagram Image */}
-                    <div className={`relative rounded-2xl overflow-hidden shadow-xl ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
+                    {/* Technical Diagram Image — fill + kare kap: VentImage fill'siz modda
+                        sayısal width'i sarmalayıcıya inline px genişlik olarak basıyor,
+                        dar kolonda sağ taraf kırpılıyordu (diyagramın DIŞ ORTAM yarısı
+                        görünmüyordu). Gömülü-metinli görsel: object-contain zorunlu. */}
+                    <div className={`relative aspect-square rounded-2xl overflow-hidden shadow-xl ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
                         <VentImage src="/images/category/air-curtain-diagram.jpg"
                             alt={diagramAltVal}
-                            className="w-full h-auto"
-                            width={1024}
-                            height={1024}
+                            className="object-contain"
+                            fill
                             loading="lazy"
                          />
                     </div>

@@ -74,7 +74,7 @@ const VentImage: React.FC<VentImageProps> = ({
         sizes={props.sizes || (isFillMode ? "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" : undefined)}
         className={`transition-opacity duration-300 transform-gpu ease-in-out ${
           (isLoaded || props.priority) ? 'opacity-100' : 'opacity-0'
-        } ${isFillMode ? 'object-cover' : 'w-full h-auto'} ${className || ''}`}
+        } ${isFillMode ? (/\bobject-/.test(className || '') ? '' : 'object-cover') : 'w-full h-auto'} ${className || ''}`}
         onLoad={() => setIsLoaded(true)}
         onError={() => {
           console.warn(`VentImage: Failed to load -> ${src}`);
