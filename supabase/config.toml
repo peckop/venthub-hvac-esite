@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions."return-status-notification"]
 verify_jwt = false
+
+[functions."tcmb-rates-sync"]
+verify_jwt = false

@@ -53,6 +53,9 @@ jobs:
       - name: Deploy log-client-error
         run: supabase functions deploy log-client-error --project-ref "$SUPABASE_PROJECT_REF"
 
+      - name: Deploy tcmb-rates-sync
+        run: supabase functions deploy tcmb-rates-sync --project-ref "$SUPABASE_PROJECT_REF"
+
       - name: List functions
         run: supabase functions list --project-ref "$SUPABASE_PROJECT_REF"
 
