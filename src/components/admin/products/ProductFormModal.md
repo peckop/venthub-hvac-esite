@@ -3,50 +3,65 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\admin\products\ProductFormModal.tsx
-skeleton_hash: dd3fa6b546bc96f0
+skeleton_hash: c9d3d39f056d0bd2
 entity_hashes:
   func:ProductFormModal: 6997b37c35b0ebef
+  func:getProductSchema: 1aed3dbe58799d62
   func:onSubmit: 56cec6a550e2cc75
-  overview: bdc9be85385803dd
+  overview: 7ffa6a2ec80048ee
   style_tokens: 553a7b8fa0cd3c86
-generated_at: 2026-06-08T10:08:37Z
+generated_at: 2026-08-13T08:57:18Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelinde ürün ekleme ve düzenleme işlemlerini gerçekleştiren bir form modalı bileşenidir. Kullanıcıya form gösterimi, veri doldurma ve gönderim sonrası iş akışlarını (başarı/hata durumlarını) yöneten bir arayüz sağlar.
+Bu modül, yönetici panelinde ürün ekleme ve düzenleme işlemlerini gerçekleştiren form modalı bileşenidir. Doğrulama şeması oluşturarak form alanlarının güvenli bir şekilde doldurulmasını sağlar ve gönderilen verileri sunucuya aktararak geri bildirim akışlarını yönetir.
 
 ## Fonksiyon Grupları
-### Modal Bileşeni ve Görünüm Yönetimi
-Bileşenin açılıp kapanmasını, veri modunu (yeni ürün veya düzenleme) ve form alanlarının başlangıç değerlerini dış prop'lar aracılığıyla kontrol eder.
+### Form Doğrulama Şeması
+Ürün formundaki alanlar için dinamik bir doğrulama şeması oluşturur; çeviri fonksiyonuyla birlikte hata mesajlarının çoklu dil destekli olmasını sağlar.
+- getProductSchema
+
+### Modal Bileşeni ve Etkileşim Yönetimi
+Ürün ekleme/düzenleme modunda açılan modal penceresini, form yapılandırmasını ve kullanıcı etkileşimlerini (açma/kapama, başarı/hata durumları) yöneten ana bileşendir.
 - ProductFormModal
 
-### Form İşlemleri ve Gönderim Akışı
-Kullanıcının doldurduğu form verilerini sunucuya gönderen ve sürecin sonucuna göre (başarılı kaydetme, hata) ilgili geri bildirimleri tetikleyen iş mantığını yürütür.
+### Form Gönderim İş Akışı
+Kullanıcının doldurduğu form verilerini doğrular, sunucuya asenkron olarak gönderir ve sürecin sonucuna göre üst bileşeni bilgilendirerek gerekli UI güncellemelerini tetikler.
 - onSubmit
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, ürün ekleme/düzenleme formunu yöneten bir React modal bileşenidir. Doğru çalışması için aşağıdaki varsayımlar geçerlidir.
+Bu modül, yönetici panelinde ürün ekleme/düzenleme işlemlerini gerçekleştiren bir form modalı bileşenidir ve aşağıdaki mimari varsayımlara dayanır.
 
-**[Aksiyom 1]**: Eğer `onClose` callback'i sağlanmamışsa, modal kapatma işlemi（tuş tıklaması, backdrop tıklaması, ESC tuşu）sonucunda uygulama hata verir veya modal kapanamaz.
+[Aksiyom 1]: Eğer `getProductSchema` fonksiyonuna geçirilen `t` (çeviri fonksiyonu) çalışmıyorsa veya beklenen anahtarları döndürmüyorsa, form alanlarının başlık/etiket değerleri hatalı veya boş oluşur.
 
-**[Aksiyom 2]**: Eğer `onSuccess` callback'i sağlanmamışsa, form gönderimi başarılı olduğunda üst bileşen bilgilendirilemez; başarı durumu UI'da görünmesine rağmen üst seviye akış（örn: liste yenileme）çalışmaz.
+[Aksiyom 2]: Eğer `ProductFormModal` bileşenine `open` prop'u sağlanmıyorsa, modalın başlangıç görünürlük durumu belirsiz olur ve bileşen kontrollü bir şekilde açılamaz.
 
-**[Aksiyom 3]**: Eğer `productSchema` geçerli bir Zod/joi gibi bir validation şeması olarak çağrılamıyorsa, form alanları doğrulanamaz ve hatalı veriler `onSubmit` fonksiyonuna ulaşır.
+[Aksiyom 3]: Eğer `onClose` callback'i sağlanmıyorsa, kullanıcı modalı kapatmaya çalıştığında üst bileşene bildirim yapılamaz ve modal kapatma işlevsel olarak bozulur.
 
-**[Aksiyom 4]**: Eğer `_productId` parametresi `undefined` veya `null` olarak verilmişse, form "yeni ürün ekleme" modunda açılmalıdır；değer verilmişse, ilgili ürün verisiyle "düzenleme" modunda açılmalıdır.
+[Aksiyom 4]: Eğer `onSuccess` callback'i sağlanmıyorsa, form başarıyla gönderildikten sonra üst bileşen bu durumdan haberdar olamaz; örneğin liste yenileme veya yönlendirme gibi sonraki adımlar tetiklenemez.
 
-**[Aksiyom 5]**: Eğer `open` parametresi `false` ise ve modal iç bileşen buna rağmen render edilmeye devam ediyorsa, gereksiz API çağrıları veya form state bozulmaları oluşur.
+[Aksiyom 5]: Eğer `_productId` prop'u belirtilmiyorsa, modal "yeni ürün ekleme" modunda çalışır; belirtiliyorsa "düzenleme" moduna geçer ve mevcut ürün verilerini yüklemesi beklenir.
 
-**[Aksiyom 6]**: Eğer `_productId` düzenleme modunda verilmiş ancak ilgili ürün ID'si backend'de mevcut değilse, form verilerinin yüklenemesi durumunda kullanıcıya hata bildirimi yapılmalıdır；aksi halde boş form ile sessiz düzenleme yapılır.
+[Aksiyom 6]: Eğer `onSubmit` fonksiyonuna geçilen `ProductFormValues` geçerli bir veri içermiyorsa, asenkron sunucu isteği hatalı veriyle gönderilir veya form doğrulama aşamasında başarısız olur.
 
-**[Aksiyom 7]**: Eğer `onSubmit` fonksiyonu `ProductFormValues` tipinde geçerli bir değer almıyorsa（örn: validation başarısız olduğunda form yine de submit edilirse），beklenmeyen veri yapısı hatası oluşur.
+[Aksiyom 7]: Eğer modal `open=true` durumdayken bileşen yeniden render edilmiyorsa, form alanlarının başlangıç değerleri (düzenleme modunda mevcut ürün verileri) güncellenmeyebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### getProductSchema
+**Ne yapar**: Verilen bir metin çeviri fonksiyonunu (`t`) kullanarak, ürün formu için gerekli olan validasyon şemasını (Yup veya Zod benzeri) oluşturan bir işlevi çağırır. Bu işlev, form alanları için gerekli kuralları ve hata mesajlarını tanımlar.
+
+**Nasıl yapar**: Fonksiyon, kendi iç mantığına sahip değildir; sadece daha önce tanımlanmış (muhtemelen farklı bir dosyadan import edilmiş) `getProductSchema` adlı bir işlevi bir wrapper (kapsayıcı) gibi çağırarak sonucunu döndürür. Bu yapı, belirli bir bağlamda (örn: bir React bileşeni içinde) işlevin tekrar tekrar kullanılmasını sağlar ve ana işlevi dışarıdan bağımsız bir şekilde test edilebilir hale getirebilir.
+
+**Parametreler**:
+- `t`: `(key: string) => string` — Bir metin anahtarını (key) yerelleştirilmiş (localized) bir metin dizgesine çeviren fonksiyon. Bu, genellikle uluslararasılaştırma (i18n) kütüphanelerinden sağlanan bir çeviri fonksiyonudur.
+
+**Dönüş**: Fonksiyonun dönüş tipi kodda belirsiz (`void` veya `bilinmiyor`) olarak not edilmiştir, ancak `getProductSchema` işlevi muhtemelen bir `Schema` nesnesi (örn: Yup.object() veya Zod.object()) döndürmektedir. Bu nesne, formun validasyon kurallarını temsil eder.
 
 ### ProductFormModal
 **Ne yapar**: Bu fonksiyon, ürün ekleme veya düzenleme işlemleri için kullanılan bir modal form bileşenini tanımlar. Belirtilen ürün ID'sine göre yeni ürün oluşturma veya mevcut ürünü düzenleme amacı taşır.
@@ -73,6 +88,26 @@ Bu modül, ürün ekleme/düzenleme formunu yöneten bir React modal bileşenidi
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../../../types/db-rows::type { DbCategory, DbJson,DbProductInsert, DbProductUpdate }
+- import: @/i18n/I18nProvider::useI18n
+- import: @/lib/services/product.columns::VARIANT_DETAIL_COLUMNS
+- import: @/lib/supabase/client::supabaseBrowserClient
+- import: @hookform/resolvers/zod::zodResolver
+- import: @radix-ui/react-dialog
+- import: lucide-react::Loader2
+- import: lucide-react::Save
+- import: lucide-react::X
+- import: react-hook-form::useForm
+- import: react::React
+- import: react::useCallback
+- import: react::useEffect
+- import: react::useState
+- import: sonner::toast
+- import: zod
+
+---
+
 ## INTERFACES
 
 ### ProductFormModalProps
@@ -87,74 +122,67 @@ Bu modül, ürün ekleme/düzenleme formunu yöneten bir React modal bileşenidi
 
 ### ProductFormValues
 ```typescript
-type ProductFormValues = z.infer<typeof productSchema>
+type ProductFormValues = z.infer<ReturnType<typeof getProductSchema>>
 ```
-
----
-
-## SABİTLER
-- **productSchema** (call) — `z.object({
-    name: z.string().min(3, 'İsim en az 3 karakter olmalı'),
-   ...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `components/admin/products/ProductFormModal.tsx`::ProductFormModal
-- **params**: `(_productId, open, onClose, onSuccess)` — ürün ID, modal açık/kapalı durumu, kapatma callback'i, başarılı kayıt sonrası callback'i
+### [N1_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::getProductSchema
+- **params**: (t: (key: string) => string)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu, UI metinleri için kullanılır
-  - `loading` — `useState(false)` ile tanımlı, form submission ve veri yükleme sırasında spinner kontrolü yapar
-  - `setLoading` — `loading` state setter'ı, `loadProduct` ve `onSubmit` içinde true/false ayarlanır
-  - `categories` — `useState<DbCategory[]>([])` ile tanımlı, supabase'den çekilen kategori listesini tutar
-  - `setCategories` — `categories` state setter'ı, `fetchCategories` içinde doldurulur
-  - `register` — `react-hook-form`'dan gelen register fonksiyonu, form input'larına bağlanır (`register('name')`, `register('sku')` vs.)
-  - `handleSubmit` — `react-hook-form`'dan gelen submit handler sarmalayıcısı, form onSubmit'e `handleSubmit(onSubmit)` olarak bağlanır
-  - `reset` — `react-hook-form`'dan gelen form reset fonksiyonu, `loadProduct` içinde ürün verisiyle, open effect içinde varsayılan değerlerle çağrılır
-  - `errors` — `formState.errors` destructured, form validasyon hatalarını tutar (`errors.name`, `errors.sku`)
-  - `loadProduct` — `useCallback` ile tanımlı, `_productId` olduğunda supabase'den ürün çeker ve formu doldurur
-  - `onSubmit` — form gönderim handler'ı, ürün oluşturur veya günceller
-- **Dönüş**: JSX — `Dialog.Root` ile sarılmış modal UI, `!open` ise `null`
+  - `t` — Translation fonksiyonu, Zod validasyon mesajlarını lokalize etmek için kullanılır
+- **Dönüş**: Zod schema nesnesi (ProductFormValues için validasyon şeması)
 
-### [N2_NASIL] AST Pointer: `components/admin/products/ProductFormModal.tsx`::loadProduct
-- **params**: `(id: string)` — yüklenecek ürünün UUID'si
+### [N2_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::ProductFormModal
+- **params**: ({ _productId, open, onClose, onSuccess })
 - **ic_degiskenler**:
-  - `product` — `supabase.from('products').select(...).eq('id', id).single()` sonucu `data` field'ından destructured, tüm ürün alanlarını (name, sku, brand, price, category_id, technical_specs vs.) içerir
-  - `error` — aynı supabase sorgusundan destructured hata nesnesi, `if (error) throw error` ile yukarı fırlatılır
-- **Dönüş**: yok — `reset()` ile form state'ini doldurur, `setLoading(true/false)` ile loading durumunu yönetir, hata olursa `toast.error('Ürün yüklenemedi')` gösterir
+  - `_productId` — Düzenlenecek ürünün ID'si (undefined ise yeni ürün ekleniyor)
+  - `open` — Modal'ın açık/kapalı durumunu kontrol eden boolean prop
+  - `onClose` — Modal'ı kapatma callback fonksiyonu
+  - `onSuccess` — Başarılı kayıt/güncelleme sonrası çağrılacak callback fonksiyonu
+  - `t` — useI18n() hook'undan gelen translation fonksiyonu
+  - `loading` — Form submission ve veri yükleme durumunu takip eden state
+  - `setLoading` — Loading state'ini güncellemek için setter fonksiyonu
+  - `categories` — Kategorilerin tutulduğu state dizisi
+  - `setCategories` — Categories state'ini güncellemek için setter fonksiyonu
+  - `descriptionI18n` — Description'ın çok dilli versiyonunu tutan state (tr ve en)
+  - `setDescriptionI18n` — DescriptionI18n state'ini güncellemek için setter fonksiyonu
+  - `productSchema` — useMemo ile hesaplanan Zod validasyon şeması
+  - `register` — react-hook-form'dan form alanlarını kaydetmek için fonksiyon
+  - `handleSubmit` — Form submission handler'ı
+  - `reset` — Form alanlarını sıfırlamak için fonksiyon
+  - `errors` — Form validasyon hatalarını içeren nesne
+  - `loadProduct` — useCallback ile tanımlanan ürün yükleme fonksiyonu
+- **Dönüş**: JSX (Dialog modal bileşeni)
 
-### [N3_NASIL] AST Pointer: `components/admin/products/ProductFormModal.tsx`::useEffect[fetchCategories]
-- **params**: yok
+### [N3_NASIL] AST Pointer: src/components/admin/products/ProductFormModal.tsx::ProductFormModal::onSubmit
+- **params**: (values: ProductFormValues)
 - **ic_degiskenler**:
-  - `fetchCategories` — iç içe tanımlı asenkron fonksiyon, supabase'den tüm kategorileri çeker
-  - `data` — `supabase.from('categories').select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, ...').order('name').returns<DbCategory[]>()` sonucundan destructured kategori dizisi, `setCategories(data || [])` ile state'e yazılır
-- **Dönüş**: yok — `[]` bağımlılık dizisi ile component mount'ta bir kez çalışır
-
-### [N4_NASIL] AST Pointer: `components/admin/products/ProductFormModal.tsx`::fetchCategories
-- **params**: yok
-- **ic_degiskenler**:
-  - `data` — `supabase.from('categories').select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, marketing_title, menu_label, metadata, translation_key, authority_content').order('name').returns<DbCategory[]>()` sonucundan destructured kategori dizisi, `setCategories(data || [])` ile state'e atanır
-- **Dönüş**: yok — parent scope'taki `setCategories` ile side-effect üretir
-
-### [N5_NASIL] AST Pointer: `components/admin/products/ProductFormModal.tsx`::useEffect[openState]
-- **params**: yok
-- **ic_degiskenler**:
-  - (ekstra iç değişken yok — doğrudan `open`, `_productId`, `loadProduct`, `reset` kullanılır)
-- **Dönüş**: yok — `open && _productId` olduğunda `loadProduct(_productId)` çağırır, `open && !_productId` olduğunda `reset()` ile formu varsayılan değerlere sıfırlar (`status: 'active', stock_qty: 0, low_stock_threshold: 5, price: 0`)
-
-### [N6_NASIL] AST Pointer: `components/admin/products/ProductFormModal.tsx`::onSubmit
-- **params**: `(values: ProductFormValues)` — formdan gelen doğrulanmış form değerleri (name, sku, brand, price, category_id, status, technical_specs vs.)
-- **ic_degiskenler**:
-  - `payload` — `DbProductUpdate` veya `DbProductInsert` türünde, `values` spread edilip `technical_specs` alanının `DbJson` tipine cast edildiği nesne; `_productId` varsa update, yoksa insert için kullanılır
-  - `error` — `supabase.from('products').update(payload).eq('id', _productId)` veya `supabase.from('products').insert([payload])` sonucundan destructured hata nesnesi, `if (error) throw error` ile yakalanır
-- **Dönüş**: yok — başarılıysa `toast.success(...)`, `onSuccess()`, `onClose()` çağırır; hata olursa `toast.error(t('admin.common.error'))` gösterir; her iki durumda da `setLoading(false)` ile loading'i kapatır
+  - `values` — Form verilerini içeren parametre (ProductFormValues tipi)
+  - `description` — values nesnesinden destructure edilen description alanı
+  - `rest` — values nesnesinden description hariç diğer tüm alanlar
+  - `description_i18n` — Mevcut descriptionI18n state'i ile yeni description'ı birleştiren nesne
+  - `payload` — Veritabanına gönderilecek güncelleme/ekleme verisi (koşullu olarak DbProductUpdate veya DbProductInsert)
+- **Dönüş**: Promise<void> (async fonksiyon, değer döndürmez)
 
 ---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    ProductFormModal_tsx__ProductFormModal["ProductFormModal"]
+    ProductFormModal_tsx__getProductSchema["getProductSchema"]
+    ProductFormModal_tsx__onSubmit["onSubmit"]
+    ProductFormModal_tsx__ProductFormModal --> ProductFormModal_tsx__getProductSchema
+```
 
 ## NODE ID STANDARD
 
   file: src\components\admin\products\ProductFormModal.tsx
+  function: src\components\admin\products\ProductFormModal.tsx::getProductSchema
   function: src\components\admin\products\ProductFormModal.tsx::ProductFormModal
   function: src\components\admin\products\ProductFormModal.tsx::onSubmit
 
@@ -162,6 +190,7 @@ type ProductFormValues = z.infer<typeof productSchema>
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: ProductFormModal
+  export: getProductSchema
 
 ---
 

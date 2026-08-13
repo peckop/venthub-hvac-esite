@@ -3,55 +3,67 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\ProductsDiscoveryView.tsx
-skeleton_hash: 9208f5b30d054206
+skeleton_hash: 66b42e91163e0f88
 entity_hashes:
-  func:ProductsDiscoveryView: 6785edea688433d2
-  overview: d4f91980915340a3
+  func:ProductsDiscoveryView: 7a88740fc2125f5b
+  overview: 76bae810c86fe269
   style_tokens: 8ab4f603b12ea696
-generated_at: 2026-06-19T20:51:24Z
+generated_at: 2026-08-13T08:56:46Z
 ---
 
 ## Genel Bakış
-Bu modül, Venthub HVAC platformunun ana ürün keşif sayfasını oluşturan React görünüm bileşenidir. Temel sorumluluğu, dışarıdan gelen ürün listesini ve yükleme durumunu yöneterek kullanıcıya dinamik bir arayüz sunmaktır. Bileşen, verinin hazır olma durumuna göre yükleme göstergesi, boş durum mesajı veya ürün listesi gibi farklı arayüzleri render eder.
+Bu modül, Venthub HVAC platformunda ürün keşif deneyimini sunan üst düzey React görünüm bileşenidir. Dış kaynaklardan gelen ürün aileleri listesini, toplam sayıyı ve yükleme durumunu props olarak alarak kullanıcıya dinamik bir arayüz sunar. Bileşen, verinin durumuna göre yükleme göstergesi veya ürün listesi gibi farklı arayüz katmanlarını yönetmekle sorumludur.
 
 ## Fonksiyon Grupları
-### Ana Ürün Keşif Arayüzü
-Modülün tek ve temel bileşenini oluşturur. Dışarıdan iletilen `products` ve `isLoading` verilerine bağlı olarak, kullanıcıya ürünleri CategoryOrbitCarousel aracılığıyla sunar veya yükleme/boş durum arayüzlerini gösterir.
+### Ürün Keşif Görünümü
+Modülün tek ve temel bileşenini tanımlar. Aldığı props verilerine bağlı olarak yükleme, boş durum veya ürün listesi arayüzlerinden uygun olanını render eder.
 - ProductsDiscoveryView
-
-### Dış Bağımlılıklar ve Mimari Bağlam
-Bileşen, `CategoryOrbitCarousel` iç angebenen bileşene güçlü bir bağımlılık gösterir. Bu, bileşenin veri sunum mantığını ayrı bir görünüme devrettiğini ve modülün kendi içinde veri işlevselliğinden ziyade arayüz orkestasyonuna odaklandığını gösterir. Bileşen, props aracılığıyla dış veriye (ürün listesi) ve durum yönetimine (yükleniyor bayrağı) tamamen açıktır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, bir React fonksiyonel bileşeni olup dışarıdan prop'lar aracılığıyla veri alır. Aşağıdaki varsayımlar fonksiyon imzasından çıkarılmıştır.
+
+[Aksiyom 1]: Eğer `total` parametresi sağlanmazsa, modülün davranışı tanımsızdır (default değeri yoktur ve bileşen içeriği `families` dizisini `total` ile eşleştirmek üzere tasarlanmış olabilir).
+
+[Aksiyom 2]: Eğer `families` boş dizi (`[]`) olarak kalırsa ve `isLoading` `false` ise, bileşenin boş durum (empty state) arayüzü göstermesi beklenir — ancak boş durum mesajının içeriği bilinmiyor.
+
+[Aksiyom 3]: Eğer `isLoading` `true` ise, modülün `families` ve `total` değerlerinden bağımsız olarak bir yükleme göstergesi (skeleton/spinner) render etmesi beklenir.
+
+[Aksiyom 4]: Eğer `isLoading` `false` ve `families` dolu ise, modülün `CategoryOrbitCarousel` bileşenini çağırarak ürün ailelerini göstermesi beklenir.
+
+[Aksiyom 5]: Eğer `total` bir sayısal değer olarak verilmezse veya `undefined` kalırsa, `families.length` ile `total` arasındaki tutarsızlık bileşenin doğru çalışmasını engelleyebilir — `total`'in `families` uzunluğuyla uyumlu olması beklenir ancak bu uyumun zorunluluğu bilinmiyor.
+
+[Aksiyom 6]: Eğer `families` bir dizi (`Array`) dışındaki bir tipte gelirse, `CategoryOrbitCarousel` bileşeninin hata vermesi olasıdır — `families`'in her elemanının `CategoryOrbitCarousel` tarafından beklenen shape'e uygun olması gerekir ancak bu shape bilinmiyor.
+
+[Aksiyom 7]: Modül, `total` parametresinin `families.length`'den büyük, eşit veya farklı olabileceğini varsayabilir (sayfalama/toplam ayrımı olabilir) — ancak hangi durumda hangi değerin geçerli olduğu bilinmiyor.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### ProductsDiscoveryView
-**Ne yapar**: Bu fonksiyon, ürünlerin keşfedilmesi için kullanılan bir React bileşenidir. Kullanıcıya ürün listesini sunar ve veri yüklenme durumunu gösterir.
 
-**Nasıl yapar**: Fonksiyon, gelen products ve isLoading parametrelerini kullanarak bir ürün keşif arayüzü render eder. isLoading true olduğunda yükleme göstergesi sunar, products dizisi dolu olduğunda ise ürünleri listeleyerek kullanıcıya sunar. Bileşen, varsayılan olarak boş bir dizi ve false yükleme durumu ile başlatılabilir.
+**Ne yapar**: Ürün keşif ve araştırma sayfasını görüntüleyen ana React bileşenidir. Kullanıcılara ürün ailelerini filtreleme, arama ve keşfetme imkanı sunar. Bu bileşen, ürünlerin listelendiği ve toplam sayının gösterildiği bir arayüz sağlar.
+
+**Nasıl yapar**: Fonksiyonel bir React bileşeni olarak tanımlanmıştır ve `ProductsDiscoveryViewProps` arayüzünden türetilmiş props'ları kabul eder. `families` dizisi varsayılan olarak boş bir dizi ile başlar, bu sayede ürün aileleri henüz yüklenmemiş olsa bile bileşen hataya düşmeden render edilebilir. `isLoading` parametresinin `false` varsayılan değeri sayesinde, yükleme durumu olmadığında bileşen normal görünümünü korur. Bileşen, iç mantığında ürün verilerini işleyerek kullanıcıya sunar.
 
 **Parametreler**:
-- products: object[] — Görüntülenecek ürünlerin dizisi. Her bir ürün nesnesi ürün bilgilerini içerir. Varsayılan olarak boş bir dizi kullanılır.
-- isLoading: boolean — Verinin yüklenip yüklenmediğini belirten durum bayrağı. true olduğunda yükleme animasyonu gösterilir. Varsayılan olarak false değerini alır.
+- families: `ProductFamily[]` — Görüntülenecek ürün ailelerinin dizisi. Varsayılan değeri boş dizi (`[]`) olup, ürün kategorilerini ve ailelerini temsil eder.
+- total: `number` — Toplam ürün sayısını belirtir. Bulunan veya görüntülenen ürünlerin toplam sayısını gösterir.
+- isLoading: `boolean` — Verilerin yüklenme durumunu belirtir. `true` olduğunda yükleniyor göstergesi gösterilir, `false` ise normal içerik görüntülenir. Varsayılan değeri `false`'dur.
 
-**Dönüş**: React.FC<ProductsDiscoveryViewProps> — React fonksiyonel bileşeni olarak products dizisini ve isLoading durumunu işleyen bir arayüz bileşeni döndürür.
+**Dönüş**: `React.FC<ProductsDiscoveryViewProps>` — React fonksiyonel bileşeni olarak ürün keşif arayüzünü render eder. `ProductsDiscoveryViewProps` tipindeki props'ları kullanarak JSX içeriği döndürür.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../components/ProductCard::ProductCard
+- import: ../components/products/FamilyCard::FamilyCard
 - import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
 - import: ../lib/type-converters::type { DomainCategory }
-- import: @/types/ui-models::type { Product }
+- import: @/types/ui-models::type { FamilyListItem }
 - import: framer-motion::AnimatePresence
 - import: framer-motion::motion
 - import: lucide-react::LayoutGrid
@@ -59,6 +71,7 @@ Bileşen, `CategoryOrbitCarousel` iç angebenen bileşene güçlü bir bağıml�
 - import: next/dynamic::dynamic
 - import: next/navigation::useRouter
 - import: react::React
+- import: react::Suspense
 - import: react::useCallback
 - import: react::useRef
 - import: react::useState
@@ -69,7 +82,8 @@ Bileşen, `CategoryOrbitCarousel` iç angebenen bileşene güçlü bir bağıml�
 
 ### ProductsDiscoveryViewProps
 - `initialCategories?: DomainCategory[]`
-- `products?: Product[]`
+- `families?: FamilyListItem[]`
+- `total?: number`
 - `isLoading?: boolean`
 
 ---
@@ -92,50 +106,38 @@ type ViewMode = 'grid' | 'list'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: ProductsDiscoveryView.tsx::LoadingPlaceholder
-- **params**: (parametre yok — anonim arrow function)
+### [N1_NASIL] AST Pointer: ProductsDiscoveryView.tsx::Placeholder
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  (iç değişken yok — doğrudan JSX döner)
-- **Dönüş**: JSX — loading durumunda gösterilen nebula glow placeholder div; spinner yerine animasyonlu blur efekti sunar
-
----
+  - `N/A` — Yükleme placeholder'ı, harici değişken kullanmaz
+- **Dönüş**: JSX (Loading nebula animasyonu)
 
 ### [N2_NASIL] AST Pointer: ProductsDiscoveryView.tsx::ProductsDiscoveryView
-- **params**: `{ products = [], isLoading = false }` — `products`: Product dizisi, gösterilecek ürün listesi; `isLoading`: boolean, yükleme durumu
+- **params**: `{ families = [], total, isLoading = false }`
 - **ic_degiskenler**:
-  - `router` — `useRouter()` hook'undan dönen Next.js router nesnesi; sayfa yönlendirmeleri için kullanılır
-  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu; `t('products.allProductsTitle')`, `t('products.systemTotalPrefix')`, `t('products.itemsListed')`, `t('products.emptyTitle')`, `t('products.emptyDesc')`, `t('products.viewGrid')`, `t('products.viewList')` çağrılarında kullanılır
-  - `Routes` — `useLocalizedRoutes()` hook'undan dönen localized route builder nesnesi; `Routes.category(categorySlug, subcategorySlug)` ve `Routes.category(categorySlug)` çağrılarıyla URL üretilir
-  - `[viewMode, setViewMode]` — `useState<ViewMode>('grid')` state'i; mevcut görünüm modunu tutar ('grid' veya 'list')
-  - `productsRef` — `useRef<HTMLDivElement>(null)` ref'i; `motion.section` elementine bağlanır, ürün grid konteynerine referans tutar
-  - `handleSubcategorySelect` — `useCallback` ile tanımlanan callback fonksiyonu; `CategoryOrbitCarousel` bileşenine `onSubcategorySelect` prop'u olarak geçilir
-  - `viewMode` — mevcut görünüm modu; `viewMode === 'grid'` koşuluyla grid/list CSS sınıfları ve buton aktiflik durumları belirlenir, `ProductCard` bileşenine `layout` prop'u olarak geçilir
-  - `products.length` — ürün sayısını tutar; `products.length === 0 && !isLoading` koşuluyla boş durum gösterilir, `products.length` span içinde kullanıcıya ürün sayısı olarak sunulur
-  - `products.map((product, index) => {...})` — ürün dizisi üzerinde döngü; her ürün için `ProductCard` bileşeni oluşturulur
-  - `ESTIMATED_3D_ITEMS` — sabit `8`; tahmini 3D animasyonlu ürün sayısı
-  - `TOTAL_3D_DURATION` — `ESTIMATED_3D_ITEMS * 0.18 + 1.2`; toplam 3D animasyon süresi (saniye)
-  - `GRID_ENTRY_DELAY` — `TOTAL_3D_DURATION * 0.6`; grid giriş animasyonu gecikme süresi
-  - `isInitialView` — `index < 12` boolean; ürünün ilk ekranda görünüp görünmediğini belirler, `GRID_ENTRY_DELAY + (index * 0.05)` delay hesaplamasında kullanılır
-- **Dönüş**: JSX — tam sayfa ürün keşif görünümü; CategoryOrbitCarousel, başlık, view mode butonları, ürün grid/listesi veya boş durum mesajını render eder
-
----
+  - `router` — useRouter() hook'undan yönlendirme nesnesi, sayfa geçişleri için kullanılır
+  - `t` — useI18n() hook'undan çeviri fonksiyonu, metinleri lokalize eder
+  - `Routes` — useLocalizedRoutes() hook'undan lokalize URL yapısı
+  - `viewMode` — useState ile yönetilen görünüm modu ('grid' veya 'list'), ürün yerleşimini belirler
+  - `productsRef` — useRef ile products grid bölümüne referans, scroll/animasyon için kullanılır
+  - `handleSubcategorySelect` — useCallback ile tanımlanan alt kategori seçim işleyicisi
+- **Dönüş**: JSX (Ürün keşif sayfası, CategoryOrbitCarousel, animasyonlu ürün grid'i)
 
 ### [N3_NASIL] AST Pointer: ProductsDiscoveryView.tsx::handleSubcategorySelect
-- **params**: `(categorySlug: string, subcategorySlug?: string)` — `categorySlug`: kategori slug'ı; `subcategorySlug`: opsiyonel alt kategori slug'ı
+- **params**: `(categorySlug: string, subcategorySlug?: string)`
 - **ic_degiskenler**:
-  (iç değişken yok — closure içinde `router` ve `Routes` yukarı kapsamdan kullanılır)
-- **Dönüş**: yok — `router.push()` ile yan etki olarak sayfa yönlendirmesi yapar; `subcategorySlug` varsa `Routes.category(categorySlug, subcategorySlug)`, yoksa `Routes.category(categorySlug)` URL'ine yönlendirir
+  - `router` — outer scope'tan closure ile erişilen yönlendirme nesnesi
+  - `Routes` — outer scope'tan closure ile erişilen lokalize URL yapısı
+- **Dönüş**: yok (yan etki: router.push ile yönlendirme yapar)
 
----
-
-### [N4_NASIL] AST Pointer: ProductsDiscoveryView.tsx::mapCallback (product, index)
-- **params**: `(product, index)` — `product`: Product nesnesi; `index`: ürünün dizideki indeksi
+### [N4_NASIL] AST Pointer: ProductsDiscoveryView.tsx::FamilyCardMapper
+- **params**: `(family, index)`
 - **ic_degiskenler**:
-  - `ESTIMATED_3D_ITEMS` — sabit `8`; tahmini 3D animasyonlu ürün sayısı
-  - `TOTAL_3D_DURATION` — `ESTIMATED_3D_ITEMS * 0.18 + 1.2`; toplam 3D animasyon süresi hesaplanır
-  - `GRID_ENTRY_DELAY` — `TOTAL_3D_DURATION * 0.6`; grid entry animasyonu için hesaplanan gecikme süresi
-  - `isInitialView` — `index < 12` boolean; ürünün ilk ekranda olup olmadığını belirler; `true` ise `GRID_ENTRY_DELAY + (index * 0.05)` delay uygulanır, `false` ise `0` delay ile hemen görünür
-- **Dönüş**: `motion.div` JSX — `ProductCard` bileşenini sarmalayan animasyonlu div; `product.id` key, `whileInView` ile viewport'a girince opacity ve y hareketi ile fade-in, `isInitialView` durumuna göre kademeli gecikme ile giriş animasyonu; `ProductCard`'a `product` ve `layout={viewMode}` prop'ları geçilir
+  - `ESTIMATED_3D_ITEMS` — 3D animasyon beklenen ürün sayısı sabiti (8)
+  - `TOTAL_3D_DURATION` — toplam 3D animasyon süresi (sabitlerden hesaplanır)
+  - `GRID_ENTRY_DELAY` — grid giriş gecikme süresi (3D süresinin %60'ı)
+  - `isInitialView` — ilk ekran görünümü kontrolü (index < 12)
+- **Dönüş**: JSX (motion.div ile FamilyCard animasyonlu sarımı)
 
 ---
 

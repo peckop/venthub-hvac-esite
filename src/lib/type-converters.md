@@ -13,7 +13,7 @@ entity_hashes:
   func:toUICategoryList: 9721c9c2f6b7b799
   func:toUIProductList: a473c58e2b2833ca
   overview: d299bc1749a66082
-generated_at: 2026-06-19T20:48:10Z
+generated_at: 2026-08-13T08:53:52Z
 ---
 
 ## Genel Bakış

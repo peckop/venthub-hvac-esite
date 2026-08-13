@@ -10,7 +10,7 @@ entity_hashes:
   func:getMotorInference: ef91c03ee063a82d
   func:getNoiseInference: 9266c31de55779b5
   overview: 9ce3d52a464cda5e
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-13T08:57:45Z
 ---
 
 ## Genel Bakış
@@ -145,9 +145,9 @@ graph TD
     engineeringIntelligence_ts__getEfficiencyInference["getEfficiencyInference"]
     engineeringIntelligence_ts__getMotorInference["getMotorInference"]
     engineeringIntelligence_ts__getNoiseInference["getNoiseInference"]
-    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getMotorInference
     engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getEfficiencyInference
     engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getNoiseInference
+    engineeringIntelligence_ts__generateEngineeringSummary --> engineeringIntelligence_ts__getMotorInference
 ```
 
 ## NODE ID STANDARD
