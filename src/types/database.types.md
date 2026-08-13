@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\types\database.types.ts
-skeleton_hash: 47229190246555ba
+skeleton_hash: 067e4acdd662f151
 entity_hashes:
   overview: ce3fb4ce44f2949f
-generated_at: 2026-06-19T20:48:17Z
+generated_at: 2026-08-13T19:37:07Z
 ---
 
 ## Genel Bakış
@@ -65,7 +65,7 @@ type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion
+    PostgrestVersion: "1
 ```
 
 ### DatabaseWithoutInternals
@@ -84,7 +84,7 @@ type Tables = <
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableN
+  TableName extends DefaultSchemaTableNameO
 ```
 
 ### TablesInsert
@@ -94,7 +94,7 @@ type TablesInsert = <
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-   
+    sche
 ```
 
 ### TablesUpdate
@@ -104,7 +104,7 @@ type TablesUpdate = <
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-   
+    sche
 ```
 
 ### Enums
@@ -114,7 +114,7 @@ type Enums = <
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    sch
+    schema: 
 ```
 
 ### CompositeTypes
@@ -123,16 +123,19 @@ type CompositeTypes = <
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOpti
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions 
 ```
 
 ---
 
 ## SABİTLER
 - **Constants** (as_expression) — `{
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
-      contact_department: ["sales", "support", ...`
+      cont...`
 
 ---
 
