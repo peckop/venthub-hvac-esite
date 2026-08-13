@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-notification\index.ts
-skeleton_hash: 36e242b42237e9f8
+skeleton_hash: 23787b8183560ca8
 entity_hashes:
   func:loadShippingTemplate: 4b4a832183734352
   func:renderTemplate: 26cc0a301db3fae9
   func:shipping-notification_handler: 06ce613108984be4
   overview: 9cf32250487e69ff
-generated_at: 2026-05-30T21:36:32Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -77,6 +77,15 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve mevcut doküma
 - `req`: Request — Gelen HTTP istek nesnesi. İstek gövdesi, başlıkları ve URL parametrelerini içerir.
 
 **Dönüş**: Response — İşlenen istekle ilgili HTTP yanıt nesnesi. Durum kodu, başlıklar ve opsiyonel bir gövde (örn. JSON yanıtı) içerebilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/sentry.ts::sentryCaptureException
+- import: ../_shared/tenant_config.ts::getTenantBranding
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
 
 ---
 

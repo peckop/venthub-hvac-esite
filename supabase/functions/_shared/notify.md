@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\notify.ts
-skeleton_hash: 64c41a0f9af8f2d9
+skeleton_hash: a166635d19f0ad89
 entity_hashes:
   func:getEmailConfig: d69ed27e1c404dc2
   func:getEnv: 6925671b32beb020
@@ -12,7 +12,7 @@ entity_hashes:
   func:sendEmail: 2a2dc768ec5451fa
   func:sendSlack: cd61229d7922325b
   overview: be8ec04b8995d7cb
-generated_at: 2026-05-30T21:17:01Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -136,13 +136,13 @@ graph TD
     notify_ts__notify["notify"]
     notify_ts__sendEmail["sendEmail"]
     notify_ts__sendSlack["sendSlack"]
-    notify_ts__getSlackWebhook --> notify_ts__getEnv
-    notify_ts__notify --> notify_ts__sendEmail
     notify_ts__getEmailConfig --> notify_ts__getEnv
     notify_ts__notify --> notify_ts__getEnv
     notify_ts__notify --> notify_ts__sendSlack
     notify_ts__sendSlack --> notify_ts__getSlackWebhook
     notify_ts__sendEmail --> notify_ts__getEmailConfig
+    notify_ts__getSlackWebhook --> notify_ts__getEnv
+    notify_ts__notify --> notify_ts__sendEmail
 ```
 
 ## NODE ID STANDARD

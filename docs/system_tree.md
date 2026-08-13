@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-11T06:40:37.764493+00:00
+compiled_at: 2026-08-13T07:40:56.224943+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -37,6 +37,7 @@ Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihind
 │   │   ├── ⚪ `ajanlar_ve_karmasa_3d_carousel_casestudy.md`
 │   │   ├── ⚪ `architectural_vision.md`
 │   │   ├── ⚪ `changelog_2025_legacy.md`
+│   │   ├── 📂 **db-backup-pre-kademe2/**
 │   │   ├── ⚪ `legacy-vite-seo-report.md`
 │   │   ├── ⚪ `legacy_homepage_enhancements_2025.md`
 │   │   ├── ⚪ `legacy_smart_routing_plan.md`
@@ -68,11 +69,11 @@ Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihind
 │   │   ├── ⚪ `admin-shell-e2-notification-inbox-brief.md`
 │   │   ├── ⚪ `avensair-teslim-yol-haritasi-2026-06-15.md`
 │   │   ├── ⚪ `catalog-commerce-pipeline-master-2026-06-20.md`
+│   │   ├── ⚪ `f5b-family-architecture-plan.md`
 │   │   ├── ⚪ `faz0-kit-contract-2026-06-13.md`
 │   │   ├── ⚪ `faz1-migration-playbook-2026-06-13.md`
 │   │   ├── ⚪ `faz1-remaining-divided-2026-06-13.md`
 │   │   ├── ⚪ `faz2-admin-backlog.md`
-│   │   ├── ⚪ `hvac_relations_migration_plan.md`
 │   │   ├── ⚪ `i18n-jsx-literals-cleanup-2026-06-14.md`
 │   │   ├── ⚪ `j1-dashboard-data-brief.md`
 │   │   ├── ⚪ `j10-inventorysettings-refactor-brief.md`
@@ -90,6 +91,7 @@ Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihind
 │   │   ├── ⚪ `j7-returns-refactor-brief.md`
 │   │   ├── ⚪ `j8-coupons-refactor-brief.md`
 │   │   ├── ⚪ `j9-categorybuilder-refactor-brief.md`
+│   │   ├── ⚪ `kademe2-clean-rebuild-2026-08-11.md`
 │   │   ├── ⚪ `product-schema-master-implementation-plan.md`
 │   │   ├── ⚪ `product-schema-standard-brief.md`
 │   │   ├── ⚪ `saas-funding-and-packaging-2026-06.md`
@@ -125,6 +127,7 @@ Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihind
 │   │   ├── ⚪ `dealer-module-blueprint.md`
 │   │   ├── ⚪ `dealer-network-standard.md`
 │   │   ├── ⚪ `i18n-localization-standard.md`
+│   │   ├── ⚪ `migration-safety-standard.md`
 │   │   ├── ⚪ `pricing-standard.md`
 │   │   ├── ⚪ `product-schema-standard.md`
 │   │   └── ⚪ `work-tracking-ssot-standard.md`
@@ -299,7 +302,6 @@ Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihind
 │   │   ├── ✅ `BrandsShowcase.tsx`
 │   │   ├── ✅ `BuildTag.tsx`
 │   │   ├── ✅ `CaseStudySection.tsx`
-│   │   ├── ✅ `CategoryFlow.tsx`
 │   │   ├── ✅ `ErrorBoundary.tsx`
 │   │   ├── ✅ `Footer.tsx`
 │   │   ├── ✅ `HVACIcons.tsx`
@@ -322,7 +324,6 @@ Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihind
 │   │   ├── ✅ `Seo.tsx`
 │   │   ├── ✅ `SpotlightHeroOverlay.tsx`
 │   │   ├── ✅ `StickyHeader.tsx`
-│   │   ├── ✅ `SubcategoryFlow.tsx`
 │   │   ├── ✅ `TiltCard.tsx`
 │   │   ├── ✅ `UndecidedUserCTA.tsx`
 │   │   ├── ✅ `VisualShowcase.tsx`
@@ -497,15 +498,17 @@ Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihind
 │   │   │   ├── ✅ `BlueprintCanvas.tsx`
 │   │   │   ├── ✅ `Category3DIcon.tsx`
 │   │   │   ├── ✅ `CategoryOrbitCarousel.tsx`
+│   │   │   ├── ❌ `FamilyCard.tsx`
 │   │   │   ├── ✅ `InfiniteProductsShowcase.tsx`
 │   │   │   ├── ✅ `OrbitalProductsShowcase.tsx`
 │   │   │   ├── ✅ `ProductsHero.tsx`
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
 │   │   │   ├── ✅ `RichTextRenderer.tsx`
-│   │   │   ├── ✅ `SeriesCard.tsx`
+│   │   │   ├── ❌ `VariantSelector.tsx`
 │   │   │   └── 📂 **visual-models/**
 │   │   └── 📂 **ui/**
+│   │       ├── ❌ `Pagination.tsx`
 │   │       ├── ✅ `ScrollObserver.tsx`
 │   │       ├── ✅ `Skeleton.tsx`
 │   │       └── ✅ `VentImage.tsx`
@@ -619,24 +622,31 @@ Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihind
 │   │   │   └── 📂 **search/**
 │   │   │       └── ✅ `resourceSearchers.ts`
 │   │   ├── ✅ `audit.ts`
+│   │   ├── 📂 **cache/**
+│   │   │   └── ❌ `tags.ts`
 │   │   ├── 📂 **data/**
 │   │   │   └── ✅ `preload.ts`
 │   │   ├── ✅ `ensureSessionFresh.ts`
 │   │   ├── ✅ `errorReporter.ts`
 │   │   ├── ✅ `hvacCalculations.ts`
+│   │   ├── 📂 **images/**
+│   │   │   └── ❌ `productImage.ts`
 │   │   ├── ✅ `order.ts`
 │   │   ├── ✅ `orderStatusService.ts`
 │   │   ├── ✅ `pdfAssets.ts`
 │   │   ├── ✅ `pdfGenerator.ts`
-│   │   ├── ✅ `productsApi.ts`
 │   │   ├── ✅ `rbac.ts`
+│   │   ├── 📂 **seo/**
+│   │   │   └── ❌ `jsonld.ts`
 │   │   ├── 📂 **services/**
 │   │   │   ├── ✅ `address.service.ts`
 │   │   │   ├── ✅ `cart.service.ts`
 │   │   │   ├── ✅ `category.service.ts`
+│   │   │   ├── ❌ `family.service.ts`
 │   │   │   ├── ✅ `inventoryReport.service.ts`
 │   │   │   ├── ✅ `invoice.service.ts`
 │   │   │   ├── ✅ `pricing.service.ts`
+│   │   │   ├── ❌ `product.columns.ts`
 │   │   │   ├── ✅ `product.service.ts`
 │   │   │   ├── ✅ `project.service.ts`
 │   │   │   └── ✅ `registry.ts`
@@ -682,6 +692,7 @@ Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihind
 │   │   ├── ✅ `router.ts`
 │   │   ├── ✅ `routes.ts`
 │   │   ├── ✅ `searchHighlight.tsx`
+│   │   ├── ❌ `specLabel.ts`
 │   │   ├── ✅ `tenantConstants.ts`
 │   │   ├── ✅ `tenantServer.ts`
 │   │   ├── ✅ `testA11y.tsx`
@@ -848,7 +859,24 @@ Bu belge, otonom derleyici tarafından 2026-08-11T06:40:37.764493+00:00 tarihind
 ```
 
 ## Eksik Dokümantasyonlar
-Tebrikler! Tüm çekirdek `.py` dosyalarının eşleşen `.md` belgeleri mevcut. 🎉
+- [ ] `src\components\products\FamilyCard.tsx`
+- [ ] `src\components\products\VariantSelector.tsx`
+- [ ] `src\components\ui\Pagination.tsx`
+- [ ] `src\lib\cache\tags.ts`
+- [ ] `src\lib\images\productImage.ts`
+- [ ] `src\lib\seo\jsonld.ts`
+- [ ] `src\lib\services\family.service.ts`
+- [ ] `src\lib\services\product.columns.ts`
+- [ ] `src\utils\specLabel.ts`
+- [ ] `src\components\products\FamilyCard.tsx`
+- [ ] `src\components\products\VariantSelector.tsx`
+- [ ] `src\components\ui\Pagination.tsx`
+- [ ] `src\lib\cache\tags.ts`
+- [ ] `src\lib\images\productImage.ts`
+- [ ] `src\lib\seo\jsonld.ts`
+- [ ] `src\lib\services\family.service.ts`
+- [ ] `src\lib\services\product.columns.ts`
+- [ ] `src\utils\specLabel.ts`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.

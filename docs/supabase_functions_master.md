@@ -2,8 +2,8 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-06-19T20:52:21.511305+00:00
-total_compiled_files: 30
+compiled_at: 2026-08-13T07:40:56.774606+00:00
+total_compiled_files: 31
 source: supabase/functions
 ---
 
@@ -17,11 +17,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-create-coupon\index.ts
-skeleton_hash: b33a5fa4ac98e4a4
+skeleton_hash: fd99acff0bd75a61
 entity_hashes:
   func:admin-create-coupon_handler: 72913923d4da4715
   overview: e7791c38f1685aef
-generated_at: 2026-05-30T21:36:13Z
+generated_at: 2026-08-13T07:40:08Z
 ---
 
 ## Genel Bakış
@@ -57,8 +57,16 @@ Bu modül için fonksiyon gövdesi (implementation body) paylaşılmadığından
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
+
+---
+
 ## SABİTLER
 - **corsHeaders** (object) — `{
+
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
 
 ---
@@ -120,11 +128,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-iyzico-reconcile\index.ts
-skeleton_hash: 2cafc6e476e015f8
+skeleton_hash: 0820861d4bdb27b9
 entity_hashes:
   func:admin-iyzico-reconcile_handler: e8970eccf3f1fb90
   overview: b0badc73158954b7
-generated_at: 2026-05-30T21:15:15Z
+generated_at: 2026-08-13T07:40:08Z
 ---
 
 ## Genel Bakış
@@ -171,6 +179,12 @@ Bu modül, Supabase Edge Function olarak çalışan bir HTTP handler'idır. Mima
 - `req`: Request (Supabase Request) — Gelen HTTP isteği nesnesi. İyzico mutabakat işlemi için gerekli parametreleri, başlıkları ve yetkilendirme bilgilerini içerir. Fonksiyon bu istek üzerinden admin işlem talimatlarını ve filtre kriterlerini alır.
 
 **Dönüş**: Response — İşlem sonucunu içeren HTTP yanıt nesnesi. Mutabakat işleminin başarılı veya başarısız olduğunu belirten durum kodu (status code) ve gerekirse detaylı JSON verisi döndürür. Başarılı işlemlerde mutabakat sonuçları, başarısızlıklarda ise hata açıklamaları içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -243,11 +257,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-order-inspect\index.ts
-skeleton_hash: 56a179869162a6f7
+skeleton_hash: fe4682511784f4f0
 entity_hashes:
   func:admin-order-inspect_handler: 1ddac70ce14150b4
   overview: a75dc03846842f5a
-generated_at: 2026-05-30T21:15:35Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -260,7 +274,10 @@ Modülün dış dünyayla tek temas noktası olarak tüm istek akışını yöne
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -275,6 +292,12 @@ Modülün dış dünyayla tek temas noktası olarak tüm istek akışını yöne
 - `req`: `Request` — Gelen HTTP isteğini temsil eden nesne. İstek metodu, URL, başlıklar ve gövde gibi verileri içerir.
 
 **Dönüş**: `Response` — İşlemin sonucunu içeren HTTP yanıtı. Genellikle bir durum kodu (örneğin, 200 başarılı, 404 bulunamadı, 500 sunucu hatası) ve isteğe bağlı olarak bir JSON gövdesi veya metin içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -326,11 +349,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-orders-latest\index.ts
-skeleton_hash: 6a020ed8c0cfc54c
+skeleton_hash: 1885bb9863f5ba09
 entity_hashes:
   func:admin-orders-latest_handler: 9cf0e6c826d5f20e
   overview: 3bb02a7476b8fc62
-generated_at: 2026-05-30T21:15:35Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -364,6 +387,12 @@ Bu modül, admin-orders-latest_handler fonksiyonunun doğru çalışması için 
 **Parametreler**:
 - `req`: Request — İşlenecek HTTP istek nesnesi. İstek gövdesi, başlıkları ve URL parametreleri gibi verileri içerir.
 **Dönüş**: Response — Fonksiyonun işlenen isteğe karşılık olarak döndürdüğü HTTP yanıt nesnesi. Başarılı durumlarda istenen verileri (sipariş listesi), hata durumunda ise uygun hata kodlarını ve mesajlarını içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -430,11 +459,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-update-order\index.ts
-skeleton_hash: 2aae01d91a254e30
+skeleton_hash: 80d50e92ff44be65
 entity_hashes:
   func:admin-update-order_handler: 046f5c7fec17e235
   overview: 236389b6147671e5
-generated_at: 2026-05-30T21:36:15Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -477,6 +506,13 @@ Bu modül, Supabase Edge Function ortamında çalışan bir HTTP handler'ıdır.
 - `req`: Request — İşlenecek HTTP istek nesnesi. İstemciden gelen HTTP method, header, body ve query parametrelerini içerir. Admin tarafından gönderilen sipariş güncelleme talimatlarını taşır.
 
 **Dönüş**: Response — İşlem sonucunu içeren HTTP yanıt nesnesi. Başarı durumunda güncellenen sipariş bilgilerini, hata durumunda ise hata mesajını ve uygun HTTP durum kodunu döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -539,11 +575,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-update-shipping\index.ts
-skeleton_hash: a534cbeace1d001e
+skeleton_hash: 3af04a0cc8d70862
 entity_hashes:
   func:admin-update-shipping_handler: fab3b88ab551f027
   overview: 4717843338e56bb2
-generated_at: 2026-05-30T21:36:17Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -576,6 +612,14 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 **Parametreler**:
 - req: Request — İşlenecek olan HTTP isteği nesnesi. İstek gövdesinde veya parametrelerinde kargo güncellemelerine ilişkin veriler taşır.
 **Dönüş**: Response — İşlemin sonucunu belirten bir HTTP yanıtı. Başarılı bir güncelleme için uygun bir durum kodu (örn. 200 OK) ve gerekirse bir mesaj içerir; hata durumunda ise hata kodu ve açıklama döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
+- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
 
 ---
 
@@ -683,12 +727,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\apply-coupon\index.ts
-skeleton_hash: c8d35825cdb738d5
+skeleton_hash: 0f843675c7f6ae1f
 entity_hashes:
   func:apply-coupon_handler: a399f5149250ae7f
   func:buildCors: 317be5b9cff201e9
   overview: fb96f807c58d5b28
-generated_at: 2026-05-30T21:15:46Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -745,36 +789,58 @@ Bu modül, HTTP istekleri üzerinden kupon kodu doğrulama ve uygulama işlevsel
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
+
+---
+
 ## TYPE ALIASES
 
 ### CouponRow
 ```typescript
 type CouponRow = {
+
   code: string
+
   discount_type: 'percentage' | 'fixed_amount'
+
   discount_value: number
+
   minimum_order_amount: number | null
+
   valid_from: string | null
+
   valid_until: string | null
+
   is_acti
 ```
 
 ### ApplyCouponReq
 ```typescript
 type ApplyCouponReq = {
+
   code: string
+
   subtotal: number
+
 }
 ```
 
 ### ApplyCouponResp
 ```typescript
 type ApplyCouponResp = {
+
   val_id: boolean
+
   reason?: string
+
   discount_amount?: number
+
   final_total?: number
+
   normalized_code?: string
+
 }
 ```
 
@@ -847,13 +913,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\delivery-notification\index.ts
-skeleton_hash: 70f17abbccb3b9a5
+skeleton_hash: b1edef18bcf1a308
 entity_hashes:
   func:delivery-notification_handler: bbc4a3cdb5561a07
   func:loadTemplate: 4c5f3a8524c0bb12
   func:render: b6f065ff28ae59f4
   overview: d34e01c15bff1856
-generated_at: 2026-05-30T21:36:19Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -901,6 +967,15 @@ Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomati
 **Parametreler**:
 - `req`: Request — Gelen HTTP istek nesnesi. Gövdesinde `to` (alıcı e-posta adresi), `subject` (konu) ve `data` (şablona eklenecek değişkenler) alanlarını içeren bir JSON nesnesi beklenir.
 **Dönüş**: Promise<Response> — İşlem sonucuna göre farklı HTTP durum kodları ve JSON gövdeli bir Response nesnesi. Başarılı olursa `{ success: true, to: string, subject: string }`, başarısız olursa `{ success: false, error: string }` yapısında bir yanıt döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::getTenantBranding
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -1001,11 +1076,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\healthz\index.ts
-skeleton_hash: 2f2f8d8c33239d20
+skeleton_hash: 4693e10412249aa1
 entity_hashes:
   func:healthz_handler: 680c3be8d7d51d07
   overview: 7d9308860fa3cc5c
-generated_at: 2026-05-30T21:16:00Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -1085,11 +1160,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-callback\index.ts
-skeleton_hash: 5a9d607e9b6cdc1b
+skeleton_hash: ba18e38dc5a91e53
 entity_hashes:
   func:iyzico-callback_handler: 14b42ca547fc6940
   overview: 9f60711f4ba6c146
-generated_at: 2026-05-30T21:36:21Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -1119,18 +1194,33 @@ Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel varsay�
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: npm:iyzipay::Iyzipay
+
+---
+
 ## TYPE ALIASES
 
 ### CheckoutRetrieveResponse
 ```typescript
 type CheckoutRetrieveResponse = {
+
   paymentStatus?: string;
+
   conversationId?: string;
+
   errorMessage?: string;
+
   paymentId?: string;
+
   cardFamily?: string;
+
   binNumber?: string;
+
   lastFourDigits?: string;
+
   [k: string]: unk
 ```
 
@@ -1193,11 +1283,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-payment\index.ts
-skeleton_hash: 728e831857b032c6
+skeleton_hash: 179c063d0f71f16e
 entity_hashes:
   func:iyzico-payment_handler: de31c29702dafb3c
   overview: 10ad7fb56d2cc8ae
-generated_at: 2026-05-30T21:36:23Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -1233,6 +1323,13 @@ Bu modül için özel aksiyom tanımlanmamıştır. Mevcut bilgiler (fonksiyon i
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: npm:iyzipay::Iyzipay
+
+---
+
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::maskPaymentMin
@@ -1254,6 +1351,33 @@ Bu modül için özel aksiyom tanımlanmamıştır. Mevcut bilgiler (fonksiyon i
   export: iyzico-payment_handler
 
 ---
+# FILE: supabase\functions\iyzico-payment\iyzico-real.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-payment\iyzico-real.ts
+skeleton_hash: 7d70c2aaef2028cd
+generated_at: 2026-08-13T07:40:32.807714+00:00
+---
+
+## Genel Bakış
+
+This module has been intentionally removed. Reason: contained hardcoded sandbox credentials and is not used by the active edge function (index.ts). If you need a real İyzico integration helper, create a new module that reads all secrets from environment variables and NEVER commit secrets to the repo
+
+## AXIOMS – Mimari Varsayımlar
+- [Aksiyom 1]: Bu modül yan-etki için yüklenir; kaldırılması veya yan-etkisinin değişmesi onu import eden giriş noktalarını etkiler.
+- [Aksiyom 2]: Dışa açılan API olmadığından tüketiciler doğrudan çağrıyla değil, yalnızca yükleme sırası/yan-etkisi üzerinden bağımlıdır.
+
+## AST POINTERS
+(Dışa açılan çağrılabilir öğe yok — modül-düzeyi yan-etki; AST işaretçisi gerektiren fonksiyon/metot yok.)
+
+## NODE ID STANDARD
+file: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-payment\iyzico-real.ts
+
+
+---
 # FILE: supabase\functions\iyzico-refund\index.md
 
 ---
@@ -1261,11 +1385,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-refund\index.ts
-skeleton_hash: 55d9342253dad488
+skeleton_hash: e118353a1b4289e0
 entity_hashes:
   func:iyzico-refund_handler: b3edad3bb6b5ef11
   overview: 86377044cea6469b
-generated_at: 2026-05-30T21:16:11Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -1305,6 +1429,13 @@ Bu modül, iyzico ödeme sistemi entegrasyonu ile çalışan bir HTTP endpoint'i
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
+- import: npm:iyzipay::Iyzipay
+
+---
+
 ## TYPE ALIASES
 
 ### PaymentTransaction
@@ -1315,10 +1446,15 @@ type PaymentTransaction = { paymentTransactionId?: string }
 ### PaymentDebug
 ```typescript
 type PaymentDebug = {
+
   refunded_total?: number;
+
   paymentId?: string;
+
   raw?: { paymentId?: string; itemTransactions?: PaymentTransaction[] };
+
   partial_refunds?: { amount: number; at: string }[];
+
   [k: string]: un
 ```
 
@@ -1335,13 +1471,21 @@ type IyziRefundResponse = { status?: string; [k: string]: unknown }
 ### IyziSdk
 ```typescript
 type IyziSdk = {
+
   cancel: {
+
     create: (
+
       req: { locale?: unknown; paymentId: string | null; ip: string },
+
       cb: (err: unknown, res: IyziCancelResponse) => void
+
     ) => void;
+
   };
+
   refund: {
+
    
 ```
 
@@ -1433,11 +1577,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\log-client-error\index.ts
-skeleton_hash: a8d1daee693ba3a9
+skeleton_hash: 60f03cb097186ff2
 entity_hashes:
   func:log-client-error_handler: cec12c49f3b9435f
   overview: 4c2fb15476c4ecf3
-generated_at: 2026-05-30T21:16:11Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -1485,9 +1629,18 @@ Bu modül, istemci hatalarını toplayan bir Supabase Edge Function olup, HTTP i
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: https://esm.sh/zod@3.23.8::z
+
+---
+
 ## SABİTLER
 - **clientErrorSchema** (call) — `z.object({
+
   msg: z.string().default(''),
+
   stack: z.string().default(''),
 ...`
 
@@ -1558,7 +1711,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\notification-service\index.ts
-skeleton_hash: 2b730a85f4a94145
+skeleton_hash: fc7dd8f3a0f6d4a5
 entity_hashes:
   func:formatTemplate: 77c1ba2f1d414d11
   func:notification-service_handler: dc7fd5d96878185c
@@ -1566,7 +1719,7 @@ entity_hashes:
   func:sendSMS: 569d0e2e89431898
   func:sendWhatsApp: 79c6e69b836b3ef4
   overview: 71e4dfd3d4c33151
-generated_at: 2026-05-30T21:36:25Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -1654,6 +1807,15 @@ Bu modül için varsayımlar, fonksiyon imzaları ve modül sabitlerinden yola �
 - `template`: string — Değişkenler içeren ham şablon metni (örn: `Sayın {{name}}, talebiniz {{status}} durumundadır.`).
 - `_data`: TemplateData — Şablondaki yer tutuculara karşılık gelecek anahtar-değer çiftlerini içeren nesne (örn: `{ name: 'Ahmet', status: 'inceleniyor' }`).
 **Dönüş**: string — Yer tutucuların değerlerle değiştirildiği, kullanıma hazır son metin dizesi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::getTenantBranding
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
+- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
 
 ---
 
@@ -1754,8 +1916,8 @@ graph TD
     index_ts__sendEmail["sendEmail"]
     index_ts__sendSMS["sendSMS"]
     index_ts__sendWhatsApp["sendWhatsApp"]
-    index_ts__sendEmail --> index_ts__formatTemplate
     index_ts__sendWhatsApp --> index_ts__formatTemplate
+    index_ts__sendEmail --> index_ts__formatTemplate
 ```
 
 ## NODE ID STANDARD
@@ -1784,13 +1946,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-confirmation\index.ts
-skeleton_hash: 1295d68fb2a2460f
+skeleton_hash: 42998e6013574227
 entity_hashes:
   func:loadTemplate: 9bc4b1ff28af1df3
   func:order-confirmation_handler: 52ce43dfb5d8480d
   func:renderTemplate: 598e7353aec8e680
   overview: 826d5cbc0f75e005
-generated_at: 2026-05-30T21:36:27Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -1838,6 +2000,15 @@ Bu modül, sipariş onayı e-postası gönderimi için bir Supabase Edge Functio
 **Parametreler**:
 - req: any — HTTP istek nesnesi, içinde sipariş verileri ve diğer istek bilgileri bulunur.  
 **Dönüş**: Response — HTTP yanıtı, genellikle `text/html` içerik tipinde ve doldurulmuş şablon metnini barındırır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/sentry.ts::sentryCaptureException
+- import: ../_shared/tenant_config.ts::getTenantBranding
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
 
 ---
 
@@ -1891,11 +2062,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-housekeeping\index.ts
-skeleton_hash: d0c60f47a44415de
+skeleton_hash: 1d024d7c4264226b
 entity_hashes:
   func:order-housekeeping_handler: e38889ac24217d85
   overview: 179148bdc1561c4d
-generated_at: 2026-05-30T21:16:25Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -1939,6 +2110,12 @@ Bu modül, bir Supabase Edge Function olan `order-housekeeping_handler` HTTP han
 - req: Request — İşlenecek HTTP istek nesnesi. İstek metodunu, başlıklarını ve gövdesini içerir.
 
 **Dönüş**: Response — İşlem sonucunu içeren HTTP yanıt nesnesi. Başarılı durumlarda 200 OK, hata durumlarında uygun HTTP durum kodlarıyla birlikte JSON formatında bir mesaj veya veri döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -1995,11 +2172,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-validate\index.ts
-skeleton_hash: 51c5353a83b2d85b
+skeleton_hash: 0751b7ac246602a9
 entity_hashes:
   func:order-validate_handler: 5404fb6b36c963fe
   overview: 583f7cd99c081500
-generated_at: 2026-05-30T21:16:25Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -2040,6 +2217,12 @@ Bu modül, bir HTTP isteğini alıp sipariş doğrulama işlemleri yapacak şeki
 - req: Request — Gelen HTTP istek nesnesi. Sipariş doğrulama için gerekli verileri ve header bilgilerini içerir.
 
 **Dönüş**: Response — HTTP yanıt nesnesi. Doğrulama sonucuna göre başarı veya hata durumunu belirten yanıt döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -2224,11 +2407,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\refund-order-mock\index.ts
-skeleton_hash: 0b1c330b99f2dfe6
+skeleton_hash: 4560979f836ae801
 entity_hashes:
   func:refund-order-mock_handler: 4c50c7cb50c6be68
   overview: b618c82b37f33caf
-generated_at: 2026-05-30T21:16:25Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -2265,6 +2448,13 @@ Bu modül, bir Supabase Edge Function HTTP handler'ıdır; tek bir `req` paramet
 - `req`: Request — Supabase Edge Function tarafından sağlanan ve isteği temsil eden HTTP Request nesnesi. Fonksiyon bu nesnenin `body` özelliğinden JSON verisini okur.
 
 **Dönüş**: Response — Fonksiyon, her durumda bir HTTP Response nesnesi döndürür. Başarılı simülasyon durumunda `200 OK` durum kodu ve `{ succeeded: true, message: string, order_id: string }` yapısında bir JSON gövdesi; hata durumunda `400 Bad Request` veya `500 Internal Server Error` durum kodu ve `{ succeeded: false, error: string }` yapısında bir JSON gövdesi döner.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -2341,11 +2531,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\release-expired-reservations\index.ts
-skeleton_hash: 7b8da6bd0f25e4d8
+skeleton_hash: 0b2ab56d5062791b
 entity_hashes:
   func:release-expired-reservations_handler: 2ee83a2fc9a11645
   overview: d6e6683c81c36dd3
-generated_at: 2026-05-30T21:16:46Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -2387,6 +2577,13 @@ Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyicis
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://deno.land/std@0.177.0/http/server.ts::serve
+- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
+
+---
+
 ## INTERFACES
 
 ### InventorySettings
@@ -2404,6 +2601,7 @@ Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyicis
 
 ## SABİTLER
 - **corsHeaders** (object) — `{
+
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
 
 ---
@@ -2468,11 +2666,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\return-status-notification\index.ts
-skeleton_hash: 70775c6410a3ad58
+skeleton_hash: dc719d8c1a08cfe7
 entity_hashes:
   func:return-status-notification_handler: 7d2592fd30deaf05
   overview: 2f67488397ccb15e
-generated_at: 2026-05-30T21:36:29Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -2515,6 +2713,14 @@ Bu modül, Supabase Edge Function runtime ortamında HTTP istekleriyle iade duru
 - `req`: Request — HTTP istek nesnesi. İade durum bildirimi için gerekli verileri (iade ID'si, yeni durum, kullanıcı bilgileri vb.) içeren istek gövdesi ve meta bilgilerini barındırır.
 
 **Dönüş**: `Response` — İşlem sonucunu içeren HTTP yanıt nesnesi. Başarılı bildirim gönderiminde onay mesajı, hata durumunda ise hata bilgisi ve uygun HTTP durum kodunu döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::getTenantBranding
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
 
 ---
 
@@ -2610,7 +2816,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\returns-webhook\index.ts
-skeleton_hash: 5e568e2207a57276
+skeleton_hash: 08a1f56f80c777c8
 entity_hashes:
   func:hmacValid: bae4fb8fa6cd5b7a
   func:json: 4e590f90f0f94ac5
@@ -2619,7 +2825,7 @@ entity_hashes:
   func:returns-webhook_handler: b4558e805d0a933f
   func:sha256Base64: 0784b35c5d8e45cb
   overview: 165beda8727317f0
-generated_at: 2026-05-30T21:36:30Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -2701,6 +2907,12 @@ Bu modül, kargo firmalarından gelen webhook isteklerini HMAC-SHA256 ile doğru
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://esm.sh/@supabase/supabase-js@2::createClient
+
+---
+
 ## SABİTLER
 - **SKEW_MS** (binary_expression) — `5 * 60 * 1000`
 
@@ -2756,13 +2968,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-notification\index.ts
-skeleton_hash: 36e242b42237e9f8
+skeleton_hash: 23787b8183560ca8
 entity_hashes:
   func:loadShippingTemplate: 4b4a832183734352
   func:renderTemplate: 26cc0a301db3fae9
   func:shipping-notification_handler: 06ce613108984be4
   overview: 9cf32250487e69ff
-generated_at: 2026-05-30T21:36:32Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -2833,6 +3045,15 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve mevcut doküma
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/sentry.ts::sentryCaptureException
+- import: ../_shared/tenant_config.ts::getTenantBranding
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
+
+---
+
 ## INTERFACES
 
 ### ShippingNotificationRequest
@@ -2897,12 +3118,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-status\index.ts
-skeleton_hash: bdf4bb8403cfeacb
+skeleton_hash: 3b569cae7979ec9d
 entity_hashes:
   func:jsonResponse: 60e54d50747b3229
   func:shipping-status_handler: d099b53accac2970
   overview: 695bc1e855ae9226
-generated_at: 2026-05-30T21:17:01Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -2946,6 +3167,11 @@ Bu modül, kargo durumu sorgularını işleyen bir Supabase Edge Function olarak
 **Parametreler**:
 - name: req, type: Request — İstemciden gelen HTTP isteğinin tüm detaylarını (url, istek metodu, başlıklar, gövde verisi) içeren standart web Request nesnesi
 **Dönüş**: İşlenen isteğe ait tüm bilgileri ve kargo durumu verisini içeren standart HTTP Response nesnesi döndürür, bu cevap istemciye iletilmek üzere kullanılır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: https://esm.sh/@supabase/supabase-js@2::createClient
 
 ---
 
@@ -2998,7 +3224,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-webhook\index.ts
-skeleton_hash: c43bc501d6918281
+skeleton_hash: 878d3a1d8a42845a
 entity_hashes:
   func:hmacValid: e5f4d85423ceba98
   func:jsonResponse: d167d2178aa5b5dd
@@ -3007,7 +3233,7 @@ entity_hashes:
   func:sha256Base64: 0784b35c5d8e45cb
   func:shipping-webhook_handler: b6676fdc25219168
   overview: 408836261e4028d5
-generated_at: 2026-05-30T21:36:34Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -3096,6 +3322,12 @@ Bu modül, kargo webhook'larını HMAC-SHA256 imza doğrulamasıyla işleyen bir
 **Parametreler**:
 - req: Request — Webhook çağrısını temsil eden HTTP isteği nesnesi.  
 **Dönüş**: Response — İşlem sonucunu içeren HTTP yanıtı.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://esm.sh/@supabase/supabase-js@2::createClient
 
 ---
 
@@ -3224,7 +3456,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\stock-alert\index.ts
-skeleton_hash: 2d2461a51728c843
+skeleton_hash: afbc4a8dc579b84c
 entity_hashes:
   func:checkAllProducts: 84cfac7d1bdd2b56
   func:checkSpecificProduct: 5027f709f9a40c80
@@ -3233,7 +3465,7 @@ entity_hashes:
   func:sendNotification: 9d45549bdcd4429b
   func:stock-alert_handler: 9f0ae49f1a00dd49
   overview: f1961f87b9e63cad
-generated_at: 2026-05-30T21:17:01Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -3321,6 +3553,14 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 **Parametreler**:
 - `supabase: SupabaseClient` — Veritabanı işlemleri için kullanılan Supabase istemcisi nesnesi.
 **Dönüş**: `Promise<AlertRecipient[]>` — Bildirim gönderilecek alıcıların (isim, telefon, email, whatsapp, rol, ve hangi bildirim türlerini/alıcıları istediği) listesini içeren asenkron dizi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
+- import: https://esm.sh/@supabase/supabase-js@2.39.3::SupabaseClient
+- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
 
 ---
 
@@ -3434,10 +3674,10 @@ graph TD
     index_ts__processProductAlert["processProductAlert"]
     index_ts__sendNotification["sendNotification"]
     index_ts__stock-alert_handler["stock-alert_handler"]
-    index_ts__processProductAlert --> index_ts__sendNotification
-    index_ts__checkSpecificProduct --> index_ts__processProductAlert
     index_ts__checkAllProducts --> index_ts__getAlertRecipients
     index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
+    index_ts__checkSpecificProduct --> index_ts__processProductAlert
+    index_ts__processProductAlert --> index_ts__sendNotification
     index_ts__checkAllProducts --> index_ts__processProductAlert
 ```
 
@@ -3469,11 +3709,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\cors.ts
-skeleton_hash: 1151b66ec188024e
+skeleton_hash: 00381c65f282efb4
 entity_hashes:
   func:getCorsHeaders: 1360a70a0a4d6694
   overview: 8eaad34e6f15ad7c
-generated_at: 2026-05-30T21:17:01Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -3541,7 +3781,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\notify.ts
-skeleton_hash: 64c41a0f9af8f2d9
+skeleton_hash: a166635d19f0ad89
 entity_hashes:
   func:getEmailConfig: d69ed27e1c404dc2
   func:getEnv: 6925671b32beb020
@@ -3550,7 +3790,7 @@ entity_hashes:
   func:sendEmail: 2a2dc768ec5451fa
   func:sendSlack: cd61229d7922325b
   overview: be8ec04b8995d7cb
-generated_at: 2026-05-30T21:17:01Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -3674,13 +3914,13 @@ graph TD
     notify_ts__notify["notify"]
     notify_ts__sendEmail["sendEmail"]
     notify_ts__sendSlack["sendSlack"]
-    notify_ts__getSlackWebhook --> notify_ts__getEnv
-    notify_ts__notify --> notify_ts__sendEmail
     notify_ts__getEmailConfig --> notify_ts__getEnv
     notify_ts__notify --> notify_ts__getEnv
     notify_ts__notify --> notify_ts__sendSlack
     notify_ts__sendSlack --> notify_ts__getSlackWebhook
     notify_ts__sendEmail --> notify_ts__getEmailConfig
+    notify_ts__getSlackWebhook --> notify_ts__getEnv
+    notify_ts__notify --> notify_ts__sendEmail
 ```
 
 ## NODE ID STANDARD
@@ -3712,12 +3952,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\rate_limit.ts
-skeleton_hash: d2e039f95972e4b1
+skeleton_hash: 40c1c3cb655dae2c
 entity_hashes:
   func:checkRateLimit: eb2ddca9002ea24b
   func:rateLimitHeaders: 8e57db019805fbe0
   overview: 2d23853bbec3dccf
-generated_at: 2026-05-30T21:17:11Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -3815,14 +4055,14 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\sentry.ts
-skeleton_hash: bf17e002e85319b5
+skeleton_hash: 4a1eb17c4a08a475
 entity_hashes:
   func:parseDsn: de6e6bd80de1e473
   func:postStore: baa7d375e0588daa
   func:sentryCaptureException: d3efed22b661b471
   func:sentryCaptureMessage: f1e4a7cbdea35542
   overview: a0aac1a163270d41
-generated_at: 2026-05-30T21:17:11Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -3963,8 +4203,8 @@ graph TD
     sentry_ts__sentryCaptureException["sentryCaptureException"]
     sentry_ts__sentryCaptureMessage["sentryCaptureMessage"]
     sentry_ts__sentryCaptureException --> sentry_ts__postStore
-    sentry_ts__sentryCaptureMessage --> sentry_ts__postStore
     sentry_ts__postStore --> sentry_ts__parseDsn
+    sentry_ts__sentryCaptureMessage --> sentry_ts__postStore
 ```
 
 ## NODE ID STANDARD
@@ -3992,12 +4232,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\tenant_config.ts
-skeleton_hash: 9da745ddb0a89b81
+skeleton_hash: 12c856af1a1cb729
 entity_hashes:
   func:getTenantBranding: bde2d3819c7904af
   func:resolveTenantId: 70b9699dc1e36828
   overview: 0aa8d7ed1d1b17a6
-generated_at: 2026-05-30T21:36:11Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -4056,6 +4296,11 @@ Bu modül, HTTP isteklerinden tenant (kiracı) tanımlayıcısını çıkaran ve
 - `brandLogoUrl`: string — Markanın Logo Görselinin Tam URL'i
 - `brandPrimaryColor`: string — Markanın Ana Renk Kodu (HEX formatında, Ör: "#2563eb")
 - `emailFrom`: string — Sistem e-postalarında kullanılacak "Gönderen" adresi (Ör: "VentHub <onboarding@resend.dev>")
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: https://esm.sh/@supabase/supabase-js@2::createClient
 
 ---
 

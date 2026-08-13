@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\tenant_config.ts
-skeleton_hash: 9da745ddb0a89b81
+skeleton_hash: 12c856af1a1cb729
 entity_hashes:
   func:getTenantBranding: bde2d3819c7904af
   func:resolveTenantId: 70b9699dc1e36828
   overview: 0aa8d7ed1d1b17a6
-generated_at: 2026-05-30T21:36:11Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -67,6 +67,11 @@ Bu modül, HTTP isteklerinden tenant (kiracı) tanımlayıcısını çıkaran ve
 - `brandLogoUrl`: string — Markanın Logo Görselinin Tam URL'i
 - `brandPrimaryColor`: string — Markanın Ana Renk Kodu (HEX formatında, Ör: "#2563eb")
 - `emailFrom`: string — Sistem e-postalarında kullanılacak "Gönderen" adresi (Ör: "VentHub <onboarding@resend.dev>")
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: https://esm.sh/@supabase/supabase-js@2::createClient
 
 ---
 

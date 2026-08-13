@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-confirmation\index.ts
-skeleton_hash: 1295d68fb2a2460f
+skeleton_hash: 42998e6013574227
 entity_hashes:
   func:loadTemplate: 9bc4b1ff28af1df3
   func:order-confirmation_handler: 52ce43dfb5d8480d
   func:renderTemplate: 598e7353aec8e680
   overview: 826d5cbc0f75e005
-generated_at: 2026-05-30T21:36:27Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -57,6 +57,15 @@ Bu modül, sipariş onayı e-postası gönderimi için bir Supabase Edge Functio
 **Parametreler**:
 - req: any — HTTP istek nesnesi, içinde sipariş verileri ve diğer istek bilgileri bulunur.  
 **Dönüş**: Response — HTTP yanıtı, genellikle `text/html` içerik tipinde ve doldurulmuş şablon metnini barındırır.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/sentry.ts::sentryCaptureException
+- import: ../_shared/tenant_config.ts::getTenantBranding
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
 
 ---
 

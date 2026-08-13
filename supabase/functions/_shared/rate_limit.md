@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\rate_limit.ts
-skeleton_hash: d2e039f95972e4b1
+skeleton_hash: 40c1c3cb655dae2c
 entity_hashes:
   func:checkRateLimit: eb2ddca9002ea24b
   func:rateLimitHeaders: 8e57db019805fbe0
   overview: 2d23853bbec3dccf
-generated_at: 2026-05-30T21:17:11Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış

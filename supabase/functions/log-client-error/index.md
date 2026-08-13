@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\log-client-error\index.ts
-skeleton_hash: a8d1daee693ba3a9
+skeleton_hash: 60f03cb097186ff2
 entity_hashes:
   func:log-client-error_handler: cec12c49f3b9435f
   overview: 4c2fb15476c4ecf3
-generated_at: 2026-05-30T21:16:11Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -52,6 +52,13 @@ Bu modül, istemci hatalarını toplayan bir Supabase Edge Function olup, HTTP i
 - `req`: Request — İşlenecek olan HTTP istek nesnesi. Client tarafından gönderilen hata bilgilerini ve gerekli header/body verilerini içerir.
 
 **Dönüş**: `Response` — İşlem sonucuna göre bir HTTP yanıt nesnesi döndürür. Başarılı logging işlemi veya hata durumuna uygun status kodu ve mesaj içerebilir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: https://esm.sh/zod@3.23.8::z
 
 ---
 

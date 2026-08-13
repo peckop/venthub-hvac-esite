@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-refund\index.ts
-skeleton_hash: 55d9342253dad488
+skeleton_hash: e118353a1b4289e0
 entity_hashes:
   func:iyzico-refund_handler: b3edad3bb6b5ef11
   overview: 86377044cea6469b
-generated_at: 2026-05-30T21:16:11Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -44,6 +44,13 @@ Bu modül, iyzico ödeme sistemi entegrasyonu ile çalışan bir HTTP endpoint'i
 **Parametreler**:
 - req: Request — Fonksiyonun işleyeceği HTTP istek nesnesi. İsteğin metodu, gövdesi (geri ödeme bilgileri) ve varsa başlık bilgilerini içerir.
 **Dönüş**: Response — iyzico API'sinden alınan sonuca göre başarı veya hata durumunu belirten, JSON formatında bir HTTP yanıt nesnesi. Genellikle { success: boolean, data?: object, error?: string } yapısında bir gövdeye sahiptir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
+- import: npm:iyzipay::Iyzipay
 
 ---
 

@@ -3,12 +3,12 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\apply-coupon\index.ts
-skeleton_hash: c8d35825cdb738d5
+skeleton_hash: 0f843675c7f6ae1f
 entity_hashes:
   func:apply-coupon_handler: a399f5149250ae7f
   func:buildCors: 317be5b9cff201e9
   overview: fb96f807c58d5b28
-generated_at: 2026-05-30T21:15:46Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -62,6 +62,12 @@ Bu modül, HTTP istekleri üzerinden kupon kodu doğrulama ve uygulama işlevsel
 **Parametreler**:
 - req: Request — Kupon bilgilerini ve oturum verilerini içeren yükü barındıran gelen HTTP isteği nesnesi.
 **Dönüş**: Response — Kupon uygulama işleminin sonucunu, durum kodlarını ve gerekli JSON verilerini içeren HTTP yanıt nesnesi.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 

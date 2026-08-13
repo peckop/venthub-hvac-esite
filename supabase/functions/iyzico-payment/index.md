@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-payment\index.ts
-skeleton_hash: 728e831857b032c6
+skeleton_hash: 179c063d0f71f16e
 entity_hashes:
   func:iyzico-payment_handler: de31c29702dafb3c
   overview: 10ad7fb56d2cc8ae
-generated_at: 2026-05-30T21:36:23Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -40,6 +40,13 @@ Bu modül için özel aksiyom tanımlanmamıştır. Mevcut bilgiler (fonksiyon i
 - `req`: Request — HTTP isteği nesnesi. İstemciden gelen tüm HTTP talep bilgilerini (headers, body, query params, method vb.) içerir. Bu nesne aracılığıyla isteğin içeriğine erişilir.
 
 **Dönüş**: `Response` — Fonksiyonun döndürdüğü HTTP yanıt nesnesi. İşlem sonucuna göre istemciye uygun durum kodu ve içerik döndürülür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: npm:iyzipay::Iyzipay
 
 ---
 

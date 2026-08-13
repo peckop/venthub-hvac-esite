@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\return-status-notification\index.ts
-skeleton_hash: 70775c6410a3ad58
+skeleton_hash: dc719d8c1a08cfe7
 entity_hashes:
   func:return-status-notification_handler: 7d2592fd30deaf05
   overview: 2f67488397ccb15e
-generated_at: 2026-05-30T21:36:29Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -50,6 +50,14 @@ Bu modül, Supabase Edge Function runtime ortamında HTTP istekleriyle iade duru
 - `req`: Request — HTTP istek nesnesi. İade durum bildirimi için gerekli verileri (iade ID'si, yeni durum, kullanıcı bilgileri vb.) içeren istek gövdesi ve meta bilgilerini barındırır.
 
 **Dönüş**: `Response` — İşlem sonucunu içeren HTTP yanıt nesnesi. Başarılı bildirim gönderiminde onay mesajı, hata durumunda ise hata bilgisi ve uygun HTTP durum kodunu döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/tenant_config.ts::getTenantBranding
+- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
 
 ---
 

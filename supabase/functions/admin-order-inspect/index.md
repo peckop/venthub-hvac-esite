@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-order-inspect\index.ts
-skeleton_hash: 56a179869162a6f7
+skeleton_hash: fe4682511784f4f0
 entity_hashes:
   func:admin-order-inspect_handler: 1ddac70ce14150b4
   overview: a75dc03846842f5a
-generated_at: 2026-05-30T21:15:35Z
+generated_at: 2026-08-13T07:40:32Z
 ---
 
 ## Genel Bakış
@@ -20,7 +20,10 @@ Modülün dış dünyayla tek temas noktası olarak tüm istek akışını yöne
 
 ---
 
-
+## AXIOMS – Mimari Varsayımlar
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -35,6 +38,12 @@ Modülün dış dünyayla tek temas noktası olarak tüm istek akışını yöne
 - `req`: `Request` — Gelen HTTP isteğini temsil eden nesne. İstek metodu, URL, başlıklar ve gövde gibi verileri içerir.
 
 **Dönüş**: `Response` — İşlemin sonucunu içeren HTTP yanıtı. Genellikle bir durum kodu (örneğin, 200 başarılı, 404 bulunamadı, 500 sunucu hatası) ve isteğe bağlı olarak bir JSON gövdesi veya metin içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 

@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\stock-alert\index.ts
-skeleton_hash: 2d2461a51728c843
+skeleton_hash: afbc4a8dc579b84c
 entity_hashes:
   func:checkAllProducts: 84cfac7d1bdd2b56
   func:checkSpecificProduct: 5027f709f9a40c80
@@ -12,7 +12,7 @@ entity_hashes:
   func:sendNotification: 9d45549bdcd4429b
   func:stock-alert_handler: 9f0ae49f1a00dd49
   overview: f1961f87b9e63cad
-generated_at: 2026-05-30T21:17:01Z
+generated_at: 2026-08-13T07:40:33Z
 ---
 
 ## Genel Bakış
@@ -103,6 +103,14 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../_shared/cors.ts::getCorsHeaders
+- import: https://deno.land/std@0.168.0/http/server.ts::serve
+- import: https://esm.sh/@supabase/supabase-js@2.39.3::SupabaseClient
+- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
+
+---
+
 ## INTERFACES
 
 ### Product
@@ -117,8 +125,7 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 - `email: string`
 - `whatsapp: string`
 - `role: 'admin' | 'manager' | 'buyer'`
-- `notifications: {
-`
+- `notifications: {`
 
 ### AlertData
 - `productName: string`
@@ -131,7 +138,6 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 
 ## SABİTLER
 - **corsHeaders** (object) — `{
-
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
 
 ---
@@ -213,10 +219,10 @@ graph TD
     index_ts__processProductAlert["processProductAlert"]
     index_ts__sendNotification["sendNotification"]
     index_ts__stock-alert_handler["stock-alert_handler"]
-    index_ts__processProductAlert --> index_ts__sendNotification
-    index_ts__checkSpecificProduct --> index_ts__processProductAlert
     index_ts__checkAllProducts --> index_ts__getAlertRecipients
     index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
+    index_ts__checkSpecificProduct --> index_ts__processProductAlert
+    index_ts__processProductAlert --> index_ts__sendNotification
     index_ts__checkAllProducts --> index_ts__processProductAlert
 ```
 
