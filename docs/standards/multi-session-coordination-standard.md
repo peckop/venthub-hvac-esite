@@ -32,8 +32,24 @@ tazelenir ve TTL dolunca kendiliğinden düşer. Kilit olsaydı ölü bir oturum
 pencere kapatma) şeridi sonsuza dek bloke ederdi. Ajan oturumları ölür — model bunu varsayar.
 
 **K2 · Yol rezervasyonu.** Çakışma iş emrinde değil **dosyada** olur. Talep bir glob kümesi
-taşır: `src/**` · `supabase/functions/**` · `venthub-pdf-ingestor/**`. Aynı yolu iki oturum
-talep ederse **en erken timestamp kazanır** (deterministik, tartışmasız).
+taşır. Aynı yolu iki oturum talep ederse **en erken timestamp kazanır**: kıdemli oturum
+yazmaya devam eder, **geç gelen** bloklanır. Bu simetrik değildir ve olmamalıdır — "her
+çakışanı blokla" demek iki oturumu birden durdurmak, yani katmanın kendisini kesinti
+kaynağına çevirmektir.
+
+**Şeritler DAR talep edilir.** `src/**` gibi kök-geniş glob, aynı ağacın ilgisiz bir
+köşesinde çalışan oturumu da bloklar (yanlış-pozitif). Doğrusu dokunduğun alt ağaçlar:
+`src/lib/services/pricing*` · `src/views/admin/*Pricing*`. Kök-geniş glob yalnız gerçekten
+tüm ağacı yeniden yazan bir göç için meşrudur ve o zaman da geçicidir.
+
+**Genişletme birleştirir, daraltma `release` ister.** İkinci bir `claim` globları **birleştirir**
+ve ilk talebin kıdemini korur; eskisini sessizce bırakmaz. Şeridi daraltmak/devretmek için
+önce `release`.
+
+**Worktree'ler ayrı değildir.** Yol repo köküne göre çözülür (`git rev-parse --show-toplevel`,
+`cwd` değil — bu oturumlarda birden çok çalışma dizini var ve `EnterWorktree` cwd'yi
+değiştirir). Bu bilinçlidir: aynı **dosyayı** iki dalda düzenlemek gelecekteki merge
+çakışmasıdır, katmanın görevi tam olarak onu erken göstermektir.
 
 **K3 · Olay günlüğü (append-only).** Kimse kimsenin satırını düzenlemez → çakışması tanım
 gereği imkânsız. Her oturum **yalnız kendi dosyasına** yazar (`events.<sid>.jsonl`), okuma
@@ -44,7 +60,8 @@ hepsinin birleşimidir; böylece eşzamanlı append'in satır karıştırma risk
 | An | Ne olur | Neden hatırlanmaya gerek yok |
 |---|---|---|
 | Oturum açılışı | `SessionStart` kancası kimliği + şeridi + pano özetini **bağlama enjekte eder** | Ajan zaten "neredeyiz" diye bakmak zorunda; kimliğini tahmin etmez, **okur** |
-| Her kullanıcı turu | `UserPromptSubmit` kancası **sessiz** brifing basar (yalnız söyleyecek şey varsa) | Bağlamı kirletmeden farkındalık; Recep mesaj taşımaz |
+| Her kullanıcı turu | `UserPromptSubmit` kancası **sessiz** brifing basar (yalnız söyleyecek şey varsa) **ve kirayı yeniler** | Bağlamı kirletmeden farkındalık; Recep mesaj taşımaz. Kalp atışını elle beklemek, bu cetvelin teşhis ettiği "hatırlamaya bağlı adım"ı katmanın merkezine geri koyardı |
+| Oturum kapanışı | `SessionEnd` kancası şeridi **bırakır** | TTL (4sa) yalnız çökme/kapatma için emniyet ağıdır; düzgün kapanışta sıradaki oturum beklemez |
 | Yazmadan önce | `PreToolUse` kancası başka oturumun şeridine yazmayı **reddeder** | Talimat değil **yapı** — protokolü unutmak mümkün değil |
 | PR merge | `post-merge` kancası commit künyelerinden registry'yi günceller | Kanca zaten doc üretimi için koşuyor |
 
@@ -63,7 +80,9 @@ senkron **idempotent**tir: aynı commit iki kez işlense sonuç aynıdır.
 **Fail-OPEN (bilinçli sapma).** VentHub kuralı "yeni kapıya geçiş modu koyma" der; o kural
 **güvenlik** kapıları içindir. Bu bir **koordinasyon** kapısı: pano okunamazsa fail-closed
 olmak üç oturumu birden durdurur — kendi kendine kesinti. Pano bozulduğunda yazma serbest
-kalır, son emniyet git'tir. **Sessiz değildir:** hata `stderr`'e düşer.
+kalır, son emniyet git'tir. **Sessiz değildir:** okunamayan dizin, açılamayan dosya ve
+**bozuk satır** ayrı ayrı `stderr`'e düşer — tek bozuk satır bir şeridin korumasını
+düşürebilir, sessizce yutulmaz.
 
 **Kilit değil kalite ağı.** Ajan `Bash` ile kapıyı aşabilir, kullanıcı dosyayı elle
 düzenleyebilir. Amaç kazara çakışmayı **yazım anında** yüzeye çıkarmak.
@@ -90,6 +109,15 @@ node scripts/board/registry-sync.cjs --dry            # künyeleri raporla, yazm
 - **Kiralamaya ZORLAYAMAZ.** Kiralamadan çalışan oturum görünmez kalır — ama `SessionStart`
   ona şeridinin talep edilmediğini söyler. Kaçış yolu var, sessiz değil.
 - **Git son hakem.** Pano çakışmayı önler, doğruluğu garanti etmez.
+- **`post-merge` kancası repoda DEĞİL** (`.git/hooks/` versiyonlanmaz). Aynı makinedeki
+  worktree'ler `.git/hooks`'u paylaştığı için üç oturum da kapsanır; ama **yeni bir klonda
+  ya da ikinci bir makinede registry senkronu hiç çalışmaz** — kancayı elle bağlamak gerekir.
+- **Glob granülerliği anlamsal değil.** Aynı glob'a giren ama birbiriyle ilgisiz dosyalar da
+  bloklanır; çözüm dar şerit talep etmektir (§K2), kodun akıllanması değil.
+- **Notlar en fazla 5 ve bir kez teslim edilir** (`seen` işareti). Kalıcı iletişim kanalı
+  değildir; kalıcı olması gereken şey PR gövdesine ya da dokümana yazılır.
+- **Pano kendini budar:** 24 saatten eski oturum dosyaları hiç okunmaz (maliyet sınırı).
+  Silmek gerekirse `C:/tmp/venthub-board/` elle süpürülebilir.
 
 ---
 

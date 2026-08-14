@@ -1,13 +1,19 @@
 #!/usr/bin/env node
 /**
- * UserPromptSubmit hook — SESSİZ pano brifingi.
+ * UserPromptSubmit hook — SESSİZ pano brifingi + kira yenileme.
  *
  * Amaç: "eş controller ne yapıyor?" sorusunun cevabı, sormaya gerek kalmadan bağlamda olsun.
  * Bu, Recep'i mesaj taşıyıcısı olmaktan çıkaran katman.
  *
  * SESSİZLİK KURALI: söyleyecek bir şey yoksa HİÇBİR ŞEY yazmaz. Her tura birkaç satır
  * eklemek bağlamı kirletir ve zamanla okunmaz hâle gelir; bu yüzden yalnız (a) başka bir
- * oturumun canlı şeridi varsa ya da (b) okunmamış not varsa konuşur.
+ * oturumun canlı şeridi varsa ya da (b) OKUNMAMIŞ not varsa konuşur. Teslim edilen notlar
+ * `seen` ile işaretlenir — aksi hâlde aynı not sonsuza dek basılır ve kural kendi kendini
+ * bozar.
+ *
+ * KALP ATIŞI burada: kira modeli atış olmadan çalışmaz, atışı elle yapmayı beklemek
+ * "hatırlamaya bağlı adım"ı katmanın merkezine geri koyar. Bu kanca zaten her turda
+ * koşuyor ve oturum kendi dosyasına yazıyor (çekişme yok) → atışın doğal yeri.
  *
  * stdin: { session_id, ... } · stdout: hookSpecificOutput.additionalContext
  */
@@ -32,10 +38,15 @@ try {
 let live = []
 let notes = []
 try {
+  board.touch(sid) // kirayı yenile (aralık board.cjs'te kısılı)
+  const events = board.readEvents()
   live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
-  notes = board.notesFor(sid, mine && mine.lane)
-} catch { process.exit(0) }
+  notes = board.notesFor(sid, mine && mine.lane, events)
+} catch (e) {
+  process.stderr.write(`[board-brief] pano okunamadı (fail-open): ${e && e.message}\n`)
+  process.exit(0)
+}
 
 const others = live.filter(c => c.sid !== sid)
 if (others.length === 0 && notes.length === 0) process.exit(0) // söyleyecek bir şey yok
@@ -49,6 +60,7 @@ if (others.length > 0) {
 }
 if (notes.length > 0) {
   lines.push('NOT: ' + notes.map(n => `${String(n.sid).slice(0, 8)}→${n.to || 'herkes'} "${n.text}"`).join(' | '))
+  try { board.markSeen(sid, notes) } catch { /* işaretlenemedi: not tekrar gelir, zararsız */ }
 }
 
 process.stdout.write(JSON.stringify({

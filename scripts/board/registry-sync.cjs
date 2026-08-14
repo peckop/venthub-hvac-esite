@@ -38,12 +38,26 @@ const PROJECT_ID = 'venthub-hvac'
  * bu ikincisi).
  */
 function git(args) {
-  try { return execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }) } catch { return '' }
+  try {
+    return execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
+  } catch (e) {
+    // SESSİZ KALMA: geçersiz aralıkta boş dönmek "künye yok" diye raporlanır ve senkronun
+    // hiç çalışmadığı, çalıştığı sanılarak gizlenir.
+    process.stderr.write(`[registry-sync] git ${args.join(' ')} başarısız: ${e && e.message}\n`)
+    return ''
+  }
 }
 
-/** Commit gövdelerinden `Work-Order:` künyelerini topla. */
+/**
+ * Commit gövdelerinden `Work-Order:` künyelerini topla.
+ *
+ * `--reverse` ŞART: `git log` en yeniden eskiye akar, döngü de aynı iş emrinin üstüne
+ * yazar — ters sırada okunursa aralıktaki EN ESKİ değer nihai olur ve birkaç PR biriktikten
+ * sonra tek `git pull` registry'yi GERİYE yazar. Yani betiğin var oluş sebebi olan "bayat
+ * durum" hatası, betiğin kendi içinde. En yeni künye kazanmalı.
+ */
 function parseTrailers(range) {
-  const log = git(['log', range, '--format=%B%n---COMMIT---'])
+  const log = git(['log', '--reverse', range, '--format=%B%n---COMMIT---'])
   const updates = new Map() // shortId → { progress?, status? }
   const re = /^\s*Work-Order:\s*([A-Z]\d{3}-[A-Z]{2})((?:\s+\w+=\S+)*)\s*$/gim
   let m
@@ -60,6 +74,8 @@ function parseTrailers(range) {
         if (['backlog', 'open', 'active', 'blocked', 'completed'].includes(v)) entry.status = v
       }
     }
+    // Boş künye (`Work-Order: T001-VH` tek başına) `updated_at`'ı boşuna bumplamasın.
+    if (entry.progress === undefined && entry.status === undefined) continue
     updates.set(shortId, entry)
   }
   return updates
@@ -102,13 +118,16 @@ for it in items:
 con.commit()
 print(json.dumps({"applied": applied, "lines": lines}))
 `
-  try {
-    const out = execFileSync('python', ['-c', py, payload], { encoding: 'utf8' })
-    const parsed = JSON.parse(out.trim().split('\n').pop())
-    return { applied: parsed.applied, skipped: updates.size - parsed.applied, lines: parsed.lines }
-  } catch (e) {
-    return { applied: 0, skipped: updates.size, lines: [`registry yazılamadı: ${e && e.message}`] }
+  // Windows'ta `python` bazen App Execution Alias'a (mağaza yönlendirmesi) düşer; `py` fallback.
+  let lastErr = null
+  for (const exe of ['python', 'py']) {
+    try {
+      const out = execFileSync(exe, ['-c', py, payload], { encoding: 'utf8' })
+      const parsed = JSON.parse(out.trim().split('\n').pop())
+      return { applied: parsed.applied, skipped: updates.size - parsed.applied, lines: parsed.lines }
+    } catch (e) { lastErr = e }
   }
+  return { applied: 0, skipped: updates.size, lines: [`registry yazılamadı: ${lastErr && lastErr.message}`] }
 }
 
 const args = process.argv.slice(2)

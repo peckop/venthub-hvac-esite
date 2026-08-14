@@ -24,10 +24,15 @@
 const fs = require('fs')
 const path = require('path')
 const os = require('os')
+const { execFileSync } = require('child_process')
 
 const BOARD_DIR = process.env.VENTHUB_BOARD_DIR || path.join('C:', 'tmp', 'venthub-board')
 /** Kira ömrü: bu süre atış almayan talep BAYAT sayılır ve engellemez (ölü oturum kilitlemesin). */
 const DEFAULT_TTL_MS = 4 * 60 * 60 * 1000
+/** Bu yaştan eski dosyalar hiç OKUNMAZ (sınırsız büyümeye karşı; pano anlık kanaldır). */
+const PRUNE_MS = 24 * 60 * 60 * 1000
+/** Kalp atışı bu sıklıktan daha sık yazılmaz (her tur satır eklemek dosyayı şişirir). */
+const HEARTBEAT_MIN_INTERVAL_MS = 10 * 60 * 1000
 
 function ensureDir() {
   try { fs.mkdirSync(BOARD_DIR, { recursive: true }) } catch { /* yoksay */ }
@@ -45,40 +50,81 @@ function append(sid, event) {
   fs.appendFileSync(sessionFile(sid), line, 'utf8')
 }
 
-/** Tüm oturum dosyalarını oku (bozuk satır sessizce atlanır — pano hiçbir zaman patlamamalı). */
+/**
+ * Kalp atışı — ama YALNIZ gerekiyorsa. Kira modeli atış olmadan çalışmaz; atışı elle
+ * yapmayı beklemek "hatırlamaya bağlı adım"ı katmanın merkezine geri koyar. Bu yüzden
+ * `board-brief` her turda burayı çağırır, biz de aralığı burada kısarız.
+ * @returns {boolean} atış yazıldı mı
+ */
+function touch(sid, minIntervalMs = HEARTBEAT_MIN_INTERVAL_MS) {
+  let lastTs = 0
+  try {
+    const raw = fs.readFileSync(sessionFile(sid), 'utf8')
+    const lines = raw.split('\n').filter(l => l.trim())
+    for (let i = lines.length - 1; i >= 0; i--) {
+      try { const e = JSON.parse(lines[i]); lastTs = Date.parse(e.ts) || 0; break } catch { /* bozuk satır */ }
+    }
+  } catch { return false } // dosya yok = bu oturum hiç talep etmemiş, atacak kalp yok
+  if (Date.now() - lastTs < minIntervalMs) return false
+  append(sid, { type: 'heartbeat' })
+  return true
+}
+
+/**
+ * Tüm oturum dosyalarını oku.
+ * - PRUNE_MS'ten eski dosyalar hiç AÇILMAZ (maliyet sınırı).
+ * - Bozuk satır atlanır ama SESSİZ DEĞİL: stderr'e uyarı düşer (fail-open'ın sessiz
+ *   olmaması cetvelin yazılı kuralı; bozuk tek satır bir şeridin korumasını düşürebilir).
+ */
 function readEvents() {
   ensureDir()
   let files = []
-  try { files = fs.readdirSync(BOARD_DIR).filter(f => f.startsWith('events.') && f.endsWith('.jsonl')) } catch { return [] }
+  try { files = fs.readdirSync(BOARD_DIR).filter(f => f.startsWith('events.') && f.endsWith('.jsonl')) } catch (e) {
+    warn(`pano dizini okunamadı: ${e && e.message}`)
+    return []
+  }
   const out = []
+  const cutoff = Date.now() - PRUNE_MS
   for (const f of files) {
+    const full = path.join(BOARD_DIR, f)
+    try { if (fs.statSync(full).mtimeMs < cutoff) continue } catch { continue }
     let raw = ''
-    try { raw = fs.readFileSync(path.join(BOARD_DIR, f), 'utf8') } catch { continue }
+    try { raw = fs.readFileSync(full, 'utf8') } catch (e) { warn(`okunamadı ${f}: ${e && e.message}`); continue }
+    let bad = 0
     for (const line of raw.split('\n')) {
       if (!line.trim()) continue
-      try { out.push(JSON.parse(line)) } catch { /* bozuk satır: atla */ }
+      try { out.push(JSON.parse(line)) } catch { bad++ }
     }
+    if (bad > 0) warn(`${f}: ${bad} bozuk satır atlandı — o şeridin koruması eksik olabilir`)
   }
   out.sort((a, b) => String(a.ts).localeCompare(String(b.ts)))
   return out
+}
+
+function warn(msg) {
+  try { process.stderr.write(`[board] ${msg}\n`) } catch { /* yoksay */ }
 }
 
 /**
  * Şu an CANLI olan talepler. Kurallar:
  *  - release edilmiş şerit düşer,
  *  - TTL dolmuş talep düşer (ölü oturum kilitlemez),
- *  - aynı yolu iki oturum talep ederse EN ERKEN timestamp kazanır (deterministik).
+ *  - aynı oturum tekrar claim ederse globlar BİRLEŞTİRİLİR ve KIDEM (ilk ts) korunur
+ *    — "şeridimi genişleteyim" hareketi eskisini sessizce bırakmasın diye; daraltmak
+ *    isteyen önce `release` eder.
  */
 function liveClaims(now = Date.now()) {
   const events = readEvents()
   const bySession = new Map()
   for (const e of events) {
     if (e.type === 'claim') {
+      const globs = Array.isArray(e.globs) ? e.globs : []
+      const prev = bySession.get(e.sid)
       bySession.set(e.sid, {
         sid: e.sid,
-        lane: e.lane || 'lane',
-        globs: Array.isArray(e.globs) ? e.globs : [],
-        ts: e.ts,
+        lane: e.lane || (prev && prev.lane) || 'lane',
+        globs: prev ? [...new Set([...prev.globs, ...globs])] : globs,
+        ts: prev ? prev.ts : e.ts, // kıdem korunur
         heartbeat: e.ts,
         ttlMs: typeof e.ttlMs === 'number' ? e.ttlMs : DEFAULT_TTL_MS,
       })
@@ -94,7 +140,7 @@ function liveClaims(now = Date.now()) {
     const age = now - Date.parse(c.heartbeat)
     if (Number.isFinite(age) && age <= c.ttlMs) live.push(c)
   }
-  // En erken talep kazanır (çakışan yol iddialarında deterministik sonuç).
+  // En erken talep önce (çakışan yol iddialarında deterministik sonuç — bkz. findConflict).
   live.sort((a, b) => String(a.ts).localeCompare(String(b.ts)))
   return live
 }
@@ -117,22 +163,48 @@ function globToRegExp(glob) {
   return new RegExp('^' + re + '$', 'i')
 }
 
+/**
+ * Dosyanın ait olduğu repo kökü. `cwd`'ye GÜVENİLMEZ: bu oturumda birden çok çalışma
+ * dizini kayıtlı ve `EnterWorktree` cwd'yi değiştiriyor; alt dizinden koşulduğunda da
+ * cwd kök değildir. İkisinde de yol repo-göreli olmaz, hiçbir glob tutmaz ve koruma
+ * SESSİZCE düşer (yanlış-negatif). Kökü git'ten sorarız.
+ */
+function repoRootFor(filePath) {
+  const norm = String(filePath).replace(/\\/g, '/')
+  const dir = norm.endsWith('/') ? norm : path.posix.dirname(norm)
+  try {
+    return execFileSync('git', ['-C', dir, 'rev-parse', '--show-toplevel'], {
+      encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim().replace(/\\/g, '/')
+  } catch { return '' }
+}
+
 /** Mutlak/göreli yolu repo-göreli hâle getir (pano yolları repo-göreli tutulur). */
 function toRepoRelative(filePath, repoRoot) {
   const norm = String(filePath).replace(/\\/g, '/')
-  const root = String(repoRoot || process.cwd()).replace(/\\/g, '/')
-  if (norm.toLowerCase().startsWith(root.toLowerCase() + '/')) return norm.slice(root.length + 1)
+  const roots = [repoRoot, repoRootFor(norm), process.cwd()]
+    .filter(Boolean)
+    .map(r => String(r).replace(/\\/g, '/').replace(/\/$/, ''))
+  for (const root of roots) {
+    if (norm.toLowerCase().startsWith(root.toLowerCase() + '/')) return norm.slice(root.length + 1)
+  }
   return norm.replace(/^\.\//, '')
 }
 
 /**
  * Bu yol BAŞKA bir oturumun canlı talebine giriyor mu?
- * Kendi oturumunun talebi engel değildir.
+ *
+ * "EN ERKEN KAZANIR" (cetvel §K2): benim talebimden SONRA gelen bir talep beni bloklamaz.
+ * Aksi hâlde aynı yolu iki oturum talep ettiğinde İKİSİ de yazamaz — karşılıklı kilit,
+ * yani katmanın kendisi kesinti kaynağı olur. Kıdemli olan çalışır, geç gelen engellenir.
  */
 function findConflict(filePath, sid, repoRoot) {
   const rel = toRepoRelative(filePath, repoRoot)
-  for (const c of liveClaims()) {
+  const live = liveClaims()
+  const mine = live.find(c => c.sid === sid)
+  for (const c of live) {
     if (c.sid === sid) continue
+    if (mine && String(c.ts).localeCompare(String(mine.ts)) > 0) continue // ben daha kıdemliyim
     for (const g of c.globs) {
       if (globToRegExp(g).test(rel)) return { claim: c, glob: g, rel }
     }
@@ -152,37 +224,65 @@ function summary(sid) {
   return 'PANO — canlı şeritler:\n' + lines.join('\n')
 }
 
-/** Okunmamış notlar: bana yazılmış, benim oturumumdan sonra gelen `note` olayları. */
-function notesFor(sid, lane) {
-  const events = readEvents()
-  return events.filter(e =>
+/** Bu oturumun teslim aldığı son not zamanı (`seen` işareti). */
+function lastSeen(sid, events) {
+  let last = ''
+  for (const e of events || []) {
+    if (e.type === 'seen' && e.sid === sid && typeof e.upto === 'string' && e.upto > last) last = e.upto
+  }
+  return last
+}
+
+/**
+ * OKUNMAMIŞ notlar. `seen` işaretiyle filtrelenir; yoksa aynı not her turda tekrar basılır
+ * ve brifingin tek değeri olan "sessizlik kuralı" zamanla bozulur (gürültü → okunmaz katman).
+ */
+function notesFor(sid, lane, events) {
+  const evs = events || readEvents()
+  const since = lastSeen(sid, evs)
+  return evs.filter(e =>
     e.type === 'note' &&
     e.sid !== sid &&
+    String(e.ts) > since &&
     (!e.to || e.to === sid || (lane && e.to === lane))
   ).slice(-5)
 }
 
+/** Teslim edilen notları okundu işaretle (append-only modele sadık: kendi dosyana yazarsın). */
+function markSeen(sid, notes) {
+  if (!notes || notes.length === 0) return
+  const upto = notes.map(n => String(n.ts)).sort().pop()
+  append(sid, { type: 'seen', upto })
+}
+
 module.exports = {
-  BOARD_DIR, DEFAULT_TTL_MS,
-  append, readEvents, liveClaims, findConflict, summary, notesFor,
-  globToRegExp, toRepoRelative,
+  BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS,
+  append, touch, readEvents, liveClaims, findConflict, summary,
+  notesFor, markSeen, lastSeen,
+  globToRegExp, toRepoRelative, repoRootFor,
 }
 
 /* ---------------------------- CLI ---------------------------- */
 if (require.main === module) {
+  /** Değer alan bayraklar — değerleri serbest metinden AYIKLANMALI, yoksa nota sızar. */
+  const VALUE_FLAGS = new Set(['sid', 'lane', 'globs', 'to', 'text'])
   const [, , verb, ...rest] = process.argv
-  const arg = (name, fallback) => {
-    const i = rest.indexOf('--' + name)
-    return i >= 0 && rest[i + 1] ? rest[i + 1] : fallback
+  const flags = {}
+  const positional = []
+  for (let i = 0; i < rest.length; i++) {
+    const t = rest[i]
+    if (t.startsWith('--')) {
+      const name = t.slice(2)
+      if (VALUE_FLAGS.has(name)) { flags[name] = rest[i + 1]; i++ } else flags[name] = true
+    } else positional.push(t)
   }
-  const sid = arg('sid', process.env.CLAUDE_SESSION_ID || os.hostname() + '-manual')
+  const sid = flags.sid || process.env.CLAUDE_SESSION_ID || os.hostname() + '-manual'
 
   if (verb === 'claim') {
-    const lane = arg('lane', 'lane')
-    const globs = (arg('globs', '') || '').split(',').map(s => s.trim()).filter(Boolean)
+    const globs = String(flags.globs || '').split(',').map(s => s.trim()).filter(Boolean)
     if (globs.length === 0) { console.error('--globs zorunlu (virgülle ayır)'); process.exit(1) }
-    append(sid, { type: 'claim', lane, globs })
-    console.log(`talep alındı: ${lane} → ${globs.join(', ')}`)
+    append(sid, { type: 'claim', lane: flags.lane || 'lane', globs })
+    console.log(`talep alındı: ${flags.lane || 'lane'} → ${globs.join(', ')}`)
   } else if (verb === 'heartbeat') {
     append(sid, { type: 'heartbeat' })
     console.log('atış kaydedildi')
@@ -190,11 +290,13 @@ if (require.main === module) {
     append(sid, { type: 'release' })
     console.log('şerit bırakıldı')
   } else if (verb === 'note') {
-    append(sid, { type: 'note', to: arg('to', ''), text: rest.filter(r => !r.startsWith('--')).join(' ') })
+    const text = (flags.text || positional.join(' ')).trim()
+    if (!text) { console.error('not metni boş'); process.exit(1) }
+    append(sid, { type: 'note', to: flags.to || '', text })
     console.log('not bırakıldı')
   } else if (verb === 'who') {
     console.log(summary(sid))
   } else {
-    console.log('kullanım: board.cjs <claim|heartbeat|release|note|who> [--sid X] [--lane Y] [--globs "a/**,b/**"] [--to Z]')
+    console.log('kullanım: board.cjs <claim|heartbeat|release|note|who> [--sid X] [--lane Y] [--globs "a/**,b/**"] [--to Z] [--text "..."]')
   }
 }
