@@ -191,6 +191,11 @@ const PricePreviewPanel: React.FC = () => {
     // Arama terimi yokken de ilk N ürün listelenir: boş kutu "hiç ürün yok" gibi okunuyordu.
     // 1 harflik terim henüz anlamlı daraltma yapmadığı için o da listeyi olduğu gibi bırakır.
     const isBrowse = needle.length < 2
+    // Ürün seçiliyken arama kutusu görünmüyor → boşuna sorgu atma.
+    if (selectedProduct) {
+      setSearching(false)
+      return
+    }
     setSearching(true)
     let alive = true
     const timer = setTimeout(() => {
@@ -212,7 +217,9 @@ const PricePreviewPanel: React.FC = () => {
       alive = false
       clearTimeout(timer)
     }
-  }, [term, t])
+    // `selectedProduct` bağımlılığı ŞART: "X" ile seçimi iptal etmek `term`'i zaten boş olan
+    // değere set ediyordu → effect yeniden koşmuyor, liste boş kalıyordu (Recep bildirdi).
+  }, [term, t, selectedProduct])
 
   const pickProduct = useCallback((p: ProductSearchRow) => {
     setSelectedProduct(p)
