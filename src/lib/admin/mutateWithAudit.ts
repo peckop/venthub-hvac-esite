@@ -31,6 +31,12 @@ export interface MutateWithAuditArgs<R> {
   /** serileştirilebilir audit payload (`any` yerine sıkı tip) */
   before: Record<string, unknown> | null
   after: Record<string, unknown> | null
+  /**
+   * `after`'ı mutasyonun GERÇEK sonucundan türetir (verilirse `after` yerine bu kullanılır).
+   * Toplu işlerde denetim izi tahmini değil gerçekleşeni taşımalı: ör. materialize'da
+   * önizleme ile koşu arasında kural değişebilir. Hata fırlatırsa `after`'a düşülür.
+   */
+  afterFrom?: (result: R) => Record<string, unknown> | null
   comment?: string
   /**
    * Edge-function yolu KENDİ audit'ini yazıyorsa `true` ver:
@@ -61,13 +67,21 @@ export async function mutateWithAudit<R>(
   const result = await args.fn()
 
   if (!args.auditedByEdge) {
+    let after = args.after
+    if (args.afterFrom) {
+      try {
+        after = args.afterFrom(result)
+      } catch (e) {
+        console.error('[mutateWithAudit] afterFrom failed, falling back to args.after:', e)
+      }
+    }
     try {
       await logAdminAction(supabase, {
         table_name: args.resource,
         row_pk: args.rowPk,
         action: args.action,
         before: args.before,
-        after: args.after,
+        after,
         comment: args.comment,
       })
     } catch (e) {

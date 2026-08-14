@@ -366,7 +366,7 @@ sanılan iki test aslında YOKTU. Gerçek durum:
 | **INV-PRICE-3** | Sipariş-item yazan her yol snapshot alanlarını doldurur (no-op = FAIL) | ❌ YOK (W2b-2 ile gelir; §4.1 sonrası **9 alan**) |
 | **INV-PRICE-4** | Para float saklanmaz; `currency_rates` append-only (UPDATE/DELETE policy yok) | ✅ VAR (`pricing-money-append-only.test.ts`) |
 | **INV-PRICE-5** | KDV oranı üründen okunur; kuralda sabit oran varsayımı yok | ❌ YOK — §5 kararıyla birlikte yazılacak |
-| **INV-PRICE-6** | Materialize `is_derived=false` satıra dokunmaz; cache anahtarı currency içerir | ❌ YOK — §8.1 ile birlikte yazılacak |
+| **INV-PRICE-6** | Cache anahtarı currency içerir; `product_prices`'a yalnız materialize servisi yazar; `is_derived` ayrımı korunur | ✅ VAR (`pricing-cache-invariants.test.ts`) |
 
 > **Kural:** bu tabloda ❌ olan bir maddeyi "kilitli" varsayarak karar verme. Cetvelin kendisi de denetlenir.
 

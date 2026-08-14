@@ -194,6 +194,7 @@ export const pricing = {
         totalNet: "Toplam net (TRY)",
         skippedManual: "Elle ezilmiş (korunacak)",
         deactivated: "Pasifleştirilecek bayat satır",
+        unbridgedBrand: "Markası eşleşmeyen ürün",
       },
       segments: {
         title: "Segment kırılımı",

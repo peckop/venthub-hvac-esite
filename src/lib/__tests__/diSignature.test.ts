@@ -11,6 +11,7 @@ describe('DI Signature compliance static analysis', () => {
     'category.service.ts',
     'invoice.service.ts',
     'pricing.service.ts',
+    'pricingMaterialize.service.ts',
     'product.service.ts',
     'project.service.ts'
   ]

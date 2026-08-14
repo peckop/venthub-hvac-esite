@@ -24,7 +24,7 @@ import {
  */
 
 /** Materialize edilen satırların sabit `valid_from` sentinel'i — yeniden-hesaplama aynı
- *  satırı günceller (onConflict: product_id,price_list_id,valid_from), tekrar tekrar satır üretmez. */
+ *  satırı günceller (onConflict: product_id,price_list_id,currency,valid_from), tekrar satır üretmez. */
 export const DERIVED_VALID_FROM = '2026-01-01T00:00:00.000Z'
 
 export interface CostRefreshSummary {
@@ -63,6 +63,12 @@ export interface MaterializeSummary {
   rowsUpserted: number
   /** Elle ezilmiş (`is_derived=false`) olduğu için DOKUNULMAYAN satır sayısı — cetvel §8.1/§8.2. */
   skippedManual: number
+  /**
+   * Marka metni `brands` tablosuna köprülenemeyen ürün sayısı (cetvel §8.3 zorunluluğu).
+   * `products.brand` TEXT olduğu için isim/boşluk/harf farkı marka kuralını SESSİZCE ıskalatır;
+   * bu sayaç görünmezse "marka kuralı neden işlemedi?" sorusu cevapsız kalır.
+   */
+  unbridgedBrand: number
   /** Bu koşuda üretilmediği için pasifleştirilen bayat türetilmiş satır sayısı. */
   deactivated: number
   bySegment: MaterializeSegmentSummary[]
@@ -197,6 +203,7 @@ export async function refreshCostInBase(
 type ProductPriceUpsertRow = Database['public']['Tables']['product_prices']['Insert']
 
 const PRODUCTS_PAGE_SIZE = 1000
+const CACHE_PAGE_SIZE = 1000
 const UPSERT_BATCH_SIZE = 500
 const DEACTIVATE_BATCH_SIZE = 200
 /** Cetvel §8.1: tekil anahtar para birimini İÇERİR. */
@@ -271,18 +278,31 @@ export async function materializePrices(
   //        fiyat dondurmanın taşıyıcısı odur; üstüne yazmak kullanıcının kararını sessizce siler.
   //    (b) BAYAT SATIR: kural silinince/süresi dolunca ürün "Teklif Alın"a düşmeli; eski satır
   //        is_active=true kalırsa çözücü onu okuyup ESKİ fiyatı göstermeye devam eder.
-  const { data: existingRows, error: existingErr } = await supabase
-    .from('product_prices')
-    .select('id, product_id, price_list_id, currency, is_derived, is_active')
-    .eq('valid_from', DERIVED_VALID_FROM)
-  if (existingErr) throw existingErr
-
+  //    SAYFALAMA ZORUNLU: bu iş 348 ürün × 3 segment = 1044 satır YAZIYOR; sayfalanmamış tek
+  //    okuma PostgREST satır tavanına (varsayılan 1000) takılır ve koruma SESSİZCE çöker
+  //    (tavanın dışında kalan elle-ezme satırı ezilir, bayat satır aktif kalır). Sıra da şart:
+  //    order olmadan hangi satırların düştüğü belirsizdir, hata tekrarlanamaz olur.
   const manualKeys = new Set<string>()
   const derivedActiveIdByKey = new Map<string, string>()
-  for (const row of existingRows ?? []) {
-    const key = cacheKey(row.product_id, row.price_list_id, row.currency)
-    if (row.is_derived === false) manualKeys.add(key)
-    else if (row.is_active !== false) derivedActiveIdByKey.set(key, row.id)
+  let snapshotOffset = 0
+  for (;;) {
+    const { data: existingRows, error: existingErr } = await supabase
+      .from('product_prices')
+      .select('id, product_id, price_list_id, currency, is_derived, is_active')
+      .eq('valid_from', DERIVED_VALID_FROM)
+      .order('id', { ascending: true })
+      .range(snapshotOffset, snapshotOffset + CACHE_PAGE_SIZE - 1)
+    if (existingErr) throw existingErr
+    const rows = existingRows ?? []
+    for (const row of rows) {
+      const key = cacheKey(row.product_id, row.price_list_id, row.currency)
+      // Pasifleştirilmiş elle-ezme satırı dokunulmaz DEĞİLDİR: admin onu kapattıysa
+      // türetilmiş fiyat devralmalı, yoksa ürün o segmentte kalıcı olarak fiyatsız kalır.
+      if (row.is_derived === false && row.is_active !== false) manualKeys.add(key)
+      else if (row.is_derived !== false && row.is_active !== false) derivedActiveIdByKey.set(key, row.id)
+    }
+    if (rows.length < CACHE_PAGE_SIZE) break
+    snapshotOffset += CACHE_PAGE_SIZE
   }
 
   // Materialize daima TRY yazar (product_prices.currency='TRY') → gösterim kuru gerekmez.
@@ -293,6 +313,7 @@ export async function materializePrices(
   let quoteOnlyProducts = 0
   let rowsUpserted = 0
   let skippedManual = 0
+  let unbridgedBrand = 0
   let totalNetTry = 0
   const samples: MaterializeSampleRow[] = []
   const upsertBuffer: ProductPriceUpsertRow[] = []
@@ -323,6 +344,7 @@ export async function materializePrices(
     for (const row of rows) {
       productsScanned++
       const productInput = toPricingProductInput(row, brandIdByName)
+      if (productInput.brandId === null && row.brand.trim() !== '') unbridgedBrand++
       const ancestors = ancestorsFor(productInput.categoryId)
 
       let productPriced = false
@@ -399,8 +421,12 @@ export async function materializePrices(
   // BAYAT SATIR TASFİYESİ: bu koşuda üretilmeyen türetilmiş satırlar artık motorun cevabı
   // değildir (kural silinmiş / süresi dolmuş / maliyet kalkmış olabilir). Aktif bırakılırsa
   // çözücü onları okuyup ESKİ fiyatı göstermeye devam eder — "Teklif Alın" hiç görünmez.
+  // Yalnız BU koşunun para biriminde tasfiye yapılır: writtenKeys sadece TRY anahtarları taşır,
+  // kapsamı daraltmazsak TRY-dışı türetilmiş satırlar her koşuda pasifleşir (migration'ın açtığı
+  // çok-para-birimli kapıyı kod kapatmış olurdu).
   const staleIds: string[] = []
   for (const [key, id] of derivedActiveIdByKey) {
+    if (!key.endsWith(`|${MATERIALIZE_CURRENCY}`)) continue
     if (!writtenKeys.has(key)) staleIds.push(id)
   }
   if (!dryRun) {
@@ -418,6 +444,7 @@ export async function materializePrices(
     quoteOnlyProducts,
     rowsUpserted,
     skippedManual,
+    unbridgedBrand,
     deactivated: staleIds.length,
     bySegment: [...segmentAcc.values()],
     samples,

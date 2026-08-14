@@ -115,6 +115,9 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
         rowPk: null,
         before: { ...preview },
         after: null,
+        // Denetim izi TAHMİNİ değil GERÇEKLEŞENİ taşımalı: önizleme ile koşu arasında kural
+        // değişmiş olabilir; `after` sabit kalsaydı "ne yazıldı" sorusu cevapsız kalırdı.
+        afterFrom: (result) => ({ ...result }),
         auditedByEdge: false,
         // INV-6: blok gövde + await (ifade-gövdeli arrow "sahte-success" sayılır).
         fn: async () => {
@@ -232,6 +235,20 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
                     </p>
                     <p className="text-lg font-black text-rose-400">
                       {formatNumber(preview.deactivated, locale)}
+                    </p>
+                  </div>
+                  {/* Cetvel §8.3: markası köprülenemeyen ürün sayısı GÖRÜNMEK ZORUNDA —
+                      yoksa "marka kuralı neden işlemedi?" sorusu cevapsız kalır. */}
+                  <div className="rounded-2xl glass border border-white/10 p-4 space-y-1">
+                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                      {t('admin.pricing.rules.materialize.summary.unbridgedBrand')}
+                    </p>
+                    <p
+                      className={
+                        preview.unbridgedBrand > 0 ? 'text-lg font-black text-amber-400' : 'text-lg font-black text-white'
+                      }
+                    >
+                      {formatNumber(preview.unbridgedBrand, locale)}
                     </p>
                   </div>
                 </section>

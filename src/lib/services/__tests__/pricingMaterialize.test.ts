@@ -84,7 +84,7 @@ interface CapturedWrite {
   body: unknown
 }
 
-function stubClient(tables: StubTables, calls: CapturedWrite[]): SupabaseClient<Database> {
+function stubClient(tables: StubTables, calls: CapturedWrite[], gets?: URL[]): SupabaseClient<Database> {
   const lookup: Record<string, unknown[] | undefined> = {
     pricing_rule: tables.pricing_rule,
     categories: tables.categories,
@@ -101,6 +101,7 @@ function stubClient(tables: StubTables, calls: CapturedWrite[]): SupabaseClient<
     const method = (init?.method ?? 'GET').toUpperCase()
 
     if (method === 'GET') {
+      gets?.push(url)
       const rows = lookup[table] ?? []
       return Promise.resolve(
         new Response(JSON.stringify(rows), { status: 200, headers: { 'Content-Type': 'application/json' } }),
@@ -311,6 +312,32 @@ describe('materializePrices', () => {
     expect(patches).toHaveLength(1)
     expect(patches[0].body).toMatchObject({ is_active: false })
     expect(patches[0].url.searchParams.get('id')).toBe('in.(pp-stale)')
+  })
+
+  it('mevcut cache fotoğrafını SAYFALAYARAK okur (1000 satır tavanına takılmaz)', async () => {
+    // 348 ürün × 3 segment = 1044 satır yazan bir iş, cache'i tek sayfada okuyamaz:
+    // PostgREST satır tavanı (varsayılan 1000) sessizce kırpardı ve elle-ezme koruması
+    // ile bayat tasfiyesi FARKINDA OLMADAN yanlış çalışırdı.
+    const calls: CapturedWrite[] = []
+    const gets: URL[] = []
+    const supabase = stubClient(
+      {
+        pricing_rule: [rule({ id: 'global-40' })],
+        price_lists: [INDIVIDUAL_LIST],
+        brands: [],
+        products: [{ id: 'p1', name: 'Fan A', sku: 'SKU-1', brand: 'Vortice', category_id: null, cost_in_base: 1000 }],
+      },
+      calls,
+      gets,
+    )
+
+    await materializePrices(supabase)
+
+    const snapshotGets = gets.filter(u => u.pathname.endsWith('/product_prices'))
+    expect(snapshotGets.length).toBeGreaterThan(0)
+    // Sıralama şart: order olmadan hangi satırların düştüğü belirsiz olurdu.
+    expect(snapshotGets[0].searchParams.get('order')).toBe('id.asc')
+    expect(snapshotGets[0].searchParams.get('valid_from')).toBe(`eq.${DERIVED_VALID_FROM}`)
   })
 })
 

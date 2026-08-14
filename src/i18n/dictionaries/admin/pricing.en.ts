@@ -194,6 +194,7 @@ export const pricing = {
         totalNet: "Total net (TRY)",
         skippedManual: "Manually overridden (kept)",
         deactivated: "Stale rows to deactivate",
+        unbridgedBrand: "Products with unmatched brand",
       },
       segments: {
         title: "Segment breakdown",

@@ -358,6 +358,18 @@ textarea:focus-visible {
     font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
 
+  /* Native <select> açılır listesi işletim sisteminin kendi penceresinde çizilir ve
+     select'in `text-white` rengini MİRAS ALIR — koyu temada seçenekler beyaz zemin
+     üzerinde beyaz yazıya dönüşür (üzerine gelmeden okunmaz "beyaz şerit").
+     Seçenekleri açıkça boyuyoruz. (Bulgu: fiyat önizleme ekranı, 2026-08-14)
+     Not: tema-bağımsız sabit legacy token'lar kullanılıyor — --surface-deep açık temada
+     aydınlanıyor ve aynı sorunu ters yönde üretirdi; admin kromu her hâlükârda koyu. */
+  select option,
+  select optgroup {
+    background-color: var(--navy-900);
+    color: var(--text-primary);
+  }
+
   /* ── Enterprise Global Polish ──────────────────────────────────────── */
   ::selection {
     background-color: hsl(var(--brand-cyan));
