@@ -49,6 +49,14 @@ jobs:
       - name: Deno check (edge functions — kapı-körlüğü guard)
         run: deno check --node-modules-dir=auto supabase/functions/*/index.ts 2>&1 | tee ci-deno.log
 
+      # deno check TİP hatalarını yakalar ama saf string-literal mangling'i (PostgREST/RPC param,
+      # searchParams key, mangled method çağrısı) GÖREMEZ — T011'de bu sınıf iki kez kaçtı.
+      # Bu guard bozulma imzasını doğrudan tarar (unambiguous underscore-prefix desenleri).
+      - name: Edge mangle-guard (string-literal — deno check göremez)
+        run: |
+          hits=$(grep -rnE '\._[a-z]+\(|_text/(html|plain)|[?&]_(limit|count|offset|order|select)=|\.get\('"'"'_[a-z]|\b_p_id\b|grou_p' supabase/functions --include='*.ts' || true)
+          if [ -n "$hits" ]; then echo "::error::Edge string-mangle deseni saptandi (T011 bozulma sinifi):"; echo "$hits"; exit 1; fi
+
       - name: Test
         run: pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log
 

@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
     const cancelled = cancelResp.ok ? await cancelResp.json().catch(() => []) : []
 
     // 2) Token VAR: 15 dk sonra 1 kez reconcile; SUCCESS değilse failed
-    const listResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?select=id,created_at,payment_token,status&status=eq.pending&created_at=lt.${encodeURIComponent(th15)}&payment_token=not.is.null&_limit=1000`, {
+    const listResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?select=id,created_at,payment_token,status&status=eq.pending&created_at=lt.${encodeURIComponent(th15)}&payment_token=not.is.null&limit=1000`, {
       headers: { 'Authorization': `Bearer ${serviceRoleKey}`, 'apikey': serviceRoleKey }
     })
     const pendWithToken = listResp.ok ? await listResp.json().catch(() => []) : []

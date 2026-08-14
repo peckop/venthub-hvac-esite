@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
 
     // Resolve cart_id by user if needed
     if (!cartId && userId) {
-      const carts = await getJson(`/rest/v1/shopping_carts?select=id&user_id=eq.${encodeURIComponent(userId)}&_limit=1`);
+      const carts = await getJson(`/rest/v1/shopping_carts?select=id&user_id=eq.${encodeURIComponent(userId)}&limit=1`);
       cartId = Array.isArray(carts) && carts[0]?.id || '';
     }
     if (!cartId) {
@@ -91,13 +91,13 @@ Deno.serve(async (req) => {
     let orgId: string | null = null;
     let tier: number | null = null;
     if (userId) {
-      const prof = await getJson<UserProfile[]>(`/rest/v1/user_profiles?select=id,role,organization_id&id=eq.${encodeURIComponent(userId)}&_limit=1`);
+      const prof = await getJson<UserProfile[]>(`/rest/v1/user_profiles?select=id,role,organization_id&id=eq.${encodeURIComponent(userId)}&limit=1`);
       if (Array.isArray(prof) && prof[0]) {
         role = prof[0].role || 'individual';
         orgId = prof[0].organization_id || null;
       }
       if (orgId) {
-        const org = await getJson<Organization[]>(`/rest/v1/organizations?select=id,tier_level&id=eq.${encodeURIComponent(orgId)}&_limit=1`);
+        const org = await getJson<Organization[]>(`/rest/v1/organizations?select=id,tier_level&id=eq.${encodeURIComponent(orgId)}&limit=1`);
         if (Array.isArray(org) && org[0]) tier = org[0].tier_level ?? null;
       }
     }

@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
     const to = url.searchParams.get('to')?.trim() || ''
     const q = url.searchParams.get('q')?.trim() || ''
     const preset = url.searchParams.get('preset')?.trim() || ''
-    const limitParam = Math.min(Math.max(parseInt(url.searchParams.get('_limit') || '50', 10) || 50, 1), 100)
+    const limitParam = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '50', 10) || 50, 1), 100)
     const pageParam = Math.max(parseInt(url.searchParams.get('page') || '1', 10) || 1, 1)
     const offset = (pageParam - 1) * limitParam
 
