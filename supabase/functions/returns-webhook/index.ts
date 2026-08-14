@@ -1,5 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 // supabase/functions/returns-webhook/index.ts
 // Receives carrier webhook for return shipments. On delivered, marks venthub_returns.status='received'.
 // Env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RETURNS_WEBHOOK_SECRET (HMAC) or RETURNS_WEBHOOK_TOKEN
@@ -36,7 +35,7 @@ function normalizePayload(obj: unknown) {
   const rec = (typeof obj === 'object' && obj !== null) ? (obj as Record<string, unknown>) : {}
   const pick = (...keys: string[]) => { for (const k of keys) { if (k in rec) { const v = rec[k]; if (v!=null) return v } } return undefined }
   return {
-    _return_id: (pick('_return_id','returnId','rid') || '').toString(),
+    return_id: (pick('return_id','returnId','rid') || '').toString(),
     order_id: (pick('order_id','orderId','id') || '').toString(),
     carrier: (pick('carrier','provider') || '').toString(),
     tracking_number: (pick('tracking_number','trackingNumber','tn') || '').toString(),
@@ -98,7 +97,7 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY)
 
-    const p = normalizePayload(body) as { _return_id?: string; order_id?: string; carrier?: string; tracking_number?: string; status?: string; delivered_at?: string }
+    const p = normalizePayload(body) as { return_id?: string; order_id?: string; carrier?: string; tracking_number?: string; status?: string; delivered_at?: string }
 
     // Optional dedup
     const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
@@ -107,15 +106,15 @@ Deno.serve(async (req: Request) => {
       if (Array.isArray(exist) && exist.length > 0) return json({ ok: true, event_id: eventId, duplicate: true })
     }
 
-    // Resolve _return_id if missing using order_id + tracking_number if necessary (best effort)
-    let returnId = (p._return_id || '').trim()
+    // Resolve return_id if missing using order_id + tracking_number if necessary (best effort)
+    let returnId = (p.return_id || '').trim()
     if (!returnId && p.order_id) {
       try {
         const { data } = await supabase.from('venthub_returns').select('id').eq('order_id', p.order_id).eq('tenant_id', tenantId).order('created_at',{ ascending:false }).limit(1)
         if (Array.isArray(data) && data[0]) returnId = data[0].id
       } catch {}
     }
-    if (!returnId) return json({ error: 'Missing _return_id' }, { status: 400 })
+    if (!returnId) return json({ error: 'Missing return_id' }, { status: 400 })
 
     // Fetch current status
     const { data: cur, error: curErr } = await supabase.from('venthub_returns').select('id,status').eq('id', returnId).eq('tenant_id', tenantId).single()
@@ -147,7 +146,7 @@ Deno.serve(async (req: Request) => {
       if (eventId) {
         await supabase.from('returns_webhook_events').insert({
           event_id: eventId,
-          _return_id: returnId,
+          return_id: returnId,
           order_id: p.order_id || null,
           carrier: p.carrier || null,
           tracking_number: p.tracking_number || null,
@@ -232,7 +231,7 @@ Deno.serve(async (req: Request) => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY },
                 body: JSON.stringify({
-                  _return_id: returnId,
+                  return_id: returnId,
                   order_id: rOrderId,
                   order_number: orderNumber,
                   customer_email: customerEmail,
@@ -250,7 +249,7 @@ Deno.serve(async (req: Request) => {
       }
     } catch {}
 
-    return json({ ok: true, _return_id: returnId, status: (patch['status'] || cur.status) })
+    return json({ ok: true, return_id: returnId, status: (patch['status'] || cur.status) })
   } catch (_e) {
     console.error('Returns webhook error:', _e);
     return json({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })

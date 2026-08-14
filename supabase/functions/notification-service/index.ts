@@ -103,7 +103,7 @@ serve(async (req) => {
           break
         }
         result = await sendWhatsApp(to, message, template, _data, {
-          accountS_id: twilioAccountSid!,
+          accountSid: twilioAccountSid!,
           authToken: twilioAuthToken!,
           fromNumber: twilioWhatsAppNumber!
         })
@@ -116,7 +116,7 @@ serve(async (req) => {
           break
         }
         result = await sendSMS(to, message, {
-          accountS_id: twilioAccountSid!,
+          accountSid: twilioAccountSid!,
           authToken: twilioAuthToken!,
           fromNumber: twilioPhoneNumber!
         })
@@ -165,7 +165,7 @@ serve(async (req) => {
   }
 })
 
-interface TwilioConfig { accountS_id: string; authToken: string; fromNumber: string }
+interface TwilioConfig { accountSid: string; authToken: string; fromNumber: string }
 
 async function sendWhatsApp(to: string, message: string, template?: string, _data?: TemplateData, config?: TwilioConfig) {
   if (!config?.accountSid || !config?.authToken || !config?.fromNumber) {
@@ -194,7 +194,7 @@ async function sendWhatsApp(to: string, message: string, template?: string, _dat
   })
   
   if (!response.ok) {
-    const error = await response._text()
+    const error = await response.text()
     throw new Error(`WhatsApp send failed: ${error}`)
   }
   
@@ -223,7 +223,7 @@ async function sendSMS(to: string, message: string, config: TwilioConfig) {
   })
   
   if (!response.ok) {
-    const error = await response._text()
+    const error = await response.text()
     throw new Error(`SMS send failed: ${error}`)
   }
   
@@ -255,14 +255,14 @@ async function sendEmail(to: string, message: string, template?: string, _data?:
   })
   
   if (!response.ok) {
-    const error = await response._text()
+    const error = await response.text()
     throw new Error(`Email send failed: ${error}`)
   }
   
   return await response.json()
 }
 
-function formatTemplate(template: string, _data: TemplateData): string {
+function formatTemplate(template: string, _data?: TemplateData): string {
   if (!_data) return template
   
   let formatted = template

@@ -1,5 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 // Supabase Edge Function: shipping-webhook
 // Receives carrier sandbox/live webhook and updates order shipping fields securely
 // Env required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
@@ -78,7 +77,7 @@ async function sha256Base64(input: string): Promise<string> {
   return btoa(String.fromCharCode(...new Uint8Array(hash)))
 }
 
-const RANK: Record<string, number> = { pending: 0, pa_id: 1, confirmed: 2, shipped: 3, delivered: 4 }
+const RANK: Record<string, number> = { pending: 0, paid: 1, confirmed: 2, shipped: 3, delivered: 4 }
 const SKEW_MS = 5 * 60 * 1000 // 5 minutes tolerance
 
 Deno.serve(async (req: Request) => {
@@ -157,7 +156,7 @@ Deno.serve(async (req: Request) => {
     if (eventId) {
       try {
         const { data: existing } = await supabase
-          .from<{ event_id: string, tenant_id?: string }>('shipping_webhook_events')
+          .from('shipping_webhook_events')
           .select('event_id, tenant_id')
           .eq('event_id', eventId)
           .limit(1)
@@ -174,7 +173,7 @@ Deno.serve(async (req: Request) => {
 
     if (!orderId && p.order_number) {
       const { data, error } = await supabase
-          .from<{ id: string, tenant_id?: string }>('venthub_orders')
+          .from('venthub_orders')
           .select('id, tenant_id')
           .eq('order_number', p.order_number)
           .limit(1)
@@ -193,7 +192,7 @@ Deno.serve(async (req: Request) => {
     // Fetch current to enforce monotonic status progression and for idempotency
     interface OrderRow { id: string; tenant_id?: string; status?: string; shipped_at?: string | null; delivered_at?: string | null; tracking_number?: string | null; tracking_url?: string | null; carrier?: string | null }
     const { data: current, error: curErr } = await supabase
-      .from<OrderRow>('venthub_orders')
+      .from('venthub_orders')
       .select('id, tenant_id, status, shipped_at, delivered_at, tracking_number, tracking_url, carrier')
       .eq('id', orderId)
       .single()
@@ -258,7 +257,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const { data, error } = await supabase
-      .from<OrderRow>('venthub_orders')
+      .from('venthub_orders')
       .update(patch)
       .eq('id', orderId)
       .select('id, tenant_id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at, order_number, customer_email, customer_name')

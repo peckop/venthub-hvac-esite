@@ -87,7 +87,7 @@ serve(async (req: Request) => {
     const supabase = createClient(supabaseUrl, serviceRoleKey)
 
   try {
-    let alertResults = []
+    let alertResults: unknown[] = []
 
     if (req.method === 'GET') {
       // Tüm ürünleri kontrol et

@@ -62,7 +62,7 @@ Deno.serve(async (req: Request) => {
                 const ip = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '') || 'unknown'
                 const key = `iyzico:${ip}`
                 const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')
-                const { result, _limit, _windowSec } = await checkRateLimit(key, supabaseUrl, serviceRoleKey, { _limit: Number(Deno.env.get('PAYMENT_RATE_LIMIT_PER_MINUTE') || 30), _windowSec: Number(Deno.env.get('PAYMENT_RATE_LIMIT_WINDOW_SEC') || 60) })
+                const { result } = await checkRateLimit(key, supabaseUrl, serviceRoleKey, { limit: Number(Deno.env.get('PAYMENT_RATE_LIMIT_PER_MINUTE') || 30), windowSec: Number(Deno.env.get('PAYMENT_RATE_LIMIT_WINDOW_SEC') || 60) })
                 if (!result.allowed) {
                     const rl = rateLimitHeaders(Number(Deno.env.get('PAYMENT_RATE_LIMIT_PER_MINUTE') || 30), result.remaining, result.resetAt)
                     return new Response(JSON.stringify({ error: { code: 'RATE_LIMITED', message: 'Çok fazla istek' } }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json', ...rl } })
@@ -94,12 +94,12 @@ Deno.serve(async (req: Request) => {
             shippingMethod?: string | null;
             customerInfo?: { name?: string; email?: string; phone?: string } | null;
             customer?: { name?: string; email?: string; phone?: string } | null;
-            shippingAddress?: { fullAddress?: string } | null;
-            shipping?: { fullAddress?: string } | null;
-            shipping_address?: { fullAddress?: string } | null;
-            billingAddress?: { fullAddress?: string } | null;
-            billing?: { fullAddress?: string } | null;
-            billing_address?: { fullAddress?: string } | null;
+            shippingAddress?: { fullAddress: string; city: string; postalCode: string } | null;
+            shipping?: { fullAddress: string; city: string; postalCode: string } | null;
+            shipping_address?: { fullAddress: string; city: string; postalCode: string } | null;
+            billingAddress?: { fullAddress: string; city: string; postalCode: string } | null;
+            billing?: { fullAddress: string; city: string; postalCode: string } | null;
+            billing_address?: { fullAddress: string; city: string; postalCode: string } | null;
             couponCode?: string | null;
         }
 
@@ -311,7 +311,7 @@ Deno.serve(async (req: Request) => {
         });
 
         if (!orderResponse.ok) {
-            const errorText = await orderResponse._text();
+            const errorText = await orderResponse.text();
             // Fallback: remove shipping_method if column doesn't exist yet
             const mayRetry = /shipping_method/i.test(errorText) && /does not exist|column/i.test(errorText)
             if (mayRetry) {
@@ -429,7 +429,7 @@ Deno.serve(async (req: Request) => {
             body: JSON.stringify(orderItems)
         });
         if (!itemsResp.ok) {
-            const errTxt = await itemsResp._text().catch(() => '')
+            const errTxt = await itemsResp.text().catch(() => '')
             console.error('Order items insert failed:', itemsResp.status, errTxt)
             return new Response(JSON.stringify({ error: { code: 'DATABASE_ERROR', message: 'Sipariş kalemleri eklenemedi' } }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
@@ -502,14 +502,14 @@ Deno.serve(async (req: Request) => {
                 zipCode: shipAddr.postalCode
             },
             shippingAddress: {
-                contactName: ci.name,
+                contactName: ci.name || '',
                 city: shipAddr.city,
                 country: 'Turkey',
                 address: shipAddr.fullAddress,
                 zipCode: shipAddr.postalCode
             },
             billingAddress: {
-                contactName: ci.name,
+                contactName: ci.name || '',
                 city: (billAddr || shipAddr).city,
                 country: 'Turkey',
                 address: (billAddr || shipAddr).fullAddress,

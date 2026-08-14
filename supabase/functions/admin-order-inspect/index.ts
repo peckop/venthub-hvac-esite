@@ -4,11 +4,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   const cors = corsHeaders;
-  
-  const cors = {
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
-} as Record<string,string>
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
 
@@ -58,7 +53,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const rpcUrl = `${supabaseUrl}/rest/v1/rpc/fn_admin_get_orders`
-    const body = { _p_id: id, p_conv: conv, p_status: null, p_limit: 1 }
+    const body = { p_id: id, p_conv: conv, p_status: null, p_limit: 1 }
     const resp = await fetch(rpcUrl, {
       method: 'POST',
       headers: {

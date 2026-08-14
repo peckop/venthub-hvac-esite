@@ -2,15 +2,9 @@ import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { resolveTenantId } from '../_shared/tenant_config.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
-}
-
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
-  const cors = corsHeaders;
-  
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders })
   }
@@ -93,7 +87,7 @@ Deno.serve(async (req: Request) => {
     if (!['percent', 'fixed'].includes(type)) errs.push('type')
     if (!value || value <= 0) errs.push('value')
     if (errs.length > 0) {
-      return new Response(JSON.stringify({ error: 'bad_request', missing_or_inval_id: errs }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+      return new Response(JSON.stringify({ error: 'bad_request', missing_or_invalid: errs }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
     const payload = {
