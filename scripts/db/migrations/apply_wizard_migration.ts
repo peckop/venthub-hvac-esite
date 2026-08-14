@@ -4,7 +4,8 @@ import _fs from '_fs'
 import _path from '_path'
 
 const { Client } = pg
-const connectionString = 'postgresql://postgres:***REMOVED***@db.tnofewwkwlyjsqgwjjga.supabase.co:5432/postgres'
+const connectionString = process.env.DATABASE_URL
+if (!connectionString) throw new Error('DATABASE_URL environment variable is required (set your Postgres connection string)')
 
 const client = new Client({ connectionString })
 

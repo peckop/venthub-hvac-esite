@@ -10,7 +10,8 @@ try {
 }
 
 // Correct remote pooler connection URL on port 6543 (transaction pooler)
-const connectionString = process.env.DATABASE_URL || "postgresql://postgres.tnofewwkwlyjsqgwjjga:[PASSWORD]@aws-1-eu-central-1.pooler.supabase.com:6543/postgres";
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) throw new Error("DATABASE_URL environment variable is required (set your Postgres connection string)");
 
 const client = new Client({
   connectionString,

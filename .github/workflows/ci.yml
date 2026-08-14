@@ -57,6 +57,13 @@ jobs:
           hits=$(grep -rnE '\._[a-z]+\(|_text/(html|plain)|[?&]_(limit|count|offset|order|select)=|\.get\('"'"'_[a-z]|\b_p_id\b|grou_p' supabase/functions --include='*.ts' || true)
           if [ -n "$hits" ]; then echo "::error::Edge string-mangle deseni saptandi (T011 bozulma sinifi):"; echo "$hits"; exit 1; fi
 
+      # Sabit-kodlu DB bağlantı dizesi (şifreli) tekrar commit'lenmesin — kredensiyeller env'den.
+      # İnterpolasyonlu (`${...}`) satırlar hariç tutulur (onlar değişkenden kurulur, sır değil).
+      - name: Secret guard (hardcoded DB connection string)
+        run: |
+          hits=$(grep -rnE "postgresql://[^'\"]*:[^'\"@]*@" --include='*.ts' --include='*.js' --include='*.cjs' --include='*.mjs' . | grep -v node_modules | grep -v '\${' || true)
+          if [ -n "$hits" ]; then echo "::error::Hardcoded DB connection string (with password) detected — use process.env.DATABASE_URL:"; echo "$hits"; exit 1; fi
+
       - name: Test
         run: pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log
 
