@@ -25,11 +25,7 @@ async function loadTemplate() {
 }
 
 serve(async (req) => {
-  const origin = req.headers.get('origin') ?? '*'
-  const corsHeaders = {
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
-}
+  const corsHeaders = getCorsHeaders(req)
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: corsHeaders })
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })

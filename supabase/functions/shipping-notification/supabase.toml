@@ -1,3 +1,0 @@
-[functions]
-# Public function: called from storefront without auth
-verify_jwt = false

@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\delivery-notification\index.ts
-skeleton_hash: b1edef18bcf1a308
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\delivery-notification\index.ts
+skeleton_hash: 6a8a5c8b24439021
 entity_hashes:
   func:delivery-notification_handler: bbc4a3cdb5561a07
-  func:loadTemplate: 4c5f3a8524c0bb12
-  func:render: b6f065ff28ae59f4
+  func:loadTemplate: ca2a7b2c95dee67d
+  func:render: 92bef16402e292d5
   overview: d34e01c15bff1856
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-14T12:38:55Z
 ---
 
 ## Genel Bakış
@@ -38,12 +38,16 @@ Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomati
 ## FONKSİYON DETAYLARI
 
 ### render
-**Ne yapar**: Verilen bir şablon dizesindeki `{{anahtar}}` yapısındaki yer tutucuları, sağlanan veri nesnesindeki karşılıkları ile değiştirerek dinamik bir çıktı oluşturur.
-**Nasıl yapar**: `String.prototype.replace` metodunu bir regex ile kullanarak `{{(\w+)}}` kalıplarını tespit eder. Eşleşen anahtarın (`k`) veri nesnesinde (`_data`) karşılığını arar ve bulamazsa boş bir dize kullanarak değişikliği uygular. Bu işlem, şablon motorları için basit bir değişken ekleme (interpolation) mekanizması sağlar.
+
+**Ne yapar**: Verilen string template içindeki `{{key}}` şeklindeki placeholder'ları, sağlanan veri objesindeki karşılık gelen değerlerle değiştirerek dinamik bir metin üretir. Bu fonksiyon, HTML e-posta şablonları gibi template dosyalarında değişken değerlerin yerleştirilmesi için kullanılır.
+
+**Nasıl yapar**: JavaScript'in `String.prototype.replace` metodunu ve bir regular expression (`/{{(\w+)}}/g`) kullanır. Regex, iki küme içine alınmış herhangi bir kelime karakteri grubunu yakalar. Eşleşen her placeholder için `_data` objesinde ilgili anahtarı arar; değer varsa `String()` ile string'e çevirerek yerine koyar, yoksa boş string (`''`) kullanır. `g` flag'i sayesinde template içindeki tüm eşleşmeler tek seferde değiştirilir.
+
 **Parametreler**:
-- `tpl`: string — Değiştirilecek şablon dizesi. İçerisinde `{{değişken_adı}}` formatında yer tutucular bulunmalıdır.
-- `_data`: Record<string, unknown> — Şablondaki yer tutucuların değerlerini içeren nesne. Anahtarlar yer tutucu adlarıyla, değerler ise yerine konacak verilerle eşleşmelidir.
-**Dönüş**: string — Yer tutucuların veri ile değiştirildiği yeni şablon dizesi.
+- `tpl: string` — Değiştirme işleminin yapılacağı şablon metni. İçinde `{{anahtar}}` formatında placeholder'lar barındırır.
+- `_data: Record<string, unknown>` — Placeholder'ların yerine koyulacak değerleri içeren anahtar-değer çiftlerinden oluşan obje. Değerler `unknown` tipinde olduğu için fonksiyon herhangi bir veri tipini kabul eder.
+
+**Dönüş**: `string` — Placeholder'ların değerlerle değiştirildiği, hazır metin döndürür. Eşleşme bulunamayan placeholder'lar boş string ile değiştirilir.
 
 ### loadTemplate
 **Ne yapar**: E-posta bildirimi için kullanılacak HTML şablonunu dosya sisteminden asenkron olarak yükler.
@@ -85,53 +89,86 @@ Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomati
 ### [N1_NASIL] AST Pointer: supabase/functions/delivery-notification/index.ts::render
 - **params**: `(tpl: string, _data: Record<string, unknown>)`
 - **ic_degiskenler**:
-  - `_m` — regex eşleşmesi için kullanılan geçici match nesnesi (fonksiyonda kullanılmıyor)
-  - `k` — regex tarafından yakalanan anahtar adı (template içindeki `{{k}}` yapısındaki anahtar)
-- **Dönüş**: Template string içindeki `{{anahtar}}` işaretlerinin `_data` sözlüğündeki değerlerle değiştirilmiş hali.
+  - (yok — tek satırlık bir replace ifadesi)
+- **Dönüş**: `String(_data[k] ?? '')` — tpl içindeki `{{key}}` placeholder'larını `_data` sözlüğündeki değerlerle değiştirilmiş nihai string
+- **Dict/Subscript Erişimleri**:
+  - `_data[k]` — template placeholder anahtarının `_data` sözlüğünden okunması
+
+---
 
 ### [N2_NASIL] AST Pointer: supabase/functions/delivery-notification/index.ts::loadTemplate
-- **params**: `(parametre yok)`
+- **params**: `(yok)`
 - **ic_degiskenler**:
-  - `url` — `templates/email/delivered.html` dosyasının modül göreli yolunu temsil eden URL nesnesi
-- **Dönüş**: Async, başarıyla okunursa HTML template string, hata olursa `null`.
+  - `url` — `import.meta.url` referansıyla `./templates/email/delivered.html` dosyasının mutlak URL'i; `Deno.readTextFile` ile okunacak hedef
+- **Dönüş**: `string | null` — dosya başarıyla okunursa HTML template içeriği, başarısız olursa `null`
+
+---
 
 ### [N3_NASIL] AST Pointer: supabase/functions/delivery-notification/index.ts::delivery-notification_handler
-- **params**: `(req)`
+- **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `origin` — İsteğin `origin` başlığı, yoksa `'*'` kullanılır
-  - `corsHeaders` — CORS ile ilgili HTTP başlıklarını tutar (Access-Control-Allow-*)
-  - `supabaseUrl` — Ortam değişkeninden alınan Supabase URL'i
-  - `serviceKey` — Ortam değişkeninden alınan Supabase servis rolü anahtarı
-  - `body` — İstek gövdesinden parse edilen `DeliveryRequest` nesnesi
-  - `order_id` — `body.order_id` değerinden alınan sipariş kimliği
-  - `customer_email` — Müşteri e-posta adresi (istek gövdesinden veya DB'den)
-  - `customer_name` — Müşteri adı (istek gövdesinden veya DB'den)
-  - `order_number` — Sipariş numarası (istek gövdesinden veya DB'den)
-  - `tenantId` — `resolveTenantId(req, body)` çağrısı ile elde edilen kiracı kimliği
-  - `branding` — `getTenantBranding(tenantId)` çağrısı ile elde edilen marka bilgileri nesnesi (brandName, brandPrimaryColor, brandLogoUrl, emailFrom içerir)
-  - `authHeader` — İstekten alınan `Authorization` başlığı
-  - `isAuthorized` — Yetkilendirme durumunu tutan boolean bayrak (başlangıçta false)
-  - `anonKey` — Ortam değişkeninden alınan Supabase anonim anahtarı
-  - `authClient` — `authHeader` ile başlatılan Supabase istemcisi (anonim anahtar ve yetkilendirme başlığı ile)
-  - `user` — `authClient.auth.getUser()` sonucundan alınan kullanıcı nesnesi
-  - `roleCheck` — Kullanıcının rolünü kontrol etmek için yapılan REST isteğinin sonucu
-  - `arr` — `roleCheck` yanıtından parse edilen JSON dizisi
-  - `role` — `arr[0]?.role` ifadesinden alınan kullanıcı rolü ('admin' veya 'superadmin' ise yetkili)
-  - `resendApiKey` — Ortam değişkeninden alınan Resend API anahtarı
-  - `emailFrom` — `branding.emailFrom` değerinden alınan e-posta gönderici adresi
-  - `o` — Eksik müşteri bilgilerini almak için Supabase REST API'ye yapılan istek sonucu
-  - `arr` — `o` yanıtından parse edilen JSON dizisi
-  - `arr[0]` — Sipariş satırı (order_number, customer_name, customer_email alanlarını içerir)
-  - `brandName` — `branding.brandName` değerinden alınan marka adı
-  - `brandPrimary` — `branding.brandPrimaryColor` değerinden alınan marka ana rengi
-  - `brandLogoUrl` — `branding.brandLogoUrl` değerinden alınan marka logo URL'i
-  - `prettyOrderNo` — Düzenlenmiş sipariş numarası (ör: `#123456` formatında)
-  - `subject` — E-posta konu satırı (marka adı ve sipariş numarası ile)
-  - `html` — `loadTemplate()` ile yüklenen veya fallback olarak oluşturulan HTML e-posta gövdesi
-  - `resp` — Resend API'ye e-posta göndermek için yapılan POST isteği sonucu
-  - `t` — `resp` yanıtının metin gövdesi (hata durumunda loglama için)
-  - `result` — Resend API yanıtının JSON parse edilmiş hali (başarı durumunda `id` içerir)
-- **Dönüş**: `Response` nesnesi. Başarı durumunda `{ ok: true, order_id, subject, result }`, hata durumunda uygun HTTP durum kodu ve hata mesajı ile JSON yanıtı.
+  - `corsHeaders` — `getCorsHeaders(req)` çağrısıyla elde edilen CORS response header'ları, tüm yanıtlara eklenir
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile alınan Supabase proje URL'i, API çağrılarında kullanılır
+  - `serviceKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile alınan service role anahtarı, Yetkilendirme ve DB çağrılarında kullanılır
+  - `body` — `req.json()` ile parse edilen HTTP istek gövdesi (`DeliveryRequest` tipi)
+  - `order_id` — `body.order_id` — teslim edilen siparişin ID'si
+  - `customer_email` — `body.customer_email` — müşteri e-posta adresi (mutable, eksikse DB'den doldurulur)
+  - `customer_name` — `body.customer_name` — müşteri adı (mutable, eksikse DB'den doldurulur)
+  - `order_number` — `body.order_number` — sipariş numarası (mutable, eksikse DB'den doldurulur)
+  - `tenantId` — `resolveTenantId(req, body)` ile çözümlenen kiracı ID'si, branding ve DB sorgularında kullanılır
+  - `branding` — `getTenantBranding(tenantId)` ile alınan kiracıya özel marka bilgileri (emailFrom, brandName, brandPrimaryColor, brandLogoUrl)
+  - `authHeader` — `req.headers.get('Authorization')` ile alınan yetkilendirme header'ı
+  - `isAuthorized` — boolean, kullanıcının yetkili olup olmadığını tutar, başlangıçta `false`
+  - **--- auth fallback bloğu içinde (try-catch) ---**
+  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile alınan anon anahtar, fallback auth client oluşturulurken kullanılır
+  - `authClient` — `createClient(supabaseUrl, anonKey, ...)` ile oluşturulan Supabase istemcisi, kullanıcının token'ıyla kimlik doğrulama yapılır
+  - `user` — `authClient.auth.getUser()` destructuring ile alınan kullanıcı nesnesi
+  - `roleCheck` — `fetch(...)` ile `user_profiles` tablosundan rol sorgulama sonucu (Response)
+  - `arr` — `roleCheck.json()` çözümlemesi — `arr[0]?.role` ile kullanıcının rolü alınır
+  - `role` — `arr[0]?.role` — kullanıcının rolü (`admin` veya `superadmin` ise yetkilendirme başarılı)
+  - **--- yetkilendirme sonrası ana blok ---**
+  - `resendApiKey` — `Deno.env.get('RESEND_API_KEY')` ile alınan Resend API anahtarı, e-posta gönderimi için kullanılır
+  - `emailFrom` — `branding.emailFrom` — kiracıya özel e-posta gönderici adresi
+  - `o` — `fetch(...)` ile `venthub_orders` tablosundan sipariş bilgisi sorgulama sonucu (eksik alanları doldurmak için)
+  - `arr` — `o.json()` çözümlemesi (farklı kapsamda aynı isim), sipariş satırları dizisi
+  - `row` — `Array.isArray(arr) ? arr[0] : null` — ilk sipariş satırı; `row.order_number`, `row.customer_name`, `row.customer_email` ile eksik alanlar doldurulur
+  - `brandName` — `branding.brandName` — marka adı, e-posta konusu ve HTML içeriğinde kullanılır
+  - `brandPrimary` — `branding.brandPrimaryColor` — marka ana rengi, HTML içinde renk olarak kullanılır
+  - `brandLogoUrl` — `branding.brandLogoUrl` — marka logo URL'i, template'e parametre olarak geçilir
+  - `prettyOrderNo` — Formatlanmış sipariş numarası; `order_number` varsa `#` + ikinci parçası, yoksa son 8 karakterin büyük hali
+  - `subject` — E-posta konu satırı: `${brandName} | Siparişiniz teslim edildi - ${prettyOrderNo}`
+  - `html` — E-posta HTML gövdesi (mutable); `loadTemplate()` sonucuna göre ya şablondan render edilir ya da inline fallback HTML oluşturulur
+  - `resp` — `fetch('https://api.resend.com/emails', ...)` çağrısının sonucu (Response), e-posta gönderim yanıtı
+  - `t` — `resp.text()` ile alınan hata metni, `resp.ok` false ise hata detayı olarak döner
+  - `result` — `resp.json()` çözümlemesi, Resend API yanıt gövdesi; `result?.id` audit kaydı için kullanılır
+  - **--- catch bloğu ---**
+  - `_e` — yakalanan hata nesnesi (unknown tipi)
+  - `msg` — `_e` Error instance ise `_e.message`, değilse `String(_e)` — hata mesajı
+- **Dönüş**: `Response` — HTTP yanıtı:
+  - `200 + corsHeaders` — OPTIONS istekleri ve disabled/pasif durumlar
+  - `405` — POST dışı methodlar
+  - `401` — yetkisiz erişim
+  - `400` — `order_id` eksik veya müşteri bilgileri eksik
+  - `500` — Resend gönderim hatası veya genel exception
+  - `200 { ok: true, order_id, subject, result }` — başarılı gönderim
+- **Dict/Subscript Erişimleri**:
+  - `body.order_id` — istek gövdesinden sipariş ID okuma
+  - `body.customer_email` — istek gövdesinden müşteri e-postası okuma
+  - `body.customer_name` — istek gövdesinden müşteri adı okuma
+  - `body.order_number` — istek gövdesinden sipariş numarası okuma
+  - `Deno.env.get('SUPABASE_URL')` — ortam değişkeninden Supabase URL okuma
+  - `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` — ortam değişkeninden service role key okuma
+  - `Deno.env.get('SUPABASE_ANON_KEY')` — ortam değişkeninden anon key okuma
+  - `Deno.env.get('RESEND_API_KEY')` — ortam değişkeninden Resend API key okuma
+  - `req.headers.get('Authorization')` — istek header'ından Authorization okuma
+  - `authClient.auth.getUser()` — Supabase auth client üzerinden kullanıcı bilgisi alma
+  - `arr[0]?.role` — roleCheck yanıt dizisinin ilk elemanından role okuma
+  - `row.order_number` — sipariş satırından sipariş numarası okuma
+  - `row.customer_name` — sipariş satırından müşteri adı okuma
+  - `row.customer_email` — sipariş satırından müşteri e-postası okuma
+  - `result?.id` — Resend API yanıtından mesaj ID okuma (audit kaydı için)
+  - `order_number.split('-')[1]` — sipariş numarasından gösterimlik kısmı çıkarma
+  - `order_id.slice(-8)` — sipariş ID'sinden son 8 karakteri gösterim için alma
 
 ---
 

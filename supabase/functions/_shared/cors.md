@@ -2,58 +2,60 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\cors.ts
-skeleton_hash: 00381c65f282efb4
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\_shared\cors.ts
+skeleton_hash: da1773f021d66452
 entity_hashes:
-  func:getCorsHeaders: 1360a70a0a4d6694
-  overview: 8eaad34e6f15ad7c
-generated_at: 2026-08-13T07:40:33Z
+  func:getCorsHeaders: a5294397cf162f0a
+  overview: 26144dafbf658355
+generated_at: 2026-08-14T12:38:34Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase edge function'ları arasında paylaşılan CORS (Cross-Origin Resource Sharing) yönetimi sağlar. Farklı kaynaklardan gelen HTTP istekleri için uygun erişim başlıklarını oluşturarak, API'lerin güvenli bir şekilde çapraz kaynak taleplerine izin vermesini mümkün kılar.
+Bu modül, Supabase edge fonksiyonları için merkezi bir CORS (Cross-Origin Resource Sharing) politika motoru işlevi görür. Temel sorumluluğu, gelen HTTP isteklerinin kaynak adresini (Origin) analiz ederek, yalnızca güvenli ve izinli ortamların (geliştirme ve belirli bir üretim alanı) API'ye erişmesini sağlayacak uygun HTTP başlıklarını oluşturmaktır. Bu sayede, farklı kaynaklardan gelen çapraz kaynak talepleri kontrollü ve güvenli bir şekilde yönetilir.
 
 ## Fonksiyon Grupları
-### CORS Başlık Yönetimi
-HTTP isteklerine göre CORS politikalarını uygulayan başlık setini oluşturur. Bu başlıklar, isteklerin hangi kaynaklardan gelmesine izin verileceğini ve hangi HTTP metodlarının kullanılabileceğini belirler.
+### CORS Politika Uygulaması
+Gelen isteklerin kaynak adresine göre dinamik ve güvenli erişim kontrol başlıkları üretir. Bu, API'lerin hem yerel geliştirme hem de üretim ortamlarında sorunsuz çalışmasını sağlarken, izin verilmeyen kaynaklardan gelen istekleri engeller.
 - getCorsHeaders
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, HTTP istekleri için CORS başlıkları döndüren bir fonksiyon içerir. Aşağıda, fonksiyonun doğru çalışması için gerekli temel mimari varsayımlar listelen
+
+Bu modül, HTTP istekleri için CORS (Cross-Origin Resource Sharing) başlıklarını döndüren bir paylaşımlı yardımcı modüldür.
+
+[Aksiyom 1]: Eğer `req` parametresi geçerli bir `Request` nesnesi olarak sağlanmazsa, isteğin Origin header'ı okunamaz ve uygun CORS başlıkları üretilemez.
+
+[Aksiyom 2]: Eğer istek `Origin` header'ı içermiyorsa (örn: same-origin istekler), fonksiyonun nasıl bir davranış sergileceği fonksiyon gövdesine bağlıdır ve bu durum modülün kendi kapsamı dışındadır.
+
+[Aksiyom 3]: Eğer fonksiyon döndürdüğü header'lar HTTP yanıtına eklenmezse, tarayıcı kaynaklar arası istekleri engelleyecektir (CORS politikası ihlali).
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### getCorsHeaders
+**Ne yapar**: Bu fonksiyon, istemciden gelen HTTP isteğinin (`Request`) `Origin` başlığına göre, Cross-Origin Resource Sharing (CORS) politikasına uygun yanıt başlıklarını döndürür. Temel amacı, isteği yapan kaynağın (origin) güvenli olup olmadığını belirleyip, yalnızca izin verilen kaynaklara (localhost, Vercel) erişim izni veren bir dizi HTTP başlığı üretmektir.
 
-**Ne yapar**: HTTP isteğinin `Origin` başlığını kontrol ederek, istemcinin kaynak (origin) adresinin yerel geliştirme ortamı (`localhost`) veya Vercel deploy ortamı (`.vercel.app`) olup olmadığını belirler. Bu kontrole göre tarayıcılar tarafından uygulanacak olan CORS (Cross-Origin Resource Sharing) yanıt başlıklarını döndürür. Fonksiyon, güvenli olmayan kaynaklardan gelen istekleri engelleyerek yalnızca izin verilen ortamların API'ye erişmesini sağlar.
-
-**Nasıl yapar**: Önce istek nesnesinin `Origin` başlığını okur, bulunamazsa boş bir dize kullanır. Ardından bu değeri iki koşul için test eder: `http://localhost:` ile başlayıp başlamadığını ve `.vercel.app` ile bitip bitmediğini kontrol eder. Koşullardan herhangi biri sağlanırsa istek kabul edilir ve istemcinin kendi `Origin` değeri `Access-Control-Allow-Origin` başlığına yazılır. Aksi halde varsayılan ve tek izinli üretim adresi olan `https://venthub-hvac-esite.vercel.app` kullanılır. Son olarak, izin verilen başlık türleri, HTTP metodları ve önbellek süresi (`86400` saniye = 24 saat) sabit değerler olarak ayarlanan standart bir CORS başlık nesnesi döndürülür.
+**Nasıl yapar**: Fonksiyon, gelen isteğin `Origin` başlığını okur. Bu başlığın `http://localhost:` ile başlayıp başlamadığını (lokal geliştirme ortamı) veya `.vercel.app` ile bitip bitmediğini (Vercel üretim ortamı) kontrol ederek `allowed` adlı bir boolean değişken belirler. Eğer kaynak izinliyse, yanıt `Access-Control-Allow-Origin` başlığının değerini isteğin kendi `Origin` değeri olarak ayarlar; izinli değilse, `https://venthub-hvac-esite.vercel.app` varsayılan güvenli adresini kullanır. Ardından, tarayıcının önbellek zehirlenmesini önlemek için `Vary: Origin` başlığını ve preflight isteklerinin süresini belirten `Access-Control-Max-Age: 86400` (24 saat) başlığını da ekleyerek başlık nesnesini döndürür.
 
 **Parametreler**:
-- `req`: `Request` — Tarayıcı veya istemciden gelen HTTP istek nesnesi. Bu nesne üzerindeki `headers` alanından `Origin` değeri okunarak isteğin kaynak adresi tespit edilir. Cloudflare Workers veya benzeri edge ortamlarında standart `Request` arayüzüne sahiptir.
+- `req`: `Request` — Bu parametre, istemciden gelen ve CORS kararını vermek için ihtiyaç duyulan tüm bilgileri (özellikle `Origin` başlığını) içeren standart Web API Request nesnesidir. Fonksiyon, bu nesnenin `headers` özelliğinden faydalanır.
 
-**Dönüş**: `{ [key: string]: string }` — Tarayıcı tarafından işlenecek CORS başlıklarını içeren bir nesne. İçerik şu başlıklardan oluşur:
-- `Access-Control-Allow-Origin`: İzin verilen kaynak adresi (istemci origin'i veya varsayılan üretim URL'i).
-- `Access-Control-Allow-Headers`: İzin verilen özel istek başlıkları: `authorization`, `x-client-info`, `apikey`, `content-type`.
-- `Access-Control-Allow-Methods`: İzin verilen HTTP metodları: `POST`, `GET`, `OPTIONS`, `PUT`, `DELETE`.
-- `Access-Control-Max-Age`: Preflight isteklerinin tarayıcı tarafından kaç saniye önbelleğe alınacağı (86400 saniye).
+**Dönüş**: Fonksiyon, bir nesne döndürür. Bu nesne, tarayıcı ve sunucu arasındaki跨-origin iletişimi için gerekli HTTP başlıklarını (`Access-Control-Allow-Origin`, `Access-Control-Allow-Headers`, `Access-Control-Allow-Methods`, `Access-Control-Max-Age`, `Vary`) anahtar-değer çiftleri olarak içerir. Döndürülen nesnenin yapısı, fonksiyon gövdesindeki return ifadesiyle belirlenmiştir ve belirli bir interface veya type ile zorunlu olarak ilişkilendirilmemiştir, ancak yapısı sabittir.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: _shared/cors.ts::getCorsHeaders
-- **params**: (req: Request)
+- **params**: `req: Request` — HTTP isteği nesnesi, istemciden gelen başlıkları okumak için kullanılır
 - **ic_degiskenler**:
-  - `origin` — Request nesnesinin 'Origin' başlığını alır, eğer başlık yoksa boş dize kullanır
-  - `isLocal` — origin değerinin 'http://localhost:' ile başlayıp başlamadığını kontrol eder
-  - `isVercel` — origin değerinin '.vercel.app' ile bitip bitmediğini kontrol eder
-  - `allowed` — isLocal veya isVercel durumlarından herhangi biri doğruysa true olan mantıksal değişken
-- **Dönüş**: CORS başlıklarını içeren nesne (Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Methods, Access-Control-Max-Age anahtarlarını içerir)
+  - `origin` — `req.headers.get('Origin')` ile isteğin geldiği origin adresi alınır; değer yoksa boş string (`''`) kullanılır
+  - `isLocal` — `origin.startsWith('http://localhost:')` ile origin'in yerel geliştirme sunucusu olup olmadığı kontrol edilir
+  - `isVercel` — `origin.endsWith('.vercel.app')` ile origin'in Vercel deployed bir domain olup olmadığı kontrol edilir
+  - `allowed` — `isLocal || isVercel` boolean değeri; origin izin verilen listede ise `true` olur
+- **Dönüş**: CORS başlıkları içeren nesne — `Access-Control-Allow-Origin`, `Access-Control-Allow-Headers`, `Access-Control-Allow-Methods`, `Access-Control-Max-Age` ve `Vary` başlıklarını barındırır; `allowed` `true` ise actual origin, değilse sabit `https://venthub-hvac-esite.vercel.app` adresi `Allow-Origin` değerine yazılır
 
 ---
 

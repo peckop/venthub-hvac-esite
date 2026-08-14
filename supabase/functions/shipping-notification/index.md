@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-notification\index.ts
-skeleton_hash: 23787b8183560ca8
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-notification\index.ts
+skeleton_hash: 8c24ea9257d7297e
 entity_hashes:
-  func:loadShippingTemplate: 4b4a832183734352
-  func:renderTemplate: 26cc0a301db3fae9
+  func:loadShippingTemplate: f08a6d8b632a3fdf
+  func:renderTemplate: cd17dd9e91246fbd
   func:shipping-notification_handler: 06ce613108984be4
   overview: 9cf32250487e69ff
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-14T12:38:46Z
 ---
 
 ## Genel Bakış
@@ -49,15 +49,16 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve mevcut doküma
 ## FONKSİYON DETAYLARI
 
 ### renderTemplate
-**Ne yapar**: Bu fonksiyon, bir şablon dizesi içindeki değişkenleri ve koşullu blokları, sağlanan bir veri nesnesindeki değerlerle değiştirerek dinamik bir çıktı üretir. Temel olarak basit bir şablon motoru görevi görür.
 
-**Nasıl yapar**: Fonksiyon, iki aşamalı bir string değiştirme işlemi uygular. İlk olarak, `{{#if key}}...{{/if}}` sözdizimindeki koşullu blokları işler: `key` değerinin varlığını ve truthy olup olmadığını kontrol eder, doğru ise bloğun içeriğini korur, aksi halde boş string ile değiştirir. İkinci aşamada, kalan `{{key}}` değişkenlerini bulur ve veri nesnesindeki karşılık gelen değerle değiştirir; değer `null` veya `undefined` ise boş string kullanır.
+**Ne yapar**: Bir HTML şablonu dizesini alır ve içindeki değişken yer tutucularını (`{{değişken}}`) ile koşullu blokları (`{{#if değişken}}...{{/if}}`) verilen nesnedeki değerlerle değiştirerek son HTML çıktısını üretir.
+
+**Nasıl yapar**: Fonksiyon iki aşamalı bir `String.replace` Zinciri kullanır. Birinci adımda, `{{#if anahtar}}içerik{{/if}}` kalıbını eşleştiren bir正则表达ión (regex) ile koşullu blokları işler: eğer `_data` nesnesindeki ilgili anahtarın değeri truthy ise bloğun içeriğini korur, aksi takdirde boş dize ile değiştirir. İkinci adımda, `{{anahtar}}` kalıbını eşleştiren bir regex ile kalan değişken yer tutucularını `_data` nesnesindeki karşılık gelen değerlerle (`String` dönüşümü yapılarak) değiştirir; değer `null` veya `undefined` ise boş dize kullanılır. Her iki regex操作ı da `[\s\S]*?` gibi `s` bayrağı emulasyonu içeren eşzamanlı (greedy olmayan) eşleştirmeler kullanarak çok satırlı içeriği doğru şekilde yakalar.
 
 **Parametreler**:
-- `tpl`: string — Değiştirilecek olan şablon dizesi. İçerisinde `{{#if ...}}` blokları ve `{{...}}` değişken yer tutucuları bulunabilir.
-- `_data`: Record<string, unknown> — Şablondaki yer tutucularla eşleşecek anahtar-değer çiftlerini içeren veri nesnesi.
+- `tpl`: `string` — Değişkenler ve koşullu bloklar içeren ham HTML şablonu dizesi.
+- `_data`: `Record<string, unknown>` — Şablondaki yer tutuculara karşılık gelecek değerleri barındıran anahtar-değer çiftlerinden oluşan nesne. Değerler `unknown` tipinde olup, koşullu bloklarda truthy/falsy kontrolüne tabi tutulur; değişken yerleştirmelerde ise `String()` ile dizeye dönüştürülür.
 
-**Dönüş**: string — Değişkenlerin ve koşullu blokların işlendiği, sonuç şablon dizesi.
+**Dönüş**: `string` — Tüm yer tutucuların ve koşullu blokların işlenmiş, doğrudan kullanılabilir ham HTML dizesi.
 
 ### loadShippingTemplate
 **Ne yapar**: Bu asenkron fonksiyon, kargo bildirimleri için kullanılan bir HTML e-posta şablonunu dosya sisteminden yükler.
@@ -106,19 +107,63 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve mevcut doküma
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: shipping-notification/index.ts::renderTemplate
-- **params**: `tpl: string`, `_data: Record<string, unknown>`
+- **params**: (tpl: string, _data: Record<string, unknown>)
 - **ic_degiskenler**:
-  - **1. if-blocks replace callback içinde:**
-    - `_m` — regex eşleşme nesnesi, replace callback parametresi, doğrudan kullanılmaz
-    - `key` — `{{#if ...}}` içindeki değişken adı, `_data` içinde lookup anahtarı
-    - `inner` — `{{#if}}...{{/if}}` arasındaki HTML içeriği, truthy ise döndürülür
-    - `v` — `_data[key]` ile elde edilen değerin truthy olup olmadığı kontrol edilir
-    - `truthy` — `v`'nin truthy/Falsy durumu, inner içeriğinin korunup korunmayacağına karar verir
-  - **2. variable replace callback içinde:**
-    - `_m` — regex eşleşme nesnesi, replace callback parametresi, doğrudan kullanılmaz
-    - `key` — `{{...}}` içindeki değişken adı, `_data` içinde lookup anahtarı
-    - `v` — `_data[key]` ile elde edilen değer, null ise boş string, değilse String(v) olarak döndürülür
-- **Dönüş**: `string` — if-block ve değişken replacement'ları uygulanmış şablon metni
+  - `_m` — regex eşleşmenin tam dizesi (ilk callback parametresi, kullanılmıyor)
+  - `key` — template içindeki değişken adı ({{key}} formatında)
+  - `inner` — if bloğu içindeki template içeriği (sadece {{#if}} callback'inde)
+  - `v` — _data[key] ile elde edilen değer (hem if hem değişken callback'inde)
+  - `truthy` — v değerinin truthy olup olmadığını gösteren boolean
+- **Dönüş**: string
+
+### [N2_NASIL] AST Pointer: shipping-notification/index.ts::loadShippingTemplate
+- **params**: ()
+- **ic_degiskenler**:
+  - `url` — email template dosyasının URL nesnesi (import.meta.url referanslı)
+- **Dönüş**: Promise<string | null>
+
+### [N3_NASIL] AST Pointer: shipping-notification/index.ts::shipping-notification_handler
+- **params**: (req: Request)
+- **ic_degiskenler**:
+  - `requestOrigin` — HTTP isteğinin origin header'ı
+  - `allowedOrigins` — virgülle ayrılmış izin verilen kökenlerin listesi (env'den parse edilmiş)
+  - `originAllowed` — istek kökeninin izin verilenler listesinde olup olmadığını gösteren boolean
+  - `corsHeaders` — getCorsHeaders() ile elde edilen CORS header'ları
+  - `body` — POST body'sinden parse edilen ShippingNotificationRequest nesnesi
+  - `order_id` — sipariş ID'si (body.order_id)
+  - `customer_email` — müşteri email adresi (body.customer_email)
+  - `customer_name` — müşteri adı (body.customer_name)
+  - `carrier` — kargo firması adı (body.carrier)
+  - `tracking_number` — kargo takip numarası (body.tracking_number)
+  - `tracking_url` — kargo takip URL'i (body.tracking_url)
+  - `order_number` — sipariş numarası (body.order_number, opsiyonel)
+  - `tenantId` — resolveTenantId() ile elde edilen kiracı ID'si
+  - `branding` — getTenantBranding() ile elde edilen kiracı marka bilgileri
+  - `missing` — eksik alanların listesi (validasyon hatası durumunda)
+  - `SUPABASE_URL` — Supabase servis URL'i (env'den)
+  - `SERVICE_KEY` — Supabase servis rolü anahtarı (env'den)
+  - `authHeader` — HTTP Authorization header'ı
+  - `isAuthorized` — kullanıcının yetkili olup olmadığını gösteren boolean
+  - `anonKey` — Supabase anon anahtarı (env'den, auth fallback içinde)
+  - `authClient` — Supabase kimlik doğrulama istemcisi (dinamik import ile)
+  - `user` — authClient.auth.getUser() sonucundaki kullanıcı nesnesi
+  - `roleCheck` — kullanıcı rolünü kontrol eden REST API isteği sonucu
+  - `arr` — roleCheck.json() sonucu dizi (rol kontrolü için)
+  - `role` — kullanıcının rolü (arr[0]?.role)
+  - `RESEND_API_KEY` — Resend e-posta servisi API anahtarı (env'den)
+  - `EMAIL_FROM` — e-posta gönderim adresi (branding.emailFrom'dan)
+  - `o` — sipariş numarasını çeken REST API isteği sonucu (order_number eksikse)
+  - `arr` — o.json() sonucu dizi (sipariş numarası çözümleme için)
+  - `brandName` — kiracı marka adı (branding.brandName)
+  - `brandPrimary` — kiracı ana renk kodu (branding.brandPrimaryColor)
+  - `brandLogoUrl` — kiracı logo URL'i (branding.brandLogoUrl)
+  - `prettyOrderNo` — formatlanmış sipariş numarası (# işareti ile)
+  - `subject` — e-posta konu satırı
+  - `html` — e-posta HTML içeriği (template veya fallback)
+  - `resp` — Resend API'ye gönderilen e-posta isteği sonucu
+  - `t` — resp.text() sonucu (hata durumunda)
+  - `result` — resp.json() sonucu (başarılı gönderim sonrası)
+- **Dönüş**: Promise<Response> (yan etkiler: e-posta gönderir, hata logları)
 
 ---
 

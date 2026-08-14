@@ -12,11 +12,7 @@ interface RefundRequest {
 }
 
 serve(async (req) => {
-  const origin = req.headers.get('origin') ?? '*'
-  const cors = {
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
-}
+  const cors = getCorsHeaders(req)
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...cors, 'Content-Type': 'application/json' } })

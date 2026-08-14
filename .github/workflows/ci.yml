@@ -79,6 +79,29 @@ jobs:
           # mesru "kullanilmayan degisken" deyiminden ayirt EDILEMEZ; bu guard onu gormez.
           # notification-service'te tam bu sinif aylarca sessizce stok uyarilarini oldurdu.
 
+      # T018: codemod'un ÜÇÜNCÜ zarar sınıfı — mangling DEĞİL, SESSİZ SİLME.
+      # "Kullanılmayan değişken" temizliği 9 fonksiyonda `getCorsHeaders` import'unu bırakıp
+      # onu çağıran kodu sildi, yerine `Access-Control-Allow-Origin`'i OLMAYAN elle yazılmış
+      # bir cors objesi koydu. Tarayıcıdan çağrılan fonksiyonlar (admin kargo/iade ekranları)
+      # bu haliyle deploy edilse tamamen kırılırdı. deno check göremez (tip hatası değil),
+      # mangle-guard göremez (underscore deseni değil) → ayrı kapı ŞART.
+      - name: Edge CORS guard (ölü getCorsHeaders importu + eksik Allow-Origin)
+        run: |
+          hits=""
+          for f in supabase/functions/*/index.ts; do
+            [ -f "$f" ] || continue
+            if grep -q 'import { getCorsHeaders }' "$f" && ! grep -q 'getCorsHeaders(' "$f"; then
+              hits="${hits}${f}: getCorsHeaders import edilmis ama HIC CAGRILMAMIS"$'\n'
+            fi
+            # Elle yazilmis CORS objesi (Allow-Headers var) ama ne Allow-Origin ne de helper var.
+            if grep -q "'Access-Control-Allow-Headers'" "$f" \
+               && ! grep -q 'Access-Control-Allow-Origin' "$f" \
+               && ! grep -q 'getCorsHeaders(' "$f"; then
+              hits="${hits}${f}: elle CORS objesi var, Access-Control-Allow-Origin YOK"$'\n'
+            fi
+          done
+          if [ -n "$hits" ]; then echo "::error::Edge CORS bozulmasi (T018 sinifi):"; printf '%s' "$hits"; exit 1; fi
+
       # Sabit-kodlu DB bağlantı dizesi (şifreli) tekrar commit'lenmesin — kredensiyeller env'den.
       # İnterpolasyonlu (`${...}`) satırlar hariç tutulur (onlar değişkenden kurulur, sır değil).
       - name: Secret guard (hardcoded DB connection string)

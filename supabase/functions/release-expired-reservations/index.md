@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\release-expired-reservations\index.ts
-skeleton_hash: 0b2ab56d5062791b
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\release-expired-reservations\index.ts
+skeleton_hash: c345348c4088ef24
 entity_hashes:
   func:release-expired-reservations_handler: 2ee83a2fc9a11645
   overview: d6e6683c81c36dd3
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-14T12:38:19Z
 ---
 
 ## Genel Bakış
@@ -68,12 +68,6 @@ Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyicis
 ### OrderItem
 - `product_id: string`
 - `quantity: number`
-
----
-
-## SABİTLER
-- **corsHeaders** (object) — `{
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
 
 ---
 

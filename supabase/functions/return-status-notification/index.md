@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\return-status-notification\index.ts
-skeleton_hash: dc719d8c1a08cfe7
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\return-status-notification\index.ts
+skeleton_hash: ceb725b38b3c12e4
 entity_hashes:
   func:return-status-notification_handler: 7d2592fd30deaf05
   overview: 2f67488397ccb15e
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-14T12:38:19Z
 ---
 
 ## Genel Bakış

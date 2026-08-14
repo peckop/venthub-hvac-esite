@@ -1,28 +1,40 @@
 # Supabase project configuration
 # Edge Function settings
+#
+# KURAL: `verify_jwt = false` YALNIZCA çağıranı JWT gönderemeyen uçlar içindir
+# (harici webhook, pg_cron). Burada listelenmeyen her fonksiyon varsayılan `true` alır.
+# 2026-08-14 ölçümü: bu dosya prod ile 3 yerde ÇELİŞİYORDU (admin-orders-latest prod'da
+# true ama burada false → deploy korumayı DÜŞÜRECEKTİ). Değiştirmeden önce prod'daki
+# gerçek değeri `mcp__supabase__list_edge_functions` ile doğrula.
 
 [functions]
 
+# --- Harici çağıran: JWT gönderemez, false ZORUNLU ---
+
 [functions."iyzico-callback"]
-verify_jwt = false
+verify_jwt = false          # iyzico ödeme sağlayıcısı çağırıyor
 
 [functions."returns-webhook"]
-verify_jwt = false
+verify_jwt = false          # kargo/iade firması webhook'u (gövdede HMAC + replay guard var)
+
+# --- Admin uçları: src'de tarayıcı çağıranı YOK ya da oturumlu admin çağırıyor.
+# Gövdede tam kimlik+rol kapısı var; kapı JWT bekliyor, dolayısıyla geçit de zorlamalı.
+# 2026-08-14'te dördü de false'tan true'ya alındı (prod'da 4 canlı yetkisiz-erişim vardı). ---
 
 [functions."refund-order-mock"]
-verify_jwt = false
+verify_jwt = true           # ReturnsTableBody.tsx:342/:438 — oturumlu admin tarayıcısı
 
 [functions."admin-update-order"]
-verify_jwt = false
+verify_jwt = true           # src'de çağıran yok (operasyonel uç)
 
 [functions."admin-order-inspect"]
-verify_jwt = false
+verify_jwt = true           # src'de çağıran yok (operasyonel uç)
 
 [functions."admin-orders-latest"]
-verify_jwt = false
+verify_jwt = true           # prod ZATEN true idi; buradaki false bir çelişkiydi
 
 [functions."admin-iyzico-reconcile"]
-verify_jwt = false
+verify_jwt = true           # src'de çağıran yok (operasyonel uç)
 
 [functions."shipping-webhook"]
 verify_jwt = false
