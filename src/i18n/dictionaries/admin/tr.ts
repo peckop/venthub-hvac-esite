@@ -13,6 +13,7 @@ import { logistics } from './logistics.tr'
 import { menu } from './menu.tr'
 import { movements } from './movements.tr'
 import { orders } from './orders.tr'
+import { pricing } from './pricing.tr'
 import { products } from './products.tr'
 import { returns } from './returns.tr'
 import { search } from './search.tr'
@@ -25,6 +26,7 @@ import { webhooks } from './webhooks.tr'
 
 export const admin = {
   authority,
+  pricing,
   categories,
   products,
   common,

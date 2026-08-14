@@ -2,6 +2,7 @@ export const menu = {
       groupMain: 'Ana Menü',
       groupSales: 'Satış & Operasyon',
       groupCatalog: 'Katalog Yönetimi',
+      groupPricing: 'Fiyatlandırma',
       groupStock: 'Stok & Envanter',
       groupSystem: 'Sistem & Yönetim',
       dashboard: 'Dashboard',
@@ -20,5 +21,8 @@ export const menu = {
       products: 'Ürünler',
       categories: 'Kategoriler',
       logistics: 'Kargo & Lojistik',
-      settings: 'Ayarlar'
+      settings: 'Ayarlar',
+      pricing: 'Fiyat Ayarları',
+      pricingRules: 'Marj Kuralları',
+      pricingPreview: 'Fiyat Önizleme'
 };

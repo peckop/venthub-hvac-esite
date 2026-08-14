@@ -2,6 +2,7 @@ export const menu = {
       groupMain: 'Main Menu',
       groupSales: 'Sales & Operations',
       groupCatalog: 'Catalog Management',
+      groupPricing: 'Pricing',
       groupStock: 'Stock & Inventory',
       groupSystem: 'System & Management',
       dashboard: 'Dashboard',
@@ -20,5 +21,8 @@ export const menu = {
       products: 'Products',
       categories: 'Categories',
       logistics: 'Shipping & Logistics',
-      settings: 'Settings'
+      settings: 'Settings',
+      pricing: 'Pricing Settings',
+      pricingRules: 'Margin Rules',
+      pricingPreview: 'Price Preview'
 };
