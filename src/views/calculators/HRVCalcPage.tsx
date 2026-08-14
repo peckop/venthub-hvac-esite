@@ -155,7 +155,7 @@ const HRVCalcPage: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4 mt-4">
               <InputField
-                label="Sensible Efficiency"
+                label={t('calculators.hrv.form.sensibleEfficiency')}
                 value={sensibleEfficiency}
                 onChange={setSensibleEfficiency}
                 unit="%"
@@ -165,7 +165,7 @@ const HRVCalcPage: React.FC = () => {
               />
               {recoveryType === 'erv' && (
                 <InputField
-                  label="Latent Efficiency"
+                  label={t('calculators.hrv.form.latentEfficiency')}
                   value={latentEfficiency}
                   onChange={setLatentEfficiency}
                   unit="%"
@@ -207,7 +207,7 @@ const HRVCalcPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <InputField
-                  label="Area (m²)"
+                  label={t('calculators.hrv.form.area')}
                   value={area}
                   onChange={setArea}
                   unit="m²"

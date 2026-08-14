@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\en.ts
-skeleton_hash: fe020d8bdef26670
+skeleton_hash: c607053f0b734d01
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-14T06:44:25Z
 ---
 
 ## Genel Bakış
@@ -36,9 +36,8 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## SABİTLER
 - **en** (object) — `{
   common: {
-    update: 'Update',
-    unitMeters: '{{v}} m',
-    unitCu...`
+    paginationLabel: 'Pagination',
+    paginationPrevious: 'Pre...`
 
 ---
 
