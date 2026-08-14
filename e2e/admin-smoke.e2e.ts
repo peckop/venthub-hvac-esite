@@ -81,13 +81,51 @@ test.describe('admin runtime smoke', () => {
     // Çağrıyı SAYFA İÇİNDEN yap: gerçek oturum token'ı + gerçek cross-origin CORS.
     const result = await page.evaluate(
       async ({ url, key }) => {
-        // supabase-js oturumu localStorage'da `sb-<ref>-auth-token` altında tutar.
-        const storageKey = Object.keys(localStorage).find(
-          (k) => k.startsWith('sb-') && k.endsWith('-auth-token'),
-        )
-        if (!storageKey) return { status: -1, body: 'oturum localStorage\'da bulunamadı' }
-        const token = JSON.parse(localStorage.getItem(storageKey) as string)?.access_token
-        if (!token) return { status: -2, body: 'access_token yok' }
+        // Uygulama @supabase/ssr'ın createBrowserClient'ını kullanıyor → oturum ÇEREZDE,
+        // localStorage'da DEĞİL. (İlk sürüm localStorage okuyordu ve -1 ile patladı.)
+        // Çerez adı `sb-<ref>-auth-token`; 3180 karakteri aşarsa `.0`, `.1` diye parçalanır.
+        // Değer ya doğrudan JSON ya da `base64-<base64url>` önekli olabilir.
+        const readSessionToken = (): string | null => {
+          const chunks = document.cookie
+            .split('; ')
+            .map((c) => {
+              const i = c.indexOf('=')
+              return { name: c.slice(0, i), value: c.slice(i + 1) }
+            })
+            .filter((c) => /^sb-.*-auth-token(\.\d+)?$/.test(c.name))
+            .sort((a, b) => {
+              const n = (s: string) => Number(s.split('.')[1] ?? 0)
+              return n(a.name) - n(b.name)
+            })
+          if (chunks.length === 0) return null
+
+          let raw = decodeURIComponent(chunks.map((c) => c.value).join(''))
+          if (raw.startsWith('base64-')) {
+            const b64 = raw.slice(7).replace(/-/g, '+').replace(/_/g, '/')
+            raw = atob(b64)
+          }
+          const parsed = JSON.parse(raw)
+          // Bilinen iki şekil: {access_token,...} veya [access_token, refresh_token, ...]
+          if (parsed?.access_token) return parsed.access_token as string
+          if (Array.isArray(parsed) && typeof parsed[0] === 'string') return parsed[0]
+          return null
+        }
+
+        let token: string | null = null
+        try {
+          token = readSessionToken()
+        } catch (e) {
+          return { status: -3, body: `çerez çözümlenemedi: ${String(e)}` }
+        }
+        if (!token) {
+          // Tanı için hangi sb- çerezlerinin var olduğunu göster.
+          const names = document.cookie
+            .split('; ')
+            .map((c) => c.split('=')[0])
+            .filter((n) => n.startsWith('sb-'))
+            .join(',')
+          return { status: -1, body: `oturum çerezi yok. Mevcut sb- çerezleri: [${names || 'hiç'}]` }
+        }
 
         const resp = await fetch(`${url}/functions/v1/admin-update-shipping`, {
           method: 'POST',
@@ -108,7 +146,7 @@ test.describe('admin runtime smoke', () => {
       `Beklenen 400 (missing_fields = auth geçti). Alınan ${result.status}: ${result.body}\n` +
         '401 → geçit reddetti (verify_jwt / token).\n' +
         '403 → rol kapısı reddetti (tenant-scoped user_profiles sorgusu adminleri bulamıyor).\n' +
-        '-1/-2 → oturum kurulmamış (login akışı bozuk).',
+        '-1/-3 → oturum çerezi okunamadı (login akışı ya da çerez formatı değişmiş).',
     ).toBe(400)
   })
 })
