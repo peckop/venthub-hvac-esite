@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
-skeleton_hash: 0e708634d3a1804a
+skeleton_hash: a3a09822f59e06f5
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-06-19T20:47:54Z
+generated_at: 2026-08-14T06:44:25Z
 ---
 
 ## Genel Bakış
@@ -35,9 +35,8 @@ Bu modül saf bir statik veri modülüdür (sözlük/taslak) — çalıştırıl
 ## SABİTLER
 - **tr** (object) — `{
   common: {
-    update: 'Güncelle',
-    unitMeters: '{{v}} m',
-    unit...`
+    paginationLabel: 'Sayfalama',
+    paginationPrevious: 'Önce...`
 
 ---
 

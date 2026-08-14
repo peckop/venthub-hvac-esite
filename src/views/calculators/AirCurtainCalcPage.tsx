@@ -211,7 +211,7 @@ const AirCurtainCalcPage: React.FC = () => {
             {/* SVG Diagram */}
             <div className="mt-8 p-6 bg-gray-50 rounded-xl">
               <div className="flex justify-center">
-                <svg viewBox="0 0 200 160" className="w-full max-w-xs" role="img" aria-label="Door dimensions diagram">
+                <svg viewBox="0 0 200 160" className="w-full max-w-xs" role="img" aria-label={t('calculators.airCurtain.diagram.doorDimensions')}>
                   <rect x="40" y="20" width="120" height="120" fill="none" stroke="#1C3D5A" strokeWidth="3" />
                   <rect x="50" y="20" width="100" height="8" fill="#0EA5E9" rx="2" />
                   <text x="100" y="16" textAnchor="middle" className="text-xs fill-primary-navy font-medium">

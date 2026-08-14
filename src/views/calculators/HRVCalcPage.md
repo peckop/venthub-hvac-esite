@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\calculators\HRVCalcPage.tsx
-skeleton_hash: 8e26739368c014fb
+skeleton_hash: dc14c1431beef43c
 entity_hashes:
   func:HRVCalcPage: f6b36b28ed5f44cd
   func:reset: 16764b441f7bc7b6
-  overview: e0997b7ffb0ae1d0
+  overview: f4b47809b44ad2d8
   style_tokens: 27adff48ed74fee3
-generated_at: 2026-06-19T20:50:08Z
+generated_at: 2026-08-14T06:44:54Z
 ---
 
 ## Genel Bakış
@@ -28,14 +28,7 @@ Kullanıcının form değerlerini veya hesaplama durumunu başlangıç noktalar�
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için temel aksiyomlar, bir React hesaplama bileşeninin doğru çalışması için gerekli olan bağımlılıklar ve durum yönetimi üzerine kurulmuştur.
-
-[Aksiyom 1]: Eğer React çalışma ortamı (React, ReactDOM ve gerekli bağımlılıklar) yoksa, bileşen hiç render edilemez ve modül hiçbir işlevini yerine getiremez.
-[Aksiyom 2]: Eğer `HRVCalcPage` bileşeni, hesaplama mantığını ve form durumunu (state) yönetecek yerel durum (state) mekanizmasına sahip değilse, kullanıcı girişleri işlenemez ve hesaplama sonuçları üretilemez.
-[Aksiyom 3]: Eğer `reset` işlevi, ilgili durum (state) değişkenlerini başlangıç değerlerine geri döndürecek erişime veya yetkiye sahip değilse, form alanları veya hesaplama çıktısı sıfırlanamaz.
-[Aksiyom 4]: Eğer modül, HRV sistemi hesaplaması için gerekli olan asgari sayıda ve türde kullanıcı giriş parametrelerini (örn: hava debisi, sıcaklık farkları) kabul etmiyorsa, geçerli veya anlamlı bir hesaplama sonucu üretilemez.
-[Aksiyom 5]: Eğer modül, hesaplama formüllerini veya mantığını doğru bir şekilde uygulamıyorsa, üretilen sonuçlar teknik olarak hatalı olur.
-[Aksiyom 6]: Eğer modül, kullanıcıya hesaplama sonuçlarını gösterecek bir arayüz bileşeni (JSX) içermiyorsa, hesaplama yapılsa bile sonuçlar kullanıcıya sunulamaz.
+Bu modül için, verilen fonksiyon gövdeleri temel alınarak türetilebilecek spesifik mimari varsayımlar bulunmamaktadır.
 
 ---
 
@@ -74,14 +67,43 @@ Bu modül için temel aksiyomlar, bir React hesaplama bileşeninin doğru çalı
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/calculators/HRVCalcPage.tsx::recoveryTypeOptions
-- **params**: () — parametre yok (arrow function, closure'dan `t` kullanır)
-- **ic_degiskenler**: Değişken yok — array literal doğrudan return edilir
-- **Closure erişimleri**:
-  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu; `t('calculators.hrv.form.hrv')`, `t('calculators.hrv.form.erv')` gibi çağrılarla çevirilmiş label ve description üretir
-  - `ThermometerSun` — lucide-react'ten import edilen ikon bileşeni, HRV seçeneğinin icon'u
-  - `Snowflake` — lucide-react'ten import edilen ikon bileşeni, ERV seçeneğinin icon'u
-- **Dönüş**: `Array<{ value: string, label: string, description: string, icon: JSX.Element }>` — iki elemanlı Recovery tipi seçenek listesi (hrv / erv)
+### [N1_NASIL] AST Pointer: HRVCalcPage.tsx::recoveryTypeOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of objects with `value`, `label`, `description`, `icon` properties
+
+### [N2_NASIL] AST Pointer: HRVCalcPage.tsx::buildingTypeOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of objects with `value`, `label`, `description` properties
+
+### [N3_NASIL] AST Pointer: HRVCalcPage.tsx::climateZoneOptions
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Array of objects with `value`, `label`, `description` properties
+
+### [N4_NASIL] AST Pointer: HRVCalcPage.tsx::syncUrlWithState
+- **params**: ()
+- **ic_degiskenler**:
+  - `params` — URLSearchParams nesnesi, URL query string'ini oluşturmak için kullanılır
+  - `query` — `params`'ın string karşılığı, URL'ye eklenecek query string
+- **Dönüş**: yok (yan etki: `router.replace` ile URL güncellenir)
+
+### [N5_NASIL] AST Pointer: HRVCalcPage.tsx::calculateResults
+- **params**: ()
+- **ic_degiskenler**:
+  - `areaVal` — `area` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `occVal` — `occupancy` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `hoursVal` — `operatingHours` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `sensEff` — `sensibleEfficiency` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `latEff` — `latentEfficiency` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+  - `elecCost` — `electricityCost` state'inin parseFloat karşılığı, geçerli bir sayı değilse 0
+- **Dönüş**: `calculateHRV` fonksiyonunun dönüş değeri veya geçersiz parametrelerde `null`
+
+### [N6_NASIL] AST Pointer: HRVCalcPage.tsx::resetForm
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: yok (yan etki: tüm state'leri varsayılan değerlere sıfırlar)
 
 ---
 
