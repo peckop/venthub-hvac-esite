@@ -68,6 +68,18 @@ describe('DI Signature compliance static analysis', () => {
 
       visit(sourceFile)
 
+      // DI kuralının AMACI: servis fonksiyonları kendi Supabase client'ını YARATMASIN,
+      // client çağırandan enjekte edilsin. Supabase'e hiç dokunmayan SAF yardımcılar bu
+      // amacın dışındadır — onlara kullanılmayan bir `supabase` parametresi eklemek kuralı
+      // güçlendirmez, sadece imzayı yalanlar. Bu yüzden muafiyet ADLA verilir (desenle değil):
+      // yeni bir ad eklemek bilinçli bir karar olmalı ve saflığı doğrulanmalıdır.
+      // NOT: mimari olarak daha temizi bu saf yardımcıları `lib/services/` dışına taşımaktır;
+      // bu, fiyat motoru şeridinin kararı (dosya o şeritte aktif).
+      const PURE_HELPERS_EXEMPT: Record<string, string[]> = {
+        'pricing.service.ts': ['getUserPriceSegment'], // user.app_metadata → segment; DB erişimi yok
+      }
+      const exempt = new Set(PURE_HELPERS_EXEMPT[file] ?? [])
+
       // Ensure we found at least one exported function to make the test meaningful
       expect(
         exportedFunctions.length,
@@ -75,6 +87,7 @@ describe('DI Signature compliance static analysis', () => {
       ).toBeGreaterThan(0)
 
       exportedFunctions.forEach(({ name, parameters }) => {
+        if (exempt.has(name)) return
         expect(
           parameters.length,
           `Exported function '${name}' in '${file}' must have at least one parameter (supabase)`
