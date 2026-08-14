@@ -174,7 +174,7 @@ serve(async (req) => {
       return await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: emailFrom, to: toList, bcc: bcc.length > 0 ? bcc : undefined, subject, html, _text: `${subject}` })
+        body: JSON.stringify({ from: emailFrom, to: toList, bcc: bcc.length > 0 ? bcc : undefined, subject, html, text: `${subject}` })
       })
     }
 
@@ -194,7 +194,7 @@ serve(async (req) => {
       await fetch(`${supabaseUrl}/rest/v1/order_email_events`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify({ order_id, email_to: toList[0] || '', subject, provider: 'resend', provider_message_id: result?.id || result?._data?.id || null })
+        body: JSON.stringify({ order_id, email_to: toList[0] || '', subject, provider: 'resend', provider_message_id: result?.id || result?.data?.id || null })
       })
     } catch {}
 

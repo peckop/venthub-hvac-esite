@@ -16,28 +16,6 @@ describe('DI Signature compliance static analysis', () => {
     'project.service.ts'
   ]
 
-  /**
-   * SAF (pure) export'lar: DB'ye hiç dokunmayan, bu yüzden `supabase` parametresi ALMAYAN
-   * fonksiyonlar. DI kuralı (CLAUDE.md §2) "veri erişen servis fonksiyonu" içindir; saf hesap
-   * fonksiyonuna client zorlamak sahte bağımlılık üretir ve test edilebilirliği bozar.
-   *
-   * Bu liste BİLİNÇLİ ve DAR tutulur: yeni bir isim eklemeden önce fonksiyonun gerçekten
-   * DB'ye dokunmadığını doğrula. Aşağıdaki stale-guard, listede olup dosyada artık bulunmayan
-   * bir ismi FAIL ettirir (liste çürümesin).
-   *
-   * Not: bu istisna listesi 2026-08-14'te eklendi — test W1'den beri kırmızıydı ama CI
-   * çıkış kodunu yuttuğu için görünmüyordu (fiyat motoru saf çekirdek fonksiyonları).
-   */
-  const PURE_EXPORTS: Record<string, string[]> = {
-    'pricing.service.ts': [
-      'getUserPriceSegment', // JWT app_metadata → segment (saf eşleme)
-      'ruleMatchesProduct', // kural ↔ ürün hedef eşleşmesi (saf)
-      'sortRules', // merdiven sıralaması (saf)
-      'computePriceFromRule', // tek kuraldan net/gross hesabı (saf)
-      'resolvePriceWithRules', // motorun SAF çekirdeği; DB'li sarmalayıcısı resolvePrice()
-    ],
-  }
-
   serviceFiles.forEach(file => {
     it(`should enforce that every exported function in ${file} accepts supabase as its first parameter`, () => {
       const filePath = path.join(process.cwd(), 'src/lib/services', file)
@@ -54,6 +32,7 @@ describe('DI Signature compliance static analysis', () => {
       interface ExportedFunctionInfo {
         name: string
         parameters: ts.NodeArray<ts.ParameterDeclaration>
+        text: string
       }
 
       const exportedFunctions: ExportedFunctionInfo[] = []
@@ -65,7 +44,7 @@ describe('DI Signature compliance static analysis', () => {
           )
           if (isExported) {
             const funcName = node.name ? node.name.text : 'anonymous'
-            exportedFunctions.push({ name: funcName, parameters: node.parameters })
+            exportedFunctions.push({ name: funcName, parameters: node.parameters, text: node.getText(sourceFile) })
           }
         } else if (ts.isVariableStatement(node)) {
           const isExported = node.modifiers?.some(
@@ -80,7 +59,8 @@ describe('DI Signature compliance static analysis', () => {
                 const funcName = decl.name.getText(sourceFile)
                 exportedFunctions.push({
                   name: funcName,
-                  parameters: decl.initializer.parameters
+                  parameters: decl.initializer.parameters,
+                  text: decl.initializer.getText(sourceFile)
                 })
               }
             })
@@ -91,27 +71,51 @@ describe('DI Signature compliance static analysis', () => {
 
       visit(sourceFile)
 
+      // DI kuralının AMACI: servis fonksiyonları kendi Supabase client'ını YARATMASIN,
+      // client çağırandan enjekte edilsin. Supabase'e hiç dokunmayan SAF yardımcılar bu
+      // amacın dışındadır — onlara kullanılmayan bir `supabase` parametresi eklemek kuralı
+      // güçlendirmez, sadece imzayı yalanlar. Bu yüzden muafiyet ADLA verilir (desenle değil):
+      // yeni bir ad eklemek bilinçli bir karar olmalı ve saflığı doğrulanmalıdır.
+      // NOT: mimari olarak daha temizi bu saf yardımcıları `lib/services/` dışına taşımaktır;
+      // bu, fiyat motoru şeridinin kararı (dosya o şeritte aktif).
+      const PURE_HELPERS_EXEMPT: Record<string, string[]> = {
+        'pricing.service.ts': [
+          'getUserPriceSegment',   // user.app_metadata → segment
+          'ruleMatchesProduct',    // (rule, product, ancestors) → boolean
+          'sortRules',             // kural dizisini sıralar
+          'computePriceFromRule',  // saf aritmetik: maliyet + kural → net/brüt
+          'resolvePriceWithRules', // motorun SAF çekirdeği; DB'li sarmalayıcısı resolvePrice()
+        ],
+      }
+      const exempt = new Set(PURE_HELPERS_EXEMPT[file] ?? [])
+
       // Ensure we found at least one exported function to make the test meaningful
       expect(
         exportedFunctions.length,
         `Expected to find at least one exported function in ${file}`
       ).toBeGreaterThan(0)
 
-      const pureExports = PURE_EXPORTS[file] ?? []
-
-      // Stale-guard: istisna listesindeki her isim dosyada GERÇEKTEN export edilmiş olmalı
-      // (yeniden adlandırma/silme sonrası liste sessizce genişlemesin).
+      // Stale-guard: muafiyet listesindeki her isim dosyada GERÇEKTEN export edilmiş olmalı
+      // (yeniden adlandırma/silme sonrası liste sessizce büyümesin, ölü muafiyet kalmasın).
       const exportedNames = new Set(exportedFunctions.map(f => f.name))
-      pureExports.forEach(pureName => {
+      exempt.forEach(exemptName => {
         expect(
-          exportedNames.has(pureName),
-          `PURE_EXPORTS['${file}'] içindeki '${pureName}' artık export edilmiyor — listeyi güncelle`
+          exportedNames.has(exemptName),
+          `PURE_HELPERS_EXEMPT['${file}'] içindeki '${exemptName}' artık export edilmiyor — listeyi güncelle`
         ).toBe(true)
       })
 
-      exportedFunctions
-        .filter(({ name }) => !pureExports.includes(name))
-        .forEach(({ name, parameters }) => {
+      exportedFunctions.forEach(({ name, parameters, text }) => {
+        if (exempt.has(name)) {
+          // Muafiyet KENDİNİ DENETLER: saf olduğu iddia edilen fonksiyon gövdesinde
+          // supabase geçiyorsa muafiyet geçersizdir — listeye ekleyerek gerçek bir
+          // DI ihlali gizlenemez.
+          expect(
+            /supabase/i.test(text),
+            `'${name}' in '${file}' is exempt as a PURE helper but references supabase — remove the exemption or inject the client`
+          ).toBe(false)
+          return
+        }
         expect(
           parameters.length,
           `Exported function '${name}' in '${file}' must have at least one parameter (supabase)`

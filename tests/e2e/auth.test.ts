@@ -9,6 +9,11 @@ beforeEach(() => {
   vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://tnofewwkwlyjsqgwjjga.supabase.co')
   vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.anon')
   vi.stubEnv('NODE_ENV', 'production')
+  // middleware artık bu sır yoksa admin'i FAIL-CLOSED reddeder (anon key fallback'i kaldırıldı,
+  // çünkü anon key publiktir → sahte super_admin çerezi üretilebiliyordu). Üretimde bu değişken
+  // TANIMLIDIR; testler de gerçek üretim yolunu koşabilmek için onu kurar.
+  // Sırrın YOKLUĞU davranışı ayrıca aşağıda kendi testiyle kilitlenir.
+  vi.stubEnv('JWT_CLAIMS_COOKIE_SECRET', 'test-claims-cache-secret')
 })
 
 afterEach(() => {
@@ -72,7 +77,36 @@ vi.mock('@supabase/ssr', () => {
 })
 
 describe('Supabase Auth & RBAC E2E Suite (10 Test Cases)', () => {
-  
+
+  // ─── TIER 0: FAIL-CLOSED YAPILANDIRMA KAPISI ───
+  // Bu davranış bir güvenlik düzeltmesidir, kozmetik değil: middleware eskiden
+  // JWT_CLAIMS_COOKIE_SECRET yoksa PUBLIC anon key'e düşüyordu. Anon key her client
+  // bundle'ında gönderildiği için saldırgan {user_role:'super_admin'} içeren geçerli bir
+  // `sb-claims-cache` çerezi üretip /admin kapısını geçebiliyordu (resolveUserClaims
+  // çözülebilir çerezde Supabase'e hiç sormaz). Sır yoksa erişim REDDEDİLMELİ.
+  it('0. should DENY admin access in production when JWT_CLAIMS_COOKIE_SECRET is missing (fail-closed)', async () => {
+    vi.stubEnv('JWT_CLAIMS_COOKIE_SECRET', '')
+    mockUserResolver = () => ({
+      user: {
+        id: 'user-admin-1',
+        user_metadata: { role: 'admin' },
+        app_metadata: { tenant_id: 'tenant-eng-123' }
+      },
+      error: null
+    })
+
+    const req = createMockRequest({
+      url: 'https://engineering.venthub.local/admin/orders',
+      headers: { host: 'engineering.venthub.local' },
+      cookies: { sb_access_token: 'valid-jwt' }
+    })
+
+    const res = await middleware(req)
+    // Geçerli admin oturumu OLSA BİLE erişim verilmez (yapılandırma eksik).
+    expect(res.status).toBe(302)
+    expect(res.headers.get('location')).toContain('auth_error=server_misconfigured')
+  })
+
   // ─── TIER 1: FEATURE COVERAGE (5 CASES) ───
 
   it('1. should grant access to admin route when user has a valid JWT, admin role, and correct tenant claim', async () => {

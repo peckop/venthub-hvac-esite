@@ -306,6 +306,9 @@ describe('Comprehensive Workload Scenarios E2E Suite (5 Test Cases)', () => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://tnofewwkwlyjsqgwjjga.supabase.co')
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.anon')
     vi.stubEnv('NODE_ENV', 'production')
+  // middleware fail-closed: bu sir yoksa /admin reddedilir (anon key fallback'i kaldirildi).
+  // Uretimde tanimlidir; testler gercek uretim yolunu kossun diye kurulur.
+  vi.stubEnv('JWT_CLAIMS_COOKIE_SECRET', 'test-claims-cache-secret')
     
     db = new MockDatabaseEngine()
     cache = new MultiTenantCacheEngine()

@@ -351,7 +351,7 @@ const ReturnsTableBody: React.FC = () => {
             try {
               await supabaseBrowserClient.functions.invoke('return-status-notification', {
                 body: {
-                  _return_id: row.id,
+                  return_id: row.id,
                   order_id: row.order_id,
                   order_number: row.order_number,
                   customer_email: row.customer_email,
@@ -447,7 +447,7 @@ const ReturnsTableBody: React.FC = () => {
               try {
                 await supabaseBrowserClient.functions.invoke('return-status-notification', {
                   body: {
-                    _return_id: row.id,
+                    return_id: row.id,
                     order_id: row.order_id,
                     order_number: row.order_number,
                     customer_email: row.customer_email,
