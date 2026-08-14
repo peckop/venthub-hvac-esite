@@ -1,6 +1,6 @@
 'use client'
 
-import { ExternalLink, Loader2, Percent, Search, X } from 'lucide-react'
+import { AlertTriangle, ExternalLink, Loader2, Percent, Search, X } from 'lucide-react'
 import type { Route } from 'next'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -161,6 +161,7 @@ const PricePreviewPanel: React.FC = () => {
   const [term, setTerm] = useState('')
   const [results, setResults] = useState<ProductSearchRow[]>([])
   const [searching, setSearching] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!productId) {
@@ -187,8 +188,11 @@ const PricePreviewPanel: React.FC = () => {
 
   useEffect(() => {
     const needle = term.trim()
-    if (needle.length < 2) {
-      setResults([])
+    // Arama terimi yokken de ilk N ürün listelenir: boş kutu "hiç ürün yok" gibi okunuyordu.
+    // 1 harflik terim henüz anlamlı daraltma yapmadığı için o da listeyi olduğu gibi bırakır.
+    const isBrowse = needle.length < 2
+    // Ürün seçiliyken arama kutusu görünmüyor → boşuna sorgu atma.
+    if (selectedProduct) {
       setSearching(false)
       return
     }
@@ -197,13 +201,14 @@ const PricePreviewPanel: React.FC = () => {
     const timer = setTimeout(() => {
       void (async () => {
         const pattern = `%${needle.replace(/[%,]/g, '')}%`
-        const { data } = await supabase
-          .from('products')
-          .select(PRODUCT_SELECT)
-          .or(`name.ilike.${pattern},sku.ilike.${pattern}`)
-          .is('deleted_at', null)
-          .limit(SEARCH_LIMIT)
+        let query = supabase.from('products').select(PRODUCT_SELECT).is('deleted_at', null)
+        query = isBrowse
+          ? query.order('name', { ascending: true })
+          : query.or(`name.ilike.${pattern},sku.ilike.${pattern}`)
+        const { data, error } = await query.limit(SEARCH_LIMIT)
         if (!alive) return
+        // Hatayı yutma: sessiz boş liste, "ürün yok" ile "sorgu patladı"yı ayırt ettirmiyordu.
+        setSearchError(error ? t('admin.pricing.common.loadFailed') : null)
         setResults(data ?? [])
         setSearching(false)
       })()
@@ -212,7 +217,9 @@ const PricePreviewPanel: React.FC = () => {
       alive = false
       clearTimeout(timer)
     }
-  }, [term])
+    // `selectedProduct` bağımlılığı ŞART: "X" ile seçimi iptal etmek `term`'i zaten boş olan
+    // değere set ediyordu → effect yeniden koşmuyor, liste boş kalıyordu (Recep bildirdi).
+  }, [term, t, selectedProduct])
 
   const pickProduct = useCallback((p: ProductSearchRow) => {
     setSelectedProduct(p)
@@ -350,7 +357,14 @@ const PricePreviewPanel: React.FC = () => {
                 </ul>
               ) : null}
 
-              {!searching && term.trim().length >= 2 && results.length === 0 ? (
+              {searchError ? (
+                <p className="flex items-center gap-2 text-xs font-bold text-rose-400">
+                  <AlertTriangle size={14} />
+                  {searchError}
+                </p>
+              ) : null}
+
+              {!searching && !searchError && results.length === 0 ? (
                 <p className="text-xs font-bold text-slate-500">{t('admin.pricing.preview.product.searchEmpty')}</p>
               ) : null}
             </>

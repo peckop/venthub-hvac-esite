@@ -179,6 +179,40 @@ export const pricing = {
       productSearchEmpty: "Eşleşen ürün bulunamadı.",
       clearTarget: "Seçimi temizle",
     },
+    materialize: {
+      toolbarAction: "Fiyatları yeniden hesapla",
+      title: "Fiyatları yeniden hesapla",
+      description: "Motor tüm ürünleri tarar ve mevcut marj kurallarına göre net/brüt fiyatları yeniden türetir. Hiçbir şey kaydedilmeden önce önizlemeyi inceleyin.",
+      loading: "Önizleme hesaplanıyor...",
+      retry: "Tekrar dene",
+      apply: "Uygula",
+      applying: "Uygulanıyor...",
+      summary: {
+        scanned: "Taranan ürün",
+        priced: "Fiyatlanacak",
+        quoteOnly: "\"Teklif Alın\" kalacak",
+        totalNet: "Toplam net (TRY)",
+        skippedManual: "Elle ezilmiş (korunacak)",
+        deactivated: "Pasifleştirilecek bayat satır",
+        unbridgedBrand: "Markası eşleşmeyen ürün",
+      },
+      segments: {
+        title: "Segment kırılımı",
+        empty: "Segment verisi yok",
+        table: {
+          priced: "Fiyatlanan",
+          quoteOnly: "Teklif Alın",
+        },
+      },
+      samples: {
+        title: "Örnek satırlar",
+        empty: "Örnek satır yok",
+      },
+      toasts: {
+        applied: "{{count}} ürün fiyatı güncellendi",
+        applyFailed: "Fiyatlar güncellenemedi",
+      },
+    },
     impact: {
       title: "Etki",
       loading: "Kapsam hesaplanıyor...",

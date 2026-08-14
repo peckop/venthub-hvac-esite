@@ -1,4 +1,4 @@
-# VentHub Fiyatlandırma Standardı (Cetvel) — v1.0
+# VentHub Fiyatlandırma Standardı (Cetvel) — v1.1
 
 > **Bu dosya nedir?** "Bir satış sitesinde fiyat nasıl kurulur?" sorusunun **karar veren cetveli.**
 > Alış fiyatı + satıcı kârı; **üründe / markada / kategoride farklılaşan** marj; çoklu-para-birimi (USD/EUR/TRY)
@@ -10,6 +10,22 @@
 > **Neden var?** Bugün fiyat **amatör**: `product_prices` = 0 satır, çözücü bozuk (staff-rolünü segmente
 > bağlıyor → her ürün düz `products.price`), currency/kur/KDV/kâr alanı yok. Bu cetvel, full ürün
 > yüklemesinden **önce** kurulması gereken omurgayı tanımlar.
+>
+> ### ⚠️ v1.1 (2026-08-14) — çürüyen varsayım: "elimizde alış maliyeti var"
+>
+> v1.0 boyunca `products.purchase_price` **alış maliyeti** sanıldı. Kaynak doğrulandı: alan,
+> **AVenS Ürün Fiyat Kataloğu 2026.1**'den geliyor — yani Avensair'in **müşteriye satış / liste**
+> fiyatı (EUR, KDV hariç, depo teslim, *"TCMB Efektif Satış Kuru geçerlidir"*). Recep'in beyanı
+> (2026-08-14): *"elimde alış fiyatları yok; o fiyatlar liste fiyatları yani iskontosuz; ben sonra
+> o fiyatlardan iskonto alacağım."*
+>
+> **Sonuçlar (bu sürümün omurgası):**
+> 1. Bugün sistemde **maliyet yok, LİSTE var** → §2 iki tabana bölündü (liste ≠ maliyet).
+> 2. Liste EUR çapalı ve kur her gün değişiyor → `cost_in_base` **donmuş değil, türetilmiş**tir;
+>    tazeleme sözleşmesi §8'de.
+> 3. Geçiş kurulumu: **global kural = maliyet+marj %0** → vitrin fiyatı = katalog fiyatı + KDV.
+>    Gerçek marj, gerçek alış maliyeti geldiğinde (**T010 satınalma**) anlam kazanır.
+> 4. Maliyet-tabanlı her koruma (zarar eşiği, marj kelepçesi) bugün **ölçüsüzdür** — T010'a bağlıdır.
 
 ---
 
@@ -30,14 +46,25 @@ amatör tarafından ayrıldığımız nokta — onlarda maliyet pasif bir rapor 
 
 ---
 
-## 2. Maliyet tabanı (cost basis)
+## 2. Fiyat tabanı — İKİ ayrı taban (v1.1'de bölündü)
 
-- **Alış para-birimi başına, zaman-versiyonlu.** Cost tek bir TL sabiti DEĞİL: `(product, currency)` başına
-  alış tutarı + **alındığı andaki kur snapshot'ı.** (Salesforce CPQ per-currency cost satırları deseni.)
-- Mevcut `products.purchase_price` (tek alan) yetersiz → genişlet (bkz §10): `purchase_currency` +
-  `purchase_rate_to_base` (snapshot) + türetilmiş `cost_in_base` (donmuş TL maliyet).
+Motorun beslendiği taban tek değildir. **Liste fiyatı ile alış maliyeti aynı alan olamaz** — v1.0'ın
+tek-alan varsayımı bugünkü sessiz yanlışın kaynağıydı.
+
+| Taban | Nedir | Kur rolü | Bugünkü durum |
+|---|---|---|---|
+| **A · Liste fiyatı** (`list`) | Tedarikçinin/üreticinin **yayınlanmış satış fiyatı**, iskontosuz. Bizim iskontomuz da müşteri iskontosu da bunun üstünden konuşulur. | **Canlı** gösterim kuru — liste EUR çapalıysa TL her gün türetilir, DONMAZ | **VAR** — `products.purchase_price` + `purchase_currency` fiilen bunu taşıyor (AVenS Katalog 2026.1) |
+| **B · Alış maliyeti** (`cost`) | Fiilen ödenen tutar = liste − alınan iskonto zinciri (ör. %30+%10). | **Donmuş** tedarik kuru — alış anında snapshot'lanır, sonradan oynamaz | **YOK** — satınalma modülü (**T010**) ile gelecek |
+
+- **Bugünkü geçiş (dürüst kayıt):** `cost_in_base` alanı adı gereği maliyet der, **fiilen liste fiyatının
+  TL karşılığını** taşır ve `refreshCostInBase` tarafından güncel TCMB kuruyla **her tazelemede yeniden
+  hesaplanır**. Bu bilinçlidir (liste EUR çapalı); v1.0'ın "donmuş TL maliyet" ifadesi **geçersizdir**.
+- **T010 geldiğinde:** `list_price_original`/`list_currency` (canlı kur) ile `purchase_cost`/
+  `purchase_rate_to_base` (alış-anı snapshot) **ayrı alanlara** ayrılır; `cost_in_base` yalnız B tabanını
+  taşır ve o zaman gerçekten donar. Bu ayrım yapılmadan marj/zarar korumaları ölçüsüzdür.
 - **İki kur rolü asla birleşmez** (§4): *tedarik kuru* (alış→TL maliyet, alışta snapshot) ile *gösterim kuru*
-  (TL base→USD/EUR vitrin, canlı) **farklı sayılardır.**
+  (TL base→USD/EUR vitrin, canlı) **farklı sayılardır.** ⚠️ **Bilinen sapma:** bugün `currency_rates` tek
+  satır kümesiyle her iki rolü de besliyor (rol ayrımı kolonu yok) — T010 ile `rate_role` eklenecek.
 
 ---
 
@@ -95,6 +122,19 @@ Kural başına: `method ∈ {cost_plus, fixed, percent_off_list}`, `base ∈ {co
 - **Sipariş anında kur DONDURULUR:** order satırına kullanılan **kur skaler olarak kopyalanır** (FK değil) →
   geçmiş sipariş toplamları sonradan kaymaz. (Tarihsel-kur yöntemi, evrensel muhasebe standardı.)
 
+### 4.1 Çoklu-para birimi satış sözleşmesi (v1.1)
+
+- **İşlem para birimi daima TRY.** Tahsilat (İyzico), fatura, KDV, iade TL üzerindendir. EUR/USD gösterimi
+  **yalnız vitrin bilgilendirmesidir**; etikette bu açıkça belirtilir.
+- **Sipariş satırı kur snapshot'ı ZORUNLU:** `display_currency` + `display_rate` + `rate_effective_date`
+  sipariş kalemine kopyalanır. ⚠️ Canlı `venthub_order_items`'ta bu üç alan **YOK** — çoklu-para gösterimi
+  bu alanlar eklenmeden açılırsa geçmiş siparişler her kur hareketinde yeniden değerlenir. §13'teki
+  snapshot listesi bu nedenle **6 → 9 alana** çıkarıldı.
+- **İade daima orijinal TL tutarından** hesaplanır (gösterim para birimi iadeyi belirlemez).
+- ⚠️ **Bilinen sapma (v1.1):** `spread_pct` üç yerde duruyor (`currency_rates.spread_pct`,
+  `site_settings.pricing.display_spread_pct`, admin panelinde salt-okunur kart) ama **hiçbir hesaba girmiyor**
+  — gösterim çevrimi ham `net / rate`. Ya uygulanır ya cetvelden düşer; "duran ama işlemeyen ayar" kabul edilemez.
+
 ---
 
 ## 5. KDV (%20) — net sakla, çift mod
@@ -108,13 +148,23 @@ Kural başına: `method ∈ {cost_plus, fixed, percent_off_list}`, `base ∈ {co
   - **B2B (bayi/Avensair):** **KDV-hariç (net)** göster; KDV faturada **ayrı satır** (Türk yasası: ticari
     faturada KDV tutarı ayrı gösterilmek zorunda; e-Fatura/e-Arşiv XML toplamlarıyla **birebir** uyuşmalı).
   - Tek `display_tax_mode = inclusive|exclusive` bayrağı aynı saklanan net üzerinden audience'a göre render eder.
+- **KDV ORANININ SSOT'u = ürün** (v1.1 kararı). Canlı şemada `products.tax_rate numeric NOT NULL DEFAULT 20.00`
+  ve `products.is_taxable boolean NOT NULL DEFAULT true` **zaten var**; motor ise oranı `pricing_rule.vat_rate_pct`
+  üzerinden okuyordu → **iki rakip KDV kaynağı**. Kural:
+  1. Oran **üründen** okunur (`is_taxable = false` → KDV yok, gross = net).
+  2. `pricing_rule.vat_rate_pct` **yalnız bilinçli override**tir; `NULL` = "üründen oku" (varsayılan).
+  3. Tek oran varsayımı (%20) yasaktır: Türkiye'de %1/%10/%20 dilimleri var; bazı HVAC kalemleri %10 olabilir.
+  - Zorlayan test: **INV-PRICE-5** (§14).
 
 ---
 
 ## 6. Yuvarlama (per-currency, en SON)
 
-- **Para tamsayı-minor saklanır** (kuruş/cent ×100); float YASAK (0.1 binary'de temsil edilemez, hata birikir).
-  Precision ISO 4217'den (minor-unit exponent) türetilir, 2 sabitlenmez.
+- **Para ondalık-kesin (`numeric`) saklanır; float (`real`/`double precision`) YASAK** — 0.1 binary'de temsil
+  edilemez, hata birikir. Uygulanan biçim: DB'de `numeric(14,4)` (kur için `numeric(18,6)`), hesapta tek
+  yuvarlama sınırı. *(v1.1 düzeltmesi: v1.0 "tamsayı-minor ×100 sakla" diyordu — ne şema ne kod böyleydi;
+  cetvel hiçbir yerde geçerli olmayan bir kural yazıyordu. Tamsayı-minor göçü istenirse ayrı iş emri olur,
+  "zaten kural" gibi davranılamaz.)* Precision ISO 4217'den (minor-unit exponent) türetilir, 2 sabitlenmez.
 - **En son, her para sınırında bir kez yuvarla** (round-half-up). Tam precision'ı zincir boyunca taşı, yalnız
   saklanan/gösterilen para değerine inerken yuvarla.
 - **Charm/yuvarlama per-kategori/per-tenant POLİTİKA** (global sabit değil): premium ürün yuvarlak (₺100),
@@ -151,6 +201,52 @@ TL faturası **yasal otorite**; USD/EUR açıkça "tahmini" gösterim.
   price_list → product_prices` → bulunamazsa maliyet-artı motor çıktısı (§3). (Karar: dealer-blueprint §2, B-minimal.)
 - **`product_prices` = motor çıktısının materialize cache'i:** `(product, price_list, currency)` başına net+gross.
   Motor yazar, çözücü okur. Boş tablonun anlamı buydu — seed (B2) bu cache'i doldurur.
+
+### 8.1 Cache sözleşmesi (v1.1 — seed'den ÖNCE uyulması zorunlu)
+
+1. **Tekil anahtar para birimini İÇERİR:** `(product_id, price_list_id, currency, valid_from)`.
+   ⚠️ Canlı indeks v1.1 öncesi `currency`'siz kuruldu (`product_prices_unique`) → aynı ürünün EUR ve TRY
+   satırı fiziksel olarak yan yana duramıyordu. "Ürün/grup bazında para birimi" gereksiniminin ön koşulu budur;
+   **tablo boşken düzeltilir**, dolduktan sonra göç acılıdır.
+2. **Elle-ezme dokunulmazdır:** `is_derived = false` satırlar **motor tarafından ASLA üzerine yazılmaz/silinmez**.
+   Materialize yalnız `is_derived = true` satırları tazeler. (Fiyat dondurmanın taşıyıcısı bu bayraktır — §8.2.)
+3. **Tazelik sözleşmesi:** cache satırı `computed_at` taşır. TCMB senkronundan sonra zincir
+   `refreshCostInBase → etkilenen ürünler için materialize` otomatik koşar; **elle tetiklemeye bırakılmaz**
+   (bırakılırsa vitrin her gün dünkü kuru gösterir ve kimse fark etmez). N saatten bayat satır admin panelinde uyarı üretir.
+4. **Cache adet-boyutsuzdur:** materialize `quantity = 1` ile koşar. Bu nedenle `min_quantity > 1` kuralı
+   **sepet/checkout runtime `resolvePrice` yolunu çağırana kadar YAZILMAMALIDIR** — bugün girilirse hiçbir
+   yüzeyde görünmez (sessiz ölü kural).
+
+### 8.2 Fiyat kilidi (dondurma) — v1.1
+
+Kur oynasa da fiyatın sabit kalması **birinci sınıf gereksinimdir** (Recep, 2026-08-14), yalnız gösterim
+numarası değil:
+
+- **Kilit = kapsam bazlı politika** (ürün / marka / kategori / global — §3 merdiveniyle aynı özgüllük sırası).
+- Kilitli kapsam **hem `refreshCostInBase` hem materialize tarafından ATLANIR.** Yalnız gösterimi dondurup
+  maliyet tazelemesini serbest bırakmak yetmez: ertesi gün marj kelepçesi fiyatı yine oynatır.
+- Kilit kaydı **kimin, ne zaman, hangi kurdan** dondurduğunu taşır (`frozen_at`, `frozen_by`, `fx_frozen_rate`);
+  kilit açma `admin_audit_log`'a yazılır.
+- Uygulama biçimleri: (a) `method='fixed'` kural — hesaplanan fiyatı tek tıkla sabit kurala çevirir;
+  (b) `is_derived=false` elle-ezme satırı — tek üründe nokta atışı.
+
+### 8.3 Politika katmanı — kural ≠ politika (v1.1)
+
+`pricing_rule` **nasıl hesaplanacağını** taşır; "bu markanın fiyatları EUR gösterilsin", "bu tedarikçi
+kur değişiminden etkilenmesin", "bu kapsamda minimum marj %X" gibi **ayarlar** kuralın işi değildir.
+Bunlar için aynı özgüllük merdivenini kullanan ikinci bir katman tanımlanır:
+
+```
+pricing_policy(scope, target_id, display_currency, fx_lock, min_margin_pct, ...)
+```
+
+- Merdiven §3.1 ile birebir aynıdır (en özel kazanır) — ikinci bir öncelik mantığı icat edilmez.
+- **Tedarikçi boyutu:** şemada tedarikçi tablosu YOK (`products.supplier_name` serbest metinden ibaret).
+  Tedarikçi-bazlı politika **T010 satınalma** ile gelir; o zamana kadar marka kapsamı vekildir.
+- **Marka boyutu kırılgan:** `products.brand` TEXT, `pricing_rule.brand_id` ise `brands(id)` FK'si — köprü
+  **isim eşleşmesi** üzerinden kuruluyor. İsim/boşluk/harf farkı = marka kuralı **sessizce eşleşmez**.
+  `products.brand_id` FK'si marka-bazlı ayarların ön koşuludur; o gelene kadar materialize raporu
+  "markası köprülenemeyen ürün" sayacını **göstermek zorundadır**.
 - **RLS segment daraltması (R5, B2'den ÖNCE zorunlu):** `price_lists`/`product_prices` SELECT'ine segment
   koşulu; yoksa bayi fiyatı anon'a sızar.
 
@@ -247,8 +343,12 @@ resolvePrice(supabase, product, qty, currency, userCtx):
 | `any` yasak, strict TS | §3 |
 | Tüm okuma/yazma **tenant-scoped** (`tenant_id = jwt_tenant_id()`) | §12 |
 | Yetki/segment **app_metadata**'dan (asla `user_profiles.role`/`raw_user_meta_data`) | §12 |
-| Sipariş satırında **6 snapshot alanı** dolu (unit/list_id/name/sku/tax_rate/product jsonb) | blueprint §R3 |
+| Sipariş satırında **9 snapshot alanı** dolu (unit/list_id/name/sku/tax_rate/product jsonb **+ display_currency/display_rate/rate_effective_date**) | blueprint §R3 + §4.1 |
 | Idempotent seed: sabit `valid_from` + `ON CONFLICT DO NOTHING` | blueprint §B2 |
+| Materialize **`is_derived=false` satırı ezmez** (elle-ezme/dondurma dokunulmaz) | §8.1 |
+| KDV oranı **üründen** (`products.tax_rate`/`is_taxable`); kural alanı yalnız override | §5 |
+| Cache tekil anahtarı **currency içerir** | §8.1 |
+| Fiyat kilidi kapsamı `refreshCostInBase` + materialize tarafından **atlanır** | §8.2 |
 | Sipariş/teklif durumu **monoton** | §11 |
 | Marj/iskonto eşiği aşımı → çok-seviyeli onay | dealer §5 |
 
@@ -256,12 +356,19 @@ resolvePrice(supabase, product, qty, currency, userCtx):
 
 ## 14. Enforcement (cetvel + onu zorlayan test)
 
-Standart-artı-zorlayan-test = kontrol. Eklenecek INV-* conformance testleri:
-- **INV-PRICE-1:** `products.price` hiçbir müşteri-yüzeyi kod yolunda **doğrudan** okunmaz (motor/çözücü
-  üzerinden) — düz-fiyat regresyonunu kilitler.
-- **INV-PRICE-2:** çözücü `user_profiles.role`'u segment için okumaz (app_metadata/tier_level) — eski hata geri gelmez.
-- **INV-PRICE-3:** sipariş-item yazan her yol 6 snapshot alanını doldurur (no-op = FAIL).
-- **INV-PRICE-4:** para float saklanmaz (numeric/minor-int); `currency_rates` append-only (UPDATE policy yok).
+Standart-artı-zorlayan-test = kontrol. **Durum dürüstlüğü (v1.1):** cetvel "kilitli" dediği için kilitli
+sanılan iki test aslında YOKTU. Gerçek durum:
+
+| Test | Ne kilitler | Durum |
+|---|---|---|
+| **INV-PRICE-1** | `products.price` hiçbir müşteri-yüzeyi kod yolunda **doğrudan** okunmaz | ❌ **YOK** — üstelik çözücünün kendisi hâlâ `products.price`'a fallback ediyor (§8 borcu, W4b'de kapanır) |
+| **INV-PRICE-2** | Çözücü segment için `user_profiles.role` okumaz (yalnız `app_metadata`) | ✅ VAR (`pricing-segment-source.test.ts`, ratchet 0, edge dahil) |
+| **INV-PRICE-3** | Sipariş-item yazan her yol snapshot alanlarını doldurur (no-op = FAIL) | ❌ YOK (W2b-2 ile gelir; §4.1 sonrası **9 alan**) |
+| **INV-PRICE-4** | Para float saklanmaz; `currency_rates` append-only (UPDATE/DELETE policy yok) | ✅ VAR (`pricing-money-append-only.test.ts`) |
+| **INV-PRICE-5** | KDV oranı üründen okunur; kuralda sabit oran varsayımı yok | ❌ YOK — §5 kararıyla birlikte yazılacak |
+| **INV-PRICE-6** | Cache anahtarı currency içerir; `product_prices`'a yalnız materialize servisi yazar; `is_derived` ayrımı korunur | ✅ VAR (`pricing-cache-invariants.test.ts`) |
+
+> **Kural:** bu tabloda ❌ olan bir maddeyi "kilitli" varsayarak karar verme. Cetvelin kendisi de denetlenir.
 
 ---
 
@@ -294,3 +401,11 @@ Salesforce Help, Adobe/Shopify/BigCommerce docs, TCMB, PwC Türkiye KDV, ISO 421
 ---
 
 > v1.0 · 2026-06-19 · İlk sürüm (araştırma + sentez). Değişiklikte sürüm yükselt + provenance güncelle.
+>
+> v1.1 · 2026-08-14 · **Çürüyen varsayım düzeltmesi + esneklik maddeleri.** Kaynak: (a) veri doğrulaması —
+> `purchase_price`'ın kaynağı AVenS Ürün Fiyat Kataloğu 2026.1 (liste fiyatı, alış değil); (b) Recep'in
+> gereksinim beyanı (ürün/grup bazında para birimi · kur değişimine kapatma/dondurma · marka ve tedarikçi
+> bazında ayar); (c) cetvel↔canlı-şema↔motor sapma denetimi (opus). Değişenler: §2 iki tabana bölündü ·
+> §4.1 çoklu-para satış sözleşmesi + spread sapması · §5 KDV SSOT = ürün · §6 minor-int kuralı gerçeğe
+> çekildi · §8.1 cache sözleşmesi · §8.2 fiyat kilidi · §8.3 politika katmanı · §13 snapshot 6→9 alan ·
+> §14 test durum tablosu (dürüstlük). Açık borçlar cetvelde ⚠️ ile işaretli.

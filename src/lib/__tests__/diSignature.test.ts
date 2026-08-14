@@ -11,6 +11,7 @@ describe('DI Signature compliance static analysis', () => {
     'category.service.ts',
     'invoice.service.ts',
     'pricing.service.ts',
+    'pricingMaterialize.service.ts',
     'product.service.ts',
     'project.service.ts'
   ]
@@ -83,6 +84,7 @@ describe('DI Signature compliance static analysis', () => {
           'ruleMatchesProduct',    // (rule, product, ancestors) → boolean
           'sortRules',             // kural dizisini sıralar
           'computePriceFromRule',  // saf aritmetik: maliyet + kural → net/brüt
+          'resolvePriceWithRules', // motorun SAF çekirdeği; DB'li sarmalayıcısı resolvePrice()
         ],
       }
       const exempt = new Set(PURE_HELPERS_EXEMPT[file] ?? [])
@@ -92,6 +94,16 @@ describe('DI Signature compliance static analysis', () => {
         exportedFunctions.length,
         `Expected to find at least one exported function in ${file}`
       ).toBeGreaterThan(0)
+
+      // Stale-guard: muafiyet listesindeki her isim dosyada GERÇEKTEN export edilmiş olmalı
+      // (yeniden adlandırma/silme sonrası liste sessizce büyümesin, ölü muafiyet kalmasın).
+      const exportedNames = new Set(exportedFunctions.map(f => f.name))
+      exempt.forEach(exemptName => {
+        expect(
+          exportedNames.has(exemptName),
+          `PURE_HELPERS_EXEMPT['${file}'] içindeki '${exemptName}' artık export edilmiyor — listeyi güncelle`
+        ).toBe(true)
+      })
 
       exportedFunctions.forEach(({ name, parameters, text }) => {
         if (exempt.has(name)) {
