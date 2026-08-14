@@ -128,6 +128,25 @@ Bittiğinde: verdiktleri oku → **Faz 3 merkezi doğrulama** → düzelt → **
   orkestratör merkezde birleştirir (dict/registry/allowlist). Worker'lar çakışmaz. (Gerekmiyorsa delta boş —
   ör. her worker yalnız kendi bileşenini düzenliyorsa.)
 
+## Acıyla öğrenildi — 2026-08-14 (W3 fiyat paneli dalgası)
+
+- **i18n delta birleştirme = üretici script + `json.dumps`:** worker deltalarını sözlük TS dosyasına
+  elle/f-string kaçışla gömme — kesme işareti (`form's`) sözdizimini kırar ve parite testi "0 test"
+  olarak SESSİZCE düşer (tail'de fark edilmez). Değerleri `json.dumps(..., ensure_ascii=False)` ile yaz,
+  sonra `eslint --fix` tek-tırnağa çevirsin. Delta KÖKÜNÜ de doğrula: worker tam alt-ağaç yerine
+  `{common, rules}` gibi sarmalanmış kök döndürebilir — kodun GERÇEK t() çağrılarını grep'leyip monte et.
+- **Supabase test stub'ının ev deseni = gerçek `createClient` + sahte `fetch`:** `as unknown as` guard'a
+  takılır ve zaten daha kötüdür; sahte fetch, PostgREST cevabını taklit eder, gerçek query-builder'ı test
+  eder, cast gerektirmez. Örnek: `src/lib/services/__tests__/pricing.resolve.test.ts::stubClient`.
+- **Yargıç bulgularını worker'a GERİ GÖNDERME — orkestratör kendisi işler:** W3'te 2 yargıçtan 19 bulgu
+  çıktı; hepsi orkestratör tarafından tek pasta düzeltildi (worker round-trip'inden hızlı ve temiz).
+  Worker'a iade yalnız "yeniden tasarım" gerektiren critical'da mantıklı.
+- **Model katmanı W3'te doğrulandı:** TASARIM-GEREK worker'ı opus yapmak değdi — `Omit<tenant_id>` gibi
+  "yapı>talimat" kararlarını worker seviyesinde üretti; mekanik T1/T3 sonnet ile sorunsuzdu.
+- **Ortam tuzakları:** lokal `deno check --node-modules-dir=auto` pnpm yerleşimini bozar (build patlar,
+  kod hatası sanılır; onarım `pnpm install`) · private repo'da workflow `permissions:` bloğu
+  `contents: read` içermezse checkout ölür.
+
 ## Kanıtlanmış örnek (referans)
 VentHub admin panelinin **DataTableKit**'e göçü: 9 liste sayfası, kod-okumalı triyajla 4'ü Faz-2'ye ayrıldı;
 kalan **7 sayfa 3 dalgada** (Errors → AuditLog+Categories → Movements+ErrorGroups+Returns+Users) bu akışla
