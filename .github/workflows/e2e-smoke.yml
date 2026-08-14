@@ -52,6 +52,10 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.E2E_SUPABASE_ANON_KEY }}
           E2E_ADMIN_EMAIL: ${{ vars.E2E_ADMIN_EMAIL }}
           E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+          # middleware artık bu sır yoksa admin'i FAIL-CLOSED reddediyor (anon key fallback'i kaldırıldı).
+          # Buradaki değer efemer CI sunucusunun çerezlerini şifreler — üretim sırrı DEĞİL.
+          # Repo/organizasyonda gerçek bir secret tanımlıysa o kullanılır.
+          JWT_CLAIMS_COOKIE_SECRET: ${{ secrets.JWT_CLAIMS_COOKIE_SECRET || 'e2e-ephemeral-ci-claims-key-not-a-production-secret' }}
 
       - name: Upload Playwright report on failure
         if: failure()
