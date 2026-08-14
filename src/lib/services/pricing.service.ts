@@ -53,10 +53,21 @@ export async function getEffectiveUnitPrice(supabase: SupabaseClient<Database>, 
  * @param product - The product for which to determine the price.
  * @returns An object containing the calculated unit price and the ID of the applied price list (if any).
  */
+export interface EffectivePriceInfo {
+  unitPrice: number
+  priceListId: string | null
+  /**
+   * unitPrice'ın KDV semantiği: true = KDV dahil (B2C gross), false = KDV hariç (B2B net),
+   * null = bilinmiyor (legacy sale/base_price veya fallback yolu). Denetim bulgusu:
+   * segment-bağımlı semantik taşıyıcı bayrak olmadan sipariş hattında çift-KDV riski yaratır.
+   */
+  taxIncluded: boolean | null
+}
+
 export async function getEffectivePriceInfo(
   supabase: SupabaseClient<Database>,
   product: Product
-): Promise<{ unitPrice: number, priceListId: string | null }> {
+): Promise<EffectivePriceInfo> {
   const fallback = (() => {
     const v = typeof product.price === 'number' ? product.price : parseFloat(String(product.price || 0))
     return Number.isFinite(v) ? v : 0
@@ -77,7 +88,7 @@ export async function getEffectivePriceInfo(
       .lte('effective_from', now)
       .or(`effective_to.is.null,effective_to.gte.${now}`)
 
-    if (listErr || !Array.isArray(lists)) return { unitPrice: fallback, priceListId: null }
+    if (listErr || !Array.isArray(lists)) return { unitPrice: fallback, priceListId: null, taxIncluded: null }
 
     interface PriceListRow { 
       id: string; 
@@ -138,27 +149,28 @@ export async function getEffectivePriceInfo(
       const derivedGross = cacheRow.gross_price != null ? Number(cacheRow.gross_price) : null
       const derived = segment === 'individual' ? (derivedGross ?? derivedNet) : (derivedNet ?? derivedGross)
       if (derived != null && Number.isFinite(derived) && derived > 0) {
-        return { unitPrice: derived, priceListId: plId }
+        const usedGross = segment === 'individual' ? derivedGross != null : derivedNet == null
+        return { unitPrice: derived, priceListId: plId, taxIncluded: usedGross }
       }
 
       const base = Number(pick.base_price || 0)
       const sale = pick.sale_price != null ? Number(pick.sale_price) : null
       const disc = Number(pick.discount_percentage || 0)
 
-      if (sale != null && Number.isFinite(sale) && sale > 0) return { unitPrice: sale, priceListId: plId }
+      if (sale != null && Number.isFinite(sale) && sale > 0) return { unitPrice: sale, priceListId: plId, taxIncluded: null }
       if (Number.isFinite(base) && base > 0) {
         if (disc > 0) {
           const val = base * (1 - disc / 100)
-          return { unitPrice: Math.max(0, Number(val.toFixed(2))), priceListId: plId }
+          return { unitPrice: Math.max(0, Number(val.toFixed(2))), priceListId: plId, taxIncluded: null }
         }
-        return { unitPrice: base, priceListId: plId }
+        return { unitPrice: base, priceListId: plId, taxIncluded: null }
       }
     }
 
-    return { unitPrice: fallback, priceListId: chosen ? chosen.id : null }
+    return { unitPrice: fallback, priceListId: chosen ? chosen.id : null, taxIncluded: null }
   } catch (e) {
     console.error('getEffectivePriceInfo error', e)
-    return { unitPrice: fallback, priceListId: null }
+    return { unitPrice: fallback, priceListId: null, taxIncluded: null }
   }
 }
 

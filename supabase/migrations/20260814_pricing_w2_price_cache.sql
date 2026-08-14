@@ -14,25 +14,41 @@ alter table public.product_prices
   add column if not exists currency char(3) not null default 'TRY',
   add column if not exists net_price numeric,
   add column if not exists gross_price numeric,
-  add column if not exists is_derived boolean not null default true;
+  add column if not exists is_derived boolean not null default false;
+
+-- Tutarlılık kelepçeleri (denetim bulgusu: negatif/ters fiyat cache'e giremez)
+alter table public.product_prices
+  drop constraint if exists product_prices_cache_sanity;
+alter table public.product_prices
+  add constraint product_prices_cache_sanity check (
+    (net_price is null or net_price >= 0)
+    and (gross_price is null or gross_price >= 0)
+    and (net_price is null or gross_price is null or gross_price >= net_price)
+  );
 
 comment on column public.product_prices.net_price is
   'Motor çıktısı KDV-hariç fiyat (kanonik; pricing-standard §5). base/sale_price legacy alanlardır.';
 comment on column public.product_prices.gross_price is 'KDV-dahil gösterim fiyatı (net × (1+KDV)).';
 comment on column public.product_prices.is_derived is
-  'true = pricing_rule motorundan materialize edildi (cache; elle düzenleme yerine kural değiştir).';
+  'true = pricing_rule motorundan materialize edildi (cache; elle düzenleme yerine kural değiştir). Varsayılan false: elle satır kendini motor-çıktısı sayamaz.';
 
 -- === 2. Segment yardımcı fonksiyonu (JWT app_metadata → price_lists.user_type) ===
--- Claim henüz atanmamış kullanıcı/anon → 'individual' (güvenli varsayılan: public fiyat).
--- Bayi/kurumsal ataması admin tarafından app_metadata.price_segment ile yapılır (R1/bayi fazı).
+-- Birincil kaynak: app_metadata.price_segment (admin atar). Fallback (denetim bulgusu):
+-- canlı custom_access_token_hook her kullanıcıya app_metadata.user_role enjekte ediyor
+-- (server-side, kullanıcı-düzenleyemez) → dealer/corporate rolü claim atanmadan da doğru
+-- segmenti alır. Hiçbiri yoksa güvenli varsayılan: 'individual' (public fiyat).
 create or replace function public.jwt_price_segment()
 returns text
 language sql
 stable
+set search_path = public, pg_catalog
 as $$
+  with claims as (
+    select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb -> 'app_metadata' as md
+  )
   select coalesce(
-    nullif(coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb
-      -> 'app_metadata' ->> 'price_segment', ''),
+    (select case when md ->> 'price_segment' in ('dealer', 'corporate') then md ->> 'price_segment' end from claims),
+    (select case when md ->> 'user_role' in ('dealer', 'corporate') then md ->> 'user_role' end from claims),
     'individual'
   )
 $$;
@@ -46,10 +62,8 @@ create policy product_prices_select_anon
   using (
     tenant_id = (select public.jwt_tenant_id())
     and is_active = true
-    and (
-      price_list_id is null
-      or price_list_id in (select pl.id from public.price_lists pl where pl.user_type = 'individual')
-    )
+    -- price_list_id canlı şemada NOT NULL (denetim bulgusu) — null-dalı bilinçli yok
+    and price_list_id in (select pl.id from public.price_lists pl where pl.user_type = 'individual')
   );
 
 drop policy if exists product_prices_select_authenticated on public.product_prices;
@@ -63,13 +77,10 @@ create policy product_prices_select_authenticated
       (select public.is_user_admin((select auth.uid())))
       or (
         is_active = true
-        and (
-          price_list_id is null
-          or price_list_id in (
-            select pl.id from public.price_lists pl
-            where pl.user_type = 'individual'
-               or pl.user_type = (select public.jwt_price_segment())
-          )
+        and price_list_id in (
+          select pl.id from public.price_lists pl
+          where pl.user_type = 'individual'
+             or pl.user_type = (select public.jwt_price_segment())
         )
       )
     )
