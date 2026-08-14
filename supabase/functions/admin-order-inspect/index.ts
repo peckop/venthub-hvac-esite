@@ -23,7 +23,7 @@ Deno.serve(async (req: Request) => {
     const supabaseUser = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey)
 
-    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
+    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
     if (userErr || !userRes?.user) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type':'application/json' } })
     }

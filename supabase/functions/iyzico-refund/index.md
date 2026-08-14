@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-refund\index.ts
-skeleton_hash: e118353a1b4289e0
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\iyzico-refund\index.ts
+skeleton_hash: 08f598d2cf9e96a2
 entity_hashes:
   func:iyzico-refund_handler: b3edad3bb6b5ef11
   overview: 86377044cea6469b
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-14T22:02:42Z
 ---
 
 ## Genel Bakış
@@ -68,7 +68,7 @@ type PaymentDebug = {
   paymentId?: string;
   raw?: { paymentId?: string; itemTransactions?: PaymentTransaction[] };
   partial_refunds?: { amount: number; at: string }[];
-  [k: string]: un
+  [k: string]: unknown
 ```
 
 ### IyziCancelResponse
@@ -91,7 +91,7 @@ type IyziSdk = {
     ) => void;
   };
   refund: {
-   
+    create:
 ```
 
 ### IyziCtor

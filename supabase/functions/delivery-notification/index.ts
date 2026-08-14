@@ -52,7 +52,7 @@ serve(async (req) => {
       try {
         const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
         const authClient = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
-        const { data: { user } } = await authClient.auth.getUser()
+        const { data: { user } } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
         if (user) {
           const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=role`, {
             headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }

@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\return-status-notification\index.ts
-skeleton_hash: ceb725b38b3c12e4
+skeleton_hash: 6055003b32df02ed
 entity_hashes:
   func:return-status-notification_handler: 7d2592fd30deaf05
   overview: 2f67488397ccb15e
-generated_at: 2026-08-14T12:38:19Z
+generated_at: 2026-08-14T22:02:42Z
 ---
 
 ## Genel Bakış
@@ -74,6 +74,9 @@ Bu modül, Supabase Edge Function runtime ortamında HTTP istekleriyle iade duru
 - `reason: string`
 - `description?: string | null`
 - `tenant_id?: string`
+
+### ResendResult
+- `id?: string`
 
 ---
 

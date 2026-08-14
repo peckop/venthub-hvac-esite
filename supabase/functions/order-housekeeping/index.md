@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-housekeeping\index.ts
-skeleton_hash: 1d024d7c4264226b
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\order-housekeeping\index.ts
+skeleton_hash: 0581d0462a26915d
 entity_hashes:
   func:order-housekeeping_handler: e38889ac24217d85
   overview: 179148bdc1561c4d
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-14T22:02:42Z
 ---
 
 ## Genel Bakış

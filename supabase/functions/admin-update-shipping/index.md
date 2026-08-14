@@ -7,7 +7,7 @@ skeleton_hash: 8d7c3110f700187c
 entity_hashes:
   func:admin-update-shipping_handler: fab3b88ab551f027
   overview: 4717843338e56bb2
-generated_at: 2026-08-14T12:38:19Z
+generated_at: 2026-08-14T22:02:42Z
 ---
 
 ## Genel Bakış

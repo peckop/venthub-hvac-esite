@@ -7,7 +7,7 @@ skeleton_hash: 4b351dda23d540b3
 entity_hashes:
   func:refund-order-mock_handler: 4c50c7cb50c6be68
   overview: b618c82b37f33caf
-generated_at: 2026-08-14T12:38:19Z
+generated_at: 2026-08-14T22:02:42Z
 ---
 
 ## Genel Bakış

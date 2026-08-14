@@ -78,9 +78,15 @@ serve(async (req) => {
     const authClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } }
     })
-    
-    // Verify caller identity
-    const { data: { user }, error: authErr } = await authClient.auth.getUser()
+
+    // Verify caller identity.
+    // JWT'yi AÇIKÇA geçir. Argümansız `getUser()` önce oturum deposuna bakar; edge
+    // runtime'da oturum deposu YOKTUR → "Auth session missing" → burada 401'e dönüşür.
+    // Belirti: geçerli bir admin token'ıyla bile 401. e2e ile ölçüldü (2026-08-14):
+    // aynı token+anon key /auth/v1/user'a doğrudan gidince 200 dönüyordu, fonksiyon
+    // içinden 401. anonKey boş DEĞİL (boş olsa satır 68 CONFIG_MISSING/500 dönerdi).
+    const jwt = authHeader.replace(/^Bearer\s+/i, '')
+    const { data: { user }, error: authErr } = await authClient.auth.getUser(jwt)
     if (authErr || !user) {
       return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
     }

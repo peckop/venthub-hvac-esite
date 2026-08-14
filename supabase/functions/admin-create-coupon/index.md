@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-create-coupon\index.ts
-skeleton_hash: fd99acff0bd75a61
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\admin-create-coupon\index.ts
+skeleton_hash: 0b8f2f6d1fed93ef
 entity_hashes:
   func:admin-create-coupon_handler: 72913923d4da4715
   overview: e7791c38f1685aef
-generated_at: 2026-08-13T07:40:08Z
+generated_at: 2026-08-14T22:02:42Z
 ---
 
 ## Genel Bakış
@@ -47,12 +47,6 @@ Bu modül için fonksiyon gövdesi (implementation body) paylaşılmadığından
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: ../_shared/tenant_config.ts::resolveTenantId
 - import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
-
----
-
-## SABİTLER
-- **corsHeaders** (object) — `{
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
 
 ---
 

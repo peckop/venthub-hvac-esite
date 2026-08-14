@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-validate\index.ts
-skeleton_hash: ab6f40489d866897
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\order-validate\index.ts
+skeleton_hash: c5992e8b629d24ba
 entity_hashes:
   func:order-validate_handler: 5404fb6b36c963fe
-  func:segmentFromUser: 75769b5088e7f187
+  func:segmentFromUser: 705d18e6eb2ea250
   overview: 07239b761dcc7b2d
-generated_at: 2026-08-14T07:20:36Z
+generated_at: 2026-08-14T22:03:26Z
 ---
 
 ## Genel Bakış
@@ -40,15 +40,14 @@ Bu modül, bir HTTP isteğini alıp sipariş doğrulama işlemleri yapacak şeki
 ## FONKSİYON DETAYLARI
 
 ### segmentFromUser
+**Ne yapar**: Bu fonksiyon, bir kullanıcının fiyat segmentini (PriceSegment) belirler. Kullanıcı nesnesinin `app_metadata` alanındaki `price_segment` veya `user_role` özelliklerini kontrol ederek, kullanıcının bireysel (individual), bayi (dealer) veya kurumsal (corporate) müşteri olup olmadığını döndürür.
 
-**Ne yapar**: Verilen kullanıcı nesnesinin fiyat segmentini belirler. Kullanıcının rolüne veya mevcut fiyat segmenti bilgisine göre 'dealer', 'corporate' veya 'individual' değerlerinden birini döndürerek, sipariş fiyatlandırma mantığının doğru dalga geçmesini sağlar.
-
-**Nasıl yapar**: Fonksiyon, kullanıcının `app_metadata` alanını güvenli bir şekilde erişilebilir hale getirir (nullish coalescing operatörü ile `?? {}` kullanarak). Ardından `price_segment` ve `user_role` olmak üzere iki anahtarı sırasıyla kontrol eder. Bu anahtarlardan herhangi birinin değeri 'dealer' veya 'corporate' ise, o değeri doğrudan döndürür. Her iki anahtar da bu değerleri içermiyorsa, varsayılan olarak 'individual' segmentini döndürür. Bu sayede öncelik sırası `price_segment` > `user_role` > `individual` şeklindedir.
+**Nasıl yapar**: Fonksiyon, verilen kullanıcı nesnesinden `app_metadata` alanını alır veya nesne null ise boş bir nesne kullanır. Ardından `price_segment` ve `user_role` alanlarını sırasıyla kontrol eder. Bu alanlardan herhangi biri `'dealer'` veya `'corporate'` değerine sahipse, bu değeri doğrudan `PriceSegment` olarak döndürür. Bu koşullar sağlanmazsa varsayılan olarak `'individual'` değerini döndürür.
 
 **Parametreler**:
-- `u`: `{ app_metadata?: Record<string, unknown> } | null` — Kullanıcı nesnesi. `app_metadata` alanı opsiyoneldir ve `Record<string, unknown>` tipinde, yani key-value çiftlerinden oluşan bir sözlük yapısındadır. `null` değer alabilmesi, kullanıcının oturum açmamış olabileceği veya bilinmeyen bir durumda olduğu senaryoları kapsar.
+- `u`: `{ app_metadata?: Record<string, unknown> } | null` — İşlem yapılacak kullanıcı nesnesi. `app_metadata` alanı opsiyoneldir ve nesne herself null olabilir.
 
-**Dönüş**: `PriceSegment` — Fonksiyon, predefined (önceden tanımlı) bir string union tipi olan `PriceSegment` döndürür. Bu değerler kodun başka bir yerinde tanımlı olmakla birlikte, fonksiyonun mantığından anlaşıldığı üzere 'dealer', 'corporate' veya 'individual' değerlerinden birini alır.
+**Dönüş**: `PriceSegment` — Kullanıcının belirlenen fiyat segmenti. `'individual'`, `'dealer'` veya `'corporate'` değerlerinden biri olabilir.
 
 ### order-validate_handler
 
@@ -135,90 +134,92 @@ type PriceSegment = 'individual' | 'dealer' | 'corporate'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::segmentFromUser
-- **params**: `u` — JWT user objesi, `app_metadata` alanı içerebilir, null olabilir
+- **params**: `u: { app_metadata?: Record<string, unknown> } | null` — JWT user objesi, app_metadata içerebilir
 - **ic_degiskenler**:
-  - `md` — `u?.app_metadata ?? {}` → kullanıcının app_metadata'sı, yoksa boş obje
-  - `c` — for döngüsü değişkeni, `[md['price_segment'], md['user_role']]` dizisi üzerinde iterasyon yapar
-- **Dönüş**: `PriceSegment` — `'dealer'`, `'corporate'` veya `'individual'` string döner
+  - `md` — u?.app_metadata değerini alır, null/undefined ise boş obje {} fallback'lidir; price_segment ve user_role alanlarını barındırır
+  - `c` — for döngüsü iterasyon değişkeni; önce md['price_segment'] sonra md['user_role'] değerlerini sırayla kontrol eder
+- **Dönüş**: PriceSegment — 'dealer', 'corporate' veya 'individual'
 
 ### [N2_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::order-validate_handler
-- **params**: `req` — gelen HTTP Request nesnesi
+- **params**: `req` — gelen HTTP Request objesi, method/headers/body taşır
 - **ic_degiskenler**:
-  - `cors` — `getCorsHeaders(req)` ile elde edilen CORS başlık nesnesi
-  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL') || ''` → Supabase proje URL'i
-  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''` → service role anahtarı, servis çağrılarında kullanılır
-  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY') || ''` → anonim公众 anahtar, auth client oluşturulurken kullanılır
-  - `authHeader` — `req.headers.get('Authorization')` → istekten gelen Authorization başlığı
-  - `authClient` — `createClient(supabaseUrl, anonKey, ...)` → kullanıcının own token'ı ile oluşturulmuş Supabase auth istemcisi
-  - `user` — `authClient.auth.getUser()` sonucu dönen authenticated kullanıcı objesi
-  - `authErr` — auth sırasında oluşabilecek hata
-  - `headers` — `{ Authorization: Bearer serviceRoleKey, apikey: serviceRoleKey, Content-Type }` → servis rolü ile yapılacak HTTP istekleri için başlıklar
-  - `body` — `await req.json()` → istek gövdesi, parse edilemezse boş obje
-  - `userId` — `user.id` → oturum açmış kullanıcının ID'si
-  - `cartId` — `body?.cart_id || body?.cartId || ''` → sepetteki sepet ID'si, body'den gelmezse user'dan çözülür
-  - `getJson` — iç içe tanımlı async fonksiyon, Supabase REST API'ye GET isteği atar ve JSON parse eder
-  - `nowIso` — iç içe tanımlı fonksiyon, `new Date().toISOString()` döner
-  - `carts` — `getJson('/rest/v1/shopping_carts?...')` → kullanıcının sepetleri (cartId yoksa)
-  - `items` — `getJson<CartItem[]>('/rest/v1/cart_items?...')` → sepetteki ürünler, Product[] tipinde döner
-  - `_productIds` — `Array.from(new Set(items.map(i=>i.product_id)))` → items içindeki benzersiz product_id'ler
-  - `prods` — `getJson<Product[]>('/rest/v1/products?...')` → ürün bilgileri dizisi
-  - `pmap` — `new Map<string, Product>()` → product.id → Product eşlemesi, hızlı erişim için
-  - `segment` — `segmentFromUser(user)` → kullanıcının fiyat segmenti (individual/dealer/corporate)
-  - `n` — `nowIso()` → şu anki ISO zaman damgası, fiyat listesi filtrelemede kullanılır
-  - `lists` — `getJson<PriceList[]>('/rest/v1/price_lists?...')` → aktif ve geçerli fiyat listeleri
-  - `flists` — `lists` dizisinin `user_type` segment'e uyan veya genel olanlarına göre filtrelenmiş ve sıralanmış hali
-  - `chosenListId` — `flists[0]?.id ?? null` → en uygun fiyat listesinin ID'si, hiçbiri yoksa null
-  - `priceFor` — iç içe async fonksiyon, bir ürünün fiyat listesinden birim fiyatını hesaplar
-  - `recalculated` — `RecalcItem[]` → her satır için yeniden hesaplanmış fiyat/miktar bilgileri
-  - `mismatches` — `MismatchItem[]` → sepetteki fiyat ile hesaplanan fiyat arasındaki farklar
-  - `stockIssues` — `StockIssue[]` → stok yetersizliği olan ürünler
-  - `to2` — `(n:number)=> Number(Number(n).toFixed(2))` → virgülden sonra 2 basamağa yuvarlama helper'ı
-  - `toCents` — `(n:number)=> Math.round(Number(n)*100)` → ondalıklı fiyatı kuruşa çevirme
-  - `product` — döngü içinde `pmap.get(it.product_id)` ile elde edilen ürün nesnesi
-  - `pr` — `priceFor(product)` sonucu, `{unit, listId}` objesi
-  - `unit` — `pr.unit` → hesaplanan birim fiyat
-  - `unitNorm` — `to2(unit)` → 2 ondalığa yuvarlanmış birim fiyat
-  - `equal` — boolean → `it.unit_price` ile `unitNorm` arasındaki fark 0.005'ten küçükse true
-  - `available` — `number | null` → ürünün stok miktarı, aday alanlardan ilki bulunana kadar aranır
-  - `cand` — stok miktarı için aday alan isimleri dizisi: `[product.stock_qty, product.stock, product.quantity_available, product.inventory, product.inventory_quantity, product.available, product.on_hand]`
-  - `c` — cand döngüsü değişkeni
-  - `qty` — `Number(it.quantity)||0` → sepetteki ürün miktarı
-  - `finalQty` — stok kontrolü sonrası nihai miktar, stok yetersizse `available` değerine düşürülür
-  - `subtotalCents` — `recalculated.reduce(...)` → toplam tutar kuruş cinsinden
-  - `subtotal` — `subtotalCents/100` → toplam tutar ana para birimi cinsinden
-  - `ok` — boolean → `mismatches.length===0 && stockIssues.length===0` ise true
-  - `_e` — catch bloğundaki hata nesnesi
-- **Dönüş**: `Response` — JSON body: `{ ok, items, mismatches, stock_issues, totals: { subtotal, subtotal_cents }, cart_id }` veya hata durumunda `{ error }`
+  - `cors` — getCorsHeaders(req) ile üretilen CORS header objesi, her yanıtta kullanılır
+  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ortam değişkeni, Supabase API temel URL'i
+  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'), servis seviyesi yetkilendirme anahtarı
+  - `anonKey` — Deno.env.get('SUPABASE_ANON_KEY'), anonim kullanıcı anahtarı
+  - `authHeader` — req.headers.get('Authorization'), Bearer token taşıyan başlık
+  - `authClient` — createClient ile anonKey + authHeader ile oluşturulan Supabase istemcisi, kullanıcı doğrulaması için kullanılır
+  - `user` — authClient.auth.getUser() sonucu dönen authenticated kullanıcı objesi; user.id sepet çözümlemesinde kullanılır
+  - `authErr` — authClient.auth.getUser() hata sonucu; hata varsa veya user null ise 401 döner
+  - `headers` — serviceRoleKey ile API istekleri için Authorization, apikey ve Content-Type barındıran header objesi
+  - `body` — req.json().catch(()=>({})) ile parse edilen istek gövdesi, cart_id/cartId içerebilir
+  - `userId` — user.id değerinden türetilen kullanıcının UUID'si
+  - `cartId` — body.cart_id veya body.cartId'den çözülen alışveriş sepeti ID'si; boşsa user_id ile sorgulanır
+  - `carts` — /rest/v1/shopping_carts sorgusundan dönen kullanıcının sepetleri dizisi
+  - `items` — /rest/v1/cart_items sorgusundan dönen CartItem[] dizisi; product_id, quantity, unit_price, price_list_id taşır
+  - `_productIds` — items dizisinden map ile çıkarılıp Set ile benzersizleştirilmiş product_id'ler dizisi
+  - `prods` — /rest/v1/products sorgusundan dönen Product[] dizisi, _productIds ile filtrelenmiş
+  - `pmap` — product.id → Product eşlemesi yapan Map, ürünleri hızlı erişim için indeksler
+  - `segment` — segmentFromUser(user) çağrısıyla JWT'den çıkarılan fiyat segmenti ('individual'/'dealer'/'corporate')
+  - `n` — nowIso() çağrısıyla elde edilen mevcut ISO zaman damgası, fiyat listesi geçerlilik kontrolünde kullanılır
+  - `lists` — /rest/v1/price_lists sorgusundan dönen PriceList[] dizisi; is_active=true, effective_from<=now, effective_to>=now veya null filtresi uygulanmış
+  - `flists` — lists'ten segment'e eşleşen veya user_type'ı olmayan (genel) listeleri filtreleyip sıralayan dizi; spesifik user_type önce, sonra en yeni effective_from
+  - `chosenListId` — flists[0]?.id, sıralama sonrası seçilen fiyat listesinin ID'si; null ise fallback fiyat kullanılır
+  - `recalculated` — RecalcItem[] dizisi, her kalem için yeniden hesaplanan birim fiyat ve miktarı tutar
+  - `mismatches` — MismatchItem[] dizisi, sepetteki unit_price ile hesaplanan fiyat arasındaki farkları kaydeder
+  - `stockIssues` — StockIssue[] dizisi, istenen miktarın mevcut stoktan fazla olduğu durumları kaydeder
+  - `to2` — (n:number) => Number(Number(n).toFixed(2)), sayıyı 2 ondalık basamağa yuvarlayan yardımcı fonksiyon
+  - `toCents` — (n:number) => Math.round(Number(n)*100), sayıyı sent cinsine çeviren yardımcı fonksiyon
+  - `it` — for...of items döngüsü iterasyon değişkeni,her bir CartItem
+  - `product` — pmap.get(it.product_id) ile elde edilen ürün objesi; bulunamazsa döngü atlanır
+  - `pr` — await priceFor(product) sonucu {unit, listId} nesnesi, hesaplanan birim fiyat ve kullanılan liste ID'si
+  - `unit` — pr.unit, priceFor fonksiyonundan dönen hesaplanmış birim fiyat
+  - `unitNorm` — to2(unit), 2 ondalık basamağa yuvarlanmış birim fiyat
+  - `equal` — it.unit_price ile unitNorm arasındaki mutlak farkın 0.005'ten küçük olup olmadığını test eden boolean
+  - `available` — ürünün stok miktarı; product nesnesinin stock_qty/stock/quantity_available/inventory/inventory_quantity/available/on_hand alanlarından ilk geçerli sayısal değer
+  - `cand` — stok alanı adlarının dizisi, product nesnesinden stok değerini çözmek için sırayla kontrol edilir
+  - `c` — cand döngüsü iterasyon değişkeni, her bir potansiyel stok alanı adı
+  - `qty` — Number(it.quantity)||0, istenen kalem miktarı
+  - `finalQty` — stok kısıtlamasıyla belirlenen nihai miktar; available varsa ve qty>available ise available'a düşürülür
+  - `subtotalCents` — recalculated.reduce ile hesaplanan toplam tutarın sent cinsinden değeri
+  - `subtotal` — subtotalCents/100, toplam tutarın birim cinsinden değeri
+  - `ok` — mismatches.length===0 && stockIssues.length===0, siparişin fiyat ve stok açısından uyumlu olduğunu gösteren boolean
+- **Dönüş**: Response — JSON { ok, items, mismatches, stock_issues, totals, cart_id }
 
-### [N3_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::getJson
-- **params**: `_path: string` — Supabase REST API yolu (örn. `/rest/v1/cart_items?...`)
+### [N3_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::getJson (inner)
+- **params**: `_path: string` — Supabase REST API'ye yapılacak istek yolu (ör: /rest/v1/cart_items?...)
 - **ic_degiskenler**:
-  - `res` — `fetch()` sonucu Response nesnesi
-  - `txt` — `await res.text()` → yanıtın ham metin gövdesi
-- **Dönüş**: `Promise<T>` — parse edilmiş JSON nesnesi; parse edilemezse `null as unknown as T`
+  - `res` — fetch(supabaseUrl + _path, { headers }) çağrısından dönen Response objesi
+  - `txt` — res.text() ile elde edilen response body'sinin ham metin hali; hata durumunda da loglanır
+- **Dönüş**: Promise<T> — JSON.parse(txt) ile çözülen泛型 nesne; parse hatasında null cast edilir
 
-### [N4_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::sort_comparator (flists.sort callback)
-- **params**: `a: PriceList`, `b: PriceList` — karşılaştırılan iki fiyat listesi
-- **ic_degiskenler**:
-  - `at` — `a.effective_from ? Date.parse(a.effective_from) : 0` → fiyat listesi A'nın geçerlilik başlangıç zamanı (timestamp)
-  - `bt` — `b.effective_from ? Date.parse(b.effective_from) : 0` → fiyat listesi B'nin geçerlilik başlangıç zamanı (timestamp)
-- **Dönüş**: `number` — sıralama sırası (negatif: a önce, pozitif: b önce)
+### [N4_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::nowIso (inner)
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string — new Date().toISOString() ile elde edilen güncel ISO 8601 zaman damgası
 
-### [N5_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::priceFor
-- **params**: `product: Product` — fiyat hesaplanacak ürün nesnesi
+### [N5_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::priceFor (inner)
+- **params**: `product: Product` — fiyat hesaplanacak ürün nesnesi; product.id ve product.price fallback olarak kullanılır
 - **ic_degiskenler**:
-  - `_path` — product_prices REST API sorgu yolu, `chosenListId`, `product.id` parametreleriyle
-  - `rows` — `getJson<ProductPrice[]>(_path)` → ilgili fiyat listesindeki ürün fiyat kayıtları
-  - `pick` — `rows.find(...)` ile bulunan veya `rows[0]` fallback'li seçilmiş fiyat kaydı, geçerli tarih aralığındaki kayıt tercih edilir
-  - `net` — `pick.net_price != null ? Number(pick.net_price) : null` → KDV hariç net fiyat
-  - `gross` — `pick.gross_price != null ? Number(pick.gross_price) : null` → KDV dahil brüt fiyat
-  - `derived` — segment'e göre türetilen fiyat: individual ise gross→net öncelikli, diğerleri net→gross
-  - `base` — `Number(pick.base_price||0)` → fiyat kaydının temel fiyatı
-  - `sale` — `pick.sale_price != null ? Number(pick.sale_price) : null` → indirimli satış fiyatı
-  - `disc` — `Number(pick.discount_percentage||0)` → yüzdelik indirim oranı
-  - `v` — `base*(1-disc/100)` → indirim uygulanmış hesaplanan fiyat
-  - `fb` — `Number(product.price||0)` → fallback olarak ürünün kendi fiyatı
-- **Dönüş**: `Promise<{unit: number, listId: string|null}>` — birim fiyat ve kullanılan fiyat listesi ID'si
+  - `_path` — /rest/v1/product_prices sorgusu için oluşturulan URL; product_id, is_active=true, price_list_id=chosenListId filtreleri uygulanmış
+  - `rows` — getJson<ProductPrice[]>(_path) ile dönen fiyat kayıtları dizisi
+  - `pick` — rows içinden valid_from<=now && valid_until>=now koşulunu sağlayan ilk kayıt; yoksa rows[0] fallback
+  - `net` — pick.net_price null değilse Number(pick.net_price), aksi halde null; B2B (net/KDV-harici) fiyat
+  - `gross` — pick.gross_price null değilse Number(pick.gross_price), aksi halde null; B2C (gross/KDV-dahil) fiyat
+  - `derived` — segment==='individual' ise gross??net, aksi halde net??gross; segment'e göre türetilen fiyat
+  - `base` — Number(pick.base_price||0), taban fiyat
+  - `sale` — pick.sale_price null değilse Number(pick.sale_price), aksi halde null; indirimli satış fiyatı
+  - `disc` — Number(pick.discount_percentage||0), indirim yüzdesi (0-100)
+  - `v` — base*(1-disc/100) ile hesaplanan indirim uygulanmış fiyat
+  - `fb` — Number(product.price||0), fiyat listesinde kayıt bulunamazsa kullanılan fallback ürün fiyatı
+- **Dönüş**: Promise<{unit: number, listId: string | null}> — hesaplanmış birim fiyat ve kullanılan fiyat listesi ID'si
+
+### [N6_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::sort_comparator (anonymous)
+- **params**: `a: PriceList` — karşılaştırılacak ilk fiyat listesi, `b: PriceList` — karşılaştırılacak ikinci fiyat listesi
+- **ic_degiskenler**:
+  - `at` — a.effective_from Date.parse() sonucu milisaniye cinsinden tarih; null/parse edilemezse 0
+  - `bt` — b.effective_from Date.parse() sonucu milisaniye cinsinden tarih; null/parse edilemezse 0
+- **Dönüş**: number — negatif ise a önce gelir; spesifik user_type olan önce, sonra en yeni effective_from önce gelir (azalan sıra)
 
 ---
 

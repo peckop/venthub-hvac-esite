@@ -45,7 +45,7 @@ serve(async (req: Request) => {
         const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
         const { createClient: createClientAuth } = await import('https://esm.sh/@supabase/supabase-js@2.45.4')
         const authClient = createClientAuth(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
-        const { data: { user } } = await authClient.auth.getUser()
+        const { data: { user } } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
         if (user) {
           const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
             headers: { Authorization: `Bearer ${supabaseKey}`, apikey: supabaseKey }
