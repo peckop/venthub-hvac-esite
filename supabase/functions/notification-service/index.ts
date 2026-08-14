@@ -11,7 +11,7 @@ interface NotificationRequest {
   message: string
   priority: 'low' | 'medium' | 'high' | 'critical'
   template?: string
-  _data?: TemplateData
+  data?: TemplateData
   tenant_id?: string
 }
 
@@ -45,7 +45,7 @@ serve(async (req) => {
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
 
     const body = await req.json().catch(()=>({})) as NotificationRequest
-    const { type, to, message, priority, template, _data } = body
+    const { type, to, message, priority, template, data } = body
 
     // Resolve Tenant ID and get Branding details dynamically
     const tenantId = resolveTenantId(req, body)
@@ -102,7 +102,7 @@ serve(async (req) => {
           result = { success: true, disabled: true, channel: 'whatsapp' }
           break
         }
-        result = await sendWhatsApp(to, message, template, _data, {
+        result = await sendWhatsApp(to, message, template, data, {
           accountSid: twilioAccountSid!,
           authToken: twilioAuthToken!,
           fromNumber: twilioWhatsAppNumber!
@@ -128,7 +128,7 @@ serve(async (req) => {
           result = { success: true, disabled: true, channel: 'email' }
           break
         }
-        result = await sendEmail(to, message, template, { ...(_data||{}), emailFrom, brandName: branding.brandName, brandPrimaryColor: branding.brandPrimaryColor }, {
+        result = await sendEmail(to, message, template, { ...(data||{}), emailFrom, brandName: branding.brandName, brandPrimaryColor: branding.brandPrimaryColor }, {
           apiKey: resendApiKey!,
           from: emailFrom,
         })
@@ -167,12 +167,12 @@ serve(async (req) => {
 
 interface TwilioConfig { accountSid: string; authToken: string; fromNumber: string }
 
-async function sendWhatsApp(to: string, message: string, template?: string, _data?: TemplateData, config?: TwilioConfig) {
+async function sendWhatsApp(to: string, message: string, template?: string, data?: TemplateData, config?: TwilioConfig) {
   if (!config?.accountSid || !config?.authToken || !config?.fromNumber) {
     throw new Error('WhatsApp configuration missing')
   }
 
-  const finalMessage = template ? formatTemplate(template, _data) : message
+  const finalMessage = template ? formatTemplate(template, data) : message
   
   // Format phone number for WhatsApp (must include whatsapp: prefix)
   const formattedTo = to.startsWith('whatsapp:') ? to : `whatsapp:${to}`
@@ -230,14 +230,14 @@ async function sendSMS(to: string, message: string, config: TwilioConfig) {
   return await response.json()
 }
 
-async function sendEmail(to: string, message: string, template?: string, _data?: TemplateData, config?: { apiKey: string; from?: string }) {
+async function sendEmail(to: string, message: string, template?: string, data?: TemplateData, config?: { apiKey: string; from?: string }) {
   if (!config?.apiKey) {
     throw new Error('Email configuration missing')
   }
 
-  const subject = _data?.subject || 'VentHub Bildirim'
-  const finalMessage = template ? formatTemplate(template, _data) : message
-  const from = config?.from || _data?.emailFrom || 'VentHub <noreply@venthub.com>'
+  const subject = data?.subject || 'VentHub Bildirim'
+  const finalMessage = template ? formatTemplate(template, data) : message
+  const from = config?.from || data?.emailFrom || 'VentHub <noreply@venthub.com>'
   
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -262,13 +262,13 @@ async function sendEmail(to: string, message: string, template?: string, _data?:
   return await response.json()
 }
 
-function formatTemplate(template: string, _data?: TemplateData): string {
-  if (!_data) return template
+function formatTemplate(template: string, data?: TemplateData): string {
+  if (!data) return template
   
   let formatted = template
-  Object.keys(_data).forEach(key => {
+  Object.keys(data).forEach(key => {
     const placeholder = new RegExp(`{{${key}}}`, 'g')
-    const value = String(_data[key])
+    const value = String(data[key])
     formatted = formatted.replace(placeholder, value)
   })
   

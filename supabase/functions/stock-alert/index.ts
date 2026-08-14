@@ -214,6 +214,12 @@ async function sendNotification(type: string, to: string, data: AlertData, prior
         type,
         to,
         priority,
+        // `message` notification-service sözleşmesinde ZORUNLU: şablon gönderilmediğinde
+        // e-posta/SMS gövdesi doğrudan bundan üretilir. Eksik olduğu için gövde undefined
+        // kalıyor ve `.replace()` çağrısı 500 veriyordu — stok uyarıları sessizce ölüydü.
+        message: data.alertType === 'out_of_stock'
+          ? `${data.productName} STOKTA KALMADI (eşik: ${data.threshold}). Acil tedarik gerekiyor.`
+          : `${data.productName} stoğu azaldı: ${data.currentStock} adet kaldı (eşik: ${data.threshold}).`,
         data: {
           ...data,
           subject: data.alertType === 'out_of_stock' ? '🚨 KRİTİK: STOK TÜKENDİ' : '⚠️ DÜŞÜK STOK UYARISI'

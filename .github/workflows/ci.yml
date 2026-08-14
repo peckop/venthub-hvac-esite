@@ -69,6 +69,15 @@ jobs:
           # `_productId` bilinçli/tutarlı bir isimlendirme (gönderen+alan aynı) → allowlist.
           hits=$(grep -rnE '\._[a-z]+\(|_text/(html|plain)|[?&]_(limit|count|offset|order|select)=|\.get\('"'"'_[a-z]|\b_p_id\b|grou_p|([{,]|^)\s*_[a-z][a-zA-Z_]*:' supabase/functions --include='*.ts' | grep -vE '_productId' | grep -vE ':[0-9]+:\s*(export )?(async )?function ' || true)
           if [ -n "$hits" ]; then echo "::error::Edge string-mangle deseni saptandi (T011 bozulma sinifi):"; echo "$hits"; exit 1; fi
+          # Ayni sinif src/ tarafinda da yasandi: ReturnsTableBody `_return_id` gonderiyordu,
+          # edge fonksiyonu `return_id` bekliyordu -> her iade bildirimi 400 donuyor ve hata
+          # yutuluyordu. Kapsam bilerek DAR: sadece functions.invoke govdeleri (src genelinde
+          # `_anahtar:` taramasi 22 mesru `_productId` eslesmesi uretiyor = gurultu).
+          inv=$(grep -rn -A12 "functions\.invoke(" src --include='*.ts' --include='*.tsx' | grep -E '^\S+[-:][0-9]+[-:]\s*_[a-z][a-zA-Z_]*:' || true)
+          if [ -n "$inv" ]; then echo "::error::functions.invoke govdesinde mangled anahtar:"; echo "$inv"; exit 1; fi
+          # BILINEN SINIR: destructuring sinifi (`const { ..., _data } = body`) grep ile
+          # mesru "kullanilmayan degisken" deyiminden ayirt EDILEMEZ; bu guard onu gormez.
+          # notification-service'te tam bu sinif aylarca sessizce stok uyarilarini oldurdu.
 
       # Sabit-kodlu DB bağlantı dizesi (şifreli) tekrar commit'lenmesin — kredensiyeller env'den.
       # İnterpolasyonlu (`${...}`) satırlar hariç tutulur (onlar değişkenden kurulur, sır değil).
