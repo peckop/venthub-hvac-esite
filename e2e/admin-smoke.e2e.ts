@@ -105,6 +105,23 @@ test.describe('admin runtime smoke', () => {
       `exp_in=${secondsToExpiry}s role=${claims.role} aud=${claims.aud} ` +
       `chunks=${chunks.length}`
 
+    // ── İZOLASYON DENEYİ ──────────────────────────────────────────────────────
+    // Token süresi dolmamış (exp_in≈3599s) ve role=authenticated. Yine de fonksiyonun
+    // gövdesindeki auth.getUser() 401 diyor. Fonksiyonu denklemden çıkarmak için AYNI
+    // token + AYNI anon key ile doğrudan Auth'a gidiyoruz:
+    //   200 → ikili sağlam, fark fonksiyonun ÇALIŞMA ORTAMINDA (SUPABASE_ANON_KEY?)
+    //   401 → token/anon-key ikilisinin kendisi geçersiz (test env'i yanlış key taşıyor)
+    // Bu, "fonksiyonun içi mi dışı mı" sorusunu tek istekte kapatır.
+    const authProbe = await page.evaluate(
+      async ({ url, key, tok }) => {
+        const r = await fetch(`${url}/auth/v1/user`, {
+          headers: { Authorization: `Bearer ${tok}`, apikey: key },
+        })
+        return { status: r.status, body: (await r.text()).slice(0, 120) }
+      },
+      { url: supabaseUrl as string, key: anonKey as string, tok: token as string },
+    )
+
     // Çağrıyı SAYFA İÇİNDEN yap → gerçek cross-origin CORS de sınanmış olur.
     const result = await page.evaluate(
       async ({ url, key, tok }) => {
@@ -121,7 +138,8 @@ test.describe('admin runtime smoke', () => {
       },
       { url: supabaseUrl as string, key: anonKey as string, tok: token as string },
     )
-    result.body = `${result.body} | ${diag}`
+    result.body =
+      `${result.body} | ${diag} | authProbe=${authProbe.status} ${authProbe.body}`
 
     expect(
       result.status,
