@@ -62,7 +62,7 @@ Bu uyarı 6 hukuki sayfanın **hepsinde sarı bantla ziyaretçiye gösteriliyor*
 > alanları eklendi, KVKK yurt dışı aktarım metni 2024 rejimine güncellendi, İYS/ticari elektronik ileti ve
 > VERBİS bölümleri eklendi, çerez tablosu gerçek çerezlerle dolduruldu, garanti/kullanım ömrü/yetkili servis
 > eklendi, fiyat-hatası hükmü eklendi.
-> **Geriye kalan iki şey Recep'te:** (1) `src/config/legal.ts`'teki 17 placeholder'ın doldurulması,
+> **Geriye kalan iki şey Recep'te:** (1) `src/config/legal.ts`'teki 18 placeholder'ın doldurulması,
 > (2) hukukçu teyidi → `legalReviewCompleted: true`. **İkisi tamamlanana kadar taslak bandı kendiliğinden
 > görünmeye devam eder** (`isLegalContentReady()`); ikisi de tamamlanınca kendiliğinden kalkar.
 
