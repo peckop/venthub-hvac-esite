@@ -54,7 +54,10 @@ jobs:
       # Edge Functions (Deno) Next.js tsc kapsamı DIŞINDA — tsconfig supabase/'i hariç tutar.
       # Bu adım 2026-05'te maskesiz kalan edge bozulmasını (T011) yakalamak için eklendi: kalıcı kapı.
       - name: Deno check (edge functions — kapı-körlüğü guard)
-        run: deno check --node-modules-dir=auto supabase/functions/*/index.ts 2>&1 | tee ci-deno.log
+        # --node-modules-dir=none ŞART: `auto` node_modules/.deno/ yaratıp pnpm ağacını kirletiyor
+        # (undici@8.10.0 oradan çözülüp jsdom'u kırıyordu → adversarial.test.ts çöküyordu).
+        # Bu regresyon #494'te girdi ama CI o zaman pipefail'siz olduğu için görünmedi.
+        run: deno check --node-modules-dir=none supabase/functions/*/index.ts 2>&1 | tee ci-deno.log
 
       # deno check TİP hatalarını yakalar ama saf string-literal mangling'i (PostgREST/RPC param,
       # searchParams key, mangled method çağrısı) GÖREMEZ — T011'de bu sınıf iki kez kaçtı.
