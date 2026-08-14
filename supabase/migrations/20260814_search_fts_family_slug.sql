@@ -15,6 +15,12 @@
 
 begin;
 
+-- DİKKAT: `create or replace` dönüş tipini DEĞİŞTİREMEZ ("cannot change return type of
+-- existing function" — OUT parametreleri değişti: +family_slug, +cover_image_path).
+-- Bu yüzden önce düşürülür. Fonksiyon PostgREST üzerinden çağrıldığından yetkiler
+-- create sonrası AÇIKÇA geri verilir: drop, mevcut grant'leri de götürür.
+drop function if exists public.fts_search_products(text, integer, jsonb);
+
 create or replace function public.fts_search_products(
   p_q text, p_limit integer default 20, p_filters jsonb default '{}'::jsonb
 )
@@ -87,10 +93,17 @@ BEGIN
 END;
 $function$;
 
+grant execute on function public.fts_search_products(text, integer, jsonb) to anon, authenticated;
+
 -- === Guard ===
 do $$
 declare src text;
 begin
+  -- Drop sonrası yetkiler geri verilmezse arama anon kullanıcıda sessizce ölür.
+  if not has_function_privilege('anon', 'public.fts_search_products(text, integer, jsonb)', 'execute') then
+    raise exception 'guard: anon fts_search_products''ı çağıramıyor — grant kaybolmuş';
+  end if;
+
   select pg_get_functiondef(p.oid) into src from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'public' and p.proname = 'fts_search_products';
   if src not like '%family_slug%' then
