@@ -29,6 +29,13 @@ const PRICING_SOURCES: Record<string, string> = import.meta.glob(
   { query: '?raw', import: 'default', eager: true },
 )
 
+// Denetim bulgusu (2026-08-14): fiyat hattının İKİNCİ çözücüsü edge'de yaşıyor ve tek-dosya
+// glob bunu göremiyordu. order-validate da aynı sözleşmeye tabidir (segment=app_metadata).
+const EDGE_RESOLVER_SOURCES: Record<string, string> = import.meta.glob(
+  '/supabase/functions/order-validate/index.ts',
+  { query: '?raw', import: 'default', eager: true },
+)
+
 // W2 tek-sözleşme geçişiyle 0'a indi (segment = app_metadata.price_segment) — burada kalır.
 const USER_PROFILES_READ_BASELINE = 0
 
@@ -64,5 +71,32 @@ describe('INV-PRICE-2: fiyat çözücüsü segment kaynağı', () => {
       source.includes(USER_EDITABLE_META_TOKEN),
       `yetki/segment kararı ${USER_EDITABLE_META_TOKEN} üzerinden verilemez (CLAUDE.md §12; app_metadata kullan)`,
     ).toBe(false)
+  })
+})
+
+describe('INV-PRICE-2 (edge): order-validate çözücüsü', () => {
+  const edgeSource = Object.values(EDGE_RESOLVER_SOURCES)[0]
+
+  it('order-validate kaynağı bulunur', () => {
+    expect(edgeSource, 'order-validate glob ile okunamadı — yol değiştiyse testi güncelle').toBeTruthy()
+  })
+
+  it('segment için user_profiles/organizations SORGULANMAZ (app_metadata sözleşmesi)', () => {
+    // REST-string sorguları hedefle (yorumlardaki geçmiş-anlatısı serbest kalsın)
+    expect(/rest\/v1\/user_profiles/.test(edgeSource), 'order-validate user_profiles sorgulamamalı').toBe(false)
+    expect(/rest\/v1\/organizations/.test(edgeSource), 'order-validate organizations sorgulamamalı').toBe(false)
+  })
+
+  it('price_lists HAYALET kolonlarla filtrelenmez (2026-08 regresyonu geri gelmesin)', () => {
+    // Bu üç kolon canlı price_lists şemasında YOK; eski kod bunlarla filtreleyip
+    // her kullanıcıya en-yeni (bayi olabilen) listeyi seçebiliyordu.
+    for (const phantom of ['allowed_user_roles', 'organization_tiers', 'is_default']) {
+      const usedAsCode = new RegExp(`\\.${phantom}\\b|${phantom}\\s*[?:]|${phantom}=`).test(edgeSource)
+      expect(usedAsCode, `order-validate '${phantom}' hayalet kolonunu kullanamaz`).toBe(false)
+    }
+  })
+
+  it('kullanıcı-düzenleyebilir metadata edge çözücüsünde de kullanılmaz', () => {
+    expect(edgeSource.includes(USER_EDITABLE_META_TOKEN)).toBe(false)
   })
 })

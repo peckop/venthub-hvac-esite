@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\__tests__\conformance\pricing-segment-source.test.ts
-skeleton_hash: ccfdb97d56992e01
+skeleton_hash: 356bf5935689db71
 entity_hashes:
   overview: 79c805ae104c62b6
-generated_at: 2026-08-14T06:22:01Z
+generated_at: 2026-08-14T07:20:04Z
 ---
 
 ## Genel Bakış
@@ -43,6 +43,9 @@ Aksiyomlar **sadece fonksiyon gövdesinden** üretileceği için, kod gövdesi o
 - **PRICING_SOURCES** (call) — `import.meta.glob(
   '/src/lib/services/pricing.service.ts',
   { query: '?ra...`
+- **EDGE_RESOLVER_SOURCES** (call) — `import.meta.glob(
+  '/supabase/functions/order-validate/index.ts',
+  { quer...`
 - **USER_EDITABLE_META_TOKEN** (call) — `['raw', 'user', 'meta', 'data'].join('_')`
 
 ---

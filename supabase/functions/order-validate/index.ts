@@ -6,10 +6,20 @@ interface Product {
   price?: number | string;
   stock_qty?: number | string; stock?: number | string; quantity_available?: number | string; inventory?: number | string; inventory_quantity?: number | string; available?: number | string; on_hand?: number | string;
 }
-interface UserProfile { id: string; role?: string; organization_id?: string | null }
-interface Organization { id: string; tier_level?: number | null }
-interface PriceList { id: string; allowed_user_roles?: string[] | null; organization_tiers?: number[] | null; is_default?: boolean; effective_from?: string | null }
-interface ProductPrice { base_price?: number | string | null; sale_price?: number | string | null; discount_percentage?: number | string | null; is_active?: boolean; valid_from?: string | null; valid_until?: string | null; price_list_id?: string | null }
+interface PriceList { id: string; user_type?: string | null; effective_from?: string | null }
+interface ProductPrice { base_price?: number | string | null; sale_price?: number | string | null; discount_percentage?: number | string | null; is_active?: boolean; valid_from?: string | null; valid_until?: string | null; price_list_id?: string | null; net_price?: number | string | null; gross_price?: number | string | null }
+
+// W2 tek sözleşme (pricing-standard §8, INV-PRICE-2): segment = JWT app_metadata
+// (price_segment, yoksa hook'un enjekte ettiği user_role) — user_profiles.role OKUNMAZ.
+// pricing.service.ts::getUserPriceSegment ve public.jwt_price_segment() ile birebir aynı kural.
+type PriceSegment = 'individual' | 'dealer' | 'corporate'
+function segmentFromUser(u: { app_metadata?: Record<string, unknown> } | null): PriceSegment {
+  const md = u?.app_metadata ?? {}
+  for (const c of [md['price_segment'], md['user_role']]) {
+    if (c === 'dealer' || c === 'corporate') return c
+  }
+  return 'individual'
+}
 interface RecalcItem { product_id: string; quantity: number; unit_price: number; price_list_id: string | null }
 interface MismatchItem { product_id: string; had: unknown; expected: number; price_list_id: string | null }
 interface StockIssue { product_id: string; requested: number; available: number }
@@ -86,51 +96,41 @@ Deno.serve(async (req) => {
     const pmap = new Map<string, Product>();
     (Array.isArray(prods)?prods:[]).forEach((p: Product)=>pmap.set(p.id, p));
 
-    // Load profile + tier
-    let role = 'individual';
-    let orgId: string | null = null;
-    let tier: number | null = null;
-    if (userId) {
-      const prof = await getJson<UserProfile[]>(`/rest/v1/user_profiles?select=id,role,organization_id&id=eq.${encodeURIComponent(userId)}&limit=1`);
-      if (Array.isArray(prof) && prof[0]) {
-        role = prof[0].role || 'individual';
-        orgId = prof[0].organization_id || null;
-      }
-      if (orgId) {
-        const org = await getJson<Organization[]>(`/rest/v1/organizations?select=id,tier_level&id=eq.${encodeURIComponent(orgId)}&limit=1`);
-        if (Array.isArray(org) && org[0]) tier = org[0].tier_level ?? null;
-      }
-    }
+    // Segment: JWT'den (yukarıdaki tek-sözleşme kuralı). Eski sürüm user_profiles.role +
+    // organizations.tier_level okuyor ve price_lists'i VAR OLMAYAN kolonlarla
+    // (allowed_user_roles/organization_tiers/is_default) filtreliyordu → tüm listeler geçiyor,
+    // en yeni liste (bayi olabilir!) seçilebiliyordu. Şimdi storefront çözücüsüyle birebir aynı
+    // seçim: user_type = segment, en yeni effective_from kazanır.
+    const segment = segmentFromUser(user);
 
-    // Load active price lists
     const n = nowIso();
-    const lists = await getJson<PriceList[]>(`/rest/v1/price_lists?select=* &is_active=eq.true&effective_from=lte.${encodeURIComponent(n)}&or=(effective_to.is.null,effective_to.gte.${encodeURIComponent(n)})`);
-    const flists = (Array.isArray(lists)?lists:[]).filter((pl: PriceList)=>{
-      const rs = pl.allowed_user_roles as string[] | null | undefined;
-      const ts = pl.organization_tiers as number[] | null | undefined;
-      const roleOk = !rs || rs.length===0 || rs.includes(role);
-      const tierOk = (tier==null) || !ts || ts.length===0 || ts.includes(tier);
-      return roleOk && tierOk;
-    });
+    const lists = await getJson<PriceList[]>(`/rest/v1/price_lists?select=id,user_type,effective_from&is_active=eq.true&effective_from=lte.${encodeURIComponent(n)}&or=(effective_to.is.null,effective_to.gte.${encodeURIComponent(n)})`);
+    const flists = (Array.isArray(lists)?lists:[]).filter((pl: PriceList)=> pl.user_type === segment || !pl.user_type);
     flists.sort((a: PriceList, b: PriceList)=>{
-      const ad = a.is_default?1:0; const bd=b.is_default?1:0; if (ad!==bd) return ad-bd; // non-default first
+      if (!a.user_type !== !b.user_type) return a.user_type ? -1 : 1; // spesifik user_type önce
       const at=a.effective_from?Date.parse(a.effective_from):0; const bt=b.effective_from?Date.parse(b.effective_from):0; return bt-at;
     });
     const chosenListId = flists[0]?.id ?? null;
 
     async function priceFor(product: Product): Promise<{unit:number, listId:string|null}> {
-      const queries: (string|null)[] = chosenListId? [chosenListId, null] : [null];
-      for (const q of queries) {
-        const basePath = `/rest/v1/product_prices?select=base_price,sale_price,discount_percentage,is_active,valid_from,valid_until&product_id=eq.${encodeURIComponent(product.id)}&is_active=eq.true`;
-        const _path = q===null ? `${basePath}&price_list_id=is.null` : `${basePath}&price_list_id=eq.${encodeURIComponent(q)}`;
+      // price_list_id canlı şemada NOT NULL → eski "is.null fallback" sorgusu ölüydü, kaldırıldı.
+      if (chosenListId) {
+        const _path = `/rest/v1/product_prices?select=base_price,sale_price,discount_percentage,is_active,valid_from,valid_until,net_price,gross_price&product_id=eq.${encodeURIComponent(product.id)}&is_active=eq.true&price_list_id=eq.${encodeURIComponent(chosenListId)}`;
         const rows = await getJson<ProductPrice[]>(_path);
-        if (!Array.isArray(rows) || rows.length===0) continue;
-        const pick = rows.find((r: ProductPrice)=>{ const f=!r.valid_from||Date.parse(r.valid_from)<=Date.now(); const t=!r.valid_until||Date.parse(r.valid_until)>=Date.now(); return f&&t; }) || rows[0];
-        const base = Number(pick.base_price||0); const sale = pick.sale_price!=null?Number(pick.sale_price):null; const disc = Number(pick.discount_percentage||0);
-        if (sale!=null && Number.isFinite(sale) && sale>0) return { unit: sale, listId: q };
-        if (Number.isFinite(base) && base>0) {
-          if (disc>0) { const v=base*(1-disc/100); return { unit: Math.max(0, Number(v.toFixed(2))), listId: q }; }
-          return { unit: base, listId: q };
+        if (Array.isArray(rows) && rows.length>0) {
+          const pick = rows.find((r: ProductPrice)=>{ const f=!r.valid_from||Date.parse(r.valid_from)<=Date.now(); const t=!r.valid_until||Date.parse(r.valid_until)>=Date.now(); return f&&t; }) || rows[0];
+          // W2 cache sözleşmesi: motor çıktısı varsa o kazanır — storefront çözücüsüyle AYNI kural
+          // (B2C=gross KDV-dahil, B2B=net KDV-hariç), yoksa tutar karşılaştırması yanlış-mismatch üretir.
+          const net = pick.net_price!=null?Number(pick.net_price):null;
+          const gross = pick.gross_price!=null?Number(pick.gross_price):null;
+          const derived = segment==='individual' ? (gross ?? net) : (net ?? gross);
+          if (derived!=null && Number.isFinite(derived) && derived>0) return { unit: derived, listId: chosenListId };
+          const base = Number(pick.base_price||0); const sale = pick.sale_price!=null?Number(pick.sale_price):null; const disc = Number(pick.discount_percentage||0);
+          if (sale!=null && Number.isFinite(sale) && sale>0) return { unit: sale, listId: chosenListId };
+          if (Number.isFinite(base) && base>0) {
+            if (disc>0) { const v=base*(1-disc/100); return { unit: Math.max(0, Number(v.toFixed(2))), listId: chosenListId }; }
+            return { unit: base, listId: chosenListId };
+          }
         }
       }
       // fallback product.price

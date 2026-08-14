@@ -1482,9 +1482,13 @@ export type Database = {
         Row: {
           base_price: number
           created_at: string | null
+          currency: string
           discount_percentage: number | null
+          gross_price: number | null
           id: string
           is_active: boolean | null
+          is_derived: boolean
+          net_price: number | null
           price_list_id: string
           product_id: string
           sale_price: number | null
@@ -1496,9 +1500,13 @@ export type Database = {
         Insert: {
           base_price: number
           created_at?: string | null
+          currency?: string
           discount_percentage?: number | null
+          gross_price?: number | null
           id?: string
           is_active?: boolean | null
+          is_derived?: boolean
+          net_price?: number | null
           price_list_id: string
           product_id: string
           sale_price?: number | null
@@ -1510,9 +1518,13 @@ export type Database = {
         Update: {
           base_price?: number
           created_at?: string | null
+          currency?: string
           discount_percentage?: number | null
+          gross_price?: number | null
           id?: string
           is_active?: boolean | null
+          is_derived?: boolean
+          net_price?: number | null
           price_list_id?: string
           product_id?: string
           sale_price?: number | null
@@ -3159,6 +3171,7 @@ export type Database = {
       is_admin_user: { Args: never; Returns: boolean }
       is_staff_user: { Args: never; Returns: boolean }
       is_user_admin: { Args: { user_id: string }; Returns: boolean }
+      jwt_price_segment: { Args: never; Returns: string }
       jwt_role: { Args: never; Returns: string }
       jwt_tenant_id: { Args: never; Returns: string }
       process_order_stock_reduction: {
