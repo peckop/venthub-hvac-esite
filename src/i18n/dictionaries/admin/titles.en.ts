@@ -11,5 +11,8 @@ export const titles = {
       products: 'Products',
       categories: 'Categories',
       coupons: 'Coupons',
-      settings: 'Admin Settings'
+      settings: 'Admin Settings',
+      pricing: 'Pricing Settings',
+      pricingRules: 'Margin Rules',
+      pricingPreview: 'Price Preview'
 };
