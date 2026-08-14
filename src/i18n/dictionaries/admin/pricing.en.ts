@@ -208,9 +208,34 @@ export const pricing = {
         title: "Sample rows",
         empty: "No sample rows",
       },
+      staleCost: "Costs are not at the current rate: {{count}} products would use a stale rate. Run \"Refresh costs\" first.",
       toasts: {
         applied: "{{count}} product prices updated",
         applyFailed: "Could not update prices",
+      },
+    },
+    costRefresh: {
+      toolbarAction: "Refresh costs",
+      title: "Refresh costs (TCMB)",
+      description: "Catalog purchase prices are in foreign currency; this step rewrites the TRY cost using the current TCMB effective selling rate. Run it BEFORE recalculating prices — otherwise the storefront stays at the rate of the day costs were last written.",
+      loading: "Calculating preview...",
+      retry: "Retry",
+      apply: "Apply",
+      applying: "Applying...",
+      upToDate: "Costs already match the current rate — nothing to write.",
+      summary: {
+        scanned: "Products scanned",
+        updated: "Cost will change",
+        skippedNoRate: "No rate found",
+        skippedNoPurchasePrice: "No purchase price",
+      },
+      rates: {
+        title: "Rates used",
+        empty: "No rates found",
+      },
+      toasts: {
+        applied: "{{count}} product costs refreshed",
+        applyFailed: "Could not refresh costs",
       },
     },
     impact: {

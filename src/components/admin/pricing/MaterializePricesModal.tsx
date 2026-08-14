@@ -9,7 +9,11 @@ import { useRole } from '@/hooks/useRole'
 import { formatCurrency, formatNumber } from '@/i18n/format'
 import { useI18n } from '@/i18n/I18nProvider'
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
-import { materializePrices, type MaterializeSummary } from '@/lib/services/pricingMaterialize.service'
+import {
+  materializePrices,
+  type MaterializeSummary,
+  refreshCostInBase,
+} from '@/lib/services/pricingMaterialize.service'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { adminButtonPrimaryClass, adminModalScrollAreaClass } from '../../../utils/adminUi'
@@ -51,6 +55,12 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
 
   const [previewLoading, setPreviewLoading] = useState(false)
   const [preview, setPreview] = useState<MaterializeSummary | null>(null)
+  /**
+   * Maliyeti güncel kurla UYUŞMAYAN ürün sayısı. Fiyat, donmuş `cost_in_base` üstünden
+   * hesaplanır; maliyet tazelenmemişse bütün vitrin eski kurda çıkar ve bunu hiçbir sayı
+   * ele vermez. Sessiz yanlış yerine görünür uyarı: cetvel §2·A.
+   */
+  const [staleCosts, setStaleCosts] = useState<number>(0)
   const [loadFailed, setLoadFailed] = useState(false)
   const [applying, setApplying] = useState(false)
 
@@ -60,12 +70,18 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
     setLoadFailed(false)
     void (async () => {
       try {
-        const summary = await materializePrices(supabase, { dryRun: true })
+        // Maliyet bayatlığı YAN bilgidir: sorgusu patlarsa fiyat önizlemesi yine gösterilmeli.
+        const [summary, costCheck] = await Promise.all([
+          materializePrices(supabase, { dryRun: true }),
+          refreshCostInBase(supabase, { dryRun: true }).catch(() => null),
+        ])
         if (!alive) return
         setPreview(summary)
+        setStaleCosts(costCheck ? costCheck.updated : 0)
       } catch {
         if (!alive) return
         setPreview(null)
+        setStaleCosts(0)
         setLoadFailed(true)
       } finally {
         if (alive) setPreviewLoading(false)
@@ -89,6 +105,7 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
   useEffect(() => {
     if (!open) return
     setPreview(null)
+    setStaleCosts(0)
     setLoadFailed(false)
     startPreview()
     return () => {
@@ -185,6 +202,16 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
               </div>
             ) : preview ? (
               <div className="space-y-8">
+                {staleCosts > 0 ? (
+                  <p
+                    role="status"
+                    className="flex items-start gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-200"
+                  >
+                    <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+                    <span>{t('admin.pricing.rules.materialize.staleCost', { count: staleCosts })}</span>
+                  </p>
+                ) : null}
+
                 {/* ---- kapsam özeti ---- */}
                 <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="rounded-2xl glass border border-white/10 p-4 space-y-1">
