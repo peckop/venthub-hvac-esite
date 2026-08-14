@@ -78,77 +78,50 @@ test.describe('admin runtime smoke', () => {
     await page.click('button[type="submit"]')
     await page.waitForURL((u) => !u.pathname.includes('/auth/login'), { timeout: 25_000 })
 
-    // Çağrıyı SAYFA İÇİNDEN yap: gerçek oturum token'ı + gerçek cross-origin CORS.
+    // Oturumu ÇEREZDEN oku. Uygulama @supabase/ssr'ın createBrowserClient'ını kullanıyor
+    // (src/lib/supabase/client.ts) → oturum çerezde, localStorage'da DEĞİL.
+    // Çözümlemeyi NODE tarafında yapıyoruz: tarayıcıdaki atob() Latin-1 döndürür ve
+    // oturum JSON'undaki Türkçe karakterleri bozar; Buffer UTF-8'i doğru işler.
+    const chunks = (await page.context().cookies())
+      .filter((c) => /^sb-.*-auth-token(\.\d+)?$/.test(c.name))
+      .sort((a, b) => Number(a.name.split('.')[1] ?? 0) - Number(b.name.split('.')[1] ?? 0))
+
+    expect(chunks.length, 'Oturum çerezi bulunamadı — login akışı kurulmamış.').toBeGreaterThan(0)
+
+    let raw = decodeURIComponent(chunks.map((c) => c.value).join(''))
+    if (raw.startsWith('base64-')) raw = Buffer.from(raw.slice(7), 'base64url').toString('utf8')
+    const parsed = JSON.parse(raw)
+    const token: string | undefined =
+      parsed?.access_token ?? (Array.isArray(parsed) ? parsed[0] : undefined)
+    expect(typeof token, 'Çerezden access_token çıkarılamadı.').toBe('string')
+
+    // JWT gövdesi imzasızdır ve herkese açıktır — sır DEĞİL. Yalnız teşhis alanlarını
+    // raporluyoruz (exp/role/aud); token'ın kendisi ASLA loglanmıyor.
+    const claims = JSON.parse(
+      Buffer.from((token as string).split('.')[1], 'base64url').toString('utf8'),
+    )
+    const secondsToExpiry = Number(claims.exp) - Math.floor(Date.now() / 1000)
+    const diag =
+      `exp_in=${secondsToExpiry}s role=${claims.role} aud=${claims.aud} ` +
+      `chunks=${chunks.length}`
+
+    // Çağrıyı SAYFA İÇİNDEN yap → gerçek cross-origin CORS de sınanmış olur.
     const result = await page.evaluate(
-      async ({ url, key }) => {
-        // Uygulama @supabase/ssr'ın createBrowserClient'ını kullanıyor → oturum ÇEREZDE,
-        // localStorage'da DEĞİL. (İlk sürüm localStorage okuyordu ve -1 ile patladı.)
-        // Çerez adı `sb-<ref>-auth-token`; 3180 karakteri aşarsa `.0`, `.1` diye parçalanır.
-        // Değer ya doğrudan JSON ya da `base64-<base64url>` önekli olabilir.
-        const readSessionToken = (): string | null => {
-          const chunks = document.cookie
-            .split('; ')
-            .map((c) => {
-              const i = c.indexOf('=')
-              return { name: c.slice(0, i), value: c.slice(i + 1) }
-            })
-            .filter((c) => /^sb-.*-auth-token(\.\d+)?$/.test(c.name))
-            .sort((a, b) => {
-              const n = (s: string) => Number(s.split('.')[1] ?? 0)
-              return n(a.name) - n(b.name)
-            })
-          if (chunks.length === 0) return null
-
-          let raw = decodeURIComponent(chunks.map((c) => c.value).join(''))
-          if (raw.startsWith('base64-')) {
-            const b64 = raw.slice(7).replace(/-/g, '+').replace(/_/g, '/')
-            raw = atob(b64)
-          }
-          const parsed = JSON.parse(raw)
-          // Bilinen iki şekil: {access_token,...} veya [access_token, refresh_token, ...]
-          if (parsed?.access_token) return parsed.access_token as string
-          if (Array.isArray(parsed) && typeof parsed[0] === 'string') return parsed[0]
-          return null
-        }
-
-        let token: string | null = null
-        try {
-          token = readSessionToken()
-        } catch (e) {
-          return { status: -3, body: `çerez çözümlenemedi: ${String(e)}` }
-        }
-        if (!token) {
-          // Tanı için hangi sb- çerezlerinin var olduğunu göster.
-          const names = document.cookie
-            .split('; ')
-            .map((c) => c.split('=')[0])
-            .filter((n) => n.startsWith('sb-'))
-            .join(',')
-          return { status: -1, body: `oturum çerezi yok. Mevcut sb- çerezleri: [${names || 'hiç'}]` }
-        }
-
-        // Teşhis: token'ın KENDİSİNİ asla loglama (canlı kimlik bilgisi). Yalnız şekli:
-        // geçerli bir JWT 3 nokta-ayrımlı parçadan oluşur ve "ey" ile başlar.
-        const cookieNames = document.cookie
-          .split('; ')
-          .map((c) => c.split('=')[0])
-          .filter((n) => n.startsWith('sb-'))
-        const shape = `len=${token.length} segments=${token.split('.').length} ` +
-          `startsWithEy=${token.startsWith('ey')} cookies=[${cookieNames.join(',')}]`
-
+      async ({ url, key, tok }) => {
         const resp = await fetch(`${url}/functions/v1/admin-update-shipping`, {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${tok}`,
             apikey: key,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({}), // BİLEREK boş — mutasyona ulaşmadan doğrulamada durur
         })
-        return { status: resp.status, body: `${(await resp.text()).slice(0, 160)} | ${shape}` }
+        return { status: resp.status, body: (await resp.text()).slice(0, 160) }
       },
-      { url: supabaseUrl as string, key: anonKey as string },
+      { url: supabaseUrl as string, key: anonKey as string, tok: token as string },
     )
+    result.body = `${result.body} | ${diag}`
 
     expect(
       result.status,
