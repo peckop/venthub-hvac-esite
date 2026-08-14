@@ -8,7 +8,8 @@ dotenv.config()
 const { Client } = pg
 
 // Use provided pooler format from .env or fallback to provided working string
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres.tnofewwkwlyjsqgwjjga:***REMOVED***@aws-1-eu-central-1.pooler.supabase.com:5432/postgres'
+const DATABASE_URL = process.env.DATABASE_URL
+if (!DATABASE_URL) throw new Error('DATABASE_URL environment variable is required (set your Postgres connection string)')
 
 console.warn('🚀 Using Pooler Connection to connect...')
 

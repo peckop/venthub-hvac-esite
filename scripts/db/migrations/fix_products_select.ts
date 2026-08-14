@@ -4,7 +4,8 @@ import * as dotenv from 'dotenv';
 const { Client } = pg;
 dotenv.config();
 
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tnofewwkwlyjsqgwjjga:***REMOVED***@aws-1-eu-central-1.pooler.supabase.com:5432/postgres';
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) throw new Error('DATABASE_URL environment variable is required (set your Postgres connection string)');
 
 const client = new Client({
     connectionString,
