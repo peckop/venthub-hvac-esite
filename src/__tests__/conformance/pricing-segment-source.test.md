@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\__tests__\conformance\pricing-segme
 skeleton_hash: ccfdb97d56992e01
 entity_hashes:
   overview: 79c805ae104c62b6
-generated_at: 2026-08-13T18:58:31Z
+generated_at: 2026-08-14T06:22:01Z
 ---
 
 ## Genel Bakış
@@ -42,7 +42,7 @@ Aksiyomlar **sadece fonksiyon gövdesinden** üretileceği için, kod gövdesi o
 ## SABİTLER
 - **PRICING_SOURCES** (call) — `import.meta.glob(
   '/src/lib/services/pricing.service.ts',
-  { query: '?raw'...`
+  { query: '?ra...`
 - **USER_EDITABLE_META_TOKEN** (call) — `['raw', 'user', 'meta', 'data'].join('_')`
 
 ---
