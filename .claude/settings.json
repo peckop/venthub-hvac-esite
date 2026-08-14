@@ -9,6 +9,34 @@
             "type": "command",
             "command": "node .claude/hooks/protect-config.cjs",
             "statusMessage": "config-protection"
+          },
+          {
+            "type": "command",
+            "command": "node .claude/hooks/lane-guard.cjs",
+            "statusMessage": "lane-guard"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/session-board.cjs",
+            "statusMessage": "board"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/board-brief.cjs"
           }
         ]
       }
