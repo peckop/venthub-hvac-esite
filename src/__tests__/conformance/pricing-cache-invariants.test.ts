@@ -43,11 +43,19 @@ function normalize(path: string): string {
 
 describe('INV-PRICE-6 · fiyat cache değişmezleri', () => {
   it('product_prices tekil anahtarı currency içerir (en son tanım kazanır)', () => {
+    // Tekil anahtar İKİ biçimde tanımlanabilir: serbest UNIQUE INDEX ya da UNIQUE CONSTRAINT
+    // (kısıt kendi indeksini yaratır). Bekçi ikisini de tanımalı, yoksa biçim değişiminde
+    // gerçek bir ihlal değil, testin kendisi yanlış alarm verir.
     const definitions: { file: string; def: string }[] = []
+    const PATTERNS = [
+      /create\s+unique\s+index[^;]*\bproduct_prices_unique\b[^;]*;/gi,
+      /add\s+constraint\s+product_prices_unique\s+unique[^;]*;/gi,
+    ]
     for (const [file, source] of Object.entries(MIGRATION_SOURCES)) {
-      const re = /create\s+unique\s+index[^;]*\bproduct_prices_unique\b[^;]*;/gi
-      for (const match of source.matchAll(re)) {
-        definitions.push({ file: normalize(file), def: match[0] })
+      for (const re of PATTERNS) {
+        for (const match of source.matchAll(re)) {
+          definitions.push({ file: normalize(file), def: match[0] })
+        }
       }
     }
 
