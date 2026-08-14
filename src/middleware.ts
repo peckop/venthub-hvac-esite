@@ -159,8 +159,23 @@ export async function middleware(request: NextRequest) {
       },
     })
 
-    // Resolve claims through our high performance caching layer (AES-GCM cryptographically secure cookies)
-    const secret = process.env.JWT_CLAIMS_COOKIE_SECRET || anonKey
+    // Resolve claims through our high performance caching layer (AES-GCM cryptographically secure cookies).
+    // GÜVENLİK: anonKey'e ASLA düşme. Anon key publiktir (her client bundle'ında gönderilir);
+    // ondan türeyen AES anahtarıyla saldırgan `sb-claims-cache` çerezini {user_role:'super_admin'}
+    // olarak üretip bu kapıyı geçebilir (resolveUserClaims geçerli çerezde Supabase'e hiç sormaz).
+    // Sır yoksa üretimde FAIL-CLOSED: admin erişimi reddedilir.
+    const claimsSecret = process.env.JWT_CLAIMS_COOKIE_SECRET
+    if (!claimsSecret && process.env.NODE_ENV === 'production') {
+      console.error('[Middleware] JWT_CLAIMS_COOKIE_SECRET tanımlı değil — admin erişimi reddedildi (fail-closed).')
+      const misconfigUrl = request.nextUrl.clone()
+      misconfigUrl.pathname = '/'
+      misconfigUrl.searchParams.set('auth_error', 'server_misconfigured')
+      return redirectResponse(misconfigUrl, 302)
+    }
+    if (!claimsSecret) {
+      console.warn('[Middleware] JWT_CLAIMS_COOKIE_SECRET yok — yalnızca geliştirme anahtarı kullanılıyor. Dağıtımdan önce tanımla.')
+    }
+    const secret = claimsSecret || 'dev-only-insecure-claims-cache-key'
     const { claims, error } = await resolveUserClaims(request, response, supabase, secret)
     const jwtRole = claims?.user_role
     const roleString = typeof jwtRole === 'string' ? jwtRole : ''

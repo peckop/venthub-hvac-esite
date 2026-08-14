@@ -114,6 +114,11 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 
 ## Notlar
 
+- **Lokal `deno check`:** daima `--node-modules-dir=none` ile koş — `auto` pnpm node_modules
+  yerleşimini BOZAR (build "Module not found" ile patlar; onarım `pnpm install`). CI etkilenmez.
+- **Repo PRIVATE:** workflow'da `permissions:` bloğu yazıyorsan `contents: read` ZORUNLU —
+  yoksa checkout "Repository not found" verir (varsayılan izinler düşer).
+
 - **CONTEXT.md NotebookLM tarafından üretilir** — "iyileştirme" adına yeniden yazma; not/ilave ekleyebilirsin.
 - Dokümantasyon, Corpus Callosum / Orion CLI ile `*.md` master dosyalarına çevrilip
   NotebookLM "VentHub Proje Hafızası" defterine (dijital ikiz) yüklenir.
