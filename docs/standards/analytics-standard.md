@@ -41,12 +41,36 @@
 - **Consent:** KVKK + çerez onayı **şart** — `CookieConsent` onayı verilmeden analytics olayları
   **ateşlenmez** (consent-mode). Çerez politikası sayfasıyla tutarlı.
 
+### ⛔ ÖN KOŞUL — `NEXT_PUBLIC_GA_ID`'yi env'e KOYMADAN önce oku (`T020-VH`)
+
+Yukarıdaki consent şartının **kodda karşılığı YOK**. Ölçüldü (2026-08-15, LAUNCH denetimi):
+
+- `vh_cookie_consent` bayrağını **yalnız bandın kendisi** okuyor (`CookieConsent.tsx:17`), kendini
+  gösterip göstermeyeceğine karar vermek için. **Başka hiçbir yer okumuyor** → "Reddet" hiçbir şeyi kapatmıyor.
+- `trackEvent()` uygulamada **zaten 3 yerden çağrılıyor**: `StickyHeader.tsx:150`, `StickyHeader.tsx:275`,
+  `CaseStudySection.tsx:56`.
+
+Yani sistemin bugün sessiz olmasının tek sebebi **GA ID'nin yokluğu** — güvenlik değil tesadüf.
+ID env'e konulduğu **an**, "Reddet" demiş kullanıcı dâhil herkesten olay akmaya başlar; bu hem KVKK
+ihlali hem de **bu cetvelin kendi ihlali** olur.
+
+**Bu yüzden GA4 kurulumu (`avensair-teslim-yol-haritasi` madde G) `T020-VH` bitmeden BAŞLAMAZ.**
+`T020-VH` kapsamı: kategori bazlı rıza (zorunlu/işlevsel/analitik/pazarlama — bugünkü ikili
+kabul-ret yetersiz) · rızayı okuyan tek merkezî gate · reddedilen kategorinin script'inin **hiç
+yüklenmemesi** (olay bastırmak yetmez) · rızanın geri alınabilmesi · rıza kaydı (tarih/versiyon, ispat yükü).
+
+İlgili: `docs/audits/canliya-alma-hazirlik-2026-08-15.md` §S6 · PR #512 (Çerez Politikası bugünün
+gerçeğini yazıyor: *"Site hâlihazırda analitik/pazarlama çerezi kullanmamaktadır"* — bu cümle
+GA açıldığı an YALAN olur, metin de güncellenmeli).
+
 ## Raporlama
 - Mevcut sağlayıcının aylık raporunun **eşdeğeri/fazlası**: organik trafik (Search Console), dönüşüm
   hunisi (GA4), en çok gezilen/çıkılan sayfalar, kaynak/medya, cihaz.
 - Sıklık: aylık özet + geçiş döneminde (cutover ilk 4-8 hafta) haftalık sıra-takibi.
 
 ## DoD (ne zaman "kurulu" sayılır)
+- [ ] **`T020-VH` rıza kapısı bitti** (ön koşul — bkz. §Yapılandırma ⛔). Kanıt: "Reddet" seçili
+      tarayıcıda GA/GTM script'i **hiç yüklenmiyor** ve tek bir olay gitmiyor.
 - [ ] GA4 + GTM canlı, ID env'de, consent-mode bağlı.
 - [ ] Huni olayları (en az view_item → add_to_cart → begin_checkout → purchase) akıyor.
 - [ ] Search Console bağlı + sitemap gönderildi.
