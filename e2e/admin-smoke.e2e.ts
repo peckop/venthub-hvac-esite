@@ -127,6 +127,15 @@ test.describe('admin runtime smoke', () => {
           return { status: -1, body: `oturum çerezi yok. Mevcut sb- çerezleri: [${names || 'hiç'}]` }
         }
 
+        // Teşhis: token'ın KENDİSİNİ asla loglama (canlı kimlik bilgisi). Yalnız şekli:
+        // geçerli bir JWT 3 nokta-ayrımlı parçadan oluşur ve "ey" ile başlar.
+        const cookieNames = document.cookie
+          .split('; ')
+          .map((c) => c.split('=')[0])
+          .filter((n) => n.startsWith('sb-'))
+        const shape = `len=${token.length} segments=${token.split('.').length} ` +
+          `startsWithEy=${token.startsWith('ey')} cookies=[${cookieNames.join(',')}]`
+
         const resp = await fetch(`${url}/functions/v1/admin-update-shipping`, {
           method: 'POST',
           headers: {
@@ -136,7 +145,7 @@ test.describe('admin runtime smoke', () => {
           },
           body: JSON.stringify({}), // BİLEREK boş — mutasyona ulaşmadan doğrulamada durur
         })
-        return { status: resp.status, body: (await resp.text()).slice(0, 200) }
+        return { status: resp.status, body: `${(await resp.text()).slice(0, 160)} | ${shape}` }
       },
       { url: supabaseUrl as string, key: anonKey as string },
     )

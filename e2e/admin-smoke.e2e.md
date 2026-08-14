@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-wt-hotfix\e2e\admin-smoke.e2e.ts
 skeleton_hash: 04c7e0b87d83897c
 entity_hashes:
   overview: 529d691256ce33bd
-generated_at: 2026-08-14T20:44:08Z
+generated_at: 2026-08-14T21:19:28Z
 ---
 
 ## Genel Bakış
