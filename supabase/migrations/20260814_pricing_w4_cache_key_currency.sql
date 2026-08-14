@@ -40,12 +40,28 @@ create trigger trg_product_prices_computed_at
   for each row execute function public.touch_product_prices_computed_at();
 
 -- 2) Tekil anahtara currency eklenir
-drop index if exists public.product_prices_unique;
+--    DİKKAT: `product_prices_unique` bir UNIQUE CONSTRAINT'tir; arkasındaki indeks tek başına
+--    düşürülemez (`cannot drop index ... because constraint ... requires it` — 2026-08-14'te
+--    prod deploy'u tam burada kırmızıya düştü, migration atomik olduğu için etkisiz geri alındı).
+--    Bu yüzden önce kısıt, o yoksa serbest indeks düşürülür: iki kurulumda da çalışır.
+do $$
+begin
+  if exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.product_prices'::regclass
+      and conname = 'product_prices_unique'
+  ) then
+    alter table public.product_prices drop constraint product_prices_unique;
+  else
+    execute 'drop index if exists public.product_prices_unique';
+  end if;
+end $$;
 
-create unique index if not exists product_prices_unique
-  on public.product_prices (product_id, price_list_id, currency, valid_from);
+-- Yeni anahtar da KISIT olarak kurulur (eski şekliyle simetri; ON CONFLICT her iki hâlde çalışır).
+alter table public.product_prices
+  add constraint product_prices_unique unique (product_id, price_list_id, currency, valid_from);
 
-comment on index public.product_prices_unique is
+comment on constraint product_prices_unique on public.product_prices is
   'Cache tekil anahtarı: (ürün, fiyat listesi, PARA BİRİMİ, geçerlilik başlangıcı) — cetvel §8.1.';
 
 -- === Guard ===
