@@ -41,7 +41,8 @@ export interface ProductScopeRow {
 /** Örnek ürün = fiyat motoru girdisi + panelde gösterilecek kimlik alanları. */
 export type SampleProduct = PricingProductInput & { name: string; sku: string }
 
-const PRODUCT_SCOPE_COLUMNS = 'id, name, sku, brand, category_id, cost_in_base'
+/** Fiyat motorunun ürün girdisi için gereken SSOT kolon listesi (materialize servisi de bunu kullanır). */
+export const PRODUCT_SCOPE_COLUMNS = 'id, name, sku, brand, category_id, cost_in_base'
 
 /** Panelde tek seferde listelenen kural üst sınırı (kural sayısı düzinelerle ölçülür). */
 export const PRICING_RULE_LIST_LIMIT = 500

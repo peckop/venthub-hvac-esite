@@ -179,6 +179,39 @@ export const pricing = {
       productSearchEmpty: "No matching product found.",
       clearTarget: "Clear selection",
     },
+    materialize: {
+      toolbarAction: "Recalculate prices",
+      title: "Recalculate prices",
+      description: "The engine scans all products and re-derives net/gross prices from the current margin rules. Review the preview before anything is saved.",
+      loading: "Calculating preview...",
+      retry: "Retry",
+      apply: "Apply",
+      applying: "Applying...",
+      summary: {
+        scanned: "Products scanned",
+        priced: "Will be priced",
+        quoteOnly: "Will stay \"Request a Quote\"",
+        totalNet: "Total net (TRY)",
+        skippedManual: "Manually overridden (kept)",
+        deactivated: "Stale rows to deactivate",
+      },
+      segments: {
+        title: "Segment breakdown",
+        empty: "No segment data",
+        table: {
+          priced: "Priced",
+          quoteOnly: "Request a Quote",
+        },
+      },
+      samples: {
+        title: "Sample rows",
+        empty: "No sample rows",
+      },
+      toasts: {
+        applied: "{{count}} product prices updated",
+        applyFailed: "Could not update prices",
+      },
+    },
     impact: {
       title: "Impact",
       loading: "Calculating coverage...",

@@ -1,7 +1,7 @@
 'use client'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { Percent, Plus, SearchX } from 'lucide-react'
+import { Percent, Plus, RefreshCw, SearchX } from 'lucide-react'
 import type { Route } from 'next'
 import Link from 'next/link'
 import React, { useCallback, useMemo, useState } from 'react'
@@ -18,6 +18,7 @@ import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import { FacetedFilter } from '../../components/admin/data-table/FacetedFilter'
 import type { AdminColumn, DataTableFacet } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
+import MaterializePricesModal from '../../components/admin/pricing/MaterializePricesModal'
 import PricingRuleFormModal from '../../components/admin/pricing/PricingRuleFormModal'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
@@ -164,6 +165,7 @@ const PricingRulesTableBody: React.FC = () => {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<PricingRuleRow | null>(null)
+  const [materializeOpen, setMaterializeOpen] = useState(false)
 
   const table = useAdminTable<RuleRow>({
     resource: 'pricing_rules',
@@ -305,7 +307,10 @@ const PricingRulesTableBody: React.FC = () => {
           if (r.method === 'fixed' && r.fixedPrice !== null) {
             return (
               <div className="flex flex-col items-end gap-0.5">
-                <span className="text-sm font-black text-white">{formatCurrency(r.fixedPrice, locale)}</span>
+                <span className="text-sm font-black text-white">
+                  {/* Para birimi ZORUNLU: verilmezse format yardımcısı EN dilinde USD'ye düşer ($ sızar). */}
+                  {formatCurrency(r.fixedPrice, locale, { currency: r.raw.currency ?? 'TRY' })}
+                </span>
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   {t(r.vatInclusive ? 'admin.pricing.common.vatIncluded' : 'admin.pricing.common.vatExcluded')}
                 </span>
@@ -532,6 +537,15 @@ const PricingRulesTableBody: React.FC = () => {
                   />
                 ))}
                 <ExportMenu items={[{ key: 'csv', label: t('admin.dataTable.export.csv'), onSelect: () => void exportCsv() }]} />
+                <button
+                  type="button"
+                  onClick={() => setMaterializeOpen(true)}
+                  disabled={!hasWriteAccess}
+                  className={`${adminTableActionClass} disabled:opacity-40 disabled:cursor-not-allowed`}
+                >
+                  <RefreshCw size={14} />
+                  {t('admin.pricing.rules.materialize.toolbarAction')}
+                </button>
                 {hasWriteAccess ? (
                   <button type="button" onClick={openCreate} className={adminTableActionPrimaryClass}>
                     <Plus size={14} />
@@ -560,6 +574,12 @@ const PricingRulesTableBody: React.FC = () => {
         rule={editing}
         onClose={() => setModalOpen(false)}
         onSaved={() => void table.reload()}
+      />
+
+      <MaterializePricesModal
+        open={materializeOpen}
+        onClose={() => setMaterializeOpen(false)}
+        onSuccess={() => void table.reload()}
       />
     </div>
   )

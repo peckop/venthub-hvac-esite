@@ -315,15 +315,28 @@ export function computePriceFromRule(
 }
 
 /**
- * Deterministik fiyat çözümü (cetvel §11). DI: ilk parametre SupabaseClient.
- * Kuralları çeker, merdivene göre sıralar, kazanan İLK hesaplanabilir kuralı uygular
+ * resolvePriceWithRules'a girdi: dış-dünya (DB) sorgularının SONUCU — çağıran
+ * (resolvePrice veya materializePrices) verileri bir kez çeker, saf çekirdeğe verir.
+ * SAF: içeride DB erişimi / yan etki YOK, aynı girdi → aynı çıktı (test edilebilirlik + W3 toplu-hesap).
+ */
+export interface RuleEvaluationInputs {
+  rules: PricingRuleRow[]
+  categoryAncestors: ReadonlySet<string>
+  /** currency !== 'TRY' ise gösterim kuru; TRY için null. */
+  fxRate: { rate: number; effectiveDate: string } | null
+}
+
+/**
+ * Fiyat çözümünün SAF çekirdeği (cetvel §11). DB erişimi yok — kural havuzu,
+ * kategori ata-kümesi ve (gerekiyorsa) gösterim kuru çağırandan `inputs` ile gelir.
+ * Kuralları merdivene göre sıralar, kazanan İLK hesaplanabilir kuralı uygular
  * (stop-at-first-hit; is_exclusive=false yığılması bilinçli W1 kapsamı dışı).
  */
-export async function resolvePrice(
-  supabase: SupabaseClient<Database>,
+export function resolvePriceWithRules(
   product: PricingProductInput,
-  context: PricingContext = {},
-): Promise<PriceResolution> {
+  context: PricingContext,
+  inputs: RuleEvaluationInputs,
+): PriceResolution {
   const trace: string[] = []
   const qty = context.quantity ?? 1
   const currency = (context.currency ?? 'TRY').toUpperCase()
@@ -332,27 +345,8 @@ export async function resolvePrice(
   const cost = product.costInBase ?? null
   trace.push(`girdi: ürün=${product.id} adet=${qty} para=${currency} kitap=${priceBookId ?? 'base'} maliyet=${cost ?? 'YOK'}`)
 
-  const { data: ruleRows, error: rulesError } = await supabase.from('pricing_rule').select('*')
-  if (rulesError) {
-    trace.push(`pricing_rule okunamadı: ${rulesError.message}`)
-    return { price: null, trace }
-  }
-  const allRules = (ruleRows ?? []) as PricingRuleRow[]
+  const allRules = inputs.rules
   trace.push(`kural havuzu: ${allRules.length}`)
-
-  // Kategori ata-zinciri (scope 3 cascade) — yalnız gerektiğinde çekilir
-  const categoryAncestors = new Set<string>()
-  if (product.categoryId && allRules.some(r => r.scope === 3)) {
-    categoryAncestors.add(product.categoryId)
-    const { data: cats } = await supabase.from('categories').select('id, parent_id')
-    const parentOf = new Map<string, string | null>()
-    for (const c of (cats ?? []) as { id: string; parent_id: string | null }[]) parentOf.set(c.id, c.parent_id)
-    let cursor: string | null | undefined = parentOf.get(product.categoryId)
-    for (let depth = 0; cursor && depth < 10; depth++) {
-      categoryAncestors.add(cursor)
-      cursor = parentOf.get(cursor)
-    }
-  }
 
   const candidates = allRules.filter(rule =>
     (rule.price_book_id === null || rule.price_book_id === priceBookId) &&
@@ -360,7 +354,7 @@ export async function resolvePrice(
     rule.min_quantity <= qty &&
     (rule.valid_from === null || rule.valid_from <= today) &&
     (rule.valid_to === null || rule.valid_to >= today) &&
-    ruleMatchesProduct(rule, product, categoryAncestors),
+    ruleMatchesProduct(rule, product, inputs.categoryAncestors),
   )
   trace.push(`eşleşen aday: ${candidates.length}`)
   if (candidates.length === 0) {
@@ -379,23 +373,15 @@ export async function resolvePrice(
 
     let { net, gross } = computed
     if (currency !== 'TRY') {
-      // Gösterim çevirisi: en güncel kur (effective_date ≤ bugün; currency_rates append-only)
-      const { data: rates } = await supabase
-        .from('currency_rates')
-        .select('rate, effective_date')
-        .eq('quote_ccy', currency)
-        .lte('effective_date', today)
-        .order('effective_date', { ascending: false })
-        .order('fetched_at', { ascending: false })
-        .limit(1)
-      const rate = rates && rates.length > 0 ? Number(rates[0].rate) : null
-      if (!rate || !Number.isFinite(rate) || rate <= 0) {
+      // Gösterim çevirisi: kur çağırandan gelir (TRY için asla sorgulanmaz).
+      const fx = inputs.fxRate
+      if (!fx) {
         trace.push(`sonuç: ${currency} kuru yok → Teklif Alın`)
         return { price: null, trace }
       }
-      net = Number((net / rate).toFixed(4))
-      gross = round2(gross / rate)
-      trace.push(`gösterim çevirisi: TRY→${currency} kur=${rate} (${rates?.[0]?.effective_date})`)
+      net = Number((net / fx.rate).toFixed(4))
+      gross = round2(gross / fx.rate)
+      trace.push(`gösterim çevirisi: TRY→${currency} kur=${fx.rate} (${fx.effectiveDate})`)
     }
 
     return {
@@ -406,4 +392,69 @@ export async function resolvePrice(
 
   trace.push('sonuç: hesaplanabilir kural yok → Teklif Alın')
   return { price: null, trace }
+}
+
+/**
+ * Deterministik fiyat çözümü (cetvel §11). DI: ilk parametre SupabaseClient.
+ * İNCE SARMALAYICI: veriyi çeker (pricing_rule, gerekiyorsa categories, currency !== 'TRY'
+ * ise currency_rates) ve saf çekirdek `resolvePriceWithRules`'a delege eder — hesap mantığı
+ * burada TEKRARLANMAZ.
+ */
+export async function resolvePrice(
+  supabase: SupabaseClient<Database>,
+  product: PricingProductInput,
+  context: PricingContext = {},
+): Promise<PriceResolution> {
+  const qty = context.quantity ?? 1
+  const currency = (context.currency ?? 'TRY').toUpperCase()
+  const today = context.today ?? new Date().toISOString().slice(0, 10)
+  const priceBookId = context.priceBookId ?? null
+  const cost = product.costInBase ?? null
+
+  const { data: ruleRows, error: rulesError } = await supabase.from('pricing_rule').select('*')
+  if (rulesError) {
+    // Çekirdek çağrılmadan erken çıkış — 'girdi:' satırı yine de üretilir (trace birebir aynı kalır).
+    return {
+      price: null,
+      trace: [
+        `girdi: ürün=${product.id} adet=${qty} para=${currency} kitap=${priceBookId ?? 'base'} maliyet=${cost ?? 'YOK'}`,
+        `pricing_rule okunamadı: ${rulesError.message}`,
+      ],
+    }
+  }
+  const allRules = (ruleRows ?? []) as PricingRuleRow[]
+
+  // Kategori ata-zinciri (scope 3 cascade) — yalnız gerektiğinde çekilir
+  const categoryAncestors = new Set<string>()
+  if (product.categoryId && allRules.some(r => r.scope === 3)) {
+    categoryAncestors.add(product.categoryId)
+    const { data: cats } = await supabase.from('categories').select('id, parent_id')
+    const parentOf = new Map<string, string | null>()
+    for (const c of (cats ?? []) as { id: string; parent_id: string | null }[]) parentOf.set(c.id, c.parent_id)
+    let cursor: string | null | undefined = parentOf.get(product.categoryId)
+    for (let depth = 0; cursor && depth < 10; depth++) {
+      categoryAncestors.add(cursor)
+      cursor = parentOf.get(cursor)
+    }
+  }
+
+  // Gösterim kuru: TRY dışıysa önce çekilip çekirdeğe verilir; TRY için HİÇ sorgulanmaz.
+  let fxRate: RuleEvaluationInputs['fxRate'] = null
+  if (currency !== 'TRY') {
+    const { data: rates } = await supabase
+      .from('currency_rates')
+      .select('rate, effective_date')
+      .eq('quote_ccy', currency)
+      .lte('effective_date', today)
+      .order('effective_date', { ascending: false })
+      .order('fetched_at', { ascending: false })
+      .limit(1)
+    const rateRow = rates && rates.length > 0 ? rates[0] : null
+    const rate = rateRow ? Number(rateRow.rate) : null
+    if (rateRow && rate && Number.isFinite(rate) && rate > 0) {
+      fxRate = { rate, effectiveDate: rateRow.effective_date }
+    }
+  }
+
+  return resolvePriceWithRules(product, context, { rules: allRules, categoryAncestors, fxRate })
 }

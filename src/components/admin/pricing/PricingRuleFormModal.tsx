@@ -934,7 +934,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                             <span className="ml-auto text-xs font-black uppercase tracking-widest text-slate-500">
                               {beforeGross === null
                                 ? t('admin.pricing.rules.impact.noPrice')
-                                : formatCurrency(beforeGross, locale)}
+                                : formatCurrency(beforeGross, locale, { currency: 'TRY' })}
                             </span>
                             <span className="text-xs font-black text-slate-600" aria-hidden="true">
                               {'→'}
@@ -942,7 +942,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                             <span className="text-xs font-black uppercase tracking-widest text-cyan-400">
                               {after === null
                                 ? t('admin.pricing.rules.impact.notPriceable')
-                                : formatCurrency(after.gross, locale)}
+                                : formatCurrency(after.gross, locale, { currency: 'TRY' })}
                             </span>
                             {loses ? (
                               <span className="w-full flex items-center gap-2 text-xs font-bold text-amber-400">
