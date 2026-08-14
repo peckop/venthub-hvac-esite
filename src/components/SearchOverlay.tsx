@@ -131,6 +131,21 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     onClose()
   }
 
+  /**
+   * Arama sonucundan ürüne git. PDP bir AİLE slug'ı bekler, varyant `?sku=` ile seçilir.
+   * Eskiden `Routes.product(r.slug!)` çağrılıyordu ama RPC slug DÖNDÜRMÜYOR — kullanıcı
+   * `/products/undefined` sayfasına düşüyordu. Aile slug'ı henüz gelmiyorsa (migration
+   * prod'a inene kadar) sessizce hatalı adrese gitmek yerine arama sayfasına düşülür.
+   */
+  const goToResult = (res: FtsProductResult) => {
+    if (res.family_slug) {
+      router.push(Routes.product(res.family_slug, res.sku))
+    } else {
+      router.push(Routes.products())
+    }
+    handleClose()
+  }
+
   const addToRecent = (term: string) => {
     if (!term.trim()) return
     const next = [term, ...recentSearches.filter(x => x !== term)].slice(0, 5)
@@ -178,8 +193,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           handleClose()
         } else if (viewState === 'RESULTS') {
           const res = results[activeIndex]
-          router.push(Routes.product(res.slug!))
-          handleClose()
+          goToResult(res)
         }
       } else {
         performFullSearch(q)
@@ -366,7 +380,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
               <li key={r.id}>
                 <button
                   className={`w-full text-left px-4 py-3 flex items-center justify-between group outline-none transition-colors ${isActive ? 'bg-air-blue/10 ring-inset ring-2 ring-primary-navy/20' : 'hover:bg-slate-50'}`}
-                  onClick={() => { router.push(Routes.product(r.slug!)); handleClose() }}
+                  onClick={() => goToResult(r)}
                   onMouseEnter={() => setActiveIndex(idx)}
                 >
                   <div className="flex items-center gap-4">

@@ -8,6 +8,10 @@
  * JSON-LD'si tek-Product değil schema.org ProductGroup + hasVariant[] üretir.
  * Fiyatı NULL olan varyanta (Teklif Alın modeli) `offers` alanı HİÇ yazılmaz —
  * eski koddaki fiyatsız "0.00" beyanı (Merchant uyumsuzluğu) burada biter.
+ *
+ * W4b (T001-VH): `variant.price` ham `products.price` DEĞİL — `get_family_detail`
+ * RPC'si onu `display_price(products)` ile motor cache'inden türetir (INV-PRICE-1).
+ * Bu modülde ikinci bir fiyat hesabı yoktur; yalnız beyan edilip edilmeyeceğine karar verilir.
  */
 
 import type { FamilyListItem } from '../../types/ui-models'
@@ -46,7 +50,10 @@ export interface BuildProductGroupJsonLdParams {
  *   - productGroupID = family.slug
  *   - url = `${baseUrl}/${lang}/products/${family.slug}` (varyant URL'i YAZILMAZ)
  *   - hasVariant: her varyant için Product {name, sku, mpn, image?, offers?}
- *   - fiyatı NULL olan varyanta offers alanı HİÇ yazılmaz.
+ *   - fiyatı olmayan (NULL veya ≤ 0) varyanta offers alanı HİÇ yazılmaz.
+ *
+ * Fiyat eşiği vitrinin "Teklif Alın" eşiğiyle AYNIDIR: 0/negatif fiyat, fiyatı olmayan
+ * ürünün başka bir yazılışıdır — beyan edilirse arama sonucunda "0,00 ₺" görünür.
  */
 export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): Record<string, unknown> {
   const { family, variants, lang, baseUrl } = params
@@ -68,11 +75,13 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
       productNode.image = storagePathToUrl(imagePath)
     }
 
-    // Teklif Alın modeli: fiyat NULL ise offers alanı hiç yazılmaz (Merchant uyumsuzluğu önlenir).
-    if (variant.price != null) {
+    // Teklif Alın modeli: motor fiyatı yoksa (NULL/≤0) offers alanı hiç yazılmaz
+    // (Merchant uyumsuzluğu ve "0,00 ₺" beyanı önlenir).
+    const offerPrice = variant.price == null ? null : Number(variant.price)
+    if (offerPrice != null && Number.isFinite(offerPrice) && offerPrice > 0) {
       productNode.offers = {
         '@type': 'Offer',
-        price: variant.price.toFixed(2),
+        price: offerPrice.toFixed(2),
         priceCurrency: 'TRY',
         availability:
           (variant.stock_qty ?? 0) > 0

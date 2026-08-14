@@ -5,6 +5,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { resolveProductImageUrl } from '@/lib/images/productImage'
+import type { WithDisplayPrice } from '@/lib/services/displayPrice.service'
 import type { Product } from '@/types/ui-models'
 
 import { useCart } from '../hooks/useCartHook'
@@ -14,9 +15,20 @@ import { useI18n } from '../i18n/I18nProvider'
 import { BrandIcon } from './HVACIcons'
 import VentImage from './ui/VentImage'
 
+/**
+ * W4b · Kartın fiyat kaynağı MOTORDUR (`displayPrice`), ham `products.price` DEĞİL —
+ * o kolon Kademe-2'de emekli edildi (INV-PRICE-1, cetvel §1).
+ *
+ * Alanlar bilinçli olarak OPSİYONEL: fiyat köprüsü henüz bağlanmamış çağıranlar
+ * (ör. ana sayfa blokları) derlenmeye devam etsin, ama fiyat yerine "Teklif İste"
+ * göstersin. Yanlış fiyat göstermek, fiyat göstermemekten kötüdür.
+ */
+export type StorefrontProduct = Product &
+  Partial<Pick<WithDisplayPrice<Product>, 'displayPrice' | 'displayPriceTaxIncluded'>>
+
 interface ProductCardProps {
-  product: Product
-  onQuickView?: (product: Product) => void
+  product: StorefrontProduct
+  onQuickView?: (product: StorefrontProduct) => void
   highlightFeatured?: boolean
   layout?: 'grid' | 'list'
   priority?: boolean
@@ -35,7 +47,17 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
   const Routes = useLocalizedRoutes()
   const isList = layout === 'list'
   const { addToCart } = useCart()
-  const quoteMode = hidePrice || product.price == null || Number(product.price) <= 0
+
+  const displayPrice = product.displayPrice ?? null
+  const quoteMode = hidePrice || displayPrice == null || displayPrice <= 0
+
+  // KDV etiketi ARTIK SABİT DEĞİL: bireysel/anon BRÜT (KDV dahil), bayi/kurumsal NET görür.
+  // Semantik bilinmiyorsa (fiyat köprüsü bağlı değil) etiket HİÇ çizilmez — bayiye "KDV Dahil"
+  // demek, hiçbir şey dememekten kötüdür (net fiyatı brüt sanıp eksik teklif verir).
+  // Anahtarlar İKİ AYRI t() çağrısı: `t(cond ? 'a' : 'b')` biçimini INV-5 keycheck'i
+  // göremez, eksik anahtar sessizce ham-key render ederdi.
+  const taxIncluded = product.displayPriceTaxIncluded ?? null
+  const taxLabel = taxIncluded == null ? null : taxIncluded ? t('pdp.vatIncluded') : t('pdp.vatExcluded')
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -72,12 +94,12 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             <div className="mt-2 flex items-baseline gap-3">
               <div className="text-xl font-bold text-primary-navy">
                 {quoteMode ? (
-                  <span className="text-sm font-medium text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
+                  <span className="text-sm font-medium text-industrial-gray">{t('common.requestQuote')}</span>
                 ) : (
-                  formatCurrency(product.price ?? 0, lang, { maximumFractionDigits: 0 })
+                  formatCurrency(displayPrice ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })
                 )}
               </div>
-              {!quoteMode && <span className="text-xs text-steel-gray font-medium uppercase">{t('pdp.vatIncluded') || 'KDV Dahil'}</span>}
+              {!quoteMode && taxLabel && <span className="text-xs text-steel-gray font-medium uppercase">{taxLabel}</span>}
             </div>
           </div>
 
@@ -86,7 +108,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             disabled={quoteMode}
             aria-disabled={quoteMode}
             className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-11 h-11 rounded-xl bg-primary-navy text-white flex items-center justify-center hover:bg-secondary-blue transition-transform shadow-md active:scale-95 ml-4 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-navy"
-            title={quoteMode ? (t('common.requestQuote') || 'Teklif İste') : (t('common.addToCart') || 'Sepete Ekle')}
+            title={quoteMode ? t('common.requestQuote') : t('common.addToCart')}
           >
             <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v16m8-8H4" />
@@ -144,11 +166,15 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             <div className="flex flex-col">
               <div className="text-lg font-bold text-primary-navy tracking-tight">
                 {quoteMode ? (
-                  <span className="text-xs font-semibold text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
+                  <span className="text-xs font-semibold text-industrial-gray">{t('common.requestQuote')}</span>
                 ) : (
-                  formatCurrency(product.price ?? 0, lang, { maximumFractionDigits: 0 })
+                  formatCurrency(displayPrice ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })
                 )}
               </div>
+              {/* Izgara kartında KDV etiketi BİLİNÇLİ olarak yok: master'da da yoktu.
+                  Eklemek kart yüksekliğini fiyatlı/fiyatsız ürünlerde farklılaştırır —
+                  vitrin kart ritmi storefront-design-standard kapsamında, tek başına
+                  alınacak bir karar değil. */}
             </div>
 
             <button
@@ -156,7 +182,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
               disabled={quoteMode}
               aria-disabled={quoteMode}
               className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 w-9 h-9 rounded-lg bg-primary-navy text-white flex items-center justify-center transition-transform hover:bg-secondary-blue hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-navy"
-              title={quoteMode ? (t('common.requestQuote') || 'Teklif İste') : (t('common.addToCart') || 'Sepete Ekle')}
+              title={quoteMode ? t('common.requestQuote') : t('common.addToCart')}
             >
               <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v16m8-8H4" />

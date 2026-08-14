@@ -36,7 +36,25 @@
 - **Durum:** ✅ conformance kapandı (re-audit 36 dosya/34 temiz · INV-3D-1/2/5/7 canlı · BlueprintCanvas Suspense #396 · audit §0 reconciliation) + Wave3-6 + recipe (FlexibleDuct/DuctFan) + ProductModelRenderer rename hepsi master'da → 🟡 GÖRSEL: ışık v3 #399 (onay bekliyor) → sıradaki: (2) ürün çok-yakın framing · (3) per-model boyut normalizasyon · sonra materyal/post + ordu cila. Tam durum → memory `3d-visual-quality-phase`.
 
 ### Controller #3 — katalog/ticaret şeridi
-- **Aktif (2026-06-19) — FİYAT CETVELİ YAZILDI, Recep incelemesinde:** Bu şerit = ürün kataloğunu **doğru kategori + doğru fiyatla** doldurma (full ürün yüklemesinin ön-koşulları). Yürüten: ben (Controller) + Antigravity worker (ürün çıkarım). **İzole worktree'de çalışılır** (`docs/catalog-commerce-foundation` dalı) — paylaşılan ana dizin ikiz tarafından dal-değiştirildiğinden burada commit'lenmemiş iş kaybolur (yaşandı).
+- **⭐ AKTİF ŞU AN (2026-08-14, oturum `f68f03d8`) — FİYAT MOTORU (T001-VH) CANLIYA İNDİ, %70.**
+  Şerit dosyaları: `src/**` (servis/UI/sepet-checkout) + `supabase/migrations/2026081*_pricing*`.
+  **Dokunmuyorum:** `src/middleware.ts` (eş-controller rezervi) · `supabase/functions/**` (eş-controller şeridi).
+  - **Prod'a inen zincir (hepsi onaylı kapılardan geçti):** W0 kur defteri + TCMB cron + 348 ürün maliyet
+    backfill `#491` · W1 `pricing_rule` + `resolvePrice()` motoru `#492` · W2a cache kolonları + segment-farkındalıklı
+    R5 RLS + tek sözleşme `#495` · W2b-1 `order-validate` onarımı (hayalet kolon + segment) `#498` ·
+    W3 admin fiyat paneli 3 ekran `#501` · W4a materialize servisi + "yeniden hesapla" aksiyonu + cetvel v1.1 `#504`
+    (+ `#505` migration onarımı: `product_prices_unique` indeks değil KISITMIŞ) · W4b-1 vitrin SQL katmanı
+    `display_price` computed column + `get_display_prices` RPC `#507`.
+  - **Şu an açık PR:** W4b-2 vitrin/PDP/sepet bağlama (bu dal). Ham `products.price` müşteri yolundan
+    tamamen çıktı; `DomainProduct`'tan Omit'lendi (derleyici zorlayıcı). INV-PRICE-1 bekçisi canlı.
+  - **Cetvel v1.1** (`pricing-standard.md`): "elimizde alış maliyeti var" varsayımı ÇÜRÜDÜ — DB'deki EUR rakam
+    AVenS Katalog 2026.1'in **liste/satış** fiyatı. Bugünkü kurulum: global kural **marj %0** = katalog fiyatı + KDV.
+    Gerçek marj, alış maliyeti geldiğinde (**T010 satınalma**) anlam kazanır.
+  - **Sıradaki:** seed (348 ürün × 3 segment, prod-yazım kapısı) → W2b-2 sipariş satırı snapshot'ları
+    (peer'ın checkout hotfix'i indi, blokaj kalktı) → W5 para birimi çapası + fiyat dondurma.
+  - **Registry:** `T001-VH` artık gerçeği söylüyor (%70, sahibi `controller-pricing`). Diğer 17 emir hâlâ
+    yanlış durumda — çok-oturumlu bağlantı modeli (kira + yol rezervasyonu + olay günlüğü) bu PR'dan sonra kurulacak.
+- **Önceki (2026-06-19) — FİYAT CETVELİ YAZILDI, Recep incelemesinde:** Bu şerit = ürün kataloğunu **doğru kategori + doğru fiyatla** doldurma (full ürün yüklemesinin ön-koşulları). Yürüten: ben (Controller) + Antigravity worker (ürün çıkarım). **İzole worktree'de çalışılır** (`docs/catalog-commerce-foundation` dalı) — paylaşılan ana dizin ikiz tarafından dal-değiştirildiğinden burada commit'lenmemiş iş kaybolur (yaşandı).
 - **Yapıldı:** boş kategori gizleme `#435` (`get_category_counts` RPC + CategoryContext tek-nokta filtre, SaaS-uyumlu) · ürün kategorizasyon düzeltme `#436` (67 `category_id=alt` normalize + 12 orphan; prod'a uygulandı; 0 tutarsızlık) · Avensair NLM defteri **24/24** (web kataloğuyla doğrulandı) · kategori cetveli `category-taxonomy-standard.md` v1.1 · **fiyat cetveli `pricing-standard.md` v1.0** (3 paralel araştırma ajanı: Odoo/SAP/Salesforce CPQ + çoklu-para/KDV + canlı yer-gerçeği).
 - **ZORUNLU SIRA (her biri öncekine BAĞIMLI — bu yüzden ürün yükleme EN SONDA):**
   1. **Taksonomi** Avensair'e oturt (hâlâ Vortice-şekilli) + TR render doğrula + HRV slug + çatı-fan böl

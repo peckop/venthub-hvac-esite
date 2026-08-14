@@ -68,6 +68,12 @@ export interface FamilyDetail {
     meta_description: { tr?: string | null; en?: string | null } | null
   }
   variants: FamilyVariant[]
+  /**
+   * W4b: gösterilen fiyatların KDV semantiği. Bireysel/anon brüt (KDV dahil), bayi/kurumsal
+   * net görür — etiket buna göre çizilir. RPC kök düzeyinde döndürür; alan taşınmazsa PDP
+   * fiyatının KDV durumu hakkında hiçbir bilgi kalmaz (regresyon).
+   */
+  price_tax_included: boolean | null
 }
 
 /**
@@ -81,7 +87,8 @@ function parseFamilyDetail(data: unknown): FamilyDetail | null {
   const family = obj.family
   const variants = obj.variants
   if (typeof family !== 'object' || family === null || !Array.isArray(variants)) return null
-  return { family, variants } as FamilyDetail
+  const taxIncluded = typeof obj.price_tax_included === 'boolean' ? obj.price_tax_included : null
+  return { family, variants, price_tax_included: taxIncluded } as FamilyDetail
 }
 
 export async function getFamilyDetail(

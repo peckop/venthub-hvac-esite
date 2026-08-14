@@ -22,7 +22,9 @@ const getProductSchema = (t: (key: string) => string) => z.object({
     model_code: z.string().optional(),
     category_id: z.string().min(1, t('admin.products.errors.categoryRequired')),
     status: z.enum(['active', 'out_of_stock', 'inactive']),
-    price: z.number().min(0),
+    // W4b: `price` alanı BİLİNÇLİ olarak yok. Satış fiyatını artık fiyat motoru üretiyor
+    // (/admin/pricing → marj kuralı → product_prices cache). Buraya elle yazılan bir sayıyı
+    // vitrin OKUMUYOR; formda tutmak "fiyatı değiştirdim ama değişmedi" tuzağı olurdu.
     purchase_price: z.number().optional(),
     stock_qty: z.number().min(0),
     low_stock_threshold: z.number().min(0),
@@ -54,8 +56,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
         defaultValues: {
             status: 'active',
             stock_qty: 0,
-            low_stock_threshold: 5,
-            price: 0
+            low_stock_threshold: 5
         }
     })
 
@@ -72,7 +73,6 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                 model_code: product.model_code || '',
                 category_id: product.category_id || '',
                 status: (product.status as 'active' | 'out_of_stock' | 'inactive') || 'active',
-                price: Number(product.price) || 0,
                 purchase_price: Number(product.purchase_price) || 0,
                 stock_qty: product.stock_qty || 0,
                 low_stock_threshold: product.low_stock_threshold || 5,
@@ -114,8 +114,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
             reset({
                 status: 'active',
                 stock_qty: 0,
-                low_stock_threshold: 5,
-                price: 0
+                low_stock_threshold: 5
             })
             // Modal parent'ta kosulsuz render edilir (unmount olmaz) — onceki
             // urunun EN cevirisi state'te kalip yeni urune sizmasin.
@@ -204,10 +203,6 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                                     <option value="out_of_stock">{t('admin.products.form.outOfStock')}</option>
                                     <option value="inactive">{t('admin.common.passive')}</option>
                                 </select>
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-xs font-bold text-slate-500 uppercase">{t('admin.products.form.price')}</label>
-                                <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="w-full px-4 py-2 border rounded-lg focus-visible:outline-none" />
                             </div>
                         </div>
 
