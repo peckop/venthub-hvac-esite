@@ -190,5 +190,42 @@ export const pricing = {
     },
   },
   preview: {
+    subtitle: "Shows the pricing engine's result and winning rule for the selected product, segment, currency and quantity.",
+    resolving: "Calculating...",
+    noCostHint: "This product's base cost (cost_in_base) has not been calculated yet — only fixed-price rules can price it.",
+    loadFailed: "Failed to load the product",
+    product: {
+      label: "Product",
+      searchPlaceholder: "Search by product name or SKU...",
+      searchEmpty: "No matching product found.",
+      clear: "Clear selection",
+    },
+    context: {
+      segmentLabel: "Segment",
+      currencyLabel: "Currency",
+      quantityLabel: "Quantity",
+    },
+    empty: {
+      title: "Select a product to preview",
+      description: "Once you pick a product from the search box above, the cost, result and calculation trace will appear here.",
+    },
+    cost: {
+      title: "Cost",
+      purchasePrice: "Purchase price",
+      exchangeRate: "Base rate",
+      costInBase: "Base cost (TRY)",
+    },
+    result: {
+      title: "Result",
+      net: "Net",
+      gross: "Gross (VAT included)",
+      vatRate: "VAT rate",
+      winningRule: "Winning rule",
+      viewRule: "View rule",
+    },
+    trace: {
+      title: "Calculation trace",
+      empty: "No trace was produced for this resolution.",
+    },
   },
 }

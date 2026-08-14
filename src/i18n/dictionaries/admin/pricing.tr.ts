@@ -190,5 +190,42 @@ export const pricing = {
     },
   },
   preview: {
+    subtitle: "Seçili ürün için segment, para birimi ve adede göre fiyat motorunun ürettiği sonucu ve kazanan kuralı gösterir.",
+    resolving: "Hesaplanıyor...",
+    noCostHint: "Bu ürünün baz maliyeti (cost_in_base) henüz hesaplanmamış — yalnızca sabit fiyatlı kurallar fiyatlayabilir.",
+    loadFailed: "Ürün bilgisi yüklenemedi",
+    product: {
+      label: "Ürün",
+      searchPlaceholder: "Ürün adı veya SKU ile arayın...",
+      searchEmpty: "Eşleşen ürün bulunamadı.",
+      clear: "Seçimi temizle",
+    },
+    context: {
+      segmentLabel: "Segment",
+      currencyLabel: "Para birimi",
+      quantityLabel: "Adet",
+    },
+    empty: {
+      title: "Önizlemek için bir ürün seçin",
+      description: "Yukarıdaki arama kutusundan bir ürün seçtiğinizde maliyet, sonuç ve hesaplama izi burada görünecek.",
+    },
+    cost: {
+      title: "Maliyet",
+      purchasePrice: "Alış fiyatı",
+      exchangeRate: "Baz kur",
+      costInBase: "Baz maliyet (TRY)",
+    },
+    result: {
+      title: "Sonuç",
+      net: "Net",
+      gross: "Brüt (KDV dahil)",
+      vatRate: "KDV oranı",
+      winningRule: "Kazanan kural",
+      viewRule: "Kuralı görüntüle",
+    },
+    trace: {
+      title: "Hesaplama izi",
+      empty: "Bu çözümleme için iz üretilmedi.",
+    },
   },
 }
