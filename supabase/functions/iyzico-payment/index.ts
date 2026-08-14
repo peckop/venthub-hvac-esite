@@ -582,7 +582,7 @@ Deno.serve(async (req: Request) => {
             }
 
             return new Response(JSON.stringify({
-                _data: {
+                data: {
                     status: 'success',
                     orderId: dbOrderId,
                     orderNumber: orderId,
