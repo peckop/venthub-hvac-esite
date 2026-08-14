@@ -51,4 +51,64 @@ test.describe('admin runtime smoke', () => {
       { timeout: 20_000 },
     )
   })
+
+  /**
+   * Edge yetki-zinciri smoke — 2026-08-14 (T018 W1).
+   *
+   * Yukarıdaki test admin'in AÇILDIĞINI ölçer ama hiçbir edge fonksiyonu ÇAĞIRMAZ.
+   * W1'de 17 edge fonksiyonu deploy edildi; ikisi kritik biçimde değişti:
+   *   - geçit: verify_jwt false→true (anonim erişim kapandı)
+   *   - gövde: rol sorgusuna `.eq('tenant_id', ...)` filtresi eklendi
+   * İkincisi yanlışsa admin'in rolü BULUNAMAZ ve panel 403 alır — statik kapıların
+   * hiçbiri (tsc/lint/build/INV) bunu göremez, çünkü sorun canlı JWT'nin claim'lerinde.
+   *
+   * PROD'A YAZMADAN kanıtlama: fonksiyonun kontrol sırası
+   *   401 (token yok/geçersiz) → 403 (rol yetersiz) → 400 missing_fields
+   * Boş gövde `{}` gönderiyoruz. **400 almak, geçidin VE rol kapısının geçildiğini
+   * kanıtlar** — fonksiyon DB mutasyonuna hiç ulaşmaz. 401/403 alırsak zincir kırık.
+   */
+  test('edge yetki zinciri: gerçek admin oturumu geçit + rol kapısını geçiyor', async ({ page }) => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    test.skip(!supabaseUrl || !anonKey, 'NEXT_PUBLIC_SUPABASE_URL / ANON_KEY gerekli.')
+
+    await page.goto('/tr/auth/login')
+    await page.fill('input[name="email"]', EMAIL as string)
+    await page.fill('input[name="password"]', PASSWORD as string)
+    await page.click('button[type="submit"]')
+    await page.waitForURL((u) => !u.pathname.includes('/auth/login'), { timeout: 25_000 })
+
+    // Çağrıyı SAYFA İÇİNDEN yap: gerçek oturum token'ı + gerçek cross-origin CORS.
+    const result = await page.evaluate(
+      async ({ url, key }) => {
+        // supabase-js oturumu localStorage'da `sb-<ref>-auth-token` altında tutar.
+        const storageKey = Object.keys(localStorage).find(
+          (k) => k.startsWith('sb-') && k.endsWith('-auth-token'),
+        )
+        if (!storageKey) return { status: -1, body: 'oturum localStorage\'da bulunamadı' }
+        const token = JSON.parse(localStorage.getItem(storageKey) as string)?.access_token
+        if (!token) return { status: -2, body: 'access_token yok' }
+
+        const resp = await fetch(`${url}/functions/v1/admin-update-shipping`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            apikey: key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({}), // BİLEREK boş — mutasyona ulaşmadan doğrulamada durur
+        })
+        return { status: resp.status, body: (await resp.text()).slice(0, 200) }
+      },
+      { url: supabaseUrl as string, key: anonKey as string },
+    )
+
+    expect(
+      result.status,
+      `Beklenen 400 (missing_fields = auth geçti). Alınan ${result.status}: ${result.body}\n` +
+        '401 → geçit reddetti (verify_jwt / token).\n' +
+        '403 → rol kapısı reddetti (tenant-scoped user_profiles sorgusu adminleri bulamıyor).\n' +
+        '-1/-2 → oturum kurulmamış (login akışı bozuk).',
+    ).toBe(400)
+  })
 })
