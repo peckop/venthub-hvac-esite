@@ -6,7 +6,7 @@ source_path: C:\Users\alize\venthub-hvac\src\types\database.types.ts
 skeleton_hash: 067e4acdd662f151
 entity_hashes:
   overview: ce3fb4ce44f2949f
-generated_at: 2026-08-13T19:37:07Z
+generated_at: 2026-08-14T07:20:04Z
 ---
 
 ## Genel Bakış
