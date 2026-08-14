@@ -31,6 +31,7 @@ describe('DI Signature compliance static analysis', () => {
       interface ExportedFunctionInfo {
         name: string
         parameters: ts.NodeArray<ts.ParameterDeclaration>
+        text: string
       }
 
       const exportedFunctions: ExportedFunctionInfo[] = []
@@ -42,7 +43,7 @@ describe('DI Signature compliance static analysis', () => {
           )
           if (isExported) {
             const funcName = node.name ? node.name.text : 'anonymous'
-            exportedFunctions.push({ name: funcName, parameters: node.parameters })
+            exportedFunctions.push({ name: funcName, parameters: node.parameters, text: node.getText(sourceFile) })
           }
         } else if (ts.isVariableStatement(node)) {
           const isExported = node.modifiers?.some(
@@ -57,7 +58,8 @@ describe('DI Signature compliance static analysis', () => {
                 const funcName = decl.name.getText(sourceFile)
                 exportedFunctions.push({
                   name: funcName,
-                  parameters: decl.initializer.parameters
+                  parameters: decl.initializer.parameters,
+                  text: decl.initializer.getText(sourceFile)
                 })
               }
             })
@@ -68,13 +70,40 @@ describe('DI Signature compliance static analysis', () => {
 
       visit(sourceFile)
 
+      // DI kuralının AMACI: servis fonksiyonları kendi Supabase client'ını YARATMASIN,
+      // client çağırandan enjekte edilsin. Supabase'e hiç dokunmayan SAF yardımcılar bu
+      // amacın dışındadır — onlara kullanılmayan bir `supabase` parametresi eklemek kuralı
+      // güçlendirmez, sadece imzayı yalanlar. Bu yüzden muafiyet ADLA verilir (desenle değil):
+      // yeni bir ad eklemek bilinçli bir karar olmalı ve saflığı doğrulanmalıdır.
+      // NOT: mimari olarak daha temizi bu saf yardımcıları `lib/services/` dışına taşımaktır;
+      // bu, fiyat motoru şeridinin kararı (dosya o şeritte aktif).
+      const PURE_HELPERS_EXEMPT: Record<string, string[]> = {
+        'pricing.service.ts': [
+          'getUserPriceSegment',   // user.app_metadata → segment
+          'ruleMatchesProduct',    // (rule, product, ancestors) → boolean
+          'sortRules',             // kural dizisini sıralar
+          'computePriceFromRule',  // saf aritmetik: maliyet + kural → net/brüt
+        ],
+      }
+      const exempt = new Set(PURE_HELPERS_EXEMPT[file] ?? [])
+
       // Ensure we found at least one exported function to make the test meaningful
       expect(
         exportedFunctions.length,
         `Expected to find at least one exported function in ${file}`
       ).toBeGreaterThan(0)
 
-      exportedFunctions.forEach(({ name, parameters }) => {
+      exportedFunctions.forEach(({ name, parameters, text }) => {
+        if (exempt.has(name)) {
+          // Muafiyet KENDİNİ DENETLER: saf olduğu iddia edilen fonksiyon gövdesinde
+          // supabase geçiyorsa muafiyet geçersizdir — listeye ekleyerek gerçek bir
+          // DI ihlali gizlenemez.
+          expect(
+            /supabase/i.test(text),
+            `'${name}' in '${file}' is exempt as a PURE helper but references supabase — remove the exemption or inject the client`
+          ).toBe(false)
+          return
+        }
         expect(
           parameters.length,
           `Exported function '${name}' in '${file}' must have at least one parameter (supabase)`

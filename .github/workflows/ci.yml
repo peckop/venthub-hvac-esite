@@ -14,6 +14,13 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # KRİTİK: GitHub Actions'ın örtük varsayılanı `bash -e` — pipefail YOK.
+    # Adımlar `... 2>&1 | tee X.log` şeklinde olduğu için exit kodu tee'den geliyordu
+    # (her zaman 0) → Lint/Type check/Test/Build/Deno check adımlarının HİÇBİRİ
+    # bloklamıyordu. Açık `shell: bash` pipefail'i devreye alır ve kapıları gerçek yapar.
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,14 +54,20 @@ jobs:
       # Edge Functions (Deno) Next.js tsc kapsamı DIŞINDA — tsconfig supabase/'i hariç tutar.
       # Bu adım 2026-05'te maskesiz kalan edge bozulmasını (T011) yakalamak için eklendi: kalıcı kapı.
       - name: Deno check (edge functions — kapı-körlüğü guard)
-        run: deno check --node-modules-dir=auto supabase/functions/*/index.ts 2>&1 | tee ci-deno.log
+        # --node-modules-dir=none ŞART: `auto` node_modules/.deno/ yaratıp pnpm ağacını kirletiyor
+        # (undici@8.10.0 oradan çözülüp jsdom'u kırıyordu → adversarial.test.ts çöküyordu).
+        # Bu regresyon #494'te girdi ama CI o zaman pipefail'siz olduğu için görünmedi.
+        run: deno check --node-modules-dir=none supabase/functions/*/index.ts 2>&1 | tee ci-deno.log
 
       # deno check TİP hatalarını yakalar ama saf string-literal mangling'i (PostgREST/RPC param,
       # searchParams key, mangled method çağrısı) GÖREMEZ — T011'de bu sınıf iki kez kaçtı.
       # Bu guard bozulma imzasını doğrudan tarar (unambiguous underscore-prefix desenleri).
       - name: Edge mangle-guard (string-literal — deno check göremez)
         run: |
-          hits=$(grep -rnE '\._[a-z]+\(|_text/(html|plain)|[?&]_(limit|count|offset|order|select)=|\.get\('"'"'_[a-z]|\b_p_id\b|grou_p' supabase/functions --include='*.ts' || true)
+          # NOT: son iki sınıf sonradan eklendi — `_data:`/`_text:` gibi mangled OBJE ANAHTARLARI
+          # ilk guard'ın kör noktasıydı ve checkout'u kırık bıraktı (frontend `data.data` bekliyordu).
+          # `_productId` bilinçli/tutarlı bir isimlendirme (gönderen+alan aynı) → allowlist.
+          hits=$(grep -rnE '\._[a-z]+\(|_text/(html|plain)|[?&]_(limit|count|offset|order|select)=|\.get\('"'"'_[a-z]|\b_p_id\b|grou_p|([{,]|^)\s*_[a-z][a-zA-Z_]*:' supabase/functions --include='*.ts' | grep -vE '_productId' | grep -vE ':[0-9]+:\s*(export )?(async )?function ' || true)
           if [ -n "$hits" ]; then echo "::error::Edge string-mangle deseni saptandi (T011 bozulma sinifi):"; echo "$hits"; exit 1; fi
 
       # Sabit-kodlu DB bağlantı dizesi (şifreli) tekrar commit'lenmesin — kredensiyeller env'den.

@@ -26,6 +26,12 @@ export default defineConfig({
         inline: [/supabase\/functions/],
       },
     },
+    // `tests/e2e/empirical_*` CANLI veritabanına bağlanır: repo kökündeki `.env`i
+    // fs.readFileSync ile okuyup DATABASE_URL'den doğrudan pg bağlantısı açarlar.
+    // CI'da `.env` yoktur → ENOENT. Birim/bileşen paketinin parçası değiller;
+    // yerelde elle koşulacak ampirik DB denetimleridir:
+    //   pnpm vitest run tests/e2e/empirical_db.test.ts   (repo kökünde .env varken)
+    exclude: ['**/node_modules/**', '**/dist/**', 'tests/e2e/empirical_*.test.ts'],
     // Use threads pool (default) for better stability on Windows/CI
     pool: 'threads',
     testTimeout: 20000,

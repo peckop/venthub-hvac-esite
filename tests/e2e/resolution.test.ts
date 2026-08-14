@@ -98,6 +98,9 @@ async function resolutionMiddleware(req: NextRequest): Promise<NextResponse> {
 describe('Tenant Resolution E2E Suite (10 Test Cases)', () => {
   beforeEach(() => {
     vi.stubEnv('NODE_ENV', 'production')
+  // middleware fail-closed: bu sir yoksa /admin reddedilir (anon key fallback'i kaldirildi).
+  // Uretimde tanimlidir; testler gercek uretim yolunu kossun diye kurulur.
+  vi.stubEnv('JWT_CLAIMS_COOKIE_SECRET', 'test-claims-cache-secret')
   })
 
   afterEach(() => {

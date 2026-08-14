@@ -249,7 +249,7 @@ async function sendEmail(to: string, message: string, template?: string, _data?:
       from,
       to: [to],
       subject: subject,
-      _text: finalMessage,
+      text: finalMessage,
       html: `<p>${finalMessage.replace(/\n/g, '<br>')}</p>`,
     }),
   })
