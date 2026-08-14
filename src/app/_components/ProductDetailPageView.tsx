@@ -62,11 +62,24 @@ import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
  *
  * Sepet/PDF/proje gibi EYLEMLER tam `Product` satırına ihtiyaç duyar; bu satır
  * seçili varyant için tembel (lazy) çekilir — GÖRÜNÜM asla ona bağlı değildir.
+ *
+ * W4b: varyantın `price` alanı RPC tarafında `display_price(products)` ile üretilir
+ * (motor fiyatı, INV-PRICE-1) — ham `products.price` DEĞİL. KDV etiketi de sabit değil,
+ * aynı RPC'nin kök alanı `price_tax_included` üzerinden gelir.
  */
 
 export interface ProductDetailPageProps {
   family: FamilyDetail['family'] | null
   variants: FamilyVariant[]
+  /**
+   * W4b · Gösterilen fiyatların KDV semantiği — `get_family_detail` KÖK düzeyindeki
+   * `price_tax_included` (bireysel/anon BRÜT = true, bayi/kurumsal NET = false).
+   *
+   * OPSİYONEL: köprü henüz `family.service.ts` → `page.tsx` hattında bağlı değil
+   * (ORTAK DOSYALAR — bu izde değiştirilmedi, bkz. notes). Bağlanana dek `null` gelir
+   * ve KDV etiketi HİÇ çizilmez; yanlış etiket, eksik etiketten kötüdür.
+   */
+  priceTaxIncluded?: boolean | null
 }
 
 interface ProductDetailBodyProps extends ProductDetailPageProps {
@@ -82,7 +95,12 @@ function pickLang(value: LocalizedText, lang: string): string | null {
   return preferred || value.tr || value.en || null
 }
 
-const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants, selectedSku: skuParam }) => {
+const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
+  family,
+  variants,
+  selectedSku: skuParam,
+  priceTaxIncluded = null,
+}) => {
   const { t, lang } = useI18n()
   const router = useRouter()
   const pathname = usePathname()
@@ -123,11 +141,19 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants,
 
   // Fiyatı olmayan varyant (null/0) "Teklif Alın" moduna düşer; kategori bazlı
   // hide_price bayrağı da aynı moda düşürür. quoteMode'da sepete-ekle HİÇ render edilmez.
+  // NOT: `selectedVariant.price` motor fiyatıdır (RPC'de display_price) — ham kolon değil.
   const quoteMode =
     Boolean((mainCategory?.metadata as CategoryMetadata | null)?.hide_price) ||
     selectedVariant == null ||
     selectedVariant.price == null ||
     Number(selectedVariant.price) <= 0
+
+  // W4b: KDV etiketi segmentten türer — sabit "KDV Dahil" varsayımı kaldırıldı.
+  // Bilinmiyorsa (köprü bağlı değil) etiket hiç çizilmez; bayiye NET fiyatı "KDV Dahil"
+  // diye sunmak eksik teklife yol açar. Anahtarlar İKİ AYRI t() çağrısı — tek çağrıda
+  // ternary anahtar yazılsaydı INV-5 keycheck'i eksik anahtarı göremezdi.
+  const priceTaxLabel =
+    priceTaxIncluded == null ? null : priceTaxIncluded ? t('pdp.vatIncluded') : t('pdp.vatExcluded')
 
   const toggleSpecSection = (sectionKey: string) => {
     setOpenSpecSections(prev =>
@@ -455,6 +481,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants,
                   selectedSku={selectedVariant.sku}
                   onSelect={handleSelectVariant}
                   quoteMode={quoteMode}
+                  priceTaxIncluded={priceTaxIncluded}
                 />
               </div>
             )}
@@ -485,12 +512,12 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants,
                       {quoteMode ? (
                         <span className="text-xl text-industrial-gray font-bold">{t('pdp.techQuote')}</span>
                       ) : (
-                        formatCurrency(Number(selectedVariant.price ?? 0), lang, { maximumFractionDigits: 0 })
+                        formatCurrency(Number(selectedVariant.price ?? 0), lang, { currency: 'TRY', maximumFractionDigits: 0 })
                       )}
                     </div>
-                    {!quoteMode && (
+                    {!quoteMode && priceTaxLabel && (
                       <span className="text-xs font-bold text-steel-gray uppercase mt-1">
-                        {t('pdp.vatIncluded')}
+                        {priceTaxLabel}
                       </span>
                     )}
                   </div>
@@ -657,7 +684,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants,
               <div className="flex flex-col items-end mr-2">
                 <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px uppercase tracking-tight">{family.name}</span>
                 <span className="text-xs text-primary-navy font-black tracking-widest">
-                  {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { maximumFractionDigits: 0 })}
+                  {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                 </span>
               </div>
 
@@ -740,7 +767,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants,
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
                               <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal">{t('common.listingPrice')}</span>
                               <span className="text-lg font-black text-primary-navy">
-                                {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { maximumFractionDigits: 0 })}
+                                {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                               </span>
                             </div>
                           </div>
@@ -757,6 +784,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({ family, variants,
                           selectedSku={selectedVariant.sku}
                           onSelect={handleSelectVariant}
                           quoteMode={quoteMode}
+                          priceTaxIncluded={priceTaxIncluded}
                         />
                       ) : (
                         <p className="text-steel-gray italic font-medium py-10 text-center text-xs uppercase tracking-widest">

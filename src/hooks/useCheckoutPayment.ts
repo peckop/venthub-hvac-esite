@@ -20,7 +20,7 @@ interface UseCheckoutPaymentProps {
   getCartTotal: () => number
   user: User | null
   clearCart: (options?: { silent: boolean }) => void
-  applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void
+  applyServerPricing: (items: { product_id: string, unit_price: number | null }[]) => void
   orchestrator: {
     customerInfo: CheckoutCustomerInfo
     shippingAddress: CheckoutAddressInfo
@@ -141,8 +141,15 @@ export const useCheckoutPayment = ({
       }
       throw new Error('Ödeme başlatılamadı.')
     } catch (err: unknown) {
+      // W4b: bazı hatalar (ör. fiyatsız kalemle ödeme denemesi) makine kodu taşır
+      // (`CART_ITEM_PRICE_MISSING: <uuid>`). Onu kullanıcıya olduğu gibi göstermek yerine
+      // hatanın taşıdığı i18n anahtarı çözülür — CLAUDE.md §7.
+      const i18nKey =
+        err !== null && typeof err === 'object' && 'i18nKey' in err
+          ? String((err as { i18nKey: unknown }).i18nKey)
+          : null
       const msg = err instanceof Error ? err.message : String(err)
-      toast.error(msg || t('checkout.errors.paymentInit'))
+      toast.error(i18nKey ? t(i18nKey) : (msg || t('checkout.errors.paymentInit')))
       return false
     } finally {
       setLoading(false)

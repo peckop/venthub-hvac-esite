@@ -35,6 +35,13 @@ export interface VariantSelectorProps {
   onSelect: (sku: string) => void
   /** Fiyat gösterimi kapalıysa (Teklif Alın modeli) fiyat kolonu "Teklif" yazar. */
   quoteMode: boolean
+  /**
+   * W4b · Gösterilen varyant fiyatlarının KDV semantiği — `get_family_detail` KÖK
+   * düzeyindeki `price_tax_included`. Bireysel/anon BRÜT (KDV dahil), bayi/kurumsal NET.
+   * `null`/verilmemiş = bilinmiyor → fiyat kolonu etiketsiz kalır (yanlış etiket yerine
+   * hiç etiket). Sabit "KDV Dahil" varsayımı W4b'de kaldırıldı.
+   */
+  priceTaxIncluded?: boolean | null
 }
 
 function variantLabel(v: FamilyVariant): string {
@@ -72,6 +79,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
   selectedSku,
   onSelect,
   quoteMode,
+  priceTaxIncluded = null,
 }) => {
   const { t, lang } = useI18n()
   const [query, setQuery] = useState('')
@@ -98,10 +106,19 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
 
   if (total <= 1) return null
 
+  // W4b: `v.price` RPC'den gelen MOTOR fiyatıdır (display_price) — ham products.price DEĞİL.
   const priceCell = (v: FamilyVariant) =>
     quoteMode || v.price == null || Number(v.price) <= 0
       ? t('pdp.variant.quote')
-      : formatCurrency(Number(v.price), lang, { maximumFractionDigits: 0 })
+      : formatCurrency(Number(v.price), lang, { currency: 'TRY', maximumFractionDigits: 0 })
+
+  // Fiyat kolonu başlığı KDV semantiğini taşır (bilinmiyorsa sade "Fiyat" kalır).
+  // Anahtarlar İKİ AYRI t() çağrısı — `t(cond ? 'a' : 'b')` biçimini INV-5 keycheck'i görmez.
+  const taxSuffix =
+    priceTaxIncluded == null ? null : priceTaxIncluded ? t('pdp.vatIncluded') : t('pdp.vatExcluded')
+  const priceColumnLabel = taxSuffix
+    ? `${t('pdp.variant.colPrice')} ${taxSuffix}`
+    : t('pdp.variant.colPrice')
 
   return (
     <div className="bg-white rounded-2xl border border-light-gray p-5">
@@ -229,7 +246,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                 </span>
               ))}
               <span className="text-xs font-black text-steel-gray uppercase tracking-widest text-right">
-                {t('pdp.variant.colPrice')}
+                {priceColumnLabel}
               </span>
             </div>
 

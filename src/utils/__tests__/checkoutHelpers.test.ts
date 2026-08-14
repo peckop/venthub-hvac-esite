@@ -4,46 +4,44 @@ import type { CartItem } from '@/types/cart'
 
 import { getPriceHashLocal } from '../checkoutHelpers'
 
-const createMockItem = (
-  id: string,
-  quantity: number,
-  productPrice: number,
-  unitPrice?: number
-): CartItem => ({
+/**
+ * W4b: fiyat artık üründen değil, sunucunun doğruladığı `unitPrice`tan gelir.
+ * Ham `product.price` fallback'i KALDIRILDI (emekli alan); fiyatı bilinmeyen kalem
+ * hash'te `null` taşır ki "fiyat yok" ile "0 TL" birbirine karışmasın.
+ */
+const createMockItem = (id: string, quantity: number, unitPrice?: number): CartItem => ({
   id,
   quantity,
-  product: { price: productPrice } as Partial<CartItem['product']> as CartItem['product'],
+  product: { id: `p-${id}`, name: 'Test' } as Partial<CartItem['product']> as CartItem['product'],
   unitPrice
 })
 
 describe('getPriceHashLocal', () => {
-  it('should return an empty array string for an empty list', () => {
+  it('boş listede boş dizi döner', () => {
     expect(getPriceHashLocal([])).toBe('[]')
   })
 
-  it('should use unitPrice if provided, otherwise fallback to product.price', () => {
+  it('unitPrice varsa onu kullanır; fiyatı olmayan kalem null taşır', () => {
     const items = [
-      createMockItem('item-1', 2, 100, 90), // Uses unitPrice 90
-      createMockItem('item-2', 1, 50)       // Uses product.price 50
+      createMockItem('item-1', 2, 90),
+      createMockItem('item-2', 1) // fiyat bekleniyor → null
     ]
 
-    const result = getPriceHashLocal(items)
-    const parsed = JSON.parse(result)
+    const parsed = JSON.parse(getPriceHashLocal(items))
 
     expect(parsed).toEqual([
       { id: 'item-1', qty: 2, unit: 90 },
-      { id: 'item-2', qty: 1, unit: 50 }
+      { id: 'item-2', qty: 1, unit: null }
     ])
   })
 
-  it('should handle decimal prices and apply rounding correctly', () => {
+  it('ondalıkları iki basamağa yuvarlar', () => {
     const items = [
-      createMockItem('item-1', 1, 10.121), // Rounds down to 10.12
-      createMockItem('item-2', 1, 20.999, 15.559) // Rounds up to 15.56
+      createMockItem('item-1', 1, 10.121), // 10.12
+      createMockItem('item-2', 1, 15.559)  // 15.56
     ]
 
-    const result = getPriceHashLocal(items)
-    const parsed = JSON.parse(result)
+    const parsed = JSON.parse(getPriceHashLocal(items))
 
     expect(parsed).toEqual([
       { id: 'item-1', qty: 1, unit: 10.12 },
@@ -51,15 +49,14 @@ describe('getPriceHashLocal', () => {
     ])
   })
 
-  it('should sort items by id', () => {
+  it('kalemleri id sırasına dizer', () => {
     const items = [
       createMockItem('z-item', 1, 100),
       createMockItem('a-item', 2, 50),
       createMockItem('m-item', 3, 75)
     ]
 
-    const result = getPriceHashLocal(items)
-    const parsed = JSON.parse(result)
+    const parsed = JSON.parse(getPriceHashLocal(items))
 
     expect(parsed).toEqual([
       { id: 'a-item', qty: 2, unit: 50 },
@@ -68,19 +65,18 @@ describe('getPriceHashLocal', () => {
     ])
   })
 
-  it('should handle two items with the same ID', () => {
+  it('aynı id ile iki kalemi ayrı ayrı korur', () => {
     const items = [
       createMockItem('dup-item', 1, 100),
-      createMockItem('dup-item', 3, 100, 90)
+      createMockItem('dup-item', 3, 90)
     ]
 
-    const result = getPriceHashLocal(items)
-    const parsed = JSON.parse(result)
+    const parsed = JSON.parse(getPriceHashLocal(items))
 
     expect(parsed).toHaveLength(2)
     expect(parsed[0].id).toBe('dup-item')
     expect(parsed[1].id).toBe('dup-item')
-    const units = parsed.map((p: { unit: number }) => p.unit)
+    const units = parsed.map((p: { unit: number | null }) => p.unit)
     expect(units).toContain(100)
     expect(units).toContain(90)
   })

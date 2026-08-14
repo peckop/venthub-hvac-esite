@@ -6,15 +6,18 @@ import React from 'react'
 import { formatCurrency } from '../../i18n/format'
 import { Lang } from '../../i18n/I18nContext'
 
+/**
+ * W4b: kalem fiyatı YALNIZ `unitPrice`tan okunur (sunucunun doğruladığı fiyat).
+ * Ham `product.price` alanı bilinçli olarak KALDIRILDI — o kolon Kademe-2'de emekli
+ * edildi ve ona düşmek özet ekranında 0 TL gösteriyordu. Fiyat yoksa "Teklif Alın".
+ */
 export interface OrderSummaryItem {
     id: string
     product: {
         name: string
-        image_url?: string | null
-        price: number | null
     }
     quantity: number
-    unitPrice?: number | string
+    unitPrice?: number
 }
 
 export interface OrderSummarySidebarProps {
@@ -52,7 +55,12 @@ const OrderSummarySidebar: React.FC<OrderSummarySidebarProps> = ({
 
             {/* Items */}
             <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
-                {items.map((item) => (
+                {items.map((item) => {
+                    // Fiyatı çözülemeyen kalem "Teklif Alın" gösterir — 0 TL YAZILMAZ.
+                    const unitPrice = typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice)
+                        ? item.unitPrice
+                        : null
+                    return (
                     <div key={item.id} className="flex items-center space-x-3">
                         <div className="w-12 h-12 bg-light-gray rounded-lg flex items-center justify-center">
                             <span className="text-xs text-steel-gray">{t('checkout.summaryThumb')}</span>
@@ -62,25 +70,30 @@ const OrderSummarySidebar: React.FC<OrderSummarySidebarProps> = ({
                                 {item.product.name}
                             </p>
                             <p className="text-xs text-steel-gray">
-                                {item.quantity} {t('orders.qtyCol')} x {formatCurrency(Number(item.unitPrice ?? parseFloat(String(item.product.price))), lang, { maximumFractionDigits: 0 })}
+                                {unitPrice === null
+                                    ? `${item.quantity} ${t('orders.qtyCol')}`
+                                    : `${item.quantity} ${t('orders.qtyCol')} x ${formatCurrency(unitPrice, lang, { currency: 'TRY', maximumFractionDigits: 0 })}`}
                             </p>
                         </div>
                         <div className="text-sm font-medium text-industrial-gray">
-                            {formatCurrency((Number(item.unitPrice ?? parseFloat(String(item.product.price))) * item.quantity), lang, { maximumFractionDigits: 0 })}
+                            {unitPrice === null
+                                ? t('common.requestQuote')
+                                : formatCurrency(unitPrice * item.quantity, lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                         </div>
                     </div>
-                ))}
+                    )
+                })}
             </div>
 
             {/* Totals */}
             <div className="space-y-2 mb-6">
                 <div className="flex justify-between text-steel-gray">
                     <span>{t('cart.subtotal')}</span>
-                    <span>{formatCurrency(totalAmount, lang, { maximumFractionDigits: 0 })}</span>
+                    <span>{formatCurrency(totalAmount, lang, { currency: 'TRY', maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className="flex justify-between text-steel-gray">
                     <span>{t('cart.vatIncluded')}</span>
-                    <span>{formatCurrency(vatAmount, lang, { maximumFractionDigits: 0 })}</span>
+                    <span>{formatCurrency(vatAmount, lang, { currency: 'TRY', maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className="flex justify-between text-steel-gray">
                     <span>{t('cart.shipping')}</span>
@@ -89,7 +102,7 @@ const OrderSummarySidebar: React.FC<OrderSummarySidebarProps> = ({
                 {couponApplied ? (
                     <div className="flex justify-between text-success-green">
                         <span>{t('checkout.couponDiscount', { code: couponApplied.code })}</span>
-                        <span>-{formatCurrency(couponApplied.discount, lang, { maximumFractionDigits: 0 })}</span>
+                        <span>-{formatCurrency(couponApplied.discount, lang, { currency: 'TRY', maximumFractionDigits: 0 })}</span>
                     </div>
                 ) : null}
                 <div className="mt-3 flex items-center gap-2">
@@ -113,7 +126,7 @@ const OrderSummarySidebar: React.FC<OrderSummarySidebarProps> = ({
                 <div className="flex justify-between text-lg font-semibold text-industrial-gray">
                     <span>{t('cart.total')}</span>
                     <span className="text-primary-navy">
-                        {formatCurrency(finalAmount, lang, { maximumFractionDigits: 0 })}
+                        {formatCurrency(finalAmount, lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                     </span>
                 </div>
             </div>

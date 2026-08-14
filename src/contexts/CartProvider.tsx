@@ -14,7 +14,11 @@ const CART_VERSION_KEY = 'venthub-cart-version'
 const CART_OWNER_KEY = 'venthub-cart-owner'
 // New: cart schema version key to invalidate stale carts across deployments
 const CART_SCHEMA_KEY = 'venthub-cart-schema'
-const CURRENT_CART_SCHEMA = '2'
+// W4b: 2 → 3. Sepet kaleminin fiyat semantiği değişti: unitPrice artık TEK fiyat kaynağı
+// (ham products.price fallback'i kaldırıldı). Eski anlık görüntülerde misafir kalemlerinin
+// unitPrice'ı hiç yoktu; taşınsalardı kalıcı olarak "Teklif Alın"da takılır ve ödemeye
+// geçemezlerdi. O sepetler zaten 0 ₺ gösteriyordu (products.price NULL) — bir kez temizlenir.
+const CURRENT_CART_SCHEMA = '3'
 
 import type { CartItem } from '@/types/cart'
 
@@ -197,21 +201,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         // If we cleared server due to post-order flag, also remove the flag now
         try { if (clearOnce) localStorage.removeItem('vh_clear_server_cart_once') } catch { }
-        // Compute unit prices for merged items and upsert server
+        // Compute unit prices for merged items and upsert server.
+        // W4b: motor fiyat veremezse unitPrice NULL yazılır — 0 TL yazmak sepeti sessizce bozardı.
         const priceInfoList = await Promise.all(
           merged.map(async (it) => {
+            // Fiyat çözümü ile sunucuya yazma AYRI tutulur: geçici bir yazma hatası,
+            // BAŞARIYLA çözülmüş fiyatın ekrana yansımasını engellememeli (kullanıcı
+            // bayat fiyat görmeye devam ederdi).
+            let info: Awaited<ReturnType<typeof getEffectivePriceInfo>>
             try {
-              const info = await getEffectivePriceInfo(supabase, it.product)
+              info = await getEffectivePriceInfo(supabase, it.product)
+            } catch (e) {
+              console.error('cart price resolve error', e)
+              return { _productId: it.product.id, resolved: false, unitPrice: undefined }
+            }
+            try {
               await upsertCartItem(supabase, { cartId: cart.id, _productId: it.product.id, quantity: it.quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
-              return { _productId: it.product.id, unitPrice: info.unitPrice }
             } catch (e) {
               console.error('cart upsert error', e)
-              return { _productId: it.product.id, unitPrice: undefined as number | undefined }
             }
+            return { _productId: it.product.id, resolved: true, unitPrice: info.unitPrice ?? undefined }
           })
         )
-        const unitMap = new Map<string, number | undefined>(priceInfoList.map(p => [p._productId, p.unitPrice]))
-        const mergedWithPrices = merged.map(it => ({ ...it, unitPrice: unitMap.get(it.product.id) ?? it.unitPrice }))
+        const unitMap = new Map<string, { resolved: boolean; unitPrice: number | undefined }>(
+          priceInfoList.map(p => [p._productId, { resolved: p.resolved, unitPrice: p.unitPrice }])
+        )
+        // Fiyat ÇÖZÜLDÜYSE sonucu (null dahil) uygula; çözülemediyse (ağ/servis hatası)
+        // yerel anlık görüntüyü koru — ama asla ham product.price'a düşme.
+        const mergedWithPrices = merged.map(it => {
+          const info = unitMap.get(it.product.id)
+          if (!info || !info.resolved) return it
+          return { ...it, unitPrice: info.unitPrice }
+        })
         setItems(mergedWithPrices)
 
         // Clear guest cart to avoid double-merge next time
@@ -288,23 +309,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     })
 
-    // If logged in, also sync to server (optimistic)
-    if (CART_SERVER_SYNC && user && serverCartId) {
-      // compute effective price and upsert optimistically, also reflect locally
-      Promise.all([
-        import('../lib/services/pricing.service'),
-        import('../lib/services/cart.service')
-      ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }]) => {
-        getEffectivePriceInfo(supabase, product)
-          .then(info => {
-            upsertCartItem(supabase, { cartId: serverCartId, _productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
-              .catch(err => console.error('server addToCart error', err))
-            // Update local snapshot unit price
-            setItems(curr => curr.map(it => it.product.id === product.id ? { ...it, unitPrice: info.unitPrice } : it))
-          })
-          .catch(err => console.error('server addToCart error', err))
-      }).catch(() => { })
-    }
+    // W4b: birim fiyat HER durumda çözülür — anonim kullanıcı da 'individual' segmentiyle
+    // public liste fiyatını görür (RLS kısıtlar). Önceden fiyat yalnız oturum açıkken
+    // hesaplanıyordu; ham products.price fallback'i kalktığı için misafir sepeti aksi hâlde
+    // tamamen fiyatsız ("Teklif Alın") kalırdı. Sunucuya YAZMAK yalnız oturum açıkken anlamlı.
+    import('../lib/services/pricing.service')
+      .then(({ getEffectivePriceInfo }) => getEffectivePriceInfo(supabase, product))
+      .then(info => {
+        // Update local snapshot unit price (fiyatlanamıyorsa undefined = "fiyat bekleniyor")
+        setItems(curr => curr.map(it => it.product.id === product.id ? { ...it, unitPrice: info.unitPrice ?? undefined } : it))
+
+        if (!CART_SERVER_SYNC || !user || !serverCartId) return
+        import('../lib/services/cart.service').then(({ upsertCartItem }) => {
+          upsertCartItem(supabase, { cartId: serverCartId, _productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
+            .catch(err => console.error('server addToCart error', err))
+        }).catch(() => { })
+      })
+      .catch(err => console.error('addToCart pricing error', err))
 
     // Dispatch a global event so UI can present a rich toast/modal
     try {
@@ -346,23 +367,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
       )
     )
 
-    if (CART_SERVER_SYNC && user && serverCartId) {
-      const product = items.find(i => i.product.id === _productId)?.product
-      if (product) {
-        Promise.all([
-          import('../lib/services/pricing.service'),
-          import('../lib/services/cart.service')
-        ]).then(([{ getEffectivePriceInfo }, { upsertCartItem }]) => {
-          getEffectivePriceInfo(supabase, product)
-            .then(info => {
-              upsertCartItem(supabase, { cartId: serverCartId, _productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
-                .catch(err => console.error('server updateQuantity error', err))
-              // Ensure local snapshot unit price is present
-              setItems(curr => curr.map(it => it.product.id === _productId ? { ...it, unitPrice: info.unitPrice } : it))
-            })
-            .catch(err => console.error('server updateQuantity error', err))
-        }).catch(() => { })
-      }
+    // Fiyat çözümü oturumdan bağımsız (bkz. addToCart); sunucuya yazım oturuma bağlı.
+    const product = items.find(i => i.product.id === _productId)?.product
+    if (product) {
+      import('../lib/services/pricing.service')
+        .then(({ getEffectivePriceInfo }) => getEffectivePriceInfo(supabase, product))
+        .then(info => {
+          // Ensure local snapshot unit price is present (fiyat yoksa undefined kalır)
+          setItems(curr => curr.map(it => it.product.id === _productId ? { ...it, unitPrice: info.unitPrice ?? undefined } : it))
+
+          if (!CART_SERVER_SYNC || !user || !serverCartId) return
+          import('../lib/services/cart.service').then(({ upsertCartItem }) => {
+            upsertCartItem(supabase, { cartId: serverCartId, _productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
+              .catch(err => console.error('server updateQuantity error', err))
+          }).catch(() => { })
+        })
+        .catch(err => console.error('updateQuantity pricing error', err))
     }
   }, [user, serverCartId, removeFromCart, items, supabase])
 
@@ -398,9 +418,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [user, serverCartId, supabase])
 
+  /**
+   * W4b: fiyatı BİLİNMEYEN kalem (unitPrice yok) toplama 0 olarak GİRMEZ — hiç girmez.
+   * Ham `products.price` fallback'i kaldırıldı; o kolon emekli (çoğunlukla NULL) ve
+   * ona düşmek "0 TL'lik ürün" yanılsaması üretiyordu. Toplam yalnız fiyatlı kalemleri
+   * kapsar; fiyatsız kalem vitrinde "Teklif Alın" olarak işaretlenir (bkz. CartPage).
+   */
   const cartTotal = useMemo(() => {
     return items.reduce((total, item) => {
-      const unit = typeof item.unitPrice === 'number' ? item.unitPrice : Number(item.product.price || 0)
+      const unit = item.unitPrice
+      if (typeof unit !== 'number' || !Number.isFinite(unit)) return total
       return total + unit * item.quantity
     }, 0)
   }, [items])
@@ -414,35 +441,41 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const getCartCount = useCallback(() => cartCount, [cartCount])
 
   // Sunucudan gelen birim fiyatları yerel sepete uygula ve (varsa) sunucu sepetine yaz
-  const applyServerPricing = useCallback((serverItems: { product_id: string, unit_price: number }[]) => {
+  const applyServerPricing = useCallback((serverItems: { product_id: string, unit_price: number | null }[]) => {
     if (!Array.isArray(serverItems) || serverItems.length === 0) return
 
     const to2 = (n: number) => Number(Number(n).toFixed(2))
     const nearlyEqual = (a: number, b: number) => Math.abs(to2(a) - to2(b)) <= 0.01
 
-    // Gelen veriyi normalize ederek bir harita oluştur (2 ondalık)
+    // W4b: SIFIR FİYAT KABUL EDİLMEZ. `Number(null)` = 0 ve sunucu bugün fiyatsız kalem için
+    // 0 dönebiliyor (order-validate'te ham products.price fallback'i hâlâ canlı). 0 "sonlu bir
+    // sayı" olduğu için eski kod onu geçerli fiyat sanıp yerele yazıyordu; sonuç: kalem
+    // "Teklif Alın" yerine ₺0 görünüyor, "Ödemeye Geç" yeniden açılıyor ve ödeme adımında
+    // patlıyordu. Yalnız POZİTİF fiyat kabul edilir; diğerleri "fiyat yok" olarak geçer.
     const pmap = new Map<string, number>()
     for (const it of serverItems) {
       const pid = String(it.product_id)
       const up = Number(it.unit_price)
-      if (Number.isFinite(up)) pmap.set(pid, to2(up))
+      if (Number.isFinite(up) && up > 0) pmap.set(pid, to2(up))
     }
 
-    // Hangi kalemlerin gerçekten değişeceğini önceden belirle (idempotent davranış için)
+    // Hangi kalemlerin gerçekten değişeceğini önceden belirle (idempotent davranış için).
+    // W4b: yerel fiyat YOKSA (undefined) ham product.price'a düşülmez — sunucunun verdiği
+    // fiyat her hâlükârda bir değişikliktir ("fiyat bekleniyor" → fiyatlı).
     const changedIds = new Set<string>()
     for (const it of items) {
       const nextUnit = pmap.get(it.product.id)
       if (nextUnit == null) continue
-      const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : Number(it.product.price || 0)
-      if (!nearlyEqual(currUnit, nextUnit)) changedIds.add(it.product.id)
+      const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : null
+      if (currUnit === null || !nearlyEqual(currUnit, nextUnit)) changedIds.add(it.product.id)
     }
 
     // Yerel güncelle (yalnızca değişen kalemlerde yeni referans üret)
     setItems(curr => curr.map(it => {
       const nextUnit = pmap.get(it.product.id)
       if (nextUnit == null) return it
-      const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : Number(it.product.price || 0)
-      if (nearlyEqual(currUnit, nextUnit)) return it
+      const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : null
+      if (currUnit !== null && nearlyEqual(currUnit, nextUnit)) return it
       return { ...it, unitPrice: nextUnit }
     }))
 

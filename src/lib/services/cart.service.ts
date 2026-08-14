@@ -4,6 +4,7 @@ import type { Database } from '../../types/database.types'
 import type { DbCartItem, DbProduct,DbShoppingCart } from '../../types/db-rows'
 import type { Product } from '../../types/ui-models'
 import { mapDatabaseProductToDomain } from '../type-converters'
+import { VARIANT_DETAIL_COLUMNS } from './product.columns'
 
 async function ensureUserProfile(supabase: SupabaseClient<Database>, userId: string): Promise<boolean> {
   try {
@@ -121,9 +122,12 @@ export async function listCartItemsWithProducts(
   if (items.length === 0) return []
   
   const _productIds = Array.from(new Set(items.map(i => i.product_id)))
+  // W4b: `select('*')` ham `price` kolonunu da çekiyordu — o alan emekli ve müşteri
+  // yolunda okunmamalı (INV-PRICE-1). Kolon SSOT'una bağlandı; yıldız seçim, bekçinin
+  // göremediği sessiz bir kaçaktı.
   const { data: products, error: pErr } = await supabase
     .from('products')
-    .select('*')
+    .select(VARIANT_DETAIL_COLUMNS)
     .in('id', _productIds)
   
   if (pErr) throw pErr

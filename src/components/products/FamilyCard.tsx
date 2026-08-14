@@ -47,7 +47,9 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
 
   const priceBlock = quoteMode
     ? <span className="text-sm font-semibold text-industrial-gray">{t('common.requestQuote')}</span>
-    : <>{formatCurrency(family.min_price ?? 0, lang, { maximumFractionDigits: 0 })}</>
+    // W4b: `min_price` artık motor fiyatı (TRY). `currency` verilmezse format yardımcısı
+    // EN dilinde USD'ye düşüyor ve '$1,234' yazıyordu.
+    : <>{formatCurrency(family.min_price ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })}</>
 
   // LIST VIEW LAYOUT
   if (isList) {

@@ -1182,7 +1182,8 @@ export const tr = {
     checkout: 'Ödemeye Geç',
     continueShopping: 'Alışverişe Devam Et',
     securePayment: 'Güvenli ödeme sistemi ile korunmaktadır',
-    itemTotal: 'Toplam'
+    itemTotal: 'Toplam',
+    quoteItemsNotice: 'Sepetinizde fiyatı henüz belirlenmemiş ürün var. Toplam yalnızca fiyatlı ürünleri kapsar; ödemeye geçmek için bu ürünler için teklif alın.'
   },
   checkout: {
     securePayment: {
@@ -1345,6 +1346,7 @@ export const tr = {
     },
     errors: {
       paymentError: 'Ödeme sırasında bir hata oluştu',
+      itemPriceMissing: 'Sepetinizde fiyatı belirlenmemiş ürün olduğu için ödeme başlatılamadı. Lütfen bu ürünler için teklif alın.',
       nameRequired: 'Ad Soyad gereklidir',
       emailInvalid: 'Lütfen geçerli bir e-posta adresi girin',
       phoneRequired: 'Telefon numarası gereklidir',
@@ -1752,6 +1754,7 @@ export const tr = {
     inStock: 'Stokta Var',
     outOfStock: 'Stokta Yok',
     vatIncluded: '(KDV Dahil)',
+    vatExcluded: '(+KDV)',
     qty: 'Adet:',
     addToCart: 'Sepete Ekle',
     askStock: 'Stok Sor',

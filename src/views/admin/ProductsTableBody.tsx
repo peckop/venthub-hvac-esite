@@ -35,7 +35,10 @@ import {
 } from '../../utils/adminUi'
 
 /* ---- model ---- */
-type ProductRow = DomainProduct & { cover_path?: string }
+// W4b: `price` domain tipinden çıkarıldı (satış fiyatı artık motorun işi). Admin ham
+// kolonu görmeye devam edebilir — bu yüzden burada AÇIKÇA geri ekleniyor; müşteri
+// yüzeyinde aynı şeyi yapmak INV-PRICE-1 ihlalidir.
+type ProductRow = DomainProduct & { cover_path?: string; price?: number | null }
 
 interface CategoryOpt {
   id: string

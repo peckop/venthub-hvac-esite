@@ -4,7 +4,28 @@ import type { Database } from '../../types/database.types'
 import type { DbAdminSearchResult,DbProduct } from '../../types/db-rows'
 import type { FtsProductResult, Product, SearchSuggestion } from '../../types/ui-models'
 import { mapDatabaseProductToDomain,toUIProductList } from '../type-converters'
+import { attachDisplayPrices, type WithDisplayPrice, withDisplayPrices } from './displayPrice.service'
 import { VARIANT_DETAIL_COLUMNS } from './product.columns'
+
+/**
+ * W4b · Müşteri yüzeyine hizmet eden her okumada vitrin fiyatını iliştirir.
+ *
+ * Ham `products.price` artık HİÇ okunmuyor (bkz. product.columns.ts) — fiyat
+ * `display_price` üzerinden türetilir. Fiyat katmanı arızalanırsa (RPC hatası, ağ)
+ * ürün listesi YİNE döner, satırlar `displayPrice: null` taşır ve vitrin
+ * "Teklif Alın" gösterir; fiyat arızası sayfayı düşürmemeli.
+ */
+async function withDisplayPricesSafe<T extends { id: string }>(
+  supabase: SupabaseClient<Database>,
+  rows: T[]
+): Promise<WithDisplayPrice<T>[]> {
+  try {
+    return await withDisplayPrices(supabase, rows)
+  } catch (error) {
+    console.error('withDisplayPrices error:', error)
+    return attachDisplayPrices(rows, new Map())
+  }
+}
 
 export async function getSearchSuggestions(
   supabase: SupabaseClient<Database>,
@@ -34,10 +55,13 @@ export async function ftsSearchProducts(
   const payload = { p_q: q, p_limit: limit, p_filters: filters || {} }
   const { data, error } = await supabase.rpc('fts_search_products', payload)
   if (error) throw error
+  // W4b: RPC'nin döndürdüğü `price` ZATEN motor fiyatıdır (migration: `display_price(p) AS price`).
+  // Burada ikinci bir get_display_prices turu açmak, her tuş vuruşunda (debounce'lu arama)
+  // kullanılmayan bir istek üretirdi — üstelik aynı satırda iki fiyat alanı ayrışabilirdi.
   return (data as FtsProductResult[]) || []
 }
 
-export async function getProducts(supabase: SupabaseClient<Database>, limit?: number): Promise<Product[]> {
+export async function getProducts(supabase: SupabaseClient<Database>, limit?: number): Promise<WithDisplayPrice<Product>[]> {
   let query = supabase
     .from('products')
     .select(VARIANT_DETAIL_COLUMNS)
@@ -52,11 +76,11 @@ export async function getProducts(supabase: SupabaseClient<Database>, limit?: nu
 
   const { data, error } = await query
   if (error) throw error
-  return toUIProductList((data as DbProduct[]) || [])
+  return withDisplayPricesSafe(supabase, toUIProductList((data as DbProduct[]) || []))
 }
 
 // Get all products without limit
-export async function getAllProducts(supabase: SupabaseClient<Database>): Promise<Product[]> {
+export async function getAllProducts(supabase: SupabaseClient<Database>): Promise<WithDisplayPrice<Product>[]> {
   const { data, error } = await supabase
     .from('products')
     .select(VARIANT_DETAIL_COLUMNS)
@@ -66,10 +90,10 @@ export async function getAllProducts(supabase: SupabaseClient<Database>): Promis
     .order('name', { ascending: true })
 
   if (error) throw error
-  return toUIProductList((data as DbProduct[]) || [])
+  return withDisplayPricesSafe(supabase, toUIProductList((data as DbProduct[]) || []))
 }
 
-export async function getProductsByCategory(supabase: SupabaseClient<Database>, categoryId: string): Promise<Product[]> {
+export async function getProductsByCategory(supabase: SupabaseClient<Database>, categoryId: string): Promise<WithDisplayPrice<Product>[]> {
   const { data, error } = await supabase
     .from('products')
     .select(VARIANT_DETAIL_COLUMNS)
@@ -80,10 +104,10 @@ export async function getProductsByCategory(supabase: SupabaseClient<Database>, 
     .order('name', { ascending: true })
 
   if (error) throw error
-  return toUIProductList((data as DbProduct[]) || [])
+  return withDisplayPricesSafe(supabase, toUIProductList((data as DbProduct[]) || []))
 }
 
-export async function getProductsBySubcategory(supabase: SupabaseClient<Database>, subcategoryId: string): Promise<Product[]> {
+export async function getProductsBySubcategory(supabase: SupabaseClient<Database>, subcategoryId: string): Promise<WithDisplayPrice<Product>[]> {
   const { data, error } = await supabase
     .from('products')
     .select(VARIANT_DETAIL_COLUMNS)
@@ -94,7 +118,7 @@ export async function getProductsBySubcategory(supabase: SupabaseClient<Database
     .order('name', { ascending: true })
 
   if (error) throw error
-  return toUIProductList((data as DbProduct[]) || [])
+  return withDisplayPricesSafe(supabase, toUIProductList((data as DbProduct[]) || []))
 }
 
 async function fetchProductBy(
@@ -102,7 +126,7 @@ async function fetchProductBy(
   column: 'id' | 'slug',
   value: string,
   throwOnError = false
-): Promise<Product | null> {
+): Promise<WithDisplayPrice<Product> | null> {
   const query = supabase
     .from('products')
     .select(VARIANT_DETAIL_COLUMNS)
@@ -114,23 +138,25 @@ async function fetchProductBy(
   const { data, error } = await query
   if (error && throwOnError) throw error
   if (error || !data) return null
-  return mapDatabaseProductToDomain(data as DbProduct)
+  // Tekil okumada da aynı köprü kullanılır (tek elemanlı dizi) — ikinci bir fiyat yolu yok.
+  const [product] = await withDisplayPricesSafe(supabase, [mapDatabaseProductToDomain(data as DbProduct)])
+  return product ?? null
 }
 
-export async function getProductById(supabase: SupabaseClient<Database>, id: string): Promise<Product | null> {
+export async function getProductById(supabase: SupabaseClient<Database>, id: string): Promise<WithDisplayPrice<Product> | null> {
   return fetchProductBy(supabase, 'id', id, true)
 }
 
-export async function getProductBySlugOrId(supabase: SupabaseClient<Database>, identifier: string): Promise<Product | null> {
+export async function getProductBySlugOrId(supabase: SupabaseClient<Database>, identifier: string): Promise<WithDisplayPrice<Product> | null> {
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier)
   return fetchProductBy(supabase, isUuid ? 'id' : 'slug', identifier, false)
 }
 
-export async function getProductBySlug(supabase: SupabaseClient<Database>, slug: string): Promise<Product | null> {
+export async function getProductBySlug(supabase: SupabaseClient<Database>, slug: string): Promise<WithDisplayPrice<Product> | null> {
   return fetchProductBy(supabase, 'slug', slug, false)
 }
 
-export async function getFeaturedProducts(supabase: SupabaseClient<Database>): Promise<Product[]> {
+export async function getFeaturedProducts(supabase: SupabaseClient<Database>): Promise<WithDisplayPrice<Product>[]> {
   const { data, error } = await supabase
     .from('products')
     .select(VARIANT_DETAIL_COLUMNS)
@@ -140,7 +166,7 @@ export async function getFeaturedProducts(supabase: SupabaseClient<Database>): P
     .limit(6)
 
   if (error) throw error
-  return toUIProductList((data as DbProduct[]) || [])
+  return withDisplayPricesSafe(supabase, toUIProductList((data as DbProduct[]) || []))
 }
 
 export async function adminSearchProducts(
