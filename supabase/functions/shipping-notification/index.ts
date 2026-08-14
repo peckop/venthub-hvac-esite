@@ -41,14 +41,15 @@ interface ShippingNotificationRequest {
 
 serve(async (req) => {
   const requestOrigin = req.headers.get('origin') || ''
-  const requestHeaders = req.headers.get('access-control-request-headers') ?? 'authorization, x-client-info, apikey, content-type'
-  const requestMethod = req.headers.get('access-control-request-method') ?? 'POST, OPTIONS'
   const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
   const originAllowed = allowedOrigins.length === 0 || (requestOrigin && allowedOrigins.includes(requestOrigin))
-  const corsHeaders = {
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
-}
+  const corsHeaders = getCorsHeaders(req)
+
+  // Bu 403 kapısı prod v21'de VAR; codemod hesaplamayı bırakıp kapıyı silmişti
+  // (originAllowed ölü değişkene dönmüştü). order-confirmation ile aynı desen.
+  if (!originAllowed && req.method !== 'OPTIONS') {
+    return new Response(JSON.stringify({ error: 'forbidden_origin' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+  }
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: corsHeaders })
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })

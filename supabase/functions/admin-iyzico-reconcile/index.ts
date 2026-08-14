@@ -44,23 +44,30 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'internal_error', message: 'Failed to verify user role' }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
-    let _id: string | null = null
+    let id: string | null = null
     let conv: string | null = null
     if (req.method === 'POST') {
       const body = await req.json().catch(()=>null)
-      _id = body?.id || null
+      id = body?.id || null
       conv = body?.conv || null
     } else {
       const url = new URL(req.url)
-      _id = url.searchParams.get('id')
+      id = url.searchParams.get('id')
       conv = url.searchParams.get('conv')
     }
 
     // RPC ile listeleme
-    const _limit = 10
+    // NOT: `?limit=` override bloğu prod v20'de VARDI; codemod `let limit` → `const _limit = 10`
+    // yaparken override'ı da sildi → operatör toplu uzlaştırma yapamaz hale gelmişti. Geri kondu.
+    let limit = 10
+    try {
+      const url = new URL(req.url)
+      const l = url.searchParams.get('limit')
+      if (l) limit = Math.max(1, Math.min(100, parseInt(l)))
+    } catch { /* URL parse edilemezse varsayılan 10 */ }
     const rpcListUrl = `${supabaseUrl}/rest/v1/rpc/fn_admin_get_orders`
-    const listBody: { p_id: string | null; p_conv: string | null; p_limit: number; p_status?: string | null } = { p_id: _id, p_conv: conv, p_limit: _limit }
-    if (!_id && !conv) listBody.p_status = 'pending'; else listBody.p_status = null
+    const listBody: { p_id: string | null; p_conv: string | null; p_limit: number; p_status?: string | null } = { p_id: id, p_conv: conv, p_limit: limit }
+    if (!id && !conv) listBody.p_status = 'pending'; else listBody.p_status = null
 
     const listResp = await fetch(rpcListUrl, {
       method: 'POST',

@@ -32,12 +32,10 @@ interface AlertData {
   alertType: 'out_of_stock' | 'low_stock'
 }
 
-const corsHeaders = {
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE'
-}
-
 serve(async (req: Request) => {
+  // CORS başlıkları req'e bağlı (origin allowlist) → modül seviyesinde tutulamaz.
+  const corsHeaders = getCorsHeaders(req)
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }

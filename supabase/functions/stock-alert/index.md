@@ -2,17 +2,17 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\stock-alert\index.ts
-skeleton_hash: afbc4a8dc579b84c
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\stock-alert\index.ts
+skeleton_hash: 5e4b57ede49f72b6
 entity_hashes:
   func:checkAllProducts: 84cfac7d1bdd2b56
   func:checkSpecificProduct: 5027f709f9a40c80
   func:getAlertRecipients: b32f47ebd9b11ba3
   func:processProductAlert: c58aae9b08876f88
-  func:sendNotification: 9d45549bdcd4429b
+  func:sendNotification: 9cdc9ad48f9dd1f6
   func:stock-alert_handler: 9f0ae49f1a00dd49
   overview: f1961f87b9e63cad
-generated_at: 2026-08-13T07:40:33Z
+generated_at: 2026-08-14T12:38:44Z
 ---
 
 ## Genel Bakış
@@ -85,14 +85,17 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 **Dönüş**: `{ product, alertType, notifications, success }` — İşlem sonucunu özetleyen bir nesne. `product` (ürün adı), `alertType` ('out_of_stock' veya 'low_stock'), `notifications` (gönderilen bildirim sayısı), `success` (tüm bildirimler başarılıysa true, değilse false).
 
 ### sendNotification
-**Ne yapar**: Belirli bir iletişim kanalı (tip) üzerinden, belirli bir alıcıya (to), öncelikli bir stok uyarısı bildirimi göndermek için harici bir `notification-service` fonksiyonunu çağırır.
-**Nasıl yapar**: Ortam değişkenlerinden (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) servis bilgilerini alır. `notification-service` edge fonksiyonuna bir HTTP POST isteği gönderir. İstek gövdesinde bildirim tipi, alıcı, öncelik ve ürün verileriyle birlikte bir `subject` alanı (ürün durumuna göre emoji ve başlık) oluşturur. İşlem sonucu (başarılı olup olmadığı) hakkında bir sonuç nesnesi döndürür veya hata durumunda başarısızlık sonucu döndürür.
+**Ne yapar**: Bu fonksiyon, belirtilen türde bir bildirim (e-posta, SMS vb.) alıcısına göndermek için Supabase'deki `notification-service` edge fonksiyonunu çağırır. Temel olarak, stok uyarıları gibi belirli bir veri setini alarak harici bir hizmete iletir.
+
+**Nasıl yapar**: Fonksiyon, ortam değişkenlerinden `SUPABASE_URL` ve `SUPABASE_SERVICE_ROLE_KEY` değerlerini okur. Ardından, `notification-service` endpoint'ine `POST` isteği göndermek için `fetch` kullanır. İstek gövdesi, bildirim türü, alıcı, öncelik, zorunlu bir `message` alanı ve orijinal veriyi genişleten bir `data` nesnesi içerir. `message` alanı, `data.alertType` değerine göre dinamik olarak oluşturulur; bu, notification-service'in şablon olmadığında kullanacağı gövdeyi tanımlar ve önceki bir hatayı (`.replace()` çağrısının 500 hatası vermesi) önler. İşlem başarıyla tamamlanırsa `{ type, recipient, success: true }` döner, bir hata yakalanırsa hata günlüğe yazılır ve `{ success: false }` döner.
+
 **Parametreler**:
-- `type: string` — Bildirim gönderilecek kanalın tipi (örn: 'whatsapp', 'sms', 'email').
-- `to: string` — Bildirimin gönderileceği alıcının iletişim adresi (telefon numarası veya email).
-- `data: AlertData` — Bildirim içeriğini oluşturan ürün detaylarını (ürün adı, id, stok miktarı, eşik, uyarı türü) içeren veri nesnesi.
-- `priority: string` — Bildirimin öncelik seviyesi (örn: 'critical', 'high').
-**Dönüş**: `{ type, recipient, success }` — Gönderim denemesinin sonucunu gösteren nesne. `type` (kanal), `recipient` (alıcı), `success` (istek başarılıysa true, değilse false).
+- `type`: string — Gönderilecek bildirim türünü belirtir (örn: "email", "sms").
+- `to`: string — Bildirimin gönderileceği alıcının adresi veya numarası.
+- `data`: AlertData — Bildirim için gerekli tüm verileri (ürün adı, mevcut stok, eşik değeri, uyarı türü) içeren bir nesne.
+- `priority`: string — Bildirimin öncelik seviyesini belirtir (örn: "high", "low").
+
+**Dönüş**: `Promise<{ type: string; recipient: string; success: boolean }>` — Bildirim denemesinin sonucunu ve alıcıyı içeren bir nesne döner.
 
 ### getAlertRecipients
 **Ne yapar**: Stok uyarı bildirimlerinin gönderileceği alıcıların listesini veritabanından çeker. Varsayılan bir alıcı (sistem yöneticisi) sağlamaya çalışır ve bulamazsa sabit bir acil durum email adresi ile geri dönüş (fallback) yapar.
@@ -136,76 +139,69 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 
 ---
 
-## SABİTLER
-- **corsHeaders** (object) — `{
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
-
----
-
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: stock-alert/index.ts::stock-alert_handler
+### [N1_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::stock-alert_handler
 - **params**: (req: Request)
 - **ic_degiskenler**:
-  - `supabaseUrl` — Supabase proje URL'si, environment variable'dan alınır
-  - `serviceRoleKey` — Supabase service role anahtarı, environment variable'dan alınır
-  - `authHeader` — İsteğin Authorization header'ı
-  - `isAuthorized` — Yetkilendirme durumunu takip eden boolean
-  - `anonKey` — Supabase anon key, auth fallback için kullanılır
-  - `createClientAuth` — Dinamik import ile yüklenen Supabase client factory
-  - `authClient` — Kullanıcı doğrulama için oluşturulan Supabase client
-  - `user` — Doğrulanmış kullanıcı nesnesi
-  - `roleCheck` — Kullanıcı rolünü kontrol eden fetch isteği sonucu
-  - `arr` — Rol kontrolü sonucu JSON array
-  - `role` — Kullanıcının rolü (array[0].role)
-  - `supabase` — Service role ile oluşturulan ana Supabase client
-  - `alertResults` — İşlenen uyarı sonuçları dizisi
-  - `_productId` — POST isteğinden gelen ürün ID'si
-  - `error` — Try-catch bloğundaki yakalanan hata
-- **Dönüş**: Response (JSON yanıt veya hata yanıtı)
+  - `corsHeaders` — getCorsHeaders(req) ile gelen, istekteki origin'e göre ayarlanmış CORS başlıkları
+  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile okunan ortam değişkeni, Supabase proje URL'si
+  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile okunan ortam değişkeni, servis rolü anahtarı
+  - `authHeader` — req.headers.get('Authorization') ile gelen yetkilendirme başlığı
+  - `isAuthorized` — boolean, isteğin yetkili olup olmadığını belirtir
+  - `anonKey` — Deno.env.get('SUPABASE_ANON_KEY') ile okunan, anonim kullanıcı anahtarı
+  - `createClientAuth` — Dinamik import ile yüklenen Supabase istemcisi (anonKey ile)
+  - `authClient` — createClientAuth ile oluşturulan, anonim anahtarı ve Authorization başlığını kullanan istemci
+  - `user` — authClient.auth.getUser() çağrısından dönen kullanıcı nesnesi
+  - `roleCheck` — fetch ile user_profiles tablosunda rol kontrolü yapan HTTP yanıt nesnesi
+  - `arr` — roleCheck.json().catch() ile parse edilen (hata durumunda boş dizi) rol verisi
+  - `role` — arr[0]?.role, kullanıcının rolü (admin veya superadmin)
+  - `supabase` — createClient ile oluşturulan, serviceRoleKey ile Servis Rolü yetkisine sahip Supabase istemcisi
+  - `alertResults` — unknown[] tipinde, işlenen uyarı sonuçları dizisi
+  - `error` — try-catch bloğundaki hata nesnesi
+- **Dönüş**: Response (JSON.stringify ile success, alerts_processed, results, timestamp veya error döner)
 
-### [N2_NASIL] AST Pointer: stock-alert/index.ts::checkAllProducts
+### [N2_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::checkAllProducts
 - **params**: (supabase: SupabaseClient)
 - **ic_degiskenler**:
-  - `allLowStock` — Veritabanından çekilen düşük stoklu ürünler dizisi
-  - `fetchErr` — Ürünleri çekerken oluşabilecek hata
-  - `productsToAlert` — Eşik değerin altında kalan filtrelenmiş ürünler
-  - `recipients` — Uyarı alıcıları dizisi
-  - `results` — İşlenen ürünlerin sonuçlarını tutan dizi
-- **Dönüş**: Promise<any[]> (işlenen uyarı sonuçları)
+  - `allLowStock` — supabase.from('products').select(...).filter(...) sorgusundan dönen tüm düşük stoklu ürünler
+  - `fetchErr` — aynı sorgudan dönen hata nesnesi (varsa)
+  - `productsToAlert` — allLowStock dizisinin, stock_qty low_stock_threshold değerine eşit veya küçük olan filtrelenmiş hali
+  - `recipients` — getAlertRecipients(supabase) çağrısı ile global olarak çekilen bildirim alıcıları
+  - `results` — processProductAlert çağrılarının sonuçlarını toplayan dizi
+- **Dönüş**: results dizisi (unknown[])
 
-### [N3_NASIL] AST Pointer: stock-alert/index.ts::checkSpecificProduct
+### [N3_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::checkSpecificProduct
 - **params**: (supabase: SupabaseClient, _productId: string)
 - **ic_degiskenler**:
-  - `product` — Tek bir ürünün verileri
-  - `error` — Ürün çekerken oluşabilecek hata
-  - `recipients` — Uyarı alıcıları dizisi
-- **Dönüş**: Promise<any[]> (ürün işlenme sonucu)
+  - `product` — supabase.from('products').select(...).eq('id', _productId).single() ile belirli bir ürünün verileri
+  - `error` — aynı sorgudan dönen hata nesnesi (varsa)
+  - `recipients` — getAlertRecipients(supabase) çağrısı ile çekilen bildirim alıcıları
+- **Dönüş**: [{ product: product.name, message: '...' }] veya [processProductAlert(...)] sonucu
 
-### [N4_NASIL] AST Pointer: stock-alert/index.ts::processProductAlert
+### [N4_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::processProductAlert
 - **params**: (supabase: SupabaseClient, product: Product, recipients: AlertRecipient[])
 - **ic_degiskenler**:
-  - `alertType` — Uyarı türü ('out_of_stock' veya 'low_stock')
-  - `priority` — Bildirim önceliği ('critical' veya 'high')
-  - `alertData` — Uyarı verisi nesnesi
-  - `notifications` — Bildirim sonuçları dizisi
-- **Dönüş**: Promise<{product: string, alertType: string, notifications: number, success: boolean}>
+  - `alertType` — product.stock_qty'a göre belirlenen uyarı türü ('out_of_stock' veya 'low_stock')
+  - `priority` — product.stock_qty'a göre belirlenen öncelik ('critical' veya 'high')
+  - `alertData` — AlertData nesnesi, ürün adı, ID'si, mevcut stok, eşik değeri ve alertType içerir
+  - `notifications` — sendNotification çağrılarının sonuçlarını toplayan dizi
+- **Dönüş**: { product, alertType, notifications: notifications.length, success: boolean }
 
-### [N5_NASIL] AST Pointer: stock-alert/index.ts::sendNotification
+### [N5_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::sendNotification
 - **params**: (type: string, to: string, data: AlertData, priority: string)
 - **ic_degiskenler**:
-  - `supabaseUrl` — Supabase URL'si
-  - `serviceRoleKey` — Service role anahtarı
-  - `response` — notification-service fonksiyonuna yapılan fetch isteği sonucu
-  - `err` — Bildirim gönderirken oluşabilecek hata
-- **Dönüş**: Promise<{type: string, recipient: string, success: boolean}>
+  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile okunan ortam değişkeni
+  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile okunan ortam değişkeni
+  - `response` — fetch ile notification-service endpoint'ine POST isteği gönderen HTTP yanıt nesnesi
+- **Dönüş**: { type, recipient: to, success: response.ok } veya { type, recipient: to, success: false }
 
-### [N6_NASIL] AST Pointer: stock-alert/index.ts::getAlertRecipients
+### [N6_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::getAlertRecipients
 - **params**: (supabase: SupabaseClient)
 - **ic_degiskenler**:
-  - `settings` — inventory_settings tablosundan çekilen ayarlar
-  - `recipients` — Alıcılar dizisi (varsayılan değerlerle)
-- **Dönüş**: Promise<AlertRecipient[]> (alıcılar dizisi)
+  - `settings` — supabase.from('inventory_settings').select('alert_email').maybeSingle() ile çekilen envanter ayarları
+  - `recipients` — AlertRecipient[] dizisi, bildirim alıcılarını tutar
+- **Dönüş**: Promise<AlertRecipient[]> (recipients dizisi)
 
 ---
 
@@ -219,11 +215,11 @@ graph TD
     index_ts__processProductAlert["processProductAlert"]
     index_ts__sendNotification["sendNotification"]
     index_ts__stock-alert_handler["stock-alert_handler"]
-    index_ts__checkAllProducts --> index_ts__getAlertRecipients
-    index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
     index_ts__checkSpecificProduct --> index_ts__processProductAlert
-    index_ts__processProductAlert --> index_ts__sendNotification
+    index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
     index_ts__checkAllProducts --> index_ts__processProductAlert
+    index_ts__processProductAlert --> index_ts__sendNotification
+    index_ts__checkAllProducts --> index_ts__getAlertRecipients
 ```
 
 ## NODE ID STANDARD

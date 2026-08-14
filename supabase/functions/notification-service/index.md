@@ -2,53 +2,40 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\notification-service\index.ts
-skeleton_hash: fc7dd8f3a0f6d4a5
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\notification-service\index.ts
+skeleton_hash: 60993c8b94a02220
 entity_hashes:
-  func:formatTemplate: 77c1ba2f1d414d11
+  func:formatTemplate: c5ca15fcdaa2c8a5
   func:notification-service_handler: dc7fd5d96878185c
-  func:sendEmail: d1bf521769c184e8
-  func:sendSMS: 569d0e2e89431898
-  func:sendWhatsApp: 79c6e69b836b3ef4
-  overview: 71e4dfd3d4c33151
-generated_at: 2026-08-13T07:40:32Z
+  func:sendEmail: daef5620e68a0a9d
+  func:sendSMS: 55159eef6de6f7d5
+  func:sendWhatsApp: 2e1274fd64222c15
+  overview: 8312f4e94cd26e7a
+generated_at: 2026-08-14T12:38:42Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase edge function olarak HTTP isteklerini karşılayan bildirim servisidir. WhatsApp, SMS ve e-posta olmak üzere üç farklı kanal üzerinden mesaj gönderimi sunar. İstek parametrelerine göre uygun kanalı seçer, gerekirse şablonları dinamik verilerle doldurur ve ilgili servis sağlayıcıya iletir.
+Bu modül, bir Supabase edge function olarak HTTP isteklerini karşılayan merkezi bir bildirim servisidir. Tek bir giriş noktası üzerinden WhatsApp, SMS ve e-posta olmak üzere üç farklı iletişim kanalına mesaj gönderimi sağlar. Gelen isteklere göre uygun kanalı seçer, içerik şablonlarını dinamik verilerle doldurur ve mesajları ilgili harici servis sağlayıcıya iletir.
 
 ## Fonksiyon Grupları
-### İstek Yönetimi
-Gelen HTTP isteklerini işleyen ana giriş noktasıdır. İstek içeriğini ayrıştırarak hangi bildirim kanalının kullanılacağını belirler ve ilgili gönderme fonksiyonunu çağırır.
+### İstek Yönetimi ve Yönlendirme
+Modülün dışarıya açılan tek giriş noktasıdır. Gelen HTTP isteğinin gövdesini okuyarak hedef kanalı ve mesaj bilgilerini ayrıştırır, ardından işlmeyi ilgili gönderim fonksiyonuna devreder.
 - notification-service_handler
 
-### Kanal Bazlı Bildirim Gönderimi
-Farklı iletişim kanalları üzerinden mesaj iletmekten sorumlu fonksiyonlardır. Her biri ilgili servis sağlayıcıya bağlanarak mesajı hedef kullanıcıya iletir.
+### Kanal Bazlı Mesaj Gönderimi
+Her biri farklı bir iletişim protokolü ve harici servis (Twilio, SendGrid vb.) ile entegre çalışan gönderim fonksiyonlarıdır. Kullanıcıya ait hedef bilgiyi ve mesaj içeriğini alarak doğrudan ilgili kanal üzerinden iletir.
 - sendWhatsApp, sendSMS, sendEmail
 
-### Şablon Doldurma
-Bildirim içeriklerindeki yer tutucuları gerçek verilerle değiştiren yardımcı fonksiyondur. Kişiselleştirilmiş mesajlar hazırlanırken gönderme fonksiyonları tarafından iç çağrı olarak kullanılır.
+### İçerik Hazırlama
+Bildirim metinlerindeki dinamik yer tutucuları, gelen veri nesnesindeki değerlerle değiştirerek kişiselleştirilmiş mesajlar oluşturan yardımcı fonksiyondur. Kanal gönderim fonksiyonları tarafından mesaj iletimi öncesinde iç调用 olarak kullanılır.
 - formatTemplate
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için varsayımlar, fonksiyon imzaları ve modül sabitlerinden yola çıkılarak çıkarılmıştır.
-
-**[Aksiyom 1]:** Eğer `notification-service_handler` fonksiyonuna geçilen `req` nesnesi geçerli bir HTTP isteği (Request) nesnesi değilse (örn. `null`, `undefined` veya yanlış tipteyse), istek ayrıştırılamaz ve modül temel işlevini yerine getiremez; bu durumda istemciye hata yanıtı dönmelidir.
-
-**[Aksiyom 2]:** Eğer `sendWhatsApp`, `sendSMS` veya `sendEmail` fonksiyonlarından herhangi biri çağrıldığında `to` parametresi boş bir string (`""`) veya `undefined` ise, mesaj hedeflenen kişiye ulaştırılamaz ve ilgili servis sağlayıcı tarafında hata oluşur.
-
-**[Aksiyom 3]:** Eğer `sendWhatsApp` fonksiyonu `template` parametresi ile çağrılıyorsa, `_data` parametresinin (eğer sağlanmışsa) şablondaki değişken alanlarıyla uyumlu olması gerekir; aksi halde `formatTemplate` fonksiyonu beklenmeyen bir çıktı üretebilir veya şablon düzgün doldurulamaz.
-
-**[Aksiyom 4]:** Eğer `sendEmail` fonksiyonu `config` parametresi ile çağrılıyorsa, `config.apiKey` alanının sağlanması zorunludur; aksi halde e-posta servis sağlayıcısına (örn. SendGrid, Mailgun vb.) kimlik doğrulama yapılamaz ve e-posta gönderimi başarısız olur.
-
-**[Aksiyom 5]:** Eğer `sendWhatsApp` veya `sendSMS` fonksiyonu `config` (TwilioConfig) parametresi olmadan çağrılıyorsa (varsayılan değer `undefined` ise), Twilio API凭据ları dış bir kaynaktan (örn. ortam değişkenleri) sağlanmalıdır; aksi halde Twilio servisine bağlanılamaz ve mesaj gönderilemez.
-
-**[Aksiyom 6]:** Eğer `notification-service_handler` isteği işlerken geçersiz bir `channel` değeri (örn. `sendWhatsApp`, `sendSMS`, `sendEmail` dışında bir değer) alıysa, modül tanımsız bir kanal için işlem yapamaz ve hata döndürmelidir.
-
-**[Aksiyom 7]:** Eğer `_stockAlertTemplates` modül sabiti bir sözlük (object) olarak tanımlı değilse veya beklenen şablon anahtarlarını içermiyorsa, `formatTemplate` fonksiyonu stok uyarı şablonlarını bulamaz ve formatlama işlemi başarısız olur
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -62,43 +49,43 @@ Bu modül için varsayımlar, fonksiyon imzaları ve modül sabitlerinden yola �
 **Dönüş**: Response — İşlemin sonucunu (başarı/hata durumu) içeren HTTP yanıt nesnesi.
 
 ### sendWhatsApp
-**Ne yapar**: Belirtilen alıcıya Twilio API'si üzerinden bir WhatsApp mesajı gönderir. İsteğe bağlı olarak bir mesaj şablonunu ve değişken verilerini kullanarak kişiselleştirilmiş mesajlar oluşturabilir.
-**Nasıl yapar**: Fonksiyon, yapılandırma nesnesindeki (config) Twilio hesap bilgileriyle (accountSid, authToken, fromNumber) bir Basic Auth başlığı oluşturur. Alıcı numarasını `whatsapp:` önekine sahip olacak şekilde formatlar. Eğer bir şablon ve veri sağlandıysa, `formatTemplate` fonksiyonunu kullanarak son mesajı oluşturur. Ardından, Twilio'nun Messages endpoint'ine POST isteği göndererek mesajı iletir ve API yanıtını döndürür.
+**Ne yapar**: Twilio API kullanarak belirli bir telefon numarasına WhatsApp mesajı gönderir.
+**Nasıl yapar**: Fonksiyon, Twilio API'sine HTTP POST isteği göndererek mesajı iletir. İlk olarak yapılandırma (config) nesnesinde accountSid, authToken ve fromNumber alanlarının varlığını kontrol eder, eksiklik varsa hata fırlatır. Mesaj bir şablondan oluşturulacaksa `formatTemplate` fonksiyonu ile veri birleştirilir, aksi halde doğrudan message parametresi kullanılır. Hedef telefon numarası 'whatsapp:' ön ekini içermiyorsa eklenerek formatlanır. Twilio'nun Basic Auth mekanizması kullanılarak Base64 kodlanmış kimlik bilgileri Authorization başlığına eklenir. İstek gövdesi URLSearchParams formatında hazırlanır. Yanıt başarısız ise (response.ok false) hata mesajı ile birlikte exception fırlatılır.
 **Parametreler**:
-- `to`: string — Mesajın gönderileceği alıcının WhatsApp numarası (örn: `+1234567890`).
-- `message`: string — Gönderilecek düz metin mesajı. Şablon kullanılmadığında doğrudan gönderilir.
-- `template?`: string (isteğe bağlı) — Değişken içeren mesaj şablonu (örn: `Merhaba {{name}}, durumunuz: {{status}}`).
-- `_data?`: TemplateData (isteğe bağlı) — Şablondaki `{{değişken}}` alanlarını doldurmak için kullanılacak anahtar-değer çiftlerini içeren nesne.
-- `config?`: TwilioConfig (isteğe bağlı) — Twilio API kimlik bilgilerini (`accountSid`, `authToken`, `fromNumber`) içeren yapılandırma nesnesi.
-**Dönüş**: Promise<any> — Twilio API'sinden dönen JSON yanıtını çözer ve döndürür. Başarılı gönderimde mesaj bilgilerini içerir.
+- `to`: string — Mesaj gönderilecek hedef telefon numarası (whatsapp: ön eki içerebilir).
+- `message`: string — Gönderilecek ham metin mesajı (şablon kullanılmıyorsa doğrudan gönderilir).
+- `template`: string (isteğe bağlı) — Mesaj içeriği için kullanılacak şablon stringi. `{{değişken}}` formatında yer tutucular içerebilir.
+- `data`: TemplateData (isteğe bağlı) — Şablondaki yer tutucuların değerlerini içeren nesne. Anahtar-değer çiftlerinden oluşur.
+- `config`: TwilioConfig (isteğe bağlı) — Twilio API kimlik bilgilerini ve gönderici numarasını içeren yapılandırma nesnesi. accountSid, authToken ve fromNumber alanlarını içermelidir.
+**Dönüş**: Promise<any> — Twilio API'sinden dönen ham JSON yanıtını (başarılı mesaj gönderimi detaylarını) içerir.
 
 ### sendSMS
-**Ne yapar**: Twilio API'si kullanarak belirli bir alıcıya bir Short Message Service (SMS) metni gönderir.
-**Nasıl yapar**: `sendWhatsApp` fonksiyonuna çok benzer bir mantıkla çalışır, ancak alıcı numarasına `whatsapp:` eki eklemez ve Twilio'nun SMS endpoint'ine doğrudan POST isteği gönderir. Yapılandırma nesnesindeki Twilio bilgilerini kullanarak Basic Auth ile kimlik doğrulaması yapar ve mesajı iletir.
+**Ne yapar**: Twilio API kullanarak belirli bir telefon numarasına standart SMS metin mesajı gönderir.
+**Nasıl yapar**: Fonksiyon, Twilio API'sine HTTP POST isteği göndererek SMS'i iletir. İlk olarak yapılandırma (config) nesnesinde accountSid, authToken ve fromNumber alanlarının varlığını kontrol eder, eksiklik varsa hata fırlatır. Twilio'nun Basic Auth mekanizması kullanılarak Base64 kodlanmış kimlik bilgileri Authorization başlığına eklenir. İstek gövdesi URLSearchParams formatında hazırlanır. Yanıt başarısız ise (response.ok false) hata mesajı ile birlikte exception fırlatılır. Bu fonksiyon şablon desteği içermez, doğrudan message parametresini gönderir.
 **Parametreler**:
-- `to`: string — SMS'in gönderileceği alıcının telefon numarası (örn: `+1234567890`).
+- `to`: string — SMS gönderilecek hedef telefon numarası.
 - `message`: string — Gönderilecek metin mesajı.
-- `config`: TwilioConfig — Twilio API kimlik bilgilerini (`accountSid`, `authToken`, `fromNumber`) içeren zorunlu yapılandırma nesnesi.
-**Dönüş**: Promise<any> — Twilio API'sinden dönen JSON yanıtını çözer ve döndürür. Gönderilen mesajın SID'si gibi bilgileri içerir.
+- `config`: TwilioConfig — Twilio API kimlik bilgilerini ve gönderici numarasını içeren yapılandırma nesnesi. accountSid, authToken ve fromNumber alanlarını içermelidir.
+**Dönüş**: Promise<any> — Twilio API'sinden dönen ham JSON yanıtını (başarılı SMS gönderimi detaylarını) içerir.
 
 ### sendEmail
-**Ne yapar**: Resend API'si kullanarak belirtilen alıcıya bir e-posta gönderir. Düz metin veya HTML formatında mesaj gönderebilir ve isteğe bağlı olarak değişken içeren bir şablon kullanabilir.
-**Nasıl yapar**: Fonksiyon, Resend API'sinin `/emails` endpoint'ine POST isteği gönderir. İstek gövdesini oluştururken, sağlanan şablonu `_data` nesnesiyle formatlayarak (`formatTemplate` kullanarak) final mesajını oluşturur. Bu mesajı hem `_text` (düz metin) hem de `html` (basit paragraf etiketleriyle) alanlarına yerleştirir. Varsayılan olarak "VentHub Bildirim" konu satırı ve `noreply@venthub.com` adresini kullanır, ancak bunlar `_data` veya `config` içindeki değerlerle değiştirilebilir.
+**Ne yapar**: Resend API kullanarak belirli bir e-posta adresine e-posta gönderir.
+**Nasıl yapar**: Fonksiyon, Resend API'sine HTTP POST isteği göndererek e-postayı iletir. İlk olarak yapılandırma (config) nesnesinde apiKey alanının varlığını kontrol eder, eksiklik varsa hata fırlatır. Konu (subject) olarak veri nesnesindeki subject alanı veya varsayılan 'VentHub Bildirim' kullanılır. Mesaj bir şablondan oluşturulacaksa `formatTemplate` fonksiyonu ile veri birleştirilir, aksi halde doğrudan message parametresi kullanılır. Gönderici adresi (from) olarak öncelikle config.from, ardından data.emailFrom ve son olarak varsayılan 'VentHub <noreply@venthub.com>' kullanılır. Gövde JSON formatında oluşturulur, metin içeriği hem text hem de HTML (satır başları `<br>` ile değiştirilerek) olarak gönderilir. Yanıt başarısız ise (response.ok false) hata mesajı ile birlikte exception fırlatılır.
 **Parametreler**:
-- `to`: string — E-postanın gönderileceği alıcının e-posta adresi.
-- `message`: string — Gönderilecek düz metin mesajı. Şablon kullanılmadığında doğrudan gönderilir.
-- `template?`: string (isteğe bağlı) — Değişken içeren e-posta şablonu.
-- `_data?`: TemplateData (isteğe bağlı) — Şablondaki `{{değişken}}` alanlarını doldurmak için veri. Ek olarak `subject` ve `emailFrom` alanlarını da içerebilir.
-- `config?`: { apiKey: string; from?: string } (isteğe bağlı) — Resend API anahtarını (`apiKey`) ve isteğe bağlı olarak gönderici adresini (`from`) içeren yapılandırma nesnesi.
-**Dönüş**: Promise<any> — Resend API'sinden dönen JSON yanıtını çözer ve döndürür. Başarılı gönderimde e-posta ID'si gibi bilgileri içerir.
+- `to`: string — E-posta gönderilecek hedef e-posta adresi.
+- `message`: string — Gönderilecek ham metin mesajı (şablon kullanılmıyorsa doğrudan gönderilir).
+- `template`: string (isteğe bağlı) — E-posta içeriği için kullanılacak şablon stringi. `{{değişken}}` formatında yer tutucular içerebilir.
+- `data`: TemplateData (isteğe bağlı) — Şablondaki yer tutucuların değerlerini ve e-posta konusu gibi ek alanları içeren nesne. subject ve emailFrom anahtarlarını içerebilir.
+- `config`: { apiKey: string; from?: string } (isteğe bağlı) — Resend API anahtarını ve isteğe bağlı olarak gönderici e-posta adresini içeren yapılandırma nesnesi.
+**Dönüş**: Promise<any> — Resend API'sinden dönen ham JSON yanıtını (başarılı e-posta gönderimi detaylarını) içerir.
 
 ### formatTemplate
-**Ne yapar**: Bir metin şablonunu, sağlanan veri nesnesindeki değerlerle eşleştirerek kişiselleştirilmiş bir metin dizesi oluşturur. `{{anahtar}}` biçimindeki yer tutucuları gerçek değerlerle değiştirir.
-**Nasıl yapar**: Fonksiyon, `_data` nesnesinin tüm anahtarları üzerinde döngüye girer. Her anahtar için, şablon içindeki `{{anahtar}}` kalıbını (RegExp kullanarak, `g` flag'i ile tüm eşleşmeleri bulacak şekilde) bulur ve ilgili değerin string karşılığıyla değiştirir. Değerleri zorunlu olarak string'e dönüştürerek (String(_data[key])) tutarlılık sağlar.
+**Ne yapar**: Verilen bir şablon string'indeki `{{anahtar}}` formatındaki yer tutucuları, sağlanan veri nesnesindeki karşılık gelen değerlerle değiştirerek formatlanmış bir metin döndürür.
+**Nasıl yapar**: Fonksiyon, veri (data) nesnesi sağlanmamışsa veya boşsa şablonu olduğu gibi döndürür. Aksi halde, her bir veri anahtarı için bir RegExp nesnesi oluşturarak (`{{anahtar}}` formatında, 'g' bayrağı ile tüm eşleşmeleri bulacak şekilde) şablondaki yer tutucuları bulur ve String(data[key]) ile elde edilen değere dönüştürerek replace işlemi yaparak tüm eşleşmeleri değiştirir. Düzenlenmiş string'i döndürür.
 **Parametreler**:
-- `template`: string — Değişkenler içeren ham şablon metni (örn: `Sayın {{name}}, talebiniz {{status}} durumundadır.`).
-- `_data`: TemplateData — Şablondaki yer tutuculara karşılık gelecek anahtar-değer çiftlerini içeren nesne (örn: `{ name: 'Ahmet', status: 'inceleniyor' }`).
-**Dönüş**: string — Yer tutucuların değerlerle değiştirildiği, kullanıma hazır son metin dizesi.
+- `template`: string — Yer tutucular içeren şablon metni.
+- `data`: TemplateData (isteğe bağlı) — Yer tutucuların değerlerini içeren nesne. Anahtarları `{{...}}` içindeki isimlere karşılık gelmelidir.
+**Dönüş**: string — Yer tutucuların değerlerle değiştirildiği formatlanmış metin.
 
 ---
 
@@ -119,7 +106,7 @@ Bu modül için varsayımlar, fonksiyon imzaları ve modül sabitlerinden yola �
 - `message: string`
 - `priority: 'low' | 'medium' | 'high' | 'critical'`
 - `template?: string`
-- `_data?: TemplateData`
+- `data?: TemplateData`
 - `tenant_id?: string`
 
 ### _StockAlertData
@@ -129,7 +116,7 @@ Bu modül için varsayımlar, fonksiyon imzaları ve modül sabitlerinden yola �
 - `_productId: string`
 
 ### TwilioConfig
-- `accountS_id: string`
+- `accountSid: string`
 - `authToken: string`
 - `fromNumber: string`
 
@@ -149,49 +136,98 @@ type TemplateData = Record<string, string | number | boolean>
   whatsapp: {
     low_stock: `🚨 STOK UYARISI 🚨
     
-📦 Ürün: {{productNa...`
+📦 Ürün: {{productName}}...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::notification-service_handler
-- **params**: `(req)`
+- **params**: `req` — HTTP isteği nesnesi
 - **ic_degiskenler**:
-  - `corsHeaders` — Tüm yanıtlara eklenen CORS başlık nesnesi (Allow-Headers, Allow-Methods)
-  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase proje URL'i
-  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan servis rol anahtarı, yetkilendirmede ve rol kontrolünde kullanılır
-  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan anonim anahtar, auth client oluşturulurken kullanılır
-  - `body` — `req.json()` ile parse edilen istek gövdesi, `NotificationRequest` tipinde
-  - `type` — `body` destructuring ile alınan bildirim türü (whatsapp/sms/email)
-  - `to` — `body` destructuring ile alınan alıcı iletişim bilgisi
-  - `message` — `body` destructuring ile alınan mesaj içeriği
-  - `priority` — `body` destructuring ile alınan bildirim öncelik seviyesi
-  - `template` — `body` destructuring ile alınan opsiyonel şablon string'i
-  - `_data` — `body` destructuring ile alınan opsiyonel şablon veri sözlüğü
-  - `tenantId` — `resolveTenantId(req, body)` çağrısı ile elde edilen kiracı kimliği
-  - `branding` — `await getTenantBranding(tenantId)` ile elde edilen kiracı marka bilgileri (emailFrom, brandName, brandPrimaryColor içerir)
-  - `authHeader` — `req.headers.get('Authorization')` ile alınan yetkilendirme başlığı
-  - `authClient` — `createClient(supabaseUrl, anonKey, {...})` ile oluşturulan yetkilendirme istemcisi
-  - `user` — `await authClient.auth.getUser()` destructuring ile alınan authenticated kullanıcı nesnesi
-  - `authErr` — `await authClient.auth.getUser()` destructuring ile alınan kimlik doğrulama hatası
-  - `roleCheck` — `fetch(...)` ile yapılan `user_profiles` tablosundan rol sorgulama yanıt nesnesi
-  - `arr` — `roleCheck.json()` ile parse edilen rol kontrol sonucu dizi
-  - `role` — `arr[0]?.role` erişimi ile alınan kullanıcının rolü (admin/superadmin beklenir)
-  - `twilioAccountSid` — `Deno.env.get('TWILIO_ACCOUNT_SID')` ile okunan Twilio hesap SID'i
-  - `twilioAuthToken` — `Deno.env.get('TWILIO_AUTH_TOKEN')` ile okunan Twilio yetki token'ı
-  - `twilioWhatsAppNumber` — `Deno.env.get('TWILIO_WHATSAPP_NUMBER')` ile okunan Twilio WhatsApp numarası
-  - `twilioPhoneNumber` — `Deno.env.get('TWILIO_PHONE_NUMBER')` ile okunan Twilio SMS numarası
-  - `resendApiKey` — `Deno.env.get('RESEND_API_KEY')` ile okunan Resend e-posta API anahtarı
-  - `emailFrom` — `branding.emailFrom` değerinden atanan gönderici e-posta adresi
-  - `notifyDebug` — `Deno.env.get('NOTIFY_DEBUG')` karşılaştırması ile belirlenen hata ayıklama modu bayrağı
-  - `result` — switch-case bloğunda hangi kanal seçilirse seçilsin bildirim gönderme sonucu
-  - `isWhatsAppEnabled` — Twilio WhatsApp ortam değişkenlerinin tamamının mevcut olup olmadığını gösteren boolean
-  - `isSmsEnabled` — Twilio SMS ortam değişkenlerinin tamamının mevcut olup olmadığını gösteren boolean
-  - `isEmailEnabled` — Resend API anahtarının mevcut olup olmadığını gösteren boolean
-  - `error` — catch bloğunda yakalanan hata nesnesi
-  - `msg` — `error instanceof Error ? error.message : 'Unknown error'` ile elde edilen hata mesajı string'i
-- **Dönüş**: `Response` — başarılıysa JSON `{success, result, type, priority, timestamp}`, hata durumunda JSON `{error, success: false}` veya HTTP hata yanıtı
+  - `corsHeaders` — getCorsHeaders ile elde edilen CORS başlıkları
+  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile alınan Supabase URL'i
+  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile alınan servis rol anahtarı
+  - `anonKey` — Deno.env.get('SUPABASE_ANON_KEY') ile alınan anonim anahtar
+  - `body` — req.json() ile parse edilen NotificationRequest nesnesi
+  - `type` — body.type, bildirim türü (whatsapp/sms/email)
+  - `to` — body.to, hedef alıcı
+  - `message` — body.message, mesaj içeriği
+  - `priority` — body.priority, öncelik seviyesi
+  - `template` — body.template, optional şablon adı
+  - `data` — body.data, optional şablon verileri
+  - `tenantId` — resolveTenantId ile çözümlenen kiracı ID'si
+  - `branding` — getTenantBranding ile alınan marka bilgileri (emailFrom, brandName, brandPrimaryColor)
+  - `authHeader` — req.headers.get('Authorization') ile alınan yetkilendirme başlığı
+  - `authClient` — createClient ile oluşturulan Supabase istemcisi (anonim anahtar ile)
+  - `user` — authClient.auth.getUser() sonucu alınan kullanıcı nesnesi
+  - `authErr` — auth.getUser() hatası
+  - `roleCheck` — fetch ile user_profiles tablosundan rol kontrolü sonucu
+  - `arr` — roleCheck.json() parse edilmiş array
+  - `role` — arr[0]?.role, kullanıcının rolü
+  - `twilioAccountSid` — Deno.env.get('TWILIO_ACCOUNT_SID') ile alınan Twilio hesap SID'i
+  - `twilioAuthToken` — Deno.env.get('TWILIO_AUTH_TOKEN') ile alınan Twilio auth token'ı
+  - `twilioWhatsAppNumber` — Deno.env.get('TWILIO_WHATSAPP_NUMBER') ile alınan WhatsApp numarası
+  - `twilioPhoneNumber` — Deno.env.get('TWILIO_PHONE_NUMBER') ile alınan SMS numarası
+  - `resendApiKey` — Deno.env.get('RESEND_API_KEY') ile alınan Resend API anahtarı
+  - `emailFrom` — branding.emailFrom değerinden türetilen gönderen e-posta adresi
+  - `notifyDebug` — Deno.env.get('NOTIFY_DEBUG') === 'true' ile debug modu kontrolü
+  - `result` — bildirim gönderme sonucu
+  - `isWhatsAppEnabled` — WhatsApp kanalının aktif olup olmadığını belirleyen boolean
+  - `isSmsEnabled` — SMS kanalının aktif olup olmadığını belirleyen boolean
+  - `isEmailEnabled` — E-posta kanalının aktif olup olmadığını belirleyen boolean
+- **Dönüş**: Response (JSON: success, result, type, priority, timestamp veya hata)
+
+### [N2_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendWhatsApp
+- **params**:
+  - `to` — string, hedef WhatsApp numarası
+  - `message` — string, gönderilecek mesaj
+  - `template` — string (optional), kullanılacak şablon
+  - `data` — TemplateData (optional), şablon değişkenleri
+  - `config` — TwilioConfig (optional), accountSid, authToken, fromNumber
+- **ic_degiskenler**:
+  - `finalMessage` — template varsa formatTemplate(template, data), yoksa message
+  - `formattedTo` — WhatsApp formatında numara (whatsapp: prefix eklenmiş)
+  - `twilioUrl` — Twilio API endpoint URL'i
+  - `credentials` — btoa ile Base64 kodlanmış accountSid:authToken
+  - `response` — fetch ile Twilio API'ye yapılan POST isteği sonucu
+  - `error` — response.ok false ise response.text() ile hata mesajı
+- **Dönüş**: Twilio API response JSON'u
+
+### [N3_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendSMS
+- **params**:
+  - `to` — string, hedef telefon numarası
+  - `message` — string, gönderilecek SMS mesajı
+  - `config` — TwilioConfig, accountSid, authToken, fromNumber
+- **ic_degiskenler**:
+  - `twilioUrl` — Twilio API endpoint URL'i
+  - `credentials` — btoa ile Base64 kodlanmış accountSid:authToken
+  - `response` — fetch ile Twilio API'ye yapılan POST isteği sonucu
+  - `error` — response.ok false ise response.text() ile hata mesajı
+- **Dönüş**: Twilio API response JSON'u
+
+### [N4_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendEmail
+- **params**:
+  - `to` — string, hedef e-posta adresi
+  - `message` — string, gönderilecek mesaj
+  - `template` — string (optional), kullanılacak şablon
+  - `data` — TemplateData (optional), şablon değişkenleri
+  - `config` — { apiKey: string; from?: string } (optional), Resend API yapılandırması
+- **ic_degiskenler**:
+  - `subject` — data?.subject || 'VentHub Bildirim', e-posta konusu
+  - `finalMessage` — template varsa formatTemplate(template, data), yoksa message
+  - `from` — config?.from || data?.emailFrom || 'VentHub <noreply@venthub.com>'
+  - `response` — fetch ile Resend API'ye yapılan POST isteği sonucu
+  - `error` — response.ok false ise response.text() ile hata mesajı
+- **Dönüş**: Resend API response JSON'u
+
+### [N5_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::formatTemplate
+- **params**:
+  - `template` — string, {{key}} placeholder'ları içeren şablon
+  - `data` — TemplateData (optional), placeholder değerleri sözlüğü
+- **ic_degiskenler**:
+  - `formatted` — template değerinin kopyası, replace ile değiştirilecek
+- **Dönüş**: string, placeholder'ları değerlerle değiştirilmiş şablon
 
 ---
 
