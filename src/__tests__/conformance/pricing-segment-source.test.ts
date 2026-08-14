@@ -10,9 +10,9 @@ import { describe, expect, it } from 'vitest'
  * Neden test: tsc/lint bir tablodan hangi kolonun ne AMAÇLA okunduğunu göremez;
  * role-tabanlı segment 2026-06 öncesi desendi ve sessizce geri gelebilir.
  *
- * Ratchet: mevcut LEGACY çözücü (getEffectivePriceInfo) role okuyor → baseline = 1.
- * W2 "çözücü tek sözleşme" dalgası bunu 0'a indirir; 0'a inince stale-guard
- * baseline'ı sıkılaştırmaya zorlar. Yeni role-okuma eklemek ratchet'i patlatır.
+ * Ratchet: W1'de legacy çözücü role okuyordu (baseline=1); W2 tek-sözleşme geçişi
+ * (segment = app_metadata.price_segment) 0'a indirdi. Baseline 0'da kalır —
+ * pricing.service.ts'e HERHANGİ bir user_profiles okuması eklemek testi patlatır.
  */
 
 declare global {
@@ -29,8 +29,8 @@ const PRICING_SOURCES: Record<string, string> = import.meta.glob(
   { query: '?raw', import: 'default', eager: true },
 )
 
-// W2'de 0'a inecek — yeni ihlal eklenemez, mevcut legacy tek blok.
-const USER_PROFILES_READ_BASELINE = 1
+// W2 tek-sözleşme geçişiyle 0'a indi (segment = app_metadata.price_segment) — burada kalır.
+const USER_PROFILES_READ_BASELINE = 0
 
 // Yasak token'ın kendisi de guard-hook'a takılır — parçalı kur (davranış aynı).
 const USER_EDITABLE_META_TOKEN = ['raw', 'user', 'meta', 'data'].join('_')

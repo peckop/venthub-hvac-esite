@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import type { Database } from '../../../types/database.types'
 import {
   computePriceFromRule,
+  getUserPriceSegment,
   type PricingRuleRow,
   resolvePrice,
   ruleMatchesProduct,
@@ -81,6 +82,22 @@ function stubClient(tables: StubTables): SupabaseClient<Database> {
 }
 
 const PRODUCT = { id: 'p1', brandId: 'b1', categoryId: 'c-child', costInBase: 1000 }
+
+// ── getUserPriceSegment (W2 tek sözleşme: segment kaynağı app_metadata) ──────
+
+describe('getUserPriceSegment', () => {
+  it('app_metadata.price_segment=dealer/corporate aynen döner', () => {
+    expect(getUserPriceSegment({ app_metadata: { price_segment: 'dealer' } })).toBe('dealer')
+    expect(getUserPriceSegment({ app_metadata: { price_segment: 'corporate' } })).toBe('corporate')
+  })
+
+  it('claim yok / geçersiz / anonim → güvenli varsayılan individual', () => {
+    expect(getUserPriceSegment({ app_metadata: {} })).toBe('individual')
+    expect(getUserPriceSegment({ app_metadata: { price_segment: 'admin' } })).toBe('individual')
+    expect(getUserPriceSegment(null)).toBe('individual')
+    expect(getUserPriceSegment(undefined)).toBe('individual')
+  })
+})
 
 // ── computePriceFromRule (saf hesap) ─────────────────────────────────────────
 

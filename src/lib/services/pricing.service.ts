@@ -7,15 +7,24 @@ export type PricingRuleRow = Database['public']['Tables']['pricing_rule']['Row']
 
 export type UserRole = 'individual' | 'dealer' | 'corporate' | 'admin'
 
-export interface UserProfileLight {
-  id: string
-  role?: UserRole | null
-  organization_id?: string | null
-}
-
 export interface OrganizationLight {
   id: string
   tier_level?: number | null
+}
+
+export type PriceSegment = 'individual' | 'dealer' | 'corporate'
+
+/**
+ * Fiyat segmenti kaynağı = JWT `app_metadata.price_segment` (W2 tek sözleşme).
+ * Profil rolü/kullanıcı-düzenleyebilir metadata OKUNMAZ (CLAUDE.md §12, INV-PRICE-2).
+ * Claim atanmamışsa güvenli varsayılan: 'individual' (public fiyat) — bayi/kurumsal
+ * ataması admin tarafından yapılır; RLS tarafındaki eşi `public.jwt_price_segment()`.
+ */
+export function getUserPriceSegment(
+  user: { app_metadata?: Record<string, unknown> } | null | undefined,
+): PriceSegment {
+  const raw = user?.app_metadata?.price_segment
+  return raw === 'dealer' || raw === 'corporate' ? raw : 'individual'
 }
 
 function nowIso(): string {
@@ -54,21 +63,11 @@ export async function getEffectivePriceInfo(
   })()
 
   try {
+    // W2 tek sözleşme: user → app_metadata.price_segment → price_list → product_prices → fallback.
+    // Anonim kullanıcı da 'individual' segmentiyle public liste fiyatını görür (RLS zaten kısıtlar).
     const { data: authData, error: userErr } = await supabase.auth.getUser()
     const user = userErr ? null : authData?.user
-
-    if (!user) return { unitPrice: fallback, priceListId: null }
-
-    const { data: prof, error: profErr } = await supabase
-      .from('user_profiles')
-      .select('id, role, organization_id')
-      .eq('id', user.id)
-      .maybeSingle()
-
-    if (profErr) return { unitPrice: fallback, priceListId: null }
-
-    const profile = (prof || {}) as UserProfileLight
-    const role = (profile.role || 'individual') as UserRole
+    const segment = getUserPriceSegment(user)
 
     const now = nowIso()
     const { data: lists, error: listErr } = await supabase
@@ -91,7 +90,7 @@ export async function getEffectivePriceInfo(
     // Filter and sort lists
     const matchedLists = typedLists.filter(list => {
       let match = false
-      if (list.user_type === role) match = true
+      if (list.user_type === segment) match = true
       if (!match && !list.user_type) match = true // fallback to default (no user_type)
       return match
     })
@@ -130,6 +129,17 @@ export async function getEffectivePriceInfo(
         const toOk = !r.valid_until || new Date(r.valid_until).getTime() >= Date.now()
         return fromOk && toOk
       }) || rows[0]
+
+      // W2 cache sözleşmesi: motor materialize çıktısı varsa o kazanır —
+      // B2C (individual) KDV-dahil gross, B2B (dealer/corporate) KDV-hariç net (cetvel §5).
+      // (Kolonlar W2 migration'ıyla geldi; types regen'e kadar opsiyonel-genişletme ile okunur.)
+      const cacheRow: typeof pick & { net_price?: number | null; gross_price?: number | null } = pick
+      const derivedNet = cacheRow.net_price != null ? Number(cacheRow.net_price) : null
+      const derivedGross = cacheRow.gross_price != null ? Number(cacheRow.gross_price) : null
+      const derived = segment === 'individual' ? (derivedGross ?? derivedNet) : (derivedNet ?? derivedGross)
+      if (derived != null && Number.isFinite(derived) && derived > 0) {
+        return { unitPrice: derived, priceListId: plId }
+      }
 
       const base = Number(pick.base_price || 0)
       const sale = pick.sale_price != null ? Number(pick.sale_price) : null
