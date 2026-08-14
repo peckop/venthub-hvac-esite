@@ -1481,6 +1481,7 @@ export type Database = {
       product_prices: {
         Row: {
           base_price: number
+          computed_at: string
           created_at: string | null
           currency: string
           discount_percentage: number | null
@@ -1499,6 +1500,7 @@ export type Database = {
         }
         Insert: {
           base_price: number
+          computed_at?: string
           created_at?: string | null
           currency?: string
           discount_percentage?: number | null
@@ -1517,6 +1519,7 @@ export type Database = {
         }
         Update: {
           base_price?: number
+          computed_at?: string
           created_at?: string | null
           currency?: string
           discount_percentage?: number | null
@@ -3000,6 +3003,14 @@ export type Database = {
         }[]
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      display_price: {
+        Args: { p: Database["public"]["Tables"]["products"]["Row"] }
+        Returns: number
+      }
+      display_price_tax_included: {
+        Args: { p: Database["public"]["Tables"]["products"]["Row"] }
+        Returns: boolean
+      }
       fn_admin_get_orders: {
         Args: {
           p_conv?: string
@@ -3123,6 +3134,14 @@ export type Database = {
         Returns: {
           category_id: string
           product_count: number
+        }[]
+      }
+      get_display_prices: {
+        Args: { p_product_ids: string[] }
+        Returns: {
+          display_price: number
+          product_id: string
+          tax_included: boolean
         }[]
       }
       get_family_detail: {

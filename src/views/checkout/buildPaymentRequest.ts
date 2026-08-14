@@ -1,12 +1,60 @@
 import { resolveProductImageUrl } from '@/lib/images/productImage'
 import type { UserAddress } from '@/types/ui-models'
 
-import { safeNumber } from '../../utils/type-converters'
-
+/**
+ * W4b (T001-VH) · ödeme payload'ı artık YALNIZ doğrulanmış fiyatı taşır.
+ *
+ * Önceki hâlde kalem fiyatı ham `it.product.price`'tan geliyordu. O kolon Kademe-2'de
+ * emekli edildi (374 üründe NULL) → `safeNumber(null)` = 0 → İyzico'ya 0 TL'lik kalemler
+ * gidiyor, `amount` ile kalem toplamı tutmuyordu (tutarsız sipariş / muhasebe kaydı).
+ * Artık fiyat `unitPrice`tan (sunucunun doğruladığı fiyat) okunur; fiyatı olmayan kalem
+ * ödemeye HİÇ girmez — sessizce atlanmaz da, çağıran hata ile uyarılır.
+ */
 export interface CartItemInput {
   id: string
   quantity: number
-  product: { id: string; name: string; price: number | null; image_url?: string | null; cover_image_path?: string | null }
+  /** Doğrulanmış birim fiyat. Yoksa kalem fiyatlanamaz → ödeme reddedilir. */
+  unitPrice?: number
+  product: { id: string; name: string; image_url?: string | null; cover_image_path?: string | null }
+}
+
+/**
+ * Sepette fiyatı çözülememiş kalem varken ödeme başlatılamaz.
+ * `message` makine kodudur (log/Sentry); kullanıcıya gösterilecek metin `i18nKey`
+ * üzerinden sözlükten çözülmelidir — bu modül i18n'e erişmez (saf payload kurucu).
+ */
+/**
+ * Çekilecek tutar (`amount`) ile kalem dökümünün toplamı ayrışırsa ödeme kurulamaz.
+ * İkisi FARKLI kaynaklardan gelir: `amount` sunucunun doğruladığı toplam, kalem fiyatları
+ * ise sepetteki `unitPrice`. Sunucu bir kalemi 0'a düşürürse tutar kalem toplamının altına
+ * iner ve müşteriden eksik tahsilat yapılır (İyzico sepet-tutar uyuşmazlığı). Kargo/ek
+ * ücret tutarı BÜYÜTEBİLİR — o yön serbest; tehlikeli olan yalnız küçültme yönüdür.
+ */
+export class PaymentAmountMismatchError extends Error {
+  readonly code = 'PAYMENT_AMOUNT_MISMATCH'
+  readonly i18nKey = 'checkout.errors.paymentInit'
+
+  constructor(amount: number, itemsSum: number) {
+    super(`PAYMENT_AMOUNT_MISMATCH: amount=${amount} < itemsSum=${itemsSum}`)
+    this.name = 'PaymentAmountMismatchError'
+  }
+}
+
+export class CartItemPriceMissingError extends Error {
+  readonly code = 'CART_ITEM_PRICE_MISSING'
+  readonly i18nKey = 'checkout.errors.itemPriceMissing'
+  readonly productIds: string[]
+
+  constructor(productIds: string[]) {
+    super(`CART_ITEM_PRICE_MISSING: ${productIds.join(', ')}`)
+    this.name = 'CartItemPriceMissingError'
+    this.productIds = productIds
+  }
+}
+
+/** Ödemeye girebilecek fiyat: sonlu ve pozitif. 0 = "fiyat yok"un eski maskesiydi. */
+function isPayablePrice(value: number | undefined): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0
 }
 
 export interface CustomerInput { 
@@ -48,14 +96,44 @@ export interface BuildPaymentArgs {
 export function buildPaymentRequest(args: BuildPaymentArgs) {
   const { amount, items, customer, shipping, billing, sameAsShipping, userId, invoiceType, invoiceInfo, legalConsents, shippingMethod } = args
 
-  const cartItems = items.map(it => ({
-    product_id: it.product.id,
-    quantity: it.quantity,
-    price: safeNumber(it.product.price),
-    product_name: it.product.name,
-    // F5-B W3.2: legacy products.image_url doğrudan okunmuyor — tek-kaynak resolver.
-    product_image_url: resolveProductImageUrl(it.product),
-  }))
+  // Tek geçiş: fiyatı olan kalem payload'a girer, olmayan toplanır. Fiyatsız kalem
+  // varsa ödeme HİÇ kurulmaz — kalemi sessizce düşürmek, müşterinin gördüğü sepetle
+  // çekilen tutarı ayrıştırırdı.
+  const cartItems: {
+    product_id: string
+    quantity: number
+    price: number
+    product_name: string
+    product_image_url: string | null
+  }[] = []
+  const unpricedProductIds: string[] = []
+
+  for (const it of items) {
+    if (!isPayablePrice(it.unitPrice)) {
+      unpricedProductIds.push(it.product.id)
+      continue
+    }
+    cartItems.push({
+      product_id: it.product.id,
+      quantity: it.quantity,
+      // Ham products.price DEĞİL: sunucunun doğruladığı birim fiyat (W4b).
+      price: it.unitPrice,
+      product_name: it.product.name,
+      // F5-B W3.2: legacy products.image_url doğrudan okunmuyor — tek-kaynak resolver.
+      product_image_url: resolveProductImageUrl(it.product),
+    })
+  }
+
+  if (unpricedProductIds.length > 0) {
+    throw new CartItemPriceMissingError(unpricedProductIds)
+  }
+
+  // Tahsil edilecek tutar, kalem toplamının ALTINA inemez (eksik tahsilat koruması).
+  // Üstüne çıkması meşru: kargo/ek ücret `amount`a dahil olabilir.
+  const itemsSum = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  if (amount + 0.01 < itemsSum) {
+    throw new PaymentAmountMismatchError(amount, itemsSum)
+  }
 
   const normalizeAddress = (addr: AddressInput | UserAddress | null) => {
     if (!addr) return { fullAddress: '', city: '', district: '', postalCode: '' }

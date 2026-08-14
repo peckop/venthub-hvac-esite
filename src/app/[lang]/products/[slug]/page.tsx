@@ -155,7 +155,8 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
         />
       )}
-      <PageComponent family={family} variants={variants} />
+      {/* W4b: KDV etiketi sabit değil — bireysel/anon brüt, bayi/kurumsal net görür. */}
+      <PageComponent family={family} variants={variants} priceTaxIncluded={detail?.price_tax_included ?? null} />
     </>
   )
 }

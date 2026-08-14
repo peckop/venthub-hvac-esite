@@ -57,7 +57,6 @@ describe('generateProductDatasheet Fallback Handling', () => {
     sku: 'VH-12345',
     model_code: 'VH-FAN-01',
     description: 'High quality ventilation fan with low noise rating.',
-    price: 99.99,
     category_id: 'cat-uuid-123',
     subcategory_id: null,
     status: 'active',

@@ -1495,6 +1495,7 @@ export const en: typeof tr = {
     inStock: 'In Stock',
     outOfStock: 'Out of Stock',
     vatIncluded: '(VAT Included)',
+    vatExcluded: '(+VAT)',
     qty: 'Quantity:',
     addToCart: 'Add to Cart',
     askStock: 'Ask about stock',
@@ -1689,7 +1690,8 @@ export const en: typeof tr = {
     checkout: 'Proceed to Checkout',
     continueShopping: 'Continue Shopping',
     securePayment: 'Protected by a secure payment system',
-    itemTotal: 'Total'
+    itemTotal: 'Total',
+    quoteItemsNotice: 'Your cart contains items with no price yet. The total covers priced items only; request a quote for those items to continue to payment.'
   },
   orders: {
     page: {
@@ -2053,7 +2055,8 @@ export const en: typeof tr = {
       paymentInit: 'An error occurred while starting payment',
       validation: 'Some form fields are missing or invalid. Please check.',
       database: 'Database error. Please try again.',
-      paymentError: 'An error occurred during payment'
+      paymentError: 'An error occurred during payment',
+      itemPriceMissing: 'Payment could not be started because your cart contains items with no price. Please request a quote for those items.'
     }
   },
   payment: {

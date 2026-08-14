@@ -10,7 +10,9 @@ describe('buildPaymentRequest', () => {
       items: [
         // F5-B W3.2: product_image_url artık resolveProductImageUrl üzerinden gelir —
         // resolver yalnız tam http(s) URL'i veya cover_image_path'i kabul eder.
-        { id: 'c1', quantity: 2, product: { id: 'p1', name: 'Ürün', price: 100.50, image_url: 'https://example.com/x.webp' } },
+        // W4b: ödeme kalemi artık ürünün ham fiyatından DEĞİL, sunucunun doğruladığı
+        // unitPrice'tan üretilir (teklif modundaki ürün 0 TL olarak ödemeye giremesin).
+        { id: 'c1', quantity: 2, unitPrice: 100.50, product: { id: 'p1', name: 'Ürün', image_url: 'https://example.com/x.webp' } },
       ],
       customer: { name: 'Ali', email: 'ali@example.com', phone: '+90...' },
       shipping: { fullAddress: 'A', city: 'İstanbul', district: 'Kadıköy', postalCode: '34000' },

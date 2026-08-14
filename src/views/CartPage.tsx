@@ -17,6 +17,12 @@ const CartPage: React.FC = () => {
   const { t, lang } = useI18n()
   const Routes = useLocalizedRoutes()
 
+  // W4b: fiyatı çözülemeyen ("Teklif Alın") kalem var mı? Varsa toplam onu KAPSAMAZ ve
+  // ödemeye geçilemez — buildPaymentRequest fiyatsız kalemi zaten reddediyor.
+  const hasUnpricedItems = items.some(
+    (item) => typeof item.unitPrice !== 'number' || !Number.isFinite(item.unitPrice)
+  )
+
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-light-gray">
@@ -63,7 +69,13 @@ const CartPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {items.map((item) => (
+            {items.map((item) => {
+              // W4b: fiyatı çözülemeyen kalem "Teklif Alın" gösterir — 0 TL YAZILMAZ.
+              // Ham products.price fallback'i kaldırıldı (o kolon emekli, çoğunlukla NULL).
+              const unitPrice = typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice)
+                ? item.unitPrice
+                : null
+              return (
               <div key={item.id} className="bg-white rounded-xl shadow-sm border border-light-gray p-6">
                 <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
                   {/* Product Image Placeholder */}
@@ -85,13 +97,21 @@ const CartPage: React.FC = () => {
                       {item.product.brand} • {item.product.sku}
                     </p>
                     <div className="flex items-center space-x-4">
-                      <span className="text-lg font-bold text-primary-navy">
-                        {formatCurrency(Number(item.unitPrice ?? item.product.price), lang, { maximumFractionDigits: 0 })}
-                      </span>
-                      {item.quantity > 1 && (
-                        <span className="text-sm text-steel-gray">
-                          {t('cart.itemTotal')}: {formatCurrency(Number(item.unitPrice ?? item.product.price) * item.quantity, lang, { maximumFractionDigits: 0 })}
+                      {unitPrice === null ? (
+                        <span className="text-lg font-semibold text-steel-gray">
+                          {t('common.requestQuote')}
                         </span>
+                      ) : (
+                        <>
+                          <span className="text-lg font-bold text-primary-navy">
+                            {formatCurrency(unitPrice, lang, { currency: 'TRY', maximumFractionDigits: 0 })}
+                          </span>
+                          {item.quantity > 1 && (
+                            <span className="text-sm text-steel-gray">
+                              {t('cart.itemTotal')}: {formatCurrency(unitPrice * item.quantity, lang, { currency: 'TRY', maximumFractionDigits: 0 })}
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -131,7 +151,8 @@ const CartPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-            ))}
+              )
+            })}
 
             {/* Clear Cart Button */}
             <div className="pt-4">
@@ -156,7 +177,7 @@ const CartPage: React.FC = () => {
                 <div className="flex justify-between">
                   <span className="text-steel-gray">{t('cart.subtotal')}</span>
                   <span className="font-medium text-industrial-gray">
-                    {formatCurrency(getCartTotal(), lang, { maximumFractionDigits: 0 })}
+                    {formatCurrency(getCartTotal(), lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -166,25 +187,48 @@ const CartPage: React.FC = () => {
                 <div className="flex justify-between">
                   <span className="text-steel-gray">{t('cart.vatIncluded')}</span>
                   <span className="font-medium text-industrial-gray">
-                    {formatCurrency(getCartTotal() - getCartTotal() / 1.2, lang, { maximumFractionDigits: 0 })}
+                    {formatCurrency(getCartTotal() - getCartTotal() / 1.2, lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                   </span>
                 </div>
                 <hr className="border-light-gray" />
                 <div className="flex justify-between text-lg">
                   <span className="font-semibold text-industrial-gray">{t('cart.total')}</span>
+                  {/* W4b: fiyatı bekleyen kalem varken KISMİ toplamı "Toplam" diye sunmak
+                      yanıltıcı olur (kalem satırı "Teklif Alın" derken özet ₺0 basıyordu).
+                      O durumda rakam yerine teklif ifadesi gösterilir. */}
                   <span className="font-bold text-primary-navy">
-                    {formatCurrency(getCartTotal(), lang, { maximumFractionDigits: 0 })}
+                    {hasUnpricedItems
+                      ? t('common.requestQuote')
+                      : formatCurrency(getCartTotal(), lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                   </span>
                 </div>
               </div>
 
+              {/* W4b: toplam yalnız fiyatlı kalemleri kapsar; fiyatı bekleyen kalem varsa
+                  bunu söyle ve ödemeyi engelle — ödeme hattı fiyatsız kalemi reddeder. */}
+              {hasUnpricedItems && (
+                <div className="mb-4 p-3 bg-air-blue rounded-lg">
+                  <p className="text-sm text-steel-gray">{t('cart.quoteItemsNotice')}</p>
+                </div>
+              )}
+
               {/* Checkout Button */}
-              <Link
-                href={Routes.checkout()}
-                className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center block"
-              >
-                {t('cart.checkout')}
-              </Link>
+              {hasUnpricedItems ? (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full bg-light-gray text-steel-gray font-semibold py-3 px-6 rounded-lg text-center block cursor-not-allowed"
+                >
+                  {t('cart.checkout')}
+                </button>
+              ) : (
+                <Link
+                  href={Routes.checkout()}
+                  className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center block"
+                >
+                  {t('cart.checkout')}
+                </Link>
+              )}
 
               {/* Continue Shopping */}
               <Link

@@ -32,14 +32,16 @@ function nowIso(): string {
 }
 
 /**
- * Retrieves the effective unit price for a given product by evaluating user roles,
- * active price lists, and any applicable discounts.
+ * Ürünün etkin birim fiyatı. Fiyat çözülemezse `null` döner — 0 DEĞİL (W4b).
  *
  * @param supabase - The active Supabase client instance.
  * @param product - The product object containing base price information.
- * @returns The resolved unit price as a number.
+ * @returns Çözülen birim fiyat; fiyatlanamıyorsa null ("Teklif Alın").
  */
-export async function getEffectiveUnitPrice(supabase: SupabaseClient<Database>, product: Product): Promise<number> {
+export async function getEffectiveUnitPrice(
+  supabase: SupabaseClient<Database>,
+  product: Product,
+): Promise<number | null> {
   const info = await getEffectivePriceInfo(supabase, product)
   return info.unitPrice
 }
@@ -47,18 +49,23 @@ export async function getEffectiveUnitPrice(supabase: SupabaseClient<Database>, 
 /**
  * Determines the most applicable pricing information for a product based on the current user's role.
  * It queries active price lists sorted by effective dates and applies the best valid price or discount.
- * If no matching price list is found or an error occurs, it returns a fallback based on the product's default price.
+ *
+ * W4b (T001-VH): ham `products.price` FALLBACK'İ KALDIRILDI. O kolon Kademe-2'de emekli
+ * edildi ve 374 üründe NULL — ona düşmek sepete/ödemeye sessizce 0 TL yazıyordu. Fiyat
+ * çözülemiyorsa artık AÇIKÇA "fiyat yok" döner; "fiyat yok" ile "sıfır fiyat" birbirine
+ * karıştırılamaz. Çağıran taraf null'ı "Teklif Alın" gösterir, toplama katmaz, ödemeye sokmaz.
  *
  * @param supabase - The active Supabase client instance.
  * @param product - The product for which to determine the price.
  * @returns An object containing the calculated unit price and the ID of the applied price list (if any).
  */
 export interface EffectivePriceInfo {
-  unitPrice: number
+  /** null = fiyat çözülemedi → "Teklif Alın". ASLA 0'a düşürülmez. */
+  unitPrice: number | null
   priceListId: string | null
   /**
    * unitPrice'ın KDV semantiği: true = KDV dahil (B2C gross), false = KDV hariç (B2B net),
-   * null = bilinmiyor (legacy sale/base_price veya fallback yolu). Denetim bulgusu:
+   * null = bilinmiyor (legacy sale/base_price yolu). Denetim bulgusu:
    * segment-bağımlı semantik taşıyıcı bayrak olmadan sipariş hattında çift-KDV riski yaratır.
    */
   taxIncluded: boolean | null
@@ -68,13 +75,11 @@ export async function getEffectivePriceInfo(
   supabase: SupabaseClient<Database>,
   product: Product
 ): Promise<EffectivePriceInfo> {
-  const fallback = (() => {
-    const v = typeof product.price === 'number' ? product.price : parseFloat(String(product.price || 0))
-    return Number.isFinite(v) ? v : 0
-  })()
+  /** Tek "fiyat yok" çıkışı — her çağrıda taze nesne (paylaşılan referans mutasyonu olmasın). */
+  const unpriced = (): EffectivePriceInfo => ({ unitPrice: null, priceListId: null, taxIncluded: null })
 
   try {
-    // W2 tek sözleşme: user → app_metadata.price_segment → price_list → product_prices → fallback.
+    // W2 tek sözleşme: user → app_metadata.price_segment → price_list → product_prices → (yoksa) null.
     // Anonim kullanıcı da 'individual' segmentiyle public liste fiyatını görür (RLS zaten kısıtlar).
     const { data: authData, error: userErr } = await supabase.auth.getUser()
     const user = userErr ? null : authData?.user
@@ -88,7 +93,8 @@ export async function getEffectivePriceInfo(
       .lte('effective_from', now)
       .or(`effective_to.is.null,effective_to.gte.${now}`)
 
-    if (listErr || !Array.isArray(lists)) return { unitPrice: fallback, priceListId: null, taxIncluded: null }
+    // Liste okunamadıysa fiyat bilinmiyordur — ham fiyata düşmek yerine "Teklif Alın".
+    if (listErr || !Array.isArray(lists)) return unpriced()
 
     interface PriceListRow { 
       id: string; 
@@ -116,8 +122,11 @@ export async function getEffectivePriceInfo(
 
     const chosen = sorted.length > 0 ? sorted[0] : null
 
-    // Try price lists in order: chosen, then fallback (null)
-    const priceListIds = chosen ? [chosen.id, null] : [null]
+    // W4b: `price_list_id IS NULL` turu ÖLÜ daldı — canlı şemada kolon NOT NULL
+    // (dealer_layer_baseline), yani o sorgu her zaman 0 satır dönüp her sepet
+    // mutasyonunda ürün başına boş bir round-trip üretiyordu. Segmentine uyan aktif
+    // liste yoksa ürün doğrudan "Teklif Alın"a düşer.
+    const priceListIds = chosen ? [chosen.id] : []
 
     for (const plId of priceListIds) {
       let query = supabase
@@ -125,12 +134,11 @@ export async function getEffectivePriceInfo(
         .select('*')
         .eq('product_id', product.id)
         .eq('is_active', true)
+        // Sepet/ödeme hattı TL çalışır. Bu koşul olmadan çok para birimli satır geldiğinde
+        // rastgele biri (ör. EUR net) seçilip TL sanılıyordu — tutar sessizce bozuluyordu.
+        .eq('currency', 'TRY')
 
-      if (plId === null) {
-        query = query.is('price_list_id', null)
-      } else {
-        query = query.eq('price_list_id', plId)
-      }
+      query = query.eq('price_list_id', plId)
 
       const { data: rows, error: prErr } = await query
       if (prErr || !Array.isArray(rows) || rows.length === 0) continue
@@ -143,10 +151,9 @@ export async function getEffectivePriceInfo(
 
       // W2 cache sözleşmesi: motor materialize çıktısı varsa o kazanır —
       // B2C (individual) KDV-dahil gross, B2B (dealer/corporate) KDV-hariç net (cetvel §5).
-      // (Kolonlar W2 migration'ıyla geldi; types regen'e kadar opsiyonel-genişletme ile okunur.)
-      const cacheRow: typeof pick & { net_price?: number | null; gross_price?: number | null } = pick
-      const derivedNet = cacheRow.net_price != null ? Number(cacheRow.net_price) : null
-      const derivedGross = cacheRow.gross_price != null ? Number(cacheRow.gross_price) : null
+      // (W4b: tipler yeniden üretildi; net_price/gross_price artık doğrudan okunur.)
+      const derivedNet = pick.net_price != null ? Number(pick.net_price) : null
+      const derivedGross = pick.gross_price != null ? Number(pick.gross_price) : null
       const derived = segment === 'individual' ? (derivedGross ?? derivedNet) : (derivedNet ?? derivedGross)
       if (derived != null && Number.isFinite(derived) && derived > 0) {
         const usedGross = segment === 'individual' ? derivedGross != null : derivedNet == null
@@ -167,10 +174,12 @@ export async function getEffectivePriceInfo(
       }
     }
 
-    return { unitPrice: fallback, priceListId: chosen ? chosen.id : null, taxIncluded: null }
+    // Hiçbir listede geçerli cache satırı yok → ürün fiyatlanamıyor ("Teklif Alın").
+    // priceListId de null bırakılır: fiyatı olmayan kaleme liste iliştirmek yanıltıcıdır.
+    return unpriced()
   } catch (e) {
     console.error('getEffectivePriceInfo error', e)
-    return { unitPrice: fallback, priceListId: null, taxIncluded: null }
+    return unpriced()
   }
 }
 

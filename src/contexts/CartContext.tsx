@@ -14,7 +14,7 @@ export interface CartContextType {
   getCartTotal: () => number
   getCartCount: () => number
   // Yeni: Sunucunun hesapladığı birim fiyatları uygula (mismatch sonrası loop'u kırmak için)
-  applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void
+  applyServerPricing: (items: { product_id: string, unit_price: number | null }[]) => void
 }
 
 export const CartContext = createContext<CartContextType | undefined>(undefined)

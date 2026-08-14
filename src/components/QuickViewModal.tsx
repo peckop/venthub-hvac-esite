@@ -2,17 +2,16 @@ import { Eye,ShoppingCart, X } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-import type { Product } from '@/types/ui-models'
-
 import { useCart } from '../hooks/useCartHook'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
+import type { StorefrontProduct } from './ProductCard'
 
 const PLACEHOLDER_EMOJI = '🌪️'
 
 interface QuickViewModalProps {
-  product: Product | null
+  product: StorefrontProduct | null
   open: boolean
   onClose: () => void
 }
@@ -24,9 +23,12 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
 
   if (!open || !product) return null
 
-  const price = Number(product.price)
+  // W4b: fiyat motordan gelir (displayPrice); ham `products.price` emekli (INV-PRICE-1).
+  const displayPrice = product.displayPrice ?? null
+  const quoteMode = displayPrice == null || displayPrice <= 0
 
   const handleAdd = () => {
+    if (quoteMode) return
     addToCart(product)
     onClose()
   }
@@ -47,12 +49,16 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
           <div className="flex flex-col">
             <h4 className="font-semibold text-industrial-gray mb-1 line-clamp-2">{product.name}</h4>
             <div className="text-sm text-steel-gray mb-2">{product.brand} • {product.sku}</div>
-            <div className="text-2xl font-bold text-primary-navy mb-4">{formatCurrency(price, lang, { maximumFractionDigits: 0 })}</div>
+            <div className="text-2xl font-bold text-primary-navy mb-4">
+              {quoteMode
+                ? t('common.requestQuote')
+                : formatCurrency(displayPrice ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })}
+            </div>
             <p className="text-sm text-steel-gray line-clamp-4 mb-6">
               {product.description || t('quickView.descFallback')}
             </p>
             <div className="mt-auto flex gap-2">
-              <button onClick={handleAdd} className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">
+              <button onClick={handleAdd} disabled={quoteMode} aria-disabled={quoteMode} className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
                 <ShoppingCart size={18} className="mr-2" /> {t('quickView.addToCart')}
               </button>
               <Link href={Routes.product(product.slug!)} onClick={onClose} className="inline-flex items-center justify-center px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy focus-visible:ring-offset-2">

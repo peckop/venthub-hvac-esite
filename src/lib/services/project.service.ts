@@ -120,15 +120,21 @@ export async function removeProductFromProject(
  * @throws {Error} If the database query fails.
  */
 export async function listProjectItems(supabase: SupabaseClient<Database>, projectId: string): Promise<ProjectItem[]> {
+  // NOT (W4b): gömülü `products(*)` ham `price` kolonunu da getiriyor. Kolon SSOT'unu
+  // şablon dizgeyle geçirmek PostgREST tip-ayrıştırıcısını kırıyor (dinamik gömülü alan
+  // listesi desteklenmiyor), o yüzden yıldız korundu. Tip katmanı zaten koruyor:
+  // `DomainProduct` artık `price` taşımıyor, dolayısıyla okunamaz.
   const { data, error } = await supabase.from('project_items')
     .select('*, product:products(*)')
     .eq('project_id', projectId)
 
   if (error) throw (error as Error)
-  
+
   const items = (data as (DbProjectItem & { product: DbProduct | null })[]) || []
-  return items.map(item => ({
-    ...item,
-    product: item.product ? mapDatabaseProductToDomain(item.product) : undefined
-  }))
+  // `exactOptionalPropertyTypes`: opsiyonel alana açıkça `undefined` atanamaz —
+  // ürün yoksa anahtar hiç eklenmez.
+  return items.map(item => {
+    const { product, ...rest } = item
+    return product ? { ...rest, product: mapDatabaseProductToDomain(product) } : rest
+  })
 }
