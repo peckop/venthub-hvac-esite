@@ -65,6 +65,34 @@
 - **Fiyat kararları (cetvel kilidi):** fiyat **TÜRETİLİR** (cache; elle-yazma yok) · marj merdiveni **ürün > MARKA > kategori > global** (en-özel-kazanır) · base=TRY + **iki kur** (tedarik=snapshot / gösterim=canlı) + TCMB · **NET sakla**, B2C-dahil / B2B-hariç. INV-PRICE-1..4 conformance tanımlı.
 - **İlişki:** bu şerit admin/3D şeritlerine ⟂ (dik); fiyat build'i bayi **R2/R5/B2** ile ÖRTÜŞÜR (`pricing-standard §15` entegre). ⚠️ `catalog-ingestion-standard.md` hafızada "var" sanılıyordu, tree'de **YOK** (skill var: `.agent/skills/venthub-catalog-importer`) → yazılacak. Memory: `pricing-currency-requirements` · `category-taxonomy-state` · `catalog-ingestion-system` · `documents-are-the-decision` · `avensair-delivery-roadmap`.
 
+### Controller #4 — LAUNCH şeridi (canlıya alma hazırlığı)
+- **⭐ AKTİF (2026-08-15, oturum `eda80084`).** Şerit: `docs/audits/**` · `docs/plans/launch-**` ·
+  `src/views/legal/**` · `src/config/legal.ts` · `docs/standards/analytics-standard.md` · `.env.example`.
+  **Amaç:** iki dikey şerit (PRICING, EDGE) kendi işini yürütürken kimsenin bakmadığı **yatay** soru —
+  *"bu site bugün canlıya çıkarsa müşteri alışveriş yapabilir mi, hukuken satabilir miyiz?"*
+- **Denetim (salt-okuma, prod DB + repo):** `docs/audits/canliya-alma-hazirlik-2026-08-15.md`.
+  Yer-gerçeği: `product_images=0` · `product_prices=0` · `venthub_orders=0` · 374 aktif ürün · 2 kullanıcı.
+  **Sonuç: kritik yol kodda değil Recep'te** (fiyat seed onayı → şirket bilgileri → görseller).
+- **Kırmızı:** K1 görsel yok (`T003-VH`) · K2 fiyat seed yok (PRICING) · K3 hukuki metinler (`T019-VH`, **yapıldı**) ·
+  K4 sahte iletişim bilgisi · K5 edge güvenlik (EDGE/`T018-VH`) · **K6 `iyzico-callback` sandbox URL'i sabit
+  kodlu → prod ödemede sipariş onaylanmaz** (`T022-VH`, EDGE'e devredildi).
+- **Yapılan (PR #512):** 6 hukuki metin × TR/EN mevzuata karşı denetlenip boşlukları kapatıldı
+  (örnek cayma formu YOKTU · iade masrafı kimde YAZMIYORDU · cayma istisnaları HVAC'a somutlandı ·
+  ETBİS/MERSİS/ticaret sicil/KEP · KVKK m.9 güncel rejim · İYS + VERBİS · gerçek çerez tablosu ·
+  garanti/kullanım ömrü/yetkili servis · fiyat-hatası hükmü). Şirket bilgileri **bilerek boş**:
+  `src/config/legal.ts` = tek doldurma noktası, 18 placeholder. Taslak bandı artık koşullu
+  (`isLegalContentReady()` = alanlar dolu **VE** hukukçu teyidi). `lastUpdated`'ın `new Date()` ile
+  her gün kayması giderildi. Kapılar: tsc 0 · lint 0 hata · 631 test · gerçek `next build` yeşil.
+- **Açtığım iş emirleri:** `T019-VH` hukuki metinler (active %85) · `T020-VH` analytics rıza kapısı (open) ·
+  `T021-VH` GA4 kurulumu = yol haritası madde G (**blocked**, `T020` bloklar — registry'de bağ kuruldu) ·
+  `T022-VH` iyzico-callback sandbox (open, EDGE).
+- **Kritik bulgu (analytics):** cetvel *"onay verilmeden analytics ateşlenmez"* diyor ama **kodda karşılığı yok** —
+  `vh_cookie_consent`'i yalnız bandın kendisi okuyor, `trackEvent` ise zaten 3 yerden çağrılıyor.
+  Sistemin sessiz olmasının tek sebebi GA ID'nin yokluğu = **tesadüf, güvenlik değil.**
+  `analytics-standard.md`'ye ⛔ ön-koşul bloğu + kanıta bağlı DoD maddesi eklendi.
+- **Recep'te bekleyen:** fiyat seed "evet"i · 18 şirket bilgisi alanı + hukukçu teyidi · ürün görselleri ·
+  İyzico prod anahtarları/merchant onayı.
+
 ---
 
 ## Büyük Resim (zincir)

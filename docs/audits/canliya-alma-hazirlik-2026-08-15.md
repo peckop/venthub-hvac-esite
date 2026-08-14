@@ -74,6 +74,27 @@ email: 'info@venthub.com.tr'
 ```
 Placeholder telefon canlıda görünüyor. (Hafızada `user-side-open-items` olarak zaten duruyordu — kapanmamış.)
 
+### K6 · `iyzico-callback` sandbox URL'ini sabit kodluyor → prod ödemede sipariş onaylanmaz
+**Kanıt:** `supabase/functions/iyzico-callback/index.ts:117`
+```ts
+const baseUrl = "https://sandbox-api.iyzipay.com"; // isteğe göre prod ayarlanabilir
+```
+Bu değer SDK'ya `uri` olarak veriliyor (`new IyziCb({ apiKey, secretKey, uri: baseUrl })`).
+
+**Asimetri — kardeş fonksiyonlar doğru yapıyor:** `iyzico-payment/index.ts:232` ve
+`iyzico-refund/index.ts:53` env'den `IYZICO_BASE_URL` okuyor. **Yalnız callback sabit.**
+
+**Etki (prod anahtarları konulduğu an):** ödeme PROD'da başlatılır → callback `checkoutForm.retrieve`'i
+**SANDBOX'a** sorar → prod token orada yok/kimlik doğrulanmaz → **para çekilir, sipariş doğrulanamaz.**
+Bu "ileride patlar" bir borç değil; **ilk gerçek satışta** patlar. Bugün görünmemesinin sebebi
+0 sipariş olması ve hâlâ sandbox anahtarlarıyla çalışılıyor olması.
+
+**Çözüm:** `Deno.env.get('IYZICO_BASE_URL') || <sandbox>` — kardeşleriyle aynı desen; ayrıca üç
+fonksiyonun aynı değeri okuduğunu doğrulayan bir kontrol.
+**Sahibi:** EDGE şeridi (`supabase/functions/**` onun mülkü — LAUNCH yalnızca **okudu, dokunmadı**).
+**İş emri:** `T022-VH` (open). ⚠️ Prod'daki deploy edilmiş sürüm repo'dan farklı olabilir (T018 deploy
+drift) → onarım gerçek prod sürümü üzerinde doğrulanmalı.
+
 ### K5 · Edge fonksiyon güvenlik açığı (devam eden iş, bilgi amaçlı)
 `admin-order-inspect` prod'daki donmuş sürümde `verify_jwt=false` + gövdede auth yok + service_role ile
 sipariş döndürüyor. **Sahibi:** EDGE şeridi (`61104be3`, T018-VH) — aktif çalışılıyor, LAUNCH şeridi karışmıyor.
