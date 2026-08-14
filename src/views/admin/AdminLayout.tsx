@@ -3,10 +3,13 @@
 import {
   ArrowRightLeft,
   BarChart3,
+  Calculator,
+  Coins,
   FileText,
   Menu,
   Package,
   PackageSearch,
+  Percent,
   Settings,
   ShoppingCart,
   Tags,
@@ -97,6 +100,11 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
     { label: t('admin.menu.groupCatalog'), items: [
         { href: '/admin/products', label: t('admin.menu.products'), icon: Package },
         { href: '/admin/categories', label: t('admin.menu.categories'), icon: Tags },
+    ]},
+    { label: t('admin.menu.groupPricing'), items: [
+        { href: '/admin/pricing', label: t('admin.menu.pricing'), icon: Coins },
+        { href: '/admin/pricing/rules', label: t('admin.menu.pricingRules'), icon: Percent },
+        { href: '/admin/pricing/preview', label: t('admin.menu.pricingPreview'), icon: Calculator },
     ]},
     { label: t('admin.menu.groupStock'), items: [
         { href: '/admin/inventory', label: t('admin.menu.inventory'), icon: PackageSearch },

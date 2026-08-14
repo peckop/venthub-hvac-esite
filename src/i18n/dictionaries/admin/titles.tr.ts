@@ -11,5 +11,8 @@ export const titles = {
       products: 'Ürünler',
       categories: 'Kategoriler',
       coupons: 'Kuponlar',
-      settings: 'Admin Ayarları'
+      settings: 'Admin Ayarları',
+      pricing: 'Fiyat Ayarları',
+      pricingRules: 'Marj Kuralları',
+      pricingPreview: 'Fiyat Önizleme'
 };

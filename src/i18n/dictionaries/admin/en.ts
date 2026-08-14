@@ -13,6 +13,7 @@ import { logistics } from './logistics.en'
 import { menu } from './menu.en'
 import { movements } from './movements.en'
 import { orders } from './orders.en'
+import { pricing } from './pricing.en'
 import { products } from './products.en'
 import { returns } from './returns.en'
 import { search } from './search.en'
@@ -24,6 +25,7 @@ import { users } from './users.en'
 import { webhooks } from './webhooks.en'
 
 export const admin = {
+  pricing,
   common,
   coupons,
   dataTable,

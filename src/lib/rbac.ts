@@ -30,8 +30,8 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
  */
 const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'],
-    admin: ['orders', 'logistics', 'returns', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings'],
-    moderator: ['orders', 'logistics', 'returns', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings'],
+    admin: ['orders', 'logistics', 'returns', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing'],
+    moderator: ['orders', 'logistics', 'returns', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing'],
     warehouse: ['logistics', 'inventory', 'movements', 'inventory_settings'],
     sales: ['orders', 'logistics', 'returns', 'coupons'],
     viewer: [],
