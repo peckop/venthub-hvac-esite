@@ -59,8 +59,12 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
    * Maliyeti güncel kurla UYUŞMAYAN ürün sayısı. Fiyat, donmuş `cost_in_base` üstünden
    * hesaplanır; maliyet tazelenmemişse bütün vitrin eski kurda çıkar ve bunu hiçbir sayı
    * ele vermez. Sessiz yanlış yerine görünür uyarı: cetvel §2·A.
+   *
+   * `null` = KONTROL EDİLEMEDİ (sorgu patladı) — 0 ile AYNI KOVAYA konamaz: 0 "maliyetler
+   * güncel" demektir, null "bilmiyoruz" demektir. İkisini birleştirmek, hatayı "temiz"
+   * diye okutur ve kullanıcı eski kurla materialize eder.
    */
-  const [staleCosts, setStaleCosts] = useState<number>(0)
+  const [staleCosts, setStaleCosts] = useState<number | null>(0)
   const [loadFailed, setLoadFailed] = useState(false)
   const [applying, setApplying] = useState(false)
 
@@ -77,7 +81,7 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
         ])
         if (!alive) return
         setPreview(summary)
-        setStaleCosts(costCheck ? costCheck.updated : 0)
+        setStaleCosts(costCheck ? costCheck.updated : null)
       } catch {
         if (!alive) return
         setPreview(null)
@@ -202,7 +206,15 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
               </div>
             ) : preview ? (
               <div className="space-y-8">
-                {staleCosts > 0 ? (
+                {staleCosts === null ? (
+                  <p
+                    role="status"
+                    className="flex items-start gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300"
+                  >
+                    <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+                    <span>{t('admin.pricing.rules.materialize.staleCostUnknown')}</span>
+                  </p>
+                ) : staleCosts > 0 ? (
                   <p
                     role="status"
                     className="flex items-start gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-200"

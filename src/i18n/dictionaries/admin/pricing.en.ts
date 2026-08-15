@@ -209,6 +209,7 @@ export const pricing = {
         empty: "No sample rows",
       },
       staleCost: "Costs are not at the current rate: {{count}} products would use a stale rate. Run \"Refresh costs\" first.",
+      staleCostUnknown: "Could NOT verify whether costs are at the current rate. Open \"Refresh costs\" and check before continuing.",
       toasts: {
         applied: "{{count}} product prices updated",
         applyFailed: "Could not update prices",
@@ -223,6 +224,7 @@ export const pricing = {
       apply: "Apply",
       applying: "Applying...",
       upToDate: "Costs already match the current rate — nothing to write.",
+      noneWritable: "No cost can be written: no rate was found for these products. This does NOT mean they are up to date — check the rate book.",
       summary: {
         scanned: "Products scanned",
         updated: "Cost will change",
@@ -232,6 +234,7 @@ export const pricing = {
       rates: {
         title: "Rates used",
         empty: "No rates found",
+        pair: "{{currency}} → TRY",
       },
       toasts: {
         applied: "{{count}} product costs refreshed",

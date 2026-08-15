@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\pricing.tr.ts
-skeleton_hash: 51deaaf0361506dc
+skeleton_hash: e1b4b02e8aa072cf
 entity_hashes:
   overview: 09d4da507c2b51b1
-generated_at: 2026-08-14T22:24:11Z
+generated_at: 2026-08-15T03:54:29Z
 ---
 
 ## Genel Bakış

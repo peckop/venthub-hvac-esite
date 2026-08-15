@@ -231,7 +231,9 @@ const CostRefreshModal: React.FC<CostRefreshModalProps> = ({ open, onClose, onSu
                           key={r.currency}
                           className="flex items-center justify-between text-sm border-b border-white/5 pb-2 last:border-0 last:pb-0"
                         >
-                          <span className="font-bold text-white">{r.currency} → TRY</span>
+                          <span className="font-bold text-white">
+                            {t('admin.pricing.rules.costRefresh.rates.pair', { currency: r.currency })}
+                          </span>
                           <span className="text-slate-300 tabular-nums">
                             {formatNumber(r.rate, locale, { maximumFractionDigits: 4 })}
                             <span className="text-slate-500 ml-2">{r.effectiveDate}</span>
@@ -242,8 +244,14 @@ const CostRefreshModal: React.FC<CostRefreshModalProps> = ({ open, onClose, onSu
                   )}
                 </section>
 
+                {/* "Yazılacak bir şey yok" iki AYRI gerçeği anlatabilir: ya maliyetler güncel,
+                    ya da kuru bulunamadığı için hepsi atlandı. İkincisine "güncel" demek yanlış. */}
                 {preview.updated === 0 ? (
-                  <p className="text-sm text-slate-400">{t('admin.pricing.rules.costRefresh.upToDate')}</p>
+                  <p className="text-sm text-slate-400">
+                    {preview.skippedNoRate > 0
+                      ? t('admin.pricing.rules.costRefresh.noneWritable')
+                      : t('admin.pricing.rules.costRefresh.upToDate')}
+                  </p>
                 ) : null}
               </div>
             ) : null}

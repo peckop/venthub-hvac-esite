@@ -131,9 +131,13 @@ export async function refreshCostInBase(
       return val
     }
 
+    // `base_ccy` FİLTRESİ ŞART: kayıt (base=TRY, quote=EUR, rate=55.32) yani "1 EUR kaç TL".
+    // Tabloda `base_ccy` üzerinde CHECK yok ve `source='manual'` serbest; TRY-dışı tabanlı tek
+    // bir satır girerse yalnız `quote_ccy` eşleşmesi YANLIŞ BİRİMİ tüm ürün maliyetlerine yazar.
     const { data: rates, error: ratesErr } = await supabase
       .from('currency_rates')
       .select('rate, effective_date')
+      .eq('base_ccy', 'TRY')
       .eq('quote_ccy', ccy)
       .lte('effective_date', today)
       .order('effective_date', { ascending: false })
