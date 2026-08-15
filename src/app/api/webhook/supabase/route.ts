@@ -60,9 +60,24 @@ export async function POST(request: NextRequest) {
     const payload = (await request.json()) as SupabaseWebhookPayload
     const webhookSecret = request.headers.get('x-webhook-secret')
 
-    // Strict HMAC/Token Verification
+    /**
+     * FAIL-CLOSED. Eski hâli `if (expectedSecret && ...)` idi: env TANIMSIZSA koşul hiç
+     * çalışmıyor ve imza doğrulaması TAMAMEN atlanıyordu — yani yapılandırma eksikliği,
+     * kapıyı sıkılaştırmak yerine SESSİZCE açıyordu. Bu, bu hafta iki kez düzeltilen
+     * fail-open deseninin aynısı (shipping-webhook replay guard'ı, T025-VH).
+     *
+     * Env yoksa da 401 dönülür (500 değil): eksik yapılandırma, çağırana sunucunun iç
+     * durumunu bildirmemeli. Sebep sunucu tarafında `error` seviyesinde loglanır.
+     */
     const expectedSecret = process.env.SUPABASE_WEBHOOK_SECRET
-    if (expectedSecret && webhookSecret !== expectedSecret) {
+    if (!expectedSecret) {
+      console.error(
+        '[Supabase Webhook] SUPABASE_WEBHOOK_SECRET tanımsız — istek REDDEDİLDİ. ' +
+        'Doğrulanamayan çağrı kabul edilmez; env değişkenini ayarlayın.',
+      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    if (webhookSecret !== expectedSecret) {
       console.warn('Unauthorized Supabase webhook attempt blocked.')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
