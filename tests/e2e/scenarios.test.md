@@ -2,20 +2,20 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\tests\e2e\scenarios.test.ts
-skeleton_hash: 544ad39d32eb60f2
+source_path: C:\Users\alize\venthub-wt-hotfix\tests\e2e\scenarios.test.ts
+skeleton_hash: 604baecef3203eeb
 entity_hashes:
-  func:MultiTenantCacheEngine:buildKey: 4bacbcb6b521659f
-  func:MultiTenantCacheEngine:getCachedData: cddcfc4cdfc07f78
-  func:MultiTenantCacheEngine:revalidateTag: 3d101fcb04b3c9b4
-  func:MultiTenantCacheEngine:secureRevalidateTag: a3b9862da61d79c1
-  func:WebhookMockDb:from: 50088fcf172f6607
-  func:WebhookMockDb:reset: 360250dfc0147daf
-  func:computeSignature: bfbf81eaa5d0230a
-  func:mockUserResolver: 0a8058bd356caf3b
-  func:resolveTenant: 2faf60673d0f2b07
+  func:MultiTenantCacheEngine:buildKey: a77b73421950ce20
+  func:MultiTenantCacheEngine:getCachedData: 5078a28db2621b58
+  func:MultiTenantCacheEngine:revalidateTag: f7938fe7013a3eb2
+  func:MultiTenantCacheEngine:secureRevalidateTag: 75237a6e48f7fcc8
+  func:WebhookMockDb:from: 0ca32233a6ca28df
+  func:WebhookMockDb:reset: 58b3f23f23a6fc30
+  func:computeSignature: 6cced5797e512f5e
+  func:mockUserResolver: 7e9a6c40643ac35b
+  func:resolveTenant: 9b6d9a6031e985bc
   overview: 4d5e19321d714ae2
-generated_at: 2026-06-02T07:55:55Z
+generated_at: 2026-08-15T06:35:13Z
 ---
 
 ## Genel Bakış
@@ -45,71 +45,120 @@ Bu modül, e2e test senaryoları için multi-tenant webhook ve cache altyapısı
 ## FONKSİYON DETAYLARI
 
 ### resolveTenant
+**Ne yapar**: HTTP isteğinin `host` header'ını analiz ederek geçerli bir kiracı (tenant) tanımlayıcısı (ID) çözümler. Bu, çok kiracılı (multi-tenant) bir sistemde isteğin hangi kiracıya ait olduğunu belirlemenin temel yoludur.
 
-**Ne yapar**: Bir HTTP isteğinin `host` başlığını analiz ederek ilgili tenant'ı (kiracıyı) belirler. Bu fonksiyon, çoklu kiracılı (multi-tenant) bir sistemde isteklerin hangi kiracıya ait olduğunu tespit etmek için kullanılır.
-
-**Nasıl yapar**: Önce ortamın geliştirme modu olup olmadığını ve host'un `localhost` ile başlayıp başlamadığını kontrol eder; bu durumda doğrudan `'default'` tenant'ı döner. Sonrasında TENANT_REGISTRY üzerinde custom domain eşleşmesi arar. Eşleşme bulunamazsa hostname'i noktalara göre ayırarak subdomain tabanlı eşleme yapar. Subdomain'de geçersiz karakter varsa hata döner. Hiçbir eşleşme bulunamazsa varsayılan tenant'a yönelir.
+**Nasıl yapar**: Fonksiyon, öncelikle geliştirme ortamı ve localhost kontrolü yaparak varsayılan bir kiracı döndürür. Ardından host header'ını temizler ve port numarasını ayırt ederek hostname'i elde eder. `TENANT_REGISTRY` array'indeki kayıtları, özel alan adı (customDomain) ve alt alan adı (subdomain) eşleştirmeleri için tarar. Eşleşme bulursa kiracının askıya alınmış (suspended) olup olmadığını kontrol eder ve uygun sonucu döndürür. Hiçbir eşleşme bulunamazsa 'default' kiracısını döndürür.
 
 **Parametreler**:
-- `req`: NextRequest — Kiracı tespiti için host başlığı çıkarılacak olan Next.js istek nesnesi
+- `req`: NextRequest — HTTP isteği nesnesi. İsteğin host header'ı bu nesnenin `headers.get('host')` metoduyla alınır.
 
-**Dönüş**: `{ tenantId: string | null; error?: string }` — Eşleşen kiracının ID'sini veya hata durumunda hata mesajını içeren nesne döner. Tenant bulunamadığında `tenantId: null` ve ilgili hata mesajı gönderilir.
+**Dönüş**: `{ tenantId: string | null; error?: string }` — Bir nesne döndürür. Başarılı çözümlemede `tenantId` string, başarısızsa `null` olur. Hata durumunda `error` alanı hata mesajını içerir. Olası hata mesajları: 'Empty Host Header', 'Tenant Suspended', 'Malformed Subdomain'.
 
 ### mockUserResolver
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Testler için sahte (mock) kullanıcı çözücü (resolver) bir fonksiyon üretir (factory pattern). Üretilen fonksiyon çağrıldığında, sahte bir kullanıcı nesnesi veya bir hata nesnesi içeren bir sonuç döndürür.
+
+**Nasıl yapar**: Fonksiyon, `mockUserResolver()` çağrıldığında, içinde asenkron bir arrow fonksiyon (`async () => { ... }`) tanımlar ve bunu döndürür. Döndürülen bu asenkron fonksiyon kendi içinde gerçek `mockUserResolver` fonksiyonunu çağırarak sonuçları alır ve `{ data, error }` formatına dönüştürerek dışarı verir.
+
+**Parametreler**: Parametre almaz.
+
+**Dönüş**: `() => { user: any; error: any }` — Parametresiz, `{ user: any; error: any }` objesi döndüren bir fonksiyon.
 
 ### computeSignature
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Verilen bir `secret` anahtarı ve `body` içeriği kullanarak HMAC-SHA256 tabanlı bir imza hesaplar. Bu genellikle webhook doğrulama gibi güvenlik mekanizmalarında kullanılır.
+
+**Nasıl yapar**: Fonksiyon, `TextEncoder` kullanarak secret ve body string'lerini byte dizilerine dönüştürür. `globalThis.crypto.subtle.importKey` metoduyla raw secret'tan bir HMAC-SHA256 kripto anahtarı (CryptoKey) oluşturur. Sonra `globalThis.crypto.subtle.sign` metoduyla bu anahtarı kullanarak body üzerinde bir imza üretir. Üretilen imza byte dizisi `Uint8Array`'den `btoa` ile base64 encoded bir string'e dönüştürülerek döndürülür.
+
+**Parametreler**:
+- `secret`: string — İmza hesaplamada kullanılacak gizli anahtar.
+- `body`: string — İmzalanacak olan veri içeriği.
+
+**Dönüş**: `Promise<string>` — Asenkron olarak hesaplanmış, base64 formatında HMAC-SHA256 imzası.
 
 ### buildKey
-**Ne yapar**: Verilen anahtar, dil ve kiracı kimliği bilgilerini birleştirerek önbellekte kullanılan benzersiz bir string anahtar oluşturur.
-**Nasıl yapar**: Parametreleri bir dizi içinde toplayıp `JSON.stringify` ile JavaScript nesnesine dönüştürerek tutarlı ve dizilebilir bir anahtar üretir.
+**Ne yapar**: Çok kiracılı önbellek motoru için benzersiz bir önbellek anahtarı (key) oluşturur. Bu anahtar, belirli bir dil ve kiracıya ait veriyi depolamak ve almak için kullanılır.
+
+**Nasıl yapar**: Fonksiyon, `key`, `lang` ve `tenantId` parametrelerini bir array'e koyar ve `JSON.stringify` ile bir string'e dönüştürerek döndürür. Bu, her üç değerin benzersiz kombinasyonunu temsil eden basit ama etkili bir anahtar üretim methodudur.
+
 **Parametreler**:
-- `key: string` — Önbelleklenen veriye ilişkin temel anahtar.
-- `lang: string` — Veri diline ilişkin kod (ör. 'tr', 'en').
-- `tenantId: string` — Verinin ait olduğu kiracı (tenant) kimliği.
-**Dönüş**: `string` — JSON formatında oluşturulmuş, benzersiz bir önbellek anahtarı.
+- `key`: string — Önbelleklenecek verinin tanımlayıcı anahtarı.
+- `lang`: string — Verinin ait olduğu dil kodu (ör. 'tr', 'en').
+- `tenantId`: string — Verinin ait olduğu kiracı tanımlayıcısı.
+
+**Dönüş**: `string` — JSON string formatında, üç parametrenin kombinasyonundan oluşan benzersiz önbellek anahtarı.
 
 ### getCachedData
-**Ne yapar**: Verilen parametrelerle eşleşen veriyi önbellekten getirir; önbellekte yoksa verilen fonksiyonu kullanarak taze veri alır, önbelleğe kaydeder ve döndürür.
-**Nasıl yapar**: Önce `buildKey` ile anahtar oluşturup depoda arar. Eğer varsa, derin bir kopyasını (`JSON.parse(JSON.stringify(...))`) döndürerek dışarıdan yapılabilecek değişikliklerin önbellekteki değeri etkilemesini önler. Yoksa, `fetchFn` çağrısı ile yeni veri alınır, opsiyonel olarak belirtilen etiketler (`tags`) kiracı kimliği ile ilişkilendirilerek saklanır ve taze değer döndürülür.
+**Ne yapar**: Kiracıya ve dile özgü verileri önbellekten alır. Eğer istenen veri önbellekte yoksa, sağlanan `fetchFn` asenkron fonksiyonunu çağırarak taze veriyi getirir, önbelleğe kaydeder ve döndürür.
+
+**Nasıl yapar**: Fonksiyon, önce `buildKey` metodunu kullanarak benzersiz bir önbellek anahtarı üretir. Bu anahtarla `store` Map'inde arama yapar. Eğer veri mevcutsa, `JSON.parse(JSON.stringify(...))` ile derin bir kopyasını alarak orijinal veriyi korur ve döndürür. Veri yoksa, `fetchFn()` çağrısıyla taze veriyi alır. Eğer `options.tags` tanımlıysa, her etiketi `:${tenantId}` soneki ile bağlayarak (bound tags) önbellek girişinin etiketleri olarak ekler. Sonra veriyi store'a kaydeder ve taze veriyi döndürür.
+
 **Parametreler**:
-- `key: string` — Temel önbellek anahtarı.
-- `lang: string` — Veri dili kodu.
-- `tenantId: string` — Kiracı kimliği.
-- `fetchFn: () => Promise<any> | any` — Önbellekte bulunmadığında çağrılacak, veriyi getiren fonksiyon.
-- `options: { tags?: string[] }` — İsteğe bağlı ayarlar. `tags` dizisi, bu önbellek girişini ileride toplu olarak temizlemek için kullanılabilecek etiketleri belirtir.
-**Dönüş**: `Promise<any>` — Önbellekten alınmış derin kopya veya taze olarak getirilmiş değer.
+- `key`: string — Önbellek anahtarı için temel tanımlayıcı.
+- `lang`: string — Dil kodu.
+- `tenantId`: string — Kiracı tanımlayıcısı.
+- `fetchFn`: `() => Promise<any> | any` — Önbellekte veri yoksa çağrılacak, taze veriyi getiren fonksiyon. Asenkron veya senkron olabilir.
+- `options`: `{ tags?: string[] }` — İsteğe bağlı. Önbellek girişine bağlanacak etiket dizisi. Bu etiketler, sonradan `revalidateTag` ile temizleme için kullanılır.
+
+**Dönüş**: `Promise<any>` — Önbellekten alınan veya taze olarak fetch edilmiş veri.
 
 ### revalidateTag
-**Ne yapar**: Belirli bir etikete ve kiracıya ait tüm önbellek girişlerini depodan silerek önbelleği yeniden doğrular (temizler).
-**Nasıl yapar**: Etiket ve kiracı kimliğini birleştirerek hedef etiket formatını oluşturur (`tag:tenantId`). Depodaki tüm girdileri dolaşıp, etiketleri bu hedefi içeren girişlerin anahtarlarını toplar, ardından bu anahtarların hepsini depodan siler.
+**Ne yapar**: Belirli bir etikete (tag) ve kiracıya ait tüm önbellek girişlerini temizler (invalidates). Bu, veri güncellendiğinde ilgili önbelleklerin silinmesi için kullanılır.
+
+**Nasıl yapar**: Fonksiyon, hedef etiketi `${tag}:${tenantId}` formatında oluşturur. Ardından `store` Map'indeki tüm girişleri döngüye alır. Her girişin `tags` dizisinde bu hedef etiketi arar. Eşleşen tüm önbellek anahtarlarını `keysToDelete` dizisine toplar. Döngüden sonra bu anahtarların hepsini `store.delete` metoduyla siler.
+
 **Parametreler**:
-- `tag: string` — Temizlenecek önbellek etiketi.
-- `tenantId: string` — Etiketin ait olduğu kiracı kimliği.
-**Dönüş**: `void` — Fonksiyon doğrudan bir değer döndürmez, depo üzerinde yan etki (silme) oluşturur.
+- `tag`: string — Temizlenecek önbellek etiketinin temel adı.
+- `tenantId`: string — Hangi kiracının önbelleğinin temizleneceği.
+
+**Dönüş**: Fonksiyon herhangi bir değer döndürmez (void).
 
 ### secureRevalidateTag
-**Ne yapar**: Kiracının kendi verisine ait önbelleği temizlemesine olanak tanıyan, erişim kontrollü bir `revalidateTag` sarmalayıcısıdır.
-**Nasıl yapar**: Önce istekte bulunan kiracının (`requestingTenantId`), hedef kiracıyla (`targetTenantId`) aynı olup olmadığını kontrol eder. Eşleşmezse bir hata fırlatır. Eşleşirse, yetkilendirme başarılı demektir ve `revalidateTag` fonksiyonunu çağırarak temizliği gerçekleştirir.
+**Ne yapar**: `revalidateTag` metodunun güvenli (secure) versiyonunu sunar. Kiracılar arası önbellek temizleme işlemlerini engelleyerek çok kiracılı ortamda veri güvenliğini sağlar.
+
+**Nasıl yapar**: Fonksiyon, önce `targetTenantId` ile `requestingTenantId`'nin aynı olup olmadığını kontrol eder. Eğer farklıysa 'Access Denied: Cannot invalidate cache for another tenant' hata mesajıyla bir Error fırlatır. Eğer aynıysa, `this.revalidateTag(tag, targetTenantId)` metodunu çağırarak temizleme işlemini gerçekleştirir.
+
 **Parametreler**:
-- `tag: string` — Temizlenecek önbellek etiketi.
-- `targetTenantId: string` — Önbelleği temizlenmek istenen hedef kiracının kimliği.
-- `requestingTenantId: string` — İşlemi başlatan (istekte bulunan) kiracının kimliği.
-**Dönüş**: `void` — Başarılıysa sessizce çalışır, başarısızsa hata fırlatır.
+- `tag`: string — Temizlenecek etiket.
+- `targetTenantId`: string — Önbelleği temizlenecek hedef kiracının ID'si.
+- `requestingTenantId`: string — Bu işlemi isteyen (yetkili) kiracının ID'si.
+
+**Dönüş**: Fonksiyon herhangi bir değer döndürmez (void). Yetkisiz erişim durumunda hata fırlatır.
 
 ### reset
-**Ne yapar**: `WebhookMockDb` içindeki tüm sipariş (`orders`) ve olay (`events`) verilerini temizleyerek veritabanı simülasyonunu başlangıç durumuna getirir.
-**Nasıl yapar**: Nesne içindeki `orders` ve `events` dizilerini sıfırlar, boş dizi (`[]`) atayarak tüm kayıtları siler.
-**Parametreler**: Yok.
-**Dönüş**: `void` — Fonksiyon doğrudan bir değer döndürmez, nesne içindeki durumu sıfırlar.
+**Ne yapar**: Webhook simülasyonu için kullanılan sahte (mock) veritabanındaki tüm sipariş ve olay verilerini temizler.
+
+**Nasıl yapar**: Fonksiyon, `this.orders` ve `this.events` dizilerini boş array'ler ile değiştirerek (atayarak) veritabanını sıfırlar.
+
+**Parametreler**: Parametre almaz.
+
+**Dönüş**: Fonksiyon herhangi bir değer döndürmez (void).
 
 ### from
-**Ne yapar**: Belirtilen tablo (`venthub_orders` veya olay tablosu) üzerinde zincirleme sorgulama ve veri manipulation (ekleme, güncelleme) işlemleri yapabilen bir sorgu nesnesi (chain) döndürür.
-**Nasıl yapar**: Verilen tablo adına göre dahili veri setini (`orders` veya `events`) seçer. Ardından `select`, `eq`, `limit`, `update`, `single`, `insert` ve `then` gibi metodları içeren ve her biri kendi döngüsünü (chain) döndüren bir nesne oluşturur. Bu metodlar, bir sonraki adım için durum (filtre, patch, limit) ayarlar veya son asenkron işlemi (`single`, `insert`, `then`) tetikleyerek nihai sonucu `{ data, error }` formatında döndürür.
+**Ne yapar**: Mock veritabanı üzerinde zincirleme (chaining) sorgu metotları sunan bir nesne döndürür. Bu, gerçek bir veritabanı istemcisinin (ör. Supabase client) API'sini taklit ederek testlerin yapılmasını sağlar.
+
+**Nasıl yapar**: Fonksiyon, tablo adına göre ilgili veri setini (`orders` veya `events`) seçer. Ardından, `select`, `eq`, `limit`, `update`, `single`, `insert` ve `then` metotlarını içeren bir `chain` nesnesi oluşturur. Bu metotlar, iç durumları (filterColumn, filterValue, limitVal, patchObject) değiştirerek zincirleme sorgu kurulumunu sağlar. `single` ve `insert` metotları asenkrondur ve Promise döndürürken, `then` metodu senkron çalışır ve bir `resolve` fonksiyonu çağırarak sonucu verir.
+
 **Parametreler**:
-- `table: string` — Sorgulanacak tablonun adı. `venthub_orders` ise siparişler, diğer bir değer ise olaylar集合 kullanılır.
-**Dönüş**: `object` — Zincirleme metodları (`select`, `eq`, `limit`, `update`, `single`, `insert`, `then`) içeren, sorgu oluşturma ve çalıştırma nesnesi.
+- `table`: string — Sorgulanacak tablonun adı. Şu an için 'venthub_orders' veya diğer olay tablosu kabul edilir.
+
+**Dönüş**: `chain` nesnesi — Zincirleme metotlar (`select`, `eq`, `limit`, `update`, `single`, `insert`, `then`) içeren bir nesne. Bu metotlar `Promise<{ data: any; error: any }>` formatında sonuç döndürür.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./helpers/denoRuntime::DenoRuntimeSimulator
+- import: ./helpers/denoRuntime::setupDenoRuntime
+- import: ./helpers/mockDb::MockDatabaseEngine
+- import: ./helpers/mockRequest::MockNextResponse
+- import: ./helpers/mockRequest::createMockRequest
+- import: @/middleware::middleware
+- import: next/server::NextRequest
+- import: next/server::NextResponse
+- import: vitest::afterEach
+- import: vitest::beforeEach
+- import: vitest::describe
+- import: vitest::expect
+- import: vitest::it
+- import: vitest::vi
 
 ---
 
@@ -124,8 +173,7 @@ Bu modül, e2e test senaryoları için multi-tenant webhook ve cache altyapısı
 ### FeatureConfig
 - `id: string`
 - `name: string`
-- `features: {
-`
+- `features: {`
 
 ### UserProfile
 - `id: string`
@@ -141,204 +189,222 @@ Bu modül, e2e test senaryoları için multi-tenant webhook ve cache altyapısı
 
 ## SABİTLER
 - **TENANT_REGISTRY** (array) — `[
-
   { id: 'tenant-eng-123', subdomain: 'engineering', status: 'active' },
-
- ...`
+  {...`
 - **FEATURE_REGISTRY** (new_expression) — `new Map<string, FeatureConfig>([
-
   ['tenant-eng-123', {
-
-    id: 'tenant-eng...`
+    id: 'tenant-eng-1...`
 - **mockDbInstance** (new_expression) — `new WebhookMockDb()`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::resolveTenant
-- **params**: `(req: NextRequest)` — HTTP isteği nesnesi, header'ları host bilgisi için kullanılır
+### [N1_NASIL] AST Pointer: scenarios.test.ts::resolveTenant
+- **params**: `req: NextRequest` — İstek nesnesi, host header'ını okumak için kullanılır
 - **ic_degiskenler**:
-  - `host` — `req.headers.get('host')` ile alınan host header'ı, boşsa boş string default'u
-  - `isDev` — `process.env.NODE_ENV === 'development'` kontrolü, geliştirme ortamı mı
-  - `isLocalhost` — host'un `localhost` veya `127.0.0.1` ile başlayıp başlamadığı kontrolü
-  - `cleanHost` — host'un küçük harfe çevrilip trim edilmiş hali
-  - `parts` — cleanHost'un `:` ile split edilmesiyle elde edilen parçalar
-  - `hostname` — `parts[0]`, port bilgisi çıkarılmış ana hostname
-  - `customMatch` — `TENANT_REGISTRY.find(...)` ile özel domain eşleşmesi aranması
-  - `domainParts` — hostname'un `.` ile split edilmesi, alt domain kontrolü için
-  - `subdomain` — `domainParts[0]`, ilk alt domain parçası
-  - `subMatch` — `TENANT_REGISTRY.find(...)` ile subdomain eşleşmesi aranması
-- **Dönüş**: `{ tenantId: string | null; error?: string }` — tenant ID veya hata mesajı
+  - `host` — `req.headers.get('host') || ''` — İsteğin host header değerini alır, boşsa boş string döner
+  - `isDev` — `process.env.NODE_ENV === 'development'` — Geliştirme modunda olup olmadığını kontrol eder
+  - `isLocalhost` — host'un `'localhost'` veya `'127.0.0.1'` ile başlayıp başlamadığını kontrol eder
+  - `cleanHost` — `host.toLowerCase().trim()` — Host'u küçük harfe çevirip boşlukları temizler
+  - `parts` — `cleanHost.split(':')` — Host'u port ayracı ile böler
+  - `hostname` — `parts[0]` — Port kısmını çıkarılmış saf hostname
+  - `customMatch` — `TENANT_REGISTRY.find(t => t.customDomain && hostname === t.customDomain)` — TENANT_REGISTRY'de customDomain eşleşmesi arar
+  - `domainParts` — `hostname.split('.')` — Hostname'i nokta ile böler
+  - `subdomain` — `domainParts[0]` — İlk bölüm, subdomain kısmı
+- **Dönüş**: `{ tenantId: string | null; error?: string }` — Çözülen tenant ID veya hata mesajı
 
----
+### [N2_NASIL] AST Pointer: scenarios.test.ts::mockUserResolver
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ user: { id, user_metadata, app_metadata }; error: null }` — Mock kullanıcı nesnesi ve null hata
 
-### [N2_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::mockUserResolver
-- **params**: (yok)
-- **ic_degiskenler**: (yok — sadece literal nesne döndürür)
-- **Dönüş**: `{ user: { id: string, user_metadata: { role: string }, app_metadata: { tenant_id: string } }, error: null }` — varsayılan admin kullanıcısını simüle eder
+### [N3_NASIL] AST Pointer: scenarios.test.ts::createMockSupabaseClient (anonim arrow)
+- **params**: yok
+- **ic_degiskenler**: yok — Doğrudan `createServerClient` nesnesi döndürür
+- **Dönüş**: `{ createServerClient: () => { auth: { getUser, getClaims, getSession } } }` — Mock Supabase client nesnesi
 
----
+### [N4_NASIL] AST Pointer: scenarios.test.ts::mockSupabaseClientFactory (anonim arrow)
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ auth: { getUser, getClaims, getSession } }` — Mock auth nesnesi
 
-### [N3_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::computeSignature
-- **params**: `(secret: string, body: string)` — HMAC secret anahtarı ve imzalanacak raw body string'i
+### [N5_NASIL] AST Pointer: scenarios.test.ts::getUser (anonim async arrow)
+- **params**: yok
 - **ic_degiskenler**:
-  - `encoder` — `new TextEncoder()`, string'leri UTF-8 byte dizisine çevirmek için
-  - `key` — `crypto.subtle.importKey(...)` ile HMAC-SHA256 CryptoKey nesnesi
-  - `signature` — `crypto.subtle.sign(...)` ile HMAC-SHA256 imza byte dizisi
-- **Dönüş**: `Promise<string>` — base64url formatında HMAC imza string'i
+  - `res` — `mockUserResolver()` çağrısı — Mock user resolver sonucu
+- **Dönüş**: `{ data: { user }, error }` — Kullanıcı verisi veya hata
 
----
-
-### [N4_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::MultiTenantCacheEngine.buildKey
-- **params**: `(key: string, lang: string, tenantId: string)` — cache key, dil kodu ve tenant ID
-- **ic_degiskenler**: (yok — tek satır return)
-- **Dönüş**: `string` — `[key, lang, tenantId]` dizisinin JSON string temsili
-
----
-
-### [N5_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::MultiTenantCacheEngine.getCachedData
-- **params**: `(key: string, lang: string, tenantId: string, fetchFn: () => Promise<any> | any, options: { tags?: string[] })` — cache key, dil, tenant ID, veri çekme fonksiyonu ve opsiyonel tag listesi
+### [N6_NASIL] AST Pointer: scenarios.test.ts::getClaims (anonim async arrow)
+- **params**: yok
 - **ic_degiskenler**:
-  - `cacheKey` — `this.buildKey(key, lang, tenantId)` çağrısı ile üretilen birleşik cache anahtarı
-  - `existing` — `this.store.get(cacheKey)` ile mevcut cache kaydının aranması
-  - `freshValue` — `await fetchFn()` ile cache miss durumunda taze verinin çekilmesi
-  - `boundTags` — `options.tags` dizisinin tenant ID ile birleştirilerek `tag:tenantId` formatına dönüştürülmesi
-- **Dönüş**: `Promise<any>` — cache'den derin kopya veya fetchFn sonucu
+  - `res` — `mockUserResolver()` çağrısı — Mock user resolver sonucu
+- **Dönüş**: `{ data: { claims: { user_role, app_metadata, user_metadata } } | null, error }` — JWT claim'leri veya hata
 
----
-
-### [N6_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::MultiTenantCacheEngine.revalidateTag
-- **params**: `(tag: string, tenantId: string)` — invalidate edilecek tag ve tenant ID
+### [N7_NASIL] AST Pointer: scenarios.test.ts::getSession (anonim async arrow)
+- **params**: yok
 - **ic_degiskenler**:
-  - `targetTag` — `tag:tenantId` formatında birleşik tag anahtarı
-  - `keysToDelete` — silinecek cache anahtarlarını tutan dizi, `string[]`
-- **Dönüş**: yok — `this.store` Map'inden eşleşen tag'li entry'leri siler (yan etki)
+  - `res` — `mockUserResolver()` çağrısı — Mock user resolver sonucu
+  - `payload` — `{ user_role, app_metadata, user_metadata }` — JWT payload için claim nesnesi
+  - `base64` — `Buffer.from(JSON.stringify(payload)).toString('base64')...` — Base64URL encode edilmiş payload
+  - `token` — `` `header.${base64}.signature` `` — Sahte JWT access token
+- **Dönüş**: `{ data: { session: { access_token, user } }, error }` — Mock session nesnesi
 
----
+### [N8_NASIL] AST Pointer: scenarios.test.ts::computeSignature
+- **params**: `secret: string` — HMAC gizli anahtarı, `body: string` — İmzalanacak JSON gövdesi
+- **ic_degiskenler**:
+  - `encoder` — `new TextEncoder()` — String'leri Uint8Array'e çeviren encoder
+  - `key` — `globalThis.crypto.subtle.importKey('raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])` — HMAC-SHA-256 anahtarı
+  - `signature` — `globalThis.crypto.subtle.sign('HMAC', key, encoder.encode(body))` — HMAC imzası (Uint8Array)
+- **Dönüş**: `Promise<string>` — Base64 encode edilmiş HMAC imzası
 
-### [N7_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::MultiTenantCacheEngine.secureRevalidateTag
-- **params**: `(tag: string, targetTenantId: string, requestingTenantId: string)` — tag, hedef tenant ID, istek yapan tenant ID
-- **ic_degiskenler**: (yok — koşul kontrolü ve revalidateTag çağrısı)
-- **Dönüş**: yok — tenant eşleşmiyorsa `Error` fırlatır, eşleşiyorsa `revalidateTag` çağırır
+### [N9_NASIL] AST Pointer: scenarios.test.ts::MultiTenantCacheEngine.buildKey
+- **params**: `key: string` — Cache anahtarı adı, `lang: string` — Dil kodu, `tenantId: string` — Tenant ID
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — `JSON.stringify([key, lang, tenantId])` formatında birleşik cache anahtarı
 
----
+### [N10_NASIL] AST Pointer: scenarios.test.ts::MultiTenantCacheEngine.getCachedData
+- **params**: `key: string`, `lang: string`, `tenantId: string`, `fetchFn: () => Promise<any> | any`, `options: { tags?: string[] } = {}`
+- **ic_degiskenler**:
+  - `cacheKey` — `this.buildKey(key, lang, tenantId)` — Oluşturulan birleşik cache anahtarı
+  - `existing` — `this.store.get(cacheKey)` — Map'ten okunan mevcut cache girişi
+  - `freshValue` — `await fetchFn()` — Cache miss durumunda fetch fonksiyonu ile çekilen taze veri
+  - `boundTags` — `(options.tags || []).map(t => \`${t}:${tenantId}\`)` — Tenant ID ile bağlanmış etiketler dizisi
+- **Dönüş**: `Promise<any>` — Cache'den veya fetch fonksiyonundan gelen veri
 
-### [N8_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::WebhookMockDb.reset
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
+### [N11_NASIL] AST Pointer: scenarios.test.ts::MultiTenantCacheEngine.revalidateTag
+- **params**: `tag: string` — İptal edilecek etiket adı, `tenantId: string` — Tenant scope'u
+- **ic_degiskenler**:
+  - `targetTag` — `` `${tag}:${tenantId}` `` — Tenant ile bound edilmiş tam etiket
+  - `keysToDelete` — `string[]` — Silinecek cache anahtarları dizisi
+- **Dönüş**: yok — Bu method `this.store` Map'inden eşleşen entry'leri siler (yan etki)
+
+### [N12_NASIL] AST Pointer: scenarios.test.ts::MultiTenantCacheEngine.secureRevalidateTag
+- **params**: `tag: string`, `targetTenantId: string`, `requestingTenantId: string`
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — Tenant ID eşleşmezse `Error('Access Denied: Cannot invalidate cache for another tenant')` fırlatır, eşleşirse `this.revalidateTag` çağırır
+
+### [N13_NASIL] AST Pointer: scenarios.test.ts::WebhookMockDb.reset
+- **params**: yok
+- **ic_degiskenler**: yok
 - **Dönüş**: yok — `this.orders` ve `this.events` dizilerini boş array'e sıfırlar
 
----
-
-### [N9_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::WebhookMockDb.from
-- **params**: `(table: string)` — sorgulanacak tablo adı (`venthub_orders` veya diğer)
+### [N14_NASIL] AST Pointer: scenarios.test.ts::WebhookMockDb.from
+- **params**: `table: string` — Erişilecek tablo adı (`'venthub_orders'` veya diğer)
 - **ic_degiskenler**:
-  - `dataset` — tabloya göre `this.orders` veya `this.events` referansı
-  - `filterColumn` — `eq()` ile ayarlanan filtre sütun adı
-  - `filterValue` — `eq()` ile ayarlanan filtre değeri
-  - `limitVal` — `limit()` ile ayarlanan sonuç sayısı limiti
-  - `patchObject` — `update()` ile ayarlanan güncelleme nesnesi
-  - `chain` — zincirleme API (select, eq, limit, update, single, insert, then metodları içeren nesne)
-- **Dönüş**: `chain` nesnesi — Supabase query builder simülasyonu, `.then()` ile promise gibi çözümlenir
+  - `dataset` — `table === 'venthub_orders' ? this.orders : this.events` — Tabloya karşılık gelen veri dizisi
+  - `filterColumn` — `string` — Dinamik eq() ile ayarlanan filtre sütun adı
+  - `filterValue` — `any` — Dinamik eq() ile ayarlanan filtre değeri
+  - `limitVal` — `number` — limit() ile ayarlanan satır limiti
+  - `patchObject` — `any` — update() ile ayarlanan güncelleme nesnesi
+  - `chain` — Nesne — Zincirleme method'lar (select, eq, limit, update, single, insert, then) içeren query builder
+- **Dönüş**: `chain` — Supabase-style query builder nesnesi (select → eq → limit → single/then zinciri)
 
----
-
-### [N10_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::runCheckout
-- **params**: `(dbEngine: MockDatabaseEngine, activeTenantId: string, productId: string, quantity: number)` — DB motoru, aktif tenant ID, ürün ID ve sipariş miktarı
+### [N15_NASIL] AST Pointer: scenarios.test.ts::runCheckout
+- **params**: `dbEngine: MockDatabaseEngine` — Mock veritabanı motoru, `activeTenantId: string` — Aktif tenant ID, `productId: string` — Ürün ID, `quantity: number` — Satın alınacak miktar
 - **ic_degiskenler**:
-  - `client` — `dbEngine.createClient()` ile oluşturulan Supabase client nesnesi
-  - `product` — `client.from('products').eq('id', productId).maybeSingle()` ile bulunan ürün satırı
-  - `error` — ürün sorgulama hatası
-  - `updatedStock` — `product.stock - quantity` hesaplanan yeni stok değeri
-  - `updated` — `client.from('products').eq('id', productId).update(...)` ile güncellenmiş satırlar
-- **Dönüş**: `{ success: boolean; error?: string }` — checkout başarısı veya hata mesajı
+  - `client` — `dbEngine.createClient()` — RLS bağlamı ayarlanmış Supabase client
+  - `product` — `client.from('products').eq('id', productId).maybeSingle()` sonucu data — Sorgulanan ürün nesnesi
+  - `error` — Ürün sorgulama hatası
+  - `updatedStock` — `product.stock - quantity` — Güncellenmiş stok miktarı
+  - `updated` — `client.from('products').eq('id', productId).update({ stock: updatedStock })` sonucu — Güncelleme sonucu
+- **Dönüş**: `{ success: boolean; error?: string }` — İşlem başarısı ve hata mesajı
 
----
-
-### [N11_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::secureMiddleware
-- **params**: `(req: NextRequest)` — HTTP isteği
+### [N16_NASIL] AST Pointer: scenarios.test.ts::secureMiddleware
+- **params**: `req: NextRequest` — Middleware'e verilen istek
 - **ic_degiskenler**:
-  - `baseRes` — `await middleware(req)` çağrısı ile elde edilen temel yanıt
-  - `resolvedTenantId` — hardcoded `'tenant-eng-123'`, engineering subdomain'inden çözümlenen tenant
-  - `claims` — `mockUserResolver().user?.app_metadata` ile JWT claim'lerinden tenant_id alınması
-  - `redirectUrl` — `req.nextUrl.clone()` ile klonlanan URL, auth_error parametresi eklenir
-- **Dönüş**: `NextResponse` — middleware yanıtını veya 302 redirect (auth_error) döndürür
+  - `baseRes` — `await middleware(req)` — Orijinal middleware yanıt nesnesi
+  - `resolvedTenantId` — `'tenant-eng-123'` — Host'tan çözülen tenant ID (hardcoded, engineering.venthub.local'den)
+  - `claims` — `mockUserResolver().user?.app_metadata` — JWT claim'lerindeki tenant bilgisi
+  - `redirectUrl` — `req.nextUrl.clone()` — Redirect için klonlanmış URL nesnesi
+- **Dönüş**: `NextResponse` — 200 ise claim eşleşmezse 302 redirect, değilse baseRes
 
----
-
-### [N12_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::beforeEach (test setup)
-- **params**: (yok — vitest lifecycle callback)
+### [N17_NASIL] AST Pointer: scenarios.test.ts::beforeEach_callback
+- **params**: yok
 - **ic_degiskenler**:
-  - `db` — `new MockDatabaseEngine()` ile oluşturulan mock DB motoru
-  - `cache` — `new MultiTenantCacheEngine()` ile oluşturulan multi-tenant cache motoru
-  - `simulator` — `setupDenoRuntime({ env: {...} })` ile oluşturulan Deno runtime simülatörü, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SHIPPING_WEBHOOK_SECRET, SHIPPING_WEBHOOK_TOKEN env'leri ile
-- **Dönüş**: yok — test öncesi ortamı hazırlar (env stub, DB seed, simulator başlatma)
+  - `vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', ...)` — Supabase URL stub'u
+  - `vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', ...)` — Anon key stub'u
+  - `vi.stubEnv('NODE_ENV', 'production')` — Production modu stub'u
+  - `vi.stubEnv('JWT_CLAIMS_COOKIE_SECRET', ...)` — JWT claims cookie secret stub'u
+  - `db` — `new MockDatabaseEngine()` — Mock veritabanı instance'ı
+  - `cache` — `new MultiTenantCacheEngine()` — Multi-tenant cache instance'ı
+  - `simulator` — `setupDenoRuntime({ env: { ... } })` — Deno runtime simülatörü, env değişkenleri ile
+- **Dönüş**: yok — Test ortamını hazırlar, seed data ekler
 
----
+### [N18_NASIL] AST Pointer: scenarios.test.ts::afterEach_callback
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `vi.unstubAllEnvs()`, `vi.restoreAllMocks()`, `simulator.cleanup()` çağırarak temizlik yapar
 
-### [N13_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::afterEach (test teardown)
-- **params**: (yok — vitest lifecycle callback)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — `vi.unstubAllEnvs()`, `vi.restoreAllMocks()`, `simulator.cleanup()` çağrısı ile temizlik
-
----
-
-### [N14_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::it callback (Dynamic Onboarding)
-- **params**: (yok — vitest it callback)
+### [N19_NASIL] AST Pointer: scenarios.test.ts::it_dynamic_onboarding
+- **params**: yok
 - **ic_degiskenler**:
-  - `onboardedTenantId` — `'tenant-new-999'`, yeni kiracı ID'si
-  - `client` — `db.createClient()` ile oluşturulan Supabase client
-  - `profile` — `client.from('user_profiles').insert(...)` ile eklenen kullanıcı profili
-  - `errProfile` — insert hatası
-  - `req` — `createMockRequest(...)` ile oluşturulan `new-hvac.venthub.local` host'lu mock istek
-  - `tenantId` — `resolveTenant(req)` ile çözümlenen tenant ID'si
-  - `errResolve` — resolve hatası
-  - `featureFlags` — `FEATURE_REGISTRY.get(tenantId!)` ile feature flag nesnesi
-  - `newInsertedProduct` — yeni ürün ekleme sonucu
-  - `retrievedProducts` — `client.from('products').select()` ile çekilen ürünler
-  - `salesProducts` — sales tenant context'inde çekilen ürünler (izolasyon doğrulama)
-- **Dönüş**: yok — `expect` assertion'ları ile test doğrulaması yapar
+  - `onboardedTenantId` — `'tenant-new-999'` — Yeni oluşturulan tenant ID
+  - `db` — `MockDatabaseEngine` instance'ı (outer scope'tan)
+  - `client` — `db.createClient()` — Veritabanı istemcisi
+  - `profile` — `client.from('user_profiles').insert(...)` sonucu data — Oluşturulan kullanıcı profili
+  - `errProfile` — Profil oluşturma hatası
+  - `req` — `createMockRequest({ url: 'https://new-hvac.venthub.local/admin/dashboard', headers: { host: 'new-hvac.venthub.local' } })` — Mock istek
+  - `tenantId` — `resolveTenant(req).tenantId` — Çözülen tenant ID
+  - `errResolve` — resolveTenant hatası
+  - `featureFlags` — `FEATURE_REGISTRY.get(tenantId!)` — Tenant'a ait feature flag'ler
+  - `newInsertedProduct` — Yeni eklenen ürün verisi
+  - `retrievedProducts` — `client.from('products').select()` ile çekilen ürünler dizisi
+  - `salesProducts` — Sales tenant context'inde çekilen ürünler
+- **Dönüş**: yok — Test assertion'ları çalıştırır
 
----
-
-### [N15_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::it callback (Concurrent Checkout)
-- **params**: (yok — vitest it callback)
+### [N20_NASIL] AST Pointer: scenarios.test.ts::it_checkout_stock_decrement
+- **params**: yok
 - **ic_degiskenler**:
-  - `resA` — `runCheckout(db, 'tenant-eng-123', 'prod-eng-1', 3)` sonucu
-  - `resB` — `runCheckout(db, 'tenant-sales-456', 'prod-sales-1', 2)` sonucu
-  - `pA` — engineering tenant ürün verisi, `db.createClient().from('products').eq('id', 'prod-eng-1').single()`
-  - `pB` — sales tenant ürün verisi, `db.createClient().from('products').eq('id', 'prod-sales-1').single()`
-  - `resCross` — `runCheckout(db, 'tenant-eng-123', 'prod-sales-1', 1)` cross-tenant checkout sonucu
-- **Dönüş**: yok — `expect` assertion'ları ile stok seviyelerini ve cross-tenant izolasyonu doğrular
+  - `db` — `MockDatabaseEngine` instance'ı (outer scope'tan)
+  - `resA` — `runCheckout(db, 'tenant-eng-123', 'prod-eng-1', 3)` sonucu — Engineering tenant checkout sonucu
+  - `resB` — `runCheckout(db, 'tenant-sales-456', 'prod-sales-1', 2)` sonucu — Sales tenant checkout sonucu
+  - `pA` — `db.createClient().from('products').eq('id', 'prod-eng-1').single()` sonucu data — Engineering ürün stok seviyesi
+  - `pB` — `db.createClient().from('products').eq('id', 'prod-sales-1').single()` sonucu data — Sales ürün stok seviyesi
+  - `resCross` — `runCheckout(db, 'tenant-eng-123', 'prod-sales-1', 1)` sonucu — Çapraz tenant checkout denemesi
+- **Dönüş**: yok — Test assertion'ları çalıştırır
 
----
-
-### [N16_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::it callback (Security/Penetration Testing)
-- **params**: (yok — vitest it callback)
+### [N21_NASIL] AST Pointer: scenarios.test.ts::it_security_cross_tenant_attack
+- **params**: yok
 - **ic_degiskenler**:
-  - `attackerTenantId` — `'tenant-eng-123'`, saldırgan kiracı ID'si
-  - `victimTenantId` — `'tenant-sales-456'`, kurban kiracı ID'si
-  - `leakedProds` — cross-tenant ürün sorgulama sonucu (RLS ile filtrelenmeli)
-  - `reqHijack` — `createMockRequest(...)` ile `engineering.venthub.local` host'lu mock istek
-  - `resHijack` — `secureMiddleware(reqHijack)` sonucu, 302 redirect beklenir
-  - `cachedB` — `cache.getCachedData(...)` ile victim tenant cache'inin hala sağlam olup olmadığı
-  - `rawBody` — `JSON.stringify(...)` ile üretilen fake webhook body'i
-  - `reqFakeWebhook` — `new Request(...)` ile üretilen sahte webhook isteği, `x-signature` header'ı ile
-  - `resFakeWebhook` — `simulator.invokeFunction(webhookFunctionPath, reqFakeWebhook)` sonucu
-- **Dönüş**: yok — 4 farklı saldırı vektörünü test eder: veri sızıntısı, session hijacking, cache invalidation, fake webhook
+  - `attackerTenantId` — `'tenant-eng-123'` — Saldırgan tenant ID
+  - `victimTenantId` — `'tenant-sales-456'` — Kurban tenant ID
+  - `db` — `MockDatabaseEngine` instance'ı (outer scope'tan)
+  - `leakedProds` — `db.createClient().from('products').eq('tenant_id', victimTenantId).select()` sonucu — Çapraz tenant ürün sızıntısı testi
+  - `reqHijack` — `createMockRequest({ url: 'https://engineering.venthub.local/admin/settings', ... })` — Session hijacking isteği
+  - `resHijack` — `secureMiddleware(reqHijack)` sonucu — Middleware yanıt nesnesi
+  - `cachedB` — `cache.getCachedData(...)` sonucu — Victim cache verisi doğrulaması
+  - `rawBody` — `JSON.stringify({ order_number: 'ORD-COL-100', status: 'shipped' })` — Fake webhook gövdesi
+  - `reqFakeWebhook` — `new Request(...)` — Sahte webhook isteği (fake signature ile)
+  - `resFakeWebhook` — `simulator.invokeFunction(webhookFunctionPath, reqFakeWebhook)` sonucu — Sahte webhook yanıtı
+- **Dönüş**: yok — Test assertion'ları çalıştırır
 
----
-
-### [N17_NASIL] AST Pointer: `tests/e2e/scenarios.test.ts`::it callback (Order Number Collision)
-- **params**: (yok — vitest it callback)
+### [N22_NASIL] AST Pointer: scenarios.test.ts::it_tenant_scoped_webhook_collision
+- **params**: yok
 - **ic_degiskenler**:
-  - `payload` — `{ order_number: 'ORD-COL-100', status: 'shipped' }` webhook payload'u
-  - `rawBody` — `JSON.stringify(payload)` ile üretilen ham body string'i
-  - `signature` — `await computeSignature('webhook-hmac-secret-12345', rawBody)` ile hesaplanan HMAC imzası
-  - `req` — `new Request(...)` ile üretilen webhook POST isteği, imzalı
-  - `originalFrom` — `mockDbInstance.from.bind(mockDbInstance)` ile orijinal from metodunun referansı
-- **Dönüş**: yok — `try/finally` bloğunda RLS simülasyonu ile aynı order_number'a sahip farklı tenant siparişlerinin izolasyonunu doğrular, finally'de `mockDbInstance.from = originalFrom` ile orijinal metot geri yüklenir
+  - `payload` — `{ order_number: 'ORD-COL-100', status: 'shipped' }` — Webhook payload nesnesi
+  - `rawBody` — `JSON.stringify(payload)` — JSON string'e çevrilmiş payload
+  - `signature` — `await computeSignature('webhook-hmac-secret-12345', rawBody)` — HMAC-SHA256 imzası
+  - `req` — `new Request('https://localhost/functions/v1/shipping-webhook', ...)` — Webhook isteği (x-timestamp header ile)
+  - `originalFrom` — `mockDbInstance.from.bind(mockDbInstance)` — Orijinal from method referansı (patch öncesi)
+  - `mockDbInstance.from` — Monkey-patched from method — RLS simülasyonu için single() methodunu override eder
+  - `chain` — `originalFrom(table)` — Orijinal query chain
+  - `originalSingle` — `chain.single.bind(chain)` — Orijinal single method referansı
+  - `rows` — `mockDbInstance.orders.filter(o => o.order_number === 'ORD-COL-100' && o.tenant_id === 'tenant-eng-123')` — RLS ile filtrelenmiş siparişler
+- **Dönüş**: yok — Test assertion'ları çalıştırır, `finally` bloğunda `originalFrom` geri yüklenir
+
+### [N23_NASIL] AST Pointer: scenarios.test.ts::it_custom_domain_resilience
+- **params**: yok
+- **ic_degiskenler**:
+  - `req1` — `createMockRequest({ url: 'https://custom-hvac.com/', ... })` — Custom domain, trailing slash
+  - `tenantId1` — `resolveTenant(req1).tenantId` — İlk test için çözülen tenant
+  - `req2` — `createMockRequest({ url: 'https://custom-hvac.com/tr/admin/orders', ... })` — Locale prefix ile path
+  - `tenantId2` — `resolveTenant(req2).tenantId` — İkinci test için çözülen tenant
+  - `req3` — `createMockRequest({ url: 'http://custom-hvac.com:3000/en/shop', ... })` — Port ile domain
+  - `tenantId3` — `resolveTenant(req3).tenantId` — Üçüncü test için çözülen tenant
+  - `db` — `MockDatabaseEngine` instance'ı (outer scope'tan)
+  - `customProducts` — `db.createClient().from('products').select()` sonucu — Custom tenant ürünleri
+- **Dönüş**: yok — Test assertion'ları çalıştırır
 
 ---
 

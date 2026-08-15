@@ -2,6 +2,7 @@ import { AlertTriangle, RefreshCw } from 'lucide-react'
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 
 import { I18nContext } from '../i18n/I18nContext'
+import { reportError } from '../lib/errorReporter'
 
 interface Props {
   children: ReactNode
@@ -50,6 +51,15 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo)
+
+    // T014-VH: boundary'ye düşen hatalar artık gerçek bir kanala (log-client-error
+    // edge fonksiyonu) da raporlanıyor; daha önce yalnız console'a yazılıyordu.
+    // reportError fire-and-forget'tir ve asla throw etmez.
+    reportError(error, {
+      source: 'ErrorBoundary',
+      componentStack: errorInfo.componentStack ?? '',
+      isChunkError: isChunkLoadError(error),
+    })
 
     // Track chunk loading errors specifically
     if (isChunkLoadError(error)) {

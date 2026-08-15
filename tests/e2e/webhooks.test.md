@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\tests\e2e\webhooks.test.ts
-skeleton_hash: 4abcf4ef2f95c955
+source_path: C:\Users\alize\venthub-wt-hotfix\tests\e2e\webhooks.test.ts
+skeleton_hash: 13cf93b83c79c47b
 entity_hashes:
-  func:WebhookMockDb:from: 50088fcf172f6607
-  func:WebhookMockDb:reset: 360250dfc0147daf
-  func:computeSignature: bfbf81eaa5d0230a
+  func:WebhookMockDb:from: 0ca32233a6ca28df
+  func:WebhookMockDb:reset: 58b3f23f23a6fc30
+  func:computeSignature: 6cced5797e512f5e
   overview: 861218b312344817
-generated_at: 2026-05-30T20:39:32Z
+generated_at: 2026-08-15T06:35:00Z
 ---
 
 ## Genel Bakış
@@ -35,25 +35,44 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ## FONKSİYON DETAYLARI
 
 ### computeSignature
-**Ne yapar**: HMAC-SHA256 algoritmasını kullanarak verilen bir gövde (body) için kriptografik bir imza hesaplar.
-**Nasıl yapar**: Web Crypto API'sini kullanarak gizli anahtarı (secret) raw formatında içe aktarır, HMAC-SHA256 ayarlarıyla bir CryptoKey nesnesi oluşturur. Ardından bu anahtarla gövdeyi imzalar ve elde edilen ikili imza verisini Base64 formatına dönüştürerek okunabilir bir metin dizesi olarak döndürür.
+**Ne yapar**: Bu fonksiyon, bir HMAC-SHA256 imzası hesaplar. Genellikle webhook'ların güvenliğini sağlamak için, gönderilen verilerin bütünlüğünü doğrulamak amacıyla kullanılır.
+**Nasıl yapar**: Fonksiyon, gizli anahtarı (secret) ve gövde (body) metnini `TextEncoder` ile UTF-8 byte dizisine dönüştürür. Ardından Web Crypto API'sini (`globalThis.crypto.subtle`) kullanarak, HMAC-SHA256 algoritması için bir anahtar (key) import eder. Bu anahtar ile gövde üzerine bir imza (sign) işlemi uygulanır. Elde edilen imza byte dizisi, base64 formatına dönüştürülerek string olarak döndürülür. Bu süreç, kriptografik olarak güvenli bir imza üretmek için standart bir yöntemdir.
 **Parametreler**:
-- `secret`: string — HMAC imza hesaplamasında kullanılacak gizli anahtar.
-- `body`: string — İmzası hesaplanacak olan HTTP isteği gövdesi veya veri.
-**Dönüş**: `Promise<string>` — Hesaplanan HMAC-SHA256 imzasının Base64 ile kodlanmış hali.
+- secret: string — HMAC imza hesaplamasında kullanılacak gizli anahtar. Genellikle webhook ayarlarında belirlenen paylaşımlı bir sırdır.
+- body: string — İmzalanacak olan ham veri (payload). Genellikle JSON formatındaki webhook gövdesidir.
+**Dönüş**: Promise<string> — Base64 kodlamalı HMAC-SHA256 imzasını temsil eden bir string. Bu değer, webhook isteklerinde `X-Signature` gibi bir başlık ile gönderilir.
 
 ### reset
-**Ne yapar**: `WebhookMockDb` sınıfının tüm durumunu (siparişler ve olaylar) sıfırlar.
-**Nasıl yapar**: Sınıf içinde tutulan `orders` ve `events` adlı iki dizi referansını, boş dizilerle (`[]`) değiştirerek tüm önceki verileri siler. Bu, her test senaryosu arasında izole bir başlangıç durumu sağlamak için kullanılır.
+**Ne yapar**: `WebhookMockDb` sınıfının (veya nesnesinin) içinde bulunduğu test ortamındaki tüm sipariş (`orders`) ve olay (`events`) verilerini temizler.
+**Nasıl yapar**: Bu bir örnek (instance) metodudur. `this.orders` ve `this.events` adlı iki diziyi boş birer dizi (`[]`) ile değiştirerek, mock veritabanını başlangıç durumuna sıfırlar. Bu, her test senaryosundan önce veri kalıntısı olmasını önlemek ve testlerin birbirinden izole olmasını sağlamak için kullanılır.
 **Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
-**Dönüş**: Fonksiyon herhangi bir değer döndürmez (`void`).
+**Dönüş**: Yok (void). Fonksiyon doğrudan sınıfın iç durumunu (state) değiştirir ve bir değer döndürmez.
 
 ### from
-**Ne yapar**: Belirtilen bir tablo adı için bir sorgu zincirleme (query chain) nesnesi başlatır.
-**Nasıl yapar**: Verilen `table` parametresine göre dahili `this.orders` veya `this.events` veri kümesini seçer. Ardından filtreleme (`eq`), güncelleme (`update`), ekleme (`insert`) ve sonuç alma (`single`, `then`) gibi Zincirleme (chainable) metodlar içeren bir nesne döndürür. Bu nesne, sonradan çağrılan metotlara göre filtreleme ve veri manipülasyonu için gerekli durumları (filterColumn, filterValue, patchObject vb.) kapanış (closure) aracılığıyla saklar.
+**Ne yapar**: `WebhookMockDb` içindeki belirli bir tabloya (veri setine) karşılık gelen verileri sorgulamak, filtrelemek, güncellemek ve eklemek için zincirlenebilir (chainable) bir API arayüzü döndürür. Bu arayüz, Supabase veya benzeri kütüphanelerin sorgu yapma mantığını taklit eder.
+**Nasıl yapar**: Fonksiyon, `table` parametresine göre iç veri setini seçer (`venthub_orders` ise `this.orders`, diğerleri ise `this.events`). Ardından, `select`, `eq`, `limit`, `update`, `single`, `insert` ve `then` metodlarını içeren bir zincir nesnesi (chain) döndürür. Bu metodlar, filtreleme sütunu/değeri (`filterColumn`, `filterValue`), sonuç limiti (`limitVal`) ve güncelleme nesnesi (`patchObject`) gibi iç durum değişkenlerini ayarlar. `single` ve `insert` asenkron olup `Promise<{ data: any; error: any }>` döndürürken, `then` metodu bir callback (`resolve`) çağırarak filtrelenmiş, limitlenmiş ve güncellenmiş sonuçları doğrudan sunar. Bu yapı, asenkron bir veritabanı isteğini simüle eder.
 **Parametreler**:
-- `table`: string — Sorgulanacak tablonun adı. Yalnızca `'venthub_orders'` için siparişler kümesini, diğer tüm değerler için olaylar kümesini seçer.
-**Dönüş**: `object` — `select`, `eq`, `limit`, `update`, `single`, `insert` ve `then` metodları içeren zincirleme sorgu nesnesi.
+- table: string — Sorgulanacak tablo adı. `'venthub_orders'` değeri siparişler dizisini, diğer değerler ise olaylar dizisini hedefler.
+**Dönüş**: Bir zincir (chain) nesnesi. Bu nesne, aşağıdaki metodları içerir:
+  - `select(fields?: string)`: Mevcut zinciri döndürür (bu uygulamada alan seçimi yapılmaz).
+  - `eq(col: string, val: any)`: Filtreleme sütunu ve değerini ayarlar, zinciri döndürür.
+  - `limit(l: number)`: Sonuç sayısını sınırlar, zinciri döndürür.
+  - `update(patch: any)`: Güncellenecek alanları belirtir, zinciri döndürür.
+  - `single()`: Promise<{ data: any; error: any }> — Tek bir satırı döndürür. Eşleşen kayıt yoksa `error` ile döner.
+  - `insert(row: any)`: Promise<{ data: any; error: any }> — Yeni bir satır ekler ve eklenen satırı döndürür.
+  - `then(resolve: any)`: void — Filtrelenmiş, limitlenmiş ve güncellenmiş sonuçları `resolve` callback'ine iletir. Bu, promise benzeri bir kullanım sağlar.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./helpers/denoRuntime::DenoRuntimeSimulator
+- import: ./helpers/denoRuntime::setupDenoRuntime
+- import: vitest::afterEach
+- import: vitest::beforeEach
+- import: vitest::describe
+- import: vitest::expect
+- import: vitest::it
+- import: vitest::vi
 
 ---
 
@@ -64,164 +83,159 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::WebhookMockDb::reset
+### [N1_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::reset
 - **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void
-- **Etki**: `this.orders` ve `this.events` array'lerini sıfırlar
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `this.orders` ve `this.events` dizilerini sıfırlar (class özelliklerini boş array yapar)
 
-### [N2_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::WebhookMockDb::from
+### [N2_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::from
 - **params**: (table: string)
 - **ic_degiskenler**:
-  - `dataset` — Tablo adına göre `this.orders` veya `this.events` array'ini referans olarak alan değişken
-  - `filterColumn` — eq ile ayarlanan filtre sütun adını tutar (varsayılan: boş string)
-  - `filterValue` — eq ile ayarlanan filtre değerini tutar (varsayılan: null)
-  - `limitVal` — limit ile ayarlanan maksimum sonuç sayısını tutar (varsayılan: 0)
-  - `patchObject` — update ile ayarlanan güncelleme nesnesini tutar (varsayılan: null)
-  - `chain` — Zincirleme metodları (select, eq, limit, update, single, insert, then) barındıran nesne
-- **Dönüş**: chain nesnesi
+  - `dataset` — `table` parametresine göre `this.orders` veya `this.events` referansını atar
+  - `filterColumn` — eq() ile ayarlanan filtreleme sütunu adı
+  - `filterValue` — eq() ile ayarlanan filtreleme değeri
+  - `limitVal` — limit() ile ayarlanan sonuç sayısı limiti
+  - `patchObject` — update() ile ayarlanan güncelleme nesnesi
+  - `chain` — zincirleme sorgu nesnesi (select, eq, limit, update, single, insert, then metodları)
+- **Dönüş**: chain nesnesi (sorgu zincirleme nesnesi)
 
 ### [N3_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::computeSignature
 - **params**: (secret: string, body: string)
 - **ic_degiskenler**:
-  - `encoder` — Metinleri byte dizisine çeviren TextEncoder örneği
-  - `key` — HMAC-SHA256 için import edilmiş CryptoKey örneği
-  - `signature` — HMAC imzasının ArrayBuffer olarak ham hali
-- **Dönüş**: Promise<string> (base64 encode edilmiş imza stringi)
+  - `encoder` — TextEncoder instance (stringleri byte dizisine çevirir)
+  - `key` — HMAC SHA-256 anahtarı (crypto.subtle.importKey ile oluşturulur)
+  - `signature` — HMAC imzası ArrayBuffer (crypto.subtle.sign ile hesaplanır)
+- **Dönüş**: Promise<string> — Base64 encoded imza
 
-### [N4_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::getRealtimeChannel
+### [N4_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::createClientFactory
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: `createClient` metodunu içeren nesne (mockDbInstance döndürür)
+
+### [N5_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::createClient
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: mockDbInstance (WebhookMockDb instance)
+
+### [N6_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::beforeEach
+- **params**: ()
+- **ic_degiskenler**:
+  - `simulator` — DenoRuntimeSimulator instance (setupDenoRuntime ile oluşturulur, test ortamını başlatır)
+- **Dönüş**: yok
+
+### [N7_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::afterEach
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — simulator.cleanup() ve vi.restoreAllMocks() çağırır
+
+### [N8_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_update_order_to_shipped
+- **params**: ()
+- **ic_degiskenler**:
+  - `payload` — Webhook isteği için JSON gövdesi (order_number, status, carrier, tracking_number)
+  - `rawBody` — payload'ın string hali (JSON.stringify ile)
+  - `signature` — computeSignature ile hesaplanan HMAC imzası
+  - `req` — Request nesnesi (POST isteği, header'lar ile)
+  - `res` — simulator.invokeFunction sonucu Response nesnesi
+  - `resBody` — res.json() ile parse edilmiş yanıt gövdesi
+- **Dönüş**: yok — status 200, order güncellenmiş olmalı
+
+### [N9_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_reject_invalid_signature
+- **params**: ()
+- **ic_degiskenler**:
+  - `payload` — Webhook isteği için JSON gövdesi
+  - `rawBody` — payload'ın string hali
+  - `req` — Request nesnesi (geçersiz imza ile)
+  - `res` — Response nesnesi
+- **Dönüş**: yok — status 401 dönmeli
+
+### [N10_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_reject_expired_timestamp
+- **params**: ()
+- **ic_degiskenler**:
+  - `payload` — Webhook isteği için JSON gövdesi
+  - `rawBody` — payload'ın string hali
+  - `signature` — geçerli HMAC imzası
+  - `expiredTimestamp` — 10 dakika önceki timestamp (Date.now() - 600000)
+  - `req` — Request nesnesi (süresi dolmuş timestamp ile)
+  - `res` — Response nesnesi
+  - `body` — parse edilmiş yanıt gövdesi
+- **Dönüş**: yok — status 401, error "Stale or invalid timestamp"
+
+### [N11_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::getRealtimeChannel
 - **params**: (tenantId: string)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: string (realtime kanal adı)
+- **ic_degiskenler**: yok
+- **Dönüş**: string — `admin-orders-realtime-${tenantId}` formatında kanal adı
 
-### [N5_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::resolveInvoicePath
+### [N12_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::resolveInvoicePath
 - **params**: (tenantId: string, invoiceId: string)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: string (fatura dosya yolu)
+- **ic_degiskenler**: yok
+- **Dönüş**: string — `tenants/${tenantId}/invoices/${invoiceId}.pdf` formatında yol veya hata fırlatır
 
-### [N6_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::beforeEach_callback
+### [N13_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_tenant_context_rls
 - **params**: ()
 - **ic_degiskenler**:
-  - `simulator` — Deno runtime simülatörünü temsil eden DenoRuntimeSimulator örneği
-- **Dönüş**: void
+  - `payload` — Webhook isteği için JSON gövdesi
+  - `rawBody` — payload'ın string hali
+  - `signature` — HMAC imzası
+  - `req` — Request nesnesi
+  - `originalFrom` — mockDbInstance.from metodunun orijinal referansı
+  - `res` — Response nesnesi
+- **Dönüş**: yok — tenant-a order güncellenmiş, tenant-b unchanged
 
-### [N7_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::afterEach_callback
-- **params**: ()
-- **ic_degiskenler**: (yok)
-- **Dönüş**: void
-
-### [N8_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_1_callback
-- **params**: ()
+### [N14_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::mockFromOverride
+- **params**: (table: string)
 - **ic_degiskenler**:
-  - `payload` — Webhook için sipariş güncelleme verilerini içeren nesne
-  - `rawBody` — payload'ın JSON string hali
-  - `signature` — HMAC-SHA256 ile hesaplanmış imza stringi
-  - `req` — Webhook fonksiyonuna gönderilecek Request nesnesi
-  - `res` — Simulator'den dönen Response nesnesi
-  - `resBody` — Response'un JSON parsed gövdesi
-- **Dönüş**: Promise<void>
+  - `chain` — orijinal from().from() metodundan dönen zincir nesnesi
+  - `originalSingle` — chain.single metodunun orijinal referansı
+- **Dönüş**: chain nesnesi (RLS filtresi enjekte edilmiş)
 
-### [N9_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_2_callback
+### [N15_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::rlsSingleOverride
 - **params**: ()
 - **ic_degiskenler**:
-  - `payload` — Geçersiz imza ile gönderilecek sipariş verisi
-  - `rawBody` — payload'ın JSON string hali
-  - `req` — Geçersiz x-signature header'ı ile Request nesnesi
-  - `res` — Simulator'den dönen Response nesnesi (beklenen: 401)
-- **Dönüş**: Promise<void>
+  - `res` — orijinal single() sonucu
+  - `rows` — RLS filtresi uygulanmış order listesi (tenant_id='tenant-a')
+- **Dönüş**: Promise<{data: any, error: any}> — filtrelenmiş tek satır veya orijinal sonuç
 
-### [N10_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_3_callback
+### [N16_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_legacy_webhook_token
 - **params**: ()
 - **ic_degiskenler**:
-  - `payload` — Sipariş güncelleme verisi
-  - `rawBody` — payload'ın JSON string hali
-  - `signature` — Geçerli HMAC-SHA256 imzası
-  - `expiredTimestamp` — 10 dakika önceki zaman damgası stringi
-  - `req` — Süresi geçmiş timestamp ile Request nesnesi
-  - `res` — Simulator'den dönen Response nesnesi (beklenen: 401)
-  - `resBody` — Response'un JSON parsed gövdesi (error mesajı kontrolü)
-- **Dönüş**: Promise<void>
+  - `payload` — Webhook isteği için JSON gövdesi
+  - `rawBody` — payload'ın string hali
+  - `req` — Request nesnesi (x-webhook-token header ile)
+  - `res` — Response nesnesi
+- **Dönüş**: yok — status 200, order güncellenmiş
 
-### [N11_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_4_callback
+### [N17_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_ignore_status_demotion
 - **params**: ()
 - **ic_degiskenler**:
-  - `channelA` — Tenant A için realtime kanal adı
-  - `channelB` — Tenant B için realtime kanal adı
-- **Dönüş**: void
+  - `payload` — Webhook isteği için JSON gövdesi (durum düşürme denemesi)
+  - `rawBody` — payload'ın string hali
+  - `signature` — HMAC imzası
+  - `req` — Request nesnesi
+  - `res` — Response nesnesi
+  - `body` — parse edilmiş yanıt gövdesi
+- **Dönüş**: yok — status 200, unchanged=true, order durumu değişmemiş
 
-### [N12_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_5_callback
+### [N18_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_missing_supabase_url
 - **params**: ()
 - **ic_degiskenler**:
-  - `pathA` — Tenant A için fatura dosya yolu
-- **Dönüş**: void
+  - `payload` — Webhook isteği için JSON gövdesi
+  - `rawBody` — payload'ın string hali
+  - `signature` — HMAC imzası
+  - `req` — Request nesnesi
+  - `res` — Response nesnesi
+  - `body` — parse edilmiş yanıt gövdesi
+- **Dönüş**: yok — status 500, error "missing SUPABASE_URL"
 
-### [N13_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_6_callback
+### [N19_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_duplicate_event_id
 - **params**: ()
 - **ic_degiskenler**:
-  - `order_a` — Tenant A'ya ait sipariş nesnesi (push ile eklenir)
-  - `order_b` — Tenant B'ye ait sipariş nesnesi (push ile eklenir)
-  - `payload` — Sipariş güncelleme verisi
-  - `rawBody` — payload'ın JSON string hali
-  - `signature` — Geçerli HMAC-SHA256 imzası
-  - `originalFrom` — Orijinal mockDbInstance.from fonksiyonunun referansı
-  - `req` — Webhook Request nesnesi
-  - `res` — Simulator'den dönen Response nesnesi
-- **Dönüş**: Promise<void>
-
-### [N14_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_7_callback
-- **params**: ()
-- **ic_degiskenler**:
-  - `payload` — Legacy sandbox token ile gönderilecek sipariş verisi
-  - `rawBody` — payload'ın JSON string hali
-  - `req` — x-webhook-token header'ı ile Request nesnesi
-  - `res` — Simulator'den dönen Response nesnesi (beklenen: 200)
-- **Dönüş**: Promise<void>
-
-### [N15_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_8_callback
-- **params**: ()
-- **ic_degiskenler**:
-  - `payload` — Durum düşürme denemesi yapan sipariş verisi
-  - `rawBody` — payload'ın JSON string hali
-  - `signature` — Geçerli HMAC-SHA256 imzası
-  - `req` — Webhook Request nesnesi
-  - `res` — Simulator'den dönen Response nesnesi
-  - `body` — Response'un JSON parsed gövdesi (unchanged flag kontrolü)
-- **Dönüş**: Promise<void>
-
-### [N16_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_9_callback
-- **params**: ()
-- **ic_degiskenler**:
-  - `payload` — Sipariş güncelleme verisi
-  - `rawBody` — payload'ın JSON string hali
-  - `signature` — Geçerli HMAC-SHA256 imzası
-  - `req` — Webhook Request nesnesi
-  - `res` — Simulator'den dönen Response nesnesi (beklenen: 500)
-  - `body` — Response'un JSON parsed gövdesi (hata mesajı kontrolü)
-- **Dönüş**: Promise<void>
-
-### [N17_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::test_10_callback
-- **params**: ()
-- **ic_degiskenler**:
-  - `payload` — Sipariş güncelleme verisi
-  - `rawBody` — payload'ın JSON string hali
-  - `signature` — Geçerli HMAC-SHA256 imzası
-  - `req` — x-id header'ı ile (tekrarlanan event ID) Request nesnesi
-  - `res` — Simulator'den dönen Response nesnesi (beklenen: 200)
-  - `resBody` — Response'un JSON parsed gövdesi (duplicate ve unchanged flag kontrolü)
-- **Dönüş**: Promise<void>
-
-### [N18_NASIL] AST Pointer: tests/e2e/webhooks.test.ts::chain_arrow_callbacks
-- **params**: (anonim)
-- **ic_degiskenler**:
-  - `chain` — Zincirleme metodları barındıran nesne (select, eq, limit, update, single, insert, then)
-  - `select` arrow callback — zincirleme için select metodunu temsil eder
-  - `eq` arrow callback — zincirleme için eq metodunu temsil eder
-  - `limit` arrow callback — zincirleme için limit metodunu temsil eder
-  - `update` arrow callback — zincirleme için update metodunu temsil eder
-  - `single` async arrow callback — zincirleme için single metodunu temsil eder
-  - `insert` async arrow callback — zincirleme için insert metodunu temsil eder
-  - `then` arrow callback — promise çözümleme için then metodunu temsil eder
-- **Dönüş**: chain nesnesi (select, eq, limit, update, single, insert, then metodlarıyla)
+  - `payload` — Webhook isteği için JSON gövdesi
+  - `rawBody` — payload'ın string hali
+  - `signature` — HMAC imzası
+  - `req` — Request nesnesi (x-id header ile)
+  - `res` — Response nesnesi
+  - `resBody` — parse edilmiş yanıt gövdesi
+- **Dönüş**: yok — status 200, duplicate=true, unchanged=true, order güncellenmemiş
 
 ---
 

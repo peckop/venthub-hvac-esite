@@ -132,6 +132,10 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
+        // T025-VH: shipping-webhook replay guard'i artik ZORUNLU (cetvel §3.5).
+        // Bu testler basari yolunu sinadigi icin taze bir timestamp gondermeleri gerekiyor;
+        // eskiden guard 'varsa uygula' (fail-OPEN) oldugu icin basliksiz geciyorlardi.
+        'x-timestamp': String(Date.now()),
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -241,6 +245,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
+        'x-timestamp': String(Date.now()),
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -291,6 +296,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
+        'x-timestamp': String(Date.now()),
         'Content-Type': 'application/json',
         'x-webhook-token': 'legacy-sandbox-token-555' // Legacy fallback
       },
@@ -316,6 +322,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
+        'x-timestamp': String(Date.now()),
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -341,6 +348,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
+        'x-timestamp': String(Date.now()),
         'Content-Type': 'application/json',
         'x-signature': signature
       },
@@ -371,6 +379,7 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     const req = new Request('https://localhost/functions/v1/shipping-webhook', {
       method: 'POST',
       headers: {
+        'x-timestamp': String(Date.now()),
         'Content-Type': 'application/json',
         'x-signature': signature,
         'x-id': 'EV-111222' // Already exists
