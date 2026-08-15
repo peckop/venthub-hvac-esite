@@ -99,6 +99,24 @@ ayrı ayrı kırmızı yanar.
 > prod'da elle düşürülseler repo bunu göremez. Bunları idempotent bir migration'la repoya yazmak
 > gerekir; migration prod'a otomatik uygulandığı için (CLAUDE.md kural 13) kullanıcı onayı ister.
 
+### Prod doğrulaması (2026-08-15, `pg_trigger` sorgulandı)
+
+Statik kapı repo SQL'ini denetler; **prod'un gerçekten aynı hâlde olduğu ayrıca ölçülmelidir.** Ölçüm:
+
+| Tablo | Tetik | Etkin | `WHEN` | Fonksiyon `search_path` |
+|---|---|---|---|---|
+| `products` | `on_products_change` | ✅ | — | `pg_catalog, public, net` |
+| `categories` | `on_categories_change` | ✅ | — | ✅ |
+| `inventory_movements` | `on_inventory_movements_change` | ✅ | — | ✅ |
+| `product_families` | `on_product_families_change` | ✅ | — | ✅ |
+| `product_prices` | `on_product_prices_ins_del` | ✅ | — | ✅ |
+| `product_prices` | `on_product_prices_upd` | ✅ | **var** | ✅ |
+
+Üç sonuç: (1) §3 tablosu prod ile **birebir** — cetvel gerçeği anlatıyor; (2) 08-15 migration'ı doğru
+uygulanmış, ayrık tetikler ve `WHEN` koşulu canlı; (3) `handle_supabase_webhook()` fonksiyonunun
+`search_path` kilidi prod'da **duruyor** — yani kurulum betiklerindeki eksik `SET search_path`
+teorik değil, çalıştırıldığında bu kilidi gerçekten düşürecek bir regresyondu.
+
 **Kurulum betikleri de bu sözleşmeye tabidir.** `scripts/webhook_setup.sql`,
 `scripts/setup_webhooks.js` ve `scripts/setup_webhooks_cli.js` sıfırdan bir ortamda webhook
 altyapısını kurar. 2026-08-15 denetimine kadar **üçü de yalnız ilk üç tetiği kuruyordu** — yani
