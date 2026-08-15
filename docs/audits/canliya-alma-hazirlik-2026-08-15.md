@@ -94,7 +94,7 @@ değeri yoktur. Bu, K3'ün sessiz tamamlayıcısıydı.
 `marketing` bilerek dışarıda: ticari elektronik ileti onayı opsiyoneldir, zorunlu tutulamaz
 (zorunlu tutmak 6563'e aykırı olurdu). Mesaj `checkout.errors.consentsRequired` (TR+EN).
 
-### K6 · `iyzico-callback` sandbox URL'ini sabit kodluyor → prod ödemede sipariş onaylanmaz
+### K6 · `iyzico-callback` sandbox URL'ini sabit kodluyor → prod ödemede sipariş onaylanmaz ✅ KAPANDI
 **Kanıt:** `supabase/functions/iyzico-callback/index.ts:117`
 ```ts
 const baseUrl = "https://sandbox-api.iyzipay.com"; // isteğe göre prod ayarlanabilir
@@ -112,8 +112,12 @@ Bu "ileride patlar" bir borç değil; **ilk gerçek satışta** patlar. Bugün g
 **Çözüm:** `Deno.env.get('IYZICO_BASE_URL') || <sandbox>` — kardeşleriyle aynı desen; ayrıca üç
 fonksiyonun aynı değeri okuduğunu doğrulayan bir kontrol.
 **Sahibi:** EDGE şeridi (`supabase/functions/**` onun mülkü — LAUNCH yalnızca **okudu, dokunmadı**).
-**İş emri:** `T022-VH` (open). ⚠️ Prod'daki deploy edilmiş sürüm repo'dan farklı olabilir (T018 deploy
-drift) → onarım gerçek prod sürümü üzerinde doğrulanmalı.
+
+> **✅ KAPANDI (`T022-VH`, aynı gün):** EDGE tarafı env desenine çekti, PR #509 ile master'da,
+> prod `v197`'de doğrulandı. LAUNCH bağımsız teyit etti (`origin/master`:`iyzico-callback/index.ts:121`
+> → `Deno.env.get("IYZICO_BASE_URL") || sandbox`) — ajan raporu olduğu gibi kabul edilmedi, diske bakıldı.
+> **Kalan koşul S4'e taşındı:** fallback hâlâ sandbox, dolayısıyla prod anahtarlarıyla birlikte
+> `IYZICO_BASE_URL` de set edilmeli.
 
 ### K5 · Edge fonksiyon güvenlik açığı (devam eden iş, bilgi amaçlı)
 `admin-order-inspect` prod'daki donmuş sürümde `verify_jwt=false` + gövdede auth yok + service_role ile
@@ -128,7 +132,13 @@ sipariş döndürüyor. **Sahibi:** EDGE şeridi (`61104be3`, T018-VH) — aktif
 | S1 | ~~Leaked-password koruması KAPALI~~ **YAPILAMAZ** | advisor `auth_leaked_password_protection` uyarıyor ama bu özellik **ücretsiz Supabase planında yok** — plan yükseltilmeden kapatılamaz. Advisor'ı kalıcı gürültü kabul et. | — (kapalı madde) |
 | S2 | `_migration_ledger` RLS açık ama **0 politika** | advisor `rls_enabled_no_policy` | LAUNCH (migration, onaya tabi) |
 | S3 | `.env.example`'da `NEXT_PUBLIC_IYZICO_SECRET_KEY` satırı | `.env.example:22` | LAUNCH (doc) |
-| S4 | İyzico prod anahtarları / merchant onayı doğrulanmadı | `.env.example` sandbox URL varsayılan | Recep |
+| S4 | İyzico prod anahtarları / merchant onayı doğrulanmadı **+ `IYZICO_BASE_URL` unutulursa sessizce sandbox'ta kalır** | `.env.example` · üç edge fonksiyonu da `\|\| sandbox` fallback'i taşıyor | Recep |
+
+**⚠️ S4 HATIRLATMASI (K6 kapandıktan sonra bile geçerli):** `T022-VH` düzeltildi (master'da doğrulandı:
+`iyzico-callback/index.ts:121` artık `Deno.env.get("IYZICO_BASE_URL") || sandbox`). Ama **fallback hâlâ
+sandbox** — üç fonksiyonda da. Yani prod anahtarlarını girip `IYZICO_BASE_URL`'i **girmezsen** sistem
+hata vermez, sessizce sandbox'a konuşur. Prod anahtarları + `IYZICO_BASE_URL=https://api.iyzipay.com`
+**birlikte** set edilmeli (Supabase Edge Function secrets). Tek başına anahtar yetmez.
 | S5 | 0 sipariş / 2 kullanıcı — uçtan uca gerçek satın alma **hiç** denenmedi | `venthub_orders = 0` | LAUNCH + PRICING (K2 sonrası) |
 | S6 | **Çerez onay bandı hiçbir şeyi kapatmıyor** — "Reddet"e basmak yalnız `vh_cookie_consent='rejected'` yazıp bandı gizliyor; hiçbir çerez/izleyici bu tercihe bağlanmamış | `src/components/layout/CookieConsent.tsx:35` | LAUNCH (T019 takibi) |
 
