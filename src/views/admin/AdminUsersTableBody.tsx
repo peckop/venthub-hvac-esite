@@ -10,6 +10,8 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import { type BulkAction, BulkBar } from '../../components/admin/data-table/BulkBar'
+import BulkRolePanel from '../../components/admin/data-table/BulkRolePanel'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -142,81 +144,6 @@ const UserSpecsRow: React.FC<UserSpecsRowProps> = ({ userRow }) => {
             {t('admin.users.expand.organizationId')}
           </div>
           <div className="text-xs font-black text-slate-200">{profile?.organization_id || '—'}</div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ---- toplu işlem araç çubuğu ---- */
-interface UserBulkActionToolbarProps {
-  selectedCount: number
-  onRoleChange: (role: UserRoleCode) => void
-  onClearSelection: () => void
-}
-
-const UserBulkActionToolbar: React.FC<UserBulkActionToolbarProps> = ({
-  selectedCount,
-  onRoleChange,
-  onClearSelection,
-}) => {
-  const { t } = useI18n()
-  const [showRolePanel, setShowRolePanel] = useState(false)
-
-  if (selectedCount === 0) return null
-
-  return (
-    <div className="sticky bottom-4 z-40 mx-auto max-w-4xl animate-slide-up">
-      <div className="bg-primary-navy text-white rounded-xl shadow-2xl px-5 py-3 flex items-center gap-3 flex-wrap">
-        {/* Selection Info */}
-        <div className="flex items-center gap-2 mr-2">
-          <div className="bg-white/20 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-            {selectedCount}
-          </div>
-          <span className="text-sm font-medium">{t('admin.toolbar.itemsSelected')}</span>
-          <button onClick={onClearSelection} className="text-white/60 hover:text-white text-xs ml-1 underline">
-            {t('admin.toolbar.clear')}
-          </button>
-        </div>
-
-        <div className="h-6 w-px bg-white/20" />
-
-        {/* Change Role Button & Dropdown/Panel */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setShowRolePanel(!showRolePanel)}
-            className="px-4 py-2 rounded-lg bg-cyan-500/80 hover:bg-cyan-500 text-xs font-black uppercase tracking-wider transition-colors flex items-center gap-2"
-          >
-            <span>{t('admin.users.bulk.changeRole')}</span>
-          </button>
-          {showRolePanel && (
-            <div className="absolute bottom-full mb-2 left-0 bg-surface-deep text-slate-200 rounded-xl shadow-2xl p-4 min-w-240px border border-white/10 glass-strong">
-              <div className="text-xs font-black uppercase tracking-widest mb-3 text-cyan-400">
-                {t('admin.users.bulk.selectRole')}
-              </div>
-              <div className="flex flex-col gap-1.5">
-                {ROLE_KEYS.map((targetRole) => (
-                  <button
-                    key={targetRole}
-                    type="button"
-                    onClick={() => {
-                      onRoleChange(targetRole)
-                      setShowRolePanel(false)
-                    }}
-                    className="flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-slate-300 rounded-xl hover:bg-white/5 hover:text-white text-left transition-colors"
-                  >
-                    <div className="text-slate-400 shrink-0">
-                      {ROLE_BUTTON_ICON[targetRole]}
-                    </div>
-                    <span className="uppercase tracking-widest text-xs">
-                      {t(`roles.${targetRole}`)}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -384,6 +311,24 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
       }
     },
     [confirm, hasWriteAccess, t, table],
+  )
+
+  /**
+   * Toplu işlem eylemleri — ortak `BulkBar` sözleşmesi. Rol paneli `BulkRolePanel`
+   * olarak çıkarıldı ve `panel` render-prop'una bağlandı (bkz. dosya üstü yorum).
+   */
+  const bulkActions = useMemo<BulkAction[]>(
+    () => [
+      {
+        key: 'role',
+        label: t('admin.users.bulk.changeRole'),
+        tone: 'default',
+        panel: (close) => (
+          <BulkRolePanel onRoleChange={(r) => void bulkRoleChange(r)} onClose={close} />
+        ),
+      },
+    ],
+    [t, bulkRoleChange],
   )
 
   /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
@@ -653,10 +598,14 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         }
         bulkBarSlot={
           hasWriteAccess ? (
-            <UserBulkActionToolbar
+            <BulkBar
               selectedCount={table.selection.selectedIds.length}
-              onRoleChange={(targetRole) => void bulkRoleChange(targetRole)}
-              onClearSelection={table.selection.clear}
+              selectedLabel={t('admin.dataTable.bulk.selectedCount', {
+                count: table.selection.selectedIds.length,
+              })}
+              clearLabel={t('admin.dataTable.bulk.clear')}
+              actions={bulkActions}
+              onClear={table.selection.clear}
             />
           ) : null
         }

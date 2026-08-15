@@ -12,8 +12,8 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
 import CategoryFormModal from '../../components/admin/categories/CategoryFormModal'
+import { type BulkAction, BulkBar } from '../../components/admin/data-table/BulkBar'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import EditableCell from '../../components/admin/EditableCell'
@@ -342,6 +342,45 @@ const CategoriesTableBody: React.FC = () => {
     }
   }, [hasWriteAccess, t, table, confirm])
 
+  /**
+   * Toplu işlem eylemleri — ortak `BulkBar` sözleşmesi.
+   *
+   * Eskiden bu sayfa `BulkActionToolbar` kullanıyordu; o bileşen `BulkBar` ile
+   * MÜKERRERDİ (aynı işi yapan iki yapışkan çubuk) ve ÜSTELİK farklı görünüyordu.
+   * Aynı işlemin sayfadan sayfaya farklı görünmesi cetvel §4'ün doğrudan ihlaliydi.
+   * Artık tek bileşen. Kategorilerde fiyat düzenleme diye bir şey YOK — eski
+   * `onPriceAdjust` ölü saptı ve ham İngilizce toast basıyordu; taşınmadı, kalktı.
+   */
+  const bulkActions = useMemo<BulkAction[]>(
+    () => [
+      {
+        key: 'activate',
+        label: t('admin.toolbar.makeActive'),
+        tone: 'default',
+        onRun: () => bulkStatusChange('active'),
+      },
+      {
+        key: 'deactivate',
+        label: t('admin.toolbar.makePassive'),
+        tone: 'warning',
+        onRun: () => bulkStatusChange('inactive'),
+      },
+      {
+        key: 'feature',
+        label: t('admin.toolbar.feature'),
+        tone: 'default',
+        onRun: () => bulkFeatureToggle(true),
+      },
+      {
+        key: 'delete',
+        label: t('admin.common.delete'),
+        tone: 'danger',
+        onRun: () => bulkDelete(),
+      },
+    ],
+    [t, bulkStatusChange, bulkFeatureToggle, bulkDelete],
+  )
+
   /* ---- status chip'leri (is_active) ---- */
   const statusChips = useMemo(
     () =>
@@ -609,15 +648,14 @@ const CategoriesTableBody: React.FC = () => {
         }
         bulkBarSlot={
           hasWriteAccess ? (
-            <BulkActionToolbar
+            <BulkBar
               selectedCount={table.selection.selectedIds.length}
-              onStatusChange={(status) => void bulkStatusChange(status)}
-              onFeatureToggle={(featured) => void bulkFeatureToggle(featured)}
-              onDelete={() => void bulkDelete()}
-              onPriceAdjust={() => {
-                toast.error('Categories do not support price adjustments')
-              }}
-              onClearSelection={table.selection.clear}
+              selectedLabel={t('admin.dataTable.bulk.selectedCount', {
+                count: table.selection.selectedIds.length,
+              })}
+              clearLabel={t('admin.dataTable.bulk.clear')}
+              actions={bulkActions}
+              onClear={table.selection.clear}
             />
           ) : null
         }
