@@ -869,7 +869,7 @@ const ProductsTableBody: React.FC = () => {
             onClear={resetFilters}
             recordCount={table.totalMatched}
             rightExtra={
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-end gap-2">
                 {hasWriteAccess && <ProductCsvImport categories={cats} onSuccess={() => void table.reload()} />}
                 <ExportMenu
                   items={[

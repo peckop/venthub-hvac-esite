@@ -16,5 +16,14 @@ export const a11y = {
       save: 'Save',
       search: 'Search',
       settings: 'Settings',
-      upload: 'Upload File'
+      upload: 'Upload File',
+      // Shell — standard: admin-design-standard.md §2.5, §2.6
+      skipToContent: 'Skip to content',
+      openNavigation: 'Open navigation',
+      closeNavigation: 'Close navigation',
+      expandNavigation: 'Expand navigation',
+      collapseNavigation: 'Collapse navigation',
+      mainNavigation: 'Main navigation',
+      breadcrumb: 'Breadcrumb',
+      userMenu: 'User menu'
 };

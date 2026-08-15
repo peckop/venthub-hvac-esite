@@ -158,17 +158,23 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
 
       <div className={adminTableContainerClass}>
         {table.error && (
-          <div className="p-4 text-rose-400 text-xs font-bold bg-rose-500/10 border-b border-white/5 flex items-center gap-2">
+          <div className="p-4 text-rose-400 text-xs font-bold bg-rose-500/10 border-b border-white/5 flex flex-wrap items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
             {errorLabel ?? table.error}
           </div>
         )}
 
-        <div className="p-4 flex items-center justify-between border-b border-white/5">
+        {/*
+          Sarmalanabilir olmak ZORUNDA: bu satır `adminTableContainerClass`'ın
+          (`overflow-hidden`) doğrudan çocuğu ve kendi yatay scroll'u yok — wrap
+          olmazsa dar viewport'ta ve zoom'da SERT kesilir (WCAG SC 1.4.10 Reflow).
+          Cetvel: docs/standards/admin-design-standard.md §2.3
+        */}
+        <div className="p-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/5">
           <div className="text-xs font-black text-slate-500 uppercase tracking-widest">
             {totalLabel ?? 'Toplam'}: <span className="text-cyan-400" aria-live="polite">{table.totalMatched}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <ColumnsMenu
               columns={columnToggles}
               density={density}

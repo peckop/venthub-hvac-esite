@@ -33,7 +33,10 @@ export const adminSettingsLabelClass = 'block text-xs font-black text-slate-500 
 export const adminTableScrollAreaClass = 'overflow-y-auto max-h-400px'
 
 // DataTableKit Inventory Column Tokens to avoid arbitrary Tailwind classes
-export const adminTableMinWidthClass = 'min-w-[1000px]'
+// `adminTableMinWidthClass = 'min-w-[1000px]'` SİLİNDİ (2026-08-15): tüketicisi
+// kalmamıştı (InventoryTable DataTableKit'e göçtü) ve arbitrary değerdi. Yeniden
+// ihtiyaç olursa `overflow-x-auto` bir kapsayıcı OLMADAN kullanılması yatay kesme
+// üretir — cetvel §2.3. Yeni min-genişlik gerekirse tokens.js'ten türet.
 export const adminSupplierMaxWidthClass = 'max-w-[120px]'
 export const adminInputWidthLocationClass = 'w-20'
 export const adminInputWidthSupplierClass = 'w-24'
@@ -43,7 +46,27 @@ export const adminStepperLineBgClass = 'absolute left-10% right-10% top-1/2 -tra
 export const adminStepperLineFillClass = 'absolute left-10% top-1/2 -translate-y-1/2 h-0.5 bg-cyan-400 -z-10 transition-transform duration-700 rounded-full shadow-glow-sm'
 
 // Modal
-export const adminModalScrollAreaClass = 'p-10 space-y-8 max-h-70vh overflow-y-auto custom-scrollbar'
+/**
+ * Modal GÖVDESİNİN kabı: yüksekliğini ebeveynden alır (`flex-1 min-h-0`), kendi
+ * `max-h`'ini DAYATMAZ.
+ *
+ * Eskiden `max-h-70vh` vardı ve dış `Dialog.Content`'te `max-h` YOKTU → toplam
+ * yükseklik başlık + 70vh + altbilgi > viewport oluyordu; ortalanmış
+ * (`-translate-y-1/2`) kutunun ÜST kısmı ekran dışına taşıp **erişilemez** kalıyordu
+ * (2026-08-15 taraması: 5 modalda ölçüldü). Tavan artık dış kutuda ve `svh` tabanlı.
+ * `p-10` de 320px viewport'ta içeriğe yalnız 240px bırakıyordu → `p-6 md:p-10`.
+ * Cetvel: docs/standards/admin-design-standard.md §2.2, §4.10
+ */
+export const adminModalScrollAreaClass = 'p-6 md:p-10 space-y-8 min-h-0 overflow-y-auto custom-scrollbar'
+
+/**
+ * Modal DIŞ kutusu — ortalanmış, viewport'u asla taşmayan, dikeyde esneyen kap.
+ * Gövde `flex-1 ${adminModalScrollAreaClass}` ile buraya oturur.
+ */
+export const adminModalContentClass =
+  'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-modal ' +
+  'flex flex-col overflow-hidden max-h-admin-modal ' +
+  'bg-surface-deep border border-white/10 rounded-admin-lg shadow-2xl'
 
 // Opacities & Layout for Kanban Board
 export const adminBgWhite2Class = 'bg-white/2'

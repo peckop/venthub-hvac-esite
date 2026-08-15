@@ -636,7 +636,7 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
             recordCount={table.totalMatched}
             onClear={table.filtering.clearAll}
             rightExtra={
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-end gap-2">
                 <ExportMenu
                   items={[
                     { key: 'csv', label: t('admin.users.export.csvLabel'), onSelect: () => void exportCsv() },

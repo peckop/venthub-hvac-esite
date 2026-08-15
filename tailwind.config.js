@@ -124,6 +124,10 @@ const tailwindConfig = {
         '45': '45deg',
       },
       inset: {
+        // Admin kabuk başlığı yüksekliği — `height['admin-header']` ile AYNI değer
+        // olmak zorunda; sabit sidebar paneli başlığın hemen altından başlar.
+        // Cetvel: docs/standards/admin-design-standard.md §2.4
+        'admin-header': '3.5rem',
         '56px': '56px',
         '80px': '80px',
         '96px': '96px',

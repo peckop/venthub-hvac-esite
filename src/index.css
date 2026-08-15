@@ -354,7 +354,27 @@ textarea:focus-visible {
   html, body {
     width: 100%;
     margin: 0;
-    overflow-x: hidden;
+    /*
+      `overflow-x: hidden` KALDIRILDI (2026-08-15).
+
+      Bu tek satır tüm uygulamaya (vitrin + admin) uygulanıyordu ve viewport'a
+      propagate olduğu için taşan içeriği KAYDIRILAMAZ kılıp KESİYORDU. Bu,
+      WCAG 2.2 SC 1.4.10 Reflow (Level AA) ihlalidir ve admin'de bildirilen
+      "zoom'da içerik kırpılıyor" şikâyetinin kök sebebiydi.
+
+      Sinsi yanı: kural yürürlükteyken `scrollingElement.scrollWidth` taşmayı
+      RAPORLAMIYOR — sayfaya 3000px genişlikte bir öğe enjekte edildiğinde bile
+      değer değişmedi. Yani sorun ölçüm araçlarından da gizleniyordu.
+
+      Kaldırmadan önce ölçüldü (`scripts/a11y/reflow-scan.mjs`, 12 vitrin rotası ×
+      {320, 768, 1024, 1280}px = 48 ölçüm): 45 temiz, 3 küçük taşma —
+      /tr/about +16px, /tr/legal/kvkk +17px, /tr/brands@1024 +7px. Bunlar bu
+      değişikliğin YARATTIĞI hatalar değil, gizlediği hatalardır; artık kesilmek
+      yerine kaydırılabiliyorlar ve panoya bildirildi.
+
+      Yeni taşma eklemeyin: kırpma yerine sarmalama (`flex-wrap`), `min-w-0` ve
+      `overflow-wrap` kullanın. Cetvel: docs/standards/admin-design-standard.md §2.3
+    */
     font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
 

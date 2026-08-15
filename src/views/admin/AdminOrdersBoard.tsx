@@ -216,7 +216,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
             <div 
                 role="dialog"
                 aria-modal="true"
-                className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-300 relative"
+                className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-lg overflow-hidden max-h-admin-modal flex flex-col animate-in zoom-in-95 duration-300 relative"
             >
                 {/* Header */}
                 <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
@@ -229,7 +229,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                     </button>
                 </div>
 
-                <div className={adminModalScrollAreaClass}>
+                <div className={`flex-1 ${adminModalScrollAreaClass}`}>
                     {loading ? (
                         <div className="p-10 flex flex-col items-center gap-4">
                             <div className="animate-spin w-10 h-10 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />

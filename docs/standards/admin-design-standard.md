@@ -162,6 +162,21 @@ kurtarır, hücre içeriğini kurtarmaz.
 > **yoktur**; `overflow:hidden` yalnız **F69** (1.4.4) altında geçer. 1.4.10'un tek failure'ı **F102**'dir
 > ve CSS mekanizmasını adlandırmaz. "F102 = overflow-hidden failure" diye yazmayın.
 
+> ⚠️ **ÖLÇÜM TUZAĞI — zoom kapısını yazacak kişi bunu bilmeli.**
+> `html, body { overflow-x: hidden }` yürürlükteyken **`scrollingElement.scrollWidth` yatay taşmayı
+> RAPORLAMAZ.** 2026-08-15'te ölçüldü: canlı sayfaya 3000px genişlikte bir öğe enjekte edildi,
+> `scrollWidth` **hiç değişmedi** (310px → 310px). Yani kural yerindeyken naif bir
+> `scrollWidth > innerWidth` kontrolü **her zaman yeşil yanar** ve kırpılan içeriği göremez.
+>
+> Doğru yöntem: ölçümden hemen önce `documentElement.style.overflowX = 'visible'` (ve `body` için de)
+> uygulayıp yeniden düzen tetiklemek. Bu aynı zamanda *"kuralı kaldırırsam ne olur"* sorusunun
+> birebir cevabıdır. Araç: `scripts/a11y/reflow-scan.mjs` — ve o araç, **bilerek taşma enjekte
+> edilerek** görebildiği kanıtlandıktan sonra kullanıldı (310px → 3000px).
+>
+> Genel ders: **tek genişlikte ölçmek yetmez.** Admin'de bildirilen kırpılma 320px'te *görünmüyordu*
+> (orada mobil dal devreye girip kurtarıyor); gerçek bant **~768–1100px** idi. Tarama en az
+> {320, 768, 1024, 1280} genişliklerinde koşmalı.
+
 ### 2.4 Sidebar mekaniği — **gap + fixed deseni**
 
 **D4'ün kökü:** `lg:relative` + genişlik akışta kalırken `-translate-x-full` uygulamak **görsel** bir

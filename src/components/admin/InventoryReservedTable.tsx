@@ -23,7 +23,7 @@ export default function InventoryReservedTable({ reservedOrders }: InventoryRese
     if (reservedOrders.length === 0) return null;
 
     return (
-        <div className="overflow-hidden">
+        <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-xs border-separate border-spacing-0">
                 <thead>
                     <tr className="bg-white/2">
