@@ -38,6 +38,14 @@ try {
 
 let conflict = null
 try {
+  /**
+   * KALP ATIŞI BURADA DA — ölçülmüş bir arıza sonucu eklendi: atış yalnız
+   * `UserPromptSubmit`'e bağlıyken, kullanıcı mesaj yazmadan geçen uzun otonom
+   * çalışma boyunca hiç atış olmuyor ve 4 saatlik TTL dolunca oturum KENDİ şeridini
+   * kaybediyor (5 saatlik bir koşuda üç oturumun üçü de düştü). Yazma anı, "bu oturum
+   * yaşıyor"un en doğrudan kanıtıdır; aralık board.cjs'te kısılı olduğu için maliyeti yok.
+   */
+  board.touch(sid)
   conflict = board.findConflict(filePath, sid, input.cwd || process.cwd())
 } catch (e) {
   process.stderr.write(`[lane-guard] pano okunamadı (fail-open): ${e && e.message}\n`)
@@ -47,12 +55,20 @@ try {
 if (!conflict) process.exit(0)
 
 const { claim, glob, rel } = conflict
+const isSubagent = Boolean(input.agent_id)
 process.stderr.write(
   `[lane-guard] "${rel}" BAŞKA bir oturumun şeridinde — yazma bloklandı.\n` +
   `  Şerit: ${claim.lane} · oturum ${String(claim.sid).slice(0, 8)} · kural: ${glob}\n` +
-  `  Seçenekler: (a) o oturuma not bırak — ` +
-  `node scripts/board/board.cjs note --sid <senin-sid> --to ${claim.lane} "…" ` +
-  `(b) devretmesini iste (c) gerçekten senin işinse şeridi yeniden talep et.\n` +
+  (isSubagent
+    // Alt-ajan ebeveyninin `session_id`'siyle koşar (ölçüldü) — yani bu blok "alt-ajan
+    // tanınmadı" DEĞİL, gerçekten yabancı bir şerit. Doğru çıkış yazmak değil raporlamak.
+    ? `  SEN BİR ALT-AJANSIN: yazmayı deneme, dosyanın TAM İÇERİĞİNİ raporunda döndür —\n` +
+      `  seni başlatan oturum kendi kapısından geçirip yazar. Bash ile kapıyı AŞMA.\n`
+    : '') +
+  `  Yapılacaklar: (a) şerit sahibine not bırak —\n` +
+  `      node scripts/board/board.cjs note --sid <senin-sid> --to ${claim.lane} --text "…"\n` +
+  `  (b) sahip bayatsa (kalp atışı yoksa TTL düşürür) Recep'e sor — Bash ile aşma.\n` +
+  `  UYARI: yeniden claim etmek SENİ AÇMAZ; "en erken kazanır", geç gelen talep hep bloklu.\n` +
   `  Not: bu bir kilit değil kalite ağıdır; kullanıcı dosyayı elle düzenleyebilir.\n`
 )
 process.exit(2)
