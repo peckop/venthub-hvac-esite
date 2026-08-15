@@ -1,6 +1,28 @@
+// Çağıran sınıfı: (a) oturumlu admin tarayıcısı — getUser(jwt) + rol kapısı
+//
+// Tenant, isteğin HİÇBİR alanından okunmaz: rol ile AYNI profil satırından türetilir
+// (`_shared/tenant.ts::tenantFromVerifiedUser`). Eski kod tenant'ı `resolveTenantId` ile
+// istekten alıp profil sorgusuna FİLTRE koyuyordu; o döngü tenant'ın istekten okunmasının
+// gerekçesiydi (cetvel §3.9).
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
-import { resolveTenantId } from '../_shared/tenant_config.ts'
+import { TenantMismatchError, tenantFromVerifiedUser } from '../_shared/tenant.ts'
+
+/**
+ * PostgREST dizisinden ilk profil satırını RUNTIME kontrolüyle daraltır.
+ * `fetch(...).json()` tipsiz döner; tip uydurmak yerine alanlar tek tek doğrulanır
+ * (`_shared/caller.ts::toProfileRow` ile aynı desen).
+ */
+function firstProfileRow(value: unknown): { role: string | null; tenant_id: string | null } | null {
+  if (!Array.isArray(value) || value.length === 0) return null
+  const first: unknown = value[0]
+  if (typeof first !== 'object' || first === null) return null
+  const record = first as Record<string, unknown>
+  return {
+    role: typeof record.role === 'string' ? record.role : null,
+    tenant_id: typeof record.tenant_id === 'string' ? record.tenant_id : null,
+  }
+}
 
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
@@ -54,22 +76,34 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
     }
 
-    // We must resolve tenantId before profile check
-    const bodyClone = await req.clone().json().catch(() => ({}))
-    const tenantId = resolveTenantId(req, bodyClone)
-
-    const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=role`, {
+    // Rol VE tenant TEK sorgudan; filtre YALNIZ doğrulanmış `user.id`.
+    const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${encodeURIComponent(user.id)}&select=role,tenant_id`, {
       headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey }
     });
 
-    if (roleCheck.ok) {
-      const arr = await roleCheck.json().catch(() => []);
-      const role = arr[0]?.role;
-      if (role !== 'admin' && role !== 'superadmin') {
-        return new Response(JSON.stringify({ error: 'forbidden', message: 'Insufficient privileges' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
-      }
-    } else {
+    if (!roleCheck.ok) {
       return new Response(JSON.stringify({ error: 'internal_error', message: 'Failed to verify user role' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    }
+
+    const profileRow = firstProfileRow(await roleCheck.json().catch(() => []));
+    const role = profileRow?.role;
+    if (role !== 'admin' && role !== 'superadmin') {
+      return new Response(JSON.stringify({ error: 'forbidden', message: 'Insufficient privileges' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    }
+
+    // Doğrulanmış kullanıcı + profil satırı → tenant. Çelişen `app_metadata` claim'i 403
+    // (mesaj gövdesinde UUID yok).
+    let tenantId: string
+    try {
+      tenantId = tenantFromVerifiedUser(
+        { id: user.id, app_metadata: user.app_metadata ?? null },
+        profileRow,
+      ).tenantId
+    } catch (tenantErr) {
+      if (tenantErr instanceof TenantMismatchError) {
+        return new Response(JSON.stringify({ error: 'forbidden', message: 'tenant_mismatch' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+      }
+      throw tenantErr
     }
 
     const body = await req.json().catch(() => ({}));

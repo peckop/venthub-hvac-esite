@@ -42,14 +42,24 @@ verify_jwt = false
 [functions."shipping-status"]
 verify_jwt = false
 
+# T026-VH Adım 3 (2026-08-15): bu üçü SINIF (a+b) — sunucu→sunucu service_role VE
+# oturumlu admin tarayıcısı çağırıyor. İkisi de geçerli bir JWT taşır, yani `false`
+# olmaları hiçbir zaman gerekli değildi; §3.1 ihlaliydi ve geçidi herkese açık
+# bırakıyordu. Kapı artık `_shared/caller.ts::resolveCaller` ile gövdede de var.
+# Yön kontrolü (§3.7): prod'da ÜÇÜ DE `false` ölçüldü → bu değişiklik deploy edilince
+# korumayı DÜŞÜRMEZ, SIKILAŞTIRIR.
+# Çağıranlar doğrulandı: order-confirmation ← iyzico-callback (service_role);
+# return-status-notification ← returns-webhook (service_role) + admin paneli
+# (ReturnsTableBody.tsx, oturumlu JWT); shipping-notification ← admin-update-shipping
+# (service_role).
 [functions."shipping-notification"]
-verify_jwt = false
+verify_jwt = true
 
 [functions."order-confirmation"]
-verify_jwt = false
+verify_jwt = true
 
 [functions."return-status-notification"]
-verify_jwt = false
+verify_jwt = true
 
 [functions."tcmb-rates-sync"]
 verify_jwt = false

@@ -1,7 +1,34 @@
+// Çağıran sınıfı: (b) sunucu→sunucu service_role + (a) oturumlu admin — resolveCaller kapısı
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { sentryCaptureException } from "../_shared/sentry.ts"
-import { resolveTenantId, getTenantBranding } from '../_shared/tenant_config.ts'
+import { getTenantBranding } from '../_shared/tenant_config.ts'
+import {
+  CallerConfigError,
+  CallerLookupError,
+  TenantMismatchError,
+  resolveCaller,
+  type CallerContext,
+} from '../_shared/caller.ts'
+
+/** Cetvel §3.2 — yetkili roller. Gövdeden gelen `role`/`is_admin` ASLA kaynak değildir. */
+const ADMIN_ROLES: readonly string[] = ['admin', 'superadmin']
+
+/**
+ * KAPI HATASI → HTTP EŞLEMESİ (T026-VH Adım 3 · BEŞ bildirim ucunda BİREBİR AYNI):
+ *   `TenantMismatchError` → **403** (claim ile profil çelişiyor; kullanıcı o tenant'a ait değil)
+ *   `CallerConfigError`   → **500** (ortam değişkeni eksik — bizim hatamız, çağıranın değil)
+ *   `CallerLookupError`   → **503** (profil satırı OKUNAMADI; geçici DB/ağ hatası, tekrar denenebilir)
+ * `null` dönerse hata bu kapıya ait DEĞİLDİR — yeniden fırlatılır ve dıştaki catch 500 döner
+ * (fail-closed). Eşleme `_shared`'a çıkarılmadı: Adım 1'de yazılan paylaşılan modüller
+ * dondurulmuş durumda; bu yüzden beş uca aynı metinle kopyalanır.
+ */
+function callerFailure(error: unknown): { status: number; error: string } | null {
+  if (error instanceof TenantMismatchError) return { status: 403, error: 'tenant_mismatch' }
+  if (error instanceof CallerConfigError) return { status: 500, error: 'CONFIG_MISSING' }
+  if (error instanceof CallerLookupError) return { status: 503, error: 'profile_lookup_failed' }
+  return null
+}
 
 // Tiny template renderer for {{var}} and {{#if var}} ... {{/if}}
 function renderTemplate(tpl: string, data: Record<string, unknown>): string {
@@ -56,10 +83,6 @@ interface ResendResult {
   id?: string
 }
 
-interface UserProfileRoleRow {
-  role?: string | null
-}
-
 serve(async (req) => {
   const requestOrigin = req.headers.get('origin') || ''
   const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
@@ -104,47 +127,36 @@ serve(async (req) => {
     let tracking_number = pick(['tracking_number', 'trackingNumber'])
     let tracking_url = pick(['tracking_url', 'trackingUrl'])
 
-    // Resolve Tenant ID and get Branding details dynamically
-    const tenantId = resolveTenantId(req, parsed)
-    const branding = await getTenantBranding(tenantId)
-
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || ''
     const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 
-    // ---- Authorization gate (service-key bearer VEYA admin/superadmin user JWT) ----
-    const authHeader = req.headers.get('Authorization')
-    let isAuthorized = false
-    if (authHeader === `Bearer ${SERVICE_KEY}`) {
-      isAuthorized = true
-    } else if (authHeader) {
-      try {
-        const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
-        const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.45.4')
-        const authClient = createClient(SUPABASE_URL, anonKey, { global: { headers: { Authorization: authHeader } } })
-        const { data: { user } } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
-        if (user) {
-          const roleCheck = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${user.id}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=role`, {
-            headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
-          })
-          if (roleCheck.ok) {
-            const arr = await roleCheck.json().catch(() => []) as UserProfileRoleRow[]
-            const role = Array.isArray(arr) ? arr[0]?.role : undefined
-            if (role === 'admin' || role === 'superadmin') {
-              isAuthorized = true
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Auth fallback error:', err)
-      }
+    // ---- Yetki kapısı: ortak `resolveCaller` (cetvel §3.2/§3.6) ----
+    // Sıra sabittir: kimlik → yetki → ancak sonra service_role verisi/`tenants` sorgusu.
+    let ctx: CallerContext
+    try {
+      ctx = await resolveCaller(req, parsed)
+    } catch (err) {
+      const failure = callerFailure(err)
+      if (!failure) throw err
+      return new Response(JSON.stringify({ error: failure.error }), { status: failure.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    if (!isAuthorized) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      })
+    // `resolveCaller` geçersiz/eksik JWT'yi 401'e ÇEVİRMEZ — `kind: 'anon'` döndürüp kararı
+    // buraya bırakır (sınıf (c+a) uçları anon çağıranla meşru çalışabildiği için). Bu uçta
+    // anonim çağıran AÇIKÇA reddedilir; bu satır olmazsa uç anonime AÇIK kalır.
+    if (ctx.kind === 'anon') {
+      return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
+    // Sınıf (b) service_role VEYA sınıf (a) admin/superadmin. Diğer her oturumlu kullanıcı 403
+    // (kimlik ≠ yetki — §3.2: eskiden burada 401 dönüyordu, yetkisizlik kimliksizlikle karışıyordu).
+    if (ctx.kind !== 'service_role' && !ADMIN_ROLES.includes(ctx.role ?? '')) {
+      return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    }
+
+    // Tenant artık istekten DEĞİL, doğrulanmış çağırandan gelir (§3.9).
+    const tenantId = ctx.tenantId
+    // Branding kapının ARKASINDA: yetkisiz çağıran `tenants` tablosuna sorgu tetikleyemez.
+    const branding = await getTenantBranding(tenantId)
 
     // Env-derived test flags must exist before the validation branches
     const testMode = Deno.env.get('EMAIL_TEST_MODE') === 'true'

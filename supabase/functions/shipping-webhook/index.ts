@@ -1,11 +1,17 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// Çağıran sınıfı: (c) harici kargo/iade sistemi — HMAC imzası + zorunlu timestamp
+//
 // Supabase Edge Function: shipping-webhook
 // Receives carrier sandbox/live webhook and updates order shipping fields securely
 // Env required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 // Optional (recommended): SHIPPING_WEBHOOK_SECRET (HMAC-SHA256) or SHIPPING_WEBHOOK_TOKEN (legacy)
-
+//
+// TENANT (T026-VH Adım 5): kargo firması bizim tenant UUID'lerimizi BİLMEZ — `order_id` /
+// `order_number` bilir. Bu yüzden tenant istekten OKUNMAZ, imzalı isteğin işaret ettiği
+// `venthub_orders` satırından TÜRETİLİR (`_shared/tenant.ts::tenantFromRow`). Eski kod
+// `resolveTenantId(req, payload)` ile istekten okuyup satırla KARŞILAŞTIRIYORDU; karşılaştırma
+// `isMockEnv` dalıyla testlerde tamamen atlanıyordu — yani kapı test edilmiyordu (cetvel §3.9).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
-import { resolveTenantId } from '../_shared/tenant_config.ts'
+import { tenantFromRow } from '../_shared/tenant.ts'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), {
@@ -91,10 +97,8 @@ Deno.serve(async (req: Request) => {
     let payload: unknown = {}
     try { payload = JSON.parse(raw) } catch { payload = {} }
 
-    // Resolve Tenant ID dynamically
-    const tenantId = resolveTenantId(req, payload)
-    const isMockEnv = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') === 'service-key' // diff-ignore
-
+    // TENANT BURADA ÇÖZÜLMEZ. Sıra kutsal: önce imza/token, sonra replay guard, sonra
+    // DB'ye dokunuş, en son sipariş satırından türetme (aşağıda `tenantFromRow`).
     const secret = Deno.env.get('SHIPPING_WEBHOOK_SECRET') || ''
     const signature = req.headers.get('x-signature') || req.headers.get('x-carrier-signature') || ''
     let authorized = false
@@ -161,19 +165,21 @@ Deno.serve(async (req: Request) => {
     }
 
     // Optional dedup by event id
+    // Dedup, tenant türetmeden ÖNCE gelir çünkü henüz sipariş satırı okunmadı. Eskiden burada
+    // `matched.tenant_id === tenantId` karşılaştırması vardı ve `tenantId` İSTEKTEN geliyordu —
+    // yani saldırgan farklı bir `?tenant_id=` göndererek idempotency'yi ATLAYABİLİYORDU.
+    // `event_id` kargo firmasının global tekil kimliği; varlığı tek başına "bu olay işlendi"
+    // demektir. Karşılaştırmayı silmek burada sınırı gevşetmez, bypass kolunu kaldırır.
     const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     if (eventId) {
       try {
         const { data: existing } = await supabase
           .from('shipping_webhook_events')
-          .select('event_id, tenant_id')
+          .select('event_id')
           .eq('event_id', eventId)
           .limit(1)
         if (Array.isArray(existing) && existing.length > 0) {
-          const matched = existing[0]
-          if (!matched.tenant_id || matched.tenant_id === tenantId) {
-            return jsonResponse({ ok: true, event_id: eventId, duplicate: true, unchanged: true })
-          }
+          return jsonResponse({ ok: true, event_id: eventId, duplicate: true, unchanged: true })
         }
       } catch {}
     }
@@ -188,9 +194,6 @@ Deno.serve(async (req: Request) => {
           .limit(1)
           .single()
       if (error || !data) return jsonResponse({ error: 'Order not found for given order_number' }, { status: 404 })
-      if (!isMockEnv && data.tenant_id && data.tenant_id !== tenantId) {
-        return jsonResponse({ error: 'Order not found for given order_number' }, { status: 404 })
-      }
       orderId = data?.id as string
     }
 
@@ -206,9 +209,10 @@ Deno.serve(async (req: Request) => {
       .eq('id', orderId)
       .single()
     if (curErr || !current) return jsonResponse({ error: 'Order not found' }, { status: 404 })
-    if (!isMockEnv && current.tenant_id && current.tenant_id !== tenantId) {
-      return jsonResponse({ error: 'Order not found' }, { status: 404 })
-    }
+
+    // ★ TENANT TÜRETME NOKTASI — imza + replay guard'dan SONRA, sipariş satırından.
+    // Bundan sonraki HER yazma/çağrı bu değeri kullanır; istekten okunan bir tenant YOK.
+    const { tenantId } = tenantFromRow(current)
 
     const patch: Partial<OrderRow> & Record<string, unknown> = {}
     if (typeof p.carrier === 'string' && p.carrier) patch.carrier = p.carrier
@@ -275,9 +279,6 @@ Deno.serve(async (req: Request) => {
     if (error || !data) {
       const msg = (typeof (error as { message?: unknown })?.message === 'string') ? (error as { message: string }).message : 'Update failed'
       return jsonResponse({ error: msg }, { status: 500 })
-    }
-    if (!isMockEnv && data.tenant_id && data.tenant_id !== tenantId) {
-      return jsonResponse({ error: 'Order not found' }, { status: 404 })
     }
 
     // Insert event audit

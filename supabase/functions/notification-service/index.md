@@ -3,71 +3,67 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\notification-service\index.ts
-skeleton_hash: 6fd10197fe12a893
+skeleton_hash: 486067bba4c00e78
 entity_hashes:
+  func:callerFailure: 86e71a59bf4b25a1
   func:formatTemplate: c5ca15fcdaa2c8a5
   func:notification-service_handler: dc7fd5d96878185c
   func:sendEmail: daef5620e68a0a9d
   func:sendSMS: 55159eef6de6f7d5
   func:sendWhatsApp: 2e1274fd64222c15
-  overview: 44ac4dd509c89b46
-generated_at: 2026-08-15T07:34:11Z
+  overview: 4046d60aeec5499d
+generated_at: 2026-08-15T09:05:02Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase edge function olarak HTTP isteklerini karşılayan merkezi bir bildirim servisidir. Tek bir giriş noktası üzerinden WhatsApp, SMS ve e-posta olmak üzere üç farklı iletişim kanalına mesaj gönderimi sağlar. Gelen isteklere göre uygun kanalı seçer, içerik şablonlarını dinamik verilerle doldurur ve mesajları ilgili harici servis sağlayıcıya (örn. Twilio) iletir.
+Bu modül, bir Supabase edge function olarak HTTP isteklerini karşılayan merkezi bir bildirim servisidir. Tek bir giriş noktası üzerinden WhatsApp, SMS ve e-posta olmak üzere üç farklı iletişim kanalına mesaj gönderimi sağlar. Gelen isteklere göre uygun kanalı seçer, içerik şablonlarını dinamik verilerle doldurur ve mesajları ilgili harici servis sağlayıcıya iletir.
 
 ## Fonksiyon Grupları
-### İstek Yönetimi ve Yönlendirme
-Modülün dışarıya açılan tek HTTP giriş noktasıdır. Gelen isteğin gövdesini okuyarak hedef kanalı, mesaj bilgilerini ve yapılandırma parametrelerini ayrıştırır, ardından işlmeyi ilgili gönderim fonksiyonuna devreder.
-- notification-service_handler
+### İstek Yönetimi ve Hata İşleme
+Gelen HTTP isteklerini karşılayan ve işleyen ana modül giriş noktasıdır. İstek gövdesinden verileri çıkarır, kanal seçimini yapar ve hata durumlarında standart bir hata nesnesi döndürerek hata yönetimini sağlar.
+- notification-service_handler, callerFailure
 
 ### Kanal Bazlı Mesaj Gönderimi
-Her biri farklı bir iletişim protokolü ve harici servis (Twilio, SendGrid vb.) ile entegre çalışan gönderim fonksiyonlarıdır. Kullanıcıya ait hedef numara/adresi ve mesaj içeriğini alarak doğrudan ilgili kanal üzerinden iletir. Opsiyonel olarak şablon ve yapılandırma alabilir.
+Her biri farklı bir iletişim protokolü ve harici servis entegrasyonu ile çalışan gönderim fonksiyonlarıdır. Kullanıcıya ait hedef numara/adresi ve mesaj içeriğini alarak doğrudan ilgili kanal üzerinden iletir,Opsiyonel olarak şablon ve yapılandırma alabilir.
 - sendWhatsApp, sendSMS, sendEmail
 
 ### İçerik Hazırlama
-Bildirim metinlerindeki dinamik yer tutucuları, gelen veri nesnesindeki değerlerle değiştirerek kişiselleştirilmiş mesajlar oluşturan yardımcı fonksiyondur. Kanal gönderim fonksiyonları tarafından mesaj iletimi öncesinde iç调用 olarak kullanılır.
+Bildirim metinlerindeki dinamik yer tutucuları, gelen veri nesnesindeki değerlerle değiştirerek kişiselleştirilmiş mesajlar oluşturan yardımcı fonksiyondur. Mesaj gönderimi öncesinde iç调用 olarak kullanılır.
 - formatTemplate
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, merkezi bir bildirim servisi olarak çalışır ve üç farklı iletişim kanalına (WhatsApp, SMS, E-posta) mesaj yönlendirir. Doğru çalışması için aşağıdaki koşulların karşılanması gerekir.
+Bu modül, bildirim gönderimi için外部 servis sağlayıcılarına ve doğru yapılandırmaya bağımlıdır.
 
----
+[Aksiyom 1]: Eğer `TwilioConfig` yapılandırması (`accountSid`, `authToken` vb.) sağlanmamışsa veya geçersizse, SMS mesajları gönderilemez ve `sendSMS` fonksiyonu hata fırlatır.
 
-**[Aksiyom 1]:** Eğer `sendSMS` çağrısında `config` (TwilioConfig) parametresi sağlanmazsa, SMS gönderimi başarısız olur.
-> *Gerekçe:* Fonksiyon imzasında `config: TwilioConfig` zorunlu parametre olarak tanımlıdır (`?` işareti yoktur).
+[Aksiyom 2]: Eğer e-posta için `config.apiKey` değeri sağlanmamışsa, `sendEmail` fonksiyonu e-posta gönderimi gerçekleştiremez.
 
-**[Aksiyom 2]:** Eğer `sendEmail` çağrısında `config` parametresi (`{ apiKey: string; from?: string }`) sağlanmazsa, e-posta gönderimi başarısız olur.
-> *Gerekçe:* Fonksiyon imzasında `config` opsiyonel olarak işaretlenmemiştir; API key zorunludur.
+[Aksiyom 3]: Eğer `_stockAlertTemplates` nesnesinde ilgili şablon anahtarı (key) tanımlı değilse, stok uyarısı bildirimi için formatlanacak geçerli bir şablon bulunamaz.
 
-**[Aksiyom 3]:** Eğer `sendEmail` çağrısında `config` içinde `apiKey` alanı verilmezse, e-posta servis sağlayıcıyaYetkilendirme yapılamaz ve gönderim başarısız olur.
-> *Gerekçe:* `config` nesnesinde `from` opsiyonel (`?`) iken `apiKey` zorunludur.
+[Aksiyom 4]: Eğer `formatTemplate` fonksiyonuna verilen `template` dizgesinde `data` nesnesindeki anahtarlar ile eşleşen yer tutucu (placeholder) bulunmazsa, doldurulmamış yer tutucular metin olarak kalır (hata fırlatmaz ancak eksik bilgi iletilir).
 
-**[Aksiyom 4]:** Eğer `sendWhatsApp`, `sendSMS` veya `sendEmail` fonksiyonlarından herhangi birine `to` parametresi verilmezse, ilgili kanal üzerinden mesaj gönderilemez.
-> *Gerekçe:* Üç send fonksiyonunun da imzasında `to: string` zorunlu parametre olarak tanımlıdır.
+[Aksiyom 5]: Eğer `notification-service_handler` fonksiyonuna geçerli bir HTTP istek nesnesi (`req`) iletilmemişse, modül geçerli bir `Response` üretemez.
 
-**[Aksiyom 5]:** Eğer `sendWhatsApp`, `sendSMS` veya `sendEmail` fonksiyonlarından herhangi birine `message` parametresi verilmezse, ilgili kanal üzerinden mesaj gönderilemez.
-> *Gerekçe:* Üç send fonksiyonunun da imzasında `message: string` zorunlu parametre olarak tanımlıdır.
+[Aksiyom 6]: Eğer Twilio servisi (WhatsApp ve SMS için ortak yapılandırıcı) erişilebilir durumda değilse, hem `sendWhatsApp` hem de `sendSMS` fonksiyonları başarısız olur.
 
-**[Aksiyom 6]:** Eğer `formatTemplate` fonksiyonuna `data` parametresi verilmezse, şablon içinde dinamik alanlar (`{{değişken}}` benzeri) değişmeden olduğu gibi döner.
-> *Gerekçe:* `data?: TemplateData` opsiyonel parametre olarak tanımlıdır; verilmediğinde değiştirilecek alan yoktur.
-
-**[Aksiyom 7]:** Eğer `_stockAlertTemplates` nesnesi modül kapsamında tanımlı değilse (boşsa veya erişilemezse), stok alert ile ilgili şablon tabanlı bildirimler oluşturulamaz.
-> *Gerekçe:* `_stockAlertTemplates` modül sabiti olarak tanımlıdır ve bildirim şablonları bu nesneden referansla beklenir.
-
-**[Aksiyom 8]:** Eğer `notification-service_handler` fonksiyonuna geçilen `req` (HTTP Request) nesnesi geçersiz veya boşsa, handler fonksiyonu çalışamaz ve yanıt üretilmez.
-> *Gerekçe:* Handler fonksiyonu tek giriş noktasıdır; istek gövdesi okunarak yönlendirme yapıldığından, geçerli bir request nesnesi şarttır.
-
-**[Aksiyom 9]:** Eğer `sendWhatsApp` çağrısında `config` parametresi sağlanmazsa (opsiyonel olduğu için), varsayılan Twilio yapılandırması kullanılmalıdır; aksi halde WhatsApp gönderimi başarısız olur.
-> *Gerekçe:* `config?: TwilioConfig` opsiyoneldir, ancak Twilio servis bağlantısı için bir config'e ihtiyaç vardır; modül içinde varsayılan bir config sunulmuyorsa gönderim yapılamaz.
+[Aksiyom 7]: Eğer `sendWhatsApp` fonksiyonunda `config` parametresi sağlanmamışsa (opsiyonel), varsayılan Twilio yapılandırmasının mevcut olması beklenir; aksi halde WhatsApp mesajı gönderilemez.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### callerFailure
+**Ne yapar**: Bu fonksiyon, `notification-service` içindeki çağrıcı katmanlardan (örn. `serve` dekoratörü ile çağrılmış bir endpoint) fırlatılabilecek belirli hata türlerini, uygun HTTP durum kodlarına ve standart bir hata mesajı dizgesine dönüştürür. Amacı, düşük seviyeli hataları (örn. yanlış yapılandırma, profillerin bulunamaması) sunucunun dışarıya vereceği standart HTTP hatalarına haritalandırarak arayüzün tutarlı olmasını sağlamaktır.
+
+**Nasıl yapar**: Fonksiyon, girdi olarak `unknown` tipinde bir hata nesnesi alır ve bu nesnenin `instanceof` kontrolüyle özel hata sınıflarına (`TenantMismatchError`, `CallerConfigError`, `CallerLookupError`) ait olup olmadığını test eder. Eşleşme sağlanırsa, o hataya karşılık gelen predefined bir `{ status, error }` objesini döndürür. Hiçbir sınıfla eşleşmeyen (tanınmayan) hatalar için `null` dönerek çağrıcının hata yönetiminin devam etmesine izin verir. Bu fonksiyon, T026-VH Adım 3'te belirtilen beş farklı bildirim ucunda birebir aynı mantıkla kullanılır.
+
+**Parametreler**:
+- error: unknown — Fonksiyona fırlatılmış olan hata nesnesi. Fonksiyon, bu nesnenin belirli hata sınıflarına (`TenantMismatchError`, `CallerConfigError`, `CallerLookupError`) ait olup olmadığını `instanceof` ile kontrol ederek işler.
+
+**Dönüş**: { status: number; error: string } | null — Eğer hata, işlenen bir hata türüne aitse, `status` alanı HTTP durum kodunu (403, 500 veya 503), `error` alanı ise sabit bir hata mesajı dizgesini (`tenant_mismatch`, `CONFIG_MISSING` veya `profile_lookup_failed`) tutan bir nesne döner. İşlenemeyen veya tanımlanmayan hatalar için `null` döner.
 
 ### notification-service_handler
 **Ne yapar**: Bu fonksiyon, HTTP isteklerini alarak bildirim servisinin ana işleyişini yöneten giriş noktasıdır (handler). Gelen isteğe göre doğru bildirim kanalını (WhatsApp, SMS veya e-posta) seçip ilgili gönderim fonksiyonunu çağırarak işlemi koordine eder.
@@ -120,9 +116,7 @@ Bu modül, merkezi bir bildirim servisi olarak çalışır ve üç farklı ileti
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: ../_shared/tenant_config.ts::getTenantBranding
-- import: ../_shared/tenant_config.ts::resolveTenantId
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
-- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -170,90 +164,10 @@ type TemplateData = Record<string, string | number | boolean>
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::notification-service_handler
-- **params**: `(req)`
-- **ic_degiskenler**:
-  - `corsHeaders` — `getCorsHeaders(req)` çağrısıyla elde edilen CORS başlıkları nesnesi, tüm Response'lara eklenir
-  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile alınan Supabase proje URL'i
-  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile alınan servis rol anahtarı, yetkilendirme ve rolleri kontrol etmek için kullanılır
-  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile alınan anonim istemci anahtarı, authClient oluşturmak için kullanılır
-  - `body` — `req.json()` ile parse edilen request gövdesi, `NotificationRequest` tipinde
-  - `type` — `body` destructuring'inden alınan bildirim kanalı tipi (whatsapp/sms/email)
-  - `to` — `body` destructuring'inden alınan alıcı bilgisi
-  - `message` — `body` destructuring'inden alınan mesaj içeriği
-  - `priority` — `body` destructuring'inden alınan bildirim önceliği
-  - `template` — `body` destructuring'inden alınan opsiyonel şablon adı
-  - `data` — `body` destructuring'inden alınan opsiyonal şablon verileri
-  - `tenantId` — `resolveTenantId(req, body)` ile çözümlenen kiracı ID'si
-  - `branding` — `await getTenantBranding(tenantId)` ile asenkron olarak alınan kiracı marka bilgileri (emailFrom, brandName, brandPrimaryColor içerir)
-  - `authHeader` — `req.headers.get('Authorization')` ile alınan yetkilendirme başlığı
-  - `authClient` — `createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })` ile oluşturulan Supabase auth istemcisi
-  - `user` — `await authClient.auth.getUser()` sonucundan alınan authenticate edilmiş kullanıcı nesnesi
-  - `authErr` — `authClient.auth.getUser()` sonucundaki hata nesnesi
-  - `roleCheck` — `fetch(...)` ile `user_profiles` tablosundan rol kontrolü yapan HTTP yanıt nesnesi
-  - `arr` — `roleCheck.json()` ile parse edilen rol sorgusu sonucu dizisi
-  - `role` — `arr[0]?.role` ile alınan kullanıcının rolü (admin veya superadmin olmalı)
-  - `twilioAccountSid` — `Deno.env.get('TWILIO_ACCOUNT_SID')` ile alınan Twilio hesap SID'i
-  - `twilioAuthToken` — `Deno.env.get('TWILIO_AUTH_TOKEN')` ile alınan Twilio auth token'ı
-  - `twilioWhatsAppNumber` — `Deno.env.get('TWILIO_WHATSAPP_NUMBER')` ile alınan Twilio WhatsApp gönderici numarası
-  - `twilioPhoneNumber` — `Deno.env.get('TWILIO_PHONE_NUMBER')` ile alınan Twilio SMS gönderici numarası
-  - `resendApiKey` — `Deno.env.get('RESEND_API_KEY')` ile alınan Resend e-posta API anahtarı
-  - `emailFrom` — `branding.emailFrom` değerinden alınan e-posta gönderici adresi
-  - `notifyDebug` — `Deno.env.get('NOTIFY_DEBUG') === 'true'` kontrolü ile belirlenen debug modu bayrağı
-  - `result` — `let` ile tanımlı, bildirim gönderme sonucunu tutan değişken
-  - `isWhatsAppEnabled` — WhatsApp kanalının yapılandırma ile etkin olup olmadığını belirleyen boolean
-  - `isSmsEnabled` — SMS kanalının yapılandırma ile etkin olup olmadığını belirleyen boolean
-  - `isEmailEnabled` — E-posta kanalının yapılandırma ile etkin olup olmadığını belirleyen boolean
-  - `error` — `catch` bloğunda yakalanan hata nesnesi
-  - `msg` — `error instanceof Error` kontrolü ile çıkarılan hata mesajı stringi
-- **Dönüş**: `Response` (başarılı Response veya hata Response'u)
-
----
-
-### [N2_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendWhatsApp
-- **params**: `(to: string, message: string, template?: string, data?: TemplateData, config?: TwilioConfig)`
-- **ic_degiskenler**:
-  - `finalMessage` — `template` mevcutsa `formatTemplate(template, data)` ile formatlanmış mesaj; yoksa doğrudan `message` parametresi
-  - `formattedTo` — `to`数値ının `whatsapp:` prefix ile formatlanmış hali; zaten `whatsapp:` ile başlıyorsa olduğu gibi bırakılır
-  - `twilioUrl` — Twilio Messages API endpoint URL'i, `${config.accountSid}` ile dinamik oluşturulur
-  - `credentials` — `${config.accountSid}:${config.authToken}` birleşiminin Base64 (`btoa`) ile kodlanmış hali, Basic Auth header'ı için kullanılır
-  - `response` — Twilio API'ye POST isteği yapan `fetch` sonucu
-  - `error` — `response.ok` false ise `response.text()` ile alınan hata metni stringi
-- **Dönüş**: `response.json()` — Twilio API yanıt nesnesi
-
----
-
-### [N3_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendSMS
-- **params**: `(to: string, message: string, config: TwilioConfig)`
-- **ic_degiskenler**:
-  - `twilioUrl` — Twilio Messages API endpoint URL'i, `${config.accountSid}` ile dinamik oluşturulur
-  - `credentials` — `${config.accountSid}:${config.authToken}` birleşiminin Base64 (`btoa`) ile kodlanmış hali, Basic Auth header'ı için kullanılır
-  - `response` — Twilio API'ye POST isteği yapan `fetch` sonucu
-  - `error` — `response.ok` false ise `response.text()` ile alınan hata metni stringi
-- **Dönüş**: `response.json()` — Twilio API yanıt nesnesi
-
----
-
-### [N4_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendEmail
-- **params**: `(to: string, message: string, template?: string, data?: TemplateData, config?: { apiKey: string; from?: string })`
-- **ic_degiskenler**:
-  - `subject` — `data?.subject` varsa onu kullanır, yoksa varsayılan `'VentHub Bildirim'` stringi
-  - `finalMessage` — `template` mevcutsa `formatTemplate(template, data)` ile formatlanmış mesaj; yoksa doğrudan `message` parametresi
-  - `from` — Gönderici adresi; sırasıyla `config?.from`, `data?.emailFrom` veya varsayılan `'VentHub <noreply@venthub.com>'` değerini alır
-  - `response` — Resend API'ye (`https://api.resend.com/emails`) POST isteği yapan `fetch` sonucu
-  - `error` — `response.ok` false ise `response.text()` ile alınan hata metni stringi
-- **Dönüş**: `response.json()` — Resend API yanıt nesnesi
-
----
-
-### [N5_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::formatTemplate
-- **params**: `(template: string, data?: TemplateData)`
-- **ic_degiskenler**:
-  - `formatted` — `template`'in kopyası; `data` mevcutsa her bir placeholder `{{key}}` yerine gerçek değerlerle değiştirilerek oluşturulmuş formatlanmış string
-  - `key` — `Object.keys(data)` döngüsündeki her bir anahtar, `forEach` callback parametresi olarak kullanılır
-  - `placeholder` — `{{${key}}}` pattern'ini eşleştiren `RegExp` nesnesi, global flag ile tüm eşleşmeleri bulur
-  - `value` — `String(data[key])` ile elde edilen, placeholder'ın yerine konacak değer stringi
-- **Dönüş**: `string` — placeholder'ları gerçek değerlerle değiştirilmiş şablon stringi
+### [N1_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::callerFailure
+- **params**: `(error: unknown)`
+- **ic_degiskenler**: (yok — sadece parametre ve literal dönüşler kullanılır)
+- **Dönüş**: `{ status: number; error: string } | null` — hatanın türüne göre HTTP status kodu ve hata mesajı döner; tanınamayan hatalarda `null` döner
 
 ---
 
@@ -261,18 +175,20 @@ type TemplateData = Record<string, string | number | boolean>
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    index_ts__callerFailure["callerFailure"]
     index_ts__formatTemplate["formatTemplate"]
     index_ts__notification-service_handler["notification-service_handler"]
     index_ts__sendEmail["sendEmail"]
     index_ts__sendSMS["sendSMS"]
     index_ts__sendWhatsApp["sendWhatsApp"]
-    index_ts__sendEmail --> index_ts__formatTemplate
     index_ts__sendWhatsApp --> index_ts__formatTemplate
+    index_ts__sendEmail --> index_ts__formatTemplate
 ```
 
 ## NODE ID STANDARD
 
   file: supabase\functions\notification-service\index.ts
+  function: supabase\functions\notification-service\index.ts::callerFailure
   function: supabase\functions\notification-service\index.ts::notification-service_handler
   function: supabase\functions\notification-service\index.ts::sendWhatsApp
   function: supabase\functions\notification-service\index.ts::sendSMS
@@ -282,6 +198,7 @@ graph TD
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: callerFailure
   export: formatTemplate
   export: notification-service_handler
   export: sendEmail

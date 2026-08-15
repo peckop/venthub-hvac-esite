@@ -12,42 +12,20 @@ export interface TenantBranding {
   emailFrom: string
 }
 
-const DEFAULT_TENANT_ID = 'd3b07384-d113-495f-a558-8c38634e0000'
-
-/**
- * Extracts the tenant_id from either the Authorization Header JWT claims,
- * a query parameter (e.g. ?tenant_id=xxx), or parsed request body.
- */
-export function resolveTenantId(req: Request, parsedBody?: any): string {
-  try {
-    // 1. Try URL search params
-    const url = new URL(req.url)
-    const queryTenantId = url.searchParams.get('tenant_id')
-    if (queryTenantId) return queryTenantId
-
-    // 2. Try Authorization header
-    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization')
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7)
-      const jwtParts = token.split('.')
-      if (jwtParts.length === 3) {
-        const payload = JSON.parse(atob(jwtParts[1]))
-        const tenantId = payload?.app_metadata?.tenant_id
-        if (tenantId) return tenantId
-      }
-    }
-
-    // 3. Try parsed request body
-    if (parsedBody && typeof parsedBody === 'object') {
-      const bodyTenantId = parsedBody.tenant_id || parsedBody.tenantId
-      if (bodyTenantId) return String(bodyTenantId)
-    }
-  } catch (err) {
-    console.error('[tenant-config] Error parsing tenant_id context:', err)
-  }
-
-  return DEFAULT_TENANT_ID
-}
+// T026-VH Adım 6 (2026-08-15): `resolveTenantId` BURADAN SİLİNDİ.
+//
+// Tenant sınırını üç ayrı İSTEK alanından çiziyordu — `?tenant_id=` query'si (her şeyden
+// önce, yani doğrulanmış kimliği EZEREK), imzası doğrulanmadan `atob` ile çözülmüş JWT
+// payload'ı, ve gövde. Üçü de saldırganın yazdığı yerler; değer PostgREST filtresine
+// (`tenant_id=eq.…`) girdiği için etki "başka tenant'ın satırını oku/yaz"a kadar gidiyordu.
+//
+// Yerine geçen: `_shared/tenant.ts` (istek nesnesini GÖREMEYEN saf modül) + `_shared/caller.ts`
+// (getUser'ı en fazla bir kez çağıran ortak kapı). 12 çağıranın hepsi Adım 2–5'te göçtü.
+// Sırayı çevirmek yetmezdi: `atob` kaldıkça saldırı query'den sahte-JWT'ye taşınırdı.
+// Detay: docs/plans/tenant-id-hardening-2026-08-15.md · cetvel §3.9
+//
+// `DEFAULT_TENANT_ID` artık TEK yerde: `_shared/tenant.ts`.
+// Bu dosyada yalnız `getTenantBranding` kaldı — 5 bildirim ucu onu kullanıyor.
 
 /**
  * Dynamically fetches branding configurations for a given tenant_id.
