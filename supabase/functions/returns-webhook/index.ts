@@ -3,7 +3,7 @@
 // Receives carrier webhook for return shipments. On delivered, marks venthub_returns.status='received'.
 // Env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RETURNS_WEBHOOK_SECRET (HMAC) or RETURNS_WEBHOOK_TOKEN
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { resolveTenantId } from '../_shared/tenant_config.ts'
 
 function json(body: unknown, init: ResponseInit = {}) {

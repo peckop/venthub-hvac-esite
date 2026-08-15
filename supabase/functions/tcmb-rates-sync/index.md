@@ -2,67 +2,58 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\tcmb-rates-sync\index.ts
-skeleton_hash: 6210aa5ad92f37e2
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\tcmb-rates-sync\index.ts
+skeleton_hash: 154a8f6d9cd8d94f
 entity_hashes:
-  func:parseBulletin: bb903b4819589f60
+  func:parseBulletin: 22e4e4d4e126232a
   func:tcmb-rates-sync_handler: 091085454d214b21
-  overview: 4605344897640e28
-generated_at: 2026-08-13T18:23:43Z
+  overview: 79862a3904613170
+generated_at: 2026-08-15T07:33:55Z
 ---
 
 ## Genel Bakış
-Bu modül, Türkiye Cumhuriyet Merkez Bankası'nın (TCMB) döviz kuru ve faiz oranlarını içeren XML bültenlerini işleyerek veritabanını güncellemekten sorumludur. Temel olarak harici bir HTTP isteği alır, gelen XML verisini analiz eder ve işlenmiş verileri veritabanına kaydeder.
+Bu modül, Türkiye Cumhuriyet Merkez Bankası (TCMB) tarafından yayımlanan döviz kuru ve faiz oranları bültenlerini otomatik olarak senkronize etmek için tasarlanmış bir Supabase Edge Function'dır. Dışarıdan bir HTTP isteği ile tetiklenen modül, gelen XML bültenini analiz ederek yapılandırılmış bir veriye dönüştürür ve işlenen verilerin veritabanına kaydedilmesini koordine eder.
 
 ## Fonksiyon Grupları
-### HTTP İşleyici ve Koordinasyon
-Modülün dış dünyayla tek etkileşim noktasıdır; gelen istekleri doğrular, XML bültenini alır ve işlemenin tüm akışını koordine eder.
+### HTTP İstek Koordinasyonu
+Modülün dış etkileşim noktasıdır; isteği doğrular, XML bültenini alır ve iş akışını başlatarak parse etme, veritabanı güncelleme gibi tüm adımları yönetir.
 - tcmb-rates-sync_handler
-### XML Veri Analizi
-Ham XML bültenini alıp yapılandırılmış ve kullanıma hazır bir veri nesnesine dönüştürmekten sorumludur.
+
+### XML Bülten Analizi
+Ham TCMB XML verisini alıp, doğrudan kullanılabilecek yapılandırılmış bir JavaScript nesnesine (döviz kurları, faiz oranları) dönüştürmekten sorumludur.
 - parseBulletin
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül TCMB (Türkiye Cumhuriyet Merkez Bankası) döviz kuru verilerini XML formatından parse eden ve senkronize eden bir Supabase Edge Function'dır. Aşağıdaki varsayımlar fonksiyon imzalarından türetilmiştir:
+Bu modül, TCMB döviz kuru XML bültenlerini işleyerek veritabanını güncelleyen bir veri senkronizasyon modülüdür.
 
----
+[Aksiyom 1]: Eğer `parseBulletin` fonksiyonuna geçersiz veya beklenen TCMB XML formatında olmayan bir string girilirse, `ParsedBulletin | null` dönüş tanımı gereği `null` döner.
 
-**[Aksiyom 1]:** Eğer `xml` parametresi geçerli/biyar XML formatında değilse veya beklenen TCMB bülten yapısını içermiyorsa, `parseBulletin` fonksiyonu `null` döner ve senkronizasyon verisi üretilemez.
+[Aksiyom 2]: Eğer `parseBulletin` başarılı bir şekilde XML'yi parse ederse, yapılandırılmış bir `ParsedBulletin` nesnesi döner.
 
-> *Gerekçe:* `parseBulletin`'in dönüş tipi `ParsedBulletin | null` olarak tanımlıdır — bu, parse işleminin başarısız olabileceğini ve `null` ile bildirileceğini gösterir.
+[Aksiyom 3]: Eğer `tcmb-rates-sync_handler` fonksiyonu bir hata ile karşılaşırsa bile, fonksiyon imzası gereği her zaman geçerli bir `Response` nesnesi dönmelidir.
 
----
+[Aksiyom 4]: Eğer `tcmb-rates-sync_handler` fonksiyonu `async` olarak tanımlanmamışsa, içeresindeki I/O işlemleri (HTTP istekleri, veritabanı yazma) bloklanarak hata oluşur.
 
-**[Aksiyom 2]:** Eğer `req` (Request) parametresi geçerli bir HTTP Request nesnesi değilse, handler fonksiyonu beklenmeyen bir hata fırlatır veya geçersiz bir Response döner.
+[Aksiyom 5]: Eğer handler'a geçersiz bir `Request` nesnesi girilse bile, fonksiyon response döndürme zorunluluğundadır (hata response'u dahil).
 
-> *Gerekçe:* `tcmb-rates-sync_handler`'ın `req: Request` parametresi ile çağrılması zorunludur; request nesnesi olmadan endpoint çalışamaz.
-
----
-
-**[Aksiyom 3]:** Eğer `parseBulletin` sonucu `null` ise, handler fonksiyonu successfully (200) bir senkronizasyon yanıtı döndüremez — hata durumu veya boş veri yanıtı döndürmelidir.
-
-> *Gerekçe:* Parse başarısız olduğunda işlenecek geçerliParsedBulletin verisi olmadığından, handler'ın senkronizasyon işlemini tamamlaması yapısal olarak mümkün değildir.
-
----
-
-**Not:** Bu modül için fonksiyon gövdesine erişim olmadığından, parse edilen XML şeması (hangi elemanların beklenildiği), API endpoint URL'i, kimlik doğrulama mekanizması ve döviz kuru eşik değerleri gibi detaylar **bilinmiyor** olarak işaretlenmiştir.
+[Aksiyom 6]: Modül, TCMB XML bültenlerinin belirli bir şemaya sahip olduğunu varsayar; bu şema değişirse `ParsedBulletin` yapısı da güncellenmelidir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### parseBulletin
-**Ne yapar**: Bu fonksiyon, Türkiye Cumhuriyet Merkez Bankası (TCMB) döviz kurları XML verisini ayrıştırarak belirli para birimleri için efektif satış kurunu ve tarihi yapılandırılmış bir nesne olarak döndürür. Fonksiyon, geçerli bir veri bulunamadığında `null` döner.
+**Ne yapar**: Bu fonksiyon, Türkiye Cumhuriyet Merkez Bankası'ndan gelen bir XML dizesini (muhtemelen döviz kurları bülteni) alır, bu XML'den etkin kur tarihini ve belirli para birimleri için döviz kurlarını çıkararak yapılandırılmış bir nesne olarak döndürür.
 
-**Nasıl yapar**: Fonksiyon, gelen XML string'inde `Tarih_Date` etiketindeki `Date` özelliğini regex kullanarak bulur ve ay, gün, yıl bileşenlerini çıkarır. Ardından, dışarıdan tanımlı `QUOTE_CURRENCIES` dizisindeki her para birimi kodu için, XML içinde ilgili `<Currency>` bloğunu regex ile tarar. Her blok içinde `BanknoteSelling` ve `ForexSelling` etiketlerinden değerleri çeker; `BanknoteSelling` geçerli ve pozitifse onu, değilse `ForexSelling` kurunu kullanarak bir kur oranı oluşturur. Toplanan geçerli kur oranlarını bir `rates` nesnesinde depolar. Hiçbir geçerli kur bulunamazsa `null`, aksi takdirde tarih ve kurları içeren bir nesne döner.
+**Nasıl yapar**: Fonksiyon öncelikle verilen XML string'i üzerinde bir regular expression (regex) kullanarak `Tarih_Date` elemanındaki `Date` özniteliğini arar ve tarih bilgisini (ay, gün, yıl) çıkarır. Tarih bulunamazsa `null` döner. Ardından, önceden tanımlı `QUOTE_CURRENCIES` dizisindeki her bir para birimi kodu için XML'de ilgili `<Currency>` bloğunu regex ile bulur. Her blok içinde `BanknoteSelling` etiketinden (kağıt para satış fiyatı) kuru almaya çalışır; bu değer geçerli ve sıfırdan büyük değilse `ForexSelling` etiketinden (döviz kuru) kuru almaya çalışır. Geçerli bir kur elde edildiğinde bu kuru `rates` nesnesine ekler. Tüm para birimleri işlendikten sonra, eğer hiçbir geçerli kur bulunamamışsa (`rates` nesnesinin anahtarları boşsa) `null` döner; aksi halde etkin tarih (YYYY-AA-GG formatında) ve kurlar nesnesini içeren `ParsedBulletin` nesnesini döndürür.
 
 **Parametreler**:
-- xml: string — TCMB dövim kurlarını içeren ham XML verisi.
+- `xml`: `string` — TCMB'den alınan döviz kurları bültenini içeren ham XML verisi. Fonksiyon bu string'i doğrudan düzenli ifadelerle ayrıştırır.
 
-**Dönüş**: `ParsedBulletin | null` — Ayrıştırılmış bulletin nesnesi veya ayrıştırma başarısız olursa `null`. `ParsedBulletin` tipi `{ effectiveDate: string; rates: Record<string, number> }` yapısındadır; `effectiveDate` YYYY-AA-GG formatında tarih, `rates` ise para birimi kodlarını (örn: "USD", "EUR") kurlarına eşleyen bir nesnedir.
+**Dönüş**: `ParsedBulletin | null` — İşleme başarılıysa, `effectiveDate` (string, YYYY-AA-GG formatında) ve `rates` (döviz kodlarını anahtar, kur değerlerini sayı olarak tutan nesne) alanlarını içeren bir nesne döner. Tarih bilgisi XML'de bulunamazsa veya hiçbir para birimi için geçerli bir kur extracts edilemezse `null` döner. `ParsedBulletin` tipinin yapısı `{ effectiveDate: string; rates: Record<string, number> }` şeklindedir.
 
 ### tcmb-rates-sync_handler
 **Ne yapar**: Bu fonksiyon, HTTP isteklerini karşılayan asenkron bir sunucu işleyicisidir. TCMB döviz kurlarının senkronizasyonunu tetikleyen veya bu işlemle ilgili bir API endpoint'ini temsil eder.
@@ -78,7 +69,7 @@ Bu modül TCMB (Türkiye Cumhuriyet Merkez Bankası) döviz kuru verilerini XML 
 
 ## İTHALATLAR (IMPORTS)
 - import: https://deno.land/std@0.177.0/http/server.ts::serve
-- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -92,45 +83,44 @@ Bu modül TCMB (Türkiye Cumhuriyet Merkez Bankası) döviz kuru verilerini XML 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\tcmb-rates-sync\index.ts::parseBulletin
-- **params**: (xml: string)
+### [N1_NASIL] AST Pointer: supabase/functions/tcmb-rates-sync/index.ts::parseBulletin
+- **params**: `(xml: string)`
 - **ic_degiskenler**:
-  - `dateMatch` — Tarih_Date XML bloğundaki Date niteliğinden ay, gün, yıl bilgilerini çıkaran regex eşleşme sonucu (RegExp match array veya null)
-  - `month` — dateMatch dizisinden destructuring ile alınan ay bilgisi (2 haneli string, ör. "03")
-  - `day` — dateMatch dizisinden destructuring ile alınan gün bilgisi (2 haneli string, ör. "15")
-  - `year` — dateMatch dizisinden destructuring ile alınan yıl bilgisi (4 haneli string, ör. "2024")
-  - `rates` — Para birimi kodlarını anahtar, döviz kurunu sayı olarak tutan sözlük (Record<string, number>), her geçerli kurla doldurulur
-  - `code` — QUOTE_CURRENCIES dizisi üzerindeki for döngüsündeki mevcut para birimi kodu (ör. "USD", "EUR")
-  - `block` — Belirli bir para birimi koduna ait tüm Currency XML bloğunu eşleştiren regex sonucu (RegExp match array veya null)
-  - `pick` — Bir XML etiketinin (BanknoteSelling/ForexSelling) içeriğini sayıya dönüştüren inner fonksiyon; tag parametresi alır, number döndürür
-  - `m` — pick inner fonksiyonu içindeki regex eşleşme sonucu (belirli tag değerini yakalar)
-  - `banknote` — pick('BanknoteSelling') çağrısı ile elde edilen banknot satış kuru (number, geçerli değilse NaN)
-  - `forex` — pick('ForexSelling') çağrısı ile elde edilen döviz satış kuru (number, geçerli değilse NaN)
-  - `rate` — banknote geçerli ve pozitifse banknote, aksi takdirde forex değeri; tercih edilen nihai kuru temsil eder
-- **Dönüş**: { effectiveDate: `${year}-${month}-${day}`, rates } veya null — effectiveDate YYYY-MM-DD formatında tarih stringi, rates_para birimi-kuru sözlüğü; bulletin parse edilemezse null
+  - `dateMatch` — xml içinden Tarih_Date etiketinin Date özniteliğini eşleştiren regex sonucu (tarih bilgisi)
+  - `month` — dateMatch[1] erişimi ile elde edilen ay bilgisi (2 haneli string)
+  - `day` — dateMatch[2] erişimi ile elde edilen gün bilgisi (2 haneli string)
+  - `year` — dateMatch[3] erişimi ile elde edilen yıl bilgisi (4 haneli string)
+  - `rates` — para birimi kodlarına karşılık gelen kurları tutan nesne
+  - `code` — QUOTE_CURRENCIES dizisindeki her bir para birimi kodu
+  - `block` — xml içinde belirli bir para birimi bloğunu eşleştiren regex sonucu
+  - `pick` — Belirli bir XML etiketinin (BanknoteSelling/ForexSelling) içeriğini çıkaran iç fonksiyon
+  - `m` — pick fonksiyonu içindeki regex eşleşme sonucu
+  - `banknote` — BanknoteSelling değerini pick ile çıkaran değişken (sayısal)
+  - `forex` — ForexSelling değerini pick ile çıkaran değişken (sayısal)
+  - `rate` — banknote veya forex'ten uygun olanı seçip hesaplanan kur
+- **Dönüş**: `ParsedBulletin | null` (tarih ve kurlar nesnesi veya parse başarısızsa null)
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\tcmb-rates-sync\index.ts::tcmb-rates-sync_handler
-- **params**: (req: Request)
+### [N2_NASIL] AST Pointer: supabase/functions/tcmb-rates-sync/index.ts::tcmb-rates-sync_handler
+- **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile okunan Supabase proje URL'si (string veya undefined)
-  - `serviceKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile okunan Supabase servis rol anahtarı (string veya undefined)
-  - `supabase` — createClient(supabaseUrl, serviceKey) ile oluşturulan Supabase istemcisi
-  - `xml` — TCMB web servisinden çekilen ham XML verisi (başlangıçta boş string, fetch sonrası doldurulur)
-  - `res` — TCMB_URL üzerine yapılan fetch çağrısının Response sonucu; res.ok kontrolü ile HTTP durumu değerlendirilir
-  - `_err` — catch bloğunda yakalanan hata nesnesi (TCMB erişilemez durumlarda); fonksiyonda kullanılmaz, sadece varlık bildirimi
-  - `bulletin` — parseBulletin(xml) çağrısının dönüşü (ParsedBulletin nesnesi veya null); effectiveDate ve rates alanlarını içerir
-  - `tenants` — supabase.from('tenants').select('id') sorgusundan dönen kiracı listesi (dizi, her eleman { id: string })
-  - `tenantsError` — tenants sorgusundaki olası hata nesnesi (error veya null)
-  - `inserted` — Başarıyla veritabanına inserted edilen kur kayıtlarının sayacı (başlangıçta 0)
-  - `skipped` — Atlanan kur kayıtlarının sayacı; mevcut kayıt bulunduğu veya yarış durumunda unique ihlali olduğunda artırılır (başlangıçta 0)
-  - `errors` — Oluşan hata mesajlarını toplayan dizi (her eleman "paraBirimKodu: hataMesaji" formatında string)
-  - `tenant` — tenants dizisi üzerindeki dış for döngüsündeki mevcut kiracı nesnesi ({ id: string })
-  - `code` — bulletin.rates sözlüğü üzerindeki iç for döngüsündeki para birimi kodu (ör. "USD", "EUR")
-  - `rate` — bulletin.rates sözlüğünden alınan döviz kuru değeri (number)
-  - `existing` — currency_rates tablosundan aynı tenant_id, quote_ccy, effective_date ve source='tcmb' koşuluyla okunan mevcut kayıt listesi (dizi veya null)
-  - `readError` — currency_rates okuma sorgusundaki olası hata nesnesi
-  - `insertError` — currency_rates.insert() çağrısındaki olası hata nesnesi; insertError.code === '23505' ise unique ihlali sayılır
-- **Dönüş**: Response nesnesi — JSON gövdesinde { ok: boolean, bulletinDate?: string, rates?: Record<string, number>, inserted: number, skipped: number, errors: string[], carried?: boolean, reason?: string, error?: string } ; OPTIONS isteklerinde basit 'ok' yanıtı, Supabase yapılandırma eksikliğinde 500, TCMB erişilemezse 200 + carried:true, parse başarısızlığında 502, normal tamamlanmada 200 (hata varsa 500)
+  - `supabaseUrl` — Deno ortam değişkeninden alınan SUPABASE_URL
+  - `serviceKey` — Deno ortam değişkeninden alınan SUPABASE_SERVICE_ROLE_KEY
+  - `supabase` — createClient ile oluşturulan Supabase istemcisi
+  - `xml` — TCMB API'sinden çekilen XML verisi (başlangıçta boş string)
+  - `res` — TCMB_URL adresine yapılan fetch isteği sonucu
+  - `bulletin` — parseBulletin ile işlenmiş TCMB bülteni (tarih ve kurlar)
+  - `tenants` — 'tenants' tablosundan çekilen tüm kiracılar
+  - `tenantsError` — tenants sorgusu hatası
+  - `inserted` — başarıyla eklenen kur sayısı
+  - `skipped` — atlanan (mevcut veya hata nedeniyle eklenmeyen) kur sayısı
+  - `errors` — hata mesajlarını tutan dizi
+  - `tenant` — tenants dizisindeki her bir kiracı nesnesi (id alanı)
+  - `code` — bulletin.rates nesnesindeki her bir para birimi kodu
+  - `rate` — bulletin.rates[code] erişimi ile elde edilen kur değeri
+  - `existing` — 'currency_rates' tablosunda aynı kiracı/kur/tarih/kaynak kombinasyonu olup olmadığını kontrol eden sorgu sonucu
+  - `readError` — existing sorgusundaki hata
+  - `insertError` — currency_rates tablosuna insert işlemindeki hata
+- **Dönüş**: `Response` (JSON formatında sonuç: tarih, eklenen/atlanan kur sayıları ve hatalar)
 
 ---
 

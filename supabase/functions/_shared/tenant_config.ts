@@ -1,4 +1,9 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+// T028-VH: pin ZORUNLU. Pin'siz `@2` esm.sh tarafından DEPLOY ANINDA çözülür — aynı kaynak
+// iki farklı zamanda deploy edilince iki farklı sürüm çalışır. Ölçülmüş kanıt: `deno.lock`
+// bu spec'i 2.101.1'e çözmüştü, yani kayma teorik değil gerçekleşmişti. Burası PAYLAŞILAN
+// modül olduğu için pin'siz kalması, onu import eden her fonksiyonun çalışma zamanına
+// İKİNCİ ve floating bir supabase-js kopyası sokuyordu.
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
 
 export interface TenantBranding {
   brandName: string

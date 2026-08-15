@@ -2,42 +2,43 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\tenant_config.ts
-skeleton_hash: 12c856af1a1cb729
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\_shared\tenant_config.ts
+skeleton_hash: ae031a376d4afe0c
 entity_hashes:
   func:getTenantBranding: bde2d3819c7904af
   func:resolveTenantId: 70b9699dc1e36828
-  overview: 0aa8d7ed1d1b17a6
-generated_at: 2026-08-13T07:40:33Z
+  overview: 0e3d39bd3d5cdaab
+generated_at: 2026-08-15T07:33:58Z
 ---
 
 ## Genel Bakış
-
-Bu modül, kiracı (tenant) bazlı yapılandırma ve kimlik tespitini sağlamak için ortak yardımcı fonksiyonlar içerir. Supabase edge fonksiyonları arasında paylaşılan bir yapı olarak, HTTP isteklerinden kiracı tanımlayıcısının çıkarılması ve kiracıya özel marka bilgilerinin getirilmesi işlemlerini merkezi olarak yönetir.
+Bu modül, Supabase edge fonksiyonları arasında paylaşılan kiracı (tenant) yapılandırma yardımcılarını içerir. HTTP isteklerinden kiracı tanımlayıcısının çıkarılması ve ilgili kiracının marka bilgilerinin getirilmesi işlemlerini merkezi olarak sunar.
 
 ## Fonksiyon Grupları
 
-### Kiracı Kimlik Tespiti
-HTTP isteklerinden kiracı tanımlayıcısını çıkarıp standart bir biçime dönüştürerek diğer fonksiyonların kullanabileceği şekilde sunar.
+### Kiracı Kimlik Çıkarma
+HTTP isteklerinden kiracı tanımlayıcısını analiz edip standart bir biçime dönüştürerek diğer fonksiyonların kullanabileceği şekilde hazırlar.
 - resolveTenantId
 
-### Kiracı Marka Bilgisi
-Verilen kiracı tanımlayıcısına karşılık gelen marka ve görsel yapılandırma bilgilerini asenkron olarak getirir.
+### Kiracı Marka Yapılandırma
+Verilen kiracı tanımlayıcısına karşılık gelen marka ve görsel yapılandırma bilgilerini asenkron olarak getirerek kiracıya özel görünümlerin sağlanmasını destekler.
 - getTenantBranding
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, HTTP isteklerinden tenant (kiracı) tanımlayıcısını çıkaran ve ilgili tenant'ın marka bilgisini getiren yardımcı fonksiyonlar içerir.
+Bu modül, kiracı kimlik tespiti ve marka bilgisi getirme işlemleri için paylaşımlı yardımcı fonksiyonlar sunar.
 
-**[Aksiyom 1]**: Eğer `resolveTenantId` fonksiyonuna geçirilen `req` parametresi geçerli bir HTTP Request nesnesi değilse, fonksiyon tenant ID'sini başarıyla çıkaramaz.
+**[Aksiyom 1]**: Eğer `resolveTenantId` çağrısında geçerli bir `Request` nesnesi yoksa, kiracı tanımlayıcısı tespit edilemez ve fonksiyon geçerli bir `string` dönemez.
 
-**[Aksiyom 2]**: Eğer `resolveTenantId` fonksiyonuna geçirilen `parsedBody` parametresi `undefined` ise ve request body'den tenant ID çıkarımı bu parametreye bağımlıysa, çözümleme başarısız olur.
+**[Aksiyom 2]**: Eğer `getTenantBranding` çağrısında geçerli bir `tenantId` (string) parametresi yoksa, kiracıya ait marka bilgisi (`TenantBranding`) getirilemez ve Promise başarısız olur.
 
-**[Aksiyom 3]**: Eğer `getTenantBranding` fonksiyonuna geçirilen `tenantId` boş string (`""`) ise veya geçerli bir tenant temsil etmiyorsa, fonksiyon geçerli marka bilgisi dönemez.
+**[Aksiyom 3]**: Eğer `TenantBranding` tipi (veri yapısı) sistemde tanımlı değilse, `getTenantBranding` fonksiyonunun dönüş tipi geçersiz olur ve çağrı yapan modüller tip hatası alır.
 
-**[Aksiyom 4]**: Eğer `getTenantBranding` fonksiyonu için veritabanında veya yapılandırma kaynağında `tenantId`'ye karşılık gelen bir kayıt yoksa, fonksiyon geçerli marka bilgisi dönemez.
+**[Aksiyom 4]**: Eğer `getTenantBranding` fonksiyonunun eriştiği arka veri kaynağı (veritabanı veya servis) erişilebilir değilse, marka bilgisi asenkron olarak getirilemez ve Promise asılı kalır veya hata ile sonuçlanır.
+
+**[Aksiyom 5]**: Eğer `resolveTenantId` isteğinde kiracı tanımlayıcısını çıkarılabilecek bir kaynak (header, URL parametresi, body içeriği vb.) yoksa, `parsedBody` parametresi `undefined` olsa bile fonksiyon varsayılan bir kiracı tanımlayıcısı dönemez.
 
 ---
 
@@ -71,7 +72,7 @@ Bu modül, HTTP isteklerinden tenant (kiracı) tanımlayıcısını çıkaran ve
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -87,34 +88,33 @@ Bu modül, HTTP isteklerinden tenant (kiracı) tanımlayıcısını çıkaran ve
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: _shared/tenant_config.ts::resolveTenantId
-- **params**: (req: Request, parsedBody?: any)
+### [N1_NASIL] AST Pointer: supabase/functions/_shared/tenant_config.ts::resolveTenantId
+- **params**: `(req: Request, parsedBody?: any)`
 - **ic_degiskenler**:
-  - `url` — İstek URL'sini temsil eden URL nesnesi, sorgu parametrelerini okumak için kullanılır
-  - `queryTenantId` — URL'deki `tenant_id` sorgu parametresinden gelen string değer
-  - `authHeader` — Authorization veya authorization header'ından gelen token string'i
-  - `token` — Bearer prefix'i去除ılmış JWT token string'i
-  - `jwtParts` — JWT token'ının '.' karakteriyle ayrılmış parçalarını içeren array
-  - `payload` — JWT payload'unun Base64 decode edilmiş JSON objesi
-  - `tenantId` — JWT payload'unun `app_metadata.tenant_id` alanından gelen tenant ID string'i
-  - `bodyTenantId` — parsedBody objesinden gelen `tenant_id` veya `tenantId` alanı
-  - `err` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: string — Çözümlenmiş tenant ID'si veya DEFAULT_TENANT_ID
+  - `url` — req.url'den oluşturulan URL nesnesi, sorgu parametrelerini okumak için kullanılır
+  - `queryTenantId` — URL searchParams'tan alınan 'tenant_id' değeri
+  - `authHeader` — req.headers'dan alınan Authorization header'ı (Büyük/küçük harf duyarsız)
+  - `token` — Authorization header'dan çıkarılan Bearer token'ın kendisi
+  - `jwtParts` — JWT token'ın '.' ile split edilmiş parçaları (header, payload, signature)
+  - `payload` — JWT payload kısmının decode edilmiş hali (JSON.parse ile)
+  - `tenantId` — JWT payload'un app_metadata.tenant_id alanından alınan değer
+  - `bodyTenantId` — parsedBody nesnesinden tenant_id veya tenantId alanı
+- **Dönüş**: `string` — tenant_id değeri veya DEFAULT_TENANT_ID (hata durumunda)
 
-### [N2_NASIL] AST Pointer: _shared/tenant_config.ts::getTenantBranding
-- **params**: (tenantId: string)
+### [N2_NASIL] AST Pointer: supabase/functions/_shared/tenant_config.ts::getTenantBranding
+- **params**: `(tenantId: string)`
 - **ic_degiskenler**:
-  - `supabaseUrl` — SUPABASE_URL ortam değişkeninden gelen Supabase URL string'i
-  - `serviceKey` — SUPABASE_SERVICE_ROLE_KEY ortam değişkeninden gelen service role key string'i
-  - `dbConfig` — Veritabanından çekilen tenant konfigürasyon objesi (Record<string, string>)
-  - `supabase` — createClient ile oluşturulan Supabase istemcisi nesnesi
-  - `data` — Veritabanı sorgusundan dönen tenant verisi (config alanını içerir)
-  - `error` — Veritabanı sorgusundan dönen hata nesnesi
-  - `brandName` — Hiyerarşik resolved marka adı (DB config, alternatif key, ortam değişkeni veya varsayılan)
-  - `brandLogoUrl` — Hiyerarşik resolved marka logosu URL'i
-  - `brandPrimaryColor` — Hiyerarşik resolved marka ana rengi
-  - `emailFrom` — Hiyerarşik resolved e-posta gönderici adresi
-- **Dönüş**: Promise<TenantBranding> — {brandName, brandLogoUrl, brandPrimaryColor, emailFrom} objesi
+  - `supabaseUrl` — Deno.env'den SUPABASE_URL değerini alan string, Supabase bağlantısı için kullanılır
+  - `serviceKey` — Deno.env'den SUPABASE_SERVICE_ROLE_KEY değerini alan string, Supabase servis anahtarı
+  - `dbConfig` — Veritabanından çekilen tenant konfigürasyonu (boş obje ile başlar, data.config ile doldurulur)
+  - `supabase` — createClient ile oluşturulan Supabase istemcisi (auth persistSession: false ile)
+  - `data` — supabase.from('tenants').select('config') sorgusunun sonucu (tenant verisi)
+  - `error` — Supabase sorgusu sırasında oluşabilecek hata nesnesi
+  - `brandName` — Marka adı: dbConfig.brand_name veya dbConfig.brandName veya BRAND_NAME env veya 'VentHub' fallback
+  - `brandLogoUrl` — Marka logo URL'si: dbConfig.brand_logo_url veya dbConfig.brandLogoUrl veya BRAND_LOGO_URL env veya varsayılan logo
+  - `brandPrimaryColor` — Marka ana rengi: dbConfig.brand_primary_color veya dbConfig.brandPrimaryColor veya BRAND_PRIMARY_COLOR env veya '#2563eb'
+  - `emailFrom` — E-posta gönderen adresi: dbConfig.email_from veya dbConfig.EMAIL_FROM veya EMAIL_FROM env veya varsayılan e-posta
+- **Dönüş**: `Promise<TenantBranding>` — brandName, brandLogoUrl, brandPrimaryColor, emailFrom alanlarını içeren nesne
 
 ---
 

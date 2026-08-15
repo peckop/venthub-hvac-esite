@@ -4,7 +4,7 @@
 // Env required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 // Optional (recommended): SHIPPING_WEBHOOK_SECRET (HMAC-SHA256) or SHIPPING_WEBHOOK_TOKEN (legacy)
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { resolveTenantId } from '../_shared/tenant_config.ts'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {

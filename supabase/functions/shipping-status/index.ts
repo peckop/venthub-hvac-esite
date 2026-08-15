@@ -3,7 +3,7 @@
 // Returns shipping status for a given order_id or tracking_number
 // Env required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (read-only is okay but service role simplifies policies in sandbox)
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), {

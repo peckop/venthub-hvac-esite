@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-webhook\index.ts
-skeleton_hash: 54a7b9460a1eef6e
+skeleton_hash: 127da671a0ab28be
 entity_hashes:
   func:hmacValid: e5f4d85423ceba98
   func:jsonResponse: d167d2178aa5b5dd
@@ -11,47 +11,46 @@ entity_hashes:
   func:normalizePayload: 6091b60fb70ee727
   func:sha256Base64: 0784b35c5d8e45cb
   func:shipping-webhook_handler: b6676fdc25219168
-  overview: abc81f5956efe8ab
-generated_at: 2026-08-15T06:34:56Z
+  overview: 779e75170e178f54
+generated_at: 2026-08-15T07:34:38Z
 ---
 
 ## Genel Bakış
-Bu modül, kargo firmalarından gelen ve farklı formatlardaki webhook'ları işleyen bir Supabase Edge Function'dur. Gelen talepleri HMAC-SHA256 imza doğrulamasıyla güvenli bir şekilde alır, gelen veriyi standart bir forma dönüştürür ve siparişlerin kargo durumunu güncelleyerek iş akışını yönetir. Modül, merkezi bir kargo durumu güncelleme noktası olarak hizmet verir.
+Bu modül, kargo firmalarından gelen webhook bildirimlerini işleyen bir Supabase Edge Function'dır. HMAC-SHA256 imza doğrulamasıyla güvenli bir şekilde istekleri alır, farklı kargo firmalarının değişken formatlarındaki verileri standart bir forma dönüştürür ve siparişlerin kargo durumunu günceller. Modül, merkezi bir kargo durumu güncelleme noktası olarak çoklu kargo firması desteği sunar.
 
 ## Fonksiyon Grupları
-### Güvenlik ve Yanıt Oluşturma
-Bu grup, gelen HTTP isteklerinin HMAC-SHA256 imzasıyla otentikasyonunu sağlar ve istemciye standart JSON yanıtlar üretmek için yardımcı fonksiyonları içerir. İmza doğrulaması, ortam değişkenindeki bir gizli anahtar ve SHA-256 hash hesaplamasıyla yapılır.
+
+### Güvenlik ve Yanıt Yardımcıları
+Bu grup, webhook isteklerinin HMAC-SHA256 imzasıyla otentikasyonunu sağlar ve HTTP yanıtlarını standart JSON formatında oluşturmak için yardımcı fonksiyonları içerir.
 - jsonResponse, hmacValid, sha256Base64
 
-### Veri Normalizasyonu ve Durum Haritalama
-Bu grup, farklı kargo firmalarının özel payload yapılarını standart, işlenebilir bir formata dönüştürür ve firma bazlı durum kodlarını modülün kendi iç durum yapısına eşler. Bu sayede çoklu kargo firması desteği için merkezi bir dönüşüm katmanı oluşturur.
+### Veri Dönüştürme ve Durum Eşleme
+Farklı kargo firmalarının özel payload yapılarını merkezi, işlenebilir bir normalize forma çevirir ve firma bazlı durum kodlarını modülün iç durum yapısına eşler. Bu sayede tek bir işleyici ile çoklu kargo firması entegrasyonu mümkün olur.
 - normalizePayload, mapCarrierStatus
 
-### Ana Webhook İşleyici (Koordinatör)
-Modülün giriş noktasıdır; gelen HTTP talebini alarak yukarıdaki tüm grupları sırayla koordine eder. İş akışı şu adımları yönetir: HMAC imza doğrulaması, payload normalizasyonu, durum haritalama ve nihai güncelleme yanıtı oluşturma.
+### Ana Webhook İşleyici
+Modülün giriş noktasıdır; gelen HTTP isteğini alarak HMAC doğrulaması, payload normalizasyonu, durum haritalama ve güncelleme yanıtı oluşturma adımlarını sırayla koordine eder.
 - shipping-webhook_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kargo firmalarından gelen webhook'ları HMAC-SHA256 imza doğrulamasıyla güvenli bir şekilde işleyen bir Supabase Edge Function'dur.
+Bu modül, kargo webhook'larını HMAC-SHA256 imza doğrulamasıyla alıp standart forma dönüştüren bir Supabase Edge Function'dur.
 
-**[Aksiyom 1]:** Eğer HMAC_SECRET ortam değişkeni (hmacValid fonksiyonuna `secret` parametresi olarak verilen değer) yoksa, tüm webhook istekleri HMAC doğrulaması başarısız olarak reddedilir.
+**[Aksiyom 1]:** Eğer `HMAC_SECRET` ortam değişkeni (veya fonksiyonun erişeceği benzer bir gizli anahtar kaynağı) yoksa, `hmacValid` fonksiyonu tüm imza doğrulamalarında başarısız olur ve webhook istekleri reddedilir.
 
-**[Aksiyom 2]:** Eğer `signatureHeader` parametresi boş string veya undefined ise, hmacValid fonksiyonu false döner ve istek reddedilir.
+**[Aksiyom 2]:** Eğer gelen HTTP isteği `signatureHeader` içeren bir imza header'ı (örn. `x-hub-signature-256` veya benzeri) taşımıyorsa, `hmacValid` fonksiyonu imza doğrulamasını başaramaz ve `shipping-webhook_handler` geçersiz imza ile yanıt döner.
 
-**[Aksiyom 3]:** Eğer SKEW_MS sabiti tanımlı değilse veya zaman sapması kontrolü yapılamazsa, HMAC imza doğrulaması zaman pencereli olarak çalışamaz.
+**[Aksiyom 3]:** Eğer `SKEW_MS` sabiti zaman sapması toleransını tanımlıyorsa ve bu değer `0`'a eşit veya negatif ise, HMAC zaman damgası doğrulaması (varsa) hiçbir zaman penceresini kabul etmez; istekler zaman aşımı nedeniyle reddedilir.
 
-**[Aksiyom 4]:** Eğer mapCarrierStatus fonksiyonuna desteklenmeyen veya bilinmeyen bir kargo firması durum stringi girilirse, dönen nesnenin status alanı undefined olur ve setShipped/setDelivered boolean'ları false kalır.
+**[Aksiyom 4]:** Eğer `mapCarrierStatus` fonksiyonuna bilinmeyen bir kargo durum string'i (kendi sözlüğünde eşleşmeyen bir值) girilirse, dönen nesnenin `status`, `setShipped` ve `setDelivered` alanlarının tümü `undefined` olur.
 
-**[Aksiyom 5]:** Eğer normalizePayload fonksiyonuna geçersiz veya nil bir `obj` parametresi verilirse, normalizasyon başarısız olur.
+**[Aksiyom 5]:** Eğer `normalizePayload` fonksiyonuna geçersiz veya beklenmeyen yapıda bir `obj` parametresi girilirse (örn. `null`, `undefined` veya beklenen alanları içermeyen bir nesne), fonksiyon standart formata dönüştürme işlemini tamamlayamaz;调用çı standart dışı veya eksik veri ile karşılaşır.
 
-**[Aksiyom 6]:** Eğer normalizePayload fonksiyonuna boş string veya undefined `carrierHint` verilse bile, fonksiyon çalışır ancak kargo firması bazlı normalizasyon yapılamaz.
+**[Aksiyom 6]:** Eğer `sha256Base64` fonksiyonuna boş string (`""`) girilirse, boş bir string'in SHA-256 hash'inin base64 karşılığını döner; bu durum, HMAC hesaplamasında boş payload ile aynı sonucu verir.
 
-**[Aksiyom 7]:** Eğer Request nesnesinin body'si okunamaz veya parse edilemez ise, shipping-webhook_handler 400 Bad Request yanıtı döner.
-
-**[Aksiyom 8]:** Eğer HMAC doğrulaması başarısız olursa (hmacValid false dönerse), webhook handler 401 Unauthorized yanıtı döner.
+**[Aksiyom 7]:** Eğer `shipping-webhook_handler` isteği `Request` nesnesi olarak geçerli bir HTTP isteği değilse (örn. `null`, `undefined` veya geçersiz bir obje), fonksiyon çağrılamaz ve runtime hatası oluşur.
 
 ---
 
@@ -107,7 +106,7 @@ Bu modül, kargo firmalarından gelen webhook'ları HMAC-SHA256 imza doğrulamas
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/tenant_config.ts::resolveTenantId
-- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -118,96 +117,93 @@ Bu modül, kargo firmalarından gelen webhook'ları HMAC-SHA256 imza doğrulamas
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `supabase/functions/shipping-webhook/index.ts`::jsonResponse
+### [N1_NASIL] AST Pointer: supabase/functions/shipping-webhook/index.ts::jsonResponse
 - **params**: `(body: unknown, init: ResponseInit = {})`
-- **ic_degiskenler**:
-  - parametreler doğrudan kullanılır, ek iç değişken yok
-- **Dönüş**: `Response` — JSON.stringify ile serialize edilmiş body'yi, `content-type: application/json` header'ı ve status kodu ile Response nesnesi döner
+- **ic_degiskenler**: (yok — parametreler doğrudan kullanılır)
+- **Dönüş**: `Response` — JSON.stringify ile serialize edilmiş body'yi application/json content-type ile Response nesnesi olarak döner
 
 ---
 
-### [N2_NASIL] AST Pointer: `supabase/functions/shipping-webhook/index.ts`::hmacValid
+### [N2_NASIL] AST Pointer: supabase/functions/shipping-webhook/index.ts::hmacValid
 - **params**: `(secret: string, raw: string, signatureHeader: string)`
 - **ic_degiskenler**:
-  - `key` — `crypto.subtle.importKey` ile secret'tan ham byte'lardan üretilen HMAC-SHA256 anahtarı
-  - `sigBytes` — `crypto.subtle.sign` ile raw string üzerine hesaplanan HMAC imzasının byte dizisi
-  - `computed` — `sigBytes`'ın `btoa(String.fromCharCode(...))` ile base64'e çevrilmiş hali; verilen imza ile karşılaştırılacak referans değer
-  - `normalize` — inner fonksiyon; signature header'ındaki `sha256=` prefix'ini ve boşlukları temizleyen lambda
-  - `given` — `normalize(signatureHeader)` çağrısıyla elde edilmiş, temizlenmiş istemci imzası
-- **Dönüş**: `Promise<boolean>` — computed === given eşleşmesi varsa `true`, herhangi bir hata yakalanırsa `false`
+  - `key` — crypto.subtle.importKey ile oluşturulmuş HMAC-SHA-256 crypto key nesnesi; secret'tan ham byte'lara convert edilerek import edilir
+  - `sigBytes` — crypto.subtle.sign ile HMAC-SHA-256 imzasının ham byte dizisi
+  - `computed` — sigBytes'ın base64 string'e encode edilmiş hali; verilen imza ile karşılaştırılır
+  - `normalize` — `(s: string) => string` arrow fonksiyonu; signatureHeader'dan trim ve `sha256=` prefix'ini kaldırarak base64 değerini normalize eder
+  - `given` — normalize edilmiş (temizlenmiş) imza değeri; computed ile eşleştirilir
+- **Dönüş**: `Promise<boolean>` — imzalar eşleşiyorsa true, aksi halde veya hata durumunda false
 
 ---
 
-### [N3_NASIL] AST Pointer: `supabase/functions/shipping-webhook/index.ts`::mapCarrierStatus
+### [N3_NASIL] AST Pointer: supabase/functions/shipping-webhook/index.ts::mapCarrierStatus
 - **params**: `(input?: string)`
 - **ic_degiskenler**:
-  - `s` — `input`'un `(input || '').toLowerCase()` ile küçük harfe çevrilmiş normalize hali; tüm status eşleştirmeleri bu değer üzerinden yapılır
-- **Dönüş**: `{ status?: string; setShipped?: boolean; setDelivered?: boolean }` — taşıcı durumunu iç statüye eşler; `setShipped`/`setDelivered` flag'leri order güncelleme mantığını yönlendirir
+  - `s` — input'un null-safe lowercase'e çevrilmiş hali; kargo durumu eşleştirmesi için kullanılır
+- **Dönüş**: `{ status?: string; setShipped?: boolean; setDelivered?: boolean }` — carrier durumunu iç sipariş durumuna (paid/shipped/delivered/failed) eşler
 
 ---
 
-### [N4_NASIL] AST Pointer: `supabase/functions/shipping-webhook/index.ts`::normalizePayload
+### [N4_NASIL] AST Pointer: supabase/functions/shipping-webhook/index.ts::normalizePayload
 - **params**: `(carrierHint: string, obj: unknown)`
 - **ic_degiskenler**:
-  - `rec` — `obj`'nin nesne olup olmadığı kontrol edilip `Record<string, unknown>` olarak cast edilmiş hali; tüm alan erişimleri bu üzerinden yapılır
-  - `c` — carrier adının normalize edilmiş hali: önce `carrierHint` parametresi, sonra `rec.carrier` alanından türetilir, trim + toLowerCase uygulanır
-  - `pick` — inner fonksiyon; sırasıyla verilen anahtar isimlerini `rec` içinde arayan ve ilk `null` olmayan değeri dönen helper; tüm alan eşleştirmeleri bu üzerinden yürütülür
-  - `norm` — normalize edilmiş payload objesi; `order_id`, `order_number`, `carrier`, `tracking_number`, `tracking_url`, `status`, `shipped_at`, `delivered_at` alanlarını standart isimlerle birleştirir
-- **Dönüş**: `norm` objesi (standartlaştırılmış webhook payload'u)
+  - `rec` — obj'in Record<string, unknown>'a cast edilmiş hali; obj nesne ise doğrudan, değilse boş obje olarak alınır
+  - `c` — carrier adının lowercase trim edilmiş hali; carrierHint parametresinden, yoksa rec.carrier alanından çözümlenir
+  - `pick` — `(...keys: string[]) => unknown` arrow fonksiyonu; rec içindeki alanları sırayla arar, ilk non-null değeri döner (alias'ları resolve eder: order_id/orderId/id gibi)
+  - `norm` — normalize edilmiş payload nesnesi; pick() kullanarak order_id, order_number, carrier, tracking_number, tracking_url, status, shipped_at, delivered_at alanlarını standart forma getirir
+- **Dönüş**: `norm` nesnesi — tüm kargo sağlayıcı formatlarından standart formata normalize edilmiş order/shipping bilgisi
 
 ---
 
-### [N5_NASIL] AST Pointer: `supabase/functions/shipping-webhook/index.ts`::sha256Base64
+### [N5_NASIL] AST Pointer: supabase/functions/shipping-webhook/index.ts::sha256Base64
 - **params**: `(input: string)`
 - **ic_degiskenler**:
-  - `bytes` — `input` string'inin `TextEncoder.encode()` ile UTF-8 byte dizisine çevrilmiş hali
-  - `hash` — `crypto.subtle.digest('SHA-256', bytes)` çağrısıyla elde edilen SHA-256 hash'inin ArrayBuffer'ı
-- **Dönüş**: `Promise<string>` — hash'in `btoa(String.fromCharCode(...))` ile base64'e kodlanmış hali
+  - `bytes` — input string'in TextEncoder ile UTF-8 byte dizisine çevrilmiş hali
+  - `hash` — crypto.subtle.digest('SHA-256', bytes) ile hesaplanmış 256-bit hash'in Uint8Array'i
+- **Dönüş**: `Promise<string>` — hash'in base64 string olarak encode edilmiş hali
 
 ---
 
-### [N6_NASIL] AST Pointer: `supabase/functions/shipping-webhook/index.ts`::shipping-webhook_handler
+### [N6_NASIL] AST Pointer: supabase/functions/shipping-webhook/index.ts::shipping-webhook_handler
 - **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `raw` — `req.text()` ile okunan request body'sinin ham string hali; HMAC imza doğrulaması ve bodyHash hesaplamasında kullanılır
-  - `payload` — `raw`'ın `JSON.parse` ile parse edilmiş hali; `try-catch` ile sarmalanmıştır, parse hatasında `{}` fallback'i alınır
-  - `tenantId` — `resolveTenantId(req, payload)` çağrısı ile request ve payload'tan dinamik olarak çözümlenen kiracı ID'si; tüm veritabanı operations'da row-level security bağlamını belirler
-  - `isMockEnv` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') === 'service-key'` karşılaştırmasıyla belirlenen mock ortam bayrağı; tenant_id eşleşme kontrollerini atlar
-  - `secret` — `Deno.env.get('SHIPPING_WEBHOOK_SECRET')` ile alınan HMAC gizli anahtarı; boş string fallback'i var
-  - `signature` — `x-signature` veya `x-carrier-signature` header'ından alınan taşıcı imza değeri
-  - `authorized` — yetkilendirme durum bayrağı; HMAC veya token fallback ile `true`'ya ayarlanır
-  - `token` — `x-webhook-token` header'ından alınan legacy sandbox token'ı
-  - `expected` — `Deno.env.get('SHIPPING_WEBHOOK_TOKEN')` ile alınan beklenen legacy token değeri
-  - `tsHeader` — `x-timestamp` veya `x-event-time` header'ından alınan zaman damgası string'i; replay guard için zorunlu
-  - `t` — `tsHeader`'ın epoch ms veya ISO formatından parse edilmiş numerik zaman damgası; `SKEW_MS` sabiti ile `Date.now()` karşılaştırması yapılır
-  - `SUPABASE_URL` — `Deno.env.get('SUPABASE_URL')` ile alınan Supabase proje URL'i; client oluşturma ve `delivery-notification` çağrısında kullanılır
-  - `SERVICE_KEY` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile alınan servis rolü anahtarı; Supabase client ve edge function çağrısı için kullanılır
-  - `supabase` — `createClient(SUPABASE_URL, SERVICE_KEY)` ile oluşturulan Supabase istemcisi; tüm DB operations bu üzerinden yürütülür
-  - `carrierHint` — `x-carrier` header'ından alınan taşıcı ipucu string'i; `normalizePayload`'a geçirilir
-  - `p` — `normalizePayload(carrierHint, payload)` dönüş değeri; `order_id`, `order_number`, `carrier`, `tracking_number`, `tracking_url`, `status`, `shipped_at`, `delivered_at` alanlarını içeren normalize edilmiş payload
-  - `eventId` — `x-id` veya `x-event-id` header'ından alınan, opsiyonel deduplication amaçlı event ID'si
-  - `existing` — deduplication sorgusunun `shipping_webhook_events` tablosundan dönen mevcut kayıt listesi (varsa)
-  - `matched` — `existing[0]` olarak alınan ilk eşleşen satır; `tenant_id` kontrolü için kullanılır
-  - `orderId` — siparişin `venthub_orders.tablosundaki` `id` değeri; önce `p.order_id`'den, yoksa `p.order_number` ile join sorgusundan çözümlenir
-  - `data` (birinci kullanım) — `p.order_number` ile `venthub_orders` tablosunda `id, tenant_id` seçen sorgunun sonucu; `orderId`'yiresolve eder
-  - `error` (birinci kullanım) — aynı sorgunun hata objesi; sipariş bulunamazsa 404 döner
-  - `current` — `venthub_orders` tablosundan mevcut siparişin `id, tenant_id, status, shipped_at, delivered_at, tracking_number, tracking_url, carrier` alanlarını çeken sorgunun sonucu; monotonik durum ilerlemesi kontrolü ve idempotency için kullanılır
-  - `curErr` — mevcut sipariş sorgusunun hata objesi
-  - `patch` — `Partial<OrderRow> & Record<string, unknown>` türündeki güncelleme sözlüğü; değiştirilecek alanlar bu biriktiriciye eklenir
-  - `mapped` — `mapCarrierStatus(p.status)` çağrısının sonucu; `status`, `setShipped`, `setDelivered` alanlarını içerir
-  - `curStatus` — `current.status`'un küçük harfe çevrilmiş string karşılığı; monotonik sıralama karşılaştırması için referans
-  - `next` — `mapped.status`'un küçük harfe çevrilmiş hali; sıradaki potansiyel durum
-  - `curRank` — `RANK[curStatus]` sözlük erişimiyle elde edilen mevcut durumun sıralama sayısı; 0'da fallback yapılır
-  - `nextRank` — `RANK[next]` sözlük erişimiyle elde edilen sonraki durumun sıralama sayısı; `nextRank >= curRank` koşulu monotonik ilerlemeyi garanti eder
-  - `parseDate` — inner fonksiyon; opsiyonel string tarih değerini `new Date(s).toISOString()` ile ISO formatına çevirir, boşsa `undefined` döner
-  - `noChange` — boolean bayrak; `patch` ile `current` arasındaki tüm alanların eşit olup olmadığını kontrol eder; `true` ise update atlanır
-  - `bodyHash` (birinci kullanım) — unchanged yolunda `sha256Base64(raw)` ile hesaplanan request body hash'i; event audit kaydı için kullanılır
-  - `data` (ikinci kullanım) — `venthub_orders.update(patch).eq('id', orderId).select(...).single()` sorgusunun güncellenmiş satır sonucu; `id, tenant_id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at, order_number, customer_email, customer_name` alanlarını içerir
-  - `error` (ikinci kullanım) — update sorgusunun hata objesi
-  - `msg` — `error.message`'dan çıkarılan hata mesajı string'i; fallback olarak `'Update failed'` alınır
-  - `bodyHash` (ikinci kullanım) — güncelleme yolunda `sha256Base64(raw)` ile hesaplanan request body hash'i; event audit kaydı için kullanılır
-  - `_e` —外 katman `try-catch`'in yakaladığı beklenmedik hata objesi; `console.error` ile loglanır ve `_e instanceof Error ? _e.message : 'Unexpected error'` ile döner
-- **Dönüş**: `Response` — `jsonResponse` ile oluşturulmuş HTTP yanıtı; başarılı senaryolarda `{ ok: true, order_id, shipping, unchanged? }`, hata durumlarında `{ error }` body'si ve uygun HTTP status kodu döner
+  - `raw` — req.text() ile okunan ham HTTP body string'i; HMAC imza doğrulaması ve payload parse için kullanılır
+  - `payload` — JSON.parse(raw) ile parse edilmiş request body nesnesi; hata olursa boş obje `{}`
+  - `tenantId` — resolveTenantId(req, payload) ile çözümlenen kiracı ID'si; tüm DB sorgularında row-level security/tenant filtresi için kullanılır
+  - `isMockEnv` — `SUPABASE_SERVICE_ROLE_KEY === 'service-key'` kontrolü; test/sandbox ortamında tenant eşleşme kontrollerini atlar
+  - `secret` — Deno.env.get('SHIPPING_WEBHOOK_SECRET') ile okunan webhook HMAC secret anahtarı; boş string fallback
+  - `signature` — req.headers.get('x-signature') veya req.headers.get('x-carrier-signature') ile alınan kargo imza header değeri
+  - `authorized` — yetkilendirme durumu boolean flag; HMAC veya legacy token ile true olur
+  - `token` — req.headers.get('x-webhook-token') ile alınan legacy yetkilendirme token'ı
+  - `expected` — Deno.env.get('SHIPPING_WEBHOOK_TOKEN') ile okunan beklenen legacy token değeri
+  - `tsHeader` — req.headers.get('x-timestamp') veya req.headers.get('x-event-time') ile alınan replay guard timestamp header'ı
+  - `t` — tsHeader'dan parse edilmiş epoch millisecond timestamp; hem epoch ms hem ISO format desteklenir
+  - `SUPABASE_URL` — Deno.env.get('SUPABASE_URL') ile okunan Supabase proje URL'i
+  - `SERVICE_KEY` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile okunan service role anahtarı
+  - `supabase` — createClient(SUPABASE_URL, SERVICE_KEY) ile oluşturulmuş Supabase istemcisi; tüm DB ve edge function çağrıları için kullanılır
+  - `carrierHint` — req.headers.get('x-carrier') ile alınan kargo sağlayıcı adı hint'i; normalizePayload'aPassedılır
+  - `p` — normalizePayload(carrierHint, payload) dönüş değeri; order_id, order_number, carrier, tracking_number, tracking_url, status, shipped_at, delivered_at alanlarını standart formatta içerir
+  - `eventId` — req.headers.get('x-id') veya req.headers.get('x-event-id') ile alınan dedup event ID'si; boşsa dedup atlanır
+  - `existing` — shipping_webhook_events tablosundan eventId ile sorgulanmış mevcut event kayıtları dizisi; duplicate kontrolü için kullanılır
+  - `matched` — `existing[0]` — ilk eşleşen mevcut event kaydı; tenant_id eşleşmesi kontrol edilir
+  - `orderId` — p.order_id trim edilmiş hali; boşsa p.order_number ile venthub_orders tablosundan çözümlenir
+  - `data` (order_number lookup) — venthub_orders tablosundan `.eq('order_number', p.order_number)` ile bulunan sipariş kaydı; `{ id, tenant_id }` shape'inde
+  - `error` (order_number lookup) — order_number sorgu hatası; data ile birlikte 404 kontrolü için kullanılır
+  - `current` — venthub_orders tablosundan `orderId` ile fetch edilmiş mevcut sipariş kaydı; id, tenant_id, status, shipped_at, delivered_at, tracking_number, tracking_url, carrier alanlarını içerir
+  - `curErr` — current fetch sorgu hatası; order bulunamazsa 404 döner
+  - `patch` — `Partial<OrderRow> & Record<string, unknown>` tipinde güncellenecek alanlar nesnesi; carrier, tracking_number, tracking_url, status, shipped_at, delivered_at alanlarını koşullu olarak doldurulur
+  - `mapped` — mapCarrierStatus(p.status) dönüş değeri; status, setShipped, setDelivered alanlarını içerir
+  - `curStatus` — `current.status || 'pending'` değerinin lowercase'i; mevcut sipariş durumu rank karşılaştırması için
+  - `next` — `mapped.status` değerinin lowercase'i; hedef durum
+  - `curRank` — `RANK[curStatus] ?? 0` — mevcut durumun sıralama rank'ı; monotonik ilerleme kontrolü için
+  - `nextRank` — `RANK[next] ?? curRank` — hedef durumun sıralama rank'ı
+  - `parseDate` — `(s?: string) => string | undefined` arrow fonksiyonu; string tarih ISO'ya parse eder, geçerliyse ISO string döner
+  - `noChange` — boolean flag; patch'te etkili bir değişim olup olmadığını kontrol eder (status, tracking_number, tracking_url, carrier, shipped_at, delivered_at alanlarının tamamı değişmemişse true)
+  - `bodyHash` — `sha256Base64(raw)` ile hesaplanmış request body SHA-256 hash'inin base64 hali; event audit kaydı için kullanılır
+  - `data` (update result) — venthub_orders tablosunda `.update(patch)` sonrası dönen güncellenmiş sipariş kaydı; id, tenant_id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at, order_number, customer_email, customer_name alanlarını içerir
+  - `error` (update result) — update sorgu hatası; varsa message提取 edilip 500 döner
+  - `msg` — error.message'in string kontrolü ile extract edilmiş hata mesajı; hata response body'sinde kullanılır
+- **Dönüş**: `Response` — jsonResponse() ile oluşturulmuş JSON response; başarılı durumda `{ ok, order_id, shipping, unchanged?, duplicate? }`, hatalı durumda `{ error }`
 
 ---
 

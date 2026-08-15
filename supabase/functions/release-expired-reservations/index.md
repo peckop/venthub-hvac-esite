@@ -3,18 +3,17 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\release-expired-reservations\index.ts
-skeleton_hash: c345348c4088ef24
+skeleton_hash: a7cae81d35deed42
 entity_hashes:
   func:release-expired-reservations_handler: 2ee83a2fc9a11645
-  overview: d6e6683c81c36dd3
-generated_at: 2026-08-14T22:02:42Z
+  overview: 6bf610a5523c7d5f
+generated_at: 2026-08-15T07:34:00Z
 ---
 
 ## Genel Bakış
 Bu modül, süresi dolmuş rezervasyonları otomatik olarak serbest bırakan bir Supabase Edge Function'dır. Gelen HTTP istekleri aracılığıyla tetiklenerek veritabanındaki geçerlilik süresi dolan rezervasyon kayıtlarını tespit eder, bunların durumunu günceller ve ilişkili kaynakların yeniden kullanıma açılmasını sağlar.
 
 ## Fonksiyon Grupları
-
 ### HTTP İstek İşleyici
 Tek bir HTTP endpoint üzerinden dışarıya açılan giriş noktasıdır; isteği alır, iş mantığını koordine eder ve sonucu yanıt olarak döner.
 - release-expired-reservations_handler
@@ -22,15 +21,19 @@ Tek bir HTTP endpoint üzerinden dışarıya açılan giriş noktasıdır; iste�
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyicisi olarak yapılandırılmıştır.
+Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyici olarak yapılandırılmıştır.
 
-[Aksiyom 1]: Eğer geçerli bir HTTP `Request` nesnesi (req parametresi) sağlanmazsa, fonksiyon başlatılamaz ve HTTP yanıtı üretilemez.
+**[Aksiyom 1]:** Eğer Supabase Edge Functions runtime ortamı (Deno) yoksa, fonksiyon çalıştırılamaz ve HTTP 500 hata yanıtı döner.
 
-[Aksiyom 2]: Eğer `corsHeaders` sabiti (object) tanımlı değilse veya boş/eksik ise, istemcilere döndürülen HTTP yanıtlarında CORS başlıkları eksik kalır ve tarayıcı tarafı istekleri engellenebilir.
+**[Aksiyom 2]:** Eğer `@serve` dekoratörü doğru yapılandırılmamışsa (örn. yanlış endpoint rotası), HTTP istekleri bu handler'a yönlendirilemez ve istemci tarafında bağlantı hatası oluşur.
 
-[Aksiyom 3]: Eğer Supabase Edge Functions çalışma ortamı (runtime) mevcut değilse, bu fonksiyon çalıştırılamaz — fonksiyon imzası `Request` tipine bağımlıdır.
+**[Aksiyom 3]:** Eğer `req: Request` parametresi geçerli bir HTTP isteği içermiyorsa (örn. bozuk/eksik header-lar), iş mantığı beklenmedik davranış gösterebilir.
 
-[Aksiyom 4]: Eğer Supabase veritabanı bağlantısı (edge function ortamında otomatik sağlanan) erişilebilir durumda değilse, rezervasyon kayıtları sorgulanamaz ve süresi dolmuş kayıtlar tespit edilemez.
+**[Aksiyom 4]:** Eğer modülün erişim izni olduğu veritabanı bağlantısı (Supabase client) yoksa veya erişim izni reddedilirse, rezervasyon sorgulama/güncelleme işlemleri başarısız olur.
+
+**[Aksiyom 5]:** Fonksiyon asenkron (`async`) olarak tanımlanmıştır; eğer await edilen bir operasyon (DB sorgusu, HTTP çağrısı vb.) zaman aşımına uğrarsa, fonksiyon zaman aşımı hatası ile sonlanır.
+
+> **Not:** Fonksiyon gövdesi (implementation body) paylaşılmadığından, iş mantığına ilişkin aksiyomlar (örn: hangi eşik değerine göre rezervasyon "süresi dolmuş" kabul edilir, hangi tablolar güncellenir, ne tür kaynaklar serbest bırakılır vb.) belirlenememiştir. Bu bilgiler için fonksiyon gövdesinin incelenmesi gereklidir.
 
 ---
 
@@ -52,7 +55,7 @@ Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyicis
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: https://deno.land/std@0.177.0/http/server.ts::serve
-- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -73,43 +76,42 @@ Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyicis
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/release-expired-reservations/index.ts::release-expired-reservations_handler
+### [N1_NASIL] AST Pointer: `supabase/functions/release-expired-reservations/index.ts`::release-expired-reservations_handler
 - **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase proje URL'si
-  - `supabaseKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan Supabase servis rol anahtarı
-  - `authHeader` — `req.headers.get('Authorization')` ile istekten alınan yetkilendirme başlığı
-  - `isAuthorized` — Boolean flag, kullanıcının yetkili olup olmadığını tutar
-  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan anonim anahtar, JWT doğrulama için kullanılır
-  - `createClientAuth` — Dinamik import ile yüklenen alternatif `createClient` fonksiyonu, anonim anahtarla istemci oluşturmak için
-  - `authClient` — Anonim anahtar ve Authorization header ile oluşturulan Supabase istemcisi, kullanıcı kimliğini doğrulamak için
-  - `user` — `authClient.auth.getUser()` sonucundan çıkarılan kullanıcı nesnesi
-  - `roleCheck` — `fetch` ile `/rest/v1/user_profiles` endpoint'ine yapılan rol kontrol isteği sonucu (Response)
-  - `arr` — `roleCheck.json()` ile parse edilen rol kontrol yanıt dizisi
-  - `role` — `arr[0]?.role` ile elde edilen kullanıcının rolü ('admin' veya 'superadmin' kontrolü yapılır)
-  - `supabase` — `createClient(supabaseUrl, supabaseKey)` ile oluşturulan Supabase servis istemcisi
-  - `settingsData` — `inventory_settings` tablosundan `reservation_timeout_hours` alanını seçen sorgu sonucu verisi
-  - `settings` — `settingsData`'nın `InventorySettings` tipine cast edilmiş hali
-  - `hours` — Rezervasyon zaman aşımı süresi saat cinsinden, `settings?.reservation_timeout_hours` veya varsayılan 24
-  - `timeoutDate` — Şu andan `hours` kadar önceki tarih nesnesi, süresi dolmuş siparişlerin eşik zamanı
-  - `expiredOrders` — `venthub_orders` tablosundan süresi dolmuş 'pending' durumlu siparişlerin listesi
-  - `findErr` — Süresi dolmuş siparişleri bulma sorgusunun hata nesnesi
-  - `releasedCount` — Sayaç, başarıyla iptal edilen ve stoku iade edilen sipariş sayısı
-  - `order` — `expiredOrders` dizisi üzerindeki döngü değişkeni, her süresi dolmuş siparişi temsil eder
-  - `updateErr` — Sipariş durumunu 'cancelled'/'failed' olarak güncelleme sorgusunun hata nesnesi
-  - `itemsRaw` — `venthub_order_items` tablosundan belirli siparişin ürün listesini seçen sorgu sonucu verisi
-  - `items` — `itemsRaw`'ın `OrderItem` tipine cast edilmiş hali
-  - `item` — `items` dizisi üzerindeki iç döngü değişkeni, her sipariş kalemini temsil eder
-  - `rpcErr` — `adjust_stock_v2` RPC çağrısının hata nesnesi, stok iade işleminin sonucu
-  - `orderErr` — Sipariş bazlı try-catch bloğunun yakaladığı hata nesnesi
-  - `error` — Ana try-catch bloğunun yakaladığı genel hata nesnesi
-- **Dönüş**: `Response` — JSON body ile sonuç döner:
-  - CORS OPTIONS istekleri: 200 `{ 'ok' }`
-  - Eksik config: 500 `{ error: 'Missing Supabase Config' }`
-  - Yetkisiz erişim: 401 `{ error: 'Unauthorized' }`
-  - Süresi dolmuş sipariş yoksa: 200 `{ message: 'No expired reservations found.', released: 0 }`
-  - Başarılı: 200 `{ success: true, released_count, message }`
-  - Genel hata: 500 `{ error: 'internal_error' }`
+  - `corsHeaders` — İsteğin origin'ine göre ayarlanmış CORS başlıkları nesnesi.
+  - `supabaseUrl` — Ortam değişkeninden alınan Supabase proje URL'si.
+  - `supabaseKey` — Ortam değişkeninden alınan Supabase service role anahtarı.
+  - `authHeader` — İstek başlığından alınan `Authorization` değeri.
+  - `isAuthorized` — İstek yapan kullanıcının yetkili olup olmadığını belirleyen boolean bayrak.
+  - `anonKey` — Ortam değişkeninden alınan Supabase anonim anahtar (auth istemcisi için).
+  - `createClientAuth` — Dinamik import ile yüklenen Supabase istemci oluşturucu fonksiyonu.
+  - `authClient` — Kullanıcı kimlik doğrulaması için oluşturulan geçici Supabase istemcisi.
+  - `user` — `authClient.auth.getUser` çağrısından dönen kullanıcı nesnesi.
+  - `roleCheck` — Kullanıcının rolünü kontrol etmek için Supabase REST API'sine yapılan fetch isteğinin sonucu.
+  - `arr` — `roleCheck.json()` çağrısından dönen, kullanıcı rollerini içeren dizi.
+  - `role` — `arr` dizisinin ilk elemanından alınan rol string'i (`'admin'` veya `'superadmin'`).
+  - `supabase` — Ana Supabase istemcisi, service role anahtarıyla oluşturulmuş.
+  - `settingsData` — `inventory_settings` tablosundan sorgulanan rezervasyon ayarları verisi.
+  - `settings` — `settingsData`'nın tip güvenli hali (InventorySettings veya null).
+  - `hours` — Rezervasyon zaman aşımı süresi (saat cinsinden, varsayılan 24).
+  - `timeoutDate` — Mevcut saatten `hours` kadar önceki zamanı temsil eden Date nesnesi.
+  - `expiredOrders` — Zaman aşımına uğramış ve `pending` durumundaki siparişlerin listesi.
+  - `findErr` — Süresi dolmuş siparişleri sorgulama hata nesnesi.
+  - `releasedCount` — Başarıyla iptal edilen ve stokları iade edilen sipariş sayacı.
+  - `order` — `expiredOrders` dizisi üzerindeki döngüde mevcut sipariş nesnesi.
+  - `updateErr` — Sipariş durumunu güncelleme (iptal etme) hata nesnesi.
+  - `itemsRaw` — Siparişin ürünlerini (miktar ve ürün ID) içeren ham veri.
+  - `items` — `itemsRaw`'ın tip güvenli hali (OrderItem[]).
+  - `item` — `items` dizisi üzerindeki döngüde mevcut sipariş kalemi.
+  - `rpcErr` — `adjust_stock_v2` RPC çağrısından dönen hata nesnesi.
+- **Dönüş**: `Promise<Response>` — İşlem sonucuna göre farklı HTTP Response nesneleri döndürülür:
+  - OPTIONS istekleri için `200 'ok'`.
+  - Eksik Supabase konfigürasyonu için `500` hatalı JSON.
+  - Yetkisiz erişim için `401` hatalı JSON.
+  - Süresi dolmuş sipariş bulunamadığında `200` başarılı JSON.
+  - İşlem başarılı olduğunda `200` başarılı JSON (içerik: released_count, message).
+  - İç hatalarda `500` hatalı JSON.
 
 ---
 
