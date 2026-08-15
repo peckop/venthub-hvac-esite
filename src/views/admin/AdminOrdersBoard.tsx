@@ -120,7 +120,7 @@ function OrderStepper({ status }: { status: string }) {
                 const isCurrent = idx === currentIndex
 
                 return (
-                    <div key={step.key} className="flex flex-col items-center gap-2 z-10 w-1/5 relative">
+                    <div key={step.key} className="flex flex-col items-center gap-2 z-raised w-1/5 relative">
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold transition-colors duration-500
                             ${isPast ? 'bg-admin-accent text-admin-accent-fg' :
                                 isCurrent ? 'bg-admin-surface text-admin-fg-subtle ring-4 ring-admin-accent/30 scale-125' :
@@ -573,14 +573,14 @@ export default function AdminOrdersBoard() {
                                                                 tabIndex={0}
                                                                 className={`p-5 rounded-hvac-xl border transition-colors duration-300 cursor-pointer group relative overflow-hidden
                                                                     ${snapshot.isDragging 
-                                                                        ? 'bg-admin-accent text-admin-accent-fg border-admin-accent shadow-admin-orders-board-glow scale-105 z-50' 
+                                                                        ? 'bg-admin-accent text-admin-accent-fg border-admin-accent shadow-admin-orders-board-glow scale-105 z-raised' 
                                                                         : `${adminOrderBoardItemClass}`}`}
                                                                 style={{ ...provided.draggableProps.style }}
                                                             >
                                                                 {/* Accent Glow */}
                                                                 {shardColor(getEffectiveStatus(order), snapshot.isDragging)}
 
-                                                                <div className="flex items-start justify-between gap-3 relative z-10">
+                                                                <div className="flex items-start justify-between gap-3 relative z-raised">
                                                                     <div className="flex-1 min-w-0">
                                                                         <div className={`flex items-center gap-2 text-xs font-semibold mb-2 ${snapshot.isDragging ? 'text-surface-deep/60' : 'text-admin-fg-muted'}`}>
                                                                             <GripVertical size={12} className="opacity-30" />
@@ -595,7 +595,7 @@ export default function AdminOrdersBoard() {
                                                                     </div>
                                                                 </div>
 
-                                                                <div className={`flex items-center justify-between mt-4 pt-4 border-t ${snapshot.isDragging ? 'border-surface-deep/10' : 'border-admin-border'} relative z-10`}>
+                                                                <div className={`flex items-center justify-between mt-4 pt-4 border-t ${snapshot.isDragging ? 'border-surface-deep/10' : 'border-admin-border'} relative z-raised`}>
                                                                     <span className={`text-xs font-semibold ${snapshot.isDragging ? 'text-surface-deep/40' : 'text-admin-fg-muted'}`}>
                                                                         {formatDateTime(order.created_at, lang).split(' ')[0]}
                                                                     </span>

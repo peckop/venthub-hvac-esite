@@ -84,7 +84,7 @@ const CurrencyRatesCard: React.FC = () => {
 
   return (
     <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-      <div className="relative z-10 flex items-center justify-between gap-3 border-b border-admin-border pb-4">
+      <div className="relative z-raised flex items-center justify-between gap-3 border-b border-admin-border pb-4">
         <div className="flex items-center gap-3">
           <Coins className="text-admin-accent" size={20} />
           <div>
@@ -98,7 +98,7 @@ const CurrencyRatesCard: React.FC = () => {
         </div>
       </div>
 
-      <div className="relative z-10">
+      <div className="relative z-raised">
         {loading ? (
           <AdminSkeleton variant="table" rows={3} />
         ) : error ? (
@@ -169,7 +169,7 @@ const CurrencyRatesCard: React.FC = () => {
       </div>
 
       {!loading && !error && rates.length > 0 && (
-        <div className="relative z-10 pt-6 border-t border-admin-border space-y-3">
+        <div className="relative z-raised pt-6 border-t border-admin-border space-y-3">
           <p className="text-xs font-semibold text-admin-fg-muted">
             {t('admin.pricing.settings.currencyRates.spreadLabel')}
           </p>
@@ -186,7 +186,7 @@ const CurrencyRatesCard: React.FC = () => {
         </div>
       )}
 
-      <div className="relative z-10 pt-6 border-t border-admin-border">
+      <div className="relative z-raised pt-6 border-t border-admin-border">
         <button
           type="button"
           disabled

@@ -126,7 +126,7 @@ const AdminSettingsPage: React.FC = () => {
         {/* General Settings Card */}
         <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group flex flex-col justify-between`}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-admin-accent-weak rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-admin-accent-weak" />
-          <div className="relative z-10 space-y-6">
+          <div className="relative z-raised space-y-6">
             <div className="flex items-center gap-3 border-b border-admin-border pb-4">
               <Globe className="text-admin-accent" size={20} />
               <h2 className="text-lg font-semibold text-admin-fg tracking-tight">
@@ -156,7 +156,7 @@ const AdminSettingsPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="relative z-10 pt-6 border-t border-admin-border">
+          <div className="relative z-raised pt-6 border-t border-admin-border">
             <button
               onClick={() => openModal('general', generalValues)}
               disabled={!hasWriteAccess}
@@ -170,7 +170,7 @@ const AdminSettingsPage: React.FC = () => {
         {/* Payment Settings Card */}
         <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group flex flex-col justify-between`}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-admin-accent-weak rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-admin-accent-weak" />
-          <div className="relative z-10 space-y-6">
+          <div className="relative z-raised space-y-6">
             <div className="flex items-center gap-3 border-b border-admin-border pb-4">
               <CreditCard className="text-admin-accent" size={20} />
               <h2 className="text-lg font-semibold text-admin-fg tracking-tight">
@@ -196,7 +196,7 @@ const AdminSettingsPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="relative z-10 pt-6 border-t border-admin-border">
+          <div className="relative z-raised pt-6 border-t border-admin-border">
             <button
               onClick={() => openModal('payment', paymentValues)}
               disabled={!hasWriteAccess}
@@ -210,7 +210,7 @@ const AdminSettingsPage: React.FC = () => {
         {/* Admin Policies Card */}
         <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group flex flex-col justify-between`}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-admin-accent-weak rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-admin-accent-weak" />
-          <div className="relative z-10 space-y-6">
+          <div className="relative z-raised space-y-6">
             <div className="flex items-center gap-3 border-b border-admin-border pb-4">
               <ShieldCheck className="text-admin-accent" size={20} />
               <h2 className="text-lg font-semibold text-admin-fg tracking-tight">
@@ -230,7 +230,7 @@ const AdminSettingsPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="relative z-10 pt-6 border-t border-admin-border">
+          <div className="relative z-raised pt-6 border-t border-admin-border">
             <button
               onClick={() => openModal('admins', adminsValues)}
               disabled={!hasWriteAccess}
@@ -244,7 +244,7 @@ const AdminSettingsPage: React.FC = () => {
         {/* System Configurations Card */}
         <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group flex flex-col justify-between`}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-admin-accent-weak rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-admin-accent-weak" />
-          <div className="relative z-10 space-y-6">
+          <div className="relative z-raised space-y-6">
             <div className="flex items-center gap-3 border-b border-admin-border pb-4">
               <Activity className="text-admin-accent" size={20} />
               <h2 className="text-lg font-semibold text-admin-fg tracking-tight">
@@ -264,7 +264,7 @@ const AdminSettingsPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="relative z-10 pt-6 border-t border-admin-border">
+          <div className="relative z-raised pt-6 border-t border-admin-border">
             <button
               onClick={() => openModal('system', systemValues)}
               disabled={!hasWriteAccess}

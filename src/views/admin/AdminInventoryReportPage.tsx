@@ -399,7 +399,7 @@ function InventoryReportContent() {
                         <div ref={dragScrollRefIn} className={`overflow-x-auto ${adminTableScrollAreaClass}`}>
                             {inboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
-                                    <thead className="bg-admin-surface-2 sticky top-0 z-10">
+                                    <thead className="bg-admin-surface-2 sticky top-0 z-raised">
                                         <tr>
                                             <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.date')}</th>
                                             <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.product')}</th>
@@ -436,7 +436,7 @@ function InventoryReportContent() {
                         <div ref={dragScrollRefOut} className={`overflow-x-auto ${adminTableScrollAreaClass}`}>
                             {outboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
-                                    <thead className="bg-admin-surface-2 sticky top-0 z-10">
+                                    <thead className="bg-admin-surface-2 sticky top-0 z-raised">
                                         <tr>
                                             <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.date')}</th>
                                             <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.product')}</th>

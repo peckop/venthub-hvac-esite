@@ -158,11 +158,17 @@ describe('INV-ADMIN-OVERLAY-3 · katman ölçeği (ratchet)', () => {
    * portal ettiği bir dropdown, modalın ARKASINDA render olur. Token ölçeğinde
    * `z-popover` (110) bunu çözer — ham değerler çözmez.
    */
-  // 57 → 49: envanter regresyon onarımında çekmece, CSV modalı ve InfoTooltip elle
-  // yazılmış perdelerden Radix Dialog'a alındı; ham `z-40/z-50/z-10` yerine
-  // `z-backdrop/z-modal/z-raised/z-popover` token'ları geldi (6 ham değer eridi).
-  // Ratchet sıkılaşır: yeni kod bu tavanı ARTIRAMAZ.
-  const RAW_Z_CEILING = 49
+  // 57 → 49 → **0**: Faz 2'nin son kalemi. Kalan 49 ham değerin her biri AYRI
+  // karara bağlandı, kör bir sayı→token eşlemesi yapılmadı:
+  //   41× `z-10` → `z-raised` (token değeri de 10; görsel değişiklik SIFIR)
+  //   yapışkan araç/toplu-işlem çubuğu (`z-30`/`z-40`) → `z-sticky` (90) —
+  //     modalın (100) ALTINDA kalmalı
+  //   menü · ipucu · dışa aktarma (`z-50`) → `z-popover` (110) — modalın ÜSTÜNDE
+  //     olmalı; Radix bunları body'ye portal eder, altında kalsaydı modal içinden
+  //     açılan menü modalın ARKASINDA çizilirdi (bu hata daha önce ölçülmüştü)
+  //   sürüklenen kart (`z-50`) → `z-raised`; portal edilmiyor, kardeş üstü yeter
+  // Tavan artık 0: ham değer eklemek DOĞRUDAN kırmızıdır, "ratchet aşımı" değil.
+  const RAW_Z_CEILING = 0
 
   it('ham z-* sayısı tavanı aşmıyor', () => {
     const pattern = /\bz-(?:0|10|20|30|40|50|60|\[[^\]]+\])\b/g

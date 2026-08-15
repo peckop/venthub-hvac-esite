@@ -29,7 +29,7 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
         <DropdownMenu.Content 
           sideOffset={8} 
           align="end"
-          className="z-50 min-w-200px bg-admin-surface rounded-admin-md border border-admin-border p-2 shadow-elevation-5 animate-in fade-in zoom-in-95 duration-200"
+          className="z-popover min-w-200px bg-admin-surface rounded-admin-md border border-admin-border p-2 shadow-elevation-5 animate-in fade-in zoom-in-95 duration-200"
         >
           <div className="px-3 pt-2 pb-2 text-xs font-semibold text-admin-fg-muted flex items-center gap-2 mb-1">
             <FileDown size={12} />

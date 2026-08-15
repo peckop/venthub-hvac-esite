@@ -65,7 +65,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
             const data = payload[0].payload
             const formattedTime = `${data.dayName}, ${String(data.hour).padStart(2, '0')}:00`
             return (
-                <div className="bg-admin-surface border border-admin-border py-3 px-5 rounded-admin-lg z-50 shadow-elevation-4 animate-in fade-in zoom-in-95 duration-200">
+                <div className="bg-admin-surface border border-admin-border py-3 px-5 rounded-admin-lg z-popover shadow-elevation-4 animate-in fade-in zoom-in-95 duration-200">
                     <p className="text-sm font-semibold text-admin-fg mb-2">{formattedTime}</p>
                     <p className="text-xs font-semibold text-admin-fg-muted">
                         {t('admin.dashboard.heatmap.order')}: <span className="text-admin-accent drop-shadow-heatmap-glow">{data.count}</span>
@@ -171,7 +171,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
             )}
 
             {chartData.length > 0 && (
-                <div className="mt-8 flex items-center justify-end gap-4 px-6 relative z-10">
+                <div className="mt-8 flex items-center justify-end gap-4 px-6 relative z-raised">
                     <span className="text-xs text-admin-fg-subtle font-semibold italic">{t('admin.dashboard.heatmap.densityScale')}</span>
                     <div className="flex items-center gap-2 p-1.5 bg-admin-surface rounded-full border border-admin-border">
                         <div className="w-2.5 h-2.5 rounded-full bg-admin-accent opacity-20 border border-admin-border"></div>

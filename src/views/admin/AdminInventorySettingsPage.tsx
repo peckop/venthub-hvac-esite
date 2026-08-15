@@ -215,7 +215,7 @@ const AdminInventorySettingsPage: React.FC = () => {
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={2} />
               ) : (
-                <div className="relative z-10 space-y-6">
+                <div className="relative z-raised space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-3">
                       <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.defaultLowStockThreshold')}</label>
@@ -292,7 +292,7 @@ const AdminInventorySettingsPage: React.FC = () => {
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={2} />
               ) : (
-                <div className="relative z-10 space-y-6">
+                <div className="relative z-raised space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.emailNotifications')}</label>
@@ -352,7 +352,7 @@ const AdminInventorySettingsPage: React.FC = () => {
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={1} />
               ) : (
-                <div className="relative z-10 space-y-6">
+                <div className="relative z-raised space-y-6">
                   <div className="max-w-md space-y-4">
                     <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.reservationTimeoutLabel')}</label>
                     <div className="flex items-end gap-6">
@@ -374,7 +374,7 @@ const AdminInventorySettingsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="pt-8 flex justify-end relative z-10 border-t border-admin-border">
+                  <div className="pt-8 flex justify-end relative z-raised border-t border-admin-border">
                     <button
                       disabled={savingGeneral || !hasWriteAccess}
                       onClick={saveGeneralSettings}

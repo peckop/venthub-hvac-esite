@@ -614,7 +614,7 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
       {/* Rol Yetkilendirme Rehberi — kit'in ALTINDA */}
       <div className="bg-admin-surface p-8 lg:p-10 rounded-admin-lg border border-admin-border shadow-admin-lg relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-96 h-96 bg-admin-accent-weak blur-120 rounded-full -mr-48 -mt-48 group-hover:bg-admin-accent-weak transition-colors duration-1000" />
-        <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
+        <div className="relative z-raised flex flex-col md:flex-row gap-8 items-start">
           <div className="w-16 h-16 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-accent shrink-0 shadow-admin-lg group-hover:scale-110 transition-transform duration-700">
             <Shield size={32} />
           </div>

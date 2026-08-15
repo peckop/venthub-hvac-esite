@@ -123,7 +123,7 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
               <button
                 key={bt.type}
                 type="button"
-                className={`${btnOutline} h-auto py-3 flex-col gap-2 border-dashed hover:border-admin-accent hover:bg-admin-accent relative z-10`}
+                className={`${btnOutline} h-auto py-3 flex-col gap-2 border-dashed hover:border-admin-accent hover:bg-admin-accent relative z-raised`}
                 onClick={() => addBlock(bt.type)}
               >
                 <bt.icon className="w-5 h-5 text-admin-fg-muted" />

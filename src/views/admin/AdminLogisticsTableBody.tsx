@@ -372,7 +372,7 @@ const AdminLogisticsTableBody: React.FC = () => {
             <div className={`${adminCardClass} p-8 flex flex-col md:flex-row md:items-end gap-6 relative overflow-hidden group`}>
               <div className="absolute top-0 right-0 w-64 h-64 bg-admin-accent-weak rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-admin-accent-weak" />
 
-              <div className="flex-1 space-y-3 relative z-10">
+              <div className="flex-1 space-y-3 relative z-raised">
                 <label className="block text-xs font-semibold text-admin-fg-muted ml-1">
                   {t('admin.orders.modals.shipping.carrierLabel')}
                 </label>
@@ -394,7 +394,7 @@ const AdminLogisticsTableBody: React.FC = () => {
               {hasWriteAccess && (
                 <button
                   onClick={applyGlobalCarrier}
-                  className="h-12 px-8 rounded-admin-lg bg-admin-surface-2 border border-admin-border text-admin-fg text-xs font-semibold hover:bg-admin-surface-3 hover:border-admin-border transition-transform active:scale-95 relative z-10"
+                  className="h-12 px-8 rounded-admin-lg bg-admin-surface-2 border border-admin-border text-admin-fg text-xs font-semibold hover:bg-admin-surface-3 hover:border-admin-border transition-transform active:scale-95 relative z-raised"
                 >
                   {t('admin.logistics.applyToAll')}
                 </button>

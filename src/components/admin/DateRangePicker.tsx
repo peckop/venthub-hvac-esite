@@ -108,7 +108,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
         head_row: "flex",
         head_cell: "text-admin-fg-muted rounded-md w-9 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-admin-surface-2 [&:has([aria-selected])]:bg-admin-surface-2 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-admin-surface-2 [&:has([aria-selected])]:bg-admin-surface-2 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-raised",
         day: "h-9 w-9 p-0 font-normal hover:bg-admin-surface-2 hover:text-admin-fg-subtle rounded-md transition-colors aria-selected:opacity-100",
         day_range_end: "day-range-end",
         day_selected: "bg-admin-accent text-admin-accent-fg hover:bg-admin-accent hover:text-admin-accent-fg focus-visible:bg-admin-accent focus-visible:text-admin-accent-fg",
