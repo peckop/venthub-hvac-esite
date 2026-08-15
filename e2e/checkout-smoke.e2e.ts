@@ -20,12 +20,24 @@ const PASSWORD = process.env.E2E_ADMIN_PASSWORD
 // ⚠️ KARARLI HALE GETİRİLDİ (2026-06-19): Sepete-ekleme adımı artık ürün detay sayfasından
 // data-testid="pdp-add-to-cart" butonuyla gerçekleştiriliyor. Böylece hover-transform / pointer
 // intercepting gibi liste sayfası sorunları elenmiştir.
-// ⏸️ KARANTİNA (2026-08-11, Kademe-2 F0 tasfiyesi): DB'de satın alınabilir ürün yok — legacy
-// katalog silindi (kademe2-clean-rebuild F0), yeni katalog fiyat motoru gelene dek "Teklif Al"
-// modunda yüklenecek (price=null). Satın alınabilir kart şartı bu pencerede yapısal olarak
-// sağlanamaz. KALDIRMA KRİTERİ: Fiyat Motoru dalgası (PS Wave 4) satış fiyatlarını yazınca
-// describe.skip'i sil (product-schema-master-implementation-plan Wave 4 kalite kapısı maddesi).
-test.describe.skip('checkout funnel smoke (pre-payment)', () => {
+// ⏸️ KARANTİNA (2026-08-11, Kademe-2 F0 tasfiyesi): DB'de satın alınabilir ürün yoktu — legacy
+// katalog silinmiş, yeni katalog fiyat motoru gelene dek "Teklif Al" modundaydı (price=null).
+// Satın alınabilir kart şartı o pencerede YAPISAL olarak sağlanamıyordu.
+//
+// ▶️ KARANTİNA KALDIRILDI (2026-08-15). Kaldırma kriteri fiyat motorunun satış fiyatlarını
+// yazmasıydı; seed koştu ve prod'dan ÖLÇÜLDÜ: 374 aktif ürün, 1044 fiyat satırı,
+// 348 ürünün `display_price > 0`. Yani "satın alınabilir kart" artık var.
+//
+// NİÇİN ŞİMDİ ÖNEMLİ — bu testin asıl işi bugün değişti. 2026-08-15'te ödeme yolu
+// FAIL-CLOSED yapıldı (T041-VH): `order-validate` doğrulaması yapılamazsa `iyzico-payment`
+// ödemeyi BAŞLATMIYOR ve istemci fiyatına düşen yedek yol SİLİNDİ. Bu doğru karar ama yeni
+// bir risk getirdi: fail-closed mantığında bir hata olsa checkout tamamen ölür ve **bunu
+// yakalayacak hiçbir çalışma-zamanı kapısı yoktu** — 794 testin tamamı statik/birim, hiçbiri
+// tarayıcı açmıyor. Bu dosya o boşluğu kapatır.
+//
+// Ödeme adımına HÂLÂ girilmez (aşağıdaki güvenlik sınırı); ölçülen şey, hunının ödeme
+// düğmesine kadar boot olup interaktif kaldığıdır.
+test.describe('checkout funnel smoke (pre-payment)', () => {
   // Secret/credential yoksa atla (CI'ı kırma) — admin smoke ile aynı kimlik.
   test.skip(!EMAIL || !PASSWORD, 'E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD gerekli (CI var+secret).')
 
