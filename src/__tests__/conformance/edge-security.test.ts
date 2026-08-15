@@ -163,6 +163,17 @@ const KNOWN_VIOLATIONS = {
   // Tenant artık `_shared/tenant.ts` üzerinden yalnız doğrulanmış kimlikten / kaynak
   // satırından türetiliyor. Baseline BOŞ = sıfır tolerans.
   R11: [] as string[],
+
+  // R11-B (E12-B) — `_shared/tenant*.ts` istek nesnesine DOKUNAMAZ.
+  // T026'nın kök sebebi buydu: modül `Request`'i görebildiği için `?tenant_id=`
+  // okuyabiliyordu. Sıralamayı düzeltmek yeteneği bırakır; bu kural yeteneği siler.
+  // Ölçüldü (2026-08-15): iki dosya da temiz → sıfır tolerans.
+  R11B: [] as string[],
+
+  // R11-D (E12-D) — `tenantFromServiceBody` çağıran dosya, aynı dosyada service_role
+  // doğrulaması taşımalı. Bugün tek çağıran `_shared/caller.ts` ve orada
+  // `timingSafeEquals(token, serviceRoleKey)` kapısı var → baseline BOŞ.
+  R11D: [] as string[],
 } as const
 
 /** R5 muafiyeti — çağıran Authorization header'ı GÖNDEREMEZ. Ada göre, kapsam değil. */
@@ -329,9 +340,49 @@ const CALLER_CLASS_HEADER_LINES = 15
  * İkisi de saldırgan tarafından serbestçe yazılır — JWT'den ÖNCE okunurlarsa JWT'yi ezerler.
  */
 const UNTRUSTED_TENANT_RE =
-  /searchParams\s*\.\s*get\s*\(\s*['"]tenant_?[iI]d['"]\s*\)|\b(?:parsedBody|body|payload|input|req)\s*\??\s*\.\s*tenant_?[iI]d\b/
+  /searchParams\s*\.\s*get\s*\(\s*['"]tenant_?[iI]d['"]\s*\)|\b(?:parsedBody|body|payload|input|req|requestData|formJson|parsed|json|data)\s*\??\s*(?:\.\s*tenant_?[iI]d\b|\[\s*['"]tenant_?[iI]d['"]\s*\])/
 /** DOĞRULANMIŞ kimlik: imzayı Supabase'e doğrulatan tek çağrı. */
 const VERIFIED_IDENTITY_RE = /\.auth\s*\.\s*getUser\s*\(/
+
+/**
+ * R11-B · YAPISAL KİLİT — tenant modülü isteği GÖREMEZ.
+ *
+ * T026'nın kök sebebi sıralama DEĞİLDİ: `_shared/tenant_config.ts` istek nesnesine
+ * erişebiliyordu, dolayısıyla `?tenant_id=` okuyabiliyordu. Sıralamayı düzeltmek o
+ * *yeteneği* yerinde bırakır — bir sonraki düzenleme aynı satırı geri koyabilir ve
+ * R11-C (sıralama) o an yeşil kalabilir. Bu kural yeteneği dosya düzeyinde yok eder:
+ * tenant kararı veren modül `Request`'i ADLANDIRAMAZ bile.
+ *
+ * HAM dosyaya bakılır (yorumlar dahil, bilinçli): yorumda duran `req.tenant_id` bir
+ * sonraki geliştirici için "burada yapılabilir" davetidir; dedektör için görünmez olursa
+ * kural yalnız bugünü korur.
+ */
+const TENANT_MODULE_FORBIDDEN: ReadonlyArray<{ ad: string; re: RegExp }> = [
+  { ad: 'Request tipi', re: /\bRequest\b/ },
+  { ad: 'req. erişimi', re: /\breq\s*\./ },
+  { ad: 'request. erişimi', re: /\brequest\s*\./ },
+  { ad: 'headers.get', re: /headers\s*\.\s*get\s*\(/ },
+  { ad: 'searchParams', re: /\bsearchParams\b/ },
+  { ad: 'atob (imzasız JWT çözme)', re: /\batob\s*\(/ },
+]
+
+/**
+ * R11-D · sınıf-(b) kapısı. Gövdeden tenant okumanın tek meşru yolu
+ * `tenantFromServiceBody`'dir; o da YALNIZCA service_role anahtarı DOĞRULANDIKTAN
+ * sonra meşrudur (anahtarı bilen zaten her tenant'a yazabilir, gövdeye güvenmek yeni
+ * yetki vermez). Çağıran dosya aynı kapsamda bir service_role karşılaştırması
+ * taşımıyorsa gövde = doğrulanmamış girdi ve E12 ihlali geri gelmiş demektir.
+ */
+const SERVICE_BODY_CALL_RE = /\btenantFromServiceBody\s*\(/
+/**
+ * TANIM ≠ ÇAĞRI. İlk yazımda dedektör `_shared/tenant.ts:175`'i ihlal saydı — orası
+ * fonksiyonun kendisi. Tanımlandığı dosyada service_role kapısı ARANMAZ; kapı, gövdeyi
+ * ileten ÇAĞIRANIN sorumluluğudur. (Yanlış-pozitifi testin kendisi yakaladı; bu satır
+ * onun kaydı.)
+ */
+const SERVICE_BODY_DECL_RE = /\b(?:export\s+)?(?:async\s+)?function\s+tenantFromServiceBody\b/
+const SERVICE_ROLE_CHECK_RE =
+  /timingSafeEquals\s*\([^)]*serviceRoleKey|===\s*serviceRoleKey|serviceRoleKey\s*===|kind\s*===\s*['"]service_role['"]/
 
 /**
  * Webhook fail-closed dedektörü (§3.5 · E10). Eksik olan kapıların ADINI döndürür.
@@ -473,6 +524,59 @@ describe('edge-security · tarama sağlık kontrolü', () => {
       expect(UNTRUSTED_TENANT_RE.test(ornek), `yanlış-pozitif: ${ornek}`).toBe(false)
       UNTRUSTED_TENANT_RE.lastIndex = 0
     }
+  })
+
+  it('E12-B dedektörü çalışıyor (yapısal kilit sentetik kanıtı)', () => {
+    // Aynı sebep: hedef glob boşalır ya da regex çürürse R11-B sessizce yeşile döner.
+    // Sağlığı repo durumundan bağımsız ölç.
+    const KOTU = [
+      `export function resolveTenantId(req: Request) {`,
+      `  const url = new URL(req.url)`,
+      `  return url.searchParams.get('tenant_id')`,
+      `  const claims = JSON.parse(atob(jwt.split('.')[1]))`,
+      `  const h = request.headers.get('x-tenant')`,
+    ]
+    for (const ornek of KOTU) {
+      const yakalandi = TENANT_MODULE_FORBIDDEN.some(({ re }) => re.test(ornek))
+      expect(yakalandi, `yakalanmalıydı: ${ornek}`).toBe(true)
+    }
+
+    const IYI = [
+      `export function tenantFromVerifiedUser(user: VerifiedUser, profile: Profile | null) {`,
+      `  if (!UUID_RE.test(candidate)) return { tenantId: DEFAULT_TENANT_ID }`,
+      `export type TenantSource = 'user_profile' | 'service_body' | 'resource_row' | 'default'`,
+    ]
+    for (const ornek of IYI) {
+      const yakalandi = TENANT_MODULE_FORBIDDEN.some(({ re }) => re.test(ornek))
+      expect(yakalandi, `yanlış-pozitif: ${ornek}`).toBe(false)
+    }
+
+    // Hedef küme gerçekten var mı — dosya yeniden adlandırılırsa kural ölür.
+    expect(SOURCES.filter((s) => /_shared\/tenant[^/]*\.ts$/.test(s.path)).length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('E12-D dedektörü çalışıyor (sınıf-(b) kapısı sentetik kanıtı)', () => {
+    expect(SERVICE_BODY_CALL_RE.test(`const d = tenantFromServiceBody(parsedBody)`)).toBe(true)
+    expect(SERVICE_BODY_CALL_RE.test(`// tenantFromServiceBody anlatılıyor`)).toBe(false)
+    // TANIM ≠ ÇAĞRI — ilk yazımda dedektör tam olarak bunu ihlal saydı.
+    const decl = `export function tenantFromServiceBody(parsedBody: unknown): TenantDecision {`
+    expect(SERVICE_BODY_CALL_RE.test(decl)).toBe(true) // ham desen eşleşir…
+    expect(SERVICE_BODY_DECL_RE.test(decl)).toBe(true) // …ama tanım filtresi ayıklar
+    expect(SERVICE_BODY_DECL_RE.test(`const d = tenantFromServiceBody(parsedBody)`)).toBe(false)
+
+    // Kapının gerçekten tanındığı biçimler:
+    expect(SERVICE_ROLE_CHECK_RE.test(`if (timingSafeEquals(token, serviceRoleKey)) {`)).toBe(true)
+    expect(SERVICE_ROLE_CHECK_RE.test(`if (token === serviceRoleKey) {`)).toBe(true)
+    expect(SERVICE_ROLE_CHECK_RE.test(`if (ctx.kind === 'service_role') {`)).toBe(true)
+    // Kapı DEĞİL: yalnız adı geçiyor.
+    expect(SERVICE_ROLE_CHECK_RE.test(`// service_role ile çağrılır`)).toBe(false)
+    expect(SERVICE_ROLE_CHECK_RE.test(`const k = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')`)).toBe(false)
+
+    // Bugünkü tek meşru çağıran gerçekten kapılı mı — kural boşa dönmesin.
+    const caller = SOURCES.find((s) => s.path.endsWith('_shared/caller.ts'))
+    expect(caller, '_shared/caller.ts bulunamadı — E12-D kör kalır').toBeTruthy()
+    expect(SERVICE_BODY_CALL_RE.test(caller!.code)).toBe(true)
+    expect(SERVICE_ROLE_CHECK_RE.test(caller!.code)).toBe(true)
   })
 })
 
@@ -878,7 +982,7 @@ describe('R10 · her fonksiyon dosya başında çağıran sınıfını beyan etm
  * R11 (E12) — tenant_id önce DOĞRULANMIŞ kimlikten
  * ------------------------------------------------------------------ */
 
-describe('R11 · tenant_id istekten önce doğrulanmış kimlikten okunmalı', () => {
+describe('R11-C · tenant_id istekten önce doğrulanmış kimlikten okunmalı (sıralama)', () => {
   /**
    * §3.9 (AÇIK BORÇ). `_shared/tenant_config.ts::resolveTenantId` önce `?tenant_id=`
    * query parametresini okuyor (satır 20) — yani istekten gelen değer JWT'yi EZİYOR.
@@ -910,6 +1014,92 @@ describe('R11 · tenant_id istekten önce doğrulanmış kimlikten okunmalı', (
         'değeri YALNIZ sınıf (c)/(d) uçlarında ve o ucun HMAC kontrolünden SONRA kabul edilsin. ' +
         'Yarım düzeltme (sadece sırayı çevirmek) saldırıyı query-param\'dan sahte JWT\'ye taşır — ' +
         'R6 (atob) ile BİRLİKTE düzeltilmelidir.',
+    )
+  })
+})
+
+
+/* ------------------------------------------------------------------ *
+ * R11-B (E12-B) — YAPISAL KİLİT: tenant modülü isteği göremez
+ * ------------------------------------------------------------------ */
+
+describe('R11-B · _shared/tenant*.ts istek nesnesine dokunamaz', () => {
+  /**
+   * NİÇİN AYRI BİR KURAL. R11-C sıralamaya bakar: "doğrulanmamış okuma `getUser`'dan
+   * sonra mı?" Bu, DOLAYLI ihlali göremez — modül okur, çağıran sadece çağırır; iki
+   * dosyanın hiçbirinde ihlal deseni yan yana görünmez. **T026'daki gerçek açık tam
+   * olarak buydu** ve o gün R11 yeşildi.
+   *
+   * Bu kural sıralamaya değil YETENEĞE bakar: tenant kararı veren dosya istek nesnesini
+   * adlandıramaz. Yeteneği olmayan modül, yanlış sırayla bile yazılsa güvenlidir.
+   */
+  it('tenant çözümleyen modüller Request/req/headers/searchParams/atob içermez', () => {
+    const hedefler = SOURCES.filter((s) => /_shared\/tenant[^/]*\.ts$/.test(s.path))
+
+    // Hedef küme boşalırsa (dosya yeniden adlandırılır) kural sessizce yeşile döner.
+    expect(
+      hedefler.length,
+      '_shared/tenant*.ts bulunamadı — dosya adı değiştiyse bu kuralın globu da güncellenmeli, ' +
+        'yoksa E12-B sessizce ölür.',
+    ).toBeGreaterThanOrEqual(1)
+
+    const found: string[] = []
+    for (const h of hedefler) {
+      for (const { ad, re } of TENANT_MODULE_FORBIDDEN) {
+        // HAM dosya: yorumdaki `req.tenant_id` de davettir, ayıklanmaz.
+        const satir = lineOf(h.raw, re)
+        if (satir) found.push(`${h.path}:${satir} (${ad})`)
+      }
+    }
+
+    assertRatchet(
+      'R11B',
+      found.sort(),
+      "NEDEN: T026'nın kök sebebi sıralama değil, tenant modülünün isteği GÖREBİLMESİYDİ — " +
+        "`?tenant_id=` okuyabildiği için JWT'yi eziyordu. Sıralamayı düzeltmek o yeteneği " +
+        'yerinde bırakır ve bir sonraki düzenleme satırı geri koyabilir (sıralama testi yeşil kalır). ' +
+        'ÇÖZÜM: tenant kararı SAF olsun — girdisi doğrulanmış kimlik ya da DB satırı olsun, ' +
+        'istek nesnesi HİÇ geçmesin. İsteği okuman gerekiyorsa bu iş `_shared/caller.ts` gibi ' +
+        'kimlik doğrulayan bir katmana aittir, tenant modülüne değil.',
+    )
+  })
+})
+
+/* ------------------------------------------------------------------ *
+ * R11-D (E12-D) — sınıf (b) kapısı: gövde ancak service_role sonrası
+ * ------------------------------------------------------------------ */
+
+describe('R11-D · gövdeden tenant okuyan dosya service_role doğrulaması taşımalı', () => {
+  /**
+   * `tenantFromServiceBody` istek GÖVDESİNDEN tenant kabul eder — bu, yalnızca çağıran
+   * service_role anahtarını kanıtladıysa meşrudur: o anahtarı bilen zaten her tenant'a
+   * yazabilir, dolayısıyla gövdeye güvenmek YENİ yetki vermez. Anahtar doğrulanmadan
+   * aynı çağrı yapılırsa gövde doğrulanmamış girdidir ve E12 ihlali geri gelmiştir.
+   *
+   * Dosya düzeyi kasıtlı: fonksiyon-içi akış takibi statik olarak kırılgan; "aynı
+   * dosyada service_role karşılaştırması VAR mı" hem sağlam hem de yeterince dar
+   * (bugün tek çağıran `_shared/caller.ts` ve kapısı orada).
+   */
+  it('tenantFromServiceBody çağıran her dosyada service_role karşılaştırması var', () => {
+    const found: string[] = []
+    for (const s of SOURCES) {
+      if (s.path.includes('__tests__')) continue // testler kasten kapısız çağırır
+      // Yalnız ÇAĞRI satırları: fonksiyonun tanımlandığı satır kapı aramaz.
+      const cagriSatiri = s.code
+        .split('\n')
+        .findIndex((l) => SERVICE_BODY_CALL_RE.test(l) && !SERVICE_BODY_DECL_RE.test(l))
+      if (cagriSatiri === -1) continue
+      if (!SERVICE_ROLE_CHECK_RE.test(s.code)) found.push(`${s.path}:${cagriSatiri + 1}`)
+    }
+
+    assertRatchet(
+      'R11D',
+      found.sort(),
+      'NEDEN: gövdeden gelen `tenant_id` yalnızca çağıran service_role anahtarını KANITLADIKTAN ' +
+        "sonra kabul edilebilir. Kanıt olmadan bu, saldırganın seçtiği tenant'a yazmak demektir " +
+        '(CLAUDE.md §12: data bleeding = felaket). ÇÖZÜM: çağrıdan ÖNCE aynı kapsamda ' +
+        '`timingSafeEquals(token, serviceRoleKey)` kapısı koy (bkz. `_shared/caller.ts`), ya da ' +
+        'gövdeyi hiç okuma — `tenantFromRow` ile kaynak satırından türet.',
     )
   })
 })

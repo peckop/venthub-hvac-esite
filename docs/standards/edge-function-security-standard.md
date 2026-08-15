@@ -351,7 +351,18 @@ sonra R7/R8/R9/R10/R11 de tek tek bozuldu — R10 hem **yeni-ihlal** hem **bayat
 | **E9** | §3.2 admin ucu rol kontrolü | `functions/admin-*/index.ts` | dosyada `'admin'`/`'superadmin'` rol kontrolü yok | **CANLI — R8** (baseline BOŞ — 6/6 admin ucu geçiyor) |
 | **E10** | §3.5 webhook fail-closed | `functions/*webhook*/index.ts` | HMAC imza doğrulaması **veya** ZORUNLU timestamp guard'ı yok | **CANLI — R9** (baseline BOŞ — `shipping-webhook` T025-VH ile uyumlu hâle geldi) |
 | **E11** | §2 çağıran sınıfı beyanı | `functions/*/index.ts` | ilk 15 satırda ve `serve()`'den önce geçerli beyan yok | **CANLI — R10** (baseline: 26/26 — hiçbirinde beyan yok) |
-| **E12** | §3.9 `tenant_id` önceliği | tüm edge kaynakları | doğrulanmamış `tenant_id` okuması `getUser()`'dan **önce** (ya da `getUser` hiç yok) | **CANLI — R11** (baseline: `_shared/tenant_config.ts:20` — §3.9 borcu) |
+| **E12-C** | §3.9 `tenant_id` **sıralaması** | tüm edge kaynakları | doğrulanmamış `tenant_id` okuması `getUser()`'dan **önce** (ya da `getUser` hiç yok) | **CANLI — R11-C** (baseline BOŞ, T026-VH ile kapandı) |
+| **E12-B** | §3.9 **yapısal kilit** | `_shared/tenant*.ts` | dosya `Request`/`req.`/`headers.get`/`searchParams`/`atob(` içeriyor (yorum dahil) | **CANLI — R11-B** (baseline BOŞ) |
+| **E12-D** | §3.9 **sınıf (b) kapısı** | `tenantFromServiceBody` çağıran her dosya | aynı dosyada service_role karşılaştırması yok | **CANLI — R11-D** (baseline BOŞ) |
+
+> **E12 niçin üçe bölündü (2026-08-15).** Tek kural sıralamaya bakıyordu ve T026'daki
+> gerçek açığı **göremedi**: `_shared/tenant_config.ts` modülü `?tenant_id=` okuyordu,
+> çağıran `index.ts`'lerde ise ihlal deseni hiç görünmüyordu — kural yeşildi, açık canlıydı.
+> Ders: *dolaylı ihlali sıralama testi yakalayamaz.* **E12-B** sıralamaya değil **yeteneğe**
+> bakar (modül isteği adlandıramaz bile) ve bu yüzden üçünün en güçlüsüdür; **E12-D** gövde
+> yolunun tek meşru kullanımını (service_role kanıtlanmış) kilitler. Üçü de kasıtlı bozmayla
+> kanıtlandı: B'ye yorum içinde `req.headers.get` eklemek, D'de `timingSafeEquals` kapısını
+> `true` yapmak — ikisi de FAIL verdi, geri alındı.
 
 **Makine ile denetlenemeyenler** (insan/runtime kapısı, §4'e bağlıdır):
 `config.toml` ↔ **prod** sürüm çelişkisi (canlı sorgu gerektirir) · gerçek 401/403 davranışı ·
