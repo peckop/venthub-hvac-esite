@@ -6,7 +6,6 @@ import {
     adminTableActionClass,
     adminTableActionDangerClass,
     adminTableActionWarningClass,
-    glassStrongClass,
 } from '../../../utils/adminUi'
 
 export interface BulkAction {
@@ -46,7 +45,7 @@ export function BulkBar({
 
     return (
         <div className="sticky bottom-4 z-40 mx-auto max-w-4xl">
-            <div className={`${glassStrongClass} rounded-2xl px-5 py-3 flex items-center justify-between gap-4 flex-wrap`}>
+            <div className={`bg-admin-surface rounded-2xl px-5 py-3 flex items-center justify-between gap-4 flex-wrap`}>
                 {/* Left: selection info */}
                 <div className="flex items-center gap-3">
                     <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-cyan-400 text-surface-deep text-sm font-black">

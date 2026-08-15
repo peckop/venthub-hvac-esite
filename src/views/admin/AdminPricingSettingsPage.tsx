@@ -14,7 +14,6 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import {
-  adminBlurBlobClass,
   adminCardClass,
   adminSectionTitleClass,
   adminSubtitleClass,
@@ -124,7 +123,6 @@ const AdminPricingSettingsPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Fiyatlandırma Varsayılanları Card */}
         <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group flex flex-col justify-between`}>
-          <div className={`${adminBlurBlobClass} bg-cyan-500/5 group-hover:bg-cyan-500/10`} />
           <div className="relative z-10 space-y-6">
             <div className="flex items-center gap-3 border-b border-white/5 pb-4">
               <DollarSign className="text-cyan-400" size={20} />

@@ -1,4 +1,5 @@
 import { a11y } from './a11y.en'
+import { theme } from './theme.en'
 import { audit } from './audit.en'
 import { authority } from './authority.en'
 import { categories } from './categories.en'
@@ -50,6 +51,7 @@ export const admin = {
   users,
   logistics,
   a11y,
+  theme,
   authority,
   categories,
 }

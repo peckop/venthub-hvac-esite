@@ -31,7 +31,6 @@ import {
   adminSelectClass,
   adminSelectStyle,
   adminTableActionPrimaryClass,
-  glassStrongClass,
 } from '../../utils/adminUi'
 
 /* ---- modeller ---- */
@@ -708,7 +707,7 @@ const ReturnsTableBody: React.FC = () => {
         label: t('admin.returns.bulk.statusTitle'),
         tone: 'default',
         panel: (close) => (
-          <div className={`${glassStrongClass} rounded-2xl p-3 flex items-center gap-2`}>
+          <div className={`bg-admin-surface rounded-2xl p-3 flex items-center gap-2`}>
             <select
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value)}

@@ -25,7 +25,6 @@ import {
   adminInputClass,
   adminSelectClass,
   adminSelectStyle,
-  glassStrongClass,
 } from '../../utils/adminUi'
 
 /* ---- modeller ---- */
@@ -609,7 +608,7 @@ const ErrorGroupsTableBody: React.FC = () => {
         label: t('admin.errorGroups.bulk.statusTitle'),
         tone: 'default',
         panel: (close) => (
-          <div className={`${glassStrongClass} rounded-2xl p-3 flex items-center gap-2`}>
+          <div className={`bg-admin-surface rounded-2xl p-3 flex items-center gap-2`}>
             <select
               value={bulkStatus}
               onChange={(e) => {

@@ -1,4 +1,5 @@
 import { a11y } from './a11y.tr'
+import { theme } from './theme.tr'
 import { audit } from './audit.tr'
 import { authority } from './authority.tr'
 import { categories } from './categories.tr'
@@ -44,6 +45,7 @@ export const admin = {
   titles,
   webhooks,
   a11y,
+  theme,
   returns,
   logistics,
   audit,

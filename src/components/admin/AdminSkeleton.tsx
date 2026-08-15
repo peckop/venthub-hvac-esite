@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { glassStrongClass } from '../../utils/adminUi'
 
 interface AdminSkeletonProps {
     variant: 'table' | 'cards' | 'form'
@@ -12,7 +11,7 @@ interface AdminSkeletonProps {
 export default function AdminSkeleton({ variant, rows = 5, count = 4, fields = 6 }: AdminSkeletonProps) {
     if (variant === 'table') {
         return (
-            <div className={`w-full ${glassStrongClass} rounded-hvac-xl border border-white/5 overflow-hidden shadow-2xl`}>
+            <div className={`w-full bg-admin-surface rounded-hvac-xl border border-white/5 overflow-hidden shadow-2xl`}>
                 <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/2">
                     <div className="h-6 w-32 bg-white/5 animate-pulse rounded-lg border border-white/5"></div>
                     <div className="h-10 w-48 bg-white/5 animate-pulse rounded-xl border border-white/5 shadow-inner"></div>
@@ -49,7 +48,7 @@ export default function AdminSkeleton({ variant, rows = 5, count = 4, fields = 6
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[...Array(count)].map((_, i) => (
-                    <div key={i} className={`${glassStrongClass} p-8 rounded-hvac-xl border border-white/5 shadow-xl flex items-center justify-between group overflow-hidden relative`}>
+                    <div key={i} className={`bg-admin-surface p-8 rounded-hvac-xl border border-white/5 shadow-xl flex items-center justify-between group overflow-hidden relative`}>
                         <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <div className="space-y-4 relative z-10">
                             <div className="h-3 w-20 bg-white/10 animate-pulse rounded-full"></div>
@@ -64,7 +63,7 @@ export default function AdminSkeleton({ variant, rows = 5, count = 4, fields = 6
 
     // form variant
     return (
-        <div className={`${glassStrongClass} p-8 md:p-10 rounded-hvac-2xl border border-white/5 shadow-2xl space-y-8 max-w-2xl relative overflow-hidden`}>
+        <div className={`bg-admin-surface p-8 md:p-10 rounded-hvac-2xl border border-white/5 shadow-2xl space-y-8 max-w-2xl relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 blur-3xl rounded-full"></div>
             <div className="h-8 w-48 bg-white/10 animate-pulse rounded-xl border border-white/5 mb-10 relative z-10"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">

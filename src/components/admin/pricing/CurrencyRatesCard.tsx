@@ -8,7 +8,7 @@ import { formatNumber } from '@/i18n/format'
 import { useI18n } from '@/i18n/I18nProvider'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
-import { adminBlurBlobClass, adminCardClass } from '../../../utils/adminUi'
+import { adminCardClass } from '../../../utils/adminUi'
 import AdminSkeleton from '../AdminSkeleton'
 
 interface CurrencyRateRow {
@@ -84,7 +84,6 @@ const CurrencyRatesCard: React.FC = () => {
 
   return (
     <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-      <div className={`${adminBlurBlobClass} bg-cyan-500/5 group-hover:bg-cyan-500/10`} />
       <div className="relative z-10 flex items-center justify-between gap-3 border-b border-white/5 pb-4">
         <div className="flex items-center gap-3">
           <Coins className="text-cyan-400" size={20} />

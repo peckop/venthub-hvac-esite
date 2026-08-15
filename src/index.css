@@ -351,6 +351,96 @@ textarea:focus-visible {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
+  /* ── ADMIN SEMANTİK RENK KATMANI ────────────────────────────────────
+     Neden ayrı bir katman: admin kromu bugüne kadar `text-white`,
+     `bg-white/3`, `text-slate-400`, `glass-strong` gibi SABİT KOYU
+     sınıflarla yazılmıştı. Bu sınıflar hiçbir temayla dönmez — mevcut
+     `.light` sınıfı yalnız `--surface-*` değişkenlerini çevirdiği için
+     açık temada admin "açık zemin üzerinde beyaz yazı"ya dönüyordu.
+     (Zaten `.light`/`.dark` sınıflarını uygulayan bir düzenek de YOKTU;
+     2026-08-15 taraması: uygulamada tek bir `classList` çağrısı bile yok.)
+
+     KAPSAM BİLEREK DAR: değişkenler `[data-admin-theme]` altında tanımlı,
+     `:root` altında DEĞİL. Vitrin koyu tasarlanmıştır, kendi cetveli vardır
+     (`storefront-design-standard.md`) ve bu değişikliğin kapsamında değildir;
+     `:root`a koymak vitrini de çevirirdi.
+
+     VARSAYILAN = AÇIK (Recep kararı, 2026-08-15). Öznitelik yalnız değeri
+     TAŞIYORSA da açık değerler geçerlidir; `='dark'` koyuya çevirir.
+     Tercih ÇEREZDE tutulur ve `src/app/admin/layout.tsx` içinde SUNUCUDA
+     okunup ilk render'a basılır — bu yüzden koyu temayı seçmiş kullanıcı da
+     beyaz sıçrama görmez. 'system' seçeneğinde çözülmüş değer istemci
+     tarafından çereze geri yazılır, çünkü sunucu `prefers-color-scheme`
+     okuyamaz (ayrıntı: `components/admin/shell/themeCookie.ts`).
+
+     Kontrast (WCAG 2.2 SC 1.4.3, beyaz zemine karşı ölçüldü):
+       --admin-fg ~14:1 · --admin-fg-muted ~4.9:1 (AA gövde metni ✓)
+       --admin-fg-subtle ~3.6:1 → SADECE büyük metin ve UI bileşeni
+       sınırı için (SC 1.4.11, ≥3:1). Gövde metninde KULLANMA.
+     Cetvel: docs/standards/admin-design-standard.md §3.8 */
+  [data-admin-theme] {
+    --admin-bg: 220 20% 97%;
+    --admin-surface: 0 0% 100%;
+    --admin-surface-2: 220 20% 97%;
+    --admin-surface-3: 220 16% 93%;
+    --admin-border: 220 13% 89%;
+    --admin-border-strong: 220 13% 80%;
+    --admin-fg: 222 30% 14%;
+    --admin-fg-muted: 220 9% 42%;
+    --admin-fg-subtle: 220 9% 52%;
+    --admin-accent: 226 71% 45%;
+    --admin-accent-hover: 226 71% 38%;
+    --admin-accent-fg: 0 0% 100%;
+    --admin-accent-weak: 226 71% 96%;
+    --admin-danger: 351 70% 44%;
+    --admin-danger-fg: 0 0% 100%;
+    --admin-danger-weak: 351 80% 97%;
+    --admin-warning: 32 81% 36%;
+    --admin-warning-fg: 0 0% 100%;
+    --admin-warning-weak: 42 90% 95%;
+    --admin-success: 158 74% 27%;
+    --admin-success-fg: 0 0% 100%;
+    --admin-success-weak: 152 60% 96%;
+    --admin-ring: 226 71% 45%;
+    color-scheme: light;
+  }
+
+  [data-admin-theme='dark'] {
+    --admin-bg: 224 30% 8%;
+    --admin-surface: 222 26% 11%;
+    --admin-surface-2: 222 22% 15%;
+    --admin-surface-3: 222 20% 19%;
+    --admin-border: 220 15% 22%;
+    --admin-border-strong: 220 14% 32%;
+    --admin-fg: 210 20% 96%;
+    --admin-fg-muted: 215 15% 68%;
+    --admin-fg-subtle: 215 12% 52%;
+    --admin-accent: 199 89% 60%;
+    --admin-accent-hover: 199 89% 68%;
+    --admin-accent-fg: 222 47% 11%;
+    --admin-accent-weak: 199 60% 18%;
+    --admin-danger: 0 84% 68%;
+    --admin-danger-fg: 222 47% 11%;
+    --admin-danger-weak: 0 45% 20%;
+    --admin-warning: 38 92% 58%;
+    --admin-warning-fg: 222 47% 11%;
+    --admin-warning-weak: 33 50% 20%;
+    --admin-success: 158 64% 52%;
+    --admin-success-fg: 222 47% 11%;
+    --admin-success-weak: 158 40% 18%;
+    --admin-ring: 199 89% 60%;
+    color-scheme: dark;
+  }
+
+  /* Native <select> açılır listesi işletim sisteminin kendi penceresinde
+     çizilir; aşağıdaki global kural onu koyu boyuyor. Admin kapsamında
+     tema-duyarlı değerlerle EZİYORUZ, yoksa açık temada koyu şerit kalırdı. */
+  [data-admin-theme] select option,
+  [data-admin-theme] select optgroup {
+    background-color: hsl(var(--admin-surface));
+    color: hsl(var(--admin-fg));
+  }
+
   html, body {
     width: 100%;
     margin: 0;

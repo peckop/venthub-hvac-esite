@@ -75,6 +75,15 @@ export const boxShadow = {
   'elevation-3':           '0 10px 30px rgba(0,0,0,0.25)',
   'elevation-4':           '0 20px 50px rgba(0,0,0,0.35)',
   'elevation-5':           '0 30px 60px rgba(0,0,0,0.5)',
+  // Admin yükseklik ölçeği — Y-KAYMASI OLAN gerçek gölgeler.
+  // Admin kartlarında `shadow-[0_0_40px_rgba(0,0,0,0.3)]` kullanılıyordu:
+  // Y-offset'i SIFIR, yani ışık kaynağı yok — bu gölge değil GLOW'dur ve
+  // dört resmi token setinin (MD3, Tailwind, Radix, Polaris) hiçbirinde yok.
+  // Açık zeminde ayrıca kirli bir hale bırakır. Cetvel §3.3 (yüzey/gölge) ve §3.8.1.
+  'admin-sm':              '0 1px 2px rgba(16,24,40,0.06), 0 1px 3px rgba(16,24,40,0.10)',
+  'admin-md':              '0 2px 4px -1px rgba(16,24,40,0.06), 0 4px 8px -2px rgba(16,24,40,0.10)',
+  'admin-lg':              '0 4px 6px -2px rgba(16,24,40,0.05), 0 12px 16px -4px rgba(16,24,40,0.10)',
+  'admin-overlay':         '0 8px 8px -4px rgba(16,24,40,0.04), 0 20px 24px -4px rgba(16,24,40,0.10)',
   // Glow (Dinamik CSS variable ile beslenen renkler - Kütüphaneci Onaylı)
   'glow-sm':               '0 0 10px var(--glow-color, rgba(34,211,238,0.3))',
   'glow-md':               '0 0 20px var(--glow-color, rgba(34,211,238,0.4))',

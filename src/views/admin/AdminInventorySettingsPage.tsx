@@ -11,7 +11,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useRole } from '../../hooks/useRole'
 import { 
-  adminBlurBlobClass,  adminButtonPrimaryClass,
+  adminButtonPrimaryClass,
   adminCardClass, 
   adminInputClass,
   adminInputThresholdClass,
@@ -211,7 +211,6 @@ const AdminInventorySettingsPage: React.FC = () => {
           {/* Sağ Kolon: Form Alanları Card (5fr) */}
           <div className="md:col-span-5">
             <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-              <div className={`${adminBlurBlobClass} bg-cyan-500/5 group-hover:bg-cyan-500/10`} />
               
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={2} />
@@ -289,7 +288,6 @@ const AdminInventorySettingsPage: React.FC = () => {
           {/* Sağ Kolon: Form Alanları Card (5fr) */}
           <div className="md:col-span-5">
             <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-              <div className={`${adminBlurBlobClass} bg-violet-500/5 group-hover:bg-violet-500/10`} />
               
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={2} />
@@ -350,7 +348,6 @@ const AdminInventorySettingsPage: React.FC = () => {
           {/* Sağ Kolon: Form Alanları Card (5fr) */}
           <div className="md:col-span-5">
             <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-              <div className={`${adminBlurBlobClass} bg-amber-500/5 group-hover:bg-amber-500/10`} />
               
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={1} />
