@@ -15,6 +15,7 @@ import { navCookieName } from '../../components/admin/shell/navCookie'
 import { isAdminByEmail } from '../../config/admin'
 import { buildBreadcrumbTrail } from '../../config/admin-resources'
 import { useAuth } from '../../hooks/useAuth'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useRole } from '../../hooks/useRole'
 import { useTenant } from '../../hooks/useTenant'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -56,6 +57,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   const router = useRouter()
   const { t } = useI18n()
   const tenant = useTenant()
+  // Vitrin rotası dile göre çözülür (kural 7: manuel `/tr/` öneki yasak).
+  const localizedRoutes = useLocalizedRoutes()
+  const siteHomeHref = localizedRoutes.home()
 
   const [navCollapsed, setNavCollapsed] = useState(defaultNavCollapsed)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -199,6 +203,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
         )}
 
         <div className="ml-auto flex items-center gap-2">
+          {/*
+            REGRESYON ONARIMI — "Siteye dön" linki eskiden `MainLayout`'un admin
+            çubuğundaydı; o çubuk kabuk sadeleştirmesinde kaldırılınca link de
+            kayboldu ve admin'den vitrine dönmenin BAŞKA yolu kalmadı. Artık
+            kabuğun kalıcı parçası ve §5'teki işlev envanteri testiyle kilitli.
+          */}
+          <Link
+            href={siteHomeHref}
+            className="hidden rounded-admin-sm border border-white/10 px-3 py-1.5 text-xs
+              font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 sm:inline-flex"
+          >
+            {t('header.adminBar.backToSite')}
+          </Link>
           <AdminRealtimeNotifications />
           <div
             aria-label={t('admin.a11y.userMenu')}
@@ -221,6 +239,19 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
 
         <main id="admin-main" className="min-w-0 flex-1">
           <div className="mx-auto w-full max-w-page px-4 py-6 md:px-6">{children}</div>
+
+          {/*
+            REGRESYON ONARIMI — admin footer'ı (telif + güvenli-düğüm rozeti) kabuk
+            yeniden yazımında düşmüştü. `<main>` içinde duruyor ki sidebar'ın altına
+            değil, içerik sütununun altına hizalansın.
+          */}
+          <footer
+            className="mx-auto flex w-full max-w-page items-center justify-between gap-4
+              border-t border-white/10 px-4 py-4 text-xs text-white/40 md:px-6"
+          >
+            <span>{t('admin.common.copyright')}</span>
+            <span className="text-cyan-400/50">{t('admin.common.secureNode')}</span>
+          </footer>
         </main>
       </div>
 

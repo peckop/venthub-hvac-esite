@@ -235,6 +235,36 @@ describe('INV-ADMIN-SHELL-2 · kabuk sorumlulukları', () => {
     ).toMatch(/<Toaster\b/)
   })
 
+  /**
+   * KABUK İŞLEV ENVANTERİ — sessiz işlev kaybına karşı.
+   *
+   * Kabuk v2 yazılırken `MainLayout`'un admin çubuğu kaldırıldı; içindeki
+   * "siteye dön" linki ve `AdminLayout`'un footer'ı da onunla birlikte düştü.
+   * Lint bunları "kullanılmayan import" diye raporladı, yani kayıp KULLANICI
+   * TARAFINDAN bildirilene kadar hiçbir kapıya takılmadı.
+   *
+   * Aşağıdaki liste kabuğun sunmak ZORUNDA olduğu kullanıcı yüzeyleridir.
+   * Kabuk yeniden düzenlenirse bu test kırılır ve kayıp merge öncesi görülür.
+   */
+  it.each([
+    ['admin.common.copyright', 'admin footer telif satırı'],
+    ['admin.common.secureNode', 'admin footer güvenli-düğüm rozeti'],
+    ['header.adminBar.backToSite', 'vitrine dönüş linki (admin\'den çıkmanın TEK yolu)'],
+    ['admin.a11y.skipToContent', 'içeriğe atlama linki'],
+  ])('kabuk %s sunar (%s)', (key) => {
+    expect(
+      layout(),
+      `Kabuk "${key}" anahtarını kullanmalı — bu bir KULLANICI YÜZEYİ, sessizce düşmemeli`,
+    ).toContain(key)
+  })
+
+  it('vitrine dönüş linki lokalize rota üreticisinden geçer', () => {
+    // Kural 7: manuel `/tr/` öneki yasak; URL `useLocalizedRoutes` ile üretilir.
+    expect(layout(), 'Siteye dönüş linki useLocalizedRoutes ile üretilmeli (kural 7)').toMatch(
+      /useLocalizedRoutes/,
+    )
+  })
+
   it('nav tetikleyicileri aria-expanded + aria-controls taşır', () => {
     const source = layout()
     expect(source, 'Nav tetikleyicisinde aria-expanded zorunlu (cetvel §2.5)').toMatch(
