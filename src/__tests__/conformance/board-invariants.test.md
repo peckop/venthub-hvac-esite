@@ -3,47 +3,43 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\__tests__\conformance\board-invariants.test.ts
-skeleton_hash: 8dde8424d6f761ac
+skeleton_hash: 1764ae9a666ff6fb
 entity_hashes:
   func:isoAgo: b8a4d559f7e778ae
   func:loadBoard: 9f1c54a925d3dcae
-  func:tmpRoot: d2d210adfce5b2ba
+  func:tmpRoot: 16d120940404e835
   func:uniqueTempDir: 11470406ffef69ce
-  overview: 17f511615d5dbc71
-generated_at: 2026-08-15T06:32:30Z
+  overview: 6da611275aeff8f8
+generated_at: 2026-08-15T07:16:56Z
 ---
 
 ## Genel Bakış
-Bu modül, board invariant testlerini desteklemek için gerekli yardımcı fonksiyonları sağlar. Temel olarak test ortamını kurmaya, board modüllerini yüklemeye ve zaman/hesaplama işlemlerine yönelik araçlar sunar. Modül, dosya sistemi işlemleri ve test verileriyle etkileşim için gerekli altyapıyı oluşturur.
+Bu modül, board invariant testlerini desteklemek için gerekli yardımcı fonksiyonları içerir. Test ortamının hazırlanması, board modüllerinin yüklenmesi ve zaman bazlı hesaplamalar için araçlar sunarak test altyapısını kolaylaştırır.
 
 ## Fonksiyon Grupları
 ### Test Altyapısı ve Kurulum
-Bu grup, test ortamının hazırlanması için geçici dizinlerin yönetimini ve temel kaynakların yüklenmesini sağlar.
+Test çalıştırılabilirliği için gerekli olan dosya sistemi altyapısını ve modül yüklemelerini yönetir.
 - loadBoard, tmpRoot, uniqueTempDir
 
 ### Zaman Hesaplama Yardımcıları
-Bu grup, testlerde zaman bazlı senaryoları模拟 etmek için tarih-farhesaplama ve formatlama yardımcıları sunar.
+Geçmiş zaman damgalarını ISO formatında döndüren yardımcı fonksiyon, testlerde zaman bazlı koşulları test etmek için kullanılır.
 - isoAgo
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, board invarianlarını test eden bir test modülüdür. Aşağıdaki mimari varsayımlar fonksiyon imzalarından türetilmiştir:
+Bu modül, board invariant testlerini destekleyen yardımcı fonksiyonlar içeren bir test altyapısı modülüdür.
 
-**[Aksiyom 1]:** Eğer `boardDir` parametresi geçerli (var olan, okunabilir) bir dizin yolunu temsil etmiyorsa, `loadBoard(boardDir)` fonksiyonunun çağrılmaması gerekir; aksi halde BoardModule yüklenemez.
+[Aksiyom 1]: Eğer `loadBoard` için geçerli bir `boardDir` yolu (içerisinde yüklenebilir bir board modülü bulunan dizin) sağlanmazsa, `BoardModule` döndürülmez ve modül yükleme hatası oluşur.
 
-**[Aksiyom 2]:** Eğer `BOARD_MODULE_PATH` sabiti, geçerli bir board modülü yolunu içermiyorsa (örn. `require` ile yüklenebilir bir modül değilse), `loadBoard` fonksiyonunun çağrılabilirliği bilinmiyor.
+[Aksiyom 2]: Eğer `isoAgo` için geçerli bir sayısal `msAgo` değeri (milisaniye cinsinden) sağlanmazsa, geçerli bir ISO tarih dizesi döndürülmez.
 
-**[Aksiyom 3]:** Eğer `msAgo` parametresi negatif bir sayı ise, `isoAgo` fonksiyonunun döndüreceği zaman damgası mantığı (gelecek tarih mi, sıfır mı, hata mı) bilinmiyor.
+[Aksiyom 3]: Eğer sistemde yazılabilir bir geçici dizin (`temp`) yoksa veya yeterli dosya sistemi izinleri verilmemişse, `tmpRoot()` geçerli bir yol döndüremez.
 
-**[Aksiyom 4]:** Eğer `tmpRoot()` çağrıldığında geçici dizin sistemi (örn. `/tmp` veya OS-dependent temp path) erişilebilir değilse, hem `tmpRoot()` hem de `uniqueTempDir` fonksiyonları başarısız olur.
+[Aksiyom 4]: Eğer `uniqueTempDir` için geçerli bir `prefix` dizesi sağlanmazsa veya `tmpRoot()` erişilebilir bir kök dizin sunamazsa, benzersiz geçici dizin oluşturulamaz.
 
-**[Aksiyom 5]:** Eğer `prefix` parametresi boş string (`""`) ise, `uniqueTempDir` fonksiyonunun oluşturacağı dizin adı唯一liği (benzersizliği)如何保证 bilinmiyor.
-
-**[Aksiyom 6]:** Eğer `originalEnv` değişkeni test sonunda geri yüklenmezse, testler sonrası ortam değişkenlerinde kalıcı bozulma (env pollution) oluşur.
-
-**[Aksiyom 7]:** Eğer `require` fonksiyonu (Node.js ortamı) mevcut değilse, `BOARD_MODULE_PATH` ile modül yüklenemez.
+[Aksiyom 5]: Eğer `loadBoard` çağrılırken `require` veya `BOARD_MODULE_PATH` aracılığıyla erişilen board modülü yolu yanlışsa veya modül yoksa, `loadBoard` hata ile sonuçlanır.
 
 ---
 
@@ -64,10 +60,16 @@ Bu modül, board invarianlarını test eden bir test modülüdür. Aşağıdaki 
 **Dönüş**: `string` — ISO 8601 formatında, örneğin `"2023-10-27T10:00:00.000Z"` şeklinde bir tarih-saat dizgesi.
 
 ### tmpRoot
-**Ne yapar**: İşletim sisteminin geçici dosya kök dizinini (temp directory) döndürür. Bu işlev, `node:os` modülü yerine doğrudan ortam değişkenlerini okuyarak daha hafif ve esnek bir çözüm sunar.
-**Nasıl yapar**: Sırasıyla `TEMP`, `TMPDIR` ve `TMP` ortam değişkenlerini kontrol eder; ilk bulunan değeri kullanır. Hiçbir ortam değişkeni tanımlı değilse `'C:/tmp'` dizinini varsayılan olarak döndürür. Aldığı yolu, Windows tarzı ters eğik çizgileri (`\`) düz eğik çizgiye (`/`) çevirir ve sondaki olası eğik çizgiyi kaldırarak standart bir Unix tarzı yol elde eder.
-**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
-**Dönüş**: `string` — Standartlaştırılmış, eğik çizgiyle ayrılmış mutlak geçici dizin yolu (örn: `/tmp` veya `C:/tmp`).
+
+**Ne yapar**: Platformdan bağımsız geçici dizin kök yolunu döndürür. Fonksiyon, Windows ve Linux gibi farklı işletim sistemlerinde çalışırken tutarlı bir geçici dizin yolu elde edilmesini sağlar, böylece test süreçlerinde ve CI ortamlarında dosya yolu kaynaklı hataların önüne geçilir.
+
+**Nasıl yapar**: Ortam değişkenlerini belirli bir öncelik sırasıyla kontrol eder: önce `RUNNER_TEMP` (GitHub Actions CI ortamına özgü), ardından `TMPDIR` (Linux/macOS standart), sonra `TEMP` ve `TMP` (Windows standart) değişkenlerini sırasıyla dener. Hiçbiri tanımlı değilse `/tmp` yolunu fallback olarak kullanır. Elde edilen ham yol üzerinde ters eğik çizgileri (`\`) düz eğik çizgiye (`/`) dönüştürür ve sondaki eğik çizgiyi kaldırarak跨 platform uyumlu, temiz bir yol döndürür. Bu dönüşümler, Windows'ta alınan yolların Linux ortamlarında da doğru şekilde işlenmesini garanti altına alır.
+
+**Parametreler**:
+
+Bu fonksiyon parametre almaz.
+
+**Dönüş**: `string` — Platformdan bağımsız, ters eğik çizgilerden arındırılmış, sondaki eğik çizgi kaldırılmış mutlak geçici dizin yolu. Örnek dönüş değerleri: `/tmp`, `C:/Users/broker/AppData/Local/Temp`, `/home/runner/work/_temp`.
 
 ### uniqueTempDir
 **Ne yapar**: Her çağrıda, henüz oluşturulmamış ancak gelecekte oluşturulabilecek benzersiz bir geçici dizin yolu üretir. Bu, testlerin birbirini etkilemeden paralel çalışmasını veya izole dosya sistemi deneyimleri yapmasını sağlar.
@@ -133,103 +135,45 @@ INV-BOARD-1 · Çok-oturum panosu değişmezleri (kalıcı bekçi). `scripts/boa
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: board-invariants.test.ts::loadBoard
-- **params**: `boardDir: string` — Board modülünün yükleneceği geçici dizin yolu
-- **ic_degiskenler**: (yok — parametreler ve doğrudan ifadeler kullanılıyor)
-- **Dönüş**: `BoardModule` — require ile yüklenen board modülü nesnesi
+### [N1_NASIL] AST Pointer: `__tests__/conformance/board-invariants.test.ts::loadBoard`
+- **params**: `boardDir: string` — test çalışması sırasında board dizininin yolu
+- **ic_degiskenler**:
+  (değişken yok — doğrudan parametre ve global/sabit kullanılır)
+- **Kullanılan dış referanslar**:
+  - `process.env.VENTHUB_BOARD_DIR` — ortam değişkenine `boardDir` yazılır, board modülü bu yolu okur
+  - `require.cache[BOARD_MODULE_PATH]` — modül önbellekten silinir ki her çağrıda taze yüklenme sağlanır
+  - `BOARD_MODULE_PATH` — `require()` ile board modülünün dosya yolu sabiti
+- **Dönüş**: `BoardModule` — `require()` ile yüklenen board modülü (append, findConflict, liveClaims, notesFor, markSeen, globToRegExp, toRepoRelative metotlarını içerir)
 
-### [N2_NASIL] AST Pointer: board-invariants.test.ts::isoAgo
-- **params**: `msAgo: number` — bugünden geriye doğru milisaniye cinsinden zaman
-- **ic_degiskenler**: (yok — doğrudan expression)
-- **Dönüş**: `string` — ISO 8601 formatında tarih stringi
+### [N2_NASIL] AST Pointer: `__tests__/conformance/board-invariants.test.ts::isoAgo`
+- **params**: `msAgo: number` — milisaniye cinsinden geriye dönük zaman miktarı
+- **ic_degiskenler**:
+  (değişken yok — tek satırlık return ifadesi)
+- **Kullanılan dış referanslar**:
+  - `Date.now()` — anlık zaman damgası (epoch ms)
+- **Dönüş**: `string` — ISO 8601 formatında tarih stringi, `msAgo` kadar geçmişe ait
 
-### [N3_NASIL] AST Pointer: board-invariants.test.ts::tmpRoot
+### [N3_NASIL] AST Pointer: `__tests__/conformance/board-invariants.test.ts::tmpRoot`
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `raw` — process.env'den okunan geçici dizin yolu (TEMP, TMPDIR veya TMP ortam değişkenlerinden biri, yoksa 'C:/tmp' varsayılanı)
-- **Dönüş**: `string` — ters eğik çizgileri `/` ile değiştirilmiş, sondaki `/` kaldırılmış temiz dizin yolu
+  - `raw` — ortam değişkenlerinden çözümleme sırasıyla (`RUNNER_TEMP`, `TMPDIR`, `TEMP`, `TMP`) veya fallback `/tmp` ile elde edilen ham geçici dizin yolu
+- **Kullanılan dış referanslar**:
+  - `process.env.RUNNER_TEMP` — GitHub Actions runner geçici dizini
+  - `process.env.TMPDIR` — Unix-style geçici dizin
+  - `process.env.TEMP` — Windows-style geçici dizin
+  - `process.env.TMP` — alternatif Windows geçici dizin
+- **Dönüş**: `string` — ters eğik çizgileri `/` ile değiştirilmiş, sondaki `/` kırılmış normalize edilmiş yol
 
-### [N4_NASIL] AST Pointer: board-invariants.test.ts::uniqueTempDir
-- **params**: `prefix: string` — oluşturulacak dizin adının başlangıç öneki
-- **ic_degiskenler**: (yok — tmpRoot() çağrısı ve string template doğrudan kullanılıyor; `dirCounter` modül seviyesinde global değişken olarak artırılır)
-- **Dönüş**: `string` — benzersiz geçici dizin yolu (prefix-timestamp-random-counter formatında)
-
-### [N5_NASIL] AST Pointer: board-invariants.test.ts::(beforeEach callback)
-- **params**: (yok)
+### [N4_NASIL] AST Pointer: `__tests__/conformance/board-invariants.test.ts::uniqueTempDir`
+- **params**: `prefix: string` — dizin adının başlangıç öneki (ör. `'venthub-board-test'`, `'venthub-board-scratch-repo'`)
 - **ic_degiskenler**:
-  - `originalEnv` — test öncesi `process.env.VENTHUB_BOARD_DIR` değerinin orijinali (test sonrası geri yükleme için saklanır)
-- **Dönüş**: yok (yan etki: `process.env.VENTHUB_BOARD_DIR`'ı uniqueTempDir sonucuyla ayarlar)
-
-### [N6_NASIL] AST Pointer: board-invariants.test.ts::(afterEach callback)
-- **params**: (yok)
-- **ic_degiskenler**: (yok — `originalEnv` modül seviyesinden okunur)
-- **Dönüş**: yok (yan etki: `process.env.VENTHUB_BOARD_DIR`'ı orijinal değerine geri yükler veya siler)
-
-### [N7_NASIL] AST Pointer: board-invariants.test.ts::(it — kıdemli talep engellenmez, geç gelen engellenir)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `board` — loadBoard(boardDir) ile yüklenen BoardModule nesnesi
-  - `target` — çakışma testi yapılacak dosya yolu: `'/repo/supabase/migrations/20260101_test.sql'`
-  - `repoRoot` — repo kök dizini: `'/repo'`
-  - `seniorResult` — session-a (erken timestamp) için `board.findConflict()` sonucu; null olması beklenir (kıdemli engellenmemeli)
-  - `juniorResult` — session-b (geç timestamp) için `board.findConflict()` sonucu; null olmamalı (geç gelen kıdemliye çarpmalı)
-- **Dönüş**: yok (yan etki: board'a iki claim append eder, assertion'lar çalıştırır)
-
-### [N8_NASIL] AST Pointer: board-invariants.test.ts::(it — bir oturum kendi talep ettiği globa yazabilir)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `board` — loadBoard(boardDir) ile yüklenen BoardModule nesnesi
-  - `result` — session-a'nın kendi globuyla eşleşen dosya için `board.findConflict()` sonucu; null olması beklenir
-- **Dönüş**: yok (yan etki: board'a bir claim append eder, assertion çalıştırır)
-
-### [N9_NASIL] AST Pointer: board-invariants.test.ts::(it — aynı oturumun ikinci claim'i globları birleştirir)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `board` — loadBoard(boardDir) ile yüklenen BoardModule nesnesi
-  - `first` — ilk claim'in timestamp'i (10000 ms önce); kıdem olarak korunması beklenen değer
-  - `live` — `board.liveClaims()` ile dönen aktif talepler dizisi
-  - `mine` — liveClaims içinde `c.sid === 'session-a'` filtresiyle bulunan birleşmiş talep nesnesi
-  - `conflict` — session-b'nin eski glob'a (`src/lib/**`) denk gelen dosya için `board.findConflict()` sonucu; `conflict?.claim.sid`'nin `'session-a'` olması beklenir
-- **Dönüş**: yok (yan etki: board'a birden fazla claim append eder, assertion'lar çalıştırır)
-
-### [N10_NASIL] AST Pointer: board-invariants.test.ts::(it — release sonrası gelen heartbeat şeridi geri getirmez)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `board` — loadBoard(boardDir) ile yüklenen BoardModule nesnesi
-  - `live` — `board.liveClaims()` ile dönen aktif talepler dizisi
-- **Dönüş**: yok (yan etki: board'a claim, release ve heartbeat append eder; liveClaims içinde session-a'nın undefined olması beklenir)
-
-### [N11_NASIL] AST Pointer: board-invariants.test.ts::(it — TTL'i dolmuş talep yeni bir oturumu engellemez)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `board` — loadBoard(boardDir) ile yüklenen BoardModule nesnesi
-  - `live` — `board.liveClaims()` ile dönen aktif talepler dizisi; TTL dolmuş claim'in artık canlı listede olmaması beklenir
-  - `result` — session-b için `board.findConflict()` sonucu; null olması beklenir (bayat talep engellemez)
-- **Dönüş**: yok (yan etki: board'a TTL'li claim append eder, assertion'lar çalıştırır)
-
-### [N12_NASIL] AST Pointer: board-invariants.test.ts::(it — not bir kez teslim edilir, markSeen sonrası ikinci turda tekrar gelmez)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `board` — loadBoard(boardDir) ile yüklenen BoardModule nesnesi
-  - `firstRound` — session-b için `board.notesFor()` ile dönen not dizisi; uzunluğu 1 olmalı ve `firstRound[0].text` değeri `'merhaba'` olmalı
-  - `secondRound` — `board.markSeen()` sonrası tekrar çağrılan `board.notesFor()` sonucu; boş dizi olması beklenir
-- **Dönüş**: yok (yan etki: board'a note append eder, markSeen çağırır, assertion'lar çalıştırır)
-
-### [N13_NASIL] AST Pointer: board-invariants.test.ts::(it — src/** derin yolu yakalar, komşu önek yakalamaz)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `board` — loadBoard(boardDir) ile yüklenen BoardModule nesnesi
-  - `re` — `board.globToRegExp('src/**')` ile dönen RegExp nesnesi; src/ alt yollarını eşleştirmeli, srcfoo/ gibi komşu önekleri eşleştirmemeli
-- **Dönüş**: yok (yan etki: globToRegExp çağırır, regex test'leri ve assertion'lar çalıştırır)
-
-### [N14_NASIL] AST Pointer: board-invariants.test.ts::(it — dosyanın kendi git kökünden repo-göreli yol üretir)
-- **params**: (yok)
-- **ic_degiskenler**:
-  - `board` — loadBoard(boardDir) ile yüklenen BoardModule nesnesi
-  - `scratchRepo` — `uniqueTempDir('venthub-board-scratch-repo')` ile oluşturulan geçici scratch git reposu dizini
-  - `filePath` — scratchRepo üzerine oluşturulacak test dosyasının tam yolu: `` `${scratchRepo}/foo.ts` ``
-  - `rel` — `board.toRepoRelative(filePath)` ile dönen repo-göreli yol; scratch reponun kendi köküne göre çözülmeli, `'foo.ts'` olmalı
-- **Dönüş**: yok (yan etki: `execFileSync` ile scratch git reposu oluşturur, toRepoRelative çağırır, assertion çalıştırır)
+  (değişken yok — doğrudan global `dirCounter` ve `tmpRoot()` sonucu kullanılır)
+- **Kullanılan dış referanslar**:
+  - `dirCounter` — global sayaç, her çağrıda `+=1` ile artırılır; benzersizlik sağlar
+  - `tmpRoot()` — geçici dizin kök yolunu döndüren fonksiyon çağrısı
+  - `Date.now()` — milisaniye zaman damgası benzersizlik için kullanılır
+  - `Math.random().toString(36).slice(2)` — rastgele alfasayısal string, çarpışma olasılığını düşürür
+- **Dönüş**: `string` — `{tmpRoot}/{prefix}-{timestamp}-{random}-{counter}` formatında benzersiz dizin yolu
 
 ---
 

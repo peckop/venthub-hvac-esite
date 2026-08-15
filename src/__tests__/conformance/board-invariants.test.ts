@@ -81,8 +81,18 @@ function isoAgo(msAgo: number): string {
 }
 
 /** Sistem geçici klasörü — `node:os` yerine düz `process.env` okuması. */
+/**
+ * Geçici dizin kökü — PLATFORMDAN BAĞIMSIZ olmak ZORUNDA.
+ *
+ * İlk sürüm `'C:/tmp'` fallback'i taşıyordu ve yerelde (Windows, `TEMP` hep dolu) sorunsuz
+ * geçti; CI Linux runner'ında `TEMP`/`TMP` yok, `TMPDIR` de her zaman set edilmiyor → fallback
+ * devreye girdi ve `C:/tmp/...` orada MUTLAK yol değil, cwd'ye göreli bir dizin adı oldu.
+ * Sonuç: `git rev-parse --show-toplevel` başka bir kök döndürdü, `toRepoRelative` eşleşmedi ve
+ * test yalnız CI'da kırmızı yandı. GitHub runner'ı `RUNNER_TEMP` verir; POSIX fallback `/tmp`.
+ */
 function tmpRoot(): string {
-  const raw = process.env.TEMP || process.env.TMPDIR || process.env.TMP || 'C:/tmp'
+  const raw =
+    process.env.RUNNER_TEMP || process.env.TMPDIR || process.env.TEMP || process.env.TMP || '/tmp'
   return raw.replace(/\\/g, '/').replace(/\/$/, '')
 }
 
