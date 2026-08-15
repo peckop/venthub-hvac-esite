@@ -59,7 +59,17 @@ memory-engine/data/*.db
 
 session_catalog.db
 
-mcp_config_for_claude_code.json
+# MCP istemci config'i — CANLI token taşır (Supabase PAT + GitHub PAT).
+# Sondaki `*` ŞART: 2026-08-15'te bir onarım sırasında yanına
+# `mcp_config_for_claude_code.json.oncesi-2026-08-15` yedeği düştü ve tam-ad
+# deseni onu YAKALAMADI — repo public olduğu için tek `git add -A` canlı PAT'i
+# herkese açık commit edecekti. Deseni daraltma.
+mcp_config_for_claude_code.json*
+
+# "*.oncesi-<tarih>" bu repoda onarım öncesi yedek adlandırma geleneği
+# (git kancaları ve config dosyaları için). Yedek, kaynağı ignore'lu olsa bile
+# takip edilebilir bir ada sahip olabildiği için sınıfın tamamı kapatılıyor.
+*.oncesi-*
 .vercel
 .agents/
 .agent/cache/
