@@ -40,6 +40,7 @@ adminModalScrollAreaClass,
   adminSelectStyle,
   adminSettingsLabelClass,
 } from '../../../utils/adminUi'
+import { useConfirm } from '../overlay/ConfirmProvider'
 import RuleScopeTargetPicker from './RuleScopeTargetPicker'
 
 /**
@@ -256,6 +257,7 @@ interface PricingRuleFormModalProps {
 
 const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule, onClose, onSaved }) => {
   const { t, lang } = useI18n()
+  const confirm = useConfirm()
   const locale = lang === 'en' ? 'en' : 'tr'
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('pricing')
@@ -483,10 +485,18 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
   )
 
   /* ---- dirty-guard ---- */
-  const handleClose = useCallback(() => {
-    if (formState.isDirty && !window.confirm(t('admin.pricing.rules.form.unsavedConfirm'))) return
-    onClose()
-  }, [formState.isDirty, onClose, t])
+  const handleClose = useCallback(async () => {
+    if (!formState.isDirty) {
+      onClose()
+      return
+    }
+    const ok = await confirm({
+      description: t('admin.pricing.rules.form.unsavedConfirm'),
+      confirmLabel: t('admin.confirm.discardChanges'),
+      tone: 'danger',
+    })
+    if (ok) onClose()
+  }, [formState.isDirty, onClose, t, confirm])
 
   useEffect(() => {
     if (!open) return
@@ -604,7 +614,9 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
     <Dialog.Root open={open} onOpenChange={(next) => (next ? undefined : handleClose())}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-admin-modal">
+        <Dialog.Content
+          // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
+          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-admin-modal">
           <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
             <div>
               <Dialog.Title className="text-xl font-bold text-white tracking-tight">

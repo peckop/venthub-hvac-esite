@@ -17,6 +17,7 @@ import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import { FacetedFilter } from '../../components/admin/data-table/FacetedFilter'
 import type { AdminColumn, DataTableFacet } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
+import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { formatDate, formatDateTime, formatTime } from '../../i18n/datetime'
@@ -211,6 +212,7 @@ function orderLabel(r: ReturnRow): string {
 
 const ReturnsTableBody: React.FC = () => {
   const { t, lang } = useI18n()
+  const confirm = useConfirm()
   const router = useRouter()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('returns')
@@ -396,16 +398,13 @@ const ReturnsTableBody: React.FC = () => {
         return
       }
 
-      if (
-        !window.confirm(
-          t('admin.returns.bulk.statusConfirm', {
-            count: String(targets.length),
-            status: getStatusLabel(targetStatus),
-          })
-        )
-      ) {
-        return
-      }
+      const ok = await confirm({
+        description: t('admin.returns.bulk.statusConfirm', {
+          count: String(targets.length),
+          status: getStatusLabel(targetStatus),
+        }),
+      })
+      if (!ok) return
 
       try {
         await mutateWithAudit(supabaseBrowserClient, {
@@ -483,7 +482,7 @@ const ReturnsTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, table, t, getStatusLabel],
+    [confirm, hasWriteAccess, table, t, getStatusLabel],
   )
 
   /* ---- kolonlar (SSOT) ---- */

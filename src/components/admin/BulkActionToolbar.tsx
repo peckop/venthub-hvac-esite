@@ -32,6 +32,12 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
     const [showPricePanel, setShowPricePanel] = React.useState(false)
     const [priceMode, setPriceMode] = React.useState<'percent' | 'fixed'>('percent')
     const [priceValue, setPriceValue] = React.useState('')
+    /**
+     * Alan doğrulama hatası INLINE — `alert()` yerine (cetvel §4.6):
+     * NN/g: "an error in a form should be reported on the page, next to where it
+     * occurred, so that users can refer to the error message while they fix the problem."
+     */
+    const [priceError, setPriceError] = React.useState<string | null>(null)
 
     if (selectedCount === 0) return null
 
@@ -106,14 +112,20 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                                 <input
                                     type="number"
                                     value={priceValue}
-                                    onChange={(e) => setPriceValue(e.target.value)}
+                                    onChange={(e) => { setPriceValue(e.target.value); setPriceError(null) }}
+                                    aria-invalid={priceError ? true : undefined}
+                                    aria-describedby={priceError ? 'bulk-price-error' : undefined}
                                     placeholder={priceMode === 'percent' ? t('admin.toolbar.placeholderPercent') : t('admin.toolbar.placeholderFixed')}
                                     className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/30"
                                 />
                                 <button
                                     onClick={() => {
                                         const v = parseFloat(priceValue)
-                                        if (isNaN(v)) return alert(t('admin.toolbar.invalidNumberAlert'))
+                                        if (isNaN(v)) {
+                                            setPriceError(t('admin.toolbar.invalidNumberAlert'))
+                                            return
+                                        }
+                                        setPriceError(null)
                                         onPriceAdjust(priceMode, v)
                                         setShowPricePanel(false)
                                         setPriceValue('')
@@ -123,6 +135,15 @@ const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                                     {t('admin.common.apply')}
                                 </button>
                             </div>
+                            {priceError && (
+                                <p
+                                    id="bulk-price-error"
+                                    role="alert"
+                                    className="mt-2 text-xs text-rose-500"
+                                >
+                                    {priceError}
+                                </p>
+                            )}
                             <div className="text-xs text-gray-400 mt-2">
                                 {priceMode === 'percent'
                                     ? t('admin.toolbar.priceHintPercent')

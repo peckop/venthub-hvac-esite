@@ -13,6 +13,7 @@ import AdminToolbar from '../../components/admin/AdminToolbar'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
+import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { listAdminUsers, setUserAdminRole } from '../../config/admin'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useAuth } from '../../hooks/useAuth'
@@ -224,6 +225,7 @@ const UserBulkActionToolbar: React.FC<UserBulkActionToolbarProps> = ({
 
 const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   const { t, lang } = useI18n()
+  const confirm = useConfirm()
   const { user } = useAuth()
   const { role, canWrite } = useRole()
   const hasWriteAccess = canWrite('users')
@@ -347,7 +349,10 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
       }
       const ids = table.selection.selectedIds
       if (ids.length === 0) return
-      if (!window.confirm(t('admin.users.bulk.confirm', { count: String(ids.length), role: t(`roles.${newRole}`) }))) return
+      const ok = await confirm({
+        description: t('admin.users.bulk.confirm', { count: String(ids.length), role: t(`roles.${newRole}`) }),
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'users',
@@ -378,7 +383,7 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [confirm, hasWriteAccess, t, table],
   )
 
   /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */

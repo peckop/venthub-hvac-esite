@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { ConfirmProvider } from '@/components/admin/overlay/ConfirmProvider'
 import { testA11y } from '@/utils/testA11y'
 
 import AdminReturnsPage from '../AdminReturnsPage'
@@ -118,7 +119,11 @@ vi.mock('next/navigation', () => ({
 
 describe('AdminReturnsPage (kit göçü) — integration + a11y', () => {
   it('iade satırlarını render eder + sıralanabilir başlıkta aria-sort taşır', async () => {
-    render(<AdminReturnsPage />)
+    render(
+    <ConfirmProvider>
+      <AdminReturnsPage />
+    </ConfirmProvider>
+  )
     // client fetcher çözülünce satırlar görünür (düzleştirilmiş join alanları)
     await screen.findByText('Ayşe Yılmaz')
     await screen.findByText('Mehmet Demir')
@@ -131,7 +136,11 @@ describe('AdminReturnsPage (kit göçü) — integration + a11y', () => {
   })
 
   it('a11y ihlali yok (axe 0)', async () => {
-    const { container } = render(<AdminReturnsPage />)
+    const { container } = render(
+    <ConfirmProvider>
+      <AdminReturnsPage />
+    </ConfirmProvider>
+  )
     await screen.findByText('Ayşe Yılmaz')
     const results = await testA11y(container)
     expect(results).toHaveNoViolations()

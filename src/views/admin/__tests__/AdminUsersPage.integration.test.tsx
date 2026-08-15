@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { ConfirmProvider } from '@/components/admin/overlay/ConfirmProvider'
 import { testA11y } from '@/utils/testA11y'
 
 import AdminUsersPage from '../AdminUsersPage'
@@ -91,7 +92,11 @@ vi.mock('next/navigation', () => ({
 
 describe('AdminUsersPage (kit göçü) — integration + a11y', () => {
   it('admin kullanıcılarını render eder + sıralanabilir başlıkta aria-sort taşır', async () => {
-    render(<AdminUsersPage />)
+    render(
+    <ConfirmProvider>
+      <AdminUsersPage />
+    </ConfirmProvider>
+  )
     // admins-tab fetcher çözülünce satırlar görünür
     await screen.findByText('admin@venthub.com')
     await screen.findByText('super@venthub.com')
@@ -102,7 +107,11 @@ describe('AdminUsersPage (kit göçü) — integration + a11y', () => {
   })
 
   it('"Tümü" sekmesine geçince user_profiles kaynağını yükler', async () => {
-    render(<AdminUsersPage />)
+    render(
+    <ConfirmProvider>
+      <AdminUsersPage />
+    </ConfirmProvider>
+  )
     await screen.findByText('admin@venthub.com')
 
     fireEvent.click(screen.getByText('admin.users.tabs.all'))
@@ -111,7 +120,11 @@ describe('AdminUsersPage (kit göçü) — integration + a11y', () => {
   })
 
   it('a11y ihlali yok (axe 0)', async () => {
-    const { container } = render(<AdminUsersPage />)
+    const { container } = render(
+    <ConfirmProvider>
+      <AdminUsersPage />
+    </ConfirmProvider>
+  )
     await screen.findByText('admin@venthub.com')
     const results = await testA11y(container)
     expect(results).toHaveNoViolations()

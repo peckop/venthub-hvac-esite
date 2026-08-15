@@ -10,6 +10,7 @@ import { Toaster } from 'sonner'
 import AccessDenied from '../../components/admin/AccessDenied'
 import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
 import CommandPalette from '../../components/admin/CommandPalette'
+import { ConfirmProvider } from '../../components/admin/overlay/ConfirmProvider'
 import { AdminMobileNav, AdminSidebar } from '../../components/admin/shell/AdminSidebar'
 import { navCookieName } from '../../components/admin/shell/navCookie'
 import { isAdminByEmail } from '../../config/admin'
@@ -107,6 +108,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   }
 
   return (
+    /*
+      ConfirmProvider kabukta TEK bir onay yüzeyi mount eder; sayfalar `useConfirm()`
+      ile imperatif olarak çağırır. Bu, `window.confirm`'ün yerini birebir alır
+      (cetvel §4.7) — native kutu stilsizdi, i18n taşımıyordu ve mobilde
+      "bu site tekrar sormasın" ile kalıcı susturulup sessiz veri kaybı üretebiliyordu.
+    */
+    <ConfirmProvider>
     <div className="min-h-svh bg-surface-deep font-sans text-white">
       {/*
         SC 2.4.1 Bypass Blocks (Level A): kalıcı sol nav "tekrarlanan blok"tur;
@@ -274,6 +282,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       */}
       <Toaster richColors position="top-right" />
     </div>
+    </ConfirmProvider>
   )
 }
 

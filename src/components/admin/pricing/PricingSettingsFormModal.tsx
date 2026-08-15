@@ -19,6 +19,7 @@ import {
   adminInputClass,
   adminSettingsLabelClass,
 } from '../../../utils/adminUi'
+import { useConfirm } from '../overlay/ConfirmProvider'
 
 // --- Şema + tip + form-varsayılanı (SSOT bu modülde; view bu tipi/const'u import eder) ---
 // UYARI: bu değerler YALNIZ formun başlangıç değerleridir — motor/servislere (lib/services/pricing.service.ts) BAĞLANMAZ.
@@ -84,6 +85,7 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
   onSuccess,
 }) => {
   const { t } = useI18n()
+  const confirm = useConfirm()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('pricing')
   const [saving, setSaving] = useState(false)
@@ -101,14 +103,23 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
     }
   }, [open, initialValues, form])
 
-  const handleClose = () => {
-    if (form.formState.isDirty) {
-      if (window.confirm(t('admin.pricing.settings.unsavedChangesConfirm'))) {
-        onOpenChange(false)
-      }
-    } else {
+  /**
+   * Kirli-form guard'i — window.confirm yerine ConfirmDialog (cetvel §4.7).
+   * Kapatma AKISI DEGISTI: eskiden confirm senkron blokluyordu; artik kapatma
+   * ISTEGI once yakalanir, onay beklenir, ancak onaylanirsa gercekten kapatilir.
+   * Degisiklikleri atmak GERI ALINAMAZ -> tone:'danger'.
+   */
+  const handleClose = async () => {
+    if (!form.formState.isDirty) {
       onOpenChange(false)
+      return
     }
+    const ok = await confirm({
+      description: t('admin.pricing.settings.unsavedChangesConfirm'),
+      confirmLabel: t('admin.confirm.discardChanges'),
+      tone: 'danger',
+    })
+    if (ok) onOpenChange(false)
   }
 
   const handleOpenChange = (openVal: boolean) => {
@@ -194,7 +205,9 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-90vh">
+        <Dialog.Content
+          // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
+          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-90vh">
           <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
             <div>
               <Dialog.Title className="text-xl font-bold text-white tracking-tight">

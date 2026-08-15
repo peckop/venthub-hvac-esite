@@ -18,6 +18,7 @@ import type { AdminColumn } from '../../components/admin/data-table/types'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import ExportMenu from '../../components/admin/ExportMenu'
 import OrderFormModal from '../../components/admin/orders/OrderFormModal'
+import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { formatDateTime } from '../../i18n/datetime'
@@ -498,6 +499,7 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
 
 const OrdersTableBody: React.FC = () => {
   const { t, lang } = useI18n()
+  const confirm = useConfirm()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('orders')
 
@@ -814,7 +816,11 @@ const OrdersTableBody: React.FC = () => {
     const selected = table.selection.selectedIds
     const targets = table.rows.filter((r) => selected.includes(r.id) && r.status === 'shipped').map((r) => r.id)
     if (targets.length === 0) return
-    if (!window.confirm(t('admin.orders.bulk.confirmCancelShipping', { count: String(targets.length) }))) return
+    const ok = await confirm({
+      description: t('admin.orders.bulk.confirmCancelShipping', { count: String(targets.length) }),
+      tone: 'danger',
+    })
+    if (!ok) return
     try {
       await mutateWithAudit(supabaseBrowserClient, {
         resource: 'orders',
@@ -846,7 +852,7 @@ const OrdersTableBody: React.FC = () => {
           : t('admin.orders.bulk.cancelFailed'),
       )
     }
-  }, [hasWriteAccess, t, table])
+  }, [confirm, hasWriteAccess, t, table])
 
   /* ---- date-range picker ↔ filters.from/to ---- */
   const dateRange = useMemo<DateRange | undefined>(() => {

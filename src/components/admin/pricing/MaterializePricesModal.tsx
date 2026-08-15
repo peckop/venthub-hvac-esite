@@ -163,7 +163,9 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
     <Dialog.Root open={open} onOpenChange={(next) => (next ? undefined : handleClose())}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-admin-modal">
+        <Dialog.Content
+          // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
+          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-admin-modal">
           <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
             <div>
               <Dialog.Title className="text-xl font-bold text-white tracking-tight">

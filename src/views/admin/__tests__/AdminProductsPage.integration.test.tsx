@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { ConfirmProvider } from '@/components/admin/overlay/ConfirmProvider'
 import { testA11y } from '@/utils/testA11y'
 
 import AdminProductsPage from '../AdminProductsPage'
@@ -143,7 +144,11 @@ vi.mock('next/navigation', () => ({
 
 describe('AdminProductsPage (kit göçü) — integration + a11y', () => {
   it('ürünleri render eder + varsayılan sıralı başlıkta aria-sort taşır', async () => {
-    render(<AdminProductsPage />)
+    render(
+    <ConfirmProvider>
+      <AdminProductsPage />
+    </ConfirmProvider>
+  )
     // server fetcher (terim-yok) çözülünce ürün adı satırları görünür
     await screen.findByText('Kanal Tipi Fan')
     await screen.findByText('Hız Kontrol Cihazı')
@@ -156,7 +161,11 @@ describe('AdminProductsPage (kit göçü) — integration + a11y', () => {
   })
 
   it('a11y ihlali yok (axe 0)', async () => {
-    const { container } = render(<AdminProductsPage />)
+    const { container } = render(
+    <ConfirmProvider>
+      <AdminProductsPage />
+    </ConfirmProvider>
+  )
     await screen.findByText('Kanal Tipi Fan')
     const results = await testA11y(container)
     expect(results).toHaveNoViolations()
