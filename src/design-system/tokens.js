@@ -3,12 +3,24 @@
  * RENKLER BURADA DEĞİL — src/index.css'te CSS variable olarak tanımlı.
  */
 
+/**
+ * Katman ölçeği — SSOT. Tek tek değiştirilmez; biri değişirse hepsi gözden geçirilir
+ * (Bootstrap 5.3: "should you change one, you likely need to change them all").
+ * Cetvel: docs/standards/admin-design-standard.md §4.9
+ *
+ * `popover` neden `modal`'ın ÜSTÜNDE? Radix menü/popover içeriği `body`'ye portal
+ * ediliyor; `dropdown` (50) < `modal` (100) olduğu sürece bir modal içinden açılan
+ * dropdown modalın ARKASINDA render olur. Carbon aynı gerekçeyle dropdown'ı modalın
+ * üstüne alır: "Dropdowns that render outside of a Modal should render above a Modal."
+ */
 export const zIndex = {
   'raised':   '10',
-  'dropdown': '50',
-  'sticky':   '90',
-  'modal':    '100',
-  'toast':    '9999',
+  'dropdown': '50',    // LEGACY — yeni kodda `popover` kullan (ratchet ile eritilecek)
+  'sticky':   '90',    // kabuk başlığı / yapışkan toolbar
+  'backdrop': '95',    // modal perdesi
+  'modal':    '100',   // modal · drawer · dialog
+  'popover':  '110',   // menü · popover · dropdown · tooltip — modalın ÜSTÜNDE
+  'toast':    '9999',  // bildirim (Bootstrap/Atlassian/MUI: toast > modal)
 };
 
 export const maxWidth = {
@@ -35,6 +47,15 @@ export const borderRadius = {
   'hvac-xl':  '2rem',      // 32px
   'hvac-2xl': '2.5rem',    // 40px
   'hvac-3xl': '3rem',      // 48px
+  /**
+   * Admin ölçeği — vitrin `hvac-*` ölçeği admin için fazla yuvarlak.
+   * Kurumsal yakınsama (Radix / Tailwind / shadcn / Polaris): kontrol 4-8px,
+   * kart 8-12px, modal 12-16px; 20px+ hiçbir sistemde standart bileşene atanmamış.
+   * Cetvel: docs/standards/admin-design-standard.md §3.5
+   */
+  'admin-sm': '0.375rem',  // 6px  — buton · input · chip · badge
+  'admin-md': '0.5rem',    // 8px  — kart · panel
+  'admin-lg': '0.75rem',   // 12px — modal · dialog · geniş yüzey
 };
 
 export const fontSize = {
@@ -91,6 +112,9 @@ export const boxShadow = {
 };
 
 export const height = {
+  // Admin kabuk başlığı — kurumsal yakınsamada yalnız iki değer var: 48px ve 56px
+  // (Carbon 48 · Atlassian 48/56 · Polaris 56). Cetvel §2.4
+  'admin-header': '3.5rem',  // 56px
   'hvac-input':   '40px',   // 5×8
   'hvac-thumb':   '72px',   // 9×8
   'hvac-card':    '300px',  
@@ -144,6 +168,13 @@ export const minHeight = {
 };
 
 export const maxHeight = {
+  /**
+   * Admin modal tavanı. `svh` çünkü `vh` ≡ `lvh` — mobil araç çubuğu görünürken
+   * `70vh`/`90vh` ile boyutlanan modal viewport'u taşar ve ortalanmış `fixed`
+   * kutunun ÜST kısmı erişilemez hâle gelir (2026-08-15 taraması: 5 modalda ölçüldü).
+   * Cetvel: docs/standards/admin-design-standard.md §2.2, §4.10
+   */
+  'admin-modal':  'calc(100svh - 2rem)',
   'hvac-menu':    '300px',
   'hvac-panel':   '480px',  // 60×8
   'hvac-modal':   '85vh',
@@ -164,6 +195,14 @@ export const maxHeight = {
 };
 
 export const width = {
+  /**
+   * Admin kabuk ölçüleri — kaynak yakınsaması (Carbon 256/48 · shadcn 256/288/48 ·
+   * Polaris 240 · Atlassian 320 · M3 rail 80-96dp / drawer 360dp).
+   * Cetvel: docs/standards/admin-design-standard.md §2.4
+   */
+  'admin-nav':    '16rem',  // 256px — genişletilmiş sol nav
+  'admin-rail':   '3rem',   // 48px  — ikon rayı (collapsed)
+  'admin-drawer': '18rem',  // 288px — mobil overlay drawer
   'hvac-menu':    '360px',  // 45×8 (toast, küçük panel)
   'hvac-modal':   '480px',  // 60×8
   'hvac-mega-sm': '500px',  

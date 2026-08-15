@@ -20,6 +20,7 @@ export const menu = {
       errorGroups: 'Error Groups',
       products: 'Products',
       categories: 'Categories',
+      categoryBuilder: 'Content Builder',
       logistics: 'Shipping & Logistics',
       settings: 'Settings',
       pricing: 'Pricing Settings',

@@ -20,6 +20,7 @@ export const menu = {
       errorGroups: 'Hata Grupları',
       products: 'Ürünler',
       categories: 'Kategoriler',
+      categoryBuilder: 'İçerik Düzenleyici',
       logistics: 'Kargo & Lojistik',
       settings: 'Ayarlar',
       pricing: 'Fiyat Ayarları',

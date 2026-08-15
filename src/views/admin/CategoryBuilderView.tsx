@@ -266,7 +266,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
 
   if (loading) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-surface-deep space-y-6">
+      <div className="min-h-400px flex flex-col items-center justify-center bg-surface-deep space-y-6">
         <div className="w-12 h-12 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin" />
         <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-loose animate-pulse">
           {t('admin.categories.studioInitialization')}
@@ -276,9 +276,17 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
   }
 
   return (
-    <div className="h-screen flex flex-col bg-surface-darkest text-slate-200 overflow-hidden font-sans">
-      {/* --- PLATINUM HEADER --- */}
-      <header className="h-16 border-b border-white/5 flex items-center justify-between px-6 bg-surface-deep z-50">
+    /*
+      Bu görünüm KENDİ tam-ekran kabuğunu kurmaz — `AdminLayout`'un içine oturur.
+      Eskiden burada `h-screen` + kendi `h-16` başlığı + `overflow-hidden` vardı;
+      dış kabuk zaten 100vh olduğu için toplam ~190px taşıyor ve dış `overflow-hidden`
+      bunu kesiyordu (iki başlık üst üste, iki dikey scrollbar, builder'ın alt kısmı
+      hiç görünmüyordu). Denetim 2026-08-15 / D1.
+      Cetvel: docs/standards/admin-design-standard.md §2.1
+    */
+    <div className="flex flex-col bg-surface-darkest text-slate-200 font-sans">
+      {/* Sayfa-içi araç çubuğu — kabuk başlığının ALTINA yapışır (§2.7) */}
+      <header className="sticky top-admin-header z-raised border-b border-white/5 flex items-center justify-between px-6 py-3 bg-surface-deep">
         <div className="flex items-center gap-6">
           <button onClick={handleBack} type="button" className="group flex items-center gap-2 text-slate-500 hover:text-white transition-colors">
             <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors">
@@ -318,10 +326,11 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
-        
+      {/* İç scroll konteyneri YOK — belge kaydırır (§2.1) */}
+      <div className="flex-1 flex">
+
         {/* --- CENTER: MAIN EDITOR (Studio Area) --- */}
-        <main className="flex-1 overflow-y-auto bg-surface-darkest custom-scrollbar relative">
+        <main className="flex-1 min-w-0 bg-surface-darkest relative">
             <form id="category-builder-form" onSubmit={form.handleSubmit(onSubmit)} className={`${adminContentMaxWidthClass} mx-auto py-12 px-6`}>
                 <div className="mb-12 flex items-center justify-between">
                     <div>

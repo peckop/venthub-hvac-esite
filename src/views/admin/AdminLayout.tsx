@@ -1,198 +1,278 @@
 'use client';
 
-import {
-  ArrowRightLeft,
-  BarChart3,
-  Calculator,
-  Coins,
-  FileText,
-  Menu,
-  Package,
-  PackageSearch,
-  Percent,
-  Settings,
-  ShoppingCart,
-  Tags,
-  Ticket,
-  Truck,
-  Undo2,
-  Users,
-  Webhook,
-  X
-} from 'lucide-react'
+import { ChevronRight, Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import type { Route } from 'next'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import React, { useEffect,useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Toaster } from 'sonner'
 
 import AccessDenied from '../../components/admin/AccessDenied'
 import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
 import CommandPalette from '../../components/admin/CommandPalette'
+import { AdminMobileNav, AdminSidebar } from '../../components/admin/shell/AdminSidebar'
+import { navCookieName } from '../../components/admin/shell/navCookie'
 import { isAdminByEmail } from '../../config/admin'
+import { buildBreadcrumbTrail } from '../../config/admin-resources'
 import { useAuth } from '../../hooks/useAuth'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useRole } from '../../hooks/useRole'
-// import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import { useTenant } from '../../hooks/useTenant'
 import { useI18n } from '../../i18n/I18nProvider'
 import { Routes } from '../../utils/routes';
 
-const globalStyles = `
-  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-  .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(34, 211, 238, 0.1); border-radius: 10px; }
-`
+/**
+ * ADMIN KABUĞU (shell)
+ * Cetvel: docs/standards/admin-design-standard.md §2
+ *
+ * DEĞİŞMEZ — kök scroll konteyneri DEĞİLDİR. Belge scroll eder, başlık `sticky`.
+ * `h-screen` / `100vh` / `overflow-hidden` bu zincirde YASAK: belge kaydırıcısının
+ * ayrıcalıkları (mobil URL çubuğu gizleme, Space ile sayfa atlama, scroll
+ * restoration, iOS başa dönme) iç konteynere devredilemez; ayrıca `overflow:hidden`
+ * WCAG F69'un adlandırdığı kırpılma sebebidir ve %400 zoom'da (SC 1.4.10, Level AA)
+ * kaçış scroll'unu yok eder.
+ *
+ * Yükseklik birimi `svh`: `vh` ≡ `lvh` olduğu için `100vh` "araç çubuğu gizliyken"
+ * demektir ve daima taşar; `dvh` ise scroll sırasında yeniden düzen üretir (MDN).
+ */
 
-const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+const NAV_COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 gün
+
+/** Marka adı çevrilmez — sözlüğe girmez, JSX literali de olmaz. */
+const BRAND_NAME = 'VentHub'
+
+interface AdminLayoutProps {
+  children?: React.ReactNode
+  /** Sunucuda çerezden okunan başlangıç değeri — SSR'da doğru render için. */
+  defaultNavCollapsed?: boolean
+}
+
+const AdminLayout: React.FC<AdminLayoutProps> = ({
+  children,
+  defaultNavCollapsed = false
+}) => {
   const pathname = usePathname()
   const { user, loading: authLoading } = useAuth()
-  const { role, canAccess, loading: roleLoading } = useRole()
+  const { canAccess, loading: roleLoading } = useRole()
   const router = useRouter()
   const { t } = useI18n()
-  const brandNameVent = 'Vent'
-  const brandNameHub = 'Hub'
+  const tenant = useTenant()
+  // Vitrin rotası dile göre çözülür (kural 7: manuel `/tr/` öneki yasak).
+  const localizedRoutes = useLocalizedRoutes()
+  const siteHomeHref = localizedRoutes.home()
+
+  const [navCollapsed, setNavCollapsed] = useState(defaultNavCollapsed)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const loading = authLoading || roleLoading
-
-  // 1. Email Fallback Check (Immediate bypass)
   const isEmailAdmin = user?.email ? isAdminByEmail(user.email) : false
 
   useEffect(() => {
-    // Wait for both auth and role to load, but email bypass can happen
     if (loading) return
+    if (!user) router.replace('/' as Route)
+  }, [loading, user, router])
 
-    // If no user at all, redirect to home
-    if (!user) {
-      router.replace('/' as import('next').Route)
-      return
-    }
+  /**
+   * Tercih ÇEREZDE saklanır, localStorage'da değil: localStorage sunucuda okunamaz,
+   * dolayısıyla SSR daima yanlış varsayılanı render eder ve ilk boyada menü zıplar.
+   * Çerez tenant-scoped (kural 12) — düz `path=/` çerezi kiracılar arası sızar.
+   */
+  const toggleNav = useCallback(() => {
+    setNavCollapsed((prev) => {
+      const next = !prev
+      if (typeof document !== 'undefined') {
+        document.cookie =
+          `${navCookieName(tenant.id)}=${next ? '1' : '0'}` +
+          `; path=/admin; max-age=${NAV_COOKIE_MAX_AGE}; SameSite=Lax`
+      }
+      return next
+    })
+  }, [tenant.id])
 
-    // Email admin'ler her zaman erişir
-    if (isEmailAdmin) return
-
-    // Check if user has admin role access
-    // Next.js 15+ navigation senkronizasyonu için bir kez daha rol kontrolü
-    const hasAccess = canAccess(pathname ?? '')
-    if (!hasAccess && role !== undefined) {
-      // Sadece rol bilgisi kesinleşmişse (undefined değilse) kararı uygula
-      // router.replace('/' as import('next').Route) // AccessDenied zaten render ediliyor
-    }
-  }, [loading, user, pathname, canAccess, router, isEmailAdmin, role])
+  const breadcrumb = React.useMemo(
+    () => buildBreadcrumbTrail(pathname ?? ''),
+    [pathname]
+  )
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-surface-deep">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400" />
+      <div className="flex min-h-svh items-center justify-center bg-surface-deep">
+        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-cyan-400" />
       </div>
     )
   }
 
-  // Final check for render
   if (!isEmailAdmin && !canAccess(pathname ?? '')) {
     return <AccessDenied />
   }
 
-  const navGroups = [
-    { label: t('admin.menu.groupMain'), items: [{ href: '/admin', label: t('admin.menu.dashboard'), icon: BarChart3 }] },
-    { label: t('admin.menu.groupSales'), items: [
-        { href: '/admin/orders', label: t('admin.menu.orders'), icon: ShoppingCart },
-        { href: '/admin/logistics', label: t('admin.menu.logistics'), icon: Truck },
-        { href: '/admin/returns', label: t('admin.menu.returns'), icon: Undo2 },
-        { href: '/admin/coupons', label: t('admin.menu.coupons'), icon: Ticket },
-    ]},
-    { label: t('admin.menu.groupCatalog'), items: [
-        { href: '/admin/products', label: t('admin.menu.products'), icon: Package },
-        { href: '/admin/categories', label: t('admin.menu.categories'), icon: Tags },
-    ]},
-    { label: t('admin.menu.groupPricing'), items: [
-        { href: '/admin/pricing', label: t('admin.menu.pricing'), icon: Coins },
-        { href: '/admin/pricing/rules', label: t('admin.menu.pricingRules'), icon: Percent },
-        { href: '/admin/pricing/preview', label: t('admin.menu.pricingPreview'), icon: Calculator },
-    ]},
-    { label: t('admin.menu.groupStock'), items: [
-        { href: '/admin/inventory', label: t('admin.menu.inventory'), icon: PackageSearch },
-        { href: '/admin/movements', label: t('admin.menu.movements'), icon: ArrowRightLeft },
-    ]},
-    { label: t('admin.menu.groupSystem'), items: [
-        { href: '/admin/users', label: t('admin.menu.users'), icon: Users },
-        { href: '/admin/settings', label: t('admin.menu.settings'), icon: Settings },
-        { href: '/admin/audit-logs', label: t('admin.menu.logs'), icon: FileText },
-    ]},
-  ]
-
   return (
-    <div className="h-screen flex flex-col font-sans bg-surface-deep text-slate-200 overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute -top-10% -left-10% w-2/5 h-2/5 bg-primary-navy/20 blur-120 rounded-full opacity-50" />
-        <div className="absolute top-20% -right-10% w-3/10 h-1/2 bg-secondary-blue/10 blur-100 rounded-full opacity-30" />
-      </div>
+    <div className="min-h-svh bg-surface-deep font-sans text-white">
+      {/*
+        SC 2.4.1 Bypass Blocks (Level A): kalıcı sol nav "tekrarlanan blok"tur;
+        atlama yolunu sunmak kabuğun sorumluluğudur (§2.6).
+      */}
+      <a
+        href="#admin-main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-toast
+          focus:rounded-admin-sm focus:bg-cyan-400 focus:px-4 focus:py-2 focus:text-sm
+          focus:font-medium focus:text-surface-deep"
+      >
+        {t('admin.a11y.skipToContent')}
+      </a>
 
-      <header className="h-16 flex-none border-b border-white/5 bg-surface-deep/60 backdrop-blur-xl relative z-50 px-4 md:px-8 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            className="p-2 text-cyan-400 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-transform active:scale-95"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
+      <header
+        className="sticky top-0 z-sticky flex h-admin-header items-center gap-3
+          border-b border-white/10 bg-surface-deep/95 px-3 backdrop-blur md:px-4"
+      >
+        {/*
+          Mobil tetikleyici — YALNIZ CSS breakpoint'i (`md:hidden`). JS tarafında
+          ikinci bir breakpoint sayısı yok; böylece §2.4'ün "JS ve CSS aynı sayı
+          olmak zorunda" değişmezi yapısal olarak sağlanıyor ve hydration
+          uyuşmazlığı imkânsız hâle geliyor.
+        */}
+        <button
+          type="button"
+          onClick={() => setMobileNavOpen(true)}
+          aria-label={t('admin.a11y.openNavigation')}
+          aria-expanded={mobileNavOpen}
+          aria-controls="admin-mobile-nav"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-admin-sm
+            text-white/70 transition-colors hover:bg-white/10 hover:text-white
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 md:hidden"
+        >
+          <Menu size={18} aria-hidden="true" />
+        </button>
+
+        {/* Masaüstü tetikleyici — ikon rayı ↔ genişletilmiş */}
+        <button
+          type="button"
+          onClick={toggleNav}
+          aria-label={
+            navCollapsed
+              ? t('admin.a11y.expandNavigation')
+              : t('admin.a11y.collapseNavigation')
+          }
+          aria-expanded={!navCollapsed}
+          aria-controls="admin-desktop-nav"
+          className="hidden h-9 w-9 items-center justify-center rounded-admin-sm
+            text-white/70 transition-colors hover:bg-white/10 hover:text-white
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 md:inline-flex"
+        >
+          {navCollapsed ? (
+            <PanelLeftOpen size={18} aria-hidden="true" />
+          ) : (
+            <PanelLeftClose size={18} aria-hidden="true" />
+          )}
+        </button>
+
+        <Link
+          href={Routes.admin.dashboard()}
+          className="rounded-admin-sm px-1 text-base font-semibold text-white
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+        >
+          {BRAND_NAME}
+        </Link>
+
+        {breadcrumb.length >= 2 && (
+          <nav aria-label={t('admin.a11y.breadcrumb')} className="hidden min-w-0 md:block">
+            <ol className="flex items-center gap-1 text-sm text-white/50">
+              {breadcrumb.map((item, index) => {
+                const isLast = index === breadcrumb.length - 1
+                return (
+                  <li key={item.key} className="flex min-w-0 items-center gap-1">
+                    <ChevronRight size={14} aria-hidden="true" className="shrink-0 opacity-50" />
+                    {isLast ? (
+                      <span aria-current="page" className="truncate text-white/80">
+                        {t(item.labelKey)}
+                      </span>
+                    ) : (
+                      <Link
+                        href={item.route as Route}
+                        className="truncate rounded-admin-sm transition-colors hover:text-white
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+                      >
+                        {t(item.labelKey)}
+                      </Link>
+                    )}
+                  </li>
+                )
+              })}
+            </ol>
+          </nav>
+        )}
+
+        <div className="ml-auto flex items-center gap-2">
+          {/*
+            REGRESYON ONARIMI — "Siteye dön" linki eskiden `MainLayout`'un admin
+            çubuğundaydı; o çubuk kabuk sadeleştirmesinde kaldırılınca link de
+            kayboldu ve admin'den vitrine dönmenin BAŞKA yolu kalmadı. Artık
+            kabuğun kalıcı parçası ve §5'teki işlev envanteri testiyle kilitli.
+          */}
+          <Link
+            href={siteHomeHref}
+            className="hidden rounded-admin-sm border border-white/10 px-3 py-1.5 text-xs
+              font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 sm:inline-flex"
           >
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-          <Link href={Routes.admin.dashboard()} className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center">
-              <Webhook size={20} className="text-cyan-400" />
-            </div>
-            <h1 className="text-lg font-bold text-white">{brandNameVent}<span className="text-slate-500">{brandNameHub}</span></h1>
+            {t('header.adminBar.backToSite')}
           </Link>
-        </div>
-        <div className="flex items-center gap-4">
           <AdminRealtimeNotifications />
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-white/10 flex items-center justify-center text-cyan-400 font-bold">
+          <div
+            aria-label={t('admin.a11y.userMenu')}
+            className="flex h-8 w-8 items-center justify-center rounded-full
+              border border-white/10 bg-white/5 text-sm font-medium text-cyan-300"
+          >
             {(user?.user_metadata?.first_name?.[0] || 'A').toUpperCase()}
           </div>
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden relative z-10">
-        {/* Sidebar KatmanÄ± */}
-        <aside className={`
-          absolute lg:relative inset-y-0 left-0 z-40 w-280px bg-surface-deep border-r border-white/5 transition-colors duration-300 ease-in-out
-          ${sidebarOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}
-        `}>
-          <nav className="h-full overflow-y-auto p-4 space-y-8 py-8 custom-scrollbar">
-            {navGroups.map((group, gi) => (
-              <div key={gi}>
-                <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 px-3 opacity-60">{group.label}</h3>
-                <div className="space-y-1">
-                  {group.items.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href as import('next').Route}
-                      className={`flex items-center gap-3 px-3 py-2.5 text-sm font-bold transition-colors rounded-xl ${
-                        pathname === item.href ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                      }`}
-                      onClick={() => window.innerWidth < 1024 && setSidebarOpen(false)}
-                    >
-                      <item.icon size={18} />
-                      <span className="truncate">{item.label}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </nav>
-        </aside>
+      <div className="flex">
+        <div id="admin-desktop-nav">
+          <AdminSidebar
+            pathname={pathname ?? ''}
+            collapsed={navCollapsed}
+            canAccess={canAccess}
+          />
+        </div>
 
-        {/* Ana Ä°Ã§erik KatmanÄ± */}
-        <main className="flex-1 overflow-y-auto relative custom-scrollbar flex flex-col bg-white/2">
-            <div className="flex-1 w-full max-w-page mx-auto p-4 md:p-8">
-                {children}
-            </div>
-            <footer className="px-8 py-6 text-slate-600 text-xs font-bold uppercase tracking-widest flex justify-between opacity-50 border-t border-white/5">
-                <span>{t('admin.common.copyright')}</span>
-                <span className="text-cyan-400/40">{t('admin.common.secureNode')}</span>
-            </footer>
+        <main id="admin-main" className="min-w-0 flex-1">
+          <div className="mx-auto w-full max-w-page px-4 py-6 md:px-6">{children}</div>
+
+          {/*
+            REGRESYON ONARIMI — admin footer'ı (telif + güvenli-düğüm rozeti) kabuk
+            yeniden yazımında düşmüştü. `<main>` içinde duruyor ki sidebar'ın altına
+            değil, içerik sütununun altına hizalansın.
+          */}
+          <footer
+            className="mx-auto flex w-full max-w-page items-center justify-between gap-4
+              border-t border-white/10 px-4 py-4 text-xs text-white/40 md:px-6"
+          >
+            <span>{t('admin.common.copyright')}</span>
+            <span className="text-cyan-400/50">{t('admin.common.secureNode')}</span>
+          </footer>
         </main>
       </div>
-      
+
+      <div id="admin-mobile-nav">
+        <AdminMobileNav
+          open={mobileNavOpen}
+          onOpenChange={setMobileNavOpen}
+          pathname={pathname ?? ''}
+          canAccess={canAccess}
+        />
+      </div>
+
       <CommandPalette />
-      
-      <style jsx global>{globalStyles}</style>
+
+      {/*
+        D11 — 2026-08-15 denetimi: `<Toaster/>` admin ağacında HİÇ mount edilmiyordu
+        (`MainLayout`'un isAdmin dalı Toaster bloğundan ÖNCE erken dönüyordu), yani
+        127 `toast.*` çağrısı sessizce ölüydü ve geri bildirim `alert()`'e kaçmıştı.
+        Kabuk artık kendi Toaster'ını taşır. Cetvel §4.6.
+      */}
+      <Toaster richColors position="top-right" />
     </div>
   )
 }
