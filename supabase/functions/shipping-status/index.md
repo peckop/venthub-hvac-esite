@@ -2,37 +2,46 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-status\index.ts
-skeleton_hash: 3b569cae7979ec9d
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-status\index.ts
+skeleton_hash: c75e333122af75fd
 entity_hashes:
   func:jsonResponse: 60e54d50747b3229
   func:shipping-status_handler: d099b53accac2970
-  overview: 695bc1e855ae9226
-generated_at: 2026-08-13T07:40:32Z
+  overview: 41fd0f2fe1f6fb98
+generated_at: 2026-08-15T07:34:14Z
 ---
 
 ## Genel Bakış
-Bu modül, kargo durumu sorgularını karşılayan bir Supabase edge function'dır. Gelen HTTP isteklerini işleyerek yapılandırılmış JSON yanıtları döndürür ve yanıt oluşturımında tutarlılık sağlamak için bir yardımcı işlev kullanır.
+Bu modül, kargo durumu sorgularını işleyen bir Supabase edge function olarak tasarlanmıştır. Gelen HTTP isteklerini alır, işler ve istemciye standart JSON formatında yanıt döndürür. Yanıt oluşturumunda tutarlılık için yardımcı bir fonksiyon kullanır.
 
 ## Fonksiyon Grupları
-### İstek İşleyicisi
-Modülün ana giriş noktasıdır ve gelen kargo durumu isteklerini alarak işler, nihai yanıtı istemciye iletir.
+### Ana İstek İşleyicisi
+Modülün ana giriş noktasıdır ve gelen kargo durumu isteklerini işleyerek nihai yanıtı üretir.
 - shipping-status_handler
 
-### Yanıt Oluşturma Yardımcıları
-HTTP yanıtlarını JSON formatında standartlaştırmak için kullanılan yardımcı işlevi içerir.
+### Yanıt Yardımcıları
+HTTP yanıtlarını JSON formatında paketlemek için kullanılan yardımcı fonksiyonları içerir.
 - jsonResponse
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, kargo durumu sorgularını işleyen bir Supabase Edge Function olarak tasarlanmıştır.
 
-[Aksiyom 1]: Eğer `shipping-status_handler` fonksiyonuna geçilen `req` parametresi geçerli bir `Request` nesnesi değilse, fonksiyon beklenmeyen davranış sergiler veya hata fırlatır.
+Bu modül, Supabase Edge Function平台上 kargo durumu sorgularını işleyen bir HTTP istek handler'ıdır.
 
-[Aksiyom 2]: Eğer `jsonResponse` fonksiyonuna geçilen `init` parametresi geçerli bir `ResponseInit` nesnesi değilse, yanıt oluşturulamaz.
+**[Aksiyom 1]:** Eğer `req` parametresi geçerli bir `Request` nesnesi değilse veya `null/undefined` ise, `shipping-status_handler` isteği işleyemez ve fonksiyon hata ile sonuçlanır.
 
-[Aksiyom 3]: Eğer `shipping-status_handler` tarafından üretilen yanıt `jsonResponse` aracılığı ile döndürülmezse, istemciye standart JSON formatında yanıt ulaştırılamaz.
+**[Aksiyom 2]:** Eğer `jsonResponse` fonksiyonuna `body` parametresi olarak JSON-serializable olmayan bir değer verilirse, HTTP yanıt gövdesi oluşturulamaz ve istemci geçersiz bir yanıt alır.
+
+**[Aksiyom 3]:** Eğer `shipping-status_handler` tarafından döndürülen `Response` nesnesi (`jsonResponse` veya doğrudan `Response` constructor ile) oluşturulamazsa, Supabase Edge Function runtime'ıvarsayılan bir hata yanıtı üretir.
+
+**[Aksiyom 4]:** Eğer `jsonResponse` fonksiyonu çağrılmazsa ve handler doğrudan `new Response()` kullanarak JSON yanıtı döndürmeye çalışırsa, yanıt formatı tutarsız olur ve istemci tarafında parse hataları oluşabilir.
+
+**[Aksiyom 5]:** Eğer `ResponseInit` parametresi (`init`) geçerli HTTP header veya status code içermiyorsa, döndürülen yanıt varsayılan `200 OK` durum kodu ile gönderilir.
+
+---
+
+> **Not:** Fonksiyon gövdeleri sağlandığında (örn: request body parsing, auth kontrolü, veritabanı sorgusu mantığı), aksiyomlar genişletilebilir ve veri doğrulama eşikleri, yetkilendirme gereksinimleri gibi domain-specific kurallar eklenebilir.
 
 ---
 
@@ -56,36 +65,35 @@ Bu modül, kargo durumu sorgularını işleyen bir Supabase Edge Function olarak
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: shipping-status/index.ts::jsonResponse
-- **params**: (body: unknown, init: ResponseInit = {})
-- **ic_degiskenler**:
-  (fonksiyon gövdesinde açıkça tanımlanmış yerel değişken yok)
-- **Dönüş**: Response — JSON içeriği ile HTTP yanıt nesnesi oluşturur ve döndürür.
+### [N1_NASIL] AST Pointers: supabase/functions/shipping-status/index.ts::jsonResponse
+- **params**: `body: unknown` — Döndürülecek JSON verisi, `init: ResponseInit` — Response nesnesi için ek ayarlar (varsayılan: {})
+- **ic_degiskenler**: (yok — parametreler doğrudan kullanılır)
+- **Dönüş**: `Response` — JSON verisini içeren HTTP Response nesnesi
 
-### [N2_NASIL] AST Pointer: shipping-status/index.ts::shipping-status_handler
-- **params**: (req: Request)
+### [N2_NASIL] AST Pointer: supabase/functions/shipping-status/index.ts::shipping-status_handler
+- **params**: `req: Request` — Gelen HTTP isteği nesnesi
 - **ic_degiskenler**:
-  - `SUPABASE_URL` — Deno ortamından alınan Supabase proje URL adresi.
-  - `SERVICE_KEY` — Deno ortamından alınan Supabase servis rolü anahtarı.
-  - `forwarded` — İstemcinin yönlendirme (forwarded-for) IP adresi başlığı değeri.
-  - `ip` — İstemcinin gerçek IP adresi, various başlıklardan çözümlenir.
-  - `key` — IP tabanlı rate limiting için benzersiz anahtar.
-  - `result` — checkRateLimit fonksiyonunun döndüğü sonuç nesnesi, istek izin durumunu içerir.
-  - `rlHeaders` — rateLimitHeaders fonksiyonu tarafından oluşturulan HTTP başlık nesnesi.
-  - `url` — Request URL'sinden oluşturulan URL nesnesi, sorgu parametrelerine erişim sağlar.
-  - `tracking` — Sorgu parametrelerinden alınan kargo takip numarası.
-  - `supabase` — createClient ile oluşturulmuş Supabase istemci nesnesi.
-  - `query` — Supabase veritabanı sorgusu, belirli takip numarasına ait sipariş bilgilerini seçer.
-  - `data` — Supabase sorgusunun başarılı sonucu, sipariş veri nesnesi.
-  - `error` — Supabase sorgusunun hata nesnesi, sorgu başarısız olduğunda dolu olur.
-  - `_e` — Yakalanan genel hata nesnesi, try-catch bloğunda yakalanır.
-- **Dönüş**: Response — Kargo durumu bilgisi veya hata mesajı ile HTTP yanıt nesnesi döndürür.
+  - `SUPABASE_URL` — Ortam değişkeninden alınan Supabase projesi URL'i
+  - `SERVICE_KEY` — Ortam değişkeninden alınan Supabase servis rolü anahtarı
+  - `forwarded` — x-forwarded-for header değerinden istemci IP adreslerini ayırır
+  - `ip` — İstemcinin gerçek IP adresi (birden fazla header'dan deneyerek)
+  - `key` — Rate limiting için benzersiz anahtar (IP adresine göre)
+  - `checkRateLimit` — Dinamik import ile yüklenen rate limiting kontrol fonksiyonu
+  - `rateLimitHeaders` — Dinamik import ile yüklenen rate limiting başlıkları oluşturma fonksiyonu
+  - `url` — İsteğin URL nesnesi, query parametrelerini okumak için
+  - `tracking` — URL'den alınan tracking_number parametresi
+  - `supabase` — Supabase istemcisi (createClient ile oluşturulan)
+  - `query` — Supabase sorgu nesnesi (venthub_orders tablosundan veri çekmek için)
+  - `data` — Sorgu sonucundan gelen sipariş verileri
+  - `error` — Sorgu sonucundan gelen hata nesnesi
+  - `_e` — Try-catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: `Response` — JSON yanıt nesnesi
 
 ---
 

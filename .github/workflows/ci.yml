@@ -2,8 +2,15 @@ name: CI
 
 on:
   pull_request:
+# ⚠️ `push.branches` KASITEN yalnız master.
+# Eskiden `['**']` yazıyordu ve `pull_request` ile BİRLİKTE ateşliyordu: dal push'landığında
+# AYNI commit iki kez test ediliyordu (kontrol listesinde `ci` ve `admin-smoke`'un ikişer
+# görünmesinin sebebi buydu). Repo PRIVATE olduğu için Actions dakikaları ücretli —
+# yani bu, kapsam kazandırmadan faturayı ~2 katına çıkaran saf israftı ve
+# 2026-08-15'te hesabın iş başlatmayı reddetmesine katkı verdi.
+# Kapsam kaybı YOK: dal push'unda `pull_request` koşar, master'da `push` koşar.
   push:
-    branches: ['**']
+    branches: [master]
   workflow_dispatch:
 
 concurrency:

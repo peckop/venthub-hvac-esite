@@ -3,39 +3,62 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\delivery-notification\index.ts
-skeleton_hash: 6a8a5c8b24439021
+skeleton_hash: 5d6b141eed7bcaab
 entity_hashes:
+  func:callerFailure: 86e71a59bf4b25a1
   func:delivery-notification_handler: bbc4a3cdb5561a07
   func:loadTemplate: ca2a7b2c95dee67d
   func:render: 92bef16402e292d5
-  overview: d34e01c15bff1856
-generated_at: 2026-08-14T22:02:42Z
+  overview: dcf4a5dae7d2f50d
+generated_at: 2026-08-15T09:05:02Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase Edge Function olarak sipariş teslimatı tamamlandığında müşteriye otomatik e-posta bildirimi göndermekle yükümlüdür. Sipariş bilgilerini veritabanından çeker, dinamik bir şablonla e-posta içeriğini oluşturur ve harici bir e-posta servisi aracılığıyla mesajı iletir; süreç boyunca hata yönetimi ve loglama gerçekleştirilir.
+Bu modül, Supabase Edge Function olarak sipariş teslimatı tamamlandığında müşteriye otomatik e-posta bildirimi göndermekle yükümlüdür. Dosya tabanlı bir e-posta şablonunu yükleyip dinamik verilerle doldurarak harici e-posta servisi aracılığıyla iletir. Modül, hata yönetimi ve istek akışı kontrolü için yardımcı fonksiyonlar içerir.
 
 ## Fonksiyon Grupları
+### Hata Yönetimi
+İşlem sırasında oluşabilecek beklenmeyen hataları yakalayan ve tutarlı hata yanıtları üreten yardımcı fonksiyonları barındırır. Bu grup, üst düzey işleyicilerin hata senaryolarını merkezi olarak ele almasını sağlar.
+- callerFailure
+
 ### Şablon İşleme
-E-posta içeriğinin hazırlanmasıyla ilgili yardımcı işlevleri barındırır. Dosya sisteminden gerekli şablonun yüklenmesini ve bu şablonun sipariş verisiyle birleştirilerek son metnin elde edilmesini sağlar.
+E-posta içeriğinin dinamik olarak hazırlanmasıyla ilgili işlevleri kapsar. Dosya sisteminden gerekli HTML şablonunun asenkron yüklenmesini ve bu şablonun sipariş verisiyle birleştirilerek son metnin elde edilmesini sağlar.
 - render, loadTemplate
 
 ### Ana İstek İşleyici
-Modülün dışarıya açılan ana giriş noktasıdır. Gelen HTTP isteğini alarak tüm iş akışını (veritabanı sorgulama, şablon hazırlama, e-posta gönderimi ve loglama) yönetir ve sonuç olarak bir HTTP yanıtı döner.
+Modülün dışarıya açılan tek giriş noktasıdır. Gelen HTTP isteğini alarak tüm iş akışını yönetir: veritabanından sipariş bilgilerini çeker, şablon hazırlama ve e-posta gönderimi adımlarını orkestra eder, sürecin başarı/hata durumuna göre HTTP yanıtı döner.
 - delivery-notification_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomatik e-posta bildirimi göndermek için tasarlanmıştır. Aşağıdaki mimari varsayımlar, fonksiyon imzaları ve modülün temel amacına dayanarak tanımlanmıştır.
-
-[Aksiyom 1]: Eğer `render` fonksiyonuna geçerli bir şablon string'i (`tpl`) ve veri sözlüğü (`_data`) sağlanmazsa, şablon işleme başarısız olur.
-[Aksiyom 2]: Eğer `loadTemplate` fonksiyonu dosya sisteminden gerekli şablon dosyasını bulamazsa veya okuyamazsa, şablon yükleme hatası oluşur.
-[Aksiyom 3]: Eğer `
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### callerFailure
+
+**Ne yapar**: Bu fonksiyon, kapı (gateway) katmanında oluşan hataları HTTP uyumlu durum kodlarına ve hata mesajlarına dönüştürür. Belirli hata sınıflarını tanımlayarak, istemciye anlamlı ve standart HTTP yanıt kodları göndermeyi sağlar. Tanınmayan hatalar için null dönerek üst katmanın kendi hata yönetimini sürdürmesine olanak tanır.
+
+**Nasıl yapar**: Fonksiyon, `instanceof` operatörünü kullanarak gelen `error` parametresinin türünü sırasıyla `TenantMismatchError`, `CallerConfigError` ve `CallerLookupError` sınıflarıyla kontrol eder. Her bir eşleşme durumunda, belirli bir HTTP durum kodu ve standart bir hata mesajı içeren bir nesne döndürür. Hiçbir sınıfla eşleşmeyen durumlarda `null` değeri döner, bu da çağrı yapan kodun hatayı kendi mantığında işlemesine olanak tanır.
+
+**Parametreler**:
+- `error`: `unknown` — İşlenmesi gereken hata nesnesi. Bu parametre `unknown` tipindedir çünkü herhangi bir yerden gelen hataları kabul edebilir; fonksiyon内部inde belirli hata sınıflarına dönüştürme işlemi yapılır.
+
+**Dönüş**: `{ status: number; error: string } | null`
+
+Geriye dönüş değeri iki olasılıktan biridir:
+
+- `{ status: number; error: string }` nesnesi: Tanınan bir hata durumunda döner.
+  - `status`: HTTP durum kodunu temsil eder (403, 500 veya 503).
+  - `error`: Hata durumunu tanımlayan standart bir metin dizesi.
+- `null`: Fonksiyonun tanımadığı bir hata türü geldiğinde döner.
+
+Dönüş değerinin yapısal tanımı: `TenantMismatchError` için `{ status: 403, error: 'tenant_mismatch' }`, `CallerConfigError` için `{ status: 500, error: 'CONFIG_MISSING' }`, `CallerLookupError` için `{ status: 503, error: 'profile_lookup_failed' }` şeklindedir.
 
 ### render
 
@@ -67,9 +90,7 @@ Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomati
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: ../_shared/tenant_config.ts::getTenantBranding
-- import: ../_shared/tenant_config.ts::resolveTenantId
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
-- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -86,13 +107,10 @@ Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomati
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/delivery-notification/index.ts::render
-- **params**: `(tpl: string, _data: Record<string, unknown>)`
-- **ic_degiskenler**:
-  - (yok — tek satırlık bir replace ifadesi)
-- **Dönüş**: `String(_data[k] ?? '')` — tpl içindeki `{{key}}` placeholder'larını `_data` sözlüğündeki değerlerle değiştirilmiş nihai string
-- **Dict/Subscript Erişimleri**:
-  - `_data[k]` — template placeholder anahtarının `_data` sözlüğünden okunması
+### [N1_NASIL] AST Pointer: supabase/functions/delivery-notification/index.ts::callerFailure
+- **params**: `(error: unknown)`
+- **ic_degiskenler**: (yok — sadece parametre ve koşullu return)
+- **Dönüş**: `{ status: number; error: string } | null` — TenantMismatchError için 403, CallerConfigError için 500, CallerLookupError için 503 döner; diğer hatalar için null döner
 
 ---
 
@@ -100,6 +118,7 @@ Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomati
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    index_ts__callerFailure["callerFailure"]
     index_ts__delivery-notification_handler["delivery-notification_handler"]
     index_ts__loadTemplate["loadTemplate"]
     index_ts__render["render"]
@@ -108,6 +127,7 @@ graph TD
 ## NODE ID STANDARD
 
   file: supabase\functions\delivery-notification\index.ts
+  function: supabase\functions\delivery-notification\index.ts::callerFailure
   function: supabase\functions\delivery-notification\index.ts::render
   function: supabase\functions\delivery-notification\index.ts::loadTemplate
   function: supabase\functions\delivery-notification\index.ts::delivery-notification_handler
@@ -115,6 +135,7 @@ graph TD
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: callerFailure
   export: delivery-notification_handler
   export: loadTemplate
   export: render

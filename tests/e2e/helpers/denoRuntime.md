@@ -2,19 +2,19 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\tests\e2e\helpers\denoRuntime.ts
-skeleton_hash: 7661456bfb584d1a
+source_path: C:\Users\alize\venthub-wt-hotfix\tests\e2e\helpers\denoRuntime.ts
+skeleton_hash: fc8166db6e22e33b
 entity_hashes:
   func:DenoRuntimeSimulator:cleanup: 11766b4b0651eb09
   func:DenoRuntimeSimulator:constructor: c8bd196185514286
   func:DenoRuntimeSimulator:invokeFunction: dc0f077050e69d4d
-  func:DenoRuntimeSimulator:loadFunction: d7add3f795080ab6
+  func:DenoRuntimeSimulator:loadFunction: 3a8e0fae20ee8799
   func:DenoRuntimeSimulator:setEnv: 1c17cf0de154984a
   func:DenoRuntimeSimulator:setEnvs: ee1e05f28e0c54af
   func:DenoRuntimeSimulator:setupGlobal: 7aef53f26f9e05f4
   func:setupDenoRuntime: ced5fd77752b313f
   overview: 622e59962c13886e
-generated_at: 2026-05-30T20:35:16Z
+generated_at: 2026-08-15T07:44:50Z
 ---
 
 ## Genel Bakış
@@ -47,22 +47,6 @@ Bu modül, Deno runtime ortamını simüle eden bir test yardımcı modülüdür
 
 ---
 
-**[Aksiyom 1]:** Eğer `DenoRuntimeSimulator.constructor()` çağrılmadan önce `setupDenoRuntime()` fonksiyonu çağrılmamışsa, geçerli bir `DenoRuntimeOptions` nesnesi oluşturulamaz ve simülatör geçersiz bir durumda başlar.
-
-**[Aksiyom 2]:** Eğer `DenoRuntimeSimulator.setupGlobal()` fonksiyonu çağrılmadan önce `setEnv()`, `setEnvs()`, `loadFunction()` veya `invokeFunction()` fonksiyonlarından biri çağrılırsa, global Deno ortamı henüz hazırlanmadığından bu işlemler başarısız olur.
-
-**[Aksiyom 3]:** Eğer `loadFunction(functionPath)` fonksiyonu çağrılmadan `invokeFunction(functionPath, request)` fonksiyonu çağrılırsa, çağrılacak işlev runtime'a yüklenmediğinden `invokeFunction` başarısız olur.
-
-**[Aksiyom 4]:** Eğer `cleanup()` fonksiyonu çağrıldıktan sonra `setEnv()`, `setEnvs()`, `loadFunction()` veya `invokeFunction()` gibi fonksiyonlardan herhangi biri tekrar çağrılırsa, temizlik işlemi yapıldığı için bu işlemler başarısız olur.
-
-**[Aksiyom 5]:** Eğer `invokeFunction(functionPath, request)` fonksiyonunda `request` parametresi geçerli bir `Request` nesnesi değilse, fonksiyon geçersiz istek nedeniyle hata verir.
-
-**[Aksiyom 6]:** Eğer `setEnv(key, value)` fonksiyonunda `key` boş bir string ise veya `setEnvs(envs)` fonksiyonunda `envs` boş bir nesne `{}` ise, hiçbir environment değişkeni ayarlanmaz ve runtime mevcut environment değerleriyle çalışmaya devam eder.
-
-**[Aksiyom 7]:** Eğer `options` parametresi `DenoRuntimeOptions` tipinde değilse veya zorunlu alanları içermiyorsa, `setupDenoRuntime()` fonksiyonu hata fırlatır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ### setupDenoRuntime
@@ -73,53 +57,53 @@ Bu modül, Deno runtime ortamını simüle eden bir test yardımcı modülüdür
 **Dönüş**: DenoRuntimeSimulator — Oluşturulan ve yapılandırılmış simülasyon nesnesi.
 
 ### constructor
-**Ne yapar**: `DenoRuntimeSimulator` sınıfının yapıcı metodudur ve nesne başlatılırken gerekli iç durumları ayarlar.
-**Nasıl yapar**: Seçenekler nesnesinden ortam değişkenlerini (`env`) kopyalayarak `this.envs` özelliğine atar. Mevcut global `Deno` nesnesini (`globalThis.Deno`) saklar (`originalDeno`) ve `setupGlobal` metodunu çağırarak sahte Deno ad alanını kurar.
+**Ne yapar**: `DenoRuntimeSimulator` sınıfının yapıcı metodudur. Simülatörün başlangıç durumunu ayarlar, ortam değişkenlerini başlatır ve `globalThis` üzerindeki `Deno` nesnesini yedekler.
+**Nasıl yapar**: Parametre olarak gelen `options` nesnesindeki `env` özelliği varsa, mevcut ortam değişkenlerini `this.envs` üzerine yayar. Ardından, global `Deno` nesnesinin orijinal referansını (`this.originalDeno`) saklar. Son olarak, `setupGlobal` metodunu çağırarak global `Deno` nesnesini stub (sahte) bir implementasyonla değiştirir.
 **Parametreler**:
-- options: DenoRuntimeOptions — Simülasyon yapılandırması. Opsiyonel olup, belirtilmezse boş bir nesne kullanılır.
-**Dönüş**: void (Dönüş değeri yoktur; nesne yan etkiler yaratır.)
+- options: `DenoRuntimeOptions = {}` — Sınıfın başlatma seçeneklerini içeren nesne. `env` özelliği ile başlangıç ortam değişkenleri (key-value çiftleri) sağlanabilir. Boş bırakılabilir.
+**Dönüş**: `void` — Fonksiyon bir değer döndürmez.
 
 ### setupGlobal
-**Ne yapar**: `globalThis` üzerindeki `Deno` ad alanını, testler için kullanılabilir sahte bir implementasyonla (stub) değiştirir.
-**Nasıl yapar**: `globalThis.Deno` özelliğini, `serve` fonksiyonunu ve `env` nesnesini içeren bir stub nesce ile yeniden tanımlar. `serve` stub'u, çağrıldığında işleyiciyi (`handler`) yakalar ve kaydeder. `env` stub'u ise ortam değişkenlerini simülasyonun iç durumu olan `this.envs` üzerinden yönetir (get, set, delete, toObject).
-**Parametreler**: Parametre almaz.
-**Dönüş**: void (Dönüş değeri yoktur; global durumu değiştirir.)
+**Ne yapar**: Global `Deno` nesnesini, test ortamında kullanılabilecek bir stub (sahte) implementasyonla değiştirir. Bu sayede, Edge fonksiyonların `Deno.serve` ve `Deno.env` çağrıları kontrol edilebilir hale gelir.
+**Nasıl yapar**: `globalThis` üzerindeki `Deno` nesnesini, kendi içinde tanımlı bir nesne ile değiştirir. Bu stub nesne iki ana özellik sağlar: 1) `serve` fonksiyonu: Gelen argümanlara göre handler'ı (istek işleyiciyi) algılar ve bunu `this.activeHandler` ile `globalThis.__last_registered_handler__` üzerine kaydeder. Bu, testin later aşamada hangi handler'ın kaydedildiğini bulmasını sağlar. 2) `env` nesnesi: `get`, `set`, `delete` ve `toObject` metotlarıyla, `this.envs` üzerindeki ortam değişkenlerini yönetir.
+**Parametreler**: Yok.
+**Dönüş**: `void` — Fonksiyon bir değer döndürmez.
 
 ### setEnv
-**Ne yapar**: Simülasyon ortamında belirli bir ortam değişkenini ayarlar veya günceller.
-**Nasıl yapar**: `this.envs` nesnesinde belirtilen anahtar (`key`) için yeni bir değer (`value`) ataması yapar. Bu, simülasyonun ortam değişkenleri havuzunu doğrudan etkiler.
+**Ne yapar**: Tek bir ortam değişkenini (key-value çiftini) simülatörün ortam havuzuna ekler veya günceller.
+**Nasıl yapar**: `this.envs` nesnesinin, verilen `key` değerine karşılık gelen özelliğini, `value` parametresiyle doğrudan atar. Bu, `Deno.env` stub'ının kullandığı iç depolama alanını doğrudan değiştirir.
 **Parametreler**:
-- key: string — Ayarlanacak ortam değişkeninin adı.
-- value: string — Ortam değişkenine atanacak değer.
-**Dönüş**: void (Dönüş değeri yoktur.)
+- key: `string` — Ayarlanacak ortam değişkeninin adı.
+- value: `string` — Ortam değişkenine atanacak değer.
+**Dönüş**: `void` — Fonksiyon bir değer döndürmez.
 
 ### setEnvs
-**Ne yapar**: Birden fazla ortam değişkenini toplu olarak simülasyon ortamına ekler veya mevcut olanları günceller.
-**Nasıl yapar**: Mevcut `this.envs` nesnesini, verilen `envs` nesnesiyle birleştirir (spread operatörü ile). Bu, hem yeni değişkenleri ekler hem de mevcut olanları üzerine yazar.
+**Ne yapar**: Birden fazla ortam değişkenini (bir nesne olarak) simülatörün mevcut ortam havuzuna ekler veya günceller. Bu, mevcut değişkenleri korurken yeni olanları eklemek için kullanılır.
+**Nasıl yapar**: `this.envs` nesnesini, önce mevcut değerleri (`...this.envs`) ve ardından yeni gelen `envs` parametresindeki değerleri (`...envs`) birleştirerek yeniden atar. Bu süreç, eski değişkenlerin üzerine yazılmasını sağlar, ancak `envs` içinde olmayan mevcut değişkenleri silmez.
 **Parametreler**:
-- envs: Record<string, string> — Eklenecek veya güncellenecek ortam değişkenlerini içeren anahtar-değer çiftleri nesnesi.
-**Dönüş**: void (Dönüş değeri yoktur.)
+- envs: `Record<string, string>` — Eklenecek veya güncellenecek ortam değişkenlerini (key-value çiftleri) içeren nesne.
+**Dönüş**: `void` — Fonksiyon bir değer döndürmez.
 
 ### loadFunction
-**Ne yapar**: Belirtilen dosya yolundaki bir edge fonksiyonunu (TypeScript modülünü) yükler, derler ve çalıştırılabilir bir işleyici (handler) olarak kaydeder.
-**Nasıl yapar**: Öncelikle global bir işleyici havuzundan fonksiyonu arar; Eğer daha önce yüklenmişse doğrudan onu döndürür. Aksi halde, dosyayı okur, `@supabase/supabase-js` importlarını düzeltir (ESM URL'lerini modül referanslarına dönüştürür), benzersiz bir isimle geçici bir derlenmiş dosya oluşturur ve `import()` ile dinamik olarak yükler. Yükleme sırasında `Deno.serve` çağrısı yapılarak işleyici yakalanır ve hem global hem de iç havuza kaydedilir. Paylaşılan yapılandırma dosyası (`_shared/tenant_config.ts`) varsa benzer şekilde işlenir.
+**Ne yapar**: Belirtilen dosya yolundaki bir Edge fonksiyonunu (TypeScript modülünü) dinamik olarak yükler, derler ve çalıştırılabilir hale getirir. Fonksiyonun `Deno.serve` çağrısını yakalar ve istek işleyiciyi (handler) döndürür.
+**Nasıl yapar**: 1) Önce, fonksiyonun daha önce yüklenip yüklenmediğini kontrol etmek için global bir registry (`__edge_function_handlers__`) kullanır. Eğer varsa, önbellekten döndürür. 2) Yoksa, dosyayı okur ve ESM import hatalarını önlemek için `@supabase/supabase-js` URL'lerini satır içi bir formata dönüştürür. 3) Fonksiyonun `_shared` dizinindeki bağımlılıklarını tarar ve derler (zincirleme referansları dahil). 4) Hem ana fonksiyon hem de bağımlılıklar için derlenmiş (.compiled.ts) dosyalar oluşturur. 5) Dinamik `import()` ile bu derlenmiş dosyayı yükler. 6) Modülün yüklenmesi sırasında global `Deno.serve` stub'ı tarafından yakalanan handler'ı (`this.activeHandler` veya `globalThis.__last_registered_handler__`) alır. 7) Bu handler'ı hem global hem de instance seviyesindeki registry'ye kaydeder ve döndürür.
 **Parametreler**:
-- functionPath: string — Yüklenecek edge fonksiyonunun tam dosya yolu (ör. `/functions/my-function/index.ts`).
-**Dönüş**: Promise<(req: Request) => Promise<Response> | Response> — Fonksiyonun işleyicisi (handler). Bu, bir Request alıp Response döndüren asenkron bir fonksiyondur.
+- functionPath: `string` — Yüklenecek Edge fonksiyonunun dosya yolu (ör. `./functions/api/hello/index.ts`).
+**Dönüş**: `Promise<(req: Request) => Promise<Response> | Response>` — Yüklenen ve çalıştırılabilir hale getirilmiş, bir Request alıp Response döndüren asenkron istek işleyici (handler) fonksiyonu.
 
 ### invokeFunction
-**Ne yapar**: Yüklenmiş bir edge fonksiyonunu belirtilen HTTP isteğiyle çalıştırır ve sonucu döndürür.
-**Nasıl yapar**: Verilen fonksiyon yolu için önceden yüklenmiş bir işleyici arar. Eğer işleyici bulunamazsa, `loadFunction` metodunu çağırarak fonksiyonu yükler. Ardından, yakaladığı işleyiciyi verilen istekle çağırır ve ortaya çıkan yanıtı döndürür.
+**Ne yapar**: Daha önce yüklenmiş (veya ilk kez yüklenmesi gereken) bir Edge fonksiyonunu, verilen bir HTTP isteği ile çalıştırır ve sonucu döndürür.
+**Nasıl yapar**: `this.handlers` haritasında fonksiyon yoluna karşılık gelen handler'ı arar. Eğer handler bulunamazsa, `loadFunction` metodunu çağırarak fonksiyonu yükler ve handler'ı alır. Ardından, handler'ı asenkron olarak çağırarak isteği işler ve Response nesnesini döndürür.
 **Parametreler**:
-- functionPath: string — Çalıştırılacak edge fonksiyonunun dosya yolu.
-- request: Request — Fonksiyona iletilcek HTTP istek nesnesi.
-**Dönüş**: Promise<Response> — Fonksiyonun döndürdüğü HTTP yanıtı.
+- functionPath: `string` — Çalıştırılacak Edge fonksiyonunun dosya yolu.
+- request: `Request` — Fonksiyona geçirilecek HTTP isteği.
+**Dönüş**: `Promise<Response>` — Fonksiyonun ürettiği HTTP yanıtını içeren bir Promise.
 
 ### cleanup
-**Ne yapar**: Deno çalışma zamanı simülasyonunu temizler, global durumu eski haline getirir ve oluşturulan geçici dosyaları siler.
-**Nasıl yapar**: Öncelikle, `setupGlobal` tarafından değiştirilen `globalThis.Deno` nesnesini, saklanan `originalDeno` ile geri yükler (eğer orijinal mevcutsa). Ardından, `loadFunction` sırasında oluşturulan geçici derlenmiş dosyaları (`tempFiles` dizisi) dosya sistemi üzerinden silmeye çalışır. Bu işlem için `fs` modülünü senkron veya asenkron olarak kullanabilir.
-**Parametreler**: Parametre almaz.
-**Dönüş**: void (Dönüş değeri yoktur; temizlik yan etkileri gerçekleştirir.)
+**Ne yapar**: Simülatörün oluşturduğu yan etkileri (değişiklikleri) geri alır. Global `Deno` nesnesini orijinal haline döndürür ve derleme sürecinde oluşturulan geçici dosyaları temizler.
+**Nasıl yapar**: 1) Eğer `this.originalDeno` tanımlıysa, onu `globalThis.Deno` üzerine atayarak orijinal duruma döner. Eğer tanımlı değilse (başlangıçta mevcut değildiyse), `globalThis.Deno`'yu silerek global ortamı temizler. 2) `this.tempFiles` dizisinde kayıtlı tüm geçici `.compiled.ts` dosyalarını siler. Bu işlem için Node.js `fs` modülünü kullanır. `require` kullanılamıyorsa (ESM ortamı), dinamik `import()` ile asenkron olarak dener.
+**Parametreler**: Yok.
+**Dönüş**: `void` — Fonksiyon bir değer döndürmez.
 
 ---
 
@@ -133,75 +117,64 @@ Bu modül, Deno runtime ortamını simüle eden bir test yardımcı modülüdür
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: tests/e2e/helpers/denoRuntime.ts::setupDenoRuntime
-- **params**: `options: DenoRuntimeOptions = {}` — Deno runtime simülatörü için yapılandırma seçenekleri (opsiyonel, boş obje varsayılan)
+- **params**: (options: DenoRuntimeOptions = {})
 - **ic_degiskenler**: (yok)
-- **Dönüş**: `DenoRuntimeSimulator` — yeni oluşturulan simülatör instance'ı
-
----
+- **Dönüş**: DenoRuntimeSimulator
 
 ### [N2_NASIL] AST Pointer: tests/e2e/helpers/denoRuntime.ts::DenoRuntimeSimulator.constructor
-- **params**: `options: DenoRuntimeOptions = {}` — opsiyonel yapılandırma seçenekleri
+- **params**: (options: DenoRuntimeOptions = {})
 - **ic_degiskenler**:
-  - `options.env` — options objesinden gelen ortam değişkenleri sözlüğü
+  - `this.envs` — globalThis.Deno.env stub'unda kullanılacak ortam değişkenleri sözlüğü, options.env'den kopyalanarak oluşturulur
+  - `this.originalDeno` — orijinal Deno nesnesinin referansı, cleanup() fonksiyonunda geri yüklenmek üzere saklanır
 - **Dönüş**: yok (constructor)
 
----
-
 ### [N3_NASIL] AST Pointer: tests/e2e/helpers/denoRuntime.ts::DenoRuntimeSimulator.setupGlobal
-- **params**: (parametre yok)
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `self` — instance referansı, iç içe fonksiyonlardan erişim sağlamak için saklanır
+  - `self` — this referansının saklanması, inner function'larda kullanılmak üzere
 - **Dönüş**: yok
-
----
 
 ### [N4_NASIL] AST Pointer: tests/e2e/helpers/denoRuntime.ts::DenoRuntimeSimulator.setEnv
-- **params**: `key: string, value: string` — ayarlanacak ortam değişkeninin adı ve değeri
+- **params**: (key: string, value: string)
 - **ic_degiskenler**: (yok)
 - **Dönüş**: yok
-
----
 
 ### [N5_NASIL] AST Pointer: tests/e2e/helpers/denoRuntime.ts::DenoRuntimeSimulator.setEnvs
-- **params**: `envs: Record<string, string>` — toplu olarak ayarlanacak ortam değişkenleri sözlüğü
+- **params**: (envs: Record<string, string>)
 - **ic_degiskenler**: (yok)
 - **Dönüş**: yok
 
----
-
 ### [N6_NASIL] AST Pointer: tests/e2e/helpers/denoRuntime.ts::DenoRuntimeSimulator.loadFunction
-- **params**: `functionPath: string` — yüklenecek Edge fonksiyonunun dosya yolu
+- **params**: (functionPath: string)
 - **ic_degiskenler**:
-  - `globalHandlers` — `(globalThis as any).__edge_function_handlers__` — global fonksiyon handler registry'si, zaten yüklenmiş fonksiyonları cache'lemek için kullanılır
-  - `handler` — yüklenen veya önbellekten alınan `(req: Request) => any` fonksiyon handler'ı
-  - `fs` — dinamik import ile yüklenen Node.js `fs` modülü, dosya okuma/yazma işlemleri için
-  - `path` — dinamik import ile yüklenen Node.js `path` modülü, dosya yolları üzerinde çözümleme için
-  - `rand` — `Math.random().toString(36).substring(2, 10)` — derlenen geçici dosya adlarında çakışma önlemek için rastgele字符串
-  - `sharedPath` — `path.resolve(...)` ile hesaplanan `_shared/tenant_config.ts` dosyasının tam yolu
-  - `sharedCompiledCreated` — boolean, tenant_config derleme dosyasının oluşturulup oluşturulmadığını takip eder
-  - `sharedCompiledPath` — derlenmiş tenant_config geçici dosya yolu
-  - `sharedContent` — `fs.readFileSync(sharedPath, 'utf-8')` — tenant_config.ts dosyasının ham içeriği
-  - `sharedCompiledContent` — supabase-js esm.sh URL'lerinin yerine koyulmuş derlenmiş tenant_config içeriği
-  - `content` — `fs.readFileSync(functionPath, 'utf-8')` — Edge fonksiyonun ham TS içeriği
-  - `compiledContent` — supabase-js URL替换 ve tenant_config yol替换 uygulanmış derlenmiş fonksiyon içeriği
-  - `compiledPath` — derlenmiş fonksiyonun yazılacağı geçici dosya yolu
-- **Dönüş**: `Promise<(req: Request) => Promise<Response> | Response>` — yüklenen handler fonksiyonu
-
----
+  - `globalHandlers` — (globalThis as any).__edge_function_handlers__ global handler sözlüğü
+  - `handler` — işlevden alınan handler fonksiyonu, globalHandlers'dan veya yeni yüklenen modülden
+  - `fs` — await import('fs') ile yüklenen dosya sistemi modülü
+  - `path` — await import('path') ile yüklenen path modülü
+  - `rand` — Math.random().toString(36).substring(2, 10) ile oluşturulan benzersiz rastgele string
+  - `sharedDir` — _shared klasörünün mutlak yolu, path.resolve ile hesaplanır
+  - `sharedRefRe` — /['"`][^'"`]*_shared\/([A-Za-z0-9_.-]+\.ts)['"`]/g regular expression'i
+  - `content` — fs.readFileSync(functionPath, 'utf-8') ile okunan fonksiyon kaynak kodu
+  - `sharedNames` — Set<string>, _shared bağımlılıklarının adlarını tutar
+  - `queue` — collectSharedRefs sonucu alınan _shared dosya adları dizisi
+  - `compiledNameOf` — isim fonksiyonu, .compiled.{rand}.ts dönüşümü yapar
+  - `sharedCompiledPaths` — string[] derlenmiş _shared dosyalarının yolları
+  - `compiledContent` — inlineSupabaseUrl ve shared referans dönüşümleri yapılmış derlenmiş kod
+  - `compiledPath` — derlenmiş ana fonksiyon dosyasının yolu
+  - `err` — import hatası durumunda yakalanan hata nesnesi
+- **Dönüş**: Promise<(req: Request) => Promise<Response> | Response>
 
 ### [N7_NASIL] AST Pointer: tests/e2e/helpers/denoRuntime.ts::DenoRuntimeSimulator.invokeFunction
-- **params**: `functionPath: string, request: Request` — çalıştırılacak fonksiyonun dosya yolu ve HTTP isteği
+- **params**: (functionPath: string, request: Request)
 - **ic_degiskenler**:
-  - `handler` — `this.handlers.get(functionPath)` ile alınan veya `this.loadFunction()` ile yüklenen handler fonksiyonu
-- **Dönüş**: `Promise<Response>` — handler'ın döndürdüğü HTTP yanıtı
-
----
+  - `handler` — this.handlers sözlüğünden alınan veya loadFunction ile yüklenen handler fonksiyonu
+- **Dönüş**: Promise<Response>
 
 ### [N8_NASIL] AST Pointer: tests/e2e/helpers/denoRuntime.ts::DenoRuntimeSimulator.cleanup
-- **params**: (parametre yok)
+- **params**: (yok)
 - **ic_degiskenler**:
-  - `fs` — `require('fs')` ile yüklenen Node.js fs modülü, geçici dosyaları silmek için
-  - `file` — `this.tempFiles` dizisindeki her bir geçici dosya yolunu temsil eder
+  - `fs` — require('fs') veya import('fs') ile yüklenen dosya sistemi modülü
+  - `file` — this.tempFiles dizisindeki her bir geçici dosya yolu
 - **Dönüş**: yok
 
 ---

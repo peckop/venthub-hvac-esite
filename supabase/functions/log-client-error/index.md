@@ -2,41 +2,38 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\log-client-error\index.ts
-skeleton_hash: 60f03cb097186ff2
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\log-client-error\index.ts
+skeleton_hash: d40202c9d638d96f
 entity_hashes:
   func:log-client-error_handler: cec12c49f3b9435f
-  overview: 4c2fb15476c4ecf3
-generated_at: 2026-08-13T07:40:32Z
+  overview: 38ce599da378ec18
+generated_at: 2026-08-15T07:33:59Z
 ---
 
 ## Genel Bakış
-Bu modül, istemci uygulamalarında oluşan hataları merkezi olarak toplayan ve kaydeden bir Supabase Edge Function'dur. Gelen HTTP isteklerinden hata verisini çıkarır, doğrular ve kalıcı bir şekilde depolar, ardından sonucu istemciye bildirir.
+Bu modül, istemci tarafı uygulamalarda oluşan hataların merkezi olarak toplanmasını ve kaydedilmesini sağlayan bir Supabase Edge Function'dır. Gelen HTTP istekleri aracılığıyla hata verisini alır, doğrular ve veritabanına kalıcı olarak yazarak hata izleme ve teşhis süreçlerini destekler.
 
 ## Fonksiyon Grupları
-### Hata İşleme ve Yanıt Oluşturma
-Gelen hata raporunu işleyen tek işleyici; istek gövdesindeki veriyi doğrulayıp veritabanına yazar ve uygun HTTP yanıtını döndürerek sürecin tamamını yönetir.
+### Hata Kayıt İşleyicisi
+Gelen hata raporu isteklerini işleyen ve yanıt oluşturan tek sorumlu bileşen; istek gövdesinden hata verisini çıkarıp doğrular, Supabase veritabanına yazar ve istemciye durum bildirimi döndürür.
 - log_client_error_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, istemci hatalarını almak için bir HTTP endpoint'idir ve `clientErrorSchema` kullanarak gelen veriyi doğrular.
 
-Bu modül, istemci hatalarını toplayan bir Supabase Edge Function olup, HTTP istek-tabanlı bir işleyici yapısına sahiptir.
+[Aksiyom 1]: Eğer istek gövdesi (`req.body`) JSON formatında ayrıştırılamıyorsa, istek reddedilir (HTTP 400 Bad Request).
 
-**[Aksiyom 1]**: Eğer geçerli bir `Request` nesnesi fonksiyona sağlanmazsa, işleyici işlevsiz kalır ve uygun hata yanıtı dönmez.
+[Aksiyom 2]: Eğer istek gövdesi `clientErrorSchema` ile doğrulanamıyorsa, istek reddedilir (HTTP 400 Bad Request).
 
-**[Aksiyom 2]**: Eğer `clientErrorSchema` tanımlı değilse veya modülün çalıştırılabilir ortamında mevcut değilse, istek gövdesinin doğrulanması başarısız olur.
+[Aksiyom 3]: Eğer istek yöntemi (`req.method`) POST değilse, istek reddedilir (HTTP 405 Method Not Allowed).
 
-**[Aksiyom 3]**: Eğer istek gövdesi (`req.body`) okunamaz veya_PARSE_edilemezse (örn: geçersiz JSON), hata kaydı gerçekleştirilemez.
+[Aksiyom 4]: Eğer veritabanına yazma işlemi başarısız olursa, sunucu hatası yanıtı dönülür (HTTP 500 Internal Server Error).
 
-**[Aksiyom 4]**: Eğer `clientErrorSchema` çağrısı (`(call)`) başarısız olursa (geçersiz hata verisi yapısı), modül kalıcı depolamaya yazma işleminden önce reddeder.
+[Aksiyom 5]: Eğer `clientErrorSchema` tanımı (çağrısı) başarısız olursa veya geçerli bir doğrulama şeması sağlanamıyorsa, modül herhangi bir isteği başarıyla işleyemez.
 
-**[Aksiyom 5]**: Eğer kalıcı depolama (Supabase veritabanı) erişilebilir durumda değilse veya yazma işlemi başarısız olursa, istemciye hata durumu bildirilir.
-
-**[Aksiyom 6]**: Eğer istek CORS politikalarını ihlal ediyorsa (örn: izin verilmeyen Origin), işlenmeden önce reddedilebilir — bu durum Supabase Edge Function ortamına bağlıdır.
-
-**[Aksiyom 7]**: Eğer `req` nesnesinde HTTP metodu işleyici tarafından desteklenmiyorsa (örn: OPTIONS dışında bir yöntem), uygun HTTP durum kodu ile yanıt dönülür.
+[Aksiyom 6]: Eğer istek gövdesindeki veri `clientErrorSchema` tarafından tanımlanan alanları içermiyorsa (eksik alanlar), istek reddedilir (HTTP 400 Bad Request).
 
 ---
 
@@ -57,7 +54,7 @@ Bu modül, istemci hatalarını toplayan bir Supabase Edge Function olup, HTTP i
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
-- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 - import: https://esm.sh/zod@3.23.8::z
 
 ---
@@ -72,47 +69,51 @@ Bu modül, istemci hatalarını toplayan bir Supabase Edge Function olup, HTTP i
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: supabase/functions/log-client-error/index.ts::log-client-error_handler
-- **params**: (req: Request)
+- **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `corsHeaders` — CORS başlıklarını istekten elde eden fonksiyonun dönüş değeri
-  - `cors` — CORS başlıkları nesnesi, istek için erişim izinlerini tanımlar
-  - `requestId` — Benzersiz istek tanımlayıcısı, crypto.randomUUID() veya Date.now() ile üretilir
-  - `supabaseUrl` — Deno ortam değişkeninden alınan Supabase proje URL'i
-  - `serviceRoleKey` — Deno ortam değişkeninden alınan Supabase servis rol anahtarı
-  - `allowedOrigins` — ALLOWED_ORIGINS ortam değişkeninden split edilerek oluşturulan izin verilen origin listesi
-  - `originHeader` — İstekten alınan 'origin' başlık değeri
-  - `originToCheck` — Kontrol edilecek origin, önce header'dan, yoksa referer'dan alınır
-  - `requireAuth` — REQUIRE_AUTH ortam değişkeninden okunan boolean değer, kimlik doğrulama zorunluluğunu belirler
-  - `supabase` — createClient ile oluşturulan Supabase istemcisi
-  - `authHeader` — İstekten alınan authorization başlık değeri
-  - `accessToken` — authHeader'dan slice ile çıkarılan Bearer token
-  - `authData` — supabase.auth.getUser çağrısının dönüşündeki data nesnesi
-  - `authErr` — supabase.auth.getUser çağrısının dönüşündeki error nesnesi
-  - `rawBody` — req.json() ile parse edilen ham istek gövdesi
-  - `parsed` — clientErrorSchema.safeParse ile doğrulanmış veri
-  - `payload` — parsed.data'dan gelen doğrulanmış hata verisi
-  - `mask` — PII маскировlama için iç fonksiyon, email ve uzun string'leri maskeler
-  - `firstLine` — payload.stack'in ilk satırı, hata izini temsil eder
-  - `urlObj` — payload.url'den oluşturulmaya çalışılan URL nesnesi
-  - `_path` — urlObj pathname değeri, istek yolunu temsil eder
-  - `signature` — Hata gruplandırma için imza, msg, firstLine ve _path'in maskelenmiş birleşimidir
-  - `groupId` — error_groups tablosundan upsert ile elde edilen grup ID'si
-  - `groupPayload` — error_groups tablosuna upsert edilecek nesne
-  - `upsertRow` — error_groups upsert çağrısının dönüşündeki satır verisi
-  - `q` — signature ile error_groups tablosundan ID sorgulama sonucu
-  - `dedupSeconds` — DEDUP_SECONDS ortam değişkeninden okunan saniye cinsinden dedup penceresi
-  - `since` — dedupSeconds kullanılarak hesaplanan ISO tarih stringi
-  - `recent` — client_errors tablosundan son dedupSeconds içindeki aynı gruba ait hatalar
-  - `row` — client_errors tablosuna insert edilecek satır verisi
-  - `error` — client_errors insert çağrısının dönüşündeki hata nesnesi
-  - `msg` — error nesnesinden çıkarılan hata mesajı stringi
-  - `level` — payload.level değerinden alınan hata seviyesi stringi
-  - `env` — payload.env değerinden alınan ortam bilgisi stringi
-  - `notifyEnabled` — SLACK_WEBHOOK_URL ortam değişkeninin varlığını kontrol eden boolean
-  - `isCritical` — level'ın 'fatal' veya 'error' olup olmadığını belirleyen boolean
-  - `shortMsg` — payload.msg'nin ilk 200 karakteri, Slack bildirimi için kısaltılmış mesaj
-  - `fields` — Slack bildirimi için alanlar dizisi (signature, level, env, URL, request-id)
-- **Dönüş**: `Response` — HTTP yanıt nesnesi, farklı durumlarda değişik status kodları ile döner
+  - `corsHeaders` — getCorsHeaders(req) çağrısıyla elde edilen CORS başlıkları
+  - `cors` — corsHeaders değişkeninin takma adı (alias)
+  - `requestId` — crypto.randomUUID() veya Date.now() ile üretilen benzersiz istek tanımlayıcısı
+  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile okunan Supabase servis URL'i
+  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile okunan servis rol anahtarı
+  - `allowedOrigins` — Deno.env.get('ALLOWED_ORIGINS') virgülle ayrılmış izin verilen origin listesi, split/map/filter ile temizlenmiş
+  - `originHeader` — req.headers.get('origin') ile gelen Origin başlığı
+  - `originToCheck` — kontrol edilecek origin; originHeader yoksa referer'dan URL.parse ile türetilir
+  - `ref` — req.headers.get('referer') ile gelen referer başlığı
+  - `requireAuth` — Deno.env.get('REQUIRE_AUTH') değerinden türetilen boolean; true ise yetkilendirme zorunlu
+  - `supabase` — createClient(supabaseUrl, serviceRoleKey) ile oluşturulan Supabase istemcisi
+  - `authHeader` — req.headers.get('authorization') veya req.headers.get('Authorization') ile gelen yetkilendirme başlığı
+  - `accessToken` — authHeader içinden 'Bearer ' ön ekini atarak çıkarılan token
+  - `authData` — supabase.auth.getUser(accessToken) sonucundaki data nesnesi
+  - `authErr` — supabase.auth.getUser(accessToken) sonucundaki hata nesnesi
+  - `rawBody` — req.json() ile okunan ham istek gövdesi, parse edilemezse null
+  - `parsed` — clientErrorSchema.safeParse(rawBody) ile Zod doğrulama sonucu
+  - `payload` — parsed.data; Zod doğrulamasından geçmiş güvenli veri nesnesi
+  - `mask` — inline arrow fonksiyon; stringleri 4000 karakterle kısaltıp email ve uzun token'ları maskeleyen sanitizasyon fonksiyonu
+  - `firstLine` — payload.stack değerinin ilk satırı (stack trace'in ilk çizgisi)
+  - `urlObj` — payload.url değerinden URL nesnesi oluşturulmaya çalışılır, başarısızsa null
+  - `_path` — urlObj.pathname veya boş string; hata imzası için URL yolu
+  - `signature` — msg + firstLine + _path bileşenlerinden maskelenmiş ve birleştirilmiş hata imzası (error_groups tablosunda onConflict anahtarı)
+  - `groupId` — upsert veya select ile bulunan error_groups tablosu satır ID'si; bulunamazsa null
+  - `groupPayload` — error_groups tablosuna upsert edilecek nesne (signature, level, last_message, url_sample, env, release, last_seen alanları)
+  - `upsertRow` — error_groups tablosuna upsert sonrası select('id') ile dönen satır
+  - `q` — groupId bulunamadığda signature ile error_groups tablosundan select('id') sorgu sonucu
+  - `dedupSeconds` — Deno.env.get('DEDUP_SECONDS') değerinden parseInt ile okunan dedup pencere süresi (saniye cinsinden)
+  - `since` — dedup kontrolü için Date.now() - dedupSeconds*1000 hesaplanmış ISO zaman damgası
+  - `recent` — client_errors tablosundan group_id ve at filtresiyle son dedup süresi içindeki kayıtlar (id, at alanları)
+  - `row` — client_errors tablosuna insert edilecek tüm alanları içeren kayıt nesnesi (at, url, message, stack, user_agent, release, env, level, extra, opsiyonel group_id)
+  - `error` — supabase.from('client_errors').insert(row) sonucundaki hata nesnesi
+  - `msg` — insert hatasından veya outer catch'ten türetilen hata mesajı stringi
+  - `level` — payload.level değerinden türetilen küçük harfli hata seviyesi
+  - `env` — payload.env değerinden türetilen ortam bilgisi stringi
+  - `notifyEnabled` — SLACK_WEBHOOK_URL env var'ının boş olup olmadığına göre boolean
+  - `isCritical` — level değerinin 'fatal' veya 'error' olup olmadığına göre boolean
+  - `shortMsg` — payload.msg değerinden 200 karaktere kısaltılmış mesaj
+  - `fields` — slackNotify fonksiyonuna aktarılacak alanlar dizisi (Signature, Level, Env, URL, Request-Id)
+  - `_e` — outer try-catch bloğunda yakalanan hata nesnesi
+- **Dinamik import**: `../_shared/notify.ts` → `slackNotify` fonksiyonu (Slack webhook ile bildirim gönderir, sadece kritik seviyelerde ve notifyEnabled ise çağrılır; ayrıca outer catch bloğunda hata bildirimi için de import edilir)
+- **Yan etkiler**: Supabase veritabanına `error_groups` tablosuna upsert, `client_errors` tablosuna insert, `increment_error_group_count` RPC çağrısı; opsiyonel Slack webhook bildirimi
+- **Dönüş**: `Response` — başarı durumunda 200 'ok', hata durumlarında 400/401/403/405/500 ile JSON hata mesajı
 
 ---
 

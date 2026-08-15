@@ -1,6 +1,22 @@
+// Çağıran sınıfı: (a) oturumlu müşteri tarayıcısı — getUser(jwt) + sahiplik kapısı
+//
+// NİÇİN BU KAPI VAR (T026-VH Adım 4 · 2026-08-15)
+// Bu uç `venthub_orders` satırı YAZAR ve `user_id` kolonunu doldurur. 2026-08-15'e kadar
+// o değer doğrudan istek gövdesinden geliyordu (`requestData.user_id`) ve yalnız "boş mu"
+// diye bakılıyordu. `verify_jwt = true` olması yetmez: anon key de GEÇERLİ bir JWT'dir ve
+// frontend paketinde herkese açıktır → pratikte herkes BAŞKASININ `user_id`'siyle sipariş
+// oluşturabiliyordu (cetvel §3.2: "gövdeden gelen user_id asla yetki kaynağı olamaz").
+// Artık kimlik `resolveCaller` içindeki TEK `auth.getUser(<jwt>)` çağrısından gelir; tenant
+// de aynı doğrulanmış kimliğin `user_profiles` satırından türetilir (cetvel §3.9 · plan §4).
 import { getCorsHeaders } from '../_shared/cors.ts'
 import Iyzipay from "npm:iyzipay";
-import { resolveTenantId } from '../_shared/tenant_config.ts'
+import {
+    type CallerContext,
+    CallerConfigError,
+    CallerLookupError,
+    resolveCaller,
+    TenantMismatchError,
+} from '../_shared/caller.ts'
 
 
 /**
@@ -87,7 +103,12 @@ Deno.serve(async (req: Request) => {
         interface IyzicoPaymentRequestData {
             amount?: number | string;
             cartItems?: Array<{ product_id: string; quantity: number; price?: number }>;
-            user_id?: string;
+            /**
+             * YETKİ KAYNAĞI DEĞİL. Sipariş sahibi DAİMA doğrulanmış JWT'den (`caller.user.id`)
+             * alınır; bu alan yalnız "istemci kendini kim sanıyor" tutarlılık kontrolüdür
+             * (uyuşmazlıkta 403). Buradan okunup bir yere YAZILMAZ.
+             */
+            user_id?: string | null;
             invoiceInfo?: Record<string, unknown> | null;
             invoiceType?: string | null;
             legalConsents?: Record<string, unknown> | null;
@@ -125,26 +146,86 @@ Deno.serve(async (req: Request) => {
             });
         }
 
-        // Resolve Tenant ID dynamically
-        const tenantId = resolveTenantId(req, requestData || {})
+        // ── Kimlik kapısı (cetvel §3.2 / §3.3) ─────────────────────────────────────
+        // `resolveCaller` içinde `auth.getUser(<token>)` **tek kez** çağrılır — token açıkça
+        // geçirilir, çünkü argümansız `getUser()` edge'de oturum deposu olmadığı için DAİMA
+        // 401 verir (§3.3). Rol ve tenant AYNI `user_profiles` satırından, filtresi YALNIZ
+        // doğrulanmış `id` olan tek sorguyla okunur; yani bu dosyada ikinci bir Auth ya da
+        // profil round-trip'i YOKTUR.
+        //
+        // Gövde bilerek GEÇİLMİYOR (`resolveCaller(req)`): burası saf sınıf (a). Tek üretim
+        // çağıranı `src/hooks/useCheckoutPayment.ts`; service_role ile çağıran bir kardeş uç
+        // yok. Gövdeyi geçseydik service_role dalı gövdedeki `tenant_id`'yi kabul ederdi —
+        // bu uçta böyle bir çağıran olmadığı için o yüzeyi hiç açmıyoruz.
+        let caller: CallerContext | null = null
+        try {
+            caller = await resolveCaller(req)
+        } catch (e) {
+            if (e instanceof TenantMismatchError) {
+                // Doğrulanmış `app_metadata.tenant_id` claim'i profil satırıyla çelişiyor.
+                // UUID'ler YALNIZ log'a yazılır; cevap gövdesine kopyalanmaz (tenant.ts sözleşmesi).
+                console.error('iyzico-payment tenant_mismatch:', requestId, e.profileTenantId, e.claimTenantId)
+                return new Response(JSON.stringify({
+                    error: { code: 'FORBIDDEN', message: 'Tenant doğrulanamadı' }
+                }), {
+                    status: 403,
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
+                });
+            }
+            if (e instanceof CallerConfigError || e instanceof CallerLookupError) {
+                // Fail-closed: profil sorgusu HATA verdiyse (satır yok değil) tenant'ı
+                // "bilinmiyor" sayıp varsayılana düşmek kullanıcıyı YANLIŞ tenant'a yazardı.
+                console.error('iyzico-payment caller resolution failed:', requestId, e.message)
+                return new Response(JSON.stringify({
+                    error: { code: 'CONFIG_ERROR', message: 'Sunucu yapılandırma hatası' }
+                }), {
+                    status: 500,
+                    headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
+                });
+            }
+            throw e
+        }
+
+        // Authorization başlığı yok, JWT geçersiz, ya da yalnız anon key gönderilmiş
+        // (`resolveCaller` bu üçünü de `kind: 'anon'` olarak döndürür) → 401.
+        // `service_role` de burada reddedilir: bu uç sınıf (a)'dır, sipariş sahibi bir
+        // KULLANICI olmak zorundadır.
+        if (caller.kind !== 'user' || !caller.user) {
+            return new Response(JSON.stringify({
+                error: { code: 'UNAUTHORIZED', message: 'Oturum doğrulanamadı' }
+            }), {
+                status: 401,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
+            });
+        }
+
+        // Sipariş sahibi ve tenant: ikisi de DOĞRULANMIŞ kimlikten. İstekten değil.
+        const user_id = caller.user.id
+        const tenantId = caller.tenantId
+
+        // Gövdedeki `user_id` artık yalnız TUTARLILIK kontrolüdür.
+        // Neden "yok say" değil de 403: meşru istemci ya kendi oturumunun id'sini gönderir
+        // ya da (oturum context'i henüz hidrate olmadıysa) `null` gönderir — ikisi de
+        // aşağıdaki koşulu tetiklemez. DOLU ve FARKLI bir değer üreten tek senaryo
+        // taahhüt-uyuşmazlığıdır (başkası adına sipariş denemesi ya da istemcide oturum
+        // karışması); ikisini de sessizce doğru id'ye çevirmek gerçek hatayı gizlerdi.
+        const claimedUserId = typeof requestData?.user_id === 'string' ? requestData.user_id.trim() : ''
+        if (claimedUserId.length > 0 && claimedUserId !== user_id) {
+            console.error('iyzico-payment identity_mismatch:', requestId, user_id, claimedUserId)
+            return new Response(JSON.stringify({
+                error: { code: 'FORBIDDEN', message: 'Kimlik uyuşmazlığı' }
+            }), {
+                status: 403,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
+            });
+        }
 
         const amount = requestData?.amount
         const cartItems = requestData?.cartItems
-        const user_id = requestData?.user_id
         const invoiceInfo = requestData?.invoiceInfo
         const invoiceType = requestData?.invoiceType
         const legalConsents = requestData?.legalConsents
         const shippingMethod = requestData?.shippingMethod
-
-        // Enforce user_id validation
-        if (!user_id) {
-            return new Response(JSON.stringify({
-                error: { code: 'VALIDATION_ERROR', message: 'user_id alanı zorunludur' }
-            }), {
-                status: 400,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
-            });
-        }
 
         // Coalesce customer/shipping/billing from alternative keys and apply fallbacks
         let ci = requestData?.customerInfo || requestData?.customer || {}
@@ -277,7 +358,9 @@ Deno.serve(async (req: Request) => {
         const dbGeneratedId = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
         const orderData = {
             id: dbGeneratedId,
-            user_id: user_id || null,
+            // Doğrulanmış JWT'den; `|| null` fallback'i KALDIRILDI — kimlik kapısı geçilmeden
+            // buraya gelinemez, dolayısıyla sahipsiz sipariş satırı da üretilemez.
+            user_id: user_id,
             conversation_id: conversationId,
             // order_number kolonu şemada yoksa göndermiyoruz; gerekirse ileride eklenir.
             total_amount: Number(authoritativeTotalNum.toFixed(2)),
@@ -487,7 +570,14 @@ Deno.serve(async (req: Request) => {
             callbackUrl: callbackUrlWithParams,
             enabledInstallments: [1, 2, 3, 6, 9, 12],
             buyer: {
-                id: user_id || 'guest_' + Date.now(),
+                // `'guest_' + Date.now()` dalı SİLİNDİ. Ulaşılamazdı (eski kodda da bir satır
+                // yukarıda `if (!user_id) → 400` vardı) ve bir "misafir ödeme" akışını temsil
+                // etmiyordu: her istekte DEĞİŞEN bir alıcı kimliği üretiyordu, yani İyzico
+                // tarafında hiçbir işe yaramayan sahte bir sabitti. Ölçüm de destekliyor:
+                // prod'da `venthub_orders` 0 satır — kıracak canlı misafir akışı yok.
+                // Misafir ödeme gerçekten istenirse bu, sınıf beyanını değiştiren AYRI bir
+                // tasarım kararıdır (anonim oturum ya da ayrı bir uç), sessiz bir fallback değil.
+                id: user_id,
                 name: (ci.name || '').split(' ')[0] || 'Ad',
                 surname: (ci.name || '').split(' ').slice(1).join(' ') || 'Soyad',
                 gsmNumber: (() => { const raw = ci.phone || '+905555555555'; const digits = raw.replace(/\s+/g, ''); return digits.startsWith('+') ? digits : ('+' + digits.replace(/[^0-9]/g, '')); })(),

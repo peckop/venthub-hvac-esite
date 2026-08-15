@@ -1013,7 +1013,11 @@ CREATE FUNCTION public.handle_supabase_webhook() RETURNS trigger
     DECLARE
       payload jsonb;
       webhook_url text := 'https://venthub-hvac-esite.vercel.app/api/webhook/supabase';
-      webhook_secret text := 'whsec_venthub_a61f54b2bcff63f221259b315256d006';
+      -- 2026-08-15 REDAKTE EDILDI: burada canli bir webhook sirri DUZ METIN duruyordu.
+      -- Bu dosyalar SNAPSHOT'tir, uygulanan migration degil; yine de repo public oldugu
+      -- icin degerin agacta durmasi anlamsiz risk. Gercek deger Vault'a tasinacak
+      -- (ayri migration + Recep onayi). Gecmiste kalan kopya icin rotasyon SART.
+      webhook_secret text := 'REDACTED_SEE_VAULT';
       req_id bigint;
     BEGIN
       -- Construct the payload matching Route Handler expectations

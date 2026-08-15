@@ -2,29 +2,26 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-payment\index.ts
-skeleton_hash: 179c063d0f71f16e
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\iyzico-payment\index.ts
+skeleton_hash: debf4ca0e0179b96
 entity_hashes:
   func:iyzico-payment_handler: de31c29702dafb3c
-  overview: 10ad7fb56d2cc8ae
-generated_at: 2026-08-13T07:40:32Z
+  overview: e7caf5244e4f3d30
+generated_at: 2026-08-15T09:05:02Z
 ---
 
 ## Genel Bakış
-
-Bu modül, İyzico ödeme altyapısıyla entegre çalışan bir Supabase Edge Function'dır. HTTP istekleri üzerinden ödeme başlatma, iptal etme ve durum sorgulama gibi temel ödeme operasyonlarını merkezi olarak yönetir. Hassas müşteri verilerini (e-posta, adres bilgileri) maskeleyerek güvenli ödeme süreçleri sunar.
+Bu modül, İyzico ödeme altyapısını kullanarak güvenli online ödeme süreçlerini yöneten bir Supabase Edge Function'dır. Tek bir HTTP handler fonksiyonu aracılığıyla, istemciden gelen isteklere göre ödeme başlatma, iptal etme ve durum sorgulama gibi temel finansal operasyonları merkezi ve güvenli bir şekilde yürütür.
 
 ## Fonksiyon Grupları
-
-### Ödeme İşlemi Yönetimi
-Gelen HTTP isteklerini alarak İyzico API'sine uygun ödeme akışlarını yönlendirir. İstek metoduna göre (ödeme başlatma, iptal, durum sorgulama) uygun işlemi başlatır ve sonucu istemciye iletir.
-
-- iyzico_payment_handler
+### HTTP İstek İşleme ve Yönlendirme
+Gelen tüm HTTP isteklerini alarak, istek metoduna ve içeriğine göre ilgili İyzico ödeme işlemini başlatır ve sonucunu istemciye iletir.
+- iyzico-payment_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır. Mevcut bilgiler (fonksiyon imzası ve modül sabitleri), modülün doğru çalışması için zorunlu olan koşulları belirlemek için yeterli değildir. Aksiyomlar, fonksiyon gövdesinin analiz edilmesiyle üretilebilir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -45,18 +42,17 @@ Bu modül için özel aksiyom tanımlanmamıştır. Mevcut bilgiler (fonksiyon i
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
-- import: ../_shared/tenant_config.ts::resolveTenantId
 - import: npm:iyzipay::Iyzipay
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::maskPaymentMin
-- **params**: `obj` — `PaymentMin` tipinde, ödeme verisi içeren nesne; hassas alanlar maskelenir
-- **ic_degiskenler**: (yok — parametre üzerinde spread + koşullu eşleme yapılır)
-- **Dönüş**: Hassas alanları (`email`, `gsmNumber`, `registrationAddress`, `ip`, `address`) maskelenmiş `PaymentMin` nesnesi; `buyer`, `shippingAddress`, `billingAddress` koşullu olarak eklenir
-- **Closure değişkenleri**: `mask` — metin maskeleyici yardımcı fonksiyon
+### [N1_NASIL] AST Pointer: iyzico-payment/index.ts::maskPaymentInfo
+- **params**: `(obj: PaymentMin)` — Ödeme bilgisi nesnesi
+- **ic_degiskenler**:
+  - yok — Spread operasyonları ile doğrudan dönüş yapılıyor
+- **Dönüş**: Maskelenmiş `PaymentMin` nesnesi (buyer.email, buyer.gsmNumber masked; registrationAddress, ip ve shipping/billing address'ler `'***'` ile değiştirilmiş)
 
 ---
 

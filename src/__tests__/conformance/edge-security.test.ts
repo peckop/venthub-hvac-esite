@@ -87,7 +87,9 @@ const KNOWN_VIOLATIONS = {
   // R6 — _shared/tenant_config.ts JWT payload'ını İMZASIZ çözüp `tenant_id` seçiyor.
   // Sahte JWT ile tenant sınırı aşılabilir (data bleeding). ÇÖZÜM: tenant_id'yi
   // doğrulanmış `getUser()` sonucunun app_metadata'sından al.
-  R6: ['supabase/functions/_shared/tenant_config.ts:29'],
+  // T026-VH Adım 6 (2026-08-15): `resolveTenantId` SİLİNDİ — imzasız `atob` ile birlikte.
+  // Baseline BOŞ = sıfır tolerans. Yeni bir `atob(` FAIL eder.
+  R6: [] as string[],
 
   // R7 (E7) — `supabase/config.toml`'da [functions."<ad>"] BLOĞU OLMAYAN fonksiyonlar.
   // Blok yokken değer örtük `true` olur; bu güvenli TARAF ama BİLİNÇLİ karar değildir:
@@ -128,30 +130,25 @@ const KNOWN_VIOLATIONS = {
   // 26 ayrı güvenlik duruşunun kök sebebi). Beyan biçimi: `// Çağıran sınıfı: (a) ...`
   // Tek tek düzeltilecek borç; YENİ fonksiyon beyansız eklenemez.
   R10: [
-    'supabase/functions/admin-create-coupon/index.ts',
+    // T026-VH Adım 2 (2026-08-15): admin-create-coupon · admin-update-order ·
+    // admin-update-shipping beyanlarını aldı ve sınıf (a) tenant sözleşmesine geçti →
+    // stale-guard gereği üç ad buradan SİLİNDİ.
+    // T026-VH Adım 3 (2026-08-15): 5 bildirim ucu (order-confirmation ·
+    // delivery-notification · return-status-notification · notification-service ·
+    // shipping-notification) `(b)+(a)` beyanını aldı ve ortak `resolveCaller` kapısına
+    // geçti → beş ad da SİLİNDİ.
     'supabase/functions/admin-iyzico-reconcile/index.ts',
     'supabase/functions/admin-order-inspect/index.ts',
     'supabase/functions/admin-orders-latest/index.ts',
-    'supabase/functions/admin-update-order/index.ts',
-    'supabase/functions/admin-update-shipping/index.ts',
     'supabase/functions/apply-coupon/index.ts',
-    'supabase/functions/delivery-notification/index.ts',
     'supabase/functions/healthz/index.ts',
-    'supabase/functions/iyzico-callback/index.ts',
-    'supabase/functions/iyzico-payment/index.ts',
     'supabase/functions/iyzico-refund/index.ts',
     'supabase/functions/log-client-error/index.ts',
-    'supabase/functions/notification-service/index.ts',
-    'supabase/functions/order-confirmation/index.ts',
     'supabase/functions/order-housekeeping/index.ts',
     'supabase/functions/order-validate/index.ts',
     'supabase/functions/refund-order-mock/index.ts',
     'supabase/functions/release-expired-reservations/index.ts',
-    'supabase/functions/return-status-notification/index.ts',
-    'supabase/functions/returns-webhook/index.ts',
-    'supabase/functions/shipping-notification/index.ts',
     'supabase/functions/shipping-status/index.ts',
-    'supabase/functions/shipping-webhook/index.ts',
     'supabase/functions/stock-alert/index.ts',
     'supabase/functions/tcmb-rates-sync/index.ts',
   ],
@@ -162,7 +159,10 @@ const KNOWN_VIOLATIONS = {
   // ÇÖZÜM (§3.9): resolveTenantId async olup tenant_id'yi auth.getUser(jwt) sonucunun
   // app_metadata'sından okumalı; query/gövde yalnız sınıf (c)/(d) uçlarında, imza
   // kontrolünden SONRA kabul edilmeli. R6 (atob) ile birlikte düzeltilir.
-  R11: ['supabase/functions/_shared/tenant_config.ts:20'],
+  // T026-VH Adım 6 (2026-08-15): doğrulanmamış `?tenant_id=` okuması SİLİNDİ.
+  // Tenant artık `_shared/tenant.ts` üzerinden yalnız doğrulanmış kimlikten / kaynak
+  // satırından türetiliyor. Baseline BOŞ = sıfır tolerans.
+  R11: [] as string[],
 } as const
 
 /** R5 muafiyeti — çağıran Authorization header'ı GÖNDEREMEZ. Ada göre, kapsam değil. */
@@ -443,10 +443,36 @@ describe('edge-security · tarama sağlık kontrolü', () => {
     expect(SERVE_RE.test('serve(async (req) => {')).toBe(true)
   })
 
-  it('E12 dedektörü hedefini gerçekten buluyor (R11 bayat-tarama koruması)', () => {
-    const hits = SOURCES.filter((s) => UNTRUSTED_TENANT_RE.test(s.code)).map((s) => s.path)
-    // Tarama bir gün hiçbir şey bulmazsa R11 SESSİZCE yeşile döner — bu kontrol onu engeller.
-    expect(hits.length).toBeGreaterThan(0)
+  it('E12 dedektörü çalışıyor (R11 bayat-tarama koruması)', () => {
+    // Bu kontrolün AMACI: tarama bir gün bozulursa (glob boşalır, regex çürür) R11
+    // SESSİZCE yeşile dönmesin — "hiçbir şey bulamadım" ile "ihlal yok" aynı şey değil.
+    //
+    // İLK HÂLİ YANLIŞTI: repoda EN AZ BİR ihlal bulunmasını şart koşuyordu. Yani
+    // dedektörün sağlığını, kodda bir HATANIN var olmasına bağlıyordu; T026 Adım 6'da
+    // son ihlal silinince kontrol kendini vurdu. Sağlık, repo durumundan BAĞIMSIZ
+    // ölçülmeli: bilinen-kötü sentetik örnek + kaynakların gerçekten yüklendiği.
+    expect(SOURCES.length).toBeGreaterThan(20) // glob boşalırsa burada patlar
+
+    const KOTU = [
+      `const t = url.searchParams.get('tenant_id')`,
+      `const t = url.searchParams.get("tenantId")`,
+      `const t = body.tenant_id`,
+      `const t = parsedBody.tenantId`,
+    ]
+    for (const ornek of KOTU) {
+      expect(UNTRUSTED_TENANT_RE.test(ornek), `yakalanmalıydı: ${ornek}`).toBe(true)
+      UNTRUSTED_TENANT_RE.lastIndex = 0
+    }
+
+    const IYI = [
+      `const { tenantId } = tenantFromVerifiedUser(user, profile)`,
+      `const { tenantId } = tenantFromRow(order)`,
+      `.eq('tenant_id', tenantId)`,
+    ]
+    for (const ornek of IYI) {
+      expect(UNTRUSTED_TENANT_RE.test(ornek), `yanlış-pozitif: ${ornek}`).toBe(false)
+      UNTRUSTED_TENANT_RE.lastIndex = 0
+    }
   })
 })
 
@@ -575,6 +601,17 @@ const IDENTITY_SIGNALS: { name: string; re: RegExp }[] = [
   { name: 'crypto.subtle', re: /crypto\s*\.\s*subtle/ },
   { name: 'x-webhook-secret', re: /x-webhook-secret/i },
   { name: 'service-key karşılaştırması', re: /[!=]==\s*`Bearer\s/ },
+  // T026-VH Adım 3 (2026-08-15) — DEDEKTÖRÜN KÖRLEŞMESİ.
+  // Kimlik kapısı `_shared/caller.ts::resolveCaller`'a taşınınca yukarıdaki sinyallerin
+  // HİÇBİRİ uç dosyasında kalmıyor: kapı GÜÇLENDİ ama R5 onu göremez oldu ve 3 ucu
+  // yanlış-pozitif olarak ihlal saydı. Kural doğruydu, dedektör eskiydi.
+  // İKİ PARÇA ŞART: yalnız `resolveCaller(` aramak, sonucu ÇÖPE ATAN bir dosyayı da
+  // "kimlik var" sayardı — yani kuralı zayıflatırdı. `ctx.kind`/`caller.kind` okuması,
+  // çağıranın kararı gerçekten kullandığının kanıtıdır.
+  {
+    name: 'resolveCaller() kapısı (+ kind okuması)',
+    re: /\bresolveCaller\s*\([\s\S]*?\b(?:ctx|caller)\s*\.\s*kind\b/,
+  },
 ]
 
 describe('R5 · verify_jwt=false olan her fonksiyon gövdesinde kimlik doğrulamalı', () => {

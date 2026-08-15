@@ -395,4 +395,54 @@ describe('Secure Webhooks & Realtime E2E Suite (10 Test Cases)', () => {
     expect(resBody.unchanged).toBe(true)
     expect(mockDbInstance.orders[0].status).toBe('pending') // Database update bypassed
   })
+
+  // T026-VH Adim 5 kilidi. Eski kod tenant'i ISTEKTEN okuyup (`resolveTenantId`) satirla
+  // KARSILASTIRIYORDU, ustelik karsilastirma `isMockEnv` daliyla testlerde tamamen
+  // atlaniyordu — yani hicbir test tenant sinirini gormuyordu. Artik tenant imzali istegin
+  // isaret ettigi `venthub_orders` satirindan TURETILIYOR; bu test onu kanitlar:
+  // saldirgan hem query'de hem govdede kendi tenant'ini gonderse bile yazilan olay kaydi
+  // SIPARISIN tenant'ini tasimali. Derivasyon geri alinirsa bu test kirmiziya doner.
+  it('11. should derive tenant from the order row and ignore attacker-supplied tenant_id in query/body', async () => {
+    const ORDER_TENANT = '11111111-1111-1111-1111-111111111111'
+    const ATTACKER_TENANT = '22222222-2222-2222-2222-222222222222'
+
+    mockDbInstance.orders.push({
+      id: 'order-derive',
+      status: 'pending',
+      order_number: 'ORD-DERIVE',
+      tenant_id: ORDER_TENANT,
+      carrier: null,
+      tracking_number: null
+    })
+
+    // Saldirgan govdeye kendi tenant'ini koyuyor; imza bu govde uzerinden hesaplandigi icin
+    // istek YINE DE gecerli imzali. Yani "imza dogru" tenant'i dogrulamaz — kaynak satir dogrular.
+    const payload = { order_number: 'ORD-DERIVE', status: 'shipped', tenant_id: ATTACKER_TENANT }
+    const rawBody = JSON.stringify(payload)
+    const signature = await computeSignature('webhook-hmac-secret-12345', rawBody)
+
+    const req = new Request(
+      `https://localhost/functions/v1/shipping-webhook?tenant_id=${ATTACKER_TENANT}`,
+      {
+        method: 'POST',
+        headers: {
+          'x-timestamp': String(Date.now()),
+          'Content-Type': 'application/json',
+          'x-signature': signature,
+          'x-id': 'EV-DERIVE-1'
+        },
+        body: rawBody
+      }
+    )
+
+    const res = await simulator.invokeFunction(webhookFunctionPath, req)
+    expect(res.status).toBe(200)
+    expect(mockDbInstance.orders[0].status).toBe('shipped')
+
+    interface EventRow { event_id?: string; tenant_id?: string }
+    const event = (mockDbInstance.events as EventRow[]).find((e) => e.event_id === 'EV-DERIVE-1')
+    expect(event).toBeDefined()
+    expect(event?.tenant_id).toBe(ORDER_TENANT)
+    expect(event?.tenant_id).not.toBe(ATTACKER_TENANT)
+  })
 })

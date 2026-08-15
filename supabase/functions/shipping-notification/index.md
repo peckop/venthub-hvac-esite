@@ -3,37 +3,61 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-notification\index.ts
-skeleton_hash: fa64bfe51880fa0a
+skeleton_hash: 79dbab1fd8c75acf
 entity_hashes:
+  func:callerFailure: 86e71a59bf4b25a1
   func:loadShippingTemplate: f08a6d8b632a3fdf
   func:renderTemplate: 1558cee1949920ff
   func:shipping-notification_handler: 06ce613108984be4
-  overview: b960028f01f7c623
-generated_at: 2026-08-14T22:03:04Z
+  overview: 52bbb74d5e434069
+generated_at: 2026-08-15T09:21:14Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase Edge Function olarak kargo bildirimlerini yönetmek için tasarlanmış bir HTTP API uç noktasıdır. Temel işlevi, depolama alanından dinamik bir şablon yüklemek, gelen istek verileriyle birleştirerek kişiselleştirilmiş bir bildirim metni oluşturmaktır. Modül, istemcilerden gelen RESTful istekleri alıp, şablon tabanlı bir içerik üretim hattını koordine ederek sonucu döndürür.
+Bu modül, bir Supabase Edge Function olarak kargo takip bildirimlerini dışarıya sunan bir HTTP API uç noktasıdır. Gelen istek verilerini alır, depolama alanından dinamik bir bildirim şablonu yükler, bu şablonu istek bilgileriyle doldurarak kişiselleştirilmiş bir içerik üretir ve istemciye yanıt olarak döndürür.
 
 ## Fonksiyon Grupları
-### Şablon Yönetimi
-Bu grup, bildirim içeriğinin dinamik ve yeniden kullanılabilir olmasını sağlayan çekirdek şablon işleme mantığını kapsar. Fonksiyonlar, dış bir depolama alanından ham şablon şablonunu çeker ve bu şablonu belirli veri alanlarıyla doldurarak nihai, okunabilir metni üretir.
+
+### Şablon İşleme
+Bu grup, bildirim içeriğinin dinamik ve yeniden kullanılabilir olmasını sağlayan temel mantığı barındırır. Dış depolama alanından ham şablon metni çekilir ve veri alanlarıyla birleştirilerek nihai, okunabilir bildirim metni üretilir.
 - `loadShippingTemplate`, `renderTemplate`
 
 ### İstek Koordinasyonu
-Bu grup, modülün dış dünya ile olan tek temas noktasıdır ve tüm gelen HTTP isteklerinin yaşam döngüsünü yönetir. Aldığı ham isteği doğrulayıp işler, şablon yönetim fonksiyonlarını buna göre çağırır ve istemciye uygun durum kodları ve gövdelerle yanıt döndürerek iş akışını tamamlar.
+Bu grup, modülün dış dünya ile tek temas noktasıdır ve tüm gelen HTTP isteklerinin yaşam döngüsünü yönetir. İsteği alır, şablon işlemlerini sırasıyla çağırarak iş akışını koordine eder ve istemciye uygun durum koduyla birlikte yanıt döndürür.
 - `shipping-notification_handler`
+
+### Hata Yönetimi
+Bu grup, modül genelinde oluşabilecek beklenmedik durumları yakalayıp standart bir hata yanıtı formatında dışarıya sunar. Fonksiyon, hata türünü analiz ederek anlamlı ve tutarlı bir geri bildirim üretir.
+- `callerFailure`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, bir Supabase Edge Function olarak kargo bildirim şablonlarını yükleyip, gelen HTTP istekleriyle birleştirerek kişiselleştirilmiş bildirim metni üreten bir API servisidir.
+
+[Aksiyom 1]: Eğer `loadShippingTemplate` fonksiyonu depolama alanından bir şablon yükleyemezse (dosya yoksa, erişim hatası oluşursa veya depolama servisi müsait değilse), `null` değeri döndürür.
+[Aksiyom 2]: Eğer `renderTemplate` fonksiyonuna geçersiz bir şablon deseni verilirse (sözdizimi hatalıysa), fonksiyon hata fırlatır veya beklenmeyen çıktı üretir.
+[Aksiyom 3]: Eğer `renderTemplate` fonksiyonuna verilen `data` nesnesi, şablondaki değişken isimlerini karşılamıyorsa (eksik değişken varsa), fonksiyon hata fırlatır veya eksik değişkenleri boş/varsayılan değerle değiştirir.
+[Aksiyom 4]: Eğer `shipping-notification_handler` isteği işlerken `loadShippingTemplate` fonksiyonu `null` döndürürse, handler istemciye bir hata yanıtı (muhtemelen 500) döndürür.
+[Aksiyom 5]: Eğer `shipping-notification_handler` isteği işlerken `renderTemplate` fonksiyonu bir hata fırlatırsa, handler bu hatayı yakalar ve `callerFailure` aracılığıyla istemciye bir hata yanıtı döndürür.
+[Aksiyom 6]: Eğer `callerFailure` fonksiyonuna bir `error` nesnesi verilirse, bu hata istemciler için güvenli bir hata mesajı ve uygun HTTP durum kodu içeren bir nesne döndürür; ancak bu hata nesnesi hakkında detaylı bilgi (hangi durum kodunu döndürdüğü) bilinmiyor.
+[Aksiyom 7]: `shipping-notification_handler`'ın çağrıldığı `req` nesnesinin, handler'ın işleyebileceği geçerli bir HTTP isteği olduğu varsayılır.
+[Aksiyom 8]: `renderTemplate` fonksiyonu, `tpl` parametresinin bir string ve `data` parametresinin key-value çiftlerinden oluşan bir nesne olduğunu varsayar; aksi takdirde fonksiyon hata fırlatır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### callerFailure
+**Ne yapar**: Bu fonksiyon, `shipping-notification` fonksiyonunun çağrılmasında oluşabilecek belirli hata türlerini yakalar ve bunları uygun HTTP durum kodlarıyla eşler. Temel amacı, çağrıcıya (HTTP istemcisine) anlamlı ve standartlaştırılmış bir hata yanıtı döndürerek sorunun kaynağını belirtmektir. Örneğin, bir kullanıcının yetkilendirilmemiş olduğu bir kiralamaya (tenant) erişmeye çalışması durumunda 403 Forbidden hatası üretir.
+
+**Nasıl yapar**: Fonksiyon, gelen `error` nesnesinin türünü `instanceof` operatörünü kullanarak kontrol eden bir dizi koşullu ifade (if-else) bloğu çalıştırır. Her bir özel hata sınıfı (`TenantMismatchError`, `CallerConfigError`, `CallerLookupError`) için önceden tanımlanmış bir HTTP durum kodu ve bir hata mesajı içeren bir nesne döndürür. Eşleşmeyen veya bilinmeyen bir hata türü gelmesi durumunda, hiçbir eşleşme yapılamaz ve `null` değeri döndürülerek üst seviye hata işleyicinin devreye girmesi sağlanır.
+
+**Parametreler**:
+- `error: unknown` — Fonksiyona iletilen ve işlenmesi gereken hata nesnesi. Bu nesne, fonksiyonun içinde kontrol edilen `TenantMismatchError`, `CallerConfigError` veya `CallerLookupError` sınıflarından birine ait olabilir veya farklı bir hata türü olabilir. Tipi `unknown` olarak belirlenerek fonksiyonun her türlü hata girdisini kabul etmesi sağlanmıştır.
+
+**Dönüş**: Fonksiyon, bir hata eşleşmesi bulunduğunda `{ status: number; error: string }` tipinde bir nesne döndürür. `status` alanı, HTTP durum kodunu (403, 500 veya 503), `error` alanı ise harici API yanıtlarında kullanılan kısa bir hata tanımlayıcısını (`tenant_mismatch`, `CONFIG_MISSING`, `profile_lookup_failed`) içerir. Hata eşleşmesi bulunamazsa `null` değeri döndürülür.
 
 ### renderTemplate
 
@@ -72,7 +96,6 @@ Bu grup, modülün dış dünya ile olan tek temas noktasıdır ve tüm gelen HT
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: ../_shared/sentry.ts::sentryCaptureException
 - import: ../_shared/tenant_config.ts::getTenantBranding
-- import: ../_shared/tenant_config.ts::resolveTenantId
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
 
 ---
@@ -103,69 +126,14 @@ Bu grup, modülün dış dünya ile olan tek temas noktasıdır ve tüm gelen HT
 ### ResendResult
 - `id?: string`
 
-### UserProfileRoleRow
-- `role?: string | null`
-
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::renderTemplate
-- **params**: `(tpl: string, data: Record<string, unknown>)`
-- **ic_degiskenler**:
-  - `tpl` — Şablon stringi, if-block ve değişken replace işlemleri uygulanarak iteratif olarak güncellenir
-  - `data` — Şablondaki `{{key}}` ve `{{#if key}}` ifadelerine karşılık gelen değerleri içeren dict
-  - `_m` — İlk regex callback parametresi, eşleşen tam kalıbı temsil eder (kullanılmaz)
-  - `key` — Regex grubundan çıkartılan değişken/blok adı (ör: `"tracking_number"`, `"is_shipped"`)
-  - `inner` — `{{#if key}}...{{/if}}` arasındaki içerik stringi; koşul doğruysa korunur, değilse boş string ile değiştirilir
-  - `v` — `data[key]` ile elde edilen değer; truthy kontrolü veya string dönüşümü için kullanılır
-  - `truthy` — `v` değerinin boolean truthy olup olmadığı; if-block içeriğinin korunup korunmayacağını belirler
-- **Dönüş**: `string` — Değişkenleri ve koşulları işlenmiş nihai şablon stringi
-
----
-
-### [N2_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::loadShippingTemplate
-- **params**: `(yok)`
-- **ic_degiskenler**:
-  - `url` — `new URL('./templates/email/shipping.html', import.meta.url)` ile oluşturulan dosya yolu URL nesnesi; mevcut modül konumuna göremutlak dosya yolunu temsil eder
-- **Dönüş**: `Promise<string | null>` — HTML şablon dosyasının içeriği; dosya bulunamazsa veya okunamazsa `null` döner
-
----
-
-### [N3_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::shipping-notification_handler
-- **params**: `(req: Request)`
-- **ic_degiskenler**:
-  - `parsed` — Request body'sinden parse edilmiş JSON objesi; kargo bildirimi verilerini (alıcı, gönderici, sipariş no vb.) içerir
-  - `RESEND_API_KEY` — Resend e-posta API anahtarı; `Authorization` header'da `Bearer` token olarak kullanılır
-  - `fromAddr` — Gönderici e-posta adresi; `parsed` içinden提取 edilir ve Resend API'ye iletilir
-  - `to` — Alıcı e-posta adresleri dizisi; Resend API'ye `to` alanında iletilir
-  - `bccArr` — BCC alıcıları dizisi; boş değilse Resend API'ye `bcc` alanında iletilir, boşsa `undefined` gönderilir
-  - `subject` — E-posta konu satırı; Resend API'ye `subject` alanında iletilir
-  - `emailContent` — Doldurulmuş şablonun düz metin versiyonu; Resend API'ye `text` alanında iletilir
-  - `html` — Doldurulmuş şablonun HTML versiyonu; Resend API'ye `html` alanında iletilir
-  - `k` — Anonim `resolveField` callback içindeki döngü değişkeni; `keys` dizisi üzerinde iterasyon yapar
-- **Dönüş**: `Response` — HTTP yanıt nesnesi; Resend API yanıtını veya hata yanıtını client'a iletir
-
----
-
-### [N3a_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::shipping-notification_handler::resolveField (anonim)
-- **params**: `(keys: string[])`
-- **ic_degiskenler**:
-  - `k` — Mevcut iterasyondaki anahtar dizisi elemanı; `parsed` dict'inde aranır
-  - `v` — `parsed[k]` ile elde edilen değer; string olup boş olmadığını veya number olup finite olup olmadığı kontrol edilir
-  - `s` — `v` değerinin `.trim()` ile boşlukları temizlenmiş hali; boş string olup olmadığı denetlenir
-- **Dönüş**: `string | null` — İlk geçerli (boş olmayan string veya finite number) değerin string karşılığı; hiçbiri uygun değilse `null`
-
----
-
-### [N3b_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::shipping-notification_handler::sendEmail (iç fonksiyon)
-- **params**: `(fromAddr: string, to: string[], bccArr: string[])`
-- **ic_degiskenler**:
-  - `RESEND_API_KEY` — Ortam değişkeninden okunan Resend API anahtarı; `fetch` isteğinin `Authorization` header'ında kullanılır
-  - `subject` — Üst kapsamdan erişilen e-posta konu satırı
-  - `emailContent` — Üst kapsamdan erişilen düz metin e-posta içeriği
-  - `html` — Üst kapsamdan erişilen HTML e-posta içeriği
-- **Dönüş**: `Promise<Response>` — Resend API (`https://api.resend.com/emails`) POST yanıtını döner
+### [N1_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::callerFailure
+- **params**: `error: unknown`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `{ status: number; error: string } | null`
 
 ---
 
@@ -173,6 +141,7 @@ Bu grup, modülün dış dünya ile olan tek temas noktasıdır ve tüm gelen HT
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    index_ts__callerFailure["callerFailure"]
     index_ts__loadShippingTemplate["loadShippingTemplate"]
     index_ts__renderTemplate["renderTemplate"]
     index_ts__shipping-notification_handler["shipping-notification_handler"]
@@ -181,6 +150,7 @@ graph TD
 ## NODE ID STANDARD
 
   file: supabase\functions\shipping-notification\index.ts
+  function: supabase\functions\shipping-notification\index.ts::callerFailure
   function: supabase\functions\shipping-notification\index.ts::renderTemplate
   function: supabase\functions\shipping-notification\index.ts::loadShippingTemplate
   function: supabase\functions\shipping-notification\index.ts::shipping-notification_handler
@@ -188,6 +158,7 @@ graph TD
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: callerFailure
   export: loadShippingTemplate
   export: renderTemplate
   export: shipping-notification_handler

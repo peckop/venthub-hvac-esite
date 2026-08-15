@@ -98,31 +98,61 @@ export class DenoRuntimeSimulator {
     
     const rand = Math.random().toString(36).substring(2, 10)
     
-    // Also compile _shared/tenant_config.ts if it exists
-    const sharedPath = path.resolve(path.dirname(functionPath), '../_shared/tenant_config.ts')
-    let sharedCompiledCreated = false
-    const sharedCompiledPath = sharedPath.replace('tenant_config.ts', `tenant_config.compiled.${rand}.ts`)
-    
-    if (fs.existsSync(sharedPath)) {
-      const sharedContent = fs.readFileSync(sharedPath, 'utf-8')
-      const sharedCompiledContent = sharedContent.replace(
-        /https:\/\/esm\.sh\/@supabase\/supabase-js(@[0-9a-zA-Z\.\-]+)?/g,
-        '@supabase/supabase-js'
-      )
-      fs.writeFileSync(sharedCompiledPath, sharedCompiledContent, 'utf-8')
-      sharedCompiledCreated = true
+    // _shared bağımlılıkları — ADLA DEĞİL, GERÇEK IMPORT'A göre.
+    //
+    // Burası eskiden yalnız `tenant_config.ts`'i adıyla derliyordu. Yeni bir `_shared`
+    // modülü (T026'da `tenant.ts` + `caller.ts`) eklendiği anda o fonksiyonun testi
+    // "module not found" ile patlıyordu — ve sebebi test dosyasında değil BURADA olduğu
+    // için bulunması zordu. Artık kaynak taranıp gerçekten import edilenler derleniyor,
+    // `_shared` içi zincir (ör. caller.ts -> tenant.ts) dahil.
+    const sharedDir = path.resolve(path.dirname(functionPath), '../_shared')
+    const sharedRefRe = /['"`][^'"`]*_shared\/([A-Za-z0-9_.-]+\.ts)['"`]/g
+
+    const collectSharedRefs = (src: string): string[] => {
+      const out: string[] = []
+      let m: RegExpExecArray | null
+      while ((m = sharedRefRe.exec(src)) !== null) out.push(m[1])
+      sharedRefRe.lastIndex = 0
+      return out
     }
 
+    const inlineSupabaseUrl = (src: string): string =>
+      src.replace(/https:\/\/esm\.sh\/@supabase\/supabase-js(@[0-9a-zA-Z\.\-]+)?/g, '@supabase/supabase-js')
+
     const content = fs.readFileSync(functionPath, 'utf-8')
-    let compiledContent = content.replace(
-      /https:\/\/esm\.sh\/@supabase\/supabase-js(@[0-9a-zA-Z\.\-]+)?/g,
-      '@supabase/supabase-js'
-    )
-    if (sharedCompiledCreated) {
-      compiledContent = compiledContent.replace(
-        /..\/_shared\/tenant_config.ts/g,
-        `../_shared/tenant_config.compiled.${rand}.ts`
-      )
+
+    // Kapanış: fonksiyonun referansları + _shared dosyalarının birbirine referansları.
+    const sharedNames = new Set<string>()
+    const queue = collectSharedRefs(content)
+    while (queue.length) {
+      const name = queue.shift() as string
+      if (sharedNames.has(name)) continue
+      const abs = path.join(sharedDir, name)
+      if (!fs.existsSync(abs)) continue
+      sharedNames.add(name)
+      queue.push(...collectSharedRefs(fs.readFileSync(abs, 'utf-8')))
+    }
+
+    const compiledNameOf = (name: string) => name.replace(/\.ts$/, `.compiled.${rand}.ts`)
+
+    // Derlenmiş kopyalar: hem supabase-js URL'i satır-içine alınır hem `_shared` içi
+    // referanslar derlenmiş adlara çevrilir (yoksa zincirin ikinci halkası ham dosyayı
+    // import eder ve URL yeniden ortaya çıkar).
+    const sharedCompiledPaths: string[] = []
+    for (const name of sharedNames) {
+      let src = inlineSupabaseUrl(fs.readFileSync(path.join(sharedDir, name), 'utf-8'))
+      for (const other of sharedNames) {
+        src = src.split(`./${other}`).join(`./${compiledNameOf(other)}`)
+        src = src.split(`_shared/${other}`).join(`_shared/${compiledNameOf(other)}`)
+      }
+      const outPath = path.join(sharedDir, compiledNameOf(name))
+      fs.writeFileSync(outPath, src, 'utf-8')
+      sharedCompiledPaths.push(outPath)
+    }
+
+    let compiledContent = inlineSupabaseUrl(content)
+    for (const name of sharedNames) {
+      compiledContent = compiledContent.split(`_shared/${name}`).join(`_shared/${compiledNameOf(name)}`)
     }
     
     const compiledPath = functionPath.replace('index.ts', `index.compiled.${rand}.ts`)
@@ -130,9 +160,7 @@ export class DenoRuntimeSimulator {
 
     try {
       this.tempFiles.push(compiledPath)
-      if (sharedCompiledCreated) {
-        this.tempFiles.push(sharedCompiledPath)
-      }
+      this.tempFiles.push(...sharedCompiledPaths)
       await import(compiledPath)
     } catch (err) {
       console.error('[denoRuntime] Error importing compiled function:', err)

@@ -6,7 +6,7 @@
 // Kur taşıma sözleşmesi: çözücü "en güncel effective_date ≤ bugün" okur (currency_rates_latest_idx).
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 const TCMB_URL = 'https://www.tcmb.gov.tr/kurlar/today.xml'
 const QUOTE_CURRENCIES = ['EUR', 'USD']

@@ -1,6 +1,16 @@
+// Çağıran sınıfı: (c) ödeme sağlayıcısı + (a) tarayıcı dönüşü — tenant sipariş satırından türetilir
+//
+// TENANT (T026-VH Adım 5): bu uç İKİ ayrı çağıran tarafından vurulur — İyzico'nun kendi
+// callback POST'u (form-urlencoded, hiç Authorization yok) ve tarayıcının dönüş sayfası
+// (`src/views/PaymentSuccessPage.tsx`, Authorization çoğu zaman ANON key). Bu yüzden tenant
+// JWT'den ALINAMAZ (plan R2: "JWT kazanır" dersek tarayıcı dönüşü kırılır) ve istekten de
+// okunamaz. İki durumda da tek doğru kaynak `orderId`/`conversationId`'nin işaret ettiği
+// `venthub_orders` satırıdır (`_shared/tenant.ts::tenantFromRow`).
+// FAIL-CLOSED DEĞİL: sipariş bulunamazsa uç 4xx dönmez — bugünkü "pending" davranışı korunur,
+// aksi hâlde ödeme dönüş sayfası kırılır (kullanıcı parasını verip beyaz ekran görür).
 import { getCorsHeaders } from '../_shared/cors.ts'
 import Iyzipay from "npm:iyzipay";
-import { resolveTenantId } from '../_shared/tenant_config.ts'
+import { tenantFromRow } from '../_shared/tenant.ts'
 
 // Minimal types to avoid `any` while keeping integration flexible
 type CheckoutRetrieveResponse = {
@@ -40,24 +50,19 @@ Deno.serve(async (req) => {
     let conversationId: string | undefined;
     let orderId: string | undefined;
 
-    let formJson: Record<string, unknown> = {}
     if (contentType.includes("application/x-www-form-urlencoded")) {
       const form = await req.formData();
       token = String(form.get("token") || "");
       conversationId = form.get("conversationId")?.toString();
       orderId = form.get("orderId")?.toString();
-      formJson = { token, conversationId, orderId }
     } else {
       const bodyJson = await req.json().catch(() => ({} as Record<string, unknown>));
       const body = bodyJson as { token?: string; conversationId?: string; orderId?: string };
       token = body?.token;
       conversationId = body?.conversationId;
       orderId = body?.orderId;
-      formJson = bodyJson;
     }
 
-    // Resolve Tenant ID dynamically
-    const tenantId = resolveTenantId(req, formJson)
     // URL query'den de parametre al (callbackUrl'_e eklendi)
     let successUrl: string | null = null;
     try {
@@ -66,6 +71,43 @@ Deno.serve(async (req) => {
       if (!conversationId) conversationId = url.searchParams.get('conversationId') || undefined;
       successUrl = url.searchParams.get('successUrl');
     } catch {}
+
+    // ★ TENANT TÜRETME NOKTASI — `orderId`/`conversationId` çözüldükten SONRA, sipariş
+    // satırından. Sorgu tenant ile FİLTRELENMEZ (filtreyi kuracak güvenilir değer yok);
+    // satır bulunur, tenant ondan okunur. Aynı sorgu `payment_token` fallback'ini de
+    // getirir — eskiden bu ayrı bir istekti ve `tenant_id=eq.<istekten gelen>` ile
+    // filtreliydi, yani saldırganın verdiği değer sorgunun kapsamını belirliyordu.
+    let tenantId = tenantFromRow(null).tenantId
+    let tenantIsDerived = false
+    let orderPaymentToken: string | undefined
+    if (orderId || conversationId) {
+      try {
+        const su = Deno.env.get('SUPABASE_URL') || ''
+        const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+        if (su && sk) {
+          const filter = orderId
+            ? `id=eq.${encodeURIComponent(orderId)}`
+            : `conversation_id=eq.${encodeURIComponent(conversationId as string)}`
+          const got = await fetch(`${su}/rest/v1/venthub_orders?${filter}&select=tenant_id,payment_token`, {
+            headers: { Authorization: `Bearer ${sk}`, apikey: sk }
+          })
+          const arr = await got.json().catch(() => [])
+          const row = Array.isArray(arr) ? arr[0] : null
+          // Satır YOKSA hata değil: tenant DEFAULT kalır ve akış aşağıda 'pending' ile sürer.
+          const decision = tenantFromRow(row)
+          tenantId = decision.tenantId
+          tenantIsDerived = decision.source === 'resource_row'
+          if (row?.payment_token) orderPaymentToken = String(row.payment_token)
+        }
+      } catch {}
+    }
+
+    // `venthub_orders`'a giden sorgular — yani tenant'ı TÜRETTİĞİMİZ satırın kendisi — tenant
+    // ile ancak gerçekten türetebildiysek filtrelenir. Satır yoksa ya da tenant'ı boşsa
+    // `tenantFromRow` DEFAULT'a düşer; o uydurulmuş değeri filtreye koymak sorguyu sessizce
+    // boşa çıkarır — ödeme sonucu DB'ye HİÇ yazılmaz. Bu, sessiz bir fail-closed olurdu ve
+    // tam da bu uçta yasak. Sipariş `id`/`conversation_id` zaten tekil; sınırı onlar çizer.
+    const orderTenantFilter = tenantIsDerived ? `&tenant_id=eq.${encodeURIComponent(tenantId)}` : ''
 
     // Eğer successUrl yoksa, ortamdan türet (PUBLIC_SITE_URL/FRONTEND_URL/SITE_URL)
     if (!successUrl) {
@@ -81,17 +123,8 @@ Deno.serve(async (req) => {
     }
 
     if (!token) {
-      // Fallback: orderId üzerinden payment_token'ı getir ve devam et
-      if (orderId) {
-        try {
-          const got = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=payment_token`, {
-            headers: { Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`, apikey: `${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` }
-          })
-          const arr = await got.json().catch(()=>[])
-          const row = Array.isArray(arr) ? arr[0] : null
-          if (row?.payment_token) token = row.payment_token
-        } catch {}
-      }
+      // Fallback: sipariş satırındaki payment_token (yukarıdaki tenant türetme sorgusundan geldi)
+      if (orderPaymentToken) token = orderPaymentToken
       if (!token) {
         // Token yine yoksa, uygulama çağrısı ise JSON, değilse frontend'_e yönlendir (pending)
         if (wantsJson) {
@@ -152,7 +185,7 @@ Deno.serve(async (req) => {
     // Token geldiyse hemen DB'ye yaz (denetim ve reconcile için)
     try {
       if (token && orderId) {
-        await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
+        await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
           body: JSON.stringify({ payment_token: token })
@@ -198,7 +231,7 @@ Deno.serve(async (req) => {
       const filterByConv = (!orderId && (result?.conversationId || conversationId)) ? `conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}` : '';
       const filter = filterById || filterByConv;
       if (!filter) return null;
-      const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
+      const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}${orderTenantFilter}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${serviceRoleKey}`,
@@ -225,7 +258,7 @@ Deno.serve(async (req) => {
       try {
         let finalOrderId: string | null = orderId || null
         if (!finalOrderId && (result?.conversationId || conversationId)) {
-          const oResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!) }&tenant_id=eq.${encodeURIComponent(tenantId)}&select=id`, {
+          const oResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!) }${orderTenantFilter}&select=id`, {
             headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey }
           })
           if (oResp.ok) {
@@ -253,7 +286,7 @@ Deno.serve(async (req) => {
           const su = Deno.env.get('SUPABASE_URL') || ''
           const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
           if (su && sk) {
-            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=id,total_amount,coupon_code,coupon_discount`, { headers: { Authorization: `Bearer ${sk}`, apikey: sk } })
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}&select=id,total_amount,coupon_code,coupon_discount`, { headers: { Authorization: `Bearer ${sk}`, apikey: sk } })
             if (oResp.ok) {
               const arr = await oResp.json().catch(()=>[])
               const row = Array.isArray(arr) ? arr[0] as { id?: string; total_amount?: number; coupon_code?: string|null; coupon_discount?: number|null } : null
@@ -278,7 +311,7 @@ Deno.serve(async (req) => {
                       if (disc > total) disc = total
                       const disc2 = Number(Number(disc).toFixed(2))
                       // Patch order with computed discount
-                      await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}`, {
+                      await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}`, {
                         method: 'PATCH',
                         headers: { Authorization: `Bearer ${sk}`, apikey: sk, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
                         body: JSON.stringify({ coupon_discount: disc2 })
@@ -318,7 +351,7 @@ Deno.serve(async (req) => {
             // Mark stock processed flag and attach RPC summary to payment_debug
             try {
               const updatedDebugInfo = { ...debugInfo, stock_processed: true, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson };
-              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${orderId}&tenant_id=eq.${tenantId}`, {
+              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}`, {
                 method: 'PATCH',
                 headers: {
                   'Authorization': `Bearer ${serviceRoleKey}`,
@@ -384,14 +417,14 @@ Deno.serve(async (req) => {
           // Fetch order row to get user_id
           let uid: string | null = null
           if (orderId) {
-            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=user_id`, {
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}&select=user_id`, {
               headers: { Authorization: `Bearer ${sk}`, apikey: sk }
             })
             const arr = await oResp.json().catch(()=>[])
             const row = Array.isArray(arr) ? arr[0] : null
             uid = row?.user_id || null
           } else if (result?.conversationId || conversationId) {
-            const oResp = await fetch(`${su}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=user_id`, {
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}${orderTenantFilter}&select=user_id`, {
               headers: { Authorization: `Bearer ${sk}`, apikey: sk }
             })
             const arr = await oResp.json().catch(()=>[])

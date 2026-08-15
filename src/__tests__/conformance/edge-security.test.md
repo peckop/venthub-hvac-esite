@@ -3,7 +3,7 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-hotfix\src\__tests__\conformance\edge-security.test.ts
-skeleton_hash: 67af150221e8c970
+skeleton_hash: 95278796814553e7
 entity_hashes:
   func:assertRatchet: 8f686617daf25e92
   func:firstLineMatching: 9b4704bb804f395c
@@ -15,7 +15,7 @@ entity_hashes:
   func:stripComments: 3f4717c6a5209249
   func:webhookGaps: 809f21544933d64f
   overview: 6bbb68a5213cfbcd
-generated_at: 2026-08-15T06:35:08Z
+generated_at: 2026-08-15T09:02:38Z
 ---
 
 ## Genel Bakış

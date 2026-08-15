@@ -3,36 +3,42 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\admin-update-shipping\index.ts
-skeleton_hash: 8d7c3110f700187c
+skeleton_hash: 8826e4eb433f0803
 entity_hashes:
   func:admin-update-shipping_handler: fab3b88ab551f027
-  overview: 4717843338e56bb2
-generated_at: 2026-08-14T22:02:42Z
+  func:firstProfileRow: a0e6e5d01b903221
+  overview: 36b9e64a0a5f328f
+generated_at: 2026-08-15T09:03:36Z
 ---
 
 ## Genel Bakış
-Bu modül, yetkili yönetici kullanıcıların siparişlere ait kargo bilgilerini güncellemek için kullandığı bir Supabase Edge Function'dır. Gelen HTTP isteklerini kimlik doğrulaması ve yetki kontrolünden geçirerek veritabanındaki kargo kayıtlarını güvenli bir şekilde günceller.
+Bu modül, Supabase Edge Function olarak çalışan bir kargo güncelleme servisidir. Yönetici kullanıcıların siparişlere ait kargo bilgilerini güvenli bir şekilde güncellemesini sağlar. Tek bir HTTP istek işleyicisi üzerinden kimlik doğrulama, yetki kontrolü ve veritabanı güncelleme işlemlerini yönetir.
 
 ## Fonksiyon Grupları
-
-### İstek Doğrulama ve İşleme
-Gelen HTTP isteğini kabul eder, istekteki yöneticinin kimliğini doğrular ve yetkili olup olmadığını kontrol eder. Doğrulama başarılıysa kargo güncelleme işlemini başlatır.
-- admin_update_shipping_handler
-
-### Yanıt Üretme
-Veritabanı güncelleme işleminin sonucuna göre istemciye uygun HTTP durum kodu ve bilgilendirici mesaj içeren yanıt döner.
-- admin_update_shipping_handler
+### İstek İşleme ve Yanıt Üretme
+Gelen HTTP isteklerini alır, yönetici kimliğini doğrular ve yetki kontrolünü gerçekleştirir. İşlem sonucuna göre başarılı veya hatalı bir HTTP yanıtı döndürerek istemciye geri bildirim sağlar.
+- admin-update-shipping_handler, firstProfileRow
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Not:** Fonksiyon gövdesi (kod) paylaşılmadığı için, sadece fonksiyon imzasından veya genel bakıştan mimari varsayımlar çıkarılamaz. Aksiyomlar sadece fonksiyon gövdesindeki kontrollere, koşullara ve süreçlere dayanılarak tanımlanabilir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### firstProfileRow
+**Ne yapar**: Bu fonksiyon, PostgREST API'inden dönen ve ham bir JSON verisi olan `unknown` tipindeki bir değeri alır. Fonksiyon, bu değerin bir dizi (array) olup olmadığını ve ilk elemanının geçerli bir profil nesnesi (belirli alanlara sahip bir nesne) olup olmadığını kontrollü bir şekilde doğrular. Doğrulama başarılı ise ilk profil satırından `role` ve `tenant_id` alanlarını çıkararak tip güvenli bir nesne olarak döndürür; aksi takdirde `null` döner.
+
+**Nasıl yapar**: Fonksiyon, gelen `value` parametresi üzerinde bir dizi runtime kontrolü uygular. Önce değerin bir dizi olup olmadığını ve boş olmadığını kontrol eder. Ardından dizinin ilk elemanının bir nesne (`object`) olup olmadığını doğrular. Bu kontrollerden geçerse, ilkel bir `Record<string, unknown>` tipine dönüştürdüğü bu nesnenin `role` ve `tenant_id` alanlarının string tipinde olup olmadığını test eder. Bu alanların mevcut ve doğru tipte olmaları durumunda ilgili değerleri, değilse `null` değerlerini içeren tip güvenli bir nesne oluşturur. Bu desen, tip uydurmaya (`type casting`) dayanmayan, dinamik ve güvenli bir veri çıkarma yöntemi sunar.
+
+**Parametreler**:
+- value: unknown — PostgREST dizisi (`fetch().json()` çağrısından dönen) veya herhangi bir veriyi temsil eder. Fonksiyon, bu değerin dizin ilk elemanının `role` ve `tenant_id` alanlarını içermesini bekler.
+
+**Dönüş**: `{ role: string | null; tenant_id: string | null } | null` — Doğrulama başarılı ise, `role` ve `tenant_id` alanlarını (her ikisi de `string` veya `null` olabilir) içeren bir nesne döner. Doğrulama başarısız olursa (gelen değer diz değilse, boş dizi ise veya ilk eleman geçerli bir nesne/yapı değilse) `null` döner.
 
 ### admin-update-shipping_handler
 **Ne yapar**: Bu fonksiyon, bir HTTP isteği alarak bir yanıt döndüren bir Supabase Edge Function istek işleyicisidir. Fonksiyonun adı, yöneticilerin kargo veya gönderi bilgilerini güncellemek üzere tasarlandığını belirtir.
@@ -45,104 +51,123 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
-- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: ../_shared/tenant.ts::TenantMismatchError
+- import: ../_shared/tenant.ts::tenantFromVerifiedUser
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
-- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::admin-update-shipping_handler
-- **params**: (req: Request)
-- **ic_degiskenler**:
-  - `requestId` — benzersiz istek kimliği, crypto.randomUUID() veya Date.now() ile oluşturulur
-  - `origin` — istekten alınan Origin başlığı
-  - `allowed` — ALLOWED_ORIGINS ortam değişkeninden split edilmiş izin verilen kökenler dizisi
-  - `okOrigin` — origin'ın allowed listesinde olup olmadığını kontrol eden boolean
-  - `cors` — CORS başlıklarını içeren nesne
-  - `ct` — Content-Type başlığı, küçük harfe çevrilmiş
-  - `max` — MAX_BODY_KB ortam değişkeninden hesaplanan maksimum gövde boyutu (byte)
-  - `cl` — Content-Length başlığı
-  - `_text` — request gövdesi metin olarak
-  - `parsed` — JSON.parse ile ayrıştırılmış gövde nesnesi
-  - `pick` — parsed içindeki anahtarlardan ilk geçerli değeri döndüren yardımcı fonksiyon
-  - `qs` — URL search parametreleri
-  - `cancel` — kargo iptal isteği boolean'ı
-  - `order_id` — sipariş ID'si (parsed veya qs'den)
-  - `carrier` — kargo şirketi
-  - `tracking_number` — kargo takip numarası
-  - `tracking_url` — kargo takip URL'si
-  - `send_email` — kargo bildirimi e-postası gönderilip gönderilmeyeceğini belirleyen boolean
-  - `supabaseUrl` — SUPABASE_URL ortam değişkeni
-  - `anonKey` — SUPABASE_ANON_KEY ortam değişkeni
-  - `serviceKey` — SUPABASE_SERVICE_ROLE_KEY ortam değişkeni
-  - `authHeader` — Authorization başlığı
-  - `authClient` — anonKey ile oluşturulan Supabase istemcisi
-  - `user` — authClient.auth.getUser() ile doğrulanmış kullanıcı
-  - `authErr` — authClient.auth.getUser() hatası
-  - `tenantId` — resolveTenantId ile çözümlenmiş kiracı ID'si
-  - `roleCheck` — kullanıcının rolünü kontrol eden fetch isteği yanıtı
-  - `arr` — roleCheck.json() ile çözümlenmiş dizi
-  - `role` — arr[0].role değerinden alınan rol
-  - `isCurrentlyShipped` — siparişin şu anda kargoya verilip verilmediğini belirleyen boolean
-  - `wantCancel` — iptal isteği veya mevcut kargodan çıkarak belirlenen iptal boolean'ı
-  - `updCancel` — iptal PATCH isteği yanıtı
-  - `isFirstShip` — ilk kez kargoya verme işleminin yapılıp yapılmadığını belirleyen boolean
-  - `patchBody` — sipariş güncellemesi için PATCH gövdesi
-  - `upd` — kargo güncelleme PATCH isteği yanıtı
-  - `headerKey` — x-idempotency-key başlığı
-  - `derivedKey` — computeIdemKey ile hesaplanan derived key
-  - `idemKey` — headerKey veya derivedKey
-  - `customer_email` — müşteri e-posta adresi (sipariş ve kullanıcı verilerinden)
-  - `customer_name` — müşteri adı (sipariş ve kullanıcı verilerinden)
-  - `ordResp` — sipariş bilgilerini çekmek için yapılan fetch isteği yanıtı
-  - `arr` — ordResp.json() ile çözümlenmiş dizi
-  - `row` — arr[0] dizisi
-  - `uid` — row.user_id
-  - `usrResp` — Auth Admin API ile kullanıcı bilgisini çekmek için yapılan fetch isteği yanıtı
-  - `u` — usrResp.json() ile çözümlenmiş kullanıcı nesnesi
-  - `emailResult` — e-posta gönderme sonucunu tutan nesne
-  - `resp` — shipping-notification fonksiyonuna yapılan fetch isteği yanıtı
-  - `j` — resp.json() ile çözümlenmiş ShippingNotifyResponse
-  - `body` — shipping_email_events tablosuna eklenecek JSON gövdesi
-- **Dönüş**: Response
+### [N1_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::firstProfileRow
+- **params**: `(value: unknown)`
+- **ic_degiskenler**: 
+  - `first` — value[0] indisinden alınan ilk eleman, array olup olmadığı ve eleman tipi kontrolü için kullanılır
+  - `record` — first nesnesi Record<string, unknown> tipine dönüştürülmüş kayıt, role ve tenant_id alanları bu nesneden okunur
+- **Dönüş**: `{ role: string | null; tenant_id: string | null } | null`
 
-### [N2_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::pick
-- **params**: (keys: string[])
-- **ic_degiskenler**:
-  - `k` — döngüdeki mevcut anahtar
-  - `v` — parsed nesnesinden alınan değer
-- **Dönüş**: string | null
+### [N2_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::admin-update-shipping_handler
+- **params**: `(req: Request)`
+- **ic_degiskenler**: 
+  - `requestId` — Her istek için benzersiz tanımlayıcı, crypto.randomUUID veya Date.now ile oluşturulur
+  - `origin` — İstek header'ından gelen origin değeri, CORS kontrolü için kullanılır
+  - `allowed` — ALLOWED_ORIGINS env değişkeninden split edilmiş izin verilen origin listesi
+  - `okOrigin` — Mevcut origin'in izin verilen listede olup olmadığını kontrol eden boolean
+  - `cors` — getCorsHeaders ile elde edilen CORS başlık nesnesi
+  - `ct` — Content-Type header'ının lowercased hali, JSON olup olmadığının kontrolü için
+  - `max` — MAX_BODY_KB env değişkeninden hesaplanan maksimum gövde boyutu (bayt)
+  - `cl` — Content-Length header'ından alınan mevcut gövde boyutu (bayt)
+  - `_text` — req.text() ile okunan ham istek gövdesi metni
+  - `parsed` — _text'in JSON.parse ile ayrıştırılmış hali, request parametreleri için
+  - `pick` — İç içe fonksiyon, parsed objesinde belirli anahtarlar arayan yardımcı fonksiyon
+  - `qs` — req.url'den oluşturulan URL searchParams nesnesi
+  - `cancel` — iptal isteği boolean değeri, parsed veya query'den alınır
+  - `order_id` — Sipariş ID'si, parsed veya query'den alınır
+  - `carrier` — Kargo şirketi, parsed veya query'den alınır
+  - `tracking_number` — Kargo takip numarası, parsed veya query'den alınır
+  - `tracking_url` — Kargo takip URL'i, parsed veya query'den alınır
+  - `send_email` — E-posta gönderilip gönderilmeyeceğini belirleyen boolean, parsed veya query'den alınır
+  - `supabaseUrl` — SUPABASE_URL env değişkeninden alınan Supabase URL'i
+  - `anonKey` — SUPABASE_ANON_KEY env değişkeninden alınan Supabase anon anahtarı
+  - `serviceKey` — SUPABASE_SERVICE_ROLE_KEY env değişkeninden alınan Supabase servis rolü anahtarı
+  - `authHeader` — İstek header'ından alınan Authorization başlığı
+  - `authClient` — anonKey ile oluşturulan Supabase istemcisi, JWT ile kimlik doğrulama için
+  - `jwt` — Authorization header'ından çıkarılan JWT token'ı
+  - `user` — authClient.auth.getUser ile doğrulanmış kullanıcı nesnesi
+  - `authErr` — Kimlik doğrulama sırasında oluşan hata
+  - `roleCheck` — Kullanıcı rolünü kontrol etmek için yapılan fetch isteği yanıtı
+  - `profileRow` — firstProfileRow ile elde edilen kullanıcı profil satırı
+  - `role` — profileRow?.role değerinden alınan kullanıcı rolü
+  - `tenantId` — tenantFromVerifiedUser ile elde edilen tenant ID'si
+  - `isCurrentlyShipped` — Siparişin mevcut durumunun shipped olup olmadığını belirleyen boolean
+  - `wantCancel` — İptal isteği boolean değeri, cancel parametresi veya mevcut duruma göre belirlenir
+  - `updCancel` — İptal işlemini gerçekleştiren PATCH isteği yanıtı
+  - `txt` — updCancel başarısız olduğunda alınan hata metni
+  - `isFirstShip` — İlk kez kargo gönderimi yapılıp yapılmadığını belirleyen boolean
+  - `cur` — Mevcut sipariş durumunu getiren fetch isteği yanıtı
+  - `arr` — cur.json() ile elde edilen dizi (sipariş satırları)
+  - `row` — arr[0] indisinden alınan ilk sipariş satırı
+  - `computeIdemKey` — İdempotens anahtarı hesaplayan iç içe fonksiyon
+  - `patchBody` — Sipariş güncellemesi için gönderilecek JSON gövdesi
+  - `upd` — Sipariş güncellemesini gerçekleştiren PATCH isteği yanıtı
+  - `txt` — upd başarısız olduğunda alınan hata metni
+  - `headerKey` — İstek header'ından gelen x-idempotency-key değeri
+  - `derivedKey` — computeIdemKey ile hesaplanan idempotens anahtarı
+  - `idemKey` — Son idempotens anahtarı (headerKey veya derivedKey)
+  - `customer_email` — Müşteri e-posta adresi, bildirim için kullanılır
+  - `customer_name` — Müşteri adı, bildirim için kullanılır
+  - `ordResp` — Sipariş detaylarını getiren fetch isteği yanıtı
+  - `arr` — ordResp.json() ile elde edilen dizi
+  - `row` — arr[0] indisinden alınan sipariş satırı
+  - `uid` — row?.user_id değerinden alınan kullanıcı ID'si
+  - `usrResp` — Kullanıcı bilgilerini getiren Auth Admin API isteği yanıtı
+  - `u` — usrResp.json() ile elde edilen kullanıcı nesnesi
+  - `metaName` — u.user_metadata.full_name veya u.user_metadata.name değerinden alınan isim
+  - `emailResult` — E-posta gönderim sonucunu tutan nesne {sent: boolean, disabled: boolean}
+  - `resp` — shipping-notification fonksiyonuna yapılan istek yanıtı
+  - `j` — resp.json() ile elde edilen JSON yanıtı (ShippingNotifyResponse)
+  - `_e` — catch bloğunda yakalanan hata nesnesi
+  - `msg` — _e.message veya String(_e) ile elde edilen hata mesajı
+- **Dönüş**: `Response` (çeşitli HTTP durum kodlarıyla)
 
-### [N3_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::cancel
-- **params**: ()
-- **ic_degiskenler**:
+### [N3_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::pick
+- **params**: `(keys: string[])`
+- **ic_degiskenler**: 
+  - `k` — Döngü değişkeni, keys dizisindeki her anahtar
+  - `v` — parsed objesinden k ile alınan değer
+- **Dönüş**: `string | null`
+
+### [N4_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::cancel
+- **params**: `(yok)`
+- **ic_degiskenler**: 
   - `vRaw` — parsed['cancel'] veya qs.get('cancel') değerinden alınan ham değer
-- **Dönüş**: boolean
+- **Dönüş**: `boolean`
 
-### [N4_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::send_email
-- **params**: ()
-- **ic_degiskenler**:
-  - `v` — parsed['send_email'], parsed['sendEmail'], qs.get('send_email') veya qs.get('sendEmail') değerinden alınan değer
-- **Dönüş**: boolean
+### [N5_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::send_email
+- **params**: `(yok)`
+- **ic_degiskenler**: 
+  - `v` — parsed['send_email'] veya qs.get('send_email') değerinden alınan değer
+- **Dönüş**: `boolean`
 
-### [N5_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::computeIdemKey
-- **params**: (action: 'ship' | 'cancel', orderId: string, carrier?: string|null, tn?: string|null)
-- **ic_degiskenler**:
-  - `raw` — parametrelerin pipe ile birleştirilmiş hali
-  - `bytes` — raw dizgesinin TextEncoder ile Uint8Array'e çevrilmiş hali
-  - `hash` — SHA-256 ile hesaplanan ArrayBuffer
-- **Dönüş**: string
+### [N6_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::computeIdemKey
+- **params**: `(action: 'ship' | 'cancel', orderId: string, carrier?: string|null, tn?: string|null)`
+- **ic_degiskenler**: 
+  - `raw` — Parametrelerin '|' ile birleştirilmesiyle oluşturulan ham string
+  - `bytes` — raw string'in TextEncoder ile bayt dizisine dönüştürülmüş hali
+  - `hash` — crypto.subtle.digest ile hesaplanan SHA-256 hash'i
+- **Dönüş**: `string` (16 baytlık hex string)
 
 ---
 
 ## NODE ID STANDARD
 
   file: supabase\functions\admin-update-shipping\index.ts
+  function: supabase\functions\admin-update-shipping\index.ts::firstProfileRow
   function: supabase\functions\admin-update-shipping\index.ts::admin-update-shipping_handler
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: admin-update-shipping_handler
+  export: firstProfileRow

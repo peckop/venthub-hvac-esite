@@ -1,6 +1,12 @@
+// Çağıran sınıfı: (a) oturumlu admin tarayıcısı — getUser(jwt) + rol kapısı
+//
+// Tenant, isteğin HİÇBİR alanından okunmaz: rol ile AYNI profil satırından türetilir
+// (`_shared/tenant.ts::tenantFromVerifiedUser`). Buradaki eski kod tenant'ı `resolveTenantId`
+// ile istekten alıp profil sorgusuna FİLTRE olarak koyuyordu — "profili filtrelemek için
+// tenant'ı bilmek" döngüsü, tenant'ın istekten okunmasının gerekçesiydi (cetvel §3.9).
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
-import { resolveTenantId } from '../_shared/tenant_config.ts'
+import { TenantMismatchError, tenantFromVerifiedUser } from '../_shared/tenant.ts'
 
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
@@ -37,15 +43,12 @@ Deno.serve(async (req: Request) => {
 
     const userId = userRes.user.id
 
-    // We must resolve tenantId before profile check
-    const bodyCheck = await req.clone().json().catch(() => ({}))
-    const tenantId = resolveTenantId(req, bodyCheck)
-
+    // Rol VE tenant TEK sorgudan; filtre YALNIZ doğrulanmış `id`. Tenant artık sorgunun
+    // girdisi değil, SONUCU — ek round-trip yok.
     const { data: profile, error: profErr } = await supabaseAdmin
       .from('user_profiles')
-      .select('role')
+      .select('role, tenant_id')
       .eq('id', userId)
-      .eq('tenant_id', tenantId)
       .maybeSingle()
 
     if (profErr) {
@@ -55,6 +58,21 @@ Deno.serve(async (req: Request) => {
     const userRole = profile?.role as string | undefined || 'user'
     if (!['admin', 'superadmin'].includes(userRole)) {
       return new Response(JSON.stringify({ error: 'forbidden', details: 'admin_only' }), { status: 403, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+    }
+
+    // Doğrulanmış kullanıcı + profil satırı → tenant. `app_metadata` yalnız çapraz kontrol;
+    // profille çelişirse 403 (gövdeye UUID yazılmaz).
+    let tenantId: string
+    try {
+      tenantId = tenantFromVerifiedUser(
+        { id: userId, app_metadata: userRes.user.app_metadata ?? null },
+        profile,
+      ).tenantId
+    } catch (tenantErr) {
+      if (tenantErr instanceof TenantMismatchError) {
+        return new Response(JSON.stringify({ error: 'forbidden', details: 'tenant_mismatch' }), { status: 403, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+      }
+      throw tenantErr
     }
 
     interface CouponBody {
