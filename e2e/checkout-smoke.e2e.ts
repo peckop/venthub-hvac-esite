@@ -20,12 +20,24 @@ const PASSWORD = process.env.E2E_ADMIN_PASSWORD
 // ⚠️ KARARLI HALE GETİRİLDİ (2026-06-19): Sepete-ekleme adımı artık ürün detay sayfasından
 // data-testid="pdp-add-to-cart" butonuyla gerçekleştiriliyor. Böylece hover-transform / pointer
 // intercepting gibi liste sayfası sorunları elenmiştir.
-// ⏸️ KARANTİNA (2026-08-11, Kademe-2 F0 tasfiyesi): DB'de satın alınabilir ürün yok — legacy
-// katalog silindi (kademe2-clean-rebuild F0), yeni katalog fiyat motoru gelene dek "Teklif Al"
-// modunda yüklenecek (price=null). Satın alınabilir kart şartı bu pencerede yapısal olarak
-// sağlanamaz. KALDIRMA KRİTERİ: Fiyat Motoru dalgası (PS Wave 4) satış fiyatlarını yazınca
-// describe.skip'i sil (product-schema-master-implementation-plan Wave 4 kalite kapısı maddesi).
-test.describe.skip('checkout funnel smoke (pre-payment)', () => {
+// ⏸️ KARANTİNA (2026-08-11, Kademe-2 F0 tasfiyesi): DB'de satın alınabilir ürün yoktu — legacy
+// katalog silinmiş, yeni katalog fiyat motoru gelene dek "Teklif Al" modundaydı (price=null).
+// Satın alınabilir kart şartı o pencerede YAPISAL olarak sağlanamıyordu.
+//
+// ▶️ KARANTİNA KALDIRILDI (2026-08-15). Kaldırma kriteri fiyat motorunun satış fiyatlarını
+// yazmasıydı; seed koştu ve prod'dan ÖLÇÜLDÜ: 374 aktif ürün, 1044 fiyat satırı,
+// 348 ürünün `display_price > 0`. Yani "satın alınabilir kart" artık var.
+//
+// NİÇİN ŞİMDİ ÖNEMLİ — bu testin asıl işi bugün değişti. 2026-08-15'te ödeme yolu
+// FAIL-CLOSED yapıldı (T041-VH): `order-validate` doğrulaması yapılamazsa `iyzico-payment`
+// ödemeyi BAŞLATMIYOR ve istemci fiyatına düşen yedek yol SİLİNDİ. Bu doğru karar ama yeni
+// bir risk getirdi: fail-closed mantığında bir hata olsa checkout tamamen ölür ve **bunu
+// yakalayacak hiçbir çalışma-zamanı kapısı yoktu** — 794 testin tamamı statik/birim, hiçbiri
+// tarayıcı açmıyor. Bu dosya o boşluğu kapatır.
+//
+// Ödeme adımına HÂLÂ girilmez (aşağıdaki güvenlik sınırı); ölçülen şey, hunının ödeme
+// düğmesine kadar boot olup interaktif kaldığıdır.
+test.describe('checkout funnel smoke (pre-payment)', () => {
   // Secret/credential yoksa atla (CI'ı kırma) — admin smoke ile aynı kimlik.
   test.skip(!EMAIL || !PASSWORD, 'E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD gerekli (CI var+secret).')
 
@@ -39,23 +51,49 @@ test.describe.skip('checkout funnel smoke (pre-payment)', () => {
       .waitForURL((u) => !u.pathname.includes('/auth/login'), { timeout: 25_000 })
       .catch(() => { /* yine de devam; aşağıda net patlar */ })
 
-    // 2) Ürün listesi → teklif isteme gerektirmeyen ilk satın alınabilir ürünün detay sayfasına git → sepete ekle
+    // 2) Ürün listesi → satın alınabilir bir ürünün detay sayfasına git → sepete ekle
+    //
+    // ⚠️ ESKİ SEÇİCİ NİÇİN KALDIRILDI (2026-08-15, karantinadan çıkarken ilk koşuda patladı):
+    // Test "satın alınabilir kart"ı `hasNotText: 'Teklif İste'` ile arıyordu. O varsayım
+    // ARTIK YANLIŞ: `/tr/products` F5-B'den beri `FamilyCard` basıyor ve fiyat karttan
+    // BİLEREK kaldırıldı (PS-042 önbellek izolasyonu) — dosyanın kendi yorumu diyor ki
+    // "her kart aynı 'Teklif İste' CTA'sını gösterir". Yani filtre SIFIR kart eşleştiriyordu.
+    // Kod doğruydu, test eski sözleşmeyi kodluyordu.
+    //
+    // YENİ ÇAPA: satın alınabilirliğin tek dürüst işareti PDP'deki `pdp-add-to-cart`.
+    // Kart metnine değil, ürünün gerçekten sepete eklenebilir olmasına bakılır. 374 ailenin
+    // 348'i fiyatlı, ama İLK kartın fiyatlı olduğu garanti değil — bu yüzden ilk birkaç
+    // kart sırayla denenir. (Kart metnine geri dönme: aynı hataya düşersin.)
     await page.goto('/tr/products')
-    const productCardLink = page.locator('a[href*="/products/"]').filter({ hasNotText: 'Teklif İste' }).first()
-    await expect(productCardLink, 'Satın alınabilir ürün kartı linki görünmedi').toBeVisible({ timeout: 30_000 })
-    // Karta click() YERİNE href'i alıp DOĞRUDAN git: kartın hover-transform'u / üstteki katman
-    // click()'i "stable değil / pointer intercept" diye 60sn timeout'a sokuyordu (master'da flaky).
-    // goto deterministiktir — actionability beklemesi yok.
-    const productHref = await productCardLink.getAttribute('href')
-    if (!productHref) throw new Error('Ürün kartı href alınamadı (liste boot olmadı?)')
-    await page.goto(productHref)
+    const cardLinks = page.locator('a[href*="/products/"]')
+    await expect(cardLinks.first(), 'Ürün listesi hiç kart basmadı (liste boot olmadı?)').toBeVisible({
+      timeout: 30_000,
+    })
 
-    // Detay sayfasına geçişi doğrula
-    await page.waitForURL(/\/products\//, { timeout: 25_000 })
+    const hrefs = (await cardLinks.evaluateAll((els) =>
+      els.map((e) => (e as HTMLAnchorElement).getAttribute('href')).filter(Boolean),
+    )) as string[]
+    const denenecek = [...new Set(hrefs)].slice(0, 6)
+    expect(denenecek.length, 'Ürün listesinden hiç href toplanamadı').toBeGreaterThan(0)
 
-    // Ürün detay sayfasındaki "Sepete Ekle" butonu
     const addToCartBtn = page.getByTestId('pdp-add-to-cart')
-    await expect(addToCartBtn, 'Detay sayfasındaki "Sepete Ekle" butonu görünmedi').toBeVisible({ timeout: 20_000 })
+    let bulunan: string | null = null
+    for (const href of denenecek) {
+      // Karta click() YERİNE href'e DOĞRUDAN git: kartın hover-transform'u / üstteki katman
+      // click()'i "stable değil / pointer intercept" diye 60sn timeout'a sokuyordu (flaky).
+      await page.goto(href)
+      await page.waitForURL(/\/products\//, { timeout: 25_000 })
+      if (await addToCartBtn.isVisible({ timeout: 12_000 }).catch(() => false)) {
+        bulunan = href
+        break
+      }
+    }
+    expect(
+      bulunan,
+      `Denenen ${denenecek.length} üründen hiçbiri sepete eklenebilir değil — hepsi "Teklif Al" ` +
+        'modunda görünüyor. Fiyat motoru vitrine ulaşmıyor olabilir (bu GERÇEK bir regresyon ' +
+        `olabilir, testi gevşetme). Denenenler: ${denenecek.join(', ')}`,
+    ).not.toBeNull()
 
     // Sepet localStorage'a yazılana kadar hidrasyon/bağlanma yarışını tolere ederek yeniden tıkla.
     await expect
@@ -100,11 +138,28 @@ test.describe.skip('checkout funnel smoke (pre-payment)', () => {
       timeout: 20_000,
     })
 
-    // 5) Adres doldur (validateAddress: full_address + city + district yeterli; legal onaylar
-    //    yalnız ödeme anında gerekir, o yüzden buraya kadar onay gerekmez).
+    // 5) Adres doldur (validateAddress: full_address + city + district yeterli).
     await page.getByTestId('checkout-ship-address').fill('E2E Test Mah. Smoke Sk. No:1 D:2')
     await city.fill('İstanbul')
     await page.getByTestId('checkout-ship-district').fill('Kadıköy')
+
+    // 5b) ZORUNLU YASAL ONAYLAR — adım 2→3 geçişinin ÖN KOŞULU.
+    //
+    // ⚠️ TESTİN ESKİ YORUMU YANLIŞTI: "legal onaylar yalnız ödeme anında gerekir, buraya
+    // kadar onay gerekmez" yazıyordu. Bu 2026-08-15'e kadar doğruydu ve tam da SORUNDU:
+    // tüketici hiçbirini işaretlemeden ödemeye geçebiliyor, sistem `accepted:false`'ı zaman
+    // damgasıyla siparişe yazıyordu (kendi aleyhine delil). LAUNCH kapıyı `handleNextStep`
+    // içinde adım 2→3'e taşıdı (INV-LEGAL-1). Yani onaylar artık huninin ORTASINDA zorunlu.
+    //
+    // Bu satırlar testi "geçsin diye" gevşetmiyor — mevzuatın gerektirdiği gerçek kullanıcı
+    // davranışını taklit ediyor (Mesafeli Sözleşmeler Yönetmeliği: ön bilgilendirme ve
+    // sözleşme teyidi, sözleşme kurulmadan ÖNCE). `marketing` bilerek işaretlenmez:
+    // ticari elektronik ileti onayı opsiyoneldir ve zorunlu tutulamaz.
+    for (const onay of ['kvkk', 'distanceSales', 'preInfo', 'orderConfirm']) {
+      const kutu = page.getByTestId(`checkout-consent-${onay}`)
+      await expect(kutu, `Yasal onay kutusu bulunamadı: ${onay}`).toBeVisible({ timeout: 10_000 })
+      await kutu.check()
+    }
 
     // İleri → ADIM 3 (özet / review). Huni burada donsaydı review mount olmazdı.
     await page.getByTestId('checkout-next-btn').click()
