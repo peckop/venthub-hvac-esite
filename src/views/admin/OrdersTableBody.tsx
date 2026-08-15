@@ -2,7 +2,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { endOfDay } from 'date-fns'
-import { Info, ShoppingCart, X } from 'lucide-react'
+import { Info, ShoppingCart } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import type { DateRange } from 'react-day-picker'
 import { toast } from 'sonner'
@@ -18,6 +18,8 @@ import type { AdminColumn } from '../../components/admin/data-table/types'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import ExportMenu from '../../components/admin/ExportMenu'
 import OrderFormModal from '../../components/admin/orders/OrderFormModal'
+import { AdminModal } from '../../components/admin/overlay/AdminModal'
+import { AdminSidePanel } from '../../components/admin/overlay/AdminSidePanel'
 import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
@@ -27,6 +29,17 @@ import type { Lang } from '../../i18n/I18nContext'
 import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import type { Database } from '../../types/database.types'
+import {
+  adminButtonPrimaryClass,
+  adminButtonSecondaryClass,
+  adminInputClass,
+  adminSelectClass,
+  adminSelectStyle,
+  adminSettingsLabelClass,
+  adminTableActionDangerClass,
+  adminTableCellClass,
+  adminTableHeadCellClass,
+} from '../../utils/adminUi'
 
 /* ---- model ---- */
 interface AdminOrderRow {
@@ -1119,261 +1132,211 @@ const OrdersTableBody: React.FC = () => {
         }
       />
 
-      {shipOpen && (
-        <div className="fixed inset-0 bg-surface-darker/40 backdrop-blur-xl flex items-center justify-center z-modal p-4 animate-in fade-in duration-500">
-          <div className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-lg overflow-hidden transform animate-in zoom-in-95 duration-500">
-            <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
-              <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">
-                {bulkMode
-                  ? t('admin.orders.modals.shipping.bulkTitle')
-                  : t('admin.orders.modals.shipping.title')}
-              </h3>
-              <button
-                type="button"
-                onClick={closeShipModal}
-                aria-label={t('admin.orders.modals.shipping.cancel')}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-10 space-y-8">
-              <div className="grid grid-cols-1 gap-8">
-                <div className="space-y-3">
-                  <label
-                    htmlFor="ship-carrier"
-                    className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1"
-                  >
-                    {t('admin.orders.modals.shipping.carrierLabel')}
-                  </label>
-                  <select
-                    id="ship-carrier"
-                    value={carrier}
-                    onChange={(e) => setCarrier(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 transition-colors"
-                  >
-                    <option value="" className="bg-surface-deep">
-                      {t('admin.orders.modals.shipping.carrierSelect')}
-                    </option>
-                    <option value="Yurtiçi" className="bg-surface-deep">
-                      {t('admin.orders.modals.shipping.carriers.yurtici')}
-                    </option>
-                    <option value="Aras" className="bg-surface-deep">
-                      {t('admin.orders.modals.shipping.carriers.aras')}
-                    </option>
-                    <option value="MNG" className="bg-surface-deep">
-                      {t('admin.orders.modals.shipping.carriers.mng')}
-                    </option>
-                    <option value="PTT" className="bg-surface-deep">
-                      {t('admin.orders.modals.shipping.carriers.ptt')}
-                    </option>
-                  </select>
-                </div>
-                <div className="space-y-3">
-                  <label
-                    htmlFor="ship-tracking"
-                    className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1"
-                  >
-                    {t('admin.orders.modals.shipping.trackingLabel')}
-                  </label>
-                  <input
-                    id="ship-tracking"
-                    value={tracking}
-                    onChange={(e) => setTracking(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 transition-colors placeholder:text-slate-600"
-                    placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
-                  />
-                </div>
-                <label className="flex items-center gap-3 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                  <input
-                    type="checkbox"
-                    checked={sendEmail}
-                    onChange={(e) => setSendEmail(e.target.checked)}
-                    className="w-4 h-4 rounded border-white/10 bg-white/5 text-cyan-500 focus-visible:ring-cyan-500/20"
-                  />
-                  {t('admin.orders.modals.shipping.sendEmailLabel')}
-                </label>
-              </div>
-            </div>
-            <div className="px-10 py-8 bg-white/2 border-t border-white/5 flex justify-end gap-4">
-              <button
-                type="button"
-                onClick={closeShipModal}
-                className="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
-              >
-                {t('admin.orders.modals.shipping.cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={() => void submitShip()}
-                className="px-8 py-3 text-xs font-black uppercase tracking-widest bg-cyan-500 text-white rounded-xl shadow-glow-md hover:scale-105 active:scale-95 transition-transform"
-              >
-                {t('admin.orders.modals.shipping.save')}
-              </button>
-            </div>
+      {/*
+        KARGO — **MODAL**. Cetvel §4.1: "<5 girdili form → Modal" (Carbon Forms).
+        Kullanıcı burada BAKMIYOR, KARAR VERİYOR: taşıyıcı + takip no giriliyor,
+        `admin-update-shipping` edge fonksiyonu çağrılıyor ve sipariş durumu
+        `shipped`'e taşınıyor (tekil veya toplu). Kararın sonucu geri alınması
+        pahalı bir yazma → arka planı bloklamak DOĞRU davranıştır (§4.2).
+      */}
+      <AdminModal
+        open={shipOpen}
+        onOpenChange={(next) => {
+          if (!next) closeShipModal()
+        }}
+        title={
+          bulkMode
+            ? t('admin.orders.modals.shipping.bulkTitle')
+            : t('admin.orders.modals.shipping.title')
+        }
+        description={t('admin.orders.modals.shipping.description')}
+        closeLabel={t('admin.orders.modals.shipping.close')}
+        footer={
+          <>
+            <button type="button" onClick={closeShipModal} className={adminButtonSecondaryClass}>
+              {t('admin.orders.modals.shipping.cancel')}
+            </button>
+            <button
+              type="button"
+              onClick={() => void submitShip()}
+              className={adminButtonPrimaryClass}
+            >
+              {t('admin.orders.modals.shipping.save')}
+            </button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="ship-carrier" className={adminSettingsLabelClass}>
+              {t('admin.orders.modals.shipping.carrierLabel')}
+            </label>
+            <select
+              id="ship-carrier"
+              value={carrier}
+              onChange={(e) => setCarrier(e.target.value)}
+              className={adminSelectClass}
+              style={adminSelectStyle}
+            >
+              <option value="">{t('admin.orders.modals.shipping.carrierSelect')}</option>
+              <option value="Yurtiçi">{t('admin.orders.modals.shipping.carriers.yurtici')}</option>
+              <option value="Aras">{t('admin.orders.modals.shipping.carriers.aras')}</option>
+              <option value="MNG">{t('admin.orders.modals.shipping.carriers.mng')}</option>
+              <option value="PTT">{t('admin.orders.modals.shipping.carriers.ptt')}</option>
+            </select>
           </div>
-        </div>
-      )}
 
-      {logsOpen && (
-        <div className="fixed inset-0 bg-surface-darker/40 backdrop-blur-xl flex items-center justify-center z-modal p-4 animate-in fade-in duration-500">
-          <div className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform animate-in zoom-in-95 duration-500">
-            <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
-              <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">
-                {t('admin.orders.modals.logs.title')}
-              </h3>
-              <button
-                type="button"
-                onClick={closeLogsModal}
-                aria-label={t('admin.orders.modals.logs.close')}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-10">
-              <div className="max-h-50vh overflow-y-auto rounded-hvac-xl border border-white/10 bg-white/2 overflow-hidden custom-scrollbar">
-                {logsLoading ? (
-                  <div className="p-20 text-center flex flex-col items-center gap-4">
-                    <div className="animate-spin w-10 h-10 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
-                    <span className="text-xs font-black uppercase tracking-hvac-relaxed text-slate-500">
-                      {t('admin.common.loading')}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto w-full">
-                    <table className="min-w-full text-sm divide-y divide-white/5">
-                      <thead className="bg-white/5 sticky top-0 backdrop-blur-xl">
-                        <tr>
-                          <th className="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-hvac-normal">
-                            {t('admin.orders.modals.logs.table.date')}
-                          </th>
-                          <th className="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-hvac-normal">
-                            {t('admin.orders.modals.logs.table.subject')}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/2">
-                        {emailLogs.map((l, i) => (
-                          <tr key={i} className="hover:bg-white/3 transition-colors group">
-                            <td className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">
-                              {safeDate(l.created_at, lang)}
-                            </td>
-                            <td className="px-8 py-5 text-xs text-white font-medium flex items-center gap-3">
-                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-admin-orders-glow-3" />
-                              {l.subject}
-                            </td>
-                          </tr>
-                        ))}
-                        {emailLogs.length === 0 && !logsLoading && (
-                          <tr>
-                            <td colSpan={2} className="px-8 py-20 text-center">
-                              <div className="flex flex-col items-center gap-4 text-slate-500">
-                                <Info size={32} className="opacity-20" />
-                                <span className="text-xs font-black uppercase tracking-hvac-relaxed italic">
-                                  {t('admin.orders.modals.logs.noRecords')}
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="px-10 py-8 bg-white/2 border-t border-white/5 flex justify-end">
-              <button
-                type="button"
-                onClick={closeLogsModal}
-                className="px-10 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
-              >
-                {t('admin.orders.modals.logs.close')}
-              </button>
-            </div>
+          <div>
+            <label htmlFor="ship-tracking" className={adminSettingsLabelClass}>
+              {t('admin.orders.modals.shipping.trackingLabel')}
+            </label>
+            <input
+              id="ship-tracking"
+              value={tracking}
+              onChange={(e) => setTracking(e.target.value)}
+              className={adminInputClass}
+              placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
+            />
           </div>
-        </div>
-      )}
 
-      {notesOpen && (
-        <div className="fixed inset-0 bg-surface-darker/40 backdrop-blur-xl flex items-center justify-center z-modal p-4 animate-in fade-in duration-500">
-          <div className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-xl overflow-hidden transform animate-in zoom-in-95 duration-500">
-            <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
-              <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">
-                {t('admin.orders.modals.notes.title')}
-              </h3>
-              <button
-                type="button"
-                onClick={closeNotesModal}
-                aria-label={t('admin.orders.modals.notes.close')}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-10 space-y-8">
-              {hasWriteAccess && (
-                <div className="flex gap-4">
-                  <input
-                    value={noteInput}
-                    onChange={(e) => setNoteInput(e.target.value)}
-                    placeholder={t('admin.orders.modals.notes.inputPlaceholder')}
-                    aria-label={t('admin.orders.modals.notes.inputPlaceholder')}
-                    className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-xs font-medium text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 transition-colors placeholder:text-slate-600"
-                  />
+          <label className="flex items-center gap-2 text-sm text-admin-fg-muted">
+            <input
+              type="checkbox"
+              checked={sendEmail}
+              onChange={(e) => setSendEmail(e.target.checked)}
+              className="h-4 w-4 rounded-admin-sm border-admin-border accent-admin-accent
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-ring"
+            />
+            {t('admin.orders.modals.shipping.sendEmailLabel')}
+          </label>
+        </div>
+      </AdminModal>
+
+      {/*
+        E-POSTA KAYITLARI — **NON-MODAL YAN PANEL**. Cetvel §4.1: "Kullanıcı arkadaki
+        içeriğe bakmalı → non-modal panel" + "Tablo satırı seçince hızlı detay →
+        split panel". Burada HİÇBİR karar verilmiyor, hiçbir alan doldurulmuyor:
+        sipariş başına gönderilmiş bildirim e-postalarının salt-okunur listesi.
+        Böyle bir yüzey için modal, NN/g'nin deyimiyle kullanıcıya "fazladan bir
+        hedef — diyaloğu kapatmak" yükler (§4.2) ve listeyle karşılaştırma yapmayı
+        engeller. Panel açıkken tablo etkileşimli kalır; perde ve kaydırma kilidi
+        BİLEREK yok (§4.3 — bunlar konulursa panel modal olur, sadece şekli değişir).
+      */}
+      <AdminSidePanel
+        open={logsOpen}
+        onClose={closeLogsModal}
+        title={t('admin.orders.modals.logs.title')}
+        description={t('admin.orders.modals.logs.description')}
+        closeLabel={t('admin.orders.modals.logs.close')}
+      >
+        {logsLoading ? (
+          <p className="py-10 text-center text-sm text-admin-fg-muted">
+            {t('admin.common.loading')}
+          </p>
+        ) : emailLogs.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-10 text-admin-fg-subtle">
+            <Info size={24} aria-hidden="true" />
+            <span className="text-sm">{t('admin.orders.modals.logs.noRecords')}</span>
+          </div>
+        ) : (
+          /* Geniş içerik KENDİ kabında yatay kayar — sayfa gövdesi asla yatay kaymaz. */
+          <div className="overflow-x-auto rounded-admin-md border border-admin-border">
+            <table className="min-w-full">
+              <thead>
+                <tr>
+                  <th scope="col" className={adminTableHeadCellClass}>
+                    {t('admin.orders.modals.logs.table.date')}
+                  </th>
+                  <th scope="col" className={adminTableHeadCellClass}>
+                    {t('admin.orders.modals.logs.table.subject')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {emailLogs.map((l) => (
+                  <tr key={`${l.created_at}-${l.provider_message_id ?? l.subject}`} className="group">
+                    <td className={`${adminTableCellClass} whitespace-nowrap`}>
+                      {safeDate(l.created_at, lang)}
+                    </td>
+                    <td className={adminTableCellClass}>{l.subject}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </AdminSidePanel>
+
+      {/*
+        NOTLAR — **MODAL**. Salt-okunur GİBİ görünür ama değildir: metin girişi +
+        INSERT + DELETE barındırır, yani bir ÇALIŞMA yüzeyidir. Carbon'un non-modal
+        kısıtı birebir geçerli: "non-modal yalnız isteğe bağlı / kritik olmayan
+        görevler içindir; kullanıcının girdisi akışı ilerletmek için gerekliyse
+        modal kullan" (§4.3). Alan sayısı 1 → §4.1 "1–2 alanlı hızlı düzenleme → Modal".
+      */}
+      <AdminModal
+        open={notesOpen}
+        onOpenChange={(next) => {
+          if (!next) closeNotesModal()
+        }}
+        title={t('admin.orders.modals.notes.title')}
+        description={t('admin.orders.modals.notes.description')}
+        closeLabel={t('admin.orders.modals.notes.close')}
+        footer={
+          <button type="button" onClick={closeNotesModal} className={adminButtonSecondaryClass}>
+            {t('admin.orders.modals.notes.close')}
+          </button>
+        }
+      >
+        {hasWriteAccess && (
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={noteInput}
+              onChange={(e) => setNoteInput(e.target.value)}
+              placeholder={t('admin.orders.modals.notes.inputPlaceholder')}
+              aria-label={t('admin.orders.modals.notes.inputPlaceholder')}
+              className={`${adminInputClass} flex-1`}
+            />
+            <button
+              type="button"
+              onClick={() => void addNote()}
+              className={adminButtonPrimaryClass}
+            >
+              {t('admin.orders.modals.notes.add')}
+            </button>
+          </div>
+        )}
+
+        <ul className="space-y-3">
+          {notes.map((n) => (
+            <li
+              key={n.id}
+              className="rounded-admin-md border border-admin-border bg-admin-surface-2 p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="min-w-0 flex-1 text-sm leading-relaxed text-admin-fg">{n.note}</p>
+                {hasWriteAccess && (
+                  /* Eskiden `opacity-0 group-hover:opacity-100` idi: klavye ve dokunmatik
+                     kullanıcı için görünmez bir eylemdi. Artık daima görünür. */
                   <button
                     type="button"
-                    onClick={() => void addNote()}
-                    className="px-8 py-4 bg-cyan-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-glow-md hover:scale-105 active:scale-95 transition-transform"
+                    onClick={() => void deleteNote(n.id)}
+                    className={adminTableActionDangerClass}
                   >
-                    {t('admin.orders.modals.notes.add')}
+                    {t('admin.orders.modals.notes.delete')}
                   </button>
-                </div>
-              )}
-              <div className="max-h-40vh overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                {notes.map((n) => (
-                  <div
-                    key={n.id}
-                    className="p-6 bg-white/2 rounded-2xl border border-white/5 group hover:border-white/10 transition-colors"
-                  >
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1 text-sm text-slate-300 leading-relaxed font-medium">{n.note}</div>
-                      {hasWriteAccess && (
-                        <button
-                          type="button"
-                          onClick={() => void deleteNote(n.id)}
-                          aria-label={t('admin.orders.modals.notes.delete')}
-                          className="p-1.5 text-xs font-black uppercase tracking-widest text-rose-500 hover:bg-rose-500 hover:text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity border border-rose-500/20"
-                        >
-                          {t('admin.orders.modals.notes.delete')}
-                        </button>
-                      )}
-                    </div>
-                    <div className="text-xs text-slate-500 mt-4 font-black uppercase tracking-hvac-normal">
-                      {safeDate(n.created_at, lang)}
-                    </div>
-                  </div>
-                ))}
-                {notes.length === 0 && (
-                  <div className="text-center py-16 text-slate-500 font-black uppercase tracking-hvac-normal text-xs">
-                    {t('admin.orders.modals.notes.noRecords')}
-                  </div>
                 )}
               </div>
-            </div>
-            <div className="px-10 py-8 bg-white/2 border-t border-white/5 flex justify-end">
-              <button
-                type="button"
-                onClick={closeNotesModal}
-                className="px-10 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
-              >
-                {t('admin.orders.modals.notes.close')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <p className="mt-2 text-xs text-admin-fg-subtle">{safeDate(n.created_at, lang)}</p>
+            </li>
+          ))}
+          {notes.length === 0 && (
+            <li className="py-8 text-center text-sm text-admin-fg-muted">
+              {t('admin.orders.modals.notes.noRecords')}
+            </li>
+          )}
+        </ul>
+      </AdminModal>
 
       {editOpen && (
         <OrderFormModal

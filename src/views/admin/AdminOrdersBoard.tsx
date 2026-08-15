@@ -1,7 +1,7 @@
 'use client'
 
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd'
-import { CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock, GripVertical, LucideIcon,Mail, MessageSquare, Package, RotateCcw, Truck, X, XCircle } from 'lucide-react'
+import { CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock, GripVertical, LucideIcon,Mail, MessageSquare, Package, RotateCcw, Truck, XCircle } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import React, { useCallback, useEffect, useRef,useState } from 'react'
 import { toast } from 'sonner'
@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import { AdminModal } from '../../components/admin/overlay/AdminModal'
 import { useRole } from '../../hooks/useRole'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
@@ -20,7 +21,6 @@ import {
     adminButtonPrimaryClass,
     adminColumnContainerClass,
     adminInputClass,
-    adminModalScrollAreaClass,
     adminNoteItemClass,
     adminOrderBoardItemClass,
     adminOrderCardClass,
@@ -205,31 +205,29 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
         }
     }
 
+    /*
+     * ÖLÜ ESC (D14) ONARIMI — 2026-08-15.
+     *
+     * Eski hâli: perde `<div role="presentation">` idi ve `onKeyDown` ORAYA bağlıydı.
+     * `tabIndex` taşımayan bir `<div>` ODAK ALAMAZ; `keydown` odaklanmış öğeden
+     * kabararak gelir → o handler HİÇBİR ZAMAN tetiklenmedi. Kodda "ESC destekli"
+     * görünen ama gerçekte ölü bir yüzeydi ve hiçbir test bunu görmedi.
+     *
+     * ÇÖZÜM: yüzey `AdminModal`'a (Radix Dialog) taşındı. ESC artık Radix'in
+     * `DismissableLayer`'ında BELGE seviyesinde dinleniyor — odak nerede olursa
+     * olsun çalışır. Ayrıca beraberinde odak tuzağı, açılışta odak taşıma,
+     * kapanışta odağın tetikleyiciye dönmesi ve gövde kaydırma kilidi de geliyor;
+     * bunların hiçbiri elle yazılmış overlay'de yoktu (cetvel §4.8).
+     */
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-modal p-4 text-left">
-            <div 
-                className="absolute inset-0 bg-surface-darker/40 backdrop-blur-xl animate-in fade-in duration-300"
-                onClick={onClose}
-                onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}
-                role="presentation"
-            />
-            <div 
-                role="dialog"
-                aria-modal="true"
-                className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-lg overflow-hidden max-h-admin-modal flex flex-col animate-in zoom-in-95 duration-300 relative"
-            >
-                {/* Header */}
-                <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
-                    <div>
-                        <div className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal mb-1">{HASH_SYMBOL}{order.order_number || order.id.substring(0, 8)}</div>
-                        <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">{order.customer_name || t('common.none')}</h3>
-                    </div>
-                    <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10">
-                        <X size={20} />
-                    </button>
-                </div>
-
-                <div className={`flex-1 ${adminModalScrollAreaClass}`}>
+        <AdminModal
+            open
+            onOpenChange={(next) => { if (!next) onClose() }}
+            title={`${HASH_SYMBOL}${order.order_number || order.id.substring(0, 8)} · ${order.customer_name || t('common.none')}`}
+            description={t('admin.orders.board.detail.description')}
+            closeLabel={t('admin.orders.board.detail.close')}
+        >
+            <>
                     {loading ? (
                         <div className="p-10 flex flex-col items-center gap-4">
                             <div className="animate-spin w-10 h-10 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
@@ -319,9 +317,8 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                             </section>
                         </>
                     ) : null}
-                </div>
-            </div>
-        </div>
+            </>
+        </AdminModal>
     )
 }
 
