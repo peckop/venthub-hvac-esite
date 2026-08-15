@@ -343,6 +343,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                     <label className="flex items-start gap-3">
                         <input
                             type="checkbox"
+                            data-testid="checkout-consent-kvkk"
                             checked={legalConsents.kvkk}
                             onChange={(e) => setLegalConsents({ ...legalConsents, kvkk: e.target.checked })}
                             className="mt-1 rounded border-light-gray text-primary-navy focus-visible:ring-primary-navy"
@@ -354,6 +355,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                     <label className="flex items-start gap-3">
                         <input
                             type="checkbox"
+                            data-testid="checkout-consent-distanceSales"
                             checked={legalConsents.distanceSales}
                             onChange={(e) => setLegalConsents({ ...legalConsents, distanceSales: e.target.checked })}
                             className="mt-1 rounded border-light-gray text-primary-navy focus-visible:ring-primary-navy"
@@ -365,6 +367,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                     <label className="flex items-start gap-3">
                         <input
                             type="checkbox"
+                            data-testid="checkout-consent-preInfo"
                             checked={legalConsents.preInfo}
                             onChange={(e) => setLegalConsents({ ...legalConsents, preInfo: e.target.checked })}
                             className="mt-1 rounded border-light-gray text-primary-navy focus-visible:ring-primary-navy"
@@ -376,6 +379,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                     <label className="flex items-start gap-3">
                         <input
                             type="checkbox"
+                            data-testid="checkout-consent-orderConfirm"
                             checked={legalConsents.orderConfirm}
                             onChange={(e) => setLegalConsents({ ...legalConsents, orderConfirm: e.target.checked })}
                             className="mt-1 rounded border-light-gray text-primary-navy focus-visible:ring-primary-navy"

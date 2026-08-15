@@ -138,11 +138,28 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
       timeout: 20_000,
     })
 
-    // 5) Adres doldur (validateAddress: full_address + city + district yeterli; legal onaylar
-    //    yalnız ödeme anında gerekir, o yüzden buraya kadar onay gerekmez).
+    // 5) Adres doldur (validateAddress: full_address + city + district yeterli).
     await page.getByTestId('checkout-ship-address').fill('E2E Test Mah. Smoke Sk. No:1 D:2')
     await city.fill('İstanbul')
     await page.getByTestId('checkout-ship-district').fill('Kadıköy')
+
+    // 5b) ZORUNLU YASAL ONAYLAR — adım 2→3 geçişinin ÖN KOŞULU.
+    //
+    // ⚠️ TESTİN ESKİ YORUMU YANLIŞTI: "legal onaylar yalnız ödeme anında gerekir, buraya
+    // kadar onay gerekmez" yazıyordu. Bu 2026-08-15'e kadar doğruydu ve tam da SORUNDU:
+    // tüketici hiçbirini işaretlemeden ödemeye geçebiliyor, sistem `accepted:false`'ı zaman
+    // damgasıyla siparişe yazıyordu (kendi aleyhine delil). LAUNCH kapıyı `handleNextStep`
+    // içinde adım 2→3'e taşıdı (INV-LEGAL-1). Yani onaylar artık huninin ORTASINDA zorunlu.
+    //
+    // Bu satırlar testi "geçsin diye" gevşetmiyor — mevzuatın gerektirdiği gerçek kullanıcı
+    // davranışını taklit ediyor (Mesafeli Sözleşmeler Yönetmeliği: ön bilgilendirme ve
+    // sözleşme teyidi, sözleşme kurulmadan ÖNCE). `marketing` bilerek işaretlenmez:
+    // ticari elektronik ileti onayı opsiyoneldir ve zorunlu tutulamaz.
+    for (const onay of ['kvkk', 'distanceSales', 'preInfo', 'orderConfirm']) {
+      const kutu = page.getByTestId(`checkout-consent-${onay}`)
+      await expect(kutu, `Yasal onay kutusu bulunamadı: ${onay}`).toBeVisible({ timeout: 10_000 })
+      await kutu.check()
+    }
 
     // İleri → ADIM 3 (özet / review). Huni burada donsaydı review mount olmazdı.
     await page.getByTestId('checkout-next-btn').click()
