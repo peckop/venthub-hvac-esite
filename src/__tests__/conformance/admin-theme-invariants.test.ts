@@ -268,7 +268,11 @@ describe('INV-ADMIN-THEME-5 · tema düzeneği yerinde', () => {
     // Sunucu okuması düşerse koyu temayı seçen kullanıcı her yüklemede beyaz
     // sıçrama görür; çerez yazılır ama hiç okunmadığı için kalıcılık "sessizce"
     // çalışmaz — aynı tuzağa sol menü tercihinde de düşülmüştü.
-    expect(serverLayout).toContain('parseAdminTheme')
+    // ALT-DİZE DEĞİL, KELİME SINIRI. `toContain('parseAdminTheme')` kullanılıyordu
+    // ve kasıtlı sabotaj testinde `parseAdminThemeX` bu kontrolü GEÇTİ — çünkü
+    // bozuk ad, doğru adı alt-dize olarak içeriyor. Kapı yeniden adlandırmayı
+    // göremiyordu; bilerek bozmasaydım fark edilmezdi.
+    expect(serverLayout).toContain('parseAdminTheme(')
     expect(serverLayout).toContain('defaultThemeResolved')
   })
 
@@ -290,3 +294,4 @@ describe('INV-ADMIN-THEME-5 · tema düzeneği yerinde', () => {
     ).toBe(0)
   })
 })
+
