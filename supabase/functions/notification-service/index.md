@@ -11,7 +11,7 @@ entity_hashes:
   func:sendSMS: 55159eef6de6f7d5
   func:sendWhatsApp: 2e1274fd64222c15
   overview: 8312f4e94cd26e7a
-generated_at: 2026-08-14T12:38:42Z
+generated_at: 2026-08-14T22:02:42Z
 ---
 
 ## Genel Bakış
@@ -240,8 +240,8 @@ graph TD
     index_ts__sendEmail["sendEmail"]
     index_ts__sendSMS["sendSMS"]
     index_ts__sendWhatsApp["sendWhatsApp"]
-    index_ts__sendWhatsApp --> index_ts__formatTemplate
     index_ts__sendEmail --> index_ts__formatTemplate
+    index_ts__sendWhatsApp --> index_ts__formatTemplate
 ```
 
 ## NODE ID STANDARD

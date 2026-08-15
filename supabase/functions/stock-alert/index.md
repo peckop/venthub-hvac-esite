@@ -3,16 +3,16 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\stock-alert\index.ts
-skeleton_hash: 5e4b57ede49f72b6
+skeleton_hash: 35e60873e2d6ad6d
 entity_hashes:
-  func:checkAllProducts: 84cfac7d1bdd2b56
-  func:checkSpecificProduct: 5027f709f9a40c80
-  func:getAlertRecipients: b32f47ebd9b11ba3
-  func:processProductAlert: c58aae9b08876f88
-  func:sendNotification: 9cdc9ad48f9dd1f6
+  func:checkAllProducts: 5390066961a4b148
+  func:checkSpecificProduct: 1c67f43d00c92500
+  func:getAlertRecipients: 9238df6cc0a27003
+  func:processProductAlert: 30853b14bf015724
+  func:sendNotification: b82c8baef5be3011
   func:stock-alert_handler: 9f0ae49f1a00dd49
   overview: f1961f87b9e63cad
-generated_at: 2026-08-14T12:38:44Z
+generated_at: 2026-08-14T22:03:15Z
 ---
 
 ## Genel Bakış
@@ -61,11 +61,14 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 **Dönüş**: `Response` — İşlemin sonucunu içeren, istemciye gönderilecek HTTP yanıtı.
 
 ### checkAllProducts
-**Ne yapar**: Veritabanındaki **tüm ürünleri** stok seviyelerine göre tarar, stok miktarı belirlenmiş eşik değerin (veya varsayılan 5 birim) altında veya eşitinde olan ürünler için uyarı sürecini başlatır.
-**Nasıl yapar**: Supabase istemcisi aracılığıyla `products` tablosundan düşük stoklu olabilecek tüm ürünleri çeker. SQL tarafında karmaşık filtreleme yerine, JavaScript tarafında her bir ürünün `stock_qty` değerini, kendi `low_stock_threshold` alanı (yoksa 5) ile karşılaştırarak filtreler. Ardından, alıcıları tek seferde çekip (N+1 sorgu optimizasyonu) her uygun ürün için `processProductAlert` fonksiyonunu çağırarak sonuçları derler.
+**Ne yapar**: Stok seviyesi eşik değerinin altında kalan tüm ürünleri sorgular ve her biri için uyarı bildirimleri gönderir. Stok yönetimi için toplu kontrol yapan ana işlevdir.
+
+**Nasıl yapar**: Supabase üzerinden `products` tablosundan `stock_qty` değeri 10 veya altında olan ürünleri çeker. JS tarafında filtreleme yaparak `low_stock_threshold` değerinin altına düşen ürünleri belirler. N+1 sorgu optimizasyonu uygulayarak alıcı listesini tek seferde çeker, ardından her ürün için `processProductAlert` fonksiyonunu sıralı olarak çağırır. Bulunan ürün sayısını konsola警告 olarak kaydeder.
+
 **Parametreler**:
-- `supabase: SupabaseClient` — Veritabanı işlemleri için kullanılan Supabase istemcisi nesnesi.
-**Dönüş**: `results` — Her bir işlenen ürün için `processProductAlert` fonksiyonunun döndüğü sonuç nesnelerinden oluşan bir dizi (array). Her sonuç, ürün adını, uyarı türünü, gönderilen bildirim sayısını ve başarı durumunu içerir.
+- supabase: SupabaseClient — Veritabanı işlemleri için Supabase istemcisi. Tablolardan veri okuma ve yazma işlemlerinde kullanılır.
+
+**Dönüş**: Promise<Array<{product: string, alertType: string, notifications: number, success: boolean}>> — İşlenen her ürün için sonuç nesnelerini içeren dizi. Her sonuç; ürün adı, uyarı türü, gönderilen bildirim sayısı ve başarı durumunu içerir.
 
 ### checkSpecificProduct
 **Ne yapar**: Verilen **tek bir ürünün** stok seviyesini kontrol eder ve belirlenen eşik değerinin altındaysa uyarı sürecini başlatır.
@@ -128,7 +131,7 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 - `email: string`
 - `whatsapp: string`
 - `role: 'admin' | 'manager' | 'buyer'`
-- `notifications: {`
+- `notifications: {`
 
 ### AlertData
 - `productName: string`
@@ -142,66 +145,106 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::stock-alert_handler
-- **params**: (req: Request)
+- **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `corsHeaders` — getCorsHeaders(req) ile gelen, istekteki origin'e göre ayarlanmış CORS başlıkları
-  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile okunan ortam değişkeni, Supabase proje URL'si
-  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile okunan ortam değişkeni, servis rolü anahtarı
-  - `authHeader` — req.headers.get('Authorization') ile gelen yetkilendirme başlığı
-  - `isAuthorized` — boolean, isteğin yetkili olup olmadığını belirtir
-  - `anonKey` — Deno.env.get('SUPABASE_ANON_KEY') ile okunan, anonim kullanıcı anahtarı
-  - `createClientAuth` — Dinamik import ile yüklenen Supabase istemcisi (anonKey ile)
-  - `authClient` — createClientAuth ile oluşturulan, anonim anahtarı ve Authorization başlığını kullanan istemci
-  - `user` — authClient.auth.getUser() çağrısından dönen kullanıcı nesnesi
-  - `roleCheck` — fetch ile user_profiles tablosunda rol kontrolü yapan HTTP yanıt nesnesi
-  - `arr` — roleCheck.json().catch() ile parse edilen (hata durumunda boş dizi) rol verisi
-  - `role` — arr[0]?.role, kullanıcının rolü (admin veya superadmin)
-  - `supabase` — createClient ile oluşturulan, serviceRoleKey ile Servis Rolü yetkisine sahip Supabase istemcisi
-  - `alertResults` — unknown[] tipinde, işlenen uyarı sonuçları dizisi
-  - `error` — try-catch bloğundaki hata nesnesi
-- **Dönüş**: Response (JSON.stringify ile success, alerts_processed, results, timestamp veya error döner)
+  - `corsHeaders` — `getCorsHeaders(req)` ile üretilen CORS response header nesnesi, tüm yanıtlara eklenir
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase proje URL'i
+  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan admin servis anahtarı
+  - `authHeader` — `req.headers.get('Authorization')` ile gelen Bearer token header'ı
+  - `isAuthorized` — boolean flag, kullanıcının yetkili olup olmadığını tutar (başlangıç: `false`)
+  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan anonymous key, auth fallback'te kullanılır
+  - `createClientAuth` — **dinamik/lazy import**: `await import('https://esm.sh/@supabase/supabase-js@2.45.4')` ile yüklenen `createClient` fonksiyonu (auth client oluşturmak için)
+  - `authClient` — anonKey + Authorization header ile oluşturulan Supabase auth istemcisi
+  - `user` — `authClient.auth.getUser()` sonucundan elde edilen authenticated kullanıcı nesnesi
+  - `roleCheck` — `fetch()` ile `/rest/v1/user_profiles` endpoint'ine yapılan role kontrol isteği sonucu (Response)
+  - `arr` — `roleCheck.json()` sonucu, user_profiles satır dizisi; `.catch(() => [])` ile boş dizi fallback'i
+  - `role` — `arr[0]` erişimi ile alınan kullanıcının rolü (`'admin'` veya `'superadmin'` olmalı)
+  - `supabase` — `createClient(supabaseUrl, serviceRoleKey)` ile oluşturulan service-role Supabase client'ı
+  - `alertResults` — `unknown[]` tipinde, işlenen uyarı sonuçları dizisi (GET: `checkAllProducts`, POST: `checkSpecificProduct` dönüşü)
+  - `_productId` — POST body'sinden `req.json()` ile parse edilen ürün ID'si (POST isteklerinde kullanılır)
+  - `error` — try-catch bloğundan yakalanan hata nesnesi
+  - `msg` — `error instanceof Error ? error.message : String(error)` ile güvenli hata mesajı dönüşümü
+- **Subscript Erişimleri**:
+  - `arr[0]?.role` — roleCheck JSON yanıtının ilk satırından rol alanı okunur
+- **Dönüş**: `Response` (CORS header'lı, JSON body'li HTTP yanıtı)
+
+---
 
 ### [N2_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::checkAllProducts
-- **params**: (supabase: SupabaseClient)
+- **params**: `(supabase: SupabaseClient)`
 - **ic_degiskenler**:
-  - `allLowStock` — supabase.from('products').select(...).filter(...) sorgusundan dönen tüm düşük stoklu ürünler
-  - `fetchErr` — aynı sorgudan dönen hata nesnesi (varsa)
-  - `productsToAlert` — allLowStock dizisinin, stock_qty low_stock_threshold değerine eşit veya küçük olan filtrelenmiş hali
-  - `recipients` — getAlertRecipients(supabase) çağrısı ile global olarak çekilen bildirim alıcıları
-  - `results` — processProductAlert çağrılarının sonuçlarını toplayan dizi
-- **Dönüş**: results dizisi (unknown[])
+  - `allLowStock` — `supabase.from('products').select(...).filter('stock_qty', 'lte', 10)` sorgusundan dönen düşük stoklu tüm ürünler dizisi
+  - `fetchErr` — Supabase sorgu hatası; varsa `throw fetchErr` ile fırlatılır
+  - `productsToAlert` — `allLowStock` dizisi `.filter()` ile `stock_qty <= (low_stock_threshold || 5)` koşuluna göre filtrelenmiş nihai ürün listesi; `Product[]` tipine cast edilmiş
+  - `recipients` — `getAlertRecipients(supabase)` çağrısı ile全球 tek seferde çekilen bildirim alıcıları listesi (N+1 optimizasyonu)
+  - `results` — işlenen her ürünün sonuç nesnelerini toplayan dizi
+- **Subscript Erişimleri**:
+  - `p.stock_qty` — döngüde her ürünün stok miktarı
+  - `p.low_stock_threshold` — döngüde her ürünün düşük stok eşik değeri (fallback: `5`)
+  - `p.name` — ürün adı (result objesinde kullanılır)
+  - `p.id` — ürün ID'si (result objesinde kullanılır)
+- **Dönüş**: `results` dizisi — her biri `{ product, alertType, notifications, success }` nesnesi olan array
+
+---
 
 ### [N3_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::checkSpecificProduct
-- **params**: (supabase: SupabaseClient, _productId: string)
+- **params**: `(supabase: SupabaseClient, _productId: string)`
 - **ic_degiskenler**:
-  - `product` — supabase.from('products').select(...).eq('id', _productId).single() ile belirli bir ürünün verileri
-  - `error` — aynı sorgudan dönen hata nesnesi (varsa)
-  - `recipients` — getAlertRecipients(supabase) çağrısı ile çekilen bildirim alıcıları
-- **Dönüş**: [{ product: product.name, message: '...' }] veya [processProductAlert(...)] sonucu
+  - `product` — `supabase.from('products').select(...).eq('id', _productId).single()` ile çekilen tek ürün nesnesi (`Product`)
+  - `error` — Supabase sorgu hatası; `error || !product` koşulunda hata fırlatılır
+  - `recipients` — `getAlertRecipients(supabase)` çağrısı ile çekilen bildirim alıcıları listesi
+- **Subscript Erişimleri**:
+  - `product.stock_qty` — ürünün stok miktarı, eşik kontrolünde kullanılır
+  - `product.low_stock_threshold` — ürünün düşük stok eşik değeri (fallback: `5`)
+  - `product.name` — ürün adı, stok eşik üstündeyse mesaj nesnesinde kullanılır
+- **Dönüş**: Dizi — stok eşik üstündeyse `[{ product: string, message: string }]`, eşik altındaysa `processProductAlert` dönüşü
+
+---
 
 ### [N4_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::processProductAlert
-- **params**: (supabase: SupabaseClient, product: Product, recipients: AlertRecipient[])
+- **params**: `(supabase: SupabaseClient, product: Product, recipients: AlertRecipient[])`
 - **ic_degiskenler**:
-  - `alertType` — product.stock_qty'a göre belirlenen uyarı türü ('out_of_stock' veya 'low_stock')
-  - `priority` — product.stock_qty'a göre belirlenen öncelik ('critical' veya 'high')
-  - `alertData` — AlertData nesnesi, ürün adı, ID'si, mevcut stok, eşik değeri ve alertType içerir
-  - `notifications` — sendNotification çağrılarının sonuçlarını toplayan dizi
-- **Dönüş**: { product, alertType, notifications: notifications.length, success: boolean }
+  - `alertType` — `'out_of_stock'` veya `'low_stock'`, `product.stock_qty <= 0` koşuluna göre belirlenir
+  - `priority` — `'critical'` veya `'high'`, aynı stoq koşuluna göre belirlenir
+  - `alertData` — `AlertData` tipinde nesne, bildirim şablonuna gönderilecek ürün bilgilerini içerir (`productName`, `_productId`, `currentStock`, `threshold`, `alertType`)
+  - `notifications` — gönderilen her bildirim sonucunu toplayan dizi
+- **Subscript Erişimleri**:
+  - `recipient.notifications[alertType]` — **dinamik key erişimi**: alıcının bu alert type için bildirim tercihi (`true`/`false`)
+  - `recipient.notifications.whatsapp` — alıcının WhatsApp bildirim tercihi
+  - `recipient.notifications.sms` — alıcının SMS bildirim tercihi
+  - `recipient.notifications.email` — alıcının email bildirim tercihi
+  - `recipient.whatsapp` — alıcının WhatsApp numarası/hesabı
+  - `recipient.phone` — alıcının telefon numarası
+  - `recipient.email` — alıcının email adresi
+  - `notifications.every(n => n.success)` — tüm bildirimlerin başarılı olup olmadığını kontrol eden dizi metodu
+- **Dönüş**: `{ product: string, alertType: string, notifications: number, success: boolean }`
+
+---
 
 ### [N5_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::sendNotification
-- **params**: (type: string, to: string, data: AlertData, priority: string)
+- **params**: `(type: string, to: string, data: AlertData, priority: string)`
 - **ic_degiskenler**:
-  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile okunan ortam değişkeni
-  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile okunan ortam değişkeni
-  - `response` — fetch ile notification-service endpoint'ine POST isteği gönderen HTTP yanıt nesnesi
-- **Dönüş**: { type, recipient: to, success: response.ok } veya { type, recipient: to, success: false }
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase URL'i (fonksiyon içinde tekrar okunur)
+  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan servis anahtarı (fonksiyon içinde tekrar okunur)
+  - `response` — `fetch()` ile `notification-service` Edge Function'ına yapılan POST isteği sonucu (Response)
+- **Subscript Erişimleri**:
+  - `data.alertType` — bildirim tipi (`'out_of_stock'`/`'low_stock'`), mesaj şablonu koşulunda kullanılır
+  - `data.productName` — ürün adı, mesaj şablonunda string interpolation ile yerleştirilir
+  - `data.threshold` — eşik değeri, mesaj şablonunda gösterilir
+  - `data.currentStock` — mevcut stok miktarı, mesaj şablonunda gösterilir
+- **Dönüş**: `{ type: string, recipient: string, success: boolean }` — bildirim sonucu nesnesi
+
+---
 
 ### [N6_NASIL] AST Pointer: supabase/functions/stock-alert/index.ts::getAlertRecipients
-- **params**: (supabase: SupabaseClient)
+- **params**: `(supabase: SupabaseClient)`
 - **ic_degiskenler**:
-  - `settings` — supabase.from('inventory_settings').select('alert_email').maybeSingle() ile çekilen envanter ayarları
-  - `recipients` — AlertRecipient[] dizisi, bildirim alıcılarını tutar
-- **Dönüş**: Promise<AlertRecipient[]> (recipients dizisi)
+  - `settings` — `supabase.from('inventory_settings').select('alert_email').maybeSingle()` sorgusundan dönen ayarlar nesnesi (null olabilir)
+  - `recipients` — `AlertRecipient[]` tipinde, bildirim yapılacak alıcıların toplandığı dizi
+- **Subscript Erişimleri**:
+  - `settings?.alert_email` — inventory_settings tablosundan okunan ana alarm email adresi
+  - `recipients.length` — dizinin boş olup olmadığını kontrol etmek için kullanılır (fallback koşulu)
+- **Dönüş**: `AlertRecipient[]` — en az bir alıcı listesi (settings'den veya `stok@venthub.com` fallback'inden)
 
 ---
 
@@ -215,11 +258,11 @@ graph TD
     index_ts__processProductAlert["processProductAlert"]
     index_ts__sendNotification["sendNotification"]
     index_ts__stock-alert_handler["stock-alert_handler"]
+    index_ts__checkAllProducts --> index_ts__getAlertRecipients
+    index_ts__checkAllProducts --> index_ts__processProductAlert
     index_ts__checkSpecificProduct --> index_ts__processProductAlert
     index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
-    index_ts__checkAllProducts --> index_ts__processProductAlert
     index_ts__processProductAlert --> index_ts__sendNotification
-    index_ts__checkAllProducts --> index_ts__getAlertRecipients
 ```
 
 ## NODE ID STANDARD

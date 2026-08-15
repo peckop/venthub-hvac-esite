@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-orders-latest\index.ts
-skeleton_hash: 1885bb9863f5ba09
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\admin-orders-latest\index.ts
+skeleton_hash: c61d40cd807e5dcd
 entity_hashes:
   func:admin-orders-latest_handler: 9cf0e6c826d5f20e
   overview: 3bb02a7476b8fc62
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-14T22:02:42Z
 ---
 
 ## Genel Bakış

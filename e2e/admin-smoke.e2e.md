@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\e2e\admin-smoke.e2e.ts
-skeleton_hash: fffe1abc591e7b7b
+source_path: C:\Users\alize\venthub-wt-hotfix\e2e\admin-smoke.e2e.ts
+skeleton_hash: 04c7e0b87d83897c
 entity_hashes:
   overview: 529d691256ce33bd
-generated_at: 2026-06-19T07:57:28Z
+generated_at: 2026-08-14T21:38:09Z
 ---
 
 ## Genel Bakış
@@ -31,10 +31,6 @@ Bu modül, admin kullanıcı için e2e smoke testi içeren bir test dosyasıdır
 [Aksiyom 2]: Eğer `PASSWORD` sabiti tanımlı değilse veya geçerli bir admin şifresi içermiyorsa, tüm testler giriş aşamasında başarısız olur.
 
 [Aksiyom 3]: Eğer admin giriş endpoint'i (veya ilgili API) erişilebilir durumda değilse veya test ortamı düzgün yapılandırılmamışsa, tüm e2e testleri bağlantı/hatayla sonuçlanır.
-
----
-
-**Not:** Bu modül bir test dosyası olduğu için; production iş mantığı, veri dönüşümü veya bağımlılık enjeksiyonu gibi klasik mimari varsayımlar geçerli değildir. Varsayımlar test ortamının ve test verilerinin mevcudiyetine ilişkindir.
 
 ---
 

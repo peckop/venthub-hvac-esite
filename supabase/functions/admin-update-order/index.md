@@ -2,54 +2,49 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-update-order\index.ts
-skeleton_hash: 80d50e92ff44be65
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\admin-update-order\index.ts
+skeleton_hash: 855899dc96f26e1d
 entity_hashes:
-  func:admin-update-order_handler: 046f5c7fec17e235
-  overview: 236389b6147671e5
-generated_at: 2026-08-13T07:40:32Z
+  func:admin-update-order_handler: 401e11b0dc3cc59d
+  overview: 0343caf9b492a7ea
+generated_at: 2026-08-14T22:03:06Z
 ---
 
 ## Genel Bakış
-Bu modül, yöneticilerin mevcut siparişleri güncellemesi için bir Supabase Edge Function olarak_deploye edilmiş bir HTTP API servisidir. Modül, gelen isteği doğrulamak, yönetici yetkisini kontrol etmek, veritabanı bağlantısı kurarak sipariş kaydını güncellemek ve işlemin sonucuna göre bir yanıt döndürmekten sorumludur.
+Bu modül, yöneticilerin mevcut siparişleri güncellemek için kullanabilecekleri bir Supabase Edge Function olarak deployed bir HTTP API servisidir. Tek bir handler fonksiyonu, gelen HTTP isteklerini alarak yönetici yetkilendirmesi doğrultusunda veritabanı üzerindeki sipariş kayıtlarını günceller ve sonucu istemciye bildirir.
 
 ## Fonksiyon Grupları
 ### Sipariş Güncelleme İşleyicisi
-Modülün tek bileşeni olarak tüm HTTP istek-yanıt döngüsünü yönetir. İsteğin içeriğini ayrıştırır, kimlik doğrulama ve yetkilendirme adımlarını uygular, veritabanı işlemlerini koordine eder.
+Modülün tek bileşeni olarak tüm iş mantığını ve istek-yanıt döngüsünü yönetir. Gelen isteği doğrular, yönetici kimliğini ve yetkisini doğrular, Supabase veritabanı bağlantısı kurarak ilgili sipariş kaydını günceller ve işlem sonucuna uygun HTTP yanıtı döner.
 - admin_update_order_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Supabase Edge Function ortamında çalışan bir HTTP handler'ıdır. Aşağıdaki mimari varsayımlar fonksiyon imzası ve modül yapısından türetilmiştir:
+Bu modül için yalnızca fonksiyon imzasından türetilen minimum varsayımlar tanımlanabilir.
 
-**[Aksiyom 1]:** Eğer geçerli bir HTTP `Request` nesnesi (req) yoksa, handler fonksiyonu çalıştırılamaz ve istemciye hata yanıtı döner.
+[Aksiyom 1]: Eğer `req` parametresi `Request` tipinde bir nesne olarak sağlanmazsa, fonksiyon çağırmada tip hatası oluşur.
 
-**[Aksiyom 2]:** Eğer istek gövdesinde (request body) geçerli bir sipariş JSON verisi yoksa veya JSON ayrıştırma başarısız olursa, fonksiyon istemciye hata yanıtı döner.
+[Aksiyom 2]: Eğer fonksiyon bir `Response` nesnesi döndürmezse, HTTP istemcisi geçersiz yanıt alır veya sunucu hatası oluşur.
 
-**[Aksiyom 3]:** Eğer isteği yapan kullanıcının admin yetkisi yoksa veya yetkilendirme doğrulanamazsa, fonksiyon istemciye yetkilendirme hatası (401/403) yanıtı döner.
+---
 
-**[Aksiyom 4]:** Eğer Supabase veritabanı bağlantısı kurulamazsa veya veritabanı erişilemez durumdaysa, sipariş güncelleme işlemi başarısız olur ve istemciye sunucu hatası yanıtı döner.
-
-**[Aksiyom 5]:** Eğer güncellenmeye çalışılan sipariş kaydı veritabanında mevcut değilse, güncelleme işlemi başarısız olur veya ilgili durum koduyla yanıt döner.
-
-**[Aksiyom 6]:** Fonksiyon, istek-yanıt döngüsünü tamamen asenkron olarak yönetir; tüm HTTP yanıtları `Response` nesnesi olarak döndürülür.
+**Not:** Fonksiyon gövdesi (implementasyon detayları) paylaşılmadığından, modülün iç işleyişine (veritabanı bağlantısı, yetkilendirme mantığı, API anahtarı kullanımı vb.) ilişkin aksiyomlar türetilmemiştir. Mevcut aksiyomlar yalnızca fonksiyon imzasındaki parametre ve dönüş tiplerine dayanmaktadır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### admin-update-order_handler
+**Ne yapar**: Bu fonksiyon, bir HTTP POST isteği alarak, bir siparişin (order) güncellenmesi işlemini tetikleyen bir Supabase Edge Function'ın ana giriş noktasıdır (handler). Genellikle bir yönetici (admin) yetkisiyle çalışması beklenen bu fonksiyon, istek gövdesinden gelen verileri işleyerek ilgili sipariş kaydını veritabanında günceller.
 
-**Ne yapar**: Bu fonksiyon, HTTP isteklerini alarak admin panelinden sipariş güncelleme işlemlerini yönetir. Supabase Edge Function yapısı içinde yer alan bu handler, Request nesnesini işler ve Response nesnesi döndürerek istemciye sonuç bildirir.
-
-**Nasıl yapar**: `@ts-nocheck` directive'i ile TypeScript tip kontrolü devre dışı bırakılmıştır. Fonksiyon, bir HTTP Request nesnesini parametre olarak alır ve gerekli iş mantığını uygulayarak Response nesnesi ile sonuç döndürür. Edge Function mimarisi gereği, bu handler Sunucu Tarafı (server-side) çalışarak API uç noktasına gelen istekleri işler.
+**Nasıl yapar**: Fonksiyon, `@serve(Deno.serve)` dekoratörü ile işaretlenmiştir. Bu dekoratör, fonksiyonu bir Deno HTTP sunucusu işleyicisi (request handler) olarak kaydeder; bu sayede gelen bir HTTP isteği (`Request` nesnesi) bu fonksiyona yönlendirilir. Fonksiyon, asenkron (`async`) olarak çalışır, isteği işler ve bir `Response` nesnesi döndürerek HTTP yanıtını oluşturur.
 
 **Parametreler**:
-- `req`: Request — İşlenecek HTTP istek nesnesi. İstemciden gelen HTTP method, header, body ve query parametrelerini içerir. Admin tarafından gönderilen sipariş güncelleme talimatlarını taşır.
+- `req`: `Request` — Gelen HTTP isteğini temsil eder. Standart web API Request nesnesidir. Genellikle gövdesinde (`req.json()` kullanarak) güncellenecek siparişin ID'si ve yeni değerleri gibi JSON verileri barındırır.
 
-**Dönüş**: Response — İşlem sonucunu içeren HTTP yanıt nesnesi. Başarı durumunda güncellenen sipariş bilgilerini, hata durumunda ise hata mesajını ve uygun HTTP durum kodunu döndürür.
+**Dönüş**: `Response` — İşlem sonucunu içeren bir HTTP yanıt nesnesi. Başarılı bir güncelleme sonrası genellikle HTTP 200 OK durum kodu ve güncellenen siparişin verilerini veya bir başarı mesajını JSON formatında gövdesinde barındırır. Bir hata durumunda ise uygun HTTP hata kodları (örn. 400, 403, 500) ve hata açıklamasını içeren bir yanıt döner.
 
 ---
 
@@ -62,42 +57,59 @@ Bu modül, Supabase Edge Function ortamında çalışan bir HTTP handler'ıdır.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: admin-update-order/index.ts::admin-update-order_handler
-- **params**: `req: Request`
+### [N1_NASIL] AST Pointer: supabase/functions/admin-update-order/index.ts::admin-update-order_handler
+- **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `corsHeaders` — `getCorsHeaders(req)` ile elde edilen CORS başlık nesnesi
-  - `cors` — ikinci kez tanımlanan ve actual olarak kullanılan CORS başlık nesnesi (Access-Control-Allow-Headers, Allow-Methods içerir)
-  - `origin` — İsteğin `origin` başlığından okunan değer, boş string fallback'li
-  - `allowed` — `ALLOWED_ORIGINS` env var'ından virgülle ayrılmış izinli origin listesi, trimlenmiş ve boş olmayanlar filtrelenmiş
-  - `okOrigin` — Origin'in allowed listesinde olup olmadığını veya listenin boş olup olmadığını kontrol eden boolean
-  - `requestId` — `crypto.randomUUID()` veya `Date.now()` ile üretilen benzersiz istek tanımlayıcısı
-  - `ct` — `content-type` başlığının küçük harfe çevrilmiş hali
-  - `max` — `MAX_BODY_KB` env var'ından okunan, byte cinsinden maksimum gövde boyutu limiti
-  - `cl` — `content-length` header'ından okunan istek gövdesi boyutu (byte)
-  - `supabaseUrl` — `SUPABASE_URL` env var'ından okunan Supabase URL adresi
-  - `serviceRoleKey` — `SUPABASE_SERVICE_ROLE_KEY` env var'ından okunan service role anahtarı
-  - `anonKey` — `SUPABASE_ANON_KEY` env var'ından okunan anon anahtar
-  - `authHeader` — `Authorization` başlığından okunan JWT token değeri
-  - `authClient` — anonKey ile oluşturulan Supabase client, Authorization başlığı user token'ı ile başlatılmış
-  - `user` — `authClient.auth.getUser()` sonucundan elde edilen authenticated kullanıcı nesnesi
-  - `authErr` — kimlik doğrulama hata nesnesi
-  - `bodyClone` — istek gövdesinin klonlanarak JSON parse edilmesi, hata durumunda boş obje
-  - `tenantId` — `resolveTenantId(req, bodyClone)` ile çözümlenen kiracı ID'si
-  - `roleCheck` — `user_profiles` tablosunda kullanıcının rolünü sorgulayan fetch response'u
-  - `arr` — roleCheck response'unun JSON parse edilmiş hali (rol array'i)
-  - `role` — `arr[0]?.role` ile elde edilen kullanıcının rolü ('admin' veya 'superadmin' olmalı)
-  - `body` — `req.json()` ile parse edilen istek gövdesi
-  - `id` — `body.id`, güncellenecek siparişin UUID'si
-  - `conversation_id` — `body.conversation_id`, güncellenecek siparişin konuşma ID'si
-  - `status` — `body.status`, istenen yeni sipariş durumu
-  - `display_code` — `body.display_code`, UI'da görünen sipariş kodunun son 8 hanesi
-  - `newStatus` — `status` değerinin string'e çevrilmiş hali, varsayılan 'paid'
-  - `resp` — `patch()` çağrılarından dönen Response nesnesi, hangi identifier kullanılıyorsa ona göre atanır
-  - `ok` — `resp.ok` değerinden elde edilen boolean, PATCH işleminin başarılı olup olmadığını gösterir
-  - `text` — `resp` gövdesinin text olarak okunmuş hali
-  - `recent` — `listRecent(200)` ile son 200 siparişin getirildiği array (display_code araması için)
-  - `target` — `recent` array'inde `display_code` ile eşleşen sipariş nesnesi, `id` alanının son 8 hanesi ile karşılaştırılır
-- **Dönüş**: `Response` — JSON { ok, response } veya hata Response'u
+  - `corsHeaders` — getCorsHeaders(req) ile üretilen CORS başlık nesnesi
+  - `cors` — corsHeaders'ın kısaltma referansı, tüm yanıt başlıklarında kullanılır
+  - `origin` — req.headers'tan okunan origin değeri; boş string fallback'li
+  - `allowed` — Deno.env.get('ALLOWED_ORIGINS') ile alınan, virgülle ayrılmış izinli origin listesi (trim + filter uygulanmış)
+  - `okOrigin` — origin'in allowed listesinde olup olmadığını gösteren boolean; allowed boşsa true kabul edilir
+  - `requestId` — benzersiz istek takip ID'si; crypto.randomUUID() veya Date.now() fallback'i
+  - `ct` — req.headers'tan gelen content-type değerinin küçük harfe çevrilmiş hali
+  - `max` — Deno.env.get('MAX_BODY_KB') ile alınan maksimum gövde boyutu, byte'a çevrilmiş (varsayılan 100KB)
+  - `cl` — req.headers'tan content-length değeri; parse edilemezse 0
+  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile alınan Supabase proje URL'i
+  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile alınan service role anahtarı
+  - `anonKey` — Deno.env.get('SUPABASE_ANON_KEY') ile alınan anon anahtar
+  - `authHeader` — req.headers.get('Authorization') ile alınan yetkilendirme başlığı
+  - `authClient` — anonKey ile createClient ile oluşturulan Supabase istemcisi; authHeader global header olarak eklenmiş
+  - `user` — authClient.auth.getUser() ile elde edilen authenticated kullanıcı nesnesi (data.user destructured)
+  - `authErr` — authClient.auth.getUser() sonucundaki hata nesnesi (data.error destructured)
+  - `bodyClone` — req.clone().json() ile elde edilen request body klonu; parse hatası olursa boş obje
+  - `tenantId` — resolveTenantId(req, bodyClone) çağrısıyla hesaplanan kiracı ID'si
+  - `roleCheck` — user_profiles tablosuna fetch ile rol kontrolü yapılan yanıt nesnesi; user.id ve tenantId ile filtrelenmiş
+  - `arr` — roleCheck.json() sonucu; roleCheck.ok ise JSON array, değilse boş dizi
+  - `role` — arr[0]?.role ile alınan kullanıcının rolü ('admin' veya 'superadmin' olmalı)
+  - `body` — req.json() ile parse edilen istek gövdesi; parse hatası olursa boş obje
+  - `id` — body.id; sipariş güncellemesi için birincil filtre (UUID)
+  - `conversation_id` — body.conversation_id; sipariş güncellemesi için alternatif filtre
+  - `status` — body.status; güncellenecek yeni sipariş durumu
+  - `display_code` — body.display_code; UI'da görünen sipariş kodunun son 8 hanesi
+  - `newStatus` — status değerinin string'e çevrilmiş hali; boşsa 'paid' fallback'i
+  - `resp` — patch() çağrılarından dönen Response nesnesi; hangi filtre kullanılırsa kullanılsın sonucu tutar
+  - `recent` — display_code kullanıldığında listRecent(200) ile getirilen son 200 sipariş dizisi
+  - `target` — display_code ile eşleşen (o.id toString低位 eşleşmesi ile) sipariş nesnesi
+  - `ok` — resp ve resp.ok durumu; yanıtın başarılı olup olmadığını gösterir
+  - `text` — resp.text() ile alınan yanıt gövdesi string'i
+- **Dönüş**: Response (JSON payload ile `ok` ve `response` alanları; HTTP status kodları: 200, 400, 401, 403, 404, 405, 413, 415, 500)
+
+---
+
+### [N2_NASIL] AST Pointer: supabase/functions/admin-update-order/index.ts::patch
+- **params**: `(filter: string)` — venthub_orders tablosuna uygulanacak filtre sorgu stringi (ör: `id=eq.xxx` veya `conversation_id=eq.xxx`)
+- **ic_degiskenler**: yok (closure ile üst kapsam değişkenlerine erişir: `supabaseUrl`, `tenantId`, `serviceRoleKey`, `newStatus`)
+- **Dönüş**: Response (PATCH isteği sonucu; `Prefer: return=representation` ile temsilci veri döner)
+
+---
+
+### [N3_NASIL] AST Pointer: supabase/functions/admin-update-order/index.ts::listRecent
+- **params**: `(_limit = 100)` — çekilecek maksimum sipariş sayısı; varsayılan 100
+- **ic_degiskenler**:
+  - `res` — Supabase REST API'ye yapılan GET isteğinin Response nesnesi; venthub_orders tablosundan son kayıtları çeker
+  - `txt` — res.text() ile alınan ham JSON string yanıtı
+  - `data` — JSON.parse(txt) ile çözümlenen veri; parse hatasında boş dizi `[]` döner
+- **Dönüş**: Array — her biri `{ id, conversation_id, created_at }` alanlarına sahip sipariş nesnelerinden oluşan dizi; veri dizi değilse boş dizi
 
 ---
 

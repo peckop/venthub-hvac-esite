@@ -34,7 +34,7 @@ serve(async (req) => {
     const authClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } }
     })
-    const { data: { user }, error: authErr } = await authClient.auth.getUser()
+    const { data: { user }, error: authErr } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
     if (authErr || !user) {
       return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
     }

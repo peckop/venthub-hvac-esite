@@ -15,6 +15,10 @@ interface ReturnStatusNotificationRequest {
   tenant_id?: string
 }
 
+interface ResendResult {
+  id?: string
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req)
 
@@ -57,7 +61,7 @@ serve(async (req) => {
         const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
         const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.45.4')
         const authClient = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
-        const { data: { user } } = await authClient.auth.getUser()
+        const { data: { user } } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
         if (user) {
           const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&tenant_id=eq.${encodeURIComponent(tenantId)}&select=role`, {
             headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
@@ -141,11 +145,21 @@ serve(async (req) => {
     }
 
     if (!return_id || !new_status) {
-      return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      const missing = [!return_id && 'return_id', !new_status && 'new_status'].filter(Boolean)
+      return new Response(JSON.stringify({
+        error: 'Missing required fields: return_id, new_status',
+        code: 'MISSING_REQUIRED_FIELDS',
+        missing
+      }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
-    
+
     if (!customer_email || !customer_name) {
-      return new Response(JSON.stringify({ error: 'Customer info unavailable' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      const missing = [!customer_email && 'customer_email', !customer_name && 'customer_name'].filter(Boolean)
+      return new Response(JSON.stringify({
+        error: 'Customer info unavailable',
+        code: 'CUSTOMER_INFO_MISSING',
+        missing
+      }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     const brandName = branding.brandName
@@ -169,12 +183,113 @@ serve(async (req) => {
 
     const statusLabel = getStatusLabel(new_status)
     const subject = `${brandName} | İade durumu güncellendi - ${prettyOrderNo}`
-    
+
+    // Duruma özel müşteri mesajı + "Sonraki Adımlar" (prod v-frozen davranışı)
+    const getStatusMessage = (status: string): { message: string; nextSteps?: string } => {
+      switch (status) {
+        case 'approved':
+          return {
+            message: 'İade talebiniz onaylandı! Ürünü kargoya verebilirsiniz.',
+            nextSteps: 'Kargo bilgileri e-posta ile tarafınıza iletilecektir. Ürünü orijinal ambalajında ve tüm aksesuarları ile birlikte gönderiniz.'
+          }
+        case 'rejected':
+          return {
+            message: 'İade talebiniz maalesef reddedildi.',
+            nextSteps: 'Daha fazla bilgi için müşteri hizmetleri ile iletişime geçebilirsiniz.'
+          }
+        case 'in_transit':
+          return {
+            message: 'İade ürününüz kargoda! Teslimatı bekleniyor.',
+            nextSteps: 'Ürününüzü aldığımızda kontrol edilecek ve işleminiz devam edecektir.'
+          }
+        case 'received':
+          return {
+            message: 'İade ürününüz tarafımıza ulaştı ve kontrol ediliyor.',
+            nextSteps: 'Kontrol tamamlandıktan sonra iade ücreti hesabınıza iade edilecektir.'
+          }
+        case 'refunded':
+          return {
+            message: '🎉 İade ücretiniz hesabınıza iade edildi!',
+            nextSteps: 'İade tutarı 1-3 iş günü içinde hesabınızda görünecektir. Bizi tercih ettiğiniz için teşekkürler.'
+          }
+        case 'cancelled':
+          return {
+            message: 'İade işlemi iptal edildi.',
+            nextSteps: 'Sorularınız için müşteri hizmetleri ile iletişime geçebilirsiniz.'
+          }
+        default:
+          return { message: `İade durumunuz güncellendi: ${statusLabel}` }
+      }
+    }
+
+    const { message, nextSteps } = getStatusMessage(new_status)
+
+    // Düz metin gövde (Resend `text:`)
+    const emailContent = `
+Merhaba ${customer_name},
+
+${prettyOrderNo} numaralı siparişinizin iade durumu güncellendi.
+
+📦 İade Sebebi: ${reason}
+${description ? `📝 Açıklama: ${description}` : ''}
+
+🔄 Yeni Durum: ${statusLabel}
+
+${message}
+
+${nextSteps ? `\n📋 Sonraki Adımlar:\n${nextSteps}` : ''}
+
+İade süreci ile ilgili sorularınız için destek ekibimizle iletişime geçebilirsiniz.
+
+Teşekkürler,
+${brandName} Ekibi
+
+---
+Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
+    `.trim()
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: ${brandPrimary};">${brandName} — İade Durumu Güncellendi</h2>
+        ${brandLogoUrl ? `<p><img src="${brandLogoUrl}" alt="${brandName}" style="max-height:40px;"/></p>` : ''}
+        <p>Merhaba <strong>${customer_name}</strong>,</p>
+        <p><strong>${prettyOrderNo}</strong> numaralı siparişinizin iade durumu güncellendi.</p>
+
+        <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #374151;">İade Bilgileri</h3>
+          <p><strong>📦 İade Sebebi:</strong> ${reason}</p>
+          ${description ? `<p><strong>📝 Açıklama:</strong> ${description}</p>` : ''}
+          <div style="background-color: #dbeafe; border-left: 4px solid ${brandPrimary}; padding: 12px; margin: 12px 0;">
+            <p style="margin: 0;"><strong>🔄 Yeni Durum:</strong> <span style="color: ${brandPrimary}; font-weight: bold;">${statusLabel}</span></p>
+          </div>
+        </div>
+
+        <div style="background-color: #ecfccb; padding: 16px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 0; color: #365314;"><strong>${message}</strong></p>
+        </div>
+
+        ${nextSteps ? `
+        <div style="background-color: #fef3c7; padding: 16px; border-radius: 8px; margin: 20px 0;">
+          <h4 style="margin-top: 0; color: #92400e;">📋 Sonraki Adımlar:</h4>
+          <p style="margin-bottom: 0; color: #92400e;">${nextSteps}</p>
+        </div>
+        ` : ''}
+
+        <p>İade süreci ile ilgili sorularınız için destek ekibimizle iletişime geçebilirsiniz.</p>
+        <p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>
+
+        <hr style="margin-top: 30px; border: none; border-top: 1px solid #e5e7eb;">
+        <p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın.</p>
+      </div>
+    `
+
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
-    let emailFrom = branding.emailFrom
-    
+    const emailFrom = branding.emailFrom
+    const notifyDebug = Deno.env.get('NOTIFY_DEBUG') === 'true'
+
     if (!resendApiKey) {
-      return new Response(JSON.stringify({ success: true, disabled: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      if (notifyDebug) console.warn('[return-status-notification] Email disabled: missing RESEND_API_KEY')
+      return new Response(JSON.stringify({ success: true, disabled: true, channel: 'email' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     const emailResponse = await fetch('https://api.resend.com/emails', {
@@ -184,16 +299,8 @@ serve(async (req) => {
         from: emailFrom,
         to: [customer_email],
         subject: subject,
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: ${brandPrimary};">${brandName} — İade Durumu Güncellendi</h2>
-            <p>Merhaba ${customer_name},</p>
-            <p>Siparişinizin iade durumu güncellendi: <strong>${statusLabel}</strong></p>
-            <p>Sebepler: ${reason}</p>
-            ${description ? `<p>Açıklama: ${description}</p>` : ''}
-            <p>Teşekkürler,<br>${brandName} Ekibi</p>
-          </div>
-        `,
+        text: emailContent,
+        html,
       }),
     })
 
@@ -202,9 +309,18 @@ serve(async (req) => {
       throw new Error(`Email failed: ${errorText}`)
     }
 
+    const result = await emailResponse.json().catch(() => ({})) as ResendResult
+
     console.warn(`📧 Notification sent to ${customer_email} for return ${return_id}: ${old_status} → ${new_status}`)
 
-    return new Response(JSON.stringify({ success: true, return_id, new_status }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({
+      success: true,
+      result,
+      return_id,
+      customer_email,
+      new_status,
+      timestamp: new Date().toISOString()
+    }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Unknown error'
