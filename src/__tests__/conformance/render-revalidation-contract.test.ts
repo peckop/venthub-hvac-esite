@@ -9,88 +9,65 @@ import { describe, expect, it } from 'vitest'
  * NİÇİN VAR: 2026-08-15'te 1044 fiyat satırı prod'a yazıldı ve vitrin DEĞİŞMEDİ. Sebep tek tek
  * bakınca görünmüyordu — ürün sayfası statik üretiliyor, tazeleme webhook'a bağlı, webhook üç
  * tabloyu dinliyor ve `product_prices` o üçünde yoktu. Zincirin iki ucundan biri eksikti ve
- * **hiçbir test bunu görmedi**: handler dalı yazılmış olsa bile tetik yoksa webhook hiç ateşlenmez;
- * tetik olsa bile handler dalı yoksa istek gelir ve sessizce düşer. İki uç AYRI AYRI doğru olabilir,
- * yanlış olan EŞLEŞMEdir — bu yüzden kapı çift yönlüdür.
+ * hiçbir test bunu görmedi: handler dalı yazılmış olsa bile tetik yoksa webhook hiç ateşlenmez;
+ * tetik olsa bile handler dalı yoksa istek gelir ve sessizce düşer. İki uç AYRI AYRI doğru
+ * olabilir, yanlış olan EŞLEŞMEdir — bu yüzden kapı çift yönlüdür.
  *
- * ── Bu dosyanın ilk sürümü DENETİMDEN GEÇEMEDİ; iki kanıtlanmış sessiz-yeşil vardı ──
+ * ── DÖRT DENETİM PASI, ALTI KANITLANMIŞ SESSİZ-YEŞİL ──
  *
- *  (1) `handledTables()` `table === 'x'` metnini dosyanın HER yerinde arıyordu. `route.ts` içindeki
- *      keşif-kapısı koşulu (`if (table === 'inventory_movements' || table === 'product_prices')`)
- *      bir handler dalı DEĞİL — ama tarayıcı onu dal sanıyordu. Sonuç: `product_prices`'ın GERÇEK
- *      handler bloğu tamamen silinebiliyor ve test yeşil kalıyordu. Yani kapı, var oluş sebebi olan
- *      hatanın tam imzasını kaçırıyordu. → Artık yalnız **dal başı** eşleşir (tek koşullu
- *      `if (table === 'x') {`), koşul içindeki geçişler değil.
+ * Bu dosyanın ilk üç sürümü denetimden geçemedi. Aşağıdakilerin hepsi ÖLÇÜLDÜ (bozma yapıldı,
+ * test yeşil kaldı); hiçbiri koda bakıp "doğru görünüyor" diyerek bulunamazdı.
  *
- *  (2) SQL düz `;` ile bölünüyordu. PostgreSQL'de gövdeler dollar-quote'ludur (`$$ … $$`) ve
- *      noktalı virgül içerirler; üstelik hiç çağrılmayan bir fonksiyonun gövdesinde METİN olarak
- *      geçen `create trigger … handle_supabase_webhook()` gerçek tetik sayılıyordu. Denetçi bunu
- *      gerçek tetiği düşürüp metni fonksiyon gövdesine koyarak kanıtladı: test yeşil kaldı.
- *      → Artık dollar-quote blokları ve dizgeler MASKELENİR, ifade `create trigger` ile BAŞLAMALIDIR.
+ *  1. Keşif-kapısı koşulu (`table === 'a' || table === 'b'`) handler dalı sanılıyordu → gerçek
+ *     `product_prices` bloğu silinebiliyordu. Artık yalnız TEK KOŞULLU dal başı eşleşir.
+ *  2. SQL düz `;` ile bölünüyordu → dollar-quote'lu bir fonksiyon gövdesinde METİN olarak geçen
+ *     `create trigger` gerçek tetik sayılıyordu. Artık tek geçişli tarayıcı maskeliyor.
+ *  3. Kurulum taraması dosyadaki metne bakıyordu → tetikleri ölü bir `legacySql` değişkenine
+ *     taşımak yetiyordu. **Sonraki sürümde "hangi literal çalışıyor" sorusunu statik olarak
+ *     cevaplamayı denedim; o da kaçak verdi** — çağrıyı `if (false)` dalına ya da yoruma almak
+ *     kapıyı yeşil bırakıyordu. Erişilebilirlik analizi metin taramasıyla YAPILAMAZ. Çözüm
+ *     soruyu ortadan kaldırmak oldu: SQL artık TEK KAYNAKTA, JS betikleri onu okuyor.
+ *  4. İç içe blok yorumu (`/* … /* … *​/ … *​/`, PG el kitabı §4.1.5) — "bloğu yorum yaparak
+ *     kapatma", en sık devre-dışı bırakma biçimi, görünmezdi. Artık derinlik sayacı var.
+ *  5. Tarihsiz migration adı sıralamayı bozuyordu. Artık fail-closed bir iddia var.
+ *  6. Sıralama modeli CI'ın GERÇEK sırası değildi (aşağıya bkz. `byteCompare`).
  *
- * ── ÜÇÜNCÜ denetim pası, İKİNCİ sürümde ÜÇ kaçak daha buldu ──
+ * Ayrıca `table === "x"` (çift tırnak) bir öksüz handler'ı kaçırıyordu; repoda `quotes` lint
+ * kuralı ve Prettier yapılandırması yok, yani çift tırnak meşru bir yazım.
  *
- *  (3) **Ölü SQL dizgesi.** Kurulum iddiası dosyadaki METNE bakıyordu. Fiyat tetiklerini
- *      çalıştırılan şablondan alıp kullanılmayan bir `legacySql` değişkenine taşımak yetiyordu:
- *      betik 4 tabloya tetik kuruyor, yine "Setup Completed Successfully" yazıyor, kapı yeşil.
- *      Bu, (2)'nin birebir JavaScript boyutuydu. → `executedSql()` artık yalnız bir yürütme
- *      çağrısına BESLENEN şablon literallerini tarar.
- *
- *  (4) **İç içe blok yorumu.** PostgreSQL `/* … /* … *​/ … *​/` iç içe yorumu kabul eder (PG el
- *      kitabı §4.1.5, C'den farklı). Tarayıcı ilk kapanışta duruyordu, dolayısıyla "bir bloğu
- *      yorum yaparak kapatma" — en sık devre-dışı bırakma biçimi — görünmez kalıyordu.
- *      → Derinlik sayacı.
- *
- *  (5) **Tarihsiz migration adı.** `hotfix_drop_products_webhook.sql` gibi rakamla başlamayan bir
- *      ad `chronoKey`'de en başa düşüyor; içindeki `drop trigger` henüz var olmayan bir tetiği
- *      düşürmeye çalışıp hiçbir şeye denk gelmiyordu. Denetçi ölçtü: aynı içerik tarihsiz adla
- *      SESSİZ YEŞİL, `20260816_` önekiyle kırmızı. → Ayrı bir fail-closed iddia.
- *
- *  Ayrıca: `table === "x"` (çift tırnak) bir öksüz handler'ı kaçırıyordu — repoda `quotes` lint
- *  kuralı ve Prettier yapılandırması yok, yani çift tırnak meşru bir yazım.
- *
- * Ders (kaydedilmeye değer): statik tarayıcının yanlış-negatifi, kapının hiç olmamasından daha
- * kötüdür — çünkü yeşil ışık güven üretir. Üç denetim pası, üç ayrı sürümde toplam beş sessiz-yeşil
- * çıkardı; hiçbiri koda bakarak "doğru görünüyor" demekle bulunamazdı. Bu yüzden aşağıdaki her
- * iddia bilerek bozularak kanıtlanmıştır.
+ * DERS: statik tarayıcının yanlış-negatifi, kapının hiç olmamasından daha kötüdür — çünkü yeşil
+ * ışık güven üretir. Ve tekrarlayan ders: bir kaçağı statik olarak "daha iyi tarayarak" kapatmaya
+ * çalışmak çoğu zaman kusuru bir kabuk yukarı taşır; kalıcı çözüm sorunun kendisini kaldırmaktır.
  *
  * ── KAPSAM DIŞI (dürüstçe, kapatılmamış) ──
  *
- *  • **Tetiğin OLAY kapsamı denetlenmiyor.** `AFTER INSERT ON public.products` (UPDATE/DELETE
- *    olmadan) bu kapıdan geçer; `on_product_prices_upd`'nin `WHEN` koşulunun kaybolması da repo
- *    tarafında görünmez. Cetvelin §3 tablosundaki tetik ADLARI da doğrulanmıyor.
- *  • **Aynı-gün sıralaması** ad-sırası ile tam örtüşmüyor (197 migration'ın 7'si yer değiştiriyor);
- *    bugün hiçbiri webhook tetiğine dokunmadığı için etkisiz.
- *  • **Zincirin çalıştığı** denetlenmiyor, yalnız bağlı olduğu. `scripts/webhook_setup.sql`
- *    `REPLACE_WITH_ENV_SECRET` ile gelir; olduğu gibi koşulursa tetikler kurulur, her webhook 401
- *    alır ve kapı yine yeşildir.
- *
  *  • "Vitrinde görünen tablo" kümesi KODDAN türetilmiyor; cetvelin §3 tablosundan okunuyor.
- *    Altıncı bir tablo vitrine çıkar ve cetvele de yazılmazsa bu kapı sessiz kalır. Gerçek çözüm
- *    `generateStaticParams()` içeren rotalardan servis zinciri boyunca `.from('x')` çağrılarını
- *    türetmektir; ayrı ve daha büyük bir iş.
- *  • Tetiğin PROD'da gerçekten var olduğunu değil, repo SQL'inde tanımlı olduğunu doğrular.
- *    İlk üç tetiğin (`on_products_change`, `on_categories_change`, `on_inventory_movements_change`)
- *    repoda HİÇBİR migration karşılığı yok — yalnız `supabase/baselines/2026-06-12_public_schema.sql`
- *    anlık görüntüsünde tanımlılar. Bunları idempotent bir migration'la repoya yazmak açık kalemdir
- *    (migration = prod'a otomatik uygulanır → kullanıcı onayı gerekir, CLAUDE.md kural 13).
- *  • Handler dalının DOĞRU yolu tazelediğini denetlemez — yalnız dalın VAR olduğunu.
+ *    Altıncı bir tablo vitrine çıkar ve cetvele de yazılmazsa bu kapı sessiz kalır.
+ *  • Tetiğin PROD'da var olduğunu değil, repo SQL'inde tanımlı olduğunu doğrular. (Prod ayrıca
+ *    elle ölçüldü — cetvel §3 "Prod doğrulaması" tablosu, 2026-08-15.)
+ *  • Tetiğin OLAY kapsamı denetlenmiyor: `AFTER INSERT` (UPDATE/DELETE olmadan) geçer; ayrıca
+ *    `on_product_prices_upd`'nin `WHEN` koşulunun kaybolması repo tarafında görünmez.
+ *  • Zincirin ÇALIŞTIĞI denetlenmiyor, yalnız BAĞLI olduğu. `webhook_setup.sql`
+ *    `REPLACE_WITH_ENV_SECRET` ile gelir; olduğu gibi koşulursa tetikler kurulur, her webhook
+ *    401 alır ve kapı yine yeşildir.
+ *  • Ada uymayan YENİ bir kurulum betiği (`install_webhooks.js` gibi) glob'a düşmez.
  */
 
 const ROUTE_PATH = '/src/app/api/webhook/supabase/route.ts'
 const STANDARD_PATH = '/docs/standards/rendering-cache-standard.md'
+const SETUP_SQL_PATH = '/scripts/webhook_setup.sql'
 const WEBHOOK_FN = 'handle_supabase_webhook'
 
 /**
  * SQL kaynakları İKİ yerde yaşıyor ve bu tesadüf değil:
- *  - `supabase/baselines/*.sql` — anlık görüntüler. İlk üç webhook tetiği YALNIZ burada tanımlı.
+ *  - `supabase/baselines/*.sql` — anlık görüntüler. İlk üç webhook tetiği YALNIZ burada tanımlı;
+ *    hiçbir migration dosyasında geçmiyorlar (repo'dan önce elle kurulmuşlar).
  *  - `supabase/migrations/*.sql` — sonradan eklenenler (`product_prices`, `product_families`).
  * Yalnız `migrations/`'a bakan bir tarayıcı ilk üç tabloyu "tetiksiz" sanıp YANLIŞ alarm verirdi.
  *
  * DİKKAT — baseline'lar tam şema dökümü DEĞİL: `2026-08-13_public_schema.sql` kendi başlığında
  * "trigger/RLS politikaları DAHİL DEĞİL" diyor ve içinde sıfır `create trigger` var. Bu yüzden
- * "en yeni baseline yaşayan durumu tanımlar" varsayımı YANLIŞ olurdu; tüm kaynaklar tek bir
- * KRONOLOJİK defter gibi işlenir.
+ * "en yeni baseline yaşayan durumu tanımlar" varsayımı yanlış olurdu.
  */
 const baselineSql = import.meta.glob('/supabase/baselines/*.sql', {
   query: '?raw',
@@ -106,12 +83,7 @@ const migrationSql = import.meta.glob('/supabase/migrations/*.sql', {
 
 /**
  * KURULUM (bootstrap) kaynakları — sıfırdan bir ortamda webhook altyapısını kuran betikler.
- *
- * NİÇİN AYRI BİR KÜME: bunlar migration DEĞİL, kronolojik deftere ait değiller; her biri tek
- * başına "tam kurulum" iddiasındadır. Denetim (2026-08-15) şunu ölçtü: üçü de yalnız İLK ÜÇ
- * tetiği kuruyordu. Yani cetvel doğru, migration doğru, test yeşil — ama depo, 08-15 hatasını
- * yeni bir ortamda **birebir yeniden kuran bir düğme** taşıyordu ve hiçbir kapı oraya bakmıyordu.
- * Üstelik `setup_webhooks.js` sonunda "Setup Completed Successfully" yazıyordu: sahte başarı.
+ * `webhook_setup.sql` TEK KAYNAKTIR; iki `.js` betiği onu `readFileSync` ile okur.
  */
 const bootstrapSources = {
   ...(import.meta.glob('/scripts/webhook_setup*.sql', {
@@ -139,20 +111,28 @@ const standardSources = import.meta.glob('/docs/standards/rendering-cache-standa
 }) as Record<string, string>
 
 /**
- * Dosya adından kronolojik anahtar. Adlandırma tek biçimli değil:
- * `2026-06-12_public_schema.sql` · `20260815_x.sql` · `202508260945_y.sql`
- * Baştaki rakamlar çıkarılır, ilk 8 hane gün, kalanı sıra numarası olarak kullanılır.
- * Grup grup (önce baseline'lar, sonra migration'lar) işlemek yanlıştır: gerçek bir pg_dump
- * baseline'ı eklendiğinde ondan ÖNCEKİ migration'ların `drop`ları baseline'dan SONRA uygulanır.
+ * SIRALAMA — CI'IN FİİLEN YAPTIĞINI taklit eder, idealize bir kronolojiyi DEĞİL.
+ *
+ * `.github/workflows/supabase-migrate.yml` migration'ları şöyle uygular:
+ *     for f in $(ls -1 supabase/migrations/*.sql | sort); do
+ * yani düz BAYT SIRASI (runner'da `LC_ALL` set edilmiyor). Depoda 8-haneli (`20250903_*`) ve
+ * 14-haneli (`20250915152500_*`) adlar yan yana yaşıyor; aynı gün için bu iki biçim bayt
+ * sırasında TERS dizilir (`'1'` 0x31 < `'_'` 0x5F).
+ *
+ * Önceki sürüm "ilk 8 hane gün + kalanı sıra" diye normalleştiriyordu ve denetim bunun
+ * sessiz-yeşil ürettiğini ÖLÇTÜ: aynı push'ta gelen `20260815_zz_drop…` + `20260815120000_zz_recreate…`
+ * ikilisinde test "önce drop, sonra create → tetik yaşıyor" diyordu, CI ise tersini uygular ve
+ * prod'da tetik ÖLÜR. Kapının kendi varsayımı gerçekle çelişiyordu.
+ *
+ * Ders: bir kapı, doğru sandığı sırayı değil, ORTAMIN uyguladığı sırayı modellemelidir.
  */
+function byteCompare(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0
+}
+
 function leadingDigits(filePath: string): string {
   const base = filePath.split('/').pop() ?? filePath
   return (base.match(/^[\d_-]+/)?.[0] ?? '').replace(/\D/g, '')
-}
-
-function chronoKey(filePath: string): string {
-  const d = leadingDigits(filePath)
-  return `${d.slice(0, 8).padEnd(8, '0')}${d.slice(8).padEnd(6, '0')}|${filePath.split('/').pop()}`
 }
 
 /** `"public"."products"` · `public.products` · `products` → `products` */
@@ -165,12 +145,12 @@ function normalizeIdent(raw: string): string {
  * SQL'i ayrıştırılabilir hale getir: yorumlar, dizgeler ve dollar-quote gövdeleri maskelenir,
  * geriye yalnız yapısal metin kalır.
  *
- * TEK GEÇİŞLİ TARAYICI — ard arda `replace()` ÇAĞIRMAK YETMEZ. İlk sürüm öyleydi ve kendi
+ * TEK GEÇİŞLİ TARAYICI — ard arda `replace()` çağırmak YETMEZ. İlk sürüm öyleydi ve kendi
  * kapısında yakalandı: dizge maskesi satır yorumlarından ÖNCE koşuyordu, dolayısıyla bir `--`
- * yorumunun içindeki Türkçe kesme işaretleri (`INSERT'te`, `DELETE'te`) dizge sınırı sanılıyor ve
- * maskeleme oradan kayarak gerçek SQL'i yutuyordu. Ters sıra da çözmez: o zaman `raise notice
- * 'a -- b'` gibi bir dizgedeki `--` yorum sanılır. İki kural birbirine bağımlıdır — hangisinin
- * içinde olduğunu ancak metni baştan sona TEK KEZ, durum takip ederek yürüyerek bilebilirsin.
+ * yorumunun içindeki Türkçe kesme işaretleri (`INSERT'te`) dizge sınırı sanılıyor ve maskeleme
+ * oradan kayarak gerçek SQL'i yutuyordu. Ters sıra da çözmez: o zaman `raise notice 'a -- b'`
+ * gibi bir dizgedeki `--` yorum sanılır. İki kural birbirine bağımlıdır — hangisinin içinde
+ * olduğunu ancak metni baştan sona TEK KEZ, durum takip ederek yürüyerek bilebilirsin.
  */
 function normalizeSql(sql: string): string {
   let out = ''
@@ -191,8 +171,17 @@ function normalizeSql(sql: string): string {
     if (two === '/*') {
       let depth = 0
       while (i < sql.length) {
-        if (sql.slice(i, i + 2) === '/*') { depth++; i += 2; continue }
-        if (sql.slice(i, i + 2) === '*/') { depth--; i += 2; if (depth === 0) break; continue }
+        if (sql.slice(i, i + 2) === '/*') {
+          depth++
+          i += 2
+          continue
+        }
+        if (sql.slice(i, i + 2) === '*/') {
+          depth--
+          i += 2
+          if (depth === 0) break
+          continue
+        }
         i++
       }
       out += ' '
@@ -212,7 +201,10 @@ function normalizeSql(sql: string): string {
       i++
       while (i < sql.length) {
         if (sql[i] === "'") {
-          if (sql[i + 1] === "'") { i += 2; continue } // SQL'de kaçış: '' = tek tırnak
+          if (sql[i + 1] === "'") {
+            i += 2 // SQL'de kaçış: '' = tek tırnak
+            continue
+          }
           i++
           break
         }
@@ -233,21 +225,38 @@ function stripTsComments(src: string): string {
   return src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ')
 }
 
+/** Bir SQL metnindeki, `handle_supabase_webhook()` çağıran `create trigger` ifadelerinin tabloları. */
+function webhookTriggerStatements(sql: string): Array<{ table: string; trigger: string }> {
+  const found: Array<{ table: string; trigger: string }> = []
+  for (const stmt of normalizeSql(sql).split(';')) {
+    const head = stmt.trimStart()
+    // İfade `create trigger` ile BAŞLAMALI — bir fonksiyon gövdesinde/başka bir ifadenin ortasında
+    // geçen `create trigger` metni gerçek tanım sayılmasın.
+    const create = /^create\s+(?:or\s+replace\s+)?(?:constraint\s+)?trigger\s+([\w."]+)[\s\S]*?\son\s+([\w."]+)/i.exec(head)
+    if (!create) continue
+    if (!head.toLowerCase().includes(WEBHOOK_FN)) continue
+    found.push({ table: normalizeIdent(create[2]), trigger: normalizeIdent(create[1]) })
+  }
+  return found
+}
+
 /**
- * Webhook tetiklerinin YAŞAYAN durumu. Dosyalar kronolojik işlenir; `create`/`drop` etkileri
- * sırayla uygulanır. Tek bir `create trigger` görmek yetmez — sonraki bir migration onu düşürmüş
- * olabilir ve o durumda tablo fiilen tetiksizdir.
+ * Webhook tetiklerinin YAŞAYAN durumu. `create`/`drop` etkileri CI'ın sırasıyla uygulanır.
+ * Tek bir `create trigger` görmek yetmez — sonraki bir migration onu düşürmüş olabilir.
  *
  * Anahtar `tablo::tetik` — yalnız ada bakmak hatalıydı: bu repoda tetik adları tablolar arasında
  * tekrar ediyor (`*_set_updated_at` ailesi tek dosyada 6 kez), dolayısıyla başka bir tablodaki
  * aynı adlı tetiğin düşürülmesi izlenen tetiği yanlışlıkla siliyordu.
  */
 function liveWebhookTriggers(): Set<string> {
-  const files = [...Object.entries(baselineSql), ...Object.entries(migrationSql)].sort(
-    (a, b) => chronoKey(a[0]).localeCompare(chronoKey(b[0])),
-  )
+  // Baseline'lar önce: CI onları HİÇ uygulamaz, başlangıç durumunu belgeleyen anlık görüntülerdir.
+  // Migration'lar sonra ve CI'ın birebir sırasıyla (bayt).
+  const files = [
+    ...Object.entries(baselineSql).sort((a, b) => byteCompare(a[0], b[0])),
+    ...Object.entries(migrationSql).sort((a, b) => byteCompare(a[0], b[0])),
+  ]
 
-  const live = new Set<string>() // "tablo::tetik"
+  const live = new Set<string>()
 
   for (const [, rawSql] of files) {
     for (const stmt of normalizeSql(rawSql).split(';')) {
@@ -259,8 +268,6 @@ function liveWebhookTriggers(): Set<string> {
         continue
       }
 
-      // İfade `create trigger` ile BAŞLAMALI — fonksiyon gövdesinde metin olarak geçen
-      // `create trigger` (maskeleme sonrası artakalan) gerçek tanım sayılmasın.
       const create = /^create\s+(?:or\s+replace\s+)?(?:constraint\s+)?trigger\s+([\w."]+)[\s\S]*?\son\s+([\w."]+)/i.exec(head)
       if (!create) continue
       if (!head.toLowerCase().includes(WEBHOOK_FN)) continue
@@ -276,17 +283,14 @@ function tablesWithLiveTrigger(): Set<string> {
 }
 
 /**
- * Handler'ın DAL BAŞLARI. Yalnız tek koşullu `if (table === 'x') {` / `else if (table === 'x') {`
- * eşleşir. Çok koşullu bir `if` (ör. keşif kapısı `table === 'a' || table === 'b'`) bilerek
- * DIŞARIDA bırakılır: o bir tazeleme dalı değil, bir politika kapısıdır — dal sanılması bu testin
- * ilk sürümündeki kanıtlanmış yanlış-negatifin sebebiydi.
+ * Handler'ın DAL BAŞLARI. Yalnız tek koşullu `if (table === 'x') {` eşleşir. Çok koşullu bir `if`
+ * (ör. keşif kapısı `table === 'a' || table === 'b'`) bilerek DIŞARIDA bırakılır: o bir tazeleme
+ * dalı değil, bir politika kapısıdır — dal sanılması ilk sürümdeki kanıtlanmış kaçağın sebebiydi.
+ * Üç tırnak biçimi de kabul edilir; repoda `quotes` lint kuralı yok.
  */
 function handlerBranches(routeSrc: string): Set<string> {
   const src = stripTsComments(routeSrc)
   const found = new Set<string>()
-  // Üç tırnak biçimi de kabul edilir: repoda `quotes` lint kuralı ve Prettier yapılandırması YOK,
-  // yani `table === "x"` tamamen meşru bir yazım. Yalnız tek tırnağı eşleyen sürüm, çift tırnakla
-  // yazılmış bir öksüz handler'ı sessizce kaçırıyordu.
   for (const m of src.matchAll(/(?:\belse\s+)?\bif\s*\(\s*table\s*===\s*['"`](\w+)['"`]\s*\)\s*\{/g)) {
     found.add(m[1])
   }
@@ -294,41 +298,26 @@ function handlerBranches(routeSrc: string): Set<string> {
 }
 
 /**
- * Cetvel §3 tablosundaki tablo adları = SSOT. Elle tutulan bir kopya, dokümanla testin
- * ayrışmasına davetiyedir; liste tek yerden okunur.
+ * Cetvel §3 SÖZLEŞME tablosundaki tablo adları = SSOT. Elle tutulan bir kopya, dokümanla testin
+ * ayrışmasına davetiyedir.
+ *
+ * Dilim ilk `### ` alt başlığında kesilir: §3 altında `### Prod doğrulaması` gibi başka
+ * `| \`tablo\` |` tabloları da var. Onları da yutmak listeyi mükerrer girişlerle şişiriyor, hata
+ * mesajlarını tekrar bastırıyor ve "en az 5 tablo okundu" korumasını GEVŞETİYOR — asıl sözleşme
+ * tablosu tamamen silinse bile prod-doğrulama tablosu tek başına eşiği karşılardı.
  */
 function requiredTablesFromStandard(md: string): string[] {
   const start = md.indexOf('## 3.')
   const end = md.indexOf('## 4.')
-  // indexOf -1 dönerse slice sessizce dosyanın sonundan/başından keser ve liste ya boşalır ya
-  // §4'ü de yutar. İkisi de sessiz bozulma; başlık bulunamadıysa boş dön, iddia gürültülü patlasın.
+  // indexOf -1 dönerse slice sessizce keser: liste ya boşalır ya §4'ü yutar. İkisi de sessiz
+  // bozulma; başlık bulunamadıysa boş dön, iddia gürültülü patlasın.
   if (start === -1 || end === -1 || end <= start) return []
-  return [...md.slice(start, end).matchAll(/^\|\s*`(\w+)`\s*\|/gm)].map((m) => m[1])
-}
 
-/**
- * Bir kurulum betiğinin GERÇEKTEN ÇALIŞTIRDIĞI SQL.
- *
- * NİÇİN: denetim (2026-08-15, üçüncü pas) şunu kanıtladı — `product_prices` tetiklerini
- * çalıştırılan şablondan çıkarıp kullanılmayan bir `legacySql` değişkenine taşımak yetiyordu;
- * betik 4 tabloya tetik kuruyor, sonunda yine "Setup Completed Successfully" yazıyor ve kapı
- * YEŞİL kalıyordu. Bu, SQL tarafında kapatılan "gövdede metin olarak geçen create trigger"
- * kusurunun birebir JavaScript boyutudur: dosyada METİN olması ≠ çalıştırılıyor olması.
- *
- * Bu yüzden `.js` betiklerinde tüm dosya değil, yalnız bir yürütme çağrısına (`client.query(...)`,
- * `writeFileSync(..., x)`) BESLENEN şablon literalleri taranır. `.sql` dosyalarında dosyanın
- * tamamı zaten yürütülür.
- */
-function executedSql(path: string, src: string): string {
-  if (path.endsWith('.sql')) return src
+  let section = md.slice(start, end)
+  const subHeading = section.indexOf('\n### ')
+  if (subHeading !== -1) section = section.slice(0, subHeading)
 
-  const chunks: string[] = []
-  for (const m of src.matchAll(/const\s+(\w+)\s*=\s*`([\s\S]*?)`/g)) {
-    const [, name, body] = m
-    const isExecuted = new RegExp(`(?:\\.query|writeFileSync|execSync)\\s*\\([^)]*\\b${name}\\b`).test(src)
-    if (isExecuted) chunks.push(body)
-  }
-  return chunks.join('\n;\n')
+  return [...new Set([...section.matchAll(/^\|\s*`(\w+)`\s*\|/gm)].map((m) => m[1]))]
 }
 
 const REQUIRED_TABLES = requiredTablesFromStandard(standardSources[STANDARD_PATH] ?? '')
@@ -341,27 +330,26 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
     expect(Object.keys(standardSources), `Cetvel ${STANDARD_PATH} bulunamadı`).toContain(STANDARD_PATH)
   })
 
-  it('her SQL kaynağı tarihle başlıyor (kronolojik defterin ön koşulu)', () => {
+  it('her SQL kaynağı tarihle başlıyor (sıralamanın ön koşulu)', () => {
     const undated = [...Object.keys(baselineSql), ...Object.keys(migrationSql)]
       .filter((p) => leadingDigits(p).length < 8)
       .sort()
     expect(
       undated,
       `TARİHSİZ SQL DOSYASI: [${undated.join(', ')}]\n\n` +
-        'Yaşayan tetik durumu, dosya adındaki tarihe göre KRONOLOJİK hesaplanır. Adı rakamla ' +
-        'başlamayan bir dosya en başa sıralanır — yani içindeki "drop trigger" henüz var olmayan ' +
-        'bir tetiği düşürmeye çalışır ve HİÇBİR ŞEYE denk gelmez. Denetimde ölçüldü: aynı içerik ' +
-        '"hotfix_drop_products_webhook.sql" adıyla SESSİZ YEŞİL, "20260816_..." adıyla kırmızı. ' +
-        'Prod\'da tetik ölür, vitrin donar, kapı görmez. (Supabase CLI de bu dosyaları sıralayamaz.)',
+        'Yaşayan tetik durumu, CI\'ın uyguladığı sırayla (dosya adı bayt sırası) hesaplanır. ' +
+        'Adı tarihle başlamayan bir dosya bu sıraya oturmaz: içindeki "drop trigger" ait olmadığı ' +
+        'bir noktada uygulanır ve hiçbir şeye denk gelmeyebilir — prod\'da tetik ölür, vitrin ' +
+        'donar, kapı görmez. Denetimde ölçüldü. (Supabase CLI de bu dosyaları sıralayamaz.)',
     ).toEqual([])
   })
 
   it('cetvel §3 tablosu okunabiliyor (SSOT boşa düşerse tüm iddialar anlamsızlaşır)', () => {
     expect(
       REQUIRED_TABLES.length,
-      `${STANDARD_PATH} §3 tablosundan tablo adı çıkarılamadı. Cetvelin biçimi değiştiyse ` +
-        'requiredTablesFromStandard() da güncellenmeli — yoksa bu dosyadaki HER iddia boş kümeyi ' +
-        'denetler ve sessizce yeşil kalır.',
+      `${STANDARD_PATH} §3 SÖZLEŞME tablosundan tablo adı çıkarılamadı. Cetvelin biçimi ` +
+        'değiştiyse requiredTablesFromStandard() da güncellenmeli — yoksa bu dosyadaki HER iddia ' +
+        'boş kümeyi denetler ve vakumda yeşil kalır.',
     ).toBeGreaterThanOrEqual(5)
   })
 
@@ -370,8 +358,7 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
       handlerBranches(routeSources[ROUTE_PATH] ?? '').size,
       `${ROUTE_PATH} içinde "if (table === '<tablo>') {" biçiminde dal bulunamadı. Sevk mekanizması ` +
         'switch/case ya da tablo→işleyici sözlüğüne çevrildiyse bu doğru bir refactor olabilir; ama ' +
-        'o zaman handlerBranches() ayrıştırıcısı da güncellenmelidir. Bu iddia, ayrıştırıcı körleşince ' +
-        'testin sessizce yeşil kalmasını engellemek için var.',
+        'o zaman handlerBranches() ayrıştırıcısı da güncellenmelidir.',
     ).toBeGreaterThanOrEqual(3)
   })
 
@@ -381,9 +368,8 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
     expect(
       missing,
       `TETİK EKSİK: [${missing.join(', ')}] tablosu vitrinde görünüyor ama ${WEBHOOK_FN}() çağıran ` +
-        'yaşayan bir tetiği yok. Bu tam olarak 2026-08-15 hatasıdır: veri değişir, webhook HİÇ ateşlenmez, ' +
-        'statik sayfa eski kalır ve hiçbir şey hata vermez. Çözüm: supabase/migrations/ altına ' +
-        '"create trigger ... execute function public.handle_supabase_webhook();" ekle.',
+        'yaşayan bir tetiği yok. Bu tam olarak 2026-08-15 hatasıdır: veri değişir, webhook HİÇ ' +
+        'ateşlenmez, statik sayfa eski kalır ve hiçbir şey hata vermez.',
     ).toEqual([])
   })
 
@@ -392,8 +378,8 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
     const missing = REQUIRED_TABLES.filter((t) => !branches.has(t))
     expect(
       missing,
-      `HANDLER DALI EKSİK: [${missing.join(', ')}] için ${ROUTE_PATH} içinde "if (table === '<tablo>') {" ` +
-        'dalı yok. Tetik ateşlenir, istek gelir ve sessizce düşer — hiçbir sayfa tazelenmez.',
+      `HANDLER DALI EKSİK: [${missing.join(', ')}] için ${ROUTE_PATH} içinde dal yok. ` +
+        'Tetik ateşlenir, istek gelir ve sessizce düşer — hiçbir sayfa tazelenmez.',
     ).toEqual([])
   })
 
@@ -402,50 +388,9 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
     const orphanTriggers = [...tablesWithLiveTrigger()].filter((t) => !branches.has(t)).sort()
     expect(
       orphanTriggers,
-      `ÖKSÜZ TETİK: [${orphanTriggers.join(', ')}] tablosunda webhook tetiği var ama handler'da karşılığı yok. ` +
-        'Her satır değişikliğinde boşuna HTTP isteği atılır ve hiçbir şey tazelenmez — maliyet var, etki yok. ' +
-        'Ya handler dalını ekle ya tetiği kaldır.',
-    ).toEqual([])
-  })
-
-  it('KURULUM betikleri cetveldeki TÜM tabloların tetiğini kuruyor', () => {
-    const paths = Object.keys(bootstrapSources).sort()
-    expect(
-      paths.length,
-      'Kurulum betiği bulunamadı (beklenen desen: scripts/webhook_setup*.sql, scripts/setup_webhook*.js). ' +
-        'Yeniden adlandırıldılarsa bu glob da güncellenmeli — yoksa iddia sessizce boşa düşer. ' +
-        'Glob desen tabanlı: yeni bir kurulum betiği eklendiğinde kendiliğinden kapsama girer.',
-    ).toBeGreaterThanOrEqual(3)
-
-    const gaps: string[] = []
-    for (const p of paths) {
-      const runnable = executedSql(p, bootstrapSources[p])
-      expect(
-        runnable.trim().length,
-        `${p} içinde ÇALIŞTIRILAN SQL bulunamadı. Betik SQL'ini bir yürütme çağrısına ` +
-          '(client.query / writeFileSync / execSync) beslenen bir şablon literalinde tutmalı; ' +
-          'aksi hâlde bu iddia neyin gerçekten koşduğunu bilemez ve sessizce boşa düşer.',
-      ).toBeGreaterThan(0)
-
-      const installed = new Set(
-        [...normalizeSql(runnable).split(';')]
-          .map((s) => s.trimStart())
-          .filter((s) => /^create\s+(?:or\s+replace\s+)?(?:constraint\s+)?trigger\b/i.test(s))
-          .filter((s) => s.toLowerCase().includes(WEBHOOK_FN))
-          .map((s) => /\son\s+([\w."]+)/i.exec(s)?.[1])
-          .filter((t): t is string => Boolean(t))
-          .map(normalizeIdent),
-      )
-      const missing = REQUIRED_TABLES.filter((t) => !installed.has(t))
-      if (missing.length) gaps.push(`${p} → eksik: [${missing.join(', ')}]`)
-    }
-
-    expect(
-      gaps,
-      'KURULUM BETİĞİ EKSİK TABLO KURUYOR:\n' + gaps.join('\n') + '\n\n' +
-        'Bu betikler sıfırdan bir ortamda "kurulum tamam" diyerek biter. Eksik tablo bırakırlarsa ' +
-        'yeni ortam 2026-08-15 hatasıyla DOĞAR: veri değişir, sayfa değişmez, kimse fark etmez. ' +
-        'Migration eklerken kurulum betikleri de güncellenmelidir — ikisi ayrı kaynaktır.',
+      `ÖKSÜZ TETİK: [${orphanTriggers.join(', ')}] tablosunda webhook tetiği var ama handler'da ` +
+        'karşılığı yok. Her satır değişikliğinde boşuna HTTP isteği atılır ve hiçbir şey tazelenmez ' +
+        '— maliyet var, etki yok. Ya handler dalını ekle ya tetiği kaldır.',
     ).toEqual([])
   })
 
@@ -457,8 +402,45 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
     expect(
       orphanHandlers,
       `ÖKSÜZ HANDLER: [${orphanHandlers.join(', ')}] için handler dalı yazılmış ama o tabloda ` +
-        `${WEBHOOK_FN}() çağıran tetik yok. Kod doğru görünür, gözden geçirme geçer, ürün ÇALIŞMAZ — ` +
-        'çünkü webhook hiç ateşlenmez. 2026-08-15 hatasının tam imzası budur.',
+        `${WEBHOOK_FN}() çağıran tetik yok. Kod doğru görünür, gözden geçirme geçer, ürün ÇALIŞMAZ ` +
+        '— çünkü webhook hiç ateşlenmez. 2026-08-15 hatasının tam imzası budur.',
+    ).toEqual([])
+  })
+
+  it('KURULUM tek kaynağı cetveldeki TÜM tabloların tetiğini kuruyor', () => {
+    expect(
+      Object.keys(bootstrapSources),
+      `Kurulum tek kaynağı ${SETUP_SQL_PATH} bulunamadı — taşındıysa bu glob da güncellenmeli.`,
+    ).toContain(SETUP_SQL_PATH)
+
+    const installed = new Set(
+      webhookTriggerStatements(bootstrapSources[SETUP_SQL_PATH]).map((t) => t.table),
+    )
+    const missing = REQUIRED_TABLES.filter((t) => !installed.has(t))
+    expect(
+      missing,
+      `KURULUM BETİĞİ EKSİK TABLO KURUYOR: [${missing.join(', ')}]\n\n` +
+        'Bu betik sıfırdan bir ortamda webhook altyapısını kurar ve "Setup Completed Successfully" ' +
+        'diyerek biter. Eksik tablo bırakırsa yeni ortam 2026-08-15 hatasıyla DOĞAR: veri değişir, ' +
+        'sayfa değişmez, kimse fark etmez. Migration eklerken bu betik de güncellenmelidir.',
+    ).toEqual([])
+  })
+
+  it("kurulum SQL'i TEK KAYNAKTA — JS betikleri kendi kopyasını taşımıyor", () => {
+    const duplicates = Object.keys(bootstrapSources)
+      .filter((p) => p.endsWith('.js'))
+      .filter((p) => /create\s+trigger/i.test(stripTsComments(bootstrapSources[p])))
+      .sort()
+
+    expect(
+      duplicates,
+      `KURULUM SQL'İ KOPYALANMIŞ: [${duplicates.join(', ')}]\n\n` +
+        `Bu betikler SQL'i ${SETUP_SQL_PATH}'ten okumalı, kendi içlerinde tutmamalı.\n` +
+        'NİÇİN BU KADAR SERT: aynı SQL üç yerde kopyalıyken üçü de eksik tablo kuruyordu ve hiçbir ' +
+        'kapı görmüyordu. Sonra "hangi kopya çalışıyor" sorusunu statik olarak cevaplamayı denedim; ' +
+        'o da kaçak verdi — tetikleri ölü bir değişkene taşımak ya da çağrıyı yoruma almak kapıyı ' +
+        'yeşil bırakıyordu (denetimde ÖLÇÜLDÜ). Erişilebilirlik analizi metin taramasıyla yapılamaz. ' +
+        'Tek kalıcı çözüm sorunun kendisini kaldırmak: KOPYA OLMASIN.',
     ).toEqual([])
   })
 })
