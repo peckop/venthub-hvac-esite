@@ -120,6 +120,32 @@ describe('INV-ADMIN-OVERLAY-2 · modal a11y sözleşmesi (APG)', () => {
       `${path}: Radix aria-modal basmaz, Dialog.Content'e elle eklenmeli (cetvel §2.5, §4.8)`,
     ).toMatch(/aria-modal="true"/)
   })
+
+  /**
+   * SESSİZ-YEŞİL KAPATMA (2026-08-15, overlay göçünde ölçüldü).
+   *
+   * Yukarıdaki iki kural KAYNAK METNİNE bakar. Radix'te `<Dialog.Root modal={false}>`
+   * iken `<Dialog.Overlay>` **null döner** — kaynakta duran Overlay hiç render
+   * EDİLMEZ, gövde kaydırma kilidi kaybolur ve `aria-modal` anlamını yitirir.
+   * Bu durumda üstteki iki test GEÇER ama sözleşme sağlanmaz: kapının tam da
+   * yakalaması gereken şey ölçülemez hâle gelir.
+   *
+   * Karar: non-modal bir yüzey istiyorsan Radix Dialog KULLANMA — `AdminSidePanel`
+   * kullan (§4.3 sözleşmesi: `role="region"`, perde yok, kilit yok, odak iadesi var).
+   * Modal davranmayan bir yüzeyi modal işaretlemek APG'nin "severe negative
+   * ramifications" dediği hatadır.
+   */
+  it('hiçbir Dialog `modal={false}` ile kurulmuyor (sessiz-yeşil kapısı)', () => {
+    const offenders = ADMIN_FILES.filter(([, source]) => /modal=\{false\}/.test(source)).map(
+      ([path]) => path,
+    )
+    expect(
+      offenders.length,
+      `Radix'te \`modal={false}\` iken <Dialog.Overlay> NULL döner: kaynakta durur ama\n` +
+        `render EDİLMEZ → kaydırma kilidi sessizce kaybolur ve üstteki iki test yine GEÇER.\n` +
+        `Non-modal yüzey için \`AdminSidePanel\` kullan (cetvel §4.3).\n  ${offenders.join('\n  ')}`,
+    ).toBe(0)
+  })
 })
 
 describe('INV-ADMIN-OVERLAY-3 · katman ölçeği (ratchet)', () => {
