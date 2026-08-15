@@ -20,6 +20,8 @@
 | 14/18 | CI 26 fonksiyondan yalnız **7'sini** deploy ediyordu; 19'u prod'da 11 ay dondu | `.github/workflows/deploy-functions.yml` (kapsam dizinden türetiliyor) + `scripts/edge/{select-functions,drift-check}.mjs` |
 | 17 | PostgREST select ↔ şema uyuşmazlığı (statik select listeleri) | `src/__tests__/conformance/edge-select-columns.test.ts` (INV-8) |
 | 11 | `iyzico-callback` sandbox URL'ini SABİT kodluyordu (prod anahtarıyla: para çekilir, sipariş doğrulanamaz) — T022-VH | *(kilit YOK — env-okuma deseni cetvelde yazılı değil; E-kuralı adayı)* |
+| 12 | `shipping-webhook` replay guard'ı **"başlık VARSA uygula" = fail-OPEN** idi; kardeşi `returns-webhook` zorunlu tutuyordu (asimetri) — T025-VH | `tests/e2e/adversarial.test.ts` **test 7** (geçerli imzalı + timestamp'siz → 401). Bilerek-bozularak kanıtlandı. Cetvel §3.5 |
+| 18 | **Repo ≠ prod sapması ÖLÇÜLDÜ: 26/26 fonksiyon + 5/5 `_shared` dosyası BİREBİR AYNI** (2026-08-15, CLI ile prod'dan indirilip karşılaştırıldı). W1/W2 deploy'ları tuttu; 11 aylık sapma kapandı. | `scripts/edge/drift-check.mjs` + günlük CI cron. ⚠️ Ölçüm **elle** yapıldı; otomatik dedektör T024-VH bitene kadar "ölçemedim" (exit 2) diyor — o iş bitmeden bu satır tam kilitli sayılmaz. |
 
 ## Hâlâ AÇIK — bilinçli borç, yeniden raporlama gerekmez ama kapanmış da sayma
 

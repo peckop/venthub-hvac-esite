@@ -114,9 +114,18 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Optional replay guard — enforce only if timestamp header present
+    // Replay guard — ZORUNLU (T025-VH, 2026-08-15). Eskiden "başlık varsa kontrol et"ti;
+    // yani göndermeyen çağıran için guard hiç çalışmıyordu = fail-OPEN. Kardeşi
+    // `returns-webhook` (satır 76) başlığı zaten ZORUNLU tutuyor — asimetri kusurdu.
+    // Cetvel §3.5: kapı ya vardır ya yoktur; "uyar-geç"/"varsa uygula" geçiş modu YASAK.
+    // Şu an entegre bir kargo sağlayıcısı YOK, yani kıracak canlı çağıran da yok —
+    // kapıyı sıkı kurmanın en ucuz anı burası. Sağlayıcı bağlanırken `x-timestamp`
+    // (veya `x-event-time`) göndermesi ENTEGRASYON ÖN KOŞULUDUR.
     const tsHeader = req.headers.get('x-timestamp') || req.headers.get('x-event-time') || ''
-    if (tsHeader) {
+    if (!tsHeader) {
+      return jsonResponse({ error: 'Missing timestamp header' }, { status: 401 })
+    }
+    {
       let t = 0
       // support epoch ms or ISO
       if (/^\d+$/.test(tsHeader.trim())) {
