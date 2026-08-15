@@ -259,9 +259,17 @@ describe('INV-ADMIN-THEME-5 · tema düzeneği yerinde', () => {
   })
 
   it('kabuk kökü `data-admin-theme` basıyor', () => {
-    // Öznitelik düşerse admin token'larının HİÇBİRİ tanımlı olmaz ve panel
-    // tarayıcı varsayılan renkleriyle çizilir — sessiz ve tam bir görsel çöküş.
-    expect(layout).toContain('data-admin-theme')
+    // ALT-DİZE ARAMASI YETMEZ: `toContain('data-admin-theme')` sabotaj testinde
+    // `data-admin-themeX` ile GEÇTİ — bozuk ad doğru adı içeriyor. Özniteliğin
+    // gerçekten BAĞLANDIĞI da görülmeli (`={`). Kabuk üç yerde basmalı:
+    // normal ağaç, yükleme dalı, erişim-reddi dalı — biri düşerse o ekran
+    // token'sız, yani tarayıcı varsayılan renkleriyle çizilir.
+    const bindings = [...layout.matchAll(/data-admin-theme=\{/g)]
+    expect(
+      bindings.length,
+      'Öznitelik düşerse admin token’larının HİÇBİRİ tanımlı olmaz ve o ekran ' +
+        'tarayıcı varsayılan renkleriyle çizilir — sessiz ve tam bir görsel çöküş.',
+    ).toBeGreaterThanOrEqual(3)
   })
 
   it('tema tercihi SUNUCUDA okunuyor (FOUC bekçisi)', () => {
