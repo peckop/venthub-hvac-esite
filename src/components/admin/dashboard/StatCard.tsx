@@ -93,7 +93,7 @@ const StatCard: React.FC<StatCardProps> = ({
                 : value
 
     const content = (
-        <div className="flex items-start justify-between relative z-10 h-full">
+        <div className="flex items-start justify-between relative z-raised h-full">
             <div className="flex-1 min-w-0 pr-2">
                 <div className="text-xs font-semibold text-admin-fg-muted leading-tight mb-4 truncate group-hover:text-admin-fg-muted transition-colors" title={title}>
                     {title}

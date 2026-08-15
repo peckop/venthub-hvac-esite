@@ -123,7 +123,7 @@ const AdminPricingSettingsPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Fiyatlandırma Varsayılanları Card */}
         <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group flex flex-col justify-between`}>
-          <div className="relative z-10 space-y-6">
+          <div className="relative z-raised space-y-6">
             <div className="flex items-center gap-3 border-b border-admin-border pb-4">
               <DollarSign className="text-admin-accent" size={20} />
               <h2 className="text-lg font-semibold text-admin-fg tracking-tight">
@@ -181,7 +181,7 @@ const AdminPricingSettingsPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="relative z-10 pt-6 border-t border-admin-border">
+          <div className="relative z-raised pt-6 border-t border-admin-border">
             <button
               onClick={openModal}
               disabled={!hasWriteAccess}

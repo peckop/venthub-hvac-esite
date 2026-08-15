@@ -932,6 +932,45 @@ INV-ADMIN-DESIGN-1 için başlangıç tavanları — hedef hepsinde **0**:
 > Statik tarama tuzakları → `conformance-test-static-scan-gotchas` (import.meta.glob, tam-literal kök
 > glob, stale-guard).
 
+### 7.1 YENİDEN ÖLÇÜM — 2026-08-15 akşamı (Faz 5)
+
+114 admin dosyası, **yorumlar ayıklanarak** ölçüldü. Ham `grep` bu depoda yanıltıcıdır: kuralı
+*anlatan* yorumlar kuralın kendisini içerir (`window.confirm` yasağını açıklayan yorum,
+`window.confirm` araması için bulgu üretir). Conformance testleri de yorum ayıklıyor; ölçüm aynı
+yöntemi kullanmazsa iki sayı birbirini tutmaz ve hangisinin doğru olduğu belirsizleşir.
+
+| Sayaç | Baseline | Şimdi | Durum |
+|---|---|---|---|
+| `window.confirm` / `confirm(` | 21 | **0** | ✅ kapı: INV-ADMIN-OVERLAY-1 |
+| `alert(` | 7 | **0** | ✅ |
+| Ham `z-*` | ~30 (tavan 57) | **0** | ✅ tavan **0**'a indirildi |
+| Arbitrary `shadow-[0_0_…]` (glow) | ≥18 | **0** | ✅ `shadow-admin-*` |
+| `font-black` | 475 | **0** | ✅ |
+| `uppercase` | 539 | **3** | muaf: QR etiketinin yazdırma CSS'i |
+| `tracking-widest` | 240 | **0** | ✅ |
+| `glass` / `glass-strong` | çok | **0** | ✅ opak yüzey |
+| Ham renk skalası (`slate-*` vb.) | 951 | **1** | muaf: önizleme cihaz çerçevesi |
+| `focus:` (non-`focus-visible`) | çok | **0** | ✅ |
+| `aria-invalid` | 1 | **31** | form modallarında alan-seviyesi hata |
+| `aria-modal` | 8 eksik | **14** | her Dialog'da |
+| Ölü overlay kodu | ~1000 satır | **0** | ölü değilmiş — **geri takıldı** (§7.2) |
+
+**İki muafiyet ADLA verilmiştir, desenle değil:**
+`InventoryQrLabel.tsx` (yazıcıya giden gerçek CSS, Tailwind sınıfı değil) ve
+`CategoryBuilderView.tsx` (önizleme tuvali — admin kromu değil, içinde vitrin render ediliyor).
+
+### 7.2 "Ölü kod" ölü değildi
+
+Baseline'da "~1000 satır ölü overlay kodu — sil veya bağla" yazıyordu. Git arkeolojisi
+üçünün de **kalite temizliğinde düşmüş kullanıcı işlevi** olduğunu gösterdi:
+`3c7ea6ff` ("total quality purge — 980 to 0 errors") `AdminInventoryPage.tsx`'i **770 satırdan
+27'ye** düşürmüş, konteyner buharlaşmış, sunum bileşenleri yetim kalmıştı. Hepsi geri takıldı.
+
+**Cetvel kuralı:** bir bileşen "import edilmiyor" ise bu bir **soru**dur, cevap değil. Silmeden
+önce `git log -S "<Ad>" --all -- src` ile eskiden kimin import ettiğine ve o commit'in
+"purge/cleanup/lint fix" olup olmadığına bak; sözlükte ya da DB'de o yüzeye ait yetim kalmış
+anahtar/kolon varsa işlev gerçekti.
+
 ---
 
 ## 8. PROVENANCE

@@ -37,17 +37,17 @@ export default function AdminEmptyState({ icon: Icon, title, description, action
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center bg-admin-surface rounded-admin-lg border border-dashed border-admin-border relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             
-            <div className="w-20 h-20 bg-admin-surface flex items-center justify-center rounded-admin-lg mb-6 text-admin-accent border border-admin-border relative z-10 transition-transform duration-500 group-hover:scale-110">
+            <div className="w-20 h-20 bg-admin-surface flex items-center justify-center rounded-admin-lg mb-6 text-admin-accent border border-admin-border relative z-raised transition-transform duration-500 group-hover:scale-110">
                 <Icon size={36} strokeWidth={1.5} />
             </div>
             
-            <h3 className="text-lg font-semibold text-admin-fg mb-3 relative z-10">{title}</h3>
-            <p className="text-xs text-admin-fg-muted max-w-sm mb-8 leading-relaxed font-bold relative z-10">{description}</p>
+            <h3 className="text-lg font-semibold text-admin-fg mb-3 relative z-raised">{title}</h3>
+            <p className="text-xs text-admin-fg-muted max-w-sm mb-8 leading-relaxed font-bold relative z-raised">{description}</p>
             
             {action && (
                 <button
                     onClick={action.onClick}
-                    className="relative z-10 px-8 py-3 rounded-admin-lg bg-admin-accent text-admin-accent-fg text-xs font-semibold hover:bg-admin-accent-hover transform hover:-translate-y-0.5 transition-transform shadow-admin-lg shadow-cyan-400/20 active:scale-95"
+                    className="relative z-raised px-8 py-3 rounded-admin-lg bg-admin-accent text-admin-accent-fg text-xs font-semibold hover:bg-admin-accent-hover transform hover:-translate-y-0.5 transition-transform shadow-admin-lg shadow-cyan-400/20 active:scale-95"
                 >
                     {action.label}
                 </button>

@@ -363,7 +363,7 @@ const AdminRealtimeNotifications: React.FC = () => {
     ].filter(item => item.hasAccess && item.count > 0)
 
     return (
-        <div className="relative z-50" ref={dropdownRef}>
+        <div className="relative z-popover" ref={dropdownRef}>
             {/* Bell Trigger */}
             <button
                 onClick={toggleDropdown}

@@ -98,10 +98,10 @@ export default function AbcPieChart({ data, title }: AbcPieChartProps) {
                 {/* Merkezdeki Toplam Metni */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-4 flex flex-col items-center justify-center pointer-events-none">
                     <div className="absolute inset-0 bg-admin-accent-weak blur-3xl rounded-full scale-150 pointer-events-none" />
-                    <span className="text-4xl font-semibold text-admin-fg tracking-tighter drop-shadow-pie-chart-glow relative z-10">
+                    <span className="text-4xl font-semibold text-admin-fg tracking-tighter drop-shadow-pie-chart-glow relative z-raised">
                         {totalValue}
                     </span>
-                    <span className="text-xs font-semibold text-admin-fg-muted mt-1 relative z-10 italic">
+                    <span className="text-xs font-semibold text-admin-fg-muted mt-1 relative z-raised italic">
                         {t('admin.dashboard.totalStock')}
                     </span>
                 </div>

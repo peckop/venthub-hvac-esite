@@ -24,7 +24,7 @@ import { useConfirm } from './overlay/ConfirmProvider'
  *  · §4.7 — GERÇEK içe aktarma (dry-run KAPALI) çok ürünün stoğunu tek seferde değiştirir:
  *    "ciddi / zincirleme sonuç" kademesi → `useConfirm` ile onay isteniyor. `window.confirm`
  *    yasak (INV-ADMIN-OVERLAY-1).
- *  · §4.9 — ham `z-50`/`z-10` yerine `z-backdrop`/`z-modal`/`z-raised` token'ları.
+ *  · §4.9 — ham `z-50`/`z-raised` yerine `z-backdrop`/`z-modal`/`z-raised` token'ları.
  *
  * BİLİNEN GERİLİM (kapatılmadı, kayıt altında): §4.2 "modal içinde büyük tablo yok" diyor;
  * buradaki önizleme tablosu bunu zorluyor. Doğrusu ayrı bir içe-aktarma ROTASI olurdu;
