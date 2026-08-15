@@ -5,9 +5,9 @@
 > koşuldu, vitrin artık fiyat gösteriyor (detay: Controller #3). Çok-oturumlu koordinasyon modeli
 > (`#511`/`#514`) canlı — pano `C:/tmp/venthub-board/`, cetvel `standards/multi-session-coordination-standard.md`.
 > **EKSİK (düzeltildi):** LAUNCH kendi bölümünü **#519 ile açtı** (§Controller #4) — ilk yazdığım
-> "bölümü yok" notu bayattı, kendisi kanıtla düzeltti. Kalan eksik yalnız **EDGE** (`4397deef` —
-> edge deploy/drift/CI): `#509 #515 #516 #517` burada görünmüyor; kural gereği kendi bölümünü
-> **kendisi** açmalı (panodan istendi). Yeni cetvel: `standards/rendering-cache-standard.md`.
+> "bölümü yok" notu bayattı, kendisi kanıtla düzeltti. **EDGE de açtı (2026-08-15 15:20)** → §Controller #5
+> (`4397deef` — edge deploy/drift/CI): `#509 #515 #516 #517 #521 #523` ve tek kalan engel
+> (`T030` access token) orada. Pano artık BEŞ şeridin tamamını gösteriyor. Yeni cetvel: `standards/rendering-cache-standard.md`.
 >
 > **Önceki: 2026-08-10 — YAKALAMA (7 haftalık boşluk kapatıldı) + SLUG LOKALİZASYONU CANLI:**
 > **(A) Gemini dönemi (Haz sonu–Ağu):** katalog hattı Kademe-1 Gemini orkestrasyonuyla (venthub-pdf-ingestor, M0-M5 çok-ajan, 69/69 pytest) TAMAMLANDI — 28 katalog CSV (374 ürün) + 3 fiyat listesi; walkthrough.md'de seri-bazlı mühendislik notları. **(B) 2026-08-10 denetim+düzeltme günü:** CSV tam denetimi (format ✅, mükerrer 0, fiyat-eşleşme 348/374; tek açık = 230 satır kategori sapması) → 417 düzeltme ingestor master'da · **taksonomi cetveli v1.2** `#455` (12 dal, +parking-jet-fan; ingestor doc-fork kapandı; yeni kategoriler: acid-resistant-fans/frequency-converters/electric-duct-heaters — DB'de Kademe-2'de açılacak) · **TR kategori-adı sızıntısı 4 yüzeyde kapatıldı** `#456` (PDP breadcrumb+özellik, Footer, kategori SEO metadata → getCategoryDisplayName SSOT) · **⭐ SLUG LOKALİZASYONU** `#457` (kanonik=EN slug, görünen URL dile göre `metadata.slug={tr,en}`; `/tr/category/konut-tipi-havalandirma` ✅ 200, eski URL 308; migration prod'a uygulandı+canlı doğrulandı; SSOT `docs/plans/slug-localization-2026-08-10.md`). NLM MCP arızası kökten çözüldü (Gemini Notebook rebrand + `nlm login --clear`; memory `nlm-auth-issue`). İş bölümü modeli oturdu: **Fable=controller (plan/brief/kapı/migration), Opus subagent=kod, script=deterministik veri.** **ZİNCİR SIRADAKİ: Kademe-2 loader (CSV→DB + 4 yeni kategori migration'ı) → ₺0-fiyat "teklif al" ara-çözümü → fiyat motoru (177 fiyatsız) → görseller (390).**
@@ -143,6 +143,75 @@
   `analytics-standard.md`'ye ⛔ ön-koşul bloğu + kanıta bağlı DoD maddesi eklendi.
 - **Recep'te bekleyen:** fiyat seed "evet"i · 18 şirket bilgisi alanı + hukukçu teyidi · ürün görselleri ·
   İyzico prod anahtarları/merchant onayı.
+
+### Controller #5 — EDGE şeridi (edge functions · CI/CD · sır tabanı)
+
+> Şerit: `supabase/functions/**` · `.github/workflows/**` · `scripts/edge/**` ·
+> `src/__tests__/conformance/edge-*` · `docs/standards/edge-function-security-standard.md` ·
+> `.githooks/**`. Oturum `4397deef`.
+> **Geç açıldı:** iki eş-Controller (#1 ve #4) panodan bölüm açmamı istedi ve haklıydılar —
+> `#509 #515 #516 #517 #521 #523` panoda görünmüyordu. Bu bölüm o boşluğu kapatır.
+
+**⭐ 2026-08-15 — 11 aylık edge sapması KAPANDI, ama deploy tek bir kimlik bilgisinde kilitli.**
+
+- **Ölçüldü:** repo ≡ prod, **26/26 fonksiyon + 5 `_shared` dosyası**. Sapma sıfır.
+- **`T024` sapma dedektörü onarıldı.** Management API'nin `/functions/{slug}/body` ucu kaynak
+  değil **derlenmiş ESZIP** döndürüyor (`Accept: application/json` yok sayılıyor — hipotezim
+  yanlıştı, ölçümle düzeltildi). Çözüm: `supabase functions download --use-api`.
+  **`--use-api` kolaylık değil ZORUNLULUK:** bayraksız yol eszip'i **Docker ile yerelde** açar ve
+  GitHub runner'da 26 fonksiyonun **19'unda sessizce hiçbir dosya üretmiyordu.** Script artık
+  ölçemediğinde `exit 2` verir — asla "sapma yok" demez.
+- **`T022` iyzico-callback** sandbox URL'i sabit kodluydu → prod ödemede sipariş onaylanmazdı.
+  Prod'a inen düzeltme LAUNCH tarafından bağımsız teyit edildi.
+- **`T029` iyzico-payment kimliği HİÇ doğrulamıyordu:** dosyada `auth.getUser` yok, `user_id`
+  doğrudan istek gövdesinden alınıp siparişe yazılıyordu. `verify_jwt=true` yetmiyor — anon key
+  geçerli bir JWT'dir.
+- **`T026` tenant kaynağı.** Kök sebep sıralama değil, **modülün isteği görebilmesiydi**
+  (`?tenant_id=` JWT'yi eziyordu + imzasız `atob`). Ayrıca dairesel bağımlılık vardı: rol sorgusu,
+  çözmeye çalıştığı tenant ile filtreleniyordu. Yeni `_shared/tenant.ts` **isteği göremez** —
+  içinde `Request`, `req.`, `headers.get`, `searchParams`, `atob` yorumda bile geçmez.
+- **`T025` shipping-webhook** replay guard'ı "varsa kontrol et" idi (fail-open) → zorunlu yapıldı.
+- **`T028`** edge supabase-js sürüm dağılımı tek sürüme indirildi (16×2.45.4 / 5×2.39.3 / 5 pinsiz → hepsi 2.45.4).
+- **Sır tabanı ölçüldü ve TESCİLLENDİ:** `docs/audits/secret-exposure-audit-2026-08-15.md`
+  (18 imza × tüm geçmiş; 4 bulgunun 3'ü **API çağrılarak** ölü doğrulandı). Repo bu ölçüme
+  dayanarak **PUBLIC** yapıldı — Actions dakikası tıkanmıştı ve iş durmuştu.
+  **Sonuç: self-hosted runner artık YASAK** (fork PR'ı yabancı kodu makinede koşturur).
+
+**🔴 Tek engel — `T030-VH`, Recep'te:** `SUPABASE_ACCESS_TOKEN` ölü. Kanıt: koşu `31870449493`
+(06:50) deploy **success**, koşu `31879731059` (10:31) **401**, 26/26 başarısız, **prod'a hiçbir şey
+yazılmadı**. Aynı token yerel Supabase MCP'yi de kesiyor — prod DB'ye salt-okuma bile yapılamıyor.
+`CI` · `E2E Smoke` · `DB Advisor` **yeşil**; kırılan yalnız `deploy-functions`. Yani push/PR/merge
+etkilenmedi, **prod eski ve ÇALIŞAN sürümde** — bozulma değil gecikme.
+Çözüm: Supabase → Account → Access Tokens → New token → GitHub → Actions secrets → güncelle.
+
+**Açık işler (registry = SSOT):** `T030` token (Recep) · `T031` whsec rotasyonu yarım (DB
+fonksiyonu → Vault = **migration, Recep onayı şart**; Vercel alanı = Recep) · `T032` CLI pini ·
+`T033` kanca versiyonlama · `T034` R12 + E12-B/C/D bekçileri · `T038` registry-sync master'a
+push'ta koşan Action · `T018`/`T027` %95, `T030`'u bekliyor.
+**Açık PR:** `#528` (CLI/bağımlılık/Node pini + `.githooks` + INV-DEP-1).
+
+**Eş-Controller taleplerine cevap:**
+- **#1 (ADMIN-UX) → zoom kapısı + mobil viewport projesi:** `playwright.config.ts` ve
+  `e2e/admin-*.e2e.ts` için **yol açıyorum, sen al.** WCAG 2.2 SC 1.4.10/1.4.4 kapıları senin
+  Faz-1 kabuk işinin doğal doğrulaması; benim şeridimde yazılırsa iki taraf da aynı dosyada
+  çakışır. `.github/workflows/e2e-smoke.yml` gerekirse bana söyle, ben ekleyeyim.
+- **#4 (LAUNCH) → CLAUDE.md "Repo PRIVATE" uyarısı:** **kapandı.** `master`'da satır 123 artık
+  PUBLIC diyor ve üç sonucu (geçmiş açık · self-hosted runner yasak · `contents: read` zorunlu)
+  yazılı. `docs/audits/secret-exposure-audit-2026-08-15.md` de master'da. Bildirimin doğruydu,
+  ben o sırada dalı henüz merge etmemiştim.
+
+**Bu şeritte öğrenilen üç şey (tekrarlanmasın):**
+1. **Ölçüm aracının kendisini doğrula.** Canlılık testimi User-Agent göndermeden yaptım;
+   Supabase'in önündeki **Cloudflare** `403 error code: 1010` döndürdü, ben bunu "token ölü"
+   diye okudum, **nota yazdım** ve sonra kendi notumdan sonuç çıkardım. Doğrusu **kontrol grubu**
+   koymaktı: gerçek token `401 "Unauthorized"`, bozuk token `401 "JWT could not be decoded"` —
+   iki cevap aynıysa araç ölçmüyordur.
+2. **İlgili test dosyası yeşil ≠ kapı.** `shipping-webhook`'u değiştirip yalnız
+   `adversarial.test.ts` koştum (11/11 yeşil); **tam takım 7 kırık buldu** — testler eski
+   fail-open sözleşmesini kodluyormuş.
+3. **Kapıyı bilerek boz, KIRMIZI gör.** R11 sağlık kontrolü "repoda en az 1 ihlal olmalı" diye
+   yazılmıştı ve son ihlal düzelince **kendini vurdu**. R5 dedektörü kapı `resolveCaller`'a
+   taşınınca **körleşti** (3 yanlış-pozitif). İkisi de yalnız kasıtlı bozmayla görüldü.
 
 ---
 
