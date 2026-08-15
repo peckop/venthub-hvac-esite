@@ -1351,6 +1351,7 @@ export const tr = {
       emailInvalid: 'Lütfen geçerli bir e-posta adresi girin',
       phoneRequired: 'Telefon numarası gereklidir',
       addressRequired: 'Adres gereklidir',
+      consentsRequired: 'Devam etmek için KVKK, Mesafeli Satış Sözleşmesi, Ön Bilgilendirme Formu ve sipariş onayı kutularını işaretlemeniz gerekir.',
       locationRequired: 'Lütfen şehir ve ilçe bilgilerini girin',
       cityRequired: 'Şehir gereklidir',
       districtRequired: 'İlçe gereklidir',

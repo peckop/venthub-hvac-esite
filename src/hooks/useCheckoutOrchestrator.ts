@@ -177,18 +177,41 @@ export const useCheckoutOrchestrator = () => {
     return true
   }, [t])
 
+  /**
+   * Zorunlu yasal onaylar işaretlenmeden ödeme BAŞLATILAMAZ.
+   *
+   * Mesafeli Sözleşmeler Yönetmeliği: tüketicinin Ön Bilgilendirme Formunu ve Mesafeli Satış
+   * Sözleşmesini sözleşme kurulmadan ÖNCE teyit etmesi zorunludur. Bu kontrol olmadan
+   * `buildPaymentRequest` onayları `accepted: false` olarak damgalıyordu — yani sistem
+   * tüketicinin kabul ETMEDİĞİNİN kaydını tutup ödemeyi yine de alıyordu.
+   * `marketing` bilerek dışarıda: ticari elektronik ileti onayı opsiyoneldir, zorunlu tutulamaz.
+   */
+  const validateLegalConsents = useCallback(() => {
+    const required: Array<keyof CheckoutLegalConsents> = ['kvkk', 'distanceSales', 'preInfo', 'orderConfirm']
+    if (required.some((key) => !legalConsents[key])) {
+      toast.error(t('checkout.errors.consentsRequired'))
+      return false
+    }
+    return true
+  }, [legalConsents, t])
+
   const handleNextStep = useCallback(async (initiatePayment: () => Promise<boolean | undefined>) => {
     if (step === 1 && validateCustomerInfo()) {
       setStep(2)
     } else if (step === 2 && validateAddress(shippingAddress)) {
+      // Onay kutuları bu adımda (StepAddressInfo) → uyarıyı kutuların GÖRÜNDÜĞÜ yerde ver.
+      if (!validateLegalConsents()) return
       setStep(3)
     } else if (step === 3) {
+      // Savunma katmanı: adım 3'e başka bir yoldan gelinmişse (geri/ileri, doğrudan setStep)
+      // ödeme yine de onaysız başlamasın.
+      if (!validateLegalConsents()) return
       const success = await initiatePayment()
       if (success) {
         setStep(4)
       }
     }
-  }, [step, shippingAddress, validateCustomerInfo, validateAddress])
+  }, [step, shippingAddress, validateCustomerInfo, validateAddress, validateLegalConsents])
 
   return {
     step,

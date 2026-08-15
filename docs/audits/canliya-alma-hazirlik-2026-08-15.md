@@ -74,6 +74,26 @@ email: 'info@venthub.com.tr'
 ```
 Placeholder telefon canlıda görünüyor. (Hafızada `user-side-open-items` olarak zaten duruyordu — kapanmamış.)
 
+### K7 · Yasal onay kutuları hiç zorlanmıyordu — sistem kendi aleyhine delil üretiyordu ✅ DÜZELTİLDİ
+**Kanıt (düzeltmeden önce):** `src/hooks/useCheckoutOrchestrator.ts` — adım ilerletme yalnız
+`validateCustomerInfo()` ve `validateAddress()` çağırıyordu; `step === 3` dalı doğrudan
+`initiatePayment()`'a gidiyordu. `legalConsents` state'i `{kvkk:false, distanceSales:false,
+preInfo:false, orderConfirm:false}` ile başlıyor ve **hiçbir yerde kontrol edilmiyordu.**
+
+Yani tüketici dört kutuyu da işaretlemeden ödemeye geçebiliyordu — ve `buildPaymentRequest.ts:173`
+onayları **zaman damgasıyla** `accepted: false` olarak sipariş kaydına yazıyordu. Sonuç: mesafeli
+satışta tüketicinin **kabul ETMEDİĞİNİN kaydını tutup ödemeyi yine de alan** bir sistem.
+İhtilafta bu kayıt satıcının aleyhine delildir.
+
+**Neden kritik:** MSY, Ön Bilgilendirme Formu ve Mesafeli Satış Sözleşmesinin sözleşme kurulmadan
+**önce** teyidini zorunlu kılar. Metinleri yazmak (K3) tek başına yetmez; **onaylatılmazsa** hukuki
+değeri yoktur. Bu, K3'ün sessiz tamamlayıcısıydı.
+
+**Düzeltme (bu PR):** `validateLegalConsents()` eklendi; dört zorunlu onay işaretli değilse
+(a) adım 2→3 geçişi — kutuların **göründüğü** yerde uyarı — ve (b) ödeme başlatma, ikisi de bloklanır.
+`marketing` bilerek dışarıda: ticari elektronik ileti onayı opsiyoneldir, zorunlu tutulamaz
+(zorunlu tutmak 6563'e aykırı olurdu). Mesaj `checkout.errors.consentsRequired` (TR+EN).
+
 ### K6 · `iyzico-callback` sandbox URL'ini sabit kodluyor → prod ödemede sipariş onaylanmaz
 **Kanıt:** `supabase/functions/iyzico-callback/index.ts:117`
 ```ts
