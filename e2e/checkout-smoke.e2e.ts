@@ -51,23 +51,49 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
       .waitForURL((u) => !u.pathname.includes('/auth/login'), { timeout: 25_000 })
       .catch(() => { /* yine de devam; aşağıda net patlar */ })
 
-    // 2) Ürün listesi → teklif isteme gerektirmeyen ilk satın alınabilir ürünün detay sayfasına git → sepete ekle
+    // 2) Ürün listesi → satın alınabilir bir ürünün detay sayfasına git → sepete ekle
+    //
+    // ⚠️ ESKİ SEÇİCİ NİÇİN KALDIRILDI (2026-08-15, karantinadan çıkarken ilk koşuda patladı):
+    // Test "satın alınabilir kart"ı `hasNotText: 'Teklif İste'` ile arıyordu. O varsayım
+    // ARTIK YANLIŞ: `/tr/products` F5-B'den beri `FamilyCard` basıyor ve fiyat karttan
+    // BİLEREK kaldırıldı (PS-042 önbellek izolasyonu) — dosyanın kendi yorumu diyor ki
+    // "her kart aynı 'Teklif İste' CTA'sını gösterir". Yani filtre SIFIR kart eşleştiriyordu.
+    // Kod doğruydu, test eski sözleşmeyi kodluyordu.
+    //
+    // YENİ ÇAPA: satın alınabilirliğin tek dürüst işareti PDP'deki `pdp-add-to-cart`.
+    // Kart metnine değil, ürünün gerçekten sepete eklenebilir olmasına bakılır. 374 ailenin
+    // 348'i fiyatlı, ama İLK kartın fiyatlı olduğu garanti değil — bu yüzden ilk birkaç
+    // kart sırayla denenir. (Kart metnine geri dönme: aynı hataya düşersin.)
     await page.goto('/tr/products')
-    const productCardLink = page.locator('a[href*="/products/"]').filter({ hasNotText: 'Teklif İste' }).first()
-    await expect(productCardLink, 'Satın alınabilir ürün kartı linki görünmedi').toBeVisible({ timeout: 30_000 })
-    // Karta click() YERİNE href'i alıp DOĞRUDAN git: kartın hover-transform'u / üstteki katman
-    // click()'i "stable değil / pointer intercept" diye 60sn timeout'a sokuyordu (master'da flaky).
-    // goto deterministiktir — actionability beklemesi yok.
-    const productHref = await productCardLink.getAttribute('href')
-    if (!productHref) throw new Error('Ürün kartı href alınamadı (liste boot olmadı?)')
-    await page.goto(productHref)
+    const cardLinks = page.locator('a[href*="/products/"]')
+    await expect(cardLinks.first(), 'Ürün listesi hiç kart basmadı (liste boot olmadı?)').toBeVisible({
+      timeout: 30_000,
+    })
 
-    // Detay sayfasına geçişi doğrula
-    await page.waitForURL(/\/products\//, { timeout: 25_000 })
+    const hrefs = (await cardLinks.evaluateAll((els) =>
+      els.map((e) => (e as HTMLAnchorElement).getAttribute('href')).filter(Boolean),
+    )) as string[]
+    const denenecek = [...new Set(hrefs)].slice(0, 6)
+    expect(denenecek.length, 'Ürün listesinden hiç href toplanamadı').toBeGreaterThan(0)
 
-    // Ürün detay sayfasındaki "Sepete Ekle" butonu
     const addToCartBtn = page.getByTestId('pdp-add-to-cart')
-    await expect(addToCartBtn, 'Detay sayfasındaki "Sepete Ekle" butonu görünmedi').toBeVisible({ timeout: 20_000 })
+    let bulunan: string | null = null
+    for (const href of denenecek) {
+      // Karta click() YERİNE href'e DOĞRUDAN git: kartın hover-transform'u / üstteki katman
+      // click()'i "stable değil / pointer intercept" diye 60sn timeout'a sokuyordu (flaky).
+      await page.goto(href)
+      await page.waitForURL(/\/products\//, { timeout: 25_000 })
+      if (await addToCartBtn.isVisible({ timeout: 12_000 }).catch(() => false)) {
+        bulunan = href
+        break
+      }
+    }
+    expect(
+      bulunan,
+      `Denenen ${denenecek.length} üründen hiçbiri sepete eklenebilir değil — hepsi "Teklif Al" ` +
+        'modunda görünüyor. Fiyat motoru vitrine ulaşmıyor olabilir (bu GERÇEK bir regresyon ' +
+        `olabilir, testi gevşetme). Denenenler: ${denenecek.join(', ')}`,
+    ).not.toBeNull()
 
     // Sepet localStorage'a yazılana kadar hidrasyon/bağlanma yarışını tolere ederek yeniden tıkla.
     await expect
