@@ -163,13 +163,26 @@ function fatal(msg) {
  */
 async function fetchDeployedFiles(token, ref, slug) {
   const url = `${API_BASE}/v1/projects/${ref}/functions/${encodeURIComponent(slug)}/body`
-  const res = await api(token, url)
+
+  // ÖLÇÜLDÜ (2026-08-15, CI run 31865954364): Accept BAŞLIĞI OLMADAN bu uç
+  // `application/octet-stream` + `ESZIP2.3` sihirli baytlarıyla derlenmiş bir
+  // bundle döndürüyor (743 KB) — kaynak DEĞİL, karşılaştırılamaz.
+  // `Accept: application/json` ile aynı uç `{ files: [{name, content}] }` döner;
+  // Supabase MCP'nin `get_edge_function`'ı da bu şekli alıyor. Bu yüzden başlık
+  // İSTEĞE BAĞLI DEĞİL, zorunlu.
+  let res = await api(token, url, 'application/json')
   if (!res.ok) {
     const body = await res.text().catch(() => '')
     fatal(`GET ${url} -> HTTP ${res.status}. ${body.slice(0, 400)}`)
   }
-  const ct = (res.headers.get('content-type') || '').toLowerCase()
-  const buf = Buffer.from(await res.arrayBuffer())
+  let ct = (res.headers.get('content-type') || '').toLowerCase()
+  let buf = Buffer.from(await res.arrayBuffer())
+
+  // Sunucu Accept'i yok sayıp yine eszip döndürürse: bu bir "sapma yok" değil,
+  // ölçemedik demektir. Aşağıdaki tanınmayan-format dalı fatal() ile durdurur.
+  if (ct.includes('octet-stream') && buf.subarray(0, 5).toString('latin1') === 'ESZIP') {
+    ct = 'application/x-eszip'
+  }
 
   if (ct.includes('multipart/')) {
     let form
@@ -207,8 +220,13 @@ async function fetchDeployedFiles(token, ref, slug) {
     `'${slug}' govdesi COZULEMEYEN formatta dondu.\n` +
       `  content-type: ${ct || '(yok)'}  boyut: ${buf.length} bayt\n` +
       `  Ilk baytlar: ${JSON.stringify(buf.subarray(0, 32).toString('latin1'))}\n` +
-      `  (Muhtemelen eszip bundle. Bu durumda /body yerine kaynak karsilastirmasi\n` +
-      `   'supabase functions download <slug>' ile yapilmali — script bunu VARSAYMAZ.)`
+      (ct === 'application/x-eszip'
+        ? `  ESZIP bundle geldi: sunucu 'Accept: application/json' istegimizi YOK SAYDI.\n` +
+          `  Bu bir 'sapma yok' sonucu DEGILDIR — kaynak karsilastirmasi YAPILAMADI.\n` +
+          `  Sonraki adim: eszip'i cozen bir okuyucu ya da 'supabase functions download <slug>'\n` +
+          `  ile GECICI bir dizine indirip karsilastirmak (repo kopyasinin UZERINE YAZMA).`
+        : `  (Muhtemelen eszip bundle. Bu durumda /body yerine kaynak karsilastirmasi\n` +
+          `   'supabase functions download <slug>' ile yapilmali — script bunu VARSAYMAZ.)`)
   )
 }
 
