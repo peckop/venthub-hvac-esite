@@ -11,6 +11,7 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
 import Iyzipay from "npm:iyzipay";
 import { tenantFromRow } from '../_shared/tenant.ts'
+import { buildAllowedOrigins, isAllowedRedirectTarget, normalizeOrigin } from '../_shared/origins.ts'
 
 // Minimal types to avoid `any` while keeping integration flexible
 type CheckoutRetrieveResponse = {
@@ -25,6 +26,35 @@ type CheckoutRetrieveResponse = {
 };
 
 Deno.serve(async (req) => {
+  // ── YONLENDIRME HEDEFI TEK KAPIDAN GEÇER (T043-VH) ──────────────────────────
+  //
+  // Query'den gelen `successUrl` daha önce HİÇ doğrulanmadan `location.replace` ile
+  // açılıyordu. O değer `iyzico-payment` tarafından isteğin `Origin` başlığından
+  // türetiliyordu ve o başlık saldırganın kontrolündedir: yani GERÇEK ödeme
+  // tamamlandıktan sonra müşteri saldırganın sayfasına yönlendirilebiliyordu.
+  //
+  // KAPI HANDLER'IN EN BAŞINDA, `try`'dan ÖNCE kurulur — bilinçli. İlk düzeltmemde
+  // iki çağrı yerini sarmıştım ama **üçüncüsü dış `catch` bloğundaydı** ve kapsam
+  // dışında kaldığı için açıkta kalmıştı; INV-PAY-2 bunu yakaladı. Hata yolu tam da
+  // gözden kaçan yoldur; kapı oraya da yetişmeli. Aynı kuralın iki kopyası olması,
+  // birini düzeltip diğerini unutmaya davettir.
+  const redirectAllowlist = buildAllowedOrigins({
+    PUBLIC_SITE_URL: Deno.env.get('PUBLIC_SITE_URL'),
+    FRONTEND_URL: Deno.env.get('FRONTEND_URL'),
+    SITE_URL: Deno.env.get('SITE_URL'),
+    ALLOWED_ORIGINS: Deno.env.get('ALLOWED_ORIGINS'),
+  })
+  /** Adayı allowlist'ten geçirir; geçemezse null döner (kanoniğe düşülür). */
+  const safeRedirect = (candidate: string | null | undefined): string | null => {
+    if (!candidate) return null
+    if (isAllowedRedirectTarget(redirectAllowlist, candidate)) return candidate
+    console.warn(`[iyzico-callback] successUrl allowlist disi, yok sayildi: ${normalizeOrigin(candidate) ?? '(cozulemedi)'}`)
+    return null
+  }
+  /** Ortamdan türetilen kanonik dönüş adresi (allowlist başı). */
+  const canonicalSuccessUrl = (): string | null =>
+    redirectAllowlist[0] ? `${redirectAllowlist[0]}/payment-success` : null
+
   const corsHeaders = getCorsHeaders(req);
   // İyzico callback istekleri Authorization header göndermez; 401'i engellemek için kendi CORS/anon kabulümüzü sağlar ve asla auth doğrulaması istemeyiz.
 
@@ -69,7 +99,7 @@ Deno.serve(async (req) => {
       const url = new URL(req.url);
       if (!orderId) orderId = url.searchParams.get('orderId') || undefined;
       if (!conversationId) conversationId = url.searchParams.get('conversationId') || undefined;
-      successUrl = url.searchParams.get('successUrl');
+      successUrl = safeRedirect(url.searchParams.get('successUrl'));
     } catch {}
 
     // ★ TENANT TÜRETME NOKTASI — `orderId`/`conversationId` çözüldükten SONRA, sipariş
@@ -109,18 +139,8 @@ Deno.serve(async (req) => {
     // tam da bu uçta yasak. Sipariş `id`/`conversation_id` zaten tekil; sınırı onlar çizer.
     const orderTenantFilter = tenantIsDerived ? `&tenant_id=eq.${encodeURIComponent(tenantId)}` : ''
 
-    // Eğer successUrl yoksa, ortamdan türet (PUBLIC_SITE_URL/FRONTEND_URL/SITE_URL)
-    if (!successUrl) {
-      const base = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
-      if (base) {
-        try {
-          const origin = new URL(base).origin;
-          successUrl = origin + '/payment-success';
-        } catch {
-          successUrl = base.replace(/\/$/, '') + '/payment-success';
-        }
-      }
-    }
+    // successUrl yoksa (ya da allowlist'i gecemediyse) kanonik adrese dus.
+    if (!successUrl) successUrl = canonicalSuccessUrl();
 
     if (!token) {
       // Fallback: sipariş satırındaki payment_token (yukarıdaki tenant türetme sorgusundan geldi)
@@ -225,8 +245,38 @@ Deno.serve(async (req) => {
       raw: result,
     } : { paymentStatus: null }
 
-    // Supabase: venthub_orders güncelle (yalnızca kesin durumlarda yaz)
-    async function patchStatus(newStatus: 'paid' | 'failed' | 'confirmed') {
+    // ── SİPARİŞ DURUMU: İKİ KOLON, İKİ AYRI SÖZLÜK (T042-VH · 2026-08-15) ────────
+    //
+    // Buradaki hata, iki kolonun sözlüğünün birbirine karışmasıydı. PROD'DAN ÖLÇÜLDÜ:
+    //
+    //   venthub_orders_status_check          → pending · confirmed · processing ·
+    //                                          shipped · delivered · cancelled
+    //   venthub_orders_payment_status_check  → pending · paid · failed · refunded ·
+    //                                          partial_refunded
+    //
+    // Yani `paid`/`failed` **yaşam döngüsü** değil **ödeme** sözlüğüne aittir. Eski kod
+    // ikisini de `status` kolonuna yazmaya çalışıyordu:
+    //
+    //   • başarı dalında `patchStatus('paid')` reddediliyor, `'confirmed'` ile TEKRAR
+    //     deneniyordu — yani kısıt reddi, akış denetimi olarak kullanılıyordu (çalışıyordu
+    //     ama yanlışlıkla);
+    //   • başarısızlık dalında `patchStatus('failed')` reddediliyor ve GERİ DÖNÜŞ YOKTU →
+    //     reddedilen ödeme sonsuza kadar `pending` kalıyordu. `payment_debug` de
+    //     yazılamıyordu, çünkü aynı PATCH ile gidiyordu: başarısızlığın izi bile kalmıyordu.
+    //   • `payment_status` kolonuna bu uç HİÇ yazmıyordu → ön yüzdeki iki yoklayıcı
+    //     (`useCheckoutPayment`, `PaymentWatcher`) hiçbir zaman ateşlenemezdi.
+    //
+    // MIGRATION GEREKMEDİ. `status` kısıtına `paid`/`failed` eklemek (Recep onayı + prod'a
+    // otomatik apply) ilk akla gelen çözümdü ama YANLIŞ olurdu: iki sözlüğü kalıcı olarak
+    // birbirine karıştırırdı. Doğru olan, her değeri ait olduğu kolona yazmak.
+    //
+    // BAŞARISIZLIKTA `status` DEĞİŞMEZ. Ödeme reddedildiğinde sipariş `pending` kalır ve
+    // yalnız `payment_status='failed'` olur — çünkü yaşam döngüsü ilerlememiştir ve
+    // kullanıcı aynı sipariş üzerinden tekrar deneyebilir. `cancelled` yazmak tekrar
+    // denemeyi kapatırdı (CLAUDE.md §11: durumlar monoton). Süresi dolan rezervasyonları
+    // `release-expired-reservations` zaten `payment_status='failed'` ile temizliyor —
+    // aynı sözlük, aynı kolon, tutarlı.
+    async function patchOrder(fields: { status?: string; payment_status?: string }) {
       const filterById = orderId ? `id=eq.${encodeURIComponent(orderId)}` : '';
       const filterByConv = (!orderId && (result?.conversationId || conversationId)) ? `conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}` : '';
       const filter = filterById || filterByConv;
@@ -239,7 +289,7 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
           Prefer: "return=representation",
         },
-        body: JSON.stringify({ status: newStatus, payment_debug: debugInfo }),
+        body: JSON.stringify({ ...fields, payment_debug: debugInfo }),
       });
       return resp;
     }
@@ -247,12 +297,12 @@ Deno.serve(async (req) => {
     let updateOk = false;
     let _stockResult: unknown = null;
     if (paid) {
-      // Önce 'paid' olarak güncellemeyi dene; constraint nedeniyle reddedilirse 'confirmed' ile tekrar dene
-      let r = await patchStatus('paid');
-      if (!r || !r.ok) {
-        r = await patchStatus('confirmed');
-      }
+      // Yaşam döngüsü: 'confirmed' · Ödeme: 'paid'. Tek PATCH, deneme-yanılma yok.
+      const r = await patchOrder({ status: 'confirmed', payment_status: 'paid' });
       updateOk = !!(r && r.ok);
+      if (!updateOk) {
+        console.error(`[iyzico-callback] BASARILI odeme yazilamadi (status=${r ? r.status : 'yok'}) — para cekildi, siparis guncellenmedi.`);
+      }
       
       // Send order confirmation (best-effort, only after payment success)
       try {
@@ -450,8 +500,12 @@ Deno.serve(async (req) => {
         }
       } catch { /* best-effort */ }
     } else if (result && result.paymentStatus && String(result.paymentStatus).toUpperCase() !== 'SUCCESS') {
-      const r = await patchStatus('failed');
+      // Yalnız ödeme durumu yazılır; `status` 'pending' kalır (tekrar deneme açık).
+      const r = await patchOrder({ payment_status: 'failed' });
       updateOk = !!(r && r.ok);
+      if (!updateOk) {
+        console.error(`[iyzico-callback] BASARISIZ odeme isaretlenemedi (status=${r ? r.status : 'yok'}) — siparis 'pending' gorunmeye devam edecek.`);
+      }
     }
 
     const responseBody = {
@@ -468,14 +522,10 @@ Deno.serve(async (req) => {
     // Her durumda frontende yönlendiren HTML dön (IyziCo bazı durumlarda 302'yi takip etmiyor olabilir)
     try {
       const url = new URL(req.url);
-      const successUrl = url.searchParams.get('successUrl');
-      let finalSuccess = successUrl;
-      if (!finalSuccess) {
-        const base = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
-        if (base) {
-          try { finalSuccess = new URL(base).origin + '/payment-success'; } catch { finalSuccess = base.replace(/\/$/, '') + '/payment-success'; }
-        }
-      }
+      // AYNI KAPI: bu blok eskiden query'deki `successUrl`'u dogrudan hedef yapiyordu.
+      // Iki ayri yerde iki ayri kural olmasi, birini duzeltip digerini unutmaya davettir.
+      let finalSuccess = safeRedirect(url.searchParams.get('successUrl'));
+      if (!finalSuccess) finalSuccess = canonicalSuccessUrl();
       if (finalSuccess) {
         const target = new URL(finalSuccess);
         if (orderId) target.searchParams.set('orderId', orderId);
@@ -503,13 +553,9 @@ Deno.serve(async (req) => {
       const url = new URL(req.url);
       const orderId = url.searchParams.get('orderId') || undefined;
       const conversationId = url.searchParams.get('conversationId') || undefined;
-      let finalSuccess = url.searchParams.get('successUrl');
-      if (!finalSuccess) {
-        const base = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
-        if (base) {
-          try { finalSuccess = new URL(base).origin + '/payment-success'; } catch { finalSuccess = base.replace(/\/$/, '') + '/payment-success'; }
-        }
-      }
+      // Hata yolu da AYNI kapıdan geçer (bkz. handler başındaki gerekçe).
+      let finalSuccess = safeRedirect(url.searchParams.get('successUrl'));
+      if (!finalSuccess) finalSuccess = canonicalSuccessUrl();
       if (finalSuccess) {
         const target = new URL(finalSuccess);
         if (orderId) target.searchParams.set('orderId', orderId);

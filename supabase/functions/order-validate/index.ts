@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
 
     // Load products
     const _productIds = Array.from(new Set(items.map((i)=>i.product_id)));
-    const prods = await getJson<Product[]>(`/rest/v1/products?select=* &id=in.(${_productIds.map(encodeURIComponent).join(',')})`);
+    const prods = await getJson<Product[]>(`/rest/v1/products?select=*&id=in.(${_productIds.map(encodeURIComponent).join(',')})`);
     const pmap = new Map<string, Product>();
     (Array.isArray(prods)?prods:[]).forEach((p: Product)=>pmap.set(p.id, p));
 
