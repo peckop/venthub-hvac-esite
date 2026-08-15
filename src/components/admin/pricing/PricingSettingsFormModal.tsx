@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Loader2, Save, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import type { FieldErrors } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -71,6 +72,40 @@ export const DEFAULT_PRICING_SETTINGS: PricingSettingsValues = {
   display_spread_pct: 0,
 }
 
+/* ---------------------------------------------------------------------------
+ * ALAN SEVİYESİ HATA GERİ BİLDİRİMİ (cetvel `docs/standards/admin-design-standard.md` §4.6)
+ *
+ * Hata, oluştuğu girdinin YANINDA durur — toast kaybolur, bu satır kalmaz.
+ * `aria-invalid` + `aria-describedby` bağı, ekran okuyucu kullanıcısının bozuk
+ * alana odaklandığında hatayı DUYMASINI sağlar; toast bu bağı KURAMAZ.
+ * Renk tek başına taşıyıcı değildir (WCAG 1.4.1): asıl sinyal mesajın METNİ.
+ * ------------------------------------------------------------------------- */
+
+/** Girdinin hemen altındaki hata satırı. Hata yoksa DOM'a hiçbir şey basmaz. */
+const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
+  message ? (
+    <p id={id} role="alert" className="mt-1 text-xs font-bold uppercase tracking-tighter text-admin-danger">
+      {message}
+    </p>
+  ) : null
+
+/** Submit'te odak taşınacak alanların DOM sırası (yukarıdan aşağı). */
+const FIELD_FOCUS_ORDER: { name: keyof PricingSettingsValues; id: string }[] = [
+  // Para birimi grubunda TRY kapatılamaz → odak ilk DEĞİŞTİRİLEBİLİR kutuya gider.
+  { name: 'enabled_currencies', id: 'pricing-settings-currency-EUR' },
+  { name: 'default_vat_rate_pct', id: 'pricing-settings-vat-rate' },
+  { name: 'default_round_to', id: 'pricing-settings-round-to' },
+  { name: 'default_charm_ending', id: 'pricing-settings-charm-ending' },
+  { name: 'display_spread_pct', id: 'pricing-settings-display-spread' },
+]
+
+/** İlk bozuk alana odak (`shouldFocusError:false` — sıra DETERMİNİSTİK olsun diye). */
+function focusFirstInvalid(errs: FieldErrors<PricingSettingsValues>): void {
+  const first = FIELD_FOCUS_ORDER.find(({ name }) => errs[name])
+  if (!first) return
+  document.getElementById(first.id)?.focus()
+}
+
 interface PricingSettingsFormModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -93,8 +128,16 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
   const schema = React.useMemo(() => buildPricingSettingsSchema(t), [t])
   const form = useForm<PricingSettingsValues>({
     resolver: zodResolver(schema),
+    // Odak sırasını biz yönetiyoruz (bkz. focusFirstInvalid).
+    shouldFocusError: false,
     defaultValues: initialValues || DEFAULT_PRICING_SETTINGS,
   })
+
+  /** Hata mesajını string olarak çeker (`any` YOK). */
+  const fieldError = (name: keyof PricingSettingsValues): string | undefined => {
+    const message = form.formState.errors[name]?.message
+    return typeof message === 'string' ? message : undefined
+  }
 
   // Modal açıldığında / değerler değiştiğinde formu doldur
   useEffect(() => {
@@ -223,7 +266,11 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
           </div>
 
           <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-            <form id="pricing-settings-modal-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form
+              id="pricing-settings-modal-form"
+              onSubmit={form.handleSubmit(onSubmit, focusFirstInvalid)}
+              className="space-y-6"
+            >
               {/* Taban Para Birimi — salt-okunur */}
               <div className="space-y-2">
                 <label className={adminSettingsLabelClass}>{t('admin.pricing.settings.baseCurrencyLabel')}</label>
@@ -247,6 +294,7 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
                   {PRICING_CURRENCY_OPTIONS.map((code) => {
                     const checked = enabledCurrencies.includes(code)
                     const disabled = code === 'TRY'
+                    const groupError = fieldError('enabled_currencies')
                     return (
                       <label
                         key={code}
@@ -254,13 +302,20 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
                           checked
                             ? 'bg-cyan-400/10 border-cyan-400/30 text-cyan-400'
                             : 'bg-slate-950/40 border-white/5 text-slate-400 hover:border-white/10'
-                        } ${disabled ? 'cursor-not-allowed opacity-80' : ''}`}
+                        } ${disabled ? 'cursor-not-allowed opacity-80' : ''}${
+                          groupError ? ' !border-admin-danger' : ''
+                        }`}
                       >
+                        {/* Grup hatası: bağ HER kutuya verilir — ekran okuyucu hangi kutuya
+                            odaklanırsa odaklansın hatayı duyar (grup üstündeki tek bağ duyulmaz). */}
                         <input
+                          id={`pricing-settings-currency-${code}`}
                           type="checkbox"
                           className="w-4 h-4 rounded border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20"
                           checked={checked}
                           disabled={disabled}
+                          aria-invalid={groupError ? true : undefined}
+                          aria-describedby={groupError ? 'pricing-settings-currencies-error' : undefined}
                           onChange={() => toggleCurrency(code)}
                         />
                         <span className="text-sm font-black">{code}</span>
@@ -268,94 +323,109 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
                     )
                   })}
                 </div>
-                {form.formState.errors.enabled_currencies?.message ? (
-                  <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                    {String(form.formState.errors.enabled_currencies.message)}
-                  </p>
-                ) : null}
+                <FieldError
+                  id="pricing-settings-currencies-error"
+                  message={fieldError('enabled_currencies')}
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Varsayılan KDV Oranı */}
                 <div className="space-y-2">
-                  <label className={adminSettingsLabelClass}>{t('admin.pricing.settings.defaultVatRatePctLabel')}</label>
+                  <label htmlFor="pricing-settings-vat-rate" className={adminSettingsLabelClass}>{t('admin.pricing.settings.defaultVatRatePctLabel')}</label>
                   <input
+                    id="pricing-settings-vat-rate"
                     type="number"
                     step="0.01"
                     min="0"
                     max="100"
-                    className={adminInputClass}
+                    className={`${adminInputClass}${fieldError('default_vat_rate_pct') ? ' !border-admin-danger' : ''}`}
                     {...form.register('default_vat_rate_pct')}
+                    aria-invalid={fieldError('default_vat_rate_pct') ? true : undefined}
+                    aria-describedby={
+                      fieldError('default_vat_rate_pct') ? 'pricing-settings-vat-rate-error' : undefined
+                    }
                   />
-                  {form.formState.errors.default_vat_rate_pct?.message ? (
-                    <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                      {String(form.formState.errors.default_vat_rate_pct.message)}
-                    </p>
-                  ) : null}
+                  <FieldError
+                    id="pricing-settings-vat-rate-error"
+                    message={fieldError('default_vat_rate_pct')}
+                  />
                 </div>
 
                 {/* Varsayılan Yuvarlama Birimi */}
                 <div className="space-y-2">
-                  <label className={adminSettingsLabelClass}>{t('admin.pricing.settings.defaultRoundToLabel')}</label>
+                  <label htmlFor="pricing-settings-round-to" className={adminSettingsLabelClass}>{t('admin.pricing.settings.defaultRoundToLabel')}</label>
                   <input
+                    id="pricing-settings-round-to"
                     type="number"
                     step="0.01"
                     min="0.01"
-                    className={adminInputClass}
+                    className={`${adminInputClass}${fieldError('default_round_to') ? ' !border-admin-danger' : ''}`}
                     {...form.register('default_round_to')}
+                    aria-invalid={fieldError('default_round_to') ? true : undefined}
+                    aria-describedby={
+                      fieldError('default_round_to') ? 'pricing-settings-round-to-error' : undefined
+                    }
                     placeholder="0.01"
                   />
                   <p className="text-xs font-bold text-slate-500 leading-relaxed">
                     {t('admin.pricing.settings.defaultRoundToDesc')}
                   </p>
-                  {form.formState.errors.default_round_to?.message ? (
-                    <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                      {String(form.formState.errors.default_round_to.message)}
-                    </p>
-                  ) : null}
+                  <FieldError
+                    id="pricing-settings-round-to-error"
+                    message={fieldError('default_round_to')}
+                  />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Varsayılan Charm Kuyruğu */}
                 <div className="space-y-2">
-                  <label className={adminSettingsLabelClass}>{t('admin.pricing.settings.defaultCharmEndingLabel')}</label>
+                  <label htmlFor="pricing-settings-charm-ending" className={adminSettingsLabelClass}>{t('admin.pricing.settings.defaultCharmEndingLabel')}</label>
                   <input
+                    id="pricing-settings-charm-ending"
                     type="text"
                     inputMode="decimal"
-                    className={adminInputClass}
+                    className={`${adminInputClass}${fieldError('default_charm_ending') ? ' !border-admin-danger' : ''}`}
                     {...form.register('default_charm_ending')}
+                    aria-invalid={fieldError('default_charm_ending') ? true : undefined}
+                    aria-describedby={
+                      fieldError('default_charm_ending') ? 'pricing-settings-charm-ending-error' : undefined
+                    }
                     placeholder={t('admin.pricing.settings.defaultCharmEndingNone')}
                   />
                   <p className="text-xs font-bold text-slate-500 leading-relaxed">
                     {t('admin.pricing.settings.defaultCharmEndingDesc')}
                   </p>
-                  {form.formState.errors.default_charm_ending?.message ? (
-                    <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                      {String(form.formState.errors.default_charm_ending.message)}
-                    </p>
-                  ) : null}
+                  <FieldError
+                    id="pricing-settings-charm-ending-error"
+                    message={fieldError('default_charm_ending')}
+                  />
                 </div>
 
                 {/* Gösterim Spread */}
                 <div className="space-y-2">
-                  <label className={adminSettingsLabelClass}>{t('admin.pricing.settings.displaySpreadPctLabel')}</label>
+                  <label htmlFor="pricing-settings-display-spread" className={adminSettingsLabelClass}>{t('admin.pricing.settings.displaySpreadPctLabel')}</label>
                   <input
+                    id="pricing-settings-display-spread"
                     type="number"
                     step="0.01"
                     min="-50"
                     max="50"
-                    className={adminInputClass}
+                    className={`${adminInputClass}${fieldError('display_spread_pct') ? ' !border-admin-danger' : ''}`}
                     {...form.register('display_spread_pct')}
+                    aria-invalid={fieldError('display_spread_pct') ? true : undefined}
+                    aria-describedby={
+                      fieldError('display_spread_pct') ? 'pricing-settings-display-spread-error' : undefined
+                    }
                   />
                   <p className="text-xs font-bold text-slate-500 leading-relaxed">
                     {t('admin.pricing.settings.displaySpreadPctDesc')}
                   </p>
-                  {form.formState.errors.display_spread_pct?.message ? (
-                    <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                      {String(form.formState.errors.display_spread_pct.message)}
-                    </p>
-                  ) : null}
+                  <FieldError
+                    id="pricing-settings-display-spread-error"
+                    message={fieldError('display_spread_pct')}
+                  />
                 </div>
               </div>
 

@@ -80,5 +80,18 @@ export const settings = {
       // Form modal
       form: {
         descEdit: 'Ayarları güncelleyin. Kaydetmeden önce alanları doğrulayın.'
+      },
+
+      // Alan seviyesi doğrulama mesajları (cetvel §4.6 — girdinin altında, toast'ta değil)
+      validation: {
+        siteNameRequired: 'Site adı zorunludur',
+        taglineRequired: 'Slogan zorunludur',
+        emailInvalid: 'Geçersiz e-posta adresi',
+        emailRequired: 'E-posta zorunludur',
+        supportPhoneRequired: 'Destek telefonu zorunludur',
+        headquartersRequired: 'Merkez adresi zorunludur',
+        logoUrlInvalid: 'Geçersiz URL',
+        apiKeyRequired: 'API anahtarı zorunludur',
+        sessionTimeoutRequired: 'Oturum süresi zorunludur'
       }
 };

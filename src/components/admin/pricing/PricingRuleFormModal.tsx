@@ -5,6 +5,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import type { PostgrestError } from '@supabase/supabase-js'
 import { AlertTriangle, Loader2, Save, X } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import type { FieldErrors } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -247,6 +248,56 @@ interface ImpactSample {
   beforeGross: number | null
 }
 
+/* ---------------------------------------------------------------------------
+ * ALAN SEVİYESİ HATA GERİ BİLDİRİMİ (cetvel `docs/standards/admin-design-standard.md` §4.6)
+ *
+ * Bu formda 15 girdi var. "Bir alan hatalı" diyen bir toast HANGİ alan olduğunu
+ * söylemez ve birkaç saniyede kaybolur; NN/g'nin kuralı hatanın oluştuğu yerin
+ * YANINDA durmasıdır. Ekran okuyucu tarafı `aria-invalid` + `aria-describedby`
+ * bağıyla kurulur — toast bu bağı KURAMAZ. Renk tek başına taşıyıcı değildir
+ * (WCAG 1.4.1): asıl sinyal mesajın METNİ, kenarlık rengi yalnız ek işarettir.
+ * ------------------------------------------------------------------------- */
+
+/** RHF mesajı `unknown` olabilir → `any` kullanmadan string'e daralt. */
+const errText = (message: unknown): string | undefined =>
+  typeof message === 'string' ? message : undefined
+
+/** Girdinin hemen altındaki hata satırı. Hata yoksa DOM'a hiçbir şey basmaz. */
+const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
+  message ? (
+    <p id={id} role="alert" className="mt-1 text-xs font-bold uppercase tracking-tighter text-admin-danger">
+      {message}
+    </p>
+  ) : null
+
+/**
+ * Submit'te odak taşınacak alanların DOM sırası (yukarıdan aşağı).
+ * KAPSAM SINIRI: kapsam hedefi (`product_id`/`brand_id`/`category_id`)
+ * `RuleScopeTargetPicker` içinde render edilir; o bileşen bu işin dosya
+ * kapsamında DEĞİL, bu yüzden odak listesinde yok (hata mesajı yine görünür).
+ */
+const FIELD_FOCUS_ORDER: { name: keyof PricingRuleFormValues; id: string }[] = [
+  { name: 'margin_pct', id: 'rule-rate' },
+  { name: 'fixed_price', id: 'rule-rate' },
+  { name: 'surcharge', id: 'rule-surcharge' },
+  { name: 'vat_rate_pct', id: 'rule-vat' },
+  { name: 'min_margin_abs', id: 'rule-min-margin' },
+  { name: 'max_margin_abs', id: 'rule-max-margin' },
+  { name: 'round_to', id: 'rule-round' },
+  { name: 'charm_ending', id: 'rule-charm' },
+  { name: 'currency', id: 'rule-currency' },
+  { name: 'min_quantity', id: 'rule-min-qty' },
+  { name: 'priority', id: 'rule-priority' },
+  { name: 'valid_to', id: 'rule-valid-to' },
+]
+
+/** İlk bozuk alana odak (`shouldFocusError:false` — sıra DETERMİNİSTİK olsun diye). */
+function focusFirstInvalid(errs: FieldErrors<PricingRuleFormValues>): void {
+  const first = FIELD_FOCUS_ORDER.find(({ name }) => errs[name])
+  if (!first) return
+  document.getElementById(first.id)?.focus()
+}
+
 interface PricingRuleFormModalProps {
   open: boolean
   /** null = yeni kural; dolu = düzenleme (giriş modu method'tan türetilir) */
@@ -272,10 +323,15 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
   const [impactLoading, setImpactLoading] = useState(false)
 
   const schema = useMemo(() => getPricingRuleSchema(t), [t])
-  const { handleSubmit, register, reset, setValue, watch, formState } = useForm<PricingRuleFormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: EMPTY_VALUES,
-  })
+  const { clearErrors, handleSubmit, register, reset, setValue, watch, formState } =
+    useForm<PricingRuleFormValues>({
+      resolver: zodResolver(schema),
+      // Odak sırasını biz yönetiyoruz (bkz. focusFirstInvalid). Ayrıca bu formun
+      // çoğu alanı `register` yerine `setValue` ile sürülür — RHF'nin kendi odak
+      // denemesi o alanlarda ref bulamadığı için SESSİZCE hiçbir şey yapmıyordu.
+      shouldFocusError: false,
+      defaultValues: EMPTY_VALUES,
+    })
   const values = watch()
   const errors = formState.errors
 
@@ -428,6 +484,10 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
   const applyRate = useCallback(
     (raw: string, nextMode: RateInputMode) => {
       setRateRaw(raw)
+      // Kullanıcı düzeltmeye BAŞLAYINCA o alanın hatası temizlenir. `setValue`
+      // tek başına yeniden doğrulama tetiklemez (register'lı alanlarda RHF'nin
+      // reValidateMode'u bunu zaten yapıyor); bu yüzden elle temizleniyor.
+      clearErrors(['margin_pct', 'fixed_price'])
       const parsed = parseNumberInput(raw)
       if (nextMode === 'fixed') {
         setValue('fixed_price', parsed, { shouldDirty: true })
@@ -441,12 +501,14 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
         shouldDirty: true,
       })
     },
-    [setValue],
+    [clearErrors, setValue],
   )
 
   const switchMode = useCallback(
     (nextMode: RateInputMode) => {
       setMode(nextMode)
+      // Mod değişince diğer alanın hatası ARTIK GEÇERSİZ — bayat mesaj bırakma.
+      clearErrors(['margin_pct', 'fixed_price'])
       if (nextMode === 'fixed') {
         setValue('method', 'fixed', { shouldDirty: true })
         setValue('margin_pct', null, { shouldDirty: true })
@@ -462,7 +524,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
       }
       setRateRaw(String(nextMode === 'percent' ? marginPct : marginPctToCoefficient(marginPct)))
     },
-    [setValue, values.fixed_price, values.margin_pct],
+    [clearErrors, setValue, values.fixed_price, values.margin_pct],
   )
 
   const handleScopeChange = useCallback(
@@ -596,10 +658,27 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
     { key: 'fixed', label: t('admin.pricing.rules.form.modeFixed') },
   ]
 
-  const fieldError = (message: unknown) =>
-    typeof message === 'string' ? (
-      <p className="text-xs font-bold text-rose-400 mt-1 uppercase tracking-tighter">{message}</p>
-    ) : null
+  /* ---- alan hataları (tek yerden okunur, işaretlemede tekrar edilmez) ---- */
+  const marginError = errText(errors.margin_pct?.message)
+  const fixedPriceError = errText(errors.fixed_price?.message)
+  // Oran girdisi TEK kutudur ama moda göre iki farklı kanonik alana yazar →
+  // aktif olan hangisiyse onun mesaj id'si bağlanır (ikisi birden olabilir).
+  const rateErrorIds = [
+    marginError ? 'rule-margin-error' : null,
+    fixedPriceError ? 'rule-fixed-price-error' : null,
+  ]
+    .filter((id): id is string => id !== null)
+    .join(' ')
+  const surchargeError = errText(errors.surcharge?.message)
+  const vatError = errText(errors.vat_rate_pct?.message)
+  const minMarginError = errText(errors.min_margin_abs?.message)
+  const maxMarginError = errText(errors.max_margin_abs?.message)
+  const roundToError = errText(errors.round_to?.message)
+  const charmError = errText(errors.charm_ending?.message)
+  const currencyError = errText(errors.currency?.message)
+  const minQuantityError = errText(errors.min_quantity?.message)
+  const priorityError = errText(errors.priority?.message)
+  const validToError = errText(errors.valid_to?.message)
 
   const targetErrorMessage =
     values.scope === 1
@@ -637,7 +716,11 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
           </div>
 
           <div className={`flex-1 ${adminModalScrollAreaClass}`}>
-            <form id="pricing-rule-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            <form
+              id="pricing-rule-form"
+              onSubmit={handleSubmit(onSubmit, focusFirstInvalid)}
+              className="space-y-8"
+            >
               {/* ---- kapsam ---- */}
               <section className="space-y-4">
                 <h3 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
@@ -712,11 +795,13 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       inputMode="decimal"
                       value={rateRaw}
                       onChange={(e) => applyRate(e.target.value, mode)}
-                      className={`${adminInputClass}`}
+                      aria-invalid={rateErrorIds ? true : undefined}
+                      aria-describedby={rateErrorIds || undefined}
+                      className={`${adminInputClass}${rateErrorIds ? ' !border-admin-danger' : ''}`}
                     />
                     {rateHelper ? <p className="text-xs font-bold text-slate-500">{rateHelper}</p> : null}
-                    {fieldError(errors.margin_pct?.message)}
-                    {fieldError(errors.fixed_price?.message)}
+                    <FieldError id="rule-margin-error" message={marginError} />
+                    <FieldError id="rule-fixed-price-error" message={fixedPriceError} />
                   </div>
 
                   {mode === 'fixed' ? (
@@ -747,10 +832,15 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       type="text"
                       inputMode="decimal"
                       value={String(values.surcharge ?? '')}
-                      onChange={(e) => setValue('surcharge', parseNumberInput(e.target.value) ?? 0, { shouldDirty: true })}
-                      className={`${adminInputClass}`}
+                      onChange={(e) => {
+                        clearErrors('surcharge')
+                        setValue('surcharge', parseNumberInput(e.target.value) ?? 0, { shouldDirty: true })
+                      }}
+                      aria-invalid={surchargeError ? true : undefined}
+                      aria-describedby={surchargeError ? 'rule-surcharge-error' : undefined}
+                      className={`${adminInputClass}${surchargeError ? ' !border-admin-danger' : ''}`}
                     />
-                    {fieldError(errors.surcharge?.message)}
+                    <FieldError id="rule-surcharge-error" message={surchargeError} />
                   </div>
 
                   <div className="space-y-2">
@@ -762,12 +852,15 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       type="text"
                       inputMode="decimal"
                       value={String(values.vat_rate_pct ?? '')}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        clearErrors('vat_rate_pct')
                         setValue('vat_rate_pct', parseNumberInput(e.target.value) ?? Number.NaN, { shouldDirty: true })
-                      }
-                      className={`${adminInputClass}`}
+                      }}
+                      aria-invalid={vatError ? true : undefined}
+                      aria-describedby={vatError ? 'rule-vat-error' : undefined}
+                      className={`${adminInputClass}${vatError ? ' !border-admin-danger' : ''}`}
                     />
-                    {fieldError(errors.vat_rate_pct?.message)}
+                    <FieldError id="rule-vat-error" message={vatError} />
                   </div>
                 </div>
               </section>
@@ -787,10 +880,16 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       type="text"
                       inputMode="decimal"
                       value={values.min_margin_abs === null ? '' : String(values.min_margin_abs)}
-                      onChange={(e) => setValue('min_margin_abs', parseNumberInput(e.target.value), { shouldDirty: true })}
-                      className={`${adminInputClass}`}
+                      onChange={(e) => {
+                        // Kelepçe tutarlılığı hatası ÜST alanda yazılıdır → ikisi birden temizlenir.
+                        clearErrors(['min_margin_abs', 'max_margin_abs'])
+                        setValue('min_margin_abs', parseNumberInput(e.target.value), { shouldDirty: true })
+                      }}
+                      aria-invalid={minMarginError ? true : undefined}
+                      aria-describedby={minMarginError ? 'rule-min-margin-error' : undefined}
+                      className={`${adminInputClass}${minMarginError ? ' !border-admin-danger' : ''}`}
                     />
-                    {fieldError(errors.min_margin_abs?.message)}
+                    <FieldError id="rule-min-margin-error" message={minMarginError} />
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="rule-max-margin" className={adminSettingsLabelClass}>
@@ -801,10 +900,15 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       type="text"
                       inputMode="decimal"
                       value={values.max_margin_abs === null ? '' : String(values.max_margin_abs)}
-                      onChange={(e) => setValue('max_margin_abs', parseNumberInput(e.target.value), { shouldDirty: true })}
-                      className={`${adminInputClass}`}
+                      onChange={(e) => {
+                        clearErrors(['min_margin_abs', 'max_margin_abs'])
+                        setValue('max_margin_abs', parseNumberInput(e.target.value), { shouldDirty: true })
+                      }}
+                      aria-invalid={maxMarginError ? true : undefined}
+                      aria-describedby={maxMarginError ? 'rule-max-margin-error' : undefined}
+                      className={`${adminInputClass}${maxMarginError ? ' !border-admin-danger' : ''}`}
                     />
-                    {fieldError(errors.max_margin_abs?.message)}
+                    <FieldError id="rule-max-margin-error" message={maxMarginError} />
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="rule-round" className={adminSettingsLabelClass}>
@@ -815,10 +919,15 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       type="text"
                       inputMode="decimal"
                       value={values.round_to === null ? '' : String(values.round_to)}
-                      onChange={(e) => setValue('round_to', parseNumberInput(e.target.value), { shouldDirty: true })}
-                      className={`${adminInputClass}`}
+                      onChange={(e) => {
+                        clearErrors('round_to')
+                        setValue('round_to', parseNumberInput(e.target.value), { shouldDirty: true })
+                      }}
+                      aria-invalid={roundToError ? true : undefined}
+                      aria-describedby={roundToError ? 'rule-round-error' : undefined}
+                      className={`${adminInputClass}${roundToError ? ' !border-admin-danger' : ''}`}
                     />
-                    {fieldError(errors.round_to?.message)}
+                    <FieldError id="rule-round-error" message={roundToError} />
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="rule-charm" className={adminSettingsLabelClass}>
@@ -829,10 +938,15 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       type="text"
                       inputMode="decimal"
                       value={values.charm_ending === null ? '' : String(values.charm_ending)}
-                      onChange={(e) => setValue('charm_ending', parseNumberInput(e.target.value), { shouldDirty: true })}
-                      className={`${adminInputClass}`}
+                      onChange={(e) => {
+                        clearErrors('charm_ending')
+                        setValue('charm_ending', parseNumberInput(e.target.value), { shouldDirty: true })
+                      }}
+                      aria-invalid={charmError ? true : undefined}
+                      aria-describedby={charmError ? 'rule-charm-error' : undefined}
+                      className={`${adminInputClass}${charmError ? ' !border-admin-danger' : ''}`}
                     />
-                    {fieldError(errors.charm_ending?.message)}
+                    <FieldError id="rule-charm-error" message={charmError} />
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="rule-currency" className={adminSettingsLabelClass}>
@@ -844,9 +958,11 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       maxLength={3}
                       placeholder={t('admin.pricing.rules.form.currencyPlaceholder')}
                       {...register('currency')}
-                      className={`${adminInputClass} uppercase`}
+                      aria-invalid={currencyError ? true : undefined}
+                      aria-describedby={currencyError ? 'rule-currency-error' : undefined}
+                      className={`${adminInputClass} uppercase${currencyError ? ' !border-admin-danger' : ''}`}
                     />
-                    {fieldError(errors.currency?.message)}
+                    <FieldError id="rule-currency-error" message={currencyError} />
                   </div>
                 </div>
               </section>
@@ -866,12 +982,15 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       type="text"
                       inputMode="decimal"
                       value={String(values.min_quantity ?? '')}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        clearErrors('min_quantity')
                         setValue('min_quantity', parseNumberInput(e.target.value) ?? Number.NaN, { shouldDirty: true })
-                      }
-                      className={`${adminInputClass}`}
+                      }}
+                      aria-invalid={minQuantityError ? true : undefined}
+                      aria-describedby={minQuantityError ? 'rule-min-qty-error' : undefined}
+                      className={`${adminInputClass}${minQuantityError ? ' !border-admin-danger' : ''}`}
                     />
-                    {fieldError(errors.min_quantity?.message)}
+                    <FieldError id="rule-min-qty-error" message={minQuantityError} />
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="rule-priority" className={adminSettingsLabelClass}>
@@ -882,12 +1001,15 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       type="text"
                       inputMode="numeric"
                       value={String(values.priority ?? '')}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        clearErrors('priority')
                         setValue('priority', parseNumberInput(e.target.value) ?? 0, { shouldDirty: true })
-                      }
-                      className={`${adminInputClass}`}
+                      }}
+                      aria-invalid={priorityError ? true : undefined}
+                      aria-describedby={priorityError ? 'rule-priority-error' : undefined}
+                      className={`${adminInputClass}${priorityError ? ' !border-admin-danger' : ''}`}
                     />
-                    {fieldError(errors.priority?.message)}
+                    <FieldError id="rule-priority-error" message={priorityError} />
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="rule-valid-from" className={adminSettingsLabelClass}>
@@ -899,8 +1021,15 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                     <label htmlFor="rule-valid-to" className={adminSettingsLabelClass}>
                       {t('admin.pricing.rules.form.validTo')}
                     </label>
-                    <input id="rule-valid-to" type="date" {...register('valid_to')} className={`${adminInputClass}`} />
-                    {fieldError(errors.valid_to?.message)}
+                    <input
+                      id="rule-valid-to"
+                      type="date"
+                      {...register('valid_to')}
+                      aria-invalid={validToError ? true : undefined}
+                      aria-describedby={validToError ? 'rule-valid-to-error' : undefined}
+                      className={`${adminInputClass}${validToError ? ' !border-admin-danger' : ''}`}
+                    />
+                    <FieldError id="rule-valid-to-error" message={validToError} />
                   </div>
                 </div>
                 <label className="flex items-center gap-3 px-4 h-11 glass border border-white/10 rounded-xl cursor-pointer w-fit">

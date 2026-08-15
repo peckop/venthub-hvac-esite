@@ -3,6 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import * as Tabs from '@radix-ui/react-tabs'
 import { Loader2, Save, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import type { FieldErrors } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -18,17 +19,58 @@ import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { useConfirm } from '../overlay/ConfirmProvider'
 
 // --- Zod Schema ---
-const orderFormSchema = z.object({
-  status: z.string().min(1, 'Durum zorunludur'),
-  customer_name: z.string().min(1, 'Müşteri adı zorunludur'),
-  customer_email: z.string().email('Geçersiz e-posta adresi').min(1, 'E-posta zorunludur'),
-  customer_phone: z.string().optional().nullable(),
-  carrier: z.string().optional().nullable(),
-  tracking_number: z.string().optional().nullable(),
-  shipping_method: z.string().optional().nullable(),
-})
+// Kurallar AYNI; yalnız mesajlar sözlükten (i18n fabrikası). Mesaj artık alanın
+// ALTINDA gösterildiği için sabit Türkçe metin EN oturumda görünür kusur olurdu.
+const buildOrderFormSchema = (t: (key: string) => string) =>
+  z.object({
+    status: z.string().min(1, t('admin.orders.form.validation.statusRequired')),
+    customer_name: z.string().min(1, t('admin.orders.form.validation.customerNameRequired')),
+    customer_email: z
+      .string()
+      .email(t('admin.orders.form.validation.emailInvalid'))
+      .min(1, t('admin.orders.form.validation.emailRequired')),
+    customer_phone: z.string().optional().nullable(),
+    carrier: z.string().optional().nullable(),
+    tracking_number: z.string().optional().nullable(),
+    shipping_method: z.string().optional().nullable(),
+  })
 
-type OrderFormValues = z.infer<typeof orderFormSchema>
+type OrderFormValues = z.infer<ReturnType<typeof buildOrderFormSchema>>
+
+/* ---------------------------------------------------------------------------
+ * ALAN SEVİYESİ HATA GERİ BİLDİRİMİ (cetvel `docs/standards/admin-design-standard.md` §4.6)
+ *
+ * Hata, oluştuğu girdinin YANINDA durur — toast kaybolur, bu satır kalmaz.
+ * `aria-invalid` + `aria-describedby` bağı, ekran okuyucu kullanıcısının bozuk
+ * alana odaklandığında hatayı DUYMASINI sağlar; toast bu bağı KURAMAZ.
+ * Renk tek başına taşıyıcı değildir (WCAG 1.4.1): asıl sinyal mesajın METNİ.
+ * ------------------------------------------------------------------------- */
+
+/** Girdinin hemen altındaki hata satırı. Hata yoksa DOM'a hiçbir şey basmaz. */
+const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
+  message ? (
+    <p id={id} role="alert" className="mt-1 px-1 text-xs font-bold uppercase tracking-tighter text-admin-danger">
+      {message}
+    </p>
+  ) : null
+
+/** Submit'te odak taşınacak alanların DOM sırası (yukarıdan aşağı). */
+const FIELD_FOCUS_ORDER: { name: keyof OrderFormValues; id: string }[] = [
+  { name: 'customer_name', id: 'order-customer-name' },
+  { name: 'customer_email', id: 'order-customer-email' },
+  { name: 'status', id: 'order-status' },
+]
+
+/**
+ * İlk bozuk alana odak: kullanıcı hatayı görmek için scroll/sekme aramasın.
+ * `shouldFocusError:false` ile RHF'nin kendi odak denemesi kapatıldı — sıra
+ * DETERMİNİSTİK olsun diye (bu alanların üçü de "Genel" sekmesindedir).
+ */
+function focusFirstInvalid(errs: FieldErrors<OrderFormValues>): void {
+  const first = FIELD_FOCUS_ORDER.find(({ name }) => errs[name])
+  if (!first) return
+  document.getElementById(first.id)?.focus()
+}
 
 // --- İleri-yön statü kuralı (CLAUDE.md Kural 11: sipariş durumu monoton) ---
 // Happy-path sırası; terminal statülere (cancelled/refunded/partial_refunded) gelindiyse GERİ dönülemez.
@@ -104,8 +146,11 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
   const [saving, setSaving] = useState(false)
   const [order, setOrder] = useState<DetailOrder | null>(null)
 
+  const schema = React.useMemo(() => buildOrderFormSchema(t), [t])
   const form = useForm<OrderFormValues>({
-    resolver: zodResolver(orderFormSchema),
+    resolver: zodResolver(schema),
+    // Odak sırasını biz yönetiyoruz (bkz. focusFirstInvalid).
+    shouldFocusError: false,
     defaultValues: {
       status: '',
       customer_name: '',
@@ -324,6 +369,11 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
   const items = order?.venthub_order_items || []
   const currentStatus = order?.status ?? ''
 
+  const errors = form.formState.errors
+  const customerNameError = errors.customer_name?.message
+  const customerEmailError = errors.customer_email?.message
+  const statusError = errors.status?.message
+
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
@@ -376,37 +426,35 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
               </Tabs.List>
 
               <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-                <form id="order-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <form id="order-form" onSubmit={form.handleSubmit(onSubmit, focusFirstInvalid)} className="space-y-8">
                   <Tabs.Content value="general" className="space-y-6">
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label htmlFor="order-customer-name" className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
                           {t('admin.orders.form.customerName')}
                         </label>
                         <input
+                          id="order-customer-name"
                           {...form.register('customer_name')}
-                          className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600"
+                          aria-invalid={customerNameError ? true : undefined}
+                          aria-describedby={customerNameError ? 'order-customer-name-error' : undefined}
+                          className={`w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600${customerNameError ? ' !border-admin-danger' : ''}`}
                         />
-                        {form.formState.errors.customer_name && (
-                          <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">
-                            {form.formState.errors.customer_name.message}
-                          </p>
-                        )}
+                        <FieldError id="order-customer-name-error" message={customerNameError} />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label htmlFor="order-customer-email" className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
                           {t('admin.orders.form.customerEmail')}
                         </label>
                         <input
+                          id="order-customer-email"
                           {...form.register('customer_email')}
-                          className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600"
+                          aria-invalid={customerEmailError ? true : undefined}
+                          aria-describedby={customerEmailError ? 'order-customer-email-error' : undefined}
+                          className={`w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600${customerEmailError ? ' !border-admin-danger' : ''}`}
                         />
-                        {form.formState.errors.customer_email && (
-                          <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">
-                            {form.formState.errors.customer_email.message}
-                          </p>
-                        )}
+                        <FieldError id="order-customer-email-error" message={customerEmailError} />
                       </div>
                     </div>
 
@@ -422,12 +470,15 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label htmlFor="order-status" className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
                           {t('admin.orders.form.orderStatus')}
                         </label>
                         <select
+                          id="order-status"
                           {...form.register('status')}
-                          className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer"
+                          aria-invalid={statusError ? true : undefined}
+                          aria-describedby={statusError ? 'order-status-error' : undefined}
+                          className={`w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer${statusError ? ' !border-admin-danger' : ''}`}
                         >
                           <option value="pending" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'pending')}>
                             {t('admin.orders.statusLabels.pending')}
@@ -454,6 +505,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                             {t('admin.orders.statusLabels.partialRefunded')}
                           </option>
                         </select>
+                        <FieldError id="order-status-error" message={statusError} />
                       </div>
                     </div>
                   </Tabs.Content>
