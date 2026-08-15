@@ -74,6 +74,35 @@ email: 'info@venthub.com.tr'
 ```
 Placeholder telefon canlıda görünüyor. (Hafızada `user-side-open-items` olarak zaten duruyordu — kapanmamış.)
 
+### K8 · Sitenin kanonik adresi her deploy'da değişiyordu + **alan adı DNS'te yok**
+**Kanıt (canlı prod, 2026-08-15):**
+```
+$ curl https://venthub-hvac-esite.vercel.app/robots.txt
+Sitemap: https://venthub-hvac-esite-m8cog5tbe-peckops-projects.vercel.app/sitemap.xml
+                                   ^^^^^^^^^^ deploy'a özel, her deploy'da DEĞİŞİR
+
+$ nslookup venthub.com.tr
+*** can't find venthub.com.tr: Non-existent domain
+```
+**Kök sebep:** `src/config/siteUrl.ts` merdiveni `NEXT_PUBLIC_SITE_URL` → `VERCEL_URL` idi.
+`NEXT_PUBLIC_SITE_URL` prod'da set edilmemiş → `VERCEL_URL`'e düşüldü; ama o değer **deploy'a özeldir.**
+
+**Etki:** `sitemap.xml` ve hreflang alternatifleri geçici URL üretiyordu (SEO kökten bozuk — Google
+her deploy'da yeni bir site görür) · `robots.txt`'nin `Sitemap:` satırı kayıyordu · canonical/OG
+metadata'sı geçici URL gösteriyordu · **hukuki metinler satıcının sitesi olarak o rastgele deploy
+adresini yazıyordu** (Mesafeli Satış Sözleşmesinde hukuken anlamsız adres — K3 ile doğrudan bağlantılı).
+
+**Düzeltme (bu PR):** merdivene `VERCEL_PROJECT_PRODUCTION_URL` eklendi ve `VERCEL_URL`'den **önce**
+denenir; o değer projenin **kalıcı** production alan adıdır ve özel alan adı bağlandığı an
+kendiliğinden ona döner. Sondaki `/` de temizleniyor (çift-slash canonical üretiyordu).
+Üç senaryo (açık yapılandırma / kalıcı alan adı / son çare) probe ile doğrulandı.
+
+**⚠️ Bu düzeltme emniyet ağıdır, çözüm DEĞİL — ikisi Recep'te:**
+1. **`venthub.com.tr` DNS'te yok.** Alan adı alınıp Vercel'e bağlanmalı. Bugün site yalnızca
+   `venthub-hvac-esite.vercel.app` üzerinde yaşıyor. İyzico merchant kaydı, SEO 301 geçişi ve
+   hukuki metinlerdeki site adresi bu alan adına bağlı.
+2. **`NEXT_PUBLIC_SITE_URL`** Vercel production env'ine açıkça yazılmalı (`https://…`, sondaki `/` yok).
+
 ### K7 · Yasal onay kutuları hiç zorlanmıyordu — sistem kendi aleyhine delil üretiyordu ✅ DÜZELTİLDİ
 **Kanıt (düzeltmeden önce):** `src/hooks/useCheckoutOrchestrator.ts` — adım ilerletme yalnız
 `validateCustomerInfo()` ve `validateAddress()` çağırıyordu; `step === 3` dalı doğrudan
