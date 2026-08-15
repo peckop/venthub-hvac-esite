@@ -3,37 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\home\FeaturedCommercialBlocks.tsx
-skeleton_hash: 0d9d81df1c65b148
+skeleton_hash: 05cfca4fb86aaf84
 entity_hashes:
   func:FeaturedCommercialBlocks: 1889811721e866db
-  overview: cdfdca949aa78f1f
+  overview: a6f2b84b89640427
   style_tokens: ff89a6880a24812d
-generated_at: 2026-06-14T21:14:22Z
+generated_at: 2026-08-15T06:32:06Z
 ---
 
 ## Genel Bakış
-Bu modül, ana sayfada öne çıkan ticari ürünleri (örneğin klima, havalandırma üniteleri gibi) görselleri ve temel bilgileriyle birlikte sergileyen bir React bileşenidir. Gelen ürün verisini işleyerek, eksik veya geçerli görsel adreslerini temizleyen yardımcı bir işlev ile birlikte kullanıcıya düzgün bir görünüm sunar.
+`FeaturedCommercialBlocks`, ana sayfada öne çıkan ticari HVAC ürünlerini (klima, havalandırma üniteleri vb.) görselleri ve temel bilgileriyle birlikte sergileyen bir React bileşenidir. Verilen ürün listesini işleyerek eksik veya geçersiz görselleri temizler ve kullanıcılara düzenli bir görünüm sunar.
 
 ## Fonksiyon Grupları
-### Ana Görünüm Bileşeni
-Verilen başlangıç ürün listesine göre öne çıkan ticari ürün bloklarını düzenler ve kullanıcıya sunar; veri sağlanmazsa boş bir liste ile çalışarak bileşenin stabil kalmasını sağlar.
+### Öne Çıkan Ürünler Görünümü
+Ana sayfada ticari ürün bloklarını grid veya kart düzeninde listeler; ürün verisi sağlanmazsa boş liste ile çalışarak bileşenin stabil kalmasını sağlar.
 - FeaturedCommercialBlocks
-
-### Görsel İşleme Yardımcıları
-Ürün nesnelerindeki görsel URL adreslerini kontrol eder; boş, eksik veya geçerli olmayan değerleri temizleyerek bileşenin kullanabileceği standart ve güvenli bir URL formatı üretir.
-- normalizeImageUrl
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, girdi olarak verilen `initialProducts` değerinin bir dizi (Array) yapısında olmasını ve her elemanın ürün nesnesi (object) formatında olmasını bekler.
+Bu modül için temel mimari varsayımlar, fonksiyon imzasından ve bileşenin doğasından türetilmiştir.
 
-[Aksiyom 1]: Eğer `initialProducts` parametresi bir dizi (Array) değilse, bileşen render sürecinde hata verir veya TypeError ile karşılaşır.
+[Aksiyom 1]: Eğer `initialProducts` parametresi sağlanmazsa, bileşen boş bir dizi (`[]`) ile çalışır ve gösterilecek ürün bulunmadığında uygun boş durum (empty state) render etmelidir.
 
-[Aksiyom 2]: Eğer `initialProducts` boş dizi (`[]`) olarak sağlanırsa bileşen stabil kalır ve boş/hiç ürün içermeyen bir görünüm render eder.
+[Aksiyom 2]: Eğer `initialProducts` içindeki herhangi bir ürün nesnesi geçerli bir görsel URL'si içermiyorsa, o ürün için görsel temizleme/yardımcı işlev devreye girerek geçersiz görseller filtrelenmeli veya varsayılan bir görsel ile değiştirilmelidir.
 
-[Aksiyom 3]: Eğer `initialProducts` içindeki ürün nesnelerinin görsel alanı (`image`/`imageURL` gibi bir alan) geçerli bir URL içermiyorsa veya hiç yoksa, bileşen varsayılan/bos bir görsel gösterir veya görseli atlar; bileşenin çökmesine yol açmaz.
+[Aksiyom 3]: Eğer `initialProducts` bir dizi değilse (örn: `null`, `undefined`, veya farklı bir tipteyse), bileşen hata vermemeli; fonksiyon imzasındaki varsayılan değer (`[]`) devreye girerek stabil kalmalıdır.
+
+---
+
+**Not:** Bu modül için belirtilen fonksiyon imzası dışında, eşik değerleri veya ek kabul kriterlerine dair sayısal/alan-spesifik bilgi mevcut değildir. Görsel işleme mantığı fonksiyon gövdesinde tanımlı olup, burada yalnızca component seviyesindeki mimari varsayımlar belirtilmiştir.
 
 ---
 
@@ -51,9 +51,10 @@ Bu modül, girdi olarak verilen `initialProducts` değerinin bir dizi (Array) ya
 ## İTHALATLAR (IMPORTS)
 - import: ../../i18n/I18nProvider::useI18n
 - import: ../ProductCard::ProductCard
+- import: @/hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: @/lib/images/productImage::resolveProductImageUrl
 - import: @/types/ui-models::type { Category, Product }
 - import: @/utils/imageUtils::normalizeImageUrl
-- import: @/utils/routes::Routes
 - import: framer-motion::AnimatePresence
 - import: framer-motion::motion
 - import: next/image::Image
@@ -83,15 +84,39 @@ type CommercialTab = 'featured' | 'newArrivals' | 'bestSellers'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/components/home/FeaturedCommercialBlocks.tsx`::FeaturedCommercialBlocks
-- **params**: `{ initialProducts = [] }` — destructured prop, `initialProducts` başlangıç ürün listesi, boş dizi fallback'li
+### [N1_NASIL] AST Pointer: `FeaturedCommercialBlocks.tsx`::FeaturedCommercialBlocks
+- **params**: `{ initialProducts = [] }` — başlangıç ürünleri dizisi, varsayılan olarak boş dizi
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hookundan dönen çeviri fonksiyonu, `t('home.featuredCommercial.eyebrow')` gibi anahtarlarla string çevirisi yapar
-  - `activeTab` — `useState<CommercialTab>` state değişkeni, şu anki aktif sekmeyi tutar, varsayılan `'featured'`
-  - `setActiveTab` — `activeTab` state'ini güncelleyen setter fonksiyonu, tab butonlarının `onClick` handler'ında çağrılır
-  - `productsByTab` — `useMemo` ile hesaplanan nesne, `{ featured, newArrivals, bestSellers }` anahtarlarına sahip Product dizilerini barındırır, `[initialProducts]` bağımlılığıyla yeniden hesaplanır
-  - `activeProducts` — `productsByTab[activeTab]` erişimiyle elde edilen Product dizisi, mevcut sekmedeki ürünleri temsil eder; hem ürün kartları grid'inde `.map()` ile hem de sidebar'da `activeProducts[0]?.image_url` ve `activeProducts[0]?.name` erişimiyle kullanılır
-- **Dönüş**: JSX — `<section>` wrapper'ı içinde header, tab butonları, ürün grid'i ve sidebar barındıran React elementi
+  - `t` — i18n çeviri fonksiyonu, `useI18n()` hook'undan alınır, tüm metinler buna bağlıdır
+  - `Routes` — lokalize edilmiş rota builder'ları, `useLocalizedRoutes()` hook'undan alınır; `Routes.products()` gibi çağrılar yapar
+  - `activeTab` — `useState<CommercialTab>` ile yönetilen aktif sekme durumu, `'featured'` varsayılır; `setActiveTab` ile güncellenir
+  - `productsByTab` — `useMemo` ile hesaplanan `{ featured, newArrivals, bestSellers }` objesi; her sekme için ayrı ürün listesi tutar
+  - `activeProducts` — `productsByTab[activeTab]` erişimiyle elde edilen mevcut sekmedeki ürünler dizisi; hem kart grid'inde hem sidebar görselinde kullanılır
+- **Dönüş**: JSX — bölüm header'ı, sekme navigasyonu, ürün kartı grid'i ve contextual sidebar içeren React section elementi
+
+---
+
+### [N2_NASIL] AST Pointer: `FeaturedCommercialBlocks.tsx`::productsByTab useMemo callback
+- **params**: yok
+- **ic_degiskenler**:
+  - `featured` — `initialProducts` dizisinden `p.is_featured` filtresiyle ilk 4 ürün; boşsa `initialProducts.slice(0, 4)` fallback
+  - `newArrivals` — `initialProducts` dizisinin kopyası, `created_at` alanına göre azalan sırada sıralanıp ilk 4 ürün
+  - `bestSellers` — `initialProducts.slice(4, 8)` ile 5-8. ürünler; boşsa `initialProducts.slice(0, 4)` fallback
+- **Dönüş**: `{ featured, newArrivals, bestSellers }` — her sekme için filtrelenmiş/sıralanmış ürün listelerini içeren obje
+
+---
+
+### [N3_NASIL] AST Pointer: `FeaturedCommercialBlocks.tsx`::tabOrder.map callback
+- **params**: `tab` — mevcut sekme tanımlayıcı string'i (ör. `'featured'`, `'new'`, `'bestsellers'`)
+- **ic_degiskenler**: yok (closure'dan `activeTab`, `t`, `setActiveTab` kullanılır)
+- **Dönüş**: JSX — `role="tab"` nitelikli `<button>` elementi; aktif sekme ise `motion.div` ile animasyonlu arka plan glow efekti eklenir
+
+---
+
+### [N4_NASIL] AST Pointer: `FeaturedCommercialBlocks.tsx`::activeProducts.map callback
+- **params**: `product` — `Product` tipinde ürün nesnesi; `product.id`, `product.name`, `product.is_featured`, `product.created_at` alanlarına erişilir, `ProductCard`'a geçirilir; `idx` — dizi indeksi, animasyon gecikme hesabında `idx * 0.1` olarak kullanılır
+- **ic_degiskenler**: yok (closure'dan `ProductCard`, `motion.div` kullanılır)
+- **Dönüş**: JSX — `motion.div` sarmalayıcısı içinde `<ProductCard product={product} compact hidePrice />` component'i; `key={product.id}`, `delay: idx * 0.1` animasyonu ile
 
 ---
 

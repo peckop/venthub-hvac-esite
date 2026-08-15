@@ -49,7 +49,22 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
   const { addToCart } = useCart()
 
   const displayPrice = product.displayPrice ?? null
-  const quoteMode = hidePrice || displayPrice == null || displayPrice <= 0
+
+  /**
+   * İKİ AYRI SORU, İKİ AYRI DEĞİŞKEN — eskiden `quoteMode` ikisini birbirine yapıştırıyordu
+   * (`hidePrice || fiyat yok`), bu yüzden fiyatı GİZLEMEK istemek sepete eklemeyi de
+   * kapatıyordu. Ticari karar "fiyatı kartta gösterme" idi, "karttan satın almayı kaldır"
+   * değil; ikisi ayrılmazsa görsel bir tercih sessizce satış yolunu kapatır.
+   *
+   *  · quoteMode  = SATIN ALINABİLİR Mİ  → fiyat yoksa "Teklif İste", sepet kapalı
+   *  · showPrice  = GÖSTERİLECEK Mİ      → çağıran `hidePrice` ile bastırabilir
+   *
+   * Recep kararı (2026-08-15): fiyat yalnız ürün satış sayfasında (PDP) görünür; kartlar
+   * bastırır. Cetvel gerekçesi PS-042 (`product-schema-standard.md` §2.2): kart fiyat
+   * taşımazsa keşif önbelleği de taşımaz, fiyat değişimi keşif'i çökertmek zorunda kalmaz.
+   */
+  const quoteMode = displayPrice == null || displayPrice <= 0
+  const showPrice = !hidePrice && !quoteMode
 
   // KDV etiketi ARTIK SABİT DEĞİL: bireysel/anon BRÜT (KDV dahil), bayi/kurumsal NET görür.
   // Semantik bilinmiyorsa (fiyat köprüsü bağlı değil) etiket HİÇ çizilmez — bayiye "KDV Dahil"
@@ -93,13 +108,13 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             </h3>
             <div className="mt-2 flex items-baseline gap-3">
               <div className="text-xl font-bold text-primary-navy">
-                {quoteMode ? (
-                  <span className="text-sm font-medium text-industrial-gray">{t('common.requestQuote')}</span>
-                ) : (
+                {showPrice ? (
                   formatCurrency(displayPrice ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })
+                ) : (
+                  <span className="text-sm font-medium text-industrial-gray">{t('common.requestQuote')}</span>
                 )}
               </div>
-              {!quoteMode && taxLabel && <span className="text-xs text-steel-gray font-medium uppercase">{taxLabel}</span>}
+              {showPrice && taxLabel && <span className="text-xs text-steel-gray font-medium uppercase">{taxLabel}</span>}
             </div>
           </div>
 
@@ -165,10 +180,10 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
           <div className="mt-auto pt-3 border-t border-light-gray flex items-center justify-between">
             <div className="flex flex-col">
               <div className="text-lg font-bold text-primary-navy tracking-tight">
-                {quoteMode ? (
-                  <span className="text-xs font-semibold text-industrial-gray">{t('common.requestQuote')}</span>
-                ) : (
+                {showPrice ? (
                   formatCurrency(displayPrice ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })
+                ) : (
+                  <span className="text-xs font-semibold text-industrial-gray">{t('common.requestQuote')}</span>
                 )}
               </div>
               {/* Izgara kartında KDV etiketi BİLİNÇLİ olarak yok: master'da da yoktu.

@@ -75,7 +75,10 @@ export async function POST(request: NextRequest) {
     // tenant-scoped keşif tag'lerine AYNI şekilde uygulanır — stok-only UPDATE
     // tenant tag'i üzerinden de cache thrash edemez.
     let shouldRevalidateDiscovery = true
-    if (table === 'inventory_movements') {
+    if (table === 'inventory_movements' || table === 'product_prices') {
+      // PS-042: fiyat (product_prices) da stok hareketi gibi keşif önbelleğini
+      // asla thrash ETMEZ — Recep kararı: fiyat yalnız PDP'de gösterilir,
+      // kartlarda gösterilmez. Bkz. table === 'product_prices' bloğu altındaki not.
       shouldRevalidateDiscovery = false
     } else if (table === 'products' && type === 'UPDATE') {
       if (record && old_record) {
@@ -194,6 +197,43 @@ export async function POST(request: NextRequest) {
         revalidateTag(familyTag(familySlug))
         revalidatedTags.push(familyTag(familySlug))
       }
+    }
+
+    // 5. Table: product_prices (YENİ — fiyat değişimi → yalnız ilgili ürünün AİLE PDP yolu)
+    else if (table === 'product_prices') {
+      const productId = activeRecord.product_id as string | undefined
+      if (productId) {
+        // PDP artık AİLE kanoniktir (/[lang]/products/[family-slug]), ürün slug'ı değil —
+        // bkz. table === 'inventory_movements' bloğundaki product lookup deseni.
+        const { data: product } = await supabase
+          .from('products')
+          .select('family_id')
+          .eq('id', productId)
+          .single()
+
+        if (product?.family_id) {
+          const { data: family } = await supabase
+            .from('product_families')
+            .select('slug')
+            .eq('id', product.family_id)
+            .single()
+
+          const familySlug = family?.slug
+          if (familySlug) {
+            revalidatePath(`/tr/products/${familySlug}`)
+            revalidatePath(`/en/products/${familySlug}`)
+            revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
+          }
+        }
+      }
+
+      // PS-042: fiyat değişimi keşif (home-data/products-discovery) tag'lerini
+      // BİLİNÇLİ olarak tetiklemez — Recep kararı: fiyat yalnız PDP'de gösterilir,
+      // ürün kartlarında gösterilmez, dolayısıyla keşif önbelleğinin fiyat
+      // değişiminde thrash olmasının hiçbir faydası yok. Bu, yukarıdaki
+      // shouldRevalidateDiscovery=false ataması ile de garanti altına alınmıştır.
+      // Biri "eksik" sanıp buraya revalidateTag(HOME_DATA_TAG) /
+      // revalidateTag(PRODUCTS_DISCOVERY_TAG) EKLEMESİN.
     }
 
     return NextResponse.json({

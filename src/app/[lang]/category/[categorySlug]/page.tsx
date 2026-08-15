@@ -58,6 +58,9 @@ const _getCachedSupabaseData = cache((id: string) => {
 })
 
 
+/** ISR yedeği (1 saat) — birincil yol webhook; bkz. `rendering-cache-standard.md` §3-4. */
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   const { data } = await supabase
     .from('categories')

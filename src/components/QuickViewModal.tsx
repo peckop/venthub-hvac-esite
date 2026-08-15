@@ -4,7 +4,6 @@ import React from 'react'
 
 import { useCart } from '../hooks/useCartHook'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
-import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import type { StorefrontProduct } from './ProductCard'
 
@@ -17,7 +16,7 @@ interface QuickViewModalProps {
 }
 
 const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose }) => {
-  const { t, lang } = useI18n()
+  const { t } = useI18n()
   const { addToCart } = useCart()
   const Routes = useLocalizedRoutes()
 
@@ -49,10 +48,12 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
           <div className="flex flex-col">
             <h4 className="font-semibold text-industrial-gray mb-1 line-clamp-2">{product.name}</h4>
             <div className="text-sm text-steel-gray mb-2">{product.brand} • {product.sku}</div>
+            {/* Fiyat YALNIZ ürün satış sayfasında gösterilir (`rendering-cache-standard.md` §2).
+                Hızlı önizleme bir liste yüzeyidir: fiyatı burada göstermek hem ticari kararın
+                (Recep, 2026-08-15) hem PS-042 önbellek izolasyonunun dışına çıkar. Sepete ekleme
+                AÇIK kalır — `quoteMode` "satın alınabilir mi"yi söyler, gösterimi değil. */}
             <div className="text-2xl font-bold text-primary-navy mb-4">
-              {quoteMode
-                ? t('common.requestQuote')
-                : formatCurrency(displayPrice ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })}
+              {t('common.requestQuote')}
             </div>
             <p className="text-sm text-steel-gray line-clamp-4 mb-6">
               {product.description || t('quickView.descFallback')}

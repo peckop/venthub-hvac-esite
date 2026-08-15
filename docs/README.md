@@ -27,6 +27,7 @@
 | **Ne ölçülür** (analytics / GA4 / dönüşüm)? | `standards/analytics-standard.md` |
 | Şu an **gerçek** ne? | `audits/dealer-data-ground-truth-2026-06-11.md` |
 | Fiyat/kur/marj **nasıl hesaplanır**? | `standards/pricing-standard.md` |
+| Hangi sayfa **nasıl üretilir**, veri değişince **ne tazelenir**, fiyat **hangi yüzeyde** görünür? | `standards/rendering-cache-standard.md` |
 | Birden çok Claude oturumu **nasıl çakışmadan** çalışır? | `standards/multi-session-coordination-standard.md` |
 | **Niçin** / moat / vizyon? | `../VISION.md` |
 | Kapsamlı uçtan uca referans | `../CONTEXT.md` (NLM üretir) |

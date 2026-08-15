@@ -3,23 +3,24 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ProductCard.tsx
-skeleton_hash: 4a22b4591c05c2c0
+skeleton_hash: d29f558e350cd40d
 entity_hashes:
-  overview: 4ebb1c4f22471a6d
-  style_tokens: 19c7d9ec430fc71d
-generated_at: 2026-06-09T06:46:02Z
+  overview: 9d2b069c54b1d8b3
+  style_tokens: f04c95b84c1173dc
+generated_at: 2026-08-15T06:31:57Z
 ---
 
 ## Genel Bakış
-Bu modül, HVAC ürün kartlarını render eden bir React bileşenidir. `Product` nesnesinden gelen verileri (görsel, marka, fiyat) alır, yerelleştirilmiş fiyat gösterimi ve sepete ekleme işlevselliği sunar. Next.js `Link` ile ürün detay sayfasına yönlendirme sağlar ve `grid`/`list` olmak üzere iki farklı düzen seçeneğini destekler.
 
-Bu bileşen以下 bağımlılıklar kullanır: `Product` türü, `BrandIcon`, `VentImage`, `useCart` hook'u, `useI18n` hook'u ve `formatCurrency` yardımcı fonksiyonu. `onQuickView` prop'u ile hızlı bakış işlevselliği de desteklenir.
+`ProductCard.tsx`, HVAC ürünlerini kart bileşeni olarak render eden bir React bileşenidir. `Product` tipindeki verileri (görsel, marka, fiyat) alarak yerelleştirilmiş fiyat gösterimi sunar, sepete ekleme işlemini `useCart` hook'u ile yönetir ve `next/link` kullanarak ürün detay sayfasına yönlendirme sağlar. Bileşen `grid` ve `list` olmak üzere iki farklı düzen modunu destekler; `priority`, `compact`, `hidePrice` ve `highlightFeatured` gibi opsiyonel prop'larla görsel ve işlevsel özelleştirmelere olanak tanır.
+
+**Dış Bağımlılıklar:** `resolveProductImageUrl` (görsel URL çözümleme), `formatCurrency` (para birimi formatlama), `useLocalizedRoutes` (yerelleştirilmiş rotalar) ve `Product` / `WithDisplayPrice` tipleri.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi (implementation) verilmemiştir. Sağlanan bilgiler仅有 dosya yolu ve modül sabitleri olup, mimari varsayımların türetilmesi için gerekli olan **fonksiyon gövdesi** bulunmamaktadır.
+Bu modül için aksiyom tanımlanamamıştır. Fonksiyon gövdesi (implementation) verilmemiş olup, yalnızca dosya yolu ve modül sabiti (ProductCard) mevcuttur. Mimari varsayımların üretilebilmesi için fonksiyon gövdesine erişim gereklidir.
 
 ---
 
@@ -27,16 +28,42 @@ Bu modül için fonksiyon gövdesi (implementation) verilmemiştir. Sağlanan bi
 
 ---
 
+## İTHALATLAR (IMPORTS)
+- import: ../hooks/useCartHook::useCart
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
+- import: ../i18n/I18nProvider::useI18n
+- import: ../i18n/format::formatCurrency
+- import: ./HVACIcons::BrandIcon
+- import: ./ui/VentImage::VentImage
+- import: @/lib/images/productImage::resolveProductImageUrl
+- import: @/lib/services/displayPrice.service::type { WithDisplayPrice }
+- import: @/types/ui-models::type { Product }
+- import: next/link::Link
+- import: react::React
+
+---
+
 ## INTERFACES
 
 ### ProductCardProps
-- `product: Product`
-- `onQuickView?: (product: Product) => void`
+- `product: StorefrontProduct`
+- `onQuickView?: (product: StorefrontProduct) => void`
 - `highlightFeatured?: boolean`
 - `layout?: 'grid' | 'list'`
 - `priority?: boolean`
 - `hidePrice?: boolean`
 - `compact?: boolean`
+
+---
+
+## TYPE ALIASES
+
+### StorefrontProduct
+W4b · Kartın fiyat kaynağı MOTORDUR (`displayPrice`), ham `products.price` DEĞİL — o kolon Kademe-2'de emekli edildi (INV-PRICE-1, cetvel §1). Alanlar bilinçli olarak OPSİYONEL: fiyat köprüsü henüz bağlanmamış çağıranlar (ör. ana sayfa blokları) derlenmeye devam etsin, ama fiyat yerine "Teklif İste"
+```typescript
+type StorefrontProduct = Product &
+  Partial<Pick<WithDisplayPrice<Product>, 'displayPrice' | 'displayPriceTaxIncluded'>>
+```
 
 ---
 
@@ -50,22 +77,29 @@ Bu modül için fonksiyon gövdesi (implementation) verilmemiştir. Sağlanan bi
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: ProductCard.tsx::onClickAddToCart
-- **params**: `(e: React.MouseEvent)` — React click event nesnesi, preventDefault ve stopPropagation metotlarını içerir
-- **ic_degiskenler**: []
-- **Dönüş**: yok (event handler fonksiyonu, return değeri yok)
+### [N1_NASIL] AST Pointer: src/components/ProductCard.tsx::(onClick Handler - anonim arrow function)
+- **params**: `(e: React.MouseEvent)` — tıklama olayı nesnesi
+- **ic_degiskenler**:
+  - `e` — React fare olayı nesnesi; `preventDefault()` ve `stopPropagation()` çağrıları için kullanılır
+  - `quoteMode` — mantıksal değer (closure'dan yakalanır); `true` ise fonksiyon erken döner, sepete ekleme yapılmaz
+  - `addToCart` — sepete ürün ekleyen fonksiyon (closure'dan yakalanır, `useCart` hook'undan gelir)
+  - `product` — eklenecek ürün nesnesi (closure'dan yakalanır, bileşen prop'undan gelir); `addToCart`'a argüman olarak verilir
+- **Dönüş**: `void` — yan etki tabanlıdır; varsayılan tıklama davranışını iptal eder, üst bileşen yayılmasını engeller ve koşula göre sepete ürün ekler
 
-**Notlar**:
-- Fonksiyon `e.preventDefault()` ile varsayılan tarayıcı olayını engeller
-- Fonksiyon `e.stopPropagation()` ile olayın yukarı doğru yayılmasını engeller
-- Fonksiyon `addToCart(product)` çağrısı ile ürün sepete eklenir
-- `addToCart` ve `product` değişkenleri dış scope'dan closure ile gelir (fonksiyon gövdesinde tanımlı değildir)
+---
+
+**Not**: Fonksiyonda erken dönüş (`if (quoteMode) return`) mevcuttur; bu durumda `addToCart(product)` çağrısı çalışmaz. Fonksiyonun tüm amacı: tıklama olayını yutmak ve `quoteMode` dışı senaryolarda ürünü sepete eklemektir.
 
 ---
 
 ## NODE ID STANDARD
 
   file: src\components\ProductCard.tsx
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: StorefrontProduct
 
 ---
 
@@ -78,7 +112,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-gold-accent`, `bg-light-gray/30`, `bg-light-gray/50`, `bg-primary-navy`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-t`, `group-hover:bg-light-gray/50`, `group-hover:text-primary-navy`, `hover:bg-secondary-blue`, `sm:text-lg`, `text-base`, `text-industrial-gray`, `text-lg`
+- **Renkler:** `bg-gold-accent`, `bg-light-gray/30`, `bg-light-gray/50`, `bg-primary-navy`, `bg-white`, `bg-white/90`, `border-light-gray`, `border-t`, `disabled:hover:bg-primary-navy`, `group-hover:bg-light-gray/50`, `group-hover:text-primary-navy`, `hover:bg-secondary-blue`, `sm:text-lg`, `text-base`, `text-industrial-gray`
 - **Layout:** `absolute`, `backdrop-blur-sm`, `block`, `flex`, `flex-1`, `flex-col`, `flex-shrink-0`, `gap-3`, `h-11`, `h-28`, `h-9`, `h-full`, `hover:shadow-hvac-lg`, `hover:shadow-lg`, `items-baseline`
-- **Varyant/Responsive:** `:`, `active:`, `focus-visible:`, `group-hover:`, `hover:`, `sm:` önekleri
-- **Yardımcı Sınıflar:** `${compact`, `:`, `active:scale-95`, `aspect-square`, `border`, `duration-300`, `duration-500`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `font-bold`, `font-medium`, `font-semibold`, `group`
+- **Varyant/Responsive:** `:`, `active:`, `disabled:`, `focus-visible:`, `group-hover:`, `hover:`, `sm:` önekleri
+- **Yardımcı Sınıflar:** `${compact`, `:`, `active:scale-95`, `aspect-square`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-300`, `duration-500`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-offset-2`, `focus-visible:ring-primary-navy`, `font-bold`, `font-medium`

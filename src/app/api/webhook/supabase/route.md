@@ -5,10 +5,10 @@ namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\api\webhook\supabase\route.ts
 skeleton_hash: 08b98e8e9b42745f
 entity_hashes:
-  func:POST: f8624b1d68b4c268
+  func:POST: 2fcd3f5f1c25bb41
   func:hasDiscoverySensitiveChange: accd627030a7d82e
   overview: b32240b75b2cdc96
-generated_at: 2026-08-13T08:57:44Z
+generated_at: 2026-08-15T06:32:18Z
 ---
 
 ## Genel Bakış
@@ -42,18 +42,14 @@ Bu modül için aksiyom üretilebilmesi için fonksiyon gövde Implementasyonlar
 **Dönüş**: `boolean` — Duyarlı herhangi bir alanda fark varsa `true`, aksi halde `false`.
 
 ### POST
-**Ne yapar**: Supabase veritabanından gelen webhook isteklerini (INSERT, UPDATE, DELETE) alır, doğrular ve ilgili tablodaki değişikliğe bağlı olarak Next.js uygulamasının önbelleğini (cache) yeniden doğrular (revalidate).
-**Nasıl yapar**:
-1. İsteğin gövdesini (`payload`) ve `x-webhook-secret` başlığını okur.
-2. Ortam değişkenindeki `SUPABASE_WEBHOOK_SECRET` değeri ile gönderilen secret'ı karşılaştırarak HMAC/Token doğrulaması yapar; eşleşmezse 401 Unauthorized döner.
-3. Webhook olayının (`table`, `type`, `record`, `old_record`) bilgilerini çıkarır.
-4. `products` tablosunda bir `UPDATE` olayı gerçekleştiğinde, `hasDiscoverySensitiveChange` fonksiyonunu kullanarak değişikliğin keşif tag'lerini tetikleyip tetiklemeyeceğini (`shouldRevalidateDiscovery`) belirler.
-5. İlgili `tenant_id` mevcutsa ve keşif tetiklemesi uygunsa, kiracıya (tenant) özel keşif ve ana sayfa verisi tag'lerini yeniden doğrular.
-6. Değişikliğin olduğu tabloya göre (`products`, `categories`, `inventory_movements`, `product_families`) ilgili sayfa yollarını (`revalidatePath`) ve global tag'leri (`revalidateTag`) yeniden doğrular. Bu süreçte veritabanından ek bilgiler (ürün slug'ı, kategori slug'ı) de sorgulanabilir.
-7. İşlemin sonucu, yeniden doğrulanan yollar ve tag'lerin listesi ile birlikte JSON yanıtı olarak döner. Hata oluşursa 500 döner.
+**Ne yapar**: Supabase veritabanından gelen webhook isteklerini alır, tablo bazlı mantıkla ilgili sayfaları ve önbellek tag'lerini yeniden doğrulama (revalidation) işlemine tabi tutar. Bu sayede veritabanındaki değişikliklerin Next.js uygulamasına anlık olarak yansımasını sağlar.
+
+**Nasıl yapar**: Fonksiyon, gelen HTTP POST isteğinin JSON gövdesini `SupabaseWebhookPayload` tipine dönüştürür. Önce `x-webhook-secret` başlığını kontrol ederek HMAC/Token doğrulaması yapar; eşleşmezse 401 Unauthorized yanıtı döner. Ardından payload'daki `table`, `type`, `record` ve `old_record` alanlarını çıkarır. `record` veya `old_record` mevcutsa `activeRecord` olarak kullanılır; ikisi de yoksa revalidation yapmadan yanıt döner. PS-042 kararı gereği, `inventory_movements` ve `product_prices` tablolarındaki değişimler keşif (discovery) tag'lerini tetiklemez. `products` tablosunda UPDATE işlemi yapılıyorsa ve hem `record` hem `old_record` mevcutsa `hasDiscoverySensitiveChange` fonksiyonuyla alan-bazlı karşılaştırma yapılarak sadece duyarlı alanlardaki (status, family_id, category_id, subcategory_id, deleted_at) değişikliklerde keşif tag'leri tetiklenir. Tablo tipine göre `revalidatePath` ve `revalidateTag` çağrıları yapılarak ilgili sayfa yolları ve önbellek etiketleri yeniden doğrulanır. Her tablo için farklı mantık uygulanır: `products` tablosunda ürün sayfası, kategori sayfası ve keşif tag'leri; `categories` tablosunda kategori sayfası ve keşif tag'leri; `inventory_movements` tablosunda ürün ve kategori sayfaları ile `variantStockTag` etiketi; `product_families` tablosunda aile etiketi ve keşif tag'leri; `product_prices` tablosunda ise aile kanonik PDP yolu yeniden doğrulanır. İşlem sonunda yeniden doğrulanan yolları, tag'leri ve zaman damgasını içeren JSON yanıtı döner.
+
 **Parametreler**:
-- `request`: `NextRequest` — Gelen HTTP webhook isteği nesnesi. Gövdesi ve başlıkları erişim için kullanılır.
-**Dönüş**: `Promise<NextResponse>` — İşlemin sonucunu (başarı/hata, yeniden doğrulanan kaynaklar, zaman damgası) içeren JSON yanıtı. Başarılı olduğunda `{ revalidated: true, event, revalidatedPaths, revalidatedTags, discoveryComparisonSkipped, timestamp }` yapısına sahiptir.
+- request: NextRequest — Gelen webhook HTTP istek nesnesi. Gövdesinde Supabase'den gelen `SupabaseWebhookPayload` yapısında veri taşır ve `x-webhook-secret` başlığını içerir.
+
+**Dönüş**: NextResponse — Başarılı olduğunda `{ revalidated: boolean, event: { table: string, type: string }, revalidatedPaths: string[], revalidatedTags: string[], discoveryComparisonSkipped: boolean, timestamp: string }` yapısında JSON yanıtı döner. Doğrulama hatası durumunda 401, sunucu hatası durumunda 500 HTTP durum koduyla hata yanıtı döner.
 
 ---
 
@@ -90,63 +86,38 @@ Bu modül için aksiyom üretilebilmesi için fonksiyon gövde Implementasyonlar
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/app/api/webhook/supabase/route.ts::hasDiscoverySensitiveChange
-- **params**: `(record: Record<string, unknown>, oldRecord: Record<string, unknown>)`
-- **ic_degiskenler**:
-  - `field` — `.some()` callback parametresi; PRODUCT_DISCOVERY_SENSITIVE_FIELDS dizisindeki her bir alanı temsil eder; `record[field]` ve `oldRecord[field]` ile aynı alanın eski ve yeni değerleri karşılaştırılır
-- **Dict Erişimleri**:
-  - `record[field]` — güncellenmiş kayıtta duyaru alanının değeri
-  - `oldRecord[field]` — eski kayıtta duyaru alanının değeri
-- **Dönüş**: `boolean` — herhangi bir hassas alanda değer farkı varsa `true`
+- **params**: (record: Record<string, unknown>, oldRecord: Record<string, unknown>)
+- **ic_degiskenler**: 
+  - `PRODUCT_DISCOVERY_SENSITIVE_FIELDS` — Outer scope sabiti: Hassas keşif alanlarının listesi (as_expression ile referans alınır)
+- **Dönüş**: boolean
 
 ### [N2_NASIL] AST Pointer: src/app/api/webhook/supabase/route.ts::POST
-- **params**: `(request: NextRequest)`
+- **params**: (request: NextRequest)
 - **ic_degiskenler**:
-  - `payload` — `request.json()`'dan parse edilen SupabaseWebhookPayload; webhook'un gövdesi (table, type, record, old_record içerir)
-  - `webhookSecret` — `request.headers.get('x-webhook-secret')` ile alınan istemci tarafı webhook secret'ı
-  - `expectedSecret` — `process.env.SUPABASE_WEBHOOK_SECRET` ortam değişkeninden okunan beklenen secret değeri; HMAC/token doğrulaması için kullanılır
-  - `table` — `payload.table`; hangi tablonun değiştiğini belirtir (products, categories, inventory_movements, product_families)
-  - `type` — `payload.type`; tetiklenen CRUD operasyonu türü (INSERT, UPDATE, DELETE)
-  - `record` — `payload.record`; yeni/üncellenmiş kayıt verisi
-  - `old_record` — `payload.old_record`; UPDATE öncesi eski kayıt verisi (sadece UPDATE'lerde mevcut olabilir)
-  - `activeRecord` — `record || old_record`; mevcut kayıt; record yoksa old_record'a fallback
-  - `revalidatedPaths` — `string[]`; tetiklenen path revalidation'ların logunu tutar; yanıtta raporlanır
-  - `revalidatedTags` — `string[]`; tetiklenen tag revalidation'ların logunu tutar; yanıtta raporlanır
-  - `discoveryComparisonSkipped` — `boolean`; products UPDATE'inde old_record olmadığı için alan-bazlı karşılamanın atlandığını belirtir (PS-042)
-  - `shouldRevalidateDiscovery` — `boolean`; keşif (discovery) tag'lerinin tetiklenip tetiklenmeyeceğini kontrol eder; inventory_movements'ta `false`, products UPDATE'te hassas alan değişimine bağlı
-  - `tenantId` — `activeRecord.tenant_id as string | undefined`; kiracı (tenant) identifier'ı; tag revalidation'ları tenant-scoped yapmak için kullanılır
-  - `productSlug` (products bloğu) — `activeRecord.slug as string | undefined`; ürünün URL slug'ı; ürün detay sayfalarının path revalidation'ı için kullanılır
-  - `categoryId` — `activeRecord.category_id as string | undefined`; ürünün bağlı olduğu kategori ID'si; ilgili kategori sayfalarının revalidation'ı için kullanılır
-  - `category` — `supabase.from('categories').select('slug').eq('id', categoryId).single()` sonucu; kategori slug bilgisini içerir; kategori path revalidation'ı için kullanılır
-  - `categorySlug` (categories bloğu) — `activeRecord.slug as string | undefined`; kategorinin URL slug'ı; kategori sayfalarının path revalidation'ı için kullanılır
-  - `productId` — `activeRecord.product_id as string | undefined`; stok hareketinin ait olduğu ürün ID'si; ürün ve kategori sayfalarının revalidation'ı için kullanılır
-  - `product` — `supabase.from('products').select('slug, category_id').eq('id', productId).single()` sonucu; ürünün slug ve category_id bilgilerini içerir
-  - `productSlug` (inventory_movements bloğu) — `product.slug`; stok hareketine ait ürünün URL slug'ı
-  - `category` (inventory_movements bloğu) — `supabase.from('categories').select('slug').eq('id', product.category_id).single()` sonucu; stok hareketine ait ürünün kategori slug bilgisi
-  - `familySlug` — `activeRecord.slug as string | undefined`; ürün ailesinin URL slug'ı; aile-specific tag revalidation'ı için kullanılır
-  - `errorMsg` — catch bloğunda `error instanceof Error ? error.message : String(error)` ile elde edilen hata mesajı; 500 yanıtı gövdesine yazılır
-- **Dict/Subscript Erişimleri**:
-  - `process.env.SUPABASE_WEBHOOK_SECRET` — ortam değişkeninden webhook secret okunması
-  - `request.headers.get('x-webhook-secret')` — istek header'ından webhook secret alınması
-  - `activeRecord.tenant_id` — aktif kayıttan tenant ID erişimi
-  - `activeRecord.slug` — aktif kayıttan slug erişimi (products, categories, product_families bloklarında)
-  - `activeRecord.category_id` — aktif kayıttan kategori ID erişimi (products bloğunda)
-  - `activeRecord.product_id` — aktif kayıttan ürün ID erişimi (inventory_movements bloğunda)
-  - `payload.table`, `payload.type`, `payload.record`, `payload.old_record` — webhook payload alan erişimleri
-- **API Çağrıları**:
-  - `request.json()` — webhook isteğinin gövdesini JSON olarak parse eder
-  - `request.headers.get('x-webhook-secret')` — HTTP header değerini okur
-  - `supabase.from('categories').select('slug').eq('id', categoryId).single()` — kategori tablosundan slug bilgisini çeker (products bloğunda)
-  - `supabase.from('products').select('slug, category_id').eq('id', productId).single()` — ürün tablosundan slug ve category_id bilgisini çeker (inventory_movements bloğunda)
-  - `supabase.from('categories').select('slug').eq('id', product.category_id).single()` — kategori tablosundan slug bilgisini çeker (inventory_movements bloğunda, ürünün kategorisi için)
-  - `revalidatePath(...)` — Next.js path cache'ini invalidade eder (ürün/kategori sayfaları)
-  - `revalidateTag(...)` — Next.js tag cache'ini invalidade eder (homeData, discovery, products_discovery, variantStock, family tag'leri)
-  - `homeDataTag(tenantId)` — tenant-scoped ana sayfa verisi tag'i üretir
-  - `discoveryTag(tenantId)` — tenant-scoped keşif tag'i üretir
-  - `familyTag(familySlug)` — aile-specific tag üretir
-  - `variantStockTag()` — varyant stok tag'i üretir
-  - `NextResponse.json(...)` — HTTP yanıt gövdesi oluşturur
-  - `console.warn(...)`, `console.error(...)` — konsol çıktıları (logging)
-- **Dönüş**: `NextResponse` — başarılıysa revalidation detaylarını (revalidated, event, revalidatedPaths, revalidatedTags, discoveryComparisonSkipped, timestamp) içeren JSON 200 yanıtı; yetkisizse 401; hata durumunda 500 yanıtı döner
+  - `payload` — request.json() ile parse edilen Supabase webhook payload'u, `SupabaseWebhookPayload` tipine assert edilir
+  - `webhookSecret` — request.headers.get('x-webhook-secret') ile alınan HMAC secret header değeri
+  - `expectedSecret` — process.env.SUPABASE_WEBHOOK_SECRET'dan gelen beklenen secret değeri
+  - `table` — payload'tan destructuring ile alınan tablo adı (payload.table)
+  - `type` — payload'tan destructuring ile alınan event tipi (payload.type)
+  - `record` — payload'tan destructuring ile alınan yeni kayıt (payload.record)
+  - `old_record` — payload'tan destructuring ile alınan eski kayıt (payload.old_record)
+  - `activeRecord` — record || old_record değerini alan değişken, mevcut kaydı temsil eder
+  - `tenantId` — activeRecord.tenant_id alanından cast edilen kiracı ID'si (string | undefined)
+  - `revalidatedPaths` — Revalidate edilen yolların toplandığı string array
+  - `revalidatedTags` — Revalidate edilen tag'lerin toplandığı string array
+  - `discoveryComparisonSkipped` — PS-042: products UPDATE'inde old_record yoksa alan-bazlı karşılaştırmanın atlandığını belirten boolean flag
+  - `shouldRevalidateDiscovery` — Keşif tag'lerinin tetiklenip tetiklenmeyeceğini belirleyen boolean değişken (varsayılan true)
+  - `productSlug` — activeRecord.slug alanından cast edilen ürün slug'ı (products tablosunda kullanılır)
+  - `categoryId` — activeRecord.category_id alanından cast edilen kategori ID'si (products tablosunda kullanılır)
+  - `category` — supabase.from('categories') sorgusundan dönen kategori verisi (products tablosunda kategori yolu revalidate için)
+  - `categorySlug` — activeRecord.slug alanından cast edilen kategori slug'ı (categories tablosunda kullanılır)
+  - `productId` — activeRecord.product_id alanından cast edilen ürün ID'si (inventory_movements ve product_prices tablolarında kullanılır)
+  - `product` — supabase.from('products') sorgusundan dönen ürün verisi (inventory_movements tablosunda ürün ve kategori yolları revalidate için)
+  - `familySlug` — activeRecord.slug alanından cast edilen aile slug'ı (product_families tablosunda kullanılır)
+  - `family` — supabase.from('product_families') sorgusundan dönen aile verisi (product_prices tablosunda aile PDP yolu revalidate için)
+  - `error` — try-catch bloğunda yakalanan hata nesnesi
+  - `errorMsg` — error instanceof Error kontrolünden sonra error.message veya String(error) değeri
+- **Dönüş**: NextResponse (JSON response döner: { revalidated, event, revalidatedPaths, revalidatedTags, discoveryComparisonSkipped, timestamp } veya error durumunda { error })
 
 ---
 

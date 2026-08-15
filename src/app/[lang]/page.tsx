@@ -15,6 +15,13 @@ import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import HomePage from '../../views/HomePage'
 
+/**
+ * ISR YEDEĞİ (1 saat) — birincil tazeleme yolu webhook'tur (`rendering-cache-standard.md` §3);
+ * bu yalnız EMNİYET AĞIDIR. Yedek olmadan kaçan tek bir webhook sayfayı SONSUZA DEK eski
+ * bırakır ve bunu hiçbir şey söylemez — 2026-08-15'te fiyatlar yazıldı, vitrin değişmedi.
+ */
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   return [
     { lang: 'tr' },

@@ -1,7 +1,15 @@
 # DURUM TAKİP — Canlı Çalışma Panosu
 
 > Tek "neredeyiz?" kaynağı. Daldan dala geçince buraya bak. Her önemli adımda güncellenir.
-> **Son güncelleme: 2026-08-10 — YAKALAMA (7 haftalık boşluk kapatıldı) + SLUG LOKALİZASYONU CANLI:**
+> **Son güncelleme: 2026-08-15 — FİYATLAR CANLI + ÜÇ OTURUM PARALEL ÇALIŞIYOR:** Fiyat motoru seed'i
+> koşuldu, vitrin artık fiyat gösteriyor (detay: Controller #3). Çok-oturumlu koordinasyon modeli
+> (`#511`/`#514`) canlı — pano `C:/tmp/venthub-board/`, cetvel `standards/multi-session-coordination-standard.md`.
+> **Bu panoda EKSİK:** bugün aktif olan iki oturumun (**EDGE** `4397deef` — edge deploy/drift/CI · **LAUNCH**
+> `eda80084` — hukuki metinler/lansman denetimi) kendi bölümü yok; 14-15 Ağustos'ta sevk ettikleri
+> `#509 #512 #515 #516 #517 #518` burada görünmüyor. Kural gereği kendi bölümlerini **kendileri** açmalı
+> (panodan istendi). Yeni cetvel: `standards/rendering-cache-standard.md` (render/önbellek/fiyat yüzeyi).
+>
+> **Önceki: 2026-08-10 — YAKALAMA (7 haftalık boşluk kapatıldı) + SLUG LOKALİZASYONU CANLI:**
 > **(A) Gemini dönemi (Haz sonu–Ağu):** katalog hattı Kademe-1 Gemini orkestrasyonuyla (venthub-pdf-ingestor, M0-M5 çok-ajan, 69/69 pytest) TAMAMLANDI — 28 katalog CSV (374 ürün) + 3 fiyat listesi; walkthrough.md'de seri-bazlı mühendislik notları. **(B) 2026-08-10 denetim+düzeltme günü:** CSV tam denetimi (format ✅, mükerrer 0, fiyat-eşleşme 348/374; tek açık = 230 satır kategori sapması) → 417 düzeltme ingestor master'da · **taksonomi cetveli v1.2** `#455` (12 dal, +parking-jet-fan; ingestor doc-fork kapandı; yeni kategoriler: acid-resistant-fans/frequency-converters/electric-duct-heaters — DB'de Kademe-2'de açılacak) · **TR kategori-adı sızıntısı 4 yüzeyde kapatıldı** `#456` (PDP breadcrumb+özellik, Footer, kategori SEO metadata → getCategoryDisplayName SSOT) · **⭐ SLUG LOKALİZASYONU** `#457` (kanonik=EN slug, görünen URL dile göre `metadata.slug={tr,en}`; `/tr/category/konut-tipi-havalandirma` ✅ 200, eski URL 308; migration prod'a uygulandı+canlı doğrulandı; SSOT `docs/plans/slug-localization-2026-08-10.md`). NLM MCP arızası kökten çözüldü (Gemini Notebook rebrand + `nlm login --clear`; memory `nlm-auth-issue`). İş bölümü modeli oturdu: **Fable=controller (plan/brief/kapı/migration), Opus subagent=kod, script=deterministik veri.** **ZİNCİR SIRADAKİ: Kademe-2 loader (CSV→DB + 4 yeni kategori migration'ı) → ₺0-fiyat "teklif al" ara-çözümü → fiyat motoru (177 fiyatsız) → görseller (390).**
 > **Son güncelleme: 2026-06-19 (akşam) — 4-İŞ BATCH MASTER'DA + canlı DB doğrulandı:** (1) **types-sync** `database.types.ts` regen `#440` · (2) **checkout smoke deterministik DÜZELTİLDİ → karantinadan ÇIKTI** (ürün-detay `pdp-add-to-cart` + href-goto; actionability flaky'si bitti; **3/3 yeşil** koşu) `#442` · (3) **moderator rolü** `user_profiles_role_check`'e eklendi `#443` — **migration PROD DB'ye uygulandı ve canlıdan DOĞRULANDI** (kısıt artık moderator kabul ediyor; "Moderatör yap" butonu çalışır) · (4) **Faz-2 Detay-CRUD archetype** (Orders/Settings/Categories modal, Zod+dirty-guard) `#444` + Controller'ın eklediği 2 düzeltme: sipariş statüsü **monoton guard** (iptal/iade serbest, terminal→aktif geri-alma yasak, iptal→iade ilerlemesi serbest) + Order/Settings i18n. **Master CI/E2E yeşil. Cetvel D2/D3/D4 + types-sync KAPANDI.**
 > **Önceki: 2026-06-19** — **Runtime kalite kapısı 2. ayak: checkout funnel smoke MERGED** (master `52343a1f`, #431). Satınalma hunisinin TÜM ödeme-öncesi adımları (login→sepete ekle→müşteri→adres→özet→"Ödemeye Geç" var) gerçek tarayıcıda boot+donma-yok doğrulanır; **"Öde"ye ASLA basılmaz** (İyzico/`venthub_orders` yok); ilk koşuda yeşildi AMA sonradan CI yükü altında **kararsız (flaky)** çıktı (sepet-seed yarışı tam çözülmedi) → **#438 ile KARANTİNAYA alındı** (`describe.skip`). **Sağlam runtime kapı = admin smoke** (aktif/yeşil). Checkout smoke seed'i deterministik hale gelince geri açılacak. Önce (aynı gün): **P0 admin donması kök çözüm + 3-katman runtime kapı** (#427 `useRole` memoize · #428 hook-stabilite conformance · #429 admin e2e smoke; KANITLANDI yapay donma→e2e-FAIL/CI-SUCCESS). **Admin cetvel son-metre ZATEN BİTTİ** (hepsi master'da, 2026-06-18): J14 Inventory→kit `#413` · J15 cila-A `#421` · J16 cila-B `#415` · E2 inbox `49c9ca84`. **Gerçek sıradaki:** types-sync (`database.types.ts` regen, Controller) + Faz-2 Detay-CRUD archetype (D2/D3/D4: Orders/Settings/Categories modal). ⚠️ **DÜZELTME 2026-06-19:** bu işler 06-18'de bitmişti ama doc yanlışlıkla "bekliyor/sıradaki" diyordu → bitmiş işin worker'a yeniden dağıtılmasına ve saatlerin boşa harcanmasına yol açtı. Bir daha olmaması için bitmiş işler PR no'larıyla işaretlendi. Önceki (2026-06-18): Admin §8 **2. dalga** (5 PR #400-#404 + INV-6 keystone #398) production'a alındı → §8 TAM kapandı. Önceki (2026-06-17): admin cetvel YENİDEN ölçüldü (~%40→%63, 3 keep; `docs/audits/admin-cetvel-scores-2026-06-17.md`); doc konsolidasyonu (`admin-capabilities.md` = tek SSOT, §4.5 enterprise açık registry; mükerrer `admin-feature-recommendations` silindi); ve **yeni sıralama kararı: ADMIN-ÖNCE, BAYİ-SON** (aşağıda); + **standart-önce alt-kararı:** §8 açıkları (3 fake rewrite: Inventory/Settings/Webhook) E1 shell'den ÖNCE dünya-standardına getirilir.
@@ -36,7 +44,32 @@
 - **Durum:** ✅ conformance kapandı (re-audit 36 dosya/34 temiz · INV-3D-1/2/5/7 canlı · BlueprintCanvas Suspense #396 · audit §0 reconciliation) + Wave3-6 + recipe (FlexibleDuct/DuctFan) + ProductModelRenderer rename hepsi master'da → 🟡 GÖRSEL: ışık v3 #399 (onay bekliyor) → sıradaki: (2) ürün çok-yakın framing · (3) per-model boyut normalizasyon · sonra materyal/post + ordu cila. Tam durum → memory `3d-visual-quality-phase`.
 
 ### Controller #3 — katalog/ticaret şeridi
-- **⭐ AKTİF ŞU AN (2026-08-14, oturum `f68f03d8`) — FİYAT MOTORU (T001-VH) CANLIYA İNDİ, %70.**
+- **⭐⭐ 2026-08-15 (oturum `f68f03d8`) — FİYATLAR MÜŞTERİYE GÖRÜNÜR OLDU (T001-VH %79) + RENDER KATMANI DENETLENDİ.**
+  - **SEED KOŞULDU (Recep onayı):** 1044 satır (348 ürün × 3 segment), kur 55,3213. Bireysel brüt:
+    en ucuz 4.647 · medyan 65.390 · en pahalı 1.182.991 TL. 26 ürün fiyatsız — hepsinin katalog alış
+    fiyatı **0,00**, yani "Teklif Alın" doğru davranış. Panel yolundan koşuldu (RLS + `admin_audit_log`).
+  - **Seed öncesi yakalanan boşluk `#513`:** 348 ürünün `cost_in_base`'i 13 Ağustos kurunda donmuştu ve
+    **tazeleyen düğme panelde HİÇ YOKTU** (`refreshCostInBase` W4a'da yazılmış, hiçbir UI'ya bağlanmamış).
+    `CostRefreshModal` + araç çubuğu butonu + materialize modalına **bayat-kur uyarı bandı** eklendi.
+    Opus denetimi bloklayıcı bulmadı; C3 (uyarının hata durumunda sessizce "temiz" demesi) ve
+    C4 (`base_ccy` filtresiz kur seçimi) merge öncesi kapatıldı.
+  - **Koordinasyon modeli `#511` + `#514`:** kira + yol rezervasyonu + olay günlüğü canlı. Denetim önce
+    "merge edilemez" dedi ve haklıydı: "en erken kazanır" kodda **hiç uygulanmamıştı** (iki oturum da
+    bloklanıyordu — LAUNCH bunu bizzat yaşadı) · `registry-sync` **en eski** künyeyi yazıyordu · kirayı
+    yenileyen adım yoktu (5 saatlik otonom koşuda üç oturumun üçü de TTL'den düştü). Üçü de düzeltildi.
+  - **RENDER DENETİMİ (yeni cetvel):** vitrin statik üretiliyor, tazeleme Supabase webhook'una bağlı ve
+    webhook **3 tabloyu** dinliyordu — `product_prices` hiçbirinde yoktu. Fiyat yazıldı, sayfa değişmedi;
+    sonradan görünmesi alakasız bir PR'ın prod'u yeniden basmasıydı (tesadüf). Ayrıca `product_families`
+    handler'ı var ama **DB tetiği yok** (ölü kod yolu). → `docs/standards/rendering-cache-standard.md` v1.0.
+  - **Recep kararı:** fiyat **yalnız PDP'de** gösterilir; kartlarda gösterilmez (PS-042 izolasyonu korunur).
+    Ana sayfada fiyat gösteren canlı bir kart bulundu (`ProductCard` ← `FeaturedCommercialBlocks`) ve kapatıldı.
+  - **Registry:** `registry-sync` GitHub üzerinden yapılan merge'lerde **hiç çalışmıyormuş** (post-merge
+    yalnız yerel `pull`'da tetikleniyor) → 6 künye işlenmemişti, elle uygulandı (T001=79 · T018=95 ·
+    T019=100 · T020=5 · T022=completed · T023=50). Kalıcı çözüm master'a push'ta koşan bir Action;
+    `.github/workflows/**` EDGE şeridinde olduğu için panodan istendi.
+  - **Sıradaki:** `product_prices`/`product_families` tetikleri (migration — Recep onayı gerekir) ·
+    INV-RENDER-1 + pano değişmez testleri · zaman-tabanlı `revalidate` yedeği · W2b-2 · W5.
+- **Önceki (2026-08-14, oturum `f68f03d8`) — FİYAT MOTORU (T001-VH) CANLIYA İNDİ, %70.**
   Şerit dosyaları: `src/**` (servis/UI/sepet-checkout) + `supabase/migrations/2026081*_pricing*`.
   **Dokunmuyorum:** `src/middleware.ts` (eş-controller rezervi) · `supabase/functions/**` (eş-controller şeridi).
   - **Prod'a inen zincir (hepsi onaylı kapılardan geçti):** W0 kur defteri + TCMB cron + 348 ürün maliyet

@@ -57,6 +57,11 @@ VentHub, sıradan bir e-ticaret sitesi değildir. HVAC sektörüne özel **"Müh
 | Teknoloji | Versiyon | Kullanım |
 |-----------|----------|----------|
 | Next.js | 15.5.18 | App Router, SSR/SSG, PPR (Kısmi Ön Oluşturma) |
+
+> ⚠️ **Not (2026-08-15, elle eklendi — üretilmiş metne dokunulmadı):** yukarıdaki satırdaki **PPR
+> GERÇEKTE KULLANILMIYOR.** `next.config.mjs`'te `experimental.ppr` yok; olan şey SSG + Suspense
+> streaming'dir. Aynı düzeltme §14 madde 14 için de geçerlidir: oradaki Suspense kuralı geçerli,
+> "PPR" adlandırması yanlış. Render/önbellek SSOT'u artık `docs/standards/rendering-cache-standard.md`.
 | React | 19.0.0 | UI bileşenler, React Compiler |
 | TypeScript | 5.7.2 | Tip güvenliği (strict mode, `any` yasak) |
 | Tailwind CSS | 3.4.16 | Styling, Dynamic Theme Ready (.light/.dark runtime CSS variables) |

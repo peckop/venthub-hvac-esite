@@ -131,7 +131,9 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
                   >
-                    <ProductCard product={product} compact />
+                    {/* Fiyat YALNIZ ürün satış sayfasında gösterilir (Recep kararı 2026-08-15).
+                        `hidePrice` yalnız GÖSTERİMİ bastırır; sepete ekleme açık kalır. */}
+                    <ProductCard product={product} compact hidePrice />
                   </motion.div>
                 ))}
               </motion.div>
