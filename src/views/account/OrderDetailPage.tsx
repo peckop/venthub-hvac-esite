@@ -422,6 +422,12 @@ export default function OrderDetailPage() {
                           ) : (
                             item.product_name
                           )}
+                          {/* Sipariş anındaki SKU — katalogtaki güncel SKU değil (W2b-2 snapshot). */}
+                          {item.product_sku ? (
+                            <div className="mt-0.5 text-xs font-normal text-slate-500">
+                              {t('orders.skuLabel', { sku: item.product_sku })}
+                            </div>
+                          ) : null}
                         </td>
                         <td className="p-4">
                           {item.product_image_url ? (

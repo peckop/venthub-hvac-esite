@@ -137,8 +137,9 @@ describe('INV-PRICE-3 — sipariş satırı snapshot sözleşmesi', () => {
     for (const path of writePaths) {
       const src = productionSources[path]
       const missing = SNAPSHOT_FIELDS.filter(
-        // Nesne anahtarı olarak geçmeli (`alan:`), yalnızca metin içinde anılması yetmez.
-        (field) => !new RegExp(`\\b${field}\\s*:`).test(src),
+        // Nesne anahtarı olarak geçmeli: uzun biçim (`alan: deger`) ya da kısayol
+        // (`{ alan, ... }` / `{ ..., alan }`). Yalnızca düz metin içinde anılması yetmez.
+        (field) => !new RegExp(`\\b${field}\\s*[:,}]`).test(src),
       )
       if (missing.length > 0) violations.push(`${path} → eksik: ${missing.join(', ')}`)
     }
@@ -155,7 +156,17 @@ describe('INV-PRICE-3 — sipariş satırı snapshot sözleşmesi', () => {
         'Bu alanların 8 tanesi veritabanında NOT NULL — eksik bırakmak zaten INSERT hatası',
         'verir. Bu test o hatayı prod yerine CI\'da gösterir.',
         '',
-        'Cetvel: docs/standards/pricing-standard.md §4.1 + §13',
+        "⚠️ YANLIŞ TEŞHİS UYARISI — bu KIRMIZI'yı okumadan koda dokunma:",
+        'Bu tarayıcı STATİKTİR ve alan adlarını `.insert(`/POST ile AYNI DOSYADA arar',
+        '(cetvel §14, "eş-konumluluk" notu). Satır kurucusunu paylaşılan bir modüle',
+        'taşımak (ör. `_shared/orderItemSnapshot.ts`) sözleşmeyi BOZMAZ, aksine',
+        'güçlendirir — ama bu testi haksız yere kırar. Böyle bir refactor yaptıysan',
+        'doğru hamle ÖNCE tarayıcıyı yeni yapıya uyarlamaktır (kurucu modülünü de',
+        '`writePaths`\'e dahil et); alanları geri kopyalamak DEĞİL.',
+        '',
+        'Gerçekten eksikse: 8 alan DB\'de NOT NULL, yani prod\'da zaten INSERT hatası alırsın.',
+        '',
+        'Cetvel: docs/standards/pricing-standard.md §4.1 + §13 + §14',
         '',
         ...violations,
       ].join('\n'),

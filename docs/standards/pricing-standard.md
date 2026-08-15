@@ -350,7 +350,7 @@ resolvePrice(supabase, product, qty, currency, userCtx):
 | `any` yasak, strict TS | §3 |
 | Tüm okuma/yazma **tenant-scoped** (`tenant_id = jwt_tenant_id()`) | §12 |
 | Yetki/segment **app_metadata**'dan (asla `user_profiles.role`/`raw_user_meta_data`) | §12 |
-| Sipariş satırında **9 snapshot alanı** dolu (unit/list_id/name/sku/tax_rate/product jsonb **+ display_currency/display_rate/rate_effective_date**) | blueprint §R3 + §4.1 |
+| Sipariş satırında **9 snapshot alanı** yazılır (unit/list_id/name/sku/tax_rate/product jsonb **+ display_currency/display_rate/rate_effective_date**). 8'i DB'de NOT NULL; **`price_list_id_snapshot` bilerek nullable** — fiyat bir listeden değil kuraldan/tekliften gelebilir, o durumda liste kimliği YOKTUR. Kodun alanı **yazması** yine zorunlu, değerin dolu olması değil | blueprint §R3 + §4.1 |
 | Idempotent seed: sabit `valid_from` + `ON CONFLICT DO NOTHING` | blueprint §B2 |
 | Materialize **`is_derived=false` satırı ezmez** (elle-ezme/dondurma dokunulmaz) | §8.1 |
 | KDV oranı **üründen** (`products.tax_rate`/`is_taxable`); kural alanı yalnız override | §5 |
@@ -376,6 +376,30 @@ sanılan iki test aslında YOKTU. Gerçek durum:
 | **INV-PRICE-6** | Cache anahtarı currency içerir; `product_prices`'a yalnız materialize servisi yazar; `is_derived` ayrımı korunur | ✅ VAR (`pricing-cache-invariants.test.ts`) |
 
 > **Kural:** bu tabloda ❌ olan bir maddeyi "kilitli" varsayarak karar verme. Cetvelin kendisi de denetlenir.
+
+### 14.1 INV-PRICE-3'ün bilinen sınırları (kapsamı dürüstçe yaz)
+
+Bir kapının neyi **görmediğini** yazmamak, onu olduğundan güçlü göstermektir.
+
+- **Eş-konumluluk şartı.** Tarayıcı statiktir: 9 alan adını, `insert`/POST'un yapıldığı **aynı
+  dosyada** arar. Satır kurucusunu paylaşılan bir modüle taşımak (ör.
+  `_shared/orderItemSnapshot.ts`) sözleşmeyi bozmaz — **ama testi kırar.** Böyle bir refactor
+  meşrudur; doğru hamle önce tarayıcıyı yeni yapıya uyarlamaktır, alanları geri kopyalamak değil.
+  Bu uyarı testin hata mesajına da gömülüdür (yanlış teşhis, sessiz-yeşilden hızlı güven kaybettirir).
+- **Migration bacağı metinseldir.** Test tek bir migration dosyasının içeriğine bakar, **canlı
+  şemaya değil**. Sonraki bir migration NOT NULL'ı düşürürse test bunu görmez.
+- **Tarama kapsamı** `src/**` + `supabase/functions/**`. `scripts/**` dışarıdadır (bugün orada
+  sipariş kalemi yazan yok).
+- **Kasıtlı atlatma kapsam dışı** (tehdit modeli: drift dedektörü). Tablo adı bir sabite alınırsa
+  (`.from(TABLE)`) yeni yol görünmez olur. Asıl fail-closed katman DB'deki NOT NULL kısıtlarıdır.
+- **`rate_effective_date` UTC tarihidir** (`new Date().toISOString()`; DB varsayılanı `current_date`
+  de sunucu/UTC tarihi — ikisi tutarlı). TSİ 00:00–03:00 arası verilen sipariş yerel tarihten bir
+  gün geri kalır. Bugün zararsız (kur daima 1.0), **ama W5'te gerçek kurlar bu tarihle eşlenince
+  gün-kayması hatasına döner** — W5 bunu çözmeden kapanmamalı.
+- **Okuma tarafı yarım.** Yalnız `account/OrderDetailPage` snapshot kolonlarına geçti;
+  `views/OrdersPage.tsx`, `views/admin/OrdersTableBody.tsx`, `components/admin/orders/OrderFormModal.tsx`
+  hâlâ `product_name`/`price_at_time` okuyor. Bugün kırılmaz (aynı INSERT ikisini de aynı kaynaktan
+  yazar) ama blueprint §R3 "hiçbiri atlanmaz" diyor — ADMIN-UX şeridine devredildi.
 
 ---
 
