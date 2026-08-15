@@ -1,0 +1,57 @@
+#!/bin/sh
+# Orion Auto-Doc Post-Commit — YEREL ONLY (NotebookLM sync KASITLI kaldırıldı)
+#
+# NEDEN: --nlm-sync ağ + NotebookLM auth gerektirir. Mekanik post-commit hattı,
+# auth düştüğünde SESSİZCE başarısız olur (.git/orion-sync.log'a
+# "nlm_sync_performed: true" yazar ama hiçbir şey yüklemez) — kimse fark etmez,
+# çünkü döngüde akıl (LLM/insan) yok. Twin sessizce eskir.
+#
+# YENİ MODEL — NLM sync artık LLM-güdümlü MILESTONE eylemi:
+#   1) powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
+#        (auth tazele — penceresiz ~15sn, şifre girişi yok)
+#   2) orion doc tree --nlm-sync --force-sync --repo-root <REPO_ROOT>
+#   3) notebook_query ile twin'i sorgulayıp gerçekten güncellendiğini DOĞRULA
+# Tetikleyici: `notebooklm-sync` skill'i, ya da kullanıcı "twin'i güncelle".
+#
+# Bu hook artık SADECE yerel system_tree.md'yi tazeler — ağ yok, auth yok,
+# sessiz-fail yok, commit yavaşlamaz.
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Python yorumlayıcısını seç (yerel .venv tercih)
+if [ -f "$REPO_ROOT/.venv/Scripts/python" ]; then
+    PYTHON_EXEC="$REPO_ROOT/.venv/Scripts/python"
+elif [ -f "$REPO_ROOT/.venv/bin/python" ]; then
+    PYTHON_EXEC="$REPO_ROOT/.venv/bin/python"
+else
+    PYTHON_EXEC="python"
+fi
+
+# 2026-08-15: iki düzeltme.
+#
+# (1) LOG YOLU — `$REPO_ROOT/.git` bir WORKTREE'de dizin değil DOSYADIR; bu yüzden
+#     yönlendirme her worktree commit'inde "Not a directory" hatası veriyordu ve log
+#     hiç yazılmıyordu. Doğrusu `git rev-parse --git-dir`.
+#
+# (2) COMPANION ÜRETİMİ BURAYA TAŞINDI. Eskiden `pre-commit` içindeki `doc run-hook`
+#     yapıyordu ve `exit $?` ile commit'i BLOKLUYORDU — reddetme ölçütü bir LLM kalite
+#     skoruydu, yani aynı dosya bir koşuda 80/100 alıp commit'i reddedip diğerinde
+#     100/100 alabiliyordu. Rastgele patlayan kapı `--no-verify` alışkanlığı doğurur ve
+#     GERÇEK kapıları da birlikte atlatır. Üretimin kendisi değerli, BLOKLAMASI değil:
+#     artık commit'ten SONRA, arka planda koşuyor. Gerekçenin tamamı: `pre-commit` başlığı.
+GIT_DIR_ABS=$(git rev-parse --absolute-git-dir)
+
+(
+    "$PYTHON_EXEC" -m orion.cli.main doc tree --repo-root "$REPO_ROOT" > "$GIT_DIR_ABS/orion-tree.log" 2>&1
+    # ÖLÇÜLDÜ: `doc run-hook` ÇALIŞMA AĞACINDAKİ değişikliklere bakar ("değişen dosyaları
+    # belgeler"). Commit'ten SONRA ağaç temizdir → hiçbir şey yapmaz, log 0 bayt kalır.
+    # Sessizce hiçbir şey yapan kanca, olmayan kancadan kötüdür. Bu yüzden son commit'in
+    # dosyaları `doc batch`e AÇIKÇA veriliyor (batch pozisyonel FILES kabul ediyor).
+    CHANGED=$(git diff-tree --no-commit-id --name-only -r HEAD         | grep -E '\.(ts|tsx|mjs|cjs)$' | grep -v '\.test\.' | grep -v '__tests__' || true)
+    if [ -n "$CHANGED" ]; then
+        # shellcheck disable=SC2086
+        "$PYTHON_EXEC" -m orion.cli.main doc batch $CHANGED > "$GIT_DIR_ABS/orion-doc.log" 2>&1
+    else
+        echo "[post-commit] belgelenecek kaynak dosya yok" > "$GIT_DIR_ABS/orion-doc.log"
+    fi
+) &

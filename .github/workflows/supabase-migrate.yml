@@ -78,14 +78,33 @@ jobs:
               skipped=$((skipped + 1))
               continue
             fi
-            echo "▶ Uygulanıyor: $base"
-            if psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f"; then
+            # ATOMİKLİK. İki meşru biçim var, üçüncüsü yok:
+            #   (a) dosya kendi BEGIN;/COMMIT;'ini yazar  -> OLDUĞU GİBİ koşulur.
+            #       Bunu körü körüne sarmak YANLIŞ olurdu: bazı dosyalar bilinçli olarak
+            #       COMMIT'ten SONRA işlem-dışı ifadeler taşır (ör.
+            #       20260402000000_security_and_performance_hardening.sql: BEGIN@7,
+            #       COMMIT@95, ardından CREATE INDEX CONCURRENTLY@103-112 — CONCURRENTLY
+            #       bir transaction bloğunun İÇİNDE çalışamaz).
+            #   (b) dosya işlem denetimi içermez -> psql --single-transaction ile SARILIR.
+            # Sarılmamış çok-ifadeli bir dosya ortasında patlarsa DB YARI-UYGULANMIŞ kalır,
+            # ledger'a yazılmaz ve bir sonraki koşu baştan dener = ikinci kez yarım uygulama.
+            # PR anında aynı kural INV-MIGRATION-1 ile de denetlenir (bkz. conformance).
+            if grep -qiE '^[[:space:]]*(begin|start[[:space:]]+transaction)[[:space:]]*;' "$f"; then
+              TX_ARGS=""
+              TX_MODE="dosya kendi işlemini yönetiyor"
+            else
+              TX_ARGS="--single-transaction"
+              TX_MODE="--single-transaction ile sarıldı"
+            fi
+            echo "▶ Uygulanıyor: $base  [$TX_MODE]"
+            # shellcheck disable=SC2086
+            if psql "$DB_URL" -v ON_ERROR_STOP=1 $TX_ARGS -f "$f"; then
               psql "$DB_URL" -v ON_ERROR_STOP=1 -c \
                 "insert into public._migration_ledger(name) values ('$base');"
               echo "✅ $base uygulandı ve ledger'a kaydedildi"
               applied=$((applied + 1))
             else
-              echo "::error file=$f::Migration BAŞARISIZ: $base — koşu kırmızı, DB'de uygulanmadı (dosya kendi begin/commit'i ile atomik olmalı)."
+              echo "::error file=$f::Migration BAŞARISIZ: $base — koşu kırmızı. Atomiklik: $TX_MODE, yani bu dosya ya kendi işleminde ya da --single-transaction içinde koştu; kısmi yazım BEKLENMEZ. Yine de DB'yi doğrula."
               exit 1
             fi
           done
