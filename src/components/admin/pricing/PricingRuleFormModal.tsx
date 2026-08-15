@@ -265,7 +265,7 @@ const errText = (message: unknown): string | undefined =>
 /** Girdinin hemen altındaki hata satırı. Hata yoksa DOM'a hiçbir şey basmaz. */
 const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
   message ? (
-    <p id={id} role="alert" className="mt-1 text-xs font-bold uppercase tracking-tighter text-admin-danger">
+    <p id={id} role="alert" className="mt-1 text-xs font-bold tracking-tighter text-admin-danger">
       {message}
     </p>
   ) : null
@@ -692,16 +692,16 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
   return (
     <Dialog.Root open={open} onOpenChange={(next) => (next ? undefined : handleClose())}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/60 z-modal" />
         <Dialog.Content
           // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
-          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-admin-modal">
-          <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
+          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-admin-bg border border-admin-border rounded-admin-lg shadow-admin-lg z-modal flex flex-col overflow-hidden max-h-admin-modal">
+          <div className="p-6 border-b border-admin-border flex items-center justify-between bg-admin-surface-2">
             <div>
-              <Dialog.Title className="text-xl font-bold text-white tracking-tight">
+              <Dialog.Title className="text-xl font-bold text-admin-fg tracking-tight">
                 {rule ? t('admin.pricing.rules.form.editTitle') : t('admin.pricing.rules.form.createTitle')}
               </Dialog.Title>
-              <Dialog.Description className="text-sm text-slate-400 mt-1">
+              <Dialog.Description className="text-sm text-admin-fg-muted mt-1">
                 {t('admin.pricing.rules.form.description')}
               </Dialog.Description>
             </div>
@@ -709,7 +709,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
               type="button"
               onClick={handleClose}
               aria-label={t('admin.pricing.rules.form.close')}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+              className="p-2 rounded-admin-md hover:bg-admin-surface-3 transition-colors text-admin-fg-muted hover:text-admin-fg focus-visible:ring-2 focus-visible:ring-admin-accent/30"
             >
               <X size={20} />
             </button>
@@ -723,7 +723,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
             >
               {/* ---- kapsam ---- */}
               <section className="space-y-4">
-                <h3 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                <h3 className="text-xs font-semibold text-admin-accent">
                   {t('admin.pricing.rules.form.sectionScope')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -755,14 +755,14 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
 
               {/* ---- fiyatlandırma ---- */}
               <section className="space-y-4">
-                <h3 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                <h3 className="text-xs font-semibold text-admin-accent">
                   {t('admin.pricing.rules.form.sectionPricing')}
                 </h3>
 
                 <div
                   role="radiogroup"
                   aria-label={t('admin.pricing.rules.form.inputMode')}
-                  className="inline-flex rounded-xl glass border border-white/10 p-1 gap-1"
+                  className="inline-flex rounded-admin-md bg-admin-surface border border-admin-border p-1 gap-1"
                 >
                   {modeButtons.map((m) => (
                     <button
@@ -771,8 +771,8 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       role="radio"
                       aria-checked={mode === m.key}
                       onClick={() => switchMode(m.key)}
-                      className={`px-4 h-9 rounded-lg text-xs font-black uppercase tracking-widest transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/40 ${
-                        mode === m.key ? 'bg-cyan-400 text-surface-deep' : 'text-slate-400 hover:text-white'
+                      className={`px-4 h-9 rounded-admin-md text-xs font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-admin-accent/30 ${
+                        mode === m.key ? 'bg-admin-accent text-admin-accent-fg' : 'text-admin-fg-muted hover:text-admin-fg'
                       }`}
                     >
                       {m.label}
@@ -799,7 +799,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       aria-describedby={rateErrorIds || undefined}
                       className={`${adminInputClass}${rateErrorIds ? ' !border-admin-danger' : ''}`}
                     />
-                    {rateHelper ? <p className="text-xs font-bold text-slate-500">{rateHelper}</p> : null}
+                    {rateHelper ? <p className="text-xs font-bold text-admin-fg-muted">{rateHelper}</p> : null}
                     <FieldError id="rule-margin-error" message={marginError} />
                     <FieldError id="rule-fixed-price-error" message={fixedPriceError} />
                   </div>
@@ -807,16 +807,16 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                   {mode === 'fixed' ? (
                     <div className="space-y-2">
                       <span className={adminSettingsLabelClass}>{t('admin.pricing.rules.form.vatSemantics')}</span>
-                      <label className="flex items-center gap-3 px-4 h-11 glass border border-white/10 rounded-xl cursor-pointer">
+                      <label className="flex items-center gap-3 px-4 h-11 bg-admin-surface border border-admin-border rounded-admin-md cursor-pointer">
                         <input
                           type="checkbox"
                           checked={values.price_is_vat_inclusive}
                           onChange={(e) =>
                             setValue('price_is_vat_inclusive', e.target.checked, { shouldDirty: true })
                           }
-                          className="w-4 h-4 rounded border-white/10 bg-slate-800 text-cyan-500 focus-visible:ring-cyan-400/20"
+                          className="w-4 h-4 rounded border-admin-border bg-admin-surface-3 text-admin-accent focus-visible:ring-admin-accent/30"
                         />
-                        <span className="text-sm font-bold text-slate-300">
+                        <span className="text-sm font-bold text-admin-fg">
                           {t('admin.pricing.rules.form.vatInclusive')}
                         </span>
                       </label>
@@ -867,7 +867,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
 
               {/* ---- kelepçe & yuvarlama ---- */}
               <section className="space-y-4">
-                <h3 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                <h3 className="text-xs font-semibold text-admin-accent">
                   {t('admin.pricing.rules.form.sectionGuards')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -960,7 +960,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                       {...register('currency')}
                       aria-invalid={currencyError ? true : undefined}
                       aria-describedby={currencyError ? 'rule-currency-error' : undefined}
-                      className={`${adminInputClass} uppercase${currencyError ? ' !border-admin-danger' : ''}`}
+                      className={`${adminInputClass} ${currencyError ? ' !border-admin-danger' : ''}`}
                     />
                     <FieldError id="rule-currency-error" message={currencyError} />
                   </div>
@@ -969,7 +969,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
 
               {/* ---- öncelik & geçerlilik ---- */}
               <section className="space-y-4">
-                <h3 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                <h3 className="text-xs font-semibold text-admin-accent">
                   {t('admin.pricing.rules.form.sectionPriority')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1032,33 +1032,33 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                     <FieldError id="rule-valid-to-error" message={validToError} />
                   </div>
                 </div>
-                <label className="flex items-center gap-3 px-4 h-11 glass border border-white/10 rounded-xl cursor-pointer w-fit">
+                <label className="flex items-center gap-3 px-4 h-11 bg-admin-surface border border-admin-border rounded-admin-md cursor-pointer w-fit">
                   <input
                     type="checkbox"
                     checked={values.is_exclusive}
                     onChange={(e) => setValue('is_exclusive', e.target.checked, { shouldDirty: true })}
-                    className="w-4 h-4 rounded border-white/10 bg-slate-800 text-cyan-500 focus-visible:ring-cyan-400/20"
+                    className="w-4 h-4 rounded border-admin-border bg-admin-surface-3 text-admin-accent focus-visible:ring-admin-accent/30"
                   />
-                  <span className="text-sm font-bold text-slate-300">{t('admin.pricing.rules.form.isExclusive')}</span>
+                  <span className="text-sm font-bold text-admin-fg">{t('admin.pricing.rules.form.isExclusive')}</span>
                 </label>
               </section>
 
               {/* ---- ETKİ PANELİ ---- */}
-              <section className="space-y-4 rounded-2xl glass border border-white/10 p-6">
-                <h3 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+              <section className="space-y-4 rounded-admin-lg bg-admin-surface border border-admin-border p-6">
+                <h3 className="text-xs font-semibold text-admin-accent">
                   {t('admin.pricing.rules.impact.title')}
                 </h3>
 
                 {impactLoading ? (
-                  <p className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  <p className="flex items-center gap-2 text-xs font-bold text-admin-fg-muted">
                     <Loader2 size={14} className="animate-spin" />
                     {t('admin.pricing.rules.impact.loading')}
                   </p>
                 ) : impactCount === null ? (
-                  <p className="text-xs font-bold text-slate-500">{t('admin.pricing.rules.impact.selectTarget')}</p>
+                  <p className="text-xs font-bold text-admin-fg-muted">{t('admin.pricing.rules.impact.selectTarget')}</p>
                 ) : (
                   <>
-                    <p className="text-sm font-black text-white">
+                    <p className="text-sm font-semibold text-admin-fg">
                       {t('admin.pricing.rules.impact.coverage', { count: impactCount })}
                     </p>
                     <ul className="space-y-2">
@@ -1068,25 +1068,25 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                         return (
                           <li
                             key={product.id}
-                            className="flex flex-wrap items-center gap-3 rounded-xl bg-white/3 border border-white/5 px-4 py-3"
+                            className="flex flex-wrap items-center gap-3 rounded-admin-md bg-admin-surface-2 border border-admin-border px-4 py-3"
                           >
-                            <span className="text-sm font-bold text-white truncate">{product.name}</span>
-                            <span className="text-xs font-mono font-bold text-slate-500">{product.sku}</span>
-                            <span className="ml-auto text-xs font-black uppercase tracking-widest text-slate-500">
+                            <span className="text-sm font-bold text-admin-fg truncate">{product.name}</span>
+                            <span className="text-xs font-mono font-bold text-admin-fg-muted">{product.sku}</span>
+                            <span className="ml-auto text-xs font-semibold text-admin-fg-muted">
                               {beforeGross === null
                                 ? t('admin.pricing.rules.impact.noPrice')
                                 : formatCurrency(beforeGross, locale, { currency: 'TRY' })}
                             </span>
-                            <span className="text-xs font-black text-slate-600" aria-hidden="true">
+                            <span className="text-xs font-semibold text-admin-fg-subtle" aria-hidden="true">
                               {'→'}
                             </span>
-                            <span className="text-xs font-black uppercase tracking-widest text-cyan-400">
+                            <span className="text-xs font-semibold text-admin-accent">
                               {after === null
                                 ? t('admin.pricing.rules.impact.notPriceable')
                                 : formatCurrency(after.gross, locale, { currency: 'TRY' })}
                             </span>
                             {loses ? (
-                              <span className="w-full flex items-center gap-2 text-xs font-bold text-amber-400">
+                              <span className="w-full flex items-center gap-2 text-xs font-bold text-admin-warning">
                                 <AlertTriangle size={14} />
                                 {t('admin.pricing.rules.impact.moreSpecificWins')}
                               </span>
@@ -1101,11 +1101,11 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
             </form>
           </div>
 
-          <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/2">
+          <div className="p-6 border-t border-admin-border flex items-center justify-between bg-admin-surface-2">
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors"
+              className="px-6 py-3 text-xs font-bold text-admin-fg-muted hover:text-admin-fg transition-colors"
             >
               {t('admin.common.cancel')}
             </button>

@@ -34,7 +34,7 @@ export function DataTableHead<T>(props: DataTableHeadProps<T>): ReactNode {
 
   return (
     <thead>
-      <tr className="glass-strong">
+      <tr className="bg-admin-surface">
         {selectable && (
           <th className={`${adminTableHeadCellClass} ${pad} w-10 text-center`}>
             <input
@@ -42,7 +42,7 @@ export function DataTableHead<T>(props: DataTableHeadProps<T>): ReactNode {
               checked={allSelected}
               onChange={onToggleAll}
               aria-label={selectAllLabel}
-              className="w-4 h-4 rounded-md border-white/10 bg-white/5 text-cyan-400 focus-visible:ring-cyan-400/30 focus-visible:ring-offset-0"
+              className="w-4 h-4 rounded-md border-admin-border bg-admin-surface-2 text-admin-accent focus-visible:ring-admin-accent/30 focus-visible:ring-offset-0"
             />
           </th>
         )}
@@ -69,12 +69,12 @@ export function DataTableHead<T>(props: DataTableHeadProps<T>): ReactNode {
                 <button
                   type="button"
                   onClick={() => onToggleSort(col.key)}
-                  className={`inline-flex items-center gap-2 hover:text-cyan-400 transition-colors uppercase tracking-widest ${
+                  className={`inline-flex items-center gap-2 hover:text-admin-accent transition-colors ${
                     col.align === 'right' ? 'flex-row-reverse' : ''
                   }`}
                 >
                   {col.header}
-                  <span className="text-cyan-400/50">{active ? (sort?.dir === 'asc' ? '▲' : '▼') : ''}</span>
+                  <span className="text-admin-accent">{active ? (sort?.dir === 'asc' ? '▲' : '▼') : ''}</span>
                 </button>
               ) : (
                 col.header

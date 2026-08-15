@@ -427,7 +427,7 @@ const CategoriesTableBody: React.FC = () => {
         header: t('admin.categories.table.image'),
         hideable: true,
         cell: (r) => (
-          <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-colors duration-500">
+          <div className="relative w-12 h-12 rounded-admin-md border border-admin-border overflow-hidden bg-admin-surface group-hover:border-admin-border transition-colors duration-500">
             {r.image_url ? (
               <VentImage
                 src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
@@ -436,7 +436,7 @@ const CategoriesTableBody: React.FC = () => {
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-white/5 text-xs font-black text-slate-700 uppercase">
+              <div className="w-full h-full flex items-center justify-center bg-admin-surface-2 text-xs font-semibold text-admin-fg-subtle">
                 {t('admin.categories.noImage')}
               </div>
             )}
@@ -449,22 +449,22 @@ const CategoriesTableBody: React.FC = () => {
         sortable: true,
         cell: (r) => (
           <div className="flex items-center gap-2">
-            {r.parent_id && <div className="w-4 h-px bg-slate-700 mt-1" />}
+            {r.parent_id && <div className="w-4 h-px bg-admin-surface-3 mt-1" />}
             <div className="flex flex-col">
               {hasWriteAccess ? (
                 <EditableCell
                   value={r.name}
                   placeholder={t('admin.categories.namePlaceholder')}
                   inputWidth="w-full"
-                  className={`group-hover:text-cyan-400 transition-colors uppercase tracking-wider font-black ${
-                    r.parent_id ? 'text-slate-400 text-xs' : 'text-white text-xs'
+                  className={`group-hover:text-admin-accent transition-colors font-semibold ${
+                    r.parent_id ? 'text-admin-fg-muted text-xs' : 'text-admin-fg text-xs'
                   }`}
                   onSave={(val) => saveName(r, val)}
                 />
               ) : (
                 <span
-                  className={`uppercase tracking-wider font-black ${
-                    r.parent_id ? 'text-slate-400 text-xs' : 'text-white text-xs'
+                  className={`font-semibold ${
+                    r.parent_id ? 'text-admin-fg-muted text-xs' : 'text-admin-fg text-xs'
                   }`}
                 >
                   {r.name}
@@ -472,8 +472,8 @@ const CategoriesTableBody: React.FC = () => {
               )}
               {r.is_featured && (
                 <div className="flex items-center gap-1.5 mt-1">
-                  <span className="w-1 h-1 rounded-full bg-cyan-400 shadow-admin-categories-glow" />
-                  <span className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                  <span className="w-1 h-1 rounded-full bg-admin-accent shadow-admin-categories-glow" />
+                  <span className="text-xs font-semibold text-admin-accent">
                     {t('admin.categories.featuredBadge')}
                   </span>
                 </div>
@@ -491,21 +491,21 @@ const CategoriesTableBody: React.FC = () => {
           hasWriteAccess ? (
             <div
               title={t('admin.categories.sortOrderTooltip')}
-              className="inline-block glass bg-white/5 rounded-xl border border-white/5 group-hover:border-cyan-400/30 transition-colors p-1"
+              className="inline-block bg-admin-surface bg-admin-surface-2 rounded-admin-md border border-admin-border group-hover:border-admin-accent/30 transition-colors p-1"
             >
               <EditableCell
                 value={r.sort_order ?? 0}
                 placeholder="0"
                 type="number"
                 inputWidth="w-12"
-                className="text-center text-cyan-400 font-black text-xs tracking-widest uppercase"
+                className="text-center text-admin-accent font-semibold text-xs"
                 onSave={(val) => saveSortOrder(r, val)}
               />
             </div>
           ) : (
             <span
               title={t('admin.categories.sortOrderTooltip')}
-              className="text-xs font-black text-slate-500 uppercase tracking-widest"
+              className="text-xs font-semibold text-admin-fg-muted"
             >
               {r.sort_order ?? 0}
             </span>
@@ -516,7 +516,7 @@ const CategoriesTableBody: React.FC = () => {
         header: t('admin.categories.table.slug'),
         hideable: true,
         cell: (r) => (
-          <code className="text-xs font-black text-slate-500 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5 group-hover:text-cyan-400/60 transition-colors uppercase tracking-hvac-snug font-mono">
+          <code className="text-xs font-semibold text-admin-fg-muted bg-admin-surface-2 px-2 py-0.5 rounded-admin-md border border-admin-border group-hover:text-admin-accent transition-colors font-mono">
             {r.slug}
           </code>
         ),
@@ -526,7 +526,7 @@ const CategoriesTableBody: React.FC = () => {
         header: t('admin.categories.table.parent'),
         hideable: true,
         cell: (r) => (
-          <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-snug">
+          <span className="text-xs font-semibold text-admin-fg-muted">
             {r.parent_id ? categoryNameMap.get(r.parent_id) ?? t('admin.categories.noPlaceholder') : t('admin.categories.noPlaceholder')}
           </span>
         ),
@@ -537,7 +537,7 @@ const CategoriesTableBody: React.FC = () => {
         hideable: true,
         defaultHidden: true,
         cell: (r) => (
-          <p className="text-xs text-slate-500 line-clamp-1 max-w-200px italic">
+          <p className="text-xs text-admin-fg-muted line-clamp-1 max-w-200px italic">
             {r.description || t('admin.categories.noPlaceholder')}
           </p>
         ),
@@ -550,7 +550,7 @@ const CategoriesTableBody: React.FC = () => {
           <div className="flex items-center justify-center gap-2">
             <button
               type="button"
-              className={`${adminTableActionClass} bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500 hover:text-white`}
+              className={`${adminTableActionClass} bg-admin-accent-weak text-admin-accent border-admin-accent/30 hover:bg-admin-accent hover:text-admin-accent-fg`}
               onClick={() => router.push(`/admin/categories/${r.id}/builder`)}
               title={t('admin.categories.designAction')}
               aria-label={t('admin.categories.designAction')}

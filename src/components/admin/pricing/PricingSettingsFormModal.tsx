@@ -84,7 +84,7 @@ export const DEFAULT_PRICING_SETTINGS: PricingSettingsValues = {
 /** Girdinin hemen altındaki hata satırı. Hata yoksa DOM'a hiçbir şey basmaz. */
 const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
   message ? (
-    <p id={id} role="alert" className="mt-1 text-xs font-bold uppercase tracking-tighter text-admin-danger">
+    <p id={id} role="alert" className="mt-1 text-xs font-bold tracking-tighter text-admin-danger">
       {message}
     </p>
   ) : null
@@ -247,20 +247,20 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/60 z-modal" />
         <Dialog.Content
           // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
-          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-90vh">
-          <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
+          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-admin-bg border border-admin-border rounded-admin-lg shadow-admin-lg z-modal flex flex-col overflow-hidden max-h-90vh">
+          <div className="p-6 border-b border-admin-border flex items-center justify-between bg-admin-surface-2">
             <div>
-              <Dialog.Title className="text-xl font-bold text-white tracking-tight">
+              <Dialog.Title className="text-xl font-bold text-admin-fg tracking-tight">
                 {t('admin.pricing.settings.defaultsCardTitle')}
               </Dialog.Title>
-              <Dialog.Description className="text-sm text-slate-400 mt-1">
+              <Dialog.Description className="text-sm text-admin-fg-muted mt-1">
                 {t('admin.pricing.settings.formDesc')}
               </Dialog.Description>
             </div>
-            <Dialog.Close className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white">
+            <Dialog.Close className="p-2 rounded-admin-md hover:bg-admin-surface-3 transition-colors text-admin-fg-muted hover:text-admin-fg">
               <X size={20} />
             </Dialog.Close>
           </div>
@@ -274,11 +274,11 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
               {/* Taban Para Birimi — salt-okunur */}
               <div className="space-y-2">
                 <label className={adminSettingsLabelClass}>{t('admin.pricing.settings.baseCurrencyLabel')}</label>
-                <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-950/40 border border-white/5">
-                  <span className="px-3 py-1 rounded-lg bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 text-sm font-black tracking-widest">
+                <div className="flex items-center gap-3 p-4 rounded-admin-lg bg-admin-surface-2 border border-admin-border">
+                  <span className="px-3 py-1 rounded-admin-md bg-admin-accent-weak border border-admin-accent/30 text-admin-accent text-sm font-semibold">
                     {DEFAULT_PRICING_SETTINGS.base_currency}
                   </span>
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-admin-fg-muted">
                     {t('admin.pricing.settings.baseCurrencyReadonlyNote')}
                   </span>
                 </div>
@@ -287,7 +287,7 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
               {/* Etkin Para Birimleri */}
               <div className="space-y-2">
                 <label className={adminSettingsLabelClass}>{t('admin.pricing.settings.enabledCurrenciesLabel')}</label>
-                <p className="text-xs font-bold text-slate-500 leading-relaxed">
+                <p className="text-xs font-bold text-admin-fg-muted leading-relaxed">
                   {t('admin.pricing.settings.enabledCurrenciesDesc')}
                 </p>
                 <div className="flex flex-wrap gap-3">
@@ -300,8 +300,8 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
                         key={code}
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border cursor-pointer transition-colors ${
                           checked
-                            ? 'bg-cyan-400/10 border-cyan-400/30 text-cyan-400'
-                            : 'bg-slate-950/40 border-white/5 text-slate-400 hover:border-white/10'
+                            ? 'bg-admin-accent-weak border-admin-accent/30 text-admin-accent'
+                            : 'bg-admin-surface-2 border-admin-border text-admin-fg-muted hover:border-admin-border'
                         } ${disabled ? 'cursor-not-allowed opacity-80' : ''}${
                           groupError ? ' !border-admin-danger' : ''
                         }`}
@@ -311,14 +311,14 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
                         <input
                           id={`pricing-settings-currency-${code}`}
                           type="checkbox"
-                          className="w-4 h-4 rounded border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20"
+                          className="w-4 h-4 rounded border-admin-border bg-transparent text-admin-accent focus-visible:ring-admin-accent/30"
                           checked={checked}
                           disabled={disabled}
                           aria-invalid={groupError ? true : undefined}
                           aria-describedby={groupError ? 'pricing-settings-currencies-error' : undefined}
                           onChange={() => toggleCurrency(code)}
                         />
-                        <span className="text-sm font-black">{code}</span>
+                        <span className="text-sm font-semibold">{code}</span>
                       </label>
                     )
                   })}
@@ -368,7 +368,7 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
                     }
                     placeholder="0.01"
                   />
-                  <p className="text-xs font-bold text-slate-500 leading-relaxed">
+                  <p className="text-xs font-bold text-admin-fg-muted leading-relaxed">
                     {t('admin.pricing.settings.defaultRoundToDesc')}
                   </p>
                   <FieldError
@@ -394,7 +394,7 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
                     }
                     placeholder={t('admin.pricing.settings.defaultCharmEndingNone')}
                   />
-                  <p className="text-xs font-bold text-slate-500 leading-relaxed">
+                  <p className="text-xs font-bold text-admin-fg-muted leading-relaxed">
                     {t('admin.pricing.settings.defaultCharmEndingDesc')}
                   </p>
                   <FieldError
@@ -419,7 +419,7 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
                       fieldError('display_spread_pct') ? 'pricing-settings-display-spread-error' : undefined
                     }
                   />
-                  <p className="text-xs font-bold text-slate-500 leading-relaxed">
+                  <p className="text-xs font-bold text-admin-fg-muted leading-relaxed">
                     {t('admin.pricing.settings.displaySpreadPctDesc')}
                   </p>
                   <FieldError
@@ -432,17 +432,17 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
               {/* Varsayılan Fiyat KDV Dahil mi */}
               <div className="space-y-2">
                 <label className={adminSettingsLabelClass}>{t('admin.pricing.settings.defaultPriceIsVatInclusiveLabel')}</label>
-                <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-950/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
+                <label className="flex items-start gap-4 p-4 rounded-admin-lg bg-admin-surface-2 border border-admin-border cursor-pointer group hover:border-admin-border transition-colors">
                   <input
                     type="checkbox"
-                    className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors"
+                    className="mt-1 w-5 h-5 rounded-admin-md border-admin-border bg-transparent text-admin-accent focus-visible:ring-admin-accent/30 transition-colors"
                     {...form.register('default_price_is_vat_inclusive')}
                   />
                   <div className="space-y-1">
-                    <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">
+                    <span className="block text-sm font-semibold text-admin-fg group-hover:text-admin-accent transition-colors">
                       {t('admin.pricing.settings.defaultPriceIsVatInclusiveLabel')}
                     </span>
-                    <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
+                    <span className="block text-xs font-bold text-admin-fg-muted leading-relaxed">
                       {t('admin.pricing.settings.defaultPriceIsVatInclusiveDesc')}
                     </span>
                   </div>
@@ -451,11 +451,11 @@ const PricingSettingsFormModal: React.FC<PricingSettingsFormModalProps> = ({
             </form>
           </div>
 
-          <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/2">
+          <div className="p-6 border-t border-admin-border flex items-center justify-between bg-admin-surface-2">
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors"
+              className="px-6 py-3 text-xs font-bold text-admin-fg-muted hover:text-admin-fg transition-colors"
             >
               {t('admin.common.cancel')}
             </button>

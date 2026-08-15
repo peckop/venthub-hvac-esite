@@ -234,6 +234,8 @@ export const width = {
 };
 
 export const minWidth = {
+  // Admin açılır menüsü — kural 8 gereği arbitrary değer (`min-w-[9rem]`) yasak.
+  'admin-menu':   '9rem',   // 144px — üç seçenekli tema menüsünün rahat genişliği
   'hvac-btn':     '120px',  // 15×8
   'hvac-menu':    '140px',
   'hvac-select':  '200px',

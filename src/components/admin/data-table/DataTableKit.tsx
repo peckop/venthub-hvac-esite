@@ -167,8 +167,8 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
 
       <div className={adminTableContainerClass}>
         {table.error && (
-          <div className="p-4 text-rose-400 text-xs font-bold bg-rose-500/10 border-b border-white/5 flex flex-wrap items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+          <div className="p-4 text-admin-danger text-xs font-bold bg-admin-danger-weak border-b border-admin-border flex flex-wrap items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-admin-danger" />
             {errorLabel ?? t('admin.dataTable.states.error')}
           </div>
         )}
@@ -179,9 +179,9 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
           olmazsa dar viewport'ta ve zoom'da SERT kesilir (WCAG SC 1.4.10 Reflow).
           Cetvel: docs/standards/admin-design-standard.md §2.3
         */}
-        <div className="p-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/5">
-          <div className="text-xs font-black text-slate-500 uppercase tracking-widest">
-            {totalLabel ?? 'Toplam'}: <span className="text-cyan-400" aria-live="polite">{table.totalMatched}</span>
+        <div className="p-4 flex flex-wrap items-center justify-between gap-3 border-b border-admin-border">
+          <div className="text-xs font-semibold text-admin-fg-muted">
+            {totalLabel ?? 'Toplam'}: <span className="text-admin-accent" aria-live="polite">{table.totalMatched}</span>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
             <ColumnsMenu
@@ -197,11 +197,11 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                   onClick={() => setPage(Math.max(1, page - 1))}
                   disabled={page <= 1}
                   aria-label="Önceki sayfa"
-                  className="w-8 h-8 flex items-center justify-center rounded-lg glass border border-white/5 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="w-8 h-8 flex items-center justify-center rounded-admin-md bg-admin-surface border border-admin-border text-admin-fg-muted hover:text-admin-fg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight size={16} className="rotate-180" />
                 </button>
-                <span className="text-xs font-black text-slate-400 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 text-center uppercase tracking-tighter">
+                <span className="text-xs font-semibold text-admin-fg-muted bg-admin-surface-2 px-3 py-1.5 rounded-admin-md border border-admin-border text-center tracking-tighter">
                   {renderPageLabel ? renderPageLabel(page, pageCount) : `${page} / ${pageCount}`}
                 </span>
                 <button
@@ -209,7 +209,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                   onClick={() => setPage(Math.min(pageCount, page + 1))}
                   disabled={page >= pageCount}
                   aria-label="Sonraki sayfa"
-                  className="w-8 h-8 flex items-center justify-center rounded-lg glass border border-white/5 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="w-8 h-8 flex items-center justify-center rounded-admin-md bg-admin-surface border border-admin-border text-admin-fg-muted hover:text-admin-fg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -232,7 +232,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
               selectAllLabel={selectAllLabel}
               compact={density === 'compact'}
             />
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-admin-border">
               {table.isLoading && table.rows.length === 0 ? (
                 <tr>
                   <td colSpan={colSpan} className="p-0">
@@ -256,7 +256,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                     <Fragment key={id}>
                       <tr
                         className={`group transition-colors duration-300 ${
-                          selected ? 'bg-cyan-400/5' : 'hover:bg-white/2'
+                          selected ? 'bg-admin-accent-weak' : 'hover:bg-admin-surface-2'
                         } ${clickable ? 'cursor-pointer' : ''}`}
                         role={clickable ? 'button' : undefined}
                         tabIndex={clickable ? 0 : undefined}
@@ -283,7 +283,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                                 table.selection.toggle(id, { shiftKey: e.shiftKey })
                               }}
                               aria-label={rowSelectLabel}
-                              className="w-4 h-4 rounded-md border-white/10 bg-white/5 text-cyan-400 focus-visible:ring-cyan-400/30 focus-visible:ring-offset-0"
+                              className="w-4 h-4 rounded-md border-admin-border bg-admin-surface-2 text-admin-accent focus-visible:ring-admin-accent/30 focus-visible:ring-offset-0"
                             />
                           </td>
                         )}
@@ -297,8 +297,8 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                               }}
                               aria-label={expandLabel}
                               aria-expanded={isExpanded}
-                              className={`w-6 h-6 flex items-center justify-center rounded-lg transition-colors duration-300 ${
-                                isExpanded ? 'bg-cyan-400/10 text-cyan-400 rotate-90' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'
+                              className={`w-6 h-6 flex items-center justify-center rounded-admin-md transition-colors duration-300 ${
+                                isExpanded ? 'bg-admin-accent-weak text-admin-accent rotate-90' : 'text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-2'
                               }`}
                             >
                               <ChevronRight size={14} />
@@ -313,7 +313,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                             rowHref && col.key === firstVisibleKey ? (
                               <Link
                                 href={rowHref(row) as import('next').Route}
-                                className="block hover:text-cyan-400 transition-colors"
+                                className="block hover:text-admin-accent transition-colors"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {rendered}
@@ -332,7 +332,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                         })}
                       </tr>
                       {isExpanded && expandable && (
-                        <tr className="bg-white/1">
+                        <tr className="bg-admin-surface-2">
                           <td colSpan={colSpan} className="px-12 py-8">
                             {renderExpandedRow?.(row)}
                           </td>

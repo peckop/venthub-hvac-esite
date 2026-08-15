@@ -298,7 +298,7 @@ const PricePreviewPanel: React.FC = () => {
   return (
     <div className="space-y-8">
       {initError ? (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm font-bold">
+        <div className="p-4 rounded-admin-md bg-admin-danger-weak border border-admin-danger/30 text-admin-danger text-sm font-bold">
           {t('admin.pricing.common.loadFailed')}
         </div>
       ) : null}
@@ -311,14 +311,14 @@ const PricePreviewPanel: React.FC = () => {
           </label>
 
           {selectedProduct ? (
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl glass border border-cyan-400/20 bg-cyan-400/5">
-              <span className="text-sm font-black text-white truncate">{selectedProduct.name}</span>
-              <span className="text-xs font-mono font-bold text-cyan-400">{selectedProduct.sku}</span>
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-admin-md bg-admin-surface border border-admin-accent/30 bg-admin-accent-weak">
+              <span className="text-sm font-semibold text-admin-fg truncate">{selectedProduct.name}</span>
+              <span className="text-xs font-mono font-bold text-admin-accent">{selectedProduct.sku}</span>
               <button
                 type="button"
                 onClick={clearProduct}
                 aria-label={t('admin.pricing.preview.product.clear')}
-                className="ml-auto p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+                className="ml-auto p-1 rounded-admin-md text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-3 transition-colors focus-visible:ring-2 focus-visible:ring-admin-accent/30"
               >
                 <X size={14} />
               </button>
@@ -326,7 +326,7 @@ const PricePreviewPanel: React.FC = () => {
           ) : (
             <>
               <div className="relative">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-admin-fg-muted" />
                 <input
                   id="preview-product-search"
                   type="text"
@@ -336,21 +336,21 @@ const PricePreviewPanel: React.FC = () => {
                   className={adminInputClass}
                 />
                 {searching ? (
-                  <Loader2 size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-cyan-400 animate-spin" />
+                  <Loader2 size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-admin-accent animate-spin" />
                 ) : null}
               </div>
 
               {results.length > 0 ? (
-                <ul className="max-h-60 overflow-y-auto custom-scrollbar rounded-xl glass border border-white/10 divide-y divide-white/5">
+                <ul className="max-h-60 overflow-y-auto custom-scrollbar rounded-admin-md bg-admin-surface border border-admin-border divide-y divide-admin-border">
                   {results.map((p) => (
                     <li key={p.id}>
                       <button
                         type="button"
                         onClick={() => pickProduct(p)}
-                        className="w-full text-left px-4 py-2.5 hover:bg-white/5 transition-colors focus-visible:bg-white/5 focus-visible:outline-none"
+                        className="w-full text-left px-4 py-2.5 hover:bg-admin-surface-2 transition-colors focus-visible:bg-admin-surface-2 focus-visible:outline-none"
                       >
-                        <span className="block text-sm font-bold text-white truncate">{p.name}</span>
-                        <span className="block text-xs font-mono font-bold text-slate-500">{p.sku}</span>
+                        <span className="block text-sm font-bold text-admin-fg truncate">{p.name}</span>
+                        <span className="block text-xs font-mono font-bold text-admin-fg-muted">{p.sku}</span>
                       </button>
                     </li>
                   ))}
@@ -358,14 +358,14 @@ const PricePreviewPanel: React.FC = () => {
               ) : null}
 
               {searchError ? (
-                <p className="flex items-center gap-2 text-xs font-bold text-rose-400">
+                <p className="flex items-center gap-2 text-xs font-bold text-admin-danger">
                   <AlertTriangle size={14} />
                   {searchError}
                 </p>
               ) : null}
 
               {!searching && !searchError && results.length === 0 ? (
-                <p className="text-xs font-bold text-slate-500">{t('admin.pricing.preview.product.searchEmpty')}</p>
+                <p className="text-xs font-bold text-admin-fg-muted">{t('admin.pricing.preview.product.searchEmpty')}</p>
               ) : null}
             </>
           )}
@@ -429,7 +429,7 @@ const PricePreviewPanel: React.FC = () => {
 
       {/* ---- içerik: boş durum ya da 3 kart ---- */}
       {productLoadError ? (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm font-bold">
+        <div className="p-4 rounded-admin-md bg-admin-danger-weak border border-admin-danger/30 text-admin-danger text-sm font-bold">
           {productLoadError}
         </div>
       ) : !selectedProduct ? (
@@ -442,41 +442,41 @@ const PricePreviewPanel: React.FC = () => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* ---- 1) maliyet ---- */}
           <div className={adminCardPaddedClass}>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight mb-6">
+            <h2 className="text-lg font-semibold text-admin-fg tracking-tight mb-6">
               {t('admin.pricing.preview.cost.title')}
             </h2>
             <dl className="space-y-4 text-sm">
               <div className="flex items-center justify-between gap-4">
-                <dt className="text-slate-500 font-bold uppercase tracking-wider text-xs">
+                <dt className="text-admin-fg-muted font-bold text-xs">
                   {t('admin.pricing.preview.cost.purchasePrice')}
                 </dt>
-                <dd className="font-black text-white">
+                <dd className="font-semibold text-admin-fg">
                   {formatCurrency(selectedProduct.purchase_price, locale, {
                     currency: selectedProduct.purchase_currency,
                   })}
                 </dd>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <dt className="text-slate-500 font-bold uppercase tracking-wider text-xs">
+                <dt className="text-admin-fg-muted font-bold text-xs">
                   {t('admin.pricing.preview.cost.exchangeRate')}
                 </dt>
-                <dd className="font-black text-white">
+                <dd className="font-semibold text-admin-fg">
                   {selectedProduct.purchase_rate_to_base != null
                     ? formatNumber(selectedProduct.purchase_rate_to_base, locale, { maximumFractionDigits: 4 })
                     : '—'}
                 </dd>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <dt className="text-slate-500 font-bold uppercase tracking-wider text-xs">
+                <dt className="text-admin-fg-muted font-bold text-xs">
                   {t('admin.pricing.preview.cost.costInBase')}
                 </dt>
-                <dd className="font-black text-white">
+                <dd className="font-semibold text-admin-fg">
                   {selectedProduct.cost_in_base != null ? formatCurrency(selectedProduct.cost_in_base, locale, { currency: 'TRY' }) : '—'}
                 </dd>
               </div>
             </dl>
             {selectedProduct.cost_in_base == null ? (
-              <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold leading-relaxed">
+              <div className="mt-6 p-4 rounded-admin-md bg-admin-warning-weak border border-admin-warning/30 text-admin-warning text-xs font-bold leading-relaxed">
                 {t('admin.pricing.preview.noCostHint')}
               </div>
             ) : null}
@@ -484,64 +484,64 @@ const PricePreviewPanel: React.FC = () => {
 
           {/* ---- 2) sonuç ---- */}
           <div className={adminCardPaddedClass}>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight mb-6">
+            <h2 className="text-lg font-semibold text-admin-fg tracking-tight mb-6">
               {t('admin.pricing.preview.result.title')}
             </h2>
             {resolving ? (
-              <div className="flex items-center gap-3 text-slate-400 text-sm font-bold">
-                <Loader2 size={16} className="animate-spin text-cyan-400" />
+              <div className="flex items-center gap-3 text-admin-fg-muted text-sm font-bold">
+                <Loader2 size={16} className="animate-spin text-admin-accent" />
                 {t('admin.pricing.preview.resolving')}
               </div>
             ) : resolveError ? (
-              <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm font-bold">
+              <div className="p-4 rounded-admin-md bg-admin-danger-weak border border-admin-danger/30 text-admin-danger text-sm font-bold">
                 {t('admin.pricing.common.loadFailed')}
               </div>
             ) : resolution?.price ? (
               <div className="space-y-4">
                 <dl className="space-y-4 text-sm">
                   <div className="flex items-center justify-between gap-4">
-                    <dt className="text-slate-500 font-bold uppercase tracking-wider text-xs">
+                    <dt className="text-admin-fg-muted font-bold text-xs">
                       {t('admin.pricing.preview.result.net')}
                     </dt>
-                    <dd className="font-black text-white">
+                    <dd className="font-semibold text-admin-fg">
                       {formatCurrency(resolution.price.net, locale, { currency: resolution.price.currency })}
                     </dd>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <dt className="text-slate-500 font-bold uppercase tracking-wider text-xs">
+                    <dt className="text-admin-fg-muted font-bold text-xs">
                       {t('admin.pricing.preview.result.gross')}
                     </dt>
-                    <dd className="font-black text-white">
+                    <dd className="font-semibold text-admin-fg">
                       {formatCurrency(resolution.price.gross, locale, { currency: resolution.price.currency })}
                     </dd>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <dt className="text-slate-500 font-bold uppercase tracking-wider text-xs">
+                    <dt className="text-admin-fg-muted font-bold text-xs">
                       {t('admin.pricing.preview.result.vatRate')}
                     </dt>
-                    <dd className="font-black text-white">
+                    <dd className="font-semibold text-admin-fg">
                       {locale === 'tr'
                         ? `%${formatNumber(resolution.price.vatRatePct, locale, { maximumFractionDigits: 2 })}`
                         : `${formatNumber(resolution.price.vatRatePct, locale, { maximumFractionDigits: 2 })}%`}
                     </dd>
                   </div>
                 </dl>
-                <div className="pt-4 border-t border-white/5 space-y-3">
-                  <span className="block text-slate-500 font-bold uppercase tracking-wider text-xs">
+                <div className="pt-4 border-t border-admin-border space-y-3">
+                  <span className="block text-admin-fg-muted font-bold text-xs">
                     {t('admin.pricing.preview.result.winningRule')}
                   </span>
                   <div className="flex items-center gap-3 flex-wrap">
                     {resultScopeKey ? (
-                      <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-black uppercase tracking-wider">
+                      <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-admin-accent-weak border border-admin-accent/30 text-admin-accent text-xs font-semibold">
                         {t(`admin.pricing.common.scope.${resultScopeKey}`)}
                       </span>
                     ) : null}
-                    <span className="text-xs font-mono font-bold text-slate-400">
+                    <span className="text-xs font-mono font-bold text-admin-fg-muted">
                       {resolution.price.ruleId.slice(0, 8)}
                     </span>
                     <Link
                       href={'/admin/pricing/rules' as Route}
-                      className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-cyan-400 hover:text-cyan-300 transition-colors"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-admin-accent hover:text-admin-accent transition-colors"
                     >
                       {t('admin.pricing.preview.result.viewRule')}
                       <ExternalLink size={12} />
@@ -550,7 +550,7 @@ const PricePreviewPanel: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="p-4 rounded-xl bg-white/3 border border-white/10 text-slate-300 text-sm font-bold">
+              <div className="p-4 rounded-admin-md bg-admin-surface-2 border border-admin-border text-admin-fg text-sm font-bold">
                 {t('admin.pricing.common.quoteOnly')}
               </div>
             )}
@@ -558,7 +558,7 @@ const PricePreviewPanel: React.FC = () => {
 
           {/* ---- 3) hesaplama izi ---- */}
           <div className={adminCardPaddedClass}>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight mb-6">
+            <h2 className="text-lg font-semibold text-admin-fg tracking-tight mb-6">
               {t('admin.pricing.preview.trace.title')}
             </h2>
             {resolution?.trace && resolution.trace.length > 0 ? (
@@ -566,19 +566,19 @@ const PricePreviewPanel: React.FC = () => {
                 {resolution.trace.map((line, i) => (
                   <li
                     key={i}
-                    className={`flex gap-3 px-3 py-1.5 rounded-lg ${
+                    className={`flex gap-3 px-3 py-1.5 rounded-admin-md ${
                       line.startsWith('KAZANAN')
-                        ? 'bg-cyan-400/10 border border-cyan-400/20 text-cyan-300 font-bold'
-                        : 'text-slate-400'
+                        ? 'bg-admin-accent-weak border border-admin-accent/30 text-admin-accent font-bold'
+                        : 'text-admin-fg-muted'
                     }`}
                   >
-                    <span className="text-slate-600 select-none">{i + 1}</span>
+                    <span className="text-admin-fg-subtle select-none">{i + 1}</span>
                     <span className="break-all">{line}</span>
                   </li>
                 ))}
               </ol>
             ) : (
-              <p className="text-xs font-bold text-slate-500">{t('admin.pricing.preview.trace.empty')}</p>
+              <p className="text-xs font-bold text-admin-fg-muted">{t('admin.pricing.preview.trace.empty')}</p>
             )}
           </div>
         </div>

@@ -163,23 +163,23 @@ const ErrorGroupExpandedRow: React.FC<ExpandedRowProps> = ({ group, hasWriteAcce
   return (
     <div className="grid md:grid-cols-3 gap-6 text-xs">
       <div className="md:col-span-2">
-        <div className="font-black text-slate-500 mb-3 uppercase tracking-widest">
+        <div className="font-semibold text-admin-fg-muted mb-3">
           {t('admin.errorGroups.details.latest')}
         </div>
-        <div className="space-y-3 max-h-80 overflow-auto overscroll-y-contain bg-surface-deep/40 p-4 rounded-2xl border border-white/5 custom-scrollbar">
+        <div className="space-y-3 max-h-80 overflow-auto overscroll-y-contain bg-surface-deep/40 p-4 rounded-admin-lg border border-admin-border custom-scrollbar">
           {errors.map((e) => (
-            <div key={e.id} className="border-b border-white/5 last:border-b-0 pb-2">
-              <div className="text-slate-500">
+            <div key={e.id} className="border-b border-admin-border last:border-b-0 pb-2">
+              <div className="text-admin-fg-muted">
                 {formatDateTime(e.at, lang as 'tr' | 'en')} • {e.level || 'error'}
               </div>
-              <div className="text-slate-300 break-words">{e.message}</div>
-              <div className="text-slate-500 break-all">{e.url || '-'}</div>
+              <div className="text-admin-fg break-words">{e.message}</div>
+              <div className="text-admin-fg-muted break-all">{e.url || '-'}</div>
               {e.stack && (
                 <details className="mt-1">
-                  <summary className="cursor-pointer text-slate-500">
+                  <summary className="cursor-pointer text-admin-fg-muted">
                     {t('admin.errorGroups.details.stackSummary')}
                   </summary>
-                  <pre className="text-xs overflow-auto max-h-40 text-amber-300/80 font-mono">
+                  <pre className="text-xs overflow-auto max-h-40 text-admin-warning font-mono">
                     {String(e.stack).slice(0, 4000)}
                   </pre>
                 </details>
@@ -193,7 +193,7 @@ const ErrorGroupExpandedRow: React.FC<ExpandedRowProps> = ({ group, hasWriteAcce
         <div>
           <label
             htmlFor={`group-notes-${group.id}`}
-            className="block font-black text-slate-500 mb-2 uppercase tracking-widest"
+            className="block font-semibold text-admin-fg-muted mb-2"
           >
             {t('admin.errorGroups.details.notes')}
           </label>
@@ -210,30 +210,30 @@ const ErrorGroupExpandedRow: React.FC<ExpandedRowProps> = ({ group, hasWriteAcce
         </div>
 
         <div>
-          <div className="font-black text-slate-500 mb-2 uppercase tracking-widest">
+          <div className="font-semibold text-admin-fg-muted mb-2">
             {t('admin.errorGroups.details.sampleUrl')}
           </div>
-          <div className="text-xs break-all text-slate-400">{group.url_sample || '-'}</div>
+          <div className="text-xs break-all text-admin-fg-muted">{group.url_sample || '-'}</div>
         </div>
 
         <div>
-          <div className="font-black text-slate-500 mb-2 uppercase tracking-widest">
+          <div className="font-semibold text-admin-fg-muted mb-2">
             {t('admin.errorGroups.details.top5')}
           </div>
           <div className="grid grid-cols-1 gap-3">
             {aggregations.map((block) => (
               <div key={block.title}>
-                <div className="text-slate-500 font-bold mb-1">{block.title}</div>
+                <div className="text-admin-fg-muted font-bold mb-1">{block.title}</div>
                 <ul className="space-y-1 list-disc pl-4">
                   {block.items.map(([k, c]) => {
                     const countStr = `(${c})`
                     return (
                       <li key={k} className="text-xs break-all">
-                        <span className="text-slate-300">{k}</span> <span className="text-slate-500">{countStr}</span>
+                        <span className="text-admin-fg">{k}</span> <span className="text-admin-fg-muted">{countStr}</span>
                       </li>
                     )
                   })}
-                  {block.items.length === 0 && <li className="text-xs text-slate-500">-</li>}
+                  {block.items.length === 0 && <li className="text-xs text-admin-fg-muted">-</li>}
                 </ul>
               </div>
             ))}
@@ -432,7 +432,7 @@ const ErrorGroupsTableBody: React.FC = () => {
         sortable: true,
         hideable: true,
         cell: (r) => (
-          <span className="font-black text-white tracking-widest uppercase text-xs">
+          <span className="font-semibold text-admin-fg text-xs">
             {formatDateTime(r.last_seen, lang as 'tr' | 'en')}
           </span>
         ),
@@ -443,12 +443,12 @@ const ErrorGroupsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <span
-            className={`inline-flex items-center text-xs font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
+            className={`inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full ${
               r.level === 'error'
-                ? 'bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20'
+                ? 'bg-admin-danger-weak text-admin-danger ring-1 ring-admin-danger/30'
                 : r.level === 'warn'
-                  ? 'bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20'
-                  : 'bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/20'
+                  ? 'bg-admin-warning-weak text-admin-warning ring-1 ring-admin-warning/30'
+                  : 'bg-admin-accent-weak text-admin-accent ring-1 ring-admin-accent/30'
             }`}
           >
             {r.level || 'error'}
@@ -463,8 +463,8 @@ const ErrorGroupsTableBody: React.FC = () => {
           const idStr = `ID: ${r.id.slice(0, 8)}`
           return (
             <div className="flex flex-col gap-1">
-              <span className="font-black text-slate-100 uppercase tracking-tight line-clamp-1">{r.signature}</span>
-              <code className="text-xs font-black text-slate-500 uppercase tracking-widest opacity-60 font-mono">
+              <span className="font-semibold text-admin-fg tracking-tight line-clamp-1">{r.signature}</span>
+              <code className="text-xs font-semibold text-admin-fg-muted opacity-60 font-mono">
                 {idStr}
               </code>
             </div>
@@ -476,7 +476,7 @@ const ErrorGroupsTableBody: React.FC = () => {
         header: t('admin.errorGroups.table.lastMsg'),
         hideable: true,
         cell: (r) => (
-          <span className="text-slate-300 text-xs whitespace-normal break-words" title={r.last_message || ''}>
+          <span className="text-admin-fg text-xs whitespace-normal break-words" title={r.last_message || ''}>
             {r.last_message || '-'}
           </span>
         ),
@@ -488,7 +488,7 @@ const ErrorGroupsTableBody: React.FC = () => {
         hideable: true,
         align: 'right',
         cell: (r) => (
-          <span className="inline-flex items-center justify-center min-w-28px h-7 px-2 rounded-lg bg-cyan-500/10 text-cyan-400 text-xs font-black border border-cyan-500/20">
+          <span className="inline-flex items-center justify-center min-w-28px h-7 px-2 rounded-admin-md bg-admin-accent-weak text-admin-accent text-xs font-semibold border border-admin-accent/30">
             {r.count}
           </span>
         ),
@@ -507,7 +507,7 @@ const ErrorGroupsTableBody: React.FC = () => {
             aria-label={t('admin.errorGroups.table.status')}
           >
             {STATUS_VALUES.map((s) => (
-              <option key={s} value={s} className="bg-surface-deep">
+              <option key={s} value={s} className="bg-admin-bg">
                 {s}
               </option>
             ))}
@@ -527,11 +527,11 @@ const ErrorGroupsTableBody: React.FC = () => {
             style={adminSelectStyle}
             aria-label={t('admin.errorGroups.table.assigned')}
           >
-            <option value="" className="bg-surface-deep">
+            <option value="" className="bg-admin-bg">
               {t('admin.errorGroups.assigned.none')}
             </option>
             {users.map((u) => (
-              <option key={u.id} value={u.id} className="bg-surface-deep">
+              <option key={u.id} value={u.id} className="bg-admin-bg">
                 {userLabel(u)}
               </option>
             ))}
@@ -608,7 +608,7 @@ const ErrorGroupsTableBody: React.FC = () => {
         label: t('admin.errorGroups.bulk.statusTitle'),
         tone: 'default',
         panel: (close) => (
-          <div className={`bg-admin-surface rounded-2xl p-3 flex items-center gap-2`}>
+          <div className={`bg-admin-surface rounded-admin-lg p-3 flex items-center gap-2`}>
             <select
               value={bulkStatus}
               onChange={(e) => {
@@ -619,7 +619,7 @@ const ErrorGroupsTableBody: React.FC = () => {
               aria-label={t('admin.errorGroups.bulk.statusTitle')}
             >
               {STATUS_VALUES.map((s) => (
-                <option key={s} value={s} className="bg-surface-deep">
+                <option key={s} value={s} className="bg-admin-bg">
                   {s}
                 </option>
               ))}
@@ -699,11 +699,11 @@ const ErrorGroupsTableBody: React.FC = () => {
                 aria-label={t('admin.errorGroups.filter.statusAll')}
                 title={t('admin.errorGroups.filter.statusAll')}
               >
-                <option value="" className="bg-surface-deep">
+                <option value="" className="bg-admin-bg">
                   {t('admin.errorGroups.filter.statusAll')}
                 </option>
                 {STATUS_VALUES.map((s) => (
-                  <option key={s} value={s} className="bg-surface-deep">
+                  <option key={s} value={s} className="bg-admin-bg">
                     {s}
                   </option>
                 ))}
@@ -716,14 +716,14 @@ const ErrorGroupsTableBody: React.FC = () => {
                 aria-label={t('admin.errorGroups.filter.assignedAll')}
                 title={t('admin.errorGroups.filter.assignedAll')}
               >
-                <option value="" className="bg-surface-deep">
+                <option value="" className="bg-admin-bg">
                   {t('admin.errorGroups.filter.assignedAll')}
                 </option>
-                <option value="__none__" className="bg-surface-deep">
+                <option value="__none__" className="bg-admin-bg">
                   {t('admin.errorGroups.filter.unassigned')}
                 </option>
                 {users.map((u) => (
-                  <option key={u.id} value={u.id} className="bg-surface-deep">
+                  <option key={u.id} value={u.id} className="bg-admin-bg">
                     {userLabel(u)}
                   </option>
                 ))}

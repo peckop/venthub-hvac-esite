@@ -134,17 +134,17 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
             }}
           >
             <div className="p-6 space-y-4">
-              <Dialog.Title className="text-base font-semibold text-white">
+              <Dialog.Title className="text-base font-semibold text-admin-fg">
                 {options?.title ?? t('admin.confirm.defaultTitle')}
               </Dialog.Title>
               {/* APG: alertdialog'da `aria-describedby` ZORUNLU. */}
-              <Dialog.Description className="text-sm leading-relaxed text-white/70">
+              <Dialog.Description className="text-sm leading-relaxed text-admin-fg-muted">
                 {options?.description}
               </Dialog.Description>
 
               {needsTyped && (
                 <label className="block space-y-2">
-                  <span className="block text-xs text-white/60">
+                  <span className="block text-xs text-admin-fg-muted">
                     {t('admin.confirm.typeToConfirm', {
                       value: options?.requireTypedConfirmation ?? ''
                     })}
@@ -152,9 +152,9 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                   <input
                     value={typed}
                     onChange={(event) => setTyped(event.target.value)}
-                    className="w-full rounded-admin-sm border border-white/15 bg-white/5 px-3 py-2
-                      text-sm text-white focus-visible:outline-none focus-visible:ring-2
-                      focus-visible:ring-cyan-400/60"
+                    className="w-full rounded-admin-sm border border-admin-border bg-admin-surface-2 px-3 py-2
+                      text-sm text-admin-fg focus-visible:outline-none focus-visible:ring-2
+                      focus-visible:ring-admin-accent/30"
                   />
                 </label>
               )}

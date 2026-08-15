@@ -255,7 +255,7 @@ const AdminDashboardPage: React.FC = () => {
         description={t('admin.dashboard.subtitle')}
       />
 
-      {error && <div className="p-4 bg-red-50 text-red-500 rounded-xl">{error}</div>}
+      {error && <div className="p-4 bg-admin-danger text-admin-danger rounded-admin-md">{error}</div>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
@@ -308,12 +308,12 @@ const AdminDashboardPage: React.FC = () => {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
-        <div className="glass-card p-8 rounded-hvac-2xl border border-white/5 bg-surface-deep/40">
-          <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-8">{t('admin.dashboard.charts.recentOrders')}</h3>
+        <div className="bg-admin-surface p-6 rounded-admin-lg border border-admin-border shadow-admin-sm">
+          <h3 className="text-sm font-semibold text-admin-fg-muted mb-8">{t('admin.dashboard.charts.recentOrders')}</h3>
           <RecentOrdersTable orders={recentOrders} title={t('admin.dashboard.charts.recentOrders')} />
         </div>
-        <div className="glass-card p-8 rounded-hvac-2xl border border-white/5 bg-surface-deep/40">
-          <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-8">{t('admin.dashboard.charts.orderFlow')}</h3>
+        <div className="bg-admin-surface p-6 rounded-admin-lg border border-admin-border shadow-admin-sm">
+          <h3 className="text-sm font-semibold text-admin-fg-muted mb-8">{t('admin.dashboard.charts.orderFlow')}</h3>
           <SalesChart data={chartData} title={t('admin.dashboard.charts.salesTrend')} />
         </div>
       </div>
@@ -324,10 +324,10 @@ const AdminDashboardPage: React.FC = () => {
         saf sunum bileşeni; eksik olan yalnız veriyi besleyen konteynerdi.
       */}
       <div className="grid lg:grid-cols-2 gap-8">
-        <div className="glass-card p-8 rounded-hvac-2xl border border-white/5 bg-surface-deep/40">
+        <div className="bg-admin-surface p-6 rounded-admin-lg border border-admin-border shadow-admin-sm">
           <AbcPieChart data={abcData} title={t('admin.dashboard.abcProductClassification')} />
         </div>
-        <div className="glass-card p-8 rounded-hvac-2xl border border-white/5 bg-surface-deep/40">
+        <div className="bg-admin-surface p-6 rounded-admin-lg border border-admin-border shadow-admin-sm">
           <ActivityHeatmap data={heatmapData} title={t('admin.dashboard.charts.orderFlow')} />
         </div>
       </div>

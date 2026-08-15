@@ -41,8 +41,8 @@ export function BulkRolePanel({ onRoleChange, onClose }: BulkRolePanelProps): Re
   const { t } = useI18n()
 
   return (
-    <div className="bg-surface-deep text-slate-200 rounded-xl shadow-2xl p-4 min-w-240px border border-white/10 glass-strong">
-      <div className="text-xs font-black uppercase tracking-widest mb-3 text-cyan-400">
+    <div className="bg-admin-bg text-admin-fg rounded-admin-md shadow-admin-lg p-4 min-w-240px border border-admin-border bg-admin-surface">
+      <div className="text-xs font-semibold mb-3 text-admin-accent">
         {t('admin.users.bulk.selectRole')}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -54,10 +54,10 @@ export function BulkRolePanel({ onRoleChange, onClose }: BulkRolePanelProps): Re
               onRoleChange(targetRole)
               onClose()
             }}
-            className="flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-slate-300 rounded-xl hover:bg-white/5 hover:text-white text-left transition-colors"
+            className="flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-admin-fg rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg text-left transition-colors"
           >
-            <div className="text-slate-400 shrink-0">{ROLE_BUTTON_ICON[targetRole]}</div>
-            <span className="uppercase tracking-widest text-xs">{t(`roles.${targetRole}`)}</span>
+            <div className="text-admin-fg-muted shrink-0">{ROLE_BUTTON_ICON[targetRole]}</div>
+            <span className="text-xs">{t(`roles.${targetRole}`)}</span>
           </button>
         ))}
       </div>

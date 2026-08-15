@@ -66,9 +66,9 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({ text, size = 14, className = 
                 onFocus={show}
                 onBlur={hide}
                 onClick={() => setOpen((v) => !v)}
-                className="inline-flex items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+                className="inline-flex items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30"
             >
-                <Info size={size} aria-hidden="true" className="text-slate-400 hover:text-primary-navy cursor-help transition-colors" />
+                <Info size={size} aria-hidden="true" className="text-admin-fg-muted hover:text-primary-navy cursor-help transition-colors" />
             </button>
 
             {/* SC 1.4.13 "Persistent": zamanlayıcı YOK — tetikleyici bırakılana veya ESC'e kadar durur. */}
@@ -76,7 +76,7 @@ const InfoTooltip: React.FC<InfoTooltipProps> = ({ text, size = 14, className = 
                 <span
                     role="tooltip"
                     id={tooltipId}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 px-3 py-2 bg-slate-800 text-white text-xs leading-relaxed rounded-md z-popover shadow-xl whitespace-normal normal-case font-normal text-left"
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 px-3 py-2 bg-admin-surface-3 text-admin-fg text-xs leading-relaxed rounded-md z-popover shadow-admin-lg whitespace-normal normal-case font-normal text-left"
                 >
                     {text}
                     {/* Ok (Triangle) */}

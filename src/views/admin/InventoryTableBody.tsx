@@ -335,7 +335,7 @@ const InventoryTableBody: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setCsvImportOpen(true)}
-                className="h-12 px-6 rounded-2xl bg-cyan-400 text-surface-deep text-xs font-black uppercase tracking-widest hover:bg-cyan-300 transition-colors flex items-center gap-2"
+                className="h-12 px-6 rounded-admin-lg bg-admin-accent text-admin-accent-fg text-xs font-semibold hover:bg-admin-accent-hover transition-colors flex items-center gap-2"
               >
                 <FileUp size={16} aria-hidden="true" />
                 {t('admin.inventory.csvLoad')}

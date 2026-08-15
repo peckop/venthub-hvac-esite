@@ -66,7 +66,7 @@ const buildSystemSchema = () =>
 /** Girdinin hemen altındaki hata satırı. Hata yoksa DOM'a hiçbir şey basmaz. */
 const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
   message ? (
-    <p id={id} role="alert" className="mt-1 text-xs font-bold uppercase tracking-tighter text-admin-danger">
+    <p id={id} role="alert" className="mt-1 text-xs font-bold tracking-tighter text-admin-danger">
       {message}
     </p>
   ) : null
@@ -254,20 +254,20 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/60 z-modal" />
         <Dialog.Content
           // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
-          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-admin-modal">
-          <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
+          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-admin-bg border border-admin-border rounded-admin-lg shadow-admin-lg z-modal flex flex-col overflow-hidden max-h-admin-modal">
+          <div className="p-6 border-b border-admin-border flex items-center justify-between bg-admin-surface-2">
             <div>
-              <Dialog.Title className="text-xl font-bold text-white tracking-tight">
+              <Dialog.Title className="text-xl font-bold text-admin-fg tracking-tight">
                 {getSectionTitle()}
               </Dialog.Title>
-              <Dialog.Description className="text-sm text-slate-400 mt-1">
+              <Dialog.Description className="text-sm text-admin-fg-muted mt-1">
                 {t('admin.settings.form.descEdit')}
               </Dialog.Description>
             </div>
-            <Dialog.Close className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white">
+            <Dialog.Close className="p-2 rounded-admin-md hover:bg-admin-surface-3 transition-colors text-admin-fg-muted hover:text-admin-fg">
               <X size={20} />
             </Dialog.Close>
           </div>
@@ -368,17 +368,17 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className={adminSettingsLabelClass}>{t('admin.settings.iyzicoActive')}</label>
-                    <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-950/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
+                    <label className="flex items-start gap-4 p-4 rounded-admin-lg bg-admin-surface-2 border border-admin-border cursor-pointer group hover:border-admin-border transition-colors">
                       <input
                         type="checkbox"
-                        className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors"
+                        className="mt-1 w-5 h-5 rounded-admin-md border-admin-border bg-transparent text-admin-accent focus-visible:ring-admin-accent/30 transition-colors"
                         {...form.register('iyzico_enabled')}
                       />
                       <div className="space-y-1">
-                        <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">
+                        <span className="block text-sm font-semibold text-admin-fg group-hover:text-admin-accent transition-colors">
                           {t('admin.settings.iyzicoEnable')}
                         </span>
-                        <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
+                        <span className="block text-xs font-bold text-admin-fg-muted leading-relaxed">
                           {t('admin.settings.iyzicoEnableDesc')}
                         </span>
                       </div>
@@ -389,7 +389,7 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
                     <div className="space-y-2">
                       <label className={adminSettingsLabelClass}>{t('admin.settings.iyzicoMode')}</label>
                       <select
-                        className={`${adminInputClass} !bg-slate-950 !border-white/5`}
+                        className={`${adminInputClass} !bg-admin-surface-3 !border-admin-border`}
                         {...form.register('iyzico_mode')}
                       >
                         <option value="sandbox">{t('admin.settings.iyzicoSandbox')}</option>
@@ -438,17 +438,17 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
 
                     <div className="space-y-2">
                       <label className={adminSettingsLabelClass}>{t('admin.settings.mfaRequired')}</label>
-                      <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-950/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
+                      <label className="flex items-start gap-4 p-4 rounded-admin-lg bg-admin-surface-2 border border-admin-border cursor-pointer group hover:border-admin-border transition-colors">
                         <input
                           type="checkbox"
-                          className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors"
+                          className="mt-1 w-5 h-5 rounded-admin-md border-admin-border bg-transparent text-admin-accent focus-visible:ring-admin-accent/30 transition-colors"
                           {...form.register('mfa_required')}
                         />
                         <div className="space-y-1">
-                          <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">
+                          <span className="block text-sm font-semibold text-admin-fg group-hover:text-admin-accent transition-colors">
                             {t('admin.settings.mfaRequiredLabel')}
                           </span>
-                          <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
+                          <span className="block text-xs font-bold text-admin-fg-muted leading-relaxed">
                             {t('admin.settings.mfaRequiredDesc')}
                           </span>
                         </div>
@@ -464,7 +464,7 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
                     <div className="space-y-2">
                       <label className={adminSettingsLabelClass}>{t('admin.settings.systemLogLevel')}</label>
                       <select
-                        className={`${adminInputClass} !bg-slate-950 !border-white/5`}
+                        className={`${adminInputClass} !bg-admin-surface-3 !border-admin-border`}
                         {...form.register('system_log_level')}
                       >
                         <option value="debug">{t('admin.settings.logLevelDebug')}</option>
@@ -476,17 +476,17 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
 
                     <div className="space-y-2">
                       <label className={adminSettingsLabelClass}>{t('admin.settings.debugMode')}</label>
-                      <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-950/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
+                      <label className="flex items-start gap-4 p-4 rounded-admin-lg bg-admin-surface-2 border border-admin-border cursor-pointer group hover:border-admin-border transition-colors">
                         <input
                           type="checkbox"
-                          className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors"
+                          className="mt-1 w-5 h-5 rounded-admin-md border-admin-border bg-transparent text-admin-accent focus-visible:ring-admin-accent/30 transition-colors"
                           {...form.register('debug_mode')}
                         />
                         <div className="space-y-1">
-                          <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">
+                          <span className="block text-sm font-semibold text-admin-fg group-hover:text-admin-accent transition-colors">
                             {t('admin.settings.debugModeEnable')}
                           </span>
-                          <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
+                          <span className="block text-xs font-bold text-admin-fg-muted leading-relaxed">
                             {t('admin.settings.debugModeDesc')}
                           </span>
                         </div>
@@ -498,11 +498,11 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
             </form>
           </div>
 
-          <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/2">
+          <div className="p-6 border-t border-admin-border flex items-center justify-between bg-admin-surface-2">
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors"
+              className="px-6 py-3 text-xs font-bold text-admin-fg-muted hover:text-admin-fg transition-colors"
             >
               {t('admin.categories.cancel')}
             </button>

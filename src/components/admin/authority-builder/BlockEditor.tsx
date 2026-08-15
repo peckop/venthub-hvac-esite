@@ -16,10 +16,10 @@ import {
 } from '@/types/authority';
 
 // Standart Form Sınıfları
-const labelClass = "text-sm font-black uppercase tracking-widest text-slate-400 mb-1 block";
-const inputClass = "flex h-9 w-full rounded-md border border-slate-200 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 disabled:cursor-not-allowed disabled:opacity-50 text-slate-900";
-const textareaClass = "flex min-h-[60px] w-full rounded-md border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 disabled:cursor-not-allowed disabled:opacity-50 text-slate-900";
-const selectClass = "flex h-9 w-full items-center justify-between rounded-md border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 disabled:cursor-not-allowed disabled:opacity-50 text-slate-900";
+const labelClass = "text-sm font-semibold text-admin-fg-muted mb-1 block";
+const inputClass = "flex h-9 w-full rounded-md border border-admin-border bg-transparent px-3 py-1 text-sm shadow-admin-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-admin-fg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-admin-border disabled:cursor-not-allowed disabled:opacity-50 text-admin-fg-subtle";
+const textareaClass = "flex min-h-[60px] w-full rounded-md border border-admin-border bg-transparent px-3 py-2 text-sm shadow-admin-sm placeholder:text-admin-fg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-admin-border disabled:cursor-not-allowed disabled:opacity-50 text-admin-fg-subtle";
+const selectClass = "flex h-9 w-full items-center justify-between rounded-md border border-admin-border bg-transparent px-3 py-2 text-sm shadow-admin-sm ring-offset-white placeholder:text-admin-fg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-admin-border disabled:cursor-not-allowed disabled:opacity-50 text-admin-fg-subtle";
 
 interface BlockEditorProps {
   block: AuthorityBlock;
@@ -102,19 +102,19 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-black uppercase tracking-hvac-normal text-indigo-400">{t('admin.authority.technicalRows')}</label>
+                <label className="text-xs font-semibold text-admin-accent">{t('admin.authority.technicalRows')}</label>
                 <button 
                   type="button" 
                   onClick={addRow}
-                  className="flex items-center gap-1 text-xs font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full transition-colors"
+                  className="flex items-center gap-1 text-xs font-semibold text-admin-accent hover:text-admin-accent bg-admin-accent px-3 py-1 rounded-full transition-colors"
                 >
                   <Plus size={12} /> {t('admin.common.addLine')}
                 </button>
               </div>
 
-              <div className="grid gap-2 border border-slate-100 p-3 rounded-xl bg-slate-50/30">
+              <div className="grid gap-2 border border-admin-border p-3 rounded-admin-md bg-admin-surface-2">
                 {rows.map((row, i) => (
-                  <div key={i} className="flex gap-2 items-start group bg-white p-2 rounded-lg border border-slate-100 shadow-sm">
+                  <div key={i} className="flex gap-2 items-start group bg-admin-surface p-2 rounded-admin-md border border-admin-border shadow-admin-sm">
                     <div className="flex-1 grid gap-2">
                         <input 
                         placeholder={t('admin.authority.featurePlaceholder')} 
@@ -140,7 +140,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                     <button 
                       type="button" 
                       onClick={() => removeRow(i)}
-                      className="h-9 w-9 flex items-center justify-center text-slate-300 hover:text-red-500 transition-colors"
+                      className="h-9 w-9 flex items-center justify-center text-admin-fg hover:text-admin-danger transition-colors"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -183,11 +183,11 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-black uppercase tracking-hvac-normal text-indigo-400">{t('admin.authority.featureCards')}</label>
+                <label className="text-xs font-semibold text-admin-accent">{t('admin.authority.featureCards')}</label>
                 <button 
                   type="button" 
                   onClick={addItem}
-                  className="flex items-center gap-1 text-xs font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest bg-indigo-50 px-3 py-1 rounded-full transition-colors"
+                  className="flex items-center gap-1 text-xs font-semibold text-admin-accent hover:text-admin-accent bg-admin-accent px-3 py-1 rounded-full transition-colors"
                 >
                   <Plus size={12} /> {t('admin.common.addCard')}
                 </button>
@@ -195,18 +195,18 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
 
               <div className="grid gap-3">
                 {items.map((item, i) => (
-                  <div key={i} className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 relative group">
+                  <div key={i} className="bg-admin-surface-2 p-4 rounded-admin-md border border-admin-border relative group">
                     <button 
                       type="button" 
                       onClick={() => removeItem(i)}
-                      className="absolute top-2 right-2 h-7 w-7 flex items-center justify-center text-slate-300 hover:text-red-500 transition-colors bg-white rounded-lg shadow-sm border border-slate-100"
+                      className="absolute top-2 right-2 h-7 w-7 flex items-center justify-center text-admin-fg hover:text-admin-danger transition-colors bg-admin-surface rounded-admin-md shadow-admin-sm border border-admin-border"
                     >
                       <Trash2 size={12} />
                     </button>
                     
                     <div className="grid gap-3">
                         <div className="grid gap-1">
-                            <label className="text-xs font-bold text-slate-400 uppercase">{t('admin.authority.iconName')}</label>
+                            <label className="text-xs font-bold text-admin-fg-muted">{t('admin.authority.iconName')}</label>
                             <input 
                                 className={inputClass} 
                                 value={item.icon || 'zap'} 
@@ -214,7 +214,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                             />
                         </div>
                         <div className="grid gap-1">
-                            <label className="text-xs font-bold text-slate-400 uppercase">{t('admin.authority.title')}</label>
+                            <label className="text-xs font-bold text-admin-fg-muted">{t('admin.authority.title')}</label>
                             <input 
                                 className={inputClass} 
                                 value={item.title || ''} 
@@ -222,7 +222,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
                             />
                         </div>
                         <div className="grid gap-1">
-                            <label className="text-xs font-bold text-slate-400 uppercase">{t('admin.authority.description')}</label>
+                            <label className="text-xs font-bold text-admin-fg-muted">{t('admin.authority.description')}</label>
                             <textarea 
                                 className={textareaClass} 
                                 value={item.description || ''} 
@@ -252,15 +252,15 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
             </div>
             
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-3 p-3 bg-slate-50/50 rounded-xl border border-slate-100">
-                    <label className="text-xs font-black text-indigo-400 uppercase tracking-widest">{t('admin.authority.leftSideEski')}</label>
+                <div className="space-y-3 p-3 bg-admin-surface-2 rounded-admin-md border border-admin-border">
+                    <label className="text-xs font-semibold text-admin-accent">{t('admin.authority.leftSideEski')}</label>
                     <div className="grid gap-2">
                         <input className={inputClass} placeholder={t('admin.authority.labelTraditional')} value={compContent.leftLabel} onChange={(e) => handleContentChange({ leftLabel: e.target.value })} />
                         <input className={inputClass} placeholder={t('admin.common.imageUrl')} value={compContent.leftImage} onChange={(e) => handleContentChange({ leftImage: e.target.value })} />
                     </div>
                 </div>
-                <div className="space-y-3 p-3 bg-indigo-50/20 rounded-xl border border-indigo-100/50">
-                    <label className="text-xs font-black text-indigo-600 uppercase tracking-widest">{t('admin.authority.rightSideYeni')}</label>
+                <div className="space-y-3 p-3 bg-admin-accent-weak rounded-admin-md border border-admin-accent/30">
+                    <label className="text-xs font-semibold text-admin-accent">{t('admin.authority.rightSideYeni')}</label>
                     <div className="grid gap-2">
                         <input className={inputClass} placeholder={t('admin.authority.labelVenthub')} value={compContent.rightLabel} onChange={(e) => handleContentChange({ rightLabel: e.target.value })} />
                         <input className={inputClass} placeholder={t('admin.common.imageUrl')} value={compContent.rightImage} onChange={(e) => handleContentChange({ rightImage: e.target.value })} />
@@ -342,7 +342,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
 
       default:
         return (
-          <div className="p-4 bg-slate-50 rounded text-slate-500 text-center italic text-sm">
+          <div className="p-4 bg-admin-surface-2 rounded text-admin-fg-muted text-center italic text-sm">
             {t('admin.authority.noEditorForType', { type: block.type })}
           </div>
         );

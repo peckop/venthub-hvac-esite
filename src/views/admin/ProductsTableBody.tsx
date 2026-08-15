@@ -184,8 +184,8 @@ const ProductSpecsRow: React.FC<ProductSpecsRowProps> = ({ productId }) => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-8 h-0.5 bg-cyan-400" />
-        <h4 className="text-xs font-black text-cyan-400 uppercase tracking-hvac-relaxed">
+        <div className="w-8 h-0.5 bg-admin-accent" />
+        <h4 className="text-xs font-semibold text-admin-accent">
           {t('admin.products.expand.title')}
         </h4>
       </div>
@@ -194,18 +194,18 @@ const ProductSpecsRow: React.FC<ProductSpecsRowProps> = ({ productId }) => {
           {entries.map(([key, val]) => (
             <div
               key={key}
-              className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec"
+              className="bg-admin-surface p-4 rounded-admin-lg border border-admin-border hover:border-admin-border transition-colors group/spec"
             >
-              <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+              <div className="text-xs text-admin-fg-muted font-bold mb-1 group-hover/spec:text-admin-accent transition-colors">
                 {key}
               </div>
-              <div className="text-xs font-black text-slate-200 uppercase">{String(val)}</div>
+              <div className="text-xs font-semibold text-admin-fg">{String(val)}</div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="glass p-8 rounded-2xl border border-white/5 text-center">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+        <div className="bg-admin-surface p-8 rounded-admin-lg border border-admin-border text-center">
+          <p className="text-xs font-bold text-admin-fg-muted">
             {t('admin.products.expand.empty')}
           </p>
         </div>
@@ -266,7 +266,7 @@ const InlineNumberCell: React.FC<InlineNumberCellProps> = ({ value, display, wid
               setEditing(false)
             }
           }}
-          className={`${widthClass} text-right bg-surface-deep border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400/10 font-black`}
+          className={`${widthClass} text-right bg-admin-bg border-2 border-admin-accent/30 rounded-admin-md px-2 py-1 text-sm text-admin-accent focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-admin-accent/30 font-semibold`}
         />
       </div>
     )
@@ -276,16 +276,16 @@ const InlineNumberCell: React.FC<InlineNumberCellProps> = ({ value, display, wid
     <button
       type="button"
       onClick={() => setEditing(true)}
-      className={`group/btn relative px-3 py-1.5 rounded-xl border transition-colors duration-300 flex flex-col items-end gap-0.5 ml-auto ${
+      className={`group/btn relative px-3 py-1.5 rounded-admin-md border transition-colors duration-300 flex flex-col items-end gap-0.5 ml-auto ${
         low
-          ? 'bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20'
-          : 'bg-white/3 border-white/5 hover:bg-white/8 hover:border-white/10'
+          ? 'bg-admin-danger-weak border-admin-danger/30 hover:bg-admin-danger-weak'
+          : 'bg-admin-surface-2 border-admin-border hover:bg-admin-surface-3 hover:border-admin-border'
       }`}
     >
-      <span className={`text-sm font-black ${low ? 'text-rose-400' : 'text-slate-100'} group-hover/btn:text-cyan-400 transition-colors`}>
+      <span className={`text-sm font-semibold ${low ? 'text-admin-danger' : 'text-admin-fg'} group-hover/btn:text-admin-accent transition-colors`}>
         {display}
       </span>
-      <Pencil size={8} className="text-slate-600 group-hover/btn:text-cyan-400 transition-colors" />
+      <Pencil size={8} className="text-admin-fg-subtle group-hover/btn:text-admin-accent transition-colors" />
     </button>
   )
 }
@@ -630,26 +630,26 @@ const ProductsTableBody: React.FC = () => {
   const statusBadge = useCallback(
     (s?: string | null) => {
       const v = (s || '').toLowerCase()
-      const baseClass = 'px-2.5 py-1 text-xs font-black uppercase tracking-wider rounded-lg border'
+      const baseClass = 'px-2.5 py-1 text-xs font-semibold rounded-admin-md border'
       if (v === 'active')
         return (
-          <span className={`${baseClass} bg-emerald-500/10 text-emerald-400 border-emerald-500/20`}>
+          <span className={`${baseClass} bg-admin-success-weak text-admin-success border-admin-success/30`}>
             {t('admin.products.statusLabels.active')}
           </span>
         )
       if (v === 'inactive')
         return (
-          <span className={`${baseClass} bg-slate-500/10 text-slate-400 border-white/5`}>
+          <span className={`${baseClass} bg-admin-surface-3 text-admin-fg-muted border-admin-border`}>
             {t('admin.products.statusLabels.inactive')}
           </span>
         )
       if (v === 'out_of_stock')
         return (
-          <span className={`${baseClass} bg-rose-500/10 text-rose-400 border-rose-500/20`}>
+          <span className={`${baseClass} bg-admin-danger-weak text-admin-danger border-admin-danger/30`}>
             {t('admin.products.statusLabels.out_of_stock')}
           </span>
         )
-      return <span className={`${baseClass} bg-slate-500/10 text-slate-500 border-white/5`}>-</span>
+      return <span className={`${baseClass} bg-admin-surface-3 text-admin-fg-muted border-admin-border`}>-</span>
     },
     [t],
   )
@@ -663,7 +663,7 @@ const ProductsTableBody: React.FC = () => {
         hideable: true,
         sortable: false,
         cell: (r) => (
-          <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-colors duration-500">
+          <div className="relative w-12 h-12 rounded-admin-md border border-admin-border overflow-hidden bg-admin-surface group-hover:border-admin-border transition-colors duration-500">
             {r.cover_path ? (
               <VentImage
                 src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${r.cover_path}`}
@@ -672,7 +672,7 @@ const ProductsTableBody: React.FC = () => {
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-white/5 text-slate-700 uppercase font-black text-xs">
+              <div className="w-full h-full flex items-center justify-center bg-admin-surface-2 text-admin-fg-subtle font-semibold text-xs">
                 {t('admin.products.noImage')}
               </div>
             )}
@@ -685,10 +685,10 @@ const ProductsTableBody: React.FC = () => {
         sortable: true,
         cell: (r) => (
           <div className="flex flex-col gap-0.5">
-            <span className="text-sm font-bold text-slate-100 line-clamp-1 group-hover:text-cyan-400 transition-colors">
+            <span className="text-sm font-bold text-admin-fg line-clamp-1 group-hover:text-admin-accent transition-colors">
               {r.name}
             </span>
-            <span className="text-xs text-slate-500 font-bold uppercase tracking-tight">
+            <span className="text-xs text-admin-fg-muted font-bold tracking-tight">
               {r.brand || t('admin.products.brandless')}
             </span>
           </div>
@@ -701,11 +701,11 @@ const ProductsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div className="flex flex-col gap-0.5">
-            <code className="text-xs font-mono font-black text-cyan-400/70 bg-cyan-400/10 px-2 py-0.5 rounded-md w-max">
+            <code className="text-xs font-mono font-semibold text-admin-accent bg-admin-accent-weak px-2 py-0.5 rounded-md w-max">
               {r.sku}
             </code>
             {r.model_code && (
-              <span className="text-xs text-slate-500 font-black uppercase tracking-tighter">{r.model_code}</span>
+              <span className="text-xs text-admin-fg-muted font-semibold tracking-tighter">{r.model_code}</span>
             )}
           </div>
         ),
@@ -716,7 +716,7 @@ const ProductsTableBody: React.FC = () => {
         sortable: false,
         hideable: true,
         cell: (r) => (
-          <span className="text-xs font-black text-slate-400 uppercase tracking-tighter">
+          <span className="text-xs font-semibold text-admin-fg-muted tracking-tighter">
             {r.category_id ? catsMap.get(r.category_id) || '-' : '-'}
           </span>
         ),
@@ -761,7 +761,7 @@ const ProductsTableBody: React.FC = () => {
               onSave={(num) => saveInlineEdit(r, 'price', num)}
             />
           ) : (
-            <span className="text-sm font-black text-slate-100">
+            <span className="text-sm font-semibold text-admin-fg">
               {r.price != null ? formatCurrency(Number(r.price), lang) : '-'}
             </span>
           ),
@@ -784,7 +784,7 @@ const ProductsTableBody: React.FC = () => {
               onSave={(num) => saveInlineEdit(r, 'stock_qty', num)}
             />
           ) : (
-            <span className={`text-sm font-black ${low ? 'text-rose-400' : 'text-slate-100'}`}>
+            <span className={`text-sm font-semibold ${low ? 'text-admin-danger' : 'text-admin-fg'}`}>
               {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
             </span>
           )

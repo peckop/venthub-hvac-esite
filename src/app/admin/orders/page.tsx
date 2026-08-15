@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 const Loading = () => {
   const { t } = useI18n();
-  return <div className="p-8 text-center text-slate-400 animate-pulse">{t('admin.common.loading')}</div>;
+  return <div className="p-8 text-center text-admin-fg-muted animate-pulse">{t('admin.common.loading')}</div>;
 };
 
 const AdminOrdersPage = nextDynamic(
@@ -20,7 +20,7 @@ const AdminOrdersPage = nextDynamic(
 export default function Page() {
   const { t } = useI18n()
   return (
-    <Suspense fallback={<div className="p-8 text-center text-slate-400 animate-pulse">{t('common.loading')}</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-admin-fg-muted animate-pulse">{t('common.loading')}</div>}>
       <AdminOrdersPage />
     </Suspense>
   )

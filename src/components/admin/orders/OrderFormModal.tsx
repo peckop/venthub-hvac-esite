@@ -49,7 +49,7 @@ type OrderFormValues = z.infer<ReturnType<typeof buildOrderFormSchema>>
 /** Girdinin hemen altındaki hata satırı. Hata yoksa DOM'a hiçbir şey basmaz. */
 const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
   message ? (
-    <p id={id} role="alert" className="mt-1 px-1 text-xs font-bold uppercase tracking-tighter text-admin-danger">
+    <p id={id} role="alert" className="mt-1 px-1 text-xs font-bold tracking-tighter text-admin-danger">
       {message}
     </p>
   ) : null
@@ -377,49 +377,49 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/60 z-modal" />
         <Dialog.Content
           // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
-          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-90vh overflow-hidden bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col">
-          <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
+          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-90vh overflow-hidden bg-admin-bg border border-admin-border rounded-admin-lg shadow-admin-lg z-modal flex flex-col">
+          <div className="p-6 border-b border-admin-border flex items-center justify-between bg-admin-surface-2">
             <div>
-              <Dialog.Title className="text-xl font-bold text-white tracking-tight">
+              <Dialog.Title className="text-xl font-bold text-admin-fg tracking-tight">
                 {order ? `${t('admin.orders.orderDetails')} — ${order.order_number || order.id.slice(0, 8)}` : ''}
               </Dialog.Title>
-              <Dialog.Description className="text-sm text-slate-400 mt-1">
+              <Dialog.Description className="text-sm text-admin-fg-muted mt-1">
                 {t('admin.orders.form.descEdit')}
               </Dialog.Description>
             </div>
-            <Dialog.Close className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white">
+            <Dialog.Close className="p-2 rounded-admin-md hover:bg-admin-surface-3 transition-colors text-admin-fg-muted hover:text-admin-fg">
               <X size={20} />
             </Dialog.Close>
           </div>
 
           {loadingOrder ? (
             <div className="flex-1 flex flex-col items-center justify-center p-12 gap-4">
-              <Loader2 className="animate-spin text-cyan-400" size={32} />
-              <span className="text-xs font-black uppercase tracking-widest text-slate-500">
+              <Loader2 className="animate-spin text-admin-accent" size={32} />
+              <span className="text-xs font-semibold text-admin-fg-muted">
                 {t('admin.common.loading')}
               </span>
             </div>
           ) : (
             <Tabs.Root defaultValue="general" className="flex-1 flex flex-col overflow-hidden">
-              <Tabs.List className="px-6 py-2 border-b border-white/5 flex gap-4 bg-white/1">
+              <Tabs.List className="px-6 py-2 border-b border-admin-border flex gap-4 bg-admin-surface-2">
                 <Tabs.Trigger
                   value="general"
-                  className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors"
+                  className="px-4 py-2 text-xs font-bold text-admin-fg-muted border-b-2 border-transparent data-[state=active]:text-admin-accent data-[state=active]:border-admin-accent transition-colors"
                 >
                   {t('admin.settings.tabGeneral')}
                 </Tabs.Trigger>
                 <Tabs.Trigger
                   value="shipping"
-                  className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors"
+                  className="px-4 py-2 text-xs font-bold text-admin-fg-muted border-b-2 border-transparent data-[state=active]:text-admin-accent data-[state=active]:border-admin-accent transition-colors"
                 >
                   {t('admin.orders.form.tabShipping')}
                 </Tabs.Trigger>
                 <Tabs.Trigger
                   value="items"
-                  className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors animate-in fade-in"
+                  className="px-4 py-2 text-xs font-bold text-admin-fg-muted border-b-2 border-transparent data-[state=active]:text-admin-accent data-[state=active]:border-admin-accent transition-colors animate-in fade-in"
                 >
                   {t('admin.orders.form.tabItems')}
                 </Tabs.Trigger>
@@ -430,7 +430,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                   <Tabs.Content value="general" className="space-y-6">
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label htmlFor="order-customer-name" className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label htmlFor="order-customer-name" className="text-xs font-semibold text-admin-fg-muted px-1">
                           {t('admin.orders.form.customerName')}
                         </label>
                         <input
@@ -438,13 +438,13 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                           {...form.register('customer_name')}
                           aria-invalid={customerNameError ? true : undefined}
                           aria-describedby={customerNameError ? 'order-customer-name-error' : undefined}
-                          className={`w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600${customerNameError ? ' !border-admin-danger' : ''}`}
+                          className={`w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle${customerNameError ? ' !border-admin-danger' : ''}`}
                         />
                         <FieldError id="order-customer-name-error" message={customerNameError} />
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="order-customer-email" className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label htmlFor="order-customer-email" className="text-xs font-semibold text-admin-fg-muted px-1">
                           {t('admin.orders.form.customerEmail')}
                         </label>
                         <input
@@ -452,7 +452,7 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                           {...form.register('customer_email')}
                           aria-invalid={customerEmailError ? true : undefined}
                           aria-describedby={customerEmailError ? 'order-customer-email-error' : undefined}
-                          className={`w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600${customerEmailError ? ' !border-admin-danger' : ''}`}
+                          className={`w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle${customerEmailError ? ' !border-admin-danger' : ''}`}
                         />
                         <FieldError id="order-customer-email-error" message={customerEmailError} />
                       </div>
@@ -460,17 +460,17 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
 
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label className="text-xs font-semibold text-admin-fg-muted px-1">
                           {t('admin.orders.form.customerPhone')}
                         </label>
                         <input
                           {...form.register('customer_phone')}
-                          className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600"
+                          className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="order-status" className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label htmlFor="order-status" className="text-xs font-semibold text-admin-fg-muted px-1">
                           {t('admin.orders.form.orderStatus')}
                         </label>
                         <select
@@ -478,30 +478,30 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                           {...form.register('status')}
                           aria-invalid={statusError ? true : undefined}
                           aria-describedby={statusError ? 'order-status-error' : undefined}
-                          className={`w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer${statusError ? ' !border-admin-danger' : ''}`}
+                          className={`w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors appearance-none cursor-pointer${statusError ? ' !border-admin-danger' : ''}`}
                         >
-                          <option value="pending" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'pending')}>
+                          <option value="pending" className="bg-admin-bg" disabled={!isStatusTransitionAllowed(currentStatus, 'pending')}>
                             {t('admin.orders.statusLabels.pending')}
                           </option>
-                          <option value="paid" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'paid')}>
+                          <option value="paid" className="bg-admin-bg" disabled={!isStatusTransitionAllowed(currentStatus, 'paid')}>
                             {t('admin.orders.statusLabels.paid')}
                           </option>
-                          <option value="confirmed" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'confirmed')}>
+                          <option value="confirmed" className="bg-admin-bg" disabled={!isStatusTransitionAllowed(currentStatus, 'confirmed')}>
                             {t('admin.orders.statusLabels.confirmed')}
                           </option>
-                          <option value="shipped" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'shipped')}>
+                          <option value="shipped" className="bg-admin-bg" disabled={!isStatusTransitionAllowed(currentStatus, 'shipped')}>
                             {t('admin.orders.statusLabels.shipped')}
                           </option>
-                          <option value="delivered" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'delivered')}>
+                          <option value="delivered" className="bg-admin-bg" disabled={!isStatusTransitionAllowed(currentStatus, 'delivered')}>
                             {t('admin.orders.statusLabels.delivered')}
                           </option>
-                          <option value="cancelled" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'cancelled')}>
+                          <option value="cancelled" className="bg-admin-bg" disabled={!isStatusTransitionAllowed(currentStatus, 'cancelled')}>
                             {t('admin.orders.statusLabels.cancelled')}
                           </option>
-                          <option value="refunded" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'refunded')}>
+                          <option value="refunded" className="bg-admin-bg" disabled={!isStatusTransitionAllowed(currentStatus, 'refunded')}>
                             {t('admin.orders.statusLabels.refunded')}
                           </option>
-                          <option value="partial_refunded" className="bg-surface-deep" disabled={!isStatusTransitionAllowed(currentStatus, 'partial_refunded')}>
+                          <option value="partial_refunded" className="bg-admin-bg" disabled={!isStatusTransitionAllowed(currentStatus, 'partial_refunded')}>
                             {t('admin.orders.statusLabels.partialRefunded')}
                           </option>
                         </select>
@@ -513,39 +513,39 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                   <Tabs.Content value="shipping" className="space-y-6">
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label className="text-xs font-semibold text-admin-fg-muted px-1">
                           {t('admin.orders.form.carrier')}
                         </label>
                         <input
                           {...form.register('carrier')}
-                          className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600"
+                          className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label className="text-xs font-semibold text-admin-fg-muted px-1">
                           {t('admin.orders.form.trackingNumber')}
                         </label>
                         <input
                           {...form.register('tracking_number')}
-                          className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600"
+                          className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label className="text-xs font-semibold text-admin-fg-muted px-1">
                           {t('admin.orders.form.shippingMethod')}
                         </label>
                         <select
                           {...form.register('shipping_method')}
-                          className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer"
+                          className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors appearance-none cursor-pointer"
                         >
-                          <option value="standard" className="bg-surface-deep">
+                          <option value="standard" className="bg-admin-bg">
                             {t('admin.orders.form.shippingStandard')}
                           </option>
-                          <option value="express" className="bg-surface-deep">
+                          <option value="express" className="bg-admin-bg">
                             {t('admin.orders.form.shippingExpress')}
                           </option>
                         </select>
@@ -554,41 +554,41 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                   </Tabs.Content>
 
                   <Tabs.Content value="items" className="space-y-6">
-                    <div className="glass rounded-2xl border border-white/5 overflow-hidden">
-                      <table className="min-w-full text-xs divide-y divide-white/5">
-                        <thead className="bg-white/3">
+                    <div className="bg-admin-surface rounded-admin-lg border border-admin-border overflow-hidden">
+                      <table className="min-w-full text-xs divide-y divide-admin-border">
+                        <thead className="bg-admin-surface-2">
                           <tr>
-                            <th className="px-6 py-4 text-left font-black text-slate-500 uppercase tracking-wider">
+                            <th className="px-4 py-2.5 text-left font-semibold text-admin-fg-muted">
                               {t('admin.orders.form.itemsTableProduct')}
                             </th>
-                            <th className="px-6 py-4 text-center font-black text-slate-500 uppercase tracking-wider w-20">
+                            <th className="px-4 py-2.5 text-center font-semibold text-admin-fg-muted w-20">
                               {t('admin.orders.form.itemsTableQuantity')}
                             </th>
-                            <th className="px-6 py-4 text-right font-black text-slate-500 uppercase tracking-wider w-32">
+                            <th className="px-4 py-2.5 text-right font-semibold text-admin-fg-muted w-32">
                               {t('admin.orders.form.itemsTableUnitPrice')}
                             </th>
-                            <th className="px-6 py-4 text-right font-black text-slate-500 uppercase tracking-wider w-32">
+                            <th className="px-4 py-2.5 text-right font-semibold text-admin-fg-muted w-32">
                               {t('admin.orders.form.itemsTableTotal')}
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/2">
+                        <tbody className="divide-y divide-admin-border">
                           {items.map((it) => {
                             const qty = Number(it.quantity) || 0
                             const unitPrice = Number(it.price_at_time) || 0
                             const totalPrice = qty * unitPrice
                             return (
-                              <tr key={it.id} className="hover:bg-white/2 transition-colors">
-                                <td className="px-6 py-4 font-bold text-slate-200">
+                              <tr key={it.id} className="hover:bg-admin-surface-2 transition-colors">
+                                <td className="px-4 py-2.5 text-admin-fg">
                                   {it.product_name}
                                 </td>
-                                <td className="px-6 py-4 text-center text-slate-300 font-bold">
+                                <td className="px-4 py-2.5 text-center text-admin-fg">
                                   {qty}
                                 </td>
-                                <td className="px-6 py-4 text-right text-slate-300 font-mono">
+                                <td className="px-4 py-2.5 text-right text-admin-fg font-mono">
                                   {formatCurrency(unitPrice, lang)}
                                 </td>
-                                <td className="px-6 py-4 text-right text-cyan-400 font-mono font-bold">
+                                <td className="px-4 py-2.5 text-right text-admin-accent font-mono">
                                   {formatCurrency(totalPrice, lang)}
                                 </td>
                               </tr>
@@ -601,11 +601,11 @@ const OrderFormModal: React.FC<OrderFormModalProps> = ({ open, onOpenChange, ord
                 </form>
               </div>
 
-              <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/2">
+              <div className="p-6 border-t border-admin-border flex items-center justify-between bg-admin-surface-2">
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="px-6 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors"
+                  className="px-6 py-3 text-xs font-bold text-admin-fg-muted hover:text-admin-fg transition-colors"
                 >
                   {t('admin.categories.cancel')}
                 </button>

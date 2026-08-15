@@ -65,10 +65,10 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
             const data = payload[0].payload
             const formattedTime = `${data.dayName}, ${String(data.hour).padStart(2, '0')}:00`
             return (
-                <div className="glass-strong border border-white/5 py-3 px-5 rounded-2xl z-50 shadow-elevation-4 animate-in fade-in zoom-in-95 duration-200">
-                    <p className="text-sm font-black text-white mb-2 uppercase tracking-wider">{formattedTime}</p>
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
-                        {t('admin.dashboard.heatmap.order')}: <span className="text-cyan-400 drop-shadow-heatmap-glow">{data.count}</span>
+                <div className="bg-admin-surface border border-admin-border py-3 px-5 rounded-admin-lg z-50 shadow-elevation-4 animate-in fade-in zoom-in-95 duration-200">
+                    <p className="text-sm font-semibold text-admin-fg mb-2">{formattedTime}</p>
+                    <p className="text-xs font-semibold text-admin-fg-muted">
+                        {t('admin.dashboard.heatmap.order')}: <span className="text-admin-accent drop-shadow-heatmap-glow">{data.count}</span>
                     </p>
                 </div>
             )
@@ -90,8 +90,8 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
         <div className="flex flex-col h-full w-full group/heatmap">
             {title && (
                 <div className="mb-10">
-                    <h3 className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed group-hover/heatmap:text-cyan-400 transition-colors uppercase">{title}</h3>
-                    <div className="h-0.5 w-12 bg-cyan-500/30 mt-2 rounded-full group-hover/heatmap:w-20 transition-colors duration-700" />
+                    <h3 className="text-xs font-semibold text-admin-fg-muted group-hover/heatmap:text-admin-accent transition-colors">{title}</h3>
+                    <div className="h-0.5 w-12 bg-admin-accent-weak mt-2 rounded-full group-hover/heatmap:w-20 transition-colors duration-700" />
                 </div>
             )}
 
@@ -107,7 +107,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
             ) : (
                 <div className="w-full flex-1 min-h-300px -ml-6 relative">
                     {/* Background decorative glow */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-cyan-500/5 blur-80 rounded-full pointer-events-none" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-admin-accent-weak blur-80 rounded-full pointer-events-none" />
                     
                     <ResponsiveContainer width="100%" height="100%">
                         <ScatterChart margin={{ top: 10, right: 30, bottom: 20, left: 30 }}>
@@ -172,11 +172,11 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
 
             {chartData.length > 0 && (
                 <div className="mt-8 flex items-center justify-end gap-4 px-6 relative z-10">
-                    <span className="text-xs text-slate-600 font-black uppercase tracking-hvac-normal italic">{t('admin.dashboard.heatmap.densityScale')}</span>
-                    <div className="flex items-center gap-2 p-1.5 glass rounded-full border border-white/5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-20 border border-white/10"></div>
-                        <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-50 border border-white/10"></div>
-                        <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-100 shadow-glow-md border border-cyan-400/20"></div>
+                    <span className="text-xs text-admin-fg-subtle font-semibold italic">{t('admin.dashboard.heatmap.densityScale')}</span>
+                    <div className="flex items-center gap-2 p-1.5 bg-admin-surface rounded-full border border-admin-border">
+                        <div className="w-2.5 h-2.5 rounded-full bg-admin-accent opacity-20 border border-admin-border"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-admin-accent opacity-50 border border-admin-border"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-admin-accent opacity-100 border border-admin-accent/30"></div>
                     </div>
                 </div>
             )}

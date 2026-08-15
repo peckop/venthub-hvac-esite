@@ -135,28 +135,28 @@ function prettyStatus(s: string, t: (key: string, params?: Record<string, unknow
 
 function badgeClass(s: string): string {
   if (!s)
-    return 'inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-hvac-snug px-3 py-1.5 rounded-full border bg-white/5 text-slate-400 border-white/5 ring-1 ring-white/10 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-colors'
+    return 'inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border bg-admin-surface-2 text-admin-fg-muted border-admin-border ring-1 ring-admin-border transition-colors'
   const base =
-    'inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-hvac-snug px-3 py-1.5 rounded-full border group-hover:scale-105 transition-colors shadow-[0_0_15px_rgba(0,0,0,0.1)]'
+    'inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border group-hover:scale-105 transition-colors'
   const key = s.toLowerCase()
   switch (key) {
     case 'pending':
-      return `${base} bg-slate-500/10 text-slate-400 border-slate-500/20 ring-1 ring-slate-500/10`
+      return `${base} bg-admin-surface-3 text-admin-fg-muted border-admin-border ring-1 ring-admin-border`
     case 'paid':
-      return `${base} bg-emerald-500/10 text-emerald-400 border-emerald-500/20 ring-1 ring-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.1)]`
+      return `${base} bg-admin-success-weak text-admin-success border-admin-success/30 ring-1 ring-admin-success/30`
     case 'confirmed':
-      return `${base} bg-cyan-500/10 text-cyan-400 border-cyan-500/20 ring-1 ring-cyan-500/10 shadow-[0_0_20px_rgba(34,211,238,0.1)]`
+      return `${base} bg-admin-accent-weak text-admin-accent border-admin-accent/30 ring-1 ring-admin-accent/30`
     case 'shipped':
-      return `${base} bg-amber-500/10 text-amber-400 border-amber-500/20 ring-1 ring-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.1)]`
+      return `${base} bg-admin-warning-weak text-admin-warning border-admin-warning/30 ring-1 ring-admin-warning/30`
     case 'delivered':
-      return `${base} bg-indigo-500/10 text-indigo-400 border-indigo-500/20 ring-1 ring-indigo-500/10 shadow-[0_0_20px_rgba(99,102,241,0.1)]`
+      return `${base} bg-admin-accent-weak text-admin-accent border-admin-accent/30 ring-1 ring-admin-accent/30`
     case 'cancelled':
-      return `${base} bg-rose-500/10 text-rose-400 border-rose-500/20 ring-1 ring-rose-500/10 shadow-[0_0_20px_rgba(244,63,94,0.1)]`
+      return `${base} bg-admin-danger-weak text-admin-danger border-admin-danger/30 ring-1 ring-admin-danger/30`
     case 'refunded':
     case 'partial_refunded':
-      return `${base} bg-orange-500/10 text-orange-400 border-orange-500/20 ring-1 ring-orange-500/10 shadow-[0_0_20px_rgba(249,115,22,0.1)]`
+      return `${base} bg-admin-warning-weak text-admin-warning border-admin-warning/30 ring-1 ring-admin-warning/30`
     default:
-      return `${base} bg-white/5 text-slate-400 border-white/5 ring-1 ring-white/10 shadow-[0_0_15px_rgba(0,0,0,0.1)]`
+      return `${base} bg-admin-surface-2 text-admin-fg-muted border-admin-border ring-1 ring-admin-border`
   }
 }
 
@@ -355,8 +355,8 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-12 gap-4">
-        <div className="animate-spin w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
-        <span className="text-xs font-black uppercase tracking-hvac-relaxed text-slate-500">
+        <div className="animate-spin w-8 h-8 border-2 border-admin-accent/30 border-t-cyan-500 rounded-full" />
+        <span className="text-xs font-semibold text-admin-fg-muted">
           {t('admin.common.loading')}
         </span>
       </div>
@@ -365,8 +365,8 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
 
   if (!order) {
     return (
-      <div className="glass p-8 rounded-2xl border border-white/5 text-center">
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+      <div className="bg-admin-surface p-8 rounded-admin-lg border border-admin-border text-center">
+        <p className="text-xs font-bold text-admin-fg-muted">
           {t('admin.orders.states.noRecords')}
         </p>
       </div>
@@ -380,8 +380,8 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-0.5 bg-cyan-400" />
-        <h4 className="text-xs font-black text-cyan-400 uppercase tracking-hvac-relaxed">
+        <div className="w-8 h-0.5 bg-admin-accent" />
+        <h4 className="text-xs font-semibold text-admin-accent">
           {t('admin.orders.orderDetails')}
         </h4>
       </div>
@@ -389,44 +389,44 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Sol Kolon: Ürünler */}
         <div className="lg:col-span-2 space-y-4">
-          <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">
+          <h5 className="text-xs font-semibold text-admin-fg-muted">
             {t('common.products')}
           </h5>
-          <div className="glass rounded-2xl border border-white/5 overflow-hidden">
-            <table className="min-w-full text-xs divide-y divide-white/5">
-              <thead className="bg-white/3">
+          <div className="bg-admin-surface rounded-admin-lg border border-admin-border overflow-hidden">
+            <table className="min-w-full text-xs divide-y divide-admin-border">
+              <thead className="bg-admin-surface-2">
                 <tr>
-                  <th className="px-6 py-4 text-left font-black text-slate-500 uppercase tracking-wider">
+                  <th className="px-4 py-2.5 text-left font-semibold text-admin-fg-muted">
                     {t('orders.productCol')}
                   </th>
-                  <th className="px-6 py-4 text-center font-black text-slate-500 uppercase tracking-wider w-20">
+                  <th className="px-4 py-2.5 text-center font-semibold text-admin-fg-muted w-20">
                     {t('orders.qtyCol')}
                   </th>
-                  <th className="px-6 py-4 text-right font-black text-slate-500 uppercase tracking-wider w-32">
+                  <th className="px-4 py-2.5 text-right font-semibold text-admin-fg-muted w-32">
                     {t('orders.unitPriceCol')}
                   </th>
-                  <th className="px-6 py-4 text-right font-black text-slate-500 uppercase tracking-wider w-32">
+                  <th className="px-4 py-2.5 text-right font-semibold text-admin-fg-muted w-32">
                     {t('orders.totalCol')}
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/2">
+              <tbody className="divide-y divide-admin-border">
                 {items.map((it: DetailOrderItem) => {
                   const qty = Number(it.quantity) || 0
                   const unitPrice = Number(it.price_at_time) || 0
                   const totalPrice = qty * unitPrice
                   return (
-                    <tr key={it.id} className="hover:bg-white/2 transition-colors">
-                      <td className="px-6 py-4 font-bold text-slate-200">
+                    <tr key={it.id} className="hover:bg-admin-surface-2 transition-colors">
+                      <td className="px-4 py-2.5 text-admin-fg">
                         {it.product_name}
                       </td>
-                      <td className="px-6 py-4 text-center text-slate-300 font-bold">
+                      <td className="px-4 py-2.5 text-center text-admin-fg">
                         {qty}
                       </td>
-                      <td className="px-6 py-4 text-right text-slate-300 font-mono">
+                      <td className="px-4 py-2.5 text-right text-admin-fg font-mono">
                         {formatCurrency(unitPrice, lang)}
                       </td>
-                      <td className="px-6 py-4 text-right text-cyan-400 font-mono font-bold">
+                      <td className="px-4 py-2.5 text-right text-admin-accent font-mono">
                         {formatCurrency(totalPrice, lang)}
                       </td>
                     </tr>
@@ -440,20 +440,20 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
         {/* Sağ Kolon: Teslimat & Fatura */}
         <div className="space-y-6">
           {/* Müşteri & Teslimat */}
-          <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
-            <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">
+          <div className="bg-admin-surface p-6 rounded-admin-lg border border-admin-border space-y-4">
+            <h5 className="text-xs font-semibold text-admin-fg-muted">
               {t('orders.shippingInfo')}
             </h5>
             <div className="space-y-3 text-xs">
               <div>
-                <span className="text-slate-500 font-bold block">{t('orders.name')}:</span>
-                <span className="text-slate-200 font-bold block">{order.customer_name}</span>
-                <span className="text-slate-400 font-medium block">{order.customer_email}</span>
+                <span className="text-admin-fg-muted font-bold block">{t('orders.name')}:</span>
+                <span className="text-admin-fg font-bold block">{order.customer_name}</span>
+                <span className="text-admin-fg-muted font-medium block">{order.customer_email}</span>
               </div>
               {addr && (
                 <div>
-                  <span className="text-slate-500 font-bold block">{t('orders.deliveryAddress')}:</span>
-                  <p className="text-slate-300 mt-1 font-medium leading-relaxed">
+                  <span className="text-admin-fg-muted font-bold block">{t('orders.deliveryAddress')}:</span>
+                  <p className="text-admin-fg mt-1 font-medium leading-relaxed">
                     {addr.fullAddress || addr.street}<br />
                     {[addr.city, addr.district || addr.state].filter(Boolean).join(', ')}<br />
                     {addr.postalCode || addr.postal_code}
@@ -462,8 +462,8 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
               )}
               {order.shipping_method && (
                 <div>
-                  <span className="text-slate-500 font-bold block">{t('account.orderDetail.shippingMethod')}:</span>
-                  <span className="text-slate-300 font-bold uppercase">
+                  <span className="text-admin-fg-muted font-bold block">{t('account.orderDetail.shippingMethod')}:</span>
+                  <span className="text-admin-fg font-bold">
                     {order.shipping_method === 'express'
                       ? t('account.orderDetail.express')
                       : t('account.orderDetail.standard')}
@@ -474,30 +474,30 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
           </div>
 
           {/* Fatura Bilgileri */}
-          <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
-            <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">
+          <div className="bg-admin-surface p-6 rounded-admin-lg border border-admin-border space-y-4">
+            <h5 className="text-xs font-semibold text-admin-fg-muted">
               {t('account.orderDetail.invoiceInfo')}
             </h5>
             <div className="space-y-3 text-xs">
               <div>
-                <span className="text-slate-500 font-bold block">{t('account.orderDetail.typeLabel')}</span>
-                <span className="text-slate-200 font-bold block uppercase">
+                <span className="text-admin-fg-muted font-bold block">{t('account.orderDetail.typeLabel')}</span>
+                <span className="text-admin-fg font-bold block">
                   {order.invoice_type === 'corporate'
                     ? t('checkout.invoice.corporate')
                     : t('checkout.invoice.individual')}
                 </span>
               </div>
               {invoice && (
-                <div className="space-y-2 text-slate-300 font-medium leading-relaxed">
+                <div className="space-y-2 text-admin-fg font-medium leading-relaxed">
                   {order.invoice_type === 'corporate' ? (
                     <>
-                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.companyTitleLabel')}</span> {invoice.companyName || invoice.company_name}</p>
-                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.taxOfficeLabel')}</span> {invoice.taxOffice || invoice.tax_office}</p>
-                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.vknLabel')}</span> {invoice.taxNumber || invoice.tax_no}</p>
+                      <p><span className="text-admin-fg-muted font-bold">{t('account.orderDetail.companyTitleLabel')}</span> {invoice.companyName || invoice.company_name}</p>
+                      <p><span className="text-admin-fg-muted font-bold">{t('account.orderDetail.taxOfficeLabel')}</span> {invoice.taxOffice || invoice.tax_office}</p>
+                      <p><span className="text-admin-fg-muted font-bold">{t('account.orderDetail.vknLabel')}</span> {invoice.taxNumber || invoice.tax_no}</p>
                     </>
                   ) : (
                     <>
-                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.tcknLabel')}</span> {invoice.tcNo || invoice.tc_no || invoice.national_id}</p>
+                      <p><span className="text-admin-fg-muted font-bold">{t('account.orderDetail.tcknLabel')}</span> {invoice.tcNo || invoice.tc_no || invoice.national_id}</p>
                     </>
                   )}
                 </div>
@@ -942,10 +942,10 @@ const OrdersTableBody: React.FC = () => {
           const shortId = `${r.id.slice(0, 8)}...`
           return (
             <div className="flex flex-col gap-1">
-              <span className="font-black text-white uppercase tracking-wider text-xs">
+              <span className="font-semibold text-admin-fg text-xs">
                 {r.order_number || r.id.slice(0, 8)}
               </span>
-              {r.order_number && <span className="text-xs text-slate-500 font-mono">{shortId}</span>}
+              {r.order_number && <span className="text-xs text-admin-fg-muted font-mono">{shortId}</span>}
             </div>
           )
         },
@@ -963,7 +963,7 @@ const OrdersTableBody: React.FC = () => {
         sortable: true,
         hideable: true,
         cell: (r) => (
-          <span className="text-xs font-medium text-slate-400 font-mono italic">{r.conversation_id || '-'}</span>
+          <span className="text-xs font-medium text-admin-fg-muted font-mono italic">{r.conversation_id || '-'}</span>
         ),
       },
       {
@@ -973,7 +973,7 @@ const OrdersTableBody: React.FC = () => {
         hideable: true,
         align: 'right',
         cell: (r) => (
-          <span className="font-black text-white text-xs tracking-wider">{formatAmount(r.total_amount, lang)}</span>
+          <span className="font-semibold text-admin-fg text-xs">{formatAmount(r.total_amount, lang)}</span>
         ),
       },
       {
@@ -982,7 +982,7 @@ const OrdersTableBody: React.FC = () => {
         sortable: true,
         hideable: true,
         cell: (r) => (
-          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">
+          <span className="text-xs font-semibold text-admin-fg-muted">
             {safeDate(r.created_at, lang)}
           </span>
         ),
@@ -998,14 +998,14 @@ const OrdersTableBody: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => openEditModal(r.id)}
-                  className="px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-xs font-black uppercase text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors"
+                  className="px-3 py-1.5 rounded-admin-md bg-admin-accent-weak border border-admin-accent/30 text-xs font-semibold text-admin-accent hover:bg-admin-accent hover:text-admin-accent-fg transition-colors"
                 >
                   {t('admin.common.edit')}
                 </button>
                 <button
                   type="button"
                   onClick={() => void openShipModal(r.id)}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors"
+                  className="px-3 py-1.5 rounded-admin-md bg-admin-surface-2 border border-admin-border text-xs font-semibold text-admin-accent hover:bg-admin-accent hover:text-admin-accent-fg transition-colors"
                 >
                   {t('admin.orders.actions.shipping')}
                 </button>
@@ -1014,14 +1014,14 @@ const OrdersTableBody: React.FC = () => {
             <button
               type="button"
               onClick={() => void openLogsModal(r.id)}
-              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-amber-400 hover:bg-amber-500 hover:text-white transition-colors"
+              className="px-3 py-1.5 rounded-admin-md bg-admin-surface-2 border border-admin-border text-xs font-semibold text-admin-warning hover:bg-admin-warning hover:text-admin-warning-fg transition-colors"
             >
               {t('admin.orders.actions.logs')}
             </button>
             <button
               type="button"
               onClick={() => void openNotesModal(r.id)}
-              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-slate-400 hover:bg-slate-500 hover:text-white transition-colors"
+              className="px-3 py-1.5 rounded-admin-md bg-admin-surface-2 border border-admin-border text-xs font-semibold text-admin-fg-muted hover:bg-admin-surface-3 hover:text-admin-fg transition-colors"
             >
               {t('admin.orders.actions.notes')}
             </button>

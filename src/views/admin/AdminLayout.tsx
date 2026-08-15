@@ -11,17 +11,17 @@ import AccessDenied from '../../components/admin/AccessDenied'
 import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
 import CommandPalette from '../../components/admin/CommandPalette'
 import { ConfirmProvider } from '../../components/admin/overlay/ConfirmProvider'
-import AdminThemeToggle from '../../components/admin/shell/AdminThemeToggle'
 import { AdminMobileNav, AdminSidebar } from '../../components/admin/shell/AdminSidebar'
+import AdminThemeToggle from '../../components/admin/shell/AdminThemeToggle'
 import { navCookieName } from '../../components/admin/shell/navCookie'
 import {
   ADMIN_THEME_COOKIE_MAX_AGE,
   ADMIN_THEME_DEFAULT,
   ADMIN_THEME_RESOLVED_DEFAULT,
   adminThemeCookieName,
-  serializeAdminTheme,
   type AdminThemePreference,
   type AdminThemeResolved,
+  serializeAdminTheme,
 } from '../../components/admin/shell/themeCookie'
 import { isAdminByEmail } from '../../config/admin'
 import { buildBreadcrumbTrail } from '../../config/admin-resources'
@@ -190,9 +190,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       */}
       <a
         href="#admin-main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-toast
-          focus:rounded-admin-sm focus:bg-admin-accent focus:px-4 focus:py-2 focus:text-sm
-          focus:font-medium focus:text-admin-accent-fg"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-toast
+          focus-visible:rounded-admin-sm focus-visible:bg-admin-accent focus-visible:px-4 focus-visible:py-2 focus-visible:text-sm
+          focus-visible:font-medium focus-visible:text-admin-accent-fg"
       >
         {t('admin.a11y.skipToContent')}
       </a>

@@ -66,12 +66,12 @@ const ROLE_BUTTON_ICON: Record<UserRoleCode, React.ReactNode> = {
 }
 
 const ROLE_BUTTON_TONE: Record<UserRoleCode, string> = {
-  super_admin: 'text-amber-500 hover:bg-amber-500/10 hover:border-amber-500/50',
-  admin: 'text-indigo-400 hover:bg-indigo-400/10 hover:border-indigo-400/50',
-  warehouse: 'text-orange-400 hover:bg-orange-400/10 hover:border-orange-400/50',
-  sales: 'text-blue-400 hover:bg-blue-400/10 hover:border-blue-400/50',
-  viewer: 'text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/50',
-  user: 'text-slate-400 hover:bg-white/10 hover:border-white/20',
+  super_admin: 'text-admin-warning hover:bg-admin-warning-weak hover:border-admin-warning/30',
+  admin: 'text-admin-accent hover:bg-admin-accent-weak hover:border-admin-accent/30',
+  warehouse: 'text-admin-warning hover:bg-admin-warning-weak hover:border-admin-warning/30',
+  sales: 'text-admin-accent hover:bg-admin-accent-weak hover:border-admin-accent/30',
+  viewer: 'text-admin-success hover:bg-admin-success-weak hover:border-admin-success/30',
+  user: 'text-admin-fg-muted hover:bg-admin-surface-3 hover:border-admin-border',
 }
 
 const ROLE_KEYS: UserRoleCode[] = ['super_admin', 'admin', 'warehouse', 'sales', 'viewer', 'user']
@@ -112,38 +112,38 @@ const UserSpecsRow: React.FC<UserSpecsRowProps> = ({ userRow }) => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-8 h-0.5 bg-cyan-400" />
-        <h4 className="text-xs font-black text-cyan-400 uppercase tracking-hvac-relaxed">
+        <div className="w-8 h-0.5 bg-admin-accent" />
+        <h4 className="text-xs font-semibold text-admin-accent">
           {t('admin.users.expand.title')}
         </h4>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
-          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+        <div className="bg-admin-surface p-4 rounded-admin-lg border border-admin-border hover:border-admin-border transition-colors group/spec">
+          <div className="text-xs text-admin-fg-muted font-bold mb-1 group-hover/spec:text-admin-accent transition-colors">
             {t('admin.users.expand.id')}
           </div>
-          <div className="text-xs font-mono text-slate-200 break-all select-all">{userRow.id}</div>
+          <div className="text-xs font-mono text-admin-fg break-all select-all">{userRow.id}</div>
         </div>
 
-        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
-          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+        <div className="bg-admin-surface p-4 rounded-admin-lg border border-admin-border hover:border-admin-border transition-colors group/spec">
+          <div className="text-xs text-admin-fg-muted font-bold mb-1 group-hover/spec:text-admin-accent transition-colors">
             {t('admin.users.expand.fullName')}
           </div>
-          <div className="text-xs font-black text-slate-200 uppercase">{userRow.full_name || '—'}</div>
+          <div className="text-xs font-semibold text-admin-fg">{userRow.full_name || '—'}</div>
         </div>
 
-        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
-          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+        <div className="bg-admin-surface p-4 rounded-admin-lg border border-admin-border hover:border-admin-border transition-colors group/spec">
+          <div className="text-xs text-admin-fg-muted font-bold mb-1 group-hover/spec:text-admin-accent transition-colors">
             {t('admin.users.expand.phone')}
           </div>
-          <div className="text-xs font-black text-slate-200">{profile?.phone || '—'}</div>
+          <div className="text-xs font-semibold text-admin-fg">{profile?.phone || '—'}</div>
         </div>
 
-        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
-          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+        <div className="bg-admin-surface p-4 rounded-admin-lg border border-admin-border hover:border-admin-border transition-colors group/spec">
+          <div className="text-xs text-admin-fg-muted font-bold mb-1 group-hover/spec:text-admin-accent transition-colors">
             {t('admin.users.expand.organizationId')}
           </div>
-          <div className="text-xs font-black text-slate-200">{profile?.organization_id || '—'}</div>
+          <div className="text-xs font-semibold text-admin-fg">{profile?.organization_id || '—'}</div>
         </div>
       </div>
     </div>
@@ -358,21 +358,21 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   const getRoleIcon = useCallback((roleCode: string) => {
     switch (roleCode) {
       case 'super_admin':
-        return <Crown className="text-purple-400" size={14} />
+        return <Crown className="text-admin-accent" size={14} />
       case 'admin':
-        return <Shield className="text-indigo-400" size={14} />
+        return <Shield className="text-admin-accent" size={14} />
       case 'warehouse':
       case 'sales':
-        return <ShieldCheck className="text-cyan-400" size={14} />
+        return <ShieldCheck className="text-admin-accent" size={14} />
       default:
-        return <Users className="text-slate-500" size={14} />
+        return <Users className="text-admin-fg-muted" size={14} />
     }
   }, [])
 
   const UserAvatar = useCallback(({ name, email }: { name?: string; email?: string }) => {
     const initial = (name || email || '?').charAt(0).toUpperCase()
     return (
-      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-cyan-400 font-black border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-500 shrink-0">
+      <div className="w-10 h-10 rounded-admin-md bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-admin-accent font-semibold border border-admin-border shadow-admin-md group-hover:scale-110 transition-transform duration-500 shrink-0">
         {initial}
       </div>
     )
@@ -385,7 +385,7 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         type="button"
         onClick={() => handleRoleChange(row, target)}
         disabled={disabled}
-        className={`w-8 h-8 rounded-xl glass border border-white/5 flex items-center justify-center transition-transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${ROLE_BUTTON_TONE[target]}`}
+        className={`w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center transition-transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${ROLE_BUTTON_TONE[target]}`}
         title={t(`admin.users.actionTitles.${target}`)}
         aria-label={t(`admin.users.actionTitles.${target}`)}
       >
@@ -406,11 +406,11 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
           <div className="flex items-center gap-4">
             <UserAvatar name={r.full_name || undefined} email={r.email} />
             <div className="flex flex-col min-w-0">
-              <span className="font-black text-slate-100 truncate uppercase tracking-tight">
+              <span className="font-semibold text-admin-fg truncate tracking-tight">
                 {r.email ? r.email : t('admin.users.noEmail')}
               </span>
               {r.full_name && (
-                <span className="text-xs text-slate-500 font-bold truncate uppercase tracking-widest mt-0.5">
+                <span className="text-xs text-admin-fg-muted font-bold truncate mt-0.5">
                   {r.full_name}
                 </span>
               )}
@@ -423,9 +423,9 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         header: t('admin.users.table.role'),
         hideable: true,
         cell: (r) => (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl glass border border-white/5 text-xs font-black uppercase tracking-widest shadow-lg group-hover:border-cyan-400/30 transition-shadow duration-500">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-admin-md bg-admin-surface border border-admin-border text-xs font-semibold shadow-admin-md group-hover:border-admin-accent/30 transition-shadow duration-500">
             {getRoleIcon(r.role)}
-            <span className="text-slate-300 group-hover:text-cyan-400 transition-colors">
+            <span className="text-admin-fg group-hover:text-admin-accent transition-colors">
               {t(`roles.${r.role}`)}
             </span>
           </div>
@@ -438,10 +438,10 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         hideable: true,
         cell: (r) => (
           <div className="flex flex-col">
-            <span className="text-slate-200 font-black text-xs tabular-nums tracking-tight">
+            <span className="text-admin-fg font-semibold text-xs tabular-nums tracking-tight">
               {r.created_at ? formatDate(r.created_at, lang as 'tr' | 'en') : t('admin.users.noEmail')}
             </span>
-            <span className="text-xs text-slate-600 uppercase font-black tracking-widest mt-0.5">
+            <span className="text-xs text-admin-fg-subtle font-semibold mt-0.5">
               {t('admin.users.table.createdLabel')}
             </span>
           </div>
@@ -507,14 +507,14 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
 
   const accessDenied = (
     <div className="flex flex-col items-center justify-center min-h-50vh space-y-4">
-      <div className="p-6 bg-red-500/10 rounded-3xl border border-red-500/20 shadow-xl shadow-red-500/5">
-        <AlertCircle className="text-red-500" size={48} />
+      <div className="p-6 bg-admin-danger-weak rounded-admin-lg border border-admin-danger/30 shadow-admin-lg shadow-red-500/5">
+        <AlertCircle className="text-admin-danger" size={48} />
       </div>
       <div className="text-center">
-        <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+        <h2 className="text-2xl font-semibold text-admin-fg tracking-tight">
           {t('admin.users.accessDeniedTitle')}
         </h2>
-        <p className="text-slate-500 mt-2 max-w-sm font-medium">{t('admin.users.accessDeniedDesc')}</p>
+        <p className="text-admin-fg-muted mt-2 max-w-sm font-medium">{t('admin.users.accessDeniedDesc')}</p>
       </div>
     </div>
   )
@@ -522,14 +522,14 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   return (
     <div className="space-y-6">
       {/* sekme pilleri — kit'in ÜSTÜNDE; sayaç yalnız AKTİF sekme için */}
-      <div className="flex glass bg-white/5 p-1 rounded-2xl w-fit border border-white/10 shadow-2xl">
+      <div className="flex bg-admin-surface bg-admin-surface-2 p-1 rounded-admin-lg w-fit border border-admin-border shadow-admin-lg">
         <button
           type="button"
           onClick={() => switchTab('admins')}
-          className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors duration-300 ${
+          className={`px-6 py-2.5 rounded-admin-md text-xs font-semibold transition-colors duration-300 ${
             activeTab === 'admins'
-              ? 'bg-cyan-400 text-surface-deep shadow-glow-md'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-admin-accent text-admin-accent-fg'
+              : 'text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-2'
           }`}
         >
           {t('admin.users.tabs.admins', { count: activeTab === 'admins' ? activeCount : 0 })}
@@ -537,10 +537,10 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         <button
           type="button"
           onClick={() => switchTab('all')}
-          className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors duration-300 ${
+          className={`px-6 py-2.5 rounded-admin-md text-xs font-semibold transition-colors duration-300 ${
             activeTab === 'all'
-              ? 'bg-cyan-400 text-surface-deep shadow-glow-md'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-admin-accent text-admin-accent-fg'
+              : 'text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-2'
           }`}
         >
           {t('admin.users.tabs.all', { count: activeTab === 'all' ? activeCount : 0 })}
@@ -612,83 +612,83 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
       />
 
       {/* Rol Yetkilendirme Rehberi — kit'in ALTINDA */}
-      <div className="glass-strong p-8 lg:p-10 rounded-hvac-2xl border border-white/5 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400/5 blur-120 rounded-full -mr-48 -mt-48 group-hover:bg-cyan-400/10 transition-colors duration-1000" />
+      <div className="bg-admin-surface p-8 lg:p-10 rounded-admin-lg border border-admin-border shadow-admin-lg relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-admin-accent-weak blur-120 rounded-full -mr-48 -mt-48 group-hover:bg-admin-accent-weak transition-colors duration-1000" />
         <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
-          <div className="w-16 h-16 rounded-hvac-lg glass-strong border border-white/10 flex items-center justify-center text-cyan-400 shrink-0 shadow-xl group-hover:scale-110 transition-transform duration-700">
+          <div className="w-16 h-16 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-accent shrink-0 shadow-admin-lg group-hover:scale-110 transition-transform duration-700">
             <Shield size={32} />
           </div>
           <div className="flex-1">
-            <h2 className="font-black text-white text-xl uppercase tracking-tight tracking-widest">
+            <h2 className="font-semibold text-admin-fg text-xl tracking-tight">
               {t('admin.users.info.title')}
             </h2>
-            <p className="text-slate-500 text-sm mt-2 mb-8 font-bold uppercase tracking-hvac-snug">
+            <p className="text-admin-fg-muted text-sm mt-2 mb-8 font-bold">
               {t('admin.users.info.subtitle')}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
+              <div className="bg-admin-surface bg-admin-surface-2 border border-admin-border p-5 rounded-admin-lg hover:border-admin-accent/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-warning group-hover/item:scale-110 transition-transform">
                     <Crown size={16} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">
+                  <span className="text-xs font-semibold text-admin-fg">
                     {t('roles.superadmin')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">
+                <p className="text-xs text-admin-fg-muted font-bold leading-relaxed tracking-wide">
                   {t('admin.users.roles.superadmin')}
                 </p>
               </div>
-              <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
+              <div className="bg-admin-surface bg-admin-surface-2 border border-admin-border p-5 rounded-admin-lg hover:border-admin-accent/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-indigo-400 group-hover/item:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-accent group-hover/item:scale-110 transition-transform">
                     <Shield size={16} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">
+                  <span className="text-xs font-semibold text-admin-fg">
                     {t('roles.admin')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">
+                <p className="text-xs text-admin-fg-muted font-bold leading-relaxed tracking-wide">
                   {t('admin.users.roles.admin')}
                 </p>
               </div>
-              <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
+              <div className="bg-admin-surface bg-admin-surface-2 border border-admin-border p-5 rounded-admin-lg hover:border-admin-accent/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-orange-400 group-hover/item:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-warning group-hover/item:scale-110 transition-transform">
                     <Package size={16} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">
+                  <span className="text-xs font-semibold text-admin-fg">
                     {t('roles.warehouse')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">
+                <p className="text-xs text-admin-fg-muted font-bold leading-relaxed tracking-wide">
                   {t('admin.users.roles.warehouse')}
                 </p>
               </div>
-              <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
+              <div className="bg-admin-surface bg-admin-surface-2 border border-admin-border p-5 rounded-admin-lg hover:border-admin-accent/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-blue-400 group-hover/item:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-accent group-hover/item:scale-110 transition-transform">
                     <Tag size={16} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">
+                  <span className="text-xs font-semibold text-admin-fg">
                     {t('roles.sales')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">
+                <p className="text-xs text-admin-fg-muted font-bold leading-relaxed tracking-wide">
                   {t('admin.users.roles.sales')}
                 </p>
               </div>
-              <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
+              <div className="bg-admin-surface bg-admin-surface-2 border border-admin-border p-5 rounded-admin-lg hover:border-admin-accent/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-emerald-400 group-hover/item:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-success group-hover/item:scale-110 transition-transform">
                     <Eye size={16} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">
+                  <span className="text-xs font-semibold text-admin-fg">
                     {t('roles.viewer')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">
+                <p className="text-xs text-admin-fg-muted font-bold leading-relaxed tracking-wide">
                   {t('admin.users.roles.viewer')}
                 </p>
               </div>

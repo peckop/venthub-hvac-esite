@@ -5,7 +5,6 @@ import { Check, Laptop, Moon, Sun } from 'lucide-react'
 import React from 'react'
 
 import { useI18n } from '../../../i18n/I18nProvider'
-
 import type { AdminThemePreference } from './themeCookie'
 
 /**
@@ -70,7 +69,7 @@ const AdminThemeToggle: React.FC<AdminThemeToggleProps> = ({
         <DropdownMenu.Content
           align="end"
           sideOffset={6}
-          className="z-popover min-w-[9rem] rounded-admin-md border border-admin-border
+          className="z-popover min-w-admin-menu rounded-admin-md border border-admin-border
             bg-admin-surface p-1 shadow-admin-overlay"
         >
           <DropdownMenu.RadioGroup
