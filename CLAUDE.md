@@ -56,7 +56,11 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 
 ## Mutlak Kurallar (ihlal etme)
 
-1. **No-Plan-No-Code:** Değişiklikten önce plan çıkar, onay al.
+1. **No-Plan-No-Code:** Değişiklikten önce plan çıkar, onay al. Plan, **kendisini hangi cetvelin
+   yönettiğini** söylemeli: ya `docs/standards/` altından bir dosya adı, ya açıkça "cetvel yok".
+   "Cetvel yok" geçerli bir cevap ama **bedava değil** — o zaman iş, cetveli yazmayı da kapsar.
+   (Niçin: 2026-08-15'te 1044 fiyat satırı prod'a yazıldı ve vitrin değişmedi; sebebi render/önbellek
+   cetvelinin hiç yazılmamış olmasıydı — hata tam o boşlukta yaşadı ve hiçbir kapı görmedi.)
 2. **Dependency Injection:** Tüm `lib/services/*` fonksiyonları ilk parametre olarak
    `supabase: SupabaseClient<Database>` alır. Modül düzeyinde statik client importu yok.
    (ESLint `no-restricted-imports` + AST testi zorlar.)

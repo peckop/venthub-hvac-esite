@@ -73,8 +73,18 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 Tetik fonksiyonu `public.handle_supabase_webhook()` jeneriktir (`TG_TABLE_NAME` ile tabloyu
 kendi okur) — yeni tablo eklemek yalnız `create trigger` demektir.
 
-**Kapı:** yukarıdaki tablo, `INV-RENDER-1`'in kapsamına alınmalıdır (dördüncü/beşinci tablo
-eklendiğinde test uyarsın).
+**Kapı:** `INV-RENDER-2` (`src/__tests__/conformance/render-revalidation-contract.test.ts`) — yukarıdaki
+tabloyu **çift yönlü** zorlar: her tablonun yaşayan bir tetiği VE handler dalı olmalı; ayrıca öksüz tetik
+(tetik var, handler yok → boşuna HTTP) ve öksüz handler (handler var, tetik yok → **08-15 hatasının imzası**)
+ayrı ayrı kırmızı yanar. Yeni bir tablo vitrine çıkarken bu dosyadaki `REQUIRED_TABLES` dizisi ile yukarıdaki
+tablo **birlikte** güncellenir.
+
+> **Tetikler İKİ kaynakta yaşıyor.** İlk üçü (`on_products_change`, `on_categories_change`,
+> `on_inventory_movements_change`) hiçbir migration dosyasında geçmez — yalnız
+> `supabase/baselines/*.sql` anlık görüntülerinde tanımlıdır (repo'dan önce elle kurulmuşlar).
+> Sonradan eklenenler `supabase/migrations/` altındadır. Yalnız `migrations/`'a bakan bir tarayıcı
+> ilk üç tabloyu "tetiksiz" sanıp yanlış alarm verir; `INV-RENDER-2` ikisini de tarar ve
+> `create`/`drop` etkilerini kronolojik sırayla uygulayarak **yaşayan** durumu hesaplar.
 
 ## 4. Bilinen sınırlar (dürüstçe)
 
@@ -83,9 +93,10 @@ eklendiğinde test uyarsın).
   kaynağı buydu), ama fiyatların gerçekten hepsi değişirse (kur hareketi) tek tıkla ~1044 webhook
   ateşlenir ve bunlar yalnız ~32 aile yolunu tazeler. İşe yarar ama israf; toplu-değişimi tek
   çağrıya indirmek (statement-level tetik ya da materialize sonrası tek toplu tazeleme) açık kalemdir.
-- **PPR kapalı.** `CONTEXT.md` ve CLAUDE.md yığın tablosu "PPR" diyor; `next.config.mjs`'te
-  `experimental.ppr` **yok**. Bugün olan şey SSG + Suspense streaming'dir. Ya açılmalı ya
-  dokümandan çıkarılmalı — ikisinden biri yalan söylüyor.
+- **PPR kapalı** (*2026-08-15: kapatıldı*). `next.config.mjs`'te `experimental.ppr` **yok**; bugün olan
+  şey SSG + Suspense streaming'dir. Dokümanlardaki "PPR" ibaresi kaldırıldı: `CLAUDE.md` yığın satırı +
+  kural 5 başlığı, `CONTEXT.md` yığın tablosu (not) + §14 madde 14 başlığı. Kuralın kendisi (Suspense
+  sınırı) aynen geçerli — değişen yalnız adlandırmaydı.
 - **Webhook URL/secret'ı `handle_supabase_webhook()` gövdesinde literal** (env değil).
   Ortam değiştiğinde fonksiyon elle güncellenmeli.
 - **Aile slug'ı her tetikte ayrı SELECT ile çözülüyor** (N+1). Mevcut desen; hacim artarsa
