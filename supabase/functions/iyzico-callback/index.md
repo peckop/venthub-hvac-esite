@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-callback\index.ts
-skeleton_hash: ba18e38dc5a91e53
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\iyzico-callback\index.ts
+skeleton_hash: fb629e0681c06a41
 entity_hashes:
   func:iyzico-callback_handler: 14b42ca547fc6940
   overview: 9f60711f4ba6c146
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-15T04:12:43Z
 ---
 
 ## Genel Bakış

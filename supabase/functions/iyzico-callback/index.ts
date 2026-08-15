@@ -114,7 +114,11 @@ Deno.serve(async (req) => {
 
     const apiKey = Deno.env.get("IYZICO_API_KEY");
     const secretKey = Deno.env.get("IYZICO_SECRET_KEY");
-    const baseUrl = "https://sandbox-api.iyzipay.com"; // isteğe göre prod ayarlanabilir
+    // LANSMAN ENGELİ İDİ (T022-VH, 2026-08-15): burası sandbox'ı SABİT kodluyordu.
+    // Kardeşleri env'den okuyor (iyzico-payment:232, iyzico-refund:53) — yalnız callback sabitti.
+    // Etki: prod anahtarları konulduğu an ödeme PROD'da başlar ama callback retrieve'i
+    // SANDBOX'a sorar → para çekilir, sipariş DOĞRULANAMAZ. Aynı desene çekildi.
+    const baseUrl = Deno.env.get("IYZICO_BASE_URL") || "https://sandbox-api.iyzipay.com";
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
