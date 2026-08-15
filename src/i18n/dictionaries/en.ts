@@ -946,6 +946,26 @@ export const en: typeof tr = {
     privacy: 'Privacy Policy',
     terms: 'Terms of Use'
   },
+  cookieConsent: {
+    title: 'Cookie Consent',
+    description: 'We use strictly necessary cookies to run the site. Non-essential cookies are used only with your consent.',
+    policyLink: 'Cookie Policy',
+    acceptAll: 'Accept All',
+    rejectOptional: 'Necessary Only',
+    manage: 'Manage Preferences',
+    saveSelection: 'Save Selection',
+    changePreferences: 'Change my cookie preferences',
+    categories: {
+      necessary: 'Strictly necessary',
+      necessaryDesc: 'Required for sign-in, basket and security; cannot be switched off.',
+      functional: 'Functional',
+      functionalDesc: 'Remembers your language and display preferences.',
+      analytics: 'Analytics',
+      analyticsDesc: 'Lets us measure how the site is used.',
+      marketing: 'Marketing',
+      marketingDesc: 'Allows promotions tailored to your interests.'
+    }
+  },
   legal: {
     kvkkTitle: 'KVKK Clarification Text (Draft)',
     draftWarning: 'This text is a draft and for testing purposes. Please update it with your company\'s actual details and confirm with a legal expert before going live.',

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
+import CookiePreferencesButton from '@/components/consent/CookiePreferencesButton'
 import legalConfig from '@/config/legal'
 import { localizedHref, Routes } from '@/utils/routes'
 
@@ -44,8 +45,8 @@ export const CookiePolicyContentEn: React.FC<{ lang: string }> = ({ lang }) => {
                 <td className="p-2 border-b border-light-gray">1 year</td>
               </tr>
               <tr>
-                <td className="p-2 border-b border-light-gray"><code>vh_cookie_consent</code> (local storage)</td>
-                <td className="p-2 border-b border-light-gray">Remembering your cookie preference so the banner is not shown again</td>
+                <td className="p-2 border-b border-light-gray"><code>vh_consent</code> (local storage)</td>
+                <td className="p-2 border-b border-light-gray">Storing your per-category cookie preference, the date of your decision and the policy version you accepted</td>
                 <td className="p-2 border-b border-light-gray">Functional</td>
                 <td className="p-2 border-b border-light-gray">Until you clear it</td>
               </tr>
@@ -58,7 +59,7 @@ export const CookiePolicyContentEn: React.FC<{ lang: string }> = ({ lang }) => {
             </tbody>
           </table>
         </div>
-        <p className="text-sm mt-3"><strong>Analytics and marketing cookies:</strong> the Site currently does <strong>not</strong> use cookies for analytics, advertising or profiling. Should such cookies be introduced, your explicit consent will be obtained before they are activated and this table will be updated.</p>
+        <p className="text-sm mt-3"><strong>Analytics and marketing cookies:</strong> the Site currently does <strong>not</strong> use cookies for analytics, advertising or profiling. Should such cookies be introduced, they will run only with your <strong>explicit consent</strong> and this table will be updated. Where you have not consented to a category, its tag/script is <strong>never loaded</strong> — not merely prevented from sending events, but blocked before the code that writes the cookie can run.</p>
       </section>
 
       <section>
@@ -74,10 +75,14 @@ export const CookiePolicyContentEn: React.FC<{ lang: string }> = ({ lang }) => {
       <section>
         <h2 className="text-xl font-semibold text-industrial-gray mb-3">5) Managing Your Preferences</h2>
         <ul className="list-disc pl-6 space-y-1">
-          <li>You can set your preference via the cookie banner shown on your first visit.</li>
-          <li>To change your preference, clear the site data (cookies and local storage) in your browser; the banner will be shown again.</li>
+          <li>The cookie banner shown on your first visit lets you choose <strong>per category</strong>: accept all, necessary only, or use &quot;Manage Preferences&quot; to switch functional, analytics and marketing on or off individually.</li>
+          <li><strong>You may withdraw your consent at any time</strong> — the button below clears your record and reopens the selection. Withdrawing is as easy as giving consent.</li>
           <li>You can block or delete cookies entirely from your browser settings. If strictly necessary cookies are blocked, functions such as sign-in and the basket may not work.</li>
         </ul>
+        <div className="mt-4">
+          <CookiePreferencesButton />
+        </div>
+        <p className="text-xs text-steel-gray mt-3">Your consent is stored in your browser together with the date you decided and the policy version you accepted. If this Policy changes materially, your consent lapses and you will be asked again.</p>
       </section>
 
       <section>

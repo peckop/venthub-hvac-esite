@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
+import CookiePreferencesButton from '@/components/consent/CookiePreferencesButton'
 import legalConfig from '@/config/legal'
 import { localizedHref, Routes } from '@/utils/routes'
 
@@ -44,8 +45,8 @@ export const CookiePolicyContentTr: React.FC<{ lang: string }> = ({ lang }) => {
                 <td className="p-2 border-b border-light-gray">1 yıl</td>
               </tr>
               <tr>
-                <td className="p-2 border-b border-light-gray"><code>vh_cookie_consent</code> (localStorage)</td>
-                <td className="p-2 border-b border-light-gray">Çerez tercihinizin hatırlanması, bandın tekrar gösterilmemesi</td>
+                <td className="p-2 border-b border-light-gray"><code>vh_consent</code> (localStorage)</td>
+                <td className="p-2 border-b border-light-gray">Kategori bazlı çerez tercihinizin, karar tarihinin ve onayladığınız metin sürümünün saklanması</td>
                 <td className="p-2 border-b border-light-gray">İşlevsel</td>
                 <td className="p-2 border-b border-light-gray">Siz silene kadar</td>
               </tr>
@@ -58,7 +59,7 @@ export const CookiePolicyContentTr: React.FC<{ lang: string }> = ({ lang }) => {
             </tbody>
           </table>
         </div>
-        <p className="text-sm mt-3"><strong>Analitik ve pazarlama çerezleri:</strong> Site hâlihazırda analitik, reklam veya profilleme amaçlı çerez <strong>kullanmamaktadır</strong>. Bu tür çerezler ileride devreye alınırsa, çalıştırılmadan önce açık rızanız alınacak ve bu tablo güncellenecektir.</p>
+        <p className="text-sm mt-3"><strong>Analitik ve pazarlama çerezleri:</strong> Site hâlihazırda analitik, reklam veya profilleme amaçlı çerez <strong>kullanmamaktadır</strong>. Bu tür çerezler ileride devreye alınırsa yalnızca <strong>açık rızanızla</strong> çalışır ve bu tablo güncellenir. Rıza vermediğiniz kategoriye ait etiket/script sayfaya <strong>hiç yüklenmez</strong> — yalnızca olay gönderimi değil, çerezi yazan kodun kendisi engellenir.</p>
       </section>
 
       <section>
@@ -74,10 +75,14 @@ export const CookiePolicyContentTr: React.FC<{ lang: string }> = ({ lang }) => {
       <section>
         <h2 className="text-xl font-semibold text-industrial-gray mb-3">5) Tercihlerinizi Nasıl Yönetirsiniz?</h2>
         <ul className="list-disc pl-6 space-y-1">
-          <li>Site ilk ziyaretinizde gösterilen çerez bandı üzerinden tercihinizi belirleyebilirsiniz.</li>
-          <li>Tercihinizi değiştirmek için tarayıcınızın site verilerini (çerezler ve yerel depolama) temizleyebilirsiniz; band yeniden gösterilir.</li>
+          <li>Site ilk ziyaretinizde gösterilen çerez bandından <strong>kategori bazlı</strong> seçim yapabilirsiniz: tümünü kabul, yalnızca zorunlu, veya &quot;Tercihleri Yönet&quot; ile işlevsel/analitik/pazarlama kategorilerini tek tek açıp kapatabilirsiniz.</li>
+          <li><strong>Rızanızı dilediğiniz an geri alabilirsiniz</strong> — aşağıdaki düğme kaydınızı siler ve seçim ekranını yeniden açar. Geri alma, rıza vermek kadar kolaydır.</li>
           <li>Tarayıcı ayarlarından çerezleri tümüyle engelleyebilir veya silebilirsiniz. Zorunlu çerezlerin engellenmesi hâlinde üye girişi ve sepet gibi işlevler çalışmayabilir.</li>
         </ul>
+        <div className="mt-4">
+          <CookiePreferencesButton />
+        </div>
+        <p className="text-xs text-steel-gray mt-3">Rızanız, verdiğiniz tarih ve onayladığınız metin sürümüyle birlikte tarayıcınızda saklanır. Bu Politika esaslı olarak değişirse rızanız geçersizleşir ve size yeniden sorulur.</p>
       </section>
 
       <section>
