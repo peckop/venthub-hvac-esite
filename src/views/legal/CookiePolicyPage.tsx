@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { isLegalContentReady } from '@/config/legal'
+
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
@@ -16,9 +18,11 @@ const CookiePolicyPage: React.FC<{ lang: string }> = ({ lang }) => {
         {t('legal.cookieTitle')}
       </h1>
 
-      <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4 mb-6 text-sm">
-        {t('legal.draftWarning')}
-      </div>
+      {!isLegalContentReady() && (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4 mb-6 text-sm">
+          {t('legal.draftWarning')}
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6 text-steel-gray space-y-6 prose dark:prose-invert max-w-prose">
         {lang === 'en' ? (
