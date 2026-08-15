@@ -1364,7 +1364,9 @@ export const tr = {
       desc: 'Ödeme sayfasına erişmek için sepetinizde ürün bulunmalıdır.',
       startShopping: 'Alışverişe Başla'
     },
+    priceUpdated: 'Fiyatlar güncellendi, ödeme devam ediyor.',
     errors: {
+      priceVerificationFailed: 'Fiyatlar şu anda doğrulanamadığı için ödeme başlatılamadı. Lütfen birkaç dakika sonra tekrar deneyin.',
       paymentError: 'Ödeme sırasında bir hata oluştu',
       itemPriceMissing: 'Sepetinizde fiyatı belirlenmemiş ürün olduğu için ödeme başlatılamadı. Lütfen bu ürünler için teklif alın.',
       nameRequired: 'Ad Soyad gereklidir',
