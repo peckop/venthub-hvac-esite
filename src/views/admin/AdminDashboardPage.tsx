@@ -15,10 +15,10 @@ import ActivityHeatmap from '../../components/admin/dashboard/ActivityHeatmap'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
 import SalesChart from '../../components/admin/dashboard/SalesChart'
 import StatCard from '../../components/admin/dashboard/StatCard'
+import AdminPageHeader from '../../components/admin/shell/AdminPageHeader'
 import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import type { DbOrder } from '../../types/db-rows'
-import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
 
 interface DashboardChartData {
   date: string
@@ -250,10 +250,10 @@ const AdminDashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-10" data-testid="admin-dashboard">
-      <header>
-        <h1 className={adminSectionTitleClass}>{t('admin.titles.dashboard')}</h1>
-        <p className={adminSubtitleClass}>{t('admin.dashboard.subtitle')}</p>
-      </header>
+      <AdminPageHeader
+        title={t('admin.titles.dashboard')}
+        description={t('admin.dashboard.subtitle')}
+      />
 
       {error && <div className="p-4 bg-red-50 text-red-500 rounded-xl">{error}</div>}
 

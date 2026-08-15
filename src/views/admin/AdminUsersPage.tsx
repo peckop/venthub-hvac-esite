@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation'
 import React, { Suspense, useEffect, useMemo } from 'react'
 
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminPageHeader from '../../components/admin/shell/AdminPageHeader'
 import { useAuth } from '../../hooks/useAuth'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useRole } from '../../hooks/useRole'
 import { useI18n } from '../../i18n/I18nProvider'
-import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
 import AdminUsersTableBody from './AdminUsersTableBody'
 
 /**
@@ -33,10 +33,10 @@ const AdminUsersPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-20">
-      <header>
-        <h1 className={adminSectionTitleClass}>{t('admin.titles.users')}</h1>
-        <p className={adminSubtitleClass}>{t('admin.users.subtitle')}</p>
-      </header>
+      <AdminPageHeader
+        title={t('admin.titles.users')}
+        description={t('admin.users.subtitle')}
+      />
 
       <Suspense fallback={<AdminSkeleton variant="table" count={8} rows={6} />}>
         <AdminUsersTableBody isAdmin={isAdmin} />

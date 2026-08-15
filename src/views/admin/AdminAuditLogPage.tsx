@@ -3,8 +3,8 @@
 import React, { Suspense } from 'react'
 
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminPageHeader from '../../components/admin/shell/AdminPageHeader'
 import { useI18n } from '../../i18n/I18nProvider'
-import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
 import AuditLogTableBody from './AuditLogTableBody'
 
 /**
@@ -17,10 +17,10 @@ const AdminAuditLogPage: React.FC = () => {
 
   return (
     <div className="space-y-4 pb-20">
-      <header>
-        <h1 className={adminSectionTitleClass}>{t('admin.titles.audit')}</h1>
-        <p className={adminSubtitleClass}>{t('admin.audit.subtitle')}</p>
-      </header>
+      <AdminPageHeader
+        title={t('admin.titles.audit')}
+        description={t('admin.audit.subtitle')}
+      />
 
       <Suspense fallback={<AdminSkeleton variant="table" count={5} rows={6} />}>
         <AuditLogTableBody />

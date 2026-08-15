@@ -3,8 +3,8 @@
 import React, { Suspense } from 'react'
 
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminPageHeader from '../../components/admin/shell/AdminPageHeader'
 import { useI18n } from '../../i18n/I18nProvider'
-import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
 import ErrorsTableBody from './ErrorsTableBody'
 
 /**
@@ -17,10 +17,10 @@ const AdminErrorsPage: React.FC = () => {
 
   return (
     <div className="space-y-4 pb-20">
-      <header>
-        <h1 className={adminSectionTitleClass}>{t('admin.titles.errors')}</h1>
-        <p className={adminSubtitleClass}>{t('admin.errors.subtitle')}</p>
-      </header>
+      <AdminPageHeader
+        title={t('admin.titles.errors')}
+        description={t('admin.errors.subtitle')}
+      />
 
       <Suspense fallback={<AdminSkeleton variant="table" count={5} rows={6} />}>
         <ErrorsTableBody />
