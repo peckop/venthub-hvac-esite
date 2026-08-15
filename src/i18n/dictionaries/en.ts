@@ -2038,6 +2038,7 @@ export const en: typeof tr = {
       emailInvalid: 'Please enter a valid email address',
       phoneRequired: 'Phone number is required',
       addressRequired: 'Address is required',
+      consentsRequired: 'To continue, please tick the KVKK, Distance Sales Agreement, Pre-Information Form and order confirmation boxes.',
       locationRequired: 'Please enter your city and district',
       cityRequired: 'City is required',
       districtRequired: 'District is required',
