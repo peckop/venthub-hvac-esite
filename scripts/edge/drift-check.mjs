@@ -38,9 +38,8 @@
  *   node scripts/edge/drift-check.mjs --all-files   # _shared kopyalarını da karşılaştır
  *
  * Ortam değişkenleri:
- *   SUPABASE_ACCESS_TOKEN  (zorunlu)  API + CLI kimliği
+ *   SUPABASE_ACCESS_TOKEN  (ops.)     CI'da CLI kimliği; yerelde CLI kendi oturumunu kullanır
  *   SUPABASE_PROJECT_REF   (zorunlu)  proje ref'i
- *   SUPABASE_API_URL       (ops.)     Management API tabanı
  *   SUPABASE_CLI_BIN       (ops.)     CLI ikili adı/yolu (varsayılan: supabase)
  *   DRIFT_DOWNLOAD_CONCURRENCY (ops.) eşzamanlı indirme sayısı (varsayılan: 4)
  *
@@ -60,7 +59,6 @@ import { promisify } from 'node:util'
 
 const execFileAsync = promisify(execFile)
 
-const API_BASE = process.env.SUPABASE_API_URL || 'https://api.supabase.com'
 const FUNCTIONS_DIR = 'supabase/functions'
 const CONFIG_TOML = 'supabase/config.toml'
 const CLI_BIN = process.env.SUPABASE_CLI_BIN || 'supabase'
@@ -178,10 +176,13 @@ export function cliProbeVerdict(probe) {
 /* ------------------------------------------------------------------- API */
 
 function requireEnv() {
-  const token = process.env.SUPABASE_ACCESS_TOKEN
+  // SUPABASE_ACCESS_TOKEN artık bu script için ZORUNLU DEĞİL: hem liste hem kaynak
+  // Supabase CLI üzerinden alınıyor. CLI token'ı ya kendi oturumundan (yerel) ya da
+  // ortam değişkeninden (CI) okur — tek kimlik kaynağı, iki yol yok.
+  // Bu sayede script, CLI'ı giriş yapmış HER makinede token elle geçirmeden koşar;
+  // T024 doğrulaması tam olarak böyle yapıldı (CI faturalandırma nedeniyle durmuşken).
   const ref = process.env.SUPABASE_PROJECT_REF
   const missing = []
-  if (!token) missing.push('SUPABASE_ACCESS_TOKEN')
   if (!ref) missing.push('SUPABASE_PROJECT_REF')
   if (missing.length) {
     console.error('')
@@ -190,13 +191,13 @@ function requireEnv() {
     console.error('  Bu script prod ile karşılaştırma yapar; kimlik olmadan hiçbir şey doğrulayamaz.')
     console.error('  "sapma yok" SONUCU ÜRETİLMEDİ — sonuç YOK. (exit 2)')
     console.error('')
-    console.error('  Yerel çalıştırma:')
-    console.error('    SUPABASE_ACCESS_TOKEN=sbp_... SUPABASE_PROJECT_REF=<ref> node scripts/edge/drift-check.mjs')
-    console.error('  CI: her ikisi de repo secret olarak tanımlı.')
+    console.error('  Yerel çalıştırma (CLI giriş yapmışsa token GEREKMEZ):')
+    console.error('    SUPABASE_PROJECT_REF=<ref> node scripts/edge/drift-check.mjs')
+    console.error('  CI: SUPABASE_PROJECT_REF + SUPABASE_ACCESS_TOKEN secret olarak tanımlı.')
     console.error('')
     process.exit(2)
   }
-  return { token, ref }
+  return { ref }
 }
 
 /**
@@ -223,12 +224,6 @@ function requireCli() {
     process.exit(2)
   }
   return verdict.version
-}
-
-function api(token, url, accept) {
-  return fetch(url, {
-    headers: { Authorization: `Bearer ${token}`, ...(accept ? { Accept: accept } : {}) },
-  })
 }
 
 function fatal(msg) {
@@ -370,19 +365,57 @@ function repoSlugs(root) {
     .sort()
 }
 
+/**
+ * Prod fonksiyon listesini CLI ile çeker (`functions list --output json`).
+ * Şekil Management API ile aynı: { slug, verify_jwt, version, status, updated_at }.
+ */
+async function listProdFunctions(ref) {
+  let out
+  try {
+    const r = await execFileAsync(CLI_BIN, ['functions', 'list', '--project-ref', ref, '--output', 'json'], {
+      shell: USE_SHELL,
+      windowsHide: true,
+      maxBuffer: 32 * 1024 * 1024,
+    })
+    out = r.stdout
+  } catch (e) {
+    const detail = String(e?.stderr || e?.stdout || e?.message || e).trim().slice(0, 600)
+    fatal(
+      `'${CLI_BIN} functions list' BAŞARISIZ (exit ${e?.code ?? '?'}): ${detail}
+` +
+        `  CLI giriş yapmış mı (yerelde 'supabase login', CI'da SUPABASE_ACCESS_TOKEN)?`
+    )
+  }
+  // CLI, JSON'dan önce/sonra bilgilendirme satırı basabiliyor (ör. "yeni sürüm mevcut").
+  // Bu yüzden ham stdout'u değil, ilk '[' ile son ']' arasını çözüyoruz.
+  const a = out.indexOf('[')
+  const b = out.lastIndexOf(']')
+  if (a === -1 || b <= a) {
+    fatal(`'${CLI_BIN} functions list' JSON dizisi döndürmedi. İlk 300 karakter: ${out.slice(0, 300)}`)
+  }
+  let parsed
+  try {
+    parsed = JSON.parse(out.slice(a, b + 1))
+  } catch (e) {
+    fatal(`'${CLI_BIN} functions list' çıktısı JSON olarak çözülemedi: ${e?.message ?? e}`)
+  }
+  if (!Array.isArray(parsed) || !parsed.length) {
+    fatal(`'${CLI_BIN} functions list' boş/beklenmeyen sonuç döndürdü — prod'da 0 fonksiyon olamaz.`)
+  }
+  return parsed
+}
+
 async function run({ root, asJson, compareAllFiles }) {
-  const { token, ref } = requireEnv()
+  const { ref } = requireEnv()
   const cliVersion = requireCli()
   console.error(`[drift] Supabase CLI: ${cliVersion || '(sürüm okunamadı)'}`)
 
-  const listUrl = `${API_BASE}/v1/projects/${ref}/functions`
-  const res = await api(token, listUrl, 'application/json')
-  if (!res.ok) {
-    const body = await res.text().catch(() => '')
-    fatal(`GET ${listUrl} -> HTTP ${res.status}. ${body.slice(0, 400)}`)
-  }
-  const prodList = await res.json()
-  if (!Array.isArray(prodList)) fatal(`Liste ucu dizi dondurmedi: ${JSON.stringify(prodList).slice(0, 300)}`)
+  // Fonksiyon listesi de CLI'dan. Management API yerine CLI kullanmanın sebebi
+  // kolaylık değil TEK KİMLİK KAYNAĞI: kaynak indirme zaten CLI'dan geçiyor; listeyi
+  // ayrı bir token'la ayrı bir uçtan çekmek, ikisinin farklı projeyi/kimliği
+  // görebildiği bir tutarsızlık penceresi açar. Çıktı şekli aynı
+  // (slug/verify_jwt/version/status) — ölçüldü.
+  const prodList = await listProdFunctions(ref)
 
   const repo = repoSlugs(root)
   const repoSet = new Set(repo)
