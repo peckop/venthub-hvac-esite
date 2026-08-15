@@ -208,9 +208,37 @@ export const pricing = {
         title: "Örnek satırlar",
         empty: "Örnek satır yok",
       },
+      staleCost: "Maliyetler güncel kurda değil: {{count}} üründe eski kur kullanılacak. Önce \"Maliyetleri tazele\" adımını çalıştırın.",
+      staleCostUnknown: "Maliyetlerin güncel kurda olup olmadığı KONTROL EDİLEMEDİ. Devam etmeden önce \"Maliyetleri tazele\" adımını açıp bakın.",
       toasts: {
         applied: "{{count}} ürün fiyatı güncellendi",
         applyFailed: "Fiyatlar güncellenemedi",
+      },
+    },
+    costRefresh: {
+      toolbarAction: "Maliyetleri tazele",
+      title: "Maliyetleri tazele (TCMB)",
+      description: "Katalog alış fiyatları döviz cinsindendir; bu adım TL maliyeti güncel TCMB efektif satış kuruyla yeniden yazar. Fiyatları yeniden hesaplamadan ÖNCE çalıştırın — yoksa vitrin, maliyetin en son yazıldığı günün kurunda kalır.",
+      loading: "Önizleme hesaplanıyor...",
+      retry: "Tekrar dene",
+      apply: "Uygula",
+      applying: "Uygulanıyor...",
+      upToDate: "Maliyetler güncel kurla zaten uyumlu — yazılacak bir şey yok.",
+      noneWritable: "Hiçbir maliyet yazılamıyor: ürünlerin kuru bulunamadı. Bu, \"güncel\" demek DEĞİL — kur defterini kontrol edin.",
+      summary: {
+        scanned: "Taranan ürün",
+        updated: "Maliyeti değişecek",
+        skippedNoRate: "Kuru bulunamayan",
+        skippedNoPurchasePrice: "Alış fiyatı olmayan",
+      },
+      rates: {
+        title: "Kullanılan kurlar",
+        empty: "Kur bulunamadı",
+        pair: "{{currency}} → TRY",
+      },
+      toasts: {
+        applied: "{{count}} ürünün maliyeti tazelendi",
+        applyFailed: "Maliyetler tazelenemedi",
       },
     },
     impact: {

@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\pricing.en.ts
-skeleton_hash: 944678e658b3daa2
+skeleton_hash: 156c3aba4ff0480c
 entity_hashes:
   overview: a30f302d74ed1c78
-generated_at: 2026-08-14T09:15:23Z
+generated_at: 2026-08-15T03:54:29Z
 ---
 
 ## Genel Bakış
@@ -25,19 +25,6 @@ Bu modül için fonksiyon imzası veya kullanım detayı verilmediğinden, apena
 
 ---
 
-### Notlar
-
-| Gözlem | Açıklama |
-|--------|----------|
-| Kaynak türü | `doc` (döküman/kaynak kod dosyası) |
-| Dosya yapısı | `.ts` uzantılı i18n sözlük dosyası |
-| Mevcut sabit | `pricing` (object) |
-| Fonksiyon imzası | Tanımlanmamış |
-
-Mimari varsayımlar üretmek için modülün **fonksiyon imzaları**, **parametreleri** ve **kullanım bağlamı** hakkında daha fazla bilgiye ihtiyaç vardır.
-
----
-
 ## FONKSİYON DETAYLARI
 
 ---
@@ -47,7 +34,7 @@ Mimari varsayımlar üretmek için modülün **fonksiyon imzaları**, **parametr
   common: {
     scopeLabel: "Scope",
     methodLabel: "Method",
-    sco...`
+    scope: ...`
 
 ---
 

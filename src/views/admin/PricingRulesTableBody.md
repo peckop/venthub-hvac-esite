@@ -3,51 +3,44 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\views\admin\PricingRulesTableBody.tsx
-skeleton_hash: e54c533e79f5e3d3
+skeleton_hash: a15eca5aa5a05b77
 entity_hashes:
   func:PricingRulesTableBody: 812c9bf97543d2da
   func:deriveStatus: 4a2473aac1292e82
   func:methodLabel: 5641ed46bb40bec9
   func:pricingRulesFetcher: ee3ea2c96d78ae7c
-  overview: d26e6e69047675d2
+  overview: f5344e8ccf42b503
   style_tokens: 75cecbf71e7068d4
-generated_at: 2026-08-14T09:19:56Z
+generated_at: 2026-08-14T22:25:21Z
 ---
 
 ## Genel Bakış
 
-Bu modül, fiyatlandırma kuralları tablosunun her bir satırını (body) oluşturmak ve sunmakla sorumludur. Modül, arka planda veri çekme işlemini yöneten, bir kuralın durumunu (aktif, pasif, gelecek) tarihe göre hesaplayan ve ödeme yöntemi etiketlerini dönüştüren yardımcı fonksiyonları içererek ana bileşene destek verir.
+Bu modül, yöneticilik panelindeki fiyatlandırma kurallarının tablo görünümünü oluşturmakla sorumludur. Modül, Supabase üzerinden veri çekme sürecini yöneten, kuralların durumunu tarihsel olarak hesaplayan, ödeme yöntemlerini okunabilir etiketlere dönüştüren yardımcı fonksiyonları içeren bir React bileşenidir.
 
 ## Fonksiyon Grupları
 
-### Veri Çekme ve Hazırlama
-Bu grup, modülün dış veri kaynağından (Supabase) fiyatlandırma kurallarını çekmekle ve UI bileşenine sunulacak formata hazırlamakla sorumludur.
-- pricingRulesFetcher: Supabase istemcisini kullanarak fiyatlandırma kurallarını çeken ve tablonun gerektirdiği formatta sonuç döndüren ana veri çekme fonksiyonudur.
+### Veri Çekme ve Yönetimi
+Bu grup, fiyatlandırma kurallarının uzak veri kaynağından güvenilir bir şekilde çekilmesini ve bileşenin kullanabileceği formata dönüştürülmesini sağlar.
+- pricingRulesFetcher: Supabase istemcisi ile fiyatlandırma kurallarını çeken ve Promise formatında sonuç döndüren asenkron veri getirme fonksiyonudur.
 
-### Yardımcı İşlem Fonksiyonları
-Bu grup, çekilen verilerin bireysel satırlar üzerinde anlaşılabilir ve anlamlı bir şekilde gösterilmesi için gerekli dönüşümleri ve hesaplamaları yapar.
-- methodLabel: Ödeme yöntemi kodunu (örn: "credit_card") kullanıcıya gösterilecek etikete (örn: "Kredi Kartı") dönüştürür.
-- deriveStatus: Bir kuralın, bugünün tarihine göre "aktif", "pasif" veya "gelecek" gibi durumunu hesaplar.
+### Veri İşleme ve Dönüştürme
+Bu grup, ham verileri kullanıcıya gösterim için anlamlı ve tutarlı biçimlere dönüştüren yardımcı fonksiyonları kapsar.
+- deriveStatus: Bir kuralın, bugünkü tarihe göre "aktif", "pasif" veya "gelecek" gibi durumunu hesaplayan tarih tabanlı mantık fonksiyonudur.
+- methodLabel: Ödeme yöntemi kodunu kullanıcı arayüzünde gösterilecek lokalize etikete dönüştüren harita fonksiyonudur.
 
 ### Ana Bileşen
-Bu grup, modülün dışarıya sunduğu ve React içinde kullanılan temel UI bileşenidir.
-- PricingRulesTableBody: Fiyatlandırma kurallarının her birini tablo satırı olarak render eden ana React fonksiyonel bileşenidir.
+Bu grup, modülün dışarıya sunduğu ve tüm diğer fonksiyonları bir araya getirerek arayüzü oluşturan temel React bileşenini ifade eder.
+- PricingRulesTableBody: Fiyatlandırma kurallarını tablo satırları olarak oluşturan ve veri çekme ile işleme fonksiyonlarını bir arada kullanan fonksiyonel React bileşenidir.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül için, yalnızca sağlanan fonksiyon imzalarına dayalı kesin aksiyomlar çıkarılamamaktadır. Fonksiyon gövdesi içeriği bilinmediğinden, aşağıda modülün temel bağımlılıklarına ve genel yapısına ilişkin gerekli koşullar listelenmektedir.
 
-Bu modül, fiyatlandırma kurallarının tablo halinde sunulmasını sağlayan bir React bileşen modülüdür. Aşağıdaki mimari varsayımlar fonksiyon imzalarından ve modül sabitlerinden türetilmiştir.
-
-[Aksiyom 1]: Eğer `deriveStatus` fonksiyonuna `PricingRuleRow` tipinde bir `rule` nesnesi verilmezse veya `today` parametresi geçerli bir tarih stringi formatında değilse, fonksiyonun `today` ve `rule` alanlarını tarih karşılaştırması için kullanacağı garanti edilemez; bu durumda `RuleStatus` dönüş değeri tutarsız olur.
-
-[Aksiyom 2]: Eğer `methodLabel` fonksiyonuna verilen `method` parametresi `METHOD_I18N_KEYS` nesnesinde bir alan olarak mevcut değilse, i18n çevirisi yapılamaz ve döndürülen string ham anahtar olur veya tanımsız bir değere işaret eder.
-
-[Aksiyom 3]: Eğer `pricingRulesFetcher` fonksiyonuna verilen `supabase` istemcisi `Database` tipiyle uyumlu bir Supabase bağlantısı içermiyorsa veya `_params` parametresi `FetchParams` formatına uymuyorsa, veritabanı sorgusu başarısız olur ve `Promise<FetchResult<RuleRow>>` reddedilir.
-
-[Aksiyom 4]: Eğer `deriveStatus` fonksiyonundaki tarih karşılaştırması için `PricingRuleRow` nesnesinin `valid_from` veya `valid_to` alanları (veya benzer tarih alanları) tanımsız veya `null` ise, kuralın bugün itibarıyla aktif/pasif durumu doğru hesaplanamaz.
-
-[Aksiyom 5]: Eğer `SCOPE_KEYS` nesnesi modül içinde bir kapsam (scope) filtreleme veya gruplama amacıyla kullanılıyorsa ve bu nesnenin değerleri veritabanındaki gerçek kapsam değerleriyle eşleşmiyorsa, tabloda filtreleme sonuçları boş veya eksik olur.
+[Aksiyom 1]: Eğer `methodLabel` fonksiyonuna sağlanan `t` (çeviri fonksiyonu), `METHOD_I18N_KEYS` içindeki anahtarları dönüştüremezse, metin gösterimi hatalı veya eksik olur.
+[Aksiyom 2]: Eğer `deriveStatus` fonksiyonuna verilen `rule` (`PricingRuleRow`) nesnesinde tarih karşılaştırması için gerekli alanlar (örn. `start_date`, `end_date`) yoksa veya `today` string'i beklenen formatta (örn. `YYYY-MM-DD`) değilse, kuralın durumu (aktif, pasif, gelecek) hatalı hesaplanır.
+[Aksiyom 3]: Eğer `pricingRulesFetcher` fonksiyonuna geçirilen `supabase` istemcisi (`SupabaseClient<Database>`), veritabanına erişim iznine sahip değilse veya ilgili tablo (pricing_rules) mevcut değilse, veri çekme başarısız
 
 ---
 
@@ -86,6 +79,8 @@ Bu modül, fiyatlandırma kurallarının tablo halinde sunulmasını sağlayan b
 - import: ../../components/admin/data-table/DataTableKit::DataTableKit
 - import: ../../components/admin/data-table/FacetedFilter::FacetedFilter
 - import: ../../components/admin/data-table/types::type { AdminColumn, DataTableFacet }
+- import: ../../components/admin/pricing/CostRefreshModal::CostRefreshModal
+- import: ../../components/admin/pricing/MaterializePricesModal::MaterializePricesModal
 - import: ../../components/admin/pricing/PricingRuleFormModal::PricingRuleFormModal
 - import: ../../hooks/useAdminTable::type FetchParams
 - import: ../../hooks/useAdminTable::type FetchResult
@@ -102,8 +97,10 @@ Bu modül, fiyatlandırma kurallarının tablo halinde sunulmasını sağlayan b
 - import: @/lib/admin/mutateWithAudit::mutateWithAudit
 - import: @/lib/supabase/client::supabaseBrowserClient
 - import: @supabase/supabase-js::type { SupabaseClient }
+- import: lucide-react::Coins
 - import: lucide-react::Percent
 - import: lucide-react::Plus
+- import: lucide-react::RefreshCw
 - import: lucide-react::SearchX
 - import: next/link::Link
 - import: next::type { Route }
@@ -167,38 +164,114 @@ type RuleStatus = 'active' | 'scheduled' | 'expired'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/admin/PricingRulesTableBody.tsx::methodLabel
-- **params**: (method: string, t: (key: string) => string)
+### [N1_NASIL] AST Pointer: PricingRulesTableBody.tsx::methodLabel
+- **params**: `method: string`, `t: (key: string) => string`
 - **ic_degiskenler**:
-  - `key` — METHOD_I18N_KEYS nesnesinden method anahtarının karşılığını alan i18n anahtarı
-- **Dönüş**: string — method etiketinin lokalize edilmiş hali veya method'un kendisi
+  - `key` — `METHOD_I18N_KEYS[method]` ile elde edilen i18n anahtar sözlüğü mapped değeri; method string'ini iç localization key'ine dönüştürür
+- **Dönüş**: `string` — yerelleştirilmiş yöntem etiketi; eşleşme yoksa ham `method` döner
 
-### [N2_NASIL] AST Pointer: src/views/admin/PricingRulesTableBody.tsx::deriveStatus
-- **params**: (rule: PricingRuleRow, today: string)
-- **ic_degiskenler**: (yok — sadece parametreler kullanılıyor)
-- **Dönüş**: RuleStatus — 'expired', 'scheduled' veya 'active'
+### [N2_NASIL] AST Pointer: PricingRulesTableBody.tsx::deriveStatus
+- **params**: `rule: PricingRuleRow`, `today: string`
+- **ic_degiskenler**: yok
+- **Dönüş**: `RuleStatus` — `'expired'` | `'scheduled'` | `'active'`; `valid_to < today` ise expired, `valid_from > today` ise scheduled, aksi halde active
 
-### [N3_NASIL] AST Pointer: src/views/admin/PricingRulesTableBody.tsx::pricingRulesFetcher
-- **params**: (supabase: SupabaseClient<Database>, _params: FetchParams)
+### [N3_NASIL] AST Pointer: PricingRulesTableBody.tsx::pricingRulesFetcher
+- **params**: `supabase: SupabaseClient<Database>`, `_params: FetchParams`
 - **ic_degiskenler**:
-  - `rules` — supabase'den getirilen pricing rules listesi
-  - `brands` — supabase.from('brands').select() sonucu gelen marka verileri
-  - `categories` — supabase.from('categories').select() sonucu gelen kategori verileri
-  - `productIds` — rules dizisinden elde edilen benzersiz product_id'ler dizisi
-  - `products` — productIds ile products tablosundan getirilen ürün verileri
-  - `brandName` — brand id → brand name eşleştirmesi yapan Map nesnesi
-  - `categoryName` — category id → category name eşleştirmesi yapan Map nesnesi
-  - `productName` — product id → product name (sku) eşleştirmesi yapan Map nesnesi
-  - `today` — bugünün tarihi (YYYY-MM-DD formatında)
-  - `rows` — her rule için hesaplanmış hedef ad ve status ile birlikte oluşturulan RuleRow[] dizisi
-  - `scopeKey` — SCOPE_KEYS ile rule.scope'tan elde edilen scope anahtarı
-  - `targetName` — scope'a göre marka, kategori veya ürün adını bulan değişken
-- **Dönüş**: Promise<FetchResult<RuleRow>> — rows ve toplam eşleşme sayısını içeren nesne
+  - `rules` — `listPricingRules(supabase)` çağrısının sonucu; veritabanından çekilen tüm fiyatlandırma kuralları dizisi
+  - `brands` — `Promise.all` destructuring'inden elde edilen `data` alanı; `supabase.from('brands').select('id, name')` sonucu
+  - `categories` — `Promise.all` destructuring'inden elde edilen `data` alanı; `supabase.from('categories').select('id, name')` sonucu
+  - `productIds` — `rules` dizisinden `product_id`'leri benzersizleştiren `new Set` + `filter` ile elde edilen `string[]`; null olanları dışlar
+  - `products` — `productIds` boş değilse `supabase.from('products').select('id, name, sku').in('id', productIds)` sonucu; boşsa `[]` döner
+  - `brandName` — `Map<string, string>`; `(brands ?? []).map(b => [b.id, b.name])` ile marka ID → isim eşleme haritası
+  - `categoryName` — `Map<string, string>`; `(categories ?? []).map(c => [c.id, c.name])` ile kategori ID → isim eşleme haritası
+  - `productName` — `Map<string, string>`; `products.map(p => [p.id, p.name + ' (' + p.sku + ')'])` ile ürün ID → "isim (sku)" eşleme haritası
+  - `today` — `new Date().toISOString().slice(0, 10)` ile elde edilen `YYYY-MM-DD` biçiminde bugünün tarih dizgesi
+  - `rows` — `rules.map(rule => { ... })` ile her kuralı `RuleRow` objesine dönüştüren sonuç dizisi; her eleman `scopeKey`, `targetName`, `status` gibi zenginleştirilmiş alanları içerir
+- **Dönüş**: `Promise<FetchResult<RuleRow>>` — `{ rows, totalMatched: rows.length }` objesi
 
-### [N4_NASIL] AST Pointer: src/views/admin/PricingRulesTableBody.tsx::PricingRulesTableBody
-- **params**: (yok)
-- **ic_degiskenler**: (fonksiyon gövdesi verilmemiş, sadece iç içe fonksiyonlar/arrow function'lar var)
-- **Dönüş**: React.FC — React bileşeni
+### [N4_NASIL] AST Pointer: PricingRulesTableBody.tsx::(rule map — pricingRulesFetcher içindeki dönüştürme callback'i)
+- **params**: `rule` — tek bir kural nesnesi (rules dizisinin bir elemanı)
+- **ic_degiskenler**:
+  - `scopeKey` — `SCOPE_KEYS[rule.scope] ?? 'global'`; sayısal scope değerini okunabilir string anahtarına dönüştürür (variant, product, brand, category, global)
+  - `targetName` — scope türüne göre koşullu zincirleme: `scope === 2` ise `brandName.get(rule.brand_id ?? '')`, `scope === 3` ise `categoryName.get(rule.category_id ?? '')`, `scope === 0 || scope === 1` ise `productName.get(rule.product_id ?? '')`, aksi halde boş string
+- **Dönüş**: `RuleRow` objesi — `{ id, scope, scopeKey, targetName, method, supported, marginPct, fixedPrice, vatInclusive, priority, validFrom, validTo, status, productId, raw }` alanlarını içeren tam nesne
+
+### [N5_NASIL] AST Pointer: PricingRulesTableBody.tsx::PricingRulesTableBody
+- **params**: yok (React bileşeni)
+- **ic_degiskenler** (callback'lerden çıkarılan):
+  - `setEditing` — `useState` setter; düzenleme modunda açık olan kuralı tutar
+  - `setModalOpen` — `useState` setter; modalın açık/kapalı durumunu kontrol eder
+  - `table` — tablo durum/hook nesnesi; `.reload()`, `.selection`, `.allRows`, `.fetchAllForExport()`, `.filtering` üyelerini içerir
+  - `hasWriteAccess` — `boolean`; kullanıcının yazma iznini belirler,但 silme/düzenleme butonlarının `disabled` durumunu kontrol eder
+  - `locale` — dil/bölge ayarı; `formatNumber`, `formatCurrency`, `formatDate` yardımcılarına geçilir
+  - `t` — çeviri fonksiyonu; tüm UI metinleri için kullanılır
+  - `supabaseBrowserClient` — import edilen tarayıcı tarafı Supabase istemcisi; silme işlemlerinde kullanılır
+  - `openCreate` — callback; `setEditing(null)` ve `setModalOpen(true)` çağırarak yeni kural ekleme modunu açar
+  - `openEdit` — `(row) => { setEditing(row.raw); setModalOpen(true); }` callback'i; var olan kuralı düzenleme modunda açar
+  - `removeRule` — tekil kural silme callback'i (detaylı aşağıda)
+  - `bulkDelete` — toplu silme callback'i (detaylı aşağıda)
+  - `columns` — tablo sütun tanımları dizisi (detaylı aşağıda)
+  - `facets` — filtre facet tanımları (detaylı aşağıda)
+  - `bulkActions` — toplu işlem menüsü dizisi
+  - `onExport` — CSV dışa aktarma callback'i (detaylı aşağıda)
+- **Dönüş**: JSX bileşeni; tablo, filtreler, toplu işlemler ve modal'ı render eder
+
+### [N6_NASIL] AST Pointer: PricingRulesTableBody.tsx::removeRule (tekil silme callback'i)
+- **params**: `row: RuleRow` — silinecek kural
+- **ic_degiskenler**:
+  - `window.confirm(...)` — `t('admin.pricing.rules.confirm.delete')` ile onay diyaloğu; false dönerse işlev iptal
+  - `mutateWithAudit(...)` — audit loglu silme çağrısı parametreleri: `resource: 'pricing_rule'`, `canWrite: hasWriteAccess`, `action: 'DELETE'`, `rowPk: row.id`, `before: { scope, method, margin_pct, priority }`, `after: null`, `auditedByEdge: false`
+  - `fn` (iç callback) — `async () => { await deletePricingRule(supabaseBrowserClient, row.id) }` asıl silme işlemini yürütür
+  - `e` — catch bloğu yakaladığı hata; `AdminPermissionError` instance ise izin hatası, diğerleri silme hatası
+- **Dönüş**: `void` — başarıyla `toast.success` gösterir ve `table.reload()` ile tabloyu yeniler; hata durumunda `toast.error`
+
+### [N7_NASIL] AST Pointer: PricingRulesTableBody.tsx::bulkDelete (toplu silme callback'i)
+- **params**: yok
+- **ic_degiskenler**:
+  - `ids` — `table.selection.selectedIds`; kullanıcının seçtiği kural ID'leri dizisi; boşsa işlev iptal
+  - `window.confirm(...)` — `t('admin.pricing.rules.confirm.bulkDelete', { count: ids.length })` ile onay diyaloğu
+  - `mutateWithAudit(...)` — audit loglu toplu silme: `resource: 'pricing_rule'`, `action: 'DELETE'`, `rowPk: null`, `before: { ids }`, `after: null`
+  - `fn` (iç callback) — `async () => { await deletePricingRules(supabaseBrowserClient, ids) }` toplu silme işlemini yürütür
+  - `e` — catch bloğu; `AdminPermissionError` kontrolü
+- **Dönüş**: `void` — başarıyla `table.selection.clear()`, `toast.success`, `table.reload()`; hata durumunda `toast.error`
+
+### [N8_NASIL] AST Pointer: PricingRulesTableBody.tsx::columns (tablo sütun tanımları)
+- **params**: yok (closure olarak `t`, `locale`, `openEdit`, `removeRule`, `hasWriteAccess` gibi dış değişkenlere erişir)
+- **ic_degiskenler**: yok (düz array return)
+- **Dönüş**: `Array<{ key, header, sortable?, align?, hideable?, cell: (r) => JSX }> ` — 8 sütun tanımları:
+  - `scopeKey` — cyan badge ile kapsam etiketi
+  - `targetName` — hedef adı veya "Tüm Ürünler" fallback
+  - `method` — yöntem etiketi + desteklenmeyen yöntem uyarısı
+  - `rate` — cost_plus için `%margin × katsayı`, fixed için para birimli fiyat + KDV bilgisi
+  - `priority` — öncelik sayısı
+  - `validity` — geçerlilik tarih aralığı (başlangıç/bitiş)
+  - `status` — renkli badge ile durum (active/scheduled/expired)
+  - `actions` — preview linki (scope 0/1 ve productId varsa) + düzenle + sil butonları
+
+### [N9_NASIL] AST Pointer: PricingRulesTableBody.tsx::facets (filtre tanımı)
+- **params**: yok (closure)
+- **ic_degiskenler**:
+  - `scopeCount` — `Map<string, number>`; `table.allRows` üzerinden her `scopeKey`'in sayısını sayar
+  - `methodCount` — `Map<string, number>`; her yöntem tipinin sayısını sayar
+  - `statusCount` — `Map<string, number>`; her durum tipinin sayısını sayar
+  - `scopeOptions` — `['variant', 'product', 'brand', 'category', 'global']` sabit dizisi
+  - `methodOptions` — `['cost_plus', 'fixed', 'percent_off_list']` sabit dizisi
+  - `statusOptions` — `['active', 'scheduled', 'expired']` sabit dizisi
+- **Dönüş**: `Array<{ key, label, options: Array<{ value, label, count }> }>` — 3 facet objesi (scope, method, status); her biri seçeneklerin sayısını ve etiketlerini içerir
+
+### [N10_NASIL] AST Pointer: PricingRulesTableBody.tsx::onExport (CSV dışa aktarma)
+- **params**: yok (closure)
+- **ic_degiskenler**:
+  - `rows` — `table.fetchAllForExport()` sonucu; dışa aktarılacak tüm satırlar
+  - `cols` — `['id', 'scope', 'target', 'method', 'margin_pct', 'fixed_price', 'priority', 'valid_from', 'valid_to']` CSV sütun başlıkları
+  - `escape` — `(v: unknown) => '"' + String(v ?? '').replace(/"/g, '""') + '"'` CSV hücre kaçış fonksiyonu; tırnak işaretlerini çiftler
+  - `lines` — `rows.map(r => [...].map(escape).join(','))` ile her satırı CSV satırına dönüştüren dizi; `r.marginPct ?? ''` ve `r.fixedPrice ?? ''` ile null değerleri boş string'e çevirir
+  - `csv` — BOM (`\uFEFF`) + başlık satırı + veri satırları birleştirilmiş tam CSV dizgesi
+  - `blob` — `new Blob([csv], { type: 'text/csv;charset=utf-8;' })` ile oluşturulan CSV blob nesnesi
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici dosya URL'i
+  - `a` — `document.createElement('a')` ile oluşturulan geçici anchor elementi; `href = url`, `download = 'pricing-rules.csv'`, `.click()` ile indirme tetiklenir
+- **Dönüş**: `void` — dosya indirmeyi tetikler; sonunda `URL.revokeObjectURL(url)` ile URL'i serbest bırakır
 
 ---
 
@@ -210,8 +283,8 @@ graph TD
     PricingRulesTableBody_tsx__deriveStatus["deriveStatus"]
     PricingRulesTableBody_tsx__methodLabel["methodLabel"]
     PricingRulesTableBody_tsx__pricingRulesFetcher["pricingRulesFetcher"]
-    PricingRulesTableBody_tsx__pricingRulesFetcher --> PricingRulesTableBody_tsx__deriveStatus
     PricingRulesTableBody_tsx__PricingRulesTableBody --> PricingRulesTableBody_tsx__methodLabel
+    PricingRulesTableBody_tsx__pricingRulesFetcher --> PricingRulesTableBody_tsx__deriveStatus
 ```
 
 ## NODE ID STANDARD

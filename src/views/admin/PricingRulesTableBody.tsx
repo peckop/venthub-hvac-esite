@@ -1,7 +1,7 @@
 'use client'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { Percent, Plus, RefreshCw, SearchX } from 'lucide-react'
+import { Coins, Percent, Plus, RefreshCw, SearchX } from 'lucide-react'
 import type { Route } from 'next'
 import Link from 'next/link'
 import React, { useCallback, useMemo, useState } from 'react'
@@ -18,6 +18,7 @@ import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import { FacetedFilter } from '../../components/admin/data-table/FacetedFilter'
 import type { AdminColumn, DataTableFacet } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
+import CostRefreshModal from '../../components/admin/pricing/CostRefreshModal'
 import MaterializePricesModal from '../../components/admin/pricing/MaterializePricesModal'
 import PricingRuleFormModal from '../../components/admin/pricing/PricingRuleFormModal'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
@@ -166,6 +167,7 @@ const PricingRulesTableBody: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<PricingRuleRow | null>(null)
   const [materializeOpen, setMaterializeOpen] = useState(false)
+  const [costRefreshOpen, setCostRefreshOpen] = useState(false)
 
   const table = useAdminTable<RuleRow>({
     resource: 'pricing_rules',
@@ -537,6 +539,18 @@ const PricingRulesTableBody: React.FC = () => {
                   />
                 ))}
                 <ExportMenu items={[{ key: 'csv', label: t('admin.dataTable.export.csv'), onSelect: () => void exportCsv() }]} />
+                {/* Maliyet tazeleme fiyat hesabından ÖNCE gelir: cost_in_base donmuş TL'dir,
+                    tazelenmezse bütün vitrin eski kurda kalır (cetvel §2·A). Sırayı butonların
+                    dizilişi de anlatsın diye önce bu duruyor. */}
+                <button
+                  type="button"
+                  onClick={() => setCostRefreshOpen(true)}
+                  disabled={!hasWriteAccess}
+                  className={`${adminTableActionClass} disabled:opacity-40 disabled:cursor-not-allowed`}
+                >
+                  <Coins size={14} />
+                  {t('admin.pricing.rules.costRefresh.toolbarAction')}
+                </button>
                 <button
                   type="button"
                   onClick={() => setMaterializeOpen(true)}
@@ -574,6 +588,12 @@ const PricingRulesTableBody: React.FC = () => {
         rule={editing}
         onClose={() => setModalOpen(false)}
         onSaved={() => void table.reload()}
+      />
+
+      <CostRefreshModal
+        open={costRefreshOpen}
+        onClose={() => setCostRefreshOpen(false)}
+        onSuccess={() => void table.reload()}
       />
 
       <MaterializePricesModal
