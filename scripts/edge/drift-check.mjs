@@ -292,7 +292,13 @@ async function downloadSlug(ref, tempRoot, slug) {
   fs.writeFileSync(path.join(work, 'supabase', 'config.toml'), `project_id = "${ref}"\n`, 'utf8')
 
   try {
-    await execFileAsync(CLI_BIN, ['functions', 'download', slug, '--project-ref', ref], {
+    // `--use-api` ZORUNLU, kolaylık değil. Bayrak yokken CLI eszip'i **Docker ile**
+    // yerelde açıyor; GitHub runner'da bu 26 fonksiyonun 19'unda SESSİZCE başarısız
+    // oldu — CLI exit 0 döndürdü ama hiç dosya çıkarmadı (ölçüldü: CI run 31870449493;
+    // çalışan 7 tanesi, tesadüfen, bundle'ı CI'da üretilmiş olanlardı).
+    // `--use-api` unbundle'ı sunucu tarafında yaptırır: Docker bağımlılığı yok,
+    // sonuç ortamdan bağımsız. Yerelde iki yolun da aynı dosyaları verdiği doğrulandı.
+    await execFileAsync(CLI_BIN, ['functions', 'download', slug, '--project-ref', ref, '--use-api'], {
       cwd: work,
       shell: USE_SHELL,
       windowsHide: true,
@@ -340,7 +346,10 @@ async function downloadAll(ref, slugs) {
     fatal(
       `Prod kaynağı indirilemedi — ${failed.length}/${slugs.length} fonksiyon (süre ${seconds}s).\n` +
         failed.map((f) => `    - ${f.error}`).join('\n') +
-        '\n  Olası sebepler: SUPABASE_ACCESS_TOKEN geçersiz/süresi dolmuş, CLI sürümü eski,\n' +
+        '\n  "hata vermedi ama dosya çıkarmadı" görüyorsan: sunucu-tarafı unbundle (--use-api)\n' +
+        '  bozulmuş olabilir. Bayrak KALDIRILMAMALI — kaldırılırsa CLI Docker ile açmaya çalışır\n' +
+        '  ve runner\'da 26 fonksiyonun 19\'unda sessizce başarısız olur (CI run 31870449493).\n' +
+        '  Diğer olası sebepler: SUPABASE_ACCESS_TOKEN geçersiz/süresi dolmuş, CLI sürümü eski,\n' +
         '  proje ref yanlış, ya da ağ erişimi yok. Kaynak karşılaştırması YAPILAMADI.'
     )
   }
