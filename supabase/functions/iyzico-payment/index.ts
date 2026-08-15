@@ -17,6 +17,8 @@ import {
     resolveCaller,
     TenantMismatchError,
 } from '../_shared/caller.ts'
+import { buildAllowedOrigins, isOriginAccepted, pickRedirectOrigin } from '../_shared/origins.ts'
+import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 
 
 /**
@@ -33,9 +35,18 @@ declare const Deno: {
 Deno.serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
 
+    // T043-VH: allowlist artik YALNIZ `ALLOWED_ORIGINS`'ten degil, site adresi
+    // degiskenlerinden de kuruluyor. Eskiden `ALLOWED_ORIGINS` bos olunca koken denetimi
+    // tamamen kapaniyordu (fail-open); artik `PUBLIC_SITE_URL`/`FRONTEND_URL`/`SITE_URL`
+    // tanimliysa denetim kendiliginden SILAHLANIR. Detay: `_shared/origins.ts`.
     const origin = req.headers.get('origin') || '';
-    const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean);
-    const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin));
+    const allowlist = buildAllowedOrigins({
+        PUBLIC_SITE_URL: Deno.env.get('PUBLIC_SITE_URL'),
+        FRONTEND_URL: Deno.env.get('FRONTEND_URL'),
+        SITE_URL: Deno.env.get('SITE_URL'),
+        ALLOWED_ORIGINS: Deno.env.get('ALLOWED_ORIGINS'),
+    });
+    const okOrigin = isOriginAccepted(allowlist, origin);
     const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now());
 
     if (req.method === 'OPTIONS') {
@@ -262,49 +273,116 @@ Deno.serve(async (req: Request) => {
             });
         }
 
-        // Authoritative server-side validation (prices + stock)
-        let authoritativeItems: Array<{ product_id: string; quantity: number; unit_price: number; price_list_id: string | null }> = []
-        let authoritativeTotalNum: number = typeof amount === 'number' ? Number(amount) : 0
-        try {
-            const vHeaders = {
-                'Authorization': `Bearer ${serviceRoleKey as string}`,
-                'apikey': serviceRoleKey as string,
-                'Content-Type': 'application/json'
-            } as Record<string, string>;
-            const vResp = await fetch(`${supabaseUrl}/functions/v1/order-validate`, {
-                method: 'POST',
-                headers: vHeaders,
-                body: JSON.stringify({ user_id })
-            });
-            if (vResp.ok) {
-                interface StockIssue { product_id: string; required: number; available: number }
-                interface ValidationResponse {
-                    stock_issues?: StockIssue[];
-                    mismatches?: unknown[];
-                    items?: { product_id: string; quantity: number; unit_price: number; price_list_id: string | null }[];
-                    totals?: { subtotal: number };
-                }
-                const validation = await vResp.json().catch(() => ({})) as ValidationResponse;
-                const stockIssues = Array.isArray(validation?.stock_issues) ? validation.stock_issues : [];
-                const _mismatches = Array.isArray(validation?.mismatches) ? validation.mismatches : [];
-                // Eski davranış: 409 döndürüp akışı durdurmak. Yeni davranış: sunucu otoritesini uygula ve devam et.
-                if ((stockIssues && stockIssues.length > 0)) {
-                    // Stok problemi varsa yine durdur (kullanıcı müdahalesi gerekir)
-                    return new Response(JSON.stringify({ error: { code: 'VALIDATION_STOCK', message: 'Stock issue', stock_issues: stockIssues } }), { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-                }
-                // Fiyat uyuşmazlığında: authoritativeItems ve subtotal ile devam et (ödeme bloklanmasın)
-                authoritativeItems = Array.isArray(validation?.items) ? (validation.items || []) : []
-                if (validation?.totals?.subtotal != null) {
-                    authoritativeTotalNum = Number(validation.totals.subtotal)
-                }
-            }
-        } catch {
-            // fallback to client-requested cartItems
+        // ── SUNUCU FİYAT OTORİTESİ (T041-VH · 2026-08-15) ─────────────────────────
+        //
+        // ÖNCEKİ HÂLİ NİÇİN HİÇ ÇALIŞMADI. `order-validate` kimliği token'dan alır
+        // (`auth.getUser(<token>)`); burada gönderilen SERVICE_ROLE anahtarının `sub`
+        // claim'i YOKTUR → çağrı HER SEFERİNDE 401 döndü. `if (vResp.ok)` bunu sessizce
+        // atladı, `catch {}` de öyle, ve akış aşağıdaki "cartItems'a düş" dalına indi:
+        // yani **tahsil edilecek tutarı tarayıcı belirliyordu.** Üstelik gövdedeki
+        // `user_id` de boşunaydı — `order-validate` kullanıcıyı DOĞRULANMIŞ token'dan
+        // okur, gövdeye bakmaz.
+        //
+        // İKİ AYAK BİRLİKTE DÜZELTİLİR, biri tek başına yetmez:
+        //   (1) KİMLİK — çağıranın kendi doğrulanmış JWT'si iletilir. Bu, `resolveCaller`
+        //       içinde `auth.getUser` ile İMZASI DOĞRULANMIŞ token'ın ta kendisidir
+        //       (bu satıra gelinebilmesi için sınıf (a) kapısından geçilmiş olmalı).
+        //       `order-validate` sepeti o kullanıcının `shopping_carts` satırından bulur.
+        //   (2) FAIL-CLOSED — doğrulama yapılamıyorsa ödeme BAŞLAMAZ. İstemci fiyatına
+        //       düşen yedek yol SİLİNDİ. "Ödeme bloklanmasın" iyi niyeti, sunucu
+        //       otoritesini isteğe bağlı hâle getirdiği an otoriteyi yok eder.
+        //
+        // Boş sepet de bir RET sebebidir: `order-validate` boş sepette 200 + `items: []`
+        // döner; eskiden bu da yedek yolu tetikliyordu. Sunucu "sepette bir şey yok"
+        // diyorsa tahsilat yapılamaz.
+        interface StockIssue { product_id: string; required: number; available: number }
+        interface ValidationResponse {
+            stock_issues?: StockIssue[];
+            mismatches?: unknown[];
+            items?: { product_id: string; quantity: number; unit_price: number; price_list_id: string | null }[];
+            totals?: { subtotal: number };
         }
-        if (authoritativeItems.length === 0 && Array.isArray(cartItems)) {
-            authoritativeItems = (cartItems as Array<{ product_id: string; quantity: number; price?: number }>)
-                .map((ci) => ({ product_id: ci.product_id, quantity: ci.quantity, unit_price: Number(ci.price ?? 0), price_list_id: null }))
-            authoritativeTotalNum = authoritativeItems.reduce((s, it) => s + Number(it.unit_price) * Number(it.quantity), 0)
+        const validationFail = (code: string, message: string, extra: Record<string, unknown> = {}, status = 409) =>
+            new Response(JSON.stringify({ error: { code, message, ...extra } }), {
+                status,
+                headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
+            });
+
+        let authoritativeItems: Array<{ product_id: string; quantity: number; unit_price: number; price_list_id: string | null }> = []
+        let authoritativeTotalNum = 0
+
+        {
+            const callerAuth = req.headers.get('Authorization') || '';
+            let vResp: Response;
+            try {
+                vResp = await fetch(`${supabaseUrl}/functions/v1/order-validate`, {
+                    method: 'POST',
+                    headers: {
+                        // Çağıranın KENDİ doğrulanmış JWT'si — service_role DEĞİL.
+                        'Authorization': callerAuth,
+                        'apikey': Deno.env.get('SUPABASE_ANON_KEY') || '',
+                        'Content-Type': 'application/json'
+                    },
+                    // Gövde bilerek BOŞ: `order-validate` kullanıcıyı token'dan okur.
+                    body: JSON.stringify({})
+                });
+            } catch (e) {
+                // T045-VH: fail-closed sessiz kalmamali — bu dal "kimse satin alamiyor"
+                // demektir ve hicbir yerde patlamaz. Alarm admin panelinde gorunur.
+                await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+                    fn: 'iyzico-payment',
+                    code: 'VALIDATION_UNAVAILABLE',
+                    message: 'order-validate erisilemedi; odeme baslatilamiyor.',
+                    extra: { reason: e instanceof Error ? e.message : String(e) },
+                });
+                return validationFail('VALIDATION_UNAVAILABLE', 'Fiyat doğrulaması yapılamadı, ödeme başlatılmadı.', {}, 502);
+            }
+
+            if (!vResp.ok) {
+                const detail = await vResp.text().catch(() => '');
+                await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+                    fn: 'iyzico-payment',
+                    code: 'VALIDATION_UNAVAILABLE',
+                    message: `order-validate ${vResp.status} dondu; odeme baslatilamiyor.`,
+                    extra: { upstream_status: vResp.status, detail: detail.slice(0, 300) },
+                });
+                return validationFail('VALIDATION_UNAVAILABLE', 'Fiyat doğrulaması yapılamadı, ödeme başlatılmadı.', { upstream_status: vResp.status }, 502);
+            }
+
+            const validation = await vResp.json().catch(() => null) as ValidationResponse | null;
+            if (!validation) {
+                await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+                    fn: 'iyzico-payment',
+                    code: 'VALIDATION_UNAVAILABLE',
+                    message: 'order-validate yaniti JSON olarak cozulemedi; odeme baslatilamiyor.',
+                });
+                return validationFail('VALIDATION_UNAVAILABLE', 'Fiyat doğrulaması okunamadı, ödeme başlatılmadı.', {}, 502);
+            }
+
+            const stockIssues = Array.isArray(validation.stock_issues) ? validation.stock_issues : [];
+            if (stockIssues.length > 0) {
+                return validationFail('VALIDATION_STOCK', 'Stock issue', { stock_issues: stockIssues });
+            }
+
+            authoritativeItems = Array.isArray(validation.items) ? validation.items : [];
+            authoritativeTotalNum = Number(validation.totals?.subtotal ?? 0);
+
+            if (authoritativeItems.length === 0 || !(authoritativeTotalNum > 0)) {
+                // Sunucu sepeti boş/sıfır: istemcinin sepeti sunucuya yazılmamış olabilir
+                // (oturum düşmüş, senkron hatası). Tahsilat yapılamaz — istemci sepeti
+                // yeniden senkronlayıp tekrar denemeli.
+                return validationFail('VALIDATION_EMPTY_CART', 'Sunucudaki sepet boş, ödeme başlatılmadı.');
+            }
+
+            // İstemcinin GÖRDÜĞÜ tutar ile sunucunun hesabı aynı olmalı. Farklıysa ya
+            // istemci değiştirilmiştir ya da iki çağrı arasında fiyat değişmiştir; ikisinde
+            // de kullanıcının onaylamadığı bir tutarı çekmek YANLIŞ. Sunucu toplamı geri
+            // döndürülür ki istemci yeniden doğrulayıp kullanıcıya göstersin.
+            if (typeof amount === 'number' && Math.abs(Number(amount) - authoritativeTotalNum) > 0.01) {
+                return validationFail('AMOUNT_MISMATCH', 'Tutar sunucu hesabıyla uyuşmuyor.', {
+                    server_total: Number(authoritativeTotalNum.toFixed(2)),
+                });
+            }
         }
 
         // İyzico credentials (Environment)
@@ -334,18 +412,16 @@ Deno.serve(async (req: Request) => {
         const orderId = `VH-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
         const conversationId = `CONV-${Date.now()}`;
 
-        // Frontend origin for redirect after callback (if available)
-        let clientOrigin = req.headers.get('origin') || '';
-        if (!clientOrigin) {
-            const ref = req.headers.get('referer') || '';
-            try { clientOrigin = ref ? new URL(ref).origin : ''; } catch { clientOrigin = ''; }
-        }
-        if (!clientOrigin) {
-            const envOrigin = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
-            if (envOrigin) {
-                try { clientOrigin = new URL(envOrigin).origin; } catch { clientOrigin = envOrigin.replace(/\/$/, ''); }
-            }
-        }
+        // Odeme sonrasi donulecek KOKEN — T043-VH.
+        //
+        // ESKIDEN: dogrudan `Origin` basligindan, o yoksa `Referer`'dan aliniyordu. Ikisi de
+        // saldirganin serbestce yazdigi degerlerdir ve buradan cikan adres `successUrl` olarak
+        // Iyzico'ya gonderilip callback tarafindan `location.replace` ile ACILIYORDU. Yani
+        // GERCEK odeme tamamlandiktan sonra musteri saldirganin sayfasina dusuyordu.
+        //
+        // SIMDI: aday ancak allowlist'i GECERSE kullanilir; gecemezse kanonik adrese dusulur,
+        // o da yoksa yonlendirme hic yapilmaz. Istekten gelen deger sonuca dogrudan SIZAMAZ.
+        const clientOrigin = pickRedirectOrigin(allowlist, req.headers.get('origin')) ?? '';
 
         // Resolve client IP from headers
         const forwarded = req.headers.get('x-forwarded-for') || '';
