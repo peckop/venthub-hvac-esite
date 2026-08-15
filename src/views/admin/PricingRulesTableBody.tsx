@@ -18,6 +18,7 @@ import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import { FacetedFilter } from '../../components/admin/data-table/FacetedFilter'
 import type { AdminColumn, DataTableFacet } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
+import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import CostRefreshModal from '../../components/admin/pricing/CostRefreshModal'
 import MaterializePricesModal from '../../components/admin/pricing/MaterializePricesModal'
 import PricingRuleFormModal from '../../components/admin/pricing/PricingRuleFormModal'
@@ -160,6 +161,7 @@ async function pricingRulesFetcher(
 
 const PricingRulesTableBody: React.FC = () => {
   const { t, lang } = useI18n()
+  const confirm = useConfirm()
   const locale = lang === 'en' ? 'en' : 'tr'
   const { role, loading: roleLoading, canWrite } = useRole()
   const hasWriteAccess = canWrite('pricing')
@@ -191,7 +193,12 @@ const PricingRulesTableBody: React.FC = () => {
 
   const removeRule = useCallback(
     async (row: RuleRow) => {
-      if (!window.confirm(t('admin.pricing.rules.confirm.delete'))) return
+      const ok = await confirm({
+        description: t('admin.pricing.rules.confirm.delete'),
+        confirmLabel: t('admin.confirm.delete'),
+        tone: 'danger',
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'pricing_rule',
@@ -215,13 +222,18 @@ const PricingRulesTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [confirm, hasWriteAccess, t, table],
   )
 
   const bulkDelete = useCallback(async () => {
     const ids = table.selection.selectedIds
     if (ids.length === 0) return
-    if (!window.confirm(t('admin.pricing.rules.confirm.bulkDelete', { count: ids.length }))) return
+    const ok = await confirm({
+      description: t('admin.pricing.rules.confirm.bulkDelete', { count: ids.length }),
+      confirmLabel: t('admin.confirm.delete'),
+      tone: 'danger',
+    })
+    if (!ok) return
     try {
       await mutateWithAudit(supabaseBrowserClient, {
         resource: 'pricing_rule',
@@ -245,7 +257,7 @@ const PricingRulesTableBody: React.FC = () => {
           : t('admin.pricing.rules.toasts.deleteFailed'),
       )
     }
-  }, [hasWriteAccess, t, table])
+  }, [confirm, hasWriteAccess, t, table])
 
   const columns = useMemo<AdminColumn<RuleRow>[]>(
     () => [

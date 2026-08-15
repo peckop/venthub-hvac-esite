@@ -3,6 +3,7 @@ import { audit } from './audit.en'
 import { authority } from './authority.en'
 import { categories } from './categories.en'
 import { common } from './common.en'
+import { confirm } from './confirm.en'
 import { coupons } from './coupons.en'
 import { dashboard } from './dashboard.en'
 import { dataTable } from './dataTable.en'
@@ -27,6 +28,7 @@ import { webhooks } from './webhooks.en'
 export const admin = {
   pricing,
   common,
+  confirm,
   coupons,
   dataTable,
   dashboard,

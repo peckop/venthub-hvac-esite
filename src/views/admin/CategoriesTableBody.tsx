@@ -18,6 +18,7 @@ import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import EditableCell from '../../components/admin/EditableCell'
 import ExportMenu from '../../components/admin/ExportMenu'
+import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -52,6 +53,7 @@ async function categoriesFetcher(
 
 const CategoriesTableBody: React.FC = () => {
   const { t } = useI18n()
+  const confirm = useConfirm()
   const router = useRouter()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('categories')
@@ -168,7 +170,12 @@ const CategoriesTableBody: React.FC = () => {
         toast.error(t('admin.categories.toasts.noPermission'))
         return
       }
-      if (!confirm(t('admin.categories.deleteConfirm'))) return
+      const ok = await confirm({
+        description: t('admin.categories.deleteConfirm'),
+        confirmLabel: t('admin.confirm.delete'),
+        tone: 'danger',
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'categories',
@@ -193,7 +200,7 @@ const CategoriesTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [hasWriteAccess, t, table, confirm],
   )
 
   /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
@@ -228,15 +235,13 @@ const CategoriesTableBody: React.FC = () => {
       const ids = table.selection.selectedIds
       if (ids.length === 0) return
       const isActive = status === 'active'
-      if (
-        !window.confirm(
-          t('admin.categories.bulk.statusConfirm', {
-            count: String(ids.length),
-            status: t(`admin.categories.statusLabels.${status}`),
-          }),
-        )
-      )
-        return
+      const ok = await confirm({
+        description: t('admin.categories.bulk.statusConfirm', {
+          count: String(ids.length),
+          status: t(`admin.categories.statusLabels.${status}`),
+        }),
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'categories',
@@ -264,7 +269,7 @@ const CategoriesTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [hasWriteAccess, t, table, confirm],
   )
 
   /* ---- toplu öne çıkarma — UPDATE, mutateWithAudit kapısından ---- */
@@ -306,7 +311,12 @@ const CategoriesTableBody: React.FC = () => {
   const bulkDelete = useCallback(async () => {
     const ids = table.selection.selectedIds
     if (ids.length === 0) return
-    if (!window.confirm(t('admin.categories.bulk.deleteConfirm', { count: String(ids.length) }))) return
+    const ok = await confirm({
+      description: t('admin.categories.bulk.deleteConfirm', { count: String(ids.length) }),
+      confirmLabel: t('admin.confirm.delete'),
+      tone: 'danger',
+    })
+    if (!ok) return
     try {
       await mutateWithAudit(supabaseBrowserClient, {
         resource: 'categories',
@@ -330,7 +340,7 @@ const CategoriesTableBody: React.FC = () => {
           : t('admin.categories.bulk.deleteFailed'),
       )
     }
-  }, [hasWriteAccess, t, table])
+  }, [hasWriteAccess, t, table, confirm])
 
   /* ---- status chip'leri (is_active) ---- */
   const statusChips = useMemo(

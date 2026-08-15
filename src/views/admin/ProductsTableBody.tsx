@@ -17,6 +17,7 @@ import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
+import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import ProductCsvImport from '../../components/admin/products/ProductCsvImport'
 import ProductFormModal from '../../components/admin/products/ProductFormModal'
 import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
@@ -290,6 +291,7 @@ const InlineNumberCell: React.FC<InlineNumberCellProps> = ({ value, display, wid
 
 const ProductsTableBody: React.FC = () => {
   const { t, lang } = useI18n()
+  const confirm = useConfirm()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('products')
 
@@ -348,7 +350,15 @@ const ProductsTableBody: React.FC = () => {
   /* ---- (a) tekil silme — DELETE, mutateWithAudit kapısından ---- */
   const removeSingle = useCallback(
     async (r: ProductRow) => {
-      if (!window.confirm(t('admin.products.confirm.deleteProduct'))) return
+      // window.confirm → ConfirmDialog (cetvel §4.7): native kutu stilsizdi, i18n
+      // taşımıyordu ve mobilde "tekrar sorma" ile kalıcı susturulup sessiz veri
+      // kaybı üretebiliyordu (false döner, silme sessizce iptal olur).
+      const ok = await confirm({
+        description: t('admin.products.confirm.deleteProduct'),
+        confirmLabel: t('admin.confirm.delete'),
+        tone: 'danger'
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'products',
@@ -372,7 +382,7 @@ const ProductsTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [hasWriteAccess, t, table, confirm],
   )
 
   /* ---- (b) toplu durum — UPDATE, mutateWithAudit kapısından ---- */
@@ -380,7 +390,10 @@ const ProductsTableBody: React.FC = () => {
     async (status: string) => {
       const ids = table.selection.selectedIds
       if (ids.length === 0) return
-      if (!window.confirm(t('admin.products.bulk.statusConfirm', { count: String(ids.length), status }))) return
+      const ok = await confirm({
+        description: t('admin.products.bulk.statusConfirm', { count: String(ids.length), status }),
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'products',
@@ -405,7 +418,7 @@ const ProductsTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [hasWriteAccess, t, table, confirm],
   )
 
   /* ---- (c) toplu vitrin — UPDATE, mutateWithAudit kapısından (audit boşluğu kapandı) ---- */
@@ -447,7 +460,12 @@ const ProductsTableBody: React.FC = () => {
   const bulkDelete = useCallback(async () => {
     const ids = table.selection.selectedIds
     if (ids.length === 0) return
-    if (!window.confirm(t('admin.products.bulk.deleteConfirm', { count: String(ids.length) }))) return
+    const ok = await confirm({
+      description: t('admin.products.bulk.deleteConfirm', { count: String(ids.length) }),
+      confirmLabel: t('admin.confirm.delete'),
+      tone: 'danger',
+    })
+    if (!ok) return
     try {
       await mutateWithAudit(supabaseBrowserClient, {
         resource: 'products',
@@ -471,14 +489,17 @@ const ProductsTableBody: React.FC = () => {
           : t('admin.products.bulk.deleteFailed'),
       )
     }
-  }, [hasWriteAccess, t, table])
+  }, [hasWriteAccess, t, table, confirm])
 
   /* ---- (e) toplu fiyat — UPDATE, mutateWithAudit kapısından (audit boşluğu kapandı) ---- */
   const bulkPriceAdjust = useCallback(
     async (mode: 'percent' | 'fixed', value: number) => {
       const ids = table.selection.selectedIds
       if (ids.length === 0) return
-      if (!window.confirm(t('admin.products.bulk.priceConfirm', { count: String(ids.length) }))) return
+      const ok = await confirm({
+        description: t('admin.products.bulk.priceConfirm', { count: String(ids.length) }),
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'products',
@@ -521,7 +542,7 @@ const ProductsTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [hasWriteAccess, t, table, confirm],
   )
 
   /* ---- (f) inline-edit kaydet — UPDATE, mutateWithAudit kapısından (audit boşluğu kapandı) ---- */
