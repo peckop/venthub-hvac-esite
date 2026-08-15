@@ -10,6 +10,13 @@
 >
 > **Kaynaklar:** Refine · Shopify Polaris · Medusa Admin · Saleor Dashboard · shadcn-admin (provenance §9).
 > Yaşayan doküman — büyür ama her an **kullanılır ve eksiksizdir**. Strateji: memory `standard-first-strategy`.
+>
+> 🎨 **Kardeş cetvel — `admin-design-standard.md` (v1.0, 2026-08-15):** bu dosya *yapıyı ve davranışı*
+> sabitler; **görünüş, his ve yerleşim mekaniği** oraya aittir — kabuk scroll sahipliği ve zoom
+> dayanıklılığı (WCAG 1.4.10 / 1.4.4), sidebar collapse mekaniği, yoğunluk / tipografi / yüzey kuralları
+> ve **etkileşim yüzeyi (overlay) taksonomisi** ("nerede modal, nerede non-modal panel, nerede ayrı
+> rota, nerede popover"). §4.3'teki route-modal kararının kaynaklı gerekçesi ve §10.4'ün kapsamadığı
+> yerleşim/a11y maddeleri de oradadır. **İkisi birlikte admin'in tam cetvelidir.**
 
 ---
 
