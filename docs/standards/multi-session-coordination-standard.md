@@ -61,6 +61,7 @@ hepsinin birleşimidir; böylece eşzamanlı append'in satır karıştırma risk
 |---|---|---|
 | Oturum açılışı | `SessionStart` kancası kimliği + şeridi + pano özetini **bağlama enjekte eder** | Ajan zaten "neredeyiz" diye bakmak zorunda; kimliğini tahmin etmez, **okur** |
 | Her kullanıcı turu | `UserPromptSubmit` kancası **sessiz** brifing basar (yalnız söyleyecek şey varsa) **ve kirayı yeniler** | Bağlamı kirletmeden farkındalık; Recep mesaj taşımaz. Kalp atışını elle beklemek, bu cetvelin teşhis ettiği "hatırlamaya bağlı adım"ı katmanın merkezine geri koyardı |
+| **Her yazmada** | `PreToolUse` kancası **kirayı yeniler** | Atış yalnız kullanıcı turuna bağlıyken, uzun **otonom** çalışmada hiç atış olmaz ve oturum KENDİ şeridini kaybeder. Ölçüldü: 5 saatlik bir koşuda üç oturumun **üçü de** düştü. Yazıyorsan yaşıyorsundur |
 | Oturum kapanışı | `SessionEnd` kancası şeridi **bırakır** | TTL (4sa) yalnız çökme/kapatma için emniyet ağıdır; düzgün kapanışta sıradaki oturum beklemez |
 | Yazmadan önce | `PreToolUse` kancası başka oturumun şeridine yazmayı **reddeder** | Talimat değil **yapı** — protokolü unutmak mümkün değil |
 | PR merge | `post-merge` kancası commit künyelerinden registry'yi günceller | Kanca zaten doc üretimi için koşuyor |
@@ -89,6 +90,18 @@ düzenleyebilir. Amaç kazara çakışmayı **yazım anında** yüzeye çıkarma
 
 **Oturum kimliği uydurulmaz.** Claude Code kalıcı bir UUID verir ve kancaya `stdin` ile
 geçirir. Compact'ten sağ çıkar (bağlam sıfırlansa da `SessionStart` yeniden koşar).
+
+**Alt-ajanlar ebeveynin kimliğiyle koşar (ÖLÇÜLDÜ).** `PreToolUse` girdisinde alt-ajanın
+`session_id`'si ebeveynininkiyle **aynıdır**; ayrıca `agent_id` + `agent_type` gelir. Yani
+alt-ajan, kendisini başlatan oturumun şerit haklarını olduğu gibi devralır. Bundan çıkan iki
+sonuç: (1) "alt-ajanlar bloklanıyor" gözlemi **kimlik sorunu değildir** — gerçekten yabancı bir
+şerit vardır (ya da kira TTL'den düşmüştür); (2) bir alt-ajan yabancı şeride yazmak zorunda
+kalırsa doğru çıkış **yazmak değil raporlamaktır**: içeriği raporunda döndürür, ebeveyn kendi
+kapısından geçirip yazar. `Bash` ile kapıyı aşmak yasak ([[worker-direct-push-incident]] deseni).
+
+**Şerit ADI etikettir, talep OTURUM başınadır.** Aynı adı iki oturum kullanabilir (ör. oturum
+yeniden başlatıldığında eskisi TTL dolana dek görünür). Pano bunu birleştirmez, **çakışma olarak
+işaretler** — çünkü aynı adı taşıyan iki canlı talep birbirini bloklayabilir.
 
 ## 5. Kullanım
 

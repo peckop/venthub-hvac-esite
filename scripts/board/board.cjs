@@ -212,14 +212,24 @@ function findConflict(filePath, sid, repoRoot) {
   return null
 }
 
-/** İnsan/ajan için kısa pano özeti (birkaç satır). */
+/**
+ * İnsan/ajan için kısa pano özeti.
+ *
+ * Talepler OTURUM başına tutulur, şerit ADI başına değil: aynı adı iki oturum kullanabilir
+ * (ör. bir oturum yeniden başlatıldığında eskisi TTL dolana dek görünür). Bu, "şerit iki kez
+ * yazılmış" gibi okunup kafa karıştırıyordu — artık ÇAKIŞMA olarak işaretlenir, çünkü aynı
+ * adı taşıyan iki canlı talep birbirini bloklayabilir (kıdemsiz olan yazamaz).
+ */
 function summary(sid) {
   const live = liveClaims()
   if (live.length === 0) return 'PANO: canlı talep yok.'
+  const laneCount = new Map()
+  for (const c of live) laneCount.set(c.lane, (laneCount.get(c.lane) || 0) + 1)
   const lines = live.map(c => {
     const mine = c.sid === sid ? ' (sen)' : ''
+    const dup = laneCount.get(c.lane) > 1 ? ' ⚠ AYNI ŞERİT ADI birden çok oturumda' : ''
     const mins = Math.max(0, Math.round((Date.now() - Date.parse(c.heartbeat)) / 60000))
-    return `  · ${c.lane}${mine} — ${c.globs.join(', ')} [${c.sid.slice(0, 8)}, ${mins}dk önce]`
+    return `  · ${c.lane}${mine}${dup} — ${c.globs.join(', ')} [${c.sid.slice(0, 8)}, ${mins}dk önce]`
   })
   return 'PANO — canlı şeritler:\n' + lines.join('\n')
 }
