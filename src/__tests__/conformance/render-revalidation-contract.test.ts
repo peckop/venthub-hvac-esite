@@ -28,11 +28,42 @@ import { describe, expect, it } from 'vitest'
  *      gerçek tetiği düşürüp metni fonksiyon gövdesine koyarak kanıtladı: test yeşil kaldı.
  *      → Artık dollar-quote blokları ve dizgeler MASKELENİR, ifade `create trigger` ile BAŞLAMALIDIR.
  *
+ * ── ÜÇÜNCÜ denetim pası, İKİNCİ sürümde ÜÇ kaçak daha buldu ──
+ *
+ *  (3) **Ölü SQL dizgesi.** Kurulum iddiası dosyadaki METNE bakıyordu. Fiyat tetiklerini
+ *      çalıştırılan şablondan alıp kullanılmayan bir `legacySql` değişkenine taşımak yetiyordu:
+ *      betik 4 tabloya tetik kuruyor, yine "Setup Completed Successfully" yazıyor, kapı yeşil.
+ *      Bu, (2)'nin birebir JavaScript boyutuydu. → `executedSql()` artık yalnız bir yürütme
+ *      çağrısına BESLENEN şablon literallerini tarar.
+ *
+ *  (4) **İç içe blok yorumu.** PostgreSQL `/* … /* … *​/ … *​/` iç içe yorumu kabul eder (PG el
+ *      kitabı §4.1.5, C'den farklı). Tarayıcı ilk kapanışta duruyordu, dolayısıyla "bir bloğu
+ *      yorum yaparak kapatma" — en sık devre-dışı bırakma biçimi — görünmez kalıyordu.
+ *      → Derinlik sayacı.
+ *
+ *  (5) **Tarihsiz migration adı.** `hotfix_drop_products_webhook.sql` gibi rakamla başlamayan bir
+ *      ad `chronoKey`'de en başa düşüyor; içindeki `drop trigger` henüz var olmayan bir tetiği
+ *      düşürmeye çalışıp hiçbir şeye denk gelmiyordu. Denetçi ölçtü: aynı içerik tarihsiz adla
+ *      SESSİZ YEŞİL, `20260816_` önekiyle kırmızı. → Ayrı bir fail-closed iddia.
+ *
+ *  Ayrıca: `table === "x"` (çift tırnak) bir öksüz handler'ı kaçırıyordu — repoda `quotes` lint
+ *  kuralı ve Prettier yapılandırması yok, yani çift tırnak meşru bir yazım.
+ *
  * Ders (kaydedilmeye değer): statik tarayıcının yanlış-negatifi, kapının hiç olmamasından daha
- * kötüdür — çünkü yeşil ışık güven üretir. Bu yüzden aşağıdaki her iddia bilerek bozularak
- * kanıtlanmıştır, denetçinin bulduğu iki kaçak senaryosu dahil.
+ * kötüdür — çünkü yeşil ışık güven üretir. Üç denetim pası, üç ayrı sürümde toplam beş sessiz-yeşil
+ * çıkardı; hiçbiri koda bakarak "doğru görünüyor" demekle bulunamazdı. Bu yüzden aşağıdaki her
+ * iddia bilerek bozularak kanıtlanmıştır.
  *
  * ── KAPSAM DIŞI (dürüstçe, kapatılmamış) ──
+ *
+ *  • **Tetiğin OLAY kapsamı denetlenmiyor.** `AFTER INSERT ON public.products` (UPDATE/DELETE
+ *    olmadan) bu kapıdan geçer; `on_product_prices_upd`'nin `WHEN` koşulunun kaybolması da repo
+ *    tarafında görünmez. Cetvelin §3 tablosundaki tetik ADLARI da doğrulanmıyor.
+ *  • **Aynı-gün sıralaması** ad-sırası ile tam örtüşmüyor (197 migration'ın 7'si yer değiştiriyor);
+ *    bugün hiçbiri webhook tetiğine dokunmadığı için etkisiz.
+ *  • **Zincirin çalıştığı** denetlenmiyor, yalnız bağlı olduğu. `scripts/webhook_setup.sql`
+ *    `REPLACE_WITH_ENV_SECRET` ile gelir; olduğu gibi koşulursa tetikler kurulur, her webhook 401
+ *    alır ve kapı yine yeşildir.
  *
  *  • "Vitrinde görünen tablo" kümesi KODDAN türetilmiyor; cetvelin §3 tablosundan okunuyor.
  *    Altıncı bir tablo vitrine çıkar ve cetvele de yazılmazsa bu kapı sessiz kalır. Gerçek çözüm
@@ -83,17 +114,12 @@ const migrationSql = import.meta.glob('/supabase/migrations/*.sql', {
  * Üstelik `setup_webhooks.js` sonunda "Setup Completed Successfully" yazıyordu: sahte başarı.
  */
 const bootstrapSources = {
-  ...(import.meta.glob('/scripts/webhook_setup.sql', {
+  ...(import.meta.glob('/scripts/webhook_setup*.sql', {
     query: '?raw',
     import: 'default',
     eager: true,
   }) as Record<string, string>),
-  ...(import.meta.glob('/scripts/setup_webhooks.js', {
-    query: '?raw',
-    import: 'default',
-    eager: true,
-  }) as Record<string, string>),
-  ...(import.meta.glob('/scripts/setup_webhooks_cli.js', {
+  ...(import.meta.glob('/scripts/setup_webhook*.js', {
     query: '?raw',
     import: 'default',
     eager: true,
@@ -119,10 +145,14 @@ const standardSources = import.meta.glob('/docs/standards/rendering-cache-standa
  * Grup grup (önce baseline'lar, sonra migration'lar) işlemek yanlıştır: gerçek bir pg_dump
  * baseline'ı eklendiğinde ondan ÖNCEKİ migration'ların `drop`ları baseline'dan SONRA uygulanır.
  */
-function chronoKey(filePath: string): string {
+function leadingDigits(filePath: string): string {
   const base = filePath.split('/').pop() ?? filePath
-  const digits = (base.match(/^[\d_-]+/)?.[0] ?? '').replace(/\D/g, '')
-  return `${digits.slice(0, 8).padEnd(8, '0')}${digits.slice(8).padEnd(6, '0')}|${base}`
+  return (base.match(/^[\d_-]+/)?.[0] ?? '').replace(/\D/g, '')
+}
+
+function chronoKey(filePath: string): string {
+  const d = leadingDigits(filePath)
+  return `${d.slice(0, 8).padEnd(8, '0')}${d.slice(8).padEnd(6, '0')}|${filePath.split('/').pop()}`
 }
 
 /** `"public"."products"` · `public.products` · `products` → `products` */
@@ -154,10 +184,17 @@ function normalizeSql(sql: string): string {
       continue
     }
 
+    // PostgreSQL blok yorumları İÇ İÇE GEÇEBİLİR (PG el kitabı §4.1.5 — C'den farklı olarak).
+    // İlk `*/`'de durmak, "bir bloğu yorum yaparak devre dışı bırakma" gibi EN SIK devre-dışı
+    // bırakma biçimini görünmez kılıyordu: dıştaki yorumun gövdesindeki CREATE TRIGGER'lar canlı
+    // sayılıyor, betik hiç tetik kurmadığı hâlde kapı yeşil yanıyordu. Derinlik sayacı şart.
     if (two === '/*') {
-      i += 2
-      while (i < sql.length && sql.slice(i, i + 2) !== '*/') i++
-      i += 2
+      let depth = 0
+      while (i < sql.length) {
+        if (sql.slice(i, i + 2) === '/*') { depth++; i += 2; continue }
+        if (sql.slice(i, i + 2) === '*/') { depth--; i += 2; if (depth === 0) break; continue }
+        i++
+      }
       out += ' '
       continue
     }
@@ -247,7 +284,10 @@ function tablesWithLiveTrigger(): Set<string> {
 function handlerBranches(routeSrc: string): Set<string> {
   const src = stripTsComments(routeSrc)
   const found = new Set<string>()
-  for (const m of src.matchAll(/(?:\belse\s+)?\bif\s*\(\s*table\s*===\s*'(\w+)'\s*\)\s*\{/g)) {
+  // Üç tırnak biçimi de kabul edilir: repoda `quotes` lint kuralı ve Prettier yapılandırması YOK,
+  // yani `table === "x"` tamamen meşru bir yazım. Yalnız tek tırnağı eşleyen sürüm, çift tırnakla
+  // yazılmış bir öksüz handler'ı sessizce kaçırıyordu.
+  for (const m of src.matchAll(/(?:\belse\s+)?\bif\s*\(\s*table\s*===\s*['"`](\w+)['"`]\s*\)\s*\{/g)) {
     found.add(m[1])
   }
   return found
@@ -258,8 +298,37 @@ function handlerBranches(routeSrc: string): Set<string> {
  * ayrışmasına davetiyedir; liste tek yerden okunur.
  */
 function requiredTablesFromStandard(md: string): string[] {
-  const section = md.slice(md.indexOf('## 3.'), md.indexOf('## 4.'))
-  return [...section.matchAll(/^\|\s*`(\w+)`\s*\|/gm)].map((m) => m[1])
+  const start = md.indexOf('## 3.')
+  const end = md.indexOf('## 4.')
+  // indexOf -1 dönerse slice sessizce dosyanın sonundan/başından keser ve liste ya boşalır ya
+  // §4'ü de yutar. İkisi de sessiz bozulma; başlık bulunamadıysa boş dön, iddia gürültülü patlasın.
+  if (start === -1 || end === -1 || end <= start) return []
+  return [...md.slice(start, end).matchAll(/^\|\s*`(\w+)`\s*\|/gm)].map((m) => m[1])
+}
+
+/**
+ * Bir kurulum betiğinin GERÇEKTEN ÇALIŞTIRDIĞI SQL.
+ *
+ * NİÇİN: denetim (2026-08-15, üçüncü pas) şunu kanıtladı — `product_prices` tetiklerini
+ * çalıştırılan şablondan çıkarıp kullanılmayan bir `legacySql` değişkenine taşımak yetiyordu;
+ * betik 4 tabloya tetik kuruyor, sonunda yine "Setup Completed Successfully" yazıyor ve kapı
+ * YEŞİL kalıyordu. Bu, SQL tarafında kapatılan "gövdede metin olarak geçen create trigger"
+ * kusurunun birebir JavaScript boyutudur: dosyada METİN olması ≠ çalıştırılıyor olması.
+ *
+ * Bu yüzden `.js` betiklerinde tüm dosya değil, yalnız bir yürütme çağrısına (`client.query(...)`,
+ * `writeFileSync(..., x)`) BESLENEN şablon literalleri taranır. `.sql` dosyalarında dosyanın
+ * tamamı zaten yürütülür.
+ */
+function executedSql(path: string, src: string): string {
+  if (path.endsWith('.sql')) return src
+
+  const chunks: string[] = []
+  for (const m of src.matchAll(/const\s+(\w+)\s*=\s*`([\s\S]*?)`/g)) {
+    const [, name, body] = m
+    const isExecuted = new RegExp(`(?:\\.query|writeFileSync|execSync)\\s*\\([^)]*\\b${name}\\b`).test(src)
+    if (isExecuted) chunks.push(body)
+  }
+  return chunks.join('\n;\n')
 }
 
 const REQUIRED_TABLES = requiredTablesFromStandard(standardSources[STANDARD_PATH] ?? '')
@@ -270,6 +339,21 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
     expect(Object.keys(migrationSql).length, 'supabase/migrations/*.sql bulunamadı').toBeGreaterThan(0)
     expect(Object.keys(routeSources), `Webhook rotası ${ROUTE_PATH} bulunamadı`).toContain(ROUTE_PATH)
     expect(Object.keys(standardSources), `Cetvel ${STANDARD_PATH} bulunamadı`).toContain(STANDARD_PATH)
+  })
+
+  it('her SQL kaynağı tarihle başlıyor (kronolojik defterin ön koşulu)', () => {
+    const undated = [...Object.keys(baselineSql), ...Object.keys(migrationSql)]
+      .filter((p) => leadingDigits(p).length < 8)
+      .sort()
+    expect(
+      undated,
+      `TARİHSİZ SQL DOSYASI: [${undated.join(', ')}]\n\n` +
+        'Yaşayan tetik durumu, dosya adındaki tarihe göre KRONOLOJİK hesaplanır. Adı rakamla ' +
+        'başlamayan bir dosya en başa sıralanır — yani içindeki "drop trigger" henüz var olmayan ' +
+        'bir tetiği düşürmeye çalışır ve HİÇBİR ŞEYE denk gelmez. Denetimde ölçüldü: aynı içerik ' +
+        '"hotfix_drop_products_webhook.sql" adıyla SESSİZ YEŞİL, "20260816_..." adıyla kırmızı. ' +
+        'Prod\'da tetik ölür, vitrin donar, kapı görmez. (Supabase CLI de bu dosyaları sıralayamaz.)',
+    ).toEqual([])
   })
 
   it('cetvel §3 tablosu okunabiliyor (SSOT boşa düşerse tüm iddialar anlamsızlaşır)', () => {
@@ -328,14 +412,23 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
     const paths = Object.keys(bootstrapSources).sort()
     expect(
       paths.length,
-      'Kurulum betikleri bulunamadı (scripts/webhook_setup.sql, setup_webhooks.js, setup_webhooks_cli.js). ' +
-        'Yeniden adlandırıldılarsa bu glob da güncellenmeli — yoksa iddia sessizce boşa düşer.',
-    ).toBe(3)
+      'Kurulum betiği bulunamadı (beklenen desen: scripts/webhook_setup*.sql, scripts/setup_webhook*.js). ' +
+        'Yeniden adlandırıldılarsa bu glob da güncellenmeli — yoksa iddia sessizce boşa düşer. ' +
+        'Glob desen tabanlı: yeni bir kurulum betiği eklendiğinde kendiliğinden kapsama girer.',
+    ).toBeGreaterThanOrEqual(3)
 
     const gaps: string[] = []
     for (const p of paths) {
+      const runnable = executedSql(p, bootstrapSources[p])
+      expect(
+        runnable.trim().length,
+        `${p} içinde ÇALIŞTIRILAN SQL bulunamadı. Betik SQL'ini bir yürütme çağrısına ` +
+          '(client.query / writeFileSync / execSync) beslenen bir şablon literalinde tutmalı; ' +
+          'aksi hâlde bu iddia neyin gerçekten koşduğunu bilemez ve sessizce boşa düşer.',
+      ).toBeGreaterThan(0)
+
       const installed = new Set(
-        [...normalizeSql(bootstrapSources[p]).split(';')]
+        [...normalizeSql(runnable).split(';')]
           .map((s) => s.trimStart())
           .filter((s) => /^create\s+(?:or\s+replace\s+)?(?:constraint\s+)?trigger\b/i.test(s))
           .filter((s) => s.toLowerCase().includes(WEBHOOK_FN))

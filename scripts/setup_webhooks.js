@@ -189,7 +189,12 @@ async function main() {
 
         RETURN NEW;
       END;
-      $$ LANGUAGE plpgsql SECURITY DEFINER;
+      $$ LANGUAGE plpgsql SECURITY DEFINER
+      -- SET search_path SART: CREATE OR REPLACE FUNCTION fonksiyonun TUM ozniteliklerini
+      -- yeniden yazar; SET yazilmazsa proconfig SILINIR ve SECURITY DEFINER bir fonksiyon
+      -- search_path kilidini kaybeder (20260602070000_security_hardening.sql ile getirilen
+      -- sertlestirme geri alinir). Prod'daki canli hal: SET search_path TO 'pg_catalog','public','net'.
+      SET search_path = pg_catalog, public, net;
 
       -- Attach triggers to public.products
       DROP TRIGGER IF EXISTS on_products_change ON public.products;

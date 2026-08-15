@@ -107,13 +107,30 @@ kuran bir düğme taşıyordu; üstelik betik sonunda "Setup Completed Successfu
 başarı). Üçü de tamamlandı ve `INV-RENDER-2`'nin ayrı bir iddiası artık bunları da denetliyor.
 **Migration eklerken kurulum betikleri de güncellenir — ikisi ayrı kaynaktır.**
 
-**Denetim notu (2026-08-15):** bu kapının ilk sürümü denetimden geçemedi. İki kanıtlanmış
-sessiz-yeşili vardı: (1) `route.ts`'teki keşif-kapısı koşulu (`table === 'a' || table === 'b'`)
-handler dalı sanılıyordu, bu yüzden gerçek `product_prices` bloğu silinebiliyor ve test yeşil
-kalıyordu; (2) SQL düz `;` ile bölündüğü için dollar-quote'lu (`$$ … $$`) fonksiyon gövdesinde
-**metin olarak** geçen bir `create trigger` gerçek tetik sayılıyordu. İkisi de tam olarak bu
-cetvelin kovaladığı hatanın imzasını gizliyordu. **Ders: statik tarayıcının yanlış-negatifi,
-kapının hiç olmamasından daha kötüdür — çünkü yeşil ışık güven üretir.**
+**Denetim notu (2026-08-15) — üç pas, beş sessiz-yeşil.** Bu kapının ilk iki sürümü denetimden
+geçemedi. Bulunanların hepsi *kanıtlanmış* yanlış-negatiftir (bozma yapılıp test yeşil kaldığı
+ölçülmüştür), koda bakarak "doğru görünüyor" demekle hiçbiri bulunamazdı:
+
+| # | Kaçak | Nasıl gizliyordu |
+|---|---|---|
+| 1 | Keşif-kapısı koşulu (`table === 'a' \|\| table === 'b'`) handler dalı sanılıyordu | Gerçek `product_prices` bloğu silinebiliyordu |
+| 2 | SQL düz `;` ile bölünüyordu (dollar-quote yok) | Fonksiyon gövdesinde **metin olarak** geçen `create trigger` gerçek sayılıyordu |
+| 3 | Kurulum taraması dosyadaki **metne** bakıyordu | Tetikleri ölü bir `legacySql` değişkenine taşımak yetiyordu — 2'nin JavaScript boyutu |
+| 4 | İç içe blok yorumu (`/* … /* … */ … */`, PG §4.1.5) | "Bloğu yorum yaparak kapatma" — en sık devre-dışı bırakma biçimi — görünmezdi |
+| 5 | Tarihsiz migration adı | `hotfix_drop_*.sql` en başa sıralanıp `drop`'u hiçbir şeye denk gelmiyordu |
+
+Ayrıca `table === "x"` (çift tırnak) bir öksüz handler'ı kaçırıyordu — repoda `quotes` lint kuralı
+ve Prettier yapılandırması yok, yani çift tırnak meşru bir yazım.
+
+**Ders: statik tarayıcının yanlış-negatifi, kapının hiç olmamasından daha kötüdür — çünkü yeşil
+ışık güven üretir.** Yeni bir INV-* kapısı, en az bir kez *kendi kaçak senaryosu üretilerek*
+çürütülmeden kapı sayılmaz.
+
+**Yan bulgu — kurulum betikleri güvenlik sertleştirmesini geri alıyordu.** Üç betik de
+`CREATE OR REPLACE FUNCTION … SECURITY DEFINER` yazıyor ama `SET search_path` yazmıyordu.
+`CREATE OR REPLACE` fonksiyonun TÜM özniteliklerini yeniden yazar; `SET` yoksa `proconfig`
+**silinir** ve `20260602070000_security_hardening.sql` ile getirilen kilit düşer. Üçüne de
+`SET search_path = pg_catalog, public, net` eklendi (prod'daki canlı hâlle aynı).
 
 ## 4. Bilinen sınırlar (dürüstçe)
 
