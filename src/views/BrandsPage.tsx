@@ -73,10 +73,20 @@ const BrandsPage: React.FC = () => {
 
                   {/* Info Layer */}
                   <div className="space-y-4">
+                    {/*
+                      `min-w-0 truncate` + `shrink-0` ZORUNLU — süs değil.
+                      ÖLÇÜLDÜ 2026-08-15 (1024px): flex öğelerinin varsayılan
+                      `min-width: auto`'su yüzünden marka adı min-content'in altına
+                      inemiyordu; ad + `mx-4` + ülke etiketi kart genişliğini aşınca
+                      esneyen ayraç sıfıra inse bile satır taşıyor ve belge 7px yatay
+                      kayıyordu (WCAG SC 1.4.10 ihlali). Uzun marka adı artık üç noktayla
+                      kısalıyor. Bu, ölçülen tek markaya özel bir yama değil: ad ne kadar
+                      uzun olursa olsun satır taşmaz.
+                    */}
                     <div className="flex items-center justify-between">
-                      <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{brand.name}</h2>
+                      <h2 className="min-w-0 truncate text-2xl font-bold text-slate-900 tracking-tight">{brand.name}</h2>
                       <div className="h-px flex-1 mx-4 bg-slate-100 group-hover:bg-cyan-500/20 transition-colors" />
-                      <span className="text-xs font-black uppercase tracking-widest text-slate-400">
+                      <span className="shrink-0 text-xs font-black uppercase tracking-widest text-slate-400">
                         {brand.country}
                       </span>
                     </div>

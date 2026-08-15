@@ -110,7 +110,17 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
                 staggerIndex={i}
               >
                 <div className="text-5xl lg:text-7xl font-bold text-slate-900 tracking-tighter mb-4">{stat.value}</div>
-                <div className="text-xs font-black uppercase tracking-hvac-relaxed text-cyan-600">{stat.label}</div>
+                {/*
+                  Harf aralığı DAR ekranda kısılır (WCAG SC 1.4.10 · 320px reflow).
+                  ÖLÇÜLDÜ 2026-08-15: `tracking-hvac-relaxed` = 0.3em. 320px'te bu ızgara
+                  2 sütuna düşüyor ve `gap-12` sonrası sütun 115px kalıyor; "GLOBAL
+                  DİSTRİBÜTÖRLÜK" gibi tek uzun kelime 0.3em ile ~136px min-content
+                  istiyor → satır kırılamıyor, belge 16px yatay taşıyordu.
+                  0.1em'de aynı kelime ~103px → sütuna sığıyor. 640px üstünde tasarım
+                  aynen korunuyor. (Sütun sayısını düşürmek yerine bunu seçtim: 375px'te
+                  iki sütun zaten sığıyor, gereksiz yere tek sütuna inmesin.)
+                */}
+                <div className="text-xs font-black uppercase tracking-hvac-tight sm:tracking-hvac-relaxed text-cyan-600">{stat.label}</div>
               </ScrollReveal>
             ))}
           </div>
