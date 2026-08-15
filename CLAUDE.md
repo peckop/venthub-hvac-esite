@@ -116,8 +116,18 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 
 - **Lokal `deno check`:** daima `--node-modules-dir=none` ile koş — `auto` pnpm node_modules
   yerleşimini BOZAR (build "Module not found" ile patlar; onarım `pnpm install`). CI etkilenmez.
-- **Repo PRIVATE:** workflow'da `permissions:` bloğu yazıyorsan `contents: read` ZORUNLU —
-  yoksa checkout "Repository not found" verir (varsayılan izinler düşer).
+- **Repo 2026-08-15'ten beri PUBLIC** (öncesi private'tı). Karar ölçüme dayandı:
+  `docs/audits/secret-exposure-audit-2026-08-15.md` — 18 sır imzası × tüm geçmiş tarandı,
+  bulunan 4 kalemin 3'ü **API çağrılarak** ölü doğrulandı (401/403). Sebep: private repoda
+  Actions dakikası ücretli ve hesap iş başlatmayı reddetti; public'te ücretsiz/sınırsız.
+  **Sonuçları:** (1) geçmiş dahil her şey herkese açık — yeni bir sır commit'lenirse geri
+  dönüşü YOK, görünürlükten önce betiği koş; (2) **self-hosted runner KULLANMA** — public
+  repoda fork PR'ı yabancı kodu makinede çalıştırır; (3) `permissions:` bloğu yazıyorsan
+  `contents: read` yine ZORUNLU (varsayılanlar düşer, checkout "Repository not found" verir).
+- **Git kancaları (2026-08-15):** `pre-commit` artık **bloklamaz** — hızlı, çevrimdışı,
+  uyarı-only (companion dosyası var mı diye bakar, LLM skoruna DEĞİL). Companion üretimi
+  `post-commit`te arka planda (log: `.git/orion-doc.log`). Yedekler: `*.oncesi-2026-08-15`.
+  Eskisi rastgele reddediyordu (aynı dosya 80/100 ↔ 100/100) ve 3 dalından 2'si sessizce ölüydü.
 
 - **CONTEXT.md NotebookLM tarafından üretilir** — "iyileştirme" adına yeniden yazma; not/ilave ekleyebilirsin.
 - Dokümantasyon, Corpus Callosum / Orion CLI ile `*.md` master dosyalarına çevrilip
