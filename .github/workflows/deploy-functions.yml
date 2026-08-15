@@ -231,9 +231,16 @@ jobs:
           # Tek geçiş: rapor hem log'a hem iş özetine gider, çıkış kodu KORUNUR.
           # (`| tee` KULLANILMAZ — bu repoda daha önce boru, exit kodunu yutup
           #  kapıyı dekoratif hale getirmişti.)
+          #
+          # ⚠️ `set +e` ŞART. GitHub `shell: bash`'i `bash --noprofile --norc -e -o pipefail`
+          # olarak açar; `-e` yüzünden script sıfırdan farklı dönünce adım TAM O SATIRDA
+          # ölür, `cat drift.log` hiç çalışmaz. İlk koşumda tam bu oldu: exit 2 görüldü ama
+          # SEBEBİ görünmedi — rapor, en çok gerektiği anda kayboldu.
           set -uo pipefail
+          set +e
           node scripts/edge/drift-check.mjs > drift.log 2>&1
           rc=$?
+          set -e
           cat drift.log
           {
             echo '### Edge sapma raporu'
