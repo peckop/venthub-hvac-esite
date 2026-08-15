@@ -168,6 +168,13 @@ export const minHeight = {
 };
 
 export const maxHeight = {
+  /**
+   * Admin modal tavanı. `svh` çünkü `vh` ≡ `lvh` — mobil araç çubuğu görünürken
+   * `70vh`/`90vh` ile boyutlanan modal viewport'u taşar ve ortalanmış `fixed`
+   * kutunun ÜST kısmı erişilemez hâle gelir (2026-08-15 taraması: 5 modalda ölçüldü).
+   * Cetvel: docs/standards/admin-design-standard.md §2.2, §4.10
+   */
+  'admin-modal':  'calc(100svh - 2rem)',
   'hvac-menu':    '300px',
   'hvac-panel':   '480px',  // 60×8
   'hvac-modal':   '85vh',

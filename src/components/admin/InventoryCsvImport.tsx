@@ -362,7 +362,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                     </h3>
                                 </div>
                                 <div className="glass rounded-hvac-xl border border-white/5 overflow-hidden shadow-2xl">
-                                    <div className="max-h-300px overflow-y-auto custom-scrollbar">
+                                    <div className="max-h-300px overflow-auto custom-scrollbar">
                                         <table className="w-full text-xs border-separate border-spacing-0">
                                             <thead className="sticky top-0 bg-surface-midnight z-10">
                                                 <tr>
