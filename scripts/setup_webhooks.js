@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { fileURLToPath } from 'node:url';
 import path from 'path';
 import crypto from 'crypto';
 import pg from 'pg';
@@ -51,8 +52,10 @@ function updateEnvFile(filePath, key, value) {
 async function main() {
   console.log('=== Supabase Webhook Automated Setup ===');
   
-  const envPath = path.resolve(process.cwd(), '.env');
-  const envLocalPath = path.resolve(process.cwd(), '.env.local');
+  // .env dosyalari REPO KOKUNE yazilir (betige goreli). process.cwd() kullanmak, betik baska
+  // bir dizinden kosuldugunda gizli anahtari YANLIS DIZINE dusuruyordu — denetimde olculdu.
+  const envPath = fileURLToPath(new URL('../.env', import.meta.url));
+  const envLocalPath = fileURLToPath(new URL('../.env.local', import.meta.url));
   
   const env = {
     ...parseEnv(envPath),
@@ -157,58 +160,17 @@ async function main() {
     // 4. Create Webhook Trigger function and triggers
     console.log('Creating webhook trigger function and triggers in database...');
     
-    const sql = `
-      -- Create the webhook function
-      CREATE OR REPLACE FUNCTION public.handle_supabase_webhook()
-      RETURNS TRIGGER AS $$
-      DECLARE
-        payload jsonb;
-        webhook_url text := 'https://venthub-hvac-esite.vercel.app/api/webhook/supabase';
-        webhook_secret text := '${secret}';
-        req_id bigint;
-      BEGIN
-        -- Construct the payload matching Route Handler expectations
-        payload := jsonb_build_object(
-          'type', TG_OP,
-          'table', TG_TABLE_NAME,
-          'schema', TG_TABLE_SCHEMA,
-          'record', CASE WHEN TG_OP = 'DELETE' THEN NULL ELSE to_jsonb(NEW) END,
-          'old_record', CASE WHEN TG_OP = 'INSERT' THEN NULL ELSE to_jsonb(OLD) END
-        );
-
-        -- Perform asynchronous HTTP POST request using pg_net
-        SELECT net.http_post(
-          url := webhook_url,
-          body := payload::text,
-          headers := jsonb_build_object(
-            'Content-Type', 'application/json',
-            'x-webhook-secret', webhook_secret
-          ),
-          timeout_milliseconds := 5000
-        ) INTO req_id;
-
-        RETURN NEW;
-      END;
-      $$ LANGUAGE plpgsql SECURITY DEFINER;
-
-      -- Attach triggers to public.products
-      DROP TRIGGER IF EXISTS on_products_change ON public.products;
-      CREATE TRIGGER on_products_change
-      AFTER INSERT OR UPDATE OR DELETE ON public.products
-      FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
-
-      -- Attach triggers to public.categories
-      DROP TRIGGER IF EXISTS on_categories_change ON public.categories;
-      CREATE TRIGGER on_categories_change
-      AFTER INSERT OR UPDATE OR DELETE ON public.categories
-      FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
-
-      -- Attach triggers to public.inventory_movements
-      DROP TRIGGER IF EXISTS on_inventory_movements_change ON public.inventory_movements;
-      CREATE TRIGGER on_inventory_movements_change
-      AFTER INSERT OR UPDATE OR DELETE ON public.inventory_movements
-      FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
-    `;
+    // SQL TEK KAYNAKTAN gelir: scripts/webhook_setup.sql.
+    // Daha once ayni SQL uc yerde AYRI AYRI kopyalanmisti (bu betik, setup_webhooks_cli.js ve
+    // .sql dosyasi). Uc kopya birbirinden ayrisabiliyordu ve 2026-08-15 denetimi ucunun de eksik
+    // tablo kurdugunu olctu — hicbir kapi gormuyordu. Kopyayi silmek, "hangi kopya guncel"
+    // sorusunu tamamen ortadan kaldirir.
+    // Yol BETIGE gore cozulur, process.cwd()'e gore DEGIL. Denetim olctu: cwd'ye baglayinca
+    // betik repo koku disindan kosuldugunda ENOENT veriyordu — ama once .env'i YANLIS DIZINE
+    // yazip prod DB'ye baglanip CREATE EXTENSION kosturduktan SONRA. Yan etki, on kosul
+    // dogrulanmadan olmamali.
+    const setupSqlPath = fileURLToPath(new URL('webhook_setup.sql', import.meta.url));
+    const sql = fs.readFileSync(setupSqlPath, 'utf8').replace(/REPLACE_WITH_ENV_SECRET/g, secret);
     
     await client.query(sql);
     console.log('SUCCESS: Supabase Webhook triggers and function successfully installed in remote database!');
@@ -218,7 +180,7 @@ async function main() {
     const verificationRes = await client.query(`
       SELECT trigger_name, event_manipulation, event_object_table, action_statement
       FROM information_schema.triggers
-      WHERE trigger_name IN ('on_products_change', 'on_categories_change', 'on_inventory_movements_change');
+      WHERE trigger_name IN ('on_products_change', 'on_categories_change', 'on_inventory_movements_change', 'on_product_families_change', 'on_product_prices_ins_del', 'on_product_prices_upd');
     `);
     
     console.log('Installed Triggers:');
@@ -232,7 +194,7 @@ async function main() {
     console.log('1. Generated and saved SUPABASE_WEBHOOK_SECRET in .env and .env.local.');
     console.log('2. Connected directly to the remote Supabase database.');
     console.log('3. Enabled the pg_net extension in PostgreSQL.');
-    console.log('4. Installed the asynchronous HTTP triggers on products, categories, and inventory_movements.');
+    console.log('4. Installed the asynchronous HTTP triggers on products, categories, inventory_movements, product_families and product_prices.');
     console.log('===============================================================');
     
   } catch (err) {

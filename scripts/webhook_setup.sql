@@ -34,7 +34,12 @@ BEGIN
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER
+-- SET search_path SART: CREATE OR REPLACE FUNCTION fonksiyonun TUM ozniteliklerini
+-- yeniden yazar; SET yazilmazsa proconfig SILINIR ve SECURITY DEFINER bir fonksiyon
+-- search_path kilidini kaybeder (20260602070000_security_hardening.sql ile getirilen
+-- sertlestirme geri alinir). Prod'daki canli hal: SET search_path TO 'pg_catalog','public','net'.
+SET search_path = pg_catalog, public, net;
 
 -- 3. Attach triggers to public.products
 DROP TRIGGER IF EXISTS on_products_change ON public.products;
@@ -53,3 +58,32 @@ DROP TRIGGER IF EXISTS on_inventory_movements_change ON public.inventory_movemen
 CREATE TRIGGER on_inventory_movements_change
 AFTER INSERT OR UPDATE OR DELETE ON public.inventory_movements
 FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
+
+-- 6. Attach triggers to public.product_families
+DROP TRIGGER IF EXISTS on_product_families_change ON public.product_families;
+CREATE TRIGGER on_product_families_change
+AFTER INSERT OR UPDATE OR DELETE ON public.product_families
+FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
+
+-- 7. Attach triggers to public.product_prices
+--    UPDATE ayri ve KOSULLU: fiyat materialize her satiri yeniden yazar; kosulsuz bir tetik
+--    fiyat DEGISMESE bile ~1044 webhook atesler (2026-08-15 olculdu). WHEN yalniz UPDATE'te
+--    kurulabilir (INSERT'te OLD, DELETE'te NEW yoktur), o yuzden ekleme/silme ayri tetikte kalir.
+DROP TRIGGER IF EXISTS on_product_prices_change ON public.product_prices;
+DROP TRIGGER IF EXISTS on_product_prices_ins_del ON public.product_prices;
+DROP TRIGGER IF EXISTS on_product_prices_upd ON public.product_prices;
+
+CREATE TRIGGER on_product_prices_ins_del
+AFTER INSERT OR DELETE ON public.product_prices
+FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
+
+CREATE TRIGGER on_product_prices_upd
+AFTER UPDATE ON public.product_prices
+FOR EACH ROW
+WHEN (
+  OLD.net_price IS DISTINCT FROM NEW.net_price
+  OR OLD.gross_price IS DISTINCT FROM NEW.gross_price
+  OR OLD.is_active IS DISTINCT FROM NEW.is_active
+  OR OLD.currency IS DISTINCT FROM NEW.currency
+)
+EXECUTE FUNCTION public.handle_supabase_webhook();

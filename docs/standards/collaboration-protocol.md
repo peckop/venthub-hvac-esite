@@ -98,6 +98,9 @@ bu cetvelin "geriye-denetleyen + geleceği-kilitleyen" ayağıdır (`standard-pl
 - **INV-2** `localized-route-ssot` — yol localize SSOT. ⚠️ **`/admin` rotaları dil-önekinden MUAF** (admin istisnası).
 - **INV-5** `i18n-key-resolution` — her statik `t('a.b')` **namespaced (≥2 segment)** + sözlükte çözülmeli; düz-anahtar-içi-nokta (`t('table.x')`) sessiz ham-key render = YASAK.
 - **INV-6** `admin-mutate-real-write` — her `mutateWithAudit` `fn` gövdesi GERÇEK yazma (`.insert/.update/.upsert/.delete/.rpc/.functions.invoke`) ya da awaited servis çağrısı içermeli; no-op `Promise.resolve()` + başarı bildirimi = **sahte-success** = YASAK (admin şeridi; `admin-standard §8`).
+- **INV-RENDER-1** `render-price-surface` — fiyat yalnız PDP yüzeyinde; kart/kategori/keşif `hidePrice` geçmeli (`rendering-cache-standard §2`).
+- **INV-RENDER-2** `render-revalidation-contract` — vitrinde görünen her tablonun **DB tetiği + webhook handler dalı** olmalı, çift yönlü; kurulum betikleri de aynı tablo kümesini kurmalı (`rendering-cache-standard §3`).
+- **INV-WEBHOOK-1** `webhook-auth-fail-closed` — webhook secret'ı tanımsızsa istek **reddedilir** (fail-open yasak).
 - `category-*-ssot` · `numeric-format-ssot` · `legal-en-leftover` · `3d-single-canvas`/`asset`/`procedural-env` · `3d-csp`/`3d-model-recipe` (ilgili şeritlerde).
 - **DI** (servis/searcher ilk-param `supabase`, modül-düzeyi client importu yok) = `pnpm lint` (`no-restricted-imports`) zorlar.
 > Yeni page-crash/SSOT sınıfı bulgu → yeni bir **INV-*** test'ine terfi eder (kalıcı bekçi olur).
@@ -142,7 +145,7 @@ bu cetvelin "geriye-denetleyen + geleceği-kilitleyen" ayağıdır (`standard-pl
 
 ## 7. VentHub Mutlak Kuralları (her Controller + worker için bağlayıcı)
 
-- `CLAUDE.md` #1–12: **No-Plan-No-Code · DI** (servisler ilk param `supabase`) **· no-`any`** · RSC-öncelik · PPR/Suspense · i18n (metin sözlükten, URL `useLocalizedRoutes`) · **design-token** (arbitrary Tailwind/HEX yasak) · 3D = R3F+Drei · **RLS/tenant-scope** · webhook HMAC + monoton durum · admin `admin_audit_log`. **İhlal = ret.**
+- `CLAUDE.md` #1–13: **No-Plan-No-Code** (plan hangi cetvelin yönettiğini söylemeli — bir `docs/standards/` dosya adı ya da açıkça "cetvel yok"; "cetvel yok" geçerli ama iş o zaman cetveli yazmayı kapsar) **· DI** (servisler ilk param `supabase`) **· no-`any`** · RSC-öncelik · Suspense sınırı · i18n (metin sözlükten, URL `useLocalizedRoutes`) · **design-token** (arbitrary Tailwind/HEX yasak) · 3D = R3F+Drei · **RLS/tenant-scope** · webhook HMAC + monoton durum · admin `admin_audit_log` · **migration merge = prod'a otomatik uygulama** (kullanıcı onayı şart). **İhlal = ret.**
 
 ---
 
