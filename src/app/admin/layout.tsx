@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 
 import { NAV_COLLAPSED_VALUE,navCookieName } from '../../components/admin/shell/navCookie'
+import { adminThemeCookieName, parseAdminTheme } from '../../components/admin/shell/themeCookie'
 import { TenantProvider } from '../../hooks/useTenant'
 import { getTenantConfig } from '../../utils/tenantServer'
 import LayoutComponent from '../../views/admin/AdminLayout'
@@ -18,9 +19,22 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const navCollapsed =
     cookieStore.get(navCookieName(tenantConfig.id))?.value === NAV_COLLAPSED_VALUE
 
+  /**
+   * Tema de AYNI sebeple sunucuda okunur: istemcide çözülseydi koyu temayı
+   * seçmiş kullanıcı her yüklemede bir kare beyaz ekran görürdü. `parseAdminTheme`
+   * bozuk/eksik çerezi sessizce varsayılana (AÇIK) düşürür.
+   */
+  const theme = parseAdminTheme(cookieStore.get(adminThemeCookieName(tenantConfig.id))?.value)
+
   return (
     <TenantProvider value={tenantConfig}>
-      <LayoutComponent defaultNavCollapsed={navCollapsed}>{children}</LayoutComponent>
+      <LayoutComponent
+        defaultNavCollapsed={navCollapsed}
+        defaultThemePreference={theme.preference}
+        defaultThemeResolved={theme.resolved}
+      >
+        {children}
+      </LayoutComponent>
     </TenantProvider>
   )
 }

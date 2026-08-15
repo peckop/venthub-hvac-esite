@@ -8,7 +8,7 @@ import { formatNumber } from '@/i18n/format'
 import { useI18n } from '@/i18n/I18nProvider'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
-import { adminBlurBlobClass, adminCardClass } from '../../../utils/adminUi'
+import { adminCardClass } from '../../../utils/adminUi'
 import AdminSkeleton from '../AdminSkeleton'
 
 interface CurrencyRateRow {
@@ -40,8 +40,8 @@ const daysSince = (effectiveDate: string): number => {
 
 const sourceBadgeClass = (source: string): string =>
   source === 'tcmb'
-    ? 'bg-cyan-400/10 border-cyan-400/20 text-cyan-400'
-    : 'bg-amber-400/10 border-amber-400/20 text-amber-400'
+    ? 'bg-admin-accent-weak border-admin-accent/30 text-admin-accent'
+    : 'bg-admin-warning-weak border-admin-warning/30 text-admin-warning'
 
 const CurrencyRatesCard: React.FC = () => {
   const { t, lang } = useI18n()
@@ -84,15 +84,14 @@ const CurrencyRatesCard: React.FC = () => {
 
   return (
     <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-      <div className={`${adminBlurBlobClass} bg-cyan-500/5 group-hover:bg-cyan-500/10`} />
-      <div className="relative z-10 flex items-center justify-between gap-3 border-b border-white/5 pb-4">
+      <div className="relative z-10 flex items-center justify-between gap-3 border-b border-admin-border pb-4">
         <div className="flex items-center gap-3">
-          <Coins className="text-cyan-400" size={20} />
+          <Coins className="text-admin-accent" size={20} />
           <div>
-            <h2 className="text-lg font-black text-white uppercase tracking-tight">
+            <h2 className="text-lg font-semibold text-admin-fg tracking-tight">
               {t('admin.pricing.settings.currencyRates.title')}
             </h2>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">
+            <p className="text-xs font-bold text-admin-fg-muted mt-1">
               {t('admin.pricing.settings.currencyRates.subtitle')}
             </p>
           </div>
@@ -103,56 +102,56 @@ const CurrencyRatesCard: React.FC = () => {
         {loading ? (
           <AdminSkeleton variant="table" rows={3} />
         ) : error ? (
-          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm font-bold">
+          <div className="p-4 rounded-admin-md bg-admin-danger-weak border border-admin-danger/30 text-admin-danger text-sm font-bold">
             {t('admin.pricing.common.loadFailed')}
           </div>
         ) : rates.length === 0 ? (
-          <div className="p-4 rounded-xl bg-white/3 border border-white/5 text-slate-500 text-sm font-bold text-center">
+          <div className="p-4 rounded-admin-md bg-admin-surface-2 border border-admin-border text-admin-fg-muted text-sm font-bold text-center">
             {t('admin.pricing.settings.currencyRates.empty')}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-white/5">
-                  <th className="py-3 pr-4 text-xs font-black text-slate-500 uppercase tracking-wider">
+                <tr className="border-b border-admin-border">
+                  <th className="py-2.5 pr-4 text-xs font-semibold text-admin-fg-muted">
                     {t('admin.pricing.settings.currencyRates.columnCurrency')}
                   </th>
-                  <th className="py-3 pr-4 text-xs font-black text-slate-500 uppercase tracking-wider">
+                  <th className="py-2.5 pr-4 text-xs font-semibold text-admin-fg-muted">
                     {t('admin.pricing.settings.currencyRates.columnRate')}
                   </th>
-                  <th className="py-3 pr-4 text-xs font-black text-slate-500 uppercase tracking-wider">
+                  <th className="py-2.5 pr-4 text-xs font-semibold text-admin-fg-muted">
                     {t('admin.pricing.settings.currencyRates.columnSource')}
                   </th>
-                  <th className="py-3 pr-4 text-xs font-black text-slate-500 uppercase tracking-wider">
+                  <th className="py-2.5 pr-4 text-xs font-semibold text-admin-fg-muted">
                     {t('admin.pricing.settings.currencyRates.columnDate')}
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-admin-border">
                 {rates.map((row) => {
                   const stale = isStale(row.effective_date)
                   return (
                     <tr key={row.quote_ccy}>
-                      <td className="py-3 pr-4 text-sm font-black text-white">{row.quote_ccy}</td>
-                      <td className="py-3 pr-4 text-sm font-bold text-slate-200 font-mono">
+                      <td className="py-2.5 pr-4 text-sm font-semibold text-admin-fg">{row.quote_ccy}</td>
+                      <td className="py-2.5 pr-4 text-sm text-admin-fg font-mono">
                         {formatNumber(row.rate, lang, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
                       </td>
-                      <td className="py-3 pr-4">
+                      <td className="py-2.5 pr-4">
                         <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-xs font-black uppercase tracking-wider ${sourceBadgeClass(row.source)}`}
+                          className={`inline-flex items-center px-2.5 py-1 rounded-admin-md border text-xs font-semibold ${sourceBadgeClass(row.source)}`}
                         >
                           {row.source === 'tcmb'
                             ? t('admin.pricing.settings.currencyRates.sourceTcmb')
                             : t('admin.pricing.settings.currencyRates.sourceManual')}
                         </span>
                       </td>
-                      <td className="py-3 pr-4 text-sm font-bold text-slate-300">
+                      <td className="py-2.5 pr-4 text-sm text-admin-fg">
                         <div className="flex items-center gap-2">
                           <span>{formatDate(row.effective_date, lang)}</span>
                           {stale && (
                             <span
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-400/10 border border-amber-400/20 text-amber-400 text-xs font-black"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-admin-md bg-admin-warning-weak border border-admin-warning/30 text-admin-warning text-xs font-semibold"
                               title={t('admin.pricing.settings.currencyRates.staleWarning', { days: daysSince(row.effective_date) })}
                             >
                               <AlertTriangle size={12} />
@@ -170,15 +169,15 @@ const CurrencyRatesCard: React.FC = () => {
       </div>
 
       {!loading && !error && rates.length > 0 && (
-        <div className="relative z-10 pt-6 border-t border-white/5 space-y-3">
-          <p className="text-xs font-black text-slate-500 uppercase tracking-wider">
+        <div className="relative z-10 pt-6 border-t border-admin-border space-y-3">
+          <p className="text-xs font-semibold text-admin-fg-muted">
             {t('admin.pricing.settings.currencyRates.spreadLabel')}
           </p>
           <div className="flex flex-wrap gap-3">
             {rates.map((row) => (
               <span
                 key={row.quote_ccy}
-                className="px-3 py-1.5 rounded-xl bg-white/3 border border-white/10 text-xs font-bold text-slate-300"
+                className="px-3 py-1.5 rounded-admin-md bg-admin-surface-2 border border-admin-border text-xs font-bold text-admin-fg"
               >
                 {row.quote_ccy}: {formatNumber(row.spread_pct, lang, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%
               </span>
@@ -187,13 +186,13 @@ const CurrencyRatesCard: React.FC = () => {
         </div>
       )}
 
-      <div className="relative z-10 pt-6 border-t border-white/5">
+      <div className="relative z-10 pt-6 border-t border-admin-border">
         <button
           type="button"
           disabled
           aria-disabled="true"
           title={t('admin.pricing.settings.manualRate.soon')}
-          className="w-full py-3 flex items-center justify-center gap-2 bg-white/3 border border-white/5 text-slate-500 font-bold text-xs uppercase tracking-widest rounded-xl opacity-50 cursor-not-allowed"
+          className="w-full py-3 flex items-center justify-center gap-2 bg-admin-surface-2 border border-admin-border text-admin-fg-muted font-bold text-xs rounded-admin-md opacity-50 cursor-not-allowed"
         >
           <PlusCircle size={16} />
           {t('admin.pricing.settings.currencyRates.addManual')}

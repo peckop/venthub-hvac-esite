@@ -493,10 +493,73 @@ Aralık kuralı (Atlassian): 0–8px = kompakt UI içi · 12–24px = bileşen p
   unobstructed background for panels, useful for presenting information clearly"*).
   ❌ Mevcut `glass`/`glass-strong` + `backdrop-blur-xl` her kartta — veri okunabilirliğine aykırı.
 
-> ⚠️ **AÇIK KARAR — varsayılan tema.** Bu cetvelin geri kalanı tema-bağımsızdır, ama varsayılanın
-> hangisi olacağı ürün kararıdır ve Recep'in onayını bekliyor. Referans olarak verilen iki ürün bu
-> eksende ayrışıyor: **Linear koyu**, **Stripe/Vercel açık** varsayılan. Tokenlar rol-bazlı tanımlandığı
-> için varsayılanı çevirmek tek satırlık iştir; bu karar §3'ün *uygulanmasını* bloklamaz.
+> ✅ **KARAR VERİLDİ (Recep, 2026-08-15): varsayılan AÇIK tema, koyu birinci sınıf seçenek.**
+> Görsel yön *nötr kurumsal* (Linear/Stripe hissi).
+
+#### 3.8.1 Token kümesi (normatif)
+
+Admin renkleri `src/index.css` içinde **`[data-admin-theme]`** kapsamında tanımlıdır; `='dark'` yalnız
+değerleri ezer. Bileşen iki farklı sınıf yazmaz, tek token yazar.
+
+**Kapsam bilerek DAR:** değişkenler `:root` altında **değil**. Vitrin koyu tasarlanmıştır ve kendi
+cetveli vardır (`storefront-design-standard.md`); `:root`a koymak vitrini de çevirirdi.
+
+| Rol | Token | Kullanım |
+|---|---|---|
+| Sayfa zemini | `admin-bg` | kabuk arkaplanı |
+| Yüzey | `admin-surface` | kart, panel, modal, tablo gövdesi |
+| Yüzey +1 | `admin-surface-2` | tablo başlığı, hover, ikincil zemin |
+| Yüzey +2 | `admin-surface-3` | seçili satır, vurgulu zemin |
+| Kenarlık | `admin-border` / `admin-border-strong` | hairline / hover-vurgu |
+| Metin | `admin-fg` | gövde ve başlık |
+| Metin (ikincil) | `admin-fg-muted` | etiket, yardım metni — **AA ✓ (~4.9:1)** |
+| Metin (üçüncül) | `admin-fg-subtle` | **yalnız büyük metin ve UI sınırı** (~3.6:1) — gövdede YASAK |
+| Vurgu | `admin-accent` / `-hover` / `-fg` / `-weak` | birincil buton, link, aktif nav, odak |
+| Durum | `admin-danger` / `-warning` / `-success` (+ `-fg`, `-weak`) | yalnız kendi anlamında (§3.4) |
+| Odak | `admin-ring` | odak halkası |
+
+Yükseklik: `shadow-admin-sm / -md / -lg / -overlay` (`tokens.js`). **Y-kayması sıfır olan gölge
+(`shadow-[0_0_40px…]`) glow'dur, gölge değildir** — ışık kaynağı yoktur ve dört resmi token setinin
+hiçbirinde yer almaz; açık zeminde kirli hale bırakır. Yasak.
+
+#### 3.8.2 Tercihin kalıcılığı — çerez, localStorage DEĞİL
+
+Tercih `vh_admin_theme_<tenantId>` çerezinde `<tercih>:<çözülmüş>` biçiminde tutulur ve
+`src/app/admin/layout.tsx` içinde **SUNUCUDA** okunup ilk render'a basılır.
+
+localStorage sunucuda okunamaz; tercih sunucuda bilinmezse koyu temayı seçen kullanıcı **her sayfa
+yüklemesinde beyaz bir kare** görür. Aynı tuzağa sol menü tercihinde de düşülmüştü (çerez yazılıyor,
+hiç okunmuyordu → kalıcılık sessizce çalışmıyordu).
+
+`system` seçeneğinde çözülmüş değeri **istemci çereze geri yazar**: sunucu `prefers-color-scheme`
+okuyamaz, dolayısıyla bir sonraki ilk boyamanın doğru gelmesinin başka yolu yoktur. Çerez ayrıca
+tenant-scoped (kural 12) ve medya sorgusu canlı dinlenir (kullanıcı OS temasını panel açıkken
+değiştirirse "sistem"in anlamı derhal karşılanır).
+
+#### 3.8.3 Ham sınıf → token eşleme tablosu (geçiş kaydı)
+
+2026-08-15 taraması: **951 ham `slate-*`, 219 `text-white`, 475 `font-black`, 539 `uppercase`,
+240 `tracking-widest`, 18 glow.** Hiçbiri derleme hatası değildir — `text-white` geçerli bir sınıftır,
+tsc/lint/test/build hepsi geçer; hata yalnız **kullanıcıda** ortaya çıkar. Bu yüzden kural statik
+taramayla korunur (`INV-ADMIN-THEME-*`).
+
+| Ham | Token | Gerekçe |
+|---|---|---|
+| `text-white`, `text-white/N` | `text-admin-fg` (renkli zeminde `text-admin-*-fg`) | açık temada zeminle aynı renge gelir, içerik kaybolur |
+| `bg-white/1..5` → `bg-admin-surface-2`, `/6..20` → `-3` | | `white/N` yalnız koyu zeminde görünen bir hiledir |
+| `glass`, `glass-strong`, `glass-md` | `bg-admin-surface` | yarı saydam koyu katman; ayrıca her kart ayrı kompozisyon katmanı doğurur |
+| `text-slate-100..300` / `400-500` / `600-700` | `text-admin-fg` / `-muted` / `-subtle` | |
+| `border-white/N`, `border-slate-*`, `ring-white/N` | `border-admin-border` | |
+| `bg/text/border-{cyan,sky,blue}-*` | `admin-accent` (+`-weak` alfalıda) | |
+| `{rose,red}` → `danger` · `{amber,yellow,orange}` → `warning` · `{emerald,green,teal}` → `success` | | §3.4 |
+| `font-black` | `font-semibold` | her şey en kalınsa hiyerarşi yoktur |
+| `uppercase`, `tracking-widest/wider/hvac-*` | *(kaldırılır)* | okuma hızını düşürür; TR'de İ/ı sorunları |
+| `rounded-hvac-*`, `rounded-xl/2xl/3xl` | `rounded-admin-sm/md/lg` | §3.5 |
+| `shadow-sm/md/lg/xl/2xl`, `shadow-[0_0_…]`, `shadow-glow-*` | `shadow-admin-sm/md/lg/overlay` | |
+| `focus:` | `focus-visible:` | `focus:` fareyle de halka çizer → geliştirici `outline-none` ile bastırır ve klavye odağını da öldürür |
+
+**`uppercase` için TEK muafiyet:** `src/utils/adminUi.ts` içindeki tablo başlığı ve etiket sabitleri
+(ölçülü `tracking-wide` ile). Muafiyet **adla** verilir, desenle değil.
 
 ### 3.9 Odak halkası
 

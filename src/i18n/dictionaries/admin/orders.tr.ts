@@ -71,6 +71,8 @@ export const orders = {
         shipping: {
           title: 'Kargo / Takip No',
           bulkTitle: 'Toplu Kargo İşlemi',
+          description: 'Kargo firmasını ve takip numarasını girin; dilerseniz müşteriye bildirim e-postası gönderilir.',
+          close: 'Kapat',
           carrierLabel: 'Kargo Firması',
           carrierSelect: 'Seçiniz...',
           trackingLabel: 'Takip Numarası',
@@ -99,6 +101,7 @@ export const orders = {
         },
         logs: {
           title: 'E-posta Kayıtları',
+          description: 'Bu siparişe gönderilen kargo bildirim e-postalarının kaydı. Panel açıkken listeyle çalışmaya devam edebilirsiniz.',
           orderLabel: 'Sipariş:',
           table: {
             date: 'Tarih',
@@ -113,6 +116,7 @@ export const orders = {
         },
         notes: {
           title: 'Sipariş Notları',
+          description: 'Bu siparişe iliştirilen dahili notlar. Notlar müşteriye gösterilmez.',
           inputPlaceholder: 'Yeni bir not yazın...',
           add: 'Ekle',
           adding: 'Ekleniyor...',
@@ -167,6 +171,10 @@ export const orders = {
           cancelledOrRefunded: 'Sipariş iptal veya iade edilmiş.',
           updateSuccess: 'Sipariş durumu başarıyla güncellendi.',
           updateError: 'Durum güncellenirken hata oluştu.'
+        },
+        detail: {
+          description: 'Seçili siparişin durumu, iletişim bilgileri, notları ve e-posta kayıtları.',
+          close: 'Kapat'
         }
       },
         tooltips: {
@@ -178,6 +186,13 @@ export const orders = {
         },
         orderDetails: 'Sipariş Detayları',
       form: {
+        // Alan seviyesi doğrulama mesajları (cetvel §4.6 — girdinin altında, toast'ta değil)
+        validation: {
+          statusRequired: 'Sipariş durumu zorunludur',
+          customerNameRequired: 'Müşteri adı zorunludur',
+          emailInvalid: 'Geçersiz e-posta adresi',
+          emailRequired: 'E-posta zorunludur',
+        },
         descEdit: 'Sipariş detaylarını görüntüleyin ve güncelleyin.',
         tabShipping: 'Sevkiyat',
         tabItems: 'Sipariş Kalemleri',

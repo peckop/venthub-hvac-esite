@@ -14,7 +14,6 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import {
-  adminBlurBlobClass,
   adminCardClass,
   adminSectionTitleClass,
   adminSubtitleClass,
@@ -116,7 +115,7 @@ const AdminPricingSettingsPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm font-bold">
+        <div className="p-4 rounded-admin-md bg-admin-danger-weak border border-admin-danger/30 text-admin-danger text-sm font-bold">
           {t('admin.pricing.common.loadFailed')}
         </div>
       )}
@@ -124,70 +123,69 @@ const AdminPricingSettingsPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Fiyatlandırma Varsayılanları Card */}
         <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group flex flex-col justify-between`}>
-          <div className={`${adminBlurBlobClass} bg-cyan-500/5 group-hover:bg-cyan-500/10`} />
           <div className="relative z-10 space-y-6">
-            <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-              <DollarSign className="text-cyan-400" size={20} />
-              <h2 className="text-lg font-black text-white uppercase tracking-tight">
+            <div className="flex items-center gap-3 border-b border-admin-border pb-4">
+              <DollarSign className="text-admin-accent" size={20} />
+              <h2 className="text-lg font-semibold text-admin-fg tracking-tight">
                 {t('admin.pricing.settings.defaultsCardTitle')}
               </h2>
             </div>
-            <div className="space-y-3 text-sm text-slate-300">
+            <div className="space-y-3 text-sm text-admin-fg">
               <p>
-                <span className="text-slate-500 font-bold block text-xs uppercase tracking-wider">
+                <span className="text-admin-fg-muted font-bold block text-xs">
                   {t('admin.pricing.settings.baseCurrencyLabel')}
                 </span>
-                <span className="font-semibold text-white">{values?.base_currency || '-'}</span>
+                <span className="font-semibold text-admin-fg">{values?.base_currency || '-'}</span>
               </p>
               <p>
-                <span className="text-slate-500 font-bold block text-xs uppercase tracking-wider">
+                <span className="text-admin-fg-muted font-bold block text-xs">
                   {t('admin.pricing.settings.enabledCurrenciesLabel')}
                 </span>
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-admin-fg">
                   {values?.enabled_currencies?.join(', ') || '-'}
                 </span>
               </p>
               <p>
-                <span className="text-slate-500 font-bold block text-xs uppercase tracking-wider">
+                <span className="text-admin-fg-muted font-bold block text-xs">
                   {t('admin.pricing.settings.defaultVatRatePctLabel')}
                 </span>
-                <span className="font-semibold text-white">%{values?.default_vat_rate_pct ?? '-'}</span>
+                <span className="font-semibold text-admin-fg">%{values?.default_vat_rate_pct ?? '-'}</span>
               </p>
               <p>
-                <span className="text-slate-500 font-bold block text-xs uppercase tracking-wider">
+                <span className="text-admin-fg-muted font-bold block text-xs">
                   {t('admin.pricing.settings.defaultPriceIsVatInclusiveLabel')}
                 </span>
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-admin-fg">
                   {values?.default_price_is_vat_inclusive ? t('admin.common.yes') : t('admin.common.no')}
                 </span>
               </p>
               <p>
-                <span className="text-slate-500 font-bold block text-xs uppercase tracking-wider">
+                <span className="text-admin-fg-muted font-bold block text-xs">
                   {t('admin.pricing.settings.defaultRoundToLabel')}
                 </span>
-                <span className="font-semibold text-white">{values?.default_round_to ?? '-'}</span>
+                <span className="font-semibold text-admin-fg">{values?.default_round_to ?? '-'}</span>
               </p>
               <p>
-                <span className="text-slate-500 font-bold block text-xs uppercase tracking-wider">
+                <span className="text-admin-fg-muted font-bold block text-xs">
                   {t('admin.pricing.settings.defaultCharmEndingLabel')}
                 </span>
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-admin-fg">
                   {values?.default_charm_ending ?? t('admin.pricing.settings.defaultCharmEndingNone')}
                 </span>
               </p>
               <p>
-                <span className="text-slate-500 font-bold block text-xs uppercase tracking-wider">
+                <span className="text-admin-fg-muted font-bold block text-xs">
                   {t('admin.pricing.settings.displaySpreadPctLabel')}
                 </span>
-                <span className="font-semibold text-white">%{values?.display_spread_pct ?? '-'}</span>
+                <span className="font-semibold text-admin-fg">%{values?.display_spread_pct ?? '-'}</span>
               </p>
             </div>
           </div>
-          <div className="relative z-10 pt-6 border-t border-white/5">
+          <div className="relative z-10 pt-6 border-t border-admin-border">
             <button
               onClick={openModal}
               disabled={!hasWriteAccess}
-              className="w-full py-3 bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 hover:bg-cyan-400 hover:text-slate-950 font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-admin-accent-weak border border-admin-accent/30 text-admin-accent hover:bg-admin-accent hover:text-admin-fg-subtle font-bold text-xs rounded-admin-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t('admin.common.edit')}
             </button>

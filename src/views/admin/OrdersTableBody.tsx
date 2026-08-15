@@ -2,7 +2,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { endOfDay } from 'date-fns'
-import { Info, ShoppingCart, X } from 'lucide-react'
+import { Info, ShoppingCart } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import type { DateRange } from 'react-day-picker'
 import { toast } from 'sonner'
@@ -18,6 +18,8 @@ import type { AdminColumn } from '../../components/admin/data-table/types'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import ExportMenu from '../../components/admin/ExportMenu'
 import OrderFormModal from '../../components/admin/orders/OrderFormModal'
+import { AdminModal } from '../../components/admin/overlay/AdminModal'
+import { AdminSidePanel } from '../../components/admin/overlay/AdminSidePanel'
 import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
@@ -27,6 +29,17 @@ import type { Lang } from '../../i18n/I18nContext'
 import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import type { Database } from '../../types/database.types'
+import {
+  adminButtonPrimaryClass,
+  adminButtonSecondaryClass,
+  adminInputClass,
+  adminSelectClass,
+  adminSelectStyle,
+  adminSettingsLabelClass,
+  adminTableActionDangerClass,
+  adminTableCellClass,
+  adminTableHeadCellClass,
+} from '../../utils/adminUi'
 
 /* ---- model ---- */
 interface AdminOrderRow {
@@ -122,28 +135,28 @@ function prettyStatus(s: string, t: (key: string, params?: Record<string, unknow
 
 function badgeClass(s: string): string {
   if (!s)
-    return 'inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-hvac-snug px-3 py-1.5 rounded-full border bg-white/5 text-slate-400 border-white/5 ring-1 ring-white/10 shadow-[0_0_15px_rgba(0,0,0,0.1)] transition-colors'
+    return 'inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border bg-admin-surface-2 text-admin-fg-muted border-admin-border ring-1 ring-admin-border transition-colors'
   const base =
-    'inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-hvac-snug px-3 py-1.5 rounded-full border group-hover:scale-105 transition-colors shadow-[0_0_15px_rgba(0,0,0,0.1)]'
+    'inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border group-hover:scale-105 transition-colors'
   const key = s.toLowerCase()
   switch (key) {
     case 'pending':
-      return `${base} bg-slate-500/10 text-slate-400 border-slate-500/20 ring-1 ring-slate-500/10`
+      return `${base} bg-admin-surface-3 text-admin-fg-muted border-admin-border ring-1 ring-admin-border`
     case 'paid':
-      return `${base} bg-emerald-500/10 text-emerald-400 border-emerald-500/20 ring-1 ring-emerald-500/10 shadow-[0_0_20px_rgba(16,185,129,0.1)]`
+      return `${base} bg-admin-success-weak text-admin-success border-admin-success/30 ring-1 ring-admin-success/30`
     case 'confirmed':
-      return `${base} bg-cyan-500/10 text-cyan-400 border-cyan-500/20 ring-1 ring-cyan-500/10 shadow-[0_0_20px_rgba(34,211,238,0.1)]`
+      return `${base} bg-admin-accent-weak text-admin-accent border-admin-accent/30 ring-1 ring-admin-accent/30`
     case 'shipped':
-      return `${base} bg-amber-500/10 text-amber-400 border-amber-500/20 ring-1 ring-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.1)]`
+      return `${base} bg-admin-warning-weak text-admin-warning border-admin-warning/30 ring-1 ring-admin-warning/30`
     case 'delivered':
-      return `${base} bg-indigo-500/10 text-indigo-400 border-indigo-500/20 ring-1 ring-indigo-500/10 shadow-[0_0_20px_rgba(99,102,241,0.1)]`
+      return `${base} bg-admin-accent-weak text-admin-accent border-admin-accent/30 ring-1 ring-admin-accent/30`
     case 'cancelled':
-      return `${base} bg-rose-500/10 text-rose-400 border-rose-500/20 ring-1 ring-rose-500/10 shadow-[0_0_20px_rgba(244,63,94,0.1)]`
+      return `${base} bg-admin-danger-weak text-admin-danger border-admin-danger/30 ring-1 ring-admin-danger/30`
     case 'refunded':
     case 'partial_refunded':
-      return `${base} bg-orange-500/10 text-orange-400 border-orange-500/20 ring-1 ring-orange-500/10 shadow-[0_0_20px_rgba(249,115,22,0.1)]`
+      return `${base} bg-admin-warning-weak text-admin-warning border-admin-warning/30 ring-1 ring-admin-warning/30`
     default:
-      return `${base} bg-white/5 text-slate-400 border-white/5 ring-1 ring-white/10 shadow-[0_0_15px_rgba(0,0,0,0.1)]`
+      return `${base} bg-admin-surface-2 text-admin-fg-muted border-admin-border ring-1 ring-admin-border`
   }
 }
 
@@ -342,8 +355,8 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-12 gap-4">
-        <div className="animate-spin w-8 h-8 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
-        <span className="text-xs font-black uppercase tracking-hvac-relaxed text-slate-500">
+        <div className="animate-spin w-8 h-8 border-2 border-admin-accent/30 border-t-cyan-500 rounded-full" />
+        <span className="text-xs font-semibold text-admin-fg-muted">
           {t('admin.common.loading')}
         </span>
       </div>
@@ -352,8 +365,8 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
 
   if (!order) {
     return (
-      <div className="glass p-8 rounded-2xl border border-white/5 text-center">
-        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+      <div className="bg-admin-surface p-8 rounded-admin-lg border border-admin-border text-center">
+        <p className="text-xs font-bold text-admin-fg-muted">
           {t('admin.orders.states.noRecords')}
         </p>
       </div>
@@ -367,8 +380,8 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-0.5 bg-cyan-400" />
-        <h4 className="text-xs font-black text-cyan-400 uppercase tracking-hvac-relaxed">
+        <div className="w-8 h-0.5 bg-admin-accent" />
+        <h4 className="text-xs font-semibold text-admin-accent">
           {t('admin.orders.orderDetails')}
         </h4>
       </div>
@@ -376,44 +389,44 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Sol Kolon: Ürünler */}
         <div className="lg:col-span-2 space-y-4">
-          <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">
+          <h5 className="text-xs font-semibold text-admin-fg-muted">
             {t('common.products')}
           </h5>
-          <div className="glass rounded-2xl border border-white/5 overflow-hidden">
-            <table className="min-w-full text-xs divide-y divide-white/5">
-              <thead className="bg-white/3">
+          <div className="bg-admin-surface rounded-admin-lg border border-admin-border overflow-hidden">
+            <table className="min-w-full text-xs divide-y divide-admin-border">
+              <thead className="bg-admin-surface-2">
                 <tr>
-                  <th className="px-6 py-4 text-left font-black text-slate-500 uppercase tracking-wider">
+                  <th className="px-4 py-2.5 text-left font-semibold text-admin-fg-muted">
                     {t('orders.productCol')}
                   </th>
-                  <th className="px-6 py-4 text-center font-black text-slate-500 uppercase tracking-wider w-20">
+                  <th className="px-4 py-2.5 text-center font-semibold text-admin-fg-muted w-20">
                     {t('orders.qtyCol')}
                   </th>
-                  <th className="px-6 py-4 text-right font-black text-slate-500 uppercase tracking-wider w-32">
+                  <th className="px-4 py-2.5 text-right font-semibold text-admin-fg-muted w-32">
                     {t('orders.unitPriceCol')}
                   </th>
-                  <th className="px-6 py-4 text-right font-black text-slate-500 uppercase tracking-wider w-32">
+                  <th className="px-4 py-2.5 text-right font-semibold text-admin-fg-muted w-32">
                     {t('orders.totalCol')}
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/2">
+              <tbody className="divide-y divide-admin-border">
                 {items.map((it: DetailOrderItem) => {
                   const qty = Number(it.quantity) || 0
                   const unitPrice = Number(it.price_at_time) || 0
                   const totalPrice = qty * unitPrice
                   return (
-                    <tr key={it.id} className="hover:bg-white/2 transition-colors">
-                      <td className="px-6 py-4 font-bold text-slate-200">
+                    <tr key={it.id} className="hover:bg-admin-surface-2 transition-colors">
+                      <td className="px-4 py-2.5 text-admin-fg">
                         {it.product_name}
                       </td>
-                      <td className="px-6 py-4 text-center text-slate-300 font-bold">
+                      <td className="px-4 py-2.5 text-center text-admin-fg">
                         {qty}
                       </td>
-                      <td className="px-6 py-4 text-right text-slate-300 font-mono">
+                      <td className="px-4 py-2.5 text-right text-admin-fg font-mono">
                         {formatCurrency(unitPrice, lang)}
                       </td>
-                      <td className="px-6 py-4 text-right text-cyan-400 font-mono font-bold">
+                      <td className="px-4 py-2.5 text-right text-admin-accent font-mono">
                         {formatCurrency(totalPrice, lang)}
                       </td>
                     </tr>
@@ -427,20 +440,20 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
         {/* Sağ Kolon: Teslimat & Fatura */}
         <div className="space-y-6">
           {/* Müşteri & Teslimat */}
-          <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
-            <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">
+          <div className="bg-admin-surface p-6 rounded-admin-lg border border-admin-border space-y-4">
+            <h5 className="text-xs font-semibold text-admin-fg-muted">
               {t('orders.shippingInfo')}
             </h5>
             <div className="space-y-3 text-xs">
               <div>
-                <span className="text-slate-500 font-bold block">{t('orders.name')}:</span>
-                <span className="text-slate-200 font-bold block">{order.customer_name}</span>
-                <span className="text-slate-400 font-medium block">{order.customer_email}</span>
+                <span className="text-admin-fg-muted font-bold block">{t('orders.name')}:</span>
+                <span className="text-admin-fg font-bold block">{order.customer_name}</span>
+                <span className="text-admin-fg-muted font-medium block">{order.customer_email}</span>
               </div>
               {addr && (
                 <div>
-                  <span className="text-slate-500 font-bold block">{t('orders.deliveryAddress')}:</span>
-                  <p className="text-slate-300 mt-1 font-medium leading-relaxed">
+                  <span className="text-admin-fg-muted font-bold block">{t('orders.deliveryAddress')}:</span>
+                  <p className="text-admin-fg mt-1 font-medium leading-relaxed">
                     {addr.fullAddress || addr.street}<br />
                     {[addr.city, addr.district || addr.state].filter(Boolean).join(', ')}<br />
                     {addr.postalCode || addr.postal_code}
@@ -449,8 +462,8 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
               )}
               {order.shipping_method && (
                 <div>
-                  <span className="text-slate-500 font-bold block">{t('account.orderDetail.shippingMethod')}:</span>
-                  <span className="text-slate-300 font-bold uppercase">
+                  <span className="text-admin-fg-muted font-bold block">{t('account.orderDetail.shippingMethod')}:</span>
+                  <span className="text-admin-fg font-bold">
                     {order.shipping_method === 'express'
                       ? t('account.orderDetail.express')
                       : t('account.orderDetail.standard')}
@@ -461,30 +474,30 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
           </div>
 
           {/* Fatura Bilgileri */}
-          <div className="glass p-6 rounded-2xl border border-white/5 space-y-4">
-            <h5 className="text-xs font-black text-slate-400 uppercase tracking-widest">
+          <div className="bg-admin-surface p-6 rounded-admin-lg border border-admin-border space-y-4">
+            <h5 className="text-xs font-semibold text-admin-fg-muted">
               {t('account.orderDetail.invoiceInfo')}
             </h5>
             <div className="space-y-3 text-xs">
               <div>
-                <span className="text-slate-500 font-bold block">{t('account.orderDetail.typeLabel')}</span>
-                <span className="text-slate-200 font-bold block uppercase">
+                <span className="text-admin-fg-muted font-bold block">{t('account.orderDetail.typeLabel')}</span>
+                <span className="text-admin-fg font-bold block">
                   {order.invoice_type === 'corporate'
                     ? t('checkout.invoice.corporate')
                     : t('checkout.invoice.individual')}
                 </span>
               </div>
               {invoice && (
-                <div className="space-y-2 text-slate-300 font-medium leading-relaxed">
+                <div className="space-y-2 text-admin-fg font-medium leading-relaxed">
                   {order.invoice_type === 'corporate' ? (
                     <>
-                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.companyTitleLabel')}</span> {invoice.companyName || invoice.company_name}</p>
-                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.taxOfficeLabel')}</span> {invoice.taxOffice || invoice.tax_office}</p>
-                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.vknLabel')}</span> {invoice.taxNumber || invoice.tax_no}</p>
+                      <p><span className="text-admin-fg-muted font-bold">{t('account.orderDetail.companyTitleLabel')}</span> {invoice.companyName || invoice.company_name}</p>
+                      <p><span className="text-admin-fg-muted font-bold">{t('account.orderDetail.taxOfficeLabel')}</span> {invoice.taxOffice || invoice.tax_office}</p>
+                      <p><span className="text-admin-fg-muted font-bold">{t('account.orderDetail.vknLabel')}</span> {invoice.taxNumber || invoice.tax_no}</p>
                     </>
                   ) : (
                     <>
-                      <p><span className="text-slate-500 font-bold">{t('account.orderDetail.tcknLabel')}</span> {invoice.tcNo || invoice.tc_no || invoice.national_id}</p>
+                      <p><span className="text-admin-fg-muted font-bold">{t('account.orderDetail.tcknLabel')}</span> {invoice.tcNo || invoice.tc_no || invoice.national_id}</p>
                     </>
                   )}
                 </div>
@@ -929,10 +942,10 @@ const OrdersTableBody: React.FC = () => {
           const shortId = `${r.id.slice(0, 8)}...`
           return (
             <div className="flex flex-col gap-1">
-              <span className="font-black text-white uppercase tracking-wider text-xs">
+              <span className="font-semibold text-admin-fg text-xs">
                 {r.order_number || r.id.slice(0, 8)}
               </span>
-              {r.order_number && <span className="text-xs text-slate-500 font-mono">{shortId}</span>}
+              {r.order_number && <span className="text-xs text-admin-fg-muted font-mono">{shortId}</span>}
             </div>
           )
         },
@@ -950,7 +963,7 @@ const OrdersTableBody: React.FC = () => {
         sortable: true,
         hideable: true,
         cell: (r) => (
-          <span className="text-xs font-medium text-slate-400 font-mono italic">{r.conversation_id || '-'}</span>
+          <span className="text-xs font-medium text-admin-fg-muted font-mono italic">{r.conversation_id || '-'}</span>
         ),
       },
       {
@@ -960,7 +973,7 @@ const OrdersTableBody: React.FC = () => {
         hideable: true,
         align: 'right',
         cell: (r) => (
-          <span className="font-black text-white text-xs tracking-wider">{formatAmount(r.total_amount, lang)}</span>
+          <span className="font-semibold text-admin-fg text-xs">{formatAmount(r.total_amount, lang)}</span>
         ),
       },
       {
@@ -969,7 +982,7 @@ const OrdersTableBody: React.FC = () => {
         sortable: true,
         hideable: true,
         cell: (r) => (
-          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">
+          <span className="text-xs font-semibold text-admin-fg-muted">
             {safeDate(r.created_at, lang)}
           </span>
         ),
@@ -985,14 +998,14 @@ const OrdersTableBody: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => openEditModal(r.id)}
-                  className="px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-xs font-black uppercase text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors"
+                  className="px-3 py-1.5 rounded-admin-md bg-admin-accent-weak border border-admin-accent/30 text-xs font-semibold text-admin-accent hover:bg-admin-accent hover:text-admin-accent-fg transition-colors"
                 >
                   {t('admin.common.edit')}
                 </button>
                 <button
                   type="button"
                   onClick={() => void openShipModal(r.id)}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-cyan-400 hover:bg-cyan-500 hover:text-white transition-colors"
+                  className="px-3 py-1.5 rounded-admin-md bg-admin-surface-2 border border-admin-border text-xs font-semibold text-admin-accent hover:bg-admin-accent hover:text-admin-accent-fg transition-colors"
                 >
                   {t('admin.orders.actions.shipping')}
                 </button>
@@ -1001,14 +1014,14 @@ const OrdersTableBody: React.FC = () => {
             <button
               type="button"
               onClick={() => void openLogsModal(r.id)}
-              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-amber-400 hover:bg-amber-500 hover:text-white transition-colors"
+              className="px-3 py-1.5 rounded-admin-md bg-admin-surface-2 border border-admin-border text-xs font-semibold text-admin-warning hover:bg-admin-warning hover:text-admin-warning-fg transition-colors"
             >
               {t('admin.orders.actions.logs')}
             </button>
             <button
               type="button"
               onClick={() => void openNotesModal(r.id)}
-              className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-black uppercase text-slate-400 hover:bg-slate-500 hover:text-white transition-colors"
+              className="px-3 py-1.5 rounded-admin-md bg-admin-surface-2 border border-admin-border text-xs font-semibold text-admin-fg-muted hover:bg-admin-surface-3 hover:text-admin-fg transition-colors"
             >
               {t('admin.orders.actions.notes')}
             </button>
@@ -1119,261 +1132,211 @@ const OrdersTableBody: React.FC = () => {
         }
       />
 
-      {shipOpen && (
-        <div className="fixed inset-0 bg-surface-darker/40 backdrop-blur-xl flex items-center justify-center z-modal p-4 animate-in fade-in duration-500">
-          <div className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-lg overflow-hidden transform animate-in zoom-in-95 duration-500">
-            <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
-              <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">
-                {bulkMode
-                  ? t('admin.orders.modals.shipping.bulkTitle')
-                  : t('admin.orders.modals.shipping.title')}
-              </h3>
-              <button
-                type="button"
-                onClick={closeShipModal}
-                aria-label={t('admin.orders.modals.shipping.cancel')}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-10 space-y-8">
-              <div className="grid grid-cols-1 gap-8">
-                <div className="space-y-3">
-                  <label
-                    htmlFor="ship-carrier"
-                    className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1"
-                  >
-                    {t('admin.orders.modals.shipping.carrierLabel')}
-                  </label>
-                  <select
-                    id="ship-carrier"
-                    value={carrier}
-                    onChange={(e) => setCarrier(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 transition-colors"
-                  >
-                    <option value="" className="bg-surface-deep">
-                      {t('admin.orders.modals.shipping.carrierSelect')}
-                    </option>
-                    <option value="Yurtiçi" className="bg-surface-deep">
-                      {t('admin.orders.modals.shipping.carriers.yurtici')}
-                    </option>
-                    <option value="Aras" className="bg-surface-deep">
-                      {t('admin.orders.modals.shipping.carriers.aras')}
-                    </option>
-                    <option value="MNG" className="bg-surface-deep">
-                      {t('admin.orders.modals.shipping.carriers.mng')}
-                    </option>
-                    <option value="PTT" className="bg-surface-deep">
-                      {t('admin.orders.modals.shipping.carriers.ptt')}
-                    </option>
-                  </select>
-                </div>
-                <div className="space-y-3">
-                  <label
-                    htmlFor="ship-tracking"
-                    className="text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1"
-                  >
-                    {t('admin.orders.modals.shipping.trackingLabel')}
-                  </label>
-                  <input
-                    id="ship-tracking"
-                    value={tracking}
-                    onChange={(e) => setTracking(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 transition-colors placeholder:text-slate-600"
-                    placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
-                  />
-                </div>
-                <label className="flex items-center gap-3 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                  <input
-                    type="checkbox"
-                    checked={sendEmail}
-                    onChange={(e) => setSendEmail(e.target.checked)}
-                    className="w-4 h-4 rounded border-white/10 bg-white/5 text-cyan-500 focus-visible:ring-cyan-500/20"
-                  />
-                  {t('admin.orders.modals.shipping.sendEmailLabel')}
-                </label>
-              </div>
-            </div>
-            <div className="px-10 py-8 bg-white/2 border-t border-white/5 flex justify-end gap-4">
-              <button
-                type="button"
-                onClick={closeShipModal}
-                className="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
-              >
-                {t('admin.orders.modals.shipping.cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={() => void submitShip()}
-                className="px-8 py-3 text-xs font-black uppercase tracking-widest bg-cyan-500 text-white rounded-xl shadow-glow-md hover:scale-105 active:scale-95 transition-transform"
-              >
-                {t('admin.orders.modals.shipping.save')}
-              </button>
-            </div>
+      {/*
+        KARGO — **MODAL**. Cetvel §4.1: "<5 girdili form → Modal" (Carbon Forms).
+        Kullanıcı burada BAKMIYOR, KARAR VERİYOR: taşıyıcı + takip no giriliyor,
+        `admin-update-shipping` edge fonksiyonu çağrılıyor ve sipariş durumu
+        `shipped`'e taşınıyor (tekil veya toplu). Kararın sonucu geri alınması
+        pahalı bir yazma → arka planı bloklamak DOĞRU davranıştır (§4.2).
+      */}
+      <AdminModal
+        open={shipOpen}
+        onOpenChange={(next) => {
+          if (!next) closeShipModal()
+        }}
+        title={
+          bulkMode
+            ? t('admin.orders.modals.shipping.bulkTitle')
+            : t('admin.orders.modals.shipping.title')
+        }
+        description={t('admin.orders.modals.shipping.description')}
+        closeLabel={t('admin.orders.modals.shipping.close')}
+        footer={
+          <>
+            <button type="button" onClick={closeShipModal} className={adminButtonSecondaryClass}>
+              {t('admin.orders.modals.shipping.cancel')}
+            </button>
+            <button
+              type="button"
+              onClick={() => void submitShip()}
+              className={adminButtonPrimaryClass}
+            >
+              {t('admin.orders.modals.shipping.save')}
+            </button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="ship-carrier" className={adminSettingsLabelClass}>
+              {t('admin.orders.modals.shipping.carrierLabel')}
+            </label>
+            <select
+              id="ship-carrier"
+              value={carrier}
+              onChange={(e) => setCarrier(e.target.value)}
+              className={adminSelectClass}
+              style={adminSelectStyle}
+            >
+              <option value="">{t('admin.orders.modals.shipping.carrierSelect')}</option>
+              <option value="Yurtiçi">{t('admin.orders.modals.shipping.carriers.yurtici')}</option>
+              <option value="Aras">{t('admin.orders.modals.shipping.carriers.aras')}</option>
+              <option value="MNG">{t('admin.orders.modals.shipping.carriers.mng')}</option>
+              <option value="PTT">{t('admin.orders.modals.shipping.carriers.ptt')}</option>
+            </select>
           </div>
-        </div>
-      )}
 
-      {logsOpen && (
-        <div className="fixed inset-0 bg-surface-darker/40 backdrop-blur-xl flex items-center justify-center z-modal p-4 animate-in fade-in duration-500">
-          <div className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform animate-in zoom-in-95 duration-500">
-            <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
-              <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">
-                {t('admin.orders.modals.logs.title')}
-              </h3>
-              <button
-                type="button"
-                onClick={closeLogsModal}
-                aria-label={t('admin.orders.modals.logs.close')}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-10">
-              <div className="max-h-50vh overflow-y-auto rounded-hvac-xl border border-white/10 bg-white/2 overflow-hidden custom-scrollbar">
-                {logsLoading ? (
-                  <div className="p-20 text-center flex flex-col items-center gap-4">
-                    <div className="animate-spin w-10 h-10 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
-                    <span className="text-xs font-black uppercase tracking-hvac-relaxed text-slate-500">
-                      {t('admin.common.loading')}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto w-full">
-                    <table className="min-w-full text-sm divide-y divide-white/5">
-                      <thead className="bg-white/5 sticky top-0 backdrop-blur-xl">
-                        <tr>
-                          <th className="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-hvac-normal">
-                            {t('admin.orders.modals.logs.table.date')}
-                          </th>
-                          <th className="px-8 py-5 text-left text-xs font-black text-slate-500 uppercase tracking-hvac-normal">
-                            {t('admin.orders.modals.logs.table.subject')}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/2">
-                        {emailLogs.map((l, i) => (
-                          <tr key={i} className="hover:bg-white/3 transition-colors group">
-                            <td className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">
-                              {safeDate(l.created_at, lang)}
-                            </td>
-                            <td className="px-8 py-5 text-xs text-white font-medium flex items-center gap-3">
-                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-admin-orders-glow-3" />
-                              {l.subject}
-                            </td>
-                          </tr>
-                        ))}
-                        {emailLogs.length === 0 && !logsLoading && (
-                          <tr>
-                            <td colSpan={2} className="px-8 py-20 text-center">
-                              <div className="flex flex-col items-center gap-4 text-slate-500">
-                                <Info size={32} className="opacity-20" />
-                                <span className="text-xs font-black uppercase tracking-hvac-relaxed italic">
-                                  {t('admin.orders.modals.logs.noRecords')}
-                                </span>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="px-10 py-8 bg-white/2 border-t border-white/5 flex justify-end">
-              <button
-                type="button"
-                onClick={closeLogsModal}
-                className="px-10 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
-              >
-                {t('admin.orders.modals.logs.close')}
-              </button>
-            </div>
+          <div>
+            <label htmlFor="ship-tracking" className={adminSettingsLabelClass}>
+              {t('admin.orders.modals.shipping.trackingLabel')}
+            </label>
+            <input
+              id="ship-tracking"
+              value={tracking}
+              onChange={(e) => setTracking(e.target.value)}
+              className={adminInputClass}
+              placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
+            />
           </div>
-        </div>
-      )}
 
-      {notesOpen && (
-        <div className="fixed inset-0 bg-surface-darker/40 backdrop-blur-xl flex items-center justify-center z-modal p-4 animate-in fade-in duration-500">
-          <div className="glass-strong border border-white/10 rounded-hvac-2xl shadow-2xl w-full max-w-xl overflow-hidden transform animate-in zoom-in-95 duration-500">
-            <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
-              <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">
-                {t('admin.orders.modals.notes.title')}
-              </h3>
-              <button
-                type="button"
-                onClick={closeNotesModal}
-                aria-label={t('admin.orders.modals.notes.close')}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-colors ring-1 ring-white/10"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-10 space-y-8">
-              {hasWriteAccess && (
-                <div className="flex gap-4">
-                  <input
-                    value={noteInput}
-                    onChange={(e) => setNoteInput(e.target.value)}
-                    placeholder={t('admin.orders.modals.notes.inputPlaceholder')}
-                    aria-label={t('admin.orders.modals.notes.inputPlaceholder')}
-                    className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-xs font-medium text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 transition-colors placeholder:text-slate-600"
-                  />
+          <label className="flex items-center gap-2 text-sm text-admin-fg-muted">
+            <input
+              type="checkbox"
+              checked={sendEmail}
+              onChange={(e) => setSendEmail(e.target.checked)}
+              className="h-4 w-4 rounded-admin-sm border-admin-border accent-admin-accent
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-ring"
+            />
+            {t('admin.orders.modals.shipping.sendEmailLabel')}
+          </label>
+        </div>
+      </AdminModal>
+
+      {/*
+        E-POSTA KAYITLARI — **NON-MODAL YAN PANEL**. Cetvel §4.1: "Kullanıcı arkadaki
+        içeriğe bakmalı → non-modal panel" + "Tablo satırı seçince hızlı detay →
+        split panel". Burada HİÇBİR karar verilmiyor, hiçbir alan doldurulmuyor:
+        sipariş başına gönderilmiş bildirim e-postalarının salt-okunur listesi.
+        Böyle bir yüzey için modal, NN/g'nin deyimiyle kullanıcıya "fazladan bir
+        hedef — diyaloğu kapatmak" yükler (§4.2) ve listeyle karşılaştırma yapmayı
+        engeller. Panel açıkken tablo etkileşimli kalır; perde ve kaydırma kilidi
+        BİLEREK yok (§4.3 — bunlar konulursa panel modal olur, sadece şekli değişir).
+      */}
+      <AdminSidePanel
+        open={logsOpen}
+        onClose={closeLogsModal}
+        title={t('admin.orders.modals.logs.title')}
+        description={t('admin.orders.modals.logs.description')}
+        closeLabel={t('admin.orders.modals.logs.close')}
+      >
+        {logsLoading ? (
+          <p className="py-10 text-center text-sm text-admin-fg-muted">
+            {t('admin.common.loading')}
+          </p>
+        ) : emailLogs.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-10 text-admin-fg-subtle">
+            <Info size={24} aria-hidden="true" />
+            <span className="text-sm">{t('admin.orders.modals.logs.noRecords')}</span>
+          </div>
+        ) : (
+          /* Geniş içerik KENDİ kabında yatay kayar — sayfa gövdesi asla yatay kaymaz. */
+          <div className="overflow-x-auto rounded-admin-md border border-admin-border">
+            <table className="min-w-full">
+              <thead>
+                <tr>
+                  <th scope="col" className={adminTableHeadCellClass}>
+                    {t('admin.orders.modals.logs.table.date')}
+                  </th>
+                  <th scope="col" className={adminTableHeadCellClass}>
+                    {t('admin.orders.modals.logs.table.subject')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {emailLogs.map((l) => (
+                  <tr key={`${l.created_at}-${l.provider_message_id ?? l.subject}`} className="group">
+                    <td className={`${adminTableCellClass} whitespace-nowrap`}>
+                      {safeDate(l.created_at, lang)}
+                    </td>
+                    <td className={adminTableCellClass}>{l.subject}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </AdminSidePanel>
+
+      {/*
+        NOTLAR — **MODAL**. Salt-okunur GİBİ görünür ama değildir: metin girişi +
+        INSERT + DELETE barındırır, yani bir ÇALIŞMA yüzeyidir. Carbon'un non-modal
+        kısıtı birebir geçerli: "non-modal yalnız isteğe bağlı / kritik olmayan
+        görevler içindir; kullanıcının girdisi akışı ilerletmek için gerekliyse
+        modal kullan" (§4.3). Alan sayısı 1 → §4.1 "1–2 alanlı hızlı düzenleme → Modal".
+      */}
+      <AdminModal
+        open={notesOpen}
+        onOpenChange={(next) => {
+          if (!next) closeNotesModal()
+        }}
+        title={t('admin.orders.modals.notes.title')}
+        description={t('admin.orders.modals.notes.description')}
+        closeLabel={t('admin.orders.modals.notes.close')}
+        footer={
+          <button type="button" onClick={closeNotesModal} className={adminButtonSecondaryClass}>
+            {t('admin.orders.modals.notes.close')}
+          </button>
+        }
+      >
+        {hasWriteAccess && (
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={noteInput}
+              onChange={(e) => setNoteInput(e.target.value)}
+              placeholder={t('admin.orders.modals.notes.inputPlaceholder')}
+              aria-label={t('admin.orders.modals.notes.inputPlaceholder')}
+              className={`${adminInputClass} flex-1`}
+            />
+            <button
+              type="button"
+              onClick={() => void addNote()}
+              className={adminButtonPrimaryClass}
+            >
+              {t('admin.orders.modals.notes.add')}
+            </button>
+          </div>
+        )}
+
+        <ul className="space-y-3">
+          {notes.map((n) => (
+            <li
+              key={n.id}
+              className="rounded-admin-md border border-admin-border bg-admin-surface-2 p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="min-w-0 flex-1 text-sm leading-relaxed text-admin-fg">{n.note}</p>
+                {hasWriteAccess && (
+                  /* Eskiden `opacity-0 group-hover:opacity-100` idi: klavye ve dokunmatik
+                     kullanıcı için görünmez bir eylemdi. Artık daima görünür. */
                   <button
                     type="button"
-                    onClick={() => void addNote()}
-                    className="px-8 py-4 bg-cyan-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-glow-md hover:scale-105 active:scale-95 transition-transform"
+                    onClick={() => void deleteNote(n.id)}
+                    className={adminTableActionDangerClass}
                   >
-                    {t('admin.orders.modals.notes.add')}
+                    {t('admin.orders.modals.notes.delete')}
                   </button>
-                </div>
-              )}
-              <div className="max-h-40vh overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                {notes.map((n) => (
-                  <div
-                    key={n.id}
-                    className="p-6 bg-white/2 rounded-2xl border border-white/5 group hover:border-white/10 transition-colors"
-                  >
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1 text-sm text-slate-300 leading-relaxed font-medium">{n.note}</div>
-                      {hasWriteAccess && (
-                        <button
-                          type="button"
-                          onClick={() => void deleteNote(n.id)}
-                          aria-label={t('admin.orders.modals.notes.delete')}
-                          className="p-1.5 text-xs font-black uppercase tracking-widest text-rose-500 hover:bg-rose-500 hover:text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity border border-rose-500/20"
-                        >
-                          {t('admin.orders.modals.notes.delete')}
-                        </button>
-                      )}
-                    </div>
-                    <div className="text-xs text-slate-500 mt-4 font-black uppercase tracking-hvac-normal">
-                      {safeDate(n.created_at, lang)}
-                    </div>
-                  </div>
-                ))}
-                {notes.length === 0 && (
-                  <div className="text-center py-16 text-slate-500 font-black uppercase tracking-hvac-normal text-xs">
-                    {t('admin.orders.modals.notes.noRecords')}
-                  </div>
                 )}
               </div>
-            </div>
-            <div className="px-10 py-8 bg-white/2 border-t border-white/5 flex justify-end">
-              <button
-                type="button"
-                onClick={closeNotesModal}
-                className="px-10 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
-              >
-                {t('admin.orders.modals.notes.close')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <p className="mt-2 text-xs text-admin-fg-subtle">{safeDate(n.created_at, lang)}</p>
+            </li>
+          ))}
+          {notes.length === 0 && (
+            <li className="py-8 text-center text-sm text-admin-fg-muted">
+              {t('admin.orders.modals.notes.noRecords')}
+            </li>
+          )}
+        </ul>
+      </AdminModal>
 
       {editOpen && (
         <OrderFormModal

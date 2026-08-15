@@ -19,6 +19,7 @@ import { products } from './products.en'
 import { returns } from './returns.en'
 import { search } from './search.en'
 import { settings } from './settings.en'
+import { theme } from './theme.en'
 import { titles } from './titles.en'
 import { toolbar } from './toolbar.en'
 import { ui } from './ui.en'
@@ -50,6 +51,7 @@ export const admin = {
   users,
   logistics,
   a11y,
+  theme,
   authority,
   categories,
 }

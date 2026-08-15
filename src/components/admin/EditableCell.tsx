@@ -124,13 +124,13 @@ const EditableCell: React.FC<EditableCellProps> = ({
         <button
             type="button"
             disabled={disabled}
-            className={`cursor-pointer border-b border-dashed border-slate-300 hover:border-primary-navy hover:text-primary-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-left bg-transparent p-0 ${className}`}
+            className={`cursor-pointer border-b border-dashed border-admin-border hover:border-primary-navy hover:text-primary-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-left bg-transparent p-0 ${className}`}
             onClick={(e) => {
                 e.stopPropagation()
                 startEdit()
             }}
         >
-            {String(value ?? '') || <span className="text-slate-400">{placeholder}</span>}
+            {String(value ?? '') || <span className="text-admin-fg-muted">{placeholder}</span>}
         </button>
     )
 }

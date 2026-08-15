@@ -277,9 +277,9 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
 
   if (loading) {
     return (
-      <div className="min-h-400px flex flex-col items-center justify-center bg-surface-deep space-y-6">
-        <div className="w-12 h-12 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin" />
-        <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-loose animate-pulse">
+      <div className="min-h-400px flex flex-col items-center justify-center bg-admin-bg space-y-6">
+        <div className="w-12 h-12 border-4 border-admin-accent/30 border-t-cyan-400 rounded-full animate-spin" />
+        <span className="text-xs font-semibold text-admin-fg-muted animate-pulse">
           {t('admin.categories.studioInitialization')}
         </span>
       </div>
@@ -295,29 +295,29 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
       hiç görünmüyordu). Denetim 2026-08-15 / D1.
       Cetvel: docs/standards/admin-design-standard.md §2.1
     */
-    <div className="flex flex-col bg-surface-darkest text-slate-200 font-sans">
+    <div className="flex flex-col bg-admin-bg text-admin-fg font-sans">
       {/* Sayfa-içi araç çubuğu — kabuk başlığının ALTINA yapışır (§2.7) */}
-      <header className="sticky top-admin-header z-raised border-b border-white/5 flex items-center justify-between px-6 py-3 bg-surface-deep">
+      <header className="sticky top-admin-header z-raised border-b border-admin-border flex items-center justify-between px-6 py-3 bg-admin-bg">
         <div className="flex items-center gap-6">
-          <button onClick={handleBack} type="button" className="group flex items-center gap-2 text-slate-500 hover:text-white transition-colors">
-            <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:bg-white/10 transition-colors">
+          <button onClick={handleBack} type="button" className="group flex items-center gap-2 text-admin-fg-muted hover:text-admin-fg transition-colors">
+            <div className="p-2 rounded-admin-md bg-admin-surface-2 border border-admin-border group-hover:bg-admin-surface-3 transition-colors">
                 <ChevronLeft size={18} />
             </div>
             <div className="flex flex-col">
-                <span className="text-xs font-black text-slate-600 uppercase tracking-widest leading-none">
+                <span className="text-xs font-semibold text-admin-fg-subtle leading-none">
                   {t('admin.common.goBack')}
                 </span>
-                <span className="text-xs font-bold text-white mt-1">{category?.name}</span>
+                <span className="text-xs font-bold text-admin-fg mt-1">{category?.name}</span>
             </div>
           </button>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 mr-4 bg-white/5 p-1 rounded-xl border border-white/5">
+          <div className="flex items-center gap-2 mr-4 bg-admin-surface-2 p-1 rounded-admin-md border border-admin-border">
              <button 
                 onClick={() => setShowPreview(!showPreview)} 
                 type="button"
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest transition-colors ${showPreview ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/20' : 'text-slate-500 hover:text-slate-300'}`}
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-admin-md text-xs font-semibold transition-colors ${showPreview ? 'bg-admin-accent text-admin-accent-fg shadow-admin-md shadow-cyan-500/20' : 'text-admin-fg-muted hover:text-admin-fg'}`}
              >
                 <Eye size={14} />
                 {showPreview ? t('admin.categories.previewOn') : t('admin.categories.previewOff')}
@@ -329,7 +329,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
             form="category-builder-form"
             disabled={isSaveDisabled}
             title={!hasWriteAccess ? t('admin.categories.toasts.noWritePermission') : undefined}
-            className="flex items-center gap-3 bg-white text-slate-900 hover:bg-cyan-400 hover:text-white disabled:opacity-50 px-8 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase shadow-xl transition-transform active:scale-95"
+            className="flex items-center gap-3 bg-admin-surface text-admin-fg-subtle hover:bg-admin-accent hover:text-admin-accent-fg disabled:opacity-50 px-8 py-2.5 rounded-admin-md text-xs font-semibold shadow-admin-lg transition-transform active:scale-95"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             {t('admin.common.saveChanges')}
@@ -341,21 +341,21 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
       <div className="flex-1 flex">
 
         {/* --- CENTER: MAIN EDITOR (Studio Area) --- */}
-        <main className="flex-1 min-w-0 bg-surface-darkest relative">
+        <main className="flex-1 min-w-0 bg-admin-bg relative">
             <form id="category-builder-form" onSubmit={form.handleSubmit(onSubmit)} className={`${adminContentMaxWidthClass} mx-auto py-12 px-6`}>
                 <div className="mb-12 flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-black text-white tracking-tight italic">
+                        <h2 className="text-2xl font-semibold text-admin-fg tracking-tight italic">
                           {t('admin.categories.pageStudio')}
                         </h2>
-                        <p className="text-sm text-slate-500 mt-1">
+                        <p className="text-sm text-admin-fg-muted mt-1">
                           {t('admin.categories.pageStudioDesc')}
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">
+                        <div className="px-3 py-1 bg-admin-success-weak border border-admin-success/30 rounded-full flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-admin-success animate-pulse" />
+                            <span className="text-xs font-semibold text-admin-success">
                               {t('admin.categories.liveSyncActive')}
                             </span>
                         </div>
@@ -363,10 +363,10 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                 </div>
 
                 {/* --- CATEGORY BASIC INFO FORM --- */}
-                <div className="bg-white/2 border border-white/5 rounded-2xl p-6 mb-8 space-y-6">
-                    <div className="flex items-center gap-2 pb-4 border-b border-white/5">
-                        <div className="w-1 h-4 bg-cyan-500 rounded-full" />
-                        <h3 className="text-xs font-black text-white uppercase tracking-widest">
+                <div className="bg-admin-surface-2 border border-admin-border rounded-admin-lg p-6 mb-8 space-y-6">
+                    <div className="flex items-center gap-2 pb-4 border-b border-admin-border">
+                        <div className="w-1 h-4 bg-admin-accent rounded-full" />
+                        <h3 className="text-xs font-semibold text-admin-fg">
                             {t('admin.categories.tabGeneral')}
                         </h3>
                     </div>
@@ -374,16 +374,16 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Name */}
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                            <label className="text-xs font-semibold text-admin-fg-muted px-1">
                                 {t('admin.categories.formName')}
                             </label>
                             <input 
                                 {...form.register('name')}
-                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 text-white"
+                                className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle text-admin-fg"
                                 placeholder={t('admin.categories.formName') + '...'}
                             />
                             {form.formState.errors.name && (
-                                <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">
+                                <p className="text-xs font-bold text-admin-danger mt-1 tracking-tighter px-1">
                                     {form.formState.errors.name.message}
                                 </p>
                             )}
@@ -391,16 +391,16 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
 
                         {/* Slug */}
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                            <label className="text-xs font-semibold text-admin-fg-muted px-1">
                                 {t('admin.categories.formSlug')}
                             </label>
                             <input 
                                 {...form.register('slug')}
-                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 font-mono text-white"
+                                className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle font-mono text-admin-fg"
                                 placeholder="slug..."
                             />
                             {form.formState.errors.slug && (
-                                <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">
+                                <p className="text-xs font-bold text-admin-danger mt-1 tracking-tighter px-1">
                                     {form.formState.errors.slug.message}
                                 </p>
                             )}
@@ -410,45 +410,45 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Parent ID */}
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                            <label className="text-xs font-semibold text-admin-fg-muted px-1">
                                 {t('admin.categories.formParent')}
                             </label>
                             <select 
                                 {...form.register('parent_id')}
-                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer text-white"
+                                className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors appearance-none cursor-pointer text-admin-fg"
                             >
-                                <option value="" className="bg-surface-deep">{t('admin.categories.parentNone')}</option>
+                                <option value="" className="bg-admin-bg">{t('admin.categories.parentNone')}</option>
                                 {parentIdOptions.map(p => (
-                                    <option key={p.id} value={p.id} className="bg-surface-deep">{p.name}</option>
+                                    <option key={p.id} value={p.id} className="bg-admin-bg">{p.name}</option>
                                 ))}
                             </select>
                         </div>
 
                         {/* Sort Order */}
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                            <label className="text-xs font-semibold text-admin-fg-muted px-1">
                                 {t('admin.categories.formSortOrder')}
                             </label>
                             <input 
                                 type="number"
                                 {...form.register('sort_order', { valueAsNumber: true })}
-                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors text-white"
+                                className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors text-admin-fg"
                             />
                         </div>
 
                         {/* Is Active */}
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                            <label className="text-xs font-semibold text-admin-fg-muted px-1">
                                 {t('admin.common.status')}
                             </label>
-                            <div className="flex items-center py-3 bg-white/2 px-4 rounded-xl border border-white/10">
+                            <div className="flex items-center py-3 bg-admin-surface-2 px-4 rounded-admin-md border border-admin-border">
                                 <input 
                                     type="checkbox"
                                     {...form.register('is_active')}
                                     id="is_active"
-                                    className="w-5 h-5 rounded border-white/10 bg-white/5 text-cyan-500 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0 cursor-pointer"
+                                    className="w-5 h-5 rounded border-admin-border bg-admin-surface-2 text-admin-accent focus-visible:ring-admin-accent/30 focus-visible:ring-offset-0 cursor-pointer"
                                 />
-                                <label htmlFor="is_active" className="text-xs font-bold text-slate-400 ml-3 cursor-pointer select-none">
+                                <label htmlFor="is_active" className="text-xs font-bold text-admin-fg-muted ml-3 cursor-pointer select-none">
                                     {t('admin.categories.statusLabels.active')}
                                 </label>
                             </div>
@@ -457,13 +457,13 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
 
                     {/* Description */}
                     <div className="space-y-2">
-                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                        <label className="text-xs font-semibold text-admin-fg-muted px-1">
                             {t('admin.categories.formDescription')}
                         </label>
                         <textarea 
                             {...form.register('description')}
                             rows={3}
-                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 resize-none text-white"
+                            className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle resize-none text-admin-fg"
                             placeholder={t('admin.categories.formDescription') + '...'}
                         />
                     </div>
@@ -474,8 +474,8 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
                 </div>
 
                 {/* Bottom Guide */}
-                <div className="mt-20 pt-12 border-t border-white/5 text-center">
-                    <p className="text-xs font-bold text-slate-600 uppercase tracking-hvac-relaxed">
+                <div className="mt-20 pt-12 border-t border-admin-border text-center">
+                    <p className="text-xs font-bold text-admin-fg-subtle">
                       {BRAND_NAME} {t('admin.categories.engineTitle')} {ENGINE_VERSION}
                     </p>
                 </div>
@@ -484,37 +484,43 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
 
         {/* --- RIGHT: FLOATING PREVIEW SIDEBAR --- */}
         {showPreview && (
-          <aside className={`${adminSidebarWidthClass} border-l border-white/5 flex flex-col bg-surface-deep animate-in slide-in-from-right duration-500`}>
-            <div className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-white/2">
+          <aside className={`${adminSidebarWidthClass} border-l border-admin-border flex flex-col bg-admin-bg animate-in slide-in-from-right duration-500`}>
+            <div className="h-14 border-b border-admin-border flex items-center justify-between px-6 bg-admin-surface-2">
                 <div className="flex items-center gap-2">
-                    <PanelRight size={16} className="text-cyan-400" />
-                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                    <PanelRight size={16} className="text-admin-accent" />
+                    <span className="text-xs font-semibold text-admin-fg-muted">
                       {t('admin.categories.livePreview')}
                     </span>
                 </div>
-                <div className="flex bg-black/40 p-1 rounded-lg border border-white/5 scale-75">
-                    <button onClick={() => setPreviewMode('desktop')} className={`p-2 rounded-md transition-colors ${previewMode === 'desktop' ? 'bg-white/10 text-cyan-400' : 'text-slate-500'}`}>
+                <div className="flex bg-black/40 p-1 rounded-admin-md border border-admin-border scale-75">
+                    <button onClick={() => setPreviewMode('desktop')} className={`p-2 rounded-md transition-colors ${previewMode === 'desktop' ? 'bg-admin-surface-3 text-admin-accent' : 'text-admin-fg-muted'}`}>
                         <Monitor size={16} />
                     </button>
-                    <button onClick={() => setPreviewMode('mobile')} className={`p-2 rounded-md transition-colors ${previewMode === 'mobile' ? 'bg-white/10 text-cyan-400' : 'text-slate-500'}`}>
+                    <button onClick={() => setPreviewMode('mobile')} className={`p-2 rounded-md transition-colors ${previewMode === 'mobile' ? 'bg-admin-surface-3 text-admin-accent' : 'text-admin-fg-muted'}`}>
                         <Smartphone size={16} />
                     </button>
                 </div>
             </div>
 
-            <div className="flex-1 bg-slate-950 p-4 relative overflow-hidden flex items-center justify-center">
+            <div className="flex-1 bg-admin-surface-3 p-4 relative overflow-hidden flex items-center justify-center">
                 {/* Device Frame */}
+                {/*
+                  ÖNİZLEME TUVALİ — admin kromu DEĞİL. Burada ziyaretçinin göreceği
+                  vitrin içeriği render ediliyor; zemin bilerek tema-bağımsız sabit
+                  beyazdır (kâğıt/cihaz metaforu). Admin temasına bağlanırsa önizleme
+                  "neyi önizlediğini" yansıtmaz. INV-ADMIN-THEME'de ADLA muaf.
+                */}
                 <div 
                     className={`
-                    bg-white shadow-2xl transition-colors duration-500 overflow-y-auto custom-scrollbar-light relative
-                    ${previewMode === 'mobile' ? `${adminMobilePreviewClass} rounded-hvac-xl border-8 border-slate-800` : 'w-full h-full rounded-lg'}
+                    bg-white shadow-admin-lg transition-colors duration-500 overflow-y-auto custom-scrollbar-light relative
+                    ${previewMode === 'mobile' ? `${adminMobilePreviewClass} rounded-admin-lg border-8 border-admin-border` : 'w-full h-full rounded-admin-md'}
                     `}
                 >
                     <AuthorityRenderer content={blocks || []} />
                     {(!blocks || blocks.length === 0) && (
-                        <div className="flex flex-col items-center justify-center h-full text-slate-300 space-y-4">
+                        <div className="flex flex-col items-center justify-center h-full text-admin-fg space-y-4">
                             <Layout size={32} className="opacity-10" />
-                            <p className="text-xs uppercase font-bold tracking-widest opacity-20 text-center px-8">
+                            <p className="text-xs font-bold opacity-20 text-center px-8">
                               {t('admin.categories.waitingForContent')}
                             </p>
                         </div>

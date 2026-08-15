@@ -56,12 +56,12 @@ export function BulkPricePanel({ onApply, onClose }: BulkPricePanelProps): React
   const modeButtonClass = (active: boolean): string =>
     `flex-1 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
       active
-        ? 'bg-primary-navy text-white border-primary-navy'
-        : 'bg-gray-50 border-gray-200 hover:border-primary-navy'
+        ? 'bg-admin-accent text-admin-accent-fg border-primary-navy'
+        : 'bg-admin-surface-2 border-admin-border hover:border-primary-navy'
     }`
 
   return (
-    <div className="bg-white text-gray-800 rounded-xl shadow-2xl p-4 min-w-280px border border-gray-200">
+    <div className="bg-admin-surface text-admin-fg rounded-admin-md shadow-admin-lg p-4 min-w-280px border border-admin-border">
       <div className="text-sm font-semibold mb-3 text-primary-navy">
         {t('admin.toolbar.bulkPriceUpdate')}
       </div>
@@ -100,7 +100,7 @@ export function BulkPricePanel({ onApply, onClose }: BulkPricePanelProps): React
               ? t('admin.toolbar.placeholderPercent')
               : t('admin.toolbar.placeholderFixed')
           }
-          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm
+          className="flex-1 border border-admin-border rounded-admin-md px-3 py-2 text-sm
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/30"
         />
         <button type="button" onClick={apply} className={`${adminButtonPrimaryClass} !py-2 !text-xs`}>
@@ -108,11 +108,11 @@ export function BulkPricePanel({ onApply, onClose }: BulkPricePanelProps): React
         </button>
       </div>
       {priceError && (
-        <p id="bulk-price-error" role="alert" className="mt-2 text-xs text-rose-500">
+        <p id="bulk-price-error" role="alert" className="mt-2 text-xs text-admin-danger">
           {priceError}
         </p>
       )}
-      <div className="text-xs text-gray-400 mt-2">
+      <div className="text-xs text-admin-fg-muted mt-2">
         {priceMode === 'percent'
           ? t('admin.toolbar.priceHintPercent')
           : t('admin.toolbar.priceHintFixed')}

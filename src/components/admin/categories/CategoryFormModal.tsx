@@ -3,6 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import * as Tabs from '@radix-ui/react-tabs'
 import { Loader2,Save, Trash2, Upload, X } from 'lucide-react'
 import React, { useEffect,useState } from 'react'
+import type { FieldErrors } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -23,23 +24,68 @@ type CategoryUpdate = Database['public']['Tables']['categories']['Update']
 type CategoryInsert = Database['public']['Tables']['categories']['Insert']
 
 // --- Zod Schema ---
-const categorySchema = z.object({
-    name: z.string().min(1, 'Kategori adı zorunludur'),
-    slug: z.string().min(1, 'Slug zorunludur'),
-    parent_id: z.string().optional().nullable(),
-    description: z.string().optional().nullable(),
-    seo_title: z.string().optional().nullable(),
-    seo_desc: z.string().optional().nullable(),
-    is_featured: z.boolean().optional().default(false),
-    sort_order: z.number().int().optional().default(0),
-    image_url: z.string().optional().nullable(),
-    metric1_value: z.string().optional().nullable(),
-    metric1_label: z.string().optional().nullable(),
-    metric2_value: z.string().optional().nullable(),
-    metric2_label: z.string().optional().nullable(),
-})
+// Kurallar AYNI kaldı; yalnız mesajlar sözlükten geliyor (i18n fabrikası —
+// PricingSettingsFormModal'daki desenin aynısı). Mesaj artık alanın ALTINDA
+// gösterildiği için sabit Türkçe metin EN oturumda görünür kusur olurdu.
+const buildCategorySchema = (t: (key: string) => string) =>
+    z.object({
+        name: z.string().min(1, t('admin.categories.nameRequired')),
+        slug: z.string().min(1, t('admin.categories.slugRequired')),
+        parent_id: z.string().optional().nullable(),
+        description: z.string().optional().nullable(),
+        seo_title: z.string().optional().nullable(),
+        seo_desc: z.string().optional().nullable(),
+        is_featured: z.boolean().optional().default(false),
+        sort_order: z
+            .number({ invalid_type_error: t('admin.categories.sortOrderInvalid') })
+            .int(t('admin.categories.sortOrderInvalid'))
+            .optional()
+            .default(0),
+        image_url: z.string().optional().nullable(),
+        metric1_value: z.string().optional().nullable(),
+        metric1_label: z.string().optional().nullable(),
+        metric2_value: z.string().optional().nullable(),
+        metric2_label: z.string().optional().nullable(),
+    })
 
-type CategoryFormValues = z.infer<typeof categorySchema>
+type CategoryFormValues = z.infer<ReturnType<typeof buildCategorySchema>>
+
+/* ---------------------------------------------------------------------------
+ * ALAN SEVİYESİ HATA GERİ BİLDİRİMİ (cetvel `docs/standards/admin-design-standard.md` §4.6)
+ *
+ * Neden toast YETMEZ: bu formda 14 girdi var. "Bir alan hatalı" diyen bir toast
+ * hangi alan olduğunu SÖYLEMEZ ve birkaç saniyede kaybolur. NN/g: hata, oluştuğu
+ * yerin YANINDA durmalı ki kullanıcı düzeltirken mesajı okuyabilsin.
+ * Ekran okuyucu tarafı `aria-invalid` + `aria-describedby` bağıyla kurulur —
+ * toast bu bağı KURAMAZ. Renk tek başına taşıyıcı değildir (WCAG 1.4.1):
+ * asıl sinyal mesajın METNİ, kenarlık rengi yalnız ek işarettir.
+ * ------------------------------------------------------------------------- */
+
+/** Girdinin hemen altındaki hata satırı. Hata yoksa DOM'a hiçbir şey basmaz. */
+const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
+    message ? (
+        <p id={id} role="alert" className="mt-1 px-1 text-xs font-bold tracking-tighter text-admin-danger">
+            {message}
+        </p>
+    ) : null
+
+/** Submit'te odak taşınacak alanların DOM sırası (yukarıdan aşağı). */
+const FIELD_FOCUS_ORDER: { name: keyof CategoryFormValues; id: string }[] = [
+    { name: 'name', id: 'category-name' },
+    { name: 'slug', id: 'category-slug' },
+    { name: 'sort_order', id: 'category-sort-order' },
+]
+
+/**
+ * 14 alanlı formda kullanıcı hatayı görmek için scroll etmek zorunda kalmasın:
+ * ilk bozuk alana odak taşınır (`shouldFocusError:false` ile RHF'nin kendi
+ * odak denemesi kapatıldı — sıra DETERMİNİSTİK olsun diye).
+ */
+function focusFirstInvalid(errs: FieldErrors<CategoryFormValues>): void {
+    const first = FIELD_FOCUS_ORDER.find(({ name }) => errs[name])
+    if (!first) return
+    document.getElementById(first.id)?.focus()
+}
 
 interface CategoryFormModalProps {
     open: boolean
@@ -64,8 +110,11 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     const [uploadingImage, setUploadingImage] = useState(false)
     const [parentIdOptions, setParentIdOptions] = useState<{ id: string, name: string }[]>([])
 
+    const schema = React.useMemo(() => buildCategorySchema(t), [t])
     const form = useForm<CategoryFormValues>({
-        resolver: zodResolver(categorySchema),
+        resolver: zodResolver(schema),
+        // Odak sırasını biz yönetiyoruz (bkz. focusFirstInvalid).
+        shouldFocusError: false,
         defaultValues: {
             name: '',
             slug: '',
@@ -273,104 +322,119 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
         }
     }, [form.formState.isDirty])
 
+    const errors = form.formState.errors
+    const nameError = errors.name?.message
+    const slugError = errors.slug?.message
+    const sortOrderError = errors.sort_order?.message
+
     return (
         <Dialog.Root open={open} onOpenChange={handleOpenChange}>
             <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
+                <Dialog.Overlay className="fixed inset-0 bg-black/60 z-modal" />
                 <Dialog.Content
                   // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
-                  aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-90vh overflow-hidden bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col">
-                    <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
+                  aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-90vh overflow-hidden bg-admin-bg border border-admin-border rounded-admin-lg shadow-admin-lg z-modal flex flex-col">
+                    <div className="p-6 border-b border-admin-border flex items-center justify-between bg-admin-surface-2">
                         <div>
-                            <Dialog.Title className="text-xl font-bold text-white tracking-tight">
+                            <Dialog.Title className="text-xl font-bold text-admin-fg tracking-tight">
                                 {category ? t('admin.categories.editCategory') : t('admin.categories.createNewCategory')}
                             </Dialog.Title>
-                            <Dialog.Description className="text-sm text-slate-400 mt-1">
+                            <Dialog.Description className="text-sm text-admin-fg-muted mt-1">
                                 {t('admin.categories.modalDesc')}
                             </Dialog.Description>
                         </div>
-                        <Dialog.Close className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white">
+                        <Dialog.Close className="p-2 rounded-admin-md hover:bg-admin-surface-3 transition-colors text-admin-fg-muted hover:text-admin-fg">
                             <X size={20} />
                         </Dialog.Close>
                     </div>
 
                     <Tabs.Root defaultValue="general" className="flex-1 flex flex-col overflow-hidden">
-                        <Tabs.List className="px-6 py-2 border-b border-white/5 flex gap-4 bg-white/1">
+                        <Tabs.List className="px-6 py-2 border-b border-admin-border flex gap-4 bg-admin-surface-2">
                             <Tabs.Trigger 
                                 value="general"
-                                className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors"
+                                className="px-4 py-2 text-xs font-bold text-admin-fg-muted border-b-2 border-transparent data-[state=active]:text-admin-accent data-[state=active]:border-admin-accent transition-colors"
                             >
                                 {t('admin.categories.tabGeneral')}
                             </Tabs.Trigger>
                             <Tabs.Trigger 
                                 value="seo"
-                                className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors"
+                                className="px-4 py-2 text-xs font-bold text-admin-fg-muted border-b-2 border-transparent data-[state=active]:text-admin-accent data-[state=active]:border-admin-accent transition-colors"
                             >
                                 {t('admin.categories.tabSeo')}
                             </Tabs.Trigger>
                             <Tabs.Trigger 
                                 value="content"
-                                className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-colors"
+                                className="px-4 py-2 text-xs font-bold text-admin-fg-muted border-b-2 border-transparent data-[state=active]:text-admin-accent data-[state=active]:border-admin-accent transition-colors"
                             >
                                 {t('admin.categories.tabMetrics')}
                             </Tabs.Trigger>
                         </Tabs.List>
 
                         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-                            <form id="category-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                            <form id="category-form" onSubmit={form.handleSubmit(onSubmit, focusFirstInvalid)} className="space-y-8">
                                 <Tabs.Content value="general" className="space-y-6">
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formName')}</label>
-                                            <input 
+                                            <label htmlFor="category-name" className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.formName')}</label>
+                                            <input
+                                                id="category-name"
                                                 {...form.register('name')}
-                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600"
+                                                aria-invalid={nameError ? true : undefined}
+                                                aria-describedby={nameError ? 'category-name-error' : undefined}
+                                                className={`w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle${nameError ? ' !border-admin-danger' : ''}`}
                                                 placeholder={t('admin.categories.formName') + '...'}
                                             />
-                                            {form.formState.errors.name && <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">{form.formState.errors.name.message}</p>}
+                                            <FieldError id="category-name-error" message={nameError} />
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formSlug')}</label>
-                                            <input 
+                                            <label htmlFor="category-slug" className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.formSlug')}</label>
+                                            <input
+                                                id="category-slug"
                                                 {...form.register('slug')}
-                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 font-mono"
+                                                aria-invalid={slugError ? true : undefined}
+                                                aria-describedby={slugError ? 'category-slug-error' : undefined}
+                                                className={`w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle font-mono${slugError ? ' !border-admin-danger' : ''}`}
                                                 placeholder="slug..."
                                             />
-                                            {form.formState.errors.slug && <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">{form.formState.errors.slug.message}</p>}
+                                            <FieldError id="category-slug-error" message={slugError} />
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formParent')}</label>
+                                            <label className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.formParent')}</label>
                                             <select 
                                                 {...form.register('parent_id')}
-                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors appearance-none cursor-pointer"
+                                                className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors appearance-none cursor-pointer"
                                             >
-                                                <option value="" className="bg-surface-deep">{t('admin.categories.parentNone')}</option>
+                                                <option value="" className="bg-admin-bg">{t('admin.categories.parentNone')}</option>
                                                 {parentIdOptions.map(p => (
-                                                    <option key={p.id} value={p.id} className="bg-surface-deep">{p.name}</option>
+                                                    <option key={p.id} value={p.id} className="bg-admin-bg">{p.name}</option>
                                                 ))}
                                             </select>
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formSortOrder')}</label>
-                                            <input 
+                                            <label htmlFor="category-sort-order" className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.formSortOrder')}</label>
+                                            <input
+                                                id="category-sort-order"
                                                 type="number"
                                                 {...form.register('sort_order', { valueAsNumber: true })}
-                                                className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors"
+                                                aria-invalid={sortOrderError ? true : undefined}
+                                                aria-describedby={sortOrderError ? 'category-sort-order-error' : undefined}
+                                                className={`w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors${sortOrderError ? ' !border-admin-danger' : ''}`}
                                             />
+                                            <FieldError id="category-sort-order-error" message={sortOrderError} />
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formDescription')}</label>
+                                        <label className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.formDescription')}</label>
                                         <textarea 
                                             {...form.register('description')}
                                             rows={4}
-                                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors placeholder:text-slate-600 resize-none"
+                                            className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors placeholder:text-admin-fg-subtle resize-none"
                                             placeholder={t('admin.categories.formDescription') + '...'}
                                         />
                                     </div>
@@ -378,34 +442,34 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
 
                                 <Tabs.Content value="seo" className="space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formSeoTitle')}</label>
+                                        <label className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.formSeoTitle')}</label>
                                         <input 
                                             {...form.register('seo_title')}
-                                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors"
+                                            className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors"
                                             placeholder="SEO title..."
                                         />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.formSeoDesc')}</label>
+                                        <label className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.formSeoDesc')}</label>
                                         <textarea 
                                             {...form.register('seo_desc')}
                                             rows={3}
-                                            className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 focus:bg-white/5 transition-colors"
+                                            className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 focus-visible:bg-admin-surface-2 transition-colors"
                                             placeholder="SEO description..."
                                         />
                                     </div>
 
-                                    <div className="flex items-center gap-4 bg-white/2 p-6 rounded-2xl border border-white/5">
+                                    <div className="flex items-center gap-4 bg-admin-surface-2 p-6 rounded-admin-lg border border-admin-border">
                                         <input 
                                             type="checkbox"
                                             {...form.register('is_featured')}
                                             id="is_featured"
-                                            className="w-5 h-5 rounded border-white/10 bg-white/5 text-cyan-500 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0"
+                                            className="w-5 h-5 rounded border-admin-border bg-admin-surface-2 text-admin-accent focus-visible:ring-admin-accent/30 focus-visible:ring-offset-0"
                                         />
-                                        <label htmlFor="is_featured" className="text-sm font-bold text-white cursor-pointer select-none">
+                                        <label htmlFor="is_featured" className="text-sm font-bold text-admin-fg cursor-pointer select-none">
                                             {t('admin.categories.formFeatured')}
-                                            <span className="block text-xs font-normal text-slate-500 mt-1 uppercase tracking-tight">{t('admin.categories.formFeaturedDesc')}</span>
+                                            <span className="block text-xs font-normal text-admin-fg-muted mt-1 tracking-tight">{t('admin.categories.formFeaturedDesc')}</span>
                                         </label>
                                     </div>
                                 </Tabs.Content>
@@ -413,9 +477,9 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                 <Tabs.Content value="content" className="space-y-8">
                                     {/* Image Selection */}
                                     <div className="space-y-4">
-                                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.imageLabel')}</label>
+                                        <label className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.imageLabel')}</label>
                                         <div className="flex items-start gap-8">
-                                            <div className="w-48 h-48 rounded-2xl bg-white/5 border-2 border-dashed border-white/10 overflow-hidden flex items-center justify-center relative group">
+                                            <div className="w-48 h-48 rounded-admin-lg bg-admin-surface-2 border-2 border-dashed border-admin-border overflow-hidden flex items-center justify-center relative group">
                                                 {previewImage ? (
                                                     <>
                                                         <VentImage 
@@ -427,7 +491,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                             <button 
                                                                 type="button"
                                                                 onClick={() => { setPreviewImage(null); form.setValue('image_url', '') }}
-                                                                className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-transform transform hover:scale-110 shadow-xl"
+                                                                className="p-3 bg-admin-danger text-admin-danger-fg rounded-full hover:bg-admin-danger transition-transform transform hover:scale-110 shadow-admin-lg"
                                                             >
                                                                 <Trash2 size={20} />
                                                             </button>
@@ -435,8 +499,8 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                     </>
                                                 ) : (
                                                     <div className="text-center p-6">
-                                                        <Upload size={32} className="mx-auto text-slate-600 mb-2" />
-                                                        <span className="text-xs font-bold text-slate-500 leading-tight">{t('admin.categories.clickToUpload')}</span>
+                                                        <Upload size={32} className="mx-auto text-admin-fg-subtle mb-2" />
+                                                        <span className="text-xs font-bold text-admin-fg-muted leading-tight">{t('admin.categories.clickToUpload')}</span>
                                                     </div>
                                                 )}
                                                 <input 
@@ -448,22 +512,22 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                 />
                                                 {uploadingImage && (
                                                     <div className="absolute inset-0 bg-black/60 backdrop-blur-2 flex flex-col items-center justify-center">
-                                                        <Loader2 className="animate-spin text-cyan-400 mb-2" />
-                                                        <span className="text-xs font-black text-white uppercase tracking-widest">{t('admin.categories.uploading')}</span>
+                                                        <Loader2 className="animate-spin text-admin-accent mb-2" />
+                                                        <span className="text-xs font-semibold text-admin-fg">{t('admin.categories.uploading')}</span>
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="flex-1 space-y-4">
-                                                <p className="text-xs text-slate-500 leading-relaxed">
+                                                <p className="text-xs text-admin-fg-muted leading-relaxed">
                                                     {t('admin.categories.imageDesc')} <br/>
-                                                    {t('admin.categories.resolutionLabel')} <span className="text-white font-bold">{resolutionVal}</span>{dot} <br/>
-                                                    {t('admin.categories.supportedFormatsLabel')} <span className="text-white font-bold">{formatsVal}</span>{dot}
+                                                    {t('admin.categories.resolutionLabel')} <span className="text-admin-fg font-bold">{resolutionVal}</span>{dot} <br/>
+                                                    {t('admin.categories.supportedFormatsLabel')} <span className="text-admin-fg font-bold">{formatsVal}</span>{dot}
                                                 </p>
                                                 <div className="space-y-2">
-                                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.common.imageUrlWithManual')}</label>
+                                                    <label className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.common.imageUrlWithManual')}</label>
                                                     <input 
                                                         {...form.register('image_url')}
-                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-3 py-2 text-xs focus-visible:outline-none focus-visible:border-cyan-500/50 font-mono"
+                                                        className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-3 py-2 text-xs focus-visible:outline-none focus-visible:border-admin-accent/30 font-mono"
                                                         placeholder="https://..."
                                                     />
                                                 </div>
@@ -474,45 +538,45 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                     {/* Metrics (Technical specs summary for cards) */}
                                     <div className="space-y-4 pt-4">
                                         <div className="flex items-center gap-2 mb-2">
-                                            <div className="w-1 h-4 bg-cyan-500 rounded-full" />
-                                            <label className="text-xs font-black text-white uppercase tracking-widest">{t('admin.categories.quickMetrics')}</label>
+                                            <div className="w-1 h-4 bg-admin-accent rounded-full" />
+                                            <label className="text-xs font-semibold text-admin-fg">{t('admin.categories.quickMetrics')}</label>
                                         </div>
-                                        <p className="text-xs text-slate-500 uppercase font-medium tracking-tight mt-1">{t('admin.categories.quickMetricsDesc')}</p>
+                                        <p className="text-xs text-admin-fg-muted font-medium tracking-tight mt-1">{t('admin.categories.quickMetricsDesc')}</p>
                                         
                                         <div className="grid grid-cols-2 gap-8">
-                                            <div className="p-6 bg-white/2 border border-white/5 rounded-2xl space-y-4">
+                                            <div className="p-6 bg-admin-surface-2 border border-admin-border rounded-admin-lg space-y-4">
                                                 <div className="space-y-1">
-                                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric1Label')}</label>
+                                                    <label className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.metric1Label')}</label>
                                                     <input 
                                                         {...form.register('metric1_label')}
-                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 transition-colors font-medium"
+                                                        className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 transition-colors font-medium"
                                                         placeholder={t('admin.categories.metric1LabelPlaceholder')}
                                                     />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric1Value')}</label>
+                                                    <label className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.metric1Value')}</label>
                                                     <input 
                                                         {...form.register('metric1_value')}
-                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 transition-colors font-bold text-cyan-400"
+                                                        className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 transition-colors font-bold text-admin-accent"
                                                         placeholder={t('admin.categories.metric1ValuePlaceholder')}
                                                     />
                                                 </div>
                                             </div>
 
-                                            <div className="p-6 bg-white/2 border border-white/5 rounded-2xl space-y-4">
+                                            <div className="p-6 bg-admin-surface-2 border border-admin-border rounded-admin-lg space-y-4">
                                                 <div className="space-y-1">
-                                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric2Label')}</label>
+                                                    <label className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.metric2Label')}</label>
                                                     <input 
                                                         {...form.register('metric2_label')}
-                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 transition-colors font-medium"
+                                                        className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 transition-colors font-medium"
                                                         placeholder="Örn: Güç Aralığı"
                                                     />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">{t('admin.categories.metric2Value')}</label>
+                                                    <label className="text-xs font-semibold text-admin-fg-muted px-1">{t('admin.categories.metric2Value')}</label>
                                                     <input 
                                                         {...form.register('metric2_value')}
-                                                        className="w-full bg-white/3 border border-white/10 rounded-xl px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-cyan-500/50 transition-colors font-bold text-cyan-400"
+                                                        className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 transition-colors font-bold text-admin-accent"
                                                         placeholder="Örn: 0.75 - 45 kW"
                                                     />
                                                 </div>
@@ -523,11 +587,11 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                             </form>
                         </div>
 
-                        <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/2">
+                        <div className="p-6 border-t border-admin-border flex items-center justify-between bg-admin-surface-2">
                             <button 
                                 type="button" 
                                 onClick={handleClose}
-                                className="px-6 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors"
+                                className="px-6 py-3 text-xs font-bold text-admin-fg-muted hover:text-admin-fg transition-colors"
                             >
                                 {t('admin.categories.cancel')}
                             </button>

@@ -225,14 +225,14 @@ function InventoryReportContent() {
         <div className="space-y-6 max-w-page">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <div className="h-8 w-64 bg-slate-200 animate-pulse rounded mb-2"></div>
-                    <div className="h-4 w-96 bg-slate-100 animate-pulse rounded"></div>
+                    <div className="h-8 w-64 bg-admin-surface-2 animate-pulse rounded mb-2"></div>
+                    <div className="h-4 w-96 bg-admin-surface-2 animate-pulse rounded"></div>
                 </div>
             </div>
             <AdminSkeleton variant="cards" count={3} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="h-80 bg-slate-100 animate-pulse rounded-2xl border border-slate-200/60 w-full" />
-                <div className="h-80 bg-slate-100 animate-pulse rounded-2xl border border-slate-200/60 w-full" />
+                <div className="h-80 bg-admin-surface-2 animate-pulse rounded-admin-lg border border-admin-border w-full" />
+                <div className="h-80 bg-admin-surface-2 animate-pulse rounded-admin-lg border border-admin-border w-full" />
             </div>
         </div>
     )
@@ -242,11 +242,11 @@ function InventoryReportContent() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className={adminSectionTitleClass}>{t('admin.inventory.reportTitle')}</h1>
-                    <p className="text-slate-500 text-sm mt-1">{t('admin.inventory.reportSubtitle')}</p>
+                    <p className="text-admin-fg-muted text-sm mt-1">{t('admin.inventory.reportSubtitle')}</p>
                 </div>
                 <button
                     onClick={exportCsv}
-                    className={`${adminButtonSecondaryClass} flex items-center gap-2 !px-4 !py-2.5 !rounded-xl shadow-sm`}
+                    className={`${adminButtonSecondaryClass} flex items-center gap-2 !px-4 !py-2.5 !rounded-admin-md shadow-admin-sm`}
                 >
                     <Download size={18} />
                     <span>{t('admin.inventory.downloadCsv')}</span>
@@ -267,38 +267,38 @@ function InventoryReportContent() {
             <>
                 {/* Üst Kartlar */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className={`${adminCardClass} p-6 border-l-4 border-l-emerald-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
-                        <div className="flex items-center gap-2 text-slate-500 mb-2">
-                            <ArrowDownRight className="w-5 h-5 text-emerald-500" />
-                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">{t('admin.inventory.totalIn')}</h3>
+                    <div className={`${adminCardClass} p-6 border-l-4 border-l-emerald-500 !rounded-admin-lg shadow-admin-md relative overflow-hidden group`}>
+                        <div className="flex items-center gap-2 text-admin-fg-muted mb-2">
+                            <ArrowDownRight className="w-5 h-5 text-admin-success" />
+                            <h3 className="font-semibold text-xs text-admin-fg-muted">{t('admin.inventory.totalIn')}</h3>
                         </div>
-                        <div className="text-3xl font-black text-slate-800">{stats.totalIn} <span className="text-xs font-medium text-slate-400">{t('admin.inventory.pieces')}</span></div>
+                        <div className="text-3xl font-semibold text-admin-fg-subtle">{stats.totalIn} <span className="text-xs font-medium text-admin-fg-muted">{t('admin.inventory.pieces')}</span></div>
                     </div>
 
-                    <div className={`${adminCardClass} p-6 border-l-4 border-l-rose-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
-                        <div className="flex items-center gap-2 text-slate-500 mb-2">
-                            <ArrowUpRight className="w-5 h-5 text-rose-500" />
-                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">{t('admin.inventory.totalOut')}</h3>
+                    <div className={`${adminCardClass} p-6 border-l-4 border-l-rose-500 !rounded-admin-lg shadow-admin-md relative overflow-hidden group`}>
+                        <div className="flex items-center gap-2 text-admin-fg-muted mb-2">
+                            <ArrowUpRight className="w-5 h-5 text-admin-danger" />
+                            <h3 className="font-semibold text-xs text-admin-fg-muted">{t('admin.inventory.totalOut')}</h3>
                         </div>
-                        <div className="text-3xl font-black text-slate-800">{stats.totalOut} <span className="text-xs font-medium text-slate-400">{t('admin.inventory.pieces')}</span></div>
+                        <div className="text-3xl font-semibold text-admin-fg-subtle">{stats.totalOut} <span className="text-xs font-medium text-admin-fg-muted">{t('admin.inventory.pieces')}</span></div>
                     </div>
 
-                    <div className={`${adminCardClass} p-6 border-l-4 border-l-indigo-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
-                        <div className="flex items-center gap-2 text-slate-500 mb-2">
-                            <Activity className="w-5 h-5 text-indigo-500" />
-                            <h3 className="font-black uppercase tracking-hvac-normal text-xs text-slate-500/80">{t('admin.inventory.netChange')}</h3>
+                    <div className={`${adminCardClass} p-6 border-l-4 border-l-indigo-500 !rounded-admin-lg shadow-admin-md relative overflow-hidden group`}>
+                        <div className="flex items-center gap-2 text-admin-fg-muted mb-2">
+                            <Activity className="w-5 h-5 text-admin-accent" />
+                            <h3 className="font-semibold text-xs text-admin-fg-muted">{t('admin.inventory.netChange')}</h3>
                         </div>
-                        <div className={`text-3xl font-black ${stats.net > 0 ? 'text-emerald-600' : stats.net < 0 ? 'text-rose-600' : 'text-slate-800'}`}>
-                            {stats.net > 0 ? '+' : ''}{stats.net} <span className="text-xs font-medium text-slate-400">{t('admin.inventory.pieces')}</span>
+                        <div className={`text-3xl font-semibold ${stats.net > 0 ? 'text-admin-success' : stats.net < 0 ? 'text-admin-danger' : 'text-admin-fg-subtle'}`}>
+                            {stats.net > 0 ? '+' : ''}{stats.net} <span className="text-xs font-medium text-admin-fg-muted">{t('admin.inventory.pieces')}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Ana Grafikler Grid (2 Pencereli Görünüm) */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-5 duration-600 delay-100">
-                    <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100`}>
-                        <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 mb-6 flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-cyan-500" />
+                    <div className={`${adminCardClass} p-6 !rounded-admin-lg shadow-admin-md border-admin-border`}>
+                        <h2 className="text-xs font-semibold text-admin-fg-subtle mb-6 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-admin-accent" />
                             {t('admin.inventory.stockFlowTrend')}
                         </h2>
                         {movementsData.length > 0 ? (
@@ -330,9 +330,9 @@ function InventoryReportContent() {
                         )}
                     </div>
 
-                    <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100`}>
-                        <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 mb-6 flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-cyan-500" />
+                    <div className={`${adminCardClass} p-6 !rounded-admin-lg shadow-admin-md border-admin-border`}>
+                        <h2 className="text-xs font-semibold text-admin-fg-subtle mb-6 flex items-center gap-2">
+                            <Activity className="w-4 h-4 text-admin-accent" />
                             {t('admin.inventory.actionTypeAnalysis')}
                         </h2>
                         {reasonData.length > 0 ? (
@@ -346,8 +346,8 @@ function InventoryReportContent() {
                                     </PieChart>
                                 </ResponsiveContainer>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span className="text-xs text-slate-400 font-bold uppercase tracking-tight">{t('admin.ui.total')}</span>
-                                    <span className="text-xl font-black text-slate-800">{movementsData.length}</span>
+                                    <span className="text-xs text-admin-fg-muted font-bold tracking-tight">{t('admin.ui.total')}</span>
+                                    <span className="text-xl font-semibold text-admin-fg-subtle">{movementsData.length}</span>
                                 </div>
                             </div>
                         ) : (
@@ -359,9 +359,9 @@ function InventoryReportContent() {
                 </div>
 
                 {/* Orta Bölüm: En Çok Hareket Görenler (Geniş Grafik) */}
-                <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200`}>
-                    <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 mb-6 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-cyan-500" />
+                <div className={`${adminCardClass} p-6 !rounded-admin-lg shadow-admin-md border-admin-border animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200`}>
+                    <h2 className="text-xs font-semibold text-admin-fg-subtle mb-6 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-admin-accent" />
                         {t('admin.inventory.topMovingProducts')}
                     </h2>
                     <div className="h-80">
@@ -388,30 +388,30 @@ function InventoryReportContent() {
                 {/* Detay Tabloları (2 Pencereli Görünüm: Girişler vs Çıkışlar) */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-800 delay-300">
                     {/* Giriş Hareketleri Penceresi */}
-                    <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-emerald-100/10`}>
-                        <div className="p-4 bg-emerald-500/5 border-b border-emerald-500/10 flex items-center justify-between">
-                            <h2 className="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                    <div className={`${adminCardClass} overflow-hidden !rounded-admin-lg shadow-admin-lg border-admin-success/30`}>
+                        <div className="p-4 bg-admin-success-weak border-b border-admin-success/30 flex items-center justify-between">
+                            <h2 className="text-xs font-semibold text-admin-success flex items-center gap-2">
                                 <PlusCircle className="w-4 h-4" />
                                 {t('admin.inventory.recentIncoming')}
                             </h2>
-                            <span className="text-xs font-black text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-md border border-emerald-400/20 uppercase tracking-tighter">{t('admin.inventory.incomingLabel')}</span>
+                            <span className="text-xs font-semibold text-admin-success bg-admin-success-weak px-2 py-0.5 rounded-md border border-admin-success/30 tracking-tighter">{t('admin.inventory.incomingLabel')}</span>
                         </div>
                         <div ref={dragScrollRefIn} className={`overflow-x-auto ${adminTableScrollAreaClass}`}>
                             {inboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
-                                    <thead className="bg-slate-50 sticky top-0 z-10">
+                                    <thead className="bg-admin-surface-2 sticky top-0 z-10">
                                         <tr>
                                             <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.date')}</th>
                                             <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.product')}</th>
                                             <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.amount')}</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100">
+                                    <tbody className="divide-y divide-admin-border">
                                         {inboundMovements.map((m) => (
-                                            <tr key={m.id as string} className="hover:bg-emerald-50/30 transition-colors">
+                                            <tr key={m.id as string} className="hover:bg-admin-success-weak transition-colors">
                                                 <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at as string), 'dd.MM HH:mm')}</td>
                                                 <td className={`${adminTableCellClass} py-2 font-medium truncate ${adminTableCellTruncate150Class}`}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
-                                                <td className={adminTableCellClass + " py-2 font-bold text-emerald-600"}>+{m.delta as number}</td>
+                                                <td className={adminTableCellClass + "py-2 font-bold text-admin-success"}>+{m.delta as number}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -425,30 +425,30 @@ function InventoryReportContent() {
                     </div>
 
                     {/* Çıkış Hareketleri Penceresi */}
-                    <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-rose-100/10`}>
-                        <div className="p-4 bg-rose-500/5 border-b border-rose-500/10 flex items-center justify-between">
-                            <h2 className="text-xs font-black text-rose-400 uppercase tracking-widest flex items-center gap-2">
+                    <div className={`${adminCardClass} overflow-hidden !rounded-admin-lg shadow-admin-lg border-admin-danger/30`}>
+                        <div className="p-4 bg-admin-danger-weak border-b border-admin-danger/30 flex items-center justify-between">
+                            <h2 className="text-xs font-semibold text-admin-danger flex items-center gap-2">
                                 <MinusCircle className="w-4 h-4" />
                                 {t('admin.inventory.recentOutgoing')}
                             </h2>
-                            <span className="text-xs font-black text-rose-400 bg-rose-400/10 px-2 py-0.5 rounded-md border border-rose-400/20 uppercase tracking-tighter">{t('admin.inventory.outgoingLabel')}</span>
+                            <span className="text-xs font-semibold text-admin-danger bg-admin-danger-weak px-2 py-0.5 rounded-md border border-admin-danger/30 tracking-tighter">{t('admin.inventory.outgoingLabel')}</span>
                         </div>
                         <div ref={dragScrollRefOut} className={`overflow-x-auto ${adminTableScrollAreaClass}`}>
                             {outboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
-                                    <thead className="bg-slate-50 sticky top-0 z-10">
+                                    <thead className="bg-admin-surface-2 sticky top-0 z-10">
                                         <tr>
                                             <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.date')}</th>
                                             <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.product')}</th>
                                             <th className={adminTableHeadCellClass + " py-2"}>{t('admin.inventory.table.amount')}</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100">
+                                    <tbody className="divide-y divide-admin-border">
                                         {outboundMovements.map((m) => (
-                                            <tr key={m.id as string} className="hover:bg-rose-50/30 transition-colors">
+                                            <tr key={m.id as string} className="hover:bg-admin-danger-weak transition-colors">
                                                 <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at as string), 'dd.MM HH:mm')}</td>
                                                 <td className={`${adminTableCellClass} py-2 font-medium truncate ${adminTableCellTruncate150Class}`}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
-                                                <td className={adminTableCellClass + " py-2 font-bold text-rose-600"}>{m.delta as number}</td>
+                                                <td className={adminTableCellClass + "py-2 font-bold text-admin-danger"}>{m.delta as number}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -472,14 +472,14 @@ export default function AdminInventoryReportPage() {
             <div className="space-y-6 max-w-page">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <div className="h-8 w-64 bg-slate-200 animate-pulse rounded mb-2"></div>
-                        <div className="h-4 w-96 bg-slate-100 animate-pulse rounded"></div>
+                        <div className="h-8 w-64 bg-admin-surface-2 animate-pulse rounded mb-2"></div>
+                        <div className="h-4 w-96 bg-admin-surface-2 animate-pulse rounded"></div>
                     </div>
                 </div>
                 <AdminSkeleton variant="cards" count={3} />
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="h-80 bg-slate-100 animate-pulse rounded-2xl border border-slate-200/60 w-full" />
-                    <div className="h-80 bg-slate-100 animate-pulse rounded-2xl border border-slate-200/60 w-full" />
+                    <div className="h-80 bg-admin-surface-2 animate-pulse rounded-admin-lg border border-admin-border w-full" />
+                    <div className="h-80 bg-admin-surface-2 animate-pulse rounded-admin-lg border border-admin-border w-full" />
                 </div>
             </div>
         }>

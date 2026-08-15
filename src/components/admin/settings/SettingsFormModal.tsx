@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Loader2, Save, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import type { FieldErrors } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -22,30 +23,75 @@ import { useConfirm } from '../overlay/ConfirmProvider'
 export type SettingsSection = 'general' | 'payment' | 'admins' | 'system'
 
 // --- Schemas per section ---
-const generalSchema = z.object({
-  site_name: z.string().min(1, 'Site adı zorunludur'),
-  tagline: z.string().min(1, 'Slogan zorunludur'),
-  contact_email: z.string().email('Geçersiz e-posta adresi').min(1, 'E-posta zorunludur'),
-  support_phone: z.string().min(1, 'Destek telefonu zorunludur'),
-  headquarters: z.string().min(1, 'Merkez adresi zorunludur'),
-  logo_url: z.string().url('Geçersiz URL').or(z.string().length(0)).nullable().optional(),
-})
+// Kurallar AYNI; yalnız mesajlar sözlükten (i18n fabrikası). Mesaj artık alanın
+// ALTINDA gösterildiği için sabit Türkçe metin EN oturumda görünür kusur olurdu.
+const buildGeneralSchema = (v: (key: string) => string) =>
+  z.object({
+    site_name: z.string().min(1, v('siteNameRequired')),
+    tagline: z.string().min(1, v('taglineRequired')),
+    contact_email: z.string().email(v('emailInvalid')).min(1, v('emailRequired')),
+    support_phone: z.string().min(1, v('supportPhoneRequired')),
+    headquarters: z.string().min(1, v('headquartersRequired')),
+    logo_url: z.string().url(v('logoUrlInvalid')).or(z.string().length(0)).nullable().optional(),
+  })
 
-const paymentSchema = z.object({
-  iyzico_enabled: z.boolean(),
-  iyzico_mode: z.enum(['sandbox', 'production']),
-  iyzico_api_key: z.string().min(1, 'API anahtarı zorunludur'),
-})
+const buildPaymentSchema = (v: (key: string) => string) =>
+  z.object({
+    iyzico_enabled: z.boolean(),
+    iyzico_mode: z.enum(['sandbox', 'production']),
+    iyzico_api_key: z.string().min(1, v('apiKeyRequired')),
+  })
 
-const adminsSchema = z.object({
-  admin_sessions_timeout: z.string().min(1, 'Oturum süresi zorunludur'),
-  mfa_required: z.boolean(),
-})
+const buildAdminsSchema = (v: (key: string) => string) =>
+  z.object({
+    admin_sessions_timeout: z.string().min(1, v('sessionTimeoutRequired')),
+    mfa_required: z.boolean(),
+  })
 
-const systemSchema = z.object({
-  system_log_level: z.enum(['debug', 'info', 'warn', 'error']),
-  debug_mode: z.boolean(),
-})
+const buildSystemSchema = () =>
+  z.object({
+    system_log_level: z.enum(['debug', 'info', 'warn', 'error']),
+    debug_mode: z.boolean(),
+  })
+
+/* ---------------------------------------------------------------------------
+ * ALAN SEVİYESİ HATA GERİ BİLDİRİMİ (cetvel `docs/standards/admin-design-standard.md` §4.6)
+ *
+ * Hata, oluştuğu girdinin YANINDA durur — toast kaybolur, bu satır kalmaz.
+ * `aria-invalid` + `aria-describedby` bağı, ekran okuyucu kullanıcısının bozuk
+ * alana odaklandığında hatayı DUYMASINI sağlar; toast bu bağı KURAMAZ.
+ * Renk tek başına taşıyıcı değildir (WCAG 1.4.1): asıl sinyal mesajın METNİ.
+ * ------------------------------------------------------------------------- */
+
+/** Girdinin hemen altındaki hata satırı. Hata yoksa DOM'a hiçbir şey basmaz. */
+const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
+  message ? (
+    <p id={id} role="alert" className="mt-1 text-xs font-bold tracking-tighter text-admin-danger">
+      {message}
+    </p>
+  ) : null
+
+/**
+ * Submit'te odak taşınacak alanların DOM sırası. Bölümler AYRI AYRI render
+ * edildiği için tek liste yeter: aynı anda yalnız birinin girdileri DOM'dadır.
+ */
+const FIELD_FOCUS_ORDER: { name: string; id: string }[] = [
+  { name: 'site_name', id: 'settings-site-name' },
+  { name: 'tagline', id: 'settings-tagline' },
+  { name: 'contact_email', id: 'settings-contact-email' },
+  { name: 'support_phone', id: 'settings-support-phone' },
+  { name: 'headquarters', id: 'settings-headquarters' },
+  { name: 'logo_url', id: 'settings-logo-url' },
+  { name: 'iyzico_api_key', id: 'settings-iyzico-api-key' },
+  { name: 'admin_sessions_timeout', id: 'settings-admin-sessions-timeout' },
+]
+
+/** İlk bozuk alana odak (`shouldFocusError:false` — sıra DETERMİNİSTİK olsun diye). */
+function focusFirstInvalid(errs: FieldErrors<Record<string, unknown>>): void {
+  const first = FIELD_FOCUS_ORDER.find(({ name }) => errs[name])
+  if (!first) return
+  document.getElementById(first.id)?.focus()
+}
 
 interface SettingsFormModalProps {
   open: boolean
@@ -70,23 +116,32 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
 
   // Determine active schema dynamically
   const schema = React.useMemo(() => {
-    if (!section) return generalSchema
+    const v = (key: string) => t(`admin.settings.validation.${key}`)
+    if (!section) return buildGeneralSchema(v)
     switch (section) {
       case 'general':
-        return generalSchema
+        return buildGeneralSchema(v)
       case 'payment':
-        return paymentSchema
+        return buildPaymentSchema(v)
       case 'admins':
-        return adminsSchema
+        return buildAdminsSchema(v)
       case 'system':
-        return systemSchema
+        return buildSystemSchema()
     }
-  }, [section])
+  }, [section, t])
 
   const form = useForm<Record<string, unknown>>({
     resolver: zodResolver(schema),
+    // Odak sırasını biz yönetiyoruz (bkz. focusFirstInvalid).
+    shouldFocusError: false,
     defaultValues: initialValues || {},
   })
+
+  /** Hata mesajını string olarak çeker (RHF mesajı `unknown` olabilir — `any` YOK). */
+  const fieldError = (name: string): string | undefined => {
+    const message = form.formState.errors[name]?.message
+    return typeof message === 'string' ? message : undefined
+  }
 
   // Load values when modal opens or section changes
   useEffect(() => {
@@ -199,118 +254,112 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/60 z-modal" />
         <Dialog.Content
           // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
-          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-admin-modal">
-          <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
+          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-admin-bg border border-admin-border rounded-admin-lg shadow-admin-lg z-modal flex flex-col overflow-hidden max-h-admin-modal">
+          <div className="p-6 border-b border-admin-border flex items-center justify-between bg-admin-surface-2">
             <div>
-              <Dialog.Title className="text-xl font-bold text-white tracking-tight">
+              <Dialog.Title className="text-xl font-bold text-admin-fg tracking-tight">
                 {getSectionTitle()}
               </Dialog.Title>
-              <Dialog.Description className="text-sm text-slate-400 mt-1">
+              <Dialog.Description className="text-sm text-admin-fg-muted mt-1">
                 {t('admin.settings.form.descEdit')}
               </Dialog.Description>
             </div>
-            <Dialog.Close className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white">
+            <Dialog.Close className="p-2 rounded-admin-md hover:bg-admin-surface-3 transition-colors text-admin-fg-muted hover:text-admin-fg">
               <X size={20} />
             </Dialog.Close>
           </div>
 
           <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-            <form id="settings-modal-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form id="settings-modal-form" onSubmit={form.handleSubmit(onSubmit, focusFirstInvalid)} className="space-y-6">
               {section === 'general' && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className={adminSettingsLabelClass}>{t('admin.settings.siteName')}</label>
+                      <label htmlFor="settings-site-name" className={adminSettingsLabelClass}>{t('admin.settings.siteName')}</label>
                       <input
+                        id="settings-site-name"
                         type="text"
-                        className={adminInputClass}
+                        className={`${adminInputClass}${fieldError('site_name') ? ' !border-admin-danger' : ''}`}
                         {...form.register('site_name')}
+                        aria-invalid={fieldError('site_name') ? true : undefined}
+                        aria-describedby={fieldError('site_name') ? 'settings-site-name-error' : undefined}
                         placeholder={t('admin.settings.siteNamePlaceholder')}
                       />
-                      {form.formState.errors.site_name?.message ? (
-                        <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                          {String(form.formState.errors.site_name.message)}
-                        </p>
-                      ) : null}
+                      <FieldError id="settings-site-name-error" message={fieldError('site_name')} />
                     </div>
                     <div className="space-y-2">
-                      <label className={adminSettingsLabelClass}>{t('admin.settings.tagline')}</label>
+                      <label htmlFor="settings-tagline" className={adminSettingsLabelClass}>{t('admin.settings.tagline')}</label>
                       <input
+                        id="settings-tagline"
                         type="text"
-                        className={adminInputClass}
+                        className={`${adminInputClass}${fieldError('tagline') ? ' !border-admin-danger' : ''}`}
                         {...form.register('tagline')}
+                        aria-invalid={fieldError('tagline') ? true : undefined}
+                        aria-describedby={fieldError('tagline') ? 'settings-tagline-error' : undefined}
                         placeholder={t('admin.settings.taglinePlaceholder')}
                       />
-                      {form.formState.errors.tagline?.message ? (
-                        <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                          {String(form.formState.errors.tagline.message)}
-                        </p>
-                      ) : null}
+                      <FieldError id="settings-tagline-error" message={fieldError('tagline')} />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className={adminSettingsLabelClass}>{t('admin.settings.contactEmail')}</label>
+                      <label htmlFor="settings-contact-email" className={adminSettingsLabelClass}>{t('admin.settings.contactEmail')}</label>
                       <input
+                        id="settings-contact-email"
                         type="email"
-                        className={adminInputClass}
+                        className={`${adminInputClass}${fieldError('contact_email') ? ' !border-admin-danger' : ''}`}
                         {...form.register('contact_email')}
+                        aria-invalid={fieldError('contact_email') ? true : undefined}
+                        aria-describedby={fieldError('contact_email') ? 'settings-contact-email-error' : undefined}
                         placeholder={t('admin.settings.contactEmailPlaceholder')}
                       />
-                      {form.formState.errors.contact_email?.message ? (
-                        <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                          {String(form.formState.errors.contact_email.message)}
-                        </p>
-                      ) : null}
+                      <FieldError id="settings-contact-email-error" message={fieldError('contact_email')} />
                     </div>
                     <div className="space-y-2">
-                      <label className={adminSettingsLabelClass}>{t('admin.settings.supportPhone')}</label>
+                      <label htmlFor="settings-support-phone" className={adminSettingsLabelClass}>{t('admin.settings.supportPhone')}</label>
                       <input
+                        id="settings-support-phone"
                         type="text"
-                        className={adminInputClass}
+                        className={`${adminInputClass}${fieldError('support_phone') ? ' !border-admin-danger' : ''}`}
                         {...form.register('support_phone')}
+                        aria-invalid={fieldError('support_phone') ? true : undefined}
+                        aria-describedby={fieldError('support_phone') ? 'settings-support-phone-error' : undefined}
                         placeholder={t('admin.settings.supportPhonePlaceholder')}
                       />
-                      {form.formState.errors.support_phone?.message ? (
-                        <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                          {String(form.formState.errors.support_phone.message)}
-                        </p>
-                      ) : null}
+                      <FieldError id="settings-support-phone-error" message={fieldError('support_phone')} />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>{t('admin.settings.headquarters')}</label>
+                    <label htmlFor="settings-headquarters" className={adminSettingsLabelClass}>{t('admin.settings.headquarters')}</label>
                     <input
+                      id="settings-headquarters"
                       type="text"
-                      className={adminInputClass}
+                      className={`${adminInputClass}${fieldError('headquarters') ? ' !border-admin-danger' : ''}`}
                       {...form.register('headquarters')}
+                      aria-invalid={fieldError('headquarters') ? true : undefined}
+                      aria-describedby={fieldError('headquarters') ? 'settings-headquarters-error' : undefined}
                       placeholder={t('admin.settings.headquartersPlaceholder')}
                     />
-                    {form.formState.errors.headquarters?.message ? (
-                      <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                        {String(form.formState.errors.headquarters.message)}
-                      </p>
-                    ) : null}
+                    <FieldError id="settings-headquarters-error" message={fieldError('headquarters')} />
                   </div>
 
                   <div className="space-y-2">
-                    <label className={adminSettingsLabelClass}>{t('admin.settings.logoUrl')}</label>
+                    <label htmlFor="settings-logo-url" className={adminSettingsLabelClass}>{t('admin.settings.logoUrl')}</label>
                     <input
+                      id="settings-logo-url"
                       type="text"
-                      className={adminInputClass}
+                      className={`${adminInputClass}${fieldError('logo_url') ? ' !border-admin-danger' : ''}`}
                       {...form.register('logo_url')}
+                      aria-invalid={fieldError('logo_url') ? true : undefined}
+                      aria-describedby={fieldError('logo_url') ? 'settings-logo-url-error' : undefined}
                       placeholder={t('admin.settings.logoUrlPlaceholder')}
                     />
-                    {form.formState.errors.logo_url?.message ? (
-                      <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                        {String(form.formState.errors.logo_url.message)}
-                      </p>
-                    ) : null}
+                    <FieldError id="settings-logo-url-error" message={fieldError('logo_url')} />
                   </div>
                 </div>
               )}
@@ -319,17 +368,17 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className={adminSettingsLabelClass}>{t('admin.settings.iyzicoActive')}</label>
-                    <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-950/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
+                    <label className="flex items-start gap-4 p-4 rounded-admin-lg bg-admin-surface-2 border border-admin-border cursor-pointer group hover:border-admin-border transition-colors">
                       <input
                         type="checkbox"
-                        className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors"
+                        className="mt-1 w-5 h-5 rounded-admin-md border-admin-border bg-transparent text-admin-accent focus-visible:ring-admin-accent/30 transition-colors"
                         {...form.register('iyzico_enabled')}
                       />
                       <div className="space-y-1">
-                        <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">
+                        <span className="block text-sm font-semibold text-admin-fg group-hover:text-admin-accent transition-colors">
                           {t('admin.settings.iyzicoEnable')}
                         </span>
-                        <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
+                        <span className="block text-xs font-bold text-admin-fg-muted leading-relaxed">
                           {t('admin.settings.iyzicoEnableDesc')}
                         </span>
                       </div>
@@ -340,7 +389,7 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
                     <div className="space-y-2">
                       <label className={adminSettingsLabelClass}>{t('admin.settings.iyzicoMode')}</label>
                       <select
-                        className={`${adminInputClass} !bg-slate-950 !border-white/5`}
+                        className={`${adminInputClass} !bg-admin-surface-3 !border-admin-border`}
                         {...form.register('iyzico_mode')}
                       >
                         <option value="sandbox">{t('admin.settings.iyzicoSandbox')}</option>
@@ -348,18 +397,17 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <label className={adminSettingsLabelClass}>{t('admin.settings.iyzicoApiKey')}</label>
+                      <label htmlFor="settings-iyzico-api-key" className={adminSettingsLabelClass}>{t('admin.settings.iyzicoApiKey')}</label>
                       <input
+                        id="settings-iyzico-api-key"
                         type="text"
-                        className={adminInputClass}
+                        className={`${adminInputClass}${fieldError('iyzico_api_key') ? ' !border-admin-danger' : ''}`}
                         {...form.register('iyzico_api_key')}
+                        aria-invalid={fieldError('iyzico_api_key') ? true : undefined}
+                        aria-describedby={fieldError('iyzico_api_key') ? 'settings-iyzico-api-key-error' : undefined}
                         placeholder={t('admin.settings.iyzicoApiKeyPlaceholder')}
                       />
-                      {form.formState.errors.iyzico_api_key?.message ? (
-                        <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                          {String(form.formState.errors.iyzico_api_key.message)}
-                        </p>
-                      ) : null}
+                      <FieldError id="settings-iyzico-api-key-error" message={fieldError('iyzico_api_key')} />
                     </div>
                   </div>
                 </div>
@@ -369,34 +417,38 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className={adminSettingsLabelClass}>{t('admin.settings.adminSessionTimeout')}</label>
+                      <label htmlFor="settings-admin-sessions-timeout" className={adminSettingsLabelClass}>{t('admin.settings.adminSessionTimeout')}</label>
                       <input
+                        id="settings-admin-sessions-timeout"
                         type="number"
-                        className={adminInputClass}
+                        className={`${adminInputClass}${fieldError('admin_sessions_timeout') ? ' !border-admin-danger' : ''}`}
                         {...form.register('admin_sessions_timeout')}
+                        aria-invalid={fieldError('admin_sessions_timeout') ? true : undefined}
+                        aria-describedby={
+                          fieldError('admin_sessions_timeout') ? 'settings-admin-sessions-timeout-error' : undefined
+                        }
                         min="1"
                         max="168"
                       />
-                      {form.formState.errors.admin_sessions_timeout?.message ? (
-                        <p className="text-xs font-bold text-red-400 mt-1 uppercase tracking-tighter">
-                          {String(form.formState.errors.admin_sessions_timeout.message)}
-                        </p>
-                      ) : null}
+                      <FieldError
+                        id="settings-admin-sessions-timeout-error"
+                        message={fieldError('admin_sessions_timeout')}
+                      />
                     </div>
 
                     <div className="space-y-2">
                       <label className={adminSettingsLabelClass}>{t('admin.settings.mfaRequired')}</label>
-                      <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-950/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
+                      <label className="flex items-start gap-4 p-4 rounded-admin-lg bg-admin-surface-2 border border-admin-border cursor-pointer group hover:border-admin-border transition-colors">
                         <input
                           type="checkbox"
-                          className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors"
+                          className="mt-1 w-5 h-5 rounded-admin-md border-admin-border bg-transparent text-admin-accent focus-visible:ring-admin-accent/30 transition-colors"
                           {...form.register('mfa_required')}
                         />
                         <div className="space-y-1">
-                          <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">
+                          <span className="block text-sm font-semibold text-admin-fg group-hover:text-admin-accent transition-colors">
                             {t('admin.settings.mfaRequiredLabel')}
                           </span>
-                          <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
+                          <span className="block text-xs font-bold text-admin-fg-muted leading-relaxed">
                             {t('admin.settings.mfaRequiredDesc')}
                           </span>
                         </div>
@@ -412,7 +464,7 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
                     <div className="space-y-2">
                       <label className={adminSettingsLabelClass}>{t('admin.settings.systemLogLevel')}</label>
                       <select
-                        className={`${adminInputClass} !bg-slate-950 !border-white/5`}
+                        className={`${adminInputClass} !bg-admin-surface-3 !border-admin-border`}
                         {...form.register('system_log_level')}
                       >
                         <option value="debug">{t('admin.settings.logLevelDebug')}</option>
@@ -424,17 +476,17 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
 
                     <div className="space-y-2">
                       <label className={adminSettingsLabelClass}>{t('admin.settings.debugMode')}</label>
-                      <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-950/40 border border-white/5 cursor-pointer group hover:border-white/10 transition-colors">
+                      <label className="flex items-start gap-4 p-4 rounded-admin-lg bg-admin-surface-2 border border-admin-border cursor-pointer group hover:border-admin-border transition-colors">
                         <input
                           type="checkbox"
-                          className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors"
+                          className="mt-1 w-5 h-5 rounded-admin-md border-admin-border bg-transparent text-admin-accent focus-visible:ring-admin-accent/30 transition-colors"
                           {...form.register('debug_mode')}
                         />
                         <div className="space-y-1">
-                          <span className="block text-sm font-black text-white group-hover:text-cyan-400 transition-colors">
+                          <span className="block text-sm font-semibold text-admin-fg group-hover:text-admin-accent transition-colors">
                             {t('admin.settings.debugModeEnable')}
                           </span>
-                          <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
+                          <span className="block text-xs font-bold text-admin-fg-muted leading-relaxed">
                             {t('admin.settings.debugModeDesc')}
                           </span>
                         </div>
@@ -446,11 +498,11 @@ const SettingsFormModal: React.FC<SettingsFormModalProps> = ({
             </form>
           </div>
 
-          <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/2">
+          <div className="p-6 border-t border-admin-border flex items-center justify-between bg-admin-surface-2">
             <button
               type="button"
               onClick={handleClose}
-              className="px-6 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors"
+              className="px-6 py-3 text-xs font-bold text-admin-fg-muted hover:text-admin-fg transition-colors"
             >
               {t('admin.categories.cancel')}
             </button>

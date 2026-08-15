@@ -12,7 +12,17 @@ import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNoti
 import CommandPalette from '../../components/admin/CommandPalette'
 import { ConfirmProvider } from '../../components/admin/overlay/ConfirmProvider'
 import { AdminMobileNav, AdminSidebar } from '../../components/admin/shell/AdminSidebar'
+import AdminThemeToggle from '../../components/admin/shell/AdminThemeToggle'
 import { navCookieName } from '../../components/admin/shell/navCookie'
+import {
+  ADMIN_THEME_COOKIE_MAX_AGE,
+  ADMIN_THEME_DEFAULT,
+  ADMIN_THEME_RESOLVED_DEFAULT,
+  adminThemeCookieName,
+  type AdminThemePreference,
+  type AdminThemeResolved,
+  serializeAdminTheme,
+} from '../../components/admin/shell/themeCookie'
 import { isAdminByEmail } from '../../config/admin'
 import { buildBreadcrumbTrail } from '../../config/admin-resources'
 import { useAuth } from '../../hooks/useAuth'
@@ -46,11 +56,17 @@ interface AdminLayoutProps {
   children?: React.ReactNode
   /** Sunucuda çerezden okunan başlangıç değeri — SSR'da doğru render için. */
   defaultNavCollapsed?: boolean
+  /** Sunucuda çerezden okunan tema tercihi (bkz. `themeCookie.ts`). */
+  defaultThemePreference?: AdminThemePreference
+  /** Sunucuda çerezden okunan ÇÖZÜLMÜŞ tema — ilk boyamada uygulanan budur. */
+  defaultThemeResolved?: AdminThemeResolved
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({
   children,
-  defaultNavCollapsed = false
+  defaultNavCollapsed = false,
+  defaultThemePreference = ADMIN_THEME_DEFAULT,
+  defaultThemeResolved = ADMIN_THEME_RESOLVED_DEFAULT
 }) => {
   const pathname = usePathname()
   const { user, loading: authLoading } = useAuth()
@@ -64,6 +80,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const [navCollapsed, setNavCollapsed] = useState(defaultNavCollapsed)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [themePreference, setThemePreference] =
+    useState<AdminThemePreference>(defaultThemePreference)
+  const [themeResolved, setThemeResolved] =
+    useState<AdminThemeResolved>(defaultThemeResolved)
 
   const loading = authLoading || roleLoading
   const isEmailAdmin = user?.email ? isAdminByEmail(user.email) : false
@@ -90,21 +110,66 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     })
   }, [tenant.id])
 
+  /**
+   * Tema tercihini uygula + kalıcılaştır.
+   *
+   * 'system' seçiliyse `prefers-color-scheme` BURADA çözülür ve çözülmüş değer
+   * çereze de yazılır — sunucu medya sorgusunu okuyamadığı için bir sonraki
+   * ilk boyamanın doğru gelmesinin tek yolu budur (`themeCookie.ts`).
+   * Medya sorgusu ayrıca CANLI dinlenir: kullanıcı işletim sistemi temasını
+   * panel açıkken değiştirirse "sistem"in anlamı derhal karşılanmalı.
+   */
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+
+    const apply = (): void => {
+      const resolved: AdminThemeResolved =
+        themePreference === 'system'
+          ? media.matches
+            ? 'dark'
+            : 'light'
+          : themePreference
+
+      setThemeResolved(resolved)
+      document.cookie =
+        `${adminThemeCookieName(tenant.id)}=${serializeAdminTheme(themePreference, resolved)}` +
+        `; path=/admin; max-age=${ADMIN_THEME_COOKIE_MAX_AGE}; SameSite=Lax`
+    }
+
+    apply()
+    if (themePreference !== 'system') return
+
+    media.addEventListener('change', apply)
+    return () => media.removeEventListener('change', apply)
+  }, [themePreference, tenant.id])
+
   const breadcrumb = React.useMemo(
     () => buildBreadcrumbTrail(pathname ?? ''),
     [pathname]
   )
 
+  /*
+    `data-admin-theme` YÜKLEME ve ERİŞİM-REDDİ dallarında da basılmalı: admin
+    token'ları yalnız bu öznitelik altında tanımlıdır, yoksa bu iki ekran
+    renksiz (tarayıcı varsayılanı) çizilir.
+  */
   if (loading) {
     return (
-      <div className="flex min-h-svh items-center justify-center bg-surface-deep">
-        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-cyan-400" />
+      <div
+        data-admin-theme={themeResolved}
+        className="flex min-h-svh items-center justify-center bg-admin-bg"
+      >
+        <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-admin-accent" />
       </div>
     )
   }
 
   if (!isEmailAdmin && !canAccess(pathname ?? '')) {
-    return <AccessDenied />
+    return (
+      <div data-admin-theme={themeResolved}>
+        <AccessDenied />
+      </div>
+    )
   }
 
   return (
@@ -115,23 +180,26 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       "bu site tekrar sormasın" ile kalıcı susturulup sessiz veri kaybı üretebiliyordu.
     */
     <ConfirmProvider>
-    <div className="min-h-svh bg-surface-deep font-sans text-white">
+    <div
+      data-admin-theme={themeResolved}
+      className="min-h-svh bg-admin-bg font-sans text-admin-fg"
+    >
       {/*
         SC 2.4.1 Bypass Blocks (Level A): kalıcı sol nav "tekrarlanan blok"tur;
         atlama yolunu sunmak kabuğun sorumluluğudur (§2.6).
       */}
       <a
         href="#admin-main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-toast
-          focus:rounded-admin-sm focus:bg-cyan-400 focus:px-4 focus:py-2 focus:text-sm
-          focus:font-medium focus:text-surface-deep"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-toast
+          focus-visible:rounded-admin-sm focus-visible:bg-admin-accent focus-visible:px-4 focus-visible:py-2 focus-visible:text-sm
+          focus-visible:font-medium focus-visible:text-admin-accent-fg"
       >
         {t('admin.a11y.skipToContent')}
       </a>
 
       <header
         className="sticky top-0 z-sticky flex h-admin-header items-center gap-3
-          border-b border-white/10 bg-surface-deep/95 px-3 backdrop-blur md:px-4"
+          border-b border-admin-border bg-admin-surface px-3 md:px-4"
       >
         {/*
           Mobil tetikleyici — YALNIZ CSS breakpoint'i (`md:hidden`). JS tarafında
@@ -146,8 +214,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           aria-expanded={mobileNavOpen}
           aria-controls="admin-mobile-nav"
           className="inline-flex h-9 w-9 items-center justify-center rounded-admin-sm
-            text-white/70 transition-colors hover:bg-white/10 hover:text-white
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 md:hidden"
+            text-admin-fg-muted transition-colors hover:bg-admin-surface-2 hover:text-admin-fg
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-ring md:hidden"
         >
           <Menu size={18} aria-hidden="true" />
         </button>
@@ -164,8 +232,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           aria-expanded={!navCollapsed}
           aria-controls="admin-desktop-nav"
           className="hidden h-9 w-9 items-center justify-center rounded-admin-sm
-            text-white/70 transition-colors hover:bg-white/10 hover:text-white
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 md:inline-flex"
+            text-admin-fg-muted transition-colors hover:bg-admin-surface-2 hover:text-admin-fg
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-ring md:inline-flex"
         >
           {navCollapsed ? (
             <PanelLeftOpen size={18} aria-hidden="true" />
@@ -176,29 +244,29 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
 
         <Link
           href={Routes.admin.dashboard()}
-          className="rounded-admin-sm px-1 text-base font-semibold text-white
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+          className="rounded-admin-sm px-1 text-base font-semibold text-admin-fg
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-ring"
         >
           {BRAND_NAME}
         </Link>
 
         {breadcrumb.length >= 2 && (
           <nav aria-label={t('admin.a11y.breadcrumb')} className="hidden min-w-0 md:block">
-            <ol className="flex items-center gap-1 text-sm text-white/50">
+            <ol className="flex items-center gap-1 text-sm text-admin-fg-muted">
               {breadcrumb.map((item, index) => {
                 const isLast = index === breadcrumb.length - 1
                 return (
                   <li key={item.key} className="flex min-w-0 items-center gap-1">
                     <ChevronRight size={14} aria-hidden="true" className="shrink-0 opacity-50" />
                     {isLast ? (
-                      <span aria-current="page" className="truncate text-white/80">
+                      <span aria-current="page" className="truncate text-admin-fg">
                         {t(item.labelKey)}
                       </span>
                     ) : (
                       <Link
                         href={item.route as Route}
-                        className="truncate rounded-admin-sm transition-colors hover:text-white
-                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+                        className="truncate rounded-admin-sm transition-colors hover:text-admin-fg
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-ring"
                       >
                         {t(item.labelKey)}
                       </Link>
@@ -219,17 +287,22 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           */}
           <Link
             href={siteHomeHref}
-            className="hidden rounded-admin-sm border border-white/10 px-3 py-1.5 text-xs
-              font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 sm:inline-flex"
+            className="hidden rounded-admin-sm border border-admin-border px-3 py-1.5 text-xs
+              font-medium text-admin-fg-muted transition-colors hover:bg-admin-surface-2
+              hover:text-admin-fg focus-visible:outline-none focus-visible:ring-2
+              focus-visible:ring-admin-ring sm:inline-flex"
           >
             {t('header.adminBar.backToSite')}
           </Link>
+          <AdminThemeToggle
+            preference={themePreference}
+            onPreferenceChange={setThemePreference}
+          />
           <AdminRealtimeNotifications />
           <div
             aria-label={t('admin.a11y.userMenu')}
             className="flex h-8 w-8 items-center justify-center rounded-full
-              border border-white/10 bg-white/5 text-sm font-medium text-cyan-300"
+              border border-admin-border bg-admin-surface-2 text-sm font-medium text-admin-fg-muted"
           >
             {(user?.user_metadata?.first_name?.[0] || 'A').toUpperCase()}
           </div>
@@ -255,10 +328,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           */}
           <footer
             className="mx-auto flex w-full max-w-page items-center justify-between gap-4
-              border-t border-white/10 px-4 py-4 text-xs text-white/40 md:px-6"
+              border-t border-admin-border px-4 py-4 text-xs text-admin-fg-subtle md:px-6"
           >
             <span>{t('admin.common.copyright')}</span>
-            <span className="text-cyan-400/50">{t('admin.common.secureNode')}</span>
+            <span className="text-admin-fg-subtle">{t('admin.common.secureNode')}</span>
           </footer>
         </main>
       </div>

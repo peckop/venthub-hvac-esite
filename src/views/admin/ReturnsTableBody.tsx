@@ -31,7 +31,6 @@ import {
   adminSelectClass,
   adminSelectStyle,
   adminTableActionPrimaryClass,
-  glassStrongClass,
 } from '../../utils/adminUi'
 
 /* ---- modeller ---- */
@@ -99,38 +98,38 @@ const ReturnDetailRow: React.FC<{ row: ReturnRow }> = ({ row }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-4 py-4 animate-in fade-in slide-in-from-top-2 duration-300">
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-8 h-0.5 bg-cyan-400" />
-        <h4 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+        <div className="w-8 h-0.5 bg-admin-accent" />
+        <h4 className="text-xs font-semibold text-admin-accent">
           {t('admin.returns.detail.title')}
         </h4>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="space-y-3 bg-surface-deep/40 p-4 rounded-2xl border border-white/5">
-          <div className="flex justify-between items-center border-b border-white/5 pb-2">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.id')}</span>
-            <span className="text-slate-300 font-mono text-xs select-all">{row.id}</span>
+        <div className="space-y-3 bg-surface-deep/40 p-4 rounded-admin-lg border border-admin-border">
+          <div className="flex justify-between items-center border-b border-admin-border pb-2">
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.detail.id')}</span>
+            <span className="text-admin-fg font-mono text-xs select-all">{row.id}</span>
           </div>
-          <div className="flex justify-between items-center border-b border-white/5 pb-2">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.orderId')}</span>
-            <span className="text-slate-300 font-mono text-xs select-all">{row.order_id}</span>
+          <div className="flex justify-between items-center border-b border-admin-border pb-2">
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.detail.orderId')}</span>
+            <span className="text-admin-fg font-mono text-xs select-all">{row.order_id}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.userId')}</span>
-            <span className="text-slate-300 font-mono text-xs select-all">{row.user_id}</span>
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.detail.userId')}</span>
+            <span className="text-admin-fg font-mono text-xs select-all">{row.user_id}</span>
           </div>
         </div>
-        <div className="space-y-3 bg-surface-deep/40 p-4 rounded-2xl border border-white/5">
-          <div className="flex flex-col gap-1 border-b border-white/5 pb-2">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.table.reason')}</span>
-            <span className="text-slate-200 text-xs font-black uppercase tracking-wider">{row.reason}</span>
+        <div className="space-y-3 bg-surface-deep/40 p-4 rounded-admin-lg border border-admin-border">
+          <div className="flex flex-col gap-1 border-b border-admin-border pb-2">
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.table.reason')}</span>
+            <span className="text-admin-fg text-xs font-semibold">{row.reason}</span>
           </div>
-          <div className="flex flex-col gap-1 border-b border-white/5 pb-2">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.description')}</span>
-            <span className="text-slate-300 text-xs font-semibold normal-case leading-relaxed break-words">{row.description || '—'}</span>
+          <div className="flex flex-col gap-1 border-b border-admin-border pb-2">
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.detail.description')}</span>
+            <span className="text-admin-fg text-xs font-semibold normal-case leading-relaxed break-words">{row.description || '—'}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.updatedAt')}</span>
-            <span className="text-slate-300 font-black text-xs uppercase tracking-widest">{formatDateTime(row.updated_at, lang)}</span>
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.detail.updatedAt')}</span>
+            <span className="text-admin-fg font-semibold text-xs">{formatDateTime(row.updated_at, lang)}</span>
           </div>
         </div>
       </div>
@@ -262,42 +261,42 @@ const ReturnsTableBody: React.FC = () => {
   const getStatusIcon = useCallback((status: string): React.ReactNode => {
     switch (status) {
       case 'requested':
-        return <Clock className="text-yellow-600" size={16} />
+        return <Clock className="text-admin-warning" size={16} />
       case 'approved':
-        return <CheckCircle className="text-green-600" size={16} />
+        return <CheckCircle className="text-admin-success" size={16} />
       case 'rejected':
-        return <XCircle className="text-red-600" size={16} />
+        return <XCircle className="text-admin-danger" size={16} />
       case 'in_transit':
-        return <Truck className="text-blue-600" size={16} />
+        return <Truck className="text-admin-accent" size={16} />
       case 'received':
-        return <Package className="text-purple-600" size={16} />
+        return <Package className="text-admin-accent" size={16} />
       case 'refunded':
-        return <CheckCircle className="text-green-700" size={16} />
+        return <CheckCircle className="text-admin-success" size={16} />
       case 'cancelled':
-        return <XCircle className="text-gray-600" size={16} />
+        return <XCircle className="text-admin-fg-subtle" size={16} />
       default:
-        return <RefreshCw className="text-gray-400" size={16} />
+        return <RefreshCw className="text-admin-fg-muted" size={16} />
     }
   }, [])
 
   const getStatusColor = useCallback((status: string): string => {
     switch (status) {
       case 'requested':
-        return 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+        return 'bg-admin-warning-weak text-admin-warning border-admin-warning/30'
       case 'approved':
-        return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+        return 'bg-admin-success-weak text-admin-success border-admin-success/30'
       case 'rejected':
-        return 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+        return 'bg-admin-danger-weak text-admin-danger border-admin-danger/30'
       case 'in_transit':
-        return 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20'
+        return 'bg-admin-accent-weak text-admin-accent border-admin-accent/30'
       case 'received':
-        return 'bg-violet-500/10 text-violet-500 border-violet-500/20'
+        return 'bg-admin-accent-weak text-admin-accent border-admin-accent/30'
       case 'refunded':
-        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+        return 'bg-admin-success-weak text-admin-success border-admin-success/30'
       case 'cancelled':
-        return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+        return 'bg-admin-surface-3 text-admin-fg-muted border-admin-border'
       default:
-        return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+        return 'bg-admin-surface-3 text-admin-fg-muted border-admin-border'
     }
   }, [])
 
@@ -497,14 +496,14 @@ const ReturnsTableBody: React.FC = () => {
             <button
               type="button"
               onClick={() => router.push(`/admin/orders?q=${r.order_number ?? r.order_id}`)}
-              className="text-cyan-400 hover:text-cyan-300 font-black text-left transition-colors uppercase tracking-wider"
+              className="text-admin-accent hover:text-admin-accent font-semibold text-left transition-colors"
               aria-label={orderLabel(r)}
             >
               {orderLabel(r)}
             </button>
             {typeof r.total_amount === 'number' && (
-              <span className="text-xs font-black text-white/50 uppercase tracking-widest flex items-center gap-1">
-                <span className="w-1 h-px bg-white/10" />
+              <span className="text-xs font-semibold text-admin-fg-muted flex items-center gap-1">
+                <span className="w-1 h-px bg-admin-surface-3" />
                 {formatCurrency(Number(r.total_amount), lang)}
               </span>
             )}
@@ -518,8 +517,8 @@ const ReturnsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div className="flex flex-col gap-0.5">
-            <span className="font-black text-white uppercase tracking-tight">{r.customer_name}</span>
-            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{r.customer_email}</span>
+            <span className="font-semibold text-admin-fg tracking-tight">{r.customer_name}</span>
+            <span className="text-xs font-semibold text-admin-fg-muted">{r.customer_email}</span>
           </div>
         ),
       },
@@ -530,10 +529,10 @@ const ReturnsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div className="max-w-xs space-y-1">
-            <div className="font-black text-xs text-slate-200 uppercase tracking-wider">{r.reason}</div>
+            <div className="font-semibold text-xs text-admin-fg">{r.reason}</div>
             {r.description && (
               <div
-                className="text-xs font-bold text-slate-500 leading-relaxed truncate uppercase tracking-widest"
+                className="text-xs font-bold text-admin-fg-muted leading-relaxed truncate"
                 title={r.description}
               >
                 {r.description}
@@ -549,7 +548,7 @@ const ReturnsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-black uppercase tracking-widest ${getStatusColor(
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${getStatusColor(
               r.status,
             )}`}
           >
@@ -565,9 +564,9 @@ const ReturnsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div className="flex flex-col gap-0.5">
-            <span className="font-black text-white tracking-widest text-xs uppercase">{formatDate(r.created_at, lang)}</span>
-            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">
-              <span className="inline-block w-1.5 h-px bg-white/10 mr-1 align-middle" />
+            <span className="font-semibold text-admin-fg text-xs">{formatDate(r.created_at, lang)}</span>
+            <span className="text-xs font-semibold text-admin-fg-muted">
+              <span className="inline-block w-1.5 h-px bg-admin-surface-3 mr-1 align-middle" />
               {formatTime(r.created_at, lang)}
             </span>
           </div>
@@ -579,7 +578,7 @@ const ReturnsTableBody: React.FC = () => {
         cell: (r) => {
           const next = allowedNextStatuses(r.status)
           if (!hasWriteAccess || next.length === 0) {
-            return <span className="text-xs text-slate-400">{EMPTY_DASH}</span>
+            return <span className="text-xs text-admin-fg-muted">{EMPTY_DASH}</span>
           }
           return (
             <div className="flex gap-1.5">
@@ -597,7 +596,7 @@ const ReturnsTableBody: React.FC = () => {
                     <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
-                      <span className="text-xs font-black uppercase tracking-widest">{getStatusLabel(status)}</span>
+                      <span className="text-xs font-semibold">{getStatusLabel(status)}</span>
                       <ChevronRight size={10} strokeWidth={3} />
                     </>
                   )}
@@ -708,7 +707,7 @@ const ReturnsTableBody: React.FC = () => {
         label: t('admin.returns.bulk.statusTitle'),
         tone: 'default',
         panel: (close) => (
-          <div className={`${glassStrongClass} rounded-2xl p-3 flex items-center gap-2`}>
+          <div className={`bg-admin-surface rounded-admin-lg p-3 flex items-center gap-2`}>
             <select
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value)}
@@ -717,7 +716,7 @@ const ReturnsTableBody: React.FC = () => {
               aria-label={t('admin.returns.bulk.statusTitle')}
             >
               {['approved', 'in_transit', 'received', 'refunded', 'cancelled', 'rejected'].map((s) => (
-                <option key={s} value={s} className="bg-surface-deep">
+                <option key={s} value={s} className="bg-admin-bg">
                   {getStatusLabel(s)}
                 </option>
               ))}

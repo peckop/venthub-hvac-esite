@@ -78,6 +78,8 @@ export const orders = {
         shipping: {
           title: 'Ship / Tracking No',
           bulkTitle: 'Bulk: Ship Orders',
+          description: 'Enter the carrier and tracking number; optionally send a notification email to the customer.',
+          close: 'Close',
           carrierLabel: 'Carrier',
           carrierSelect: 'Select…',
           trackingLabel: 'Tracking Number',
@@ -106,6 +108,7 @@ export const orders = {
         },
         logs: {
           title: 'Email Logs',
+          description: 'Log of shipping notification emails sent for this order. You can keep working with the list while this panel is open.',
           orderLabel: 'Order:',
           table: {
             date: 'Date',
@@ -120,6 +123,7 @@ export const orders = {
         },
         notes: {
           title: 'Order Notes',
+          description: 'Internal notes attached to this order. Notes are never shown to the customer.',
           inputPlaceholder: 'Write a new note',
           add: 'Add',
           adding: 'Saving…',
@@ -174,10 +178,21 @@ export const orders = {
           cancelledOrRefunded: 'Order is cancelled or refunded.',
           updateSuccess: 'Order status updated successfully.',
           updateError: 'Error occurred while updating status.'
+        },
+        detail: {
+          description: 'Status, contact details, notes and email log of the selected order.',
+          close: 'Close'
         }
       },
       orderDetails: 'Order Details',
       form: {
+        // Field-level validation messages (standard §4.6 — under the input, not in a toast)
+        validation: {
+          statusRequired: 'Order status is required',
+          customerNameRequired: 'Customer name is required',
+          emailInvalid: 'Invalid email address',
+          emailRequired: 'Email is required',
+        },
         descEdit: 'View and update order details.',
         tabShipping: 'Shipping',
         tabItems: 'Order Items',

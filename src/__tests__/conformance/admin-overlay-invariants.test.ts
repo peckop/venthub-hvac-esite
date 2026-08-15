@@ -120,6 +120,32 @@ describe('INV-ADMIN-OVERLAY-2 · modal a11y sözleşmesi (APG)', () => {
       `${path}: Radix aria-modal basmaz, Dialog.Content'e elle eklenmeli (cetvel §2.5, §4.8)`,
     ).toMatch(/aria-modal="true"/)
   })
+
+  /**
+   * SESSİZ-YEŞİL KAPATMA (2026-08-15, overlay göçünde ölçüldü).
+   *
+   * Yukarıdaki iki kural KAYNAK METNİNE bakar. Radix'te `<Dialog.Root modal={false}>`
+   * iken `<Dialog.Overlay>` **null döner** — kaynakta duran Overlay hiç render
+   * EDİLMEZ, gövde kaydırma kilidi kaybolur ve `aria-modal` anlamını yitirir.
+   * Bu durumda üstteki iki test GEÇER ama sözleşme sağlanmaz: kapının tam da
+   * yakalaması gereken şey ölçülemez hâle gelir.
+   *
+   * Karar: non-modal bir yüzey istiyorsan Radix Dialog KULLANMA — `AdminSidePanel`
+   * kullan (§4.3 sözleşmesi: `role="region"`, perde yok, kilit yok, odak iadesi var).
+   * Modal davranmayan bir yüzeyi modal işaretlemek APG'nin "severe negative
+   * ramifications" dediği hatadır.
+   */
+  it('hiçbir Dialog `modal={false}` ile kurulmuyor (sessiz-yeşil kapısı)', () => {
+    const offenders = ADMIN_FILES.filter(([, source]) => /modal=\{false\}/.test(source)).map(
+      ([path]) => path,
+    )
+    expect(
+      offenders.length,
+      `Radix'te \`modal={false}\` iken <Dialog.Overlay> NULL döner: kaynakta durur ama\n` +
+        `render EDİLMEZ → kaydırma kilidi sessizce kaybolur ve üstteki iki test yine GEÇER.\n` +
+        `Non-modal yüzey için \`AdminSidePanel\` kullan (cetvel §4.3).\n  ${offenders.join('\n  ')}`,
+    ).toBe(0)
+  })
 })
 
 describe('INV-ADMIN-OVERLAY-3 · katman ölçeği (ratchet)', () => {
@@ -132,7 +158,11 @@ describe('INV-ADMIN-OVERLAY-3 · katman ölçeği (ratchet)', () => {
    * portal ettiği bir dropdown, modalın ARKASINDA render olur. Token ölçeğinde
    * `z-popover` (110) bunu çözer — ham değerler çözmez.
    */
-  const RAW_Z_CEILING = 57
+  // 57 → 49: envanter regresyon onarımında çekmece, CSV modalı ve InfoTooltip elle
+  // yazılmış perdelerden Radix Dialog'a alındı; ham `z-40/z-50/z-10` yerine
+  // `z-backdrop/z-modal/z-raised/z-popover` token'ları geldi (6 ham değer eridi).
+  // Ratchet sıkılaşır: yeni kod bu tavanı ARTIRAMAZ.
+  const RAW_Z_CEILING = 49
 
   it('ham z-* sayısı tavanı aşmıyor', () => {
     const pattern = /\bz-(?:0|10|20|30|40|50|60|\[[^\]]+\])\b/g

@@ -30,10 +30,10 @@ export function FacetedFilter({ facet, selected, onChange, clearLabel }: Faceted
           className={adminButtonSecondaryClass + ' h-12 flex items-center gap-2 px-5'}
           aria-label={facet.label}
         >
-          <Filter size={16} className="text-cyan-400" />
+          <Filter size={16} className="text-admin-accent" />
           <span className="truncate">{facet.label}</span>
           {selected.length > 0 && (
-            <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-cyan-400 text-surface-deep text-xs font-black tabular-nums">
+            <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-admin-accent text-admin-accent-fg text-xs font-semibold tabular-nums">
               {selected.length}
             </span>
           )}
@@ -42,11 +42,11 @@ export function FacetedFilter({ facet, selected, onChange, clearLabel }: Faceted
 
       <Popover.Portal>
         <Popover.Content
-          className="min-w-240px glass-strong rounded-3xl border border-white/10 p-2 shadow-elevation-4 animate-in fade-in zoom-in-95 duration-200 z-modal"
+          className="min-w-240px bg-admin-surface rounded-admin-lg border border-admin-border p-2 shadow-elevation-4 animate-in fade-in zoom-in-95 duration-200 z-modal"
           align="start"
           sideOffset={8}
         >
-          <div className="px-4 pt-3 pb-2 text-xs font-black uppercase tracking-hvac-normal text-slate-500 border-b border-white/5 mb-2 flex items-center gap-2">
+          <div className="px-4 pt-3 pb-2 text-xs font-semibold text-admin-fg-muted border-b border-admin-border mb-2 flex items-center gap-2">
             <Filter size={12} />
             {facet.label}
           </div>
@@ -61,17 +61,17 @@ export function FacetedFilter({ facet, selected, onChange, clearLabel }: Faceted
                   onClick={() => toggle(option.value)}
                   aria-label={option.label}
                   aria-pressed={checked}
-                  className={`group w-full flex items-center justify-between px-3 py-2.5 text-xs font-bold rounded-xl hover:bg-white/5 hover:text-white cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40 ${checked ? 'text-cyan-400' : 'text-slate-300'}`}
+                  className={`group w-full flex items-center justify-between px-3 py-2.5 text-xs font-bold rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30 ${checked ? 'text-admin-accent' : 'text-admin-fg'}`}
                 >
                   <span className="flex items-center gap-3">
                     <span
-                      className={`w-4 h-4 rounded-md border transition-colors flex items-center justify-center ${checked ? 'bg-cyan-400 border-cyan-400 shadow-glow-sm' : 'border-white/10 bg-white/5'}`}
+                      className={`w-4 h-4 rounded-md border transition-colors flex items-center justify-center ${checked ? 'bg-admin-accent border-admin-accent' : 'border-admin-border bg-admin-surface-2'}`}
                     >
-                      {checked && <Check size={10} className="text-surface-deep stroke-4" />}
+                      {checked && <Check size={10} className="text-admin-accent-fg stroke-4" />}
                     </span>
                     {option.label}
                   </span>
-                  <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-white/5 text-slate-400 text-xs font-black tabular-nums group-hover:bg-white/10">
+                  <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-admin-surface-2 text-admin-fg-muted text-xs font-semibold tabular-nums group-hover:bg-admin-surface-3">
                     {option.count}
                   </span>
                 </button>
@@ -81,12 +81,12 @@ export function FacetedFilter({ facet, selected, onChange, clearLabel }: Faceted
 
           {selected.length > 0 && (
             <>
-              <div className="my-3 h-px bg-white/5" />
+              <div className="my-3 h-px bg-admin-surface-2" />
               <button
                 type="button"
                 onClick={() => onChange([])}
                 aria-label={clearLabel}
-                className="group w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-black uppercase tracking-hvac-normal text-slate-400 rounded-xl hover:bg-white/5 hover:text-white cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-white/10"
+                className="group w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-semibold text-admin-fg-muted rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-admin-border"
               >
                 <X size={12} />
                 {clearLabel}

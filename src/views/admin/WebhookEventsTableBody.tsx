@@ -142,7 +142,7 @@ const WebhookEventsTableBody: React.FC = () => {
         header: t('admin.webhooks.eventType'),
         sortable: true,
         cell: (e) => (
-          <span className="font-bold text-white uppercase tracking-tight">
+          <span className="font-bold text-admin-fg tracking-tight">
             {e.event_type}
           </span>
         ),
@@ -152,7 +152,7 @@ const WebhookEventsTableBody: React.FC = () => {
         header: t('admin.webhooks.source'),
         sortable: true,
         cell: (e) => (
-          <span className="text-slate-300 font-bold">
+          <span className="text-admin-fg font-bold">
             {e.provider}
           </span>
         ),
@@ -165,19 +165,19 @@ const WebhookEventsTableBody: React.FC = () => {
           switch (e.status) {
             case 'processed':
               return (
-                <span className="flex items-center gap-1.5 text-emerald-400 font-black text-xs uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1.5 rounded-xl w-fit">
+                <span className="flex items-center gap-1.5 text-admin-success font-semibold text-xs bg-admin-success-weak border border-admin-success/30 px-2.5 py-1.5 rounded-admin-md w-fit">
                   <CheckCircle2 size={12} strokeWidth={3} /> {t('admin.webhooks.statusProcessed')}
                 </span>
               )
             case 'failed':
               return (
-                <span className="flex items-center gap-1.5 text-rose-400 font-black text-xs uppercase tracking-widest bg-rose-500/10 border border-rose-500/20 px-2.5 py-1.5 rounded-xl w-fit">
+                <span className="flex items-center gap-1.5 text-admin-danger font-semibold text-xs bg-admin-danger-weak border border-admin-danger/30 px-2.5 py-1.5 rounded-admin-md w-fit">
                   <XCircle size={12} strokeWidth={3} /> {t('admin.webhooks.statusFailed')}
                 </span>
               )
             default:
               return (
-                <span className="flex items-center gap-1.5 text-amber-400 font-black text-xs uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-2.5 py-1.5 rounded-xl w-fit">
+                <span className="flex items-center gap-1.5 text-admin-warning font-semibold text-xs bg-admin-warning-weak border border-admin-warning/30 px-2.5 py-1.5 rounded-admin-md w-fit">
                   <Clock size={12} strokeWidth={3} /> {t('admin.webhooks.statusPending')}
                 </span>
               )
@@ -189,7 +189,7 @@ const WebhookEventsTableBody: React.FC = () => {
         header: t('admin.webhooks.date'),
         sortable: true,
         cell: (e) => (
-          <span className="font-black text-slate-400 text-xs uppercase tracking-widest">
+          <span className="font-semibold text-admin-fg-muted text-xs">
             {formatDateTime(e.created_at, lang as 'tr' | 'en')}
           </span>
         ),
@@ -298,28 +298,28 @@ const WebhookEventsTableBody: React.FC = () => {
       </div>
 
       <div className={adminCardPaddedClass}>
-        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2 uppercase tracking-wide">
-          <Code size={18} className="text-cyan-400" />
+        <h3 className="text-lg font-bold text-admin-fg mb-4 flex items-center gap-2 tracking-wide">
+          <Code size={18} className="text-admin-accent" />
           {t('admin.webhooks.eventDetail')}
         </h3>
         {selectedEvent ? (
           <div className="space-y-4">
-            <div className="bg-slate-950/80 rounded-2xl p-4 overflow-x-auto border border-white/5">
-              <pre className="text-xs text-cyan-300 font-mono">
+            <div className="bg-admin-surface-2 rounded-admin-lg p-4 overflow-x-auto border border-admin-border">
+              <pre className="text-xs text-admin-accent font-mono">
                 {JSON.stringify(selectedEvent.payload, null, 2)}
               </pre>
             </div>
             {selectedEvent.error_message && (
-              <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
-                <p className="text-xs font-black text-rose-400 mb-2 uppercase tracking-wider">
+              <div className="p-4 bg-admin-danger-weak border border-admin-danger/30 rounded-admin-lg">
+                <p className="text-xs font-semibold text-admin-danger mb-2">
                   {t('admin.webhooks.errorMessage')}
                 </p>
-                <p className="text-xs text-rose-300 font-medium">{selectedEvent.error_message}</p>
+                <p className="text-xs text-admin-danger font-medium">{selectedEvent.error_message}</p>
               </div>
             )}
           </div>
         ) : (
-          <div className="py-20 text-center text-slate-500 text-sm font-bold uppercase tracking-widest italic">
+          <div className="py-20 text-center text-admin-fg-muted text-sm font-bold italic">
             {t('admin.webhooks.selectEventToView')}
           </div>
         )}
