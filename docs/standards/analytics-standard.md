@@ -41,9 +41,19 @@
 - **Consent:** KVKK + çerez onayı **şart** — `CookieConsent` onayı verilmeden analytics olayları
   **ateşlenmez** (consent-mode). Çerez politikası sayfasıyla tutarlı.
 
-### ⛔ ÖN KOŞUL — `NEXT_PUBLIC_GA_ID`'yi env'e KOYMADAN önce oku (`T020-VH`)
+### ✅ ÖN KOŞUL KAPANDI — `T020-VH` bitti (PR #524, 2026-08-15)
 
-Yukarıdaki consent şartının **kodda karşılığı YOK**. Ölçüldü (2026-08-15, LAUNCH denetimi):
+> Aşağıdaki bölüm **açığın tarihçesidir**, güncel durum değil. Silinmedi çünkü GA açan kişinin
+> *neden* bir rıza kapısı olduğunu bilmesi gerekiyor. **Bugünkü durum:** `trackEvent()` gönderim
+> öncesi `hasConsent('analytics')` soruyor; GA/GTM script'i yalnız `ConsentGatedAnalytics` içinden
+> ve yalnız rıza varsa yükleniyor; rıza kategori bazlı, versiyonlu, geri alınabilir.
+> Kalıcı bekçi: `src/__tests__/conformance/legal-consent-analytics.test.ts` (INV-LEGAL-2) —
+> kapı sökülürse test kırmızıya döner.
+
+<details>
+<summary>Açığın kaydı (2026-08-15 öncesi durum) — tıkla</summary>
+
+Yukarıdaki consent şartının **kodda karşılığı YOKTU**. Ölçüldü (2026-08-15, LAUNCH denetimi):
 
 - `vh_cookie_consent` bayrağını **yalnız bandın kendisi** okuyor (`CookieConsent.tsx:17`), kendini
   gösterip göstermeyeceğine karar vermek için. **Başka hiçbir yer okumuyor** → "Reddet" hiçbir şeyi kapatmıyor.
@@ -63,14 +73,27 @@ yüklenmemesi** (olay bastırmak yetmez) · rızanın geri alınabilmesi · rız
 gerçeğini yazıyor: *"Site hâlihazırda analitik/pazarlama çerezi kullanmamaktadır"* — bu cümle
 GA açıldığı an YALAN olur, metin de güncellenmeli).
 
+</details>
+
 ## Raporlama
 - Mevcut sağlayıcının aylık raporunun **eşdeğeri/fazlası**: organik trafik (Search Console), dönüşüm
   hunisi (GA4), en çok gezilen/çıkılan sayfalar, kaynak/medya, cihaz.
 - Sıklık: aylık özet + geçiş döneminde (cutover ilk 4-8 hafta) haftalık sıra-takibi.
 
 ## DoD (ne zaman "kurulu" sayılır)
-- [ ] **`T020-VH` rıza kapısı bitti** (ön koşul — bkz. §Yapılandırma ⛔). Kanıt: "Reddet" seçili
-      tarayıcıda GA/GTM script'i **hiç yüklenmiyor** ve tek bir olay gitmiyor.
+- [x] **`T020-VH` rıza kapısı bitti** (ön koşul — bkz. §Yapılandırma). Kanıt: "Reddet" seçili
+      tarayıcıda GA/GTM script'i **hiç yüklenmiyor** ve tek bir olay gitmiyor. *(PR #524)*
+- [ ] **CSP `script-src`'a GA alan adları eklendi** — `next.config.mjs:59` şu an
+      `Content-Security-Policy-**Report-Only**` ve `script-src 'self' 'unsafe-inline' 'unsafe-eval'`;
+      `googletagmanager.com` / `google-analytics.com` **listede yok**. Bugün zararsız (Report-Only
+      hiçbir şeyi engellemez, yalnız raporlar) ama CSP **uygulanır hâle getirildiği an GA sessizce
+      ölür** — konsolda blok, panelde veri yok, sebep görünmez. İkisi farklı zamanlarda farklı
+      kişilerce yapılırsa bağlantı kurulamaz; bu yüzden buraya yazıldı. `connect-src`'a da
+      `https://*.google-analytics.com` gerekir (olaylar oradan gönderilir).
+- [ ] **Çerez Politikası metni güncellendi** — bugün *"Site hâlihazırda analitik/pazarlama çerezi
+      kullanmamaktadır"* diyor (PR #512, o gün doğruydu). GA açıldığı an bu cümle yanlış beyan olur;
+      çerez tablosuna `_ga`/`_ga_*` satırları + saklama süreleri girilmeli. Dosyalar:
+      `src/views/legal/components/{tr,en}/CookiePolicyContent.tsx`.
 - [ ] GA4 + GTM canlı, ID env'de, consent-mode bağlı.
 - [ ] Huni olayları (en az view_item → add_to_cart → begin_checkout → purchase) akıyor.
 - [ ] Search Console bağlı + sitemap gönderildi.
