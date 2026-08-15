@@ -1,0 +1,81 @@
+#!/bin/sh
+# Orion Auto-Doc Post-Merge — pull/merge ile GELEN kod için doküman tazeleme
+# + Orion registry senkronu.
+#
+# NEDEN VAR: İş worktree'lerde commit'lenip ana klasöre `git pull` ile geliyor.
+# pre/post-commit kancaları pull'da TETİKLENMEZ → companion .md'ler sessizce
+# eskiyordu (2026-08-13'te 284 bayat companion; product.service.md D4'te silinmiş
+# bir RPC'yi anlatıyordu). Bu kanca o kopukluğu kapatır. Tamamı ARKA PLANDA koşar,
+# pull'u bloklamaz.
+#
+# ⚠️ 2026-08-15 — BU KANCA `.githooks/`'a EN SON GELDİ ve o gecikme pahalıya patladı.
+# `pre-commit`/`post-commit` versiyonlanırken bu dosya `.git/hooks/` içinde unutuldu;
+# orada da aşağıdaki hatayı taşıyordu, yani hem bozuktu hem görünmezdi.
+#
+# ## LOG YOLU — `$REPO_ROOT/.git/...` YAZMA
+#
+# Worktree'de `.git` bir DİZİN değil, ana repoya işaret eden tek satırlık bir
+# DOSYADIR (`gitdir: .../worktrees/<ad>`). `>> "$REPO_ROOT/.git/x.log"` orada
+# "Not a directory" ile patlar. Kritik kısım: kabuk, yönlendirme başarısız olunca
+# alt-kabuğu HİÇ ÇALIŞTIRMAZ. Yani kayıp bir log satırı değil — bloğun tamamı
+# sessizce hiç koşmaz.
+#
+# ÖLÇÜLDÜ (2026-08-15): ana repo logunun son satırı 2026-08-14 12:31. İş
+# worktree'lere taşındığı andan itibaren (a) companion üretimi (b) registry-sync
+# hiç çalışmamış. registry-sync GitHub üzerinden yapılan merge'lerde de zaten
+# çalışmıyor (T038-VH) — ikisi birleşince "Work-Order künyeleri işlenmemiş"
+# şikâyetinin sebebi buydu; künyeler kaybolmuyordu, onları okuyan adım ölüydü.
+#
+# Doğrusu `git rev-parse --absolute-git-dir`: ana repoda `.git`, worktree'de
+# o worktree'ye ait GERÇEK dizin. Aynı düzeltme `post-commit` içinde de var.
+# Kalıcı bekçi: src/__tests__/conformance/githooks-integrity.test.ts
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+GIT_DIR_ABS=$(git rev-parse --absolute-git-dir)
+LOG="$GIT_DIR_ABS/orion-postmerge.log"
+
+if [ -f "$REPO_ROOT/.venv/Scripts/python" ]; then
+    PYTHON_EXEC="$REPO_ROOT/.venv/Scripts/python"
+elif [ -f "$REPO_ROOT/.venv/bin/python" ]; then
+    PYTHON_EXEC="$REPO_ROOT/.venv/bin/python"
+else
+    PYTHON_EXEC="python"
+fi
+
+CHANGED=$(git diff --name-only ORIG_HEAD HEAD 2>/dev/null)
+[ -z "$CHANGED" ] && exit 0
+
+(
+    echo "=== post-merge $(date) ==="
+
+    # 1) Kod companion'ları: pull'un getirdiği her .ts/.tsx için zorla üret.
+    #    --force ŞART: worktree kancaları hash'i DB'ye yazıp çıktıyı worktree'de
+    #    bırakabiliyor, yani hash DB'si "üretildi" der ama ana klasörde dosya yoktur.
+    echo "$CHANGED" | grep -E '^src/.*\.(ts|tsx)$' | while IFS= read -r f; do
+        [ -f "$REPO_ROOT/$f" ] || continue  # silinen dosya
+        "$PYTHON_EXEC" -m orion.cli.main doc single --py-file "$REPO_ROOT/$f" --force
+    done
+
+    # 2) Migration geldiyse şema master'ı (baseline merdiveninden)
+    if echo "$CHANGED" | grep -qE '^supabase/(migrations|baselines)/.*\.sql$'; then
+        "$PYTHON_EXEC" -m orion.cli.main doc schema --workspace "$REPO_ROOT" --no-use-dump
+    fi
+
+    # 3) Edge function geldiyse fonksiyon master'ı
+    if echo "$CHANGED" | grep -qE '^supabase/functions/.*\.ts$'; then
+        "$PYTHON_EXEC" -m orion.cli.main doc batch --batch-dir "$REPO_ROOT/supabase/functions" --workspace "$REPO_ROOT" --workers 20
+    fi
+
+    # 4) Yerel ağaç (system_tree.md) — NLM'e DOKUNMAZ (milestone modeli korunur)
+    "$PYTHON_EXEC" -m orion.cli.main doc tree --repo-root "$REPO_ROOT"
+
+    echo "=== bitti $(date) ==="
+) >> "$LOG" 2>&1 &
+
+# --- Orion registry senkronu (çok-oturumlu koordinasyon cetveli §3) ---
+# Merge/pull ile gelen commit'lerdeki `Work-Order:` künyelerinden registry'yi günceller.
+# Hatırlamaya bağlı adım çürür (pano/registry/companion üç kez bayatladı) → zorunlu
+# ritüele bağlandı. Arka planda koşar, pull'u bloklamaz.
+if [ -f "$REPO_ROOT/scripts/board/registry-sync.cjs" ]; then
+  (node "$REPO_ROOT/scripts/board/registry-sync.cjs" >> "$LOG" 2>&1 &)
+fi
