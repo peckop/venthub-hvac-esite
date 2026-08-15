@@ -88,8 +88,17 @@ ayrı ayrı kırmızı yanar.
 > `on_inventory_movements_change`) hiçbir migration dosyasında geçmez — yalnız
 > `supabase/baselines/2026-06-12_public_schema.sql` anlık görüntüsünde tanımlıdır (repo'dan önce elle
 > kurulmuşlar). Sonradan eklenenler `supabase/migrations/` altındadır. Kapı ikisini de tarar ve
-> `create`/`drop` etkilerini **kronolojik** uygulayarak (dosya adındaki tarihe göre; grup grup değil)
-> yaşayan durumu hesaplar.
+> `create`/`drop` etkilerini **CI'ın uyguladığı sırayla** işleyerek yaşayan durumu hesaplar.
+>
+> **Sıra "kronolojik" değil, BAYT sırasıdır** — çünkü `supabase-migrate.yml` şunu yapar:
+> `for f in $(ls -1 supabase/migrations/*.sql | sort)`. Depoda 8-haneli (`20250903_*`) ve 14-haneli
+> (`20250915152500_*`) adlar yan yana yaşıyor; aynı gün için bu iki biçim bayt sırasında **ters**
+> dizilir (`'1'` 0x31 < `'_'` 0x5F). Kapının ilk sürümü tarihe göre normalleştiriyordu ve bu
+> sessiz-yeşil üretiyordu: aynı push'ta gelen `20260815_drop` + `20260815120000_recreate` ikilisinde
+> test "tetik yaşıyor" derken CI tersini uygular ve prod'da tetik ölür. **Ders: bir kapı, doğru
+> sandığı sırayı değil, ortamın uyguladığı sırayı modellemelidir.**
+> *Açık kalem:* workflow `LC_ALL` set etmiyor, yani doğruluk runner locale'ine bağlı;
+> `LC_ALL=C sort` yazılması EDGE'e bildirildi (`.github/workflows/**` onun şeridi).
 >
 > **Baseline ≠ tam şema dökümü.** `2026-08-13_public_schema.sql` kendi başlığında "trigger/RLS
 > politikaları DAHİL DEĞİL" diyor ve içinde sıfır `create trigger` var. Bu yüzden "en yeni baseline
@@ -117,13 +126,26 @@ uygulanmış, ayrık tetikler ve `WHEN` koşulu canlı; (3) `handle_supabase_web
 `search_path` kilidi prod'da **duruyor** — yani kurulum betiklerindeki eksik `SET search_path`
 teorik değil, çalıştırıldığında bu kilidi gerçekten düşürecek bir regresyondu.
 
-**Kurulum betikleri de bu sözleşmeye tabidir.** `scripts/webhook_setup.sql`,
-`scripts/setup_webhooks.js` ve `scripts/setup_webhooks_cli.js` sıfırdan bir ortamda webhook
-altyapısını kurar. 2026-08-15 denetimine kadar **üçü de yalnız ilk üç tetiği kuruyordu** — yani
-cetvel doğru, migration doğru, test yeşilken depo, 08-15 hatasını yeni bir ortamda birebir yeniden
-kuran bir düğme taşıyordu; üstelik betik sonunda "Setup Completed Successfully" yazıyordu (sahte
-başarı). Üçü de tamamlandı ve `INV-RENDER-2`'nin ayrı bir iddiası artık bunları da denetliyor.
-**Migration eklerken kurulum betikleri de güncellenir — ikisi ayrı kaynaktır.**
+**Kurulum SQL'i TEK KAYNAKTADIR: `scripts/webhook_setup.sql`.** `scripts/setup_webhooks.js` ve
+`scripts/setup_webhooks_cli.js` bu dosyayı okuyup yalnız `REPLACE_WITH_ENV_SECRET`'i değiştirir;
+kendi SQL kopyalarını **taşımazlar**.
+
+Bu hâline üç turda gelindi ve yol öğreticidir. Başlangıçta aynı SQL üç yerde kopyalıydı ve **üçü de
+yalnız ilk üç tetiği kuruyordu** — cetvel doğru, migration doğru, test yeşilken depo, 08-15 hatasını
+yeni bir ortamda birebir yeniden kuran bir düğme taşıyordu; üstelik betik sonunda "Setup Completed
+Successfully" yazıyordu (sahte başarı). Kopyaları tamamladım. Sonra "hangi kopya çalışıyor" sorusunu
+statik olarak cevaplamayı denedim — o da kaçak verdi: tetikleri ölü bir değişkene taşımak, çağrıyı
+`if (false)` dalına ya da yoruma almak kapıyı yeşil bırakıyordu. **Erişilebilirlik analizi metin
+taramasıyla yapılamaz.** Kalıcı çözüm sorunun kendisini kaldırmak oldu: kopya yoksa "hangi kopya
+güncel / hangisi çalışıyor" diye bir soru da yoktur.
+
+**Kapı (`INV-RENDER-2`) bunu iki OLUMLU iddiayla zorlar** — olumsuz bir "kopya yok" iddiası yetmiyordu
+(SQL'i başka bir dosyaya taşımak, betiğe başka bir `.sql` okutmak ya da kurulumu tamamen silmek
+üçünde de yeşil kalıyordu):
+1. `scripts/**` altında webhook tetiği kuran dosya kümesi **tam olarak** `webhook_setup.sql` olmalı.
+2. Her kurulum betiği o dosyayı `readFileSync` ile okumalı ve bir yürütme çağrısına beslemeli.
+
+**Migration eklerken kurulum kaynağı da güncellenir — ikisi ayrı kaynaktır.**
 
 **Denetim notu (2026-08-15) — üç pas, beş sessiz-yeşil.** Bu kapının ilk iki sürümü denetimden
 geçemedi. Bulunanların hepsi *kanıtlanmış* yanlış-negatiftir (bozma yapılıp test yeşil kaldığı
@@ -144,11 +166,20 @@ ve Prettier yapılandırması yok, yani çift tırnak meşru bir yazım.
 ışık güven üretir.** Yeni bir INV-* kapısı, en az bir kez *kendi kaçak senaryosu üretilerek*
 çürütülmeden kapı sayılmaz.
 
-**Yan bulgu — kurulum betikleri güvenlik sertleştirmesini geri alıyordu.** Üç betik de
+**Yan bulgu — kurulum güvenlik sertleştirmesini geri alıyordu.** Betikler
 `CREATE OR REPLACE FUNCTION … SECURITY DEFINER` yazıyor ama `SET search_path` yazmıyordu.
 `CREATE OR REPLACE` fonksiyonun TÜM özniteliklerini yeniden yazar; `SET` yoksa `proconfig`
-**silinir** ve `20260602070000_security_hardening.sql` ile getirilen kilit düşer. Üçüne de
-`SET search_path = pg_catalog, public, net` eklendi (prod'daki canlı hâlle aynı).
+**silinir** ve `20260602070000_security_hardening.sql` ile getirilen kilit düşer — prod ölçümü
+(yukarıda) o kilidin gerçekten durduğunu gösterdi, yani teorik değil canlı bir regresyondu.
+Tek kaynağa `SET search_path = pg_catalog, public, net` eklendi (prod'daki canlı hâlle aynı);
+sözdizimi gerçek bir PostgreSQL 17.4 kümesinde koşturularak doğrulandı (`prosecdef=t`,
+`proconfig` dolu).
+
+**Yan bulgu 2 — betikler `process.cwd()`'ye bağlıydı.** Repo kökü dışından koşulduklarında
+`.env` + `.env.local`'i **yanlış dizine yazdıktan** ve prod DB'ye bağlanıp `CREATE EXTENSION`
+çalıştırdıktan *sonra* patlıyorlardı: yan etki, ön koşul doğrulanmadan gerçekleşiyordu. Tüm yollar
+artık betiğe göre (`import.meta.url`) çözülüyor ve `cli.js` gizli anahtarı üretmeden önce tek
+kaynağın varlığını doğruluyor.
 
 ## 4. Bilinen sınırlar (dürüstçe)
 

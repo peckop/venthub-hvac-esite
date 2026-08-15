@@ -59,6 +59,20 @@ const SETUP_SQL_PATH = '/scripts/webhook_setup.sql'
 const WEBHOOK_FN = 'handle_supabase_webhook'
 
 /**
+ * `create trigger` dilbilgisi TEK YERDE tanımlı. Denetim (beşinci pas) şunu ölçtü: bu dosyanın
+ * iki ayrı tarayıcısı farklı SQL dilbilgisi varsayıyordu — biri `or replace` / `constraint`
+ * varyantlarını karşılıyor, öbürü yalnız `create trigger` arıyordu. Sonuç: PG14+ sözdizimiyle
+ * (`CREATE OR REPLACE TRIGGER`) yazılmış bir SQL kopyası kapıdan görünmeden geçiyordu.
+ * Aynı kavramın iki tanımı = sessiz kaçak.
+ */
+const CREATE_TRIGGER_SRC = String.raw`create\s+(?:or\s+replace\s+)?(?:constraint\s+)?trigger`
+const CREATE_TRIGGER_RE = new RegExp(CREATE_TRIGGER_SRC, 'i')
+const CREATE_TRIGGER_HEAD_RE = new RegExp(
+  `^${CREATE_TRIGGER_SRC}` + String.raw`\s+([\w."]+)[\s\S]*?\son\s+([\w."]+)`,
+  'i',
+)
+
+/**
  * SQL kaynakları İKİ yerde yaşıyor ve bu tesadüf değil:
  *  - `supabase/baselines/*.sql` — anlık görüntüler. İlk üç webhook tetiği YALNIZ burada tanımlı;
  *    hiçbir migration dosyasında geçmiyorlar (repo'dan önce elle kurulmuşlar).
@@ -98,6 +112,24 @@ const bootstrapSources = {
   }) as Record<string, string>),
 }
 
+/**
+ * `scripts/**` altındaki TÜM çalıştırılabilir metin dosyaları. Amaç: "webhook tetiği kuran tek
+ * dosya hangisidir" sorusunu TÜM depoda cevaplayabilmek.
+ *
+ * NİÇİN: önceki sürüm yalnız OLUMSUZ bir iddia kuruyordu — "şu iki .js dosyasında `create
+ * trigger` metni yok". Denetim (beşinci pas) bunun üç ayrı kaçağını ölçtü: SQL'i başka bir
+ * dosyaya taşımak (`scripts/webhook_trigger_sql.js`), betiğe BAŞKA bir .sql okutmak, ya da
+ * kurulumu tamamen SİLMEK — üçünde de kapı yeşil kalıyordu ve betik yine "Setup Completed
+ * Successfully" yazıyordu. Olumsuz iddia, "kurulum gerçekten yapılıyor"un ne gerek ne yeter
+ * koşuludur. Aşağıdaki iki iddia bunu OLUMLU kurar: (a) tetik kuran dosya kümesi tam olarak
+ * tek kaynak, (b) betikler o dosyaya bağlı.
+ */
+const allScriptSources = import.meta.glob('/scripts/**/*.{js,mjs,cjs,ts,json,txt,sql}', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>
+
 const routeSources = import.meta.glob('/src/app/api/webhook/supabase/route.ts', {
   query: '?raw',
   import: 'default',
@@ -125,6 +157,13 @@ const standardSources = import.meta.glob('/docs/standards/rendering-cache-standa
  * prod'da tetik ÖLÜR. Kapının kendi varsayımı gerçekle çelişiyordu.
  *
  * Ders: bir kapı, doğru sandığı sırayı değil, ORTAMIN uyguladığı sırayı modellemelidir.
+ *
+ * AÇIK VARSAYIM (kapatılmadı): `byteCompare`, `sort`'un **C locale'de** koştuğu varsayımına
+ * dayanır. Workflow `LC_ALL` set etmiyor; glibc `sort` bir UTF-8 locale'de noktalamayı atlayan
+ * collation kullanır ve aynı-gün 8-hane/14-hane çiftini TERS dizer. Denetim iki senaryoda da
+ * ölçtü: bu model `LC_ALL=C sort` ile BİREBİR, varsayılan locale ile ters. Kalıcı düzeltme
+ * workflow'da `LC_ALL=C sort` yazmaktır — `.github/workflows/**` başka bir şeridin sahipliğinde
+ * olduğu için panodan bildirildi (EDGE). O yapılana kadar doğruluk runner locale'ine bağlıdır.
  */
 function byteCompare(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0
@@ -232,7 +271,7 @@ function webhookTriggerStatements(sql: string): Array<{ table: string; trigger: 
     const head = stmt.trimStart()
     // İfade `create trigger` ile BAŞLAMALI — bir fonksiyon gövdesinde/başka bir ifadenin ortasında
     // geçen `create trigger` metni gerçek tanım sayılmasın.
-    const create = /^create\s+(?:or\s+replace\s+)?(?:constraint\s+)?trigger\s+([\w."]+)[\s\S]*?\son\s+([\w."]+)/i.exec(head)
+    const create = CREATE_TRIGGER_HEAD_RE.exec(head)
     if (!create) continue
     if (!head.toLowerCase().includes(WEBHOOK_FN)) continue
     found.push({ table: normalizeIdent(create[2]), trigger: normalizeIdent(create[1]) })
@@ -268,7 +307,7 @@ function liveWebhookTriggers(): Set<string> {
         continue
       }
 
-      const create = /^create\s+(?:or\s+replace\s+)?(?:constraint\s+)?trigger\s+([\w."]+)[\s\S]*?\son\s+([\w."]+)/i.exec(head)
+      const create = CREATE_TRIGGER_HEAD_RE.exec(head)
       if (!create) continue
       if (!head.toLowerCase().includes(WEBHOOK_FN)) continue
       live.add(`${normalizeIdent(create[2])}::${normalizeIdent(create[1])}`)
@@ -337,10 +376,12 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
     expect(
       undated,
       `TARİHSİZ SQL DOSYASI: [${undated.join(', ')}]\n\n` +
-        'Yaşayan tetik durumu, CI\'ın uyguladığı sırayla (dosya adı bayt sırası) hesaplanır. ' +
-        'Adı tarihle başlamayan bir dosya bu sıraya oturmaz: içindeki "drop trigger" ait olmadığı ' +
-        'bir noktada uygulanır ve hiçbir şeye denk gelmeyebilir — prod\'da tetik ölür, vitrin ' +
-        'donar, kapı görmez. Denetimde ölçüldü. (Supabase CLI de bu dosyaları sıralayamaz.)',
+        'Migration adları Supabase adlandırma sözleşmesine uymalı (tarihle başlamalı): ' +
+        '`supabase migration list` ve ledger bu dosyaları sıralayamaz, insan gözü de sırayı okuyamaz.\n\n' +
+        'NOT (dürüstlük): bu bir SIRALAMA ARIZASI değil, adlandırma ihlalidir. Önceki sürüm ' +
+        '"tarihsiz ad sıralamayı bozar" diyordu; o gerekçe kaldırılan `chronoKey` modeline aitti. ' +
+        'Şimdiki model CI\'ın bayt sırasının aynısı olduğu için tarihsiz dosya da CI\'ın koyduğu ' +
+        'yere oturur — denetimde iki uçta da ölçüldü.',
     ).toEqual([])
   })
 
@@ -353,12 +394,20 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
     ).toBeGreaterThanOrEqual(5)
   })
 
-  it('handler sevk şekli beklenen biçimde (refactor olursa SESSİZ değil GÜRÜLTÜLÜ kırılsın)', () => {
+  it('AYRIŞTIRICI SAĞLIĞI: handler sevk biçimi tanınıyor (ön koşul)', () => {
+    // Bu bir ÖN KOŞULdur, bağımsız bir kural değil. Denetim (beşinci pas) şunu ölçtü: sevk
+    // `switch/case`'e çevrildiğinde — ki iddia mesajının kendisi bunu "doğru bir refactor olabilir"
+    // diye kabul ediyor — aşağıdaki iddialar da patlıyor ve GERÇEK DIŞI teşhis koyuyordu:
+    // "ÖKSÜZ TETİK … ya handler dalını ekle YA TETİĞİ KALDIR". Hiçbir dal eksik, hiçbir tetik
+    // öksüz değilken kapı geliştiriciye CANLI TETİKLERİ DÜŞÜRMESİNİ söylüyordu — bir kapının
+    // verebileceği en kötü yanlış-kırmızı. Ayrıştırıcı körse önce BU iddia konuşsun.
     expect(
       handlerBranches(routeSources[ROUTE_PATH] ?? '').size,
-      `${ROUTE_PATH} içinde "if (table === '<tablo>') {" biçiminde dal bulunamadı. Sevk mekanizması ` +
-        'switch/case ya da tablo→işleyici sözlüğüne çevrildiyse bu doğru bir refactor olabilir; ama ' +
-        'o zaman handlerBranches() ayrıştırıcısı da güncellenmelidir.',
+      `${ROUTE_PATH} içinde "if (table === '<tablo>') {" biçiminde dal bulunamadı.\n\n` +
+        'ÖNCE BUNU OKU: sevk mekanizması switch/case ya da tablo→işleyici sözlüğüne çevrildiyse bu ' +
+        'DOĞRU bir refactor olabilir ve aşağıdaki "HANDLER DALI EKSİK" / "ÖKSÜZ TETİK" hataları ' +
+        'YANLIŞ TEŞHİStir — hiçbir tetiği kaldırma. Yapılacak iş handlerBranches() ayrıştırıcısını ' +
+        'yeni biçime uyarlamaktır.',
     ).toBeGreaterThanOrEqual(3)
   })
 
@@ -390,7 +439,9 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
       orphanTriggers,
       `ÖKSÜZ TETİK: [${orphanTriggers.join(', ')}] tablosunda webhook tetiği var ama handler'da ` +
         'karşılığı yok. Her satır değişikliğinde boşuna HTTP isteği atılır ve hiçbir şey tazelenmez ' +
-        '— maliyet var, etki yok. Ya handler dalını ekle ya tetiği kaldır.',
+        '— maliyet var, etki yok. Ya handler dalını ekle ya tetiği kaldır.\n\n' +
+        'ÖNCE: "AYRIŞTIRICI SAĞLIĞI" iddiası da kırmızıysa BU TEŞHİS YANLIŞTIR — sevk biçimi ' +
+        'değişmiştir, tetikleri KALDIRMA; handlerBranches() ayrıştırıcısını güncelle.',
     ).toEqual([])
   })
 
@@ -426,21 +477,51 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
     ).toEqual([])
   })
 
-  it("kurulum SQL'i TEK KAYNAKTA — JS betikleri kendi kopyasını taşımıyor", () => {
-    const duplicates = Object.keys(bootstrapSources)
-      .filter((p) => p.endsWith('.js'))
-      .filter((p) => /create\s+trigger/i.test(stripTsComments(bootstrapSources[p])))
+  it('webhook tetiği kuran TEK dosya kurulum kaynağıdır (tüm scripts/** tarandı)', () => {
+    const scanned = Object.keys(allScriptSources)
+    expect(
+      scanned.length,
+      'scripts/** taraması boş döndü — glob bozulmuşsa bu iddia sessizce anlamsızlaşır.',
+    ).toBeGreaterThan(5)
+
+    const installers = scanned
+      .filter((p) => CREATE_TRIGGER_RE.test(allScriptSources[p]))
+      .filter((p) => allScriptSources[p].includes(WEBHOOK_FN))
       .sort()
 
     expect(
-      duplicates,
-      `KURULUM SQL'İ KOPYALANMIŞ: [${duplicates.join(', ')}]\n\n` +
-        `Bu betikler SQL'i ${SETUP_SQL_PATH}'ten okumalı, kendi içlerinde tutmamalı.\n` +
-        'NİÇİN BU KADAR SERT: aynı SQL üç yerde kopyalıyken üçü de eksik tablo kuruyordu ve hiçbir ' +
-        'kapı görmüyordu. Sonra "hangi kopya çalışıyor" sorusunu statik olarak cevaplamayı denedim; ' +
-        'o da kaçak verdi — tetikleri ölü bir değişkene taşımak ya da çağrıyı yoruma almak kapıyı ' +
-        'yeşil bırakıyordu (denetimde ÖLÇÜLDÜ). Erişilebilirlik analizi metin taramasıyla yapılamaz. ' +
-        'Tek kalıcı çözüm sorunun kendisini kaldırmak: KOPYA OLMASIN.',
+      installers,
+      `WEBHOOK TETİĞİ KURAN DOSYA KÜMESİ BEKLENENDEN FARKLI:\n  bulunan: [${installers.join(', ')}]\n` +
+        `  beklenen: [${SETUP_SQL_PATH}]\n\n` +
+        "Kurulum SQL'i TEK KAYNAKTA olmalı. İkinci bir dosya tetik kuruyorsa iki kopya ayrışır ve " +
+        '"hangisi güncel" sorusu geri gelir — bu repoda üç kopya varken üçü de eksik tablo kuruyordu. ' +
+        'Kaynak taşındıysa SETUP_SQL_PATH da güncellenmeli.',
+    ).toEqual([SETUP_SQL_PATH])
+  })
+
+  it('kurulum betikleri tek kaynağa BAĞLI (okuyor ve çalıştırıyor)', () => {
+    const scripts = Object.keys(bootstrapSources).filter((p) => p.endsWith('.js')).sort()
+    expect(scripts.length, 'Kurulum .js betiği bulunamadı — glob bozulmuş olabilir.').toBeGreaterThanOrEqual(2)
+
+    const unbound = scripts.filter((p) => {
+      const src = stripTsComments(bootstrapSources[p])
+      const readsSource = src.includes('webhook_setup.sql') && /readFileSync/.test(src)
+      const executes = /\.query\s*\(|execSync\s*\(|writeFileSync\s*\(/.test(src)
+      return !(readsSource && executes)
+    })
+
+    expect(
+      unbound,
+      `KURULUM BETİĞİ TEK KAYNAĞA BAĞLI DEĞİL: [${unbound.join(', ')}]
+
+` +
+        'Betik "webhook_setup.sql" dosyasını readFileSync ile okumalı ve bir yürütme çağrısına ' +
+        '(query / execSync / writeFileSync) beslemelidir. Denetimde ölçüldü: kurulum adımı tamamen ' +
+        'silindiğinde ya da başka bir .sql dosyasına yönlendirildiğinde betik hiçbir şey kurmuyor ' +
+        'ama yine "Setup Completed Successfully" yazıyordu — cetvelin "sahte başarı" dediği desen.\n\n' +
+        'DÜRÜST SINIR: bu iddia BAĞLILIĞI kanıtlar, ERİŞİLEBİLİRLİĞİ değil. Çağrının gerçekten ' +
+        'koşulan bir dalda olduğu statik olarak kanıtlanamaz (bu dosyanın tarihçesindeki en ' +
+        'inatçı ders). Gerçekçi drift yollarını görünür kılar; kasıtlı bir sabotajı değil.',
     ).toEqual([])
   })
 })

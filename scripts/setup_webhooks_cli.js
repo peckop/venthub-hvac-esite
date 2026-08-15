@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { fileURLToPath } from 'node:url';
 import path from 'path';
 import crypto from 'crypto';
 import { execSync } from 'child_process';
@@ -49,14 +50,22 @@ function updateEnvFile(filePath, key, value) {
 async function main() {
   console.log('=== Supabase Webhook Automated CLI Setup ===');
   
-  const envPath = path.resolve(process.cwd(), '.env');
-  const envLocalPath = path.resolve(process.cwd(), '.env.local');
+  // .env dosyalari REPO KOKUNE yazilir (betige goreli). process.cwd() kullanmak, betik baska
+  // bir dizinden kosuldugunda gizli anahtari YANLIS DIZINE dusuruyordu — denetimde olculdu.
+  const envPath = fileURLToPath(new URL('../.env', import.meta.url));
+  const envLocalPath = fileURLToPath(new URL('../.env.local', import.meta.url));
   
   const env = {
     ...parseEnv(envPath),
     ...parseEnv(envLocalPath)
   };
   
+  // ON KOSUL once: tek kaynak yoksa hicbir YAN ETKI olmasin (.env yazimi, DB baglantisi).
+  if (!fs.existsSync(fileURLToPath(new URL('webhook_setup.sql', import.meta.url)))) {
+    console.error('HATA: scripts/webhook_setup.sql bulunamadi — kurulum SQL tek kaynagi eksik.');
+    process.exit(1);
+  }
+
   const webhookPrefix = 'whsec_';
   let secret = env.SUPABASE_WEBHOOK_SECRET || process.env.SUPABASE_WEBHOOK_SECRET;
   if (!secret) {
@@ -74,10 +83,12 @@ async function main() {
   // 2. Prepare the SQL file
   // SQL TEK KAYNAKTAN gelir: scripts/webhook_setup.sql. Bkz. setup_webhooks.js icindeki not —
   // uc ayri kopya, uc ayri drift yolu demekti.
-  const setupSqlPath = path.resolve(process.cwd(), 'scripts/webhook_setup.sql');
+  // Yol BETIGE gore (bkz. setup_webhooks.js icindeki not: cwd'ye baglamak, .env'i yanlis dizine
+  // yazdiktan SONRA patlamaya yol aciyordu).
+  const setupSqlPath = fileURLToPath(new URL('webhook_setup.sql', import.meta.url));
   const sqlContent = fs.readFileSync(setupSqlPath, 'utf8').replace(/REPLACE_WITH_ENV_SECRET/g, secret);
   
-  const tempSqlFile = path.resolve(process.cwd(), 'scripts/temp_setup.sql');
+  const tempSqlFile = fileURLToPath(new URL('temp_setup.sql', import.meta.url));
   fs.writeFileSync(tempSqlFile, sqlContent, 'utf8');
   console.log('Created temporary SQL file scripts/temp_setup.sql');
   

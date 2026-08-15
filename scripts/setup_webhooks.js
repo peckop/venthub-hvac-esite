@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { fileURLToPath } from 'node:url';
 import path from 'path';
 import crypto from 'crypto';
 import pg from 'pg';
@@ -51,8 +52,10 @@ function updateEnvFile(filePath, key, value) {
 async function main() {
   console.log('=== Supabase Webhook Automated Setup ===');
   
-  const envPath = path.resolve(process.cwd(), '.env');
-  const envLocalPath = path.resolve(process.cwd(), '.env.local');
+  // .env dosyalari REPO KOKUNE yazilir (betige goreli). process.cwd() kullanmak, betik baska
+  // bir dizinden kosuldugunda gizli anahtari YANLIS DIZINE dusuruyordu — denetimde olculdu.
+  const envPath = fileURLToPath(new URL('../.env', import.meta.url));
+  const envLocalPath = fileURLToPath(new URL('../.env.local', import.meta.url));
   
   const env = {
     ...parseEnv(envPath),
@@ -162,7 +165,11 @@ async function main() {
     // .sql dosyasi). Uc kopya birbirinden ayrisabiliyordu ve 2026-08-15 denetimi ucunun de eksik
     // tablo kurdugunu olctu — hicbir kapi gormuyordu. Kopyayi silmek, "hangi kopya guncel"
     // sorusunu tamamen ortadan kaldirir.
-    const setupSqlPath = path.resolve(process.cwd(), 'scripts/webhook_setup.sql');
+    // Yol BETIGE gore cozulur, process.cwd()'e gore DEGIL. Denetim olctu: cwd'ye baglayinca
+    // betik repo koku disindan kosuldugunda ENOENT veriyordu — ama once .env'i YANLIS DIZINE
+    // yazip prod DB'ye baglanip CREATE EXTENSION kosturduktan SONRA. Yan etki, on kosul
+    // dogrulanmadan olmamali.
+    const setupSqlPath = fileURLToPath(new URL('webhook_setup.sql', import.meta.url));
     const sql = fs.readFileSync(setupSqlPath, 'utf8').replace(/REPLACE_WITH_ENV_SECRET/g, secret);
     
     await client.query(sql);
