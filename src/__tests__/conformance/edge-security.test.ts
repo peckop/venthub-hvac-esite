@@ -87,7 +87,7 @@ const KNOWN_VIOLATIONS = {
   // R6 — _shared/tenant_config.ts JWT payload'ını İMZASIZ çözüp `tenant_id` seçiyor.
   // Sahte JWT ile tenant sınırı aşılabilir (data bleeding). ÇÖZÜM: tenant_id'yi
   // doğrulanmış `getUser()` sonucunun app_metadata'sından al.
-  R6: ['supabase/functions/_shared/tenant_config.ts:29'],
+  R6: ['supabase/functions/_shared/tenant_config.ts:34'],
 
   // R7 (E7) — `supabase/config.toml`'da [functions."<ad>"] BLOĞU OLMAYAN fonksiyonlar.
   // Blok yokken değer örtük `true` olur; bu güvenli TARAF ama BİLİNÇLİ karar değildir:
@@ -162,7 +162,7 @@ const KNOWN_VIOLATIONS = {
   // ÇÖZÜM (§3.9): resolveTenantId async olup tenant_id'yi auth.getUser(jwt) sonucunun
   // app_metadata'sından okumalı; query/gövde yalnız sınıf (c)/(d) uçlarında, imza
   // kontrolünden SONRA kabul edilmeli. R6 (atob) ile birlikte düzeltilir.
-  R11: ['supabase/functions/_shared/tenant_config.ts:20'],
+  R11: ['supabase/functions/_shared/tenant_config.ts:25'],
 } as const
 
 /** R5 muafiyeti — çağıran Authorization header'ı GÖNDEREMEZ. Ada göre, kapsam değil. */
