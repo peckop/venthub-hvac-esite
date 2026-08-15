@@ -2053,7 +2053,9 @@ export const en: typeof tr = {
       desc: 'You need items in your cart to access the checkout page.',
       startShopping: 'Start Shopping'
     },
+    priceUpdated: 'Prices have been updated; the payment is continuing.',
     errors: {
+      priceVerificationFailed: 'Payment could not be started because prices cannot be verified right now. Please try again in a few minutes.',
       nameRequired: 'Full name is required',
       emailInvalid: 'Please enter a valid email address',
       phoneRequired: 'Phone number is required',

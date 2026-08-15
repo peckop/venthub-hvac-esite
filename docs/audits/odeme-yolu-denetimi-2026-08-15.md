@@ -8,6 +8,37 @@
 > aynı zamanda ilk test edici olacak. Bu belge o yolu **okuyarak** izler.
 > **Yöntem:** iddia yok. Her madde ya dosya/satır referansı ya da kontrol gruplu bir ölçüm taşır.
 
+## 📌 SONRAKİ DURUM — aynı gün, denetimden birkaç saat sonra
+
+Recep `SUPABASE_ACCESS_TOKEN`'ı yeniledi (`T030-VH` kapandı), böylece §7'de "ölçülemedi" diye
+kaydettiğim iki şeyden biri **kesinleşti**:
+
+- **CHECK kısıtı prod'dan doğrulandı.** `venthub_orders_status_check` =
+  `pending·confirmed·processing·shipped·delivered·cancelled`. `paid`/`failed` gerçekten yok;
+  `payment_status` ayrı kısıtta bu ikisini kabul ediyor. **Ö2 ve Ö3 artık çıkarım değil, ölçüm.**
+- **Hâlâ ölçülemedi:** `iyzico-payment`'ın service_role ile yaptığı çağrının 401 aldığı. Bunun için
+  service_role anahtarı gerekiyor; ajanın eline geçmemeli. Sandbox'ta tek bir gerçek ödeme turu
+  bunu da kapatır.
+
+**Ne onarıldı (ön-yüz yarısı, bu PR):**
+
+| Bulgu | Durum |
+|---|---|
+| Ö1 · `validateServerCart` anon anahtarla çağrılıyordu | ✅ `supabase.functions.invoke` → oturum JWT'si |
+| Ö1 · hata yutuluyordu (`console.warn` + devam) | ✅ **fail-closed** — doğrulama yoksa ödeme başlamaz |
+| Ö1 · `iyzico-payment` içindeki service_role çağrısı ve `catch {}` fallback'i | ❌ **açık** — EDGE şeridi (`T041-VH`) |
+| Ö2 · yoklayıcılar `status === 'paid'` bekliyordu | ✅ ikisi de `payment_status` okuyor |
+| Ö2 · `vh_pending_order`'ı kimse yazmıyordu | ✅ ödeme başlarken yazılıyor, anahtar tek kaynaktan |
+| Ö3 · başarısız ödeme `pending` donuyor | ❌ **açık** — callback'te, EDGE şeridi (`T042-VH`) |
+| Ö4 · `ALLOWED_ORIGINS` fail-open | ❌ **açık** — EDGE şeridi (`T043-VH`) |
+| Ö5 · `if (isTest) return true` | ✅ kaldırıldı |
+
+Kalıcı bekçi: `src/__tests__/conformance/payment-integrity.test.ts` (**INV-PAY-1**, 6 kural) —
+beş sabotajla kırmızı görüldü. Ayrıca `src/lib/__tests__/order.test.ts` yeniden yazıldı: eski hâli
+`Authorization: 'Bearer test-anon-key'` bekleyerek **hatanın kendisini kilitliyordu**.
+
+---
+
 ## 0. Tek cümlelik cevap
 
 **Mutlu yol büyük ihtimalle çalışır; ama sunucunun fiyat otoritesi tamamen ölü ve iki kurtarma

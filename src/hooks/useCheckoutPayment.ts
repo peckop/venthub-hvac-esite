@@ -7,11 +7,11 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import type { CartItem } from '@/types/cart'
 
 import { validateServerCart } from '../lib/order'
-import { 
-  CheckoutAddressInfo, 
-  CheckoutCustomerInfo, 
-  CheckoutInvoiceInfo, 
-  CheckoutLegalConsents 
+import {
+  CheckoutAddressInfo,
+  CheckoutCustomerInfo,
+  CheckoutInvoiceInfo,
+  CheckoutLegalConsents
 } from '../types/db-rows'
 import { getPriceHashLocal, getPriceHashServer } from '../utils/checkoutHelpers'
 
@@ -35,6 +35,25 @@ interface UseCheckoutPaymentProps {
   t: (key: string) => string
 }
 
+/** `PaymentWatcher`'ın okuduğu anahtar — tek kaynak burada tanımlı. */
+export const PENDING_ORDER_KEY = 'vh_pending_order'
+
+/**
+ * Sunucu fiyat doğrulaması yapılamadığında fırlatılır.
+ *
+ * `message` makine kodudur (log/Sentry); kullanıcıya gösterilecek metin `i18nKey`
+ * üzerinden sözlükten çözülür — `buildPaymentRequest`'teki hata sınıflarıyla aynı sözleşme.
+ */
+export class ServerValidationUnavailableError extends Error {
+  readonly code = 'SERVER_VALIDATION_UNAVAILABLE'
+  readonly i18nKey = 'checkout.errors.priceVerificationFailed'
+
+  constructor(cause: unknown) {
+    super(`SERVER_VALIDATION_UNAVAILABLE: ${cause instanceof Error ? cause.message : String(cause)}`)
+    this.name = 'ServerValidationUnavailableError'
+  }
+}
+
 /**
  * Manages the checkout payment flow, integrating with the server-side validation and Iyzico payment gateway.
  * Handles cart validation, generating payment requests, initializing the Iyzico form, and polling for successful payment.
@@ -49,12 +68,6 @@ interface UseCheckoutPaymentProps {
  * @param props.couponCode - Applied discount code (if any)
  * @param props.t - Translation function for localized error messages
  * @returns An object containing payment state (loading, token, URL), configuration functions, and the `initiatePayment` trigger.
- *
- * @example
- * const { initiatePayment, loading, iyzToken } = useCheckoutPayment({
- *   items, getCartTotal, user, clearCart, applyServerPricing,
- *   orchestrator, couponCode: null, t
- * });
  */
 export const useCheckoutPayment = ({
   items,
@@ -77,29 +90,30 @@ export const useCheckoutPayment = ({
   const [progressPct, setProgressPct] = useState(20)
   const [paymentFrameContent] = useState('')
 
-  // Checking for Vitest global in test environment safely without unsafe casting or unused expect-error
-  const isTest = 'vi' in globalThis
-
   const initiatePayment = async () => {
-    if (isTest) return true
-
     setLoading(true)
     try {
       let authoritativeTotal = getCartTotal()
-      
-      // Server-side validation
-      try {
-        const validation = await validateServerCart({ userId: user?.id })
-        const localHash = getPriceHashLocal(items)
-        const serverHash = getPriceHashServer(validation?.items, items)
 
-        if (serverHash !== localHash) {
-          applyServerPricing(validation?.items || [])
-          authoritativeTotal = validation?.totals?.subtotal || authoritativeTotal
-          toast('Fiyatlar güncellendi, ödeme devam ediyor.')
-        }
+      // ── Sunucu fiyat doğrulaması — FAIL-CLOSED ─────────────────────────────────
+      // Eskiden bu blok `try/catch` içindeydi ve hatayı `console.warn` ile yutup yerel
+      // toplamla devam ediyordu. Çağrı da anon anahtarla yapıldığı için HER ZAMAN 401
+      // alıyordu (ölçüldü — bkz. `lib/order.ts` başlığı): yani doğrulama hiç çalışmadı,
+      // çalışmadığı da hiç görülmedi. Doğrulama yapılamıyorsa ödeme BAŞLAMAZ; aksi hâlde
+      // tahsil edilecek tutarı tarayıcı belirlemiş olur.
+      let validation
+      try {
+        validation = await validateServerCart(supabase, { userId: user?.id })
       } catch (e) {
-        console.warn('validateServerCart failed:', e)
+        throw new ServerValidationUnavailableError(e)
+      }
+
+      const localHash = getPriceHashLocal(items)
+      const serverHash = getPriceHashServer(validation.items, items)
+      if (serverHash !== localHash) {
+        applyServerPricing(validation.items)
+        authoritativeTotal = validation.totals?.subtotal ?? authoritativeTotal
+        toast(t('checkout.priceUpdated'))
       }
 
       const { buildPaymentRequest } = await import('../views/checkout/buildPaymentRequest')
@@ -126,6 +140,18 @@ export const useCheckoutPayment = ({
 
       if (data?.data) {
         const d = data.data
+        // Sipariş kimliğini KALICI yere yaz: kullanıcı 3DS penceresinden dönemezse
+        // (banka uygulamasına geçiş, sekme düşmesi) `PaymentWatcher` onu buradan bulur.
+        // Bu anahtarı bugüne kadar hiçbir yer YAZMIYORDU → watcher hiç başlamıyordu.
+        if (d.orderId) {
+          try {
+            localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify({
+              orderId: d.orderId,
+              conversationId: d.conversationId || null,
+            }))
+          } catch { /* private mode: watcher devre dışı kalır, ödeme etkilenmez */ }
+        }
+
         if (d.paymentPageUrl && !d.token) {
           window.location.href = d.paymentPageUrl
           return
@@ -156,24 +182,31 @@ export const useCheckoutPayment = ({
     }
   }
 
-  // Polling for order status
+  // ── Sipariş durumu yoklaması ────────────────────────────────────────────────
+  // `status` DEĞİL `payment_status` okunur. `venthub_orders_status_check` yalnız
+  // pending/confirmed/processing/shipped/delivered/cancelled kabul ediyor (prod'dan
+  // doğrulandı, 2026-08-15) — `'paid'` orada YOK, `payment_status` kolonunun değeri.
+  // Bu yüzden `status === 'paid'` bekleyen eski koşul HİÇ gerçekleşemiyordu ve bu
+  // yoklama ölü bir güvenlik ağıydı. `sync_payment_status_with_status` tetikleyicisi
+  // status 'confirmed' olduğunda payment_status'ü 'paid' yapıyor → doğru sinyal bu.
   useEffect(() => {
-    if (isTest || !orderId) return
+    if (!orderId) return
     const timer = setInterval(async () => {
       const { data } = await supabase
         .from('venthub_orders')
-        .select('status')
+        .select('payment_status')
         .eq('id', orderId)
         .maybeSingle()
-      
-      if (data?.status === 'paid') {
+
+      if (data?.payment_status === 'paid') {
         clearInterval(timer)
+        try { localStorage.removeItem(PENDING_ORDER_KEY) } catch { /* yok sayılır */ }
         clearCart()
         router.push(`/payment-success?orderId=${orderId}&status=success`)
       }
     }, 3000)
     return () => clearInterval(timer)
-  }, [orderId, isTest, clearCart, router])
+  }, [orderId, clearCart, router])
 
   return {
     loading,

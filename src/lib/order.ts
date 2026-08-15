@@ -1,3 +1,7 @@
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+import type { Database } from '@/types/database.types'
+
 export interface ValidationItem { product_id: string; quantity: number; unit_price: number; price_list_id: string | null }
 export interface StockIssue { product_id: string; requested: number; available: number }
 interface PriceMismatch {
@@ -6,37 +10,48 @@ interface PriceMismatch {
   actual_price: number;
 }
 
-export interface ValidationResult { ok: boolean; items: ValidationItem[]; mismatches: PriceMismatch[]; stock_issues?: StockIssue[]; totals: { subtotal: number }; cart_id: string }
+export interface ValidationResult { ok: boolean; items: ValidationItem[]; mismatches: PriceMismatch[]; stock_issues?: StockIssue[]; totals: { subtotal: number }; cart_id?: string }
 
 /**
- * Validates a user's shopping cart against the server to ensure prices and stock are current.
- * Makes a request to the Supabase Edge Function `order-validate`.
+ * Sepeti sunucuya doğrulatır (fiyat + stok) — `order-validate` Edge Function'ı.
  *
- * @param input - The identifiers required to validate the cart
- * @param input.cartId - The unique identifier of the user's cart
- * @param input.userId - The unique identifier of the authenticated user
- * @returns A promise that resolves to the validation result, detailing stock issues, price mismatches, and calculated totals
- * @throws {Error} If Supabase environment variables are missing
- * @throws {Error} If the validation API endpoint returns a non-200 response
+ * ## ⭐ NİÇİN `supabase.functions.invoke` — ham `fetch` DEĞİL (2026-08-15, ölçülerek)
  *
- * @example
- * const result = await validateServerCart({ cartId: 'cart-123', userId: 'user-456' });
- * if (!result.ok) {
- *   console.log('Price mismatches:', result.mismatches);
- * }
+ * Önceki hâli `fetch`'e **anon anahtarı** `Authorization` başlığı olarak koyuyordu.
+ * `order-validate` ise kimliği gövdedeki `user_id`'den değil **token'dan** alır
+ * (`auth.getUser`). Anon anahtar bir proje JWT'sidir; `sub` claim'i yoktur, dolayısıyla
+ * bir kullanıcıya çözülemez. Ölçüm (kontrol gruplu, 2026-08-15):
+ *
+ * ```
+ * anon anahtarla     -> 401 {"error":"unauthorized","message":"Invalid or expired token"}
+ * Authorization'sız  -> 401 {"code":"UNAUTHORIZED_NO_AUTH_HEADER"}      (geçitten)
+ * çöp token          -> 401 {"code":"UNAUTHORIZED_INVALID_JWT_FORMAT"}  (geçitten)
+ * ```
+ *
+ * Üç FARKLI cevap: yani istek fonksiyona ulaşıyor ve fonksiyon anon anahtarı reddediyor.
+ * Sonuç: bu çağrı **her zaman** 401 alıyordu — yani sunucu fiyat doğrulaması hiç
+ * çalışmamıştı. Çağıran taraf hatayı yuttuğu için kimse fark etmedi.
+ *
+ * `functions.invoke` oturumun **kullanıcı JWT**'sini kendisi ekler — `iyzico-payment`
+ * çağrısı da zaten böyle yapılıyor ve o çalışıyor. Aynı istemciyi kullanmak, iki çağrının
+ * kimlik davranışının ayrışmasını da engeller.
+ *
+ * DI kuralı (CLAUDE.md §2): istemci parametre olarak alınır, modül düzeyinde import edilmez.
+ *
+ * @throws Doğrulama yapılamazsa hata fırlatır. **Yutma** — çağıran ödemeyi durdurmalıdır;
+ *   sessizce devam etmek, tutarı istemcinin belirlemesi demektir.
  */
-export async function validateServerCart(input: { cartId?: string; userId?: string }): Promise<ValidationResult> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  if (!url || !anon) throw new Error('Missing Supabase envs')
-  const resp = await fetch(`${url}/functions/v1/order-validate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', apikey: anon, Authorization: `Bearer ${anon}` },
-    body: JSON.stringify({ cart_id: input.cartId, user_id: input.userId })
+export async function validateServerCart(
+  supabase: SupabaseClient<Database>,
+  input: { cartId?: string; userId?: string },
+): Promise<ValidationResult> {
+  const { data, error } = await supabase.functions.invoke<ValidationResult>('order-validate', {
+    body: { cart_id: input.cartId, user_id: input.userId },
   })
-  if (!resp.ok) throw new Error(await resp.text())
-  return await resp.json()
+  if (error) throw error
+  // Boş gövde = doğrulama YAPILMADI. "ok" saymak, doğrulamayı atlamakla aynı şey.
+  if (!data || !Array.isArray(data.items)) {
+    throw new Error('ORDER_VALIDATE_EMPTY_RESPONSE')
+  }
+  return data
 }
-
-
-
