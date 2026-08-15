@@ -1779,6 +1779,8 @@ export const en: typeof tr = {
     reorderedToast: '{{count}} items added to cart',
     reorderNotFound: 'Items not found in stock',
     reorderError: 'Error during reorder',
+    /** SKU as of the order date (snapshot) — not the current catalog SKU. */
+    skuLabel: 'SKU: {{sku}}',
     shippingInfo: 'Shipping / Tracking',
     carrier: 'Carrier',
     trackingNumber: 'Tracking Number',

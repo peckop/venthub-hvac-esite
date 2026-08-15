@@ -2355,6 +2355,8 @@ export const tr = {
     reorderedToast: '{{count}} ürün sepete eklendi',
     reorderNotFound: 'Ürünler stokta bulunamadı',
     reorderError: 'Tekrar sipariş sırasında hata',
+    /** Sipariş anındaki SKU (snapshot) — katalogtaki güncel SKU değil. */
+    skuLabel: 'SKU: {{sku}}',
     shippingInfo: 'Kargo / Takip',
     carrier: 'Kargo Firması',
     trackingNumber: 'Takip Numarası',
