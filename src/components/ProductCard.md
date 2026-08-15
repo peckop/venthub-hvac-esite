@@ -3,11 +3,11 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\components\ProductCard.tsx
-skeleton_hash: d29f558e350cd40d
+skeleton_hash: c952d1ee37a51ab6
 entity_hashes:
   overview: 9d2b069c54b1d8b3
   style_tokens: f04c95b84c1173dc
-generated_at: 2026-08-15T06:31:57Z
+generated_at: 2026-08-15T07:02:08Z
 ---
 
 ## Genel Bakış
@@ -85,10 +85,6 @@ type StorefrontProduct = Product &
   - `addToCart` — sepete ürün ekleyen fonksiyon (closure'dan yakalanır, `useCart` hook'undan gelir)
   - `product` — eklenecek ürün nesnesi (closure'dan yakalanır, bileşen prop'undan gelir); `addToCart`'a argüman olarak verilir
 - **Dönüş**: `void` — yan etki tabanlıdır; varsayılan tıklama davranışını iptal eder, üst bileşen yayılmasını engeller ve koşula göre sepete ürün ekler
-
----
-
-**Not**: Fonksiyonda erken dönüş (`if (quoteMode) return`) mevcuttur; bu durumda `addToCart(product)` çağrısı çalışmaz. Fonksiyonun tüm amacı: tıklama olayını yutmak ve `quoteMode` dışı senaryolarda ürünü sepete eklemektir.
 
 ---
 

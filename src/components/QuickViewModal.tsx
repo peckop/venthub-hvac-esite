@@ -52,9 +52,11 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
                 Hızlı önizleme bir liste yüzeyidir: fiyatı burada göstermek hem ticari kararın
                 (Recep, 2026-08-15) hem PS-042 önbellek izolasyonunun dışına çıkar. Sepete ekleme
                 AÇIK kalır — `quoteMode` "satın alınabilir mi"yi söyler, gösterimi değil. */}
-            <div className="text-2xl font-bold text-primary-navy mb-4">
-              {t('common.requestQuote')}
-            </div>
+            {/* "Teklif İste" YALNIZ fiyatlanamayan üründe. Fiyatı olan ama gizlenen üründe hiçbir
+                şey yazılmaz — yoksa "Teklif İste" derken alttaki "Sepete Ekle" çalışır (çelişki). */}
+            {quoteMode ? (
+              <div className="text-2xl font-bold text-primary-navy mb-4">{t('common.requestQuote')}</div>
+            ) : null}
             <p className="text-sm text-steel-gray line-clamp-4 mb-6">
               {product.description || t('quickView.descFallback')}
             </p>

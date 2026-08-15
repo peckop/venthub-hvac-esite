@@ -107,12 +107,15 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
               {product.name}
             </h3>
             <div className="mt-2 flex items-baseline gap-3">
+              {/* ÜÇ HÂL, İKİ DEĞİL: "Teklif İste" YALNIZ gerçekten fiyatlanamayan üründe yazılır.
+                  Fiyatı OLAN ama gizlenen üründe hiçbir şey yazılmaz — yoksa kart "Teklif İste"
+                  derken yanındaki "Sepete Ekle" çalışır ve müşteriye çelişki gösterilir. */}
               <div className="text-xl font-bold text-primary-navy">
-                {showPrice ? (
-                  formatCurrency(displayPrice ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })
-                ) : (
-                  <span className="text-sm font-medium text-industrial-gray">{t('common.requestQuote')}</span>
-                )}
+                {showPrice
+                  ? formatCurrency(displayPrice ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })
+                  : quoteMode
+                    ? <span className="text-sm font-medium text-industrial-gray">{t('common.requestQuote')}</span>
+                    : null}
               </div>
               {showPrice && taxLabel && <span className="text-xs text-steel-gray font-medium uppercase">{taxLabel}</span>}
             </div>
@@ -179,12 +182,13 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
 
           <div className="mt-auto pt-3 border-t border-light-gray flex items-center justify-between">
             <div className="flex flex-col">
+              {/* Bkz. liste görünümündeki not: fiyatı olan ama gizlenen üründe hiçbir şey yazılmaz. */}
               <div className="text-lg font-bold text-primary-navy tracking-tight">
-                {showPrice ? (
-                  formatCurrency(displayPrice ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })
-                ) : (
-                  <span className="text-xs font-semibold text-industrial-gray">{t('common.requestQuote')}</span>
-                )}
+                {showPrice
+                  ? formatCurrency(displayPrice ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })
+                  : quoteMode
+                    ? <span className="text-xs font-semibold text-industrial-gray">{t('common.requestQuote')}</span>
+                    : null}
               </div>
               {/* Izgara kartında KDV etiketi BİLİNÇLİ olarak yok: master'da da yoktu.
                   Eklemek kart yüksekliğini fiyatlı/fiyatsız ürünlerde farklılaştırır —

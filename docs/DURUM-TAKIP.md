@@ -4,10 +4,10 @@
 > **Son güncelleme: 2026-08-15 — FİYATLAR CANLI + ÜÇ OTURUM PARALEL ÇALIŞIYOR:** Fiyat motoru seed'i
 > koşuldu, vitrin artık fiyat gösteriyor (detay: Controller #3). Çok-oturumlu koordinasyon modeli
 > (`#511`/`#514`) canlı — pano `C:/tmp/venthub-board/`, cetvel `standards/multi-session-coordination-standard.md`.
-> **Bu panoda EKSİK:** bugün aktif olan iki oturumun (**EDGE** `4397deef` — edge deploy/drift/CI · **LAUNCH**
-> `eda80084` — hukuki metinler/lansman denetimi) kendi bölümü yok; 14-15 Ağustos'ta sevk ettikleri
-> `#509 #512 #515 #516 #517 #518` burada görünmüyor. Kural gereği kendi bölümlerini **kendileri** açmalı
-> (panodan istendi). Yeni cetvel: `standards/rendering-cache-standard.md` (render/önbellek/fiyat yüzeyi).
+> **EKSİK (düzeltildi):** LAUNCH kendi bölümünü **#519 ile açtı** (§Controller #4) — ilk yazdığım
+> "bölümü yok" notu bayattı, kendisi kanıtla düzeltti. Kalan eksik yalnız **EDGE** (`4397deef` —
+> edge deploy/drift/CI): `#509 #515 #516 #517` burada görünmüyor; kural gereği kendi bölümünü
+> **kendisi** açmalı (panodan istendi). Yeni cetvel: `standards/rendering-cache-standard.md`.
 >
 > **Önceki: 2026-08-10 — YAKALAMA (7 haftalık boşluk kapatıldı) + SLUG LOKALİZASYONU CANLI:**
 > **(A) Gemini dönemi (Haz sonu–Ağu):** katalog hattı Kademe-1 Gemini orkestrasyonuyla (venthub-pdf-ingestor, M0-M5 çok-ajan, 69/69 pytest) TAMAMLANDI — 28 katalog CSV (374 ürün) + 3 fiyat listesi; walkthrough.md'de seri-bazlı mühendislik notları. **(B) 2026-08-10 denetim+düzeltme günü:** CSV tam denetimi (format ✅, mükerrer 0, fiyat-eşleşme 348/374; tek açık = 230 satır kategori sapması) → 417 düzeltme ingestor master'da · **taksonomi cetveli v1.2** `#455` (12 dal, +parking-jet-fan; ingestor doc-fork kapandı; yeni kategoriler: acid-resistant-fans/frequency-converters/electric-duct-heaters — DB'de Kademe-2'de açılacak) · **TR kategori-adı sızıntısı 4 yüzeyde kapatıldı** `#456` (PDP breadcrumb+özellik, Footer, kategori SEO metadata → getCategoryDisplayName SSOT) · **⭐ SLUG LOKALİZASYONU** `#457` (kanonik=EN slug, görünen URL dile göre `metadata.slug={tr,en}`; `/tr/category/konut-tipi-havalandirma` ✅ 200, eski URL 308; migration prod'a uygulandı+canlı doğrulandı; SSOT `docs/plans/slug-localization-2026-08-10.md`). NLM MCP arızası kökten çözüldü (Gemini Notebook rebrand + `nlm login --clear`; memory `nlm-auth-issue`). İş bölümü modeli oturdu: **Fable=controller (plan/brief/kapı/migration), Opus subagent=kod, script=deterministik veri.** **ZİNCİR SIRADAKİ: Kademe-2 loader (CSV→DB + 4 yeni kategori migration'ı) → ₺0-fiyat "teklif al" ara-çözümü → fiyat motoru (177 fiyatsız) → görseller (390).**

@@ -21,10 +21,31 @@
 begin;
 
 -- 1) product_prices: fiyat değişince PDP tazelensin (kart/keşif etkilenmez — PS-042)
+--
+--    İKİ AYRI TETİK, TEK DEĞİL. Sebep ölçüldü: `materializePrices` tabloyu KOMPLE yeniden
+--    yazıyor (1044 satır toplu upsert). Tek bir `after insert or delete or update` tetiği
+--    satır başına webhook attığı için, fiyatların HİÇBİRİ değişmese bile her "yeniden hesapla"
+--    tıklaması 1044 HTTP çağrısı üretirdi — hepsi aynı ~32 aile yolunu tazelemek için.
+--    `WHEN` koşulu yalnız UPDATE'te kurulabilir (INSERT'te OLD, DELETE'te NEW yoktur), o yüzden
+--    ekleme/silme ayrı tetikte kalır ve güncelleme tetiği gerçekten DEĞİŞEN satırlarla sınırlanır.
 drop trigger if exists on_product_prices_change on public.product_prices;
-create trigger on_product_prices_change
-  after insert or delete or update on public.product_prices
+drop trigger if exists on_product_prices_ins_del on public.product_prices;
+drop trigger if exists on_product_prices_upd on public.product_prices;
+
+create trigger on_product_prices_ins_del
+  after insert or delete on public.product_prices
   for each row execute function public.handle_supabase_webhook();
+
+create trigger on_product_prices_upd
+  after update on public.product_prices
+  for each row
+  when (
+    old.net_price   is distinct from new.net_price
+    or old.gross_price is distinct from new.gross_price
+    or old.is_active   is distinct from new.is_active
+    or old.currency    is distinct from new.currency
+  )
+  execute function public.handle_supabase_webhook();
 
 -- 2) product_families: aile verisi değişince ilgili aile tag'i + PDP tazelensin
 --    (route.ts case 4 zaten var — ölü kod yolunu canlandırıyoruz)
@@ -38,11 +59,23 @@ do $$
 begin
   if not exists (
     select 1 from pg_trigger
-    where tgname = 'on_product_prices_change'
+    where tgname = 'on_product_prices_ins_del'
       and tgrelid = 'public.product_prices'::regclass
       and not tgisinternal
   ) then
-    raise exception 'Guard: on_product_prices_change tetiği oluşmadı';
+    raise exception 'Guard: on_product_prices_ins_del tetiği oluşmadı';
+  end if;
+
+  -- WHEN koşulu SESSİZCE düşerse tetik yine kurulur ama gürültü filtresi kaybolur;
+  -- bu yüzden koşulun VARLIĞI ayrıca doğrulanır (tgqual dolu olmalı).
+  if not exists (
+    select 1 from pg_trigger
+    where tgname = 'on_product_prices_upd'
+      and tgrelid = 'public.product_prices'::regclass
+      and not tgisinternal
+      and tgqual is not null
+  ) then
+    raise exception 'Guard: on_product_prices_upd tetiği yok ya da WHEN koşulu boş';
   end if;
 
   if not exists (

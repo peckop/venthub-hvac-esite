@@ -3,31 +3,37 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\api\webhook\supabase\route.ts
-skeleton_hash: 08b98e8e9b42745f
+skeleton_hash: 05cf604b350f9202
 entity_hashes:
-  func:POST: 2fcd3f5f1c25bb41
+  func:POST: f2683c1e5cf11a92
+  func:familySlugById: ba6879dff9753851
   func:hasDiscoverySensitiveChange: accd627030a7d82e
-  overview: b32240b75b2cdc96
-generated_at: 2026-08-15T06:32:18Z
+  overview: a6f7f2dc4bbac1b5
+generated_at: 2026-08-15T07:02:33Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase veritabanında gerçekleşen değişiklikleri (INSERT, UPDATE, DELETE) izleyerek bir Next.js uygulamasının sayfa önbelleğini gerçek zamanlı olarak yeniler. Temel işlevi, gelen webhook isteklerini HMAC-SHA256 imzası ile güvenli bir şekilde doğrulamak, olay türünü ve tabloyu analiz etmek ve önceden tanımlı bir haritaya göre ilgili sayfaların yeniden derlenmesini (revalidation) tetikleyerek uygulama arayüzünün güncel kalmasını sağlamaktır.
+
+Bu modül, Supabase veritabanında gerçekleşen veri değişimlerini (INSERT, UPDATE, DELETE) yakalayan bir webhook API noktasıdır. Gelen istekleri HMAC-SHA256 imza ile doğruladıktan sonra, olay türünü ve etkilenen kaydı analiz ederek Next.js uygulamasının ilgili sayfa önbelleklerini yenilemesini tetikler. Böylece veritabanındaki değişikliklerin kullanıcı arayüzüne anlık olarak yansımasını sağlar.
 
 ## Fonksiyon Grupları
-### HTTP Webhook İşleyici
-Modülün tek dışsal giriş noktasıdır. Gelen POST isteğinin HMAC imzasını doğrular, JSON payload'ını ayrıştırır ve olay türüne/ tablosuna göre önbellek yenileme sürecini başlatır.
+
+### Webhook API Giriş Noktası
+Modülün tek dışa açık HTTP endpoint'idir. Supabase'den gelen POST isteklerini alır, HMAC-SHA256 imza doğrulamasını gerçekleştirir, payload'daki veri değişimini analiz eder ve Next.js revalidation mekanizmasını tetikleyerek önbellek yenileme sürecini başlatır.
+
 - POST
 
-### Değişiklik Analizi Yardımcı Fonksiyonu
-Bir veritabanı kaydındaki değişikliklerin, uygulama keşif (discovery) mantığı için hassas olup olmadığını belirler. POST işleyicisi tarafından çağrılarak önbellek yenileme kararının desteklenmesine katkı sağlar.
-- hasDiscoverySensitiveChange
+### Değişim Analizi Yardımcı Fonksiyonları
+POST işleyicisi tarafından iç çağrım yoluyla kullanılan yardımcı fonksiyonlardır. Bir kaydın keşif (discovery) süreçlerini etkileyip etkilemediğini belirlemek ve aile slug'ını çözümlemek gibi destekleyici analiz işlemlerini yürütürler.
+
+- hasDiscoverySensitiveChange, familySlugById
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için aksiyom üretilebilmesi için fonksiyon gövde Implementasyonları gereklidir. Verilen sadece fonks
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -40,6 +46,17 @@ Bu modül için aksiyom üretilebilmesi için fonksiyon gövde Implementasyonlar
 - `record`: `Record<string, unknown>` — Karşılaştırmaya tabi tutulacak güncel (yeni) ürün kaydı.
 - `oldRecord`: `Record<string, unknown>` — Karşılaştırma için kullanılacak önceki (eski) ürün kaydı.
 **Dönüş**: `boolean` — Duyarlı herhangi bir alanda fark varsa `true`, aksi halde `false`.
+
+### familySlugById
+
+**Ne yapar**: Verilen `familyId` ile `product_families` tablosundan ilgili ürün ailesinin slug'ını getirir. Bu slug, ürün detay sayfasının (PDP) kanonik URL yolunu (`/[lang]/products/[family-slug]`) oluşturmak için kullanılır. Üç farklı tablodaki (`products`, `inventory_movements`, `product_prices`) yenileme mantığı aynı slug çözümlemesini gerektirdiğinden, çözüm tek bir fonksiyonda merkezileştirilmiştir.
+
+**Nasıl yapar**: Fonksiyon önce `familyId` parametresinin tanımlı olup olmadığını kontrol eder; tanımlı değilse doğrudan `null` döner. Tanımlıysa Supabase istemcisi (`supabase`) üzerinden `product_families` tablosuna bir `select('slug')` sorgusu gönderir, `eq('id', familyId)` ile filtreleme yapar ve `.single()` ile tek bir satır bekler. Dönen `data` nesnesinden `slug` alanı çıkarılır; eğer `data`本身`null`/`undefined` ise veya `slug` alanı mevcut değilse `null` döner. Bu tekil sorgulama yaklaşımı, aile slug'ının her zaman benzersiz ve tek olduğunu garantiler.
+
+**Parametreler**:
+- `familyId`: `string | undefined` — Ürün ailesinin benzersiz tanımlayıcısı. `undefined` geldiğinde fonksiyon erken dönüş yapar ve veritabanı sorgusu gönderilmez.
+
+**Dönüş**: `Promise<string | null>` — Aile slug'ı başarıyla bulunursa ilgili string değeri, bulunamazsa veya parametre geçersizse `null` değeri döner.
 
 ### POST
 **Ne yapar**: Supabase veritabanından gelen webhook isteklerini alır, tablo bazlı mantıkla ilgili sayfaları ve önbellek tag'lerini yeniden doğrulama (revalidation) işlemine tabi tutar. Bu sayede veritabanındaki değişikliklerin Next.js uygulamasına anlık olarak yansımasını sağlar.
@@ -85,50 +102,65 @@ Bu modül için aksiyom üretilebilmesi için fonksiyon gövde Implementasyonlar
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/app/api/webhook/supabase/route.ts::hasDiscoverySensitiveChange
+### [N1_NASIL] AST Pointer: src\app\api\webhook\supabase\route.ts::hasDiscoverySensitiveChange
 - **params**: (record: Record<string, unknown>, oldRecord: Record<string, unknown>)
 - **ic_degiskenler**: 
-  - `PRODUCT_DISCOVERY_SENSITIVE_FIELDS` — Outer scope sabiti: Hassas keşif alanlarının listesi (as_expression ile referans alınır)
-- **Dönüş**: boolean
+  - `PRODUCT_DISCOVERY_SENSITIVE_FIELDS` — keşif duyarlı alanların listesini tutan sabit, some() ile döngüde kullanılır
+- **Dönüş**: boolean (değişiklik varsa true)
 
-### [N2_NASIL] AST Pointer: src/app/api/webhook/supabase/route.ts::POST
+### [N2_NASIL] AST Pointer: src\app\api\webhook\supabase\route.ts::familySlugById
+- **params**: (familyId: string | undefined)
+- **ic_degiskenler**: 
+  - `data` — supabase sorgusundan dönen product_families kaydı, `data?.slug` olarak erişilir
+- **Dönüş**: Promise<string | null> (aile slug'ı veya null)
+
+### [N3_NASIL] AST Pointer: src\app\api\webhook\supabase\route.ts::POST
 - **params**: (request: NextRequest)
-- **ic_degiskenler**:
-  - `payload` — request.json() ile parse edilen Supabase webhook payload'u, `SupabaseWebhookPayload` tipine assert edilir
-  - `webhookSecret` — request.headers.get('x-webhook-secret') ile alınan HMAC secret header değeri
-  - `expectedSecret` — process.env.SUPABASE_WEBHOOK_SECRET'dan gelen beklenen secret değeri
-  - `table` — payload'tan destructuring ile alınan tablo adı (payload.table)
-  - `type` — payload'tan destructuring ile alınan event tipi (payload.type)
-  - `record` — payload'tan destructuring ile alınan yeni kayıt (payload.record)
-  - `old_record` — payload'tan destructuring ile alınan eski kayıt (payload.old_record)
-  - `activeRecord` — record || old_record değerini alan değişken, mevcut kaydı temsil eder
-  - `tenantId` — activeRecord.tenant_id alanından cast edilen kiracı ID'si (string | undefined)
-  - `revalidatedPaths` — Revalidate edilen yolların toplandığı string array
-  - `revalidatedTags` — Revalidate edilen tag'lerin toplandığı string array
-  - `discoveryComparisonSkipped` — PS-042: products UPDATE'inde old_record yoksa alan-bazlı karşılaştırmanın atlandığını belirten boolean flag
-  - `shouldRevalidateDiscovery` — Keşif tag'lerinin tetiklenip tetiklenmeyeceğini belirleyen boolean değişken (varsayılan true)
-  - `productSlug` — activeRecord.slug alanından cast edilen ürün slug'ı (products tablosunda kullanılır)
-  - `categoryId` — activeRecord.category_id alanından cast edilen kategori ID'si (products tablosunda kullanılır)
-  - `category` — supabase.from('categories') sorgusundan dönen kategori verisi (products tablosunda kategori yolu revalidate için)
-  - `categorySlug` — activeRecord.slug alanından cast edilen kategori slug'ı (categories tablosunda kullanılır)
-  - `productId` — activeRecord.product_id alanından cast edilen ürün ID'si (inventory_movements ve product_prices tablolarında kullanılır)
-  - `product` — supabase.from('products') sorgusundan dönen ürün verisi (inventory_movements tablosunda ürün ve kategori yolları revalidate için)
-  - `familySlug` — activeRecord.slug alanından cast edilen aile slug'ı (product_families tablosunda kullanılır)
-  - `family` — supabase.from('product_families') sorgusundan dönen aile verisi (product_prices tablosunda aile PDP yolu revalidate için)
-  - `error` — try-catch bloğunda yakalanan hata nesnesi
-  - `errorMsg` — error instanceof Error kontrolünden sonra error.message veya String(error) değeri
-- **Dönüş**: NextResponse (JSON response döner: { revalidated, event, revalidatedPaths, revalidatedTags, discoveryComparisonSkipped, timestamp } veya error durumunda { error })
+- **ic_degiskenler**: 
+  - `payload` — request.json() ile parse edilen SupabaseWebhookPayload nesnesi
+  - `webhookSecret` — request.headers.get('x-webhook-secret') ile alınan HMAC token
+  - `expectedSecret` — process.env.SUPABASE_WEBHOOK_SECRET ile doğrulanan beklenen secret
+  - `table` — payload.table (hangi tablo)
+  - `type` — payload.type (INSERT/UPDATE/DELETE)
+  - `record` — payload.record (yeni/şu anki kayıt)
+  - `old_record` — payload.old_record (eski kayıt, UPDATE'lerde gelir)
+  - `activeRecord` — record || old_record (var olan aktif kayıt)
+  - `tenantId` — activeRecord.tenant_id (kiracının ID'si)
+  - `revalidatedPaths` — tazelenen path'lerin string array'i, yanıta eklenir
+  - `revalidatedTags` — tazelenen tag'lerin string array'i, yanıta eklenir
+  - `discoveryComparisonSkipped` — products UPDATE'inde alan-bazlı karşılaştırmanın atlanıp atlanmadığını gösterir boolean
+  - `shouldRevalidateDiscovery` — keşif tag'lerinin tetiklenip tetiklenmeyeceğini belirleyen boolean
+  - `familySlug` — familySlugById() çağrısıyla elde edilen ürün ailesinin slug'ı (products/inventory_movements/product_families/Product_prices bloklarında kullanılır)
+  - `categoryId` — activeRecord.category_id (ürünün kategori ID'si, products bloğunda kullanılır)
+  - `category` — supabase.from('categories').select('slug')...single() ile getirilen kategori nesnesi
+  - `categorySlug` — activeRecord.slug (categories tablosunda update edilen kategorinin slug'ı)
+  - `productId` — activeRecord.product_id (inventory_movements ve product_prices tablolarında kullanılır)
+  - `product` — supabase.from('products').select('family_id, category_id')...single() ile getirilen ürün nesnesi
+- **Dönüş**: NextResponse (yanıt JSON'u includes: revalidated, event, revalidatedPaths, revalidatedTags, discoveryComparisonSkipped, timestamp)
 
 ---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    route_ts__POST["POST"]
+    route_ts__familySlugById["familySlugById"]
+    route_ts__hasDiscoverySensitiveChange["hasDiscoverySensitiveChange"]
+    route_ts__POST --> route_ts__hasDiscoverySensitiveChange
+    route_ts__POST --> route_ts__familySlugById
+```
 
 ## NODE ID STANDARD
 
   file: src\app\api\webhook\supabase\route.ts
   function: src\app\api\webhook\supabase\route.ts::hasDiscoverySensitiveChange
+  function: src\app\api\webhook\supabase\route.ts::familySlugById
   function: src\app\api\webhook\supabase\route.ts::POST
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: POST
+  export: familySlugById
   export: hasDiscoverySensitiveChange

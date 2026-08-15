@@ -39,6 +39,22 @@ interface SupabaseWebhookPayload {
   old_record: Record<string, unknown> | null
 }
 
+/**
+ * Aile slug'ı — PDP'nin KANONİK adresi bunun üzerinden kurulur
+ * (`/[lang]/products/[family-slug]`). Üç dal (products · inventory_movements ·
+ * product_prices) aynı çözümü yaptığı için tek yerde tutulur; ayrı ayrı yazıldığında
+ * ikisi ürün slug'ını kullanıp sessizce yanlış yolu tazeliyordu.
+ */
+async function familySlugById(familyId: string | undefined): Promise<string | null> {
+  if (!familyId) return null
+  const { data } = await supabase
+    .from('product_families')
+    .select('slug')
+    .eq('id', familyId)
+    .single()
+  return data?.slug ?? null
+}
+
 export async function POST(request: NextRequest) {
   try {
     const payload = (await request.json()) as SupabaseWebhookPayload
@@ -96,12 +112,18 @@ export async function POST(request: NextRequest) {
 
     // 1. Table: products
     if (table === 'products') {
-      const productSlug = activeRecord.slug as string | undefined
-      if (productSlug) {
-        // Revalidate the product details pages for all locales
-        revalidatePath(`/tr/products/${productSlug}`)
-        revalidatePath(`/en/products/${productSlug}`)
-        revalidatedPaths.push(`/tr/products/${productSlug}`, `/en/products/${productSlug}`)
+      /**
+       * PDP AİLE KANONİKTİR (`/[lang]/products/[family-slug]`) — ÜRÜN slug'ı değil.
+       * Burada eskiden `activeRecord.slug` (ürün slug'ı) tazeleniyordu; prerender edilmiş
+       * yol aile slug'ı olduğu için o çağrı VAR OLMAYAN bir yolu geçersiz kılıyordu, yani
+       * ürün güncellemesi PDP'yi hiç tazelemiyordu. Sessiz bir kaçaktı; 2026-08-15 denetimi
+       * yakaladı. `family_id` payload'da zaten var (`to_jsonb(NEW)`), ek sorgu gerekmez.
+       */
+      const familySlug = await familySlugById(activeRecord.family_id as string | undefined)
+      if (familySlug) {
+        revalidatePath(`/tr/products/${familySlug}`)
+        revalidatePath(`/en/products/${familySlug}`)
+        revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
       }
 
       if (shouldRevalidateDiscovery) {
@@ -148,16 +170,18 @@ export async function POST(request: NextRequest) {
       if (productId) {
         const { data: product } = await supabase
           .from('products')
-          .select('slug, category_id')
+          .select('family_id, category_id')
           .eq('id', productId)
           .single()
 
         if (product) {
-          const productSlug = product.slug
-          if (productSlug) {
-            revalidatePath(`/tr/products/${productSlug}`)
-            revalidatePath(`/en/products/${productSlug}`)
-            revalidatedPaths.push(`/tr/products/${productSlug}`, `/en/products/${productSlug}`)
+          // Ürün slug'ı DEĞİL aile slug'ı — PDP aile kanoniktir; eskisi var olmayan yolu
+          // tazeliyordu (stok hareketi PDP'yi hiç yenilemiyordu).
+          const familySlug = await familySlugById(product.family_id ?? undefined)
+          if (familySlug) {
+            revalidatePath(`/tr/products/${familySlug}`)
+            revalidatePath(`/en/products/${familySlug}`)
+            revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
           }
 
           // If product is linked to a category, revalidate category path too
@@ -194,6 +218,16 @@ export async function POST(request: NextRequest) {
       revalidatedTags.push(HOME_DATA_TAG, PRODUCTS_DISCOVERY_TAG)
 
       if (familySlug) {
+        /**
+         * PDP YOLU DA TAZELENMELİ. Eskiden yalnız `familyTag` çağrılıyordu ve o tag'i
+         * tüketen HİÇBİR `unstable_cache` yok — yani çağrı sessiz bir no-op'tu; aile adı
+         * değişince PDP en fazla ISR yedeğiyle (1 saat) güncelleniyordu. PDP verisi
+         * `React.cache()` ile sarılı olduğu için etkili olan şey `revalidatePath`'tir.
+         */
+        revalidatePath(`/tr/products/${familySlug}`)
+        revalidatePath(`/en/products/${familySlug}`)
+        revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
+
         revalidateTag(familyTag(familySlug))
         revalidatedTags.push(familyTag(familySlug))
       }
@@ -203,27 +237,18 @@ export async function POST(request: NextRequest) {
     else if (table === 'product_prices') {
       const productId = activeRecord.product_id as string | undefined
       if (productId) {
-        // PDP artık AİLE kanoniktir (/[lang]/products/[family-slug]), ürün slug'ı değil —
-        // bkz. table === 'inventory_movements' bloğundaki product lookup deseni.
+        // PDP AİLE kanoniktir (/[lang]/products/[family-slug]), ürün slug'ı değil.
         const { data: product } = await supabase
           .from('products')
           .select('family_id')
           .eq('id', productId)
           .single()
 
-        if (product?.family_id) {
-          const { data: family } = await supabase
-            .from('product_families')
-            .select('slug')
-            .eq('id', product.family_id)
-            .single()
-
-          const familySlug = family?.slug
-          if (familySlug) {
-            revalidatePath(`/tr/products/${familySlug}`)
-            revalidatePath(`/en/products/${familySlug}`)
-            revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
-          }
+        const familySlug = await familySlugById(product?.family_id ?? undefined)
+        if (familySlug) {
+          revalidatePath(`/tr/products/${familySlug}`)
+          revalidatePath(`/en/products/${familySlug}`)
+          revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
         }
       }
 

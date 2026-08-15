@@ -16,7 +16,7 @@
 
 | Sınıf | Nasıl | Nerede | Neden |
 |---|---|---|---|
-| **Statik + talep-üzerine ISR** | `generateStaticParams()`, `revalidate` yok, tazeleme webhook ile | Vitrin: ana sayfa · kategori · alt kategori · marka · ürün (PDP) · destek konuları | LCP/SEO. Bu sayfalar herkese aynı; istek başına üretmek israf |
+| **Statik + talep-üzerine ISR** | `generateStaticParams()` + **`revalidate = 3600` (yedek)**; birincil tazeleme webhook ile | Vitrin: ana sayfa · kategori · alt kategori · marka · ürün (PDP). *(`destek/konular` statik içerik — yedek eklenmedi)* | LCP/SEO. Bu sayfalar herkese aynı; istek başına üretmek israf |
 | **Tam statik** | `export const dynamic = 'force-static'` | Yasal metinler · hakkımızda · iletişim | İçerik deploy dışında değişmez |
 | **Dinamik** | `export const dynamic = 'force-dynamic'` | Admin/** · hesap/** · API rotaları | Kullanıcıya/oturuma özel; önbelleklenirse veri sızar |
 
@@ -54,11 +54,21 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 
 | Tablo | Tetik | Handler | Ne tazelenir |
 |---|---|---|---|
-| `products` | `on_products_change` | var | ürün yolu + (alan-duyarlı) keşif tag'leri |
+| `products` | `on_products_change` | var | **aile** PDP yolu + (alan-duyarlı) keşif tag'leri |
 | `categories` | `on_categories_change` | var | kategori yolları |
-| `inventory_movements` | `on_inventory_movements_change` | var | ürün + kategori yolu (**keşif'e dokunmaz** — PS-042) |
-| `product_families` | `on_product_families_change` | var | aile yolu |
-| `product_prices` | `on_product_prices_change` | var | **yalnız** o ürünün PDP yolu — keşif tag'lerine DOKUNMAZ (PS-042) |
+| `inventory_movements` | `on_inventory_movements_change` | var | **aile** PDP yolu + kategori yolu (**keşif'e dokunmaz** — PS-042) |
+| `product_families` | `on_product_families_change` | var | aile PDP yolu + keşif tag'leri |
+| `product_prices` | `on_product_prices_ins_del` + `on_product_prices_upd` (`WHEN`) | var | **yalnız** o ürünün aile PDP yolu — keşif tag'lerine DOKUNMAZ (PS-042) |
+
+> **PDP AİLE KANONİKTİR** (`/[lang]/products/[family-slug]`). Yol tazelenirken **ürün** slug'ı
+> kullanmak sessiz bir kaçaktır: prerender edilmiş yol aile slug'ı olduğu için var olmayan bir
+> yol geçersiz kılınır ve sayfa hiç yenilenmez. `products` ve `inventory_movements` dalları tam
+> bunu yapıyordu (2026-08-15 denetimi yakaladı); üçü de artık tek yardımcıdan (`familySlugById`)
+> çözüyor.
+>
+> **`revalidateTag` yalnız o tag'i tüketen bir `unstable_cache` varsa iş görür.** `familyTag`'in
+> tüketicisi yoktu → çağrı sessiz no-op'tu. PDP verisi `React.cache()` ile sarılı olduğundan
+> PDP için etkili olan **`revalidatePath`**'tir.
 
 Tetik fonksiyonu `public.handle_supabase_webhook()` jeneriktir (`TG_TABLE_NAME` ile tabloyu
 kendi okur) — yeni tablo eklemek yalnız `create trigger` demektir.
@@ -68,9 +78,11 @@ eklendiğinde test uyarsın).
 
 ## 4. Bilinen sınırlar (dürüstçe)
 
-- **Zaman-tabanlı yedek yok.** Hiçbir rotada `export const revalidate` yok; bir webhook kaçarsa
-  sayfa **sonsuza dek** eski kalır ve bunu hiçbir şey söylemez. Vitrin rotalarına yedek
-  `revalidate` eklenmesi açık kalemdir.
+- **Toplu fiyat yazımı = satır başına webhook.** Tetikler `FOR EACH ROW`; materialize 1044 satırı
+  birden yazar. `UPDATE` tetiğinde `WHEN` koşulu **değişmeyen** satırları eler (asıl gürültü
+  kaynağı buydu), ama fiyatların gerçekten hepsi değişirse (kur hareketi) tek tıkla ~1044 webhook
+  ateşlenir ve bunlar yalnız ~32 aile yolunu tazeler. İşe yarar ama israf; toplu-değişimi tek
+  çağrıya indirmek (statement-level tetik ya da materialize sonrası tek toplu tazeleme) açık kalemdir.
 - **PPR kapalı.** `CONTEXT.md` ve CLAUDE.md yığın tablosu "PPR" diyor; `next.config.mjs`'te
   `experimental.ppr` **yok**. Bugün olan şey SSG + Suspense streaming'dir. Ya açılmalı ya
   dokümandan çıkarılmalı — ikisinden biri yalan söylüyor.
