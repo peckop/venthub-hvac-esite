@@ -76,6 +76,22 @@
 - **Kırmızı:** K1 görsel yok (`T003-VH`) · K2 fiyat seed yok (PRICING) · K3 hukuki metinler (`T019-VH`, **yapıldı**) ·
   K4 sahte iletişim bilgisi · K5 edge güvenlik (EDGE/`T018-VH`) · **K6 `iyzico-callback` sandbox URL'i sabit
   kodlu → prod ödemede sipariş onaylanmaz** (`T022-VH`, EDGE'e devredildi).
+- **✅ TESLİM EDİLDİ (2026-08-15) — PR #512 ve #518 MASTER'DA, prod'da doğrulandı.**
+  `T019-VH` **completed** · `T022-VH` **completed** (EDGE yaptı, LAUNCH bağımsız teyit etti) ·
+  `T020/T021/T023` açıldı ve Recep'e/ilgili şeride devredildi.
+  **Prod kanıtı:** 12 hukuki sayfa canlıda 200 + yeni bölümler render oluyor · `robots.txt` artık
+  kalıcı alan adını gösteriyor (deploy'a özel URL'den döndü, 8 ölçümde doğrulandı).
+- **Sonradan çıkan iki kırmızı (ikisi de başka iş yapılırken bulundu, ikisi de düzeltildi):**
+  **K7** yasal onay kutuları hiç zorlanmıyordu — tüketici hiçbirini işaretlemeden ödemeye geçebiliyor,
+  sistem `accepted:false`'ı zaman damgasıyla siparişe yazıyordu (kendi aleyhine delil). Kapı kondu +
+  **INV-LEGAL-1** conformance bekçisi yazıldı; bekçi **bilerek bozularak** kanıtlandı ve ilk denemede
+  kendi yanlış-negatifi bulunup sıkılaştırıldı.
+  **K8** kanonik `SITE_URL` her deploy'da değişiyordu → sitemap/canonical/OG **ve hukuki metinlerdeki
+  satıcı sitesi** rastgele deploy adresini gösteriyordu; merdivene kalıcı prod alan adı eklendi.
+- **⛔ Recep'te kalan (kod çözemez):** ① fiyat seed "evet"i ② `src/config/legal.ts` 18 alan + hukukçu
+  teyidi (`legalReviewCompleted: true`) ③ ürün görselleri ④ **`venthub.com.tr` DNS'te YOK** — alan adı
+  alınıp Vercel'e bağlanmalı + `NEXT_PUBLIC_SITE_URL` ⑤ İyzico prod anahtarları **ve `IYZICO_BASE_URL`
+  BİRLİKTE** (unutulursa hata vermez, sessizce sandbox'a konuşur).
 - **Yapılan (PR #512):** 6 hukuki metin × TR/EN mevzuata karşı denetlenip boşlukları kapatıldı
   (örnek cayma formu YOKTU · iade masrafı kimde YAZMIYORDU · cayma istisnaları HVAC'a somutlandı ·
   ETBİS/MERSİS/ticaret sicil/KEP · KVKK m.9 güncel rejim · İYS + VERBİS · gerçek çerez tablosu ·
@@ -83,9 +99,11 @@
   `src/config/legal.ts` = tek doldurma noktası, 18 placeholder. Taslak bandı artık koşullu
   (`isLegalContentReady()` = alanlar dolu **VE** hukukçu teyidi). `lastUpdated`'ın `new Date()` ile
   her gün kayması giderildi. Kapılar: tsc 0 · lint 0 hata · 631 test · gerçek `next build` yeşil.
-- **Açtığım iş emirleri:** `T019-VH` hukuki metinler (active %85) · `T020-VH` analytics rıza kapısı (open) ·
-  `T021-VH` GA4 kurulumu = yol haritası madde G (**blocked**, `T020` bloklar — registry'de bağ kuruldu) ·
-  `T022-VH` iyzico-callback sandbox (open, EDGE).
+- **Açtığım iş emirleri (registry = SSOT):** `T019-VH` hukuki metinler **completed %100** ·
+  `T020-VH` analytics rıza kapısı (open) · `T021-VH` GA4 kurulumu = yol haritası madde G
+  (**blocked**, `T020` bloklar — registry'de bağ kuruldu; CLI `task dependency` kırık, sqlite'a
+  doğrudan yazıldı) · `T022-VH` iyzico-callback sandbox **completed** · `T023-VH` alan adı +
+  kanonik SITE_URL (open, kod tarafı %50 bitti, kalanı Recep'te).
 - **Kritik bulgu (analytics):** cetvel *"onay verilmeden analytics ateşlenmez"* diyor ama **kodda karşılığı yok** —
   `vh_cookie_consent`'i yalnız bandın kendisi okuyor, `trackEvent` ise zaten 3 yerden çağrılıyor.
   Sistemin sessiz olmasının tek sebebi GA ID'nin yokluğu = **tesadüf, güvenlik değil.**
