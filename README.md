@@ -8,7 +8,7 @@ HVAC sektörüne özel, B2B/B2C karma satış mimarisi üzerine kurulu premium e
 
 | Katman | Teknoloji | Sürüm |
 |---|---|---|
-| Framework | Next.js (App Router, PPR) | **15.5.18** |
+| Framework | Next.js (App Router, SSG + talep-üzerine ISR) | **15.5.18** |
 | UI Kütüphanesi | React | **19.0.0** |
 | 3D Motor | Three.js / React Three Fiber | **0.183.2** / **9.5.0** |
 | Animasyon | Framer Motion | **11.13.1** |
@@ -97,7 +97,7 @@ Uygulamanın veri güvenliğini, çoklu kiracı (multi-tenant) izolasyonunu ve g
 
 VentHub HVAC platformu, modern web standartlarını ve maksimum hızı hedefleyen en güncel Next.js 15+ ve React 19 mimarisi üzerine inşa edilmiştir:
 
-*   ⚡ **SSG + PPR (Partial Prerendering):** Dinamik bileşenler (ürün gridleri, filtreleme arayüzleri) `<Suspense>` sınırları ile sarmalanarak kısmi olarak yüklenirken; kritik sayfa kabukları (Hero, layout) statik olarak anında (LCP = 0) render edilir.
+*   ⚡ **SSG + Suspense streaming:** Vitrin sayfaları derleme anında statik üretilir (LCP için), veri değişince Supabase webhook'u ile talep-üzerine tazelenir (ISR); `useSearchParams` okuyan dinamik bileşenler `<Suspense>` sınırlarıyla sarmalanarak sayfanın tamamını CSR'a düşürmeden akıtılır. **PPR (Partial Prerendering) kullanılmıyor** — `next.config.mjs`'te `experimental.ppr` yok. Ayrıntı: `docs/standards/rendering-cache-standard.md`.
 *   🌐 **i18n Sub-path Routing:** Uygulama, `src/app/[lang]/` alt-yol kurgusuyla tam çoklu dil desteğine (Türkçe/İngilizce) sahiptir. SEO kalitesi için dinamik kanonik URL'ler ve `sitemap.ts` üzerinde hreflang alternates metadata kurgusu aktiftir.
 *   🌐 **Merkezi Rota Yerelleştirme (`useLocalizedRoutes`):** İstemci tarafı yönlendirme işlemlerinde kullanılan `useLocalizedRoutes` hook'u; dil segmetine (`tr`/`en`) duyarlı rota yardımcılarını (`Routes.home()`, `Routes.auth.login()` vb.) dinamik olarak çözümler. Bu sayede statik/sabit yönlendirme yollarının önüne geçilir ve middleware yönlendirmeleriyle senkronize çalışır.
 *   ✍️ **Next.js Yazı Tipi Yükleme Yapılandırması (Inter Font & `--font-sans`):** `src/app/layout.tsx` dosyasında Next.js Google Fonts (`next/font/google`) ile yüklenen Inter değişken yazı tipi, `--font-sans` değişkeniyle (`variable: '--font-sans'`) projeye dahil edilir. Bu CSS değişkeni, hem `tailwind.config.js` (`fontFamily.sans` dizisi) hem de `src/index.css` (`html, body` kuralları) ile eşleştirilerek sayfa kayması (CLS) yaşanmadan pürüzsüz yazı tipi sunumu sağlar.

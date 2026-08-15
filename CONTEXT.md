@@ -329,7 +329,7 @@ Proje, **orion** pipeline ile kaynak koddan otonom `.md` üretir; master'lar **N
 
 ## 14. Geliştirme Kuralları
 
-1. **No-Plan-No-Code:** Değişiklik yapmadan önce plan oluştur ve onay al
+1. **No-Plan-No-Code:** Değişiklik yapmadan önce plan oluştur ve onay al. *(2026-08-15 eki: plan ayrıca **kendisini hangi cetvelin yönettiğini** söylemeli — ya `docs/standards/` altından bir dosya adı, ya açıkça "cetvel yok". "Cetvel yok" geçerli bir cevap ama bedava değil; o zaman iş cetveli yazmayı da kapsar. SSOT: `CLAUDE.md` kural 1.)*
 2. **Tip Güvenliği:** `any` kullanımı yasak, strict TypeScript
 3. **RLS-First:** Her tablo mutlaka RLS politikası ile korunmalı
 4. **Monoton Durum:** Sipariş/iade durumları sadece ileri gidebilir, geri dönüş engellenir

@@ -76,15 +76,44 @@ kendi okur) — yeni tablo eklemek yalnız `create trigger` demektir.
 **Kapı:** `INV-RENDER-2` (`src/__tests__/conformance/render-revalidation-contract.test.ts`) — yukarıdaki
 tabloyu **çift yönlü** zorlar: her tablonun yaşayan bir tetiği VE handler dalı olmalı; ayrıca öksüz tetik
 (tetik var, handler yok → boşuna HTTP) ve öksüz handler (handler var, tetik yok → **08-15 hatasının imzası**)
-ayrı ayrı kırmızı yanar. Yeni bir tablo vitrine çıkarken bu dosyadaki `REQUIRED_TABLES` dizisi ile yukarıdaki
-tablo **birlikte** güncellenir.
+ayrı ayrı kırmızı yanar.
+
+> ⚠️ **Yukarıdaki tablo testin GİRDİSİDİR, süsü değil.** `INV-RENDER-2` denetlenecek tablo listesini
+> bu markdown tablosunun ilk sütunundan okur (`| \`tablo\` |` satırları). Yani buraya bir satır
+> eklemek kapıyı o tablo için anında açar; biçimi bozmak (backtick'i kaldırmak, sütun sırasını
+> değiştirmek) ise listeyi boşaltır — bu yüzden ayrı bir iddia "en az 5 tablo okunabildi mi" diye
+> bakar. Elle tutulan ikinci bir kopya bilerek YOK: doküman ile test ayrışamasın diye.
 
 > **Tetikler İKİ kaynakta yaşıyor.** İlk üçü (`on_products_change`, `on_categories_change`,
 > `on_inventory_movements_change`) hiçbir migration dosyasında geçmez — yalnız
-> `supabase/baselines/*.sql` anlık görüntülerinde tanımlıdır (repo'dan önce elle kurulmuşlar).
-> Sonradan eklenenler `supabase/migrations/` altındadır. Yalnız `migrations/`'a bakan bir tarayıcı
-> ilk üç tabloyu "tetiksiz" sanıp yanlış alarm verir; `INV-RENDER-2` ikisini de tarar ve
-> `create`/`drop` etkilerini kronolojik sırayla uygulayarak **yaşayan** durumu hesaplar.
+> `supabase/baselines/2026-06-12_public_schema.sql` anlık görüntüsünde tanımlıdır (repo'dan önce elle
+> kurulmuşlar). Sonradan eklenenler `supabase/migrations/` altındadır. Kapı ikisini de tarar ve
+> `create`/`drop` etkilerini **kronolojik** uygulayarak (dosya adındaki tarihe göre; grup grup değil)
+> yaşayan durumu hesaplar.
+>
+> **Baseline ≠ tam şema dökümü.** `2026-08-13_public_schema.sql` kendi başlığında "trigger/RLS
+> politikaları DAHİL DEĞİL" diyor ve içinde sıfır `create trigger` var. Bu yüzden "en yeni baseline
+> yaşayan durumu tanımlar" varsayımı yanlış olurdu.
+>
+> **Açık kalem:** ilk üç tetiğin repoda hiçbir migration karşılığı olmaması gerçek bir drift riskidir —
+> prod'da elle düşürülseler repo bunu göremez. Bunları idempotent bir migration'la repoya yazmak
+> gerekir; migration prod'a otomatik uygulandığı için (CLAUDE.md kural 13) kullanıcı onayı ister.
+
+**Kurulum betikleri de bu sözleşmeye tabidir.** `scripts/webhook_setup.sql`,
+`scripts/setup_webhooks.js` ve `scripts/setup_webhooks_cli.js` sıfırdan bir ortamda webhook
+altyapısını kurar. 2026-08-15 denetimine kadar **üçü de yalnız ilk üç tetiği kuruyordu** — yani
+cetvel doğru, migration doğru, test yeşilken depo, 08-15 hatasını yeni bir ortamda birebir yeniden
+kuran bir düğme taşıyordu; üstelik betik sonunda "Setup Completed Successfully" yazıyordu (sahte
+başarı). Üçü de tamamlandı ve `INV-RENDER-2`'nin ayrı bir iddiası artık bunları da denetliyor.
+**Migration eklerken kurulum betikleri de güncellenir — ikisi ayrı kaynaktır.**
+
+**Denetim notu (2026-08-15):** bu kapının ilk sürümü denetimden geçemedi. İki kanıtlanmış
+sessiz-yeşili vardı: (1) `route.ts`'teki keşif-kapısı koşulu (`table === 'a' || table === 'b'`)
+handler dalı sanılıyordu, bu yüzden gerçek `product_prices` bloğu silinebiliyor ve test yeşil
+kalıyordu; (2) SQL düz `;` ile bölündüğü için dollar-quote'lu (`$$ … $$`) fonksiyon gövdesinde
+**metin olarak** geçen bir `create trigger` gerçek tetik sayılıyordu. İkisi de tam olarak bu
+cetvelin kovaladığı hatanın imzasını gizliyordu. **Ders: statik tarayıcının yanlış-negatifi,
+kapının hiç olmamasından daha kötüdür — çünkü yeşil ışık güven üretir.**
 
 ## 4. Bilinen sınırlar (dürüstçe)
 
@@ -93,10 +122,15 @@ tablo **birlikte** güncellenir.
   kaynağı buydu), ama fiyatların gerçekten hepsi değişirse (kur hareketi) tek tıkla ~1044 webhook
   ateşlenir ve bunlar yalnız ~32 aile yolunu tazeler. İşe yarar ama israf; toplu-değişimi tek
   çağrıya indirmek (statement-level tetik ya da materialize sonrası tek toplu tazeleme) açık kalemdir.
-- **PPR kapalı** (*2026-08-15: kapatıldı*). `next.config.mjs`'te `experimental.ppr` **yok**; bugün olan
-  şey SSG + Suspense streaming'dir. Dokümanlardaki "PPR" ibaresi kaldırıldı: `CLAUDE.md` yığın satırı +
-  kural 5 başlığı, `CONTEXT.md` yığın tablosu (not) + §14 madde 14 başlığı. Kuralın kendisi (Suspense
-  sınırı) aynen geçerli — değişen yalnız adlandırmaydı.
+- **PPR hiç açılmadı** (*"kapatıldı" değil — `experimental.ppr` `next.config.mjs`'te hiçbir zaman
+  olmadı*). Bugün olan şey SSG + Suspense streaming'dir; kuralın kendisi (Suspense sınırı) aynen
+  geçerli, değişen yalnız yanlış adlandırmaydı. **Temizlenen yerler:** `CLAUDE.md` (yığın satırı +
+  kural 5 başlığı) · `CONTEXT.md` (yığın tablosu notu + §14 madde 14 başlığı) · `README.md`
+  (yığın tablosu + özellik maddesi — PPR'ı *sevk edilmiş özellik* diye pazarlıyordu) ·
+  `public/llms.txt` (yeni ajanların onboarding SSOT'u) · `docs/standards/collaboration-protocol.md`
+  (kural özeti). **Kalan:** `.claude/skills/venthub-architecture/` + `.agent/` ikizi hâlâ "PPR config"
+  tetikleyicisiyle açılıyor ve kasten yok olan bir özelliğin kurulumunu öğretiyor; üretilmiş
+  `docs/venthub_hvac_master.md` kopyaları kaynak (README) düzeldiği için sonraki sync'te düşer.
 - **Webhook URL/secret'ı `handle_supabase_webhook()` gövdesinde literal** (env değil).
   Ortam değiştiğinde fonksiyon elle güncellenmeli.
 - **Aile slug'ı her tetikte ayrı SELECT ile çözülüyor** (N+1). Mevcut desen; hacim artarsa

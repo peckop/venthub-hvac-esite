@@ -208,6 +208,35 @@ async function main() {
       CREATE TRIGGER on_inventory_movements_change
       AFTER INSERT OR UPDATE OR DELETE ON public.inventory_movements
       FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
+
+      -- Attach triggers to public.product_families
+      DROP TRIGGER IF EXISTS on_product_families_change ON public.product_families;
+      CREATE TRIGGER on_product_families_change
+      AFTER INSERT OR UPDATE OR DELETE ON public.product_families
+      FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
+
+      -- Attach triggers to public.product_prices
+      -- UPDATE ayri ve KOSULLU: fiyat materialize her satiri yeniden yazar; kosulsuz bir tetik
+      -- fiyat DEGISMESE bile ~1044 webhook atesler (2026-08-15 olculdu). WHEN yalniz UPDATE'te
+      -- kurulabilir (INSERT'te OLD, DELETE'te NEW yoktur), o yuzden ekleme/silme ayri tetikte kalir.
+      DROP TRIGGER IF EXISTS on_product_prices_change ON public.product_prices;
+      DROP TRIGGER IF EXISTS on_product_prices_ins_del ON public.product_prices;
+      DROP TRIGGER IF EXISTS on_product_prices_upd ON public.product_prices;
+
+      CREATE TRIGGER on_product_prices_ins_del
+      AFTER INSERT OR DELETE ON public.product_prices
+      FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
+
+      CREATE TRIGGER on_product_prices_upd
+      AFTER UPDATE ON public.product_prices
+      FOR EACH ROW
+      WHEN (
+        OLD.net_price IS DISTINCT FROM NEW.net_price
+        OR OLD.gross_price IS DISTINCT FROM NEW.gross_price
+        OR OLD.is_active IS DISTINCT FROM NEW.is_active
+        OR OLD.currency IS DISTINCT FROM NEW.currency
+      )
+      EXECUTE FUNCTION public.handle_supabase_webhook();
     `;
     
     await client.query(sql);
@@ -218,7 +247,7 @@ async function main() {
     const verificationRes = await client.query(`
       SELECT trigger_name, event_manipulation, event_object_table, action_statement
       FROM information_schema.triggers
-      WHERE trigger_name IN ('on_products_change', 'on_categories_change', 'on_inventory_movements_change');
+      WHERE trigger_name IN ('on_products_change', 'on_categories_change', 'on_inventory_movements_change', 'on_product_families_change', 'on_product_prices_ins_del', 'on_product_prices_upd');
     `);
     
     console.log('Installed Triggers:');
@@ -232,7 +261,7 @@ async function main() {
     console.log('1. Generated and saved SUPABASE_WEBHOOK_SECRET in .env and .env.local.');
     console.log('2. Connected directly to the remote Supabase database.');
     console.log('3. Enabled the pg_net extension in PostgreSQL.');
-    console.log('4. Installed the asynchronous HTTP triggers on products, categories, and inventory_movements.');
+    console.log('4. Installed the asynchronous HTTP triggers on products, categories, inventory_movements, product_families and product_prices.');
     console.log('===============================================================');
     
   } catch (err) {
