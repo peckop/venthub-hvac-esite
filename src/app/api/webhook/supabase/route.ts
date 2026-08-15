@@ -39,14 +39,45 @@ interface SupabaseWebhookPayload {
   old_record: Record<string, unknown> | null
 }
 
+/**
+ * Aile slug'ı — PDP'nin KANONİK adresi bunun üzerinden kurulur
+ * (`/[lang]/products/[family-slug]`). Üç dal (products · inventory_movements ·
+ * product_prices) aynı çözümü yaptığı için tek yerde tutulur; ayrı ayrı yazıldığında
+ * ikisi ürün slug'ını kullanıp sessizce yanlış yolu tazeliyordu.
+ */
+async function familySlugById(familyId: string | undefined): Promise<string | null> {
+  if (!familyId) return null
+  const { data } = await supabase
+    .from('product_families')
+    .select('slug')
+    .eq('id', familyId)
+    .single()
+  return data?.slug ?? null
+}
+
 export async function POST(request: NextRequest) {
   try {
     const payload = (await request.json()) as SupabaseWebhookPayload
     const webhookSecret = request.headers.get('x-webhook-secret')
 
-    // Strict HMAC/Token Verification
+    /**
+     * FAIL-CLOSED. Eski hâli `if (expectedSecret && ...)` idi: env TANIMSIZSA koşul hiç
+     * çalışmıyor ve imza doğrulaması TAMAMEN atlanıyordu — yani yapılandırma eksikliği,
+     * kapıyı sıkılaştırmak yerine SESSİZCE açıyordu. Bu, bu hafta iki kez düzeltilen
+     * fail-open deseninin aynısı (shipping-webhook replay guard'ı, T025-VH).
+     *
+     * Env yoksa da 401 dönülür (500 değil): eksik yapılandırma, çağırana sunucunun iç
+     * durumunu bildirmemeli. Sebep sunucu tarafında `error` seviyesinde loglanır.
+     */
     const expectedSecret = process.env.SUPABASE_WEBHOOK_SECRET
-    if (expectedSecret && webhookSecret !== expectedSecret) {
+    if (!expectedSecret) {
+      console.error(
+        '[Supabase Webhook] SUPABASE_WEBHOOK_SECRET tanımsız — istek REDDEDİLDİ. ' +
+        'Doğrulanamayan çağrı kabul edilmez; env değişkenini ayarlayın.',
+      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    if (webhookSecret !== expectedSecret) {
       console.warn('Unauthorized Supabase webhook attempt blocked.')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -75,7 +106,10 @@ export async function POST(request: NextRequest) {
     // tenant-scoped keşif tag'lerine AYNI şekilde uygulanır — stok-only UPDATE
     // tenant tag'i üzerinden de cache thrash edemez.
     let shouldRevalidateDiscovery = true
-    if (table === 'inventory_movements') {
+    if (table === 'inventory_movements' || table === 'product_prices') {
+      // PS-042: fiyat (product_prices) da stok hareketi gibi keşif önbelleğini
+      // asla thrash ETMEZ — Recep kararı: fiyat yalnız PDP'de gösterilir,
+      // kartlarda gösterilmez. Bkz. table === 'product_prices' bloğu altındaki not.
       shouldRevalidateDiscovery = false
     } else if (table === 'products' && type === 'UPDATE') {
       if (record && old_record) {
@@ -93,12 +127,18 @@ export async function POST(request: NextRequest) {
 
     // 1. Table: products
     if (table === 'products') {
-      const productSlug = activeRecord.slug as string | undefined
-      if (productSlug) {
-        // Revalidate the product details pages for all locales
-        revalidatePath(`/tr/products/${productSlug}`)
-        revalidatePath(`/en/products/${productSlug}`)
-        revalidatedPaths.push(`/tr/products/${productSlug}`, `/en/products/${productSlug}`)
+      /**
+       * PDP AİLE KANONİKTİR (`/[lang]/products/[family-slug]`) — ÜRÜN slug'ı değil.
+       * Burada eskiden `activeRecord.slug` (ürün slug'ı) tazeleniyordu; prerender edilmiş
+       * yol aile slug'ı olduğu için o çağrı VAR OLMAYAN bir yolu geçersiz kılıyordu, yani
+       * ürün güncellemesi PDP'yi hiç tazelemiyordu. Sessiz bir kaçaktı; 2026-08-15 denetimi
+       * yakaladı. `family_id` payload'da zaten var (`to_jsonb(NEW)`), ek sorgu gerekmez.
+       */
+      const familySlug = await familySlugById(activeRecord.family_id as string | undefined)
+      if (familySlug) {
+        revalidatePath(`/tr/products/${familySlug}`)
+        revalidatePath(`/en/products/${familySlug}`)
+        revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
       }
 
       if (shouldRevalidateDiscovery) {
@@ -145,16 +185,18 @@ export async function POST(request: NextRequest) {
       if (productId) {
         const { data: product } = await supabase
           .from('products')
-          .select('slug, category_id')
+          .select('family_id, category_id')
           .eq('id', productId)
           .single()
 
         if (product) {
-          const productSlug = product.slug
-          if (productSlug) {
-            revalidatePath(`/tr/products/${productSlug}`)
-            revalidatePath(`/en/products/${productSlug}`)
-            revalidatedPaths.push(`/tr/products/${productSlug}`, `/en/products/${productSlug}`)
+          // Ürün slug'ı DEĞİL aile slug'ı — PDP aile kanoniktir; eskisi var olmayan yolu
+          // tazeliyordu (stok hareketi PDP'yi hiç yenilemiyordu).
+          const familySlug = await familySlugById(product.family_id ?? undefined)
+          if (familySlug) {
+            revalidatePath(`/tr/products/${familySlug}`)
+            revalidatePath(`/en/products/${familySlug}`)
+            revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
           }
 
           // If product is linked to a category, revalidate category path too
@@ -191,9 +233,47 @@ export async function POST(request: NextRequest) {
       revalidatedTags.push(HOME_DATA_TAG, PRODUCTS_DISCOVERY_TAG)
 
       if (familySlug) {
+        /**
+         * PDP YOLU DA TAZELENMELİ. Eskiden yalnız `familyTag` çağrılıyordu ve o tag'i
+         * tüketen HİÇBİR `unstable_cache` yok — yani çağrı sessiz bir no-op'tu; aile adı
+         * değişince PDP en fazla ISR yedeğiyle (1 saat) güncelleniyordu. PDP verisi
+         * `React.cache()` ile sarılı olduğu için etkili olan şey `revalidatePath`'tir.
+         */
+        revalidatePath(`/tr/products/${familySlug}`)
+        revalidatePath(`/en/products/${familySlug}`)
+        revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
+
         revalidateTag(familyTag(familySlug))
         revalidatedTags.push(familyTag(familySlug))
       }
+    }
+
+    // 5. Table: product_prices (YENİ — fiyat değişimi → yalnız ilgili ürünün AİLE PDP yolu)
+    else if (table === 'product_prices') {
+      const productId = activeRecord.product_id as string | undefined
+      if (productId) {
+        // PDP AİLE kanoniktir (/[lang]/products/[family-slug]), ürün slug'ı değil.
+        const { data: product } = await supabase
+          .from('products')
+          .select('family_id')
+          .eq('id', productId)
+          .single()
+
+        const familySlug = await familySlugById(product?.family_id ?? undefined)
+        if (familySlug) {
+          revalidatePath(`/tr/products/${familySlug}`)
+          revalidatePath(`/en/products/${familySlug}`)
+          revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
+        }
+      }
+
+      // PS-042: fiyat değişimi keşif (home-data/products-discovery) tag'lerini
+      // BİLİNÇLİ olarak tetiklemez — Recep kararı: fiyat yalnız PDP'de gösterilir,
+      // ürün kartlarında gösterilmez, dolayısıyla keşif önbelleğinin fiyat
+      // değişiminde thrash olmasının hiçbir faydası yok. Bu, yukarıdaki
+      // shouldRevalidateDiscovery=false ataması ile de garanti altına alınmıştır.
+      // Biri "eksik" sanıp buraya revalidateTag(HOME_DATA_TAG) /
+      // revalidateTag(PRODUCTS_DISCOVERY_TAG) EKLEMESİN.
     }
 
     return NextResponse.json({

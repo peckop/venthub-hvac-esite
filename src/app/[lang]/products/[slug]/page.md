@@ -3,14 +3,15 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\src\app\[lang]\products\[slug]\page.tsx
-skeleton_hash: 69f3a2054f9a9899
+skeleton_hash: e78a9db412f492bc
 entity_hashes:
-  func:Page: 23ecda9f387402f7
-  func:generateMetadata: c086561deb8aad58
-  func:generateStaticParams: 10793e6b52b39af0
-  overview: 6d2c8f1d1305f6ba
+  func:Page: 824acaa8a7eb48b1
+  func:generateMetadata: 20e91270cae1fabc
+  func:generateStaticParams: 53ceea77512d4dbc
+  func:pickLang: 946d41753cca4e50
+  overview: 633b6c86f96d9a4b
   style_tokens: dd5ed8d0f58dcf57
-generated_at: 2026-06-19T20:46:14Z
+generated_at: 2026-08-15T06:32:21Z
 ---
 
 ## Genel Bakış
@@ -19,103 +20,131 @@ Bu modül, Next.js uygulamasında çok dilli (Türkçe/İngilizce) ürün detay 
 ## Fonksiyon Grupları
 ### Derleme Zamanı Sayfa Planlaması
 Modül, uygulamanın derleme (build) aşamasında hangi dil ve ürün kombinasyonları için sayfaların önceden oluşturulacağını (statik olarak üretileceğini) belirler. Bu, uygulamanın verimli çalışmasını ve ilgili sayfaların istek üzerine değil, derleme zamanında hazır olmasını sağlar.
-- `generateStaticParams`
+- generateStaticParams
 
 ### Dinamik SEO Meta Verisi Üretimi
 Her bir ürün detay sayfası için arama motorları ve sosyal paylaşım platformları tarafından okunabilecek dinamik meta bilgiler (başlık, açıklama, vb.) oluşturur. Bu sayede sayfalar arama sonuçlarında doğru ve çekici bir şekilde listelenir.
-- `generateMetadata`
+- generateMetadata
 
 ### Ürün Sayfası Sunumu
-Kullanıcı tarafından ziyaret edildiğinde, ilgili dil ve ürün adresine (slug) karşılık gelen asıl sayfa içeriğini render ederek tarayıcıda gösterir. Bu fonksiyon, sayfanın görünür kısmını oluşturan ana bileşendir.
-- `Page`
+Kullanıcı tarafından ziyaret edildiğinde, ilgili dil ve ürün adresine (slug) karşılık g
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül, Next.js App Router yapısında çok dilli ürün detay sayfalarını yöneten bir sayfa bileşenidir.
-
-[Aksiyom 1]: Eğer `generateStaticParams` fonksiyonu geçerli bir parametre nesneleri dizisi döndürmüyorsa, Next.js derleme aşamasında hangi sayfaları statik olarak üreteceğini bilemez ve build süreci başarısız olur veya eksik sayfalar oluşur.
-
-[Aksiyom 2]: Eğer `generateMetadata` fonksiyonuna iletilen `params.lang` değeri 'tr' veya 'en' dışında bir değerse, modül için tanımlanmamış bir dilde meta veri üretilemez ve SEO verileri eksik veya hatalı olur.
-
-[Aksiyom 3]: Eğer `params.slug` değerine karşılık gelen ürün verisi (örn: bir API veya veritabanı sorgusu ile) mevcut değilse, `Page` bileşeni geçerli bir ürün içeriği render edemez ve sayfa hata durumuna düşer veya boş görünür.
-
-[Aksiyom 4]: Eğer `Page` bileşeninin props olarak aldığı `params.lang` geçerli bir dil kodu değilse (örn: desteklenmeyen bir dil), modül doğru dilde içerik sunamaz ve olası bir hata yönetim mekanizması devreye girmezse sayfa bozuk görünebilir.
-
-[Aksiyom 5]: Eğer `generateStaticParams` ve/veya `generateMetadata` fonksiyonları, modülün çalışması için gerekli olan (örn: ürün listesini çeken) harici bir veri kaynağına erişemiyorsa, derleme zamanı planlama ve SEO verisi üretimi tamamlanamaz.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### generateStaticParams
-**Ne yapar**: Bu fonksiyon, ürünler için statik yolları (path) oluşturur. Yalnızca veritabanında durumu 'active' olan ve slug değeri dolu olan ürünler için, her biri için Türkçe ('tr') ve İngilizce ('en') olmak üzere iki adet farklı dilde yol parametresi üretir. Bu sayede Next.js, build aşamasında bu sayfaları önceden oluşturabilir.
-
-**Nasıl yapar**: Fonksiyon, `supabase` istemcisi kullanarak 'products' tablosundan sadece 'slug' sütununu çeker. Gelen verilerde `slug` alanı dolu olanları filtreler. Ardından her geçerli slug için `{ lang: 'tr', slug: ... }` ve `{ lang: 'en', slug: ... }` olmak üzere iki nesne içeren bir dizi oluşturur. Eğer hiç geçerli yol üretilemezse boş bir dizi döner. Hata oluşursa bir uyarı yazdırır ve yine boş dizi ile çıkar.
-
+### pickLang
+**Ne yapar**: Verilen LocalizedText nesnesinden, belirli bir dil için metin içeriğini seçer ve döndürür.
+**Nasıl yapar**: Fonksiyon, `value` parametresinin varlığını kontrol eder. Eğer değer yoksa `null` döner. Ardından, `lang` parametresinin `'en'` olup olmadığına bakarak `value.en` veya `value.tr` değerini tercih eder. Tercih edilen değer boş (null/undefined/boş string) ise, sırasıyla `value.tr`, `value.en` ve son olarak `null` değerlerini fallback olarak döndürür. Bu mantık, birincil dil tercih edilmeyen içerik varsa bile sayfada bir metin gösterilmesini sağlar.
 **Parametreler**:
-- Fonksiyonun herhangi bir parametresi yoktur.
+- value: `LocalizedText` — `en` ve `tr` anahtarlarına sahip, iki dildeki metinleri tutan nesne. Nullable olabilir.
+- lang: `string` — İstenen dil kodu (örn. `'tr'`, `'en'`). Mevcut mantıkta sadece `'en'` değeri doğrudan işlenir, diğer tüm değerler `'tr'` tercihini tetikler.
+**Dönüş**: `string | null` — Seçilen dildeki metin döner. Uygun dil veya içerik bulunamazsa `null` döner.
 
-**Dönüş**: `Promise<Array<{ lang: string; slug: string }>>` veya bir hata/boş durum için `Promise<[]>`. Fonksiyon asenkron çalışır ve statik yolların listesini döner.
+### generateStaticParams
+**Ne yapar**: Uygulama derleme zamanında (build time) önceden render edilecek (prerender) tüm ürün ailesi (family) sayfaları için dinamik parametrelerin listesini üretir.
+**Nasıl yapar**: Fonksiyon, `getAllFamilySlugs` fonksiyonunu kullanarak Supabase veritabanından tüm ürün ailesi slug'larını (`slug`) çeker. Bu işlem `try-catch` bloğu ile sarılmıştır; bir hata oluşursa konsola uyarı yazdırır ve boş bir dizi döner. Çekilen ailelerden `slug` değeri olan (`!!f.slug`) tüm elemanları filtreler. Her geçerli aile için, hem Türkçe (`'tr'`) hem İngilizce (`'en'`) dil kodlarıyla birlikte birer parametre nesnesi oluşturur. `flatMap` kullanarak bu nesneleri tek bir düz diziye dönüştürür. Bu sayede, her ürün ailesi için iki dilde de `/products/[lang]/[slug]` yolları statik olarak oluşturulur.
+**Parametreler**: Yok.
+**Dönüş**: `Array<{ lang: string; slug: string }>` — Statik olarak oluşturulacak sayfaların parametrelerini içeren dizi. Hata durumunda boş dizi döner.
 
 ### generateMetadata
-**Ne yapar**: Belirli bir ürün sayfası için SEO (Arama Motoru Optimizasyonu) meta verilerini ve Open Graph verilerini dinamik olarak üretir. Bu sayede ürün adı, açıklaması, kanonik URL'i ve paylaşım görseli gibi bilgiler doğru şekilde tarayıcılara ve sosyal medya platformlarına iletilir.
-
-**Nasıl yapar**: Fonksiyon, URL parametrelerinden `slug` değerini alır. Hemen ardından o ürünün verilerini önbellekten veya veritabanından çekmek için `preloadProduct` ve `getCachedProductBySlug` işlevlerini çağırarak verileri erkenden yükler. Eğer ürün verisi başarıyla çekilip geçerliyse, `product.name` ve `product.description` alanlarını kullanarak dinamik bir `title` ve `description` oluşturur. Ayrıca `alternates.canonical` ve Open Graph için gerekli tüm alanları (title, description, url, images vb.) ayarlar. Ürün verisi alınamazsa veya bir hata oluşursa, varsayılan bir "Ürün Detayı | VentHub" başlığı ve açıklaması ile döner.
-
+**Ne yapar**: Belirli bir ürün ailesi sayfası için, SEO ve OpenGraph (sosyal paylaşım) amacıyla kullanılacak olan sayfa başlığını, açıklamasını, kanonik URL'ini ve görsel bilgilerini üretir.
+**Nasıl yapar**: Fonksiyon, `params` promise'ını çözerek `lang` ve `slug` değerlerini alır. Ardından `preloadFamily` ile ilgili aile verisinin arka planda yüklenmesini tetikler. `getCachedFamilyDetail` kullanarak ailenin ve varyantlarının detaylı bilgisini çekmeyi dener. Bilgi başarıyla çekildiğinde:
+1.  Kanonik URL, dil kodu içermeyen sadece aile slug'ından oluşur (`/products/${family.slug}`).
+2.  Başlık ve açıklama, `pickLang` kullanılarak ilgili dilden seçilir; uygun dil yoksa fallback değerler veya aile adı kullanılır.
+3.  Görsel (cover) olarak, varyantlar arasında ilk bulunan görselin yolu kullanılır; görsel yoksa varsayılan bir görsel belirlenir.
+4.  Tüm bu bilgilerle, standart bir OpenGraph yapısı (`title`, `description`, `url`, `images`, `locale`, vb.) oluşturulur.
+Bilgi çekme sırasında bir hata oluşursa konsola uyarı yazdırır ve varsayılan bir başlık/açıklama ile basit bir metadata nesnesi döner.
 **Parametreler**:
-- `params`: `{ lang: string; slug: string }` — Sayfaya ait URL parametrelerini içeren bir nesne. `slug` alanı, görüntülenecek ürünün benzersiz tanımlayıcısıdır.
-
-**Dönüş**: `Promise<{ title: string; description: string; alternates?: object; openGraph?: object }>`. Asenkron olarak resolve olan bir meta nesnesi döner.
+- params: `Promise<{ lang: string; slug: string }>` — Sayfa parametrelerini içeren promise. `lang` dil kodunu, `slug` ise ürün ailesi tanımıcısını tutar.
+**Dönüş**: `Promise<{ title: string; description: string; alternates?: { canonical: string }; openGraph?: {...} }>` — Sayfa metadata bilgilerini içeren nesne. Hata veya veri bulunamama durumunda, sadece `title` ve `description` alanlarını içeren basit bir nesne döner.
 
 ### Page
-**Ne yapar**: Bu bileşen, bir ürünün detay sayfasını render eder. Sayfaya JSON-LD yapılandırılmış veri (SEO için zengin sonuçlar) ekler ve asıl sayfa içeriğini `PageComponent` aracılığıyla gösterir. Ürün verilerini sayfaya ilk yükleme verisi (initial prop) olarak aktarır.
-
-**Nasıl yapar**: Fonksiyon, URL'den `slug` parametresini alır. `preloadProduct` ile veriyi erkenden yüklemeye başlar. Ardından, `slug` 'generic' değilse, `getCachedProductBySlug` ile ürün verisini çekmeye çalışır. Herhangi bir ağ hatası veya veritabanı hatası durumunda bunu yakalar ve bir uyarı yazdırır, sayfanın kırılmasını engeller. Çekilen ürün verisine (`productData`) dayanarak, Schema.org standardında bir JSON-LD nesnesi oluşturur. Bu nesne ürünün adını, açıklamasını, resmini, markasını, fiyatını ve stok durumunu içerir. Oluşturulan JSON-LD, `<script type="application/ld+json">` etiketi ile HTML'e enjekte edilir. Son olarak, tüm sayfa içeriğinin bulunduğu `PageComponent` bileşenini, `initialProduct` prop'u ile birlikte döndürür.
-
+**Ne yapar**: Ürün ailesi detay sayfasının (React bileşeni) asenkron ana bileşenidir. Sayfa verilerini çeker, yönlendirme (redirect) mantığını yönetir, JSON-LD (yapılandırılmış veri) oluşturur ve arayüzü render eder.
+**Nasıl yapar**: Fonksiyon, `params` promise'ını çözerek `lang` ve `slug` değerlerini alır. `preloadFamily` ile veri yüklemeyi başlatır.
+1.  `slug` `'generic'` değilse, `getCachedFamilyDetail` ile aile bilgisini çekmeyi dener.
+2.  Eğer aile bulunamazsa (`detail` null ise), `getCachedProductBySlug` ile `slug`'ın bir varyant slug'ı olup olmadığını kontrol eder. Eğer bir varyant ise ve bu varyantın ailesi (`family_id`) varsa, ailenin kendi slug'ını (`getCachedFamilySlugById`) çeker. Eğer aile slug'ı mevcut slug'dan farklıysa, kalıcı bir 308 yönlendirmesi (`permanentRedirect`) için hedef URL oluşturur.
+3.  `permanentRedirect` bir istisna fırlatacağı için, potansiyel bir yönlendirme (`redirectTo`) varsa `try-catch` bloğu dışında çağrılır.
+4.  Yönlendirme yoksa veya hata oluştuysa, mevcut aile (`family`) ve varyantlar (`variants`) bilgileri alınır. Aile bulunuyorsa, `buildProductGroupJsonLd` kullanılarak arama motorları için yapılandırılmış veri (JSON-LD) üretilir ve `dangerouslySetInnerHTML` ile sayfaya eklenir.
+5.  Son olarak, `PageComponent`'e gerekli veriler (`family`, `variants`, `priceTaxIncluded`) prop olarak geçirilerek ana arayüz render edilir.
 **Parametreler**:
-- `params`: `{ lang: string; slug: string }` — Sayfaya ait URL parametrelerini içeren bir nesne. `slug` alanı, gösterilecek ürünün benzersiz tanımlayıcısıdır.
-
-**Dönüş**: `JSX.Element`. Sayfanın HTML yapısını temsil eden bir React elemanı döner. İçeriğinde bir JSON-LD `<script>` etiketi ve `PageComponent` bileşeni bulunur.
+- params: `Promise<{ lang: string; slug: string }>` — Sayfa parametrelerini içeren promise. `lang` dil kodunu, `slug` ise ürün ailesi veya varyant tanımıcısını tutar.
+**Dönüş**: `Promise<JSX.Element>` — Render edilmiş React JSX içeriğini döndürür. İçerik, opsiyonel bir JSON-LD script etiketi ve ana `PageComponent`'ten oluşur.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../../../../config/siteUrl::SITE_URL
-- import: ../../../../lib/data/preload::getCachedProductBySlug
-- import: ../../../../lib/data/preload::preloadProduct
 - import: ../../../_components/ProductDetailPageView::ProductDetailPage
+- import: @/lib/images/productImage::storagePathToUrl
+- import: @/lib/seo/jsonld::assertNoUuid
+- import: @/lib/seo/jsonld::buildProductGroupJsonLd
+- import: @/lib/services/family.service::getAllFamilySlugs
 - import: @/lib/supabase/static::supabaseStaticClient
-- import: @/types/ui-models::type { Product }
+- import: next/navigation::permanentRedirect
+- import: next::type { Route }
+
+---
+
+## TYPE ALIASES
+
+### LocalizedText
+F5-B W2.2 — PDP artık AİLE (product_families) kanoniktir. `/[lang]/products/[slug]` slug'ı bir AİLE slug'ıdır; belirli varyant `?sku=` ile ön-seçilir (canonical/metadata URL'lerine GİRMEZ). Eski varyant slug'ları 308 (permanentRedirect) ile aile URL'ine taşınır.
+```typescript
+type LocalizedText = { tr?: string | null; en?: string | null } | null
+```
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/app/[lang]/products/[slug]/page.tsx`::generateStaticParams
+### [N1_NASIL] AST Pointer: [lang]/products/[slug]/page.tsx::pickLang
+- **params**: `value: LocalizedText, lang: string`
+- **ic_degiskenler**:
+  - `preferred` — `lang` değerine göre `value.en` veya `value.tr` tercih edilen metni tutar
+- **Dönüş**: `string | null` — yerelleştirilmiş metni veya `null` döner
+
+### [N2_NASIL] AST Pointer: [lang]/products/[slug]/page.tsx::generateStaticParams
 - **params**: (yok)
 - **ic_degiskenler**:
-  - `products` — Supabase'den çekilen aktif ve slug değeri null olmayan ürünlerin listesi
-  - `paths` — Her ürün için `tr` ve `en` dillerinde olmak üzere oluşturulan statik parametre yolları dizisi
-- **Dönüş**: `Array<{ lang: string, slug: string }>` (yollar) veya boş dizi `[]`
+  - `families` — `getAllFamilySlugs(supabase)` ile tüm aile slug'larının listesi; her biri `slug` alanı içerir
+- **Dönüş**: `{ lang: string, slug: string }[]` — her aile için `'tr'` ve `'en'` olmak üzere iki statik parametre çifti döner; hata durumunda boş dizi döner
 
-### [N2_NASIL] AST Pointer: `src/app/[lang]/products/[slug]/page.tsx`::generateMetadata
-- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — URL parametreleri (asenkron çözümlenir)
+### [N3_NASIL] AST Pointer: [lang]/products/[slug]/page.tsx::generateMetadata
+- **params**: `{ params: Promise<{ lang: string, slug: string }> }`
 - **ic_degiskenler**:
-  - `slug` — params promise'ından çözümlenen ürün slug değeri
-  - `product` — `getCachedProductBySlug(slug)` ile önbellekten getirilen ürün nesnesi
-  - `canonicalPath` — product.slug değerinden türetilen kanonik URL yolu
-- **Dönüş**: SEO metadata nesnesi (title, description, alternates, openGraph alanları) veya varsayılan fallback metadata
+  - `lang` — params'tan çözülen dil kodu (`'tr'` veya `'en'`)
+  - `slug` — params'tan çözülen ürün ailesi slug'ı
+  - `detail` — `getCachedFamilyDetail(slug, lang)` ile getirilen önbelleklenmiş aile detayı (`{ family, variants }` veya `null`)
+  - `family` — `detail.family` objesi; `name`, `meta_title`, `meta_description`, `description`, `slug` alanlarını içerir
+  - `variants` — `detail.variants` dizisi; her biri `images` alanını içerir
+  - `canonicalUrl` — kanonik URL dizgesi; `${SITE_URL}/products/${family.slug}` formatında
+  - `title` — SEO başlığı; `pickLang(family.meta_title, lang)` veya fallback olarak `${family.name} | VentHub`
+  - `description` — SEO açıklaması; `pickLang(family.meta_description, lang)` veya `pickLang(family.description, lang)?.substring(0, 160)` veya sabit fallback
+  - `coverPath` — OG görseli için kapak görseli path'i; varyantlardaki ilk görselin `path` alanı
+- **Dönüş**: Next.js metadata objesi (`title`, `description`, `alternates`,`, `openGraph` alanları) veya hata/fallback durumunda sabit `{ title, description }` objesi
 
-### [N3_NASIL] AST Pointer: `src/app/[lang]/products/[slug]/page.tsx`::Page
-- **params**: `{ params: Promise<{ lang: string, slug: string }> }` — URL parametreleri (asenkron çözümlenir)
+### [N4_NASIL] AST Pointer: [lang]/products/[slug]/page.tsx::Page
+- **params**: `{ params: Promise<{ lang: string, slug: string }> }`
 - **ic_degiskenler**:
-  - `slug` — params promise'ından çözümlenen ürün slug değeri
-  - `productData` — `getCachedProductBySlug(slug)` ile getirilen Product tipinde ürün nesnesi veya null
-  - `canonicalPath` — productData.slug değerinden türetilen kanonik URL yolu; yoksa `'generic'`
-  - `jsonLd` — Schema.org Product tipinde yapılandırılmış JSON-LD verisi (SEO için schema markup)
-- **Dönüş**: JSX Fragment — JSON-LD script etiketi ve `PageComponent` bileşeninin render edildiği React fragment
+  - `lang` — params'tan çözülen dil kodu (`'tr'` veya `'en'`)
+  - `slug` — params'tan çözülen URL slug'ı
+  - `detail` — `getCachedFamilyDetail(slug, lang)` ile getirilen aile detayı; `{ family, variants, price_tax_included }` veya `null`
+  - `redirectTo` — varyant slug'ı tespit edildiğinde kanonik aile URL'ine yönlendirme rotası (`Route` veya `null`)
+  - `variant` — `getCachedProductBySlug(slug)` ile getirilen tekil ürün/varyant objesi; `family_id` ve `sku` alanlarını içerir
+  - `familySlug` — `getCachedFamilySlugById(variant.family_id)` ile varyantın ait olduğu aile slug'ı
+  - `errorMsg` — yakalanan hatanın mesaj dizgesi
+  - `family` — `detail?.family ?? null` — ürün ailesi objesi veya `null`
+  - `variants` — `detail?.variants ?? []` — varyantlar dizisi
+  - `jsonLd` — `buildProductGroupJsonLd({ family, variants, lang, baseUrl: SITE_URL })` ile üretilen JSON-LD objesi veya `null`
+- **Dönüş**: JSX — `PageComponent`'e `family`, `variants`, `priceTaxIncluded` props'ları ile render edilmiş React elemanı; opsiyonel JSON-LD script bloğu
 
 ---
 
@@ -126,11 +155,14 @@ graph TD
     page_tsx__Page["Page"]
     page_tsx__generateMetadata["generateMetadata"]
     page_tsx__generateStaticParams["generateStaticParams"]
+    page_tsx__pickLang["pickLang"]
+    page_tsx__generateMetadata --> page_tsx__pickLang
 ```
 
 ## NODE ID STANDARD
 
   file: src\app\[lang]\products\[slug]\page.tsx
+  function: src\app\[lang]\products\[slug]\page.tsx::pickLang
   function: src\app\[lang]\products\[slug]\page.tsx::generateStaticParams
   function: src\app\[lang]\products\[slug]\page.tsx::generateMetadata
   function: src\app\[lang]\products\[slug]\page.tsx::Page
@@ -141,6 +173,7 @@ graph TD
   export: Page
   export: generateMetadata
   export: generateStaticParams
+  export: pickLang
 
 ---
 

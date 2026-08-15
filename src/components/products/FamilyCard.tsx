@@ -7,7 +7,6 @@ import { productImagePlaceholder, resolveProductImageUrl } from '@/lib/images/pr
 import type { FamilyListItem } from '@/types/ui-models'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
-import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { BrandIcon } from '../HVACIcons'
 import VentImage from '../ui/VentImage'
@@ -24,8 +23,14 @@ interface FamilyCardProps {
  *
  * Vitrin listeleri artık varyant değil AİLE satırı basar (PS-041): "JET 20" bir kez
  * görünür, 6 varyant rozet olarak sayılır. Sepete-ekle HİÇ render edilmez — sepete
- * eklenebilir birim varyanttır ve varyant seçimi PDP'de yapılır (W2.2). Fiyat motoru
- * açılana dek `min_price` fiilen hep null olduğundan kart "Teklif İste" moduna düşer.
+ * eklenebilir birim varyanttır ve varyant seçimi PDP'de yapılır (W2.2).
+ *
+ * Fiyat kartta HİÇ gösterilmez (Recep kararı 2026-08-15): fiyat yalnız PDP'de
+ * görünür. Gerekçe — product-schema-standard.md §2.2 PS-042: sık değişen fiyat verisi
+ * statik keşif önbelleğini (`products-discovery-${tenantId}`) çökertmemeli; kart
+ * fiyat taşımazsa katalog ve fiyat önbellekleri izole kalır, fiyat değişimi keşif
+ * önbelleğini tazelemeye zorlamaz. Bu yüzden `min_price`'a bağlı davranış YOK —
+ * her kart aynı "Teklif İste" CTA'sını gösterir.
  *
  * Görsel dil ProductCard ile aynı tutulur (token'lar, hover, focus-visible).
  */
@@ -35,21 +40,15 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
   priority = false,
   compact = false
 }) {
-  const { lang, t } = useI18n()
+  const { t } = useI18n()
   const Routes = useLocalizedRoutes()
   const isList = layout === 'list'
 
   const imageSrc = resolveProductImageUrl({ cover_image_path: family.cover_image_path })
     ?? productImagePlaceholder(family.slug)
 
-  const quoteMode = family.min_price == null || Number(family.min_price) <= 0
   const variantBadge = t('category.family.variantCount', { count: family.variant_count })
-
-  const priceBlock = quoteMode
-    ? <span className="text-sm font-semibold text-industrial-gray">{t('common.requestQuote')}</span>
-    // W4b: `min_price` artık motor fiyatı (TRY). `currency` verilmezse format yardımcısı
-    // EN dilinde USD'ye düşüyor ve '$1,234' yazıyordu.
-    : <>{formatCurrency(family.min_price ?? 0, lang, { currency: 'TRY', maximumFractionDigits: 0 })}</>
+  const ctaBlock = <span className="text-sm font-semibold text-industrial-gray">{t('common.requestQuote')}</span>
 
   // LIST VIEW LAYOUT
   if (isList) {
@@ -84,8 +83,7 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
               {family.name}
             </h3>
             <div className="mt-2 flex items-baseline gap-3">
-              <div className="text-xl font-bold text-primary-navy">{priceBlock}</div>
-              {!quoteMode && <span className="text-xs text-steel-gray font-medium uppercase">{t('pdp.vatIncluded')}</span>}
+              <div className="text-xl font-bold text-primary-navy">{ctaBlock}</div>
             </div>
           </div>
         </div>
@@ -143,7 +141,7 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
           </h3>
 
           <div className="mt-auto pt-3 border-t border-light-gray flex items-center justify-between gap-3">
-            <div className="text-lg font-bold text-primary-navy tracking-tight">{priceBlock}</div>
+            <div className="text-lg font-bold text-primary-navy tracking-tight">{ctaBlock}</div>
             <span className="text-xs font-black uppercase tracking-wider text-secondary-blue group-hover:text-primary-navy transition-colors">
               {t('category.family.viewFamily')}
             </span>

@@ -30,6 +30,9 @@ function pickLang(value: LocalizedText, lang: string): string | null {
   return preferred || value.tr || value.en || null
 }
 
+/** ISR yedeği (1 saat) — birincil yol webhook; bkz. `rendering-cache-standard.md` §3-4. */
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   try {
     // Yalnız AİLE slug'ları prerender edilir — varyant slug'ı statik yol üretmez.

@@ -12,7 +12,8 @@ Faz 2 (White-Label) sırada. Birincil dil Türkçe, ikincil İngilizce.
 
 ## Teknoloji Yığını (özet)
 
-- **Next.js 15.5** (App Router, RSC, PPR) + **React 19** (React Compiler)
+- **Next.js 15.5** (App Router, RSC, SSG + talep-üzerine ISR) + **React 19** (React Compiler)
+  — **PPR KULLANILMIYOR** (`next.config.mjs`'te `experimental.ppr` yok; 2026-08-15 ölçüldü)
 - **TypeScript 5.7** strict — `any` **yasak**
 - **Supabase** (PostgreSQL + Auth + Edge Functions + Realtime + Storage), RLS-first
 - **React Three Fiber 9** + Drei (3D), **Tailwind 3.4** (design tokens), Framer Motion
@@ -62,7 +63,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 3. **Tip güvenliği:** `any` yasak, strict TypeScript.
 4. **RSC öncelikli:** `page.tsx` varsayılan Server Component; `'use client'` sadece
    etkileşimli uç bileşenlerde. Ana rotalarda `ssr: false` yasak.
-5. **PPR/Suspense:** `useSearchParams` kullanan her bileşen `<Suspense fallback={<Skeleton/>}>`
+5. **Suspense sınırı:** `useSearchParams` kullanan her bileşen `<Suspense fallback={<Skeleton/>}>`
    ile sarılmalı (SSR zehirlenmesini engellemek için).
 6. **React.cache():** RSC ağacında tekrarlanabilen Supabase sorguları `React.cache()` ile tekilleştirilir.
 7. **i18n:** Kullanıcıya görünen metin sözlükten gelir; URL'ler `useLocalizedRoutes`
@@ -94,6 +95,9 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 - `CONTEXT.md` — uçtan uca kapsamlı referans (mimari, DB, akışlar, kurallar). **İlk buraya bak.**
 - `docs/README.md` — doküman sistemi haritası ("hangi soru → hangi dosya"). `docs/standards/` = cetveller (admin/bayi standartları, blueprint), `docs/audits/` = ölçümler, `docs/plans/` = roadmap.
 - `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` — canlı "neredeyiz" + **şerit panosu**.
+- `docs/standards/rendering-cache-standard.md` — **hangi sayfa nasıl üretilir, veri değişince ne
+  tazelenir, fiyat hangi yüzeyde görünür.** Statik vitrin sayfasında görünen HER tablonun DB tetiği +
+  webhook handler dalı olmalı (yoksa veri değişir, sayfa değişmez ve hiçbir test görmez).
 - `PROJECT.md` — DI & güvenlik milestone kayıtları + arayüz kontratları.
 - `RECOMMENDATIONS.md` · `CHANGELOG.md` — durum ve değişiklik geçmişi.
 - **Katalog→ticaret hattı SSOT:** `docs/plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan-uca pano)

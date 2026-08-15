@@ -14,6 +14,7 @@
  */
 const fs = require('fs')
 const path = require('path')
+const { spawn } = require('child_process')
 
 function readStdin() {
   try { return fs.readFileSync(0, 'utf8') } catch { return '' }
@@ -24,6 +25,26 @@ try { input = JSON.parse(readStdin() || '{}') } catch { input = {} }
 
 const sid = input.session_id || ''
 if (!sid) process.exit(0)
+
+/**
+ * Registry oto-senkronu — KOPARILMIŞ süreç olarak başlatılır.
+ *
+ * Neden burada: `post-merge` kancası yalnız yerel `git pull/merge`'de koşar, biz ise PR'ları
+ * `gh pr merge` ile GitHub üzerinden kapatıyoruz → senkron hiç çalışmıyordu. CI'a taşımak
+ * ÇÖZÜM DEĞİL: registry `~/.orion/registry.db`, yani bu makinedeki yerel bir dosya; runner'da
+ * boş bir DB yaratılır ve silinir (yeşil yanar, hiçbir şey senkronlanmaz). Üç oturum da aynı
+ * makinede olduğu için doğru yer oturum açılışıdır.
+ *
+ * Neden koparılmış: `git fetch` ağ işidir; oturum açılışını bekletmemeli. Çıktı
+ * `~/.orion/registry-autosync.log`'a düşer.
+ */
+try {
+  const child = spawn(process.execPath, [path.join(__dirname, '..', '..', 'scripts', 'board', 'registry-autosync.cjs')], {
+    detached: true,
+    stdio: 'ignore',
+  })
+  child.unref()
+} catch { /* senkron başlatılamadıysa oturumu bloklama — bir sonraki açılışta tekrar denenir */ }
 
 let context = `Oturum kimliğin: ${sid}\n`
 

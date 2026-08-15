@@ -2,6 +2,9 @@ import { SITE_URL } from '../../../../config/siteUrl'
 import { HVAC_BRANDS } from '../../../../data/brands'
 import PageComponent from '../../../../views/BrandDetailPage'
 
+/** ISR yedeği (1 saat) — birincil yol webhook; bkz. `rendering-cache-standard.md` §3-4. */
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   try {
     const uniqueBrands = HVAC_BRANDS.map(b => b.slug)
