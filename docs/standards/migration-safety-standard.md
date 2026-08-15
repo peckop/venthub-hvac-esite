@@ -91,6 +91,35 @@ end $$;
 commit;
 ```
 
+## KURAL: her migration ATOMİK uygulanır (INV-MIGRATION-1)
+
+Yıkıcılıktan bağımsız, **her** migration için geçerli. Yarım uygulanmış bir migration,
+yanlış uygulanmış bir migration'dan daha kötüdür: DB tutarsız kalır, ledger'a yazılmaz ve
+bir sonraki koşu **baştan dener** — yani yarım uygulama ikinci kez yaşanır.
+
+Çalıştırıcı (`supabase-migrate.yml`) iki biçim tanır, üçüncüsü yoktur:
+
+| Biçim | Dosyada | Çalıştırıcı ne yapar |
+|---|---|---|
+| **(a) kendi işlemini yönetir** | `BEGIN;` … `COMMIT;` | olduğu gibi koşar (`psql -f`) |
+| **(b) işlem denetimi yok** | ne `BEGIN` ne `COMMIT` | `psql --single-transaction` ile **sarar** |
+
+**Biçim (a) niçin körü körüne sarılmaz:** bazı ifadeler bir transaction bloğunun içinde
+**çalışamaz** — `CREATE INDEX CONCURRENTLY`, `DROP INDEX CONCURRENTLY`, `VACUUM`,
+`ALTER SYSTEM`. Yazar bunları bilinçli olarak `COMMIT;`'ten **sonra** bırakır.
+Kanonik örnek: `20260402000000_security_and_performance_hardening.sql`
+(`BEGIN@7` … `COMMIT@95`, ardından `CREATE INDEX CONCURRENTLY@103-112`).
+
+**Bekçi:** `src/__tests__/conformance/migration-atomicity.test.ts` üç şeyi PR anında
+denetler — (1) `BEGIN`/`COMMIT` sayıları dengeli, (2) işlem-dışı ifade `BEGIN…COMMIT`
+**arasında** değil, (3) işlem-dışı ifade taşıyan dosya `BEGIN/COMMIT`'siz **değil**
+(öyleyse çalıştırıcı sarar ve PostgreSQL reddeder).
+
+> Niçin PR anında: bu hata sınıfı yerelde **görünmez**. `tsc`/`lint`/`deno check` SQL
+> metnini yorumlamaz. Tek diğer görülme anı prod deploy'udur ve orada iş işten geçmiştir
+> (CLAUDE.md kural 13: merge = prod'a otomatik apply). Bekçi üç ihlal tipi de **bilerek
+> yaratılarak** kanıtlandı; üçü de FAIL verdi, dosyalar silindi.
+
 ## Kapsam ve sınırlar
 
 - Bu cetvel **yıkıcı** değişiklikler içindir: `DROP COLUMN/TABLE/FUNCTION`,
@@ -98,5 +127,5 @@ commit;
   guard B/E zorunlu değildir (A tavsiye edilir).
 - Migration merge = prod'a otomatik apply (CLAUDE.md §13) — guard'ların değeri tam
   da budur: kırmızı durursa DROP hiç çalışmaz, prod bozulmadan workflow FAIL verir.
-- İlgili kalıcı bekçiler: `INV-8 edge-select-columns` (şema↔edge sınırı) ·
+- İlgili kalıcı bekçiler: `INV-MIGRATION-1` (işlem sınırı, yukarıda) · `INV-8 edge-select-columns` (şema↔edge sınırı) ·
   `pr-size-check` büyük-dosya guard'ı (çalışma-ağacı hijyeni).
