@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\tests\e2e\adversarial.test.ts
-skeleton_hash: a6ec1ca31ad6d8d4
+source_path: C:\Users\alize\venthub-wt-hotfix\tests\e2e\adversarial.test.ts
+skeleton_hash: c850964a1f81ae9d
 entity_hashes:
   func:SecureCacheEngine:buildKey: 20c7443e1398653f
   func:SecureCacheEngine:get: 174c63f5685011f3
@@ -15,7 +15,7 @@ entity_hashes:
   func:secureResolveInvoicePath: 8bd792a72ccb68e5
   func:secureResolveTenant: a7c0a6c7bd053522
   overview: 88ca2352585634a1
-generated_at: 2026-06-02T07:51:17Z
+generated_at: 2026-08-15T06:35:36Z
 ---
 
 ## Genel Bakış
@@ -40,46 +40,6 @@ Bu grup, test senaryolarında verilerin temizlenmesini ve önbellekleme anahtar�
 ## AXIOMS – Mimari Varsayımlar
 
 Bu modül, HVAC sistemi için adversarial (saldırgan) test senaryolarında kullanılan yardımcı fonksiyonları ve güvenli önbellek motorunu kapsar. Güvenlik mekanizmalarının doğru çalışmasını test etmek için kritik varsayımlar taşır.
-
----
-
-**[Aksiyom 1 - Tenant Izolasyonu]:** `SecureCacheEngine` tarafından depolanan değerler, `tenantId` parameteresine göre kesinlikle izole olmalıdır.
-*Eğer farklı `tenantId` değerleri ile aynı `key` ve `lang` kullanılarak `set` ve `get` işlemleri yapılırsa, farklı tenantlar için farklı değerler dönmelidir. Aksi halde, tenant veri sızıntısı (tenant data leakage) oluşur.*
-
----
-
-**[Aksiyom 2 - Host Çözümleme Sınırları]:** `secureResolveTenant` fonksiyonu `host` parametresi `null` veya `undefined` olduğunda bile çalışabilir durumda olmalıdır.
-*Eğer `host` parametresi `null` veya `undefined` geldiğinde fonksiyon hata fırlatırsa, beklenmeyen host değerleri için sistem çöker. Güvenli bir varsayılan tenant veya hata yönetimi ile sonuç döndürmelidir.*
-
----
-
-**[Aksiyom 3 - İmza Hesaplama Bileşenleri]:** `computeSignature(secret, body)` fonksiyonu için hem `secret` hem de `body` non-empty string olmalıdır.
-*Eğer `secret` boş string olarak verilirse, hesaplanan imza güvenliksiz ve tahmin edilebilir hale gelir. Eğer `body` boş string olursa, imza tutarsız ve reprodukible olmayan sonuçlar doğurur.*
-
----
-
-**[Aksiyom 4 - Güvenli vs. Naif Anahtar Üretimi]:** `naiveBuildKey` ve `SecureCacheEngine.buildKey` fonksiyonları farklı güvenlik seviyelerine sahip olmalıdır.
-*Eğer `naiveBuildKey` ile `SecureCacheEngine.buildKey` aynı inputlar için aynı çıktıyı üretirse, naif implementasyonun güvenli implementasyondan farkı kalmaz ve adversary testleri anlamını yitirir. `naiveBuildKey` kasıtlı olarak zayıf bir anahtar üretim stratejisi izlemelidir.*
-
----
-
-**[Aksiyom 5 - Marka Konfigürasyonu Alan Zorunluluğu]:** `sanitizeBrandConfig` tarafından işlenen config objesinin `brandName`, `brandPrimaryColor` ve `brandLogoUrl` alanlarının tümü var olmalıdır.
-*Eğer bu alanlardan herhangi biri eksik veya farklı bir tipte gelirse, sanitizasyon süreci tanımsız davranış (undefined behavior) sergileyebilir. Eksik alan durumunda varsayılan değer mi yoksa hata mı döndürüleceği modülün test senaryoları ile tutarlı olmalıdır.*
-
----
-
-**[Aksiyom 6 - Fatura Yolu Deterministikliği]:** `secureResolveInvoicePath(tenantId, invoiceId)` aynı `tenantId` ve `invoiceId` değerleri için her zaman aynı yolu döndürmelidir.
-*Eğer aynı inputlar için farklı path'ler döndürülürse, fatura dosyalarına erişim tutarsız hale gelir ve dosya sistemi tabanlı testler başarısız olur.*
-
----
-
-**[Aksiyom 7 - Cache Anahtar Formatı]:** `SecureCacheEngine.buildKey` fonksiyonu, `key`, `lang` ve `tenantId` bileşenlerinden deterministik ve benzersiz bir anahtar üretmelidir.
-*Eğer farklı `(key, lang, tenantId)` üçlülerinden aynı cache anahtarı üretilirse, cache çakışmaları (collision) oluşur ve yanlış veriler okunur.*
-
----
-
-**[Aksiyom 8 - Mock User Resolver Çıktı Yapısı]:** `mockUserResolver()` fonksiyonu, bir kullanıcı objesi döndürmelidir ve bu obje至少 `id` alanı içermelidir.
-*Eğer mock user objesi geçerli bir yapıya sahip değilse, user-referanslı fonksiyonların test
 
 ---
 
@@ -132,22 +92,252 @@ Bu modül, HVAC sistemi için adversarial (saldırgan) test senaryolarında kull
 **Dönüş**: `{ brandName: string; brandPrimaryColor: string; brandLogoUrl: string }` — Her alaninin guvenli ve gecerli formata temizlenmis hali.
 
 ### buildKey
-**Ne yapar**: Güvenli bir cache anahtarı oluşturur. Verilen key, dil ve tenant bilgilerini birleştirerek prototip manipülasyonu saldırılarına karşı korumalı bir string üretir.
-
-**Nasıl yapar**: İlk olarak prototype pollution guard uygulayarak `__proto__` veya `constructor` değerlerini engeller. Ardından parametreleri bir array içinde JSON.stringify ile serialize ederek yapısal olarak güvenli bir anahtar oluşturur.
-
+**Ne yapar**: SecureCacheEngine sınıfının bir örneği için, verilen anahtar, dil ve kiracı ID bilgilerinden oluşacak ve önbellek deposunda kullanılabilecek güvenli bir anahtar dizesi üretir.
+**Nasıl yapar**: Fonksiyon, bir prototype pollution (prototip kirlenmesi) saldırısını engelleyen bir koruma kontrolü yapar. `key`, `lang` veya `tenantId` parametrelerinin `__proto__` veya `constructor` değerlerini alması durumunda hata fırlatır. Kontrolü geçen değerler, dizi yapısı içinde `JSON.stringify` kullanılarak bir dizeye dönüştürülür. Bu yapı, anahtar değerlerinin token manipülasyonu yoluyla çarpışmasını önleyen yapısal olarak güvenli bir serileştirme sağlar.
 **Parametreler**:
-- key: string — Cache'de depolanacak verinin tanımlayıcısı
-- lang: string — Dil kodu bilgisi
-- tenantId: string — Kiracı (tenant) tanımlayıcısı
-
-**Dönüş**: string — JSON formatında serialize edilmiş güvenli cache anahtarı
+- key: string — Önbellek kaydının birincil tanımlayıcısı.
+- lang: string — İlgili dil bilgisi, çoklu dil desteği için kullanılır.
+- tenantId: string — Veri izolasyonu için kiracı tanımlayıcısı.
+**Dönüş**: string — Oluşturulan, JSON formatında seri hale getirilmiş ve benzersiz önbellek anahtarı dizesi.
 
 ### get
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: SecureCacheEngine önbellek deposunda, belirli bir anahtar, dil ve kiracı ID kombinasyonu ile saklanan değeri geri döndürür.
+**Nasıl yapar**: Fonksiyon, girdi olarak alınan parametreleri `buildKey` metoduna aktararak güvenli bir anahtar oluşturur. Ardından, bu güvenli anahtarı kullanarak dahili `store` deposundan ilgili değeri sorgular ve sonucu döndürür. Bu, farklı kiracı ve dil seçenekleri için aynı temel anahtarın çakışmasını önler.
+**Parametreler**:
+- key: string — İstenen kaydın birincil tanımlayıcısı.
+- lang: string — İstenen kaydın dil bağlamı.
+- tenantId: string — İstenen kaydın ait olduğu kiracı bilgisi.
+**Dönüş**: any — Anahtar ile eşleşen önbellek kaydının değeri veya eşleşme yoksa `undefined`.
 
 ### set
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: SecureCacheEngine önbellek deposuna, belirli bir anahtar, dil ve kiracı ID kombinasyonu ile yeni bir değer kaydeder veya mevcut bir değeri günceller.
+**Nasıl yapar**: Fonksiyon, girdi olarak alınan parametreleri `buildKey` metoduna aktararak güvenli bir anahtar oluşturur. Oluşturulan bu güvenli anahtarı anahtar, verilen `value` değerini ise değer olarak kullanarak dahili `store` deposuna yazar. Bu, farklı kiracı ve dil seçenekleri için veri izolasyonunu ve güvenli depolamayı sağlar.
+**Parametreler**:
+- key: string — Kaydedilecek kaydın birincil tanımlayıcısı.
+- lang: string — Kaydın dil bağlamı.
+- tenantId: string — Kaydın ait olacağı kiracı bilgisi.
+- value: any — Depolanacak veri, herhangi bir tipte olabilir.
+**Dönüş**: Bu fonksiyon açık bir dönüş değeri döndürmez (void).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ./helpers/denoRuntime::DenoRuntimeSimulator
+- import: ./helpers/denoRuntime::setupDenoRuntime
+- import: ./helpers/mockRequest::MockNextResponse
+- import: ./helpers/mockRequest::createMockRequest
+- import: @/lib/tenantResolver::resolveTenant
+- import: @/middleware::middleware
+- import: isomorphic-dompurify::DOMPurify
+- import: next/server::NextRequest
+- import: next/server::NextResponse
+- import: vitest::afterEach
+- import: vitest::beforeEach
+- import: vitest::describe
+- import: vitest::expect
+- import: vitest::it
+- import: vitest::vi
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::beforeEachGlobal
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: void — vi.stubEnv ile ortam değişkenlerini (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NODE_ENV, JWT_CLAIMS_COOKIE_SECRET) production değerlerine sabitler
+
+### [N2_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::afterEachGlobal
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: void — vi.unstubAllEnvs() ve vi.restoreAllMocks() ile tüm ortam ve mock temizliğini yapar
+
+### [N3_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::mockUserResolverDefault
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ user: { id, user_metadata: { role }, app_metadata: { tenant_id } }, error: null }` — varsayılan admin kullanıcısını döner
+
+### [N4_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::createMockSupabaseClient
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ createServerClient: () => { auth: { getUser, getClaims, getSession }, from } }` — createServerClient sarmalı ile tam mock Supabase client
+
+### [N5_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::createMockSupabaseClientBare
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ auth: { getUser, getClaims, getSession }, from }` — createServerClient sarmalı olmadan düz mock Supabase client
+
+### [N6_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::mockGetUser
+- **params**: ()
+- **ic_degiskenler**:
+  - `res` — mockUserResolver() çağrı sonucu; error veya user içerir
+- **Dönüş**: `{ data: { user }, error }` — Supabase auth.getUser yanıtını simüle eder
+
+### [N7_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::mockGetClaims
+- **params**: ()
+- **ic_degiskenler**:
+  - `res` — mockUserResolver() çağrı sonucu
+- **Dönüş**: `{ data: { claims: { user_role, app_metadata, user_metadata } } | null, error }` — Supabase auth.getClaims yanıtını simüle eder
+
+### [N8_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::mockGetSession
+- **params**: ()
+- **ic_degiskenler**:
+  - `res` — mockUserResolver() çağrı sonucu
+  - `payload` — `{ user_role, app_metadata, user_metadata }` — JWT payload olarak kullanılacak nesne
+  - `base64` — Buffer.from(JSON.stringify(payload)).toString('base64') ile encode edilmiş payload; regex replace'lar ile URL-safe hale getirilir
+  - `token` — `` `header.${base64}.signature` `` formatında pseudo JWT token
+- **Dönüş**: `{ data: { session: { access_token, user } }, error }` — Supabase auth.getSession yanıtını simüle eder
+
+### [N9_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::mockFromSelectEqSingle
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ eq: () => { single: async () => ({ data: { slug: 'active-slug' }, error: null }) } }`
+
+### [N10_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::mockSelectEqSingle
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ select: () => { eq: () => { single: async () => ... } } }`
+
+### [N11_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::mockEqSingle
+- **params**: ()
+- **ic_degiskenler**: yok
+- **Dönüş**: `{ single: async () => ({ data: { slug: 'active-slug' }, error: null }) }`
+
+### [N12_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::computeSignature
+- **params**: `secret: string, body: string`
+- **ic_degiskenler**:
+  - `encoder` — TextEncoder instance'ı; secret ve body'yi Uint8Array'e dönüştürmek için kullanılır
+  - `key` — crypto.subtle.importKey sonucu HMAC-SHA256 anahtarı; raw formatında import edilir
+  - `signature` — crypto.subtle.sign sonucu; HMAC-SHA256 imza Uint8Array olarak üretilir
+- **Dönüş**: `Promise<string>` — imzanın base64 string karşılığı
+
+### [N13_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::secureResolveTenant
+- **params**: `host: string | null | undefined`
+- **ic_degiskenler**:
+  - `base` — resolveTenant(host) çağrı sonucu; slug ve tenantId alanlarını içerir
+- **Dönüş**: `{ slug, tenantId, ... }` — slug regex ile doğrulanmış, güvenli olmayan slug'lar 'invalid' olarak değiştirilmiş tenant çözümleme sonucu
+
+### [N14_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::SecureCacheEngine.buildKey
+- **params**: `key: string, lang: string, tenantId: string`
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — JSON.stringify([key, lang, tenantId]); __proto__/constructor kontrolü ile prototype pollution engellenir
+
+### [N15_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::SecureCacheEngine.get
+- **params**: `key: string, lang: string, tenantId: string`
+- **ic_degiskenler**:
+  - `safeKey` — this.buildKey(key, lang, tenantId) çağrı sonucu
+- **Dönüş**: `any` — this.store.get(safeKey) ile cache'den alınan değer
+
+### [N16_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::SecureCacheEngine.set
+- **params**: `key: string, lang: string, tenantId: string, value: any`
+- **ic_degiskenler**:
+  - `safeKey` — this.buildKey(key, lang, tenantId) çağrı sonucu
+- **Dönüş**: void — this.store.set(safeKey, value) ile cache'e yazar
+
+### [N17_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::naiveBuildKey
+- **params**: `key: string, lang: string, tenantId: string`
+- **ic_degiskenler**: yok
+- **Dönüş**: `string` — `` `${key}-${lang}-${tenantId}` `` template literal; delimiter-based birleşim, collision savunması yok
+
+### [N18_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::secureResolveInvoicePath
+- **params**: `tenantId: string, invoiceId: string`
+- **ic_degiskenler**:
+  - `normalizedInvoiceId` — decodeURIComponent(invoiceId); URL-encoded traversal karakterlerini decode eder
+- **Dönüş**: `string` — `` `tenants/${tenantId}/invoices/${normalizedInvoiceId}.pdf` ``; tenantId regex ve invoiceId traversal kontrolü ile
+
+### [N19_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::sanitizeBrandConfig
+- **params**: `config: { brandName: string; brandPrimaryColor: string; brandLogoUrl: string }`
+- **ic_degiskenler**:
+  - `brandName` — DOMPurify.sanitize(config.brandName, { ALLOWED_TAGS: [] }).trim(); HTML etiketlerini temizler
+  - `colorRegex` — `/^#(?:[0-9a-fA-F]{3,4}){1,2}$|^rgb\([0-9\s,]+\)$|^rgba\([0-9\s,.]+\)$/`; hex/rgb/rgba formatlarını doğrular
+  - `brandPrimaryColor` — colorRegex.test ile doğrulanmış renk; geçerli değilse '#2563eb' default'u
+  - `brandLogoUrl` — config.brandLogoUrl başlangıç değeri; protocol kontrolü ile değiştirilir
+  - `parsed` — new URL(config.brandLogoUrl) ile oluşturulmuş URL objesi; protocol kontrolü için
+- **Dönüş**: `{ brandName, brandPrimaryColor, brandLogoUrl }` — sanitize edilmiş marka konfigürasyonu
+
+### [N20_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::describeMalformedHost
+- **params**: () — test callback
+- **ic_degiskenler**: yok
+- **Dönüş**: void — describe('A. Malformed Host / Subdomain Resolution') bloğu; 2 test çalıştırır
+
+### [N21_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::testSqlInjectionQuarantine
+- **params**: ()
+- **ic_degiskenler**:
+  - `sqlInjectionHost` — `"engineering'; DROP TABLE tenants;--.venthub.local"` — SQL injection payload
+  - `resolved` — secureResolveTenant(sqlInjectionHost) çağrı sonucu
+- **Dönüş**: void — resolved.slug === 'invalid' doğrulaması
+
+### [N22_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::testHostHeaderPoisoning
+- **params**: ()
+- **ic_degiskenler**:
+  - `toxicHost` — `'engineering.venthub.local:80:443:invalid'` — çoklu port poisoning
+  - `resolved` — secureResolveTenant(toxicHost) çağrı sonucu
+- **Dönüş**: void — resolved.slug === 'engineering' ve resolved.tenantId doğrulaması
+
+### [N23_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::describeCrossTenantCache
+- **params**: () — test callback
+- **ic_degiskenler**: yok
+- **Dönüş**: void — describe('B. Cross-Tenant Cache Key Isolation') bloğu; 2 test çalıştırır
+
+### [N24_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::testPrototypePollutionBlock
+- **params**: ()
+- **ic_degiskenler**:
+  - `cache` — new SecureCacheEngine() instance'ı
+- **Dönüş**: void — cache.set('__proto__', ...) fırlatma ve Object.prototype temizlik doğrulaması
+
+### [N25_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::testCacheKeyCollision
+- **params**: ()
+- **ic_degiskenler**:
+  - `cache` — new SecureCacheEngine() instance'ı
+  - `key1` — naiveBuildKey('portal-en', 'us', 'tenant-a') çağrı sonucu
+  - `key2` — naiveBuildKey('portal', 'en-us', 'tenant-a') çağrı sonucu
+- **Dönüş**: void — naive collision ve secure schema ayrımı doğrulaması
+
+### [N26_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::describeWebhookSignatures
+- **params**: () — test callback
+- **ic_degiskenler**:
+  - `simulator` — DenoRuntimeSimulator instance'ı; beforeEach'te setup, afterEach'te cleanup
+  - `webhookPath` — process.cwd() + '/supabase/functions/shipping-webhook/index.ts'
+- **Dönüş**: void — describe('C. Webhook Signature & Replay Attacks') bloğu; beforeEach, afterEach, 3 test çalıştırır
+
+### [N27_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::testMissingSignature
+- **params**: ()
+- **ic_degiskenler**:
+  - `req` — new Request ile oluşturulmuş istek; Content-Type ve body var, signature header'ı yok
+  - `res` — await simulator.invokeFunction(webhookPath, req) çağrı sonucu
+- **Dönüş**: void — res.status === 401 doğrulaması
+
+### [N28_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::testClockSkewRejection
+- **params**: ()
+- **ic_degiskenler**:
+  - `payload` — `{ order_number: 'ORD-1', status: 'shipped' }` — webhook test payload'u
+  - `rawBody` — JSON.stringify(payload) — ham JSON string
+  - `sig` — await computeSignature('hmac-secret-999', rawBody) — HMAC-SHA256 imzası
+  - `futureTime` — String(Date.now() + 60 * 60 * 1000) — 1 saat ileri timestamp
+  - `req` — new Request ile oluşturulmuş istek; x-signature ve x-timestamp header'ları dahil
+  - `res` — await simulator.invokeFunction(webhookPath, req) çağrı sonucu
+  - `resBody` — await res.json() parse edilmiş response body
+- **Dönüş**: void — res.status === 401 ve resBody.error === 'Stale or invalid timestamp' doğrulaması
+
+### [N29_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::testOmittedTimestamp
+- **params**: ()
+- **ic_degiskenler**:
+  - `payload` — `{ order_number: 'ORD-1', status: 'shipped' }` — webhook test payload'u
+  - `rawBody` — JSON.stringify(payload) — ham JSON string
+  - `sig` — await computeSignature('hmac-secret-999', rawBody) — HMAC-SHA256 imzası
+  - `req` — new Request ile oluşturulmuş istek; x-signature var ama x-timestamp bilerek yok
+  - `res` — await simulator.invokeFunction(webhookPath, req) çağrı sonucu
+  - `resBody` — await res.json() parse edilmiş response body
+- **Dönüş**: void — res.status === 401 ve resBody.error === 'Missing timestamp header' doğrulaması
+
+### [N30_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::describeStorageEscape
+- **params**: () — test callback
+- **ic_degiskenler**: yok
+- **Dönüş**: void — describe('D. Storage Folder Escape & Directory Traversal') bloğu; 2 test çalıştırır
+
+### [N31_NASIL] AST Pointer: tests/e2e/adversarial.test.ts::testDirectoryTraversalBlock
+- **params**: ()
+- **ic
 
 ---
 

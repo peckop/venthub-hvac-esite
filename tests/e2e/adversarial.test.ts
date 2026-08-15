@@ -290,6 +290,32 @@ describe('Tier 5 Adversarial & Coverage Hardening E2E Suite', () => {
       const resBody = await res.json()
       expect(resBody.error).toBe('Stale or invalid timestamp')
     })
+
+    // T025-VH kilidi. Buradaki 5 ve 6 numaralı testler YALNIZ reddi sınıyordu:
+    // 5'te imza hiç yok (auth'ta düşüyor), 6'da timestamp VAR ama bayat. İkisi de
+    // "imza geçerli AMA timestamp hiç gönderilmemiş" halini görmüyordu — replay
+    // guard'ın "varsa uygula" (fail-OPEN) olduğu ay boyunca ikisi de yeşil kaldı.
+    // Bu test tam o boşluğu kapatır: guard artık ZORUNLU (cetvel §3.5).
+    it('7. should reject a correctly signed webhook that omits the timestamp header entirely', async () => {
+      const payload = { order_number: 'ORD-1', status: 'shipped' }
+      const rawBody = JSON.stringify(payload)
+      const sig = await computeSignature('hmac-secret-999', rawBody)
+
+      const req = new Request('https://localhost/functions/v1/shipping-webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-signature': sig
+          // x-timestamp / x-event-time BİLEREK yok
+        },
+        body: rawBody
+      })
+
+      const res = await simulator.invokeFunction(webhookPath, req)
+      expect(res.status).toBe(401)
+      const resBody = await res.json()
+      expect(resBody.error).toBe('Missing timestamp header')
+    })
   })
 
   // ─── 4. STORAGE FOLDER ESCAPE ATTEMPTS ───

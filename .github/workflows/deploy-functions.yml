@@ -216,6 +216,18 @@ jobs:
         with:
           node-version: '20'
 
+      # Kaynak karşılaştırması CLI ile yapılır: Management API'nin
+      # /functions/{slug}/body ucu derlenmiş ESZIP bundle döndürüyor ve
+      # `Accept: application/json` isteğini YOK SAYIYOR (ölçüldü, run 31866494488).
+      # `supabase functions download` eszip'i çözüp gerçek kaynağı çıkarır.
+      # CLI kimliği job env'indeki SUPABASE_ACCESS_TOKEN'dan gelir.
+      # Bu adım silinirse drift script'i exit 2 ile durur ("sapma yok" DEMEZ).
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+
+      - name: Show CLI version
+        run: supabase --version
+
       - name: Deploy sonrası yakınsama payı
         if: needs.deploy.result == 'success'
         shell: bash

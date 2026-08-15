@@ -17,30 +17,58 @@
  *                          kimlik-doğrulamasız hesap açma ucuydu)
  *   4) Deploy edilmemiş  — repoda var, prod'da YOK
  *
- * Management API uçları (supabase.com/docs/reference/api ile doğrulandı):
- *   GET /v1/projects/{ref}/functions              -> liste (slug, verify_jwt, version, status)
- *   GET /v1/projects/{ref}/functions/{slug}/body  -> deploy edilmiş kaynak
- *   Kimlik: Authorization: Bearer $SUPABASE_ACCESS_TOKEN
+ * Kaynağı NEREDEN alır (2026-08-15'te değişti):
+ *   - Fonksiyon LİSTESİ  -> Management API: GET /v1/projects/{ref}/functions
+ *     (slug, verify_jwt, version, status) — Authorization: Bearer $SUPABASE_ACCESS_TOKEN
+ *   - Fonksiyon KAYNAĞI  -> `supabase functions download <slug>` (Supabase CLI).
+ *     Management API'nin `/functions/{slug}/body` ucu KALDIRILDI: o uç derlenmiş bir
+ *     ESZIP bundle (`ESZIP2.3` sihirli baytları, ~743 KB) döndürüyor ve
+ *     `Accept: application/json` isteğini sunucu YOK SAYIYOR — yani kaynak
+ *     karşılaştırması o yoldan YAPILAMIYOR (ölçüldü: CI run 31866494488).
+ *     CLI eszip'i kendisi çözer; `_shared` bağımlılıklarını da çıkarır.
+ *
+ * REPOYA DOKUNMAZ: her slug için `os.tmpdir()` altında geçici bir "sahte proje"
+ * dizini açılır (`<tmp>/<slug>/supabase/config.toml` içinde yalnız project_id),
+ * CLI oraya yazar, karşılaştırma bittiğinde dizin silinir.
  *
  * Kullanım:
  *   SUPABASE_ACCESS_TOKEN=... SUPABASE_PROJECT_REF=... node scripts/edge/drift-check.mjs
- *   node scripts/edge/drift-check.mjs --self-test   # ağsız / token'sız birim testi
+ *   node scripts/edge/drift-check.mjs --self-test   # ağsız / token'sız / CLI'sız birim testi
  *   node scripts/edge/drift-check.mjs --json        # makine okunur çıktı
  *   node scripts/edge/drift-check.mjs --all-files   # _shared kopyalarını da karşılaştır
+ *
+ * Ortam değişkenleri:
+ *   SUPABASE_ACCESS_TOKEN  (zorunlu)  API + CLI kimliği
+ *   SUPABASE_PROJECT_REF   (zorunlu)  proje ref'i
+ *   SUPABASE_API_URL       (ops.)     Management API tabanı
+ *   SUPABASE_CLI_BIN       (ops.)     CLI ikili adı/yolu (varsayılan: supabase)
+ *   DRIFT_DOWNLOAD_CONCURRENCY (ops.) eşzamanlı indirme sayısı (varsayılan: 4)
  *
  * Exit kodları:
  *   0 = sapma yok
  *   1 = SAPMA VAR (kırmızı)
- *   2 = çalıştırılamadı (token/ref yok, API hatası, gövde formatı çözülemedi)
+ *   2 = çalıştırılamadı (token/ref yok, CLI yok/giriş yok, API hatası, indirme hatası)
  *       -> "0 sapma" ASLA denmez; çözemediğini açıkça söyler.
  */
 
+import { execFile, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { promisify } from 'node:util'
+
+const execFileAsync = promisify(execFile)
 
 const API_BASE = process.env.SUPABASE_API_URL || 'https://api.supabase.com'
 const FUNCTIONS_DIR = 'supabase/functions'
 const CONFIG_TOML = 'supabase/config.toml'
+const CLI_BIN = process.env.SUPABASE_CLI_BIN || 'supabase'
+// Windows'ta CLI npm ile kurulunca `supabase.cmd` olabilir; kabuk olmadan spawn
+// edilemez. Argümanlar sabit token'lar + slug (yalnız [a-z0-9-]) olduğu için
+// kabuk üzerinden geçmeleri güvenli.
+const USE_SHELL = process.platform === 'win32'
+const DOWNLOAD_CONCURRENCY = Math.max(1, Number(process.env.DRIFT_DOWNLOAD_CONCURRENCY) || 4)
 
 /* ------------------------------------------------------------ saf yardımcılar */
 
@@ -122,6 +150,31 @@ export function diffStats(repoText, prodText) {
   }
 }
 
+/**
+ * `supabase --version` sondasını yoruma çevirir (saf: test edilebilir).
+ * probe: spawnSync sonucu benzeri { error?, status?, stdout? }
+ */
+export function cliProbeVerdict(probe) {
+  if (probe?.error) {
+    const enoent = probe.error.code === 'ENOENT'
+    return {
+      ok: false,
+      reason: enoent ? 'not-found' : 'spawn-error',
+      message: enoent
+        ? 'Supabase CLI bulunamadi (ENOENT).'
+        : `Supabase CLI calistirilamadi (${probe.error.code ?? probe.error.message ?? 'bilinmeyen hata'}).`,
+    }
+  }
+  if (probe?.status !== 0) {
+    return {
+      ok: false,
+      reason: 'failed',
+      message: `Supabase CLI hata dondurdu (exit ${probe?.status ?? '?'}).`,
+    }
+  }
+  return { ok: true, reason: 'ok', version: String(probe.stdout ?? '').trim() }
+}
+
 /* ------------------------------------------------------------------- API */
 
 function requireEnv() {
@@ -146,6 +199,32 @@ function requireEnv() {
   return { token, ref }
 }
 
+/**
+ * CLI olmadan kaynak karşılaştırması YAPILAMAZ. Yoksa exit 2 — asla "sapma yok".
+ */
+function requireCli() {
+  const probe = spawnSync(CLI_BIN, ['--version'], { encoding: 'utf8', shell: USE_SHELL, windowsHide: true })
+  const verdict = cliProbeVerdict(probe)
+  if (!verdict.ok) {
+    console.error('')
+    console.error(`HATA: edge drift-check ÇALIŞTIRILAMADI — ${verdict.message}`)
+    console.error('')
+    console.error(`  Denenen komut: ${CLI_BIN} --version`)
+    const detail = String(probe?.stderr ?? '').trim()
+    if (detail) console.error(`  CLI stderr: ${detail.slice(0, 400)}`)
+    console.error('')
+    console.error('  Kaynak karşılaştırması Supabase CLI ile yapılır: Management API\'nin')
+    console.error('  /functions/{slug}/body ucu derlenmiş ESZIP bundle döndürüyor, kaynak değil.')
+    console.error('  CLI olmadan hiçbir şey ÖLÇÜLEMEZ — "sapma yok" SONUCU ÜRETİLMEDİ. (exit 2)')
+    console.error('')
+    console.error('  CI: drift job\'una `uses: supabase/setup-cli@v1` adımı ekli olmalı.')
+    console.error('  Yerel: https://supabase.com/docs/guides/cli  (veya SUPABASE_CLI_BIN=<tam yol>)')
+    console.error('')
+    process.exit(2)
+  }
+  return verdict.version
+}
+
 function api(token, url, accept) {
   return fetch(url, {
     headers: { Authorization: `Bearer ${token}`, ...(accept ? { Accept: accept } : {}) },
@@ -157,77 +236,117 @@ function fatal(msg) {
   process.exit(2)
 }
 
+/* ------------------------------------------------- CLI ile kaynak indirme */
+
+/** Sınırlı eşzamanlılıkla çalıştırır; sonuçları giriş sırasında döner. */
+async function runPool(items, limit, worker) {
+  const results = new Array(items.length)
+  let cursor = 0
+  const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    for (;;) {
+      const i = cursor++
+      if (i >= items.length) return
+      results[i] = await worker(items[i])
+    }
+  })
+  await Promise.all(runners)
+  return results
+}
+
+function listFilesRecursive(dir, acc = []) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const abs = path.join(dir, entry.name)
+    if (entry.isDirectory()) listFilesRecursive(abs, acc)
+    else if (entry.isFile()) acc.push(abs)
+  }
+  return acc
+}
+
 /**
- * Deploy edilmiş gövdeyi dosya listesine çevirir.
- * Content-Type'a göre davranır; TANIMADIĞI formatta SESSİZCE BOŞ DÖNMEZ, patlar.
+ * İndirme kökü: os.tmpdir() altında tek geçici dizin. Süreç biterken silinir —
+ * `process.exit()` ile çıkan yollarda da (fatal) temizlik yapılsın diye 'exit'
+ * kancasına bağlanır. REPO DİZİNİNE ASLA YAZILMAZ.
  */
-async function fetchDeployedFiles(token, ref, slug) {
-  const url = `${API_BASE}/v1/projects/${ref}/functions/${encodeURIComponent(slug)}/body`
-
-  // ÖLÇÜLDÜ (2026-08-15, CI run 31865954364): Accept BAŞLIĞI OLMADAN bu uç
-  // `application/octet-stream` + `ESZIP2.3` sihirli baytlarıyla derlenmiş bir
-  // bundle döndürüyor (743 KB) — kaynak DEĞİL, karşılaştırılamaz.
-  // `Accept: application/json` ile aynı uç `{ files: [{name, content}] }` döner;
-  // Supabase MCP'nin `get_edge_function`'ı da bu şekli alıyor. Bu yüzden başlık
-  // İSTEĞE BAĞLI DEĞİL, zorunlu.
-  let res = await api(token, url, 'application/json')
-  if (!res.ok) {
-    const body = await res.text().catch(() => '')
-    fatal(`GET ${url} -> HTTP ${res.status}. ${body.slice(0, 400)}`)
-  }
-  let ct = (res.headers.get('content-type') || '').toLowerCase()
-  let buf = Buffer.from(await res.arrayBuffer())
-
-  // Sunucu Accept'i yok sayıp yine eszip döndürürse: bu bir "sapma yok" değil,
-  // ölçemedik demektir. Aşağıdaki tanınmayan-format dalı fatal() ile durdurur.
-  if (ct.includes('octet-stream') && buf.subarray(0, 5).toString('latin1') === 'ESZIP') {
-    ct = 'application/x-eszip'
-  }
-
-  if (ct.includes('multipart/')) {
-    let form
+function makeTempRoot() {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'venthub-edge-drift-'))
+  process.on('exit', () => {
     try {
-      form = await new Response(buf, { headers: { 'content-type': ct } }).formData()
-    } catch (e) {
-      fatal(`'${slug}' govdesi multipart olarak cozulemedi (content-type: ${ct}): ${e?.message ?? e}`)
+      fs.rmSync(base, { recursive: true, force: true })
+    } catch {
+      // temizlik best-effort: tmpdir'de kalan artık sonucu etkilemez
     }
-    const files = []
-    for (const [key, value] of form.entries()) {
-      if (typeof value === 'string') continue // metadata vb.
-      files.push({ name: normalizeRemotePath(value.name || key), content: await value.text() })
-    }
-    if (!files.length) fatal(`'${slug}' govdesi multipart ama icinde dosya parcasi YOK (content-type: ${ct})`)
-    return files
+  })
+  return base
+}
+
+/**
+ * Tek slug'ı geçici "sahte proje" dizinine indirir.
+ * Dönen: { slug, files: [{name, content}] } veya { slug, error }
+ * name -> fonksiyon-göreli yol: 'healthz/index.ts', '_shared/sentry.ts'
+ */
+async function downloadSlug(ref, tempRoot, slug) {
+  const work = path.join(tempRoot, slug)
+  const fnDir = path.join(work, 'supabase', 'functions')
+  fs.mkdirSync(fnDir, { recursive: true })
+  // CLI'nin "burası bir Supabase projesi" demesi için gereken TEK şey.
+  fs.writeFileSync(path.join(work, 'supabase', 'config.toml'), `project_id = "${ref}"\n`, 'utf8')
+
+  try {
+    await execFileAsync(CLI_BIN, ['functions', 'download', slug, '--project-ref', ref], {
+      cwd: work,
+      shell: USE_SHELL,
+      windowsHide: true,
+      maxBuffer: 64 * 1024 * 1024,
+    })
+  } catch (e) {
+    const detail = String(e?.stderr || e?.stdout || e?.message || e).trim().slice(0, 600)
+    return { slug, error: `'${CLI_BIN} functions download ${slug}' BAŞARISIZ (exit ${e?.code ?? '?'}): ${detail}` }
   }
 
-  if (ct.includes('json')) {
-    let json
-    try {
-      json = JSON.parse(buf.toString('utf8'))
-    } catch (e) {
-      fatal(`'${slug}' govdesi JSON olarak cozulemedi: ${e?.message ?? e}`)
-    }
-    const arr = Array.isArray(json?.files) ? json.files : Array.isArray(json) ? json : null
-    if (!arr) fatal(`'${slug}' govdesi JSON ama beklenen 'files[]' alani yok. Anahtarlar: ${Object.keys(json ?? {}).join(', ')}`)
-    return arr.map((f) => ({ name: normalizeRemotePath(f.name ?? f.path ?? 'index.ts'), content: f.content ?? '' }))
+  let files
+  try {
+    files = listFilesRecursive(fnDir).map((abs) => ({
+      name: path.relative(fnDir, abs).replace(/\\/g, '/'),
+      content: fs.readFileSync(abs, 'utf8'),
+    }))
+  } catch (e) {
+    return { slug, error: `'${slug}' indirildi ama çıkarılan dosyalar okunamadı: ${e?.message ?? e}` }
   }
 
-  if (ct.includes('javascript') || ct.includes('typescript') || ct.startsWith('text/')) {
-    return [{ name: 'index.ts', content: buf.toString('utf8') }]
+  if (!files.length) {
+    return { slug, error: `'${slug}' için CLI hata vermedi ama HİÇ DOSYA çıkarmadı (${fnDir} boş).` }
   }
+  return { slug, files }
+}
 
-  fatal(
-    `'${slug}' govdesi COZULEMEYEN formatta dondu.\n` +
-      `  content-type: ${ct || '(yok)'}  boyut: ${buf.length} bayt\n` +
-      `  Ilk baytlar: ${JSON.stringify(buf.subarray(0, 32).toString('latin1'))}\n` +
-      (ct === 'application/x-eszip'
-        ? `  ESZIP bundle geldi: sunucu 'Accept: application/json' istegimizi YOK SAYDI.\n` +
-          `  Bu bir 'sapma yok' sonucu DEGILDIR — kaynak karsilastirmasi YAPILAMADI.\n` +
-          `  Sonraki adim: eszip'i cozen bir okuyucu ya da 'supabase functions download <slug>'\n` +
-          `  ile GECICI bir dizine indirip karsilastirmak (repo kopyasinin UZERINE YAZMA).`
-        : `  (Muhtemelen eszip bundle. Bu durumda /body yerine kaynak karsilastirmasi\n` +
-          `   'supabase functions download <slug>' ile yapilmali — script bunu VARSAYMAZ.)`)
+/**
+ * Tüm slug'ları indirir. Tek bir slug bile alınamazsa exit 2 — kısmi sonuçla
+ * "sapma yok" denmez.
+ */
+async function downloadAll(ref, slugs) {
+  if (!slugs.length) return new Map()
+  const tempRoot = makeTempRoot()
+  const started = Date.now()
+  console.error(
+    `[drift] ${slugs.length} fonksiyonun kaynağı indiriliyor ` +
+      `(supabase functions download, paralellik ${DOWNLOAD_CONCURRENCY}, geçici dizin: ${tempRoot})`
   )
+
+  const results = await runPool(slugs, DOWNLOAD_CONCURRENCY, (slug) => downloadSlug(ref, tempRoot, slug))
+  const seconds = ((Date.now() - started) / 1000).toFixed(1)
+
+  const failed = results.filter((r) => r.error)
+  if (failed.length) {
+    fatal(
+      `Prod kaynağı indirilemedi — ${failed.length}/${slugs.length} fonksiyon (süre ${seconds}s).\n` +
+        failed.map((f) => `    - ${f.error}`).join('\n') +
+        '\n  Olası sebepler: SUPABASE_ACCESS_TOKEN geçersiz/süresi dolmuş, CLI sürümü eski,\n' +
+        '  proje ref yanlış, ya da ağ erişimi yok. Kaynak karşılaştırması YAPILAMADI.'
+    )
+  }
+
+  console.error(`[drift] indirme tamam: ${slugs.length} fonksiyon, ${seconds}s`)
+  return new Map(results.map((r) => [r.slug, r.files]))
 }
 
 /* ------------------------------------------------------------------ main */
@@ -244,6 +363,8 @@ function repoSlugs(root) {
 
 async function run({ root, asJson, compareAllFiles }) {
   const { token, ref } = requireEnv()
+  const cliVersion = requireCli()
+  console.error(`[drift] Supabase CLI: ${cliVersion || '(sürüm okunamadı)'}`)
 
   const listUrl = `${API_BASE}/v1/projects/${ref}/functions`
   const res = await api(token, listUrl, 'application/json')
@@ -274,6 +395,10 @@ async function run({ root, asJson, compareAllFiles }) {
   // 4) Deploy edilmemis: repoda var, prod'da yok
   for (const slug of repo) if (!prodBySlug.has(slug)) report.missing.push({ slug })
 
+  // Kaynağı yalnız iki tarafta da bulunan fonksiyonlar için indir.
+  const comparable = repo.filter((slug) => prodBySlug.has(slug))
+  const deployedFilesBySlug = await downloadAll(ref, comparable)
+
   for (const slug of repo) {
     const prodFn = prodBySlug.get(slug)
     if (!prodFn) continue
@@ -294,7 +419,8 @@ async function run({ root, asJson, compareAllFiles }) {
     }
 
     // 1) Kaynak sapmasi
-    const files = await fetchDeployedFiles(token, ref, slug)
+    const files = deployedFilesBySlug.get(slug)
+    if (!files) fatal(`'${slug}' icin indirilmis kaynak yok — indirme adimi eksik calisti.`)
     const targets = compareAllFiles
       ? files
       : files.filter((f) => f.name === `${slug}/index.ts` || f.name === 'index.ts')
@@ -428,6 +554,38 @@ function selfTest() {
   eq('toml: yorum satiri sayilmadi', cfg.has('yorumlanmis'), false)
   eq('toml: [db] bolumu sizdirmadi', cfg.size, 2)
 
+  // --- CLI sondasi (saf) -----------------------------------------------------
+  eq('cliProbeVerdict: ENOENT -> not-found', cliProbeVerdict({ error: { code: 'ENOENT' } }).reason, 'not-found')
+  eq(
+    'cliProbeVerdict: ENOENT mesaji CLI\'yi adiyla soyluyor',
+    cliProbeVerdict({ error: { code: 'ENOENT' } }).message.includes('Supabase CLI'),
+    true
+  )
+  eq('cliProbeVerdict: exit!=0 -> failed', cliProbeVerdict({ status: 127, stdout: '' }).reason, 'failed')
+  eq('cliProbeVerdict: exit 0 -> ok', cliProbeVerdict({ status: 0, stdout: ' 2.34.3\n' }), { ok: true, reason: 'ok', version: '2.34.3' })
+
+  // --- CLI yoksa GERCEKTEN exit 2 (alt surec, AGA CIKMADAN) -------------------
+  // Kritik davranis: kaynak olculemiyorsa script "sapma yok" DEMEZ.
+  // CLI sondasi ag cagrisindan ONCE kostugu icin bu test token/ag gerektirmez.
+  {
+    const selfPath = fileURLToPath(import.meta.url)
+    const child = spawnSync(process.execPath, [selfPath], {
+      encoding: 'utf8',
+      windowsHide: true,
+      env: {
+        ...process.env,
+        SUPABASE_ACCESS_TOKEN: 'self-test-sahte-token',
+        SUPABASE_PROJECT_REF: 'self-test-sahte-ref',
+        SUPABASE_CLI_BIN: 'venthub-boyle-bir-komut-yok',
+      },
+    })
+    const out = `${child.stdout ?? ''}${child.stderr ?? ''}`
+    eq('CLI yoksa exit 2', child.status, 2)
+    eq('CLI yoksa mesaj CLI eksikligini soyluyor', /Supabase CLI/.test(out), true)
+    eq('CLI yoksa "sapma yok" YAZMIYOR', /SAPMA YOK/.test(out), false)
+    eq('CLI yoksa setup-cli ipucu veriyor', out.includes('supabase/setup-cli@v1'), true)
+  }
+
   const real = path.join(process.cwd(), CONFIG_TOML)
   if (fs.existsSync(real)) {
     const rc = parseConfigVerifyJwt(fs.readFileSync(real, 'utf8'))
@@ -441,7 +599,7 @@ function selfTest() {
     console.error(`SELF-TEST FAIL (${fails.length}):\n` + fails.join('\n'))
     process.exit(1)
   }
-  console.log('SELF-TEST OK  (ag/token gerektiren yollar bu modda calistirilmaz)')
+  console.log('SELF-TEST OK  (ag/token/CLI gerektiren yollar bu modda calistirilmaz)')
 }
 
 /* -------------------------------------------------------------------- CLI */

@@ -50,6 +50,17 @@ Bir fonksiyonun güvenlik duruşu, **kimin çağırdığından** türetilir. Dö
 **Fonksiyonun dosya başında, `Deno.serve`'den önce hangi sınıfa ait olduğu yorumla yazılır.**
 Sınıfı yazılmamış yeni fonksiyon review'da reddedilir — çünkü sınıf belirlenmeden §3–§6 uygulanamaz.
 
+**Kanonik biçim** (E11/R10 bunu birebir dayatıyor — serbest metin KABUL EDİLMEZ):
+
+```ts
+// Çağıran sınıfı: (a) oturumlu admin tarayıcısı — getUser(jwt) + rol kapısı
+```
+
+Kural: satır dosyanın **ilk 15 satırı içinde** ve `serve(`/`Deno.serve(` çağrısından **önce** olmalı;
+parantez içi tam olarak `a`, `b`, `c` veya `d`. Ardından serbest açıklama gelebilir.
+Bugün **26/26 fonksiyonda beyan YOK** — hepsi R10 baseline'ında borç olarak duruyor; yeni fonksiyon
+beyansız eklenemez.
+
 ---
 
 ## 3. Değişmezler (İHLAL ETME)
@@ -196,6 +207,25 @@ if (Math.abs(Date.now() - Date.parse(ts)) > 5 * 60_000) {
 }
 ```
 
+**Uygulanma durumu (2026-08-15, T025-VH).** `shipping-webhook` aylarca *"başlık varsa uygula"*
+ile duruyordu — yani başlığı göndermeyen çağıran için replay guard hiç çalışmıyordu (**fail-OPEN**),
+kardeşi `returns-webhook` ise başlığı zaten zorunlu tutuyordu. Asimetri kapatıldı, ikisi de zorunlu.
+Kapıyı sıkı kurmanın en ucuz anı buydu: entegre bir kargo sağlayıcısı henüz **yok**, kıracak canlı
+çağıran da yok. → **Sağlayıcı bağlanırken `x-timestamp` (veya `x-event-time`) göndermesi
+ENTEGRASYON ÖN KOŞULUDUR**; bu, sağlayıcıya iletilecek teknik gerekliliktir, sonradan gevşetilecek
+bir kural değil.
+
+Kilit: `tests/e2e/adversarial.test.ts` test 7 — *geçerli imzalı ama timestamp'siz* istek 401 almalı.
+Mevcut 5 ve 6 numaralı testler bu hâli **göremiyordu** (5'te imza hiç yok, 6'da timestamp var ama
+bayat), fail-open ay boyunca yeşil kaldı. Kilit bilerek-bozularak kanıtlandı: guard geri alınınca
+test 7 FAIL etti.
+
+**Adlandırılmış istisna — `SHIPPING_WEBHOOK_TOKEN` (legacy).** `shipping-webhook`, HMAC'e ek olarak
+statik bir `x-webhook-token` yolunu da kabul ediyor. Bu yol da **fail-closed**'dır (env tanımlı
+değilse hiç açılmaz) ve artık zorunlu replay guard'ın arkasındadır. Yine de HMAC'ten zayıftır:
+sır dönmez, gövdeye bağlı değildir. **Gerçek sağlayıcı bağlanınca kaldırılacaktır**; o güne kadar
+sandbox/test yolu olarak adıyla kayıtlıdır (`tests/e2e/adversarial.test.ts` bu yolu sınıyor).
+
 ### 3.6 `service_role` kuralı
 
 **KURAL.**
@@ -263,9 +293,10 @@ query-param'dan sahte-JWT'ye taşınır, kapanmaz. Gerçek çözüm `resolveTena
 `auth.getUser(jwt)` ile doğrulanmış `app_metadata`'dan okumaktır; bu 26 fonksiyonun çağrı yerini
 etkiler ve kendi doğrulama turunu hak eder. Yarım düzeltme "kapandı" yanılsaması üretirdi.
 
-**Ratchet durumu:** `atob` kısmı `edge-security.test.ts` R6 baseline'ında **adıyla** kayıtlı —
-yeni `atob` kullanımı FAIL eder, bu satır düzeltilince baseline'dan **silinmelidir**
-(stale-guard zorlar). Sıralama hatası için henüz statik kural yok (§5 · E12).
+**Ratchet durumu:** iki kural da CANLI ve ikisinin de baseline'ında bu dosya adıyla duruyor —
+`atob` için **R6**, sıralama için **R11** (`_shared/tenant_config.ts:20`). Yeni bir ihlal FAIL eder;
+düzeltme yapılınca **iki baseline satırı da silinmelidir** (stale-guard zaten zorlar).
+Göç planı: `docs/plans/tenant-id-hardening-2026-08-15.md` (7 adım, ölçülmüş çağıran envanteriyle).
 
 ---
 
@@ -303,7 +334,9 @@ ajan için net kapsam (statik-tarama gotcha'ları → `conformance-test-static-s
 
 **Durum sütunu = kapı GERÇEKTEN var mı.** Cetvelin master'da olması işin yapıldığı anlamına gelmez;
 `CANLI` olanlar `src/__tests__/conformance/edge-security.test.ts` içinde **bilerek-boz-kırmızı-gör**
-yöntemiyle kanıtlandı (2026-08-15: R1/R4/R6 kasten bozuldu, üçü de dosya:satır ile FAIL etti).
+yöntemiyle kanıtlandı. 2026-08-15: R1/R4/R6 kasten bozuldu (üçü de dosya:satır ile FAIL);
+sonra R7/R8/R9/R10/R11 de tek tek bozuldu — R10 hem **yeni-ihlal** hem **bayat-baseline** yönünde
+(baseline'dan çıkan bir adı silmeyi de zorluyor). Kanıtsız hiçbir kural CANLI sayılmadı.
 
 | # | Kural | Taranan | FAIL koşulu | Durum |
 |---|---|---|---|---|
@@ -313,12 +346,12 @@ yöntemiyle kanıtlandı (2026-08-15: R1/R4/R6 kasten bozuldu, üçü de dosya:s
 | **E4** | §3.4 elle cors objesi yasak | aynı | `Access-Control-Allow-` literali `_shared/cors.ts` **dışında** geçiyor | **CANLI — R3** (baseline: `apply-coupon`) |
 | **E5** | §3.7 per-fonksiyon toml yasak | `supabase/functions/*/supabase.toml` | dosya sayısı > 0 | **CANLI — R4** |
 | **E6** | §3.1 `verify_jwt=false` allow-list | `supabase/config.toml` | `false` olan uçta gövdede kimlik/imza sinyali yok | **CANLI — R5** (baseline: `iyzico-callback`, `shipping-status`; muaf: `tcmb-rates-sync`) |
-| **E7** | §3.1 config kapsamı | `config.toml` ↔ `functions/*/` dizinleri | dizini olup `[functions."x"]` bloğu olmayan fonksiyon | beklemede |
+| **E7** | §3.7 config kapsamı | `config.toml` ↔ `functions/*/` dizinleri | dizini olup `[functions."x"]` bloğu olmayan fonksiyon | **CANLI — R7** (baseline: 26'nın 13'ünde blok yok) |
 | **E8** | §3.8 deploy kapsamı | `.github/workflows/deploy-functions.yml` | elle sabit fonksiyon listesi içeriyor (dizin taraması değil) | **karşılandı** — liste `scripts/edge/select-functions.mjs` ile türetiliyor; ayrıca `scripts/edge/drift-check.mjs` repo↔prod sapmasını CI'da ölçüyor |
-| **E9** | §3.2 admin ucu rol kontrolü | `functions/admin-*/index.ts` | dosyada `'admin'`/`'superadmin'` rol kontrolü yok | beklemede |
-| **E10** | §3.5 webhook fail-closed | `functions/*webhook*/index.ts` | HMAC imza doğrulaması **veya** timestamp guard'ı yok | beklemede |
-| **E11** | §2 çağıran sınıfı beyanı | `functions/*/index.ts` | dosya başında sınıf (a/b/c/d) beyan yorumu yok | beklemede |
-| **E12** | §3.9 `tenant_id` önceliği | `_shared/tenant_config.ts` | query/gövde `tenant_id`'si doğrulanmış JWT'den **önce** okunuyor | beklemede — §3.9 borcu |
+| **E9** | §3.2 admin ucu rol kontrolü | `functions/admin-*/index.ts` | dosyada `'admin'`/`'superadmin'` rol kontrolü yok | **CANLI — R8** (baseline BOŞ — 6/6 admin ucu geçiyor) |
+| **E10** | §3.5 webhook fail-closed | `functions/*webhook*/index.ts` | HMAC imza doğrulaması **veya** ZORUNLU timestamp guard'ı yok | **CANLI — R9** (baseline BOŞ — `shipping-webhook` T025-VH ile uyumlu hâle geldi) |
+| **E11** | §2 çağıran sınıfı beyanı | `functions/*/index.ts` | ilk 15 satırda ve `serve()`'den önce geçerli beyan yok | **CANLI — R10** (baseline: 26/26 — hiçbirinde beyan yok) |
+| **E12** | §3.9 `tenant_id` önceliği | tüm edge kaynakları | doğrulanmamış `tenant_id` okuması `getUser()`'dan **önce** (ya da `getUser` hiç yok) | **CANLI — R11** (baseline: `_shared/tenant_config.ts:20` — §3.9 borcu) |
 
 **Makine ile denetlenemeyenler** (insan/runtime kapısı, §4'e bağlıdır):
 `config.toml` ↔ **prod** sürüm çelişkisi (canlı sorgu gerektirir) · gerçek 401/403 davranışı ·
