@@ -10,6 +10,8 @@ import React, { useCallback, useEffect, useState } from 'react'
 
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
+import AbcPieChart from '../../components/admin/dashboard/AbcPieChart'
+import ActivityHeatmap from '../../components/admin/dashboard/ActivityHeatmap'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
 import SalesChart from '../../components/admin/dashboard/SalesChart'
 import StatCard from '../../components/admin/dashboard/StatCard'
@@ -22,6 +24,29 @@ interface DashboardChartData {
   date: string
   orders: number
   returns: number
+}
+
+interface AbcSlice {
+  name: string
+  value: number
+  color: string
+}
+
+interface HeatmapCell {
+  day: number
+  hour: number
+  count: number
+}
+
+/**
+ * ABC dilim renkleri semantik token'lardan okunur — sabit HEX yazılsaydı tema
+ * değişince grafik zeminle uyumsuz kalırdı. SVG `fill` içinde `var()` çözülür;
+ * değişkenler `[data-admin-theme]` kapsamından miras alınır.
+ */
+const ABC_COLORS: Record<string, string> = {
+  A: 'hsl(var(--admin-accent))',
+  B: 'hsl(var(--admin-warning))',
+  C: 'hsl(var(--admin-fg-subtle))',
 }
 
 const AdminDashboardPage: React.FC = () => {
@@ -38,6 +63,8 @@ const AdminDashboardPage: React.FC = () => {
 
   const [tiedCapital, setTiedCapital] = useState<number | null>(null)
   const [alarmCount, setAlarmCount] = useState<number | null>(null)
+  const [abcData, setAbcData] = useState<AbcSlice[]>([])
+  const [heatmapData, setHeatmapData] = useState<HeatmapCell[]>([])
 
   const loadKPIs = useCallback(async () => {
     try {
@@ -62,17 +89,24 @@ const AdminDashboardPage: React.FC = () => {
       sevenDaysAgo.setHours(0, 0, 0, 0)
       const sevenDaysAgoISO = sevenDaysAgo.toISOString()
 
-      const [returnsRes, shipRes, productsRes, chartReturnsRes] = await Promise.all([
+      const [returnsRes, shipRes, productsRes, chartReturnsRes, abcRes] = await Promise.all([
         supabase.from('venthub_returns').select('id', { count: 'exact', head: true }).in('status', ['requested', 'approved']),
         supabase.from('venthub_orders').select('id', { count: 'exact', head: true }).is('shipped_at', null).in('status', ['confirmed', 'processing']),
         supabase.from('products').select('purchase_price, price, stock_qty, low_stock_threshold'),
-        supabase.from('venthub_returns').select('id, created_at').gte('created_at', sevenDaysAgoISO)
+        supabase.from('venthub_returns').select('id, created_at').gte('created_at', sevenDaysAgoISO),
+        /*
+          ABC sınıfı `inventory_summary`'de — `inventory_velocity`'de DEĞİL.
+          İki view zamanla ayrışmış; velocity yalnız stok kolonlarını taşıyor.
+          Yanlış view'dan seçmek sessiz bir "veri yok" durumu üretirdi.
+        */
+        supabase.from('inventory_summary' as never).select('abc_class')
       ])
 
       if (returnsRes.error) throw returnsRes.error
       if (shipRes.error) throw shipRes.error
       if (productsRes.error) throw productsRes.error
       if (chartReturnsRes.error) throw chartReturnsRes.error
+      if (abcRes.error) throw abcRes.error
 
       setPendingReturns(returnsRes.count)
       setPendingShipments(shipRes.count)
@@ -139,6 +173,45 @@ const AdminDashboardPage: React.FC = () => {
           orders: cd.orders,
           returns: cd.returns
         }))
+      )
+
+      /*
+        ABC dağılımı. Sınıfı boş olan satırlar sayılmaz — "sınıflandırılmamış"
+        bir dilim olarak göstermek, satış geçmişi henüz olmayan katalogda
+        yanıltıcı bir "kategori" uydururdu.
+      */
+      const abcCounts: Record<string, number> = {}
+      for (const row of (abcRes.data ?? []) as Array<{ abc_class: string | null }>) {
+        const cls = row.abc_class
+        if (!cls) continue
+        abcCounts[cls] = (abcCounts[cls] ?? 0) + 1
+      }
+      setAbcData(
+        Object.entries(abcCounts)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([name, value]) => ({
+            name,
+            value,
+            color: ABC_COLORS[name] ?? ABC_COLORS.C
+          }))
+      )
+
+      /*
+        Sipariş yoğunluğu ısı haritası — AYRI SORGU YOK. Yukarıda zaten çekilen
+        `ordersData` (son 1000 sipariş) gün/saat kovalarına dağıtılıyor.
+        Aynı veri için ikinci bir gidiş-dönüş, panelin açılışını yavaşlatırdı.
+      */
+      const buckets = new Map<string, number>()
+      for (const order of ordersData ?? []) {
+        const d = new Date(order.created_at)
+        const key = `${d.getDay()}-${d.getHours()}`
+        buckets.set(key, (buckets.get(key) ?? 0) + 1)
+      }
+      setHeatmapData(
+        [...buckets.entries()].map(([key, count]) => {
+          const [day, hour] = key.split('-').map(Number)
+          return { day, hour, count }
+        })
       )
 
       if (productsRes.data) {
@@ -242,6 +315,20 @@ const AdminDashboardPage: React.FC = () => {
         <div className="glass-card p-8 rounded-hvac-2xl border border-white/5 bg-surface-deep/40">
           <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-8">{t('admin.dashboard.charts.orderFlow')}</h3>
           <SalesChart data={chartData} title={t('admin.dashboard.charts.salesTrend')} />
+        </div>
+      </div>
+
+      {/*
+        REGRESYON ONARIMI — `AbcPieChart` ve `ActivityHeatmap` tam yazılmış ama
+        HİÇBİR yerden import edilmiyordu (~300 satır ulaşılamaz yüzey). İkisi de
+        saf sunum bileşeni; eksik olan yalnız veriyi besleyen konteynerdi.
+      */}
+      <div className="grid lg:grid-cols-2 gap-8">
+        <div className="glass-card p-8 rounded-hvac-2xl border border-white/5 bg-surface-deep/40">
+          <AbcPieChart data={abcData} title={t('admin.dashboard.abcProductClassification')} />
+        </div>
+        <div className="glass-card p-8 rounded-hvac-2xl border border-white/5 bg-surface-deep/40">
+          <ActivityHeatmap data={heatmapData} title={t('admin.dashboard.charts.orderFlow')} />
         </div>
       </div>
     </div>
