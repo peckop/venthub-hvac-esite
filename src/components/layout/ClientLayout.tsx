@@ -3,6 +3,7 @@
 import { usePathname, useSearchParams } from 'next/navigation'
 import React, { Suspense, useEffect } from 'react'
 
+import ConsentGatedAnalytics from '@/components/analytics/ConsentGatedAnalytics'
 import { SupabaseProvider } from '@/providers/SupabaseProvider'
 
 import AuthProvider from '../../contexts/AuthContext'
@@ -104,6 +105,8 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
         <MainLayout>
             {children}
             <CookieConsent />
+            {/* Rızaya bağlı analitik: NEXT_PUBLIC_GA_ID yoksa VEYA rıza yoksa hiçbir şey yüklemez (T020-VH) */}
+            <ConsentGatedAnalytics />
             {/* MantÄ±ksal TakipÃ§iler */}
             <Suspense fallback={null}>
                 <NavigationTracker />

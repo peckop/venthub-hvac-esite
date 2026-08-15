@@ -834,6 +834,26 @@ export const tr = {
     privacy: 'Gizlilik Politikası',
     terms: 'Kullanım Koşulları'
   },
+  cookieConsent: {
+    title: 'Çerez İzni',
+    description: 'Sitenin çalışması için zorunlu çerezleri kullanıyoruz. Zorunlu olmayan çerezler yalnızca sizin onayınızla çalışır.',
+    policyLink: 'Çerez Politikası',
+    acceptAll: 'Tümünü Kabul Et',
+    rejectOptional: 'Yalnızca Zorunlu',
+    manage: 'Tercihleri Yönet',
+    saveSelection: 'Seçimi Kaydet',
+    changePreferences: 'Çerez tercihlerimi değiştir',
+    categories: {
+      necessary: 'Zorunlu',
+      necessaryDesc: 'Üye girişi, sepet ve güvenlik için gereklidir; kapatılamaz.',
+      functional: 'İşlevsel',
+      functionalDesc: 'Dil ve görüntüleme tercihlerinizi hatırlar.',
+      analytics: 'Analitik',
+      analyticsDesc: 'Sitenin nasıl kullanıldığını ölçmemizi sağlar.',
+      marketing: 'Pazarlama',
+      marketingDesc: 'İlgi alanlarınıza göre tanıtım gösterilmesini sağlar.'
+    }
+  },
   legal: {
     kvkkTitle: 'KVKK Aydınlatma Metni (Taslak)',
     draftWarning: 'Bu metin taslaktır ve test amaçlıdır. Canlıya çıkmadan önce şirketinizin gerçek bilgileri ile güncelleyiniz ve bir hukukçudan teyit alınız.',
