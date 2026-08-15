@@ -16,6 +16,7 @@ import type { CategoryMetadata,DbCategory } from '../../../types/db-rows'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
 import VentImage from '../../ui/VentImage'
+import { useConfirm } from '../overlay/ConfirmProvider'
 
 
 type CategoryUpdate = Database['public']['Tables']['categories']['Update']
@@ -54,6 +55,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     onSuccess
 }) => {
     const { t } = useI18n();
+    const confirm = useConfirm();
     const resolutionVal = '800x800px';
     const formatsVal = 'WebP, PNG, JPG';
     const dot = '.';
@@ -230,14 +232,23 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
         }
     }
 
-    const handleClose = () => {
-        if (form.formState.isDirty) {
-            if (window.confirm(t('admin.categories.unsavedChangesConfirm') || 'Kaydedilmemiş değişiklikleriniz var. Ayrılmak istediğinizden emin misiniz?')) {
-                onOpenChange(false)
-            }
-        } else {
+  /**
+   * Kirli-form guard'i — window.confirm yerine ConfirmDialog (cetvel §4.7).
+   * Kapatma AKISI DEGISTI: eskiden confirm senkron blokluyordu; artik kapatma
+   * ISTEGI once yakalanir, onay beklenir, ancak onaylanirsa gercekten kapatilir.
+   * Degisiklikleri atmak GERI ALINAMAZ -> tone:'danger'.
+   */
+    const handleClose = async () => {
+        if (!form.formState.isDirty) {
             onOpenChange(false)
+            return
         }
+        const ok = await confirm({
+            description: t('admin.categories.unsavedChangesConfirm'),
+            confirmLabel: t('admin.confirm.discardChanges'),
+            tone: 'danger',
+        })
+        if (ok) onOpenChange(false)
     }
 
     const handleOpenChange = (openVal: boolean) => {
@@ -266,7 +277,9 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
         <Dialog.Root open={open} onOpenChange={handleOpenChange}>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
-                <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-90vh overflow-hidden bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col">
+                <Dialog.Content
+                  // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
+                  aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-90vh overflow-hidden bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col">
                     <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
                         <div>
                             <Dialog.Title className="text-xl font-bold text-white tracking-tight">

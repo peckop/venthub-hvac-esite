@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { AuthorityBuilder } from '@/components/admin/authority-builder/AuthorityBuilder';
+import { useConfirm } from '@/components/admin/overlay/ConfirmProvider'
 import { AuthorityRenderer } from '@/components/authority/AuthorityRenderer';
 import { useRole } from '@/hooks/useRole';
 import { useI18n } from '@/i18n/I18nProvider';
@@ -52,6 +53,7 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
   const router = useRouter();
   const { canWrite } = useRole();
   const { t } = useI18n();
+  const confirm = useConfirm();
   const hasWriteAccess = canWrite('categories');
   const [category, setCategory] = useState<DbCategory | null>(null);
   const [blocks, setBlocks] = useState<AuthorityBlock[] | null>(null);
@@ -184,14 +186,23 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
     };
   }, [isFormDirty]);
 
-  const handleBack = () => {
-    if (isFormDirty) {
-      if (window.confirm(t('admin.categories.unsavedChangesConfirm'))) {
-        router.back();
-      }
-    } else {
+  /**
+   * Kirli-form guard'i — window.confirm yerine ConfirmDialog (cetvel §4.7).
+   * Kapatma AKISI DEGISTI: eskiden confirm senkron blokluyordu; artik kapatma
+   * ISTEGI once yakalanir, onay beklenir, ancak onaylanirsa gercekten kapatilir.
+   * Degisiklikleri atmak GERI ALINAMAZ -> tone:'danger'.
+   */
+  const handleBack = async () => {
+    if (!isFormDirty) {
       router.back();
+      return;
     }
+    const ok = await confirm({
+      description: t('admin.categories.unsavedChangesConfirm'),
+      confirmLabel: t('admin.confirm.discardChanges'),
+      tone: 'danger',
+    });
+    if (ok) router.back();
   };
 
   const onSubmit = async (values: CategoryFormValues) => {

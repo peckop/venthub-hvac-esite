@@ -6,5 +6,6 @@ export const confirm = {
       confirm: 'Continue',
       cancel: 'Cancel',
       delete: 'Delete',
+      discardChanges: 'Discard changes',
       typeToConfirm: 'Type "{value}" to confirm'
 };

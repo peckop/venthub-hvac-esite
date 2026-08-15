@@ -6,5 +6,6 @@ export const confirm = {
       confirm: 'Devam et',
       cancel: 'Vazgeç',
       delete: 'Sil',
+      discardChanges: 'Değişiklikleri at',
       typeToConfirm: 'Onaylamak için "{value}" yazın'
 };

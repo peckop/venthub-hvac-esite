@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\admin\BulkActionToolbar.tsx
-skeleton_hash: 8d306dcdeac63716
+source_path: C:\Users\alize\venthub-wt-admin\src\components\admin\BulkActionToolbar.tsx
+skeleton_hash: d4e74c941038075d
 entity_hashes:
   func:BulkActionToolbar: ba39222c0aa88e73
   overview: f47185db4076328f
   style_tokens: 812207303bb8adc3
-generated_at: 2026-06-19T20:47:03Z
+generated_at: 2026-08-15T15:06:38Z
 ---
 
 ## Genel Bakış
