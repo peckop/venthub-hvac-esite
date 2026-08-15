@@ -5,7 +5,7 @@
 > her satır bir komutla üretildi, komut da yazılı. Gelecekte biri "riskimiz var mı?" derse
 > cevap burada, ve **yeniden taramak yerine tarama betiğini koşmak** yeterli.
 >
-> **Yöntem:** `C:/Users/alize/venthub-secret-tarama/scan.py` — 18 sır imzası × **tüm git geçmişi**
+> **Yöntem:** `scripts/security/secret-scan.py` (repoda) — 18 sır imzası × **tüm git geçmişi**
 > (`git log --all -S<sabit dize>` → eşleşen her commit'te regex ile tam değer çıkarımı).
 > Ham değerler `TAM-RAPOR.txt`'de tutuldu; **o dosya git'te DEĞİL**, yalnız yerel diskte.
 > Bu belgeye hiçbir sırrın tam değeri yazılmadı — maskeli önek/sonek ve **canlılık testi sonucu** var.
@@ -77,10 +77,17 @@ makinende çalıştırır).
 ## 5. Bu denetim nasıl tekrarlanır
 
 ```bash
-python C:/Users/alize/venthub-secret-tarama/scan.py
+python scripts/security/secret-scan.py
 ```
 
-Çıktı: konsola **maskeli** özet, `TAM-RAPOR.txt`'ye tam değerler (git'e KOYMA).
+Çıktı: konsola **maskeli** özet, `TAM-RAPOR.txt`'ye tam değerler.
+Rapor `.gitignore`'da — commit edilemez, ama yine de kontrol edip **sil**.
+
+> **Betik 2026-08-15'te repoya alındı.** Önceden yalnız `C:/Users/alize/venthub-secret-tarama/`
+> altında duruyordu; yani bu belgenin "nasıl tekrarlanır" yordamı **tek makinede** çalışıyordu
+> ve taze bir klon denetimi yineleyemezdi. Ölçümü betiğe dönüştürüp betiği repo dışında
+> bırakmak, ölçümü hiç betiğe dönüştürmemekle aynı kapıya çıkar (aynı sınıf: `.git/hooks`).
+> Port doğrulandı: yeni yol, orijinalle **birebir aynı 5 değeri** buldu.
 Bulunan bir token'ın hâlâ geçerli olup olmadığını **tahmin etme, çağır**:
 
 ```
