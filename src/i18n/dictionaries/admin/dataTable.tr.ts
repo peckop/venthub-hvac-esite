@@ -11,6 +11,13 @@ export const dataTable = {
         clearAll: 'Tüm filtreleri temizle',
         facetEmpty: 'Bu filtre için sonuç yok'
       },
+      // ColumnsMenu (kit-geneli: 14 admin tablosunun tamamı bu menüyü kullanır).
+      columns: {
+        title: 'Aktif Kolonlar',
+        density: 'Satır Yoğunluğu',
+        densityComfortable: 'Rahat (Varsayılan)',
+        densityCompact: 'Sıkışık (Maksimum Veri)'
+      },
       states: {
         loading: 'Yükleniyor...',
         error: 'Veriler yüklenirken bir hata oluştu',
@@ -22,6 +29,7 @@ export const dataTable = {
         rowsPerPage: 'Sayfa başına satır'
       },
       export: {
-        csv: 'CSV olarak indir'
+        csv: 'CSV olarak indir',
+        fileFormat: 'Dosya Formatı'
       }
 };

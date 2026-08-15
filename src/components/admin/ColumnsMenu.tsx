@@ -22,10 +22,10 @@ const ColumnsMenu: React.FC<{
       <DropdownMenu.Trigger asChild>
         <button 
           className={adminButtonSecondaryClass + " h-12 flex items-center gap-2 px-5 min-w-140px"}
-          aria-label={_t('admin.a11y.menu') || 'Görünüm Ayarları'}
+          aria-label={_t('admin.a11y.menu')}
         >
           <Settings2 size={16} className="text-cyan-400" />
-          <span className="truncate">{buttonLabel || _t('admin.common.view') || 'Görünüm'}</span>
+          <span className="truncate">{buttonLabel || _t('admin.common.view')}</span>
         </button>
       </DropdownMenu.Trigger>
       
@@ -37,7 +37,7 @@ const ColumnsMenu: React.FC<{
         >
           <div className="px-4 pt-3 pb-2 text-xs font-black uppercase tracking-hvac-normal text-slate-500 border-b border-white/5 mb-2 flex items-center gap-2">
             <Layout size={12} />
-            {_t('admin.inventory.activeColumns') || 'Aktif Kolonlar'}
+            {_t('admin.dataTable.columns.title')}
           </div>
           
           <div className="space-y-1 overflow-y-auto max-h-300px custom-scrollbar px-1">
@@ -63,7 +63,7 @@ const ColumnsMenu: React.FC<{
           
           <div className="px-4 pt-1 pb-2 text-xs font-black uppercase tracking-hvac-normal text-slate-500 flex items-center gap-2">
             <Maximize2 size={12} />
-            {_t('admin.inventory.density') || 'Satır Yoğunluğu'}
+            {_t('admin.dataTable.columns.density')}
           </div>
           
           <DropdownMenu.RadioGroup 
@@ -79,7 +79,7 @@ const ColumnsMenu: React.FC<{
                 <div className={`w-4 h-4 rounded-full border transition-colors flex items-center justify-center ${density === 'comfortable' ? 'bg-cyan-400 border-cyan-400 shadow-glow-sm' : 'border-white/10 bg-white/5'}`}>
                   {density === 'comfortable' && <div className="w-1.5 h-1.5 rounded-full bg-surface-deep" />}
                 </div>
-                {_t('admin.inventory.densityComfortable') || 'Rahat (Varsayılan)'}
+                {_t('admin.dataTable.columns.densityComfortable')}
               </div>
             </DropdownMenu.RadioItem>
             
@@ -91,7 +91,7 @@ const ColumnsMenu: React.FC<{
                 <div className={`w-4 h-4 rounded-full border transition-colors flex items-center justify-center ${density === 'compact' ? 'bg-cyan-400 border-cyan-400 shadow-glow-sm' : 'border-white/10 bg-white/5'}`}>
                   {density === 'compact' && <div className="w-1.5 h-1.5 rounded-full bg-surface-deep" />}
                 </div>
-                {_t('admin.inventory.densityCompact') || 'Sıkışık (Maksimum Veri)'}
+                {_t('admin.dataTable.columns.densityCompact')}
               </div>
             </DropdownMenu.RadioItem>
           </DropdownMenu.RadioGroup>

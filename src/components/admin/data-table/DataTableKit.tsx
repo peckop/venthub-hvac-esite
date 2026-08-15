@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 
 import type { UseAdminTableResult } from '@/hooks/useAdminTable'
+import { useI18n } from '@/i18n/I18nProvider'
 import type { Density } from '@/types/admin-shared'
 
 import { adminTableCellClass, adminTableContainerClass } from '../../../utils/adminUi'
@@ -35,7 +36,13 @@ export interface DataTableKitProps<T> {
   filterEmptyState: ReactNode
   /** okuma yetkisizliği */
   accessDeniedState?: ReactNode
-  /** hata banner metni (table.error doluyken) */
+  /**
+   * Hata banner metni (table.error doluyken). Verilmezse kit i18n'li genel bir mesaja
+   * düşer (`admin.dataTable.states.error`) — ham `table.error`'a ASLA düşmez: o metin
+   * Supabase'ten gelir, çevrilmemiştir ve şema/SQL detayı sızdırabilir. Ham mesaj
+   * kaybolmaz; `useAdminTable` onu zaten console.error'a yazar.
+   * Yalnız kaynağa-özel bir açıklama gerçekten değerliyse geç (ör. Audit Log).
+   */
   errorLabel?: ReactNode
 
   /* ---- satır → detay (biri) ---- */
@@ -85,6 +92,8 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
     totalLabel,
     renderPageLabel,
   } = props
+
+  const { t } = useI18n()
 
   /* ---- density + kolon görünürlük (persist'li, kit'in merkezi sorumluluğu) ---- */
   const defaultVisibility = useMemo(() => {
@@ -160,7 +169,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
         {table.error && (
           <div className="p-4 text-rose-400 text-xs font-bold bg-rose-500/10 border-b border-white/5 flex flex-wrap items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-            {errorLabel ?? table.error}
+            {errorLabel ?? t('admin.dataTable.states.error')}
           </div>
         )}
 

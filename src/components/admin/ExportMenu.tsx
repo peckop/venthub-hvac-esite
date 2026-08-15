@@ -19,10 +19,10 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
       <DropdownMenu.Trigger asChild>
         <button 
           className={adminButtonSecondaryClass + " h-12 flex items-center gap-2 px-5 min-w-140px"}
-          aria-label={_t('admin.a11y.export') || 'Dışa Aktarma Menüsü'}
+          aria-label={_t('admin.a11y.export')}
         >
           <Download size={16} className="text-emerald-400" />
-          <span className="truncate">{buttonLabel || _t('admin.common.export') || 'Dışa Aktar'}</span>
+          <span className="truncate">{buttonLabel || _t('admin.common.export')}</span>
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
@@ -33,7 +33,7 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
         >
           <div className="px-3 pt-2 pb-2 text-xs font-black uppercase tracking-hvac-normal text-slate-500 flex items-center gap-2 mb-1">
             <FileDown size={12} />
-            {_t('admin.inventory.fileFormat') || 'Dosya Formatı'}
+            {_t('admin.dataTable.export.fileFormat')}
           </div>
           
           {(items && items.length > 0) ? items.map(item => (
@@ -50,7 +50,7 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
             </DropdownMenu.Item>
           )) : (
             <div className="px-4 py-3 text-xs font-bold text-slate-500 uppercase italic">
-              {_t('admin.common.noOptions') || 'Seçenek bulunamadı'}
+              {_t('admin.common.noOptions')}
             </div>
           )}
         </DropdownMenu.Content>
