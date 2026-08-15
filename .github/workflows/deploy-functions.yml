@@ -1,23 +1,147 @@
 name: Deploy Supabase Functions
 
+# ==============================================================================
+# NEDEN BU DOSYA DEĞİŞTİ (2026-08-14 ölçümü)
+#
+# Eskiden burada 7 fonksiyonun adı ELLE yazılıydı ve yalnız onlar deploy ediliyordu.
+# Repodaki diğer 19 fonksiyon prod'da 2025-09 / 2026-03 sürümlerinde DONDU. Sonuç:
+# repoda çoktan kapatılmış 4 kimlik-doğrulamasız açık prod'da 11 ay CANLI kaldı.
+# Ters yön de yaşandı: bir fonksiyonun repo sürümü prod'dakinden FAKİRDİ (codemod
+# çalışan kodu silmişti) -> körlemesine deploy REGRESYON olurdu.
+#
+# Bu yüzden iki şey birlikte duruyor:
+#   1) deploy  -> liste elle yazılmaz; değişen fonksiyonlar otomatik seçilir
+#   2) drift   -> repo ile prod'un AYNI olduğu her gün DOĞRULANIR, sapma FAIL eder
+#
+# ⚠️ verify_jwt UYARISI — DİKKAT
+# `supabase functions deploy`, `supabase/config.toml` içindeki `[functions."<slug>"]
+# verify_jwt` değerini prod'a UYGULAR. Yani config.toml YANLIŞSA deploy prod'daki
+# KORUMAYI DÜŞÜRÜR. Bugün `admin-orders-latest` tam bu yüzden risk taşıyordu:
+# prod'da verify_jwt=true idi ama config.toml'da false yazıyordu; deploy edilseydi
+# admin ucu kimlik doğrulamasız hale gelecekti. config.toml'daki bir satırı
+# değiştirmeden ÖNCE prod'daki gerçek değeri doğrula (drift job'u bunu ölçer).
+# Bu yüzden `supabase/config.toml` değişikliği de TÜM fonksiyonları deploy ettirir:
+# verify_jwt yalnızca deploy anında uygulanır; deploy edilmeyen fonksiyon eski
+# korumasında kalır ve config.toml yalancı bir SSOT'a dönüşür.
+#
+# ⚠️ İLK ÇALIŞTIRMADA drift job'unun KIRMIZI yanması BEKLENEN davranıştır:
+# 11 aylık birikmiş sapmayı görünür kılar. Kapatmak için `workflow_dispatch` ->
+# `deploy_all = true` ile bir kez tam yakınsama yapılmalıdır (önce drift raporuna
+# bakıp "PROD İLERİ (repo fakir)" işaretli fonksiyon var mı diye kontrol ederek).
+# ==============================================================================
+
 on:
   workflow_dispatch:
+    inputs:
+      deploy_all:
+        description: 'Değişiklik tespitini atla ve TÜM edge fonksiyonlarını deploy et'
+        type: boolean
+        default: false
   push:
     branches: [ master ]
     paths:
       - 'supabase/functions/**'
+      - 'supabase/config.toml'
+  schedule:
+    # Günlük sapma taraması (UTC). Deploy job'u schedule'da çalışmaz.
+    - cron: '17 4 * * *'
 
 concurrency:
   group: deploy-functions-${{ github.ref }}
-  cancel-in-progress: true
+  # cancel-in-progress KASITEN false: yarım kalmış bir deploy prod'u tutarsız
+  # bırakır. Günlük drift taraması devam eden bir deploy'u ASLA iptal etmemeli.
+  cancel-in-progress: false
+
+# Repo PRIVATE: `permissions:` bloğu yazıldığı anda varsayılanlar düşer ve
+# `contents: read` olmadan actions/checkout "Repository not found" verir.
+permissions:
+  contents: read
 
 jobs:
-  deploy:
+  # ---------------------------------------------------------------- SEÇİM ----
+  select:
+    name: Değişen fonksiyonları seç
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
+    outputs:
+      slugs: ${{ steps.pick.outputs.slugs }}
+      count: ${{ steps.pick.outputs.count }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Değişen dosyaları hesaplayabilmek için önceki commit'e erişim şart.
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fonksiyonları seç
+        id: pick
+        shell: bash
+        env:
+          DEPLOY_ALL: ${{ inputs.deploy_all }}
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          mode_all() {
+            echo "$1"
+            node scripts/edge/select-functions.mjs --all --github-output
+          }
+
+          if [ "${DEPLOY_ALL:-false}" = "true" ]; then
+            mode_all "Manuel istek: TÜM fonksiyonlar deploy edilecek."
+            exit 0
+          fi
+
+          BASE=""
+          if [ "${{ github.event_name }}" = "push" ]; then
+            BASE="${BEFORE_SHA:-}"
+          else
+            BASE="$(git rev-parse --verify HEAD~1 2>/dev/null || true)"
+          fi
+
+          # Fail-SAFE yön: taban commit çözülemiyorsa ATLAMAK değil, HEPSİNİ deploy
+          # etmek doğrudur. 11 aylık donmanın sebebi tam olarak "şüphede atla" idi.
+          if [ -z "$BASE" ] \
+            || [ "$BASE" = "0000000000000000000000000000000000000000" ] \
+            || ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            echo "::warning::Taban commit çözülemedi ('${BASE}') -> güvenli taraf: TÜMÜ deploy edilecek."
+            mode_all "Taban yok, tümü seçildi."
+            exit 0
+          fi
+
+          echo "Değişen dosyalar: ${BASE}..${CURRENT_SHA}"
+          git diff --name-only "$BASE" "$CURRENT_SHA" | tee changed-files.txt
+          echo "---"
+          node scripts/edge/select-functions.mjs \
+            --changed-from-file changed-files.txt \
+            --github-output
+
+      - name: Seçim özeti
+        shell: bash
+        run: |
+          echo "### Seçilen edge fonksiyonları: ${{ steps.pick.outputs.count }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.pick.outputs.slugs }}" | tr ' ' '\n' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  # --------------------------------------------------------------- DEPLOY ----
+  deploy:
+    name: Deploy (${{ needs.select.outputs.count }} fonksiyon)
+    needs: select
+    if: needs.select.outputs.count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SLUGS: ${{ needs.select.outputs.slugs }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,33 +153,95 @@ jobs:
         run: supabase --version
 
       - name: Validate secrets
+        shell: bash
         run: |
           if [ -z "${SUPABASE_ACCESS_TOKEN}" ] || [ -z "${SUPABASE_PROJECT_REF}" ]; then
-            echo "::error::Missing SUPABASE_ACCESS_TOKEN or SUPABASE_PROJECT_REF secrets";
-            exit 1;
+            echo "::error::Missing SUPABASE_ACCESS_TOKEN or SUPABASE_PROJECT_REF secrets"
+            exit 1
           fi
 
-      - name: Deploy order-validate
-        run: supabase functions deploy order-validate --project-ref "$SUPABASE_PROJECT_REF"
+      - name: Deploy edge functions
+        shell: bash
+        run: |
+          # `set -e` + boru YOK: çıkış kodu yutulmamalı. Bir fonksiyon patlarsa iş FAIL eder.
+          set -euo pipefail
 
-      - name: Deploy iyzico-payment
-        run: supabase functions deploy iyzico-payment --project-ref "$SUPABASE_PROJECT_REF"
+          if [ -z "${SLUGS// /}" ]; then
+            echo "::error::Deploy job'u çalıştı ama slug listesi boş — seçim adımı bozuk."
+            exit 1
+          fi
 
-      - name: Deploy iyzico-callback
-        run: supabase functions deploy iyzico-callback --project-ref "$SUPABASE_PROJECT_REF"
+          # Sıra deterministik: select-functions.mjs alfabetik sıralı üretir.
+          FAILED=""
+          for slug in $SLUGS; do
+            echo "::group::deploy ${slug}"
+            # NOT: verify_jwt burada supabase/config.toml'dan UYGULANIR.
+            #      (`--no-verify-jwt` KULLANILMAZ — korumayı sessizce düşürür.)
+            if supabase functions deploy "$slug" --project-ref "$SUPABASE_PROJECT_REF"; then
+              echo "ok: ${slug}"
+            else
+              echo "::error::deploy başarısız: ${slug}"
+              FAILED="${FAILED} ${slug}"
+            fi
+            echo "::endgroup::"
+          done
 
-      - name: Deploy shipping-webhook
-        run: supabase functions deploy shipping-webhook --project-ref "$SUPABASE_PROJECT_REF"
-
-      - name: Deploy shipping-status
-        run: supabase functions deploy shipping-status --project-ref "$SUPABASE_PROJECT_REF"
-
-      - name: Deploy log-client-error
-        run: supabase functions deploy log-client-error --project-ref "$SUPABASE_PROJECT_REF"
-
-      - name: Deploy tcmb-rates-sync
-        run: supabase functions deploy tcmb-rates-sync --project-ref "$SUPABASE_PROJECT_REF"
+          if [ -n "${FAILED// /}" ]; then
+            echo "::error::Deploy edilemeyen fonksiyonlar:${FAILED}"
+            exit 1
+          fi
+          echo "Tüm fonksiyonlar deploy edildi:${SLUGS}"
 
       - name: List functions
         run: supabase functions list --project-ref "$SUPABASE_PROJECT_REF"
 
+  # ---------------------------------------------------------------- DRIFT ----
+  drift:
+    name: Sapma dedektörü (repo != prod)
+    needs: [ deploy ]
+    # schedule'da select+deploy skipped olur; always() sayesinde drift yine koşar.
+    # deploy FAIL ettiyse zaten kırmızıyız, drift'i koşturmaya gerek yok.
+    if: ${{ always() && needs.deploy.result != 'failure' && needs.deploy.result != 'cancelled' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Deploy sonrası yakınsama payı
+        if: needs.deploy.result == 'success'
+        shell: bash
+        run: sleep 20
+
+      - name: Repo <-> prod sapma taraması
+        shell: bash
+        run: |
+          # Sapma varsa script exit 1 döner -> iş KIRMIZI. Sessiz rapor YOK;
+          # 11 ay fark edilmeyen sapmanın sebebi tam olarak sessizlikti.
+          # Token yoksa script exit 2 ile durur ve "0 sapma" DEMEZ.
+          #
+          # Tek geçiş: rapor hem log'a hem iş özetine gider, çıkış kodu KORUNUR.
+          # (`| tee` KULLANILMAZ — bu repoda daha önce boru, exit kodunu yutup
+          #  kapıyı dekoratif hale getirmişti.)
+          set -uo pipefail
+          node scripts/edge/drift-check.mjs > drift.log 2>&1
+          rc=$?
+          cat drift.log
+          {
+            echo '### Edge sapma raporu'
+            echo '```'
+            cat drift.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::Edge sapma taraması FAIL (exit ${rc})."
+          fi
+          exit "$rc"
