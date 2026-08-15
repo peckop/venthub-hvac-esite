@@ -13,7 +13,8 @@ import type { DbAdminSearchResult } from '@/types/db-rows'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
+import { type BulkAction, BulkBar } from '../../components/admin/data-table/BulkBar'
+import BulkPricePanel from '../../components/admin/data-table/BulkPricePanel'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -545,6 +546,51 @@ const ProductsTableBody: React.FC = () => {
     [hasWriteAccess, t, table, confirm],
   )
 
+  /**
+   * Toplu işlem eylemleri — ortak `BulkBar` sözleşmesi.
+   *
+   * Eskiden bu sayfa `BulkActionToolbar` kullanıyordu; o bileşen `BulkBar` ile
+   * MÜKERRERDİ (aynı işi yapan iki yapışkan çubuk) ve ÜSTELİK farklı görünüyordu:
+   * biri koyu cam, diğeri açık zeminli emoji'li. Aynı işlemin sayfadan sayfaya
+   * farklı görünmesi cetvel §4'ün doğrudan ihlaliydi. Artık tek bileşen.
+   * Fiyat paneli `BulkPricePanel` olarak çıkarıldı ve `panel` render-prop'una bağlandı.
+   */
+  const bulkActions = useMemo<BulkAction[]>(
+    () => [
+      {
+        key: 'activate',
+        label: t('admin.toolbar.makeActive'),
+        tone: 'default',
+        onRun: () => bulkStatusChange('active'),
+      },
+      {
+        key: 'deactivate',
+        label: t('admin.toolbar.makePassive'),
+        tone: 'warning',
+        onRun: () => bulkStatusChange('inactive'),
+      },
+      {
+        key: 'feature',
+        label: t('admin.toolbar.feature'),
+        tone: 'default',
+        onRun: () => bulkFeatureToggle(true),
+      },
+      {
+        key: 'price',
+        label: t('admin.toolbar.updatePrice'),
+        tone: 'default',
+        panel: (close) => <BulkPricePanel onApply={bulkPriceAdjust} onClose={close} />,
+      },
+      {
+        key: 'delete',
+        label: t('admin.common.delete'),
+        tone: 'danger',
+        onRun: () => bulkDelete(),
+      },
+    ],
+    [t, bulkStatusChange, bulkFeatureToggle, bulkPriceAdjust, bulkDelete],
+  )
+
   /* ---- (f) inline-edit kaydet — UPDATE, mutateWithAudit kapısından (audit boşluğu kapandı) ---- */
   const saveInlineEdit = useCallback(
     async (r: ProductRow, field: 'price' | 'stock_qty', raw: string | number) => {
@@ -903,13 +949,14 @@ const ProductsTableBody: React.FC = () => {
         }
         bulkBarSlot={
           hasWriteAccess ? (
-            <BulkActionToolbar
+            <BulkBar
               selectedCount={table.selection.selectedIds.length}
-              onStatusChange={(status) => void bulkStatusChange(status)}
-              onFeatureToggle={(featured) => void bulkFeatureToggle(featured)}
-              onDelete={() => void bulkDelete()}
-              onPriceAdjust={(mode, value) => void bulkPriceAdjust(mode, value)}
-              onClearSelection={table.selection.clear}
+              selectedLabel={t('admin.dataTable.bulk.selectedCount', {
+                count: table.selection.selectedIds.length,
+              })}
+              clearLabel={t('admin.dataTable.bulk.clear')}
+              actions={bulkActions}
+              onClear={table.selection.clear}
             />
           ) : null
         }
