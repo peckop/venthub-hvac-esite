@@ -98,3 +98,7 @@ docs/screenshots/*.png
 
 # Kok dizin scratch scriptleri (oturum kalintilari)
 /_*.py
+
+# Sir taramasi ham ciktisi (scripts/security/secret-scan.py). TAM token degerleri
+# icerir — repoda ASLA yeri yok. Konsol ciktisi zaten maskelidir.
+TAM-RAPOR.txt
