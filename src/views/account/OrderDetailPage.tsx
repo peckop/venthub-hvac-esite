@@ -32,6 +32,8 @@ interface OrderItem {
   id: string
   product_id?: string
   product_name: string
+  /** Sipariş anındaki SKU (snapshot). Katalogtaki güncel SKU değil. */
+  product_sku?: string
   quantity: number
   unit_price: number
   total_price: number
@@ -100,7 +102,8 @@ export default function OrderDetailPage() {
             shipped_at, delivered_at, shipping_method, invoice_type, 
             invoice_info, legal_consents,
             venthub_order_items (
-              id, product_id, product_name, quantity, price_at_time, product_image_url
+              id, product_id, quantity, product_image_url,
+              product_name_snapshot, unit_price_snapshot, product_sku_snapshot
             )
           `)
           .eq('id', id)
@@ -111,13 +114,19 @@ export default function OrderDetailPage() {
 
         const rawItems: Record<string, unknown>[] = (orderData.venthub_order_items as Record<string, unknown>[]) || []
 
+        // W2b-2: satır SNAPSHOT kolonlarından okunur (`*_snapshot`), canlı katalogtan değil.
+        // Sipariş detayı bir fatura görünümüdür: ürün adı ya da fiyatı sonradan değiştiğinde
+        // müşterinin gördüğü kayıt DEĞİŞMEMELİDİR. Yedek (fallback) bilerek YOK — bu alanlar
+        // veritabanında NOT NULL (20260815210000_pricing_w2b2_order_item_snapshots.sql) ve
+        // "boşsa eski kolona düş" davranışı tam da sessiz bozulmanın kendisi olurdu.
         const mappedItems: OrderItem[] = rawItems.map((it) => {
-          const unit = Number(it.price_at_time) || 0
+          const unit = Number(it.unit_price_snapshot) || 0
           const qty = Number(it.quantity) || 0
           return {
             id: String(it.id),
             product_id: it.product_id ? String(it.product_id) : undefined,
-            product_name: String(it.product_name),
+            product_name: String(it.product_name_snapshot),
+            product_sku: it.product_sku_snapshot ? String(it.product_sku_snapshot) : undefined,
             quantity: qty,
             unit_price: unit,
             total_price: unit * qty,

@@ -127,9 +127,16 @@ Kural başına: `method ∈ {cost_plus, fixed, percent_off_list}`, `base ∈ {co
 - **İşlem para birimi daima TRY.** Tahsilat (İyzico), fatura, KDV, iade TL üzerindendir. EUR/USD gösterimi
   **yalnız vitrin bilgilendirmesidir**; etikette bu açıkça belirtilir.
 - **Sipariş satırı kur snapshot'ı ZORUNLU:** `display_currency` + `display_rate` + `rate_effective_date`
-  sipariş kalemine kopyalanır. ⚠️ Canlı `venthub_order_items`'ta bu üç alan **YOK** — çoklu-para gösterimi
-  bu alanlar eklenmeden açılırsa geçmiş siparişler her kur hareketinde yeniden değerlenir. §13'teki
-  snapshot listesi bu nedenle **6 → 9 alana** çıkarıldı.
+  sipariş kalemine kopyalanır. §13'teki snapshot listesi bu nedenle **6 → 9 alana** çıkarıldı.
+  ✅ **W2b-2'de kapandı** (`20260815210000_pricing_w2b2_order_item_snapshots.sql`): üç alan eklendi,
+  9 alanın 8'i **NOT NULL**'a çekildi (`price_list_id_snapshot` bilerek nullable — fiyat bir listeden
+  değil kuraldan/tekliften gelebilir), bekçisi **INV-PRICE-3**.
+  > **Niçin o gün yapıldı:** tablo o an BOŞTU (0 satır, 2026-08-15'te ölçüldü), yani geri-doldurma
+  > gerekmedi ve kolonlar NOT NULL'a çekilebildi. İlk gerçek sipariş girdikten sonra aynı sertleştirme
+  > migration + backfill + kesinti işine dönerdi. Zamanlama tesadüf değil, pencere buydu.
+- ⚠️ Bu alanlar şu an **TRY/1.0/sipariş tarihi** ile yazılıyor: gösterim para birimi seçimi henüz
+  hiçbir yüzeyde yok (W5). Alanların erken açılmasının sebebi, W5 geldiğinde geçmiş siparişlerin
+  her kur hareketinde yeniden değerlenmesini önlemek.
 - **İade daima orijinal TL tutarından** hesaplanır (gösterim para birimi iadeyi belirlemez).
 - ⚠️ **Bilinen sapma (v1.1):** `spread_pct` üç yerde duruyor (`currency_rates.spread_pct`,
   `site_settings.pricing.display_spread_pct`, admin panelinde salt-okunur kart) ama **hiçbir hesaba girmiyor**
@@ -363,7 +370,7 @@ sanılan iki test aslında YOKTU. Gerçek durum:
 |---|---|---|
 | **INV-PRICE-1** | `products.price` hiçbir müşteri-yüzeyi kod yolunda **doğrudan** okunmaz | ❌ **YOK** — üstelik çözücünün kendisi hâlâ `products.price`'a fallback ediyor (§8 borcu, W4b'de kapanır) |
 | **INV-PRICE-2** | Çözücü segment için `user_profiles.role` okumaz (yalnız `app_metadata`) | ✅ VAR (`pricing-segment-source.test.ts`, ratchet 0, edge dahil) |
-| **INV-PRICE-3** | Sipariş-item yazan her yol snapshot alanlarını doldurur (no-op = FAIL) | ❌ YOK (W2b-2 ile gelir; §4.1 sonrası **9 alan**) |
+| **INV-PRICE-3** | Sipariş-item yazan her yol **9 snapshot alanını** doldurur (no-op = FAIL) | ✅ VAR (`pricing-order-snapshot-contract.test.ts`, W2b-2) — üç yönlü bağ: cetvel §13 ↔ migration NOT NULL ↔ yazma yolu. **Asıl fail-closed katman DB kısıtıdır** (8 alan NOT NULL); test onun da yerinde durduğunu doğrular |
 | **INV-PRICE-4** | Para float saklanmaz; `currency_rates` append-only (UPDATE/DELETE policy yok) | ✅ VAR (`pricing-money-append-only.test.ts`) |
 | **INV-PRICE-5** | KDV oranı üründen okunur; kuralda sabit oran varsayımı yok | ❌ YOK — §5 kararıyla birlikte yazılacak |
 | **INV-PRICE-6** | Cache anahtarı currency içerir; `product_prices`'a yalnız materialize servisi yazar; `is_derived` ayrımı korunur | ✅ VAR (`pricing-cache-invariants.test.ts`) |

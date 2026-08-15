@@ -519,62 +519,121 @@ Deno.serve(async (req: Request) => {
         // F5-B D4: products.image_url kolonu DROP edildi — select listesine geri ekleme
         // (PostgREST bilinmeyen kolonda TUM sorguyu 400 ile reddeder, prodMap bos kalir).
         // Gorsel snapshot'i client-side imageMap'ten gelir; ad/SKU sunucudan dogrulanir.
-        let prodMap = new Map<string, { id: string; name?: string; sku?: string }>()
-        try {
-            if (uniqIds.length > 0) {
-                const pRes = await fetch(`${supabaseUrl}/rest/v1/products?select=id,name,sku&id=in.(${uniqIds.map(encodeURIComponent).join(',')})`, {
+        //
+        // W2b-2: bu blok ESKIDEN `try { ... } catch { }` ile sarilmisti ve `pRes.ok` degilse
+        // sessizce gecerdi. Sonuc: prodMap bos kalir, siparis YINE olusur, ad istemci
+        // sepetinden alinir, SKU/KDV hic yazilmaz. Snapshot kolonlari artik NOT NULL
+        // (20260815210000_pricing_w2b2_order_item_snapshots.sql) — sessiz bozulma yerine ACIK RET.
+        type ProductMeta = { id: string; name: string; sku: string; tax_rate: number | string; is_taxable: boolean }
+        const metaFail = (msg: string) => new Response(
+            JSON.stringify({ error: { code: 'DATABASE_ERROR', message: msg } }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        )
+        let prodMap = new Map<string, ProductMeta>()
+        if (uniqIds.length > 0) {
+            let pRes: Response
+            try {
+                pRes = await fetch(`${supabaseUrl}/rest/v1/products?select=id,name,sku,tax_rate,is_taxable&id=in.(${uniqIds.map(encodeURIComponent).join(',')})`, {
                     headers: {
                         'Authorization': `Bearer ${serviceRoleKey}`,
                         'apikey': serviceRoleKey,
                         'Content-Type': 'application/json'
                     }
                 })
-                if (pRes.ok) {
-                    const rows = await pRes.json().catch(() => [])
-                    if (Array.isArray(rows)) {
-                        prodMap = new Map((rows as Array<{ id: string; name?: string; sku?: string }>).map((p) => [p.id, p]))
-                    }
-                }
+            } catch (e) {
+                console.error('Product metadata fetch threw:', e)
+                return metaFail('Urun bilgileri alinamadi; siparis olusturulamadi')
             }
-        } catch { }
+            if (!pRes.ok) {
+                console.error('Product metadata fetch failed:', pRes.status, await pRes.text().catch(() => ''))
+                return metaFail('Urun bilgileri alinamadi; siparis olusturulamadi')
+            }
+            const rows = await pRes.json().catch(() => null)
+            if (!Array.isArray(rows)) {
+                console.error('Product metadata response was not an array')
+                return metaFail('Urun bilgileri alinamadi; siparis olusturulamadi')
+            }
+            prodMap = new Map((rows as ProductMeta[]).map((p) => [p.id, p]))
+            // Kismi sonuc da basarisizliktir: sepetteki bir urunun metadatasi yoksa o kalemin
+            // snapshot'i uydurulmus olurdu — kayit olmayan kayit, kayittan kotudur.
+            const missingMeta = uniqIds.filter((id) => !prodMap.has(id))
+            if (missingMeta.length > 0) {
+                console.error('Product metadata missing for ids:', missingMeta.join(','))
+                return metaFail('Sepetteki bir urunun bilgisi bulunamadi; siparis olusturulamadi')
+            }
+        }
 
-        // Fallback name/image maps from client cart (in case product metadata is missing)
-        const nameMap = new Map<string, string>()
+        // Gorsel istemci sepetinden gelir — `products.image_url` kolonu F5-B D4'te DROP edildi,
+        // sunucuda karsiligi yok. AD icin istemci yedegi BILEREK KALDIRILDI (W2b-2): urun adi
+        // artik yalnizca sunucudan gelir, cunku snapshot bir kayittir ve tarayicinin yazdigi
+        // metin kayit degeri tasimaz. Metadata alinamazsa yukaridaki kapi zaten 500 doner.
         const imageMap = new Map<string, string | null>()
         try {
             if (Array.isArray(cartItems)) {
-                for (const ci of cartItems as Array<{ product_id: string; product_name?: string; product_image_url?: string | null }>) {
-                    if (ci?.product_id) {
-                        if (ci.product_name) nameMap.set(String(ci.product_id), String(ci.product_name))
-                        if (ci.product_image_url !== undefined) imageMap.set(String(ci.product_id), ci.product_image_url as string | null)
+                for (const ci of cartItems as Array<{ product_id: string; product_image_url?: string | null }>) {
+                    if (ci?.product_id && ci.product_image_url !== undefined) {
+                        imageMap.set(String(ci.product_id), ci.product_image_url as string | null)
                     }
                 }
             }
         } catch { }
 
-        // Şema uyumlu kolonlar: order_id, product_id, product_name, unit_price, quantity, total_price,
-        // opsiyonel: price_at_time, product_image_url
-        const orderItems = authoritativeItems.map((raw) => {
+        // Siparis satirinin ANLIK GORUNTUSU (cetvel: pricing-standard §4.1 + §13).
+        //
+        // Neden 9 alan: siparis satiri bir FATURA KAYDIDIR, canli katalogun bir gorunumu degil.
+        // Urun adi degisir, KDV orani degisir, fiyat listesi degisir, kur oynar — cekilen tutarin
+        // neye dayandigi kaydedilmemisse uyusmazlikta elde hicbir sey kalmaz. Bu alanlar
+        // veritabaninda NOT NULL; asagidaki hesabin hepsi ya bir degere ya da 500'e cikar.
+        //
+        // Gosterim kuru: islem para birimi DAIMA TRY (§4.1). Gosterim para birimi secimi henuz
+        // hicbir yuzeyde yok (W5 ile gelecek), bu yuzden TRY/1.0. Alanlarin SIMDI yazilmasinin
+        // sebebi, W5 acildiginda gecmis siparislerin her kur hareketinde yeniden
+        // degerlenmesini onlemek.
+        const orderDateIso = new Date().toISOString().slice(0, 10)
+        const orderItems: Array<Record<string, unknown>> = []
+        for (const raw of authoritativeItems) {
             const _productId = raw.product_id
             const unitPrice = Number(raw.unit_price)
             const qty = Math.max(1, Number(raw.quantity ?? 1))
             const safeUnit = Number.isFinite(unitPrice) ? unitPrice : 0
-            const p = _productId ? (prodMap.get(_productId) as Record<string, unknown> || {}) : {};
             const fid = String(_productId || '')
-            const fallbackName = (p.name as string) || nameMap.get(fid) || 'Ürün';
-            const fallbackImage = imageMap.get(fid) || null;
-            return {
+            const p = prodMap.get(fid)
+            // Yukaridaki eksik-metadata kapisi bunu zaten eler; burada tekrar bakiyoruz ki
+            // ileride o kapi kaldirilirsa sessizce uydurma snapshot uretilmesin.
+            if (!p) return metaFail('Sepetteki bir urunun bilgisi bulunamadi; siparis olusturulamadi')
+            const taxRate = p.is_taxable === false ? 0 : Number(p.tax_rate)
+            if (!Number.isFinite(taxRate)) return metaFail('Urun KDV orani okunamadi; siparis olusturulamadi')
+            const productImage = imageMap.get(fid) || null
+            orderItems.push({
                 order_id: dbOrderId,
                 product_id: _productId,
-                product_name: fallbackName,
+                product_name: p.name,
                 unit_price: safeUnit,
                 quantity: qty,
                 total_price: safeUnit * qty,
                 price_at_time: safeUnit,
-                product_image_url: fallbackImage,
-                tenant_id: tenantId
-            }
-        });
+                product_image_url: productImage,
+                tenant_id: tenantId,
+                // --- W2b-2 snapshot sozlesmesi (9 alan) ---
+                unit_price_snapshot: safeUnit,
+                price_list_id_snapshot: raw.price_list_id ?? null,
+                product_name_snapshot: p.name,
+                product_sku_snapshot: p.sku,
+                tax_rate_snapshot: taxRate,
+                product_snapshot: {
+                    id: p.id,
+                    name: p.name,
+                    sku: p.sku,
+                    tax_rate: taxRate,
+                    is_taxable: p.is_taxable !== false,
+                    image_url: productImage,
+                    captured_at: new Date().toISOString(),
+                },
+                display_currency: 'TRY',
+                display_rate: 1,
+                rate_effective_date: orderDateIso,
+            })
+        }
 
         // Insert order items ve sonucu kontrol et; başarısızsa işlemi durdur
         const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items`, {
