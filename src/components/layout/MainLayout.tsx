@@ -1,12 +1,9 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { lazy, Suspense, useEffect, useState } from 'react'
 
-import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useScrollThrottle } from '../../hooks/useScrollThrottle'
-import { useI18n } from '../../i18n/I18nProvider'
 import BackToTopButton from '../BackToTopButton'
 import Footer from '../Footer'
 import LanguageSwitcher from '../LanguageSwitcher'
@@ -26,8 +23,6 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-    const { t } = useI18n()
-    const Routes = useLocalizedRoutes()
     const pathname = usePathname()
     const isAdmin = pathname?.startsWith('/admin')
     
@@ -58,18 +53,22 @@ export default function MainLayout({ children }: MainLayoutProps) {
         return () => window.removeEventListener('scroll', enable)
     }, [])
 
+    /**
+     * ADMIN: hiçbir kabuk sarmalamaz — `AdminLayout` tek ve tam kabuktur.
+     *
+     * Eskiden burada `min-h-screen` + kendi marka çubuğu vardı; `AdminLayout` ise
+     * `h-screen` + `overflow-hidden` kuruyordu. İkisi aynı dikey akışta olduğu için
+     * toplam yükseklik DAİMA viewport + çubuk oluyordu → kalıcı iki scrollbar, footer
+     * hep katlanın altında, üst üste iki marka çubuğu, zoom'da büyüyen kırılma.
+     * Ayrıca bu erken dönüş aşağıdaki `<Toaster/>` bloğunu atlıyordu, yani admin'deki
+     * 127 `toast.*` çağrısı sessizce ölüydü (denetim 2026-08-15, D1 ve D11).
+     *
+     * Cetvel: docs/standards/admin-design-standard.md §2.1 — "Kabuk kökü scroll
+     * konteyneri olamaz" ve kabuk başına tek tam-ekran katman.
+     * Toaster artık `AdminLayout` içinde mount ediliyor.
+     */
     if (isAdmin) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex flex-col">
-                <div className="bg-slate-900 text-white px-6 py-3 flex justify-between items-center shrink-0 z-modal">
-                    <span className="font-bold tracking-tighter">{t('header.adminBar.brand')}</span>
-                    <Link href={Routes.home()} className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition-colors uppercase font-bold tracking-widest">{t('header.adminBar.backToSite')}</Link>
-                </div>
-                <div className="flex-grow overflow-auto">
-                    {children}
-                </div>
-            </div>
-        )
+        return <>{children}</>
     }
 
     return (

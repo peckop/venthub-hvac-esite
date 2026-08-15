@@ -16,5 +16,14 @@ export const a11y = {
       prev: 'Önceki',
       copy: 'Kopyala',
       upload: 'Dosya Yükle',
-      download: 'İndir'
+      download: 'İndir',
+      // Kabuk (shell) — cetvel: admin-design-standard.md §2.5, §2.6
+      skipToContent: 'İçeriğe geç',
+      openNavigation: 'Menüyü aç',
+      closeNavigation: 'Menüyü kapat',
+      expandNavigation: 'Menüyü genişlet',
+      collapseNavigation: 'Menüyü daralt',
+      mainNavigation: 'Ana menü',
+      breadcrumb: 'Konum',
+      userMenu: 'Kullanıcı menüsü'
 };
