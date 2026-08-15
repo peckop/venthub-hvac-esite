@@ -7,9 +7,27 @@ interface QrLabelProps {
   physical_stock: number
 }
 
-export const printQrLabel = async (r: QrLabelProps, setPrintingQr: (v: boolean) => void) => {
+/**
+ * Yazdırma belgesi ayrı bir iframe belgesidir — React ağacının dışında olduğu için
+ * `useI18n()` oraya ulaşmaz. Metinler çağıran taraftan ÇÖZÜLMÜŞ geçirilir
+ * (CLAUDE.md kural 7: kullanıcıya görünen metin sözlükten gelir).
+ */
+export interface QrLabelTexts {
+  documentTitle: string
+  skuLabel: string
+  shelfLabel: string
+  stockLine: string
+  qrAlt: string
+  failed: string
+}
+
+export const printQrLabel = async (
+  r: QrLabelProps,
+  setPrintingQr: (v: boolean) => void,
+  texts: QrLabelTexts,
+) => {
   if (typeof window === 'undefined') return
-  
+
   try {
     setPrintingQr(true)
     const url = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(r.product_id)}`
@@ -27,7 +45,7 @@ export const printQrLabel = async (r: QrLabelProps, setPrintingQr: (v: boolean) 
       <html>
       <head>
         <meta charset="utf-8">
-        <title>Etiket Yazdir - ${safeSku}</title>
+        <title>${texts.documentTitle} - ${safeSku}</title>
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap');
           @page {
@@ -136,22 +154,28 @@ export const printQrLabel = async (r: QrLabelProps, setPrintingQr: (v: boolean) 
         <div class="card-wrapper">
           <div class="card">
             <div class="qr-wrapper">
-              <VentImage src="${url}" class="qr" onload="window.print();" alt="QR Code"  />
+              <!--
+                DİKKAT: burası HTML METNİdir, JSX DEĞİL. Bir codemod bu satırdaki <img>'yi
+                <VentImage>'e çevirmişti; tarayıcı bilinmeyen elemanı resim olarak
+                yüklemez → QR hiç çizilmez ve onload tetiklenmediği için YAZDIRMA
+                PENCERESİ HİÇ AÇILMAZ. Sessiz kırıktı; tsc/lint bir string'in içini görmez.
+              -->
+              <img src="${url}" class="qr" onload="window.print();" alt="${texts.qrAlt}" />
             </div>
             <div class="title">${safeName}</div>
             <div class="separator"></div>
             <div class="meta-grid">
               <div class="meta-item">
-                <span class="meta-label">SKU Kodu</span>
+                <span class="meta-label">${texts.skuLabel}</span>
                 <span class="meta-value">${safeSku}</span>
               </div>
               <div class="meta-item">
-                <span class="meta-label">Depo Rafı</span>
+                <span class="meta-label">${texts.shelfLabel}</span>
                 <span class="meta-value">${safeLoc}</span>
               </div>
             </div>
             <div class="meta-footer">
-              MEVCUT STOK: ${r.physical_stock} ADET
+              ${texts.stockLine}
             </div>
           </div>
         </div>
@@ -173,7 +197,7 @@ export const printQrLabel = async (r: QrLabelProps, setPrintingQr: (v: boolean) 
     }, 5000)
 
   } catch {
-    toast.error('Etiket oluşturulamadı')
+    toast.error(texts.failed)
   } finally {
     setPrintingQr(false)
   }

@@ -11,6 +11,7 @@ import {
   adminInputWidthLocationClass,
   adminInputWidthSupplierClass,
   adminSupplierMaxWidthClass,
+  adminTableActionClass,
 } from '../../utils/adminUi'
 import AdminEmptyState from './AdminEmptyState'
 import { DataTableKit } from './data-table/DataTableKit'
@@ -26,6 +27,8 @@ interface InventoryTableProps {
   hasWriteAccess: boolean
   onUpdateLocation: (productId: string, val: string) => Promise<void>
   onUpdateSupplier: (productId: string, val: string) => Promise<void>
+  /** verilirse satır sonuna "Detaylar" aksiyon hücresi eklenir → stok detay çekmecesi */
+  onSelectRow?: (row: InventoryRowWithCategory) => void
 }
 
 /* ---- Inline Text Edit Cell (location / supplier) ---- */
@@ -110,6 +113,7 @@ export default function InventoryTable({
   hasWriteAccess,
   onUpdateLocation,
   onUpdateSupplier,
+  onSelectRow,
 }: InventoryTableProps) {
   const { t } = useI18n()
 
@@ -166,6 +170,7 @@ export default function InventoryTable({
       {
         key: 'physical',
         header: t('admin.inventory.table.physicalCol'),
+        headerHint: t('admin.inventory.tooltip.physical'),
         sortable: true,
         align: 'right',
         cell: (r) => <span className="font-mono font-bold text-slate-300">{r.physical_stock}</span>,
@@ -173,6 +178,7 @@ export default function InventoryTable({
       {
         key: 'reserved',
         header: t('admin.inventory.table.reservedCol'),
+        headerHint: t('admin.inventory.tooltip.reserved'),
         sortable: true,
         align: 'right',
         cell: (r) => <span className="font-mono text-slate-500">{r.reserved_stock}</span>,
@@ -180,6 +186,7 @@ export default function InventoryTable({
       {
         key: 'available',
         header: t('admin.inventory.table.availableCol'),
+        headerHint: t('admin.inventory.tooltip.available'),
         sortable: true,
         align: 'right',
         cellClassName: 'text-cyan-400',
@@ -188,6 +195,7 @@ export default function InventoryTable({
       {
         key: 'threshold',
         header: t('admin.inventory.table.thresholdCol'),
+        headerHint: t('admin.inventory.tooltip.threshold'),
         sortable: true,
         align: 'right',
         cell: (r) => <span className="font-mono text-slate-500">{r.low_stock_threshold ?? 5}</span>,
@@ -234,6 +242,7 @@ export default function InventoryTable({
       {
         key: 'abc',
         header: t('admin.inventory.table.abcCol'),
+        headerHint: t('admin.inventory.tooltip.abc'),
         sortable: true,
         align: 'center',
         hideable: true,
@@ -258,6 +267,7 @@ export default function InventoryTable({
       {
         key: 'days',
         header: t('admin.inventory.table.daysCol'),
+        headerHint: t('admin.inventory.tooltip.days'),
         sortable: true,
         align: 'right',
         hideable: true,
@@ -290,8 +300,35 @@ export default function InventoryTable({
         align: 'center',
         cell: (r) => statusBadge(r),
       },
+      /**
+       * DETAY — kit'in `onRowClick`'i (satırın kendisini `role="button"` yapar) BİLEREK
+       * kullanılmadı: yazma yetkisi olan kullanıcıda satır içinde ZATEN odaklanabilir
+       * butonlar var (raf/tedarikçi satır-içi düzenleme). Satırı da butona çevirmek
+       * "interaktif içinde interaktif" üretir — axe `nested-interactive` ihlali ve
+       * klavyede belirsiz hedef. Bu yüzden detay AÇIK bir aksiyon hücresi.
+       */
+      ...(onSelectRow
+        ? ([
+            {
+              key: 'detail',
+              header: t('admin.inventory.stockDetails'),
+              sortable: false,
+              align: 'right',
+              cell: (r) => (
+                <button
+                  type="button"
+                  onClick={() => onSelectRow(r)}
+                  aria-label={`${r.name} — ${t('admin.inventory.stockDetails')}`}
+                  className={adminTableActionClass}
+                >
+                  {t('admin.ui.details')}
+                </button>
+              ),
+            },
+          ] as AdminColumn<InventoryRowWithCategory>[])
+        : []),
     ],
-    [t, hasWriteAccess, onUpdateLocation, onUpdateSupplier, statusBadge],
+    [t, hasWriteAccess, onUpdateLocation, onUpdateSupplier, statusBadge, onSelectRow],
   )
 
   return (

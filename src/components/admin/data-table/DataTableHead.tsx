@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import type { SortState } from '@/hooks/useAdminTable'
 
 import { adminTableHeadCellClass } from '../../../utils/adminUi'
+import InfoTooltip from '../InfoTooltip'
 import type { AdminColumn } from './types'
 
 interface DataTableHeadProps<T> {
@@ -78,6 +79,8 @@ export function DataTableHead<T>(props: DataTableHeadProps<T>): ReactNode {
               ) : (
                 col.header
               )}
+              {/* Tooltip sıralama butonunun KARDEŞİ — iç içe <button> geçersiz HTML olurdu. */}
+              {col.headerHint ? <InfoTooltip text={col.headerHint} /> : null}
             </th>
           )
         })}

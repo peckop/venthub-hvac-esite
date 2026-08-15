@@ -4,6 +4,8 @@ export const ui = {
   refresh: 'Refresh',
   loading: 'Loading…',
   loadingShort: 'Loading…',
+  /** Accessible name of the InfoTooltip trigger — an icon alone carries no name. */
+  moreInfo: 'More information',
   noRecords: 'No records',
   apply: 'Apply',
   clear: 'Clear',

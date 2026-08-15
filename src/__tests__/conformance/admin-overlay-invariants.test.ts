@@ -132,7 +132,11 @@ describe('INV-ADMIN-OVERLAY-3 · katman ölçeği (ratchet)', () => {
    * portal ettiği bir dropdown, modalın ARKASINDA render olur. Token ölçeğinde
    * `z-popover` (110) bunu çözer — ham değerler çözmez.
    */
-  const RAW_Z_CEILING = 57
+  // 57 → 49: envanter regresyon onarımında çekmece, CSV modalı ve InfoTooltip elle
+  // yazılmış perdelerden Radix Dialog'a alındı; ham `z-40/z-50/z-10` yerine
+  // `z-backdrop/z-modal/z-raised/z-popover` token'ları geldi (6 ham değer eridi).
+  // Ratchet sıkılaşır: yeni kod bu tavanı ARTIRAMAZ.
+  const RAW_Z_CEILING = 49
 
   it('ham z-* sayısı tavanı aşmıyor', () => {
     const pattern = /\bz-(?:0|10|20|30|40|50|60|\[[^\]]+\])\b/g
