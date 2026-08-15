@@ -77,7 +77,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Fonksiyonları seç
         id: pick
@@ -146,8 +146,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Surum PINLI: `@v1` yalnizca action'i sabitler, KURULAN CLI'yi degil — runner
+      # bugune kadar 2.20.3 kuruyordu. drift-check.mjs `functions download --use-api`
+      # bayragina bagli ve o bayragin davranisi CLI surumune bagli; upstream degisirse
+      # dedektor SESSIZCE yanlis sonuc verebilir. 2.101.0 = `--use-api` davranisinin
+      # yerelde birebir olculdugu surum (repo == prod, 26/26 fonksiyon).
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
+        with:
+          version: 2.101.0
 
       - name: Show CLI version
         run: supabase --version
@@ -214,7 +221,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       # Kaynak karşılaştırması CLI ile yapılır: Management API'nin
       # /functions/{slug}/body ucu derlenmiş ESZIP bundle döndürüyor ve
@@ -222,8 +229,15 @@ jobs:
       # `supabase functions download` eszip'i çözüp gerçek kaynağı çıkarır.
       # CLI kimliği job env'indeki SUPABASE_ACCESS_TOKEN'dan gelir.
       # Bu adım silinirse drift script'i exit 2 ile durur ("sapma yok" DEMEZ).
+      # Surum PINLI: `@v1` yalnizca action'i sabitler, KURULAN CLI'yi degil — runner
+      # bugune kadar 2.20.3 kuruyordu. drift-check.mjs `functions download --use-api`
+      # bayragina bagli ve o bayragin davranisi CLI surumune bagli; upstream degisirse
+      # dedektor SESSIZCE yanlis sonuc verebilir. 2.101.0 = `--use-api` davranisinin
+      # yerelde birebir olculdugu surum (repo == prod, 26/26 fonksiyon).
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
+        with:
+          version: 2.101.0
 
       - name: Show CLI version
         run: supabase --version

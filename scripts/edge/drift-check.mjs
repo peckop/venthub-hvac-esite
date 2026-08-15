@@ -409,6 +409,10 @@ async function run({ root, asJson, compareAllFiles }) {
   const { ref } = requireEnv()
   const cliVersion = requireCli()
   console.error(`[drift] Supabase CLI: ${cliVersion || '(sürüm okunamadı)'}`)
+  // Sürüm rapora da yazılır: bu script `functions download --use-api` davranışına
+  // bağlı ve o davranış CLI sürümüne bağlı. Raporu okuyan biri hangi sürümün
+  // ölçtüğünü GÖRMELİ — yoksa upstream sürüm değişikliği sessiz yanlış-negatif olur.
+  // CI'da sürüm pinli (deploy-functions.yml: setup-cli with.version).
 
   // Fonksiyon listesi de CLI'dan. Management API yerine CLI kullanmanın sebebi
   // kolaylık değil TEK KİMLİK KAYNAĞI: kaynak indirme zaten CLI'dan geçiyor; listeyi
@@ -491,8 +495,8 @@ async function run({ root, asJson, compareAllFiles }) {
   const driftCount =
     report.orphans.length + report.missing.length + report.sourceDrift.length + report.jwtDrift.length
 
-  if (asJson) console.log(JSON.stringify({ ...report, driftCount }, null, 2))
-  else printReport(report, driftCount, repo.length, prodList.length)
+  if (asJson) console.log(JSON.stringify({ ...report, driftCount, cliVersion }, null, 2))
+  else printReport(report, driftCount, repo.length, prodList.length, cliVersion)
 
   if (driftCount > 0) {
     console.error(`\n::error::edge drift: ${driftCount} sapma bulundu — repo ile prod AYNI DEGIL.`)
@@ -501,10 +505,11 @@ async function run({ root, asJson, compareAllFiles }) {
   console.log('\nSAPMA YOK: repo ile prod ayni.')
 }
 
-function printReport(r, driftCount, repoCount, prodCount) {
+function printReport(r, driftCount, repoCount, prodCount, cliVersion) {
   const line = '-'.repeat(72)
   console.log(line)
   console.log(`EDGE SAPMA RAPORU  (repo: ${repoCount} fn, prod: ${prodCount} fn, karsilastirilan: ${r.checked})`)
+  console.log(`olcen: supabase CLI ${cliVersion || '(surum okunamadi)'}`)
   console.log(line)
 
   if (r.orphans.length) {

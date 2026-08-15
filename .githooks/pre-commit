@@ -1,0 +1,53 @@
+#!/bin/sh
+# Orion Auto-Doc — PRE-COMMIT
+#
+# 2026-08-15'te YENİDEN YAZILDI. Öncesi: `.git/hooks/pre-commit.oncesi-2026-08-15`
+#
+# NİÇİN DEĞİŞTİ — üçü de ölçülerek görüldü, tahmin değil:
+#
+#  1) KAPI DETERMİNİSTİK DEĞİLDİ. Son adım `doc run-hook` idi ve `exit $?` ile commit'i
+#     bloklıyordu. Reddetme ölçütü bir **LLM kalite skoru**: aynı dosya (shipping-notification)
+#     batch'te 80/100 alıp commit'i reddetti, elle koşulunca 100/100 aldı. Aynı girdi, iki
+#     sonuç. Rastgele patlayan kapı, kapısızlıktan KÖTÜDÜR: `--no-verify` alışkanlığı
+#     kazandırır, o da i18n paritesi/lint gibi GERÇEK kapıları birlikte atlatır.
+#
+#  2) ÜÇ DALDAN İKİSİ ZATEN ÖLÜYDÜ. `doc schema` ve `doc batch` alt komutlarında
+#     `--workspace` diye bir seçenek YOK (`doc <cmd> --help` ile doğrulandı) — ikisi de her
+#     koşuda "No such option" ile hata veriyor, çıkış kodu kontrol edilmediği için SESSİZCE
+#     geçiliyordu. Yani migration şema dokümanı bu kanca ile hiç güncellenmemiş.
+#     Klasik "kapı var sanıyorsun, yok" vakası.
+#
+#  3) YANLIŞ ANDI. Doküman üretimi ağ + LLM gerektirir ve dakikalar sürer; commit hızlı ve
+#     çevrimdışı çalışabilmelidir. Üretimin kendisi değerli; BLOKLAMASI değil. Bu yüzden
+#     üretim silinmedi, `post-commit`e arka plana taşındı.
+#
+# ŞİMDİ NE YAPIYOR: hızlı, çevrimdışı, DETERMİNİSTİK bir uyarı. Companion dokümanı hiç
+# olmayan yeni kaynak dosyaları listeler ve GEÇER. Skora bakmaz; varlığa bakar.
+# Doküman üretimi post-commit'e TAŞINDI (arka planda, bloklamaz; log .git/orion-doc.log).
+# İstendiğinde elle:
+#     orion doc all --changed-only
+#
+# BLOKLAMA EKLEMEK İSTERSEN: ölçütün deterministik olduğundan emin ol. LLM çıktısının
+# puanı ölçüt olamaz.
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+STAGED=$(git diff --cached --name-only --diff-filter=A | grep -E '^(src|supabase/functions|scripts)/.*\.(ts|tsx|mjs|cjs)$' | grep -v '\.test\.' | grep -v '__tests__')
+
+EKSIK=""
+for f in $STAGED; do
+    MD=$(echo "$f" | sed -E 's/\.(ts|tsx|mjs|cjs)$/.md/')
+    if [ ! -f "$REPO_ROOT/$MD" ]; then
+        EKSIK="${EKSIK}  - ${MD}\n"
+    fi
+done
+
+if [ -n "$EKSIK" ]; then
+    echo "[ORION-HOOK] Bilgi: bu YENİ dosyaların companion dokümanı yok:"
+    printf "%b" "$EKSIK"
+    echo "[ORION-HOOK] post-commit bunları ARKA PLANDA üretir (log: .git/orion-doc.log)."
+    echo "[ORION-HOOK] Hemen istersen: orion doc all --changed-only"
+    echo "[ORION-HOOK] Bu bir UYARI — commit engellenmedi (bkz. dosya başındaki gerekçe)."
+fi
+
+exit 0
