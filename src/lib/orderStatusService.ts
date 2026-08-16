@@ -79,6 +79,7 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
 
     try {
         // --- 1. Sipariş statüsünü güncelle ---
+        let deliveredNow = false
         if (!skipOrdersSync) {
             const dbFields = resolveDbFields(newStatus)
             const updatePayload: Database['public']['Tables']['venthub_orders']['Update'] = { status: dbFields.status }
@@ -86,12 +87,43 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
                 updatePayload.payment_status = dbFields.payment_status
             }
 
-            const { error: orderErr } = await supabase
-                .from('venthub_orders')
-                .update(updatePayload)
-                .eq('id', orderId)
+            /*
+              TESLİM ZAMAN DAMGASI — 2026-08-15'e kadar HİÇBİR yoldan yazılmıyordu.
+              Tek yazıcısı `shipping-webhook`'tu ve o webhook'un ÇAĞIRANI yok (taşıyıcı
+              entegrasyonu kurulmamış). Sonuç: `delivered_at` tüm siparişlerde NULL,
+              teslim e-postası hiç gitmiyor ve "kaç günde teslim ediyoruz" sorusunun
+              cevabı veride yok. Kanban'dan teslim işaretlemek ARA ÇÖZÜMDÜR; taşıyıcı
+              entegrasyonu gelince webhook asıl kaynak olur ve buradaki yazım
+              idempotent kalır (aşağıdaki `is('delivered_at', null)` koşulu).
+            */
+            if (dbFields.status === 'delivered') {
+                const { data: stamped, error: deliverErr } = await supabase
+                    .from('venthub_orders')
+                    .update({ ...updatePayload, delivered_at: new Date().toISOString() })
+                    .eq('id', orderId)
+                    .is('delivered_at', null)
+                    .select('id')
 
-            if (orderErr) throw new Error('Sipariş güncellenemedi: ' + orderErr.message)
+                if (deliverErr) throw new Error('Sipariş güncellenemedi: ' + deliverErr.message)
+
+                // Satır dönmediyse damga ZATEN vardı → statüyü yine de hizala, ama
+                // `delivered_at`'i EZME (ilk teslim anı korunur) ve e-posta TEKRAR gitmesin.
+                deliveredNow = (stamped?.length ?? 0) > 0
+                if (!deliveredNow) {
+                    const { error: alignErr } = await supabase
+                        .from('venthub_orders')
+                        .update(updatePayload)
+                        .eq('id', orderId)
+                    if (alignErr) throw new Error('Sipariş güncellenemedi: ' + alignErr.message)
+                }
+            } else {
+                const { error: orderErr } = await supabase
+                    .from('venthub_orders')
+                    .update(updatePayload)
+                    .eq('id', orderId)
+
+                if (orderErr) throw new Error('Sipariş güncellenemedi: ' + orderErr.message)
+            }
         }
 
         // --- 2. İade/İptal → venthub_returns senkronizasyonu ve Stok Restorasyonu ---
@@ -101,6 +133,25 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
             // Eğer daha önceden iptal/iade HALE GELMEMİŞSE stokları iade et
             if (oldStatus && !isReturnStatus(oldStatus)) {
                 await restoreStockForOrder(orderId)
+            }
+        }
+
+        /*
+          --- 2b. Teslim bildirimi ---
+          YALNIZ damganın İLK kez yazıldığı çağrıda tetiklenir; aksi halde panoda
+          ileri-geri sürükleyen admin müşteriye tekrar tekrar "siparişiniz teslim
+          edildi" e-postası gönderirdi.
+          Best-effort: e-posta hatası teslim kaydını GERİ ALMAZ — teslim gerçekleşti,
+          bildirim ayrı bir yan etkidir. `delivery-notification` yalnız `order_id`
+          alır, alıcı bilgisini sunucuda çözer (istemci e-posta adresi göndermez).
+        */
+        if (deliveredNow) {
+            try {
+                await supabase.functions.invoke('delivery-notification', {
+                    body: { order_id: orderId },
+                })
+            } catch {
+                // yutulur — bildirim hatası statüyü geri almaz
             }
         }
 

@@ -34,6 +34,12 @@ export const returns = {
       actions: {
         markAs: 'Mark as {{status}}'
       },
+      decision: {
+        title: 'Mark return as {{status}}',
+        description: 'The return request for order {{order}} will be closed as "{{status}}". The reason is sent to the customer and stored on the record.',
+        noteLabel: 'Reason (required)',
+        notePlaceholder: 'e.g. return window expired, item used, box opened…'
+      },
       toasts: {
         returnsLoadFailed: 'Could not load return requests',
         statusUpdated: 'Return status updated to "{{status}}"',

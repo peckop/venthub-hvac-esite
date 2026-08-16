@@ -52,19 +52,39 @@ export interface ConfirmOptions {
    * Cetvel §4.7'nin en üst risk kademesi: "ciddi / geri alınamaz / zincirleme sonuç".
    */
   requireTypedConfirmation?: string
+  /**
+   * Verilirse onay kutusuna bir SERBEST METİN alanı eklenir ve girilen değer
+   * `useConfirmWithReason` ile çağırana döner.
+   *
+   * Niçin var: bazı kararlar yalnız "onaylandı mı" değil, **niçin** bilgisini de
+   * gerektirir — iade reddi bunun tipik örneği. Gerekçesiz bir ret, müşteriye
+   * giden bildirimde boş bir mesaj ve `admin_notes` sütununda boş bir kayıt
+   * bırakır; sonradan "bu neden reddedilmiş?" sorusunun cevabı kalmaz.
+   * Ayrı bir modal açmak yerine onay yüzeyine bağlandı: karar ve gerekçe aynı
+   * anda alınır, iki adımlı bir akış doğmaz.
+   */
+  reason?: {
+    label: string
+    placeholder?: string
+    /** `true` ise alan boşken onay butonu etkinleşmez. */
+    required?: boolean
+  }
 }
 
-type Resolver = (value: boolean) => void
+/** `useConfirmWithReason`'ın dönüşü. */
+export interface ConfirmResult {
+  confirmed: boolean
+  /** `options.reason` verilmediyse daima boş string. */
+  reason: string
+}
+
+type Resolver = (value: ConfirmResult) => void
 
 const ConfirmContext = React.createContext<
-  ((options: ConfirmOptions) => Promise<boolean>) | null
+  ((options: ConfirmOptions) => Promise<ConfirmResult>) | null
 >(null)
 
-/**
- * Onay isteyen imperatif kanca.
- * `AdminLayout` içinde `<ConfirmProvider>` mount edilmiş olmalı.
- */
-export function useConfirm(): (options: ConfirmOptions) => Promise<boolean> {
+function useConfirmContext(): (options: ConfirmOptions) => Promise<ConfirmResult> {
   const ctx = React.useContext(ConfirmContext)
   if (!ctx) {
     throw new Error(
@@ -74,26 +94,58 @@ export function useConfirm(): (options: ConfirmOptions) => Promise<boolean> {
   return ctx
 }
 
+/**
+ * Onay isteyen imperatif kanca.
+ * `AdminLayout` içinde `<ConfirmProvider>` mount edilmiş olmalı.
+ *
+ * Dönüş tipi bilerek `Promise<boolean>` KALDI: gerekçe desteği eklenirken
+ * mevcut ~20 çağrı yerinin hiçbiri değişmesin diye. Gerekçe isteyen çağıran
+ * `useConfirmWithReason` kullanır.
+ */
+export function useConfirm(): (options: ConfirmOptions) => Promise<boolean> {
+  const ask = useConfirmContext()
+  return React.useCallback(
+    async (options: ConfirmOptions) => (await ask(options)).confirmed,
+    [ask]
+  )
+}
+
+/** Onay + serbest metin gerekçe isteyen kanca (`options.reason` ile birlikte kullanılır). */
+export function useConfirmWithReason(): (options: ConfirmOptions) => Promise<ConfirmResult> {
+  return useConfirmContext()
+}
+
 export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   const { t } = useI18n()
   const [options, setOptions] = React.useState<ConfirmOptions | null>(null)
   const [typed, setTyped] = React.useState('')
+  const [reason, setReason] = React.useState('')
   const resolverRef = React.useRef<Resolver | null>(null)
   const cancelRef = React.useRef<HTMLButtonElement>(null)
+  /**
+   * Gerekçe metni REF'te de tutulur: `settle` `useCallback([])` ile sabitlenmiş
+   * olduğu için state'in o an ki değerini kapanışta göremezdi (bayat closure) ve
+   * kullanıcının yazdığı gerekçe sessizce boş dönerdi.
+   */
+  const reasonRef = React.useRef('')
 
   const confirm = React.useCallback((next: ConfirmOptions) => {
     setTyped('')
+    setReason('')
+    reasonRef.current = ''
     setOptions(next)
-    return new Promise<boolean>((resolve) => {
+    return new Promise<ConfirmResult>((resolve) => {
       resolverRef.current = resolve
     })
   }, [])
 
-  const settle = React.useCallback((result: boolean) => {
-    resolverRef.current?.(result)
+  const settle = React.useCallback((confirmed: boolean) => {
+    resolverRef.current?.({ confirmed, reason: confirmed ? reasonRef.current.trim() : '' })
     resolverRef.current = null
     setOptions(null)
     setTyped('')
+    setReason('')
+    reasonRef.current = ''
   }, [])
 
   // Kapanış hangi yoldan gelirse gelsin (ESC, kapat butonu) söz mutlaka çözülür;
@@ -108,6 +160,8 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   const isDanger = options?.tone === 'danger'
   const needsTyped = Boolean(options?.requireTypedConfirmation)
   const typedOk = !needsTyped || typed.trim() === options?.requireTypedConfirmation
+  const reasonOk = !options?.reason?.required || reason.trim().length > 0
+  const canConfirm = typedOk && reasonOk
 
   return (
     <ConfirmContext.Provider value={confirm}>
@@ -159,6 +213,27 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                 </label>
               )}
 
+              {options?.reason && (
+                <label className="block space-y-2">
+                  <span className="block text-xs text-admin-fg-muted">
+                    {options.reason.label}
+                  </span>
+                  <textarea
+                    value={reason}
+                    onChange={(event) => {
+                      setReason(event.target.value)
+                      reasonRef.current = event.target.value
+                    }}
+                    rows={3}
+                    placeholder={options.reason.placeholder}
+                    aria-required={options.reason.required || undefined}
+                    className="w-full resize-y rounded-admin-sm border border-admin-border bg-admin-surface-2
+                      px-3 py-2 text-sm text-admin-fg placeholder:text-admin-fg-subtle
+                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30"
+                  />
+                </label>
+              )}
+
               <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
                 <button
                   ref={cancelRef}
@@ -170,7 +245,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
                 </button>
                 <button
                   type="button"
-                  disabled={!typedOk}
+                  disabled={!canConfirm}
                   onClick={() => settle(true)}
                   className={`${isDanger ? adminTableActionDangerClass : adminTableActionPrimaryClass}
                     h-12 px-6 disabled:cursor-not-allowed disabled:opacity-40`}
