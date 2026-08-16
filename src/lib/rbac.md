@@ -2,14 +2,14 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\rbac.ts
-skeleton_hash: cfc276f5944db127
+source_path: C:\Users\alize\venthub-wt-quote\src\lib\rbac.ts
+skeleton_hash: e1581e665a2b1d85
 entity_hashes:
   func:canAccessPage: 8cf66bde9646819e
   func:canWrite: 289f50aba94e238a
   func:isReadOnly: 4b13d0168f4b164b
   overview: e7f0da41b26e494f
-generated_at: 2026-06-19T20:48:09Z
+generated_at: 2026-08-16T10:21:25Z
 ---
 
 ## Genel Bakış
@@ -75,7 +75,7 @@ type UserRole = 'super_admin' | 'admin' | 'moderator' | 'warehouse' | 'sales' | 
     admin: ['*'], // Her seye ...`
 - **ROLE_WRITE_ACCESS** (object) — `{
     super_admin: ['*'],
-    admin: ['orders', 'logistics', 'returns', 'co...`
+    admin: ['orders', 'logistics', 'returns', 'qu...`
 
 ---
 

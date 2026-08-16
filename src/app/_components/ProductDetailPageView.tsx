@@ -25,16 +25,18 @@ import { toast } from 'sonner'
 
 import { BrandIcon } from '../../components/HVACIcons'
 import ImageGallery from '../../components/ImageGallery'
-import LeadModal from '../../components/LeadModal'
 import { ProductSmartInference } from '../../components/product/ProductSmartInference'
 import { AddToProjectModal } from '../../components/products'
 import FamilyCard from '../../components/products/FamilyCard'
 import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
+import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
 import Seo from '../../components/Seo'
 import { useCategories } from '../../contexts/CategoryContext'
+import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
 import { useFavorites } from '../../hooks/useFavorites'
+import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -105,6 +107,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const { t, lang } = useI18n()
   const router = useRouter()
   const pathname = usePathname()
+  const { user } = useAuth()
+  const LocalizedRoutes = useLocalizedRoutes()
   const { addToCart } = useCart()
   const { isFavorite, toggleFavorite } = useFavorites()
   const { refreshProjects } = useProjectLists()
@@ -116,7 +120,10 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const [activeSection, setActiveSection] = useState('general')
   // Favori durumu kalıcıdır (useFavorites/localStorage) — yerel useState değil (T059).
   const isWishlisted = actionProduct ? isFavorite(actionProduct.id) : false
-  const [leadOpen, setLeadOpen] = useState(false)
+  // T067: quoteMode CTA'sı artık GERÇEK teklif akışını açar (venthub_quotes kaydı) —
+  // eski LeadModal (iletişim formu) PDP'den kalktı; ana sayfa tüketicisi yaşıyor.
+  // Teklif LOGIN'lidir (cetvel Q4): oturum yoksa login'e yönlendirilir.
+  const [quoteOpen, setQuoteOpen] = useState(false)
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
   const [isNavSticky, setIsNavSticky] = useState(false)
   const [openSpecSections, setOpenSpecSections] = useState<string[]>(['performance'])
@@ -264,6 +271,17 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   }, [selectedVariant, variants])
 
   const handleAddToCart = () => { if (actionProduct) addToCart(actionProduct, quantity) }
+
+  // T067 (cetvel Q4): teklif LOGIN'lidir — oturum yoksa dönüş-yollu login'e yönlendir
+  // (LoginPage ?redirect='i okur, T056 sözleşmesi); varsa gerçek teklif modalı açılır.
+  const openQuoteRequest = () => {
+    if (!user) {
+      toast.error(t('quotes.request.loginRequired'))
+      router.push(LocalizedRoutes.auth.login(pathname ?? undefined))
+      return
+    }
+    setQuoteOpen(true)
+  }
 
   const handleDownloadPdf = async () => {
     if (!actionProduct || isGeneratingPdf) return
@@ -556,7 +574,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 <div className="flex flex-col gap-2">
                   {quoteMode ? (
                     <button
-                      onClick={() => setLeadOpen(true)}
+                      onClick={openQuoteRequest}
                       data-testid="pdp-add-to-cart"
                       className="w-full bg-industrial-gray hover:bg-primary-navy text-white font-black py-3.5 px-6 rounded-xl transition-shadow shadow-md flex items-center justify-center space-x-3 group"
                     >
@@ -694,7 +712,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 
               {quoteMode ? (
                 <button
-                  onClick={() => setLeadOpen(true)}
+                  onClick={openQuoteRequest}
                   className="bg-primary-navy hover:bg-secondary-blue text-white text-xs font-black uppercase tracking-widest py-2.5 px-5 rounded-xl transition-transform shadow-md active:scale-95 flex items-center space-x-2"
                 >
                   <Settings size={14} />
@@ -931,7 +949,13 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
           )}
         </div>
       </div>
-      <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} productName={selectedVariant.name} _productId={selectedVariant.id} />
+      <QuoteRequestModal
+        open={quoteOpen}
+        onClose={() => setQuoteOpen(false)}
+        source="pdp"
+        qtyEditable
+        items={[{ productId: selectedVariant.id, productName: selectedVariant.name, qty: 1 }]}
+      />
     </div>
   )
 }

@@ -92,6 +92,8 @@ export const Routes = {
     orderDetail: (orderId: string) => `/account/orders/detail?id=${encodeURIComponent(orderId)}` as Route,
     shipments: () => '/account/shipments' as Route,
     returns: (newOrderId?: string) => (newOrderId ? `/account/returns?new=${encodeURIComponent(newOrderId)}` : '/account/returns') as Route,
+    quotes: () => '/account/quotes' as Route,
+    quoteDetail: (quoteId: string) => `/account/quotes/detail?id=${encodeURIComponent(quoteId)}` as Route,
     addresses: () => '/account/addresses' as Route,
     invoices: () => '/account/invoices' as Route,
     profile: () => '/account/profile' as Route,
