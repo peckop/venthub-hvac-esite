@@ -132,3 +132,45 @@ describe('INV-ADMIN-CUSTOMER-1 · müşteri → siparişleri', () => {
     ).toBe(true)
   })
 })
+
+describe('INV-ADMIN-CUSTOMER-1 · müşteri e-postası', () => {
+  it('e-posta `admin_list_all_users` RPC ile geliyor', () => {
+    /*
+      `user_profiles`ta e-posta YOK (auth.users'ta ve istemciden okunamaz). Eskiden
+      alan `email: undefined` diye SABİT yazılıydı: admin kimin kim olduğunu göremiyor,
+      CSV e-postasız çıkıyordu.
+    */
+    expect(/rpc\('admin_list_all_users'\)/.test(usersUi)).toBe(true)
+    expect(
+      /email:\s*undefined/.test(usersUi),
+      'E-posta artık sabit `undefined` olmamalı.',
+    ).toBe(false)
+  })
+
+  it('RPC listenin KAYNAĞI değil, yalnız zenginleştirme', () => {
+    /*
+      RPC sayfa parametresi almıyor, tüm kümeyi döndürüyor. Kaynak yapmak az önce
+      kapatılan sessiz satır tavanını geri getirirdi. Sayfalama/sayım
+      `user_profiles`ta kalmalı.
+    */
+    expect(/from\('user_profiles'\)/.test(usersUi)).toBe(true)
+    expect(/\.range\(\s*offset/.test(usersUi)).toBe(true)
+  })
+
+  it('eksik e-posta eşlemesi SESSİZ GEÇMİYOR', () => {
+    /*
+      RPC yanıtı da bir üst sınıra takılabilir (PostgREST `max-rows` DB'den
+      okunamadı — varsayılmıyor). Eşleme eksikse boş hücre "bu kullanıcının
+      e-postası yok" gibi okunur; oysa gerçek "gösteremiyorum"dur.
+    */
+    expect(/emailsComplete/.test(usersUi), 'Eksiklik tespit edilmeli.').toBe(true)
+    expect(
+      /list\.length < count/.test(usersUi),
+      'Eksiklik, dönen satır sayısı ile gerçek toplam KARŞILAŞTIRILARAK anlaşılmalı.',
+    ).toBe(true)
+    expect(
+      /emailsIncomplete/.test(usersUi),
+      'Eksiklik kullanıcıya BİLDİRİLMELİ.',
+    ).toBe(true)
+  })
+})

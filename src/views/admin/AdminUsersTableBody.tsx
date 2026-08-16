@@ -270,9 +270,46 @@ function sortUserRows(rows: UserRow[], sort: { key: string; dir: 'asc' | 'desc' 
 
       const { data, error, count } = await allQuery.range(offset, offset + _params.pageSize - 1)
       if (error) throw error
+
+      /*
+        E-POSTA ZENGİNLEŞTİRMESİ (T059-VH).
+        `user_profiles`ta e-posta YOK — o alan `auth.users`ta ve istemciden okunamaz.
+        `admin_list_all_users()` e-postayı da döndürüyor ve yetki kapısı gövdesinin
+        içinde (bkz. 20260816120000 migration'ı).
+
+        Neden LİSTENİN KAYNAĞI yapılmadı: RPC sayfa parametresi almıyor, tüm kümeyi
+        döndürüyor. Kaynak olarak kullanmak, az önce kapattığım sessiz satır tavanını
+        geri getirirdi. Bu yüzden sayfalama/sayım `user_profiles`ta KALDI; RPC yalnız
+        id→e-posta eşlemesi için çağrılıyor.
+
+        EKSİKLİK SESSİZ GEÇMİYOR: RPC yanıtı da bir üst sınıra takılabilir (PostgREST
+        `max-rows` DB seviyesinden okunamadı, yani VARSAYMIYORUM). Dönen satır sayısı
+        gerçek toplamdan azsa eşleme eksiktir ve bazı satırlar e-postasız kalır —
+        bu durumda kullanıcıya söylüyoruz. Boş bir hücre "bu kullanıcının e-postası
+        yok" gibi okunur; oysa gerçek "gösteremiyorum"dur.
+      */
+      const emailByeId = new Map<string, string>()
+      let emailsComplete = true
+      try {
+        const { data: rpcRows, error: rpcError } = await supabase.rpc('admin_list_all_users')
+        if (rpcError) throw rpcError
+        const list = (rpcRows ?? []) as Array<{ id: string; email: string | null }>
+        for (const u of list) {
+          if (u.email) emailByeId.set(u.id, u.email)
+        }
+        if (typeof count === 'number' && list.length < count) emailsComplete = false
+      } catch {
+        // Yetkisiz ya da erişilemez → liste yine gösterilir, ama eksiklik bildirilir.
+        emailsComplete = false
+      }
+
+      if (!emailsComplete) {
+        toast.warning(t('admin.users.toasts.emailsIncomplete'))
+      }
+
       const rows: UserRow[] = ((data as AllProfileRow[]) || []).map((p) => ({
         id: p.id,
-        email: undefined,
+        email: emailByeId.get(p.id),
         full_name: p.full_name ?? undefined,
         role: normalizeRole(p.role),
         created_at: p.created_at,
