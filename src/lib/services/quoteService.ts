@@ -14,17 +14,17 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+import type { Database } from '../../types/database.types'
+import {
+  type QuoteItemRow,
+  type QuoteRow,
+  type QuoteSource,
+  withQuotesSchema,
+} from '../../types/quotes.bridge'
 import {
   allowedCustomerQuoteActions,
   type QuoteStatus,
 } from '../quotes/quoteStatusMachine'
-import type { Database } from '../../types/database.types'
-import {
-  withQuotesSchema,
-  type QuoteItemRow,
-  type QuoteRow,
-  type QuoteSource,
-} from '../../types/quotes.bridge'
 
 export interface QuoteRequestItemInput {
   productId: string | null
