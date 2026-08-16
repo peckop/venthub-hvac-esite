@@ -280,6 +280,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             <input
                                 type="text"
                                 inputMode="numeric"
+                                data-testid="checkout-invoice-tckn"
                                 value={invoiceInfo.tckn || ''}
                                 onChange={(e) => setInvoiceInfo({ ...invoiceInfo, tckn: e.target.value.replace(/\D/g, '').slice(0, 11) })}
                                 className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
@@ -294,6 +295,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             <label className="block text-sm font-medium text-industrial-gray mb-2">{t('checkout.invoice.companyLabel')}</label>
                             <input
                                 type="text"
+                                data-testid="checkout-invoice-company"
                                 value={invoiceInfo.companyName || ''}
                                 onChange={(e) => setInvoiceInfo({ ...invoiceInfo, companyName: e.target.value })}
                                 className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
@@ -305,6 +307,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             <input
                                 type="text"
                                 inputMode="numeric"
+                                data-testid="checkout-invoice-vkn"
                                 value={invoiceInfo.vkn || ''}
                                 onChange={(e) => setInvoiceInfo({ ...invoiceInfo, vkn: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                                 className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
@@ -316,6 +319,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             <label className="block text-sm font-medium text-industrial-gray mb-2">{t('checkout.invoice.taxOfficeLabel')}</label>
                             <input
                                 type="text"
+                                data-testid="checkout-invoice-tax-office"
                                 value={invoiceInfo.taxOffice || ''}
                                 onChange={(e) => setInvoiceInfo({ ...invoiceInfo, taxOffice: e.target.value })}
                                 className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
