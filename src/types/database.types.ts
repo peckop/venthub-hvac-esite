@@ -526,6 +526,75 @@ export type Database = {
           },
         ]
       }
+      data_subject_requests: {
+        Row: {
+          applicant_email: string
+          completed_at: string | null
+          created_at: string
+          due_at: string
+          handled_by: string | null
+          id: string
+          identity_verified_at: string | null
+          outcome: string | null
+          received_at: string
+          request_type: string
+          retained_data_note: string | null
+          status: string
+          tenant_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          applicant_email: string
+          completed_at?: string | null
+          created_at?: string
+          due_at?: string
+          handled_by?: string | null
+          id?: string
+          identity_verified_at?: string | null
+          outcome?: string | null
+          received_at?: string
+          request_type: string
+          retained_data_note?: string | null
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          applicant_email?: string
+          completed_at?: string | null
+          created_at?: string
+          due_at?: string
+          handled_by?: string | null
+          id?: string
+          identity_verified_at?: string | null
+          outcome?: string | null
+          received_at?: string
+          request_type?: string
+          retained_data_note?: string | null
+          status?: string
+          tenant_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_subject_requests_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_subject_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       error_groups: {
         Row: {
           assigned_to: string | null
@@ -582,11 +651,60 @@ export type Database = {
           },
         ]
       }
+      goods_receipts: {
+        Row: {
+          created_at: string
+          document_no: string
+          id: string
+          note: string | null
+          po_id: string
+          received_at: string
+          received_by: string | null
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_no: string
+          id?: string
+          note?: string | null
+          po_id: string
+          received_at?: string
+          received_by?: string | null
+          tenant_id?: string
+        }
+        Update: {
+          created_at?: string
+          document_no?: string
+          id?: string
+          note?: string | null
+          po_id?: string
+          received_at?: string
+          received_by?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goods_receipts_po_id_fkey"
+            columns: ["po_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "goods_receipts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_movements: {
         Row: {
           batch_id: string | null
           created_at: string
           delta: number
+          goods_receipt_id: string | null
           id: string
           order_id: string | null
           original_movement_id: string | null
@@ -596,11 +714,14 @@ export type Database = {
           tenant_id: string
           undo_at: string | null
           undo_by_user_id: string | null
+          unit_cost: number | null
+          unit_cost_currency: string | null
         }
         Insert: {
           batch_id?: string | null
           created_at?: string
           delta: number
+          goods_receipt_id?: string | null
           id?: string
           order_id?: string | null
           original_movement_id?: string | null
@@ -610,11 +731,14 @@ export type Database = {
           tenant_id?: string
           undo_at?: string | null
           undo_by_user_id?: string | null
+          unit_cost?: number | null
+          unit_cost_currency?: string | null
         }
         Update: {
           batch_id?: string | null
           created_at?: string
           delta?: number
+          goods_receipt_id?: string | null
           id?: string
           order_id?: string | null
           original_movement_id?: string | null
@@ -624,8 +748,17 @@ export type Database = {
           tenant_id?: string
           undo_at?: string | null
           undo_by_user_id?: string | null
+          unit_cost?: number | null
+          unit_cost_currency?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "inventory_movements_goods_receipt_id_fkey"
+            columns: ["goods_receipt_id"]
+            isOneToOne: false
+            referencedRelation: "goods_receipts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "inventory_movements_order_id_fkey"
             columns: ["order_id"]
@@ -1664,6 +1797,9 @@ export type Database = {
           id: string
           is_featured: boolean
           is_taxable: boolean
+          last_purchase_cost: number | null
+          last_purchase_currency: string | null
+          last_purchased_at: string | null
           low_stock_override: boolean
           low_stock_threshold: number | null
           model_code: string | null
@@ -1700,6 +1836,9 @@ export type Database = {
           id?: string
           is_featured?: boolean
           is_taxable?: boolean
+          last_purchase_cost?: number | null
+          last_purchase_currency?: string | null
+          last_purchased_at?: string | null
           low_stock_override?: boolean
           low_stock_threshold?: number | null
           model_code?: string | null
@@ -1736,6 +1875,9 @@ export type Database = {
           id?: string
           is_featured?: boolean
           is_taxable?: boolean
+          last_purchase_cost?: number | null
+          last_purchase_currency?: string | null
+          last_purchased_at?: string | null
           low_stock_override?: boolean
           low_stock_threshold?: number | null
           model_code?: string | null
@@ -1844,6 +1986,138 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "user_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_order_items: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          po_id: string
+          product_id: string
+          qty_ordered: number
+          qty_received: number
+          tax_rate: number
+          tenant_id: string
+          unit_cost: number
+        }
+        Insert: {
+          created_at?: string
+          currency: string
+          id?: string
+          po_id: string
+          product_id: string
+          qty_ordered: number
+          qty_received?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit_cost: number
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          po_id?: string
+          product_id?: string
+          qty_ordered?: number
+          qty_received?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_order_items_po_id_fkey"
+            columns: ["po_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_velocity"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_orders: {
+        Row: {
+          close_note: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          expected_at: string | null
+          id: string
+          note: string | null
+          status: string
+          supplier_id: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          close_note?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          expected_at?: string | null
+          id?: string
+          note?: string | null
+          status?: string
+          supplier_id: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Update: {
+          close_note?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          expected_at?: string | null
+          id?: string
+          note?: string | null
+          status?: string
+          supplier_id?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_orders_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_orders_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -2205,6 +2479,62 @@ export type Database = {
             columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suppliers: {
+        Row: {
+          contact_name: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          note: string | null
+          phone: string | null
+          tax_no: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          note?: string | null
+          phone?: string | null
+          tax_no?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          note?: string | null
+          phone?: string | null
+          tax_no?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suppliers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -3158,6 +3488,10 @@ export type Database = {
           total_count: number
         }[]
       }
+      anonymize_user_personal_data: {
+        Args: { p_dry_run?: boolean; p_request_id?: string; p_user_id: string }
+        Returns: Json
+      }
       bump_rate_limit: {
         Args: { p_key: string; p_limit: number; p_window_seconds: number }
         Returns: {
@@ -3359,6 +3693,15 @@ export type Database = {
       jwt_price_segment: { Args: never; Returns: string }
       jwt_role: { Args: never; Returns: string }
       jwt_tenant_id: { Args: never; Returns: string }
+      process_goods_receipt: {
+        Args: {
+          p_document_no: string
+          p_lines: Json
+          p_note?: string
+          p_po_id: string
+        }
+        Returns: Json
+      }
       process_order_stock_reduction: {
         Args: { p_order_id: string }
         Returns: Json
