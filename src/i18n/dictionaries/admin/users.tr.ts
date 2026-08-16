@@ -7,6 +7,7 @@ export const users = {
         created: 'Kayıt',
         createdLabel: 'Katılım',
         actions: 'İşlem',
+        orders: 'Siparişler',
         company: 'Şirket & B2B',
         role: 'Rol'
       },
@@ -40,6 +41,8 @@ export const users = {
         cannotDemoteSelf: 'Kendi yetkinizi düşüremezsiniz'
       },
       actions: {
+        viewOrders: 'Siparişler',
+        viewOrdersFor: '{{user}} kullanıcısının siparişlerini görüntüle',
         admin: 'Yönetici',
         moderator: 'Moderatör',
         superadmin: 'Süper Yönetici',

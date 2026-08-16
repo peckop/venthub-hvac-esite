@@ -1,7 +1,9 @@
 'use client'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { AlertCircle, Crown, Eye, Package, SearchX, Shield, ShieldCheck, Tag, Users } from 'lucide-react'
+import { AlertCircle, Crown, Eye, Package, Receipt, SearchX, Shield, ShieldCheck, Tag, Users } from 'lucide-react'
+import type { Route } from 'next'
+import Link from 'next/link'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -24,6 +26,7 @@ import { formatDate } from '../../i18n/datetime'
 import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import type { Database } from '../../types/database.types'
+import { adminTableActionClass } from '../../utils/adminUi'
 
 /* ---- normalize edilmiş satır modeli (her iki sekme tek tipe inilir) ---- */
 type UserRoleCode = 'user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer'
@@ -163,6 +166,40 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   // fetcher hangi sekmeyi okuyacağını ref'ten alır (tek table instance)
   const tabRef = useRef<UsersTab>('admins')
 
+/** Sıralanabilir sütun → DB kolonu. Bilinmeyen anahtar `created_at`e düşer. */
+const USER_SORT_COLUMNS: Record<string, string> = {
+  created_at: 'created_at',
+  role: 'role',
+  full_name: 'full_name',
+}
+
+/** `admins` dalı için JS sıralaması — RPC sayfa/sıra parametresi almıyor. */
+function sortUserRows(rows: UserRow[], sort: { key: string; dir: 'asc' | 'desc' } | null | undefined): UserRow[] {
+  const key = sort?.key ?? 'created_at'
+  const factor = sort?.dir === 'asc' ? 1 : -1
+  /*
+    Anahtar erişimi AÇIKÇA yazılıyor. Dinamik indeksleme için `as unknown as
+    Record<string, unknown>` yazmak proje kuralınca yasak (ESLint `no-restricted-syntax`)
+    ve haklı: cast, bilinmeyen bir sıralama anahtarını sessizce boş stringe çevirip
+    "sıralandı ama sıra yanlış" durumu üretirdi. Switch, desteklenmeyen anahtarı
+    varsayılana düşürdüğünü GÖRÜNÜR kılar.
+  */
+  const valueOf = (row: UserRow): string => {
+    switch (key) {
+      case 'full_name':
+        return row.full_name ?? ''
+      case 'role':
+        return row.role
+      case 'email':
+        return row.email ?? ''
+      default:
+        return row.created_at
+    }
+  }
+
+  return [...rows].sort((a, b) => valueOf(a).localeCompare(valueOf(b), 'tr') * factor)
+}
+
   /* ---- fetcher (DI: ilk param supabase) — sekmeye göre iki yol, tek UserRow'a normalize ---- */
   const usersFetcher = useCallback(
     async (supabase: SupabaseClient<Database>, _params: FetchParams): Promise<FetchResult<UserRow>> => {
@@ -178,21 +215,60 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
             .in('id', ids)
           profiles = (profileData as ProfileLite[]) || []
         }
-        const rows: UserRow[] = data.map((u) => ({
+        const allRows: UserRow[] = data.map((u) => ({
           id: u.id,
           email: u.email,
           full_name: profiles.find((p) => p.id === u.id)?.full_name ?? u.full_name ?? undefined,
           role: normalizeRole(u.role),
           created_at: u.created_at,
         }))
-        return { rows, totalMatched: rows.length }
+
+        /*
+          `admin_list_users` RPC'si TAM listeyi döndürür (personel sayısı tanım gereği
+          küçük), sayfa parametresi almaz. Sıralama ve dilimleme bu yüzden burada
+          yapılıyor — ama tablo sözleşmesi ile AYNI kalıyor: `totalMatched` sayfa
+          uzunluğu değil, kaynaktaki gerçek sayı. İki dal farklı yerden veri alsa da
+          dışarıya tek davranış gösteriyor.
+        */
+        const term = _params.query.trim().toLocaleLowerCase('tr')
+        const filtered = term
+          ? allRows.filter(
+              (r) =>
+                (r.full_name ?? '').toLocaleLowerCase('tr').includes(term) ||
+                (r.email ?? '').toLocaleLowerCase('tr').includes(term),
+            )
+          : allRows
+
+        const sorted = sortUserRows(filtered, _params.sort)
+        const offset = (_params.page - 1) * _params.pageSize
+        return {
+          rows: sorted.slice(offset, offset + _params.pageSize),
+          totalMatched: filtered.length,
+        }
       }
 
       // tab === 'all'
       await ensureSessionFresh()
-      const { data, error } = await supabase
+      /*
+        SESSİZ TAVAN ONARIMI (T059-VH). Eskiden sorguda ne `range` ne `limit` vardı ve
+        tablo `paginationMode: 'none'` ile çalışıyordu. PostgREST kendi azami satır
+        sınırını uygular (varsayılan 1000) ve BUNU HABER VERMEZ: 1001. kullanıcıdan
+        sonrası listede hiç görünmez, toplam sayı da doğru sanılır. Yani hata
+        "yavaşlama" olarak değil, VERİNİN YOKLUĞU olarak ortaya çıkardı.
+        Artık sayfa aralığı açıkça isteniyor ve gerçek toplam `count: 'exact'`ten
+        geliyor; `totalMatched` sayfa uzunluğu değil, kaynaktaki gerçek sayı.
+      */
+      const offset = (_params.page - 1) * _params.pageSize
+      const sortColumn = USER_SORT_COLUMNS[_params.sort?.key ?? ''] ?? 'created_at'
+      let allQuery = supabase
         .from('user_profiles')
-        .select('id, role, created_at, full_name')
+        .select('id, role, created_at, full_name', { count: 'exact' })
+        .order(sortColumn, { ascending: _params.sort?.dir === 'asc' })
+
+      const term = _params.query.trim()
+      if (term) allQuery = allQuery.ilike('full_name', `%${term}%`)
+
+      const { data, error, count } = await allQuery.range(offset, offset + _params.pageSize - 1)
       if (error) throw error
       const rows: UserRow[] = ((data as AllProfileRow[]) || []).map((p) => ({
         id: p.id,
@@ -201,7 +277,7 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         role: normalizeRole(p.role),
         created_at: p.created_at,
       }))
-      return { rows, totalMatched: rows.length }
+      return { rows, totalMatched: typeof count === 'number' ? count : rows.length }
     },
     [],
   )
@@ -210,8 +286,10 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
     resource: 'users',
     rowId: (r) => r.id,
     fetcher: usersFetcher,
-    paginationMode: 'none',
-    sortMode: 'client',
+    // Sayfalama ve sıralama SUNUCUDA: istemci sıralaması yalnız görünen sayfayı
+    // sıralar ve kullanıcıya "en yenisi bu" diye yanlış bir liste gösterirdi.
+    paginationMode: 'server',
+    sortMode: 'server',
     initialSort: { key: 'created_at', dir: 'desc' },
     syncUrl: true,
   })
@@ -445,6 +523,34 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
               {t('admin.users.table.createdLabel')}
             </span>
           </div>
+        ),
+      },
+      {
+        /*
+          "BU MÜŞTERİNİN SİPARİŞLERİ" — T059-VH.
+          Ayrı bir sütun, aksiyonların İÇİNE konmadı: aksiyon kabı
+          `opacity-0 group-hover:opacity-100` ile gizli ve klavye kullanıcısı onu
+          keşfedemez. Bağlantı bir GEZİNME yolu, fareyle keşfedilen bir aksiyon değil.
+
+          Ayrı bir "müşteri detayı" sayfası da açılmadı: sipariş tablosu zaten arama,
+          sıralama, sayfalama, dışa aktarma ve satır aksiyonlarını taşıyor. İkinci bir
+          ekran bunların hepsini yeniden (ve zamanla farklı) uygulamak olurdu.
+        */
+        key: 'orders',
+        header: t('admin.users.table.orders'),
+        align: 'center',
+        hideable: true,
+        cell: (r) => (
+          <Link
+            href={`/admin/orders?customer=${encodeURIComponent(r.id)}` as Route}
+            className={`${adminTableActionClass} gap-1.5`}
+            aria-label={t('admin.users.actions.viewOrdersFor', {
+              user: r.full_name || r.email || r.id.slice(0, 8),
+            })}
+          >
+            <Receipt size={12} aria-hidden="true" />
+            {t('admin.users.actions.viewOrders')}
+          </Link>
         ),
       },
       {
