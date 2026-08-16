@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       _migration_ledger: {
@@ -1122,11 +1097,6 @@ export type Database = {
           },
         ]
       }
-      // ELLE EKLENDİ (W5, 2026-08-16) — `pricing_policy` tablosu bu PR'ın migration'ıyla
-      // geliyor; `pnpm supabase:gen` CANLI şemadan üretir, dolayısıyla migration prod'a
-      // uygulanmadan üretilemez. Merge sonrası ilk `supabase:gen` bu bloğu gerçeğiyle
-      // değiştirir. Tek alternatif çift dönüşümlü tip kaçışıydı; o depoda yasak ve haklı
-      // olarak: tip yalanı gizli bug yuvasıdır (aynı dersi `DomainProduct` omit'inde yedik).
       pricing_policy: {
         Row: {
           brand_id: string | null
@@ -1182,7 +1152,50 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pricing_policy_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_policy_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_policy_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "pricing_policy_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_velocity"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "pricing_policy_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pricing_policy_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pricing_rule: {
         Row: {
@@ -1853,6 +1866,86 @@ export type Database = {
         }
         Relationships: []
       }
+      refund_attempts: {
+        Row: {
+          actor_user_id: string | null
+          amount: number
+          created_at: string
+          failure_code: string | null
+          id: string
+          idempotency_key: string
+          kind: string
+          order_id: string
+          psp_reference: string | null
+          psp_result: Json | null
+          reason: string | null
+          settled_at: string | null
+          state: string
+          tenant_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          amount: number
+          created_at?: string
+          failure_code?: string | null
+          id?: string
+          idempotency_key: string
+          kind: string
+          order_id: string
+          psp_reference?: string | null
+          psp_result?: Json | null
+          reason?: string | null
+          settled_at?: string | null
+          state?: string
+          tenant_id?: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          amount?: number
+          created_at?: string
+          failure_code?: string | null
+          id?: string
+          idempotency_key?: string
+          kind?: string
+          order_id?: string
+          psp_reference?: string | null
+          psp_result?: Json | null
+          reason?: string | null
+          settled_at?: string | null
+          state?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refund_attempts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "reserved_orders"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "refund_attempts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "refund_attempts_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "view_admin_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "refund_attempts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       returns_webhook_events: {
         Row: {
           body_hash: string
@@ -2397,6 +2490,8 @@ export type Database = {
       venthub_order_items: {
         Row: {
           created_at: string
+          display_currency: string
+          display_rate: number
           id: string
           order_id: string
           price_at_time: number | null
@@ -2405,19 +2500,22 @@ export type Database = {
           product_id: string
           product_image_url: string | null
           product_name: string
-          product_name_snapshot: string | null
+          product_name_snapshot: string
           product_sku: string | null
-          product_sku_snapshot: string | null
-          product_snapshot: Json | null
+          product_sku_snapshot: string
+          product_snapshot: Json
           quantity: number
-          tax_rate_snapshot: number | null
+          rate_effective_date: string
+          tax_rate_snapshot: number
           tenant_id: string
           total_price: number
           unit_price: number
-          unit_price_snapshot: number | null
+          unit_price_snapshot: number
         }
         Insert: {
           created_at?: string
+          display_currency?: string
+          display_rate?: number
           id?: string
           order_id: string
           price_at_time?: number | null
@@ -2426,19 +2524,22 @@ export type Database = {
           product_id: string
           product_image_url?: string | null
           product_name: string
-          product_name_snapshot?: string | null
+          product_name_snapshot: string
           product_sku?: string | null
-          product_sku_snapshot?: string | null
-          product_snapshot?: Json | null
+          product_sku_snapshot: string
+          product_snapshot: Json
           quantity?: number
-          tax_rate_snapshot?: number | null
+          rate_effective_date?: string
+          tax_rate_snapshot: number
           tenant_id?: string
           total_price: number
           unit_price: number
-          unit_price_snapshot?: number | null
+          unit_price_snapshot: number
         }
         Update: {
           created_at?: string
+          display_currency?: string
+          display_rate?: number
           id?: string
           order_id?: string
           price_at_time?: number | null
@@ -2447,16 +2548,17 @@ export type Database = {
           product_id?: string
           product_image_url?: string | null
           product_name?: string
-          product_name_snapshot?: string | null
+          product_name_snapshot?: string
           product_sku?: string | null
-          product_sku_snapshot?: string | null
-          product_snapshot?: Json | null
+          product_sku_snapshot?: string
+          product_snapshot?: Json
           quantity?: number
-          tax_rate_snapshot?: number | null
+          rate_effective_date?: string
+          tax_rate_snapshot?: number
           tenant_id?: string
           total_price?: number
           unit_price?: number
-          unit_price_snapshot?: number | null
+          unit_price_snapshot?: number
         }
         Relationships: [
           {
@@ -3173,6 +3275,8 @@ export type Database = {
         Args: { p_filters?: Json; p_limit?: number; p_q: string }
         Returns: {
           brand: string
+          cover_image_path: string
+          family_slug: string
           id: string
           name: string
           price: number
@@ -3257,6 +3361,10 @@ export type Database = {
       jwt_tenant_id: { Args: never; Returns: string }
       process_order_stock_reduction: {
         Args: { p_order_id: string }
+        Returns: Json
+      }
+      process_order_stock_restore: {
+        Args: { p_order_id: string; p_reason: string }
         Returns: Json
       }
       reverse_inventory_batch:
@@ -3424,9 +3532,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       contact_department: ["sales", "support", "consulting"],
