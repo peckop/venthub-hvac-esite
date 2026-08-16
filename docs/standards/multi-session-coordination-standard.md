@@ -103,6 +103,30 @@ kapısından geçirip yazar. `Bash` ile kapıyı aşmak yasak ([[worker-direct-p
 yeniden başlatıldığında eskisi TTL dolana dek görünür). Pano bunu birleştirmez, **çakışma olarak
 işaretler** — çünkü aynı adı taşıyan iki canlı talep birbirini bloklayabilir.
 
+### 4.1 Not adresleme (INV-BOARD-2)
+
+**KARAR: `--to <şerit>` gönderim anında o şeridi tutan OTURUMA çözülür, role değil; çözülmüş sid
+kalıcı yazılır.** Bugünkü modelde şerit = oturum olduğu için bu doğrudur; rol-tabanlı teslim
+istenirse değişecek yer bu cümledir, kod değil.
+
+Sonuçları:
+- **Hedef gönderimde doğrulanır.** Ne oturum ne şerit olan bir hedef **yazılmaz**, komut `exit 1`
+  verir ve geçerli hedefleri listeler. Teslim edilemez bir notu "bırakıldı" diye bildirmek
+  fail-open'dır ve en pahalı biçimidir: gönderen işini bitmiş sayar.
+- **Kısaltma serbesttir** (`--to <8-hane>`), tam sid'e çözülür; belirsizse `exit 1`.
+- **`herkes`/`hepsi`/`tümü`/`all`/`everyone`/`*` = broadcast.** Bunlar hedef DEĞİL, "hedef yok"
+  demenin insan biçimidir.
+- **Şerit adı değişse veya bırakılsa da not teslim edilebilir kalır** — çünkü diske sid yazılmıştır.
+
+> **Niçin bu kadar ayrıntı:** 2026-08-16'da ölçüldü — **110 notun 49'u (%45) hiç teslim edilmedi**
+> (`herkes` 37 · `ALL` 1 · 8-hane kısaltma 10 · geçersiz ad 1) ve komut her seferinde
+> "not bırakıldı" bastı. Kaybolanların arasında üç şeridi birden bloklayan bir bulgu vardı.
+> Aynı gün üç şerit adı da değişti (`PRICING`→`PRICING-STOK`, `EDGE`→`EDGE-REFUND`,
+> `ADMIN-UX`→`ADMIN-OPS`), yani okuma anında ada bakan eski çözüm ikinci kez kırılacaktı.
+> İş emri `T064-VH`; bekçi `src/__tests__/conformance/board-invariants.test.ts` (INV-BOARD-2).
+> **Geriye dönük teslim YOK:** eski notlar katı filtreden geçmeye devam eder, sahipleri yeniden
+> gönderir — append-only günlük geriye dönük yeniden yorumlanmaz.
+
 ## 5. Kullanım
 
 ```bash
