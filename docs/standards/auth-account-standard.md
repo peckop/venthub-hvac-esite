@@ -61,13 +61,22 @@ Muafiyeti kaldırmak ya da handler'ı silmek zinciri sessizce koparır — INV-A
 sağlayıcı hatası ne olursa olsun kullanıcıya tek jenerik mesaj gösterilir
 ("Sıfırlama isteği gönderilemedi"). "User not found" benzeri dallar yasaktır.
 
+---
+
+# Bölüm B — Hesap Yüzeyi (taşındı)
+
+v0.2'de burada duran hesap-yüzeyi kuralları (B1–B6) kendi cetveline taşındı:
+**`customer-account-standard.md`** (kardeş cetvel; bekçisi INV-AUTH-2). Bu dosya
+yalnız AUTH ZİNCİRİNİ (giriş/şifre/callback, A1–A6) yönetir.
+
 ## Kapsam dışı (bilerek)
 
 - `/account/*` middleware guard'ı — ortak mülk, ayrı iş (T056 kapsam dışı bırakıldı).
 - CAPTCHA / rate-limit — T060.
 - Google OAuth canlı e2e provası — Recep'in canlı ortam provası gerektirir
   (Supabase Dashboard'daki Redirect URL allowlist'i repodan denetlenemez; canlıda
-  `https://<domain>/auth/callback` kayıtlı olmalıdır).
+  `https://<domain>/auth/callback` kayıtlı olmalıdır; 2026-08-16'da Recep kaydın
+  var olduğunu doğruladı).
 
 ## Muafiyetler
 

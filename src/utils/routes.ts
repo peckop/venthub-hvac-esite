@@ -96,6 +96,7 @@ export const Routes = {
     invoices: () => '/account/invoices' as Route,
     profile: () => '/account/profile' as Route,
     favorites: () => '/account/favorites' as Route,
+    projects: () => '/account/projects' as Route,
     security: () => '/account/security' as Route
   },
   
