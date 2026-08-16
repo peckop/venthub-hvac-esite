@@ -16,7 +16,9 @@ vi.mock('../supabase', () => ({
     })),
     // Teslim bildirimi bu uçtan gidiyor; mock'ta yoksa cagri sessizce yutulur
     // ve "bildirim gitti mi" sorusu OLCULEMEZ hale gelir.
-    functions: { invoke: vi.fn().mockResolvedValue({ data: null, error: null }) }
+    functions: { invoke: vi.fn().mockResolvedValue({ data: null, error: null }) },
+    // Stok geri verme tek bu uçtan gidiyor (T052-VH).
+    rpc: vi.fn().mockResolvedValue({ data: { success: true }, error: null })
   }
 }))
 
@@ -335,5 +337,100 @@ describe('updateOrderStatus — monotonluk kapısı SERVİSTE (T058-VH)', () => 
     })
     expect(result.ok).toBe(true)
     expect(update).toHaveBeenCalled()
+  })
+})
+
+/**
+ * T052-VH — stok geri verme artık KANITA BAĞLI tek RPC ile.
+ *
+ * Eski gövde sipariş KALEMLERİNE bakıp `quantity` kadar stok EKLİYORDU: "sipariş ne
+ * kadardı" sorusunun cevabını geri veriyordu, "stoktan ne kadar düşüldü" sorusunun
+ * değil. Satışta stok hiç düşmediği için her iptal saf HAYALİ STOK üretiyordu.
+ */
+describe('restoreStockForOrder — kanıta bağlı RPC (T052-VH)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  function mockOrderUpdate() {
+    const eq = vi.fn().mockResolvedValue({ error: null })
+    const update = vi.fn().mockReturnValue({ eq })
+    ;(supabase.from as import('vitest').Mock).mockImplementation(() => ({
+      update,
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({ maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }) }),
+      }),
+      insert: vi.fn().mockResolvedValue({ error: null }),
+    }))
+    return update
+  }
+
+  it('iptalde RPC `order_cancel` sebebiyle çağrılır', async () => {
+    mockOrderUpdate()
+    ;(supabase.rpc as import('vitest').Mock).mockResolvedValue({
+      data: { success: true, restored_count: 2 }, error: null,
+    })
+
+    const res = await updateOrderStatus({
+      orderId: 'order-1', newStatus: 'cancelled', oldStatus: 'processing',
+    })
+
+    expect(res.ok).toBe(true)
+    expect(res.warning).toBeUndefined()
+    expect(supabase.rpc).toHaveBeenCalledWith('process_order_stock_restore', {
+      p_order_id: 'order-1', p_reason: 'order_cancel',
+    })
+    // Eski gövde ürün tablosuna ELLE yazıyordu; artık tek yazıcı RPC'dir.
+    expect(supabase.from).not.toHaveBeenCalledWith('venthub_order_items')
+  })
+
+  it('iadede sebep `order_refund` olur', async () => {
+    mockOrderUpdate()
+    ;(supabase.rpc as import('vitest').Mock).mockResolvedValue({ data: { success: true }, error: null })
+
+    await updateOrderStatus({ orderId: 'order-1', newStatus: 'refunded', oldStatus: 'shipped' })
+
+    expect(supabase.rpc).toHaveBeenCalledWith('process_order_stock_restore', {
+      p_order_id: 'order-1', p_reason: 'order_refund',
+    })
+  })
+
+  it('`success:false` BAŞARI SAYILMAZ — HTTP 200 tek başına yeterli değil', async () => {
+    // T052'nin kök sebeplerinden biri buydu: dönüş zarfı okunmadan "oldu" varsayılıyordu.
+    mockOrderUpdate()
+    ;(supabase.rpc as import('vitest').Mock).mockResolvedValue({
+      data: { success: false, error: 'Order not found' }, error: null,
+    })
+
+    const res = await updateOrderStatus({
+      orderId: 'order-1', newStatus: 'cancelled', oldStatus: 'processing',
+    })
+
+    // Statü değişti (sipariş gerçekten iptal edildi) AMA uyarı taşınıyor.
+    expect(res.ok).toBe(true)
+    expect(res.warning).toBe('Order not found')
+  })
+
+  it('RPC hatası sessizce YUTULMAZ, uyarı olarak taşınır', async () => {
+    mockOrderUpdate()
+    ;(supabase.rpc as import('vitest').Mock).mockResolvedValue({
+      data: null, error: { message: 'not authorized' },
+    })
+
+    const res = await updateOrderStatus({
+      orderId: 'order-1', newStatus: 'cancelled', oldStatus: 'processing',
+    })
+
+    expect(res.ok).toBe(true)
+    expect(res.warning).toBe('not authorized')
+  })
+
+  it('zaten iptal/iade olmuş siparişte stok geri verme TEKRAR denenmez', async () => {
+    mockOrderUpdate()
+    ;(supabase.rpc as import('vitest').Mock).mockResolvedValue({ data: { success: true }, error: null })
+
+    await updateOrderStatus({ orderId: 'order-1', newStatus: 'refunded', oldStatus: 'cancelled' })
+
+    expect(supabase.rpc).not.toHaveBeenCalled()
   })
 })

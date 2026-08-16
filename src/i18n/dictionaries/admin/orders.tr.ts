@@ -191,7 +191,8 @@ export const orders = {
           cancelledOrRefunded: 'Sipariş iptal veya iade edilmiş.',
           updateSuccess: 'Sipariş durumu başarıyla güncellendi.',
           updateError: 'Durum güncellenirken hata oluştu.',
-          invalidTransition: '{{from}} → {{to}} geçişi yapılamaz. Sipariş durumu yalnız ileri taşınabilir.'
+          invalidTransition: '{{from}} → {{to}} geçişi yapılamaz. Sipariş durumu yalnız ileri taşınabilir.',
+          stockRestoreFailed: 'Sipariş güncellendi ama STOK GERİ VERİLEMEDİ: {{error}} — envanteri elle düzeltin.'
         },
         detail: {
           description: 'Seçili siparişin durumu, iletişim bilgileri, notları ve e-posta kayıtları.',

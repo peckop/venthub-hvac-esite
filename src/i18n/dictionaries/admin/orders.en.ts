@@ -198,7 +198,8 @@ export const orders = {
           cancelledOrRefunded: 'Order is cancelled or refunded.',
           updateSuccess: 'Order status updated successfully.',
           updateError: 'Error occurred while updating status.',
-          invalidTransition: 'Cannot move {{from}} → {{to}}. Order status can only move forward.'
+          invalidTransition: 'Cannot move {{from}} → {{to}}. Order status can only move forward.',
+          stockRestoreFailed: 'Order updated but STOCK WAS NOT RESTORED: {{error}} — correct inventory manually.'
         },
         detail: {
           description: 'Status, contact details, notes and email log of the selected order.',
