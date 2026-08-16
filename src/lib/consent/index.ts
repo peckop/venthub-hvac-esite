@@ -117,8 +117,14 @@ function write(state: ConsentState) {
 }
 
 /**
- * Kayıtlı rızayı okur. Karar yoksa `null` döner — "karar verilmedi" ile
- * "hepsini reddetti" farklıdır: ilkinde band gösterilir, ikincisinde gösterilmez.
+ * Reads the current consent state from local storage and handles migration from legacy formats.
+ * Returns null if the user has not yet made a decision. A null value is structurally distinct from "rejected all"; null triggers the display of the consent banner, while a rejection suppresses it.
+ *
+ * @returns The parsed consent state object, or null if no decision has been made
+ *
+ * @example
+ * const state = readConsent()
+ * if (!state) showBanner()
  */
 export function readConsent(): ConsentState | null {
   if (!isBrowser()) return null
@@ -131,7 +137,16 @@ export function readConsent(): ConsentState | null {
   return parse(raw) ?? migrateLegacy()
 }
 
-/** Bir kategoriye izin var mı? SSR'de ve karar yokken DAİMA false (zorunlu hariç). */
+/**
+ * Evaluates whether the user has granted consent for a specific tracking category.
+ * The 'necessary' category implicitly always returns true. During Server-Side Rendering (SSR) or when the user has not yet made a decision, this function strictly defaults to false for all optional categories.
+ *
+ * @param category - The consent category to check (e.g., 'analytics', 'marketing')
+ * @returns True if consent is granted, false otherwise
+ *
+ * @example
+ * if (hasConsent('analytics')) trackEvent('page_view')
+ */
 export function hasConsent(category: ConsentCategory): boolean {
   if (category === 'necessary') return true
   const state = readConsent()
@@ -139,7 +154,16 @@ export function hasConsent(category: ConsentCategory): boolean {
   return state[category] === true
 }
 
-/** Rızayı kaydeder ve dinleyicilere haber verir. */
+/**
+ * Persists the user's consent choices to local storage and broadcasts a custom event to notify active listeners.
+ * Only optional categories can be modified; 'necessary' is always enforced. Any omitted optional categories in the `choice` parameter default to false.
+ *
+ * @param choice - A partial record containing the user's boolean choices for optional categories
+ * @returns The final constructed consent state that was saved
+ *
+ * @example
+ * setConsent({ analytics: true, marketing: false })
+ */
 export function setConsent(choice: Partial<Record<Exclude<ConsentCategory, 'necessary'>, boolean>>) {
   const state: ConsentState = {
     ...DENIED_ALL,
@@ -159,8 +183,13 @@ export const acceptAll = () => setConsent({ functional: true, analytics: true, m
 export const rejectOptional = () => setConsent({})
 
 /**
- * Rızayı geri alır — kayıt silinir, band yeniden gösterilir.
- * KVKK: rıza, verildiği kadar kolay geri alınabilmelidir.
+ * Completely revokes the user's previously granted consent by purging all associated records from local storage.
+ * Broadcasts a null state event to listeners, which typically triggers the consent banner to reappear. This function strictly fulfills KVKK compliance requirements ensuring consent can be withdrawn as easily as it was given.
+ *
+ * @returns void
+ *
+ * @example
+ * withdrawConsent() // User clicked "Revoke Cookie Consent" in footer
  */
 export function withdrawConsent() {
   if (!isBrowser()) return
@@ -173,7 +202,17 @@ export function withdrawConsent() {
   window.dispatchEvent(new CustomEvent<null>(CONSENT_CHANGE_EVENT, { detail: null }))
 }
 
-/** Rıza değişimlerine abone olur; aboneliği kaldıran fonksiyonu döner. */
+/**
+ * Subscribes a listener function to consent state changes, including cross-tab synchronization via the Storage API.
+ *
+ * @param listener - A callback function that receives the new consent state or null
+ * @returns A cleanup function to immediately remove the registered event listeners
+ *
+ * @example
+ * const unsubscribe = onConsentChange((state) => console.log('Consent updated:', state))
+ * // later in useEffect cleanup
+ * unsubscribe()
+ */
 export function onConsentChange(listener: (state: ConsentState | null) => void): () => void {
   if (!isBrowser()) return () => {}
   const handler = (e: Event) => listener((e as CustomEvent<ConsentState | null>).detail ?? null)

@@ -46,14 +46,14 @@ export interface BuildProductGroupJsonLdParams {
 }
 
 /**
- * Aile → schema.org ProductGroup.
- *   - productGroupID = family.slug
- *   - url = `${baseUrl}/${lang}/products/${family.slug}` (varyant URL'i YAZILMAZ)
- *   - hasVariant: her varyant için Product {name, sku, mpn, image?, offers?}
- *   - fiyatı olmayan (NULL veya ≤ 0) varyanta offers alanı HİÇ yazılmaz.
+ * Generates a schema.org ProductGroup JSON-LD object for a given product family and its variants.
+ * This structure assigns the family slug as the productGroupID and iterates over all variants to generate Product schemas. It strictly omits the 'offers' property for variants with no price or a price less than or equal to zero to prevent '0,00 ₺' from appearing in search results (acting as a "Get Quote" mechanism).
  *
- * Fiyat eşiği vitrinin "Teklif Alın" eşiğiyle AYNIDIR: 0/negatif fiyat, fiyatı olmayan
- * ürünün başka bir yazılışıdır — beyan edilirse arama sonucunda "0,00 ₺" görünür.
+ * @param params - Configuration parameters including the family data, its variants, the current language, and the site base URL
+ * @returns A structured schema.org ProductGroup JSON-LD object representation
+ *
+ * @example
+ * const jsonLd = buildProductGroupJsonLd({ family: myFamily, variants: myVariants, lang: 'tr', baseUrl: 'https://example.com' })
  */
 export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): Record<string, unknown> {
   const { family, variants, lang, baseUrl } = params
@@ -124,9 +124,14 @@ export interface BuildCategoryJsonLdParams {
 }
 
 /**
- * Kategori → schema.org CollectionPage + ItemList.
- * B9 düzeltmesi: itemListElement URL'lerine `/${lang}` prefix'i garanti edilir
- * (eski kod `${baseUrl}/products/${slug}` yazıyordu, dilsiz kalıyordu).
+ * Generates a schema.org CollectionPage and ItemList JSON-LD object for a specific product category.
+ * It compiles the category details and iterates through the provided product families to construct an ordered ItemList. Ensures that all generated URLs strictly include the language prefix to maintain localized paths.
+ *
+ * @param params - Configuration parameters containing category metadata, pagination info, localized text, and the array of families within the page
+ * @returns A structured schema.org CollectionPage and ItemList JSON-LD object representation
+ *
+ * @example
+ * const jsonLd = buildCategoryJsonLd({ categorySlug: 'fans', name: 'Fans', description: '...', total: 10, page: 1, pageSize: 20, families: [...], lang: 'tr', baseUrl: 'https://example.com' })
  */
 export function buildCategoryJsonLd(params: BuildCategoryJsonLdParams): Record<string, unknown> {
   const { lang, baseUrl, categorySlug, name, description, total, page, pageSize, families } = params

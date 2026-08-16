@@ -15,10 +15,15 @@ export interface OrganizationLight {
 export type PriceSegment = 'individual' | 'dealer' | 'corporate'
 
 /**
- * Fiyat segmenti kaynağı = JWT `app_metadata.price_segment` (W2 tek sözleşme).
- * Profil rolü/kullanıcı-düzenleyebilir metadata OKUNMAZ (CLAUDE.md §12, INV-PRICE-2).
- * Claim atanmamışsa güvenli varsayılan: 'individual' (public fiyat) — bayi/kurumsal
- * ataması admin tarafından yapılır; RLS tarafındaki eşi `public.jwt_price_segment()`.
+ * Resolves the appropriate pricing segment for a user based strictly on their JWT `app_metadata` claims.
+ * Explicitly ignores user-editable profile metadata for security. Defaults to 'individual' (public pricing) if no explicit segment is assigned, acting as a safe fallback. Dealer or corporate assignments are managed exclusively by administrators. This client-side resolution mirrors the logic of the `public.jwt_price_segment()` RLS function.
+ *
+ * @param user - The authenticated user object containing application metadata
+ * @returns The resolved pricing segment: 'dealer', 'corporate', or 'individual'
+ *
+ * @example
+ * getUserPriceSegment({ app_metadata: { price_segment: 'dealer' } }) // returns 'dealer'
+ * getUserPriceSegment(null) // returns 'individual'
  */
 export function getUserPriceSegment(
   user: { app_metadata?: Record<string, unknown> } | null | undefined,
@@ -237,7 +242,18 @@ function round2(value: number): number {
   return Number(value.toFixed(2))
 }
 
-/** Kural, ürün hedefine uyar mı? (scope↔hedef; kategori ata-cascade destekler) */
+/**
+ * Evaluates whether a specific pricing rule matches a given product target.
+ * Determines a match based on the rule's scope level: specific product (scope 0/1), brand (scope 2), category including its ancestors (scope 3), or a global fallback (scope 4).
+ *
+ * @param rule - The pricing rule to evaluate
+ * @param product - The target product to match against
+ * @param categoryAncestors - A set of category IDs representing the product's full category hierarchy, allowing cascading rule matches
+ * @returns True if the rule successfully applies to the product
+ *
+ * @example
+ * ruleMatchesProduct({ scope: 2, brand_id: 'b1' }, { brandId: 'b1' }, new Set()) // returns true
+ */
 export function ruleMatchesProduct(
   rule: PricingRuleRow,
   product: PricingProductInput,
@@ -258,7 +274,17 @@ export function ruleMatchesProduct(
   }
 }
 
-/** Cetvel §11 sıralaması: scope ASC → kitap-özgüllüğü → min_quantity DESC → priority DESC → id DESC. */
+/**
+ * Sorts an array of pricing rules to determine evaluation precedence according to the standard business rule ranking.
+ * The strict sort order is: scope specificity (ASC), price book matching (ASC), minimum quantity requirement (DESC), priority level (DESC), and finally rule ID (DESC) as a deterministic tie-breaker.
+ *
+ * @param rules - The array of candidate pricing rules to sort
+ * @param priceBookId - The active price book ID for resolving rule specificity
+ * @returns A new array of rules sorted by evaluation precedence
+ *
+ * @example
+ * const sorted = sortRules(candidates, 'custom-book-1')
+ */
 export function sortRules(rules: PricingRuleRow[], priceBookId: string | null): PricingRuleRow[] {
   const bookRank = (r: PricingRuleRow): number => (r.price_book_id === priceBookId && priceBookId !== null ? 0 : 1)
   return [...rules].sort((a, b) => {
@@ -271,8 +297,16 @@ export function sortRules(rules: PricingRuleRow[], priceBookId: string | null): 
 }
 
 /**
- * Tek kuraldan net/gross hesabı (KDV + kelepçe + yuvarlama dahil). Hesaplanamazsa null.
- * 'percent_off_list' W1'de bilinçli kapsam dışı (liste-fiyat altyapısı W2) — null döner.
+ * Computes the net and gross price for a product based on a single applied pricing rule.
+ * The calculation includes base cost margins, fixed prices, minimum/maximum margin clamps in absolute currency, VAT application, and final price rounding/charm endings. If the rule cannot be evaluated (e.g., missing base cost for a cost-plus rule, or unsupported 'percent_off_list' method), it logs the skip reason to the trace and returns null.
+ *
+ * @param rule - The pricing rule to apply
+ * @param costInBase - The base cost of the product, required for 'cost_plus' methods
+ * @param trace - An array of strings used to log the calculation steps and clamp applications for debugging
+ * @returns The computed net and gross prices, or null if the price cannot be calculated
+ *
+ * @example
+ * computePriceFromRule(costPlusRule, 100, traceLog) // returns { net: 120, gross: 144 }
  */
 export function computePriceFromRule(
   rule: PricingRuleRow,
@@ -336,10 +370,16 @@ export interface RuleEvaluationInputs {
 }
 
 /**
- * Fiyat çözümünün SAF çekirdeği (cetvel §11). DB erişimi yok — kural havuzu,
- * kategori ata-kümesi ve (gerekiyorsa) gösterim kuru çağırandan `inputs` ile gelir.
- * Kuralları merdivene göre sıralar, kazanan İLK hesaplanabilir kuralı uygular
- * (stop-at-first-hit; is_exclusive=false yığılması bilinçli W1 kapsamı dışı).
+ * The pure core of the price resolution engine that determines the final effective price for a product.
+ * It filters candidate rules against the current context (currency, quantity, dates, price book), sorts them by precedence, and applies the first valid, computable rule (stop-at-first-hit pattern). It intentionally avoids side-effects and database access, relying entirely on the injected `inputs` for testability.
+ *
+ * @param product - The product definition including ID, cost, and classification details
+ * @param context - The execution context defining quantity, requested currency, active date, and optional price book
+ * @param inputs - External data dependencies provided by the caller, containing candidate rules, category ancestors, and FX rates
+ * @returns The resolved final price details along with an execution trace log, or null if no rules match
+ *
+ * @example
+ * resolvePriceWithRules(product, { quantity: 2, currency: 'EUR' }, { rules, categoryAncestors: new Set(), fxRate: { rate: 35, effectiveDate: '2024-01-01' } })
  */
 export function resolvePriceWithRules(
   product: PricingProductInput,

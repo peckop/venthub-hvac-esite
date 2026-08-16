@@ -60,7 +60,17 @@ export async function fetchDisplayPrices(
   return result
 }
 
-/** Saf: satırlara vitrin fiyatını iliştirir (fiyatsız satır null taşır). */
+/**
+ * A pure utility function that attaches resolved display prices to an array of product-like row objects.
+ * If a row's ID does not exist in the provided prices map, the resulting object will have null values for its display price fields, indicating a "Get Quote" or unpriced state.
+ *
+ * @param rows - An array of objects, each containing at least an 'id' property representing a product
+ * @param prices - A map of pre-resolved display prices keyed by product ID
+ * @returns A new array of objects extending the original row data with displayPrice and displayPriceTaxIncluded fields
+ *
+ * @example
+ * attachDisplayPrices([{ id: 'prod-1', name: 'Fan' }], new Map([['prod-1', { amount: 1500, taxIncluded: false }]]))
+ */
 export function attachDisplayPrices<T extends { id: string }>(
   rows: T[],
   prices: Map<string, DisplayPriceInfo>,

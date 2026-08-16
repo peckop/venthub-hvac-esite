@@ -18,3 +18,6 @@
 ## 2026-04-22 - [Multiple Documentation Blocks]
 **Learning:** When adding TSDoc comments to a function, check if the function already has a documentation block. Adding a new `/** ... */` block above an existing one creates consecutive, redundant comments which are messy.
 **Action:** If a function already has a JSDoc/TSDoc block, update or replace it rather than appending a new block directly above it.
+## 2024-06-25 - [TSDoc and Markdown Side Effects]
+**Learning:** During targeted codebase sweeps, running commands or git tools indiscriminately can cause unintended formatting modifications in markdown (`.md`) documentation files due to line-ending conversions (CRLF to LF). These "ghost" modifications pollute the PR and cause code review failures.
+**Action:** When working on targeted patches (like `.ts` files), explicitly avoid adding or committing changes to `.md` files. Use `git restore --staged` or `git checkout` on specific directories or file extensions to revert accidental `.md` changes before committing, ensuring the PR stays within the stated file/line limits and strictly reflects the intended scope.
