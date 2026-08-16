@@ -222,23 +222,23 @@ const QuotesTableBody: React.FC = () => {
 
   const getStatusIcon = useCallback((status: string): React.ReactNode => {
     switch (status) {
-      case 'requested': return <Clock className="text-yellow-600" size={16} />
-      case 'quoted': return <FileText className="text-blue-600" size={16} />
-      case 'accepted': return <CheckCircle className="text-green-600" size={16} />
-      case 'rejected': return <XCircle className="text-red-600" size={16} />
-      case 'expired': return <Hourglass className="text-slate-500" size={16} />
-      default: return <FileText className="text-gray-400" size={16} />
+      case 'requested': return <Clock className="text-admin-warning" size={16} />
+      case 'quoted': return <FileText className="text-admin-accent" size={16} />
+      case 'accepted': return <CheckCircle className="text-admin-success" size={16} />
+      case 'rejected': return <XCircle className="text-admin-danger" size={16} />
+      case 'expired': return <Hourglass className="text-admin-fg-muted" size={16} />
+      default: return <FileText className="text-admin-fg-subtle" size={16} />
     }
   }, [])
 
   const getStatusColor = useCallback((status: string): string => {
     switch (status) {
-      case 'requested': return 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-      case 'quoted': return 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20'
-      case 'accepted': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-      case 'rejected': return 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-      case 'expired': return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
-      default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+      case 'requested': return 'bg-admin-warning-weak text-admin-warning border-admin-warning/30'
+      case 'quoted': return 'bg-admin-accent-weak text-admin-accent border-admin-accent/30'
+      case 'accepted': return 'bg-admin-success-weak text-admin-success border-admin-success/30'
+      case 'rejected': return 'bg-admin-danger-weak text-admin-danger border-admin-danger/30'
+      case 'expired': return 'bg-admin-surface-3 text-admin-fg-muted border-admin-border'
+      default: return 'bg-admin-surface-3 text-admin-fg-muted border-admin-border'
     }
   }, [])
 
@@ -385,8 +385,8 @@ const QuotesTableBody: React.FC = () => {
       return (
         <div className="max-w-4xl mx-auto space-y-4 py-4 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-0.5 bg-cyan-400" />
-            <h4 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+            <div className="w-8 h-0.5 bg-admin-accent" />
+            <h4 className="text-xs font-semibold text-admin-accent">
               {t('quotes.admin.detail.itemsTitle')}
             </h4>
           </div>
@@ -398,21 +398,21 @@ const QuotesTableBody: React.FC = () => {
                 valid_until: item.valid_until ? item.valid_until.slice(0, 10) : '',
               }
               return (
-                <div key={item.id} className="bg-surface-deep/40 p-4 rounded-2xl border border-white/5 space-y-3">
+                <div key={item.id} className="bg-admin-surface p-4 rounded-admin-lg border border-admin-border space-y-3">
                   <div className="flex items-center justify-between gap-3 flex-wrap">
                     <div>
-                      <div className="font-black text-white text-sm uppercase tracking-tight">{item.product_name}</div>
-                      <div className="text-xs font-black text-slate-500 uppercase tracking-widest mt-0.5">
+                      <div className="font-semibold text-admin-fg text-sm">{item.product_name}</div>
+                      <div className="text-xs text-admin-fg-muted font-bold mt-0.5">
                         {t('quotes.admin.detail.qty')}: {item.qty}
                       </div>
                       {item.note && (
-                        <div className="text-xs font-semibold text-slate-400 normal-case mt-1 break-words">
+                        <div className="text-xs text-admin-fg-muted mt-1 break-words">
                           {t('quotes.admin.detail.note')}: {item.note}
                         </div>
                       )}
                     </div>
                     {!editable && (
-                      <div className="text-sm font-black text-slate-200">
+                      <div className="text-sm font-semibold text-admin-fg">
                         {typeof item.unit_price === 'number'
                           ? formatCurrency(Number(item.unit_price), lang, { currency: item.currency ?? 'TRY' })
                           : EMPTY_DASH}
@@ -421,7 +421,7 @@ const QuotesTableBody: React.FC = () => {
                   </div>
                   {editable && (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <label className="flex flex-col gap-1 text-xs font-black text-slate-500 uppercase tracking-widest">
+                      <label className="flex flex-col gap-1 text-xs font-bold text-admin-fg-muted">
                         {t('quotes.admin.detail.unitPrice')}
                         <input
                           type="number"
@@ -429,26 +429,26 @@ const QuotesTableBody: React.FC = () => {
                           step="0.01"
                           value={draft.unit_price}
                           onChange={(e) => setDrafts((prev) => ({ ...prev, [item.id]: { ...draft, unit_price: e.target.value } }))}
-                          className="h-9 rounded-lg bg-surface-deep border border-white/10 px-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+                          className="h-9 rounded-admin-md bg-admin-surface border border-admin-border px-3 text-sm font-semibold text-admin-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/40"
                         />
                       </label>
-                      <label className="flex flex-col gap-1 text-xs font-black text-slate-500 uppercase tracking-widest">
+                      <label className="flex flex-col gap-1 text-xs font-bold text-admin-fg-muted">
                         {t('quotes.admin.detail.currency')}
                         <input
                           type="text"
                           maxLength={3}
                           value={draft.currency}
                           onChange={(e) => setDrafts((prev) => ({ ...prev, [item.id]: { ...draft, currency: e.target.value } }))}
-                          className="h-9 rounded-lg bg-surface-deep border border-white/10 px-3 text-sm font-bold text-white uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+                          className="h-9 rounded-admin-md bg-admin-surface border border-admin-border px-3 text-sm font-semibold text-admin-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/40"
                         />
                       </label>
-                      <label className="flex flex-col gap-1 text-xs font-black text-slate-500 uppercase tracking-widest">
+                      <label className="flex flex-col gap-1 text-xs font-bold text-admin-fg-muted">
                         {t('quotes.admin.detail.validUntil')}
                         <input
                           type="date"
                           value={draft.valid_until}
                           onChange={(e) => setDrafts((prev) => ({ ...prev, [item.id]: { ...draft, valid_until: e.target.value } }))}
-                          className="h-9 rounded-lg bg-surface-deep border border-white/10 px-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+                          className="h-9 rounded-admin-md bg-admin-surface border border-admin-border px-3 text-sm font-semibold text-admin-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/40"
                         />
                       </label>
                     </div>
@@ -483,11 +483,11 @@ const QuotesTableBody: React.FC = () => {
         header: t('quotes.admin.table.customer'),
         cell: (r) => (
           <div className="flex flex-col gap-0.5">
-            <span className="font-black text-white uppercase tracking-tight">
+            <span className="font-semibold text-admin-fg tracking-tight">
               {r.customer_name ?? `#${r.user_id.slice(-8).toUpperCase()}`}
             </span>
             <span
-              className="text-xs font-black text-slate-500 uppercase tracking-widest"
+              className="text-xs text-admin-fg-muted font-bold"
               title={r.customerLookupFailed ? t('quotes.admin.emailUnavailable') : undefined}
             >
               {r.customer_email ?? (r.customerLookupFailed ? t('quotes.admin.emailUnavailable') : EMPTY_DASH)}
@@ -501,11 +501,11 @@ const QuotesTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div className="max-w-xs">
-            <div className="font-black text-xs text-slate-200 uppercase tracking-wider truncate">
+            <div className="font-semibold text-xs text-admin-fg truncate">
               {r.items[0]?.product_name ?? EMPTY_DASH}
-              {r.items.length > 1 && <span className="text-slate-500"> +{r.items.length - 1}</span>}
+              {r.items.length > 1 && <span className="text-admin-fg-muted"> +{r.items.length - 1}</span>}
             </div>
-            <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-0.5">
+            <div className="text-xs text-admin-fg-muted mt-0.5">
               {t('quotes.itemsCount', { count: r.items.length })}
             </div>
           </div>
@@ -517,7 +517,7 @@ const QuotesTableBody: React.FC = () => {
         sortable: true,
         hideable: true,
         cell: (r) => (
-          <span className="text-xs font-black text-slate-300 uppercase tracking-widest">
+          <span className="text-xs font-semibold text-admin-fg-muted">
             {t(`quotes.sourceLabels.${r.source}`)}
           </span>
         ),
@@ -529,7 +529,7 @@ const QuotesTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-black uppercase tracking-widest ${getStatusColor(r.status)}`}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${getStatusColor(r.status)}`}
           >
             {getStatusIcon(r.status)}
             {getStatusLabel(r.status)}
@@ -543,11 +543,8 @@ const QuotesTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div className="flex flex-col gap-0.5">
-            <span className="font-black text-white tracking-widest text-xs uppercase">{formatDate(r.created_at, lang)}</span>
-            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">
-              <span className="inline-block w-1.5 h-px bg-white/10 mr-1 align-middle" />
-              {formatTime(r.created_at, lang)}
-            </span>
+            <span className="font-semibold text-admin-fg text-xs">{formatDate(r.created_at, lang)}</span>
+            <span className="text-xs text-admin-fg-muted">{formatTime(r.created_at, lang)}</span>
           </div>
         ),
       },
@@ -557,7 +554,7 @@ const QuotesTableBody: React.FC = () => {
         cell: (r) => {
           const next = allowedAdminQuoteActions(r.status)
           if (!hasWriteAccess || next.length === 0) {
-            return <span className="text-xs text-slate-400">{EMPTY_DASH}</span>
+            return <span className="text-xs text-admin-fg-muted">{EMPTY_DASH}</span>
           }
           return (
             <div className="flex gap-1.5">
@@ -575,7 +572,7 @@ const QuotesTableBody: React.FC = () => {
                     <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
-                      <span className="text-xs font-black uppercase tracking-widest">{getStatusLabel(status)}</span>
+                      <span className="text-xs font-semibold">{getStatusLabel(status)}</span>
                       <ChevronRight size={10} strokeWidth={3} />
                     </>
                   )}
