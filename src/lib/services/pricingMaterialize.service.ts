@@ -8,6 +8,7 @@ import {
   type ProductScopeRow,
   toPricingProductInput,
 } from './pricingAdmin.service'
+import { fetchActivePolicies, resolveFxLocks, resolveFxLockWithPolicies } from './pricingPolicy.service'
 
 /**
  * W1b · Materialize servisi (T001-VH).
@@ -32,6 +33,13 @@ export interface CostRefreshSummary {
   updated: number
   skippedNoRate: number
   skippedNoPurchasePrice: number
+  /**
+   * W5 — `pricing_policy.fx_lock` yüzünden ATLANAN ürün sayısı (cetvel §8.2).
+   * Rapora ayrı sayaç olarak çıkar: "kur değişti ama 40 ürünün maliyeti güncellenmedi"
+   * bir arıza değil bir KARARdır ve panelde öyle görünmelidir. Sessiz atlama, bir gün
+   * "neden bu fiyat değişmedi" sorusunu cevapsız bırakırdı.
+   */
+  skippedFxLocked: number
   ratesUsed: { currency: string; rate: number; effectiveDate: string }[]
 }
 
@@ -69,6 +77,11 @@ export interface MaterializeSummary {
    * bu sayaç görünmezse "marka kuralı neden işlemedi?" sorusu cevapsız kalır.
    */
   unbridgedBrand: number
+  /**
+   * W5 — `pricing_policy.fx_lock` yüzünden yeniden hesaplanmayan ürün sayısı (cetvel §8.2).
+   * Rapora ayrı sayaç olarak çıkar: dondurma bir KARARdır, sessiz atlama değil.
+   */
+  skippedFxLocked: number
   /** Bu koşuda üretilmediği için pasifleştirilen bayat türetilmiş satır sayısı. */
   deactivated: number
   bySegment: MaterializeSegmentSummary[]
@@ -158,9 +171,21 @@ export async function refreshCostInBase(
   let updated = 0
   let skippedNoRate = 0
   let skippedNoPurchasePrice = 0
+  let skippedFxLocked = 0
   const toWrite: { id: string; costInBase: number; purchaseRateToBase: number }[] = []
 
+  // W5 — fiyat kilidi (cetvel §8.2). Kilitli kapsamın `cost_in_base`'i TAZELENMEZ.
+  //
+  // Neden burada da: kilidi yalnız materialize'e koymak yetmez. `cost_in_base` yeni kurla
+  // güncellenirse, sonraki herhangi bir materialize (ya da paneldeki "yeniden hesapla")
+  // fiyatı oynatır. Zincirin iki halkasında da uygulanmayan kilit, kilit değil gecikmedir.
+  const fxLocks = await resolveFxLocks(supabase, products.map((p) => ({ id: p.id })))
+
   for (const p of products) {
+    if (fxLocks.get(p.id)?.locked) {
+      skippedFxLocked++
+      continue
+    }
     const purchasePrice = Number(p.purchase_price)
     if (!Number.isFinite(purchasePrice) || purchasePrice <= 0) {
       skippedNoPurchasePrice++
@@ -201,7 +226,7 @@ export async function refreshCostInBase(
     }
   }
 
-  return { scanned: products.length, updated, skippedNoRate, skippedNoPurchasePrice, ratesUsed }
+  return { scanned: products.length, updated, skippedNoRate, skippedNoPurchasePrice, skippedFxLocked, ratesUsed }
 }
 
 type ProductPriceUpsertRow = Database['public']['Tables']['product_prices']['Insert']
@@ -317,12 +342,19 @@ export async function materializePrices(
   let quoteOnlyProducts = 0
   let rowsUpserted = 0
   let skippedManual = 0
+  let skippedFxLocked = 0
   let unbridgedBrand = 0
   let totalNetTry = 0
   const samples: MaterializeSampleRow[] = []
   const upsertBuffer: ProductPriceUpsertRow[] = []
   /** Bu koşuda üretilen anahtarlar — kalanlar bayattır (pasifleştirilir). */
   const writtenKeys = new Set<string>()
+
+  /**
+   * W5 — fiyat kilidi havuzu (cetvel §8.2). Ürünler SAYFALANARAK dolaşılıyor; havuzu burada
+   * bir kez çekip saf çekirdeği çağırmak, sayfa başına ek sorgu üretmeden aynı kararı verir.
+   */
+  const fxPolicies = await fetchActivePolicies(supabase)
 
   async function flushUpsertBatch(rows: ProductPriceUpsertRow[]) {
     if (dryRun || rows.length === 0) return
@@ -350,6 +382,15 @@ export async function materializePrices(
       const productInput = toPricingProductInput(row, brandIdByName)
       if (productInput.brandId === null && row.brand.trim() !== '') unbridgedBrand++
       const ancestors = ancestorsFor(productInput.categoryId)
+
+      // W5 — fiyat kilidi (cetvel §8.2). Kilitli kapsamın cache satırı YENİDEN HESAPLANMAZ.
+      // Mevcut satır olduğu gibi kalır: silinmez, bayat sayılmaz, deaktive edilmez —
+      // "dondurulmuş" tam olarak bu demek. Havuz döngü DIŞINDA bir kez çekildi.
+      if (resolveFxLockWithPolicies(productInput, fxPolicies, ancestors).locked) {
+        skippedFxLocked++
+        for (const list of priceLists) writtenKeys.add(cacheKey(productInput.id, list.id, MATERIALIZE_CURRENCY))
+        continue
+      }
 
       let productPriced = false
       for (const list of priceLists) {
@@ -449,6 +490,7 @@ export async function materializePrices(
     rowsUpserted,
     skippedManual,
     unbridgedBrand,
+    skippedFxLocked,
     deactivated: staleIds.length,
     bySegment: [...segmentAcc.values()],
     samples,

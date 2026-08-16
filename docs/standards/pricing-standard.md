@@ -237,6 +237,23 @@ numarası değil:
 - Uygulama biçimleri: (a) `method='fixed'` kural — hesaplanan fiyatı tek tıkla sabit kurala çevirir;
   (b) `is_derived=false` elle-ezme satırı — tek üründe nokta atışı.
 
+✅ **W5'te CANLI** (`20260816120000_pricing_w5_policy_fx_lock.sql`, bekçi **INV-PRICE-7**):
+`pricing_policy.fx_lock` + künye kolonları; kilit **zincirin iki halkasında da** uygulanıyor
+(`refreshCostInBase` ve `materializePrices`, ayrı `skippedFxLocked` sayaçlarıyla).
+
+> **En özel kazanır, kilidin VARLIĞI değil DEĞERİ belirler.** Daha özel bir `fx_lock=false`
+> politikası, daha genel bir kilidi bozar — "global kilit ama şu ürün hariç" ifade edilebilmeli.
+> Bu en kolay yanlış uygulanacak kural (`policies.some(p => p.fx_lock)` yazmak yeterli), o yüzden
+> INV-PRICE-7'de ayrı bir davranış testi var.
+>
+> **Sessiz atlama yasak.** Dondurma bir KARARdır: "kur değişti ama 40 ürün güncellenmedi" panelde
+> görünmezse "bu fiyat neden değişmedi" sorusu cevapsız kalır. İki özet de `skippedFxLocked` taşır.
+>
+> **Kilit künyesiz olamaz** — DB CHECK'i `fx_lock=true` iken `fx_frozen_rate` zorunlu kılar.
+
+⏳ **Henüz yok:** kilit açma/kapama admin yüzeyi ve `admin_audit_log` kaydı (yüzey ADMIN-OPS
+şeridinde). Bugün politika satırı yalnız DB'den girilebilir.
+
 ### 8.3 Politika katmanı — kural ≠ politika (v1.1)
 
 `pricing_rule` **nasıl hesaplanacağını** taşır; "bu markanın fiyatları EUR gösterilsin", "bu tedarikçi
@@ -248,6 +265,16 @@ pricing_policy(scope, target_id, display_currency, fx_lock, min_margin_pct, ...)
 ```
 
 - Merdiven §3.1 ile birebir aynıdır (en özel kazanır) — ikinci bir öncelik mantığı icat edilmez.
+  ✅ **W5'te uygulandı ve KİLİTLENDİ:** hedef eşleşmesi tek bir fonksiyonda
+  (`scopeMatchesProduct`, `pricing.service.ts`); hem `ruleMatchesProduct` hem politika çözücü
+  onu çağırır. INV-PRICE-7 politika servisinin kendi `switch (x.scope)` bloğunu yazmasını
+  **yasaklar** — iki kopya, bir gün ayrışacak iki mantıktır.
+
+> **W5 KAPSAM KARARI — tablo bilerek DAR açıldı.** Yukarıdaki imzada `display_currency` ve
+> `min_margin_pct` var; canlı tabloda **yok**, yalnız `fx_lock` ve künyesi var. Sebep: onları
+> okuyan tüketici henüz yazılmadı. Bu depoda tam o hata tekrarlıyor — `venthub_order_items`
+> snapshot kolonları bir yıl boş durdu (W2b-2) çünkü "kolon eklemek" ile "sözleşme kurmak"
+> aynı sanıldı. **Alan, tüketicisiyle birlikte gelir.**
 - **Tedarikçi boyutu:** şemada tedarikçi tablosu YOK (`products.supplier_name` serbest metinden ibaret).
   Tedarikçi-bazlı politika **T010 satınalma** ile gelir; o zamana kadar marka kapsamı vekildir.
 - **Marka boyutu kırılgan:** `products.brand` TEXT, `pricing_rule.brand_id` ise `brands(id)` FK'si — köprü
@@ -374,6 +401,7 @@ sanılan iki test aslında YOKTU. Gerçek durum:
 | **INV-PRICE-4** | Para float saklanmaz; `currency_rates` append-only (UPDATE/DELETE policy yok) | ✅ VAR (`pricing-money-append-only.test.ts`) |
 | **INV-PRICE-5** | KDV oranı üründen okunur; kuralda sabit oran varsayımı yok | ❌ YOK — §5 kararıyla birlikte yazılacak |
 | **INV-PRICE-6** | Cache anahtarı currency içerir; `product_prices`'a yalnız materialize servisi yazar; `is_derived` ayrımı korunur | ✅ VAR (`pricing-cache-invariants.test.ts`) |
+| **INV-PRICE-7** | Fiyat kilidi zincirin **iki halkasında** da uygulanır (`refreshCostInBase` + materialize, `skippedFxLocked` sayaçlı); merdiven **tek** fonksiyondadır (politika kendi `switch (scope)`'unu yazamaz); kilit **künyesiz** olamaz (DB CHECK) | ✅ VAR (`pricing-fx-lock-contract.test.ts`, W5) — davranış + yapı + şema üç katman; 6 merdiven senaryosu gerçekten koşturulur, iki bacaktan bilerek bozulup KIRMIZI görüldü |
 
 > **Kural:** bu tabloda ❌ olan bir maddeyi "kilitli" varsayarak karar verme. Cetvelin kendisi de denetlenir.
 
@@ -392,10 +420,13 @@ Bir kapının neyi **görmediğini** yazmamak, onu olduğundan güçlü gösterm
   sipariş kalemi yazan yok).
 - **Kasıtlı atlatma kapsam dışı** (tehdit modeli: drift dedektörü). Tablo adı bir sabite alınırsa
   (`.from(TABLE)`) yeni yol görünmez olur. Asıl fail-closed katman DB'deki NOT NULL kısıtlarıdır.
-- **`rate_effective_date` UTC tarihidir** (`new Date().toISOString()`; DB varsayılanı `current_date`
-  de sunucu/UTC tarihi — ikisi tutarlı). TSİ 00:00–03:00 arası verilen sipariş yerel tarihten bir
-  gün geri kalır. Bugün zararsız (kur daima 1.0), **ama W5'te gerçek kurlar bu tarihle eşlenince
-  gün-kayması hatasına döner** — W5 bunu çözmeden kapanmamalı.
+- ~~**`rate_effective_date` UTC tarihidir**~~ ✅ **W5'te KAPANDI.** `iyzico-payment` artık
+  `Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul' })` ile **İstanbul günü** yazıyor.
+  Eskiden TSİ 00:00–03:00 arası verilen sipariş bir önceki günü yazardı; `currency_rates`
+  kayıtları TCMB işiyle İstanbul gününe göre düştüğü için bu, siparişi bir gün eski kura
+  bağlar ve fark **kimseye görünmezdi**. ⚠️ DB varsayılanı (`current_date`) hâlâ sunucu/UTC
+  günüdür — kod değeri **daima açıkça gönderdiği** için pratikte devreye girmez, ama başka bir
+  yazar eklenirse aynı kaymayı geri getirir.
 - **Okuma tarafı yarım.** Yalnız `account/OrderDetailPage` snapshot kolonlarına geçti;
   `views/OrdersPage.tsx`, `views/admin/OrdersTableBody.tsx`, `components/admin/orders/OrderFormModal.tsx`
   hâlâ `product_name`/`price_at_time` okuyor. Bugün kırılmaz (aynı INSERT ikisini de aynı kaynaktan

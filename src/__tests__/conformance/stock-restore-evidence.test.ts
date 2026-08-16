@@ -116,6 +116,29 @@ const stockWriters = Object.entries(productionSources)
   .map(([path]) => path)
   .sort()
 
+/**
+ * RPC'nin ADI GEÇİYOR MU değil, ÇAĞRILIYOR MU?
+ *
+ * ⭐ EDGE-REFUND bu kapıda kanıtlı bir delik buldu (2026-08-16, bilerek-bozarak): eski koşul
+ * `src.includes(RESTORE_RPC)` idi. `iyzico-refund`'da RPC çağrısı `rpc/xx_disabled` yapılıp
+ * yanına doğrudan `stock_qty` yazımı konuldu — **kapı YEŞİL kaldı.** Sebep: dosyanın başlık
+ * yorumu RPC'nin adını açıklıyor ve alt-dize iddiası onunla tatmin oluyor.
+ *
+ * Yani **iyi belgelenmiş kod kapıyı kör ediyordu.** Yorum ne kadar açıklayıcıysa naif bir
+ * ad-arama o kadar kolay tatmin olur. Aynı sınıf hatayı bugün üç kez daha yedik
+ * (INV-RETURN-1'de import satırı, INV-STOCK-1'in kendi migration yorumu, `protect-config`
+ * hook'unun benim yorumumu yasak kalıp sanması).
+ *
+ * Şimdi: önce yorumlar sıyrılır, sonra ÇAĞRI biçimi aranır — supabase-js `rpc('ad'` ya da
+ * ham PostgREST `/rest/v1/rpc/ad`.
+ */
+function callsRestoreRpc(src: string): boolean {
+  const kodsuz = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+  const jsRpc = new RegExp(String.raw`\.rpc\(\s*['"\`]` + RESTORE_RPC + String.raw`['"\`]`)
+  const restRpc = new RegExp(String.raw`/rest/v1/rpc/` + RESTORE_RPC + String.raw`\b`)
+  return jsRpc.test(kodsuz) || restRpc.test(kodsuz)
+}
+
 describe('INV-STOCK-1 — sipariş kaynaklı stok geri-vermesi kanıta bağlı', () => {
   /*
     PARSER SAĞLIĞI — SENTETİK ÖRNEKLE (2026-08-16'da düzeltildi).
@@ -173,7 +196,7 @@ describe('INV-STOCK-1 — sipariş kaynaklı stok geri-vermesi kanıta bağlı',
     const ihlaller: string[] = []
     for (const path of stockWriters) {
       if (path in PENDING_MIGRATION) continue
-      if (!productionSources[path].includes(RESTORE_RPC)) ihlaller.push(path)
+      if (!callsRestoreRpc(productionSources[path])) ihlaller.push(path)
     }
 
     expect(
