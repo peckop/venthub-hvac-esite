@@ -36,13 +36,27 @@ const sb = vi.hoisted(() => {
   ]
   /* selectChain çift kaynağı kapsar:
      - admins-tab: .select('id, full_name').in('id', ids)  → enrich promise
-     - all-tab:    await .select('id, role, created_at, full_name')  → thenable {data, error} */
+     - all-tab:    .select(..., { count: 'exact' }).order(...).range(...)  → {data, count, error}
+
+     `order`/`range`/`ilike` 2026-08-16'da EKLENDİ (T059-VH): "tümü" sekmesi artık
+     sunucu sayfalaması kullanıyor. Eskiden sorgu limitsizdi ve PostgREST'in sessiz
+     1000-satır tavanına takılıyordu; mock o eski şekli (select doğrudan await
+     edilebilir) kodluyordu. Zincir uzadı, testin NİYETİ aynı kaldı. */
   const selectChain = {
     in() {
       return Promise.resolve({
         data: adminUsers.map((u) => ({ id: u.id, full_name: u.full_name })),
         error: null,
       })
+    },
+    order() {
+      return selectChain
+    },
+    ilike() {
+      return selectChain
+    },
+    range() {
+      return Promise.resolve({ data: allProfiles, count: allProfiles.length, error: null })
     },
     then(resolve: (v: { data: unknown; error: null }) => unknown, reject?: (e: unknown) => unknown) {
       return Promise.resolve({ data: allProfiles, error: null }).then(resolve, reject)
