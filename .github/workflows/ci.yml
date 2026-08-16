@@ -29,8 +29,61 @@ jobs:
       run:
         shell: bash
     steps:
+      # ══════════════════════════════════════════════════════════════════════
+      # ELLE TETİKLEMEDE DE MERGE-REF TEST EDİLİR (T066-VH, 2026-08-16)
+      #
+      # `ci` bir REQUIRED STATUS CHECK. GitHub bunları **ADA** göre eşler, tetikleyici
+      # olayına göre değil — yani `workflow_dispatch` ile elle koşturulan bir `ci`
+      # koşusu da branch protection'ı açar.
+      #
+      # Sorun buradaydı: `actions/checkout` varsayılanı olay-bağımlıdır.
+      #   · `pull_request` → `refs/pull/N/merge` (PR head + base BİRLEŞİK ağaç)
+      #   · `workflow_dispatch` → dalın UCU (base hiç karışmaz)
+      #
+      # Yani elle alınan yeşil, "bu dal kendi başına geçiyor" der; "master'la
+      # birleştiğinde geçiyor" DEMEZ. Oysa required check'in vaat ettiği tam olarak
+      # ikincisidir. Ölçüldü (2026-08-16): PR #557'de otomatik kontroller açılışta hiç
+      # ateşlenmedi, `workflow_dispatch` ile elle koşuldu ve o yeşil merge'i açtı —
+      # master'la birleşik hâl bir kez bile test edilmeden.
+      #
+      # Çözüm, kaçış kapısını KAPATMAK değil (o kapı gerçekten gerekliydi): dispatch
+      # sırasında açık bir PR varsa merge-ref'e geç. Job ADI değişmez — değişse
+      # branch protection'daki tüm açık PR'lar "beklenen kontrol gelmedi"de kilitlenirdi.
+      - name: Merge-ref çözümle (yalnız elle tetiklemede)
+        id: mergeref
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # master'da (ya da PR'sız bir dalda) elle koşmak meşrudur; orada üzerine
+          # bindirilecek bir base yok, varsayılan checkout doğrudur.
+          if [ "${GITHUB_REF_NAME}" = "master" ]; then
+            echo "master — merge-ref yok, varsayılan checkout"; exit 0
+          fi
+          sayi=$(gh pr list --repo "${GITHUB_REPOSITORY}" --head "${GITHUB_REF_NAME}" \
+                   --state open --json number --jq 'length')
+          if [ "$sayi" -eq 0 ]; then
+            echo "::notice::Açık PR yok — dal ucu test edilecek."
+            exit 0
+          fi
+          # Birden çok açık PR varsa hangisinin merge-ref'i doğru olduğu BELİRSİZ.
+          # Rastgele birini seçmek, yanlış base'e karşı yeşil üretebilir → dur.
+          if [ "$sayi" -gt 1 ]; then
+            echo "::error::Bu dal için $sayi açık PR var; merge-ref belirsiz. Elle koşum durduruldu."
+            exit 1
+          fi
+          pr=$(gh pr list --repo "${GITHUB_REPOSITORY}" --head "${GITHUB_REF_NAME}" \
+                 --state open --json number --jq '.[0].number')
+          echo "ref=refs/pull/${pr}/merge" >> "$GITHUB_OUTPUT"
+          echo "::notice::PR #${pr} merge-ref'i test edilecek (dal ucu DEĞİL)."
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Boş dize = varsayılan davranış (pull_request'te zaten merge-ref).
+          # Yalnız elle tetiklemede ve açık PR varken dolu gelir.
+          ref: ${{ steps.mergeref.outputs.ref || '' }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4

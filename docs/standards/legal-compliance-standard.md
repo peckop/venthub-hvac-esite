@@ -61,6 +61,17 @@ kendisini eklemek insanın işidir ve PR incelemesinde aranır.
 | 5 | Cayma hâlinde bedel 14 gün içinde iade edilir | Mesafeli Satış Sözl. §7 | `iyzico-refund` (T053-VH) | Kod | 🔴 EDGE-REFUND şeridinde |
 | 6 | Teslimat süresi / kargo firması / iade adresi | Sözl. §6, §7 | `legal.ts` alanları | Konfigürasyon | 🔴 yer tutucu |
 | 7 | Kişisel veri saklama süreleri | KVKK §…, Gizlilik | `legal.ts` retention* | Konfigürasyon | ✅ |
+| 8 | Bireysel faturada alıcı kimliği (TCKN) | — (mevzuat gereği) | `invoiceIdentity.ts` + `invoiceIdentityThreshold` | Kod + Konfig. | ✅ |
+| 9 | Analitik/pazarlama etiketi rıza olmadan yüklenmez | Çerez Politikası | `ConsentGatedAnalytics` + `trackEvent` kapısı | Kod | ✅ |
+| 10 | Veri sahibi talebi 30 gün içinde sonuçlandırılır | KVKK Aydınlatma | `data_subject_requests` + §3.3 prosedürü | Kod + Manuel | 🟡 kanal eksik |
+| 11 | Silme talebinde saklama yükümlülüğü olan veri korunur | KVKK m.7 / VUK | `anonymize_user_personal_data()` | Kod | 🟡 migration onayı bekliyor |
+
+**8 numaralı satırın gerekçesi (karar kaydı).** TCKN başta koşulsuz zorunlu tutuldu; mevzuat
+araştırması (2026-08-16) bunun kanunun istediğinden sıkı olduğunu gösterdi. GİB, nihai
+tüketici numarasını vermediğinde `11111111111` dolgusunu kabul eder. **Çözüm "kullanıcıya
+`11111111111` yazdırmak" DEĞİL**, alanı boş bırakılabilir kılmaktır: dolgu değeri belge
+üretiminin işidir, kullanıcı girdisinin değil. Doldurulursa sağlama çalışmaya devam eder.
+Ayrıntı ve kademeler → §4.1.
 
 **Durum sözlüğü:** ✅ karşılık var ve çalışıyor · 🟡 karşılık var ama manuel/geçici, bitiş
 kriteri tanımlı · 🔴 karşılık YOK — bu satır kırmızıyken **satış açılamaz**.
@@ -198,6 +209,38 @@ mevzuata aykırı bir kayıt imhası üretir.
 
 **Süre sayacı en geç 30 gündür ve uzatılamaz.** Talep karmaşıksa bile süre işler; bu
 yüzden alım kutusunun izlenmesi prosedürün en kritik adımıdır.
+
+### 3.4 Mekanizma — talep defteri ve anonimleştirme
+
+Prosedürün elle işletilmesi meşrudur (§0), ama **süre ve sonuç ispat yükü altındadır**:
+"30 gün içinde yanıtladık" demek yetmez, gösterilebilmelidir. Bu yüzden defter koda alındı.
+
+**`data_subject_requests`** — her talep; başvuran adresi, talep türü, alınma anı, **otomatik
+30 günlük son tarih**, kimlik tevsik anı, sonuç ve *saklanan veri notu*. Kullanıcı silinirse
+talep kaydı `user_id` boşalarak KALIR: sürenin ve sonucun ispatı bizim yükümüzdür.
+
+**`anonymize_user_personal_data(user_id, request_id, dry_run)`** — üç ayrı davranış:
+
+| Veri | Davranış | Gerekçe |
+|---|---|---|
+| Adres defteri, fatura profilleri, sepet, projeler, sihirbaz kayıtları | **Silinir** | Saklama yükümlülüğü yok |
+| Profil (ad, telefon), iletişim mesajları | **Anonimleştirilir** | Kayıt kalır, kişiyle bağı kopar |
+| Sipariş/fatura — saklama süresi **dolmamış** | **ELLENMEZ** | VUK/TTK yükümlülüğü; KVKK m.7 istisnası |
+| Sipariş/fatura — saklama süresi **dolmuş** | Kişisel alanlar anonimleştirilir; **tutar, tarih ve kalemler korunur** | Muhasebe gerçeği silinmez |
+
+İki tasarım kararı ayrıca yazılıdır:
+
+1. **Varsayılan kuru çalışmadır** (`dry_run = true`). Geri alınamaz bir işlemin yanlışlıkla
+   tetiklenmesi, tetiklenmemesinden pahalıdır; çağıran niyetini açıkça belirtmelidir. Kuru
+   çalışma gerçek çalışmayla **birebir aynı raporu** üretir — yoksa önizleme işe yaramaz.
+2. **Kısmi ret bildirilir.** Saklanan kayıt varsa `retained_data_note` doldurulur ve veri
+   sahibine gerekçesiyle yazılır. KVKK'da kısmi ret meşrudur; **sessiz kısmi ret değildir.**
+
+> ⚠️ **Saklama süresi içindeki siparişin kişisel alanları anonimleştirilmez.** Bu, "silme
+> talebini yerine getirmedik" demek değildir — kanunun saklamayı emrettiği veriyi silmek
+> KVKK'ya uygunluk değil, başka bir ihlaldir. Sınırın tam yeri (faturanın hangi alanı
+> belge, hangisi operasyonel veri) **muhasebeci/hukukçu şeridine** aittir; kod bu yüzden
+> muhafazakâr davranır ve süre dolmadan sipariş kaydına dokunmaz.
 
 ---
 

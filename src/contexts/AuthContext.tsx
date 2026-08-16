@@ -123,7 +123,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    // redirectTo locale'siz /auth/callback'e iner (route handler locale ekleyip yönlendirir);
+    // ?next=reset-password, callback sayfasını yeni-şifre ekranına ayırır. redirectTo'suz
+    // çağrı kullanıcıyı giriş yapmış ama şifresini değiştiremez bırakır (INV-AUTH-1).
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${origin}/auth/callback?next=reset-password`,
+    });
     if (error) return { error: { message: error.message } as AuthError };
     return {};
   }, []);

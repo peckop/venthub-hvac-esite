@@ -5,16 +5,31 @@ import * as ts from 'typescript'
 import { describe, expect,it } from 'vitest'
 
 describe('DI Signature compliance static analysis', () => {
-  const serviceFiles = [
-    'address.service.ts',
-    'cart.service.ts',
-    'category.service.ts',
-    'invoice.service.ts',
-    'pricing.service.ts',
-    'pricingMaterialize.service.ts',
-    'product.service.ts',
-    'project.service.ts'
-  ]
+  /**
+   * DİZİNDEN TÜRETİLİR — elle liste DEĞİL (W5, 2026-08-16).
+   *
+   * Eskiden burada 8 dosyalık sabit bir liste vardı ve `displayPrice.service.ts`,
+   * `pricingAdmin.service.ts` **hiç taranmıyordu**; yeni bir servis dosyası da sessizce
+   * kapının dışında kalıyordu (`pricingPolicy.service.ts` tam bunu yaşadı). Kapının
+   * KAPSAMI, koruduğu kuraldan daha dar olduğunda kapı "var" görünür ama yoktur —
+   * bu, kapsam≠gerçek hatasının ders kitabı hâli.
+   *
+   * Artık `lib/services/` altındaki her `*.service.ts` otomatik taranır: yeni dosya
+   * eklemek onu KENDİLİĞİNDEN kurala tabi kılar.
+   */
+  const SERVICES_DIR = path.join(process.cwd(), 'src/lib/services')
+  const serviceFiles = fs
+    .readdirSync(SERVICES_DIR)
+    .filter(f => f.endsWith('.service.ts'))
+    .sort()
+
+  it('kapsam sağlığı: en az bir servis dosyası taranıyor', () => {
+    // Sıfır dosya "temiz" değil, "dedektör kör" demektir (dizin taşınmış olabilir).
+    expect(
+      serviceFiles.length,
+      `${SERVICES_DIR} altında hiç *.service.ts bulunamadı — dizin taşındıysa SERVICES_DIR'i güncelle.`,
+    ).toBeGreaterThan(5)
+  })
 
   serviceFiles.forEach(file => {
     it(`should enforce that every exported function in ${file} accepts supabase as its first parameter`, () => {
@@ -81,10 +96,23 @@ describe('DI Signature compliance static analysis', () => {
       const PURE_HELPERS_EXEMPT: Record<string, string[]> = {
         'pricing.service.ts': [
           'getUserPriceSegment',   // user.app_metadata → segment
-          'ruleMatchesProduct',    // (rule, product, ancestors) → boolean
+          'scopeMatchesProduct',   // (scopedRow, product, ancestors) → boolean; merdivenin TEK hedef eşleştiricisi (W5)
+          'ruleMatchesProduct',    // (rule, product, ancestors) → boolean; scopeMatchesProduct'a delege eder
           'sortRules',             // kural dizisini sıralar
           'computePriceFromRule',  // saf aritmetik: maliyet + kural → net/brüt
           'resolvePriceWithRules', // motorun SAF çekirdeği; DB'li sarmalayıcısı resolvePrice()
+        ],
+        'pricingPolicy.service.ts': [
+          'sortPolicies',              // politika dizisini merdivene göre sıralar (W5)
+          'resolveFxLockWithPolicies', // SAF çekirdek: havuz + ürün → kilit kararı (W5)
+        ],
+        'pricingAdmin.service.ts': [
+          'toPricingProductInput',  // (row, brandMap) → motor girdisi; DB'ye dokunmaz
+          'marginPctToCoefficient', // saf aritmetik
+          'coefficientToMarginPct', // saf aritmetik
+        ],
+        'displayPrice.service.ts': [
+          'attachDisplayPrices',    // (items, priceMap) → items; DB'ye dokunmaz
         ],
       }
       const exempt = new Set(PURE_HELPERS_EXEMPT[file] ?? [])

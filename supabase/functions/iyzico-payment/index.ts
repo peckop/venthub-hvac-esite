@@ -589,7 +589,19 @@ Deno.serve(async (req: Request) => {
         // hicbir yuzeyde yok (W5 ile gelecek), bu yuzden TRY/1.0. Alanlarin SIMDI yazilmasinin
         // sebebi, W5 acildiginda gecmis siparislerin her kur hareketinde yeniden
         // degerlenmesini onlemek.
-        const orderDateIso = new Date().toISOString().slice(0, 10)
+        // Kur tarihi ISTANBUL gunudur, UTC degil (W5, cetvel §14.1'de acik borc olarak yaziliydi).
+        //
+        // NIYE. `new Date().toISOString().slice(0,10)` UTC gunu verir. TSI = UTC+3, yani
+        // 00:00-03:00 arasi verilen siparis BIR ONCEKI gunu yazardi. Bugun zararsizdi (kur
+        // daima 1.0), ama W5 ile gercek kurlar bu tarihe gore eslenecek: `currency_rates`
+        // kayitlarini TCMB isi Istanbul gunuyle yaziyor, dolayisiyla gece yarisindan sonraki
+        // siparis kendini bir gun eski kura baglardi ve fark KIMSEYE gorunmezdi.
+        //
+        // `en-CA` bilerek: YYYY-MM-DD ureten tek yaygin yerel ayar (ISO ile ayni sekil).
+        const orderDateIso = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Europe/Istanbul',
+            year: 'numeric', month: '2-digit', day: '2-digit',
+        }).format(new Date())
         const orderItems: Array<Record<string, unknown>> = []
         for (const raw of authoritativeItems) {
             const _productId = raw.product_id

@@ -42,6 +42,13 @@ const DOCS: Record<string, string> = import.meta.glob('/docs/standards/*.md', {
   eager: true,
 })
 
+/** KVKK mekanizması SQL'de yaşıyor — o da `src/` dışında. */
+const MIGRATIONS: Record<string, string> = import.meta.glob('/supabase/migrations/*.sql', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+})
+
 /** Yasal metin bileşenleri — her iki dil. */
 const LEGAL_COMPONENTS = Object.entries(SOURCES).filter(([path]) =>
   /^\/src\/views\/legal\/components\/(tr|en)\/.+\.tsx$/.test(path),
@@ -202,6 +209,74 @@ describe('INV-LEGAL-3 · taahhüt ↔ mekanizma bağı', () => {
       'VUK m.231/5: fatura, teslimden itibaren azami YEDİ gün içinde düzenlenir. ' +
         'Sözleşmeye daha uzun bir süre yazmak, kanuna aykırı bir taahhüttür.',
     ).toBeLessThanOrEqual(7)
+  })
+
+  // ── Kural 6 · KVKK anonimleştirme ──────────────────────────────────────────────
+  describe('KVKK anonimleştirme mekanizması', () => {
+    const ham = Object.entries(MIGRATIONS).find(([yol]) =>
+      yol.includes('kvkk_data_subject_requests'),
+    )?.[1]
+
+    /**
+     * SQL yorumları ATILIR — yoksa bekçi kodu değil kendi açıklamasını doğrular.
+     * Bu satır bir sabotaj turunda kazanıldı: `security definer` → `security invoker`
+     * yapıldığında test YEŞİL kaldı, çünkü ifade gövdenin üstündeki yorumda da geçiyordu.
+     * Kural: bir dosyada hem anlatım hem kod varsa, denetlenen ŞEY koddur.
+     *
+     * ⚠️ `[^\r\n]` KASITLI, `.` DEĞİL. İlk yazımı `/--.*$/` idi ve HİÇBİR ŞEYİ
+     * temizlemiyordu: bu depodaki dosyalar CRLF ile saklanıyor (T017-VH satır-sonu
+     * fantomu) ve JavaScript'te `.` bir satır sonlandırıcı olan `\r` ile eşleşmez —
+     * yani desen yorumun sonuna hiç varamıyordu. Sabotaj turu olmasa fark edilmezdi.
+     */
+    const kaynak = ham?.replace(/--[^\r\n]*/g, '')
+
+    it('mekanizma bulunabiliyor (stale-guard)', () => {
+      expect(
+        ham,
+        'KVKK anonimleştirme migration\'ı bulunamadı. Dosya yeniden adlandırıldıysa bu ' +
+          'bekçi sessizce körleşir ve aşağıdaki kuralların hiçbiri denetlenmez.',
+      ).toBeTypeOf('string')
+    })
+
+    it('saklama süresi içindeki sipariş anonimleştirilmiyor', () => {
+      // En kritik kural: kanunun saklamayı emrettiği veriyi silmek, KVKK'ya uygunluk
+      // değil BAŞKA bir ihlaldir. Sipariş güncellemesi mutlaka bir kesim tarihiyle
+      // sınırlı olmalı — koşulsuz bir UPDATE, saklama yükümlülüğünü çiğner.
+      const siparisGuncelleme = (kaynak as string).slice(
+        (kaynak as string).indexOf('update public.venthub_orders'),
+      )
+      expect(
+        /created_at\s*<\s*v_cutoff/.test(siparisGuncelleme),
+        'venthub_orders güncellemesi saklama kesimiyle (created_at < v_cutoff) sınırlı değil. ' +
+          'Saklama süresi içindeki sipariş/fatura kaydı ELLENMEZ (cetvel §3.4).',
+      ).toBe(true)
+    })
+
+    it('varsayılan kuru çalışma', () => {
+      expect(
+        /p_dry_run\s+boolean\s+default\s+true/i.test(kaynak as string),
+        'Anonimleştirme varsayılan olarak UYGULUYOR. Geri alınamaz işlemde varsayılan ' +
+          'önizleme olmalı; çağıran niyetini açıkça belirtmeli (cetvel §3.4).',
+      ).toBe(true)
+    })
+
+    it('yetki kapısı gövdede', () => {
+      // SECURITY DEFINER bir fonksiyon, çağıranın yetkisini KENDİ sormak zorundadır.
+      expect(/security\s+definer/i.test(kaynak as string)).toBe(true)
+      expect(
+        /if\s+not\s+public\.is_admin_user\(\)/i.test(kaynak as string),
+        'SECURITY DEFINER fonksiyonda yönetici kapısı yok — herhangi bir oturum ' +
+          'başkasının verisini anonimleştirebilir.',
+      ).toBe(true)
+    })
+
+    it('kısmi ret sessiz kalmıyor', () => {
+      expect(
+        /retained_data_note/.test(kaynak as string),
+        'Saklanan veri notu yazılmıyor. KVKK\'da kısmi ret meşrudur, SESSİZ kısmi ret değildir ' +
+          '— veri sahibine gerekçesiyle bildirilmelidir (cetvel §3.4).',
+      ).toBe(true)
+    })
   })
 
   // ── Kural 5 ────────────────────────────────────────────────────────────────────

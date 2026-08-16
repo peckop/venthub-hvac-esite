@@ -184,6 +184,62 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'missing_fields', missing: [!order_id && 'order_id', !carrier && 'carrier', !tracking_number && 'tracking_number'].filter(Boolean) }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
+    // ── AYNI TAKİP NUMARASI BAŞKA BİR SİPARİŞTE Mİ? (T058-VH) ────────────────
+    //
+    // Denetim (2026-08-15 §4) toplu kargolamanın AYNI takip numarasını N siparişe
+    // yazdığını ölçtü: farklı müşterilere ait siparişler aynı numarayı taşıyor ve her
+    // müşteriye BAŞKASININ kolisinin takip linki e-postalanıyordu. İstemci tarafı
+    // düzeltildi (ADMIN-OPS, #557: takip numarası artık sipariş başına) — ama SUNUCU
+    // hâlâ müsamahakârdı. İki bağımsız ölçüm (EDGE + LEGAL-OPS) doğruladı:
+    // `venthub_orders` üzerinde takip numarasıyla ilgili TEK bir kısıt/indeks yok.
+    //
+    // İstemcideki bir düzeltme kapı DEĞİLDİR: aynı ucu curl'leyen, eski bir sekme
+    // kullanan ya da yarın yazılacak başka bir istemci aynı hatayı tekrar yapar.
+    //
+    // NİÇİN VERİTABANI KISITI DEĞİL: gerçek lojistikte aynı müşterinin iki siparişini
+    // TEK kolide birleştirmek meşrudur. Benzersizlik kısıtı bunu tamamen yasaklardı.
+    // Doğru denge: **varsayılan RED, açık niyetle izin.** Çağıran birleştirmeyi
+    // gerçekten istiyorsa `allow_shared_tracking: true` göndererek beyan eder; o zaman
+    // karar kayda geçer ve kaza ile bilinçli tercih birbirinden ayrılabilir.
+    // `pick` yalnız string/number döndürür (kırpar); burada gereken BOOLEAN niyet beyanı.
+    // Yalnız gerçek `true` ya da açık `'true'` dizesi kabul edilir — "1"/"yes"/boş-değil
+    // gibi gevşek doğruluk, kaza ile beyan üretir ve beyanın anlamını yok eder.
+    const sharedFlag = parsed['allow_shared_tracking'] ?? parsed['allowSharedTracking']
+    const allowSharedTracking = sharedFlag === true || sharedFlag === 'true'
+    if (!allowSharedTracking) {
+      const dupResp = await fetch(
+        `${supabaseUrl}/rest/v1/venthub_orders` +
+          `?tracking_number=eq.${encodeURIComponent(tracking_number)}` +
+          `&tenant_id=eq.${encodeURIComponent(tenantId)}` +
+          `&id=neq.${encodeURIComponent(order_id)}` +
+          `&select=id&limit=5`,
+        { headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey } },
+      )
+      // Kontrol YAPILAMADIYSA yazmayız. Bu kontrolün amacı veri bozulmasını önlemek;
+      // "sorguyu koşamadım, o hâlde geçireyim" demek kapıyı fail-open yapardı.
+      if (!dupResp.ok) {
+        const detail = await dupResp.text().catch(() => '')
+        return new Response(JSON.stringify({
+          error: 'tracking_check_failed',
+          message: 'Takip numarası benzersizlik kontrolü yapılamadı; kargo bilgisi YAZILMADI.',
+          status: dupResp.status,
+          detail: detail.slice(0, 200),
+        }), { status: 503, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+      }
+      const dupRows = await dupResp.json().then((x: unknown) => Array.isArray(x) ? x : []).catch(() => [])
+      if (dupRows.length > 0) {
+        return new Response(JSON.stringify({
+          error: 'tracking_number_in_use',
+          message:
+            'Bu takip numarası başka bir siparişte kayıtlı. Farklı müşterilere aynı takip ' +
+            'linkini göndermek veri bozulmasıdır. Gerçekten tek kolide birleştiriyorsanız ' +
+            'isteği `allow_shared_tracking: true` ile tekrarlayın.',
+          tracking_number,
+          conflicting_order_ids: dupRows.map((r: { id: string }) => r.id),
+        }), { status: 409, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+      }
+    }
+
     // Fetch current order to decide first-time vs update (preserve shipped_at if already set)
     let isFirstShip = true
     try {

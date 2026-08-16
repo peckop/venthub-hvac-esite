@@ -35,8 +35,42 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
+      # ══════════════════════════════════════════════════════════════════════
+      # ELLE TETİKLEMEDE DE MERGE-REF TEST EDİLİR (T066-VH, 2026-08-16)
+      # Gerekçenin tamamı `ci.yml`'deki eşi adımda. Özet: `admin-smoke` bir REQUIRED
+      # STATUS CHECK ve GitHub bunları ADA göre eşler; `workflow_dispatch` ile elle
+      # koşturulan bir yeşil de merge'i açar, ama dispatch dalın UCUNU checkout eder,
+      # `pull_request` ise merge-ref'i. Yani elle alınan yeşil, master'la birleşik
+      # hâli hiç test etmemiş olabilir. Job ADI bilerek değişmedi.
+      - name: Merge-ref çözümle (yalnız elle tetiklemede)
+        id: mergeref
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_NAME}" = "master" ]; then
+            echo "master — merge-ref yok, varsayılan checkout"; exit 0
+          fi
+          sayi=$(gh pr list --repo "${GITHUB_REPOSITORY}" --head "${GITHUB_REF_NAME}" \
+                   --state open --json number --jq 'length')
+          if [ "$sayi" -eq 0 ]; then
+            echo "::notice::Açık PR yok — dal ucu test edilecek."
+            exit 0
+          fi
+          if [ "$sayi" -gt 1 ]; then
+            echo "::error::Bu dal için $sayi açık PR var; merge-ref belirsiz. Elle koşum durduruldu."
+            exit 1
+          fi
+          pr=$(gh pr list --repo "${GITHUB_REPOSITORY}" --head "${GITHUB_REF_NAME}" \
+                 --state open --json number --jq '.[0].number')
+          echo "ref=refs/pull/${pr}/merge" >> "$GITHUB_OUTPUT"
+          echo "::notice::PR #${pr} merge-ref'i test edilecek (dal ucu DEĞİL)."
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.mergeref.outputs.ref || '' }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4

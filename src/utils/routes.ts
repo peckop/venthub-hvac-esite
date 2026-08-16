@@ -141,6 +141,7 @@ export const Routes = {
     },
     register: () => '/auth/register' as Route,
     forgotPassword: () => '/auth/forgot-password' as Route,
+    resetPassword: () => '/auth/reset-password' as Route,
     callback: () => '/auth/callback' as Route
   }
 };
