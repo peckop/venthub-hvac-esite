@@ -15,6 +15,7 @@
  */
 
 import type { Database } from '../types/database.types'
+import { canTransitionOrder } from './admin/orderStatusMachine'
 import { logAdminAction } from './audit'
 import { supabase } from './supabase'
 
@@ -78,6 +79,26 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
     } = input
 
     try {
+        /*
+          --- 0. MONOTONLUK KAPISI (kural 11) ---
+          Koruma bilerek SERVİSTE, arayüzde değil. Kanban'daki sürükle-bırak
+          kontrolü yalnız kullanıcıya sebebini söyleyen bir NEZAKET katmanıdır;
+          tek koruma orada olsaydı bileşen değiştiğinde sessizce düşerdi ve hiçbir
+          birim testi göremezdi — bilerek bozma denemesinde tam olarak bu yaşandı:
+          UI koşulu devre dışı bırakıldı, tüm testler YEŞİL kaldı. Mutasyonun tek
+          kapısı burası olduğu için asıl değişmez burada durur.
+
+          `oldStatus` verilmediğinde kontrol yapılamaz (çağıranın elinde kaynak
+          statü yok) ve geçişe izin verilir; bu yol yalnız senkronizasyon
+          çağrılarında kullanılıyor.
+        */
+        if (oldStatus && !skipOrdersSync && !canTransitionOrder(oldStatus, newStatus)) {
+            return {
+                ok: false,
+                error: `Geçersiz statü geçişi: ${oldStatus} → ${newStatus} (sipariş durumu yalnız ileri taşınabilir)`,
+            }
+        }
+
         // --- 1. Sipariş statüsünü güncelle ---
         let deliveredNow = false
         if (!skipOrdersSync) {

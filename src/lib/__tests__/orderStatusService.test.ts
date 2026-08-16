@@ -117,7 +117,14 @@ describe('orderStatusService', () => {
         expect(mockUpdate).toHaveBeenCalledWith({ status: 'cancelled', payment_status: 'partial_refunded' })
       })
 
-      it('should handle unknown status by defaulting to cancelled', async () => {
+      /*
+        SÖZLEŞME DEĞİŞTİ (2026-08-15, T058-VH). Eski davranış: BİLİNMEYEN her statü
+        sessizce `cancelled` olarak yazılıyordu ("güvenli varsayılan"). Bu güvenli
+        değil TEHLİKELİYDİ: tek bir yazım hatası ya da yeni bir statü adı, müşterinin
+        siparişini hiçbir uyarı vermeden İPTAL EDERDİ. Monotonluk kapısı artık
+        bilinmeyen hedefi reddediyor; yazma hiç denenmiyor.
+      */
+      it('bilinmeyen statü REDDEDİLİR — sessizce iptale çevrilmez', async () => {
         const mockEq = vi.fn().mockResolvedValue({ error: null })
         const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
         const mockFrom = vi.fn((table) => {
@@ -133,8 +140,8 @@ describe('orderStatusService', () => {
           skipReturnsSync: true
         })
 
-        expect(result.ok).toBe(true)
-        expect(mockUpdate).toHaveBeenCalledWith({ status: 'cancelled' })
+        expect(result.ok).toBe(false)
+        expect(mockUpdate).not.toHaveBeenCalled()
       })
 
     it('should return error if update fails', async () => {
@@ -287,5 +294,46 @@ describe('updateOrderStatus — teslim damgası ve bildirimi (T058-VH)', () => {
 
     expect(update).toHaveBeenCalledWith({ status: 'shipped' })
     expect(supabase.functions.invoke).not.toHaveBeenCalled()
+  })
+})
+
+describe('updateOrderStatus — monotonluk kapısı SERVİSTE (T058-VH)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('geriye geçiş REDDEDİLİR ve veritabanına hiç dokunulmaz', async () => {
+    const update = vi.fn()
+    ;(supabase.from as import('vitest').Mock).mockImplementation(() => ({ update }))
+
+    const result = await updateOrderStatus({
+      orderId: 'order-1', newStatus: 'pending', oldStatus: 'delivered', skipReturnsSync: true,
+    })
+
+    expect(result.ok).toBe(false)
+    // Kritik: yalnız "hata döndü" yetmez — YAZMA HİÇ DENENMEMELİ.
+    expect(update).not.toHaveBeenCalled()
+    expect(supabase.functions.invoke).not.toHaveBeenCalled()
+  })
+
+  it('iptal edilmiş sipariş yeniden hazırlığa alınamaz', async () => {
+    const update = vi.fn()
+    ;(supabase.from as import('vitest').Mock).mockImplementation(() => ({ update }))
+    const result = await updateOrderStatus({
+      orderId: 'order-1', newStatus: 'processing', oldStatus: 'cancelled', skipReturnsSync: true,
+    })
+    expect(result.ok).toBe(false)
+    expect(update).not.toHaveBeenCalled()
+  })
+
+  it('`oldStatus` yoksa kapı uygulanmaz (senkronizasyon yolu)', async () => {
+    const eq = vi.fn().mockResolvedValue({ error: null })
+    const update = vi.fn().mockReturnValue({ eq })
+    ;(supabase.from as import('vitest').Mock).mockImplementation(() => ({ update }))
+    const result = await updateOrderStatus({
+      orderId: 'order-1', newStatus: 'cancelled', skipReturnsSync: true,
+    })
+    expect(result.ok).toBe(true)
+    expect(update).toHaveBeenCalled()
   })
 })

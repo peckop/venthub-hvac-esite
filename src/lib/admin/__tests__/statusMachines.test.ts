@@ -45,8 +45,20 @@ describe('orderStatusMachine — kanban monotonluk kapısı (T058-VH)', () => {
     expect(canTransitionOrder('delivered', 'shipped')).toBe(false)
   })
 
-  it('teslim sonrası tek çıkış iadedir', () => {
-    expect(allowedNextOrderStatuses('delivered')).toEqual(['refunded'])
+  it('teslim sonrası tek çıkış iadedir (iptal DEĞİL)', () => {
+    // Teslim edilmiş bir siparişi "iptal" saymak yanlış kayıt üretir; para geri
+    // dönüyorsa doğru statü iadedir. Kısmi iade de meşru bir sonuçtur.
+    expect(allowedNextOrderStatuses('delivered')).toEqual(['refunded', 'partial_refunded'])
+    expect(canTransitionOrder('delivered', 'cancelled')).toBe(false)
+  })
+
+  it('iade HER aşamadan mümkün — kargo çıkmadan da para geri dönebilir', () => {
+    // İlk yazımda iade yalnız `delivered`'dan izinliydi; mevcut servis testleri
+    // (`processing → refunded`) bunu yakaladı. Dar makine gerçek bir iş akışını
+    // kapatıyordu — makine düzeltildi, test değil.
+    for (const s of ['pending', 'paid', 'confirmed', 'processing', 'shipped']) {
+      expect(canTransitionOrder(s, 'refunded')).toBe(true)
+    }
   })
 
   it('iptal ve iade terminaldir', () => {

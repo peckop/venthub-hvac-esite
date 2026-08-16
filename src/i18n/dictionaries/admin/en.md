@@ -3,20 +3,34 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\en.ts
-skeleton_hash: 22577370313f14a8
+skeleton_hash: 458261091768abac
 entity_hashes:
-  overview: 98dcb3e67e87f77a
-generated_at: 2026-08-15T15:09:15Z
+  overview: 4b1e1c79283931d3
+generated_at: 2026-08-15T19:08:10Z
 ---
 
 ## Genel Bakış
 Bu dosya, admin panelinin İngilizce lokalizasyon sözlüğünü oluşturarak erişilebilirlik, denetim, otorite, kategoriler, ortak metinler, kontrol paneli, veri tablosu ve kuponlar gibi farklı modüllerin çeviri kaynaklarını tek bir `admin` nesnesi altında birleştirir. Uygulama genelinde tutarlı dil kullanımı sağlamak ve çeviri yönetimini merkezileştirmek amacıyla yapılandırılmış statik bir veri dosyasıdır. Dosya herhangi bir fonksiyon, ortam değişkeni veya API çağrısı içermez; yalnızca import edilmiş alt sözlükleri bir araya getirerek dışa aktarır.
 
+## Modül Yapısı
+Bu dosya fonksiyon içermediğinden "Fonksiyon Grupları" bölümü yerine modülün yapısı aşağıda özetlenmiştir.
+
+### İçe Aktarılan Alt Sözlükler
+Modül, farklı alanlara ait çeviri dosyalarını import ederek tek bir `admin` nesnesi altında birleştirir. Her bir import, ilgili domain'e ait anahtar-değer çiftlerini taşır.
+- a11y (erişilebilirlik), audit (denetim), authority (otorite), categories (kategoriler), common (ortak metinler), confirm (onay metinleri), coupons (kuponlar), dashboard (kontrol paneli), dataTable (veri tablosu), errorGroups (hata grupları), errors (hatalar), inventory (envanter), logistics (lojistik), menu (menü), movements (hareketler), orders (siparişler), pricing (fiyatlandırma), products (ürünler), returns (iadeler), search (arama), settings (ayarlar), titles (başlıklar), toolbar (araç çubuğu), ui (arayüz), users (kullanıcılar), webhooks
+
+### Dışa Aktarılan Sabitler
+Modülün tek çıktısı olan `admin` nesnesi, tüm alt sözlükleri bir araya getirerek uygulama genelinde çeviri erişimi sağlar.
+
+### Bağımlılıklar
+Dosya yalnızca yerel çeviri dosyalarına bağımlıdır; dış API, ortam değişkeni veya dinamik yükleme (lazy import) içermez. Tüm bağımlılıklar statik ve derleme zamanında çözümlenir.
+
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için özel aksiyom tanımlanmamıştır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -46,6 +60,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - import: ./returns.en::returns
 - import: ./search.en::search
 - import: ./settings.en::settings
+- import: ./theme.en::theme
 - import: ./titles.en::titles
 - import: ./toolbar.en::toolbar
 - import: ./ui.en::ui
@@ -61,33 +76,67 @@ Bu modül için özel aksiyom tanımlanmamıştır.
   confirm,
   coupons,
   dataTable,
-  dashboard,
-  erro...`
+  dashboard,...`
 
 ---
 
 ## AST POINTERS
 
-Bu dosya fonksiyon içermemektedir.
+### [N1_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::a11y
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `a11y` nesnesi (erişilebilirlik çevirileri içerir)
 
-**Kaynak**: `C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\en.ts`
+### [N2_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::theme
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `theme` nesnesi (tema/renk çevirileri içerir)
 
-**Yapı**: Dosya bir TypeScript çeviri sözlüğü dosyasıdır. Sadece import bildirimleri ve bir nesne aggregator导出 barındırır.
+### [N3_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::audit
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `audit` nesnesi (denetim/logging çevirileri içerir)
 
-### Import Bağımlılıkları
-- `a11y` — `./a11y.en` modülünden, erişilebilirlik çevirileri
-- `audit` — `./audit.en` modülünden, denetim çevirileri
-- `authority` — `./authority.en` modülünden, yetki çevirileri
-- `categories` — `./categories.en` modülünden, kategori çevirileri
-- `common` — `./common.en` modülünden, ortak/genel çeviriler
-- `confirm` — `./confirm.en` modülünden, onay diyalog çevirileri
-- `coupons` — `./coupons.en` modülünden, kupon çevirileri
-- `dashboard` — `./dashboard.en` modülünden, kontrol paneli çevirileri
-- `dataTable` — `./dataTable.en` modülünden, veri tablosu çevirileri
-- `errorGroups` — `./errorGroups.en` modülünden, hata grubu çevirileri
+### [N4_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::authority
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `authority` nesnesi (yetki/izin çevirileri içerir)
 
-### Sabit
-- `admin` — Tüm import edilen çeviri modüllerini birleştiren nesne (object aggregator)
+### [N5_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::categories
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `categories` nesnesi (kategori çevirileri içerir)
+
+### [N6_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::common
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `common` nesnesi (genel ortak çevirileri içerir)
+
+### [N7_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::confirm
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `confirm` nesnesi (onay/pencere çevirileri içerir)
+
+### [N8_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::coupons
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `coupons` nesnesi (kupon çevirileri içerir)
+
+### [N9_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::dashboard
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `dashboard` nesnesi (gösterge paneli çevirileri içerir)
+
+### [N10_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::dataTable
+- **params**: (parametre yok)
+- **ic_degiskenler**: Yok (bir object import ediliyor)
+- **Dönüş**: `dataTable` nesnesi (veri tablosu çevirileri içerir)
+
+### [N11_NASIL] AST Pointer: src/i18n/dictionaries/admin/en.ts::admin
+- **params**: (parametre yok)
+- **ic_degiskenler**: 
+  - `admin` — Tüm import edilen çeviri modüllerini (a11y, theme, audit, authority, categories, common, confirm, coupons, dashboard, dataTable) birleştiren ve export edilen ana İngilizce sözlük nesnesi
+- **Dönüş**: `admin` nesnesi (tüm admin alanı çevirilerini birleştiren ana sözlük)
 
 ---
 
