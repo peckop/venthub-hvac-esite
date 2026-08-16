@@ -47,16 +47,14 @@ function byteCompare(a: string, b: string): number {
  * fail-open'dır. Bir satır çözüldüğünde listeden SİLİNİR — böylece liste yalnızca küçülür.
  */
 const PENDING_MIGRATION: Record<string, string> = {
+  // T053-VH (2026-08-16): iki EDGE-REFUND satırı SİLİNDİ — borç kapandı, liste küçüldü.
+  //   · `iyzico-refund` artık `process_order_stock_restore` RPC'sini çağırıyor
+  //     (kanıt = `order_sale` hareketleri, idempotenslik RPC'nin içinde hesaplanıyor).
+  //   · `refund-order-mock` emekliye ayrıldı (410 Gone) ve hiçbir şeye yazmıyor;
+  //     geçersiz `{"increment": N}` gövdesi de onunla birlikte gitti.
   '/src/lib/orderStatusService.ts':
     'ADMIN-OPS şeridi (oturum 6cc7f2d3). `restoreStockForOrder` sipariş kalemlerine bakıp ' +
     'quantity kadar ekliyor + oku-sonra-yaz yarışı var. Panoya RPC sözleşmesi bırakıldı.',
-  '/supabase/functions/iyzico-refund/index.ts':
-    'EDGE-REFUND şeridi (oturum 4397deef). Tam iadede `stock_qty`\'yi oku-sonra-yaz ile ' +
-    'artırıyor ve `inventory_movements`\'a HİÇ satır yazmıyor; yorumdaki "idempotent by ' +
-    'manual_refund_applied" iddiasının kodda karşılığı yok.',
-  '/supabase/functions/refund-order-mock/index.ts':
-    'EDGE-REFUND şeridi. Denetim raporunun SAYMADIĞI dördüncü yol: `stock_qty: {"increment": N}` ' +
-    'gönderiyor — PostgREST\'te geçerli bir sözdizimi değil, yani ayrıca sessizce bozuk.',
 }
 
 const appSources = import.meta.glob('/src/**/*.{ts,tsx}', {
