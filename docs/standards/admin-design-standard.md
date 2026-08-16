@@ -8,6 +8,7 @@
 > admin'i dışarıda bırakıyordu. Bu dosya o boşluğu kapatır.
 > v1.0 · 2026-08-15 — kabuk/overlay denetimi + 3 paralel kaynak araştırması sonrası ilk sürüm.
 > Zorlama planı: §6 (INV-ADMIN-* testleri + zoom kapısı + mobil viewport projesi).
+> v1.1 · 2026-08-16 — §7.3 eklendi: Faz 5 sayfa-başı ölçümü (21 sayfa + kabuk, %69) + sayaç kör noktaları.
 
 ---
 
@@ -970,6 +971,89 @@ Baseline'da "~1000 satır ölü overlay kodu — sil veya bağla" yazıyordu. Gi
 önce `git log -S "<Ad>" --all -- src` ile eskiden kimin import ettiğine ve o commit'in
 "purge/cleanup/lint fix" olup olmadığına bak; sözlükte ya da DB'de o yüzeye ait yetim kalmış
 anahtar/kolon varsa işlev gerçekti.
+
+### 7.3 SAYFA SKORLARI — 2026-08-16 (Faz 5: sayfa-başı §5 ölçümü)
+
+21 rota + kabuk, 5 paralel ölçüm ajanı, yorum ayıklamalı. Sayfa başına GÖRSEL 11 + OVERLAY 11
+maddesi; uygulanamayan madde **n.a.** sayıldı (✓ değil). Kabuk 18 maddesi bir kez ölçüldü.
+Kanıt satırları (dosya:satır) ajan raporlarında; buradaki tablo özet skordur.
+
+**Kabuk: 15/16** (statik ölçülebilir). Tek ✗: **K11** — sticky başlık var ama `scroll-padding-top`
+hiçbir yerde tanımlı değil (hash çıpaları 56px başlığın altında kalır). K5/K6 (%400 zoom, %200
+metin) statik ölçülemez — §6'daki zoom kapısı hâlâ açık kalem (`reflow-scan.mjs` var ama admin
+rotalarına bağlı değil, Playwright tek proje).
+
+| Sayfa | Skor | Sayfa | Skor |
+|---|---|---|---|
+| /admin (dashboard) | **6/14** | /admin/pricing | 14/20 |
+| /admin/orders | **9/22** | /admin/pricing/rules | 15/21 |
+| /admin/returns | 14/21 | /admin/pricing/preview | **14/16** ✦ |
+| /admin/logistics | 10/15 | /admin/coupons | 12/17 |
+| /admin/movements | 8/14 | /admin/settings | 13/19 |
+| /admin/products | **10/21** | /admin/users | 13/20 |
+| /admin/categories | **10/21** | /admin/audit-logs | 14/16 |
+| /admin/categories/…/builder | **17/21** ✦ | /admin/errors | 15/16 |
+| /admin/inventory | 16/22 | /admin/error-groups | 16/18 |
+| /admin/inventory/report | 12/17 | /admin/webhook-events | 16/17 |
+| /admin/inventory/settings | 13/17 | **TOPLAM** | **267/385 (%69)** |
+
+✦ = grubunun en temizi. Desen net: **kit'e göçmüş yüzeyler cetveli tutuyor** (DataTableKit,
+ConfirmProvider, AdminPageHeader temiz çıktı); drift kit DIŞI kalan bölgelerde toplanıyor.
+
+**Altı sistematik drift (kök sebep az, yayılım geniş):**
+
+| # | Drift | Yayılım | Kök |
+|---|---|---|---|
+| S1 | **G3**: gövde/hücre metni `font-semibold`/`font-bold` (cetvel: 400) | 21/21 sayfa | sayfa sayfa; en yoğun tablo hücreleri |
+| S2 | **O10**: işlem hataları otomatik kapanan `toast.error`'da | ~15 sayfa | alışkanlık; inline örnek mevcut (inventory/settings, pricing/preview) |
+| S3 | **O1**: paylaşılan `AdminModal` dururken 10 yerel `fixed inset-0` modal | products, categories, inventory×2, pricing×3, settings, orders | kalibrasyon dalgası form modallarına girmemiş |
+| S4 | **G8**: vitrin tokenlarının admin'e sızması (`primary-navy`, `surface-deep`, `brand-cyan`) + dashboard grafiklerinde ham HEX | ~12 sayfa | grafik bileşenleri + eski form bileşenleri |
+| S5 | **G11**: halkasız `outline-none` (ColumnsMenu/ExportMenu/AdminToolbar Switch/ProductFormModal) — klavye odağı görünmez | tablo sayfalarının tümü | 4 paylaşılan bileşen + 2 form modalı |
+| S6 | **O6**: >5 girdili form modalda — `PricingRuleFormModal` **15 girdi**, `CategoryFormModal` **14 girdi + Tabs**, OrderFormModal 7+Tabs | 5 modal | O1 ile aynı kök: modal→panel/rota göçü yapılmadı |
+
+**Cetvel kararı bekleyen madde:** `adminCardClass`/`adminTableContainerClass` düz karta
+`shadow-admin-sm` basıyor (kit-düzeyi, her sayfaya yayılıyor). §3.3 "düz kartta gölge yok" der;
+ya kit düzeltilir ya cetvele "hairline + `shadow-admin-sm` ikilisi meşru taban" istisnası yazılır.
+Ölçümde bu madde ✗ sayıldı ama tek kök karardır.
+
+**Adla kayıtlı ESKİ kusurlardan hâlâ açık olanlar:**
+- **D15 hâlâ canlı:** `DateRangePicker.tsx:139` popover'da `z-toast` (§4.9'un adıyla yasakladığı
+  birebir durum). §7.1 sayacı "ham z-*" aradığı için token'lı-ama-yanlış-katman atamasını görmedi.
+  Aynı kör noktada: `ColumnsMenu`/`FacetedFilter` popover'ına `z-modal`, yerel modal overlay'lerine
+  `z-backdrop` yerine `z-modal`.
+- **G10 çift genişlik kaynağı:** `AdminInventoryReportPage` `max-w-page` (kabukla çift) ve
+  `AdminInventorySettingsPage` `max-w-5xl` hâlâ yerinde (§3.7'de adla sayılmıştı).
+  `AdminUsersPage` kök `max-w-4xl` ise kalkmış ✓.
+- **Tokenlaşmış glow:** `tokens.js` `shadow-admin-categories-glow` = `0 0 8px` (Y-offset 0) —
+  sayaç arbitrary `shadow-[…]` aradığı için token'a taşınmış glow'u görmedi. `admin-*-glow`
+  ailesi (tokens.js:114-120) G6'nın token-katmanı artığı.
+
+**§7.1 sayaçlarının ölçülen KÖR NOKTALARI (sayaç 0 derken ihlal yaşıyor):**
+1. `font-black` sayacı **sınıf** arıyor; dashboard grafikleri (`SalesChart`, `ActivityHeatmap`,
+   `AbcPieChart`) `fontWeight: 900/'black'` değerini **inline style** ile basıyor → sayaç 0, gerçek ≥6.
+2. "Ham z-*" sayacı token kullanımını doğru sayıyor ama **katman semantiğini** ölçmüyor (D15 örneği).
+3. "Arbitrary shadow" sayacı token'a taşınmış 0-offset glow'u görmüyor (categories örneği).
+Ders: sayaç sıfırlandığında kural bitmiş sayılmaz — biçim değiştirip token/inline katmana taşınabilir.
+(Aynı aile: `substring-assert-is-not-a-gate`.)
+
+**Ölçümün bulduğu cetvel-ÜSTÜ ciddi kusurlar (tasarım değil işlev/tehlike; ilgili şeride):**
+- `ReturnsTableBody` tekil durum menüsünden `refunded` = **gerçek para iadesi onaysız tek tık**
+  (alertdialog yalnız rejected/cancelled'da; toplu akışta onay var, tekil akış açık).
+- `AdminUsersTableBody:499-509` **tekil rol değişikliği onaysız** (super_admin atama/alma dahil;
+  alertdialog yalnız toplu değişimde).
+- `ProductCsvImport.tsx:176` tamamen elle overlay — role/aria-modal/ESC/odak-tuzağı/scroll-lock **YOK**
+  (ölçümdeki en ağır a11y bulgusu).
+- `ProductFormModal` şeması `brand`'i zorunlu istiyor ama formda alan yok → yeni ürün kaydı
+  muhtemelen hiç valide olamıyor (işlevsel, doğrulanmalı).
+- `RecentOrdersTable.tsx:125` var olmayan `/admin/orders/[id]` rotasına link.
+- `ErrorsTableBody:201-206` seviye rozeti `bg-admin-danger text-admin-danger` (`-weak` eksik) —
+  rozet metni okunmaz; kardeş sayfa error-groups'ta doğrusu var.
+- Sessiz hata yüzeyleri: audit/errors `exportCsv` hatası hiçbir yüzeye düşmüyor;
+  `AdminInventoryReportPage` veri hatası yalnız `console.error`.
+- `InventoryCsvImport`: **"Tümünü geri al"** yalnız 15 sn'de kapanan toast'ta yaşıyor (§4.7:
+  kritik geri alma kalıcı yüzeyde de olmalı).
+- i18n yan bulguları: `DataTableKit`/`AdminToolbar` sabit Türkçe fallback'ler;
+  `CategoryFormModal` sözlüksüz ham Türkçe toast'lar (kural 7).
 
 ---
 
