@@ -94,14 +94,29 @@ kendi limitleridir (ölçüm 2026-08-16, supabase.com/docs/guides/auth/rate-limi
 Ayarlar Dashboard → Authentication → Rate Limits'te yaşar. **Emanet açık yazılsın:**
 bu değerler repodan denetlenemez; değiştiren, bu bölümü günceller.
 
-## A9 — CAPTCHA: KARAR BEKLİYOR (Recep)
+## A9 — CAPTCHA: v1'de YAPILMAYACAK (karar verildi, 2026-08-16)
 
-Kayıt/giriş/şifre-sıfırlama uçlarında CAPTCHA yok — sağlayıcı + site anahtarı
-Recep kararıdır. Öneri: **Cloudflare Turnstile** (Supabase Auth'un yerleşik
-attestation entegrasyonu var; Dashboard → Auth → Attack Protection + client'ta
-`captchaToken` geçirme). Karar verilince bu bölüm kurala dönüşür. Not: HIBP
-kontrolü ağ hatasında bilerek fail-open'dır (kayıt akışını sızıntı servisine
-bağımlı kılmamak için) — bu bilinçli tercih burada kayıt altındadır.
+Kayıt/giriş/şifre-sıfırlama uçlarında CAPTCHA **yok ve v1'de eklenmeyecek** —
+Recep'in kararı. Bu bir "sonra bakarız" değil, **kapanmış karardır**: yeniden
+gündeme getirmenin tek meşru tetikleyicisi **gözlenmiş istismardır** (bot kayıt
+dalgası, credential-stuffing izi, GoTrue rate-limit'in 429 üretmeye başlaması).
+Böyle bir gözlem OLMADAN bu maddeyi tekrar öneri olarak açma.
+
+Gerekçe zinciri: A8'deki GoTrue limitleri yürürlükte (IP-bazlı token/verify
+tavanları + e-posta uçlarında kullanıcı-başı pencere), lansman ölçeğinde trafik
+düşük, ve CAPTCHA'nın bedeli sıfır değil — üçüncü taraf bağımlılığı, kayıt
+hunisinde sürtünme, sağlayıcı anahtarı yönetimi.
+
+**İstismar gözlenirse uygulama notu (o gün lazım olacak):** Supabase Auth'un
+yerleşik attestation'ı iki sağlayıcıyı destekler — hCaptcha veya Cloudflare
+Turnstile. Turnstile'ı varsayılan öneri olarak sunma: Cloudflare bu projede
+kullanılmıyor, yani yeni bir hesap/bağımlılık demek; hCaptcha tek başına kurulabilir.
+⚠️ **Sıralama kritik:** Supabase tarafındaki CAPTCHA zorunluluğu, client kodu
+`captchaToken` göndermeye hazır OLMADAN açılırsa **tüm kayıt/giriş akışı anında
+kilitlenir** — önce kod, sonra dashboard.
+
+Not: HIBP kontrolü ağ hatasında bilerek fail-open'dır (kayıt akışını sızıntı
+servisine bağımlı kılmamak için) — bu bilinçli tercih burada kayıt altındadır.
 
 ## A10 — tenant_id: user_metadata GÜVENİLMEZ, tasarım kararı
 
@@ -127,7 +142,8 @@ yalnız AUTH ZİNCİRİNİ (giriş/şifre/callback/oturum, A1–A10) yönetir.
 ## Kapsam dışı (bilerek)
 
 - `/account/*` middleware guard'ı — ortak mülk, ayrı iş (T056 kapsam dışı bırakıldı).
-- CAPTCHA uygulaması — A9'da karar bekliyor (Recep).
+- CAPTCHA — A9'da v1 için KAPANMIŞ karar (yapılmayacak); yeniden açılışı yalnız
+  gözlenmiş istismar tetikler.
 - tenant_id app_metadata yazımının uygulaması — A10'da tasarım hazır, EDGE'e devredildi.
 - Google OAuth canlı e2e provası — Recep'in canlı ortam provası gerektirir
   (Supabase Dashboard'daki Redirect URL allowlist'i repodan denetlenemez; canlıda
