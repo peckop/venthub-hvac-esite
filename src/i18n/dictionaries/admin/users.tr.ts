@@ -79,6 +79,7 @@ export const users = {
         csvLabel: 'CSV Olarak Aktar'
       },
       toasts: {
+        emailsIncomplete: 'Bazı kullanıcıların e-postası gösterilemiyor (liste sınıra takıldı). Boş hücre "e-posta yok" demek DEĞİLDİR.',
         adminsLoadFailed: 'Yönetici kullanıcılar yüklenemedi',
         allLoadFailed: 'Kullanıcılar yüklenemedi',
         roleNotUpdated: 'Rol güncellenemedi',

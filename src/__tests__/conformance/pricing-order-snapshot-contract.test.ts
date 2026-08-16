@@ -26,6 +26,17 @@
  */
 import { describe, expect, it } from 'vitest'
 
+// Interface-merge ile mevcut global bildirime dizi-desenli aşırı yükleme eklenir
+// (negatif `!` desenleri yalnız dizi biçiminde ifade edilebiliyor).
+declare global {
+  interface ImportMeta {
+    glob(
+      pattern: readonly string[],
+      options: { query: string; import: string; eager: true },
+    ): Record<string, string>
+  }
+}
+
 /** Cetvel §13'ün saydığı 9 alan. Bu liste değişiyorsa §13 satırı da değişmeli. */
 const SNAPSHOT_FIELDS = [
   'unit_price_snapshot',
@@ -55,7 +66,9 @@ const ANCHOR_WRITE_PATH = '/supabase/functions/iyzico-payment/index.ts'
 
 const MIGRATION_PATH = '/supabase/migrations/20260815210000_pricing_w2b2_order_item_snapshots.sql'
 
-const edgeSources = import.meta.glob('/supabase/functions/**/*.ts', {
+// `!` deseni ŞART: eager glob içeriği filtreden ÖNCE okur; tests/e2e denoRuntime'ın
+// geçici `*.compiled.<rastgele>.ts` dosyaları paralel koşuda ENOENT yarışı üretir.
+const edgeSources = import.meta.glob(['/supabase/functions/**/*.ts', '!**/*.compiled.*.ts'], {
   query: '?raw',
   import: 'default',
   eager: true,

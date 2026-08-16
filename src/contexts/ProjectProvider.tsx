@@ -1,34 +1,27 @@
 'use client'
 
-import React, { createContext,  useCallback,useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { addProductToProject, createProject, deleteProject, listProjectItems,listUserProjects, removeProductFromProject } from '@/lib/services/project.service'
+import { useI18n } from '@/i18n/I18nProvider'
+import { addProductToProject, createProject, deleteProject, listProjectItems, listUserProjects, removeProductFromProject } from '@/lib/services/project.service'
 import { useSupabaseClient } from '@/providers/SupabaseProvider'
-import type { ProjectItem,UserProject } from '@/types/ui-models'
+import type { Product, ProjectItem, UserProject } from '@/types/ui-models'
 
 import { useAuth } from '../hooks/useAuth'
-
-interface ProjectContextType {
-  projects: UserProject[]
-  loading: boolean
-  refreshProjects: () => Promise<void>
-  addProject: (name: string, description?: string) => Promise<UserProject | null>
-  removeProject: (id: string) => Promise<void>
-  addItem: (projectId: string, _productId: string, quantity?: number) => Promise<void>
-  removeItem: (projectId: string, _productId: string) => Promise<void>
-  getProjectItems: (projectId: string) => Promise<ProjectItem[]>
-}
-
-const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
+// SSOT: context nesnesi TEK yerde (ProjectContext.tsx) yaratılır. Bu dosyada ikinci bir
+// createContext çağrısı YASAK — 2026-08-16'ya kadar burada yerel bir kopya vardı ve
+// useProjectLists başka nesneyi okuduğu için "projeye ekle" sessiz no-op'tu (INV-AUTH-2 R2).
+import { ProjectContext } from './ProjectContext'
 
 export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { supabase } = useSupabaseClient()
+  const { t } = useI18n()
   const [projects, setProjects] = useState<UserProject[]>([])
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
 
-  const refreshProjects = React.useCallback(async () => {
+  const refreshProjects = useCallback(async () => {
     if (!user) return
     setLoading(true)
     try {
@@ -52,52 +45,54 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const addProject = useCallback(async (name: string, description?: string) => {
     if (!user?.id) {
-      toast.error('Oturum açmanız gerekiyor.')
-      return null
+      toast.error(t('account.projects.toasts.authRequired'))
+      throw new Error('auth required')
     }
     try {
       const newProject = await createProject(supabase, { name, description, user_id: user.id })
       setProjects(prev => [newProject, ...prev])
-      toast.success('Proje başarıyla oluşturuldu.')
+      toast.success(t('account.projects.toasts.created'))
       return newProject
-    } catch {
-      toast.error('Proje oluşturulamadı.')
-      return null
+    } catch (error) {
+      toast.error(t('account.projects.toasts.createError'))
+      throw error
     }
-  }, [user?.id, supabase])
+  }, [user?.id, supabase, t])
 
   const removeProject = useCallback(async (id: string) => {
     try {
       await deleteProject(supabase, id)
       setProjects(prev => prev.filter(p => p.id !== id))
-      toast.success('Proje silindi.')
+      toast.success(t('account.projects.toasts.deleted'))
     } catch {
-      toast.error('Proje silinemedi.')
+      toast.error(t('account.projects.toasts.deleteError'))
     }
-  }, [supabase])
+  }, [supabase, t])
 
-  const addItem = useCallback(async (projectId: string, _productId: string, quantity: number = 1) => {
+  const addItemToProject = useCallback(async (projectId: string, productId: string, quantity: number = 1) => {
     try {
-      await addProductToProject(supabase, projectId, _productId, quantity)
-      toast.success('Ürün projeye eklendi.')
-    } catch {
-      toast.error('Ürün eklenemedi.')
+      await addProductToProject(supabase, projectId, productId, quantity)
+      toast.success(t('account.projects.toasts.itemAdded'))
+    } catch (error) {
+      toast.error(t('account.projects.toasts.itemAddError'))
+      throw error
     }
-  }, [supabase])
+  }, [supabase, t])
 
-  const removeItem = useCallback(async (projectId: string, _productId: string) => {
+  const removeItemFromProject = useCallback(async (projectId: string, productId: string) => {
     try {
-      await removeProductFromProject(supabase, projectId, _productId)
-      toast.success('Ürün projeden çıkarıldı.')
+      await removeProductFromProject(supabase, projectId, productId)
+      toast.success(t('account.projects.toasts.itemRemoved'))
     } catch {
-      toast.error('Ürün çıkarılamadı.')
+      toast.error(t('account.projects.toasts.itemRemoveError'))
     }
-  }, [supabase])
+  }, [supabase, t])
 
-  const getProjectItems = useCallback(async (projectId: string): Promise<ProjectItem[]> => {
+  const getProjectItems = useCallback(async (projectId: string): Promise<(ProjectItem & { product: Product })[]> => {
     try {
       const items = await listProjectItems(supabase, projectId)
-      return items as ProjectItem[]
+      // Ürünü silinmiş öğeler listeden düşer (context sözleşmesi product'ı zorunlu tutar).
+      return items.filter((i): i is ProjectItem & { product: Product } => !!i.product)
     } catch {
       console.error('Error getting project items')
       return []
@@ -110,10 +105,10 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     refreshProjects,
     addProject,
     removeProject,
-    addItem,
-    removeItem,
+    addItemToProject,
+    removeItemFromProject,
     getProjectItems
-  }), [projects, loading, refreshProjects, addProject, removeProject, addItem, removeItem, getProjectItems])
+  }), [projects, loading, refreshProjects, addProject, removeProject, addItemToProject, removeItemFromProject, getProjectItems])
 
   return (
     <ProjectContext.Provider value={value}>
