@@ -26,7 +26,28 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    /**
+     * T050: mobil viewport hattı. Repo bugüne dek TEK masaüstü projeyle koştu —
+     * mobil cihaz emülasyonu (dokunma, mobil UA, deviceScaleFactor) hiç test
+     * edilmiyordu; yalnız mobilde kırılan bir şey hiçbir kapıya görünmezdi.
+     *
+     * Kapsam bilinçli DAR ve KANITLANABİLİR olanla sınırlı:
+     *  · reflow.e2e.ts — yerelde ölçülüp doğrulandı (mobil emülasyonda 5/5 yeşil).
+     *  · checkout-smoke BİLİNÇLİ DIŞARIDA: gerçek login ister, parolası CI secret'ı
+     *    (`E2E_ADMIN_PASSWORD`) — yerelde koşturulamıyor. Doğrulayamadığım bir spec'i
+     *    ZORUNLU kontrole (`admin-smoke`) sokmak, kırmızı çıkarsa herkesin merge'ini
+     *    bloklardı. Mobil huni ayrı iş olarak kayıtlı (cetvel §Kapsam).
+     *  · admin BİLİNÇLİ DIŞARIDA: mobil/dar tasarımı henüz yok (ADMIN Faz-5 kaydı) —
+     *    regresyon değil eksik-özellik kırmızısı üretir ve kapı söktürür.
+     */
+    {
+      name: 'mobile-storefront',
+      use: { ...devices['Pixel 7'] },
+      testMatch: '**/reflow.e2e.ts',
+    },
+  ],
   // E2E_BASE_URL verilmişse (deploy edilmiş URL'e karşı) sunucu başlatma; yoksa prod build'i servis et.
   webServer: process.env.E2E_BASE_URL
     ? undefined
