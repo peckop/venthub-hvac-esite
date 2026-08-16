@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\dataTable.tr.ts
-skeleton_hash: 3a1cd23d4565cfa7
+source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\dataTable.tr.ts
+skeleton_hash: 354521f327e14f61
 entity_hashes:
   overview: 929ede5dd9b9aed8
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-15T18:29:39Z
 ---
 
 ## Genel Bakış
@@ -38,7 +38,7 @@ Bu modül, bir Vue uygulamasının tablo bileşenleri için uluslararasılaştı
 - **dataTable** (object) — `{
       bulk: {
         selectedCount: '{count} öğe seçili',
-        clear: '...`
+        clear...`
 
 ---
 

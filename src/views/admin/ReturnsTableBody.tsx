@@ -17,7 +17,7 @@ import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import { FacetedFilter } from '../../components/admin/data-table/FacetedFilter'
 import type { AdminColumn, DataTableFacet } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
-import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
+import { useConfirmWithReason } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { formatDate, formatDateTime, formatTime } from '../../i18n/datetime'
@@ -30,6 +30,7 @@ import {
   adminButtonPrimaryClass,
   adminSelectClass,
   adminSelectStyle,
+  adminTableActionDangerClass,
   adminTableActionPrimaryClass,
 } from '../../utils/adminUi'
 
@@ -144,6 +145,38 @@ const STATUS_VALUES = ['requested', 'approved', 'rejected', 'in_transit', 'recei
 
 const EMPTY_DASH = '—'
 
+/** Karar gerekçesi zorunlu olan statüler — gerekçesiz ret/iptal kaydı sonradan okunamaz. */
+const STATUSES_REQUIRING_NOTE = new Set(['rejected', 'cancelled'])
+
+type ReturnUpdate = Database['public']['Tables']['venthub_returns']['Update']
+
+/**
+ * Statü geçişinin yazacağı ALANLARI üretir.
+ *
+ * Bugüne kadar YALNIZ `status` yazılıyordu; oysa tabloda `approved_at`,
+ * `processed_at`, `completed_at` ve `admin_notes` sütunları vardı ve HİÇBİRİ
+ * doldurulmuyordu (2026-08-15 denetimi). Sonucu: bir iadenin ne zaman
+ * onaylandığı/karara bağlandığı/kapandığı ve NİÇİN reddedildiği kayıtta yok;
+ * `updated_at` yalnız "en son bir şey değişti" der, hangi adım olduğunu söylemez.
+ *
+ * Zaman damgaları istemci saatiyle değil `new Date().toISOString()` ile UTC
+ * yazılır; sütunlar `timestamptz`.
+ */
+function buildReturnUpdate(newStatus: string, note?: string): ReturnUpdate {
+  const now = new Date().toISOString()
+  const update: ReturnUpdate = { status: newStatus }
+
+  if (newStatus === 'approved') update.approved_at = now
+  if (newStatus === 'rejected' || newStatus === 'cancelled') update.processed_at = now
+  if (newStatus === 'received') update.processed_at = now
+  if (newStatus === 'refunded') update.completed_at = now
+
+  const trimmed = note?.trim()
+  if (trimmed) update.admin_notes = trimmed
+
+  return update
+}
+
 /* ---- fetcher: server-mode (arama, süzme, sıralama, range) ---- */
 async function returnsFetcher(
   supabase: SupabaseClient<Database>,
@@ -211,7 +244,7 @@ function orderLabel(r: ReturnRow): string {
 
 const ReturnsTableBody: React.FC = () => {
   const { t, lang } = useI18n()
-  const confirm = useConfirm()
+  const confirmWithReason = useConfirmWithReason()
   const router = useRouter()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('returns')
@@ -302,7 +335,7 @@ const ReturnsTableBody: React.FC = () => {
 
   /* ---- statü güncelleme — TEK mutateWithAudit kapısı + durum-makinesi koruması ---- */
   const handleStatusUpdate = useCallback(
-    async (row: ReturnRow, newStatus: string) => {
+    async (row: ReturnRow, newStatus: string, note?: string) => {
       if (!hasWriteAccess) {
         toast.error(t('admin.returns.toasts.statusUpdateFailed'))
         return
@@ -326,7 +359,7 @@ const ReturnsTableBody: React.FC = () => {
             // (1) asıl mutasyon — hata audit'i kapatır (gate)
             const { error } = await supabaseBrowserClient
               .from('venthub_returns')
-              .update({ status: newStatus })
+              .update(buildReturnUpdate(newStatus, note))
               .eq('id', row.id)
             if (error) throw error
 
@@ -379,6 +412,40 @@ const ReturnsTableBody: React.FC = () => {
     [hasWriteAccess, t, getStatusLabel, table],
   )
 
+  /**
+   * Satır aksiyonunun kapısı: gerekçe gerektiren geçişlerde ÖNCE onay + gerekçe
+   * ister, sonra mutasyonu çağırır.
+   *
+   * Ret ve iptal için gerekçe ZORUNLU: gerekçesiz bir ret `admin_notes`'u boş
+   * bırakır ve müşteriye giden bildirimde "talebiniz reddedildi" dışında hiçbir
+   * bilgi kalmaz — sonradan "niçin reddedilmiş?" sorusunun cevabı yoktur.
+   */
+  const requestStatusChange = useCallback(
+    async (row: ReturnRow, newStatus: string) => {
+      if (!STATUSES_REQUIRING_NOTE.has(newStatus)) {
+        await handleStatusUpdate(row, newStatus)
+        return
+      }
+      const { confirmed, reason } = await confirmWithReason({
+        title: t('admin.returns.decision.title', { status: getStatusLabel(newStatus) }),
+        description: t('admin.returns.decision.description', {
+          status: getStatusLabel(newStatus),
+          order: row.order_number,
+        }),
+        confirmLabel: getStatusLabel(newStatus),
+        tone: 'danger',
+        reason: {
+          label: t('admin.returns.decision.noteLabel'),
+          placeholder: t('admin.returns.decision.notePlaceholder'),
+          required: true,
+        },
+      })
+      if (!confirmed) return
+      await handleStatusUpdate(row, newStatus, reason)
+    },
+    [confirmWithReason, handleStatusUpdate, getStatusLabel, t],
+  )
+
   /* ---- toplu statü güncelleme — UPDATE, mutateWithAudit kapısından ---- */
   const bulkStatusChange = useCallback(
     async (targetStatus: string) => {
@@ -397,13 +464,28 @@ const ReturnsTableBody: React.FC = () => {
         return
       }
 
-      const ok = await confirm({
+      /*
+        Gerekçe gerektiren toplu geçişte TEK bir ortak gerekçe alınır. Bu meşrudur
+        (ör. "iade süresi doldu" N talebe aynı sebeple uygulanır), ama gerekçesiz
+        toplu ret yasak: `required` ile onay butonu boşken etkinleşmiyor.
+      */
+      const needsNote = STATUSES_REQUIRING_NOTE.has(targetStatus)
+      const { confirmed, reason } = await confirmWithReason({
         description: t('admin.returns.bulk.statusConfirm', {
           count: String(targets.length),
           status: getStatusLabel(targetStatus),
         }),
+        tone: needsNote ? 'danger' : 'default',
+        confirmLabel: getStatusLabel(targetStatus),
+        reason: needsNote
+          ? {
+              label: t('admin.returns.decision.noteLabel'),
+              placeholder: t('admin.returns.decision.notePlaceholder'),
+              required: true,
+            }
+          : undefined,
       })
-      if (!ok) return
+      if (!confirmed) return
 
       try {
         await mutateWithAudit(supabaseBrowserClient, {
@@ -419,7 +501,7 @@ const ReturnsTableBody: React.FC = () => {
               // (1) asıl mutasyon
               const { error } = await supabaseBrowserClient
                 .from('venthub_returns')
-                .update({ status: targetStatus })
+                .update(buildReturnUpdate(targetStatus, reason))
                 .eq('id', row.id)
               if (error) throw error
 
@@ -586,9 +668,18 @@ const ReturnsTableBody: React.FC = () => {
                 <button
                   key={status}
                   type="button"
-                  onClick={() => handleStatusUpdate(r, status)}
+                  onClick={() => void requestStatusChange(r, status)}
                   disabled={updatingStatus === r.id}
-                  className={`${adminTableActionPrimaryClass} !px-3 !h-7 disabled:opacity-50 gap-1`}
+                  /*
+                    Ret/iptal İLERİ GÖTÜREN bir adım değil, talebi kapatan bir
+                    karardır; birincil buton tonuyla sunmak onu "önerilen adım"
+                    gibi gösterirdi. Tehlike tonu yanlış tıklamayı da azaltır.
+                  */
+                  className={`${
+                    STATUSES_REQUIRING_NOTE.has(status)
+                      ? adminTableActionDangerClass
+                      : adminTableActionPrimaryClass
+                  } !px-3 !h-7 disabled:opacity-50 gap-1`}
                   title={t('admin.returns.actions.markAs', { status: getStatusLabel(status) })}
                   aria-label={t('admin.returns.actions.markAs', { status: getStatusLabel(status) })}
                 >
@@ -607,7 +698,7 @@ const ReturnsTableBody: React.FC = () => {
         },
       },
     ],
-    [t, lang, router, hasWriteAccess, updatingStatus, handleStatusUpdate, getStatusLabel, getStatusColor, getStatusIcon],
+    [t, lang, router, hasWriteAccess, updatingStatus, requestStatusChange, getStatusLabel, getStatusColor, getStatusIcon],
   )
 
   /* ---- status facet — count'lar server'dan dynamic olarak ---- */

@@ -160,6 +160,15 @@ function badgeClass(s: string): string {
   }
 }
 
+/**
+ * Kullanıcıya gösterilecek sipariş künyesi. `order_number` yoksa UUID'nin ilk 8'i —
+ * tablodaki "Sipariş No" sütunuyla BİREBİR aynı kural (satırda ne yazıyorsa modalde
+ * ve hata mesajında da o yazsın; kullanıcı iki yüzeyi eşleştirebilmeli).
+ */
+function orderLabel(row: AdminOrderRow): string {
+  return row.order_number || row.id.slice(0, 8)
+}
+
 function generateTrackingUrl(carrier: string, tracking: string): string | null {
   if (!carrier || !tracking) return null
   const c = carrier.toLowerCase()
@@ -567,6 +576,36 @@ const OrdersTableBody: React.FC = () => {
   const [tracking, setTracking] = useState('')
   const [sendEmail, setSendEmail] = useState(true)
   const [bulkMode, setBulkMode] = useState(false)
+  /**
+   * TOPLU KARGO — SİPARİŞ BAŞINA TAKİP NUMARASI (T058-VH, 2026-08-16).
+   *
+   * Eskiden toplu dal TEK bir `tracking` state'ini seçili N siparişin HEPSİNE
+   * yazıyordu. Sonuç veri bozulmasıydı: farklı müşterilere ait N sipariş aynı takip
+   * numarasını taşıyor ve `admin-update-shipping` her müşteriye BAŞKASININ kolisinin
+   * takip linkini e-postayla gönderiyordu. Takip numarası artık sipariş kimliğine
+   * bağlı; taşıyıcı ise ortak kalır (tek gönderide aynı taşıyıcı normaldir).
+   */
+  const [bulkTracking, setBulkTracking] = useState<Record<string, string>>({})
+  /** Alan seviyesinde hata (§4.6): toast tek başına hangi alanın eksik olduğunu söylemez. */
+  const [carrierError, setCarrierError] = useState(false)
+  const [missingTrackingIds, setMissingTrackingIds] = useState<string[]>([])
+
+  /**
+   * Toplu kargonun hedefleri — SSOT. Hem modal listesi hem gönderim aynı diziyi
+   * kullanır; iki ayrı yerde filtrelenirse ekranda görünen satırlarla gerçekten
+   * yazılan siparişler ayrışabilir. Zaten kargoya verilmiş siparişler atlanır.
+   */
+  const selectedIds = table.selection.selectedIds
+  const tableRows = table.rows
+  const bulkTargets = useMemo(
+    () => tableRows.filter((r) => selectedIds.includes(r.id) && r.status !== 'shipped'),
+    [tableRows, selectedIds],
+  )
+
+  const setTrackingFor = useCallback((orderId: string, value: string) => {
+    setBulkTracking((prev) => ({ ...prev, [orderId]: value }))
+    setMissingTrackingIds((prev) => (prev.includes(orderId) ? prev.filter((x) => x !== orderId) : prev))
+  }, [])
 
   /* ---- modal state: e-posta kayıtları (READ) ---- */
   const [logsOpen, setLogsOpen] = useState(false)
@@ -587,6 +626,8 @@ const OrdersTableBody: React.FC = () => {
     setShipId(id)
     setCarrier('')
     setTracking('')
+    setCarrierError(false)
+    setMissingTrackingIds([])
     setSendEmail(true)
     try {
       const { data } = await supabaseBrowserClient
@@ -728,9 +769,11 @@ const OrdersTableBody: React.FC = () => {
       const cur = curRow?.status ?? ''
       const isShipped = cur === 'shipped'
       if (!isShipped && (!carrier.trim() || !tracking.trim())) {
+        setCarrierError(!carrier.trim())
         toast.error(t('admin.orders.toasts.missingFields'))
         return
       }
+      setCarrierError(false)
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'orders',
@@ -771,17 +814,46 @@ const OrdersTableBody: React.FC = () => {
       return
     }
 
-    /* toplu kargo */
-    const selected = table.selection.selectedIds
-    const targets = table.rows.filter((r) => selected.includes(r.id) && r.status !== 'shipped').map((r) => r.id)
+    /* ---- toplu kargo: SİPARİŞ BAŞINA takip numarası ---- */
+    const targets = bulkTargets
     if (targets.length === 0) {
       setShipOpen(false)
       return
     }
-    if (!carrier.trim() || !tracking.trim()) {
+
+    /* (1) Doğrulama — ALAN SEVİYESİNDE. Toast kaybolur, `aria-invalid` kalmaz. */
+    const trimmedCarrier = carrier.trim()
+    const missing = targets.filter((r) => !(bulkTracking[r.id] ?? '').trim()).map((r) => r.id)
+    setCarrierError(!trimmedCarrier)
+    setMissingTrackingIds(missing)
+    if (!trimmedCarrier || missing.length > 0) {
       toast.error(t('admin.orders.toasts.missingFields'))
       return
     }
+
+    /* (2) Mükerrer takip numarası MEŞRU olabilir (birleştirilmiş tek koli) → bloklamak
+       yanlış, sessizce geçmek de yanlış. Açık onay iste. */
+    const counts = new Map<string, number>()
+    for (const row of targets) {
+      const value = (bulkTracking[row.id] ?? '').trim()
+      counts.set(value, (counts.get(value) ?? 0) + 1)
+    }
+    const sharedCount = [...counts.values()].filter((n) => n > 1).reduce((sum, n) => sum + n, 0)
+    if (sharedCount > 0) {
+      const approved = await confirm({
+        title: t('admin.orders.bulk.duplicateTracking.title'),
+        description: t('admin.orders.bulk.duplicateTracking.description', { count: String(sharedCount) }),
+        confirmLabel: t('admin.orders.bulk.duplicateTracking.confirmLabel'),
+        cancelLabel: t('admin.orders.bulk.duplicateTracking.cancelLabel'),
+        tone: 'default',
+      })
+      if (!approved) return
+    }
+
+    /* (3) Kısmi başarısızlıkta HANGİ siparişlerin düştüğü kullanıcıya gösterilir.
+       Eski kod yalnız "bazıları başarısız" diyordu — kullanıcı hangi siparişi
+       elle düzelteceğini bilemiyordu. */
+    const failedLabels: string[] = []
     try {
       await mutateWithAudit(supabaseBrowserClient, {
         resource: 'orders',
@@ -789,40 +861,59 @@ const OrdersTableBody: React.FC = () => {
         action: 'UPDATE',
         rowPk: null,
         before: null,
-        after: { status: 'shipped', ids: targets },
+        after: {
+          status: 'shipped',
+          carrier: trimmedCarrier,
+          shipments: targets.map((r) => ({ id: r.id, tracking_number: (bulkTracking[r.id] ?? '').trim() })),
+        },
         auditedByEdge: false,
         fn: async () => {
-          const turl = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
           const results = await Promise.all(
-            targets.map(async (id) => {
+            targets.map(async (row) => {
+              const trackingValue = (bulkTracking[row.id] ?? '').trim()
+              const turl = generateTrackingUrl(trimmedCarrier, trackingValue)
               const { error: fnErr } = await supabaseBrowserClient.functions.invoke('admin-update-shipping', {
                 body: {
-                  order_id: id,
-                  carrier: carrier.trim(),
-                  tracking_number: tracking.trim(),
+                  order_id: row.id,
+                  carrier: trimmedCarrier,
+                  tracking_number: trackingValue,
                   tracking_url: turl,
                   send_email: !!sendEmail,
                 },
               })
-              return !fnErr
+              return { row, ok: !fnErr }
             }),
           )
-          if (results.some((ok) => !ok)) throw new Error('Some failed')
+          const failed = results.filter((r) => !r.ok)
+          if (failed.length > 0) {
+            failedLabels.push(...failed.map((r) => orderLabel(r.row)))
+            throw new Error('bulk-shipping-partial-failure')
+          }
         },
       })
       setShipOpen(false)
       setBulkMode(false)
+      setBulkTracking({})
       toast.success(t('admin.orders.toasts.bulkShippingSuccess', { count: String(targets.length) }))
       table.selection.clear()
       await table.reload()
     } catch (e) {
-      toast.error(
-        e instanceof AdminPermissionError
-          ? t('admin.orders.toasts.noPermission')
-          : t('admin.orders.toasts.bulkShippingFailed'),
-      )
+      if (e instanceof AdminPermissionError) {
+        toast.error(t('admin.orders.toasts.noPermission'))
+      } else if (failedLabels.length > 0) {
+        toast.error(
+          t('admin.orders.toasts.bulkShippingPartialFailed', {
+            count: String(failedLabels.length),
+            orders: failedLabels.join(', '),
+          }),
+        )
+        /* Kalan siparişler GERÇEKTEN kargolandı → tablo tazelenmezse ekran yalan söyler. */
+        await table.reload()
+      } else {
+        toast.error(t('admin.orders.toasts.bulkShippingFailed'))
+      }
     }
-  }, [bulkMode, shipId, carrier, tracking, sendEmail, hasWriteAccess, t, table])
+  }, [bulkMode, shipId, carrier, tracking, sendEmail, hasWriteAccess, t, table, bulkTargets, bulkTracking, confirm])
 
   /* ---- (c) Toplu kargo iptal ---- */
   const bulkCancelShipping = useCallback(async () => {
@@ -1043,6 +1134,11 @@ const OrdersTableBody: React.FC = () => {
           setBulkMode(true)
           setCarrier('')
           setTracking('')
+          /* Her açılışta SIFIRLA: önceki toplu işlemin numaraları sızarsa yine
+             yanlış müşteriye yanlış takip linki gider. */
+          setBulkTracking({})
+          setCarrierError(false)
+          setMissingTrackingIds([])
           setSendEmail(true)
           setShipOpen(true)
         },
@@ -1149,8 +1245,15 @@ const OrdersTableBody: React.FC = () => {
             ? t('admin.orders.modals.shipping.bulkTitle')
             : t('admin.orders.modals.shipping.title')
         }
-        description={t('admin.orders.modals.shipping.description')}
+        description={
+          bulkMode
+            ? t('admin.orders.modals.shipping.bulkDescription')
+            : t('admin.orders.modals.shipping.description')
+        }
         closeLabel={t('admin.orders.modals.shipping.close')}
+        /* Toplu modda gövde iki sütunlu bir liste taşır; 420px'lik varsayılan dar kalır.
+           `max-w-640px` token'dır (design-system/tokens.js) — arbitrary değer DEĞİL. */
+        widthClass={bulkMode ? 'w-full max-w-90vw sm:max-w-640px' : undefined}
         footer={
           <>
             <button type="button" onClick={closeShipModal} className={adminButtonSecondaryClass}>
@@ -1174,7 +1277,12 @@ const OrdersTableBody: React.FC = () => {
             <select
               id="ship-carrier"
               value={carrier}
-              onChange={(e) => setCarrier(e.target.value)}
+              onChange={(e) => {
+                setCarrier(e.target.value)
+                setCarrierError(false)
+              }}
+              aria-invalid={carrierError ? true : undefined}
+              aria-describedby={carrierError ? 'ship-carrier-error' : undefined}
               className={adminSelectClass}
               style={adminSelectStyle}
             >
@@ -1184,20 +1292,95 @@ const OrdersTableBody: React.FC = () => {
               <option value="MNG">{t('admin.orders.modals.shipping.carriers.mng')}</option>
               <option value="PTT">{t('admin.orders.modals.shipping.carriers.ptt')}</option>
             </select>
+            {carrierError && (
+              <p id="ship-carrier-error" role="alert" className="mt-2 text-xs text-admin-danger">
+                {t('admin.orders.modals.shipping.errors.carrierRequired')}
+              </p>
+            )}
           </div>
 
-          <div>
-            <label htmlFor="ship-tracking" className={adminSettingsLabelClass}>
-              {t('admin.orders.modals.shipping.trackingLabel')}
-            </label>
-            <input
-              id="ship-tracking"
-              value={tracking}
-              onChange={(e) => setTracking(e.target.value)}
-              className={adminInputClass}
-              placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
-            />
-          </div>
+          {bulkMode ? (
+            /*
+              SİPARİŞ BAŞINA TAKİP NUMARASI. Liste uzun olabilir; KENDİ `max-h` tavanını
+              KOYMUYORUZ — `AdminModal` gövdesi zaten `adminModalScrollAreaClass`
+              (`min-h-0 overflow-y-auto`) ile viewport tavanını yönetir. Buraya ikinci bir
+              tavan koymak iki kaydırma çubuğu üretir ve modalın sözleşmesini bozar.
+            */
+            <fieldset className="space-y-2">
+              <legend className={adminSettingsLabelClass}>
+                {t('admin.orders.modals.shipping.bulkList.heading')}
+              </legend>
+              {bulkTargets.length === 0 ? (
+                <p className="text-sm text-admin-fg-muted">
+                  {t('admin.orders.modals.shipping.bulkList.noTargets')}
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {bulkTargets.map((row) => {
+                    const label = orderLabel(row)
+                    const invalid = missingTrackingIds.includes(row.id)
+                    const errorId = `ship-tracking-error-${row.id}`
+                    return (
+                      <li
+                        key={row.id}
+                        className="rounded-admin-md border border-admin-border bg-admin-surface-2 p-3"
+                      >
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                          <div className="min-w-0 sm:w-40">
+                            <span className="block truncate text-xs font-semibold text-admin-fg">
+                              {label}
+                            </span>
+                            {row.customer_name && (
+                              <span className="block truncate text-xs text-admin-fg-muted">
+                                {row.customer_name}
+                              </span>
+                            )}
+                          </div>
+                          <input
+                            id={`ship-tracking-${row.id}`}
+                            value={bulkTracking[row.id] ?? ''}
+                            onChange={(e) => setTrackingFor(row.id, e.target.value)}
+                            aria-label={t('admin.orders.modals.shipping.bulkList.trackingAriaLabel', {
+                              order: label,
+                            })}
+                            aria-invalid={invalid ? true : undefined}
+                            aria-describedby={invalid ? errorId : undefined}
+                            className={`${adminInputClass} flex-1`}
+                            placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
+                          />
+                        </div>
+                        {invalid && (
+                          <p id={errorId} role="alert" className="mt-2 text-xs text-admin-danger">
+                            {t('admin.orders.modals.shipping.errors.trackingRequired')}
+                          </p>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+              {missingTrackingIds.length > 0 && (
+                <p role="alert" className="text-xs text-admin-danger">
+                  {t('admin.orders.modals.shipping.errors.missingSummary', {
+                    count: String(missingTrackingIds.length),
+                  })}
+                </p>
+              )}
+            </fieldset>
+          ) : (
+            <div>
+              <label htmlFor="ship-tracking" className={adminSettingsLabelClass}>
+                {t('admin.orders.modals.shipping.trackingLabel')}
+              </label>
+              <input
+                id="ship-tracking"
+                value={tracking}
+                onChange={(e) => setTracking(e.target.value)}
+                className={adminInputClass}
+                placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
+              />
+            </div>
+          )}
 
           <label className="flex items-center gap-2 text-sm text-admin-fg-muted">
             <input

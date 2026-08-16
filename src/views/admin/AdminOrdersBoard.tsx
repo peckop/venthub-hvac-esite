@@ -14,6 +14,7 @@ import { useRole } from '../../hooks/useRole'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
+import { canTransitionOrder } from '../../lib/admin/orderStatusMachine'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { updateOrderStatus } from '../../lib/orderStatusService'
 import {
@@ -401,6 +402,24 @@ export default function AdminOrdersBoard() {
         const targetStatus = destCol.targetStatus
         const effectiveCurrent = getEffectiveStatus(targetOrder)
         if (effectiveCurrent === targetStatus) return
+
+        /*
+          MONOTONLUK KAPISI (kural 11). Bu kontrol YOKTU: teslim edilmiş bir sipariş
+          "Yeni" sütununa geri sürüklenebiliyor, iptal edilmiş sipariş yeniden
+          hazırlığa alınabiliyordu. Tek yanlış sürükleme müşteriye yanlış bildirim
+          ve tutarsız kayıt üretiyordu. Sessizce geri almak yerine SEBEBİNİ söyleriz —
+          aksi halde kullanıcı sürüklemenin neden "tutmadığını" anlayamaz.
+        */
+        if (!canTransitionOrder(effectiveCurrent, targetStatus)) {
+            const sourceCol = COLUMNS.find(c => c.statuses.includes(effectiveCurrent))
+            toast.error(
+                t('admin.orders.board.messages.invalidTransition', {
+                    from: sourceCol?.title ?? effectiveCurrent,
+                    to: destCol.title,
+                }),
+            )
+            return
+        }
 
         const oldStatus = targetOrder.status
 

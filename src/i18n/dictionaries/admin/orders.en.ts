@@ -40,7 +40,13 @@ export const orders = {
         confirmCancelShipping: 'Are you sure to cancel shipping for {{count}} orders?',
         cancelSuccess: '{{count}} orders cancelled',
         cancelPartialFail: 'Some cancellations failed: {{failed}}',
-        cancelFailed: 'Bulk cancel failed'
+        cancelFailed: 'Bulk cancel failed',
+        duplicateTracking: {
+          title: 'Same tracking number shared',
+          description: '{{count}} orders will carry the same tracking number. Are these orders going out as one consolidated parcel?',
+          confirmLabel: 'Yes, consolidated shipment',
+          cancelLabel: 'No, let me fix the numbers'
+        }
       },
       export: {
         csvLabel: 'CSV (Excel-compatible UTF‑8 BOM)',
@@ -85,11 +91,24 @@ export const orders = {
           trackingLabel: 'Tracking Number',
           trackingPlaceholder: 'Tracking number',
           sendEmailLabel: 'Send email notification to customer',
+          bulkDescription: 'The carrier is shared across all selected orders. Enter the tracking number SEPARATELY FOR EACH ORDER — reusing one number for all of them sends every customer a tracking link for somebody else’s parcel.',
           advancedLabel: 'Advanced: per-order carrier/tracking',
           advancedTable: {
             orderId: 'Order ID',
             carrier: 'Carrier',
             tracking: 'Tracking'
+          },
+          bulkList: {
+            heading: 'Tracking number per order',
+            orderColumn: 'Order',
+            trackingColumn: 'Tracking Number',
+            trackingAriaLabel: 'Tracking number for order {{order}}',
+            noTargets: 'No shippable order in the selection (already shipped orders are skipped).'
+          },
+          errors: {
+            carrierRequired: 'A carrier must be selected.',
+            trackingRequired: 'A tracking number is required for this order.',
+            missingSummary: '{{count}} orders are missing a tracking number.'
           },
           carriers: {
             yurtici: 'Yurtiçi',
@@ -150,6 +169,7 @@ export const orders = {
         shippingUpdateFailed: 'Could not update shipping',
         bulkShippingSuccess: '{{count}} orders shipped',
         bulkShippingFailed: 'Bulk shipping update failed',
+        bulkShippingPartialFailed: '{{count}} orders could not be shipped: {{orders}}',
         missingFields: 'Carrier and tracking number are required',
         missingAdvancedFields: 'Missing fields: {{count}} rows'
       },
@@ -177,7 +197,8 @@ export const orders = {
         messages: {
           cancelledOrRefunded: 'Order is cancelled or refunded.',
           updateSuccess: 'Order status updated successfully.',
-          updateError: 'Error occurred while updating status.'
+          updateError: 'Error occurred while updating status.',
+          invalidTransition: 'Cannot move {{from}} → {{to}}. Order status can only move forward.'
         },
         detail: {
           description: 'Status, contact details, notes and email log of the selected order.',

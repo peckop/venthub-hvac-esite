@@ -34,6 +34,12 @@ export const returns = {
       actions: {
         markAs: '{{status}} olarak işaretle'
       },
+      decision: {
+        title: 'İade talebini {{status}}',
+        description: '{{order}} numaralı siparişin iade talebi "{{status}}" olarak kapatılacak. Gerekçe müşteriye iletilir ve kayda işlenir.',
+        noteLabel: 'Gerekçe (zorunlu)',
+        notePlaceholder: 'Örn. iade süresi dolmuş, ürün kullanılmış, kutu açılmış…'
+      },
       toasts: {
         returnsLoadFailed: 'İade talepleri yüklenemedi',
         statusUpdated: 'İade durumu "{{status}}" olarak güncellendi',
