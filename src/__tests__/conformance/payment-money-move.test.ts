@@ -22,7 +22,20 @@ import { describe, expect, it } from 'vitest'
  *   3. `refund-order-mock` prod yolunda canlı bir iade yolu OLMAMALI.
  */
 
-const edgeSources = import.meta.glob('/supabase/functions/**/*.ts', {
+// Dizi-desenli aşırı yükleme (negatif `!` desenleri yalnız dizi biçiminde ifade edilebilir).
+declare global {
+  interface ImportMeta {
+    glob(
+      pattern: readonly string[],
+      options: { query: string; import: string; eager: true },
+    ): Record<string, string>
+  }
+}
+
+// `!` deseni ŞART (filtre yetmez): eager glob içeriği filtre çalışmadan okur.
+// tests/e2e/helpers/denoRuntime.ts, _shared/ içine geçici `*.compiled.<rastgele>.ts`
+// yazıp siler; paralel vitest'te glob o dosyayı görüp okuyamadan kaybediyordu (ENOENT).
+const edgeSources = import.meta.glob(['/supabase/functions/**/*.ts', '!**/*.compiled.*.ts'], {
   query: '?raw',
   import: 'default',
   eager: true,
