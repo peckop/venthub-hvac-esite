@@ -20,6 +20,7 @@ export const errors = {
       },
       export: {
         csvLabel: 'CSV (UTF-8 BOM)',
+        failed: 'Dışa aktarma başarısız — kayıtlar çekilemedi',
         filename: 'istemci_hatalari.csv',
         headers: {
           id: 'ID',

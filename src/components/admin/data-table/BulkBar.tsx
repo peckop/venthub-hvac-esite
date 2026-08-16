@@ -45,13 +45,13 @@ export function BulkBar({
 
     return (
         <div className="sticky bottom-4 z-sticky mx-auto max-w-4xl">
-            <div className={`bg-admin-surface rounded-admin-lg px-5 py-3 flex items-center justify-between gap-4 flex-wrap`}>
+            <div className={`bg-admin-surface rounded-admin-lg border border-admin-border shadow-admin-overlay px-5 py-3 flex items-center justify-between gap-4 flex-wrap`}>
                 {/* Left: selection info */}
                 <div className="flex items-center gap-3">
                     <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-admin-accent text-admin-accent-fg text-sm font-semibold">
                         {selectedCount}
                     </span>
-                    <span className="text-sm font-bold text-admin-fg">{selectedLabel}</span>
+                    <span className="text-sm font-medium text-admin-fg">{selectedLabel}</span>
                     <button
                         type="button"
                         onClick={onClear}

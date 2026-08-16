@@ -121,8 +121,10 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                                         </span>
                                     </td>
                                     <td className={`${adminTableCellClass} text-right last:pr-8`}>
-                                        <Link 
-                                            href={`/admin/orders/${r.id}` as import('next').Route} 
+                                        {/* /admin/orders/[id] rotası YOK (Faz 5: ölü bağlantı) — detay,
+                                            listede ?q= ile o siparişe daraltılarak açılır. */}
+                                        <Link
+                                            href={(r.order_number ? `/admin/orders?q=${encodeURIComponent(r.order_number)}` : '/admin/orders') as import('next').Route}
                                             className="inline-flex items-center gap-3 text-admin-accent-fg text-xs font-semibold bg-admin-surface-2 px-6 py-3 rounded-admin-md hover:bg-admin-accent hover:text-admin-accent-fg border border-admin-border transition-shadow duration-500 shadow-admin-md"
                                         >
                                             {t('admin.dashboard.table.detail')} <ExternalLink size={14} className="opacity-60 group-hover/link:opacity-100" />

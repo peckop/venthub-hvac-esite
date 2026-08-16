@@ -191,12 +191,21 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Faz 5 bulgusu: şema brand'i zorunlu istiyordu ama formda alan YOKTU ve
+                                hata hiçbir yerde gösterilmiyordu — yeni ürün kaydı sessizce hiç
+                                çalışmıyordu. Alan + hata metni eklendi. */}
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-admin-fg-muted">{t('admin.products.form.brand')}</label>
+                                <input {...register('brand')} className="w-full px-4 py-2 border rounded-admin-md focus-visible:outline-none" />
+                                {errors.brand && <p className="text-admin-danger text-xs">{errors.brand.message}</p>}
+                            </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-admin-fg-muted">{t('admin.products.form.category')}</label>
                                 <select {...register('category_id')} className="w-full px-4 py-2 border rounded-admin-md focus-visible:outline-none">
                                     <option value="">{t('admin.products.form.select')}</option>
                                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
+                                {errors.category_id && <p className="text-admin-danger text-xs">{errors.category_id.message}</p>}
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-admin-fg-muted">{t('admin.common.status')}</label>

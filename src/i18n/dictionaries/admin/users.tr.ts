@@ -70,6 +70,11 @@ export const users = {
         phone: 'Telefon',
         organizationId: 'Organizasyon ID'
       },
+      roleConfirm: {
+        title: 'Rol değişikliği',
+        description: '{{user}} kullanıcısının rolü "{{from}}" → "{{to}}" olarak değiştirilecek. Bu, kullanıcının admin panel yetkilerini anında değiştirir.',
+        confirmLabel: 'Rolü "{{role}}" yap'
+      },
       bulk: {
         changeRole: 'Rol Değiştir',
         selectRole: 'Hedef Rol Seçin',

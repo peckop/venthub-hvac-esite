@@ -31,7 +31,7 @@ const ColumnsMenu: React.FC<{
       
       <DropdownMenu.Portal>
         <DropdownMenu.Content 
-          className="min-w-240px bg-admin-surface rounded-admin-lg border border-admin-border p-2 shadow-elevation-4 animate-in fade-in zoom-in-95 duration-200 z-modal"
+          className="min-w-240px bg-admin-surface rounded-admin-lg border border-admin-border p-2 shadow-admin-overlay animate-in fade-in zoom-in-95 duration-200 z-popover"
           align="end"
           sideOffset={8}
         >
@@ -47,7 +47,7 @@ const ColumnsMenu: React.FC<{
                 checked={col.checked}
                 onCheckedChange={(v) => col.onChange(Boolean(v))}
                 aria-label={col.label}
-                className="group flex items-center justify-between px-3 py-2.5 text-xs font-bold text-admin-fg rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none data-[state=checked]:text-admin-accent"
+                className="group flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-admin-fg rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none data-[highlighted]:bg-admin-surface-2 data-[highlighted]:ring-2 data-[highlighted]:ring-inset data-[highlighted]:ring-admin-ring data-[state=checked]:text-admin-accent"
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-4 h-4 rounded-md border transition-colors flex items-center justify-center ${col.checked ? 'bg-admin-accent border-admin-accent' : 'border-admin-border bg-admin-surface-2'}`}>
@@ -73,7 +73,7 @@ const ColumnsMenu: React.FC<{
           >
             <DropdownMenu.RadioItem 
               value="comfortable" 
-              className="group flex items-center justify-between px-3 py-2.5 text-xs font-bold text-admin-fg rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none data-[state=checked]:text-admin-accent"
+              className="group flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-admin-fg rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none data-[highlighted]:bg-admin-surface-2 data-[highlighted]:ring-2 data-[highlighted]:ring-inset data-[highlighted]:ring-admin-ring data-[state=checked]:text-admin-accent"
             >
               <div className="flex items-center gap-3">
                 <div className={`w-4 h-4 rounded-full border transition-colors flex items-center justify-center ${density === 'comfortable' ? 'bg-admin-accent border-admin-accent' : 'border-admin-border bg-admin-surface-2'}`}>
@@ -85,7 +85,7 @@ const ColumnsMenu: React.FC<{
             
             <DropdownMenu.RadioItem 
               value="compact" 
-              className="group flex items-center justify-between px-3 py-2.5 text-xs font-bold text-admin-fg rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none data-[state=checked]:text-admin-accent"
+              className="group flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-admin-fg rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none data-[highlighted]:bg-admin-surface-2 data-[highlighted]:ring-2 data-[highlighted]:ring-inset data-[highlighted]:ring-admin-ring data-[state=checked]:text-admin-accent"
             >
               <div className="flex items-center gap-3">
                 <div className={`w-4 h-4 rounded-full border transition-colors flex items-center justify-center ${density === 'compact' ? 'bg-admin-accent border-admin-accent' : 'border-admin-border bg-admin-surface-2'}`}>

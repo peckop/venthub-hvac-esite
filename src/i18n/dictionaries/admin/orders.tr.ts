@@ -42,6 +42,7 @@ export const orders = {
         clearSelection: 'Seçimi Temizle',
         noShippableSelected: 'İptal edilecek kargo seçilmedi',
         confirmCancelShipping: '{{count}} siparişin kargosunu iptal etmek istediğinize emin misiniz?',
+        cancelShippingLabel: 'Kargoyu iptal et',
         cancelSuccess: '{{count}} sipariş kargosu iptal edildi',
         cancelPartialFail: 'Bazı iptaller başarısız oldu: {{failed}}',
         cancelFailed: 'Toplu iptal başarısız oldu',

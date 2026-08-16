@@ -29,7 +29,7 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
         <DropdownMenu.Content 
           sideOffset={8} 
           align="end"
-          className="z-popover min-w-200px bg-admin-surface rounded-admin-md border border-admin-border p-2 shadow-elevation-5 animate-in fade-in zoom-in-95 duration-200"
+          className="z-popover min-w-200px bg-admin-surface rounded-admin-md border border-admin-border p-2 shadow-admin-overlay animate-in fade-in zoom-in-95 duration-200"
         >
           <div className="px-3 pt-2 pb-2 text-xs font-semibold text-admin-fg-muted flex items-center gap-2 mb-1">
             <FileDown size={12} />
@@ -39,7 +39,7 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
           {(items && items.length > 0) ? items.map(item => (
             <DropdownMenu.Item
               key={item.key}
-              className="flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-admin-fg rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none"
+              className="flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-admin-fg rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none data-[highlighted]:bg-admin-surface-2 data-[highlighted]:ring-2 data-[highlighted]:ring-inset data-[highlighted]:ring-admin-ring"
               onSelect={(e) => { e.preventDefault(); item.onSelect() }}
               aria-label={item.label}
             >
@@ -49,7 +49,7 @@ const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: string }> = 
               {item.label}
             </DropdownMenu.Item>
           )) : (
-            <div className="px-4 py-3 text-xs font-bold text-admin-fg-muted italic">
+            <div className="px-4 py-3 text-xs font-semibold text-admin-fg-muted italic">
               {_t('admin.common.noOptions')}
             </div>
           )}

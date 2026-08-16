@@ -40,6 +40,11 @@ export const returns = {
         noteLabel: 'Reason (required)',
         notePlaceholder: 'e.g. return window expired, item used, box opened…'
       },
+      refundConfirm: {
+        title: 'A refund will be issued',
+        description: 'A REAL refund of {{amount}} will be initiated for order {{order}}. This cannot be undone.',
+        confirmLabel: 'Start refund'
+      },
       toasts: {
         returnsLoadFailed: 'Could not load return requests',
         statusUpdated: 'Return status updated to "{{status}}"',

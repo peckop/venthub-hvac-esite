@@ -17,6 +17,7 @@ export const audit = {
       viewMovements: 'Hareketleri Görüntüle',
       export: {
         csvLabel: 'CSV (UTF-8 BOM)',
+        failed: 'Dışa aktarma başarısız — kayıtlar çekilemedi',
         filename: 'denetim_gunlugu.csv',
         headers: {
           id: 'ID',

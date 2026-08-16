@@ -42,7 +42,7 @@ export function FacetedFilter({ facet, selected, onChange, clearLabel }: Faceted
 
       <Popover.Portal>
         <Popover.Content
-          className="min-w-240px bg-admin-surface rounded-admin-lg border border-admin-border p-2 shadow-elevation-4 animate-in fade-in zoom-in-95 duration-200 z-modal"
+          className="min-w-240px bg-admin-surface rounded-admin-lg border border-admin-border p-2 shadow-admin-overlay animate-in fade-in zoom-in-95 duration-200 z-popover"
           align="start"
           sideOffset={8}
         >
@@ -61,7 +61,7 @@ export function FacetedFilter({ facet, selected, onChange, clearLabel }: Faceted
                   onClick={() => toggle(option.value)}
                   aria-label={option.label}
                   aria-pressed={checked}
-                  className={`group w-full flex items-center justify-between px-3 py-2.5 text-xs font-bold rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30 ${checked ? 'text-admin-accent' : 'text-admin-fg'}`}
+                  className={`group w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold rounded-admin-md hover:bg-admin-surface-2 hover:text-admin-fg cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30 ${checked ? 'text-admin-accent' : 'text-admin-fg'}`}
                 >
                   <span className="flex items-center gap-3">
                     <span

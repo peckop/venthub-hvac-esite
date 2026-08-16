@@ -12,6 +12,9 @@ export const inventory = {
   csvLoad: 'CSV Yükle',
   groupByCategory: 'Kategoriye Göre Grupla',
   reportTitle: 'Stok Hareket Raporu',
+  report: {
+    loadFailed: 'Rapor verisi yüklenemedi — aşağıdaki grafikler eksik veya boş olabilir. Sayfayı yenileyin.'
+  },
   reportSubtitle: 'Depo giriş/çıkış trendleri ve ürün bazlı analizler.',
   downloadCsv: 'CSV İndir',
   filterPlaceholder: 'Ürün adına göre filtrele...',
@@ -124,6 +127,11 @@ export const inventory = {
     applyToAll: 'Tüm Ürünlere Uygula',
     bulkApplyHelp: 'Ürün bazlı özel eşikleri temizleyerek her şeyde varsayılanı kullanır.',
     bulkApplyWarning: 'Bu işlem ürün veritabanında toplu güncelleme yapar ve geri alınamaz.',
+    resetAllConfirm: {
+      title: 'Tüm ürün eşikleri sıfırlanacak',
+      description: 'Ürün bazlı TÜM özel eşik değerleri silinecek ve her ürün varsayılan eşiğe dönecek. Bu işlem geri alınamaz.',
+      confirmLabel: 'Eşikleri sıfırla ve uygula'
+    },
     alarmAutomation: 'Alarm ve Otomasyon',
     alarmDescription: 'E-posta bildirimlerini ve webhook entegrasyon kanallarını yapılandırın.',
     emailNotifications: 'E-Posta Bildirimleri',

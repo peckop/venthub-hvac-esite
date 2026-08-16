@@ -937,6 +937,8 @@ const OrdersTableBody: React.FC = () => {
     if (targets.length === 0) return
     const ok = await confirm({
       description: t('admin.orders.bulk.confirmCancelShipping', { count: String(targets.length) }),
+      /* Varsayılan "Devam et" sonucu özetlemiyordu (cetvel §4.7: buton sonucu söyler). */
+      confirmLabel: t('admin.orders.bulk.cancelShippingLabel'),
       tone: 'danger',
     })
     if (!ok) return

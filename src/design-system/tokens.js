@@ -184,6 +184,9 @@ export const maxHeight = {
    * Cetvel: docs/standards/admin-design-standard.md §2.2, §4.10
    */
   'admin-modal':  'calc(100svh - 2rem)',
+  /* Admin popover/açılır takvim tavanları — aynı svh gerekçesi (§2.2). */
+  'admin-popover': '85svh',
+  'admin-popover-section': '60svh',
   'hvac-menu':    '300px',
   'hvac-panel':   '480px',  // 60×8
   'hvac-modal':   '85vh',

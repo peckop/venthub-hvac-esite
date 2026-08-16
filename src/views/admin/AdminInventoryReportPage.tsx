@@ -49,6 +49,7 @@ function InventoryReportContent() {
     }, [searchQuery, dateRange])
 
     const [loading, setLoading] = React.useState(true)
+    const [loadError, setLoadError] = React.useState(false)
     const [movementsData, setMovementsData] = React.useState<InventoryMovementRow[]>([])
     const [stats, setStats] = React.useState({ totalIn: 0, totalOut: 0, net: 0 })
     const [reasonData, setReasonData] = React.useState<{ name: string, value: number, color: string }[]>([])
@@ -111,9 +112,15 @@ function InventoryReportContent() {
                 to: dateRange?.to ?? undefined
             })
             setMovementsData(data)
+            setLoadError(false)
 
         } catch (err) {
+            /*
+              Faz 5 bulgusu: hata yalnız console'a gidiyordu — kullanıcı boş grafikleri
+              "veri yok" sanıyordu. Boş veri ile alınamayan veri aynı şey değildir.
+            */
             console.error('Report fetch error:', err)
+            setLoadError(true)
         } finally {
             setLoading(false)
         }
@@ -239,6 +246,11 @@ function InventoryReportContent() {
 
     return (
         <div className="space-y-6 max-w-page">
+            {loadError && (
+                <div role="alert" className="p-4 rounded-admin-lg bg-admin-danger-weak border border-admin-danger/30 text-sm text-admin-danger">
+                    {t('admin.inventory.report.loadFailed')}
+                </div>
+            )}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className={adminSectionTitleClass}>{t('admin.inventory.reportTitle')}</h1>
