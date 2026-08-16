@@ -63,44 +63,11 @@ sağlayıcı hatası ne olursa olsun kullanıcıya tek jenerik mesaj gösterilir
 
 ---
 
-# Bölüm B — Hesap Yüzeyi (v0.2, T059)
+# Bölüm B — Hesap Yüzeyi (taşındı)
 
-> **Bekçi:** `src/__tests__/conformance/auth-account-surface.test.ts` (INV-AUTH-2).
-> **Doğuş sebebi:** T059 (2026-08-16) — header'ın favoriler butonu var olmayan sayfaya
-> gidiyordu (garantili 404); "projeye ekle" modalı kopuk context teli yüzünden sessiz
-> no-op'tu; overview'un okuduğu `full_address` alanını form hiç yazmıyordu (hep boş kart).
-
-## B1 — Rotası olan her hesap yolunun sayfası olur
-
-`Routes.account.*`'a eklenen her yol için `/src/app/[lang]/account/<yol>/page.tsx`
-**aynı PR'da** eklenir. Merkezi rota tanımı UI'da link üretir; sayfasız rota tanımı
-"derlenen 404"tür ve hiçbir statik kapı görmez — INV-AUTH-2 R1 tüm listeyi tarar.
-
-## B2 — Proje context'i tek yerde yaratılır
-
-`createContext` çağrısı yalnız `contexts/ProjectContext.tsx`'te yaşar; provider ve
-hook AYNI nesneyi paylaşır. İki ayrı context nesnesi, tüketiciyi sessizce fallback'e
-düşürür — çağrı "başarılı" görünür, hiçbir şey yazılmaz (T059'da olan buydu).
-
-## B3 — Favori durumu kalıcı kaynaktan
-
-Ürün kartı/detayındaki kalp `useFavorites`'e bağlanır; yerel `useState` ile favori
-tutmak yasaktır (sayfa yenilenince kaybolur = sahte özellik). **v1 sözleşmesi:**
-kimlik listesi `localStorage['venthub:favorites:v1']`, senkron `storage` +
-`venthub:favorites-changed` olayları. DB'ye (user_favorites) geçiş Recep kararıdır
-(migration → kural 13); geçişte hook arayüzü sabit kalır.
-
-## B4 — Overview'un okuduğu her alan ya yazılır ya fallback'lidir
-
-`full_address` formca yazılmaz; gösteren yüzey `address_line + district + city`
-fallback'i uygular (checkout'un yaptığı gibi). Genel kural: bir yüzeye alan eklerken
-"bu alanı hangi form yazıyor?" sorusunun cevabı yoksa fallback zorunludur.
-
-## B5 — Favoriler yüzeyinde fiyat (bilinçli yok)
-
-Favoriler v1 fiyat GÖSTERMEZ. Fiyat yüzeyi eklemek `rendering-cache-standard.md`'nin
-fiyat-yüzeyi kurallarına (INV-PRICE ailesi) tabidir; eklenecekse `display_price`
-hattından gelir, ham `price` kolonu çekilmez.
+v0.2'de burada duran hesap-yüzeyi kuralları (B1–B6) kendi cetveline taşındı:
+**`customer-account-standard.md`** (kardeş cetvel; bekçisi INV-AUTH-2). Bu dosya
+yalnız AUTH ZİNCİRİNİ (giriş/şifre/callback, A1–A6) yönetir.
 
 ## Kapsam dışı (bilerek)
 
@@ -108,12 +75,9 @@ hattından gelir, ham `price` kolonu çekilmez.
 - CAPTCHA / rate-limit — T060.
 - Google OAuth canlı e2e provası — Recep'in canlı ortam provası gerektirir
   (Supabase Dashboard'daki Redirect URL allowlist'i repodan denetlenemez; canlıda
-  `https://<domain>/auth/callback` kayıtlı olmalıdır).
-- `email_confirmed_at` kod kapısı — 2026-08-16'da CANLIDA ÖLÇÜLDÜ:
-  `/auth/v1/settings` → `mailer_autoconfirm: false`; GoTrue doğrulanmamış girişi
-  sunucuda zaten reddediyor, istemci kapısı gereksiz. (Ayar değişirse bu satır geçersizleşir.)
-- Misafir checkout — Recep kararı (T059 notunda açık bırakıldı).
+  `https://<domain>/auth/callback` kayıtlı olmalıdır; 2026-08-16'da Recep kaydın
+  var olduğunu doğruladı).
 
 ## Muafiyetler
 
-Yok. Muafiyet gerekirse buraya **adla** yazılır ve INV-AUTH-1/INV-AUTH-2'de aynı adla sabitlenir.
+Yok. Muafiyet gerekirse buraya **adla** yazılır ve INV-AUTH-1'de aynı adla sabitlenir.

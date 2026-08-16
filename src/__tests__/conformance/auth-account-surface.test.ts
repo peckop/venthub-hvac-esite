@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
  * AccountOverviewPage full_address okuyordu, adres formu o alanı HİÇ yazmıyordu →
  * varsayılan adres kartı sonsuza dek boş. Hiçbirini tsc/lint/build görmedi.
  *
- * Zorlanan kurallar (cetvel: docs/standards/auth-account-standard.md §B):
+ * Zorlanan kurallar (cetvel: docs/standards/customer-account-standard.md):
  *   R1→B1: Routes.account'ta tanımlı HER yol için /src/app/[lang]/account altında
  *          page.tsx VAR olmalı (404 sınıfını kökten kapatır — yeni rota eklenirse
  *          sayfasız merge edilemez).
