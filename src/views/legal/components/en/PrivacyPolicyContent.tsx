@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import legalConfig from '@/config/legal'
+import { legalConfigEn as legalConfig } from '@/config/legal'
 import { localizedHref, Routes } from '@/utils/routes'
 
 export const PrivacyPolicyContentEn: React.FC<{ lang: string }> = ({ lang }) => {

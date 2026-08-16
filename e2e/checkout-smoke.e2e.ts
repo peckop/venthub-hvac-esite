@@ -143,6 +143,19 @@ test.describe('checkout funnel smoke (pre-payment)', () => {
     await city.fill('İstanbul')
     await page.getByTestId('checkout-ship-district').fill('Kadıköy')
 
+    // 5a) FATURA KİMLİĞİ — adım 2→3 geçişinin ÖN KOŞULU (2026-08-16'dan beri).
+    //
+    // Fatura, siparişin `invoice_info` alanından kesilir. Bu alan 2026-08-16'ya kadar
+    // HİÇ doğrulanmıyordu: bireyselde TCKN, kurumsalda VKN + vergi dairesi boş bırakılarak
+    // ödeme başlatılabiliyordu (sözlükteki altı hata metninin tek çağıranı yoktu).
+    // `validateInvoiceInfo` bunu kapattı — bkz. `docs/standards/legal-compliance-standard.md` §4.
+    //
+    // Aşağıdaki satır testi "geçsin diye" GEVŞETMİYOR, tam tersini yapıyor: gerçek bir
+    // kullanıcının artık zorunlu olarak yaptığı şeyi taklit ediyor. Değer, sağlaması geçerli
+    // bir test numarasıdır; uzunluğu doğru ama sağlaması bozuk bir değer (ör. 11111111111)
+    // kasten KABUL EDİLMEZ ve bu satır onunla kırmızıya döner.
+    await page.getByTestId('checkout-invoice-tckn').fill('10000000146')
+
     // 5b) ZORUNLU YASAL ONAYLAR — adım 2→3 geçişinin ÖN KOŞULU.
     //
     // ⚠️ TESTİN ESKİ YORUMU YANLIŞTI: "legal onaylar yalnız ödeme anında gerekir, buraya

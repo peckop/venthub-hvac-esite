@@ -3,10 +3,13 @@
 import { useCallback,useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import legalConfig from '@/config/legal'
 import { listAddresses } from '@/lib/services/address.service'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
+import { checkInvoiceIdentity } from '@/lib/validation/invoiceIdentity'
 import type { InvoiceProfile,UserAddress } from '@/types/ui-models'
 
+import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import { listInvoiceProfiles } from '../lib/services/invoice.service'
 import { 
@@ -16,10 +19,14 @@ import {
   CheckoutLegalConsents 
 } from '../types/db-rows'
 import { useAuth } from './useAuth'
+import { useCart } from './useCartHook'
 
 export const useCheckoutOrchestrator = () => {
   const { user } = useAuth()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
+  // Fatura kimliği kuralı tutara bağlı (bkz. validateInvoiceInfo) — sepet toplamı burada
+  // okunuyor ki çağıranın imzası değişmesin ve kural tek yerde kalsın.
+  const { getCartTotal } = useCart()
   const [step, setStep] = useState<number>(1)
 
   // Form states
@@ -178,6 +185,57 @@ export const useCheckoutOrchestrator = () => {
   }, [t])
 
   /**
+   * Fatura kimliği doğrulaması — ödeme adımına geçmeden ÖNCE.
+   *
+   * Bu kontrol 2026-08-16'ya kadar HİÇ yoktu: `validateAddress` yalnız adres/il/ilçe
+   * bakıyordu, dolayısıyla kurumsal faturada VKN ve vergi dairesi, bireysel faturada
+   * TCKN **boş** bırakılarak ödeme başlatılabiliyordu. Sözlükteki altı hata metni
+   * (`tcknRequired`, `vknFormat` …) yazılmış ama kodda tek bir çağıranı yoktu.
+   *
+   * Neden kapı burada: fatura, siparişin `invoice_info` alanından kesilir. Sipariş
+   * yazıldıktan sonra fark edilen eksik kimlik, müşteriye geri dönmeyi ve sevkiyatı
+   * bekletmeyi gerektirir. Bkz. `docs/standards/legal-compliance-standard.md` §4.
+   *
+   * Okunan alanlar, ödeme isteğine gerçekten giden alanlardır (`buildPaymentRequest.ts`
+   * `InvoiceInfo`: tckn · companyName · vkn · taxOffice). Tip birden çok takma ad
+   * taşıdığı için (`taxNumber`, `tax_number`) onlar da yedek olarak okunuyor —
+   * doğrulanan alan ile faturaya giden alan AYNI olmalıdır.
+   *
+   * KURAL EŞİKLİDİR ve burada DEĞİL `lib/validation/invoiceIdentity.ts` içinde durur:
+   * TCKN koşulsuz zorunlu değildir, fatura düzenleme haddini aşan siparişlerde zorunlu
+   * olur (mevzuat gerekçesi o dosyanın başlığında). Burada yalnız yan etki var: toast.
+   */
+  const validateInvoiceInfo = useCallback(() => {
+    const sorun = checkInvoiceIdentity(
+      {
+        type: invoiceType,
+        tckn: invoiceInfo.tckn || invoiceInfo.t_c_id,
+        companyName: invoiceInfo.companyName || invoiceInfo.company_name,
+        vkn: invoiceInfo.vkn || invoiceInfo.taxNumber || invoiceInfo.tax_number,
+        taxOffice: invoiceInfo.taxOffice || invoiceInfo.tax_office,
+      },
+      getCartTotal(),
+      legalConfig.invoiceIdentityThreshold,
+    )
+
+    if (!sorun) return true
+
+    // `tcknRequired` eşiğe bağlı doğduğu için tutarı da söyler — "neden benden isteniyor"
+    // sorusunun cevabı mesajın içinde olsun; aksi hâlde keyfi bir engel gibi görünür.
+    toast.error(
+      sorun === 'tcknRequired'
+        ? t('checkout.errors.tcknRequired', {
+            limit: formatCurrency(legalConfig.invoiceIdentityThreshold, lang, {
+              currency: 'TRY',
+              maximumFractionDigits: 0,
+            }),
+          })
+        : t(`checkout.errors.${sorun}`),
+    )
+    return false
+  }, [invoiceType, invoiceInfo, getCartTotal, t, lang])
+
+  /**
    * Zorunlu yasal onaylar işaretlenmeden ödeme BAŞLATILAMAZ.
    *
    * Mesafeli Sözleşmeler Yönetmeliği: tüketicinin Ön Bilgilendirme Formunu ve Mesafeli Satış
@@ -199,19 +257,22 @@ export const useCheckoutOrchestrator = () => {
     if (step === 1 && validateCustomerInfo()) {
       setStep(2)
     } else if (step === 2 && validateAddress(shippingAddress)) {
+      // Fatura alanları da bu adımda (StepAddressInfo) → uyarıyı alanların GÖRÜNDÜĞÜ yerde ver.
+      if (!validateInvoiceInfo()) return
       // Onay kutuları bu adımda (StepAddressInfo) → uyarıyı kutuların GÖRÜNDÜĞÜ yerde ver.
       if (!validateLegalConsents()) return
       setStep(3)
     } else if (step === 3) {
       // Savunma katmanı: adım 3'e başka bir yoldan gelinmişse (geri/ileri, doğrudan setStep)
-      // ödeme yine de onaysız başlamasın.
+      // ödeme yine de onaysız VE faturasız kimlikle başlamasın.
+      if (!validateInvoiceInfo()) return
       if (!validateLegalConsents()) return
       const success = await initiatePayment()
       if (success) {
         setStep(4)
       }
     }
-  }, [step, shippingAddress, validateCustomerInfo, validateAddress, validateLegalConsents])
+  }, [step, shippingAddress, validateCustomerInfo, validateAddress, validateInvoiceInfo, validateLegalConsents])
 
   return {
     step,
