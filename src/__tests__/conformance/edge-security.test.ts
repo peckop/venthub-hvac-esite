@@ -132,6 +132,8 @@ const KNOWN_VIOLATIONS = {
   R10: [
     // T053-VH (2026-08-16): `iyzico-refund` yeniden yazıldı ve `refund-order-mock` emekliye
     // ayrıldı (410 Gone); ikisi de sınıf beyanını aldı → stale-guard gereği iki ad da SİLİNDİ.
+    // T058-VH (2026-08-16): `shipping-status` de emekliye ayrıldı (410 Gone, veri okumuyor)
+    // ve sınıf beyanını aldı → adı buradan da SİLİNDİ. Liste yalnızca küçülür.
     // T026-VH Adım 2 (2026-08-15): admin-create-coupon · admin-update-order ·
     // admin-update-shipping beyanlarını aldı ve sınıf (a) tenant sözleşmesine geçti →
     // stale-guard gereği üç ad buradan SİLİNDİ.
@@ -148,7 +150,6 @@ const KNOWN_VIOLATIONS = {
     'supabase/functions/order-housekeeping/index.ts',
     'supabase/functions/order-validate/index.ts',
     'supabase/functions/release-expired-reservations/index.ts',
-    'supabase/functions/shipping-status/index.ts',
     'supabase/functions/stock-alert/index.ts',
     'supabase/functions/tcmb-rates-sync/index.ts',
   ],

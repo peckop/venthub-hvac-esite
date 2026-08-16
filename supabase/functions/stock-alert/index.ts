@@ -117,21 +117,62 @@ serve(async (req: Request) => {
   }
 })
 
+/** `low_stock_threshold` boşsa kullanılan varsayılan — JS tarafındaki filtreyle AYNI olmalı. */
+const VARSAYILAN_ESIK = 5
+
 async function checkAllProducts(supabase: SupabaseClient) {
-  // Eşik değerinin altında kalan ürünleri çek
-  // Üstteki filtreleme SQL tarafında karmaşık olabilir, basitleştirip JS tarafında filtreleyelim
+  // ── ÖN-FİLTRE EŞİĞE GÖRE, SABİTE GÖRE DEĞİL ────────────────────────────────
+  // Eskiden burada `.filter('stock_qty', 'lte', 10)` vardı ve altındaki JS filtresi
+  // `p.stock_qty <= p.low_stock_threshold` diyordu. İkisi ÇELİŞİYORDU: eşiği 10'dan
+  // BÜYÜK olan bir ürün (ör. hızlı tüketilen bir filtre için `low_stock_threshold = 40`)
+  // stoğu 25'e düştüğünde uyarı üretmesi gerekirken ön-filtreye takılıp hiç GELMİYORDU.
+  // Yani o ürünler için alarm sessizce hiç kurulmamıştı — ve sessizlik "stok yeterli"
+  // ile ayırt edilemiyordu.
+  //
+  // PostgREST iki kolonu doğrudan karşılaştıramaz, o yüzden sınır VERİDEN türetilir:
+  // önce en büyük eşik okunur, ön-filtre ona göre kurulur. Böylece hiçbir ürün
+  // kapsam dışında kalmaz ve tüm tabloyu çekmek de gerekmez.
+  const { data: esikSatiri, error: esikErr } = await supabase
+    .from('products')
+    .select('low_stock_threshold')
+    .order('low_stock_threshold', { ascending: false, nullsFirst: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (esikErr) throw esikErr
+
+  const enBuyukEsik = Math.max(Number(esikSatiri?.low_stock_threshold ?? 0) || 0, VARSAYILAN_ESIK)
+
   const { data: allLowStock, error: fetchErr } = await supabase
     .from('products')
     .select('id, name, stock_qty, low_stock_threshold')
-    .filter('stock_qty', 'lte', 10) // Önce genel bir filtre
-  
+    .filter('stock_qty', 'lte', enBuyukEsik)
+
   if (fetchErr) throw fetchErr
 
-  const productsToAlert = ((allLowStock || []) as Product[]).filter(p => p.stock_qty <= (p.low_stock_threshold || 5))
+  const productsToAlert = ((allLowStock || []) as Product[]).filter(p => p.stock_qty <= (p.low_stock_threshold || VARSAYILAN_ESIK))
   console.warn(`[JOB] Found ${productsToAlert.length} products requiring alerts`)
 
   // Fetch recipients once globally (N+1 query optimization)
   const recipients = await getAlertRecipients(supabase)
+
+  // ── ALICI YOKSA SESSİZ KALMA ────────────────────────────────────────────────
+  // Gömülü yedek adres kaldırıldı (bkz. `getAlertRecipients`). Artık alıcı listesi
+  // gerçekten boş olabilir ve bu, uyarılacak ürün VARKEN en tehlikeli hâldir:
+  // iş yapılmış gibi 200 döner, kimse haberdar olmaz. Bu yüzden durum çağırana
+  // AÇIKÇA bildirilir ve platform loguna düşer.
+  if (recipients.length === 0) {
+    if (productsToAlert.length > 0) {
+      console.error(
+        `[JOB] ALICI YAPILANDIRILMAMIS — ${productsToAlert.length} urun icin uyari uretilemedi. ` +
+        `inventory_settings.alert_email bos.`,
+      )
+    }
+    throw new Error(
+      `Uyari alicisi yapilandirilmamis (inventory_settings.alert_email bos). ` +
+      `${productsToAlert.length} urun esigin altinda ve hicbir bildirim gonderilemedi.`,
+    )
+  }
 
   const results = []
   for (const product of productsToAlert) {
@@ -252,17 +293,16 @@ async function getAlertRecipients(supabase: SupabaseClient): Promise<AlertRecipi
     })
   }
 
-  // Fallback (En azından bir yere gitmeli)
-  if (recipients.length === 0) {
-    recipients.push({
-      name: 'Acil Durum Bildirimi',
-      phone: '',
-      email: 'stok@venthub.com',
-      whatsapp: '',
-      role: 'manager',
-      notifications: { low_stock: true, out_of_stock: true, sms: false, whatsapp: false, email: true }
-    })
-  }
-
+  // ── YEDEK ALICI YOK — BİLEREK ────────────────────────────────────────────────
+  // Eskiden burada `stok@venthub.com` diye gömülü bir adres vardı; yorumu da
+  // "en azından bir yere gitmeli" diyordu. Sorun: o adres var olmayan bir kutu.
+  // Yani `inventory_settings.alert_email` boşken sistem uyarıyı "gönderdi" sayıyor,
+  // sağlayıcı 200 dönüyor ve alarm HİÇ KİMSEYE ulaşmıyordu. Bu bir yedek değil,
+  // alarmın sessizce yutulmasıydı — üstelik en çok ihtiyaç duyulan durumda
+  // (kimse yapılandırmamışken).
+  //
+  // Boş liste dönmek daha dürüst: çağıran `recipients.length === 0` durumunu görüp
+  // "alıcı yapılandırılmamış" diye RAPOR EDER. Yapılandırılmamış bir alarm, yanlış
+  // adrese gönderilen bir alarmdan daha kolay fark edilir.
   return recipients
 }

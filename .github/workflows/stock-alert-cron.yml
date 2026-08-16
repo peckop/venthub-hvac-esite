@@ -1,0 +1,108 @@
+name: Stok Uyarisi (gunluk)
+
+# ==============================================================================
+# NİÇİN VAR (T061-VH · operasyon döngüsü denetimi 2026-08-15 §5)
+#
+# `stock-alert` fonksiyonunun `GET` yolu (`checkAllProducts` — tüm katalogu tarar)
+# 2026-08-16 itibarıyla **hiçbir yerden tetiklenmiyordu.** Repoda tek zamanlanmış iş
+# `tcmb-rates-sync` idi. Stok uyarısı yalnızca bir SATIŞ anında, `iyzico-callback`
+# içinden ve yalnız o siparişin ürünleri için çalışıyordu.
+#
+# Sonuç: satılmayan bir ürünün stoğu eşiğin altına düşerse (iade, sayım düzeltmesi,
+# fire) kimse haberdar olmuyordu. Alarmın çalışması, alarmı gereksiz kılan olaya
+# (satış) bağlıydı.
+#
+# ── Niçin pg_cron DEĞİL ─────────────────────────────────────────────────────
+# Evin geleneği pg_cron (`tcmb-rates-sync-daily`). Ama o iş kimlik doğrulaması
+# GEREKTİRMEYEN bir uca gidiyor; `stock-alert` ise `Authorization: Bearer <service key>`
+# istiyor (2026-08-14'te tam da bu ucun anonim açığı kapatıldı — gevşetilemez).
+# Anahtarı pg_cron ile kullanmanın tek yolu onu `cron.job.command` içine DÜZ METİN
+# yazmaktı: veritabanını okuyabilen herkesin görebileceği bir service_role anahtarı.
+# Repo PUBLIC ve bugün zaten bir sır-sızıntısı taban çizgisi çıkarıldı; yeni bir
+# düz-metin sır ekleyerek bir izleme boşluğunu kapatmak kötü bir takas olurdu.
+#
+# Vault'lu pg_cron da mümkün ama o da anahtarın bir kez elle saklanmasını ister —
+# yani her yol tek bir insan adımı gerektiriyor. GitHub Actions seçildi çünkü sır
+# zaten sır olarak saklanır ve iş kaydı (başarı/başarısızlık) görünür bir yerde durur.
+#
+# ⚠️ TEK ÖN KOŞUL: `SUPABASE_SERVICE_ROLE_KEY` reposu sırrı. Tanımlı değilken bu iş
+# GÜRÜLTÜLÜ biçimde başarısız olur — bilerek. "Sır yoksa sessizce atla" demek, hiç
+# koşmayan bir alarmı koşuyormuş gibi göstermek olurdu; bugün onarılan hataların
+# tamamı tam olarak bu sınıftandı (sessiz sahte-başarı).
+# ==============================================================================
+
+on:
+  schedule:
+    # Her gün 06:20 UTC (TR 09:20) — mesai başında, gün içi hareketten önce.
+    - cron: '20 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: stock-alert-cron
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  stok-uyarisi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Örtük varsayılan `bash -e`'de pipefail YOK; boru hattının çıkış kodu son komuttan
+    # gelir ve `curl | jq` gibi bir satır curl 000 dönse bile 0 ile geçer.
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Ön koşulları doğrula
+        env:
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          eksik=""
+          [ -n "${SERVICE_KEY:-}" ] || eksik="$eksik SUPABASE_SERVICE_ROLE_KEY"
+          [ -n "${PROJECT_REF:-}" ] || eksik="$eksik SUPABASE_PROJECT_REF"
+          if [ -n "$eksik" ]; then
+            echo "::error::Eksik repo sirri:$eksik — stok uyarisi KOSMADI."
+            echo "Settings > Secrets and variables > Actions altina ekleyin."
+            exit 1
+          fi
+
+      - name: stock-alert cagir
+        env:
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          URL="https://${PROJECT_REF}.supabase.co/functions/v1/stock-alert"
+
+          # Gövde ve HTTP kodu AYRI okunur: gövdeyi ayrıştırmadan yalnız 200'e bakmak,
+          # fonksiyonun "200 + success:false" dönebildiği bu kod tabanında yanıltıcıdır.
+          govde=$(mktemp)
+          kod=$(curl -sS -o "$govde" -w '%{http_code}' -X GET "$URL" \
+                  -H "Authorization: Bearer ${SERVICE_KEY}" \
+                  -H 'Content-Type: application/json' \
+                  --max-time 120 || echo "000")
+
+          echo "HTTP $kod"
+          # Sır sızdırmamak için yalnız ilk 500 karakter ve yalnız beklenen alanlar.
+          head -c 500 "$govde" || true
+          echo
+
+          if [ "$kod" != "200" ]; then
+            echo "::error::stock-alert HTTP $kod dondu — uyari taramasi YAPILMADI."
+            exit 1
+          fi
+
+          # HTTP 200 tek basina basari DEGIL. `alicisi yapilandirilmamis` durumu
+          # fonksiyonda bilerek 500'e cevrildi, ama zarfi yine de dogrularız:
+          # sessiz "success:false" gecmesin.
+          if ! grep -q '"success"[[:space:]]*:[[:space:]]*true' "$govde"; then
+            echo "::error::Yanit zarfinda success:true yok — tarama basarisiz sayildi."
+            exit 1
+          fi
+
+          islenen=$(grep -oE '"alerts_processed"[[:space:]]*:[[:space:]]*[0-9]+' "$govde" | grep -oE '[0-9]+$' || echo "?")
+          echo "::notice::Stok uyarisi tamamlandi — islenen uyari: ${islenen}"
