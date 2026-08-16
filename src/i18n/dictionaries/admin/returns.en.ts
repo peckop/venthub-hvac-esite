@@ -46,6 +46,7 @@ export const returns = {
         emailNotifySent: 'Customer notification email sent',
         emailNotifyFailed: 'Email could not be sent, but the status was updated',
         statusUpdateFailed: 'Could not update return status',
+        bulkPartialFailed: '{{count}} return(s) could not be processed (refund failed): {{detail}} — their status was NOT changed.',
         noValidTransitions: 'No valid status transitions found for selected return requests',
         bulkStatusUpdated: 'Status of {{count}} return requests updated to "{{status}}"',
         noPermission: 'You do not have permission for this action'

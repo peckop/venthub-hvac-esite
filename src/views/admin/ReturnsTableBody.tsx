@@ -162,6 +162,56 @@ type ReturnUpdate = Database['public']['Tables']['venthub_returns']['Update']
  * Zaman damgaları istemci saatiyle değil `new Date().toISOString()` ile UTC
  * yazılır; sütunlar `timestamptz`.
  */
+/**
+ * GERÇEK PARA İADESİ — `iyzico-refund` ucu.
+ *
+ * 2026-08-16'ya kadar burada `refund-order-mock` çağrılıyordu ve o uç kendi
+ * başlığında "no real PSP call" diyordu. Denetimin "sessiz sahte-başarı" dediği
+ * sınıfın en pahalı örneğiydi: `payment_status='refunded'` yazılıyor, denetim kaydı
+ * düşüyor, müşteriye **"iadeniz tamamlandı"** e-postası gidiyor ve İyzico'ya tek bir
+ * istek bile gitmiyordu. Mock artık emekli (410 Gone), yani çağrı BUGÜN hiçbir şey
+ * yapmıyor — hatanın `catch {}` ile yutulması bunu tamamen görünmez kılıyordu.
+ *
+ * Bu yüzden iade artık **statüden ÖNCE** yapılır ve başarısızsa statü `received`'da
+ * KALIR. "Para gitmedi ama kayıt iade göründü" durumu üretmemek tek şart.
+ *
+ * Tam iade olduğu için `amount` GÖNDERİLMEZ (uç kalanı kendisi hesaplar) ve
+ * `idempotency_key` gerekmez — uç tam iadede anahtarı sipariş kimliğinden türetir.
+ * Tekrarlanan çağrı `already_refunded` döner; bu bir HATA DEĞİL, başarıdır.
+ */
+type RefundOutcome = { ok: true } | { ok: false; message: string }
+
+interface RefundResponse {
+  status?: string
+  error?: { code?: string; message?: string }
+}
+
+async function performRealRefund(orderId: string, returnId: string): Promise<RefundOutcome> {
+  try {
+    const { data, error } = await supabaseBrowserClient.functions.invoke<RefundResponse>(
+      'iyzico-refund',
+      { body: { order_id: orderId, reason: `return:${returnId}` } },
+    )
+
+    // Ağ/HTTP hatası: uç 4xx/5xx döndüyse `error` dolu gelir.
+    if (error) return { ok: false, message: error.message }
+
+    /*
+      HTTP 200 TEK BAŞINA BAŞARI DEĞİL. Uç, gövdesinde `{ error: { code, message } }`
+      döndürebiliyor; zarfı okumadan "oldu" varsaymak T053'ün kök sebebiydi.
+    */
+    if (data?.error) return { ok: false, message: data.error.message ?? data.error.code ?? 'refund_failed' }
+
+    const status = data?.status
+    if (status !== 'refunded' && status !== 'partial_refunded' && status !== 'already_refunded') {
+      return { ok: false, message: `Beklenmeyen iade yanıtı: ${status ?? 'bilinmiyor'}` }
+    }
+    return { ok: true }
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : 'Bilinmeyen hata' }
+  }
+}
+
 function buildReturnUpdate(newStatus: string, note?: string): ReturnUpdate {
   const now = new Date().toISOString()
   const update: ReturnUpdate = { status: newStatus }
@@ -356,6 +406,19 @@ const ReturnsTableBody: React.FC = () => {
           after: { status: newStatus },
           auditedByEdge: false,
           fn: async () => {
+            /*
+              (0) PARA ÖNCE. `refunded` geçişinde gerçek iade statüden ÖNCE denenir ve
+              başarısızsa AKIŞ DURUR — statü `received`'da kalır. Sıra tersine olsaydı
+              (eski hâl) kayıt "iade edildi" der, para yerinde durur ve müşteriye
+              yanlış bildirim giderdi.
+            */
+            if (newStatus === 'refunded') {
+              const refund = await performRealRefund(row.order_id, row.id)
+              if (!refund.ok) {
+                throw new Error(refund.message)
+              }
+            }
+
             // (1) asıl mutasyon — hata audit'i kapatır (gate)
             const { error } = await supabaseBrowserClient
               .from('venthub_returns')
@@ -368,17 +431,6 @@ const ReturnsTableBody: React.FC = () => {
               await syncOrderFromReturn(row.order_id, newStatus)
             } catch {
               /* swallow — orders sync hatası iade güncellemesini bloklamaz */
-            }
-
-            // (3) refunded → mock iade — best-effort
-            if (newStatus === 'refunded') {
-              try {
-                await supabaseBrowserClient.functions.invoke('refund-order-mock', {
-                  body: { order_id: row.order_id, reason: `return:${row.id}` },
-                })
-              } catch {
-                /* swallow — mock iade hatası statüyü geri almaz */
-              }
             }
 
             // (4) müşteri bildirimi — best-effort
@@ -487,6 +539,8 @@ const ReturnsTableBody: React.FC = () => {
       })
       if (!confirmed) return
 
+      let failures: string[] = []
+
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'returns',
@@ -498,6 +552,19 @@ const ReturnsTableBody: React.FC = () => {
           auditedByEdge: false,
           fn: async () => {
             const dbUpdates = targets.map(async (row) => {
+              /*
+                (0) PARA ÖNCE — tek satır akışıyla aynı sözleşme. Toplu işlemde bir
+                siparişin iadesi başarısız olursa YALNIZ o satır düşer; kalanlar
+                etkilenmez (`Promise.allSettled` ile toplanıyor). Toplu işlemi tümden
+                iptal etmek, parası zaten iade edilmiş siparişleri de geri çevirirdi.
+              */
+              if (targetStatus === 'refunded') {
+                const refund = await performRealRefund(row.order_id, row.id)
+                if (!refund.ok) {
+                  throw new Error(`${row.order_number ?? row.id}: ${refund.message}`)
+                }
+              }
+
               // (1) asıl mutasyon
               const { error } = await supabaseBrowserClient
                 .from('venthub_returns')
@@ -510,17 +577,6 @@ const ReturnsTableBody: React.FC = () => {
                 await syncOrderFromReturn(row.order_id, targetStatus)
               } catch {
                 /* swallow */
-              }
-
-              // (3) refunded → mock iade — best-effort
-              if (targetStatus === 'refunded') {
-                try {
-                  await supabaseBrowserClient.functions.invoke('refund-order-mock', {
-                    body: { order_id: row.order_id, reason: `return:${row.id}` },
-                  })
-                } catch {
-                  /* swallow */
-                }
               }
 
               // (4) müşteri bildirimi — best-effort
@@ -543,13 +599,37 @@ const ReturnsTableBody: React.FC = () => {
               }
             })
 
-            await Promise.all(dbUpdates)
+            /*
+              `allSettled` — `all` DEĞİL. `all` ilk hatada reddeder: parası zaten
+              iade edilmiş diğer satırların ne olduğu belirsiz kalır ve kullanıcı
+              "toplu işlem başarısız" görüp hepsini yeniden dener (çift iade riski).
+              Uç idempotent olsa da kullanıcıyı bu belirsizliğe itmemek gerekir.
+            */
+            const outcomes = await Promise.allSettled(dbUpdates)
+            failures = outcomes
+              .filter((o): o is PromiseRejectedResult => o.status === 'rejected')
+              .map((o) => (o.reason instanceof Error ? o.reason.message : String(o.reason)))
+
+            // Hepsi düştüyse audit kapısı da açılmamalı — işlem gerçekten olmadı.
+            if (failures.length === targets.length) {
+              throw new Error(failures[0])
+            }
           },
         })
 
+        if (failures.length > 0) {
+          // Kısmi başarı SESSİZ GEÇMEZ: hangi satırların düştüğü söylenir.
+          toast.warning(
+            t('admin.returns.toasts.bulkPartialFailed', {
+              count: String(failures.length),
+              detail: failures.slice(0, 3).join(' · '),
+            })
+          )
+        }
+
         toast.success(
           t('admin.returns.toasts.bulkStatusUpdated', {
-            count: String(targets.length),
+            count: String(targets.length - failures.length),
             status: getStatusLabel(targetStatus),
           })
         )
