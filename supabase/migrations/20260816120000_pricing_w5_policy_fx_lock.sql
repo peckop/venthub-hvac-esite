@@ -91,7 +91,7 @@ create policy pricing_policy_admin_select
     and exists (
       select 1 from public.user_profiles up
       where up.id = (select auth.uid())
-        and up.role::text = any (array['admin', 'superadmin', 'moderator'])
+        and up.role::text = any (array['super_admin', 'admin', 'moderator'])
     )
   );
 
@@ -105,7 +105,7 @@ create policy pricing_policy_admin_insert
     and exists (
       select 1 from public.user_profiles up
       where up.id = (select auth.uid())
-        and up.role::text = any (array['admin', 'superadmin', 'moderator'])
+        and up.role::text = any (array['super_admin', 'admin', 'moderator'])
     )
   );
 
@@ -119,7 +119,7 @@ create policy pricing_policy_admin_update
     and exists (
       select 1 from public.user_profiles up
       where up.id = (select auth.uid())
-        and up.role::text = any (array['admin', 'superadmin', 'moderator'])
+        and up.role::text = any (array['super_admin', 'admin', 'moderator'])
     )
   )
   with check (
@@ -127,7 +127,7 @@ create policy pricing_policy_admin_update
     and exists (
       select 1 from public.user_profiles up
       where up.id = (select auth.uid())
-        and up.role::text = any (array['admin', 'superadmin', 'moderator'])
+        and up.role::text = any (array['super_admin', 'admin', 'moderator'])
     )
   );
 
@@ -141,7 +141,7 @@ create policy pricing_policy_admin_delete
     and exists (
       select 1 from public.user_profiles up
       where up.id = (select auth.uid())
-        and up.role::text = any (array['admin', 'superadmin', 'moderator'])
+        and up.role::text = any (array['super_admin', 'admin', 'moderator'])
     )
   );
 
