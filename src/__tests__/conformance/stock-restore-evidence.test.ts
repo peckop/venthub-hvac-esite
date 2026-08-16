@@ -1,0 +1,206 @@
+/**
+ * INV-STOCK-1 — Sipariş kaynaklı stok geri-vermesi KANITA bağlıdır
+ *
+ * KAYNAK: `docs/audits/operasyon-dongusu-denetimi-2026-08-15.md` §2 (T052-VH, CRITICAL).
+ *
+ * KURAL. Bir siparişin stoğu ancak **gerçekten düşülmüşse** geri verilebilir, ve bu yalnızca
+ * `process_order_stock_restore` RPC'si üzerinden yapılır. Kanıt = `inventory_movements`
+ * tablosundaki `order_sale` satırları. Sipariş KALEMLERİ kanıt değildir: "sipariş ne kadardı"
+ * ile "stoktan ne kadar düşüldü" farklı sorulardır.
+ *
+ * NİÇİN BU TEST VAR. 2026-08-15'te ölçüldü: satışta stok **hiç** düşmüyordu. RPC'nin kapısı
+ * `status IN ('paid','processing')` bekliyordu, ama `'paid'` sipariş statü sözlüğünde HİÇ YOK
+ * (`venthub_orders_status_check`: pending/confirmed/processing/shipped/delivered/cancelled) ve
+ * callback `'confirmed'` yazıyordu. Kapı hiç açılmadı. Buna karşılık **dört** ayrı yol stoğu
+ * koşulsuz geri ekliyordu — düşülmüş mü diye bakmadan. Net sonuç: her iptal/iade/zaman aşımı
+ * envanteri şişiriyordu, yani **hayalî stok**.
+ *
+ * TEHDİT MODELİ: drift dedektörü. Yakalaması gereken, yeni bir iptal/iade yolu yazan birinin
+ * "stoğu geri ekleyeyim" deyip doğrudan `stock_qty`'ye dokunması. Asıl fail-closed katman
+ * RPC'nin içindeki kanıt kapısıdır; bu test yalnızca RPC'nin ATLANMADIĞINI kontrol eder.
+ */
+import { describe, expect, it } from 'vitest'
+
+const RESTORE_RPC = 'process_order_stock_restore'
+
+const MIGRATION_PATH = '/supabase/migrations/20260815224500_stock_restore_evidence_and_reduction_gate.sql'
+
+/**
+ * ADLANDIRILMIŞ MUAFİYETLER — henüz göç etmemiş yollar.
+ *
+ * Bunlar "geçiş modu" DEĞİL: liste sabittir, yeni bir dosya sessizce katılamaz ve her satır
+ * kimin şeridinde beklediğini söyler. Muafiyet ADLA verilir; "şimdilik uyar-geç" bir kapı
+ * fail-open'dır. Bir satır çözüldüğünde listeden SİLİNİR — böylece liste yalnızca küçülür.
+ */
+const PENDING_MIGRATION: Record<string, string> = {
+  '/src/lib/orderStatusService.ts':
+    'ADMIN-OPS şeridi (oturum 6cc7f2d3). `restoreStockForOrder` sipariş kalemlerine bakıp ' +
+    'quantity kadar ekliyor + oku-sonra-yaz yarışı var. Panoya RPC sözleşmesi bırakıldı.',
+  '/supabase/functions/iyzico-refund/index.ts':
+    'EDGE-REFUND şeridi (oturum 4397deef). Tam iadede `stock_qty`\'yi oku-sonra-yaz ile ' +
+    'artırıyor ve `inventory_movements`\'a HİÇ satır yazmıyor; yorumdaki "idempotent by ' +
+    'manual_refund_applied" iddiasının kodda karşılığı yok.',
+  '/supabase/functions/refund-order-mock/index.ts':
+    'EDGE-REFUND şeridi. Denetim raporunun SAYMADIĞI dördüncü yol: `stock_qty: {"increment": N}` ' +
+    'gönderiyor — PostgREST\'te geçerli bir sözdizimi değil, yani ayrıca sessizce bozuk.',
+}
+
+const appSources = import.meta.glob('/src/**/*.{ts,tsx}', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>
+
+const edgeSources = import.meta.glob('/supabase/functions/**/*.ts', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>
+
+const migrationSql = import.meta.glob('/supabase/migrations/*.sql', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>
+
+function isExcluded(path: string): boolean {
+  // Testler gerçek yol değil; `database.types.ts` üretilmiş şema tipi (kod yolu değil).
+  return /__tests__|\.test\.|\.spec\.|\/tests?\//.test(path) || path.endsWith('/types/database.types.ts')
+}
+
+const productionSources: Record<string, string> = Object.fromEntries(
+  [...Object.entries(appSources), ...Object.entries(edgeSources)].filter(([p]) => !isExcluded(p)),
+)
+
+/**
+ * "Sipariş bağlamında stok yazan" dosya: hem bir siparişten söz eder hem de stoğa yazar.
+ *
+ * Sipariş bağlamı şartı bilinçli: admin panelindeki ELLE stok düzeltmesi
+ * (`InventoryCsvImport`, `useInventoryDetail` → `adjust_stock`) meşrudur ve bu kuralın
+ * konusu değildir. Kural yalnız SİPARİŞ kaynaklı geri-vermeyi bağlar.
+ *
+ * Stok yazımı iki biçimde tanınır:
+ *   · `stock_qty:` — nesne anahtarı olarak, yani bir güncelleme gövdesinde. Salt-okuma
+ *     kullanımları (`select=...,stock_qty,...` ya da `Number(p.stock_qty)`) bu desene UYMAZ.
+ *   · `inventory_movements` + `.insert(` — hareket satırını elle yazmak.
+ */
+function isOrderScopedStockWriter(src: string): boolean {
+  const mentionsOrder = /\border_id\b|venthub_order_items/.test(src)
+  if (!mentionsOrder) return false
+
+  if (/\bstock_qty\s*:/.test(src)) return true
+
+  const movementInsert = /\.from\(\s*['"`]inventory_movements['"`]\s*\)/g
+  for (const m of src.matchAll(movementInsert)) {
+    const window = src.slice(m.index ?? 0, (m.index ?? 0) + 300)
+    if (/\.(insert|upsert)\s*\(/.test(window)) return true
+  }
+  return false
+}
+
+const stockWriters = Object.entries(productionSources)
+  .filter(([, src]) => isOrderScopedStockWriter(src))
+  .map(([path]) => path)
+  .sort()
+
+describe('INV-STOCK-1 — sipariş kaynaklı stok geri-vermesi kanıta bağlı', () => {
+  it('dedektör çalışıyor: bilinen doğrudan-yazan yollar bulunabiliyor (parser sağlığı)', () => {
+    // Sıfır bulmak "temiz" değil, "dedektör kör" demektir. Muafiyet listesindeki her yol
+    // TANIM GEREĞİ doğrudan yazandır — hiçbiri görünmüyorsa tarayıcı bozulmuştur.
+    const gorulen = Object.keys(PENDING_MIGRATION).filter((p) => stockWriters.includes(p))
+    expect(
+      gorulen.length,
+      [
+        'Muafiyet listesindeki yolların HİÇBİRİ dedektöre takılmadı.',
+        '',
+        'YANLIŞ TEŞHİS UYARISI: bu, "her şey düzeldi" anlamına gelmez. Muhtemelen yazma',
+        'biçimi değişti (ör. `stock_qty` bir sabite taşındı) ve `isOrderScopedStockWriter`',
+        'artık göremiyor. Yolların gerçekten göç ettiğini doğrulamadan muafiyet silme.',
+        '',
+        `Bulunan yazarlar: ${stockWriters.length ? stockWriters.join(', ') : '(HİÇBİRİ)'}`,
+      ].join('\n'),
+    ).toBeGreaterThan(0)
+  })
+
+  it('muafiyet listesi BAYAT değil: her satır hâlâ var ve hâlâ doğrudan yazıyor', () => {
+    const bayat: string[] = []
+    for (const [path, gerekce] of Object.entries(PENDING_MIGRATION)) {
+      if (!(path in productionSources)) {
+        bayat.push(`${path} → dosya YOK (taşındı/silindi). Muafiyeti kaldır. [${gerekce}]`)
+        continue
+      }
+      if (!stockWriters.includes(path)) {
+        bayat.push(`${path} → artık doğrudan yazmıyor. Muafiyeti KALDIR — borç kapandı.`)
+      }
+    }
+    expect(
+      bayat,
+      ['Muafiyet listesi gerçeği yansıtmıyor. Liste yalnızca küçülmeli.', '', ...bayat].join('\n'),
+    ).toEqual([])
+  })
+
+  it('muaf olmayan HER sipariş-stok yazarı RPC üzerinden gider', () => {
+    const ihlaller: string[] = []
+    for (const path of stockWriters) {
+      if (path in PENDING_MIGRATION) continue
+      if (!productionSources[path].includes(RESTORE_RPC)) ihlaller.push(path)
+    }
+
+    expect(
+      ihlaller,
+      [
+        'Bir kod yolu sipariş stoğunu DOĞRUDAN geri veriyor.',
+        '',
+        `Sipariş kaynaklı stok geri-vermesi yalnız \`${RESTORE_RPC}\` ile yapılır.`,
+        'Kanıt = `inventory_movements`\'taki `order_sale` satırları; düşülmemişse geri',
+        'verilecek bir şey yoktur. Doğrudan yazmak "hayalî stok" üretir — 2026-08-15\'te',
+        'dört ayrı yol tam bunu yapıyordu ve satışta stok hiç düşmüyordu.',
+        '',
+        'Sözleşme: rpc(\'' + RESTORE_RPC + '\', { p_order_id, p_reason }) ·',
+        "p_reason ∈ order_cancel | order_refund | order_expire",
+        'Dönen jsonb\'nin `success` alanına BAK — HTTP 200 tek başına başarı değil.',
+        '',
+        'Cetvel: docs/audits/operasyon-dongusu-denetimi-2026-08-15.md §2 (T052-VH)',
+        '',
+        ...ihlaller,
+      ].join('\n'),
+    ).toEqual([])
+  })
+
+  it('şema tarafı: RPC kanıta bağlı ve düşme kapısı gerçek statü sözlüğünü kullanıyor', () => {
+    const sql = migrationSql[MIGRATION_PATH]
+    expect(sql, `Beklenen migration bulunamadı: ${MIGRATION_PATH}`).toBeTruthy()
+
+    const n = sql.toLowerCase()
+
+    expect(
+      n.includes(`create or replace function public.${RESTORE_RPC}`),
+      `Migration ${RESTORE_RPC} fonksiyonunu tanımlamıyor.`,
+    ).toBe(true)
+
+    // Kanıt kapısı: geri-verme hesabı `order_sale` hareketlerinden türemeli.
+    expect(
+      /reason\s*=\s*'order_sale'/.test(n),
+      'Geri-verme fonksiyonu `order_sale` kanıtına bakmıyor — sipariş kalemlerinden hesaplamak ' +
+        'tam olarak hayalî stoğu üreten hatadır.',
+    ).toBe(true)
+
+    // Düşme kapısı: `'paid'` bir statü DEĞİLDİR (CHECK reddeder). Kapıda durması, kapının
+    // açıldığı izlenimini vermekten başka bir işe yaramıyordu.
+    const gate = n.slice(n.indexOf('from public.venthub_orders'))
+    expect(
+      /status in \([^)]*'confirmed'/.test(gate),
+      "Düşme kapısı `'confirmed'` kabul etmiyor — callback başarılı ödemede bunu yazıyor.",
+    ).toBe(true)
+    expect(
+      /status in \([^)]*'paid'/.test(gate),
+      "Düşme kapısında hâlâ `'paid'` var. Bu değer `venthub_orders_status_check` sözlüğünde " +
+        'YOK; hiçbir siparişte eşleşemez.',
+    ).toBe(false)
+  })
+
+  it('migration dosya adı 14 haneli damga kuralına uyuyor', () => {
+    const base = MIGRATION_PATH.split('/').pop() ?? ''
+    expect(base, `Migration adı YYYYMMDDHHMMSS_ ile başlamalı: ${base}`).toMatch(/^\d{14}_/)
+  })
+})
