@@ -79,6 +79,7 @@ export const users = {
         csvLabel: 'Export as CSV'
       },
       toasts: {
+        emailsIncomplete: 'Some user emails could not be shown (the list hit a limit). An empty cell does NOT mean the user has no email.',
         adminsLoadFailed: 'Failed to load admin users',
         allLoadFailed: 'Failed to load users',
         roleNotUpdated: 'Role could not be updated',
