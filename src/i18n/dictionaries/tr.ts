@@ -2033,6 +2033,7 @@ export const tr = {
       addresses: 'Adreslerim',
       invoices: 'Fatura Profilleri',
       returns: 'İade Taleplerim',
+      quotes: 'Tekliflerim',
       profile: 'Profilim',
       security: 'Güvenlik'
     },
@@ -2428,6 +2429,62 @@ export const tr = {
       received: 'Teslim Alındı',
       refunded: 'İade Edildi',
       cancelled: 'İptal Edildi'
+    }
+  },
+  quotes: {
+    title: 'Teklif Taleplerim',
+    subtitle: 'Teklif taleplerinizi oluşturun ve fiyatlama sürecini takip edin.',
+    empty: 'Henüz bir teklif talebiniz bulunmuyor.',
+    emptyHint: 'Fiyatı görünmeyen ürünlerde "Teklif İste" ile talep açabilirsiniz.',
+    fetchError: 'Teklif kayıtları yüklenemedi',
+    itemsCount: '{{count}} kalem',
+    requestCta: 'Teklif İste',
+    request: {
+      title: 'Teklif İste',
+      itemsTitle: 'Talep Kalemleri',
+      qty: 'Adet',
+      note: 'Not (opsiyonel)',
+      notePh: 'Projeniz/ihtiyacınız hakkında kısa not (opsiyonel)',
+      submit: 'Teklif Talebi Gönder',
+      cancel: 'Vazgeç',
+      loginRequired: 'Teklif istemek için giriş yapmalısınız',
+      successToast: 'Teklif talebiniz alındı',
+      errorToast: 'Teklif talebi oluşturulamadı',
+      cartQuoteItems: 'Sepetinizdeki fiyatı belirlenmemiş ürünler'
+    },
+    detail: {
+      title: 'Teklif Detayı',
+      requestedAt: 'Talep Tarihi',
+      itemsTitle: 'Kalemler',
+      product: 'Ürün',
+      qty: 'Adet',
+      unitPrice: 'Birim Fiyat',
+      lineTotal: 'Tutar',
+      validUntil: 'Geçerlilik',
+      total: 'Toplam',
+      note: 'Not',
+      awaitingPricing: 'Fiyatlama bekleniyor — ekibimiz talebinizi inceliyor.',
+      accept: 'Teklifi Kabul Et',
+      reject: 'Teklifi Reddet',
+      acceptConfirm: 'Teklifi kabul etmek istediğinize emin misiniz?',
+      rejectConfirm: 'Teklifi reddetmek istediğinize emin misiniz?',
+      decisionSuccess: 'Kararınız kaydedildi',
+      decisionError: 'Karar kaydedilemedi',
+      acceptedNext: 'Teklifi kabul ettiniz. Ekibimiz sipariş adımları için sizinle iletişime geçecek.',
+      backToList: 'Tekliflerime dön',
+      notFound: 'Teklif bulunamadı'
+    },
+    sourceLabels: {
+      pdp: 'Ürün sayfası',
+      cart: 'Sepet',
+      project: 'Proje'
+    },
+    statusLabels: {
+      requested: 'Talep Alındı',
+      quoted: 'Teklif Verildi',
+      accepted: 'Kabul Edildi',
+      rejected: 'Reddedildi',
+      expired: 'Süresi Doldu'
     }
   },
   lead: {

@@ -2227,6 +2227,7 @@ export const en: typeof tr = {
       addresses: 'Addresses',
       invoices: 'Invoices',
       returns: 'Returns',
+      quotes: 'My Quotes',
       profile: 'Profile',
       security: 'Security'
     },
@@ -2540,6 +2541,62 @@ export const en: typeof tr = {
       received: 'Received',
       refunded: 'Refunded',
       cancelled: 'Cancelled'
+    }
+  },
+  quotes: {
+    title: 'My Quote Requests',
+    subtitle: 'Create quote requests and track the pricing process.',
+    empty: 'You have no quote requests yet.',
+    emptyHint: 'For products without a visible price, use "Request Quote" to open a request.',
+    fetchError: 'Could not load quote records',
+    itemsCount: '{{count}} items',
+    requestCta: 'Request Quote',
+    request: {
+      title: 'Request Quote',
+      itemsTitle: 'Requested Items',
+      qty: 'Qty',
+      note: 'Note (optional)',
+      notePh: 'A short note about your project/needs (optional)',
+      submit: 'Send Quote Request',
+      cancel: 'Cancel',
+      loginRequired: 'You need to sign in to request a quote',
+      successToast: 'Your quote request has been received',
+      errorToast: 'Could not create quote request',
+      cartQuoteItems: 'Unpriced products in your cart'
+    },
+    detail: {
+      title: 'Quote Detail',
+      requestedAt: 'Requested At',
+      itemsTitle: 'Items',
+      product: 'Product',
+      qty: 'Qty',
+      unitPrice: 'Unit Price',
+      lineTotal: 'Amount',
+      validUntil: 'Valid Until',
+      total: 'Total',
+      note: 'Note',
+      awaitingPricing: 'Awaiting pricing — our team is reviewing your request.',
+      accept: 'Accept Quote',
+      reject: 'Reject Quote',
+      acceptConfirm: 'Are you sure you want to accept this quote?',
+      rejectConfirm: 'Are you sure you want to reject this quote?',
+      decisionSuccess: 'Your decision has been saved',
+      decisionError: 'Could not save your decision',
+      acceptedNext: 'You accepted the quote. Our team will contact you for the order steps.',
+      backToList: 'Back to my quotes',
+      notFound: 'Quote not found'
+    },
+    sourceLabels: {
+      pdp: 'Product page',
+      cart: 'Cart',
+      project: 'Project'
+    },
+    statusLabels: {
+      requested: 'Requested',
+      quoted: 'Quoted',
+      accepted: 'Accepted',
+      rejected: 'Rejected',
+      expired: 'Expired'
     }
   },
   lead: {

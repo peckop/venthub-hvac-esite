@@ -19,6 +19,7 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
         '/admin/orders',
         '/admin/logistics',
         '/admin/returns',
+        '/admin/quotes',
         '/admin/coupons'
     ],
     viewer: ['*'], // Her seyi gorebilir
@@ -30,10 +31,10 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
  */
 const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'],
-    admin: ['orders', 'logistics', 'returns', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing'],
-    moderator: ['orders', 'logistics', 'returns', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing'],
+    admin: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing'],
+    moderator: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing'],
     warehouse: ['logistics', 'inventory', 'movements', 'inventory_settings'],
-    sales: ['orders', 'logistics', 'returns', 'coupons'],
+    sales: ['orders', 'logistics', 'returns', 'quotes', 'coupons'],
     viewer: [],
     user: []
 };
