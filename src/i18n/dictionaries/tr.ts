@@ -2520,6 +2520,45 @@ export const tr = {
       accepted: 'Kabul Edildi',
       rejected: 'Reddedildi',
       expired: 'Süresi Doldu'
+    },
+    admin: {
+      title: 'Teklif Kuyruğu',
+      navLabel: 'Teklifler',
+      subtitle: 'Müşteri teklif taleplerini fiyatlayın ve süreci yönetin.',
+      searchPlaceholder: 'Ürün adına göre ara...',
+      columnsButton: 'Kolonlar',
+      emptyTitle: 'Teklif talebi yok',
+      emptyDescription: 'Müşteriler fiyatı görünmeyen ürünlerde teklif istediğinde burada listelenir.',
+      filterEmptyDescription: 'Filtrelerinize uyan teklif talebi bulunamadı.',
+      emailUnavailable: 'e-posta gösterilemiyor',
+      table: {
+        customer: 'Müşteri',
+        items: 'Kalemler',
+        source: 'Kaynak',
+        status: 'Durum',
+        date: 'Tarih',
+        actions: 'Aksiyonlar'
+      },
+      detail: {
+        itemsTitle: 'Talep Kalemleri',
+        qty: 'Adet',
+        note: 'Müşteri notu',
+        unitPrice: 'Birim Fiyat',
+        currency: 'Para Birimi',
+        validUntil: 'Geçerlilik',
+        savePrices: 'Fiyatları Kaydet'
+      },
+      actions: {
+        markAs: '{{status}} olarak işaretle'
+      },
+      toasts: {
+        statusUpdated: 'Teklif durumu güncellendi: {{status}}',
+        statusUpdateFailed: 'Teklif durumu güncellenemedi',
+        noPermission: 'Bu işlem için yetkiniz yok',
+        pricesSaved: 'Fiyatlar kaydedildi',
+        pricesSaveFailed: 'Fiyatlar kaydedilemedi',
+        priceRequired: 'Teklif göndermeden önce tüm kalemlere fiyat girin'
+      }
     }
   },
   lead: {

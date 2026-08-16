@@ -115,6 +115,18 @@ export const ADMIN_RESOURCES: AdminResource[] = [
     inNav: true
   },
   {
+    // T067: teklif kuyruğu. labelKey ana sözlükte yaşar (quotes.admin.*) — admin/*
+    // sözlük dosyaları başka şeridin mülkü, çözücü birleşik kökten okuduğu için eşdeğer.
+    key: 'quotes',
+    labelKey: 'quotes.admin.navLabel',
+    group: 'sales',
+    route: '/admin/quotes',
+    icon: FileText,
+    requiredAccess: '/admin/quotes',
+    searchable: true,
+    inNav: true
+  },
+  {
     key: 'coupons',
     labelKey: 'admin.menu.coupons',
     group: 'sales',

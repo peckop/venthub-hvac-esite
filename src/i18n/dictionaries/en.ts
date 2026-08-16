@@ -2632,6 +2632,45 @@ export const en: typeof tr = {
       accepted: 'Accepted',
       rejected: 'Rejected',
       expired: 'Expired'
+    },
+    admin: {
+      title: 'Quote Queue',
+      navLabel: 'Quotes',
+      subtitle: 'Price customer quote requests and manage the process.',
+      searchPlaceholder: 'Search by product name...',
+      columnsButton: 'Columns',
+      emptyTitle: 'No quote requests',
+      emptyDescription: 'When customers request quotes for unpriced products, they are listed here.',
+      filterEmptyDescription: 'No quote requests match your filters.',
+      emailUnavailable: 'email unavailable',
+      table: {
+        customer: 'Customer',
+        items: 'Items',
+        source: 'Source',
+        status: 'Status',
+        date: 'Date',
+        actions: 'Actions'
+      },
+      detail: {
+        itemsTitle: 'Requested Items',
+        qty: 'Qty',
+        note: 'Customer note',
+        unitPrice: 'Unit Price',
+        currency: 'Currency',
+        validUntil: 'Valid Until',
+        savePrices: 'Save Prices'
+      },
+      actions: {
+        markAs: 'Mark as {{status}}'
+      },
+      toasts: {
+        statusUpdated: 'Quote status updated: {{status}}',
+        statusUpdateFailed: 'Could not update quote status',
+        noPermission: 'You do not have permission for this action',
+        pricesSaved: 'Prices saved',
+        pricesSaveFailed: 'Could not save prices',
+        priceRequired: 'Enter a price for every item before sending the quote'
+      }
     }
   },
   lead: {

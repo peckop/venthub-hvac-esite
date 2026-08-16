@@ -32,6 +32,7 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
         { to: routes.account.orders(), label: t('account.tabs.orders') || 'Siparişler', icon: <Package size={18} className="shrink-0" /> },
         { to: routes.account.shipments(), label: t('account.tabs.shipments') || 'Kargo Takibi', icon: <Truck size={18} className="shrink-0" /> },
         { to: routes.account.returns(), label: t('account.tabs.returns') || 'İadeler', icon: <RefreshCcw size={18} className="shrink-0" /> },
+        { to: routes.account.quotes(), label: t('account.tabs.quotes') || 'Tekliflerim', icon: <FileText size={18} className="shrink-0" /> },
       ]
     },
     {
