@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, Eye, EyeOff, Loader2,Lock, Mail } from 'lucide-react'
+import { AlertCircle,ArrowLeft, Eye, EyeOff, Loader2,Lock, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useState } from 'react'
@@ -22,7 +22,10 @@ const LoginPage: React.FC = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { t, lang } = useI18n()
-  const from = searchParams?.get('redirect') || '/'
+  // middleware ?from= yazar, uygulama içi linkler ?redirect= — ikisi de dönüş yoludur.
+  const from = searchParams?.get('redirect') || searchParams?.get('from') || '/'
+  const errorParam = searchParams?.get('error')
+  const expired = searchParams?.get('reason') === 'expired'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -85,6 +88,13 @@ const LoginPage: React.FC = () => {
               {t('auth.loginSubtitle')}
             </p>
           </div>
+
+          {(errorParam || expired) && (
+            <div role="alert" className="mb-6 flex items-start gap-2 rounded-lg border border-error-red/30 bg-error-red/10 p-3 text-sm text-error-red">
+              <AlertCircle size={18} className="mt-0.5 shrink-0" />
+              <span>{expired ? t('auth.sessionExpired') : errorParam}</span>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>

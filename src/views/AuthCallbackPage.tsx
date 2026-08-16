@@ -1,7 +1,7 @@
 'use client'
 
 import { AlertCircle,CheckCircle } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -16,67 +16,57 @@ const AuthCallbackPage: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const next = searchParams?.get('next')
 
   useEffect(() => {
     async function handleAuthCallback() {
       try {
-        // Get the hash fragment from the URL
         const hashFragment = window.location.hash
+        const hasCode = new URL(window.location.href).searchParams.has('code')
+        // Şifre-kurtarma dönüşü iki yoldan gelir: PKCE'de ?next=reset-password (redirectTo'ya
+        // bizim yazdığımız), implicit akışta hash içindeki type=recovery.
+        const isRecovery = next === 'reset-password' || hashFragment.includes('type=recovery')
 
-        if (hashFragment && hashFragment.length > 0) {
-          // Handle auth callback with URL hash
-          const { data, error } = await supabase.auth.getSession()
-          
-          // If no session yet, try to exchange the tokens from URL
-          if (!data.session) {
-            const { error: sessionError } = await supabase.auth.exchangeCodeForSession(window.location.href)
-            if (sessionError) {
-              console.error('Error exchanging tokens:', sessionError)
-            }
-            // Get session again after exchange
-            const { data: newData, error: newError } = await supabase.auth.getSession()
-            if (newError) {
-              throw newError
-            }
-            if (newData.session) {
-              setStatus('success')
-              setMessage(t('auth.callback.successRedirect'))
-              toast.success(t('auth.callback.successToast'))
-              setTimeout(() => {
-                router.push(Routes.home())
-              }, 2000)
-              return
-            }
+        let { data } = await supabase.auth.getSession()
+
+        if (!data.session && hasCode) {
+          // PKCE akışı (?code=): kodu oturuma çevir. OAuth ve redirectTo'lu e-posta linkleri buraya düşer.
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(window.location.href)
+          if (exchangeError) {
+            console.error('Error exchanging code for session:', exchangeError.message)
           }
+          ;({ data } = await supabase.auth.getSession())
+        }
 
-          if (error) {
-            console.error('Error exchanging code for session:', error.message)
-            setStatus('error')
-            setMessage(t('auth.callback.verifyError', { message: error.message }))
-            // Redirect to error page after 3 seconds
-            setTimeout(() => {
-              router.push(Routes.auth.login(undefined, error.message))
-            }, 3000)
-            return
-          }
-
-          if (data.session) {
-            setStatus('success')
-            setMessage('E-posta başarıyla doğrulandı! Anasayfaya yönlendiriliyorsunuz...')
-            toast.success('E-posta başarıyla doğrulandı!')
-            // Successfully signed in, redirect to app
-            setTimeout(() => {
-              router.push(Routes.home())
-            }, 2000)
-            return
+        if (!data.session && hashFragment.length > 0) {
+          // Implicit akış (hash token): client init'teki detectSessionInUrl işlesin diye kısa bekle.
+          for (let i = 0; i < 3 && !data.session; i++) {
+            await new Promise(resolve => setTimeout(resolve, 400))
+            ;({ data } = await supabase.auth.getSession())
           }
         }
 
-        // If we get here, something went wrong
+        if (data.session) {
+          if (isRecovery) {
+            setStatus('success')
+            setMessage(t('auth.callback.recoveryRedirect'))
+            router.push(Routes.auth.resetPassword())
+            return
+          }
+          setStatus('success')
+          setMessage(t('auth.callback.successRedirect'))
+          toast.success(t('auth.callback.successToast'))
+          setTimeout(() => {
+            router.push(Routes.home())
+          }, 2000)
+          return
+        }
+
         setStatus('error')
         setMessage(t('auth.callback.invalidLink'))
         setTimeout(() => {
-          router.push(Routes.auth.login(undefined, 'No session found'))
+          router.push(Routes.auth.login(undefined, t('auth.callback.invalidLink')))
         }, 3000)
       } catch (error: unknown) {
         console.error('Auth callback error:', error)
@@ -89,7 +79,7 @@ const AuthCallbackPage: React.FC = () => {
     }
 
     handleAuthCallback()
-  }, [router, t, Routes])
+  }, [router, t, Routes, next])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-air-blue via-clean-white to-light-gray flex items-center justify-center">
