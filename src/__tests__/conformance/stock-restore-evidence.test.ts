@@ -23,7 +23,21 @@ import { describe, expect, it } from 'vitest'
 
 const RESTORE_RPC = 'process_order_stock_restore'
 
-const MIGRATION_PATH = '/supabase/migrations/20260815224500_stock_restore_evidence_and_reduction_gate.sql'
+/**
+ * RPC'yi tanımlayan migration SABİT DEĞİL — `create or replace` ile yeniden tanımlanabilir
+ * ve son tanım kazanır. Tek bir dosya adına çivilemek, sonraki bir migration fonksiyonu
+ * zayıflattığında testi kör bırakırdı: eski dosya hâlâ doğru görünür, canlı fonksiyon
+ * değişmiştir. Bu yüzden aşağıda migration'lar CI'ın uyguladığı sırayla taranır ve
+ * **en son tanım** doğrulanır.
+ *
+ * CI sırası bayt sırasıdır (`.github/workflows/supabase-migrate.yml` → `ls -1 | sort`),
+ * o yüzden karşılaştırma da bayt sırasıyla yapılır — `localeCompare` DEĞİL.
+ */
+const RESTORE_FN_DECL = `create or replace function public.${RESTORE_RPC}`
+
+function byteCompare(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0
+}
 
 /**
  * ADLANDIRILMIŞ MUAFİYETLER — henüz göç etmemiş yollar.
@@ -167,27 +181,63 @@ describe('INV-STOCK-1 — sipariş kaynaklı stok geri-vermesi kanıta bağlı',
     ).toEqual([])
   })
 
-  it('şema tarafı: RPC kanıta bağlı ve düşme kapısı gerçek statü sözlüğünü kullanıyor', () => {
-    const sql = migrationSql[MIGRATION_PATH]
-    expect(sql, `Beklenen migration bulunamadı: ${MIGRATION_PATH}`).toBeTruthy()
-
-    const n = sql.toLowerCase()
-
+  /** RPC'yi tanımlayan SON migration — canlıda geçerli olan tanım budur. */
+  function sonRpcTanimi(): { path: string; sql: string } {
+    const adaylar = Object.entries(migrationSql)
+      .filter(([, sql]) => sql.toLowerCase().includes(RESTORE_FN_DECL))
+      .sort((a, b) => byteCompare(a[0], b[0]))
+    const son = adaylar[adaylar.length - 1]
     expect(
-      n.includes(`create or replace function public.${RESTORE_RPC}`),
-      `Migration ${RESTORE_RPC} fonksiyonunu tanımlamıyor.`,
-    ).toBe(true)
+      son,
+      `Hiçbir migration \`${RESTORE_RPC}\` fonksiyonunu tanımlamıyor. Fonksiyon yeniden ` +
+        'adlandırıldıysa bu testteki RESTORE_RPC sabitini güncelle.',
+    ).toBeTruthy()
+    return { path: son[0], sql: son[1] }
+  }
+
+  it('şema tarafı: RPC kanıta bağlı ve düşme kapısı gerçek statü sözlüğünü kullanıyor', () => {
+    const { path, sql } = sonRpcTanimi()
+    const n = sql.toLowerCase()
 
     // Kanıt kapısı: geri-verme hesabı `order_sale` hareketlerinden türemeli.
     expect(
       /reason\s*=\s*'order_sale'/.test(n),
-      'Geri-verme fonksiyonu `order_sale` kanıtına bakmıyor — sipariş kalemlerinden hesaplamak ' +
-        'tam olarak hayalî stoğu üreten hatadır.',
+      `${path}: geri-verme fonksiyonu \`order_sale\` kanıtına bakmıyor — sipariş kalemlerinden ` +
+        'hesaplamak tam olarak hayalî stoğu üreten hatadır.',
+    ).toBe(true)
+
+    // "Daha önce geri verildi mi" hesabı, GÖÇ ETMEMİŞ yolların yazdığı legacy `'return'`
+    // hareketlerini de saymalı. Saymazsa: eski yolla geri verilmiş bir sipariş için defter
+    // "hiç geri verilmemiş" der ve RPC aynı miktarı BİR DAHA geri verir.
+    //
+    // DİKKAT — burada bir kez yanlış yazdım: koşul `/'return'/.test(n)` idi ve `'return'`
+    // dosyanın YORUMUNDA da geçtiği için, sebep listesinden silsem bile test YEŞİL kalıyordu.
+    // Bilerek-bozma turu bunu yakaladı. Şimdi iddia, `reason in (...)` listesinin KENDİSİNE
+    // bakıyor: metinde geçmesi değil, hesaba girmesi aranıyor.
+    const sebepListeleri = [...n.matchAll(/reason\s+in\s*\(([^)]*)\)/g)].map((m) => m[1])
+    const geriVermeListesi = sebepListeleri.find((l) => l.includes("'order_cancel'"))
+    expect(
+      geriVermeListesi,
+      `${path}: "daha önce geri verildi mi" hesabında \`reason in (...)\` listesi bulunamadı.`,
+    ).toBeTruthy()
+    expect(
+      (geriVermeListesi ?? '').includes("'return'"),
+      `${path}: "daha önce geri verildi mi" hesabı legacy \`'return'\` hareketlerini saymıyor ` +
+        `(bulunan liste: ${geriVermeListesi?.trim()}). Göç etmemiş yollar (orderStatusService, ` +
+        'iyzico-refund) stoğu deftere görünmez şekilde geri veriyor; bu olmadan çift ' +
+        'geri-ekleme olur.',
     ).toBe(true)
 
     // Düşme kapısı: `'paid'` bir statü DEĞİLDİR (CHECK reddeder). Kapıda durması, kapının
     // açıldığı izlenimini vermekten başka bir işe yaramıyordu.
-    const gate = n.slice(n.indexOf('from public.venthub_orders'))
+    const reductionSql = Object.entries(migrationSql)
+      .filter(([, s]) => s.toLowerCase().includes('create or replace function public.process_order_stock_reduction'))
+      .sort((a, b) => byteCompare(a[0], b[0]))
+      .pop()
+    expect(reductionSql, 'Hiçbir migration `process_order_stock_reduction` tanımlamıyor.').toBeTruthy()
+
+    const rn = reductionSql![1].toLowerCase()
+    const gate = rn.slice(rn.indexOf('from public.venthub_orders'))
     expect(
       /status in \([^)]*'confirmed'/.test(gate),
       "Düşme kapısı `'confirmed'` kabul etmiyor — callback başarılı ödemede bunu yazıyor.",
@@ -200,7 +250,7 @@ describe('INV-STOCK-1 — sipariş kaynaklı stok geri-vermesi kanıta bağlı',
   })
 
   it('migration dosya adı 14 haneli damga kuralına uyuyor', () => {
-    const base = MIGRATION_PATH.split('/').pop() ?? ''
+    const base = sonRpcTanimi().path.split('/').pop() ?? ''
     expect(base, `Migration adı YYYYMMDDHHMMSS_ ile başlamalı: ${base}`).toMatch(/^\d{14}_/)
   })
 })
