@@ -1,13 +1,5 @@
 // Çağıran sınıfı: yardımcı modül (uç değil) — dış para hareketini TEK SEFERLİK kılar.
 //
-// ⚠️ HENÜZ BAĞLI DEĞİL — bilerek. İki ön koşulu var ve ikisi de bu PR'ın dışında:
-//   1. `refund_attempts` tablosu (migration hazır: `20260816090000_returns_refund_integrity.sql`,
-//      `supabase/migrations/**` şu an STOK-T052 şeridinde olduğu için konulamadı).
-//   2. `iyzico-refund/index.ts`'in bunu çağıracak şekilde yeniden yazılması — o dosya da
-//      aynı şeritte (denetim raporu onu hem T052 hem T053 kapsamına koymuş).
-// Modül burada duruyor çünkü tasarımın kendisi ölçülmüş bir bulgunun cevabı ve kaybolmamalı.
-// Hiçbir fonksiyon import etmediği için davranışa etkisi YOKTUR (deploy nötr).
-//
 // NİÇİN VAR (T053-VH · 2026-08-15 operasyon döngüsü denetimi §3)
 //
 // `iyzico-refund` dosyasının başlığında 2025'ten beri "Idempotent" yazıyordu. Kodda
@@ -244,36 +236,5 @@ export async function settleRefund(
     return { ok: true }
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : String(e) }
-  }
-}
-
-/**
- * Bu sipariş için satış anında stok GERÇEKTEN düştü mü?
- *
- * NİÇİN SORULUYOR (T052-VH ile kesişim): bugün satışta stok düşmüyor — `iyzico-callback`
- * `process_order_stock_reduction` RPC'sini çağırıyor ama RPC kapısı `status IN
- * ('paid','processing')` bekliyor, callback ise siparişi `confirmed` yazıyor; yani RPC her
- * seferinde erken dönüyor. Bu ortamda iade sırasında stoğu KOŞULSUZ geri eklemek, hiç
- * düşmemiş stoğu artırır ve envanteri tek yönlü şişirir.
- *
- * Denetim raporunun çözüm sırası tam olarak budur: **önce geri-ekleme yollarını
- * `inventory_movements` 'order_sale' kanıtına bağla, SONRA kapıyı aç.** Bu fonksiyon o
- * kanıtı sorar. T052 kapıyı açtığında burası kendiliğinden doğru davranmaya başlar —
- * ekstra bir değişiklik gerekmez.
- */
-export async function saleReducedStock(ctx: Ctx, orderId: string): Promise<boolean> {
-  const url =
-    `${ctx.supabaseUrl}/rest/v1/inventory_movements` +
-    `?or=(order_id.eq.${encodeURIComponent(orderId)},batch_id.eq.${encodeURIComponent(orderId)})` +
-    `&reason=eq.order_sale&select=id&limit=1`
-  try {
-    const resp = await fetch(url, { headers: restHeaders(ctx.serviceRoleKey) })
-    if (!resp.ok) return false
-    const rows = await resp.json().catch(() => [])
-    return Array.isArray(rows) && rows.length > 0
-  } catch {
-    // Kanıt okunamadıysa stok EKLENMEZ. Yanlış yönde hata yapmak envanteri şişirir;
-    // eksik kalan bir iade stoğu ise admin panelinden elle düzeltilebilir.
-    return false
   }
 }

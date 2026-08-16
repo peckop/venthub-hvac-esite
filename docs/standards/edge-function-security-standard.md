@@ -355,7 +355,7 @@ açık bir tabloda tutulur; sonlanma durumlarından çıkış **yoktur.**
 | Kural | Kapı | Kanıt |
 |---|---|---|
 | E, F | `INV-RETURN-1` — `src/__tests__/conformance/returns-webhook-transitions.test.ts` | 2026-08-16: 5 sabotaj KIRMIZI (refunded yazımı · terminal kaçışı · istemcide olmayan geçiş · rank haritasının dönüşü · kapının devre dışı bırakılması) + 1 yanlış-pozitif kontrolü YEŞİL |
-| A–D | **kapı YOK — açık borç.** Şu an yalnız bu cetvel ve kod yorumları taşıyor. `iyzico-refund` şeridi devredilince `INV-PAY-3` yazılmalı: para hareketinden sonraki yolda boş `catch`, ve talep defteri olmadan PSP çağrısı. | — |
+| A–D | `INV-PAY-3` — `src/__tests__/conformance/payment-money-move.test.ts` | 2026-08-16: 5 sabotaj KIRMIZI (talep defteri atlanarak PSP çağrısı · boş `catch{}`'in dönüşü · emekli `refund-order-mock`'un yeniden DB'ye yazması · 410 yerine 200 · iadenin stoğu doğrudan yazması) + 1 yanlış-pozitif kontrolü YEŞİL |
 
 > ⚠️ `INV-RETURN-1` bir dersi kendi içinde de taşır: ilk sürümü `kaynak.includes('canCarrierTransition')`
 > diyordu ve sabotaj turunda **yeşil kaldı** — çağrı silinmiş olmasına rağmen `import` satırı
