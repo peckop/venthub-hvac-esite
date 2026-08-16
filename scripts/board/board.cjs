@@ -258,6 +258,75 @@ function notesFor(sid, lane, events) {
   ).slice(-5)
 }
 
+/**
+ * "herkese" anlamına gelen serbest-metin hedefleri. GÖNDERİMDE broadcast'e çevrilirler.
+ *
+ * NİÇİN LİSTE: `notesFor` tam-eşitlik arıyor, yani `to:'herkes'` **hiçbir** oturumla eşleşmez
+ * ve not sessizce yok olur. 2026-08-16'da ölçüldü: 110 notun 38'i tam bu yüzden kayboldu
+ * (`herkes` 37 + `ALL` 1) ve komut her seferinde "not bırakıldı" bastı.
+ */
+const BROADCAST_WORDS = new Set(['herkes', 'hepsi', 'tumu', 'tümü', 'all', 'everyone', 'broadcast', '*'])
+
+/** Panoda adı geçen tüm oturumlar (yalnız canlı olanlar değil). */
+function knownSids(events) {
+  return [...new Set((events || readEvents()).map(e => e.sid).filter(Boolean))]
+}
+
+/**
+ * `--to` değerini TESLİM EDİLEBİLİR bir hedefe çevir. Çözüm GÖNDERİM ANINDA yapılır ve
+ * sonuç kalıcı yazılır — şerit adı sonradan değişse (`PRICING`→`PRICING-STOK`,
+ * `EDGE`→`EDGE-REFUND`, `ADMIN-UX`→`ADMIN-OPS` hepsi 2026-08-16'da oldu) veya şerit
+ * bırakılsa bile not teslim edilebilir kalır.
+ *
+ * ⚠ KARAR: şerit adı → **OTURUM**a çözülür, role değil. Bugünkü modelde şerit = oturum
+ * olduğu için doğru; cetvel `multi-session-coordination-standard.md §Not adresleme`'de
+ * tek cümleyle yazılı. Rol-tabanlı teslim isteniyorsa çözüm burada değil, cetvelde değişir.
+ *
+ * @returns {{ok:true,to:string,how:string}|{ok:false,reason:string,valid:string[]}}
+ */
+function resolveNoteTarget(rawTo, events) {
+  const evs = events || readEvents()
+  const raw = String(rawTo == null ? '' : rawTo).trim()
+  if (!raw) return { ok: true, to: '', how: 'broadcast (hedef verilmedi)' }
+  if (BROADCAST_WORDS.has(raw.toLowerCase())) return { ok: true, to: '', how: `broadcast ("${raw}" → herkese)` }
+
+  const sids = knownSids(evs)
+  const exact = sids.find(s => s === raw)
+  if (exact) return { ok: true, to: exact, how: `oturum ${exact.slice(0, 8)}` }
+
+  // Kısaltma (8-hane vb.) → tam UUID. Belirsizse hata: yanlış oturuma teslim etmeyiz.
+  if (raw.length >= 4) {
+    const pref = sids.filter(s => s.startsWith(raw))
+    if (pref.length === 1) return { ok: true, to: pref[0], how: `oturum ${pref[0].slice(0, 8)} (kısaltmadan çözüldü)` }
+    if (pref.length > 1) {
+      return { ok: false, reason: `"${raw}" kısaltması ${pref.length} oturumla eşleşiyor — tam UUID ver`, valid: pref }
+    }
+  }
+
+  // Şerit adı → o şeridi en SON talep eden oturum. Canlı olan tercih edilir.
+  const laneOwners = new Map()
+  for (const e of evs) {
+    if (e.type === 'claim' && e.lane && String(e.lane).toLowerCase() === raw.toLowerCase()) laneOwners.set(e.sid, e.ts)
+  }
+  if (laneOwners.size > 0) {
+    const liveSids = new Set(liveClaims().map(c => c.sid))
+    const cands = [...laneOwners.entries()].sort((a, b) => String(b[1]).localeCompare(String(a[1])))
+    const live = cands.filter(([s]) => liveSids.has(s))
+    const pick = (live.length > 0 ? live : cands)[0][0]
+    if (live.length > 1) {
+      return { ok: false, reason: `"${raw}" şeridini ${live.length} canlı oturum tutuyor — tam UUID ver`, valid: live.map(([s]) => s) }
+    }
+    return { ok: true, to: pick, how: `şerit "${raw}" → oturum ${pick.slice(0, 8)}` }
+  }
+
+  const lanes = [...new Set(evs.filter(e => e.type === 'claim' && e.lane).map(e => e.lane))]
+  return {
+    ok: false,
+    reason: `"${raw}" ne bir oturum ne de bir şerit — not YAZILMADI`,
+    valid: [...lanes, ...sids.map(s => s.slice(0, 8))],
+  }
+}
+
 /** Teslim edilen notları okundu işaretle (append-only modele sadık: kendi dosyana yazarsın). */
 function markSeen(sid, notes) {
   if (!notes || notes.length === 0) return
@@ -266,9 +335,9 @@ function markSeen(sid, notes) {
 }
 
 module.exports = {
-  BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS,
+  BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS,
   append, touch, readEvents, liveClaims, findConflict, summary,
-  notesFor, markSeen, lastSeen,
+  notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids,
   globToRegExp, toRepoRelative, repoRootFor,
 }
 
@@ -302,8 +371,16 @@ if (require.main === module) {
   } else if (verb === 'note') {
     const text = (flags.text || positional.join(' ')).trim()
     if (!text) { console.error('not metni boş'); process.exit(1) }
-    append(sid, { type: 'note', to: flags.to || '', text })
-    console.log('not bırakıldı')
+    // Hedefi YAZMADAN ÖNCE çöz. Teslim edilemez hedefte yazmak = sahte başarı (T064-VH).
+    const target = resolveNoteTarget(flags.to)
+    if (!target.ok) {
+      console.error(`not GÖNDERİLMEDİ: ${target.reason}`)
+      if (target.valid && target.valid.length) console.error(`geçerli hedefler: ${target.valid.join(', ')}`)
+      console.error('herkese göndermek için --to VERME (ya da --to herkes).')
+      process.exit(1)
+    }
+    append(sid, { type: 'note', to: target.to, text })
+    console.log(`not bırakıldı → ${target.how}`)
   } else if (verb === 'who') {
     console.log(summary(sid))
   } else {

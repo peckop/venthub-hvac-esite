@@ -237,25 +237,53 @@ function round2(value: number): number {
   return Number(value.toFixed(2))
 }
 
+/**
+ * Özgüllük merdiveninin HEDEF EŞLEŞMESİ — tek yer.
+ *
+ * `pricing_rule` (fiyat NASIL hesaplanır) ve `pricing_policy` (hangi AYAR geçerli) aynı
+ * merdiveni kullanır: scope 0 varyant · 1 ürün · 2 marka · 3 kategori · 4 global.
+ * Cetvel §8.3 bunu açıkça şart koşuyor: *"Merdiven §3.1 ile birebir aynıdır — ikinci bir
+ * öncelik mantığı icat edilmez."*
+ *
+ * Bu yüzden eşleşme satır TİPİNDEN bağımsız, ortak bir alan üçlüsü üzerinden yapılır. İki
+ * tablo için iki kopya yazmak, ikisinin bir gün ayrışacağı anlamına gelirdi — ve ayrıştığı
+ * gün "kural bu ürüne uyuyor ama politika uymuyor" gibi teşhisi zor bir durum doğardı.
+ * Bekçisi: INV-PRICE-7.
+ */
+export interface ScopedTarget {
+  scope: number
+  product_id: string | null
+  brand_id: string | null
+  category_id: string | null
+}
+
+export function scopeMatchesProduct(
+  row: ScopedTarget,
+  product: PricingProductInput,
+  categoryAncestors: ReadonlySet<string>,
+): boolean {
+  switch (row.scope) {
+    case 0:
+    case 1:
+      return row.product_id === product.id
+    case 2:
+      return row.brand_id != null && row.brand_id === product.brandId
+    case 3:
+      return row.category_id != null && categoryAncestors.has(row.category_id)
+    case 4:
+      return true
+    default:
+      return false
+  }
+}
+
 /** Kural, ürün hedefine uyar mı? (scope↔hedef; kategori ata-cascade destekler) */
 export function ruleMatchesProduct(
   rule: PricingRuleRow,
   product: PricingProductInput,
   categoryAncestors: ReadonlySet<string>,
 ): boolean {
-  switch (rule.scope) {
-    case 0:
-    case 1:
-      return rule.product_id === product.id
-    case 2:
-      return rule.brand_id != null && rule.brand_id === product.brandId
-    case 3:
-      return rule.category_id != null && categoryAncestors.has(rule.category_id)
-    case 4:
-      return true
-    default:
-      return false
-  }
+  return scopeMatchesProduct(rule, product, categoryAncestors)
 }
 
 /** Cetvel §11 sıralaması: scope ASC → kitap-özgüllüğü → min_quantity DESC → priority DESC → id DESC. */

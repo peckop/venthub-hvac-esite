@@ -11,10 +11,9 @@ interface ExpiredOrder {
     order_number: string | null
 }
 
-interface OrderItem {
-    product_id: string
-    quantity: number
-}
+// NOT: `OrderItem` tipi kaldirildi — bu fonksiyon artik siparis kalemlerini HIC OKUMUYOR.
+// Stok geri-vermesi `process_order_stock_restore` RPC'sine devredildi ve o, kalemlere degil
+// `inventory_movements` kanitina bakiyor (T052-VH).
 
 serve(async (req: Request) => {
     // CORS başlıkları req'e bağlı (origin allowlist) → modül seviyesinde tutulamaz.
@@ -130,36 +129,35 @@ serve(async (req: Request) => {
                     is_internal: true
                 })
 
-                // c. Ürünleri ve stokları iade et
-                const { data: itemsRaw } = await supabase
-                    .from('venthub_order_items')
-                    .select('product_id, quantity')
-                    .eq('order_id', order.id)
-                
-                const items = itemsRaw as OrderItem[]
-                
-                if (items && items.length > 0) {
-                    for (const item of items) {
-                        // ATOMİK STOK ARTIŞI (adjust_stock_v2 RPC kullanıyoruz)
-                        const { error: rpcErr } = await supabase.rpc('adjust_stock_v2', {
-                            p_product_id: item.product_id,
-                            p_delta: item.quantity
-                        })
+                // c. Stoğu geri ver — YALNIZCA gerçekten düşülmüşse (T052-VH).
+                //
+                // ESKİ HÂLİ EN AĞIR YOLDU. Burası `pending` siparişleri, yani ödemesi HİÇ
+                // ALINMAMIŞ siparişleri temizliyor. Eski kod `venthub_order_items`'a bakıp her
+                // kalem için `adjust_stock_v2(+quantity)` çağırıyordu — hiç düşülmemiş miktarı
+                // geri ekliyordu. Sonuç doğrudan HAYALÎ STOK: süresi dolan her sepet envanteri
+                // şişiriyordu. Üstelik satışta stok zaten hiç düşmüyordu (RPC kapısı `'paid'`
+                // bekliyor, öyle bir statü sözlükte YOK), yani dengeleyen taraf da yoktu.
+                //
+                // Şimdi tek kanıta-bağlı RPC. Kanıt = `inventory_movements`'taki `order_sale`
+                // satırları. `pending` bir sipariş için öyle satır YOKTUR → RPC hiçbir şey
+                // yapmaz ve `restored_count: 0` döner. Doğru davranış budur: kapatılan bir
+                // rezervasyon, alınmamış stoğu geri veremez.
+                const { data: restoreRaw, error: restoreErr } = await supabase.rpc('process_order_stock_restore', {
+                    p_order_id: order.id,
+                    p_reason: 'order_expire',
+                })
 
-                        if (rpcErr) {
-                            console.warn(`[ERROR] Could not adjust stock for product ${item.product_id}:`, rpcErr)
-                            continue
-                        }
-
-                        // Hareket kaydı
-                        await supabase.from('inventory_movements').insert({
-                            product_id: item.product_id,
-                            delta: item.quantity,
-                            reason: 'return', 
-                            order_id: order.id
-                        })
-                        
-                        console.warn(`[SUCCESS] Returned ${item.quantity} units to product ${item.product_id} from order ${order.order_number || order.id}`)
+                if (restoreErr) {
+                    console.warn(`[ERROR] Stock restore RPC failed for order ${order.id}:`, restoreErr)
+                } else {
+                    // HTTP 200 tek başına başarı DEĞİL — T052'nin kök sebeplerinden biri tam
+                    // olarak bu varsayımdı (callback, RPC'nin `success:false` yanıtına bakmadan
+                    // `stock_processed=true` damgası basıyordu).
+                    const restore = restoreRaw as { success?: boolean; error?: string; restored_count?: number; restored_units?: number } | null
+                    if (restore?.success === false) {
+                        console.warn(`[ERROR] Stock restore rejected for order ${order.id}: ${restore.error}`)
+                    } else {
+                        console.warn(`[SUCCESS] Order ${order.order_number || order.id}: ${restore?.restored_count ?? 0} product(s), ${restore?.restored_units ?? 0} unit(s) restored`)
                     }
                 }
                 

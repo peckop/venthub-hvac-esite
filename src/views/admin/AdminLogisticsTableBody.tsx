@@ -255,7 +255,7 @@ const AdminLogisticsTableBody: React.FC = () => {
         header: t('admin.logistics.table.order'),
         sortable: true,
         cell: (r) => (
-          <span className="bg-cyan-500/10 px-2 py-1 rounded-lg border border-cyan-500/20 font-mono text-xs font-black text-cyan-400">
+          <span className="bg-admin-accent-weak px-2 py-1 rounded-admin-md border border-admin-accent/30 font-mono text-xs font-semibold text-admin-accent">
             {HASH}{r.order_number}
           </span>
         ),
@@ -265,7 +265,7 @@ const AdminLogisticsTableBody: React.FC = () => {
         header: t('admin.logistics.table.customer'),
         sortable: true,
         cell: (r) => (
-          <span className="font-black text-slate-100 uppercase tracking-tight">
+          <span className="font-semibold text-admin-fg tracking-tight">
             {r.customer_name || '-'}
           </span>
         ),
@@ -275,7 +275,7 @@ const AdminLogisticsTableBody: React.FC = () => {
         header: t('admin.logistics.table.date'),
         sortable: true,
         cell: (r) => (
-          <span className="text-xs font-bold text-slate-400">
+          <span className="text-xs font-bold text-admin-fg-muted">
             {formatDateTime(r.created_at, lang)}
           </span>
         ),
@@ -292,7 +292,7 @@ const AdminLogisticsTableBody: React.FC = () => {
                 disabled={!hasWriteAccess || saving}
                 value={currentCarrier}
                 onChange={(e) => updateRowDraft(r.id, 'carrier', e.target.value)}
-                className={`${adminSelectClass} !py-2 !text-xs !rounded-xl !bg-surface-deep/60 disabled:opacity-40`}
+                className={`${adminSelectClass} !py-2 !text-xs !rounded-admin-md !bg-surface-deep/60 disabled:opacity-40`}
                 style={adminSelectStyle}
               >
                 <option value="Yurtiçi">{t('admin.logistics.carriers.yurtici')}</option>
@@ -318,7 +318,7 @@ const AdminLogisticsTableBody: React.FC = () => {
               value={currentTracking}
               onChange={(e) => updateRowDraft(r.id, 'tracking_number', e.target.value)}
               placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
-              className={`${adminInputClass} !py-2 !text-xs !rounded-xl !bg-surface-deep/60 !font-mono focus:!bg-white/3 disabled:opacity-40`}
+              className={`${adminInputClass} !py-2 !text-xs !rounded-admin-md !bg-surface-deep/60 !font-mono focus-visible:!bg-admin-surface-2 disabled:opacity-40`}
             />
           )
         },
@@ -370,10 +370,10 @@ const AdminLogisticsTableBody: React.FC = () => {
         toolbarSlot={
           <div className="space-y-6">
             <div className={`${adminCardClass} p-8 flex flex-col md:flex-row md:items-end gap-6 relative overflow-hidden group`}>
-              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-cyan-500/10" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-admin-accent-weak rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-admin-accent-weak" />
 
-              <div className="flex-1 space-y-3 relative z-10">
-                <label className="block text-xs font-black text-slate-500 uppercase tracking-hvac-normal ml-1">
+              <div className="flex-1 space-y-3 relative z-raised">
+                <label className="block text-xs font-semibold text-admin-fg-muted ml-1">
                   {t('admin.orders.modals.shipping.carrierLabel')}
                 </label>
                 <div className="relative max-w-xs">
@@ -394,7 +394,7 @@ const AdminLogisticsTableBody: React.FC = () => {
               {hasWriteAccess && (
                 <button
                   onClick={applyGlobalCarrier}
-                  className="h-12 px-8 rounded-2xl bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-transform active:scale-95 relative z-10"
+                  className="h-12 px-8 rounded-admin-lg bg-admin-surface-2 border border-admin-border text-admin-fg text-xs font-semibold hover:bg-admin-surface-3 hover:border-admin-border transition-transform active:scale-95 relative z-raised"
                 >
                   {t('admin.logistics.applyToAll')}
                 </button>

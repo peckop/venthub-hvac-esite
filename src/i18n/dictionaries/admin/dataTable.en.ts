@@ -11,6 +11,13 @@ export const dataTable = {
         clearAll: 'Clear all filters',
         facetEmpty: 'No results for this filter'
       },
+      // ColumnsMenu (kit-wide: all 14 admin tables share this menu).
+      columns: {
+        title: 'Active Columns',
+        density: 'Row Density',
+        densityComfortable: 'Comfortable (Default)',
+        densityCompact: 'Compact (Maximum Data)'
+      },
       states: {
         loading: 'Loading...',
         error: 'An error occurred while loading data',
@@ -22,6 +29,7 @@ export const dataTable = {
         rowsPerPage: 'Rows per page'
       },
       export: {
-        csv: 'Download CSV'
+        csv: 'Download CSV',
+        fileFormat: 'File Format'
       }
 };

@@ -2,37 +2,45 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\CategoriesTableBody.tsx
-skeleton_hash: 097ab28f4c3c8803
+source_path: C:\Users\alize\venthub-wt-admin\src\views\admin\CategoriesTableBody.tsx
+skeleton_hash: ade322d276d3ca4e
 entity_hashes:
   func:CategoriesTableBody: d50fe77bdbd7da87
   func:categoriesFetcher: c2a94f9401915640
-  overview: 22cea1905ba0d279
+  overview: e8914144c0390be2
   style_tokens: fc380c343feea254
-generated_at: 2026-06-19T20:49:57Z
+generated_at: 2026-08-15T15:13:57Z
 ---
 
 ## Genel Bakış
-Bu modül, admin panelindeki kategoriler tablosunun gövde bölümünü render eden React bileşeni ve bu bileşenin ihtiyaç duyduğu verileri Supabase veritabanından asenkron olarak çeken veri getirici fonksiyonunu içerir. Modül, veri erişimi ve sunum katmanlarını tek bir dosyada birleştirerek kategori yönetimi arayüzünün temel parçasını oluşturur.
+Bu modül, admin panelindeki kategoriler tablosunun verilerini getiren ve sunan iki temel parçadan oluşur: asenkron veri çekme fonksiyonu ve bu veriyi tablo gövdesi olarak render eden React bileşeni. Modül, veritabanı ile arayüz arasındaki köprüyü kurarak kategori yönetim arayüzünün işlevsel temelini sağlar.
 
 ## Fonksiyon Grupları
-### Veri Erişimi
-Bu grup, Supabase veritabanından kategori kayıtlarını çekmek için kullanılan asenkron veri getirici mantığını içerir. Fonksiyon, filtreleme ve sayfalama parametrelerini işleyerek tutarlı bir veri yapısı döndürür.
+### Veri Getirme
+Bu grup, Supabase veritabanından kategori kayıtlarını asenkron olarak çeken ve istenen formata dönüştüren fonksiyonu içerir. Fonksiyon, filtreleme parametrelerini işleyerek tutarlı bir veri yapısı döndürür.
 - categoriesFetcher
 
-### Görsel Bileşen
-Bu grup, çekilen kategori verilerini bir tablo gövdesi içinde kullanıcıya sunan React fonksiyonel bileşenini kapsar. Bileşen, gelen veriyi satırlar ve hücreler halinde düzenleyerek admin arayüzünün interaktif bir parçasını oluşturur.
+### Arayüz Bileşeni
+Bu grup, getirilen verileri bir tablo gövdesi içinde düzenleyerek kullanıcıya sunan React fonksiyonel bileşenini kapsar. Bileşen, veriyi satırlar halinde göstererek admin panelinin etkileşimli bir parçasını oluşturur.
 - CategoriesTableBody
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için, veri erişim ve sunum katmanlarının doğru entegrasyonu temel bir varsayımdır.
 
-[Aksiyom 1]: Eğer `categoriesFetcher` fonksiyonuna geçirilen `supabase` parametresi, geçerli ve aktif bir Supabase veritabanı bağlantısı içermiyorsa, fonksiyon asenkron veri getirme işlemini başlatamaz veya bir hata fırlatır.
-[Aksiyom 2]: Eğer `categoriesFetcher` fonksiyonuna geçirilen `_params` (FetchParams) parametresi, modülün beklediği filtreleme ve sayfalama bilgilerini içermiyorsa (örneğin, `undefined` veya geçersiz bir yapıdaysa), veritabanı sorgusu tutarsız sonuçlar döndürür veya başarıyla tamamlanamaz.
-[Aksiyom 3]: Eğer `CATEGORY_SELECT` sabiti (veritabanı sorgusunda seçilecek alanları belirtir) boş bir string ise veya `categories` tablosunda karşılığı olmayan alan adlarını içeriyorsa, `categoriesFetcher` fonksiyonu geçerli bir veri yapısı (`DbCategory`) üretemez ve hata oluşur.
-[Aksiyom 4]: Eğer `CategoriesTableBody` React bileşeni, `categoriesFetcher` tarafından döndürülen verileri alamazsa (örneğin, veri yükleme durumu henüz tamamlanmadıysa veya bir hata oluştuysa), bileşen kendi içinde tanı
+Bu modül, Supabase üzerinden kategori verilerini çekip admin panelinde tablo olarak gösteren bir veri getirici ve sunum bileşeni içerir.
+
+---
+
+**[Aksiyom 1]:** Eğer `categoriesFetcher` fonksiyonuna geçerli bir SupabaseClient bağlantısı (`supabase`) sağlanmazsa, veritabanı sorgusu başarısız olur ve kategori verileri getirilemez.
+
+**[Aksiyom 2]:** Eğer Supabase veritabanında `DbCategory` yapısına karşılık gelen kategori tablosu (ilgili alanlar ve şema) yoksa veya `CATEGORY_SELECT` sabitinde belirtilen alan adları tabloda mevcut değilse, `categoriesFetcher` fonksiyonu geçersiz veya eksik veri döndürür.
+
+**[Aksiyom 3]:** Eğer `_params` (FetchParams) parametresi geçersiz veya eksik değerler içeriyorsa (örn: geçersiz sayfalama, filtre parametreleri), `categoriesFetcher` fonksiyonu beklenen `FetchResult<DbCategory>` yapısını doğru üretemez.
+
+**[Aksiyom 4]:** Eğer `CategoriesTableBody` bileşeni, verilerini sağlamak için `categoriesFetcher` fonksiyonunu çağıran bir üst bileşen veya context tarafından sarmalanmazsa, bileşen veriye erişemez ve boş/hatalı bir tablo render eder.
+
+**[Aksiyom 5]:** Eğer `CATEGORY_SELECT` sabiti (str) değiştirilir veya silinirse, Supabase sorgusunda seçilecek alanlar tanımsız olacağından `categoriesFetcher` fonksiyonu beklenen alanları içermeyen veri döndürür.
 
 ---
 
@@ -66,6 +74,7 @@ Bu modül için, veri erişim ve sunum katmanlarının doğru entegrasyonu temel
 - import: ../../components/admin/categories/CategoryFormModal::CategoryFormModal
 - import: ../../components/admin/data-table/DataTableKit::DataTableKit
 - import: ../../components/admin/data-table/types::type { AdminColumn }
+- import: ../../components/admin/overlay/ConfirmProvider::useConfirm
 - import: ../../hooks/useAdminTable::type FetchParams
 - import: ../../hooks/useAdminTable::type FetchResult
 - import: ../../hooks/useAdminTable::useAdminTable
@@ -102,158 +111,217 @@ Bu modül için, veri erişim ve sunum katmanlarının doğru entegrasyonu temel
 ### [N1_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::categoriesFetcher
 - **params**: `(supabase: SupabaseClient<Database>, _params: FetchParams)`
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen ham veri (DbCategory[] veya null)
-  - `error` — Supabase sorgusu sırasında oluşabilecek hata nesnesi
-  - `rows` — data'nın DbCategory[] tipine cast edilmiş hali; null ise boş dizi
-- **Dönüş**: `Promise<FetchResult<DbCategory>>` — `{ rows, totalMatched }` objesi
+  - `data` — Supabase'den dönen ham kategori satırları (DbCategory[])
+  - `error` — Supabase sorgusundaki hata nesnesi, varsa throw edilir
+  - `rows` — data'nın DbCategory[] olarak cast edilmiş hali, null ise boş dizi
+  - `totalMatched` — toplam satır sayısı (rows.length)
+- **Dönüş**: `{ rows, totalMatched: rows.length }` — `Promise<FetchResult<DbCategory>>`
+- **Yan etkiler**: `ensureSessionFresh()` çağırarak oturum yeniler; `categories` tablosundan sıralı veri çeker
 
 ---
 
-### [N2_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody
-- **params**: `(parametre yok)`
-- **ic_degiskenler**:
-  - `supabaseBrowserClient` — modülden import edilen Supabase browser client örneği, tüm CRUD操作larında kullanılır
-  - `hasWriteAccess` — kullanıcının yazma izni olup olmadığını belirten boolean (dışarıdan gelir)
-  - `t` — i18n çeviri fonksiyonu
-  - `router` — `useRouter()` hook'undan gelen Next.js yönlendirme nesnesi
-  - `table` — admin tablo hook'undan gelen tablo yönetimi nesnesi (fetchAllForExport, reload, selection, allRows, fetchAllForExport metodları)
-  - `editingId` — şu anda düzenlenen kategorinin ID'si (setEditingId ile yönetilir)
-  - `isModalOpen` — modalın açık olup olmadığını tutan boolean state (setIsModalOpen)
-  - `query` — arama sorgusu stringi (setQuery ile yönetilir)
-  - `activeStatuses` — filtrelenen aktif durum değerleri dizisi (setFilter ile yönetilir)
-  - `categoryNameMap` — kategori ID -> isim eşlemesi yapan Map nesnesi, parent isim gösteriminde kullanılır
-  - `val` — EditableCell'den gelen yeni isim/sıralama değeri
-  - `r` — DbCategory tipinde tekil satır verisi (tüm callbacklerde döngü veya parametre olarak gelir)
-  - `ids` — tablo seçimindeki seçili kategori ID'leri dizisi
-  - `isActive` — toplu durum güncellemesinde hedef aktiflik değeri (true/false)
-  - `featured` — toplu öne çıkma güncellemesinde hedef değer
-  - `num` — sıralama düzenlemesinde string'den parse edilmiş sayısal değer
-  - `is` — catch bloğundaki hata nesnesi
-  - `cols` — CSV dışa aktarımında kullanılacak sütun adları dizisi
-  - `header` — CSV dosyasının ilk satırı (sütun adları birleşik)
-  - `lines` — her satırı CSV formatına dönüştürülmüş veri dizisi
-  - `csv` — BOM karakteri ile başlayan tam CSV içeriği stringi
-  - `blob` — CSV verisinden oluşturulan Blob nesnesi
-  - `url` — Blob için oluşturulan Object URL
-  - `a` — indirme tetiklemek için oluşturulan geçici `<a>` DOM elemanı
-  - `process.env.NEXT_PUBLIC_SUPABASE_URL` — Supabase depolama URL'i, görsel yüklemelerinde kullanılır
-  - `adminTableActionClass` — aksiyon butonları için ortak CSS sınıfı
-  - `adminTableActionDangerClass` — tehlikeli aksiyon butonları için CSS sınıfı
-- **Dönüş**: `React.FC` — JSX ile admin kategorileri tablosunu render eden React bileşeni
+### [N2_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::openAdd (anonim callback)
+- **params**: `()` — parametre yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `setEditingId(null)` ve `isModalOpen(true)` state'lerini ayarlayarak modal açar
 
 ---
 
-### [N3_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (saveName callback)
-- **params**: `(r: DbCategory, raw: string | number)`
-- **ic_degiskenler**:
-  - `val` — raw değerinin trim edilmiş string hali, boş veya aynı isimse işlem yapılmaz
-  - `error` — mutateWithAudit fn içindeki Supabase update işleminde oluşabilecek hata
-- **Dönüş**: `Promise<void>` — Toast bildirimi ve tabloyu yeniden yükleme (yan etki)
+### [N3_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::openEdit (anonim callback)
+- **params**: `(r: DbCategory)` — düzenlenecek kategori satırı
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `setEditingId(r.id)` ve `setIsModalOpen(true)` ile düzenleme modunda modal açar
 
 ---
 
-### [N4_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (saveSortOrder callback)
-- **params**: `(r: DbCategory, raw: string | number)`
+### [N4_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::saveName (anonim async callback)
+- **params**: `(r: DbCategory, raw: string | number)` — satır ve yeni ad değeri
 - **ic_degiskenler**:
-  - `num` — raw değerinin parseInt ile parse edilmiş tam sayı hali; NaN veya aynı sıralama ise iptal
-  - `error` — mutateWithAudit fn içindeki Supabase update işleminde oluşabilecek hata
-- **Dönüş**: `Promise<void>` — Toast bildirimi ve tabloyu yeniden yükleme (yan etki)
+  - `val` — raw değerinin trim edilmiş string hali
+  - `e` — try/catch yakalanan hata nesnesi (AdminPermissionError veya Error)
+- **Dönüş**: yok (void); hata durumunda throw eder
+- **Yan etkiler**: `mutateWithAudit` ile audit loglu isim günceller, `toast.success/error` gösterir, `table.reload()` çağırarak tabloyu yeniler
 
 ---
 
-### [N5_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (removeCategory callback)
-- **params**: `(r: DbCategory)`
+### [N5_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::saveSortOrder (anonim async callback)
+- **params**: `(r: DbCategory, raw: string | number)` — satır ve yeni sıralama değeri
 - **ic_degiskenler**:
-  - `error` — mutateWithAudit fn içindeki Supabase delete işleminde oluşabilecek hata
-- **Dönüş**: `Promise<void>` — Onay dialogu, silme işlemi, Toast bildirimi (yan etki)
+  - `num` — raw değerinin parseInt ile ondalık tamsayıya dönüştürülmüş hali
+  - `e` — try/catch yakalanan hata nesnesi
+- **Dönüş**: yok (void); hata durumunda throw eder
+- **Yan etkiler**: `mutateWithAudit` ile audit loglu sıralama günceller, `toast.success/error` gösterir, `table.reload()` çağırır
 
 ---
 
-### [N6_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (handleExportCsv callback)
-- **params**: `(parametre yok)`
+### [N6_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::removeCategory (anonim async callback)
+- **params**: `(r: DbCategory)` — silinecek kategori satırı
 - **ic_degiskenler**:
-  - `rows` — `table.fetchAllForExport()` ile gelen tüm satırlar dizisi
-  - `cols` — CSV sütun başlıkları: `['id', 'name', 'slug', 'parent_id', 'is_active', 'sort_order', 'description']`
+  - `ok` — confirm dialog'unun onay sonucu (boolean)
+  - `e` — try/catch yakalanan hata nesnesi
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `hasWriteAccess` kontrolü yapar, `confirm` dialogu gösterir, `mutateWithAudit` ile silme işlemi yapar, `toast.success/error` gösterir, `table.reload()` çağırır
+
+---
+
+### [N7_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::exportCSV (anonim async callback)
+- **params**: `()` — parametre yok
+- **ic_degiskenler**:
+  - `rows` — `table.fetchAllForExport()` ile çekilen tüm satırlar
+  - `cols` — CSV sütun başlıkları dizisi (`['id', 'name', 'slug', ...]`)
   - `header` — virgülle birleştirilmiş sütun başlık satırı
-  - `lines` — her satırın CSV formatına dönüştürülmüş hali (tırnak escape'li)
-  - `csv` — BOM (`\ufeff`) ile başlayan tam CSV içeriği
-  - `blob` — CSV stringinden oluşturulan Blob (text/csv charset utf-8)
-  - `url` — Blob için URL.createObjectURL ile oluşturulan URL
-  - `a` — document.createElement('a') ile oluşturulan geçici indirme linki DOM elemanı
-- **Dönüş**: `Promise<void>` — CSV dosyasını tarayıcıda indirme tetikler (yan etki)
+  - `lines` — her satırın CSV formatına dönüştürülmüş hali (map ile üretilir)
+  - `csv` — BOM (\ufeff) ve tüm satırları birleştiren tam CSV string
+  - `blob` — CSV içeriğinden oluşturulan Blob nesnesi
+  - `url` — blob için oluşturulmuş object URL
+  - `a` — dosya indirmek için oluşturulan `<a>` DOM elementi
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `document.createElement('a')` ile DOM'a enjekte edip `a.click()` ile dosya indirme tetikler, `URL.revokeObjectURL` ile URL'i temizler
 
 ---
 
-### [N7_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (bulkSetStatus callback)
-- **params**: `(status: string)`
+### [N8_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::bulkStatusChange (anonim async callback)
+- **params**: `(status: string)` — hedef durum ('active' veya diğer)
 - **ic_degiskenler**:
-  - `ids` — `table.selection.selectedIds` ile gelen seçili kategori ID'leri dizisi
-  - `isActive` — status === 'active' kontrolünden türetilen boolean değer
-  - `error` — mutateWithAudit fn içindeki Supabase update işleminde oluşabilecek hata
-- **Dönüş**: `Promise<void>` — Toplu aktif/pasif durum güncelleme (yan etki)
+  - `ids` — `table.selection.selectedIds` ile seçili satır ID'leri dizisi
+  - `isActive` — status === 'active' sonucu boolean
+  - `ok` — confirm dialog onay sonucu
+  - `e` — try/catch yakalanan hata nesnesi
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `mutateWithAudit` ile toplu aktif/pasif durum günceller, `table.selection.clear()` ile seçimi temizler, `table.reload()` çağırır, toast gösterir
 
 ---
 
-### [N8_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (bulkSetFeatured callback)
-- **params**: `(featured: boolean)`
+### [N9_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::bulkFeaturedChange (anonim async callback)
+- **params**: `(featured: boolean)` — öne çıkan durumu
 - **ic_degiskenler**:
-  - `ids` — `table.selection.selectedIds` ile gelen seçili kategori ID'leri dizisi
-  - `error` — mutateWithAudit fn içindeki Supabase update işleminde oluşabilecek hata
-- **Dönüş**: `Promise<void>` — Toplu öne çıkma durumu güncelleme (yan etki)
+  - `ids` — `table.selection.selectedIds` ile seçili satır ID'leri dizisi
+  - `e` — try/catch yakalanan hata nesnesi
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `mutateWithAudit` ile toplu is_featured günceller, `table.selection.clear()` ve `table.reload()` çağırır, toast gösterir
 
 ---
 
-### [N9_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (bulkDelete callback)
-- **params**: `(parametre yok)`
+### [N10_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::bulkDelete (anonim async callback)
+- **params**: `()` — parametre yok
 - **ic_degiskenler**:
-  - `ids` — `table.selection.selectedIds` ile gelen seçili kategori ID'leri dizisi
-  - `error` — mutateWithAudit fn içindeki Supabase delete işleminde oluşabilecek hata
-- **Dönüş**: `Promise<void>` — Toplu silme onayı ve işleme (yan etki)
+  - `ids` — `table.selection.selectedIds` ile seçili satır ID'leri dizisi
+  - `ok` — confirm dialog onay sonucu
+  - `e` — try/catch yakalanan hata nesnesi
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `confirm` dialogu ile silme onayı alır, `mutateWithAudit` ile toplu silme yapar, `table.selection.clear()` ve `table.reload()` çağırır, toast gösterir
 
 ---
 
-### [N10_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (statusFilterItems getter)
-- **params**: `(parametre yok)`
-- **ic_degiskenler**: (yok — inline map)
-- **Dönüş**: Array — aktif/pasif durum filtre seçenekleri dizisi; her eleman `{ key, label, active, onToggle }` formatında
-
----
-
-### [N11_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (parentFilterOptions getter)
-- **params**: `(parametre yok)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: Array — tüm üst kategorilerin `{ value, label }` formatında options dizisi; ilk eleman "Tümü" seçeneği
-
----
-
-### [N12_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (handleClearFilters callback)
-- **params**: `(parametre yok)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `void` — query'yi boş stringe, parent_id ve is_active filtrelerini boş dizilere set eder
-
----
-
-### [N13_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (columns definition)
-- **params**: `(parametre yok)`
+### [N11_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::statusFilterItems (anonim callback)
+- **params**: `()` — parametre yok
 - **ic_degiskenler**:
-  - `r` — her cell render fonksiyonuna giren DbCategory tipinde satır verisi
-  - `process.env.NEXT_PUBLIC_SUPABASE_URL` — VentImage src oluşturma için Supabase storage URL'i
-  - `categoryNameMap` — parent_id'den kategori adına karşılık gelen Map erişimi
-- **Dönüş**: Array — tablo sütun tanımları dizisi; her biri `{ key, header, sortable, hideable, align, cell, defaultHidden }` formatında
+  - `activeStatuses` — filtrede aktif olan durum stringleri dizisi (dış scope'tan)
+  - `s` — map içinde her bir durum objesi `{ key: string, label: string }`
+  - `next` — toggle sonrası güncellenmiş aktif durumlar dizisi
+- **Dönüş**: `{ key, label, active, onToggle }[]` — toolbar'a verilen filtre butonları
+- **Yan etkiler**: `setFilter('is_active', next)` ile filtre state'ini günceller
 
 ---
 
-### [N14_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (handlePriceAdjustment stub)
-- **params**: `(parametre yok)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `void` — her zaman toast.error ile "Categories do not support price adjustments" mesajı gösterir
+### [N12_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::parentFilterOptions (anonim callback)
+- **params**: `()` — parametre yok
+- **ic_degiskenler**: yok (inline mapping)
+- **Dönüş**: `{ value: string, label: string }[]` — üst kategori filtre seçenekleri
+- **Yan etkiler**: `table.allRows`'ı `!c.parent_id` ile filtreleyip üst kategorileri option listesine dönüştürür
 
 ---
 
-### [N15_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::CategoriesTableBody (handleReload callback)
-- **params**: `(parametre yok)`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `Promise<void>` — `table.reload()` çağırarak tabloyu yeniden yükler
+### [N13_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::clearFilters (anonim callback)
+- **params**: `()` — parametre yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `setQuery('')`, `setFilter('parent_id', [])`, `setFilter('is_active', [])` ile tüm filtreleri sıfırlar
+
+---
+
+### [N14_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::columns (anonim callback)
+- **params**: `()` — parametre yok
+- **ic_degiskenler**:
+  - `r` — her hücrede render edilen DbCategory satırı (map callback parametresi)
+  - `process.env.NEXT_PUBLIC_SUPABASE_URL` — Supabase storage URL'i (image sütunu için)
+  - `categoryNameMap` — kategori ID → isim eşlemesi Map nesnesi (parent sütunu için)
+- **Dönüş**: sütun tanımları dizisi (table columns config)
+- **Yan etkiler**: `router.push` ile navigasyon tetikler (design butonu), `openEdit(r)` ve `removeCategory(r)` callback'lerini bağlar
+
+---
+
+### [N15_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::imageCellRenderer (anonim callback)
+- **params**: `(r)` — DbCategory satırı
+- **ic_degiskenler**: yok (inline JSX)
+- **Dönüş**: JSX.Element — kategori görsel hücresi
+- **Yan etkiler**: yok
+
+---
+
+### [N16_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::nameCellRenderer (anonim callback)
+- **params**: `(r)` — DbCategory satırı
+- **ic_degiskenler**: yok (inline JSX)
+- **Dönüş**: JSX.Element — kategori adı hücresi (EditableCell veya span)
+- **Yan etkiler**: `saveName(r, val)` çağırarak isim kaydeder
+
+---
+
+### [N17_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::sortOrderCellRenderer (anonim callback)
+- **params**: `(r)` — DbCategory satırı
+- **ic_degiskenler**: yok (inline JSX)
+- **Dönüş**: JSX.Element — sıralama hücresi (EditableCell veya span)
+- **Yan etkiler**: `saveSortOrder(r, val)` çağırarak sıralama kaydeder
+
+---
+
+### [N18_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::slugCellRenderer (anonim callback)
+- **params**: `(r)` — DbCategory satırı
+- **ic_degiskenler**: yok (inline JSX)
+- **Dönüş**: JSX.Element — slug hücresi (code elementi)
+- **Yan etkiler**: yok
+
+---
+
+### [N19_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::parentCellRenderer (anonim callback)
+- **params**: `(r)` — DbCategory satırı
+- **ic_degiskenler**: yok (inline JSX)
+- **Dönüş**: JSX.Element — üst kategori adı hücresi
+- **Yan etkiler**: `categoryNameMap.get(r.parent_id)` ile üst kategori ismini çeker
+
+---
+
+### [N20_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::descriptionCellRenderer (anonim callback)
+- **params**: `(r)` — DbCategory satırı
+- **ic_degiskenler**: yok (inline JSX)
+- **Dönüş**: JSX.Element — açıklama hücreesi
+- **Yan etkiler**: yok
+
+---
+
+### [N21_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::actionsCellRenderer (anonim callback)
+- **params**: `(r)` — DbCategory satırı
+- **ic_degiskenler**: yok (inline JSX)
+- **Dönüş**: JSX.Element — aksiyon butonları hücresi (tasarım, düzenle, sil)
+- **Yan etkiler**: `router.push`, `openEdit(r)`, `removeCategory(r)` çağırır
+
+---
+
+### [N22_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::onPriceAdjustClick (anonim callback)
+- **params**: `()` — parametre yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `toast.error('Categories do not support price adjustments')` gösterir
+
+---
+
+### [N23_NASIL] AST Pointer: `src/views/admin/CategoriesTableBody.tsx`::onTableActionComplete (anonim callback)
+- **params**: `()` — parametre yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok (void)
+- **Yan etkiler**: `void table.reload()` ile tabloyu yeniler
 
 ---
 

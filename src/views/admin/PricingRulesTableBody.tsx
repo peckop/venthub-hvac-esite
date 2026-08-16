@@ -18,6 +18,7 @@ import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import { FacetedFilter } from '../../components/admin/data-table/FacetedFilter'
 import type { AdminColumn, DataTableFacet } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
+import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import CostRefreshModal from '../../components/admin/pricing/CostRefreshModal'
 import MaterializePricesModal from '../../components/admin/pricing/MaterializePricesModal'
 import PricingRuleFormModal from '../../components/admin/pricing/PricingRuleFormModal'
@@ -160,6 +161,7 @@ async function pricingRulesFetcher(
 
 const PricingRulesTableBody: React.FC = () => {
   const { t, lang } = useI18n()
+  const confirm = useConfirm()
   const locale = lang === 'en' ? 'en' : 'tr'
   const { role, loading: roleLoading, canWrite } = useRole()
   const hasWriteAccess = canWrite('pricing')
@@ -191,7 +193,12 @@ const PricingRulesTableBody: React.FC = () => {
 
   const removeRule = useCallback(
     async (row: RuleRow) => {
-      if (!window.confirm(t('admin.pricing.rules.confirm.delete'))) return
+      const ok = await confirm({
+        description: t('admin.pricing.rules.confirm.delete'),
+        confirmLabel: t('admin.confirm.delete'),
+        tone: 'danger',
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'pricing_rule',
@@ -215,13 +222,18 @@ const PricingRulesTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [confirm, hasWriteAccess, t, table],
   )
 
   const bulkDelete = useCallback(async () => {
     const ids = table.selection.selectedIds
     if (ids.length === 0) return
-    if (!window.confirm(t('admin.pricing.rules.confirm.bulkDelete', { count: ids.length }))) return
+    const ok = await confirm({
+      description: t('admin.pricing.rules.confirm.bulkDelete', { count: ids.length }),
+      confirmLabel: t('admin.confirm.delete'),
+      tone: 'danger',
+    })
+    if (!ok) return
     try {
       await mutateWithAudit(supabaseBrowserClient, {
         resource: 'pricing_rule',
@@ -245,7 +257,7 @@ const PricingRulesTableBody: React.FC = () => {
           : t('admin.pricing.rules.toasts.deleteFailed'),
       )
     }
-  }, [hasWriteAccess, t, table])
+  }, [confirm, hasWriteAccess, t, table])
 
   const columns = useMemo<AdminColumn<RuleRow>[]>(
     () => [
@@ -254,7 +266,7 @@ const PricingRulesTableBody: React.FC = () => {
         header: t('admin.pricing.common.scopeLabel'),
         sortable: true,
         cell: (r) => (
-          <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-black uppercase tracking-wider">
+          <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-admin-accent-weak border border-admin-accent/30 text-admin-accent text-xs font-semibold">
             {t(`admin.pricing.common.scope.${r.scopeKey}`)}
           </span>
         ),
@@ -264,7 +276,7 @@ const PricingRulesTableBody: React.FC = () => {
         header: t('admin.pricing.rules.table.target'),
         sortable: true,
         cell: (r) => (
-          <span className="text-sm font-bold text-white">
+          <span className="text-sm font-bold text-admin-fg">
             {r.targetName || t('admin.pricing.rules.table.allProducts')}
           </span>
         ),
@@ -275,11 +287,11 @@ const PricingRulesTableBody: React.FC = () => {
         sortable: true,
         cell: (r) => (
           <div className="flex flex-col gap-1">
-            <span className="text-xs font-black uppercase tracking-widest text-slate-300">
+            <span className="text-xs font-semibold text-admin-fg">
               {methodLabel(r.method, t)}
             </span>
             {r.supported ? null : (
-              <span className="inline-flex w-fit items-center px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-black uppercase tracking-wider">
+              <span className="inline-flex w-fit items-center px-2 py-0.5 rounded-full bg-admin-warning-weak border border-admin-warning/30 text-admin-warning text-xs font-semibold">
                 {t('admin.pricing.rules.table.outOfW1')}
               </span>
             )}
@@ -294,10 +306,10 @@ const PricingRulesTableBody: React.FC = () => {
           if (r.method === 'cost_plus' && r.marginPct !== null) {
             return (
               <div className="flex flex-col items-end gap-0.5">
-                <span className="text-sm font-black text-white">
+                <span className="text-sm font-semibold text-admin-fg">
                   {`%${formatNumber(r.marginPct, locale, { maximumFractionDigits: 2 })}`}
                 </span>
-                <span className="text-xs font-bold text-slate-500">
+                <span className="text-xs font-bold text-admin-fg-muted">
                   {`×${formatNumber(marginPctToCoefficient(r.marginPct), locale, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 4,
@@ -309,17 +321,17 @@ const PricingRulesTableBody: React.FC = () => {
           if (r.method === 'fixed' && r.fixedPrice !== null) {
             return (
               <div className="flex flex-col items-end gap-0.5">
-                <span className="text-sm font-black text-white">
+                <span className="text-sm font-semibold text-admin-fg">
                   {/* Para birimi ZORUNLU: verilmezse format yardımcısı EN dilinde USD'ye düşer ($ sızar). */}
                   {formatCurrency(r.fixedPrice, locale, { currency: r.raw.currency ?? 'TRY' })}
                 </span>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <span className="text-xs font-bold text-admin-fg-muted">
                   {t(r.vatInclusive ? 'admin.pricing.common.vatIncluded' : 'admin.pricing.common.vatExcluded')}
                 </span>
               </div>
             )
           }
-          return <span className="text-xs font-bold text-slate-600">{'—'}</span>
+          return <span className="text-xs font-bold text-admin-fg-subtle">{'—'}</span>
         },
       },
       {
@@ -327,7 +339,7 @@ const PricingRulesTableBody: React.FC = () => {
         header: t('admin.pricing.rules.table.priority'),
         sortable: true,
         align: 'right',
-        cell: (r) => <span className="text-sm font-black text-slate-300">{r.priority}</span>,
+        cell: (r) => <span className="text-sm font-semibold text-admin-fg">{r.priority}</span>,
       },
       {
         key: 'validity',
@@ -335,14 +347,14 @@ const PricingRulesTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div
-            className={`flex flex-col gap-1 text-xs font-black uppercase tracking-widest ${
+            className={`flex flex-col gap-1 text-xs font-semibold ${
               r.status === 'expired' ? 'opacity-50' : ''
             }`}
           >
-            <span className="text-white/80">
+            <span className="text-admin-fg">
               {r.validFrom ? formatDate(r.validFrom, locale) : t('admin.pricing.rules.table.noStart')}
             </span>
-            <span className="text-slate-500">
+            <span className="text-admin-fg-muted">
               {r.validTo ? formatDate(r.validTo, locale) : t('admin.pricing.rules.table.unlimited')}
             </span>
           </div>
@@ -354,12 +366,12 @@ const PricingRulesTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <span
-            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${
+            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${
               r.status === 'active'
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                ? 'bg-admin-success-weak text-admin-success border-admin-success/30'
                 : r.status === 'scheduled'
-                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                  : 'bg-slate-500/10 text-slate-400 border-white/5'
+                  ? 'bg-admin-accent-weak text-admin-accent border-admin-accent/30'
+                  : 'bg-admin-surface-3 text-admin-fg-muted border-admin-border'
             }`}
           >
             {t(`admin.pricing.rules.status.${r.status}`)}

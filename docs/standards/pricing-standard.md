@@ -127,9 +127,16 @@ Kural başına: `method ∈ {cost_plus, fixed, percent_off_list}`, `base ∈ {co
 - **İşlem para birimi daima TRY.** Tahsilat (İyzico), fatura, KDV, iade TL üzerindendir. EUR/USD gösterimi
   **yalnız vitrin bilgilendirmesidir**; etikette bu açıkça belirtilir.
 - **Sipariş satırı kur snapshot'ı ZORUNLU:** `display_currency` + `display_rate` + `rate_effective_date`
-  sipariş kalemine kopyalanır. ⚠️ Canlı `venthub_order_items`'ta bu üç alan **YOK** — çoklu-para gösterimi
-  bu alanlar eklenmeden açılırsa geçmiş siparişler her kur hareketinde yeniden değerlenir. §13'teki
-  snapshot listesi bu nedenle **6 → 9 alana** çıkarıldı.
+  sipariş kalemine kopyalanır. §13'teki snapshot listesi bu nedenle **6 → 9 alana** çıkarıldı.
+  ✅ **W2b-2'de kapandı** (`20260815210000_pricing_w2b2_order_item_snapshots.sql`): üç alan eklendi,
+  9 alanın 8'i **NOT NULL**'a çekildi (`price_list_id_snapshot` bilerek nullable — fiyat bir listeden
+  değil kuraldan/tekliften gelebilir), bekçisi **INV-PRICE-3**.
+  > **Niçin o gün yapıldı:** tablo o an BOŞTU (0 satır, 2026-08-15'te ölçüldü), yani geri-doldurma
+  > gerekmedi ve kolonlar NOT NULL'a çekilebildi. İlk gerçek sipariş girdikten sonra aynı sertleştirme
+  > migration + backfill + kesinti işine dönerdi. Zamanlama tesadüf değil, pencere buydu.
+- ⚠️ Bu alanlar şu an **TRY/1.0/sipariş tarihi** ile yazılıyor: gösterim para birimi seçimi henüz
+  hiçbir yüzeyde yok (W5). Alanların erken açılmasının sebebi, W5 geldiğinde geçmiş siparişlerin
+  her kur hareketinde yeniden değerlenmesini önlemek.
 - **İade daima orijinal TL tutarından** hesaplanır (gösterim para birimi iadeyi belirlemez).
 - ⚠️ **Bilinen sapma (v1.1):** `spread_pct` üç yerde duruyor (`currency_rates.spread_pct`,
   `site_settings.pricing.display_spread_pct`, admin panelinde salt-okunur kart) ama **hiçbir hesaba girmiyor**
@@ -230,6 +237,23 @@ numarası değil:
 - Uygulama biçimleri: (a) `method='fixed'` kural — hesaplanan fiyatı tek tıkla sabit kurala çevirir;
   (b) `is_derived=false` elle-ezme satırı — tek üründe nokta atışı.
 
+✅ **W5'te CANLI** (`20260816120000_pricing_w5_policy_fx_lock.sql`, bekçi **INV-PRICE-7**):
+`pricing_policy.fx_lock` + künye kolonları; kilit **zincirin iki halkasında da** uygulanıyor
+(`refreshCostInBase` ve `materializePrices`, ayrı `skippedFxLocked` sayaçlarıyla).
+
+> **En özel kazanır, kilidin VARLIĞI değil DEĞERİ belirler.** Daha özel bir `fx_lock=false`
+> politikası, daha genel bir kilidi bozar — "global kilit ama şu ürün hariç" ifade edilebilmeli.
+> Bu en kolay yanlış uygulanacak kural (`policies.some(p => p.fx_lock)` yazmak yeterli), o yüzden
+> INV-PRICE-7'de ayrı bir davranış testi var.
+>
+> **Sessiz atlama yasak.** Dondurma bir KARARdır: "kur değişti ama 40 ürün güncellenmedi" panelde
+> görünmezse "bu fiyat neden değişmedi" sorusu cevapsız kalır. İki özet de `skippedFxLocked` taşır.
+>
+> **Kilit künyesiz olamaz** — DB CHECK'i `fx_lock=true` iken `fx_frozen_rate` zorunlu kılar.
+
+⏳ **Henüz yok:** kilit açma/kapama admin yüzeyi ve `admin_audit_log` kaydı (yüzey ADMIN-OPS
+şeridinde). Bugün politika satırı yalnız DB'den girilebilir.
+
 ### 8.3 Politika katmanı — kural ≠ politika (v1.1)
 
 `pricing_rule` **nasıl hesaplanacağını** taşır; "bu markanın fiyatları EUR gösterilsin", "bu tedarikçi
@@ -241,6 +265,16 @@ pricing_policy(scope, target_id, display_currency, fx_lock, min_margin_pct, ...)
 ```
 
 - Merdiven §3.1 ile birebir aynıdır (en özel kazanır) — ikinci bir öncelik mantığı icat edilmez.
+  ✅ **W5'te uygulandı ve KİLİTLENDİ:** hedef eşleşmesi tek bir fonksiyonda
+  (`scopeMatchesProduct`, `pricing.service.ts`); hem `ruleMatchesProduct` hem politika çözücü
+  onu çağırır. INV-PRICE-7 politika servisinin kendi `switch (x.scope)` bloğunu yazmasını
+  **yasaklar** — iki kopya, bir gün ayrışacak iki mantıktır.
+
+> **W5 KAPSAM KARARI — tablo bilerek DAR açıldı.** Yukarıdaki imzada `display_currency` ve
+> `min_margin_pct` var; canlı tabloda **yok**, yalnız `fx_lock` ve künyesi var. Sebep: onları
+> okuyan tüketici henüz yazılmadı. Bu depoda tam o hata tekrarlıyor — `venthub_order_items`
+> snapshot kolonları bir yıl boş durdu (W2b-2) çünkü "kolon eklemek" ile "sözleşme kurmak"
+> aynı sanıldı. **Alan, tüketicisiyle birlikte gelir.**
 - **Tedarikçi boyutu:** şemada tedarikçi tablosu YOK (`products.supplier_name` serbest metinden ibaret).
   Tedarikçi-bazlı politika **T010 satınalma** ile gelir; o zamana kadar marka kapsamı vekildir.
 - **Marka boyutu kırılgan:** `products.brand` TEXT, `pricing_rule.brand_id` ise `brands(id)` FK'si — köprü
@@ -343,7 +377,7 @@ resolvePrice(supabase, product, qty, currency, userCtx):
 | `any` yasak, strict TS | §3 |
 | Tüm okuma/yazma **tenant-scoped** (`tenant_id = jwt_tenant_id()`) | §12 |
 | Yetki/segment **app_metadata**'dan (asla `user_profiles.role`/`raw_user_meta_data`) | §12 |
-| Sipariş satırında **9 snapshot alanı** dolu (unit/list_id/name/sku/tax_rate/product jsonb **+ display_currency/display_rate/rate_effective_date**) | blueprint §R3 + §4.1 |
+| Sipariş satırında **9 snapshot alanı** yazılır (unit/list_id/name/sku/tax_rate/product jsonb **+ display_currency/display_rate/rate_effective_date**). 8'i DB'de NOT NULL; **`price_list_id_snapshot` bilerek nullable** — fiyat bir listeden değil kuraldan/tekliften gelebilir, o durumda liste kimliği YOKTUR. Kodun alanı **yazması** yine zorunlu, değerin dolu olması değil | blueprint §R3 + §4.1 |
 | Idempotent seed: sabit `valid_from` + `ON CONFLICT DO NOTHING` | blueprint §B2 |
 | Materialize **`is_derived=false` satırı ezmez** (elle-ezme/dondurma dokunulmaz) | §8.1 |
 | KDV oranı **üründen** (`products.tax_rate`/`is_taxable`); kural alanı yalnız override | §5 |
@@ -363,12 +397,40 @@ sanılan iki test aslında YOKTU. Gerçek durum:
 |---|---|---|
 | **INV-PRICE-1** | `products.price` hiçbir müşteri-yüzeyi kod yolunda **doğrudan** okunmaz | ❌ **YOK** — üstelik çözücünün kendisi hâlâ `products.price`'a fallback ediyor (§8 borcu, W4b'de kapanır) |
 | **INV-PRICE-2** | Çözücü segment için `user_profiles.role` okumaz (yalnız `app_metadata`) | ✅ VAR (`pricing-segment-source.test.ts`, ratchet 0, edge dahil) |
-| **INV-PRICE-3** | Sipariş-item yazan her yol snapshot alanlarını doldurur (no-op = FAIL) | ❌ YOK (W2b-2 ile gelir; §4.1 sonrası **9 alan**) |
+| **INV-PRICE-3** | Sipariş-item yazan her yol **9 snapshot alanını** doldurur (no-op = FAIL) | ✅ VAR (`pricing-order-snapshot-contract.test.ts`, W2b-2) — üç yönlü bağ: cetvel §13 ↔ migration NOT NULL ↔ yazma yolu. **Asıl fail-closed katman DB kısıtıdır** (8 alan NOT NULL); test onun da yerinde durduğunu doğrular |
 | **INV-PRICE-4** | Para float saklanmaz; `currency_rates` append-only (UPDATE/DELETE policy yok) | ✅ VAR (`pricing-money-append-only.test.ts`) |
 | **INV-PRICE-5** | KDV oranı üründen okunur; kuralda sabit oran varsayımı yok | ❌ YOK — §5 kararıyla birlikte yazılacak |
 | **INV-PRICE-6** | Cache anahtarı currency içerir; `product_prices`'a yalnız materialize servisi yazar; `is_derived` ayrımı korunur | ✅ VAR (`pricing-cache-invariants.test.ts`) |
+| **INV-PRICE-7** | Fiyat kilidi zincirin **iki halkasında** da uygulanır (`refreshCostInBase` + materialize, `skippedFxLocked` sayaçlı); merdiven **tek** fonksiyondadır (politika kendi `switch (scope)`'unu yazamaz); kilit **künyesiz** olamaz (DB CHECK) | ✅ VAR (`pricing-fx-lock-contract.test.ts`, W5) — davranış + yapı + şema üç katman; 6 merdiven senaryosu gerçekten koşturulur, iki bacaktan bilerek bozulup KIRMIZI görüldü |
 
 > **Kural:** bu tabloda ❌ olan bir maddeyi "kilitli" varsayarak karar verme. Cetvelin kendisi de denetlenir.
+
+### 14.1 INV-PRICE-3'ün bilinen sınırları (kapsamı dürüstçe yaz)
+
+Bir kapının neyi **görmediğini** yazmamak, onu olduğundan güçlü göstermektir.
+
+- **Eş-konumluluk şartı.** Tarayıcı statiktir: 9 alan adını, `insert`/POST'un yapıldığı **aynı
+  dosyada** arar. Satır kurucusunu paylaşılan bir modüle taşımak (ör.
+  `_shared/orderItemSnapshot.ts`) sözleşmeyi bozmaz — **ama testi kırar.** Böyle bir refactor
+  meşrudur; doğru hamle önce tarayıcıyı yeni yapıya uyarlamaktır, alanları geri kopyalamak değil.
+  Bu uyarı testin hata mesajına da gömülüdür (yanlış teşhis, sessiz-yeşilden hızlı güven kaybettirir).
+- **Migration bacağı metinseldir.** Test tek bir migration dosyasının içeriğine bakar, **canlı
+  şemaya değil**. Sonraki bir migration NOT NULL'ı düşürürse test bunu görmez.
+- **Tarama kapsamı** `src/**` + `supabase/functions/**`. `scripts/**` dışarıdadır (bugün orada
+  sipariş kalemi yazan yok).
+- **Kasıtlı atlatma kapsam dışı** (tehdit modeli: drift dedektörü). Tablo adı bir sabite alınırsa
+  (`.from(TABLE)`) yeni yol görünmez olur. Asıl fail-closed katman DB'deki NOT NULL kısıtlarıdır.
+- ~~**`rate_effective_date` UTC tarihidir**~~ ✅ **W5'te KAPANDI.** `iyzico-payment` artık
+  `Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul' })` ile **İstanbul günü** yazıyor.
+  Eskiden TSİ 00:00–03:00 arası verilen sipariş bir önceki günü yazardı; `currency_rates`
+  kayıtları TCMB işiyle İstanbul gününe göre düştüğü için bu, siparişi bir gün eski kura
+  bağlar ve fark **kimseye görünmezdi**. ⚠️ DB varsayılanı (`current_date`) hâlâ sunucu/UTC
+  günüdür — kod değeri **daima açıkça gönderdiği** için pratikte devreye girmez, ama başka bir
+  yazar eklenirse aynı kaymayı geri getirir.
+- **Okuma tarafı yarım.** Yalnız `account/OrderDetailPage` snapshot kolonlarına geçti;
+  `views/OrdersPage.tsx`, `views/admin/OrdersTableBody.tsx`, `components/admin/orders/OrderFormModal.tsx`
+  hâlâ `product_name`/`price_at_time` okuyor. Bugün kırılmaz (aynı INSERT ikisini de aynı kaynaktan
+  yazar) ama blueprint §R3 "hiçbiri atlanmaz" diyor — ADMIN-UX şeridine devredildi.
 
 ---
 

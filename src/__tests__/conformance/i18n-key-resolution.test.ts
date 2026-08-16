@@ -46,9 +46,16 @@ const SOURCES: Record<string, string> = import.meta.glob('/src/**/*.{ts,tsx}', {
 // Render + etkileşim katmanı: t() çağrıları burada yaşar.
 const SCOPE = ['components/', 'views/', 'app/', 'hooks/']
 
-// t('a.b.c') / t("a.b.c") — kapanış tırnağı anahtardan HEMEN sonra gelmeli (\1).
+// t('a.b.c') / t("a.b.c") / _t('a.b.c') — kapanış tırnağı anahtardan HEMEN sonra gelmeli (\1).
 // En az 2 segment (namespaced) ister; template literal t(`...`) ve t(değişken) yakalanmaz.
-const T_CALL = /\bt\(\s*(['"])([A-Za-z][\w]*(?:\.[\w]+)+)\1/g
+//
+// `_t` ALIASI (2026-08-15): eski desen `\bt\(` idi — `_` bir \w karakteri olduğu için `_t(`
+// ile `t` arasında kelime sınırı YOKTUR, dolayısıyla `const { t: _t } = useI18n()` yapan
+// dosyalar bekçiye TAMAMEN görünmezdi. Bu kör noktada 7 çözülmeyen anahtar yaşadı
+// (ColumnsMenu ×4, ExportMenu ×3) — 14 admin tablosunun tamamında ham anahtar render
+// ediyorlardı. Ölçüldü ve kapatıldı; lookbehind `(?<![\w$])` hem `t(` hem `_t(` yakalar,
+// `__t(` / `getT(` gibi ilgisiz isimleri yakalamaz.
+const T_CALL = /(?<![\w$])_?t\(\s*(['"])([A-Za-z][\w]*(?:\.[\w]+)+)\1/g
 
 /** Yorumları siler ki commentlenmiş örnek t() çağrıları bekçiyi tetiklemesin. */
 function stripComments(source: string): string {

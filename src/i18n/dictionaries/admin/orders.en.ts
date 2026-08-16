@@ -17,6 +17,10 @@ export const orders = {
         refunded: 'Refunded',
         partialRefunded: 'Partial Refunded'
       },
+      customerFilter: {
+        active: 'This list is filtered to a single customer.',
+        clear: 'Clear filter'
+      },
       table: {
         orderId: 'Order ID',
         status: 'Status',
@@ -40,7 +44,13 @@ export const orders = {
         confirmCancelShipping: 'Are you sure to cancel shipping for {{count}} orders?',
         cancelSuccess: '{{count}} orders cancelled',
         cancelPartialFail: 'Some cancellations failed: {{failed}}',
-        cancelFailed: 'Bulk cancel failed'
+        cancelFailed: 'Bulk cancel failed',
+        duplicateTracking: {
+          title: 'Same tracking number shared',
+          description: '{{count}} orders will carry the same tracking number. Are these orders going out as one consolidated parcel?',
+          confirmLabel: 'Yes, consolidated shipment',
+          cancelLabel: 'No, let me fix the numbers'
+        }
       },
       export: {
         csvLabel: 'CSV (Excel-compatible UTF‑8 BOM)',
@@ -78,16 +88,31 @@ export const orders = {
         shipping: {
           title: 'Ship / Tracking No',
           bulkTitle: 'Bulk: Ship Orders',
+          description: 'Enter the carrier and tracking number; optionally send a notification email to the customer.',
+          close: 'Close',
           carrierLabel: 'Carrier',
           carrierSelect: 'Select…',
           trackingLabel: 'Tracking Number',
           trackingPlaceholder: 'Tracking number',
           sendEmailLabel: 'Send email notification to customer',
+          bulkDescription: 'The carrier is shared across all selected orders. Enter the tracking number SEPARATELY FOR EACH ORDER — reusing one number for all of them sends every customer a tracking link for somebody else’s parcel.',
           advancedLabel: 'Advanced: per-order carrier/tracking',
           advancedTable: {
             orderId: 'Order ID',
             carrier: 'Carrier',
             tracking: 'Tracking'
+          },
+          bulkList: {
+            heading: 'Tracking number per order',
+            orderColumn: 'Order',
+            trackingColumn: 'Tracking Number',
+            trackingAriaLabel: 'Tracking number for order {{order}}',
+            noTargets: 'No shippable order in the selection (already shipped orders are skipped).'
+          },
+          errors: {
+            carrierRequired: 'A carrier must be selected.',
+            trackingRequired: 'A tracking number is required for this order.',
+            missingSummary: '{{count}} orders are missing a tracking number.'
           },
           carriers: {
             yurtici: 'Yurtiçi',
@@ -106,6 +131,7 @@ export const orders = {
         },
         logs: {
           title: 'Email Logs',
+          description: 'Log of shipping notification emails sent for this order. You can keep working with the list while this panel is open.',
           orderLabel: 'Order:',
           table: {
             date: 'Date',
@@ -120,6 +146,7 @@ export const orders = {
         },
         notes: {
           title: 'Order Notes',
+          description: 'Internal notes attached to this order. Notes are never shown to the customer.',
           inputPlaceholder: 'Write a new note',
           add: 'Add',
           adding: 'Saving…',
@@ -146,6 +173,7 @@ export const orders = {
         shippingUpdateFailed: 'Could not update shipping',
         bulkShippingSuccess: '{{count}} orders shipped',
         bulkShippingFailed: 'Bulk shipping update failed',
+        bulkShippingPartialFailed: '{{count}} orders could not be shipped: {{orders}}',
         missingFields: 'Carrier and tracking number are required',
         missingAdvancedFields: 'Missing fields: {{count}} rows'
       },
@@ -173,11 +201,24 @@ export const orders = {
         messages: {
           cancelledOrRefunded: 'Order is cancelled or refunded.',
           updateSuccess: 'Order status updated successfully.',
-          updateError: 'Error occurred while updating status.'
+          updateError: 'Error occurred while updating status.',
+          invalidTransition: 'Cannot move {{from}} → {{to}}. Order status can only move forward.',
+          stockRestoreFailed: 'Order updated but STOCK WAS NOT RESTORED: {{error}} — correct inventory manually.'
+        },
+        detail: {
+          description: 'Status, contact details, notes and email log of the selected order.',
+          close: 'Close'
         }
       },
       orderDetails: 'Order Details',
       form: {
+        // Field-level validation messages (standard §4.6 — under the input, not in a toast)
+        validation: {
+          statusRequired: 'Order status is required',
+          customerNameRequired: 'Customer name is required',
+          emailInvalid: 'Invalid email address',
+          emailRequired: 'Email is required',
+        },
         descEdit: 'View and update order details.',
         tabShipping: 'Shipping',
         tabItems: 'Order Items',

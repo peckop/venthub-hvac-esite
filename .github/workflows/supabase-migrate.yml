@@ -71,7 +71,28 @@ jobs:
           shopt -s nullglob
           applied=0
           skipped=0
-          for f in $(ls -1 supabase/migrations/*.sql | sort); do
+          # SIRALAMA LOCALE'DEN BAĞIMSIZ VE NİYETE UYGUN OLMALI.
+          #
+          # Düz `sort` iki ayrı sebeple güvenilmezdi; ikisi de ÖLÇÜLDÜ (2026-08-15):
+          #
+          #  1. LOCALE. `LC_ALL` set edilmediği için sıralama runner'ın locale'ine bağlıydı.
+          #     Depodaki 197 dosya üzerinde `LC_ALL=C sort` ile `LC_ALL=en_US.UTF-8 sort`
+          #     FARKLI çıktı veriyor (ölçüldü). Runner locale'i değişirse migration sırası
+          #     sessizce değişir: aynı push, farklı DB durumu.
+          #
+          #  2. DAMGA GENİŞLİĞİ — asıl kök sebep. Depoda 8 haneli (`20250903_x`) ve 14 haneli
+          #     (`20250915152500_x`) adlar YAN YANA yaşıyor (163 + 21). Aynı gün için bu ikisi
+          #     dize olarak karşılaştırılamaz: `20260815_drop` + `20260815120000_recreate`
+          #     çiftinde C locale `recreate`i ÖNCE koyuyor (tetik ölür), UTF-8 `drop`u önce
+          #     koyuyor (tetik yaşar). Bu yüzden yalnızca `LC_ALL=C` eklemek deterministik
+          #     ama DETERMİNİSTİK OLARAK YANLIŞ olurdu: zamansız `20260815_` "o günün başı"
+          #     demektir ve `120000`dan ÖNCE gelmelidir.
+          #
+          # Çözüm: damga 14 haneye sıfırla tamamlanır, sıralama ondan sonra bayt sırasıyla
+          # yapılır. Rakamla başlamayan ad sona atılır (INV-MIGRATION-2 yeni dosyalarda
+          # 14 hane zorunlu kılıyor). Bugünkü 197 dosyada sonuç, UTF-8 sırasıyla BİREBİR
+          # aynı (ölçüldü) — davranış değişmiyor, yalnızca garanti altına alınıyor.
+          for f in $(ls -1 supabase/migrations/*.sql | awk -F/ '{ n=$NF; ts=n; sub(/_.*/, "", ts); if (ts ~ /^[0-9]+$/) { while (length(ts) < 14) { ts = ts "0" } ts = substr(ts, 1, 14) } else { ts = "99999999999999" } print ts "|" $0 }' | LC_ALL=C sort | cut -d'|' -f2-); do
             base=$(basename "$f")
             seen=$(psql "$DB_URL" -tAc "select 1 from public._migration_ledger where name = '$base' limit 1;")
             if [ "$seen" = "1" ]; then

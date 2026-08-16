@@ -162,14 +162,16 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
   return (
     <Dialog.Root open={open} onOpenChange={(next) => (next ? undefined : handleClose())}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-modal" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-surface-deep border border-white/10 rounded-2xl shadow-2xl z-modal flex flex-col overflow-hidden max-h-admin-modal">
-          <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/2">
+        <Dialog.Overlay className="fixed inset-0 bg-black/60 z-modal" />
+        <Dialog.Content
+          // Radix `aria-modal` BASMIYOR (dist dogrulandi) -> elle veriliyor (cetvel §4.8).
+          aria-modal="true" className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl bg-admin-bg border border-admin-border rounded-admin-lg shadow-admin-lg z-modal flex flex-col overflow-hidden max-h-admin-modal">
+          <div className="p-6 border-b border-admin-border flex items-center justify-between bg-admin-surface-2">
             <div>
-              <Dialog.Title className="text-xl font-bold text-white tracking-tight">
+              <Dialog.Title className="text-xl font-bold text-admin-fg tracking-tight">
                 {t('admin.pricing.rules.materialize.title')}
               </Dialog.Title>
-              <Dialog.Description className="text-sm text-slate-400 mt-1">
+              <Dialog.Description className="text-sm text-admin-fg-muted mt-1">
                 {t('admin.pricing.rules.materialize.description')}
               </Dialog.Description>
             </div>
@@ -177,7 +179,7 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
               type="button"
               onClick={handleClose}
               aria-label={t('admin.pricing.rules.form.close')}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+              className="p-2 rounded-admin-md hover:bg-admin-surface-3 transition-colors text-admin-fg-muted hover:text-admin-fg focus-visible:ring-2 focus-visible:ring-admin-accent/30"
             >
               <X size={20} />
             </button>
@@ -185,20 +187,20 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
 
           <div className={`flex-1 ${adminModalScrollAreaClass}`}>
             {previewLoading ? (
-              <p className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+              <p className="flex items-center gap-2 text-xs font-bold text-admin-fg-muted">
                 <Loader2 size={14} className="animate-spin" />
                 {t('admin.pricing.rules.materialize.loading')}
               </p>
             ) : loadFailed ? (
               <div className="space-y-4">
-                <p className="flex items-center gap-2 text-sm font-bold text-rose-400">
+                <p className="flex items-center gap-2 text-sm font-bold text-admin-danger">
                   <AlertTriangle size={16} />
                   {t('admin.pricing.common.loadFailed')}
                 </p>
                 <button
                   type="button"
                   onClick={startPreview}
-                  className="inline-flex items-center gap-2 px-4 h-9 rounded-xl glass border border-white/10 text-slate-300 text-xs font-black uppercase tracking-widest hover:bg-white/5 hover:text-white transition-colors"
+                  className="inline-flex items-center gap-2 px-4 h-9 rounded-admin-md bg-admin-surface border border-admin-border text-admin-fg text-xs font-semibold hover:bg-admin-surface-2 hover:text-admin-fg transition-colors"
                 >
                   <RefreshCw size={14} />
                   {t('admin.pricing.rules.materialize.retry')}
@@ -209,7 +211,7 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
                 {staleCosts === null ? (
                   <p
                     role="status"
-                    className="flex items-start gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300"
+                    className="flex items-start gap-2 rounded-admin-lg border border-admin-border bg-admin-surface-2 p-4 text-sm text-admin-fg"
                   >
                     <AlertTriangle size={16} className="mt-0.5 shrink-0" />
                     <span>{t('admin.pricing.rules.materialize.staleCostUnknown')}</span>
@@ -217,7 +219,7 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
                 ) : staleCosts > 0 ? (
                   <p
                     role="status"
-                    className="flex items-start gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-200"
+                    className="flex items-start gap-2 rounded-admin-lg border border-admin-warning/30 bg-admin-warning-weak p-4 text-sm text-admin-warning"
                   >
                     <AlertTriangle size={16} className="mt-0.5 shrink-0" />
                     <span>{t('admin.pricing.rules.materialize.staleCost', { count: staleCosts })}</span>
@@ -226,65 +228,65 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
 
                 {/* ---- kapsam özeti ---- */}
                 <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="rounded-2xl glass border border-white/10 p-4 space-y-1">
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                  <div className="rounded-admin-lg bg-admin-surface border border-admin-border p-4 space-y-1">
+                    <p className="text-xs font-semibold text-admin-fg-muted">
                       {t('admin.pricing.rules.materialize.summary.scanned')}
                     </p>
-                    <p className="text-lg font-black text-white">
+                    <p className="text-lg font-semibold text-admin-fg">
                       {formatNumber(preview.productsScanned, locale)}
                     </p>
                   </div>
-                  <div className="rounded-2xl glass border border-white/10 p-4 space-y-1">
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                  <div className="rounded-admin-lg bg-admin-surface border border-admin-border p-4 space-y-1">
+                    <p className="text-xs font-semibold text-admin-fg-muted">
                       {t('admin.pricing.rules.materialize.summary.priced')}
                     </p>
-                    <p className="text-lg font-black text-cyan-400">
+                    <p className="text-lg font-semibold text-admin-accent">
                       {formatNumber(preview.pricedProducts, locale)}
                     </p>
                   </div>
-                  <div className="rounded-2xl glass border border-white/10 p-4 space-y-1">
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                  <div className="rounded-admin-lg bg-admin-surface border border-admin-border p-4 space-y-1">
+                    <p className="text-xs font-semibold text-admin-fg-muted">
                       {t('admin.pricing.rules.materialize.summary.quoteOnly')}
                     </p>
-                    <p className="text-lg font-black text-amber-400">
+                    <p className="text-lg font-semibold text-admin-warning">
                       {formatNumber(preview.quoteOnlyProducts, locale)}
                     </p>
                   </div>
-                  <div className="rounded-2xl glass border border-white/10 p-4 space-y-1">
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                  <div className="rounded-admin-lg bg-admin-surface border border-admin-border p-4 space-y-1">
+                    <p className="text-xs font-semibold text-admin-fg-muted">
                       {t('admin.pricing.rules.materialize.summary.totalNet')}
                     </p>
-                    <p className="text-lg font-black text-white">
+                    <p className="text-lg font-semibold text-admin-fg">
                       {formatCurrency(preview.totalNetTry, locale, { currency: 'TRY' })}
                     </p>
                   </div>
                   {/* Sessiz etki olmaz: dokunulmayan elle-ezme ve pasifleştirilecek bayat satır
                       sayısı UYGULA'dan ÖNCE görünür (cetvel §8.1). */}
-                  <div className="rounded-2xl glass border border-white/10 p-4 space-y-1">
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                  <div className="rounded-admin-lg bg-admin-surface border border-admin-border p-4 space-y-1">
+                    <p className="text-xs font-semibold text-admin-fg-muted">
                       {t('admin.pricing.rules.materialize.summary.skippedManual')}
                     </p>
-                    <p className="text-lg font-black text-white">
+                    <p className="text-lg font-semibold text-admin-fg">
                       {formatNumber(preview.skippedManual, locale)}
                     </p>
                   </div>
-                  <div className="rounded-2xl glass border border-white/10 p-4 space-y-1">
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                  <div className="rounded-admin-lg bg-admin-surface border border-admin-border p-4 space-y-1">
+                    <p className="text-xs font-semibold text-admin-fg-muted">
                       {t('admin.pricing.rules.materialize.summary.deactivated')}
                     </p>
-                    <p className="text-lg font-black text-rose-400">
+                    <p className="text-lg font-semibold text-admin-danger">
                       {formatNumber(preview.deactivated, locale)}
                     </p>
                   </div>
                   {/* Cetvel §8.3: markası köprülenemeyen ürün sayısı GÖRÜNMEK ZORUNDA —
                       yoksa "marka kuralı neden işlemedi?" sorusu cevapsız kalır. */}
-                  <div className="rounded-2xl glass border border-white/10 p-4 space-y-1">
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                  <div className="rounded-admin-lg bg-admin-surface border border-admin-border p-4 space-y-1">
+                    <p className="text-xs font-semibold text-admin-fg-muted">
                       {t('admin.pricing.rules.materialize.summary.unbridgedBrand')}
                     </p>
                     <p
                       className={
-                        preview.unbridgedBrand > 0 ? 'text-lg font-black text-amber-400' : 'text-lg font-black text-white'
+                        preview.unbridgedBrand > 0 ? 'text-lg font-semibold text-admin-warning' : 'text-lg font-semibold text-admin-fg'
                       }
                     >
                       {formatNumber(preview.unbridgedBrand, locale)}
@@ -293,12 +295,12 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
                 </section>
 
                 {/* ---- segment kırılımı ---- */}
-                <section className="space-y-4 rounded-2xl glass border border-white/10 p-6">
-                  <h3 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                <section className="space-y-4 rounded-admin-lg bg-admin-surface border border-admin-border p-6">
+                  <h3 className="text-xs font-semibold text-admin-accent">
                     {t('admin.pricing.rules.materialize.segments.title')}
                   </h3>
                   {preview.bySegment.length === 0 ? (
-                    <p className="text-xs font-bold text-slate-500">
+                    <p className="text-xs font-bold text-admin-fg-muted">
                       {t('admin.pricing.rules.materialize.segments.empty')}
                     </p>
                   ) : (
@@ -306,17 +308,17 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
                       {preview.bySegment.map((seg) => (
                         <li
                           key={`${seg.priceListId}:${seg.userType}`}
-                          className="flex flex-wrap items-center gap-3 rounded-xl bg-white/3 border border-white/5 px-4 py-3"
+                          className="flex flex-wrap items-center gap-3 rounded-admin-md bg-admin-surface-2 border border-admin-border px-4 py-3"
                         >
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-black uppercase tracking-wider">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-admin-accent-weak border border-admin-accent/30 text-admin-accent text-xs font-semibold">
                             {segmentLabel(seg.userType, t)}
                           </span>
-                          <span className="ml-auto text-xs font-black uppercase tracking-widest text-white">
+                          <span className="ml-auto text-xs font-semibold text-admin-fg">
                             {t('admin.pricing.rules.materialize.segments.table.priced')}
                             {': '}
                             {formatNumber(seg.priced, locale)}
                           </span>
-                          <span className="text-xs font-black uppercase tracking-widest text-amber-400">
+                          <span className="text-xs font-semibold text-admin-warning">
                             {t('admin.pricing.rules.materialize.segments.table.quoteOnly')}
                             {': '}
                             {formatNumber(seg.quoteOnly, locale)}
@@ -328,12 +330,12 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
                 </section>
 
                 {/* ---- örnek satırlar ---- */}
-                <section className="space-y-4 rounded-2xl glass border border-white/10 p-6">
-                  <h3 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                <section className="space-y-4 rounded-admin-lg bg-admin-surface border border-admin-border p-6">
+                  <h3 className="text-xs font-semibold text-admin-accent">
                     {t('admin.pricing.rules.materialize.samples.title')}
                   </h3>
                   {preview.samples.length === 0 ? (
-                    <p className="text-xs font-bold text-slate-500">
+                    <p className="text-xs font-bold text-admin-fg-muted">
                       {t('admin.pricing.rules.materialize.samples.empty')}
                     </p>
                   ) : (
@@ -341,20 +343,20 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
                       {preview.samples.map((row) => (
                         <li
                           key={`${row.sku}:${row.ruleId}`}
-                          className="flex flex-wrap items-center gap-3 rounded-xl bg-white/3 border border-white/5 px-4 py-3"
+                          className="flex flex-wrap items-center gap-3 rounded-admin-md bg-admin-surface-2 border border-admin-border px-4 py-3"
                         >
-                          <span className="text-sm font-bold text-white truncate">{row.name}</span>
-                          <span className="text-xs font-mono font-bold text-slate-500">{row.sku}</span>
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-400 text-xs font-black uppercase tracking-wider">
+                          <span className="text-sm font-bold text-admin-fg truncate">{row.name}</span>
+                          <span className="text-xs font-mono font-bold text-admin-fg-muted">{row.sku}</span>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-admin-surface-2 border border-admin-border text-admin-fg-muted text-xs font-semibold">
                             {segmentLabel(row.userType, t)}
                           </span>
-                          <span className="ml-auto text-xs font-black uppercase tracking-widest text-slate-500">
+                          <span className="ml-auto text-xs font-semibold text-admin-fg-muted">
                             {formatCurrency(row.net, locale, { currency: 'TRY' })}
                           </span>
-                          <span className="text-xs font-black text-slate-600" aria-hidden="true">
+                          <span className="text-xs font-semibold text-admin-fg-subtle" aria-hidden="true">
                             {'→'}
                           </span>
-                          <span className="text-xs font-black uppercase tracking-widest text-cyan-400">
+                          <span className="text-xs font-semibold text-admin-accent">
                             {formatCurrency(row.gross, locale, { currency: 'TRY' })}
                           </span>
                         </li>
@@ -366,12 +368,12 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
             ) : null}
           </div>
 
-          <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/2">
+          <div className="p-6 border-t border-admin-border flex items-center justify-between bg-admin-surface-2">
             <button
               type="button"
               onClick={handleClose}
               disabled={applying}
-              className="px-6 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-6 py-3 text-xs font-bold text-admin-fg-muted hover:text-admin-fg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {t('admin.common.cancel')}
             </button>

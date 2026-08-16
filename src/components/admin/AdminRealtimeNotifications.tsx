@@ -222,16 +222,16 @@ const AdminRealtimeNotifications: React.FC = () => {
                                     if (notif.link) router.push(notif.link as import('next').Route)
                                 }
                             }}
-                            className="max-w-md w-full bg-white shadow-2xl rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 border-l-4 border-primary-navy cursor-pointer hover:bg-slate-50 transition-colors animate-in fade-in slide-in-from-top-4 duration-300"
+                            className="max-w-md w-full bg-admin-surface shadow-admin-lg rounded-admin-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 border-l-4 border-primary-navy cursor-pointer hover:bg-admin-surface-2 transition-colors animate-in fade-in slide-in-from-top-4 duration-300"
                         >
                             <div className="flex-shrink-0 pt-0.5">
-                                <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+                                <div className="h-10 w-10 rounded-full bg-admin-accent flex items-center justify-center">
                                     <ShoppingBag size={20} className="text-primary-navy" />
                                 </div>
                             </div>
                             <div className="ml-3 flex-1">
-                                <p className="text-sm font-bold text-slate-900">{notif.title}</p>
-                                <p className="mt-1 text-sm text-slate-500">{notif.message}</p>
+                                <p className="text-sm font-bold text-admin-fg-subtle">{notif.title}</p>
+                                <p className="mt-1 text-sm text-admin-fg-muted">{notif.message}</p>
                             </div>
                         </div>
                     ), { duration: 6000 })
@@ -280,16 +280,16 @@ const AdminRealtimeNotifications: React.FC = () => {
                                     if (notif.link) router.push(notif.link as import('next').Route)
                                 }
                             }}
-                            className="max-w-md w-full bg-white shadow-lg rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 border-l-4 border-emerald-500 cursor-pointer hover:bg-slate-50 transition-colors animate-in fade-in slide-in-from-top-4 duration-300"
+                            className="max-w-md w-full bg-admin-surface shadow-admin-md rounded-admin-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5 p-4 border-l-4 border-admin-success cursor-pointer hover:bg-admin-surface-2 transition-colors animate-in fade-in slide-in-from-top-4 duration-300"
                         >
                             <div className="flex-shrink-0 pt-0.5">
-                                <div className="h-10 w-10 rounded-full bg-emerald-50 flex items-center justify-center">
-                                    <Box size={20} className="text-emerald-600" />
+                                <div className="h-10 w-10 rounded-full bg-admin-success flex items-center justify-center">
+                                    <Box size={20} className="text-admin-success" />
                                 </div>
                             </div>
                             <div className="ml-3 flex-1">
-                                <p className="text-sm font-bold text-slate-900">{notif.title}</p>
-                                <p className="mt-1 text-sm text-slate-500">{notif.message}</p>
+                                <p className="text-sm font-bold text-admin-fg-subtle">{notif.title}</p>
+                                <p className="mt-1 text-sm text-admin-fg-muted">{notif.message}</p>
                             </div>
                         </div>
                     ), { duration: 4000 })
@@ -319,8 +319,8 @@ const AdminRealtimeNotifications: React.FC = () => {
 
     const IconForType = ({ type }: { type: string }) => {
         if (type === 'order') return <div className="p-2 rounded-full bg-primary-navy/10 text-primary-navy"><ShoppingBag size={16} /></div>
-        if (type === 'stock') return <div className="p-2 rounded-full bg-emerald-500/10 text-emerald-600"><Box size={16} /></div>
-        return <div className="p-2 rounded-full bg-slate-500/10 text-slate-600"><Activity size={16} /></div>
+        if (type === 'stock') return <div className="p-2 rounded-full bg-admin-success-weak text-admin-success"><Box size={16} /></div>
+        return <div className="p-2 rounded-full bg-admin-surface-3 text-admin-fg-subtle"><Activity size={16} /></div>
     }
 
     const attentionItems = [
@@ -329,8 +329,8 @@ const AdminRealtimeNotifications: React.FC = () => {
             count: inboxCounts.pendingReturnsCount,
             label: t('admin.dashboard.inbox.pendingReturns' as never),
             link: '/admin/returns',
-            icon: <RefreshCw size={16} className="text-amber-600" />,
-            bgColor: 'bg-amber-500/10',
+            icon: <RefreshCw size={16} className="text-admin-warning" />,
+            bgColor: 'bg-admin-warning-weak',
             hasAccess: canWrite('returns')
         },
         {
@@ -338,8 +338,8 @@ const AdminRealtimeNotifications: React.FC = () => {
             count: inboxCounts.pendingShipmentsCount,
             label: t('admin.dashboard.inbox.pendingShipments' as never),
             link: '/admin/logistics',
-            icon: <ShoppingBag size={16} className="text-blue-600" />,
-            bgColor: 'bg-blue-500/10',
+            icon: <ShoppingBag size={16} className="text-admin-accent" />,
+            bgColor: 'bg-admin-accent-weak',
             hasAccess: canWrite('orders')
         },
         {
@@ -347,8 +347,8 @@ const AdminRealtimeNotifications: React.FC = () => {
             count: inboxCounts.lowStockAlarmsCount,
             label: t('admin.dashboard.inbox.lowStock' as never),
             link: '/admin/inventory',
-            icon: <AlertTriangle size={16} className="text-rose-600" />,
-            bgColor: 'bg-rose-500/10',
+            icon: <AlertTriangle size={16} className="text-admin-danger" />,
+            bgColor: 'bg-admin-danger-weak',
             hasAccess: canWrite('inventory')
         },
         {
@@ -356,25 +356,25 @@ const AdminRealtimeNotifications: React.FC = () => {
             count: inboxCounts.unresolvedErrorsCount,
             label: t('admin.dashboard.inbox.unresolvedErrors' as never),
             link: '/admin/error-groups',
-            icon: <Bug size={16} className="text-purple-600" />,
-            bgColor: 'bg-purple-500/10',
+            icon: <Bug size={16} className="text-admin-accent" />,
+            bgColor: 'bg-admin-accent-weak',
             hasAccess: canWrite('error_groups')
         }
     ].filter(item => item.hasAccess && item.count > 0)
 
     return (
-        <div className="relative z-50" ref={dropdownRef}>
+        <div className="relative z-popover" ref={dropdownRef}>
             {/* Bell Trigger */}
             <button
                 onClick={toggleDropdown}
                 aria-label={t('admin.dashboard.notificationCenter')}
                 aria-expanded={isOpen}
                 aria-haspopup="true"
-                className="relative p-2.5 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow hover:bg-slate-50 transition-shadow text-slate-600 hover:text-primary-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20"
+                className="relative p-2.5 rounded-full bg-admin-surface border border-admin-border shadow-admin-sm hover:shadow hover:bg-admin-surface-2 transition-shadow text-admin-fg-subtle hover:text-primary-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20"
             >
                 <Bell size={20} />
                 {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 h-2.5 w-2.5 bg-rose-500 rounded-full border-2 border-white ring-2 ring-rose-500/30 animate-pulse">
+                    <span className="absolute top-0 right-0 h-2.5 w-2.5 bg-admin-danger rounded-full border-2 border-admin-border ring-2 ring-admin-danger/30 animate-pulse">
                         <span className="sr-only">
                             {t('admin.dashboard.unreadCount', { count: unreadCount })}
                         </span>
@@ -387,25 +387,25 @@ const AdminRealtimeNotifications: React.FC = () => {
                 <div 
                     role="menu"
                     aria-label={t('admin.dashboard.notificationCenter')}
-                    className="absolute top-12 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col transform origin-top-right transition-colors animate-in fade-in zoom-in-95"
+                    className="absolute top-12 right-0 w-80 sm:w-96 bg-admin-surface rounded-admin-lg shadow-admin-lg border border-admin-border overflow-hidden flex flex-col transform origin-top-right transition-colors animate-in fade-in zoom-in-95"
                 >
                     {/* Header */}
-                    <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                        <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <div className="px-4 py-3 border-b border-admin-border flex items-center justify-between bg-admin-surface-2">
+                        <h3 className="text-sm font-bold text-admin-fg-subtle flex items-center gap-2">
                             {t('admin.dashboard.notificationCenter')}
                             {unreadCount > 0 && (
-                                <span className="bg-rose-100 text-rose-700 text-xs px-2 py-0.5 rounded-full font-bold">
+                                <span className="bg-admin-danger text-admin-danger text-xs px-2 py-0.5 rounded-full font-bold">
                                     {t('admin.dashboard.unreadCount', { count: unreadCount })}
                                 </span>
                             )}
                         </h3>
                         <div className="flex items-center gap-2">
                             {notifications.length > 0 && (
-                                <button onClick={clearAll} className="text-xs font-medium text-slate-500 hover:text-primary-navy transition-colors">
+                                <button onClick={clearAll} className="text-xs font-medium text-admin-fg-muted hover:text-primary-navy transition-colors">
                                     {t('admin.dashboard.clearAll')}
                                 </button>
                             )}
-                            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label={t('admin.dashboard.closeNotifications')}>
+                            <button onClick={() => setIsOpen(false)} className="text-admin-fg-muted hover:text-admin-fg-subtle" aria-label={t('admin.dashboard.closeNotifications')}>
                                 <X size={16} aria-hidden="true" />
                             </button>
                         </div>
@@ -415,8 +415,8 @@ const AdminRealtimeNotifications: React.FC = () => {
                     <div className="max-h-70vh overflow-y-auto w-full">
                         {/* 1. İlgi Bekleyenler Section */}
                         {attentionItems.length > 0 && (
-                            <div className="border-b border-slate-100 bg-slate-50/30 p-3">
-                                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 px-1 mb-2">
+                            <div className="border-b border-admin-border bg-admin-surface-2 p-3">
+                                <h4 className="text-xs font-bold text-admin-fg-muted px-1 mb-2">
                                     {t('admin.dashboard.inbox.title' as never)}
                                 </h4>
                                 <div className="grid grid-cols-1 gap-1.5" role="none">
@@ -436,18 +436,18 @@ const AdminRealtimeNotifications: React.FC = () => {
                                                     router.push(item.link as import('next').Route)
                                                 }
                                             }}
-                                            className="group flex items-center justify-between p-2 rounded-xl bg-white border border-slate-100 hover:border-primary-navy/20 hover:shadow-sm transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20"
+                                            className="group flex items-center justify-between p-2 rounded-admin-md bg-admin-surface border border-admin-border hover:border-primary-navy/20 hover:shadow-admin-sm transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20"
                                         >
                                             <div className="flex items-center gap-2.5 min-w-0">
-                                                <div className={`p-2 rounded-lg ${item.bgColor} flex items-center justify-center shrink-0`}>
+                                                <div className={`p-2 rounded-admin-md ${item.bgColor} flex items-center justify-center shrink-0`}>
                                                     {item.icon}
                                                 </div>
-                                                <span className="text-xs font-semibold text-slate-700 group-hover:text-primary-navy transition-colors truncate">
+                                                <span className="text-xs font-semibold text-admin-fg-subtle group-hover:text-primary-navy transition-colors truncate">
                                                     {item.label}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-1">
-                                                <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-xs font-bold ring-1 ring-rose-500/10">
+                                                <span className="px-2 py-0.5 rounded-full bg-admin-danger text-admin-danger text-xs font-bold ring-1 ring-admin-danger/30">
                                                     {item.count}
                                                 </span>
                                             </div>
@@ -459,20 +459,20 @@ const AdminRealtimeNotifications: React.FC = () => {
 
                         {/* Recent Activity Divider/Title if we have attention items and notifications */}
                         {attentionItems.length > 0 && notifications.length > 0 && (
-                            <div className="px-4 py-2 bg-slate-50/10 border-b border-slate-100">
-                                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                            <div className="px-4 py-2 bg-admin-surface-2 border-b border-admin-border">
+                                <h4 className="text-xs font-bold text-admin-fg-muted">
                                     {t('admin.dashboard.recent.transactions')}
                                 </h4>
                             </div>
                         )}
 
                         {notifications.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center p-8 text-center bg-slate-50/30">
-                                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-3">
+                            <div className="flex flex-col items-center justify-center p-8 text-center bg-admin-surface-2">
+                                <div className="w-12 h-12 bg-admin-surface-2 rounded-full flex items-center justify-center text-admin-fg mb-3">
                                     <Check size={24} />
                                 </div>
-                                <p className="text-sm font-medium text-slate-500">{t('admin.dashboard.allRead')}</p>
-                                <p className="text-xs text-slate-400 mt-1">{t('admin.dashboard.noNewActivity')}</p>
+                                <p className="text-sm font-medium text-admin-fg-muted">{t('admin.dashboard.allRead')}</p>
+                                <p className="text-xs text-admin-fg-muted mt-1">{t('admin.dashboard.noNewActivity')}</p>
                             </div>
                         ) : (
                             <div className="flex flex-col" role="none">
@@ -496,26 +496,26 @@ const AdminRealtimeNotifications: React.FC = () => {
                                                 }
                                             }
                                         }}
-                                        className={`p-4 border-b border-slate-100/50 hover:bg-slate-50/80 transition-colors flex gap-3 ${!notif.isRead ? 'bg-blue-50/30' : ''} ${notif.link ? 'cursor-pointer' : ''}`}
+                                        className={`p-4 border-b border-admin-border hover:bg-admin-surface-2 transition-colors flex gap-3 ${!notif.isRead ? 'bg-admin-accent-weak' : ''} ${notif.link ? 'cursor-pointer' : ''}`}
                                     >
                                         <div className="flex-shrink-0 mt-0.5">
                                             <IconForType type={notif.type} />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className={`text-sm tracking-tight ${!notif.isRead ? 'font-bold text-slate-900' : 'font-medium text-slate-700'}`}>
+                                            <p className={`text-sm tracking-tight ${!notif.isRead ? 'font-bold text-admin-fg-subtle' : 'font-medium text-admin-fg-subtle'}`}>
                                                 {notif.title}
                                             </p>
-                                            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                                            <p className="text-xs text-admin-fg-muted mt-1 leading-relaxed">
                                                 {notif.message}
                                             </p>
-                                            <div className="flex items-center gap-1 mt-2 text-xs text-slate-400 font-medium">
+                                            <div className="flex items-center gap-1 mt-2 text-xs text-admin-fg-muted font-medium">
                                                 <Clock size={10} />
                                                 {formatDateTime(notif.timestamp, lang)}
                                             </div>
                                         </div>
                                         {!notif.isRead && (
                                             <div className="flex-shrink-0">
-                                                <div className="w-2 h-2 rounded-full bg-primary-navy" />
+                                                <div className="w-2 h-2 rounded-full bg-admin-accent" />
                                             </div>
                                         )}
                                     </div>
@@ -526,8 +526,8 @@ const AdminRealtimeNotifications: React.FC = () => {
 
                     {/* Footer */}
                     {notifications.length > 0 && (
-                        <div className="bg-slate-50/80 p-3 text-center border-t border-slate-100">
-                            <span className="text-xs font-medium text-slate-500">{t('admin.dashboard.onlyLast20Notifications')}</span>
+                        <div className="bg-admin-surface-2 p-3 text-center border-t border-admin-border">
+                            <span className="text-xs font-medium text-admin-fg-muted">{t('admin.dashboard.onlyLast20Notifications')}</span>
                         </div>
                     )}
                 </div>

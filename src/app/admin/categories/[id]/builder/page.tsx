@@ -10,7 +10,7 @@ import { useI18n } from '@/i18n/I18nProvider';
 const Loading = () => {
   const { t } = useI18n();
   return (
-    <div className="h-screen flex items-center justify-center bg-surface-deep text-slate-400 font-mono text-xs uppercase tracking-widest">
+    <div className="h-screen flex items-center justify-center bg-admin-bg text-admin-fg-muted font-mono text-xs">
       {t('admin.common.loading')}
     </div>
   );
@@ -31,7 +31,7 @@ export default function CategoryBuilderPage({ params }: { params: Promise<{ id: 
 
   if (!id) {
     return (
-      <div className="h-screen flex items-center justify-center bg-surface-deep text-slate-400 font-mono text-xs uppercase tracking-widest">
+      <div className="h-screen flex items-center justify-center bg-admin-bg text-admin-fg-muted font-mono text-xs">
         {t('admin.common.invalidCategory')}
       </div>
     );

@@ -2,12 +2,12 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\admin\returnStatusMachine.ts
-skeleton_hash: d38dc01210646ffc
+source_path: C:\Users\alize\venthub-wt-admin\src\lib\admin\returnStatusMachine.ts
+skeleton_hash: 4524368751fb4e7f
 entity_hashes:
-  func:allowedNextStatuses: 2cc7c349dc1ea2c6
+  func:allowedNextStatuses: c5a64be7cb890a38
   overview: eb1dc3e13feb0c1b
-generated_at: 2026-06-19T20:47:59Z
+generated_at: 2026-08-16T05:20:52Z
 ---
 
 ## Genel Bakış
@@ -39,14 +39,14 @@ Bu modül, return (iade) durum makinesi için mevcut durumdan izin verilen sonra
 ## FONKSİYON DETAYLARI
 
 ### allowedNextStatuses
-**Ne yapar**: Verilen mevcut durum (status) string'ine karşılık gelen izin verilen sonraki durumların listesini döndürür. Durum_TRANSITIONS sözlüğünde tanımlı değilse veya bilinmiyorsa boş bir dizi döndürerek ileri geçişin mümkün olmadığını belirtir.
+**Ne yapar**: Verilen mevcut statüye göre izin verilen sonraki statülerin listesini döndürür. Bilinmeyen veya tanımsız bir statü verildiğinde boş bir dizi döner; bu durum statünün kilitli olduğunu ve ileri geçiş yapılamayacağını gösterir.
 
-**Nasıl yapar**: Fonksiyon, önceden tanımlanmış bir TRANSITIONS nesnesine (durum geçiş haritası) erişir ve `current` parametresini bu nesnenin anahtarı olarak kullanarak ilgili durumun izin verilen sonraki durumlarını bulur. Nullish coalescing operatörü (`??`) kullanılarak, anahtar sözlükte mevcut değilse varsayılan olarak boş bir dizi (`[]`) alınır. Ardından spread operatörü (`...`) ile orijinal dizi referansını paylaşmayan yeni bir kopya oluşturarak dışarıya bırakılır, böylece fonksiyonun dışından TRANSITIONS yapısının değiştirilmesi riski ortadan kalkar.
+**Nasıl yapar**: `TRANSITIONS` adlı harita nesnesinde `current` parametresini anahtar olarak kullanarak ilgili statünün geçebileceği hedef statüleri bulur. `??` (nullish coalescing) operatörü ile anahtar bulunamazsa varsayılan olarak boş dizi (`[]`) kullanılır. Bulunan dizi `...` (spread) operatörü ile kopyalanarak orijinal `TRANSITIONS` yapısının dışarıdan değiştirilmesi engellenir.
 
 **Parametreler**:
-- `current`: `string` — Kontrol edilmek istenen mevcut durumun adı. Bu değer, izin verilen bir sonraki adımların belirlenmesi için TRANSITIONS sözlüğünde aranacak anahtardır.
+- `current`: `string` — Mevcut durum/akış adımını temsil eden statü dizesi. Bu değer, `TRANSITIONS` haritasında bir anahtar olarak aranır.
 
-**Dönüş**: `string[]` — Verilen mevcut durumdan geçiş yapılabilecek izinli sonraki durumların bir dizisi. Durum sözlükte tanımlı değilse boş bir dizi döner; bu durum, o statüden hiçbir ileri geçişin mümkün olmadığını ve akışın kilitlendiğini ifade eder.
+**Dönüş**: `string[]` — Verilen `current` statüsünden geçilebilecek izin verilen hedef statülerin dizisi. Tanımsız bir statü verilirse boş dizi (`[]`) döner.
 
 ---
 
@@ -68,21 +68,22 @@ type ReturnStatus = | 'requested'
 
 ## SABİTLER
 - **TRANSITIONS** (object) — `{
-  requested: ['approved', 'cancelled'],
-  approved: ['in_transit', 'cancell...`
+  requested: ['approved', 'rejected', 'cancelled'],
+  approved: ['in_tran...`
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/lib/admin/returnStatusMachine.ts::allowedNextStatuses
-- **params**: `current: string` — mevcut durum durumunu temsil eden string, TRANSITIONS objesinde hangi durumun izin verilen sonraki durumlarının sorgulanacağını belirtir
-- **ic_degiskenler**: (yok — fonksiyon gövdesinde yerel değişken tanımlanmamıştır)
-- **Erişimler**:
-  - `TRANSITIONS` — dosya seviyesinde tanımlı sabit obje, durum geçiş kurallarını tutar
-  - `TRANSITIONS[current]` — mevcut duruma karşılık gelen izin verilen sonraki durumlar dizisine erişim
-  - `?? []` — nullish coalescing operatörü, TRANSITIONS[current] undefined/null ise boş dizi kullanılır
-- **Dönüş**: `string[]` — `current` durumundan geçilebilecek izin verilen sonraki durumların dizisi; spread operatörü ile orijinal dizi kopyalanarak dönüş yapılır
+- **params**: `current: string` — mevcut durum değerini temsil eder, TRANSITIONS nesnesinde hangi durumun izin verilen sonraki durumlarını aratacağını belirtir
+- **ic_degiskenler**:
+  (fonksiyon gövdesinde değişken tanımlanmamıştır; doğrudan ifade döndürülür)
+- **Erisilen Sabitler**:
+  - `TRANSITIONS` — modül seviyesinde tanımlı durum geçiş sözlüğü/nesnesi
+  - `TRANSITIONS[current]` — mevcut duruma karşılık gelen izin verilen sonraki durumlar dizisi (bulunamazsa `undefined`)
+  - `?? []` — nullish coalescing operatörü; `TRANSITIONS[current]` boş/null/undefined ise boş dizi kullanılır
+- **Dönüş**: `string[]` — `current` durumundan geçilebilecek izin verilen sonraki durumların dizisi; her çağrıda TRANSITIONS dizisinin浅 kopyasını (spread) döndürerek orijinal diziyi korur
 
 ---
 

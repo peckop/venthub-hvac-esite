@@ -7,6 +7,7 @@ export const users = {
         created: 'Created',
         createdLabel: 'Joined',
         actions: 'Actions',
+        orders: 'Orders',
         company: 'Company & B2B',
         role: 'Role'
       },
@@ -40,6 +41,8 @@ export const users = {
         cannotDemoteSelf: 'You can\'t demote yourself'
       },
       actions: {
+        viewOrders: 'Orders',
+        viewOrdersFor: "View orders for {{user}}",
         admin: 'Admin',
         moderator: 'Mod',
         superadmin: 'Superadmin',
@@ -76,6 +79,7 @@ export const users = {
         csvLabel: 'Export as CSV'
       },
       toasts: {
+        emailsIncomplete: 'Some user emails could not be shown (the list hit a limit). An empty cell does NOT mean the user has no email.',
         adminsLoadFailed: 'Failed to load admin users',
         allLoadFailed: 'Failed to load users',
         roleNotUpdated: 'Role could not be updated',

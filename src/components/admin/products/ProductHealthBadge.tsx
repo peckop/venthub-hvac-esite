@@ -25,11 +25,11 @@ const ProductHealthBadge: React.FC<ProductHealthProps> = ({ stockQty, threshold,
 
     // Color mapping
     const colors = {
-        'A': 'bg-emerald-50 text-emerald-700 border-emerald-200 ring-emerald-500/20',
-        'B': 'bg-blue-50 text-blue-700 border-blue-200 ring-blue-500/20',
-        'C': 'bg-amber-50 text-amber-700 border-amber-200 ring-amber-500/20',
-        'D': 'bg-rose-50 text-rose-700 border-rose-200 ring-rose-500/20',
-        'N/A': 'bg-slate-50 text-slate-500 border-slate-200 ring-slate-500/20'
+        'A': 'bg-admin-success text-admin-success border-admin-success ring-admin-success/30',
+        'B': 'bg-admin-accent text-admin-accent border-admin-accent ring-admin-accent/30',
+        'C': 'bg-admin-warning text-admin-warning border-admin-warning ring-admin-warning/30',
+        'D': 'bg-admin-danger text-admin-danger border-admin-danger ring-admin-danger/30',
+        'N/A': 'bg-admin-surface-2 text-admin-fg-muted border-admin-border ring-admin-border'
     }
 
     const descriptions = {
@@ -42,7 +42,7 @@ const ProductHealthBadge: React.FC<ProductHealthProps> = ({ stockQty, threshold,
 
     return (
         <div
-            className={`inline-flex items-center justify-center w-6 h-6 rounded-full border text-xs font-bold shadow-sm ring-2 ring-offset-1 ${colors[score]}`}
+            className={`inline-flex items-center justify-center w-6 h-6 rounded-full border text-xs font-bold shadow-admin-sm ring-2 ring-offset-1 ${colors[score]}`}
             title={`Sağlık Skoru: ${score} - ${descriptions[score]}`}
         >
             {score}

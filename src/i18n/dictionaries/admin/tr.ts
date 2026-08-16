@@ -3,6 +3,7 @@ import { audit } from './audit.tr'
 import { authority } from './authority.tr'
 import { categories } from './categories.tr'
 import { common } from './common.tr'
+import { confirm } from './confirm.tr'
 import { coupons } from './coupons.tr'
 import { dashboard } from './dashboard.tr'
 import { dataTable } from './dataTable.tr'
@@ -18,6 +19,7 @@ import { products } from './products.tr'
 import { returns } from './returns.tr'
 import { search } from './search.tr'
 import { settings } from './settings.tr'
+import { theme } from './theme.tr'
 import { titles } from './titles.tr'
 import { toolbar } from './toolbar.tr'
 import { ui } from './ui.tr'
@@ -30,6 +32,7 @@ export const admin = {
   categories,
   products,
   common,
+  confirm,
   coupons,
   dataTable,
   users,
@@ -42,6 +45,7 @@ export const admin = {
   titles,
   webhooks,
   a11y,
+  theme,
   returns,
   logistics,
   audit,

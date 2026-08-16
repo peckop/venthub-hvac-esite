@@ -1,6 +1,7 @@
 'use client'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { FileUp } from 'lucide-react'
 import React, { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -10,8 +11,11 @@ import type { Database } from '@/types/database.types'
 
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
+import InventoryCsvImport from '../../components/admin/InventoryCsvImport'
+import InventoryDetailDrawer from '../../components/admin/InventoryDetailDrawer'
 import InventoryTable from '../../components/admin/InventoryTable'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
+import { useInventoryDetail } from '../../hooks/useInventoryDetail'
 import { useRole } from '../../hooks/useRole'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { InventoryRow } from '../../types/inventory'
@@ -74,16 +78,35 @@ async function inventoryFetcher(
   // View üzerinde category_id ve low_stock_threshold olmadığı için products tablosundan eşleştirme yapılır
   const categoryMap: Record<string, string> = {}
   const thresholdMap: Record<string, number> = {}
+  // `abc` ve `days` kolonları ile çekmecedeki satın alma önerisi `inventory_summary`
+  // görünümünden gelir; `inventory_velocity` bu alanları TAŞIMIYOR. Eksikti: iki kolon
+  // her satırda boş, çekmecenin öneri bloğu ise hiç render olmuyordu.
+  const velocityMap: Record<string, { daily?: number; days?: number; abc?: 'A' | 'B' | 'C' | null }> = {}
 
   if (productIds.length > 0) {
-    const { data: productsData } = await supabase
-      .from('products')
-      .select('id, category_id, low_stock_threshold')
-      .in('id', productIds)
+    const [{ data: productsData }, { data: summaryData }] = await Promise.all([
+      supabase.from('products').select('id, category_id, low_stock_threshold').in('id', productIds),
+      supabase
+        .from('inventory_summary')
+        .select('product_id, daily_velocity, days_until_empty, abc_class')
+        .in('product_id', productIds),
+    ])
     if (productsData) {
       productsData.forEach((p) => {
         if (p.category_id) categoryMap[p.id] = p.category_id
         if (typeof p.low_stock_threshold === 'number') thresholdMap[p.id] = p.low_stock_threshold
+      })
+    }
+    if (summaryData) {
+      summaryData.forEach((v) => {
+        const pid = v.product_id
+        if (!pid) return
+        const abc = v.abc_class
+        velocityMap[pid] = {
+          daily: v.daily_velocity ?? undefined,
+          days: v.days_until_empty ?? undefined,
+          abc: abc === 'A' || abc === 'B' || abc === 'C' ? abc : null,
+        }
       })
     }
   }
@@ -91,6 +114,7 @@ async function inventoryFetcher(
   const rows: InventoryRowWithCategory[] = items.map((r) => {
     const item = r as Record<string, unknown>
     const pId = String(item.product_id || '')
+    const vel = pId ? velocityMap[pId] : undefined
     return {
       product_id: pId,
       name: String(item.name || ''),
@@ -101,6 +125,9 @@ async function inventoryFetcher(
       supplier_name: item.supplier_name ? String(item.supplier_name) : null,
       category_id: pId ? categoryMap[pId] || null : null,
       low_stock_threshold: pId ? thresholdMap[pId] ?? null : null,
+      daily_velocity: vel?.daily,
+      days_until_empty: vel?.days,
+      abc_class: vel?.abc ?? undefined,
     }
   })
 
@@ -124,6 +151,7 @@ const InventoryTableBody: React.FC = () => {
   const hasWriteAccess = canWrite('inventory')
 
   const [categories, setCategories] = useState<Category[]>([])
+  const [csvImportOpen, setCsvImportOpen] = useState(false)
 
   // Fetch categories for the filter select
   React.useEffect(() => {
@@ -148,6 +176,16 @@ const InventoryTableBody: React.FC = () => {
     fetcher: inventoryFetcher,
     pageSize: PAGE_SIZE,
     syncUrl: true,
+  })
+
+  /**
+   * Stok detay çekmecesinin konteyneri. `3c7ea6ff` purge'ünde bu mantık silinmişti;
+   * dosyayı tekrar 700 satıra şişirmemek için ayrı bir kancada yaşıyor.
+   */
+  const detail = useInventoryDetail({
+    hasWriteAccess,
+    rows: table.rows,
+    onMutated: table.reload,
   })
 
   const handleUpdateLocation = useCallback(
@@ -291,15 +329,28 @@ const InventoryTableBody: React.FC = () => {
         onClear={table.filtering.clearAll}
         recordCount={table.totalMatched}
         rightExtra={
-          <ExportMenu
-            items={[
-              {
-                key: 'csv',
-                label: t('admin.inventory.export.csv') || 'Sayfa Verilerini İndir (.csv)',
-                onSelect: () => void exportCsv(),
-              },
-            ]}
-          />
+          <div className="flex items-center gap-2">
+            {/* RBAC katman-1: yazma yetkisi yoksa içe aktarma yüzeyi HİÇ render edilmez. */}
+            {hasWriteAccess && (
+              <button
+                type="button"
+                onClick={() => setCsvImportOpen(true)}
+                className="h-12 px-6 rounded-admin-lg bg-admin-accent text-admin-accent-fg text-xs font-semibold hover:bg-admin-accent-hover transition-colors flex items-center gap-2"
+              >
+                <FileUp size={16} aria-hidden="true" />
+                {t('admin.inventory.csvLoad')}
+              </button>
+            )}
+            <ExportMenu
+              items={[
+                {
+                  key: 'csv',
+                  label: t('admin.inventory.export.csv') || 'Sayfa Verilerini İndir (.csv)',
+                  onSelect: () => void exportCsv(),
+                },
+              ]}
+            />
+          </div>
         }
       />
 
@@ -308,7 +359,39 @@ const InventoryTableBody: React.FC = () => {
         hasWriteAccess={hasWriteAccess}
         onUpdateLocation={handleUpdateLocation}
         onUpdateSupplier={handleUpdateSupplier}
+        onSelectRow={detail.open}
       />
+
+      <InventoryDetailDrawer
+        selected={detail.selected}
+        onClose={detail.close}
+        printingQr={detail.printingQr}
+        setPrintingQr={detail.setPrintingQr}
+        selectedStock={detail.selectedStock}
+        selectedThreshold={detail.selectedThreshold}
+        setSelectedThreshold={detail.setSelectedThreshold}
+        defaultThreshold={detail.defaultThreshold}
+        saving={detail.saving}
+        saveThreshold={detail.saveThreshold}
+        hasWriteAccess={hasWriteAccess}
+        moveQty={detail.moveQty}
+        setMoveQty={detail.setMoveQty}
+        moving={detail.moving}
+        adjustStock={detail.adjustStock}
+        reservedOrders={detail.reservedOrders}
+        movements={detail.movements}
+        undoLastMovement={detail.undoLastMovement}
+        undoing={detail.undoing}
+      />
+
+      {hasWriteAccess && (
+        <InventoryCsvImport
+          isOpen={csvImportOpen}
+          onClose={() => setCsvImportOpen(false)}
+          onSuccess={() => void table.reload()}
+          effectiveThreshold={detail.effectiveThreshold}
+        />
+      )}
     </div>
   )
 }

@@ -1,74 +1,48 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// Supabase Edge Function: shipping-status
-// Returns shipping status for a given order_id or tracking_number
-// Env required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (read-only is okay but service role simplifies policies in sandbox)
+// Çağıran sınıfı: (c) idi — kimliksiz, halka açık uç. ARTIK HİÇBİR İŞ YAPMIYOR: EMEKLİ.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+// NİÇİN (T058-VH · operasyon döngüsü denetimi 2026-08-15 §4)
+// ─────────────────────────────────────────────────────────────────────────────
+// Bu uç, `order_id` ya da `tracking_number` verilen isteğe sipariş kargo durumunu
+// döndürüyordu. `verify_jwt=false` ile halka açıktı ve tek koruması IP rate-limit'ti
+// (`edge-security.test.ts` R5 baseline'ında bu yüzden duruyor).
+//
+// Ölçüldü (2026-08-16): repoda bu ucu çağıran **tek satır yok** — ne `src/`, ne `e2e/`,
+// ne başka bir edge fonksiyonu. Yalnızca `config.toml` kaydı ve conformance listeleri
+// adını anıyor. Yani kullanılmayan bir uç, kimliksiz erişime açık duruyordu.
+//
+// Kullanılmayan bir yüzey, güvenliği "şimdilik" olan bir yüzeyden daha tehlikelidir:
+// kimse ona bakmaz, kimse test etmez, ve bir gün biri "zaten var" diye üzerine iş bindirir.
+// Takip numarası tahmin edilebilir bir dizedir; bu uç, tahmin eden herkese sipariş
+// durumunu veriyordu. Müşterinin kendi kargo bilgisi zaten kimlik doğrulamalı hesap
+// sayfasından geliyor (`AccountShipmentsPage`, `OrderDetailPage`).
+//
+// ── Niçin SİLİNMEDİ, 410'a çevrildi ─────────────────────────────────────────
+// Dosyayı silmek prod'daki dağıtılmış fonksiyonu KALDIRMAZ (deploy yalnız değişenleri
+// yeniler) — yani kod silinir, açık uç canlı kalırdı. 410 dönen bir sürüm deploy etmek
+// ucu GERÇEKTEN kapatır. Ayrıca 410 niyet beyanıdır: 404 "henüz deploy olmadı" ile
+// karışır, 410 "vardı, bilerek kapatıldı" der.
+//
+// `verify_jwt` KASITEN false bırakıldı: bu fonksiyon artık hiçbir veriye dokunmuyor,
+// dolayısıyla kimlik doğrulaması korunacak bir şey bulamaz — ama 410 mesajının stray
+// bir çağırana ULAŞMASI teşhis değeri taşır. Ayrıca `config.toml` değişikliği TÜM
+// fonksiyonları yeniden deploy ettirir (cetvel §3.7 uyarısı); gereksiz yere o riski almayız.
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { getCorsHeaders } from '../_shared/cors.ts'
 
-function jsonResponse(body: unknown, init: ResponseInit = {}) {
-  return new Response(JSON.stringify(body, null, 2), {
-    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...(init.headers || {}) },
-    status: init.status || 200,
-  })
-}
+Deno.serve((req: Request) => {
+  const cors = getCorsHeaders(req)
 
-Deno.serve(async (req: Request) => {
-  try {
-    if (req.method !== 'GET') {
-      return jsonResponse({ error: 'Method not allowed' }, { status: 405 })
-    }
+  if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
 
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-    const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    if (!SUPABASE_URL || !SERVICE_KEY) {
-      return jsonResponse({ error: 'Function misconfigured: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY' }, { status: 500 })
-    }
-
-    // IP-based Rate Limiting to prevent tracking_number brute-force attacks
-    const forwarded = req.headers.get('x-forwarded-for') || ''
-    const ip = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '') || 'unknown'
-    const key = `shipping-status:${ip}`
-    try {
-      const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')
-      const { result } = await checkRateLimit(key, SUPABASE_URL, SERVICE_KEY, {
-        limit: Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_PER_MINUTE') || 30),
-        windowSec: Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_WINDOW_SEC') || 60)
-      })
-      if (!result.allowed) {
-        const rlHeaders = rateLimitHeaders(Number(Deno.env.get('SHIPPING_STATUS_RATE_LIMIT_PER_MINUTE') || 30), result.remaining, result.resetAt)
-        return jsonResponse({ error: 'too_many_requests' }, { status: 429, headers: rlHeaders as Record<string, string> })
-      }
-    } catch (e) {
-      // If rate_limit module is missing or throws, continue but log error
-      console.warn('Rate limiting failed or unavailable:', e)
-    }
-
-    const url = new URL(req.url)
-    // Option A: Explicitly reject the internal identifier `order_id` if provided and rely solely on `tracking_number`
-    if (url.searchParams.has('order_id')) {
-      return jsonResponse({ error: 'Internal identifiers (order_id) are not permitted for public tracking lookups. Please use tracking_number.' }, { status: 403 })
-    }
-
-    const tracking = url.searchParams.get('tracking_number') || ''
-
-    if (!tracking) {
-      return jsonResponse({ error: 'Provide a tracking_number' }, { status: 400 })
-    }
-
-    const supabase = createClient(SUPABASE_URL, SERVICE_KEY)
-
-    const query = supabase.from('venthub_orders')
-      .select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at')
-      .eq('tracking_number', tracking)
-      .limit(1)
-
-    const { data, error } = await query.single()
-    if (error) return jsonResponse({ error: error.message || 'Not found' }, { status: 404 })
-
-    return jsonResponse({ ok: true, shipping: data })
-  } catch (_e) {
-    console.error('Shipping status error:', _e);
-    return jsonResponse({ error: _e instanceof Error ? _e.message : 'Unexpected error' }, { status: 500 })
-  }
+  return new Response(
+    JSON.stringify({
+      error: 'ENDPOINT_RETIRED',
+      message:
+        'shipping-status emekliye ayrıldı: kullanılmıyordu ve takip numarasını bilen herkese ' +
+        'sipariş durumu döndürüyordu. Kargo bilgisi kimlik doğrulamalı hesap sayfalarından gelir.',
+      ref: 'T058-VH · docs/audits/operasyon-dongusu-denetimi-2026-08-15.md §4',
+    }),
+    { status: 410, headers: { ...cors, 'Content-Type': 'application/json' } },
+  )
 })
-

@@ -96,26 +96,26 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
 
     // Tailwind CSS override for react-day-picker
     const dayPickerClassNames = {
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 text-slate-700",
+        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 text-admin-fg-subtle",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-bold text-slate-800",
+        caption_label: "text-sm font-bold text-admin-fg-subtle",
         nav: "space-x-1 flex items-center",
-        nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-slate-100 rounded-md transition-colors flex items-center justify-center text-slate-600",
+        nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-admin-surface-2 rounded-md transition-colors flex items-center justify-center text-admin-fg-subtle",
         nav_button_previous: "absolute left-2",
         nav_button_next: "absolute right-2",
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
-        head_cell: "text-slate-500 rounded-md w-9 font-normal text-[0.8rem] uppercase tracking-wider",
+        head_cell: "text-admin-fg-muted rounded-md w-9 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-slate-100/50 [&:has([aria-selected])]:bg-slate-100 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: "h-9 w-9 p-0 font-normal hover:bg-slate-100 hover:text-slate-900 rounded-md transition-colors aria-selected:opacity-100",
+        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-admin-surface-2 [&:has([aria-selected])]:bg-admin-surface-2 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-raised",
+        day: "h-9 w-9 p-0 font-normal hover:bg-admin-surface-2 hover:text-admin-fg-subtle rounded-md transition-colors aria-selected:opacity-100",
         day_range_end: "day-range-end",
-        day_selected: "bg-primary-navy text-white hover:bg-primary-navy hover:text-white focus:bg-primary-navy focus:text-white",
-        day_today: "bg-slate-100 font-bold text-slate-900",
-        day_outside: "day-outside text-slate-400 opacity-50 aria-selected:bg-slate-100/50 aria-selected:text-slate-500 aria-selected:opacity-30",
-        day_disabled: "text-slate-400 opacity-50",
-        day_range_middle: "aria-selected:bg-slate-100 aria-selected:text-slate-900 aria-selected:rounded-none",
+        day_selected: "bg-admin-accent text-admin-accent-fg hover:bg-admin-accent hover:text-admin-accent-fg focus-visible:bg-admin-accent focus-visible:text-admin-accent-fg",
+        day_today: "bg-admin-surface-2 font-bold text-admin-fg-subtle",
+        day_outside: "day-outside text-admin-fg-muted opacity-50 aria-selected:bg-admin-surface-2 aria-selected:text-admin-fg-muted aria-selected:opacity-30",
+        day_disabled: "text-admin-fg-muted opacity-50",
+        day_range_middle: "aria-selected:bg-admin-surface-2 aria-selected:text-admin-fg-subtle aria-selected:rounded-none",
         day_hidden: "invisible",
     }
 
@@ -123,20 +123,20 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
         <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
             <Popover.Trigger asChild>
                 <button
-                    className={`inline-flex items-center gap-2 justify-between bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 transition-shadow w-full sm:w-auto max-w-full ${className}`}
+                    className={`inline-flex items-center gap-2 justify-between bg-admin-surface border border-admin-border shadow-admin-sm px-4 py-2.5 rounded-admin-md text-sm font-medium hover:bg-admin-surface-2 hover:border-admin-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 transition-shadow w-full sm:w-auto max-w-full ${className}`}
                 >
-                    <div className="flex items-center gap-2 text-slate-600">
-                        <CalendarIcon size={16} className={value?.from ? 'text-primary-navy' : 'text-slate-400'} />
-                        <span className={value?.from ? 'font-bold text-slate-800' : 'text-slate-500'}>
+                    <div className="flex items-center gap-2 text-admin-fg-subtle">
+                        <CalendarIcon size={16} className={value?.from ? 'text-primary-navy' : 'text-admin-fg-muted'} />
+                        <span className={value?.from ? 'font-bold text-admin-fg-subtle' : 'text-admin-fg-muted'}>
                             {triggerLabel}
                         </span>
                     </div>
-                    <ChevronDown size={16} className={`text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown size={16} className={`text-admin-fg-muted transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
             </Popover.Trigger>
             <Popover.Portal>
                 <Popover.Content
-                    className="z-toast mt-2 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl p-0 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-85vh md:max-h-none overflow-y-auto md:w-auto"
+                    className="z-toast mt-2 bg-admin-surface border border-admin-border rounded-admin-lg shadow-admin-lg p-0 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-85vh md:max-h-none overflow-y-auto md:w-auto"
                     style={{ width: typeof window !== 'undefined' && window.innerWidth >= 768 ? 'auto' : 'calc(100vw - 32px)' }}
                     align="center"
                     sideOffset={5}
@@ -144,8 +144,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
                 >
 
                     {/* Preset Buttons - Left Sidebar */}
-                    <div className="md:w-48 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200/60 p-3 overflow-y-auto max-h-60vh">
-                        <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">{t('admin.common.quickSelect')}</div>
+                    <div className="md:w-48 bg-admin-surface-2 border-b md:border-b-0 md:border-r border-admin-border p-3 overflow-y-auto max-h-60vh">
+                        <div className="text-xs font-bold text-admin-fg-muted mb-3 px-2">{t('admin.common.quickSelect')}</div>
                         <div className="flex flex-col gap-1">
                             {presets.map((preset, idx) => {
                                 const isSelected =
@@ -156,7 +156,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
                                     <button
                                         key={idx}
                                         onClick={() => handleSelect(preset.getRange())}
-                                        className={`text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${isSelected ? 'bg-primary-navy text-white font-bold shadow-md' : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-800'}`}
+                                        className={`text-left px-3 py-2 rounded-admin-md text-sm transition-colors flex items-center justify-between ${isSelected ? 'bg-admin-accent text-admin-accent-fg font-bold shadow-admin-md' : 'text-admin-fg-subtle hover:bg-admin-surface-2 hover:text-admin-fg-subtle'}`}
                                     >
                                         {preset.label}
                                         {isSelected && <Check size={14} className="opacity-80" />}
@@ -178,32 +178,32 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
                             showOutsideDays
                             classNames={dayPickerClassNames}
                             modifiersClassNames={{
-                                selected: 'bg-primary-navy text-white'
+                                selected: 'bg-admin-accent text-admin-accent-fg'
                             }}
                         />
 
                         {/* Actions */}
-                        <div className="flex items-center justify-between mt-4 border-t border-slate-100 pt-4">
-                            <span className="text-xs text-slate-500 font-medium">
+                        <div className="flex items-center justify-between mt-4 border-t border-admin-border pt-4">
+                            <span className="text-xs text-admin-fg-muted font-medium">
                                 {selectedRange?.from ? (
                                     <>
-                                        {t('admin.common.range')}: <b className="text-slate-700">{format(selectedRange.from, 'dd MMM', { locale })}</b>
+                                        {t('admin.common.range')}: <b className="text-admin-fg-subtle">{format(selectedRange.from, 'dd MMM', { locale })}</b>
                                         {selectedRange.to ? (
                                             <>
-                                                {' '} - <b className="text-slate-700">{format(selectedRange.to, 'dd MMM', { locale })}</b>
+                                                {' '} - <b className="text-admin-fg-subtle">{format(selectedRange.to, 'dd MMM', { locale })}</b>
                                             </>
                                         ) : ' - '}
                                     </>
                                 ) : t('admin.common.selectDateRange')}
                             </span>
                             <div className="flex items-center gap-2">
-                                <button onClick={cancelSelection} className="px-5 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-colors">
+                                <button onClick={cancelSelection} className="px-5 py-2 text-sm font-bold text-admin-fg-muted hover:bg-admin-surface-2 rounded-admin-md transition-colors">
                                     {t('admin.common.discard')}
                                 </button>
                                 <button
                                     onClick={applySelection}
                                     disabled={!selectedRange?.from}
-                                    className="px-6 py-2 text-sm font-bold bg-primary-navy text-white hover:bg-primary-navy/90 rounded-lg shadow-md shadow-primary-navy/20 active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
+                                    className="px-6 py-2 text-sm font-bold bg-admin-accent text-admin-accent-fg hover:bg-primary-navy/90 rounded-admin-md shadow-admin-md shadow-primary-navy/20 active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
                                 >
                                     {t('admin.common.apply')}
                                 </button>

@@ -109,6 +109,7 @@ export const categories = {
   },
   nameRequired: 'Kategori adı zorunludur',
   slugRequired: 'Slug alanı zorunludur',
+  sortOrderInvalid: 'Sıra değeri tam sayı olmalıdır',
   unsavedChangesConfirm: 'Kaydedilmemiş değişiklikleriniz var. Sayfadan ayrılmak istediğinizden emin misiniz?',
 };
 

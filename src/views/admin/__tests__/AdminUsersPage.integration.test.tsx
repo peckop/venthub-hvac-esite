@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { ConfirmProvider } from '@/components/admin/overlay/ConfirmProvider'
 import { testA11y } from '@/utils/testA11y'
 
 import AdminUsersPage from '../AdminUsersPage'
@@ -35,13 +36,27 @@ const sb = vi.hoisted(() => {
   ]
   /* selectChain çift kaynağı kapsar:
      - admins-tab: .select('id, full_name').in('id', ids)  → enrich promise
-     - all-tab:    await .select('id, role, created_at, full_name')  → thenable {data, error} */
+     - all-tab:    .select(..., { count: 'exact' }).order(...).range(...)  → {data, count, error}
+
+     `order`/`range`/`ilike` 2026-08-16'da EKLENDİ (T059-VH): "tümü" sekmesi artık
+     sunucu sayfalaması kullanıyor. Eskiden sorgu limitsizdi ve PostgREST'in sessiz
+     1000-satır tavanına takılıyordu; mock o eski şekli (select doğrudan await
+     edilebilir) kodluyordu. Zincir uzadı, testin NİYETİ aynı kaldı. */
   const selectChain = {
     in() {
       return Promise.resolve({
         data: adminUsers.map((u) => ({ id: u.id, full_name: u.full_name })),
         error: null,
       })
+    },
+    order() {
+      return selectChain
+    },
+    ilike() {
+      return selectChain
+    },
+    range() {
+      return Promise.resolve({ data: allProfiles, count: allProfiles.length, error: null })
     },
     then(resolve: (v: { data: unknown; error: null }) => unknown, reject?: (e: unknown) => unknown) {
       return Promise.resolve({ data: allProfiles, error: null }).then(resolve, reject)
@@ -91,7 +106,11 @@ vi.mock('next/navigation', () => ({
 
 describe('AdminUsersPage (kit göçü) — integration + a11y', () => {
   it('admin kullanıcılarını render eder + sıralanabilir başlıkta aria-sort taşır', async () => {
-    render(<AdminUsersPage />)
+    render(
+    <ConfirmProvider>
+      <AdminUsersPage />
+    </ConfirmProvider>
+  )
     // admins-tab fetcher çözülünce satırlar görünür
     await screen.findByText('admin@venthub.com')
     await screen.findByText('super@venthub.com')
@@ -102,7 +121,11 @@ describe('AdminUsersPage (kit göçü) — integration + a11y', () => {
   })
 
   it('"Tümü" sekmesine geçince user_profiles kaynağını yükler', async () => {
-    render(<AdminUsersPage />)
+    render(
+    <ConfirmProvider>
+      <AdminUsersPage />
+    </ConfirmProvider>
+  )
     await screen.findByText('admin@venthub.com')
 
     fireEvent.click(screen.getByText('admin.users.tabs.all'))
@@ -111,7 +134,11 @@ describe('AdminUsersPage (kit göçü) — integration + a11y', () => {
   })
 
   it('a11y ihlali yok (axe 0)', async () => {
-    const { container } = render(<AdminUsersPage />)
+    const { container } = render(
+    <ConfirmProvider>
+      <AdminUsersPage />
+    </ConfirmProvider>
+  )
     await screen.findByText('admin@venthub.com')
     const results = await testA11y(container)
     expect(results).toHaveNoViolations()

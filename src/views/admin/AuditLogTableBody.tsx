@@ -138,7 +138,7 @@ const AuditLogTableBody: React.FC = () => {
         header: t('admin.audit.colDate'),
         sortable: true,
         cell: (r) => (
-          <span className="text-slate-400 text-xs font-black uppercase tracking-widest whitespace-nowrap">
+          <span className="text-admin-fg-muted text-xs font-semibold whitespace-nowrap">
             {formatDateTime(r.at, lang as 'tr' | 'en')}
           </span>
         ),
@@ -149,14 +149,14 @@ const AuditLogTableBody: React.FC = () => {
         sortable: true,
         cell: (r) => (
           <span
-            className={`px-2 py-0.5 rounded-lg text-xs font-black uppercase tracking-wider border transition-colors ${
+            className={`px-2 py-0.5 rounded-admin-md text-xs font-semibold border transition-colors ${
               r.action === 'INSERT'
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                ? 'bg-admin-success-weak text-admin-success border-admin-success/30'
                 : r.action === 'UPDATE'
-                  ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
+                  ? 'bg-admin-accent-weak text-admin-accent border-admin-accent/30'
                   : r.action === 'DELETE'
-                    ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                    : 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+                    ? 'bg-admin-danger-weak text-admin-danger border-admin-danger/30'
+                    : 'bg-admin-surface-3 text-admin-fg-muted border-admin-border'
             }`}
           >
             {r.action}
@@ -166,17 +166,17 @@ const AuditLogTableBody: React.FC = () => {
       {
         key: 'table_name',
         header: t('admin.audit.colTable'),
-        cell: (r) => <span className="text-slate-200 text-xs">{r.table_name}</span>,
+        cell: (r) => <span className="text-admin-fg text-xs">{r.table_name}</span>,
       },
       {
         key: 'row_pk',
         header: t('admin.audit.colPk'),
-        cell: (r) => <span className="text-slate-400 text-xs font-mono">{r.row_pk || '-'}</span>,
+        cell: (r) => <span className="text-admin-fg-muted text-xs font-mono">{r.row_pk || '-'}</span>,
       },
       {
         key: 'comment',
         header: t('admin.audit.colNote'),
-        cell: (r) => <span className="block max-w-xs truncate text-slate-300 text-xs">{r.comment || '-'}</span>,
+        cell: (r) => <span className="block max-w-xs truncate text-admin-fg text-xs">{r.comment || '-'}</span>,
       },
     ],
     [t, lang],
@@ -185,24 +185,24 @@ const AuditLogTableBody: React.FC = () => {
   return (
     <div className="space-y-6">
       {batchVal && (
-        <div className="glass-strong border border-amber-500/20 bg-amber-500/5 p-4 rounded-2xl flex items-center justify-between gap-4">
+        <div className="bg-admin-surface border border-admin-warning/30 bg-admin-warning-weak p-4 rounded-admin-lg flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Filter size={18} className="text-amber-500" />
-            <span className="text-xs font-black uppercase tracking-widest text-amber-500">
+            <Filter size={18} className="text-admin-warning" />
+            <span className="text-xs font-semibold text-admin-warning">
               {t('admin.audit.filterBatch')} <span className="font-mono text-xs">{batchVal}</span>
             </span>
           </div>
           <div className="flex items-center gap-2">
             <a
               href={`/admin/movements?batch=${batchVal}`}
-              className={`${adminButtonSecondaryClass} !h-8 !px-3 font-black text-xs uppercase border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-colors`}
+              className={`${adminButtonSecondaryClass} !h-8 !px-3 font-semibold text-xs border-admin-warning/30 text-admin-warning hover:bg-admin-warning-weak transition-colors`}
             >
               {t('admin.audit.viewMovements')}
             </a>
             <button
               type="button"
               onClick={clearBatch}
-              className={`${adminButtonSecondaryClass} !h-8 !px-3 font-black text-xs uppercase border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-colors`}
+              className={`${adminButtonSecondaryClass} !h-8 !px-3 font-semibold text-xs border-admin-warning/30 text-admin-warning hover:bg-admin-warning-weak transition-colors`}
             >
               {t('admin.audit.clear')}
             </button>
@@ -237,12 +237,12 @@ const AuditLogTableBody: React.FC = () => {
         renderExpandedRow={(r) => (
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <Terminal size={14} className="text-cyan-400" />
-              <div className="text-xs font-black text-cyan-400 uppercase tracking-hvac-normal">
+              <Terminal size={14} className="text-admin-accent" />
+              <div className="text-xs font-semibold text-admin-accent">
                 {t('admin.audit.details')}
               </div>
             </div>
-            <div className="rounded-2xl border border-white/5 bg-surface-deep/60 p-1">
+            <div className="rounded-admin-lg border border-admin-border bg-surface-deep/60 p-1">
               <JsonDiffViewer before={r.before} after={r.after} />
             </div>
           </div>

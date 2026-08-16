@@ -24,14 +24,14 @@ const JsonDiffViewer: React.FC<JsonDiffViewerProps> = ({ before, after }) => {
     }
 
     return (
-        <div className="w-full bg-slate-900 rounded-xl overflow-hidden border border-slate-700 shadow-xl">
-            <div className="flex text-xs font-semibold text-slate-400 bg-slate-800/80 border-b border-slate-700">
-                <div className="flex-1 p-3 border-r border-slate-700 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-rose-500"></div>
+        <div className="w-full bg-admin-surface-3 rounded-admin-md overflow-hidden border border-admin-border shadow-admin-lg">
+            <div className="flex text-xs font-semibold text-admin-fg-muted bg-admin-surface-2 border-b border-admin-border">
+                <div className="flex-1 p-3 border-r border-admin-border flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-admin-danger"></div>
                     {t('admin.common.oldValueBefore')}
                 </div>
                 <div className="flex-1 p-3 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                    <div className="w-2 h-2 rounded-full bg-admin-success"></div>
                     {t('admin.common.newValueAfter')}
                 </div>
             </div>
@@ -50,35 +50,35 @@ const JsonDiffViewer: React.FC<JsonDiffViewerProps> = ({ before, after }) => {
                     if (!isRemoved && !isAdded && !isChanged) {
                         // Unchanged
                         return (
-                            <div key={key} className="flex hover:bg-slate-800/50 transition-colors">
-                                <div className="flex-1 px-2 py-1 border-r border-slate-800 text-slate-500 truncate" title={`${key}: ${strB}`}>
-                                    <span className="text-slate-600 mr-2">{key}:</span> {strB}
+                            <div key={key} className="flex hover:bg-admin-surface-2 transition-colors">
+                                <div className="flex-1 px-2 py-1 border-r border-admin-border text-admin-fg-muted truncate" title={`${key}: ${strB}`}>
+                                    <span className="text-admin-fg-subtle mr-2">{key}:</span> {strB}
                                 </div>
-                                <div className="flex-1 px-2 py-1 text-slate-500 truncate" title={`${key}: ${strB}`}>
-                                    <span className="text-slate-600 mr-2">{key}:</span> {strB}
+                                <div className="flex-1 px-2 py-1 text-admin-fg-muted truncate" title={`${key}: ${strB}`}>
+                                    <span className="text-admin-fg-subtle mr-2">{key}:</span> {strB}
                                 </div>
                             </div>
                         )
                     }
 
                     return (
-                        <div key={key} className="flex hover:bg-slate-800/50 transition-colors">
+                        <div key={key} className="flex hover:bg-admin-surface-2 transition-colors">
                             {/* Before Column */}
-                            <div className={`flex-1 px-2 py-1 border-r border-slate-800 truncate ${isAdded ? 'bg-slate-800/30' : (isRemoved || isChanged ? 'bg-rose-500/10 text-rose-300' : 'text-slate-500')}`}>
-                                <span className="text-slate-500 mr-2 opacity-70">{key}:</span>
-                                {isAdded ? <span className="text-slate-600 italic">{t('admin.common.added')}</span> : <span title={strB}>{strB}</span>}
+                            <div className={`flex-1 px-2 py-1 border-r border-admin-border truncate ${isAdded ? 'bg-admin-surface-2' : (isRemoved || isChanged ? 'bg-admin-danger-weak text-admin-danger' : 'text-admin-fg-muted')}`}>
+                                <span className="text-admin-fg-muted mr-2 opacity-70">{key}:</span>
+                                {isAdded ? <span className="text-admin-fg-subtle italic">{t('admin.common.added')}</span> : <span title={strB}>{strB}</span>}
                             </div>
 
                             {/* After Column */}
-                            <div className={`flex-1 px-2 py-1 truncate ${isRemoved ? 'bg-slate-800/30' : (isAdded || isChanged ? 'bg-emerald-500/10 text-emerald-300' : 'text-slate-500')}`}>
-                                <span className="text-slate-500 mr-2 opacity-70">{key}:</span>
-                                {isRemoved ? <span className="text-slate-600 italic">{t('admin.common.deleted')}</span> : <span title={strA}>{strA}</span>}
+                            <div className={`flex-1 px-2 py-1 truncate ${isRemoved ? 'bg-admin-surface-2' : (isAdded || isChanged ? 'bg-admin-success-weak text-admin-success' : 'text-admin-fg-muted')}`}>
+                                <span className="text-admin-fg-muted mr-2 opacity-70">{key}:</span>
+                                {isRemoved ? <span className="text-admin-fg-subtle italic">{t('admin.common.deleted')}</span> : <span title={strA}>{strA}</span>}
                             </div>
                         </div>
                     )
                 })}
                 {allKeys.length === 0 && (
-                    <div className="text-center py-4 text-slate-500 italic">{t('admin.common.noChangeDetails')}</div>
+                    <div className="text-center py-4 text-admin-fg-muted italic">{t('admin.common.noChangeDetails')}</div>
                 )}
             </div>
         </div>

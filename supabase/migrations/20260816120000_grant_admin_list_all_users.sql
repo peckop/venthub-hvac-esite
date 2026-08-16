@@ -1,0 +1,28 @@
+-- T059-VH · Admin müşteri listesinde e-posta görünsün
+--
+-- SORUN: Admin panelindeki "Tümü" sekmesi kullanıcıları `user_profiles`'tan okuyor ve
+-- o tabloda e-posta YOK (e-posta `auth.users`ta ve istemciden okunamaz). Sonuç: admin
+-- kimin kim olduğunu göremiyor, müşteri desteği pratikte imkânsız, CSV dışa aktarma
+-- e-postasız çıkıyor.
+--
+-- YENİ FONKSİYON YAZILMADI. `public.admin_list_all_users()` ZATEN VAR:
+--   · e-posta dahil tüm kolonları döndürüyor (id, email, full_name, phone, role, …),
+--   · SECURITY DEFINER,
+--   · ve yetki kapısı GÖVDESİNİN İÇİNDE: `user_profiles.role IN
+--     ('admin','moderator','super_admin')` değilse `not authorized` fırlatıyor.
+-- Tek eksik, `authenticated` rolüne EXECUTE verilmemiş olması. Yani sorun bir yetenek
+-- eksikliği değil, tek satırlık bir izin eksikliğiydi.
+--
+-- NİÇİN GÜVENLİ: `public.admin_list_users()` (yalnız PERSONELİ döndüren ikizi) tam olarak
+-- AYNI yetki kontrolüyle ve zaten `authenticated`a GRANT'li olarak çalışıyor. Bu migration
+-- yeni bir güven modeli kurmuyor, mevcut olanı ikinci fonksiyona da uyguluyor.
+--
+-- NİÇİN YİNE DE DİKKAT: bu fonksiyon personel yerine TÜM MÜŞTERİ e-postalarını döndürür.
+-- Rol kapısı bir gün aşılırsa patlama yarıçapı `admin_list_users`tan büyüktür. Kapı
+-- `user_profiles.role` okuyor; o sütunun kullanıcı tarafından değiştirilememesi
+-- `trg_enforce_role_change` tetikleyicisine bağlı — o tetikleyici kaldırılırsa BU GRANT
+-- yeniden değerlendirilmelidir. (İlgili açık iş: T047-VH, yetki kaynağı sertleştirmesi.)
+--
+-- Recep 2026-08-16'da onayladı (kural 13: migration merge'i prod'a otomatik uygulanır).
+
+grant execute on function public.admin_list_all_users() to authenticated;

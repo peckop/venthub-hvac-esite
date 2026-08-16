@@ -154,13 +154,13 @@ const RuleScopeTargetPicker: React.FC<RuleScopeTargetPickerProps> = ({
   if (scope === 4) return null
 
   const errorText = error ? (
-    <p className="text-xs font-bold text-rose-400 mt-1 uppercase tracking-tighter">{error}</p>
+    <p className="text-xs font-bold text-admin-danger mt-1 tracking-tighter">{error}</p>
   ) : null
 
   if (scope === 2) {
     return (
       <div className="space-y-2">
-        <label htmlFor="rule-brand" className="block text-xs font-black text-slate-500 uppercase tracking-wider">
+        <label htmlFor="rule-brand" className="block text-xs font-semibold text-admin-fg-muted">
           {t('admin.pricing.rules.form.brandTarget')}
         </label>
         <select
@@ -186,7 +186,7 @@ const RuleScopeTargetPicker: React.FC<RuleScopeTargetPickerProps> = ({
   if (scope === 3) {
     return (
       <div className="space-y-2">
-        <label htmlFor="rule-category" className="block text-xs font-black text-slate-500 uppercase tracking-wider">
+        <label htmlFor="rule-category" className="block text-xs font-semibold text-admin-fg-muted">
           {t('admin.pricing.rules.form.categoryTarget')}
         </label>
         <select
@@ -204,7 +204,7 @@ const RuleScopeTargetPicker: React.FC<RuleScopeTargetPickerProps> = ({
             </option>
           ))}
         </select>
-        <p className="text-xs font-bold text-slate-500 leading-relaxed">
+        <p className="text-xs font-bold text-admin-fg-muted leading-relaxed">
           {t('admin.pricing.rules.form.categoryCascadeHint')}
         </p>
         {errorText}
@@ -215,20 +215,20 @@ const RuleScopeTargetPicker: React.FC<RuleScopeTargetPickerProps> = ({
   /* scope 0/1 — ürün araması */
   return (
     <div className="space-y-2">
-      <label htmlFor="rule-product-search" className="block text-xs font-black text-slate-500 uppercase tracking-wider">
+      <label htmlFor="rule-product-search" className="block text-xs font-semibold text-admin-fg-muted">
         {t('admin.pricing.rules.form.productTarget')}
       </label>
 
       {selectedProduct ? (
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl glass border border-cyan-400/20 bg-cyan-400/5">
-          <span className="text-sm font-black text-white truncate">{selectedProduct.name}</span>
-          <span className="text-xs font-mono font-bold text-cyan-400">{selectedProduct.sku}</span>
+        <div className="flex items-center gap-3 px-4 py-2.5 rounded-admin-md bg-admin-surface border border-admin-accent/30 bg-admin-accent-weak">
+          <span className="text-sm font-semibold text-admin-fg truncate">{selectedProduct.name}</span>
+          <span className="text-xs font-mono font-bold text-admin-accent">{selectedProduct.sku}</span>
           <button
             type="button"
             onClick={clearProduct}
             disabled={disabled}
             aria-label={t('admin.pricing.rules.form.clearTarget')}
-            className="ml-auto p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+            className="ml-auto p-1 rounded-admin-md text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-3 transition-colors focus-visible:ring-2 focus-visible:ring-admin-accent/30"
           >
             <X size={14} />
           </button>
@@ -236,7 +236,7 @@ const RuleScopeTargetPicker: React.FC<RuleScopeTargetPickerProps> = ({
       ) : (
         <>
           <div className="relative">
-            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-admin-fg-muted" />
             <input
               id="rule-product-search"
               type="text"
@@ -247,21 +247,21 @@ const RuleScopeTargetPicker: React.FC<RuleScopeTargetPickerProps> = ({
               className={adminInputClass}
             />
             {searching ? (
-              <Loader2 size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-cyan-400 animate-spin" />
+              <Loader2 size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-admin-accent animate-spin" />
             ) : null}
           </div>
 
           {results.length > 0 ? (
-            <ul className="max-h-60 overflow-y-auto custom-scrollbar rounded-xl glass border border-white/10 divide-y divide-white/5">
+            <ul className="max-h-60 overflow-y-auto custom-scrollbar rounded-admin-md bg-admin-surface border border-admin-border divide-y divide-admin-border">
               {results.map((p) => (
                 <li key={p.id}>
                   <button
                     type="button"
                     onClick={() => pickProduct(p)}
-                    className="w-full text-left px-4 py-2.5 hover:bg-white/5 transition-colors focus-visible:bg-white/5 focus-visible:outline-none"
+                    className="w-full text-left px-4 py-2.5 hover:bg-admin-surface-2 transition-colors focus-visible:bg-admin-surface-2 focus-visible:outline-none"
                   >
-                    <span className="block text-sm font-bold text-white truncate">{p.name}</span>
-                    <span className="block text-xs font-mono font-bold text-slate-500">{p.sku}</span>
+                    <span className="block text-sm font-bold text-admin-fg truncate">{p.name}</span>
+                    <span className="block text-xs font-mono font-bold text-admin-fg-muted">{p.sku}</span>
                   </button>
                 </li>
               ))}
@@ -269,7 +269,7 @@ const RuleScopeTargetPicker: React.FC<RuleScopeTargetPickerProps> = ({
           ) : null}
 
           {!searching && term.trim().length >= 2 && results.length === 0 ? (
-            <p className="text-xs font-bold text-slate-500">{t('admin.pricing.rules.form.productSearchEmpty')}</p>
+            <p className="text-xs font-bold text-admin-fg-muted">{t('admin.pricing.rules.form.productSearchEmpty')}</p>
           ) : null}
         </>
       )}

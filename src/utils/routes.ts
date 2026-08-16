@@ -96,6 +96,7 @@ export const Routes = {
     invoices: () => '/account/invoices' as Route,
     profile: () => '/account/profile' as Route,
     favorites: () => '/account/favorites' as Route,
+    projects: () => '/account/projects' as Route,
     security: () => '/account/security' as Route
   },
   
@@ -141,6 +142,7 @@ export const Routes = {
     },
     register: () => '/auth/register' as Route,
     forgotPassword: () => '/auth/forgot-password' as Route,
+    resetPassword: () => '/auth/reset-password' as Route,
     callback: () => '/auth/callback' as Route
   }
 };

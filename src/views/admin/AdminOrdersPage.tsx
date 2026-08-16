@@ -30,14 +30,14 @@ const AdminOrdersPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-1 glass-strong p-1 rounded-2xl border border-white/5 shrink-0 shadow-2xl">
+        <div className="flex items-center gap-1 bg-admin-surface p-1 rounded-admin-lg border border-admin-border shrink-0 shadow-admin-lg">
           <button
             type="button"
             onClick={() => setViewMode('list')}
-            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-hvac-normal flex items-center gap-2 transition-colors duration-500 ${
+            className={`px-6 py-2.5 rounded-admin-md text-xs font-semibold flex items-center gap-2 transition-colors duration-500 ${
               viewMode === 'list'
-                ? 'bg-cyan-400 text-surface-deep shadow-glow-md'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                ? 'bg-admin-accent text-admin-accent-fg'
+                : 'text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-2'
             }`}
           >
             <LayoutList size={14} /> {t('admin.orders.view_list')}
@@ -45,10 +45,10 @@ const AdminOrdersPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setViewMode('board')}
-            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-hvac-normal flex items-center gap-2 transition-colors duration-500 ${
+            className={`px-6 py-2.5 rounded-admin-md text-xs font-semibold flex items-center gap-2 transition-colors duration-500 ${
               viewMode === 'board'
-                ? 'bg-cyan-400 text-surface-deep shadow-glow-md'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                ? 'bg-admin-accent text-admin-accent-fg'
+                : 'text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-2'
             }`}
           >
             <KanbanSquare size={14} /> {t('admin.orders.view_board')}

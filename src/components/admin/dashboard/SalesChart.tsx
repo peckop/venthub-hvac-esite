@@ -27,17 +27,17 @@ const SalesChart: React.FC<SalesChartProps> = ({ data, title }) => {
         <div className="flex flex-col h-hvac-panel w-full group/chart">
             <div className="flex items-center justify-between mb-10">
                 <div>
-                    <h3 className="text-xl font-black text-white tracking-tighter uppercase leading-none group-hover/chart:text-cyan-400 transition-colors">{title}</h3>
-                    <p className="text-xs font-black text-slate-500 uppercase tracking-hvac-relaxed mt-3 italic opacity-60">{t('admin.dashboard.charts.operationalPerformanceTrend')}</p>
+                    <h3 className="text-xl font-semibold text-admin-fg tracking-tighter leading-none group-hover/chart:text-admin-accent transition-colors">{title}</h3>
+                    <p className="text-xs font-semibold text-admin-fg-muted mt-3 italic opacity-60">{t('admin.dashboard.charts.operationalPerformanceTrend')}</p>
                 </div>
-                <div className="flex items-center gap-4 glass p-1.5 rounded-2xl border border-white/5 backdrop-blur-2xl shadow-2xl">
-                    <div className="flex items-center gap-2 px-4 py-2 hover:bg-white/5 rounded-xl transition-colors">
-                        <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-glow-md" />
-                        <span className="text-xs font-black text-slate-300 uppercase tracking-widest">{t('admin.dashboard.charts.order')}</span>
+                <div className="flex items-center gap-4 bg-admin-surface p-1.5 rounded-admin-lg border border-admin-border shadow-admin-lg">
+                    <div className="flex items-center gap-2 px-4 py-2 hover:bg-admin-surface-2 rounded-admin-md transition-colors">
+                        <div className="w-2.5 h-2.5 rounded-full bg-admin-accent" />
+                        <span className="text-xs font-semibold text-admin-fg">{t('admin.dashboard.charts.order')}</span>
                     </div>
-                    <div className="flex items-center gap-2 px-4 py-2 border-l border-white/10 hover:bg-white/5 rounded-xl transition-colors">
-                        <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-glow-md" />
-                        <span className="text-xs font-black text-slate-300 uppercase tracking-widest">{t('admin.dashboard.charts.return')}</span>
+                    <div className="flex items-center gap-2 px-4 py-2 border-l border-admin-border hover:bg-admin-surface-2 rounded-admin-md transition-colors">
+                        <div className="w-2.5 h-2.5 rounded-full bg-admin-danger" />
+                        <span className="text-xs font-semibold text-admin-fg">{t('admin.dashboard.charts.return')}</span>
                     </div>
                 </div>
             </div>
@@ -89,8 +89,8 @@ const SalesChart: React.FC<SalesChartProps> = ({ data, title }) => {
                                     backdropFilter: 'blur(20px)',
                                     color: '#fff'
                                 }}
-                                labelStyle={{ fontWeight: 'black', color: '#fff', marginBottom: '16px', fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase' }}
-                                itemStyle={{ fontSize: '11px', fontWeight: '900', padding: '8px 0', textTransform: 'uppercase', letterSpacing: '0.15em' }}
+                                labelStyle={{ fontWeight: 'black', color: '#fff', marginBottom: '16px', fontSize: '13px', letterSpacing: '0.1em', textTransform: '' }}
+                                itemStyle={{ fontSize: '11px', fontWeight: '900', padding: '8px 0', textTransform: '', letterSpacing: '0.15em' }}
                                 cursor={{ stroke: '#22d3ee', strokeWidth: 1.5, strokeDasharray: '4 4', opacity: 0.4 }}
                             />
                             <Area

@@ -22,6 +22,14 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
     const [importPreview, setImportPreview] = React.useState<{ header: string[]; rows: Record<string, string>[]; total: number } | null>(null)
     const [importRows, setImportRows] = React.useState<Record<string, string>[] | null>(null)
     const [isProcessing, setIsProcessing] = React.useState(false)
+    /**
+     * Hata ve sonuç bildirimi INLINE — `alert()` yerine.
+     * Cetvel §4.6: hata / kritik / eylem gerektiren mesaj toast'a KONMAZ (beş tasarım
+     * sistemi + WAI-ARIA APG hemfikir); inline mesaj veya banner kullanılır. `alert()`
+     * ayrıca stilsizdir, ana iş parçacığını bloklar ve e2e'de dialog yakalama gerektirir.
+     * `role="status"`/`aria-live` ile ekran okuyucuya da duyurulur.
+     */
+    const [notice, setNotice] = React.useState<{ tone: 'error' | 'info'; text: string } | null>(null)
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0]
@@ -48,18 +56,21 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
         const hasRequired = required.every(k => h.includes(k))
         const okCount = (importPreview?.rows || []).filter(r => r['name'] && r['sku']).length
         const statusKey = hasRequired ? 'admin.products.import.statusComplete' : 'admin.products.import.statusMissing'
-        alert(t('admin.products.import.dryRunResult', {
-            status: t(statusKey),
-            ok: okCount,
-            total: importPreview?.total || 0
-        }))
+        setNotice({
+            tone: 'info',
+            text: t('admin.products.import.dryRunResult', {
+                status: t(statusKey),
+                ok: okCount,
+                total: importPreview?.total || 0
+            })
+        })
     }
 
     const handleImport = async () => {
-        if (!importRows || !importPreview) return alert(t('admin.products.import.needCsv'))
+        if (!importRows || !importPreview) { setNotice({ tone: 'error', text: t('admin.products.import.needCsv') }); return }
         const h = importPreview.header
         if (!h.includes('sku') || !h.includes('name')) {
-            alert(t('admin.products.import.minColumns'))
+            setNotice({ tone: 'error', text: t('admin.products.import.minColumns') })
             return
         }
 
@@ -93,7 +104,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
         }
 
         if (payloads.length === 0) {
-            alert(t('admin.products.import.noneFound'))
+            setNotice({ tone: 'error', text: t('admin.products.import.noneFound') })
             setIsProcessing(false)
             return
         }
@@ -111,12 +122,12 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                     ok += chunk.length
                 }
             }
-            alert(t('admin.products.import.done', { ok, fail }))
+            setNotice({ tone: 'info', text: t('admin.products.import.done', { ok, fail }) })
             setImportPreview(null)
             setImportRows(null)
             onSuccess()
         } catch (e) {
-            alert(t('admin.products.import.error', { msg: ((e as Error).message || String(e)) }))
+            setNotice({ tone: 'error', text: t('admin.products.import.error', { msg: ((e as Error).message || String(e)) }) })
         } finally {
             setIsProcessing(false)
         }
@@ -132,17 +143,46 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                 {t('admin.products.import.button')}
             </button>
 
-            {importPreview && (
-                <div className="fixed inset-0 z-modal flex items-center justify-center bg-slate-900/50 p-4">
-                    <div className={`${adminCardClass} w-full max-w-4xl max-h-90vh flex flex-col shadow-xl animate-in fade-in zoom-in duration-200`}>
+            {/*
+              Inline bildirim — `alert()`'in yerini alır. `role="status"` + `aria-live`
+              ile ekran okuyucuya duyurulur; hata tonu KALICIDIR (kullanıcı kapatana
+              kadar durur), çünkü cetvel §4.6 hata mesajının kendiliğinden kaybolmasını
+              yasaklıyor (WCAG 2.2.3 atfıyla APG de aynısını söylüyor).
+            */}
+            {notice && (
+                <div
+                    role="status"
+                    aria-live="polite"
+                    className={`mt-3 flex items-start justify-between gap-3 rounded-admin-sm border px-3 py-2 text-sm ${
+                        notice.tone === 'error'
+                            ? 'border-admin-danger/30 bg-admin-danger-weak text-admin-danger'
+                            : 'border-admin-accent/30 bg-admin-accent-weak text-admin-accent'
+                    }`}
+                >
+                    <span>{notice.text}</span>
+                    <button
+                        type="button"
+                        onClick={() => setNotice(null)}
+                        aria-label={t('admin.a11y.close')}
+                        className="shrink-0 rounded-admin-sm px-1 text-current/70 hover:text-current
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30"
+                    >
+                        {t('admin.products.import.closeSymbol')}
+                    </button>
+                </div>
+            )}
 
-                        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-                            <h3 className="font-semibold text-slate-800">
+            {importPreview && (
+                <div className="fixed inset-0 z-modal flex items-center justify-center bg-admin-surface-2 p-4">
+                    <div className={`${adminCardClass} w-full max-w-4xl max-h-90vh flex flex-col shadow-admin-lg animate-in fade-in zoom-in duration-200`}>
+
+                        <div className="p-4 border-b border-admin-border flex items-center justify-between">
+                            <h3 className="font-semibold text-admin-fg-subtle">
                                 {t('admin.products.import.previewTitle', { total: importPreview.total })}
                             </h3>
                             <button
                                 onClick={() => { setImportPreview(null); setImportRows(null) }}
-                                className="text-slate-400 hover:text-slate-600 transition-colors"
+                                className="text-admin-fg-muted hover:text-admin-fg-subtle transition-colors"
                                 disabled={isProcessing}
                             >
                                 {t('admin.products.import.closeSymbol')}
@@ -151,20 +191,20 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
 
                         <div className="overflow-x-auto p-4 flex-1 overflow-y-auto">
                             <table className="w-full text-xs">
-                                <thead className="bg-gray-50 border-b border-gray-200 text-slate-500 uppercase">
+                                <thead className="bg-admin-surface-2 border-b border-admin-border text-admin-fg-muted">
                                     <tr>
                                         {importPreview.header.map(h => (<th key={h} className="p-2 text-left font-semibold">{h}</th>))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100">
+                                <tbody className="divide-y divide-admin-border">
                                     {importPreview.rows.map((r, idx) => (
-                                        <tr key={idx} className="hover:bg-gray-50/50">
+                                        <tr key={idx} className="hover:bg-admin-surface-2">
                                             {importPreview.header.map(h => (<td key={h} className="p-2 whitespace-nowrap">{r[h]}</td>))}
                                         </tr>
                                     ))}
                                     {importPreview.total > 10 && (
                                         <tr>
-                                            <td colSpan={importPreview.header.length} className="p-3 text-center text-slate-500 italic">
+                                            <td colSpan={importPreview.header.length} className="p-3 text-center text-admin-fg-muted italic">
                                                 {t('admin.products.import.moreRows', { count: importPreview.total - 10 })}
                                             </td>
                                         </tr>
@@ -173,7 +213,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                             </table>
                         </div>
 
-                        <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center gap-3 justify-end rounded-b-2xl">
+                        <div className="p-4 border-t border-admin-border bg-admin-surface-2 flex items-center gap-3 justify-end rounded-b-2xl">
                             <button
                                 className={`${adminButtonSecondaryClass} h-10`}
                                 onClick={() => { setImportPreview(null); setImportRows(null); }}

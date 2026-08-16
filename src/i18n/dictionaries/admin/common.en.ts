@@ -23,6 +23,8 @@ export const common = {
   no: 'No',
   yes: 'Yes',
   view: 'View',
+  export: 'Export',
+  noOptions: 'No options available',
   save: 'Save',
   total: 'Total',
   copyright: '© 2026 VentHub Platinum',
