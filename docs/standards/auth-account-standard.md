@@ -61,18 +61,74 @@ Muafiyeti kaldırmak ya da handler'ı silmek zinciri sessizce koparır — INV-A
 sağlayıcı hatası ne olursa olsun kullanıcıya tek jenerik mesaj gösterilir
 ("Sıfırlama isteği gönderilemedi"). "User not found" benzeri dallar yasaktır.
 
+## A7 — Oturum kapatma iki katmanlıdır (v0.3, T060)
+
+`sb-claims-cache` çerezi **httpOnly**'dir — client JS onu silemez ve `resolveUserClaims`
+geçerli çerezde Supabase'e hiç sormaz. Bu yüzden çıkış İKİ parçadan oluşur ve ikisi de
+zorunludur (bekçi: INV-AUTH-3, `auth-session-security.test.ts`):
+
+1. **Sunucu:** `POST /auth/signout` — oturumu sunucuda kapatır ve
+   `clearClaimsCacheCookie` ile claims cache'i temizler.
+2. **Client:** `supabase.auth.signOut()` — yerel oturum/state temizliği.
+
+`AuthContext.signOut` sunucu ucunu ÇAĞIRMAK zorundadır; yalnız client signOut,
+admin'i çıkıştan sonra cache TTL'i (≤900 sn) boyunca `/admin` kapısından geçirir
+(T060'ın kök bulgusu: temizleyicinin tek çağıranı hiç kullanılmayan route'tu —
+iki parça tek tek doğruydu, kopukluk aradaki teldeydi). Çerez httpOnly + TTL ≤ 900
+kalır; httpOnly'yi gevşetmek çerezi XSS'e açar, TTL'i büyütmek çıkış penceresini büyütür.
+
+## A8 — Rate limit politikası: GoTrue'ya emanet (ölçülmüş)
+
+Login/signup/forgot istekleri `supabase.co`'daki GoTrue uçlarına DOĞRUDAN gider —
+uygulama sunucumuzdan/middleware'den **geçmez**. Bu yüzden middleware'de auth
+rate-limit katmanı kurulamaz (istekleri hiç görmeyiz); `_shared/rate_limit.ts`
+deseni yalnız KENDİ edge fonksiyonlarımız içindir. Yürürlükteki koruma GoTrue'nun
+kendi limitleridir (ölçüm 2026-08-16, supabase.com/docs/guides/auth/rate-limits):
+
+- `/auth/v1/token` (login + refresh): IP başına 1800/saat, 30'luk burst — sabit.
+- `/auth/v1/verify`: IP başına 360/saat, 30 burst — sabit.
+- E-posta gönderen uçlar (`signup`/`recover`): kullanıcı başına 60 sn pencere +
+  proje genel e-posta limiti (yerleşik SMTP'de saatlik düşük tavan; custom SMTP'de
+  yükseltilebilir — canlıya çıkışta custom SMTP zaten gerekiyor).
+
+Ayarlar Dashboard → Authentication → Rate Limits'te yaşar. **Emanet açık yazılsın:**
+bu değerler repodan denetlenemez; değiştiren, bu bölümü günceller.
+
+## A9 — CAPTCHA: KARAR BEKLİYOR (Recep)
+
+Kayıt/giriş/şifre-sıfırlama uçlarında CAPTCHA yok — sağlayıcı + site anahtarı
+Recep kararıdır. Öneri: **Cloudflare Turnstile** (Supabase Auth'un yerleşik
+attestation entegrasyonu var; Dashboard → Auth → Attack Protection + client'ta
+`captchaToken` geçirme). Karar verilince bu bölüm kurala dönüşür. Not: HIBP
+kontrolü ağ hatasında bilerek fail-open'dır (kayıt akışını sızıntı servisine
+bağımlı kılmamak için) — bu bilinçli tercih burada kayıt altındadır.
+
+## A10 — tenant_id: user_metadata GÜVENİLMEZ, tasarım kararı
+
+Bugün `signUp` tenant_id'yi `user_metadata`'ya yazar (client-kontrollü alan);
+RLS ise `app_metadata` okur (kural 12) → signup'taki tenant seçimi yok sayılır.
+Tek-tenant v1'de zararsız (varsayılan tenant), multi-tenant'ta sessiz karışma.
+**Tasarım (devredilecek, uygulama bu cetvelin işi değil):** tenant ataması
+client iddiasından DEĞİL, sunucunun kendi gözleminden türetilir — ilk oturumda
+sunucu tarafı (route handler/edge fn) HOST'tan tenant'ı çözer ve service-role
+`auth.admin.updateUserById(..., { app_metadata: { tenant_id } })` ile BİR KEZ
+yazar; `user_metadata.tenant_id` yalnız görsel/istatistik amaçlıdır, hiçbir
+yetki/RLS kararına girmez. Uygulama EDGE şeridine devredildi (T047/T048 ailesiyle
+koordineli; `is_admin_user`'a dokunulmaz — ayrı iş emri).
+
 ---
 
 # Bölüm B — Hesap Yüzeyi (taşındı)
 
 v0.2'de burada duran hesap-yüzeyi kuralları (B1–B6) kendi cetveline taşındı:
 **`customer-account-standard.md`** (kardeş cetvel; bekçisi INV-AUTH-2). Bu dosya
-yalnız AUTH ZİNCİRİNİ (giriş/şifre/callback, A1–A6) yönetir.
+yalnız AUTH ZİNCİRİNİ (giriş/şifre/callback/oturum, A1–A10) yönetir.
 
 ## Kapsam dışı (bilerek)
 
 - `/account/*` middleware guard'ı — ortak mülk, ayrı iş (T056 kapsam dışı bırakıldı).
-- CAPTCHA / rate-limit — T060.
+- CAPTCHA uygulaması — A9'da karar bekliyor (Recep).
+- tenant_id app_metadata yazımının uygulaması — A10'da tasarım hazır, EDGE'e devredildi.
 - Google OAuth canlı e2e provası — Recep'in canlı ortam provası gerektirir
   (Supabase Dashboard'daki Redirect URL allowlist'i repodan denetlenemez; canlıda
   `https://<domain>/auth/callback` kayıtlı olmalıdır; 2026-08-16'da Recep kaydın
@@ -80,4 +136,4 @@ yalnız AUTH ZİNCİRİNİ (giriş/şifre/callback, A1–A6) yönetir.
 
 ## Muafiyetler
 
-Yok. Muafiyet gerekirse buraya **adla** yazılır ve INV-AUTH-1'de aynı adla sabitlenir.
+Yok. Muafiyet gerekirse buraya **adla** yazılır ve INV-AUTH-1/INV-AUTH-3'te aynı adla sabitlenir.
