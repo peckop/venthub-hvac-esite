@@ -12,7 +12,8 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
         '/admin/inventory',
         '/admin/movements',
         '/admin/inventory/report',
-        '/admin/inventory/settings'
+        '/admin/inventory/settings',
+        '/admin/purchasing'
     ],
     sales: [
         '/admin',
@@ -31,9 +32,10 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
  */
 const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'],
-    admin: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing'],
-    moderator: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing'],
-    warehouse: ['logistics', 'inventory', 'movements', 'inventory_settings'],
+    admin: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing', 'purchasing'],
+    moderator: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing', 'purchasing'],
+    // warehouse mal kabul İŞLER (RPC yetki kapısı da warehouse içerir — D2 migration).
+    warehouse: ['logistics', 'inventory', 'movements', 'inventory_settings', 'purchasing'],
     sales: ['orders', 'logistics', 'returns', 'quotes', 'coupons'],
     viewer: [],
     user: []

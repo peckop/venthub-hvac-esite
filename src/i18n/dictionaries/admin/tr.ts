@@ -16,6 +16,7 @@ import { movements } from './movements.tr'
 import { orders } from './orders.tr'
 import { pricing } from './pricing.tr'
 import { products } from './products.tr'
+import { purchasing } from './purchasing.tr'
 import { returns } from './returns.tr'
 import { search } from './search.tr'
 import { settings } from './settings.tr'
@@ -31,6 +32,7 @@ export const admin = {
   pricing,
   categories,
   products,
+  purchasing,
   common,
   confirm,
   coupons,
