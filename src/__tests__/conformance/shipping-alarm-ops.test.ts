@@ -164,6 +164,16 @@ describe('INV-OPS-1 · operasyon uçları sessizce sahte-başarı üretmez', () 
     expect(stripComments('/* recep.varlik@x */\nconst a = 1')).not.toMatch(/recep\.varlik/)
     // Ama koddaki gerçek geçiş GÖRÜLMELİ.
     expect(stripComments("const e = 'stok@venthub.com'")).toMatch(/stok@venthub/)
+    // ⚠️ CRLF KONTROLÜ — LEGAL-OPS'un 2026-08-16 uyarısı. Onların yorum ayıklayıcısı
+    // `/--.*$/` deseniyle HİÇBİR ŞEYİ temizlemiyordu: depo satırları CRLF ile saklıyor
+    // (T017-VH fantomu) ve JS'te `.` bir satır sonlandırıcı olan `\r` ile EŞLEŞMEZ.
+    // Bu dosyanın taradığı edge kaynakları GERÇEKTEN CRLF (ölçüldü) — yani buradaki
+    // sıyırıcı `[^\n]*` kullanmasaydı bu testin TAMAMI sessizce kör olurdu.
+    expect(stripComments('const a = 1\r\n// stok@venthub.com\r\nconst b = 2\r\n')).not.toMatch(/stok@venthub/)
+    expect(stripComments('/* recep.varlik@x */\r\nconst a = 1\r\n')).not.toMatch(/recep\.varlik/)
+    // CRLF'li kodda GERÇEK geçiş yine görülmeli (aşırı sıyırma da kusurdur).
+    expect(stripComments("const e = 'stok@venthub.com'\r\n")).toMatch(/stok@venthub/)
+
     // Sabit eşik dedektörü gerçek biçimi tanımalı.
     expect(/filter\(\s*['"]stock_qty['"]\s*,\s*['"]lte['"]\s*,\s*\d/.test("filter('stock_qty', 'lte', 10)")).toBe(true)
     // Değişkenli hâli ihlal SAYILMAMALI.
