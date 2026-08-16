@@ -20,6 +20,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { PO_STATUSES } from '@/lib/purchasing/poStatusMachine'
+import { canWrite, type UserRole } from '@/lib/rbac'
 
 declare global {
   interface ImportMeta {
@@ -115,6 +116,29 @@ function statusDictFromMigrations(): { file: string; statuses: string[] } | null
     if (!m) continue
     const statuses = [...m[1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1])
     if (statuses.length > 0) return { file, statuses }
+  }
+  return null
+}
+
+/**
+ * `purchase_orders` SELECT politikasının rol dizisini SON TANIMLAYAN migration'dan çıkarır.
+ * (R1a ile aynı "son tanım kazanır" mantığı — politika `drop policy if exists` + `create`
+ * ile yeniden yazılabilir.)
+ */
+function selectPolicyRolesFromMigrations(): { file: string; roles: string[] } | null {
+  const defs = Object.entries(migrationSql)
+    .filter(([, sql]) => /create policy\s+purchase_orders_admin_select/i.test(sql))
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+  for (let i = defs.length - 1; i >= 0; i--) {
+    const [file, sql] = defs[i]
+    const idx = sql.search(/create policy\s+purchase_orders_admin_select/i)
+    if (idx === -1) continue
+    // Politika gövdesi bir sonraki `;`'e kadar.
+    const body = sql.slice(idx, sql.indexOf(';', idx) + 1)
+    const m = body.match(/array\s*\[([^\]]+)\]/i)
+    if (!m) continue
+    const roles = [...m[1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1])
+    if (roles.length > 0) return { file, roles }
   }
   return null
 }
@@ -263,6 +287,54 @@ describe('INV-PURCH-1 — satınalma sözleşmeleri', () => {
         'politikası + fx_lock uyumu + render tetikleri + bu bekçinin güncellenmesi BİRLİKTE',
         'gelir; beş şartın listesi cetveldedir.',
         ...violations,
+      ].join('\n'),
+    ).toEqual([])
+  })
+
+  /*
+    R6 — UI izni, DB izninin ötesine geçemez (cetvel §8.1).
+
+    Bu kural 2026-08-16'da ÖLÇÜLEN gerçek bir kusurdan doğdu: D4'te `warehouse` rolüne
+    /admin/purchasing sayfa+yazma izni verildi, çünkü mal kabul RPC'si (adjust_stock
+    deseni) warehouse'u kabul ediyor. Ama satınalma tablolarının RLS SELECT'i
+    (pricing_policy deseni — maliyet hassas) warehouse'u İÇERMİYOR. Sonuç: kullanıcı
+    sayfayı açar, RLS boş küme döndürür, ekranda "kayıt yok" yazar ve HİÇBİR HATA
+    DÜŞMEZ — yetki eksiği boş veriye benzer. İki meşru desen çarpıştı; kesişimini
+    kimse ölçmüyordu.
+
+    Kapsam bilerek DAR: yalnız YAZMA izni. Yazma izni olan rol listeyi görmek
+    ZORUNDADIR. Salt-okur `viewer` ('*' sayfa jokeri taşır) kapsam dışıdır — onun
+    RLS'lerle ilişkisi satınalmaya özgü değil, ayrı ve daha geniş bir sorudur;
+    buraya çekmek yanlış-KIRMIZI üretirdi.
+  */
+  it('R6 — purchasing YAZMA izni olan her rol, RLS SELECT politikasında da var (sessiz-boş yasağı)', () => {
+    const policy = selectPolicyRolesFromMigrations()
+    expect(
+      policy,
+      'purchase_orders_admin_select politikası hiçbir migration\'da bulunamadı — tarayıcı kör olabilir.',
+    ).not.toBeNull()
+    if (!policy) return
+
+    const ALL_ROLES: UserRole[] = [
+      'super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer', 'user',
+    ]
+    // canWrite'ı ÇAĞIRIR (matrisi regex'le okumaz): rbac'ın gerçek kararı neyse o.
+    const writeRoles = ALL_ROLES.filter((r) => canWrite(r, 'purchasing'))
+    const missing = writeRoles.filter((r) => !policy.roles.includes(r))
+
+    expect(
+      missing,
+      [
+        'Bu role UI\'da satınalma YAZMA izni verilmiş ama RLS SELECT politikası onu tanımıyor.',
+        'Kullanıcı sayfayı açar, boş liste görür, hata almaz — SESSİZ-BOŞ (cetvel §8.1).',
+        '',
+        `RLS rolleri (${policy.file}): ${policy.roles.join(', ')}`,
+        `rbac yazma rolleri: ${writeRoles.join(', ')}`,
+        `EKSİK: ${missing.join(', ')}`,
+        '',
+        'İki doğru çözüm var; "izni geri ekle" tek başına ÇÖZÜM DEĞİL:',
+        ' (a) rolü rbac\'tan çıkar (UI, DB\'nin verdiğiyle hizalanır) — migration gerekmez;',
+        ' (b) maliyetsiz görünüm + o role SELECT ver, UI görünümü okusun (§8.1 v1.1 şartları).',
       ].join('\n'),
     ).toEqual([])
   })

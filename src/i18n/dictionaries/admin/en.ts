@@ -16,6 +16,7 @@ import { movements } from './movements.en'
 import { orders } from './orders.en'
 import { pricing } from './pricing.en'
 import { products } from './products.en'
+import { purchasing } from './purchasing.en'
 import { returns } from './returns.en'
 import { search } from './search.en'
 import { settings } from './settings.en'
@@ -41,6 +42,7 @@ export const admin = {
   inventory,
   settings,
   products,
+  purchasing,
   ui,
   search,
   movements,
