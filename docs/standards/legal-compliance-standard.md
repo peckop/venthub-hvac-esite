@@ -206,17 +206,58 @@ yüzden alım kutusunun izlenmesi prosedürün en kritik adımıdır.
 Fatura, siparişin `invoice_type` + `invoice_info` alanlarından kesilir. Bu alanlar bozuksa
 fatura kesilemez — köprü döneminde bu, siparişin **kargolanamaması** demektir.
 
-**Kurallar:**
+### 4.1 TCKN koşulsuz zorunlu DEĞİLDİR — eşiklidir
 
-1. **Varlık.** Bireysel faturada TCKN, kurumsal faturada VKN + unvan + vergi dairesi
-   **boş bırakılarak ödeme adımına geçilemez.** (2026-08-16 ölçümü: `validateAddress`
-   yalnız adres/il/ilçe bakıyor; `invoiceInfo` hiçbir yerde doğrulanmıyordu.)
-2. **Biçim.** TCKN 11, VKN 10 hanedir ve yalnız rakam içerir.
-3. **Sağlama (checksum).** TCKN ve VKN, kendi algoritmalarıyla doğrulanır. Yalnız uzunluk
-   kontrolü yetmez: `11111111111` on bir hanedir ve bugün kabul edilmektedir, ancak geçerli
-   bir TCKN değildir ve o bilgiyle fatura kesilemez.
-4. **Sunucu tarafı.** İstemci doğrulaması bir kolaylıktır, kapı değildir; aynı kurallar
-   sipariş yazılmadan önce sunucuda da uygulanır.
+Bu bölüm 2026-08-16'da **düzeltildi.** İlk yazımı "bireysel faturada TCKN boş bırakılarak
+ödeme adımına geçilemez" diyordu; mevzuat araştırması bunun **kanunun istediğinden sıkı**
+olduğunu gösterdi. Kural, ölçülmeden yazılmış bir varsayımdı ve dönüşüm maliyeti üretiyordu.
+
+GİB, nihai tüketici numarasını vermek istemediğinde alıcı kimlik alanına **`11111111111`**
+yazılmasını kabul eder. Zorunluluk tutara bağlı olarak doğar:
+
+| Fatura tutarı (KDV dahil) | Zorunlu olan |
+|---|---|
+| ≤ 500 TL | Ad bile yazılmayabilir — "NİHAİ TÜKETİCİ" ibaresi yeterli (515 SN VUK GT) |
+| 500 TL – fatura düzenleme haddi | Ad-soyad + adres zorunlu; **TCKN zorunlu değil** |
+| Haddin üzeri | Ad-soyad **ve TCKN zorunlu** (509 SN VUK GT, asgari bilgiler) |
+
+**2026 fatura düzenleme haddi: 12.000 TL** (588 SN VUK GT, 31.12.2025 RG; 2025: 9.900 TL).
+
+**Karıştırılmaması gereken ikinci eşik:** 2026'dan itibaren nihai tüketiciye e-arşiv
+faturası **tutara bakılmaksızın** zorunludur. Yani "küçük satışta fatura kesmeyiz" diye bir
+seçenek yoktur. Yukarıdaki eşik *fatura kesilir mi*nin değil, *alıcı kimliği zorunlu mu*nun
+eşiğidir.
+
+**Güven sınırı:** kademelerin varlığı ve `11111111111` uygulaması birden çok bağımsız
+kaynakta aynıdır; **eşiğin o yılki tam değeri muhasebeci şeridine aittir** (§2.1). Bu yüzden
+değer koda değil `legal.ts → invoiceIdentityThreshold` alanına yazılır — muhasebeci
+düzelttiğinde tek satır değişir.
+
+### 4.2 Kurallar
+
+1. **Bireysel — eşikli.** TCKN, sipariş toplamı (KDV dahil) eşiği **aşıyorsa** zorunludur.
+   Aşmıyorsa boş bırakılabilir; fatura `11111111111` ile kesilir.
+2. **Bireysel — girilmişse geçerli olmalı.** Tutar ne olursa olsun: yanlış numara, boş
+   numaradan kötüdür (fatura yanlış kişiye kesilir ve hata sessiz kalır).
+3. **Kurumsal — eşikten bağımsız.** VKN + unvan + vergi dairesi her tutarda zorunludur;
+   VKN'siz kurumsal fatura hiçbir tutarda kesilemez ve müşteri "kurumsal"ı bilerek seçmiştir.
+   **Bireyseldeki gevşeme kurumsala sızmamalıdır.**
+4. **Sağlama (checksum).** TCKN ve VKN kendi algoritmalarıyla doğrulanır. Uzunluk kontrolü
+   yetmez: `11111111111` on bir hanedir ve eski kontrolden geçiyordu.
+5. **Tutar bilinemiyorsa kimlik istenir.** Eşik kararı verilemeyen bir siparişte, eksik
+   kimlikli fatura riskini almaktansa sorulur.
+6. **Sunucu tarafı.** İstemci doğrulaması kolaylıktır, kapı değildir; aynı kurallar sipariş
+   yazılmadan önce sunucuda da uygulanır.
+
+### 4.3 ⚠️ Tuzak — `11111111111` iki farklı şey
+
+`isValidTckn` bu değeri **reddeder** ve bu **müşteri girdisi için doğrudur**: numarayı
+doğrudan kişiden istiyoruz, dolgu değerini kullanıcıya yazdırmıyoruz.
+
+Ama aynı değer **GİB'in kendi dolgu değeridir.** Bu doğrulayıcıyı ileride *giden fatura
+verisine* uygulayan biri, GİB'in kabul ettiği değeri reddetmiş olur ve fatura üretimi
+sebepsiz durur. Fatura kesme yolu yazıldığında bu ayrım korunmalıdır:
+**içeri gelen kullanıcı girdisi ≠ dışarı giden belge alanı.**
 
 ---
 

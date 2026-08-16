@@ -153,6 +153,47 @@ describe('INV-LEGAL-3 · taahhüt ↔ mekanizma bağı', () => {
     }
   })
 
+  it('fatura kimliği eşiği koda gömülmemiş, konfigürasyondan gelir', () => {
+    // Eşik her yıl tebliğle değişen bir VERGİ parametresidir. Koda gömülürse yıl döndüğünde
+    // kimse fark etmez ve haddin üstünde eksik kimlikli fatura doğar.
+    const kural = SOURCES['/src/lib/validation/invoiceIdentity.ts']
+    expect(kural, 'Fatura kimliği kuralı bulunamadı — dosya taşındıysa bu bekçi körleşir.').toBeTypeOf('string')
+
+    // Kod satırlarında (yorum HARİÇ) 12000/9900 gibi bir had sabiti bulunmamalı.
+    const kodSatirlari = kural
+      .split('\n')
+      .filter((satir: string) => !/^\s*(\*|\/\/|\/\*)/.test(satir))
+      .join('\n')
+
+    expect(
+      /\b(12[_.]?000|9[_.]?900|5[_.]?000)\b/.test(kodSatirlari),
+      'Fatura haddi kod gövdesine gömülmüş. Değer `legal.ts → invoiceIdentityThreshold` ' +
+        'alanından parametre olarak geçmelidir.',
+    ).toBe(false)
+
+    // Eşik gerçekten dışarıdan alınıyor mu?
+    expect(kodSatirlari).toContain('identityThreshold')
+  })
+
+  it('kurumsal fatura eşikten bağımsız — gevşeme kurumsala sızmamış', () => {
+    const kural = SOURCES['/src/lib/validation/invoiceIdentity.ts']
+    const kurumsalBlok = (kural as string).slice(
+      (kural as string).indexOf("input.type === 'corporate'"),
+      (kural as string).indexOf('const tckn'),
+    )
+
+    expect(
+      kurumsalBlok.length,
+      'Kurumsal dal bulunamadı — fonksiyon yeniden yazıldıysa bu bekçi körleşir.',
+    ).toBeGreaterThan(50)
+
+    expect(
+      /identityThreshold|orderTotalWithVat/.test(kurumsalBlok),
+      'Kurumsal dal tutara/eşiğe bakıyor. VKN\'siz kurumsal fatura hiçbir tutarda kesilemez; ' +
+        'bireyseldeki eşik gevşemesi buraya sızmamalı (cetvel §4.2 kural 3).',
+    ).toBe(false)
+  })
+
   it('VUK m.231/5 tavanı aşılmamış (fatura süresi en çok 7 gün)', () => {
     const gun = Number((legalConfig.invoiceDeliveryTime.match(/\d+/) ?? ['0'])[0])
     expect(gun).toBeGreaterThan(0)

@@ -2067,7 +2067,7 @@ export const en: typeof tr = {
       cityRequired: 'City is required',
       districtRequired: 'District is required',
       postalRequired: 'Postal code is required',
-      tcknRequired: 'National ID is required for individual invoice',
+      tcknRequired: 'For orders above {{limit}} the invoice must carry the buyer\'s national ID number. Please enter yours.',
       tcknFormat: 'Enter a valid national ID number (11 digits). Your invoice is issued using this detail.',
       companyRequired: 'Company name is required for corporate invoice',
       vknRequired: 'Tax ID (VKN) is required for corporate invoice',

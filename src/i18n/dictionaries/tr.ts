@@ -1378,7 +1378,7 @@ export const tr = {
       cityRequired: 'Şehir gereklidir',
       districtRequired: 'İlçe gereklidir',
       postalRequired: 'Posta kodu gereklidir',
-      tcknRequired: 'Bireysel fatura için T.C. No gereklidir',
+      tcknRequired: '{{limit}} üzerindeki siparişlerde fatura, alıcının T.C. Kimlik No\'su ile düzenlenmek zorundadır. Lütfen numaranızı girin.',
       tcknFormat: 'Geçerli bir T.C. Kimlik No girin (11 hane). Fatura bu bilgiyle düzenlenir.',
       companyRequired: 'Kurumsal fatura için şirket ünvanı gereklidir',
       vknRequired: 'Kurumsal fatura için VKN gereklidir',

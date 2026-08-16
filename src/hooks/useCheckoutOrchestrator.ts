@@ -3,11 +3,13 @@
 import { useCallback,useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import legalConfig from '@/config/legal'
 import { listAddresses } from '@/lib/services/address.service'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
-import { isValidTckn, isValidVkn } from '@/lib/validation/taxIdentity'
+import { checkInvoiceIdentity } from '@/lib/validation/invoiceIdentity'
 import type { InvoiceProfile,UserAddress } from '@/types/ui-models'
 
+import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import { listInvoiceProfiles } from '../lib/services/invoice.service'
 import { 
@@ -17,10 +19,14 @@ import {
   CheckoutLegalConsents 
 } from '../types/db-rows'
 import { useAuth } from './useAuth'
+import { useCart } from './useCartHook'
 
 export const useCheckoutOrchestrator = () => {
   const { user } = useAuth()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
+  // Fatura kimliği kuralı tutara bağlı (bkz. validateInvoiceInfo) — sepet toplamı burada
+  // okunuyor ki çağıranın imzası değişmesin ve kural tek yerde kalsın.
+  const { getCartTotal } = useCart()
   const [step, setStep] = useState<number>(1)
 
   // Form states
@@ -194,45 +200,40 @@ export const useCheckoutOrchestrator = () => {
    * `InvoiceInfo`: tckn · companyName · vkn · taxOffice). Tip birden çok takma ad
    * taşıdığı için (`taxNumber`, `tax_number`) onlar da yedek olarak okunuyor —
    * doğrulanan alan ile faturaya giden alan AYNI olmalıdır.
+   *
+   * KURAL EŞİKLİDİR ve burada DEĞİL `lib/validation/invoiceIdentity.ts` içinde durur:
+   * TCKN koşulsuz zorunlu değildir, fatura düzenleme haddini aşan siparişlerde zorunlu
+   * olur (mevzuat gerekçesi o dosyanın başlığında). Burada yalnız yan etki var: toast.
    */
   const validateInvoiceInfo = useCallback(() => {
-    if (invoiceType === 'individual') {
-      const tckn = (invoiceInfo.tckn || invoiceInfo.t_c_id || '').trim()
-      if (!tckn) {
-        toast.error(t('checkout.errors.tcknRequired'))
-        return false
-      }
-      if (!isValidTckn(tckn)) {
-        toast.error(t('checkout.errors.tcknFormat'))
-        return false
-      }
-      return true
-    }
+    const sorun = checkInvoiceIdentity(
+      {
+        type: invoiceType,
+        tckn: invoiceInfo.tckn || invoiceInfo.t_c_id,
+        companyName: invoiceInfo.companyName || invoiceInfo.company_name,
+        vkn: invoiceInfo.vkn || invoiceInfo.taxNumber || invoiceInfo.tax_number,
+        taxOffice: invoiceInfo.taxOffice || invoiceInfo.tax_office,
+      },
+      getCartTotal(),
+      legalConfig.invoiceIdentityThreshold,
+    )
 
-    const companyName = (invoiceInfo.companyName || invoiceInfo.company_name || '').trim()
-    if (!companyName) {
-      toast.error(t('checkout.errors.companyRequired'))
-      return false
-    }
+    if (!sorun) return true
 
-    const vkn = (invoiceInfo.vkn || invoiceInfo.taxNumber || invoiceInfo.tax_number || '').trim()
-    if (!vkn) {
-      toast.error(t('checkout.errors.vknRequired'))
-      return false
-    }
-    if (!isValidVkn(vkn)) {
-      toast.error(t('checkout.errors.vknFormat'))
-      return false
-    }
-
-    const taxOffice = (invoiceInfo.taxOffice || invoiceInfo.tax_office || '').trim()
-    if (!taxOffice) {
-      toast.error(t('checkout.errors.taxOfficeRequired'))
-      return false
-    }
-
-    return true
-  }, [invoiceType, invoiceInfo, t])
+    // `tcknRequired` eşiğe bağlı doğduğu için tutarı da söyler — "neden benden isteniyor"
+    // sorusunun cevabı mesajın içinde olsun; aksi hâlde keyfi bir engel gibi görünür.
+    toast.error(
+      sorun === 'tcknRequired'
+        ? t('checkout.errors.tcknRequired', {
+            limit: formatCurrency(legalConfig.invoiceIdentityThreshold, lang, {
+              currency: 'TRY',
+              maximumFractionDigits: 0,
+            }),
+          })
+        : t(`checkout.errors.${sorun}`),
+    )
+    return false
+  }, [invoiceType, invoiceInfo, getCartTotal, t, lang])
 
   /**
    * Zorunlu yasal onaylar işaretlenmeden ödeme BAŞLATILAMAZ.

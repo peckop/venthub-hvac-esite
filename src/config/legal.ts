@@ -68,6 +68,20 @@ export interface LegalSellerInfo {
    * (INV-LEGAL-3 kural 4). Köprü prosedürü: `docs/standards/legal-compliance-standard.md` §2.3.
    */
   invoiceDeliveryTime: string
+  /**
+   * Bireysel faturada alıcı kimliğinin (TCKN) ZORUNLU hâle geldiği tutar — **KDV dahil, TL**.
+   *
+   * TCKN koşulsuz zorunlu DEĞİLDİR: GİB, tüketici vermek istemediğinde alıcı kimlik alanına
+   * `11111111111` yazılmasını kabul eder. Zorunluluk, faturanın **fatura düzenleme haddini**
+   * aşmasıyla doğar (509 SN VUK GT asgari bilgiler). 2026 haddi: 12.000 TL (588 SN VUK GT).
+   *
+   * Bu bir VERGİ parametresidir → muhasebeci şeridi (cetvel §2.1). Her yıl tebliğle değişir,
+   * bu yüzden koda gömülmez. `0` yazılırsa her siparişte TCKN istenir (hep-topla tercihi).
+   *
+   * Karıştırma: 2026'dan itibaren nihai tüketiciye e-arşiv faturası TUTARA BAKILMAKSIZIN
+   * zorunludur. Bu eşik "fatura kesilir mi"nin değil, "alıcı kimliği zorunlu mu"nun eşiğidir.
+   */
+  invoiceIdentityThreshold: number
   retentionOrders: string
   retentionSupport: string
   retentionMarketing: string
@@ -118,6 +132,9 @@ const legalConfig: LegalConfig = {
   // otomasyon açıldığında kısaltılabilir. Recep daha kısa bir süre taahhüt etmek isterse
   // yalnız bu değer değişir — sözleşme metni bu alandan okur.
   invoiceDeliveryTime: '7 gün',
+  // 2026 fatura düzenleme haddi (588 SN VUK GT, 31.12.2025 RG). 2025'te 9.900 TL idi.
+  // Muhasebeci teyidi bekliyor; teyit gelene kadar kanunun ilan ettiği değer kullanılıyor.
+  invoiceIdentityThreshold: 12_000,
   warrantyPeriod: '2 yıl',
   usefulLife: '10 yıl',
   retentionOrders: '10 yıl',
