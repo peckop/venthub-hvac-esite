@@ -36,6 +36,7 @@ import {
   adminSelectClass,
   adminSelectStyle,
   adminSettingsLabelClass,
+  adminTableActionClass,
   adminTableActionDangerClass,
   adminTableCellClass,
   adminTableHeadCellClass,
@@ -216,6 +217,18 @@ async function ordersFetcher(
   const to = params.filters.to?.[0]
   if (from) query = query.gte('created_at', from)
   if (to) query = query.lte('created_at', to)
+
+  /*
+    MÜŞTERİ FİLTRESİ — "bu müşterinin siparişleri" görünümünün tamamı.
+    Ayrı bir sayfa açmak yerine mevcut sipariş tablosu parametreleniyor: arama,
+    sıralama, sayfalama, dışa aktarma ve satır aksiyonları olduğu gibi çalışsın.
+    Ayrı bir ekran yazmak bunların hepsini ikinci kez (ve zamanla farklı) uygulamak
+    demek olurdu.
+    `syncUrl` açık olduğu için filtre URL'de taşınır → kullanıcılar sayfasından
+    gelen bağlantı paylaşılabilir ve geri/ileri düğmeleri çalışır.
+  */
+  const customerId = params.filters.customer?.[0]
+  if (customerId) query = query.eq('user_id', customerId)
 
   const offset = (params.page - 1) * params.pageSize
   const { data, error, count } = await query.range(offset, offset + params.pageSize - 1)
@@ -539,6 +552,8 @@ const OrdersTableBody: React.FC = () => {
   const { setFilter, setQuery } = table.filtering
   const filters = table.filtering.filters
   const presetActive = filters.preset?.[0] === 'pendingShipments'
+  /** Kullanıcılar sayfasından gelen `?customer=<uuid>` filtresi (URL'de taşınır). */
+  const customerFilter = filters.customer?.[0]
   const activeStatuses = useMemo(() => filters.status ?? [], [filters.status])
 
   const statusChips = useMemo(
@@ -1180,7 +1195,34 @@ const OrdersTableBody: React.FC = () => {
         expandLabel={t('admin.orders.orderDetails')}
         renderExpandedRow={(r) => <OrderSpecsRow orderId={r.id} />}
         toolbarSlot={
-          <AdminToolbar
+          <>
+            {/*
+              MÜŞTERİ FİLTRESİ ŞERİDİ — sessiz filtre tuzağına karşı.
+              Kullanıcılar sayfasından gelen bağlantı listeyi tek müşteriye daraltıyor.
+              Bunu GÖRÜNÜR kılmadan uygulamak, admin'in "siparişler nereye gitti?" diye
+              düşünmesine yol açar; üstelik URL paylaşıldığında karşı taraf hiç
+              filtrelenmiş olduğunu bilmez. Şerit hem durumu söyler hem çıkışı verir.
+            */}
+            {customerFilter && (
+              <div
+                role="status"
+                className="mb-3 flex flex-wrap items-center gap-3 rounded-admin-md border
+                  border-admin-accent/30 bg-admin-accent-weak px-4 py-2.5 text-sm text-admin-fg"
+              >
+                <span>{t('admin.orders.customerFilter.active')}</span>
+                <code className="rounded-admin-sm bg-admin-surface px-2 py-0.5 font-mono text-xs">
+                  {customerFilter}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => setFilter('customer', [])}
+                  className={`${adminTableActionClass} ml-auto`}
+                >
+                  {t('admin.orders.customerFilter.clear')}
+                </button>
+              </div>
+            )}
+            <AdminToolbar
             storageKey="toolbar:orders"
             search={{
               value: table.filtering.query,
@@ -1213,7 +1255,8 @@ const OrdersTableBody: React.FC = () => {
                 />
               </div>
             }
-          />
+            />
+          </>
         }
         bulkBarSlot={
           hasWriteAccess ? (

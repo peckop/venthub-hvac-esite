@@ -17,6 +17,10 @@ export const orders = {
         refunded: 'Refunded',
         partialRefunded: 'Partial Refunded'
       },
+      customerFilter: {
+        active: 'This list is filtered to a single customer.',
+        clear: 'Clear filter'
+      },
       table: {
         orderId: 'Order ID',
         status: 'Status',

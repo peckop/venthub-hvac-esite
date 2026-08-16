@@ -7,6 +7,7 @@ export const users = {
         created: 'Created',
         createdLabel: 'Joined',
         actions: 'Actions',
+        orders: 'Orders',
         company: 'Company & B2B',
         role: 'Role'
       },
@@ -40,6 +41,8 @@ export const users = {
         cannotDemoteSelf: 'You can\'t demote yourself'
       },
       actions: {
+        viewOrders: 'Orders',
+        viewOrdersFor: "View orders for {{user}}",
         admin: 'Admin',
         moderator: 'Mod',
         superadmin: 'Superadmin',

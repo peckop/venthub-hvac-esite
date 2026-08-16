@@ -17,6 +17,10 @@ export const orders = {
         refunded: 'İade Edildi',
         partialRefunded: 'Kısmi İade'
       },
+      customerFilter: {
+        active: 'Liste tek bir müşteriye göre filtrelenmiş.',
+        clear: 'Filtreyi kaldır'
+      },
       table: {
         orderId: 'Sipariş No',
         status: 'Durum',
