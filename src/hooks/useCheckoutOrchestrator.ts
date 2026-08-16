@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import { listAddresses } from '@/lib/services/address.service'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
+import { isValidTckn, isValidVkn } from '@/lib/validation/taxIdentity'
 import type { InvoiceProfile,UserAddress } from '@/types/ui-models'
 
 import { useI18n } from '../i18n/I18nProvider'
@@ -178,6 +179,62 @@ export const useCheckoutOrchestrator = () => {
   }, [t])
 
   /**
+   * Fatura kimliği doğrulaması — ödeme adımına geçmeden ÖNCE.
+   *
+   * Bu kontrol 2026-08-16'ya kadar HİÇ yoktu: `validateAddress` yalnız adres/il/ilçe
+   * bakıyordu, dolayısıyla kurumsal faturada VKN ve vergi dairesi, bireysel faturada
+   * TCKN **boş** bırakılarak ödeme başlatılabiliyordu. Sözlükteki altı hata metni
+   * (`tcknRequired`, `vknFormat` …) yazılmış ama kodda tek bir çağıranı yoktu.
+   *
+   * Neden kapı burada: fatura, siparişin `invoice_info` alanından kesilir. Sipariş
+   * yazıldıktan sonra fark edilen eksik kimlik, müşteriye geri dönmeyi ve sevkiyatı
+   * bekletmeyi gerektirir. Bkz. `docs/standards/legal-compliance-standard.md` §4.
+   *
+   * Okunan alanlar, ödeme isteğine gerçekten giden alanlardır (`buildPaymentRequest.ts`
+   * `InvoiceInfo`: tckn · companyName · vkn · taxOffice). Tip birden çok takma ad
+   * taşıdığı için (`taxNumber`, `tax_number`) onlar da yedek olarak okunuyor —
+   * doğrulanan alan ile faturaya giden alan AYNI olmalıdır.
+   */
+  const validateInvoiceInfo = useCallback(() => {
+    if (invoiceType === 'individual') {
+      const tckn = (invoiceInfo.tckn || invoiceInfo.t_c_id || '').trim()
+      if (!tckn) {
+        toast.error(t('checkout.errors.tcknRequired'))
+        return false
+      }
+      if (!isValidTckn(tckn)) {
+        toast.error(t('checkout.errors.tcknFormat'))
+        return false
+      }
+      return true
+    }
+
+    const companyName = (invoiceInfo.companyName || invoiceInfo.company_name || '').trim()
+    if (!companyName) {
+      toast.error(t('checkout.errors.companyRequired'))
+      return false
+    }
+
+    const vkn = (invoiceInfo.vkn || invoiceInfo.taxNumber || invoiceInfo.tax_number || '').trim()
+    if (!vkn) {
+      toast.error(t('checkout.errors.vknRequired'))
+      return false
+    }
+    if (!isValidVkn(vkn)) {
+      toast.error(t('checkout.errors.vknFormat'))
+      return false
+    }
+
+    const taxOffice = (invoiceInfo.taxOffice || invoiceInfo.tax_office || '').trim()
+    if (!taxOffice) {
+      toast.error(t('checkout.errors.taxOfficeRequired'))
+      return false
+    }
+
+    return true
+  }, [invoiceType, invoiceInfo, t])
+
+  /**
    * Zorunlu yasal onaylar işaretlenmeden ödeme BAŞLATILAMAZ.
    *
    * Mesafeli Sözleşmeler Yönetmeliği: tüketicinin Ön Bilgilendirme Formunu ve Mesafeli Satış
@@ -199,19 +256,22 @@ export const useCheckoutOrchestrator = () => {
     if (step === 1 && validateCustomerInfo()) {
       setStep(2)
     } else if (step === 2 && validateAddress(shippingAddress)) {
+      // Fatura alanları da bu adımda (StepAddressInfo) → uyarıyı alanların GÖRÜNDÜĞÜ yerde ver.
+      if (!validateInvoiceInfo()) return
       // Onay kutuları bu adımda (StepAddressInfo) → uyarıyı kutuların GÖRÜNDÜĞÜ yerde ver.
       if (!validateLegalConsents()) return
       setStep(3)
     } else if (step === 3) {
       // Savunma katmanı: adım 3'e başka bir yoldan gelinmişse (geri/ileri, doğrudan setStep)
-      // ödeme yine de onaysız başlamasın.
+      // ödeme yine de onaysız VE faturasız kimlikle başlamasın.
+      if (!validateInvoiceInfo()) return
       if (!validateLegalConsents()) return
       const success = await initiatePayment()
       if (success) {
         setStep(4)
       }
     }
-  }, [step, shippingAddress, validateCustomerInfo, validateAddress, validateLegalConsents])
+  }, [step, shippingAddress, validateCustomerInfo, validateAddress, validateInvoiceInfo, validateLegalConsents])
 
   return {
     step,

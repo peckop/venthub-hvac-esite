@@ -57,6 +57,17 @@ export interface LegalSellerInfo {
   usefulLife: string
   /** Yetkili servis / satış sonrası hizmet iletişim bilgisi */
   afterSalesService: string
+  /**
+   * Faturanın düzenlenip tüketiciye iletileceği azami süre.
+   *
+   * ÜST SINIR KANUNDAN GELİR: VUK m.231/5 uyarınca fatura, malın teslim edildiği tarihten
+   * itibaren azami **yedi gün** içinde düzenlenir. Bu alana yedi günden UZUN bir süre
+   * yazılamaz; kısaltmak serbesttir ve manuel kesim ritmi elverdiğinde kısaltılmalıdır.
+   *
+   * Bu alan sözleşme metnine doğrudan render edilir — metne gömülü sabit süre YAZMA
+   * (INV-LEGAL-3 kural 4). Köprü prosedürü: `docs/standards/legal-compliance-standard.md` §2.3.
+   */
+  invoiceDeliveryTime: string
   retentionOrders: string
   retentionSupport: string
   retentionMarketing: string
@@ -103,6 +114,10 @@ const legalConfig: LegalConfig = {
   deliveryTime: '1-5 iş günü',
   shippingFee: 'Sipariş özetinde gösterilir',
   refundTime: '14 gün',
+  // Kanuni azami süre (VUK m.231/5). Köprü döneminde manuel kesim bu pencereye sığar;
+  // otomasyon açıldığında kısaltılabilir. Recep daha kısa bir süre taahhüt etmek isterse
+  // yalnız bu değer değişir — sözleşme metni bu alandan okur.
+  invoiceDeliveryTime: '7 gün',
   warrantyPeriod: '2 yıl',
   usefulLife: '10 yıl',
   retentionOrders: '10 yıl',
@@ -118,6 +133,41 @@ const legalConfig: LegalConfig = {
 
   legalReviewCompleted: false,
 }
+
+/**
+ * İngilizce metinler için süre/politika ifadelerinin çevirisi.
+ *
+ * NİÇİN VAR: yukarıdaki değerler Türkçe cümle parçalarıdır ("14 gün", "1-5 iş günü",
+ * "Sipariş özetinde gösterilir") ve İngilizce hukuki sayfalarda **doğrudan** render
+ * ediliyordu — 2026-08-16'da ölçüldü: 6 dosyada 18 render noktası, hepsi Türkçe basıyordu.
+ * Bunlar pazarlama metni değil sözleşme hükmüdür; İngilizce sözleşmede Türkçe süre
+ * yazması, o hükmü İngilizce okuyan taraf için belirsiz kılar.
+ *
+ * KAPSAM: yalnız **çevrilebilir** alanlar. Özel isimler (unvan, adres, kargo firması,
+ * vergi dairesi, MERSİS/ETBİS numaraları) çevrilmez — onlar her iki dilde de aynıdır ve
+ * bilerek dışarıda bırakılmıştır. Recep'in dolduracağı serbest metin alanları
+ * (`returnShippingBearer`, `afterSalesService`) doldurulduğunda Türkçe olacaktır;
+ * İngilizce karşılıkları o gün buraya eklenir (INV-LEGAL-3 kural 5 bunu hatırlatır).
+ */
+const EN_OVERRIDES: Partial<LegalConfig> = {
+  deliveryTime: '1-5 business days',
+  shippingFee: 'Shown in the order summary',
+  refundTime: '14 days',
+  invoiceDeliveryTime: '7 days',
+  warrantyPeriod: '2 years',
+  usefulLife: '10 years',
+  retentionOrders: '10 years',
+  retentionSupport: '3 years',
+  retentionMarketing: '2 years',
+  retentionLogs: '2 years',
+}
+
+/**
+ * İngilizce hukuki metinlerin okuduğu konfigürasyon.
+ * `src/views/legal/components/en/*` bunu `legalConfig` adıyla import eder; böylece
+ * 18 render noktasının hiçbiri değişmeden doğru dilde basar.
+ */
+export const legalConfigEn: LegalConfig = { ...legalConfig, ...EN_OVERRIDES }
 
 /** Doldurulmamış alan deseni: tamamı köşeli parantez içinde olan değer. */
 const PLACEHOLDER_PATTERN = /^\[[A-Z0-9_]+\]$/
