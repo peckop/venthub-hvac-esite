@@ -112,14 +112,26 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }, []);
 
   const signOut = useCallback(async () => {
+    // Sunucu ÖNCE: sb-claims-cache httpOnly'dir, client JS SİLEMEZ. /auth/signout
+    // route'u oturumu sunucuda kapatır ve claims cache çerezini temizler. Yalnız
+    // client signOut() bırakmak, admin'i çıkıştan sonra cache TTL'i (15 dk) boyunca
+    // /admin kapısından geçirir — resolveUserClaims geçerli çerezde Supabase'e sormaz (T060).
     try {
+      await fetch('/auth/signout', { method: 'POST' });
+    } catch (serverSignOutError) {
+      // Ağ hatasında yerel çıkışa yine de devam et; çerez TTL ile ölür.
+      console.error('Server sign-out failed:', serverSignOutError);
+    }
+    try {
+      // Sunucu oturumu az önce kapattıysa bu çağrı hata dönebilir — yerel state
+      // temizliği hatadan bağımsız her koşulda yapılır.
       await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
-      setRole(null);
     } catch (error) {
       console.error('Error signing out:', error);
     }
+    setUser(null);
+    setSession(null);
+    setRole(null);
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
