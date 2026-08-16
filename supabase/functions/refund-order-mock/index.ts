@@ -1,144 +1,59 @@
+// supabase/functions/refund-order-mock/index.ts
+//
+// Çağıran sınıfı: (a) — ama artık HİÇBİR İŞ YAPMIYOR. Bu uç EMEKLİYE AYRILDI.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+// NİÇİN (T053-VH · operasyon döngüsü denetimi 2026-08-15 §3)
+// ─────────────────────────────────────────────────────────────────────────────
+// Bu fonksiyon kendi başlığında *"no real PSP call, only DB state updates"* diyordu ve
+// bunu dürüstçe yapıyordu. Sorun fonksiyonun kendisi değil, ÇAĞRILDIĞI YERDİ: admin
+// panelindeki iade akışı `refunded` derken bunu çağırıyordu. Sonuç, denetimin
+// "sessiz sahte-başarı" dediği sınıfın en pahalı örneğiydi:
+//
+//   · `payment_status = 'refunded'` yazılıyordu,
+//   · denetim kaydı düşüyordu,
+//   · müşteriye **"iadeniz tamamlandı"** e-postası gidiyordu,
+//   · ve İyzico'ya **tek bir istek bile gitmiyordu.**
+//
+// Yani sistem, parayı iade ettiğini söylüyordu; etmiyordu. Gerçek uç (`iyzico-refund`)
+// repoda vardı ama onu çağıran tek satır yoktu — yetimdi.
+//
+// Ayrıca bu dosyanın stok geri-ekleme yolu da bozuktu (denetimin saymadığı dördüncü yol):
+// PostgREST'e `stock_qty` için `{"increment": N}` biçiminde bir gövde gönderiyordu. Bu
+// geçerli bir PostgREST sözdizimi DEĞİL — 400 dönüyor ve `catch {}` içinde yutuluyordu.
+// Yani iade stoğu da hiç artmıyordu; "çalışıyor" görüntüsü tamamen kayıtsızlıktandı.
+//
+// ── Niçin SİLİNMEDİ, 410'a çevrildi ─────────────────────────────────────────
+// Fonksiyonu tamamen silmek, dağıtılmış bir uçta 404 üretir ve 404 "henüz deploy olmadı"
+// ile karışır. 410 Gone ise niyet beyanıdır: *bu uç vardı, bilerek kapatıldı.* Gövdedeki
+// mesaj çağıranı doğru yere yönlendirir. Eski çağıran (admin UI) hâlâ buraya gelirse
+// **gürültülü biçimde** başarısız olur — yalan söylemektense patlaması yeğdir.
+//
+// Yerine: `iyzico-refund` (gerçek PSP çağrısı + `refund_attempts` talep defteri ile
+// çift-iade koruması + kanıta bağlı stok geri-verme RPC'si).
+// Cetvel: docs/standards/edge-function-security-standard.md §3.10.
+
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4"
 
-// Mock refund function: no real PSP call, only DB state updates + audit insert
-// Auth: require authenticated; allow only admin or order owner
-
-interface RefundRequest {
-  order_id: string
-  amount?: number
-  reason?: string
-}
-
-serve(async (req) => {
+serve((req: Request) => {
   const cors = getCorsHeaders(req)
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
-  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...cors, 'Content-Type': 'application/json' } })
 
-  try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
-    if (!supabaseUrl || !serviceKey || !anonKey) {
-      return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
-
-    // Auth check using auth.getUser()
-    const authHeader = req.headers.get('authorization')
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'unauthenticated', message: 'Missing Authorization header' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
-
-    const authClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } }
-    })
-    const { data: { user }, error: authErr } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
-    if (authErr || !user) {
-      return new Response(JSON.stringify({ error: 'unauthorized', message: 'Invalid or expired token' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
-    const actorUserId = user.id
-
-    const body = await req.json().catch(()=>({})) as RefundRequest
-    const order_id = (body.order_id || '').trim()
-    const amount = typeof body.amount === 'number' && isFinite(body.amount) ? Number(body.amount) : undefined
-    const reason = typeof body.reason === 'string' ? body.reason.slice(0, 140) : undefined
-    if (!order_id) {
-      return new Response(JSON.stringify({ error: 'missing_fields', missing: ['order_id'] }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
-
-
-    // Load order
-    const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=id,user_id,status,payment_status,total_amount,payment_debug`, {
-      headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
-    })
-    if (!ordResp.ok) {
-      return new Response(JSON.stringify({ error: 'order_fetch_failed', status: ordResp.status }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
-    const arr = await ordResp.json().catch(()=>[])
-    const order = Array.isArray(arr) ? arr[0] : null
-    if (!order) return new Response(JSON.stringify({ error: 'order_not_found' }), { status: 404, headers: { ...cors, 'Content-Type': 'application/json' } })
-
-    // Role check
-    let isAdmin = false
-    if (actorUserId) {
-      const prof = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${encodeURIComponent(actorUserId)}&select=role`, {
-        headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
-      })
-      if (prof.ok) {
-        const prows = await prof.json().catch(()=>[])
-        const prow = Array.isArray(prows) ? prows[0] : null
-        isAdmin = prow?.role === 'admin' || prow?.role === 'superadmin'
-      }
-    }
-    const isOwner = actorUserId && order.user_id === actorUserId
-    if (!(isAdmin || isOwner)) {
-      return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
-
-    const totalAmount = Number(order.total_amount || 0)
-    const target = typeof amount === 'number' && amount > 0 ? amount : totalAmount
-
-    // Update order payment_status and debug (mock)
-    const isFull = target >= totalAmount
-    const newPaymentStatus = isFull ? 'refunded' : 'partial_refunded'
-    const newOrderStatus = isFull ? (order.status === 'shipped' || order.status === 'delivered' ? order.status : 'cancelled') : order.status
-    const dbg = order.payment_debug || {}
-    const newDebug = {
-      ...dbg,
-      mock_refund: true,
-      mock_refund_reason: reason || null,
-      refund_type: isFull ? 'cancel' : 'refund',
-      refund_amount: target,
-      refunded_total: isFull ? totalAmount : ((Number(dbg?.refunded_total || 0)) + target),
-      partial_refunds: isFull ? (dbg?.partial_refunds || []) : ([...(Array.isArray(dbg?.partial_refunds) ? dbg.partial_refunds : []), { amount: target, at: new Date().toISOString() }])
-    }
-
-    // Stock restore on full refund (mock)
-    if (isFull) {
-      try {
-        const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${encodeURIComponent(order_id)}&select=product_id,quantity`, {
-          headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
-        })
-        if (itemsResp.ok) {
-          const items = await itemsResp.json().catch(()=>[])
-          for (const it of (Array.isArray(items) ? items : [])) {
-            try {
-              await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(it.product_id)}`, {
-                method: 'PATCH',
-                headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-                body: JSON.stringify({ stock_qty: { "increment": Number(it.quantity||0) } })
-              })
-            } catch {}
-          }
-        }
-      } catch {}
-    }
-
-    const upd = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}`, {
-      method: 'PATCH',
-      headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({ payment_status: newPaymentStatus, status: newOrderStatus, payment_debug: newDebug })
-    })
-    if (!upd.ok) {
-      const txt = await upd.text().catch(()=> '')
-      return new Response(JSON.stringify({ error: 'order_update_failed', status: upd.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
-
-    // Audit insert (best effort)
-    try {
-      const payload = { order_id, amount: target, reason: reason || null, actor_user_id: actorUserId || null }
-      await fetch(`${supabaseUrl}/rest/v1/order_refund_events`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type':'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify(payload)
-      })
-    } catch {}
-
-    return new Response(JSON.stringify({ ok: true, order_id, payment_status: newPaymentStatus, amount: target }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
-  } catch (_e: unknown) {
-    const msg = _e instanceof Error ? _e.message : String(_e)
-    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
-  }
+  return new Response(
+    JSON.stringify({
+      error: 'ENDPOINT_RETIRED',
+      message:
+        'refund-order-mock emekliye ayrıldı: sahte iade yapıyor ama müşteriye "iadeniz tamamlandı" ' +
+        'dedirtiyordu. Gerçek para iadesi için iyzico-refund kullanın.',
+      replacement: 'iyzico-refund',
+      contract: {
+        body: { order_id: 'uuid', amount: 'number (opsiyonel; yoksa kalanın tamamı)', reason: 'string?', idempotency_key: 'parsiyel iadede ZORUNLU' },
+        note: 'Tam iptalde anahtar sunucuda türetilir. 409 = zaten işleniyor/işlenmiş; 200 already_refunded = tekrar çağrı, para iki kez çıkmaz.',
+      },
+      ref: 'T053-VH · docs/audits/operasyon-dongusu-denetimi-2026-08-15.md §3',
+    }),
+    { status: 410, headers: { ...cors, 'Content-Type': 'application/json' } },
+  )
 })

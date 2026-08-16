@@ -198,6 +198,25 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
             }
         }
 
+        /*
+          --- 2b. Teslim bildirimi ---
+          YALNIZ damganın İLK kez yazıldığı çağrıda tetiklenir; aksi halde panoda
+          ileri-geri sürükleyen admin müşteriye tekrar tekrar "siparişiniz teslim
+          edildi" e-postası gönderirdi.
+          Best-effort: e-posta hatası teslim kaydını GERİ ALMAZ — teslim gerçekleşti,
+          bildirim ayrı bir yan etkidir. `delivery-notification` yalnız `order_id`
+          alır, alıcı bilgisini sunucuda çözer (istemci e-posta adresi göndermez).
+        */
+        if (deliveredNow) {
+            try {
+                await supabase.functions.invoke('delivery-notification', {
+                    body: { order_id: orderId },
+                })
+            } catch {
+                // yutulur — bildirim hatası statüyü geri almaz
+            }
+        }
+
         // --- 3. Audit log (hata UI'ı bloklamasın) ---
         try {
             await logAdminAction(supabase, {

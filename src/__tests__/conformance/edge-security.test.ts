@@ -130,6 +130,8 @@ const KNOWN_VIOLATIONS = {
   // 26 ayrı güvenlik duruşunun kök sebebi). Beyan biçimi: `// Çağıran sınıfı: (a) ...`
   // Tek tek düzeltilecek borç; YENİ fonksiyon beyansız eklenemez.
   R10: [
+    // T053-VH (2026-08-16): `iyzico-refund` yeniden yazıldı ve `refund-order-mock` emekliye
+    // ayrıldı (410 Gone); ikisi de sınıf beyanını aldı → stale-guard gereği iki ad da SİLİNDİ.
     // T026-VH Adım 2 (2026-08-15): admin-create-coupon · admin-update-order ·
     // admin-update-shipping beyanlarını aldı ve sınıf (a) tenant sözleşmesine geçti →
     // stale-guard gereği üç ad buradan SİLİNDİ.
@@ -142,11 +144,9 @@ const KNOWN_VIOLATIONS = {
     'supabase/functions/admin-orders-latest/index.ts',
     'supabase/functions/apply-coupon/index.ts',
     'supabase/functions/healthz/index.ts',
-    'supabase/functions/iyzico-refund/index.ts',
     'supabase/functions/log-client-error/index.ts',
     'supabase/functions/order-housekeeping/index.ts',
     'supabase/functions/order-validate/index.ts',
-    'supabase/functions/refund-order-mock/index.ts',
     'supabase/functions/release-expired-reservations/index.ts',
     'supabase/functions/shipping-status/index.ts',
     'supabase/functions/stock-alert/index.ts',
