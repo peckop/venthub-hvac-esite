@@ -31,11 +31,9 @@ const ForgotPasswordPage: React.FC = () => {
       const { error } = await resetPassword(email)
 
       if (error) {
-        if (error.message?.includes('User not found')) {
-          toast.error(t('auth.userNotFound') || 'User not found')
-        } else {
-          toast.error(error.message || t('auth.resetError') || 'Reset error')
-        }
+        // Sağlayıcı mesajını YANSITMA: "User not found" benzeri metinler hangi e-postanın
+        // kayıtlı olduğunu sızdırır (hesap enumerasyonu). Her hatada tek jenerik mesaj.
+        toast.error(t('auth.resetError'))
       } else {
         setEmailSent(true)
         toast.success(t('auth.resetEmailSent') || 'Email sent')
