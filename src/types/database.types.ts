@@ -1122,6 +1122,68 @@ export type Database = {
           },
         ]
       }
+      // ELLE EKLENDİ (W5, 2026-08-16) — `pricing_policy` tablosu bu PR'ın migration'ıyla
+      // geliyor; `pnpm supabase:gen` CANLI şemadan üretir, dolayısıyla migration prod'a
+      // uygulanmadan üretilemez. Merge sonrası ilk `supabase:gen` bu bloğu gerçeğiyle
+      // değiştirir. Tek alternatif çift dönüşümlü tip kaçışıydı; o depoda yasak ve haklı
+      // olarak: tip yalanı gizli bug yuvasıdır (aynı dersi `DomainProduct` omit'inde yedik).
+      pricing_policy: {
+        Row: {
+          brand_id: string | null
+          category_id: string | null
+          created_at: string
+          frozen_at: string
+          frozen_by: string | null
+          fx_frozen_rate: number | null
+          fx_lock: boolean
+          id: string
+          is_active: boolean
+          note: string | null
+          priority: number
+          product_id: string | null
+          scope: number
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          brand_id?: string | null
+          category_id?: string | null
+          created_at?: string
+          frozen_at?: string
+          frozen_by?: string | null
+          fx_frozen_rate?: number | null
+          fx_lock?: boolean
+          id?: string
+          is_active?: boolean
+          note?: string | null
+          priority?: number
+          product_id?: string | null
+          scope: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          brand_id?: string | null
+          category_id?: string | null
+          created_at?: string
+          frozen_at?: string
+          frozen_by?: string | null
+          fx_frozen_rate?: number | null
+          fx_lock?: boolean
+          id?: string
+          is_active?: boolean
+          note?: string | null
+          priority?: number
+          product_id?: string | null
+          scope?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       pricing_rule: {
         Row: {
           base: string
