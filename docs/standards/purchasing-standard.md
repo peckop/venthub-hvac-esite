@@ -143,8 +143,8 @@ tetiksiz kalabilir — bugün zararsız görünen köprü, yeni yazar eklenince 
 
 - Dosyalar: `src/app/admin/purchasing/**` + `src/views/admin/purchasing/**` +
   `src/components/admin/purchasing/**` + `src/i18n/dictionaries/admin/purchasing.{tr,en}.ts`.
-  Bu globlar ADMIN-CUSTOMER şeridinin genel claim'i içinde — **oyma talebi iletildi**
-  (2026-08-16); cevap gelmeden D4 başlamaz.
+  Oyma 2026-08-16'da ADMIN-CUSTOMER'dan ALINDI; üç koşulu bağlayıcı: mevcut admin sözlük
+  dosyalarına dokunma · aggregator kaydı TR+EN'e BİRLİKTE · çözücü NESTED-ONLY.
 - `admin-standard` K1–K5 + DataTableKit deseni geçerli; statü butonları
   `allowedNextStatuses`'tan ÜRETİLİR (elle buton listesi yasak — returnStatusMachine deseni).
 - Tüm metin sözlükten (kural 7); tutar gösterimi PO para birimiyle, TRY'ye çevrim YOK
@@ -170,6 +170,14 @@ tetiksiz kalabilir — bugün zararsız görünen köprü, yeni yazar eklenince 
 | R3 | `purchasing*` dosyaları `purchase_price`/`purchase_currency`/`purchase_rate_to_base`'e YAZMAZ | update/insert alan taraması |
 | R4 | **Mal kabul motor zincirini ÇAĞIRMAZ**: `purchasing*` içinde `refreshCostInBase`/`materializePrices` çağrısı yok | **ayrı assert, çağrı-bazlı** (karar çerçevesi md.2) |
 | R5 | RPC zarfı: çağıranlar `success` alanını kontrol eder | desen taraması |
+
+**Durum (2026-08-16): CANLI.** 8 test; 6 kuralın tamamı bilerek-bozarak kanıtlandı
+(sahte geçiş haritası · doğrudan `goods_receipts` insert'i · zarfsız RPC çağrısı ·
+`purchase_price:` yazımı · `refreshCostInBase()` çağrısı · modüle sahte statü ·
+RPC adını sakatlama — yedisi de KIRMIZI gördü, restore sonrası yeşil). Parser sağlığı
+sentetik pozitif/negatif çiftiyle ölçülür (gerçek ihlalin varlığına bağlı değil);
+yorum sıyırma CRLF-güvenli (`[^\r\n]*`); eager glob'lar e2e'nin geçici
+`*.compiled.<rastgele>.ts` dosyalarını `!` deseniyle dışlar (#571).
 
 Teknik zorunluluklar (bu oturumun dersleri): yorum sıyırma **CRLF-güvenli** (`[^\r\n]`,
 `.` değil) · assert kendi dokümanı/yorumuyla TATMİN OLMAZ · her kural **bilerek-boz**
