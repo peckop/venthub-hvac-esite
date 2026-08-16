@@ -21,6 +21,17 @@
  */
 import { describe, expect, it } from 'vitest'
 
+// Interface-merge ile mevcut global bildirime dizi-desenli aşırı yükleme eklenir
+// (negatif `!` desenleri yalnız dizi biçiminde ifade edilebiliyor).
+declare global {
+  interface ImportMeta {
+    glob(
+      pattern: readonly string[],
+      options: { query: string; import: string; eager: true },
+    ): Record<string, string>
+  }
+}
+
 const RESTORE_RPC = 'process_order_stock_restore'
 
 /**
@@ -64,7 +75,10 @@ const appSources = import.meta.glob('/src/**/*.{ts,tsx}', {
   eager: true,
 }) as Record<string, string>
 
-const edgeSources = import.meta.glob('/supabase/functions/**/*.ts', {
+// `!` deseni ŞART (isExcluded yetmez): eager glob içeriği filtre çalışmadan okur.
+// tests/e2e/helpers/denoRuntime.ts, _shared/ içine geçici `*.compiled.<rastgele>.ts`
+// yazar ve siler; paralel koşuda glob o dosyayı görüp okuyamadan kaybediyordu (ENOENT).
+const edgeSources = import.meta.glob(['/supabase/functions/**/*.ts', '!**/*.compiled.*.ts'], {
   query: '?raw',
   import: 'default',
   eager: true,
