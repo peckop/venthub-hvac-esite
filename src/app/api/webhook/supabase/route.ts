@@ -68,16 +68,32 @@ export async function POST(request: NextRequest) {
      *
      * Env yoksa da 401 dönülür (500 değil): eksik yapılandırma, çağırana sunucunun iç
      * durumunu bildirmemeli. Sebep sunucu tarafında `error` seviyesinde loglanır.
+     *
+     * ROTASYON PENCERESİ (T031-VH). `_NEXT` ikinci bir GEÇERLİ değer tutar ve yalnız
+     * rotasyon sırasında tanımlıdır. Aksi hâlde sırrı değiştirmenin kesintisiz yolu
+     * yok: DB tetiği ile Vercel env'i aynı anda değişemez, hangisi önce dönerse diğer
+     * taraf 401 alır ve **sayfa yenileme sessizce durur** — vitrin bayatlar, hiçbir
+     * alarm çalmaz. İki değerin kabul edildiği pencere bu boşluğu kapatır: yeni değer
+     * `_NEXT` olarak eklenir, DB tarafı geçirilir, doğrulanır, sonra ana değişkene
+     * taşınıp `_NEXT` silinir. Sıra: secret-exposure-audit §4.1.
+     *
+     * Pencere iki DEĞERİ genişletir, kapıyı değil: liste boşsa istek yine reddedilir
+     * ve listede olmayan değer yine 401 alır (INV-WEBHOOK-1 ikisini de davranışsal
+     * olarak ölçer).
      */
-    const expectedSecret = process.env.SUPABASE_WEBHOOK_SECRET
-    if (!expectedSecret) {
+    const acceptedSecrets = [
+      process.env.SUPABASE_WEBHOOK_SECRET,
+      process.env.SUPABASE_WEBHOOK_SECRET_NEXT,
+    ].filter((s): s is string => typeof s === 'string' && s.length > 0)
+
+    if (acceptedSecrets.length === 0) {
       console.error(
         '[Supabase Webhook] SUPABASE_WEBHOOK_SECRET tanımsız — istek REDDEDİLDİ. ' +
         'Doğrulanamayan çağrı kabul edilmez; env değişkenini ayarlayın.',
       )
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    if (webhookSecret !== expectedSecret) {
+    if (!webhookSecret || !acceptedSecrets.includes(webhookSecret)) {
       console.warn('Unauthorized Supabase webhook attempt blocked.')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

@@ -72,6 +72,39 @@ makinende çalıştırır).
 > Bu yüzden bu belgenin tarihi önemli: **bu tarihten SONRA** commit'lenmiş bir sır varsa bu denetim
 > onu kapsamaz. Görünürlük değiştirmeden önce betiği **yeniden koş**.
 
+### 4.1 Bulgu #4 (whsec) — kapanış durumu ve ROTASYON SIRASI
+
+**2026-08-16 · Kod tarafı KAPANDI (T031-VH).** Ölçüldü: `public.handle_supabase_webhook()`
+gövdesinde `webhook_secret text := '<düz metin>'` satırı duruyordu ve bu fonksiyon tanımı
+baseline SQL'e de girmişti. Yapılanlar:
+
+- `20260816160245_webhook_secret_to_vault.sql` — sır Vault'a taşındı, fonksiyon
+  `vault.decrypted_secrets`'ten okuyor. **Sır migration dosyasında YAZILI DEĞİL:**
+  değeri veritabanı kendi fonksiyon tanımından okuyup aktarır; dosya sırrı hiç görmez
+  (yazsaydık sorunu çözmek yerine yeniden üretirdik — dosya da public repoya gider).
+  Taşıma **fail-closed**: sır çıkarılamazsa migration durur. Sessizce devam etseydi
+  fonksiyon Vault'u okumaya geçer, Vault boş olur ve **sayfa yenileme sessizce ölürdü.**
+- `/api/webhook/supabase` — rotasyon penceresi (`SUPABASE_WEBHOOK_SECRET_NEXT`).
+- INV-WEBHOOK-1 — kapı statik taramadan **davranışsal** teste yükseltildi (gerçek istek,
+  gerçek yanıt) + **R2**: kaynakta düz-metin `whsec_` literali yasak.
+
+> **Bu bir TAŞIMA'dır, ROTASYON DEĞİL.** Değer aynı kaldığı için kesinti yoktur; ama sır
+> hâlâ deponun GEÇMİŞİNDE okunabilir. Gerçek kapanış aşağıdaki rotasyondur — **Recep'e ait.**
+
+**Rotasyon sırası (bu sırayla — yanlış sıra sayfa yenilemeyi sessizce durdurur):**
+
+1. Yeni bir değer üret (ör. `openssl rand -hex 24`, başına `whsec_`).
+2. **Vercel** → `SUPABASE_WEBHOOK_SECRET_NEXT` = yeni değer (eskiye DOKUNMA) → deploy.
+   Artık iki değer de kabul ediliyor.
+3. **Supabase** → Vault'taki `supabase_webhook_secret` kaydını yeni değerle güncelle
+   (`vault.update_secret`). DB artık yeni değeri gönderiyor, Vercel onu tanıyor.
+4. **Doğrula:** bir ürünü admin'den güncelle → PDP'nin tazelendiğini gör. Bu adım
+   atlanamaz; arıza sessizdir (yenileme durursa kimse fark etmez, vitrin bayatlar).
+5. **Vercel** → `SUPABASE_WEBHOOK_SECRET` = yeni değer, `SUPABASE_WEBHOOK_SECRET_NEXT`'i SİL
+   → deploy. Pencere kapandı, eski değer artık hiçbir yerde geçerli değil.
+
+**Kalan (Recep):** yukarıdaki 5 adım. Kod tarafında yapılacak bir şey yok.
+
 ---
 
 ## 5. Bu denetim nasıl tekrarlanır
