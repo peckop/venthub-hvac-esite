@@ -79,11 +79,27 @@ describe('INV-REFUND-UI-1 · gerçek para iadesi', () => {
       iade sonucunun `ok` olmadığı durumda `throw` ile sağlanıyor — `mutateWithAudit`
       gövdesinden atılan hata hem statü yazımını hem audit kaydını engeller.
     */
-    const guard = /performRealRefund\([\s\S]{0,200}?if \(!refund\.ok\)[\s\S]{0,120}?throw/
+    /*
+      SAYIYA BAĞLI — "bir yerde var" YETMEZ. İlk yazımda `guard.test(source)` idi;
+      sabotaj turunda TEK SATIR akışındaki `throw`u `console.warn`a çevirdim ve kapı
+      YEŞİL kaldı, çünkü toplu akıştaki koruma iddiayı tek başına tatmin ediyordu.
+      Yani kapı "korunuyor mu"yu değil "herhangi bir yerde koruma var mı"yı ölçüyordu.
+      İki çağrı yeri var (tek satır + toplu); her birinin ardından throw'lu bir
+      koruma gelmeli.
+    */
+    // `await` ile daraltıldı: `async function performRealRefund(` TANIMI da
+    // çağrı sanılıyordu (sayaç 2 yerine 3 veriyordu).
+    const callSites = [...source.matchAll(/await\s+performRealRefund\s*\(/g)].length
+    const guarded = [
+      ...source.matchAll(/await\s+performRealRefund\s*\([\s\S]{0,200}?if \(!refund\.ok\)[\s\S]{0,160}?throw/g),
+    ].length
+
+    expect(callSites, 'İade çağrısı hem tek satır hem toplu akışta olmalı').toBeGreaterThanOrEqual(2)
     expect(
-      guard.test(source),
-      'Başarısız iade `throw` ile akışı durdurmalı; aksi halde "para gitmedi ama kayıt iade göründü" durumu doğar.',
-    ).toBe(true)
+      guarded,
+      `${callSites} çağrı yerinin yalnız ${guarded} tanesi korunuyor. Başarısız iade ` +
+        '`throw` ile akışı DURDURMALI; aksi halde "para gitmedi ama kayıt iade göründü" durumu doğar.',
+    ).toBe(callSites)
   })
 
   it('iade sonucu SESSİZCE yutulmuyor (boş catch yok)', () => {
