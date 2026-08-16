@@ -46,6 +46,7 @@ export const returns = {
         emailNotifySent: 'Müşteri bilgilendirme e-postası gönderildi',
         emailNotifyFailed: 'E-posta gönderilemedi ancak durum güncellendi',
         statusUpdateFailed: 'İade durumu güncellenemedi',
+        bulkPartialFailed: '{{count}} iade işlenemedi (para iadesi başarısız): {{detail}} — bu satırların statüsü DEĞİŞMEDİ.',
         noValidTransitions: 'Seçilen iade talepleri için geçerli durum geçişi bulunamadı',
         bulkStatusUpdated: 'Seçilen {{count}} iade talebinin durumu "{{status}}" olarak güncellendi',
         noPermission: 'Bu işlem için yetkiniz bulunmuyor'

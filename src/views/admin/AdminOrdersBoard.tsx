@@ -446,6 +446,15 @@ export default function AdminOrdersBoard() {
 
         if (res.ok) {
             toast.success(`${t('admin.orders.board.messages.updateSuccess')}: ${destCol.title}`)
+            /*
+              Statü değişti ama stok geri verilemedi: envanter YANLIŞ ve elle düzeltme
+              gerekiyor. Başarı toast'ının altında ayrı bir uyarı olarak gösterilir —
+              başarıyı bastırmak yanlış olurdu (sipariş gerçekten taşındı), sessiz
+              geçmek ise stok kaymasını gizlerdi.
+            */
+            if (res.warning) {
+                toast.warning(t('admin.orders.board.messages.stockRestoreFailed', { error: res.warning }))
+            }
         } else {
             setOrders(prev => prev.map(o => o.id === draggableId ? { ...o, status: oldStatus } : o))
             toast.error(t('admin.orders.board.messages.updateError') + ': ' + (res.error || ''))

@@ -52,9 +52,10 @@ const PENDING_MIGRATION: Record<string, string> = {
   //     (kanıt = `order_sale` hareketleri, idempotenslik RPC'nin içinde hesaplanıyor).
   //   · `refund-order-mock` emekliye ayrıldı (410 Gone) ve hiçbir şeye yazmıyor;
   //     geçersiz `{"increment": N}` gövdesi de onunla birlikte gitti.
-  '/src/lib/orderStatusService.ts':
-    'ADMIN-OPS şeridi (oturum 6cc7f2d3). `restoreStockForOrder` sipariş kalemlerine bakıp ' +
-    'quantity kadar ekliyor + oku-sonra-yaz yarışı var. Panoya RPC sözleşmesi bırakıldı.',
+  // T052-VH (2026-08-16): ADMIN-OPS satırı da SİLİNDİ — borç kapandı, liste yine küçüldü.
+  //   `restoreStockForOrder` artık ürün tablosuna hiç yazmıyor; tek yazıcı
+  //   `process_order_stock_restore` RPC'si (kanıt = `order_sale` hareketleri).
+  //   Ayrıca RPC'nin `success:false` zarfı okunuyor: HTTP 200 tek başına başarı sayılmıyor.
 }
 
 const appSources = import.meta.glob('/src/**/*.{ts,tsx}', {
@@ -116,22 +117,39 @@ const stockWriters = Object.entries(productionSources)
   .sort()
 
 describe('INV-STOCK-1 — sipariş kaynaklı stok geri-vermesi kanıta bağlı', () => {
-  it('dedektör çalışıyor: bilinen doğrudan-yazan yollar bulunabiliyor (parser sağlığı)', () => {
-    // Sıfır bulmak "temiz" değil, "dedektör kör" demektir. Muafiyet listesindeki her yol
-    // TANIM GEREĞİ doğrudan yazandır — hiçbiri görünmüyorsa tarayıcı bozulmuştur.
-    const gorulen = Object.keys(PENDING_MIGRATION).filter((p) => stockWriters.includes(p))
-    expect(
-      gorulen.length,
-      [
-        'Muafiyet listesindeki yolların HİÇBİRİ dedektöre takılmadı.',
-        '',
-        'YANLIŞ TEŞHİS UYARISI: bu, "her şey düzeldi" anlamına gelmez. Muhtemelen yazma',
-        'biçimi değişti (ör. `stock_qty` bir sabite taşındı) ve `isOrderScopedStockWriter`',
-        'artık göremiyor. Yolların gerçekten göç ettiğini doğrulamadan muafiyet silme.',
-        '',
-        `Bulunan yazarlar: ${stockWriters.length ? stockWriters.join(', ') : '(HİÇBİRİ)'}`,
-      ].join('\n'),
-    ).toBeGreaterThan(0)
+  /*
+    PARSER SAĞLIĞI — SENTETİK ÖRNEKLE (2026-08-16'da düzeltildi).
+
+    Önceki hâli, muafiyet listesindeki GERÇEK yolların dedektöre takılmasını şart
+    koşuyordu. Bu, kapının kendi BAŞARI KOŞULUNDA kırılması demekti: liste sıfıra
+    indiğinde — yani tam olarak hedefe ulaşıldığında — "hiçbiri takılmadı" diye
+    KIRMIZI yanıyordu. Son borç kapanınca (ADMIN-OPS / T052) aynen bu oldu ve kapı
+    doğru düzeltmeyi ihlal gibi gösterdi.
+
+    Sağlık kontrolünün sorusu "dedektör hâlâ görüyor mu?"dur; bu soru gerçek
+    ihlallerin VARLIĞINA bağlı olmamalı. Artık bilinen bir pozitif ve bilinen bir
+    negatif örnekle ölçülüyor, dolayısıyla liste boşken de anlamlı kalıyor.
+  */
+  it('dedektör çalışıyor: sentetik pozitif/negatif ayırt ediliyor (parser sağlığı)', () => {
+    const dogrudanYazan = [
+      "const { data } = await supabase.from('venthub_order_items').select('quantity').eq('order_id', id)",
+      "await supabase.from('products').update({ stock_qty: current + qty }).eq('id', pid)",
+    ].join('\n')
+
+    const hareketYazan = [
+      "const oid = order_id",
+      "await supabase.from('inventory_movements').insert([{ product_id: pid, delta: 3 }])",
+    ].join('\n')
+
+    const saltOkuma = [
+      "const { data } = await supabase.from('products').select('id, stock_qty').eq('order_id', id)",
+      "const kalan = Number(data?.stock_qty ?? 0)",
+    ].join('\n')
+
+    expect(isOrderScopedStockWriter(dogrudanYazan), 'stok gövdesi yazımı görülmeli').toBe(true)
+    expect(isOrderScopedStockWriter(hareketYazan), 'elle hareket yazımı görülmeli').toBe(true)
+    // Yanlış-POZİTİF kontrolü: salt-okuma ihlal sayılmamalı (yanlış-KIRMIZI da kusurdur).
+    expect(isOrderScopedStockWriter(saltOkuma), 'salt-okuma ihlal sayılmamalı').toBe(false)
   })
 
   it('muafiyet listesi BAYAT değil: her satır hâlâ var ve hâlâ doğrudan yazıyor', () => {

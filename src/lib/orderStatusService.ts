@@ -39,6 +39,12 @@ interface UpdateOrderStatusInput {
 interface UpdateOrderStatusResult {
     ok: boolean
     error?: string
+    /**
+     * Statü değişti AMA yan bir adım başarısız oldu (ör. stok geri verilemedi).
+     * `ok: true` ile birlikte gelir — çağıran bunu kullanıcıya GÖSTERMELİ; sessizce
+     * yutmak envanterin kaydığını gizler.
+     */
+    warning?: string
 }
 
 /**
@@ -77,6 +83,8 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
         skipReturnsSync = false,
         skipOrdersSync = false,
     } = input
+
+    let stockWarning: string | undefined
 
     try {
         /*
@@ -153,7 +161,40 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
 
             // Eğer daha önceden iptal/iade HALE GELMEMİŞSE stokları iade et
             if (oldStatus && !isReturnStatus(oldStatus)) {
-                await restoreStockForOrder(orderId)
+                const restore = await restoreStockForOrder(
+                    orderId,
+                    newStatus === 'cancelled' ? 'order_cancel' : 'order_refund',
+                )
+                /*
+                  Hata SESSİZCE YUTULMAZ ama statüyü de geri almaz. Sipariş gerçekten
+                  iptal/iade edildi; o kaydı geri çevirmek daha büyük bir yalan olurdu.
+                  Ama stok geri verilmediyse envanter YANLIŞ ve elle düzeltme gerekir —
+                  kullanıcı bunu görmek zorunda. Eski gövde `catch{}` ile yutuyordu,
+                  yani envanter sessizce kayıyordu.
+                */
+                if (!restore.ok) {
+                    stockWarning = restore.error ?? 'Stok geri verilemedi'
+                    console.error('[orderStatusService] stok geri verme başarısız:', stockWarning)
+                }
+            }
+        }
+
+        /*
+          --- 2b. Teslim bildirimi ---
+          YALNIZ damganın İLK kez yazıldığı çağrıda tetiklenir; aksi halde panoda
+          ileri-geri sürükleyen admin müşteriye tekrar tekrar "siparişiniz teslim
+          edildi" e-postası gönderirdi.
+          Best-effort: e-posta hatası teslim kaydını GERİ ALMAZ — teslim gerçekleşti,
+          bildirim ayrı bir yan etkidir. `delivery-notification` yalnız `order_id`
+          alır, alıcı bilgisini sunucuda çözer (istemci e-posta adresi göndermez).
+        */
+        if (deliveredNow) {
+            try {
+                await supabase.functions.invoke('delivery-notification', {
+                    body: { order_id: orderId },
+                })
+            } catch {
+                // yutulur — bildirim hatası statüyü geri almaz
             }
         }
 
@@ -190,7 +231,7 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
             // audit log hataları sessizce yutulur
         }
 
-        return { ok: true }
+        return stockWarning ? { ok: true, warning: stockWarning } : { ok: true }
     } catch (err: unknown) {
         const message = (err as Error).message || 'Bilinmeyen hata'
         console.error('[orderStatusService]', message)
@@ -281,53 +322,70 @@ async function syncReturnsRecord(
     }
 }
 
-async function restoreStockForOrder(orderId: string): Promise<void> {
+/** RPC'nin döndürdüğü zarf — `success` bayrağı HTTP durumundan ayrı okunur. */
+interface StockRestoreResult {
+    success?: boolean
+    error?: string
+    restored_count?: number
+    restored_units?: number
+}
+
+/**
+ * İptal/iade sonrası stok geri verme.
+ *
+ * ESKİ GÖVDE SİLİNDİ (2026-08-16, T052-VH). İki ayrı kusuru vardı:
+ *
+ *  1. **Yanlış soruyu soruyordu.** Sipariş KALEMLERİNE bakıp `quantity` kadar stok
+ *     EKLİYORDU — yani "sipariş ne kadardı?" sorusunun cevabını geri veriyordu,
+ *     "stoktan ne kadar düşüldü?" sorusunun değil. Satışta stok hiç düşmediği için
+ *     (RPC kapısı hiç var olmayan bir `paid` statüsünü bekliyordu) her iptal saf
+ *     HAYALİ STOK üretiyordu.
+ *  2. **Oku-sonra-yaz yarışı.** `currentStock + quantity` iki eş zamanlı çağrıda
+ *     birbirini eziyordu.
+ *
+ * Yerine tek, kanıta bağlı RPC: `inventory_movements`'taki `order_sale` satırlarına
+ * bakar, `düşülen - geri verilen` hesaplar. Düşülmemişse HİÇBİR ŞEY yapmaz.
+ * İdempotens bayrakla değil HESAPLA sağlanır — ikinci çağrı no-op'tur.
+ * Yetki kapısı fonksiyonun içindedir (`adjust_stock` ile aynı).
+ */
+async function restoreStockForOrder(
+    orderId: string,
+    reason: 'order_cancel' | 'order_refund',
+): Promise<{ ok: boolean; error?: string }> {
     try {
-        // Fetch order items and related products in a single relational query
-        const { data: items } = await supabase
-            .from('venthub_order_items')
-            .select('product_id, quantity, products(id, stock_qty)')
-            .eq('order_id', orderId)
+        /*
+          TIP KÖPRÜSÜ — `process_order_stock_restore` henüz `database.types.ts`e
+          ÜRETİLMEDİ (migration bu depoya yeni girdi). `any` yasak olduğu için
+          köprü `unknown` üzerinden ve YALNIZ bu çağrının imzasını tanımlıyor.
+          `pnpm supabase:gen` koşulduğunda bu blok SİLİNMELİ — kalırsa gerçek
+          şemadaki bir değişikliği tsc'den gizler.
+        */
+        type StockRestoreRpc = (
+            fn: 'process_order_stock_restore',
+            args: { p_order_id: string; p_reason: string },
+        ) => Promise<{ data: unknown; error: { message: string } | null }>
 
-        if (!items || items.length === 0) return
-
-        const updates: { id: string; stock_qty: number }[] = []
-        const movements: { product_id: string; delta: number; reason: string; order_id: string }[] = []
-
-        // Group items by product_id to sum quantities correctly and avoid overwriting
-        const groupedItems = items.reduce((acc, item) => {
-            const prod = Array.isArray(item.products) ? item.products[0] : item.products;
-            if (!item.product_id || !prod) return acc;
-
-            if (!acc[item.product_id]) {
-                acc[item.product_id] = { quantity: 0, currentStock: prod.stock_qty || 0 };
-            }
-            acc[item.product_id].quantity += item.quantity;
-            return acc;
-        }, {} as Record<string, { quantity: number; currentStock: number }>)
-
-        for (const [productId, data] of Object.entries(groupedItems)) {
-            updates.push({
-                id: productId,
-                stock_qty: data.currentStock + data.quantity
-            })
-            movements.push({
-                product_id: productId,
-                delta: data.quantity,
-                reason: 'return',
-                order_id: orderId
-            })
-        }
-
-        await Promise.all(
-            updates.map(update => supabase.from('products').update({ stock_qty: update.stock_qty }).eq('id', update.id))
+        const { data, error } = await (supabase.rpc as unknown as StockRestoreRpc)(
+            'process_order_stock_restore',
+            { p_order_id: orderId, p_reason: reason },
         )
 
-        if (movements.length > 0) {
-            await supabase.from('inventory_movements').insert(movements)
+        if (error) return { ok: false, error: error.message }
+
+        /*
+          KRİTİK: HTTP 200 tek başına BAŞARI DEĞİL. RPC geçersiz sebep, bulunamayan
+          sipariş ya da yetkisizlik durumunda `{ success: false, error }` döndürür ve
+          çağrı yine 200 ile biter. T052'nin kök sebeplerinden biri tam olarak buydu:
+          dönüş zarfı okunmadan "oldu" varsayılıyordu.
+        */
+        const result = (data ?? null) as StockRestoreResult | null
+        if (!result || result.success !== true) {
+            return { ok: false, error: result?.error ?? 'Stok geri verme yanıtı doğrulanamadı' }
         }
+        return { ok: true }
     } catch (err) {
         console.error('[restoreStockForOrder] Hata:', err)
+        return { ok: false, error: err instanceof Error ? err.message : 'Bilinmeyen hata' }
     }
 }
 
