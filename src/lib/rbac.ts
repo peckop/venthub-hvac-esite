@@ -7,13 +7,17 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'], // Her seye erişim
     admin: ['*'], // Her seye erişim (kullanıcılar sayfası haricinde kontrol edilecek)
     moderator: ['*'],
+    // T062 NOTU: `/admin/purchasing` BİLEREK YOK. `process_goods_receipt` RPC'si
+    // warehouse'u kabul eder, ama satınalma tablolarının RLS SELECT'i (maliyet hassas)
+    // yalnız super_admin/admin/moderator'a açık. Sayfayı açsa BOŞ liste görür ve hata
+    // da almaz — sessiz-boş. UI izni, DB'nin gerçekten verdiğinin ötesine geçemez.
+    // Açılış şartı: purchasing-standard.md §8.1 (maliyetsiz view + warehouse SELECT).
     warehouse: [
         '/admin',
         '/admin/inventory',
         '/admin/movements',
         '/admin/inventory/report',
-        '/admin/inventory/settings',
-        '/admin/purchasing'
+        '/admin/inventory/settings'
     ],
     sales: [
         '/admin',
@@ -34,8 +38,9 @@ const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'],
     admin: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing', 'purchasing'],
     moderator: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing', 'purchasing'],
-    // warehouse mal kabul İŞLER (RPC yetki kapısı da warehouse içerir — D2 migration).
-    warehouse: ['logistics', 'inventory', 'movements', 'inventory_settings', 'purchasing'],
+    // warehouse'a 'purchasing' yazma izni YOK — yukarıdaki sayfa notuna bak (RLS okuma
+    // vermiyor; yazma izni tek başına kullanılamaz, yalnız yanıltıcı buton üretirdi).
+    warehouse: ['logistics', 'inventory', 'movements', 'inventory_settings'],
     sales: ['orders', 'logistics', 'returns', 'quotes', 'coupons'],
     viewer: [],
     user: []
