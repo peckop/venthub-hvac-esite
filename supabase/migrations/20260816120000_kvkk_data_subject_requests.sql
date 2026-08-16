@@ -167,8 +167,16 @@ begin
    where id = p_user_id;
 
   if v_email is not null then
+    -- `email` ve `name` NOT NULL (2026-08-16'da prod şemasından doğrulandı) — NULL'a
+    -- ÇEKİLEMEZ. İlk yazımı `email = null` idi ve migration temiz uygulanırdı; hata
+    -- ancak ilk gerçek KVKK talebinde ortaya çıkardı. Bu yüzden kimliksizleştirici
+    -- sabit bir değer yazılıyor; satır kimliği ekleniyor ki farklı kişilerin mesajları
+    -- aynı adreste birleşip "tek kişi" gibi görünmesin.
     update public.contact_messages
-       set name = '[ANONİMLEŞTİRİLDİ]', email = null, phone = null, ip_address = null
+       set name = '[ANONİMLEŞTİRİLDİ]',
+           email = 'anonim+' || id::text || '@kvkk.local',
+           phone = null,
+           ip_address = null
      where lower(email) = lower(v_email);
   end if;
 
