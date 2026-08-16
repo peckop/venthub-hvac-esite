@@ -11,6 +11,7 @@
 // kurmak sınırı çizmez, sınırı SALDIRGANA çizdirir (cetvel §3.9).
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 import { tenantFromRow } from '../_shared/tenant.ts'
+import { canCarrierTransition } from '../_shared/return_transitions.ts'
 
 function json(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body, null, 2), { status: init.status || 200, headers: { 'content-type': 'application/json; charset=utf-8', ...(init.headers||{}) } })
@@ -34,7 +35,11 @@ function mapReturnStatus(input?: string): { status?: string; setReceived?: boole
   if (['in_transit','transit','return_in_transit','returning'].includes(s)) return { status: 'in_transit' }
   if (['received','delivered','returned','completed'].includes(s)) return { status: 'received', setReceived: true }
   if (['cancelled','canceled'].includes(s)) return { status: 'cancelled' }
-  return { status: s }
+  // TANIMADIĞIMIZ STATÜ YAZILMAZ. Eskiden burası `return { status: s }` idi: kargo
+  // firmasının gönderdiği ham dize doğrudan patch'e giriyordu. Bilinmeyen bir değer ya
+  // DB CHECK kısıtına çarpıp 500 üretir, ya da (kısıt gevşerse) statü sözlüğünü sessizce
+  // genişletir. Kuralı olmayan girdiyi geçirmek, kapıyı dış sisteme yazdırmaktır.
+  return {}
 }
 
 function normalizePayload(obj: unknown) {
@@ -143,12 +148,27 @@ Deno.serve(async (req: Request) => {
     const patch: Record<string, unknown> = {}
     if (mapped.status) patch['status'] = mapped.status
 
-    // Only allow progression to received (or mapped status) and never regress silently
-    const rank: Record<string, number> = { requested:0, approved:1, rejected:1, in_transit:2, received:3, refunded:4, cancelled:4 }
-    const curRank = rank[String(cur.status) as string] ?? 0
-    const nextRank = rank[String(patch['status']) as string] ?? curRank
-    if (nextRank < curRank) {
-      return json({ ok: true, unchanged: true, reason: 'regression_blocked' })
+    // ── Geçiş kapısı ──────────────────────────────────────────────────────────────
+    // ESKİDEN BURADA BİR SIRALAMA (rank) HARİTASI VARDI ve iki yerden sızdırıyordu:
+    //   • `rejected` sonlanma durumu olduğu hâlde rütbesi 1'di → kargo firmasının
+    //     gönderdiği `in_transit` (2) "ilerleme" sayılıp REDDEDİLMİŞ iadeyi canlandırıyordu.
+    //   • `refunded` ve `cancelled` eşit rütbedeydi (4) ve kontrol `nextRank < curRank`
+    //     olduğu için `4 < 4` yanlış → parası iade edilmiş iade `cancelled`'a çevrilebiliyordu.
+    // Kök sebep: iade akışı bir SIRA değil, bir geçiş grafiğidir. Tablo artık
+    // `_shared/return_transitions.ts`'te ve sonlanma durumları SOĞURUCU.
+    const nextStatusCandidate = String(patch['status'] ?? cur.status)
+    const verdict = canCarrierTransition(String(cur.status), nextStatusCandidate)
+    if (!verdict.allowed) {
+      // 200 dönülür: kargo firmasının kuyruğu tekrar tekrar denemesin. Reddin SEBEBİ
+      // gövdede açıkça yazar — sessiz yutma değil, kayıtlı ret.
+      return json({
+        ok: true,
+        unchanged: true,
+        reason: 'transition_blocked',
+        detail: verdict.reason,
+        current: cur.status,
+        attempted: nextStatusCandidate,
+      })
     }
 
     // Update returns row

@@ -300,6 +300,70 @@ Göç planı: `docs/plans/tenant-id-hardening-2026-08-15.md` (7 adım, ölçülm
 
 ---
 
+### 3.10 Dış para hareketi — **çağır-önce-talep-et** ve sonlanma durumu SOĞURUCU
+
+> Bu bölüm 2026-08-16'da eklendi. Eklenme sebebi bir boşluktu: cetvel webhook'ları (§3.5)
+> ve yetkiyi (§3.2) düzenliyordu ama **para hareketi hakkında tek bir değişmez içermiyordu.**
+> Boşluk ücretsiz değildi — `iyzico-refund` iki yıl boyunca başlığında *"Idempotent"* yazarak
+> durdu ve idempotent değildi. Hiçbir kapı bunu göremedi çünkü ölçecek kural yazılmamıştı.
+
+**KURAL A — PSP'yi çağırmadan ÖNCE talebi yaz.** Dış bir ödeme sistemine (İyzico) para
+hareketi isteği gönderen her fonksiyon, isteği **önce** veritabanındaki bir talep defterine
+yazmalı; defterdeki **benzersiz kısıt** çakışırsa PSP'ye **hiç gitmemelidir.**
+
+```
+1. talebi YAZ   → unique çakıştı mı? → PSP'ye GİTME, mevcut sonucu döndür
+2. PSP'yi çağır
+3. sonucu aynı satıra işle
+```
+
+*Niçin bu sıra:* tersi (önce çağır, sonra yaz) yazma düştüğünde **para hareketinin hiçbir
+izini bırakmaz** — bir sonraki çağrı aynı guard'ı geçip parayı ikinci kez gönderir.
+`iyzico-refund`'da tam olarak bu vardı: PSP sonrası `PATCH` boş `catch {}` içindeydi ve
+fonksiyon yine `200 {status:'refunded'}` dönüyordu.
+
+**KURAL B — `if (durum === 'X') return` bir idempotency mekanizması DEĞİLDİR.** Okuma ile
+yazma arasındaki pencereyi uygulama katmanı kapatamaz; iki eşzamanlı istek aynı okumayı
+yapar ve ikisi de geçer. Karşılıklı dışlamayı **veritabanı** yapmalıdır (benzersiz indeks
+ya da `FOR UPDATE`). Aynı şekilde **yazılıp hiç okunmayan bir bayrak** koruma değildir —
+`manual_refund_applied` tam olarak böyleydi.
+
+**KURAL C — belirsizlik OTOMATİK çözülmez.** Talep `in_flight` kalmışsa "para çıktı mı
+bilmiyoruz" demektir. Zaman aşımıyla kendiliğinden serbest bırakmak, kapatılan çift-ödeme
+penceresini **en kötü anda** (PSP yavaşken) geri açar. Doğru davranış: **409 + alarm**,
+yani insan kararı. Ağ hatasında talep `failed` değil **bilerek `in_flight`** bırakılır:
+istek PSP'ye ulaşıp cevabı kaybolmuş olabilir.
+
+**KURAL D — para geçtikten sonra hiçbir hata yutulmaz.** `//` para hareketinden sonraki
+kod yolunda boş `catch {}` **yasaktır**. Yutulan her hata, bir sonraki çağrıda ikinci kez
+para göndermenin izinsiz kapısıdır. Yazma başarısızsa: 5xx + `raiseRevenueAlarm`.
+
+**KURAL E — dış sistem para/ödeme durumu ilan EDEMEZ.** Bir kargo webhook'u `refunded`
+yazamaz; `refunded` PSP kanıtıyla ödeme fonksiyonunun yazdığı bir durumdur. Genel biçim:
+**dış sinyalin yazabileceği durum kümesi, iç durum makinesinin izin verdiklerinin ALT
+KÜMESİDİR.**
+
+**KURAL F — sonlanma (terminal) durumu SOĞURUCUDUR ve sıralamayla ifade edilmez.** İş akışı
+statüleri bir sayı ekseni değil, bir geçiş grafiğidir. `returns-webhook` statüleri
+`{requested:0 … rejected:1 … refunded:4, cancelled:4}` diye sıralıyordu; sonuç iki kaçaktı:
+`rejected` (sonlanma, rütbe 1) kargo firmasının `in_transit` (2) mesajıyla **canlanıyor**,
+`refunded`→`cancelled` ise eşit rütbe olduğu için (`4 < 4` yanlış) **geçiyordu**. Geçişler
+açık bir tabloda tutulur; sonlanma durumlarından çıkış **yoktur.**
+
+**Kapılar (CANLI, bilerek-bozularak kanıtlandı):**
+
+| Kural | Kapı | Kanıt |
+|---|---|---|
+| E, F | `INV-RETURN-1` — `src/__tests__/conformance/returns-webhook-transitions.test.ts` | 2026-08-16: 5 sabotaj KIRMIZI (refunded yazımı · terminal kaçışı · istemcide olmayan geçiş · rank haritasının dönüşü · kapının devre dışı bırakılması) + 1 yanlış-pozitif kontrolü YEŞİL |
+| A–D | **kapı YOK — açık borç.** Şu an yalnız bu cetvel ve kod yorumları taşıyor. `iyzico-refund` şeridi devredilince `INV-PAY-3` yazılmalı: para hareketinden sonraki yolda boş `catch`, ve talep defteri olmadan PSP çağrısı. | — |
+
+> ⚠️ `INV-RETURN-1` bir dersi kendi içinde de taşır: ilk sürümü `kaynak.includes('canCarrierTransition')`
+> diyordu ve sabotaj turunda **yeşil kaldı** — çağrı silinmiş olmasına rağmen `import` satırı
+> ismi hâlâ içeriyordu. Bir ismin dosyada geçmesi çağrıldığı anlamına gelmez; kapı çağrıyı
+> (`ad\s*\(`) aramalı ve import satırlarını hariç tutmalıdır.
+
+---
+
 ## 4. Doğrulama — kaynağa bakarak değil, **ÇAĞIRARAK**
 
 **KURAL.** Bir fonksiyonun güvenli olduğu, kodunu okuyarak değil **prod'a istek atarak** kanıtlanır.
