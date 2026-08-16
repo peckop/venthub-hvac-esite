@@ -33,7 +33,14 @@ const LoginPage: React.FC = () => {
     try {
       const result = await signIn(email, password)
       if (result.error) {
-        toast.error(result.error.message)
+        // Supabase hata metinleri İngilizce döner — bilinenleri sözlüğe eşle.
+        const raw = result.error.message || ''
+        const mapped = raw.includes('Email not confirmed')
+          ? t('auth.emailNotConfirmed')
+          : raw.includes('Invalid login credentials')
+            ? t('auth.invalidCreds')
+            : raw || t('auth.genericLoginError')
+        toast.error(mapped)
       } else {
         toast.success(t('auth.loginSuccess'))
         router.refresh()

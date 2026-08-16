@@ -34,6 +34,7 @@ import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/Vari
 import Seo from '../../components/Seo'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCart } from '../../hooks/useCartHook'
+import { useFavorites } from '../../hooks/useFavorites'
 import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -105,6 +106,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const router = useRouter()
   const pathname = usePathname()
   const { addToCart } = useCart()
+  const { isFavorite, toggleFavorite } = useFavorites()
   const { refreshProjects } = useProjectLists()
   const { categories } = useCategories()
 
@@ -112,7 +114,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const [actionProduct, setActionProduct] = useState<Product | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [activeSection, setActiveSection] = useState('general')
-  const [isWishlisted, setIsWishlisted] = useState(false)
+  // Favori durumu kalıcıdır (useFavorites/localStorage) — yerel useState değil (T059).
+  const isWishlisted = actionProduct ? isFavorite(actionProduct.id) : false
   const [leadOpen, setLeadOpen] = useState(false)
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
   const [isNavSticky, setIsNavSticky] = useState(false)
@@ -585,7 +588,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                 {/* Secondary Actions */}
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    onClick={() => actionProduct && toggleFavorite(actionProduct.id)}
+                    disabled={!actionProduct}
                     className={`flex-1 flex items-center justify-center space-x-2 py-2.5 border rounded-xl font-bold text-xs uppercase tracking-widest transition-colors ${isWishlisted
                       ? 'border-red-500 text-red-500 bg-red-50'
                       : 'border-light-gray text-steel-gray hover:border-red-500 hover:text-red-500'
