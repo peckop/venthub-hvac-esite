@@ -40,7 +40,7 @@ declare global {
   }
 }
 
-const SOURCES: Record<string, string> = import.meta.glob('/src/**/*.tsx', {
+const SOURCES: Record<string, string> = import.meta.glob('/src/**/*.{ts,tsx}', {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -76,15 +76,84 @@ const TEXT_PROP_LITERAL =
   /\b(\w*(?:Label|Text|Title|Placeholder|Message|Heading))\s*(?:=|\|\||\?\?)\s*(['"])([^'"]{2,})\2/g
 
 /**
+ * (d) OPERATÖR-ÇAPALI fallback: `... || 'Türkçe'` / `... ?? 'Türkçe'` — SOL taraf ne
+ * olursa olsun.
+ *
+ * NİÇİN AYRI BİR DESEN: (b) ad-çapalıdır (`ad → operatör → literal`) ve bu yüzden
+ * `x = someExpr ?? 'Sipariş Özeti'` biçimini KAÇIRIYORDU — ad ile literal arasına
+ * bir ifade girdiği anda desen kopuyor. Kendi sabotajım (S3) tam bunu yakaladı ve
+ * kapı YEŞİL kaldı; yani sabotaj turu olmasaydı bu açık kapının içinde yaşardı.
+ * Ders: aynı kuralın iki farklı çapası, iki farklı kapsam demektir — birini yazmak
+ * öbürünü kapsamaz.
+ *
+ * GRUP SIRASI ÜÇ DESENDE AYNI OLMAK ZORUNDA: (1) etiket, (2) tırnak, (3) değer.
+ * Operatörü bilerek yakalıyoruz — hem etiket görevi görür hem hizayı korur. Hizasız
+ * bıraktığımda `value` sessizce `undefined` oluyordu ve desen HİÇ ihlal bulamıyordu
+ * (kapı yeşil, koruma yok — fail-open'ın sessiz biçimi).
+ */
+const FALLBACK_LITERAL = /(\|\||\?\?)\s*(['"])([^'"]{2,})\2/g
+
+/**
+ * SAVUNMA SINIFI MUAFİYETİ: `t('anahtar') || 'Türkçe'`.
+ *
+ * Ölçüm (2026-08-17): bu biçimden **47** adet var. Bunlar çevrilmemiş UI DEĞİL —
+ * anahtar çözülemezse devreye giren yedeklerdir ve INV-5 (`i18n-key-resolution`,
+ * ratchet **0**) tüm statik anahtarların çözüldüğünü hâlihazırda garanti ediyor;
+ * yani bu yedekler bugün HİÇ render edilmiyor. INV-5 aynı gerekçeyle `t('k','alt')`
+ * biçimini de bilinçli atlıyor — iki kapı aynı sınıfta aynı kararı vermeli, aksi
+ * halde biri "borç" derken öbürü "temiz" der ve hangisine inanılacağı belirsizleşir.
+ *
+ * Kapsam DIŞI ≠ görmezden gelme: yedeklerin gereksizliği ayrı bir temizlik işidir
+ * (OPS-AUDIT'e bildirildi), ama bu kapının konusu ÇEVRİLMEMİŞ GÖRÜNEN METİN.
+ */
+const T_CALL_BEFORE_FALLBACK = /t\(\s*(['"])[\w.]+\1\s*\)\s*$/
+
+/**
  * ADLA MUAFİYET (muafiyet = ADLA ilkesi). Boş kalması HEDEFTİR; her satır bir borçtur.
  *
  * - `components/admin/data-table/DataTableKit.tsx`: `aria-label="Önceki sayfa"` —
  *   dosya ADMIN-CUSTOMER şeridinin canlı claim'inde (2026-08-17). Ölçüldü, sahibine
  *   panodan adresli devredildi. Sahibi düzeltince BU SATIR SİLİNECEK.
  *   Kapıyı o düzeltmeyi beklerken kırmızı bırakmak, başka şeridi bloke etmek olurdu.
+ *
+ * - `utils/whatsapp.ts`: `generateSupportMessage()` ham TR WhatsApp metni döndürüyor
+ *   (EN kullanıcı Türkçe ön-dolu mesaj alır — gerçek kusur). Ama bu SAF bir util:
+ *   `t`/`lang` erişimi YOK, düzeltmek çağıranlara dil geçirmeyi gerektiriyor = ayrı
+ *   iş emri. Yarım düzeltmek (util içine sözlük import etmek) DI kuralını bozardı.
+ *   JSX içermediği için tüm-desen muafiyeti burada kayıp üretmiyor.
  */
 const KNOWN_DEBT = new Set<string>([
   'components/admin/data-table/DataTableKit.tsx',
+  'utils/whatsapp.ts',
+])
+
+/**
+ * ÇIPLAK FALLBACK BORCU (yalnız `FALLBACK_LITERAL` deseni için — dosyayı diğer
+ * desenlere KÖR ETMEZ; `KNOWN_DEBT` tüm desenleri atlar, bu yalnız birini).
+ *
+ * Ölçüm (2026-08-17, bu kapı yazılırken ORTAYA ÇIKTI): `t()` yedeği OLMAYAN, doğrudan
+ * ham TR'ye düşen **19** fallback var — SEO açıklaması, toast mesajları, kart
+ * başlıkları. Bunlar gerçek borçtur ama benim iş emrim ATTRIBUTE süpürmesiydi ve
+ * çoğu BAŞKA ŞERİTLERİN canlı dosyasında (hooks/useAdminTable, lib/orderStatusService,
+ * views/admin/*, components/admin/*). Sahibine sormadan girmek şerit ihlali olurdu.
+ *
+ * Liste bu yüzden DONDURUR (ratchet): yeni fallback eklenemez, mevcut 19 görünür
+ * kalır ve OPS-AUDIT triyajıyla sahiplerine dağıtılır. Her satır bir borçtur; borç
+ * ödenince satır SİLİNİR (aşağıdaki bayatlık testi zorlar).
+ */
+const FALLBACK_DEBT = new Set<string>([
+  'app/[lang]/products/[slug]/page.tsx',
+  'app/_components/ProductDetailPageView.tsx',
+  'components/StickyHeader.tsx',
+  'components/admin/authority-builder/BlockEditor.tsx',
+  'components/authority/AuthorityRenderer.tsx',
+  'hooks/useAdminTable.ts',
+  'hooks/useApiCall.ts',
+  'hooks/useCheckoutCoupon.ts',
+  'lib/orderStatusService.ts',
+  'views/OrdersPage.tsx',
+  'views/account/OrderDetailPage.tsx',
+  'views/admin/AdminLogisticsTableBody.tsx',
 ])
 
 /**
@@ -124,7 +193,7 @@ function collectOffenders(): Offender[] {
 
     const clean = stripComments(source)
 
-    for (const pattern of [ATTR_LITERAL, TEXT_PROP_LITERAL]) {
+    for (const pattern of [ATTR_LITERAL, TEXT_PROP_LITERAL, FALLBACK_LITERAL]) {
       pattern.lastIndex = 0
       let m: RegExpExecArray | null
       // `while` ile TÜM isabetler taranır — ilk isabette durmak, aynı dosyadaki
@@ -132,6 +201,14 @@ function collectOffenders(): Offender[] {
       while ((m = pattern.exec(clean)) !== null) {
         const [, attr, , value] = m
         if (!TURKISH_SPECIFIC.test(value)) continue
+        // Savunma sınıfı: `t('anahtar') || 'Türkçe'` → INV-5 kapsamı, burada değil.
+        if (
+          pattern === FALLBACK_LITERAL &&
+          T_CALL_BEFORE_FALLBACK.test(clean.slice(Math.max(0, m.index - 60), m.index))
+        ) {
+          continue
+        }
+        if (FALLBACK_DEBT.has(rel) && pattern === FALLBACK_LITERAL) continue
         offenders.push({ file: rel, attr, value: value.slice(0, 60) })
       }
     }
@@ -168,7 +245,7 @@ describe('INV-I18N-ATTR · görünen metin sözlükten gelmeli (attribute + vars
       }
       const clean = stripComments(entry[1])
       let hasViolation = false
-      for (const pattern of [ATTR_LITERAL, TEXT_PROP_LITERAL]) {
+      for (const pattern of [ATTR_LITERAL, TEXT_PROP_LITERAL, FALLBACK_LITERAL]) {
         pattern.lastIndex = 0
         let m: RegExpExecArray | null
         while ((m = pattern.exec(clean)) !== null) {
