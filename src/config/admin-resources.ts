@@ -6,6 +6,7 @@ import {
   ClipboardList,
   Coins,
   FileText,
+  Lock,
   LucideIcon,
   Package,
   PackageSearch,
@@ -205,6 +206,21 @@ export const ADMIN_RESOURCES: AdminResource[] = [
     group: 'pricing',
     route: '/admin/pricing/preview',
     icon: Calculator,
+    requiredAccess: '/admin/pricing',
+    searchable: false,
+    inNav: true,
+    parentKey: 'pricing'
+  },
+  {
+    // Kur kilidi (fx_lock) yönetimi. `requiredAccess` bilerek `/admin/pricing`:
+    // kilit ayrı bir yetki DEĞİL, fiyat yönetiminin parçası. UI izni (admin+moderator)
+    // ile `pricing_policy` RLS'i (super_admin+admin+moderator) ölçüldü — alt küme,
+    // sessiz-boş riski yok (cetvel §6.1).
+    key: 'pricing_policies',
+    labelKey: 'admin.menu.pricingPolicies',
+    group: 'pricing',
+    route: '/admin/pricing/policies',
+    icon: Lock,
     requiredAccess: '/admin/pricing',
     searchable: false,
     inNav: true,
