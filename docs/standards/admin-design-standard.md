@@ -9,6 +9,7 @@
 > v1.0 · 2026-08-15 — kabuk/overlay denetimi + 3 paralel kaynak araştırması sonrası ilk sürüm.
 > Zorlama planı: §6 (INV-ADMIN-* testleri + zoom kapısı + mobil viewport projesi).
 > v1.1 · 2026-08-16 — §7.3 eklendi: Faz 5 sayfa-başı ölçümü (21 sayfa + kabuk, %69) + sayaç kör noktaları.
+> v1.2 · 2026-08-17 — §6.1 eklendi: yeni admin rotasında UI izni ⊆ DB izni ölçüm yükümlülüğü (sessiz-boş sınıfı 3 kez görüldü).
 
 ---
 
@@ -909,6 +910,37 @@ Skor = ✓ / 40. Kabuk maddeleri **kabuk başına bir kez**, sayfa maddeleri **s
 
 **Kapı ekleme kuralı:** her yeni kapı **bilerek bozularak** FAIL görülür; geçmesi çalıştığını
 kanıtlamaz. Muafiyet varsa **adla** yazılır, sessiz geçilmez.
+
+### 6.1 Yeni admin rotası açarken: UI izni ⊆ DB izni (ZORUNLU ÖLÇÜM)
+
+Yeni bir admin rotası ekleyen kişi, rotayı yayına almadan önce **iki rol listesinin kesişimini
+ölçer** ve ölçümü PR'a yazar:
+
+1. **UI tarafı** — `src/lib/rbac.ts`'te bu rotaya/varlığa erişim verilen roller.
+2. **DB tarafı** — sayfanın okuduğu/yazdığı **her** tablonun RLS politikalarındaki rol dizisi
+   (ve varsa çağrılan RPC'nin gövdesindeki rol kapısı).
+
+**Kural: UI'da izin verilen her rol, DB'de de izinli olmalı.** Aksi hâlde kullanıcı menüde
+öğeyi görür, sayfayı açar ve **boş bir ekranla** karşılaşır — hiçbir hata düşmez, çünkü RLS
+"yetkin yok" demez, **boş küme** döndürür. Ekran "veri yok" der; gerçek "gösteremiyorum"dur.
+
+**Niçin kural: bu sınıf ÜÇ kez görüldü** (hepsi ayrı şeritte, hepsi aynı biçimde):
+
+| # | Yer | UI izni | DB izni | Sonuç |
+|---|---|---|---|---|
+| 1 | Satınalma (T062) | `warehouse` | RPC'de var, RLS'te **yok** | mal kabul ekranı sessiz-boş |
+| 2 | KVKK/DSR (T063) | genişletilmiş | tablo politikası dar | aynı |
+| 3 | `pricing_policy` (FX-LOCK) | admin + moderator | super_admin/admin/moderator | ✅ kesişim **ölçüldü**, uyumlu |
+
+Üçüncüsü kusur değil: **ölçüm yapıldığı için** kusur doğmadı. Kuralın istediği tam olarak budur.
+
+**Ölçümün biçimi (PR'da bir satır yeterli):** "UI: `<roller>` · DB(`<tablo>`): `<roller>` → alt küme ✓/✗".
+`✗` ise rotayı açmadan önce ya UI listesi daraltılır ya DB politikası genişletilir; **hangisi
+doğruysa o** — ve genişletme migration ise Recep onayına gider (kural 13).
+
+> Bu bir *kapı* değil **ölçüm yükümlülüğüdür**: rol dizileri statik taramayla güvenilir
+> eşleştirilemiyor (RLS ifadeleri serbest SQL). Ölçmediğimiz şeyi kapı sanmıyoruz — §5'in
+> "ölçülemedi ≠ geçti" ilkesi burada da geçerli.
 
 ---
 

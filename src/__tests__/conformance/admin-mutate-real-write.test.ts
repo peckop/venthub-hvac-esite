@@ -138,7 +138,15 @@ describe('INV-6 · admin-write real-effect conformance', () => {
     expect(
       offenders,
       `SAHTE-SUCCESS: mutateWithAudit fn gövdesi gerçek yazma (.insert/.update/.upsert/.delete/.rpc) ` +
-        `içermiyor. Ya gerçek yaz ya da başarı bildirimini kaldır:\n` +
+        `içermiyor. Ya gerçek yaz ya da başarı bildirimini kaldır.\n` +
+        // Kapının en sık YANLIŞ-POZİTİF görünen dalı. Mesaj yol göstermezse geliştirici
+        // testin kaynağını okumak zorunda kalıyor (AUTH bunu yaşadı, T063). Kural keyfî
+        // değil: `await`siz çağrının sonucu beklenmez, hata yutulur ve `mutateWithAudit`
+        // yazma başarısız olsa bile başarı sanar — yani gerçekten sahte-success olur.
+        `İPUCU — servise delege ediyorsan ASYNC + AWAIT zorunlu:\n` +
+        `  YANLIS  fn: () => guncelleServis(supabase, veri)        (arrow-return: sahte-success sayılır)\n` +
+        `  DOGRU   fn: async () => { await guncelleServis(supabase, veri) }\n` +
+        `Toplu işte kombinatör de kabul edilir: await Promise.all / allSettled / race (...)\n` +
         offenders.map((o) => `  ${o.file}  →  fn{ ${o.snippet} }`).join('\n'),
     ).toEqual([])
   })
