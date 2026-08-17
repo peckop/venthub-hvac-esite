@@ -270,6 +270,26 @@ const MaterializePricesModal: React.FC<MaterializePricesModalProps> = ({ open, o
                       {formatNumber(preview.skippedManual, locale)}
                     </p>
                   </div>
+                  {/*
+                    KUR KİLİDİ atlaması — servis hep üretiyordu, hiçbir yüzey göstermiyordu.
+                    Kilidi görünür kılan tek geri bildirim (pricing-standard §8.2.1-C) ve aynı
+                    zamanda sessiz-arıza dedektörü: aktif kilit varken sürekli 0 ise kilit
+                    uygulanmıyordur. 0 da gösterilir, gizlenmez.
+                  */}
+                  <div className="rounded-admin-lg bg-admin-surface border border-admin-border p-4 space-y-1">
+                    <p className="text-xs font-semibold text-admin-fg-muted">
+                      {t('admin.pricing.rules.materialize.summary.skippedFxLocked')}
+                    </p>
+                    <p
+                      className={
+                        preview.skippedFxLocked > 0
+                          ? 'text-lg font-semibold text-admin-accent'
+                          : 'text-lg font-semibold text-admin-fg'
+                      }
+                    >
+                      {formatNumber(preview.skippedFxLocked, locale)}
+                    </p>
+                  </div>
                   <div className="rounded-admin-lg bg-admin-surface border border-admin-border p-4 space-y-1">
                     <p className="text-xs font-semibold text-admin-fg-muted">
                       {t('admin.pricing.rules.materialize.summary.deactivated')}

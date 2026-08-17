@@ -192,6 +192,7 @@ export const pricing = {
         priced: "Will be priced",
         quoteOnly: "Will stay \"Request a Quote\"",
         totalNet: "Total net (TRY)",
+        skippedFxLocked: "Skipped (FX lock)",
         skippedManual: "Manually overridden (kept)",
         deactivated: "Stale rows to deactivate",
         unbridgedBrand: "Products with unmatched brand",
@@ -230,6 +231,7 @@ export const pricing = {
         updated: "Cost will change",
         skippedNoRate: "No rate found",
         skippedNoPurchasePrice: "No purchase price",
+        skippedFxLocked: "Skipped (FX lock)",
       },
       rates: {
         title: "Rates used",
