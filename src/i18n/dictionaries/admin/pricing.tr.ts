@@ -192,6 +192,7 @@ export const pricing = {
         priced: "Fiyatlanacak",
         quoteOnly: "\"Teklif Alın\" kalacak",
         totalNet: "Toplam net (TRY)",
+        skippedFxLocked: "Kur kilidi nedeniyle atlanan",
         skippedManual: "Elle ezilmiş (korunacak)",
         deactivated: "Pasifleştirilecek bayat satır",
         unbridgedBrand: "Markası eşleşmeyen ürün",
@@ -230,6 +231,7 @@ export const pricing = {
         updated: "Maliyeti değişecek",
         skippedNoRate: "Kuru bulunamayan",
         skippedNoPurchasePrice: "Alış fiyatı olmayan",
+        skippedFxLocked: "Kur kilidi nedeniyle atlanan",
       },
       rates: {
         title: "Kullanılan kurlar",

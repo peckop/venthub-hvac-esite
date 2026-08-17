@@ -217,6 +217,29 @@ const CostRefreshModal: React.FC<CostRefreshModalProps> = ({ open, onClose, onSu
                       {formatNumber(preview.skippedNoPurchasePrice, locale)}
                     </p>
                   </div>
+                  {/*
+                    KUR KİLİDİ atlaması: servis bu sayıyı hep üretiyordu ama HİÇBİR
+                    yüzeyde gösterilmiyordu — kilit, ürünleri sessizce atlıyordu.
+                    Kilidi görünür kılan tek geri bildirim budur (pricing-standard §8.2.1-C).
+
+                    Ayrıca SESSİZ-ARIZA dedektörü: aktif kilit varken bu sayaç sürekli 0
+                    ise kilit UYGULANMIYOR demektir. Bu yüzden 0 değeri de gösterilir,
+                    gizlenmez.
+                  */}
+                  <div className="rounded-admin-lg bg-admin-surface border border-admin-border p-4 space-y-1">
+                    <p className="text-xs font-semibold text-admin-fg-muted">
+                      {t('admin.pricing.rules.costRefresh.summary.skippedFxLocked')}
+                    </p>
+                    <p
+                      className={
+                        preview.skippedFxLocked > 0
+                          ? 'text-lg font-semibold text-admin-accent'
+                          : 'text-lg font-semibold text-admin-fg'
+                      }
+                    >
+                      {formatNumber(preview.skippedFxLocked, locale)}
+                    </p>
+                  </div>
                 </section>
 
                 {/* ---- kullanılan kurlar: hangi maliyet HANGİ kurla yazılıyor, izlenebilir olmalı ---- */}
