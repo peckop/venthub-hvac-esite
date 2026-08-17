@@ -6,6 +6,7 @@ import { common } from './common.en'
 import { confirm } from './confirm.en'
 import { coupons } from './coupons.en'
 import { dashboard } from './dashboard.en'
+import { dataRequests } from './dataRequests.en'
 import { dataTable } from './dataTable.en'
 import { errorGroups } from './errorGroups.en'
 import { errors } from './errors.en'
@@ -32,6 +33,7 @@ export const admin = {
   common,
   confirm,
   coupons,
+  dataRequests,
   dataTable,
   dashboard,
   errors,

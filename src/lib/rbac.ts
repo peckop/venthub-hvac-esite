@@ -36,7 +36,9 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
  */
 const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'],
-    admin: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing', 'purchasing'],
+    admin: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing', 'purchasing', 'data_requests'],
+    // 'data_requests' BILEREK yalniz admin'de (+ super_admin '*'): RLS is_admin_user()
+    // moderator'u kabul ETMEZ; moderator'a yazma izni vermek yalniz yaniltici buton uretirdi.
     moderator: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups', 'settings', 'pricing', 'purchasing'],
     // warehouse'a 'purchasing' yazma izni YOK — yukarıdaki sayfa notuna bak (RLS okuma
     // vermiyor; yazma izni tek başına kullanılamaz, yalnız yanıltıcı buton üretirdi).
@@ -56,6 +58,15 @@ export function canAccessPage(role: UserRole | null | undefined, path: string): 
 
     // Özel yetki: super_admin hariç kimse 'Kullanıcılar' sayfasını göremez
     if (role !== 'super_admin' && path.startsWith('/admin/users')) {
+        return false;
+    }
+
+    // T063 — KVKK talep defteri: RLS kapısı `p_dsr_admin_all` → `is_admin_user()`, o da
+    // YALNIZ 'admin'/'super_admin' kabul eder (2026-08-17'de prod'dan ölçüldü). moderator
+    // ve viewer burada '*' taşıdığı için sayfayı AÇABİLİRDİ ama RLS satır vermezdi →
+    // "yetkin yok" yerine "kayıt yok" ekranı = SESSİZ-BOŞ. UI izni DB izninin ötesine
+    // geçemez (INV-KVKK-1 R3; aynı sınıf hata T062'de warehouse'ta yaşandı).
+    if (path.startsWith('/admin/data-requests') && role !== 'admin' && role !== 'super_admin') {
         return false;
     }
 
