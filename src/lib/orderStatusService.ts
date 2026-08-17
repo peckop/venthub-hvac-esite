@@ -244,13 +244,28 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
  * (İki yönlü senkronizasyon — Returns→Orders tarafı)
  */
 export async function syncOrderFromReturn(orderId: string, returnStatus: string): Promise<UpdateOrderStatusResult> {
-    // Returns statülerini Orders statülerine map'le (DB kısıtlamalarına uygun)
+    /*
+      M1 (20-madde v2 denetimi) — `payment_status` YALNIZ paranın gerçekten
+      hareket ettiği dalda yazılır.
+
+      `received` = iade edilen ürün depoya ULAŞTI. Para o an hareket etmemiştir;
+      gerçek iade `refunded` dalında olur ve o dal ödeme sağlayıcısını (iyzico-refund)
+      fiilen çağırır. `received` dalında `payment_status: 'refunded'` yazmak muhasebe
+      YALANI üretiyordu: sipariş "iadesi yapıldı" görünür, para hâlâ satıcıdadır.
+
+      Neden hiçbir kapı görmedi: 'refunded' DB'nin payment_status sözlüğünde GEÇERLİ
+      bir değer (pending/paid/failed/refunded/partial_refunded), yani kısıt itiraz
+      etmez; ve iade çağrısı yapılmadığı için ödeme sağlayıcısının defterinde de iz
+      kalmaz — yalan tek başına, sessizce yaşar.
+
+      Statü davranışı (received → cancelled) BİLEREK değiştirilmedi: o ayrı bir karar.
+    */
     const orderStatusMap: Record<string, { status: string; payment_status?: string }> = {
         refunded: { status: 'cancelled', payment_status: 'refunded' },
         cancelled: { status: 'cancelled' },
         approved: { status: 'processing' },
         rejected: { status: 'delivered' },
-        received: { status: 'cancelled', payment_status: 'refunded' },
+        received: { status: 'cancelled' },
     }
 
     const mapped = orderStatusMap[returnStatus]
