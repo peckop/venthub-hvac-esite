@@ -569,7 +569,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                     <input 
                                                         {...form.register('metric2_label')}
                                                         className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 transition-colors font-medium"
-                                                        placeholder="Örn: Güç Aralığı"
+                                                        placeholder={t('admin.categories.metric2LabelPlaceholder')}
                                                     />
                                                 </div>
                                                 <div className="space-y-1">
@@ -577,7 +577,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                                                     <input 
                                                         {...form.register('metric2_value')}
                                                         className="w-full bg-admin-surface-2 border border-admin-border rounded-admin-md px-4 py-3 text-sm focus-visible:outline-none focus-visible:border-admin-accent/30 transition-colors font-bold text-admin-accent"
-                                                        placeholder="Örn: 0.75 - 45 kW"
+                                                        placeholder={t('admin.categories.metric2ValuePlaceholder')}
                                                     />
                                                 </div>
                                             </div>

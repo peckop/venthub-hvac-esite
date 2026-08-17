@@ -1,4 +1,5 @@
 export const settings = {
+      hoursUnit: 'Saat',
       addAdmin: 'Yeni Yönetici Ekle',
       adminsDesc: 'Platform yöneticilerini buradan yönetebilirsiniz.',
       adminsTab: 'Yönetici Yönetimi',

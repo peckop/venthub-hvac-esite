@@ -145,15 +145,19 @@ interface RecommendationsProps {
 
 export const Recommendations: React.FC<RecommendationsProps> = ({
     items,
-    title = 'Öneriler'
+    title
 }) => {
+    // Varsayılan başlık sözlükten gelir; prop verilmezse ham TR literal render EDİLMEZ.
+    const { t } = useI18n()
+    const heading = title ?? t('calculators.recommendations')
+
     if (items.length === 0) return null
 
     return (
         <div className="mt-6 p-4 bg-secondary-blue/5 border border-secondary-blue/20 rounded-xl">
             <h4 className="font-medium text-industrial-gray mb-3 flex items-center gap-2">
                 <Info size={18} className="text-secondary-blue" />
-                {title}
+                {heading}
             </h4>
             <ul className="space-y-2">
                 {items.map((item, index) => (

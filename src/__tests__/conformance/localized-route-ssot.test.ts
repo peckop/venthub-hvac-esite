@@ -43,6 +43,56 @@ const SOURCES: Record<string, string> = import.meta.glob('/src/**/*.{ts,tsx}', {
 // Yalnız UI render katmanı: navigasyon href'leri burada yaşar.
 const SCOPE = ['components/', 'views/']
 
+/**
+ * ⭐ ALTYAPI KATMANI (D3, 2026-08-17 · render denetimi K7'nin işaret ettiği boşluk).
+ *
+ * `SCOPE` yalnız render katmanını tarıyordu; `app/`, `utils/`, `lib/` kapsam DIŞIYDI.
+ * Denetimin tespiti buydu ve haklıydı: K2 (webhook'un TR kategori yollarını hiç
+ * tazelememesi) TAM bu boşlukta yaşadı, hiçbir kapı görmedi.
+ *
+ * ÖNCE ÖLÇTÜM (ölçmeden kural yazmamak için): bu üç katmanda **46 isabet / 11 dosya**
+ * var ve BUGÜN HEPSİ MEŞRU — locale-routing altyapısı, SEO kanonik URL'leri, sunucu
+ * `permanentRedirect`'leri, webhook `revalidatePath`'i ve `utils/routes.ts`'in KENDİSİ.
+ * Yani bu genişletme bugün sıfır kaçak buluyor.
+ *
+ * O HÂLDE NİÇİN: kapının işi bugünkü ihlali bulmak değil, YARINKİNİ engellemek.
+ * 11 dosya ADLA muaf; listede olmayan bir `app/`/`utils/`/`lib/` dosyası elle dil
+ * öneki kurarsa kapı kırmızı yanar. Liste sessizce büyüyemez — her satır gerekçeli.
+ */
+const INFRA_SCOPE = ['app/', 'utils/', 'lib/']
+
+/**
+ * Altyapıda dil öneki İKİ biçimde kurulur ve ikisi de sayılmalı:
+ *   - şablon:  `/${lang}/...`  → `MANUAL_LANG_PREFIX`
+ *   - LİTERAL: `'/tr/...'` / `"/en/..."` → aşağıdaki desen
+ * Bunu bayatlık testi ortaya çıkardı: webhook allowlist'teydi ama şablon biçimini
+ * kullanmadığı için desene HİÇ takılmıyordu, yani muafiyet boşa yazılmıştı ve o
+ * dosyada gerçek bir literal `/tr/` kullanımı kapının dışında kalıyordu.
+ * (Aynı ders bugün ikinci kez: bir kuralın iki yazım biçimi = iki ayrı kapsam.)
+ */
+const LITERAL_LANG_PREFIX = /['"`]\/(?:tr|en)\//
+
+const INFRA_ALLOWLIST = new Set<string>([
+  // Dil önekini KURAN altyapının kendisi.
+  'utils/routes.ts',
+  // SEO yüzeyleri: kanonik/alternate URL'ler mutlak ve dil-açık olmak ZORUNDA.
+  'app/sitemap.ts',
+  'app/[lang]/page.tsx',
+  'lib/seo/jsonld.ts',
+  // Sunucu tarafı yönlendirme: locale zaten segmentten çözülü, `useLocalizedRoutes`
+  // bir React hook'u olduğu için burada kullanılamaz.
+  'app/auth/callback/route.ts',
+  'app/auth/signout/route.ts',
+  'app/[lang]/category/[categorySlug]/page.tsx',
+  'app/[lang]/category/[categorySlug]/[subCategorySlug]/page.tsx',
+  'app/[lang]/products/[slug]/page.tsx',
+  // `revalidatePath` literal yol ister (Next sözleşmesi).
+  // ⚠️ NOT: bu dosyanın TR yollarını KANONİK slug'la kurması AYRI bir kusurdur
+  // (render denetimi K2, Dalga-1'de düzeltilecek). Buradaki muafiyet onu AKLAMAZ,
+  // yalnız "bu kapının konusu değil" der — muafiyet, kusuru görünmez yapmamalı.
+  'app/api/webhook/supabase/route.ts',
+])
+
 // 1) Elle `/${lang}` / `/${locale}` dil-öneki birleştirme.
 const MANUAL_LANG_PREFIX = /\/\$\{\s*(?:lang|locale)\s*\}/
 
@@ -97,6 +147,53 @@ describe('INV-2 · localized-route SSOT conformance', () => {
         `  elle dil öneki : ${manualPrefix.join('\n                   ') || '—'}\n` +
         `  sabit app-yolu : ${hardcodedPath.join('\n                   ') || '—'}`,
     ).toEqual({ manualPrefix: [], hardcodedPath: [] })
+  })
+
+  /**
+   * D3 — ALTYAPI KATMANI: `app/` + `utils/` + `lib/` içinde elle dil öneki yalnız
+   * ADLA muaf dosyalarda olabilir. Render katmanı (yukarıdaki test) sıfır kaçakla
+   * temiz; bu test o temizliği altyapıya taşır ve YENİ kaçağı engeller.
+   */
+  it('altyapı katmanında elle dil öneki yalnız ADLA muaf dosyalarda olabilir', () => {
+    const offenders: string[] = []
+
+    for (const [key, source] of Object.entries(SOURCES)) {
+      const rel = toRelPath(key)
+      if (rel.endsWith('.d.ts') || rel.includes('__tests__') || rel.includes('.test.')) continue
+      if (!INFRA_SCOPE.some((s) => rel.startsWith(s))) continue
+      if (INFRA_ALLOWLIST.has(rel)) continue
+
+      const clean = stripComments(source)
+      if (MANUAL_LANG_PREFIX.test(clean) || LITERAL_LANG_PREFIX.test(clean)) offenders.push(rel)
+    }
+
+    expect(
+      offenders,
+      'Altyapı katmanında SSOT-dışı dil öneki — `localizedHref` kullan ya da meşruysa ' +
+        'INFRA_ALLOWLIST\'e GEREKÇESİYLE ekle:\n  ' + offenders.join('\n  '),
+    ).toEqual([])
+  })
+
+  /**
+   * Muafiyet listesi bayatlamasın: dosya silinir ya da dil önekini bırakırsa satır
+   * SİLİNMELİ. Aksi halde liste sessizce kalıcılaşır ve kapı o dosyayı sonsuza dek görmez.
+   */
+  it('INFRA_ALLOWLIST bayat değil (dil önekini bırakan dosya listede kalmamalı)', () => {
+    const stale: string[] = []
+
+    for (const allowed of INFRA_ALLOWLIST) {
+      const entry = Object.entries(SOURCES).find(([k]) => toRelPath(k) === allowed)
+      if (!entry) {
+        stale.push(`${allowed} (dosya artık yok)`)
+        continue
+      }
+      const clean = stripComments(entry[1])
+      if (!MANUAL_LANG_PREFIX.test(clean) && !LITERAL_LANG_PREFIX.test(clean)) {
+        stale.push(`${allowed} (artık elle dil öneki kurmuyor — listeden SİL)`)
+      }
+    }
+
+    expect(stale, `INFRA_ALLOWLIST bayat:\n  ${stale.join('\n  ')}`).toEqual([])
   })
 
   it('client/RSC nav bileşeni ham Routes değil localize SSOT kullanmalı', () => {

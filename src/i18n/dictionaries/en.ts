@@ -1699,6 +1699,8 @@ export const en: typeof tr = {
     startShopping: 'Start Shopping',
     title: 'Shopping Cart',
     countLabel: '{{count}} item(s) in your cart',
+    decreaseQty: 'Decrease quantity',
+    increaseQty: 'Increase quantity',
     removeItem: 'Remove item',
     clearCart: 'Clear Cart',
     summary: 'Order Summary',
@@ -1937,6 +1939,7 @@ export const en: typeof tr = {
     saved: {
       title: 'Saved Addresses',
       address: 'Address',
+      labelPlaceholder: 'Home, Work etc.',
       default: 'Default',
       use: 'Use this address',
       manage: 'Manage addresses',
@@ -2680,6 +2683,8 @@ export const en: typeof tr = {
     contactInfo: 'Contact Information',
     name: 'Full Name',
     company: 'Company',
+    companyPlaceholder: 'Your company Inc.',
+    cityPlaceholder: 'e.g. Istanbul',
     email: 'Email',
     phone: 'Phone',
     city: 'City',
@@ -2794,6 +2799,7 @@ export const en: typeof tr = {
     }
   },
   calculators: {
+    recommendations: 'Recommendations',
     stepIndicator: {
       progress: 'Step {{current}} / {{total}}',
     },

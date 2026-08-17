@@ -1,0 +1,260 @@
+import { describe, expect, it } from 'vitest'
+
+/**
+ * INV-I18N-ATTR · Kullanıcıya görünen ATTRIBUTE metni sözlükten gelmeli.
+ *
+ * NİÇİN VAR (ölçülmüş kör nokta, 2026-08-17): depoda `react/jsx-no-literals` kuralı
+ * AÇIK ama iki sebeple bu sınıfı hiç görmüyor —
+ *   1. `ignoreProps: true` → attribute değerleri taranmıyor,
+ *   2. kural `warn` seviyesinde → fail-open, kimseyi durdurmuyor.
+ * Ölçüm: 9 ham TR attribute canlıydı (LeadModal/CartPage/AddressFormModal/ResultCard/
+ * CategoryFormModal/AdminSettingsPage/DataTableKit). Bunlar JSX çocuk metni değil,
+ * `placeholder`/`aria-label`/`title`/`alt` içinde yaşadığı için i18n kampanyasının
+ * tamamı bitmiş görünürken kullanıcıya Türkçe görünmeye devam ediyordu.
+ *
+ * A11Y BAĞI: `aria-label` çevrilmezse EN kullanıcı ekran okuyucuda TR duyar — bu aynı
+ * anda WCAG kusurudur (3.1.2 Language of Parts sınıfı). Bu yüzden kapı, kozmetik
+ * değil erişilebilirlik kapısıdır.
+ *
+ * ⭐ ÜÇ BİÇİM, TEK KURAL (ADMIN-CUSTOMER ölçümü, 2026-08-17): ilk sürümüm yalnız JSX
+ * attribute'una bakıyordu ve AYNI dosyada 1 kalem bulurken sahibi 5 ölçtü. Kaçanlar
+ * kuralı ihlal etmeyi bırakmamış, yalnız BİÇİM değiştirmişti:
+ *   (a) prop varsayılanı        → `selectAllLabel = 'Tümünü seç'`  (destructuring içinde)
+ *   (b) boş-birleştirici fallback → `totalLabel || 'Toplam'`, `?? 'Toplam'`
+ *   (c) aynı dosyada birden çok attribute (Önceki/Sonraki) — tek isabette durmamak gerek
+ * Üçü de ekran okuyucuya/kullanıcıya giden metin üretir. "Sayaç sıfırlandı" kuralın
+ * bittiği anlamına gelmez — bu, ADMIN'in Faz-5'te yaşadığı `font-black` → inline
+ * `fontWeight: 900` göçüyle aynı aile.
+ *
+ * KAPSAM BİLİNÇLİ OLARAK DAR: yalnız TÜRKÇE'ye özgü karakter içeren değerler. Böylece
+ * `placeholder="https://..."`, `alt=""`, teknik/simge değerler yanlış-pozitif üretmez
+ * (yanlış-KIRMIZI da kusurdur).
+ */
+
+declare global {
+  interface ImportMeta {
+    glob(
+      pattern: string,
+      options: { query: string; import: string; eager: true },
+    ): Record<string, string>
+  }
+}
+
+const SOURCES: Record<string, string> = import.meta.glob('/src/**/*.{ts,tsx}', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+})
+
+/** Kullanıcıya görünen attribute'lar. `label` HTML'de görünür metin taşıyabilir. */
+const VISIBLE_ATTRS = ['placeholder', 'aria-label', 'title', 'alt', 'label'] as const
+
+/**
+ * Türkçe'ye ÖZGÜ karakterler. Yalnız bunları arıyoruz çünkü ASCII bir metnin
+ * ("Save") çevrilmemiş TR mi yoksa meşru teknik değer mi ("https://...") olduğunu
+ * statik olarak ayırt edemeyiz — ASCII'yi de yakalamak kapıyı yanlış-pozitif
+ * fabrikasına çevirirdi. Bu bilinçli bir DUYARLILIK/KESİNLİK takasıdır:
+ * kapı "her ihlali yakalar" demiyor, "yakaladığı her şey GERÇEK ihlaldir" diyor.
+ */
+const TURKISH_SPECIFIC = /[çğıöşüÇĞİÖŞÜ]/
+
+/** (a) JSX attribute: `placeholder="..."` / `aria-label="..."` */
+const ATTR_LITERAL = new RegExp(
+  String.raw`\b(` + VISIBLE_ATTRS.join('|') + String.raw`)\s*=\s*(['"])([^'"]{2,})\2`,
+  'g',
+)
+
+/**
+ * (b)+(c) Görünen metin taşıyan prop/değişkenin VARSAYILANI ya da FALLBACK'i.
+ * `...Label` / `...Text` / `...Title` / `...Placeholder` / `...Message` / `...Heading`
+ * adlandırması bu depoda "kullanıcıya görünen metin" sözleşmesidir
+ * (DataTableKit: `selectAllLabel`, `totalLabel`). Hem `=` varsayılanını hem
+ * `||` / `??` fallback'ini yakalar — ikisi de attribute DEĞİL, o yüzden ilk
+ * sürümüm ikisini de görmüyordu.
+ */
+const TEXT_PROP_LITERAL =
+  /\b(\w*(?:Label|Text|Title|Placeholder|Message|Heading))\s*(?:=|\|\||\?\?)\s*(['"])([^'"]{2,})\2/g
+
+/**
+ * (d) OPERATÖR-ÇAPALI fallback: `... || 'Türkçe'` / `... ?? 'Türkçe'` — SOL taraf ne
+ * olursa olsun.
+ *
+ * NİÇİN AYRI BİR DESEN: (b) ad-çapalıdır (`ad → operatör → literal`) ve bu yüzden
+ * `x = someExpr ?? 'Sipariş Özeti'` biçimini KAÇIRIYORDU — ad ile literal arasına
+ * bir ifade girdiği anda desen kopuyor. Kendi sabotajım (S3) tam bunu yakaladı ve
+ * kapı YEŞİL kaldı; yani sabotaj turu olmasaydı bu açık kapının içinde yaşardı.
+ * Ders: aynı kuralın iki farklı çapası, iki farklı kapsam demektir — birini yazmak
+ * öbürünü kapsamaz.
+ *
+ * GRUP SIRASI ÜÇ DESENDE AYNI OLMAK ZORUNDA: (1) etiket, (2) tırnak, (3) değer.
+ * Operatörü bilerek yakalıyoruz — hem etiket görevi görür hem hizayı korur. Hizasız
+ * bıraktığımda `value` sessizce `undefined` oluyordu ve desen HİÇ ihlal bulamıyordu
+ * (kapı yeşil, koruma yok — fail-open'ın sessiz biçimi).
+ */
+const FALLBACK_LITERAL = /(\|\||\?\?)\s*(['"])([^'"]{2,})\2/g
+
+/**
+ * SAVUNMA SINIFI MUAFİYETİ: `t('anahtar') || 'Türkçe'`.
+ *
+ * Ölçüm (2026-08-17): bu biçimden **47** adet var. Bunlar çevrilmemiş UI DEĞİL —
+ * anahtar çözülemezse devreye giren yedeklerdir ve INV-5 (`i18n-key-resolution`,
+ * ratchet **0**) tüm statik anahtarların çözüldüğünü hâlihazırda garanti ediyor;
+ * yani bu yedekler bugün HİÇ render edilmiyor. INV-5 aynı gerekçeyle `t('k','alt')`
+ * biçimini de bilinçli atlıyor — iki kapı aynı sınıfta aynı kararı vermeli, aksi
+ * halde biri "borç" derken öbürü "temiz" der ve hangisine inanılacağı belirsizleşir.
+ *
+ * Kapsam DIŞI ≠ görmezden gelme: yedeklerin gereksizliği ayrı bir temizlik işidir
+ * (OPS-AUDIT'e bildirildi), ama bu kapının konusu ÇEVRİLMEMİŞ GÖRÜNEN METİN.
+ */
+const T_CALL_BEFORE_FALLBACK = /t\(\s*(['"])[\w.]+\1\s*\)\s*$/
+
+/**
+ * ADLA MUAFİYET (muafiyet = ADLA ilkesi). Boş kalması HEDEFTİR; her satır bir borçtur.
+ *
+ * - ~~`components/admin/data-table/DataTableKit.tsx`~~ → **BORÇ ÖDENDİ, SATIR SİLİNDİ**
+ *   (ADMIN-CUSTOMER, PR #605, 2026-08-17). Devir işledi: ben 1 kalem ölçmüştüm, sahibi
+ *   kendi dosyasında 5 buldu ve hepsini kapattı. Bayatlık testi bu satırın silinmesini
+ *   zaten zorluyordu — ratchet çalıştı.
+ *
+ * - `utils/whatsapp.ts`: `generateSupportMessage()` ham TR WhatsApp metni döndürüyor
+ *   (EN kullanıcı Türkçe ön-dolu mesaj alır — gerçek kusur). Ama bu SAF bir util:
+ *   `t`/`lang` erişimi YOK, düzeltmek çağıranlara dil geçirmeyi gerektiriyor = ayrı
+ *   iş emri. Yarım düzeltmek (util içine sözlük import etmek) DI kuralını bozardı.
+ *   JSX içermediği için tüm-desen muafiyeti burada kayıp üretmiyor.
+ */
+const KNOWN_DEBT = new Set<string>([
+  'utils/whatsapp.ts',
+])
+
+/**
+ * ÇIPLAK FALLBACK BORCU (yalnız `FALLBACK_LITERAL` deseni için — dosyayı diğer
+ * desenlere KÖR ETMEZ; `KNOWN_DEBT` tüm desenleri atlar, bu yalnız birini).
+ *
+ * Ölçüm (2026-08-17, bu kapı yazılırken ORTAYA ÇIKTI): `t()` yedeği OLMAYAN, doğrudan
+ * ham TR'ye düşen **19** fallback var — SEO açıklaması, toast mesajları, kart
+ * başlıkları. Bunlar gerçek borçtur ama benim iş emrim ATTRIBUTE süpürmesiydi ve
+ * çoğu BAŞKA ŞERİTLERİN canlı dosyasında (hooks/useAdminTable, lib/orderStatusService,
+ * views/admin/*, components/admin/*). Sahibine sormadan girmek şerit ihlali olurdu.
+ *
+ * Liste bu yüzden DONDURUR (ratchet): yeni fallback eklenemez, mevcut 19 görünür
+ * kalır ve OPS-AUDIT triyajıyla sahiplerine dağıtılır. Her satır bir borçtur; borç
+ * ödenince satır SİLİNİR (aşağıdaki bayatlık testi zorlar).
+ */
+const FALLBACK_DEBT = new Set<string>([
+  'app/[lang]/products/[slug]/page.tsx',
+  'app/_components/ProductDetailPageView.tsx',
+  'components/StickyHeader.tsx',
+  'components/admin/authority-builder/BlockEditor.tsx',
+  'components/authority/AuthorityRenderer.tsx',
+  'hooks/useAdminTable.ts',
+  'hooks/useApiCall.ts',
+  'hooks/useCheckoutCoupon.ts',
+  'lib/orderStatusService.ts',
+  'views/OrdersPage.tsx',
+  'views/account/OrderDetailPage.tsx',
+  'views/admin/AdminLogisticsTableBody.tsx',
+])
+
+/**
+ * Hukuk metinleri sözlükle değil DİZİNLE lokalize edilir (`legal/components/{tr,en}/`,
+ * 12/12 parite ölçüldü) — 10 sayfalık sözleşmeyi sözlüğe koymak yanlış olurdu.
+ * Bu bir muafiyet değil, KAPSAM DIŞI bir lokalizasyon deseni.
+ */
+const DIRECTORY_LOCALIZED = 'views/legal/components/'
+
+/** Yorumları CRLF-güvenli siler — `.` bu depoda `\r` ile eşleşmez (T017 fantomu). */
+function stripComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/[^\r\n]*/g, '$1')
+}
+
+function toRelPath(globKey: string): string {
+  const marker = '/src/'
+  const idx = globKey.indexOf(marker)
+  return (idx >= 0 ? globKey.slice(idx + marker.length) : globKey).replace(/\\/g, '/')
+}
+
+interface Offender {
+  file: string
+  attr: string
+  value: string
+}
+
+function collectOffenders(): Offender[] {
+  const offenders: Offender[] = []
+
+  for (const [globKey, source] of Object.entries(SOURCES)) {
+    const rel = toRelPath(globKey)
+    if (rel.includes('__tests__') || rel.includes('.test.')) continue
+    if (rel.startsWith(DIRECTORY_LOCALIZED)) continue
+    if (KNOWN_DEBT.has(rel)) continue
+
+    const clean = stripComments(source)
+
+    for (const pattern of [ATTR_LITERAL, TEXT_PROP_LITERAL, FALLBACK_LITERAL]) {
+      pattern.lastIndex = 0
+      let m: RegExpExecArray | null
+      // `while` ile TÜM isabetler taranır — ilk isabette durmak, aynı dosyadaki
+      // ikinci ihlali (Önceki/Sonraki sayfa) gizlerdi.
+      while ((m = pattern.exec(clean)) !== null) {
+        const [, attr, , value] = m
+        if (!TURKISH_SPECIFIC.test(value)) continue
+        // Savunma sınıfı: `t('anahtar') || 'Türkçe'` → INV-5 kapsamı, burada değil.
+        if (
+          pattern === FALLBACK_LITERAL &&
+          T_CALL_BEFORE_FALLBACK.test(clean.slice(Math.max(0, m.index - 60), m.index))
+        ) {
+          continue
+        }
+        if (FALLBACK_DEBT.has(rel) && pattern === FALLBACK_LITERAL) continue
+        offenders.push({ file: rel, attr, value: value.slice(0, 60) })
+      }
+    }
+  }
+
+  return offenders
+}
+
+describe('INV-I18N-ATTR · görünen metin sözlükten gelmeli (attribute + varsayılan + fallback)', () => {
+  it('attribute, prop varsayılanı ve fallback içinde ham Türkçe literal yok', () => {
+    const offenders = collectOffenders()
+
+    expect(
+      offenders,
+      'Ham Türkçe attribute literali — sözlüğe taşı ve `t(...)` ile bağla ' +
+        '(aria-label ise aynı zamanda a11y kusuru):\n' +
+        offenders.map((o) => `  ${o.file}  ${o.attr}="${o.value}"`).join('\n'),
+    ).toEqual([])
+  })
+
+  /**
+   * Muafiyet listesi bayatlamasın: borç ödendiğinde satır SİLİNMELİ, yoksa liste
+   * sessizce kalıcı olur ve kapı o dosyayı sonsuza dek görmez.
+   * (Ratchet deseni — INV-5'in KNOWN_UNRESOLVED'ında kanıtlanmış.)
+   */
+  it('KNOWN_DEBT listesi bayat değil (düzelen dosya listede kalmamalı)', () => {
+    const stale: string[] = []
+
+    for (const debt of KNOWN_DEBT) {
+      const entry = Object.entries(SOURCES).find(([k]) => toRelPath(k) === debt)
+      if (!entry) {
+        stale.push(`${debt} (dosya artık yok)`)
+        continue
+      }
+      const clean = stripComments(entry[1])
+      let hasViolation = false
+      for (const pattern of [ATTR_LITERAL, TEXT_PROP_LITERAL, FALLBACK_LITERAL]) {
+        pattern.lastIndex = 0
+        let m: RegExpExecArray | null
+        while ((m = pattern.exec(clean)) !== null) {
+          if (TURKISH_SPECIFIC.test(m[3])) { hasViolation = true; break }
+        }
+        if (hasViolation) break
+      }
+      if (!hasViolation) stale.push(`${debt} (düzelmiş — KNOWN_DEBT'ten SİL)`)
+    }
+
+    expect(stale, `KNOWN_DEBT bayat:\n  ${stale.join('\n  ')}`).toEqual([])
+  })
+})
