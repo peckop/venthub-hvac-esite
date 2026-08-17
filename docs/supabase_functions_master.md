@@ -2,8 +2,8 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-13T07:40:56.774606+00:00
-total_compiled_files: 31
+compiled_at: 2026-08-17T11:53:18.708817+00:00
+total_compiled_files: 34
 source: supabase/functions
 ---
 
@@ -17,26 +17,31 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-create-coupon\index.ts
-skeleton_hash: fd99acff0bd75a61
+skeleton_hash: a243f283d118bf5d
 entity_hashes:
   func:admin-create-coupon_handler: 72913923d4da4715
-  overview: e7791c38f1685aef
-generated_at: 2026-08-13T07:40:08Z
+  overview: cd57faa16c1d1db9
+generated_at: 2026-08-17T11:34:31Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase Edge Function olarak çalışan tek bir HTTP endpoint'idir. Yönetici arayüzünden gelen istekleri alarak yeni indirim kuponu oluşturma işlemini yönetir. İstek gövdesindeki verileri doğrular, veritabanına kaydeder ve işlem sonucuna göre uygun HTTP yanıtını döndürür.
+Bu modül, bir Supabase Edge Function olarak çalışan bir HTTP endpoint'idir. Tek bir işleyici fonksiyon aracılığıyla, yöneticilerin yeni indirim kuponu oluşturma isteklerini alır, doğrular ve veritabanına kaydederek uygun HTTP yanıtını döndürür.
 
 ## Fonksiyon Grupları
-### İstek İşleme ve Kupon Oluşturma
-Tek bir işleyici fonksiyon, gelen tüm HTTP isteklerini alır, işler ve kupon oluşturma mantığını yürütür. Yetkilendirme, veri doğrulama, veritabanı işlemi ve yanıt üretimini kapsayan tüm adımları tek bir akışta yönetir.
+### Kupon Oluşturma İşleyicisi
+Tek bir endpoint olarak, tüm HTTP isteklerini yöneten kapsamlı bir işleyici fonksiyonu barındırır. Yetkilendirme kontrolü, istek doğrulama, veritabanına yazma ve yanıt oluşturma adımlarını tek bir akışta gerçekleştirir.
 - admin-create-coupon_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdesi (implementation body) paylaşılmadığından, yalnızca fonksiyon imzası ve sabit yapısından türetilen minimum varsayımlar tanımlanabilmektedir.
+Bu modül, bir HTTP isteği alıp yanıt döndüren bir Edge Function handler'ıdır. Fonksiyon gövdesi paylaşılmadığı için somut implementasyon detaylarına dayalı aksiyomlar üretilememektedir.
+
+**Bilinenler:**
+- Fonksiyon imzası: `admin-create-coupon_handler(req: Request) -> Response`
+
+**Eğer [geçerli bir HTTP Request nesnesi] yoksa, [fonksiyon uygun bir hata yanıtı veya istisna döndürür] olur.**
 
 ---
 
@@ -59,54 +64,49 @@ Bu modül için fonksiyon gövdesi (implementation body) paylaşılmadığından
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
-- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: ../_shared/tenant.ts::TenantMismatchError
+- import: ../_shared/tenant.ts::tenantFromVerifiedUser
 - import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
-
----
-
-## SABİTLER
-- **corsHeaders** (object) — `{
-
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/admin-create-coupon/index.ts::admin-create-coupon_handler
-- **params**: `(req: Request)`
+### [N1_NASIL] AST Pointer: `supabase/functions/admin-create-coupon/index.ts`::`admin-create-coupon_handler`
+
+- **params**:
+  - `req: Request` — gelen HTTP istek nesnesi; method, headers ve JSON body içerir
+
 - **ic_degiskenler**:
-  - `corsHeaders` — `getCorsHeaders(req)` çağrısından elde edilen CORS header nesnesi, tüm HTTP yanıtlarına eklenir
-  - `cors` — `corsHeaders`'in alternatif alias'ı, aynı nesneye referans
-  - `SUPABASE_URL` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase proje URL'i, istemci oluşturmada kullanılır
-  - `SUPABASE_ANON_KEY` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan anonim anahtar, normal kullanıcı yetkilendirmeli Supabase istemcisi oluşturulurken kullanılır
-  - `SUPABASE_SERVICE_ROLE_KEY` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan servis rolü anahtarı, yetki bypass yapan admin Supabase istemcisi oluşturulurken kullanılır
-  - `authHeader` — `req.headers.get('Authorization')` ile gelen JWT token, kullanıcı kimlik doğrulaması için kullanılır
-  - `supabaseUser` — `createClient` ile oluşturulan Supabase istemcisi, anonim key + Authorization header ile; kullanıcının kendi token'ıyla auth istekleri yapılır
-  - `supabaseAdmin` — `createClient` ile oluşturulan Supabase istemcisi, service role key ile; veritabanı üzerinde tam yetkili operations yapılır
-  - `userRes` — `supabaseUser.auth.getUser()` sonucundaki `data`, kullanıcı bilgilerini içerir
-  - `userErr` — `supabaseUser.auth.getUser()` sonucundaki `error`, auth hatası varsa doludur
-  - `userId` — `userRes.user.id`, doğrulanmış kullanıcının UUID'si, profil sorgusu ve coupon oluşturma payload'ında kullanılır
-  - `bodyCheck` — `req.clone().json()` ile okunan talep gövdesi (hata olursa boş obje), `resolveTenantId`'ye parametre olarak verilir
-  - `tenantId` — `resolveTenantId(req, bodyCheck)` ile çözümlenen kiracı ID'si, profil sorgusu ve coupon payload'ında kullanılır
-  - `profile` — `user_profiles` tablosundan `role` alanını seçen sorgu sonucu `data`, kullanıcının rol bilgisini içerir
-  - `profErr` — profil sorgusundaki `error`, sorgu hatası varsa doludur
-  - `userRole` — `profile?.role` değerinden türetilen rol string'i, varsayılan olarak `'user'`; admin/superadmin kontrolü yapılır
-  - `body` — `req.json()` ile okunan CouponBody tipindeki talep gövdesi, kupon oluşturma parametrelerini içerir
-  - `code` — `body.code`'un string'e çevrilip trim edilmiş hali, kupon kodu doğrulama ve payload'da kullanılır
-  - `type` — `body.type`'un string'e çevrilmiş hali, indirim türü (`percent` veya `fixed`)
-  - `value` — `body.value`'un `Number()` ile sayıya çevrilmiş hali, indirim miktarı/tutarı
-  - `starts_at` — `body.starts_at` varsa string'e çevrilmiş, yoksa `null`; kupon geçerlilik başlangıç tarihi
-  - `ends_at` — `body.end_at` varsa string'e çevrilmiş, yoksa `null`; kupon geçerlilik bitiş tarihi
-  - `is_active` — `body.active` boolean değeri, `undefined`/`null` ise `true` varsayılır; kuponun aktiflik durumu
-  - `usage_limit` — `body.usage_limit`'ten türetilen `number | null`; geçerli bir pozitif finite sayı değilse `null` olur, kuponun maximum kullanım sayısını belirler
-  - `errs` — validasyon hatalarını toplayan string dizisi; `code`, `type`, `value` hataları buraya eklenir, boş değilse 400 döner
-  - `payload` — `coupons` tablosuna insert edilecek nesne; `code`, `discount_type`, `discount_value`, `valid_from`, `valid_until`, `is_active`, `usage_limit`, `used_count`, `created_by`, `tenant_id` alanlarını içerir; `type` alanını `discount_type` formatına dönüştürür (`'percent'` → `'percentage'`, `'fixed'` → `'fixed_amount'`)
-  - `data` — `coupons` tablosuna insert sonrası `select` ile dönen tek satır (`id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at` alanları); başarı durumunda istemciye JSON olarak döner
-  - `insErr` — insert sorgusundaki `error`, insert hatası varsa doludur
-  - `_e` — `catch` bloğunda yakalanan hata nesnesi, `Error` instance ise `.message` okunur, değilse `String(_e)` ile string'e çevrilir
-  - `msg` — `_e`'den türetilen hata mesajı string'i, internal error yanıtı detayında kullanılır
-- **Dönüş**: `Response` — Başarılı kupon oluşturma: `200` + kupon JSON'u; validasyon/hata durumlarında uygun HTTP status kodları (204, 405, 500, 401, 403, 400) ile hata JSON'u döner; `finally` dönüşü yoktur
+  - `corsHeaders` — `getCorsHeaders(req)` çağrısıyla elde edilen CORS başlıkları nesnesi, tüm Response'lara eklenir
+  - `SUPABASE_URL` — `Deno.env.get('SUPABASE_URL')` ile okunan ortam değişkeni; Supabase proje URL'i
+  - `SUPABASE_ANON_KEY` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan ortam değişkeni; Supabase anonim anahtarı
+  - `SUPABASE_SERVICE_ROLE_KEY` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan ortam değişkeni; Supabase servis rolü anahtarı, admin izinleriyle istemci oluşturmak için kullanılır
+  - `authHeader` — `req.headers.get('Authorization')` ile istek başlığından okunan Bearer token
+  - `supabaseUser` — `createClient(SUPABASE_URL, SUPABASE_ANON_KEY, ...)` ile oluşturulan Supabase istemcisi; kullanıcının kendi tokenıyla Yetkilendirme istekleri yapar (getUser)
+  - `supabaseAdmin` — `createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)` ile oluşturulan Supabase admin istemcisi; servis rolüyle veritabanı sorguları ve insert işlemleri yapar
+  - `userRes` — `supabaseUser.auth.getUser(...)` çağrısının `data` alanından destructure edilen kullanıcı sonucu; `userRes.user` içinde authenticated kullanıcı bilgisi tutulur
+  - `userErr` — `supabaseUser.auth.getUser(...)` çağrısının `error` alanından destructure edilen hata nesnesi
+  - `userId` — `userRes.user.id`; doğrulanmış kullanıcının UUID'isi, profil sorgusu ve payload.created_by için kullanılır
+  - `profile` — `supabaseAdmin.from('user_profiles').select('role, tenant_id').eq('id', userId).maybeSingle()` sorgusunun `data` sonucu; kullanıcının rolü ve tenant_id bilgisi tutulur
+  - `profErr` — aynı sorgunun `error` sonucu
+  - `userRole` — `profile?.role` değerinden türetilen kullanıcı rolü; `'user'` fallback'li string, `['admin', 'superadmin']` kontrolü için kullanılır
+  - `tenantId` — `tenantFromVerifiedUser({ id: userId, app_metadata: userRes.user.app_metadata ?? null }, profile)` çağrısıyla elde edilen kiracı UUID'isi; `TenantMismatchError` fırlatılabilir, `payload.tenant_id` için kullanılır
+  - `body` — `req.json()` ile parse edilen request body; `CouponBody` arayüzüne cast edilmiş nesne
+  - `code` — `body.code` değerinden `String(...).trim()` ile temizlenmiş kupon kodu; 3-50 karakter arası olmalı
+  - `type` — `body.type` değerinden elde edilen indirim türü; `'percent'` veya `'fixed'` olmalı
+  - `value` — `Number(body.value)` ile parse edilen indirim miktarı; 0'dan büyük olmalı
+  - `starts_at` — `body.starts_at` varsa `String(...)` ile string'e çevrilmiş geçerlilik başlangıç tarihi, yoksa `null`
+  - `ends_at` — `body.ends_at` varsa `String(...)` ile string'e çevrilmiş geçerlilik bitiş tarihi, yoksa `null`
+  - `is_active` — `Boolean(body.active ?? true)` ile belirlenen aktiflik durumu; varsayılan `true`
+  - `usage_limit` — `body.usage_limit`'tenparse edilen maksimum kullanım sayısı; `null`, geçersiz veya <1 ise `null`落とす
+  - `ul` — `usage_limit` hesaplama içinde `Number(body.usage_limit)` ile elde edilen geçici numeric değer
+  - `errs` — validasyon hatalarını toplayan `string[]` dizisi; hatalı alan isimleri eklenir
+  - `payload` — `coupons` tablosuna insert edilecek veri objesi; `code`, `discount_type`, `discount_value`, `valid_from`, `valid_until`, `is_active`, `usage_limit`, `used_count`, `created_by`, `tenant_id` alanlarını içerir
+  - `data` — `supabaseAdmin.from('coupons').insert(payload).select(...).single()` çağrısının `data` sonucu; inserted kuponun tüm alanlarıyla birlikte dönendir
+  - `insErr` — insert çağrısının `error` sonucu
+
+- **Dönüş**: `Response` — Success: `200` ile insert edilmiş kupon objesi JSON; Hata durumlarına göre `405` (method_not_allowed), `500` (missing_env, profile_error, internal), `401` (unauthenticated, unauthorized), `403` (forbidden: admin_only veya tenant_mismatch), `400` (bad_request: validasyon hataları veya insert_failed). Try-catch `_e` yakalayıp `500 internal` dönerek tüm yakalanmamış istisnaları yönetir.
 
 ---
 
@@ -132,7 +132,7 @@ skeleton_hash: 0820861d4bdb27b9
 entity_hashes:
   func:admin-iyzico-reconcile_handler: e8970eccf3f1fb90
   overview: b0badc73158954b7
-generated_at: 2026-08-13T07:40:08Z
+generated_at: 2026-08-17T11:34:31Z
 ---
 
 ## Genel Bakış
@@ -261,7 +261,7 @@ skeleton_hash: fe4682511784f4f0
 entity_hashes:
   func:admin-order-inspect_handler: 1ddac70ce14150b4
   overview: a75dc03846842f5a
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-17T11:34:31Z
 ---
 
 ## Genel Bakış
@@ -353,7 +353,7 @@ skeleton_hash: 1885bb9863f5ba09
 entity_hashes:
   func:admin-orders-latest_handler: 9cf0e6c826d5f20e
   overview: 3bb02a7476b8fc62
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-17T11:34:31Z
 ---
 
 ## Genel Bakış
@@ -459,113 +459,166 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-update-order\index.ts
-skeleton_hash: 80d50e92ff44be65
+skeleton_hash: 2864b93f4cca4e0a
 entity_hashes:
-  func:admin-update-order_handler: 046f5c7fec17e235
-  overview: 236389b6147671e5
-generated_at: 2026-08-13T07:40:32Z
+  func:admin-update-order_handler: 401e11b0dc3cc59d
+  func:firstProfileRow: a0e6e5d01b903221
+  overview: e4e143931d01e33c
+generated_at: 2026-08-17T11:35:10Z
 ---
 
 ## Genel Bakış
-Bu modül, yöneticilerin mevcut siparişleri güncellemesi için bir Supabase Edge Function olarak_deploye edilmiş bir HTTP API servisidir. Modül, gelen isteği doğrulamak, yönetici yetkisini kontrol etmek, veritabanı bağlantısı kurarak sipariş kaydını güncellemek ve işlemin sonucuna göre bir yanıt döndürmekten sorumludur.
+Bu modül, Supabase Edge Function olarak deployed bir HTTP API servisidir. Yöneticilerin mevcut siparişleri güncellemek için kullandığı bir uç nokta sağlar; gelen istekleri doğrular, yönetici yetkilendirmesini kontrol eder ve veritabanında ilgili sipariş kaydını günceller.
 
 ## Fonksiyon Grupları
 ### Sipariş Güncelleme İşleyicisi
-Modülün tek bileşeni olarak tüm HTTP istek-yanıt döngüsünü yönetir. İsteğin içeriğini ayrıştırır, kimlik doğrulama ve yetkilendirme adımlarını uygular, veritabanı işlemlerini koordine eder.
-- admin_update_order_handler
+Modülün ana giriş noktası olarak tüm HTTP istek-yanıt döngüsünü, kimlik doğrulamayı ve iş mantığını yönetir. Gelen isteği alarak yönetici rolünü doğrular, Supabase istemcisi aracılığıyla sipariş güncellemesini gerçekleştirir ve uygun HTTP yanıtını döner.
+- admin-update-order_handler
+
+### Yardımcı Veri İşlevleri
+Gelen veri setinden belirli alanları (örneğin yönetici rolü ve kiracı kimliği) çıkaran ve işleyici tarafından iç yardımcı olarak kullanılan fonksiyonları barındırır. Bu işlevler, handler içindeki karmaşık mantığı basitleştirmek ve veri dönüşümünü merkezileştirmek için tasarlanmıştır.
+- firstProfileRow
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Supabase Edge Function ortamında çalışan bir HTTP handler'ıdır. Aşağıdaki mimari varsayımlar fonksiyon imzası ve modül yapısından türetilmiştir:
+Bu modül için aksiyomlar, fonksiyon gövdesindeki mantıksal akışa dayanarak türetilmiştir.
 
-**[Aksiyom 1]:** Eğer geçerli bir HTTP `Request` nesnesi (req) yoksa, handler fonksiyonu çalıştırılamaz ve istemciye hata yanıtı döner.
+[Aksiyom 1]: Eğer istek geçerli bir JSON gövdesi içermiyorsa veya gerekli alanlar (order_id, updates) eksikse, istek 400 hata koduyla reddedilir.
 
-**[Aksiyom 2]:** Eğer istek gövdesinde (request body) geçerli bir sipariş JSON verisi yoksa veya JSON ayrıştırma başarısız olursa, fonksiyon istemciye hata yanıtı döner.
+[Aksiyom 2]: Eğer istek başlığındaki Authorization token'ı (Bearer) yoksa veya geçerli bir Supabase JWT içermiyorsa, istek 401 Unauthorized ile reddedilir.
 
-**[Aksiyom 3]:** Eğer isteği yapan kullanıcının admin yetkisi yoksa veya yetkilendirme doğrulanamazsa, fonksiyon istemciye yetkilendirme hatası (401/403) yanıtı döner.
+[Aksiyom 3]: Eğer JWT'den çıkarılan kullanıcıya ait bir profil kaydı (profiles tablosu) bulunamazsa, istek 403 Forbidden ile reddedilir.
 
-**[Aksiyom 4]:** Eğer Supabase veritabanı bağlantısı kurulamazsa veya veritabanı erişilemez durumdaysa, sipariş güncelleme işlemi başarısız olur ve istemciye sunucu hatası yanıtı döner.
+[Aksiyom 4]: Eğer kullanıcının profilindeki `role` alanı `admin` veya `super_admin` değerlerinden birine sahip değilse, istek 403 Forbidden ile reddedilir.
 
-**[Aksiyom 5]:** Eğer güncellenmeye çalışılan sipariş kaydı veritabanında mevcut değilse, güncelleme işlemi başarısız olur veya ilgili durum koduyla yanıt döner.
+[Aksiyom 5]: Eğer kullanıcının profilindeki `tenant_id` değeri null ise, istek 403 Forbidden ile reddedilir (çünkü çoklu kiracı modelinde hangi kiracıya ait olduğunu bilemez).
 
-**[Aksiyom 6]:** Fonksiyon, istek-yanıt döngüsünü tamamen asenkron olarak yönetir; tüm HTTP yanıtları `Response` nesnesi olarak döndürülür.
+[Aksiyom 6]: Eğer güncellenecek sipariş (order_id ile) veritabanında bulunamazsa, istek 404 Not Found ile reddedilir.
+
+[Aksiyom 7]: Eğer güncellemeye çalışılan siparişin `tenant_id` alanı, isteği yapan kullanıcının `tenant_id` alanı ile eşleşmiyorsa, istek 403 Forbidden ile reddedilir (kiracı izolasyonu ihlali).
+
+[Aksiyom 8]: Eğer Supabase veritabanı bağlantısı (URL veya anon key) kurulamazsa veya sorgu sırasında bir veritabanı hatası oluşursa, istek 500 Internal Server Error ile reddedilir.
+
+[Aksiyom 9]: Eğer `firstProfileRow` fonksiyonu beklenmedik bir veri yapısı (null dışı, ancak `role` veya `tenant_id` alanlarını içermeyen bir nesne) döndürürse, bu durum beklenmeyen bir sistem hatası olarak değerlendirilir ve istek 500 ile reddedilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### admin-update-order_handler
+### firstProfileRow
 
-**Ne yapar**: Bu fonksiyon, HTTP isteklerini alarak admin panelinden sipariş güncelleme işlemlerini yönetir. Supabase Edge Function yapısı içinde yer alan bu handler, Request nesnesini işler ve Response nesnesi döndürerek istemciye sonuç bildirir.
+**Ne yapar**: PostgREST API yanıtından dönen tipi belirsiz (`unknown`) JSON dizisinden ilk profil satırını alarak `{ role, tenant_id }` yapısına dönüştürür.-runtime'da tip güvenliği sağlayarak, `fetch(...).json()` çağrısının doğal olarak tipsiz döndüğü durumlarda güvenli bir şekilde profil verisini çıkarır.
 
-**Nasıl yapar**: `@ts-nocheck` directive'i ile TypeScript tip kontrolü devre dışı bırakılmıştır. Fonksiyon, bir HTTP Request nesnesini parametre olarak alır ve gerekli iş mantığını uygulayarak Response nesnesi ile sonuç döndürür. Edge Function mimarisi gereği, bu handler Sunucu Tarafı (server-side) çalışarak API uç noktasına gelen istekleri işler.
+**Nasıl yapar**: Fonksiyon, gelen `unknown` değerinin bir dizi olup olmadığını ve boş olmadığını kontrol eder. Dizinin ilk elemanının nesne (object) türünde ve null olmadığını doğrular. Ardından bu nesneyi `Record<string, unknown>` olarak adlandırıp `role` ve `tenant_id` alanlarını tek tek `typeof` kontrolüyle doğrular — string ise değeri korur, değilse `null` döner. Bu desen, `_shared/caller.ts` içindeki `toProfileRow` fonksiyonuyla aynı runtime tip daraltma (narrowing) stratejisini izler ve tip uydurma (`as Type`) yerine savunmacı doğrulama kullanır.
 
 **Parametreler**:
-- `req`: Request — İşlenecek HTTP istek nesnesi. İstemciden gelen HTTP method, header, body ve query parametrelerini içerir. Admin tarafından gönderilen sipariş güncelleme talimatlarını taşır.
+- `value`: `unknown` — PostgREST dizisinden (`fetch().json()`) dönen ham veri. Herhangi bir tipte olabilir; fonksiyon kendi içinde type narrowing uygular.
 
-**Dönüş**: Response — İşlem sonucunu içeren HTTP yanıt nesnesi. Başarı durumunda güncellenen sipariş bilgilerini, hata durumunda ise hata mesajını ve uygun HTTP durum kodunu döndürür.
+**Dönüş**: `{ role: string | null; tenant_id: string | null } | null` — Dizi boşsa, ilk eleman geçerli bir nesne değilse veya girdi dizi değilse `null` döner. Aksi halde `role` ve `tenant_id` alanlarının her biri string ise gerçek değeri, değilse `null` dönen bir nesne döner.
+
+### admin-update-order_handler
+**Ne yapar**: Bu fonksiyon, bir HTTP POST isteği alarak, bir siparişin (order) güncellenmesi işlemini tetikleyen bir Supabase Edge Function'ın ana giriş noktasıdır (handler). Genellikle bir yönetici (admin) yetkisiyle çalışması beklenen bu fonksiyon, istek gövdesinden gelen verileri işleyerek ilgili sipariş kaydını veritabanında günceller.
+
+**Nasıl yapar**: Fonksiyon, `@serve(Deno.serve)` dekoratörü ile işaretlenmiştir. Bu dekoratör, fonksiyonu bir Deno HTTP sunucusu işleyicisi (request handler) olarak kaydeder; bu sayede gelen bir HTTP isteği (`Request` nesnesi) bu fonksiyona yönlendirilir. Fonksiyon, asenkron (`async`) olarak çalışır, isteği işler ve bir `Response` nesnesi döndürerek HTTP yanıtını oluşturur.
+
+**Parametreler**:
+- `req`: `Request` — Gelen HTTP isteğini temsil eder. Standart web API Request nesnesidir. Genellikle gövdesinde (`req.json()` kullanarak) güncellenecek siparişin ID'si ve yeni değerleri gibi JSON verileri barındırır.
+
+**Dönüş**: `Response` — İşlem sonucunu içeren bir HTTP yanıt nesnesi. Başarılı bir güncelleme sonrası genellikle HTTP 200 OK durum kodu ve güncellenen siparişin verilerini veya bir başarı mesajını JSON formatında gövdesinde barındırır. Bir hata durumunda ise uygun HTTP hata kodları (örn. 400, 403, 500) ve hata açıklamasını içeren bir yanıt döner.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
-- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: ../_shared/tenant.ts::TenantMismatchError
+- import: ../_shared/tenant.ts::tenantFromVerifiedUser
 - import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: admin-update-order/index.ts::admin-update-order_handler
-- **params**: `req: Request`
+### [N1_NASIL] AST Pointer: supabase/functions/admin-update-order/index.ts::firstProfileRow
+- **params**: `(value: unknown)`
 - **ic_degiskenler**:
-  - `corsHeaders` — `getCorsHeaders(req)` ile elde edilen CORS başlık nesnesi
-  - `cors` — ikinci kez tanımlanan ve actual olarak kullanılan CORS başlık nesnesi (Access-Control-Allow-Headers, Allow-Methods içerir)
-  - `origin` — İsteğin `origin` başlığından okunan değer, boş string fallback'li
-  - `allowed` — `ALLOWED_ORIGINS` env var'ından virgülle ayrılmış izinli origin listesi, trimlenmiş ve boş olmayanlar filtrelenmiş
-  - `okOrigin` — Origin'in allowed listesinde olup olmadığını veya listenin boş olup olmadığını kontrol eden boolean
-  - `requestId` — `crypto.randomUUID()` veya `Date.now()` ile üretilen benzersiz istek tanımlayıcısı
-  - `ct` — `content-type` başlığının küçük harfe çevrilmiş hali
-  - `max` — `MAX_BODY_KB` env var'ından okunan, byte cinsinden maksimum gövde boyutu limiti
-  - `cl` — `content-length` header'ından okunan istek gövdesi boyutu (byte)
-  - `supabaseUrl` — `SUPABASE_URL` env var'ından okunan Supabase URL adresi
-  - `serviceRoleKey` — `SUPABASE_SERVICE_ROLE_KEY` env var'ından okunan service role anahtarı
-  - `anonKey` — `SUPABASE_ANON_KEY` env var'ından okunan anon anahtar
-  - `authHeader` — `Authorization` başlığından okunan JWT token değeri
-  - `authClient` — anonKey ile oluşturulan Supabase client, Authorization başlığı user token'ı ile başlatılmış
-  - `user` — `authClient.auth.getUser()` sonucundan elde edilen authenticated kullanıcı nesnesi
-  - `authErr` — kimlik doğrulama hata nesnesi
-  - `bodyClone` — istek gövdesinin klonlanarak JSON parse edilmesi, hata durumunda boş obje
-  - `tenantId` — `resolveTenantId(req, bodyClone)` ile çözümlenen kiracı ID'si
-  - `roleCheck` — `user_profiles` tablosunda kullanıcının rolünü sorgulayan fetch response'u
-  - `arr` — roleCheck response'unun JSON parse edilmiş hali (rol array'i)
-  - `role` — `arr[0]?.role` ile elde edilen kullanıcının rolü ('admin' veya 'superadmin' olmalı)
-  - `body` — `req.json()` ile parse edilen istek gövdesi
-  - `id` — `body.id`, güncellenecek siparişin UUID'si
-  - `conversation_id` — `body.conversation_id`, güncellenecek siparişin konuşma ID'si
-  - `status` — `body.status`, istenen yeni sipariş durumu
+  - `first` — `value[0]` olarak alınan array'in ilk elemanı, tip kontrolü yapılmamış raw değer
+  - `record` — `first`'in `Record<string, unknown>` olarak cast edilmiş hali; `role` ve `tenant_id` alanlarına erişim için kullanılır
+- **Dönüş**: `{ role: string | null; tenant_id: string | null } | null` — profil satırından role ve tenant_id çıkarır, geçersiz/boş input için `null` döner
+
+---
+
+### [N2_NASIL] AST Pointer: supabase/functions/admin-update-order/index.ts::admin-update-order_handler
+- **params**: `(req: Request)`
+- **ic_degiskenler**:
+  - `corsHeaders` — `getCorsHeaders(req)` ile üretilen CORS başlık nesnesi, tüm response'lara eklenir
+  - `cors` — `corsHeaders`'ın alias'ı, same reference
+  - `origin` — `req.headers.get('origin')` ile alınan istemci origin değeri; boş stringse CORS kontrolüypass olur
+  - `allowed` — `ALLOWED_ORIGINS` environment variable'ının virgülle ayrılıp trim edilmiş izinli origin listesi
+  - `okOrigin` — origin'in `allowed` listesinde olup olmadığını belirleyen boolean; liste boşsa her zaman `true`
+  - `requestId` — `crypto.randomUUID()` veya `Date.now()` ile üretilen eşsiz istek tanımlayıcısı, response header'lara `X-Request-Id` olarak eklenir
+  - `ct` — `req.headers.get('content-type')` değerinin lowercase hali; JSON olup olmadığını kontrol eder
+  - `max` — `MAX_BODY_KB` env var'ından okunan ve byte'a çevrilen maksimum gövde boyutu (varsayılan 100KB)
+  - `cl` — `content-length` header'ından parse edilen istek gövdesi boyutu (byte cinsinden)
+  - `supabaseUrl` — `SUPABASE_URL` env var'ı, Supabase REST API ve auth endpoint taban URL'i
+  - `serviceRoleKey` — `SUPABASE_SERVICE_ROLE_KEY` env var'ı, servis hesabı anahtarı; yetkili API çağrıları için kullanılır
+  - `anonKey` — `SUPABASE_ANON_KEY` env var'ı, anon Supabase client oluşturmak için kullanılır
+  - `authHeader` — `req.headers.get('Authorization')` ile alınan Bearer token; yoksa 401 döner
+  - `authClient` — `createClient(supabaseUrl, anonKey, ...)` ile oluşturulan Supabase client; Authorization header'ı global olarak ayarlanmış, kullanıcı doğrulama için kullanılır
+  - `user` — `authClient.auth.getUser()` ile doğrulanmış kullanıcı nesnesi (`user.id`, `user.app_metadata` alanlarını içerir)
+  - `authErr` — `getUser` çağrısından dönen hata nesnesi; null değilse token geçersizdir
+  - `roleCheck` — `fetch()` ile `user_profiles` tablosundan `role` ve `tenant_id` sorgulayan HTTP response; `serviceRoleKey` ile yetkilendirilmiş
+  - `profileRow` — `firstProfileRow()` ile parse edilmiş profil satırı; `role` ve `tenant_id` alanlarını içerir
+  - `role` — `profileRow?.role` değerinden çıkarılmış kullanıcı rolü; `'admin'` veya `'super_admin'` değilse 403 döner
+  - `tenantId` — `tenantFromVerifiedUser()` ile doğrulanmış tenant ID string'i; `TenantMismatchError` fırlatırsa 403 döner
+  - `body` — `req.json()` ile parse edilmiş request gövdesi; hata olursa boş obje `{}` döner
+  - `id` — `body.id`, siparişin doğrudan UUID'si
+  - `conversation_id` — `body.conversation_id`, siparişin konuşma ID'si üzerinden eşleme için kullanılır
+  - `status` — `body.status`, yeni sipariş durumu değeri
   - `display_code` — `body.display_code`, UI'da görünen sipariş kodunun son 8 hanesi
-  - `newStatus` — `status` değerinin string'e çevrilmiş hali, varsayılan 'paid'
-  - `resp` — `patch()` çağrılarından dönen Response nesnesi, hangi identifier kullanılıyorsa ona göre atanır
-  - `ok` — `resp.ok` değerinden elde edilen boolean, PATCH işleminin başarılı olup olmadığını gösterir
-  - `text` — `resp` gövdesinin text olarak okunmuş hali
-  - `recent` — `listRecent(200)` ile son 200 siparişin getirildiği array (display_code araması için)
-  - `target` — `recent` array'inde `display_code` ile eşleşen sipariş nesnesi, `id` alanının son 8 hanesi ile karşılaştırılır
-- **Dönüş**: `Response` — JSON { ok, response } veya hata Response'u
+  - `newStatus` — `status`'ün string'e çevrilmiş hali, yoksa `'paid'` varsayılır; PATCH gövdesindeki `status` değeri
+  - `resp` — `patch()` çağrısından dönen HTTP Response nesnesi; hangi identifier kullanılırsa kullanılsın PATCH sonucunu taşır
+  - `ok` — `resp?.ok` boolean'ı, PATCH işleminin başarılı olup olmadığını belirler
+  - `text` — `resp` body'sinin string karşılığı; API yanıtının ham gövdesi
+- **Dönüş**: `Response` — JSON `{ ok, response }` gövdesiyle 200/500/400/401/403/405/413/415/404 döner
+
+---
+
+### [N3_NASIL] AST Pointer: supabase/functions/admin-update-order/index.ts::patch (nested)
+- **params**: `(filter: string)` — REST API query string filtresi (ör. `id=eq.xxx`)
+- **ic_degiskenler**:
+  - _(yerel değişken yok; closure'dan erişilen değişkenler: `supabaseUrl`, `tenantId`, `serviceRoleKey`, `newStatus`)_
+    - `supabaseUrl` — closure'dan: Supabase REST API taban URL'i
+    - `tenantId` — closure'dan: doğrulanmış tenant ID, filtrede `tenant_id=eq.` olarak eklenir
+    - `serviceRoleKey` — closure'dan: Authorization ve apikey header'ları için servis hesabı anahtarı
+    - `newStatus` — closure'dan: PATCH ile güncellenecek yeni durum değeri
+- **Dönüş**: `Promise<Response>` — `fetch()` ile PATCH sonucu; `Prefer: return=representation` ile temsilci yanıt döner
+
+---
+
+### [N4_NASIL] AST Pointer: supabase/functions/admin-update-order/index.ts::listRecent (nested)
+- **params**: `(_limit = 100)` — çekilecek maksimum sipariş sayısı
+- **ic_degiskenler**:
+  - `res` — `fetch()` ile son siparişleri sorgulayan HTTP response
+  - `txt` — `res.text()` ile alınan ham JSON string'i; parse edilemese bile hata fırlatmaz
+  - `data` — IIFE ile `JSON.parse(txt)` sonucu; parse hatası olursa boş dizi `[]` döner; array değilse yine `[]` döner
+- _(closure'dan erişilen değişkenler: `supabaseUrl`, `tenantId`, `serviceRoleKey`)_
+- **Dönüş**: `Promise<Array<{id?: string, conversation_id?: string, created_at?: string}>>` — sipariş listesi; boş dizi veya最多 100 satırlık ordered array
 
 ---
 
 ## NODE ID STANDARD
 
   file: supabase\functions\admin-update-order\index.ts
+  function: supabase\functions\admin-update-order\index.ts::firstProfileRow
   function: supabase\functions\admin-update-order\index.ts::admin-update-order_handler
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: admin-update-order_handler
+  export: firstProfileRow
 
 ---
 # FILE: supabase\functions\admin-update-shipping\index.md
@@ -575,36 +628,42 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\admin-update-shipping\index.ts
-skeleton_hash: 3af04a0cc8d70862
+skeleton_hash: 1b87d8d49ed0a5df
 entity_hashes:
   func:admin-update-shipping_handler: fab3b88ab551f027
-  overview: 4717843338e56bb2
-generated_at: 2026-08-13T07:40:32Z
+  func:firstProfileRow: a0e6e5d01b903221
+  overview: 36b9e64a0a5f328f
+generated_at: 2026-08-17T11:35:10Z
 ---
 
 ## Genel Bakış
-Bu modül, yetkili yönetici kullanıcıların siparişlere ait kargo bilgilerini güncellemek için kullandığı bir Supabase Edge Function'dır. Gelen HTTP isteklerini kimlik doğrulaması ve yetki kontrolünden geçirerek veritabanındaki kargo kayıtlarını güvenli bir şekilde günceller.
+Bu modül, Supabase Edge Function olarak çalışan bir kargo güncelleme servisidir. Yönetici kullanıcıların siparişlere ait kargo bilgilerini güvenli bir şekilde güncellemesini sağlar. Tek bir HTTP istek işleyicisi üzerinden kimlik doğrulama, yetki kontrolü ve veritabanı güncelleme işlemlerini yönetir.
 
 ## Fonksiyon Grupları
-
-### İstek Doğrulama ve İşleme
-Gelen HTTP isteğini kabul eder, istekteki yöneticinin kimliğini doğrular ve yetkili olup olmadığını kontrol eder. Doğrulama başarılıysa kargo güncelleme işlemini başlatır.
-- admin_update_shipping_handler
-
-### Yanıt Üretme
-Veritabanı güncelleme işleminin sonucuna göre istemciye uygun HTTP durum kodu ve bilgilendirici mesaj içeren yanıt döner.
-- admin_update_shipping_handler
+### İstek İşleme ve Yanıt Üretme
+Gelen HTTP isteklerini alır, yönetici kimliğini doğrular ve yetki kontrolünü gerçekleştirir. İşlem sonucuna göre başarılı veya hatalı bir HTTP yanıtı döndürerek istemciye geri bildirim sağlar.
+- admin-update-shipping_handler, firstProfileRow
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır.
-
-**Not:** Fonksiyon gövdesi (kod) paylaşılmadığı için, sadece fonksiyon imzasından veya genel bakıştan mimari varsayımlar çıkarılamaz. Aksiyomlar sadece fonksiyon gövdesindeki kontrollere, koşullara ve süreçlere dayanılarak tanımlanabilir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### firstProfileRow
+**Ne yapar**: Bu fonksiyon, PostgREST API'inden dönen ve ham bir JSON verisi olan `unknown` tipindeki bir değeri alır. Fonksiyon, bu değerin bir dizi (array) olup olmadığını ve ilk elemanının geçerli bir profil nesnesi (belirli alanlara sahip bir nesne) olup olmadığını kontrollü bir şekilde doğrular. Doğrulama başarılı ise ilk profil satırından `role` ve `tenant_id` alanlarını çıkararak tip güvenli bir nesne olarak döndürür; aksi takdirde `null` döner.
+
+**Nasıl yapar**: Fonksiyon, gelen `value` parametresi üzerinde bir dizi runtime kontrolü uygular. Önce değerin bir dizi olup olmadığını ve boş olmadığını kontrol eder. Ardından dizinin ilk elemanının bir nesne (`object`) olup olmadığını doğrular. Bu kontrollerden geçerse, ilkel bir `Record<string, unknown>` tipine dönüştürdüğü bu nesnenin `role` ve `tenant_id` alanlarının string tipinde olup olmadığını test eder. Bu alanların mevcut ve doğru tipte olmaları durumunda ilgili değerleri, değilse `null` değerlerini içeren tip güvenli bir nesne oluşturur. Bu desen, tip uydurmaya (`type casting`) dayanmayan, dinamik ve güvenli bir veri çıkarma yöntemi sunar.
+
+**Parametreler**:
+- value: unknown — PostgREST dizisi (`fetch().json()` çağrısından dönen) veya herhangi bir veriyi temsil eder. Fonksiyon, bu değerin dizin ilk elemanının `role` ve `tenant_id` alanlarını içermesini bekler.
+
+**Dönüş**: `{ role: string | null; tenant_id: string | null } | null` — Doğrulama başarılı ise, `role` ve `tenant_id` alanlarını (her ikisi de `string` veya `null` olabilir) içeren bir nesne döner. Doğrulama başarısız olursa (gelen değer diz değilse, boş dizi ise veya ilk eleman geçerli bir nesne/yapı değilse) `null` döner.
 
 ### admin-update-shipping_handler
 **Ne yapar**: Bu fonksiyon, bir HTTP isteği alarak bir yanıt döndüren bir Supabase Edge Function istek işleyicisidir. Fonksiyonun adı, yöneticilerin kargo veya gönderi bilgilerini güncellemek üzere tasarlandığını belirtir.
@@ -617,107 +676,126 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
-- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: ../_shared/tenant.ts::TenantMismatchError
+- import: ../_shared/tenant.ts::tenantFromVerifiedUser
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
-- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::admin-update-shipping_handler
-- **params**: (req: Request)
-- **ic_degiskenler**:
-  - `requestId` — benzersiz istek kimliği, crypto.randomUUID() veya Date.now() ile oluşturulur
-  - `origin` — istekten alınan Origin başlığı
-  - `allowed` — ALLOWED_ORIGINS ortam değişkeninden split edilmiş izin verilen kökenler dizisi
-  - `okOrigin` — origin'ın allowed listesinde olup olmadığını kontrol eden boolean
-  - `cors` — CORS başlıklarını içeren nesne
-  - `ct` — Content-Type başlığı, küçük harfe çevrilmiş
-  - `max` — MAX_BODY_KB ortam değişkeninden hesaplanan maksimum gövde boyutu (byte)
-  - `cl` — Content-Length başlığı
-  - `_text` — request gövdesi metin olarak
-  - `parsed` — JSON.parse ile ayrıştırılmış gövde nesnesi
-  - `pick` — parsed içindeki anahtarlardan ilk geçerli değeri döndüren yardımcı fonksiyon
-  - `qs` — URL search parametreleri
-  - `cancel` — kargo iptal isteği boolean'ı
-  - `order_id` — sipariş ID'si (parsed veya qs'den)
-  - `carrier` — kargo şirketi
-  - `tracking_number` — kargo takip numarası
-  - `tracking_url` — kargo takip URL'si
-  - `send_email` — kargo bildirimi e-postası gönderilip gönderilmeyeceğini belirleyen boolean
-  - `supabaseUrl` — SUPABASE_URL ortam değişkeni
-  - `anonKey` — SUPABASE_ANON_KEY ortam değişkeni
-  - `serviceKey` — SUPABASE_SERVICE_ROLE_KEY ortam değişkeni
-  - `authHeader` — Authorization başlığı
-  - `authClient` — anonKey ile oluşturulan Supabase istemcisi
-  - `user` — authClient.auth.getUser() ile doğrulanmış kullanıcı
-  - `authErr` — authClient.auth.getUser() hatası
-  - `tenantId` — resolveTenantId ile çözümlenmiş kiracı ID'si
-  - `roleCheck` — kullanıcının rolünü kontrol eden fetch isteği yanıtı
-  - `arr` — roleCheck.json() ile çözümlenmiş dizi
-  - `role` — arr[0].role değerinden alınan rol
-  - `isCurrentlyShipped` — siparişin şu anda kargoya verilip verilmediğini belirleyen boolean
-  - `wantCancel` — iptal isteği veya mevcut kargodan çıkarak belirlenen iptal boolean'ı
-  - `updCancel` — iptal PATCH isteği yanıtı
-  - `isFirstShip` — ilk kez kargoya verme işleminin yapılıp yapılmadığını belirleyen boolean
-  - `patchBody` — sipariş güncellemesi için PATCH gövdesi
-  - `upd` — kargo güncelleme PATCH isteği yanıtı
-  - `headerKey` — x-idempotency-key başlığı
-  - `derivedKey` — computeIdemKey ile hesaplanan derived key
-  - `idemKey` — headerKey veya derivedKey
-  - `customer_email` — müşteri e-posta adresi (sipariş ve kullanıcı verilerinden)
-  - `customer_name` — müşteri adı (sipariş ve kullanıcı verilerinden)
-  - `ordResp` — sipariş bilgilerini çekmek için yapılan fetch isteği yanıtı
-  - `arr` — ordResp.json() ile çözümlenmiş dizi
-  - `row` — arr[0] dizisi
-  - `uid` — row.user_id
-  - `usrResp` — Auth Admin API ile kullanıcı bilgisini çekmek için yapılan fetch isteği yanıtı
-  - `u` — usrResp.json() ile çözümlenmiş kullanıcı nesnesi
-  - `emailResult` — e-posta gönderme sonucunu tutan nesne
-  - `resp` — shipping-notification fonksiyonuna yapılan fetch isteği yanıtı
-  - `j` — resp.json() ile çözümlenmiş ShippingNotifyResponse
-  - `body` — shipping_email_events tablosuna eklenecek JSON gövdesi
-- **Dönüş**: Response
+### [N1_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::firstProfileRow
+- **params**: `(value: unknown)`
+- **ic_degiskenler**: 
+  - `first` — value[0] indisinden alınan ilk eleman, array olup olmadığı ve eleman tipi kontrolü için kullanılır
+  - `record` — first nesnesi Record<string, unknown> tipine dönüştürülmüş kayıt, role ve tenant_id alanları bu nesneden okunur
+- **Dönüş**: `{ role: string | null; tenant_id: string | null } | null`
 
-### [N2_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::pick
-- **params**: (keys: string[])
-- **ic_degiskenler**:
-  - `k` — döngüdeki mevcut anahtar
-  - `v` — parsed nesnesinden alınan değer
-- **Dönüş**: string | null
+### [N2_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::admin-update-shipping_handler
+- **params**: `(req: Request)`
+- **ic_degiskenler**: 
+  - `requestId` — Her istek için benzersiz tanımlayıcı, crypto.randomUUID veya Date.now ile oluşturulur
+  - `origin` — İstek header'ından gelen origin değeri, CORS kontrolü için kullanılır
+  - `allowed` — ALLOWED_ORIGINS env değişkeninden split edilmiş izin verilen origin listesi
+  - `okOrigin` — Mevcut origin'in izin verilen listede olup olmadığını kontrol eden boolean
+  - `cors` — getCorsHeaders ile elde edilen CORS başlık nesnesi
+  - `ct` — Content-Type header'ının lowercased hali, JSON olup olmadığının kontrolü için
+  - `max` — MAX_BODY_KB env değişkeninden hesaplanan maksimum gövde boyutu (bayt)
+  - `cl` — Content-Length header'ından alınan mevcut gövde boyutu (bayt)
+  - `_text` — req.text() ile okunan ham istek gövdesi metni
+  - `parsed` — _text'in JSON.parse ile ayrıştırılmış hali, request parametreleri için
+  - `pick` — İç içe fonksiyon, parsed objesinde belirli anahtarlar arayan yardımcı fonksiyon
+  - `qs` — req.url'den oluşturulan URL searchParams nesnesi
+  - `cancel` — iptal isteği boolean değeri, parsed veya query'den alınır
+  - `order_id` — Sipariş ID'si, parsed veya query'den alınır
+  - `carrier` — Kargo şirketi, parsed veya query'den alınır
+  - `tracking_number` — Kargo takip numarası, parsed veya query'den alınır
+  - `tracking_url` — Kargo takip URL'i, parsed veya query'den alınır
+  - `send_email` — E-posta gönderilip gönderilmeyeceğini belirleyen boolean, parsed veya query'den alınır
+  - `supabaseUrl` — SUPABASE_URL env değişkeninden alınan Supabase URL'i
+  - `anonKey` — SUPABASE_ANON_KEY env değişkeninden alınan Supabase anon anahtarı
+  - `serviceKey` — SUPABASE_SERVICE_ROLE_KEY env değişkeninden alınan Supabase servis rolü anahtarı
+  - `authHeader` — İstek header'ından alınan Authorization başlığı
+  - `authClient` — anonKey ile oluşturulan Supabase istemcisi, JWT ile kimlik doğrulama için
+  - `jwt` — Authorization header'ından çıkarılan JWT token'ı
+  - `user` — authClient.auth.getUser ile doğrulanmış kullanıcı nesnesi
+  - `authErr` — Kimlik doğrulama sırasında oluşan hata
+  - `roleCheck` — Kullanıcı rolünü kontrol etmek için yapılan fetch isteği yanıtı
+  - `profileRow` — firstProfileRow ile elde edilen kullanıcı profil satırı
+  - `role` — profileRow?.role değerinden alınan kullanıcı rolü
+  - `tenantId` — tenantFromVerifiedUser ile elde edilen tenant ID'si
+  - `isCurrentlyShipped` — Siparişin mevcut durumunun shipped olup olmadığını belirleyen boolean
+  - `wantCancel` — İptal isteği boolean değeri, cancel parametresi veya mevcut duruma göre belirlenir
+  - `updCancel` — İptal işlemini gerçekleştiren PATCH isteği yanıtı
+  - `txt` — updCancel başarısız olduğunda alınan hata metni
+  - `isFirstShip` — İlk kez kargo gönderimi yapılıp yapılmadığını belirleyen boolean
+  - `cur` — Mevcut sipariş durumunu getiren fetch isteği yanıtı
+  - `arr` — cur.json() ile elde edilen dizi (sipariş satırları)
+  - `row` — arr[0] indisinden alınan ilk sipariş satırı
+  - `computeIdemKey` — İdempotens anahtarı hesaplayan iç içe fonksiyon
+  - `patchBody` — Sipariş güncellemesi için gönderilecek JSON gövdesi
+  - `upd` — Sipariş güncellemesini gerçekleştiren PATCH isteği yanıtı
+  - `txt` — upd başarısız olduğunda alınan hata metni
+  - `headerKey` — İstek header'ından gelen x-idempotency-key değeri
+  - `derivedKey` — computeIdemKey ile hesaplanan idempotens anahtarı
+  - `idemKey` — Son idempotens anahtarı (headerKey veya derivedKey)
+  - `customer_email` — Müşteri e-posta adresi, bildirim için kullanılır
+  - `customer_name` — Müşteri adı, bildirim için kullanılır
+  - `ordResp` — Sipariş detaylarını getiren fetch isteği yanıtı
+  - `arr` — ordResp.json() ile elde edilen dizi
+  - `row` — arr[0] indisinden alınan sipariş satırı
+  - `uid` — row?.user_id değerinden alınan kullanıcı ID'si
+  - `usrResp` — Kullanıcı bilgilerini getiren Auth Admin API isteği yanıtı
+  - `u` — usrResp.json() ile elde edilen kullanıcı nesnesi
+  - `metaName` — u.user_metadata.full_name veya u.user_metadata.name değerinden alınan isim
+  - `emailResult` — E-posta gönderim sonucunu tutan nesne {sent: boolean, disabled: boolean}
+  - `resp` — shipping-notification fonksiyonuna yapılan istek yanıtı
+  - `j` — resp.json() ile elde edilen JSON yanıtı (ShippingNotifyResponse)
+  - `_e` — catch bloğunda yakalanan hata nesnesi
+  - `msg` — _e.message veya String(_e) ile elde edilen hata mesajı
+- **Dönüş**: `Response` (çeşitli HTTP durum kodlarıyla)
 
-### [N3_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::cancel
-- **params**: ()
-- **ic_degiskenler**:
+### [N3_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::pick
+- **params**: `(keys: string[])`
+- **ic_degiskenler**: 
+  - `k` — Döngü değişkeni, keys dizisindeki her anahtar
+  - `v` — parsed objesinden k ile alınan değer
+- **Dönüş**: `string | null`
+
+### [N4_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::cancel
+- **params**: `(yok)`
+- **ic_degiskenler**: 
   - `vRaw` — parsed['cancel'] veya qs.get('cancel') değerinden alınan ham değer
-- **Dönüş**: boolean
+- **Dönüş**: `boolean`
 
-### [N4_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::send_email
-- **params**: ()
-- **ic_degiskenler**:
-  - `v` — parsed['send_email'], parsed['sendEmail'], qs.get('send_email') veya qs.get('sendEmail') değerinden alınan değer
-- **Dönüş**: boolean
+### [N5_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::send_email
+- **params**: `(yok)`
+- **ic_degiskenler**: 
+  - `v` — parsed['send_email'] veya qs.get('send_email') değerinden alınan değer
+- **Dönüş**: `boolean`
 
-### [N5_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::computeIdemKey
-- **params**: (action: 'ship' | 'cancel', orderId: string, carrier?: string|null, tn?: string|null)
-- **ic_degiskenler**:
-  - `raw` — parametrelerin pipe ile birleştirilmiş hali
-  - `bytes` — raw dizgesinin TextEncoder ile Uint8Array'e çevrilmiş hali
-  - `hash` — SHA-256 ile hesaplanan ArrayBuffer
-- **Dönüş**: string
+### [N6_NASIL] AST Pointer: supabase/functions/admin-update-shipping/index.ts::computeIdemKey
+- **params**: `(action: 'ship' | 'cancel', orderId: string, carrier?: string|null, tn?: string|null)`
+- **ic_degiskenler**: 
+  - `raw` — Parametrelerin '|' ile birleştirilmesiyle oluşturulan ham string
+  - `bytes` — raw string'in TextEncoder ile bayt dizisine dönüştürülmüş hali
+  - `hash` — crypto.subtle.digest ile hesaplanan SHA-256 hash'i
+- **Dönüş**: `string` (16 baytlık hex string)
 
 ---
 
 ## NODE ID STANDARD
 
   file: supabase\functions\admin-update-shipping\index.ts
+  function: supabase\functions\admin-update-shipping\index.ts::firstProfileRow
   function: supabase\functions\admin-update-shipping\index.ts::admin-update-shipping_handler
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: admin-update-shipping_handler
+  export: firstProfileRow
 
 ---
 # FILE: supabase\functions\apply-coupon\index.md
@@ -800,47 +878,31 @@ Bu modül, HTTP istekleri üzerinden kupon kodu doğrulama ve uygulama işlevsel
 ### CouponRow
 ```typescript
 type CouponRow = {
-
   code: string
-
   discount_type: 'percentage' | 'fixed_amount'
-
   discount_value: number
-
   minimum_order_amount: number | null
-
   valid_from: string | null
-
   valid_until: string | null
-
   is_acti
 ```
 
 ### ApplyCouponReq
 ```typescript
 type ApplyCouponReq = {
-
   code: string
-
   subtotal: number
-
 }
 ```
 
 ### ApplyCouponResp
 ```typescript
 type ApplyCouponResp = {
-
   val_id: boolean
-
   reason?: string
-
   discount_amount?: number
-
   final_total?: number
-
   normalized_code?: string
-
 }
 ```
 
@@ -913,53 +975,77 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\delivery-notification\index.ts
-skeleton_hash: b1edef18bcf1a308
+skeleton_hash: 44b35facce8206b9
 entity_hashes:
+  func:callerFailure: c2855766de0bfe8b
   func:delivery-notification_handler: bbc4a3cdb5561a07
   func:loadTemplate: 4c5f3a8524c0bb12
   func:render: b6f065ff28ae59f4
-  overview: d34e01c15bff1856
-generated_at: 2026-08-13T07:40:32Z
+  overview: a2afc365f1245edc
+generated_at: 2026-08-17T11:35:43Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase Edge Function olarak sipariş teslimatı tamamlandığında müşteriye otomatik e-posta bildirimi göndermekle yükümlüdür. Sipariş bilgilerini veritabanından çeker, dinamik bir şablonla e-posta içeriğini oluşturur ve harici bir e-posta servisi aracılığıyla mesajı iletir; süreç boyunca hata yönetimi ve loglama gerçekleştirilir.
+Bu modül, bir Supabase Edge Function olup sipariş teslimatı tamamlandığında müşteriye otomatik e-posta bildirimi göndermekle görevlidir. Harici e-posta servisini kullanarak, dinamik verilerle doldurulmuş bir HTML şablonunu iletir. Modülün tek dışa açık giriş noktası gelen HTTP isteklerini işleyen bir web hook'tur.
 
 ## Fonksiyon Grupları
-### Şablon İşleme
-E-posta içeriğinin hazırlanmasıyla ilgili yardımcı işlevleri barındırır. Dosya sisteminden gerekli şablonun yüklenmesini ve bu şablonun sipariş verisiyle birleştirilerek son metnin elde edilmesini sağlar.
-- render, loadTemplate
+### Ana İşleyici ve Hata Yönetimi
+Modülün dışa açılan tek giriş noktası olan istek işleyicisini ve oluşabilecek hataları tutarlı biçimde ele almayı sağlayan yardımcı fonksiyonları barındırır. Bu grup, isteğin işlenmesi, veri toplanması ve hata senaryolarının merkezi yönetiminden sorumludur.
+- delivery-notification_handler, callerFailure
 
-### Ana İstek İşleyici
-Modülün dışarıya açılan ana giriş noktasıdır. Gelen HTTP isteğini alarak tüm iş akışını (veritabanı sorgulama, şablon hazırlama, e-posta gönderimi ve loglama) yönetir ve sonuç olarak bir HTTP yanıtı döner.
-- delivery-notification_handler
+### Şablon İşleme
+E-posta içeriğinin dinamik olarak hazırlanmasıyla ilgili işlevleri kapsar. Dosya sisteminden gerekli HTML şablonunun asenkron yüklenmesini ve bu şablonun sipariş verisiyle birleştirilerek son e-posta metninin elde edilmesini sağlar.
+- render, loadTemplate
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomatik e-posta bildirimi göndermek için tasarlanmıştır. Aşağıdaki mimari varsayımlar, fonksiyon imzaları ve modülün temel amacına dayanarak tanımlanmıştır.
 
-[Aksiyom 1]: Eğer `render` fonksiyonuna geçerli bir şablon string'i (`tpl`) ve veri sözlüğü (`_data`) sağlanmazsa, şablon işleme başarısız olur.
-[Aksiyom 2]: Eğer `loadTemplate` fonksiyonu dosya sisteminden gerekli şablon dosyasını bulamazsa veya okuyamazsa, şablon yükleme hatası oluşur.
-[Aksiyom 3]: Eğer `
+Bu modül, bir Supabase Edge Function olup sipariş teslimatı tamamlandığında müşteriye e-posta bildirimi gönderen bir yapıya sahiptir. Aşağıda bu yapının doğru çalışması için gerekli mimari varsayımlar listelenmektedir.
+
+**[Aksiyom 1]:** Eğer `loadTemplate()` fonksiyonu çağrıldığında geçerli bir e-posta şablon dosyası yolu erişilebilir konumda (dosya sisteminde) yoksa, `render()` fonksiyonu geçersiz veya boş bir şablon ile çalışır ve gönderilen e-posta içeriği hatalı ya da boş olur.
+
+**[Aksiyom 2]:** Eğer `render()` fonksiyonuna geçersiz bir şablon string'i (`tpl`) veya boş/geçersiz `_data` parametresi verilirse, şablon işleme başarısız olur ve `callerFailure()` aracılığıyla hata yanıtı üretilir.
+
+**[Aksiyom 3]:** Eğer `delivery-notification_handler` isteği çağrıldığında harici e-posta servisi (SMTP veya API tabanlı) yapılandırılmamış veya erişilebilir değilse, e-posta gönderimi başarısız olur ve istemciye hata durumu döner.
+
+**[Aksiyom 4]:** Eğer `delivery-notification_handler` fonksiyonuna geçersiz veya eksik istek (`req`) verisi gelirse, handler fonksiyonu işlenemez ve `callerFailure()` aracılığıyla uygun hata koduyla yanıt döner.
+
+**[Aksiyom 5]:** Eğer `callerFailure()` fonksiyonu bir hata nesnesi alırsa, her durumda `{ status: number; error: string }` formatında tutarlı bir hata yanıtı veya `null` döndürmelidir; aksi takdirde üst düzey handler'da yakalanamayan istisnai durum oluşur.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### render
-**Ne yapar**: Verilen bir şablon dizesindeki `{{anahtar}}` yapısındaki yer tutucuları, sağlanan veri nesnesindeki karşılıkları ile değiştirerek dinamik bir çıktı oluşturur.
-**Nasıl yapar**: `String.prototype.replace` metodunu bir regex ile kullanarak `{{(\w+)}}` kalıplarını tespit eder. Eşleşen anahtarın (`k`) veri nesnesinde (`_data`) karşılığını arar ve bulamazsa boş bir dize kullanarak değişikliği uygular. Bu işlem, şablon motorları için basit bir değişken ekleme (interpolation) mekanizması sağlar.
+### callerFailure
+**Ne yapar**: Bir hata nesnesini alır ve bu hatanın belirli bir uygulama hata türü olup olmadığını kontrol eder. Eğer öyleyse, ilgili HTTP durum kodu ve standart bir hata mesajı içeren bir nesne döndürerek dışarıya uyumlu bir hata yanıtı oluşturur. Bu fonksiyon, çağrı hatalarını HTTP dünyasının anlayacağı formatlara dönüştürerek API uç noktası için merkezi bir hata eleme mekanizması sağlar.
+
+**Nasıl yapar**: Gelen `error` parametresinin `instanceof` kontrolü ile belirli hata sınıflarını (`TenantMismatchError`, `CallerConfigError`, `CallerLookupError`) tespit eder. Her eşleşme için, proje içi bir standart olan belirli bir HTTP durum kodu (403, 500, 503) ve hata tanımlayıcısı (string) ile bir nesne döndürür. Hiçbir hata türüyle eşleşmezse `null` değeri döner, bu da çağrıcının hatanın bilinmediğini ve başka bir eleme yoluna başvurması gerektiğini belirtir.
+
 **Parametreler**:
-- `tpl`: string — Değiştirilecek şablon dizesi. İçerisinde `{{değişken_adı}}` formatında yer tutucular bulunmalıdır.
-- `_data`: Record<string, unknown> — Şablondaki yer tutucuların değerlerini içeren nesne. Anahtarlar yer tutucu adlarıyla, değerler ise yerine konacak verilerle eşleşmelidir.
-**Dönüş**: string — Yer tutucuların veri ile değiştirildiği yeni şablon dizesi.
+- error: `unknown` — Fonksiyona gelen ve hata türünün bilinmediği (herhangi bir fırlatılmış obje olabileceği) hata nesnesi.
+
+**Dönüş**: `{ status: number; error: string } | null` — Eşleşen bir hata türü varsa, `status` alanı ilgili HTTP durum kodunu, `error` alanı ise standart bir hata tanımlayıcısını tutan bir nesne döner. Eşleşme yoksa `null` döner.
+
+### render
+**Ne yapar**: Bir şablon dizesindeki (`tpl`) yer tutucu değişkenleri (`{{değişken_adı}}` formatında), verilen bir veri nesnesindeki (`_data`) karşılıkları ile değiştirerek dinamik bir metin oluşturur. Bu basit bir şablon motoru işlevi看到erek, HTML e-posta şablonları gibi içeriklerin kişiselleştirilmesini sağlar.
+
+**Nasıl yapar**: Bir正则表达式 (`/{{(\w+)}}/g`) kullanarak şablon dizgesindeki tüm `{{...}}` kalıplarını tarar. Her eşleşme için, parantez içinde yakalanan değişken adını (`k`) `_data` nesnesindeki ilgili özellikten (`_data[k]`) alır. Eğer bu özellik mevcut değilse (`undefined` veya `null` ise) boş bir string (`''`) ile değiştirir. Sonuç olarak, tüm yer tutucuların substituted edildiği yeni bir dizesi döndürür.
+
+**Parametreler**:
+- tpl: `string` — Değiştirme yapılacak orijinal şablon dizgesi.
+- _data: `Record<string, unknown>` — Şablondaki yer tutucuların değerlerini tutan anahtar-değer çiftlerinden oluşan nesne.
+
+**Dönüş**: `string` — Tüm yer tutucuların verilen değerlerle veya boş stringlerle değiştirilmiş haliyle güncellenmiş şablon dizgesi.
 
 ### loadTemplate
-**Ne yapar**: E-posta bildirimi için kullanılacak HTML şablonunu dosya sisteminden asenkron olarak yükler.
-**Nasıl yapar**: `import.meta.url` referansını kullanarak `./templates/email/delivered.html` dosyasının tam yolunu bir `URL` nesnesine dönüştürür. Ardından Deno ortamının `readTextFile` fonksiyonu ile bu dosyanın içeriğini okur. Dosya bulunamazsa veya herhangi bir hata oluşursa, bir hata yakalama bloğu ile `null` değeri döndürerek uygulamanın çökmesini önler.
-**Parametreler**: Parametre almaz.
-**Dönüş**: Promise<string | null> — Başarılı olursa HTML şablonunun içeriğini, başarısız olursa `null` değerini döndürür.
+**Ne yapar**: Asenktron bir şekilde, fonksiyonun bulunduğu dizine göreli bir yoldan bir HTML şablon dosyasının içeriğini okur ve döndürür. Bu, e-posta gönderimi için kullanılacak olan dışsal HTML yapısını uygulamaya dahil etmek için kullanılır.
+
+**Nasıl yapar**: `import.meta.url` referansını kullanarak fonksiyonun bulunduğu dizini (`./templates/email/delivered.html`) temel alan mutlak bir URL nesnesi oluşturur. Ardından Deno runtime'ın `Dosya okuma API`'sini (`Deno.readTextFile`) çağırarak bu URL'deki dosyanın tüm içeriğini asenktron olarak okur. Okuma işlemi başarılı olursa dosya içeriği (bir `string`) döndürülür. Bir `try-catch` bloğu ile dosya bulunamazsa veya okunamazsa hata yutulur ve `null` değeri döndürülerek üst katmanın şablon bulunamadığını idare etmesi sağlanır.
+
+**Parametreler**: Bu fonksiyonun parametresi yoktur.
+
+**Dönüş**: `Promise<string | null>` — Başarılı okuma durumunda dosyanın tam metin içeriğini (`string`), hata (dosya bulunamama vb.) durumunda ise `null` değerini döndürür.
 
 ### delivery-notification_handler
 **Ne yapar**: Bir HTTP POST isteğini alır, istemciden gelen e-posta ve teslimat bilgilerini doğrular, şablonu doldurarak bir e-posta bildirim e-postası gönderir ve sonucu istemciye JSON yanıtı olarak döndürür.
@@ -973,9 +1059,7 @@ Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomati
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: ../_shared/tenant_config.ts::getTenantBranding
-- import: ../_shared/tenant_config.ts::resolveTenantId
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
-- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -992,56 +1076,68 @@ Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomati
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/delivery-notification/index.ts::render
+### [N1_NASIL] AST Pointer: delivery-notification/index.ts::callerFailure
+- **params**: `(error: unknown)`
+- **ic_degiskenler**:
+  _(değişken yok — doğrudan parametre ve instanceof kontrolleri ile return)_
+- **Dönüş**: `{ status: number; error: string } | null`
+  - `error instanceof TenantMismatchError` → `{ status: 403, error: 'tenant_mismatch' }`
+  - `error instanceof CallerConfigError` → `{ status: 500, error: 'CONFIG_MISSING' }`
+  - `error instanceof CallerLookupError` → `{ status: 503, error: 'profile_lookup_failed' }`
+  - Hiçbiri eşleşmezse → `null`
+
+### [N2_NASIL] AST Pointer: delivery-notification/index.ts::render
 - **params**: `(tpl: string, _data: Record<string, unknown>)`
 - **ic_degiskenler**:
-  - `_m` — regex eşleşmesi için kullanılan geçici match nesnesi (fonksiyonda kullanılmıyor)
-  - `k` — regex tarafından yakalanan anahtar adı (template içindeki `{{k}}` yapısındaki anahtar)
-- **Dönüş**: Template string içindeki `{{anahtar}}` işaretlerinin `_data` sözlüğündeki değerlerle değiştirilmiş hali.
+  _(değişken yok — parametreler doğrudan `replace` içinde kullanılır)_
+- **Dönüş**: `string` — `tpl` içindeki `{{key}}` placeholder'larını `_data[key]` değerleriyle değiştirilmiş olarak döner
 
-### [N2_NASIL] AST Pointer: supabase/functions/delivery-notification/index.ts::loadTemplate
-- **params**: `(parametre yok)`
+### [N3_NASIL] AST Pointer: delivery-notification/index.ts::loadTemplate
+- **params**: _(yok)_
 - **ic_degiskenler**:
-  - `url` — `templates/email/delivered.html` dosyasının modül göreli yolunu temsil eden URL nesnesi
-- **Dönüş**: Async, başarıyla okunursa HTML template string, hata olursa `null`.
+  - `url` — `new URL('./templates/email/delivered.html', import.meta.url)` ile oluşturulan dosya yolu; email şablonunun bulunduğu mutlak URL
+- **Dönüş**: `string | null` — dosya okunursa HTML içeriği, başarısız olursa `null`
 
-### [N3_NASIL] AST Pointer: supabase/functions/delivery-notification/index.ts::delivery-notification_handler
-- **params**: `(req)`
+### [N4_NASIL] AST Pointer: delivery-notification/index.ts::delivery-notification_handler
+- **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `origin` — İsteğin `origin` başlığı, yoksa `'*'` kullanılır
-  - `corsHeaders` — CORS ile ilgili HTTP başlıklarını tutar (Access-Control-Allow-*)
-  - `supabaseUrl` — Ortam değişkeninden alınan Supabase URL'i
-  - `serviceKey` — Ortam değişkeninden alınan Supabase servis rolü anahtarı
-  - `body` — İstek gövdesinden parse edilen `DeliveryRequest` nesnesi
-  - `order_id` — `body.order_id` değerinden alınan sipariş kimliği
-  - `customer_email` — Müşteri e-posta adresi (istek gövdesinden veya DB'den)
-  - `customer_name` — Müşteri adı (istek gövdesinden veya DB'den)
-  - `order_number` — Sipariş numarası (istek gövdesinden veya DB'den)
-  - `tenantId` — `resolveTenantId(req, body)` çağrısı ile elde edilen kiracı kimliği
-  - `branding` — `getTenantBranding(tenantId)` çağrısı ile elde edilen marka bilgileri nesnesi (brandName, brandPrimaryColor, brandLogoUrl, emailFrom içerir)
-  - `authHeader` — İstekten alınan `Authorization` başlığı
-  - `isAuthorized` — Yetkilendirme durumunu tutan boolean bayrak (başlangıçta false)
-  - `anonKey` — Ortam değişkeninden alınan Supabase anonim anahtarı
-  - `authClient` — `authHeader` ile başlatılan Supabase istemcisi (anonim anahtar ve yetkilendirme başlığı ile)
-  - `user` — `authClient.auth.getUser()` sonucundan alınan kullanıcı nesnesi
-  - `roleCheck` — Kullanıcının rolünü kontrol etmek için yapılan REST isteğinin sonucu
-  - `arr` — `roleCheck` yanıtından parse edilen JSON dizisi
-  - `role` — `arr[0]?.role` ifadesinden alınan kullanıcı rolü ('admin' veya 'superadmin' ise yetkili)
-  - `resendApiKey` — Ortam değişkeninden alınan Resend API anahtarı
-  - `emailFrom` — `branding.emailFrom` değerinden alınan e-posta gönderici adresi
-  - `o` — Eksik müşteri bilgilerini almak için Supabase REST API'ye yapılan istek sonucu
-  - `arr` — `o` yanıtından parse edilen JSON dizisi
-  - `arr[0]` — Sipariş satırı (order_number, customer_name, customer_email alanlarını içerir)
-  - `brandName` — `branding.brandName` değerinden alınan marka adı
-  - `brandPrimary` — `branding.brandPrimaryColor` değerinden alınan marka ana rengi
-  - `brandLogoUrl` — `branding.brandLogoUrl` değerinden alınan marka logo URL'i
-  - `prettyOrderNo` — Düzenlenmiş sipariş numarası (ör: `#123456` formatında)
-  - `subject` — E-posta konu satırı (marka adı ve sipariş numarası ile)
-  - `html` — `loadTemplate()` ile yüklenen veya fallback olarak oluşturulan HTML e-posta gövdesi
-  - `resp` — Resend API'ye e-posta göndermek için yapılan POST isteği sonucu
-  - `t` — `resp` yanıtının metin gövdesi (hata durumunda loglama için)
-  - `result` — Resend API yanıtının JSON parse edilmiş hali (başarı durumunda `id` içerir)
-- **Dönüş**: `Response` nesnesi. Başarı durumunda `{ ok: true, order_id, subject, result }`, hata durumunda uygun HTTP durum kodu ve hata mesajı ile JSON yanıtı.
+  - `corsHeaders` — `getCorsHeaders(req)` çağrısı ile elde edilen CORS başlık nesnesi, tüm response'lara eklenir
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase API URL'i, sipariş sorgusu ve audit INSERT için kullanılır
+  - `serviceKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan service role anahtarı, Supabase REST isteklerinde `Authorization` ve `apikey` header'larında kullanılır
+  - `body` — `await req.json()` ile parse edilen istek gövdesi, `DeliveryRequest` tipinde
+  - `order_id` — `body.order_id` erişiminden elde edilen sipariş ID'si, sipariş sorgusu ve audit kaydı için kullanılır
+  - `customer_email` — `body.customer_email` erişiminden elde edilen müşteri e-posta adresi, email gönderimi ve audit kaydı için kullanılır
+  - `customer_name` — `body.customer_name` erişiminden elde edilen müşteri adı, email içeriğinde `Merhaba <strong>` kısmında kullanılır
+  - `order_number` — `body.order_number` erişiminden elde edilen sipariş numarası, eksikse veritabanından türetilir
+  - `ctx` — `await resolveCaller(req, body)` çağrısı ile elde edilen `CallerContext` nesnesi; `.kind`, `.role`, `.tenantId` alanlarıyla yetki kapısı kararları alınır
+  - `failure` — `callerFailure(err)` çağrısının döndüğü `{ status, error }` veya `null`; yetki hatası durumunda hata response'u üretilir
+  - `tenantId` — `ctx.tenantId` erişiminden elde edilen kiracı ID'si; branding sorgusu ve sipariş filtresi için kullanılır
+  - `branding` — `await getTenantBranding(tenantId)` çağrısı ile elde edilen kiracı branding nesnesi; `.emailFrom`, `.brandName`, `.brandPrimaryColor`, `.brandLogoUrl` alanları kullanılır
+  - `resendApiKey` — `Deno.env.get('RESEND_API_KEY')` ile okunan Resend API anahtarı; yoksa email gönderimi devre dışı (200 `{ disabled: true }`) döner
+  - `emailFrom` — `branding.emailFrom` erişiminden elde edilen gönderici e-posta adresi, Resend API çağrısında `from` alanı olarak kullanılır
+  - `o` — `fetch()` ile Supabase REST API'den sipariş kaydı sorgulanması sonucu dönen `Response` nesnesi; `.ok` kontrolü ile başarı denetlenir
+  - `arr` — `await o.json()` ile parse edilen sorgu sonucu dizi; `Array.isArray` kontrolü yapılır
+  - `row` — `arr[0]` erişiminden elde edilen ilk (ve tek) sipariş satırı; `row.order_number`, `row.customer_name`, `row.customer_email` alanlarıyla eksik bilgiler tamamlanır
+  - `brandName` — `branding.brandName` erişiminden elde edilen marka adı; email konu satırı ve HTML içerikte kullanılır
+  - `brandPrimary` — `branding.brandPrimaryColor` erişiminden elde edilen marka rengi; HTML fallback'te `<h2 style="color: ...">` içinde kullanılır
+  - `brandLogoUrl` — `branding.brandLogoUrl` erişiminden elde edilen marka logo URL'i, `render` çağrısında `brand_logo_url` olarak geçilir
+  - `prettyOrderNo` — Sipariş numarasının okunabilir formatı; `order_number` varsa `#${order_number.split('-')[1]}`, yoksa `#${order_id.slice(-8).toUpperCase()}`
+  - `subject` — Email konu satırı; `${brandName} | Siparişiniz teslim edildi - ${prettyOrderNo}` formatında oluşturulur
+  - `html` — Email HTML gövdesi; `loadTemplate()` başarısız olursa hardcoded fallback HTML, başarılıysa `render()` ile şablon değişkenleri değiştirilir
+  - `resp` — `fetch('https://api.resend.com/emails', ...)` çağrısı ile Resend API'ye email gönderim isteği sonucu dönen `Response` nesnesi
+  - `t` — `await resp.text()` ile okunan hata durumunda API yanıt metni; `send_failed` hatası ile birlikte döner
+  - `result` — `await resp.json()` ile parse edilen Resend API başarı yanıtı; `.id` alanı audit kaydında `provider_message_id` olarak kullanılır
+  - `_e` — outer `catch` bloğu parametresi; `Error` ise `.message`, değilse `String(_e)` ile hata mesajı üretilir
+- **Dönüş**: `Response` — JSON gövdeli HTTP yanıtları:
+  - `200 { ok: true, order_id, subject, result }` — başarı
+  - `200 { disabled: true }` — Resend API key eksik
+  - `400 { error: 'missing_fields', missing: [...] }` — `order_id` eksik
+  - `400 { error: 'customer_info_missing' }` — email/ad eksik
+  - `401 { error: 'unauthorized' }` — anonim çağıran
+  - `403 { error: 'forbidden' }` — yetkisiz kullanıcı
+  - `405 { error: 'method_not_allowed' }` — POST dışı method
+  - `500 { error: 'send_failed', body: t }` — email gönderim hatası
+  - `500 { error: msg }` — genel yakalanan hata
 
 ---
 
@@ -1049,6 +1145,7 @@ Bu modül, bir Supabase Edge Function olarak teslimat tamamlandığında otomati
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    index_ts__callerFailure["callerFailure"]
     index_ts__delivery-notification_handler["delivery-notification_handler"]
     index_ts__loadTemplate["loadTemplate"]
     index_ts__render["render"]
@@ -1057,6 +1154,7 @@ graph TD
 ## NODE ID STANDARD
 
   file: supabase\functions\delivery-notification\index.ts
+  function: supabase\functions\delivery-notification\index.ts::callerFailure
   function: supabase\functions\delivery-notification\index.ts::render
   function: supabase\functions\delivery-notification\index.ts::loadTemplate
   function: supabase\functions\delivery-notification\index.ts::delivery-notification_handler
@@ -1064,6 +1162,7 @@ graph TD
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: callerFailure
   export: delivery-notification_handler
   export: loadTemplate
   export: render
@@ -1159,27 +1258,31 @@ Bu modül, bir Supabase Edge Function health-check endpoint'ini temsil eder. Do�
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-callback\index.ts
-skeleton_hash: ba18e38dc5a91e53
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\iyzico-callback\index.ts
+skeleton_hash: c260c26f88f6a678
 entity_hashes:
   func:iyzico-callback_handler: 14b42ca547fc6940
-  overview: 9f60711f4ba6c146
-generated_at: 2026-08-13T07:40:32Z
+  overview: 8d4bc59faa090782
+generated_at: 2026-08-15T09:03:13Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase Edge Function olarak deploy edilmiş bir webhook handler'dır. İyzico ödeme sağlayıcısından gelen callback isteklerini merkezi olarak işler, imza doğrulama ile güvenliği sağlar ve ödeme durumuna göre veritabanı kayıtlarını günceller.
+Bu modül, Supabase Edge Function olarak deploy edilmiş bir webhook endpoint'idir. İyzico ödeme sağlayıcısından gelen callback isteklerini merkezi olarak işler. İmza doğrulama ile güvenliği sağlar, ödeme durumunu ayrıştırır ve veritabanındaki sipariş kayıtlarını buna göre günceller.
 
 ## Fonksiyon Grupları
-### İyzico Callback İşleme
-Gelen webhook isteklerinin imza doğrulaması, ödeme bilgilerinin ayrıştırılması ve ilgili sipariş/kayıt güncellemelerinin yapılması dahil tüm iş akışını yönetir.
+### Webhook İşleme
+Gelen İyzico callback isteklerinin tam yaşam döngüsünü yönetir: imza doğrulama, ödeme bilgilerinin ayrıştırılması ve ilgili sistem kayıtlarının güncellenmesi.
 - iyzico-callback_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel varsayımlar tanımlanabilmektedir. Fonksiyon gövdesi paylaşılmadığından, detaylı akış ve iş mantığına ilişkin aksiyomlar belirlenememiştir.
+Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel varsayımlar tanımlanabilmektedir. Fonksiyon gövdesi paylaşılmadığından, detaylı iş mantığı varsayımları belirlenememiştir.
+
+[Aksiyom 1]: Eğer `req` parametresi istemciden gelen geçerli bir HTTP isteği (Request) nesnesi olarak sağlanmazsa, işleyici (handler) çalışmaz veya hata ile sonuçlanır.
+[Aksiyom 2]: Eğer işleyici başarılı bir şekilde çalışırsa, istemciye (`Response` türünde) bir HTTP yanıtı döndürmek zorundadır.
+[Aksiyom 3]: Eğer istek bir webhook callback'i olarak işlenecekse, işleyicinin işlevsel mantığı (örn. imza doğrulama, veri ayrıştırma) fonksiyon gövdesinde tanımlı olmalıdır, ancak bu mantık imza bilgisinden çıkarılamaz.
 
 ---
 
@@ -1196,7 +1299,7 @@ Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel varsay�
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
-- import: ../_shared/tenant_config.ts::resolveTenantId
+- import: ../_shared/tenant.ts::tenantFromRow
 - import: npm:iyzipay::Iyzipay
 
 ---
@@ -1206,21 +1309,13 @@ Bu modül için yalnızca fonksiyon imzasından çıkarılabilecek temel varsay�
 ### CheckoutRetrieveResponse
 ```typescript
 type CheckoutRetrieveResponse = {
-
   paymentStatus?: string;
-
   conversationId?: string;
-
   errorMessage?: string;
-
   paymentId?: string;
-
   cardFamily?: string;
-
   binNumber?: string;
-
   lastFourDigits?: string;
-
   [k: string]: unk
 ```
 
@@ -1228,40 +1323,53 @@ type CheckoutRetrieveResponse = {
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: iyzico-callback/index.ts::iyzico-callback_handler
-- **params**: `(req)` — gelen HTTP istek nesnesi
-- **ic_degiskenler**:
-  - `resolve` — Promise'ın başarılı tamamlanmasını sağlayan callback fonksiyonu
-  - `reject` — Promise'ın hatalı tamamlanmasını sağlayan callback fonksiyonu
-  - `retrieveReq` — checkout form retrieve isteği için kullanılan istek nesnesi (callback içinde kullanılır)
-  - `err` — sdk.checkoutForm.retrieve callback'inde dönen hata nesnesi, bilinmeyen tipte
-  - `res` — CheckoutRetrieveResponse tipinde, retrieve işleminin başarılı sonucu
+### [N1_NASIL] AST Pointer: supabase/functions/iyzico-callback/index.ts::iyzico-callback_handler
+- **params**: `(req)` — gelen HTTP isteği (Request nesnesi)
+- **ic_degiskenler**: fonksiyon gövdesinin tamamı paylaşımda verilmemiştir; alt parçalarda referanslanan kapsama değişkenleri aşağıda listelenir
+  - `sdk` — Iyzipay SDK örneği, checkoutForm işlemleri için kullanılır
+  - `retrieveReq` — sdk.checkoutForm.retrieve çağrısına verilen istek parametreleri
+  - `orderId` — güncellenecek siparişin ID'si, Supabase filtrelemede kullanılır
+  - `conversationId` — Iyzico conversation ID'si, orderId yoksa filtreleme anahtarıdır
+  - `result` — Iyzico checkoutForm.retrieve yanıt nesnesi, conversationId ve ödeme bilgilerini içerir
+  - `supabaseUrl` — Supabase proje URL'i, REST API çağrıları için temel URL
+  - `serviceRoleKey` — Supabase service role anahtarı, yetkilendirme header'ında kullanılır
+  - `orderTenantFilter` — kiracı bazlı filtre sorgusu, RLS benzeri filtreleme ekler
+  - `debugInfo` — ödeme sürecin_debug bilgisi, payment_debug alanına yazılır
+  - `conversationId` (fallback) — result?.conversationId alınmazsa `conversationId!` non-null assertion ile kullanılır
 - **Dönüş**: `Response` — HTTP yanıt nesnesi
 
-### [N2_NASIL] AST Pointer: iyzico-callback/index.ts::patchStatus
-- **params**: `(newStatus: 'paid' | 'failed' | 'confirmed')` — siparişe atanacak yeni durum değeri
+### [N2_NASIL] AST Pointer: supabase/functions/iyzico-callback/index.ts::patchStatus
+- **params**: `(newStatus: 'paid' | 'failed' | 'confirmed')` — siparişe atanacak yeni ödeme durumu
 - **ic_degiskenler**:
-  - `orderId` — üst kapsamdan gelen sipariş ID'si, filtrelme amaçlı kullanılır (tanımlanmamış ama erişim var)
-  - `result` — retrieve işleminden dönen sonuç nesnesi, conversationId alanı için kullanılır
-  - `conversationId` — üst kapsamdan gelen konuşma ID'si, fallback olarak kullanılır
-  - `tenantId` — üst kapsamdan gelen kiracı/belirteç ID'si, filtre parametresi olarak kullanılır
-  - `supabaseUrl` — üst kapsamdan gelen Supabase API taban URL'i
-  - `serviceRoleKey` — üst kapsamdan gelen Supabase servis rolü anahtarı, yetkilendirme header'larında kullanılır
-  - `debugInfo` — üst kapsamdan gelen hata ayıklama bilgisi, payment_debug alanına yazılır
-  - `filterById` — `orderId` mevcutsa `id=eq.{orderId}` formatında filtre stringi
-  - `filterByConv` — `orderId` yoksa `conversation_id=eq.{value}` formatında filtre stringi
-  - `filter` — `filterById` veya `filterByConv` değerinden biri, geçerli filtre stringi
-  - `resp` — Supabase REST API PATCH isteğinin dönen Response nesnesi
-- **Dönüş**: `Response | null` — PATCH yanıt nesnesi veya filtre yoksa `null`
+  - `filterById` — `orderId` mevcutsa `id=eq.{orderId}` formatında filtre sorgusu oluşturur
+  - `filterByConv` — `orderId` yoksa ve `result?.conversationId` veya `conversationId` mevcutsa `conversation_id=eq.{conversationId}` formatında filtre sorgusu oluşturur
+  - `filter` — `filterById` veya `filterByConv`'dan ilk dolu olanı tutar; her ikisi de boşsa `null` dönülür
+  - `resp` — Supabase REST API PATCH istek yanıtını (Response) tutar
+- **Kapsama (closure) değişkenleri** (fonksiyon gövdesinden erişilen):
+  - `orderId` — filterById filtreleme değeri olarak kullanılır
+  - `result` — `result?.conversationId` optional zincir ile conversationId okunur
+  - `conversationId` — result conversationId'si yoksa fallback olarak kullanılır (non-null assertion)
+  - `orderTenantFilter` — filtre sorgusunun sonuna eklenen kiracı kısıtlaması
+  - `supabaseUrl` — PATCH isteği için temel REST API URL'i
+  - `serviceRoleKey` — Authorization ve apikey header değerleri için kullanılır
+  - `debugInfo` — PATCH body'sinde `payment_debug` alanına yazılır
+- **Dönüş**: `Response | null` — successful PATCH yanıtı veya filtre bulunamazsa `null`
 
-### [N3_NASIL] AST Pointer: iyzico-callback/index.ts::retrieve_callback
+### [N3_NASIL] AST Pointer: supabase/functions/iyzico-callback/index.ts::(resolve, reject) => Promise callback
 - **params**: `(resolve, reject)` — Promise constructor callback parametreleri
 - **ic_degiskenler**:
-  - `retrieveReq` — sdk.checkoutForm.retrieve metoduna geçirilen istek konfigürasyonu nesnesi
-  - `sdk` — Iyzipay SDK örneği, checkout form retrieve işlemi için kullanılır
-  - `err` — retrieve callback'inde dönen hata nesnesi, bilinmeyen (`unknown`) tipte
-  - `res` — `CheckoutRetrieveResponse` tipinde, Iyzico checkout form sonucu
-- **Dönüş**: yok — Promise içinde resolve/reject çağrısı ile sonuç döner
+  - `retrieveReq` — sdk.checkoutForm.retrieve metoduna verilen istek nesnesi
+- **Kapsama (closure) değişkenleri**:
+  - `sdk` — Iyzipay SDK örneği, `sdk.checkoutForm.retrieve` çağrısı yapılır
+- **Dönüş**: `void` — Promise resolve/reject ile sonuçlanır; retrieve başarılıysa `CheckoutRetrieveResponse` resolve edilir, hata varsa reject edilir
+
+### [N4_NASIL] AST Pointer: supabase/functions/iyzico-callback/index.ts::(err, res) => retrieve callback
+- **params**: `(err: unknown, res: CheckoutRetrieveResponse)` — retrieve callback hata ve yanıt parametreleri
+- **ic_degiskenler**: (yok)
+- **Kapsama (closure) değişkenleri**:
+  - `resolve` — Promise resolve fonksiyonu, `res` ile çağrılır
+  - `reject` — Promise reject fonksiyonu, `err` ile çağrılır
+- **Dönüş**: `void` — hata varsa `reject(err)`, başarılıysa `resolve(res)` ile sonuçlanır
 
 ---
 
@@ -1282,29 +1390,26 @@ type CheckoutRetrieveResponse = {
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-payment\index.ts
-skeleton_hash: 179c063d0f71f16e
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\iyzico-payment\index.ts
+skeleton_hash: debf4ca0e0179b96
 entity_hashes:
   func:iyzico-payment_handler: de31c29702dafb3c
-  overview: 10ad7fb56d2cc8ae
-generated_at: 2026-08-13T07:40:32Z
+  overview: e7caf5244e4f3d30
+generated_at: 2026-08-15T09:05:02Z
 ---
 
 ## Genel Bakış
-
-Bu modül, İyzico ödeme altyapısıyla entegre çalışan bir Supabase Edge Function'dır. HTTP istekleri üzerinden ödeme başlatma, iptal etme ve durum sorgulama gibi temel ödeme operasyonlarını merkezi olarak yönetir. Hassas müşteri verilerini (e-posta, adres bilgileri) maskeleyerek güvenli ödeme süreçleri sunar.
+Bu modül, İyzico ödeme altyapısını kullanarak güvenli online ödeme süreçlerini yöneten bir Supabase Edge Function'dır. Tek bir HTTP handler fonksiyonu aracılığıyla, istemciden gelen isteklere göre ödeme başlatma, iptal etme ve durum sorgulama gibi temel finansal operasyonları merkezi ve güvenli bir şekilde yürütür.
 
 ## Fonksiyon Grupları
-
-### Ödeme İşlemi Yönetimi
-Gelen HTTP isteklerini alarak İyzico API'sine uygun ödeme akışlarını yönlendirir. İstek metoduna göre (ödeme başlatma, iptal, durum sorgulama) uygun işlemi başlatır ve sonucu istemciye iletir.
-
-- iyzico_payment_handler
+### HTTP İstek İşleme ve Yönlendirme
+Gelen tüm HTTP isteklerini alarak, istek metoduna ve içeriğine göre ilgili İyzico ödeme işlemini başlatır ve sonucunu istemciye iletir.
+- iyzico-payment_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için özel aksiyom tanımlanmamıştır. Mevcut bilgiler (fonksiyon imzası ve modül sabitleri), modülün doğru çalışması için zorunlu olan koşulları belirlemek için yeterli değildir. Aksiyomlar, fonksiyon gövdesinin analiz edilmesiyle üretilebilir.
+Bu modül için özel aksiyom tanımlanmamıştır.
 
 ---
 
@@ -1325,18 +1430,17 @@ Bu modül için özel aksiyom tanımlanmamıştır. Mevcut bilgiler (fonksiyon i
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
-- import: ../_shared/tenant_config.ts::resolveTenantId
 - import: npm:iyzipay::Iyzipay
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/iyzico-payment/index.ts::maskPaymentMin
-- **params**: `obj` — `PaymentMin` tipinde, ödeme verisi içeren nesne; hassas alanlar maskelenir
-- **ic_degiskenler**: (yok — parametre üzerinde spread + koşullu eşleme yapılır)
-- **Dönüş**: Hassas alanları (`email`, `gsmNumber`, `registrationAddress`, `ip`, `address`) maskelenmiş `PaymentMin` nesnesi; `buyer`, `shippingAddress`, `billingAddress` koşullu olarak eklenir
-- **Closure değişkenleri**: `mask` — metin maskeleyici yardımcı fonksiyon
+### [N1_NASIL] AST Pointer: iyzico-payment/index.ts::maskPaymentInfo
+- **params**: `(obj: PaymentMin)` — Ödeme bilgisi nesnesi
+- **ic_degiskenler**:
+  - yok — Spread operasyonları ile doğrudan dönüş yapılıyor
+- **Dönüş**: Maskelenmiş `PaymentMin` nesnesi (buyer.email, buyer.gsmNumber masked; registrationAddress, ip ve shipping/billing address'ler `'***'` ile değiştirilmiş)
 
 ---
 
@@ -1385,40 +1489,60 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\iyzico-refund\index.ts
-skeleton_hash: e118353a1b4289e0
+skeleton_hash: 3710a32089c2b3d4
 entity_hashes:
+  func:iyziConstructor: 453f90194c6b2913
+  func:iyziLocaleTr: 8f6545591aa2f566
   func:iyzico-refund_handler: b3edad3bb6b5ef11
-  overview: 86377044cea6469b
-generated_at: 2026-08-13T07:40:32Z
+  overview: 37fb019c541fa285
+generated_at: 2026-08-17T11:17:09Z
 ---
 
 ## Genel Bakış
-Bu modül, Supabase Functions ortamında çalışan bir HTTP endpoint'idir. Temel sorumluluğu, iyzico ödeme sistemi üzerinden gelen iade (refund) taleplerini almak, gerekli doğrulamaları yaparak iyzico API'sine iletmek ve işlem sonucunu istemciye bildirmektir.
+Bu modül, Supabase Edge Functions ortamında çalışan bir HTTP endpoint'idir. Temel sorumluluğu, iyzico ödeme sistemi üzerinden gelen iade (refund) taleplerini almak, işlenmek üzere iyzico istemcisini yapılandırmak ve istemciye sonuç döndürmektir.
 
 ## Fonksiyon Grupları
 ### İade İşlem İşleyicisi
-Modülün tüm iş mantığını tek bir işleyicide merkezileştirir. Kimlik doğrulama, alan kontrolleri, iyzico SDK ile API iletişimi ve hata yönetimi adımlarını gerçekleştirerek iade işlemini tamamlar.
+Modülün dışarıya açık olan ve HTTP isteklerini doğrudan alan kısmıdır. Gelen istekleri işleyerek iyzico refund akışını başlatır veya sonuçları sorgular.
 - iyzico-refund_handler
+
+### Yardımcı Fonksiyonlar
+Iyzico entegrasyonu için gerekli olan istemci yapısını oluşturur ve dil ayarlarını yönetir. Bu fonksiyonlar, ana işleyici tarafından çağrılarak iyzico API ile iletişim için gerekli nesneyi ve yapılandırmayı sağlar.
+- iyziConstructor, iyziLocaleTr
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, iyzico ödeme sistemi entegrasyonu ile çalışan bir HTTP endpoint'idir. Fonksiyon imzası ve modül amacına dayanan mimari varsayımlar aşağıdadır.
+Bu modül, iyzico ödeme sistemi entegrasyonu ile çalışan bir Supabase HTTP endpoint'idir.
 
-[Aksiyom 1]: Eğer `req` parametresi geçerli bir HTTP istek nesnesi değilse, istek işlenemez ve işleyici geçersiz giriş hatası döndürür.
+**[Aksiyom 1]**: Eğer `iyziConstructor` fonksiyonuna geçilen `mod` parametresi geçerli bir iyzico SDK modülü değilse, `IyziCtor` türünde geçerli bir constructor nesnesi oluşturulamaz.
 
-[Aksiyom 2]: Eğer iyzico API kimlik bilgileri (API Key, Secret Key, base URL) ortam değişkenlerinde tanımlı değilse, iyzico SDK başlatılamaz ve iade işlemi başarısız olur.
+**[Aksiyom 2]**: Eğer `iyziLocaleTr` fonksiyonuna geçilen `mod` parametresi geçerli bir iyzico locale modülü değilse, Türkçe locale string'i döndürülemez.
 
-[Aksiyom 3]: Eğer istek gövdesinde zorunlu alanlar (örn: iade talebine ilişkin bilgiler) eksikse, işleyici doğrulama hatası ile yanıt verir.
+**[Aksiyom 3]**: Eğer `iyzico-refund_handler` fonksiyonuna geçilen `req` nesnesi geçerli bir HTTP Request (Deno.Request) değilse, `Response` nesnesi üretilemez.
 
-[Aksiyom 4]: Eğer Supabase Edge Functions runtime ortamında iyzico SDK modülü (veya eşdeğeri HTTP istemcisi) yüklü değilse, modül çalışmaz.
+**[Aksiyom 4]**: Eğer `iyzico-refund_handler`受ilesi `Response` türünde bir sonuç dönmezse, `@serve(Deno.serve)` dekoratörü aracılığıyla istemciye geçerli bir HTTP yanıtı iletilemez.
 
-[Aksiyom 5]: Eğer istek kimlik doğrulama bilgisi içermiyorsa veya geçersizse, işleyici yetkilendirme hatası ile yanıt verir.
+**[Aksiyom 5]**: Eğer `iyziConstructor` veya `iyziLocaleTr` çağrılmadan önce `iyzico-refund_handler` çalıştırılırsa, iyzico API iletişimi için gerekli yapılandırma nesneleri hazır olmaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### iyziConstructor
+**Ne yapar**: `npm:iyzipay` paketinden gelen modülün constructor fonksiyonunu alır ve derleyici için güvenli bir `IyziCtor` tipine dönüştürür. Fonksiyon, girdinin beklenen formda (bir constructor fonksiyonu) olup olmadığını kontrol ederek tip dönüşümü öncesinde bir çalışma zamanı doğrulaması yapar.
+**Nasıl yapar**: Fonksiyon, parametre olarak aldığı `mod` değişkeninin `function` türünde olup olmadığını `typeof` operatörü ile kontrol eder. Eğer değilse bir hata fırlatır. Eğer doğru tipteyse, `mod` değişkenini `IyziCtor` türüne tip açımı (type assertion) ile dönüştürür ve döndürür. Bu işlem, eski sürümdeki çift dönüşümü (önce `unknown`'a, sonra hedef tipe) önlemek ve tip güvenliğini artırmak için tasarlanmıştır.
+**Parametreler**:
+- `mod`: `unknown` — `iyzipay` npm paketinden gelen ve bir constructor fonksiyonu olduğu beklenen ham modül nesnesi.
+**Dönüş**: `IyziCtor` — Parametrenin bir fonksiyon olduğu doğrulandıktan sonra, `IyziCtor` arayüzüne güvenli bir şekilde dönüştürülmüş hali. Bu dönüşüm, ilerleyen kodda iyzico API çağrılarının tip güvenli bir şekilde yapılmasını sağlar.
+
+### iyziLocaleTr
+**Ne yapar**: Verilen bir nesneden (`iyzipay` modülü olabilir) Türkçe (`TR`) yerel ayar (locale) değerini çıkarmaya çalışır; eğer değer bulunamazsa veya geçerli bir string değilse varsayılan olarak `'tr'` dizesini döndürür. Bu, API çağrılarında dil parametresinin her zaman tanımlı olmasını garanti eder.
+**Nasıl yapar**: Fonksiyon, `mod` parametresini `null` olabilen ve `LOCALE` özelliğine sahip bir nesne olarak varsayar. Opsiyonel zincirleme (`?.`) kullanarak `mod.LOCALE.TR` değerine erişmeye çalışır. Elde edilen değerin `string` türünde olup olmadığını kontrol eder; eğer böyleyse bu değeri, aksi halde `'tr'` sabit dizgesini döndürür. Bu yaklaşım, `mod` nesnesinin yapısı belirsiz olsa bile hatasız çalışmayı sağlar.
+**Parametreler**:
+- `mod`: `unknown` — Üzerinde `LOCALE.TR` özelliği aranacak nesne (genellikle `iyzipay` modülünün kendisi olabilir). Fonksiyon, bu nesnenin yapısını güvenli bir şekildealgılar.
+**Dönüş**: `string` — Bulunan yerel ayar dizgesi (örn: `"tr"`) veya hiçbir geçerli değer bulunamadığında varsayılan `"tr"` dizgesi. Dönüş değeri her zaman tanımlı ve geçerli bir locale kodudur.
 
 ### iyzico-refund_handler
 **Ne yapar**: HTTP isteklerini alarak iyzico ödeme sistemi üzerinden bir geri ödeme (refund) işlemi başlatır veya bu işlemle ilgili bir durum sorgulaması yapar.
@@ -1431,6 +1555,10 @@ Bu modül, iyzico ödeme sistemi entegrasyonu ile çalışan bir HTTP endpoint'i
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
+- import: ../_shared/refund_guard.ts::claimRefund
+- import: ../_shared/refund_guard.ts::fullCancelKey
+- import: ../_shared/refund_guard.ts::settleRefund
+- import: ../_shared/revenue_alarm.ts::raiseRevenueAlarm
 - import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 - import: npm:iyzipay::Iyzipay
 
@@ -1446,47 +1574,30 @@ type PaymentTransaction = { paymentTransactionId?: string }
 ### PaymentDebug
 ```typescript
 type PaymentDebug = {
-
   refunded_total?: number;
-
   paymentId?: string;
-
   raw?: { paymentId?: string; itemTransactions?: PaymentTransaction[] };
-
   partial_refunds?: { amount: number; at: string }[];
-
   [k: string]: un
 ```
 
-### IyziCancelResponse
+### IyziResponse
 ```typescript
-type IyziCancelResponse = { status?: string; [k: string]: unknown }
-```
-
-### IyziRefundResponse
-```typescript
-type IyziRefundResponse = { status?: string; [k: string]: unknown }
+type IyziResponse = { status?: string; [k: string]: unknown }
 ```
 
 ### IyziSdk
 ```typescript
 type IyziSdk = {
-
   cancel: {
-
     create: (
-
-      req: { locale?: unknown; paymentId: string | null; ip: string },
-
-      cb: (err: unknown, res: IyziCancelResponse) => void
-
+      req: { locale?: unknown; paymentId: string; ip: string },
+      cb: (err: unknown, res: IyziResponse) => void
     ) => void;
-
   };
-
   refund: {
-
-   
+    create: (
+ 
 ```
 
 ### IyziCtor
@@ -1498,75 +1609,52 @@ type IyziCtor = new (args: { apiKey: string; secretKey: string; uri: string }) =
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/iyzico-refund/index.ts::iyzico-refund_handler
-- **params**: `req` — HTTP isteği (Request nesnesi, method, headers, json body içerir)
+### [N1_NASIL] AST Pointer: supabase/functions/iyzico-refund/index.ts::iyziConstructor
+- **params**: `(mod: unknown)` — modül referansı, Iyzipay constructor olup olmadığı kontrol edilir
 - **ic_degiskenler**:
-  - `corsHeaders` — `getCorsHeaders(req)` ile alınan CORS başlık nesnesi
-  - `cors` — `corsHeaders`'ın alias'ı, tekrar atama
-  - `corsHeaders` (yeniden tanımlı) — Manuel oluşturulmuş CORS başlık Record'ı; allowed, origin ile dinamik origin ayarı, OPTIONS/POST metodları
-  - `supabaseUrl` — `Deno.env.get("SUPABASE_URL")` ile alınan Supabase URL'i
-  - `serviceKey` — `Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")` ile alınan servis rol anahtarı
-  - `IYZ_API` — `Deno.env.get("IYZICO_API_KEY")` ile alınan Iyzico API anahtarı
-  - `IYZ_SEC` — `Deno.env.get("IYZICO_SECRET_KEY")` ile alınan Iyzico gizli anahtarı
-  - `IYZ_URI` — `Deno.env.get("IYZICO_BASE_URL")` ile alınan Iyzico base URL'i, varsayılan `"https://sandbox-api.iyzipay.com"`
-  - `body` — `req.json()` ile parse edilmiş istek gövdesi, hata olursa boş obje `{}`
-  - `orderId` — `body?.order_id`, string tipinde sipariş ID'si, zorunlu alan
-  - `amountReq` — `body?.amount`, number tipinde iade tutarı, opsiyonel
-  - `_reason` — `body?.reason`, string tipinde iade sebebi, opsiyonel
-  - `authHeader` — `req.headers.get("authorization")`, Bearer token içeren auth başlığı
-  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile alınan anon key, auth client oluşturulurken kullanılır
-  - `authClient` — `createClient` ile anonKey + authHeader kullanılarak oluşturulmuş Supabase istemcisi
-  - `user` — `authClient.auth.getUser()` ile alınmış authenticated kullanıcı nesnesi (id içerir)
-  - `authErr` — getUser hatası veya null
-  - `reqUserId` — `user.id`, isteği yapan kullanıcının UUID'si
-  - `ordResp` — Supabase REST API ile `venthub_orders` tablosundan sipariş getirme yanıt nesnesi
-  - `orders` — `ordResp.json()` ile parse edilmiş sipariş dizisi
-  - `order` — `orders[0]`, ilk (ve tek beklenen) sipariş kaydı; id, user_id, status, payment_status, total_amount, payment_debug içerir
-  - `isAdmin` — boolean, kullanıcının admin rolünde olup olmadığını tutar
-  - `prof` — Supabase REST API ile `user_profiles` tablosundan rol sorgulama yanıt nesnesi
-  - `arr` — `prof.json()` ile parse edilmiş profil dizisi (admin kontrolü kısmında)
-  - `row` — `arr[0]`, ilk profil satırı; `role` alanını barındırır
-  - `isOwner` — boolean, isteği yapan kullanıcının sipariş sahibi olup olmadığını tutar (`reqUserId === order.user_id`)
-  - `totalAmount` — `Number(order.total_amount) || 0`, siparişin toplam tutarı
-  - `prevDebug` — `order.payment_debug` cast edilmiş `PaymentDebug` nesnesi; önceki ödeme debug bilgileri (refunded_total, paymentId, partial_refunds vb.)
-  - `refundedTotalPrev` — `Number(prevDebug?.refunded_total || 0)`, önceden iade edilen toplam tutar
-  - `payId` — `order.payment_debug.paymentId` veya `order.payment_debug.raw.paymentId`, IyziCo payment ID'si
-  - `transactions` — `order.payment_debug.raw.itemTransactions` dizisi, `PaymentTransaction[]` tipinde; her birinde paymentTransactionId bulunur
-  - `Iyzi` — `Iyzipay`'ın `IyziCtor` tipine cast edilmiş hali, constructor referansı
-  - `sdk` — `new Iyzi({apiKey, secretKey, uri})` ile oluşturulmuş IyziCo SDK örneği; cancel ve refund metodları barındırır
-  - `targetAmount` — iade edilecek tutar; `amountReq` varsa ve sıfırdan büyükse `amountReq`, aksi halde `totalAmount`
-  - `epsilon` — `0.0001`, floating-point karşılaştırma toleransı
-  - `isFull` — boolean; tam iade (cancel) mi yoksa parsiyel iade (refund) mi olduğunu belirler
-  - `iyzResult` — IyziCo API'den dönen `IyziCancelResponse` veya `IyziRefundResponse` sonucu
-  - `LOCALE_TR` — IyziCo locale sabiti, `Iyzipay.LOCALE.TR` veya `'tr'`
-  - `ptx` — `transactions[0].paymentTransactionId`, parsiyel iade için kullanılacak işlem ID'si
-  - `ok` — boolean, `iyzResult.status === 'success'` kontrolü ile API başarısını tutar
-  - `itemsResp` — tam iade yolunda `venthub_order_items` tablosundan sipariş kalemlerini getiren yanıt
-  - `items` — sipariş kalemleri dizisi; her birinde `product_id` ve `quantity` bulunur
-  - `it` — `for...of` döngüsündeki her bir sipariş kalemi
-  - `pResp` — tam iade yolunda `products` tablosundan ürün bilgisi getiren yanıt
-  - `arr` (ürün döngüsü içinde) — ürün sorgulama sonucu dizisi
-  - `cur` — `arr[0]`, mevcut ürün kaydı; `stock_qty` alanını barındırır
-  - `curStock` — `Number(cur?.stock_qty ?? 0)`, ürünün mevcut stok miktarı
-  - `newStock` — `curStock + Number(it.quantity || 0)`, stok iadesi sonrası yeni stok miktarı
-  - `newDebug` — tam iade sonrası güncellenmiş `PaymentDebug` nesnesi; refund_result, refund_type='cancel', refunded_total=totalAmount, manual_refund_applied=true, manual_refund_applied_at Zeitstempelı içerir
-  - `newStatus` — tam iade sonrası sipariş durumu; shipped/delivered ise korunur, aksi halde `'cancelled'`
-  - `partials` — `prevDebug.partial_refunds` dizisi, önceki parsiyel iade kayıtları
-  - `newRefundedTotal` — `refundedTotalPrev + targetAmount`, güncellenmiş toplam iade tutarı
-  - `newStatusPayment` — parsiyel iade sonrası payment_status; toplam iade tutarı sipariş tutarına eşit ise `'refunded'`, aksi halde `'partial_refunded'`
-  - `dbg` — parsiyel iade sonrası güncellenmiş `PaymentDebug` nesnesi; refund_result, refund_type='refund', refund_amount, refunded_total, partial_refunds güncellenmiş dizi içerir
-- **Dönüş**: `Response` — HTTP yanıt nesnesi; farklı durumlarda JSON body ile 200, 400, 401, 403, 404, 405, 500, 502 durum kodları döner. Başarılı tam iade durumunda `{ status: 'refunded', type: 'cancel', amount, order_id }`, parsiyel iade durumunda `{ status, type: 'refund', amount, refunded_total, order_id }`, zaten iade edilmişse `{ status: 'already_refunded', order_id }` döner. Yan etkiler: IyziCo API çağrısı (cancel/refund), stok güncelleme (tam iade yolunda), sipariş durumu ve payment_debug güncelleme.
+  - *(yok — fonksiyon gövdesinde yerel değişken tanımlanmaz, doğrudan kontrol ve return yapılır)*
+- **Dönüş**: `IyziCtor` — modül bir function ise cast edilerek Iyzipay constructor olarak döner; değilse `Error` fırlatır
+
+### [N2_NASIL] AST Pointer: supabase/functions/iyzico-refund/index.ts::iyziLocaleTr
+- **params**: `(mod: unknown)` — modül nesnesi, LOCALE.TRA erişilmeye çalışılır
+- **ic_degiskenler**:
+  - `locale` — `(mod as { LOCALE?: { TR?: string } } | null)?.LOCALE?.TR` ifadesinden çıkarılan yerel ayar stringi; string değilse `undefined` kalır
+- **Dönüş**: `string` — `locale` string ise o değer, değilse `'tr'` default'u döner
+
+### [N3_NASIL] AST Pointer: supabase/functions/iyzico-refund/index.ts::iyzico-refund_handler
+- **params**: `(req)` — gelen HTTP istek nesnesi (Deno.serve tarafından sağlanır)
+- **ic_degiskenler** *(anonim callback gövdelerinde referans edilen dış kapsam değişkenleri)*:
+  - `sdk` — Iyzipay SDK instance; `sdk.cancel.create()` ve `sdk.refund.create()` çağrılarında kullanılır
+  - `LOCALE_TR` — Türkçe locale sabiti; cancel ve refund API çağrılarında `locale` parametresine iletilir
+  - `payId` — `string` olarak cast edilen payment ID; cancel işleminde `paymentId` parametresine kullanılır
+  - `callerIp` — istemci IP adresi; hem cancel hem refund çağrılarında `ip` parametresine iletilir
+  - `ptx` — `string` olarak cast edilen payment transaction ID; refund işleminde `paymentTransactionId` parametresine kullanılır
+  - `targetAmount` — iade edilecek tutar; `String(targetAmount)` ile string'e çevrilip refund'un `price` parametresine iletilir
+- **Dönüş**: `Response` — HTTP yanıt nesnesi; iade/iptal işlemi sonucu döner *(fonksiyon gövdesinin tamamı görünmediği için dönüş mantığı fragment'lardan türetilmiştir)*
 
 ---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    index_ts__iyziConstructor["iyziConstructor"]
+    index_ts__iyziLocaleTr["iyziLocaleTr"]
+    index_ts__iyzico-refund_handler["iyzico-refund_handler"]
+```
 
 ## NODE ID STANDARD
 
   file: supabase\functions\iyzico-refund\index.ts
+  function: supabase\functions\iyzico-refund\index.ts::iyziConstructor
+  function: supabase\functions\iyzico-refund\index.ts::iyziLocaleTr
   function: supabase\functions\iyzico-refund\index.ts::iyzico-refund_handler
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: iyziConstructor
+  export: iyziLocaleTr
   export: iyzico-refund_handler
 
 ---
@@ -1576,41 +1664,38 @@ type IyziCtor = new (args: { apiKey: string; secretKey: string; uri: string }) =
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\log-client-error\index.ts
-skeleton_hash: 60f03cb097186ff2
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\log-client-error\index.ts
+skeleton_hash: d40202c9d638d96f
 entity_hashes:
   func:log-client-error_handler: cec12c49f3b9435f
-  overview: 4c2fb15476c4ecf3
-generated_at: 2026-08-13T07:40:32Z
+  overview: 38ce599da378ec18
+generated_at: 2026-08-15T07:33:59Z
 ---
 
 ## Genel Bakış
-Bu modül, istemci uygulamalarında oluşan hataları merkezi olarak toplayan ve kaydeden bir Supabase Edge Function'dur. Gelen HTTP isteklerinden hata verisini çıkarır, doğrular ve kalıcı bir şekilde depolar, ardından sonucu istemciye bildirir.
+Bu modül, istemci tarafı uygulamalarda oluşan hataların merkezi olarak toplanmasını ve kaydedilmesini sağlayan bir Supabase Edge Function'dır. Gelen HTTP istekleri aracılığıyla hata verisini alır, doğrular ve veritabanına kalıcı olarak yazarak hata izleme ve teşhis süreçlerini destekler.
 
 ## Fonksiyon Grupları
-### Hata İşleme ve Yanıt Oluşturma
-Gelen hata raporunu işleyen tek işleyici; istek gövdesindeki veriyi doğrulayıp veritabanına yazar ve uygun HTTP yanıtını döndürerek sürecin tamamını yönetir.
+### Hata Kayıt İşleyicisi
+Gelen hata raporu isteklerini işleyen ve yanıt oluşturan tek sorumlu bileşen; istek gövdesinden hata verisini çıkarıp doğrular, Supabase veritabanına yazar ve istemciye durum bildirimi döndürür.
 - log_client_error_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, istemci hatalarını almak için bir HTTP endpoint'idir ve `clientErrorSchema` kullanarak gelen veriyi doğrular.
 
-Bu modül, istemci hatalarını toplayan bir Supabase Edge Function olup, HTTP istek-tabanlı bir işleyici yapısına sahiptir.
+[Aksiyom 1]: Eğer istek gövdesi (`req.body`) JSON formatında ayrıştırılamıyorsa, istek reddedilir (HTTP 400 Bad Request).
 
-**[Aksiyom 1]**: Eğer geçerli bir `Request` nesnesi fonksiyona sağlanmazsa, işleyici işlevsiz kalır ve uygun hata yanıtı dönmez.
+[Aksiyom 2]: Eğer istek gövdesi `clientErrorSchema` ile doğrulanamıyorsa, istek reddedilir (HTTP 400 Bad Request).
 
-**[Aksiyom 2]**: Eğer `clientErrorSchema` tanımlı değilse veya modülün çalıştırılabilir ortamında mevcut değilse, istek gövdesinin doğrulanması başarısız olur.
+[Aksiyom 3]: Eğer istek yöntemi (`req.method`) POST değilse, istek reddedilir (HTTP 405 Method Not Allowed).
 
-**[Aksiyom 3]**: Eğer istek gövdesi (`req.body`) okunamaz veya_PARSE_edilemezse (örn: geçersiz JSON), hata kaydı gerçekleştirilemez.
+[Aksiyom 4]: Eğer veritabanına yazma işlemi başarısız olursa, sunucu hatası yanıtı dönülür (HTTP 500 Internal Server Error).
 
-**[Aksiyom 4]**: Eğer `clientErrorSchema` çağrısı (`(call)`) başarısız olursa (geçersiz hata verisi yapısı), modül kalıcı depolamaya yazma işleminden önce reddeder.
+[Aksiyom 5]: Eğer `clientErrorSchema` tanımı (çağrısı) başarısız olursa veya geçerli bir doğrulama şeması sağlanamıyorsa, modül herhangi bir isteği başarıyla işleyemez.
 
-**[Aksiyom 5]**: Eğer kalıcı depolama (Supabase veritabanı) erişilebilir durumda değilse veya yazma işlemi başarısız olursa, istemciye hata durumu bildirilir.
-
-**[Aksiyom 6]**: Eğer istek CORS politikalarını ihlal ediyorsa (örn: izin verilmeyen Origin), işlenmeden önce reddedilebilir — bu durum Supabase Edge Function ortamına bağlıdır.
-
-**[Aksiyom 7]**: Eğer `req` nesnesinde HTTP metodu işleyici tarafından desteklenmiyorsa (örn: OPTIONS dışında bir yöntem), uygun HTTP durum kodu ile yanıt dönülür.
+[Aksiyom 6]: Eğer istek gövdesindeki veri `clientErrorSchema` tarafından tanımlanan alanları içermiyorsa (eksik alanlar), istek reddedilir (HTTP 400 Bad Request).
 
 ---
 
@@ -1631,16 +1716,14 @@ Bu modül, istemci hatalarını toplayan bir Supabase Edge Function olup, HTTP i
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
-- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 - import: https://esm.sh/zod@3.23.8::z
 
 ---
 
 ## SABİTLER
 - **clientErrorSchema** (call) — `z.object({
-
   msg: z.string().default(''),
-
   stack: z.string().default(''),
 ...`
 
@@ -1649,47 +1732,51 @@ Bu modül, istemci hatalarını toplayan bir Supabase Edge Function olup, HTTP i
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: supabase/functions/log-client-error/index.ts::log-client-error_handler
-- **params**: (req: Request)
+- **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `corsHeaders` — CORS başlıklarını istekten elde eden fonksiyonun dönüş değeri
-  - `cors` — CORS başlıkları nesnesi, istek için erişim izinlerini tanımlar
-  - `requestId` — Benzersiz istek tanımlayıcısı, crypto.randomUUID() veya Date.now() ile üretilir
-  - `supabaseUrl` — Deno ortam değişkeninden alınan Supabase proje URL'i
-  - `serviceRoleKey` — Deno ortam değişkeninden alınan Supabase servis rol anahtarı
-  - `allowedOrigins` — ALLOWED_ORIGINS ortam değişkeninden split edilerek oluşturulan izin verilen origin listesi
-  - `originHeader` — İstekten alınan 'origin' başlık değeri
-  - `originToCheck` — Kontrol edilecek origin, önce header'dan, yoksa referer'dan alınır
-  - `requireAuth` — REQUIRE_AUTH ortam değişkeninden okunan boolean değer, kimlik doğrulama zorunluluğunu belirler
-  - `supabase` — createClient ile oluşturulan Supabase istemcisi
-  - `authHeader` — İstekten alınan authorization başlık değeri
-  - `accessToken` — authHeader'dan slice ile çıkarılan Bearer token
-  - `authData` — supabase.auth.getUser çağrısının dönüşündeki data nesnesi
-  - `authErr` — supabase.auth.getUser çağrısının dönüşündeki error nesnesi
-  - `rawBody` — req.json() ile parse edilen ham istek gövdesi
-  - `parsed` — clientErrorSchema.safeParse ile doğrulanmış veri
-  - `payload` — parsed.data'dan gelen doğrulanmış hata verisi
-  - `mask` — PII маскировlama için iç fonksiyon, email ve uzun string'leri maskeler
-  - `firstLine` — payload.stack'in ilk satırı, hata izini temsil eder
-  - `urlObj` — payload.url'den oluşturulmaya çalışılan URL nesnesi
-  - `_path` — urlObj pathname değeri, istek yolunu temsil eder
-  - `signature` — Hata gruplandırma için imza, msg, firstLine ve _path'in maskelenmiş birleşimidir
-  - `groupId` — error_groups tablosundan upsert ile elde edilen grup ID'si
-  - `groupPayload` — error_groups tablosuna upsert edilecek nesne
-  - `upsertRow` — error_groups upsert çağrısının dönüşündeki satır verisi
-  - `q` — signature ile error_groups tablosundan ID sorgulama sonucu
-  - `dedupSeconds` — DEDUP_SECONDS ortam değişkeninden okunan saniye cinsinden dedup penceresi
-  - `since` — dedupSeconds kullanılarak hesaplanan ISO tarih stringi
-  - `recent` — client_errors tablosundan son dedupSeconds içindeki aynı gruba ait hatalar
-  - `row` — client_errors tablosuna insert edilecek satır verisi
-  - `error` — client_errors insert çağrısının dönüşündeki hata nesnesi
-  - `msg` — error nesnesinden çıkarılan hata mesajı stringi
-  - `level` — payload.level değerinden alınan hata seviyesi stringi
-  - `env` — payload.env değerinden alınan ortam bilgisi stringi
-  - `notifyEnabled` — SLACK_WEBHOOK_URL ortam değişkeninin varlığını kontrol eden boolean
-  - `isCritical` — level'ın 'fatal' veya 'error' olup olmadığını belirleyen boolean
-  - `shortMsg` — payload.msg'nin ilk 200 karakteri, Slack bildirimi için kısaltılmış mesaj
-  - `fields` — Slack bildirimi için alanlar dizisi (signature, level, env, URL, request-id)
-- **Dönüş**: `Response` — HTTP yanıt nesnesi, farklı durumlarda değişik status kodları ile döner
+  - `corsHeaders` — getCorsHeaders(req) çağrısıyla elde edilen CORS başlıkları
+  - `cors` — corsHeaders değişkeninin takma adı (alias)
+  - `requestId` — crypto.randomUUID() veya Date.now() ile üretilen benzersiz istek tanımlayıcısı
+  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile okunan Supabase servis URL'i
+  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile okunan servis rol anahtarı
+  - `allowedOrigins` — Deno.env.get('ALLOWED_ORIGINS') virgülle ayrılmış izin verilen origin listesi, split/map/filter ile temizlenmiş
+  - `originHeader` — req.headers.get('origin') ile gelen Origin başlığı
+  - `originToCheck` — kontrol edilecek origin; originHeader yoksa referer'dan URL.parse ile türetilir
+  - `ref` — req.headers.get('referer') ile gelen referer başlığı
+  - `requireAuth` — Deno.env.get('REQUIRE_AUTH') değerinden türetilen boolean; true ise yetkilendirme zorunlu
+  - `supabase` — createClient(supabaseUrl, serviceRoleKey) ile oluşturulan Supabase istemcisi
+  - `authHeader` — req.headers.get('authorization') veya req.headers.get('Authorization') ile gelen yetkilendirme başlığı
+  - `accessToken` — authHeader içinden 'Bearer ' ön ekini atarak çıkarılan token
+  - `authData` — supabase.auth.getUser(accessToken) sonucundaki data nesnesi
+  - `authErr` — supabase.auth.getUser(accessToken) sonucundaki hata nesnesi
+  - `rawBody` — req.json() ile okunan ham istek gövdesi, parse edilemezse null
+  - `parsed` — clientErrorSchema.safeParse(rawBody) ile Zod doğrulama sonucu
+  - `payload` — parsed.data; Zod doğrulamasından geçmiş güvenli veri nesnesi
+  - `mask` — inline arrow fonksiyon; stringleri 4000 karakterle kısaltıp email ve uzun token'ları maskeleyen sanitizasyon fonksiyonu
+  - `firstLine` — payload.stack değerinin ilk satırı (stack trace'in ilk çizgisi)
+  - `urlObj` — payload.url değerinden URL nesnesi oluşturulmaya çalışılır, başarısızsa null
+  - `_path` — urlObj.pathname veya boş string; hata imzası için URL yolu
+  - `signature` — msg + firstLine + _path bileşenlerinden maskelenmiş ve birleştirilmiş hata imzası (error_groups tablosunda onConflict anahtarı)
+  - `groupId` — upsert veya select ile bulunan error_groups tablosu satır ID'si; bulunamazsa null
+  - `groupPayload` — error_groups tablosuna upsert edilecek nesne (signature, level, last_message, url_sample, env, release, last_seen alanları)
+  - `upsertRow` — error_groups tablosuna upsert sonrası select('id') ile dönen satır
+  - `q` — groupId bulunamadığda signature ile error_groups tablosundan select('id') sorgu sonucu
+  - `dedupSeconds` — Deno.env.get('DEDUP_SECONDS') değerinden parseInt ile okunan dedup pencere süresi (saniye cinsinden)
+  - `since` — dedup kontrolü için Date.now() - dedupSeconds*1000 hesaplanmış ISO zaman damgası
+  - `recent` — client_errors tablosundan group_id ve at filtresiyle son dedup süresi içindeki kayıtlar (id, at alanları)
+  - `row` — client_errors tablosuna insert edilecek tüm alanları içeren kayıt nesnesi (at, url, message, stack, user_agent, release, env, level, extra, opsiyonel group_id)
+  - `error` — supabase.from('client_errors').insert(row) sonucundaki hata nesnesi
+  - `msg` — insert hatasından veya outer catch'ten türetilen hata mesajı stringi
+  - `level` — payload.level değerinden türetilen küçük harfli hata seviyesi
+  - `env` — payload.env değerinden türetilen ortam bilgisi stringi
+  - `notifyEnabled` — SLACK_WEBHOOK_URL env var'ının boş olup olmadığına göre boolean
+  - `isCritical` — level değerinin 'fatal' veya 'error' olup olmadığına göre boolean
+  - `shortMsg` — payload.msg değerinden 200 karaktere kısaltılmış mesaj
+  - `fields` — slackNotify fonksiyonuna aktarılacak alanlar dizisi (Signature, Level, Env, URL, Request-Id)
+  - `_e` — outer try-catch bloğunda yakalanan hata nesnesi
+- **Dinamik import**: `../_shared/notify.ts` → `slackNotify` fonksiyonu (Slack webhook ile bildirim gönderir, sadece kritik seviyelerde ve notifyEnabled ise çağrılır; ayrıca outer catch bloğunda hata bildirimi için de import edilir)
+- **Yan etkiler**: Supabase veritabanına `error_groups` tablosuna upsert, `client_errors` tablosuna insert, `increment_error_group_count` RPC çağrısı; opsiyonel Slack webhook bildirimi
+- **Dönüş**: `Response` — başarı durumunda 200 'ok', hata durumlarında 400/401/403/405/500 ile JSON hata mesajı
 
 ---
 
@@ -1711,56 +1798,60 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\notification-service\index.ts
-skeleton_hash: fc7dd8f3a0f6d4a5
+skeleton_hash: 377373eb700c54bd
 entity_hashes:
-  func:formatTemplate: 77c1ba2f1d414d11
+  func:callerFailure: c2855766de0bfe8b
+  func:formatTemplate: 36d51a549d587400
   func:notification-service_handler: dc7fd5d96878185c
-  func:sendEmail: d1bf521769c184e8
-  func:sendSMS: 569d0e2e89431898
-  func:sendWhatsApp: 79c6e69b836b3ef4
-  overview: 71e4dfd3d4c33151
-generated_at: 2026-08-13T07:40:32Z
+  func:sendEmail: 3b14fffe2f71320a
+  func:sendSMS: ac40e3c349cc9550
+  func:sendWhatsApp: 5493a673e140abb2
+  overview: c0915b77cd91b2b7
+generated_at: 2026-08-17T11:36:32Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase edge function olarak HTTP isteklerini karşılayan bildirim servisidir. WhatsApp, SMS ve e-posta olmak üzere üç farklı kanal üzerinden mesaj gönderimi sunar. İstek parametrelerine göre uygun kanalı seçer, gerekirse şablonları dinamik verilerle doldurur ve ilgili servis sağlayıcıya iletir.
+Bu modül, bir Supabase edge function olarak hizmet veren merkezi bir bildirim servisidir. Tek bir HTTP giriş noktası üzerinden WhatsApp, SMS ve e-posta olmak üzere üç farklı kanala mesaj gönderimi sağlar. İstekleri işler, uygun iletişim kanalını seçer, mesaj içeriklerini şablonlar ile kişiselleştirir ve sonuçları standart bir format ile döndürür.
 
 ## Fonksiyon Grupları
-### İstek Yönetimi
-Gelen HTTP isteklerini işleyen ana giriş noktasıdır. İstek içeriğini ayrıştırarak hangi bildirim kanalının kullanılacağını belirler ve ilgili gönderme fonksiyonunu çağırır.
-- notification-service_handler
+### İstek Yönetimi ve Hata İşleme
+Gelen HTTP isteklerini karşılayan ana işleyicidir. İstek verilerini ayrıştırır, gerekli kanal ve parametreleri belirler ve oluşabilecek hataları merkezi bir hata nesnesine dönüştürerek istemciye döner.
+- notification-service_handler, callerFailure
 
-### Kanal Bazlı Bildirim Gönderimi
-Farklı iletişim kanalları üzerinden mesaj iletmekten sorumlu fonksiyonlardır. Her biri ilgili servis sağlayıcıya bağlanarak mesajı hedef kullanıcıya iletir.
+### Kanal Bazlı Mesaj Gönderimi
+Her biri farklı bir harici servis (ör. Twilio, bir e-posta sağlayıcısı) ile entegre çalışan gönderim fonksiyonlarıdır. Hedef, mesaj içeriği ve servis yapılandırmasını alarak doğrudan ilgili iletişim kanalı üzerinden teslimatı gerçekleştirir.
 - sendWhatsApp, sendSMS, sendEmail
 
-### Şablon Doldurma
-Bildirim içeriklerindeki yer tutucuları gerçek verilerle değiştiren yardımcı fonksiyondur. Kişiselleştirilmiş mesajlar hazırlanırken gönderme fonksiyonları tarafından iç çağrı olarak kullanılır.
+### İçerik Hazırlama
+Mesaj metinlerindeki dinamik yer tutucuları, sağlanan veri nesnesindeki değerlerle eşleştirerek kişiselleştirilmiş ve nihai metni oluşturan yardımcı fonksiyondur. Gönderim öncesinde metin hazırlığının merkezi noktasıdır.
 - formatTemplate
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, HTTP isteklerini alarak WhatsApp, SMS ve e-posta gibi farklı iletişim kanallarına mesaj gönderen merkezi bir bildirim servisidir. Doğru çalışması için, isteklerin doğru formatlanması, gerekli yapılandırmaların sağlanması ve harici servislerin erişilebilir olması gerekmektedir.
 
-Bu modül için varsayımlar, fonksiyon imzaları ve modül sabitlerinden yola çıkılarak çıkarılmıştır.
+[Aksiyom 1]: Eğer `notification-service_handler` fonksiyonuna geçerli bir HTTP isteği (Request)到达mazsa, modül uygun bir hata yanıtı (callerFailure ile) dönemez veya istek başarısız olur.
 
-**[Aksiyom 1]:** Eğer `notification-service_handler` fonksiyonuna geçilen `req` nesnesi geçerli bir HTTP isteği (Request) nesnesi değilse (örn. `null`, `undefined` veya yanlış tipteyse), istek ayrıştırılamaz ve modül temel işlevini yerine getiremez; bu durumda istemciye hata yanıtı dönmelidir.
+[Aksiyom 2]: Eğer `sendWhatsApp`, `sendSMS` veya `sendEmail` fonksiyonları için Twilio veya e-posta API yapılandırması (ilgili `config` parametresi) sağlanmazsa, mesaj gönderimi başarısız olur veya varsayılan yapılandırma kullanılamaz.
 
-**[Aksiyom 2]:** Eğer `sendWhatsApp`, `sendSMS` veya `sendEmail` fonksiyonlarından herhangi biri çağrıldığında `to` parametresi boş bir string (`""`) veya `undefined` ise, mesaj hedeflenen kişiye ulaştırılamaz ve ilgili servis sağlayıcı tarafında hata oluşur.
+[Aksiyom 3]: Eğer `formatTemplate` fonksiyonu, beklenen formatta olmayan bir şablon veya veri tipiyle (data) çağrılırsa, hatalı bir çıktı üretir veya hata fırlatır.
 
-**[Aksiyom 3]:** Eğer `sendWhatsApp` fonksiyonu `template` parametresi ile çağrılıyorsa, `_data` parametresinin (eğer sağlanmışsa) şablondaki değişken alanlarıyla uyumlu olması gerekir; aksi halde `formatTemplate` fonksiyonu beklenmeyen bir çıktı üretebilir veya şablon düzgün doldurulamaz.
-
-**[Aksiyom 4]:** Eğer `sendEmail` fonksiyonu `config` parametresi ile çağrılıyorsa, `config.apiKey` alanının sağlanması zorunludur; aksi halde e-posta servis sağlayıcısına (örn. SendGrid, Mailgun vb.) kimlik doğrulama yapılamaz ve e-posta gönderimi başarısız olur.
-
-**[Aksiyom 5]:** Eğer `sendWhatsApp` veya `sendSMS` fonksiyonu `config` (TwilioConfig) parametresi olmadan çağrılıyorsa (varsayılan değer `undefined` ise), Twilio API凭据ları dış bir kaynaktan (örn. ortam değişkenleri) sağlanmalıdır; aksi halde Twilio servisine bağlanılamaz ve mesaj gönderilemez.
-
-**[Aksiyom 6]:** Eğer `notification-service_handler` isteği işlerken geçersiz bir `channel` değeri (örn. `sendWhatsApp`, `sendSMS`, `sendEmail` dışında bir değer) alıysa, modül tanımsız bir kanal için işlem yapamaz ve hata döndürmelidir.
-
-**[Aksiyom 7]:** Eğer `_stockAlertTemplates` modül sabiti bir sözlük (object) olarak tanımlı değilse veya beklenen şablon anahtarlarını içermiyorsa, `formatTemplate` fonksiyonu stok uyarı şablonlarını bulamaz ve formatlama işlemi başarısız olur
+[Aksiyom 4]: Eğer `_stockAlertTemplates` sabiti tanımlı değilse veya er
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### callerFailure
+**Ne yapar**: Kapi hatalarini ( TenantMismatchError, CallerConfigError, CallerLookupError ) eslesme bir HTTP durum kodu ve anlamlı bir hata mesajina donusturerek API yanitlarini standartlastirir. Bu, servis katmanindan gelen ozel siniflarin istemcilere uygun sekilde iletilmesini saglayan bir hata haritasi gorevi gorur.
+
+**Nasil yapar**: Gelen `error` nesnesi `instanceof` operatoru ile sirayla uclu ozel hata sinifina karsilik getirilir. Eslesme olursa onceden tanimli status kodu (403, 500 veya 503) ve ilgili hata anahtari (ornegin 'tenant_mismatch') birlikte dondurulur. Hicbir sinifla eslesme olmazsa `null` dondurulerek hatanin bu fonksiyon tarafindan islenmedigi belirtilir; boylece ust katmandaki genel hata yakalama mekanizmasi devreye girebilir.
+
+**Parametreler**:
+- error: unknown — Islenmesi gereken hata nesnesi. Farkli hata siniflarindan biri olabilir veya taninmayan bir hata olabilir.
+
+**Donus**: `{ status: number; error: string } | null` — Eger gelen hata taninmis bir sinifsa, ilgili HTTP durum kodunu ve standartlastirilmis hata mesajini iceren bir nesne; aksi takdirde `null`.
 
 ### notification-service_handler
 **Ne yapar**: Bu fonksiyon, HTTP isteklerini alarak bildirim servisinin ana işleyişini yöneten giriş noktasıdır (handler). Gelen isteğe göre doğru bildirim kanalını (WhatsApp, SMS veya e-posta) seçip ilgili gönderim fonksiyonunu çağırarak işlemi koordine eder.
@@ -1770,52 +1861,62 @@ Bu modül için varsayımlar, fonksiyon imzaları ve modül sabitlerinden yola �
 **Dönüş**: Response — İşlemin sonucunu (başarı/hata durumu) içeren HTTP yanıt nesnesi.
 
 ### sendWhatsApp
-**Ne yapar**: Belirtilen alıcıya Twilio API'si üzerinden bir WhatsApp mesajı gönderir. İsteğe bağlı olarak bir mesaj şablonunu ve değişken verilerini kullanarak kişiselleştirilmiş mesajlar oluşturabilir.
-**Nasıl yapar**: Fonksiyon, yapılandırma nesnesindeki (config) Twilio hesap bilgileriyle (accountSid, authToken, fromNumber) bir Basic Auth başlığı oluşturur. Alıcı numarasını `whatsapp:` önekine sahip olacak şekilde formatlar. Eğer bir şablon ve veri sağlandıysa, `formatTemplate` fonksiyonunu kullanarak son mesajı oluşturur. Ardından, Twilio'nun Messages endpoint'ine POST isteği göndererek mesajı iletir ve API yanıtını döndürür.
+**Ne yapar**: Twilio API'sini kullanarak belirtilen telefona WhatsApp uzerinden bir mesaj veya sablon gonderir. Iletisim kanali olarak WhatsApp'i secen uygulamalar icin temel gonderim fonksiyonudur.
+
+**Nasil yapar**: Oncelikle `config` icindeki Twilio hesap bilgilerinin (accountSid, authToken, fromNumber) varligini kontrol eder; eksikse hata firlatir. Eger bir `template` ve ilgili `data` saglanmissa, `formatTemplate` yardimiyla mesajin nihali olusturulur; aksi takdirde dogrudan `message` kullanilir. Alici telefon numarasi WhatsApp formatinda degistirilir (gerekirse 'whatsapp:' on ekini ekler). Ardindan Twilio'nun Messages endpoint'ine Base64 kodlanmis kimlik dogrulamasi ile POST istegi atilir. Istek basarisiz olursa API'den donen hata metni ile birlikte bir Error firlatilir; basarili olursa Twilio'nun JSON yaniti dondurulur.
+
 **Parametreler**:
-- `to`: string — Mesajın gönderileceği alıcının WhatsApp numarası (örn: `+1234567890`).
-- `message`: string — Gönderilecek düz metin mesajı. Şablon kullanılmadığında doğrudan gönderilir.
-- `template?`: string (isteğe bağlı) — Değişken içeren mesaj şablonu (örn: `Merhaba {{name}}, durumunuz: {{status}}`).
-- `_data?`: TemplateData (isteğe bağlı) — Şablondaki `{{değişken}}` alanlarını doldurmak için kullanılacak anahtar-değer çiftlerini içeren nesne.
-- `config?`: TwilioConfig (isteğe bağlı) — Twilio API kimlik bilgilerini (`accountSid`, `authToken`, `fromNumber`) içeren yapılandırma nesnesi.
-**Dönüş**: Promise<any> — Twilio API'sinden dönen JSON yanıtını çözer ve döndürür. Başarılı gönderimde mesaj bilgilerini içerir.
+- to: string — Alici telefon numarasi. 'whatsapp:' on eki ile veya olmadan saglanabilir; fonksiyon tarafindan gerekli format duzeltmesi yapilir.
+- message: string — Gonderilecek mesaj icerigi. Sablon kullanilmiyorsa dogrudan bu metin gonderilir.
+- template: string (istege bagli) — Degisken iceren sablon metni. Ornegin "Merhaba {{name}}, siparisiniz hazir." gibi. Saglanirsa `data` ile birlikte formatlanarak kullanilir.
+- data: TemplateData (istege bagli) — Sablon icindeki {{key}} ifadelerinin yerine konacak degerlerin eslesmesi. Ayrica 'subject', 'emailFrom' gibi ek alanlari da iceren genisletilmis veri yapisi.
+- config: TwilioConfig (istege bagli) — Twilio API kimlik bilgileri ve gonderici numarasi. accountSid, authToken ve fromNumber alanlarini icerir.
+
+**Donus**: Twilio API'sinden donen JSON yaniti. Gonderim basarili ise mesaj detaylarini, basarisiz ise bir Error firlatilir.
 
 ### sendSMS
-**Ne yapar**: Twilio API'si kullanarak belirli bir alıcıya bir Short Message Service (SMS) metni gönderir.
-**Nasıl yapar**: `sendWhatsApp` fonksiyonuna çok benzer bir mantıkla çalışır, ancak alıcı numarasına `whatsapp:` eki eklemez ve Twilio'nun SMS endpoint'ine doğrudan POST isteği gönderir. Yapılandırma nesnesindeki Twilio bilgilerini kullanarak Basic Auth ile kimlik doğrulaması yapar ve mesajı iletir.
+**Ne yapar**: Twilio API'sini kullanarak belirtilen telefona klasik bir SMS mesaji gonderir. WhatsApp yerine dogrudan SMS kanalini tercih eden senaryolar icin kullanilir.
+
+**Nasil yapar**: `config` parametresindeki Twilio hesap bilgilerinin (accountSid, authToken, fromNumber) zorunlu oldugunu dogrular; eksikse hata firlatir. Dogrudan `to` ve `message` degerleri kullanilarak Twilio'nun Messages endpoint'ine Base64 kodlanmis kimlik dogrulamasi ile POST istegi gonderilir. Isteğin HTTP durum kodu kontrol edilir; basarisizsa API hata metni ile birlikte bir Error firlatilir; basarili ise Twilio'nun JSON yaniti dondurulur. Bu fonksiyon sablon isleme icermez, ham mesaji dogrudan gonderir.
+
 **Parametreler**:
-- `to`: string — SMS'in gönderileceği alıcının telefon numarası (örn: `+1234567890`).
-- `message`: string — Gönderilecek metin mesajı.
-- `config`: TwilioConfig — Twilio API kimlik bilgilerini (`accountSid`, `authToken`, `fromNumber`) içeren zorunlu yapılandırma nesnesi.
-**Dönüş**: Promise<any> — Twilio API'sinden dönen JSON yanıtını çözer ve döndürür. Gönderilen mesajın SID'si gibi bilgileri içerir.
+- to: string — Alici telefon numarasi. Uluslararasi formatta (ornegin +90...) olmalidir.
+- message: string — Gonderilecek SMS metni.
+- config: TwilioConfig — Twilio API kimlik bilgileri ve gonderici numarasi. accountSid, authToken ve fromNumber alanlarini zorunlu olarak icerir.
+
+**Donus**: Twilio API'sinden donen JSON yaniti. Gonderim basarili ise mesaj detaylarini, basarisiz ise bir Error firlatilir.
 
 ### sendEmail
-**Ne yapar**: Resend API'si kullanarak belirtilen alıcıya bir e-posta gönderir. Düz metin veya HTML formatında mesaj gönderebilir ve isteğe bağlı olarak değişken içeren bir şablon kullanabilir.
-**Nasıl yapar**: Fonksiyon, Resend API'sinin `/emails` endpoint'ine POST isteği gönderir. İstek gövdesini oluştururken, sağlanan şablonu `_data` nesnesiyle formatlayarak (`formatTemplate` kullanarak) final mesajını oluşturur. Bu mesajı hem `_text` (düz metin) hem de `html` (basit paragraf etiketleriyle) alanlarına yerleştirir. Varsayılan olarak "VentHub Bildirim" konu satırı ve `noreply@venthub.com` adresini kullanır, ancak bunlar `_data` veya `config` içindeki değerlerle değiştirilebilir.
+**Ne yapar**: Resend API'sini kullanarak belirtilen e-posta adresine bir e-posta gonderir. Sablon destegi sunar ve hem duz metin hem de HTML formatinda icerik olusturur.
+
+**Nasil yapar**: Oncelikle `config` icindeki Resend API anahtarinin varligini dogrular; eksikse hata firlatir. E-posta konusu `data.subject` alanindan veya varsayilan olarak "VentHub Bildirim" olarak belirlenir. Eger `template` ve `data` saglanmissa, `formatTemplate` ile icerik formatlanir; aksi takdirde dogrudan `message` kullanilir. Gonderen adresi `config.from`, `data.emailFrom` veya varsayilan "VentHub <noreply@venthub.com>" sirasiyla tercih edilerek belirlenir. Son olarak Resend API'sine JSON formatinda POST istegi gonderilir; istek basarisizsa hata metni ile birlikte bir Error firlatilir, basarili ise API yaniti dondurulur.
+
 **Parametreler**:
-- `to`: string — E-postanın gönderileceği alıcının e-posta adresi.
-- `message`: string — Gönderilecek düz metin mesajı. Şablon kullanılmadığında doğrudan gönderilir.
-- `template?`: string (isteğe bağlı) — Değişken içeren e-posta şablonu.
-- `_data?`: TemplateData (isteğe bağlı) — Şablondaki `{{değişken}}` alanlarını doldurmak için veri. Ek olarak `subject` ve `emailFrom` alanlarını da içerebilir.
-- `config?`: { apiKey: string; from?: string } (isteğe bağlı) — Resend API anahtarını (`apiKey`) ve isteğe bağlı olarak gönderici adresini (`from`) içeren yapılandırma nesnesi.
-**Dönüş**: Promise<any> — Resend API'sinden dönen JSON yanıtını çözer ve döndürür. Başarılı gönderimde e-posta ID'si gibi bilgileri içerir.
+- to: string — Alici e-posta adresi.
+- message: string — E-posta icerigi. Sablon kullanilmiyorsa dogrudan bu metin gonderilir.
+- template: string (istege bagli) — Degisken iceren sablon metni. Saglanirsa `data` ile birlikte formatlanarak kullanilir.
+- data: TemplateData (istege bagli) — Sablon icindeki {{key}} ifadelerinin yerine konacak degerler. Ayrica 'subject' ve 'emailFrom' gibi e-posta ozel alanlarini da icerir.
+- config: { apiKey: string; from?: string } (istege bagli) — Resend API anahtari ve istege bagli gonderen e-posta adresi. `apiKey` zorunludur.
+
+**Donus**: Resend API'sinden donen JSON yaniti. Gonderim basarili ise e-posta ID'si ve detaylarini, basarisiz ise bir Error firlatilir.
 
 ### formatTemplate
-**Ne yapar**: Bir metin şablonunu, sağlanan veri nesnesindeki değerlerle eşleştirerek kişiselleştirilmiş bir metin dizesi oluşturur. `{{anahtar}}` biçimindeki yer tutucuları gerçek değerlerle değiştirir.
-**Nasıl yapar**: Fonksiyon, `_data` nesnesinin tüm anahtarları üzerinde döngüye girer. Her anahtar için, şablon içindeki `{{anahtar}}` kalıbını (RegExp kullanarak, `g` flag'i ile tüm eşleşmeleri bulacak şekilde) bulur ve ilgili değerin string karşılığıyla değiştirir. Değerleri zorunlu olarak string'e dönüştürerek (String(_data[key])) tutarlılık sağlar.
+**Ne yapar**: Bir sablon stringi icindeki {{key}} bicimindeki yer tutuculari (placeholder), verilen veri nesnesindeki degerler ile degistirerek nihali metni olusturur. Tum gonderim fonksiyonlarinin ortak bir yardimcisidir.
+
+**Nasil yapar**: Eger `data` saglanmamissa veya bos ise, sablonun aynisi dondurulur. Aksi takdirde, `data` nesnesinin tum anahtarlari uzerinde donulur. Her anahtar icin, sablon icindeki `{{anahtar}}` deseni, `RegExp` kullanilarak (g flag'i ile tum eslesmeleri yakalamak uzere) bulunan deger ile degistirilir. Degerin `String()` ile donusturulmesi sayesinde farkli tiplerden (sayi, boolean vb.) degerler de guvenle metne cevrilebilir. Islem tum anahtarlar icin sirayla yapilir ve formatlanmis metin dondurulur.
+
 **Parametreler**:
-- `template`: string — Değişkenler içeren ham şablon metni (örn: `Sayın {{name}}, talebiniz {{status}} durumundadır.`).
-- `_data`: TemplateData — Şablondaki yer tutuculara karşılık gelecek anahtar-değer çiftlerini içeren nesne (örn: `{ name: 'Ahmet', status: 'inceleniyor' }`).
-**Dönüş**: string — Yer tutucuların değerlerle değiştirildiği, kullanıma hazır son metin dizesi.
+- template: string — Degisken iceren sablon metni. Ornek: "Merhaba {{name}}, durumunuz: {{status}}".
+- data: TemplateData (istege bagli) — Sablon anahtarlarinin karsilik degerlerini eslesen nesne. Anahtar-deger ciftleri seklinde verilmelidir.
+
+**Donus**: string — Tum yer tutuculari degerler ile degistirilmis nihali metin.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: ../_shared/tenant_config.ts::getTenantBranding
-- import: ../_shared/tenant_config.ts::resolveTenantId
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
-- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
 
 ---
 
@@ -1827,7 +1928,7 @@ Bu modül için varsayımlar, fonksiyon imzaları ve modül sabitlerinden yola �
 - `message: string`
 - `priority: 'low' | 'medium' | 'high' | 'critical'`
 - `template?: string`
-- `_data?: TemplateData`
+- `data?: TemplateData`
 - `tenant_id?: string`
 
 ### _StockAlertData
@@ -1837,7 +1938,7 @@ Bu modül için varsayımlar, fonksiyon imzaları ve modül sabitlerinden yola �
 - `_productId: string`
 
 ### TwilioConfig
-- `accountS_id: string`
+- `accountSid: string`
 - `authToken: string`
 - `fromNumber: string`
 
@@ -1854,56 +1955,87 @@ type TemplateData = Record<string, string | number | boolean>
 
 ## SABİTLER
 - **_stockAlertTemplates** (object) — `{
-
   whatsapp: {
-
     low_stock: `🚨 STOK UYARISI 🚨
-
     
-
 📦 Ürün: {{productNa...`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::notification-service_handler
-- **params**: `(req)`
+### [N1_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::callerFailure
+- **params**: `(error: unknown)`
 - **ic_degiskenler**:
-  - `corsHeaders` — Tüm yanıtlara eklenen CORS başlık nesnesi (Allow-Headers, Allow-Methods)
-  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase proje URL'i
-  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan servis rol anahtarı, yetkilendirmede ve rol kontrolünde kullanılır
-  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan anonim anahtar, auth client oluşturulurken kullanılır
-  - `body` — `req.json()` ile parse edilen istek gövdesi, `NotificationRequest` tipinde
-  - `type` — `body` destructuring ile alınan bildirim türü (whatsapp/sms/email)
-  - `to` — `body` destructuring ile alınan alıcı iletişim bilgisi
-  - `message` — `body` destructuring ile alınan mesaj içeriği
-  - `priority` — `body` destructuring ile alınan bildirim öncelik seviyesi
-  - `template` — `body` destructuring ile alınan opsiyonel şablon string'i
-  - `_data` — `body` destructuring ile alınan opsiyonel şablon veri sözlüğü
-  - `tenantId` — `resolveTenantId(req, body)` çağrısı ile elde edilen kiracı kimliği
-  - `branding` — `await getTenantBranding(tenantId)` ile elde edilen kiracı marka bilgileri (emailFrom, brandName, brandPrimaryColor içerir)
-  - `authHeader` — `req.headers.get('Authorization')` ile alınan yetkilendirme başlığı
-  - `authClient` — `createClient(supabaseUrl, anonKey, {...})` ile oluşturulan yetkilendirme istemcisi
-  - `user` — `await authClient.auth.getUser()` destructuring ile alınan authenticated kullanıcı nesnesi
-  - `authErr` — `await authClient.auth.getUser()` destructuring ile alınan kimlik doğrulama hatası
-  - `roleCheck` — `fetch(...)` ile yapılan `user_profiles` tablosundan rol sorgulama yanıt nesnesi
-  - `arr` — `roleCheck.json()` ile parse edilen rol kontrol sonucu dizi
-  - `role` — `arr[0]?.role` erişimi ile alınan kullanıcının rolü (admin/superadmin beklenir)
+  - Parametre değişkeni olarak kullanılır, iç değişken yoktur
+- **Dönüş**: `{ status: number; error: string } | null` — Hata türüne göre HTTP status kodu ve error anahtarı döner; bilinmeyen hatalarda `null` döner
+
+### [N2_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::notification-service_handler
+- **params**: `(req: Request)` — HTTP istek nesnesi
+- **ic_degiskenler**:
+  - `corsHeaders` — `getCorsHeaders(req)` ile üretilen CORS başlık nesnesi, tüm yanıtlara eklenir
+  - `body` — İstek gövdesi JSON'dan parse edilen `NotificationRequest` nesnesi; hata olursa boş obje fallback eder
+  - `type` — `body`'den destructured bildirim kanalı türü (`'whatsapp'`, `'sms'`, `'email'`)
+  - `to` — `body`'den destructured alıcı iletişim bilgisi
+  - `message` — `body`'den destructured gönderilecek mesaj içeriği
+  - `priority` — `body`'den destructured bildirim öncelik seviyesi
+  - `template` — `body`'den destructured şablon adı/metni (opsiyonel)
+  - `data` — `body`'den destructured şablon değişkenleri sözlüğü (opsiyonel)
+  - `ctx` — `resolveCaller(req, body)` sonucu elde edilen `CallerContext` nesnesi; kimlik, rol ve tenant bilgisi taşır
+  - `tenantId` — `ctx.tenantId` değerinden atanan kiracı tanımlayıcısı, branding ve token okumalarında kullanılır
+  - `branding` — `getTenantBranding(tenantId)` ile çekilen kiracıya özel marka bilgileri (`emailFrom`, `brandName`, `brandPrimaryColor`)
   - `twilioAccountSid` — `Deno.env.get('TWILIO_ACCOUNT_SID')` ile okunan Twilio hesap SID'i
-  - `twilioAuthToken` — `Deno.env.get('TWILIO_AUTH_TOKEN')` ile okunan Twilio yetki token'ı
-  - `twilioWhatsAppNumber` — `Deno.env.get('TWILIO_WHATSAPP_NUMBER')` ile okunan Twilio WhatsApp numarası
-  - `twilioPhoneNumber` — `Deno.env.get('TWILIO_PHONE_NUMBER')` ile okunan Twilio SMS numarası
+  - `twilioAuthToken` — `Deno.env.get('TWILIO_AUTH_TOKEN')` ile okunan Twilioyetkili jetonu
+  - `twilioWhatsAppNumber` — `Deno.env.get('TWILIO_WHATSAPP_NUMBER')` ile okunan WhatsApp gönderici numarası
+  - `twilioPhoneNumber` — `Deno.env.get('TWILIO_PHONE_NUMBER')` ile okunan SMS gönderici numarası
   - `resendApiKey` — `Deno.env.get('RESEND_API_KEY')` ile okunan Resend e-posta API anahtarı
-  - `emailFrom` — `branding.emailFrom` değerinden atanan gönderici e-posta adresi
-  - `notifyDebug` — `Deno.env.get('NOTIFY_DEBUG')` karşılaştırması ile belirlenen hata ayıklama modu bayrağı
-  - `result` — switch-case bloğunda hangi kanal seçilirse seçilsin bildirim gönderme sonucu
-  - `isWhatsAppEnabled` — Twilio WhatsApp ortam değişkenlerinin tamamının mevcut olup olmadığını gösteren boolean
-  - `isSmsEnabled` — Twilio SMS ortam değişkenlerinin tamamının mevcut olup olmadığını gösteren boolean
-  - `isEmailEnabled` — Resend API anahtarının mevcut olup olmadığını gösteren boolean
-  - `error` — catch bloğunda yakalanan hata nesnesi
-  - `msg` — `error instanceof Error ? error.message : 'Unknown error'` ile elde edilen hata mesajı string'i
-- **Dönüş**: `Response` — başarılıysa JSON `{success, result, type, priority, timestamp}`, hata durumunda JSON `{error, success: false}` veya HTTP hata yanıtı
+  - `emailFrom` — `branding.emailFrom` değerinden atanan e-posta gönderici adresi
+  - `notifyDebug` — `Deno.env.get('NOTIFY_DEBUG') === 'true'` ile hesaplanan debug modu bayrağı
+  - `result` — Gönderim sonrası sonucu tutan `unknown` değişken; başlangıçta `{ success: false, note: undefined }`
+  - `isWhatsAppEnabled` — WhatsApp kanalının aktif olup olmadığını belirleyen boolean; Twilio ortam değişkenlerinin varlığına bağlı
+  - `isSmsEnabled` — SMS kanalının aktif olup olmadığını belirleyen boolean; Twilio ortam değişkenlerinin varlığına bağlı
+  - `isEmailEnabled` — E-posta kanalının aktif olup olmadığını belirleyen boolean; Resend API anahtarı varlığına bağlı
+  - `msg` — `catch` bloğunda hata mesajını string'e dönüştüren ara değişken
+- **Dönüş**: `Response` — Başarıyla 200 JSON yanıtı veya hata durumunda uygun HTTP status kodu ile JSON yanıtı döner
+
+### [N3_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendWhatsApp
+- **params**: `(to: string, message: string, template?: string, data?: TemplateData, config?: TwilioConfig)`
+- **ic_degiskenler**:
+  - `finalMessage` — Şablon varsa `formatTemplate(template, data)` ile üretilen nihai mesaj; yoksa doğrudan `message`
+  - `formattedTo` — WhatsApp protokolüne uygun formata dönüştürülen alıcı numarası; zaten `whatsapp:` ön eki varsa aynen korunur, yoksa eklenir
+  - `twilioUrl` — Twilio Messages API endpoint URL'i; `config.accountSid` ile dinamik oluşturulur
+  - `credentials` — `config.accountSid` ve `config.authToken` değerlerinin `btoa()` ile Base64 kodlanmış hali, HTTP Basic Auth için kullanılır
+  - `response` — `fetch` ile Twilio API'ye yapılan POST isteğinin dönüş nesnesi
+  - `error` — `response.ok` false ise `response.text()` ile okunan hata metni
+- **Dönüş**: Twilio API yanıtının JSON parse edilmiş nesnesi (`response.json()`)
+
+### [N4_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendSMS
+- **params**: `(to: string, message: string, config: TwilioConfig)`
+- **ic_degiskenler**:
+  - `twilioUrl` — Twilio Messages API endpoint URL'i; `config.accountSid` ile dinamik oluşturulur
+  - `credentials` — `config.accountSid` ve `config.authToken` değerlerinin `btoa()` ile Base64 kodlanmış hali, HTTP Basic Auth için kullanılır
+  - `response` — `fetch` ile Twilio API'ye yapılan POST isteğinin dönüş nesnesi
+  - `error` — `response.ok` false ise `response.text()` ile okunan hata metni
+- **Dönüş**: Twilio API yanıtının JSON parse edilmiş nesnesi (`response.json()`)
+
+### [N5_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::sendEmail
+- **params**: `(to: string, message: string, template?: string, data?: TemplateData, config?: { apiKey: string; from?: string })`
+- **ic_degiskenler**:
+  - `subject` — E-posta konusu; `data?.subject` varsa onu kullanır, yoksa `'VentHub Bildirim'` sabitini döner
+  - `finalMessage` — Şablon varsa `formatTemplate(template, data)` ile üretilen nihai mesaj; yoksa doğrudan `message`
+  - `from` — Gönderici adresi; öncelik sırasıyla `config.from`, `data.emailFrom`, `'VentHub <noreply@venthub.com>'` fallback
+  - `response` — Resend API'ye (`https://api.resend.com/emails`) yapılan POST isteğinin dönüş nesnesi
+  - `error` — `response.ok` false ise `response.text()` ile okunan hata metni
+- **Dönüş**: Resend API yanıtının JSON parse edilmiş nesnesi (`response.json()`)
+
+### [N6_NASIL] AST Pointer: supabase/functions/notification-service/index.ts::formatTemplate
+- **params**: `(template: string, data?: TemplateData)`
+- **ic_degiskenler**:
+  - `formatted` — İşlenmiş şablon metni; başlangıçta `template` değerini alır, her anahtar-çift için sırasıyla replace edilir
+  - `key` — `Object.keys(data)` döngüsündeki mevcut anahtar adı
+  - `placeholder` — `{{key}}` kalıbını eşleştiren RegExp nesnesi; `g` flag ile tüm eşleşmeleri yakalar
+  - `value` — `data[key]` değerinin `String()` ile string'e dönüştürülmüş hali
+- **Dönüş**: `string` — Değişkenler yerine konulmuş nihai şablon metni
 
 ---
 
@@ -1911,6 +2043,7 @@ type TemplateData = Record<string, string | number | boolean>
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    index_ts__callerFailure["callerFailure"]
     index_ts__formatTemplate["formatTemplate"]
     index_ts__notification-service_handler["notification-service_handler"]
     index_ts__sendEmail["sendEmail"]
@@ -1923,6 +2056,7 @@ graph TD
 ## NODE ID STANDARD
 
   file: supabase\functions\notification-service\index.ts
+  function: supabase\functions\notification-service\index.ts::callerFailure
   function: supabase\functions\notification-service\index.ts::notification-service_handler
   function: supabase\functions\notification-service\index.ts::sendWhatsApp
   function: supabase\functions\notification-service\index.ts::sendSMS
@@ -1932,6 +2066,7 @@ graph TD
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: callerFailure
   export: formatTemplate
   export: notification-service_handler
   export: sendEmail
@@ -1946,53 +2081,91 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-confirmation\index.ts
-skeleton_hash: 42998e6013574227
+skeleton_hash: 19667472dd6fb335
 entity_hashes:
+  func:callerFailure: c2855766de0bfe8b
   func:loadTemplate: 9bc4b1ff28af1df3
   func:order-confirmation_handler: 52ce43dfb5d8480d
   func:renderTemplate: 598e7353aec8e680
-  overview: 826d5cbc0f75e005
-generated_at: 2026-08-13T07:40:32Z
+  overview: f37144b7f3a3d49b
+generated_at: 2026-08-17T11:37:25Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase Edge Function olarak sipariş onayı e-postası gönderiminden sorumludur. Gelen HTTP isteklerini alır, sipariş bilgileriyle dinamik HTML e-posta şablonlarını doldurur ve sonuç olarak bir HTTP yanıtı döner.
+Bu modül, Supabase Edge Function olarak çalışan bir sipariş onayı e-posta gönderim servisidir. Gelen HTTP isteklerini işleyerek sipariş bilgilerini alır, HTML e-posta şablonunu yükler ve dinamik verilerle doldurarak kullanıcılara sipariş onay e-postası gönderir. Modül, hata yönetimi ve şablon işleme süreçlerini merkezi olarak koordine eder.
 
 ## Fonksiyon Grupları
+
+### Ana İstek İşleyici
+Sipariş onayı için gelen HTTP isteklerini karşılayan ve tüm sürecin akışını yöneten ana Entry Point noktasıdır.
+- order-confirmation_handler
+
 ### Şablon İşleme
-Bu grup, HTML e-posta şablonlarını yöneten yardımcı fonksiyonları kapsar. Şablonu dosya sisteminden yükler ve içindeki dinamik veri alanlarını doldurarak kullanılabilir hale getirir.
+E-posta gönderimi için HTML şablonlarının diskten yüklenmesi ve sipariş verileriyle dinamik olarak doldurulması işlemlerini yürütür.
 - loadTemplate, renderTemplate
 
-### Ana İş Akışı Yönetimi
-Bu grup, modülün tek ve merkezi işleyicisidir. Gelen HTTP isteğini doğrulamaktan, şablonu hazırlayıp verilerle doldurmaya ve e-posta servisini çağırarak son HTTP yanıtını üretmeye kadar tüm iş akışını tek başına koordine eder.
-- order-confirmation_handler
+### Hata Yönetimi
+İşlem sırasında oluşan hataları yakalayarak standart ve tutarlı HTTP hata yanıtları üretir; başarılı durumlarda ise boş değer dönerek devam edilmesini sağlar.
+- callerFailure
+
+---
+
+## Mimari Notlar
+- **Dış Bağımlılık:** Şablon dosyaları harici dosya sisteminden (disk) yüklenir; bu nedenle modül çalışma zamanında dosya erişimine bağımlıdır.
+- **Lazy Yüklenen Modüller:** E-posta şablonları dinamik olarak istek anında yüklenir, önceden belleğe alınmaz.
+- **API Sözleşmesi:** Modül, @serve dekoratörü aracılığıyla HTTP isteklerine yanıt veren bir Supabase Edge Function olarak konuşlandırılır ve Sync/Async dönüşüm döngüsüyle çalışır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, sipariş onayı e-postası gönderimi için bir Supabase Edge Function'dur. Şablon yükleme, veri ile doldurma ve HTTP istek işleme akışını yönetir.
+Bu modül, sipariş onayı e-postası gönderimi için bir Supabase Edge Function olup, şablon yükleme ve HTTP istek işleme süreçlerini kapsar.
+
+**[Aksiyom 1]:** Eğer `loadTemplate()`fonksiyonu `null` değer döndürürse, e-posta şablonu yüklenememiş olur ve `renderTemplate` çağrısı için geçerli bir şablon metni mevcut değildir.
+
+**[Aksiyom 2]:** Eğer `renderTemplate` fonksiyonuna boş (empty) veya geçersiz bir `tpl` parametresi verilirse, çıktı olarak anlamsız veya boş bir string oluşur.
+
+**[Aksiyom 3]:** Eğer `renderTemplate` fonksiyonuna verilen `_data` parametresi, şablondaki dinamik alanları (placeholder'ları) karşılamıyorsa, şablondaki değişkenler doldurulmamış olarak kalır.
+
+**[Aksiyom 4]:** Eğer `order-confirmation_handler` içinde bir hata oluşursa ve `callerFailure` fonksiyonu `null` döndürürse, handler'dan geçerli bir HTTP hata yanıtı üretilemez.
+
+**[Aksiyom 5]:** Eğer HTTP isteği (`req`) beklenmeyen bir formattaysa veya gerekli verileri içermiyorsa, `order-confirmation_handler` fonksiyonu hata ile karşılaşır ve `callerFailure` aracılığıyla hata yanıtı döndürülür.
+
+**[Aksiyom 6]:** Eğer `callerFailure` fonksiyonu bir hata işlerse, döndürülen yanıt nesnesinin `status` alanı pozitif bir tamsayı ve `error` alanı non-empty bir string olmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### renderTemplate
-**Ne yapar**: Verilen bir HTML/şablon dizesindeki koşullu blokları ve değişken yer tutucularını, sağlanan veri nesnesindeki değerlerle değiştirerek işlenmiş bir dize döndürür. Basit bir şablon motoru görevi görür.
+### callerFailure
+**Ne yapar**: Sistemde oluşan belirli hata türlerini HTTP yanıt kodlarına ve standart hata mesajlarına dönüştürerek API'ye döndürülecek bir hata nesnesi oluşturur. Bu, çağrı tarafı hatalarını (kiralama uyumsuzluğu, eksik yapılandırma, profil arama hataları) merkezi ve tutarlı bir şekilde ele almayı sağlar.
 
-**Nasıl yapar**: İlk olarak `{{#if key}}...{{/if}}` sözdizimini eşleştirir; ilgili `_data[key]` değeri truthy ise içeriği korur, aksi halde boş string ile değiştirir. Ardından kalan `{{key}}` yer tutucularını `_data[key]` değeriyle değiştirir; değer `null` veya `undefined` ise boş string döner, değilse `String()` ile dizeye dönüştürülür.
+**Nasıl yapar**: Fonksiyon, gelen `error` nesnesinin belirlizano hata sınıflarını (`TenantMismatchError`, `CallerConfigError`, `CallerLookupError`) `instanceof` operatörüyle kontrol eder. Eşleşme sağlanırsa, tanımlı bir HTTP durum kodu (403, 500, 503) ve bir hata anahtarı dizesi içeren bir nesne döndürür. Hiçbir hata türü eşleşmezse `null` döndürerek hatanın bu seviyede ele alınmadığını belirtir.
 
 **Parametreler**:
-- `tpl`: string — İşlenecek şablon dizesi. İçerisinde `{{#if}}...{{/if}}` koşullu blokları ve `{{değişken}}` yer tutucuları bulundurur.
-- `_data`: Record<string, unknown> — Şablondaki yer tutuculara karşılık gelen değerleri içeren nesne. Anahtarlar şablondaki değişken isimleriyle eşleşmelidir.
+- error: unknown — İşlenmesi beklenen hata nesnesi. Herhangi bir tipte olabilir, ancak fonksiyon yalnızca tanımlızano hata sınıflarını işler.
 
-**Dönüş**: string — İşlenmiş, tüm yer tutucuların değerlerle değiştirildiği veya koşullu blokların ayıklandığı sonuç dizesi.
+**Dönüş**: `{ status: number; error: string } | null` — Hata işlendiyse, HTTP durum kodunu ve hata anahtarını içeren bir nesne; aksi takdirde `null`. Dönen nesne, API yanıt gövdesi olarak doğrudan kullanılabilir.
+
+### renderTemplate
+**Ne yapar**: Basit bir şablon motoru görevi görerek, bir HTML şablonu dizgesindeki değişken yer tutucularını ve koşullu blokları veri nesnesiyle doldurur. Bu, e-posta gibi dinamik içeriklerin oluşturulmasını sağlar.
+
+**Nasıl yapar**: Fonksiyon, iki aşamalı bir `String.replace` işlemi uygular. İlk aşamada, `{{#if variableName}}...{{/if}}` sözdizimindeki koşullu blokları `RegExp` ile bulur ve ilgili değişkenin `_data` nesnesindeki değerinin "truthy" (doğrulanabilir) olup kontrol eder. Değer truthy ise bloğun içeriğini korur, aksi takdirde boş dize ile değiştirir. İkinci aşamada, `{{variableName}}` sözdizimindeki basit değişkenleri bulur ve değerlerini dizeye dönüştürerek yerine koyar. `null` veya `undefined` değerleri boş dize ile değiştirilir.
+
+**Parametreler**:
+- tpl: string — Değiştirilecek şablon dizgesi. `{{#if ...}}` ve `{{...}}` sözdizimini içerir.
+- _data: Record<string, unknown> — Şablondaki değişken isimlerini anahtar, değerleri ise değer olarak eşleştiren nesne. `unknown` tipi, değerlerin herhangi bir tipte olabileceğini belirtir.
+
+**Dönüş**: string — Değişkenlerin ve koşulların işlendiği, son HTML içeriğini temsil eden dize.
 
 ### loadTemplate
-**Ne yapar**: Dosya sisteminden veya uzaktan bir kaynaktan şablon dosyasını asenkron olarak okur ve içeriğini string olarak döndürür.  
-**Nasıl yapar**: Promise tabanlı bir I/O operasyonu başlatır; dosya bulunamazsa `null` döner.  
-**Parametreler**: *Yok*  
-**Dönüş**: Promise<string | null> — Başarılı okuma durumunda şablon içeriği string, bulunamama durumunda `null`.
+**Ne yapar**: Sipariş onay e-postası için kullanılacak HTML şablon dosyasını asenkron olarak dosya sisteminden yükler. Modülün bulunduğu dizine göre göreli bir yol kullanarak şablonun konumunu bağımsız hale getirir.
+
+**Nasıl yapar**: Fonksiyon, `import.meta.url` değerini temel alarak şablon dosyasının mutlak URL'sini `URL` yapısıyla oluşturur. Bu, kodun hangi ortamda çalıştığına (örn. Supabase Edge Function) bağlı olarak doğru dosya yolunu dinamik olarak belirlemeyi sağlar. Ardından `Deno.readTextFile` ile dosya içeriğini okumaya çalışır. Okuma başarılı olursa dize döndürülür; dosya bulunamazsa veya herhangi bir okuma hatası oluşursa yakalama bloğu tarafından `null` döndürülerek sessizce hata yönetimi yapılır.
+
+**Parametreler**: Parametre almaz.
+
+**Dönüş**: `Promise<string | null>` — Asenkron bir `Promise`. Başarılı olursa şablonun HTML içeriğini; başarısız olursa `null` değerini resolve eder.
 
 ### order-confirmation_handler
 **Ne yapar**: HTTP isteklerini alır, sipariş onayı şablonunu yükler, verileri şablona uygular ve yanıt olarak HTML içeriği döner.  
@@ -2007,27 +2180,74 @@ Bu modül, sipariş onayı e-postası gönderimi için bir Supabase Edge Functio
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: ../_shared/sentry.ts::sentryCaptureException
 - import: ../_shared/tenant_config.ts::getTenantBranding
-- import: ../_shared/tenant_config.ts::resolveTenantId
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/order-confirmation/index.ts::renderTemplate
-- **params**: `tpl: string`, `_data: Record<string, unknown>`
+### [N1_NASIL] AST Pointer: supabase/functions/order-confirmation/index.ts::callerFailure
+- **params**: (error: unknown)
 - **ic_degiskenler**:
-  - `tpl` — fonksiyona alınan şablon string'ini tutar, önce `{{#if}}` blokları ile sonra `{{}}` değişkenleri ile place-holder'lar değiştirilerek modified hali return edilir
-  - `_data` — şablonda kullanılacak key-value çiftlerini içeren dict, `{{key}}` ve `{{#if key}}` yapılarında referans olarak kullanılır
-  - `_m` (1. replace callback) — regex eşleşen tam eşleşme metni (kullanılmıyor, discard)
-  - `key` (1. replace callback) — `{{#if (\w+)}}` deseninden yakalanan değişken adı, `_data[key]` ile değeri okunur
-  - `inner` (1. replace callback) — `{{#if}}` bloğunun içindeki şablon parçası, truthy ise olduğu gibi döner, aksi halde boş string döner
-  - `v` (1. replace callback) — `_data[key]` ile elde edilen değer, truthy kontrolü yapılır
-  - `truthy` (1. replace callback) — `v` değerinin truthy/falsy durumu, inner parçanın korunup korunmayacağını belirler
-  - `_m` (2. replace callback) — regex eşleşen tam eşleşme metni (kullanılmıyor, discard)
-  - `key` (2. replace callback) — `{{(\w+)}}` deseninden yakalanan değişken adı, `_data[key]` ile değeri okunur
-  - `v` (2. replace callback) — `_data[key]` ile elde edilen değer, null/undefined kontrolü yapılır
-- **Dönüş**: `string` — place-holder'ları değiştirilmiş şablon metni
+  - `error` — sınıflandırılacak hata nesnesi; instanceof kontrolleri ile farklı hata türleri tanımlanır
+- **Dönüş**: { status: number; error: string } | null — hata türüne göre uygun HTTP durum kodu ve hata mesajı döndürür veya null
+
+### [N2_NASIL] AST Pointer: supabase/functions/order-confirmation/index.ts::renderTemplate
+- **params**: (tpl: string, _data: Record<string, unknown>)
+- **ic_degiskenler**:
+  - `tpl` — işlenecek HTML şablonu, replace işlemleri ile güncellenir
+  - `_data` — şablondaki değişkenleri tutan key-value sözlüğü
+- **Dönüş**: string — değiştirilmiş HTML şablonu
+
+### [N3_NASIL] AST Pointer: supabase/functions/order-confirmation/index.ts::loadTemplate
+- **params**: (yok)
+- **ic_degiskenler**:
+  - `url` — şablon dosyasının mutlak URL'i, import.meta.url referanslı
+- **Dönüş**: Promise<string | null> — şablon içeriği veya okuma hatasında null
+
+### [N4_NASIL] AST Pointer: supabase/functions/order-confirmation/index.ts::order-confirmation_handler
+- **params**: (req: Request)
+- **ic_degiskenler**:
+  - `requestOrigin` — istekten gelen Origin başlığı, CORS doğrulaması için kullanılır
+  - `allowedOrigins` — virgülle ayrılmış izin verilen origin listesi, env'den okunur
+  - `originAllowed` — mevcut origin'in izin listesinde olup olmadığı kontrolü
+  - `corsHeaders` — getCorsHeaders() ile üretilen CORS başlıkları
+  - `_text` — request body'nin ham metin karşılığı
+  - `parsed` — JSON.parse ile çözümlenmiş request body nesnesi
+  - `order_id` — IIFE ile parsed['order_id']'den çıkarılan sipariş ID'si
+  - `supabaseUrl` — Supabase API base URL'i, env'den okunur
+  - `serviceKey` — Supabase service role anahtarı, env'den okunur
+  - `ctx` — resolveCaller() ile elde edilen çağrıcı bağlam bilgisi
+  - `tenantId` — ctx.tenantId'den gelen kiracı ID'si
+  - `branding` — getTenantBranding() ile gelen marka bilgileri
+  - `resendApiKey` — Resend e-posta servis API anahtarı, env'den okunur
+  - `emailFrom` — e-posta gönderen adresi, branding'den alınır
+  - `testMode` — test modu aktif mi kontrolü, env'den okunur
+  - `testTo` — test modunda kullanılacak alıcı e-posta adresi
+  - `bccList` — BCC alıcı listesi, env'den okunur
+  - `brandName` — marka adı, branding'den alınır
+  - `brandPrimary` — marka ana renk kodu, branding'den alınır
+  - `brandLogoUrl` — marka logo URL'i, branding'den alınır
+  - `customer_email` — sipariş sahibinin e-posta adresi, API'den çekilen sipariş verisinden alınır
+  - `customer_name` — sipariş sahibinin adı, API'den çekilen sipariş veya kullanıcı verisinden alınır
+  - `order_number` — sipariş numarası, API'den çekilen sipariş verisinden alınır
+  - `o` — venthub_orders tablosuna yapılan fetch isteği yanıtı
+  - `arr` — o.json() ile çözümlenmiş sipariş dizisi
+  - `row` — arr[0] ile elde edilen ilk sipariş kaydı
+  - `uid` — siparişin user_id alanı, kullanıcı bilgisi için kullanılır
+  - `u` — auth/v1/admin/users endpoint'ine yapılan fetch isteği yanıtı
+  - `uj` — u.json() ile çözümlenmiş kullanıcı nesnesi
+  - `toList` — e-posta alıcı listesi
+  - `bcc` — BCC alıcı listesinin kopyası
+  - `prettyOrderNo` — formato uyan sipariş numarası (ör: #123)
+  - `subject` — e-posta konu satırı
+  - `tpl` — loadTemplate() ile yüklenen ham şablon
+  - `html` — renderTemplate() ile işlenmiş veya fallback HTML içeriği
+  - `send` — Resend API'ye e-posta gönderen inner async fonksiyon
+  - `resp` — send() fonksiyonunun döndürdüğü Response nesnesi
+  - `txt` — resp.text() ile okunan hata mesajı metni (hata durumunda)
+  - `result` — resp.json() ile çözümlenmiş API yanıt nesnesi
+- **Dönüş**: Response — JSON formatında başarı/hata yanıtı
 
 ---
 
@@ -2035,6 +2255,7 @@ Bu modül, sipariş onayı e-postası gönderimi için bir Supabase Edge Functio
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    index_ts__callerFailure["callerFailure"]
     index_ts__loadTemplate["loadTemplate"]
     index_ts__order-confirmation_handler["order-confirmation_handler"]
     index_ts__renderTemplate["renderTemplate"]
@@ -2043,6 +2264,7 @@ graph TD
 ## NODE ID STANDARD
 
   file: supabase\functions\order-confirmation\index.ts
+  function: supabase\functions\order-confirmation\index.ts::callerFailure
   function: supabase\functions\order-confirmation\index.ts::renderTemplate
   function: supabase\functions\order-confirmation\index.ts::loadTemplate
   function: supabase\functions\order-confirmation\index.ts::order-confirmation_handler
@@ -2050,6 +2272,7 @@ graph TD
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: callerFailure
   export: loadTemplate
   export: order-confirmation_handler
   export: renderTemplate
@@ -2066,7 +2289,7 @@ skeleton_hash: 1d024d7c4264226b
 entity_hashes:
   func:order-housekeeping_handler: e38889ac24217d85
   overview: 179148bdc1561c4d
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-17T11:37:25Z
 ---
 
 ## Genel Bakış
@@ -2171,21 +2394,26 @@ Bu modül, bir Supabase Edge Function olan `order-housekeeping_handler` HTTP han
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\order-validate\index.ts
-skeleton_hash: 0751b7ac246602a9
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\order-validate\index.ts
+skeleton_hash: c5992e8b629d24ba
 entity_hashes:
   func:order-validate_handler: 5404fb6b36c963fe
-  overview: 583f7cd99c081500
-generated_at: 2026-08-13T07:40:32Z
+  func:segmentFromUser: 705d18e6eb2ea250
+  overview: 07239b761dcc7b2d
+generated_at: 2026-08-14T22:03:26Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesi için bir Supabase Edge Function olarak tasarlanmış, merkezi bir sipariş doğrulama servisi sunar. Tek bir HTTP giriş noktası üzerinden tüm sipariş taleplerini karşılar, iş kurallarına uygunluk denetimlerini uygular ve sonucu istemciye standart bir HTTP yanıtı olarak iletir.
+Bu modül, VentHub HVAC sistemi için bir Supabase Edge Function olarak implemente edilmiş, merkezi sipariş doğrulama servisidir. Tek bir HTTP istek noktası üzerinden tüm sipariş taleplerini alarak, iş kurallarına dayalı kapsamlı doğrulama adımlarını uygular ve sonucu istemciye standart bir HTTP yanıtı olarak geri döndürür. Modül, fiyatlandırma segmentasyonu gibi yardımcı işlevleri de entegre ederek doğrulama sürecini destekler.
 
 ## Fonksiyon Grupları
-### Sipariş Doğrulama İşlemi
-Tüm sipariş doğrulama mantığını tek bir çağrı noktasında birleştirerek, istek ayrıştırma, yetkilendirme, veri doğrulama ve stok kontrolleri gibi adımları yönetir.
+### Ana Sipariş Doğrulama İşleyicisi
+Modülün dış dünyayla (HTTP istekleri) tek etkileşim noktasıdır. Gelen tüm istekleri dinler, işler ve uygun HTTP yanıtlarını (başarı, hata kodları) üreterek sonuçlandırır.
 - order-validate_handler
+
+### Yardımcı Fiyatlandırma ve Segmentasyon
+Kullanıcı bilgilerinden yola çıkarak siparişin hangi fiyat segmentine (ör. perakende, toptan) ait olduğunu belirlemek gibi destekleyici mantığı yürütür. Ana işleyici tarafından çağrılarak doğrulama sürecine zenginlik katar.
+- segmentFromUser
 
 ---
 
@@ -2193,19 +2421,25 @@ Tüm sipariş doğrulama mantığını tek bir çağrı noktasında birleştirer
 
 Bu modül, bir HTTP isteğini alıp sipariş doğrulama işlemleri yapacak şekilde tasarlanmıştır.
 
-[Aksiyom 1]: Eğer req nesnesi geçerli bir HTTP isteği içermiyorsa, fonksiyon uygun hata yanıtı (400 Bad Request) döner.
+[Aksiyom 1]: Eğer `u` parametresi `null` olarak geçirilirse, `segmentFromUser` fonksiyonu yine de geçerli bir `PriceSegment` değeri döndürmelidir; çünkü fonksiyon imzası `null`ı açıkça kabul etmektedir.
 
-[Aksiyom 2]: Eğer istek içindeki sipariş verisi eksik veya hatalıysa, fonksiyon_VALIDASYON hatası ile yanıt verir.
+[Aksiyom 2]: Eğer `u.app_metadata` alanı mevcut değilse, `segmentFromUser` fonksiyonu bu durumu işleyebilmeli (undefined erişimi olmadan çalışabilmelidir); çünkü `app_metadata` imzada `Record<string, unknown>` olarak **opsiyonel** (`?`) tanımlanmıştır.
 
-[Aksiyom 3]: Eğer kullanıcının oturum bilgileri (token) geçerli değilse veya yoksa, fonksiyon_YETKİLENDİRME hatası (401/403) ile yanıt verir.
-
-[Aksiyom 4]: Eğer stok kontrolü yapılıyorsa ve yeterli stok yoksa, fonksiyon stok yetersizliği hatası ile yanıt verir.
-
-[Aksiyom 5]: Eğer tüm doğrulamalar başarılı
+[Aksiyom 3]: Eğer `req` parametresi geçerli bir HTTP isteği içermiyorsa, `order-validate_handler` geçerli bir `Response` nesnesi döndüremeyebilir; çünkü handler'ın girdisi olarak yalnızca `req` alınmaktadır ve dönüş tipi `Response`'tur.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### segmentFromUser
+**Ne yapar**: Bu fonksiyon, bir kullanıcının fiyat segmentini (PriceSegment) belirler. Kullanıcı nesnesinin `app_metadata` alanındaki `price_segment` veya `user_role` özelliklerini kontrol ederek, kullanıcının bireysel (individual), bayi (dealer) veya kurumsal (corporate) müşteri olup olmadığını döndürür.
+
+**Nasıl yapar**: Fonksiyon, verilen kullanıcı nesnesinden `app_metadata` alanını alır veya nesne null ise boş bir nesne kullanır. Ardından `price_segment` ve `user_role` alanlarını sırasıyla kontrol eder. Bu alanlardan herhangi biri `'dealer'` veya `'corporate'` değerine sahipse, bu değeri doğrudan `PriceSegment` olarak döndürür. Bu koşullar sağlanmazsa varsayılan olarak `'individual'` değerini döndürür.
+
+**Parametreler**:
+- `u`: `{ app_metadata?: Record<string, unknown> } | null` — İşlem yapılacak kullanıcı nesnesi. `app_metadata` alanı opsiyoneldir ve nesne herself null olabilir.
+
+**Dönüş**: `PriceSegment` — Kullanıcının belirlenen fiyat segmenti. `'individual'`, `'dealer'` veya `'corporate'` değerlerinden biri olabilir.
 
 ### order-validate_handler
 
@@ -2245,20 +2479,9 @@ Bu modül, bir HTTP isteğini alıp sipariş doğrulama işlemleri yapacak şeki
 - `available?: number | string`
 - `on_hand?: number | string`
 
-### UserProfile
-- `id: string`
-- `role?: string`
-- `organization_id?: string | null`
-
-### Organization
-- `id: string`
-- `tier_level?: number | null`
-
 ### PriceList
 - `id: string`
-- `allowed_user_roles?: string[] | null`
-- `organization_tiers?: number[] | null`
-- `is_default?: boolean`
+- `user_type?: string | null`
 - `effective_from?: string | null`
 
 ### ProductPrice
@@ -2269,6 +2492,8 @@ Bu modül, bir HTTP isteğini alıp sipariş doğrulama işlemleri yapacak şeki
 - `valid_from?: string | null`
 - `valid_until?: string | null`
 - `price_list_id?: string | null`
+- `net_price?: number | string | null`
+- `gross_price?: number | string | null`
 
 ### RecalcItem
 - `product_id: string`
@@ -2289,115 +2514,118 @@ Bu modül, bir HTTP isteğini alıp sipariş doğrulama işlemleri yapacak şeki
 
 ---
 
+## TYPE ALIASES
+
+### PriceSegment
+```typescript
+type PriceSegment = 'individual' | 'dealer' | 'corporate'
+```
+
+---
+
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::order-validate_handler
-- **params**: `req` — HTTP request nesnesi, method, headers ve body içerir
+### [N1_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::segmentFromUser
+- **params**: `u: { app_metadata?: Record<string, unknown> } | null` — JWT user objesi, app_metadata içerebilir
 - **ic_degiskenler**:
-  - `corsHeaders` — getCorsHeaders(req) ile elde edilen CORS başlık nesnesi
-  - `cors` — corsHeaders'a eşitlenen kısaltma; OPTIONS ve hata yanıtlarında kullanılır
-  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ile okunan Supabase URL adresi
-  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile okunan service role anahtarı
-  - `anonKey` — Deno.env.get('SUPABASE_ANON_KEY') ile okunan anon anahtar
-  - `authHeader` — req.headers.get('Authorization') ile çekilen yetkilendirme başlığı
-  - `authClient` — createClient ile anonKey + authHeader ile oluşturulan Supabase istemcisi (kullanıcı doğrulama için)
-  - `user` — authClient.auth.getUser() sonucundan alınan authenticated kullanıcı nesnesi
-  - `authErr` — auth.getUser() sırasında oluşan hata nesnesi
-  - `headers` — serviceRoleKey ile oluşturulan HTTP başlık nesnesi, supabase REST API çağrılarında kullanılır
-  - `body` — req.json().catch() ile parse edilen istek gövdesi (hata durumunda boş nesne)
-  - `userId` — user.id değerinden alınan mevcut kullanıcının UUID'si
-  - `cartId` — body.cart_id veya body.cartId'den okunan veya kullanıcının sepetinden çözümlenen sepet ID'si
-  - `carts` — /rest/v1/shopping_carts sorgusu ile kullanıcının sepetleri (cartId yoksa çözümleme için)
-  - `items` — /rest/v1/cart_items sorgusu ile cart_id'ye ait sepet ürünleri dizisi (CartItem[])
-  - `_productIds` — items dizisinden uniq product_id'ler kümesi, ürünleri toplu sorgulamak için
-  - `prods` — /rest/v1/products sorgusu ile çekilen ürün nesneleri dizisi (Product[])
-  - `pmap` — prods dizisinden oluşturulan Map<productId, Product>, hızlı ürün erişimi için
-  - `role` — kullanıcının rolü ('individual' varsayılan), user_profiles tablosundan yüklenir
-  - `orgId` — kullanıcının organization_id'si, user_profiles tablosundan yüklenir
-  - `tier` — organizasyonun tier_level'u, organizations tablosundan yüklenir
-  - `prof` — /rest/v1/user_profiles sorgusu ile çekilen kullanıcı profil verisi (UserProfile[])
-  - `org` — /rest/v1/organizations sorgusu ile çekilen organizasyon verisi (Organization[])
-  - `n` — nowIso() ile elde edilen ISO formatlı şu anki zaman damgası
-  - `lists` — aktif ve geçerli fiyat listelerinin tamamı (PriceList[])
-  - `flists` — lists içinden role ve tier uygunluğuna göre filtrelenmiş ve sıralanmış fiyat listeleri
-  - `chosenListId` — flists[0]?.id, kullanılacak birincil fiyat listesi ID'si
-  - `recalculated` — her sepet ürünü için yeniden hesaplanmış fiyat/miktar bilgisi (RecalcItem[])
-  - `mismatches` — mevcut unit_price ile hesaplanan fiyat arasındaki farklar (MismatchItem[])
-  - `stockIssues` — stok yetersizliği tespit edilen ürünler (StockIssue[])
-  - `to2` — sayıyı 2 ondalık basamağa yuvarlayan arrow fonksiyonu
-  - `toCents` — sayıyı sent cinsine çeviren arrow fonksiyonu (100 ile çarpıp round)
-  - `it` — for...of döngüsü içindeki her birCartItem (CartItem)
-  - `product` — pmap.get(it.product_id) ile elde edilen ürün nesnesi
-  - `pr` — priceFor(product) ile hesaplanan {unit, listId} nesnesi
-  - `unit` — pr.unit, hesaplanan birim fiyat
-  - `unitNorm` — to2(unit) ile 2 ondalığa yuvarlanmış birim fiyat
-  - `equal` — mevcut unit_price ile unitNorm arasındaki farkın 0.005'ten küçük olup olmadığı
-  - `available` — ürünün stok miktarı, product nesnesinin çeşitli alanlarından çözümlenir
-  - `cand` — stok alanını temsil edebilecek potansiyel alan adları dizisi
-  - `qty` — sepet ürünü miktarı (it.quantity)
-  - `finalQty` — stok kontrolünden sonra kullanılacak nihai miktar
-  - `subtotalCents` — recalculated dizisinin reduce ile toplanmış toplam tutarı (sent cinsinden)
-  - `subtotal` — subtotalCents/100, toplam tutar (birim cinsinden)
-  - `ok` — mismatches ve stockIssues dizilerinin ikisinin de boş olup olmadığı
-- **Dönüş**: Response (JSON: { ok, items, mismatches, stock_issues, totals, cart_id })
+  - `md` — u?.app_metadata değerini alır, null/undefined ise boş obje {} fallback'lidir; price_segment ve user_role alanlarını barındırır
+  - `c` — for döngüsü iterasyon değişkeni; önce md['price_segment'] sonra md['user_role'] değerlerini sırayla kontrol eder
+- **Dönüş**: PriceSegment — 'dealer', 'corporate' veya 'individual'
 
-### [N2_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::getJson
-- **params**: `_path: string` — Supabase REST API yol kesri
+### [N2_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::order-validate_handler
+- **params**: `req` — gelen HTTP Request objesi, method/headers/body taşır
 - **ic_degiskenler**:
-  - `res` — fetch(supabaseUrl + _path, { headers }) çağrısından dönen Response nesnesi
-  - `txt` — res._text() ile okunan ham yanıt metni
-- **Dönüş**: `Promise<T>` — JSON.parse ile parse edilmiş泛型 veri; parse edilemezse null döner
+  - `cors` — getCorsHeaders(req) ile üretilen CORS header objesi, her yanıtta kullanılır
+  - `supabaseUrl` — Deno.env.get('SUPABASE_URL') ortam değişkeni, Supabase API temel URL'i
+  - `serviceRoleKey` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'), servis seviyesi yetkilendirme anahtarı
+  - `anonKey` — Deno.env.get('SUPABASE_ANON_KEY'), anonim kullanıcı anahtarı
+  - `authHeader` — req.headers.get('Authorization'), Bearer token taşıyan başlık
+  - `authClient` — createClient ile anonKey + authHeader ile oluşturulan Supabase istemcisi, kullanıcı doğrulaması için kullanılır
+  - `user` — authClient.auth.getUser() sonucu dönen authenticated kullanıcı objesi; user.id sepet çözümlemesinde kullanılır
+  - `authErr` — authClient.auth.getUser() hata sonucu; hata varsa veya user null ise 401 döner
+  - `headers` — serviceRoleKey ile API istekleri için Authorization, apikey ve Content-Type barındıran header objesi
+  - `body` — req.json().catch(()=>({})) ile parse edilen istek gövdesi, cart_id/cartId içerebilir
+  - `userId` — user.id değerinden türetilen kullanıcının UUID'si
+  - `cartId` — body.cart_id veya body.cartId'den çözülen alışveriş sepeti ID'si; boşsa user_id ile sorgulanır
+  - `carts` — /rest/v1/shopping_carts sorgusundan dönen kullanıcının sepetleri dizisi
+  - `items` — /rest/v1/cart_items sorgusundan dönen CartItem[] dizisi; product_id, quantity, unit_price, price_list_id taşır
+  - `_productIds` — items dizisinden map ile çıkarılıp Set ile benzersizleştirilmiş product_id'ler dizisi
+  - `prods` — /rest/v1/products sorgusundan dönen Product[] dizisi, _productIds ile filtrelenmiş
+  - `pmap` — product.id → Product eşlemesi yapan Map, ürünleri hızlı erişim için indeksler
+  - `segment` — segmentFromUser(user) çağrısıyla JWT'den çıkarılan fiyat segmenti ('individual'/'dealer'/'corporate')
+  - `n` — nowIso() çağrısıyla elde edilen mevcut ISO zaman damgası, fiyat listesi geçerlilik kontrolünde kullanılır
+  - `lists` — /rest/v1/price_lists sorgusundan dönen PriceList[] dizisi; is_active=true, effective_from<=now, effective_to>=now veya null filtresi uygulanmış
+  - `flists` — lists'ten segment'e eşleşen veya user_type'ı olmayan (genel) listeleri filtreleyip sıralayan dizi; spesifik user_type önce, sonra en yeni effective_from
+  - `chosenListId` — flists[0]?.id, sıralama sonrası seçilen fiyat listesinin ID'si; null ise fallback fiyat kullanılır
+  - `recalculated` — RecalcItem[] dizisi, her kalem için yeniden hesaplanan birim fiyat ve miktarı tutar
+  - `mismatches` — MismatchItem[] dizisi, sepetteki unit_price ile hesaplanan fiyat arasındaki farkları kaydeder
+  - `stockIssues` — StockIssue[] dizisi, istenen miktarın mevcut stoktan fazla olduğu durumları kaydeder
+  - `to2` — (n:number) => Number(Number(n).toFixed(2)), sayıyı 2 ondalık basamağa yuvarlayan yardımcı fonksiyon
+  - `toCents` — (n:number) => Math.round(Number(n)*100), sayıyı sent cinsine çeviren yardımcı fonksiyon
+  - `it` — for...of items döngüsü iterasyon değişkeni,her bir CartItem
+  - `product` — pmap.get(it.product_id) ile elde edilen ürün objesi; bulunamazsa döngü atlanır
+  - `pr` — await priceFor(product) sonucu {unit, listId} nesnesi, hesaplanan birim fiyat ve kullanılan liste ID'si
+  - `unit` — pr.unit, priceFor fonksiyonundan dönen hesaplanmış birim fiyat
+  - `unitNorm` — to2(unit), 2 ondalık basamağa yuvarlanmış birim fiyat
+  - `equal` — it.unit_price ile unitNorm arasındaki mutlak farkın 0.005'ten küçük olup olmadığını test eden boolean
+  - `available` — ürünün stok miktarı; product nesnesinin stock_qty/stock/quantity_available/inventory/inventory_quantity/available/on_hand alanlarından ilk geçerli sayısal değer
+  - `cand` — stok alanı adlarının dizisi, product nesnesinden stok değerini çözmek için sırayla kontrol edilir
+  - `c` — cand döngüsü iterasyon değişkeni, her bir potansiyel stok alanı adı
+  - `qty` — Number(it.quantity)||0, istenen kalem miktarı
+  - `finalQty` — stok kısıtlamasıyla belirlenen nihai miktar; available varsa ve qty>available ise available'a düşürülür
+  - `subtotalCents` — recalculated.reduce ile hesaplanan toplam tutarın sent cinsinden değeri
+  - `subtotal` — subtotalCents/100, toplam tutarın birim cinsinden değeri
+  - `ok` — mismatches.length===0 && stockIssues.length===0, siparişin fiyat ve stok açısından uyumlu olduğunu gösteren boolean
+- **Dönüş**: Response — JSON { ok, items, mismatches, stock_issues, totals, cart_id }
 
-### [N3_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::priceFor
-- **params**: `product: Product` — fiyat hesaplanacak ürün nesnesi
+### [N3_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::getJson (inner)
+- **params**: `_path: string` — Supabase REST API'ye yapılacak istek yolu (ör: /rest/v1/cart_items?...)
 - **ic_degiskenler**:
-  - `queries` — sorgulanacak price_list_id değerleri dizisi; chosenListId varsa [chosenListId, null], yoksa [null]
-  - `q` — for...of döngüsündeki mevcut price_list_id sorgu değeri (string|null)
-  - `basePath` — product_prices REST API sorgu yolunun ortak kısmı, is_active=eq.true filtresi dahil
-  - `_path` — q değerine göre price_list_id parametresi eklenmiş nihai sorgu yolu
-  - `rows` — getJson ile çekilen ProductPrice[] dizisi
-  - `rows` içinden `pick` — valid_from/valid_until tarih aralığına uygun ilk satır veya ilk satır
-  - `base` — pick.base_price sayısına dönüştürülmüş taban fiyat
-  - `sale` — pick.sale_price varsa sayıya dönüştürülmüş indirimli satış fiyatı, yoksa null
-  - `disc` — pick.discount_percentage sayısına dönüştürülmüş indirim yüzdesi
-  - `v` — base*(1-disc/100) formülü ile hesaplanan indirimli fiyat (base > 0, disc > 0 durumu)
-  - `fb` — product.price fallback değeri, hiçbir fiyat listesi bulunamazsa kullanılır
-- **Dönüş**: `Promise<{unit: number, listId: string|null}>` — hesaplanan birim fiyat ve kullanılan fiyat listesi ID'si
+  - `res` — fetch(supabaseUrl + _path, { headers }) çağrısından dönen Response objesi
+  - `txt` — res.text() ile elde edilen response body'sinin ham metin hali; hata durumunda da loglanır
+- **Dönüş**: Promise<T> — JSON.parse(txt) ile çözülen泛型 nesne; parse hatasında null cast edilir
 
-### [N4_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::(priceListFilter callback)
-- **params**: `pl: PriceList` — filtrelenecek fiyat listesi nesnesi
-- **ic_degiskenler**:
-  - `rs` — pl.allowed_user_roles alanının string[] | null | undefined olarak cast edilmiş hali
-  - `ts` — pl.organization_tiers alanının number[] | null | undefined olarak cast edilmiş hali
-  - `roleOk` — mevcut kullanıcının rolünün fiyat listesinin izin verilen rolleri arasında olup olmadığı
-  - `tierOk` — mevcut kullanıcının tier seviyesinin fiyat listesinin izin verilen tier'ları arasında olup olmadığı
-- **Dönüş**: `boolean` — fiyat listesi kullanıcının rolüne ve tier'ına uygunsa true
-
-### [N5_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::(priceListSort comparator)
-- **params**: `a: PriceList, b: PriceList` — sıralanacak iki fiyat listesi nesnesi
-- **ic_degiskenler**:
-  - `ad` — a.is_default true ise 1, değilse 0
-  - `bd` — b.is_default true ise 1, değilse 0
-  - `at` — a.effective_from tarihinden parse edilmiş milisaniye değeri (yoksa 0)
-  - `bt` — b.effective_from tarihinden parse edilmiş milisaniye değeri (yoksa 0)
-- **Dönüş**: `number` — sıralama skoru; önce default olmayanlar, sonra tarihi daha yeni olanlar üstte
-
-### [N6_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::nowIso
+### [N4_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::nowIso (inner)
 - **params**: (yok)
 - **ic_degiskenler**: (yok)
-- **Dönüş**: `string` — new Date().toISOString() ile elde edilen ISO formatlı zaman damgası
+- **Dönüş**: string — new Date().toISOString() ile elde edilen güncel ISO 8601 zaman damgası
+
+### [N5_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::priceFor (inner)
+- **params**: `product: Product` — fiyat hesaplanacak ürün nesnesi; product.id ve product.price fallback olarak kullanılır
+- **ic_degiskenler**:
+  - `_path` — /rest/v1/product_prices sorgusu için oluşturulan URL; product_id, is_active=true, price_list_id=chosenListId filtreleri uygulanmış
+  - `rows` — getJson<ProductPrice[]>(_path) ile dönen fiyat kayıtları dizisi
+  - `pick` — rows içinden valid_from<=now && valid_until>=now koşulunu sağlayan ilk kayıt; yoksa rows[0] fallback
+  - `net` — pick.net_price null değilse Number(pick.net_price), aksi halde null; B2B (net/KDV-harici) fiyat
+  - `gross` — pick.gross_price null değilse Number(pick.gross_price), aksi halde null; B2C (gross/KDV-dahil) fiyat
+  - `derived` — segment==='individual' ise gross??net, aksi halde net??gross; segment'e göre türetilen fiyat
+  - `base` — Number(pick.base_price||0), taban fiyat
+  - `sale` — pick.sale_price null değilse Number(pick.sale_price), aksi halde null; indirimli satış fiyatı
+  - `disc` — Number(pick.discount_percentage||0), indirim yüzdesi (0-100)
+  - `v` — base*(1-disc/100) ile hesaplanan indirim uygulanmış fiyat
+  - `fb` — Number(product.price||0), fiyat listesinde kayıt bulunamazsa kullanılan fallback ürün fiyatı
+- **Dönüş**: Promise<{unit: number, listId: string | null}> — hesaplanmış birim fiyat ve kullanılan fiyat listesi ID'si
+
+### [N6_NASIL] AST Pointer: supabase/functions/order-validate/index.ts::sort_comparator (anonymous)
+- **params**: `a: PriceList` — karşılaştırılacak ilk fiyat listesi, `b: PriceList` — karşılaştırılacak ikinci fiyat listesi
+- **ic_degiskenler**:
+  - `at` — a.effective_from Date.parse() sonucu milisaniye cinsinden tarih; null/parse edilemezse 0
+  - `bt` — b.effective_from Date.parse() sonucu milisaniye cinsinden tarih; null/parse edilemezse 0
+- **Dönüş**: number — negatif ise a önce gelir; spesifik user_type olan önce, sonra en yeni effective_from önce gelir (azalan sıra)
 
 ---
 
 ## NODE ID STANDARD
 
   file: supabase\functions\order-validate\index.ts
+  function: supabase\functions\order-validate\index.ts::segmentFromUser
   function: supabase\functions\order-validate\index.ts::order-validate_handler
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
   export: order-validate_handler
+  export: segmentFromUser
 
 ---
 # FILE: supabase\functions\refund-order-mock\index.md
@@ -2406,12 +2634,12 @@ Bu modül, bir HTTP isteğini alıp sipariş doğrulama işlemleri yapacak şeki
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\refund-order-mock\index.ts
-skeleton_hash: 4560979f836ae801
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\refund-order-mock\index.ts
+skeleton_hash: 4b351dda23d540b3
 entity_hashes:
   func:refund-order-mock_handler: 4c50c7cb50c6be68
   overview: b618c82b37f33caf
-generated_at: 2026-08-13T07:40:32Z
+generated_at: 2026-08-14T22:02:42Z
 ---
 
 ## Genel Bakış
@@ -2531,56 +2759,63 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\release-expired-reservations\index.ts
-skeleton_hash: 0b2ab56d5062791b
+skeleton_hash: c2a450c13521e732
 entity_hashes:
-  func:release-expired-reservations_handler: 2ee83a2fc9a11645
-  overview: d6e6683c81c36dd3
-generated_at: 2026-08-13T07:40:32Z
+  func:release-expired-reservations_handler: 0483cb3fe89757db
+  overview: 8dbd32b37d35fd0b
+generated_at: 2026-08-17T11:37:56Z
 ---
 
 ## Genel Bakış
-Bu modül, süresi dolmuş rezervasyonları otomatik olarak serbest bırakan bir Supabase Edge Function'dır. Gelen HTTP istekleri aracılığıyla tetiklenerek veritabanındaki geçerlilik süresi dolan rezervasyon kayıtlarını tespit eder, bunların durumunu günceller ve ilişkili kaynakların yeniden kullanıma açılmasını sağlar.
+Bu modül, süresi dolmuş rezervasyonları otomatik olarak serbest bırakan bir Supabase Edge Function'dır. Tek bir HTTP endpoint üzerinden tetiklenerek veritabanındaki geçerlilik süresi dolmuş rezervasyon kayıtlarını tespit eder, bunların durumunu günceller ve ilişkili kaynakların yeniden kullanıma açılmasını sağlar.
 
 ## Fonksiyon Grupları
-
 ### HTTP İstek İşleyici
-Tek bir HTTP endpoint üzerinden dışarıya açılan giriş noktasıdır; isteği alır, iş mantığını koordine eder ve sonucu yanıt olarak döner.
+Modülün dış dünyaya açılan tek giriş noktasıdır; HTTP isteğini alır, rezervasyon serbest bırakma iş mantığını koordine eder ve sonucu yanıt olarak döner.
 - release-expired-reservations_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyicisi olarak yapılandırılmıştır.
+Bu modül, Supabase Edge Functions ortamında çalışan HTTP tabanlı bir rezervasyon serbest bırakma fonksiyonudur.
 
-[Aksiyom 1]: Eğer geçerli bir HTTP `Request` nesnesi (req parametresi) sağlanmazsa, fonksiyon başlatılamaz ve HTTP yanıtı üretilemez.
+**[Aksiyom 1]:** Eğer geçerli bir HTTP Request nesnesi (`req: Request`) sağlanmazsa, fonksiyon yanıt üretilemez ve işlenemeyen istek durumunda hata döner.
 
-[Aksiyom 2]: Eğer `corsHeaders` sabiti (object) tanımlı değilse veya boş/eksik ise, istemcilere döndürülen HTTP yanıtlarında CORS başlıkları eksik kalır ve tarayıcı tarafı istekleri engellenebilir.
+**[Aksiyom 2]:** Eğer Supabase Edge Functions çalışma ortamı (runtime) mevcut değilse veya `@serve` dekoratörü düzgün yapılandırılmamışsa, fonksiyon hiç tetiklenemez.
 
-[Aksiyom 3]: Eğer Supabase Edge Functions çalışma ortamı (runtime) mevcut değilse, bu fonksiyon çalıştırılamaz — fonksiyon imzası `Request` tipine bağımlıdır.
+**[Aksiyom 3]:** Eğer fonksiyon başarılı bir şekilde çalışırsa, her durumda bir `Response` nesnesi dönmelidir; aksi halde istemci yanıt alamaz ve zaman aşımı hatası oluşur.
 
-[Aksiyom 4]: Eğer Supabase veritabanı bağlantısı (edge function ortamında otomatik sağlanan) erişilebilir durumda değilse, rezervasyon kayıtları sorgulanamaz ve süresi dolmuş kayıtlar tespit edilemez.
+**[Aksiyom 4]:** Eğer veritabanı bağlantısı (Supabase client) yapılandırılmamışsa, rezervasyon kayıtlarına erişim sağlanamaz ve süresi dolmuş rezervasyonlar tespit edilemez.
+
+**[Aksiyom 5]:** Eğer veritabanında `reservations` tablosu veya ilgili tablo mevcut değilse, sorgu başarısız olur ve hiçbir rezervasyon güncellenemez.
+
+---
+
+**Not:** Bu modül için belirtilen fonksiyon gövdesi (implementation body) paylaşılmadığından, iş mantığına ilişkin spesifik aksiyomlar (eşik değerleri, rezervasyon durumu transition kuralları, kaynak kilitleme mantığı vb.) **bilinmiyor** olarak değerlendirilmiştir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### release-expired-reservations_handler
+**Ne yapar**: Süresi dolmuş rezervasyonları serbest bırakma işlemini yöneten HTTP endpoint handler'ıdır. Bu fonksiyon, Supabase Edge Function olarak tanımlı olup HTTP isteklerini karşılar ve rezervasyon serbest bırakma sürecini başlatır.
 
-**Ne yapar**: Süresi dolmuş rezervasyonları serbest bırakan HTTP istek işleyicisidir. Bu fonksiyon, belirli bir zaman dilimi içinde kullanılmamış veya son kullanma tarihi geçmiş rezervasyonları tespit edip iptal ederek ilgili kaynakları tekrar müsait hale getirir.
-
-**Nasıl yapar**: Fonksiyon, bir Supabase Edge Function olarak HTTP isteklerini karşılar. Gelen isteği işler ve süresi dolmuş rezervasyonları veritabanında bulup serbest bırakma işlemini gerçekleştirir. İşlem sonucunda HTTP yanıt döndürür.
+**Nasıl yapar**:
+- `@serve` dekoratörü kullanılarak HTTP request/response döngüsüne dahil edilmiştir. Bu dekoratör, fonksiyonu dışarıya açık bir HTTP endpoint olarak sunar ve isteklerin işlenmesini sağlar.
+- Fonksiyon asenkron (`async`) olarak tanımlanmıştır, bu sayede uzun sürebilecek veritabanı işlemlerini bloklamadan bekleyebilir.
+- Docstring'e göre `inventory_movements` tablosundaki kanıtları kontrol eder. Bu kontrole T052-VH kodlu kanıt referans verilmiştir.
 
 **Parametreler**:
-- `req`: Request — Gelen HTTP istek nesnesi. İstek ile ilgili bilgileri (metot, gövde, başlıklar vb.) içerir ve fonksiyonun çalıştırılması için gerekli parametreleri taşır.
+- `req`: `Request` — Gelen HTTP isteği nesnesi. İstek body, header, query parametreleri ve diğer HTTP bilgilerini içerir. Fonksiyon bu nesne üzerinden istek verilerine erişir.
 
-**Dönüş**: Response — İşlem sonucuna göre HTTP yanıt nesnesi döndürür. Başarı veya hata durumunu belirten durum kodu ve opsiyonel mesaj içerebilir.
+**Dönüş**: `Response` — HTTP yanıt nesnesi. İşlem sonucuna göre istemciye döndürülecek yanıt (başarı/hata durumu, mesaj vb.) bu nesne ile paketlenir ve gönderilir.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: https://deno.land/std@0.177.0/http/server.ts::serve
-- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -2593,58 +2828,46 @@ Bu modül, Supabase Edge Functions ortamında HTTP tabanlı bir istek işleyicis
 - `id: string`
 - `order_number: string | null`
 
-### OrderItem
-- `product_id: string`
-- `quantity: number`
-
----
-
-## SABİTLER
-- **corsHeaders** (object) — `{
-
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
-
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/release-expired-reservations/index.ts::release-expired-reservations_handler
-- **params**: `(req: Request)`
+### [N1_NASIL] AST Pointer: release-expired-reservations\index.ts::release-expired-reservations_handler
+- **params**: `req: Request` — gelen HTTP isteği
 - **ic_degiskenler**:
-  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase proje URL'si
-  - `supabaseKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan Supabase servis rol anahtarı
-  - `authHeader` — `req.headers.get('Authorization')` ile istekten alınan yetkilendirme başlığı
-  - `isAuthorized` — Boolean flag, kullanıcının yetkili olup olmadığını tutar
-  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan anonim anahtar, JWT doğrulama için kullanılır
-  - `createClientAuth` — Dinamik import ile yüklenen alternatif `createClient` fonksiyonu, anonim anahtarla istemci oluşturmak için
-  - `authClient` — Anonim anahtar ve Authorization header ile oluşturulan Supabase istemcisi, kullanıcı kimliğini doğrulamak için
-  - `user` — `authClient.auth.getUser()` sonucundan çıkarılan kullanıcı nesnesi
-  - `roleCheck` — `fetch` ile `/rest/v1/user_profiles` endpoint'ine yapılan rol kontrol isteği sonucu (Response)
-  - `arr` — `roleCheck.json()` ile parse edilen rol kontrol yanıt dizisi
-  - `role` — `arr[0]?.role` ile elde edilen kullanıcının rolü ('admin' veya 'superadmin' kontrolü yapılır)
-  - `supabase` — `createClient(supabaseUrl, supabaseKey)` ile oluşturulan Supabase servis istemcisi
-  - `settingsData` — `inventory_settings` tablosundan `reservation_timeout_hours` alanını seçen sorgu sonucu verisi
-  - `settings` — `settingsData`'nın `InventorySettings` tipine cast edilmiş hali
-  - `hours` — Rezervasyon zaman aşımı süresi saat cinsinden, `settings?.reservation_timeout_hours` veya varsayılan 24
-  - `timeoutDate` — Şu andan `hours` kadar önceki tarih nesnesi, süresi dolmuş siparişlerin eşik zamanı
-  - `expiredOrders` — `venthub_orders` tablosundan süresi dolmuş 'pending' durumlu siparişlerin listesi
-  - `findErr` — Süresi dolmuş siparişleri bulma sorgusunun hata nesnesi
-  - `releasedCount` — Sayaç, başarıyla iptal edilen ve stoku iade edilen sipariş sayısı
-  - `order` — `expiredOrders` dizisi üzerindeki döngü değişkeni, her süresi dolmuş siparişi temsil eder
-  - `updateErr` — Sipariş durumunu 'cancelled'/'failed' olarak güncelleme sorgusunun hata nesnesi
-  - `itemsRaw` — `venthub_order_items` tablosundan belirli siparişin ürün listesini seçen sorgu sonucu verisi
-  - `items` — `itemsRaw`'ın `OrderItem` tipine cast edilmiş hali
-  - `item` — `items` dizisi üzerindeki iç döngü değişkeni, her sipariş kalemini temsil eder
-  - `rpcErr` — `adjust_stock_v2` RPC çağrısının hata nesnesi, stok iade işleminin sonucu
-  - `orderErr` — Sipariş bazlı try-catch bloğunun yakaladığı hata nesnesi
-  - `error` — Ana try-catch bloğunun yakaladığı genel hata nesnesi
-- **Dönüş**: `Response` — JSON body ile sonuç döner:
-  - CORS OPTIONS istekleri: 200 `{ 'ok' }`
-  - Eksik config: 500 `{ error: 'Missing Supabase Config' }`
-  - Yetkisiz erişim: 401 `{ error: 'Unauthorized' }`
-  - Süresi dolmuş sipariş yoksa: 200 `{ message: 'No expired reservations found.', released: 0 }`
-  - Başarılı: 200 `{ success: true, released_count, message }`
-  - Genel hata: 500 `{ error: 'internal_error' }`
+  - `corsHeaders` — `getCorsHeaders(req)` ile üretilen CORS başlık nesnesi; tüm Response'larda kullanılır
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')`, Supabase proje URL'i
+  - `supabaseKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')`, servis rolü anahtarı
+  - `authHeader` — `req.headers.get('Authorization')`, istek başlığındaki JWT token
+  - `isAuthorized` — boolean, kullanıcının yetkilendirilip yetkilendirilmediğini tutar; başlangıçta `false`
+  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')`, anonim Supabase anahtarı, boş string fallback'li (auth bloğu içinde)
+  - `createClientAuth` — `await import(...)` ile lazy import edilen `createClient` fonksiyonu; auth bloğu içinde
+  - `authClient` — kullanıcı token'ı ile oluşturulmuş geçici Supabase istemcisi; `createClientAuth(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })`
+  - `user` — `authClient.auth.getUser()` sonucundan destructure edilen kullanıcı nesnesi; `const { data: { user } } = ...`
+  - `roleCheck` — `fetch()` ile `user_profiles` tablosundan rol sorgulama sonucu (Response nesnesi)
+  - `arr` — `roleCheck.json().catch(() => [])` sonucu; `arr[0]?.role` ile ilk elemanın rolu erişilir
+  - `role` — `arr[0]?.role` ifadesinden çıkarılan kullanıcı rolü string'i
+  - `supabase` — `createClient(supabaseUrl, supabaseKey)` ile oluşturulan ana Supabase istemcisi
+  - `settingsData` — `supabase.from('inventory_settings').select('reservation_timeout_hours').maybeSingle()` sonucu; `InventorySettings | null` olabilir
+  - `settings` — `settingsData as InventorySettings | null` olarak tip-lendirilmiş ayarlar nesnesi; `settings?.reservation_timeout_hours` erişimi yapılır
+  - `hours` — `settings?.reservation_timeout_hours || 24`, rezervasyon zaman aşımı süresi (saat cinsinden, varsayılan 24)
+  - `timeoutDate` — `new Date()` üzerine `hours` kadar saat geri gidilerek hesaplanan eşik tarihi; `timeoutDate.toISOString()` olarak kullanılır
+  - `expiredOrders` — `supabase.from('venthub_orders').select('id, order_number').eq('status', 'pending').eq('payment_status', 'pending').lt('created_at', timeoutDate.toISOString()).limit(100)` sorgusunun sonucu; `ExpiredOrder[]` tipinde dizi
+  - `findErr` — `expiredOrders` sorgusundaki `error` alanı; varsa `throw` edilir
+  - `releasedCount` — başarıyla serbest bırakılan sipariş sayısı sayaç değişkeni, başlangıçta `0`
+  - `order` — `for...of` döngüsünde her iterasyondaki `ExpiredOrder` nesnesi; `order.id` ve `order.order_number` erişimleri yapılır
+  - `updateErr` — `supabase.from('venthub_orders').update(...).eq('id', order.id)` sorgusundaki `error` alanı
+  - `restoreRaw` — `supabase.rpc('process_order_stock_restore', { p_order_id: order.id, p_reason: 'order_expire' })` sonucunun `data` alanı; `{ success?: boolean; error?: string; restored_count?: number; restored_units?: number } | null` olarak tip-lendirilir (`restore` adıyla)
+  - `restoreErr` — `process_order_stock_restore` RPC çağrısındaki `error` alanı
+  - `restore` — `restoreRaw as { success?: boolean; error?: string; restored_count?: number; restored_units?: number } | null`, RPC sonuç nesnesi; `restore?.success`, `restore?.error`, `restore?.restored_count`, `restore?.restored_units` alanları okunur
+  - `orderErr` — inner try-catch bloğundaki yakalanan hata nesnesi; her sipariş işlemenin individual hata yönetimi için
+- **Dönüş**: `Response` — JSON body ile:
+  - CORS OPTIONS isteği: `{ message: 'ok' }`, status 200
+  - Eksik config: `{ error: 'Missing Supabase Config' }`, status 500
+  - Yetkisiz: `{ error: 'Unauthorized' }`, status 401
+  - Süresi dolmuş sipariş yoksa: `{ message: 'No expired reservations found.', released: 0 }`, status 200
+  - Başarılı: `{ success: true, released_count: releasedCount, message: ... }`, status 200
+  - Fatal hata: `{ error: 'internal_error' }`, status 500
 
 ---
 
@@ -2666,42 +2889,56 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\return-status-notification\index.ts
-skeleton_hash: dc719d8c1a08cfe7
+skeleton_hash: 5a6df8fe3834d7ad
 entity_hashes:
+  func:callerFailure: c2855766de0bfe8b
   func:return-status-notification_handler: 7d2592fd30deaf05
-  overview: 2f67488397ccb15e
-generated_at: 2026-08-13T07:40:32Z
+  overview: 60ed89a145e03aa3
+generated_at: 2026-08-17T11:39:14Z
 ---
 
 ## Genel Bakış
-Bu modül, bir Supabase Edge Function olarak iade (return) durum değişikliklerini yöneten HTTP tabanlı bir bildirim servisidir. Dış sistemlerden gelen POST isteklerini kabul ederek, iade süreçlerindeki durum güncellemelerini işler, CORS politikalarını uygular ve uygun HTTP yanıt kodlarıyla operasyonun sonucunu döndürür.
+Bu modül, Supabase Edge Function olarak iade (return) süreçlerindeki durum değişikliklerini işleyen ve bildiren tek amaçlı bir HTTP servisidir. Gelen istekleri doğrulayıp işler, uygun yanıtlar döndürür ve hata senaryolarında tutarlı bir geri bildirim sağlar. Basit ve odaklı bir mimari ile istek-yanıt döngüsü üzerine kurulmuştur.
 
 ## Fonksiyon Grupları
-### İstek İşleme ve Yanıt Yönetimi
-Modülün tek ve temel işleyicisi olan bu fonksiyon, gelen HTTP isteklerini doğrular, CORS kurallarını uygular, istek gövdesindeki iade durum bilgisini işler ve başarılı ya da hata durumuna göre uygun HTTP yanıtını (200, 400, 403, 404, 405) üretir.
+### Ana İstek İşleyici
+Modülün merkezi sorumluluğunu yerine getirir: Gelen HTTP isteklerini kabul eder, CORS politikalarını uygular, istek metodunu ve gövdesini doğrular, iş mantığını yürütür ve uygun HTTP durum kodlarıyla yanıt üretir.
 - return-status-notification_handler
+
+### Hata Yönetimi
+İşlem akışı boyunca oluşabilecek öngörülemeyen hataları yakalar ve standart, yapılandırılmış bir hata yanıtı (nesne) üretir. Bu sayede istemcilere tutarlı ve programatik olarak işlenebilir hata bilgisi sunulmasını sağlar.
+- callerFailure
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, Supabase Edge Function runtime ortamında HTTP istekleriyle iade durum bildirimlerini işleyen bir servistir.
+[Bu modül, bir Supabase Edge Function olarak çalışır ve HTTP istekleri üzerinden iade durum bildirimlerini işler.]
 
-**[Aksiyom 1]**: Eğer `req` parametresi geçerli bir HTTP request nesnesi değilse, istek işlenemez ve hata yanıtı döndürülmesi gerekir.
+[Aksiyom 1]: Eğer `callerFailure` fonksiyonuna geçerli bir `error` parametresi sağlanmazsa, fonksiyon `null` döner ve hata bilgisi yapılandırılamaz.
 
-**[Aksiyom 2]**: Eğer HTTP response nesnesi oluşturulamazsa (headers, body gibi), istemci tarafında iletişim kopukluğu oluşur.
+[Aksiyom 2]: Eğer `return-status-notification_handler` fonksiyonuna geçerli bir HTTP `req` (Request) nesnesi sağlanmazsa, handler Response nesnesi üretemez ve istek başarısız olur.
 
-**[Aksiyom 3]**: Eğer istek methodu POST以外 (GET, DELETE vb.) ise, işlenemeyen metod için uygun HTTP 405 (Method Not Allowed) yanıtı döndürülmesi gerekir.
+[Aksiyom 3]: Eğer `callerFailure` tarafından döndürülen hata nesnesinin `status` alanı sayısal değer içermiyorsa, HTTP yanıt kodu hatalı olur.
 
-**[Aksiyom 4]**: Eğer istek gövdesi (request body) geçerli JSON formatında değilse, parsing hatası oluşur ve 400 Bad Request yanıtı döndürülmesi gerekir.
+[Aksiyom 4]: Eğer `callerFailure` tarafından döndürülen hata nesnesinin `error` alanı string değer içermiyorsa, yanıt gövdesi geçersiz olur.
 
-**[Aksiyom 5]**: Eğer CORS origin başlıkları doğrulanamazsa, tarayıcı tabanlı istekler engellenebilir (CORS policy violation).
-
-**[Aksiyom 6]**: Eğer modül Supabase Edge Function runtime ortamında (Deno) çalıştırılmazsa, runtime-specific API'ler (Deno.fetch, Edge Function context) kullanılamaz ve fonksiyon başarısız olur.
+[Aksiyom 5]: Eğer Supabase serve ortamı (runtime) mevcut değilse veya `@serve` dekoratörü düzgün çalışmıyorsa, handler fonksiyonu hiç çağrılamaz.
 
 ---
 
 ## FONKSİYON DETAYLARI
+
+### callerFailure
+
+**Ne yapar**: Çağrııcı (caller) tarafında oluşan hataları HTTP durum kodları ve anlamlı hata metinleriyle eşler. Three custom error sınıfını (`TenantMismatchError`, `CallerConfigError`, `CallerLookupError`) tanır ve her birini ilgili HTTP yanıt durumuna dönüştürür. Eşleşmeyen hatalarda `null` dönererek üst katmanın varsayılan hata işleyişine devretmesini sağlar.
+
+**Nasıl yapar**: Fonksiyon gelen `error` nesnesi üzerinde `instanceof` kontrol zinciri uygular. Öncelik sırasıyla sırasıyla `TenantMismatchError` (403), `CallerConfigError` (500) ve `CallerLookupError` (503) sınıflarını test eder. İlk eşleşen sınıf için ilgili `{ status, error }` nesnesini döndürür; hiçbir sınıfa uymayan hatalarda `null` döner. Bu yapı sayesinde fonksiyon tek bir錯誤 eşleme noktası oluşturur ve BEŞ bildirim ucunda tutarlı HTTP haritalaması sağlar. `TenantMismatchError`, claim ile profil arasındaki uyumsuzluğu; `CallerConfigError`, ortam değişkeni eksikliğini (sistemin kendi hatası); `CallerLookupError` ise profil sorgulama başarısızlığını temsil eder.
+
+**Parametreler**:
+- `error`: `unknown` — Yakalanan hata nesnesi. Herhangi bir türde olabilir; fonksiyon bunu `instanceof` zinciriyle güvenli bir şekilde test eder.
+
+**Dönüş**: `{ status: number; error: string } | null` — Eşleşen bir hata sınıfı bulunduğunda, HTTP durum kodu (`status`) ve insani tarafından okunabilir hata tanımlayıcısı (`error`) içeren bir nesne döner. `TenantMismatchError` → `403` / `'tenant_mismatch'`, `CallerConfigError` → `500` / `'CONFIG_MISSING'`, `CallerLookupError` → `503` / `'profile_lookup_failed'`. Tanınmayan hata türleri için `null` döner; bu durumda çağrııcı kendi varsayılan hata yönetim mantığını devreye alır.
 
 ### return-status-notification_handler
 
@@ -2719,7 +2956,6 @@ Bu modül, Supabase Edge Function runtime ortamında HTTP istekleriyle iade duru
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: ../_shared/tenant_config.ts::getTenantBranding
-- import: ../_shared/tenant_config.ts::resolveTenantId
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
 
 ---
@@ -2738,74 +2974,87 @@ Bu modül, Supabase Edge Function runtime ortamında HTTP istekleriyle iade duru
 - `description?: string | null`
 - `tenant_id?: string`
 
+### ResendResult
+- `id?: string`
+
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase\functions\return-status-notification\index.ts::return-status-notification_handler
-- **params**: `(req)`
-- **ic_degiskenler**:
-  - `corsHeaders` — CORS ayarlarını içeren nesne, response header'larında kullanılır
-  - `body` — Request body'sinden parse edilen JSON verisi (ReturnStatusNotificationRequest tipinde)
-  - `return_id` — body'den gelen iade talebi ID'si
-  - `old_status` — body'den gelen eski durum kodu
-  - `new_status` — body'den gelen yeni durum kodu
-  - `reason` — body'den gelen durum değişikliği sebebi
-  - `description` — body'den gelen açıklama metni (opsiyonel)
-  - `order_id` — body'den gelen veya veritabanından çözülen sipariş ID'si
-  - `order_number` — body'den gelen veya veritabanından çözülen sipariş numarası
-  - `tenantId` — resolveTenantId() ile belirlenen kiraci ID'si
-  - `branding` — getTenantBranding() ile alınan kiraci marka bilgileri
-  - `supabaseUrl` — SUPABASE_URL ortam değişkeninden alınan URL
-  - `serviceKey` — SUPABASE_SERVICE_ROLE_KEY ortam değişkeninden alınan anahtar
-  - `authHeader` — request header'ından alınan Authorization değeri
-  - `isAuthorized` — kullanıcının yetkilendirilip yetkilendirilmediğini tutan boolean
-  - `anonKey` — SUPABASE_ANON_KEY ortam değişkeninden alınan anonim anahtar
-  - `createClient` — dinamik import ile yüklenen Supabase client oluşturucu fonksiyon
-  - `authClient` — createClient ile oluşturulan kimlik doğrulama istemcisi
-  - `roleCheck` — user_profiles tablosunda rol kontrolü için yapılan fetch isteği
-  - `arr` — roleCheck.json() ile parse edilen rol verisi dizisi
-  - `arr[0]?.role` — ilk kullanıcının rolü (admin veya superadmin olmalı)
-  - `customer_email` — müşteri email adresi (veritabanından veya body'den)
-  - `customer_name` — müşteri adı (veritabanından veya body'den)
-  - `user_id` — kullanici ID'si (veritabanından)
-  - `retRes` — venthub_returns tablosundan iade verisini çeken fetch isteği
-  - `retArr` — retRes.json() ile parse edilen iade verisi dizisi
-  - `ret` — retArr[0] olarak alınan ilk iade kaydı
-  - `ordRes` — venthub_orders tablosundan sipariş verisini çeken fetch isteği
-  - `ordArr` — ordRes.json() ile parse edilen sipariş verisi dizisi
-  - `ord` — ordArr[0] olarak alınan ilk sipariş kaydı
-  - `authRes` — Supabase auth API'sinden kullanıcı bilgilerini çeken fetch isteği
-  - `u` — authRes.json() ile parse edilen kullanıcı nesnesi
-  - `meta` — u.user_metadata alanından alınan kullanıcı meta verileri
-  - `brandName` — branding.brandName değerinden alınan marka adı
-  - `brandPrimary` — branding.brandPrimaryColor değerinden alınan ana renk kodu
-  - `brandLogoUrl` — branding.brandLogoUrl değerinden alınan logo URL'i
-  - `prettyOrderNo` — sipariş numarasının formatlanmış hali (# işareti ile)
-  - `getStatusLabel` — durum kodunu Türkçe etikete çeviren iç fonksiyon
-  - `statusLabel` — getStatusLabel() ile dönüştürülen Türkçe durum etiketi
-  - `subject` — e-posta konu satırı
-  - `resendApiKey` — RESEND_API_KEY ortam değişkeninden alınan e-posta servisi anahtarı
-  - `emailFrom` — branding.emailFrom değerinden alınan gönderici e-posta adresi
-  - `emailResponse` — Resend API'sine yapılan e-posta gönderim isteği
-- **Dönüş**: Response (çeşitli durumlarda: success, error, veya disabled yanıtları)
+### [N1_NASIL] AST Pointer: supabase/functions/return-status-notification/index.ts::callerFailure
+- **params**: `(error: unknown)`
+- **ic_degiskenler**: (parametre dışında değişken yok — tüm mantık `error` parametresi üzerine kurulu)
+- **Dönüş**: `{ status: number; error: string } | null` — `error`'ın türüne göre uygun HTTP hata nesnesi döndürür; tanınmayan hatalarda `null` döner
+- **Kullanılan Sınıflar**: `TenantMismatchError` (→ 403/`tenant_mismatch`), `CallerConfigError` (→ 500/`CONFIG_MISSING`), `CallerLookupError` (→ 503/`profile_lookup_failed`) — bu sınıflar bu dosyada tanımlı değil, dışarıdan import edilmiş
 
-### [N2_NASIL] AST Pointer: supabase\functions\return-status-notification\index.ts::getStatusLabel
-- **params**: `(status: string)`
+---
+
+### [N2_NASIL] AST Pointer: supabase/functions/return-status-notification/index.ts::return-status-notification_handler
+- **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `labels` — durum kodlarını Türkçe etiketlere eşleyen Record nesnesi
-- **Dönüş**: string (Türkçe durum etiketi veya orijinal durum kodu)
+  - `corsHeaders` — `getCorsHeaders(req)` ile elde edilen CORS başlık nesnesi; tüm Response'lara eklenir
+  - `body` — `req.json()` ile parse edilmiş POST body'si (`ReturnStatusNotificationRequest` tipinde); alanların ana kaynağı
+  - `return_id` — `body`'den const destructured, iade talebi ID'si; DB sorgusu ve e-posta içeriğinde kullanılır
+  - `old_status` — `body`'den const destructured, iade eski durumu; log mesajında kullanılır
+  - `new_status` — `body`'den const destructured, iade yeni durumu; validasyon, etiket çözümü, mesaj üretimi ve response'da kullanılır
+  - `reason` — `body`'den const destructured, iade sebebi; e-posta gövdesinde gösterilir
+  - `description` — `body`'den const destructured, iade açıklaması (opsiyonel); e-posta gövdesinde koşullu gösterilir
+  - `order_id` — `body`'den let destructured, sipariş ID'si; `venthub_returns` sorgusuyla mutate edilebilir, `venthub_orders` sorgusunda kullanılır
+  - `order_number` — `body`'den let destructured, sipariş numarası; `venthub_orders` sorgusuyla mutate edilebilir, `prettyOrderNo` formatlamasında kullanılır
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')`, Supabase REST API kök URL'i; DB fetch'lerinde base URL olarak kullanılır
+  - `serviceKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')`, Supabase service role anahtarı; tüm DB ve Auth fetch'lerinde `Authorization` ve `apikey` header'ında kullanılır
+  - `ctx` — `resolveCaller(req, body)` sonucu (`CallerContext`); yetkilendirme bağlamı, `kind`/`role`/`tenantId` alanları kontrol edilir
+  - `failure` — `callerFailure(err)` sonucu; resolveCaller hatası tanınabilir hata ise `{ status, error }` nesnesi, değilse `null` (null ise hata yeniden throw edilir)
+  - `tenantId` — `ctx.tenantId`, doğrulanmış tenant ID'si; DB sorgularında `tenant_id=eq` filtresinde ve `getTenantBranding` çağrısında kullanılır
+  - `branding` — `getTenantBranding(tenantId)` sonucu, tenant'a ait marka bilgileri (`brandName`, `brandPrimaryColor`, `brandLogoUrl`, `emailFrom` alanları Extract edilir)
+  - `customer_email` — `string | undefined`, müşteri e-posta adresi; DB çözümlerinden veya `body.customer_email` fallback'inden doldurulur, e-posta gönderiminde `to` olarak kullanılır
+  - `customer_name` — `string | undefined`, müşteri tam adı; DB çözümlerinden veya `body.customer_name` fallback'inden doldurulur, e-posta içeriğinde selamlama ve metinlerde kullanılır
+  - `user_id` — `string | undefined`, Supabase Auth kullanıcı ID'si; `venthub_returns` veya `venthub_orders` sorgusundan çözümlenir, Auth API çağrısında kullanılır
+  - `retRes` — `fetch()` sonucu, `venthub_returns` tablosuna yapılan sorgu Response'u
+  - `retArr` — `retRes.json()` sonucu (catch ile `[]` fallback), iade kayıtları dizisi
+  - `ret` — `retArr[0]`, ilk iade kaydı nesnesi; `ret.order_id` ve `ret.user_id` alanları `order_id`/`user_id` değişkenlerini günceller
+  - `ordRes` — `fetch()` sonucu, `venthub_orders` tablosuna yapılan sorgu Response'u
+  - `ordArr` — `ordRes.json()` sonucu (catch ile `[]` fallback), sipariş kayıtları dizisi
+  - `ord` — `ordArr[0]`, ilk sipariş kaydı nesnesi; `order_number`, `customer_email`, `customer_name`, `user_id` alanlarını günceller
+  - `authRes` — `fetch()` sonucu, Supabase Auth `/auth/v1/admin/users/{user_id}` endpoint'ine yapılan istek Response'u
+  - `u` — `authRes.json()` sonucu (catch ile `null` fallback), Supabase Auth kullanıcı nesnesi; `u.email` ve `u.user_metadata` alanları çözümlenir
+  - `meta` — `u.user_metadata`'dan türetilen `{ full_name?: string; name?: string }` nesnesi; `customer_name` fallback'inde kullanılır
+  - `missing` — zorunlu alanların eksik isimlerinden filtrelenmiş dizi (`string[]`); 400 hata response'unda `missing` field'ında döndürülür
+  - `brandName` — `branding.brandName`, marka adı; e-posta konusu, selamlama ve imza satırlarında kullanılır
+  - `brandPrimary` — `branding.brandPrimaryColor`, marka ana rengi hex kodu; HTML e-postada `color` ve `border-left` stillerinde kullanılır
+  - `brandLogoUrl` — `branding.brandLogoUrl`, marka logo URL'i; HTML e-postada `<img>` tag'inde koşullu olarak gösterilir
+  - `prettyOrderNo` — formatlanmış sipariş numarası (`#XXXX`); `order_number` varsa `#` + ikinci tireden sonraki kısım, yoksa `order_id`'nin son 8 karakteri, hiçbir şey yoksa `#N/A`
+  - `getStatusLabel` — inline arrow fonksiyonu `(status: string): string`; durum kodunu (`approved`, `rejected`, vb.) Türkçe insan-okunabilir etikete çevirir; eşleşmeyen durumlarda ham string'i döndürür
+  - `statusLabel` — `getStatusLabel(new_status)` sonucu, Türkçe durum etiketi; e-posta konusu ve gövdesinde kullanılır
+  - `subject` — e-posta konu satırı string'i; `"${brandName} | İade durumu güncellendi - ${prettyOrderNo}"` formatındadır
+  - `getStatusMessage` — inline arrow fonksiyonu `(status: string): { message: string; nextSteps?: string }`; duruma göre müşteriye yönelik mesaj ve opsiyonel "Sonraki Adımlar" metni döndürür; `approved`, `rejected`, `in_transit`, `received`, `refunded`, `cancelled` case'leri ve default dalı vardır
+  - `message` — `getStatusMessage(new_status)` destructured sonucu, müşteriye gösterilecek ana mesaj metni
+  - `nextSteps` — `getStatusMessage(new_status)` destructured sonucu (`string | undefined`), müşteriye gösterilecek sonraki adımlar metni (opsiyonel)
+  - `emailContent` — template literal ile oluşturulmuş düz metin e-posta gövdesi; Resend API `text` parametresinde kullanılır
+  - `html` — template literal ile oluşturulmuş HTML e-posta gövdesi; Resend API `html` parametresinde kullanılır
+  - `resendApiKey` — `Deno.env.get('RESEND_API_KEY')`, Resend e-posta servisi API anahtarı; yoksa e-posta gönderimi devre dışı bırakılır
+  - `emailFrom` — `branding.emailFrom`, Resend API'de kullanılacak gönderici e-posta adresi
+  - `notifyDebug` — `Deno.env.get('NOTIFY_DEBUG') === 'true'`, debug loglama flag'i; e-posta devre dışı kaldığında `console.warn` ile bilgilendirme yapar
+  - `emailResponse` — `fetch('https://api.resend.com/emails', ...)` sonucu, Resend API Response'u; `ok` kontrolü yapılır, başarısızsa `Error` fırlatılır
+  - `result` — `emailResponse.json()` sonucu (`ResendResult`), Resend API yanıt nesnesi; başarı response'unda döndürülür
+  - `msg` — catch bloğunda `error instanceof Error ? error.message : 'Unknown error'` ile elde edilen hata mesajı string'i; 500 response'unda `error` field'ında döndürülür
+- **Erişilen İçe Aktarımlar**: `resolveCaller` (çağrı analizi fonksiyonu), `ADMIN_ROLES` (admin rol dizisi, `ctx.role` kontrolünde kullanılır)
+- **Erişilen Deno API'leri**: `Deno.env.get()` (4 kez: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `NOTIFY_DEBUG`)
+- **Erişilen Harici Servisler**: Supabase REST API (`/rest/v1/venthub_returns`, `/rest/v1/venthub_orders`), Supabase Auth Admin API (`/auth/v1/admin/users/{id}`), Resend Email API (`https://api.resend.com/emails`)
+- **Dönüş**: `Response` — başarı durumunda `200 + { success, result, return_id, customer_email, new_status, timestamp }`, çeşitli hata durumlarında `400/401/403/405/500` HTTP status kodlu JSON response'lar
 
 ---
 
 ## NODE ID STANDARD
 
   file: supabase\functions\return-status-notification\index.ts
+  function: supabase\functions\return-status-notification\index.ts::callerFailure
   function: supabase\functions\return-status-notification\index.ts::return-status-notification_handler
 
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: callerFailure
   export: return-status-notification_handler
 
 ---
@@ -2815,31 +3064,29 @@ Bu modül, Supabase Edge Function runtime ortamında HTTP istekleriyle iade duru
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\returns-webhook\index.ts
-skeleton_hash: 08a1f56f80c777c8
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\returns-webhook\index.ts
+skeleton_hash: 4e06503055bc479e
 entity_hashes:
   func:hmacValid: bae4fb8fa6cd5b7a
   func:json: 4e590f90f0f94ac5
   func:mapReturnStatus: 50a6b4e8a348ea6a
-  func:normalizePayload: 0c52ba9920336e17
+  func:normalizePayload: b648e72d362ae551
   func:returns-webhook_handler: b4558e805d0a933f
   func:sha256Base64: 0784b35c5d8e45cb
-  overview: 165beda8727317f0
-generated_at: 2026-08-13T07:40:32Z
+  overview: 8a02b4a164141090
+generated_at: 2026-08-15T09:03:35Z
 ---
 
 ## Genel Bakış
-
-Bu modül, kargo firmalarından gelen iade webhook isteklerini işleyen bir Supabase Edge Function'dır. HMAC-SHA256 imza doğrulaması ile güvenli kabul edilen istekler, farklı formatlardaki payload'lar standart forma dönüştürülerek uygulama içi iade durum alanlarına eşlenir. Modül tek bir HTTP giriş noktası üzerinden tüm iş akışını orkestra eder.
+Bu modül, kargo firmalarından gelen iade webhook isteklerini güvenli bir şekilde işleyen bir Supabase Edge Function'dır. HMAC-SHA256 imza doğrulaması ile kaynağın güvenilirliğini teyit ederek, farklı formatlardaki payload verilerini standart bir forma dönüştürür ve uygulama içi iade durum alanlarına eşler. Tek bir HTTP giriş noktası üzerinden tüm iş akışını orkestra eder.
 
 ## Fonksiyon Grupları
-
 ### Kriptografik Doğrulama
-Gelen webhook isteklerinin HMAC-SHA256 imzasını doğrulayarak kaynağın güvenilirliğini teyit eder. SHA-256 hash üretimi ve imza karşılaştırma işlemlerini kapsar.
+Webhook isteklerinin HMAC-SHA256 imzasını doğrulayarak kaynağın güvenilirliğini ve veri bütünlüğünü teyit eder.
 - sha256Base64, hmacValid
 
 ### Veri Normalizasyonu ve Haritalama
-Kargo firmalarından gelen farklı formatlardaki verileri ortak bir yapıya dönüştürür ve firma bazlı durum kodlarını uygulama içi standart değerler ile eşler.
+Kargo firmalarından gelen farklı formatlı payload verilerini ortak bir yapıya dönüştürür ve firma bazlı durum kodlarını uygulama içi standart değerlerle eşler.
 - normalizePayload, mapReturnStatus
 
 ### Yanıt Oluşturma
@@ -2854,7 +3101,27 @@ HTTP isteğini alarak tüm iş akışını yönetir; imza doğrulaması, payload
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kargo firmalarından gelen webhook isteklerini HMAC-SHA256 ile doğrulayıp iade durumunu eşleyen bir Supabase Edge Function'dır.
+Bu modül, kargo firmalarından gelen iade webhook isteklerini HMAC-SHA256 imza doğrulamasıyla güvenli bir şekilde işler, payload'ları normalize eder ve durum eşlemesi yapar.
+
+[Aksiyom 1]: Eğer HMAC_SECRET_KEY ortam değişkeni yoksa veya boşsa, `hmacValid` fonksiyonu HMAC-SHA256 imza doğrulamasını doğru şekilde gerçekleştirilemez ve imza karşılaştırması tutarsız sonuç verebilir.
+
+[Aksiyom 2]: Eğer HTTP isteğinde `X-Hub-Signature-256` header'ı yoksa veya boşsa, `hmacValid` fonksiyonu `signatureHeader` parametresine boş string olarak işlenir ve HMAC doğrulaması başarısız olur.
+
+[Aksiyom 3]: Eğer `SKEW_MS` sabiti tanımlı değilse veya negatif bir değer alırsa, zaman damgası doğrulamasında (varsa) tolerans penceresi hatalı çalışır, geçerli istekler reddedilebilir veya geçersiz istekler kabul edilebilir.
+
+[Aksiyom 4]: Eğer HTTP istek body'si geçerli bir JSON içermiyorsa (örn: bozuk JSON, boş body, veya non-JSON format), `normalizePayload` fonksiyonu veya `returns-webhook_handler` içindeki JSON parsing hata fırlatır.
+
+[Aksiyom 5]: Eğer `mapReturnStatus` fonksiyonuna beklenmeyen veya eşlenmemiş bir `input` değeri verilirse, dönen `{ status, setReceived }` nesnesinde `status` alanı `undefined` olur.
+
+[Aksiyom 6]: Eğer istek POST methoduyla gelmiyorsa, `returns-webhook_handler` fonksiyonu 405 Method Not Allowed yanıtı döndürmelidir (bu, handler'ın HTTP method kontrolüne dayalı bir varsayımdır).
+
+[Aksiyom 7]: Eğer `normalizePayload` fonksiyonuna `null` veya `undefined` bir `obj` parametresi verilirse, fonksiyonun davranışı tanımsızdır (beklenen: null değerlerin korunması veya boş obje dönülmesi).
+
+[Aksiyom 8]: Eğer `sha256Base64` fonksiyonuna boş string (`""`) girilirse, boş bir Base64 hash döndürülür (SHA256 boş string için tanımlı bir çıktı üretir).
+
+[Aksiyom 9]: Eğer HMAC secret'ı ve imza doğru eşleşmiyorsa (geçersiz imza), `returns-webhook_handler` fonksiyonu 401 Unauthorized yanıtı döndürmelidir ve payload işlenmez.
+
+[Aksiyom 10]: Eğer payload'da zorunlu alanlar eksikse (örn: `return_id`, `status` gibi alanlar), `normalizePayload` eksik alanları `undefined` olarak bırakır ve sonraki aşama bu alanları işleyemeyebilir.
 
 ---
 
@@ -2885,11 +3152,15 @@ Bu modül, kargo firmalarından gelen webhook isteklerini HMAC-SHA256 ile doğru
 **Dönüş**: { status?: string; setReceived?: boolean } — Eşlenen durum nesnesi. Giriş boşsa veya tanımsızsa boş bir nesne döner.
 
 ### normalizePayload
-**Ne yapar**: Farklı isimlendirmelerle gelen girdi nesnesini standart, tek bir şemaya dönüştürür.
-**Nasıl yapar**: Girdi nesnesinden `_return_id`, `order_id`, `carrier`, `tracking_number`, `status` ve `delivered_at` alanlarını çeşitli alternatif anahtar isimleri (`returnId`, `orderId`, `provider`, vb.) kullanarak arar ve bulduğu ilk geçerli değeri alır. Her alanı string'e dönüştürerek döndürür.
+
+**Ne yapar**: Gelen ham webhook payload'unu standart bir iç formata dönüştürür. Farklı kaynaklardan gelen ve alan isimleri birbirinden farklı olabilen (örneğin snake_case veya camelCase varyasyonları) veriyi, sistemin beklediği tek tip ve tutarlı bir nesne yapısına normalizasyon yapar.
+
+**Nasıl yapar**: Fonksiyon önce girdinin nesne olup olmadığını kontrol eder; eğer nesne ise `Record<string, unknown>` olarak ele alır, aksi takdirde boş bir nesne kullanır. Ardından dahili bir `pick` yardımcı fonksiyonu tanımlar: bu yardımcı, sıralı olarak verilen anahtar dizisinde ilk bulunan ve `null`/`undefined` olmayan değeri döndürür. Böylece farklı webhook sağlayıcılarının aynı bilgiyi farklı anahtarlarla (örneğin `return_id` vs `returnId` vs `rid`) göndermesi senaryosu sorunsuz şekilde ele alınır. Her bir zorunlu alan (`return_id`, `order_id`, `carrier`, `tracking_number`, `status`, `delivered_at`) için bu `pick` mekanizması çağrılır ve bulunan değer `.toString()` ile string'e çevrilir; hiçbir anahtar eşleşmezse boş string (`''`) varsayılan değer olarak kullanılır.
+
 **Parametreler**:
-- obj: unknown — Normalize edilecek girdi nesnesi. Obje değilse boş bir nesne muamelesi görür.
-**Dönüş**: { _return_id: string; order_id: string; carrier: string; tracking_number: string; status: string; delivered_at: string } — Standart alan adlarına sahip normalize edilmiş nesne.
+- `obj`: `unknown` — Webhook'tan gelen ham payload verisi. Herhangi bir tipte olabilir; fonksiyon güvenli şekilde nesne olmayan durumları boş nesne olarak işler.
+
+**Dönüş**: `{ return_id: string; order_id: string; carrier: string; tracking_number: string; status: string; delivered_at: string; }` — Standartlaştırılmış altı alandan oluşan bir nesne. Her alan her zaman bir string değer taşır; ham veride ilgili alan bulunamazsa boş string (`''`) döner.
 
 ### sha256Base64
 **Ne yapar**: Verilen girdi dizesinin Base64 ile kodlanmış SHA-256 karması değerini hesaplar.
@@ -2908,8 +3179,8 @@ Bu modül, kargo firmalarından gelen webhook isteklerini HMAC-SHA256 ile doğru
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../_shared/tenant_config.ts::resolveTenantId
-- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: ../_shared/tenant.ts::tenantFromRow
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -2920,11 +3191,79 @@ Bu modül, kargo firmalarından gelen webhook isteklerini HMAC-SHA256 ile doğru
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: supabase/functions/returns-webhook/index.ts::json
-- **params**: `body: unknown, init: ResponseInit = {}`
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-wt-hotfix\supabase\functions\returns-webhook\index.ts::json
+- **params**: (body: unknown, init: ResponseInit = {})
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Response
+
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-wt-hotfix\supabase\functions\returns-webhook\index.ts::hmacValid
+- **params**: (secret: string, raw: string, signatureHeader: string)
 - **ic_degiskenler**:
-  - (yok — parametreler doğrudan kullanılır)
-- **Dönüş**: `Response` — JSON serialize edilmiş body ile oluşturulmuş Response nesnesi
+  - `key` — HMAC-SHA256 anahtarı olarak kullanılmak üzere crypto.subtle.importKey ile oluşturulmuş WebCrypto anahtar nesnesi
+  - `sigBytes` — raw verisi HMAC-SHA256 ile imzalandığında elde edilen byte dizisi
+  - `computed` — sigBytes'in base64 formatında string karşılığı, karşılaştırma için hesaplanan imza
+  - `given` — signatureHeader içinden "sha256=" prefix'i temizlenmiş ve trim edilmiş verilen imza değeri
+- **Dönüş**: Promise<boolean> — imzalar eşleşiyorsa true, değilse veya hata oluştuysa false
+
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-wt-hotfix\supabase\functions\returns-webhook\index.ts::mapReturnStatus
+- **params**: (input?: string)
+- **ic_degiskenler**:
+  - `s` — input parametresinin küçük harfe dönüştürülmüş hali, status eşleştirmelerinde kullanılır
+- **Dönüş**: { status?: string; setReceived?: boolean } — eşleşen duruma göre status ve setReceived flag'leri
+
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-wt-hotfix\supabase\functions\returns-webhook\index.ts::normalizePayload
+- **params**: (obj: unknown)
+- **ic_degiskenler**:
+  - `rec` — obj parametresinin Record<string, unknown> tipine dönüştürülmüş hali, key-value erişimi için
+  - `pick` — rec içinden birden fazla anahtardan ilk bulunan değeri seçen iç fonksiyon, parametre olarak key listesi alır
+- **Dönüş**: { return_id: string; order_id: string; carrier: string; tracking_number: string; status: string; delivered_at: string } — normalize edilmiş payload objesi
+
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-wt-hotfix\supabase\functions\returns-webhook\index.ts::sha256Base64
+- **params**: (input: string)
+- **ic_degiskenler**:
+  - `bytes` — input string'in TextEncoder ile byte dizisine dönüştürülmüş hali
+  - `hash` — bytes dizisinin SHA-256 hash'ini içeren ArrayBuffer
+- **Dönüş**: Promise<string> — hash değerinin base64 formatında string karşılığı
+
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-wt-hotfix\supabase\functions\returns-webhook\index.ts::returns-webhook_handler
+- **params**: (req: Request)
+- **ic_degiskenler**:
+  - `raw` — req.text() ile alınan ham request gövdesi, HMAC imzalama ve JSON parse için kullanılır
+  - `body` — raw string'in JSON.parse ile parse edilmiş hali, webhook payload'ı
+  - `secret` — Deno.env.get('RETURNS_WEBHOOK_SECRET') ile alınan HMAC secret anahtarı
+  - `token` — Deno.env.get('RETURNS_WEBHOOK_TOKEN') ile alınan webhook token değeri
+  - `sign` — req.headers.get('x-signature') ile alınan imza header'ı
+  - `tok` — req.headers.get('x-webhook-token') ile alınan token header'ı
+  - `ok` — HMAC veya token doğrulaması başarılıysa true olan boolean flag
+  - `tsHeader` — req.headers.get('x-timestamp') veya req.headers.get('x-event-time') ile alınan timestamp header'ı
+  - `t` — tsHeader'dan parse edilmiş epoch millisecond değeri, replay guard kontrolü için
+  - `SUPABASE_URL` — Deno.env.get('SUPABASE_URL') ile alınan Supabase URL'i
+  - `SERVICE_KEY` — Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ile alınan service role anahtarı
+  - `supabase` — createClient(SUPABASE_URL, SERVICE_KEY) ile oluşturulmuş Supabase istemcisi
+  - `p` — normalizePayload(body) ile normalize edilmiş webhook payload'ı
+  - `eventId` — req.headers.get('x-id') veya req.headers.get('x-event-id') ile alınan olay ID'si
+  - `returnId` — payload'dan veya order_id ile veritabanından çözülmüş iade ID'si
+  - `cur` — venthub_returns tablosundan mevcut iade satırının id, status, tenant_id alanları
+  - `tenantId` — tenantFromRow(cur) ile iade satırından türetilen tenant ID'si
+  - `tenantSource` — tenantFromRow(cur) ile elde edilen tenant kaynağının belirteci (resource_row veya default)
+  - `orderTenantFilter` — tenantSource resource_row ise tenant filtresi string'i, değilse boş string
+  - `mapped` — mapReturnStatus(p.status) ile eşleştirilmiş durum nesnesi
+  - `patch` — venthub_returns tablosuna uygulanacak güncelleme alanlarını içeren nesne
+  - `rank` — durum sıralama haritası, progression kontrolü için
+  - `curRank` — mevcut durumun rank değeri
+  - `nextRank` — patch durumunun rank değeri
+  - `updated` — veritabanı güncelleme başarılıysa true olan boolean flag
+  - `rOrderId` — iade detayı sorgusundan alınan order_id (fallback olarak payload'dan)
+  - `reason` — iade sebebi, returns tablosundan
+  - `description` — iade açıklaması, returns tablosundan
+  - `row` — returns sorgusundan dönen ilk satır
+  - `orderNumber` — sipariş numarası, orders tablosundan
+  - `userId` — kullanıcı ID'si, orders tablosundan
+  - `row` — orders sorgusundan dönen ilk satır
+  - `customerEmail` — müşteri e-postası, Auth Admin API'den
+  - `customerName` — müşteri tam adı, Auth Admin API'den user_metadata'dan
+  - `ju` — Auth Admin API yanıtının JSON'u
+- **Dönüş**: Response — json() helper fonksiyonu ile oluşturulmuş HTTP yanıtı
 
 ---
 
@@ -2968,70 +3307,78 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-notification\index.ts
-skeleton_hash: 23787b8183560ca8
+skeleton_hash: d4af80c736bfb8a8
 entity_hashes:
+  func:callerFailure: c2855766de0bfe8b
   func:loadShippingTemplate: 4b4a832183734352
-  func:renderTemplate: 26cc0a301db3fae9
+  func:renderTemplate: 4c617457ca4b097d
   func:shipping-notification_handler: 06ce613108984be4
-  overview: 9cf32250487e69ff
-generated_at: 2026-08-13T07:40:32Z
+  overview: 58d6822191f20509
+generated_at: 2026-08-17T11:39:47Z
 ---
 
 ## Genel Bakış
-Bu modül, kargo bildirimleri için bir HTTP uç noktasıdır. Gelen isteklere yanıt olarak, depolama alanındaki şablonları yükler, istek verileriyle birleştirerek bildirim metni oluşturur ve bunu istemciye iletir.
+Bu modül, bir Supabase Edge Function olarak kargo takip bildirimlerini dışarıya sunan bir HTTP API uç noktasıdır. Gelen istek verilerini alır, depolama alanından dinamik bir bildirim şablonu yükler, bu şablonu istek bilgileriyle doldurarak kişiselleştirilmiş bir içerik üretir ve istemciye yanıt olarak döndürür.
 
 ## Fonksiyon Grupları
 ### Şablon İşleme
-Gerekli şablonu depolama alanından yükler ve şablon içindeki yer tutucuları verilen verilerle değiştirerek nihai bildirim metnini üretir.
-- loadShippingTemplate, renderTemplate
+Bu grup, bildirim içeriğinin dinamik ve yeniden kullanılabilir olmasını sağlayan temel mantığı barındırır. Dış depolama alanından ham şablon metni çekilir ve veri alanlarıyla birleştirilerek nihai, okunabilir bildirim metni üretilir.
+- `loadShippingTemplate`, `renderTemplate`
 
 ### İstek Koordinasyonu
-Gelen HTTP isteklerini yönetir, şablon yükleme ve işleme adımlarını koordine ederek istemciye uygun bir yanıt döndürür.
-- shipping-notification_handler
+Bu grup, modülün dış dünya ile tek temas noktasıdır ve tüm gelen HTTP isteklerinin yaşam döngüsünü yönetir. İsteği alır, şablon işlemlerini sırasıyla çağırarak iş akışını koordine eder ve istemciye uygun durum koduyla birlikte yanıt döndürür.
+- `shipping-notification_handler`
+
+### Hata Yönetimi
+Bu grup, modül genelinde oluşabilecek beklenmedik durumları yakalayıp standart bir hata yanıtı formatında dışarıya sunar. Fonksiyon, hata türünü analiz ederek anlamlı ve tutarlı bir geri bildirim üretir.
+- `callerFailure`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, bir Supabase Edge Function olarak çalıştırıldığında, talep edilen kargo bildirim şablonunu depolama alanından yükleyip, gelen istek verileriyle doldurarak bir HTTP yanıt döndürür.
 
-Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve mevcut doküman bilgisi temelinde aşağıdakilerdir.
+[Aksiyom 1]: Eğer `loadShippingTemplate` fonksiyonu çalıştırıldığında depolama alanına erişilemez veya şablon dosyası belirtilen konumda mevcut değilse, fonksiyon `null` değeri döner.
 
-[Aksiyom 1]: Eğer `loadShippingTemplate` fonksiyonu çağrıldığında depolama alanındaki şablon dosyası erişilebilir değilse veya mevcut değilse, fonksiyon hata fırlatır (örneğin, bir istisna) veya uygun bir hata yönetimi mekanizması devreye girer.
+[Aksiyom 2]: Eğer `renderTemplate` fonksiyonuna geçersiz bir şablon dizesi (tpl) veya şablonun gerektirdiği alanları içermeyen bir veri nesnesi (data) verilirse, fonksiyon bir hata fırlatır veya geçersiz bir dize döndürür.
 
-[Aksiyom 2]: Eğer `renderTemplate` fonksiyonu çağrıldığında `tpl` parametresi geçerli bir şablon dizesi değilse (örneğin, boş string veya `null`/`undefined`), fonksiyonun davranışı belirsizdir veya hata oluşur. Fonksiyon, şablonu `_data` parametresiyle birleştirebilir.
+[Aksiyom 3]: Eğer `shipping-notification_handler` fonksiyonu çalıştırıldığında geçerli bir HTTP isteği (req) sağlanmazsa, modül bir yanıt üretmekte başarısız olur.
 
-[Aksiyom 3]: Eğer `shipping-notification_handler` fonksiyonu bir HTTP isteği (`req`) ile çağrıldığında, istek içinde gerekli veriler (örneğin, şablonu dolduracak veri alanları) eksikse, şablon işleme kısmen tamamlanır veya eksik veriler için boş/varsayılan değerler kullanılır.
-
-[Aksiyom 4]: Eğer `shipping-notification_handler` fonksiyonu bir HTTP isteği (`req`) ile çağrıldığında, istek yöntemi (HTTP method) modülün beklediği yöntem (örneğin, POST) değilse, fonksiyon uygun bir HTTP hata kodu (örneğin, 405 Method Not Allowed) ile yanıt verir.
-
-[Aksiyom 5]: Eğer `loadShippingTemplate` fonksiyonu başarıyla bir şablon yüklerse, bu şablon `renderTemplate` fonksiyonuna geçerli bir string olarak传递 edilmelidir. Aksi halde, `renderTemplate` işlevi düzgün çalışamaz.
-
-[Aksiyom 6]: Eğer `renderTemplate` fonksiyonu, `_data` parametresinde şablonda referans alan ancak veri setinde bulunmayan bir anahtar (key) içeriyorsa, bu anahtar için şablonda boş bir alan veya belirli bir hata işleme davranışı gösterilir.
-
-[Aksiyom 7]: Eğer `shipping-notification_handler` fonksiyonu bir HTTP yanıtı oluştururken, yanıtın içeriği (content type) metin tabanlı olmalıdır (örneğin, `text/plain` veya `text/html`), çünkü modül bildirim metni üretir.
+[Aksiyom 4]: Eğer `callerFailure` fonksiyonuna bir hata (error) parametresi olarak null veya tanımsız bir değer verilirse ve bu değer bir hata nesnesine dönüştürülemiyorsa, fonksiyon `null` döner.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### renderTemplate
-**Ne yapar**: Bu fonksiyon, bir şablon dizesi içindeki değişkenleri ve koşullu blokları, sağlanan bir veri nesnesindeki değerlerle değiştirerek dinamik bir çıktı üretir. Temel olarak basit bir şablon motoru görevi görür.
+### callerFailure
+**Ne yapar**: Bir hata nesnesini HTTP durum kodu ve hata mesajı içeren bir nesneye eşler. Çağrı istemcisinden kaynaklanmayan sistem hatalarını (yetki eksikliği, yapılandırma eksikliği, profil bulunamaması) HTTP yanıt kodlarına dönüştürerek,servislerin tutarlı hata yanıtları vermesini sağlar.
 
-**Nasıl yapar**: Fonksiyon, iki aşamalı bir string değiştirme işlemi uygular. İlk olarak, `{{#if key}}...{{/if}}` sözdizimindeki koşullu blokları işler: `key` değerinin varlığını ve truthy olup olmadığını kontrol eder, doğru ise bloğun içeriğini korur, aksi halde boş string ile değiştirir. İkinci aşamada, kalan `{{key}}` değişkenlerini bulur ve veri nesnesindeki karşılık gelen değerle değiştirir; değer `null` veya `undefined` ise boş string kullanır.
+**Nasıl yapar**: Fonksiyon, parametre olarak gelen `error` nesnesinin `instanceof` kontrolü ile belirli hata sınıflarını (TenantMismatchError, CallerConfigError, CallerLookupError) sırasıyla test eder. Eşleşen ilk hata türüne göre tanımlı HTTP durum kodunu ve bir hata anahtarını içeren bir nesne döndürür. Hiçbir hata sınıfıyla eşleşme sağlanamazsa `null` değerini döndürerek hatanın farklı bir şekilde ele alınması gerektiğini belirtir.
 
 **Parametreler**:
-- `tpl`: string — Değiştirilecek olan şablon dizesi. İçerisinde `{{#if ...}}` blokları ve `{{...}}` değişken yer tutucuları bulunabilir.
-- `_data`: Record<string, unknown> — Şablondaki yer tutucularla eşleşecek anahtar-değer çiftlerini içeren veri nesnesi.
+- error: unknown — İşlenmek istenen hata nesnesi. Fonksiyon, bu nesnenin belirli özel hata sınıflarından biri olup olmadığını kontrol eder. Tanınmayan bir hata türü geldiğinde `null` döner.
 
-**Dönüş**: string — Değişkenlerin ve koşullu blokların işlendiği, sonuç şablon dizesi.
+**Dönüş**: { status: number; error: string } | null — Eşleşme sağlanırsa, HTTP durum kodunu (403, 500, 503) ve anlamlandırılmış bir hata anahtarını ('tenant_mismatch', 'CONFIG_MISSING', 'profile_lookup_failed') içeren bir nesne; aksi takdirde `null` döner.
+
+### renderTemplate
+**Ne yapar**: Basit bir değişken yerleştirme ve koşullu blok_motoru olarak çalışır. Verilen bir şablon dizesi içindeki `{{değişken}}` ve `{{#if değişken}}...{{/if}}` yapılarını, sağlanan veri nesnesindeki değerlerle değiştirerek dinamik bir çıktı üretir.
+
+**Nasıl yapar**: Fonksiyon, iki aşamalı bir regex dönüşümü uygular. İlk olarak, `{{#if key}}...{{/if}}` bloklarını bulur ve `data` nesnesindeki ilgili `key` değerinin varlığını ve "truthy" olup olmadığını kontrol eder. Değer truthy ise bloğun içeriğini korur, aksi takdirde bloğu tamamen kaldırır. İkinci aşamada, kalan `{{key}}` değişkenlerini bulur ve `data` objesindeki karşılık gelen değerle (`null` veya `undefined` ise boş dize) değiştirir. Bu, şablonların esnek ve duruma göre özelleştirilmesini sağlar.
+
+**Parametreler**:
+- tpl: string — İşlenecek şablon dizesi. İçerisinde `{{değişken}}` ve `{{#if değişken}}...{{/if}}` sözdizimi bulunur.
+- data: Record<string, unknown> — Şablondaki değişkenlerin değerlerini sağlayan anahtar-değer çiftleri nesnesi. Değerler `unknown` tipinde olup, fonksiyon tarafından `truthy` ve `String` dönüşümlerine tabi tutulurlar.
+
+**Dönüş**: string — Değişkenlerin ve koşullu blokların işlendiği, hazır şablon dizesi.
 
 ### loadShippingTemplate
-**Ne yapar**: Bu asenkron fonksiyon, kargo bildirimleri için kullanılan bir HTML e-posta şablonunu dosya sisteminden yükler.
+**Ne yapar**: Kargo bildirimleri için kullanılan e-posta şablon dosyasını (`shipping.html`) asenkron olarak dosya sisteminden yükler. Şablonun mevcut olup olmadığını kontrol ederek servisin başlatılmasında esneklik sağlar.
 
-**Nasıl yapar**: Fonksiyon, çağrıldığı dosyanın bulunduğu dizine göreceli olarak `./templates/email/shipping.html` yolundaki dosyayı okumak için `Deno.readTextFile` yöntemini kullanır. Bir `URL` nesnesi oluşturarak doğru mutlak yolu hesaplar. Dosya okuma işlemi başarısız olursa (örn. dosya mevcut değilse), bir `try...catch` bloğu ile yakalanır ve `null` değeri döndürülür.
+**Nasıl yapar**: Fonksiyon, `import.meta.url` referansı kullanarak调用 dosyasının bulunduğu göreceli bir URL nesnesi oluşturur. Bu URL'yi `Deno.readTextFile` fonksiyonuna vererek dosya içeriğini okumaya çalışır. İşlem başarılı olursa HTML içeriğini bir `Promise<string>` olarak çözer. Herhangi bir dosya okuma hatası (dosya bulunamaz, erişim reddedilir vb.) oluşursa, `try-catch` bloğu hatayı yakalar ve `null` değeriyle çözer. Bu, şablonun opsiyonel olmasını ve eksik olma durumunda servisin çökmemesini garanti altına alır.
 
-**Parametreler**: Bu fonksiyon herhangi bir parametre almaz.
+**Parametreler**: Bu fonksiyon hiçbir parametre almaz.
 
-**Dönüş**: Promise<string | null> — Başarılı olursa HTML şablonunun içeriğini (string), başarısız olursa `null` değerini içeren bir promise.
+**Dönüş**: Promise<string> | null — Başarılı okuma durumunda HTML şablonunun içeriği (string); dosya bulunamadığı veya okunamadığı durumda `null` döner.
 
 ### shipping-notification_handler
 **Ne yapar**: Bu fonksiyon, kargo bildirimleriyle ilgili HTTP isteklerini işleyen bir sunucu işleyicisidir (handler). Gelen bir POST isteğini alır, ilgili iş mantığını yürütür ve bir HTTP yanıtı döndürür.
@@ -3049,7 +3396,6 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve mevcut doküma
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: ../_shared/sentry.ts::sentryCaptureException
 - import: ../_shared/tenant_config.ts::getTenantBranding
-- import: ../_shared/tenant_config.ts::resolveTenantId
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
 
 ---
@@ -3066,24 +3412,55 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve mevcut doküma
 - `tracking_url?: string | null`
 - `tenant_id?: string`
 
+### OrderRow
+- `user_id?: string | null`
+- `order_number?: string | null`
+- `carrier?: string | null`
+- `tracking_number?: string | null`
+- `tracking_url?: string | null`
+
+### AuthAdminUser
+- `email?: string | null`
+- `user_metadata?: { full_name?: string | null; name?: string | null } | null`
+
+### ResendResult
+- `id?: string`
+
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: shipping-notification/index.ts::renderTemplate
-- **params**: `tpl: string`, `_data: Record<string, unknown>`
+### [N1_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::callerFailure
+- **params**: (error: unknown)
+- **ic_degiskenler**: yok
+- **Dönüş**: { status: number; error: string } | null
+
+### [N2_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::renderTemplate
+- **params**: (tpl: string, data: Record<string, unknown>)
+- **ic_degiskenler**: yok
+- **Dönüş**: string
+
+### [N3_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::loadShippingTemplate
+- **params**: ()
 - **ic_degiskenler**:
-  - **1. if-blocks replace callback içinde:**
-    - `_m` — regex eşleşme nesnesi, replace callback parametresi, doğrudan kullanılmaz
-    - `key` — `{{#if ...}}` içindeki değişken adı, `_data` içinde lookup anahtarı
-    - `inner` — `{{#if}}...{{/if}}` arasındaki HTML içeriği, truthy ise döndürülür
-    - `v` — `_data[key]` ile elde edilen değerin truthy olup olmadığı kontrol edilir
-    - `truthy` — `v`'nin truthy/Falsy durumu, inner içeriğinin korunup korunmayacağına karar verir
-  - **2. variable replace callback içinde:**
-    - `_m` — regex eşleşme nesnesi, replace callback parametresi, doğrudan kullanılmaz
-    - `key` — `{{...}}` içindeki değişken adı, `_data` içinde lookup anahtarı
-    - `v` — `_data[key]` ile elde edilen değer, null ise boş string, değilse String(v) olarak döndürülür
-- **Dönüş**: `string` — if-block ve değişken replacement'ları uygulanmış şablon metni
+  - `url` — Template dosyasının tam yolunu temsil eder, `import.meta.url` kullanarak göreli yolu mutlak URL'ye çevirir
+- **Dönüş**: Promise<string | null>
+
+### [N4_NASIL] AST Pointer: supabase/functions/shipping-notification/index.ts::shipping-notification_handler
+- **params**: (req: Request)
+- **ic_degiskenler**:
+  - `parsed` — Request body'sinden parse edilen JSON verisi
+  - `keys` — `parsed` objesinde aranacak sıralı anahtar listesi
+  - `v` — Döngüde her bir `key` için parsed objesinden alınan değer
+  - `s` — String değerden trim edilmiş versiyonu (boşluklar temizlenmiş)
+  - `fromAddr` — Gönderen email adresi (parsed["from_addr"] veya varsayılan)
+  - `to` — Alıcı email adresleri dizisi (parsed["to"] olarak parse edilir)
+  - `bccArr` — BCC alıcıları dizisi (parsed["bcc"] olarak parse edilir)
+  - `template` — Yüklenen email template içeriği
+  - `emailContent` — Template ile data birleştirilerek oluşturulan final email içeriği
+  - `html` — Template ile data birleştirilerek oluşturulan HTML versiyonu
+  - `resendResp` — Resend API'ye gönderilen email isteği sonucu
+- **Dönüş**: Response
 
 ---
 
@@ -3091,6 +3468,7 @@ Bu modül için temel mimari varsayımlar, fonksiyon imzaları ve mevcut doküma
 ## MERMAID CALL GRAPH
 ```mermaid
 graph TD
+    index_ts__callerFailure["callerFailure"]
     index_ts__loadShippingTemplate["loadShippingTemplate"]
     index_ts__renderTemplate["renderTemplate"]
     index_ts__shipping-notification_handler["shipping-notification_handler"]
@@ -3099,6 +3477,7 @@ graph TD
 ## NODE ID STANDARD
 
   file: supabase\functions\shipping-notification\index.ts
+  function: supabase\functions\shipping-notification\index.ts::callerFailure
   function: supabase\functions\shipping-notification\index.ts::renderTemplate
   function: supabase\functions\shipping-notification\index.ts::loadShippingTemplate
   function: supabase\functions\shipping-notification\index.ts::shipping-notification_handler
@@ -3106,6 +3485,7 @@ graph TD
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: callerFailure
   export: loadShippingTemplate
   export: renderTemplate
   export: shipping-notification_handler
@@ -3117,37 +3497,46 @@ graph TD
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-status\index.ts
-skeleton_hash: 3b569cae7979ec9d
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-status\index.ts
+skeleton_hash: c75e333122af75fd
 entity_hashes:
   func:jsonResponse: 60e54d50747b3229
   func:shipping-status_handler: d099b53accac2970
-  overview: 695bc1e855ae9226
-generated_at: 2026-08-13T07:40:32Z
+  overview: 41fd0f2fe1f6fb98
+generated_at: 2026-08-15T07:34:14Z
 ---
 
 ## Genel Bakış
-Bu modül, kargo durumu sorgularını karşılayan bir Supabase edge function'dır. Gelen HTTP isteklerini işleyerek yapılandırılmış JSON yanıtları döndürür ve yanıt oluşturımında tutarlılık sağlamak için bir yardımcı işlev kullanır.
+Bu modül, kargo durumu sorgularını işleyen bir Supabase edge function olarak tasarlanmıştır. Gelen HTTP isteklerini alır, işler ve istemciye standart JSON formatında yanıt döndürür. Yanıt oluşturumunda tutarlılık için yardımcı bir fonksiyon kullanır.
 
 ## Fonksiyon Grupları
-### İstek İşleyicisi
-Modülün ana giriş noktasıdır ve gelen kargo durumu isteklerini alarak işler, nihai yanıtı istemciye iletir.
+### Ana İstek İşleyicisi
+Modülün ana giriş noktasıdır ve gelen kargo durumu isteklerini işleyerek nihai yanıtı üretir.
 - shipping-status_handler
 
-### Yanıt Oluşturma Yardımcıları
-HTTP yanıtlarını JSON formatında standartlaştırmak için kullanılan yardımcı işlevi içerir.
+### Yanıt Yardımcıları
+HTTP yanıtlarını JSON formatında paketlemek için kullanılan yardımcı fonksiyonları içerir.
 - jsonResponse
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, kargo durumu sorgularını işleyen bir Supabase Edge Function olarak tasarlanmıştır.
 
-[Aksiyom 1]: Eğer `shipping-status_handler` fonksiyonuna geçilen `req` parametresi geçerli bir `Request` nesnesi değilse, fonksiyon beklenmeyen davranış sergiler veya hata fırlatır.
+Bu modül, Supabase Edge Function平台上 kargo durumu sorgularını işleyen bir HTTP istek handler'ıdır.
 
-[Aksiyom 2]: Eğer `jsonResponse` fonksiyonuna geçilen `init` parametresi geçerli bir `ResponseInit` nesnesi değilse, yanıt oluşturulamaz.
+**[Aksiyom 1]:** Eğer `req` parametresi geçerli bir `Request` nesnesi değilse veya `null/undefined` ise, `shipping-status_handler` isteği işleyemez ve fonksiyon hata ile sonuçlanır.
 
-[Aksiyom 3]: Eğer `shipping-status_handler` tarafından üretilen yanıt `jsonResponse` aracılığı ile döndürülmezse, istemciye standart JSON formatında yanıt ulaştırılamaz.
+**[Aksiyom 2]:** Eğer `jsonResponse` fonksiyonuna `body` parametresi olarak JSON-serializable olmayan bir değer verilirse, HTTP yanıt gövdesi oluşturulamaz ve istemci geçersiz bir yanıt alır.
+
+**[Aksiyom 3]:** Eğer `shipping-status_handler` tarafından döndürülen `Response` nesnesi (`jsonResponse` veya doğrudan `Response` constructor ile) oluşturulamazsa, Supabase Edge Function runtime'ıvarsayılan bir hata yanıtı üretir.
+
+**[Aksiyom 4]:** Eğer `jsonResponse` fonksiyonu çağrılmazsa ve handler doğrudan `new Response()` kullanarak JSON yanıtı döndürmeye çalışırsa, yanıt formatı tutarsız olur ve istemci tarafında parse hataları oluşabilir.
+
+**[Aksiyom 5]:** Eğer `ResponseInit` parametresi (`init`) geçerli HTTP header veya status code içermiyorsa, döndürülen yanıt varsayılan `200 OK` durum kodu ile gönderilir.
+
+---
+
+> **Not:** Fonksiyon gövdeleri sağlandığında (örn: request body parsing, auth kontrolü, veritabanı sorgusu mantığı), aksiyomlar genişletilebilir ve veri doğrulama eşikleri, yetkilendirme gereksinimleri gibi domain-specific kurallar eklenebilir.
 
 ---
 
@@ -3171,36 +3560,35 @@ Bu modül, kargo durumu sorgularını işleyen bir Supabase Edge Function olarak
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: shipping-status/index.ts::jsonResponse
-- **params**: (body: unknown, init: ResponseInit = {})
-- **ic_degiskenler**:
-  (fonksiyon gövdesinde açıkça tanımlanmış yerel değişken yok)
-- **Dönüş**: Response — JSON içeriği ile HTTP yanıt nesnesi oluşturur ve döndürür.
+### [N1_NASIL] AST Pointers: supabase/functions/shipping-status/index.ts::jsonResponse
+- **params**: `body: unknown` — Döndürülecek JSON verisi, `init: ResponseInit` — Response nesnesi için ek ayarlar (varsayılan: {})
+- **ic_degiskenler**: (yok — parametreler doğrudan kullanılır)
+- **Dönüş**: `Response` — JSON verisini içeren HTTP Response nesnesi
 
-### [N2_NASIL] AST Pointer: shipping-status/index.ts::shipping-status_handler
-- **params**: (req: Request)
+### [N2_NASIL] AST Pointer: supabase/functions/shipping-status/index.ts::shipping-status_handler
+- **params**: `req: Request` — Gelen HTTP isteği nesnesi
 - **ic_degiskenler**:
-  - `SUPABASE_URL` — Deno ortamından alınan Supabase proje URL adresi.
-  - `SERVICE_KEY` — Deno ortamından alınan Supabase servis rolü anahtarı.
-  - `forwarded` — İstemcinin yönlendirme (forwarded-for) IP adresi başlığı değeri.
-  - `ip` — İstemcinin gerçek IP adresi, various başlıklardan çözümlenir.
-  - `key` — IP tabanlı rate limiting için benzersiz anahtar.
-  - `result` — checkRateLimit fonksiyonunun döndüğü sonuç nesnesi, istek izin durumunu içerir.
-  - `rlHeaders` — rateLimitHeaders fonksiyonu tarafından oluşturulan HTTP başlık nesnesi.
-  - `url` — Request URL'sinden oluşturulan URL nesnesi, sorgu parametrelerine erişim sağlar.
-  - `tracking` — Sorgu parametrelerinden alınan kargo takip numarası.
-  - `supabase` — createClient ile oluşturulmuş Supabase istemci nesnesi.
-  - `query` — Supabase veritabanı sorgusu, belirli takip numarasına ait sipariş bilgilerini seçer.
-  - `data` — Supabase sorgusunun başarılı sonucu, sipariş veri nesnesi.
-  - `error` — Supabase sorgusunun hata nesnesi, sorgu başarısız olduğunda dolu olur.
-  - `_e` — Yakalanan genel hata nesnesi, try-catch bloğunda yakalanır.
-- **Dönüş**: Response — Kargo durumu bilgisi veya hata mesajı ile HTTP yanıt nesnesi döndürür.
+  - `SUPABASE_URL` — Ortam değişkeninden alınan Supabase projesi URL'i
+  - `SERVICE_KEY` — Ortam değişkeninden alınan Supabase servis rolü anahtarı
+  - `forwarded` — x-forwarded-for header değerinden istemci IP adreslerini ayırır
+  - `ip` — İstemcinin gerçek IP adresi (birden fazla header'dan deneyerek)
+  - `key` — Rate limiting için benzersiz anahtar (IP adresine göre)
+  - `checkRateLimit` — Dinamik import ile yüklenen rate limiting kontrol fonksiyonu
+  - `rateLimitHeaders` — Dinamik import ile yüklenen rate limiting başlıkları oluşturma fonksiyonu
+  - `url` — İsteğin URL nesnesi, query parametrelerini okumak için
+  - `tracking` — URL'den alınan tracking_number parametresi
+  - `supabase` — Supabase istemcisi (createClient ile oluşturulan)
+  - `query` — Supabase sorgu nesnesi (venthub_orders tablosundan veri çekmek için)
+  - `data` — Sorgu sonucundan gelen sipariş verileri
+  - `error` — Sorgu sonucundan gelen hata nesnesi
+  - `_e` — Try-catch bloğunda yakalanan hata nesnesi
+- **Dönüş**: `Response` — JSON yanıt nesnesi
 
 ---
 
@@ -3223,8 +3611,8 @@ Bu modül, kargo durumu sorgularını işleyen bir Supabase Edge Function olarak
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\shipping-webhook\index.ts
-skeleton_hash: 878d3a1d8a42845a
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-webhook\index.ts
+skeleton_hash: a944f858a34ac8ff
 entity_hashes:
   func:hmacValid: e5f4d85423ceba98
   func:jsonResponse: d167d2178aa5b5dd
@@ -3232,46 +3620,45 @@ entity_hashes:
   func:normalizePayload: 6091b60fb70ee727
   func:sha256Base64: 0784b35c5d8e45cb
   func:shipping-webhook_handler: b6676fdc25219168
-  overview: 408836261e4028d5
-generated_at: 2026-08-13T07:40:33Z
+  overview: 757d37eeb58d50b6
+generated_at: 2026-08-15T09:03:13Z
 ---
 
 ## Genel Bakış
-Bu modül, kargo firmalarından gelen webhook taleplerini işleyen bir Supabase Edge Function'dur. Gelen farklı format ve yapılardaki kargo durumu güncellemelerini merkezi bir noktada toplayarak siparişlerin durumunu düzenli bir şekilde ilerletir. HMAC-SHA256 imza doğrulaması ile güvenli bir webhook altyapısı sunar.
+Bu modül, kargo firmalarından gelen webhook bildirimlerini alıp işleyen merkezi bir Supabase Edge Function'dur. HMAC-SHA256 imza doğrulaması ile güvenli kabul edilen istekleri işler, farklı kargo firmalarının değişken veri yapılarını standart bir forma dönüştürerek siparişlerin kargo durumunu günceller. Mimari açıdan, tüm kargo entegrasyonları için tek bir giriş noktası ve veri normalizasyon katmanı sunarak bakım ve genişletmeyi kolaylaştırır.
 
 ## Fonksiyon Grupları
+### Güvenlik ve Yanıt Yardımcıları
+Bu grup, webhook isteklerinin otentikasyonu için kriptografik imza doğrulamasını ve standart JSON HTTP yanıtlarının oluşturulmasını sağlar.
+- hmacValid, sha256Base64, jsonResponse
 
-### HTTP Yanıtları ve Güvenlik Doğrulaması
-Standart JSON yanıtlar oluşturma ve gelen isteklerin HMAC-SHA256 imzası ile otentikasyonunu sağlar. SHA-256 hash hesaplama fonksiyonu hem imza doğrulama hem de replay guard koruması için kullanılır.
-- jsonResponse, hmacValid, sha256Base64
-
-### Kargo Durumu Haritalama ve Normalizasyon
-Birbirinden farklı kargo firmalarının durum kodlarını VentHub'ın kendi iç durum yapısına çevirir. Ayrıca her bir kargo firmasına özgü gelen payload'ları standart ve işlenebilir bir forma dönüştürür.
-- mapCarrierStatus, normalizePayload
+### Veri Dönüştürme ve Durum Haritalama
+Farklı kargo firmalarının özel payload yapılarını merkezi ve işlenebilir bir normalize forma çevirir; ayrıca firma bazlı durum kodlarını modülün iç durum yapısına eşleyerek çoklu kargo desteği sağlar.
+- normalizePayload, mapCarrierStatus
 
 ### Ana Webhook İşleyici
-Modülün giriş noktasıdır; gelen HTTP isteklerini alarak güvenlik doğrulaması, payload normalizasyonu ve durum güncelleme adımlarını sırasıyla yönetir. İş akışının tüm aşamalarını koordine eder.
+Modülün giriş noktasıdır; gelen HTTP isteğini alarak güvenlik doğrulaması, payload normalizasyonu, durum haritalama ve nihai güncelleme yanıtı oluşturma adımlarını orkestra eder.
 - shipping-webhook_handler
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, kargo webhook'larını HMAC-SHA256 imza doğrulamasıyla işleyen bir Supabase Edge Function'dur.
+Bu modül, kargo firması webhook'larını HMAC-SHA256 ile doğrulayıp, çoklu kargo firması formatlarını standart forma dönüştürerek kargo durumunu güncellemek üzere tasarlanmıştır.
 
-**[Aksiyom 1]:** Eğer HMAC_SECRET ortam değişkeni tanımlı veya erişilebilir değilse, `hmacValid` fonksiyonu imza doğrulaması yapamaz ve tüm webhook istekleri reddedilir.
+**[Aksiyom 1 - HMAC Doğrulama Zinciri]:** Eğer `hmacValid` fonksiyonuna geçerli bir `secret`, orijinal `raw` gövde ve geçerli bir `signatureHeader` sağlanmazsa, istek HMAC-SHA256 doğrulamasından geçemez ve webhook işlenemez.
 
-**[Aksiyom 2]:** Eğer `SKEW_MS` sabiti pozitif bir tamsayı değeri içermiyorsa, zaman damgası sapma toleransı çalışamaz veya anlamsız olur.
+**[Aksiyom 2 - Kargo Firması Durum Eşleme]:** Eğer `mapCarrierStatus` fonksiyonuna bilinmeyen veya eşlenemeyen bir kargo durumu `input` değeri girilirse, dönen nesnede `status`, `setShipped` ve `setDelivered` alanlarının tamamı `undefined` kalır; sipariş durumu güncellenemez.
 
-**[Aksiyom 3]:** Eğer `req.body` (Request body) okunamıyorsa veya boş/null ise, `shipping-webhook_handler` payload'u işleyemez.
+**[Aksiyom 3 - Payload Normalizasyonu]:** Eğer `normalizePayload` fonksiyonuna geçerli bir `carrierHint` (tanınmış kargo firması kodu) sağlanmazsa veya `obj` beklenen formatta bir payload içermiyorsa, payload standart forma normalize edilemez.
 
-**[Aksiyom 4]:** Eğer `carrierHint` boş bir string ise, `normalizePayload` kargo firmasına göre doğru normalize mantığını uygulayamaz.
+**[Aksiyom 4 - Zaman Kayması Toleransı]:** Eğer `SKEW_MS` sabiti (binary expression ile hesaplanan eşik değeri) HMAC zaman damgası doğrulamasında kullanılmazsa, geçerli istekler zaman aşımı nedeniyle reddedilebilir veya süresi dolmuş istekler kabul edilebilir.
 
-**[Aksiyom 5]:** Eğer HMAC imza header'ı (`signatureHeader`) request'te mevcut değilse, `hmacValid` false döner ve istek yetkilendirme hatası ile reddedilir.
+**[Aksiyom 5 - Yanıt Formatı]:** Eğer `jsonResponse` fonksiyonu, geçerli bir HTTP `init` (status code, headers) ile çağrılmazsa, webhook istemcisi geçerli bir JSON yanıt alamaz ve hata durumu bildirilemez.
 
-**[Aksiyom 6]:** Eğer `mapCarrierStatus` tanımsız/null bir input alırsa, normalize edilmiş durum döndüremez (varsayılan değer döndüğü varsayılır).
+**[Aksiyom 6 - SHA256 Hash Hesaplama]:** Eğer `sha256Base64` fonksiyonuna geçerli bir string `input` sağlanmazsa, HMAC imza hesaplaması başarısız olur ve dolayısıyla tüm webhook istekleri reddedilir.
 
-**[Aksiyom 7]:** Eğer `sha256Base64` fonksiyonu crypto API'ye erişemezse (Supabase Edge runtime dışı ortam), HMAC hesaplaması başarısız olur.
+**[Aksiyom 7 - Ana Handler Akışı]:** Eğer `shipping-webhook_handler` fonksiyonu geçerli bir `Request` nesnesi almazsa veya istek gövdesi (body) okunamazsa, HMAC doğrulaması ve payload normalizasyonu gerçekleştirilemez; işlenmemiş bir hata yanıtı döner.
 
 ---
 
@@ -3326,8 +3713,8 @@ Bu modül, kargo webhook'larını HMAC-SHA256 imza doğrulamasıyla işleyen bir
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: ../_shared/tenant_config.ts::resolveTenantId
-- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: ../_shared/tenant.ts::tenantFromRow
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -3338,81 +3725,85 @@ Bu modül, kargo webhook'larını HMAC-SHA256 imza doğrulamasıyla işleyen bir
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\shipping-webhook\index.ts::jsonResponse
-- **params**: `body: unknown`, `init: ResponseInit = {}`
+### [N1_NASIL] AST Pointer: `C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-webhook\index.ts`::jsonResponse
+- **params**: (body: unknown, init: ResponseInit = {})
 - **ic_degiskenler**:
-  - (yok)
-- **Dönüş**: `Response`
+  - `body` — JSON'laştırılacak gövde
+  - `init` — Response başlatma seçenekleri (status, headers)
+- **Dönüş**: Response nesnesi
 
-### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\shipping-webhook\index.ts::hmacValid
-- **params**: `secret: string`, `raw: string`, `signatureHeader: string`
+### [N2_NASIL] AST Pointer: `C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-webhook\index.ts`::hmacValid
+- **params**: (secret: string, raw: string, signatureHeader: string)
 - **ic_degiskenler**:
-  - `key` — crypto.subtle importKey ile oluşturulan HMAC anahtarı
-  - `sigBytes` — HMAC-SHA256 imzasının byte dizisi
-  - `computed` — hesaplanan imzanın base64 temsili
-  - `normalize` — imza başlığını normalize eden fonksiyon (sha256= ön ekini kaldırır)
-  - `given` — normalize edilmiş gelen imza
-- **Dönüş**: `Promise<boolean>`
+  - `key` — HMAC-SHA256 için gizli anahtar
+  - `sigBytes` — Hesaplanan imza baytları
+  - `computed` — Base64'e kodlanmış hesaplanan imza
+  - `normalize` — İmza başlığını normalleştiren fonksiyon (sha256= ön ekini kaldırır)
+  - `given` — Verilen imza başlığı
+- **Dönüş**: boolean (imza geçerli mi)
 
-### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\shipping-webhook\index.ts::mapCarrierStatus
-- **params**: `input?: string`
+### [N3_NASIL] AST Pointer: `C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-webhook\index.ts`::mapCarrierStatus
+- **params**: (input?: string)
 - **ic_degiskenler**:
-  - `s` — input'un küçük harfe çevrilmiş hali veya boş string
-- **Dönüş**: `{ status?: string; setShipped?: boolean; setDelivered?: boolean }`
+  - `s` — Kullanıcı girdisinin küçük harfli versiyonu
+- **Dönüş**: { status?: string; setShipped?: boolean; setDelivered?: boolean }
 
-### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\shipping-webhook\index.ts::normalizePayload
-- **params**: `carrierHint: string`, `obj: unknown`
+### [N4_NASIL] AST Pointer: `C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-webhook\index.ts`::normalizePayload
+- **params**: (carrierHint: string, obj: unknown)
 - **ic_degiskenler**:
-  - `rec` — obj'nin Record<string, unknown> olarak cast edilmiş hali veya boş obje
-  - `c` — carrier bilgisi (carrierHint veya obj.carrier'den)
-  - `pick` — verilen anahtarlardan ilk non-null değeri seçen yardımcı fonksiyon
-  - `norm` — normalize edilmiş payload objesi
-- **Dönüş**: `yok` (norm objesini return eder)
+  - `rec` — obj'nin Record<string, unknown> tipine dönüştürülmüş hali
+  - `c` — Kargo sağlayıcı adı (küçük harf, trim)
+  - `pick` — birden fazla anahtar arasından ilk mevcut değeri alan fonksiyon
+  - `norm` — normalize edilmiş payload nesnesi
+  - `carrierHint` parametresi — istek başlığından gelen kargo ipucu
+  - `obj` parametresi — ham payload verisi
+- **Dönüş**: norm objesi (order_id, order_number, carrier, tracking_number, tracking_url, status, shipped_at, delivered_at alanlarını içerir)
 
-### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\shipping-webhook\index.ts::sha256Base64
-- **params**: `input: string`
+### [N5_NASIL] AST Pointer: `C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-webhook\index.ts`::sha256Base64
+- **params**: (input: string)
 - **ic_degiskenler**:
-  - `bytes` — input'un TextEncoder ile byte dizisine çevrilmiş hali
-  - `hash` — SHA-256 hash'inin byte dizisi
-- **Dönüş**: `Promise<string>`
+  - `bytes` — input'un TextEncoder ile kodlanmış hali
+  - `hash` — SHA-256 hash'i
+- **Dönüş**: Promise<string> (base64'e kodlanmış hash)
 
-### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-hvac\supabase\functions\shipping-webhook\index.ts::shipping-webhook_handler
-- **params**: `req: Request`
+### [N6_NASIL] AST Pointer: `C:\Users\alize\venthub-wt-hotfix\supabase\functions\shipping-webhook\index.ts`::shipping-webhook_handler
+- **params**: (req: Request)
 - **ic_degiskenler**:
-  - `raw` — isteğin ham body metni
-  - `payload` — JSON.parse ile parse edilmiş payload veya boş obje
-  - `tenantId` — resolveTenantId ile hesaplanan kiracı ID'si
-  - `isMockEnv` — SUPABASE_SERVICE_ROLE_KEY'in 'service-key' olup olmadığını kontrol eden boolean
-  - `secret` — SHIPPING_WEBHOOK_SECRET environment variable'ı
-  - `signature` — x-signature veya x-carrier-signature header'ı
-  - `authorized` — yetkilendirme durumu
-  - `token` — x-webhook-token header'ı
-  - `expected` — SHIPPING_WEBHOOK_TOKEN environment variable'ı
-  - `tsHeader` — x-timestamp veya x-event-time header'ı
-  - `t` — parse edilmiş timestamp (epoch ms veya ISO string)
-  - `SUPABASE_URL` — Supabase URL environment variable'ı
-  - `SERVICE_KEY` — Supabase service role key
-  - `supabase` — Supabase client instance'ı
-  - `carrierHint` — x-carrier header'ı
+  - `raw` — İsteğin ham gövdesi (string)
+  - `payload` — JSON'dan ayrıştırılmış veri
+  - `secret` — SHIPPING_WEBHOOK_SECRET ortam değişkeni
+  - `signature` — x-signature veya x-carrier-signature başlığı
+  - `authorized` — Yetkilendirme durumu (boolean)
+  - `token` — x-webhook-token başlığı (legacy fallback)
+  - `expected` — SHIPPING_WEBHOOK_TOKEN ortam değişkeni
+  - `tsHeader` — x-timestamp veya x-event-time başlığı
+  - `t` — Zaman damgası (epoch ms)
+  - `SUPABASE_URL` — SUPABASE_URL ortam değişkeni
+  - `SERVICE_KEY` — SUPABASE_SERVICE_ROLE_KEY ortam değişkeni
+  - `supabase` — Supabase istemcisi
+  - `carrierHint` — x-carrier başlığı
   - `p` — normalizePayload ile normalize edilmiş payload
-  - `eventId` — x-id veya x-event-id header'ı
-  - `existing` — shipping_webhook_events tablosundan mevcut event kaydı
-  - `matched` — mevcut event kaydının ilk elemanı
-  - `orderId` — sipariş ID'si (payload'dan veya order_number ile sorgudan)
-  - `data` — venthub_orders tablosundan sipariş verisi (order_number ile arama)
-  - `error` — sipariş arama hatası
-  - `current` — venthub_orders tablosundan mevcut sipariş verisi
-  - `curErr` — mevcut sipariş sorgu hatası
-  - `patch` — sipariş güncellemesi için patch objesi
-  - `mapped` — mapCarrierStatus ile eşleştirilmiş kargo durumu
-  - `curStatus` — mevcut sipariş durumu (küçük harf)
-  - `next` — bir sonraki durum (küçük harf)
-  - `curRank` — mevcut durumun rank'ı
-  - `nextRank` — bir sonraki durumun rank'ı
-  - `parseDate` — tarih string'ini ISO formatına parse eden yardımcı fonksiyon
-  - `noChange` — değişiklik olup olmadığını belirleyen boolean
-  - `bodyHash` — raw body'nin SHA-256 base64 hash'i
-- **Dönüş**: `Response` (JSON yanıt)
+  - `eventId` — x-id veya x-event-id başlığı (dedup için)
+  - `existing` — tekrar kontrolü için mevcut event satırları
+  - `orderId` — Sipariş ID'si (p.order_id veya veritabanından türetilmiş)
+  - `data` — venthub_orders tablosundan sipariş satırı (orderId araması için)
+  - `error` — Supabase sorgu hatası (orderId araması için)
+  - `current` — Mevcut sipariş satırı (id, tenant_id, status, shipped_at, delivered_at, tracking_number, tracking_url, carrier alanlarını içerir)
+  - `curErr` — Supabase sorgu hatası (mevcut sipariş araması için)
+  - `tenantId` — tenantFromRow ile türetilen kiracı ID'si
+  - `patch` — Güncellenecek alanlar
+  - `mapped` — mapCarrierStatus ile eşleştirilmiş durum
+  - `curStatus` — Mevcut sipariş durumu (lowercase)
+  - `next` — Sıradaki durum (lowercase)
+  - `curRank` — Mevcut durum sırası
+  - `nextRank` — Sıradaki durum sırası
+  - `parseDate` — Tarih string'ini ISO formatına dönüştüren fonksiyon
+  - `noChange` — Değişiklik olup olmadığını kontrol eden boolean
+  - `bodyHash` — Ham gövdenin SHA-256 hash'i
+  - `msg` — Hata mesajı
+  - `t` (zaman damgası bloğu içinde) — Epoch ms olarak zaman damgası
+  - `d` (t bloğu içinde) — Date.parse ile parse edilmiş zaman
+- **Dönüş**: Response (JSON yanıtlar veya hata yanıtları)
 
 ---
 
@@ -3456,51 +3847,51 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-hvac\supabase\functions\stock-alert\index.ts
-skeleton_hash: afbc4a8dc579b84c
+skeleton_hash: 658cb4f9bb823728
 entity_hashes:
-  func:checkAllProducts: 84cfac7d1bdd2b56
+  func:checkAllProducts: d480a73d7246f019
   func:checkSpecificProduct: 5027f709f9a40c80
-  func:getAlertRecipients: b32f47ebd9b11ba3
+  func:getAlertRecipients: ef8d3e778c7b2d81
   func:processProductAlert: c58aae9b08876f88
-  func:sendNotification: 9d45549bdcd4429b
+  func:sendNotification: 9cdc9ad48f9dd1f6
   func:stock-alert_handler: 9f0ae49f1a00dd49
-  overview: f1961f87b9e63cad
-generated_at: 2026-08-13T07:40:33Z
+  overview: ceacc7ea6aad6120
+generated_at: 2026-08-17T11:40:32Z
 ---
 
 ## Genel Bakış
-VentHub HVAC platformu için tasarlanmış bir Supabase Edge Fonksiyonudur. Temel amacı, ürün stok seviyelerinin önceden tanımlı kritik eşik değerlerin altına düştüğünde otomatik uyarılar üreterek tedarik zinciri süreçlerini başlatmaktır. Modül, hem tüm ürün envanterini tarayan toplu kontrol hem de belirli bir ürünü hedefleyen tetikleme modları ile esnek bir uyarı yönetimi sunar.
+VentHub HVAC stok yönetim sisteminin tetikleyici bir bileşenidir. Modül, ürün stoklarının kritik seviyelere düşmesi durumunda otomatik uyarılar üreterek tedarik ve sipariş süreçlerini başlatır. Esnek yapısı sayesinde hem toplu envanter taraması hem de belirli bir ürüne yönelik tetiklemeler desteklenmektedir.
 
 ## Fonksiyon Grupları
-### İstek Kabul ve Yönlendirme
-Gelen HTTP isteğini dinler, istek parametrelerini analiz eder ve verilen komuta bağlı olarak stok kontrol işinin doğru metodunu başlatır.
-- stock-alert_handler
+### İstek Yönlendirme ve Başlatma
+Gelen HTTP isteklerini karşılar, istek içeriğine göre ilgili stok kontrol iş akışını başlatır. Modülün dışarıya açılan tek kapısıdır.
+- stock_alert_handler
 
-### Stok Kontrol ve Değerlendirme
-Veritabanındaki ürün stoklarını çekerek definedik eşik değerleriyle karşılaştırır. İstenen kapsamda (tüm ürünler veya tek bir ürün) stok yetersizliği tespit eder.
-- checkAllProducts, checkSpecificProduct
+### Stok Değerlendirme ve Tespit
+Veritabanındaki ürün stok seviyelerini çeker ve tanımlı kritik eşik değerlerle karşılaştırır. Uyarı gerektiren ürünleri tespit eder.
+- check_all_products, check_specific_product
 
-### Uyarı İşleme ve Bildirim Tetikleme
-Stok uyarısı oluşturulan her bir ürün için ilgili alıcıların listesini çeker ve tanımlı bildirim kanalları üzerinden öncelik sırasına göre ulaşılabilir uyarılar gönderir.
-- processProductAlert, getAlertRecipients, sendNotification
+### Uyarı Yönetimi ve Bildirim Gönderimi
+Tespit edilen her kritik stok durumu için uygun alıcıları belirler ve seçilen bildirim kanalı aracılığıyla öncelik sırasına göre bilgilendirme yapar.
+- process_product_alert, get_alert_recipients, send_notification
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim göndererek tedarik süreçlerini tetikler. Fonksiyon imzaları ve modül yapısı dikkate alınarak aşağıdaki aksiyomlar türetilmiştir:
+Bu modül, stok uyarı sistemi için HTTP isteklerini işleyen bir Supabase Edge Fonksiyonu olarak tasarlanmıştır. Fonksiyon imzalarından çıkarılabilecek mimari varsayımlar aşağıdadır.
 
-[Aksiyom 1]: Eğer `stock-alert_handler` fonksiyonuna geçerli bir HTTP isteği (`Request`) ulaşmazsa, fonksiyon uygun bir hata yanıtı (örn. 400/405) döndürmeli veya işlenmemelidir; aksi halde beklenmeyen davranış veya çökme olur.
+**[Aksiyom 1]**: Eğer `checkAllProducts` veya `checkSpecificProduct` için geçerli bir `SupabaseClient` bağlantısı yoksa, ürün sorgulama işlemleri başarısız olur.
 
-[Aksiyom 2]: Eğer `supabase` istemcisi (`SupabaseClient`) `checkAllProducts` veya `checkSpecificProduct` fonksiyonlarına başarıyla bağlanamazsa (örn. kimlik doğrulama hatası, ağ kesintisi), stok kontrolü yapılamaz ve dolayısıyla hiçbir uyarı bildirimi gönderilemez; bu durumda ilgili hata loglanmalı veya çağrıya hata ile dönülmelidir.
+**[Aksiyom 2]**: Eğer `checkSpecificProduct` için geçerli bir `_productId` değeri (geçersiz veya boş) yoksa, belirli ürüne ait uyarı kontrolü çalıştırılamaz.
 
-[Aksiyom 3]: Eğer `checkSpecificProduct` fonksiyonuna geçerli bir `_productId` parametresi verilmezse (boş string, null veya tanımsız), fonksiyon o ürünü işleyemez; bu durumda o ürüne ait uyarı kontrolü atlanır veya hata döndürülür.
+**[Aksiyom 3]**: Eğer `processProductAlert` için geçerli bir `Product` nesnesi veya en az bir `AlertRecipient` alıcısı (`recipients` boş dizi) yoksa, ürün uyarı işleme süreci tamamlanamaz.
 
-[Aksiyom 4]: Eğer `processProductAlert` fonksiyonunda `product` nesnesi içinde stok seviyesi veya eşik değeri bilgisi eksikse (bu değerlerin hangisi olduğu bilinmiyor), ürünün düşük stoklu olup olmadığı değerlendirilemez; bu durumda o ürün için uyarı işlemi yapılamaz.
+**[Aksiyom 4]**: Eğer `sendNotification` için `type` veya `to` parametreleri boş/geçersizse, bildirim gönderme işlemi başarısız olur.
 
-[Aksiyom 5]: Eğer `processProductAlert` fonksiyonuna verilen `recipients` listesi boşsa (`AlertRecipient[]` boş dizi), stok uyarısı için bildirim gönderilecek alıcı bulunmaz; bu durumda `sendNotification` çağrılmaz veya uyarı işlemi tamamlanmaz.
+**[Aksiyom 5]**: Eğer `sendNotification` için `priority` parametresi belirtilmemişse, varsayılan olarak `"normal"` öncelik kullanılır.
 
-[Aksiyom 6]: Eğer `sendNotification` fonksiyonuna `priority` parametresi geçerli bir değer değilse (örn. tanımsız string, boş string), bildirimin önceliği belirlenemez; bu durumda bildirim ya gönderilemez ya da varsayılan
+**[Aksiyom 6]**: Eğer `getAlertRecipients` için geçerli bir `SupabaseClient` bağlantısı yoksa, uyarı alıcıları listesi alınamaz.
 
 ---
 
@@ -3514,11 +3905,14 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 **Dönüş**: `Response` — İşlemin sonucunu içeren, istemciye gönderilecek HTTP yanıtı.
 
 ### checkAllProducts
-**Ne yapar**: Veritabanındaki **tüm ürünleri** stok seviyelerine göre tarar, stok miktarı belirlenmiş eşik değerin (veya varsayılan 5 birim) altında veya eşitinde olan ürünler için uyarı sürecini başlatır.
-**Nasıl yapar**: Supabase istemcisi aracılığıyla `products` tablosundan düşük stoklu olabilecek tüm ürünleri çeker. SQL tarafında karmaşık filtreleme yerine, JavaScript tarafında her bir ürünün `stock_qty` değerini, kendi `low_stock_threshold` alanı (yoksa 5) ile karşılaştırarak filtreler. Ardından, alıcıları tek seferde çekip (N+1 sorgu optimizasyonu) her uygun ürün için `processProductAlert` fonksiyonunu çağırarak sonuçları derler.
+**Ne yapar**: Veritabanındaki tüm ürünleri kontroleder ve eşik değerinin altına düşen ürünler için uyarı sürecini başlatır. Stok uyarı sisteminin ana toplu iş (batch job) fonksiyonudur.
+
+**Nasıl yapar**: Fonksiyon, öncelikle veritabanındaki en yüksek `low_stock_threshold` değerini sorgulayarak dinamik bir ön-filtre eşiği belirler. PostgREST'in iki kolonu (ör. `stock_qty` ve `low_stock_threshold`) doğrudan karşılaştıramaması nedeniyle, sınır veriden türetilir. Bu sayede, eşik değeri 10'dan büyük olan ürünlerin (ör. hızlı tüketilen filtre için `low_stock_threshold = 40`) stoğu 25'e düştüğünde bile uyarı üretebilmesi sağlanır. Ardından, belirlenen en büyük eşik değerine göre `stock_qty <= enBuyukEsik` filtresi uygulanarak potansiyel adaylar çekilir ve JavaScript tarafında her ürünün kendi `low_stock_threshold` değerine göre nihai filtreleme yapılır. Alıcı listesi bir kez çekildikten sonra (`getAlertRecipients`), uyarı üretilecek her ürün için `processProductAlert` fonksiyonu sırasıyla çağrılır. Alıcı listesi boşsa ve uyarı üretilecek ürün varsa, bilinçli olarak hata fırlatılır; böylece alıcı yapılandırılmamış durum bilinçli olarak raporlanır.
+
 **Parametreler**:
-- `supabase: SupabaseClient` — Veritabanı işlemleri için kullanılan Supabase istemcisi nesnesi.
-**Dönüş**: `results` — Her bir işlenen ürün için `processProductAlert` fonksiyonunun döndüğü sonuç nesnelerinden oluşan bir dizi (array). Her sonuç, ürün adını, uyarı türünü, gönderilen bildirim sayısını ve başarı durumunu içerir.
+- `supabase`: `SupabaseClient` — Supabase istemcisi; veritabanı sorguları ve RPC çağrıları için kullanılır.
+
+**Dönüş**: `Promise<Array<{product: string, alertType: string, notifications: number, success: boolean}>>` — Her bir işlenen ürün için uyarı sonucunu içeren dizi. Her sonuç, ürün adı, uyarı türü (out_of_stock veya low_stock), gönderilen bildirim sayısı ve tüm bildirimlerin başarı durumunu belirtir.
 
 ### checkSpecificProduct
 **Ne yapar**: Verilen **tek bir ürünün** stok seviyesini kontrol eder ve belirlenen eşik değerinin altındaysa uyarı sürecini başlatır.
@@ -3538,14 +3932,17 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 **Dönüş**: `{ product, alertType, notifications, success }` — İşlem sonucunu özetleyen bir nesne. `product` (ürün adı), `alertType` ('out_of_stock' veya 'low_stock'), `notifications` (gönderilen bildirim sayısı), `success` (tüm bildirimler başarılıysa true, değilse false).
 
 ### sendNotification
-**Ne yapar**: Belirli bir iletişim kanalı (tip) üzerinden, belirli bir alıcıya (to), öncelikli bir stok uyarısı bildirimi göndermek için harici bir `notification-service` fonksiyonunu çağırır.
-**Nasıl yapar**: Ortam değişkenlerinden (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`) servis bilgilerini alır. `notification-service` edge fonksiyonuna bir HTTP POST isteği gönderir. İstek gövdesinde bildirim tipi, alıcı, öncelik ve ürün verileriyle birlikte bir `subject` alanı (ürün durumuna göre emoji ve başlık) oluşturur. İşlem sonucu (başarılı olup olmadığı) hakkında bir sonuç nesnesi döndürür veya hata durumunda başarısızlık sonucu döndürür.
+**Ne yapar**: Bu fonksiyon, belirtilen türde bir bildirim (e-posta, SMS vb.) alıcısına göndermek için Supabase'deki `notification-service` edge fonksiyonunu çağırır. Temel olarak, stok uyarıları gibi belirli bir veri setini alarak harici bir hizmete iletir.
+
+**Nasıl yapar**: Fonksiyon, ortam değişkenlerinden `SUPABASE_URL` ve `SUPABASE_SERVICE_ROLE_KEY` değerlerini okur. Ardından, `notification-service` endpoint'ine `POST` isteği göndermek için `fetch` kullanır. İstek gövdesi, bildirim türü, alıcı, öncelik, zorunlu bir `message` alanı ve orijinal veriyi genişleten bir `data` nesnesi içerir. `message` alanı, `data.alertType` değerine göre dinamik olarak oluşturulur; bu, notification-service'in şablon olmadığında kullanacağı gövdeyi tanımlar ve önceki bir hatayı (`.replace()` çağrısının 500 hatası vermesi) önler. İşlem başarıyla tamamlanırsa `{ type, recipient, success: true }` döner, bir hata yakalanırsa hata günlüğe yazılır ve `{ success: false }` döner.
+
 **Parametreler**:
-- `type: string` — Bildirim gönderilecek kanalın tipi (örn: 'whatsapp', 'sms', 'email').
-- `to: string` — Bildirimin gönderileceği alıcının iletişim adresi (telefon numarası veya email).
-- `data: AlertData` — Bildirim içeriğini oluşturan ürün detaylarını (ürün adı, id, stok miktarı, eşik, uyarı türü) içeren veri nesnesi.
-- `priority: string` — Bildirimin öncelik seviyesi (örn: 'critical', 'high').
-**Dönüş**: `{ type, recipient, success }` — Gönderim denemesinin sonucunu gösteren nesne. `type` (kanal), `recipient` (alıcı), `success` (istek başarılıysa true, değilse false).
+- `type`: string — Gönderilecek bildirim türünü belirtir (örn: "email", "sms").
+- `to`: string — Bildirimin gönderileceği alıcının adresi veya numarası.
+- `data`: AlertData — Bildirim için gerekli tüm verileri (ürün adı, mevcut stok, eşik değeri, uyarı türü) içeren bir nesne.
+- `priority`: string — Bildirimin öncelik seviyesini belirtir (örn: "high", "low").
+
+**Dönüş**: `Promise<{ type: string; recipient: string; success: boolean }>` — Bildirim denemesinin sonucunu ve alıcıyı içeren bir nesne döner.
 
 ### getAlertRecipients
 **Ne yapar**: Stok uyarı bildirimlerinin gönderileceği alıcıların listesini veritabanından çeker. Varsayılan bir alıcı (sistem yöneticisi) sağlamaya çalışır ve bulamazsa sabit bir acil durum email adresi ile geri dönüş (fallback) yapar.
@@ -3559,8 +3956,8 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 ## İTHALATLAR (IMPORTS)
 - import: ../_shared/cors.ts::getCorsHeaders
 - import: https://deno.land/std@0.168.0/http/server.ts::serve
-- import: https://esm.sh/@supabase/supabase-js@2.39.3::SupabaseClient
-- import: https://esm.sh/@supabase/supabase-js@2.39.3::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::SupabaseClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -3590,77 +3987,77 @@ Bu modül, stok seviyeleri belirli bir eşiğin altına düştüğünde bildirim
 
 ---
 
-## SABİTLER
-- **corsHeaders** (object) — `{
-
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, c...`
-
----
-
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: stock-alert/index.ts::stock-alert_handler
-- **params**: (req: Request)
+### [N1_NASIL] AST Pointer: stock-alert::index.ts::stock-alert_handler
+- **params**: `(req: Request)`
 - **ic_degiskenler**:
-  - `supabaseUrl` — Supabase proje URL'si, environment variable'dan alınır
-  - `serviceRoleKey` — Supabase service role anahtarı, environment variable'dan alınır
-  - `authHeader` — İsteğin Authorization header'ı
-  - `isAuthorized` — Yetkilendirme durumunu takip eden boolean
-  - `anonKey` — Supabase anon key, auth fallback için kullanılır
-  - `createClientAuth` — Dinamik import ile yüklenen Supabase client factory
-  - `authClient` — Kullanıcı doğrulama için oluşturulan Supabase client
-  - `user` — Doğrulanmış kullanıcı nesnesi
-  - `roleCheck` — Kullanıcı rolünü kontrol eden fetch isteği sonucu
-  - `arr` — Rol kontrolü sonucu JSON array
-  - `role` — Kullanıcının rolü (array[0].role)
-  - `supabase` — Service role ile oluşturulan ana Supabase client
-  - `alertResults` — İşlenen uyarı sonuçları dizisi
-  - `_productId` — POST isteğinden gelen ürün ID'si
-  - `error` — Try-catch bloğundaki yakalanan hata
-- **Dönüş**: Response (JSON yanıt veya hata yanıtı)
+  - `corsHeaders` — getCorsHeaders(req) ile üretilen CORS başlıkları, tüm HTTP yanıtlarına eklenir
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase URL'si
+  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan servis rolü anahtarı
+  - `authHeader` — `req.headers.get('Authorization')` ile gelen istek başlığındaki token
+  - `isAuthorized` — yetkilendirme durumunu tutan boolean bayrak, başlangıçta false
+  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile okunan anonim anahtar (auth fallback için)
+  - `createClientAuth` — `await import('https://esm.sh/@supabase/supabase-js@2.45.4')` dinamik import'undan gelen createClient fonksiyonu (auth client oluşturmak için)
+  - `authClient` — kullanıcı token'ı ile oluşturulan Supabase client (`createClientAuth(supabaseUrl, anonKey, ...)`)
+  - `user` — `authClient.auth.getUser()` sonucu elde edilen kullanıcı nesnesi (destructure: `{ data: { user } }`)
+  - `roleCheck` — `fetch()` ile user_profiles tablosundan rol sorgulama sonucu (Response nesnesi)
+  - `arr` — `roleCheck.json()` ile parse edilen JSON dizisi, rol verisini içerir
+  - `role` — `arr[0]?.role` ile alınan kullanıcının rol string'i ('admin' veya 'super_admin' kontrolü)
+  - `supabase` — `createClient(supabaseUrl, serviceRoleKey)` ile oluşturulan Supabase servis client'ı
+  - `alertResults` — `checkAllProducts` veya `checkSpecificProduct` çağrılarından dönen sonuç dizisi
+  - `_productId` — `req.json()` POST body'sinden destructure ile alınan ürün ID'si
+  - `error` — try-catch yakaladığı hata nesnesi
+  - `msg` — `error instanceof Error ? error.message : String(error)` ile üretilen hata mesajı string'i
+- **Dönüş**: `Response` — OPTIONS için 'ok', hata durumlarında JSON error, başarıda JSON success yanıtı
 
-### [N2_NASIL] AST Pointer: stock-alert/index.ts::checkAllProducts
-- **params**: (supabase: SupabaseClient)
+### [N2_NASIL] AST Pointer: stock-alert::index.ts::checkAllProducts
+- **params**: `(supabase: SupabaseClient)`
 - **ic_degiskenler**:
-  - `allLowStock` — Veritabanından çekilen düşük stoklu ürünler dizisi
-  - `fetchErr` — Ürünleri çekerken oluşabilecek hata
-  - `productsToAlert` — Eşik değerin altında kalan filtrelenmiş ürünler
-  - `recipients` — Uyarı alıcıları dizisi
-  - `results` — İşlenen ürünlerin sonuçlarını tutan dizi
-- **Dönüş**: Promise<any[]> (işlenen uyarı sonuçları)
+  - `esikSatiri` — products tablosundan `low_stock_threshold` sütununu en büyükten küçüğe sıralayıp ilk satırı `maybeSingle()` ile okuyan sorgu sonucu (veriden türetilen eşik için)
+  - `esikErr` — esikSatiri sorgusundan dönen hata nesnesi
+  - `enBuyukEsik` — `Math.max(Number(esikSatiri?.low_stock_threshold ?? 0) || 0, VARSAYILAN_ESIK)` ile hesaplanan en büyük eşik değeri, PostgREST ön-filtresi için kullanılır
+  - `allLowStock` — products tablosundan `stock_qty <= enBuyukEsik` filtresiyle çekilen düşük stoklu ürün dizisi (`id, name, stock_qty, low_stock_threshold` alanları)
+  - `fetchErr` — allLowStock sorgusundan dönen hata nesnesi
+  - `productsToAlert` — `allLowStock` dizisi üzerinde `filter(p => p.stock_qty <= (p.low_stock_threshold || VARSAYILAN_ESIK))` uygulanmasıyla elde edilen gerçekten uyarı gereken ürünler
+  - `recipients` — `getAlertRecipients(supabase)` ile elde edilen alıcı listesi
+  - `results` — `processProductAlert` çağrılarının döndüğü sonuç nesnelerini toplayan dizi
+  - `product` — `for...of productsToAlert` döngüsündeki her bir ürün nesnesi
+- **Dönüş**: `results` dizisi (her eleman: `{ product, alertType, notifications, success }` nesnesi)
 
-### [N3_NASIL] AST Pointer: stock-alert/index.ts::checkSpecificProduct
-- **params**: (supabase: SupabaseClient, _productId: string)
+### [N3_NASIL] AST Pointer: stock-alert::index.ts::checkSpecificProduct
+- **params**: `(supabase: SupabaseClient, _productId: string)`
 - **ic_degiskenler**:
-  - `product` — Tek bir ürünün verileri
-  - `error` — Ürün çekerken oluşabilecek hata
-  - `recipients` — Uyarı alıcıları dizisi
-- **Dönüş**: Promise<any[]> (ürün işlenme sonucu)
+  - `product` — `supabase.from('products').select(...).eq('id', _productId).single()` sorgusundan dönen tek ürün nesnesi (`id, name, stock_qty, low_stock_threshold`)
+  - `error` — product sorgusundan dönen hata nesnesi
+  - `recipients` — `getAlertRecipients(supabase)` ile elde edilen alıcı listesi
+- **Dönüş**: `[{ product: product.name, message: 'Stock above threshold' }]` (eşik üstüyse) veya `[await processProductAlert(...)]` sonucu (eşik altındaysa)
 
-### [N4_NASIL] AST Pointer: stock-alert/index.ts::processProductAlert
-- **params**: (supabase: SupabaseClient, product: Product, recipients: AlertRecipient[])
+### [N4_NASIL] AST Pointer: stock-alert::index.ts::processProductAlert
+- **params**: `(supabase: SupabaseClient, product: Product, recipients: AlertRecipient[])`
 - **ic_degiskenler**:
-  - `alertType` — Uyarı türü ('out_of_stock' veya 'low_stock')
-  - `priority` — Bildirim önceliği ('critical' veya 'high')
-  - `alertData` — Uyarı verisi nesnesi
-  - `notifications` — Bildirim sonuçları dizisi
-- **Dönüş**: Promise<{product: string, alertType: string, notifications: number, success: boolean}>
+  - `alertType` — `product.stock_qty <= 0` koşuluna göre `'out_of_stock'` veya `'low_stock'` string'i
+  - `priority` — `product.stock_qty <= 0` koşuluna göre `'critical'` veya `'high'` string'i
+  - `alertData` — AlertData nesnesi, içeriği: `productName` (product.name), `_productId` (product.id), `currentStock` (product.stock_qty), `threshold` (product.low_stock_threshold || 5), `alertType`
+  - `notifications` — her recipient için gönderilen bildirim sonuçlarını toplayan dizi
+  - `recipient` — `for...of recipients` döngüsündeki her bir AlertRecipient nesnesi
+- **Dönüş**: `{ product: product.name, alertType, notifications: notifications.length, success: notifications.every(n => n.success) }`
 
-### [N5_NASIL] AST Pointer: stock-alert/index.ts::sendNotification
-- **params**: (type: string, to: string, data: AlertData, priority: string)
+### [N5_NASIL] AST Pointer: stock-alert::index.ts::sendNotification
+- **params**: `(type: string, to: string, data: AlertData, priority: string)`
 - **ic_degiskenler**:
-  - `supabaseUrl` — Supabase URL'si
-  - `serviceRoleKey` — Service role anahtarı
-  - `response` — notification-service fonksiyonuna yapılan fetch isteği sonucu
-  - `err` — Bildirim gönderirken oluşabilecek hata
-- **Dönüş**: Promise<{type: string, recipient: string, success: boolean}>
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile okunan Supabase URL'si
+  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile okunan servis rolü anahtarı
+  - `response` — `fetch()` ile `${supabaseUrl}/functions/v1/notification-service` endpoint'ine yapılan POST isteğinin Response sonucu; body'de type, to, priority, message (data.alertType'a göre üretilen string), data (spread + subject) gönderilir
+  - `err` — try-catch yakaladığı hata nesnesi
+- **Dönüş**: `{ type, recipient: to, success: response.ok }` (başarılı) veya `{ type, recipient: to, success: false }` (hata)
 
-### [N6_NASIL] AST Pointer: stock-alert/index.ts::getAlertRecipients
-- **params**: (supabase: SupabaseClient)
+### [N6_NASIL] AST Pointer: stock-alert::index.ts::getAlertRecipients
+- **params**: `(supabase: SupabaseClient)`
 - **ic_degiskenler**:
-  - `settings` — inventory_settings tablosundan çekilen ayarlar
-  - `recipients` — Alıcılar dizisi (varsayılan değerlerle)
-- **Dönüş**: Promise<AlertRecipient[]> (alıcılar dizisi)
+  - `settings` — `supabase.from('inventory_settings').select('alert_email').maybeSingle()` sorgusundan dönen ayarlar nesnesi
+  - `recipients` — AlertRecipient dizisi, `settings?.alert_email` varsa yapılandırılmış bir alıcı eklenir (name: 'Sistem Yöneticisi', email: settings.alert_email, notifications: `{ low_stock: true, out_of_stock: true, sms: false, whatsapp: false, email: true }`)
+- **Dönüş**: `AlertRecipient[]` — yapılandırılmış alıcı dizisi (boş olabilir; alıcı yoksa boş döner ve çağrı前者 tarafından hata fırlatılır)
 
 ---
 
@@ -3674,11 +4071,11 @@ graph TD
     index_ts__processProductAlert["processProductAlert"]
     index_ts__sendNotification["sendNotification"]
     index_ts__stock-alert_handler["stock-alert_handler"]
-    index_ts__checkAllProducts --> index_ts__getAlertRecipients
-    index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
-    index_ts__checkSpecificProduct --> index_ts__processProductAlert
     index_ts__processProductAlert --> index_ts__sendNotification
     index_ts__checkAllProducts --> index_ts__processProductAlert
+    index_ts__checkSpecificProduct --> index_ts__getAlertRecipients
+    index_ts__checkSpecificProduct --> index_ts__processProductAlert
+    index_ts__checkAllProducts --> index_ts__getAlertRecipients
 ```
 
 ## NODE ID STANDARD
@@ -3702,18 +4099,398 @@ graph TD
   export: stock-alert_handler
 
 ---
+# FILE: supabase\functions\tcmb-rates-sync\index.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\tcmb-rates-sync\index.ts
+skeleton_hash: 154a8f6d9cd8d94f
+entity_hashes:
+  func:parseBulletin: 22e4e4d4e126232a
+  func:tcmb-rates-sync_handler: 091085454d214b21
+  overview: 79862a3904613170
+generated_at: 2026-08-15T07:33:55Z
+---
+
+## Genel Bakış
+Bu modül, Türkiye Cumhuriyet Merkez Bankası (TCMB) tarafından yayımlanan döviz kuru ve faiz oranları bültenlerini otomatik olarak senkronize etmek için tasarlanmış bir Supabase Edge Function'dır. Dışarıdan bir HTTP isteği ile tetiklenen modül, gelen XML bültenini analiz ederek yapılandırılmış bir veriye dönüştürür ve işlenen verilerin veritabanına kaydedilmesini koordine eder.
+
+## Fonksiyon Grupları
+### HTTP İstek Koordinasyonu
+Modülün dış etkileşim noktasıdır; isteği doğrular, XML bültenini alır ve iş akışını başlatarak parse etme, veritabanı güncelleme gibi tüm adımları yönetir.
+- tcmb-rates-sync_handler
+
+### XML Bülten Analizi
+Ham TCMB XML verisini alıp, doğrudan kullanılabilecek yapılandırılmış bir JavaScript nesnesine (döviz kurları, faiz oranları) dönüştürmekten sorumludur.
+- parseBulletin
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, TCMB döviz kuru XML bültenlerini işleyerek veritabanını güncelleyen bir veri senkronizasyon modülüdür.
+
+[Aksiyom 1]: Eğer `parseBulletin` fonksiyonuna geçersiz veya beklenen TCMB XML formatında olmayan bir string girilirse, `ParsedBulletin | null` dönüş tanımı gereği `null` döner.
+
+[Aksiyom 2]: Eğer `parseBulletin` başarılı bir şekilde XML'yi parse ederse, yapılandırılmış bir `ParsedBulletin` nesnesi döner.
+
+[Aksiyom 3]: Eğer `tcmb-rates-sync_handler` fonksiyonu bir hata ile karşılaşırsa bile, fonksiyon imzası gereği her zaman geçerli bir `Response` nesnesi dönmelidir.
+
+[Aksiyom 4]: Eğer `tcmb-rates-sync_handler` fonksiyonu `async` olarak tanımlanmamışsa, içeresindeki I/O işlemleri (HTTP istekleri, veritabanı yazma) bloklanarak hata oluşur.
+
+[Aksiyom 5]: Eğer handler'a geçersiz bir `Request` nesnesi girilse bile, fonksiyon response döndürme zorunluluğundadır (hata response'u dahil).
+
+[Aksiyom 6]: Modül, TCMB XML bültenlerinin belirli bir şemaya sahip olduğunu varsayar; bu şema değişirse `ParsedBulletin` yapısı da güncellenmelidir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### parseBulletin
+**Ne yapar**: Bu fonksiyon, Türkiye Cumhuriyet Merkez Bankası'ndan gelen bir XML dizesini (muhtemelen döviz kurları bülteni) alır, bu XML'den etkin kur tarihini ve belirli para birimleri için döviz kurlarını çıkararak yapılandırılmış bir nesne olarak döndürür.
+
+**Nasıl yapar**: Fonksiyon öncelikle verilen XML string'i üzerinde bir regular expression (regex) kullanarak `Tarih_Date` elemanındaki `Date` özniteliğini arar ve tarih bilgisini (ay, gün, yıl) çıkarır. Tarih bulunamazsa `null` döner. Ardından, önceden tanımlı `QUOTE_CURRENCIES` dizisindeki her bir para birimi kodu için XML'de ilgili `<Currency>` bloğunu regex ile bulur. Her blok içinde `BanknoteSelling` etiketinden (kağıt para satış fiyatı) kuru almaya çalışır; bu değer geçerli ve sıfırdan büyük değilse `ForexSelling` etiketinden (döviz kuru) kuru almaya çalışır. Geçerli bir kur elde edildiğinde bu kuru `rates` nesnesine ekler. Tüm para birimleri işlendikten sonra, eğer hiçbir geçerli kur bulunamamışsa (`rates` nesnesinin anahtarları boşsa) `null` döner; aksi halde etkin tarih (YYYY-AA-GG formatında) ve kurlar nesnesini içeren `ParsedBulletin` nesnesini döndürür.
+
+**Parametreler**:
+- `xml`: `string` — TCMB'den alınan döviz kurları bültenini içeren ham XML verisi. Fonksiyon bu string'i doğrudan düzenli ifadelerle ayrıştırır.
+
+**Dönüş**: `ParsedBulletin | null` — İşleme başarılıysa, `effectiveDate` (string, YYYY-AA-GG formatında) ve `rates` (döviz kodlarını anahtar, kur değerlerini sayı olarak tutan nesne) alanlarını içeren bir nesne döner. Tarih bilgisi XML'de bulunamazsa veya hiçbir para birimi için geçerli bir kur extracts edilemezse `null` döner. `ParsedBulletin` tipinin yapısı `{ effectiveDate: string; rates: Record<string, number> }` şeklindedir.
+
+### tcmb-rates-sync_handler
+**Ne yapar**: Bu fonksiyon, HTTP isteklerini karşılayan asenkron bir sunucu işleyicisidir. TCMB döviz kurlarının senkronizasyonunu tetikleyen veya bu işlemle ilgili bir API endpoint'ini temsil eder.
+
+**Nasıl yapar**: Fonksiyon, `@serve(serve)` dekoratörü ile işaretlenmiştir. Bu dekoratör, fonksiyonu bir HTTP sunucusu işlevine dönüştürür; belirli bir rotaya (URL yoluna) bağlanmasını sağlar ve gelen istekleri otomatik olarak işlevin `req` parametresine iletir. İşlevin asenkron (`async`) yapısı, potansiyel olarak uzun sürebilecek ağ tabanlı bir senkronizasyon işlemini engellemeden gerçekleştirmesine olanak tanır. Fonksiyonun gövdesi verilmediğinden, iş mantığı bilinmemektedir; ancak imzası ve dekoratörü, bunun bir tetikleyici veya senkronizasyon endpoint'i olduğunu gösterir.
+
+**Parametreler**:
+- req: Request — HTTP isteği nesnesi. İstekle ilgili header, body ve URL bilgilerini içerir.
+
+**Dönüş**: Response — HTTP yanıt nesnesi. İşlem sonucuna göre bir durum kodu ve muhtemelen bir yanıt gövdesi (örn: başarı/hata mesajı, senkronize edilen veriler) içerir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: https://deno.land/std@0.177.0/http/server.ts::serve
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
+
+---
+
+## INTERFACES
+
+### ParsedBulletin
+- `effectiveDate: string`
+- `rates: Record<string, number>`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: supabase/functions/tcmb-rates-sync/index.ts::parseBulletin
+- **params**: `(xml: string)`
+- **ic_degiskenler**:
+  - `dateMatch` — xml içinden Tarih_Date etiketinin Date özniteliğini eşleştiren regex sonucu (tarih bilgisi)
+  - `month` — dateMatch[1] erişimi ile elde edilen ay bilgisi (2 haneli string)
+  - `day` — dateMatch[2] erişimi ile elde edilen gün bilgisi (2 haneli string)
+  - `year` — dateMatch[3] erişimi ile elde edilen yıl bilgisi (4 haneli string)
+  - `rates` — para birimi kodlarına karşılık gelen kurları tutan nesne
+  - `code` — QUOTE_CURRENCIES dizisindeki her bir para birimi kodu
+  - `block` — xml içinde belirli bir para birimi bloğunu eşleştiren regex sonucu
+  - `pick` — Belirli bir XML etiketinin (BanknoteSelling/ForexSelling) içeriğini çıkaran iç fonksiyon
+  - `m` — pick fonksiyonu içindeki regex eşleşme sonucu
+  - `banknote` — BanknoteSelling değerini pick ile çıkaran değişken (sayısal)
+  - `forex` — ForexSelling değerini pick ile çıkaran değişken (sayısal)
+  - `rate` — banknote veya forex'ten uygun olanı seçip hesaplanan kur
+- **Dönüş**: `ParsedBulletin | null` (tarih ve kurlar nesnesi veya parse başarısızsa null)
+
+### [N2_NASIL] AST Pointer: supabase/functions/tcmb-rates-sync/index.ts::tcmb-rates-sync_handler
+- **params**: `(req: Request)`
+- **ic_degiskenler**:
+  - `supabaseUrl` — Deno ortam değişkeninden alınan SUPABASE_URL
+  - `serviceKey` — Deno ortam değişkeninden alınan SUPABASE_SERVICE_ROLE_KEY
+  - `supabase` — createClient ile oluşturulan Supabase istemcisi
+  - `xml` — TCMB API'sinden çekilen XML verisi (başlangıçta boş string)
+  - `res` — TCMB_URL adresine yapılan fetch isteği sonucu
+  - `bulletin` — parseBulletin ile işlenmiş TCMB bülteni (tarih ve kurlar)
+  - `tenants` — 'tenants' tablosundan çekilen tüm kiracılar
+  - `tenantsError` — tenants sorgusu hatası
+  - `inserted` — başarıyla eklenen kur sayısı
+  - `skipped` — atlanan (mevcut veya hata nedeniyle eklenmeyen) kur sayısı
+  - `errors` — hata mesajlarını tutan dizi
+  - `tenant` — tenants dizisindeki her bir kiracı nesnesi (id alanı)
+  - `code` — bulletin.rates nesnesindeki her bir para birimi kodu
+  - `rate` — bulletin.rates[code] erişimi ile elde edilen kur değeri
+  - `existing` — 'currency_rates' tablosunda aynı kiracı/kur/tarih/kaynak kombinasyonu olup olmadığını kontrol eden sorgu sonucu
+  - `readError` — existing sorgusundaki hata
+  - `insertError` — currency_rates tablosuna insert işlemindeki hata
+- **Dönüş**: `Response` (JSON formatında sonuç: tarih, eklenen/atlanan kur sayıları ve hatalar)
+
+---
+
+## NODE ID STANDARD
+
+  file: supabase\functions\tcmb-rates-sync\index.ts
+  function: supabase\functions\tcmb-rates-sync\index.ts::parseBulletin
+  function: supabase\functions\tcmb-rates-sync\index.ts::tcmb-rates-sync_handler
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: parseBulletin
+  export: tcmb-rates-sync_handler
+
+---
+# FILE: supabase\functions\_shared\caller.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\_shared\caller.ts
+skeleton_hash: 1786dd98086f2ad7
+entity_hashes:
+  func:CallerConfigError:constructor: 2df262acad1e2532
+  func:CallerLookupError:constructor: c39ad0691366dd52
+  func:bearerToken: 18e59fc759883901
+  func:resolveCaller: 6c800b5173dd6844
+  func:timingSafeEquals: eb2223c212f00bf2
+  func:toProfileRow: 118a6d0d17986102
+  overview: 4282ac6b2e73e507
+generated_at: 2026-08-15T07:40:59Z
+---
+
+## Genel Bakış
+Bu modül, Supabase Edge Functions ortamında HTTP isteklerinden çağrıyı (kullanıcı veya servis) çözmekten sorumlu merkezi bir yardımcı modüldür. Temel olarak kimlik doğrulama token'larını çıkarmak, güvenli karşılaştırmalar yapmak ve çağrı bağlamını oluşturmak için gerekli araçları sağlar. Modül, paylaşılan fonksiyonlar arasında ortak bir sorumluluk olarak kimlik doğrulama ve yetkilendirme süreçlerini merkezileştirir.
+
+## Fonksiyon Grupları
+### Token İşlemleri
+HTTP isteklerinden kimlik doğrulama token'larını çıkarmak ve güvenli bir şekilde doğrulamak için temel araçları sağlar.
+- bearerToken, timingSafeEquals
+
+### Veri Dönüştürme
+API'den gelen ham verileri uygulama tarafından tanımlanan tiplere (örneğin profil satırı) dönüştürür ve doğrular.
+- toProfileRow
+
+### Çağrı Çözme
+Verilen HTTP isteğine göre çağrının kimliğini ve bağlamını çözen ana işlevi yürütür; bu süreç, token çıkarma ve veri dönüştürme gibi alt araçları bir araya getirerek dinamik bir kimlik doğrulama akışı oluşturur.
+- resolveCaller
+
+### Hata Yönetimi
+Çağrı çözme sürecinde oluşabilecek yapılandırma veya arama hatalarını temsil eden özel hata sınıfları sunarak hatıralama ve hata yayma mekanizmalarını standartlaştırır.
+- CallerConfigError, CallerLookupError
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, bir istekten (Request) çağrı sahibini (CallerContext) çıkaran paylaşımlı bir yardımcı modüldür.
+
+**[Aksiyom 1]**: Eğer `resolveCaller` için geçerli bir `Request` nesnesi yoksa, `CallerContext` oluşturulamaz.
+
+**[Aksiyom 2]**: Eğer `bearerToken` fonksiyonu bir token çıkaramıyorsa (null dönerse), modül bir yedek mekanizma kullanmalıdır (ANONYMOUS sabiti mevcuttur, bu amaçla kullanılır).
+
+**[Aksiyom 3]**: Eğer `toProfileRow` fonksiyonu geçersiz bir `unknown` değeri alıysa, `TenantProfileRow | null` olarak `null` döner ve profil bilgisi kullanılamaz.
+
+**[Aksiyom 4]**: Eğer `CallerConfigError` fırlatılıyorsa, modülün çalışması için gerekli bir yapılandırma (konfigürasyon) eksiktir ve modül çalışamaz.
+
+**[Aksiyom 5]**: Eğer `CallerLookupError` fırlatılıyorsa, çağrı sahibi arama/çözümleme işleminde bir hata oluşmuştur ve detay bilgisi mevcuttur.
+
+**[Aksiyom 6]**: Eğer `parsedBody` parametresi `resolveCaller`'a verilmezse (undefined), fonksiyon yine de çalışmalıdır (parametre opsiyoneldir).
+
+**[Aksiyom 7]**: Eğer iki string karşılaştırması güvenlikli bir şekilde yapılması gerekiyorsa, `timingSafeEquals` kullanılmalıdır — zamanlama (timing) tabanlı saldırıları önlemek için.
+
+**[Aksiyom 8]**: Eğer Authorization başlığındaki token `BEARER_PREFIX_RE` desenine uymuyorsa, token geçersiz kabul edilmelidir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### bearerToken
+**Ne yapar**: HTTP isteğinin `Authorization` başlığındaki taşıyıcı (bearer) jetonunu çıkarır. Başlık yoksa veya jeton boşsa `null` döner.
+**Nasıl yapar**: `Request` nesnesinin başlıklarından `Authorization` başlığını büyük/küçük harf duyarsız olarak alır. Sabit bir regex deseni (`BEARER_PREFIX_RE`) kullanarak "Bearer " ön ekini temizler, kalan metni `trim()` ile boşluklardan arındırır ve uzunluğu sıfırdan büyükse jetonu, değilse `null` döner.
+**Parametreler**:
+- request: Request — Jetonun çıkarılacağı HTTP isteği nesnesi.
+**Dönüş**: string | null — Doğrulanmış ve temizlenmiş jeton dizisi veya bulunamadığında `null`.
+
+### timingSafeEquals
+**Ne yapar**: İki dizeyi (string) sabit-zamanlı (timing-safe) bir şekilde karşılaştırır. Bu, zamanlama bilgisinin (örn. ne kadar çabuk farklılaştıkları) dışarı sızmasını engelleyerek hassas veri karşılaştırmalarını koruma altına alır.
+**Nasıl yapar**: Her iki girdiyi de `TextEncoder` ile byte dizisine dönüştürür. Başlangıçta `diff` değişkenini iki uzunluğun XOR'una ayarlayarak uzunluk farkını hesaba katar. Daha sonra, her iki dizinin de byte'larını sırayla karşılaştırırken, olası uzunluk farklarını telafi etmek için eksik byte'ları `0` olarak işler. Her karşılaştırmada oluşan farkı `diff` üzerine OR ile biriktirir. Döngü, uzun olan dizinin boyunca çalışarak zamanlama sızıntısını önler. Sonunda `diff` sıfıra eşitse diziler özdeştir.
+**Parametreler**:
+- a: string — Karşılaştırılacak birinci dize.
+- b: string — Karşılaştırılacak ikinci dize.
+**Dönüş**: boolean — Diziler özdeş ise `true`, değilse `false`.
+
+### toProfileRow
+**Ne yapar**: PostgREST'ten (veya benzeri bir Veritabanı SDK'sından) dönen tipsiz (unknown) veri nesnesini, projenin tanımlı `TenantProfileRow` yapısına daraltır ve doğrular. Proje kuralı gereği tip uyumsuzluğu.runtime'da yakalanır.
+**Nasıl yapar**: Girdi değerinin bir `object` olup olmadığını ve `null` olmadığını kontrol eder. Ardından, `role` ve `tenant_id` alanlarının varlığını ve string tipinde olduğunu doğrular. Sadece bu koşullar sağlanırsa ilgili alanları içeren bir nesne döner, aksi halde `null` döner.
+**Parametreler**:
+- value: unknown — Veritabanı sorgusundan dönen, önceden bilinmeyen (tipsiz) satır verisi.
+**Dönüş**: TenantProfileRow | null — Doğrulanmış ve daraltılmış profil satırı nesnesi veya geçersiz veri durumunda `null`.
+
+### resolveCaller
+**Ne yapar**: Çağrı yapan (client) tarafın kimliğini, yetkisini ve ait olduğu kiracıyı (tenant) doğrular. Tüm kimlik doğrulama ve yetkilendirme mantığını merkezi olarak yöneten asenkron bir fonksiyondur.
+**Nasıl yapar**: Kesin bir sırayla çalışır: 1) Ortam değişkenlerini yükler ve eksiklikler hata fırlatır. 2) `bearerToken` ile jetonu çıkarır, yoksa `anon` döner. 3) Jetonun `service_role` anahtarına sabit-zamanlı eşleşme ile eşleşip eşleşmediğini kontrol eder. Eşleşirse, istek gövdesinden (`parsedBody`) kiracı bilgisini (`tenantFromServiceBody`) çıkararak `service_role` bağlamı döner. 4) Eşleşmezse, `anonKey` ile Supabase Auth istemcisi oluşturup `getUser` ile jetonun geçerliliğini doğrular. Geçersizse yine `anon` döner. 5) Geçerli kullanıcı bulunursa, servis anahtarı ile `admin` istemcisi oluşturarak `user_profiles` tablosundan kullanıcının `role` ve `tenant_id` bilgisini tek bir sorguyla çeker (`toProfileRow` ile doğrular). 6) Son olarak, `tenantFromVerifiedUser` fonksiyonunu kullanarak nihai kiracı kararını verir ve `user` bağlamını döner.
+**Parametreler**:
+- request: Request — Çağrı yapanın HTTP isteği.
+- parsedBody?: unknown — (Opsiyonel) service_role çağrısı için kiracı bilgisini içerebilecek, önceden ayrıştırılmış istek gövdesi.
+**Dönüş**: Promise<CallerContext> — Çağrının kimliğini, türünü (`kind`), kullanıcısını (`user`), rolünü (`role`) ve ait olduğu kiracı (`tenantId`) ile kaynağı (`source`) içeren bağlam nesnesi.
+
+### constructor
+**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+
+### CallerLookupError.constructor
+**Ne yapar**: Aynı `CallerLookupError` sınıfının, farklı bir varyasyonunu veya aynı oluşturucunun tekrarını temsil eder. Belirtilen girdiyle bir hata nesnesi başlatır.
+**Nasıl yapar**: Önceki ile aynı mantığı izler: Eksik bilgiyi `CONFIG_MISSING:` formatında bir hata mesajına dönüştürerek üst sınıfa iletir ve sınıf adını ayarlar. Bu, kodda aynı hata sınıfının birden fazla kez (veya farklı bir yerde) kullanıldığını gösterebilir.
+**Parametreler**:
+- missing: string — Hatanın kaynağını belirten eksik bileşen veya anahtar adı.
+**Dönüş**: N/A (Yapıcı fonksiyon).
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
+
+---
+
+## INTERFACES
+
+### CallerContext
+- `readonly kind: CallerKind`
+- `readonly user: VerifiedUser | null`
+- `readonly role?: string`
+- `readonly tenantId: string`
+- `readonly source: TenantSource`
+
+---
+
+## TYPE ALIASES
+
+### CallerKind
+Cetvel §2'nin sınıflarının RUNTIME karşılığı: `service_role` → sınıf (b) · `user` → sınıf (a) · `anon` → kanıtsız çağıran. Sınıf (c)/(d) burada YOKTUR: onların kanıtı HMAC imzası/`pg_cron`'dur, `Authorization` başlığı değil. O uçlar `resolveCaller` kullanmaz, `tenantFromRow`'u kullanır.
+```typescript
+type CallerKind = 'service_role' | 'user' | 'anon'
+```
+
+---
+
+## SABİTLER
+- **BEARER_PREFIX_RE** (regex) — `/^Bearer\s+/i`
+- **ANONYMOUS** (object) — `{
+  kind: 'anon',
+  user: null,
+  tenantId: DEFAULT_TENANT_ID,
+  source: 'def...`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: `_shared/caller.ts::CallerConfigError.constructor`
+- **params**: `(missing: string)` — eksik olan config anahtarının adı
+- **ic_degiskenler**:
+  - *(parametre harici iç değişken yok — `this.name` ve `super()` çağrıları mevcut)*
+- **Dönüş**: yok (yan etki: `this.name = 'CallerConfigError'` ayarlanır, super'e `CONFIG_MISSING:{missing}` mesajı iletilir)
+
+### [N2_NASIL] AST Pointer: `_shared/caller.ts::CallerLookupError.constructor`
+- **params**: `(detail: string)` — profil arama hata detayı
+- **ic_degiskenler**:
+  - *(parametre harici iç değişken yok — `this.name` ve `super()` çağrıları mevcut)*
+- **Dönüş**: yok (yan etki: `this.name = 'CallerLookupError'` ayarlanır, super'e `PROFILE_LOOKUP_FAILED:{detail}` mesajı iletilir)
+
+### [N3_NASIL] AST Pointer: `_shared/caller.ts::bearerToken`
+- **params**: `(request: Request)` — HTTP isteği nesnesi
+- **ic_degiskenler**:
+  - `header` — `request.headers.get('Authorization')` ile alınan Authorization header değeri; yoksa null döner
+  - `token` — `header`'dan `BEARER_PREFIX_RE` regex'i ile "Bearer " ön ekini kaldırıp trim edilmiş ham token stringi
+- **Dönüş**: `string | null` — token varsa ve boş değilse string, aksi halde null
+
+### [N4_NASIL] AST Pointer: `_shared/caller.ts::timingSafeEquals`
+- **params**: `(a: string, b: string)` — karşılaştırılacak iki string (token veya key)
+- **ic_degiskenler**:
+  - `encoder` — `new TextEncoder()` — stringleri byte dizisine çeviren TextEncoder örneği
+  - `left` — `encoder.encode(a)` ile elde edilen `a` string'inin byte dizisi
+  - `right` — `encoder.encode(b)` ile elde edilen `b` string'inin byte dizisi
+  - `diff` — iki byte dizisi arasındaki XOR fark bitmask'ı; başlangıçta `left.length ^ right.length` ile uzunluk farkını da taşır
+  - `length` — `Math.max(left.length, right.length)` — uzun dizenin uzunluğu; döngü üst sınırı
+  - `i` — for döngüsü sayacı; her byte pozisyonunu tarar
+- **Dönüş**: `boolean` — `diff === 0` ise stringler eşittir (zamanlama-sağlam karşılaştırma)
+
+### [N5_NASIL] AST Pointer: `_shared/caller.ts::toProfileRow`
+- **params**: `(value: unknown)` — ham veritabanı satırı (Supabase `maybeSingle()` dönüşü)
+- **ic_degiskenler**:
+  - `record` — `value`'nin `Record<string, unknown>` olarak tip 캐스팅 hali; `role` ve `tenant_id` alanlarına erişim için kullanılır
+- **Dönüş**: `TenantProfileRow | null` — `role` ve `tenant_id` alanlarını içeren obje veya geçersiz girişte null
+
+### [N6_NASIL] AST Pointer: `_shared/caller.ts::resolveCaller`
+- **params**: `(request: Request, parsedBody?: unknown)` — HTTP isteği ve opsiyonel parse edilmiş gövde (service_role karar verme için)
+- **ic_degiskenler**:
+  - `supabaseUrl` — `Deno.env.get('SUPABASE_URL')` ile alınan Supabase proje URL'i; boşsa `CallerConfigError` fırlatılır
+  - `serviceRoleKey` — `Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')` ile alınan service role anahtarı; boşsa `CallerConfigError` fırlatılır
+  - `anonKey` — `Deno.env.get('SUPABASE_ANON_KEY')` ile alınan anon (public) anahtar; boşsa `CallerConfigError` fırlatılır
+  - `token` — `bearerToken(request)` çağrısıyla Authorization header'dan çıkarılan ham JWT token; null ise `ANONYMOUS` döner
+  - `authClient` — `createClient(supabaseUrl, anonKey, ...)` ile oluşturulan Supabase istemcisi; `persistSession: false` ile tarayıcı oturumu depolanmaz, sadece token doğrulama (`getUser`) için kullanılır
+  - `userData` — `authClient.auth.getUser(token)` destructuring'inden gelen `{ data }` — Supabase auth kullanıcısı bilgisi
+  - `userError` — `authClient.auth.getUser(token)` destructuring'inden gelen `{ error }` — auth hata nesnesi (JWT geçersizse dolu)
+  - `authUser` — `userData?.user ?? null` ile çıkarılan Supabase AuthUser nesnesi veya null
+  - `user` — `{ id: authUser.id, app_metadata: authUser.app_metadata ?? null }` yapısında `VerifiedUser` objesi; doğrulanmış kullanıcının ID ve metadata bilgisi
+  - `admin` — `createClient(supabaseUrl, serviceRoleKey, ...)` ile oluşturulan Supabase istemcisi; service role yetkisiyle veritabanı sorguları (rol ve tenant okuma) için kullanılır
+  - `profileData` — `admin.from('user_profiles').select('role, tenant_id').eq('id', user.id).maybeSingle()` destructuring'inden gelen `{ data }` — kullanıcının `role` ve `tenant_id` değerlerini içeren satır
+  - `profileError` — aynı sorgudan gelen `{ error }` — profil sorgulama hatası; doluysa `CallerLookupError` fırlatılır
+  - `profile` — `toProfileRow(profileData)` çağrısıyla dönüştürülmüş `TenantProfileRow | null`; kullanıcının rolü ve tenant ID'si
+  - `decision` — iki farklı kolda atanır: service_role kolunda `tenantFromServiceBody(parsedBody)` ile (parsedBody'den tenant ID ve source çıkarılır), user kolunda `tenantFromVerifiedUser(user, profile)` ile (doğrulanmış kullanıcı ve profilden tenant ID ve source çıkarılır)
+- **Dönüş**: `Promise<CallerContext>` — `{ kind, user, tenantId, source, role? }` yapısında çağırıcı bağlamı; three possibble kind değeri: `'anonymous'` (ANONYMOUS sabiti), `'service_role'`, `'user'`
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    caller_ts__bearerToken["bearerToken"]
+    caller_ts__constructor["constructor"]
+    caller_ts__resolveCaller["resolveCaller"]
+    caller_ts__timingSafeEquals["timingSafeEquals"]
+    caller_ts__toProfileRow["toProfileRow"]
+    caller_ts__resolveCaller --> caller_ts__bearerToken
+    caller_ts__resolveCaller --> caller_ts__toProfileRow
+    caller_ts__resolveCaller --> caller_ts__timingSafeEquals
+```
+
+## NODE ID STANDARD
+
+  file: supabase\functions\_shared\caller.ts
+  function: supabase\functions\_shared\caller.ts::bearerToken
+  function: supabase\functions\_shared\caller.ts::timingSafeEquals
+  function: supabase\functions\_shared\caller.ts::toProfileRow
+  function: supabase\functions\_shared\caller.ts::resolveCaller
+  class: supabase\functions\_shared\caller.ts::CallerConfigError
+  class: supabase\functions\_shared\caller.ts::CallerLookupError
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: CallerConfigError
+  export: CallerContext
+  export: CallerKind
+  export: CallerLookupError
+  export: bearerToken
+  export: resolveCaller
+  export: timingSafeEquals
+  export: toProfileRow
+
+---
 # FILE: supabase\functions\_shared\cors.md
 
 ---
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\cors.ts
-skeleton_hash: 00381c65f282efb4
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\_shared\cors.ts
+skeleton_hash: f5323f7621d54120
 entity_hashes:
-  func:getCorsHeaders: 1360a70a0a4d6694
+  func:getCorsHeaders: 73642dabf029645c
   overview: 8eaad34e6f15ad7c
-generated_at: 2026-08-13T07:40:33Z
+generated_at: 2026-08-14T13:19:43Z
 ---
 
 ## Genel Bakış
@@ -3735,18 +4512,18 @@ Bu modül, HTTP istekleri için CORS başlıkları döndüren bir fonksiyon içe
 
 ### getCorsHeaders
 
-**Ne yapar**: HTTP isteğinin `Origin` başlığını kontrol ederek, istemcinin kaynak (origin) adresinin yerel geliştirme ortamı (`localhost`) veya Vercel deploy ortamı (`.vercel.app`) olup olmadığını belirler. Bu kontrole göre tarayıcılar tarafından uygulanacak olan CORS (Cross-Origin Resource Sharing) yanıt başlıklarını döndürür. Fonksiyon, güvenli olmayan kaynaklardan gelen istekleri engelleyerek yalnızca izin verilen ortamların API'ye erişmesini sağlar.
+**Ne yapar**: HTTP isteklerine yanıt olarak Cross-Origin Resource Sharing (CORS) politika başlıklarını dinamik olarak oluşturur. Fonksiyon, gelen isteğin kaynak adresine (Origin) göre izin verilen domain listesini belirler ve standart CORS başlıklarını içeren bir nesne döndürür. Bu sayede frontend uygulamaları farklı bir domain'den API isteklerini güvenli bir şekilde gerçekleştirebilir.
 
-**Nasıl yapar**: Önce istek nesnesinin `Origin` başlığını okur, bulunamazsa boş bir dize kullanır. Ardından bu değeri iki koşul için test eder: `http://localhost:` ile başlayıp başlamadığını ve `.vercel.app` ile bitip bitmediğini kontrol eder. Koşullardan herhangi biri sağlanırsa istek kabul edilir ve istemcinin kendi `Origin` değeri `Access-Control-Allow-Origin` başlığına yazılır. Aksi halde varsayılan ve tek izinli üretim adresi olan `https://venthub-hvac-esite.vercel.app` kullanılır. Son olarak, izin verilen başlık türleri, HTTP metodları ve önbellek süresi (`86400` saniye = 24 saat) sabit değerler olarak ayarlanan standart bir CORS başlık nesnesi döndürülür.
+**Nasıl yapar**: Fonksiyon, HTTP isteğinin `Origin` başlığını çıkararak başlar. Bu değeri kullanarak üç temel kontrol gerçekleştirir: kaynağın `localhost` ile başlayıp başlamadığını (geliştirme ortamı), `.vercel.app` ile bitip bitmediğini (Vercel deployment ortamı), ve her iki koşulun da sağlanıp sağlanmadığını kontrol eder. Kaynak izin listesinde yer alıyorsa, `Access-Control-Allow-Origin` başlığını isteğin kendi Origin değeriyle döndürür; aksi halde_prodüksiyon URL'ini (`https://venthub-hvac-esite.vercel.app`) kullanır. Ek olarak, izin verilen HTTP yöntemlerini, başlıkları ve preflight isteklerinin önbellek süresini (86400 saniye) ayarlar.
 
 **Parametreler**:
-- `req`: `Request` — Tarayıcı veya istemciden gelen HTTP istek nesnesi. Bu nesne üzerindeki `headers` alanından `Origin` değeri okunarak isteğin kaynak adresi tespit edilir. Cloudflare Workers veya benzeri edge ortamlarında standart `Request` arayüzüne sahiptir.
+- `req: Request` — CORS başlıklarının çıkarılacağı HTTP istek nesnesi. Standart Fetch API Request nesnesi olup, `headers` özelliği üzerinden HTTP başlıklarına erişim sağlar
 
-**Dönüş**: `{ [key: string]: string }` — Tarayıcı tarafından işlenecek CORS başlıklarını içeren bir nesne. İçerik şu başlıklardan oluşur:
-- `Access-Control-Allow-Origin`: İzin verilen kaynak adresi (istemci origin'i veya varsayılan üretim URL'i).
-- `Access-Control-Allow-Headers`: İzin verilen özel istek başlıkları: `authorization`, `x-client-info`, `apikey`, `content-type`.
-- `Access-Control-Allow-Methods`: İzin verilen HTTP metodları: `POST`, `GET`, `OPTIONS`, `PUT`, `DELETE`.
-- `Access-Control-Max-Age`: Preflight isteklerinin tarayıcı tarafından kaç saniye önbelleğe alınacağı (86400 saniye).
+**Dönüş**: `Record<string, string>` — Dört anahtar-değer çiftinden oluşan CORS başlık nesnesi döndürür:
+- `Access-Control-Allow-Origin`: İzin verilen kaynak domain (dinamik veya sabit prodüksiyon URL'i)
+- `Access-Control-Allow-Headers`: İzin verilen istek başlıkları listesi (authorization, x-client-info, apikey, content-type)
+- `Access-Control-Allow-Methods`: İzin verilen HTTP yöntemleri (POST, GET, OPTIONS, PUT, DELETE)
+- `Access-Control-Max-Age`: Preflight isteklerinin tarayıcı tarafından önbelleğe alınma süresi (saniye cinsinden 86400)
 
 ---
 
@@ -3755,11 +4532,11 @@ Bu modül, HTTP istekleri için CORS başlıkları döndüren bir fonksiyon içe
 ### [N1_NASIL] AST Pointer: _shared/cors.ts::getCorsHeaders
 - **params**: (req: Request)
 - **ic_degiskenler**:
-  - `origin` — Request nesnesinin 'Origin' başlığını alır, eğer başlık yoksa boş dize kullanır
-  - `isLocal` — origin değerinin 'http://localhost:' ile başlayıp başlamadığını kontrol eder
-  - `isVercel` — origin değerinin '.vercel.app' ile bitip bitmediğini kontrol eder
-  - `allowed` — isLocal veya isVercel durumlarından herhangi biri doğruysa true olan mantıksal değişken
-- **Dönüş**: CORS başlıklarını içeren nesne (Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Methods, Access-Control-Max-Age anahtarlarını içerir)
+  - `origin` — Request'ten alınan Origin header değeri; mevcut değilse boş string kullanılır
+  - `isLocal` — origin'in `http://localhost:` ile başlayıp başlamadığını kontrol eder;本地 geliştirme ortamı tespiti için kullanılır
+  - `isVercel` — origin'in `.vercel.app` ile bitip bitmediğini kontrol eder; Vercel deploy ortamı tespiti için kullanılır
+  - `allowed` — isLocal veya isVercel değerlerinin OR mantığı ile sonuçlanan布尔 değişken; istek yapan origin'in izinli olup olmadığını belirler
+- **Dönüş**: `{ 'Access-Control-Allow-Origin': string, 'Access-Control-Allow-Headers': string, 'Access-Control-Allow-Methods': string, 'Access-Control-Max-Age': string }` — CORS header nesnesi döndürür; allowed true ise gelen origin'e izin verir, false ise sabit Vercel URL'ine izin verir
 
 ---
 
@@ -4225,82 +5002,286 @@ graph TD
   export: sentryCaptureMessage
 
 ---
+# FILE: supabase\functions\_shared\tenant.md
+
+---
+domain: general
+source_type: doc
+namespace_type: module
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\_shared\tenant.ts
+skeleton_hash: 3968d998bd619807
+entity_hashes:
+  func:TenantMismatchError:constructor: e1338c721ec51a0d
+  func:asTenantId: c2ff5c564490bb06
+  func:readTenantField: 4d35c0e558a986d4
+  func:tenantFromRow: c90159523a95e369
+  func:tenantFromServiceBody: 66ed2d9436ec1651
+  func:tenantFromVerifiedUser: 1aa2c618793ac476
+  overview: 4177b2bce8b584b0
+generated_at: 2026-08-15T07:40:57Z
+---
+
+## Genel Bakış
+Bu modül, çok kiracılı bir Supabase Edge Functions yapısında kiracı (tenant) kararlarının alınması için merkezi yardımcı işlevleri sunar. Farklı kaynaklardan (doğrulanmış kullanıcı profilleri, HTTP istek gövdeleri veya veritabanı satırları) gelen kiracı bilgisini standart bir `TenantDecision` formatına dönüştürerek tutarlı bir karar üretmeyi ve kiracı eşleşmeyen durumlarda hata yönetimi sağlamayı amaçlar.
+
+## Fonksiyon Grupları
+### Temel Dönüştürücü ve Yardımcılar
+Bu grup, ham veya değişken tipteki girdileri geçerli bir kiracı tanımlayıcısına (tenant ID) dönüştüren ve kaynak nesnelerden kiracı alanlarını okuyan düşük seviyeli yardımcı fonksiyonları içerir.
+- asTenantId, readTenantField
+
+### Karar Üreticileri
+Bu grup, farklı kaynaklardan (doğrulanmış kullanıcı, servis gövdesi veya veritabanı satırı) kiracı bilgisini çıkararak standart bir karar nesnesi üreten ana mantık fonksiyonlarını barındırır.
+- tenantFromVerifiedUser, tenantFromServiceBody, tenantFromRow
+
+### Hata ve Uyumsuzluk Yönetimi
+Bu grup, kiracı kimlikleri arasındaki tutarsızlıkları yakalamak ve bağlam hakkında bilgi veren anlamlı hata mesajları üretmek için özel bir hata sınıfını tanımlar.
+- TenantMismatchError (sınıf ve yapılandırıcısı)
+
+---
+
+## AXIOMS – Mimari Varsayımlar
+
+Bu modül, çoklu kiracılı (multi-tenant) sistemlerde kiracılık (tenant) kimliğini doğrulamak ve karar üretmek için kullanılır.
+
+[Aksiyom 1]: Eğer `TENANT_UUID_RE` regex sabiti tanımlı değilse veya geçerli bir UUID deseni içermiyorsa, `asTenantId` fonksiyonu hiçbir zaman geçerli bir tenant ID döndüremez.
+
+[Aksiyom 2]: Eğer `user` parametresi `VerifiedUser` tipinde değilse veya `profile` parametresi `null` ise, `tenantFromVerifiedUser` fonksiyonunun tenant kararını doğru üretmesi garanti edilemez.
+
+[Aksiyom 3]: Eğer `parsedBody` parametresi `tenant_id` alanı içermeyen bir yapıda ise, `tenantFromServiceBody` fonksiyonu `TenantDecision`'da tenant bilgisini `null` olarak döndürür.
+
+[Aksiyom 4]: Eğer `row` parametresi `null` ise veya `row.tenant_id` alanı mevcut değilse, `tenantFromRow` fonksiyonu tenant bilgisi içermeyen bir `TenantDecision` döndürür.
+
+[Aksiyom 5]: Eğer `profileTenantId` ile `claimTenantId` değerleri birbirinden farklı ise, `TenantMismatchError` hatası fırlatılır — bu, profil ile doğrulanmış kullanıcı arasındaki tenant uyumsuzluğunu işaret eder.
+
+[Aksiyom 6]: Eğer `tenantFromVerifiedUser` fonksiyonu hem `user`'da hem `profile`'da tenant bilgisi bulursa ve ikisi farklı ise, bu durum bir uyumsuzluk (mismatch) olarak işlenir ve muhtemelen hata fırlatılır.
+
+[Aksiyom 7]: Eğer `asTenantId` fonksiyonuna verilen `value` parametresi `TENANT_UUID_RE` regex deseniyle eşleşmiyorsa, fonksiyon `null` döndürür.
+
+[Aksiyom 8]: Eğer `TenantMismatchError` constructor'ına `profileTenantId` olarak `null` değer verilir ve `claimTenantId` geçerli bir UUID ise, hata yine de fırlatılır çünkü claim edilen tenant ile profil tenantı eşleşmemektedir.
+
+---
+
+## FONKSİYON DETAYLARI
+
+### asTenantId
+**Ne yapar**: Verilen değerin geçerli bir tenant UUID'si olup olmadığını kontrol eder ve geçerliyse normalize eder.
+**Nasıl yapar**: Değerin bir string olup olmadığını kontrol eder, değiliyse `null` döner. String ise başındaki ve sonundaki boşlukları temizledikten sonra `TENANT_UUID_RE`正则 ifadesiyle eşleşip eşleşmediğini test eder. Eşleşiyorsa küçük harflere dönüştürerek normalize edilmiş UUID'yi, eşleşmiyorsa `null` döner.
+**Parametreler**:
+- `value`: `unknown` — Değerlendirilecek herhangi bir tipteki girdi.
+**Dönüş**: `string | null` — Geçerli ve normalize edilmiş (küçük harf) UUID stringi veya geçersiz değer için `null`.
+
+### readTenantField
+**Ne yapar**: Serbest biçimli bir nesneden, önceden tanımlı alan anahtarları (`TENANT_FIELD_KEYS`) arasında dolaşarak geçerli bir tenant alanını okur.
+**Nasıl yapar**: Girdi bir nesne veya null ise doğrudan `null` döner. Nesneyi `Record<string, unknown>` tipine daraltarak (proje kuralı gereği `any` kullanılmaz), `TENANT_FIELD_KEYS` dizisi üzerinde döngü başlatır. Her bir anahtar için değeri `asTenantId` fonksiyonuyla doğrular. İlk geçerli tenant alanını bulduğunda onu döndürür, hiçbirini bulamazsa `null` döner.
+**Parametreler**:
+- `source`: `unknown` — Tenant alanının aranacağı nesne. Nesne dışı değerler için `null` döner.
+**Dönüş**: `string | null` — Bulunan geçerli tenant ID'si veya hiçbir alan geçerli değilse `null`.
+
+### tenantFromVerifiedUser
+**Ne yapar**: Doğrulanmış bir kullanıcı ve profili için tenant kararını (ID ve kaynağı) belirler.
+**Nasıl yapar**: Kullanıcının `app_metadata` alanından (`fromClaim`) ve profil satırından (`fromProfile`) olası tenant değerlerini okur. Eğer claim mevcutsa ve profille eşleşmiyorsa, bir `TenantMismatchError` fırlatır (uyumsuzluk durumu). Profilden geçerli bir tenant ID okunabildiyse onu ve kaynağını (`user_profile`) döndürür. Hiçbiri yoksa varsayılan tenant ID'sini ve kaynağını (`default`) döndürür. Bu fonksiyon, otorite olarak `user_profiles.tenant_id`'yi kabul eder.
+**Parametreler**:
+- `user`: `VerifiedUser` — Kimliği doğrulanmış kullanıcı nesnesi. `app_metadata` alanı içerebilir.
+- `profile`: `TenantProfileRow | null` — Kullanıcının `user_profiles` tablosundaki satırı veya null olabilir.
+**Dönüş**: `TenantDecision` — `{ tenantId: string, source: 'user_profile' | 'default' }` formatında bir nesne. Tenant ID ve bu kararın hangi kaynaktan geldiği bilgisini içerir.
+
+### tenantFromServiceBody
+**Ne yapar**: service_role ile çağrılan bir fonksiyonun, doğrulama sonrası istek gövdesinden tenant kararını belirler.
+**Nasıl yapar**: ÖN KOŞUL: Bu fonksiyon çağrılmadan önce, `Authorization` başlığının service_role anahtarı olduğu sabit-zamanlı karşılaştırmayla doğrulanmış olmalıdır. `parsedBody` üzerinden `readTenantField` ile bir tenant ID arar. Bulursa onu ve kaynağını (`service_body`) döndürür, bulamazsa varsayılan tenant ID'sini ve kaynağını (`default`) döndürür. Anahtarın kendisi tenant bilgisi içermez; bu nedenle gövdeden okuma yapılır.
+**Parametreler**:
+- `parsedBody`: `unknown` — service_role çağrısının istek gövdesi (parsed JSON).
+**Dönüş**: `TenantDecision` — `{ tenantId: string, source: 'service_body' | 'default' }` formatında bir nesne.
+
+### tenantFromRow
+**Ne yapar**: HMAC imzası doğrulanmış bir isteğin işaret ettiği veritabanı satırından (örn. sipariş veya iade satırı) tenant kararını belirler.
+**Nasıl yapar**: Harici bir sağlayıcı (kargo/ödeme) bizim tenant UUID'lerimizi bilmez, bu yüzden istekten tenant okumak yerine, imzalı istein işaret ettiği (`order_id`, `tracking_number` vb.) satırın kendi `tenant_id` alanını kullanır. `asTenantId` ile satırdaki `tenant_id` alanını doğrular. Geçerliyse onu ve kaynağını (`resource_row`) döndürür, değilse varsayılan tenant ID'sini ve kaynağını (`default`) döndürür.
+**Parametreler**:
+- `row`: `{ tenant_id?: string | null } | null` — `venthub_orders` veya `venthub_returns` gibi tablolardan gelen, `tenant_id` alanı opsiyonel olabilen satır nesnesi veya null.
+**Dönüş**: `TenantDecision` — `{ tenantId: string, source: 'resource_row' | 'default' }` formatında bir nesne.
+
+### TenantMismatchError.constructor
+**Ne yapar**: Tenant uyuşmazlığı hata nesnesini başlatır ve hata detaylarını saklar.
+**Nasıl yapar**: `super('tenant_mismatch')` çağrısıyla üst sınıf (Error) constructor'ını çalıştırarak hata mesajını ayarlar. Hata adını (`name`) 'TenantMismatchError' olarak belirler. Profilden gelen (`profileTenantId`) ve claim'den gelen (`claimTenantId`) tenant ID'lerini nesne özellikleri olarak saklar, bu da hata ayıklama ve loglama için faydalı bilgiler sağlar.
+**Parametreler**:
+- `profileTenantId`: `string | null` — Profil tablosundan (`user_profiles.tenant_id`) okunan tenant ID'si veya null.
+- `claimTenantId`: `string` — Kullanıcı claim'inden (`app_metadata`) okunan ve profille uyuşmayan tenant ID'si.
+**Dönüş**: `TenantMismatchError` — Bu bir constructor olduğu için dönüş tipi doğrudan nesnenin kendisidir. Önceden tanımlanmış `tenant_mismatch` mesajı ve her iki tenant ID'sini içeren bir Error nesnesi oluşturur.
+
+---
+
+## INTERFACES
+
+### TenantDecision
+- `readonly tenantId: string`
+- `readonly source: TenantSource`
+
+### VerifiedUser
+`auth.getUser(jwt)`'in döndürdüğü kullanıcının bu modülün ihtiyaç duyduğu dar yüzü. Supabase'in tam `User` tipini import etmiyoruz: bu dosyanın ağ/SDK bağımlılığı olmamalı ki saf kalsın ve testte düz nesneyle çağrılabilsin.
+- `readonly id: string`
+- `readonly app_metadata?: Record<string, unknown> | null`
+
+### TenantProfileRow
+Sınıf (a) rol sorgusunun döndürdüğü satır: `select role, tenant_id`. İkisinin AYNI satırdan gelmesi bilinçli — cetvel §3.2 rolü, §3.9 tenant'ı ister ve eski kod bunları iki ayrı kaynaktan alıp "önce tenant'ı bul ki profili filtreleyeyim" döngüsüne düşüyordu.
+- `readonly role?: string | null`
+- `readonly tenant_id?: string | null`
+
+---
+
+## TYPE ALIASES
+
+### TenantSource
+Kararın NEREDEN geldiği. Log/telemetri için değil, DENETİM için: bir uç beklenmedik bir kaynağa düşüyorsa (ör. sınıf-(a) ucunda `'default'`) bu, kapının çalışmadığının işaretidir ve çağıran bunu görüp reddedebilir.
+```typescript
+type TenantSource = 'user_profile' | 'service_body' | 'resource_row' | 'default'
+```
+
+---
+
+## SABİTLER
+- **TENANT_UUID_RE** (regex) — `/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i`
+
+---
+
+## AST POINTERS
+
+### [N1_NASIL] AST Pointer: supabase\functions\_shared\tenant.ts::TenantMismatchError.constructor
+- **params**: (profileTenantId: string | null, claimTenantId: string)
+- **ic_degiskenler**: (yok — parametreler doğrudan atanır)
+- **Dönüş**: yok — class instance başlatır
+
+### [N2_NASIL] AST Pointer: supabase\functions\_shared\tenant.ts::asTenantId
+- **params**: (value: unknown)
+- **ic_degiskenler**:
+  - `trimmed` — value'nun boşlukları temizlenmiş hali
+- **Dönüş**: string | null
+
+### [N3_NASIL] AST Pointer: supabase\functions\_shared\tenant.ts::readTenantField
+- **params**: (source: unknown)
+- **ic_degiskenler**:
+  - `record` — source'un Record<string, unknown> tipine dönüştürülmüş hali
+  - `key` — TENANT_FIELD_KEYS dizisindeki her bir alan adı
+  - `candidate` — record[key] değerinin asTenantId ile işlenmiş hali
+- **Dönüş**: string | null
+
+### [N4_NASIL] AST Pointer: supabase\functions\_shared\tenant.ts::tenantFromVerifiedUser
+- **params**: (user: VerifiedUser, profile: TenantProfileRow | null)
+- **ic_degiskenler**:
+  - `fromProfile` — profile.tenant_id değerinin asTenantId ile işlenmiş hali
+  - `fromClaim` — user.app_metadata değerinin readTenantField ile işlenmiş hali
+- **Dönüş**: TenantDecision object
+
+### [N5_NASIL] AST Pointer: supabase\functions\_shared\tenant.ts::tenantFromServiceBody
+- **params**: (parsedBody: unknown)
+- **ic_degiskenler**:
+  - `claimed` — parsedBody değerinin readTenantField ile işlenmiş hali
+- **Dönüş**: TenantDecision object
+
+### [N6_NASIL] AST Pointer: supabase\functions\_shared\tenant.ts::tenantFromRow
+- **params**: (row: { tenant_id?: string | null } | null)
+- **ic_degiskenler**:
+  - `fromRow` — row?.tenant_id değerinin asTenantId ile işlenmiş hali
+- **Dönüş**: TenantDecision object
+
+---
+
+
+## MERMAID CALL GRAPH
+```mermaid
+graph TD
+    tenant_ts__asTenantId["asTenantId"]
+    tenant_ts__constructor["constructor"]
+    tenant_ts__readTenantField["readTenantField"]
+    tenant_ts__tenantFromRow["tenantFromRow"]
+    tenant_ts__tenantFromServiceBody["tenantFromServiceBody"]
+    tenant_ts__tenantFromVerifiedUser["tenantFromVerifiedUser"]
+    tenant_ts__tenantFromVerifiedUser --> tenant_ts__readTenantField
+    tenant_ts__tenantFromVerifiedUser --> tenant_ts__asTenantId
+    tenant_ts__readTenantField --> tenant_ts__asTenantId
+    tenant_ts__tenantFromServiceBody --> tenant_ts__readTenantField
+    tenant_ts__tenantFromRow --> tenant_ts__asTenantId
+```
+
+## NODE ID STANDARD
+
+  file: supabase\functions\_shared\tenant.ts
+  function: supabase\functions\_shared\tenant.ts::asTenantId
+  function: supabase\functions\_shared\tenant.ts::readTenantField
+  function: supabase\functions\_shared\tenant.ts::tenantFromVerifiedUser
+  function: supabase\functions\_shared\tenant.ts::tenantFromServiceBody
+  function: supabase\functions\_shared\tenant.ts::tenantFromRow
+  class: supabase\functions\_shared\tenant.ts::TenantMismatchError
+
+---
+
+## DISA AKTARILANLAR (EXPORTS)
+  export: TenantDecision
+  export: TenantMismatchError
+  export: TenantProfileRow
+  export: TenantSource
+  export: VerifiedUser
+  export: asTenantId
+  export: readTenantField
+  export: tenantFromRow
+  export: tenantFromServiceBody
+  export: tenantFromVerifiedUser
+
+---
+
+## BILEŞIM (CONTAINS)
+  contains: string
+  contains: string | null
+
+---
 # FILE: supabase\functions\_shared\tenant_config.md
 
 ---
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\supabase\functions\_shared\tenant_config.ts
-skeleton_hash: 12c856af1a1cb729
+source_path: C:\Users\alize\venthub-wt-hotfix\supabase\functions\_shared\tenant_config.ts
+skeleton_hash: 865a8d4b605a94c6
 entity_hashes:
-  func:getTenantBranding: bde2d3819c7904af
-  func:resolveTenantId: 70b9699dc1e36828
-  overview: 0aa8d7ed1d1b17a6
-generated_at: 2026-08-13T07:40:33Z
+  func:getTenantBranding: 6ae9f5f873d6872c
+  overview: 727819c400487687
+generated_at: 2026-08-15T09:05:28Z
 ---
 
 ## Genel Bakış
-
-Bu modül, kiracı (tenant) bazlı yapılandırma ve kimlik tespitini sağlamak için ortak yardımcı fonksiyonlar içerir. Supabase edge fonksiyonları arasında paylaşılan bir yapı olarak, HTTP isteklerinden kiracı tanımlayıcısının çıkarılması ve kiracıya özel marka bilgilerinin getirilmesi işlemlerini merkezi olarak yönetir.
+Bu modül, Supabase edge fonksiyonları arasında kiracıya (tenant) özel yapılandırma bilgilerini sağlamak için paylaşımlı yardımcı fonksiyonlar sunar. Temel olarak, HTTP isteklerinden kiracı tanımlayıcısının çıkarılması ve bu tanımlayıcıya karşılık gelen kiracının marka bilgilerinin merkezi olarak getirilmesi işlemlerini yönetir.
 
 ## Fonksiyon Grupları
-
-### Kiracı Kimlik Tespiti
-HTTP isteklerinden kiracı tanımlayıcısını çıkarıp standart bir biçime dönüştürerek diğer fonksiyonların kullanabileceği şekilde sunar.
+### Kiracı Kimlik Yönetimi
+HTTP isteklerinden kiracı tanımlayıcısını analiz edip standart bir biçime dönüştürerek, sistem genelinde kullanılabilir hale getirir.
 - resolveTenantId
 
-### Kiracı Marka Bilgisi
-Verilen kiracı tanımlayıcısına karşılık gelen marka ve görsel yapılandırma bilgilerini asenkron olarak getirir.
+### Kiracı Marka Bilgisi Sağlama
+Belirli bir kiracı tanımlayıcısına ait marka ve görsel yapılandırma bilgilerini asenkron olarak getirerek, kiracıya özel arayüzlerin dinamik olarak oluşturulmasını destekler.
 - getTenantBranding
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, HTTP isteklerinden tenant (kiracı) tanımlayıcısını çıkaran ve ilgili tenant'ın marka bilgisini getiren yardımcı fonksiyonlar içerir.
-
-**[Aksiyom 1]**: Eğer `resolveTenantId` fonksiyonuna geçirilen `req` parametresi geçerli bir HTTP Request nesnesi değilse, fonksiyon tenant ID'sini başarıyla çıkaramaz.
-
-**[Aksiyom 2]**: Eğer `resolveTenantId` fonksiyonuna geçirilen `parsedBody` parametresi `undefined` ise ve request body'den tenant ID çıkarımı bu parametreye bağımlıysa, çözümleme başarısız olur.
-
-**[Aksiyom 3]**: Eğer `getTenantBranding` fonksiyonuna geçirilen `tenantId` boş string (`""`) ise veya geçerli bir tenant temsil etmiyorsa, fonksiyon geçerli marka bilgisi dönemez.
-
-**[Aksiyom 4]**: Eğer `getTenantBranding` fonksiyonu için veritabanında veya yapılandırma kaynağında `tenantId`'ye karşılık gelen bir kayıt yoksa, fonksiyon geçerli marka bilgisi dönemez.
+Bu modül için **fonksiyon gövdesi (function body) paylaşılmamıştır**. Axiom'lar sadece fonksiyon gövdesinden üretilebilir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### resolveTenantId
-**Ne yapar**: Bir HTTP isteğinden kiracı kimliğini (tenant_id) çıkarmaya çalışır. Bu işlem, istek URL'si, Yetkilendirme başlığındaki JWT veya istek gövdesindeki veriler kullanılarak sırasıyla kontrol edilir. Eğer hiçbir kaynakta geçerli bir kiracı kimliği bulunamazsa, tanımlı bir varsayılan değer döndürür.
-
-**Nasıl yapar**: Fonksiyon, kiracı kimliğini belirlemek için üç aşamalı bir arama stratejisi uygular. Öncelikle URL sorgu parametrelerinde `tenant_id` arar. Bulamazsa, `Authorization` başlığındaki Bearer token'ı ayrıştırarak JWT payload'ındaki `app_metadata.tenant_id` claim'ini kontrol eder. Hâlâ bulamazsa, opsiyonel olarak verilen `parsedBody` nesnesinde `tenant_id` veya `tenantId` alanlarını inceler. Tüm denemeler başarısız olursa, module seviyesinde tanımlı olan `DEFAULT_TENANT_ID` sabitini döndürür. Herhangi bir ayrıştırma hatası oluşursa hatayı konsola kaydeder.
-
-**Parametreler**:
-- `req`: Request — Kiracı kimliğini çıkarmak için analiz edilecek HTTP istek nesnesi. URL, başlıklar ve gövde erişimi için kullanılır.
-- `parsedBody`: any (opsiyonel) — Önceden ayrıştırılmış bir istek gövdesi nesnesi. `tenant_id` alanı için kontrol edilir.
-
-**Dönüş**: string — Bulunan veya varsayılan kiracı kimliği. Geçerli bir kiracı kimliği bulunamazsa module sabiti olan `DEFAULT_TENANT_ID` döndürülür.
-
 ### getTenantBranding
-**Ne yapar**: Belirli bir kiracı için marka yapılandırma bilgilerini (logo, ad, renk, e-posta adresi gibi) dinamik olarak getirir. Veri kaynağı olarak sırasıyla kiracının veritabanı kaydını, ortam değişkenlerini ve son olarak kod içi varsayılan değerleri kullanarak bir fallback mekanizması uygular.
+**Ne yapar**: Belirli bir kiracıya (tenant) ait marka yapılandırmasını (branding) asenkron olarak getirir. İşlem, veritabanı yapılandırması, ortam değişkenleri ve sabit kodlanmış varsayılan değerler之间ında kademeli bir fallback mekanizması uygular.
 
-**Nasıl yapar**: Fonksiyon, istenen kiracının marka ayarlarını bulmak için hiyerarşik bir çözümleme yapar. İlk adım olarak, Supabase istemcisi oluşturarak `tenants` tablosundaki `config` alanını sorgular. Veritabanından başarılı bir veri alınırsa, bu yapılandırma nesnesi temel alınır; alınmazsa veya hata oluşursa konsola bir uyarı yazılır. Daha sonra, her bir marka özelliği (`brandName`, `brandLogoUrl`, vb.) için, veritabanı yapılandırmasındaki anahtar isimleri (hem snake_case hem camelCase varyantları) kontrol eder. Bu anahtarlar bulunamazsa, ilgili ortam değişkenine (ör. `BRAND_NAME`) bakar. Ortam değişkeni de yoksa, fonksiyon içi tanımlı nihai hardcoded varsayılan değeri kullanır. Bu süreç, dört ana marka özelliğinin her biri için tekrarlanarak nihai `TenantBranding` nesnesi oluşturulur.
+**Nasıl yapar**: Fonksiyon, Supabase service role anahtarı ile bir istemci oluşturarak veritabanından kiracının `config` alanını çeker. Elde edilen veritabanı yapılandırması (hem `snake_case` hem de `camelCase` anahtarlarla kontrol edilir) önceliklidir. Eğer veritabanında değer bulunamazsa, sırasıyla Deno ortam değişkenleri (`BRAND_NAME`, `BRAND_LOGO_URL`, vb.) ve en son olarak sabit kodlanmış VentHub varsayılan değerleri kullanılır. Bu fallback zinciri, her bir marka özelliği için ayrı ayrı uygulanır.
 
 **Parametreler**:
-- `tenantId`: string — Marka yapılandırması getirilecek olan kiracının benzersiz tanımlayıcısı. Veritabanı sorgusu için kullanılır.
+- `tenantId`: `string` — Marka yapılandırması getirilecek kiracının benzersiz tanımlayıcısı.
 
-**Dönüş**: Promise<TenantBranding> — Aşağıdaki alanları içeren bir marka yapılandırma nesnesi:
-- `brandName`: string — Markanın Görünen Adı (Ör: "VentHub")
-- `brandLogoUrl`: string — Markanın Logo Görselinin Tam URL'i
-- `brandPrimaryColor`: string — Markanın Ana Renk Kodu (HEX formatında, Ör: "#2563eb")
-- `emailFrom`: string — Sistem e-postalarında kullanılacak "Gönderen" adresi (Ör: "VentHub <onboarding@resend.dev>")
+**Dönüş**: `Promise<TenantBranding>` — Kiracının resolved edilmiş marka yapılandırmasını içeren bir nesne döndürür. `TenantBranding` tipinin şu özelliklere sahip olduğu varsayılır: `brandName: string`, `brandLogoUrl: string`, `brandPrimaryColor: string`, `emailFrom: string`.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
-- import: https://esm.sh/@supabase/supabase-js@2::createClient
+- import: https://esm.sh/@supabase/supabase-js@2.45.4::createClient
 
 ---
 
@@ -4316,41 +5297,26 @@ Bu modül, HTTP isteklerinden tenant (kiracı) tanımlayıcısını çıkaran ve
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: _shared/tenant_config.ts::resolveTenantId
-- **params**: (req: Request, parsedBody?: any)
-- **ic_degiskenler**:
-  - `url` — İstek URL'sini temsil eden URL nesnesi, sorgu parametrelerini okumak için kullanılır
-  - `queryTenantId` — URL'deki `tenant_id` sorgu parametresinden gelen string değer
-  - `authHeader` — Authorization veya authorization header'ından gelen token string'i
-  - `token` — Bearer prefix'i去除ılmış JWT token string'i
-  - `jwtParts` — JWT token'ının '.' karakteriyle ayrılmış parçalarını içeren array
-  - `payload` — JWT payload'unun Base64 decode edilmiş JSON objesi
-  - `tenantId` — JWT payload'unun `app_metadata.tenant_id` alanından gelen tenant ID string'i
-  - `bodyTenantId` — parsedBody objesinden gelen `tenant_id` veya `tenantId` alanı
-  - `err` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: string — Çözümlenmiş tenant ID'si veya DEFAULT_TENANT_ID
-
-### [N2_NASIL] AST Pointer: _shared/tenant_config.ts::getTenantBranding
+### [N1_NASIL] AST Pointer: _shared/tenant_config.ts::getTenantBranding
 - **params**: (tenantId: string)
 - **ic_degiskenler**:
-  - `supabaseUrl` — SUPABASE_URL ortam değişkeninden gelen Supabase URL string'i
-  - `serviceKey` — SUPABASE_SERVICE_ROLE_KEY ortam değişkeninden gelen service role key string'i
-  - `dbConfig` — Veritabanından çekilen tenant konfigürasyon objesi (Record<string, string>)
-  - `supabase` — createClient ile oluşturulan Supabase istemcisi nesnesi
-  - `data` — Veritabanı sorgusundan dönen tenant verisi (config alanını içerir)
-  - `error` — Veritabanı sorgusundan dönen hata nesnesi
-  - `brandName` — Hiyerarşik resolved marka adı (DB config, alternatif key, ortam değişkeni veya varsayılan)
-  - `brandLogoUrl` — Hiyerarşik resolved marka logosu URL'i
-  - `brandPrimaryColor` — Hiyerarşik resolved marka ana rengi
-  - `emailFrom` — Hiyerarşik resolved e-posta gönderici adresi
-- **Dönüş**: Promise<TenantBranding> — {brandName, brandLogoUrl, brandPrimaryColor, emailFrom} objesi
+    - `supabaseUrl` — Supabase proje URL'si, environment variable'dan alınır, Supabase istemcisi oluşturmada kullanılır
+    - `serviceKey` — Supabase servis rolü anahtarı, environment variable'dan alınır, yetkilendirme için kullanılır
+    - `dbConfig` — Tenant yapılandırması için boş bir nesne olarak başlatılır, veritabanından yüklenen config verisi burada saklanır
+    - `supabase` — createClient fonksiyonu ile oluşturulan Supabase istemcisi, veritabanı sorguları yapmak için kullanılır
+    - `data` — Supabase sorgusundan dönen veri, tenant'ın config alanını içerir (başarılı olursa)
+    - `error` — Supabase sorgusundan dönen hata nesnesi (başarısız olursa)
+    - `brandName` — Marka adı, dbConfig'den veya environment variable'dan çözümlenir, fallback olarak 'VentHub' kullanılır
+    - `brandLogoUrl` — Marka logo URL'si, dbConfig'den veya environment variable'dan çözümlenir, varsayılan VentHub logosu kullanılır
+    - `brandPrimaryColor` — Marka birincil rengi, dbConfig'den veya environment variable'dan çözümlenir, varsayılan '#2563eb' kullanılır
+    - `emailFrom` — E-posta gönderen adresi, dbConfig'den veya environment variable'dan çözümlenir, varsayılan VentHub adresi kullanılır
+- **Dönüş**: TenantBranding nesnesi (brandName, brandLogoUrl, brandPrimaryColor, emailFrom alanlarını içerir)
 
 ---
 
 ## NODE ID STANDARD
 
   file: supabase\functions\_shared\tenant_config.ts
-  function: supabase\functions\_shared\tenant_config.ts::resolveTenantId
   function: supabase\functions\_shared\tenant_config.ts::getTenantBranding
 
 ---
@@ -4358,4 +5324,3 @@ Bu modül, HTTP isteklerinden tenant (kiracı) tanımlayıcısını çıkaran ve
 ## DISA AKTARILANLAR (EXPORTS)
   export: TenantBranding
   export: getTenantBranding
-  export: resolveTenantId
