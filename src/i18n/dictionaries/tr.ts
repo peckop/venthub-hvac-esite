@@ -1206,6 +1206,8 @@ export const tr = {
     title: 'Alışveriş Sepeti',
     countLabel: 'Sepetinizde {{count}} ürün var',
     removeItem: 'Ürünü kaldır',
+    decreaseQty: 'Miktarı azalt',
+    increaseQty: 'Miktarı artır',
     clearCart: 'Sepeti Temizle',
     summary: 'Sipariş Özeti',
     subtotal: 'Ara Toplam',
@@ -1246,6 +1248,7 @@ export const tr = {
     saved: {
       title: 'Kayıtlı Adresler',
       address: 'Adres',
+      labelPlaceholder: 'Ev, İş vb.',
       default: 'Varsayılan',
       use: 'Bu adresi kullan',
       manage: 'Adresleri yönet',
@@ -2568,6 +2571,8 @@ export const tr = {
     contactInfo: 'İletişim Bilgileri',
     name: 'Ad Soyad',
     company: 'Şirket',
+    companyPlaceholder: 'Şirketiniz A.Ş.',
+    cityPlaceholder: 'Örn: İstanbul',
     email: 'E-posta',
     phone: 'Telefon',
     city: 'Şehir',
@@ -2682,6 +2687,7 @@ export const tr = {
     }
   },
   calculators: {
+    recommendations: 'Öneriler',
     stepIndicator: {
       progress: 'Adım {{current}} / {{total}}',
     },

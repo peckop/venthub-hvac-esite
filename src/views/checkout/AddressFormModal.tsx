@@ -92,7 +92,7 @@ const AddressFormModal: React.FC<AddressFormModalProps> = ({
                 <form onSubmit={handleSave} className="p-5 space-y-4">
                     <div>
                         <label className="block text-xs font-medium text-steel-gray mb-1">{t('checkout.saved.address')}</label>
-                        <input type="text" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Ev, İş vb." />
+                        <input type="text" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm" placeholder={t('checkout.saved.labelPlaceholder')} />
                     </div>
                     <div>
                         <label className="block text-xs font-medium text-steel-gray mb-1">{t('checkout.shipping.addressLabel')}</label>

@@ -124,7 +124,7 @@ const CartPage: React.FC = () => {
                         onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                         className="p-2 hover:bg-light-gray transition-colors"
                         disabled={item.quantity <= 1}
-                        aria-label="Miktarı azalt"
+                        aria-label={t('cart.decreaseQty')}
                       >
                         <Minus size={16} className="text-steel-gray" aria-hidden="true" />
                       </button>
@@ -134,7 +134,7 @@ const CartPage: React.FC = () => {
                       <button
                         onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                         className="p-2 hover:bg-light-gray transition-colors"
-                        aria-label="Miktarı artır"
+                        aria-label={t('cart.increaseQty')}
                       >
                         <Plus size={16} className="text-steel-gray" aria-hidden="true" />
                       </button>
