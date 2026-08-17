@@ -150,6 +150,58 @@ function liveClaims(now = Date.now()) {
   return live
 }
 
+/**
+ * BIRAKILMAMIŞ tüm talepler — bayat olanlar DÜŞMEZ, `bayat: true` ile işaretlenir (T084-VH).
+ *
+ * NİÇİN AYRI FONKSİYON: `liveClaims` TTL'i dolmuş talebi listeden ATAR ve bu **engelleme**
+ * için doğrudur (ölü oturum kimseyi kilitlemesin). Ama aynı liste panoyu/brifingi de
+ * besliyordu ve orada **sessiz bir bilgi kaybı** üretiyordu: 2026-08-18'de EDGE şeridi
+ * 240 dakika atış almadıktan sonra listeden TAMAMEN kayboldu. Sonuç: "listede yok" ifadesi
+ * iki bambaşka durumu aynı gösteriyor —
+ *   (a) iş bitti, şerit bilinçli bırakıldı  ·  (b) oturum koptu, şerit SAHİPSİZ kaldı.
+ * (b) hâlinde o globlar kimsenin bakmadığı bir alan olur ve kimse fark etmez; oysa bu
+ * devralma kararı gerektiren bir bilgidir. Sahte-yeşil ailesinin görünürlük biçimi:
+ * yokluk "sorun yok" gibi okunuyor.
+ *
+ * ⚠ `findConflict` bilinçli olarak BUNU KULLANMAZ, `liveClaims`'i kullanır: bayat bir şerit
+ * GÖRÜNÜR olmalı ama BLOKLAMAMALIDIR. İkisini birleştirmek ölü oturumun kilidini geri getirir.
+ */
+function tumTalepler(now = Date.now()) {
+  const canli = new Set(liveClaims(now).map(c => c.sid))
+  const events = readEvents()
+  const bySession = new Map()
+  for (const e of events) {
+    if (e.type === 'claim') {
+      const globs = Array.isArray(e.globs) ? e.globs : []
+      const prev = bySession.get(e.sid)
+      bySession.set(e.sid, {
+        sid: e.sid,
+        lane: e.lane || (prev && prev.lane) || 'lane',
+        globs: prev ? [...new Set([...prev.globs, ...globs])] : globs,
+        ts: prev ? prev.ts : e.ts,
+        heartbeat: e.ts,
+        ttlMs: typeof e.ttlMs === 'number' ? e.ttlMs : DEFAULT_TTL_MS,
+      })
+    } else if (e.type === 'heartbeat') {
+      const c = bySession.get(e.sid)
+      if (c) c.heartbeat = e.ts
+    } else if (e.type === 'release') {
+      bySession.delete(e.sid) // BIRAKILAN şerit gerçekten düşer: bu bilinçli bir kapanış
+    }
+  }
+  const out = []
+  for (const c of bySession.values()) {
+    const yasMs = now - Date.parse(c.heartbeat)
+    out.push({
+      ...c,
+      bayat: !canli.has(c.sid),
+      yasDk: Number.isFinite(yasMs) ? Math.max(0, Math.round(yasMs / 60000)) : null,
+    })
+  }
+  out.sort((a, b) => String(a.ts).localeCompare(String(b.ts)))
+  return out
+}
+
 /** Glob → RegExp. `**` her şeyi, `*` tek segmenti karşılar. */
 function globToRegExp(glob) {
   const norm = String(glob).replace(/\\/g, '/')
@@ -226,17 +278,25 @@ function findConflict(filePath, sid, repoRoot) {
  * adı taşıyan iki canlı talep birbirini bloklayabilir (kıdemsiz olan yazamaz).
  */
 function summary(sid) {
-  const live = liveClaims()
-  if (live.length === 0) return 'PANO: canlı talep yok.'
+  // BAYAT şeritler artık DÜŞMEZ, etiketle gösterilir (T084-VH — bkz. tumTalepler yorumu).
+  const hepsi = tumTalepler()
+  if (hepsi.length === 0) return 'PANO: talep yok.'
   const laneCount = new Map()
-  for (const c of live) laneCount.set(c.lane, (laneCount.get(c.lane) || 0) + 1)
-  const lines = live.map(c => {
+  for (const c of hepsi) if (!c.bayat) laneCount.set(c.lane, (laneCount.get(c.lane) || 0) + 1)
+  const lines = hepsi.map(c => {
     const mine = c.sid === sid ? ' (sen)' : ''
-    const dup = laneCount.get(c.lane) > 1 ? ' ⚠ AYNI ŞERİT ADI birden çok oturumda' : ''
-    const mins = Math.max(0, Math.round((Date.now() - Date.parse(c.heartbeat)) / 60000))
-    return `  · ${c.lane}${mine}${dup} — ${c.globs.join(', ')} [${c.sid.slice(0, 8)}, ${mins}dk önce]`
+    // Çakışma uyarısı yalnız CANLI şeritler için anlamlı: bayat olan bloklamıyor.
+    const dup = !c.bayat && laneCount.get(c.lane) > 1 ? ' ⚠ AYNI ŞERİT ADI birden çok oturumda' : ''
+    const bayat = c.bayat
+      ? ` ⚠ BAYAT (${c.yasDk}dk atış yok — bırakılmadı, SAHİPSİZ olabilir; bloklamıyor)`
+      : ''
+    return `  · ${c.lane}${mine}${dup}${bayat} — ${c.globs.join(', ')} [${c.sid.slice(0, 8)}, ${c.yasDk}dk önce]`
   })
-  return 'PANO — canlı şeritler:\n' + lines.join('\n')
+  const bayatSayi = hepsi.filter(c => c.bayat).length
+  const bas = bayatSayi > 0
+    ? `PANO — şeritler (${hepsi.length - bayatSayi} canlı, ${bayatSayi} BAYAT):`
+    : 'PANO — canlı şeritler:'
+  return bas + '\n' + lines.join('\n')
 }
 
 /** Bu oturumun teslim aldığı son not zamanı (`seen` işareti). */
@@ -341,7 +401,7 @@ function markSeen(sid, notes) {
 
 module.exports = {
   BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS, PANOYA_YAZAN_FIILLER,
-  append, touch, readEvents, liveClaims, findConflict, summary,
+  append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary,
   notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids,
   globToRegExp, toRepoRelative, repoRootFor,
 }
