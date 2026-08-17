@@ -2,11 +2,11 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-13T07:40:56.224943+00:00
+compiled_at: 2026-08-17T11:53:18.194976+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
@@ -15,10 +15,10 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   └── 📂 **explorer_m4_1_gen2/**
 │       └── ⚠️ `handoff.md`
 ├── ⚪ `CHANGELOG.md`
-├── ⚠️ `CLAUDE.md`
+├── ⚪ `CLAUDE.md`
 ├── ⚪ `CONTEXT.md`
 ├── ⚠️ `ORIGINAL_REQUEST.md`
-├── ⚠️ `PROJECT.md`
+├── ⚪ `PROJECT.md`
 ├── ⚪ `README.md`
 ├── ⚪ `RECOMMENDATIONS.md`
 ├── ⚠️ `TEST_INFRA.md`
@@ -50,10 +50,18 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   ├── ⚪ `admin-cetvel-scores-2026-06-17.md`
 │   │   ├── ⚪ `admin-cetvel-scores-2026-06-18.md`
 │   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
+│   │   ├── ⚪ `canliya-alma-hazirlik-2026-08-15.md`
 │   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
 │   │   ├── ⚪ `legal-i18n-scope-antigravity-2026-06-16.md`
 │   │   ├── ⚪ `lighthouse_diagnostic_2026-06-10.md`
-│   │   └── ⚪ `product-schema-ground-truth-2026-06-21.md`
+│   │   ├── ⚪ `odeme-yolu-denetimi-2026-08-15.md`
+│   │   ├── ⚪ `operasyon-dongusu-denetimi-2026-08-15.md`
+│   │   ├── ⚪ `product-schema-ground-truth-2026-06-21.md`
+│   │   ├── ⚪ `render-stratejisi-denetimi-2026-08-16.md`
+│   │   ├── ⚪ `secret-exposure-audit-2026-08-15.md`
+│   │   ├── ⚪ `vibe-coding-20-madde-denetimi-2026-08-13.md`
+│   │   ├── ⚪ `vibe-coding-20-madde-v2-2026-08-16.md`
+│   │   └── ⚪ `yetki-katmani-denetimi-2026-08-15.md`
 │   ├── ⚪ `database_schema_master.md`
 │   ├── ⚪ `design_system_config.md`
 │   ├── 📂 **legal/**
@@ -74,6 +82,7 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   ├── ⚪ `faz1-migration-playbook-2026-06-13.md`
 │   │   ├── ⚪ `faz1-remaining-divided-2026-06-13.md`
 │   │   ├── ⚪ `faz2-admin-backlog.md`
+│   │   ├── ⚪ `fiyat-motoru-plan-2026-08-13.md`
 │   │   ├── ⚪ `i18n-jsx-literals-cleanup-2026-06-14.md`
 │   │   ├── ⚪ `j1-dashboard-data-brief.md`
 │   │   ├── ⚪ `j10-inventorysettings-refactor-brief.md`
@@ -97,6 +106,7 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   ├── ⚪ `saas-funding-and-packaging-2026-06.md`
 │   │   ├── ⚪ `seo-transition-blueprint.md`
 │   │   ├── ⚪ `slug-localization-2026-08-10.md`
+│   │   ├── ⚪ `tenant-id-hardening-2026-08-15.md`
 │   │   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
 │   │   ├── ⚪ `venthub_saas_faz1_prompt.md`
 │   │   └── ⚪ `venthub_saas_master_roadmap.md`
@@ -118,18 +128,29 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   ├── ⚪ `3d-webgl-standard.md`
 │   │   ├── ⚪ `SOURCES.md`
 │   │   ├── ⚪ `admin-capabilities.md`
+│   │   ├── ⚪ `admin-design-standard.md`
 │   │   ├── ⚪ `admin-standard.md`
 │   │   ├── ⚪ `analytics-standard.md`
+│   │   ├── ⚪ `auth-account-standard.md`
 │   │   ├── ⚪ `catalog-ingestion-standard.md`
 │   │   ├── ⚪ `category-taxonomy-standard.md`
 │   │   ├── ⚪ `collaboration-protocol.md`
 │   │   ├── ⚪ `csv-import-export-standard.md`
+│   │   ├── ⚪ `customer-account-standard.md`
 │   │   ├── ⚪ `dealer-module-blueprint.md`
 │   │   ├── ⚪ `dealer-network-standard.md`
+│   │   ├── ⚪ `edge-function-security-standard.md`
 │   │   ├── ⚪ `i18n-localization-standard.md`
+│   │   ├── ⚪ `legal-compliance-standard.md`
 │   │   ├── ⚪ `migration-safety-standard.md`
+│   │   ├── ⚪ `multi-session-coordination-standard.md`
 │   │   ├── ⚪ `pricing-standard.md`
 │   │   ├── ⚪ `product-schema-standard.md`
+│   │   ├── ⚪ `purchasing-standard.md`
+│   │   ├── ⚪ `quote-standard.md`
+│   │   ├── ⚪ `rendering-cache-standard.md`
+│   │   ├── ⚪ `storefront-design-standard.md`
+│   │   ├── ⚪ `storefront-reflow-standard.md`
 │   │   └── ⚪ `work-tracking-ssot-standard.md`
 │   ├── ⚪ `supabase_functions_master.md`
 │   ├── ⚪ `system_tree.md`
@@ -137,7 +158,8 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   └── ⚪ `venthub_skills_master.md`
 ├── 📂 **e2e/**
 │   ├── ✅ `admin-smoke.e2e.ts`
-│   └── ✅ `checkout-smoke.e2e.ts`
+│   ├── ✅ `checkout-smoke.e2e.ts`
+│   └── ❌ `reflow.e2e.ts`
 ├── 📂 **explorer_m2_3/**
 │   └── ⚠️ `analysis.md`
 ├── ⚠️ `implementation_plan.md`
@@ -156,6 +178,8 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   ├── 📂 **account/**
 │   │   │   │   ├── 📂 **addresses/**
 │   │   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   ├── 📂 **favorites/**
+│   │   │   │   │   └── ❌ `page.tsx`
 │   │   │   │   ├── 📂 **invoices/**
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   ├── ✅ `layout.tsx`
@@ -165,6 +189,12 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   ├── ✅ `page.tsx`
 │   │   │   │   ├── 📂 **profile/**
+│   │   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   ├── 📂 **projects/**
+│   │   │   │   │   └── ❌ `page.tsx`
+│   │   │   │   ├── 📂 **quotes/**
+│   │   │   │   │   ├── 📂 **detail/**
+│   │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   ├── 📂 **returns/**
 │   │   │   │   │   └── ✅ `page.tsx`
@@ -179,8 +209,10 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   ├── 📂 **login/**
 │   │   │   │   │   └── ✅ `page.tsx`
-│   │   │   │   └── 📂 **register/**
-│   │   │   │       └── ✅ `page.tsx`
+│   │   │   │   ├── 📂 **register/**
+│   │   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   └── 📂 **reset-password/**
+│   │   │   │       └── ❌ `page.tsx`
 │   │   │   ├── 📂 **brands/**
 │   │   │   │   ├── 📂 **[slug]/**
 │   │   │   │   │   └── ✅ `page.tsx`
@@ -270,7 +302,17 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   ├── 📂 **orders/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── ✅ `page.tsx`
+│   │   │   ├── 📂 **pricing/**
+│   │   │   │   ├── ✅ `page.tsx`
+│   │   │   │   ├── 📂 **preview/**
+│   │   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   └── 📂 **rules/**
+│   │   │   │       └── ✅ `page.tsx`
 │   │   │   ├── 📂 **products/**
+│   │   │   │   └── ✅ `page.tsx`
+│   │   │   ├── 📂 **purchasing/**
+│   │   │   │   └── ❌ `page.tsx`
+│   │   │   ├── 📂 **quotes/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **returns/**
 │   │   │   │   └── ✅ `page.tsx`
@@ -287,6 +329,8 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │       └── 📂 **supabase/**
 │   │   │           └── ✅ `route.ts`
 │   │   ├── 📂 **auth/**
+│   │   │   ├── 📂 **callback/**
+│   │   │   │   └── ❌ `route.ts`
 │   │   │   └── 📂 **signout/**
 │   │   │       └── ✅ `route.ts`
 │   │   ├── ✅ `layout.tsx`
@@ -334,7 +378,6 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   ├── ✅ `AdminRealtimeNotifications.tsx`
 │   │   │   ├── ✅ `AdminSkeleton.tsx`
 │   │   │   ├── ✅ `AdminToolbar.tsx`
-│   │   │   ├── ✅ `BulkActionToolbar.tsx`
 │   │   │   ├── ✅ `ColumnsMenu.tsx`
 │   │   │   ├── ✅ `CommandPalette.tsx`
 │   │   │   ├── ✅ `DateRangePicker.tsx`
@@ -362,6 +405,8 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   │   └── ✅ `StatCard.tsx`
 │   │   │   ├── 📂 **data-table/**
 │   │   │   │   ├── ✅ `BulkBar.tsx`
+│   │   │   │   ├── ✅ `BulkPricePanel.tsx`
+│   │   │   │   ├── ✅ `BulkRolePanel.tsx`
 │   │   │   │   ├── ✅ `DataTableHead.tsx`
 │   │   │   │   ├── ✅ `DataTableKit.tsx`
 │   │   │   │   ├── ✅ `FacetedFilter.tsx`
@@ -369,12 +414,33 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   │   └── ✅ `types.ts`
 │   │   │   ├── 📂 **orders/**
 │   │   │   │   └── ✅ `OrderFormModal.tsx`
+│   │   │   ├── 📂 **overlay/**
+│   │   │   │   ├── ✅ `AdminModal.tsx`
+│   │   │   │   ├── ✅ `AdminSidePanel.tsx`
+│   │   │   │   └── ✅ `ConfirmProvider.tsx`
+│   │   │   ├── 📂 **pricing/**
+│   │   │   │   ├── ✅ `CostRefreshModal.tsx`
+│   │   │   │   ├── ✅ `CurrencyRatesCard.tsx`
+│   │   │   │   ├── ✅ `MaterializePricesModal.tsx`
+│   │   │   │   ├── ✅ `PricingRuleFormModal.tsx`
+│   │   │   │   ├── ✅ `PricingSettingsFormModal.tsx`
+│   │   │   │   └── ✅ `RuleScopeTargetPicker.tsx`
 │   │   │   ├── 📂 **products/**
 │   │   │   │   ├── ✅ `ProductCsvImport.tsx`
 │   │   │   │   ├── ✅ `ProductFormModal.tsx`
 │   │   │   │   └── ✅ `ProductHealthBadge.tsx`
-│   │   │   └── 📂 **settings/**
-│   │   │       └── ✅ `SettingsFormModal.tsx`
+│   │   │   ├── 📂 **purchasing/**
+│   │   │   │   └── ❌ `CreatePurchaseOrderPanel.tsx`
+│   │   │   ├── 📂 **settings/**
+│   │   │   │   └── ✅ `SettingsFormModal.tsx`
+│   │   │   └── 📂 **shell/**
+│   │   │       ├── ✅ `AdminPageHeader.tsx`
+│   │   │       ├── ✅ `AdminSidebar.tsx`
+│   │   │       ├── ✅ `AdminThemeToggle.tsx`
+│   │   │       ├── ✅ `navCookie.ts`
+│   │   │       └── ✅ `themeCookie.ts`
+│   │   ├── 📂 **analytics/**
+│   │   │   └── ❌ `ConsentGatedAnalytics.tsx`
 │   │   ├── 📂 **authority/**
 │   │   │   ├── ✅ `AuthorityRenderer.tsx`
 │   │   │   ├── ⚪ `README.md`
@@ -408,6 +474,8 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │           ├── ✅ `SilentFanProblem.tsx`
 │   │   │           ├── ✅ `SilentFanTypeComparison.tsx`
 │   │   │           └── ✅ `SilentFanVorticeBrand.tsx`
+│   │   ├── 📂 **consent/**
+│   │   │   └── ❌ `CookiePreferencesButton.tsx`
 │   │   ├── 📂 **home/**
 │   │   │   ├── ✅ `ApplicationSolutions.tsx`
 │   │   │   ├── ✅ `CinematicProductShowcase.tsx`
@@ -442,7 +510,6 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   ├── 📂 **products/**
 │   │   │   ├── 📂 **3d/**
 │   │   │   │   ├── ✅ `AutoCenter.tsx`
-│   │   │   │   ├── ⚠️ `FanRenderer.md`
 │   │   │   │   ├── ✅ `Product3DViewer.tsx`
 │   │   │   │   ├── ✅ `ProductModelRenderer.tsx`
 │   │   │   │   ├── ✅ `SmartCenterScale.tsx`
@@ -498,7 +565,7 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   ├── ✅ `BlueprintCanvas.tsx`
 │   │   │   ├── ✅ `Category3DIcon.tsx`
 │   │   │   ├── ✅ `CategoryOrbitCarousel.tsx`
-│   │   │   ├── ❌ `FamilyCard.tsx`
+│   │   │   ├── ✅ `FamilyCard.tsx`
 │   │   │   ├── ✅ `InfiniteProductsShowcase.tsx`
 │   │   │   ├── ✅ `OrbitalProductsShowcase.tsx`
 │   │   │   ├── ✅ `ProductsHero.tsx`
@@ -507,6 +574,9 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   ├── ✅ `RichTextRenderer.tsx`
 │   │   │   ├── ❌ `VariantSelector.tsx`
 │   │   │   └── 📂 **visual-models/**
+│   │   ├── 📂 **quotes/**
+│   │   │   ├── ✅ `QuoteRequestButton.tsx`
+│   │   │   └── ✅ `QuoteRequestModal.tsx`
 │   │   └── 📂 **ui/**
 │   │       ├── ❌ `Pagination.tsx`
 │   │       ├── ✅ `ScrollObserver.tsx`
@@ -543,7 +613,9 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   ├── ✅ `useCheckoutOrchestrator.ts`
 │   │   ├── ✅ `useCheckoutPayment.ts`
 │   │   ├── ✅ `useDragScroll.ts`
+│   │   ├── ❌ `useFavorites.ts`
 │   │   ├── ✅ `useHideOnScroll.ts`
+│   │   ├── ✅ `useInventoryDetail.ts`
 │   │   ├── ✅ `useIsMounted.ts`
 │   │   ├── ✅ `useLocalizedRoutes.ts`
 │   │   ├── ✅ `useManualScrollRestoration.ts`
@@ -570,6 +642,8 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   │   ├── ✅ `categories.tr.ts`
 │   │   │   │   ├── ✅ `common.en.ts`
 │   │   │   │   ├── ✅ `common.tr.ts`
+│   │   │   │   ├── ✅ `confirm.en.ts`
+│   │   │   │   ├── ✅ `confirm.tr.ts`
 │   │   │   │   ├── ✅ `coupons.en.ts`
 │   │   │   │   ├── ✅ `coupons.tr.ts`
 │   │   │   │   ├── ✅ `dashboard.en.ts`
@@ -591,14 +665,20 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   │   ├── ✅ `movements.tr.ts`
 │   │   │   │   ├── ✅ `orders.en.ts`
 │   │   │   │   ├── ✅ `orders.tr.ts`
+│   │   │   │   ├── ✅ `pricing.en.ts`
+│   │   │   │   ├── ✅ `pricing.tr.ts`
 │   │   │   │   ├── ✅ `products.en.ts`
 │   │   │   │   ├── ✅ `products.tr.ts`
+│   │   │   │   ├── ❌ `purchasing.en.ts`
+│   │   │   │   ├── ❌ `purchasing.tr.ts`
 │   │   │   │   ├── ✅ `returns.en.ts`
 │   │   │   │   ├── ✅ `returns.tr.ts`
 │   │   │   │   ├── ✅ `search.en.ts`
 │   │   │   │   ├── ✅ `search.tr.ts`
 │   │   │   │   ├── ✅ `settings.en.ts`
 │   │   │   │   ├── ✅ `settings.tr.ts`
+│   │   │   │   ├── ✅ `theme.en.ts`
+│   │   │   │   ├── ❌ `theme.tr.ts`
 │   │   │   │   ├── ✅ `titles.en.ts`
 │   │   │   │   ├── ✅ `titles.tr.ts`
 │   │   │   │   ├── ✅ `toolbar.en.ts`
@@ -618,12 +698,14 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   ├── 📂 **admin/**
 │   │   │   ├── ✅ `inboxCounts.ts`
 │   │   │   ├── ✅ `mutateWithAudit.ts`
+│   │   │   ├── ✅ `orderStatusMachine.ts`
 │   │   │   ├── ✅ `returnStatusMachine.ts`
 │   │   │   └── 📂 **search/**
 │   │   │       └── ✅ `resourceSearchers.ts`
 │   │   ├── ✅ `audit.ts`
 │   │   ├── 📂 **cache/**
 │   │   │   └── ❌ `tags.ts`
+│   │   ├── 📂 **consent/**
 │   │   ├── 📂 **data/**
 │   │   │   └── ✅ `preload.ts`
 │   │   ├── ✅ `ensureSessionFresh.ts`
@@ -635,6 +717,10 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   ├── ✅ `orderStatusService.ts`
 │   │   ├── ✅ `pdfAssets.ts`
 │   │   ├── ✅ `pdfGenerator.ts`
+│   │   ├── 📂 **purchasing/**
+│   │   │   └── ❌ `poStatusMachine.ts`
+│   │   ├── 📂 **quotes/**
+│   │   │   └── ✅ `quoteStatusMachine.ts`
 │   │   ├── ✅ `rbac.ts`
 │   │   ├── 📂 **seo/**
 │   │   │   └── ❌ `jsonld.ts`
@@ -642,13 +728,19 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │   ├── ✅ `address.service.ts`
 │   │   │   ├── ✅ `cart.service.ts`
 │   │   │   ├── ✅ `category.service.ts`
+│   │   │   ├── ❌ `displayPrice.service.ts`
 │   │   │   ├── ❌ `family.service.ts`
 │   │   │   ├── ✅ `inventoryReport.service.ts`
 │   │   │   ├── ✅ `invoice.service.ts`
 │   │   │   ├── ✅ `pricing.service.ts`
+│   │   │   ├── ✅ `pricingAdmin.service.ts`
+│   │   │   ├── ✅ `pricingMaterialize.service.ts`
+│   │   │   ├── ❌ `pricingPolicy.service.ts`
 │   │   │   ├── ❌ `product.columns.ts`
 │   │   │   ├── ✅ `product.service.ts`
 │   │   │   ├── ✅ `project.service.ts`
+│   │   │   ├── ❌ `purchasing.service.ts`
+│   │   │   ├── ✅ `quoteService.ts`
 │   │   │   └── ✅ `registry.ts`
 │   │   ├── 📂 **supabase/**
 │   │   │   ├── ✅ `client.ts`
@@ -657,7 +749,10 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   ├── ✅ `supabase.ts`
 │   │   ├── ✅ `tenantResolver.ts`
 │   │   ├── ✅ `type-converters.ts`
-│   │   └── ✅ `utils.ts`
+│   │   ├── ✅ `utils.ts`
+│   │   └── 📂 **validation/**
+│   │       ├── ❌ `invoiceIdentity.ts`
+│   │       └── ✅ `taxIdentity.ts`
 │   ├── ✅ `middleware.ts`
 │   ├── 📂 **providers/**
 │   │   └── ✅ `SupabaseProvider.tsx`
@@ -716,6 +811,7 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │       ├── ✅ `ProductsDiscoveryView.tsx`
 │       ├── ✅ `ProductsPage.tsx`
 │       ├── ✅ `RegisterPage.tsx`
+│       ├── ❌ `ResetPasswordPage.tsx`
 │       ├── 📂 **account/**
 │       │   ├── ✅ `AccountAddressesPage.tsx`
 │       │   ├── ✅ `AccountInvoicesPage.tsx`
@@ -725,7 +821,12 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │       │   ├── ✅ `AccountReturnsPage.tsx`
 │       │   ├── ✅ `AccountSecurityPage.tsx`
 │       │   ├── ✅ `AccountShipmentsPage.tsx`
-│       │   └── ✅ `OrderDetailPage.tsx`
+│       │   ├── ❌ `FavoritesPage.tsx`
+│       │   ├── ✅ `OrderDetailPage.tsx`
+│       │   ├── ❌ `ProjectsPage.tsx`
+│       │   └── 📂 **quotes/**
+│       │       ├── ✅ `AccountQuotesPage.tsx`
+│       │       └── ✅ `QuoteDetailPage.tsx`
 │       ├── 📂 **admin/**
 │       │   ├── ✅ `AdminAuditLogPage.tsx`
 │       │   ├── ✅ `AdminCategoriesPage.tsx`
@@ -742,6 +843,9 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │       │   ├── ✅ `AdminMovementsPage.tsx`
 │       │   ├── ✅ `AdminOrdersBoard.tsx`
 │       │   ├── ✅ `AdminOrdersPage.tsx`
+│       │   ├── ✅ `AdminPricePreviewPage.tsx`
+│       │   ├── ✅ `AdminPricingRulesPage.tsx`
+│       │   ├── ✅ `AdminPricingSettingsPage.tsx`
 │       │   ├── ✅ `AdminProductsPage.tsx`
 │       │   ├── ✅ `AdminReturnsPage.tsx`
 │       │   ├── ✅ `AdminSettingsPage.tsx`
@@ -757,9 +861,17 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │       │   ├── ✅ `InventoryTableBody.tsx`
 │       │   ├── ✅ `MovementsTableBody.tsx`
 │       │   ├── ✅ `OrdersTableBody.tsx`
+│       │   ├── ✅ `PricePreviewPanel.tsx`
+│       │   ├── ✅ `PricingRulesTableBody.tsx`
 │       │   ├── ✅ `ProductsTableBody.tsx`
 │       │   ├── ✅ `ReturnsTableBody.tsx`
-│       │   └── ✅ `WebhookEventsTableBody.tsx`
+│       │   ├── ✅ `WebhookEventsTableBody.tsx`
+│       │   ├── 📂 **purchasing/**
+│       │   │   ├── ❌ `AdminPurchasingPage.tsx`
+│       │   │   └── ❌ `PurchasingTableBody.tsx`
+│       │   └── 📂 **quotes/**
+│       │       ├── ✅ `AdminQuotesPage.tsx`
+│       │       └── ✅ `QuotesTableBody.tsx`
 │       ├── 📂 **calculators/**
 │       │   ├── ✅ `AirCurtainCalcPage.tsx`
 │       │   ├── ✅ `DuctCalcPage.tsx`
@@ -817,10 +929,16 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   └── ⚪ `README.md`
 │   ├── 📂 **functions/**
 │   │   ├── 📂 **_shared/**
+│   │   │   ├── ✅ `caller.ts`
 │   │   │   ├── ✅ `cors.ts`
 │   │   │   ├── ✅ `notify.ts`
+│   │   │   ├── ❌ `origins.ts`
 │   │   │   ├── ✅ `rate_limit.ts`
+│   │   │   ├── ❌ `refund_guard.ts`
+│   │   │   ├── ❌ `return_transitions.ts`
+│   │   │   ├── ❌ `revenue_alarm.ts`
 │   │   │   ├── ✅ `sentry.ts`
+│   │   │   ├── ✅ `tenant.ts`
 │   │   │   └── ✅ `tenant_config.ts`
 │   │   ├── 📂 **admin-create-coupon/**
 │   │   ├── 📂 **admin-iyzico-reconcile/**
@@ -852,45 +970,93 @@ Bu belge, otonom derleyici tarafından 2026-08-13T07:40:56.224943+00:00 tarihind
 │   │   │       └── 📂 **email/**
 │   │   ├── 📂 **shipping-status/**
 │   │   ├── 📂 **shipping-webhook/**
-│   │   └── 📂 **stock-alert/**
+│   │   ├── 📂 **stock-alert/**
+│   │   └── 📂 **tcmb-rates-sync/**
 │   └── 📂 **migrations/**
 ├── 📂 **support/**
 └── ✅ `tailwind.config.js`
 ```
 
 ## Eksik Dokümantasyonlar
-- [ ] `src\components\products\FamilyCard.tsx`
+- [ ] `e2e\reflow.e2e.ts`
+- [ ] `src\app\[lang]\account\favorites\page.tsx`
+- [ ] `src\app\[lang]\account\projects\page.tsx`
+- [ ] `src\app\[lang]\auth\reset-password\page.tsx`
+- [ ] `src\app\admin\purchasing\page.tsx`
+- [ ] `src\app\auth\callback\route.ts`
+- [ ] `src\components\admin\purchasing\CreatePurchaseOrderPanel.tsx`
+- [ ] `src\components\analytics\ConsentGatedAnalytics.tsx`
+- [ ] `src\components\consent\CookiePreferencesButton.tsx`
 - [ ] `src\components\products\VariantSelector.tsx`
 - [ ] `src\components\ui\Pagination.tsx`
+- [ ] `src\hooks\useFavorites.ts`
+- [ ] `src\i18n\dictionaries\admin\purchasing.en.ts`
+- [ ] `src\i18n\dictionaries\admin\purchasing.tr.ts`
+- [ ] `src\i18n\dictionaries\admin\theme.tr.ts`
 - [ ] `src\lib\cache\tags.ts`
 - [ ] `src\lib\images\productImage.ts`
+- [ ] `src\lib\purchasing\poStatusMachine.ts`
 - [ ] `src\lib\seo\jsonld.ts`
+- [ ] `src\lib\services\displayPrice.service.ts`
 - [ ] `src\lib\services\family.service.ts`
+- [ ] `src\lib\services\pricingPolicy.service.ts`
 - [ ] `src\lib\services\product.columns.ts`
+- [ ] `src\lib\services\purchasing.service.ts`
+- [ ] `src\lib\validation\invoiceIdentity.ts`
 - [ ] `src\utils\specLabel.ts`
-- [ ] `src\components\products\FamilyCard.tsx`
+- [ ] `src\views\ResetPasswordPage.tsx`
+- [ ] `src\views\account\FavoritesPage.tsx`
+- [ ] `src\views\account\ProjectsPage.tsx`
+- [ ] `src\views\admin\purchasing\AdminPurchasingPage.tsx`
+- [ ] `src\views\admin\purchasing\PurchasingTableBody.tsx`
+- [ ] `supabase\functions\_shared\origins.ts`
+- [ ] `supabase\functions\_shared\refund_guard.ts`
+- [ ] `supabase\functions\_shared\return_transitions.ts`
+- [ ] `supabase\functions\_shared\revenue_alarm.ts`
+- [ ] `src\app\[lang]\account\favorites\page.tsx`
+- [ ] `src\app\[lang]\account\projects\page.tsx`
+- [ ] `src\app\[lang]\auth\reset-password\page.tsx`
+- [ ] `src\app\admin\purchasing\page.tsx`
+- [ ] `src\app\auth\callback\route.ts`
+- [ ] `src\components\admin\purchasing\CreatePurchaseOrderPanel.tsx`
+- [ ] `src\components\analytics\ConsentGatedAnalytics.tsx`
+- [ ] `src\components\consent\CookiePreferencesButton.tsx`
 - [ ] `src\components\products\VariantSelector.tsx`
 - [ ] `src\components\ui\Pagination.tsx`
+- [ ] `src\hooks\useFavorites.ts`
+- [ ] `src\i18n\dictionaries\admin\purchasing.en.ts`
+- [ ] `src\i18n\dictionaries\admin\purchasing.tr.ts`
+- [ ] `src\i18n\dictionaries\admin\theme.tr.ts`
 - [ ] `src\lib\cache\tags.ts`
 - [ ] `src\lib\images\productImage.ts`
+- [ ] `src\lib\purchasing\poStatusMachine.ts`
 - [ ] `src\lib\seo\jsonld.ts`
+- [ ] `src\lib\services\displayPrice.service.ts`
 - [ ] `src\lib\services\family.service.ts`
+- [ ] `src\lib\services\pricingPolicy.service.ts`
 - [ ] `src\lib\services\product.columns.ts`
+- [ ] `src\lib\services\purchasing.service.ts`
+- [ ] `src\lib\validation\invoiceIdentity.ts`
 - [ ] `src\utils\specLabel.ts`
+- [ ] `src\views\ResetPasswordPage.tsx`
+- [ ] `src\views\account\FavoritesPage.tsx`
+- [ ] `src\views\account\ProjectsPage.tsx`
+- [ ] `src\views\admin\purchasing\AdminPurchasingPage.tsx`
+- [ ] `src\views\admin\purchasing\PurchasingTableBody.tsx`
+- [ ] `supabase\functions\_shared\origins.ts`
+- [ ] `supabase\functions\_shared\refund_guard.ts`
+- [ ] `supabase\functions\_shared\return_transitions.ts`
+- [ ] `supabase\functions\_shared\revenue_alarm.ts`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
 - [⚠️] ` .agents\explorer_m4_1_gen2\handoff.md`
-- [⚠️] `CLAUDE.md`
 - [⚠️] `ORIGINAL_REQUEST.md`
-- [⚠️] `PROJECT.md`
 - [⚠️] `TEST_INFRA.md`
 - [⚠️] `TEST_READY.md`
 - [⚠️] `explorer_m2_3\analysis.md`
 - [⚠️] `implementation_plan.md`
 - [⚠️] `next.config.md`
-- [⚠️] `src\components\products\3d\FanRenderer.md`
-- [⚠️] `src\components\products\3d\FanRenderer.md`
 
 ## Geçersiz Şablon (Invalid Format)
 Harika! Tüm MD belgeleri Enterprise-Ready (5N1K + Axioms) şablonuna uygun. ✅
