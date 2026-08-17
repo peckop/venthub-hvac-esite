@@ -298,9 +298,65 @@ deseninde de yok, INV-PURCH-1/R1b + servis kapısı bugün yeterli. Ayrı öneri
    denemesi `P0001` almalı; RPC üzerinden meşru mal kabul ise **çalışmaya devam etmeli**
    (pozitif çapa — her şeyi reddeden bir tetik de "yeşil" görünür).
 
+### 13.6 M7 — `search_path` illüzyonu (aynı pakette düzeltilecek)
+
+**Bulgu LEGAL'den, prod'da KENDİM DOĞRULADIM (2026-08-17).** Yazdığım yedi fonksiyon
+(`adjust_stock` ×2, `set_stock` ×2, `process_goods_receipt`,
+`process_order_stock_reduction`, `process_order_stock_restore`) şu satırı taşıyor:
+
+```sql
+set search_path = 'pg_catalog, public'   -- ❌ TEK TIRNAK: tek bir isim
+```
+
+`pg_proc.proconfig` bunu `search_path="pg_catalog, public"` olarak saklıyor — yani
+**"pg_catalog, public" adında tek bir şema**. Böyle bir şema yok, dolayısıyla arama
+yolu fiilen boş.
+
+**Davranış ölçümü (transaction + rollback, prod'a yan etki yok):**
+
+| Ayar | `to_regclass('products')` |
+|---|---|
+| `search_path = "pg_catalog, public"` (bugünkü) | **NULL** — niteliksiz referans ÇÖZÜLMEZ |
+| `search_path = public` | `products` — çözülür, `pg_catalog` örtük ilk (`now()` bulunur) |
+
+**Neden bugün patlamıyor:** yedi fonksiyonun gövdesi de her nesneyi `public.` ile tam
+niteliyor. Yani satır *koruma sağlıyor* sanılıyor ama **hiçbir şey yapmıyor** — gövdeye
+eklenecek ilk niteliksiz referans anında patlar. Bu bir "illüzyon-sertleştirme": en
+tehlikeli hâli, çünkü denetimde ✅ gibi okunur.
+
+#### Cetvel kuralı — tek doğru desen (yeni fonksiyonlar bunu kopyalasın)
+
+```sql
+set search_path = public          -- ✅ tırnaksız, TEK şema
+```
+
+- **`pg_catalog` AÇIKÇA YAZILMAZ.** Yazılmazsa örtük olarak *ilk* aranır; yazılırsa
+  yazıldığı sıraya düşer. Bu yüzden `public, pg_catalog` **yanlıştır** — `public`'te
+  aynı adlı bir nesne varsa çekirdek fonksiyonun önüne geçer.
+- **`pg_temp` ASLA yazılmaz.** SECURITY DEFINER'da geçici şema, çağıranın oluşturduğu
+  nesnelerle ele geçirme yüzeyidir.
+- Ek şema yalnız gerçekten gerekiyorsa eklenir ve *sonda* durur
+  (ör. webhook fonksiyonu: `set search_path = public, net, vault`).
+- `search_path = ''` (tam niteleme zorunlu) daha katı bir alternatiftir ama **gerekmiyor**:
+  ölçüldü, `public` şemasında `anon`/`authenticated`/`service_role` için **CREATE yetkisi
+  YOK**, yani `public` üzerinden gölgeleme mümkün değil.
+
+#### Planlanan düzeltme (migration — M5/M6 ile AYNI pakette)
+
+Yedi fonksiyon `create or replace` ile yeniden tanımlanır; **tek değişiklik `set` satırı**,
+gövdeler aynen korunur. Sonrasında `proconfig` prod'dan yeniden okunur (`{search_path=public}`
+görülmeli) ve mal kabul + stok düşme yolları bir kez çalıştırılıp **pozitif çapa** alınır.
+
+> **Depo geneli (ölçüldü):** 28 SECURITY DEFINER fonksiyonunda **7 ayrı desen** var —
+> 7'si bu bozuk biçimde, 6'sı `public, pg_temp` (hijack yüzeyi), 3'ü `public, pg_catalog`
+> (sıra ters). Bunların çoğu benim şeridimin dışında; bulgu OPS-AUDIT'e iletildi.
+> Bu cetvel yalnız kendi fonksiyonlarımı bağlar ama **doğru örnek** olarak durur.
+
 ### 13.5 Uygulama notları
 
 - Tek migration yeterli (iki madde de aynı tabloları ilgilendiriyor, aynı işlemde).
+- **M7 de aynı migration'a girer** — yedi fonksiyon zaten yeniden tanımlanmıyorsa bile
+  `set` satırı için yeniden tanım gerekir; ayrı migration açmak ledger'ı gereksiz şişirir.
 - Damga gerçek saat 14 hane; ledger bayt-sırasının arkasına düşmeli (§9).
 - **Sıra önemli:** önce tetik, sonra grant kısıtı. Ters sırada, grant çekilirken servis
   yazma yolu kısa süre kısıtlı ama kuralsız kalır.
