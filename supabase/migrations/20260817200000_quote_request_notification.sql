@@ -25,6 +25,50 @@ comment on column public.venthub_quotes.request_email_sent_at is
   'Teklif talebi alındı e-postasının GÖNDERİLDİĞİ an (T068-VH). NULL = henüz gönderilmedi. '
   'Damga yalnız gönderim BAŞARILI olduktan sonra atılır; idempotency kaynağıdır.';
 
+-- ── 1b) Bildirim defteri — SESSİZ KAYBI GÖRÜNÜR KILAR ─────────────────────────────
+--
+-- NİÇİN (OPS-AUDIT şartı, T068): `net.http_post` ateşle-unut'tur. Uç düşükse, sır
+-- yanlışsa ya da Resend reddederse e-posta SESSİZCE kaybolur — kimse fark etmez, çünkü
+-- hiçbir yerde "gitmedi" diye bir kayıt oluşmaz. Sipariş/kargo tarafındaki kardeş
+-- defterler (`order_email_events`, `shipping_email_events`) YALNIZ BAŞARIYI yazıyor;
+-- yani onlar da bu soruyu cevaplayamıyor. Bu defter o eksiği kapatır: `status` ve
+-- `error` kolonlarıyla BAŞARISIZLIK da satır bırakır.
+--
+-- Damgadan (request_email_sent_at) FARKI: damga IDEMPOTENCY içindir ("ikinci kez gönderme"),
+-- defter GÖZLEM içindir ("ne oldu, neden olmadı"). Biri diğerinin yerini tutmaz: başarısız
+-- denemeler damga bırakmaz ama defterde görünmelidir.
+create table if not exists public.quote_email_events (
+  id uuid primary key default gen_random_uuid(),
+  quote_id uuid not null references public.venthub_quotes(id) on delete cascade,
+  email_to text,
+  subject text,
+  provider text not null default 'resend',
+  provider_message_id text,
+  status text not null check (status in ('sent', 'failed')),
+  error text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_quote_email_events_quote on public.quote_email_events(quote_id, created_at desc);
+
+-- Kardeş defterlerle aynı duruş: yalnız service_role yazar, admin okur. Müşteri kendi
+-- e-posta kaydını görmez (gereksiz yüzey; talebin durumu zaten Tekliflerim sayfasında).
+alter table public.quote_email_events enable row level security;
+
+drop policy if exists quote_email_events_admin_read on public.quote_email_events;
+create policy quote_email_events_admin_read on public.quote_email_events
+  for select to authenticated
+  using (
+    exists (
+      select 1 from public.user_profiles up
+      where up.id = auth.uid() and up.role in ('admin', 'super_admin')
+    )
+  );
+
+comment on table public.quote_email_events is
+  'Teklif bildirimi gonderim defteri (T068-VH). status=failed satirlari BILEREK tutulur: '
+  'net.http_post atesle-unut oldugu icin basarisizlik baska hicbir yerde gorunmez.';
+
 -- ── 2) Tetik fonksiyonu ───────────────────────────────────────────────────────────
 create or replace function public.notify_quote_request_created()
 returns trigger
