@@ -224,3 +224,86 @@ dördü de KIRMIZI görülmeden PR açılmaz).
 - Fatura/irsaliye belge eşleştirme (T055 fatura hattıyla kesişim).
 - Ağırlıklı ortalama maliyet vs son-alış (şu an: yalnız son-alış, raporlama amaçlı).
 - Motor köprüsü (§5.4) — en büyük v2 kalemi.
+
+## 13. DB sertleştirme M5–M6 — PLAN (uygulanmadı, Recep dalga onayı bekliyor)
+
+> **Durum: yalnız PLAN.** İki madde de migration gerektirir (kural 13). OPS-AUDIT ataması
+> 2026-08-17: "quote modülündeki doğru DB-desenini purchasing'e uygula; şimdi yalnız planı
+> çıkar." Uygulama, Recep dalga onayından sonra ayrı bir PR'dır.
+
+**Niçin var:** v1'de satınalmanın iki güvencesi yalnız **uygulama katmanında** duruyor.
+Cetvel §3 "monoton" diyor, §5.1 "snapshot" diyor — ama veritabanı ikisini de zorlamıyor.
+Doğrudan SQL erişimi olan bir yol (yeni bir servis, bir script, ileride gevşetilecek bir RLS)
+her ikisini de sessizce delebilir. Teklif modülü aynı iki güvenceyi DB'de kuruyor; desen
+zaten evde, purchasing ona hizalanmalı.
+
+### 13.1 M5 — Kolon düzeyi grant (şu an YOK)
+
+**Ölçüm (2026-08-17, prod):**
+
+| Tablo | `authenticated` INSERT / UPDATE kolon sayısı |
+|---|---|
+| `venthub_quote_items` (doğru desen) | **6 / 3** — INSERT'te fiyat kolonları YOK; UPDATE yalnız `unit_price, currency, valid_until` |
+| `purchase_order_items` | **10 / 10** — hepsi açık |
+| `purchase_orders` | 11 / 11 · `goods_receipts` 8 / 8 · `suppliers` 13 / 13 |
+
+Bugün zarar üretmiyor çünkü RLS satır düzeyinde zaten admin rolleriyle sınırlı. Ama RLS
+**tek hat**; §8.1'de yazdığımız v1.1 adımı (warehouse'a görünüm üzerinden SELECT) bu hattı
+bilerek gevşetiyor. Kolon grant'ı ikinci hattır ve tam o senaryoda çalışır.
+
+**Planlanan kısıtlar** (`revoke` + dar `grant`, `authenticated` için):
+
+| Kolon | Karar | Gerekçe |
+|---|---|---|
+| `purchase_order_items.qty_received` | UPDATE **çekilir** | Yalnız `process_goods_receipt` yazar (SECURITY DEFINER → grant'tan etkilenmez). Elle yazım kanıt satırını atlatır (§4). |
+| `purchase_order_items.unit_cost`, `.currency` | UPDATE **çekilir** (INSERT kalır) | Sipariş anı SNAPSHOT'ıdır (§5.1); doğduktan sonra değişmemeli. Fatura farkı mal kabulde `inventory_movements.unit_cost`'a yazılır, satıra geri yazılmaz. |
+| `products.last_purchase_cost/currency/purchased_at` | UPDATE **çekilir** | Yalnız RPC yazar (§5.3). |
+| `purchase_orders.status` | UPDATE **kalır** | Servis elle geçiş yapar; sınırı M6 tetiği koyar. |
+
+### 13.2 M6 — Durum geçiş tetiği (şu an YOK)
+
+**Ölçüm (2026-08-17, prod):** `venthub_quotes`'ta `trg_enforce_quote_status_transition` var;
+`purchase_orders`'ta durum tetiği **yok** — yalnız CHECK var, o da "hangi değerler geçerli"yi
+söyler, "hangi geçiş geçerli"yi değil. Yani `received → draft` geri sarma DB'de mümkün ve
+CLAUDE.md kural 11'in (monotonluk) satınalma tarafında DB karşılığı yok.
+
+**Planlanan:** `enforce_po_status_transition()` + `purchase_orders` BEFORE UPDATE tetiği —
+`enforce_quote_status_transition` ile birebir aynı şekil (aynı statü → geç; izinli geçiş →
+geç; aksi → `raise exception ... errcode 'P0001'`). Harita `poStatusMachine` ile birebir:
+
+```
+draft → ordered, cancelled          ordered → partially_received, received, cancelled
+partially_received → received, closed   received → closed      closed, cancelled → (yok)
+```
+
+**Kapsam dışı (bilinçli):** "türev statüler yalnız RPC'den" kuralının DB'de zorlanması.
+Bunun için tetiğin çağıran bağlamını ayırt etmesi gerekir (`set_config` bayrağı); quote
+deseninde de yok, INV-PURCH-1/R1b + servis kapısı bugün yeterli. Ayrı öneri olarak durur.
+
+### 13.3 Bekçi eklentileri (INV-PURCH-1)
+
+| # | Kural | Şekil |
+|---|---|---|
+| R7 | `purchase_order_items` UPDATE grant'ında `unit_cost`/`currency`/`qty_received` **bulunmaz**; `products` UPDATE grant'ında `last_purchase_*` bulunmaz | son-tanımlayan migration'daki `revoke/grant` ifadelerinden kolon kümesi çıkarılır |
+| R8 | DB tetiği ↔ modül haritası paritesi: `enforce_po_status_transition` gövdesindeki geçiş çiftleri `poStatusMachine` ile **birebir** | R1a'nın tetik ikizi; `PO_STATUSES` gibi harita da modülden import edilir, tetik gövdesi migration'dan ayrıştırılır |
+
+### 13.4 Sabotaj listesi (uygulama PR'ında koşulacak — hepsi KIRMIZI görmeli)
+
+1. Tetik gövdesine sahte geçiş ekle (`received → draft`) → R8 parite kırmızı.
+2. Modül haritasına sahte geçiş ekle, tetiği bırak → R8 kırmızı (**iki yönlü**, tek yön yetmez).
+3. Tetiği `drop trigger` ile kaldır → R8 "tetik yok" kırmızı.
+4. `unit_cost`'a UPDATE grant'ını geri ver → R7 kırmızı.
+5. `qty_received`'e UPDATE grant'ını geri ver → R7 kırmızı.
+6. **Canlı davranış** (migration uygulandıktan sonra, prod'da tek seferlik): geçersiz geçiş
+   denemesi `P0001` almalı; RPC üzerinden meşru mal kabul ise **çalışmaya devam etmeli**
+   (pozitif çapa — her şeyi reddeden bir tetik de "yeşil" görünür).
+
+### 13.5 Uygulama notları
+
+- Tek migration yeterli (iki madde de aynı tabloları ilgilendiriyor, aynı işlemde).
+- Damga gerçek saat 14 hane; ledger bayt-sırasının arkasına düşmeli (§9).
+- **Sıra önemli:** önce tetik, sonra grant kısıtı. Ters sırada, grant çekilirken servis
+  yazma yolu kısa süre kısıtlı ama kuralsız kalır.
+- Mevcut veriye dokunulmaz: prod'da 0 PO var (modül yeni), yani geriye dönük geçiş
+  ihlali riski yok — bu pencere de W2b-2'deki gibi bir kolaylık, uygulamadan önce
+  **yeniden ölçülmeli** (0 olmayabilir).
