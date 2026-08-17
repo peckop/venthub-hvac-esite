@@ -51,6 +51,7 @@ export const returns = {
         emailNotifySent: 'Customer notification email sent',
         emailNotifyFailed: 'Email could not be sent, but the status was updated',
         statusUpdateFailed: 'Could not update return status',
+        staleWrite: 'This return was changed by someone else while you were viewing it — the action was NOT applied. The current state has been reloaded; please try again.',
         bulkPartialFailed: '{{count}} return(s) could not be processed (refund failed): {{detail}} — their status was NOT changed.',
         noValidTransitions: 'No valid status transitions found for selected return requests',
         bulkStatusUpdated: 'Status of {{count}} return requests updated to "{{status}}"',

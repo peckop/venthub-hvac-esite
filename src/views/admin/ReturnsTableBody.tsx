@@ -227,6 +227,58 @@ function buildReturnUpdate(newStatus: string, note?: string): ReturnUpdate {
   return update
 }
 
+/**
+ * Bayat okuma: satır, arayüzün gördüğü statüde DEĞİL — başka bir admin (ya da aynı
+ * kişinin ikinci sekmesi) arada değiştirmiş.
+ *
+ * Ayırt edilebilir bir TİP olması şart: genel "güncellenemedi" mesajı kullanıcıya
+ * yanlış eylemi yaptırır (aynı işlemi tekrar dener), oysa doğru eylem TAZELEMEKTİR.
+ */
+class StaleReturnWriteError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'StaleReturnWriteError'
+  }
+}
+
+/**
+ * İade satırının TEK yazma kapısı — karşılaştır-ve-değiştir (compare-and-swap).
+ *
+ * NİÇİN (M3 · 20-madde v2 denetimi): arayüzün monotonluk kontrolü `row.status`
+ * okur ve o değer son tablo yüklemesinden kalma bir ANLIK GÖRÜNTÜDÜR. İki sekme
+ * aynı iadeyi açtığında ikisi de "geçiş serbest" der; eski yazım yalnız `.eq('id')`
+ * kullandığı için ikincisi, parası ÇIKMIŞ `refunded` kaydını `cancelled`a geri
+ * yürütebiliyordu — kayıt, gerçekleşmiş bir iadeyi yalanlıyordu.
+ *
+ * Para tarafı zaten korunuyordu (`refund_attempts` benzersiz indeksi çift iadeyi
+ * DB'de kesiyor, EDGE #558); korumasız kalan KAYDIN KENDİSİYDİ.
+ *
+ * `UPDATE ... WHERE id = ? AND status = ?` TEK bir ifadedir ve Postgres iki
+ * eşzamanlı çağrıdan yalnız birinin eşleşmesini garanti eder — bu yüzden burası
+ * gerçek bir kapıdır, kullanıcıya sebep söyleyen bir nezaket katmanı değil.
+ *
+ * Kapı BİLEREK tek fonksiyonda: tekil ve toplu akışların ayrı ayrı doğru yazması
+ * beklenirse biri er geç kayar (aynı sınıf hata #554'te yaşandı, koruma UI'daydı
+ * ve sabotajda tüm testler yeşil kalmıştı).
+ */
+async function updateReturnStatusCas(
+  returnId: string,
+  expectedStatus: string,
+  payload: ReturnUpdate,
+  staleMessage: string,
+): Promise<void> {
+  const { data, error } = await supabaseBrowserClient
+    .from('venthub_returns')
+    .update(payload)
+    .eq('id', returnId)
+    .eq('status', expectedStatus)
+    .select('id')
+
+  if (error) throw error
+  // 0 satır = beklenen statü artık orada değil. Sessiz geçmez.
+  if (!data || data.length === 0) throw new StaleReturnWriteError(staleMessage)
+}
+
 /* ---- fetcher: server-mode (arama, süzme, sıralama, range) ---- */
 async function returnsFetcher(
   supabase: SupabaseClient<Database>,
@@ -420,11 +472,12 @@ const ReturnsTableBody: React.FC = () => {
             }
 
             // (1) asıl mutasyon — hata audit'i kapatır (gate)
-            const { error } = await supabaseBrowserClient
-              .from('venthub_returns')
-              .update(buildReturnUpdate(newStatus, note))
-              .eq('id', row.id)
-            if (error) throw error
+            await updateReturnStatusCas(
+              row.id,
+              oldStatus,
+              buildReturnUpdate(newStatus, note),
+              t('admin.returns.toasts.staleWrite'),
+            )
 
             // (2) Orders senkronizasyonu — best-effort (kullanıcıyı bloklamaz)
             try {
@@ -455,8 +508,18 @@ const ReturnsTableBody: React.FC = () => {
         })
         toast.success(t('admin.returns.toasts.statusUpdated', { status: getStatusLabel(newStatus) }))
         await table.reload()
-      } catch {
-        toast.error(t('admin.returns.toasts.statusUpdateFailed'))
+      } catch (err) {
+        /*
+          Bayat okuma GENEL hataya karışmaz: kullanıcıya "tekrar dene" değil
+          "tazele" demek gerekir; ekranı da fiilen tazeleriz ki gerçek statüyü
+          görsün — yoksa aynı yanlış anlık görüntüyle tekrar dener.
+        */
+        if (err instanceof StaleReturnWriteError) {
+          toast.error(err.message)
+          await table.reload()
+        } else {
+          toast.error(t('admin.returns.toasts.statusUpdateFailed'))
+        }
       } finally {
         setUpdatingStatus(null)
       }
@@ -584,12 +647,13 @@ const ReturnsTableBody: React.FC = () => {
                 }
               }
 
-              // (1) asıl mutasyon
-              const { error } = await supabaseBrowserClient
-                .from('venthub_returns')
-                .update(buildReturnUpdate(targetStatus, reason))
-                .eq('id', row.id)
-              if (error) throw error
+              // (1) asıl mutasyon — tekil akışla AYNI kapıdan
+              await updateReturnStatusCas(
+                row.id,
+                row.status,
+                buildReturnUpdate(targetStatus, reason),
+                `${row.order_number ?? row.id}: ${t('admin.returns.toasts.staleWrite')}`,
+              )
 
               // (2) Orders senkronizasyonu — best-effort
               try {
@@ -625,13 +689,14 @@ const ReturnsTableBody: React.FC = () => {
               Uç idempotent olsa da kullanıcıyı bu belirsizliğe itmemek gerekir.
             */
             const outcomes = await Promise.allSettled(dbUpdates)
-            failures = outcomes
-              .filter((o): o is PromiseRejectedResult => o.status === 'rejected')
-              .map((o) => (o.reason instanceof Error ? o.reason.message : String(o.reason)))
+            const rejected = outcomes.filter((o): o is PromiseRejectedResult => o.status === 'rejected')
+            failures = rejected.map((o) => (o.reason instanceof Error ? o.reason.message : String(o.reason)))
 
             // Hepsi düştüyse audit kapısı da açılmamalı — işlem gerçekten olmadı.
+            // Hata NESNESİ yeniden fırlatılır: `new Error(mesaj)` bayat-okuma tipini
+            // düşürür ve dışarıdaki dal onu genel hata sanardı.
             if (failures.length === targets.length) {
-              throw new Error(failures[0])
+              throw rejected[0].reason
             }
           },
         })
@@ -655,11 +720,16 @@ const ReturnsTableBody: React.FC = () => {
         table.selection.clear()
         await table.reload()
       } catch (e) {
-        toast.error(
-          e instanceof AdminPermissionError
-            ? t('admin.returns.toasts.noPermission')
-            : t('admin.returns.toasts.statusUpdateFailed')
-        )
+        if (e instanceof StaleReturnWriteError) {
+          toast.error(e.message)
+          await table.reload()
+        } else {
+          toast.error(
+            e instanceof AdminPermissionError
+              ? t('admin.returns.toasts.noPermission')
+              : t('admin.returns.toasts.statusUpdateFailed')
+          )
+        }
       }
     },
     [confirm, hasWriteAccess, table, t, getStatusLabel],
