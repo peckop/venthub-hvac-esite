@@ -105,6 +105,30 @@ bu cetvelin "geriye-denetleyen + geleceği-kilitleyen" ayağıdır (`standard-pl
 - **DI** (servis/searcher ilk-param `supabase`, modül-düzeyi client importu yok) = `pnpm lint` (`no-restricted-imports`) zorlar.
 > Yeni page-crash/SSOT sınıfı bulgu → yeni bir **INV-*** test'ine terfi eder (kalıcı bekçi olur).
 
+### 3.1 Bekçi yazma kuralı — "çağrı var" kapı değildir
+
+Bir conformance iddiası **"X çağrılıyor mu?"** diye soruyorsa, X'in **işini yapabilecek girdiyi
+aldığını da** ölçmek zorundadır. Çağrının varlığı tek başına kapı değildir: doğru adı doğru yerde
+görmek, davranışın gerçekleştiğini kanıtlamaz.
+
+Bu sınıf 2026-08-15…17 arasında **dört ayrı biçimde** yakalandı ve her seferinde kapı yeşilken
+kural ihlal ediliyordu:
+
+| Biçim | Assert neye kandı | Nerede |
+|---|---|---|
+| Açıklayıcı **yorum** | Yasak/aranan ad, kodu anlatan yorumda geçiyordu | INV-STOCK-1, INV-RETURN-1 |
+| **Import** satırı | Ad import edilmişti ama çağrılmıyordu | INV-RETURN-1 |
+| **Sayı/biçim** değişimi | Sayaç `font-black` arıyordu, kod `fontWeight:900` yazıyordu | admin ölçümü |
+| **Fakir argüman** ⭐ | Çağrı vardı, girdi `{ id }` idi; scope 2–3 hiç eşleşmiyordu | INV-PRICE-7 |
+
+Sonuncusu en sinsisiydi: ad da çağrı da doğruydu, **eksik olan veriydi** — ürün sorgusu marka
+ve kategori kolonlarını çekmiyordu, dolayısıyla kilit iki kapsam için sessizce çalışmıyordu.
+
+**Uygulama:** yorumları sıyır (CRLF-güvenli), adı değil **çağrı biçimini** ara, ve çağrının
+**anlamlı girdiyle** yapıldığını doğrula (veri çekiliyor mu → çözücüye veriliyor mu). Kapıyı
+kurduktan sonra **kusuru birebir geri koyup** kırmızı gördüğünü kanıtla; "eski testle yeşil,
+yeni testle kırmızı" farkı, kapının gerçekten yeni bir şey ölçtüğünün tek kanıtıdır.
+
 ---
 
 ## 4. Standart-Önce (No-Standard-No-Code)
