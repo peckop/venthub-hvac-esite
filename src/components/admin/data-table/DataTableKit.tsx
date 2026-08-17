@@ -86,9 +86,15 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
     toolbarSlot,
     bulkBarSlot,
     columnsButtonLabel,
-    selectAllLabel = 'Tümünü seç',
-    rowSelectLabel = 'Satırı seç',
-    expandLabel = 'Satır detayını aç/kapat',
+    /*
+      i18n: bu etiketlerin varsayılanları eskiden HAM TÜRKÇE dizgilerdi. Çağıran
+      geçmezse EN kullanıcı ekran okuyucuda Türkçe duyuyordu — üstelik hiçbir kapı
+      görmüyordu, çünkü tarayıcılar JSX attribute'larına bakıyor, PROP VARSAYILANINA
+      değil. Varsayılan artık sözlükten geliyor (kullanım yerinde `??` ile).
+    */
+    selectAllLabel,
+    rowSelectLabel,
+    expandLabel,
     totalLabel,
     renderPageLabel,
   } = props
@@ -181,7 +187,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
         */}
         <div className="p-4 flex flex-wrap items-center justify-between gap-3 border-b border-admin-border">
           <div className="text-xs font-semibold text-admin-fg-muted">
-            {totalLabel ?? 'Toplam'}: <span className="text-admin-accent" aria-live="polite">{table.totalMatched}</span>
+            {totalLabel ?? t('admin.dataTable.pagination.total')}: <span className="text-admin-accent" aria-live="polite">{table.totalMatched}</span>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
             <ColumnsMenu
@@ -196,7 +202,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                   type="button"
                   onClick={() => setPage(Math.max(1, page - 1))}
                   disabled={page <= 1}
-                  aria-label="Önceki sayfa"
+                  aria-label={t('admin.dataTable.pagination.previous')}
                   className="w-8 h-8 flex items-center justify-center rounded-admin-md bg-admin-surface border border-admin-border text-admin-fg-muted hover:text-admin-fg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight size={16} className="rotate-180" />
@@ -208,7 +214,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                   type="button"
                   onClick={() => setPage(Math.min(pageCount, page + 1))}
                   disabled={page >= pageCount}
-                  aria-label="Sonraki sayfa"
+                  aria-label={t('admin.dataTable.pagination.next')}
                   className="w-8 h-8 flex items-center justify-center rounded-admin-md bg-admin-surface border border-admin-border text-admin-fg-muted hover:text-admin-fg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight size={16} />
@@ -229,7 +235,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
               allSelected={table.selection.allSelected}
               onToggleAll={table.selection.toggleAll}
               expandable={expandable}
-              selectAllLabel={selectAllLabel}
+              selectAllLabel={selectAllLabel ?? t('admin.dataTable.labels.selectAll')}
               compact={density === 'compact'}
             />
             <tbody className="divide-y divide-admin-border">
@@ -282,7 +288,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                                 e.stopPropagation()
                                 table.selection.toggle(id, { shiftKey: e.shiftKey })
                               }}
-                              aria-label={rowSelectLabel}
+                              aria-label={rowSelectLabel ?? t('admin.dataTable.labels.rowSelect')}
                               className="w-4 h-4 rounded-md border-admin-border bg-admin-surface-2 text-admin-accent focus-visible:ring-admin-accent/30 focus-visible:ring-offset-0"
                             />
                           </td>
@@ -295,7 +301,7 @@ export function DataTableKit<T>(props: DataTableKitProps<T>): ReactNode {
                                 e.stopPropagation()
                                 toggleExpand(id)
                               }}
-                              aria-label={expandLabel}
+                              aria-label={expandLabel ?? t('admin.dataTable.labels.expand')}
                               aria-expanded={isExpanded}
                               className={`w-6 h-6 flex items-center justify-center rounded-admin-md transition-colors duration-300 ${
                                 isExpanded ? 'bg-admin-accent-weak text-admin-accent rotate-90' : 'text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-2'

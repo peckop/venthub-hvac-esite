@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
 import type { Product } from '../../types/ui-models'
+import { resolveFxRate } from './fxRate.service'
 
 export type PricingRuleRow = Database['public']['Tables']['pricing_rule']['Row']
 
@@ -475,23 +476,16 @@ export async function resolvePrice(
     }
   }
 
-  // Gösterim kuru: TRY dışıysa önce çekilip çekirdeğe verilir; TRY için HİÇ sorgulanmaz.
-  let fxRate: RuleEvaluationInputs['fxRate'] = null
-  if (currency !== 'TRY') {
-    const { data: rates } = await supabase
-      .from('currency_rates')
-      .select('rate, effective_date')
-      .eq('quote_ccy', currency)
-      .lte('effective_date', today)
-      .order('effective_date', { ascending: false })
-      .order('fetched_at', { ascending: false })
-      .limit(1)
-    const rateRow = rates && rates.length > 0 ? rates[0] : null
-    const rate = rateRow ? Number(rateRow.rate) : null
-    if (rateRow && rate && Number.isFinite(rate) && rate > 0) {
-      fxRate = { rate, effectiveDate: rateRow.effective_date }
-    }
-  }
+  // Gösterim kuru: TRY dışıysa çekirdeğe verilir; TRY'de çekirdek kur beklemez.
+  //
+  // ⚠️ BURADA KUSUR VARDI (ADMIN-CUSTOMER buldu, 2026-08-17): bu sorgunun kendi kopyası
+  // duruyordu ve `base_ccy='TRY'` filtresi EKSİKTİ — motor (`materialize`) filtreyi
+  // uyguluyordu, gösterim yolu uygulamıyordu. Yani "maliyet hangi kurdan hesaplandı" ile
+  // "vitrinde hangi kurdan gösterildi" ayrışabiliyordu. Prod'da o gün tüm satırlar
+  // `base_ccy='TRY'` olduğu için GİZLİYDİ; tabloda `base_ccy` üzerinde CHECK yok ve
+  // `source='manual'` serbest. Artık tek çözücü (cetvel §8.2.1, bekçi INV-PRICE-8).
+  const fxRate: RuleEvaluationInputs['fxRate'] =
+    currency === 'TRY' ? null : await resolveFxRate(supabase, currency, today)
 
   return resolvePriceWithRules(product, context, { rules: allRules, categoryAncestors, fxRate })
 }

@@ -152,9 +152,11 @@ function renderBoard(): void {
 async function openBulkShipModal(): Promise<void> {
   await screen.findByText('VH-2026-0001')
 
-  // `DataTableKit` satır kutusuna sabit `aria-label="Satırı seç"` verir; başlıktaki
-  // "Tümünü seç" kutusu bu adı taşımaz → yalnız satırlar seçilir.
-  const rowBoxes = screen.getAllByLabelText('Satırı seç')
+  // `DataTableKit` satır kutusunun etiketi artık SÖZLÜKTEN geliyor (eskiden ham
+  // Türkçe sabitti; EN kullanıcı ekran okuyucuda Türkçe duyuyordu). Bu takımın
+  // i18n taklidi anahtarı aynen döndürdüğü için sorgu anahtarla yapılır — başlıktaki
+  // "tümünü seç" kutusu farklı anahtar taşır, yani yalnız satırlar seçilir.
+  const rowBoxes = screen.getAllByLabelText('admin.dataTable.labels.rowSelect')
   expect(rowBoxes).toHaveLength(2)
   for (const box of rowBoxes) {
     await userEvent.click(box)

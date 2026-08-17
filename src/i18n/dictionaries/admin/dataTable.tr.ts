@@ -26,7 +26,15 @@ export const dataTable = {
       pagination: {
         page: 'Sayfa',
         of: '/',
-        rowsPerPage: 'Sayfa başına satır'
+        rowsPerPage: 'Sayfa başına satır',
+        previous: 'Önceki sayfa',
+        next: 'Sonraki sayfa',
+        total: 'Toplam'
+      },
+      labels: {
+        selectAll: 'Tümünü seç',
+        rowSelect: 'Satırı seç',
+        expand: 'Satır detayını aç/kapat'
       },
       export: {
         csv: 'CSV olarak indir',

@@ -251,8 +251,76 @@ numarası değil:
 >
 > **Kilit künyesiz olamaz** — DB CHECK'i `fx_lock=true` iken `fx_frozen_rate` zorunlu kılar.
 
-⏳ **Henüz yok:** kilit açma/kapama admin yüzeyi ve `admin_audit_log` kaydı (yüzey ADMIN-OPS
+⏳ **Henüz yok:** kilit açma/kapama admin yüzeyi ve `admin_audit_log` kaydı (yüzey ADMIN
 şeridinde). Bugün politika satırı yalnız DB'den girilebilir.
+
+#### 8.2.1 Admin yüzeyi sözleşmesi (PRICING kararı, 2026-08-17)
+
+Yüzeyi ADMIN şeridi yazar; **semantik burada tanımlıdır** ve UI ondan türetilir. Üç soru
+ADMIN-CUSTOMER tarafından soruldu; cevapları bağlayıcıdır.
+
+**[A] `fx_frozen_rate` ELLE GİRİLMEZ — UI kilit anındaki kuru ENSTANTANE alır.**
+Kilit bir *zaman* kararıdır ("bu andaki kur sabitlensin"), fiyat pazarlığı değil. Elle
+giriş yanlış-kur riskini ve denetlenemez bir serbestliği içeri sokar; sözleşmeli özel kur
+ayrı bir özelliktir (v2) ve `fx_lock` ile karıştırılmamalıdır.
+
+> **Kaynak sorgusu motorunkiyle BİREBİR aynı olmak zorundadır** — aksi hâlde kilit,
+> motorun kullandığından *farklı* bir sayıya kilitler ve fiyat "kilitliyken" bile oynar.
+> ✅ **2026-08-17'de YAPIYA ÇEVRİLDİ:** artık "dikkatli kopyala" talimatı yok — kur
+> seçimi tek fonksiyondadır: `src/lib/services/fxRate.service.ts` →
+> `resolveFxRate(supabase, quoteCcy, today)`. Motor, `resolvePrice` ve admin yüzeyi
+> **üçü de onu çağırır**; bekçi **INV-PRICE-8** kopya sayısını 1'de tutar.
+> Aşağıdaki sözleşme o fonksiyonun davranışıdır.
+>
+> Motorun seçimi (`pricingMaterialize.service.ts`, ölçüldü 2026-08-17):
+> `currency_rates` → `base_ccy='TRY'` **(filtre ŞART)** + `quote_ccy=<ccy>` +
+> `effective_date <= bugün(İstanbul)`, sıralama `effective_date DESC, fetched_at DESC`,
+> `limit 1`, alan **`rate`**. **`spread_pct` OKUNMAZ** — UI da okumamalıdır.
+> Enstantane alınan değer `fx_frozen_rate`'e yazılır; o anki `effective_date` künyeye not
+> düşülür (`note` alanı yeterli, yeni kolon gerekmez).
+
+**[B] Yüzey ham satırları değil ETKİN KİLİDİ gösterir** — ve mantığı yeniden yazmaz.
+Merdiven "en özel kazanır" ilkesiyle çalışır ve **daha özel bir `fx_lock=false`, daha genel
+bir kilidi bozar** (§8.3). Ham liste bu yüzden yanıltıcıdır: admin global kilit koyar, tek
+ürünün oynadığını görür, sebebini bulamaz. Yüzey bir ürün/kapsam için
+`resolveFxLockWithPolicies` (toplu: `resolveFxLocks`) **çağırarak** etkin sonucu gösterir ve
+`FxLockDecision`'daki `policyId` + `scope` ile **hangi satırın kazandığını** yazar
+("etkin: ürün düzeyi politika #… → kilit YOK").
+
+> İkisi de `pricingPolicy.service.ts`'ten **zaten export edilmiştir**; ayrıca açmak
+> gerekmez. Merdiveni UI'da tekrarlamak **INV-PRICE-7'nin tek-merdiven kuralını ihlal
+> eder** (ikinci `switch (scope)` yasaktır) — yani kopya kapıdan geçmez.
+
+**[C] `skippedFxLocked` sayacı yüzeyde GÖSTERİLİR.** Kilidi görünür kılan tek geri bildirim
+odur: "son hesaplamada N ürün kilit yüzünden atlandı". Ayrıca sessiz-arıza kontrolüdür —
+aktif kilit varken sayaç sürekli 0 ise kilit uygulanmıyor demektir.
+
+**Migration gerekmez:** izin modeli bugün tutarlı (ADMIN-CUSTOMER ölçümü, 2026-08-17):
+`pricing_policy` RLS = `super_admin|admin|moderator` + tenant-scoped; rbac'ta `pricing`
+yazma izni admin+moderator → **UI izni ⊆ DB izni**. Satınalmada yaşanan "yetkisi var ama
+verisi yok" tuzağı (purchasing-standard §8.1) burada YOK.
+
+**W5 ile çakışma yok:** W5 TAMAMLANDI (`20260816120000_pricing_w5_policy_fx_lock.sql`
+prod'da; `pricing_policy` tablosunu zaten o yarattı). Yüzey çalışması beklemez.
+
+#### 8.2.2 `base_ccy` bütünlüğü — kalan DB adımı (PLAN, Recep paketinde)
+
+Çözücü artık `base_ccy='TRY'` filtresini uyguluyor, yani **okuma tarafı güvende**. Ama
+tablonun kendisi hâlâ TRY-dışı tabanlı satır kabul ediyor: `currency_rates.base_ccy`
+üzerinde CHECK **yok** ve `source='manual'` serbest. Bugün zarar üretmiyor (2026-08-17
+ölçümü: 6 satırın hepsi `base_ccy='TRY'`) — ama bu, kusurun *yokluğu* değil, verinin
+şimdilik uyumlu olması.
+
+**Planlanan (migration → kural 13, Recep onayı):**
+1. `alter table public.currency_rates add constraint currency_rates_base_try check (base_ccy = 'TRY')`
+   — v1'de motor yalnız TRY tabanlı çalışıyor; çoklu-taban gerçek bir ihtiyaç olduğunda
+   kısıt gevşetilir ve **çözücü ile birlikte** tasarlanır.
+2. Uygulamadan önce `select distinct base_ccy from currency_rates` ile **yeniden ölçüm**
+   (bugünkü 6 satır ölçümü uygulama gününde bayat olabilir).
+3. Kısıt eklenince `tcmb-rates-sync` yazma yolunun hâlâ geçtiği doğrulanır (pozitif çapa).
+
+> Bu adım okuma kusurunu kapatmaz — **onu kod zaten kapattı**. Kısıtın işi, ileride
+> yanlış tabanlı bir satırın tabloya *girmesini* engellemek.
 
 ### 8.3 Politika katmanı — kural ≠ politika (v1.1)
 
@@ -402,6 +470,7 @@ sanılan iki test aslında YOKTU. Gerçek durum:
 | **INV-PRICE-5** | KDV oranı üründen okunur; kuralda sabit oran varsayımı yok | ❌ YOK — §5 kararıyla birlikte yazılacak |
 | **INV-PRICE-6** | Cache anahtarı currency içerir; `product_prices`'a yalnız materialize servisi yazar; `is_derived` ayrımı korunur | ✅ VAR (`pricing-cache-invariants.test.ts`) |
 | **INV-PRICE-7** | Fiyat kilidi zincirin **iki halkasında** da uygulanır (`refreshCostInBase` + materialize, `skippedFxLocked` sayaçlı); merdiven **tek** fonksiyondadır (politika kendi `switch (scope)`'unu yazamaz); kilit **künyesiz** olamaz (DB CHECK) | ✅ VAR (`pricing-fx-lock-contract.test.ts`, W5) — davranış + yapı + şema üç katman; 6 merdiven senaryosu gerçekten koşturulur, iki bacaktan bilerek bozulup KIRMIZI görüldü |
+| **INV-PRICE-8** | "Bugün geçerli kur hangisi?" sorusunun kopya sayısı **1**: yalnız `fxRate.service.resolveFxRate` seçer; motor + `resolvePrice` + admin yüzeyi onu **çağırır**; çözücü `base_ccy=TRY` filtresini uygular | ✅ VAR (`pricing-fx-rate-single-resolver.test.ts`, 2026-08-17) — kusurun kendisi (filtresiz ikinci kopya) sabotajla geri konup KIRMIZI görüldü; ayrıca filtre silme ve üçüncü okuyucu doğurma sabotajları |
 
 > **Kural:** bu tabloda ❌ olan bir maddeyi "kilitli" varsayarak karar verme. Cetvelin kendisi de denetlenir.
 

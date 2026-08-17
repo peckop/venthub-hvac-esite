@@ -25,8 +25,16 @@ export const dataTable = {
       },
       pagination: {
         page: 'Page',
-        of: 'of',
-        rowsPerPage: 'Rows per page'
+        of: '/',
+        rowsPerPage: 'Rows per page',
+        previous: 'Previous page',
+        next: 'Next page',
+        total: 'Total'
+      },
+      labels: {
+        selectAll: 'Select all',
+        rowSelect: 'Select row',
+        expand: 'Toggle row details'
       },
       export: {
         csv: 'Download CSV',

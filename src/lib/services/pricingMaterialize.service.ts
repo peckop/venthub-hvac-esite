@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
+import { resolveFxRate } from './fxRate.service'
 import { type PricingRuleRow, resolvePriceWithRules, type RuleEvaluationInputs } from './pricing.service'
 import {
   loadBrandIdByName,
@@ -137,32 +138,11 @@ export async function refreshCostInBase(
     const ccy = ccyRaw.toUpperCase()
     if (rateByCcy.has(ccy)) return rateByCcy.get(ccy) ?? null
 
-    if (ccy === 'TRY') {
-      const val = { rate: 1, effectiveDate: today }
-      rateByCcy.set(ccy, val)
-      ratesUsed.push({ currency: ccy, rate: val.rate, effectiveDate: val.effectiveDate })
-      return val
-    }
-
-    // `base_ccy` FİLTRESİ ŞART: kayıt (base=TRY, quote=EUR, rate=55.32) yani "1 EUR kaç TL".
-    // Tabloda `base_ccy` üzerinde CHECK yok ve `source='manual'` serbest; TRY-dışı tabanlı tek
-    // bir satır girerse yalnız `quote_ccy` eşleşmesi YANLIŞ BİRİMİ tüm ürün maliyetlerine yazar.
-    const { data: rates, error: ratesErr } = await supabase
-      .from('currency_rates')
-      .select('rate, effective_date')
-      .eq('base_ccy', 'TRY')
-      .eq('quote_ccy', ccy)
-      .lte('effective_date', today)
-      .order('effective_date', { ascending: false })
-      .order('fetched_at', { ascending: false })
-      .limit(1)
-    if (ratesErr) throw ratesErr
-
-    const row = rates && rates.length > 0 ? rates[0] : null
-    const rate = row ? Number(row.rate) : null
-    const val = rate != null && Number.isFinite(rate) && rate > 0 && row
-      ? { rate, effectiveDate: row.effective_date }
-      : null
+    // Kur seçimi TEK yerde: `fxRate.service.resolveFxRate` (cetvel §8.2.1, INV-PRICE-8).
+    // Buradaki sorgunun bir kopyası `resolvePrice`'ta da vardı ve `base_ccy` filtresi
+    // EKSİKTİ — maliyet ile gösterim farklı kurdan hesaplanabiliyordu. Önbellek ve
+    // `ratesUsed` defteri çağıranın (bu fonksiyonun) sorumluluğunda kalır.
+    const val = await resolveFxRate(supabase, ccy, today)
     rateByCcy.set(ccy, val)
     if (val) ratesUsed.push({ currency: ccy, rate: val.rate, effectiveDate: val.effectiveDate })
     return val
