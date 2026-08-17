@@ -197,7 +197,8 @@ describe('INV-QUOTE-1 · teklif durum-makinesi SSOT', () => {
       if (rel.includes('.test.') || rel.includes('__tests__')) continue
       const clean = stripTsComments(source)
       // Anahtar konumu (`unit_price:` / `valid_until:`) = yazma/tanım niyeti.
-      // Okuma erişimi (`item.unit_price`) serbest — tipler quotes.bridge.ts'te yaşar.
+      // Okuma erişimi (`item.unit_price`) serbest — tipler `database.types.ts`'ten
+      // (supabase:gen) gelir, quoteService bunları QuoteRow/QuoteItemRow olarak dışa verir.
       if (/\b(?:unit_price|valid_until)\s*:/.test(clean)) offenders.push(rel)
     }
     expect(
