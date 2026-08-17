@@ -111,10 +111,10 @@ const T_CALL_BEFORE_FALLBACK = /t\(\s*(['"])[\w.]+\1\s*\)\s*$/
 /**
  * ADLA MUAFİYET (muafiyet = ADLA ilkesi). Boş kalması HEDEFTİR; her satır bir borçtur.
  *
- * - `components/admin/data-table/DataTableKit.tsx`: `aria-label="Önceki sayfa"` —
- *   dosya ADMIN-CUSTOMER şeridinin canlı claim'inde (2026-08-17). Ölçüldü, sahibine
- *   panodan adresli devredildi. Sahibi düzeltince BU SATIR SİLİNECEK.
- *   Kapıyı o düzeltmeyi beklerken kırmızı bırakmak, başka şeridi bloke etmek olurdu.
+ * - ~~`components/admin/data-table/DataTableKit.tsx`~~ → **BORÇ ÖDENDİ, SATIR SİLİNDİ**
+ *   (ADMIN-CUSTOMER, PR #605, 2026-08-17). Devir işledi: ben 1 kalem ölçmüştüm, sahibi
+ *   kendi dosyasında 5 buldu ve hepsini kapattı. Bayatlık testi bu satırın silinmesini
+ *   zaten zorluyordu — ratchet çalıştı.
  *
  * - `utils/whatsapp.ts`: `generateSupportMessage()` ham TR WhatsApp metni döndürüyor
  *   (EN kullanıcı Türkçe ön-dolu mesaj alır — gerçek kusur). Ama bu SAF bir util:
@@ -123,7 +123,6 @@ const T_CALL_BEFORE_FALLBACK = /t\(\s*(['"])[\w.]+\1\s*\)\s*$/
  *   JSX içermediği için tüm-desen muafiyeti burada kayıp üretmiyor.
  */
 const KNOWN_DEBT = new Set<string>([
-  'components/admin/data-table/DataTableKit.tsx',
   'utils/whatsapp.ts',
 ])
 
