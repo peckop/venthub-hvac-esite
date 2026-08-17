@@ -8,6 +8,19 @@ import { supabaseStaticClient } from '../lib/supabase/static'
 import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import { Routes } from '../utils/routes'
 
+/**
+ * W3 (render-dalga1) — YEDEK TAZELEME YOLU.
+ *
+ * Sitemap DB'den üretiliyor ama hiçbir webhook dalı onu tazelemiyordu: build'de donuyor,
+ * yeni ürün/kategori/aile arama motorlarına hiç bildirilmiyordu. Webhook artık
+ * `revalidatePath('/sitemap.xml')` çağırıyor; bu beyan İKİNCİ hattır — webhook düşerse
+ * (secret rotasyonu, ağ hatası, 401) sitemap en fazla bu süre kadar bayat kalır.
+ *
+ * 6 saat: katalog günde birkaç kez değişiyor; daha kısası boşuna DB yükü, daha uzunu
+ * webhook arızasında fark edilmeyecek kadar bayat.
+ */
+export const revalidate = 21600
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL
   const locales = ['tr', 'en']
