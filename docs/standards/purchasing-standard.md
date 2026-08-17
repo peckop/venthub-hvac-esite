@@ -225,7 +225,7 @@ dördü de KIRMIZI görülmeden PR açılmaz).
 - Ağırlıklı ortalama maliyet vs son-alış (şu an: yalnız son-alış, raporlama amaçlı).
 - Motor köprüsü (§5.4) — en büyük v2 kalemi.
 
-## 13. DB sertleştirme M5–M6 — PLAN (uygulanmadı, Recep dalga onayı bekliyor)
+## 13. DB sertleştirme M5–M8 — PLAN (uygulanmadı, Recep dalga onayı bekliyor)
 
 > **Durum: yalnız PLAN.** İki madde de migration gerektirir (kural 13). OPS-AUDIT ataması
 > 2026-08-17: "quote modülündeki doğru DB-desenini purchasing'e uygula; şimdi yalnız planı
@@ -298,9 +298,63 @@ deseninde de yok, INV-PURCH-1/R1b + servis kapısı bugün yeterli. Ayrı öneri
    denemesi `P0001` almalı; RPC üzerinden meşru mal kabul ise **çalışmaya devam etmeli**
    (pozitif çapa — her şeyi reddeden bir tetik de "yeşil" görünür).
 
+### 13.7 M8 — kalem-bazlı düşme idempotensi (kısmi düşüş maskeleniyor)
+
+**Ölçüm (prod fonksiyon gövdesinden, 2026-08-17).** `process_order_stock_reduction`
+kalem kalem çalışır: stoğu yeten kalem düşer ve `order_sale` hareketi yazılır, yetmeyen
+`failed_products`'a eklenir. Yani **kısmi düşüş gerçekleşir ve kalıcıdır.** Ama
+idempotens kapısı **sipariş bazlıdır**:
+
+```sql
+if exists (select 1 from inventory_movements
+           where (order_id = v_order_uuid or batch_id = v_order_uuid)
+             and reason = 'order_sale')
+then return jsonb_build_object('success', true,
+                               'message', 'Stock already reduced for this order', ...);
+```
+
+**Kusur senaryosu:** 3 kalemli sipariş — A ve B stoklu, C stoksuz.
+
+| Adım | Olan | Dönen |
+|---|---|---|
+| 1. çağrı | A ve B düşer (hareket yazılır), C düşemez | `success=false`, `failed=[C]` → alarm (doğru) |
+| 2. çağrı (retry / elle) | **hiçbir şey yapılmaz** — kapı "bu siparişte hareket var" der | `success=**true**`, `processed_count=0` |
+
+Yani C **hiç düşmez** ve ikinci çağrı bunu **başarı olarak raporlar**. Kısmi düşüş
+kalıcı olarak yarım kalır, üstelik maskelenir — ilk çağrının dürüst `success=false`'ı
+ikinci çağrıyla silinir. Bu, "kısmi başarı = başarı sanılır" ailesinin DB tarafındaki
+üyesi (T052'de callback tarafını kapatmıştık, RPC tarafı açık kalmış).
+
+**Planlanan düzeltme:** idempotens kontrolü kaleme iner. Sipariş-bazlı erken çıkış
+kaldırılır; döngü içinde her kalem için:
+
+```sql
+if exists (select 1 from inventory_movements
+           where (order_id = v_order_uuid or batch_id = v_order_uuid)
+             and product_id = v_item.product_id
+             and reason = 'order_sale')
+then v_skipped_already := v_skipped_already + 1; continue;
+end if;
+```
+
+**Zarf da düzelir** (bugün "0 işlendi ama başarılı" belirsizdir):
+`processed_count` (bu çağrıda düşen) · `skipped_already` (zaten düşülmüş) ·
+`failed_products` (hâlâ düşemeyen) · `success = (failed boş)`. Böylece ikinci çağrı
+C'yi gerçekten dener: stok gelmişse düşer ve `success=true` **hak edilmiş** olur;
+gelmemişse `success=false` kalır ve alarm sürer.
+
+**Bekçi (INV-STOCK-1'e eklenecek kural):** son-tanımlayan migration'da
+`process_order_stock_reduction` gövdesindeki `order_sale` idempotens kontrolü
+`product_id` koşulu **taşımalı**. Sipariş-bazlı erken çıkış deseni yasak.
+*Sabotaj:* kalem koşulunu sil → KIRMIZI; erken çıkışı geri koy → KIRMIZI.
+*Pozitif çapa:* meşru tam düşüş hâlâ tek çağrıda tamamlanmalı.
+
+**Etki bugün:** prod'da 0 sipariş var, yani geçmiş veri düzeltmesi gerekmiyor; ama
+kusur canlıya çıktığı ilk stoksuz-kalem siparişinde tetiklenir.
+
 ### 13.5 Uygulama notları
 
-- Tek migration yeterli (iki madde de aynı tabloları ilgilendiriyor, aynı işlemde).
+- Tek migration yeterli (maddeler aynı fonksiyon/tablo kümesini ilgilendiriyor, aynı işlemde).
 - Damga gerçek saat 14 hane; ledger bayt-sırasının arkasına düşmeli (§9).
 - **Sıra önemli:** önce tetik, sonra grant kısıtı. Ters sırada, grant çekilirken servis
   yazma yolu kısa süre kısıtlı ama kuralsız kalır.
