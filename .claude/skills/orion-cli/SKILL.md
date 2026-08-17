@@ -15,11 +15,11 @@ metadata:
   outputs:
   - docs/*.md
   recovery:
-    on_auth_expired: 'NLM auth: notebooklm-sync skill Adim 0 (nlm-headless-refresh.ps1
-      -> refresh_auth; oturum olmusse: nlm login --clear)'
+    on_auth_expired: 'NLM auth: notebooklm-sync skill Adim 0 (notebooklm list --json ile
+      DOGRULA; olduyse kullanici notebooklm login yapar. refresh_auth araci ARTIK YOK)'
   prerequisites:
   - OPENROUTER_API_KEY
-  - nlm login (NotebookLM sync için)
+  - notebooklm login (NotebookLM sync için — kullanıcı eylemi)
 depends_on: []
 next_steps: []
 run_last: false
@@ -139,7 +139,7 @@ Mimari değişiklik sonrası NotebookLM'i güncellemek için sırayla:
 
 ```bash
 # 1. NLM CLI güncelle
-pip install --upgrade notebooklm-mcp-cli
+uv tool upgrade notebooklm-py   # 2026-08-17: urun degisti; izole uv tool ortami
 
 # 2. Kaynak koddan MD üret
 orion doc all --changed-only --workers 20
@@ -172,9 +172,9 @@ orion doc tree --nlm-sync --force-sync
 | Hata | Çözüm |
 |------|-------|
 | LLM rate limit | `--force` olmadan tekrar çalıştır (tamamlananları atlar) |
-| Auth expired (NLM) | notebooklm-sync skill Adım 0'ı uygula (headless refresh → `refresh_auth`; oturum ölmüşse `nlm login --clear`) |
+| Auth expired (NLM) | `notebooklm list --json` ile GERÇEKTEN öldüğünü doğrula (`auth check` yalan söyleyebilir) → kullanıcı `notebooklm login` yapar. `refresh_auth` aracı YOK |
 | 0 dosya derlendi | `.cc_docs.yaml` source_dirs kontrol et |
-| Mükerrer NLM kaynağı | `nlm source list <notebook_id> --json` ile kontrol et, fazlaları sil |
+| Mükerrer NLM kaynağı | `notebooklm source list -n <notebook_id> --json` ile kontrol et, fazlaları `notebooklm source delete <id> -n <nb> -y` ile sil (ya da `source clean`) |
 | system_tree encoding bozuk | PowerShell değil Python ile oku, dosya UTF-8 |
 
 ## AXIOMS (Değiştirilemez Kurallar)

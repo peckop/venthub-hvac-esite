@@ -162,6 +162,11 @@ fanı DEĞİL. Worker bu serileri 41'e koyar; "otopark jet" diye ayrı kategori 
 ## 7. Provenance / ilişki
 
 Kaynak: çapraz-sorgu (`cross_notebook_query` Vortice-Full + Avensair, 2026-06-19) → Avensair'in 27 gerçek bölümü atıfla.
+
+> ⚠️ **2026-08-17 — YETENEK KAYBI:** ürün değişti (`notebooklm-py`) ve yeni MCP setinde
+> **`cross_notebook_query` YOK** (33 aracın hiçbiri çapraz-defter sorgusu yapmıyor).
+> Yukarıdaki bulgu geçerli kalır ama **aynı yöntemle tekrar üretilemez**. Geçici yol:
+> her defteri `chat_ask` ile ayrı ayrı sorgula, sonuçları elle birleştir.
 İlişki: `pricing-standard.md` (€ alış → satış motoru) · `category-taxonomy-standard.md` (2-seviye nihai slug) ·
 skill `.agent/skills/venthub-catalog-importer` (çıkarım aracı) · memory `catalog-ingestion-system` · `category-taxonomy-state`.
 

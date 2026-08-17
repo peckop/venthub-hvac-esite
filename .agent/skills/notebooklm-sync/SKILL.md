@@ -15,9 +15,9 @@ metadata:
   outputs:
   - synced NotebookLM source
   recovery:
-    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+    on_auth_expired: notebooklm login  # 2026-08-17: urun degisti (teng-lin/notebooklm-py); eski nlm-*.ps1 SILINDI
   prerequisites:
-  - nlm login
+  - notebooklm login
 depends_on: []
 next_steps: []
 run_last: false
@@ -39,7 +39,7 @@ Senkronizasyonu başlatmak için aşağıdaki adımları sırayla `run_command` 
 ### Adım 0 — NLM CLI Güncelleme (her sync öncesi)
 
 ```bash
-pip install --upgrade notebooklm-mcp-cli
+uv tool upgrade notebooklm-py   # 2026-08-17: urun degisti; izole uv tool ortami
 ```
 
 ### Adım 1 — Frontend Dokümantasyon Üretimi
@@ -91,7 +91,7 @@ Bu komutları çalıştırdığınızda arka planda şunlar gerçekleşir:
 4. **docs_tree linter:** `system_tree.md` oluşturur, sahipsiz/eksik dokümanları raporlar.
 5. **Master MD birleştirme:** `source_dirs` altındaki tüm geçerli `.md` dosyaları ana master'da birleştirilir.
 6. **Extra Masters birleştirme:** `.cc_docs.yaml`'daki `extra_masters` listesindeki her giriş için ayrı master MD derlenir.
-7. **NLM temizlik:** Eski master ve standalone kaynaklar `nlm source delete` ile silinir.
+7. **NLM temizlik:** Eski master ve standalone kaynaklar `notebooklm source delete <id> -n <nb> -y` ile silinir.
 8. **NLM yükleme:** Yeni master + standalone + extra master dosyalar ayrı ayrı yüklenir.
 
 ## VentHub NLM Kaynak Yapısı

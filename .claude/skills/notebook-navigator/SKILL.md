@@ -15,7 +15,7 @@ metadata:
   outputs:
   - rag response text
   recovery:
-    on_auth_expired: powershell -File .agent/scripts/nlm-headless-refresh.ps1  # oturum öldüyse: nlm login --clear (bkz. gövde)
+    on_auth_expired: notebooklm login   # 2026-08-17: ürün değişti; eski nlm-*.ps1 scriptleri SİLİNDİ (bkz. gövde §4)
 depends_on: []
 next_steps: []
 run_last: false
@@ -47,12 +47,31 @@ Defter envanteri CANLI kaynaktan alınır: her oturumda önce `notebook_list` MC
 ID'yi tespit ettikten sonra, MCP aracını kullanarak defter içindeki kaynaklara soru sorun:
 
 ```
-notebook_query(notebook_id="<ID>", query="<soru>")
+chat_ask(notebook="<ID veya defter adı>", question="<soru>")
 ```
+
+> ⚠️ **2026-08-17 — ARAÇ ADLARI DEĞİŞTİ.** Eski `notebook_query` aracı **ARTIK YOK**; ürün
+> `jacob-bd/notebooklm-mcp-cli` (`nlm`) → **`teng-lin/notebooklm-py`** (`notebooklm`) olarak
+> değişti. MCP sunucu adı `notebooklm-py`, araç sayısı 33.
+>
+> | Eski | Yeni |
+> |---|---|
+> | `notebook_query` | **`chat_ask`** |
+> | `refresh_auth` | **karşılığı YOK** — auth artık CLI'da (`notebooklm login`) |
+> | `source_add` · `notebook_list` | aynı adla duruyor |
+>
+> Yeni gelenler: `research_start/status/import` (derin araştırma), `studio_generate` (podcast/
+> video/quiz/flashcard), `share_*`, `note_save`, `suggest_prompts`, `source_read`, `source_wait`.
 
 **Örnek:** Kullanıcı "Next.js ile Supabase cache nasıl yönetilmeli?" diye sordu:
 1. Tablo → `3. NEXT.JS / REACT / ENTERPRISE WEB APPS` (ID: `0b85ac75-f456-40bf-9b04-de3161ee13b0`)
-2. Sorgu: `notebook_query(notebook_id="0b85ac75-...", query="Next.js app router'da Supabase ile data caching best practice'leri nelerdir?")`
+2. Sorgu: `chat_ask(notebook="0b85ac75-...", question="Next.js app router'da Supabase ile data caching best practice'leri nelerdir?")`
+
+**⚠️ Konuşma bağlamı tuzağı:** `chat_ask` varsayılan olarak defterin **en son konuşmasını
+sürdürür**. Uzun turlu (100+) bir konuşmaya düşersen model bağlamı kirlenir — belirti: alakasız
+takip soruları önerir. `conversation_id` ile belirli bir konuşmayı seçebilirsin; ama MCP
+aracında "yeni konuşma" parametresi YOK ve CLI'daki `--new` **YIKICI** (eski konuşmayı siler,
+onay ister). Bunu bilerek sor.
 
 **Ürün sorusu:** "Vortice Vort HRI 350 teknik özellikleri?" → Önce `00 - Full Catalog`, bulamazsa ilgili kategori defteri.
 
@@ -82,18 +101,25 @@ NotebookLM sadece statik bir doküman arşivi değil, kod tabanının ve mimarin
 - Kullanıcıya "Şu notebook'ta arayabilirim, ister misin?" diye **sormayın**. Gerekli görüyorsanız otonom olarak sorguyu yapıp sonucu entegre ederek cevap verin.
 - Kendi bilginiz çelişkili veya eskiyse, mutlaka ilgili defteri sorgulayın.
 - Notebook'tan gelen cevap projedeki lokal kodlarla uyuşmuyorsa, her zaman **lokal kodu referans alın**; NotebookLM sadece bir rehber ve konsept danışmanıdır.
-- **Authentication Expired Hatası:** Durumu kullanıcıya BİLDİRMEYİN. Penceresiz (headless) otomatik yenileme aktiftir. Windows'ta oturumu yenilemek için doğrudan şu PowerShell **headless** scriptini çalıştırın (pencere AÇMAZ, ~15 sn, ESET'i de atlar):
-  ```bash
-  powershell -File .agent/scripts/nlm-headless-refresh.ps1
-# (⚠️ 2026-08-10: -ExecutionPolicy Bypass bu ortamda DENY; -File yeterli. Script yalnız profildeki
-#  Google oturumu CANLIYSA işe yarar. Oturum ölmüşse / "Chrome is already running" / beyaz-donuk
-#  pencere görürsen → kalıcı çözüm: `nlm login --clear` (görünür, tek sefer; tüm chrome.exe kapalı).
-#  Paket: notebooklm-mcp-cli ≥0.9.8 — notebooklm-py KURMA (Gemini Notebook rebrand'ini bilmez).
-#  Detay: memory `nlm-auth-issue`.)
-  ```
-  Script bittikten sonra MCP'nin taze token'ı görmesi için **`refresh_auth`** aracını çağırın; ardından başarısız olan sorguyu otonom olarak tekrar tetikleyin.
-  - ⚠️ Düz `nlm login` ÇALIŞTIRMAYIN — bu makinede bozuk/yavaş görünür Chrome penceresi açar (ESET SSL gecikmesi → timeout → beyaz ekran). Daima headless scripti kullanın.
-  - **Yedek katmanlar:** Plan A = `nlm-headless-refresh.ps1` (varsayılan, penceresiz). Plan B = `nlm-persistent-login.ps1` (kalıcı profilin Google girişi de düşerse; görünür, ESET bankacılık koruması kapalıyken tek seferlik elle giriş — kalıcı profili tazeler, headless tekrar çalışır). Plan C (son çare) = `nlm-clean-login.ps1` (TEMP profil; çalışır ama headless zincirini tazelemez).
+- **Authentication Expired Hatası (2026-08-17 itibarıyla YENİ AKIŞ):** Auth artık **CLI tarafında**;
+  MCP'de `refresh_auth` diye bir araç YOK. Eski `nlm-*.ps1` scriptleri **SİLİNDİ** — 0.7.x için
+  yazılmışlardı, çıplak `nlm` çağırıyorlardı ve biri başarısızken `loginExit=0` yazıp
+  **başarılı görünüyordu** (sessiz-yalan).
+  - **Durum sorgusu:** `notebooklm auth check --json`
+    ⚠️ **TEK BAŞINA GÜVENME.** 2026-08-17'de ölçüldü: `auth check` **"ok"** dedi ve `psidts`i
+    2027'ye geçerli gösterdi, ama gerçek okuma (`notebooklm list`) *"Authentication expired or
+    invalid"* verdi. Statik dosya kontrolü oturumun canlılığını ölçmüyor. **Kanıt = gerçek çağrı.**
+  - **Yenileme:** `notebooklm login` — tarayıcı penceresi açar, giriş algılanınca kendisi kaydeder,
+    terminalde bir şey yazmak gerekmez. **Bu KULLANICININ eylemidir** (tıklama gerekir); ajan
+    olarak sen çalıştırıp bekleyemezsin — kullanıcıya söyle.
+  - **Tıklamasız yol (bu makinede ÇALIŞMAZ, deneme):** `notebooklm login --browser-cookies chrome`
+    → Chrome 127+ ve Edge çerez veritabanını **App-Bound Encryption** ile koruyor, harici hiçbir
+    süreç okuyamıyor, bayrakla aşılmıyor (ölçüldü). Firefox olsaydı çalışırdı (düz SQLite) — kurulu değil.
+  - **Kalıcı/headless seçenek (henüz kurulmadı):** ürün `master_token.json` destekliyor
+    (`~/.notebooklm/profiles/default/`). CI/headless gerekirse doğru yol bu, ps1 scripti değil.
+  - Kurulum **izole** `uv tool` ortamında: `~/AppData/Roaming/uv/tools/notebooklm-py`.
+    Hiçbir projenin venv'ine kurulmaz — eski kurulum orion'un venv'inde kaçak duruyordu ve
+    `uv sync` onu buduyordu; kronik "failed" sebebi buydu. Detay: memory `nlm-auth-issue`.
 
 ## 5. AMPİRİK SINIRLAR (2026-06-11 testi — güç/zayıf haritası)
 
