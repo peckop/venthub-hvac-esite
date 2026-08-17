@@ -158,3 +158,117 @@ describe('INV-MIGRATION-LEDGER-1 · migration defteri modeli korunur', () => {
     expect(yakalar('`supabase db push` yerine: supabase db push')).toBe(true)
   })
 })
+
+/* ------------------------------------------------------------------ *
+ * R4/R5 — migration DAMGASI: sıra tesadüfe bırakılamaz (T076-VH)
+ * ------------------------------------------------------------------ */
+
+/**
+ * NİÇİN VAR (T076-VH · 2026-08-17)
+ *
+ * `supabase-migrate.yml` migration'ları dosya adındaki damgayı 14 haneye TAMAMLAYIP
+ * sıralar. İki dosya aynı anahtara düşerse sıra, kalan dosya adının ALFABETİK sırasına
+ * kalır — yani aralarında bağımlılık varsa doğru sıra TESADÜFE bağlıdır. 2026-08-16'da
+ * ÜÇ dosya `20260816120000` damgasını paylaştı (ölçüldü) ve bunu hiçbir kapı görmedi.
+ *
+ * ÖLÇÜM, TAHMİN DEĞİL — ve ölçüm iş emrinden geniş çıktı:
+ *   · 14 haneli damga taşıyan dosya: 33
+ *   · 8 haneli (yalnız TARİH) taşıyan dosya: 163  ← hepsi aynı güne düşenlerle çakışıyor
+ *   · toplam çakışan grup: 26
+ * Yani "aynı damga" kuralını ham uygularsak 26 grup birden kırmızı yanar. Bu dosyalar
+ * ZATEN UYGULANMIŞ ve yeniden adlandırmak YASAK: ledger dosya ADINI kimlik alıyor, ad
+ * değişirse aynı migration YENİ sayılır ve ikinci kez uygulanır (LEGAL ölçtü).
+ *
+ * Bu yüzden kural İLERİYE dönük kurulur:
+ *   R4 — 14 haneli damgalar BENZERSİZ olmalı (bilinen 3 dosya ADIYLA muaf).
+ *   R5 — YENİ migration 8 haneli tarih önekiyle eklenemez (mevcut 163 sayı-ratchet'i).
+ */
+const MIGRATION_DIZINI = path.join(KOK, 'supabase/migrations')
+
+/** 2026-08-16'da damga çakışması ile eklenmiş, ADIYLA muaf dosyalar (yeniden adlandırma YASAK). */
+const BILINEN_DAMGA_CAKISMASI: readonly string[] = [
+  '20260816120000_grant_admin_list_all_users.sql',
+  '20260816120000_kvkk_data_subject_requests.sql',
+  '20260816120000_pricing_w5_policy_fx_lock.sql',
+]
+
+/**
+ * 2026-08-17'de ÖLÇÜLEN 8 haneli (tarih-önekli) dosya sayısı. Yalnız AZALABİLİR.
+ * Sayı-ratchet'i ad listesinden zayıftır (bir ekleyip bir silmek fark ettirmez) — ama o
+ * delik BAŞKA bir kapıyla kapalı: silinen migration `supabase-migrate.yml`'deki ledger
+ * parite adımında (dosya listesi == _migration_ledger) kırmızı yanar.
+ */
+const SEKIZ_HANELI_TABAN = 163
+
+function migrationAdlari(): string[] {
+  return readdirSync(MIGRATION_DIZINI).filter((f) => f.endsWith('.sql'))
+}
+
+/** Dosya adından sıralama anahtarı — workflow'un yaptığının BİREBİR aynısı. */
+function siralamaAnahtari(ad: string): string {
+  const ts = ad.replace(/_.*$/, '')
+  if (!/^\d+$/.test(ts)) return '99999999999999'
+  return (ts + '00000000000000').slice(0, 14)
+}
+
+function damgaUzunlugu(ad: string): number {
+  const ts = ad.replace(/_.*$/, '')
+  return /^\d+$/.test(ts) ? ts.length : 0
+}
+
+describe('INV-MIGRATION-LEDGER-1 · R4/R5 damga benzersizliği', () => {
+  it('dedektör çalışıyor: migration dosyaları okunabiliyor', () => {
+    expect(migrationAdlari().length).toBeGreaterThan(100)
+  })
+
+  it('R4 · 14 haneli damgalar BENZERSİZ (sıra alfabeye kalmasın)', () => {
+    const gruplar = new Map<string, string[]>()
+    for (const ad of migrationAdlari()) {
+      if (damgaUzunlugu(ad) !== 14) continue
+      if (BILINEN_DAMGA_CAKISMASI.includes(ad)) continue
+      const k = siralamaAnahtari(ad)
+      gruplar.set(k, [...(gruplar.get(k) ?? []), ad])
+    }
+    const cakisan = [...gruplar.entries()]
+      .filter(([, list]) => list.length > 1)
+      .map(([k, list]) => `${k}: ${list.sort().join(' + ')}`)
+
+    expect(
+      cakisan.sort(),
+      [
+        'İki migration AYNI 14 haneli damgayı taşıyor.',
+        '',
+        'supabase-migrate.yml damgayı 14 haneye tamamlayıp sıralar; eşitlikte sıra dosya',
+        'adının ALFABETİK sırasına kalır. Aralarında bağımlılık varsa doğru sıra TESADÜFE',
+        'bağlıdır — bugün çalışması, yarın çalışacağı anlamına gelmez.',
+        '',
+        'ÇÖZÜM: yeni dosyaya BENZERSİZ bir damga ver (saniye/dakika farkı yeter).',
+        'MEVCUT dosyayı YENİDEN ADLANDIRMA: ledger dosya ADINI kimlik alır, ad değişirse',
+        'aynı migration YENİ sayılır ve prod\'a İKİNCİ kez uygulanır.',
+        ...cakisan,
+      ].join('\n'),
+    ).toEqual([])
+  })
+
+  it('R5 · yeni migration 8 haneli (yalnız tarih) önekle eklenemez', () => {
+    const sekizli = migrationAdlari().filter((ad) => damgaUzunlugu(ad) === 8)
+    expect(
+      sekizli.length,
+      `8 haneli damga taşıyan migration sayısı ${sekizli.length}; taban ${SEKIZ_HANELI_TABAN}. ` +
+        'ARTTIYSA: yeni migration tarih-önekiyle eklenmiş — aynı güne düşen her dosya aynı ' +
+        'sıralama anahtarına gelir ve sıra alfabeye kalır. 14 haneli damga kullan ' +
+        '(YYYYMMDDHHMMSS). AZALDIYSA: dosya silinmiş/adı değişmiş olabilir — bu ayrıca ' +
+        'ledger paritesini bozar; tabanı düşürmeden önce SEBEBİ doğrula.',
+    ).toBeLessThanOrEqual(SEKIZ_HANELI_TABAN)
+  })
+
+  it('kendi kendini doğrular: sıralama anahtarı workflow ile aynı biçimde üretiliyor', () => {
+    expect(siralamaAnahtari('20260816120000_a.sql')).toBe('20260816120000')
+    expect(siralamaAnahtari('20250910_b.sql')).toBe('20250910000000')
+    // 8 haneli iki farklı dosya AYNI anahtara düşer — kuralın var oluş sebebi budur.
+    expect(siralamaAnahtari('20250910_b.sql')).toBe(siralamaAnahtari('20250910_c.sql'))
+    expect(damgaUzunlugu('20260816120000_a.sql')).toBe(14)
+    expect(damgaUzunlugu('20250910_b.sql')).toBe(8)
+    expect(damgaUzunlugu('baseline_x.sql')).toBe(0)
+  })
+})
