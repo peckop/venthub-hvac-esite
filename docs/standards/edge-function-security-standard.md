@@ -140,6 +140,16 @@ if (profErr || !userRole || !['admin', 'super_admin'].includes(userRole)) {
   profilini görmeyebilir; ama **okunan `id` daima doğrulanmış JWT'den gelir**, istekten değil.
 - İstek gövdesinden gelen `user_id` / `role` / `is_admin` alanları **asla** yetki kaynağı olamaz.
 
+> **Sunucu→sunucu (sınıf b) çağıranın kanıtı: sabit-zamanlı ANAHTAR EŞİTLİĞİ — ve bu bir
+> eksiklik değil, ölçülmüş bir zorunluluk (T061-VH, 2026-08-17).** "String eşitliği yerine
+> kapı-doğrulamalı `role` claim'i okuyalım" fikri makul görünür ama bugün **uygulanamaz**:
+> proje yeni API anahtar ailesine geçti (`sb_publishable_…` / `sb_secret_…`) ve bu anahtarlar
+> **JWT değil, opak dizelerdir** — içinde okunacak bir `role` claim'i yoktur. Dolayısıyla
+> doğru mekanizma eşitliktir; kusur eşitliğin kendisi değil, **erken-çıkışlı** (`===`) ve
+> **her uca kopyalanmış** olmasıdır. Kanonik yol: `_shared/caller.ts::resolveCaller`
+> (sabit-zamanlı karşılaştırma + tek sorguda rol/tenant + hata sınıflarının ayrımı).
+> Anahtar ailesi tekrar JWT'ye dönerse bu not yeniden ölçülmeli.
+
 ### 3.3 `getUser(jwt)` — argümansız çağrı **YASAK**
 
 **KURAL.** `auth.getUser()` daima **token açıkça geçirilerek** çağrılır: `auth.getUser(jwt)`.

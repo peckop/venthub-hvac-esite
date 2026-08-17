@@ -160,7 +160,8 @@ const KNOWN_VIOLATIONS = {
     'supabase/functions/order-housekeeping/index.ts',
     'supabase/functions/order-validate/index.ts',
     'supabase/functions/release-expired-reservations/index.ts',
-    'supabase/functions/stock-alert/index.ts',
+    // stock-alert 2026-08-17'de listeden ÇIKTI (T061-VH): elle yazılmış yetki kopyası
+    // `resolveCaller` kapısına göçtü ve dosya başına çağıran-sınıfı beyanı eklendi.
     'supabase/functions/tcmb-rates-sync/index.ts',
   ],
 
