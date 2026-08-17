@@ -2,6 +2,20 @@ import { admin } from './admin/en'
 import { tr } from './tr'
 
 export const en: typeof tr = {
+  whatsappMessages: {
+    greeting: 'Hello!',
+    stockInquiry: 'Hello! Could I get stock availability information for {{product}}?',
+    stockInquiryWithSku: 'Hello! Could I get stock availability information for {{product}} (SKU: {{sku}})?',
+    support: 'Hello! How can we help you?',
+    subjectLine: 'Subject: {{subject}}',
+    quoteIntro: 'Hello! Technical quote request:',
+    quoteProduct: 'Product: {{product}}',
+    quoteProjectInfo: 'Project details: {{info}}',
+    quoteAskProject: 'Could you share your project details?',
+    faqSupport: 'Hello! I could not find what I was looking for on the FAQ page. Could you help me?',
+    contactIntro: 'Hello! I am {{name}}.',
+    contactHelp: 'How can we help you?',
+  },
   common: {
     technicalDrawing: 'Technical Drawing',
     errorGeneric: 'An error occurred',

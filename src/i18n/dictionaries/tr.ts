@@ -1,6 +1,20 @@
 import { admin } from './admin/tr'
 
 export const tr = {
+  whatsappMessages: {
+    greeting: 'Merhaba!',
+    stockInquiry: 'Merhaba! {{product}} ürünü için stok durumu hakkında bilgi alabilir miyim?',
+    stockInquiryWithSku: 'Merhaba! {{product}} (SKU: {{sku}}) ürünü için stok durumu hakkında bilgi alabilir miyim?',
+    support: 'Merhaba! Size nasıl yardımcı olabilirim?',
+    subjectLine: 'Konu: {{subject}}',
+    quoteIntro: 'Merhaba! Teknik teklif talebi:',
+    quoteProduct: 'Ürün: {{product}}',
+    quoteProjectInfo: 'Proje Bilgileri: {{info}}',
+    quoteAskProject: 'Proje detaylarınızı paylaşabilir misiniz?',
+    faqSupport: 'Merhaba! SSS sayfasında aradığım bilgiyi bulamadım. Bana yardımcı olabilir misiniz?',
+    contactIntro: 'Merhaba! Ben {{name}}.',
+    contactHelp: 'Size nasıl yardımcı olabilirim?',
+  },
   common: {
     technicalDrawing: 'Teknik Çizim',
     errorGeneric: 'Bir hata oluştu',
