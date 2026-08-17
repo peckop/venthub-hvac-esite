@@ -37,11 +37,16 @@ tam bunu yasaklıyor ("yetki kararları `app_metadata` üzerinden; asla `raw_use
 `claims.user_role`'ü yazıyor — profil satırı yoksa bile `'user'` koyuyor. Yani 1. dal asla NULL
 değil ve 3. dal **ulaşılamaz**.
 
-⚠️ **ÖLÇEMEDİĞİM ŞEY (dürüst sınır):** hook'un Supabase Auth yapılandırmasında **etkin**
-olduğunu SQL'den doğrulayamadım — o ayar GoTrue tarafında, DB'de değil. Fonksiyonun *var
-olduğunu* ölçtüm, *çağrıldığını* ölçemedim. Latency'nin tamamı bu ayara bağlı olduğu için
-**uygulama öncesi bunun bir kez gözle teyidi gerekir** (Dashboard → Auth → Hooks). Bu yüzden
-kusur "teorik" değil "tek ayara bağlı".
+**Hook'un etkin olduğu ölçüldü — ama bu oturumda değil.** Ben SQL'den yalnız fonksiyonun *var
+olduğunu* görebildim; *çağrıldığı* GoTrue yapılandırmasında ve DB'den okunamıyor. OPS-AUDIT
+teyidi: **hook'un AÇIK olduğu 2026-08-15'te ölçümle doğrulandı** (memory `auth-role-source-hazard`);
+T047'nin "LATENT" hükmü zaten o ölçüme dayanıyor.
+
+⚠️ Buna rağmen **uygulama günü bir kez daha gözle teyit** şart (Dashboard → Auth → Hooks):
+kusurun zararsızlığının TAMAMI tek bir yapılandırma anahtarına bağlı ve o anahtar bu depodan
+denetlenemiyor. "Açıktı" da ölçülen andan ibarettir — platform iddiaları her iki yönde bayatlar.
+Kapı R4 bu yüzden hook'un GÖVDESİNİ zorlar: hook iki claim'i de yazdığı sürece W1'den sonra
+sistem **fail-closed** olur (rol çözülemezse admin DEĞİL).
 
 ## 2. Patlama yarıçapı (ölçüldü)
 
@@ -151,9 +156,9 @@ Bugün zararsız görünüyor (fallback yalnız JWT'siz bağlamlarda çalışıy
 
 ## 7. KARAR GEREKİYOR
 
-| # | Karar | Kim |
-|---|---|---|
-| E1 | İki yönetici e-postası `user_profiles.role` = `super_admin` mi `admin` mi olacak? (K1 kaldırılınca gerçek rol bu olacak) | **Recep** |
+| # | Karar | Kim | Durum |
+|---|---|---|---|
+| E1 | İki yönetici e-postası `user_profiles.role` = `super_admin` mi `admin` mi olacak? (K1 kaldırılınca gerçek rol bu olacak) | **Recep** | Recep paketine 6. madde olarak girdi (OPS-AUDIT); öneri: ÖNCE DB'de rol düzelt, SONRA allowlist kaldır |
 | E2 | `is_admin_user()` `SECURITY DEFINER` olsun mu, yoksa fallback "yalnız JWT'siz bağlam" diye cetvele mi yazılsın (W2) | OPS-AUDIT / Recep |
 | E3 | `user_metadata.role` alanı kullanıcı kayıtlarından temizlenecek mi (kozmetik, yetki etkisi W1'den sonra sıfır) | OPS-AUDIT |
 | E4 | Bu plan tek pakette mi (migration + kod + veri) yoksa veri→migration→kod olarak üç adımda mı merge edilecek | **Recep** (migration = prod) |
