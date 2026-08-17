@@ -34,6 +34,10 @@ yokluğu ayrı ayrı doğrulandı. Sınav geçilmeseydi rapor üretilmeyecekti.
   ama yazdırılabilir kaçışlar (`\\b` yerine `\b`) kapsam dışı.
 - Testin `.md` cetvel metni mi kod mu denetlediği — düzyazıda kelime aramak MEŞRUDUR
   (`auth-session-security.test.ts:84` bu yüzden elendi).
+- **AST tabanlı analiz.** Araç *"kaynak tarıyor ama yorum sıyırmıyor"* imzasını kusur sayar;
+  oysa TypeScript AST'i üzerinde çalışan bir bekçide (`ts.forEachChild`) yorumlar **zaten yoktur**
+  ve sıyırıcı gereksizdir. `hook-referential-stability.test.ts` bu yüzden yanlış-pozitif çıktı
+  ve §3.3'ten ÇIKARILDI. Ders: *"tarama var mı"* ile *"nasıl tarıyor"* farklı sorulardır.
 
 **Elenen yanlış-pozitif sınıfları** (bir sonraki tarayan tekrar uğraşmasın):
 yol filtreleri (`key.includes('__tests__')`), kapsam seçiciler
@@ -80,11 +84,18 @@ Ayrıca aynı dosyanın yorum sıyırıcısı satır-başı kipinde
 Kaynak tarayan ama yorumları hiç sıyırmayan bekçiler. Kuralı **anlatan** bir yorum, iddiayı
 doyurabilir — INV-STOCK-1'de (PR #556) birebir yaşandı.
 
-| Dosya | Sahip |
-|---|---|
-| `auth-account-surface.test.ts` | AUTH |
-| `hook-referential-stability.test.ts` | sahipsiz |
-| `pricing-cache-invariants.test.ts` | PRICING-STOK |
+| Dosya | Sahip | Yön |
+|---|---|---|
+| `auth-account-surface.test.ts` | AUTH | yanlış-YEŞİL (`toContain` gerektiren kurallar) |
+| `pricing-cache-invariants.test.ts` | PRICING-STOK | her iki yön: `/is_derived/.test(source)` yorumla doyar (yanlış-YEŞİL); yasaklı yazma deseni yorumda geçerse yanlış-KIRMIZI |
+
+> **DÜZELTME (aynı gün, ilk yayından sonra):** bu listede üçüncü sıradaki
+> `hook-referential-stability.test.ts` **ÇIKARILDI — yanlış-pozitifti.** O bekçi alt-dize
+> aramıyor; TypeScript **AST**'ı üzerinde çalışıyor (`ts.forEachChild`, `isObjectLiteralExpression`).
+> AST'te yorumlar zaten **yok**, dolayısıyla sıyırıcıya ihtiyacı da yok — üstelik AST analizi
+> alt-dize aramasından kesinlikle daha güçlüdür. Bulgu, düzeltmeye oturulduğunda dosya
+> okununca çürüdü. Aracın göremediği **dördüncü sınıf** bu: *"kaynak tarıyor ama sıyırmıyor"*
+> imzası, AST tabanlı analizde bir kusur DEĞİLDİR (§2'ye eklendi).
 
 ### 3.4 DÜŞÜK — rename-körü alt-dize (F1)
 
@@ -108,8 +119,21 @@ doyurabilir — INV-STOCK-1'de (PR #556) birebir yaşandı.
 | AUTH | §3.1'in üç satırı + §3.3'ün bir dosyası — import'u çıkar, çağrıyı ara |
 | PRICING-STOK | §3.3 `pricing-cache-invariants.test.ts` — yorum sıyırma ekle |
 | ADMIN-CUSTOMER | §3.4 `admin-theme-invariants.test.ts:284` — sınır ekle |
-| LEGAL-SEO (ben) | §3.2 kendi bekçim — parametre bağını ara |
-| sahipsiz | `hook-referential-stability.test.ts` — atama gerekir |
+| ~~sahipsiz~~ | ~~`hook-referential-stability.test.ts`~~ — **iş emri İPTAL**, yanlış-pozitif (§3.3 düzeltmesi) |
+| LEGAL-SEO (ben) | §3.2 kendi bekçim — ✅ **YAPILDI** (aşağıda) |
+
+### 4.1 ✅ Kapanan: §3.2 (LEGAL-SEO)
+
+`legal-promise-backing.test.ts` — `toContain('identityThreshold')` yerine **bağ** aranıyor:
+
+1. eşik `checkInvoiceIdentity` **imzasında** parametre mi,
+2. gövdede aynı adla **yerel tanım YOK** mu (parametreyi gölgelemesin),
+3. çağıran `config/legal` modülünü **import ediyor** mu,
+4. çağrıya `legalConfig.invoiceIdentityThreshold` **geçiriliyor** mu.
+
+**Sabotaj 4/4** — dördü de eski kuralın GEÇİRDİĞİ sabotajlar; dördü de artık KIRMIZI:
+eşiği parametre olmaktan çıkarıp gövdeye taşımak · parametreyi aynı adlı yerel sabitle
+gölgelemek · çağıranın SSOT alanı yerine sabit geçirmesi · çağıranın import'u bırakması.
 
 **Her düzeltme sabotajla kanıtlanmalı:** kuralı bilerek boz, KIRMIZI gör, düzelt, **tekrar boz**.
 Yeni kural yazarken yanlış-POZİTİF kontrolü de koy (doğru kodu yorumda tekrarla → YEŞİL kalmalı).

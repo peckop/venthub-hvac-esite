@@ -370,7 +370,12 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   // ve `middleware.ts:86` onu 307 ile `Accept-Language`'a göre seçilen bir dile yönlendiriyordu.
   // Yani kanonik yine ziyaretçiye göre değişiyordu — bu sefer host değil DİL üzerinden.
   // Cetvel: docs/standards/canonical-url-standard.md §4 · bekçi: INV-CANONICAL-2.
-  const canonicalUrl = `${SITE_URL}/${lang}${Routes.product(family.slug)}`
+  //
+  // Dil öneki ELLE birleştirilmez, `localizedHref` ile eklenir (CLAUDE.md kural 7). İlk
+  // düzeltmemde `${SITE_URL}/${lang}${Routes.product(...)}` yazmıştım ve I18N şeridinin
+  // INV-2 bekçisi bunu SSOT kaçağı olarak yakaladı — haklıydı: altyapı katmanında elle
+  // `/${lang}` birleştirmek, dil öneki kuralının tek merkezden değişmesini imkânsız kılar.
+  const canonicalUrl = `${SITE_URL}${localizedHref(Routes.product(family.slug), lang)}`
   const variantDescription = selectedVariant.description || pickLang(family.description, lang)
   const metaDesc = variantDescription || t('pdp.descFallback')
   const variantLabel = selectedVariant.model_code || selectedVariant.sku
@@ -980,7 +985,12 @@ const PdpSkuBridge: React.FC<ProductDetailPageProps> = (props) => {
 }
 
 /**
- * useSearchParams kullanan ağaç Suspense ile sarılır (PPR/SSR zehirlenme kuralı).
+ * useSearchParams kullanan ağaç Suspense ile sarılır — SSR zehirlenmesi (CLAUDE.md kural 5).
+ *
+ * NOT (2026-08-17): burada eskiden "PPR/SSR zehirlenme kuralı" yazıyordu. Kural doğru, GEREKÇE
+ * yanlış sınıftandı: bu projede **PPR kullanılmıyor** (`next.config.mjs`'te `experimental.ppr`
+ * yok; 08-15'te ölçüldü). Yanlış gerekçe, kuralın PPR açılırsa geçerli olduğu izlenimi verir;
+ * oysa Suspense sınırı PPR'dan bağımsız olarak BUGÜN zorunludur.
  *
  * Fallback bilinçli olarak boş bir iskelet DEĞİL, VARSAYILAN varyantla render edilmiş
  * tam gövdedir: statik ön-render'da HTML gerçek ürün içeriğiyle çıkar (SEO/LCP),

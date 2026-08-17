@@ -45,8 +45,15 @@ function kod(src: string): string {
   return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(?<!:)\/\/[^\r\n]*/g, '')
 }
 
-/** Dil parçası imzası: `${lang}` ya da açık `tr`/`en` segmenti. */
-const DIL_PARCASI = /\$\{lang\}|\/tr[/`'"]|\/en[/`'"]|['"]tr['"]|['"]en['"]/
+/**
+ * Dil parçası imzası: `${lang}`, açık `tr`/`en` segmenti, ya da **SSOT yardımcısı**.
+ *
+ * `localizedHref` neden kabul: dil önekini o ekler ve CLAUDE.md kural 7 elle `/${lang}`
+ * birleştirmeyi zaten YASAKLAR (I18N şeridinin INV-2 bekçisi altyapı katmanında bunu
+ * kırmızı yakıyor — bu bekçiyi yazarken benim kendi kodumda yakaladı). Yani yardımcıyı
+ * dil imzası saymazsak, doğru yazılmış kodu yanlış-KIRMIZI yakarız.
+ */
+const DIL_PARCASI = /\$\{lang\}|\/tr[/`'"]|\/en[/`'"]|['"]tr['"]|['"]en['"]|\blocalizedHref\s*\(/
 
 /**
  * Dosyadaki `const X = ...` atamalarını (satır sonuna kadar) topla.
