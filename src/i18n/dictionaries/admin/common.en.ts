@@ -7,6 +7,8 @@ export const common = {
   filter: 'Filter',
   noResults: 'No results found',
   loading: 'Loading...',
+  loadError: 'Could not load data',
+  newBlockTitle: 'New Heading',
   success: 'Operation successful',
   error: 'An error occurred',
   ready: 'Ready',

@@ -222,7 +222,7 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
           <div className="absolute right-0 mt-3 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-xl backdrop-blur-md">
             <div className="border-b border-slate-100 px-4 py-3">
               <div className="truncate text-sm font-semibold text-slate-900">{finalUserDisplayName}</div>
-              <div className="truncate text-xs text-steel-gray">{user?.email || 'Geliştirici Modu'}</div>
+              <div className="truncate text-xs text-steel-gray">{user?.email || t('common.devMode')}</div>
             </div>
             <div className="p-2">
               <Link href={Routes.account.overview()} onClick={closeUserMenu} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-steel-gray hover:bg-air-blue/20 hover:text-primary-navy">

@@ -130,31 +130,27 @@ const KNOWN_DEBT = new Set<string>([
  * ÇIPLAK FALLBACK BORCU (yalnız `FALLBACK_LITERAL` deseni için — dosyayı diğer
  * desenlere KÖR ETMEZ; `KNOWN_DEBT` tüm desenleri atlar, bu yalnız birini).
  *
- * Ölçüm (2026-08-17, bu kapı yazılırken ORTAYA ÇIKTI): `t()` yedeği OLMAYAN, doğrudan
- * ham TR'ye düşen **19** fallback var — SEO açıklaması, toast mesajları, kart
- * başlıkları. Bunlar gerçek borçtur ama benim iş emrim ATTRIBUTE süpürmesiydi ve
- * çoğu BAŞKA ŞERİTLERİN canlı dosyasında (hooks/useAdminTable, lib/orderStatusService,
- * views/admin/*, components/admin/*). Sahibine sormadan girmek şerit ihlali olurdu.
+ * D4 SÜPÜRMESİ (2026-08-17): liste **15 → 7** düştü; 12 dosyanın 9'u kapandı
+ * (useApiCall, useCheckoutCoupon, useAdminTable, StickyHeader, OrdersPage,
+ * AuthorityRenderer, BlockEditor, SEO metadata). Kalan üçünün her biri AYRI
+ * sebeple duruyor — "henüz yapmadım" değil, gerekçeli:
  *
- * Liste bu yüzden DONDURUR (ratchet): yeni fallback eklenemez, mevcut 19 görünür
- * kalır ve OPS-AUDIT triyajıyla sahiplerine dağıtılır. Her satır bir borçtur; borç
- * ödenince satır SİLİNİR (aşağıdaki bayatlık testi zorlar).
+ * 1. `views/admin/AdminLogisticsTableBody.tsx` (5 isabet) — değer `Yurtiçi`, yani
+ *    KARGO FİRMASININ ADI. Özel isim ÇEVRİLMEZ; sözlüğe taşımak "Domestic" gibi
+ *    yanlış bir çeviri üretme riskini doğurur. Bu bir borç DEĞİL, kalıcı istisna;
+ *    ama desenden ayırt edilemediği için listede durur. (Ayırt etmenin tek yolu
+ *    değer-listesi tutmak olurdu ve o da bayatlardı.)
+ * 2. `lib/orderStatusService.ts` — SERVİS katmanı, React yok, `t` erişimi yok.
+ *    Doğru çözüm hata KODU döndürüp çeviriyi çağırana bırakmak = çağıran API'sini
+ *    değiştirir → `utils/whatsapp.ts` ile aynı sınıf, D5'e bırakıldı.
+ * 3. `views/account/OrderDetailPage.tsx` — PRICING-STOK şeridinin CANLI claim'inde.
+ *    Ölçüldü, sahibine panodan adresli bildirildi; dokunulmadı (şerit disiplini).
  */
 const FALLBACK_DEBT = new Set<string>([
-  'app/[lang]/products/[slug]/page.tsx',
-  'app/_components/ProductDetailPageView.tsx',
-  'components/StickyHeader.tsx',
-  'components/admin/authority-builder/BlockEditor.tsx',
-  'components/authority/AuthorityRenderer.tsx',
-  'hooks/useAdminTable.ts',
-  'hooks/useApiCall.ts',
-  'hooks/useCheckoutCoupon.ts',
   'lib/orderStatusService.ts',
-  'views/OrdersPage.tsx',
   'views/account/OrderDetailPage.tsx',
   'views/admin/AdminLogisticsTableBody.tsx',
 ])
-
 /**
  * Hukuk metinleri sözlükle değil DİZİNLE lokalize edilir (`legal/components/{tr,en}/`,
  * 12/12 parite ölçüldü) — 10 sayfalık sözleşmeyi sözlüğe koymak yanlış olurdu.

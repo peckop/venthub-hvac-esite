@@ -14,6 +14,8 @@ export const common = {
   filter: 'Filtrele',
   noResults: 'Sonuç bulunamadı',
   loading: 'Yükleniyor...',
+  loadError: 'Veriler yüklenemedi',
+  newBlockTitle: 'Yeni Başlık',
   success: 'İşlem başarılı',
   error: 'Bir hata oluştu',
   ready: 'Hazır',

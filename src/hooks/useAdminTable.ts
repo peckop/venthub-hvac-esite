@@ -8,6 +8,8 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 import type { TableSortDir } from '@/types/admin-shared'
 import type { Database } from '@/types/database.types'
 
+import { useI18n } from '../i18n/I18nProvider'
+
 export type AdminMode = 'server' | 'client' | 'none'
 
 export interface SortState {
@@ -152,6 +154,7 @@ function parseFiltersFromParams(params: URLSearchParams): Record<string, string[
 /* ------------------------------- hook ---------------------------------- */
 
 export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTableResult<T> {
+  const { t } = useI18n()
   const {
     resource,
     rowId,
@@ -260,7 +263,7 @@ export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTabl
       setRawRows(res.rows)
       setServerTotal(res.totalMatched)
     } catch (e) {
-      setError((e as Error)?.message || 'Veriler yüklenemedi')
+      setError((e as Error)?.message || t('admin.common.loadError'))
       setRawRows([])
       setServerTotal(0)
     } finally {

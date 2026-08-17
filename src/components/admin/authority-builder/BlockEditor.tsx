@@ -48,7 +48,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({ block, onChange }) => 
               <input 
                 className={inputClass} 
                 value={heroContent.title || ''} 
-                onChange={(e) => handleContentChange({ title: e.target.value || 'Yeni Başlık' })} 
+                onChange={(e) => handleContentChange({ title: e.target.value || t('admin.common.newBlockTitle') })} 
               />
             </div>
             <div className="grid gap-1">

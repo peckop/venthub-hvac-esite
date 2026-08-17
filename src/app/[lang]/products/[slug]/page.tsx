@@ -65,7 +65,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       const description =
         pickLang(family.meta_description, lang) ||
         pickLang(family.description, lang)?.substring(0, 160) ||
-        'VentHub Ürün Detayı'
+        // Son çare SEO açıklaması — sözlük yok (RSC metadata), dil koşuluyla çözülür.
+        (lang === 'en' ? 'VentHub Product Details' : 'VentHub Ürün Detayı')
       const coverPath = variants.find((v) => v.images.length > 0)?.images[0]?.path
 
       return {

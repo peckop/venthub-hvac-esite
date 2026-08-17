@@ -2,6 +2,10 @@ import { admin } from './admin/tr'
 
 export const tr = {
   common: {
+    technicalDrawing: 'Teknik Çizim',
+    errorGeneric: 'Bir hata oluştu',
+    devMode: 'Geliştirici Modu',
+    userFallback: 'Kullanıcı',
     paginationLabel: 'Sayfalama',
     paginationPrevious: 'Önceki',
     paginationNext: 'Sonraki',
@@ -1228,6 +1232,7 @@ export const tr = {
     },
     orderSummary: {
       couponPlaceholder: 'Kupon kodu',
+      couponApplyFailed: 'Kupon uygulanamadı',
       applyCoupon: 'Uygula',
       removeCoupon: 'Kaldır',
     },
