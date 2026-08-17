@@ -1,6 +1,29 @@
+// Çağıran sınıfı: (b) cron/sunucu→sunucu service_role + (a) oturumlu admin — resolveCaller kapısı
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import {
+  CallerConfigError,
+  CallerLookupError,
+  TenantMismatchError,
+  resolveCaller,
+  type CallerContext,
+} from '../_shared/caller.ts'
+
+/** Cetvel §3.2 — yetkili roller. Gövdeden gelen `role`/`is_admin` ASLA kaynak değildir. */
+const ADMIN_ROLES: readonly string[] = ['admin', 'super_admin']
+
+/**
+ * KAPI HATASI → HTTP EŞLEMESİ (beş bildirim ucuyla BİREBİR aynı metin).
+ *   `TenantMismatchError` → 403 · `CallerConfigError` → 500 · `CallerLookupError` → 503
+ * `null` dönerse hata bu kapıya ait DEĞİLDİR → yeniden fırlatılır, dıştaki catch 500 döner.
+ */
+function callerFailure(error: unknown): { status: number; error: string } | null {
+  if (error instanceof TenantMismatchError) return { status: 403, error: 'tenant_mismatch' }
+  if (error instanceof CallerConfigError) return { status: 500, error: 'CONFIG_MISSING' }
+  if (error instanceof CallerLookupError) return { status: 503, error: 'profile_lookup_failed' }
+  return null
+}
 
 interface Product {
   id: string
@@ -48,38 +71,50 @@ serve(async (req: Request) => {
   }
 
 
-    const authHeader = req.headers.get('Authorization')
-    let isAuthorized = false
-    if (authHeader === `Bearer ${serviceRoleKey}`) {
-      isAuthorized = true
-    } else if (authHeader) {
-      try {
-        const anonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
-        const { createClient: createClientAuth } = await import('https://esm.sh/@supabase/supabase-js@2.45.4')
-        const authClient = createClientAuth(supabaseUrl, anonKey, { global: { headers: { Authorization: authHeader } } })
-        const { data: { user } } = await authClient.auth.getUser(authHeader.replace(/^Bearer\s+/i, ''))
-        if (user) {
-          const roleCheck = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}&select=role`, {
-            headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey }
-          })
-          if (roleCheck.ok) {
-            const arr = await roleCheck.json().catch(() => [])
-            const role = arr[0]?.role
-            if (role === 'admin' || role === 'super_admin') {
-              isAuthorized = true
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Auth fallback error:', err)
-      }
+    // ---- Yetki kapısı: ortak `resolveCaller` (cetvel §3.2/§3.6) ----
+    //
+    // T061-VH (2026-08-17): burada uca özel, elle yazılmış bir kopya vardı ve üç kusuru
+    // birden taşıyordu:
+    //   1. `authHeader === \`Bearer ${serviceRoleKey}\`` — erken-çıkışlı karşılaştırma;
+    //      ortak modül bunu SABİT ZAMANLI yapar (anahtar baytları zamanlamayla sızmasın).
+    //   2. Hata dalı `catch { console.error }` ile SESSİZCE yutuluyordu: profil satırı
+    //      okunamadığında (geçici DB/ağ hatası) uç 401 diyordu — yani "yetkin yok" ile
+    //      "bakamadım" aynı cevaba düşüyordu. Ortak kapı bunu 503 olarak ayırır.
+    //   3. Sekizinci kopya olmak: bir kopyayı düzeltmek diğerlerini düzeltmiyordu.
+    //
+    // NİÇİN HÂLÂ ANAHTAR KARŞILAŞTIRMASI VAR (ve bu kaçınılmaz): iş emri "string eşitliği
+    // yerine kapı-doğrulamalı role-claim" diyordu; ölçünce bunun bugün UYGULANAMAZ olduğu
+    // görüldü — proje yeni API anahtar ailesine geçti (`sb_secret_…`) ve bu anahtarlar JWT
+    // DEĞİL, opak dizeler. Okunacak bir `role` claim'i yok. Dolayısıyla doğru mekanizma
+    // sabit-zamanlı EŞİTLİK; kusur eşitliğin kendisi değil, erken-çıkışlı ve kopyalanmış
+    // olmasıydı. Bu ayrım cetvel §3.2'ye de işlendi.
+    let ctx: CallerContext
+    try {
+      ctx = await resolveCaller(req, {})
+    } catch (err) {
+      const failure = callerFailure(err)
+      if (!failure) throw err
+      return new Response(JSON.stringify({ error: failure.error }), {
+        status: failure.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
-    if (!isAuthorized) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-            status: 401,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
+    // `resolveCaller` geçersiz/eksik JWT'yi 401'e ÇEVİRMEZ — `kind: 'anon'` döndürüp kararı
+    // uca bırakır. Bu uçta anonim çağıran AÇIKÇA reddedilir; bu satır olmazsa uç anonime açık kalır.
+    if (ctx.kind === 'anon') {
+      return new Response(JSON.stringify({ error: 'unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+    // Sınıf (b) cron/service_role VEYA sınıf (a) admin. Diğer her oturumlu kullanıcı 403:
+    // kimlik ≠ yetki (eskiden burada da 401 dönüyordu, yetkisizlik kimliksizlikle karışıyordu).
+    if (ctx.kind !== 'service_role' && !ADMIN_ROLES.includes(ctx.role ?? '')) {
+      return new Response(JSON.stringify({ error: 'forbidden' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
     }
 
     const supabase = createClient(supabaseUrl, serviceRoleKey)
