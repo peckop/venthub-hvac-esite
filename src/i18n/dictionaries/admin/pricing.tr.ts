@@ -1,6 +1,33 @@
 // Fiyat motoru admin paneli sözlüğü (W3, T001-VH). ÜRETİLMİŞ birleşim:
 // common=orkestratör · settings=T1 · rules=T2 · preview=T3 (D2).
 export const pricing = {
+  policies: {
+    effective: {
+      title: "Etkin kilit sorgusu",
+      help: "Bir urunun SU AN kilitli olup olmadigini ve kilidi hangi kapsamin verdigini gosterir. Liste tek basina yetmez: daha ozel bir kilitsiz politika, daha genel bir kilidi bozar.",
+      placeholder: "SKU veya urun adi",
+      check: "Sorgula",
+      checking: "Sorgulaniyor...",
+      notFound: "Bu arama ile urun bulunamadi.",
+      locked: "Kilitli - kur degisimi bu urunun fiyatini etkilemez.",
+      unlocked: "Kilitli degil - kur degisimi bu urunun fiyatina yansir.",
+      winner: "Karari veren kapsam: {{scope}} - dondurulan kur: {{rate}}"
+    },
+    table: {
+      target: "Hedef",
+      lock: "Kilit",
+      locked: "Kilitli",
+      unlocked: "Serbest",
+      frozenRate: "Dondurulan kur",
+      frozenAt: "Dondurulma zamani",
+      note: "Not",
+      active: "Durum"
+    },
+    empty: {
+      title: "Henuz kur kilidi yok",
+      description: "Kur kilidi, secilen kapsamdaki urunlerin fiyatini kur degisiminden korur. Hic kilit tanimlanmadiginda tum urunler kuru takip eder."
+    }
+  },
   common: {
     scopeLabel: "Kapsam",
     methodLabel: "Yöntem",

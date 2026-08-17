@@ -1,6 +1,33 @@
 // Pricing engine admin panel dictionary (W3, T001-VH). MERGED output:
 // common=orchestrator · settings=T1 · rules=T2 · preview=T3 (D2).
 export const pricing = {
+  policies: {
+    effective: {
+      title: "Effective lock lookup",
+      help: "Shows whether a product is locked right now and which scope decided it. The list alone is not enough: a more specific unlocked policy breaks a more general lock.",
+      placeholder: "SKU or product name",
+      check: "Look up",
+      checking: "Looking up...",
+      notFound: "No product matched this search.",
+      locked: "Locked - FX movement does not affect this product price.",
+      unlocked: "Not locked - FX movement flows into this product price.",
+      winner: "Deciding scope: {{scope}} - frozen rate: {{rate}}"
+    },
+    table: {
+      target: "Target",
+      lock: "Lock",
+      locked: "Locked",
+      unlocked: "Unlocked",
+      frozenRate: "Frozen rate",
+      frozenAt: "Frozen at",
+      note: "Note",
+      active: "Status"
+    },
+    empty: {
+      title: "No FX locks yet",
+      description: "An FX lock protects prices in the selected scope from currency movement. With no locks defined, every product follows the rate."
+    }
+  },
   common: {
     scopeLabel: "Scope",
     methodLabel: "Method",
