@@ -24,7 +24,7 @@ const JsonDiffViewer: React.FC<JsonDiffViewerProps> = ({ before, after }) => {
     }
 
     return (
-        <div className="w-full bg-admin-surface-3 rounded-admin-md overflow-hidden border border-admin-border shadow-admin-lg">
+        <div className="w-full bg-admin-surface-3 rounded-admin-md overflow-hidden border border-admin-border">
             <div className="flex text-xs font-semibold text-admin-fg-muted bg-admin-surface-2 border-b border-admin-border">
                 <div className="flex-1 p-3 border-r border-admin-border flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-admin-danger"></div>

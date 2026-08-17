@@ -20,6 +20,7 @@ export const products = {
   },
   form: {
     name: 'Ürün Adı',
+    brand: 'Marka',
     category: 'Kategori',
     select: 'Seçiniz',
     outOfStock: 'Stok Yok',

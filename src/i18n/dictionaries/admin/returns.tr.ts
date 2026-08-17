@@ -40,6 +40,11 @@ export const returns = {
         noteLabel: 'Gerekçe (zorunlu)',
         notePlaceholder: 'Örn. iade süresi dolmuş, ürün kullanılmış, kutu açılmış…'
       },
+      refundConfirm: {
+        title: 'Para iadesi yapılacak',
+        description: '{{order}} numaralı sipariş için {{amount}} tutarında GERÇEK para iadesi başlatılacak. Bu işlem geri alınamaz.',
+        confirmLabel: 'Para iadesini başlat'
+      },
       toasts: {
         returnsLoadFailed: 'İade talepleri yüklenemedi',
         statusUpdated: 'İade durumu "{{status}}" olarak güncellendi',

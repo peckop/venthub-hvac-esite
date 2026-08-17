@@ -9,6 +9,7 @@ import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAud
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { useRole } from '../../hooks/useRole'
 import { 
   adminButtonPrimaryClass,
@@ -24,6 +25,7 @@ enum LoadState { Idle, Loading, Error }
 
 const AdminInventorySettingsPage: React.FC = () => {
   const { t } = useI18n()
+  const confirm = useConfirm()
   const pathname = usePathname()
   const [defaultThreshold, setDefaultThreshold] = React.useState<number | ''>('')
   const [resetAll, setResetAll] = React.useState<boolean>(false)
@@ -107,6 +109,20 @@ const AdminInventorySettingsPage: React.FC = () => {
   }, [isFormDirty])
 
   async function save() {
+    /*
+      "Tümüne uygula" ZİNCİRLEME etkilidir: tüm ürün-bazlı eşik override'larını
+      siler ve geri alınamaz (Faz 5 bulgusu: yalnız sarı uyarı metni vardı, onay
+      yoktu — cetvel §4.7: zincirleme/geri alınamaz işlem onay ister).
+    */
+    if (resetAll) {
+      const ok = await confirm({
+        title: t('admin.inventory.settings.resetAllConfirm.title'),
+        description: t('admin.inventory.settings.resetAllConfirm.description'),
+        confirmLabel: t('admin.inventory.settings.resetAllConfirm.confirmLabel'),
+        tone: 'danger',
+      })
+      if (!ok) return
+    }
     try {
       setSaving(true)
       setSuccess('')

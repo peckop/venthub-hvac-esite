@@ -20,6 +20,7 @@ export const errors = {
       },
       export: {
         csvLabel: 'CSV (UTF-8 BOM)',
+        failed: 'Export failed — could not fetch records',
         filename: 'client_errors.csv',
         headers: {
           id: 'ID',

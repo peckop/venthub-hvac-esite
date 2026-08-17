@@ -42,6 +42,7 @@ export const orders = {
         clearSelection: 'Clear',
         noShippableSelected: 'No selectable shipments to cancel',
         confirmCancelShipping: 'Are you sure to cancel shipping for {{count}} orders?',
+        cancelShippingLabel: 'Cancel shipment',
         cancelSuccess: '{{count}} orders cancelled',
         cancelPartialFail: 'Some cancellations failed: {{failed}}',
         cancelFailed: 'Bulk cancel failed',

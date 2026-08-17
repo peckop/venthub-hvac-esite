@@ -17,6 +17,7 @@ export const audit = {
       viewMovements: 'View Movements',
       export: {
         csvLabel: 'CSV (UTF-8 BOM)',
+        failed: 'Export failed — could not fetch records',
         filename: 'audit_log.csv',
         headers: {
           id: 'ID',

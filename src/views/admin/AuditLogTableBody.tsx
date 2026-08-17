@@ -3,6 +3,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { ClipboardList, Filter, SearchX, Terminal } from 'lucide-react'
 import React, { useCallback, useMemo } from 'react'
+import { toast } from 'sonner'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -98,7 +99,18 @@ const AuditLogTableBody: React.FC = () => {
 
   /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
   const exportCsv = useCallback(async () => {
-    const rows = await table.fetchAllForExport()
+    /*
+      Faz 5 bulgusu: fetchAllForExport reddedilirse hata HİÇBİR yüzeye düşmüyordu
+      (sessizce reddedilen promise). Görünür kılındı; kalıcı inline yüzeye taşıma
+      O10 süpürmesinin (sonraki dalga) işi.
+    */
+    let rows: Awaited<ReturnType<typeof table.fetchAllForExport>>
+    try {
+      rows = await table.fetchAllForExport()
+    } catch {
+      toast.error(t('admin.audit.export.failed'))
+      return
+    }
     const header = [
       t('admin.audit.export.headers.id'),
       t('admin.audit.export.headers.at'),

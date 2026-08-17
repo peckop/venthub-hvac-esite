@@ -70,6 +70,11 @@ export const users = {
         phone: 'Phone',
         organizationId: 'Organization ID'
       },
+      roleConfirm: {
+        title: 'Role change',
+        description: "The role of {{user}} will change from \"{{from}}\" to \"{{to}}\". This immediately changes the user's admin panel permissions.",
+        confirmLabel: 'Set role to "{{role}}"'
+      },
       bulk: {
         changeRole: 'Change Role',
         selectRole: 'Select Target Role',

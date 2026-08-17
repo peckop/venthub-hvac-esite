@@ -142,6 +142,7 @@ export const products = {
     deleteProduct: 'Do you want to delete this product?',
   },
   form: {
+    brand: 'Brand',
     category: 'Category',
     name: 'Product Name',
     outOfStock: 'Out of Stock',

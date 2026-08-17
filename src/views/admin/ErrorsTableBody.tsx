@@ -3,6 +3,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { Bug, SearchX } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import { toast } from 'sonner'
 
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 
@@ -134,7 +135,14 @@ const ErrorsTableBody: React.FC = () => {
 
   /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
   const exportCsv = useCallback(async () => {
-    const rows = await table.fetchAllForExport()
+    /* Faz 5: sessiz reddedilen promise görünür kılındı (bkz. AuditLogTableBody nota). */
+    let rows: Awaited<ReturnType<typeof table.fetchAllForExport>>
+    try {
+      rows = await table.fetchAllForExport()
+    } catch {
+      toast.error(t('admin.errors.export.failed'))
+      return
+    }
     const header = [
       t('admin.errors.export.headers.id'),
       t('admin.errors.export.headers.at'),
@@ -200,10 +208,10 @@ const ErrorsTableBody: React.FC = () => {
           <span
             className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${
               r.level === 'error'
-                ? 'bg-admin-danger text-admin-danger ring-1 ring-admin-danger/30'
+                ? 'bg-admin-danger-weak text-admin-danger ring-1 ring-admin-danger/30'
                 : r.level === 'warn'
-                  ? 'bg-admin-warning text-admin-warning ring-1 ring-admin-warning/30'
-                  : 'bg-admin-accent text-admin-accent ring-1 ring-admin-accent/30'
+                  ? 'bg-admin-warning-weak text-admin-warning ring-1 ring-admin-warning/30'
+                  : 'bg-admin-accent-weak text-admin-accent ring-1 ring-admin-accent/30'
             }`}
           >
             {r.level || 'error'}

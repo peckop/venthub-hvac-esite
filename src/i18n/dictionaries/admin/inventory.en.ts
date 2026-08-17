@@ -12,6 +12,9 @@ export const inventory = {
   supplier: 'Supplier',
   warehouseLocation: 'Warehouse Location',
   reportTitle: 'Stock Movement Report',
+  report: {
+    loadFailed: 'Report data could not be loaded — the charts below may be missing or empty. Refresh the page.'
+  },
   reportSubtitle: 'Warehouse incoming/outgoing trends and product-based analysis.',
   downloadCsv: 'Download CSV',
   filterPlaceholder: 'Filter by product name...',
@@ -124,6 +127,11 @@ export const inventory = {
     applyToAll: 'Apply to All Products',
     bulkApplyHelp: 'Clears product-specific custom thresholds and uses the default value for all.',
     bulkApplyWarning: 'This action performs a bulk update in the product database and cannot be undone.',
+    resetAllConfirm: {
+      title: 'All product thresholds will be reset',
+      description: 'ALL per-product custom threshold values will be deleted and every product will fall back to the default. This cannot be undone.',
+      confirmLabel: 'Reset thresholds and apply'
+    },
     alarmAutomation: 'Alerts & Automation',
     alarmDescription: 'Configure email alert addresses and webhook integration endpoints.',
     emailNotifications: 'Email Notifications',

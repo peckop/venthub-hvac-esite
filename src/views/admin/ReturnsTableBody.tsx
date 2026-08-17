@@ -474,6 +474,25 @@ const ReturnsTableBody: React.FC = () => {
    */
   const requestStatusChange = useCallback(
     async (row: ReturnRow, newStatus: string) => {
+      /*
+        `refunded` geri alınamaz PARA hareketidir (gerçek iyzico-refund çağrısı) —
+        gerekçe istemez ama onaysız tek tıkla gidemez. Faz 5 ölçümü bunu açık
+        buldu: alertdialog yalnız ret/iptalde vardı, tekil iade onaysızdı.
+      */
+      if (newStatus === 'refunded') {
+        const { confirmed } = await confirmWithReason({
+          title: t('admin.returns.refundConfirm.title'),
+          description: t('admin.returns.refundConfirm.description', {
+            order: row.order_number,
+            amount: formatCurrency(row.total_amount ?? 0, lang),
+          }),
+          confirmLabel: t('admin.returns.refundConfirm.confirmLabel'),
+          tone: 'danger',
+        })
+        if (!confirmed) return
+        await handleStatusUpdate(row, newStatus)
+        return
+      }
       if (!STATUSES_REQUIRING_NOTE.has(newStatus)) {
         await handleStatusUpdate(row, newStatus)
         return
@@ -495,7 +514,7 @@ const ReturnsTableBody: React.FC = () => {
       if (!confirmed) return
       await handleStatusUpdate(row, newStatus, reason)
     },
-    [confirmWithReason, handleStatusUpdate, getStatusLabel, t],
+    [confirmWithReason, handleStatusUpdate, getStatusLabel, t, lang],
   )
 
   /* ---- toplu statü güncelleme — UPDATE, mutateWithAudit kapısından ---- */

@@ -352,6 +352,23 @@ function sortUserRows(rows: UserRow[], sort: { key: string; dir: 'asc' | 'desc' 
         toast.error(t('admin.users.toasts.noPermission'))
         return
       }
+      /*
+        Yetki değişikliği tek tıkla GİDEMEZ (Faz 5 bulgusu: super_admin atama/alma
+        dahil onaysızdı). super_admin'e dokunan geçişler tehlike tonunda: yanlış
+        tık panelin tüm yetki düzenini değiştirir.
+      */
+      const touchesSuperAdmin = newRole === 'super_admin' || row.role === 'super_admin'
+      const ok = await confirm({
+        title: t('admin.users.roleConfirm.title'),
+        description: t('admin.users.roleConfirm.description', {
+          user: row.full_name || row.email || row.id,
+          from: t(`roles.${row.role}`),
+          to: t(`roles.${newRole}`),
+        }),
+        confirmLabel: t('admin.users.roleConfirm.confirmLabel', { role: t(`roles.${newRole}`) }),
+        tone: touchesSuperAdmin ? 'danger' : 'default',
+      })
+      if (!ok) return
       try {
         setUpdatingRole(row.id)
         await mutateWithAudit(supabaseBrowserClient, {
@@ -379,7 +396,7 @@ function sortUserRows(rows: UserRow[], sort: { key: string; dir: 'asc' | 'desc' 
         setUpdatingRole(null)
       }
     },
-    [hasWriteAccess, t, table],
+    [hasWriteAccess, t, table, confirm],
   )
 
   /* ---- (b) toplu rol değişimi — UPDATE, mutateWithAudit kapısından ---- */
@@ -393,6 +410,8 @@ function sortUserRows(rows: UserRow[], sort: { key: string; dir: 'asc' | 'desc' 
       if (ids.length === 0) return
       const ok = await confirm({
         description: t('admin.users.bulk.confirm', { count: String(ids.length), role: t(`roles.${newRole}`) }),
+        confirmLabel: t('admin.users.roleConfirm.confirmLabel', { role: t(`roles.${newRole}`) }),
+        tone: newRole === 'super_admin' ? 'danger' : 'default',
       })
       if (!ok) return
       try {
