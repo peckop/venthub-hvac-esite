@@ -198,10 +198,19 @@ Key tables in Supabase:
 - `inventory_movements` - Stock tracking
 
 ### Migration Workflow
+
+> ⛔ **BU BÖLÜM ARTIK GEÇERSİZ VE TEHLİKELİ — 2026-08-17 ölçümüyle güncellendi (T073-VH).**
+> Proje CLI'ın ledger'ını (`supabase_migrations.schema_migrations`) KULLANMIYOR; migration'lar
+> `supabase-migrate.yml` içinde `psql` ile uygulanıp `public._migration_ledger`'a kaydediliyor.
+> Ölçüldü: proje ledger'ı **208/208 tam**, CLI ledger'ı ise **110 kayıtta bayat**.
+> Bu yüzden **`supabase db push` ÇALIŞTIRMAYIN**: CLI 98+ migration'ı "uygulanmamış" sanıp
+> yeniden uygulamaya kalkar ve çoğu idempotent değildir → prod'a ağır hasar.
+> Aşağıdaki komutlar tarihsel kayıt olarak bırakıldı; uygulanacak yol tek: PR → merge → workflow.
+
 ```powershell
 # Local development
 supabase db reset                 # Reset with all migrations
-supabase db push                  # Generate migration from schema diff
+# supabase db push                # ⛔ YASAK — yukarıdaki uyarıya bak (T073-VH)
 
 # Manual migration script (Windows)
 $env:SUPABASE_DB_URL="postgresql://..."

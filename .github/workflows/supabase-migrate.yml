@@ -131,3 +131,41 @@ jobs:
           done
           echo "### Supabase Migrate" >> "$GITHUB_STEP_SUMMARY"
           echo "- Uygulanan: $applied · Atlanan (ledger'da): $skipped" >> "$GITHUB_STEP_SUMMARY"
+
+      # ══════════════════════════════════════════════════════════════════════
+      # LEDGER PARİTESİ — sistemin GERÇEKTEN kullandığı defter tam mı? (T073-VH)
+      #
+      # NİÇİN VAR: bu proje CLI'ın ledger'ını (`supabase_migrations.schema_migrations`)
+      # KULLANMAZ; migration'lar burada `psql` ile uygulanır ve `public._migration_ledger`'a
+      # kaydedilir. 2026-08-17 ölçümü: proje ledger'ı 208/208 TAM, CLI ledger'ı 110 kayıtta
+      # bayat (Nisan'da donmuş; aslında hiç tam olmamış — o tarihe kadarki dosya sayısı 160).
+      #
+      # Yani bugün sapma YOK; bu adım sapmanın GERİ GELMESİNİ engeller. Ledger, atlama
+      # kararının tek dayanağı: bir dosya ledger'da görünüyor ama uygulanmamışsa (ya da
+      # tersi) koşu sessizce yanlış şeyi atlar/uygular. Bu adım o sessizliği kırar.
+      #
+      # İKİ YÖN DE HATA:
+      #  · dosya var, ledger'da yok  → bir sonraki koşu onu YENİDEN uygular (non-idempotent
+      #    dosyada hasar demektir)
+      #  · ledger'da var, dosya yok  → uygulanmış bir migration repodan silinmiş; DB ile
+      #    repo ayrışmış, DR/yeniden kurulum eksik şema üretir
+      - name: Ledger paritesi (dosya listesi == _migration_ledger)
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -1 supabase/migrations/*.sql | xargs -n1 basename | LC_ALL=C sort > /tmp/dosyalar.txt
+          psql "$DB_URL" -tAc "select name from public._migration_ledger;" \
+            | sed '/^$/d' | LC_ALL=C sort > /tmp/ledger.txt
+
+          eksik=$(comm -23 /tmp/dosyalar.txt /tmp/ledger.txt || true)
+          fazla=$(comm -13 /tmp/dosyalar.txt /tmp/ledger.txt || true)
+
+          if [ -n "${eksik}${fazla}" ]; then
+            [ -n "$eksik" ] && { echo "::error::Ledger'da OLMAYAN migration dosyaları (bir sonraki koşu bunları YENİDEN uygular):"; echo "$eksik"; }
+            [ -n "$fazla" ] && { echo "::error::Ledger'da olup repoda BULUNMAYAN kayıtlar (uygulanmış migration silinmiş — DB ile repo ayrışmış):"; echo "$fazla"; }
+            echo "::error::Ledger paritesi BOZUK. Bu defter 'atla' kararının tek dayanağıdır; bozukken koşu sessizce yanlış şeyi uygular."
+            exit 1
+          fi
+          echo "- Ledger paritesi: $(wc -l < /tmp/dosyalar.txt) dosya == $(wc -l < /tmp/ledger.txt) kayıt ✅" >> "$GITHUB_STEP_SUMMARY"
