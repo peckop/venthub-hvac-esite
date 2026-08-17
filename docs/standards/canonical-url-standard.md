@@ -51,9 +51,14 @@ emniyet ağıdır. **Prod'da bu değişkeni set etmek Recep tarafındaki açık 
 İstemci bileşeni (`Seo.tsx`) bir kanonik daha basıyorsa değeri RSC'ninkiyle **birebir** olmak
 zorundadır — bugün ürün sayfasında böyledir (ikisi de `SITE_URL`'den, aynı yardımcıyla).
 
-## 4. ⚠ AÇIK KUSUR — kanonik, sitemap ile çelişiyor (2026-08-17 ölçümü)
+## 4. ✅ KAPANDI — kanonik, sitemap ile çelişiyordu (ölçüm 2026-08-17, düzeltme 2026-08-18)
 
-**Bu cetvelin yazılması sırasında ölçüldü; henüz DÜZELTİLMEDİ.** Sahibi §6'da.
+**T083-VH.** Aşağıdaki kusur bu cetvelin yazılması sırasında ölçüldü ve tek PR'da kapatıldı:
+ürün + marka sayfası kanonikleri dil öneki aldı, `alternates.languages` (tr/en/x-default)
+eklendi, `ProductDetailPageView` istemci kanoniği `localizedHref` ile hizalandı ve
+`INV-CANONICAL-2` bekçisi aynı PR'da indi (sabotaj 5/5 + istemci yüzeyi 3/3).
+
+Kayıt olarak bırakılıyor — kusurun **niçin görünmez** olduğu, tekrar etmemesi için değerlidir:
 
 `src/middleware.ts:86-87`: dil öneki taşımayan her kullanıcı rotası **307 ile**
 `/${detectedLocale}${pathname}` adresine yönlendirilir ve hedef dil **`Accept-Language`
@@ -61,12 +66,12 @@ başlığına göre** seçilir.
 
 Buna rağmen iki yüzey kanonik adresi **dil öneksiz** üretiyor:
 
-| Yüzey | Kanonik (bugün) | Sitemap'in bildirdiği | hreflang |
-|---|---|---|---|
-| Ana sayfa | `/tr`, `/en` | `/tr`, `/en` | var ✔ |
-| Kategori | `/tr/category/…` | `/tr/category/…` | var ✔ |
-| **Ürün** | `/products/<slug>` ✗ | `/tr/products/…` + `/en/products/…` | **yok** ✗ |
-| **Marka** | `/brands/<slug>` ✗ | `/tr/brands/…` + `/en/brands/…` | **yok** ✗ |
+| Yüzey | Kanonik (kusurluyken) | Sitemap'in bildirdiği | hreflang | Bugün |
+|---|---|---|---|---|
+| Ana sayfa | `/tr`, `/en` | `/tr`, `/en` | vardı ✔ | ✔ |
+| Kategori | `/tr/category/…` | `/tr/category/…` | vardı ✔ | ✔ |
+| **Ürün** | `/products/<slug>` ✗ | `/tr/products/…` + `/en/products/…` | **yoktu** ✗ | ✅ düzeltildi |
+| **Marka** | `/brands/<slug>` ✗ | `/tr/brands/…` + `/en/brands/…` | **yoktu** ✗ | ✅ düzeltildi |
 
 Üç ayrı sonuç doğurur:
 
@@ -79,12 +84,19 @@ Buna rağmen iki yüzey kanonik adresi **dil öneksiz** üretiyor:
    sayar ve bir dili indeksten düşürebilir. hreflang de yok, yani ayırt edecek ikinci sinyal
    de yok. Sitemap doğru olanı bildiriyor, sayfa onu **çürütüyor**.
 
-**Doğrusu** (kategori sayfasında zaten uygulanan desen): kanonik `${SITE_URL}/${lang}${Routes.x(...)}`
-olmalı **ve** `alternates.languages` ile TR/EN karşılıkları verilmelidir.
+**Uygulanan çözüm** (kategori sayfasında zaten var olan desen kopyalandı): kanonik
+`${SITE_URL}/tr|en${Routes.x(...)}` biçiminde kuruluyor **ve** `alternates.languages`
+(tr/en/x-default) veriliyor. `Routes.x` kullanımı kasıtlı: `sitemap.ts` de birebir aynı
+ifadeyi kullanır, böylece iki yüzey aynı kaynaktan üretilir ve sessizce ayrışamaz.
 
-Bu ölçüm düzeltmeyle birlikte kapanacak; kapandığında `INV-CANONICAL-2` (kanonik ↔ sitemap
-tutarlılığı) bekçisi de aynı PR'da inmelidir. **Bekçi düzeltmeden önce inmez** — yoksa master'ı
-kırar ve kimse düzeltemeden yeşile çekilmeye çalışılır.
+**İki süreç dersi bu işten çıktı:**
+
+1. **Bekçi düzeltmeden ÖNCE inmedi.** Kusurun sahibi olan dosya başka bir şeritteyken bekçiyi
+   master'a göndermek, kimsenin düzeltemeyeceği bir kırmızı yaratırdı — ve o kırmızı,
+   düzeltmek yerine *"testi gevşetelim"* baskısı üretirdi. Bekçi ve düzeltme aynı PR'da indi.
+2. **Şerit kapısı Bash ile aşılmadı.** Ürün sayfası I18N-SWEEP'teyken `lane-guard` yazmayı
+   blokladı; devir beklendi. Bu arada dokunulabilen parçalar (marka, istemci yüzeyi, bekçi)
+   hazırlandı, PR açılmadı. Devir gelince kalan tek dosya bir turda kapandı.
 
 ## 5. Bekçinin kapsamı — ölçmediği sınıflar ADIYLA
 
@@ -115,12 +127,12 @@ kanonik ↔ sitemap tutarlılığı, hreflang varlığı, ve **istemci kanonik y
 
 | Dosya | Şerit |
 |---|---|
-| `src/config/siteUrl.ts`, `canonical-url-*` testleri, bu cetvel, `ProductDetailPageView.tsx` | LEGAL-SEO |
-| `src/app/[lang]/products/[slug]/page.tsx` | I18N-SWEEP |
-| `src/app/[lang]/brands/[slug]/page.tsx`, `src/app/sitemap.ts`, `src/middleware.ts` | sahipsiz — atama gerekir |
+| `src/config/siteUrl.ts`, `canonical-*` testleri, bu cetvel, `ProductDetailPageView.tsx` | LEGAL-SEO |
+| `src/app/[lang]/products/[slug]/page.tsx` | LEGAL-SEO *(I18N-SWEEP'ten devralındı, T083)* |
+| `src/app/[lang]/brands/[slug]/page.tsx`, `src/app/sitemap.ts`, `src/middleware.ts` | LEGAL-SEO |
+| `src/components/Seo.tsx` | sahipsiz — istemci kanonik yüzeyi, `INV-CANONICAL-2` koruyor |
 
-§4'ün düzeltmesi iki farklı şeridin dosyasına dokunur; **tek PR'da inmelidir** (kanonik ile
-sitemap yarım düzeltilirse çelişki sürer, sadece yeri değişir).
+Kanonik ile sitemap **tek PR'da** değişir: yarım düzeltilirse çelişki sürer, sadece yeri değişir.
 
 ## 7. Değişmez kurallar
 
