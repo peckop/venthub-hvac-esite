@@ -188,6 +188,50 @@ describe('orderStatusService', () => {
       expect(supabase.from).not.toHaveBeenCalled()
     })
 
+    /**
+     * M1 — `payment_status` yalnız paranın gerçekten hareket ettiği dalda yazılır.
+     *
+     * `received` (iade ürünü depoya ulaştı) dalı eskiden `payment_status:'refunded'`
+     * yazıyordu: para hâlâ satıcıdayken sipariş "iade edildi" görünüyordu. DB sözlüğü
+     * 'refunded' değerini kabul ettiği için hiçbir kısıt itiraz etmiyor, iade çağrısı
+     * yapılmadığı için sağlayıcı defterinde de iz kalmıyordu — bu yüzden görünmezdi.
+     *
+     * Bu iki test davranışsaldır (gerçek çağrının argümanını ölçer); haritayı okuyan
+     * statik bir iddia, yeniden adlandırma veya yeni bir dal eklenmesini göremezdi.
+     */
+    it.each(['received', 'cancelled', 'approved', 'rejected'])('should NOT write payment_status for %s (no money moved)', async (returnStatus) => {
+      const mockEq = vi.fn().mockResolvedValue({ error: null })
+      const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
+      ;(supabase.from as import("vitest").Mock).mockImplementation((table: string) =>
+        table === 'venthub_orders' ? { update: mockUpdate } : {},
+      )
+
+      await syncOrderFromReturn('order-1', returnStatus as string)
+
+      expect(mockUpdate).toHaveBeenCalledTimes(1)
+      const payload = mockUpdate.mock.calls[0][0] as Record<string, unknown>
+      expect(
+        'payment_status' in payload,
+        `"${returnStatus}" dalında para hareket etmez; payment_status yazmak muhasebe yalanıdır.`,
+      ).toBe(false)
+    })
+
+    it('should write payment_status ONLY on the refunded branch (money actually moved)', async () => {
+      const mockEq = vi.fn().mockResolvedValue({ error: null })
+      const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
+      ;(supabase.from as import("vitest").Mock).mockImplementation((table: string) =>
+        table === 'venthub_orders' ? { update: mockUpdate } : {},
+      )
+
+      await syncOrderFromReturn('order-1', 'refunded')
+
+      const payload = mockUpdate.mock.calls[0][0] as Record<string, unknown>
+      expect(
+        payload.payment_status,
+        'Para dalı da SESSIZCE kaybolmamalı — M1 düzeltmesi fazla geniş uygulanırsa iade hiç kaydedilmez.',
+      ).toBe('refunded')
+    })
+
     it('should return error if update fails', async () => {
       const mockEq = vi.fn().mockResolvedValue({ error: new Error('Update failed') })
       const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq })
