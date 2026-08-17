@@ -279,6 +279,36 @@ yükü altındadır" şartı pratikte karşılanamıyordu. Kurulan ekranın bağ
 müşteri INSERT'i migration gerektirir; migration Recep kapısıdır ve zorunlu olmayan bir
 ürün özelliği için açılmaz. Anonim (hesapsız) başvuru ayrıca e-posta doğrulama akışı ister.
 
+### 3.6 Musteri kanali — /account/data-requests (T063 PR-2, MIGRATION)
+
+§3.5 defterin ADMIN yuzunu kurdu; bu bolum veri sahibinin kendi yuzunu tanimlar.
+**Hukuki konum degismedi:** zorunlu kanal hala kayitli e-posta/KEP'tir (§3.1); bu ekran
+onun yerine gecmez, **ek** bir yoldur ve self-servis silme dugmesi DEGILDIR.
+
+Neden migration gerekti: tablonun tek politikasi admin'di, yani giris yapmis kullanici
+KENDI talebini ne acabiliyor ne gorebiliyordu. Iki kapi BIRLIKTE konur:
+
+1. **Satir kapisi (RLS):** kullanici yalniz `user_id = auth.uid()` satirini gorur/yazar.
+2. **Kolon kapisi (GRANT):** RLS kolon-duzeyi kontrol ETMEZ. Yalniz satir kapisi konsa
+   kullanici `status='completed'`, `outcome=...`, `due_at=<uzak tarih>` ile INSERT edip
+   **defteri kirletir** — kendi talebini sonuclanmis gosterebilir ya da yasal sureyi
+   kaydirabilir. Bu yuzden yazilabilir kolonlar ADLA sayilir:
+   `applicant_email, request_type, user_id`. Sure/durum/sonuc/saklanan-veri notu ve
+   kimlik-tevsik damgasi YALNIZ admin tarafindan yazilir. **UPDATE grant'i yoktur:**
+   acilan talep musteri tarafindan degistirilemez, defter ispat aracidir.
+
+**Kimlik tevsiki DB'de zorlanir:** `applicant_email` JWT e-postasina esit olmak
+zorundadir. Tebligin "sistemde kayitli e-posta" sartinin teknik karsiligi budur ve
+kullanicinin baskasi adina talep acmasini engeller. `identity_verified_at` damgasini
+kullanici YAZAMAZ (bilincli): oturumdan gelen talepte kimlik teknik olarak dogrulanmistir
+ama tevsik hukuki bir degerlendirmedir, istemcinin beyani degil.
+
+**Kapsam disi:** anonim (hesapsiz) basvuru — ayrica e-posta dogrulama akisi ister; bugun
+o kisi zorunlu kanali (e-posta/KEP) kullanir ve admin deftere isler.
+
+Bekci: INV-KVKK-1 R6 (kolon grant + UPDATE yasagi), R7 (kimlik tevsiki), R8 (musteri
+yuzeyi defteri degistirmez).
+
 ---
 
 ## 4) Fatura verisi kalitesi

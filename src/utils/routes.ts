@@ -99,7 +99,9 @@ export const Routes = {
     profile: () => '/account/profile' as Route,
     favorites: () => '/account/favorites' as Route,
     projects: () => '/account/projects' as Route,
-    security: () => '/account/security' as Route
+    security: () => '/account/security' as Route,
+    // KVKK basvuru kanali (T063). INV-AUTH-2 R1: rota+sayfa AYNI PR'da.
+    dataRequests: () => '/account/data-requests' as Route
   },
   
   // Yönetici

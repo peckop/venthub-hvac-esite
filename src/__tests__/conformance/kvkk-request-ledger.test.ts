@@ -40,6 +40,12 @@ const MIGRATIONS: Record<string, string> = import.meta.glob(
   { query: '?raw', import: 'default', eager: true },
 )
 
+/** Müşteri kanalı migration'ı (PR-2) — RLS + kolon grant. */
+const CHANNEL_MIGRATIONS: Record<string, string> = import.meta.glob(
+  '/supabase/migrations/*_dsr_customer_*.sql',
+  { query: '?raw', import: 'default', eager: true },
+)
+
 const SOURCES: Record<string, string> = import.meta.glob(
   '/src/{views,lib,config}/**/*.{ts,tsx}',
   { query: '?raw', import: 'default', eager: true },
@@ -180,6 +186,47 @@ describe('INV-KVKK-1 · veri sahibi talep defteri', () => {
     expect(isTerminalStatus('completed')).toBe(true)
     expect(isTerminalStatus('rejected')).toBe(true)
     expect(isTerminalStatus('in_progress')).toBe(false)
+  })
+
+  /* ---- müşteri kanalı (PR-2) — RLS satır kapısı YETMEZ, kolon kapısı da şart ---- */
+
+  it('R6: müşteri kanalı — yazılabilir kolonlar ADLA sınırlı (RLS kolon kontrolü YAPMAZ)', () => {
+    const sql = Object.values(CHANNEL_MIGRATIONS)[0]
+    expect(sql, 'müşteri kanalı migration dosyası bulunamadı').toBeTruthy()
+    const clean = stripSqlComments(sql!)
+
+    // Kolon-düzeyi insert grant'i ZORUNLU: yoksa müşteri status='completed' yazıp
+    // kendi talebini "sonuçlanmış" gösterebilir, due_at'ı kaydırabilir.
+    const grantMatch = clean.match(/grant\s+insert\s*\(([^)]*)\)\s*\n?\s*on\s+public\.data_subject_requests\s+to\s+authenticated/i)
+    expect(grantMatch, 'kolon-düzeyi insert grant yok — RLS tek başına kolonu korumaz').toBeTruthy()
+
+    const granted = grantMatch![1].split(',').map(c => c.trim())
+    // Süre/durum/sonuç alanları müşteriye ASLA verilmez.
+    for (const forbidden of ['status', 'due_at', 'outcome', 'retained_data_note', 'identity_verified_at', 'completed_at', 'handled_by']) {
+      expect(granted, `'${forbidden}' müşteriye yazma izni verilmiş — defter kirletilebilir`).not.toContain(forbidden)
+    }
+    // Müşteri UPDATE edemez: açılan talep sonradan değiştirilemez (ispat izi).
+    expect(/grant\s+update[^;]*data_subject_requests[^;]*authenticated/i.test(clean)).toBe(false)
+  })
+
+  it('R7: müşteri kanalı — kimlik tevsiki DB\'de zorlanır (applicant_email = JWT email)', () => {
+    const sql = Object.values(CHANNEL_MIGRATIONS)[0]
+    const clean = stripSqlComments(sql!)
+    // INSERT politikasının with check'i hem sahipliği hem e-posta eşleşmesini istemeli.
+    const insertPolicy = clean.slice(clean.indexOf('p_dsr_owner_insert'))
+    expect(insertPolicy).toMatch(/user_id\s*=\s*\(?\s*select\s+auth\.uid\(\)/i)
+    expect(
+      /applicant_email\s*=\s*\(?\s*select\s+auth\.jwt\(\)\s*->>\s*'email'/i.test(insertPolicy),
+      'applicant_email JWT e-postasına bağlanmamış — kullanıcı başkası adına talep açabilir',
+    ).toBe(true)
+  })
+
+  it('R8: müşteri sayfası defteri DEĞİŞTİRMEZ (yalnız açar ve okur)', () => {
+    const pageSrc = stripTsComments(source('/src/views/account/DataRequestsPage.tsx'))
+    expect(pageSrc).toContain('createDataSubjectRequest')
+    expect(pageSrc).toContain('listDataSubjectRequests')
+    // Süreci müşteri yürütmez: güncelleme çağrısı bu yüzeyde olamaz.
+    expect(pageSrc.includes('updateDataSubjectRequest'), 'müşteri yüzeyi talebi güncelliyor').toBe(false)
   })
 
   it('parseCheckValues sağlığı: sentetik CHECK\'i okur, ilgisiz kolonu okumaz', () => {
