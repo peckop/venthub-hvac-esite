@@ -87,7 +87,7 @@ Deno.serve(async (req: Request) => {
 
     const profileRow = firstProfileRow(await roleCheck.json().catch(() => []));
     const role = profileRow?.role;
-    if (role !== 'admin' && role !== 'superadmin') {
+    if (role !== 'admin' && role !== 'super_admin') {
       return new Response(JSON.stringify({ error: 'forbidden', message: 'Insufficient privileges' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
     }
 

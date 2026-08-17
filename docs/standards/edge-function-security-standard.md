@@ -126,10 +126,16 @@ if (userErr || !userRes?.user) return json({ error: 'unauthorized' }, 401)
 const { data: profile, error: profErr } = await supabaseAdmin
   .from('user_profiles').select('role').eq('id', userRes.user.id).maybeSingle()
 const userRole = profile?.role as string | undefined
-if (profErr || !userRole || !['admin', 'superadmin'].includes(userRole)) {
+if (profErr || !userRole || !['admin', 'super_admin'].includes(userRole)) {
   return json({ error: 'forbidden' }, 403)
 }
 ```
+> ⚠️ **Rol literali DB sözlüğünden gelir.** Bu örnek 2026-08-17'ye kadar `'superadmin'` yazıyordu
+> ve **hata buradan yayıldı**: 15 edge fonksiyonu örneği kopyaladı, R8 bekçisi de aynı ölü yazımı
+> arıyordu — yani hem kaynak hem kapı yanlışı öğretiyordu. Canlı `user_profiles_role_check` yalnız
+> `{super_admin, admin, moderator, warehouse, sales, viewer, user}` kabul eder; `superadmin` bir
+> satıra yazılamaz bile, dolayısıyla o dal hiç eşleşmez ve **en yetkili kullanıcı 403 alır**
+> (M4). Sözlük dışına çıkmayı artık `INV-EDGE-ROLE-1` imkânsız kılıyor.
 - Rol okuması **`supabaseAdmin` (service_role)** ile yapılır — kullanıcı client'ı RLS altında kendi
   profilini görmeyebilir; ama **okunan `id` daima doğrulanmış JWT'den gelir**, istekten değil.
 - İstek gövdesinden gelen `user_id` / `role` / `is_admin` alanları **asla** yetki kaynağı olamaz.

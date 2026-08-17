@@ -171,11 +171,10 @@ Deno.serve(async (req) => {
     // yetki vermez; o karar tüccarındır. Müşterinin meşru yolu iade TALEBİ açmaktır
     // (`venthub_returns`), talebi admin onaylar ve iadeyi admin ekranı tetikler.
     //
-    // NOT (bilinçli, kapsam dışı): aşağıdaki rol listesinde ölü `'superadmin'` yazımı
-    // duruyor — DB CHECK kısıtı yalnız `super_admin` kabul ediyor, yani o dal hiç
-    // eşleşmez. Zararsız (kanonik yazım zaten listede) ama 14 edge fonksiyonunda aynı
-    // ölü yazım TEK kapı olarak kullanılıyor ve orada 403 üretiyor → M4 dalgasında
-    // topluca temizlenecek; burada tek başına silmek o dalganın sabotaj kanıtını bulandırır.
+    // Rol literalleri DB sözlüğünden: `user_profiles_role_check` yalnız
+    // {super_admin, admin, moderator, warehouse, sales, viewer, user} kabul eder.
+    // (M4 dalgası, 2026-08-17: burada duran ölü `'superadmin'` yazımı temizlendi;
+    //  sözlük-dışı literali INV-EDGE-ROLE-1 kapısı artık imkânsız kılıyor.)
     let isAdmin = false;
     const prof = await fetch(
       `${supabaseUrl}/rest/v1/user_profiles?id=eq.${encodeURIComponent(reqUserId)}&select=role`,
@@ -184,7 +183,7 @@ Deno.serve(async (req) => {
     if (prof.ok) {
       const arr = await prof.json().catch(() => []);
       const profileRow = Array.isArray(arr) ? arr[0] : null;
-      isAdmin = profileRow?.role === 'admin' || profileRow?.role === 'super_admin' || profileRow?.role === 'superadmin';
+      isAdmin = profileRow?.role === 'admin' || profileRow?.role === 'super_admin';
     }
     if (!isAdmin) return json({ error: { code: "FORBIDDEN", message: "Yetkisiz" } }, 403);
 

@@ -11,7 +11,7 @@ import {
 } from '../_shared/caller.ts'
 
 /** Cetvel §3.2 — yetkili roller. Gövdeden gelen `role`/`is_admin` ASLA kaynak değildir. */
-const ADMIN_ROLES: readonly string[] = ['admin', 'superadmin']
+const ADMIN_ROLES: readonly string[] = ['admin', 'super_admin']
 
 /**
  * KAPI HATASI → HTTP EŞLEMESİ (T026-VH Adım 3 · BEŞ bildirim ucunda BİREBİR AYNI):
