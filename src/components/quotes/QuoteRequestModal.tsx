@@ -9,8 +9,7 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { useAuth } from '../../hooks/useAuth'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
-import { createQuoteRequest } from '../../lib/services/quoteService'
-import type { QuoteSource } from '../../types/quotes.bridge'
+import { createQuoteRequest, type QuoteSource } from '../../lib/services/quoteService'
 
 /**
  * Teklif isteme modali — T067-VH v1 (cetvel: docs/standards/quote-standard.md §Q4).

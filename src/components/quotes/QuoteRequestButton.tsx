@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { useAuth } from '../../hooks/useAuth'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
-import type { QuoteSource } from '../../types/quotes.bridge'
+import type { QuoteSource } from '../../lib/services/quoteService'
 import QuoteRequestModal, { type QuoteRequestModalItem } from './QuoteRequestModal'
 
 /**

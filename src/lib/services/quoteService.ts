@@ -8,23 +8,24 @@
  * fiyat kolonlarına (unit_price/currency/valid_until) yazan hiçbir yol içermez.
  * Admin fiyatlaması admin kuyruğunda `mutateWithAudit` kapısından yapılır.
  *
- * Köprü tipler: migration merge edilene kadar `withQuotesSchema` sarmalayıcısı
- * kullanılır (src/types/quotes.bridge.ts — regen sonrası silinecek).
+ * Tipler `database.types.ts`'ten (supabase:gen) gelir; status/source DB'de text
+ * olduğundan üretilen tip `string`'dir — geçiş meşruluğunu SSOT makinesi + DB
+ * tetiği zorlar, UI kaynak-tip prop'ları için dar `QuoteSource` burada tanımlı.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
 import {
-  type QuoteItemRow,
-  type QuoteRow,
-  type QuoteSource,
-  withQuotesSchema,
-} from '../../types/quotes.bridge'
-import {
   allowedCustomerQuoteActions,
   type QuoteStatus,
 } from '../quotes/quoteStatusMachine'
+
+export type QuoteRow = Database['public']['Tables']['venthub_quotes']['Row']
+export type QuoteItemRow = Database['public']['Tables']['venthub_quote_items']['Row']
+
+/** v1 giriş kapıları (cetvel Q4) — DB check kısıtının UI aynası. */
+export type QuoteSource = 'pdp' | 'cart' | 'project'
 
 export interface QuoteRequestItemInput {
   productId: string | null
@@ -56,9 +57,7 @@ export async function createQuoteRequest(
     throw new Error('quote request needs at least one item')
   }
 
-  const db = withQuotesSchema(supabase)
-
-  const { data: quote, error } = await db
+  const { data: quote, error } = await supabase
     .from('venthub_quotes')
     .insert({
       user_id: input.userId,
@@ -69,7 +68,7 @@ export async function createQuoteRequest(
     .single()
   if (error) throw error
 
-  const { error: itemsError } = await db.from('venthub_quote_items').insert(
+  const { error: itemsError } = await supabase.from('venthub_quote_items').insert(
     input.items.map((item) => ({
       quote_id: quote.id,
       product_id: item.productId,
@@ -93,9 +92,7 @@ export async function createQuoteRequest(
 export async function listMyQuotes(
   supabase: SupabaseClient<Database>,
 ): Promise<QuoteWithItems[]> {
-  const db = withQuotesSchema(supabase)
-
-  const { data: quotes, error } = await db
+  const { data: quotes, error } = await supabase
     .from('venthub_quotes')
     .select()
     .order('created_at', { ascending: false })
@@ -104,7 +101,7 @@ export async function listMyQuotes(
 
   // Kalemler ikinci sorguyla (köprü şemada ilişki metadata'sı yok — nested select
   // regen'den SONRA düşünülebilir; iki düz sorgu tip-güvenli ve yeterli).
-  const { data: items, error: itemsError } = await db
+  const { data: items, error: itemsError } = await supabase
     .from('venthub_quote_items')
     .select()
     .in('quote_id', quotes.map((q) => q.id))
@@ -126,9 +123,7 @@ export async function getQuoteDetail(
   supabase: SupabaseClient<Database>,
   quoteId: string,
 ): Promise<QuoteWithItems | null> {
-  const db = withQuotesSchema(supabase)
-
-  const { data: quote, error } = await db
+  const { data: quote, error } = await supabase
     .from('venthub_quotes')
     .select()
     .eq('id', quoteId)
@@ -136,7 +131,7 @@ export async function getQuoteDetail(
   if (error) throw error
   if (!quote) return null
 
-  const { data: items, error: itemsError } = await db
+  const { data: items, error: itemsError } = await supabase
     .from('venthub_quote_items')
     .select()
     .eq('quote_id', quoteId)
@@ -159,8 +154,7 @@ export async function decideQuote(
     throw new Error(`invalid customer quote transition: ${quote.status} -> ${decision}`)
   }
 
-  const db = withQuotesSchema(supabase)
-  const { error } = await db
+  const { error } = await supabase
     .from('venthub_quotes')
     .update({ status: decision })
     .eq('id', quote.id)

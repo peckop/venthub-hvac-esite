@@ -20,8 +20,8 @@ import { formatDate, formatTime } from '../../../i18n/datetime'
 import { formatCurrency } from '../../../i18n/format'
 import { useI18n } from '../../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../../lib/ensureSessionFresh'
+import { type QuoteItemRow, type QuoteRow, type QuoteSource } from '../../../lib/services/quoteService'
 import type { Database } from '../../../types/database.types'
-import { type QuoteItemRow, type QuoteRow, type QuoteSource,withQuotesSchema } from '../../../types/quotes.bridge'
 import { adminTableActionPrimaryClass } from '../../../utils/adminUi'
 
 /**
@@ -92,9 +92,7 @@ async function quotesFetcher(
   params: FetchParams,
 ): Promise<FetchResult<QuoteAdminRow>> {
   await ensureSessionFresh()
-  const db = withQuotesSchema(supabase)
-
-  let query = db.from('venthub_quotes').select('*', { count: 'exact' })
+  let query = supabase.from('venthub_quotes').select('*', { count: 'exact' })
 
   // URL'den gelen filtre değerleri string'dir; typed kolona geçmeden SSOT/enum
   // bekçisiyle daraltılır (bilinmeyen değer sessizce süzülür, sorguya sızmaz).
@@ -109,7 +107,7 @@ async function quotesFetcher(
   // Arama: başlıkta metin yok — terim kalem adı üzerinden quote id'lerine çevrilir.
   const term = params.query.trim()
   if (term) {
-    const { data: matches, error: matchError } = await db
+    const { data: matches, error: matchError } = await supabase
       .from('venthub_quote_items')
       .select('quote_id')
       .ilike('product_name', `%${term}%`)
@@ -134,7 +132,7 @@ async function quotesFetcher(
   const totalMatched = typeof count === 'number' ? count : quotes.length
   if (quotes.length === 0) return { rows: [], totalMatched }
 
-  const { data: items, error: itemsError } = await db
+  const { data: items, error: itemsError } = await supabase
     .from('venthub_quote_items')
     .select('*')
     .in('quote_id', quotes.map((q) => q.id))
@@ -193,8 +191,7 @@ const QuotesTableBody: React.FC = () => {
 
   const fetchFacetCounts = useCallback(async () => {
     try {
-      const db = withQuotesSchema(supabaseBrowserClient)
-      const { data, error } = await db.from('venthub_quotes').select('status, source')
+      const { data, error } = await supabaseBrowserClient.from('venthub_quotes').select('status, source')
       if (error) throw error
       const status: Record<string, number> = {}
       const source: Record<string, number> = {}
@@ -277,9 +274,8 @@ const QuotesTableBody: React.FC = () => {
           after: { items: updates },
           auditedByEdge: false,
           fn: async () => {
-            const db = withQuotesSchema(supabaseBrowserClient)
-            for (const u of updates) {
-              const { error } = await db
+                  for (const u of updates) {
+              const { error } = await supabaseBrowserClient
                 .from('venthub_quote_items')
                 .update({ unit_price: u.unit_price, currency: u.currency, valid_until: u.valid_until })
                 .eq('id', u.itemId)
@@ -331,10 +327,9 @@ const QuotesTableBody: React.FC = () => {
           after: { status: newStatus },
           auditedByEdge: false,
           fn: async () => {
-            const db = withQuotesSchema(supabaseBrowserClient)
-            const { error } = await db
+                  const { error } = await supabaseBrowserClient
               .from('venthub_quotes')
-              .update({ status: newStatus as QuoteRow['status'] })
+              .update({ status: newStatus })
               .eq('id', row.id)
             if (error) throw error
 

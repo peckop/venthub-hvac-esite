@@ -3068,6 +3068,142 @@ export type Database = {
           },
         ]
       }
+      venthub_quote_items: {
+        Row: {
+          created_at: string
+          currency: string | null
+          id: string
+          note: string | null
+          product_id: string | null
+          product_name: string
+          qty: number
+          quote_id: string
+          tenant_id: string
+          unit_price: number | null
+          updated_at: string
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          id?: string
+          note?: string | null
+          product_id?: string | null
+          product_name: string
+          qty: number
+          quote_id: string
+          tenant_id?: string
+          unit_price?: number | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          id?: string
+          note?: string | null
+          product_id?: string | null
+          product_name?: string
+          qty?: number
+          quote_id?: string
+          tenant_id?: string
+          unit_price?: number | null
+          updated_at?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venthub_quote_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "venthub_quote_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_velocity"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "venthub_quote_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quote_items_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quote_items_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venthub_quotes: {
+        Row: {
+          created_at: string
+          id: string
+          source: string
+          source_project_id: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          source: string
+          source_project_id?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          source?: string
+          source_project_id?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venthub_quotes_source_project_id_fkey"
+            columns: ["source_project_id"]
+            isOneToOne: false
+            referencedRelation: "user_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quotes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venthub_quotes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venthub_returns: {
         Row: {
           admin_notes: string | null
