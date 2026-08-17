@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
+import { invokeShippingUpdate, SharedTrackingDeclinedError } from '@/utils/adminShipping'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -538,6 +539,23 @@ const OrdersTableBody: React.FC = () => {
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('orders')
 
+  /**
+   * Sunucu 409 (`tracking_number_in_use`) döndüğünde sorulan onay. Lojistik yüzeyi
+   * de AYNI sözlük anahtarlarını kullanır: aynı karar iki yerde iki farklı cümleyle
+   * sorulursa admin ikisinin aynı şey olduğunu anlamaz.
+   */
+  const askSharedTracking = useCallback(
+    (count: number) =>
+      confirm({
+        title: t('admin.common.sharedTracking.title'),
+        description: t('admin.common.sharedTracking.description', { count: String(count) }),
+        confirmLabel: t('admin.common.sharedTracking.confirmLabel'),
+        cancelLabel: t('admin.common.sharedTracking.cancelLabel'),
+        tone: 'default',
+      }),
+    [confirm, t],
+  )
+
   const table = useAdminTable<AdminOrderRow>({
     resource: 'orders',
     rowId: (r) => r.id,
@@ -800,16 +818,22 @@ const OrdersTableBody: React.FC = () => {
           auditedByEdge: false,
           fn: async () => {
             const turl = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
-            const { error: fnErr } = await supabaseBrowserClient.functions.invoke('admin-update-shipping', {
-              body: {
-                order_id: shipId,
-                carrier: carrier.trim(),
-                tracking_number: tracking.trim(),
-                tracking_url: turl,
-                send_email: !!sendEmail,
-              },
-            })
-            if (fnErr) throw fnErr
+            const body = {
+              order_id: shipId,
+              carrier: carrier.trim(),
+              tracking_number: tracking.trim(),
+              tracking_url: turl,
+              send_email: !!sendEmail,
+            }
+            /* Takip numarası BAŞKA bir siparişte kayıtlıysa sunucu 409 döner. Bu ret
+               kaza da olabilir meşru bir birleştirme de — kararı admin verir. Onay
+               alınırsa istek AÇIK NİYET BEYANIYLA tekrarlanır; onaysız yazma yok. */
+            let res = await invokeShippingUpdate(supabaseBrowserClient, body)
+            if (!res.ok && res.conflict) {
+              if (!(await askSharedTracking(1))) throw new SharedTrackingDeclinedError()
+              res = await invokeShippingUpdate(supabaseBrowserClient, body, true)
+            }
+            if (!res.ok) throw res.error
           },
         })
         setShipOpen(false)
@@ -820,6 +844,12 @@ const OrdersTableBody: React.FC = () => {
         )
         await table.reload()
       } catch (e) {
+        /* Vazgeçmek HATA değildir: "başarısız oldu" demek admini olmayan bir arızayı
+           aramaya gönderirdi. Kendi kararı kendi diliyle geri bildirilir. */
+        if (e instanceof SharedTrackingDeclinedError) {
+          toast.info(t('admin.common.sharedTracking.declined'))
+          return
+        }
         toast.error(
           e instanceof AdminPermissionError
             ? t('admin.orders.toasts.noPermission')
@@ -854,6 +884,10 @@ const OrdersTableBody: React.FC = () => {
       counts.set(value, (counts.get(value) ?? 0) + 1)
     }
     const sharedCount = [...counts.values()].filter((n) => n > 1).reduce((sum, n) => sum + n, 0)
+    /* Onay ALINDIYSA sunucuya da SÖYLENMELİ. Bu küme, `allow_shared_tracking` beyanını
+       hangi satırların taşıyacağını belirler. Eski kod onayı topluyor ama isteğe hiç
+       koymuyordu: sunucu 409 döndürüyor, kullanıcının verdiği karar çöpe gidiyordu. */
+    const preApprovedTracking = new Set<string>()
     if (sharedCount > 0) {
       const approved = await confirm({
         title: t('admin.orders.bulk.duplicateTracking.title'),
@@ -863,12 +897,17 @@ const OrdersTableBody: React.FC = () => {
         tone: 'default',
       })
       if (!approved) return
+      for (const [value, n] of counts) {
+        if (n > 1) preApprovedTracking.add(value)
+      }
     }
 
     /* (3) Kısmi başarısızlıkta HANGİ siparişlerin düştüğü kullanıcıya gösterilir.
        Eski kod yalnız "bazıları başarısız" diyordu — kullanıcı hangi siparişi
        elle düzelteceğini bilemiyordu. */
     const failedLabels: string[] = []
+    /** Onaylanmayan (yazılmayan) siparişler — "başarısız" değil, kullanıcının KARARI. */
+    const declinedLabels: string[] = []
     try {
       await mutateWithAudit(supabaseBrowserClient, {
         resource: 'orders',
@@ -883,23 +922,44 @@ const OrdersTableBody: React.FC = () => {
         },
         auditedByEdge: false,
         fn: async () => {
-          const results = await Promise.all(
-            targets.map(async (row) => {
-              const trackingValue = (bulkTracking[row.id] ?? '').trim()
-              const turl = generateTrackingUrl(trimmedCarrier, trackingValue)
-              const { error: fnErr } = await supabaseBrowserClient.functions.invoke('admin-update-shipping', {
-                body: {
-                  order_id: row.id,
-                  carrier: trimmedCarrier,
-                  tracking_number: trackingValue,
-                  tracking_url: turl,
-                  send_email: !!sendEmail,
-                },
-              })
-              return { row, ok: !fnErr }
-            }),
+          const send = (row: AdminOrderRow, allowShared: boolean) => {
+            const trackingValue = (bulkTracking[row.id] ?? '').trim()
+            return invokeShippingUpdate(
+              supabaseBrowserClient,
+              {
+                order_id: row.id,
+                carrier: trimmedCarrier,
+                tracking_number: trackingValue,
+                tracking_url: generateTrackingUrl(trimmedCarrier, trackingValue),
+                send_email: !!sendEmail,
+              },
+              allowShared,
+            ).then((res) => ({ row, res }))
+          }
+
+          /* (3a) İlk tur: parti İÇİNDE mükerrer olanlar zaten onaylandı, beyanla gider. */
+          const first = await Promise.all(
+            targets.map((row) => send(row, preApprovedTracking.has((bulkTracking[row.id] ?? '').trim()))),
           )
-          const failed = results.filter((r) => !r.ok)
+
+          /* (3b) Parti DIŞINDAKİ bir siparişle çakışanları ancak sunucu bilir (409).
+             Hepsi için TEK onay sorulur — sipariş başına ayrı diyalog açmak, admini
+             aynı soruya arka arkaya cevap vermeye zorlar ve "hepsine evet" refleksi
+             doğurur; o refleks tam da kapının önlemek istediği şeydir. */
+          const conflicted = first.filter((r) => !r.res.ok && r.res.conflict)
+          let retried: typeof first = []
+          if (conflicted.length > 0) {
+            if (!(await askSharedTracking(conflicted.length))) {
+              declinedLabels.push(...conflicted.map((r) => orderLabel(r.row)))
+              throw new SharedTrackingDeclinedError()
+            }
+            retried = await Promise.all(conflicted.map((r) => send(r.row, true)))
+          }
+
+          const finalByRow = new Map(first.map((r) => [r.row.id, r]))
+          for (const r of retried) finalByRow.set(r.row.id, r)
+
+          const failed = [...finalByRow.values()].filter((r) => !r.res.ok)
           if (failed.length > 0) {
             failedLabels.push(...failed.map((r) => orderLabel(r.row)))
             throw new Error('bulk-shipping-partial-failure')
@@ -915,6 +975,13 @@ const OrdersTableBody: React.FC = () => {
     } catch (e) {
       if (e instanceof AdminPermissionError) {
         toast.error(t('admin.orders.toasts.noPermission'))
+      } else if (e instanceof SharedTrackingDeclinedError) {
+        /* Çakışmayanlar YAZILDI, çakışanlar kullanıcının kararıyla yazılmadı. Tablo
+           tazelenmezse ekran hem yazılanları hem yazılmayanları yanlış gösterir. */
+        toast.info(
+          `${t('admin.common.sharedTracking.declined')}${declinedLabels.length > 0 ? ` (${declinedLabels.join(', ')})` : ''}`,
+        )
+        await table.reload()
       } else if (failedLabels.length > 0) {
         toast.error(
           t('admin.orders.toasts.bulkShippingPartialFailed', {
@@ -928,7 +995,7 @@ const OrdersTableBody: React.FC = () => {
         toast.error(t('admin.orders.toasts.bulkShippingFailed'))
       }
     }
-  }, [bulkMode, shipId, carrier, tracking, sendEmail, hasWriteAccess, t, table, bulkTargets, bulkTracking, confirm])
+  }, [bulkMode, shipId, carrier, tracking, sendEmail, hasWriteAccess, t, table, bulkTargets, bulkTracking, confirm, askSharedTracking])
 
   /* ---- (c) Toplu kargo iptal ---- */
   const bulkCancelShipping = useCallback(async () => {
