@@ -6,95 +6,82 @@ source_path: C:\Users\alize\venthub-wt-quote\src\views\admin\quotes\QuotesTableB
 skeleton_hash: 08e99a2ea0ce7ffa
 entity_hashes:
   func:QuotesTableBody: d1bbb10c17fb9016
-  func:fetchCustomerMap: 7050a01fa857f163
-  func:isQuoteSource: bf6dc2747b1b49c9
-  func:quotesFetcher: f629574699cc2483
-  overview: 1eaf5f77179ec486
-  style_tokens: e9d177cc79a5c77b
-generated_at: 2026-08-16T11:36:52Z
+  func:fetchCustomerMap: da57b157dcf3adb0
+  func:isQuoteSource: ab3489a78af0e7bf
+  func:quotesFetcher: 546c53441445c9f6
+  overview: 8afffce1bd25e1cf
+  style_tokens: 1c66ade338e8765e
+generated_at: 2026-08-17T11:21:38Z
 ---
 
 ## Genel Bakış
-Bu modül, admin panelindeki teklifler tablosunun gövdesini oluşturan React bileşenini ve onun veri ihtiyaçlarını karşılama mantığını içerir. Teklif listesini çekip müşteri bilgileriyle eşleştirerek tabloda gösterilmesini sağlar. Tekliflerin kaynak türlerini sınıflandırmak için yardımcı bir fonksiyon da sunar.
+Bu modül, admin panelindeki teklifler tablosunun gövdesini oluşturan ana React bileşenini ve bu bileşenin ihtiyaç duyduğu verileri sağlayan asenkron veri çekme fonksiyonlarını bir arada sunar. Temel sorumluluğu, teklif listesini veritabanından çekip ilgili müşteri bilgileriyle eşleştirmek ve sonuçları kullanıcının görüntüleyeceği şekilde bir araya getirmektir. Modül, teklif kaynak türlerinin doğrulanması gibi yardımcı işlevleri de içerir ve SOURCE_VALUES/STATUS_VALUES gibi harici sabitlere bağlıdır.
 
 ## Fonksiyon Grupları
 ### Veri Çekme ve Eşleştirme
-Müşteri ve teklif verilerini Supabase veritabanından çeken asenkron fonksiyonlar. Teklif listesini alırken müşteri kimliklerini eşleştirip zenginleştirilmiş bir görünüm oluşturur.
+Bu grup, asenkron olarak Supabase veritabanıyla etkileşime girerek ham teklif ve müşteri verilerini çeker. Teklif listesini alırken, her bir teklife ait müşteri kimliğini (CustomerIdentity) eşleştirerek zenginleştirilmiş bir veri kümesi oluşturur.
 - fetchCustomerMap, quotesFetcher
 
 ### UI Bileşeni
-Admin panelindeki teklifler tablosunun gövdesini render eden ana React bileşeni. Çekilen verileri kullanıcıya sunar.
+Modülün ana çıktısı olan React bileşenidir. Sunucudan çekilen ve eşleştirilmiş teklif-veri setini alarak admin panelindeki tablonun gövdesini (satırlarını) render eder.
 - QuotesTableBody
 
 ### Yardımcı Fonksiyonlar
-Verilerin işlenmesinde kullanılan küçük yardımcı fonksiyonlar. Kaynak türünün doğrulanması gibi basit kontrolleri gerçekleştirir.
+Verilerin işlenmesi ve doğrulanması için kullanılan basit, saf yardımcı fonksiyonlar. Genellikle bir değer aralığına veya belirli bir tipe ait olup olmadığının kontrolü gibi tek amaçlı işleri yapar.
 - isQuoteSource
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, Supabase veritabanından teklif ve müşteri verilerini çekerek admin tablosunu dolduran React bileşenidir. Veri çekme ve eşleştirme süreçleri kritik bağımlılıklara bağlıdır.
 
-Bu modül, tekliflerin tablo halinde gösterilmesini sağlayan bir React bileşeni ve ilgili veri çekme fonksiyonlarından oluşur. Aşağıda modülün doğru çalışması için gerekli mimari varsayımlar listelenmektedir.
-
----
-
-**[Aksiyom 1]:** Eğer `SOURCE_VALUES` sabiti tanımlı değilse veya boş bir ifade ise, `isQuoteSource()` fonksiyonu herhangi bir değer için geçerli kaynak doğrulaması yapamaz ve hatalı kaynak değerleri tabloda hata ile gösterilebilir.
-
-**[Aksiyom 2]:** Eğer `STATUS_VALUES` sabiti tanımlı değilse veya boş bir ifade ise, teklif durumlarının filtrelenmesi veya doğru şekilde gösterilmesi çalışmayabilir.
-
-**[Aksiyom 3]:** Eğer `supabase` istemcisi (`SupabaseClient<Database>`) düzgün başlatılmamışsa veya geçersiz bir yapıdaysa, `fetchCustomerMap()` ve `quotesFetcher()` fonksiyonları veritabanı sorgularında başarısız olur ve sayfa yüklenemez.
-
-**[Aksiyom 4]:** Eğer `fetchCustomerMap()` için `userIds` dizisi boş (`[]`) ise, müşteri eşleştirme haritası (`map`) boş döner; bu durumda teklif satırlarında müşteri bilgileri gösterilemez ancak `failed` alanı `false` kalır.
-
-**[Aksiyom 5]:** Eğer `fetchCustomerMap()` fonksiyonu başarısız olursa (`failed: true`), müşteri bilgilerinin gösterildiği alanlarda `QuotesTableBody` bileşeni hata durumu veya boş değer göstermek zorundadır; aksi halde bileşen hata fırlatır.
-
-**[Aksiyom 6]:** Eğer `quotesFetcher()` için `FetchParams` parametresi geçersiz veya eksik alanlar içeriyorsa, fonksiyon `FetchResult` dönmeyebilir ve `QuotesTableBody` bileşeni veri olmadan render edilir.
-
-**[Aksiyom 7]:** Eğer veritabanında `quotes` tablosu veya ilgili tablolar (örn: customer, users) yoksa veya beklenen şemaya sahip değilse, hem `fetchCustomerMap()` hem de `quotesFetcher()` fonksiyonları başarısız olur.
-
-**[Aksiyom 8]:** Eğer `QuotesTableBody` bileşeni React bağlamı (`React.FC`) dışında çağrılıyorsa veya geçersiz prop'larla besleniyorsa, bileşen render hataları verir.
-
-**[Aksiyom 9]:** Eğer `isQuoteSource()` fonksiyonuna `string` dışı bir değer (örn: `number`, `null`, `undefined`) geçilirse, fonksiyonun davranışı belirsizdir; bu yalnızca `string` tipi için tanımlıdır.
-
----
-
-> **Not:** Bu aksiyomlar yalnızca verilen fonksiyon imzaları ve modül sabitlerinden türetilmiştir. Docstring, yorum veya değişken isimlerinden ek bilgi çıkarılmamıştır.
+[Aksiyom 1]: Eğer `fetchCustomerMap` fonksiyonuna geçilen `userIds` dizisi boşsa, boş bir müşteri haritası ve `failed: false` durumu döner; eşleştirme yapılamaz.
+[Aksiyom 2]: Eğer `fetchCustomerMap` fonksiyonuna geçilen `supabase` istemcisi geçersiz veya bağlantısaysa, Promise reddedilir veya `failed: true` ile sonuçlanır; müşteri bilgileri tam olarak yüklenemez.
+[Aksiyom 3]: Eğer `quotesFetcher` fonksiyonuna geçilen `supabase` istemcisi geçersizse veya `params` geçerli bir sorgu parametresi içermiyse, teklif listesi çekilemez; bileşen boş veya hata durumunda kalır.
+[Aksiyom 4]: Eğer `isQuoteSource` fonksiyonuna geçilen `value` parametresi `SOURCE_VALUES` sabitinde tanımlı bir değer değilse, `false` döner; bu durum filtreleme/gruplama mantığını etkiler.
+[Aksiyom 5]: Eğer `QuotesTableBody` bileşeni render edilmeden önce `quotesFetcher` ve `fetchCustomerMap` çağrıları tamamlanmamışsa veya başarısız olmuşsa, tabloda veri gösterilemez veya eksik müşteri bilgileriyle gösterilir.
+[Aksiyom 6]: Eğer `STATUS_VALUES` veya `SOURCE_VALUES` sabitleri modül içinde tanımsız veya boşsa, ilgili filtreleme ve sınıflandurma mantığı çalışmaz; bileşen beklenmeyen davranışı sergiler.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### isQuoteSource
-**Ne yapar**: Verilen bir string değerinin geçerli bir `QuoteSource` tipi olup olmadığını kontrol eden ve TypeScript type guard olarak davranan bir bekçi fonksiyondur. Bu fonksiyon sayesinde URL'den gelen filtre parametreleri doğrulanarak, bilinmeyen veya geçersiz değerler sorguya sızmaması sağlanır.
+**Ne yapar**: Verilen string değerinin `SOURCE_VALUES` sabit dizisi içinde yer alıp olmadığını kontrol ederek, o değerin geçerli bir `QuoteSource` tipi olup olmadığını doğrular. Fonksiyon, TypeScript'in tip daraltma (type narrowing) mekanizmasını tetikleyerek, çağrıldığı bağlamda `value` parametresinin `QuoteSource` tipine güvenli bir şekilde daraltılmasını sağlar.
 
-**Nasıl yapar**: `SOURCE_VALUES` adlı readonly string array'inde verilen `value` değerinin bulunup bulunmadığını `Array.includes()` metoduyla test eder. Dönüş tipi `value is QuoteSource` olarak belirlenmiştir; bu bir type predicate'tir ve TypeScript derleyicisine, fonksiyon `true` döndüğünde `value`'nun artık `QuoteSource` tipinde olduğunu garanti eder. Bu mekanizma, `quotesFetcher` içindeki `.filter(isQuoteSource)` çağrısında kullanılarak filtre listelerinin tip güvenli olmasını sağlar.
+**Nasıl yapar**: Fonksiyonun gövdesi, önceden tanımlanmış ve salt okunur (`readonly`) bir string dizisi olan `SOURCE_VALUES` sabitinin `.includes()` metodunu çağırır. Bu metod, `value` parametresinin dizide bulunup bulunmadığını kontrol eder. Fonksiyonun dönüş tipi `value is QuoteSource` olarak belirlenmiştir; bu bir TypeScript "tip predicate"ıdır. `true` döndüğünde, TypeScript derleyicisi bu fonksiyonun kullanıldığı herhangi bir koşul (if) bloğu içinde `value` parametresinin `QuoteSource` tipine安全 olduğunu (güvenli olduğunu) kabul eder ve buna göre_tip_state'_i günceller.
 
 **Parametreler**:
-- `value`: `string` — Test edilecek kaynak değeri; URL'den veya dış kaynaktan gelebilecek ham string
+- value: `string` — Kontrol edilecek ham string değeri. `SOURCE_VALUES` sabitindeki değerlerden biri olup olmadığı test edilir.
 
-**Dönüş**: `value is QuoteSource` — Değer `SOURCE_VALUES` içinde mevcutsa `true`, aksi halde `false` döner. TypeScript type predicate dönüşüdür.
+**Dönüş**: `value is QuoteSource` — Boole (`true`/`false`) döndürür. Ek olarak, dönüş tipi bir TypeScript tip predicate'ıdır; `true` sonucu, `value` parametresinin `QuoteSource` tipi ile uyumlu olduğunu ve ilgili kapsamda bu tipte kullanılabileceğini belirtir.
 
 ### fetchCustomerMap
-**Ne yapar**: Verilen kullanıcı ID'leri için müşteri kimliği bilgilerini (isim ve e-posta) çekerek bir harita (Map) döndüren asenkron fonksiyondur. Admin panelindeki teklif listeleme sayfasında her bir teklif satırının müşteri adı ve e-postasıyla zenginleştirilmesini sağlar.
+**Ne yapar**: Verilen bir kullanıcı ID dizisi (`userIds`) için, her bir kullanıcının kimlik bilgilerini (ad ve e-posta) içeren bir `Map` nesnesi oluşturur ve bu verilerin başarıyla Fetch edilip edilemediğini belirten bir durum bayrağı (`failed`) ile birlikte döndürür. Fonksiyon, birincil veri kaynağının (RPC) başarısız olması durumunda alternatif bir veri kaynağına (fallback) geçerek hizmet sürekliliğini (service continuity) sağlamayı amaçlar.
 
-**Nasıl yapar**: Önce `admin_list_all_users` RPC çağrısı yaparak tüm kullanıcı bilgilerini tek seferde almaya çalışır. Bu RPC, ilgili GRANT izni (PR #566) henüz production ortamında aktif değilse 403 hatası verebilir; bu durum "veri yokluğu" değil, "gösterememe" durumudur ve `failed` flag'i `true` olarak ayarlanır. RPC başarısız olduğunda fallback olarak `user_profiles` tablosuna `select('id, full_name')` sorgusu yapılır; bu yol sadece isim bilgisini verebilir, e-posta içermeyen bir tablodur. Boş `userIds` array'i gelirse doğrudan boş harita ve `failed: false` ile erkenden dönüş yapılır.
+**Nasıl yapar**: Fonksiyon, iki aşamalı bir veri zenginleştirmesi stratejisi izler. İlk olarak `userIds` dizisi boşsa, boş bir harita ile `failed: false` döndürerek hemen çıkar. Doluysa, Supabase istemcisi üzerinden `admin_list_all_users` RPC'sini çağırmayı dener. Bu RPC, kullanıcının `id`, `full_name` ve `email` bilgilerini döndürür. Eğer RPC başarılı olursa (`!error && data`), tüm bu bilgileri içeren bir harita oluşturulur ve `failed: false` ile birlikte döndürülür. Eğer RPC başarısız olursa (örn. 403 hatası, GRANT izni henüz prod ortamına uygulanmamış olabilir), fonksiyon sessizce bir fallback mekanizmasına geçer. Bu fallback, `user_profiles` tablosuna `id` ve `full_name` alanlarını sorgulayarak sadece isim bilgisini çekmeye çalışır. Bu durumda döndürülen haritada `email` alanları `null` olarak kalır ve `failed: true` döndürülerek, müşteri_lookup işleminin tam olarak gerçekleştirilemediği (sadece kısmi veri olduğu) çağrıya bildirilir.
 
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Supabase veritabanı istemcisi; `Database` generic tipi ile şema güvenliği sağlanmıştır
-- `userIds`: `string[]` — Bilgileri çekilecek kullanıcıların benzersiz ID listesi
+- supabase: `SupabaseClient<Database>` — Supabase istemci nesnesi. Generic olarak `Database` tipi ile parametrelenmiştir, bu sayede veritabanı şeması (tablolar, RPC'ler) hakkında tip bilgisine sahip olur ve güvenli sorgular yapılabilir.
+- userIds: `string[]` — Kimlik bilgileri zenginleştirilecek kullanıcıların benzersiz tanımlayıcılarının (UUID'lerin) bulunduğu dizi.
 
-**Dönüş**: `Promise<{ map: Map<string, CustomerIdentity>; failed: boolean }>` — `map` alanı kullanıcı ID'lerinden `CustomerIdentity` (name ve email alanlarını içeren obje) değerlerine eşlenen bir Map nesnesidir; `failed` alanı müşteri lookup işleminin tam mı kısmen mi başarısız olduğunu belirtir. Bu flag, arayüzde `customerLookupFailed` durumunu tetikler.
+**Dönüş**: `Promise<{ map: Map<string, CustomerIdentity>; failed: boolean }>` — Asenkron bir Promise döndürür. Çözülen değer bir nesnedir: `map`, kullanıcı ID'lerini (string) `CustomerIdentity` nesnelerine eşleyen bir `Map` koleksiyonudur (`CustomerIdentity` `{ name: string | null, email: string | null }` yapısındadır). `failed` alanı ise veri çekme işleminin (özellikle RPC'nin) başarıyla tamamlanıp tamamlanmadığını belirten bir boole değerdir; `true` olduğunda, `map` içindeki `email` alanlarının `null` olabileceği anlamına gelir.
 
 ### quotesFetcher
-**Ne yapar**: Admin panelindeki teklif listeleme sayfası için ana veri çekme fonksiyonudur. Filtreleme, arama, sıralama ve sayfalama (pagination) işlemlerini koordine ederek, zenginleştirilmiş teklif satırlarını ve toplam eşleşme sayısını döndürür.
+**Ne yapar**: Admin arayüzü için, filtreleme, arama, sıralama ve sayfalama parametrelerine göre `venthub_quotes` tablosundan satırları çeker; her bir alıntıya ait kalem maddelerini (`quote_items`) ve müşteri bilgilerini zenginleştirerek, toplam eşleşme sayısını da içeren [`FetchResult<QuoteAdminRow>`](<#>) formatında bir sonuç döndürür.
 
-**Nasıl yapar**: Fonksiyon önce `ensureSessionFresh()` çağrısıyla oturumun güncel olmasını sağlar, ardından `withQuotesSchema(supabase)` ile şema yönlendirmesi yapar. URL parametrelerinden gelen `status` ve `source` filtreleri önce `isQuoteStatus` ve `isQuoteSource` bekçileriyle doğrulanarak bilinmeyen değerler sessizce elenir, sonra `.eq()` veya `.in()` ile sorguya eklenir. Arama işlevi doğrudan teklif başlığında değil, `venthub_quote_items` tablosundaki `product_name` kolonu üzerinde `ilike` ile çalışır; eşleşen kalemlerin `quote_id'leri` toplanarak benzersizleştirilir ve teklif sorgusuna `.in('id', ids)` olarak eklenir. Sıralama `status`, `source` veya `created_at` alanlarından birine göre yapılır; belirtilmemişse `created_at` azalan sırada kullanılır. Sayfalama `.range()` ile uygulanır. Son olarak, tekliflerin kalemleri `venthub_quote_items` tablosundan tek sorguyla çekilerek `quote_id` bazında bir Map'e gruplanır ve `fetchCustomerMap` ile müşteri bilgileri eklenerek `QuoteAdminRow` dizisi oluşturulur.
+**Nasıl yapar**: Fonksiyon, bir dizi asenkron veritabanı işlemi ve veri birleştirme (enrichment) adımı izler. Öncelikle `ensureSessionFresh()` çağrısıyla mevcut oturumun (session) geçerliliğini doğrular. Ardından `venthub_quotes` tablosu üzerinde `count: 'exact'` ile bir sorgu başlatır. URL'den gelen `params.filters` içindeki `status` ve `source` dizileri, ilgili tip bekçileri (`isQuoteStatus`, [`isQuoteSource`](#isquotesource)) kullanılarak geçerli değerlere filtrelenir; bilinmeyen değerler atılır. Filtrelenmiş değerler `.eq()` (tek değer için) veya `.in()` (çoklu değer için) koşullarıyla sorguya eklenir. Arama terimi (`params.query`) varsa, `venthub_quote_items` tablosunda `product_name` alanı üzerinde `.ilike()` ile büyük/küçük harfe duyarsız arama yapılır ve eşleşen `quote_id`'ler ana sorguya `.in('id', ids)` koşulu olarak aktarılır. Sıralama, `params.sort.key` ve `params.sort.dir` değerlerine göre `status`, `source` veya `created_at` alanları üzerinde dinamik olarak `.order()` ile ayarlanır; belirtilmemişse `created_at` azalan sıralama varsayılır. Son olarak `.range()` ile sayfalama uygulanarak veriler ve toplam say (`count`) alınır. Alıntı satırları geldikten sonra, bu satırlara ait `venthub_quote_items` satırları toplu olarak çekilir ve `quote_id`'lere göre bir `Map`'te gruplanır. Ardından [`fetchCustomerMap`](#fetchcustomermap) fonksiyonu çağrılarak, alıntıların `user_id`'lerine karşılık gelen müşteri adı ve e-posta bilgileri alınır. Son adımda, orijinal alıntı verisi, gruplanmış kalem maddeleri ve müşteri bilgileri birleştirilerek `QuoteAdminRow` dizisi oluşturulur.
 
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Supabase veritabanı istemcisi
-- `params`: `FetchParams` — Filtre, arama terimi, sıralama ve sayfalama bilgilerini içeren parametre nesnesi
+- supabase: `SupabaseClient<Database>` — Supabase istemci nesnesi. Veritabanı şeması (`Database`) generic tipi ile parametrelenmiştir, bu sayede tablolar (`venthub_quotes`, `venthub_quote_items`, `user_profiles`), RPC'ler ve Relation (ilişki) tanımları hakkında derleme zamanı kontrolü sağlar.
+- params: `FetchParams` — Fonksiyonun behaviour'unu (davranışını) tanımlayan, filtre, arama, sıralama ve sayfalama parametrelerini içeren nesne. Bu nesnenin yapısı şu alanları kapsar:
+  - `filters`: `{ status?: string[]; source?: string[] }` — URL'den gelen ve sorguya uygulanacak filtre değerleri.
+  - `query`: `string` — Arama terimi; kalem adları (`product_name`) üzerinde yapılacak arama için kullanılır.
+  - `sort`: `{ key: string; dir: 'asc' | 'desc' } | null` — Sıralama kriteri ve yönü. `key` alanı sıralanacak sütun adını, `dir` alanı sıralama yönünü belirtir.
+  - `page`: `number` — İstenen sayfa numarası (1'den başlar).
+  - `pageSize`: `number` — Sayfa başına düşen satır sayısı.
 
-**Dönüş**: `Promise<FetchResult<QuoteAdminRow>>` — `rows`, zenginleştirilmiş teklif satırlarının dizisi (her biri kalemler, müşteri adı, e-posta ve `customerLookupFailed` flag'ini içerir); `totalMatched`, filtreleme ve arama sonucunda eşleşen toplam teklif sayısıdır.
+**Dönüş**: `Promise<
 
 ### QuotesTableBody
 **Ne yapar**: Admin panelindeki teklifler tablosunun gövde (tbody) bölümünü render eden React fonksiyonel bileşenidir. Tablodaki her bir teklif satırını, ilişkili kalemlerini ve müşteri bilgilerini görsel olarak sunar.
@@ -168,99 +155,123 @@ Kalem fiyat taslağı — kaydedilene kadar yerel.
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `src/views/admin/quotes/QuotesTableBody.tsx`::isQuoteSource
-- **params**: `(value: string)`
+### [N1_NASIL] AST Pointer: QuotesTableBody.tsx::isQuoteSource
+- **params**: `value: string`
+- **ic_degiskenler**: (yok — tek satırlık guard fonksiyonu)
+- **Dönüş**: `value is QuoteSource` (type guard boolean)
+
+### [N2_NASIL] AST Pointer: QuotesTableBody.tsx::fetchCustomerMap
+- **params**: `supabase: SupabaseClient<Database>`, `userIds: string[]`
+- **ic_degiskenler**:
+  - `map` — `Map<string, CustomerIdentity>`, userId→{name,email} eşlemesi; hem rpc hem fallback yolunda doldurulur
+  - `data` — `supabase.rpc('admin_list_all_users')` yanıtının successfully case'deki satırları
+  - `error` — rpc çağrısının hata nesnesi; falsy ise ana yol çalışır
+  - `profiles` — fallback yolu: `user_profiles` tablosundan dönen `{id, full_name}` satırları
+  - `profileError` — fallback sorgusunun hata nesnesi
+- **Dönüş**: `{ map: Map<string, CustomerIdentity>; failed: boolean }` — `failed=true` ise rpc başarısız olup fallback kullanılmıştır
+
+### [N3_NASIL] AST Pointer: QuotesTableBody.tsx::quotesFetcher
+- **params**: `supabase: SupabaseClient<Database>`, `params: FetchParams`
+- **ic_degiskenler**:
+  - `statuses` — `params.filters.status` dizisinin `isQuoteStatus` ile süzülmüş hali; geçerli enum değerleri
+  - `sources` — `params.filters.source` dizisinin `isQuoteSource` ile süzülmüş hali; geçerli kaynak değerleri
+  - `term` — `params.query` trimmed arama terimi; ürün adı üzerinden quote_id araması için kullanılır
+  - `matches` — `venthub_quote_items` tablosunda `ilike` ile eşleşen satırlar `{quote_id}[]`
+  - `matchError` — arama sorgusunun hata nesnesi
+  - `ids` — eşleşen quote_id'lerin tekilleştirilmiş (unique) dizisi
+  - `sortKey` — sıralama kolonu adı (`params.sort?.key`)
+  - `ascending` — sıralama yönü (`params.sort?.dir === 'asc'`)
+  - `offset` — sayfalama başlangıç indeksi: `(params.page - 1) * params.pageSize`
+  - `data` — ana sorgunun döndürdüğü `venthub_quotes` satırları (sayfalı)
+  - `error` — ana sorgu hata nesnesi
+  - `count` — Supabase count exact sonucu; toplam eşleşme sayısı
+  - `quotes` — `data ?? []`, boşsa erken dönüş yapılır
+  - `totalMatched` — `count` sayıysa onu, değilse `quotes.length` kullanılır
+  - `items` — ilgili quote'lara ait `venthub_quote_items` satırları (`quote_id IN (...)`)
+  - `itemsError` — items sorgusunun hata nesnesi
+  - `itemsByQuote` — `Map<string, QuoteItemRow[]>`, quote_id→items eşlemesi; döngüyle doldurulur
+  - `list` — döngü içinde mevcut quote'a ait geçici item dizisi referansı
+  - `customers` — `fetchCustomerMap` sonucundaki `map` alanı; user_id→{name,email}
+  - `failed` — müşteri lookup'ının rpc ile başarısız olup olmadığını gösteren boolean
+  - `rows` — birleştirilmiş `QuoteAdminRow[]` dizisi; quote + items + customer bilgisi
+- **Dönüş**: `FetchResult<QuoteAdminRow>` — `{ rows: QuoteAdminRow[]; totalMatched: number }`
+
+### [N4_NASIL] AST Pointer: QuotesTableBody.tsx::QuotesTableBody
+- **params**: (yok — React functional component)
+- **ic_degiskenler** (component gövdesinde derived/internal):
+  - `status` — `Record<string, number>`, facetCounts içindeki status dağılımı; her durumdan kaç tane olduğunu tutar
+  - `source` — `Record<string, number>`, facetCounts içindeki source dağılımı; her kaynaktan kaç tane olduğunu tutar
+  - `row` — `QuoteAdminRow`, tablodaki tekil satır; detail/save/status cell render'larında kullanılır
+  - `draft` — `{ unit_price, currency, valid_until }` nesnesi; item draft editörünün varsayılan veya mevcut değerleri
+  - `price` — `draft.unit_price`'ten elde edilen parse edilmiş sayı veya `null` (boşsa)
+  - `updates` — güncellenecek item listesi: `{ itemId, unit_price, currency, valid_until }[]`; savePrices callback'inde oluşturulur
+  - `oldStatus` — durum güncellemeden önceki `row.status` değeri; audit before kaydı için kullanılır
+  - `newStatus` — güncellenecek hedef durum string'i; handleStatusUpdate parametresi
+  - `allowed` — `allowedAdminQuoteActions(row.status)` ile elde edilen izin verilen geçiş listesi
+  - `next` — sütun actions hücresinde, mevcut duruma göre yapılabilecek sonraki durumlar dizisi (`allowedAdminQuoteActions(r.status)`)
+  - `message` — müşteriye gönderilecek e-posta metni; quoted/expired durumuna göre Türkçe mesaj
+  - `editable` — `hasWriteAccess && row.status === 'requested'` boolean'ı; item fiyat düzenleme modu aktif mi
+  - `facet` — filtre panelinde tekil facet tanımı `{ key, label, options }`; FacetedFilter'a passed edilir
+- **Dönüş**: `React.FC` — JSX (DataTableKit ile admin quote tablosu render eder); doğrudan JSX döner
+
+### [N5_NASIL] AST Pointer: QuotesTableBody.tsx::savePrices (nested async callback)
+- **params**: `row: QuoteAdminRow`
+- **ic_degiskenler**:
+  - `updates` — filtrelenmiş geçerli fiyat güncellemeleri dizisi: `{ itemId, unit_price, currency, valid_until }[]`
+  - `item` — `row.items` üzerindeki her bir kalem; draft eşleştirilmesi yapılır
+  - `draft` — `drafts[item.id]` erişimi ile elde edilen draft nesnesi
+  - `price` — `draft.unit_price.trim()` boşsa `null`, değilse `Number()` ile parse
+  - `u` — `updates` dizisi üzerindeki her bir güncelleme objesi
+- **Dönüş**: yok (Promise<void>); yan etki: `mutateWithAudit` ile DB günceller, `toast.success` gösterir, `table.reload()` çağırır
+
+### [N6_NASIL] AST Pointer: QuotesTableBody.tsx::handleStatusUpdate (nested async callback)
+- **params**: `row: QuoteAdminRow`, `newStatus: string`
+- **ic_degiskenler**:
+  - `allowed` — `allowedAdminQuoteActions(row.status)` ile elde edilen izin verilen geçişler dizisi
+  - `oldStatus` — `row.status`, güncelleme öncesi mevcut durum; audit `before` kaydı için
+  - `message` — müşteri e-postası için metin; `newStatus` değerine göre quoted veya expired Türkçe bildirim
+- **Dönüş**: yok (Promise<void>); yan etki: `mutateWithAudit` ile durum günceller, müşteri e-postası bildirimi gönderir, `toast` gösterir
+
+### [N7_NASIL] AST Pointer: QuotesTableBody.tsx::renderItemDetails (nested callback — detail expand)
+- **params**: `row: QuoteAdminRow`
+- **ic_degiskenler**:
+  - `editable` — `hasWriteAccess && row.status === 'requested'`, item edit modu aktif mi
+  - `item` — `row.items.map()` içindeki her bir `QuoteItemRow`
+  - `draft` — `drafts[item.id] ?? { ... }` fallback ile oluşturulan geçici edit draft nesnesi; `unit_price`, `currency`, `valid_until` alanları
+- **Dönüş**: `React.ReactNode` — item düzenleme formu JSX'i; fiyat, para birimi ve geçerlilik tarihi input'ları
+
+### [N8_NASIL] AST Pointer: QuotesTableBody.tsx::columns (nested callback — tablo sütun tanımları)
+- **params**: (yok — useMemo/kapalı fonksiyon)
+- **ic_degiskenler**:
+  - `r` — her sütun `cell` callback'indeki `QuoteAdminRow` satır parametresi
+  - `next` — `allowedAdminQuoteActions(r.status)` ile mevcut satır için izin verilen sonraki durumlar
+- **Dönüş**: `ColumnDef[]` dizisi — 6 sütun: customer, items, source, status, created_at, actions
+
+### [N9_NASIL] AST Pointer: QuotesTableBody.tsx::getStatusIcon (nested callback)
+- **params**: `status: string`
 - **ic_degiskenler**: (yok)
-- **Dönüş**: `value is QuoteSource` — value'nun SOURCE_VALUES dizisi içinde olup olmadığını kontrol eden type guard fonksiyonu
+- **Dönüş**: `React.ReactNode` — lucide-react icon bileşeni (Clock, FileText, CheckCircle, XCircle, Hourglass)
 
----
+### [N10_NASIL] AST Pointer: QuotesTableBody.tsx::getStatusColor (nested callback)
+- **params**: `status: string`
+- **ic_degiskenler**: (yok)
+- **Dönüş**: `string` — Tailwind CSS class string'i; duruma göre bg/text/border renkleri
 
-### [N2_NASIL] AST Pointer: `src/views/admin/quotes/QuotesTableBody.tsx`::fetchCustomerMap
-- **params**: `(supabase: SupabaseClient<Database>, userIds: string[])`
-- **ic_degiskenler**:
-  - `map` — `Map<string, CustomerIdentity>` yapısında, user ID'lerden müşteri bilgilerine (name, email) eşleme sağlayan harita
-  - `data` — `supabase.rpc('admin_list_all_users')` çağrısından dönen tüm kullanıcı listesi
-  - `error` — rpc çağrısındaki olası hata nesnesi
-  - `u` — for döngüsündeki her bir kullanıcı nesnesi (id, full_name, email alanları)
-  - `profiles` — fallback olarak `user_profiles` tablosundan sorgulanan profil verisi (id, full_name)
-  - `profileError` — fallback sorgusundaki olası hata
-  - `p` — for döngüsündeki her bir profil nesnesi (id, full_name)
-- **Dönüş**: `Promise<{ map: Map<string, CustomerIdentity>; failed: boolean }>` — harita ve rpc başarısızsa failed=true
-
----
-
-### [N3_NASIL] AST Pointer: `src/views/admin/quotes/QuotesTableBody.tsx`::quotesFetcher
-- **params**: `(supabase: SupabaseClient<Database>, params: FetchParams)`
-- **ic_degiskenler**:
-  - `db` — `withQuotesSchema(supabase)` ile sarılmış, quote şemasına özel supabase istemcisi
-  - `query` — `venthub_quotes` tablosu üzerinde filtre/sıralama/sayfalama uygulanan zincirli supabase sorgu nesnesi
-  - `statuses` — `params.filters.status` dizisinin `isQuoteStatus` ile filtrelenmiş geçerli durum değerleri
-  - `sources` — `params.filters.source` dizisinin `isQuoteSource` ile filtrelenmiş geçerli kaynak değerleri
-  - `term` — `params.query` değerinin trim edilmiş arama terimi (kalem adı üzerinden arama)
-  - `matches` — `venthub_quote_items` tablosunda product_name'e ilike ile eşleşen satırlar (quote_id alanı)
-  - `matchError` — arama sorgusundaki olası hata
-  - `ids` — eşleşen kalem quote_id'lerinin benzersiz kümesi (diziye çevrilmiş)
-  - `sortKey` — `params.sort?.key` sıralama anahtarı (status/source/created_at)
-  - `ascending` — sıralama yönü, `params.sort?.dir === 'asc'` ise true
-  - `offset` — sayfalama için hesaplanan başlangıç indeksi: `(params.page - 1) * params.pageSize`
-  - `data` — filtrelenmiş ve sıralanmış teklif satırları
-  - `error` — ana sorgudaki olası hata
-  - `count` — sorgunun toplam eşleşme sayısı (count: 'exact')
-  - `quotes` — `data ?? []` olarak normalize edilmiş teklif dizisi
-  - `totalMatched` — count sayısal ise count, değilse quotes.length
-  - `items` — teklif kalemleri tablosundan çekilen tüm kalem satırları
-  - `itemsError` — kalem sorgusundaki olası hata
-  - `itemsByQuote` — `Map<string, QuoteItemRow[]>` — quote_id bazında gruplanmış kalem haritası
-  - `list` — mevcut quote_id için kalem dizisi (push ile büyütülür)
-  - `item` — for döngüsündeki her bir kalem satırı
-  - `customers` — `fetchCustomerMap` sonucundaki müşteri bilgi haritası
-  - `failed` — müşteri bilgisi çekme işleminin başarısızlık bayrağı
-  - `rows` — quotes.map ile her quote'a items/customer_name/customer_email/customerLookupFailed eklenmiş nihai QuoteAdminRow dizisi
-  - `q` — quotes.map callback'indeki her bir quote satırı
-- **Dönüş**: `Promise<FetchResult<QuoteAdminRow>>` — rows ve totalMatched içeren sonuç nesnesi
-
----
-
-### [N4_NASIL] AST Pointer: `src/views/admin/quotes/QuotesTableBody.tsx`::QuotesTableBody
+### [N11_NASIL] AST Pointer: QuotesTableBody.tsx::fetchFacetCounts (nested async callback)
 - **params**: (yok)
-- **ic_degiskenler** (bileşen içindeki state/effect/callback tanımları ve JSX scope'undaki değişkenler):
-  - `hasWriteAccess` — kullanıcının yazma izni olup olmadığını belirleyen boolean (bileşen scope'undan gelen prop/permission)
-  - `t` — i18n çeviri fonksiyonu
-  - `supabaseBrowserClient` — import edilmiş tarayıcı supabase istemcisi
-  - `table` — DataTableKit tarafından döndürülen tablo kontrol nesnesi (filtering, reload vb. metodlar içerir)
-  - `updatingId` — şu an güncellenmekte olan teklifin ID'si (null veya satır ID'si); `setUpdatingId` ile set edilir
-  - `drafts` — `Record<string, { unit_price, currency, valid_until }>` yapısında, her kalem ID'sine karşılık gelen draft(fiyat/döviz/geçerlilik) düzenleme değerleri; `setDrafts` ile güncellenir
-  - `facetCounts` — `{ status: Record<string, number>, source: Record<string, number> }` — her durum ve kaynak değerinin sayısını tutan facet sayacı; `setFacetCounts` ile set edilir
-  - `lang` — mevcut dil ayarı, formatCurrency/formatDate/formatTime fonksiyonlarına geçirilir
-  - `fetchFacetCounts` — async callback; `venthub_quotes` tablosundan status ve source alanlarını çekip facetCounts state'ini günceller
-  - `getStatusLabel` — durum string'ini insan-okunabilir Türkçe etikete çeviren fonksiyon
-  - `getStatusColor` — durum string'ine göre Tailwind CSS sınıf dizesi döndüren fonksiyon
-  - `getStatusIcon` — durum string'ine göre React icon bileşeni (Clock/FileText/CheckCircle/XCircle/Hourglass) döndüren fonksiyon
-  - `savePrices` — async callback; draft değerlerini validate edip `mutateWithAudit` ile `venthub_quote_items` tablosunda unit_price/currency/valid_until günceller
-    - `updates` — row.items.map/filter ile oluşmuş, `Array<{ itemId, unit_price, currency, valid_until }>` yapıdaki geçerli güncelleme listesi
-    - `draft` — `drafts[item.id]` erişimiyle elde edilen mevcut kalem draft'ı
-    - `price` — `draft.unit_price` string'inin Number'a çevrilmiş hali (boşsa null)
-    - `row` — parametre olarak alınan QuoteAdminRow nesnesi
-    - `item` — map callback'indeki her bir QuoteItemRow
-    - `u` — updates.map callback'indeki her bir güncelleme objesi
-  - `handleStatusUpdate` — async callback; teklif durumunu değiştirir
-    - `row` — parametre olarak alınan QuoteAdminRow nesnesi
-    - `newStatus` — parametre olarak alınan hedef durum string'i
-    - `allowed` — `allowedAdminQuoteActions(row.status)` ile elde edilen izin verilen geçişler dizisi
-    - `oldStatus` — `row.status` mevcut durum değeri
-    - `message` — müşteriye gönderilecek e-posta mesajı içeriği (quoted veya expired durumuna göre)
-  - `renderDetail` — `(row: QuoteAdminRow) => React.ReactNode` — her satırın genişletilmiş detay bölümünü render eder
-    - `editable` — `hasWriteAccess && row.status === 'requested'` — düzenleme modunun aktif olup olmadığı
-    - `item` — row.items.map callback'indeki her bir QuoteItemRow
-    - `draft` — `drafts[item.id] ?? { default değerler }` — draft yoksa item'dan türeyen varsayılan değerler
-  - `columns` — tablo sütun tanımları dizisi (customer/items/source/status/created_at/actions)
-    - `r` — her sütunun cell callback'indeki QuoteAdminRow parametresi
-    - `next` — actions sütununda `allowedAdminQuoteActions(r.status)` ile belirlenen sonraki durumlar
-    - `status` — next.map callback'indeki her bir izin verilen hedef durum string'i
-  - `facets` — FacetedFilter bileşenleri için tanımlar dizisi (status ve source facet'leri)
-    - `value` — STATUS_VALUES/SOURCE_VALUES map callback'indeki her bir değer
-    - `facet` — facets.map callback'indeki her bir facet tanımı nesnesi
-- **Dönüş**: `React.FC` — AdminToolbar, DataTableKit ve AdminEmptyState bileşenlerinden oluşan admin_quotes tablosu JSX'i; yan etkiler: veritabanı okuma (quotes, items, users, user_profiles), facet sayacı çekme, fiyat/durum güncelleme, müşteriye e-posta bildirimi gönderme, toast gösterme
+- **ic_degiskenler**:
+  - `data` — `venthub_quotes` tablosundan `{status, source}` seçilen satırlar
+  - `error` — Supabase sorgu hata nesnesi
+  - `status` — `Record<string, number>`, her status değerinin sayacı
+  - `source` — `Record<string, number>`, her source değerinin sayacı
+  - `row` — `data` üzerindeki her bir satır; status/source sayacı artırılır
+- **Dönüş**: yok (Promise<void>); yan etki: `setFacetCounts` ile state günceller
+
+### [N12_NASIL] AST Pointer: QuotesTableBody.tsx::facets (nested callback — filtre tanımları)
+- **params**: (yok — useMemo/kapalı fonksiyon)
+- **ic_degiskenler**:
+  - `facet` — `FacetedFilter` bileşeninepassed edilen tekil facet nesnesi
+- **Dönüş**: dizi — 2 facet tanımı: `status` ve `source`; her biri `{ key, label, options: { value, label, count }[] }`
 
 ---
 
@@ -307,7 +318,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-admin-accent`, `bg-admin-surface`, `border-admin-border`, `border-current`, `border-t-transparent`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-fg-subtle`, `text-admin-success`, `text-admin-warning`, `text-slate-500`, `text-sm`, `text-xs`
+- **Renkler:** `bg-admin-accent`, `bg-admin-surface`, `border-admin-border`, `border-current`, `border-t-transparent`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-fg-subtle`, `text-admin-success`, `text-admin-warning`, `text-sm`, `text-xs`
 - **Layout:** `!h-7`, `flex`, `flex-col`, `flex-wrap`, `gap-0.5`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `grid`, `grid-cols-1`, `h-0.5`, `h-3`, `h-9`, `inline-flex`
 - **Varyant/Responsive:** `disabled:`, `focus-visible:`, `sm:` önekleri
 - **Yardımcı Sınıflar:** `!px-3`, `!px-4`, `${adminTableActionPrimaryClass`, `${getStatusColor(r.status`, `animate-in`, `animate-spin`, `border`, `break-words`, `disabled:opacity-50`, `duration-300`, `fade-in`, `focus-visible:outline-none`, `focus-visible:ring-2`, `focus-visible:ring-admin-accent/40`, `font-bold`
