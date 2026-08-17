@@ -3,6 +3,10 @@ import { tr } from './tr'
 
 export const en: typeof tr = {
   common: {
+    technicalDrawing: 'Technical Drawing',
+    errorGeneric: 'An error occurred',
+    devMode: 'Developer Mode',
+    userFallback: 'User',
     paginationLabel: 'Pagination',
     paginationPrevious: 'Previous',
     paginationNext: 'Next',
@@ -1919,6 +1923,7 @@ export const en: typeof tr = {
     },
     orderSummary: {
       couponPlaceholder: 'Coupon code',
+      couponApplyFailed: 'Could not apply coupon',
       applyCoupon: 'Apply',
       removeCoupon: 'Remove',
     },

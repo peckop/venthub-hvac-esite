@@ -108,7 +108,7 @@ const OrdersPage: React.FC = () => {
           status: String(order.status || 'pending'),
           payment_status: order.payment_status ? String(order.payment_status) : undefined,
           created_at: String(order.created_at || new Date().toISOString()),
-          customer_name: String(order.customer_name || user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
+          customer_name: String(order.customer_name || user?.user_metadata?.full_name || user?.email || t('common.userFallback')),
           customer_email: String(order.customer_email || user?.email || '-'),
           shipping_address: isRecord(order.shipping_address) ? order.shipping_address : undefined,
           order_items: items,

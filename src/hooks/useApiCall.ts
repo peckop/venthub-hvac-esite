@@ -1,6 +1,8 @@
 import { useCallback,useState } from 'react'
 import { toast } from 'sonner'
 
+import { useI18n } from '../i18n/I18nProvider'
+
 interface ApiCallState<T> {
     data: T | null
     loading: boolean
@@ -30,6 +32,7 @@ interface UseApiCallOptions {
  * }
  */
 export function useApiCall<T = unknown>(defaultOptions?: UseApiCallOptions) {
+    const { t } = useI18n()
     const [state, setState] = useState<ApiCallState<T>>({
         data: null,
         loading: false,
@@ -58,7 +61,7 @@ export function useApiCall<T = unknown>(defaultOptions?: UseApiCallOptions) {
                 setState(prev => ({ ...prev, loading: false, error }))
 
                 if (mergedOptions.showToast !== false) {
-                    toast.error(mergedOptions.errorMessage || error.message || 'Bir hata oluştu')
+                    toast.error(mergedOptions.errorMessage || error.message || t('common.errorGeneric'))
                 }
 
                 return null

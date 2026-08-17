@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useI18n } from '../i18n/I18nProvider'
+
 /**
  * Custom hook for managing checkout coupon application.
  * Handles state for the input code, validates it, and securely calls the Supabase Edge Function to apply the discount.
@@ -13,6 +15,7 @@ import { toast } from 'sonner'
  * <button onClick={applyCoupon}>Apply</button>
  */
 export const useCheckoutCoupon = (totalAmount: number) => {
+  const { t } = useI18n()
   const [couponCode, setCouponCode] = useState<string>('')
   const [couponApplied, setCouponApplied] = useState<{ code: string; discount: number } | null>(null)
 
@@ -41,7 +44,7 @@ export const useCheckoutCoupon = (totalAmount: number) => {
       const json = await resp.json().catch(() => ({}));
       
       if (!resp.ok || !json?.valid) {
-        toast.error(json?.error || 'Kupon uygulanamadı');
+        toast.error(json?.error || t('checkout.orderSummary.couponApplyFailed'));
         setCouponApplied(null)
         return;
       }
