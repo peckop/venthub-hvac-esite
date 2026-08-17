@@ -303,6 +303,35 @@ verisi yok" tuzağı (purchasing-standard §8.1) burada YOK.
 **W5 ile çakışma yok:** W5 TAMAMLANDI (`20260816120000_pricing_w5_policy_fx_lock.sql`
 prod'da; `pricing_policy` tablosunu zaten o yarattı). Yüzey çalışması beklemez.
 
+**[D] ÇOK PARA BİRİMLİ KAPSAMDA KİLİT ENGELLENİR** (ADMIN-CUSTOMER sorusu, 2026-08-17).
+
+Kilit marka/kategori/global kapsamda birden çok para birimli ürünü kapsayabilir; tek bir
+`fx_frozen_rate` o kapsamı **temsil edemez**. Kural:
+
+1. Kilit kaydedilirken kapsamdaki ürünlerin `distinct purchase_currency` kümesi hesaplanır.
+2. **Tek** para birimi → o para biriminin kuru `resolveFxRate` ile enstantane alınır.
+3. **Birden çok** → kayıt **REDDEDİLİR**; admin'e kapsamı daraltması söylenir.
+
+> **Niçin "uyar ama kaydet" değil.** `fx_frozen_rate` motorda hesaba **girmez** — ölçüldü
+> (2026-08-17): `materialize` yalnız `locked` bayrağını okuyup ürünü atlar, `frozenRate`
+> sadece `pricingPolicy.service` içinde taşınır. Yani alan **provenanstır**: "bu fiyat neden
+> güncellenmedi" sorusunun tek cevabı. Provenans alanına kapsamı temsil etmeyen bir sayı
+> yazmak, hesabı bozmaz ama **denetim kaydını yalanlar** — hesap hatasından daha sinsi,
+> çünkü hiçbir yerde tutarsızlık üretmez, sadece geriye dönük soruyu cevapsız bırakır.
+> "Baskın para biriminin kuru + not" alternatifi bu yüzden reddedildi: bulanık provenans,
+> provenans değildir. Ayrıca uyarıp kaydetmek fail-open desenidir (yeni kapıya "uyar-geç"
+> modu konmaz).
+>
+> **Bugün kimseyi bloklamaz:** ölçüm (ADMIN-CUSTOMER, 2026-08-17) 374 ürünün tamamının
+> `purchase_currency = EUR` olduğunu, `pricing_policy`'nin 0 satır taşıdığını gösteriyor.
+> Yani global kilit bugün tek para birimlidir ve kural sessizce geçer; koruma ilk USD
+> ürün girildiği gün devreye girer.
+
+**v1.1 yolu (migration → Recep paketi):** kapsam çok para birimliyken de kilitlenebilmesi
+isteniyorsa doğru çözüm "bir sayı seç" değil, `pricing_policy`'ye **`quote_ccy` kolonu**
+eklemektir — kilit satırı para birimi başına bir kayıt olur, merdiven aynen çalışır.
+Bu, kolonu tüketicisiyle birlikte açma ilkesine de uyar (§8.3 kapsam kararı).
+
 #### 8.2.2 `base_ccy` bütünlüğü — kalan DB adımı (PLAN, Recep paketinde)
 
 Çözücü artık `base_ccy='TRY'` filtresini uyguluyor, yani **okuma tarafı güvende**. Ama

@@ -2,48 +2,52 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\AdminSettingsPage.tsx
-skeleton_hash: 82eb6271e372de31
+source_path: C:\Users\alize\venthub-wt-quote\src\views\admin\AdminSettingsPage.tsx
+skeleton_hash: ed3434f0015766ed
 entity_hashes:
   func:AdminSettingsPage: d7abe5daa414ecdd
   func:openModal: 742557352e2b120f
-  overview: c1b3377dff6e6dba
-  style_tokens: f388bdfece87d34c
-generated_at: 2026-06-19T20:49:27Z
+  overview: a93bc9c56cdba4e0
+  style_tokens: 05cbeefecec906ae
+generated_at: 2026-08-17T13:20:42Z
 ---
 
 ## Genel Bakış
-AdminSettingsPage, yönetim panelindeki ayarların sekmeli bir arayüzde görüntülenmesini ve düzenlenmesini sağlayan React bileşenidir. Genel yapılandırma, ödeme, admin ve sistem gibi farklı ayar kategorilerini merkezi bir sayfada sunarak yönetici kullanıcıların bu ayarları güncellemesine olanak tanır. Bileşen, iç durum yönetimi ve modal tabanlı düzenleme akışıyla çalışır.
+AdminSettingsPage, yönetim panelinde merkezi bir ayarlar sayfası olarak çalışır. Yönetici kullanıcıların genel yapılandırma, ödeme, admin ve sistem gibi farklı kategorilerdeki ayarları sekmeli bir arayüzde görüntülemesini ve düzenlemesini sağlar.
 
 ## Fonksiyon Grupları
+
 ### Sayfa Bileşeni
-Ana React bileşenini ve sayfa yapısını oluşturur. Ayar sekmeleri, durum yönetimi ve alt bileşenlerin render edilmesi bu bileşen tarafından koordine edilir.
-- AdminSettingsPage
+Ana React bileşenini ve sayfa yapısını oluşturur. Ayar sekmelerinin yönetimi, durum kontrolü ve alt bileşenlerin render edilmesi koordine edilir.
+- `AdminSettingsPage`
 
 ### Modal Etkileşimi
 Belirli bir ayar bölümünün düzenlenmesi için modal penceresi açma mantığını yönetir. Bölüm türüne göre uygun modal içeriğini ve varsayılan değerleri belirler.
-- openModal
-
-## Dış Bağımlılıklar
-- React çerçeve kütüphanesi ve bileşen yaşam döngüsü
-- SettingsSection ve RenderableSettings gibi proje içi tip tanımları
-- Merkezi durum yönetimi (Context veya Store) ve olası API katmanları
-
-## Mimari Notlar
-Bileşen, Modal aracılığıyla düzenlemeyi lazy olarak tetikler; bu sayede sadece gerektiğinde ilgili form yüklenir. Sayfa, dinamik olarak farklı ayar bölümleri arasında geçiş yapabilen modüler bir yapıya sahiptir.
+- `openModal`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için, verilen fonksiyon imzaları ve mevcut doküman metni temel alınarak aşağıdaki mimari varsayımlar tanımlanmıştır.
 
-[Aksiyom 1]: Eğer `openModal` fonksiyonu geçerli bir `SettingsSection` (enum tipi) değeri olmadan çağrılırsa, modal penceresi doğru bir bölüm için açılamaz veya uygulama beklenmeyen bir duruma girer.
+AdminSettingsPage modülü, bağımsız çalışan bir React bileşeni olup, iç state yönetimi ve modal tabanlı düzenleme akışına dayanır.
 
-[Aksiyom 2]: Eğer `openModal` fonksiyonundaki `values` parametresi `null` değilse, bu parametrenin `RenderableSettings` tipinde ve modal'ın açıldığı bölüm ile uyumlu bir veri yapısına sahip olması gerekir; aksi halde modal içindeki form alanları doğru değerleri gösteremez.
+---
 
-[Aksiyom 3]: Eğer `AdminSettingsPage` bileşeni, `openModal` fonksiyonunu çağıracak bir referansa veya erişime sahip değilse (örn. prop olarak geçilmiyor veya import edilmiyor), ayar düzenleme işlevi kullanıcıya sunulamaz ve sayfa salt görüntüleme modunda çalışır.
+**[Aksiyom 1]:** Eğer `SettingsSection` tipi tanımlı veya erişilebilir değilse, `openModal` fonksiyonunun `section` parametresi geçersiz olacağından modal hangi ayar bölümünü göstereceği bilemez.
 
-[Aksiyom 4]: Eğer `SettingsSection` veya `RenderableSettings` tipleri (veya ilgili veri yapıları) modül dışında tanımlıysa ve bu tanımlar değişirse, `openModal` fonksiyonunun çağrılma biçimi de güncellenmelidir; aksi halde derleme veya çalışma zamanı hataları oluşur.
+**[Aksiyom 2]:** Eğer `RenderableSettings` tipi tanımlı veya erişilebilir değilse, `openModal` fonksiyonunun `values` parametresi için tip uyumsuzluğu oluşur.
+
+**[Aksiyom 3]:** Eğer `openModal(section, values)` çağrısında `section` parametresi geçerli bir `SettingsSection` değeri değilse, modal doğru ayar arayüzünü render edemez.
+
+**[Aksiyom 4]:** `AdminSettingsPage` hiç parametre almaz (`()`), bu nedenle kendi veri yükleme mechanism'ına (fetch, context, store vb.) bağımlıdır. Eğer bu mekanizma çalışmazsa sayfa boş veya hatalı render olur.
+
+**[Aksiyom 5]:** `openModal` fonksiyonu `values: null` alabilir — bu durumda modal muhtemelen "yeni ekleme" modunda açılmalıdır. Eğer modal bileşeni `null` değerini handle edemezse hata oluşur.
+
+**[Aksiyom 6]:** Bileşen modal durumunu kendi içinde yönetiyorsa (state), bileşen unmount olduğunda modal state'i temizlenmezse (cleanup) hafıza sızıntısı oluşabilir.
+
+---
+
+> **Not:** `SettingsSection` ve `RenderableSettings` tiplerinin içeriği fonksiyon imzasında belirtilmediğinden, bunların hangi değerlere izin verdiği bilinmemektedir. Bu tiplerin modül dışında tanımlı olduğu varsayılmıştır.
 
 ---
 
@@ -92,47 +96,59 @@ Bu bileşen parametre almaz — React.FC olarak tanımlı, stateles veya kendi i
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::AdminSettingsPage
-- **params**: (parametre yok)
+- **params**: yok
 - **ic_degiskenler**:
-  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
-  - `canWrite` — useRole hook'undan gelen rol kontrol fonksiyonu
-  - `hasWriteAccess` — 'settings' izni olup olmadığını boolean olarak tutar
-  - `loading` — veri yükleme durumunu boolean olarak tutar (useState)
-  - `error` — hata mesajını string veya null olarak tutar (useState)
-  - `generalValues` — genel ayarları (site adı, slogan, iletişim bilgileri) tutar (useState)
-  - `paymentValues` — ödeme ayarlarını (iyzico aktif/pasif, mod, api key) tutar (useState)
-  - `adminsValues` — admin politikalarını (session timeout, MFA gerekliliği) tutar (useState)
-  - `systemValues` — sistem yapılandırmalarını (log seviyesi, debug modu) tutar (useState)
-  - `modalOpen` — modalın açık/kapalı durumunu tutar (useState)
-  - `modalSection` — şu an hangi bölümün edit edildiğini tutar (useState)
-  - `modalInitialValues` — modal için başlangıç değerlerini tutar (useState)
-  - `fetchAllSettings` — tüm ayarları Supabase'den çeken async fonksiyon (useCallback)
-  - `adminSectionTitleClass` — admin başlık için CSS class (kodda tanımlı değil, dış kaynak)
-  - `adminSubtitleClass` — admin alt başlık için CSS class (kodda tanımlı değil, dış kaynak)
-  - `adminCardClass` — admin kartları için CSS class (kodda tanımlı değil, dış kaynak)
-- **Dönüş**: React JSX elementi (ayarlar sayfası)
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu, Türkçe dize çevirileri için kullanılır
+  - `canWrite` — useRole hook'undan gelen izin kontrol fonksiyonu
+  - `hasWriteAccess` — `canWrite('settings')` çağrısının boolean sonucu, settings bölümü için yazma izni olup olmadığını belirtir
+  - `loading` — `useState(true)` ile tanımlı, sayfa yükleme durumunu tutar (başlangıçta true)
+  - `setLoading` — loading state'ini güncellemek için setter
+  - `error` — `useState<string | null>(null)` ile tanımlı, hata mesajını tutar
+  - `setError` — error state'ini güncellemek için setter
+  - `RenderableSettings` — `Record<string, string | number | boolean | null | undefined>` türünde tip tanımı
+  - `generalValues` — `useState<RenderableSettings | null>(null)` ile tanımlı, genel site ayar değerlerini tutar (site_name, tagline, contact_email, support_phone, headquarters, logo_url)
+  - `setGeneralValues` — generalValues state'ini güncellemek için setter
+  - `paymentValues` — `useState<RenderableSettings | null>(null)` ile tanımlı, ödeme ayar değerlerini tutar (iyzico_enabled, iyzico_mode, iyzico_api_key)
+  - `setPaymentValues` — paymentValues state'ini güncellemek için setter
+  - `adminsValues` — `useState<RenderableSettings | null>(null)` ile tanımlı, admin politika değerlerini tutar (admin_sessions_timeout, mfa_required)
+  - `setAdminsValues` — adminsValues state'ini güncellemek için setter
+  - `systemValues` — `useState<RenderableSettings | null>(null)` ile tanımlı, sistem yapılandırma değerlerini tutar (system_log_level, debug_mode)
+  - `setSystemValues` — systemValues state'ini güncellemek için setter
+  - `modalOpen` — `useState(false)` ile tanımlı, modalın açık olup olmadığını belirtir
+  - `setModalOpen` — modalOpen state'ini güncellemek için setter
+  - `modalSection` — `useState<SettingsSection | null>(null)` ile tanımlı, modalda düzenlenecek bölümü tutar
+  - `setModalSection` — modalSection state'ini güncellemek için setter
+  - `modalInitialValues` — `useState<RenderableSettings | null>(null)` ile tanımlı, modal açılırken kullanılacak başlangıç değerlerini tutar
+  - `setModalInitialValues` — modalInitialValues state'ini güncellemek için setter
+  - `fetchAllSettings` — `useCallback` ile sarılmış, supabase'den `site_settings` tablosunu çekip state'leri güncelleyen asenkron fonksiyon
+- **Dönüş**: JSX — AdminSettingsPage bileşeninin render ettiği React elementi (ayar kartları, modal, skeleton veya hata gösterimi)
 
 ### [N2_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::fetchAllSettings
-- **params**: (parametre yok)
+- **params**: yok
 - **ic_degiskenler**:
-  - `fetchError` — Supabase sorgusundan gelen hata nesnesi
-  - `data` — Supabase'den çekilen site_settings tablosu satırları
-  - `gen` — 'general' anahtarına ait ayarlar (site_name, tagline vb. alanlarını tutar)
-  - `pay` — 'payment' anahtarına ait ayarlar (iyzico_enabled, iyzico_mode vb. alanlarını tutar)
-  - `adm` — 'admins' anahtarına ait ayarlar (admin_sessions_timeout, mfa_required alanlarını tutar)
-  - `sys` — 'system' anahtarına ait ayarlar (system_log_level, debug_mode alanlarını tutar)
-  - `err` — try-catch bloğunda yakalanan hata nesnesi
-- **Dönüş**: void (Promise<void>) - state'leri günceller, return ile değer dönmez
+  - `data` — `supabase.from('site_settings').select('key, value')` çağrısından dönen satır dizisi
+  - `fetchError` — supabase çağrısından dönen hata nesnesi, `error: fetchError` destructuring ile ayrıştırılmış
+  - `gen` — `data?.find((r) => r.key === 'general')?.value` sonucu, `RenderableSettings` olarak cast edilmiş genel ayarlar
+  - `pay` — `data?.find((r) => r.key === 'payment')?.value` sonucu, `RenderableSettings` olarak cast edilmiş ödeme ayarları
+  - `adm` — `data?.find((r) => r.key === 'admins')?.value` sonucu, `Record<string, unknown>` olarak cast edilmiş admin politika değerleri
+  - `sys` — `data?.find((r) => r.key === 'system')?.value` sonucu, `Record<string, unknown>` olarak cast edilmiş sistem yapılandırma değerleri
+  - `err` — catch bloğunda yakalanan hata nesnesi (unknown türünde)
+- **Dönüş**: yok — state setter'ları (setGeneralValues, setPaymentValues, setAdminsValues, setSystemValues, setLoading, setError) çağırarak yan etki üretir
 
 ### [N3_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::useEffect callback
-- **params**: (parametre yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: undefined - fetchAllSettings() çağırır, temizlik dönüşü yok
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `fetchAllSettings()` çağırarak bileşen mount edildiğinde ayarları çeker
 
 ### [N4_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::openModal
-- **params**: (section: SettingsSection, values: RenderableSettings | null)
-- **ic_degiskenler**: (yok - sadece state setter'ları çağırır)
-- **Dönüş**: void - modal durumunu günceller
+- **params**: `(section: SettingsSection, values: RenderableSettings | null)`
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `setModalSection(section)`, `setModalInitialValues(values)`, `setModalOpen(true)` çağırarak modalı açar
+
+### [N5_NASIL] AST Pointer: src/views/admin/AdminSettingsPage.tsx::SettingsFormModal onSuccess callback
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Dönüş**: yok — `fetchAllSettings()` çağırarak modal başarıyla kapandığında ayarları yeniden çeker
 
 ---
 
@@ -158,7 +174,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400/10`, `bg-cyan-500/5`, `bg-rose-500/10`, `border-b`, `border-cyan-400/20`, `border-rose-500/20`, `border-t`, `border-white/5`, `group-hover:bg-cyan-500/10`, `hover:bg-cyan-400`, `hover:text-slate-950`, `text-amber-400`, `text-cyan-400`, `text-emerald-400`, `text-lg`
+- **Renkler:** `bg-admin-accent-weak`, `bg-admin-danger-weak`, `border-admin-accent/30`, `border-admin-border`, `border-admin-danger/30`, `border-b`, `border-t`, `group-hover:bg-admin-accent-weak`, `hover:bg-admin-accent`, `hover:text-admin-fg-subtle`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-success`
 - **Layout:** `absolute`, `block`, `flex`, `flex-col`, `gap-3`, `gap-6`, `gap-8`, `grid`, `grid-cols-1`, `h-64`, `items-center`, `justify-between`, `lg:p-10`, `md:flex-row`, `md:grid-cols-2`
 - **Varyant/Responsive:** `:`, `disabled:`, `group-hover:`, `hover:`, `lg:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `${adminCardClass`, `-mr-32`, `-mt-32`, `:`, `animate-in`, `blur-3xl`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-300`, `duration-700`, `fade-in`, `font-black`, `font-bold`, `font-mono`
+- **Yardımcı Sınıflar:** `${adminCardClass`, `-mr-32`, `-mt-32`, `:`, `animate-in`, `blur-3xl`, `border`, `disabled:cursor-not-allowed`, `disabled:opacity-50`, `duration-300`, `duration-700`, `fade-in`, `font-bold`, `font-mono`, `font-semibold`

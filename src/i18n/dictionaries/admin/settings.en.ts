@@ -1,4 +1,5 @@
 export const settings = {
+      hoursUnit: 'Hours',
       siteName: 'Site Name',
       tagline: 'Tagline',
       contactEmail: 'Contact Email',

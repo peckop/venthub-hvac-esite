@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-quote\src\i18n\dictionaries\en.ts
-skeleton_hash: 1500d0cc44015ec8
+skeleton_hash: d84ad55406c6673c
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-16T11:27:47Z
+generated_at: 2026-08-17T13:20:04Z
 ---
 
 ## Genel Bakış
@@ -37,7 +37,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - **en** (object) — `{
   common: {
     paginationLabel: 'Pagination',
-    paginationPrevious: '...`
+    paginationPrevious: 'Pre...`
 
 ---
 

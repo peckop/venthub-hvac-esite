@@ -212,7 +212,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <Briefcase className="w-4 h-4 text-gray-400 absolute left-4 top-3.5" />
                       <input
                         value={company} onChange={(e) => setCompany(e.target.value)}
-                        placeholder="Şirketiniz A.Ş."
+                        placeholder={t('lead.companyPlaceholder')}
                         className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
                       />
                     </div>
@@ -255,7 +255,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _prod
                       <MapPin className="w-4 h-4 text-gray-400 absolute left-4 top-3.5" />
                       <input
                         value={city} onChange={(e) => setCity(e.target.value)}
-                        placeholder="Örn: İstanbul"
+                        placeholder={t('lead.cityPlaceholder')}
                         className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:border-primary-navy transition-colors"
                       />
                     </div>

@@ -220,7 +220,7 @@ const AdminSettingsPage: React.FC = () => {
             <div className="space-y-3 text-sm text-admin-fg">
               <p>
                 <span className="text-admin-fg-muted font-bold block text-xs">{t('admin.settings.adminSessionTimeout')}</span>
-                <span className="font-semibold text-admin-fg">{adminsValues?.admin_sessions_timeout} {t('admin.common.range')} (Saat)</span>
+                <span className="font-semibold text-admin-fg">{adminsValues?.admin_sessions_timeout} {t('admin.common.range')} ({t('admin.settings.hoursUnit')})</span>
               </p>
               <p>
                 <span className="text-admin-fg-muted font-bold block text-xs">{t('admin.settings.mfaRequired')}</span>

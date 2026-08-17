@@ -57,14 +57,14 @@ kendisini eklemek insanın işidir ve PR incelemesinde aranır.
 | 1 | Zorunlu yasal onaylar alınmadan ödeme başlamaz | Mesafeli Satış Sözl. §4 | `validateLegalConsents` + INV-LEGAL-1 | Kod | ✅ |
 | 2 | Analitik/pazarlama çerezleri yalnız açık rızayla | Çerez Politikası | Rıza kapısı + INV-LEGAL-2 | Kod | ✅ |
 | 3 | Fatura, beyan edilen bilgilere göre düzenlenir | Mesafeli Satış Sözl. §5 | §2 köprü prosedürü | Manuel | 🟡 köprü |
-| 4 | KVKK talepleri 30 gün içinde ücretsiz sonuçlandırılır | KVKK Aydınlatma | §3 başvuru prosedürü | Manuel | 🟡 kanal eksik |
+| 4 | KVKK talepleri 30 gün içinde ücretsiz sonuçlandırılır | KVKK Aydınlatma | §3 prosedürü + `/admin/data-requests` defteri (T063) | Kod + Manuel | 🟡 kanal adresi Recep'te |
 | 5 | Cayma hâlinde bedel 14 gün içinde iade edilir | Mesafeli Satış Sözl. §7 | `iyzico-refund` (T053-VH) | Kod | 🔴 EDGE-REFUND şeridinde |
 | 6 | Teslimat süresi / kargo firması / iade adresi | Sözl. §6, §7 | `legal.ts` alanları | Konfigürasyon | 🔴 yer tutucu |
 | 7 | Kişisel veri saklama süreleri | KVKK §…, Gizlilik | `legal.ts` retention* | Konfigürasyon | ✅ |
 | 8 | Bireysel faturada alıcı kimliği (TCKN) | — (mevzuat gereği) | `invoiceIdentity.ts` + `invoiceIdentityThreshold` | Kod + Konfig. | ✅ |
 | 9 | Analitik/pazarlama etiketi rıza olmadan yüklenmez | Çerez Politikası | `ConsentGatedAnalytics` + `trackEvent` kapısı | Kod | ✅ |
-| 10 | Veri sahibi talebi 30 gün içinde sonuçlandırılır | KVKK Aydınlatma | `data_subject_requests` + §3.3 prosedürü | Kod + Manuel | 🟡 kanal eksik |
-| 11 | Silme talebinde saklama yükümlülüğü olan veri korunur | KVKK m.7 / VUK | `anonymize_user_personal_data()` | Kod | 🟡 migration onayı bekliyor |
+| 10 | Veri sahibi talebi 30 gün içinde sonuçlandırılır | KVKK Aydınlatma | `data_subject_requests` + admin defteri + süre sayacı (INV-KVKK-1) | Kod | ✅ mekanizma · 🟡 adres |
+| 11 | Silme talebinde saklama yükümlülüğü olan veri korunur | KVKK m.7 / VUK | `anonymize_user_personal_data()` | Kod | ✅ prod'da canlı (08-17 ölçüldü) |
 
 **8 numaralı satırın gerekçesi (karar kaydı).** TCKN başta koşulsuz zorunlu tutuldu; mevzuat
 araştırması (2026-08-16) bunun kanunun istediğinden sıkı olduğunu gösterdi. GİB, nihai
@@ -241,6 +241,43 @@ talep kaydı `user_id` boşalarak KALIR: sürenin ve sonucun ispatı bizim yük�
 > KVKK'ya uygunluk değil, başka bir ihlaldir. Sınırın tam yeri (faturanın hangi alanı
 > belge, hangisi operasyonel veri) **muhasebeci/hukukçu şeridine** aittir; kod bu yüzden
 > muhafazakâr davranır ve süre dolmadan sipariş kaydına dokunmaz.
+
+### 3.5 Defterin yüzü — `/admin/data-requests` (T063, 2026-08-17)
+
+Defter tablosu vardı ama **onu besleyen/gösteren arayüz yoktu**: talep kaydı elle SQL
+gerektiriyordu ve süre hiçbir yerde görünmüyordu, yani §3.4'ün "süre ve sonuç ispat
+yükü altındadır" şartı pratikte karşılanamıyordu. Kurulan ekranın bağlayıcı kuralları
+(bekçi: `kvkk-request-ledger.test.ts` · INV-KVKK-1):
+
+1. **Kanal e-postadır, form değil.** Talep `applicationEmail`/KEP'e ulaşır; admin onu
+   deftere işler. §3.1'in ayrımı korunur: self-servis "hesabımı sil" düğmesi hukuki
+   zorunluluk DEĞİL, ürün işidir — bu ekran onun yerine geçmez, onu **gerektirmez** de.
+   ⚠️ Kanalın çalışması `legal.ts → applicationEmail` değerinin **gerçek ve izlenen** bir
+   adres olmasına bağlıdır; değer yer tutucu kaldığı sürece 4/10 numaralı satırlar 🟡 kalır.
+2. **Süre otoritesi DB'dir.** 30 günlük son tarihi `due_at` DB default'u koyar; UI ve
+   servis bunu **yeniden hesaplamaz** (INV-KVKK-1 R2). Gerekçe: istemci saati ile sunucu
+   saati ayrışırsa "30 gün içinde yanıtladık" ispatı çürür.
+3. **Gecikme görünür olmak zorundadır.** Liste `due_at` artan sıralıdır; gecikmiş talep
+   hata rengi + uyarı ikonuyla ayrışır. Süre terminal statüde (`completed`/`rejected`)
+   DURUR — sonuçlanmış talep sonsuza dek "gecikmiş" görünmez.
+4. **UI izni ⊆ DB izni.** RLS kapısı `is_admin_user()` yalnız `admin`/`super_admin` kabul
+   eder; bu yüzden rota rbac'ta o iki role daraltıldı. Aksi hâlde moderator/viewer sayfayı
+   açar, RLS satır vermez ve ekran "kayıt yok" der — *yetkisi yok* yerine *veri yok*
+   yanılgısı (T062'de warehouse'ta yaşanan sessiz-boş sınıfı).
+5. **Sonuçlandırma sessiz olamaz.** `completed`/`rejected` statüsüne geçiş `outcome`
+   olmadan REDDEDİLİR (servis katmanında `throw`); saklanan veri varsa
+   `retained_data_note` doldurulur (§3.4/2'nin UI karşılığı).
+6. **Denetim izinde veri minimizasyonu.** `admin_audit_log` payload'ına başvuranın
+   e-postası YAZILMAZ; talep türü, kimlik-tevsik durumu ve son tarih yeterlidir. Kişisel
+   veriyi ikinci bir tabloya kopyalamak, KVKK talebini yönetirken KVKK ilkesini çiğnemek olurdu.
+7. **Sözlük DB'den gelir.** `request_type`/`status` değerleri migration'daki CHECK
+   kısıtının birebir kopyasıdır ve bekçi ikisini karşılaştırır: kodda fazladan değer
+   seçilirse prod INSERT'i 400 döner, eksik değer varsa admin gerçek durumu göremez.
+
+**Kapsam dışı (bilinçli):** müşteri-tarafı web başvuru formu. Gerekçe iki katmanlı —
+(a) §3.1'e göre hukuki zorunluluk değil, (b) tablonun RLS'i yalnız admin'e açık olduğundan
+müşteri INSERT'i migration gerektirir; migration Recep kapısıdır ve zorunlu olmayan bir
+ürün özelliği için açılmaz. Anonim (hesapsız) başvuru ayrıca e-posta doğrulama akışı ister.
 
 ---
 
