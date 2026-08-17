@@ -69,8 +69,47 @@ Deno.serve(async (req) => {
 
     const reconciled: string[] = []
     const failed: string[] = []
+    /** Yazması GERÇEKTEN düşenler — rapor bunları saklamaz (aşağıdaki gerekçeye bak). */
+    const yazilamayan: Array<{ id: string; detay: string }> = []
+
+    /**
+     * Ödenmemiş siparişi sonlandır.
+     *
+     * M2 (20-madde v2 · 2026-08-17) — İKİ ayrı kusur birlikte yaşıyordu:
+     *
+     * 1) SÖZLÜK DIŞI DEĞER: `{ status: 'failed' }` yazılıyordu. Canlı DB kısıtı
+     *    (`venthub_orders_status_check`) yalnız
+     *    {pending, confirmed, processing, shipped, delivered, cancelled} kabul eder —
+     *    `failed` bir STATUS değeri DEĞİL, `payment_status` değeridir. Yani PATCH
+     *    daima 400 dönüyordu ve sipariş `pending` kalıyordu.
+     * 2) SESSİZ YUTMA: `.catch(() => {})` hatayı yutuyor, sipariş id'si yine
+     *    `failed[]` listesine ekleniyor ve fonksiyon `{ ok: true }` raporluyordu.
+     *    Sonuç: kalıcı `pending` sipariş + sonsuza kadar "başarıyla failed yapıldı"
+     *    diyen bir rapor. Hiçbir alarm çalmaz çünkü çıktı BAŞARILI görünür.
+     *
+     * Doğru değer çifti kardeş fonksiyondan alındı (`release-expired-reservations`):
+     * `{ status: 'cancelled', payment_status: 'failed' }` — sipariş iptal, ödeme
+     * başarısız. Kardeş ayrıca hatayı YUTMUYOR (`if (updateErr) throw`); burada da
+     * rapor gerçeği söyler.
+     */
+    async function odemesizSiparisiSonlandir(id: string): Promise<void> {
+      const resp = await fetch(
+        `${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(id)}&status=eq.pending`,
+        {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${serviceRoleKey}`, 'apikey': serviceRoleKey, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ status: 'cancelled', payment_status: 'failed', updated_at: new Date().toISOString() })
+        }
+      ).catch((e) => { throw new Error(`ag hatasi: ${e instanceof Error ? e.message : String(e)}`) })
+
+      if (!resp.ok) {
+        const govde = await resp.text().catch(() => '')
+        throw new Error(`PATCH ${resp.status}: ${govde.slice(0, 200)}`)
+      }
+    }
 
     for (const o of pendWithToken as Array<{ id: string }>) {
+      let sonlandir = false
       try {
         const cb = await fetch(`${fnHost}/iyzico-callback`, {
           method: 'POST',
@@ -81,26 +120,38 @@ Deno.serve(async (req) => {
         if (body?.status === 'success') {
           reconciled.push(o.id)
         } else {
-          // Tek deneme sonrası hala success değilse failed yap
-          await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(o.id)}&status=eq.pending`, {
-            method: 'PATCH',
-            headers: { 'Authorization': `Bearer ${serviceRoleKey}`, 'apikey': serviceRoleKey, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ status: 'failed' })
-          }).catch(() => {})
-          failed.push(o.id)
+          // Tek deneme sonrası hâlâ success değil → siparişi sonlandır.
+          sonlandir = true
         }
       } catch {
-        // Hata alırsak da failed'a çekelim (pending kalmasın)
-        await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(o.id)}&status=eq.pending`, {
-          method: 'PATCH',
-          headers: { 'Authorization': `Bearer ${serviceRoleKey}`, 'apikey': serviceRoleKey, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ status: 'failed' })
-        }).catch(() => {})
-        failed.push(o.id)
+        // Reconcile denemesi patladıysa da sipariş `pending` kalmamalı.
+        sonlandir = true
+      }
+
+      if (sonlandir) {
+        try {
+          await odemesizSiparisiSonlandir(o.id)
+          failed.push(o.id)
+        } catch (e) {
+          // Yazma düştüyse `failed[]`'e EKLEME — o liste "sonlandırıldı" demektir.
+          // Yalanı raporda taşımaktansa görünür kıl: sipariş hâlâ `pending`.
+          const detay = e instanceof Error ? e.message : String(e)
+          console.error('[order-housekeeping] siparis sonlandirilamadi', { order_id: o.id, detay })
+          yazilamayan.push({ id: o.id, detay })
+        }
       }
     }
 
-    return new Response(JSON.stringify({ ok: true, cancelled_count: Array.isArray(cancelled) ? cancelled.length : 0, reconciled, failed }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
+    // Yazması düşen varsa `ok: true` DÖNMEZ: bu fonksiyonun tek işi durumu ilerletmek;
+    // ilerletemediyse "başarılı" demek, çağıranı (cron/izleme) kör eder.
+    const govde = {
+      ok: yazilamayan.length === 0,
+      cancelled_count: Array.isArray(cancelled) ? cancelled.length : 0,
+      reconciled,
+      failed,
+      ...(yazilamayan.length > 0 ? { yazilamayan } : {})
+    }
+    return new Response(JSON.stringify(govde), { status: yazilamayan.length === 0 ? 200 : 500, headers: { ...cors, 'Content-Type': 'application/json' } })
   } catch (_e) {
     const msg = _e instanceof Error ? _e.message : String(_e ?? '')
     return new Response(JSON.stringify({ ok: false, error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
