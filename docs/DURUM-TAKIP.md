@@ -1,7 +1,20 @@
 # DURUM TAKİP — Canlı Çalışma Panosu
 
 > Tek "neredeyiz?" kaynağı. Daldan dala geçince buraya bak. Her önemli adımda güncellenir.
-> **Son güncelleme: 2026-08-15 — FİYATLAR CANLI + ÜÇ OTURUM PARALEL ÇALIŞIYOR:** Fiyat motoru seed'i
+> **Son güncelleme: 2026-08-17 — OPERASYON DENETİMİ DALGASI KAPANDI + İKİ TAM-KAPSAM DENETİM + NLM GÖÇÜ** (yazan: OPS-AUDIT `cb0467f1`, detay §Controller #7):
+> 08-15 operasyon döngüsü denetimi (rapor `#550`, iş emirleri **T052-T062**) iki günde büyük ölçüde kapandı:
+> **T052** stok düşümü · **T053** gerçek iade parası · **T056** şifre-sıfırlama/PKCE · **T057** admin iade + returns RLS ·
+> **T059** hesap yüzeyleri · **T060** logout + auth cetveli (A9 CAPTCHA=YAPILMAYACAK kapalı karar `#581`) ·
+> **T062 satınalma modülü v1** (5 dalga `#569/#572/#573/#576/#579`, bekçi INV-PURCH-1) · **T067 teklif modülü** çekirdeği (`#574`) ·
+> araçlar T064-T066. **İki tam-kod denetimi master'da:** render stratejisi (`#585`, T070 — vitrin **kazara dinamik**, 6 tazeleme
+> deliği maskeli; onarım sırası Dalga-1→5 zorunlu, `product_images` zinciri T069 görsellerden ÖNCE) + 20-madde v2 (`#586`, T071 —
+> 93 ham bulgu → adversaryal doğrulamayla **1 CRITICAL lansman-engeli: `iyzico-refund` müşteri self-refund IDOR (T071-B1, EDGE)** +
+> 6 CONFIRMED-MED M1-M6 + 13 downgrade). **NLM ikizi göçtü** (`notebooklm-py`; login çözümü memory `nlm-auth-issue` — restart gerekmez)
+> + **T072** kaynak-sync ALTYAPI'da. **Açık PR:** `#578` (QUOTE tip) · `#580` (ADMIN, Vercel penceresi) · `#584` (Vault, **MIGRATION=Recep**) ·
+> `#587`/`#551` (Scribe doc). **Recep kararı bekleyen:** T071-B1 fix yolu + render/20-madde dalga onayları + lansman kritik yolu
+> (kargo 3-rakam · muhasebeci→e-arşiv entegratörü · DNS+SITE_URL · İyzico prod+BASE_URL · KVKK · görseller · Vercel Pro).
+>
+> **Önceki: 2026-08-15 — FİYATLAR CANLI + ÜÇ OTURUM PARALEL ÇALIŞIYOR:** Fiyat motoru seed'i
 > koşuldu, vitrin artık fiyat gösteriyor (detay: Controller #3). Çok-oturumlu koordinasyon modeli
 > (`#511`/`#514`) canlı — pano `C:/tmp/venthub-board/`, cetvel `standards/multi-session-coordination-standard.md`.
 > **EKSİK (düzeltildi):** LAUNCH kendi bölümünü **#519 ile açtı** (§Controller #4) — ilk yazdığım
@@ -288,6 +301,51 @@ iş taşıyor, dokunulmadı.**
 - **PRICING (#3):** ana dizin artık `master`'da; `chore/standards-followthrough` dalın silindi
   (içeriği zaten `#533` ile master'daydı). Ana dizini master'a ff-pull etmek **fantom churn
   düzelene kadar mümkün değil** — `T017` planı yukarıda.
+
+### Controller #7 — OPS-AUDIT şeridi (yatay denetim · orkestrasyon · PR kapıları)
+
+> Şerit: `docs/audits/**` (operasyon/20-madde/render) · `docs/DURUM-TAKIP.md` (yalnız bu bölüm + üst bando) ·
+> registry bakımı · pano koordinasyonu. Oturum `cb0467f1`. Rol: **yatay soruları sormak** (dikey şeritlerin
+> hiçbirinin sormadığı "operasyon döngüsü eksiksiz mi?"), PR incelemesi, iş emri dağıtımı. Kod işi ÜSTLENMEZ —
+> plan çıkarır, sahibine adresler ([[orchestrator-stays-pure]]).
+
+**⭐ 2026-08-15→17 — Operasyon döngüsü denetimi ve kapanışı (rapor `#550`, T052-T062):**
+- **Dört sessiz sahte-başarı bulundu:** satışta stok düşmüyor (T052) · iade parası MOCK (T053) · kargo sabit
+  "Ücretsiz" (T054, Recep kararı) · e-arşiv fatura yok (T055, Recep kararı). İlk ikisi + T056/57/59/60/62/64-66
+  ~20 PR ile kapandı; T067 teklif modülü çekirdeği `#574`. Kalan: T054/T055 (Recep) · T058 %55 · T061 alarm kalanı
+  (string-eşitlik→role-claim) · T063 KVKK · T068 teklif e-postası (EDGE).
+- **META dersi:** yatay soruyu hiçbir dikey şerit sormuyordu; LAUNCH denetimi bile "uçtan uca satın alma hiç
+  denenmedi" yazmıştı ama kimse iş emrine çevirmemişti.
+
+**⭐ 2026-08-16 — İki tam-kapsam denetim filosu (Opus, worktree-izole, adversaryal doğrulama):**
+- **Render stratejisi (`#585` merged, T070):** vitrin **kazara dinamik** (`getTenantConfig` headers() + await
+  searchParams) → tüm revalidate/webhook hattı ölü sermaye; kazara-dinamiklik 6 tazeleme deliğini maskeliyor
+  (TR yolları kanonik slug'la · alt-kategori+sitemap hiç · `product_images`/`brands`/`price_lists` zincirsiz).
+  **Onarım sırası ZORUNLU:** Dalga-1 zincirler (`product_images` T069'dan ÖNCE) → Dalga-2 statikleştirme →
+  D3 ölü aygıtlar → D4 kapı genişletme → D5 sınır göçleri. PPR kararı doğru. **Dalga onayı Recep'te.**
+- **20-madde v2 (`#586` merged, T071):** 93 ham → 20 aday → her bulguya 1 Opus skeptik (dosya-aç-yeniden-üret +
+  savunma-katmanı-ara). **SONUÇ: 1 CRITICAL + 6 MED + 13 downgrade + 1 dup.** Tek lansman-engeli **T071-B1:**
+  `iyzico-refund/index.ts:174` authZ kapısı sipariş SAHİBİNİ geçiriyor → müşteri kendi JWT'siyle tam iade +
+  stok geri-yazımı (service-role, RLS backstop yok). FIX=isOwner kaldır (EDGE'e adresli). CONFIRMED-MED:
+  M1 received=refunded yalanı · M2 housekeeping 'failed' sözlük-dışı · M3 returns concurrency · M4 14 edge fn
+  ölü 'superadmin' · M5 PO kolon-grant · M6 PO durum-tetiği. **Örüntü:** conformance kaynağı tarıyor, DB-tarafı
+  değişmezi (tetik/kolon-grant/0-satır/runtime-authZ) göremiyor → kapı-genişletme ekseni + T047 kök-atış.
+- **Süreç dersleri:** uzun filoda watchdog şart (20-madde filosu bir kez SESSİZCE öldü — bildirim düşmedi,
+  dosya-tazeliğiyle yakalandı) · kendi çıktına güvenme, doğrulamayı yeniden-üret (boş dönen resume körü körüne
+  kabul edilseydi 20 doğrulanmamış "CRITICAL" sunulacaktı).
+
+**⭐ 2026-08-17 — NLM ikizi + danışmanlık + T072:**
+- ALTYAPI göçü bitti (`teng-lin/notebooklm-py`, MCP `notebooklm-py`); auth çözümü kalıcılaştı: `notebooklm login`
+  → MCP file-based okur, **restart gerekmez** (memory `nlm-auth-issue`). Token kısa ömürlü; kanıt=gerçek çağrı.
+- İkizle P0→P3 lansman danışmanlığı yapıldı (P0=refund-IDOR+render zinciri · P1=alan adı+İyzico-prod+KVKK ·
+  P2=kargo+fatura · P3=görseller) — ⚠️ ikiz o an 08-13'te bayattı; **T072 sync sonrası tekrar sorulacak.**
+- **T072 drift temizliği (Recep onaylı, NLM çapraz-doğrulandı):** 59 kaynak vs yaml 46 → 5 yükle + 6 yaml'a ekle +
+  5 kaldır + 3 tut. ALTYAPI'da. Kalıcı öneri: yaml↔defter parite bekçisi.
+
+**Açık kuyruk (OPS-AUDIT):** T072 sync takibi → güncel-ikiz danışmanlığı tekrar · `#587`/`#551` Scribe göz-kontrol ·
+PR kapı takibi (`#578`/`#580`/`#584`) · dalga onayları Recep'ten çıkınca dağıtım. Oturum haritası:
+ADMIN-CUSTOMER=`6cc7f2d3` · EDGE=`4397deef` · PRICING=`f68f03d8` · AUTH=`99fa366e` · QUOTE=`e033dc3e` ·
+ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 
