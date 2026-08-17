@@ -97,9 +97,19 @@ Sabotajda import silinip yerine `const SITE_URL = 'https://sabit.example'` konun
 davranışı ödüllendiriyordu. Kural **bağı** arayacak şekilde daraltıldı:
 `/from\s+['"][^'"]*config\/siteUrl['"]/`. **Bir ismin dosyada geçmesi hiçbir şey kanıtlamaz.**
 
-**Kapsamaz:** kanonik ↔ sitemap tutarlılığı (§4 kapanınca `INV-CANONICAL-2`), hreflang
-tamlığı, `?sku=` gibi sorgu parametrelerinin kanonikten dışlanması (bugün elle sağlanıyor —
+**Kapsamaz:** `?sku=` gibi sorgu parametrelerinin kanonikten dışlanması (bugün elle sağlanıyor —
 `page.tsx` ve `ProductDetailPageView.tsx` yorumlarında yazılı), çalışma anında kurulan adresler.
+
+**Artık KAPSIYOR — `INV-CANONICAL-2` (dil öneki + hreflang + sitemap paritesi):**
+kanonik ↔ sitemap tutarlılığı, hreflang varlığı, ve **istemci kanonik yüzeyi**.
+
+> **İstemci yüzeyi neden ayrı kural (2026-08-18 ölçümü):** `alternates` taraması `<Seo>` ile
+> basılan kanoniği **göremez**. Ölçüldü: sekiz dosya `<Seo>` kullanıyor ama yalnız biri açık
+> `canonical` geçiyor; kalan **yedisi** (Hakkımızda, İletişim, Markalar, Bilgi Merkezi hub ve
+> topic, hesaplayıcılar, marka detayı) `Seo.tsx`'in **varsayılanına** güveniyor. Varsayılan
+> bugün doğru — `usePathname()` dil segmentini taşır — ama **korumasızdı**: biri varsayılanı
+> dilsiz bir kaynağa çevirseydi yedi yüzey birden sessizce bozulur ve hiçbir test görmezdi.
+> Yani burası "temiz" değil **ölçülmemiş**ti; artık ölçülüyor (sabotaj 3/3).
 
 ## 6. Kim neye dokunur
 

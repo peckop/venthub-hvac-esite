@@ -179,6 +179,46 @@ describe('INV-CANONICAL-2 · kanonik dil öneki + hreflang + sitemap paritesi', 
     ).toEqual([])
   })
 
+  it('istemci kanonik yüzeyi (Seo.tsx) dil önekini yolun KENDİSİNDEN alır', () => {
+    // NİÇİN AYRI KURAL: `alternates` taraması bu yüzeyi GÖREMEZ. Ölçüm (2026-08-18): sekiz
+    // dosya `<Seo>` kullanıyor, yalnız biri (`ProductDetailPageView`) açık `canonical` geçiyor;
+    // kalan yedisi (Hakkımızda, İletişim, Markalar, Bilgi Merkezi hub/topic, hesaplayıcılar,
+    // marka detayı) VARSAYILANA güveniyor. Varsayılan bugün DOĞRU — `usePathname()` dil
+    // segmentini taşır. Ama korumasızdı: biri varsayılanı `Routes.x(...)` gibi dilsiz bir
+    // kaynağa çevirseydi YEDİ yüzey birden sessizce bozulur ve hiçbir test görmezdi.
+    // Bu kural o "bugün doğru ama korumasız" hâlini kilitler.
+    const seo = kod(SOURCES['/src/components/Seo.tsx'] ?? '')
+    expect(seo.length, 'Seo.tsx okunamadı — yol değişti mi?').toBeGreaterThan(0)
+
+    expect(
+      /usePathname\s*\(/.test(seo),
+      'Seo.tsx dil önekini yolun kendisinden almıyor. `usePathname()` kaldırılırsa kanonik ' +
+        'dil segmentini kaybeder ve yedi yüzey birden bozulur.',
+    ).toBe(true)
+
+    // Kanonik SSOT host'tan + gerçek yoldan kurulmalı (INV-CANONICAL-1 ile bilerek örtüşür).
+    expect(
+      /canonical\s*\|\|\s*`\$\{siteUrl\}\$\{pathname\}`|canonical\s*\|\|\s*`\$\{SITE_URL\}\$\{pathname\}`/.test(
+        seo,
+      ),
+      'Seo.tsx kanonik yedeği `SITE_URL + pathname` biçiminde değil — dil öneki garanti edilemez.',
+    ).toBe(true)
+
+    // `<Seo>`'ya AÇIK canonical geçen her yer dil parçası taşımalı.
+    const ihlaller: string[] = []
+    for (const [dosya, ham] of uretimDosyalari()) {
+      const src = kod(ham)
+      if (!/<Seo\b/.test(src)) continue
+      const harita = sabitler(src)
+      for (const m of src.matchAll(/<Seo\b[^>]*\scanonical=\{([^}]+)\}/g)) {
+        if (!DIL_PARCASI.test(coz(m[1], harita))) {
+          ihlaller.push(`${dosya.replace(/^\//, '')} — <Seo canonical={${m[1].trim()}}> dil parçası YOK`)
+        }
+      }
+    }
+    expect(ihlaller, `\n${ihlaller.join('\n')}`).toEqual([])
+  })
+
   it('dedektör sağlığı: sentetik ihlali görür, sentetik doğruyu görmez', () => {
     const YANLIS = [
       'const canonicalUrl = `${SITE_URL}/products/${slug}`',
