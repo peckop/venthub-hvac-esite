@@ -115,6 +115,72 @@ describe('INV-PAY-3 · dış para hareketi çağır-önce-talep-et ve hatayı yu
     ).toEqual([])
   })
 
+  /**
+   * KURAL G (T071-B1 · 2026-08-17) — parayı KİM tetikleyebilir?
+   *
+   * NİÇİN SONRADAN EKLENDİ: A–D para hareketinin NASIL yapılacağını ölçüyordu, yetkiyi hiç
+   * sormuyordu; §3.2 ise "rol VEYA kaynak sahipliği" diyordu. İkisi ayrı ayrı doğruydu ve
+   * kesişimleri açıktı: `iyzico-refund` kapısı `isAdmin || isOwner` yazıldı (#558), HER İKİ
+   * kurala da uygundu ve bir IDOR'du — müşteri kendi JWT'siyle tam iade + stok geri-yazımı
+   * tetikleyebiliyordu. İstemci `service_role` olduğu için RLS yedeği de yoktu.
+   *
+   * DEDEKTÖR TASARIMI: "sahiplik" kelimesini aramak işe yaramaz (sahiplik OKUMA sorgularında
+   * meşrudur ve bu dosyalarda geçer). Aranan şey, çağıranın kimliğiyle kaynağın sahibini
+   * karşılaştıran bir ifadenin **yetki KARARINDA** (rol ile VEYA'lanmış biçimde) kullanılması.
+   * Bu yüzden desen `... || isOwner` / `isOwner || ...` gibi bir mantıksal VEYA arar; salt
+   * `order.user_id === reqUserId` karşılaştırması (ör. bir okuma filtresi) kapıyı kırmaz.
+   */
+  it('kural G — para taşıyan fonksiyonun yetki kapısında SAHİPLİK dalı yok (rol zorunlu)', () => {
+    // Yetki kararında sahipliğin rolle VEYA'lanması: `isAdmin || isOwner`, `owner || admin`,
+    // ya da doğrudan karşılaştırmanın VEYA'ya girmesi (`isAdmin || o.user_id === userId`).
+    const SAHIPLIK_VEYA_RE =
+      /(?:\|\|\s*(?:is)?[Oo]wner\b)|(?:\b(?:is)?[Oo]wner\s*\|\|)|(?:\|\|[^;\n]{0,60}\.user_id\s*===)|(?:\.user_id\s*===[^;\n]{0,60}\|\|)/
+
+    const ihlaller = moneyMovers
+      .filter((f) => SAHIPLIK_VEYA_RE.test(f.code))
+      .map((f) => f.path)
+
+    expect(
+      ihlaller,
+      [
+        'Para taşıyan bir fonksiyonun yetki kapısı SAHİPLİĞİ kabul ediyor.',
+        '',
+        'Sahiplik OKUMA yetkisi verir, PARA HAREKETİ yetkisi VERMEZ: siparişin müşteriye ait',
+        'olması, o parayı geri ödeme ve stoğu geri yazma KARARINI vermeye yetki vermez.',
+        'Müşterinin meşru yolu iade TALEBİ açmaktır; kararı admin verir.',
+        '',
+        'Bu tam olarak T071-B1 idi (20-madde v2 raporunun tek lansman-engeli):',
+        '`isAdmin || isOwner` yazılmıştı, service_role istemcisi yüzünden RLS yedeği de yoktu.',
+        '',
+        'Doğrusu: `if (!isAdmin) return 403` · cetvel §3.10-G',
+        ...ihlaller,
+      ].join('\n'),
+    ).toEqual([])
+  })
+
+  it('kural G — para taşıyan fonksiyon GERÇEKTEN rol kontrolü yapıyor (boş kapı değil)', () => {
+    // Sahipliği silmek yetmez: kapı büsbütün kaldırılırsa yukarıdaki test yine yeşil kalır.
+    // Bu yüzden pozitif şart ayrıca aranır — kanonik rol literali + 403 dönüşü.
+    const ROL_RE = /['"]super_admin['"]|['"]admin['"]/
+    const RED_RE = /\b403\b/
+    const ihlaller = moneyMovers
+      .filter((f) => !(ROL_RE.test(f.code) && RED_RE.test(f.code)))
+      .map((f) => f.path)
+
+    expect(
+      ihlaller,
+      [
+        'Para taşıyan bir fonksiyonda rol kontrolü ya da 403 reddi görünmüyor.',
+        '',
+        'Sahiplik dalını kaldırmak tek başına yetmez — yerine AYRICALIKLI ROL kapısı',
+        'gelmelidir, yoksa uç kimliği doğrulanmış herkese açık kalır.',
+        '',
+        'Cetvel §3.2 (gövde yetkisi) + §3.10-G (parayı kim tetikler)',
+        ...ihlaller,
+      ].join('\n'),
+    ).toEqual([])
+  })
+
   it('para taşıyan fonksiyon stoğu DOĞRUDAN yazmaz — RPC ÇAĞRILIR (INV-STOCK-1 takviyesi)', () => {
     // ⚠️ NİÇİN BURADA DA VAR: INV-STOCK-1 bu kuralı zaten koyuyor, ama kontrolü
     // `kaynak.includes('process_order_stock_restore')` biçiminde. Sabotaj turunda

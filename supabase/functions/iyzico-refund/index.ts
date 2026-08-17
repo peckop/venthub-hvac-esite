@@ -159,7 +159,23 @@ Deno.serve(async (req) => {
     const order = Array.isArray(orders) ? orders[0] : null;
     if (!order) return json({ error: { code: "NOT_FOUND", message: "Order not found" } }, 404);
 
-    // ── AuthZ: admin VEYA sipariş sahibi (§3.2 yatay yetki) ───────────────────────
+    // ── AuthZ: YALNIZ ayrıcalıklı rol (§3.2 + §3.10-G) ────────────────────────────
+    //
+    // T071-B1 (2026-08-17): burada eskiden `isAdmin || isOwner` vardı ve bu bir IDOR'du.
+    // Kimliği doğrulanmış HERHANGİ bir müşteri, kendi siparişi için doğrudan bu ucu
+    // çağırıp admin onayı olmadan TAM para iadesi + stok geri-yazımı tetikleyebiliyordu.
+    // İstemci `service_role` olduğu için RLS bir yedek DEĞİL — bu kapı tek kapıydı.
+    //
+    // Kural: **sahiplik OKUMA yetkisi verir, PARA HAREKETİ yetkisi vermez.** Siparişin
+    // müşteriye ait olması, o parayı geri ödeme ve stoğu geri yazma KARARINI vermeye
+    // yetki vermez; o karar tüccarındır. Müşterinin meşru yolu iade TALEBİ açmaktır
+    // (`venthub_returns`), talebi admin onaylar ve iadeyi admin ekranı tetikler.
+    //
+    // NOT (bilinçli, kapsam dışı): aşağıdaki rol listesinde ölü `'superadmin'` yazımı
+    // duruyor — DB CHECK kısıtı yalnız `super_admin` kabul ediyor, yani o dal hiç
+    // eşleşmez. Zararsız (kanonik yazım zaten listede) ama 14 edge fonksiyonunda aynı
+    // ölü yazım TEK kapı olarak kullanılıyor ve orada 403 üretiyor → M4 dalgasında
+    // topluca temizlenecek; burada tek başına silmek o dalganın sabotaj kanıtını bulandırır.
     let isAdmin = false;
     const prof = await fetch(
       `${supabaseUrl}/rest/v1/user_profiles?id=eq.${encodeURIComponent(reqUserId)}&select=role`,
@@ -170,8 +186,7 @@ Deno.serve(async (req) => {
       const profileRow = Array.isArray(arr) ? arr[0] : null;
       isAdmin = profileRow?.role === 'admin' || profileRow?.role === 'super_admin' || profileRow?.role === 'superadmin';
     }
-    const isOwner = order.user_id === reqUserId;
-    if (!(isAdmin || isOwner)) return json({ error: { code: "FORBIDDEN", message: "Yetkisiz" } }, 403);
+    if (!isAdmin) return json({ error: { code: "FORBIDDEN", message: "Yetkisiz" } }, 403);
 
     const totalAmount = Number(order.total_amount) || 0;
     const prevDebug: PaymentDebug = (order?.payment_debug || {}) as PaymentDebug;
