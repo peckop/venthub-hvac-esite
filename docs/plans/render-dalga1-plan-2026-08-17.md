@@ -158,7 +158,7 @@ bu boşlukta yaşadı. Eklenecek assert'ler:
 | A1 | Kategori yolu kuran her satır `getLocalizedCategorySlug` çağrısından geçer; ham `category.slug` ile `revalidatePath('/tr/category/...')` YASAK | K2 (TR yüzeyi tazelenmiyor) |
 | A2 | Kategori SELECT'leri `metadata` içerir | lokalize slug'ın girdisi hiç gelmiyor |
 | A3 | En az bir dal iki segmentli kategori yolu üretir (`/category/x/y` deseni) | alt-kategori donması |
-| A4 | En az bir dal `/sitemap.xml` tazeler | sitemap donması |
+| A4 | **İkisi birlikte:** en az bir dal `/sitemap.xml` tazeler **VE** `sitemap.ts` bir `revalidate` ihracı taşır (D2: olay birincil + 24s yedek) | sitemap donması; yalnız-webhook'a bel bağlama |
 | A5 | `product_images`/`brands`/`price_lists` dalları **gövdeli** (boş blok = kırmızı) | boşaltılmış handler yeşil geçiyordu |
 | A6 | Yeni tetikler AFTER (migration metninde `before ... on <t>` + webhook fn = kırmızı) | DELETE iptali |
 
@@ -193,7 +193,8 @@ webhook işi zaten aynı dosyada, ikinci bir dal aynı satırlarda çakışır. 
 | S1 | `getLocalizedCategorySlug` çağrısını ham `category.slug` ile değiştir | A1 KIRMIZI |
 | S2 | SELECT'ten `metadata`'yı çıkar | A2 KIRMIZI |
 | S3 | İki segmentli yol üretimini sil | A3 KIRMIZI |
-| S4 | `/sitemap.xml` tazelemesini sil | A4 KIRMIZI |
+| S4a | `/sitemap.xml` tazeleme dalını sil (revalidate ihracı kalsın) | A4 KIRMIZI |
+| S4b | `sitemap.ts`'ten `revalidate` ihracını sil (dal kalsın) | A4 KIRMIZI — D2'nin yedek yarısı |
 | S5 | `product_images` dalının gövdesini boşalt (blok kalsın) | A5 KIRMIZI |
 | S6 | `brands` tetiğini migration'dan sil (handler kalsın) | mevcut çift-yön kapısı KIRMIZI |
 | S7 | Tersi: handler dalını sil (tetik kalsın) | öksüz-tetik KIRMIZI |
@@ -219,14 +220,18 @@ okuduğu için cetvelden satır silmek kapıyı kandırır. Koddan-türetme Dalg
 
 ---
 
-## 6. KARAR GEREKİYOR (kendim çözmedim — Recep/OPS-AUDIT)
+## 6. KARARLAR — VERİLDİ (OPS-AUDIT, 2026-08-17; Recep uygulama-dalgası onayında topluca veto edebilir)
 
-| # | Karar | Bağlam |
+| # | Karar | Sonuç |
 |---|---|---|
-| D1 | **Webhook dosyasını kim değiştiriyor** — PRICING mi, oyup bana mı veriyor | §3; önerim PRICING (aynı dosyada açık işi var) |
-| D2 | `sitemap.ts`'e `revalidate` değeri kaç olacak | W3; webhook yedeği; cetvelde beyan edilecek |
-| D3 | `price_lists` tam fan-out onayı (bugün 32 aile → 64 çağrı) + eşik sayısı | W4; alternatifi tag icat etmek, bugün gereksiz karmaşıklık |
-| D4 | W5 (96 tavanı) Dalga-1'de mi Dalga-2'de mi | Denetim Dalga-1 diyor; bugün zarar YOK, ama T069 öncesi şart |
+| D1 | Webhook dosyasını kim değiştiriyor | **PRICING-STOK** (aynı dosyada açık işi var) → W1–W4 onda. **Bende: W5 + W6 + W7.** |
+| D2 | `sitemap.ts` tazeleme modeli | **Olay-tabanlı birincil + 24 saat zaman-tabanlı YEDEK.** İlke: *bekçisiz statik sayfa kalmasın* → `export const revalidate = 86400` (24 s) ve webhook dalı BİRLİKTE. Webhook düşerse sayfa en fazla 1 gün bayat kalır; yalnız webhook'a bel bağlamak sessiz-donma riski taşır. |
+| D3 | `price_lists` tam fan-out | **ONAYLI** (32 aile ölçüldü, 64 çağrı ucuz). **Eşik: aile sayısı > 128 olursa UYARI LOGU yeter — tag icat edilmeyecek.** |
+| D4 | W5 (96 tavanı) sırası | **Uygulama dalgasının SONU; bloklayıcı değil** (bugün zarar üretmediği ölçüldü). T069 görsel yüklemesinden önce bitmiş olmalı. |
+
+**D2'nin plana etkisi:** W3 artık iki parçalı ve ikisi birlikte zorunlu — (a) `revalidatePath('/sitemap.xml')`
+dalı, (b) `sitemap.ts`'te `export const revalidate = 86400`. Kapı A4 assert'i **ikisini de** aramalı;
+yalnız birini aramak "bekçisiz statik sayfa kalmasın" ilkesini yarım bırakır.
 
 ## 7. Kapsam DIŞI (bilinçli)
 
