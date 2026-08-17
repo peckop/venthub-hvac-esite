@@ -11,6 +11,7 @@ import {
   PackageSearch,
   Percent,
   Settings,
+  ShieldCheck,
   ShoppingCart,
   SlidersHorizontal,
   Tags,
@@ -300,6 +301,20 @@ export const ADMIN_RESOURCES: AdminResource[] = [
     requiredAccess: '/admin/audit-logs',
     searchable: true,
     searchHintKey: 'admin.search.audit',
+    inNav: true
+  },
+  {
+    // T063 KVKK talep defteri. requiredAccess ROTA'dır: canAccessPage içinde
+    // /admin/data-requests yalnız admin/super_admin'e açıldı (RLS is_admin_user()
+    // moderator/viewer'ı kabul etmiyor — UI izni ⊆ DB izni).
+    key: 'dataRequests',
+    labelKey: 'admin.dataRequests.navLabel',
+    group: 'system',
+    route: '/admin/data-requests',
+    icon: ShieldCheck,
+    requiredAccess: '/admin/data-requests',
+    searchable: true,
+    searchHintKey: 'admin.dataRequests.searchHint',
     inNav: true
   },
   {
