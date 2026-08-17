@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -54,6 +54,8 @@ interface BoardNote {
 
 interface BoardModule {
   append: (sid: string, event: Record<string, unknown>) => void
+  readEvents: () => { sid?: string; type?: string }[]
+  PANOYA_YAZAN_FIILLER: Set<string>
   liveClaims: (now?: number) => BoardClaim[]
   findConflict: (filePath: string, sid: string, repoRoot?: string) => BoardConflict | null
   notesFor: (sid: string, lane: string, events?: Record<string, unknown>[]) => BoardNote[]
@@ -393,6 +395,136 @@ describe('INV-BOARD-2 · not adresleme teslim edilebilir olmalı', () => {
       expect(res.ok, `"${word}" broadcast sayılmadı`).toBe(true)
       expect(res.to, `"${word}" broadcast ise to BOŞ olmalı`).toBe('')
     }
+  })
+})
+
+/**
+ * INV-BOARD-3 · Kimliksiz yazım YOK (T079-VH).
+ *
+ * CLI, oturum kimliğini `--sid > CLAUDE_SESSION_ID > os.hostname() + '-manual'` sırasıyla
+ * çözüyordu. Üçüncü basamak sessiz bir arıza üretti: **Bash kabuğunda `CLAUDE_SESSION_ID`
+ * tanımlı değil**, dolayısıyla `--sid` verilmeyen her çağrı `events.<makine-adı>-manual.jsonl`
+ * dosyasına yazıyor, komut ise `exit 0` verip "not bırakıldı" basıyordu. Gönderen teslim
+ * edildiğini sanıyor; alıcı o dosyayı izlemediği için hiç görmüyor.
+ *
+ * 2026-08-17'de ölçüldü: 34 kayıt hayalet dosyaya düşmüş. Bunlardan biri CANLI bir `claim`di
+ * ve etkisi nottan daha ağır: pano aynı şeridi İKİ ayrı sahiple gösterdi ve kıdem hayalete
+ * geçtiği için şerit-çakışma kontrolü GERÇEK sahibi kendi dosyalarında engelleyebilir hâle
+ * geldi — yani sessiz kayıp, sessiz kilide dönüşebiliyor.
+ *
+ * Karar: yazan fiillerde kimlik ZORUNLU, yoksa gürültülü hata + HİÇ yazmama. Muafiyet ADLA
+ * verilir (`--sid recep-manual`). `who` yazmadığı için koşmaya devam eder ama uyarır; bu
+ * asimetri bilinçlidir ve aşağıda kilitlenmiştir.
+ *
+ * ⚠ Bu testler `CLAUDE_SESSION_ID`'yi alt sürecin ortamından SİLER. Silinmezse Claude Code
+ * içinde koşarken değişken dolu gelir, CLI ikinci basamaktan kimlik bulur ve testler kusur
+ * geri konsa bile yeşil kalır — ölçüm aracının kendisi kör olur.
+ */
+describe('INV-BOARD-3 · kimliksiz yazım yok', () => {
+  /** Yazan fiilin kimlik dışındaki asgari argümanları (kimlik kapısı bunlardan ÖNCE çalışmalı). */
+  const EK_ARGS: Record<string, string[]> = {
+    claim: ['--globs', 'src/x/**'],
+    heartbeat: [],
+    release: [],
+    note: ['--text', 'hayalete-dusmemeli'],
+  }
+  /** Tanınmayan (sonradan eklenmiş) bir fiil için: her iki argümanı da ver, kapsam dışı kalmasın. */
+  const VARSAYILAN_EK_ARGS = ['--globs', 'src/x/**', '--text', 'hayalete-dusmemeli']
+
+  /** CLI'yi kimlik ortam değişkeni OLMADAN koştur. */
+  function runCli(args: string[], opts: { sidEnv?: string } = {}): { status: number; stdout: string; stderr: string } {
+    // Ortamı GİRDİ ÇİFTLERİYLE kuruyoruz: bu repoda `ProcessEnv` bildirimi genişletilmiş ve
+    // indeks imzası YOK, o yüzden `delete env.CLAUDE_SESSION_ID` tip hatası verir.
+    const ciftler = Object.entries(process.env).filter(([k]) => k !== 'CLAUDE_SESSION_ID')
+    if (opts.sidEnv) ciftler.push(['CLAUDE_SESSION_ID', opts.sidEnv])
+    ciftler.push(['VENTHUB_BOARD_DIR', boardDir])
+    const env = Object.fromEntries(ciftler) as typeof process.env
+    // `execFileSync` DEĞİL `spawnSync`: ilki BAŞARILI çıkışta yalnız stdout döndürür, yani
+    // "koştu ama uyardı mı?" sorusunu ölçemez. İlk sürümü öyle yazdım ve `who` testi
+    // aracın körlüğü yüzünden kırmızı yandı — kusur koddaydı sanılabilirdi.
+    const r = spawnSync('node', [BOARD_MODULE_PATH, ...args], { encoding: 'utf8', env })
+    return { status: typeof r.status === 'number' ? r.status : -1, stdout: r.stdout ?? '', stderr: r.stderr ?? '' }
+  }
+
+  it('YAZAN her fiil kimliksiz çağrıda exit 1 verir ve panoya HİÇBİR ŞEY yazmaz', () => {
+    const board = loadBoard(boardDir)
+    // Listeyi modülden okuyoruz: buraya yeni bir yazan fiil eklenirse kapı onu kendiliğinden
+    // kapsar. Kopyalanmış bir liste, kaynak büyüdüğünde sessizce kör kalırdı.
+    const fiiller = [...board.PANOYA_YAZAN_FIILLER]
+    expect(fiiller.length, 'yazan fiil listesi BOŞ geldi — kapı hiçbir şey ölçmüyor olurdu (vacuous)').toBeGreaterThan(0)
+
+    for (const verb of fiiller) {
+      const r = runCli([verb, ...(EK_ARGS[verb] ?? VARSAYILAN_EK_ARGS)])
+
+      expect(
+        r.status,
+        `"${verb}" kimliksiz koştu ve BAŞARILI döndü — hayalet oturum üretip "yaptım" diyen davranış tam budur (T079-VH)`,
+      ).not.toBe(0)
+      expect(
+        r.stderr,
+        `"${verb}" hatası çözümü göstermiyor; operatör neyi eklemesi gerektiğini bilemez`,
+      ).toContain('--sid')
+      expect(
+        board.readEvents().length,
+        `"${verb}" reddedildiği HÂLDE panoya yazmış — hangi kimliğe yazdığı önemli değil, kısmi yazım en kötüsü: ne teslim edilir ne de gönderen uyarılır`,
+      ).toBe(0)
+    }
+  })
+
+  it('KAPSAM DARALTMASI KİLİTLİ: yazan fiil listesi bu dördünü içermek ZORUNDA', () => {
+    const board = loadBoard(boardDir)
+    // Yukarıdaki test listeyi modülden okuyor: bu, listeye EKLEME yapıldığında kapının
+    // kendiliğinden büyümesini sağlar ama DARALTMAYA karşı korumaz — liste küçülünce test de
+    // küçülür ve sessizce yeşil kalır. Sabotaj turunda tam bu oldu (liste ['note']'a indirildi,
+    // 19/19 yeşil). Taban burada ADLARIYLA sabitlenmiştir.
+    for (const verb of ['claim', 'heartbeat', 'release', 'note']) {
+      expect(
+        board.PANOYA_YAZAN_FIILLER.has(verb),
+        `"${verb}" yazan fiil listesinden ÇIKARILMIŞ — o fiil yine kimliksiz koşabilir, kapı ise yeşil kalır`,
+      ).toBe(true)
+    }
+  })
+
+  it('kimlik makine adından TÜRETİLMEZ — hayalet oturum dosyası oluşmaz', () => {
+    const board = loadBoard(boardDir)
+    runCli(['note', '--text', 'hayalete-dusmemeli'])
+    runCli(['claim', '--lane', 'HAYALET', '--globs', 'src/x/**'])
+
+    const sidler = board.readEvents().map(e => String(e.sid ?? ''))
+    expect(
+      sidler.filter(s => s.endsWith('-manual')),
+      'kimlik yine makine adı + "-manual" ile üretilmiş: bu dosyayı hiçbir oturum izlemiyor, yani kayıt yazılmış ama YOK sayılır',
+    ).toEqual([])
+  })
+
+  it('MUAFİYET ADLA: elle verilen --sid çalışır ve TAM O kimliğe yazar', () => {
+    const board = loadBoard(boardDir)
+    const r = runCli(['claim', '--sid', 'recep-manual', '--lane', 'ELLE', '--globs', 'src/x/**'])
+
+    expect(r.status, `açıkça verilen kimlik reddedildi — kapı insanın elle çalışmasını da kapatmış olur. stderr: ${r.stderr}`).toBe(0)
+    expect(
+      board.liveClaims().map(c => c.sid),
+      'talep açıkça verilen kimliğe yazılmadı',
+    ).toContain('recep-manual')
+  })
+
+  it('CLAUDE_SESSION_ID dolu ise ikinci basamak çalışmaya devam eder', () => {
+    const board = loadBoard(boardDir)
+    const r = runCli(['claim', '--lane', 'ORTAM', '--globs', 'src/x/**'], { sidEnv: 'eeeeeeee-4444-4444-8444-eeeeeeeeeeee' })
+
+    expect(r.status, `ortam değişkeninden kimlik çözülmedi — hook'suz kabuk dışındaki tüm çağrılar kırılırdı. stderr: ${r.stderr}`).toBe(0)
+    expect(board.liveClaims().map(c => c.sid)).toContain('eeeeeeee-4444-4444-8444-eeeeeeeeeeee')
+  })
+
+  it('"who" kimliksiz KOŞAR (yazmıyor) ama sessiz kalmaz — asimetri bilinçli', () => {
+    loadBoard(boardDir)
+    const r = runCli(['who'])
+
+    expect(r.status, '"who" yalnız OKUR; kimlik yok diye engellemek pano okumayı gereksiz yere kapatır').toBe(0)
+    expect(
+      r.stderr,
+      '"who" kimliksiz koşup SUSMUŞ — okuyan kendi şeridini listede boşuna arar, çünkü "(sen)" işareti hiç konmaz',
+    ).toContain('uyarı')
   })
 })
 

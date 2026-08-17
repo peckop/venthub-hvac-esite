@@ -23,7 +23,6 @@
  */
 const fs = require('fs')
 const path = require('path')
-const os = require('os')
 const { execFileSync } = require('child_process')
 
 const BOARD_DIR = process.env.VENTHUB_BOARD_DIR || path.join('C:', 'tmp', 'venthub-board')
@@ -33,6 +32,12 @@ const DEFAULT_TTL_MS = 4 * 60 * 60 * 1000
 const PRUNE_MS = 24 * 60 * 60 * 1000
 /** Kalp atışı bu sıklıktan daha sık yazılmaz (her tur satır eklemek dosyayı şişirir). */
 const HEARTBEAT_MIN_INTERVAL_MS = 10 * 60 * 1000
+/**
+ * Panoya YAZAN fiiller — kimliksiz koşamazlar (T079-VH, CLI bloğuna bakınız).
+ * DIŞA AÇILIR ki bekçi bu listeyi kopyalamak zorunda kalmasın: buraya yeni bir yazan fiil
+ * eklenirse kapı onu kendiliğinden kapsar. Kopyalayan bir bekçi, liste büyüdüğünde kör kalır.
+ */
+const PANOYA_YAZAN_FIILLER = new Set(['claim', 'heartbeat', 'release', 'note'])
 
 function ensureDir() {
   try { fs.mkdirSync(BOARD_DIR, { recursive: true }) } catch { /* yoksay */ }
@@ -335,7 +340,7 @@ function markSeen(sid, notes) {
 }
 
 module.exports = {
-  BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS,
+  BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS, PANOYA_YAZAN_FIILLER,
   append, touch, readEvents, liveClaims, findConflict, summary,
   notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids,
   globToRegExp, toRepoRelative, repoRootFor,
@@ -355,7 +360,33 @@ if (require.main === module) {
       if (VALUE_FLAGS.has(name)) { flags[name] = rest[i + 1]; i++ } else flags[name] = true
     } else positional.push(t)
   }
-  const sid = flags.sid || process.env.CLAUDE_SESSION_ID || os.hostname() + '-manual'
+  const sid = flags.sid || process.env.CLAUDE_SESSION_ID || ''
+
+  /**
+   * Kimlik çözülemediyse YAZAN fiiller koşmaz (T079-VH).
+   *
+   * Eski hâli `os.hostname() + '-manual'` ile sessizce fallback yapıyordu. Bash kabuğunda
+   * `CLAUDE_SESSION_ID` YOK, dolayısıyla `--sid` verilmeyen her çağrı
+   * `events.<makine-adı>-manual.jsonl` dosyasına yazıyor, komut ise `exit 0` verip
+   * "not bırakıldı" diyordu: gönderen teslim edildiğini sanıyor, alıcı hiç görmüyor.
+   * Sahte-yeşil ailesinin pano biçimi — 34 kayıt bu hayalet dosyaya düştü ve biri CANLI bir
+   * `claim`di, yani pano aynı şeridi İKİ ayrı sahiple gösterdi; kıdem hayalete geçtiği için
+   * şerit-çakışma kontrolü gerçek sahibi KENDİ dosyalarında engelleyebilir hâle geldi.
+   *
+   * Muafiyet ADLA verilir: elle çalıştıran kendine bir kimlik yazar (`--sid recep-manual`).
+   * Sessiz varsayılan yok. `who` yazmadığı için koşar, ama kimliksiz "(sen)" işaretlenemez —
+   * bunu susarak geçmek yerine söylüyoruz, yoksa okuyan kendi şeridini listede aramaya kalkar.
+   */
+  if (!sid && PANOYA_YAZAN_FIILLER.has(verb)) {
+    console.error(`oturum kimliği ÇÖZÜLEMEDİ: --sid verilmedi ve CLAUDE_SESSION_ID boş.`)
+    console.error(`"${verb}" panoya YAZAR; kimliksiz yazım hayalet bir oturum üretir ve komut yine`)
+    console.error('başarılı görünür — o yüzden yazmıyoruz (T079-VH).')
+    console.error('çözüm: --sid <oturum-kimliğin> ekle. Elle çalıştırıyorsan kendine ad ver: --sid recep-manual')
+    process.exit(1)
+  }
+  if (!sid && verb === 'who') {
+    console.error('uyarı: --sid yok, kendi şeridin "(sen)" olarak işaretlenemez.')
+  }
 
   if (verb === 'claim') {
     const globs = String(flags.globs || '').split(',').map(s => s.trim()).filter(Boolean)
@@ -384,6 +415,7 @@ if (require.main === module) {
   } else if (verb === 'who') {
     console.log(summary(sid))
   } else {
-    console.log('kullanım: board.cjs <claim|heartbeat|release|note|who> [--sid X] [--lane Y] [--globs "a/**,b/**"] [--to Z] [--text "..."]')
+    console.log('kullanım: board.cjs <claim|heartbeat|release|note|who> --sid X [--lane Y] [--globs "a/**,b/**"] [--to Z] [--text "..."]')
+    console.log('--sid YAZAN fiillerde (claim/heartbeat/release/note) ZORUNLUDUR; CLAUDE_SESSION_ID doluysa oradan okunur.')
   }
 }
