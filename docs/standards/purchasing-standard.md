@@ -314,10 +314,22 @@ yolu fiilen boş.
 
 **Davranış ölçümü (transaction + rollback, prod'a yan etki yok):**
 
-| Ayar | `to_regclass('products')` |
-|---|---|
-| `search_path = "pg_catalog, public"` (bugünkü) | **NULL** — niteliksiz referans ÇÖZÜLMEZ |
-| `search_path = public` | `products` — çözülür, `pg_catalog` örtük ilk (`now()` bulunur) |
+| Ayar | Geçici tablo YOKken | Oturumda `CREATE TEMP TABLE products` VARken |
+|---|---|---|
+| `"pg_catalog, public"` (bugünkü 7 fn) | **NULL** — çözülmez | **geçici tabloyu bulur** ⚠️ |
+| `public` | `public.products` | **geçici tabloyu bulur** ⚠️ |
+| `public, pg_temp` | `public.products` | **`public.products`** ✅ |
+
+> **İlk taslakta yanıldım, ölçüm düzeltti.** "`pg_temp` ASLA yazılmaz" diye yazmıştım;
+> OPS-AUDIT itiraz etti ve haklı çıktı. PostgreSQL'de `pg_temp` search_path'te **açıkça
+> listelenmezse relation aramasında ÖRTÜK OLARAK İLK** sıradadır. Yani `public` tek başına
+> yazıldığında çağıran, kendi oturumunda `CREATE TEMP TABLE products` yapıp SECURITY DEFINER
+> fonksiyonuna **gölge tablo yedirebilir**. `pg_temp`'i açıkça SONA yazmak örtük-ilk kuralını
+> devre dışı bırakır — resmî güvenli biçim budur.
+>
+> Aynı ölçüm bugünkü kusuru da ağırlaştırıyor: bozuk tırnaklı ayar yalnız "hiçbir şey
+> yapmıyor" değil, **aktif olarak savunmasız** — arama yolu boş olduğu için niteliksiz bir
+> referans doğrudan geçici tabloya düşer.
 
 **Neden bugün patlamıyor:** yedi fonksiyonun gövdesi de her nesneyi `public.` ile tam
 niteliyor. Yani satır *koruma sağlıyor* sanılıyor ama **hiçbir şey yapmıyor** — gövdeye
@@ -327,16 +339,17 @@ tehlikeli hâli, çünkü denetimde ✅ gibi okunur.
 #### Cetvel kuralı — tek doğru desen (yeni fonksiyonlar bunu kopyalasın)
 
 ```sql
-set search_path = public          -- ✅ tırnaksız, TEK şema
+set search_path = public, pg_temp     -- ✅ tırnaksız liste; pg_temp EN SONDA
 ```
 
+- **`pg_temp` MUTLAKA ve EN SONDA yazılır.** Yazılmazsa relation aramasında örtük olarak
+  **ilk** sıraya geçer ve çağıranın geçici tablosu uygulama tablosunu gölgeler (yukarıdaki
+  ölçüm). Açıkça sona yazmak bu davranışı kapatır.
 - **`pg_catalog` AÇIKÇA YAZILMAZ.** Yazılmazsa örtük olarak *ilk* aranır; yazılırsa
   yazıldığı sıraya düşer. Bu yüzden `public, pg_catalog` **yanlıştır** — `public`'te
   aynı adlı bir nesne varsa çekirdek fonksiyonun önüne geçer.
-- **`pg_temp` ASLA yazılmaz.** SECURITY DEFINER'da geçici şema, çağıranın oluşturduğu
-  nesnelerle ele geçirme yüzeyidir.
-- Ek şema yalnız gerçekten gerekiyorsa eklenir ve *sonda* durur
-  (ör. webhook fonksiyonu: `set search_path = public, net, vault`).
+- Ek şema gerekiyorsa `public` ile `pg_temp` **arasına** girer
+  (ör. webhook fonksiyonu: `set search_path = public, net, vault, pg_temp`).
 - `search_path = ''` (tam niteleme zorunlu) daha katı bir alternatiftir ama **gerekmiyor**:
   ölçüldü, `public` şemasında `anon`/`authenticated`/`service_role` için **CREATE yetkisi
   YOK**, yani `public` üzerinden gölgeleme mümkün değil.
@@ -347,10 +360,11 @@ Yedi fonksiyon `create or replace` ile yeniden tanımlanır; **tek değişiklik 
 gövdeler aynen korunur. Sonrasında `proconfig` prod'dan yeniden okunur (`{search_path=public}`
 görülmeli) ve mal kabul + stok düşme yolları bir kez çalıştırılıp **pozitif çapa** alınır.
 
-> **Depo geneli (ölçüldü):** 28 SECURITY DEFINER fonksiyonunda **7 ayrı desen** var —
-> 7'si bu bozuk biçimde, 6'sı `public, pg_temp` (hijack yüzeyi), 3'ü `public, pg_catalog`
-> (sıra ters). Bunların çoğu benim şeridimin dışında; bulgu OPS-AUDIT'e iletildi.
-> Bu cetvel yalnız kendi fonksiyonlarımı bağlar ama **doğru örnek** olarak durur.
+> **Depo geneli (ölçüldü):** 28 SECURITY DEFINER fonksiyonunda **7 ayrı desen** var.
+> 7'si bu bozuk biçimde (benim — M7 kapatır); **6'sı `public, pg_temp` yani ZATEN DOĞRU**
+> (ilk taslakta yanlışlıkla riskli demiştim, düzeltildi); 3'ü `public, pg_catalog`
+> (`pg_temp` yok → gölgelenebilir, ayrıca sıra ters). Şeridim dışındakiler OPS-AUDIT'e
+> iletildi. Bu cetvel yalnız kendi fonksiyonlarımı bağlar ama **doğru örnek** olarak durur.
 
 ### 13.5 Uygulama notları
 
