@@ -24,6 +24,17 @@ function readIds(): string[] {
   }
 }
 
+/**
+ * Manages the user's favorite products using browser localStorage.
+ * Automatically synchronizes changes across tabs and within the current session.
+ * Does not interact with the database (v1 implementation).
+ *
+ * @returns An object containing the current favorite IDs and mutator functions
+ *
+ * @example
+ * const { isFavorite, toggleFavorite } = useFavorites();
+ * if (!isFavorite('product1')) toggleFavorite('product1');
+ */
 export function useFavorites() {
   const [ids, setIds] = useState<string[]>([])
 

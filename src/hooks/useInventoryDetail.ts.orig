@@ -66,20 +66,6 @@ export interface UseInventoryDetailResult {
   undoLastMovement: () => void
 }
 
-/**
- * Manages the state and operations for the inventory detail sidebar in the admin panel.
- * Handles fetching stock movements, active reservations, and applying manual stock adjustments with audit logging.
- *
- * @param options - Configuration including write access flag, the active dataset, and a mutation callback
- * @returns An object containing the currently selected row's data, loaders, and mutator actions
- *
- * @example
- * const { selected, open, adjustStock } = useInventoryDetail({
- *   hasWriteAccess: true,
- *   rows: currentRows,
- *   onMutated: reloadTable
- * });
- */
 export function useInventoryDetail(options: UseInventoryDetailOptions): UseInventoryDetailResult {
   const { hasWriteAccess, rows, onMutated } = options
   const { t } = useI18n()

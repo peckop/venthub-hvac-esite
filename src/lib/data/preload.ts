@@ -41,6 +41,17 @@ export const getCachedFamilySlugById = cache(async (familyId: string) => {
   return data.slug
 })
 
+/**
+ * Triggers an early background fetch for a product family's details.
+ * Useful for initiating data loading before the component actually requires it, optimizing perceived performance.
+ *
+ * @param slug - The unique slug identifier of the product family
+ * @param lang - The language code for the requested localized details
+ * @returns void - The fetch is executed fire-and-forget
+ *
+ * @example
+ * preloadFamily('duct-fans', 'en')
+ */
 export function preloadFamily(slug: string, lang: string) {
   void getCachedFamilyDetail(slug, lang)
 }

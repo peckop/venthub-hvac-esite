@@ -37,17 +37,6 @@ const DEFAULT_FILTERS: CategoryFilters = {
   catSearch: ''
 }
 
-/**
- * Orchestrates category state, filtering, and initial data hydration for the master category view.
- * Synchronizes view mode, sort preferences, and deep-linked filters from the URL.
- *
- * @param initialCategory - Optional server-rendered initial active category for hydration
- * @param initialSubCategories - Optional server-rendered child categories for hydration
- * @returns Bound state and action handlers for the category UI gateway
- *
- * @example
- * const { filters, handleFilterChange, activeCategory } = useCategoryGateway(initialCat, initialSubs);
- */
 export function useCategoryGateway(
   initialCategory?: DomainCategory | null,
   initialSubCategories?: DomainCategory[]

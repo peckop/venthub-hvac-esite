@@ -13,6 +13,19 @@ export interface TenantProviderProps {
   children: React.ReactNode;
 }
 
+/**
+ * Provides the active tenant configuration to the React tree.
+ * Must wrap all components that require tenant-specific features or styling.
+ *
+ * @param props.value - The resolved tenant configuration object
+ * @param props.children - The nested React elements
+ * @returns A Context Provider wrapping the children
+ *
+ * @example
+ * <TenantProvider value={config}>
+ *   <App />
+ * </TenantProvider>
+ */
 export function TenantProvider({ value, children }: TenantProviderProps) {
   return (
     <TenantContext.Provider value={value}>
@@ -21,6 +34,17 @@ export function TenantProvider({ value, children }: TenantProviderProps) {
   );
 }
 
+/**
+ * Accesses the active tenant configuration from the nearest Provider.
+ * Enforces feature flag defaults if the tenant is the default or flags are missing.
+ *
+ * @returns The active TenantConfig with normalized feature flags
+ * @throws {Error} If called outside of a TenantProvider or inside a Server Component
+ *
+ * @example
+ * const { features, id } = useTenant();
+ * if (features.viewer3d) render3dModel();
+ */
 export function useTenant(): TenantConfig {
   const context = useContext(TenantContext);
   if (context === undefined) {

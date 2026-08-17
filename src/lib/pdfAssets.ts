@@ -4,6 +4,16 @@ import { SITE_URL } from '../config/siteUrl';
  * Assets and constants for PDF generation
  */
 
+/**
+ * Resolves an absolute URL for a given asset path, handling both client and server environments.
+ * Uses window.location.origin on the client, or the predefined SITE_URL on the server.
+ *
+ * @param path - The relative path of the asset (e.g., '/fonts/Roboto.ttf')
+ * @returns The fully qualified absolute URL
+ *
+ * @example
+ * getAbsoluteAssetUrl('/images/logo.png') // returns 'https://venthub.com/images/logo.png'
+ */
 export function getAbsoluteAssetUrl(path: string): string {
     const base = typeof window !== 'undefined' && window.location
         ? window.location.origin

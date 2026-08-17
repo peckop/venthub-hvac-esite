@@ -257,6 +257,18 @@ export interface ScopedTarget {
   category_id: string | null
 }
 
+/**
+ * Evaluates whether a pricing scope configuration matches a given product.
+ * Supports exact product, brand, and hierarchical category matching.
+ *
+ * @param row - The scope configuration containing the target IDs and scope level (0-4)
+ * @param product - The product attributes to match against
+ * @param categoryAncestors - A set containing the IDs of all ancestor categories for the product
+ * @returns True if the product satisfies the scope conditions, false otherwise
+ *
+ * @example
+ * scopeMatchesProduct({ scope: 1, product_id: 'p1', brand_id: null, category_id: null }, { id: 'p1', brandId: null, categoryId: null }, new Set()) // returns true
+ */
 export function scopeMatchesProduct(
   row: ScopedTarget,
   product: PricingProductInput,

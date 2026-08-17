@@ -151,18 +151,6 @@ function parseFiltersFromParams(params: URLSearchParams): Record<string, string[
 
 /* ------------------------------- hook ---------------------------------- */
 
-/**
- * Core hook for managing data tables in the admin panel.
- * Handles data fetching, pagination, sorting, filtering, selection state, and URL synchronization.
- * Supports both server-side and client-side processing modes.
- *
- * @param options - Configuration for the table, including fetcher function, row ID resolver, and mode settings
- * @returns A comprehensive state object exposing rows, pagination, sorting, filtering, and selection controls
- *
- * @example
- * const table = useAdminTable({ resource: 'users', fetcher: loadUsers, paginationMode: 'server' });
- * return <DataTable rows={table.rows} pagination={table.pagination} />;
- */
 export function useAdminTable<T>(options: UseAdminTableOptions<T>): UseAdminTableResult<T> {
   const {
     resource,

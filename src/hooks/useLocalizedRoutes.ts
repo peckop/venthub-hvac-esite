@@ -28,6 +28,16 @@ function createLocalizedProxy<T extends object>(target: T, lang: string): T {
   })
 }
 
+/**
+ * Provides a localized version of the global route definitions.
+ * Automatically wraps all route getter functions to inject the current active language prefix.
+ *
+ * @returns A proxy of the global Routes object where function returns are automatically prefixed with the current locale
+ *
+ * @example
+ * const routes = useLocalizedRoutes();
+ * const url = routes.products.detail('fan-1'); // returns '/en/products/fan-1'
+ */
 export function useLocalizedRoutes() {
   const { lang } = useI18n()
   return useMemo(() => createLocalizedProxy(Routes, lang), [lang])
