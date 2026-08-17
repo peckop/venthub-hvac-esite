@@ -98,7 +98,14 @@ verify_jwt = true           # sınıf (a) — oturumlu admin tarayıcısı
 ### 3.2 Gövde yetkisi **ZORUNLU** — kimlik ≠ yetki
 
 **KURAL.** `verify_jwt = true` bir yetkilendirme değildir. Admin/ayrıcalıklı her uçta gövde içinde
-**rol kontrolü** (veya kaynak sahipliği kontrolü) yapılır ve başarısızlıkta **403** dönülür.
+**rol kontrolü** (veya — yalnız OKUMA/kendi kaydını güncelleme uçlarında — kaynak sahipliği
+kontrolü) yapılır ve başarısızlıkta **403** dönülür.
+
+> ⚠️ **Sahiplik alternatifi PARA/STOK hareketinde GEÇERSİZDİR — bkz. §3.10-G.** Bu parantez
+> 2026-08-17'ye kadar sınırsızdı ve gerçek bir açık doğurdu: `iyzico-refund` kapısı
+> `isAdmin || isOwner` yazıldı (T053-VH, #558) ve cetvele **uygundu** — müşteri kendi JWT'siyle
+> tam iade + stok geri-yazımı tetikleyebiliyordu (T071-B1). Kuralın kendisi izin verdiği için
+> hiçbir kapı itiraz etmedi; delik koddan önce METİNDEYDİ.
 
 **NEDEN.** `admin-orders-latest` ve `admin-update-shipping` `verify_jwt=true` idi ama gövdede rol
 kontrolü yoktu: **oturum açmış herhangi bir müşteri** tüm siparişleri sayfalayabiliyor, hatta herhangi
@@ -350,11 +357,30 @@ statüleri bir sayı ekseni değil, bir geçiş grafiğidir. `returns-webhook` s
 `refunded`→`cancelled` ise eşit rütbe olduğu için (`4 < 4` yanlış) **geçiyordu**. Geçişler
 açık bir tabloda tutulur; sonlanma durumlarından çıkış **yoktur.**
 
+**KURAL G — para/stok hareketini yalnız AYRICALIKLI ROL tetikleyebilir; sahiplik yetmez.**
+Bir kaynağın sahibi olmak onu **okuma** yetkisi verir; o kaynak üzerinden **para iade etme
+veya stok geri yazma** yetkisi vermez. Bu kararlar tüccarındır. Bu yüzden §3.2'nin "veya
+kaynak sahipliği" alternatifi para/stok hareketi yapan uçlarda **geçersizdir**: kapı
+`rol ∈ {admin, super_admin}` biçiminde olmalı, `rol || sahiplik` biçiminde **olmamalıdır**.
+
+*Niçin ayrı bir kural gerekti:* §3.10 A–F para hareketinin **nasıl** yapılacağını (talep
+defteri, idempotency, belirsizlik, yutulmayan hata, kim ne yazabilir) düzenliyordu ama
+**kimin tetikleyebileceğini** hiç sormuyordu; §3.2 ise sahipliği serbestçe alternatif
+sunuyordu. İkisi ayrı ayrı doğruydu, kesişimleri açıktı: `iyzico-refund` kapısı
+`isAdmin || isOwner` yazıldı (#558) ve **her iki kurala da uyuyordu** — oysa müşteri kendi
+JWT'siyle tam iade + stok geri-yazımı tetikleyebiliyordu (T071-B1, 20-madde v2 raporunun tek
+lansman-engeli). `service_role` istemcisi kullanıldığı için RLS de yedek değildi.
+
+Müşterinin meşru yolu **talep açmaktır** (`venthub_returns`), kararı admin verir.
+Bu sınır kaldırılacaksa (ör. "otomatik iade" ürün kararı), önce burada yazılır: hangi
+koşulda, hangi üst sınıra kadar, hangi kaydı bırakarak.
+
 **Kapılar (CANLI, bilerek-bozularak kanıtlandı):**
 
 | Kural | Kapı | Kanıt |
 |---|---|---|
 | E, F | `INV-RETURN-1` — `src/__tests__/conformance/returns-webhook-transitions.test.ts` | 2026-08-16: 5 sabotaj KIRMIZI (refunded yazımı · terminal kaçışı · istemcide olmayan geçiş · rank haritasının dönüşü · kapının devre dışı bırakılması) + 1 yanlış-pozitif kontrolü YEŞİL |
+| G | `INV-PAY-3` (R4) — aynı dosya | 2026-08-17: PSP çağıran fonksiyonun kapısına sahiplik dalı geri eklendi → KIRMIZI; rol kontrolü silindi → KIRMIZI; yanlış-pozitif kontrolü (sahiplik yalnız OKUMA sorgusunda) YEŞİL |
 | A–D | `INV-PAY-3` — `src/__tests__/conformance/payment-money-move.test.ts` | 2026-08-16: 5 sabotaj KIRMIZI (talep defteri atlanarak PSP çağrısı · boş `catch{}`'in dönüşü · emekli `refund-order-mock`'un yeniden DB'ye yazması · 410 yerine 200 · iadenin stoğu doğrudan yazması) + 1 yanlış-pozitif kontrolü YEŞİL |
 
 > ⚠️ `INV-RETURN-1` bir dersi kendi içinde de taşır: ilk sürümü `kaynak.includes('canCarrierTransition')`
