@@ -1,5 +1,38 @@
 # Changelog
 
+### [2026-08-17] NotebookLM ürün göçü — kronik "failed" arızası kökünden kapandı
+
+**Özet:** Dijital ikiz katmanı aylarca kararsızdı ("onar → bir süre sonra yine bozul"). Kök sebep
+ölçülerek bulundu ve ürün değiştirildi: **`jacob-bd/notebooklm-mcp-cli` (`nlm`) → `teng-lin/notebooklm-py` (`notebooklm`)**.
+
+**Kök sebep (fiziksel kanıtla):** İki proje de `notebooklm-mcp` adlı **aynı komutu** üretiyor.
+Biri kurulunca/kaldırılınca diğerinin sarmalayıcısını eziyordu. `Temp/pip-uninstall-*` klasörlerinde
+her iki ürünün shim'leri duruyordu — pip kaldırırken dosyayı geçici dizine taşır, işlem yarıda
+kesilince kalıntı kalır. Ayrıca `site-packages`'ta **`~` önekli üç ceset** vardı (`~otebooklm_py-0.8.0.dist-info`
+gibi); `importlib.metadata` bunları da saydığı için ölçüm araçları "üç kurulum var" diye yanıltıyordu.
+
+**Yapılanlar:**
+- Makine temizlendi: 8 enkaz dizini, arkasında paketi olmayan 2 yetim shim, orion venv'indeki
+  kaçak kurulum. (Eski paket orion'un venv'inde **bağımlılık olarak tanımsız** duruyordu ve
+  `uv sync` onu buduyordu — kronikliğin ikinci motoru.)
+- Yeni ürün **izole `uv tool`** ortamına kuruldu; hiçbir projenin venv'ine dokunmaz.
+- MCP config **modül yoluyla** bağlandı (`python -m notebooklm.mcp`) — kaybolabilecek `.exe`
+  sarmalayıcısına bağımlılık kalmadı.
+- `orion doc tree --nlm-sync` onarıldı: altı ayrı yerde çıplak `nlm` çağırıyordu (o komut artık
+  yok = sync tamamen kırıktı). CLI adı tek sabite alındı. Yeni CLI'da `source add`in `--wait`i
+  YOK → ayrı `source wait` çağrısı eklendi ve beklenemediği durum **söyleniyor** (yüklendi ≠ sorgulanabilir).
+- Eski `nlm-*.ps1` betiklerinin üçü de **silindi** (0.7.x kalıntısı; biri başarısızken `loginExit=0`
+  yazıp başarılı görünüyordu = sessiz-yalan).
+
+**Araç adı eşlemesi:** `notebook_query` → **`chat_ask`** · `refresh_auth` → **karşılığı yok**
+(auth artık CLI'da) · `source_add`/`notebook_list` aynı · `source_list_drive` → `source_list`.
+**Yetenek kaybı:** `cross_notebook_query` yeni sette **YOK** — çapraz-defter sorgusu artık
+defter-defter sorup elle birleştirmeyi gerektiriyor.
+
+**Doğrulama (dört katman):** komut yolu diskte ✅ · gerçek MCP `initialize` (`notebooklm` v3.4.2) ✅ ·
+`tools/list` 33 araç ✅ · deftere **gerçek soru** sorulup atıflı cevap alındı ✅ (44 defter listelendi).
+**Ders:** `auth check` "ok" derken gerçek okuma "expired" verdi — durum raporu kanıt değil, gerçek çağrı kanıttır.
+
 ### [2026-06-19] Checkout Funnel Runtime Smoke — Satınalma Hunisi Kapısı (Ödeme-Öncesi)
 
 **Özet:** Runtime kalite kapısının **ikinci ayağı** (#431, master `52343a1f`): admin smoke ile aynı sınıf, ama **satınalma hunisi** için. Gerçek bir kullanıcı gibi `login → ürün listesi → sepete ekle → checkout → müşteri bilgisi → adres → özet` adımlarını gerçek tarayıcıda sürer ve hunin **donmadığını / interaktif** olduğunu doğrular.

@@ -25,6 +25,20 @@
 *.yaml text
 *.env  text
 
+# Windows betikleri — CRLF MEŞRU (T017-VH)
+#
+# NİÇİN AÇIK BEYAN: `text eol=crlf` = depoda LF sakla, çalışma kopyasına CRLF yaz.
+# Böylece blob normalize kalır AMA PowerShell/cmd dosyaları Windows'un beklediği
+# satır sonuyla diske düşer. Beyan edilmezse `* text=auto` bunları LF'e çevirir ve
+# bazı Windows kabukları/imza doğrulamaları bozulabilir.
+#
+# 2026-08-17'de ölçüldü: bu 40 dosyanın (36 ps1 + 4 bat) blob'u CRLF ile
+# commit'lenmişti; `text` niteliği check-in'de LF'e normalize ettiği için git onları
+# SONSUZA DEK "modified" gösteriyordu ve pull/merge/dal-değiştirmeyi BLOKLUYORDU.
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
 # Lockfile (CI pnpm kullanıyor)
 pnpm-lock.yaml text
 

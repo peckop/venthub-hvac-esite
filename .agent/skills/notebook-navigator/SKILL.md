@@ -15,7 +15,7 @@ metadata:
   outputs:
   - rag response text
   recovery:
-    on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
+    on_auth_expired: notebooklm login  # 2026-08-17: urun degisti (teng-lin/notebooklm-py); eski nlm-*.ps1 SILINDI
 depends_on: []
 next_steps: []
 run_last: false
@@ -96,12 +96,15 @@ Aşağıdaki tablodan sorulan sorunun kategorisine uygun defteri seçin.
 ID'yi tespit ettikten sonra, MCP aracını kullanarak defter içindeki kaynaklara soru sorun:
 
 ```
-notebook_query(notebook_id="<ID>", query="<soru>")
+chat_ask(notebook="<ID>", question="<soru>")
 ```
 
 **Örnek:** Kullanıcı "Next.js ile Supabase cache nasıl yönetilmeli?" diye sordu:
 1. Tablo → `3. NEXT.JS / REACT / ENTERPRISE WEB APPS` (ID: `0b85ac75-f456-40bf-9b04-de3161ee13b0`)
-2. Sorgu: `notebook_query(notebook_id="0b85ac75-...", query="Next.js app router'da Supabase ile data caching best practice'leri nelerdir?")`
+2. Sorgu: `chat_ask(notebook="0b85ac75-...", question="Next.js app router'da Supabase ile data caching best practice'leri nelerdir?")`
+
+> ⚠️ 2026-08-17: `notebook_query` aracı ARTIK YOK → `chat_ask`. `refresh_auth` de yok (auth CLI'da).
+> MCP sunucu adı `notebooklm-py`, 33 araç. Detay: `.claude/skills/notebook-navigator/SKILL.md`.
 
 **Ürün sorusu:** "Vortice Vort HRI 350 teknik özellikleri?" → Önce `00 - Full Catalog`, bulamazsa ilgili kategori defteri.
 
@@ -132,7 +135,7 @@ NotebookLM sadece statik bir doküman arşivi değil, kod tabanının ve mimarin
 - Notebook'tan gelen cevap projedeki lokal kodlarla uyuşmuyorsa, her zaman **lokal kodu referans alın**; NotebookLM sadece bir rehber ve konsept danışmanıdır.
 - **Authentication Expired Hatası:** Durumu kullanıcıya BİLDİRMEYİN. Penceresiz (headless) otomatik yenileme aktiftir. Windows'ta oturumu yenilemek için doğrudan şu PowerShell **headless** scriptini çalıştırın (pencere AÇMAZ, ~15 sn, ESET'i de atlar):
   ```bash
-  powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
+  notebooklm login   # kullanıcı eylemi: tarayıcı açar, giriş algılanınca kaydeder
   ```
-  Script bittikten sonra MCP'nin taze token'ı görmesi için **`refresh_auth`** aracını çağırın; ardından başarısız olan sorguyu otonom olarak tekrar tetikleyin.
-  - ⚠️ Düz `nlm login` ÇALIŞTIRMAYIN — bu makinede bozuk/yavaş görünür Chrome penceresi açar. Daima headless scripti kullanın.
+  `refresh_auth` aracı ARTIK YOK. Auth'un canlı olduğunu `notebooklm list --json` ile DOĞRULA (`auth check` "ok" derken gerçek okuma "expired" verebilir — ölçüldü), sonra sorguyu tekrar tetikle.
+  - ⚠️ `--browser-cookies chrome` bu makinede ÇALIŞMAZ (Chrome 127+ App-Bound Encryption; ölçüldü). Firefox kurulu değil. Tıklamasız yol yok.

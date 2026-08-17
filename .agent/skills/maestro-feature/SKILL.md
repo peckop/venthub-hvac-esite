@@ -65,7 +65,7 @@ Karmaşık bir geliştirme veya hata çözme görevi geldiğinde, ana ajan göre
 ### A. Ajan Rol Şablonları
 
 1.  **`project_memory_researcher` (Araştırmacı)**
-    *   *Görevi:* Mevcut kod tabanını tarar, ilgili bağımlılıkları ve mimari şemaları inceler. NotebookLM senkronizasyonunu yönetir ve `notebook_query` ile mimari onay alır.
+    *   *Görevi:* Mevcut kod tabanını tarar, ilgili bağımlılıkları ve mimari şemaları inceler. NotebookLM senkronizasyonunu yönetir ve `chat_ask` (2026-08-17'ye kadar `notebook_query`) ile mimari onay alır.
     *   *Araç Yetkisi:* Read-only.
 
 2.  **`feature_development_worker` (Geliştirici)**
@@ -149,7 +149,7 @@ Eğer herhangi bir adım hata verirse, worker ajana hatayı bildir ve düzeltilm
 
 ### Adım 1: Planlama ve Hazırlık
 1.  Ana ajan, görevi analiz eder ve `implementation_plan.md` hazırlar.
-2.  Plan NotebookLM'e yüklenir ve `notebook_query` ile mimari onay ("FULLY APPROVED") alınır.
+2.  Plan NotebookLM'e yüklenir ve `chat_ask` (2026-08-17'ye kadar `notebook_query`) ile mimari onay ("FULLY APPROVED") alınır.
 3.  Plan kullanıcı onayına sunulur. **Kullanıcı onayı alınmadan alt ajanlar çalıştırılamaz.**
 
 ### Adım 2: Ajanların Tanımlanması ve Tetiklenmesi

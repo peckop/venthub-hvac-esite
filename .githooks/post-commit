@@ -7,7 +7,7 @@
 # çünkü döngüde akıl (LLM/insan) yok. Twin sessizce eskir.
 #
 # YENİ MODEL — NLM sync artık LLM-güdümlü MILESTONE eylemi:
-#   1) powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
+#   1) notebooklm list --json   (auth GERCEKTEN canli mi; olduyse: notebooklm login)
 #        (auth tazele — penceresiz ~15sn, şifre girişi yok)
 #   2) orion doc tree --nlm-sync --force-sync --repo-root <REPO_ROOT>
 #   3) notebook_query ile twin'i sorgulayıp gerçekten güncellendiğini DOĞRULA

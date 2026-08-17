@@ -34,6 +34,10 @@ declare global {
       pattern: string,
       options: { query: string; import: string; eager: true },
     ): Record<string, string>
+    glob(
+      pattern: readonly string[],
+      options: { query: string; import: string; eager: true },
+    ): Record<string, string>
   }
 }
 
@@ -41,11 +45,17 @@ declare global {
  * Kaynaklar — glob kökü TAM LİTERAL olmalı (Vite statik analiz eder).
  * ------------------------------------------------------------------ */
 
-const EDGE_TS: Record<string, string> = import.meta.glob('/supabase/functions/**/*.ts', {
-  query: '?raw',
-  import: 'default',
-  eager: true,
-})
+// `!` deseni ŞART (isExcluded/filtre yetmez): eager glob içeriği filtre çalışmadan okur.
+// tests/e2e/helpers/denoRuntime.ts, _shared/ içine geçici `*.compiled.<rastgele>.ts`
+// yazıp siler; paralel vitest'te glob o dosyayı görüp okuyamadan kaybediyordu (ENOENT).
+const EDGE_TS: Record<string, string> = import.meta.glob(
+  ['/supabase/functions/**/*.ts', '!**/*.compiled.*.ts'],
+  {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  },
+)
 
 const CONFIG_TOML: Record<string, string> = import.meta.glob('/supabase/config.toml', {
   query: '?raw',

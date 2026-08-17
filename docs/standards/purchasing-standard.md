@@ -143,12 +143,34 @@ tetiksiz kalabilir — bugün zararsız görünen köprü, yeni yazar eklenince 
 
 - Dosyalar: `src/app/admin/purchasing/**` + `src/views/admin/purchasing/**` +
   `src/components/admin/purchasing/**` + `src/i18n/dictionaries/admin/purchasing.{tr,en}.ts`.
-  Bu globlar ADMIN-CUSTOMER şeridinin genel claim'i içinde — **oyma talebi iletildi**
-  (2026-08-16); cevap gelmeden D4 başlamaz.
+  Oyma 2026-08-16'da ADMIN-CUSTOMER'dan ALINDI; üç koşulu bağlayıcı: mevcut admin sözlük
+  dosyalarına dokunma · aggregator kaydı TR+EN'e BİRLİKTE · çözücü NESTED-ONLY.
 - `admin-standard` K1–K5 + DataTableKit deseni geçerli; statü butonları
   `allowedNextStatuses`'tan ÜRETİLİR (elle buton listesi yasak — returnStatusMachine deseni).
 - Tüm metin sözlükten (kural 7); tutar gösterimi PO para birimiyle, TRY'ye çevrim YOK
   (çevrim = motor işi, köprü kapalı).
+
+### 8.1 UI izni, DB izninin ötesine geçemez — `warehouse` v1'de YOK
+
+**Kural:** bir role admin sayfası/yazma izni verilebilmesi için, o sayfanın okuduğu
+tabloların **RLS SELECT politikası da o rolü içermek zorundadır.** Aksi hâlde kullanıcı
+sayfayı açar, RLS boş küme döner, ekranda "kayıt yok" yazar ve **hiçbir hata düşmez** —
+yetki eksiği boş veriye benzer. Bekçi R6 bu paritenin kalıcı kapısıdır.
+
+**Ölçülen durum (2026-08-16, prod):** `process_goods_receipt` RPC kapısı `warehouse`'u
+kabul eder (`adjust_stock` ailesinin deseni), ama `purchase_orders`/`purchase_order_items`/
+`goods_receipts` RLS SELECT'i yalnız `super_admin|admin|moderator`'a açıktır
+(`pricing_policy` deseni — maliyet hassas). İki desen çarpıştı; D4'te `warehouse`'a
+verilen sayfa+yazma izni bu yüzden **geri alındı**. Bugün gerçek bir warehouse kullanıcısı
+yok, yani kusur zarar üretmeden kapandı — ama "kapı açıkken göç etmemiş yol" sınıfına
+girmeden kapatıldı.
+
+**Warehouse mal kabulünü açma şartları (v1.1, HEPSİ birlikte):**
+1. Fiyat/maliyet kolonu taşımayan bir görünüm (ör. `purchase_orders_ops_v`) + o görünüme
+   `warehouse` SELECT — maliyet gizli kalır, iş görünür olur;
+2. UI'ın o görünümü okuması (tabloyu değil) ve maliyet alanlarını hiç istememesi;
+3. `rbac`'a `warehouse` girişlerinin geri eklenmesi — R6 paritesi bu üçüyle sağlanır;
+4. migration gerektirir → kural 13, Recep kapısı.
 
 ## 9. Migration disiplini (D2)
 
@@ -170,6 +192,16 @@ tetiksiz kalabilir — bugün zararsız görünen köprü, yeni yazar eklenince 
 | R3 | `purchasing*` dosyaları `purchase_price`/`purchase_currency`/`purchase_rate_to_base`'e YAZMAZ | update/insert alan taraması |
 | R4 | **Mal kabul motor zincirini ÇAĞIRMAZ**: `purchasing*` içinde `refreshCostInBase`/`materializePrices` çağrısı yok | **ayrı assert, çağrı-bazlı** (karar çerçevesi md.2) |
 | R5 | RPC zarfı: çağıranlar `success` alanını kontrol eder | desen taraması |
+| R6 | **UI izni ⊆ DB izni**: `canWrite(rol,'purchasing')` doğru olan her rol, `purchase_orders_admin_select` politikasının rol dizisinde de olmalı (§8.1) | `canWrite` **çağrılır** (matris regex'le okunmaz) + son-tanımlayan politikadan rol dizisi |
+
+**Durum (2026-08-16): CANLI.** 9 test; 7 kuralın tamamı bilerek-bozarak kanıtlandı
+(sahte geçiş haritası · doğrudan `goods_receipts` insert'i · zarfsız RPC çağrısı ·
+`purchase_price:` yazımı · `refreshCostInBase()` çağrısı · modüle sahte statü ·
+RPC adını sakatlama · R6 İKİ YÖNDEN: warehouse'a yazma izni geri ekleme **ve** RLS rol
+dizisini daraltma — dokuzu da KIRMIZI gördü, restore sonrası yeşil). Parser sağlığı
+sentetik pozitif/negatif çiftiyle ölçülür (gerçek ihlalin varlığına bağlı değil);
+yorum sıyırma CRLF-güvenli (`[^\r\n]*`); eager glob'lar e2e'nin geçici
+`*.compiled.<rastgele>.ts` dosyalarını `!` deseniyle dışlar (#571).
 
 Teknik zorunluluklar (bu oturumun dersleri): yorum sıyırma **CRLF-güvenli** (`[^\r\n]`,
 `.` değil) · assert kendi dokümanı/yorumuyla TATMİN OLMAZ · her kural **bilerek-boz**

@@ -268,7 +268,7 @@ skills:
     exclusions: []
     commands: {}
     recovery:
-      on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-headless-refresh.ps1
+      on_auth_expired: notebooklm login  # 2026-08-17: urun degisti (teng-lin/notebooklm-py); eski nlm-*.ps1 SILINDI
   - name: notebooklm-sync
     path: .agent/skills/notebooklm-sync/SKILL.md
     description: Projedeki Markdown (.md) dosyalarını NotebookLM ile senkronize (nlm
@@ -289,7 +289,7 @@ skills:
     exclusions: []
     commands: {}
     recovery:
-      on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+      on_auth_expired: notebooklm login  # 2026-08-17: urun degisti (teng-lin/notebooklm-py); eski nlm-*.ps1 SILINDI
     prerequisites:
     - nlm login
   - name: orion-cli
@@ -312,7 +312,7 @@ skills:
     exclusions: []
     commands: {}
     recovery:
-      on_auth_expired: powershell -ExecutionPolicy Bypass -File .agent/scripts/nlm-clean-login.ps1
+      on_auth_expired: notebooklm login  # 2026-08-17: urun degisti (teng-lin/notebooklm-py); eski nlm-*.ps1 SILINDI
     prerequisites:
     - OPENROUTER_API_KEY
     - nlm login (NotebookLM sync için)

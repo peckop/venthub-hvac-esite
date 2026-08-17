@@ -256,6 +256,18 @@ export const ADMIN_RESOURCES: AdminResource[] = [
     searchHintKey: 'admin.search.movements',
     inNav: true
   },
+  {
+    // T062: satınalma (PO + mal kabul). labelKey admin/purchasing sözlüğünde
+    // (oyma 2026-08-16); requiredAccess rotası rbac ROLE_PAGE_ACCESS'te tanımlı.
+    key: 'purchasing',
+    labelKey: 'admin.purchasing.navLabel',
+    group: 'stock',
+    route: '/admin/purchasing',
+    icon: ClipboardList,
+    requiredAccess: '/admin/purchasing',
+    searchable: false,
+    inNav: true
+  },
 
   // ─── Sistem & Yönetim ─────────────────────────────────────────────────────
   {

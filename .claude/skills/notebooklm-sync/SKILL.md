@@ -8,6 +8,7 @@ category: intelligence
 metadata:
   triggers:
   - nlm sync
+  - notebooklm sync
   - twin'i güncelle
   - defteri güncelle
   - hafızayı yenile
@@ -18,9 +19,9 @@ metadata:
   outputs:
   - synced NotebookLM source
   recovery:
-    on_auth_expired: powershell -File .agent/scripts/nlm-headless-refresh.ps1  # oturum öldüyse: nlm login --clear (bkz. gövde)
+    on_auth_expired: notebooklm login   # 2026-08-17: ürün değişti; eski nlm-*.ps1 SİLİNDİ (bkz. Adım 0)
   prerequisites:
-  - nlm-headless-refresh.ps1
+  - notebooklm CLI (uv tool, izole ortam)
 depends_on: []
 next_steps: []
 run_last: false
@@ -51,20 +52,35 @@ doğrula**, (d) dürüst raporla. Bu yüzden:
 > Komutlar `orion doc ...` ile çalışır (`cc` eski alias'tır, hâlâ çalışır ama `orion` kullan).
 > Aşağıda `<ROOT>` = repo kökü (ör. `c:/Users/alize/venthub-hvac`).
 
-### Adım 0 — Auth TAZELE (her sync'in ZORUNLU ilk adımı)
+### Adım 0 — Auth DOĞRULA (her sync'in ZORUNLU ilk adımı)
+
+> ⚠️ **2026-08-17 — ÜRÜN DEĞİŞTİ.** `jacob-bd/notebooklm-mcp-cli` (`nlm`) kaldırıldı; yerine
+> **`teng-lin/notebooklm-py`** (`notebooklm`) kuruldu — izole `uv tool` ortamına
+> (`~/AppData/Roaming/uv/tools/notebooklm-py`). Eski `nlm-*.ps1` scriptleri **SİLİNDİ**.
+>
+> **Eski notta "notebooklm-py KURMA" yazıyordu ve o uyarı zamanında HAKLIYDI:** iki proje de
+> `notebooklm-mcp` adlı AYNI komutu üretiyor, yani ikisi bir arada durunca biri diğerinin
+> sarmalayıcısını eziyor — makinedeki kronik "failed" arızasının sebebi tam buydu. Bayatlayan
+> tarafı gerekçesiydi ("rebrand'i bilmez"): teng-lin sürümü 0.8.1 ve kendi tanımı *"for Google
+> Gemini Notebook"*. **Karar ölçüme dayandı**, gerçek sorguyla doğrulandı. Artık makinede tek
+> ürün var; ikisini birlikte KURMA.
 
 ```bash
-powershell -File .agent/scripts/nlm-headless-refresh.ps1
-# (⚠️ 2026-08-10: -ExecutionPolicy Bypass bu ortamda DENY; -File yeterli. Script yalnız profildeki
-#  Google oturumu CANLIYSA işe yarar. Oturum ölmüşse / "Chrome is already running" / beyaz-donuk
-#  pencere görürsen → kalıcı çözüm: `nlm login --clear` (görünür, tek sefer; tüm chrome.exe kapalı).
-#  Paket: notebooklm-mcp-cli ≥0.9.8 — notebooklm-py KURMA (Gemini Notebook rebrand'ini bilmez).
-#  Detay: memory `nlm-auth-issue`.)
+notebooklm auth check --json
 ```
 
-Penceresiz (~15sn), şifre girişi yok — kayıtlı Chrome profilinden taze cookie çeker.
-Bitince MCP'ye tanıt: `refresh_auth` tool'unu çağır. Çıktıda "✓ Authentication valid!" görmelisin.
-> (İsteğe bağlı) CLI tazeliği: `pip install --upgrade notebooklm-mcp-cli`.
+⚠️ **Bu çıktı TEK BAŞINA KANIT DEĞİL.** 2026-08-17'de ölçüldü: `auth check` **"ok"** dedi,
+`psidts`i 2027'ye geçerli gösterdi — ama gerçek okuma *"Authentication expired or invalid"*
+verdi. Statik dosya kontrolü oturumun canlılığını ölçmüyor. **Gerçek çağrıyla doğrula:**
+
+```bash
+notebooklm list --json      # defter listesi geliyorsa auth GERÇEKTEN canlı
+```
+
+Auth düştüyse: **`notebooklm login`** — tarayıcı açar, giriş algılanınca kendisi kaydeder.
+Bu **kullanıcının eylemidir** (tıklama gerekir); ajan olarak çalıştırıp bekleme, kullanıcıya söyle.
+`--browser-cookies chrome` bu makinede ÇALIŞMAZ (Chrome 127+ App-Bound Encryption; ölçüldü).
+> (İsteğe bağlı) CLI tazeliği: `uv tool upgrade notebooklm-py`.
 
 ### Adım 1 — Yerel dokümanları güncelle (NLM'e dokunmadan)
 
@@ -90,10 +106,20 @@ Eski master+standalone kaynakları siler, yenilerini yükler (Hard Reset). `--fo
 
 ### Adım 3 — DOĞRULA (sessiz-kaçırmayı yakalayan adım — ATLAMA)
 
-Twin'i `notebook_query` ile sorgula ve gerçekten güncellendiğini gör:
-- Kaynak listesi: `source_list_drive(notebook_id)` → beklenen dosyalar yeni ID'lerle orada mı?
-- İçerik: son eklenen bir dokümana özel bir soru sor (ör. bayi modülü için "R0→B2 planı nedir?")
-  ve cevabın doğru kaynağı (citation) gösterdiğini doğrula.
+Twin'i `chat_ask` ile sorgula ve gerçekten güncellendiğini gör:
+- Kaynak listesi: `source_list(notebook="<ID>")` → beklenen dosyalar yeni ID'lerle orada mı?
+  (eski `source_list_drive` aracı Drive'a özeldi; genel listeleme artık `source_list`)
+- İçerik: `chat_ask(notebook="<ID>", question="<son eklenen dokümana özel soru>")`
+  (ör. bayi modülü için "R0→B2 planı nedir?")
+
+⚠️ **YÜKLENDİ ≠ SORGULANABİLİR.** Yeni CLI'da `source add`in `--wait` bayrağı YOK; ekleme
+asenkron döner ve indeksleme bitmeden sorulan soru kaynağı GÖRMEZ. `orion doc tree --nlm-sync`
+artık her yüklemeden sonra `source wait` çağırıyor ve bekleyemediği durumu SÖYLÜYOR — çıktıda
+"indeksleme BEKLENMEDI" görürsen doğrulamayı biraz sonra tekrarla.
+
+Cevabın **doğru kaynağı (citation) gösterdiğini** de doğrula: `chat_ask` yanıtı `references`
+listesi döndürür (`source_id` + `cited_text`). Atıf yeni yüklenen dosyayı göstermiyorsa sync
+görünürde başarılı olsa bile o kaynak sorguya girmemiş demektir.
 
 ## .cc_docs.yaml — Sync Setinin SSOT'u
 
@@ -130,8 +156,9 @@ kaynak olarak yüklenir; sorgu/citation'da temiz görünür.
 ## Hata Durumları
 
 ### "Authentication expired"
-Adım 0'ı çalıştır (`nlm-headless-refresh.ps1`) → `refresh_auth` → komutu tekrarla.
-Eski yöntem (görünür Chrome, ESET-yavaş) yerine **daima headless script**.
+Adım 0'ı çalıştır: `notebooklm list --json` ile GERÇEKTEN öldüğünü doğrula (`auth check` yalan
+söyleyebilir), ölüyse kullanıcıdan `notebooklm login` istemesini bekle, sonra komutu tekrarla.
+`refresh_auth` diye bir MCP aracı ARTIK YOK — auth tamamen CLI tarafında.
 
 ### `orion doc tree` → "0 MD NLM'e birlestirilecek"
 - `.cc_docs.yaml` `source_dirs` doğru mu?
@@ -146,6 +173,7 @@ kalanları `orion doc single --py-file <dosya>` ile tek tek → son çare elle y
 - **A1:** `standalone_files` master'a dahil edilmez (dupe önlemi).
 - **A2:** Twin'de 3 master (frontend/functions/schema) + standalone set + elle-eklenenler bulunur.
 - **A3:** Sync ÖNCESİ Adım 1 (all/batch/schema) çalışmalı — yoksa eski `.md` yüklenir.
-- **A4:** Auth düşünce `nlm-headless-refresh.ps1` (headless) çalıştır, sonra `refresh_auth`.
+- **A4:** Auth düşünce `notebooklm login` (kullanıcı eylemi) — otomatik headless script YOK.
+  Durumu `auth check` DEĞİL gerçek bir okuma (`notebooklm list`) ile ölç.
 - **A5:** Sync MILESTONE eylemidir; her commit'te DEĞİL. post-commit hook artık yerel-only.
 - **A6:** Sync'i DOĞRULAMADAN (Adım 3) "tamamlandı" deme — sessiz-kaçırma ancak query ile yakalanır.
