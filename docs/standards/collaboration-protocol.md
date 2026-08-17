@@ -139,7 +139,7 @@ bu cetvelin "geriye-denetleyen + geleceği-kilitleyen" ayağıdır (`standard-pl
 - **Gereksiz dosya yasak.** Yeni MD açmadan önce: konunun SSOT'u **var mı?** Varsa oraya **bölüm ekle**.
 - İş bitince **`DURUM-TAKIP.md` güncellenir**.
 - Türkçe birincil. Commit mesajı **konvansiyonel + Türkçe** (`docs(...)`, `feat(...)`, `fix(...)`).
-- **NLM twin sync = MILESTONE** (her commit değil): auth tazele → sync → `notebook_query` ile **DOĞRULA**. Yeni önemli standart/audit `.cc_docs.yaml` `standalone_files`'a eklenmeli.
+- **NLM twin sync = MILESTONE** (her commit değil): auth DOĞRULA (`notebooklm list`) → sync → `chat_ask` ile **DOĞRULA**. Yeni önemli standart/audit `.cc_docs.yaml` `standalone_files`'a eklenmeli.
 
 ---
 

@@ -322,7 +322,7 @@ React Three Fiber (`@react-three/fiber` 9.5.0) ve `@react-three/drei` ile geliş
 Proje, **orion** pipeline ile kaynak koddan otonom `.md` üretir; master'lar **NotebookLM dijital ikizine** yüklenir (proje hafızası). Notebook ID: `235043eb-970f-4a52-9f39-1d02b2621e9c`.
 
 - **Komutlar & tam akış** → `.claude/skills/notebooklm-sync/` yeteneği (`orion doc all | batch | schema | tree`). (Eski `cc doc` alias'ı hâlâ çalışır ama `orion` kullan.)
-- **Sync modeli — MILESTONE/MANUEL (her commit'te DEĞİL):** LLM-güdümlü; sırayla **auth-tazele** (`.agent/scripts/nlm-headless-refresh.ps1`, penceresiz ~15sn) → `orion doc tree --nlm-sync --force-sync` → `notebook_query` ile **DOĞRULA**. Mekanik auto-sync auth düşünce sessizce başarısız olduğu için kaldırıldı; **post-commit hook artık yereldir** (NLM'e dokunmaz). Bkz. memory `nlm-sync-milestone-model`.
+- **Sync modeli — MILESTONE/MANUEL (her commit'te DEĞİL):** LLM-güdümlü; sırayla **auth-DOĞRULA** (`notebooklm list --json` — 2026-08-17: ürün `notebooklm-py`'ye geçti, eski `nlm-*.ps1` betikleri SİLİNDİ; `auth check` tek başına kanıt değil) → `orion doc tree --nlm-sync --force-sync` → `chat_ask` ile **DOĞRULA**. Mekanik auto-sync auth düşünce sessizce başarısız olduğu için kaldırıldı; **post-commit hook artık yereldir** (NLM'e dokunmaz). Bkz. memory `nlm-sync-milestone-model`.
 - **Üretilen vs küratörlü:** kök master'lar (`*_master.md`, `system_tree.md`) elle düzenlenmez (pipeline ezer); küratörlü dokümanlar `docs/` alt klasörlerinde — harita: **`docs/README.md`**.
 
 ---

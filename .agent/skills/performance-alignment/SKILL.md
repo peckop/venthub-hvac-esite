@@ -62,7 +62,7 @@ Bu skill, VentHub HVAC projesinde veya herhangi bir enterprise yazılım projesi
 
 ### Adım 5: Planı Deftere Yükleme ve Mimari Onay (Approval)
 *   **Aksiyon:** Hazırlanan `implementation_plan.md` NotebookLM defterine yüklenir.
-*   **Çıktı:** `notebook_query` ile plandaki tüm maddelerin proje kurallarına uyumluluğu denetlenir, "FULLY APPROVED" onayı alınır ve kullanıcıya sunulur.
+*   **Çıktı:** `chat_ask` (2026-08-17'ye kadar `notebook_query`) ile plandaki tüm maddelerin proje kurallarına uyumluluğu denetlenir, "FULLY APPROVED" onayı alınır ve kullanıcıya sunulur.
 
 ---
 

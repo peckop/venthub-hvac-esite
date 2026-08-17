@@ -107,7 +107,8 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 - **Katalog→ticaret hattı SSOT:** `docs/plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan-uca pano)
   + `docs/standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`.
   Veri deposu: `C:/Users/alize/venthub-pdf-ingestor` (CSV'ler). NLM auth bozulursa → memory `nlm-auth-issue`
-  (Gemini Notebook rebrand; çözüm `nlm login --clear`, paket `notebooklm-mcp-cli` ≥0.9.8).
+  (**2026-08-17 ürün değişti:** paket `notebooklm-py`, CLI `notebooklm`, MCP sunucusu `notebooklm-py`;
+  çözüm `notebooklm login`. `auth check` tek başına kanıt DEĞİL — `notebooklm list` ile ölç).
 - `docs/` (kök) — **üretilmiş** master MD'ler (frontend, edge functions, DB şema) — elle düzenleme.
 - `.claude/skills/` = Claude Code yetenekleri · `.agent/skills/` = Antigravity/worker yetenekleri — **İKİSİ DE AKTİF ve KASITLI** (çift ağaç); birleştirme/silme ÖNERME.
 
@@ -115,7 +116,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDD_description.sql`).
 
 - **Kod yapısı / "ne çağırıyor, neyi etkiler, nerede" sorusu** → önce **CodeGraph** (AST grafiği,
   ~1sn taze, kesin). grep'ten önce buna bak.
-- **Kural / niçin / mimari karar / SaaS plan sorusu** → **NotebookLM dijital ikiz** (`notebook_query`,
+- **Kural / niçin / mimari karar / SaaS plan sorusu** → **NotebookLM dijital ikiz** (`chat_ask` — 08-17'ye kadar `notebook_query`,
   ID `235043eb-970f-4a52-9f39-1d02b2621e9c`) veya `CONTEXT.md`.
 - **Çelişirse kod kazanır.** NLM ikizi snapshot'tır, drift edebilir (ör. tablo sayısı); kod
   yapısı için daima CodeGraph/gerçek kaynağı doğrula. CLAUDE.md = her oturum yüklü çekirdek katman.

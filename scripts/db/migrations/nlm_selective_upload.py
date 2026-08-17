@@ -27,19 +27,25 @@ def main():
             continue
             
         print(f"[{idx}/{total}] Uploading: {item['file']} as '{title}'...")
+        # 2026-08-17: ürün değişti (jacob-bd `nlm` -> teng-lin `notebooklm`). Eski komut
+        # makinede YOK, yani bu betik sessizce her dosyada FAILED veriyordu.
+        # Yeni CLI'da dosya yolu POZİSYONEL, defter -n ile, ve `--wait` bayrağı YOK
+        # (beklemek ayrı bir `source wait` komutu).
         cmd = [
-            "nlm", "source", "add", notebook_id,
-            "--file", str(filepath),
+            "notebooklm", "source", "add", str(filepath),
+            "-n", notebook_id,
+            "--type", "file",
             "--title", title,
-            "--wait"
         ]
-        
+
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=str(repo_root))
-        
+
         if result.returncode != 0:
             print(f"[{idx}/{total}] FAILED: {item['file']}\nError: {result.stderr or result.stdout}")
         else:
-            print(f"[{idx}/{total}] SUCCESS: {item['file']}")
+            # UYARI: yükleme asenkron döner. "SUCCESS" = kabul edildi, İNDEKSLENDİ demek DEĞİL.
+            # Hemen sorgulanabilir olmasını istiyorsan: notebooklm source wait <id> -n <nb>
+            print(f"[{idx}/{total}] SUCCESS (kuyruğa alındı): {item['file']}")
             
     print("Selective upload complete!")
 
