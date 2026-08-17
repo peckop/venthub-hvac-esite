@@ -26,6 +26,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { syncOrderFromReturn } from '../../lib/orderStatusService'
 import type { Database } from '../../types/database.types'
+import { orIlikeContains } from '../../utils/adminQueryFilters'
 import {
   adminButtonPrimaryClass,
   adminSelectClass,
@@ -301,11 +302,19 @@ async function returnsFetcher(
   // 2. Global search query (term)
   const term = params.query.trim()
   if (term) {
+    /* Kullanıcı metni filtre GRAMERİNE gömülmez (T078-VH): virgül yazan admin eskiden
+       koşul sayısını değiştiriyordu. E-posta/UUID araması "noktayı sil" gibi bir
+       temizlikle değil, KAÇIŞLA korunuyor — silme yaklaşımı e-posta aramasını bozardı. */
     query = query.or(
-      `reason.ilike.%${term}%,` +
-      `venthub_orders.customer_name.ilike.%${term}%,` +
-      `venthub_orders.customer_email.ilike.%${term}%,` +
-      `venthub_orders.order_number.ilike.%${term}%`
+      orIlikeContains(
+        [
+          'reason',
+          'venthub_orders.customer_name',
+          'venthub_orders.customer_email',
+          'venthub_orders.order_number',
+        ],
+        term,
+      ),
     )
   }
 

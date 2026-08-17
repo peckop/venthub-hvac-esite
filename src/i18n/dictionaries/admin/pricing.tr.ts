@@ -9,6 +9,9 @@ export const pricing = {
       check: "Sorgula",
       checking: "Sorgulaniyor...",
       notFound: "Bu arama ile urun bulunamadi.",
+      // "Sonuc yok" ile "sorgu calismadi" AYRI seylerdir: ikincisini birincisi gibi
+      // gostermek admine yalan soyler ve arizayi gorunmez kilar.
+      failed: "Sorgu calistirilamadi; sonuc GOSTERILEMIYOR. Bu 'urun yok' demek DEGILDIR - tekrar deneyin.",
       locked: "Kilitli - kur degisimi bu urunun fiyatini etkilemez.",
       unlocked: "Kilitli degil - kur degisimi bu urunun fiyatina yansir.",
       winner: "Karari veren kapsam: {{scope}} - dondurulan kur: {{rate}}"
