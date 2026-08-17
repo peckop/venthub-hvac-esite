@@ -2,20 +2,20 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\LeadModal.tsx
-skeleton_hash: 9dc3340e0671ea8a
+source_path: C:\Users\alize\venthub-wt-quote\src\components\LeadModal.tsx
+skeleton_hash: 499c5e0afbe64842
 entity_hashes:
   func:LeadModal: d62325f85f800f09
-  func:handleClose: 63d7dd03089c88aa
+  func:handleClose: 0cc370a6edc1c061
   func:submit: 57ac99ffc1840be0
-  func:validate: 3e57d313017d2565
-  overview: a3ddac6f1a67af59
+  func:validate: 4db8fe8dea658f52
+  overview: 99ab56de684b2e03
   style_tokens: 671fc429a274af0c
-generated_at: 2026-06-14T22:50:17Z
+generated_at: 2026-08-17T13:18:14Z
 ---
 
 ## Genel Bakış
-`LeadModal` bileşeni, ürünlerle ilgili potansiyel müşteri (lead) bilgilerini toplamak için kullanılan bir modal form penceresidir. Bileşen, form alanlarının doğrulamasını, gönderim işlemini ve modalın açılıp kapanma kontrollerini yönetir.
+`LeadModal` bileşeni, potansiyel müşteri (lead) bilgilerini toplamak için kullanılan modal tabanlı bir form penceresidir. Bileşen, form alanlarının doğrulamasını, gönderim işlemini ve modalın açılıp kapanma kontrollerini yöneterek kullanıcı iletişim verilerini sisteme kaydeder.
 
 ## Fonksiyon Grupları
 ### Modal Kontrol ve Render
@@ -34,7 +34,31 @@ Form gönderim olayını yakalayarak doğrulama çalıştırır, başarılı ise
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül için fonksiyon gövdeleri paylaşılmadığı için çıkarılabilir mimari varsayımlar üretilememektedir. Fonksiyon gövdesi içeriği olmadan, modülün doğru çalışması için gerekli koşullar (form alanlarının varlığı, API çağrılarının koşulları, state güncellemelerinin gereklilikleri vb.) tespit edilemez.
+Bu modül, ürün ile ilgili potansiyel müşteri bilgilerini toplayan kontrollü bir modal form bileşenidir. Aşağıdaki varsayımlar fonksiyon imzaları ve yapısal ipuçlarından türetilmiştir.
+
+---
+
+**[Aksiyom 1]:** Eğer `onClose` callback'i sağlanmazsa, modal bileşeni kendi kendini kontrollü modo kapatabilir (`open` prop'u false yapabilir) ancak üst bileşen durumunu güncelleyemez ve modal kalıcı olarak açık kalır.
+
+**[Aksiyom 2]:** Eğer `open` prop'u `boolean` türünde (veya truthy/falsy dönüştürülebilir) değilse, modalın render edilip edilmeyeceği belirlenemez ve bileşen beklenmedik davranışı gösterir.
+
+**[Aksiyom 3]:** Eğer `productName` değeri sağlanmazsa, toplanan lead bilgileri hangi ürüne ait olduğu belirsiz olacağından, form gönderiminde ürün bağlamı eksik olur.
+
+**[Aksiyom 4]:** Eğer `validate()` fonksiyonu `submit()` invokasyonundan önce çağrılmazsa, geçersiz form verileri sunucuya gönderilebilir; bu nedenle validasyon submit iş akışının zorunlu bir ön koşuludur.
+
+**[Aksiyom 5]:** Eğer `submit()` fonksiyonu `React.FormEvent` parametresi almazsa (örn: çağrıcı event'i iletmezse), form default submit davranışını (`page reload`) engelleyemez.
+
+**[Aksiyom 6]:** `_productId` prop'u (`__productId` olarak yeniden adlandırılmış) sağlanmazsa, lead kaydının hangi ürün ID'sine bağlı olacağı belirsiz olur; bu değerin form submission payload'ında gerekli olduğu varsayılır.
+
+---
+
+### Domain-Specific Kurallar
+
+| Kural | Açıklama |
+|---|---|
+| **Zorunlu alan doğrulaması** | `validate()`, tüm zorunlu form alanlarının doluluğunu kontrol etmelidir; boş alan bırakılamaz. |
+| **Kontrollü bileşen paterni** | Modal görünürlüğü `open` prop'u ile dışarıdan yönetilir; bileşen içinden `open` state'i doğrudan mutate edilmez. |
+| **Eşik değer** | Tanımlanmamıştır — form alanı sayısına veya zorunlu alan koşullarına ilişkin eşik değer kodda belirlenmemiştir. |
 
 ---
 
@@ -51,10 +75,14 @@ Bu modül için fonksiyon gövdeleri paylaşılmadığı için çıkarılabilir 
 **Dönüş**: React.FC\<LeadModalProps\> — Tanımlı prop tipleriyle bir React fonksiyonel bileşeni döndürür.
 
 ### validate
-**Ne yapar**: Form gönderiminde girilen verileri kontrol eder ve hataları bir nesne olarak döndürür.  
-**Nasıl yapar**: Form submit olayında `e.preventDefault()` ile varsayılan davranışı engeller, `validate()` fonksiyonunu çağırarak doğrulama sonuçlarını alır, `setErrors` ile hataları state’e kaydeder ve hata yoksa formun gönderilmesine izin verir.  
-**Parametreler**: Yok.  
-**Dönüş**: Bilinmiyor (kod içinde dönüş değeri kullanılmaktadır; muhtemelen hata nesnesi).
+**Ne yapar**: Bu fonksiyon, bir formun gönderilmeden önce (submit) içeriğinin geçerliliğini kontrol eder. Tüm form alanlarının doğruluğunu değerlendirir ve bulunan hataları bir nesne olarak döndürür. Hata yoksa boş bir nesne döner.
+
+**Nasıl yapar**: Fonksiyon, bir React form olay işleyicisi içinde `e.preventDefault()` ile varsayılan form gönderme işlemini engelledikten hemen sonra çağrılır. Çağrının ardından, döndürülen hata nesnesi `setErrors` aracılığıyla bileşenin state'ine kaydedilir. Eğer hata anahtarı varsa (hata bulunuyorsa) fonksiyon erken bir `return` ile işlemi sonlandırır, böylece başarılı gönderim (API çağrısı simülasyonu) sadece hata yokken çalıştırılır.
+
+**Parametreler**:
+- Bu fonksiyonun tanımında herhangi bir parametre listelenmemiştir. Ancak çağrı yapılan bağlamda (`validate()`) boş olarak çağrıldığı görülmektedir. Fonksiyonun ihtiyaç duyduğu form verilerine, muhtemelen bileşenin kendi state'inden veya bir bağlam (context) üzerinden eriştiği varsayılmaktadır.
+
+**Dönüş**: Belirtilmemiştir. Ancak kullanımından, hata durumlarını içeren bir nesne veya boş bir nesne döndüreceği anlaşılmaktadır.
 
 ### submit
 **Ne yapar**: Form gönderildiğinde çalıştırılan ana işlem akışını yönetir.  
@@ -64,16 +92,20 @@ Bu modül için fonksiyon gövdeleri paylaşılmadığı için çıkarılabilir 
 **Dönüş**: Bilinmiyor (fonksiyon içinde yan etkiler vardır, dönüş değeri belirtilmemiştir).
 
 ### handleClose
-**Ne yapar**: Modal kapanış işlemini tetikler.  
-**Nasıl yapar**: İçeride tanımlı `handleClose` fonksiyonunu çağırarak modalın kapanmasını sağlar; bu, dışarıdan gelen `onClose` geri çağırma fonksiyonuna yönlendirilmiş olabilir.  
-**Parametreler**: Yok.  
-**Dönüş**: Bilinmiyor (fonksiyon yan etki üretir, dönüş değeri belirtilmemiştir).
+**Ne yapar**: Bu fonksiyon, bir modal veya açılır pencere bileşeninin kapanmasını tetikler. Genellikle bir başarı durumu gösterildikten sonra veya kullanıcı "kapat" butonuna tıkladığında çağrılır.
+
+**Nasıl yapar**: Fonksiyon, kapanış işlemini yöneten bir durumu (state) veya prop'u günceller. Sağlanan gövde kodunda, callback fonksiyonu içinde kendisini (`handleClose()`) çağırmaktadır. Bu, genellikle bir `useState` hook'u ile yönetilen `isOpen` veya benzeri bir boolean'ı `false` yaparak modalı görünmez kılan bir eylemdir. Başarılı form gönderimi sonrasında da otomatik kapanma için belirli bir gecikmeyle (3 saniye) bu fonksiyon çağrılır.
+
+**Parametreler**:
+- Bu fonksiyonun tanımında herhangi bir parametre listelenmemiştir. Çağrıldığında boş olarak çağrılır (`handleClose()`).
+
+**Dönüş**: Belirtilmemiştir, ancak bir durum güncelleme eylemi gerçekleştirdiği için doğrudan bir değer döndürmez (void/undefined).
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
-- import: ../utils/routes::Routes
 - import: next/link::Link
 - import: react::React
 - import: react::useState
@@ -92,34 +124,41 @@ Bu modül için fonksiyon gövdeleri paylaşılmadığı için çıkarılabilir 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/LeadModal.tsx::LeadModal
-- **params**: (open, onClose, productName, __productId)
-  - `open` — boolean, modal'ın açık olup olmadığını kontrol eder
-  - `onClose` — function, modal kapatma fonksiyonu
-  - `productName` — string, ürün adı, varsayılan mesajda kullanılır
-  - `__productId` — string, ürün ID'si (prop'tan yeniden adlandırılmış)
+### [N1_NASIL] AST Pointer: src/components/LeadModal.tsx::validate
+- **params**: ()
 - **ic_degiskenler**:
-  - (fonksiyon gövdesi verilmemiş, sadece inner fonksiyonlar var)
-- **Dönüş**: React.FC<LeadModalProps> (modal bileşenini render eder)
+  - `e` — Form validasyon hatalarını tutan bir nesne. Başlangıçta boş bir `Record<string, string>` olarak oluşturulur ve hata mesajlarıyla doldurulur.
+- **Dönüş**: `e` — Hataları içeren bir nesne (`Record<string, string>`).
 
-### [N2_NASIL] AST Pointer: src/components/LeadModal.tsx::validate
-- **params**: (yok)
+### [N2_NASIL] AST Pointer: src/components/LeadModal.tsx::submit
+- **params**: (`e: React.FormEvent`)
 - **ic_degiskenler**:
-  - `e` — Record<string, string> object, hata mesajlarını tutar, başlangıçta boş object
-- **Dönüş**: `e` object (validation hatalarını içerir)
+  - `v` — `validate()` fonksiyonunun döndürdüğü validasyon sonuçlarını (hatalar) tutan nesne.
+- **Dönüş**: yok (yan etki: formu submit eder, durumları değiştirir, başarı durumunu tetikler)
 
-### [N3_NASIL] AST Pointer: src/components/LeadModal.tsx::submit
-- **params**: (e: React.FormEvent)
+### [N3_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose
+- **params**: ()
 - **ic_degiskenler**:
-  - `e` — React.FormEvent, form submit olayı
-  - `v` — validate() fonksiyonunun dönüş değeri, hata objesi
-- **Dönüş**: yok (yan etkiler: hata state'ini günceller, submit state'ini yönetir, setTimeout ile success modal'ını açar ve 3 saniye sonra handleClose'ı çağırır)
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; dışarıdan gelen `onClose`, `setIsSuccess`, `setName`, vb. state setter'ları kullanılır)
+- **Dönüş**: yok (yan etki: modalı kapatır, form alanlarını sıfırlar)
 
-### [N4_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose
-- **params**: (yok)
+### [N4_NASIL] AST Pointer: src/components/LeadModal.tsx::handleClose (iç kapanış fonksiyonu)
+- **params**: ()
 - **ic_degiskenler**:
-  - (fonksiyon gövdesinde değişken tanımı yok, sadece state setter'ları ve onClose çağrısı var)
-- **Dönüş**: yok (yan etkiler: onClose callback'ini çağırır, 300ms delay ile form state'ini sıfırlar: isSuccess, name, company, email, phone, city, appArea, consent, message, errors)
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; sadece `handleClose()` çağrısı yapılır)
+- **Dönüş**: yok (yan etki: ana kapanış fonksiyonunu çağırır)
+
+### [N5_NASIL] AST Pointer: src/components/LeadModal.tsx::resetForm
+- **params**: ()
+- **ic_degiskenler**:
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; dışarıdan gelen `onClose`, `setIsSuccess`, `setName`, `setCompany`, `setEmail`, `setPhone`, `setCity`, `setAppArea`, `setConsent`, `setMessage`, `setErrors` state setter'ları ve `productName`, `t` fonksiyonu kullanılır)
+- **Dönüş**: yok (yan etki: modalı kapatır, tüm form alanlarını başlangıç değerlerine sıfırlar)
+
+### [N6_NASIL] AST Pointer: src/components/LeadModal.tsx::resetForm (iç sıfırlama fonksiyonu)
+- **params**: ()
+- **ic_degiskenler**:
+  - (fonksiyon gövdesinde yeni bir değişken tanımlanmaz; dışarıdan gelen `setIsSuccess`, `setName`, `setCompany`, `setEmail`, `setPhone`, `setCity`, `setAppArea`, `setConsent`, `setMessage`, `setErrors` state setter'ları ve `productName`, `t` fonksiyonu kullanılır)
+- **Dönüş**: yok (yan etki: form alanlarını başlangıç değerlerine sıfırlar)
 
 ---
 

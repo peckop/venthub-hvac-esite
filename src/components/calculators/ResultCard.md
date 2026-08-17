@@ -2,48 +2,53 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\calculators\ResultCard.tsx
-skeleton_hash: b49886573ae3ad80
+source_path: C:\Users\alize\venthub-wt-quote\src\components\calculators\ResultCard.tsx
+skeleton_hash: 0f34bdbbaaf3dded
 entity_hashes:
-  func:Recommendations: 17d93b0b25d10f0e
+  func:Recommendations: cb90824638a4b1f2
   func:ResultCard: 3c33f679c49530b1
   func:ResultGrid: 1e8853c40a5113bf
   func:getStatusConfig: 90a49b86c8e12ce2
-  overview: 2e109c4e010f2bfb
+  overview: 5c46ca5f553e8511
   style_tokens: 8d8fc38c13829fd7
-generated_at: 2026-06-08T10:08:47Z
+generated_at: 2026-08-17T13:20:03Z
 ---
 
 ## Genel Bakış
-`ResultCard.tsx` modülü, HVAC hesaplama sonuçlarını görsel olarak sunmak için bir dizi React bileşeni ve yardımcı fonksiyon içerir. Modül, tekil sonuç kartlarını, düzenli ızgara yerleşimini ve öneri listelerini sunarak kullanıcı arayüzündeki bilgi sunumunu standartlaştırır.
+`ResultCard.tsx` modülü, HVAC hesaplama sonuçlarının kullanıcıya sunulması için bir dizi React bileşeni ve yardımcı fonksiyon içerir. Tekil sonuç kartları, çoklu sonuçların düzenli ızgara yerleşimi ve önerilerin listelenmesi için gerekli arayüz bileşenlerini tanımlar. Modül, duruma göre dinamik görünüm konfigürasyonu sağlayarak bilgi sunumunu standartlaştırır.
 
 ## Fonksiyon Grupları
-### UI Bileşenleri
-Bu grup, sonuçların ve önerilerin kullanıcıya gösterilmesini sağlayan temel arayüz bileşenlerini kapsar.
-- ResultCard, ResultGrid, Recommendations
+### Sonuç Bileşenleri
+Tekil hesaplama sonuçlarını kart formatında gösteren ana bileşen ve sonuçların düzenli bir ızgarada yerleştirilmesini sağlayan düzenleyici bileşeni kapsar.
+- ResultCard, ResultGrid
+
+### Öneri Bileşeni
+Hesaplama sonuçlarına bağlı önerilerin başlık ve liste formatında sunulmasını sağlar.
+- Recommendations
 
 ### Yardımcı Fonksiyonlar
-Bileşenlerin duruma göre görünümünü (renk, ikon vb.) belirleyen konfigürasyon değerlerini döndüren yardımcı işlevdir.
+Bileşenlerin duruma (success, warning, error, info) göre görünüm stilini belirleyen konfigürasyon değerlerini döndüren yardımcı işlevdir.
 - getStatusConfig
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül için gerekli mimari varsayımlar, UI bileşenlerinin doğru render edilmesi ve durum yapılandırmasına ilişkin koşulları kapsar.
 
-[Aksiyom 1]: Eğer `ResultCard` bileşenine `title` prop'u verilmezse, kart başlıksız render edilir veya hata oluşur.
+Bu modül, UI bileşenlerinden oluştuğu için mimari varsayımlar, bileşenlerin doğru çalışması için gerekli props ve veri yapılarına ilişkindir.
 
-[Aksiyom 2]: Eğer `ResultCard` bileşenine `value` prop'u verilmezse, kart değersiz render edilir veya hata oluşur.
+[Aksiyom 1]: Eğer `ResultCard` bileşenine `title` veya `value` props'ları verilmezse (undefined/null ise), bileşen eksik bilgi gösterir veya hata verebilir.
 
-[Aksiyom 3]: Eğer `getStatusConfig()` fonksiyonu bilinmeyen bir `status` değeriyle çağrılırsa, varsayılan 'info' stilini döndürür veya tanımsız davranış oluşur.
+[Aksiyom 2]: Eğer `ResultCard` bileşenine `status` prop'u verilmezse, varsayılan olarak `'info'` değeri kullanılır; aksi takdirde `getStatusConfig()` fonksiyonu farklı bir görünüm yapılandırması döndürebilir.
 
-[Aksiyom 4]: Eğer `ResultGrid` bileşenine `children` prop'u verilmezse, boş bir ızgara render edilir veya hata oluşur.
+[Aksiyom 3]: Eğer `getStatusConfig()` fonksiyonuna desteklenmeyen bir `status` değeri verilirse, fonksiyonun hangi konfigürasyonu döndüreceği belirsizdir (bu, fonksiyon gövdesindeki `switch/case` veya `if/else` yapısına bağlıdır).
 
-[Aksiyom 5]: Eğer `Recommendations` bileşenine `items` prop'u verilmezse, boş bir öneri listesi render edilir veya hata oluşur.
+[Aksiyom 4]: Eğer `ResultGrid` bileşenine `children` prop'u verilmezse, bileşen içeriği olmadan render edilir; `title` prop'u verilmezse, başlık bölümü gösterilmez.
 
-[Aksiyom 6]: Eğer `Recommendations` bileşenine `items` boş bir dizi olarak verilse bile, bileşen hata vermeden render edilmelidir.
+[Aksiyom 5]: Eğer `Recommendations` bileşenine `items` prop'u verilmezse veya boş bir dizi ise, bileşen hiçbir öneri listesi göstermez; `title` prop'u verilmezse, başlık bölümü gösterilmez.
 
-[Aksiyom 7]: Eğer `status` parametresi için beklenen değerler ('info', 'warning', 'error', 'success') dışında bir değer verilirse, bileşen varsayılan 'info' stilini kullanır.
+[Aksiyom 6]: Eğer `Recommendations` bileşenine `items` olarak dizi dışı bir değer verilirse (örneğin `null`, `undefined`, veya bir nesne), bileşen hatalı çalışır veya render sırasında hata verebilir.
+
+[Aksiyom 7]: Eğer `ResultCard` bileşeni, `getStatusConfig()` fonksiyonunu kullanarak renk veya ikon gibi görsel konfigürasyonlar elde ediyorsa, `getStatusConfig()`fonksiyonu her geçerli `status` değeri için tutarlı ve eksiksiz bir konfigürasyon nesnesi döndürmelidir; aksi takdirde bileşenin görünümü eksik veya tutarsız olur.
 
 ---
 
@@ -75,12 +80,27 @@ Bu modül için gerekli mimari varsayımlar, UI bileşenlerinin doğru render ed
 **Dönüş**: React.FC<ResultGridProps> — ResultGrid fonksiyonel bileşeni
 
 ### Recommendations
-**Ne yapar**: Belirtilmemiş (docstring sağlanmadı)  
-**Nasıl yapar**: Bilinmiyor  
+
+**Ne yapar**: Bu bileşen, verilen öneriler listesini ve başlığını kullanarak öneriler bölümünü render eden React fonksiyonel bileşenidir. tipik olarak ürün öneri kartları veya benzeri önerileri sunmak için kullanılır.
+
+**Nasıl yapar**: Fonksiyon, bir React functional component olarak tanımlanmıştır ve parametreleri destructuring (yapılandırma) Deseni ile alır. Bu desen, props nesnesinin doğrudan özelliklerini fonksiyon parametreleri olarak almaya olanak tanır. Bileşen, `React.FC<RecommendationsProps>` tipinde döner, bu da TypeScript ile tanımlanmış standart bir React fonksiyonel component olduğunu ve `RecommendationsProps` arayüzü ile tanımlanmış props'lara sahip olduğunu gösterir.
+
 **Parametreler**:
-- items: type not specified — Gösterilecek öneri öğelerini içeren veri yapısı (dizi, liste vb.)  
-- title: type not specified (default: 'Öneriler') — Öneri bölümünün başlığı; belirtilmezse varsayılan 'Öneriler' kullanılır  
-**Dönüş**: React.FC<RecommendationsProps> — Recommendations fonksiyonel bileşeni
+- `items` — TypeScript tipi belirtilmemiş, muhtemelen `RecommendationsProps` arayüzü içinde tanımlıdır — Öneri olarak gösterilecek veri koleksiyonu veya dizi
+- `title` — TypeScript tipi belirtilmemiş, muhtemelen `RecommendationsProps` arayüzü içinde tanımlıdır — Öneriler bölümünün başlığı
+
+**Dönüş**: `React.FC<RecommendationsProps>` — TypeScript ile tiplendirilmiş bir React fonksiyonel component dönüşü. Bu, bileşenin standart React FC yapısında olduğunu ve `RecommendationsProps` arayüzü ile tanımlanmış prop'lara sahip olduğunu belirtir.
+
+---
+
+## İTHALATLAR (IMPORTS)
+- import: ../../i18n/I18nProvider::useI18n
+- import: ../../i18n/format::formatNumber
+- import: lucide-react::AlertTriangle
+- import: lucide-react::CheckCircle
+- import: lucide-react::Info
+- import: lucide-react::TrendingUp
+- import: react::React
 
 ---
 
@@ -118,39 +138,30 @@ type ResultStatus = 'optimal' | 'acceptable' | 'warning' | 'critical' | 'info'
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/components/calculators/ResultCard.tsx::ResultCard
-- **params**: ({title, value, unit, status = 'info', description, icon, large = false})
+### [N1_NASIL] AST Pointer: ResultCard.tsx::ResultCard
+- **params**: (`title`, `value`, `unit`, `status = 'info'`, `description`, `icon`, `large = false`)
 - **ic_degiskenler**:
-  - `getStatusConfig` — Fonksiyon içinde tanımlanan yardımcı fonksiyon, mevcut status değerine göre renklendirme ve ikon konfigürasyonu döner
-  - `config` — getStatusConfig() çağrısının döndüğü konfigürasyon objesi (bgColor, borderColor, iconColor, icon içerir)
-  - `title` — Parametre olarak alınan başlık metni
-  - `value` — Parametre olarak alınan değer (sayı veya metin)
-  - `unit` — Parametre olarak alınan birim metni
-  - `status` — Parametre olarak alınan durum göstergesi (default: 'info')
-  - `description` — Parametre olarak alınan açıklama metni
-  - `icon` — Parametre olarak alınan özel ikon (React elemanı)
-  - `large` — Parametre olarak alınan boyut bayrağı (default: false)
-- **Dönüş**: JSX elementi (React bileşeni)
+  - `lang` — useI18n() hook'undan alınan dil kodu, formatNumber fonksiyonuna parametre olarak gönderilir
+  - `getStatusConfig` — duruma göre renk, ikon ve stil döndüren inner fonksiyon
+  - `config` — getStatusConfig() çağrısı sonucu elde edilen stil konfigürasyon nesnesi (bgColor, borderColor, iconColor, icon özelliklerini içerir)
+- **Dönüş**: JSX elementi — parametreler ve config nesnesi ile stillendirilmiş bir kart bileşeni döndürür
 
-### [N2_NASIL] AST Pointer: src/components/calculators/ResultCard.tsx::getStatusConfig
-- **params**: (parametre yok)
-- **ic_degiskenler**:
-  - `status` — Üst kapsamdan erişilen durum değişkeni (switch statement'da kullanılır)
-- **Dönüş**: Konfigürasyon objesi (bgColor, borderColor, iconColor, icon içerir)
+### [N2_NASIL] AST Pointer: ResultCard.tsx::getStatusConfig
+- **params**: (yok)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: Nesne — `status` parametresine göre bgColor, borderColor, iconColor ve icon özelliklerini içeren konfigürasyon nesnesi döndürür (optimal/acceptable/warning/critical/default durumları için)
 
-### [N3_NASIL] AST Pointer: src/components/calculators/ResultCard.tsx::ResultGrid
-- **params**: ({children, title})
-- **ic_degiskenler**:
-  - `children` — Grid içinde render edilecek React çocuk elemanları
-  - `title` — Grid başlığı (opsiyonel)
-- **Dönüş**: JSX elementi (grid layout'u)
+### [N3_NASIL] AST Pointer: ResultCard.tsx::ResultGrid
+- **params**: (`children`, `title`)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: JSX elementi — başlık varsa TrendingUp ikonu ile birlikte render edilir, children ise grid layout içinde gösterilir
 
-### [N4_NASIL] AST Pointer: src/components/calculators/ResultCard.tsx::Recommendations
-- **params**: ({items, title = 'Öneriler'})
+### [N4_NASIL] AST Pointer: ResultCard.tsx::Recommendations
+- **params**: (`items`, `title`)
 - **ic_degiskenler**:
-  - `items` — Öneri metinlerinden oluşan dizi
-  - `title` — Bölüm başlığı (default: 'Öneriler')
-- **Dönüş**: JSX elementi (öneri listesi veya null)
+  - `t` — useI18n() hook'undan alınan çeviri fonksiyonu
+  - `heading` — title prop'u yoksa t('calculators.recommendations') çeviri sonucu ile oluşturulan başlık
+- **Dönüş**: JSX elementi veya null — items boşsa null döndürür, değilse Info ikonu ile birlikte başlık ve list item'ları render eder
 
 ---
 

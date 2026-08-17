@@ -3,13 +3,13 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-quote\src\lib\rbac.ts
-skeleton_hash: e1581e665a2b1d85
+skeleton_hash: 33356fcd21744d77
 entity_hashes:
   func:canAccessPage: 8cf66bde9646819e
   func:canWrite: 289f50aba94e238a
   func:isReadOnly: 4b13d0168f4b164b
   overview: e7f0da41b26e494f
-generated_at: 2026-08-16T10:21:25Z
+generated_at: 2026-08-17T11:05:04Z
 ---
 
 ## Genel Bakış
