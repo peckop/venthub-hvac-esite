@@ -25,7 +25,7 @@ OPS-AUDIT tarafından sahibi olarak bana verildi.
 | 5 | `src/views/checkout/PaymentIframeContainer.tsx:55` | `iyzToken` dolu → `<div id="iyzipay-checkout-form" data-token=... />` | ❌ **boş div** |
 | 6 | Tüm `src/` | İyzico checkout betiğini yükleyen **hiçbir yer yok** | ❌ div'i dolduracak kod yok |
 | 7 | `next.config.mjs:60` CSP | `script-src 'self' 'unsafe-inline' 'unsafe-eval'` | ❌ `static.iyzipay.com` yok |
-| 8 | `next.config.mjs:60` CSP | `frame-src` **yazılmamış** → `default-src 'self'`e düşer | ❌ İyzico iframe'i engellenir |
+| 8 | `next.config.mjs` CSP | `frame-src 'self' youtube cloudflarestream` — **İyzico yok** | ❌ İyzico iframe'i engellenir |
 | 9 | `next.config.mjs:60` CSP | `form-action 'self'` | ❌ forma İyzico'ya POST ettirmez |
 
 **Render sonucu:** `iyzToken` dolu olduğu için 5. satırdaki dal kazanır; içi boş bir div
@@ -67,8 +67,15 @@ B yalnız "lansmanı bugün açmak" gerekirse acil çıkış olarak durmalı.
    düğümünü elle kurup ekleyen dar bir yardımcı; `iyzToken` dalı **tek başına**
    kalmasın (boş div üretemesin).
 3. **P3 — CSP (LEGAL-SEO şeridi, `next.config.mjs`):** `script-src` + `frame-src` +
-   `form-action` İzyico alan adları. **Bu dosya bana ait değil** — LEGAL-SEO'ya adresli
-   not bırakıldı, tek başına P1/P2 çalışmaz.
+   `form-action` direktiflerine İyzico alan adları **eklenir**. **Bu dosya bana ait değil** —
+   LEGAL-SEO'ya adresli not bırakıldı, tek başına P1/P2 çalışmaz.
+
+   > **Ölçüm düzeltmesi (19:0x, LEGAL):** #630 master'a inince `frame-src` **yazılmış**
+   > oldu (`'self'` + youtube + cloudflarestream). Yukarıdaki 8. satır ilk ölçümde
+   > "hiç yok" diyordu — o hâli **bayat**. Sonuç değişmiyor (İyzico listede yok, iframe
+   > yine engellenir) ama **iş küçülüyor**: direktif kurmak değil, mevcut direktife
+   > girdi eklemek. Bu, [[platform-limit-claims-expire]] dersinin bu plandaki örneği:
+   > bir gün içinde başkasının merge'i benim ölçümümü bayatlattı.
 4. **P4 — Kapı (INV-PAY-RENDER-1):** "token dolu ama formu basacak kaynak yok" hâli
    testle yasaklanır. Kapı, `paymentFrameContent`-ölü-state sınıfını da yakalamalı:
    *state'in yazıldığını* değil **bir setter'ı olduğunu** ölçmeli.
