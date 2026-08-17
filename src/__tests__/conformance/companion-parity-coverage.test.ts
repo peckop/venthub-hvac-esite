@@ -46,10 +46,33 @@ import { describe, expect, it } from 'vitest'
 
 const YAS_ESIGI_GUN = 7
 
-// Ölçülmüş tabanlar (2026-08-17, yaml-doğru kapsam, 606 kaynak dosya).
+// Ölçülmüş tabanlar (2026-08-17, yaml-doğru kapsam, master MERGE EDİLMİŞ tam geçmişte).
 // Bunlar HEDEF değil TAVAN: düşürülmeli, asla yükseltilmemeli.
 const C4_TABAN = 1
-const C5_TABAN = 34
+const C5_TABAN = 33
+
+/**
+ * ÖLÇÜM ÖNKOŞULU: TAM GİT GEÇMİŞİ.
+ *
+ * Bu bekçi yaşı `git log` üzerinden hesaplıyor. Sığ (shallow) bir klonda `git log`
+ * yalnız son commit(ler)i görür, tarih haritası boşalır ve bekçi SESSİZCE yanlış
+ * ölçer. 2026-08-17'de tam bu yaşandı: `actions/checkout@v4` `fetch-depth`
+ * belirtilmediği için varsayılan **1** ile çalışıyor: CI'da C4 borcu **0** göründü,
+ * oysa tam geçmişte **1**. Kapı yeşil kalsaydı hiç ölçmediği hâlde "geçti" derdi —
+ * kendi stale-guard'ı yakaladığı için fark edildi.
+ *
+ * AYNI TUZAĞA BEN DE DÜŞTÜM: ara ölçümde `git merge --no-commit` ile ağacı birleştirip
+ * C4=8 okudum ve bunu gerçek sandım. Ağaç birleşmişti ama GEÇMİŞ birleşmemişti, yani
+ * master'ın commit tarihleri haritada yoktu ve o 7 taze dosya "tarihsiz = çok eski"
+ * sayıldı. Gerçek merge sonrası sayı 1'e döndü. Ders: yaş ölçen bir bekçi için
+ * "hangi dosyalar var" ile "hangi commit'ler görünüyor" AYRI sorulardır.
+ *
+ * Bu yüzden önkoşul AÇIKÇA doğrulanıyor ve karşılanmıyorsa test KIRMIZI olur.
+ * "Ölçemedim, o hâlde geçtim" (fail-open / uyar-geç modu) bu depoda yasak: yeni
+ * kapıya muafiyet tanımak kapıyı dekoratif yapar. Çözüm testte değil CI'da:
+ * checkout adımına `fetch-depth: 0`.
+ */
+const ASGARI_COMMIT_SAYISI = 50
 
 const KAYNAK_UZANTILARI = ['.ts', '.tsx', '.mjs', '.cjs']
 
@@ -170,6 +193,25 @@ function olc(): Bulgular {
 
 describe('INV-DOC-2 · companion kapsam paritesi', () => {
   const b = olc()
+
+  it('ÖNKOŞUL: git geçmişi TAM (sığ klonda bu bekçi ölçemez, o hâlde geçmiş de sayılmaz)', () => {
+    const sigMi = git(['rev-parse', '--is-shallow-repository']).trim() === 'true'
+    const commitSayisi = git(['rev-list', '--count', 'HEAD']).trim()
+
+    expect(
+      sigMi,
+      'Depo SIĞ klonlanmış (shallow). Bu bekçi yaşı `git log` ile hesaplıyor; sığ klonda ' +
+      'tarih haritası boşalır ve bekçi SESSİZCE yanlış ölçer — 2026-08-17\'de yerelde 8 ' +
+      'ölçülen borç CI\'da 0 göründü. ÇÖZÜM TESTTE DEĞİL CI\'DA: checkout adımına ' +
+      '`fetch-depth: 0` ekle (.github/workflows/ci.yml). "Ölçemedim ama geçtim" kabul edilmez.',
+    ).toBe(false)
+
+    expect(
+      Number(commitSayisi),
+      `Git geçmişinde yalnız ${commitSayisi} commit görünüyor (asgari ${ASGARI_COMMIT_SAYISI}). ` +
+      'Geçmiş budanmışsa yaş hesabı anlamsızdır; `fetch-depth: 0` gerekli.',
+    ).toBeGreaterThan(ASGARI_COMMIT_SAYISI)
+  })
 
   it('C4 — companion\'ı olmayan ESKİ kaynak sayısı tabanı aşmıyor', () => {
     expect(
