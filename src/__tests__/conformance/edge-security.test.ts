@@ -849,10 +849,15 @@ describe('R8 · admin-* uçları gövdede rol kontrolü yapmalı', () => {
    * 2026-08-14: `admin-orders-latest` ve `admin-update-shipping` tam bu boşluktaydı —
    * oturum açmış HERHANGİ bir müşteri tüm siparişleri sayfalayabiliyor, hatta kargo
    * bilgisini YAZABİLİYORDU. İkisi de düzeltildi; bu kural geri gelmesini imkânsız kılar.
-   * DEDEKTÖR: dosyada hem `'admin'` hem `'superadmin'` STRING LİTERALİ geçmeli.
-   * ('superadmin' içindeki "admin" tırnaklı eşleşmez — iki ayrı literal aranır.)
+   * DEDEKTÖR: dosyada hem `'admin'` hem `'super_admin'` STRING LİTERALİ geçmeli.
+   *
+   * ⚠️ DÜZELTİLDİ (M4 · 2026-08-17): bu bekçi 2026-08-17'ye kadar `'superadmin'` arıyordu —
+   * DB'de OLMAYAN bir yazım (`user_profiles_role_check` yalnız `super_admin` kabul eder).
+   * Yani bekçi ölü sözleşmeyi ÇİVİLİYORDU: kanonik yazıma geçen bir fonksiyon kırmızı
+   * yanacak, ölü yazımda kalan yeşil kalacaktı. Kapı, kuralı korumak yerine hatayı
+   * koruyordu. Aynı yazım cetvelin §3.2 kanonik ÖRNEĞİNDE de vardı — hata oradan yayıldı.
    */
-  it("her admin-* fonksiyonu 'admin'/'superadmin' rolünü kontrol ediyor", () => {
+  it("her admin-* fonksiyonu 'admin'/'super_admin' rolünü kontrol ediyor", () => {
     const adminFns = INDEX_SOURCES.filter((s) => s.fn.startsWith('admin-'))
     // Bayat-tarama koruması: admin ucu bulunamıyorsa kural vacuous-pass ederdi.
     expect(adminFns.length).toBeGreaterThanOrEqual(5)
@@ -860,7 +865,7 @@ describe('R8 · admin-* uçları gövdede rol kontrolü yapmalı', () => {
     const found: string[] = []
     for (const s of adminFns) {
       const hasAdmin = /['"]admin['"]/.test(s.code)
-      const hasSuper = /['"]superadmin['"]/.test(s.code)
+      const hasSuper = /['"]super_admin['"]/.test(s.code)
       if (!hasAdmin || !hasSuper) found.push(s.path)
     }
 
@@ -871,8 +876,142 @@ describe('R8 · admin-* uçları gövdede rol kontrolü yapmalı', () => {
         'sıradan bir müşteri admin ucunu çağırabilir (yatay yetki açığı — 2026-08-14 canlı örneği: ' +
         'admin-orders-latest tüm siparişleri döndürüyordu). ' +
         "ÇÖZÜM (§3.2 kanonik deseni): getUser(jwt) ile kimliği doğrula → doğrulanmış user.id ile " +
-        "supabaseAdmin üzerinden user_profiles.role oku → ['admin','superadmin'].includes(role) " +
+        "supabaseAdmin üzerinden user_profiles.role oku → ['admin','super_admin'].includes(role) " +
         'değilse 403 dön. İstek gövdesinden gelen role/is_admin ASLA yetki kaynağı değildir.',
+    )
+  })
+})
+
+/* ------------------------------------------------------------------ *
+ * INV-EDGE-ROLE-1 — rol literali DB sözlüğünün DIŞINA çıkamaz
+ * ------------------------------------------------------------------ */
+
+/**
+ * NİÇİN VAR (M4 · T071 · 2026-08-17)
+ *
+ * 15 edge fonksiyonu yetki kapısında `'superadmin'` yazımını kullanıyordu. Bu değer DB'de
+ * YOK: canlı `user_profiles_role_check` kısıtı yalnız
+ * {super_admin, admin, moderator, warehouse, sales, viewer, user} kabul ediyor — yani
+ * `'superadmin'` bir satıra yazılamaz bile. Sonuç: **en yetkili kullanıcı** (`super_admin`)
+ * o uçlardan 403 alır; `admin` çalıştığı için arıza uzun süre görünmez.
+ *
+ * Bugün canlı zarar yoktu (henüz `super_admin` rolünde kullanıcı açılmamıştı) — ama bu,
+ * arızanın yokluğu değil, **tetikleyicinin henüz gelmemiş olmasıydı**. İlk süper-admin
+ * açıldığı gün 11+ uç sessizce reddedecekti.
+ *
+ * Ölü yazımı düzeltmek TEK BAŞINA yetmez, çünkü hata iki yerden yayılıyordu:
+ *   1. cetvelin §3.2 kanonik ÖRNEĞİ `['admin','superadmin']` yazıyordu (kopyalayan hatayı alır),
+ *   2. R8 bekçisi `'superadmin'` ARIYORDU — kanonik yazıma geçeni kırmızı yakacaktı.
+ * Yani kaynak da bekçi de yanlışı öğretiyordu. Bu kural, sözlüğü tek doğruluk kaynağı yapar.
+ *
+ * SÖZLÜK NEREDEN: 2026-08-17'de canlı DB'den ÖLÇÜLDÜ (pg_constraint → user_profiles_role_check).
+ * Kısıt değişirse bu liste elle güncellenir ve o an bu testin kırmızı yanması İSTENEN davranıştır.
+ */
+const DB_ROL_SOZLUGU = [
+  'super_admin',
+  'admin',
+  'moderator',
+  'warehouse',
+  'sales',
+  'viewer',
+  'user',
+] as const
+
+/**
+ * JWT `role` claim'i AYRI bir eksendir (`auth.jwt().role`): Supabase'in kendi değerleri.
+ * `user_profiles.role` ile karıştırılmasın diye ayrı ve DAR tutulur.
+ */
+const JWT_ROLLERI = ['service_role', 'authenticated', 'anon'] as const
+
+/** Rol karşılaştırmalarındaki string literalleri toplar. */
+function rolLiteralleri(code: string): string[] {
+  const bulunan: string[] = []
+  const ekle = (s: string | undefined) => {
+    if (s) bulunan.push(s)
+  }
+
+  // `role === 'x'` / `profile.userRole !== 'x'`.
+  //
+  // `typeof` ELENİR — ama saf lookbehind YETMEZ, sahada yakalandı: kod
+  // `typeof record.role === 'string'` biçiminde ve `typeof` ile değişken arasına
+  // `record.` giriyor, yani `(?<!typeof\s)` tutmuyordu. Bu yüzden `typeof` opsiyonel
+  // GRUP olarak yakalanır ve eşleşirse atlanır (tip kontrolü rol karşılaştırması değildir).
+  for (const m of code.matchAll(
+    /(typeof\s+)?\b[\w.]*[Rr]ole\w*\s*(?:===|!==)\s*['"]([^'"]+)['"]/g,
+  )) {
+    if (m[1]) continue
+    ekle(m[2])
+  }
+  // `'x' === role` (ters yazım) — burada da `typeof` elenir.
+  for (const m of code.matchAll(
+    /['"]([^'"]+)['"]\s*(?:===|!==)\s*(typeof\s+)?\b[\w.]*[Rr]ole\w*\b/g,
+  )) {
+    if (m[2]) continue
+    ekle(m[1])
+  }
+  // `['a','b'].includes(role)` — satır içi dizi
+  for (const m of code.matchAll(/\[([^\]]*)\]\s*\.\s*includes\s*\(\s*\w*[Rr]ole/g)) {
+    for (const lit of m[1].matchAll(/['"]([^'"]+)['"]/g)) ekle(lit[1])
+  }
+  // `const ADMIN_ROLES = ['a','b']` — sabit dizi
+  for (const m of code.matchAll(/\b\w*ROLES?\w*\b[^=\n]*=\s*\[([^\]]*)\]/gi)) {
+    for (const lit of m[1].matchAll(/['"]([^'"]+)['"]/g)) ekle(lit[1])
+  }
+  return bulunan
+}
+
+describe('INV-EDGE-ROLE-1 · rol literali DB sözlüğünden gelir', () => {
+  it('dedektör çalışıyor: rol karşılaştırması olan fonksiyonlar bulunabiliyor', () => {
+    // Sıfır bulmak "temiz" değil, "dedektör kör" demektir — kuralın en olası sessiz ölüm biçimi.
+    const rolKullananlar = INDEX_SOURCES.filter((s) => rolLiteralleri(s.code).length > 0)
+    expect(
+      rolKullananlar.length,
+      'Hiçbir edge fonksiyonunda rol karşılaştırması bulunamadı. Yetki deseni değiştiyse ' +
+        '`rolLiteralleri` güncellenmeli — boş liste kapının kapandığı anlamına GELMEZ.',
+    ).toBeGreaterThanOrEqual(10)
+  })
+
+  it('hiçbir edge fonksiyonu sözlük DIŞI rol literali kullanmıyor', () => {
+    const izinli = new Set<string>([...DB_ROL_SOZLUGU, ...JWT_ROLLERI])
+    const ihlaller: string[] = []
+    for (const s of INDEX_SOURCES) {
+      for (const lit of new Set(rolLiteralleri(s.code))) {
+        if (!izinli.has(lit)) ihlaller.push(`${s.path}: '${lit}'`)
+      }
+    }
+    expect(
+      ihlaller.sort(),
+      [
+        'Sözlükte olmayan bir rol literali yetki kararında kullanılıyor.',
+        '',
+        'DB kısıtı (`user_profiles_role_check`) bu değeri KABUL ETMEZ — yani o dal hiçbir',
+        'zaman eşleşmez ve kapı sessizce yanlış cevap verir. 2026-08-17: 15 fonksiyon',
+        "`'superadmin'` yazıyordu; kanonik değer `super_admin`. En yetkili kullanıcı 403 alıyordu.",
+        '',
+        `İzinli (DB): ${DB_ROL_SOZLUGU.join(', ')}`,
+        `İzinli (JWT claim): ${JWT_ROLLERI.join(', ')}`,
+        '',
+        'Cetvel §3.2 · rapor docs/audits/vibe-coding-20-madde-v2-2026-08-16.md (M4)',
+        ...ihlaller,
+      ].join('\n'),
+    ).toEqual([])
+  })
+
+  it('kendi kendini doğrular: dedektör gerçek biçimleri yakalıyor, tip kontrolünü yakalamıyor', () => {
+    expect(rolLiteralleri("if (role === 'superadmin') {}")).toEqual(['superadmin'])
+    expect(rolLiteralleri("if (userRole !== 'moderator') {}")).toEqual(['moderator'])
+    expect(rolLiteralleri("['admin', 'superadmin'].includes(userRole)")).toEqual([
+      'admin',
+      'superadmin',
+    ])
+    expect(rolLiteralleri("const ADMIN_ROLES: readonly string[] = ['admin', 'superadmin']")).toEqual(
+      ['admin', 'superadmin'],
+    )
+    // Yanlış-pozitif kontrolü: tip kontrolü rol karşılaştırması DEĞİLDİR.
+    // İKİ biçim de sınanır — sahada kapıyı yanıltan, arada nokta olan ikinci biçimdi.
+    expect(rolLiteralleri("if (typeof role === 'string') {}")).toEqual([])
+    expect(rolLiteralleri("role: typeof record.role === 'string' ? record.role : null,")).toEqual(
+      [],
     )
   })
 })

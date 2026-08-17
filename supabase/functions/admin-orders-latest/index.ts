@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
       .maybeSingle()
 
     const userRole = profile?.role
-    if (profErr || !userRole || !['admin', 'superadmin'].includes(userRole)) {
+    if (profErr || !userRole || !['admin', 'super_admin'].includes(userRole)) {
       return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 

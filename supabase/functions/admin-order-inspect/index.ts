@@ -30,7 +30,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: profile, error: profErr } = await supabaseAdmin.from('user_profiles').select('role').eq('id', userRes.user.id).maybeSingle()
     const userRole = profile?.role as string | undefined
-    if (profErr || !userRole || !['admin', 'superadmin'].includes(userRole)) {
+    if (profErr || !userRole || !['admin', 'super_admin'].includes(userRole)) {
       return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
