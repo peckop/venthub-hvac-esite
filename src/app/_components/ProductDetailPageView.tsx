@@ -32,6 +32,7 @@ import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
 import Seo from '../../components/Seo'
+import { SITE_URL } from '../../config/siteUrl'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
@@ -340,8 +341,6 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   }
 
   const topicSlug = mapSlugToTopic(subCategory?.slug) || mapSlugToTopic(mainCategory?.slug)
-  const [origin, setOrigin] = useState('')
-  useEffect(() => { if (typeof window !== 'undefined') setOrigin(window.location.origin) }, [])
 
   if (!family || !selectedVariant) {
     return (
@@ -357,7 +356,16 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   }
 
   // ?sku= canonical'a GİRMEZ — aile URL'i tek kanonik adrestir.
-  const canonicalUrl = `${origin}${Routes.product(family.slug)}`
+  //
+  // HOST **SSOT'TAN** GELİR, tarayıcıdan DEĞİL. Eskiden `window.location.origin` okunuyordu
+  // (useState + useEffect); iki ayrı arıza üretiyordu: (1) ilk render'da değer boş olduğu için
+  // canonical `/products/slug` gibi HOST'SUZ çıkıyordu, (2) efekt koştuktan sonra da ziyaret
+  // edilen host'u yazıyordu — önizleme deploy'u, alias, staging ne ise o. Yani kanonik adres
+  // "hangi adresten bakıldıysa" ona dönüşüyordu. Bu, 2026-08-15'te K8 olarak kapatılan arızanın
+  // (her deploy'da değişen kanonik adres) aynı sınıfı, başka kılıkta.
+  // Aynı sayfanın `generateMetadata`'sı da bu adresi SITE_URL'den üretir; ikisi artık BİREBİR
+  // aynı. Bekçi: INV-CANONICAL-1.
+  const canonicalUrl = `${SITE_URL}${Routes.product(family.slug)}`
   const variantDescription = selectedVariant.description || pickLang(family.description, lang)
   const metaDesc = variantDescription || t('pdp.descFallback')
   const variantLabel = selectedVariant.model_code || selectedVariant.sku
