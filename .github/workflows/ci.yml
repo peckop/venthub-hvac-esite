@@ -84,6 +84,25 @@ jobs:
           # Boş dize = varsayılan davranış (pull_request'te zaten merge-ref).
           # Yalnız elle tetiklemede ve açık PR varken dolu gelir.
           ref: ${{ steps.mergeref.outputs.ref || '' }}
+          # TAM GEÇMİŞ — sebep ADIYLA: `INV-DOC-2` companion parite bekçisi (#616) yaş
+          # ölçümünü `git log --name-only` ile yapar. `actions/checkout` varsayılanı
+          # `fetch-depth: 1`'dir; sığ klonda o bekçi geçmişi göremez ve **bilerek**
+          # kırmızı yanar (no-grace: yeni kapıya "uyar-geç" modu konmaz).
+          #
+          # ÖLÇÜLDÜ (2026-08-17, bu satır eklenmeden önce): bugünkü master'da geçmiş
+          # okuyan HİÇBİR kapı yok — `companion-doc-parity` ve `eol-normalization`
+          # `git ls-files` kullanır, o da INDEX'i okur ve sığ klonda eksiksizdir.
+          # Yani bu satır bugünü düzeltmiyor; #616 ile GELEN ihtiyacı karşılıyor.
+          # Gerekçeyi "ihtiyaten" diye yazmamak bilinçli: sahte teknik sebep, bir
+          # sonraki okuyanı yanlış yere bakmaya iter.
+          #
+          # NİÇİN HEDEFLİ DEĞİL DE TÜM JOB: bu workflow TEK job (`ci`) içeriyor;
+          # conformance'ı ayrı job'a bölmek ya zorunlu kontrolün ADINI değiştirir
+          # (açık tüm PR'lar "beklenen kontrol gelmedi"de kilitlenir) ya da
+          # conformance'ı zorunlu kapının DIŞINA taşır. İkisi de bedeli tam klondan
+          # ağır. Geçmiş isteyen diğer workflow'larda (deploy-functions, rls-guard,
+          # ai-auto-repair) bu satır zaten var — desen korunuyor.
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
