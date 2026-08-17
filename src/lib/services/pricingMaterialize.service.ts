@@ -124,7 +124,10 @@ export async function refreshCostInBase(
 
   const { data: productsData, error: productsErr } = await supabase
     .from('products')
-    .select('id, purchase_price, purchase_currency, cost_in_base, purchase_rate_to_base')
+    // `brand` + `category_id` ŞART: fx-lock merdiveni scope 2 (marka) ve 3 (kategori)
+    // için bu alanları ister. Eskiden çekilmiyordu ve kilit çözümüne yalnız `id`
+    // geçiyordu — iki kapsam bu halkada SESSİZCE yok sayılıyordu (aşağıya bak).
+    .select('id, brand, category_id, purchase_price, purchase_currency, cost_in_base, purchase_rate_to_base')
     .is('deleted_at', null)
     .eq('status', 'active')
   if (productsErr) throw productsErr
@@ -159,7 +162,22 @@ export async function refreshCostInBase(
   // Neden burada da: kilidi yalnız materialize'e koymak yetmez. `cost_in_base` yeni kurla
   // güncellenirse, sonraki herhangi bir materialize (ya da paneldeki "yeniden hesapla")
   // fiyatı oynatır. Zincirin iki halkasında da uygulanmayan kilit, kilit değil gecikmedir.
-  const fxLocks = await resolveFxLocks(supabase, products.map((p) => ({ id: p.id })))
+  //
+  // ⚠️ 2026-08-17'de DÜZELTİLDİ (ADMIN-CUSTOMER buldu): buraya yalnız `{ id }` geçiyordu.
+  // `scopeMatchesProduct` scope 2'de `brandId`, scope 3'te `categoryId` arar; ikisi de
+  // `undefined` gelince o kapsamlar HİÇ eşleşmiyordu. Yani yukarıdaki ilke doğru yazılmış
+  // ve çağrı eklenmişti, ama GİRDİ FAKİR olduğu için marka/kategori kilitleri bu halkada
+  // sessizce yok sayılıyordu — kilitli görünen fiyatın `cost_in_base`'i kurla kayıyordu.
+  // Marka bir metin alanıdır, FK'ye köprülenir (materialize halkası da aynısını yapar).
+  const brandIdForLocks = await loadBrandIdByName(supabase)
+  const fxLocks = await resolveFxLocks(
+    supabase,
+    products.map((p) => ({
+      id: p.id,
+      brandId: brandIdForLocks.get(p.brand) ?? brandIdForLocks.get(p.brand.trim()) ?? null,
+      categoryId: p.category_id ?? null,
+    })),
+  )
 
   for (const p of products) {
     if (fxLocks.get(p.id)?.locked) {
