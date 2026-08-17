@@ -251,8 +251,51 @@ numarası değil:
 >
 > **Kilit künyesiz olamaz** — DB CHECK'i `fx_lock=true` iken `fx_frozen_rate` zorunlu kılar.
 
-⏳ **Henüz yok:** kilit açma/kapama admin yüzeyi ve `admin_audit_log` kaydı (yüzey ADMIN-OPS
+⏳ **Henüz yok:** kilit açma/kapama admin yüzeyi ve `admin_audit_log` kaydı (yüzey ADMIN
 şeridinde). Bugün politika satırı yalnız DB'den girilebilir.
+
+#### 8.2.1 Admin yüzeyi sözleşmesi (PRICING kararı, 2026-08-17)
+
+Yüzeyi ADMIN şeridi yazar; **semantik burada tanımlıdır** ve UI ondan türetilir. Üç soru
+ADMIN-CUSTOMER tarafından soruldu; cevapları bağlayıcıdır.
+
+**[A] `fx_frozen_rate` ELLE GİRİLMEZ — UI kilit anındaki kuru ENSTANTANE alır.**
+Kilit bir *zaman* kararıdır ("bu andaki kur sabitlensin"), fiyat pazarlığı değil. Elle
+giriş yanlış-kur riskini ve denetlenemez bir serbestliği içeri sokar; sözleşmeli özel kur
+ayrı bir özelliktir (v2) ve `fx_lock` ile karıştırılmamalıdır.
+
+> **Kaynak sorgusu motorunkiyle BİREBİR aynı olmak zorundadır** — aksi hâlde kilit,
+> motorun kullandığından *farklı* bir sayıya kilitler ve fiyat "kilitliyken" bile oynar.
+> Motorun seçimi (`pricingMaterialize.service.ts`, ölçüldü 2026-08-17):
+> `currency_rates` → `base_ccy='TRY'` **(filtre ŞART)** + `quote_ccy=<ccy>` +
+> `effective_date <= bugün(İstanbul)`, sıralama `effective_date DESC, fetched_at DESC`,
+> `limit 1`, alan **`rate`**. **`spread_pct` OKUNMAZ** — UI da okumamalıdır.
+> Enstantane alınan değer `fx_frozen_rate`'e yazılır; o anki `effective_date` künyeye not
+> düşülür (`note` alanı yeterli, yeni kolon gerekmez).
+
+**[B] Yüzey ham satırları değil ETKİN KİLİDİ gösterir** — ve mantığı yeniden yazmaz.
+Merdiven "en özel kazanır" ilkesiyle çalışır ve **daha özel bir `fx_lock=false`, daha genel
+bir kilidi bozar** (§8.3). Ham liste bu yüzden yanıltıcıdır: admin global kilit koyar, tek
+ürünün oynadığını görür, sebebini bulamaz. Yüzey bir ürün/kapsam için
+`resolveFxLockWithPolicies` (toplu: `resolveFxLocks`) **çağırarak** etkin sonucu gösterir ve
+`FxLockDecision`'daki `policyId` + `scope` ile **hangi satırın kazandığını** yazar
+("etkin: ürün düzeyi politika #… → kilit YOK").
+
+> İkisi de `pricingPolicy.service.ts`'ten **zaten export edilmiştir**; ayrıca açmak
+> gerekmez. Merdiveni UI'da tekrarlamak **INV-PRICE-7'nin tek-merdiven kuralını ihlal
+> eder** (ikinci `switch (scope)` yasaktır) — yani kopya kapıdan geçmez.
+
+**[C] `skippedFxLocked` sayacı yüzeyde GÖSTERİLİR.** Kilidi görünür kılan tek geri bildirim
+odur: "son hesaplamada N ürün kilit yüzünden atlandı". Ayrıca sessiz-arıza kontrolüdür —
+aktif kilit varken sayaç sürekli 0 ise kilit uygulanmıyor demektir.
+
+**Migration gerekmez:** izin modeli bugün tutarlı (ADMIN-CUSTOMER ölçümü, 2026-08-17):
+`pricing_policy` RLS = `super_admin|admin|moderator` + tenant-scoped; rbac'ta `pricing`
+yazma izni admin+moderator → **UI izni ⊆ DB izni**. Satınalmada yaşanan "yetkisi var ama
+verisi yok" tuzağı (purchasing-standard §8.1) burada YOK.
+
+**W5 ile çakışma yok:** W5 TAMAMLANDI (`20260816120000_pricing_w5_policy_fx_lock.sql`
+prod'da; `pricing_policy` tablosunu zaten o yarattı). Yüzey çalışması beklemez.
 
 ### 8.3 Politika katmanı — kural ≠ politika (v1.1)
 
