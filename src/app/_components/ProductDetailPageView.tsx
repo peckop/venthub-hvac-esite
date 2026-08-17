@@ -365,7 +365,12 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   // (her deploy'da değişen kanonik adres) aynı sınıfı, başka kılıkta.
   // Aynı sayfanın `generateMetadata`'sı da bu adresi SITE_URL'den üretir; ikisi artık BİREBİR
   // aynı. Bekçi: INV-CANONICAL-1.
-  const canonicalUrl = `${SITE_URL}${Routes.product(family.slug)}`
+  //
+  // DİL ÖNEKİ ŞART (T083-VH). #620'de host'u SSOT'a bağlamak yetmemiş: adres hâlâ dil öneksizdi
+  // ve `middleware.ts:86` onu 307 ile `Accept-Language`'a göre seçilen bir dile yönlendiriyordu.
+  // Yani kanonik yine ziyaretçiye göre değişiyordu — bu sefer host değil DİL üzerinden.
+  // Cetvel: docs/standards/canonical-url-standard.md §4 · bekçi: INV-CANONICAL-2.
+  const canonicalUrl = `${SITE_URL}/${lang}${Routes.product(family.slug)}`
   const variantDescription = selectedVariant.description || pickLang(family.description, lang)
   const metaDesc = variantDescription || t('pdp.descFallback')
   const variantLabel = selectedVariant.model_code || selectedVariant.sku
