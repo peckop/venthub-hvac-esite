@@ -17,6 +17,7 @@ import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import { FacetedFilter } from '../../components/admin/data-table/FacetedFilter'
 import type { AdminColumn, DataTableFacet } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
+import { useConfirmWithReason } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { formatDate, formatDateTime, formatTime } from '../../i18n/datetime'
@@ -29,8 +30,8 @@ import {
   adminButtonPrimaryClass,
   adminSelectClass,
   adminSelectStyle,
+  adminTableActionDangerClass,
   adminTableActionPrimaryClass,
-  glassStrongClass,
 } from '../../utils/adminUi'
 
 /* ---- modeller ---- */
@@ -98,38 +99,38 @@ const ReturnDetailRow: React.FC<{ row: ReturnRow }> = ({ row }) => {
   return (
     <div className="max-w-4xl mx-auto space-y-4 py-4 animate-in fade-in slide-in-from-top-2 duration-300">
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-8 h-0.5 bg-cyan-400" />
-        <h4 className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+        <div className="w-8 h-0.5 bg-admin-accent" />
+        <h4 className="text-xs font-semibold text-admin-accent">
           {t('admin.returns.detail.title')}
         </h4>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="space-y-3 bg-surface-deep/40 p-4 rounded-2xl border border-white/5">
-          <div className="flex justify-between items-center border-b border-white/5 pb-2">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.id')}</span>
-            <span className="text-slate-300 font-mono text-xs select-all">{row.id}</span>
+        <div className="space-y-3 bg-surface-deep/40 p-4 rounded-admin-lg border border-admin-border">
+          <div className="flex justify-between items-center border-b border-admin-border pb-2">
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.detail.id')}</span>
+            <span className="text-admin-fg font-mono text-xs select-all">{row.id}</span>
           </div>
-          <div className="flex justify-between items-center border-b border-white/5 pb-2">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.orderId')}</span>
-            <span className="text-slate-300 font-mono text-xs select-all">{row.order_id}</span>
+          <div className="flex justify-between items-center border-b border-admin-border pb-2">
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.detail.orderId')}</span>
+            <span className="text-admin-fg font-mono text-xs select-all">{row.order_id}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.userId')}</span>
-            <span className="text-slate-300 font-mono text-xs select-all">{row.user_id}</span>
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.detail.userId')}</span>
+            <span className="text-admin-fg font-mono text-xs select-all">{row.user_id}</span>
           </div>
         </div>
-        <div className="space-y-3 bg-surface-deep/40 p-4 rounded-2xl border border-white/5">
-          <div className="flex flex-col gap-1 border-b border-white/5 pb-2">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.table.reason')}</span>
-            <span className="text-slate-200 text-xs font-black uppercase tracking-wider">{row.reason}</span>
+        <div className="space-y-3 bg-surface-deep/40 p-4 rounded-admin-lg border border-admin-border">
+          <div className="flex flex-col gap-1 border-b border-admin-border pb-2">
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.table.reason')}</span>
+            <span className="text-admin-fg text-xs font-semibold">{row.reason}</span>
           </div>
-          <div className="flex flex-col gap-1 border-b border-white/5 pb-2">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.description')}</span>
-            <span className="text-slate-300 text-xs font-semibold normal-case leading-relaxed break-words">{row.description || '—'}</span>
+          <div className="flex flex-col gap-1 border-b border-admin-border pb-2">
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.detail.description')}</span>
+            <span className="text-admin-fg text-xs font-semibold normal-case leading-relaxed break-words">{row.description || '—'}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-slate-500 uppercase font-bold tracking-tighter text-xs">{t('admin.returns.detail.updatedAt')}</span>
-            <span className="text-slate-300 font-black text-xs uppercase tracking-widest">{formatDateTime(row.updated_at, lang)}</span>
+            <span className="text-admin-fg-muted font-bold tracking-tighter text-xs">{t('admin.returns.detail.updatedAt')}</span>
+            <span className="text-admin-fg font-semibold text-xs">{formatDateTime(row.updated_at, lang)}</span>
           </div>
         </div>
       </div>
@@ -143,6 +144,88 @@ const RETURNS_SELECT =
 const STATUS_VALUES = ['requested', 'approved', 'rejected', 'in_transit', 'received', 'refunded', 'cancelled'] as const
 
 const EMPTY_DASH = '—'
+
+/** Karar gerekçesi zorunlu olan statüler — gerekçesiz ret/iptal kaydı sonradan okunamaz. */
+const STATUSES_REQUIRING_NOTE = new Set(['rejected', 'cancelled'])
+
+type ReturnUpdate = Database['public']['Tables']['venthub_returns']['Update']
+
+/**
+ * Statü geçişinin yazacağı ALANLARI üretir.
+ *
+ * Bugüne kadar YALNIZ `status` yazılıyordu; oysa tabloda `approved_at`,
+ * `processed_at`, `completed_at` ve `admin_notes` sütunları vardı ve HİÇBİRİ
+ * doldurulmuyordu (2026-08-15 denetimi). Sonucu: bir iadenin ne zaman
+ * onaylandığı/karara bağlandığı/kapandığı ve NİÇİN reddedildiği kayıtta yok;
+ * `updated_at` yalnız "en son bir şey değişti" der, hangi adım olduğunu söylemez.
+ *
+ * Zaman damgaları istemci saatiyle değil `new Date().toISOString()` ile UTC
+ * yazılır; sütunlar `timestamptz`.
+ */
+/**
+ * GERÇEK PARA İADESİ — `iyzico-refund` ucu.
+ *
+ * 2026-08-16'ya kadar burada `refund-order-mock` çağrılıyordu ve o uç kendi
+ * başlığında "no real PSP call" diyordu. Denetimin "sessiz sahte-başarı" dediği
+ * sınıfın en pahalı örneğiydi: `payment_status='refunded'` yazılıyor, denetim kaydı
+ * düşüyor, müşteriye **"iadeniz tamamlandı"** e-postası gidiyor ve İyzico'ya tek bir
+ * istek bile gitmiyordu. Mock artık emekli (410 Gone), yani çağrı BUGÜN hiçbir şey
+ * yapmıyor — hatanın `catch {}` ile yutulması bunu tamamen görünmez kılıyordu.
+ *
+ * Bu yüzden iade artık **statüden ÖNCE** yapılır ve başarısızsa statü `received`'da
+ * KALIR. "Para gitmedi ama kayıt iade göründü" durumu üretmemek tek şart.
+ *
+ * Tam iade olduğu için `amount` GÖNDERİLMEZ (uç kalanı kendisi hesaplar) ve
+ * `idempotency_key` gerekmez — uç tam iadede anahtarı sipariş kimliğinden türetir.
+ * Tekrarlanan çağrı `already_refunded` döner; bu bir HATA DEĞİL, başarıdır.
+ */
+type RefundOutcome = { ok: true } | { ok: false; message: string }
+
+interface RefundResponse {
+  status?: string
+  error?: { code?: string; message?: string }
+}
+
+async function performRealRefund(orderId: string, returnId: string): Promise<RefundOutcome> {
+  try {
+    const { data, error } = await supabaseBrowserClient.functions.invoke<RefundResponse>(
+      'iyzico-refund',
+      { body: { order_id: orderId, reason: `return:${returnId}` } },
+    )
+
+    // Ağ/HTTP hatası: uç 4xx/5xx döndüyse `error` dolu gelir.
+    if (error) return { ok: false, message: error.message }
+
+    /*
+      HTTP 200 TEK BAŞINA BAŞARI DEĞİL. Uç, gövdesinde `{ error: { code, message } }`
+      döndürebiliyor; zarfı okumadan "oldu" varsaymak T053'ün kök sebebiydi.
+    */
+    if (data?.error) return { ok: false, message: data.error.message ?? data.error.code ?? 'refund_failed' }
+
+    const status = data?.status
+    if (status !== 'refunded' && status !== 'partial_refunded' && status !== 'already_refunded') {
+      return { ok: false, message: `Beklenmeyen iade yanıtı: ${status ?? 'bilinmiyor'}` }
+    }
+    return { ok: true }
+  } catch (err) {
+    return { ok: false, message: err instanceof Error ? err.message : 'Bilinmeyen hata' }
+  }
+}
+
+function buildReturnUpdate(newStatus: string, note?: string): ReturnUpdate {
+  const now = new Date().toISOString()
+  const update: ReturnUpdate = { status: newStatus }
+
+  if (newStatus === 'approved') update.approved_at = now
+  if (newStatus === 'rejected' || newStatus === 'cancelled') update.processed_at = now
+  if (newStatus === 'received') update.processed_at = now
+  if (newStatus === 'refunded') update.completed_at = now
+
+  const trimmed = note?.trim()
+  if (trimmed) update.admin_notes = trimmed
+
+  return update
+}
 
 /* ---- fetcher: server-mode (arama, süzme, sıralama, range) ---- */
 async function returnsFetcher(
@@ -211,6 +294,7 @@ function orderLabel(r: ReturnRow): string {
 
 const ReturnsTableBody: React.FC = () => {
   const { t, lang } = useI18n()
+  const confirmWithReason = useConfirmWithReason()
   const router = useRouter()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('returns')
@@ -260,48 +344,48 @@ const ReturnsTableBody: React.FC = () => {
   const getStatusIcon = useCallback((status: string): React.ReactNode => {
     switch (status) {
       case 'requested':
-        return <Clock className="text-yellow-600" size={16} />
+        return <Clock className="text-admin-warning" size={16} />
       case 'approved':
-        return <CheckCircle className="text-green-600" size={16} />
+        return <CheckCircle className="text-admin-success" size={16} />
       case 'rejected':
-        return <XCircle className="text-red-600" size={16} />
+        return <XCircle className="text-admin-danger" size={16} />
       case 'in_transit':
-        return <Truck className="text-blue-600" size={16} />
+        return <Truck className="text-admin-accent" size={16} />
       case 'received':
-        return <Package className="text-purple-600" size={16} />
+        return <Package className="text-admin-accent" size={16} />
       case 'refunded':
-        return <CheckCircle className="text-green-700" size={16} />
+        return <CheckCircle className="text-admin-success" size={16} />
       case 'cancelled':
-        return <XCircle className="text-gray-600" size={16} />
+        return <XCircle className="text-admin-fg-subtle" size={16} />
       default:
-        return <RefreshCw className="text-gray-400" size={16} />
+        return <RefreshCw className="text-admin-fg-muted" size={16} />
     }
   }, [])
 
   const getStatusColor = useCallback((status: string): string => {
     switch (status) {
       case 'requested':
-        return 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+        return 'bg-admin-warning-weak text-admin-warning border-admin-warning/30'
       case 'approved':
-        return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+        return 'bg-admin-success-weak text-admin-success border-admin-success/30'
       case 'rejected':
-        return 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+        return 'bg-admin-danger-weak text-admin-danger border-admin-danger/30'
       case 'in_transit':
-        return 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20'
+        return 'bg-admin-accent-weak text-admin-accent border-admin-accent/30'
       case 'received':
-        return 'bg-violet-500/10 text-violet-500 border-violet-500/20'
+        return 'bg-admin-accent-weak text-admin-accent border-admin-accent/30'
       case 'refunded':
-        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+        return 'bg-admin-success-weak text-admin-success border-admin-success/30'
       case 'cancelled':
-        return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+        return 'bg-admin-surface-3 text-admin-fg-muted border-admin-border'
       default:
-        return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+        return 'bg-admin-surface-3 text-admin-fg-muted border-admin-border'
     }
   }, [])
 
   /* ---- statü güncelleme — TEK mutateWithAudit kapısı + durum-makinesi koruması ---- */
   const handleStatusUpdate = useCallback(
-    async (row: ReturnRow, newStatus: string) => {
+    async (row: ReturnRow, newStatus: string, note?: string) => {
       if (!hasWriteAccess) {
         toast.error(t('admin.returns.toasts.statusUpdateFailed'))
         return
@@ -322,10 +406,23 @@ const ReturnsTableBody: React.FC = () => {
           after: { status: newStatus },
           auditedByEdge: false,
           fn: async () => {
+            /*
+              (0) PARA ÖNCE. `refunded` geçişinde gerçek iade statüden ÖNCE denenir ve
+              başarısızsa AKIŞ DURUR — statü `received`'da kalır. Sıra tersine olsaydı
+              (eski hâl) kayıt "iade edildi" der, para yerinde durur ve müşteriye
+              yanlış bildirim giderdi.
+            */
+            if (newStatus === 'refunded') {
+              const refund = await performRealRefund(row.order_id, row.id)
+              if (!refund.ok) {
+                throw new Error(refund.message)
+              }
+            }
+
             // (1) asıl mutasyon — hata audit'i kapatır (gate)
             const { error } = await supabaseBrowserClient
               .from('venthub_returns')
-              .update({ status: newStatus })
+              .update(buildReturnUpdate(newStatus, note))
               .eq('id', row.id)
             if (error) throw error
 
@@ -334,17 +431,6 @@ const ReturnsTableBody: React.FC = () => {
               await syncOrderFromReturn(row.order_id, newStatus)
             } catch {
               /* swallow — orders sync hatası iade güncellemesini bloklamaz */
-            }
-
-            // (3) refunded → mock iade — best-effort
-            if (newStatus === 'refunded') {
-              try {
-                await supabaseBrowserClient.functions.invoke('refund-order-mock', {
-                  body: { order_id: row.order_id, reason: `return:${row.id}` },
-                })
-              } catch {
-                /* swallow — mock iade hatası statüyü geri almaz */
-              }
             }
 
             // (4) müşteri bildirimi — best-effort
@@ -378,6 +464,40 @@ const ReturnsTableBody: React.FC = () => {
     [hasWriteAccess, t, getStatusLabel, table],
   )
 
+  /**
+   * Satır aksiyonunun kapısı: gerekçe gerektiren geçişlerde ÖNCE onay + gerekçe
+   * ister, sonra mutasyonu çağırır.
+   *
+   * Ret ve iptal için gerekçe ZORUNLU: gerekçesiz bir ret `admin_notes`'u boş
+   * bırakır ve müşteriye giden bildirimde "talebiniz reddedildi" dışında hiçbir
+   * bilgi kalmaz — sonradan "niçin reddedilmiş?" sorusunun cevabı yoktur.
+   */
+  const requestStatusChange = useCallback(
+    async (row: ReturnRow, newStatus: string) => {
+      if (!STATUSES_REQUIRING_NOTE.has(newStatus)) {
+        await handleStatusUpdate(row, newStatus)
+        return
+      }
+      const { confirmed, reason } = await confirmWithReason({
+        title: t('admin.returns.decision.title', { status: getStatusLabel(newStatus) }),
+        description: t('admin.returns.decision.description', {
+          status: getStatusLabel(newStatus),
+          order: row.order_number,
+        }),
+        confirmLabel: getStatusLabel(newStatus),
+        tone: 'danger',
+        reason: {
+          label: t('admin.returns.decision.noteLabel'),
+          placeholder: t('admin.returns.decision.notePlaceholder'),
+          required: true,
+        },
+      })
+      if (!confirmed) return
+      await handleStatusUpdate(row, newStatus, reason)
+    },
+    [confirmWithReason, handleStatusUpdate, getStatusLabel, t],
+  )
+
   /* ---- toplu statü güncelleme — UPDATE, mutateWithAudit kapısından ---- */
   const bulkStatusChange = useCallback(
     async (targetStatus: string) => {
@@ -396,16 +516,30 @@ const ReturnsTableBody: React.FC = () => {
         return
       }
 
-      if (
-        !window.confirm(
-          t('admin.returns.bulk.statusConfirm', {
-            count: String(targets.length),
-            status: getStatusLabel(targetStatus),
-          })
-        )
-      ) {
-        return
-      }
+      /*
+        Gerekçe gerektiren toplu geçişte TEK bir ortak gerekçe alınır. Bu meşrudur
+        (ör. "iade süresi doldu" N talebe aynı sebeple uygulanır), ama gerekçesiz
+        toplu ret yasak: `required` ile onay butonu boşken etkinleşmiyor.
+      */
+      const needsNote = STATUSES_REQUIRING_NOTE.has(targetStatus)
+      const { confirmed, reason } = await confirmWithReason({
+        description: t('admin.returns.bulk.statusConfirm', {
+          count: String(targets.length),
+          status: getStatusLabel(targetStatus),
+        }),
+        tone: needsNote ? 'danger' : 'default',
+        confirmLabel: getStatusLabel(targetStatus),
+        reason: needsNote
+          ? {
+              label: t('admin.returns.decision.noteLabel'),
+              placeholder: t('admin.returns.decision.notePlaceholder'),
+              required: true,
+            }
+          : undefined,
+      })
+      if (!confirmed) return
+
+      let failures: string[] = []
 
       try {
         await mutateWithAudit(supabaseBrowserClient, {
@@ -418,10 +552,23 @@ const ReturnsTableBody: React.FC = () => {
           auditedByEdge: false,
           fn: async () => {
             const dbUpdates = targets.map(async (row) => {
+              /*
+                (0) PARA ÖNCE — tek satır akışıyla aynı sözleşme. Toplu işlemde bir
+                siparişin iadesi başarısız olursa YALNIZ o satır düşer; kalanlar
+                etkilenmez (`Promise.allSettled` ile toplanıyor). Toplu işlemi tümden
+                iptal etmek, parası zaten iade edilmiş siparişleri de geri çevirirdi.
+              */
+              if (targetStatus === 'refunded') {
+                const refund = await performRealRefund(row.order_id, row.id)
+                if (!refund.ok) {
+                  throw new Error(`${row.order_number ?? row.id}: ${refund.message}`)
+                }
+              }
+
               // (1) asıl mutasyon
               const { error } = await supabaseBrowserClient
                 .from('venthub_returns')
-                .update({ status: targetStatus })
+                .update(buildReturnUpdate(targetStatus, reason))
                 .eq('id', row.id)
               if (error) throw error
 
@@ -430,17 +577,6 @@ const ReturnsTableBody: React.FC = () => {
                 await syncOrderFromReturn(row.order_id, targetStatus)
               } catch {
                 /* swallow */
-              }
-
-              // (3) refunded → mock iade — best-effort
-              if (targetStatus === 'refunded') {
-                try {
-                  await supabaseBrowserClient.functions.invoke('refund-order-mock', {
-                    body: { order_id: row.order_id, reason: `return:${row.id}` },
-                  })
-                } catch {
-                  /* swallow */
-                }
               }
 
               // (4) müşteri bildirimi — best-effort
@@ -463,13 +599,37 @@ const ReturnsTableBody: React.FC = () => {
               }
             })
 
-            await Promise.all(dbUpdates)
+            /*
+              `allSettled` — `all` DEĞİL. `all` ilk hatada reddeder: parası zaten
+              iade edilmiş diğer satırların ne olduğu belirsiz kalır ve kullanıcı
+              "toplu işlem başarısız" görüp hepsini yeniden dener (çift iade riski).
+              Uç idempotent olsa da kullanıcıyı bu belirsizliğe itmemek gerekir.
+            */
+            const outcomes = await Promise.allSettled(dbUpdates)
+            failures = outcomes
+              .filter((o): o is PromiseRejectedResult => o.status === 'rejected')
+              .map((o) => (o.reason instanceof Error ? o.reason.message : String(o.reason)))
+
+            // Hepsi düştüyse audit kapısı da açılmamalı — işlem gerçekten olmadı.
+            if (failures.length === targets.length) {
+              throw new Error(failures[0])
+            }
           },
         })
 
+        if (failures.length > 0) {
+          // Kısmi başarı SESSİZ GEÇMEZ: hangi satırların düştüğü söylenir.
+          toast.warning(
+            t('admin.returns.toasts.bulkPartialFailed', {
+              count: String(failures.length),
+              detail: failures.slice(0, 3).join(' · '),
+            })
+          )
+        }
+
         toast.success(
           t('admin.returns.toasts.bulkStatusUpdated', {
-            count: String(targets.length),
+            count: String(targets.length - failures.length),
             status: getStatusLabel(targetStatus),
           })
         )
@@ -483,7 +643,7 @@ const ReturnsTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, table, t, getStatusLabel],
+    [confirm, hasWriteAccess, table, t, getStatusLabel],
   )
 
   /* ---- kolonlar (SSOT) ---- */
@@ -498,14 +658,14 @@ const ReturnsTableBody: React.FC = () => {
             <button
               type="button"
               onClick={() => router.push(`/admin/orders?q=${r.order_number ?? r.order_id}`)}
-              className="text-cyan-400 hover:text-cyan-300 font-black text-left transition-colors uppercase tracking-wider"
+              className="text-admin-accent hover:text-admin-accent font-semibold text-left transition-colors"
               aria-label={orderLabel(r)}
             >
               {orderLabel(r)}
             </button>
             {typeof r.total_amount === 'number' && (
-              <span className="text-xs font-black text-white/50 uppercase tracking-widest flex items-center gap-1">
-                <span className="w-1 h-px bg-white/10" />
+              <span className="text-xs font-semibold text-admin-fg-muted flex items-center gap-1">
+                <span className="w-1 h-px bg-admin-surface-3" />
                 {formatCurrency(Number(r.total_amount), lang)}
               </span>
             )}
@@ -519,8 +679,8 @@ const ReturnsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div className="flex flex-col gap-0.5">
-            <span className="font-black text-white uppercase tracking-tight">{r.customer_name}</span>
-            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{r.customer_email}</span>
+            <span className="font-semibold text-admin-fg tracking-tight">{r.customer_name}</span>
+            <span className="text-xs font-semibold text-admin-fg-muted">{r.customer_email}</span>
           </div>
         ),
       },
@@ -531,10 +691,10 @@ const ReturnsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div className="max-w-xs space-y-1">
-            <div className="font-black text-xs text-slate-200 uppercase tracking-wider">{r.reason}</div>
+            <div className="font-semibold text-xs text-admin-fg">{r.reason}</div>
             {r.description && (
               <div
-                className="text-xs font-bold text-slate-500 leading-relaxed truncate uppercase tracking-widest"
+                className="text-xs font-bold text-admin-fg-muted leading-relaxed truncate"
                 title={r.description}
               >
                 {r.description}
@@ -550,7 +710,7 @@ const ReturnsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-black uppercase tracking-widest ${getStatusColor(
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${getStatusColor(
               r.status,
             )}`}
           >
@@ -566,9 +726,9 @@ const ReturnsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div className="flex flex-col gap-0.5">
-            <span className="font-black text-white tracking-widest text-xs uppercase">{formatDate(r.created_at, lang)}</span>
-            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">
-              <span className="inline-block w-1.5 h-px bg-white/10 mr-1 align-middle" />
+            <span className="font-semibold text-admin-fg text-xs">{formatDate(r.created_at, lang)}</span>
+            <span className="text-xs font-semibold text-admin-fg-muted">
+              <span className="inline-block w-1.5 h-px bg-admin-surface-3 mr-1 align-middle" />
               {formatTime(r.created_at, lang)}
             </span>
           </div>
@@ -580,7 +740,7 @@ const ReturnsTableBody: React.FC = () => {
         cell: (r) => {
           const next = allowedNextStatuses(r.status)
           if (!hasWriteAccess || next.length === 0) {
-            return <span className="text-xs text-slate-400">{EMPTY_DASH}</span>
+            return <span className="text-xs text-admin-fg-muted">{EMPTY_DASH}</span>
           }
           return (
             <div className="flex gap-1.5">
@@ -588,9 +748,18 @@ const ReturnsTableBody: React.FC = () => {
                 <button
                   key={status}
                   type="button"
-                  onClick={() => handleStatusUpdate(r, status)}
+                  onClick={() => void requestStatusChange(r, status)}
                   disabled={updatingStatus === r.id}
-                  className={`${adminTableActionPrimaryClass} !px-3 !h-7 disabled:opacity-50 gap-1`}
+                  /*
+                    Ret/iptal İLERİ GÖTÜREN bir adım değil, talebi kapatan bir
+                    karardır; birincil buton tonuyla sunmak onu "önerilen adım"
+                    gibi gösterirdi. Tehlike tonu yanlış tıklamayı da azaltır.
+                  */
+                  className={`${
+                    STATUSES_REQUIRING_NOTE.has(status)
+                      ? adminTableActionDangerClass
+                      : adminTableActionPrimaryClass
+                  } !px-3 !h-7 disabled:opacity-50 gap-1`}
                   title={t('admin.returns.actions.markAs', { status: getStatusLabel(status) })}
                   aria-label={t('admin.returns.actions.markAs', { status: getStatusLabel(status) })}
                 >
@@ -598,7 +767,7 @@ const ReturnsTableBody: React.FC = () => {
                     <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
-                      <span className="text-xs font-black uppercase tracking-widest">{getStatusLabel(status)}</span>
+                      <span className="text-xs font-semibold">{getStatusLabel(status)}</span>
                       <ChevronRight size={10} strokeWidth={3} />
                     </>
                   )}
@@ -609,7 +778,7 @@ const ReturnsTableBody: React.FC = () => {
         },
       },
     ],
-    [t, lang, router, hasWriteAccess, updatingStatus, handleStatusUpdate, getStatusLabel, getStatusColor, getStatusIcon],
+    [t, lang, router, hasWriteAccess, updatingStatus, requestStatusChange, getStatusLabel, getStatusColor, getStatusIcon],
   )
 
   /* ---- status facet — count'lar server'dan dynamic olarak ---- */
@@ -709,7 +878,7 @@ const ReturnsTableBody: React.FC = () => {
         label: t('admin.returns.bulk.statusTitle'),
         tone: 'default',
         panel: (close) => (
-          <div className={`${glassStrongClass} rounded-2xl p-3 flex items-center gap-2`}>
+          <div className={`bg-admin-surface rounded-admin-lg p-3 flex items-center gap-2`}>
             <select
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value)}
@@ -718,7 +887,7 @@ const ReturnsTableBody: React.FC = () => {
               aria-label={t('admin.returns.bulk.statusTitle')}
             >
               {['approved', 'in_transit', 'received', 'refunded', 'cancelled', 'rejected'].map((s) => (
-                <option key={s} value={s} className="bg-surface-deep">
+                <option key={s} value={s} className="bg-admin-bg">
                   {getStatusLabel(s)}
                 </option>
               ))}

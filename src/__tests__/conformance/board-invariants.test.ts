@@ -60,6 +60,18 @@ interface BoardModule {
   markSeen: (sid: string, notes: BoardNote[]) => void
   globToRegExp: (glob: string) => RegExp
   toRepoRelative: (filePath: string, repoRoot?: string) => string
+  resolveNoteTarget: (rawTo?: string) => { ok: boolean; to?: string; how?: string; reason?: string; valid?: string[] }
+}
+
+/**
+ * `execFileSync` başarısız çıkışta fırlatır; kodu ve stderr'i buradan okuruz (`any` yasak).
+ * `encoding: 'utf8'` verildiği için akışlar string gelir — `Buffer` tipine referans YOK
+ * (bu ortamda `@types/node` bozuk, dosya başındaki NOT'a bakınız).
+ */
+interface ExecFailure {
+  status?: number
+  stderr?: string
+  stdout?: string
 }
 
 const require = createRequire(import.meta.url)
@@ -246,6 +258,141 @@ describe('INV-BOARD-1 · glob doğruluğu', () => {
       re.test('srcfoo/x.ts'),
       'src/** komşu önekli bir yolu (srcfoo/x.ts) YAKALAMAMALI — yakalarsa glob sınır denetimi olmadan geniş eşleşiyor, alakasız bir şeridi yanlışlıkla engelleyebilir',
     ).toBe(false)
+  })
+})
+
+/**
+ * INV-BOARD-2 · Not adresleme SESSİZ KAYBI (T064-VH).
+ *
+ * `notesFor` hedefi TAM EŞİTLİKLE arıyor. Bu yüzden `--to herkes` (düz metin) ve
+ * `--to <8-hane>` (kısaltma) HİÇBİR oturumla eşleşmiyordu; komut yine de "not bırakıldı"
+ * basıyordu. 2026-08-16'da ölçüldü: **110 notun 49'u (%45) hiç teslim edilmedi** —
+ * `herkes` 37 · `ALL` 1 · 8-hane kısaltma 10 · geçersiz ad 1. Kaybolanların arasında bir
+ * şeridin diğer üçünü bloklayan bir bulgusu da vardı; kimse görmedi çünkü katman
+ * ÇALIŞIYOR GİBİ YAPIYORDU.
+ *
+ * Çözüm GÖNDERİM ANINDA çözmektir (okuma anında değil): şerit adı ve kısaltma tam sid'e
+ * çevrilip KALICI yazılır. Böylece şerit adı değişse (`PRICING`→`PRICING-STOK`,
+ * `EDGE`→`EDGE-REFUND`, `ADMIN-UX`→`ADMIN-OPS` — üçü de aynı gün oldu) veya şerit
+ * bırakılsa bile not teslim edilebilir kalır.
+ *
+ * ⚠ BİLİNÇLİ KAPSAM DIŞI: diskteki 49 eski kayıp not GERİYE TESLİM EDİLMEZ. `notesFor`
+ * hâlâ katıdır; yalnız gönderim normalize eder. Aksi hâlde tek turda 38 bayat not boşalır
+ * ve append-only olay günlüğü geriye dönük yeniden yorumlanmış olur. Sahipleri yeniden
+ * gönderiyor (üç şerit 2026-08-16'da öyle yaptı).
+ */
+describe('INV-BOARD-2 · not adresleme teslim edilebilir olmalı', () => {
+  const SID_A = 'aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa'
+  const SID_B = 'bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb'
+  const SID_C = 'cccccccc-3333-4333-8333-cccccccccccc'
+
+  /** Panoyu üç oturumla doldur (hedef çözümü sid/şerit geçmişini diskten okur). */
+  function seed(board: BoardModule): void {
+    board.append(SID_A, { ts: isoAgo(9000), type: 'claim', lane: 'ALFA', globs: ['src/a/**'] })
+    board.append(SID_B, { ts: isoAgo(8000), type: 'claim', lane: 'BETA', globs: ['src/b/**'] })
+    board.append(SID_C, { ts: isoAgo(7000), type: 'claim', lane: 'GAMA', globs: ['src/c/**'] })
+  }
+
+  /** CLI'yi gerçekten koştur (exit kodu ancak süreç sınırında ölçülebilir). */
+  function runNote(args: string[]): { status: number; stdout: string; stderr: string } {
+    try {
+      const stdout = execFileSync('node', [BOARD_MODULE_PATH, 'note', ...args], {
+        encoding: 'utf8',
+        env: { ...process.env, VENTHUB_BOARD_DIR: boardDir },
+      })
+      return { status: 0, stdout, stderr: '' }
+    } catch (e) {
+      const f = e as ExecFailure
+      return { status: typeof f.status === 'number' ? f.status : -1, stdout: f.stdout ?? '', stderr: f.stderr ?? '' }
+    }
+  }
+
+  it('"--to herkes" BROADCAST olarak yazılır ve alakasız bir oturuma teslim edilir', () => {
+    const board = loadBoard(boardDir)
+    seed(board)
+
+    const r = runNote(['--sid', SID_A, '--to', 'herkes', '--text', 'yayin-notu'])
+    expect(r.status, `"herkes" reddedilmemeli, broadcast'e çevrilmeli. stderr: ${r.stderr}`).toBe(0)
+
+    const delivered = board.notesFor(SID_C, 'GAMA')
+    expect(
+      delivered.map(n => n.text),
+      '"--to herkes" ile gönderilen not teslim EDİLMEDİ — tam olarak 37 notun kaybolduğu hata bu (board.cjs notesFor tam-eşitlik)',
+    ).toContain('yayin-notu')
+    expect(delivered.find(n => n.text === 'yayin-notu')?.to ?? '', 'broadcast notunun to alanı BOŞ yazılmalı').toBe('')
+  })
+
+  it('8-hane kısaltma tam sid\'e çözülür: hedefe gider, ÜÇÜNCÜ oturuma GİTMEZ', () => {
+    const board = loadBoard(boardDir)
+    seed(board)
+
+    const r = runNote(['--sid', SID_A, '--to', SID_B.slice(0, 8), '--text', 'kisaltma-notu'])
+    expect(r.status, `8-hane kısaltma çözülmeli. stderr: ${r.stderr}`).toBe(0)
+
+    expect(
+      board.notesFor(SID_B, 'BETA').map(n => n.text),
+      'kısaltmayla adreslenen not hedefe teslim edilmedi — 10 notun kaybolduğu hata bu',
+    ).toContain('kisaltma-notu')
+    expect(
+      board.notesFor(SID_C, 'GAMA').map(n => n.text),
+      'hedefli not ÜÇÜNCÜ bir oturuma da gitmiş — çözüm broadcast\'e düşmüş, yani gizlilik/gürültü sınırı yok',
+    ).not.toContain('kisaltma-notu')
+  })
+
+  it('şerit adı sid\'e çözülür ve şerit BIRAKILDIKTAN sonra bile teslim edilir', () => {
+    const board = loadBoard(boardDir)
+    seed(board)
+
+    const r = runNote(['--sid', SID_A, '--to', 'BETA', '--text', 'serit-notu'])
+    expect(r.status, `şerit adı çözülmeli. stderr: ${r.stderr}`).toBe(0)
+
+    // Alıcı şeridi bırakıyor (ve adını değiştirip yeniden alıyor) — gerçekte olan tam bu.
+    board.append(SID_B, { ts: isoAgo(100), type: 'release' })
+
+    expect(
+      board.notesFor(SID_B, 'BETA-YENI-AD').map(n => n.text),
+      'şerit bırakıldı/yeniden adlandırıldı diye not teslim EDİLEMEZ hâle geldi — gönderimde sid\'e çözülmediği için (eski davranış okuma anında lane adına bakıyordu)',
+    ).toContain('serit-notu')
+  })
+
+  it('BİLİNMEYEN hedefte exit 1 verir ve HİÇBİR ŞEY yazmaz (sahte başarı yok)', () => {
+    const board = loadBoard(boardDir)
+    seed(board)
+    const before = board.notesFor(SID_C, 'GAMA').length
+
+    const r = runNote(['--sid', SID_A, '--to', 'boyle-bir-hedef-yok', '--text', 'kayip-olacak-not'])
+
+    expect(
+      r.status,
+      'bilinmeyen hedef SESSİZCE kabul edildi (exit 0) — "not bırakıldı" yazıp not\'u yok eden davranış tam budur',
+    ).not.toBe(0)
+    expect(r.stderr, 'hata mesajı geçerli hedefleri göstermeli, yoksa gönderen neyi yanlış yazdığını bilemez').toContain('geçerli hedefler')
+    expect(
+      board.notesFor(SID_C, 'GAMA').length,
+      'reddedilen not YİNE DE panoya yazılmış — kısmi yazım en kötüsü: ne teslim edilir ne de gönderen uyarılır',
+    ).toBe(before)
+  })
+
+  it('BELİRSİZ kısaltma exit 1 verir — yanlış oturuma teslim etmekten iyidir', () => {
+    const board = loadBoard(boardDir)
+    board.append('dddddddd-1111-4111-8111-000000000001', { ts: isoAgo(9000), type: 'claim', lane: 'D1', globs: ['x/**'] })
+    board.append('dddddddd-1111-4111-8111-000000000002', { ts: isoAgo(8000), type: 'claim', lane: 'D2', globs: ['y/**'] })
+
+    const r = runNote(['--sid', SID_A, '--to', 'dddddddd', '--text', 'belirsiz'])
+
+    expect(r.status, 'iki oturumla eşleşen kısaltma kabul edildi — not YANLIŞ oturuma gitmiş olabilir').not.toBe(0)
+    expect(r.stderr).toContain('tam UUID')
+  })
+
+  it('resolveNoteTarget: broadcast kelimeleri büyük/küçük harften bağımsız tanınır', () => {
+    const board = loadBoard(boardDir)
+    seed(board)
+
+    for (const word of ['herkes', 'HERKES', 'All', 'everyone', 'tümü']) {
+      const res = board.resolveNoteTarget(word)
+      expect(res.ok, `"${word}" broadcast sayılmadı`).toBe(true)
+      expect(res.to, `"${word}" broadcast ise to BOŞ olmalı`).toBe('')
+    }
   })
 })
 

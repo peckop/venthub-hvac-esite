@@ -34,6 +34,10 @@ declare global {
       pattern: string,
       options: { query: string; import: string; eager: true },
     ): Record<string, string>
+    glob(
+      pattern: readonly string[],
+      options: { query: string; import: string; eager: true },
+    ): Record<string, string>
   }
 }
 
@@ -41,11 +45,17 @@ declare global {
  * Kaynaklar — glob kökü TAM LİTERAL olmalı (Vite statik analiz eder).
  * ------------------------------------------------------------------ */
 
-const EDGE_TS: Record<string, string> = import.meta.glob('/supabase/functions/**/*.ts', {
-  query: '?raw',
-  import: 'default',
-  eager: true,
-})
+// `!` deseni ŞART (isExcluded/filtre yetmez): eager glob içeriği filtre çalışmadan okur.
+// tests/e2e/helpers/denoRuntime.ts, _shared/ içine geçici `*.compiled.<rastgele>.ts`
+// yazıp siler; paralel vitest'te glob o dosyayı görüp okuyamadan kaybediyordu (ENOENT).
+const EDGE_TS: Record<string, string> = import.meta.glob(
+  ['/supabase/functions/**/*.ts', '!**/*.compiled.*.ts'],
+  {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  },
+)
 
 const CONFIG_TOML: Record<string, string> = import.meta.glob('/supabase/config.toml', {
   query: '?raw',
@@ -130,6 +140,10 @@ const KNOWN_VIOLATIONS = {
   // 26 ayrı güvenlik duruşunun kök sebebi). Beyan biçimi: `// Çağıran sınıfı: (a) ...`
   // Tek tek düzeltilecek borç; YENİ fonksiyon beyansız eklenemez.
   R10: [
+    // T053-VH (2026-08-16): `iyzico-refund` yeniden yazıldı ve `refund-order-mock` emekliye
+    // ayrıldı (410 Gone); ikisi de sınıf beyanını aldı → stale-guard gereği iki ad da SİLİNDİ.
+    // T058-VH (2026-08-16): `shipping-status` de emekliye ayrıldı (410 Gone, veri okumuyor)
+    // ve sınıf beyanını aldı → adı buradan da SİLİNDİ. Liste yalnızca küçülür.
     // T026-VH Adım 2 (2026-08-15): admin-create-coupon · admin-update-order ·
     // admin-update-shipping beyanlarını aldı ve sınıf (a) tenant sözleşmesine geçti →
     // stale-guard gereği üç ad buradan SİLİNDİ.
@@ -142,13 +156,10 @@ const KNOWN_VIOLATIONS = {
     'supabase/functions/admin-orders-latest/index.ts',
     'supabase/functions/apply-coupon/index.ts',
     'supabase/functions/healthz/index.ts',
-    'supabase/functions/iyzico-refund/index.ts',
     'supabase/functions/log-client-error/index.ts',
     'supabase/functions/order-housekeeping/index.ts',
     'supabase/functions/order-validate/index.ts',
-    'supabase/functions/refund-order-mock/index.ts',
     'supabase/functions/release-expired-reservations/index.ts',
-    'supabase/functions/shipping-status/index.ts',
     'supabase/functions/stock-alert/index.ts',
     'supabase/functions/tcmb-rates-sync/index.ts',
   ],

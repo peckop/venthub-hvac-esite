@@ -26,18 +26,18 @@ export default function InventoryReservedTable({ reservedOrders }: InventoryRese
         <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-xs border-separate border-spacing-0">
                 <thead>
-                    <tr className="bg-white/2">
-                        <th className="text-left px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-hvac-normal border-b border-white/5">{t('admin.inventory.order')}</th>
-                        <th className="text-left px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-hvac-normal border-b border-white/5">{t('admin.inventory.table.date')}</th>
-                        <th className="text-right px-4 py-3 text-xs font-black text-slate-500 uppercase tracking-hvac-normal border-b border-white/5">{t('admin.inventory.quantity')}</th>
+                    <tr className="bg-admin-surface-2">
+                        <th className="text-left px-4 py-2.5 text-xs font-semibold text-admin-fg-muted border-b border-admin-border">{t('admin.inventory.order')}</th>
+                        <th className="text-left px-4 py-2.5 text-xs font-semibold text-admin-fg-muted border-b border-admin-border">{t('admin.inventory.table.date')}</th>
+                        <th className="text-right px-4 py-2.5 text-xs font-semibold text-admin-fg-muted border-b border-admin-border">{t('admin.inventory.quantity')}</th>
                     </tr>
                 </thead>
                 <tbody className="bg-transparent">
                     {reservedOrders.map(ro => (
-                        <tr key={ro.order_id} className="hover:bg-white/2 transition-colors group">
-                            <td className="px-4 py-3 text-cyan-400 font-black uppercase font-mono tracking-tighter border-b border-white/5 group-last:border-0">{ro.order_id.slice(-8)}</td>
-                            <td className="px-4 py-3 text-slate-500 font-bold border-b border-white/5 group-last:border-0">{formatDateTime(ro.created_at, lang)}</td>
-                            <td className="px-4 py-3 text-right font-black text-slate-300 border-b border-white/5 group-last:border-0">{ro.quantity}</td>
+                        <tr key={ro.order_id} className="hover:bg-admin-surface-2 transition-colors group">
+                            <td className="px-4 py-2.5 text-admin-accent font-semibold font-mono tracking-tighter border-b border-admin-border group-last:border-0">{ro.order_id.slice(-8)}</td>
+                            <td className="px-4 py-2.5 text-admin-fg-muted border-b border-admin-border group-last:border-0">{formatDateTime(ro.created_at, lang)}</td>
+                            <td className="px-4 py-2.5 text-right font-semibold text-admin-fg border-b border-admin-border group-last:border-0">{ro.quantity}</td>
                         </tr>
                     ))}
                 </tbody>

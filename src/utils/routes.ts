@@ -92,10 +92,13 @@ export const Routes = {
     orderDetail: (orderId: string) => `/account/orders/detail?id=${encodeURIComponent(orderId)}` as Route,
     shipments: () => '/account/shipments' as Route,
     returns: (newOrderId?: string) => (newOrderId ? `/account/returns?new=${encodeURIComponent(newOrderId)}` : '/account/returns') as Route,
+    quotes: () => '/account/quotes' as Route,
+    quoteDetail: (quoteId: string) => `/account/quotes/detail?id=${encodeURIComponent(quoteId)}` as Route,
     addresses: () => '/account/addresses' as Route,
     invoices: () => '/account/invoices' as Route,
     profile: () => '/account/profile' as Route,
     favorites: () => '/account/favorites' as Route,
+    projects: () => '/account/projects' as Route,
     security: () => '/account/security' as Route
   },
   
@@ -141,6 +144,7 @@ export const Routes = {
     },
     register: () => '/auth/register' as Route,
     forgotPassword: () => '/auth/forgot-password' as Route,
+    resetPassword: () => '/auth/reset-password' as Route,
     callback: () => '/auth/callback' as Route
   }
 };

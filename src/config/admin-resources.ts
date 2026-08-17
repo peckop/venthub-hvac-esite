@@ -115,6 +115,18 @@ export const ADMIN_RESOURCES: AdminResource[] = [
     inNav: true
   },
   {
+    // T067: teklif kuyruğu. labelKey ana sözlükte yaşar (quotes.admin.*) — admin/*
+    // sözlük dosyaları başka şeridin mülkü, çözücü birleşik kökten okuduğu için eşdeğer.
+    key: 'quotes',
+    labelKey: 'quotes.admin.navLabel',
+    group: 'sales',
+    route: '/admin/quotes',
+    icon: FileText,
+    requiredAccess: '/admin/quotes',
+    searchable: true,
+    inNav: true
+  },
+  {
     key: 'coupons',
     labelKey: 'admin.menu.coupons',
     group: 'sales',
@@ -242,6 +254,18 @@ export const ADMIN_RESOURCES: AdminResource[] = [
     requiredAccess: '/admin/movements',
     searchable: true,
     searchHintKey: 'admin.search.movements',
+    inNav: true
+  },
+  {
+    // T062: satınalma (PO + mal kabul). labelKey admin/purchasing sözlüğünde
+    // (oyma 2026-08-16); requiredAccess rotası rbac ROLE_PAGE_ACCESS'te tanımlı.
+    key: 'purchasing',
+    labelKey: 'admin.purchasing.navLabel',
+    group: 'stock',
+    route: '/admin/purchasing',
+    icon: ClipboardList,
+    requiredAccess: '/admin/purchasing',
+    searchable: false,
     inNav: true
   },
 

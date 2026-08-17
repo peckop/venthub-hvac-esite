@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { ConfirmProvider } from '@/components/admin/overlay/ConfirmProvider'
 import { testA11y } from '@/utils/testA11y'
 
 import AdminCategoriesPage from '../AdminCategoriesPage'
@@ -121,7 +122,11 @@ vi.mock('@/components/admin/categories/CategoryFormModal', () => ({ default: () 
 
 describe('AdminCategoriesPage (kit göçü) — integration + a11y', () => {
   it('kategorileri render eder + sıralanabilir başlıkta aria-sort taşır', async () => {
-    render(<AdminCategoriesPage />)
+    render(
+    <ConfirmProvider>
+      <AdminCategoriesPage />
+    </ConfirmProvider>
+  )
     // fetcher çözülünce satırlar görünür
     await screen.findByText('Fanlar')
     await screen.findByText('Klimalar')
@@ -134,7 +139,11 @@ describe('AdminCategoriesPage (kit göçü) — integration + a11y', () => {
   })
 
   it('a11y ihlali yok (axe 0)', async () => {
-    const { container } = render(<AdminCategoriesPage />)
+    const { container } = render(
+    <ConfirmProvider>
+      <AdminCategoriesPage />
+    </ConfirmProvider>
+  )
     await screen.findByText('Fanlar')
     const results = await testA11y(container)
     expect(results).toHaveNoViolations()

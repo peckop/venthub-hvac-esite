@@ -1,7 +1,9 @@
 'use client'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { AlertCircle, Crown, Eye, Package, SearchX, Shield, ShieldCheck, Tag, Users } from 'lucide-react'
+import { AlertCircle, Crown, Eye, Package, Receipt, SearchX, Shield, ShieldCheck, Tag, Users } from 'lucide-react'
+import type { Route } from 'next'
+import Link from 'next/link'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -10,9 +12,12 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import { type BulkAction, BulkBar } from '../../components/admin/data-table/BulkBar'
+import BulkRolePanel from '../../components/admin/data-table/BulkRolePanel'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
+import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { listAdminUsers, setUserAdminRole } from '../../config/admin'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useAuth } from '../../hooks/useAuth'
@@ -21,6 +26,7 @@ import { formatDate } from '../../i18n/datetime'
 import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import type { Database } from '../../types/database.types'
+import { adminTableActionClass } from '../../utils/adminUi'
 
 /* ---- normalize edilmiş satır modeli (her iki sekme tek tipe inilir) ---- */
 type UserRoleCode = 'user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer'
@@ -63,12 +69,12 @@ const ROLE_BUTTON_ICON: Record<UserRoleCode, React.ReactNode> = {
 }
 
 const ROLE_BUTTON_TONE: Record<UserRoleCode, string> = {
-  super_admin: 'text-amber-500 hover:bg-amber-500/10 hover:border-amber-500/50',
-  admin: 'text-indigo-400 hover:bg-indigo-400/10 hover:border-indigo-400/50',
-  warehouse: 'text-orange-400 hover:bg-orange-400/10 hover:border-orange-400/50',
-  sales: 'text-blue-400 hover:bg-blue-400/10 hover:border-blue-400/50',
-  viewer: 'text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/50',
-  user: 'text-slate-400 hover:bg-white/10 hover:border-white/20',
+  super_admin: 'text-admin-warning hover:bg-admin-warning-weak hover:border-admin-warning/30',
+  admin: 'text-admin-accent hover:bg-admin-accent-weak hover:border-admin-accent/30',
+  warehouse: 'text-admin-warning hover:bg-admin-warning-weak hover:border-admin-warning/30',
+  sales: 'text-admin-accent hover:bg-admin-accent-weak hover:border-admin-accent/30',
+  viewer: 'text-admin-success hover:bg-admin-success-weak hover:border-admin-success/30',
+  user: 'text-admin-fg-muted hover:bg-admin-surface-3 hover:border-admin-border',
 }
 
 const ROLE_KEYS: UserRoleCode[] = ['super_admin', 'admin', 'warehouse', 'sales', 'viewer', 'user']
@@ -109,113 +115,38 @@ const UserSpecsRow: React.FC<UserSpecsRowProps> = ({ userRow }) => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-8 h-0.5 bg-cyan-400" />
-        <h4 className="text-xs font-black text-cyan-400 uppercase tracking-hvac-relaxed">
+        <div className="w-8 h-0.5 bg-admin-accent" />
+        <h4 className="text-xs font-semibold text-admin-accent">
           {t('admin.users.expand.title')}
         </h4>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
-          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+        <div className="bg-admin-surface p-4 rounded-admin-lg border border-admin-border hover:border-admin-border transition-colors group/spec">
+          <div className="text-xs text-admin-fg-muted font-bold mb-1 group-hover/spec:text-admin-accent transition-colors">
             {t('admin.users.expand.id')}
           </div>
-          <div className="text-xs font-mono text-slate-200 break-all select-all">{userRow.id}</div>
+          <div className="text-xs font-mono text-admin-fg break-all select-all">{userRow.id}</div>
         </div>
 
-        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
-          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+        <div className="bg-admin-surface p-4 rounded-admin-lg border border-admin-border hover:border-admin-border transition-colors group/spec">
+          <div className="text-xs text-admin-fg-muted font-bold mb-1 group-hover/spec:text-admin-accent transition-colors">
             {t('admin.users.expand.fullName')}
           </div>
-          <div className="text-xs font-black text-slate-200 uppercase">{userRow.full_name || '—'}</div>
+          <div className="text-xs font-semibold text-admin-fg">{userRow.full_name || '—'}</div>
         </div>
 
-        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
-          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+        <div className="bg-admin-surface p-4 rounded-admin-lg border border-admin-border hover:border-admin-border transition-colors group/spec">
+          <div className="text-xs text-admin-fg-muted font-bold mb-1 group-hover/spec:text-admin-accent transition-colors">
             {t('admin.users.expand.phone')}
           </div>
-          <div className="text-xs font-black text-slate-200">{profile?.phone || '—'}</div>
+          <div className="text-xs font-semibold text-admin-fg">{profile?.phone || '—'}</div>
         </div>
 
-        <div className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-colors group/spec">
-          <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">
+        <div className="bg-admin-surface p-4 rounded-admin-lg border border-admin-border hover:border-admin-border transition-colors group/spec">
+          <div className="text-xs text-admin-fg-muted font-bold mb-1 group-hover/spec:text-admin-accent transition-colors">
             {t('admin.users.expand.organizationId')}
           </div>
-          <div className="text-xs font-black text-slate-200">{profile?.organization_id || '—'}</div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ---- toplu işlem araç çubuğu ---- */
-interface UserBulkActionToolbarProps {
-  selectedCount: number
-  onRoleChange: (role: UserRoleCode) => void
-  onClearSelection: () => void
-}
-
-const UserBulkActionToolbar: React.FC<UserBulkActionToolbarProps> = ({
-  selectedCount,
-  onRoleChange,
-  onClearSelection,
-}) => {
-  const { t } = useI18n()
-  const [showRolePanel, setShowRolePanel] = useState(false)
-
-  if (selectedCount === 0) return null
-
-  return (
-    <div className="sticky bottom-4 z-40 mx-auto max-w-4xl animate-slide-up">
-      <div className="bg-primary-navy text-white rounded-xl shadow-2xl px-5 py-3 flex items-center gap-3 flex-wrap">
-        {/* Selection Info */}
-        <div className="flex items-center gap-2 mr-2">
-          <div className="bg-white/20 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-            {selectedCount}
-          </div>
-          <span className="text-sm font-medium">{t('admin.toolbar.itemsSelected')}</span>
-          <button onClick={onClearSelection} className="text-white/60 hover:text-white text-xs ml-1 underline">
-            {t('admin.toolbar.clear')}
-          </button>
-        </div>
-
-        <div className="h-6 w-px bg-white/20" />
-
-        {/* Change Role Button & Dropdown/Panel */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setShowRolePanel(!showRolePanel)}
-            className="px-4 py-2 rounded-lg bg-cyan-500/80 hover:bg-cyan-500 text-xs font-black uppercase tracking-wider transition-colors flex items-center gap-2"
-          >
-            <span>{t('admin.users.bulk.changeRole')}</span>
-          </button>
-          {showRolePanel && (
-            <div className="absolute bottom-full mb-2 left-0 bg-surface-deep text-slate-200 rounded-xl shadow-2xl p-4 min-w-240px border border-white/10 glass-strong">
-              <div className="text-xs font-black uppercase tracking-widest mb-3 text-cyan-400">
-                {t('admin.users.bulk.selectRole')}
-              </div>
-              <div className="flex flex-col gap-1.5">
-                {ROLE_KEYS.map((targetRole) => (
-                  <button
-                    key={targetRole}
-                    type="button"
-                    onClick={() => {
-                      onRoleChange(targetRole)
-                      setShowRolePanel(false)
-                    }}
-                    className="flex items-center gap-2 px-3 py-2.5 text-xs font-bold text-slate-300 rounded-xl hover:bg-white/5 hover:text-white text-left transition-colors"
-                  >
-                    <div className="text-slate-400 shrink-0">
-                      {ROLE_BUTTON_ICON[targetRole]}
-                    </div>
-                    <span className="uppercase tracking-widest text-xs">
-                      {t(`roles.${targetRole}`)}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="text-xs font-semibold text-admin-fg">{profile?.organization_id || '—'}</div>
         </div>
       </div>
     </div>
@@ -224,6 +155,7 @@ const UserBulkActionToolbar: React.FC<UserBulkActionToolbarProps> = ({
 
 const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   const { t, lang } = useI18n()
+  const confirm = useConfirm()
   const { user } = useAuth()
   const { role, canWrite } = useRole()
   const hasWriteAccess = canWrite('users')
@@ -233,6 +165,40 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
 
   // fetcher hangi sekmeyi okuyacağını ref'ten alır (tek table instance)
   const tabRef = useRef<UsersTab>('admins')
+
+/** Sıralanabilir sütun → DB kolonu. Bilinmeyen anahtar `created_at`e düşer. */
+const USER_SORT_COLUMNS: Record<string, string> = {
+  created_at: 'created_at',
+  role: 'role',
+  full_name: 'full_name',
+}
+
+/** `admins` dalı için JS sıralaması — RPC sayfa/sıra parametresi almıyor. */
+function sortUserRows(rows: UserRow[], sort: { key: string; dir: 'asc' | 'desc' } | null | undefined): UserRow[] {
+  const key = sort?.key ?? 'created_at'
+  const factor = sort?.dir === 'asc' ? 1 : -1
+  /*
+    Anahtar erişimi AÇIKÇA yazılıyor. Dinamik indeksleme için `as unknown as
+    Record<string, unknown>` yazmak proje kuralınca yasak (ESLint `no-restricted-syntax`)
+    ve haklı: cast, bilinmeyen bir sıralama anahtarını sessizce boş stringe çevirip
+    "sıralandı ama sıra yanlış" durumu üretirdi. Switch, desteklenmeyen anahtarı
+    varsayılana düşürdüğünü GÖRÜNÜR kılar.
+  */
+  const valueOf = (row: UserRow): string => {
+    switch (key) {
+      case 'full_name':
+        return row.full_name ?? ''
+      case 'role':
+        return row.role
+      case 'email':
+        return row.email ?? ''
+      default:
+        return row.created_at
+    }
+  }
+
+  return [...rows].sort((a, b) => valueOf(a).localeCompare(valueOf(b), 'tr') * factor)
+}
 
   /* ---- fetcher (DI: ilk param supabase) — sekmeye göre iki yol, tek UserRow'a normalize ---- */
   const usersFetcher = useCallback(
@@ -249,30 +215,106 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
             .in('id', ids)
           profiles = (profileData as ProfileLite[]) || []
         }
-        const rows: UserRow[] = data.map((u) => ({
+        const allRows: UserRow[] = data.map((u) => ({
           id: u.id,
           email: u.email,
           full_name: profiles.find((p) => p.id === u.id)?.full_name ?? u.full_name ?? undefined,
           role: normalizeRole(u.role),
           created_at: u.created_at,
         }))
-        return { rows, totalMatched: rows.length }
+
+        /*
+          `admin_list_users` RPC'si TAM listeyi döndürür (personel sayısı tanım gereği
+          küçük), sayfa parametresi almaz. Sıralama ve dilimleme bu yüzden burada
+          yapılıyor — ama tablo sözleşmesi ile AYNI kalıyor: `totalMatched` sayfa
+          uzunluğu değil, kaynaktaki gerçek sayı. İki dal farklı yerden veri alsa da
+          dışarıya tek davranış gösteriyor.
+        */
+        const term = _params.query.trim().toLocaleLowerCase('tr')
+        const filtered = term
+          ? allRows.filter(
+              (r) =>
+                (r.full_name ?? '').toLocaleLowerCase('tr').includes(term) ||
+                (r.email ?? '').toLocaleLowerCase('tr').includes(term),
+            )
+          : allRows
+
+        const sorted = sortUserRows(filtered, _params.sort)
+        const offset = (_params.page - 1) * _params.pageSize
+        return {
+          rows: sorted.slice(offset, offset + _params.pageSize),
+          totalMatched: filtered.length,
+        }
       }
 
       // tab === 'all'
       await ensureSessionFresh()
-      const { data, error } = await supabase
+      /*
+        SESSİZ TAVAN ONARIMI (T059-VH). Eskiden sorguda ne `range` ne `limit` vardı ve
+        tablo `paginationMode: 'none'` ile çalışıyordu. PostgREST kendi azami satır
+        sınırını uygular (varsayılan 1000) ve BUNU HABER VERMEZ: 1001. kullanıcıdan
+        sonrası listede hiç görünmez, toplam sayı da doğru sanılır. Yani hata
+        "yavaşlama" olarak değil, VERİNİN YOKLUĞU olarak ortaya çıkardı.
+        Artık sayfa aralığı açıkça isteniyor ve gerçek toplam `count: 'exact'`ten
+        geliyor; `totalMatched` sayfa uzunluğu değil, kaynaktaki gerçek sayı.
+      */
+      const offset = (_params.page - 1) * _params.pageSize
+      const sortColumn = USER_SORT_COLUMNS[_params.sort?.key ?? ''] ?? 'created_at'
+      let allQuery = supabase
         .from('user_profiles')
-        .select('id, role, created_at, full_name')
+        .select('id, role, created_at, full_name', { count: 'exact' })
+        .order(sortColumn, { ascending: _params.sort?.dir === 'asc' })
+
+      const term = _params.query.trim()
+      if (term) allQuery = allQuery.ilike('full_name', `%${term}%`)
+
+      const { data, error, count } = await allQuery.range(offset, offset + _params.pageSize - 1)
       if (error) throw error
+
+      /*
+        E-POSTA ZENGİNLEŞTİRMESİ (T059-VH).
+        `user_profiles`ta e-posta YOK — o alan `auth.users`ta ve istemciden okunamaz.
+        `admin_list_all_users()` e-postayı da döndürüyor ve yetki kapısı gövdesinin
+        içinde (bkz. 20260816120000 migration'ı).
+
+        Neden LİSTENİN KAYNAĞI yapılmadı: RPC sayfa parametresi almıyor, tüm kümeyi
+        döndürüyor. Kaynak olarak kullanmak, az önce kapattığım sessiz satır tavanını
+        geri getirirdi. Bu yüzden sayfalama/sayım `user_profiles`ta KALDI; RPC yalnız
+        id→e-posta eşlemesi için çağrılıyor.
+
+        EKSİKLİK SESSİZ GEÇMİYOR: RPC yanıtı da bir üst sınıra takılabilir (PostgREST
+        `max-rows` DB seviyesinden okunamadı, yani VARSAYMIYORUM). Dönen satır sayısı
+        gerçek toplamdan azsa eşleme eksiktir ve bazı satırlar e-postasız kalır —
+        bu durumda kullanıcıya söylüyoruz. Boş bir hücre "bu kullanıcının e-postası
+        yok" gibi okunur; oysa gerçek "gösteremiyorum"dur.
+      */
+      const emailByeId = new Map<string, string>()
+      let emailsComplete = true
+      try {
+        const { data: rpcRows, error: rpcError } = await supabase.rpc('admin_list_all_users')
+        if (rpcError) throw rpcError
+        const list = (rpcRows ?? []) as Array<{ id: string; email: string | null }>
+        for (const u of list) {
+          if (u.email) emailByeId.set(u.id, u.email)
+        }
+        if (typeof count === 'number' && list.length < count) emailsComplete = false
+      } catch {
+        // Yetkisiz ya da erişilemez → liste yine gösterilir, ama eksiklik bildirilir.
+        emailsComplete = false
+      }
+
+      if (!emailsComplete) {
+        toast.warning(t('admin.users.toasts.emailsIncomplete'))
+      }
+
       const rows: UserRow[] = ((data as AllProfileRow[]) || []).map((p) => ({
         id: p.id,
-        email: undefined,
+        email: emailByeId.get(p.id),
         full_name: p.full_name ?? undefined,
         role: normalizeRole(p.role),
         created_at: p.created_at,
       }))
-      return { rows, totalMatched: rows.length }
+      return { rows, totalMatched: typeof count === 'number' ? count : rows.length }
     },
     [],
   )
@@ -281,8 +323,10 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
     resource: 'users',
     rowId: (r) => r.id,
     fetcher: usersFetcher,
-    paginationMode: 'none',
-    sortMode: 'client',
+    // Sayfalama ve sıralama SUNUCUDA: istemci sıralaması yalnız görünen sayfayı
+    // sıralar ve kullanıcıya "en yenisi bu" diye yanlış bir liste gösterirdi.
+    paginationMode: 'server',
+    sortMode: 'server',
     initialSort: { key: 'created_at', dir: 'desc' },
     syncUrl: true,
   })
@@ -347,7 +391,10 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
       }
       const ids = table.selection.selectedIds
       if (ids.length === 0) return
-      if (!window.confirm(t('admin.users.bulk.confirm', { count: String(ids.length), role: t(`roles.${newRole}`) }))) return
+      const ok = await confirm({
+        description: t('admin.users.bulk.confirm', { count: String(ids.length), role: t(`roles.${newRole}`) }),
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'users',
@@ -378,7 +425,25 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [confirm, hasWriteAccess, t, table],
+  )
+
+  /**
+   * Toplu işlem eylemleri — ortak `BulkBar` sözleşmesi. Rol paneli `BulkRolePanel`
+   * olarak çıkarıldı ve `panel` render-prop'una bağlandı (bkz. dosya üstü yorum).
+   */
+  const bulkActions = useMemo<BulkAction[]>(
+    () => [
+      {
+        key: 'role',
+        label: t('admin.users.bulk.changeRole'),
+        tone: 'default',
+        panel: (close) => (
+          <BulkRolePanel onRoleChange={(r) => void bulkRoleChange(r)} onClose={close} />
+        ),
+      },
+    ],
+    [t, bulkRoleChange],
   )
 
   /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
@@ -408,21 +473,21 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   const getRoleIcon = useCallback((roleCode: string) => {
     switch (roleCode) {
       case 'super_admin':
-        return <Crown className="text-purple-400" size={14} />
+        return <Crown className="text-admin-accent" size={14} />
       case 'admin':
-        return <Shield className="text-indigo-400" size={14} />
+        return <Shield className="text-admin-accent" size={14} />
       case 'warehouse':
       case 'sales':
-        return <ShieldCheck className="text-cyan-400" size={14} />
+        return <ShieldCheck className="text-admin-accent" size={14} />
       default:
-        return <Users className="text-slate-500" size={14} />
+        return <Users className="text-admin-fg-muted" size={14} />
     }
   }, [])
 
   const UserAvatar = useCallback(({ name, email }: { name?: string; email?: string }) => {
     const initial = (name || email || '?').charAt(0).toUpperCase()
     return (
-      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-cyan-400 font-black border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-500 shrink-0">
+      <div className="w-10 h-10 rounded-admin-md bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-admin-accent font-semibold border border-admin-border shadow-admin-md group-hover:scale-110 transition-transform duration-500 shrink-0">
         {initial}
       </div>
     )
@@ -435,7 +500,7 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         type="button"
         onClick={() => handleRoleChange(row, target)}
         disabled={disabled}
-        className={`w-8 h-8 rounded-xl glass border border-white/5 flex items-center justify-center transition-transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${ROLE_BUTTON_TONE[target]}`}
+        className={`w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center transition-transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${ROLE_BUTTON_TONE[target]}`}
         title={t(`admin.users.actionTitles.${target}`)}
         aria-label={t(`admin.users.actionTitles.${target}`)}
       >
@@ -456,11 +521,11 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
           <div className="flex items-center gap-4">
             <UserAvatar name={r.full_name || undefined} email={r.email} />
             <div className="flex flex-col min-w-0">
-              <span className="font-black text-slate-100 truncate uppercase tracking-tight">
+              <span className="font-semibold text-admin-fg truncate tracking-tight">
                 {r.email ? r.email : t('admin.users.noEmail')}
               </span>
               {r.full_name && (
-                <span className="text-xs text-slate-500 font-bold truncate uppercase tracking-widest mt-0.5">
+                <span className="text-xs text-admin-fg-muted font-bold truncate mt-0.5">
                   {r.full_name}
                 </span>
               )}
@@ -473,9 +538,9 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         header: t('admin.users.table.role'),
         hideable: true,
         cell: (r) => (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl glass border border-white/5 text-xs font-black uppercase tracking-widest shadow-lg group-hover:border-cyan-400/30 transition-shadow duration-500">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-admin-md bg-admin-surface border border-admin-border text-xs font-semibold shadow-admin-md group-hover:border-admin-accent/30 transition-shadow duration-500">
             {getRoleIcon(r.role)}
-            <span className="text-slate-300 group-hover:text-cyan-400 transition-colors">
+            <span className="text-admin-fg group-hover:text-admin-accent transition-colors">
               {t(`roles.${r.role}`)}
             </span>
           </div>
@@ -488,13 +553,41 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         hideable: true,
         cell: (r) => (
           <div className="flex flex-col">
-            <span className="text-slate-200 font-black text-xs tabular-nums tracking-tight">
+            <span className="text-admin-fg font-semibold text-xs tabular-nums tracking-tight">
               {r.created_at ? formatDate(r.created_at, lang as 'tr' | 'en') : t('admin.users.noEmail')}
             </span>
-            <span className="text-xs text-slate-600 uppercase font-black tracking-widest mt-0.5">
+            <span className="text-xs text-admin-fg-subtle font-semibold mt-0.5">
               {t('admin.users.table.createdLabel')}
             </span>
           </div>
+        ),
+      },
+      {
+        /*
+          "BU MÜŞTERİNİN SİPARİŞLERİ" — T059-VH.
+          Ayrı bir sütun, aksiyonların İÇİNE konmadı: aksiyon kabı
+          `opacity-0 group-hover:opacity-100` ile gizli ve klavye kullanıcısı onu
+          keşfedemez. Bağlantı bir GEZİNME yolu, fareyle keşfedilen bir aksiyon değil.
+
+          Ayrı bir "müşteri detayı" sayfası da açılmadı: sipariş tablosu zaten arama,
+          sıralama, sayfalama, dışa aktarma ve satır aksiyonlarını taşıyor. İkinci bir
+          ekran bunların hepsini yeniden (ve zamanla farklı) uygulamak olurdu.
+        */
+        key: 'orders',
+        header: t('admin.users.table.orders'),
+        align: 'center',
+        hideable: true,
+        cell: (r) => (
+          <Link
+            href={`/admin/orders?customer=${encodeURIComponent(r.id)}` as Route}
+            className={`${adminTableActionClass} gap-1.5`}
+            aria-label={t('admin.users.actions.viewOrdersFor', {
+              user: r.full_name || r.email || r.id.slice(0, 8),
+            })}
+          >
+            <Receipt size={12} aria-hidden="true" />
+            {t('admin.users.actions.viewOrders')}
+          </Link>
         ),
       },
       {
@@ -557,14 +650,14 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
 
   const accessDenied = (
     <div className="flex flex-col items-center justify-center min-h-50vh space-y-4">
-      <div className="p-6 bg-red-500/10 rounded-3xl border border-red-500/20 shadow-xl shadow-red-500/5">
-        <AlertCircle className="text-red-500" size={48} />
+      <div className="p-6 bg-admin-danger-weak rounded-admin-lg border border-admin-danger/30 shadow-admin-lg shadow-red-500/5">
+        <AlertCircle className="text-admin-danger" size={48} />
       </div>
       <div className="text-center">
-        <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+        <h2 className="text-2xl font-semibold text-admin-fg tracking-tight">
           {t('admin.users.accessDeniedTitle')}
         </h2>
-        <p className="text-slate-500 mt-2 max-w-sm font-medium">{t('admin.users.accessDeniedDesc')}</p>
+        <p className="text-admin-fg-muted mt-2 max-w-sm font-medium">{t('admin.users.accessDeniedDesc')}</p>
       </div>
     </div>
   )
@@ -572,14 +665,14 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   return (
     <div className="space-y-6">
       {/* sekme pilleri — kit'in ÜSTÜNDE; sayaç yalnız AKTİF sekme için */}
-      <div className="flex glass bg-white/5 p-1 rounded-2xl w-fit border border-white/10 shadow-2xl">
+      <div className="flex bg-admin-surface bg-admin-surface-2 p-1 rounded-admin-lg w-fit border border-admin-border shadow-admin-lg">
         <button
           type="button"
           onClick={() => switchTab('admins')}
-          className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors duration-300 ${
+          className={`px-6 py-2.5 rounded-admin-md text-xs font-semibold transition-colors duration-300 ${
             activeTab === 'admins'
-              ? 'bg-cyan-400 text-surface-deep shadow-glow-md'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-admin-accent text-admin-accent-fg'
+              : 'text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-2'
           }`}
         >
           {t('admin.users.tabs.admins', { count: activeTab === 'admins' ? activeCount : 0 })}
@@ -587,10 +680,10 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         <button
           type="button"
           onClick={() => switchTab('all')}
-          className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-colors duration-300 ${
+          className={`px-6 py-2.5 rounded-admin-md text-xs font-semibold transition-colors duration-300 ${
             activeTab === 'all'
-              ? 'bg-cyan-400 text-surface-deep shadow-glow-md'
-              : 'text-slate-400 hover:text-white hover:bg-white/5'
+              ? 'bg-admin-accent text-admin-accent-fg'
+              : 'text-admin-fg-muted hover:text-admin-fg hover:bg-admin-surface-2'
           }`}
         >
           {t('admin.users.tabs.all', { count: activeTab === 'all' ? activeCount : 0 })}
@@ -648,93 +741,97 @@ const AdminUsersTableBody: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
         }
         bulkBarSlot={
           hasWriteAccess ? (
-            <UserBulkActionToolbar
+            <BulkBar
               selectedCount={table.selection.selectedIds.length}
-              onRoleChange={(targetRole) => void bulkRoleChange(targetRole)}
-              onClearSelection={table.selection.clear}
+              selectedLabel={t('admin.dataTable.bulk.selectedCount', {
+                count: table.selection.selectedIds.length,
+              })}
+              clearLabel={t('admin.dataTable.bulk.clear')}
+              actions={bulkActions}
+              onClear={table.selection.clear}
             />
           ) : null
         }
       />
 
       {/* Rol Yetkilendirme Rehberi — kit'in ALTINDA */}
-      <div className="glass-strong p-8 lg:p-10 rounded-hvac-2xl border border-white/5 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400/5 blur-120 rounded-full -mr-48 -mt-48 group-hover:bg-cyan-400/10 transition-colors duration-1000" />
-        <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
-          <div className="w-16 h-16 rounded-hvac-lg glass-strong border border-white/10 flex items-center justify-center text-cyan-400 shrink-0 shadow-xl group-hover:scale-110 transition-transform duration-700">
+      <div className="bg-admin-surface p-8 lg:p-10 rounded-admin-lg border border-admin-border shadow-admin-lg relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-admin-accent-weak blur-120 rounded-full -mr-48 -mt-48 group-hover:bg-admin-accent-weak transition-colors duration-1000" />
+        <div className="relative z-raised flex flex-col md:flex-row gap-8 items-start">
+          <div className="w-16 h-16 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-accent shrink-0 shadow-admin-lg group-hover:scale-110 transition-transform duration-700">
             <Shield size={32} />
           </div>
           <div className="flex-1">
-            <h2 className="font-black text-white text-xl uppercase tracking-tight tracking-widest">
+            <h2 className="font-semibold text-admin-fg text-xl tracking-tight">
               {t('admin.users.info.title')}
             </h2>
-            <p className="text-slate-500 text-sm mt-2 mb-8 font-bold uppercase tracking-hvac-snug">
+            <p className="text-admin-fg-muted text-sm mt-2 mb-8 font-bold">
               {t('admin.users.info.subtitle')}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
+              <div className="bg-admin-surface bg-admin-surface-2 border border-admin-border p-5 rounded-admin-lg hover:border-admin-accent/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-warning group-hover/item:scale-110 transition-transform">
                     <Crown size={16} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">
+                  <span className="text-xs font-semibold text-admin-fg">
                     {t('roles.superadmin')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">
+                <p className="text-xs text-admin-fg-muted font-bold leading-relaxed tracking-wide">
                   {t('admin.users.roles.superadmin')}
                 </p>
               </div>
-              <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
+              <div className="bg-admin-surface bg-admin-surface-2 border border-admin-border p-5 rounded-admin-lg hover:border-admin-accent/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-indigo-400 group-hover/item:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-accent group-hover/item:scale-110 transition-transform">
                     <Shield size={16} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">
+                  <span className="text-xs font-semibold text-admin-fg">
                     {t('roles.admin')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">
+                <p className="text-xs text-admin-fg-muted font-bold leading-relaxed tracking-wide">
                   {t('admin.users.roles.admin')}
                 </p>
               </div>
-              <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
+              <div className="bg-admin-surface bg-admin-surface-2 border border-admin-border p-5 rounded-admin-lg hover:border-admin-accent/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-orange-400 group-hover/item:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-warning group-hover/item:scale-110 transition-transform">
                     <Package size={16} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">
+                  <span className="text-xs font-semibold text-admin-fg">
                     {t('roles.warehouse')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">
+                <p className="text-xs text-admin-fg-muted font-bold leading-relaxed tracking-wide">
                   {t('admin.users.roles.warehouse')}
                 </p>
               </div>
-              <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
+              <div className="bg-admin-surface bg-admin-surface-2 border border-admin-border p-5 rounded-admin-lg hover:border-admin-accent/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-blue-400 group-hover/item:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-accent group-hover/item:scale-110 transition-transform">
                     <Tag size={16} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">
+                  <span className="text-xs font-semibold text-admin-fg">
                     {t('roles.sales')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">
+                <p className="text-xs text-admin-fg-muted font-bold leading-relaxed tracking-wide">
                   {t('admin.users.roles.sales')}
                 </p>
               </div>
-              <div className="glass bg-white/5 border border-white/5 p-5 rounded-hvac-xl hover:border-cyan-400/30 transition-colors duration-500 group/item">
+              <div className="bg-admin-surface bg-admin-surface-2 border border-admin-border p-5 rounded-admin-lg hover:border-admin-accent/30 transition-colors duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-emerald-400 group-hover/item:scale-110 transition-transform">
+                  <div className="w-8 h-8 rounded-admin-md bg-admin-surface border border-admin-border flex items-center justify-center text-admin-success group-hover/item:scale-110 transition-transform">
                     <Eye size={16} />
                   </div>
-                  <span className="text-xs font-black uppercase tracking-hvac-normal text-white">
+                  <span className="text-xs font-semibold text-admin-fg">
                     {t('roles.viewer')}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-wide">
+                <p className="text-xs text-admin-fg-muted font-bold leading-relaxed tracking-wide">
                   {t('admin.users.roles.viewer')}
                 </p>
               </div>

@@ -11,7 +11,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useRole } from '../../hooks/useRole'
 import { 
-  adminBlurBlobClass,  adminButtonPrimaryClass,
+  adminButtonPrimaryClass,
   adminCardClass, 
   adminInputClass,
   adminInputThresholdClass,
@@ -184,9 +184,9 @@ const AdminInventorySettingsPage: React.FC = () => {
       </header>
 
       {!hasWriteAccess && (
-        <div className="glass-strong border border-rose-500/20 bg-rose-500/5 p-6 rounded-hvac-xl flex items-center gap-4 text-rose-500">
+        <div className="bg-admin-surface border border-admin-danger/30 bg-admin-danger-weak p-6 rounded-admin-lg flex items-center gap-4 text-admin-danger">
           <ShieldAlert size={24} />
-          <div className="text-sm font-black uppercase tracking-widest">
+          <div className="text-sm font-semibold">
             {t('admin.inventory.settings.noWritePermission')}
           </div>
         </div>
@@ -194,16 +194,16 @@ const AdminInventorySettingsPage: React.FC = () => {
 
       <div className="space-y-12">
         {/* Grup 1: Stok Eşik Ayarları */}
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-8 pt-8 first:pt-0 border-t border-white/5 first:border-t-0">
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-8 pt-8 first:pt-0 border-t border-admin-border first:border-t-0">
           {/* Sol Kolon: Başlık ve Açıklama (2fr) */}
           <div className="md:col-span-2 space-y-3">
             <div className="flex items-center gap-3">
-              <Settings className="text-cyan-400" size={20} />
-              <h2 className="text-lg font-black text-white uppercase tracking-tight">
+              <Settings className="text-admin-accent" size={20} />
+              <h2 className="text-lg font-semibold text-admin-fg tracking-tight">
                 {t('admin.inventory.settings.stockThresholdSettings')}
               </h2>
             </div>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+            <p className="text-xs font-bold text-admin-fg-muted leading-relaxed">
               {t('admin.inventory.settings.thresholdDescription')}
             </p>
           </div>
@@ -211,12 +211,11 @@ const AdminInventorySettingsPage: React.FC = () => {
           {/* Sağ Kolon: Form Alanları Card (5fr) */}
           <div className="md:col-span-5">
             <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-              <div className={`${adminBlurBlobClass} bg-cyan-500/5 group-hover:bg-cyan-500/10`} />
               
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={2} />
               ) : (
-                <div className="relative z-10 space-y-6">
+                <div className="relative z-raised space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-3">
                       <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.defaultLowStockThreshold')}</label>
@@ -229,7 +228,7 @@ const AdminInventorySettingsPage: React.FC = () => {
                           placeholder="0" 
                         />
                         <button 
-                          className={`${adminButtonPrimaryClass} flex-1 shadow-lg shadow-cyan-400/10`} 
+                          className={`${adminButtonPrimaryClass} flex-1 shadow-admin-md shadow-cyan-400/10`} 
                           disabled={saving || !hasWriteAccess} 
                           onClick={save}
                         >
@@ -240,16 +239,16 @@ const AdminInventorySettingsPage: React.FC = () => {
 
                     <div className="space-y-3">
                       <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.bulkApply')}</label>
-                      <label className="flex items-start gap-4 p-4 rounded-2xl bg-surface-deep/40 border border-white/5 cursor-pointer group/item hover:border-white/10 transition-colors">
+                      <label className="flex items-start gap-4 p-4 rounded-admin-lg bg-surface-deep/40 border border-admin-border cursor-pointer group/item hover:border-admin-border transition-colors">
                         <input 
                           type="checkbox" 
-                          className="mt-1 w-5 h-5 rounded-lg border-white/10 bg-transparent text-cyan-400 focus-visible:ring-cyan-400/20 transition-colors" 
+                          className="mt-1 w-5 h-5 rounded-admin-md border-admin-border bg-transparent text-admin-accent focus-visible:ring-admin-accent/30 transition-colors" 
                           checked={resetAll} 
                           onChange={(e) => setResetAll(e.target.checked)} 
                         />
                         <div className="space-y-1">
-                          <span className="block text-sm font-black text-white group-hover/item:text-cyan-400 transition-colors">{t('admin.inventory.settings.applyToAll')}</span>
-                          <span className="block text-xs font-bold text-slate-500 leading-relaxed uppercase tracking-wider">
+                          <span className="block text-sm font-semibold text-admin-fg group-hover/item:text-admin-accent transition-colors">{t('admin.inventory.settings.applyToAll')}</span>
+                          <span className="block text-xs font-bold text-admin-fg-muted leading-relaxed">
                             {t('admin.inventory.settings.bulkApplyHelp')}
                           </span>
                         </div>
@@ -257,14 +256,14 @@ const AdminInventorySettingsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10">
-                    <p className="text-xs font-bold text-amber-500/80 leading-relaxed uppercase tracking-widest text-center">
+                  <div className="p-4 rounded-admin-lg bg-admin-warning-weak border border-admin-warning/30">
+                    <p className="text-xs font-bold text-admin-warning leading-relaxed text-center">
                       {t('admin.inventory.settings.bulkApplyWarning')}
                     </p>
                   </div>
 
-                  {loading === LoadState.Error && <div className="text-sm font-black text-rose-500 text-center uppercase tracking-widest">{error}</div>}
-                  {!!success && <div className="text-sm font-black text-emerald-400 text-center uppercase tracking-widest">{success}</div>}
+                  {loading === LoadState.Error && <div className="text-sm font-semibold text-admin-danger text-center">{error}</div>}
+                  {!!success && <div className="text-sm font-semibold text-admin-success text-center">{success}</div>}
                 </div>
               )}
             </div>
@@ -272,16 +271,16 @@ const AdminInventorySettingsPage: React.FC = () => {
         </div>
 
         {/* Grup 2: Alarm Otomasyonu */}
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-8 pt-8 border-t border-white/5">
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-8 pt-8 border-t border-admin-border">
           {/* Sol Kolon: Başlık ve Açıklama (2fr) */}
           <div className="md:col-span-2 space-y-3">
             <div className="flex items-center gap-3">
-              <Bell className="text-violet-400" size={20} />
-              <h2 className="text-lg font-black text-white uppercase tracking-tight">
+              <Bell className="text-admin-accent" size={20} />
+              <h2 className="text-lg font-semibold text-admin-fg tracking-tight">
                 {t('admin.inventory.settings.alarmAutomation')}
               </h2>
             </div>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+            <p className="text-xs font-bold text-admin-fg-muted leading-relaxed">
               {t('admin.inventory.settings.alarmDescription')}
             </p>
           </div>
@@ -289,17 +288,16 @@ const AdminInventorySettingsPage: React.FC = () => {
           {/* Sağ Kolon: Form Alanları Card (5fr) */}
           <div className="md:col-span-5">
             <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-              <div className={`${adminBlurBlobClass} bg-violet-500/5 group-hover:bg-violet-500/10`} />
               
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={2} />
               ) : (
-                <div className="relative z-10 space-y-6">
+                <div className="relative z-raised space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.emailNotifications')}</label>
                       <div className="space-y-2">
-                        <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">{t('admin.inventory.settings.alertEmailLabel')}</label>
+                        <label className="block text-xs font-bold text-admin-fg-muted ml-1">{t('admin.inventory.settings.alertEmailLabel')}</label>
                         <input
                           type="email"
                           className={adminInputClass}
@@ -307,14 +305,14 @@ const AdminInventorySettingsPage: React.FC = () => {
                           value={alertEmail}
                           onChange={e => setAlertEmail(e.target.value)}
                         />
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.inventory.settings.alertEmailHelp')}</p>
+                        <p className="text-xs font-bold text-admin-fg-muted ml-1">{t('admin.inventory.settings.alertEmailHelp')}</p>
                       </div>
                     </div>
 
                     <div className="space-y-4">
                       <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.webhookIntegration')}</label>
                       <div className="space-y-2">
-                        <label className="block text-xs font-bold text-slate-400 ml-1 uppercase">{t('admin.inventory.settings.webhookUrlLabel')}</label>
+                        <label className="block text-xs font-bold text-admin-fg-muted ml-1">{t('admin.inventory.settings.webhookUrlLabel')}</label>
                         <input
                           type="url"
                           className={adminInputClass}
@@ -322,7 +320,7 @@ const AdminInventorySettingsPage: React.FC = () => {
                           value={alertWebhook}
                           onChange={e => setAlertWebhook(e.target.value)}
                         />
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.inventory.settings.webhookUrlHelp')}</p>
+                        <p className="text-xs font-bold text-admin-fg-muted ml-1">{t('admin.inventory.settings.webhookUrlHelp')}</p>
                       </div>
                     </div>
                   </div>
@@ -333,16 +331,16 @@ const AdminInventorySettingsPage: React.FC = () => {
         </div>
 
         {/* Grup 3: Rezervasyon Kuralları */}
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-8 pt-8 border-t border-white/5">
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-8 pt-8 border-t border-admin-border">
           {/* Sol Kolon: Başlık ve Açıklama (2fr) */}
           <div className="md:col-span-2 space-y-3">
             <div className="flex items-center gap-3">
-              <Zap className="text-amber-400" size={20} />
-              <h2 className="text-lg font-black text-white uppercase tracking-tight">
+              <Zap className="text-admin-warning" size={20} />
+              <h2 className="text-lg font-semibold text-admin-fg tracking-tight">
                 {t('admin.inventory.settings.reservationRules')}
               </h2>
             </div>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+            <p className="text-xs font-bold text-admin-fg-muted leading-relaxed">
               {t('admin.inventory.settings.reservationDescription')}
             </p>
           </div>
@@ -350,12 +348,11 @@ const AdminInventorySettingsPage: React.FC = () => {
           {/* Sağ Kolon: Form Alanları Card (5fr) */}
           <div className="md:col-span-5">
             <div className={`${adminCardClass} p-8 lg:p-10 space-y-6 relative overflow-hidden group`}>
-              <div className={`${adminBlurBlobClass} bg-amber-500/5 group-hover:bg-amber-500/10`} />
               
               {loading === LoadState.Loading ? (
                 <AdminSkeleton variant="form" fields={1} />
               ) : (
-                <div className="relative z-10 space-y-6">
+                <div className="relative z-raised space-y-6">
                   <div className="max-w-md space-y-4">
                     <label className={adminSettingsLabelClass}>{t('admin.inventory.settings.reservationTimeoutLabel')}</label>
                     <div className="flex items-end gap-6">
@@ -370,18 +367,18 @@ const AdminInventorySettingsPage: React.FC = () => {
                         />
                       </div>
                       <div className="flex-1 pb-1">
-                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+                        <p className="text-xs font-bold text-admin-fg-muted leading-relaxed">
                           {t('admin.inventory.settings.reservationTimeoutHelp')}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-8 flex justify-end relative z-10 border-t border-white/5">
+                  <div className="pt-8 flex justify-end relative z-raised border-t border-admin-border">
                     <button
                       disabled={savingGeneral || !hasWriteAccess}
                       onClick={saveGeneralSettings}
-                      className={`${adminButtonPrimaryClass} px-12 h-14 bg-violet-500 text-white hover:bg-violet-400 shadow-lg shadow-violet-500/20`}
+                      className={`${adminButtonPrimaryClass} px-12 h-14 bg-admin-accent text-admin-accent-fg hover:bg-admin-accent shadow-admin-md shadow-violet-500/20`}
                     >
                       {savingGeneral ? t('admin.inventory.settings.saving') : t('admin.inventory.settings.saveAll')}
                     </button>

@@ -398,9 +398,38 @@ Deno.serve(async (req) => {
             const rpcJson = await rpcResp.json().catch(() => ({}));
             _stockResult = rpcJson || { success: true, processed_count: null, order_id: orderId };
 
+            // T052-VH — SAHTE DAMGA BURADAYDI.
+            //
+            // Eski kod yalnizca `rpcResp.ok`'e (HTTP 200) bakip `stock_processed: true`
+            // yaziyordu. Ama PostgREST, RPC `{"success": false, ...}` dondugunde de 200
+            // doner — hata jsonb GOVDESINDEDIR. RPC kapisi `status IN ('paid','processing')`
+            // beklerken callback `'confirmed'` yaziyordu ve `'paid'` statu sozlugunde HIC
+            // YOK; yani RPC HER SEFERINDE reddediyordu. Ustune "islendi" damgasi basiliyordu.
+            // Ariza boylece kendi kanitini siliyordu: log'da basari, envanterde hicbir sey.
+            //
+            // Artik damga RPC'nin KENDI verdictine bagli. Basarisizsa damga basilmaz,
+            // sebep yazilir ve gelir yolu alarmi kalkar (`client_errors` → admin Hata
+            // Gruplari ekrani; Sentry'ye BAGLANAMAZ, DSN yok — bkz. _shared/revenue_alarm.ts).
+            const stockOk = (rpcJson as { success?: boolean } | null)?.success === true;
+
+            if (!stockOk) {
+              console.error('[iyzico-callback] STOK DUSMEDI — odeme alindi, envanter degismedi:', JSON.stringify(rpcJson));
+              try {
+                const { raiseRevenueAlarm } = await import('../_shared/revenue_alarm.ts');
+                await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+                  fn: 'iyzico-callback',
+                  code: 'STOCK_REDUCTION_FAILED',
+                  message: 'Odeme basarili ama siparis stogu dusurulemedi; envanter gercegi yansitmiyor.',
+                  extra: { order_id: orderId, rpc_result: rpcJson },
+                });
+              } catch (alarmErr) {
+                console.error('[iyzico-callback] stok alarmi yazilamadi:', alarmErr);
+              }
+            }
+
             // Mark stock processed flag and attach RPC summary to payment_debug
             try {
-              const updatedDebugInfo = { ...debugInfo, stock_processed: true, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson };
+              const updatedDebugInfo = { ...debugInfo, stock_processed: stockOk, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson };
               await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}`, {
                 method: 'PATCH',
                 headers: {

@@ -80,5 +80,18 @@ export const settings = {
       // Form modal
       form: {
         descEdit: 'Update settings. Validate the fields before saving.'
+      },
+
+      // Field-level validation messages (standard §4.6 — under the input, not in a toast)
+      validation: {
+        siteNameRequired: 'Site name is required',
+        taglineRequired: 'Tagline is required',
+        emailInvalid: 'Invalid email address',
+        emailRequired: 'Email is required',
+        supportPhoneRequired: 'Support phone is required',
+        headquartersRequired: 'Headquarters address is required',
+        logoUrlInvalid: 'Invalid URL',
+        apiKeyRequired: 'API key is required',
+        sessionTimeoutRequired: 'Session timeout is required'
       }
 };

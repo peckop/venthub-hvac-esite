@@ -99,6 +99,12 @@ export default function AccountOverviewPage() {
 
   const defaultShipping = addresses.find(a => a.is_default_shipping)
   const defaultBilling = addresses.find(a => a.is_default_billing)
+
+  // Adres formu full_address YAZMAZ (yalnız address_line+city+district) — full_address'i
+  // tek başına render etmek kartı sonsuza dek boş bırakır (T059). Checkout da aynı
+  // fallback'i kullanır (useCheckoutOrchestrator: full_address ← address_line).
+  const formatAddress = (a: UserAddress) =>
+    a.full_address || [a.address_line, a.district, a.city].filter(Boolean).join(', ')
   const fullName = user?.user_metadata?.full_name || t('account.overview.defaultPartnerName')
 
   // İstatistik Hesaplamaları
@@ -360,7 +366,7 @@ export default function AccountOverviewPage() {
                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                   <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Truck size={12} /> {t('account.overview.defaultShipping')}</div>
                   {defaultShipping ? (
-                    <div className="text-sm font-bold text-slate-700 leading-relaxed border-l-2 border-primary-navy pl-3 py-0.5">{defaultShipping.full_address}</div>
+                    <div className="text-sm font-bold text-slate-700 leading-relaxed border-l-2 border-primary-navy pl-3 py-0.5">{formatAddress(defaultShipping)}</div>
                   ) : (
                     <div className="text-sm font-medium text-slate-400 italic">{t('account.overview.noShippingAddress')}</div>
                   )}
@@ -369,7 +375,7 @@ export default function AccountOverviewPage() {
                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                   <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><CreditCard size={12} /> {t('account.overview.defaultBilling')}</div>
                   {defaultBilling ? (
-                    <div className="text-sm font-bold text-slate-700 leading-relaxed border-l-2 border-emerald-500 pl-3 py-0.5">{defaultBilling.full_address}</div>
+                    <div className="text-sm font-bold text-slate-700 leading-relaxed border-l-2 border-emerald-500 pl-3 py-0.5">{formatAddress(defaultBilling)}</div>
                   ) : (
                     <div className="text-sm font-medium text-slate-400 italic">{t('account.overview.noBillingAddress')}</div>
                   )}

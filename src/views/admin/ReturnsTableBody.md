@@ -2,81 +2,119 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\ReturnsTableBody.tsx
-skeleton_hash: c0676e18a2dc23d5
+source_path: C:\Users\alize\venthub-wt-admin\src\views\admin\ReturnsTableBody.tsx
+skeleton_hash: 8c29f35794ce3b59
 entity_hashes:
   func:ReturnDetailRow: 417bd75eec24c246
   func:ReturnsTableBody: c4e62ff41fb05b22
+  func:buildReturnUpdate: 25314c6b882429a2
   func:flatten: dba61385fd2b52cb
   func:orderLabel: dbd21fe27dfc150e
+  func:performRealRefund: 8348d9febef010ad
   func:pickOrder: 8425ae84622b4ac8
   func:returnsFetcher: be71794136738015
-  overview: 8b06f97be38962ec
-  style_tokens: 751d1aa5460b28c4
-generated_at: 2026-06-19T20:50:54Z
+  overview: 14c5490736513312
+  style_tokens: 6d490f1d65bd9e21
+generated_at: 2026-08-16T07:35:04Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelindeki iade (return) işlemlerine ait verilerin çekildiği, dönüştürüldüğü ve son olarak bir React tablosu bileşeni olarak render edildiği merkezi bir görünümdür. Ham veritabanı satırlarını zenginleştirilmiş bir veri modeline çevirir ve kullanıcının iade detaylarını tablo formatında görmesini sağlar.
+Bu modül, yönetici panelindeki iade (return) verilerinin yönetimi için tasarlanmış merkezi bir görünümdür. Supabase veritabanından ham iade kayıtlarını çeker, ilişkili sipariş bilgileriyle zenginleştirerek bileşenlerin kullanabileceği düz bir veri modeline dönüştürür ve nihayetinde bir React tablosu olarak sunar. Ayrıca, bazı durumlarda gerçek geri ödeme işlemlerini tetikleme ve durum güncelleme gibi iş mantığını da içerir.
 
 ## Fonksiyon Grupları
-### Veri Çekme ve Hazırlık
-Bu grup, Supabase veritabanından hammadde niteliğindeki iade kayıtlarını sunucu tarafında çeker ve ilişkili sipariş bilgilerini doğru formata filtreler.
-- returnsFetcher, pickOrder
+### Veri Çekme ve Parametre Yönetimi
+Veritabanından iade kayıtlarını sunucu tarafında çeker, ilişkili sipariş verisini alır ve gerekli sayfalama/parametreleri yöneterek bir sonraki aşama için ham veriyi hazırlar.
+- `returnsFetcher`, `pickOrder`
 
 ### Veri Dönüşümü ve Biçimlendirme
-Ham satır verilerini, bileşenlerin doğrudan kullanabileceği daha düz ve zenginleştirilmiş bir veri modeline dönüştürerek etiketleme işlemlerini yönetir.
-- flatten, orderLabel
+Ham veritabanı satırlarını, gösterim için uygun düz ve zenginleştirilmiş veri modellerine dönüştürerek etiketleri ve düzeni yönetir.
+- `flatten`, `orderLabel`
 
-### Görünüm Bileşeni
-İşlenmiş iade verilerini alarak tablonun her bir satırını ve gövdesini render eden React bileşenlerini barındırır.
-- ReturnDetailRow, ReturnsTableBody
+### Görünüm Bileşenleri (Tablo Gövdesi)
+İşlenmiş iade verilerini alarak tablonun her bir satırını ve tüm gövdesini render eden React bileşenlerini barındırır.
+- `ReturnDetailRow`, `ReturnsTableBody`
+
+### İşlem ve Durum Yönetimi
+İade durumunu güncellemek için gerekli nesneleri oluşturur ve gerektiğinde dış servislerle (örn. ödeme ağ geçidi) iletişime geçerek gerçek geri ödeme işlemini başlatır.
+- `performRealRefund`, `buildReturnUpdate`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, yönetici panelindeki iade işlemlerini gösteren bir tablonun gövdesini (body) oluşturmaktan sorumludur. Veri akışı: veritabanı → ham satır → düzleştirilmiş satır → tablo gövdesi şeklindedir.
+Bu modül, iade (return) verilerinin Supabase'den çekilip zenginleştirildiği ve tablo bileşenine sunulduğu merkezi görünümdür.
 
-[Aksiyom 1]: Eğer `returnsFetcher` fonksiyonu başarısız olursa veya boş bir `FetchResult` döndürürse, `ReturnsTableBody` bileşeni veri yok durumunda çalışır (boş tablo gövdesi render edilir).
+**[Aksiyom 1 – pickOrder null girdi varsayımı]:** Eğer `pickOrder`'a `joined` parametresi olarak `null` verilirse, dönüş değeri `null` olur.
 
-[Aksiyom 2]: Eğer `pickOrder` fonksiyonuna `null` değer verilirse, `null` döner; `JoinedOrder[]` (dizi) verilirse, dizinin ilk elemanını (`[0]`) seçip `JoinedOrder` olarak döner; boş dizi verilirse `null` döner.
+**[Aksiyom 2 – pickOrder dizi girdi varsayımı]:** Eğer `pickOrder`'a bir `JoinedOrder[]` dizisi verilirse, diziden tek bir `JoinedOrder` seçilir (seçim mantığı modül içindedir, bilinmiyor).
 
-[Aksiyom 3]: Eğer `flatten` fonksiyonuna geçersiz veya eksik alanlara sahip bir `RawReturnRow` verilirse, `ReturnRow` dönüşünde eksik alanlar `undefined` değerlerle dolar (tip dönüşümü garanti edilir, ancak alan varlığı garanti edilmez).
+**[Aksiyom 3 – flatten ham veri zorunluluğu]:** Eğer `flatten` fonksiyonuna verilen `RawReturnRow`'da `ReturnRow` yapısını oluşturacak zorunlu alanlar eksikse, sonuç eksik veya hatalı `ReturnRow` olur.
 
-[Aksiyom 4]: Eğer `orderLabel` fonksiyonuna verilen `ReturnRow`'ın ilişkili sipariş bilgisi (order) yoksa veya `pickOrder` tarafından `null` döndürülmüşse, string dönüşünde "bilinmeyen" veya boş string döner (belirli değer bilinmiyor).
+**[Aksiyom 4 – performRealRefund parametre zorunluluğu]:** Eğer `performRealRefund`'a `orderId` veya `returnId` boş string olarak verilirse, refund işlemi başarısız olur veya tanımsız sonuç döner.
 
-[Aksiyom 5]: Eğer `RETURNS_SELECT` sabiti geçersiz bir Supabase `select` sorgusu içerirse, `returnsFetcher` veritabanı sorgusu başarısız olur veya hata fırlatır.
+**[Aksiyom 5 – buildReturnUpdate note zorunluluğu]:** Eğer `buildReturnUpdate`'e verilen `newStatus`, `STATUSES_REQUIRING_NOTE` kümesinde yer alıyorsa ve `note` parametresi sağlanmamışsa, oluşturulan `ReturnUpdate` geçersiz olur.
 
-[Aksiyom 6]: Eğer `STATUS_VALUES` ifadesi geçerli bir durum değerleri seti içermiyorsa, iade durumlarına göre filtreleme veya gruplama düzgün çalışmaz veya beklenmeyen sonuçlar üretir.
+**[Aksiyom 6 – buildReturnUpdate statüs geçerliliği]:** Eğer `buildReturnUpdate`'e `STATUS_VALUES` kümesinde yer almayan bir `newStatus` verilirse, güncelleme tanımsız durumda olur.
 
-[Aksiyom 7]: Eğer `ReturnsTableBody` bileşeni `row` prop'u almadan (veya `row` tanımsızken) render edilirse, `ReturnDetailRow` bileşeni hata verir veya boş render eder.
+**[Aksiyom 7 – returnsFetcher supabase bağımlılığı]:** Eğer `returnsFetcher`'a verilen `supabase` istemcisi `Database` tipiyle uyumlu yapılandırılmamışsa, veri çekme işlemi başarısız olur.
+
+**[Aksiyom 8 – returnsFetcher select şeması uyumu]:** Eğer `RETURNS_SELECT` sabitindeki alan isimleri Supabase veritabanındaki gerçek tablo/sütun yapısıyla eşleşmiyorsa, sorgu hatası oluşur.
+
+**[Aksiyom 9 – orderLabel ReturnRow bağımlılığı]:** Eğer `orderLabel`'a verilen `ReturnRow`'da sipariş bilgisini temsil eden alanlar (örn: order ilişkisi) eksikse, dönen etiket字符串 eksik veya anlamsız olur.
+
+**[Aksiyom 10 – ReturnsTableBody veri akışı bağımlılığı]:** Eğer `returnsFetcher`'dan dönen `FetchResult<ReturnRow>` içindeki `ReturnRow` dizisi boşsa, `ReturnsTableBody` bileşeni boş tablo gövdesi render eder.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### pickOrder
-**Ne yapar**: Supabase sorgularından dönen ilişkili sipariş verisini güvenli bir şekilde tek bir `JoinedOrder` nesnesine indirger. Supabase'in tekil ve çoğul sorgu sonuçları arasındaki belirsizliği ortadan kaldırarak her zaman tutarlı bir dönüş sağlar.
-
-**Nasıl yapar**: Fonksiyon, gelen `joined` parametresinin bir `Array` olup olmadığını `Array.isArray()` ile kontrol eder. Eğer dizi ise ilk elemanı (`joined[0]`) döner; dizi boşsa `null` döner. Dizi değilse doğrudan gelen nesneyi veya `null` değerini geri verir. Bu sayede Supabase'in `'venthub_orders'` gibi ilişkili tabloları bazen tekil obje, bazen dizi olarak döndürmesi sorunsuz şekilde ele alınır.
-
+**Ne yapar**: Fonksiyon, bir Supabase sorgusundan dönen (`JoinedOrder` tipinde) tek bir nesne veya bir nesne dizisi olabilen, belirsiz bir giriş değerini (`JoinedOrder | JoinedOrder[] | null`) alır ve her zaman tek bir `JoinedOrder` nesnesi veya `null` döndürerek bu belirsizliği çözer.
+**Nasıl yapar**: Fonksiyon, giriş değerinin bir dizi (`Array`) olup olmadığını kontrol eder. Eğer dizi ise, dizinin ilk elemanını (`joined[0]`) döndürür; eğer dizi boşsa `null` döner. Dizi değilse, doğrudan girişi döndürür. Bu, Supabase'in tekil ve çoğul sorgu sonuçları arasındaki tutarsızlığını güvenli bir şekilde ele alır.
 **Parametreler**:
-- `joined`: `JoinedOrder | JoinedOrder[] | null` — Supabase join sorgusundan dönen ilişkili sipariş verisi. Tek bir nesne, nesne dizisi veya `null` olabilir.
-
-**Dönüş**: `JoinedOrder | null` — Düzenlenmiş tek bir sipariş nesnesi veya hiçbir eşleşme yoksa `null`.
+- joined: `JoinedOrder | JoinedOrder[] | null` — Supabase'den dönen, tekil veya çoğul bir sipariş nesnesi ya da `null` olabilen ham veri.
+**Dönüş**: `JoinedOrder | null` — Fonksiyon her zaman tek bir sipariş nesnesi veya `null` döndürür.
 
 ### flatten
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Ham bir iade satırını (`RawReturnRow`), gösterim için hazırlanmış, düzleştirilmiş ve zenginleştirilmiş bir iade satırına (`ReturnRow`) dönüştürür.
+**Nasıl yapar**: Fonksiyon, ham satırdaki (`row`) iç içe geçmiş sipariş nesnesini (`row.venthub_orders`) almak için önce `pickOrder` yardımcı fonksiyonunu çağırır. Ardından, ham verileri alıp siparişten gelen ek bilgilerle (`order_number`, `customer_name`, vb.) birleştirerek `ReturnRow` yapısını oluşturur. Eksik veya tanımsız değerler için `null` varsayılanı kullanılır.
+**Parametreler**:
+- row: `RawReturnRow` — Veritabanından gelen, iç içe bir `venthub_orders` objesi içeren ham iade satırı verisi.
+**Dönüş**: `ReturnRow` — Düzleştirilmiş, tüm gerekli alanları (sipariş numarası, müşteri adı, e-postası vb.) içeren iade satırı nesnesi.
 
 ### ReturnDetailRow
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
 
+### performRealRefund
+**Ne yapar**: Belirtilen bir sipariş için gerçek (mock olmayan) bir geri ödeme işlemini tetikler ve sonucunu döndürür.
+**Nasıl yapar**: Fonksiyon asenkron bir şekilde `supabaseBrowserClient.functions.invoke` kullanarak `'refund-order-mock'` adlı bir Supabase Edge Function'ı çağırır. Çağrıya `order_id` ve `return_id` parametrelerini bir gövde (`body`) içinde iletir. Fonksiyon, yanıtın.success olup olmadığını katmanlı bir hata kontrolü ile doğrular: önce HTTP seviyesindeki hataları, ardından yanıt gövdesindeki uygulama seviyesi hatalarını (`data?.error`) ve son olarak yanıt durumunu (`status`) kontrol eder. Beklenen durumlar (`refunded`, `partial_refunded`, `already_refunded`) dışında bir yanıt alınsa bile başarısızlık sonucu döndürür.
+**Parametreler**:
+- orderId: `string` — Geri ödemenin uygulanacağı siparişin benzersiz kimliği.
+- returnId: `string` — İlgili iade isteğinin benzersiz kimliği. Geri ödeme nedeni olarak `return:${returnId}` formatında kullanılır.
+**Dönüş**: `Promise<RefundOutcome>` — İşlemin başarı (`ok: true`) veya hata (`ok: false` ve bir `message`) ile sonuçlandığını belirten bir nesne.
+
+### buildReturnUpdate
+**Ne yapar**: Bir iade kaydının durumunu güncellemek için veritabanına gönderilecek güncelleme nesnesini (`ReturnUpdate`) oluşturur.
+**Nasıl yapar**: Fonksiyon, gelen yeni duruma (`newStatus`) göre zaman damgası alanlarını (`approved_at`, `processed_at`, `completed_at`) otomatik olarak ayarlar. Örneğin, durum `'approved'` ise `approved_at` alanını mevcut UTC zaman damgasıyla doldurur. Ek olarak, varsa ve boş olmayan bir not (`note`) parametresi trim edilerek `admin_notes` alanına eklenir.
+**Parametreler**:
+- newStatus: `string` — İade kaydının atanacak yeni durum değeri (örn. 'approved', 'refunded').
+- note?: `string` — Opsiyonel. İade sürecine eklenecek admin notu.
+**Dönüş**: `ReturnUpdate` — Veritabanına gönderilecek, zaman damgaları ve not bilgileri eklenmiş güncelleme nesnesi.
+
 ### returnsFetcher
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Veritabanından iade kayıtlarını, verilen filtreleme, arama, sıralama ve sayfalama parametrelerine göre çeker, işler ve formatlanmış bir sonuç döndürür.
+**Nasıl yapar**: Fonksiyon önce oturum tazeliğini sağlar (`ensureSessionFresh`). Ardından, `venthub_returns` tablosuna `RETURNS_SELECT` alanlarıyla bir sorgu başlatır. Gelen `FetchParams` içindeki `filters.status` dizisine göre durum filtresi, `query` alanına göre çoklu alanlarda (`reason`, müşteri bilgileri, sipariş numarası) arama (ILIKE ile büyük/küçük harf duyarsız), `sort` parametrelerine göre sıralama ve son olarak `page` ve `pageSize` kullanarak sayfalama uygulanır. Sorgu sonucu ham `RawReturnRow[]` dizisi, `flatten` fonksiyonu ile dönüştürülerek `ReturnRow` dizisine çevrilir ve toplam eşleşen kayıt sayısı (`count`) ile birlikte `FetchResult` nesnesi olarak döndürülür.
+**Parametreler**:
+- supabase: `SupabaseClient<Database>` — Veritabanı bağlantısı için kullanılan Supabase istemci nesnesi.
+- params: `FetchParams` — Sorgu parametrelerini içeren nesne. Filtreler (`filters`), arama terimi (`query`), sıralama (`sort`) ve sayfalama (`page`, `pageSize`) bilgilerini barındırır.
+**Dönüş**: `Promise<FetchResult<ReturnRow>>` — İşlenmiş iade satırlarını (`rows`) ve toplam eşleşen kayıt sayısını (`totalMatched`) içeren nesne.
 
 ### orderLabel
-**Ne yapar**: Geliştirildi ancak detay üretilemedi.
+**Ne yapar**: Bir iade satırı (`ReturnRow`) için insan tarafından okunabilir bir sipariş etiketi (görüntülenebilir numara) oluşturur.
+**Nasıl yapar**: Fonksiyon, önce `ReturnRow` nesnesindeki `order_number` alanının varlığını ve içeriğini kontrol eder. Eğer `order_number` mevcutsa, `-` karakterinden sonraki kısmı alarak `#` ile birleştirir (örn. 'INV-1234' -> '#1234'). Eğer `order_number` yoksa veya `-` içermiyorsa, `order_id`'nin son 8 karakterini büyük harflerle keserek bir etiket üretir (örn. 'abc123456789' -> '#56789').
+**Parametreler**:
+- r: `ReturnRow` — Etiketin oluşturulacağı iade satırı nesnesi.
+**Dönüş**: `string` — Oluşturulan sipariş etiketi (örn. '#1234').
 
 ### ReturnsTableBody
 **Ne yapar**: Geliştirildi ancak detay üretilemedi.
@@ -92,6 +130,7 @@ Bu modül, yönetici panelindeki iade işlemlerini gösteren bir tablonun gövde
 - import: ../../components/admin/data-table/DataTableKit::DataTableKit
 - import: ../../components/admin/data-table/FacetedFilter::FacetedFilter
 - import: ../../components/admin/data-table/types::type { AdminColumn, DataTableFacet }
+- import: ../../components/admin/overlay/ConfirmProvider::useConfirmWithReason
 - import: ../../hooks/useAdminTable::type FetchParams
 - import: ../../hooks/useAdminTable::type FetchResult
 - import: ../../hooks/useAdminTable::useAdminTable
@@ -153,310 +192,129 @@ join satırının ham şekli (Supabase ilişkiyi obje VEYA tek-elemanlı dizi ol
 - `updated_at: string`
 - `venthub_orders: JoinedOrder | JoinedOrder[] | null`
 
+### RefundResponse
+- `status?: string`
+- `error?: { code?: string; message?: string }`
+
+---
+
+## TYPE ALIASES
+
+### ReturnUpdate
+```typescript
+type ReturnUpdate = Database['public']['Tables']['venthub_returns']['Update']
+```
+
+### RefundOutcome
+GERÇEK PARA İADESİ — `iyzico-refund` ucu. 2026-08-16'ya kadar burada `refund-order-mock` çağrılıyordu ve o uç kendi başlığında "no real PSP call" diyordu. Denetimin "sessiz sahte-başarı" dediği sınıfın en pahalı örneğiydi: `payment_status='refunded'` yazılıyor, denetim kaydı düşüyor, müşteriye **"ia
+```typescript
+type RefundOutcome = { ok: true } | { ok: false; message: string }
+```
+
 ---
 
 ## SABİTLER
 - **RETURNS_SELECT** (str) — `'id, order_id, user_id, reason, description, status, created_at, updated_at, ...`
 - **STATUS_VALUES** (as_expression) — `['requested', 'approved', 'rejected', 'in_transit', 'received', 'refunded', '...`
+- **STATUSES_REQUIRING_NOTE** (new_expression) — `new Set(['rejected', 'cancelled'])`
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: `ReturnsTableBody.tsx`::pickOrder
-- **params**: `(joined: JoinedOrder | JoinedOrder[] | null)`
+### [N1_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ReturnsTableBody.tsx::pickOrder
+- **params**: (`joined: JoinedOrder | JoinedOrder[] | null`)
 - **ic_degiskenler**:
-  - Yok — doğrudan parametre ve return ifadeleri kullanılır
-- **Dönüş**: `JoinedOrder | null` — joined bir array ise ilk elemanı, değilse doğrudan değeri döner
+  - `joined` — Girdi parametresi: Tek bir JoinedOrder nesnesi, JoinedOrder dizisi veya null olabilir
+- **Dönüş**: JoinedOrder veya null
 
----
-
-### [N2_NASIL] AST Pointer: `ReturnsTableBody.tsx`::flatten
-- **params**: `(row: RawReturnRow)`
+### [N2_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ReturnsTableBody.tsx::flatten
+- **params**: (`row: RawReturnRow`)
 - **ic_degiskenler**:
-  - `order` — `pickOrder(row.venthub_orders)` çağrısıyla elde edilen tekil JoinedOrder nesnesi; sipariş bilgilerini (numara, müşteri adı, e-posta, tutar) ReturnRow'a taşır
-- **Dönüş**: `ReturnRow` — ham satır verisini ve ilişkili sipariş bilgilerini birleştirilmiş düz形式 ReturnRow nesnesine dönüştürür
+  - `row` — Ham iade satırı verisi, venthub_orders ilişkili veriyi içerir
+  - `order` — pickOrder() ile elde edilen sipariş nesnesi, null olabilir
+- **Dönüş**: ReturnRow nesnesi
 
----
-
-### [N3_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnDetailRow
-- **params**: `({ row }: { row: ReturnRow })`
+### [N3_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ReturnsTableBody.tsx::ReturnDetailRow
+- **params**: (`{ row }` — ReturnRow tipinde satır nesnesi)
 - **ic_degiskenler**:
-  - `t` — `useI18n()` hook'undan gelen çeviri fonksiyonu; UI metinlerini uluslararası dilde render eder
-  - `lang` — `useI18n()` hook'undan gelen dil kodu; tarih/saat formatlamada kullanılır
-- **Dönüş**: `JSX.Element` — iade detay satırının kartlı, grid tabanlı detail view bileşeni; row.id, row.order_id, row.user_id, row.reason, row.description, row.updated_at alanlarını gösterir
+  - `row` — Detay gösterilecek iade satırı
+  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
+  - `lang` — useI18n() hook'undan gelen dil ayarı
+- **Dönüş**: JSX elementi (iade detay bileşeni)
 
----
-
-### [N4_NASIL] AST Pointer: `ReturnsTableBody.tsx`::returnsFetcher
-- **params**: `(supabase: SupabaseClient<Database>, params: FetchParams)`
+### [N4_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ReturnsTableBody.tsx::performRealRefund
+- **params**: (`orderId: string`, `returnId: string`)
 - **ic_degiskenler**:
-  - `query` — Supabase tablo sorgusu; `venthub_returns` tablosuna select eklenen, filtre/sıralama/sayfalama zinciri uygulanan zincirsel sorgu nesnesi
-  - `statuses` — `params.filters.status ?? []` ile elde edilen filtrelenmek istenen durum dizisi; tek element eq, çoklu element in operatörü ile filtrelenir
-  - `term` — `params.query.trim()` ile elde edilen global arama metni; reason, customer_name, customer_email, order_number üzerinde ilike araması yapar
-  - `sortKey` — `params.sort?.key` sıralama anahtarı; order_number/customer_name/reason/status/created_at alanlarına göre sıralama yönünü belirler
-  - `ascending` — `params.sort?.dir === 'asc'` sıralama yönü; true ise artan, false ise azalan sıralama yapar
-  - `offset` — `(params.page - 1) * params.pageSize` sayfalama ofseti; veri aralığının başlangıç indisini hesaplar
-  - `data` — Supabase sorgusundan dönen ham satır verisi dizisi (RawReturnRow[])
-  - `error` — Supabase sorgu hatası; varsa throw edilir
-  - `count` — Supabase tarafından hesaplanan toplam eşleşen satır sayısı; sayfalama toplamı için kullanılır
-  - `raw` — `data ?? []` fallback'li ham satır dizisi
-  - `rows` — `raw.map(flatten)` ile düzleştirilmiş ReturnRow dizisi
-  - `totalMatched` — `count` sayı ise count, değilse `rows.length` fallback değeri; toplam eşleşen satır sayısını tutar
-- **Dönüş**: `Promise<FetchResult<ReturnRow>>` — `{ rows, totalMatched }` nesnesi; sayfalı, filtreli, sıralı iade satırlarını ve toplam sayıyı döner
+  - `orderId` — İade yapılacak siparişin ID'si
+  - `returnId` — İade kaydının ID'si
+  - `data` — Edge function yanıtının gövdesi (RefundResponse tipinde)
+  - `error` — Edge function yanıt hatası (varsa)
+  - `status` — Edge function yanıtındaki iade durumu
+- **Dönüş**: RefundOutcome nesnesi (ok: boolean, message?: string)
 
----
-
-### [N5_NASIL] AST Pointer: `ReturnsTableBody.tsx`::orderLabel
-- **params**: `(r: ReturnRow)`
+### [N5_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ReturnsTableBody.tsx::buildReturnUpdate
+- **params**: (`newStatus: string`, `note?: string`)
 - **ic_degiskenler**:
-  - Yok — doğrudan parametre alanları kullanılır
-- **Dönüş**: `string` — sipariş numarası varsa `#` prefix'li order_number'ın ikinci parçası (split('-')[1]), değilse order_id'nin son 8 karakteri ile oluşturulan etiket
+  - `newStatus` — Yeni iade durumu
+  - `note` — Opsiyonel admin notu
+  - `now` — Güncel zaman damgası (ISO formatında)
+  - `update` — Güncellenecek alanları tutan ReturnUpdate nesnesi
+  - `trimmed` — Note'un trim edilmiş hali (boşluklar kaldırılmış)
+- **Dönüş**: ReturnUpdate nesnesi
 
----
-
-### [N6_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (fetchStatusCounts inner async)
-- **params**: Yok (arrow function, parametresiz)
+### [N6_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ReturnsTableBody.tsx::returnsFetcher
+- **params**: (`supabase: SupabaseClient<Database>`, `params: FetchParams`)
 - **ic_degiskenler**:
-  - `data` — `supabaseBrowserClient.from('venthub_returns').select('status')` çağrısından dönen tüm iade kayıtlarının status alanları dizisi
-  - `error` — Supabase sorgu hatası; varsa throw edilir
-  - `counts` — `Record<string, number>` türünde durum bazlı sayaç sözlüğü; her status değerinin adedini tutar
-- **Dönüş**: `Promise<void>` — yan etki olarak `setStatusCounts(counts)` state günceller
+  - `supabase` — Supabase istemcisi
+  - `params` — Sayfalama, filtreleme ve sıralama parametreleri
+  - `query` — Supabase sorgu nesnesi
+  - `statuses` — Filtrelenecek durumlar dizisi
+  - `term` — Arama terimi (trimmed)
+  - `sortKey` — Sıralama anahtarı
+  - `ascending` — Artan sıralama yönü
+  - `offset` — Sayfalama için ofset değeri
+  - `data` — Supabase sorgu sonuçları
+  - `error` — Supabase sorgu hatası
+  - `count` — Toplam eşleşen kayıt sayısı
+  - `raw` — Ham ReturnRow dizisi
+  - `rows` — Düzeltilmiş ReturnRow dizisi
+  - `totalMatched` — Toplam eşleşen kayıt sayısı
+- **Dönüş**: FetchResult<ReturnRow> nesnesi
 
----
-
-### [N7_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (fetchStatusCounts useEffect)
-- **params**: Yok
-- **ic_degiskenler**: Yok
-- **Dönüş**: Yok — `void fetchStatusCounts()` çağrısı ile yan etki olarak durum sayaçlarını yükler
-
----
-
-### [N8_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (getStatusIcon)
-- **params**: `(status: string)`
-- **ic_degiskenler**: Yok
-- **Dönüş**: `React.ReactNode` — duruma göre icon bileşeni (Clock, CheckCircle, XCircle, Truck, Package, RefreshCw vb.); bilinmeyen durum için RefreshCw döner
-
----
-
-### [N9_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (getStatusColor)
-- **params**: `(status: string)`
-- **ic_degiskenler**: Yok
-- **Dönüş**: `string` — duruma göre Tailwind CSS class string'i (bg/text/border renk kombinasyonu); bilinmeyen durum için slate tonları döner
-
----
-
-### [N10_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (handleStatusUpdate async)
-- **params**: `(row: ReturnRow, newStatus: string)`
+### [N7_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ReturnsTableBody.tsx::orderLabel
+- **params**: (`r: ReturnRow`)
 - **ic_degiskenler**:
-  - `allowed` — `allowedNextStatuses(row.status)` ile elde edilen izin verilen bir sonraki durumlar dizisi; yeni durum bu dizide yoksa fonksiyon erken return ile çıkar
-  - `oldStatus` — `row.status` mevcut durum değeri; audit before kaydı ve müşteri bildirimi için kullanılır
-- **Dönüş**: `Promise<void>` — yan etkiler: Supabase status güncelleme, sipariş senkronizasyonu, mock refund, müşteri bildirimi, toast gösterimi, tablo yenileme
+  - `r` — Etiket üretilecek iade satırı
+- **Dönüş**: string (Sipariş etiketi, # ile başlayan format)
 
----
-
-### [N11_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (handleStatusUpdate inner fn mutation callback)
-- **params**: Yok
+### [N8_NASIL] AST Pointer: C:\Users\alize\venthub-wt-admin\src\views\admin\ReturnsTableBody.tsx::ReturnsTableBody
+- **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `newStatus` — outer scope'tan gelen hedef durum; `venthub_returns` tablosunda `row.id` kaydının status alanını günceller
-- **Dönüş**: `Promise<void>` — Supabase update, syncOrderFromReturn, refund-order-mock, return-status-notification yan etkilerini çalıştırır
-
----
-
-### [N12_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (bulkStatusChange async)
-- **params**: `(targetStatus: string)`
-- **ic_degiskenler**:
-  - `selected` — `table.selection.selectedIds` tablo seçiminden gelen seçili satır ID'leri dizisi
-  - `targets` — `table.rows` içinden selected'da olan VE `allowedNextStatuses` ile hedef duruma geçişi izin verilen satırların filtrelenmiş dizisi (ReturnRow[])
-- **Dönüş**: `Promise<void>` — yan etkiler: window.confirm onayı, mutateWithAudit ile toplu durum güncelleme, toast, seçim temizleme, tablo yenileme
-
----
-
-### [N13_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (bulkStatusChange inner fn bulk mutation)
-- **params**: Yok
-- **ic_degiskenler**:
-  - `targets` — outer scope'tan gelen hedef satırlar dizisi
-  - `targetStatus` — outer scope'tan gelen hedef durum stringi
-  - `dbUpdates` — `targets.map(async (row) => ...)` ile her satır için oluşturulan promise dizisi; her satır için Supabase update + sync + mock refund + bildirim çalıştırır
-- **Dönüş**: `Promise<void>` — `Promise.all(dbUpdates)` ile tüm satır güncellemelerini paralel çalıştırır
-
----
-
-### [N14_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (bulk per-row mutation callback)
-- **params**: `(row)` — outer scope'taki targets dizisinden bir ReturnRow
-- **ic_degiskenler**:
-  - `targetStatus` — outer scope'tan gelen hedef durum stringi
-- **Dönüş**: `Promise<void>` — tek bir satır için Supabase status update, syncOrderFromReturn, refund-order-mock, return-status-notification yan etkilerini çalıştırır
-
----
-
-### [N15_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (columns getter)
-- **params**: Yok
-- **ic_degiskenler**:
-  - `t` — outer scope'tan çeviri fonksiyonu
-- **Dönüş**: Column nesnesi dizisi — order_number, customer_name, reason, status, created_at, actions olmak üzere 6 sütun tanımı; her biri header, sortable, cell renderer içerir
-
----
-
-### [N16_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (order_number cell)
-- **params**: `(r)` — ReturnRow satırı
-- **ic_degiskenler**: Yok
-- **Dönüş**: `JSX.Element` — sipariş etiketi butonu ve toplam tutar; order_label butonuna tıklanınca `/admin/orders?q=...` rotasına yönlendirme yapar
-
----
-
-### [N17_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (customer_name cell)
-- **params**: `(r)` — ReturnRow satırı
-- **ic_degiskenler**: Yok
-- **Dönüş**: `JSX.Element` — müşteri adı ve e-postasını gösteren dikey flex layout
-
----
-
-### [N18_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (reason cell)
-- **params**: `(r)` — ReturnRow satırı
-- **ic_degiskenler**: Yok
-- **Dönüş**: `JSX.Element` — iade nedeni ve açıklama metnini (truncated, hover title ile) gösteren bileşen
-
----
-
-### [N19_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (status cell)
-- **params**: `(r)` — ReturnRow satırı
-- **ic_degiskenler**: Yok
-- **Dönüş**: `JSX.Element` — getStatusColor ile renklendirilmiş, getStatusIcon ile ikonlanmış, getStatusLabel ile etiketlenmiş pill/badge bileşeni
-
----
-
-### [N20_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (created_at cell)
-- **params**: `(r)` — ReturnRow satırı
-- **ic_degiskenler**: Yok
-- **Dönüş**: `JSX.Element` — `formatDate(r.created_at, lang)` ve `formatTime(r.created_at, lang)` ile biçimlendirilmiş tarih ve saat gösterimi
-
----
-
-### [N21_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (actions cell)
-- **params**: `(r)` — ReturnRow satırı
-- **ic_degiskenler**:
-  - `next` — `allowedNextStatuses(r.status)` ile elde edilen izin verilen sonraki durumlar dizisi; buton olarak render edilir
-- **Dönüş**: `JSX.Element` — her izin verilen durum için handleStatusUpdate çağıran butonlar; yükleniyor durumunda spinner gösterir, hasWriteAccess yoksa veya next boşsa dash döner
-
----
-
-### [N22_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (actions cell button renderer)
-- **params**: `(status)` — izin verilen bir sonraki durum stringi
-- **ic_degiskenler**: Yok
-- **Dönüş**: `JSX.Element` — handleStatusUpdate(r, status) onClick'li buton; updatingStatus === r.id ise spinner, değilse label + ChevronRight
-
----
-
-### [N23_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (facets getter)
-- **params**: Yok
-- **ic_degiskenler**:
-  - `t` — outer scope'tan çeviri fonksiyonu
-  - `statusCounts` — outer scope'tan durum sayaçları sözlüğü
-- **Dönüş**: Facet nesnesi dizisi — tek facet: 'status' key'li; STATUS_VALUES dizisi üzerinden value, label, count (statusCounts[value] ?? 0) oluşturur
-
----
-
-### [N24_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (facets status option mapper)
-- **params**: `(value)` — STATUS_VALUES dizisinden bir durum stringi
-- **ic_degiskenler**:
-  - `statusCounts` — outer scope'tan durum sayaçları sözlüğü
-- **Dönüş**: `{ value, label: getStatusLabel(value), count: statusCounts[value] ?? 0 }` — FacetedFilter'a sunulan seçenek nesnesi
-
----
-
-### [N25_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (handleCsvExport async)
-- **params**: Yok
-- **ic_degiskenler**:
-  - `rows` — `table.fetchAllForExport()` ile yüklenen tüm iade satırları (sayfalama olmadan tam veri)
-  - `header` — CSV başlık satırı dizisi; t() ile çevrilmiş sütun adlarını tutar
-  - `escape` — `(v: unknown) => '"' + String(v ?? '').replace(/"/g, '""') + '"'` CSV için değer kaçış fonksiyonu
-  - `lines` — `rows.map(r => [...].map(escape).join(','))` ile oluşturulmuş CSV satır dizisi
-  - `bom` — `'﻿'` UTF-8 BOM karakteri; Excel'in doğru encoding'i tanımasını sağlar
-  - `csv` — `[header.map(escape).join(','), ...lines].join('\n')` tam CSV stringi
-  - `blob` — `new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })` indirilebilir CSV blob'u
-  - `url` — `URL.createObjectURL(blob)` blob URL'i; geçici dosya indirme bağlantısı
-  - `a` — `document.createElement('a')` tıklama tetikleyici anchor elementi
-- **Dönüş**: `Promise<void>` — yan etki olarak CSV dosyasını tarayıcıda indirir, URL'i revoke eder
-
----
-
-### [N26_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (handleCsvExport row mapper)
-- **params**: `(r)` — ReturnRow satırı
-- **ic_degiskenler**:
-  - `escape` — outer scope CSV escape fonksiyonu
-  - `lang` — outer scope dil kodu
-- **Dönüş**: `string` — virgülle ayrılmış, escape'lenmiş tek CSV satırı
-
----
-
-### [N27_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (handleExcelExport async)
-- **params**: Yok
-- **ic_degiskenler**:
-  - `rows` — `table.fetchAllForExport()` ile yüklenen tüm iade satırları
-  - `rowsHtml` — `rows.map(r => ...).join('')` ile oluşturulmuş HTML `<tr>` satırları stringi; her satır orderLabel, customer_name, customer_email, reason, status, created_at, total_amount içerir
-  - `htmlTable` — tam HTML tablo stringi; DOCTYPE, meta charset, thead (t() başlıkları), tbody (rowsHtml) içerir
-  - `blob` — `new Blob([htmlTable], { type: 'application/vnd.ms-excel' })` XLS formatında indirilebilir blob
-  - `url` — `URL.createObjectURL(blob)` blob URL'i
-  - `a` — `document.createElement('a')` tıklama tetikleyici anchor elementi
-- **Dönüş**: `Promise<void>` — yan etki olarak XLS dosyasını tarayıcıda indirir, URL'i revoke eder
-
----
-
-### [N28_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (handleExcelExport row mapper)
-- **params**: `(r)` — ReturnRow satırı
-- **ic_degiskenler**:
-  - `amount` — `typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang) : ''` para formatlı tutar veya boş string
-  - `lang` — outer scope dil kodu
-- **Dönüş**: `string` — HTML `<tr>` satır stringi; orderLabel, customer_name, customer_email, reason, status, created_at, amount hücreleri
-
----
-
-### [N29_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (bulkActions getter)
-- **params**: Yok
-- **ic_degiskenler**:
-  - `t` — outer scope'tan çeviri fonksiyonu
-  - `bulkStatus` — outer state; seçilen toplu durum değişikliği hedefini tutar
-  - `setBulkStatus` — outer state setter; bulkStatus değerini günceller
-  - `bulkStatusChange` — outer scope async fonksiyonu; toplu durum değişikliğini tetikler
-  - `getStatusLabel` — outer scope durum etiketleyici fonksiyonu
-- **Dönüş**: BulkAction nesnesi dizisi — tek action: 'apply-status' key'li; select ile 6 durum (approved/in_transit/received/refunded/cancelled/rejected) sunar, apply butonu ile bulkStatusChange çağırır
-
----
-
-### [N30_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (bulkActions panel renderer)
-- **params**: `(close)` — paneli kapatacak callback fonksiyonu
-- **ic_degiskenler**:
-  - `bulkStatus` — outer state; select input'unun değeri
-  - `setBulkStatus` — outer state setter
-  - `bulkStatusChange` — outer scope async fonksiyonu
-- **Dönüş**: `JSX.Element` — glass-strong styled rounded-2xl panel; select (6 seçenek) ve apply butonu içerir
-
----
-
-### [N31_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (bulkActions option mapper)
-- **params**: `(s)` — durum stringi (approved, in_transit, received, refunded, cancelled, rejected)
-- **ic_degiskenler**: Yok
-- **Dönüş**: `JSX.Element` — `<option>` elementi; value ve label (getStatusLabel(s))
-
----
-
-### [N32_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (bulkActions confirm handler)
-- **params**: Yok
-- **ic_degiskenler**:
-  - `bulkStatus` — outer state; hedef durum
-  - `bulkStatusChange` — outer scope async fonksiyonu
-  - `close` — outer scope panel kapatma callback'i
-- **Dönüş**: `void` — `void bulkStatusChange(bulkStatus)` ve `close()` çağırarak paneli kapatır ve toplu değişimi başlatır
-
----
-
-### [N33_NASIL] AST Pointer: `ReturnsTableBody.tsx`::ReturnsTableBody (facet filter renderer)
-- **params**: `(facet)` — facet nesnesi (key, label, options)
-- **ic_degiskenler**:
-  - `table` — outer scope tablo nesnesi; `table.filtering.filters[facet.key]` ile seçili filtreleri okur, `table.filtering.setFilter(facet.key, values)` ile günceller
-  - `t` — outer scope çeviri fonksiyonu
-- **Dönüş**: `JSX.Element` — `<FacetedFilter>` bileşeni; facet tanımı, seçili değerler, onChange callback, clearLabel ile render edilir
+  - `t` — useI18n() hook'undan gelen çeviri fonksiyonu
+  - `lang` — useI18n() hook'undan gelen dil ayarı
+  - `router` — useRouter() hook'undan gelen Next.js yönlendirici
+  - `table` — Tablo yönetimi için hook (useAdminTable veya benzeri)
+  - `hasWriteAccess` — Yazma izni durumu (boolean)
+  - `updatingStatus` — Güncellenen satır ID'si veya null
+  - `setUpdatingStatus` — updatingStatus state setter'ı
+  - `statusCounts` — Durum bazlı kayıt sayıları (Record<string, number>)
+  - `setStatusCounts` — statusCounts state setter'ı
+  - `bulkStatus` — Toplu işlem için seçilen durum
+  - `setBulkStatus` — bulkStatus state setter'ı
+  - `requestStatusChange` — Tek satır durum değişikliği işleyici fonksiyonu
+  - `handleStatusChange` — Durum değişikliği onay dialogu ile işleyici
+  - `handleStatusUpdate` — Asıl durum güncelleme işleyicisi
+  - `bulkStatusChange` — Toplu durum değişikliği işleyicisi
+  - `columns` — Tablo sütun tanımları dizisi
+  - `filters` — Filtre tanımları (facet yapısı)
+  - `exportToCsv` — CSV dışa aktarma fonksiyonu
+  - `exportToXls` — XLS dışa aktarma fonksiyonu
+  - `bulkActions` — Toplu işlem seçenekleri dizisi
+  - `fetchStatusCounts` — Durum sayılarını çeken asenkron fonksiyon
+  - `getStatusIcon` — Durum için ikon döndüren fonksiyon
+  - `getStatusColor` — Durum için renk sınıfı döndüren fonksiyon
+- **Dönüş**: React.FC (Ana bileşen)
 
 ---
 
@@ -466,12 +324,16 @@ join satırının ham şekli (Supabase ilişkiyi obje VEYA tek-elemanlı dizi ol
 graph TD
     ReturnsTableBody_tsx__ReturnDetailRow["ReturnDetailRow"]
     ReturnsTableBody_tsx__ReturnsTableBody["ReturnsTableBody"]
+    ReturnsTableBody_tsx__buildReturnUpdate["buildReturnUpdate"]
     ReturnsTableBody_tsx__flatten["flatten"]
     ReturnsTableBody_tsx__orderLabel["orderLabel"]
+    ReturnsTableBody_tsx__performRealRefund["performRealRefund"]
     ReturnsTableBody_tsx__pickOrder["pickOrder"]
     ReturnsTableBody_tsx__returnsFetcher["returnsFetcher"]
-    ReturnsTableBody_tsx__flatten --> ReturnsTableBody_tsx__pickOrder
+    ReturnsTableBody_tsx__ReturnsTableBody --> ReturnsTableBody_tsx__buildReturnUpdate
     ReturnsTableBody_tsx__ReturnsTableBody --> ReturnsTableBody_tsx__orderLabel
+    ReturnsTableBody_tsx__ReturnsTableBody --> ReturnsTableBody_tsx__performRealRefund
+    ReturnsTableBody_tsx__flatten --> ReturnsTableBody_tsx__pickOrder
 ```
 
 ## NODE ID STANDARD
@@ -480,6 +342,8 @@ graph TD
   function: src\views\admin\ReturnsTableBody.tsx::pickOrder
   function: src\views\admin\ReturnsTableBody.tsx::flatten
   function: src\views\admin\ReturnsTableBody.tsx::ReturnDetailRow
+  function: src\views\admin\ReturnsTableBody.tsx::performRealRefund
+  function: src\views\admin\ReturnsTableBody.tsx::buildReturnUpdate
   function: src\views\admin\ReturnsTableBody.tsx::returnsFetcher
   function: src\views\admin\ReturnsTableBody.tsx::orderLabel
   function: src\views\admin\ReturnsTableBody.tsx::ReturnsTableBody
@@ -489,8 +353,10 @@ graph TD
 ## DISA AKTARILANLAR (EXPORTS)
   export: ReturnDetailRow
   export: ReturnsTableBody
+  export: buildReturnUpdate
   export: flatten
   export: orderLabel
+  export: performRealRefund
   export: pickOrder
   export: returnsFetcher
 
@@ -505,7 +371,7 @@ Yok — tüm stiller token'a geçirilmiş. ✅
 - (yok)
 
 ### Tailwind Sınıf Özeti
-- **Renkler:** `bg-cyan-400`, `bg-surface-deep`, `bg-surface-deep/40`, `bg-white/10`, `border-b`, `border-current`, `border-t-transparent`, `border-white/5`, `hover:text-cyan-300`, `text-blue-600`, `text-cyan-400`, `text-gray-400`, `text-gray-600`, `text-green-600`, `text-green-700`
-- **Layout:** `!h-10`, `!h-7`, `flex`, `flex-col`, `gap-0.5`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `h-0.5`, `h-3`, `h-px`, `inline-block`
-- **Varyant/Responsive:** `disabled:`, `hover:`, `md:` önekleri
-- **Yardımcı Sınıflar:** `!pl-3`, `!px-3`, `${adminButtonPrimaryClass`, `${adminSelectClass`, `${adminTableActionPrimaryClass`, `${getStatusColor`, `${glassStrongClass`, `align-middle`, `animate-in`, `animate-spin`, `border`, `break-words`, `disabled:opacity-50`, `duration-300`, `fade-in`
+- **Renkler:** `bg-admin-accent`, `bg-admin-bg`, `bg-admin-surface`, `bg-admin-surface-3`, `bg-surface-deep/40`, `border-admin-border`, `border-b`, `border-current`, `border-t-transparent`, `hover:text-admin-accent`, `text-admin-accent`, `text-admin-danger`, `text-admin-fg`, `text-admin-fg-muted`, `text-admin-fg-subtle`
+- **Layout:** `!h-10`, `!h-7`, `flex`, `flex-col`, `flex-wrap`, `gap-0.5`, `gap-1`, `gap-1.5`, `gap-2`, `gap-3`, `gap-4`, `grid`, `h-0.5`, `h-3`, `h-px`
+- **Varyant/Responsive:** `:`, `disabled:`, `hover:`, `md:` önekleri
+- **Yardımcı Sınıflar:** `!pl-3`, `!px-3`, `$`, `${adminButtonPrimaryClass`, `${adminSelectClass`, `${getStatusColor`, `:`, `STATUSES_REQUIRING_NOTE.has(status`, `adminTableActionDangerClass`, `adminTableActionPrimaryClass`, `align-middle`, `animate-in`, `animate-spin`, `border`, `break-words`

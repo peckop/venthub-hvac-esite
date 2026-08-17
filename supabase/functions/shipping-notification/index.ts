@@ -293,15 +293,35 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
     let EMAIL_FROM = branding.emailFrom
     const notifyDebug = Deno.env.get('NOTIFY_DEBUG') === 'true'
-    // İşletme kopyası: prod v21'de bu değişken varsayılanıyla birlikte vardı; env ile override edilir.
-    const bccList = (Deno.env.get('SHIP_EMAIL_BCC') || 'recep.varlik@gmail.com').split(',').map(s=>s.trim()).filter(Boolean)
+    // İşletme kopyası. VARSAYILAN YOK — bu satırda bir zamanlar gömülü bir KİŞİSEL adres
+    // vardı (`|| 'recep.varlik@gmail.com'`) ve iki ayrı soruna yol açıyordu:
+    //
+    //   1. Env değişkeni tanımlı değilken HER kargo bildiriminin bir kopyası, koda
+    //      gömülmüş özel bir gerçek kişinin gelen kutusuna gidiyordu — müşteri adı,
+    //      sipariş numarası ve takip bilgisiyle birlikte. Kimse ayarlamamış olmasına
+    //      rağmen. Bu bir yapılandırma değil, koda yazılmış bir alıcıydı.
+    //   2. Aşağıdaki "alıcı yoksa BCC'yi TO yap" dalıyla birleşince daha da kötüleşiyordu
+    //      (bkz. oradaki not).
+    //
+    // Boş varsayılan doğru olan: işletme kopyası isteyen `SHIP_EMAIL_BCC`'yi TANIMLAR.
+    // Repo PUBLIC — koda gömülü kişisel adres ayrıca kalıcı bir sızıntıdır.
+    const bccList = (Deno.env.get('SHIP_EMAIL_BCC') || '').split(',').map(s=>s.trim()).filter(Boolean)
 
     if (!RESEND_API_KEY) {
       if (notifyDebug) console.warn('[shipping-notification] Email disabled: missing RESEND_API_KEY')
       return new Response(JSON.stringify({ success: true, disabled: true, channel: 'email' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    // Recipients: test mode overrides; if no customer email, fall back to first BCC
+    // Alıcılar. İŞLETME KOPYASI ASLA BİRİNCİL ALICIYA TERFİ ETMEZ.
+    //
+    // Eskiden burada şu dal vardı: müşteri e-postası yoksa BCC listesinin ilk adresini
+    // TO yap. Görünüşte "hiç değilse bir yere gitsin" mantığı, ama ürettiği şey şuydu:
+    // müşterinin kargo bildirimi — adı, sipariş numarası, takip linkiyle — işletme
+    // kopyası için konulmuş adrese MÜŞTERİYE YAZILMIŞ GİBİ gönderiliyordu. Üstelik o
+    // adresin varsayılanı koda gömülü kişisel bir adresti.
+    //
+    // Doğrusu: alıcı yoksa GÖNDERME ve bunu çağırana AÇIKÇA söyle. Sessizce başka bir
+    // yere göndermek, eksik veriyi gizlerken bir de gizlilik sorunu yaratır.
     const toList: string[] = []
     if (testMode) {
       toList.push(testTo)
@@ -309,13 +329,14 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
       toList.push(customer_email)
     }
     const bcc = [...bccList]
-    if (toList.length === 0 && bcc.length > 0) {
-      toList.push(bcc[0])
-      bcc.shift()
-    }
 
     if (toList.length === 0) {
-      return new Response(JSON.stringify({ error: 'missing_fields', missing: ['customer_email'], received: Object.keys(parsed) }), {
+      return new Response(JSON.stringify({
+        error: 'missing_fields',
+        missing: ['customer_email'],
+        message: 'Müşteri e-postası yok; bildirim GÖNDERİLMEDİ. İşletme kopyası adresi birincil alıcı yerine kullanılmaz.',
+        received: Object.keys(parsed),
+      }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })

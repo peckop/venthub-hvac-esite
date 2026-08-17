@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { ConfirmProvider } from '@/components/admin/overlay/ConfirmProvider'
 import { testA11y } from '@/utils/testA11y'
 
 import AdminOrdersPage from '../AdminOrdersPage'
@@ -109,7 +110,11 @@ vi.mock('next/navigation', () => ({
 
 describe('AdminOrdersPage (kit göçü) — integration + a11y', () => {
   it('siparişleri render eder + varsayılan sıralı başlıkta aria-sort taşır', async () => {
-    render(<AdminOrdersPage />)
+    render(
+    <ConfirmProvider>
+      <AdminOrdersPage />
+    </ConfirmProvider>
+  )
     // server fetcher çözülünce order_number satırları görünür
     await screen.findByText('VH-2026-0001')
     await screen.findByText('VH-2026-0002')
@@ -122,7 +127,11 @@ describe('AdminOrdersPage (kit göçü) — integration + a11y', () => {
   })
 
   it('a11y ihlali yok (axe 0)', async () => {
-    const { container } = render(<AdminOrdersPage />)
+    const { container } = render(
+    <ConfirmProvider>
+      <AdminOrdersPage />
+    </ConfirmProvider>
+  )
     await screen.findByText('VH-2026-0001')
     const results = await testA11y(container)
     expect(results).toHaveNoViolations()

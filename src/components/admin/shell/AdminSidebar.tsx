@@ -36,11 +36,11 @@ import { useI18n } from '../../../i18n/I18nProvider'
 
 const NAV_ITEM_BASE =
   'group/navitem relative flex items-center gap-3 rounded-admin-sm px-3 h-9 text-sm ' +
-  'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60'
+  'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-accent/30'
 
-const NAV_ITEM_ACTIVE = 'bg-cyan-400/10 text-cyan-300'
-const NAV_ITEM_ANCESTOR = 'text-white/90'
-const NAV_ITEM_IDLE = 'text-white/60 hover:bg-white/5 hover:text-white'
+const NAV_ITEM_ACTIVE = 'bg-admin-accent-weak text-admin-accent'
+const NAV_ITEM_ANCESTOR = 'text-admin-fg'
+const NAV_ITEM_IDLE = 'text-admin-fg-muted hover:bg-admin-surface-2 hover:text-admin-fg'
 
 interface NavListProps {
   pathname: string
@@ -97,7 +97,7 @@ function NavList({ pathname, collapsed, canAccess, onNavigate }: NavListProps) {
       {groups.map((group) => (
         <div key={group.key}>
           {!collapsed && (
-            <h3 className="mb-2 px-3 text-xs font-medium uppercase tracking-wide text-white/40">
+            <h3 className="mb-2 px-3 text-xs font-medium tracking-wide text-admin-fg-muted">
               {t(group.labelKey)}
             </h3>
           )}
@@ -142,7 +142,7 @@ export function AdminSidebar({ pathname, collapsed, canAccess }: AdminSidebarPro
       <nav
         aria-label={t('admin.a11y.mainNavigation')}
         className={`fixed bottom-0 left-0 top-admin-header z-sticky ${width}
-          overflow-y-auto border-r border-white/10 bg-surface-deep
+          overflow-y-auto border-r border-admin-border bg-admin-bg
           transition-width duration-200 ease-linear`}
       >
         <NavList pathname={pathname} collapsed={collapsed} canAccess={canAccess} />
@@ -180,7 +180,7 @@ export function AdminMobileNav({
           // Radix `aria-modal` basmıyor (dist doğrulandı) → elle veriliyor.
           aria-modal="true"
           className="fixed inset-y-0 left-0 z-modal w-admin-drawer overflow-y-auto
-            border-r border-white/10 bg-surface-deep md:hidden"
+            border-r border-admin-border bg-admin-bg md:hidden"
         >
           <Dialog.Title className="sr-only">{t('admin.a11y.mainNavigation')}</Dialog.Title>
           <Dialog.Description className="sr-only">

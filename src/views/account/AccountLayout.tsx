@@ -1,4 +1,4 @@
-import { FileText, LayoutDashboard, MapPin, Package, RefreshCcw, Shield,Truck, User } from 'lucide-react'
+import { FileText, FolderKanban, Heart, LayoutDashboard, MapPin, Package, RefreshCcw, Shield,Truck, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
@@ -32,6 +32,14 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
         { to: routes.account.orders(), label: t('account.tabs.orders') || 'Siparişler', icon: <Package size={18} className="shrink-0" /> },
         { to: routes.account.shipments(), label: t('account.tabs.shipments') || 'Kargo Takibi', icon: <Truck size={18} className="shrink-0" /> },
         { to: routes.account.returns(), label: t('account.tabs.returns') || 'İadeler', icon: <RefreshCcw size={18} className="shrink-0" /> },
+        { to: routes.account.quotes(), label: t('account.tabs.quotes') || 'Tekliflerim', icon: <FileText size={18} className="shrink-0" /> },
+      ]
+    },
+    {
+      label: t('account.tabs.listsGroup'),
+      items: [
+        { to: routes.account.favorites(), label: t('account.tabs.favorites'), icon: <Heart size={18} className="shrink-0" /> },
+        { to: routes.account.projects(), label: t('account.tabs.projects'), icon: <FolderKanban size={18} className="shrink-0" /> },
       ]
     },
     {

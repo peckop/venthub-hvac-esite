@@ -321,7 +321,7 @@ const CouponsTableBody: React.FC = () => {
         header: t('admin.coupons.table.code'),
         sortable: true,
         cell: (r) => (
-          <span className="bg-cyan-500/10 px-3 py-1.5 rounded-lg border border-cyan-500/20 text-cyan-400 uppercase tracking-widest font-mono text-xs font-black">
+          <span className="bg-admin-accent-weak px-3 py-1.5 rounded-admin-md border border-admin-accent/30 text-admin-accent font-mono text-xs font-semibold">
             {r.code}
           </span>
         ),
@@ -331,7 +331,7 @@ const CouponsTableBody: React.FC = () => {
         header: t('admin.coupons.table.type'),
         hideable: true,
         cell: (r) => (
-          <span className={`uppercase tracking-widest font-black text-xs ${r.type === 'percent' ? 'text-blue-400' : 'text-emerald-400'}`}>
+          <span className={`font-semibold text-xs ${r.type === 'percent' ? 'text-admin-accent' : 'text-admin-success'}`}>
             {r.type === 'percent' ? t('admin.coupons.typeLabels.percent') : t('admin.coupons.typeLabels.fixed')}
           </span>
         ),
@@ -355,13 +355,13 @@ const CouponsTableBody: React.FC = () => {
             onClick={() => toggleActive(r)}
             disabled={!hasWriteAccess}
             aria-label={r.active ? t('admin.coupons.statusLabels.active') : t('admin.coupons.statusLabels.passive')}
-            className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-colors border ${
+            className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-bold transition-colors border ${
               r.active
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : 'bg-slate-500/10 text-slate-400 border-white/5 opacity-60'
-            } ${hasWriteAccess ? 'cursor-pointer hover:bg-white/5' : 'cursor-default'}`}
+                ? 'bg-admin-success-weak text-admin-success border-admin-success/30'
+                : 'bg-admin-surface-3 text-admin-fg-muted border-admin-border opacity-60'
+            } ${hasWriteAccess ? 'cursor-pointer hover:bg-admin-surface-2' : 'cursor-default'}`}
           >
-            <span className={`w-1 h-1 rounded-full ${r.active ? 'bg-emerald-500' : 'bg-slate-500'}`} />
+            <span className={`w-1 h-1 rounded-full ${r.active ? 'bg-admin-success' : 'bg-admin-surface-3'}`} />
             {r.active ? t('admin.coupons.statusLabels.active') : t('admin.coupons.statusLabels.passive')}
           </button>
         ),
@@ -371,9 +371,9 @@ const CouponsTableBody: React.FC = () => {
         header: t('admin.coupons.table.validity'),
         hideable: true,
         cell: (r) => (
-          <div className="flex flex-col gap-1 text-xs uppercase font-black tracking-widest">
-            <span className="text-white/80">{r.starts_at ? formatDateTime(r.starts_at, lang as 'tr' | 'en') : '-'}</span>
-            <span className="text-slate-500">
+          <div className="flex flex-col gap-1 text-xs font-semibold">
+            <span className="text-admin-fg">{r.starts_at ? formatDateTime(r.starts_at, lang as 'tr' | 'en') : '-'}</span>
+            <span className="text-admin-fg-muted">
               {r.ends_at ? formatDateTime(r.ends_at, lang as 'tr' | 'en') : t('admin.coupons.validity.unlimited')}
             </span>
           </div>
@@ -385,11 +385,11 @@ const CouponsTableBody: React.FC = () => {
         hideable: true,
         cell: (r) => (
           <div className="flex flex-col gap-1.5 w-24">
-            <div className="flex justify-between text-xs font-bold font-mono text-slate-400">
+            <div className="flex justify-between text-xs font-bold font-mono text-admin-fg-muted">
               <span>{r.used_count || 0}</span>
               <span>{r.usage_limit || '∞'}</span>
             </div>
-            <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+            <div className="h-1 w-full bg-admin-surface-2 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-colors duration-1000"
                 style={{ width: r.usage_limit ? `${Math.min(((r.used_count || 0) / r.usage_limit) * 100, 100)}%` : '0%' }}
@@ -404,7 +404,7 @@ const CouponsTableBody: React.FC = () => {
         sortable: true,
         hideable: true,
         cell: (r) => (
-          <span className="text-slate-500 text-xs font-black uppercase tracking-widest">
+          <span className="text-admin-fg-muted text-xs font-semibold">
             {formatDateTime(r.created_at, lang as 'tr' | 'en')}
           </span>
         ),
@@ -474,14 +474,14 @@ const CouponsTableBody: React.FC = () => {
     <div className="space-y-6">
       {/* create-form (inline, hardened, i18n) */}
       {hasWriteAccess && (
-        <div className={`${adminCardPaddedClass} glass-strong border-white/5 space-y-6`}>
-          <h2 className="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+        <div className={`${adminCardPaddedClass} bg-admin-surface border-admin-border space-y-6`}>
+          <h2 className="text-xs font-bold text-admin-accent flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-admin-accent" />
             {t('admin.coupons.create.sectionTitle')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-6 gap-5">
             <div className="flex flex-col gap-2">
-              <label htmlFor="coupon-code" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+              <label htmlFor="coupon-code" className="text-xs font-bold text-admin-fg-muted ml-1">
                 {t('admin.coupons.create.code')}
               </label>
               <input
@@ -492,16 +492,16 @@ const CouponsTableBody: React.FC = () => {
                   setErrors((errs) => ({ ...errs, code: '' }))
                 }}
                 placeholder={t('admin.coupons.create.codePlaceholder')}
-                className={`${adminInputClass} font-mono ${errors.code ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
+                className={`${adminInputClass} font-mono ${errors.code ? 'border-admin-danger/30 focus-visible:border-admin-danger/30 focus-visible:ring-admin-danger/30' : ''}`}
               />
               {errors.code && (
-                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                <span className="text-admin-danger text-xs font-bold ml-1 animate-in fade-in duration-200">
                   {t(errors.code)}
                 </span>
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <label htmlFor="coupon-type" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+              <label htmlFor="coupon-type" className="text-xs font-bold text-admin-fg-muted ml-1">
                 {t('admin.coupons.create.type')}
               </label>
               <select
@@ -511,19 +511,19 @@ const CouponsTableBody: React.FC = () => {
                   setForm((f) => ({ ...f, type: e.target.value as AllowedCouponType }))
                   setErrors((errs) => ({ ...errs, type: '' }))
                 }}
-                className={`${adminSelectClass} ${errors.type ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
+                className={`${adminSelectClass} ${errors.type ? 'border-admin-danger/30 focus-visible:border-admin-danger/30 focus-visible:ring-admin-danger/30' : ''}`}
               >
                 <option value="percent">{t('admin.coupons.create.typePercent')}</option>
                 <option value="fixed">{t('admin.coupons.create.typeFixed')}</option>
               </select>
               {errors.type && (
-                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                <span className="text-admin-danger text-xs font-bold ml-1 animate-in fade-in duration-200">
                   {t(errors.type)}
                 </span>
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <label htmlFor="coupon-value" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+              <label htmlFor="coupon-value" className="text-xs font-bold text-admin-fg-muted ml-1">
                 {t('admin.coupons.create.value')}
               </label>
               <input
@@ -535,16 +535,16 @@ const CouponsTableBody: React.FC = () => {
                   setErrors((errs) => ({ ...errs, value: '' }))
                 }}
                 placeholder="0"
-                className={`${adminInputClass} ${errors.value ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
+                className={`${adminInputClass} ${errors.value ? 'border-admin-danger/30 focus-visible:border-admin-danger/30 focus-visible:ring-admin-danger/30' : ''}`}
               />
               {errors.value && (
-                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                <span className="text-admin-danger text-xs font-bold ml-1 animate-in fade-in duration-200">
                   {t(errors.value)}
                 </span>
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <label htmlFor="coupon-starts" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+              <label htmlFor="coupon-starts" className="text-xs font-bold text-admin-fg-muted ml-1">
                 {t('admin.coupons.create.startsAt')}
               </label>
               <input
@@ -555,16 +555,16 @@ const CouponsTableBody: React.FC = () => {
                   setForm((f) => ({ ...f, starts_at: e.target.value }))
                   setErrors((errs) => ({ ...errs, starts_at: '', ends_at: '' }))
                 }}
-                className={`${adminInputClass} ${errors.starts_at ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
+                className={`${adminInputClass} ${errors.starts_at ? 'border-admin-danger/30 focus-visible:border-admin-danger/30 focus-visible:ring-admin-danger/30' : ''}`}
               />
               {errors.starts_at && (
-                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                <span className="text-admin-danger text-xs font-bold ml-1 animate-in fade-in duration-200">
                   {t(errors.starts_at)}
                 </span>
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <label htmlFor="coupon-ends" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+              <label htmlFor="coupon-ends" className="text-xs font-bold text-admin-fg-muted ml-1">
                 {t('admin.coupons.create.endsAt')}
               </label>
               <input
@@ -575,31 +575,31 @@ const CouponsTableBody: React.FC = () => {
                   setForm((f) => ({ ...f, ends_at: e.target.value }))
                   setErrors((errs) => ({ ...errs, ends_at: '', starts_at: '' }))
                 }}
-                className={`${adminInputClass} ${errors.ends_at ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
+                className={`${adminInputClass} ${errors.ends_at ? 'border-admin-danger/30 focus-visible:border-admin-danger/30 focus-visible:ring-admin-danger/30' : ''}`}
               />
               {errors.ends_at && (
-                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                <span className="text-admin-danger text-xs font-bold ml-1 animate-in fade-in duration-200">
                   {t(errors.ends_at)}
                 </span>
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <label htmlFor="coupon-active" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+              <label htmlFor="coupon-active" className="text-xs font-bold text-admin-fg-muted ml-1">
                 {t('admin.coupons.create.status')}
               </label>
-              <div className="flex items-center gap-3 px-4 h-10 glass-strong border-white/10 rounded-xl">
+              <div className="flex items-center gap-3 px-4 h-10 bg-admin-surface border-admin-border rounded-admin-md">
                 <input
                   id="coupon-active"
                   type="checkbox"
                   checked={!!form.active}
                   onChange={(e) => setForm((f) => ({ ...f, active: e.target.checked }))}
-                  className="w-4 h-4 rounded border-white/10 bg-slate-800 text-cyan-500 focus-visible:ring-cyan-500/20"
+                  className="w-4 h-4 rounded border-admin-border bg-admin-surface-3 text-admin-accent focus-visible:ring-admin-accent/30"
                 />
-                <span className="text-sm font-medium text-slate-300">{t('admin.coupons.create.active')}</span>
+                <span className="text-sm font-medium text-admin-fg">{t('admin.coupons.create.active')}</span>
               </div>
             </div>
             <div className="md:col-span-4 flex flex-col gap-2">
-              <label htmlFor="coupon-limit" className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">
+              <label htmlFor="coupon-limit" className="text-xs font-bold text-admin-fg-muted ml-1">
                 {t('admin.coupons.create.usageLimit')}
               </label>
               <input
@@ -615,10 +615,10 @@ const CouponsTableBody: React.FC = () => {
                   })
                 }
                 placeholder={t('admin.coupons.create.usageLimitPlaceholder')}
-                className={`${adminInputClass} ${errors.usage_limit ? 'border-rose-500/50 focus:border-rose-500/50 focus:ring-rose-500/10' : ''}`}
+                className={`${adminInputClass} ${errors.usage_limit ? 'border-admin-danger/30 focus-visible:border-admin-danger/30 focus-visible:ring-admin-danger/30' : ''}`}
               />
               {errors.usage_limit && (
-                <span className="text-rose-400 text-xs font-bold ml-1 animate-in fade-in duration-200">
+                <span className="text-admin-danger text-xs font-bold ml-1 animate-in fade-in duration-200">
                   {t(errors.usage_limit)}
                 </span>
               )}

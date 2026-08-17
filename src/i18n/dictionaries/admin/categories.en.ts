@@ -109,6 +109,7 @@ export const categories = {
   },
   nameRequired: 'Category name is required',
   slugRequired: 'Slug is required',
+  sortOrderInvalid: 'Sort order must be a whole number',
   unsavedChangesConfirm: 'You have unsaved changes. Are you sure you want to leave this page?',
 };
 

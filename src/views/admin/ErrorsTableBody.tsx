@@ -187,7 +187,7 @@ const ErrorsTableBody: React.FC = () => {
         header: t('admin.errors.table.date'),
         sortable: true,
         cell: (r) => (
-          <span className="text-slate-400 text-xs font-black uppercase tracking-widest">
+          <span className="text-admin-fg-muted text-xs font-semibold">
             {formatDateTime(r.at, lang as 'tr' | 'en')}
           </span>
         ),
@@ -200,10 +200,10 @@ const ErrorsTableBody: React.FC = () => {
           <span
             className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${
               r.level === 'error'
-                ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20'
+                ? 'bg-admin-danger text-admin-danger ring-1 ring-admin-danger/30'
                 : r.level === 'warn'
-                  ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-600/20'
-                  : 'bg-sky-50 text-sky-700 ring-1 ring-sky-600/20'
+                  ? 'bg-admin-warning text-admin-warning ring-1 ring-admin-warning/30'
+                  : 'bg-admin-accent text-admin-accent ring-1 ring-admin-accent/30'
             }`}
           >
             {r.level || 'error'}
@@ -213,13 +213,13 @@ const ErrorsTableBody: React.FC = () => {
       {
         key: 'message',
         header: t('admin.errors.table.message'),
-        cell: (r) => <span className="text-slate-200 text-xs">{r.message}</span>,
+        cell: (r) => <span className="text-admin-fg text-xs">{r.message}</span>,
       },
       {
         key: 'url',
         header: t('admin.errors.table.url'),
         hideable: true,
-        cell: (r) => <span className="text-slate-500 text-xs font-mono">{r.url || '-'}</span>,
+        cell: (r) => <span className="text-admin-fg-muted text-xs font-mono">{r.url || '-'}</span>,
       },
     ],
     [t, lang],
@@ -241,26 +241,26 @@ const ErrorsTableBody: React.FC = () => {
       renderExpandedRow={(r) => (
         <div className="grid md:grid-cols-2 gap-6 text-xs">
           <div>
-            <div className="font-black text-slate-500 mb-3 uppercase tracking-widest">{t('admin.errors.labels.stack')}</div>
-            <pre className="bg-surface-deep/80 text-amber-300/80 font-mono p-4 rounded-2xl border border-white/5 overflow-auto max-h-80 leading-relaxed custom-scrollbar">
+            <div className="font-semibold text-admin-fg-muted mb-3">{t('admin.errors.labels.stack')}</div>
+            <pre className="bg-surface-deep/80 text-admin-warning font-mono p-4 rounded-admin-lg border border-admin-border overflow-auto max-h-80 leading-relaxed custom-scrollbar">
               {String(r.stack || '').slice(0, 8000)}
             </pre>
           </div>
           <div className="space-y-6">
             <div>
-              <div className="font-black text-slate-500 mb-3 uppercase tracking-widest">{t('admin.errors.detailsTitle')}</div>
-              <div className="space-y-3 bg-surface-deep/40 p-4 rounded-2xl border border-white/5">
-                <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                  <span className="text-slate-500 uppercase font-bold tracking-tighter">{t('admin.errors.labels.ua')}</span>
-                  <span className="text-slate-300 font-mono text-xs text-right ml-4">{r.user_agent || '-'}</span>
+              <div className="font-semibold text-admin-fg-muted mb-3">{t('admin.errors.detailsTitle')}</div>
+              <div className="space-y-3 bg-surface-deep/40 p-4 rounded-admin-lg border border-admin-border">
+                <div className="flex justify-between items-center border-b border-admin-border pb-2">
+                  <span className="text-admin-fg-muted font-bold tracking-tighter">{t('admin.errors.labels.ua')}</span>
+                  <span className="text-admin-fg font-mono text-xs text-right ml-4">{r.user_agent || '-'}</span>
                 </div>
-                <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                  <span className="text-slate-500 uppercase font-bold tracking-tighter">{t('admin.errors.labels.release')}</span>
-                  <span className="text-cyan-400 font-black tracking-widest">{r.release || '-'}</span>
+                <div className="flex justify-between items-center border-b border-admin-border pb-2">
+                  <span className="text-admin-fg-muted font-bold tracking-tighter">{t('admin.errors.labels.release')}</span>
+                  <span className="text-admin-accent font-semibold">{r.release || '-'}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-500 uppercase font-bold tracking-tighter">{t('admin.errors.labels.env')}</span>
-                  <span className="text-amber-400 font-black tracking-widest">{r.env || '-'}</span>
+                  <span className="text-admin-fg-muted font-bold tracking-tighter">{t('admin.errors.labels.env')}</span>
+                  <span className="text-admin-warning font-semibold">{r.env || '-'}</span>
                 </div>
               </div>
             </div>
@@ -295,7 +295,7 @@ const ErrorsTableBody: React.FC = () => {
                 title={t('admin.errors.envTitle') as string}
               >
                 {envOptions.map((o) => (
-                  <option key={o.value || 'all'} value={o.value} className="bg-surface-deep">
+                  <option key={o.value || 'all'} value={o.value} className="bg-admin-bg">
                     {o.label}
                   </option>
                 ))}

@@ -23,6 +23,8 @@ export const common = {
   passive: 'Pasif',
   all: 'Tümü',
   view: 'Görünüm',
+  export: 'Dışa Aktar',
+  noOptions: 'Seçenek bulunamadı',
   save: 'Kaydet',
   total: 'Toplam',
   copyright: '© 2026 VentHub Platinum',

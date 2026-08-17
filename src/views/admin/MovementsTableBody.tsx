@@ -309,7 +309,7 @@ const MovementsTableBody: React.FC = () => {
         header: t('admin.movements.table.date'),
         sortable: true,
         cell: (m) => (
-          <span className="font-black text-slate-400 text-xs uppercase tracking-widest">
+          <span className="font-semibold text-admin-fg-muted text-xs">
             {formatDateTime(m.created_at, lang as 'tr' | 'en')}
           </span>
         ),
@@ -320,9 +320,9 @@ const MovementsTableBody: React.FC = () => {
         sortable: true,
         cell: (m) => (
           <div className="flex flex-col gap-0.5">
-            <span className="font-black text-white uppercase tracking-tight">{m.product?.name || m.product_id}</span>
+            <span className="font-semibold text-admin-fg tracking-tight">{m.product?.name || m.product_id}</span>
             {m.product?.sku && (
-              <span className="text-xs font-black text-slate-500 tracking-widest bg-white/5 w-fit px-2 py-0.5 rounded uppercase">
+              <span className="text-xs font-semibold text-admin-fg-muted bg-admin-surface-2 w-fit px-2 py-0.5 rounded">
                 {m.product.sku}
               </span>
             )}
@@ -339,12 +339,12 @@ const MovementsTableBody: React.FC = () => {
           const deltaText = m.delta > 0 ? `+${m.delta}` : `${m.delta}`
           return (
             <span
-              className={`inline-flex items-center gap-1 text-xs font-black font-mono px-3 py-1.5 rounded-xl border uppercase tracking-widest ${
+              className={`inline-flex items-center gap-1 text-xs font-semibold font-mono px-3 py-1.5 rounded-admin-md border ${
                 m.delta > 0
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  ? 'bg-admin-success-weak text-admin-success border-admin-success/30'
                   : m.delta < 0
-                    ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
-                    : 'bg-white/5 text-slate-500 border-white/5'
+                    ? 'bg-admin-danger-weak text-admin-danger border-admin-danger/30'
+                    : 'bg-admin-surface-2 text-admin-fg-muted border-admin-border'
               }`}
             >
               {m.delta > 0 ? <ArrowUpRight size={10} strokeWidth={3} /> : m.delta < 0 ? <ArrowDownRight size={10} strokeWidth={3} /> : null}
@@ -359,8 +359,8 @@ const MovementsTableBody: React.FC = () => {
         sortable: true,
         hideable: true,
         cell: (m) => (
-          <div className="flex items-center gap-2 uppercase font-black text-xs tracking-widest text-brand-cyan">
-            <div className="w-1 h-1 rounded-full bg-cyan-500/50" />
+          <div className="flex items-center gap-2 font-semibold text-xs text-brand-cyan">
+            <div className="w-1 h-1 rounded-full bg-admin-accent-weak" />
             {reasonLabel(m.reason, t)}
           </div>
         ),
@@ -373,11 +373,11 @@ const MovementsTableBody: React.FC = () => {
         cell: (m) => {
           const orderRef = m.order_id ? `#${m.order_id.slice(-8).toUpperCase()}` : ''
           return m.order_id ? (
-            <span className="bg-white/5 px-2 py-1 rounded border border-white/5 font-black font-mono text-white/60 text-xs uppercase tracking-hvac-tight">
+            <span className="bg-admin-surface-2 px-2 py-1 rounded border border-admin-border font-semibold font-mono text-admin-fg-muted text-xs tracking-hvac-tight">
               {orderRef}
             </span>
           ) : (
-            <span className="font-black font-mono text-white/60 text-xs">-</span>
+            <span className="font-semibold font-mono text-admin-fg-muted text-xs">-</span>
           )
         },
       },
@@ -413,11 +413,11 @@ const MovementsTableBody: React.FC = () => {
   return (
     <div className="space-y-6">
       {batchVal && (
-        <div className="p-4 glass-strong border border-amber-500/20 rounded-2xl text-sm text-amber-400 flex items-center justify-between">
+        <div className="p-4 bg-admin-surface border border-admin-warning/30 rounded-admin-lg text-sm text-admin-warning flex items-center justify-between">
           <span className="font-bold flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+            <div className="w-1.5 h-1.5 rounded-full bg-admin-warning animate-pulse" />
             {t('admin.movements.batchFilterPrefix')}{' '}
-            <span className="font-mono text-white ml-1 tracking-wider">{batchVal}</span>
+            <span className="font-mono text-admin-fg ml-1">{batchVal}</span>
           </span>
           <button
             type="button"

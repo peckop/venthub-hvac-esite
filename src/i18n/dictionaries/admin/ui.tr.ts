@@ -14,6 +14,8 @@ export const ui = {
   hide: 'Gizle',
   loading: 'Yükleniyor…',
   loadingShort: 'Yükleniyor…',
+  /** InfoTooltip tetikleyicisinin erişilebilir adı — ikon tek başına ad taşımaz. */
+  moreInfo: 'Daha fazla bilgi',
   next: 'Sonraki',
   noRecords: 'Kayıt yok',
   pageLabel: 'Sayfa {{page}} / {{pages}}',

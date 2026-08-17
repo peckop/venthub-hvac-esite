@@ -39,7 +39,7 @@ export const DistanceSalesAgreementContentTr: React.FC<{ lang: string }> = ({ la
         <h2 className="text-xl font-semibold text-industrial-gray mb-3">5) Ürün/Bedel ve Ödeme Koşulları</h2>
         <p>Ürün/hizmetin cinsi ve türü, miktarı, tüm vergiler dâhil satış fiyatı ve ödeme bilgileri Tüketici tarafından onaylanan Sipariş Özetinde yer almaktadır. Ödemeler kredi/banka kartı ile <strong>iyzico</strong> ödeme altyapısı üzerinden alınır; kart bilgileri Satıcı tarafından saklanmaz.</p>
         <p className="text-sm mt-2"><strong>Fiyat/stok hatası:</strong> sistem, dizgi veya besleme kaynaklı bariz maddi hata sonucu gerçek değerinden açıkça farklı bir fiyatın gösterilmesi ya da ürünün stokta bulunmaması hâlinde Satıcı, Tüketiciyi derhâl bilgilendirerek siparişi iptal edebilir ve tahsil edilmiş bedeli <strong>{legalConfig.refundTime}</strong> içinde eksiksiz iade eder. Bu hâlde Tüketicinin ek bir talep hakkı doğmaz.</p>
-        <p className="text-sm mt-2">Fatura, Tüketicinin beyan ettiği fatura bilgilerine göre düzenlenir ve elektronik ortamda (e-arşiv/e-fatura) iletilebilir.</p>
+        <p className="text-sm mt-2">Fatura, Tüketicinin beyan ettiği fatura bilgilerine göre düzenlenir ve en geç <strong>{legalConfig.invoiceDeliveryTime}</strong> içinde, siparişte belirtilen e-posta adresine elektronik ortamda (e-arşiv/e-fatura) iletilir. Fatura bilgilerinin eksik veya hatalı beyan edilmiş olması hâlinde Satıcı, faturanın düzenlenebilmesi için Tüketiciyle iletişime geçer; bu süre zarfında sevkiyat bekletilebilir.</p>
       </section>
 
       <section>

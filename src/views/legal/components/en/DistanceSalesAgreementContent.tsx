@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import legalConfig from '@/config/legal'
+import { legalConfigEn as legalConfig } from '@/config/legal'
 import { localizedHref, Routes } from '@/utils/routes'
 
 export const DistanceSalesAgreementContentEn: React.FC<{ lang: string }> = ({ lang }) => {
@@ -39,7 +39,7 @@ export const DistanceSalesAgreementContentEn: React.FC<{ lang: string }> = ({ la
         <h2 className="text-xl font-semibold text-industrial-gray mb-3">5) Goods, Price and Payment</h2>
         <p>The type, quantity, sales price including all taxes and payment details of the product/service are set out in the Order Summary approved by the Consumer. Payments are collected by credit/debit card through the <strong>iyzico</strong> payment infrastructure; card details are not stored by the Seller.</p>
         <p className="text-sm mt-2"><strong>Pricing/stock errors:</strong> where a manifest material error in the system, typesetting or data feed results in a price clearly different from the actual value, or where the product is out of stock, the Seller may cancel the order after notifying the Consumer without delay and shall refund any amount collected in full within <strong>{legalConfig.refundTime}</strong>. No further claim arises for the Consumer in such a case.</p>
-        <p className="text-sm mt-2">The invoice is issued according to the billing details declared by the Consumer and may be delivered electronically (e-archive/e-invoice).</p>
+        <p className="text-sm mt-2">The invoice is issued according to the billing details declared by the Consumer and is delivered electronically (e-archive/e-invoice) to the e-mail address given with the order within <strong>{legalConfig.invoiceDeliveryTime}</strong> at the latest. Where the billing details are incomplete or incorrect, the Seller contacts the Consumer so that the invoice can be issued; shipment may be held during that period.</p>
       </section>
 
       <section>

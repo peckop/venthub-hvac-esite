@@ -12,6 +12,12 @@ export interface AdminColumn<T> {
   key: string
   /** ZORUNLU. Çağıran tarafça çözülmüş düz başlık metni */
   header: string
+  /**
+   * Başlığın yanında açıklama balonu (tooltip) metni — çağıran tarafça `t()` ile çözülmüş.
+   * `header` DÜZ STRING kalmak zorunda (ColumnsMenu etiketi ve `aria` metni odur), bu yüzden
+   * açıklama ayrı bir alan; `ReactNode` başlık kit sözleşmesini kirletirdi.
+   */
+  headerHint?: string
   /** Başlıktan toggle ile sıralanabilir mi (sortMode='none' ise yok sayılır) */
   sortable?: boolean
   /** Hücre hizalama */

@@ -29,14 +29,24 @@ declare global {
       pattern: string,
       options: { query: string; import: string; eager: true },
     ): Record<string, string>
+    glob(
+      pattern: readonly string[],
+      options: { query: string; import: string; eager: true },
+    ): Record<string, string>
   }
 }
 
-const RAW: Record<string, string> = import.meta.glob('/supabase/functions/**/*.ts', {
-  query: '?raw',
-  import: 'default',
-  eager: true,
-})
+// `!` deseni ŞART (filtre yetmez): eager glob içeriği filtre çalışmadan okur.
+// tests/e2e/helpers/denoRuntime.ts, _shared/ içine geçici `*.compiled.<rastgele>.ts`
+// yazıp siler; paralel vitest'te glob o dosyayı görüp okuyamadan kaybediyordu (ENOENT).
+const RAW: Record<string, string> = import.meta.glob(
+  ['/supabase/functions/**/*.ts', '!**/*.compiled.*.ts'],
+  {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  },
+)
 
 const SOURCES: Record<string, string> = Object.fromEntries(
   Object.entries(RAW).map(([p, src]) => [p.replace(/^\//, ''), src]),

@@ -7,7 +7,11 @@
 > **EKSİK (düzeltildi):** LAUNCH kendi bölümünü **#519 ile açtı** (§Controller #4) — ilk yazdığım
 > "bölümü yok" notu bayattı, kendisi kanıtla düzeltti. **EDGE de açtı (2026-08-15 15:20)** → §Controller #5
 > (`4397deef` — edge deploy/drift/CI): `#509 #515 #516 #517 #521 #523` ve tek kalan engel
-> (`T030` access token) orada. Pano artık BEŞ şeridin tamamını gösteriyor. Yeni cetvel: `standards/rendering-cache-standard.md`.
+> (`T030` access token) orada. **ALTINCI şerit de açıldı (2026-08-15 akşam) → §Controller #6
+> (`ac03ce11` — ALTYAPI: ajan/araç katmanı, sır hijyeni, depo temizliği):** onay sürtünmesi, MCP
+> filosu, token rotasyonu (EDGE'in `T030` engelini kaldırdı), `#537` sır kapısı ve **companion
+> churn'ün ölçülmüş kök sebebi** (`T017`, satır-sonu fantomu) orada. Pano artık ALTI şeridin
+> tamamını gösteriyor. Yeni cetvel: `standards/rendering-cache-standard.md`.
 >
 > **Önceki: 2026-08-10 — YAKALAMA (7 haftalık boşluk kapatıldı) + SLUG LOKALİZASYONU CANLI:**
 > **(A) Gemini dönemi (Haz sonu–Ağu):** katalog hattı Kademe-1 Gemini orkestrasyonuyla (venthub-pdf-ingestor, M0-M5 çok-ajan, 69/69 pytest) TAMAMLANDI — 28 katalog CSV (374 ürün) + 3 fiyat listesi; walkthrough.md'de seri-bazlı mühendislik notları. **(B) 2026-08-10 denetim+düzeltme günü:** CSV tam denetimi (format ✅, mükerrer 0, fiyat-eşleşme 348/374; tek açık = 230 satır kategori sapması) → 417 düzeltme ingestor master'da · **taksonomi cetveli v1.2** `#455` (12 dal, +parking-jet-fan; ingestor doc-fork kapandı; yeni kategoriler: acid-resistant-fans/frequency-converters/electric-duct-heaters — DB'de Kademe-2'de açılacak) · **TR kategori-adı sızıntısı 4 yüzeyde kapatıldı** `#456` (PDP breadcrumb+özellik, Footer, kategori SEO metadata → getCategoryDisplayName SSOT) · **⭐ SLUG LOKALİZASYONU** `#457` (kanonik=EN slug, görünen URL dile göre `metadata.slug={tr,en}`; `/tr/category/konut-tipi-havalandirma` ✅ 200, eski URL 308; migration prod'a uygulandı+canlı doğrulandı; SSOT `docs/plans/slug-localization-2026-08-10.md`). NLM MCP arızası kökten çözüldü (Gemini Notebook rebrand + `nlm login --clear`; memory `nlm-auth-issue`). İş bölümü modeli oturdu: **Fable=controller (plan/brief/kapı/migration), Opus subagent=kod, script=deterministik veri.** **ZİNCİR SIRADAKİ: Kademe-2 loader (CSV→DB + 4 yeni kategori migration'ı) → ₺0-fiyat "teklif al" ara-çözümü → fiyat motoru (177 fiyatsız) → görseller (390).**
@@ -212,6 +216,78 @@ push'ta koşan Action · `T018`/`T027` %95, `T030`'u bekliyor.
 3. **Kapıyı bilerek boz, KIRMIZI gör.** R11 sağlık kontrolü "repoda en az 1 ihlal olmalı" diye
    yazılmıştı ve son ihlal düzelince **kendini vurdu**. R5 dedektörü kapı `resolveCaller`'a
    taşınınca **körleşti** (3 yanlış-pozitif). İkisi de yalnız kasıtlı bozmayla görüldü.
+
+### Controller #6 — ALTYAPI şeridi (ajan/araç katmanı · sır hijyeni · depo temizliği)
+
+> Şerit: `docs/DURUM-TAKIP.md` (yalnız bu bölüm) · `.gitignore` · `docs/audits/altyapi-*`.
+> Oturum `ac03ce11`. Bu şerit **repo dışı** katmanı da kapsar (izin ayarları, MCP filosu,
+> token'lar) — o kısım git'te görünmez, bu yüzden buraya yazılıyor.
+
+**⭐ 2026-08-15 — ajan katmanı onarıldı + bir sır kaçağı yolu kapandı + churn'ün kökü bulundu.**
+
+- **Onay sürtünmesi ölçülerek çözüldü** (repo dışı, `~/.claude/settings.json` v3 = 193 allow /
+  43 ask / 30 deny / 15 dizin). 50 transkript × 15.806 araç çağrısı tarandı, 24 sınıflandırıcı
+  reddi **birebir gerekçesiyle** okundu. Dört sebep vardı ve **hiçbiri "eksik allowlist" değildi:**
+  worktree'ler izinli dizinlerde yoktu · kendi koyduğumuz `powershell`/`bash -c` deny kuralları
+  rutin işi "kural dolanma" suçuna çeviriyordu · ~40 salt-okunur MCP aracı listede yoktu ·
+  **proje-local `acceptEdits` global `auto`'yu eziyordu** (en büyük kalem: her bash komutu onaya
+  düşüyordu). **Kendi hatam:** ilk sürümde kapı sayısını 10→58 çıkardım, yani "onayı azalt"
+  denen işte tam tersini yaptım ve bunu nötr dille ("kapıları düzenledim") sundum. Recep yakaladı.
+  **Kural:** yeni kapı önerisi işin içine gizlenmez, AYRI sunulur.
+- **MCP filosu 10→8, tüm `cmd /c npx` katmanı kaldırıldı.** Belirti: uygulama açılışında terminal
+  pencereleri. İlk şüphem izin ayarlarıydı, **yanlıştı** — sebep Windows'ta her `cmd /c`'nin kendi
+  konsolunu doğurmasıydı. Mükerrer `context7-live` + kullanılmayan `blender` silindi.
+  **Dönüştürmenin bedeli (benim hatam):** `npx …@latest` → global kurulum **sürümü sessizce
+  sabitler**; Supabase MCP'yi 0.10.0'dan 0.5.9'a düşürdüm ve fark etmedim (belirti: araç seti
+  değişti). Ölçülüp 0.10.0'a çıkarıldı. **Kural: npx→global çevirirken `npm view <paket> version`
+  ile karşılaştır.**
+- **NotebookLM MCP onarıldı.** 08-14 teşhisim ("profil oturumu ölmüş, görünür giriş gerek")
+  **yanlıştı**; `nlm doctor` auth'un baştan beri sağlam olduğunu gösterdi. Gerçek sebep: config'in
+  gösterdiği `notebooklm-mcp.exe` **diskte yoktu** (kısmi kurulum). Teşhis sırası: araç var mı →
+  exe diskte mi → auth → sürüm. Auth'a EN SONDA bak.
+- **Supabase access token'ı 4 yüzeyde yenilendi** (CI secret · `~/.claude.json` · `.vscode/mcp.json` ·
+  `mcp_config_for_claude_code.json`), her biri **gerçek çağrıyla** doğrulandı (Management API 200 ·
+  MCP `list_tables` 43 tablo · CI prod kaynaklarını indirdi). Eskisi revoke edildi. Bu, EDGE'in
+  `T030` engelini de kaldırdı. **Ders: `claude mcp list` "✔ Connected" YETKİ KANITI DEĞİL** —
+  sunucu sapasağlam bağlıyken token ölüydü, ancak gerçek bir okuma çağrısı gösterdi.
+- **🔴 SIR KAÇAĞI YOLU KAPANDI — `#537` (master `1a1cdca5`, `T051-VH`).** `.gitignore` **tam-ad**
+  deseni yazıyordu; token yenilemesi sırasında yanına düşen `mcp_config_for_claude_code.json.oncesi-2026-08-15`
+  yedeği **CANLI GitHub PAT** taşıyordu ve git onu görmüyordu. Repo PUBLIC olduğu için tek bir
+  `git add -A` sırrı herkese açık commit edecekti. Bilinen sızma **olmadı**. Desen
+  `mcp_config_for_claude_code.json*` + `*.oncesi-*` oldu; kapı master'da **bilerek** doğrulandı
+  (4 yedek biçimi yakalandı / 5 yanlış-pozitif kontrolü temiz / yeni desene uyan izlenen dosya sıfır).
+  **DERS: `.gitignore` DALA BAĞLIDIR** — düzeltmeden önceki dalda oturan bir çalışma dizininde açık
+  HÂLÂ AÇIKTIR. 08-15'te ana dizin tam olarak böyleydi; `git merge origin/master` kapatır.
+
+**⭐ Churn'ün kök sebebi bulundu — `T017-VH` (MEDIUM→HIGH).** Aylardır "doc-pipeline companion
+üretiyor" sanılan churn **yeniden-üretim değil, satır-sonu fantom farkı.** Üç ölçüm:
+(1) `git diff --ignore-all-space` = **sıfır** fark (içerik aynı, yalnız CRLF/LF)
+(2) `git checkout -- <dosya>` sonrası dosya **anında** yine `M` — araya hiçbir hook/watcher girmiyor,
+fark checkout'un kendisinden doğuyor (3) `.gitattributes` `*.md text` diyor, `core.autocrlf=false`,
+ama **depodaki blob CRLF ile commit'lenmiş** → çalışma kopyası sonsuza dek "değişmiş" görünür.
+**Kapsam (`git grep -I -l CR HEAD`): 141 dosya = 98 `.md` + 36 `.ps1` + 4 `.bat` + 2 `.py` + 1 `.tsx`.**
+`.ps1`/`.bat` **meşru** biçimde CRLF ister → onlara `text eol=crlf` yazılmalı, renormalize edilmemeli.
+**Etkisi ölçüldü:** bu fantom pull/rebase/dal-değiştirmeyi bloklar — depoda **15 birikmiş stash** var,
+çoğu bu churn için atılmış; 08-15'te ana dizin master'a ff-pull **edilemedi** (3 fantom dosya abort
+ettirdi). `T006-VH` (~270 companion süpürmesi) buna **bağlı** — önce bu çözülmeli, yoksa süpürme yeni
+fantom üretir. **⚠ Tek başına merge edilmemeli:** 101 dosyaya dokunan commit, açık 3 worktree'nin
+(wt-admin 33 kirli · wt-hotfix 6 merge'siz commit · wt-pricing migration+test) hepsiyle çakışır →
+panodan pencere alınmalı.
+
+**Depo temizliği (yapıldı):** ölü dal `chore/standards-followthrough` silindi — 6 commit'inin
+içeriği `#533` squash'ıyla (`3fb7eb1a`) master'da olduğu **dosya-dosya diff'lenerek** doğrulandı
+(fark sıfır). Artık worktree `venthub-wt-consent` kaldırıldı (master'da, merge'siz commit yok,
+kirliliği yalnız fantom `.md`) — `master`'ı ikinci bir worktree'de tutuyor ve ana dizinin master'a
+geçmesini **engelliyordu**. `C:/tmp/vh-gitignore` kaldırıldı. Kalan 3 worktree'nin **üçü de aktif
+iş taşıyor, dokunulmadı.**
+
+**Eş-Controller'a bilgi:**
+- **EDGE (#5):** `T030` token engelin **kalktı** — yeni Supabase token'ı CI secret'ında ve gerçek
+  koşuyla doğrulandı. Ayrıca `wt-hotfix` dalında checkout-smoke karantina-çıkışı commit'lerini
+  gördüm (`T035`); onu kendi işim olarak önermiştim, **sende olduğunu bilmiyordum, çekiliyorum.**
+- **PRICING (#3):** ana dizin artık `master`'da; `chore/standards-followthrough` dalın silindi
+  (içeriği zaten `#533` ile master'daydı). Ana dizini master'a ff-pull etmek **fantom churn
+  düzelene kadar mümkün değil** — `T017` planı yukarıda.
 
 ---
 

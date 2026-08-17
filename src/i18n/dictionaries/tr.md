@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\tr.ts
-skeleton_hash: a3a09822f59e06f5
+source_path: C:\Users\alize\venthub-wt-quote\src\i18n\dictionaries\tr.ts
+skeleton_hash: 2c51dfbdea616816
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-08-14T06:44:25Z
+generated_at: 2026-08-16T11:27:49Z
 ---
 
 ## Genel Bakış
@@ -36,7 +36,7 @@ Bu modül saf bir statik veri modülüdür (sözlük/taslak) — çalıştırıl
 - **tr** (object) — `{
   common: {
     paginationLabel: 'Sayfalama',
-    paginationPrevious: 'Önce...`
+    paginationPrevious: 'Ö...`
 
 ---
 

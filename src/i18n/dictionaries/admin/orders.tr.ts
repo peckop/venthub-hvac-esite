@@ -17,6 +17,10 @@ export const orders = {
         refunded: 'İade Edildi',
         partialRefunded: 'Kısmi İade'
       },
+      customerFilter: {
+        active: 'Liste tek bir müşteriye göre filtrelenmiş.',
+        clear: 'Filtreyi kaldır'
+      },
       table: {
         orderId: 'Sipariş No',
         status: 'Durum',
@@ -40,7 +44,13 @@ export const orders = {
         confirmCancelShipping: '{{count}} siparişin kargosunu iptal etmek istediğinize emin misiniz?',
         cancelSuccess: '{{count}} sipariş kargosu iptal edildi',
         cancelPartialFail: 'Bazı iptaller başarısız oldu: {{failed}}',
-        cancelFailed: 'Toplu iptal başarısız oldu'
+        cancelFailed: 'Toplu iptal başarısız oldu',
+        duplicateTracking: {
+          title: 'Aynı takip numarası paylaşılıyor',
+          description: '{{count}} sipariş aynı takip numarasını taşıyacak. Bu siparişler tek bir birleştirilmiş koliyle mi gönderiliyor?',
+          confirmLabel: 'Evet, birleştirilmiş gönderi',
+          cancelLabel: 'Hayır, numaraları düzelteyim'
+        }
       },
       export: {
         csvLabel: 'CSV (Excel uyumlu UTF-8)',
@@ -71,16 +81,31 @@ export const orders = {
         shipping: {
           title: 'Kargo / Takip No',
           bulkTitle: 'Toplu Kargo İşlemi',
+          description: 'Kargo firmasını ve takip numarasını girin; dilerseniz müşteriye bildirim e-postası gönderilir.',
+          close: 'Kapat',
           carrierLabel: 'Kargo Firması',
           carrierSelect: 'Seçiniz...',
           trackingLabel: 'Takip Numarası',
           trackingPlaceholder: 'Kargo Takip No',
           sendEmailLabel: 'Müşteriye e-posta bildirimi gönder',
+          bulkDescription: 'Taşıyıcı tüm seçili siparişler için ortaktır. Takip numarasını HER SİPARİŞ İÇİN AYRI girin — tek numarayı hepsine yazmak, her müşteriye başkasının kolisinin takip linkini gönderir.',
           advancedLabel: 'Gelişmiş: Sipariş bazlı kargo',
           advancedTable: {
             orderId: 'Sipariş',
             carrier: 'Kargo',
             tracking: 'Takip No'
+          },
+          bulkList: {
+            heading: 'Sipariş başına takip numarası',
+            orderColumn: 'Sipariş',
+            trackingColumn: 'Takip Numarası',
+            trackingAriaLabel: '{{order}} siparişinin takip numarası',
+            noTargets: 'Seçimde kargolanabilecek sipariş yok (kargoya verilmiş siparişler atlanır).'
+          },
+          errors: {
+            carrierRequired: 'Taşıyıcı seçilmelidir.',
+            trackingRequired: 'Bu sipariş için takip numarası zorunludur.',
+            missingSummary: '{{count}} siparişin takip numarası eksik.'
           },
           carriers: {
             yurtici: 'Yurtiçi',
@@ -99,6 +124,7 @@ export const orders = {
         },
         logs: {
           title: 'E-posta Kayıtları',
+          description: 'Bu siparişe gönderilen kargo bildirim e-postalarının kaydı. Panel açıkken listeyle çalışmaya devam edebilirsiniz.',
           orderLabel: 'Sipariş:',
           table: {
             date: 'Tarih',
@@ -113,6 +139,7 @@ export const orders = {
         },
         notes: {
           title: 'Sipariş Notları',
+          description: 'Bu siparişe iliştirilen dahili notlar. Notlar müşteriye gösterilmez.',
           inputPlaceholder: 'Yeni bir not yazın...',
           add: 'Ekle',
           adding: 'Ekleniyor...',
@@ -139,6 +166,7 @@ export const orders = {
         shippingUpdateFailed: 'Kargo bilgisi güncellenemedi',
         bulkShippingSuccess: '{{count}} sipariş kargoya verildi',
         bulkShippingFailed: 'Toplu kargo güncellemesi başarısız',
+        bulkShippingPartialFailed: '{{count}} sipariş kargoya verilemedi: {{orders}}',
         missingFields: 'Kargo firması ve takip no zorunludur',
         missingAdvancedFields: 'Eksik alanlar: {{count}} satır'
       },
@@ -166,7 +194,13 @@ export const orders = {
         messages: {
           cancelledOrRefunded: 'Sipariş iptal veya iade edilmiş.',
           updateSuccess: 'Sipariş durumu başarıyla güncellendi.',
-          updateError: 'Durum güncellenirken hata oluştu.'
+          updateError: 'Durum güncellenirken hata oluştu.',
+          invalidTransition: '{{from}} → {{to}} geçişi yapılamaz. Sipariş durumu yalnız ileri taşınabilir.',
+          stockRestoreFailed: 'Sipariş güncellendi ama STOK GERİ VERİLEMEDİ: {{error}} — envanteri elle düzeltin.'
+        },
+        detail: {
+          description: 'Seçili siparişin durumu, iletişim bilgileri, notları ve e-posta kayıtları.',
+          close: 'Kapat'
         }
       },
         tooltips: {
@@ -178,6 +212,13 @@ export const orders = {
         },
         orderDetails: 'Sipariş Detayları',
       form: {
+        // Alan seviyesi doğrulama mesajları (cetvel §4.6 — girdinin altında, toast'ta değil)
+        validation: {
+          statusRequired: 'Sipariş durumu zorunludur',
+          customerNameRequired: 'Müşteri adı zorunludur',
+          emailInvalid: 'Geçersiz e-posta adresi',
+          emailRequired: 'E-posta zorunludur',
+        },
         descEdit: 'Sipariş detaylarını görüntüleyin ve güncelleyin.',
         tabShipping: 'Sevkiyat',
         tabItems: 'Sipariş Kalemleri',

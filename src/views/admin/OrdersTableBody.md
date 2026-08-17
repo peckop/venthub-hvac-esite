@@ -2,8 +2,8 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\admin\OrdersTableBody.tsx
-skeleton_hash: d10660f2956de30e
+source_path: C:\Users\alize\venthub-wt-admin\src\views\admin\OrdersTableBody.tsx
+skeleton_hash: e16ab65acfa573f2
 entity_hashes:
   func:OrderSpecsRow: a865be15b74a12e4
   func:OrdersTableBody: f6fa9129ca876792
@@ -14,61 +14,65 @@ entity_hashes:
   func:ordersFetcher: 77c8d9b83d984605
   func:prettyStatus: b040fc101d891095
   func:safeDate: 8162cc570bcd435b
-  overview: af787ede72d62e9a
+  overview: 9e0caea0780f63c2
   style_tokens: 6a197b4b11103108
-generated_at: 2026-06-19T20:49:43Z
+generated_at: 2026-08-15T15:14:34Z
 ---
 
 ## Genel Bakış
-Bu modül, yönetici panelindeki siparişlerin tablo görünümünü oluşturan ve yöneten bir React bileşenidir. Sipariş verilerini Supabase'den çeker, formatsız verileri insan tarafından okunabilir formata dönüştürür, kargo takip URL'leri üretir ve dosya indirme işlemleri gibi yardımcı işlevleri sunar. Modül, sipariş yönetimi için gerekli tüm görünüm ve veri işleme mantığını merkezi olarak yönetir.
+Bu modül, yönetici panelindeki siparişlerin tablo görünümünü oluşturan React bileşenidir. Supabase'den sipariş verilerini çekme, ham verileri (para, tarih, durum) okunabilir biçime dönüştürme, kargo takip URL'leri üretme ve dosya indirme gibi yardımcı işlevleri merkezi olarak sunar.
 
 ## Fonksiyon Grupları
 
-### Görünüm ve Biçimlendirme Yardımcıları
-Ham verileri (para, tarih, durum) kullanıcı dostu gösterime dönüştüren ve görsel durum sınıflandırması yapan yardımcı fonksiyonlar.
+### Veri Biçimlendirme Yardımcıları
+Para birimi, tarih ve sipariş durumu gibi ham verileri kullanıcının anlayabileceği, yerelleştirilmiş forma dönüştüren saf fonksiyonlar.
 - formatAmount, safeDate, prettyStatus, badgeClass
 
 ### Veri Kaynağı
-Supabase istemcisi aracılığıyla admin siparişlerini filtreleme, sıralama ve sayfalama ile çeken asenkron veri获取 fonksiyonu.
+Supabase istemcisi ile sayfalama ve filtreleme parametrelerini kullanarak admin siparişlerini çeken asenkron veri获取 fonksiyonu.
 - ordersFetcher
 
 ### Kargo Entegrasyonu
-Kargo firması ve takip numarasından geçerli bir takip URL'i oluşturarak kullanıcının kargo durumunu izlemesini sağlayan fonksiyon.
+Kargo firması ve takip numarasından geçerli bir izleme URL'i üreten yardımcı fonksiyon.
 - generateTrackingUrl
 
 ### Dosya İşlemleri
-Oluşturulan blob nesnelerini tarayıcıda indirilebilir dosyaya dönüştüren fonksiyon (fatura, rapor gibi).
+Tarayıcı tarafında oluşturulan blob nesnelerini indirilebilir dosyaya dönüştüren fonksiyon.
 - downloadBlob
 
 ### Ana Bileşenler
-Tüm bu yardımcıları ve veri kaynaklarını bir araya getirerek sipariş tablosunu ve satır içi detayları render eden React fonksiyonel bileşenleri.
+Tüm yardımcı fonksiyonları ve veri kaynağını bir araya getirerek sipariş tablosunu ve satır içi detay satırlarını render eden React fonksiyonel bileşenleri.
 - OrdersTableBody, OrderSpecsRow
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu modül, admin sipariş tablosunu oluşturan React bileşenleri ve yardımcı fonksiyonlardan oluşur. Aşağıdaki varsayımlar fonksiyon imzalarından ve modül sabitlerinden türetilmiştir.
+Bu modül, yönetici sipariş tablosunu render eden ve veri çekme/formatlama yardımcı fonksiyonlarını içeren bir React bileşen kümesidir. Aşağıda, fonksiyon imzalarından türetilebilen mimari varsayımlar listelenmektedir.
 
-**[Aksiyom 1]:** `formatAmount` fonksiyonu yalnızca `number` veya `null`/`undefined` türünde `v` parametresi ile çağrılabilir. Eğer `v` geçerli bir sayısal değer değilse (örn. `NaN`, `Infinity`), formatlanmış tutar yerine hata veya beklenmeyen çıktı üretilebilir.
+[Aksiyom 1]: Eğer `formatAmount` fonksiyonuna geçilen `v` parametresi `undefined` veya `null` ise, fonksiyon geçerli bir varsayılan değer kullanmalıdır (örn: "0" formatı) — aksi halde formatlanmış çıktı tutarsız veya hatalı olur.
 
-**[Aksiyom 2]:** `safeDate` fonksiyonu yalnızca geçerli bir ISO 8601 formatında tarih dizesi ile çağrılmalıdır. Eğer `iso` parametresi geçerli bir tarih dizesi değilse, formatlanmış tarih yerine geçersiz veya boş bir çıktı üretilebilir.
+[Aksiyom 2]: Eğer `safeDate` fonksiyonuna geçilen `iso` parametresi geçerli bir ISO 8601 tarih dizgesi değilse, fonksiyon安全 bir şekilde hata yutmali veya geçersiz bir gösterim döndürmelidir — aksi halde tarih gösterimi kırılır.
 
-**[Aksiyom 3]:** `prettyStatus` fonksiyonu, bir durum kodunu (`s`) görüntü metnine dönüştürmek için `t` çeviri fonksiyonunu kullanır. Eğer `s` parametresi bilinen bir durum kodu değilse (`ORDER_STATUS_KEYS` içinde yer almıyorsa), çeviri fonksiyonu tanımsız anahtar hatası döndürebilir.
+[Aksiyom 3]: Eğer `prettyStatus` fonksiyonuna geçilen `t` çeviri fonksiyonu, verilen `s` durum anahtarı için bir çeviri tanımlamamışsa, döndürülen metin tanımsız veya ham anahtar metni olur — aksi halde kullanıcıya anlamsız durum gösterilir.
 
-**[Aksiyom 4]:** `badgeClass` fonksiyonu, durum kodunu CSS sınıf adına eşler. Eğer `s` parametresi beklenmeyen bir durum kodu ise, varsayılan veya boş bir CSS sınıfı döndürülebilir (modül içindeki karşılığı bilinmiyor).
+[Aksiyom 4]: Eğer `badgeClass` fonksiyonuna geçilen `s` durum dizgesi, bilinen bir durum anahtarı değilse, fonksiyon nötr bir varsayılan CSS sınıfı döndürmelidir — aksi halde badge stilinde hata oluşur.
 
-**[Aksiyom 5]:** `generateTrackingUrl` fonksiyonu, `carrier` ve `tracking` parametreleri her ikisi de dolu ve geçerli olduğunda bir URL döndürür. Eğer herhangi bir parametre boş string, `null` veya `undefined` ise, fonksiyon `null` döndürür.
+[Aksiyom 5]: Eğer `generateTrackingUrl` fonksiyonuna geçilen `carrier` dizgesi bilinen bir kargo firması değilse, fonksiyon `null` döndürmelidir — aksi halde geçersiz bir takip URL'si oluşur.
 
-**[Aksiyom 6]:** `ordersFetcher` fonksiyonu, geçerli bir `SupabaseClient<Database>` instance'ı gerektirir. Eğer `supabase` parametresi geçersiz veya oturumsuz bir client ise, veri çekme işlemi başarısız olur ve `FetchResult<AdminOrderRow>` Promise'i reject edilir.
+[Aksiyom 6]: Eğer `ordersFetcher` fonksiyonuna geçilen `supabase` istemcisi geçerli bir `Database` şemasına sahip değilse, Supabase sorgusu hata verir — aksi halde veri çekme başarısız olur.
 
-**[Aksiyom 7]:** `OrderSpecsRow` React bileşeni yalnızca `orderId` prop'u ile çağrılabilir. Eğer `orderId` sağlanmamışsa, bileşen sipariş detaylarını getiremez ve hata durumuna düşebilir.
+[Aksiyom 7]: Eğer `ordersFetcher` fonksiyonuna geçilen `params` nesnesi gerekli sayfalama/sıralama alanlarını içermiyorsa, Supabase sorgusu eksik parametrelerle çalışır — aksi halde beklenmeyen tüm kayıtlar veya hiç kayıt dönmez.
 
-**[Aksiyom 8]:** `downloadBlob` fonksiyonu, yalnızca geçerli bir `Blob` nesnesi ve boş olmayan bir `filename` dizesi ile çağrılmalıdır. Eğer `blob` geçersiz bir Blob değilse veya `filename` boş string ise, tarayıcı indirme tetiklenemez.
+[Aksiyom 8]: Eğer `OrderSpecsRow` bileşenine geçilen `orderId` geçerli bir sipariş tanımlayıcısı değilse, bileşen içermesi gereken sipariş detaylarını gösteremez — aksi halde boş veya hatalı bir detay satırı render edilir.
 
-**[Aksiyom 9]:** `SORT_COLUMN_MAP` sabiti, tablo sütun adlarını veritabanı alanlarıyla eşler. Eğer `OrdersTableBody` bileşeninde sıralama isteği geldiğinde sütun adı `SORT_COLUMN_MAP` içinde tanımlı değilse, sıralama yapılamaz (modül içindeki karşılığı bilinmiyor).
+[Aksiyom 9]: Eğer `SORT_COLUMN_MAP` sabiti, sıralama için kullanılabilecek tüm sütun anahtarlarını içermiyorsa, kullanıcı belirli sütunlara göre sıralama yapamaz — aksi halde sıralama işlevi eksik çalışır.
 
-**[Aksiyom 10]:** `ORDER_SELECT` sabiti, `ordersFetcher` tarafından Supabase sorgusunda kullanılan alan listesini tanımlar. Bu liste ile `AdminOrderRow` tipi tutarlı olmalıdır; aksi takdirde TypeScript derleme hatası veya çalışma zamanı veri kaybı oluşur.
+[Aksiyom 10]: Eğer `ORDER_STATUS_KEYS` sabiti tüm olası sipariş durumlarını kapsamiyorsa, `badgeClass` ve `prettyStatus` fonksiyonları tanımsız durumlar için stil/metin üretemez — aksi halde bazı durumlar için badge rengi veya metin eksik olur.
+
+[Aksiyom 11]: Eğer `ORDER_SELECT` sabiti ile belirtilen Supabase select sorgusu `AdminOrderRow` tipini karşılayacak tüm alanları içermiyorsa, `ordersFetcher` dönüş tipiyle uyumsuz veri döner — aksi halde tip hatası veya çalışma zamanı hatası oluşur.
+
+[A
 
 ---
 
@@ -166,6 +170,7 @@ Son olarak, `params.page` ve `params.pageSize` kullanarak sorguya `range` uygula
 - import: ../../components/admin/data-table/DataTableKit::DataTableKit
 - import: ../../components/admin/data-table/types::type { AdminColumn }
 - import: ../../components/admin/orders/OrderFormModal::OrderFormModal
+- import: ../../components/admin/overlay/ConfirmProvider::useConfirm
 - import: ../../hooks/useAdminTable::type FetchParams
 - import: ../../hooks/useAdminTable::type FetchResult
 - import: ../../hooks/useAdminTable::useAdminTable
@@ -296,112 +301,130 @@ Son olarak, `params.page` ve `params.pageSize` kullanarak sorguya `range` uygula
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/views/admin/OrdersTableBody.tsx::formatAmount
-- **params**: (v?: number | null, lang: Lang = 'tr')
-- **ic_degiskenler**: 
-  - `v` — Formatlanacak sayısal tutar, undefined veya null olabilir
-  - `lang` — Para birimi formatı için dil kodu
-- **Dönüş**: string — Biçimlendirilmiş para birimi stringi veya '-' ifadesi
+- **params**: `v?: number | null` — formatlanacak tutar, `lang: Lang` — dil kodu, varsayılan 'tr'
+- **ic_degiskenler**:
+  - yok (doğrudan return)
+- **Dönüş**: `string` — formatlanmış para birimi stringi veya '-'
+
+---
 
 ### [N2_NASIL] AST Pointer: src/views/admin/OrdersTableBody.tsx::safeDate
-- **params**: (iso: string, lang: Lang = 'tr')
+- **params**: `iso: string` — ISO tarih stringi, `lang: Lang` — dil kodu, varsayılan 'tr'
 - **ic_degiskenler**:
-  - `iso` — Biçimlendirilecek ISO tarih stringi
-  - `lang` — Tarih formatı için dil kodu
-- **Dönüş**: string — Biçimlendirilmiş tarih veya hata durumunda ham ISO string
+  - yok (try/catch içinde doğrudan return)
+- **Dönüş**: `string` — formatlanmış tarih veya ham iso stringi
+
+---
 
 ### [N3_NASIL] AST Pointer: src/views/admin/OrdersTableBody.tsx::prettyStatus
-- **params**: (s: string, t: (key: string, params?: Record<string, unknown>) => string)
+- **params**: `s: string` — ham durum stringi, `t: (key: string, params?: Record<string, unknown>) => string` — çeviri fonksiyonu
 - **ic_degiskenler**:
-  - `s` — Ham sipariş durumu stringi
-  - `t` — Çeviri fonksiyonu
-  - `key` — Küçük harfe dönüştürülmüş durum anahtarı
-- **Dönüş**: string — Çevrilmiş durum etiketi
+  - `key` — `s.toLowerCase()` ile elde edilen küçük harfli durum anahtarı, switch case eşleştirmesi için kullanılır
+- **Dönüş**: `string` — çevrilmiş durum etiketi veya ham s
+
+---
 
 ### [N4_NASIL] AST Pointer: src/views/admin/OrdersTableBody.tsx::badgeClass
-- **params**: (s: string)
+- **params**: `s: string` — durum stringi
 - **ic_degiskenler**:
-  - `s` — Durum stringi
-  - `base` — Ortak CSS sınıfları (font, padding, border vb.)
-  - `key` — Küçük harfe dönüştürülmüş durum anahtarı
-- **Dönüş**: string — Duruma göre renklendirilmiş CSS sınıfları
+  - `base` — tüm badge'ler ortak olan temel CSS class stringi
+  - `key` — `s.toLowerCase()` ile elde edilen küçük harfli durum anahtarı
+- **Dönüş**: `string` — duruma göre Tailwind CSS class stringi
+
+---
 
 ### [N5_NASIL] AST Pointer: src/views/admin/OrdersTableBody.tsx::generateTrackingUrl
-- **params**: (carrier: string, tracking: string)
+- **params**: `carrier: string` — kargo şirketi adı, `tracking: string` — takip numarası
 - **ic_degiskenler**:
-  - `carrier` — Kargo şirketi adı
-  - `tracking` — Kargo takip numarası
-  - `c` — Küçük harfe dönüştürülmüş kargo şirketi adı
-- **Dönüş**: string | null — Kargo sorgulama URL'i veya null
+  - `c` — `carrier.toLowerCase()` ile elde edilen küçük harfli kargo şirketi adı, includes kontrolü için kullanılır
+- **Dönüş**: `string | null` — kargo takip URL'i veya null
+
+---
 
 ### [N6_NASIL] AST Pointer: src/views/admin/OrdersTableBody.tsx::ordersFetcher
-- **params**: (supabase: SupabaseClient<Database>, params: FetchParams)
+- **params**: `supabase: SupabaseClient<Database>` — Supabase istemcisi, `params: FetchParams` — filtre/sayfalama parametreleri
 - **ic_degiskenler**:
-  - `supabase` — Supabase istemcisi
-  - `params` — SorguParametreleri (sıralama, sayfalama, filtreleme)
-  - `ascending` — Sıralama yönü (true: artan, false: azalan)
-  - `q` — Trim edilmişarama metni
-  - `statuses` — Durum filtreleri dizisi
-  - `preset` — Hazır filtre adı
-  - `from` — Başlangıç tarihi
-  - `to` — Bitiş tarihi
-  - `offset` — Sayfalama için satır ofseti
-  - `data` — Supabase sorgu sonucu satırlar
-  - `error` — Sorgu hatası
-  - `count` — Toplam eşleşen satır sayısı
-- **Dönüş**: Promise<FetchResult<AdminOrderRow>> — Sipariş satırları ve toplam sayı
+  - `query` — `supabase.from('view_admin_orders').select(...)` ile oluşturulan sorgu builder, filtreler ve sıralama zincirlenerek inşa edilir
+  - `ascending` — `params.sort?.dir === 'asc'` sonucu, sıralama yönünü belirler
+  - `q` — `params.query.trim()` ile elde edilen arama metni, ilike filtresi için kullanılır
+  - `statuses` — `params.filters.status ?? []` ile elde edilen durum filtre dizisi
+  - `preset` — `params.filters.preset?.[0]` ile elde edilen hazır filtre adı
+  - `from` — `params.filters.from?.[0]` ile elde edilen başlangıç tarihi
+  - `to` — `params.filters.to?.[0]` ile elde edilen bitiş tarihi
+  - `offset` — `(params.page - 1) * params.pageSize` hesaplaması ile elde edilen sayfalama ofseti
+  - `data` — Supabase sorgu sonucu dönen satır verisi
+  - `error` — Supabase sorgu hatası
+  - `count` — toplam eşleşen satır sayısı
+- **Dönüş**: `Promise<FetchResult<AdminOrderRow>>` — `{ rows, totalMatched }`
+
+---
 
 ### [N7_NASIL] AST Pointer: src/views/admin/OrdersTableBody.tsx::OrderSpecsRow
-- **params**: ({ orderId })
+- **params**: `{ orderId }` — sipariş ID'si
 - **ic_degiskenler**:
-  - `orderId` — Detayları getirilecek sipariş ID'si
-  - `t` — Çeviri fonksiyonu
-  - `lang` — Dil kodu
-  - `loading` — Yüklenme durumu (boolean state)
-  - `order` — Sipariş detayı (DetailOrder | null state)
-  - `active` — Bileşen aktiflik bayrağı (cleanup için)
-  - `data` — Supabase sorgu sonucu
-  - `error` — Sorgu hatası
-  - `rawItems` — Ham sipariş kalemleri dizisi
-  - `mappedItems` — Dönüştürülmüş sipariş kalemleri dizisi
-  - `items` — Sipariş kalemleri (order?.venthub_order_items)
-  - `addr` — Teslimat adresi (ShippingAddress | null)
-  - `invoice` — Fatura bilgisi (InvoiceInfo | null)
-- **Dönüş**: React.FC — Sipariş detaylarını gösteren JSX bileşeni
+  - `t, lang` — `useI18n()` hook'undan gelen çeviri fonksiyonu ve dil kodu
+  - `loading` — `useState(true)` — sipariş yüklenme durumu flag'i
+  - `order` — `useState<DetailOrder | null>(null)` — yüklenen sipariş detay nesnesi
+  - `active` — useEffect içinde async operation'ın hala geçerli olup olmadığını takip eden flag
+  - `rawItems` — `data.venthub_order_items` ham verisi, DetailOrderItem tipine cast edilir
+  - `mappedItems` — `rawItems.map(...)` ile transform edilmiş `DetailOrderItem[]` dizisi
+  - `items` — `order.venthub_order_items || []` fallback'li ürün dizisi, JSX'te map edilir
+  - `addr` — `order.shipping_address as ShippingAddress | null` cast'li teslimat adresi
+  - `invoice` — `order.invoice_info as InvoiceInfo | null` cast'li fatura bilgisi
+  - `it` — map callback içindeki her bir `DetailOrderItem`
+  - `qty` — `Number(it.quantity) || 0` ürün miktarı
+  - `unitPrice` — `Number(it.price_at_time) || 0` birim fiyat
+  - `totalPrice` — `qty * unitPrice` toplam tutar hesaplaması
+- **Dönüş**: `React.FC` — JSX render sonucu (loading spinner, boş state veya sipariş detay tablosu)
+
+---
 
 ### [N8_NASIL] AST Pointer: src/views/admin/OrdersTableBody.tsx::OrdersTableBody
-- **params**: ()
+- **params**: (yok — React functional component, props almaz)
 - **ic_degiskenler**:
-  - `activeStatuses` — Aktif durum filtreleri dizisi
-  - `setFilter` — Filtre güncelleme fonksiyonu
-  - `bulkMode` — Toplu işlem modu (boolean state)
-  - `shipId` — Kargoya verilecek sipariş ID'si (string state)
-  - `carrier` — Kargo şirketi (string state)
-  - `tracking` — Takip numarası (string state)
-  - `sendEmail` — E-posta gönderme seçeneği (boolean state)
-  - `shipOpen` — Kargo modal durumu (boolean state)
-  - `logsOpen` — Log modal durumu (boolean state)
-  - `logsLoading` — Log yüklenme durumu (boolean state)
-  - `emailLogs` — E-posta logları dizisi (EmailLog[] state)
-  - `notesOpen` — Not modal durumu (boolean state)
-  - `notesOrderId` — Not eklenen sipariş ID'si (string state)
-  - `notes` — Sipariş notları dizisi (OrderNote[] state)
-  - `noteInput` — Yeni not metni (string state)
-  - `hasWriteAccess` — Yazma izni (boolean)
-  - `table` — Tablo instance (tablo işlemleri için)
-  - `query` — Arama metni (string)
-  - `setSearchQuery` — Arama metni güncelleme
-  - `setQuery` — Arama metni state setter
-  - `exportHeaders` — CSV/XLS export başlıkları dizisi
-- **Dönüş**: React.FC — Sipariş tablosu ve ilgili modalları gösteren JSX bileşeni
+  - `active` — useEffect cleanup flag'i, async operasyonun hala aktif olup olmadığını kontrol eder
+  - `rawItems` — `data.venthub_order_items` ham verisi
+  - `mappedItems` — transform edilmiş `DetailOrderItem[]`
+  - `qty` — `Number(it.quantity) || 0` ürün miktarı, map callback içinde hesaplanır
+  - `unitPrice` — `Number(it.price_at_time) || 0` birim fiyat, map callback içinde hesaplanır
+  - `totalPrice` — `qty * unitPrice` toplam tutar, map callback içinde hesaplanır
+  - `shortId` — `r.id.slice(0, 8)` kısaltılmış sipariş ID'si, tablo hücreleri içinde gösterilir
+  - `activeStatuses` — aktif durum filtreleri dizisi
+  - `s` — ORDER_STATUS_KEYS dizisi üzerindeki map callback parametresi
+  - `next` — toggle edilmiş yeni durum filtresi dizisi
+  - `selected` — `table.selection.selectedIds` toplu seçimde seçili ID'ler
+  - `targets` — seçili ve filtrelenmiş hedef sipariş ID'leri
+  - `shipId` — kargo modal'ında düzenlenecek sipariş ID'si
+  - `carrier` — kargo şirketi input değeri
+  - `tracking` — takip numarası input değeri
+  - `sendEmail` — e-posta gönderim flag'i
+  - `notesOrderId` — not modal'ında düzenlenecek sipariş ID'si
+  - `noteInput` — yeni not input değeri
+  - `noteId` — silinecek not ID'si
+  - `target` — silinecek not nesnesi `notes.find(...)` ile bulunur
+  - `inserted` — `mutateWithAudit` sonucu eklenen not nesnesi
+  - `text` — `noteInput.trim()` ile elde edilen temiz not metni
+  - `curRow` — `table.rows.find(...)` ile bulunan mevcut satır
+  - `cur` — mevcut sipariş durumu
+  - `isShipped` — durumun 'shipped' olup olmadığı boolean
+  - `turl` — `generateTrackingUrl(carrier, tracking)` ile üretilen takip URL'i
+  - `results` — `Promise.all(...)` ile toplu kargo işleme sonuçları boolean dizisi
+  - `range` — DateRange callback parametresi
+  - `from, to` — `filters.from?.[0]` ve `filters.to?.[0]` tarih filtreleri
+  - `id` — fonksiyonel parametre, sipariş/sipariş notu ID'si
+  - `l` — email log satırı, map callback parametresi
+  - `n` — not nesnesi, map callback parametresi
+  - `v` — toggle callback parametresi, pendingShipments preset durumu
+- **Dönüş**: `React.FC` — tüm admin sipariş tablosu JSX'i (tablo, filtreler, modallar, toplu işlemler dahil)
+
+---
 
 ### [N9_NASIL] AST Pointer: src/views/admin/OrdersTableBody.tsx::downloadBlob
-- **params**: (blob: Blob, filename: string)
+- **params**: `blob: Blob` — indirilecek dosya blob'u, `filename: string` — indirme dosya adı
 - **ic_degiskenler**:
-  - `blob` — İndirilecek dosya verisi
-  - `filename` — İndirilecek dosya adı
-  - `url` — Blob için oluşturulan URL
-  - `link` — İndirme bağlantısı HTML elemanı
-- **Dönüş**: void — Tarayıcıda dosya indirme tetikler
+  - `url` — `URL.createObjectURL(blob)` ile oluşturulan geçici nesne URL'i
+  - `link` — `document.createElement('a')` ile oluşturulan geçici anchor elementi, tıklama tetiklemesi için kullanılır
+- **Dönüş**: `void` — tarayıcı dosya indirme tetikler, yan etki olarak dosya kaydedilir
 
 ---
 
@@ -418,11 +441,11 @@ graph TD
     OrdersTableBody_tsx__ordersFetcher["ordersFetcher"]
     OrdersTableBody_tsx__prettyStatus["prettyStatus"]
     OrdersTableBody_tsx__safeDate["safeDate"]
-    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__downloadBlob
     OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__prettyStatus
     OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__generateTrackingUrl
-    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__formatAmount
     OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__safeDate
+    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__formatAmount
+    OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__downloadBlob
     OrdersTableBody_tsx__OrdersTableBody --> OrdersTableBody_tsx__badgeClass
 ```
 

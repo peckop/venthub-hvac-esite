@@ -6,7 +6,6 @@ import {
     adminTableActionClass,
     adminTableActionDangerClass,
     adminTableActionWarningClass,
-    glassStrongClass,
 } from '../../../utils/adminUi'
 
 export interface BulkAction {
@@ -45,19 +44,19 @@ export function BulkBar({
     const closePanel = (): void => setOpenKey(null)
 
     return (
-        <div className="sticky bottom-4 z-40 mx-auto max-w-4xl">
-            <div className={`${glassStrongClass} rounded-2xl px-5 py-3 flex items-center justify-between gap-4 flex-wrap`}>
+        <div className="sticky bottom-4 z-sticky mx-auto max-w-4xl">
+            <div className={`bg-admin-surface rounded-admin-lg px-5 py-3 flex items-center justify-between gap-4 flex-wrap`}>
                 {/* Left: selection info */}
                 <div className="flex items-center gap-3">
-                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-cyan-400 text-surface-deep text-sm font-black">
+                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-admin-accent text-admin-accent-fg text-sm font-semibold">
                         {selectedCount}
                     </span>
-                    <span className="text-sm font-bold text-slate-200">{selectedLabel}</span>
+                    <span className="text-sm font-bold text-admin-fg">{selectedLabel}</span>
                     <button
                         type="button"
                         onClick={onClear}
                         aria-label={clearLabel}
-                        className="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors underline"
+                        className="text-xs font-semibold text-admin-fg-muted hover:text-admin-fg transition-colors underline"
                     >
                         {clearLabel}
                     </button>
@@ -88,7 +87,7 @@ export function BulkBar({
                                     {action.label}
                                 </button>
                                 {hasPanel && isOpen && action.panel ? (
-                                    <div className="absolute bottom-full mb-2 right-0 z-50">
+                                    <div className="absolute bottom-full mb-2 right-0 z-popover">
                                         {action.panel(closePanel)}
                                     </div>
                                 ) : null}

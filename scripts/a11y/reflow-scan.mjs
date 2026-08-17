@@ -71,6 +71,30 @@ for (const width of widths) {
     const bodyOverflowX = getComputedStyle(document.body).overflowX
 
     /**
+     * ÖLÇÜM GEÇERLİLİK SINAMASI — "sessizlik başarı değildir"in üçüncü katmanı.
+     *
+     * Yaşanmış tuzak (başka bir şerit bildirdi, teşekkürler): Vercel ÖNİZLEMESİ
+     * deployment protection ile korunuyor (curl 302). Tarayıcı uygulamayı değil
+     * KORUMA SAYFASINI ölçtü; o sayfada `overflow-x: clip` var ve `clip` altında
+     * `scrollWidth` `clientWidth`'i ASLA aşamaz → araç 8 rotayı da "tertemiz"
+     * raporladı. Yani yanlış hedefi ölçmek, aracı sessizce hep-yeşil yapar.
+     *
+     * Bu yüzden ölçümden ÖNCE iki şey doğrulanır:
+     *   1. `overflow-x: clip` yürürlükte değil (clip'i `visible`'a çevirmek de
+     *      taşmayı geri getirmez; ölçüm yapısal olarak kör olur),
+     *   2. Sayfa gerçekten uygulama gibi görünüyor (asgari DOM hacmi).
+     * Şüphe varsa sonuç "temiz" DEĞİL, "GEÇERSİZ" olarak raporlanır.
+     */
+    const domNodes = document.querySelectorAll('body *').length
+    const invalidReasons = []
+    if (htmlOverflowX === 'clip' || bodyOverflowX === 'clip') {
+      invalidReasons.push(`overflow-x:clip (html=${htmlOverflowX}, body=${bodyOverflowX})`)
+    }
+    if (domNodes < 30) {
+      invalidReasons.push(`DOM cok kucuk (${domNodes} dugum) — koruma/hata sayfasi olabilir`)
+    }
+
+    /**
      * KRİTİK ÖLÇÜM NOTU (bilerek-boz testiyle kanıtlandı):
      * `html/body { overflow-x: hidden }` yürürlükteyken `scrollingElement.scrollWidth`
      * taşmayı RAPORLAMAZ — sayfaya 3000px genişlikte bir öğe enjekte edildiğinde bile
@@ -89,32 +113,71 @@ for (const width of widths) {
     const overflowPx = doc.scrollWidth - viewportWidth
     const scrollWidthUnclamped = doc.scrollWidth
 
-    // Sağ kenarı aşan öğeleri bul; en geniş 8 tanesini raporla.
-    const offenders = []
-    for (const el of document.querySelectorAll('body *')) {
-      const rect = el.getBoundingClientRect()
-      if (rect.width === 0 || rect.height === 0) continue
-      const over = rect.right - viewportWidth
-      if (over <= tol) continue
-      const cls = typeof el.className === 'string' ? el.className : ''
-      offenders.push({
-        tag: el.tagName.toLowerCase(),
-        overPx: Math.round(over),
-        widthPx: Math.round(rect.width),
-        cls: cls.slice(0, 120),
-      })
-    }
-    offenders.sort((a, b) => b.overPx - a.overPx)
-
-    // Aynı sınıf imzasını tekrar tekrar raporlama.
-    const seen = new Set()
+    /**
+     * SUÇLU BULMA — ADAY LİSTESİ DEĞİL, KANIT.
+     *
+     * Eski sürüm "sağ kenarı aşan elemanları" `getBoundingClientRect` ile listeliyordu.
+     * Bu YANILTICI: atası `overflow:hidden` olan bir eleman kırpılır ve belge
+     * `scrollWidth`'ine KATKI VERMEZ — yani listede görünür ama suçlu değildir.
+     * Başka bir şerit bu yüzden neredeyse yanlış dosyayı onaracaktı (aday liste
+     * `NavShell` üst şeridini gösteriyordu; oysa o şerit `md` altında
+     * `h-0 opacity-0 overflow-hidden`, yani masum).
+     *
+     * Doğru yöntem AĞAÇTA İNMEK: her seviyede çocukları tek tek `display:none`
+     * yapıp `scrollWidth`'i yeniden ölç. Taşmayı KAPATAN çocuk gerçek suçludur;
+     * onun içine in. Bu, ölçümle kanıtlanmış tek zincir verir.
+     */
     const unique = []
-    for (const o of offenders) {
-      const key = `${o.tag}|${o.cls}`
-      if (seen.has(key)) continue
-      seen.add(key)
-      unique.push(o)
-      if (unique.length >= 8) break
+    if (overflowPx > tol) {
+      let node = document.body
+      let depth = 0
+      const chain = []
+      while (node && depth < 25) {
+        const children = Array.from(node.children)
+        let culprit = null
+        for (const child of children) {
+          const prevDisplay = child.style.display
+          child.style.display = 'none'
+          void document.body.offsetWidth
+          const closed = doc.scrollWidth - viewportWidth <= tol
+          child.style.display = prevDisplay
+          if (closed) {
+            culprit = child
+            break
+          }
+        }
+        if (!culprit) {
+          // Hiçbir çocuk tek başına taşmayı kapatmıyorsa suçlu ÇOCUK DEĞİL, bu
+          // düğümün KENDİSİDİR (genişliği / padding'i / min-width'i). Zinciri
+          // burada bitirmek yanıltıcı olurdu — düğümü açıkça işaretle.
+          if (node !== document.body) {
+            const rect = node.getBoundingClientRect()
+            const cls = typeof node.className === 'string' ? node.className : ''
+            chain.push({
+              tag: node.tagName.toLowerCase(),
+              overPx: Math.round(rect.right - viewportWidth),
+              widthPx: Math.round(rect.width),
+              cls: cls.slice(0, 120),
+              depth,
+              self: true,
+            })
+          }
+          break
+        }
+        const rect = culprit.getBoundingClientRect()
+        const cls = typeof culprit.className === 'string' ? culprit.className : ''
+        chain.push({
+          tag: culprit.tagName.toLowerCase(),
+          overPx: Math.round(rect.right - viewportWidth),
+          widthPx: Math.round(rect.width),
+          cls: cls.slice(0, 120),
+          depth,
+        })
+        node = culprit
+        depth++
+      }
+      // En derin düğüm gerçek suçludur; zinciri kökten yaprağa raporla.
+      unique.push(...chain.slice(-6))
     }
 
     document.documentElement.style.overflowX = prevHtml
@@ -126,6 +189,8 @@ for (const width of widths) {
       overflowPx,
       htmlOverflowX,
       bodyOverflowX,
+      domNodes,
+      invalidReasons,
       offenders: unique,
     }
     }, TOLERANCE)
@@ -152,17 +217,33 @@ for (const r of results) {
     console.log(`HATA   [${r.width}px] ${r.route} — ${r.error}`)
     continue
   }
+  // ÖLÇÜM GEÇERSİZSE "temiz" DEME. Korunan/hata sayfası ölçüldüğünde `overflow-x:clip`
+  // yüzünden scrollWidth asla clientWidth'i aşmaz ve araç her sayfayı yeşil raporlar.
+  if (r.invalidReasons?.length) {
+    errored++
+    console.log(
+      `GECERSIZ [${r.width}px] ${r.route} — ${r.invalidReasons.join(' · ')}  ` +
+        `(DOM ${r.domNodes} düğüm). Olculen sayfa uygulama olmayabilir; sonuc SAYILMADI.`
+    )
+    continue
+  }
   const ok = r.overflowPx <= TOLERANCE
   if (!ok) failed++
-  // Taşma yoksa suçlu listesini yazdırma — o öğeler bir ata tarafından kırpılıyor
-  // ve belge genişliğine katkı vermiyorlar; gürültü olur.
   console.log(
     `${ok ? 'GECTI' : 'TASMA'}  [${r.width}px] ${r.route}  ` +
       `scrollWidth=${r.scrollWidth}px (taşma ${r.overflowPx}px)  html.overflow-x=${r.htmlOverflowX}`
   )
+  // Suçlu zinciri yalnız taşma varken yazdırılır ve ÖLÇÜMLE kanıtlanmıştır
+  // (display:none ile taşmayı kapatan düğüm); en alttaki satır gerçek suçludur.
   if (!ok) {
     for (const o of r.offenders) {
-      console.log(`         └─ <${o.tag}> +${o.overPx}px (genişlik ${o.widthPx}px) ${o.cls}`)
+      const pad = '  '.repeat(o.depth ?? 0)
+      // `self` = hiçbir çocuğu taşmayı kapatmadı → taşma bu düğümün KENDİ
+      // genişliğinden/padding'inden/min-width'inden geliyor. Onarım burada.
+      const mark = o.self ? ' ← SUÇLU (kendi genişliği)' : ''
+      console.log(
+        `         └─${pad} <${o.tag}> +${o.overPx}px (genişlik ${o.widthPx}px) ${o.cls}${mark}`
+      )
     }
   }
 }

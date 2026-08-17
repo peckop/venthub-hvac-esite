@@ -44,6 +44,36 @@ const tailwindConfig = {
         'clean-white':       'hsl(var(--clean-white) / <alpha-value>)',
         'air-blue':          'hsl(var(--air-blue) / <alpha-value>)',
 
+        /* ── Admin semantik renkleri ──────────────────────────────────
+           Değişkenler `src/index.css`te `[data-admin-theme]` kapsamında
+           tanımlı (varsayılan açık, `='dark'` ile koyu). Admin yüzeylerinde
+           ham `slate-*` / `text-white` / `bg-white/N` YERİNE bunlar
+           kullanılır — ham olanlar temayla dönmez.
+           Kapı: src/__tests__/conformance/admin-theme-invariants.test.ts */
+        'admin-bg':            'hsl(var(--admin-bg) / <alpha-value>)',
+        'admin-surface':       'hsl(var(--admin-surface) / <alpha-value>)',
+        'admin-surface-2':     'hsl(var(--admin-surface-2) / <alpha-value>)',
+        'admin-surface-3':     'hsl(var(--admin-surface-3) / <alpha-value>)',
+        'admin-border':        'hsl(var(--admin-border) / <alpha-value>)',
+        'admin-border-strong': 'hsl(var(--admin-border-strong) / <alpha-value>)',
+        'admin-fg':            'hsl(var(--admin-fg) / <alpha-value>)',
+        'admin-fg-muted':      'hsl(var(--admin-fg-muted) / <alpha-value>)',
+        'admin-fg-subtle':     'hsl(var(--admin-fg-subtle) / <alpha-value>)',
+        'admin-accent':        'hsl(var(--admin-accent) / <alpha-value>)',
+        'admin-accent-hover':  'hsl(var(--admin-accent-hover) / <alpha-value>)',
+        'admin-accent-fg':     'hsl(var(--admin-accent-fg) / <alpha-value>)',
+        'admin-accent-weak':   'hsl(var(--admin-accent-weak) / <alpha-value>)',
+        'admin-danger':        'hsl(var(--admin-danger) / <alpha-value>)',
+        'admin-danger-fg':     'hsl(var(--admin-danger-fg) / <alpha-value>)',
+        'admin-danger-weak':   'hsl(var(--admin-danger-weak) / <alpha-value>)',
+        'admin-warning':       'hsl(var(--admin-warning) / <alpha-value>)',
+        'admin-warning-fg':    'hsl(var(--admin-warning-fg) / <alpha-value>)',
+        'admin-warning-weak':  'hsl(var(--admin-warning-weak) / <alpha-value>)',
+        'admin-success':       'hsl(var(--admin-success) / <alpha-value>)',
+        'admin-success-fg':    'hsl(var(--admin-success-fg) / <alpha-value>)',
+        'admin-success-weak':  'hsl(var(--admin-success-weak) / <alpha-value>)',
+        'admin-ring':          'hsl(var(--admin-ring) / <alpha-value>)',
+
         /* Korunan renkler (tema bağımsız, sabit HEX) */
         'success-green': '#10B981',
         'warning-orange': '#F59E0B',

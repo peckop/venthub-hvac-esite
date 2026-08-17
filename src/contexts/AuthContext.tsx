@@ -112,18 +112,36 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }, []);
 
   const signOut = useCallback(async () => {
+    // Sunucu ÖNCE: sb-claims-cache httpOnly'dir, client JS SİLEMEZ. /auth/signout
+    // route'u oturumu sunucuda kapatır ve claims cache çerezini temizler. Yalnız
+    // client signOut() bırakmak, admin'i çıkıştan sonra cache TTL'i (15 dk) boyunca
+    // /admin kapısından geçirir — resolveUserClaims geçerli çerezde Supabase'e sormaz (T060).
     try {
+      await fetch('/auth/signout', { method: 'POST' });
+    } catch (serverSignOutError) {
+      // Ağ hatasında yerel çıkışa yine de devam et; çerez TTL ile ölür.
+      console.error('Server sign-out failed:', serverSignOutError);
+    }
+    try {
+      // Sunucu oturumu az önce kapattıysa bu çağrı hata dönebilir — yerel state
+      // temizliği hatadan bağımsız her koşulda yapılır.
       await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
-      setRole(null);
     } catch (error) {
       console.error('Error signing out:', error);
     }
+    setUser(null);
+    setSession(null);
+    setRole(null);
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    // redirectTo locale'siz /auth/callback'e iner (route handler locale ekleyip yönlendirir);
+    // ?next=reset-password, callback sayfasını yeni-şifre ekranına ayırır. redirectTo'suz
+    // çağrı kullanıcıyı giriş yapmış ama şifresini değiştiremez bırakır (INV-AUTH-1).
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${origin}/auth/callback?next=reset-password`,
+    });
     if (error) return { error: { message: error.message } as AuthError };
     return {};
   }, []);

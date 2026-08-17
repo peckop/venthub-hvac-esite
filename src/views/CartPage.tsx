@@ -5,6 +5,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { BrandIcon } from '../components/HVACIcons'
+import QuoteRequestButton from '../components/quotes/QuoteRequestButton'
 import SecurityRibbon from '../components/SecurityRibbon'
 import { useCart } from '../hooks/useCartHook'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
@@ -205,10 +206,23 @@ const CartPage: React.FC = () => {
               </div>
 
               {/* W4b: toplam yalnız fiyatlı kalemleri kapsar; fiyatı bekleyen kalem varsa
-                  bunu söyle ve ödemeyi engelle — ödeme hattı fiyatsız kalemi reddeder. */}
+                  bunu söyle ve ödemeyi engelle — ödeme hattı fiyatsız kalemi reddeder.
+                  T067: uyarı artık eyleme bağlanıyor — fiyatsız kalemler için teklif
+                  talebi buradan açılır (cetvel Q4: sepet = v1 giriş kapısı). */}
               {hasUnpricedItems && (
-                <div className="mb-4 p-3 bg-air-blue rounded-lg">
+                <div className="mb-4 p-3 bg-air-blue rounded-lg space-y-3">
                   <p className="text-sm text-steel-gray">{t('cart.quoteItemsNotice')}</p>
+                  <QuoteRequestButton
+                    source="cart"
+                    items={items
+                      .filter((item) => typeof item.unitPrice !== 'number' || !Number.isFinite(item.unitPrice))
+                      .map((item) => ({
+                        productId: item.product.id,
+                        productName: item.product.name,
+                        qty: item.quantity,
+                      }))}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-navy hover:bg-secondary-blue text-white text-sm font-semibold rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/50"
+                  />
                 </div>
               )}
 

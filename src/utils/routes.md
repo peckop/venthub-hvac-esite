@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\routes.ts
-skeleton_hash: 19d656f32362cddc
+source_path: C:\Users\alize\venthub-wt-quote\src\utils\routes.ts
+skeleton_hash: 29f794b5abdfd830
 entity_hashes:
   func:assertProductSlug: 7cc00756c332a6af
   func:localizedHref: e1a2d461bb32d4d4
   overview: 8cbb4744a23035a6
-generated_at: 2026-06-19T20:48:41Z
+generated_at: 2026-08-16T11:27:50Z
 ---
 
 ## Genel Bakış
@@ -71,8 +71,7 @@ Bu modül, uygulama rotalarında kullanılan ürün tanımlayıcılarının doğ
 - **Routes** (object) — `{
   home: () => '/' as Route,
   
-  // Eşsiz Link Yönetimi
-  product: (slu...`
+  // Eşsiz Link Yönetimi — F5-B: slug art...`
 
 ---
 
@@ -86,71 +85,6 @@ Bu modül, uygulama rotalarında kullanılan ürün tanımlayıcılarının doğ
   - `process.env.NODE_ENV` — Ortam değişkeni, production olup olmadığını kontrol eder; production dışıysa hata fırlatır, production'daysa graceful fallback yapar
 - **Yan etkiler**: Production dışı ortamda `throw new Error(...)` ile istisna fırlatır; production'da `console.error(...)` ile log basar
 - **Dönüş**: `string` — slug'ı olduğu gibi veya boş string döner
-
----
-
-### [N2_NASIL] AST Pointer: `utils/routes.ts::Routes.product`
-- **params**: `(slug: string)`
-- **ic_degiskenler**:
-  - `validSlug` — `assertProductSlug(slug)` çağrısının dönüş değeri; UUID tespit edildiyse hata/log yapan ve slug'ı doğrulayan ara tampon
-- **Dönüş**: `Route` — `/products/{validSlug}` formatında URL, `encodeURIComponent` ile encode edilmiş
-
----
-
-### [N3_NASIL] AST Pointer: `utils/routes.ts::Routes.products`
-- **params**: `(params?: { brand?: string, limit?: number })`
-- **ic_degiskenler**:
-  - `query` — `URLSearchParams` nesnesi; `brand` ve `limit` parametrelerini query string'e eklemek için biriktirici olarak kullanılır
-  - `qs` — `query.toString()` sonucu; oluşturulan query string'in ham halidir, boşsa `/products` döner, doluysa `?` eklenir
-- **Dönüş**: `Route` — `/products` veya `/products?brand=...&limit=...` formatında URL
-
----
-
-### [N4_NASIL] AST Pointer: `utils/routes.ts::Routes.productDetail`
-- **params**: `(idOrSlug: string)`
-- **ic_degiskenler**: yok
-- **Dönüş**: `Route` — `/products/{idOrSlug}` formatında URL, `encodeURIComponent` ile encode edilmiş; boşsa `/products` döner
-
----
-
-### [N5_NASIL] AST Pointer: `utils/routes.ts::Routes.category`
-- **params**: `(slug: string, subSlug?: string)`
-- **ic_degiskenler**: yok
-- **Koşul mantığı**: `subSlug` varsa, `slug`'dan farklıysa ve `'undefined'` string'ine eşleşmiyorsa alt kategori URL'i üretir
-- **Dönüş**: `Route` — `/category/{slug}` veya `/category/{slug}/{subSlug}` formatında URL, her segment `encodeURIComponent` ile encode edilmiş
-
----
-
-### [N6_NASIL] AST Pointer: `utils/routes.ts::Routes.brand`
-- **params**: `(slug: string)`
-- **ic_degiskenler**: yok
-- **Dönüş**: `Route` — `/brands/{slug}` formatında URL, `encodeURIComponent` ile encode edilmiş
-
----
-
-### [N7_NASIL] AST Pointer: `utils/routes.ts::Routes.paymentSuccess`
-- **params**: `(orderId?: string, status?: string)`
-- **ic_degiskenler**:
-  - `query` — `URLSearchParams` nesnesi; `orderId` zorunlu olarak, `status` ise opsiyonel olarak query string'e eklenir
-- **Dönüş**: `Route` — `/payment-success?orderId=...&status=...` formatında URL; `orderId` yoksa doğrudan `/payment-success` döner
-
----
-
-### [N8_NASIL] AST Pointer: `utils/routes.ts::Routes.login`
-- **params**: `(redirect?: string, error?: string)`
-- **ic_degiskenler**:
-  - `url` — Sabit string `'/auth/login'`, login sayfasının temel yolu
-  - `params` — `URLSearchParams` nesnesi; `redirect` ve `error` opsiyonel parametreleri query string'e eklemek için kullanılır
-  - `qs` — `params.toString()` sonucu; oluşturulan query string'in ham halidir
-- **Dönüş**: `Route` — `/auth/login` veya `/auth/login?redirect=...&error=...` formatında URL
-
----
-
-### [N9_NASIL] AST Pointer: `utils/routes.ts::localizedHref`
-- **params**: `(url: string, lang: string)`
-- **ic_degiskenler**: yok
-- **Koşul mantığı**: URL `/admin` veya `/api` ile başlıyorsa olduğu gibi döner; zaten `/tr`, `/en`, `/tr/...` veya `/en/...` ile başlıyorsa locale eklenmeden döner; aksi halde `/{lang}` prefix'i eklenir
-- **Dönüş**: `Route` — Locale-önekli veya öneksiz URL string'i
 
 ---
 

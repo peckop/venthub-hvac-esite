@@ -8,6 +8,7 @@
 > admin'i dışarıda bırakıyordu. Bu dosya o boşluğu kapatır.
 > v1.0 · 2026-08-15 — kabuk/overlay denetimi + 3 paralel kaynak araştırması sonrası ilk sürüm.
 > Zorlama planı: §6 (INV-ADMIN-* testleri + zoom kapısı + mobil viewport projesi).
+> v1.1 · 2026-08-16 — §7.3 eklendi: Faz 5 sayfa-başı ölçümü (21 sayfa + kabuk, %69) + sayaç kör noktaları.
 
 ---
 
@@ -493,10 +494,73 @@ Aralık kuralı (Atlassian): 0–8px = kompakt UI içi · 12–24px = bileşen p
   unobstructed background for panels, useful for presenting information clearly"*).
   ❌ Mevcut `glass`/`glass-strong` + `backdrop-blur-xl` her kartta — veri okunabilirliğine aykırı.
 
-> ⚠️ **AÇIK KARAR — varsayılan tema.** Bu cetvelin geri kalanı tema-bağımsızdır, ama varsayılanın
-> hangisi olacağı ürün kararıdır ve Recep'in onayını bekliyor. Referans olarak verilen iki ürün bu
-> eksende ayrışıyor: **Linear koyu**, **Stripe/Vercel açık** varsayılan. Tokenlar rol-bazlı tanımlandığı
-> için varsayılanı çevirmek tek satırlık iştir; bu karar §3'ün *uygulanmasını* bloklamaz.
+> ✅ **KARAR VERİLDİ (Recep, 2026-08-15): varsayılan AÇIK tema, koyu birinci sınıf seçenek.**
+> Görsel yön *nötr kurumsal* (Linear/Stripe hissi).
+
+#### 3.8.1 Token kümesi (normatif)
+
+Admin renkleri `src/index.css` içinde **`[data-admin-theme]`** kapsamında tanımlıdır; `='dark'` yalnız
+değerleri ezer. Bileşen iki farklı sınıf yazmaz, tek token yazar.
+
+**Kapsam bilerek DAR:** değişkenler `:root` altında **değil**. Vitrin koyu tasarlanmıştır ve kendi
+cetveli vardır (`storefront-design-standard.md`); `:root`a koymak vitrini de çevirirdi.
+
+| Rol | Token | Kullanım |
+|---|---|---|
+| Sayfa zemini | `admin-bg` | kabuk arkaplanı |
+| Yüzey | `admin-surface` | kart, panel, modal, tablo gövdesi |
+| Yüzey +1 | `admin-surface-2` | tablo başlığı, hover, ikincil zemin |
+| Yüzey +2 | `admin-surface-3` | seçili satır, vurgulu zemin |
+| Kenarlık | `admin-border` / `admin-border-strong` | hairline / hover-vurgu |
+| Metin | `admin-fg` | gövde ve başlık |
+| Metin (ikincil) | `admin-fg-muted` | etiket, yardım metni — **AA ✓ (~4.9:1)** |
+| Metin (üçüncül) | `admin-fg-subtle` | **yalnız büyük metin ve UI sınırı** (~3.6:1) — gövdede YASAK |
+| Vurgu | `admin-accent` / `-hover` / `-fg` / `-weak` | birincil buton, link, aktif nav, odak |
+| Durum | `admin-danger` / `-warning` / `-success` (+ `-fg`, `-weak`) | yalnız kendi anlamında (§3.4) |
+| Odak | `admin-ring` | odak halkası |
+
+Yükseklik: `shadow-admin-sm / -md / -lg / -overlay` (`tokens.js`). **Y-kayması sıfır olan gölge
+(`shadow-[0_0_40px…]`) glow'dur, gölge değildir** — ışık kaynağı yoktur ve dört resmi token setinin
+hiçbirinde yer almaz; açık zeminde kirli hale bırakır. Yasak.
+
+#### 3.8.2 Tercihin kalıcılığı — çerez, localStorage DEĞİL
+
+Tercih `vh_admin_theme_<tenantId>` çerezinde `<tercih>:<çözülmüş>` biçiminde tutulur ve
+`src/app/admin/layout.tsx` içinde **SUNUCUDA** okunup ilk render'a basılır.
+
+localStorage sunucuda okunamaz; tercih sunucuda bilinmezse koyu temayı seçen kullanıcı **her sayfa
+yüklemesinde beyaz bir kare** görür. Aynı tuzağa sol menü tercihinde de düşülmüştü (çerez yazılıyor,
+hiç okunmuyordu → kalıcılık sessizce çalışmıyordu).
+
+`system` seçeneğinde çözülmüş değeri **istemci çereze geri yazar**: sunucu `prefers-color-scheme`
+okuyamaz, dolayısıyla bir sonraki ilk boyamanın doğru gelmesinin başka yolu yoktur. Çerez ayrıca
+tenant-scoped (kural 12) ve medya sorgusu canlı dinlenir (kullanıcı OS temasını panel açıkken
+değiştirirse "sistem"in anlamı derhal karşılanır).
+
+#### 3.8.3 Ham sınıf → token eşleme tablosu (geçiş kaydı)
+
+2026-08-15 taraması: **951 ham `slate-*`, 219 `text-white`, 475 `font-black`, 539 `uppercase`,
+240 `tracking-widest`, 18 glow.** Hiçbiri derleme hatası değildir — `text-white` geçerli bir sınıftır,
+tsc/lint/test/build hepsi geçer; hata yalnız **kullanıcıda** ortaya çıkar. Bu yüzden kural statik
+taramayla korunur (`INV-ADMIN-THEME-*`).
+
+| Ham | Token | Gerekçe |
+|---|---|---|
+| `text-white`, `text-white/N` | `text-admin-fg` (renkli zeminde `text-admin-*-fg`) | açık temada zeminle aynı renge gelir, içerik kaybolur |
+| `bg-white/1..5` → `bg-admin-surface-2`, `/6..20` → `-3` | | `white/N` yalnız koyu zeminde görünen bir hiledir |
+| `glass`, `glass-strong`, `glass-md` | `bg-admin-surface` | yarı saydam koyu katman; ayrıca her kart ayrı kompozisyon katmanı doğurur |
+| `text-slate-100..300` / `400-500` / `600-700` | `text-admin-fg` / `-muted` / `-subtle` | |
+| `border-white/N`, `border-slate-*`, `ring-white/N` | `border-admin-border` | |
+| `bg/text/border-{cyan,sky,blue}-*` | `admin-accent` (+`-weak` alfalıda) | |
+| `{rose,red}` → `danger` · `{amber,yellow,orange}` → `warning` · `{emerald,green,teal}` → `success` | | §3.4 |
+| `font-black` | `font-semibold` | her şey en kalınsa hiyerarşi yoktur |
+| `uppercase`, `tracking-widest/wider/hvac-*` | *(kaldırılır)* | okuma hızını düşürür; TR'de İ/ı sorunları |
+| `rounded-hvac-*`, `rounded-xl/2xl/3xl` | `rounded-admin-sm/md/lg` | §3.5 |
+| `shadow-sm/md/lg/xl/2xl`, `shadow-[0_0_…]`, `shadow-glow-*` | `shadow-admin-sm/md/lg/overlay` | |
+| `focus:` | `focus-visible:` | `focus:` fareyle de halka çizer → geliştirici `outline-none` ile bastırır ve klavye odağını da öldürür |
+
+**`uppercase` için TEK muafiyet:** `src/utils/adminUi.ts` içindeki tablo başlığı ve etiket sabitleri
+(ölçülü `tracking-wide` ile). Muafiyet **adla** verilir, desenle değil.
 
 ### 3.9 Odak halkası
 
@@ -868,6 +932,128 @@ INV-ADMIN-DESIGN-1 için başlangıç tavanları — hedef hepsinde **0**:
 > buradaki sayılar ilk ölçümün kaydıdır, test yazılırken yeniden ölçülüp sabitlenir.
 > Statik tarama tuzakları → `conformance-test-static-scan-gotchas` (import.meta.glob, tam-literal kök
 > glob, stale-guard).
+
+### 7.1 YENİDEN ÖLÇÜM — 2026-08-15 akşamı (Faz 5)
+
+114 admin dosyası, **yorumlar ayıklanarak** ölçüldü. Ham `grep` bu depoda yanıltıcıdır: kuralı
+*anlatan* yorumlar kuralın kendisini içerir (`window.confirm` yasağını açıklayan yorum,
+`window.confirm` araması için bulgu üretir). Conformance testleri de yorum ayıklıyor; ölçüm aynı
+yöntemi kullanmazsa iki sayı birbirini tutmaz ve hangisinin doğru olduğu belirsizleşir.
+
+| Sayaç | Baseline | Şimdi | Durum |
+|---|---|---|---|
+| `window.confirm` / `confirm(` | 21 | **0** | ✅ kapı: INV-ADMIN-OVERLAY-1 |
+| `alert(` | 7 | **0** | ✅ |
+| Ham `z-*` | ~30 (tavan 57) | **0** | ✅ tavan **0**'a indirildi |
+| Arbitrary `shadow-[0_0_…]` (glow) | ≥18 | **0** | ✅ `shadow-admin-*` |
+| `font-black` | 475 | **0** | ✅ |
+| `uppercase` | 539 | **3** | muaf: QR etiketinin yazdırma CSS'i |
+| `tracking-widest` | 240 | **0** | ✅ |
+| `glass` / `glass-strong` | çok | **0** | ✅ opak yüzey |
+| Ham renk skalası (`slate-*` vb.) | 951 | **1** | muaf: önizleme cihaz çerçevesi |
+| `focus:` (non-`focus-visible`) | çok | **0** | ✅ |
+| `aria-invalid` | 1 | **31** | form modallarında alan-seviyesi hata |
+| `aria-modal` | 8 eksik | **14** | her Dialog'da |
+| Ölü overlay kodu | ~1000 satır | **0** | ölü değilmiş — **geri takıldı** (§7.2) |
+
+**İki muafiyet ADLA verilmiştir, desenle değil:**
+`InventoryQrLabel.tsx` (yazıcıya giden gerçek CSS, Tailwind sınıfı değil) ve
+`CategoryBuilderView.tsx` (önizleme tuvali — admin kromu değil, içinde vitrin render ediliyor).
+
+### 7.2 "Ölü kod" ölü değildi
+
+Baseline'da "~1000 satır ölü overlay kodu — sil veya bağla" yazıyordu. Git arkeolojisi
+üçünün de **kalite temizliğinde düşmüş kullanıcı işlevi** olduğunu gösterdi:
+`3c7ea6ff` ("total quality purge — 980 to 0 errors") `AdminInventoryPage.tsx`'i **770 satırdan
+27'ye** düşürmüş, konteyner buharlaşmış, sunum bileşenleri yetim kalmıştı. Hepsi geri takıldı.
+
+**Cetvel kuralı:** bir bileşen "import edilmiyor" ise bu bir **soru**dur, cevap değil. Silmeden
+önce `git log -S "<Ad>" --all -- src` ile eskiden kimin import ettiğine ve o commit'in
+"purge/cleanup/lint fix" olup olmadığına bak; sözlükte ya da DB'de o yüzeye ait yetim kalmış
+anahtar/kolon varsa işlev gerçekti.
+
+### 7.3 SAYFA SKORLARI — 2026-08-16 (Faz 5: sayfa-başı §5 ölçümü)
+
+21 rota + kabuk, 5 paralel ölçüm ajanı, yorum ayıklamalı. Sayfa başına GÖRSEL 11 + OVERLAY 11
+maddesi; uygulanamayan madde **n.a.** sayıldı (✓ değil). Kabuk 18 maddesi bir kez ölçüldü.
+Kanıt satırları (dosya:satır) ajan raporlarında; buradaki tablo özet skordur.
+
+**Kabuk: 15/16** (statik ölçülebilir). Tek ✗: **K11** — sticky başlık var ama `scroll-padding-top`
+hiçbir yerde tanımlı değil (hash çıpaları 56px başlığın altında kalır). K5/K6 (%400 zoom, %200
+metin) statik ölçülemez — §6'daki zoom kapısı hâlâ açık kalem (`reflow-scan.mjs` var ama admin
+rotalarına bağlı değil, Playwright tek proje).
+
+| Sayfa | Skor | Sayfa | Skor |
+|---|---|---|---|
+| /admin (dashboard) | **6/14** | /admin/pricing | 14/20 |
+| /admin/orders | **9/22** | /admin/pricing/rules | 15/21 |
+| /admin/returns | 14/21 | /admin/pricing/preview | **14/16** ✦ |
+| /admin/logistics | 10/15 | /admin/coupons | 12/17 |
+| /admin/movements | 8/14 | /admin/settings | 13/19 |
+| /admin/products | **10/21** | /admin/users | 13/20 |
+| /admin/categories | **10/21** | /admin/audit-logs | 14/16 |
+| /admin/categories/…/builder | **17/21** ✦ | /admin/errors | 15/16 |
+| /admin/inventory | 16/22 | /admin/error-groups | 16/18 |
+| /admin/inventory/report | 12/17 | /admin/webhook-events | 16/17 |
+| /admin/inventory/settings | 13/17 | **TOPLAM** | **267/385 (%69)** |
+
+✦ = grubunun en temizi. Desen net: **kit'e göçmüş yüzeyler cetveli tutuyor** (DataTableKit,
+ConfirmProvider, AdminPageHeader temiz çıktı); drift kit DIŞI kalan bölgelerde toplanıyor.
+
+**Altı sistematik drift (kök sebep az, yayılım geniş):**
+
+| # | Drift | Yayılım | Kök |
+|---|---|---|---|
+| S1 | **G3**: gövde/hücre metni `font-semibold`/`font-bold` (cetvel: 400) | 21/21 sayfa | sayfa sayfa; en yoğun tablo hücreleri |
+| S2 | **O10**: işlem hataları otomatik kapanan `toast.error`'da | ~15 sayfa | alışkanlık; inline örnek mevcut (inventory/settings, pricing/preview) |
+| S3 | **O1**: paylaşılan `AdminModal` dururken 10 yerel `fixed inset-0` modal | products, categories, inventory×2, pricing×3, settings, orders | kalibrasyon dalgası form modallarına girmemiş |
+| S4 | **G8**: vitrin tokenlarının admin'e sızması (`primary-navy`, `surface-deep`, `brand-cyan`) + dashboard grafiklerinde ham HEX | ~12 sayfa | grafik bileşenleri + eski form bileşenleri |
+| S5 | **G11**: halkasız `outline-none` (ColumnsMenu/ExportMenu/AdminToolbar Switch/ProductFormModal) — klavye odağı görünmez | tablo sayfalarının tümü | 4 paylaşılan bileşen + 2 form modalı |
+| S6 | **O6**: >5 girdili form modalda — `PricingRuleFormModal` **15 girdi**, `CategoryFormModal` **14 girdi + Tabs**, OrderFormModal 7+Tabs | 5 modal | O1 ile aynı kök: modal→panel/rota göçü yapılmadı |
+
+**Cetvel kararı bekleyen madde:** `adminCardClass`/`adminTableContainerClass` düz karta
+`shadow-admin-sm` basıyor (kit-düzeyi, her sayfaya yayılıyor). §3.3 "düz kartta gölge yok" der;
+ya kit düzeltilir ya cetvele "hairline + `shadow-admin-sm` ikilisi meşru taban" istisnası yazılır.
+Ölçümde bu madde ✗ sayıldı ama tek kök karardır.
+
+**Adla kayıtlı ESKİ kusurlardan hâlâ açık olanlar:**
+- **D15 hâlâ canlı:** `DateRangePicker.tsx:139` popover'da `z-toast` (§4.9'un adıyla yasakladığı
+  birebir durum). §7.1 sayacı "ham z-*" aradığı için token'lı-ama-yanlış-katman atamasını görmedi.
+  Aynı kör noktada: `ColumnsMenu`/`FacetedFilter` popover'ına `z-modal`, yerel modal overlay'lerine
+  `z-backdrop` yerine `z-modal`.
+- **G10 çift genişlik kaynağı:** `AdminInventoryReportPage` `max-w-page` (kabukla çift) ve
+  `AdminInventorySettingsPage` `max-w-5xl` hâlâ yerinde (§3.7'de adla sayılmıştı).
+  `AdminUsersPage` kök `max-w-4xl` ise kalkmış ✓.
+- **Tokenlaşmış glow:** `tokens.js` `shadow-admin-categories-glow` = `0 0 8px` (Y-offset 0) —
+  sayaç arbitrary `shadow-[…]` aradığı için token'a taşınmış glow'u görmedi. `admin-*-glow`
+  ailesi (tokens.js:114-120) G6'nın token-katmanı artığı.
+
+**§7.1 sayaçlarının ölçülen KÖR NOKTALARI (sayaç 0 derken ihlal yaşıyor):**
+1. `font-black` sayacı **sınıf** arıyor; dashboard grafikleri (`SalesChart`, `ActivityHeatmap`,
+   `AbcPieChart`) `fontWeight: 900/'black'` değerini **inline style** ile basıyor → sayaç 0, gerçek ≥6.
+2. "Ham z-*" sayacı token kullanımını doğru sayıyor ama **katman semantiğini** ölçmüyor (D15 örneği).
+3. "Arbitrary shadow" sayacı token'a taşınmış 0-offset glow'u görmüyor (categories örneği).
+Ders: sayaç sıfırlandığında kural bitmiş sayılmaz — biçim değiştirip token/inline katmana taşınabilir.
+(Aynı aile: `substring-assert-is-not-a-gate`.)
+
+**Ölçümün bulduğu cetvel-ÜSTÜ ciddi kusurlar (tasarım değil işlev/tehlike; ilgili şeride):**
+- `ReturnsTableBody` tekil durum menüsünden `refunded` = **gerçek para iadesi onaysız tek tık**
+  (alertdialog yalnız rejected/cancelled'da; toplu akışta onay var, tekil akış açık).
+- `AdminUsersTableBody:499-509` **tekil rol değişikliği onaysız** (super_admin atama/alma dahil;
+  alertdialog yalnız toplu değişimde).
+- `ProductCsvImport.tsx:176` tamamen elle overlay — role/aria-modal/ESC/odak-tuzağı/scroll-lock **YOK**
+  (ölçümdeki en ağır a11y bulgusu).
+- `ProductFormModal` şeması `brand`'i zorunlu istiyor ama formda alan yok → yeni ürün kaydı
+  muhtemelen hiç valide olamıyor (işlevsel, doğrulanmalı).
+- `RecentOrdersTable.tsx:125` var olmayan `/admin/orders/[id]` rotasına link.
+- `ErrorsTableBody:201-206` seviye rozeti `bg-admin-danger text-admin-danger` (`-weak` eksik) —
+  rozet metni okunmaz; kardeş sayfa error-groups'ta doğrusu var.
+- Sessiz hata yüzeyleri: audit/errors `exportCsv` hatası hiçbir yüzeye düşmüyor;
+  `AdminInventoryReportPage` veri hatası yalnız `console.error`.
+- `InventoryCsvImport`: **"Tümünü geri al"** yalnız 15 sn'de kapanan toast'ta yaşıyor (§4.7:
+  kritik geri alma kalıcı yüzeyde de olmalı).
+- i18n yan bulguları: `DataTableKit`/`AdminToolbar` sabit Türkçe fallback'ler;
+  `CategoryFormModal` sözlüksüz ham Türkçe toast'lar (kural 7).
 
 ---
 

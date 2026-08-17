@@ -12,12 +12,13 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
 import CategoryFormModal from '../../components/admin/categories/CategoryFormModal'
+import { type BulkAction, BulkBar } from '../../components/admin/data-table/BulkBar'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import EditableCell from '../../components/admin/EditableCell'
 import ExportMenu from '../../components/admin/ExportMenu'
+import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -52,6 +53,7 @@ async function categoriesFetcher(
 
 const CategoriesTableBody: React.FC = () => {
   const { t } = useI18n()
+  const confirm = useConfirm()
   const router = useRouter()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('categories')
@@ -168,7 +170,12 @@ const CategoriesTableBody: React.FC = () => {
         toast.error(t('admin.categories.toasts.noPermission'))
         return
       }
-      if (!confirm(t('admin.categories.deleteConfirm'))) return
+      const ok = await confirm({
+        description: t('admin.categories.deleteConfirm'),
+        confirmLabel: t('admin.confirm.delete'),
+        tone: 'danger',
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'categories',
@@ -193,7 +200,7 @@ const CategoriesTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [hasWriteAccess, t, table, confirm],
   )
 
   /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
@@ -228,15 +235,13 @@ const CategoriesTableBody: React.FC = () => {
       const ids = table.selection.selectedIds
       if (ids.length === 0) return
       const isActive = status === 'active'
-      if (
-        !window.confirm(
-          t('admin.categories.bulk.statusConfirm', {
-            count: String(ids.length),
-            status: t(`admin.categories.statusLabels.${status}`),
-          }),
-        )
-      )
-        return
+      const ok = await confirm({
+        description: t('admin.categories.bulk.statusConfirm', {
+          count: String(ids.length),
+          status: t(`admin.categories.statusLabels.${status}`),
+        }),
+      })
+      if (!ok) return
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'categories',
@@ -264,7 +269,7 @@ const CategoriesTableBody: React.FC = () => {
         )
       }
     },
-    [hasWriteAccess, t, table],
+    [hasWriteAccess, t, table, confirm],
   )
 
   /* ---- toplu öne çıkarma — UPDATE, mutateWithAudit kapısından ---- */
@@ -306,7 +311,12 @@ const CategoriesTableBody: React.FC = () => {
   const bulkDelete = useCallback(async () => {
     const ids = table.selection.selectedIds
     if (ids.length === 0) return
-    if (!window.confirm(t('admin.categories.bulk.deleteConfirm', { count: String(ids.length) }))) return
+    const ok = await confirm({
+      description: t('admin.categories.bulk.deleteConfirm', { count: String(ids.length) }),
+      confirmLabel: t('admin.confirm.delete'),
+      tone: 'danger',
+    })
+    if (!ok) return
     try {
       await mutateWithAudit(supabaseBrowserClient, {
         resource: 'categories',
@@ -330,7 +340,46 @@ const CategoriesTableBody: React.FC = () => {
           : t('admin.categories.bulk.deleteFailed'),
       )
     }
-  }, [hasWriteAccess, t, table])
+  }, [hasWriteAccess, t, table, confirm])
+
+  /**
+   * Toplu işlem eylemleri — ortak `BulkBar` sözleşmesi.
+   *
+   * Eskiden bu sayfa `BulkActionToolbar` kullanıyordu; o bileşen `BulkBar` ile
+   * MÜKERRERDİ (aynı işi yapan iki yapışkan çubuk) ve ÜSTELİK farklı görünüyordu.
+   * Aynı işlemin sayfadan sayfaya farklı görünmesi cetvel §4'ün doğrudan ihlaliydi.
+   * Artık tek bileşen. Kategorilerde fiyat düzenleme diye bir şey YOK — eski
+   * `onPriceAdjust` ölü saptı ve ham İngilizce toast basıyordu; taşınmadı, kalktı.
+   */
+  const bulkActions = useMemo<BulkAction[]>(
+    () => [
+      {
+        key: 'activate',
+        label: t('admin.toolbar.makeActive'),
+        tone: 'default',
+        onRun: () => bulkStatusChange('active'),
+      },
+      {
+        key: 'deactivate',
+        label: t('admin.toolbar.makePassive'),
+        tone: 'warning',
+        onRun: () => bulkStatusChange('inactive'),
+      },
+      {
+        key: 'feature',
+        label: t('admin.toolbar.feature'),
+        tone: 'default',
+        onRun: () => bulkFeatureToggle(true),
+      },
+      {
+        key: 'delete',
+        label: t('admin.common.delete'),
+        tone: 'danger',
+        onRun: () => bulkDelete(),
+      },
+    ],
+    [t, bulkStatusChange, bulkFeatureToggle, bulkDelete],
+  )
 
   /* ---- status chip'leri (is_active) ---- */
   const statusChips = useMemo(
@@ -378,7 +427,7 @@ const CategoriesTableBody: React.FC = () => {
         header: t('admin.categories.table.image'),
         hideable: true,
         cell: (r) => (
-          <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-colors duration-500">
+          <div className="relative w-12 h-12 rounded-admin-md border border-admin-border overflow-hidden bg-admin-surface group-hover:border-admin-border transition-colors duration-500">
             {r.image_url ? (
               <VentImage
                 src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
@@ -387,7 +436,7 @@ const CategoriesTableBody: React.FC = () => {
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-white/5 text-xs font-black text-slate-700 uppercase">
+              <div className="w-full h-full flex items-center justify-center bg-admin-surface-2 text-xs font-semibold text-admin-fg-subtle">
                 {t('admin.categories.noImage')}
               </div>
             )}
@@ -400,22 +449,22 @@ const CategoriesTableBody: React.FC = () => {
         sortable: true,
         cell: (r) => (
           <div className="flex items-center gap-2">
-            {r.parent_id && <div className="w-4 h-px bg-slate-700 mt-1" />}
+            {r.parent_id && <div className="w-4 h-px bg-admin-surface-3 mt-1" />}
             <div className="flex flex-col">
               {hasWriteAccess ? (
                 <EditableCell
                   value={r.name}
                   placeholder={t('admin.categories.namePlaceholder')}
                   inputWidth="w-full"
-                  className={`group-hover:text-cyan-400 transition-colors uppercase tracking-wider font-black ${
-                    r.parent_id ? 'text-slate-400 text-xs' : 'text-white text-xs'
+                  className={`group-hover:text-admin-accent transition-colors font-semibold ${
+                    r.parent_id ? 'text-admin-fg-muted text-xs' : 'text-admin-fg text-xs'
                   }`}
                   onSave={(val) => saveName(r, val)}
                 />
               ) : (
                 <span
-                  className={`uppercase tracking-wider font-black ${
-                    r.parent_id ? 'text-slate-400 text-xs' : 'text-white text-xs'
+                  className={`font-semibold ${
+                    r.parent_id ? 'text-admin-fg-muted text-xs' : 'text-admin-fg text-xs'
                   }`}
                 >
                   {r.name}
@@ -423,8 +472,8 @@ const CategoriesTableBody: React.FC = () => {
               )}
               {r.is_featured && (
                 <div className="flex items-center gap-1.5 mt-1">
-                  <span className="w-1 h-1 rounded-full bg-cyan-400 shadow-admin-categories-glow" />
-                  <span className="text-xs font-black text-cyan-400 uppercase tracking-widest">
+                  <span className="w-1 h-1 rounded-full bg-admin-accent shadow-admin-categories-glow" />
+                  <span className="text-xs font-semibold text-admin-accent">
                     {t('admin.categories.featuredBadge')}
                   </span>
                 </div>
@@ -442,21 +491,21 @@ const CategoriesTableBody: React.FC = () => {
           hasWriteAccess ? (
             <div
               title={t('admin.categories.sortOrderTooltip')}
-              className="inline-block glass bg-white/5 rounded-xl border border-white/5 group-hover:border-cyan-400/30 transition-colors p-1"
+              className="inline-block bg-admin-surface bg-admin-surface-2 rounded-admin-md border border-admin-border group-hover:border-admin-accent/30 transition-colors p-1"
             >
               <EditableCell
                 value={r.sort_order ?? 0}
                 placeholder="0"
                 type="number"
                 inputWidth="w-12"
-                className="text-center text-cyan-400 font-black text-xs tracking-widest uppercase"
+                className="text-center text-admin-accent font-semibold text-xs"
                 onSave={(val) => saveSortOrder(r, val)}
               />
             </div>
           ) : (
             <span
               title={t('admin.categories.sortOrderTooltip')}
-              className="text-xs font-black text-slate-500 uppercase tracking-widest"
+              className="text-xs font-semibold text-admin-fg-muted"
             >
               {r.sort_order ?? 0}
             </span>
@@ -467,7 +516,7 @@ const CategoriesTableBody: React.FC = () => {
         header: t('admin.categories.table.slug'),
         hideable: true,
         cell: (r) => (
-          <code className="text-xs font-black text-slate-500 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5 group-hover:text-cyan-400/60 transition-colors uppercase tracking-hvac-snug font-mono">
+          <code className="text-xs font-semibold text-admin-fg-muted bg-admin-surface-2 px-2 py-0.5 rounded-admin-md border border-admin-border group-hover:text-admin-accent transition-colors font-mono">
             {r.slug}
           </code>
         ),
@@ -477,7 +526,7 @@ const CategoriesTableBody: React.FC = () => {
         header: t('admin.categories.table.parent'),
         hideable: true,
         cell: (r) => (
-          <span className="text-xs font-black text-slate-500 uppercase tracking-hvac-snug">
+          <span className="text-xs font-semibold text-admin-fg-muted">
             {r.parent_id ? categoryNameMap.get(r.parent_id) ?? t('admin.categories.noPlaceholder') : t('admin.categories.noPlaceholder')}
           </span>
         ),
@@ -488,7 +537,7 @@ const CategoriesTableBody: React.FC = () => {
         hideable: true,
         defaultHidden: true,
         cell: (r) => (
-          <p className="text-xs text-slate-500 line-clamp-1 max-w-200px italic">
+          <p className="text-xs text-admin-fg-muted line-clamp-1 max-w-200px italic">
             {r.description || t('admin.categories.noPlaceholder')}
           </p>
         ),
@@ -501,7 +550,7 @@ const CategoriesTableBody: React.FC = () => {
           <div className="flex items-center justify-center gap-2">
             <button
               type="button"
-              className={`${adminTableActionClass} bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500 hover:text-white`}
+              className={`${adminTableActionClass} bg-admin-accent-weak text-admin-accent border-admin-accent/30 hover:bg-admin-accent hover:text-admin-accent-fg`}
               onClick={() => router.push(`/admin/categories/${r.id}/builder`)}
               title={t('admin.categories.designAction')}
               aria-label={t('admin.categories.designAction')}
@@ -599,15 +648,14 @@ const CategoriesTableBody: React.FC = () => {
         }
         bulkBarSlot={
           hasWriteAccess ? (
-            <BulkActionToolbar
+            <BulkBar
               selectedCount={table.selection.selectedIds.length}
-              onStatusChange={(status) => void bulkStatusChange(status)}
-              onFeatureToggle={(featured) => void bulkFeatureToggle(featured)}
-              onDelete={() => void bulkDelete()}
-              onPriceAdjust={() => {
-                toast.error('Categories do not support price adjustments')
-              }}
-              onClearSelection={table.selection.clear}
+              selectedLabel={t('admin.dataTable.bulk.selectedCount', {
+                count: table.selection.selectedIds.length,
+              })}
+              clearLabel={t('admin.dataTable.bulk.clear')}
+              actions={bulkActions}
+              onClear={table.selection.clear}
             />
           ) : null
         }
