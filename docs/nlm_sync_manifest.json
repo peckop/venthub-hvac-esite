@@ -1,0 +1,257 @@
+{
+  "surum": 1,
+  "olculdu": "2026-08-17T21:55:00.000Z",
+  "notebook_id": "235043eb-970f-4a52-9f39-1d02b2621e9c",
+  "olcum_basarili": true,
+  "beklenen": [
+    "README.md",
+    "CONTEXT.md",
+    "CHANGELOG.md",
+    "RECOMMENDATIONS.md",
+    "VISION.md",
+    "CLAUDE.md",
+    "PROJECT.md",
+    "operasyon-dongusu-denetimi-2026-08-15.md",
+    "render-stratejisi-denetimi-2026-08-16.md",
+    "vibe-coding-20-madde-v2-2026-08-16.md",
+    "database_schema_master.md",
+    "design_system_config.md",
+    "venthub_skills_master.md",
+    "admin-standard.md",
+    "admin-capabilities.md",
+    "dealer-network-standard.md",
+    "dealer-module-blueprint.md",
+    "dealer-data-ground-truth-2026-06-11.md",
+    "row-level-security.md",
+    "custom-claims-and-role-based-access-control-rbac.md",
+    "auth-hooks.md",
+    "realtime-authorization.md",
+    "faz0-kit-contract-2026-06-13.md",
+    "faz1-migration-playbook-2026-06-13.md",
+    "seo-transition-blueprint.md",
+    "analytics-standard.md",
+    "i18n-localization-standard.md",
+    "collaboration-protocol.md",
+    "category-taxonomy-standard.md",
+    "3d-webgl-standard.md",
+    "3d-scene-lighting-research.md",
+    "3d-showroom-ux-research.md",
+    "SOURCES.md",
+    "pricing-standard.md",
+    "catalog-ingestion-standard.md",
+    "csv-import-export-standard.md",
+    "work-tracking-ssot-standard.md",
+    "saas-funding-and-packaging-2026-06.md",
+    "product-schema-ground-truth-2026-06-21.md",
+    "product-schema-standard.md",
+    "catalog-commerce-pipeline-master-2026-06-20.md",
+    "slug-localization-2026-08-10.md",
+    "product-schema-master-implementation-plan.md",
+    "migration-safety-standard.md",
+    "rendering-cache-standard.md",
+    "multi-session-coordination-standard.md",
+    "storefront-design-standard.md",
+    "edge-function-security-standard.md",
+    "admin-design-standard.md"
+  ],
+  "defterde": [
+    {
+      "baslik": "README.md",
+      "id": "source-1"
+    },
+    {
+      "baslik": "CONTEXT.md",
+      "id": "source-2"
+    },
+    {
+      "baslik": "CHANGELOG.md",
+      "id": "source-3"
+    },
+    {
+      "baslik": "RECOMMENDATIONS.md",
+      "id": "source-4"
+    },
+    {
+      "baslik": "VISION.md",
+      "id": "source-5"
+    },
+    {
+      "baslik": "CLAUDE.md",
+      "id": "source-6"
+    },
+    {
+      "baslik": "PROJECT.md",
+      "id": "source-7"
+    },
+    {
+      "baslik": "operasyon-dongusu-denetimi-2026-08-15.md",
+      "id": "source-8"
+    },
+    {
+      "baslik": "render-stratejisi-denetimi-2026-08-16.md",
+      "id": "source-9"
+    },
+    {
+      "baslik": "vibe-coding-20-madde-v2-2026-08-16.md",
+      "id": "source-10"
+    },
+    {
+      "baslik": "database_schema_master.md",
+      "id": "source-11"
+    },
+    {
+      "baslik": "design_system_config.md",
+      "id": "source-12"
+    },
+    {
+      "baslik": "venthub_skills_master.md",
+      "id": "source-13"
+    },
+    {
+      "baslik": "admin-standard.md",
+      "id": "source-14"
+    },
+    {
+      "baslik": "admin-capabilities.md",
+      "id": "source-15"
+    },
+    {
+      "baslik": "dealer-network-standard.md",
+      "id": "source-16"
+    },
+    {
+      "baslik": "dealer-module-blueprint.md",
+      "id": "source-17"
+    },
+    {
+      "baslik": "dealer-data-ground-truth-2026-06-11.md",
+      "id": "source-18"
+    },
+    {
+      "baslik": "row-level-security.md",
+      "id": "source-19"
+    },
+    {
+      "baslik": "custom-claims-and-role-based-access-control-rbac.md",
+      "id": "source-20"
+    },
+    {
+      "baslik": "auth-hooks.md",
+      "id": "source-21"
+    },
+    {
+      "baslik": "realtime-authorization.md",
+      "id": "source-22"
+    },
+    {
+      "baslik": "faz0-kit-contract-2026-06-13.md",
+      "id": "source-23"
+    },
+    {
+      "baslik": "faz1-migration-playbook-2026-06-13.md",
+      "id": "source-24"
+    },
+    {
+      "baslik": "seo-transition-blueprint.md",
+      "id": "source-25"
+    },
+    {
+      "baslik": "analytics-standard.md",
+      "id": "source-26"
+    },
+    {
+      "baslik": "i18n-localization-standard.md",
+      "id": "source-27"
+    },
+    {
+      "baslik": "collaboration-protocol.md",
+      "id": "source-28"
+    },
+    {
+      "baslik": "category-taxonomy-standard.md",
+      "id": "source-29"
+    },
+    {
+      "baslik": "3d-webgl-standard.md",
+      "id": "source-30"
+    },
+    {
+      "baslik": "3d-scene-lighting-research.md",
+      "id": "source-31"
+    },
+    {
+      "baslik": "3d-showroom-ux-research.md",
+      "id": "source-32"
+    },
+    {
+      "baslik": "SOURCES.md",
+      "id": "source-33"
+    },
+    {
+      "baslik": "pricing-standard.md",
+      "id": "source-34"
+    },
+    {
+      "baslik": "catalog-ingestion-standard.md",
+      "id": "source-35"
+    },
+    {
+      "baslik": "csv-import-export-standard.md",
+      "id": "source-36"
+    },
+    {
+      "baslik": "work-tracking-ssot-standard.md",
+      "id": "source-37"
+    },
+    {
+      "baslik": "saas-funding-and-packaging-2026-06.md",
+      "id": "source-38"
+    },
+    {
+      "baslik": "product-schema-ground-truth-2026-06-21.md",
+      "id": "source-39"
+    },
+    {
+      "baslik": "product-schema-standard.md",
+      "id": "source-40"
+    },
+    {
+      "baslik": "catalog-commerce-pipeline-master-2026-06-20.md",
+      "id": "source-41"
+    },
+    {
+      "baslik": "slug-localization-2026-08-10.md",
+      "id": "source-42"
+    },
+    {
+      "baslik": "product-schema-master-implementation-plan.md",
+      "id": "source-43"
+    },
+    {
+      "baslik": "migration-safety-standard.md",
+      "id": "source-44"
+    },
+    {
+      "baslik": "rendering-cache-standard.md",
+      "id": "source-45"
+    },
+    {
+      "baslik": "multi-session-coordination-standard.md",
+      "id": "source-46"
+    },
+    {
+      "baslik": "storefront-design-standard.md",
+      "id": "source-47"
+    },
+    {
+      "baslik": "edge-function-security-standard.md",
+      "id": "source-48"
+    },
+    {
+      "baslik": "admin-design-standard.md",
+      "id": "source-49"
+    }
+  ],
+  "eksik": [],
+  "fazla": []
+}
