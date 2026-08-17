@@ -59,6 +59,22 @@ o Controller işini kendi dalına alır, kendi gate'ler ve merge eder.
 **K5 — Merge hijyeni.** Her zaman **`git fetch` + en güncel `origin/master`'dan dallan**; merge'den önce
 geride kaldıysan **rebase et** → eş-zamanlı master-merge race'i önlenir.
 
+**K6 — Pano CLI'ında `--sid` ZORUNLU (T079-VH).** `board.cjs`'in **yazan** fiilleri
+(`claim`/`heartbeat`/`release`/`note`) kimlik olmadan koşmaz. Sebep ölçümle bulundu: kimlik
+`--sid > CLAUDE_SESSION_ID > makine-adı-manual` sırasıyla çözülüyordu ve **Bash kabuğunda
+`CLAUDE_SESSION_ID` tanımlı değil** — yani `--sid` verilmeyen her çağrı
+`events.<makine-adı>-manual.jsonl` dosyasına yazıyor, komut ise `exit 0` verip "not bırakıldı"
+diyordu. Gönderen teslim edildiğini sanıyor, alıcı o dosyayı izlemediği için hiç görmüyor.
+34 kayıt böyle düştü; **biri CANLI bir `claim`di** ve pano aynı şeridi iki ayrı sahiple gösterdi
+(kıdem hayalete geçtiği için şerit-çakışma kontrolü gerçek sahibi kendi dosyalarında
+engelleyebilir hâle geldi) — sessiz kayıp, sessiz kilide dönüşüyor.
+
+- Her çağrıda **`--sid <oturum-kimliğin>`** yaz. Kimliğin oturum açılışında sana verilir.
+- Kimliksiz çağrı artık **exit 1** verir ve **hiçbir şey yazmaz**; muafiyet **adla** alınır
+  (insan elle çalıştırıyorsa `--sid recep-manual` gibi kendine bir kimlik verir).
+- `who` yalnız okur, kimliksiz koşar ama **uyarır** (kendi şeridin "(sen)" işaretlenemez).
+- Bekçi: `src/__tests__/conformance/board-invariants.test.ts` → `INV-BOARD-3`.
+
 ---
 
 ## 1. Bir-İş-Bir-Dal (ZORUNLU)
