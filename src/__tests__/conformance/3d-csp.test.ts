@@ -75,8 +75,32 @@ function hostOf(url: string): string {
   return url.replace(/^[a-z]+:\/\//i, '').replace(/\/.*$/, '')
 }
 
+/**
+ * Yorum sıyırma.
+ *
+ * `(?<!:)` ÖN-BAKIŞI KAPININ KENDİSİ KADAR ÖNEMLİ (T081-VH · 2026-08-18)
+ * ------------------------------------------------------------------
+ * Önceki sürümde ön-bakış YOKTU: sıyırıcı, satırdaki HER çift eğik çizgiyi yorum
+ * başlangıcı sayıyordu. Oysa bir asset satırındaki şema (`https:` sonrası) da çift
+ * eğik çizgiyle yazılır — sıyırıcı onu yorum sanıp satırın geri kalanını siliyordu:
+ *
+ *   girdi : path: 'https://kotu-cdn.example.com/model.glb',
+ *   sonuç : path: 'https:
+ *
+ * Geriye kalan metin `REGISTRY_HOST`/`LOADER_HOST` desenlerine UYMAZ → aşağıdaki
+ * DRIFT-CATCH testi hiçbir host toplayamaz ve **her zaman yeşil** kalır. Yani kapı
+ * duruyor görünürken whitelist dışı bir 3D origin'i hiç göremezdi.
+ *
+ * Bu, bu depoda ölçülmüş bir SINIF: aynı hata `csp-origin-coverage` ve
+ * `canonical-lang-segment` bekçilerinde de yaşandı ve orada da `(?<!:)` ile kapandı.
+ * Alt-sınır kilidi aşağıdaki 'sıyırıcı şemayı yemiyor' testidir — sıyırıcı yeniden
+ * körleşirse ÖNCE o test kırmızı yanar.
+ *
+ * Gerçek yorumlar hâlâ siliniyor: yorum `//`'ından hemen önce iki nokta bulunmaz
+ * (`const x = 1 // not` → boşluk, `'https://a' // not` → tırnak).
+ */
 function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(?<!:)\/\/[^\n]*/g, '')
 }
 
 // Dış 3D origin'in koda girdiği somut yollar (generic `path:` değil → yanlış-pozitif yok).
@@ -129,5 +153,31 @@ describe('INV-3D-5 · CSP / dış-origin', () => {
       }
     }
     expect(offenders, `\n${offenders.join('\n')}`).toEqual([])
+  })
+
+  // ── ALT-SINIR KİLİDİ (T081-VH) ────────────────────────────────────────────────
+  // Yukarıdaki DRIFT-CATCH testi "offenders boş" diye yeşil olur. Boşluk iki
+  // sebepten gelebilir: (a) gerçekten ihlal yok, (b) DEDEKTÖR KÖR. İkisini ayıran
+  // tek şey budur — sıyırıcı şemayı yerse burası ÖNCE kırmızı yanar.
+  it('sıyırıcı şemayı yemiyor: URL taşıyan satır sağ çıkar, gerçek yorum silinir', () => {
+    const urlSatiri = "  path: 'https://kotu-cdn.example.com/model.glb',"
+    expect(stripComments(urlSatiri)).toContain('kotu-cdn.example.com')
+
+    // …ve o satırdan host GERÇEKTEN toplanabiliyor (sıyırma sağ kalsa bile
+    // desen eşleşmezse kapı yine kör olurdu — çağrıyı da ölç, sıyırmayı değil).
+    expect(collectHosts(REGISTRY_HOST, stripComments(urlSatiri))).toEqual([
+      'kotu-cdn.example.com',
+    ])
+    expect(
+      collectHosts(LOADER_HOST, stripComments("  useGLTF('https://kotu.example.net/a.glb')")),
+    ).toEqual(['kotu.example.net'])
+
+    // Ters yön: yorum sıyırma HÂLÂ çalışıyor (aşırı-düzeltme de kusurdur).
+    expect(stripComments('const x = 1 // useGLTF("https://yorumda.example.com/a.glb")')).not.toContain(
+      'yorumda.example.com',
+    )
+    expect(stripComments('/* useGLTF("https://blokta.example.com/a.glb") */')).not.toContain(
+      'blokta.example.com',
+    )
   })
 })
