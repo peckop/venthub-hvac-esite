@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { SYSTEM_CURRENCY } from '../../../i18n/currency'
 import { formatCurrency } from '../../../i18n/format'
 
 interface StatCardProps {
@@ -89,7 +90,7 @@ const StatCard: React.FC<StatCardProps> = ({
         : value == null
             ? '-'
             : isCurrency && typeof value === 'number'
-                ? formatCurrency(value, lang as 'tr' | 'en')
+                ? formatCurrency(value, lang as 'tr' | 'en', { currency: SYSTEM_CURRENCY })
                 : value
 
     const content = (

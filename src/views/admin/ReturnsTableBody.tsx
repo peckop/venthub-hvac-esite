@@ -20,6 +20,7 @@ import ExportMenu from '../../components/admin/ExportMenu'
 import { useConfirmWithReason } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDate, formatDateTime, formatTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -556,7 +557,7 @@ const ReturnsTableBody: React.FC = () => {
           title: t('admin.returns.refundConfirm.title'),
           description: t('admin.returns.refundConfirm.description', {
             order: row.order_number,
-            amount: formatCurrency(row.total_amount ?? 0, lang),
+            amount: formatCurrency(row.total_amount ?? 0, lang, { currency: SYSTEM_CURRENCY }),
           }),
           confirmLabel: t('admin.returns.refundConfirm.confirmLabel'),
           tone: 'danger',
@@ -764,7 +765,7 @@ const ReturnsTableBody: React.FC = () => {
             {typeof r.total_amount === 'number' && (
               <span className="text-xs font-semibold text-admin-fg-muted flex items-center gap-1">
                 <span className="w-1 h-px bg-admin-surface-3" />
-                {formatCurrency(Number(r.total_amount), lang)}
+                {formatCurrency(Number(r.total_amount), lang, { currency: SYSTEM_CURRENCY })}
               </span>
             )}
           </div>
@@ -915,7 +916,7 @@ const ReturnsTableBody: React.FC = () => {
         r.reason ?? '',
         getStatusLabel(r.status),
         formatDateTime(r.created_at, lang),
-        typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang) : '',
+        typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang, { currency: SYSTEM_CURRENCY }) : '',
       ]
         .map(escape)
         .join(','),
@@ -935,7 +936,7 @@ const ReturnsTableBody: React.FC = () => {
     const rows = await table.fetchAllForExport()
     const rowsHtml = rows
       .map((r) => {
-        const amount = typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang) : ''
+        const amount = typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang, { currency: SYSTEM_CURRENCY }) : ''
         return (
           `<tr>` +
           `<td>${orderLabel(r)}</td>` +

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { useDragScroll } from '../../../hooks/useDragScroll'
+import { SYSTEM_CURRENCY } from '../../../i18n/currency'
 import { formatDateTime } from '../../../i18n/datetime'
 import { formatCurrency } from '../../../i18n/format'
 import { useI18n } from '../../../i18n/I18nProvider'
@@ -111,7 +112,7 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                                     </td>
                                     <td className={`${adminTableCellClass} text-right font-semibold text-admin-fg text-sm`}>
                                         <span className="px-3 py-1 rounded-admin-md bg-admin-surface-2 group-hover/row:bg-admin-surface-3 transition-colors border border-admin-border">
-                                            {formatCurrency(r.total_amount, lang)}
+                                            {formatCurrency(r.total_amount, lang, { currency: SYSTEM_CURRENCY })}
                                         </span>
                                     </td>
                                     <td className={adminTableCellClass}>
