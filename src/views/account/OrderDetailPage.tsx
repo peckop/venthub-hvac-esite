@@ -141,7 +141,9 @@ export default function OrderDetailPage() {
             status: orderData.status || 'pending',
             payment_status: orderData.payment_status || undefined,
             created_at: orderData.created_at,
-            customer_name: (orderData).customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
+            // Görünen-ad yedeği sözlükten gelir: ham Türkçe dizge EN kullanıcıya da
+            // "Kullanıcı" gösteriyordu (I18N-SWEEP bildirdi; anahtar ortak sözlükte).
+            customer_name: (orderData).customer_name || (user?.user_metadata?.full_name || user?.email || t('common.userFallback')),
             customer_email: (orderData).customer_email || (user?.email || '-'),
             shipping_address: orderData.shipping_address,
             order_items: mappedItems,
