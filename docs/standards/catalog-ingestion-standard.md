@@ -159,6 +159,54 @@ fanı DEĞİL. Worker bu serileri 41'e koyar; "otopark jet" diye ayrı kategori 
 
 ---
 
+## 6.1 Aile↔içerik bütünlüğü kapısı — **INV-CATALOG-1** (v1.1, 2026-08-18)
+
+> **Niçin eklendi:** T099. Müşteri "AVenS Davlumbaz Fanları" sayfasına girdi ve sepetine bir **hız
+> anahtarı** düştü — çünkü o ailenin üç üyesinin üçü de aksesuardı, ailede tek bir davlumbaz fanı
+> yoktu. Kod doğru davranıyordu (`?sku=` yoksa ilk varyant); yanlış olan **veriydi** ve hiçbir kapı
+> onu görmüyordu. Ölçüm: `docs/audits/t099-aile-icerik-uyumu-2026-08-18.md`.
+
+### Ne ölçülür, ne ölçülmez (dürüst sınır)
+
+**ÖLÇÜLMEZ:** "aile adı içeriğine uyuyor mu" — bu bir **yargıdır**. Ne statik tarama ne SQL bunu
+karara bağlayabilir. Kapı diye yazılırsa yalnız **sahte yeşil** üretir ve gerçek kusuru gizler.
+
+**ÖLÇÜLÜR (SQL, kesin):**
+
+| Kontrol | Neyi yakalar |
+|---|---|
+| `dup-name` — aile içinde çakışan ürün adı | Yalnız adı gösteren yüzey (sepet, e-posta, fatura) iki farklı ürünü aynı gösterir |
+| `dup-label` — aile içinde çakışan `model_code`/`sku` | Varyant seçim yüzeyi anlamsızlaşır; **bugün 0, korunmalı** |
+| `orphan` — ailesiz ürün | Kanonik vitrin adresi olmayan ürün |
+| `brand-mix` — aile içinde birden çok (ya da boş) marka | Aile sınırının yanlış çizildiği |
+
+Kapı: `scripts/db/checks/catalog-integrity.mjs` · taban: `catalog-integrity-baseline.json` ·
+karar mantığının sınavı: `src/__tests__/conformance/catalog-integrity-gate.test.ts`.
+
+### Cırcır (ratchet) — niçin "sıfır ihlal" istemiyoruz
+
+Bugünkü 21 ihlal grubunun (74 satır) düzeltilmesi **prod yazımıdır → Recep kapısı**. Kapı bu yüzden
+bilinen ihlalleri **adıyla ve gerekçesiyle** tabana yazar ve **tabanın dışındaki her yeni ihlalde
+KIRMIZI** olur. Böylece sınıf bugünden itibaren geri gelemez; mevcut borç gizlenmez, **sayılır**.
+
+- **Gerekçesiz taban satırı YASAKTIR** — kapı bunu kendi sınavında reddeder.
+- **Taban yalnız küçülür.** Bir veri düzeltmesi yapıldığında ilgili taban satırını silmek,
+  **o işin parçasıdır**; ayrı bir iş değildir.
+- **Bayat taban satırı kırmızı YAPMAZ**, yalnız uyarır. Gerekçe betiğin başlığında: aksi hâlde
+  Recep'in bir veri düzeltmesi, konuyla ilgisi olmayan bir şeridin PR'ını kırardı — yani kapı
+  kimsenin hatası olmadığı bir anda **yanlış kırmızı** verirdi.
+- **Uyar-geç modu YOKTUR.** Yeni ihlal doğrudan kırmızıdır.
+
+### Bağlantı yüzeyi (ölçülmemiş — açık)
+
+Kapının prod DB'ye bağlanması `SUPABASE_DB_URL` ister ve **TLS doğrulaması açıktır**; Supabase kök
+sertifikası `PGSSLROOTCERT` ile verilir. Sertifika verilmezse betik çıkış kodu **2** ile
+"ÖLÇÜLEMEDİ" der — "geçti" **demez**. CI'da hangi iş (workflow) koşturacağı `.github/workflows/**`
+sahibi EDGE şeridiyle kararlaştırılacak; **o karar verilene kadar kapı CI'da koşmuyor** ve bu
+cetvel onu "çalışıyor" diye ilan etmez.
+
+---
+
 ## 7. Provenance / ilişki
 
 Kaynak: çapraz-sorgu (`cross_notebook_query` Vortice-Full + Avensair, 2026-06-19) → Avensair'in 27 gerçek bölümü atıfla.
@@ -173,3 +221,4 @@ skill `.agent/skills/venthub-catalog-importer` (çıkarım aracı) · memory `ca
 ---
 
 > v1.0 · 2026-06-19 · İlk sürüm. Eksik cetvel boşluğu kapatıldı (skill vardı, cetvel yoktu).
+> v1.1 · 2026-08-18 · §6.1 INV-CATALOG-1 (aile↔içerik bütünlüğü, cırcır tabanlı) — T099.
