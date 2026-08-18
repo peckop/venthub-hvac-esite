@@ -9,6 +9,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import { useAuth } from '../hooks/useAuth'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
+import { SYSTEM_CURRENCY } from '../i18n/currency'
 import { formatDateTime } from '../i18n/datetime'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
@@ -155,7 +156,7 @@ const OrdersPage: React.FC = () => {
   }
 
   const formatPrice = (price: number) => {
-    return formatCurrency(price, lang, { maximumFractionDigits: 0 })
+    return formatCurrency(price, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })
   }
 
   const getStatusColor = (status: string) => {
