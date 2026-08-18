@@ -1,4 +1,4 @@
-# Dağıtım Atlama Cetveli (Ignored Build Step) — v1.0
+# Dağıtım Atlama Cetveli (Ignored Build Step) — v1.1
 
 > **Kapsam:** Vercel'de hangi değişikliğin build tetikleyeceği.
 > **Bekçi:** `src/__tests__/conformance/build-skip-positive-logic.test.ts` (INV-BUILD-SKIP).
@@ -81,13 +81,14 @@ imkânsız kılar.
 
 ---
 
-## Kurulum — Recep'in yapacağı adım (repo tarafı hazır)
+## Kurulum — YAPILDI (2026-08-18, sahada doğrulandı)
 
-Betik ve bekçi repoda. Kalan tek adım **Vercel dashboard**'da:
+Ayar **canlı**. Kaynak: **Vercel dashboard** (repo içi yapılandırma dosyası DEĞİL — bkz. D7).
 
-1. Vercel → proje `venthub-hvac-esite` → **Settings** → **Git**
-2. **Ignored Build Step** bölümü → *Behavior*: **Custom**
-3. Komut kutusuna **tam olarak** şunu yaz:
+1. Vercel → proje `venthub-hvac-esite` → **Settings** → **Build and Deployment**
+   → doğrudan bağlantı: `/peckops-projects/venthub-hvac-esite/settings/build-and-deployment`
+2. **Ignored Build Step** → *Behavior*: **Custom**
+3. Komut kutusuna **tam olarak**:
 
 ```
 sh scripts/vercel-ignore-build.sh
@@ -95,15 +96,44 @@ sh scripts/vercel-ignore-build.sh
 
 4. **Save**.
 
-### Kurulumdan sonra DOĞRULANACAK tek şey
+> **DÜZELTME — cetvel iki kişiyi olmayan bir sayfaya gönderdi.** v1.0'da bu adım
+> "Settings → **Git**" yazıyordu; orada **Ignored Build Step diye bir alan yok**.
+> Recep sayfayı arattı, bulamadı; doğru yer **Build and Deployment**. Kusurun sınıfı
+> ölçülmemiş talimatı ölçülmüş gibi yazmaktı — o bölüm zaten "dashboard erişimi bende
+> yok" diye işaretliydi, yani **kendi belirsizliğini taşıyordu ama emir kipiyle konuştu.**
+> Ders: erişemediğim bir yüzeyin adımını yazarken **adı değil, adı ARAMANIN yolunu** ver
+> (ayarın kendi metnini arat), ya da doğrulanana dek "önerilen" diye işaretle.
 
-Salt-Markdown bir PR aç ve **Vercel kapısının PR'da ne rapor ettiğine** bak:
+## D7 — Ayarın TEK kaynağı: dashboard (yapılandırma dosyası ALTERNATİFTİR, EK DEĞİL)
 
-- Kapı **success/neutral** veriyorsa → kurulum tamam, iş bitti.
-- Kapı **pending'de kalıyorsa** → salt-doküman PR'ları merge edilemez hale gelir.
-  Bu durumda ya "Vercel" zorunlu kapı listesinden çıkarılır, ya da Ignored Build Step
-  kaldırılır. **Bu ihtimal ölçülmedi** (dashboard erişimi bende yok) — bu yüzden
-  varsayım olarak değil, doğrulanacak madde olarak yazılıyor.
+Aynı ayar iki yerden verilebilir:
+
+| Kaynak | Durum |
+|---|---|
+| **Vercel dashboard** → Ignored Build Step | ✅ **UYGULANAN** (2026-08-18'den beri canlı) |
+| Repo kökünde `vercel.json` / `vercel.ts` → `ignoreCommand` | ⚠️ **ALTERNATİF — kurulu DEĞİL** |
+
+**İkisini birden koymak yasak.** Vercel dokümanına göre yapılandırma dosyasındaki
+`ignoreCommand` **dashboard ayarını EZER**. Yani dosyayı ekleyen kişi, farkında olmadan
+canlı ayarı devre dışı bırakır ve iki kaynak sessizce çelişir — bu deponun bu hafta
+iki kez yaşadığı **çift-cetvel** sınıfının aynısı.
+
+Yapılandırma dosyasına **geçilecekse**: önce dashboard *Behavior*'ı **Automatic**'e
+çevir, sonra dosyayı ekle. Sıra tersse hangi kaynağın konuştuğu belirsiz kalır.
+
+### Kurulumdan sonra DOĞRULANACAK tek şey — HÂLÂ AÇIK
+
+Salt-Markdown bir PR'da **Vercel kapısının ne rapor ettiği** ölçülmedi:
+
+- Kapı **success/neutral** veriyorsa → iş bitti.
+- Kapı **pending'de kalıyorsa** → salt-doküman PR'ları **merge edilemez** hale gelir
+  (Vercel zorunlu kapı). Bu durumda ya "Vercel" zorunlu kapı listesinden çıkarılır,
+  ya da Ignored Build Step **Automatic**'e alınır.
+
+**Bu PR'ın kendisi o ölçümdür:** salt-Markdown değişiklik taşır, yani kurulum sonrası
+ilk temiz deney budur. Sonuç bu bölüme yazılacak. (Açık doküman PR'ları #644, #587,
+#654 de aynı soruyu yanıtlar ama **bayat** — kapı durumları kurulumdan ÖNCE yazıldı,
+o yüzden kanıt değiller.)
 
 ### Geri alma
 
