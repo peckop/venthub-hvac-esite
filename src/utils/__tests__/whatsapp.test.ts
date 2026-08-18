@@ -72,8 +72,8 @@ describe('whatsapp utils', () => {
     })
 
     it('generateTechnicalQuoteMessage', () => {
-      expect(generateTechnicalQuoteMessage()).toBe('Merhaba! Teknik teklif talebi:\n\nProje detaylarınızı paylaşabilir misiniz ? ')
-      expect(generateTechnicalQuoteMessage('Product X')).toBe('Merhaba! Teknik teklif talebi:\n\nÜrün: Product X\n\nProje detaylarınızı paylaşabilir misiniz ? ')
+      expect(generateTechnicalQuoteMessage()).toBe('Merhaba! Teknik teklif talebi:\n\nProje detaylarınızı paylaşabilir misiniz?')
+      expect(generateTechnicalQuoteMessage('Product X')).toBe('Merhaba! Teknik teklif talebi:\n\nÜrün: Product X\n\nProje detaylarınızı paylaşabilir misiniz?')
       expect(generateTechnicalQuoteMessage('Product X', 'Project Y')).toBe('Merhaba! Teknik teklif talebi:\n\nÜrün: Product X\nProje Bilgileri: Project Y')
     })
 
@@ -82,10 +82,10 @@ describe('whatsapp utils', () => {
     })
 
     it('generateContactMessage', () => {
-      expect(generateContactMessage()).toBe('Merhaba!\n\nSize nasıl yardımcı olabilirim ? ')
-      expect(generateContactMessage('Alice')).toBe('Merhaba! Ben Alice.\n\nSize nasıl yardımcı olabilirim ? ')
-      expect(generateContactMessage('Alice', 'Feedback')).toBe('Merhaba! Ben Alice.\n\nKonu: Feedback\n\nSize nasıl yardımcı olabilirim ? ')
-      expect(generateContactMessage(undefined, 'Support')).toBe('Merhaba!\n\nKonu: Support\n\nSize nasıl yardımcı olabilirim ? ')
+      expect(generateContactMessage()).toBe('Merhaba!\n\nSize nasıl yardımcı olabilirim?')
+      expect(generateContactMessage('Alice')).toBe('Merhaba! Ben Alice.\n\nSize nasıl yardımcı olabilirim?')
+      expect(generateContactMessage('Alice', 'Feedback')).toBe('Merhaba! Ben Alice.\n\nKonu: Feedback\n\nSize nasıl yardımcı olabilirim?')
+      expect(generateContactMessage(undefined, 'Support')).toBe('Merhaba!\n\nKonu: Support\n\nSize nasıl yardımcı olabilirim?')
     })
   })
 
@@ -125,6 +125,41 @@ describe('whatsapp utils', () => {
         expect(link).toContain('https://wa.me/905551234567')
         expect(link).toContain('Order%20Delay')
       })
+    })
+  })
+
+  describe('dil destegi (D5) - EN yolu', () => {
+    // NICIN: lang parametresi eklendi ve varsayilani 'tr'. Yalniz TR'yi test etmek yeni
+    // yetenegi KANITLAMAZ - varsayilan zaten eski davranis oldugu icin TR testleri lang
+    // hic calismasa da gecerdi. EN yolu AYRI olculmeli.
+    it('generateSupportMessage EN', () => {
+      expect(generateSupportMessage(undefined, 'en')).toBe('Hello! How can we help you?')
+      expect(generateSupportMessage('Billing', 'en')).toBe('Hello! How can we help you?\n\nSubject: Billing')
+    })
+
+    it('generateStockInquiryMessage EN', () => {
+      expect(generateStockInquiryMessage('Product X', undefined, 'en')).toBe(
+        'Hello! Could I get stock availability information for Product X?',
+      )
+      expect(generateStockInquiryMessage('Product Y', 'SKU123', 'en')).toBe(
+        'Hello! Could I get stock availability information for Product Y (SKU: SKU123)?',
+      )
+    })
+
+    it('generateContactMessage EN', () => {
+      expect(generateContactMessage('Alice', 'Feedback', 'en')).toBe(
+        'Hello! I am Alice.\n\nSubject: Feedback\n\nHow can we help you?',
+      )
+    })
+
+    it('generateFAQSupportMessage EN', () => {
+      expect(generateFAQSupportMessage('en')).toBe(
+        'Hello! I could not find what I was looking for on the FAQ page. Could you help me?',
+      )
+    })
+
+    it('lang verilmezse TR kalir (geriye uyum)', () => {
+      expect(generateSupportMessage()).toBe('Merhaba! Size nasıl yardımcı olabilirim?')
     })
   })
 })
