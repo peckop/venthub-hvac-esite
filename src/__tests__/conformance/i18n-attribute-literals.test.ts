@@ -56,6 +56,27 @@ const VISIBLE_ATTRS = ['placeholder', 'aria-label', 'title', 'alt', 'label'] as 
  * fabrikasına çevirirdi. Bu bilinçli bir DUYARLILIK/KESİNLİK takasıdır:
  * kapı "her ihlali yakalar" demiyor, "yakaladığı her şey GERÇEK ihlaldir" diyor.
  */
+/**
+ * ⚠️ BU KAPININ ADI KONMUŞ KÖR NOKTASI — ASCII-TÜRKÇE.
+ *
+ * Ölçüt Türkçe'ye ÖZGÜ HARF'tir. Dolayısıyla Türkçe olduğu hâlde bu harflerden
+ * hiçbirini içermeyen metin **görünmez**. Canlı örnek (2026-08-18'de ölçüldü):
+ *
+ *   `lib/orderStatusService.ts` → `stockWarning = restore.error ?? 'Stok geri verilemedi'`
+ *
+ * Bu cümle admin'e `toast.warning` ile GÖSTERİLİYOR ve tek bir Türkçe'ye özgü harf
+ * içermediği için kapı onu HİÇ görmedi. Aynı dosyadaki kardeşi ("Stok geri verme
+ * yanıtı doğrulanamadı") ise `ı` taşıdığı için görüldü — yani aynı kusurun iki
+ * örneğinden biri yakalandı, biri yakalanmadı.
+ *
+ * NİÇİN GENİŞLETİLMİYOR: "ASCII Türkçe"yi güvenilir biçimde ayırmanın yolu sözcük
+ * listesi tutmaktır ve o liste bayatlar; üstelik İngilizce teknik terimlerle
+ * (`Total`, `Stock`) çakışıp YANLIŞ-KIRMIZI üretir — yanlış kırmızı da bir kusurdur.
+ * Bu yüzden sınıf ÖLÇÜLEMEZ diye ADIYLA yazılıyor: kapının kapsamını bilmek,
+ * kapsamı abartmaktan iyidir.
+ *
+ * KAPSAYAN BAŞKA KAPI: yok. Bu sınıfın tek savunması insan incelemesidir.
+ */
 const TURKISH_SPECIFIC = /[çğıöşüÇĞİÖŞÜ]/
 
 /** (a) JSX attribute: `placeholder="..."` / `aria-label="..."` */
