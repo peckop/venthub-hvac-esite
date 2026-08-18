@@ -121,19 +121,72 @@ iki kez yaşadığı **çift-cetvel** sınıfının aynısı.
 Yapılandırma dosyasına **geçilecekse**: önce dashboard *Behavior*'ı **Automatic**'e
 çevir, sonra dosyayı ekle. Sıra tersse hangi kaynağın konuştuğu belirsiz kalır.
 
-### Kurulumdan sonra DOĞRULANACAK tek şey — HÂLÂ AÇIK
+### Kurulum sonrası ÖLÇÜM — yapıldı (2026-08-18, PR #664)
 
-Salt-Markdown bir PR'da **Vercel kapısının ne rapor ettiği** ölçülmedi:
+Deney: içinde **hiç kod değişikliği olmayan**, salt-Markdown bir PR. Dağıtım günlüğünden
+ham satırlar:
 
-- Kapı **success/neutral** veriyorsa → iş bitti.
-- Kapı **pending'de kalıyorsa** → salt-doküman PR'ları **merge edilemez** hale gelir
-  (Vercel zorunlu kapı). Bu durumda ya "Vercel" zorunlu kapı listesinden çıkarılır,
-  ya da Ignored Build Step **Automatic**'e alınır.
+```
+Running "sh scripts/vercel-ignore-build.sh"
+ignore-build: VERCEL_GIT_PREVIOUS_SHA yok (ilk dagitim?) -> BUILD
+```
 
-**Bu PR'ın kendisi o ölçümdür:** salt-Markdown değişiklik taşır, yani kurulum sonrası
-ilk temiz deney budur. Sonuç bu bölüme yazılacak. (Açık doküman PR'ları #644, #587,
-#654 de aynı soruyu yanıtlar ama **bayat** — kapı durumları kurulumdan ÖNCE yazıldı,
-o yüzden kanıt değiller.)
+**Üç şey birden öğrenildi:**
+
+1. ✅ **Kurulum çalışıyor.** Betik gerçekten koşuyor — dashboard ayarı canlı.
+2. ✅ **Vercel kapısı `success` veriyor**, `pending`'de kalmıyor. Yani korkulan
+   "doküman PR'ları merge edilemez hale gelir" senaryosu **gerçekleşmedi** ve
+   açık doküman PR'ları için bir tehlike yok.
+3. ❌ **Atlama HİÇ ÇALIŞMADI.** `VERCEL_GIT_PREVIOUS_SHA` boş geldi, betik güvenli
+   tarafa düşüp build etti. Yani T086 bu ana kadar **sıfır tasarruf** sağladı.
+
+**(3) niçin sessizdi:** betik doğru davrandı (bilmiyorsan build et), dolayısıyla
+hiçbir kırmızı üretmedi. Kapı da göremezdi — bekçi betiği *dosya-listesi kipinde*
+koşturuyordu ve **taban çözümü o yoldan hiç geçmiyordu**, yani kapının kapsamı
+dışındaydı. Kusurun sınıfı: **ölçülmemiş premis** — "değişken dolu gelir" varsayımı
+hiç sınanmamıştı ve gerekçesi (v1'de yazılıydı) kendi başına doğru olduğu için
+inandırıcı görünüyordu. *Doğru gerekçe, ölçülmemiş premis.*
+
+> **Hâlâ açık olan yarım:** *gerçekten atlanan* bir build'de kapının ne rapor ettiği
+> ölçülmedi — çünkü atlama bir kez bile gerçekleşmedi. Bu düzeltmeden sonraki ilk
+> salt-Markdown PR'ı o yarımı kapatacak; günlükte `taban = ... ortak ata` satırı
+> aranacak. Sonuç buraya yazılır.
+
+## D8 — Karşılaştırma tabanı bir ZİNCİRDİR, tek değişken değil
+
+| Sıra | Taban | Koşul |
+|---|---|---|
+| 1 | `VERCEL_GIT_PREVIOUS_SHA` | Yalnız commit **bu klonda gerçekten varsa** |
+| 2 | `git merge-base HEAD origin/<varsayılan dal>` | (1) çözülemezse |
+| — | *(hiçbiri)* | → **BUILD** |
+
+(1) en doğrusudur: son **başarılı** dağıtımdan bu yana biriken tüm değişiklikleri
+kapsar. Ama **yeni bir dalın ilk dağıtımında yoktur** ve bu depoda kural
+*bir-iş-bir-dal* olduğu için neredeyse her önizleme dağıtımı öyledir.
+
+(2) dalın **tamamını** kapsar; dalın içindeki eski bir kaynak değişikliği de görülür.
+
+**`HEAD^` yasağı sürüyor** ve gerekçesi değişmedi: yalnız son commit'e bakar, arka
+arkaya atlanmış commit'lerden sonra daha eski bir kaynak değişikliğini göremez →
+"kod değişti, deploy olmadı". Ortak ata bu tuzağa düşmez.
+
+Zincirin **hangi adımının kazandığı günlüğe yazılır**. Bu tesadüfi bir ayrıntı değil:
+yukarıdaki kusur tam olarak "hangi dalın çalıştığını göremediğimiz" için sessiz kaldı.
+
+### Kapı bunu nasıl ölçüyor
+
+INV-BUILD-SKIP artık **gerçek geçici git deposu** kurar (`git init`, commit'ler,
+`origin/master`'ı `update-ref` ile yazar — ağ yok) ve betiği o deponun içinde koşturur.
+Bilerek bozularak kanıtlandı:
+
+| Sabotaj | Yakalayan assert |
+|---|---|
+| Zincirin 2. adımını kaldır (v1 davranışı) | *salt-.md dal ATLANIR* → kırmızı |
+| `merge-base` yerine `HEAD^` koy | *dalın önceki commit'inde kod varsa BUILD* → kırmızı |
+
+İkincisi önemli: `HEAD^`'i yasaklayan **statik** assert bu sabotajı **yakalamadı**
+(sabotaj `git diff HEAD^` değil `git rev-parse HEAD^` yazıyordu). Yakalayan şey
+davranış testiydi — metin arayan kapının neyi göremediğinin canlı örneği.
 
 ### Geri alma
 
