@@ -158,8 +158,12 @@ async function main() {
   if (fixtureIdx !== -1) {
     found = collectFromFixture(process.argv[fixtureIdx + 1])
   } else if (!connectionString) {
-    console.log('catalog-integrity: baglanti dizesi yok (SUPABASE_DB_URL) -> OLCULEMEDI (gecti DEGIL)')
-    process.exit(0)
+    // ÇIKIŞ 0 DEĞİL. Eskiden burada `exit 0` vardı ve "ÖLÇÜLEMEDİ" yalnız bir ETİKETTİ — iş yeşil
+    // dönüyordu. Yani kapı, ölçemediği hâlde "geçti" diyordu; tam da bugün üç kez yaşanan
+    // "yoklukla ölçme" sınıfı. Ölçemeyen kapı YEŞİL DÖNMEZ. Sırların hiç verilmediği hâl (fork
+    // PR'ı) iş SEVİYESİNDE atlanır (workflow `if:` koşulu) — atlanmış iş "başarılı" değildir.
+    console.error('catalog-integrity: OLCULEMEDI — baglanti dizesi yok (SUPABASE_DB_URL). Kapi olcemedigi icin YESIL DONMUYOR.')
+    process.exit(2)
   } else {
     found = await collectFromDatabase(connectionString)
   }

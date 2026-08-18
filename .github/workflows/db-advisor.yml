@@ -116,9 +116,38 @@ jobs:
   # INV-CATALOG-1 — katalog butunlugu kapisi (T099).
   # Yukaridaki advisor isi TAVSIYE verir (|| true + continue-on-error). Bu is ise
   # gercek bir KAPIDIR: tabanin disinda yeni bir ihlal varsa KIRMIZI olur.
-  # Cetvel: docs/standards/catalog-ingestion-standard.md §6.1
+  #
+  # NICIN IKI IS: kapi olcemedigi bir durumda ASLA YESIL DONMEMELI. Sirlar yoksa
+  # (ornek: fork PR'i, ya da SUPABASE_CA_CERT henuz eklenmemis) kapi isi hic KOSMAZ,
+  # GitHub'da "skipped" gorunur. Atlanmis is BASARILI DEGILDIR - kimse onu "olculdu"
+  # diye okuyamaz. Eski tasarimda burada `exit 0` vardi ve "OLCULEMEDI" yalnizca bir
+  # ETIKETTI; is yesil donuyordu = sessiz fail-open. EDGE (dosya sahibi) bunu yakaladi.
+  #
+  # Cetvel: docs/standards/catalog-ingestion-standard.md 6.1
   # ---------------------------------------------------------------------------
+  catalog-integrity-precheck:
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.probe.outputs.ready }}
+    steps:
+      - name: Sirlar var mi
+        id: probe
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          CA_CERT: ${{ secrets.SUPABASE_CA_CERT }}
+        run: |
+          set -Eeuo pipefail
+          if [ -n "${DB_URL:-}" ] && [ -n "${CA_CERT:-}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "INV-CATALOG-1: sirlar tam -> kapi KOSACAK"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=INV-CATALOG-1 ATLANDI::Sirlar eksik (SUPABASE_DB_URL ve/veya SUPABASE_CA_CERT) -> kapi isi ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda katalog butunlugu OLCULMEDI."
+          fi
+
   catalog-integrity:
+    needs: catalog-integrity-precheck
+    if: needs.catalog-integrity-precheck.outputs.ready == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -138,14 +167,6 @@ jobs:
           SUPABASE_CA_CERT: ${{ secrets.SUPABASE_CA_CERT }}
         run: |
           set -Eeuo pipefail
-          if [ -z "${SUPABASE_DB_URL:-}" ]; then
-            echo "::notice title=INV-CATALOG-1::SUPABASE_DB_URL yok -> OLCULEMEDI (gecti DEGIL). Fork PR'larinda sir verilmez, beklenen durumdur."
-            exit 0
-          fi
-          if [ -z "${SUPABASE_CA_CERT:-}" ]; then
-            echo "::notice title=INV-CATALOG-1::SUPABASE_CA_CERT yok -> OLCULEMEDI (gecti DEGIL). TLS dogrulamasi KAPATILMAZ; kapinin canlanmasi icin bu sir eklenmelidir."
-            exit 0
-          fi
           printf '%s' "$SUPABASE_CA_CERT" > "$RUNNER_TEMP/supabase-ca.crt"
           export PGSSLROOTCERT="$RUNNER_TEMP/supabase-ca.crt"
           node scripts/db/checks/catalog-integrity.mjs

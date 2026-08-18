@@ -197,26 +197,33 @@ KIRMIZI** olur. Böylece sınıf bugünden itibaren geri gelemez; mevcut borç g
   kimsenin hatası olmadığı bir anda **yanlış kırmızı** verirdi.
 - **Uyar-geç modu YOKTUR.** Yeni ihlal doğrudan kırmızıdır.
 
-### Bağlantı yüzeyi — kapı BAĞLANDI ama henüz UYUMUYOR
+### Bağlantı yüzeyi — ölçemeyen kapı YEŞİL DÖNMEZ
 
-CI işi: `.github/workflows/db-advisor.yml` → `catalog-integrity` (aynı dosyadaki `advisor` işi
-tavsiye verir; bu iş **kapıdır**, kırmızı olur).
+CI: `.github/workflows/db-advisor.yml` → iki iş. `catalog-integrity-precheck` sırların varlığını
+ölçer; `catalog-integrity` **yalnız ikisi de varsa** koşar (`needs` + `if`).
 
-Kapı iki sır ister ve **ikisi de yoksa ölçmeden yeşile dönmez, "ÖLÇÜLEMEDİ" der**:
-
-| Sır | Yoksa ne olur |
+| Durum | Ne olur |
 |---|---|
-| `SUPABASE_DB_URL` | ÖLÇÜLEMEDİ notu + çıkış 0. Fork PR'larında sır verilmez; **beklenen** durumdur. |
-| `SUPABASE_CA_CERT` | ÖLÇÜLEMEDİ notu + çıkış 0. **TLS doğrulaması KAPATILMAZ.** |
+| İki sır da var | Kapı koşar. Taban dışı yeni ihlalde **KIRMIZI**. |
+| Sır eksik (fork PR'ı, ya da `SUPABASE_CA_CERT` henüz yok) | Kapı işi **hiç koşmaz — "skipped"**. Atlanmış iş **başarılı değildir**; kimse onu "ölçüldü" diye okuyamaz. |
+| Sır var ama bağlantı kurulamaz | Betik çıkış **2** — "ÖLÇÜLEMEDİ", iş **KIRMIZI**. |
 
-Supabase sunucusu kendi kök sertifikasıyla imzalı bir zincir sunuyor (ölçüldü: doğrulama açıkken
-bağlantı `self-signed certificate in certificate chain` ile ölüyor). Doğru çözüm kökü **vermek**,
-doğrulamayı kapatmak değil — bu bağlantı prod DB kimlik bilgisi taşıyor ve repo **PUBLIC**.
+> ⚠️ **Bu tasarım bir düzeltmedir.** İlk hâlinde sır yokken betik `exit 0` veriyordu ve
+> "ÖLÇÜLEMEDİ" yalnızca bir **etiketti** — iş **yeşil** dönüyordu. Yani kapı, ölçmediği bir şey
+> için "geçti" raporluyordu: sessiz fail-open. Bunu dosyanın sahibi (EDGE) yakaladı ve kanıt
+> istedi. Kural olarak yazılıyor: **bir kapı ölçemediğinde başarı raporlayamaz** — ya kırmızı olur
+> ya hiç koşmaz. `src/__tests__/conformance/catalog-integrity-gate.test.ts` bunu iki iddiayla
+> koruyor ve üç sabotajla kırmızı görüldüğü kanıtlandı (üst-dize tuzağı dahil:
+> `SUPABASE_CA_CERTX` ilk iddiayı yeşil geçiyordu).
 
-> ⚠️ **Bu cetvel kapıyı "çalışıyor" diye İLAN ETMEZ.** Kapının ilk **gerçekten ölçtüğü** koşumu
-> görülene kadar durum "bağlandı, uyuyor"dur (mekanizma ilanı kuralı, OPS-AUDIT 2026-08-18:
-> mekanizmanın kendi günlüğünden pozitif satır olmadan "çalışıyor" denmez).
-> **Recep'ten beklenen tek şey:** depo sırlarına `SUPABASE_CA_CERT` eklenmesi.
+TLS doğrulaması **açıktır**; Supabase kök sertifikası `PGSSLROOTCERT` ile verilir (ölçüldü:
+doğrulama açıkken bağlantı `self-signed certificate in certificate chain` ile ölüyor). Doğru
+çözüm kökü **vermek**, doğrulamayı kapatmak değil — bağlantı prod DB kimlik bilgisi taşıyor ve
+repo **PUBLIC**.
+
+> **Bu cetvel kapıyı "çalışıyor" diye İLAN ETMEZ.** Durum: **bağlandı, uyuyor.**
+> **Recep'ten beklenen tek şey:** depo sırlarına `SUPABASE_CA_CERT` eklenmesi; ilk gerçekten
+> ölçen koşum görüldüğünde bu bölüm güncellenir (mekanizma ilanı kuralı).
 
 ---
 

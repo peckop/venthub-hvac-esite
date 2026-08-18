@@ -78,6 +78,40 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     }
   })
 
+  it('ölçemeyen kapı YEŞİL dönmez — bağlantı dizesi yokken çıkış 0 DEĞİL', () => {
+    const res = spawnSync(process.execPath, [SCRIPT], {
+      encoding: 'utf8',
+      env: { ...process.env, SUPABASE_DB_URL: '', DATABASE_URL: '' },
+    })
+    // Eskiden burada exit 0 vardı: "ÖLÇÜLEMEDİ" yalnız bir etiketti, iş yeşil dönüyordu.
+    // Sessiz fail-open tam da "yoklukla ölçme" sınıfıdır; kapı ölçemediğinde başarı raporlamaz.
+    expect(res.status).not.toBe(0)
+    expect(`${res.stdout ?? ''}${res.stderr ?? ''}`).toContain('OLCULEMEDI')
+  })
+
+  it('CI işi, sırlar yokken KOŞMAZ (atlanır) — yeşil dönmek yerine', () => {
+    const wf = fs.readFileSync(
+      path.join(process.cwd(), '.github', 'workflows', 'db-advisor.yml'),
+      'utf8',
+    )
+    // Kapı işi bir ön-kontrole BAĞLI olmalı ve yalnız sırlar tamken koşmalı.
+    expect(wf).toMatch(/needs:\s*catalog-integrity-precheck/)
+    expect(wf).toMatch(/if:\s*needs\.catalog-integrity-precheck\.outputs\.ready == 'true'/)
+    // Ön-kontrol İKİ sırrı da aramalı; birini unutmak kapıyı yarı-kör bırakır.
+    // DİKKAT: düz `toContain` yetmez — sabotajda `SUPABASE_CA_CERTX` yazdım ve iddia yeşil kaldı
+    // (üst-dize tuzağı). Bu yüzden (a) yalnız ÖN-KONTROL bloğuna bakılır, (b) sırrın tam
+    // kullanımı aranır, (c) sırların gerçekten SINANDIĞI kabuk koşulu aranır — adı geçmesi değil.
+    const precheckStart = wf.indexOf('catalog-integrity-precheck:')
+    const precheck = wf.slice(precheckStart, wf.indexOf('  catalog-integrity:', precheckStart + 1))
+    expect(precheck.length).toBeGreaterThan(0)
+    for (const secret of ['SUPABASE_DB_URL', 'SUPABASE_CA_CERT']) {
+      expect(precheck.includes('secrets.' + secret + ' }}'), secret + ' ön-kontrolde yok').toBe(true)
+    }
+    for (const v of ['DB_URL', 'CA_CERT']) {
+      expect(precheck.includes('-n "${' + v + ':-}"'), v + ' kabuk koşulunda SINANMIYOR').toBe(true)
+    }
+  })
+
   it('kapı, doğrulanmamış TLS ile prod DB\'ye bağlanmaz', () => {
     // Yorumlar SIYRILIR: betiğin başlığı "eski betikler rejectUnauthorized: false kullanıyor"
     // diye ANLATIYOR; yorumu tarayan bir iddia bunu KOD sanır ve yanlış kırmızı verir
