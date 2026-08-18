@@ -26,7 +26,6 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { syncOrderFromReturn } from '../../lib/orderStatusService'
 import type { Database } from '../../types/database.types'
-import { orIlikeContains } from '../../utils/adminQueryFilters'
 import {
   adminButtonPrimaryClass,
   adminSelectClass,
@@ -52,46 +51,46 @@ interface ReturnRow {
   total_amount: number | null
 }
 
-/** join satırının ham şekli (Supabase ilişkiyi obje VEYA tek-elemanlı dizi olarak döndürebilir). */
-interface JoinedOrder {
-  order_number: string | null
-  customer_name: string | null
-  customer_email: string | null
-  total_amount: number | null
-}
-interface RawReturnRow {
-  id: string
-  order_id: string
-  user_id: string
-  reason: string
-  description: string | null
-  status: string
-  created_at: string
-  updated_at: string
-  venthub_orders: JoinedOrder | JoinedOrder[] | null
-}
+/**
+ * View satırının şekli.
+ *
+ * TÜM kolonlar nullable: tip üreticisi view kolonlarını daima nullable işaretler,
+ * çünkü Postgres NOT NULL kısıtını bir view üzerinden TAŞIMAZ. Taban tabloda
+ * id / order_id / user_id / reason / status / created_at / updated_at NOT NULL'dur
+ * (ölçüldü), yani aşağıdaki düşüşler pratikte ulaşılamaz — ama tip sistemine
+ * "biliyorum" demek yerine değeri gerçekten karşılamak gerekir; bir tip zorlamasıyla
+ * susturmak, yarın kolon nullable olursa hatayı sessizce üretime taşırdı.
+ */
+type ReturnViewRow = Pick<
+  Database['public']['Views']['view_admin_returns']['Row'],
+  | 'id'
+  | 'order_id'
+  | 'user_id'
+  | 'reason'
+  | 'description'
+  | 'status'
+  | 'created_at'
+  | 'updated_at'
+  | 'order_number'
+  | 'customer_name'
+  | 'customer_email'
+  | 'total_amount'
+>
 
-/** join'i tek objeye indir (Supabase çoğul/tekil belirsizliğini güvenle çöz). */
-function pickOrder(joined: JoinedOrder | JoinedOrder[] | null): JoinedOrder | null {
-  if (Array.isArray(joined)) return joined[0] ?? null
-  return joined
-}
-
-function flatten(row: RawReturnRow): ReturnRow {
-  const order = pickOrder(row.venthub_orders)
+function fromView(row: ReturnViewRow): ReturnRow {
   return {
-    id: row.id,
-    order_id: row.order_id,
-    user_id: row.user_id,
-    reason: row.reason,
+    id: row.id ?? '',
+    order_id: row.order_id ?? '',
+    user_id: row.user_id ?? '',
+    reason: row.reason ?? '',
     description: row.description,
-    status: row.status,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
-    order_number: order?.order_number ?? null,
-    customer_name: order?.customer_name ?? null,
-    customer_email: order?.customer_email ?? null,
-    total_amount: order?.total_amount ?? null,
+    status: row.status ?? '',
+    created_at: row.created_at ?? '',
+    updated_at: row.updated_at ?? '',
+    order_number: row.order_number,
+    customer_name: row.customer_name,
+    customer_email: row.customer_email,
+    total_amount: row.total_amount,
   }
 }
 
@@ -139,8 +138,22 @@ const ReturnDetailRow: React.FC<{ row: ReturnRow }> = ({ row }) => {
   )
 }
 
+/**
+ * OKUMA yüzeyi — view_admin_returns (security_invoker view, T090-VH).
+ *
+ * NİÇİN VIEW: aranan alanların bir kısmı iade satırında (reason, description),
+ * bir kısmı ANA SİPARİŞTEDİR (order_number, customer_name, customer_email).
+ * PostgREST'te üst-düzey or= içindeki bir koşul gömülü tabloya atıfta bulunamaz;
+ * eski kod tam bunu deniyordu ve arama ÜRETİMDEN BERİ 400 ile düşüyordu. View,
+ * JOIN'i ve birleşimi DB tarafında yapar; arayüz tek kolon arar.
+ *
+ * YAZMA yolu değişmedi: statü güncellemeleri hâlâ venthub_returns üzerinde
+ * (updateReturnStatusCas) — view'a yalnız SELECT verilmiştir.
+ */
+const RETURNS_VIEW = 'view_admin_returns'
+
 const RETURNS_SELECT =
-  'id, order_id, user_id, reason, description, status, created_at, updated_at, venthub_orders!inner(order_number, customer_name, customer_email, total_amount)'
+  'id, order_id, user_id, reason, description, status, created_at, updated_at, order_number, customer_name, customer_email, total_amount'
 
 const STATUS_VALUES = ['requested', 'approved', 'rejected', 'in_transit', 'received', 'refunded', 'cancelled'] as const
 
@@ -288,7 +301,7 @@ async function returnsFetcher(
   await ensureSessionFresh()
 
   let query = supabase
-    .from('venthub_returns')
+    .from(RETURNS_VIEW)
     .select(RETURNS_SELECT, { count: 'exact' })
 
   // 1. Status filters
@@ -300,32 +313,37 @@ async function returnsFetcher(
   }
 
   // 2. Global search query (term)
+  /*
+    TEK KOLON, TEK ilike — or() DEĞİL (T090-VH).
+
+    #642 bu satırdaki KAÇIŞ kusurunu kapatmıştı (virgül yazan admin koşul sayısını
+    değiştiriyordu) ama ikinci ve daha eski kusur ayakta kaldı: yukarıdaki kolon
+    adlarının üçü GÖMÜLÜ tabloya aitti ve PostgREST üst-düzey or= içinde gömülü
+    kaynağa atıf KABUL ETMEZ — sorgu 400 ile düşüyordu, yani arama hiç çalışmadı.
+
+    Çözüm iki kusuru birden kaldırır: birleştirme DB'de (view_admin_returns) yapılır,
+    arayüz tek kolon arar ve ilike(kolon, desen) desenini ayrı bir sorgu parametresi
+    olarak taşır — kullanıcı metni hiçbir zaman dilbilgisine dokunmaz.
+  */
   const term = params.query.trim()
   if (term) {
-    /* Kullanıcı metni filtre GRAMERİNE gömülmez (T078-VH): virgül yazan admin eskiden
-       koşul sayısını değiştiriyordu. E-posta/UUID araması "noktayı sil" gibi bir
-       temizlikle değil, KAÇIŞLA korunuyor — silme yaklaşımı e-posta aramasını bozardı. */
-    query = query.or(
-      orIlikeContains(
-        [
-          'reason',
-          'venthub_orders.customer_name',
-          'venthub_orders.customer_email',
-          'venthub_orders.order_number',
-        ],
-        term,
-      ),
-    )
+    query = query.ilike('search_text', `%${term}%`)
   }
 
   // 3. Sorting
   const sortKey = params.sort?.key
   const ascending = params.sort?.dir === 'asc'
   
+  /*
+    foreignTable KALKTI. Gömülü kaynağa verilen sıralama, ANA satırları değil
+    gömülü diziyi sıralar — yani "sipariş numarasına göre sırala" tıklaması hiçbir
+    zaman tabloyu sıralamıyordu. View'da bu kolonlar üst düzey olduğu için sıralama
+    artık gerçekten ana satırlara uygulanır.
+  */
   if (sortKey === 'order_number') {
-    query = query.order('order_number', { ascending, foreignTable: 'venthub_orders' })
+    query = query.order('order_number', { ascending })
   } else if (sortKey === 'customer_name') {
-    query = query.order('customer_name', { ascending, foreignTable: 'venthub_orders' })
+    query = query.order('customer_name', { ascending })
   } else if (sortKey === 'reason') {
     query = query.order('reason', { ascending })
   } else if (sortKey === 'status') {
@@ -341,8 +359,7 @@ async function returnsFetcher(
   const { data, error, count } = await query.range(offset, offset + params.pageSize - 1)
   if (error) throw error
 
-  const raw: RawReturnRow[] = data ?? []
-  const rows = raw.map(flatten)
+  const rows = (data ?? []).map(fromView)
   const totalMatched = typeof count === 'number' ? count : rows.length
 
   return { rows, totalMatched }
