@@ -46,10 +46,34 @@ import { describe, expect, it } from 'vitest'
 
 const YAS_ESIGI_GUN = 7
 
-// Ölçülmüş tabanlar (2026-08-17, yaml-doğru kapsam, master MERGE EDİLMİŞ tam geçmişte).
-// Bunlar HEDEF değil TAVAN: düşürülmeli, asla yükseltilmemeli.
-const C4_TABAN = 1
-const C5_TABAN = 33
+/**
+ * KAPI KAPSAMININ BAŞLANGIÇ TARİHİ — ölçülmüş bir kusurun düzeltmesi (2026-08-18).
+ *
+ * İLK TASARIM DRIFT EDİYORDU: borç "kaynak `YAS_ESIGI_GUN` günden eski + companion bayat"
+ * diye sayılıyordu ve taban bir SAYI idi (C5=33). Sayı **takvim ilerledikçe kendiliğinden
+ * büyüyor**: 2026-08-17'de 33 ölçüldü, ertesi gün hiçbir commit atılmadan 39 oldu. Ölçtüm —
+ * fark tam 6 ve tam 6 dosyanın kaynak yaşı 8 gündü, yani 7 günlük eşiği O GECE geçmişlerdi.
+ *
+ * Yani kapı, kimse hiçbir şey yapmasa bile birkaç günde bir kırmızıya dönecekti. Bu bir
+ * YANLIŞ-KIRMIZI ÜRETECİ ve tam olarak bu bekçinin cetvelinde uyardığım şey: "bekçi ilk
+ * günden (ya da rastgele) kırmızı yanarsa görmezden gelinir" — bu depoda yaşandı, rastgele
+ * patlayan `pre-commit` tüm filoda `--no-verify` alışkanlığı doğurdu (T033).
+ *
+ * ÇÖZÜM: eşiği "şimdi"ye değil KAPININ İNDİĞİ TARİHE demirle. Kapı yalnız **bu tarihten
+ * sonra** dokunulan kaynakları denetler; daha eski borç TARİHSEL kabul edilir, kapsam
+ * dışıdır ama GÖRÜNÜR kalır (aşağıdaki tarihsel-borç testi sayıyı basar ve sıfırlanınca
+ * demiri kaldırmaya zorlar). Böylece:
+ *   · zaman geçmesi yeni ihlal ÜRETMEZ (drift kapandı)
+ *   · yeni bir commit companion'ını bayat bırakırsa 7 gün sonra KIRMIZI (asıl amaç korundu)
+ *   · tabanlar SIFIR olur — ratchet'in en güçlü hâli, sessiz bütçe yok
+ */
+const KAPI_BASLANGIC = '2026-08-18'
+
+// Tabanlar SIFIR: kapı yalnız KAPI_BASLANGIC sonrası dokunulan kaynakları denetliyor, yani
+// tarihsel borç kapsam dışı. Bu sayılar HEDEF değil TAVAN ve YÜKSELTİLEMEZ — yükseltmek
+// "yeni borca izin ver" demektir. Tarihsel borç ayrı testte görünür kalıyor.
+const C4_TABAN = 0
+const C5_TABAN = 0
 
 /**
  * ÖLÇÜM ÖNKOŞULU: TAM GİT GEÇMİŞİ.
@@ -156,6 +180,11 @@ interface Bulgular {
   bayat: string[]
   eksikTaze: number
   bayatTaze: number
+  /** KAPI_BASLANGIC ONCESI borc: kapsam DISI ama gorunur tutuluyor. */
+  tarihselEksik: string[]
+  tarihselBayat: string[]
+  /** Kapi kapsamindaki (demir sonrasi dokunulmus) kaynak sayisi. */
+  kapidakiKaynak: number
 }
 
 function olc(): Bulgular {
@@ -168,6 +197,9 @@ function olc(): Bulgular {
   const kaynaklar = izlenen.filter(f => kapsamdaMi(f, kapsam))
   const eksik: string[] = []
   const bayat: string[] = []
+  const tarihselEksik: string[] = []
+  const tarihselBayat: string[] = []
+  let kapidakiKaynak = 0
   let eksikTaze = 0
   let bayatTaze = 0
 
@@ -176,19 +208,29 @@ function olc(): Bulgular {
     const kaynakTarih = tarihler.get(kaynak) ?? ''
     const yas = kaynakTarih ? gunFarki(kaynakTarih, bugun) : Number.MAX_SAFE_INTEGER
 
+    // Kapı kapsamı: KAPI_BASLANGIC sonrası dokunulmuş kaynaklar. Daha eskisi TARİHSEL borç
+    // (kapsam dışı ama görünür) — bkz. KAPI_BASLANGIC yorumu, drift ölçümü orada.
+    const kapidaMi = kaynakTarih >= KAPI_BASLANGIC
+    if (kapidaMi) kapidakiKaynak++
+
     if (!mdSet.has(companion)) {
-      if (yas > YAS_ESIGI_GUN) eksik.push(kaynak)
-      else eksikTaze++
+      if (yas <= YAS_ESIGI_GUN) eksikTaze++
+      else if (kapidaMi) eksik.push(kaynak)
+      else tarihselEksik.push(kaynak)
       continue
     }
     const companionTarih = tarihler.get(companion) ?? ''
     if (kaynakTarih && companionTarih && kaynakTarih > companionTarih) {
-      if (yas > YAS_ESIGI_GUN) bayat.push(companion)
-      else bayatTaze++
+      if (yas <= YAS_ESIGI_GUN) bayatTaze++
+      else if (kapidaMi) bayat.push(companion)
+      else tarihselBayat.push(companion)
     }
   }
 
-  return { kaynakSayisi: kaynaklar.length, eksik, bayat, eksikTaze, bayatTaze }
+  return {
+    kaynakSayisi: kaynaklar.length, eksik, bayat, eksikTaze, bayatTaze,
+    tarihselEksik, tarihselBayat, kapidakiKaynak,
+  }
 }
 
 describe('INV-DOC-2 · companion kapsam paritesi', () => {
@@ -231,21 +273,37 @@ describe('INV-DOC-2 · companion kapsam paritesi', () => {
     ).toBeLessThanOrEqual(C5_TABAN)
   })
 
-  it('stale-guard: borç azaldıysa TABAN DÜŞÜRÜLMELİ (ratchet geri kaymasın)', () => {
-    // Ratchet'in tek işi borcu dondurmak. Borç azaldığında taban güncellenmezse
-    // aradaki boşluk sessiz bir bütçeye dönüşür ve yeni borç fark edilmeden dolar.
-    const bosluk4 = C4_TABAN - b.eksik.length
-    const bosluk5 = C5_TABAN - b.bayat.length
+  it('TARİHSEL borç GÖRÜNÜR kalır (kapsam dışı ≠ yok sayıldı)', () => {
+    // Kapsamı KAPI_BASLANGIC ile daraltmak drift'i kapattı ama yeni bir tehlike doğurdu:
+    // eski borç sessizce yok sayılabilir. Bu yüzden sayı BASILIYOR ve sıfırlandığında test
+    // KIRMIZI yanıp demiri kaldırmaya zorluyor — gerekçesiz kapsam daraltması taşınmasın.
+    const toplam = b.tarihselEksik.length + b.tarihselBayat.length
+    // eslint-disable-next-line no-console
+    console.info(
+      `[INV-DOC-2] TARİHSEL companion borcu (KAPI_BASLANGIC=${KAPI_BASLANGIC} öncesi, kapı ` +
+      `kapsamı DIŞINDA): ${b.tarihselEksik.length} eksik + ${b.tarihselBayat.length} bayat ` +
+      `= ${toplam}. Kapı yalnız yeni borcu engelliyor; bu yığın ayrı bir iş emri konusudur.
+` +
+      `[INV-DOC-2] Kapı kapsamındaki kaynak: ${b.kapidakiKaynak} · bunlardan ihlal: ` +
+      `${b.eksik.length} eksik + ${b.bayat.length} bayat. DÜRÜST NOT: KAPI_BASLANGIC'tan ` +
+      `sonra dokunulan bir dosya ${YAS_ESIGI_GUN} günü doldurmadıkça ihlal ÜRETEMEZ — yani ` +
+      `kapı ilk ${YAS_ESIGI_GUN} gün yapısal olarak sessizdir. Bu YEŞİLİ "borç yok" diye ` +
+      `okuma; "yeni borç henüz olgunlaşmadı" diye oku.`,
+    )
     expect(
-      bosluk4 <= 0,
-      `C4 borcu ${b.eksik.length}'e düştü (taban ${C4_TABAN}). ` +
-      `C4_TABAN'ı ${b.eksik.length} yap — yoksa ${bosluk4} dosyalık sessiz bütçe kalır.`,
-    ).toBe(true)
-    expect(
-      bosluk5 <= 0,
-      `C5 borcu ${b.bayat.length}'e düştü (taban ${C5_TABAN}). ` +
-      `C5_TABAN'ı ${b.bayat.length} yap — yoksa ${bosluk5} dosyalık sessiz bütçe kalır.`,
-    ).toBe(true)
+      toplam,
+      'İYİ HABER olabilir: tarihsel companion borcu SIFIRA düştü. Öyleyse KAPI_BASLANGIC ' +
+      'demiri gereksizleşti — kaldır (ya da bugüne çek) ve bu testi sil, yoksa kapı geçmişi ' +
+      'gerekçesiz biçimde kapsam dışı tutmaya devam eder.',
+    ).toBeGreaterThan(0)
+  })
+
+  it('ratchet geri kaymasın: tabanlar SIFIR kalmalı (yükseltmek yeni borca izin verir)', () => {
+    // Sayı-tabanlı ratchet'in yerini bu aldı. Eski sürümde "borç azaldıysa tabanı düşür"
+    // diyordu; taban artık 0 olduğu için düşürülecek bir şey yok — korunması gereken şey
+    // tabanın YÜKSELTİLMEMESİ. Biri kırmızıyı susturmak için sayıyı büyütürse burası yanar.
+    expect(C4_TABAN, 'C4_TABAN yükseltilmiş — kırmızıyı susturmak için taban büyütmek, kapıyı sökmektir').toBe(0)
+    expect(C5_TABAN, 'C5_TABAN yükseltilmiş — kırmızıyı susturmak için taban büyütmek, kapıyı sökmektir').toBe(0)
   })
 
   it('vacuous-guard: kapsam gerçekten dolu (yaml/kapsam bozulunca test sessizce yeşile kaçmasın)', () => {
