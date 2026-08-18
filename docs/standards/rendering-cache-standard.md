@@ -59,6 +59,9 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 | `inventory_movements` | `on_inventory_movements_change` | var | **aile** PDP yolu + kategori yolu (**keşif'e dokunmaz** — PS-042) |
 | `product_families` | `on_product_families_change` | var | aile PDP yolu + keşif tag'leri |
 | `product_prices` | `on_product_prices_ins_del` + `on_product_prices_upd` (`WHEN`) | var | **yalnız** o ürünün aile PDP yolu — keşif tag'lerine DOKUNMAZ (PS-042) |
+| `product_images` | `on_product_images_change` | var | **aile** PDP yolu + keşif tag'leri + `/sitemap.xml` — ⚠️ tablo bugün **0 satır**; zincir T069 görsel yüklemesinden ÖNCE yerinde olmalı (sonra kurulursa görseller girer, hiçbir sayfa tazelenmez) |
+| `brands` | `on_brands_change` | var | markanın **tüm ailelerinin** PDP yolları + keşif tag'leri |
+| `price_lists` | `on_price_lists_change` | var | **tüm** ailelerin PDP yolları — keşif'e DOKUNMAZ (fiyat yalnız PDP'de görünür, `product_prices` ile aynı gerekçe). ⚠️ **FAN-OUT SINIRI:** aile sayısı kadar yol tazelenir (ölçüm 2026-08-17: **32 aile → 64 çağrı**). Birkaç yüz aileye çıkıldığında tag tabanlı çözüme geçilmeli — sınır burada **sayıyla** yazılı ki sessizce yavaşlamasın |
 
 > **PDP AİLE KANONİKTİR** (`/[lang]/products/[family-slug]`). Yol tazelenirken **ürün** slug'ı
 > kullanmak sessiz bir kaçaktır: prerender edilmiş yol aile slug'ı olduğu için var olmayan bir
