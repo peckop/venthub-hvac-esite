@@ -27,7 +27,22 @@ import { describe, expect, it } from 'vitest'
  *     kaldıran 40 kırmızı görür. Yanlış gerekçe koda yazılınca kalıcı olur ve sonradan
  *     okuyanı "bu muafiyet gereksiz" diye yanıltır; aşağıdaki test gerçeği kilitliyor.
  *  2. `w/-text` — çalışma kopyası binary algılanan her dosya. Dönüşüm uygulanmadığı için
- *     yapısal olarak fantom üretemez.
+ *     yapısal olarak fantom üretemez. **ÖLÇÜLDÜ (2026-08-18, AUTH bildirdi + doğrulandı):
+ *     bu muafiyet şu an SIFIR dosya kapsıyor** — `i/crlf` olup `w/-text` olan dosya yok
+ *     (40 arşiv `.ps1`'in hepsi `i/crlf w/crlf`, onları dışarıda tutan şey 1. maddedeki
+ *     önek). Yani madde ÖLÜ bir dal. KALDIRMADIM çünkü davranışı doğru: yarın index'i CRLF
+ *     olan gerçek bir binary eklenirse onu ihlal saymak YANLIŞ olurdu. Ama "yük taşıyor"
+ *     sanılmasın — 1. madde ile karıştırılırsa biri onu gereksiz görüp SİLER ve 40 kırmızı
+ *     alır (o muafiyet YÜK TAŞIYOR, bu taşımıyor).
+ *
+ * ⚠ BU BEKÇİ CANLI GİT DURUMUNU OKUR — YANLIŞ-KIRMIZI ÜRETEBİLİR (I18N-SWEEP bildirdi,
+ * 2026-08-18). `git ls-files --eol` **çalışılan kopyanın index'ini** okur, depoyu değil.
+ * Yani `git add --renormalize` gibi bir komut koşulduktan sonra (henüz commit'lenmeden)
+ * bu test GERÇEK bir AssertionError verir ama ihlal DEPODA yoktur, yalnız o oturumun lokal
+ * index'indedir. "Bir turda kırmızı, bir turda yeşil" deseninin bir açıklaması da budur.
+ * Kırmızı görürsen ilk ölçüm: `git status --short` ile lokal index'in temiz olduğunu
+ * doğrula, sonra TEMİZ bir klonda tekrar koş. Yanlış-kırmızı da bir kusurdur; bu satır o
+ * yüzden burada.
  *
  * NOT: `.ps1`/`.bat`/`.cmd` burada muaf DEĞİL. Onlar `.gitattributes`'ta `text eol=crlf`
  * ile beyan edildi → index LF, diske CRLF. Yani Windows betiği CRLF'ini korur AMA index
