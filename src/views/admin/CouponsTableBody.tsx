@@ -19,6 +19,7 @@ import ExportMenu from '../../components/admin/ExportMenu'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { useTenant } from '../../hooks/useTenant'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -344,7 +345,7 @@ const CouponsTableBody: React.FC = () => {
         cell: (r) =>
           r.type === 'percent'
             ? `%${r.value}`
-            : formatCurrency(r.value, lang as 'tr' | 'en', { maximumFractionDigits: 0 }),
+            : formatCurrency(r.value, lang as 'tr' | 'en', { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 }),
       },
       {
         key: 'active',
