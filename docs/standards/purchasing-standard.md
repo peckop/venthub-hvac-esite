@@ -357,8 +357,11 @@ set search_path = public, pg_temp     -- ✅ tırnaksız liste; pg_temp EN SONDA
 #### Planlanan düzeltme (migration — M5/M6 ile AYNI pakette)
 
 Yedi fonksiyon `create or replace` ile yeniden tanımlanır; **tek değişiklik `set` satırı**,
-gövdeler aynen korunur. Sonrasında `proconfig` prod'dan yeniden okunur (`{search_path=public}`
-görülmeli) ve mal kabul + stok düşme yolları bir kez çalıştırılıp **pozitif çapa** alınır.
+gövdeler aynen korunur. Sonrasında `proconfig` prod'dan yeniden okunur; **beklenen tek değer**
+`{"search_path=public, pg_temp"}`'tir — yani yukarıdaki tek doğru desenin ta kendisi.
+`{search_path=public}` (pg_temp'siz) bir okuma **KABUL DEĞİLDİR**: gövde tam nitelikli olsa bile
+çağıranın geçici tablosu örtük-ilk kuralıyla öne geçebilir (§13.6 ölçüm tablosu, 2. sütun).
+Ardından mal kabul + stok düşme yolları bir kez çalıştırılıp **pozitif çapa** alınır.
 
 > **Depo geneli (ölçüldü):** 28 SECURITY DEFINER fonksiyonunda **7 ayrı desen** var.
 > 7'si bu bozuk biçimde (benim — M7 kapatır); **6'sı `public, pg_temp` yani ZATEN DOĞRU**
