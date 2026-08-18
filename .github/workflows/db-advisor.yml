@@ -111,3 +111,41 @@ jobs:
           ORDER BY 1,2,3;" || true
           echo "::endgroup::"
         continue-on-error: true
+
+  # ---------------------------------------------------------------------------
+  # INV-CATALOG-1 — katalog butunlugu kapisi (T099).
+  # Yukaridaki advisor isi TAVSIYE verir (|| true + continue-on-error). Bu is ise
+  # gercek bir KAPIDIR: tabanin disinda yeni bir ihlal varsa KIRMIZI olur.
+  # Cetvel: docs/standards/catalog-ingestion-standard.md §6.1
+  # ---------------------------------------------------------------------------
+  catalog-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pg driver only
+        run: npm install --no-save --no-audit --no-fund pg@8
+
+      - name: Catalog integrity gate
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_CA_CERT: ${{ secrets.SUPABASE_CA_CERT }}
+        run: |
+          set -Eeuo pipefail
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "::notice title=INV-CATALOG-1::SUPABASE_DB_URL yok -> OLCULEMEDI (gecti DEGIL). Fork PR'larinda sir verilmez, beklenen durumdur."
+            exit 0
+          fi
+          if [ -z "${SUPABASE_CA_CERT:-}" ]; then
+            echo "::notice title=INV-CATALOG-1::SUPABASE_CA_CERT yok -> OLCULEMEDI (gecti DEGIL). TLS dogrulamasi KAPATILMAZ; kapinin canlanmasi icin bu sir eklenmelidir."
+            exit 0
+          fi
+          printf '%s' "$SUPABASE_CA_CERT" > "$RUNNER_TEMP/supabase-ca.crt"
+          export PGSSLROOTCERT="$RUNNER_TEMP/supabase-ca.crt"
+          node scripts/db/checks/catalog-integrity.mjs

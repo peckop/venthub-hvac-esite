@@ -197,13 +197,26 @@ KIRMIZI** olur. Böylece sınıf bugünden itibaren geri gelemez; mevcut borç g
   kimsenin hatası olmadığı bir anda **yanlış kırmızı** verirdi.
 - **Uyar-geç modu YOKTUR.** Yeni ihlal doğrudan kırmızıdır.
 
-### Bağlantı yüzeyi (ölçülmemiş — açık)
+### Bağlantı yüzeyi — kapı BAĞLANDI ama henüz UYUMUYOR
 
-Kapının prod DB'ye bağlanması `SUPABASE_DB_URL` ister ve **TLS doğrulaması açıktır**; Supabase kök
-sertifikası `PGSSLROOTCERT` ile verilir. Sertifika verilmezse betik çıkış kodu **2** ile
-"ÖLÇÜLEMEDİ" der — "geçti" **demez**. CI'da hangi iş (workflow) koşturacağı `.github/workflows/**`
-sahibi EDGE şeridiyle kararlaştırılacak; **o karar verilene kadar kapı CI'da koşmuyor** ve bu
-cetvel onu "çalışıyor" diye ilan etmez.
+CI işi: `.github/workflows/db-advisor.yml` → `catalog-integrity` (aynı dosyadaki `advisor` işi
+tavsiye verir; bu iş **kapıdır**, kırmızı olur).
+
+Kapı iki sır ister ve **ikisi de yoksa ölçmeden yeşile dönmez, "ÖLÇÜLEMEDİ" der**:
+
+| Sır | Yoksa ne olur |
+|---|---|
+| `SUPABASE_DB_URL` | ÖLÇÜLEMEDİ notu + çıkış 0. Fork PR'larında sır verilmez; **beklenen** durumdur. |
+| `SUPABASE_CA_CERT` | ÖLÇÜLEMEDİ notu + çıkış 0. **TLS doğrulaması KAPATILMAZ.** |
+
+Supabase sunucusu kendi kök sertifikasıyla imzalı bir zincir sunuyor (ölçüldü: doğrulama açıkken
+bağlantı `self-signed certificate in certificate chain` ile ölüyor). Doğru çözüm kökü **vermek**,
+doğrulamayı kapatmak değil — bu bağlantı prod DB kimlik bilgisi taşıyor ve repo **PUBLIC**.
+
+> ⚠️ **Bu cetvel kapıyı "çalışıyor" diye İLAN ETMEZ.** Kapının ilk **gerçekten ölçtüğü** koşumu
+> görülene kadar durum "bağlandı, uyuyor"dur (mekanizma ilanı kuralı, OPS-AUDIT 2026-08-18:
+> mekanizmanın kendi günlüğünden pozitif satır olmadan "çalışıyor" denmez).
+> **Recep'ten beklenen tek şey:** depo sırlarına `SUPABASE_CA_CERT` eklenmesi.
 
 ---
 
