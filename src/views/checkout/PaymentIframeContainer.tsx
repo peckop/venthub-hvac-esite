@@ -1,7 +1,11 @@
 'use client'
 
-import { CheckCircle,CreditCard, Lock } from 'lucide-react'
+import { AlertTriangle,CheckCircle,CreditCard, Lock } from 'lucide-react'
 import React from 'react'
+
+import type { PaymentPhase } from '../../hooks/useCheckoutPayment'
+import { FORM_RENDER_TIMEOUT_MS } from '../../hooks/useCheckoutPayment'
+import { hasRenderedSurface,injectCheckoutForm } from './injectCheckoutForm'
 
 interface PaymentIframeContainerProps {
     iyzToken: string
@@ -10,6 +14,13 @@ interface PaymentIframeContainerProps {
     setShowHelp: (v: boolean | ((p: boolean) => boolean)) => void
     progressPct: number
     overlayStep: number
+    phase: PaymentPhase
+    errorMessage: string
+    /** Form yüzeyi GERÇEKTEN belirdiğinde çağrılır (ölçümle, varsayımla değil). */
+    onFormReady: () => void
+    /** Yüzey kurulamadı — sebep makine okunur bir dize. */
+    onFormFailed: (reason: string) => void
+    onRetry?: () => void
     t: (key: string, params?: Record<string, unknown>) => string
 }
 
@@ -20,8 +31,64 @@ const PaymentIframeContainer: React.FC<PaymentIframeContainerProps> = ({
     setShowHelp,
     progressPct,
     overlayStep,
+    phase,
+    errorMessage,
+    onFormReady,
+    onFormFailed,
+    onRetry,
     t
 }) => {
+    const formHostRef = React.useRef<HTMLDivElement | null>(null)
+
+    // ── Form yüzeyinin kurulması ve GERÇEKTEN belirdiğinin ölçülmesi ──────────────
+    //
+    // Üç şey aynı etkide olmak zorunda, çünkü üçü de tek bir yaşam döngüsüne ait:
+    //   1. enjeksiyon (betikleri çalıştır),
+    //   2. gözlem (kapta görünür bir yüzey belirdi mi),
+    //   3. zaman aşımı (belirmezse sessiz kalma, hata bildir).
+    // Ayrılırlarsa, sökülme sırasında gözlemci ya da sayaç arkada kalır ve sökülmüş
+    // bileşende durum güncellemesi denenir.
+    React.useEffect(() => {
+        const host = formHostRef.current
+        if (!host) return
+        if (phase !== 'formLoading') return
+
+        // Yalnız `token` gelip içerik gelmediyse enjekte edilecek bir şey yoktur; kabın
+        // `data-token`'ı PSP betiği tarafından okunur. Bu dalda da gözlem AYNEN çalışır —
+        // "içerik yok" sessiz beklemeyi meşrulaştırmaz.
+        let cleanupInjection: (() => void) | null = null
+        if (paymentFrameContent) {
+            try {
+                cleanupInjection = injectCheckoutForm(host, paymentFrameContent).cleanup
+            } catch (e) {
+                onFormFailed(`inject_threw: ${e instanceof Error ? e.message : String(e)}`)
+                return
+            }
+        }
+
+        if (hasRenderedSurface(host)) { onFormReady(); return cleanupInjection ?? undefined }
+
+        const observer = new MutationObserver(() => {
+            if (!hasRenderedSurface(host)) return
+            observer.disconnect()
+            window.clearTimeout(timer)
+            onFormReady()
+        })
+        observer.observe(host, { childList: true, subtree: true })
+
+        // Sessizliği görünür kılan tek mekanizma (bkz. FORM_RENDER_TIMEOUT_MS).
+        const timer = window.setTimeout(() => {
+            observer.disconnect()
+            onFormFailed('render_timeout')
+        }, FORM_RENDER_TIMEOUT_MS)
+
+        return () => {
+            observer.disconnect()
+            window.clearTimeout(timer)
+            cleanupInjection?.()
+        }
+    }, [phase, paymentFrameContent, onFormReady, onFormFailed])
+
     return (
         <div className="space-y-6">
             <div className="flex items-center space-x-3 mb-2">
@@ -52,12 +119,42 @@ const PaymentIframeContainer: React.FC<PaymentIframeContainerProps> = ({
             <p className="text-steel-gray text-sm">{t('checkout.paymentLoading')}</p>
 
             <div className="mt-4">
-                {iyzToken ? (
-                    <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-520px">
-                        <div id="iyzipay-checkout-form" className="responsive" data-pay-with-iyzico="true" data-token={iyzToken} />
+                {phase === 'error' ? (
+                    <div
+                        role="alert"
+                        data-testid="payment-form-error"
+                        className="rounded-xl border border-danger-red/40 bg-danger-red/5 p-4 flex items-start gap-3"
+                    >
+                        <AlertTriangle className="text-danger-red shrink-0 mt-0.5" size={20} />
+                        <div className="space-y-2">
+                            <p className="text-sm font-semibold text-industrial-gray">{t('checkout.errors.paymentFormRenderTitle')}</p>
+                            <p className="text-sm text-steel-gray">{errorMessage || t('checkout.errors.paymentFormRender')}</p>
+                            {onRetry && (
+                                <button
+                                    type="button"
+                                    onClick={onRetry}
+                                    data-testid="payment-form-retry"
+                                    className="text-sm font-semibold text-primary-navy hover:text-secondary-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/30 rounded"
+                                >
+                                    {t('checkout.errors.paymentRetry')}
+                                </button>
+                            )}
+                        </div>
                     </div>
-                ) : paymentFrameContent ? (
-                    <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-520px" dangerouslySetInnerHTML={{ __html: paymentFrameContent }} />
+                ) : (paymentFrameContent || iyzToken) ? (
+                    // Kap: içeriği React DEĞİL, `injectCheckoutForm` doldurur.
+                    // Sebep: PSP parçasının içindeki betik `dangerouslySetInnerHTML` ile
+                    // ASLA çalışmaz (HTML standardı) — eski kod tam bu yüzden boş kutu basıyordu.
+                    <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-520px">
+                        <div
+                            ref={formHostRef}
+                            id="iyzipay-checkout-form"
+                            className="responsive"
+                            data-pay-with-iyzico="true"
+                            data-token={iyzToken || undefined}
+                            data-testid="payment-form-host"
+                        />
+                    </div>
                 ) : (
                     <div className="flex items-center gap-3 text-steel-gray">
                         <CheckCircle className="animate-pulse" />

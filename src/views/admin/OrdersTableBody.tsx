@@ -24,6 +24,7 @@ import { AdminSidePanel } from '../../components/admin/overlay/AdminSidePanel'
 import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import type { Lang } from '../../i18n/I18nContext'
@@ -98,7 +99,7 @@ const ORDER_STATUS_KEYS = [
 
 /* ---- helper'lar (module-level) ---- */
 function formatAmount(v?: number | null, lang: Lang = 'tr'): string {
-  if (typeof v === 'number') return formatCurrency(v, lang, { maximumFractionDigits: 0 })
+  if (typeof v === 'number') return formatCurrency(v, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })
   return '-'
 }
 
@@ -447,10 +448,10 @@ const OrderSpecsRow: React.FC<OrderSpecsRowProps> = ({ orderId }) => {
                         {qty}
                       </td>
                       <td className="px-4 py-2.5 text-right text-admin-fg font-mono">
-                        {formatCurrency(unitPrice, lang)}
+                        {formatCurrency(unitPrice, lang, { currency: SYSTEM_CURRENCY })}
                       </td>
                       <td className="px-4 py-2.5 text-right text-admin-accent font-mono">
-                        {formatCurrency(totalPrice, lang)}
+                        {formatCurrency(totalPrice, lang, { currency: SYSTEM_CURRENCY })}
                       </td>
                     </tr>
                   )

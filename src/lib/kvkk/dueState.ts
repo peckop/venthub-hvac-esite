@@ -16,10 +16,15 @@ export const TERMINAL_STATUSES = ['completed', 'rejected'] as const
 export type TerminalStatus = (typeof TERMINAL_STATUSES)[number]
 
 /**
- * Statü sonuçlanmış mı? Tip-tahmini (type guard) olarak yazıldı: `TERMINAL_STATUSES.includes(x)`
- * doğrudan çağrılamaz — `as const` dizinin `includes` imzası yalnız kendi iki literalini kabul
- * eder, geniş `status` değeri tip hatası verir. Kontrolü tek yerde tutmak ayrıca sözlüğün
- * genişlemesini de tek noktadan yönetir.
+ * Checks if a given status represents a completed or rejected terminal state.
+ * Acts as a TypeScript type guard to narrow string types into specific terminal status literals.
+ *
+ * @param status - The status string to evaluate
+ * @returns True if the status is considered terminal, allowing type-narrowing to TerminalStatus
+ *
+ * @example
+ * isTerminalStatus('completed') // returns true
+ * isTerminalStatus('in_progress') // returns false
  */
 export function isTerminalStatus(status: string): status is TerminalStatus {
   return (TERMINAL_STATUSES as readonly string[]).includes(status)
@@ -42,6 +47,18 @@ export interface DueState {
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000
 
+/**
+ * Calculates the current state of a due date SLA, evaluating remaining days, overdue flags, and whether the timer has stopped.
+ * If the row has reached a terminal status, the calculation freezes based on its completion timestamp.
+ *
+ * @param row - An object containing the due date, current status, and an optional completion timestamp
+ * @param now - The reference date against which the SLA is measured (typically the current date)
+ * @returns An object describing the SLA status including days remaining and overdue indicators
+ *
+ * @example
+ * computeDueState({ due_at: '2025-05-15', status: 'pending', completed_at: null }, new Date('2025-05-10'))
+ * // returns { daysLeft: 5, overdue: false, frozen: false }
+ */
 export function computeDueState(row: DueStateInput, now: Date): DueState {
   const due = new Date(row.due_at).getTime()
   const isTerminal = (TERMINAL_STATUSES as readonly string[]).includes(row.status)

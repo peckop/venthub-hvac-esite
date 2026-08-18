@@ -9,6 +9,7 @@ import type { UserAddress } from '@/types/ui-models'
 
 import { useAuth } from '../../hooks/useAuth'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes';
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDate } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -204,7 +205,7 @@ export default function AccountOverviewPage() {
             <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4 shadow-sm border border-blue-100">
               <CreditCard className="w-6 h-6" />
             </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight trunc">{totalVolume > 0 ? formatCurrency(totalVolume, lang, { maximumFractionDigits: 0 }) : '0 ₺'}</div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight trunc">{totalVolume > 0 ? formatCurrency(totalVolume, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 }) : '0 ₺'}</div>
             <div className="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider">{t('account.overview.totalVolume')}</div>
           </div>
         </div>
@@ -323,7 +324,7 @@ export default function AccountOverviewPage() {
                             {t('account.overview.orderNumber', { code })}
                           </Link>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm font-bold text-slate-700">{formatCurrency(Number(o.total_amount), lang, { maximumFractionDigits: 0 })}</span>
+                            <span className="text-sm font-bold text-slate-700">{formatCurrency(Number(o.total_amount), lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })}</span>
                             <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                             <span className="text-xs font-bold text-slate-400 flex items-center gap-1"><Calendar size={12} /> {formatDate(o.created_at, lang)}</span>
                           </div>

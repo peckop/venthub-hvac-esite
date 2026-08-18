@@ -52,14 +52,32 @@ const TRANSITIONS: Record<string, readonly string[]> = {
 export const DERIVED_STATUSES: readonly PoStatus[] = ['partially_received', 'received']
 
 /**
- * Verilen statüden izin verilen sonraki statüleri döndürür.
- * Bilinmeyen statü → boş dizi (kilitli; ileri geçiş yok).
+ * Retrieves the valid subsequent statuses that a purchase order can transition to from its current state.
+ * Returns an empty array if the current status is unknown or terminal (no forward transitions).
+ *
+ * @param current - The current status string of the purchase order
+ * @returns An array of allowed next status strings
+ *
+ * @example
+ * allowedNextPoStatuses('draft') // returns ['ordered', 'cancelled']
+ * allowedNextPoStatuses('closed') // returns []
  */
 export function allowedNextPoStatuses(current: string): string[] {
   return [...(TRANSITIONS[current] ?? [])]
 }
 
-/** Elle (admin eliyle) yapılabilir geçiş mi? Türev hedefler elle seçilemez. */
+/**
+ * Determines if an administrator is permitted to manually transition a purchase order to a specific target status.
+ * Derived statuses (e.g., 'partially_received', 'received') are driven by system events and are rejected as manual targets.
+ *
+ * @param current - The current status of the purchase order
+ * @param next - The desired target status
+ * @returns True if the transition is both structurally allowed and permitted for manual execution, false otherwise
+ *
+ * @example
+ * isManualPoTransitionAllowed('ordered', 'cancelled') // returns true
+ * isManualPoTransitionAllowed('ordered', 'received') // returns false (received is derived)
+ */
 export function isManualPoTransitionAllowed(current: string, next: string): boolean {
   if ((DERIVED_STATUSES as readonly string[]).includes(next)) return false
   return allowedNextPoStatuses(current).includes(next)
