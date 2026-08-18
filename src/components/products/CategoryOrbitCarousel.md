@@ -2,41 +2,34 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\products\CategoryOrbitCarousel.tsx
-skeleton_hash: e5a77fb93eacd45b
+source_path: C:\Users\alize\venthub-wt-altyapi\src\components\products\CategoryOrbitCarousel.tsx
+skeleton_hash: 07a0c8fab9650bb4
 entity_hashes:
   func:CategoryOrbitCarousel: f55930f20c5ff8c5
   func:getModelTypeForCategory: d5b53316e0d1f0a0
-  overview: f0a53dd9fcdced1d
+  overview: 351b8690efcfb1fc
   style_tokens: 47138b5b4fa0854f
-generated_at: 2026-06-19T20:47:59Z
+generated_at: 2026-08-18T07:05:23Z
 ---
 
 ## Genel Bakış
-Ürün kategorilerini interaktif, dairesel bir karusel bileşeni aracılığıyla sunan bir React modülüdür. Kullanıcıların alt kategorileri keşfetmesine olanak tanır ve hem detaylı hem de kompakt olmak üzere iki farklı görünüm modunu destekler. Modül, kategori verilerini model tiplerine dönüştüren bir yardımcı fonksiyon ile dinamik içerik oluşturmayı sağlar.
+Ürün kategorilerini interaktif ve görsel olarak sunan dairesel bir karusel bileşenini barındıran React modülüdür. Modül, kategori verilerini bileşenin içeriğini belirleyen anlamlı model tiplerine dönüştürmek için bir yardımcı fonksiyon kullanır ve kullanıcının alt kategorileri COMPACT veya detaylı modda keşfetmesini sağlar.
 
 ## Fonksiyon Grupları
-### Kategori Model Dönüşümü
-Kategori tanımlayıcısını (slug) uygun model tipine dönüştürerek bileşenin içeriğini yapılandıran yardımcı mantığı içerir.
+### Veri Dönüştürme ve Yapılandırma
+Kategori tanımlayıcısını, karusel bileşeninin içeriğini ve davranışını belirleyen bir model türüne dönüştüren yardımcı mantığı yönetir.
 - getModelTypeForCategory
 
-### Karusel Görüntüleme ve Etkileşim
-Kullanıcı arayüzünü oluşturur, kategori dolaşımını yönetir ve yapılan seçimleri üst bileşene raporlayan ana React bileşenidir.
+### Ana UI Bileşeni ve Etkileşim
+Kullanıcı arayüzünü oluşturur, dairesel dolaşım düzenini render eder ve yapılan alt kategori seçimlerini üst bileşene raporlayan kontrollü React bileşenini tanımlar.
 - CategoryOrbitCarousel
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için tanımlanan mimari varsayımlar, verilen fonksiyon imzaları ve modül yapısına dayanmaktadır.
-
-[Aksiyom 1]: Eğer `getModelTypeForCategory` fonksiyonuna geçersiz veya tanımsız bir `slug` parametresi verilirse, `undefined` değeri döner ve karusel bileşeni (`CategoryOrbitCarousel`) içeriği dinamik olarak belirlenemez; bu durumda bileşenin hangi alt kategorileri göstereceği bilinmez.
-
-[Aksiyom 2]: Eğer `CategoryOrbitCarousel` bileşeni `onSubcategorySelect` prop'u olmadan çağrılırsa, kullanıcı bir alt kategoriye tıkladığında tetiklenecek bir işlev olmadığı için ilgili ürünlere yönlendirme yapılamaz.
-
-[Aksiyom 3]: Eğer `compact` prop'u `true` olarak ayarlanırsa, karusel kompakt görünüm modunda render edilir; bu durumda bileşenin layout ve boyutları `FADE_IN_DOWN_CSS`, `FADE_IN_CSS`, `SCALE_IN_CSS` template sabitlerine veya `OrbitalProductsShowcase` çağrılarına bağlı olarak daha küçük/sıkıştırılmış bir yapıya geçebilir.
-
-[Aksiyom 4]: Eğer `getModelTypeForCategory` fonksiyonu geçerli bir `slug` girdisi için beklenmeyen bir model tipi (örn. bilinmeyen bir kategori) döndürürse, `OrbitalProductsShowcase` bileşeninin içeriği uyumsuz olabilir veya boş kalabilir.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
@@ -64,6 +57,7 @@ Bu modül için tanımlanan mimari varsayımlar, verilen fonksiyon imzaları ve 
 - import: ../../hooks/useCategoryViewModel::useCategoryViewModel
 - import: ../../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../../i18n/I18nProvider::useI18n
+- import: ../../utils/categoryHelpers::getLocalizedCategorySlug
 - import: lucide-react::ArrowLeft
 - import: lucide-react::ChevronRight
 - import: next/dynamic::dynamic
@@ -94,146 +88,56 @@ Bu modül için tanımlanan mimari varsayımlar, verilen fonksiyon imzaları ve 
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::getModelTypeForCategory
+### [N1_NASIL] AST Pointer: src/components/products/CategoryOrbitCarousel.tsx::getModelTypeForCategory
 - **params**: `(slug?: string)`
 - **ic_degiskenler**:
-  - `slug` — Kategori slug'ı, model tipini belirlemek için kullanılır
-  - `s` — slug'ın lowercase hali, kontrol işlemleri için
-- **Dönüş**: `string | undefined` — Model tipi adı veya undefined
+  - `slug` — Kategori slug'u, model tipini belirlemek için kullanılır
+  - `s` — Slug'un küçük harfli hali, karşılaştırma için normalize edilir
+- **Dönüş**: `string | undefined` — Kategori slug'una karşılık gelen model tipi string'i veya eşleşme yoksa undefined
 
-### [N2_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::CategoryOrbitCarousel
-- **params**: `({ onSubcategorySelect, compact = false }: CategoryOrbitCarouselProps)`
+### [N2_NASIL] AST Pointer: src/components/products/CategoryOrbitCarousel.tsx::CategoryOrbitCarousel
+- **params**: `({ onSubcategorySelect, compact = false })`
 - **ic_degiskenler**:
-  - `router` — Next.js router instance, navigasyon işlemleri için
-  - `categories` — Tüm kategorilerin listesi
-  - `categoriesLoading` — Kategorilerin yüklenme durumu
-  - `wrapCategory` — Kategorileri view model'e dönüştüren fonksiyon
-  - `t` — Çeviri fonksiyonu
-  - `Routes` — Localize edilmiş rotalar
-  - `level` — Aktif görünüm seviyesi ('main' veya 'subcategory')
-  - `activeMainCategorySlug` — Aktif ana kategorinin slug'ı
-  - `isTransitioning` — Geçiş animasyonu durumu
-  - `focusedItemTitle` — Odaklanan öğenin başlığı
-  - `frontCardTitle` — Ön kartın başlığı
-  - `hintIndex` — İpucu metni indeksi
-  - `ROTATING_HINTS` — Dönen ipucu metinleri dizisi
-  - `mainCategories` — Ana kategoriler (viewModel formatında)
-  - `activeMainCategory` — Aktif ana kategori view model
-  - `subcategories` — Alt kategoriler (viewModel formatında)
-  - `mainCategoriesMap` — Ana kategorilerin slug -> view model haritası
-  - `subcategoriesMap` — Alt kategorilerin slug -> view model haritası
-  - `handleFocusedItemChange` — Odak değişikliği handler'ı
-  - `handleFrontCardChange` — Ön kart değişikliği handler'ı
-  - `displayItems` — OrbitalProductsShowcase'a geçirilecek öğeler
-  - `handleCardClick` — Kart tıklama handler'ı
-  - `handleBack` — Geri gitme handler'ı
-  - `handleViewAllProducts` — Tüm ürünleri görüntüleme handler'ı
-  - `isMobile` — Mobil görünüm kontrolü
-  - `responsiveHeight` — Responsive yükseklik
-  - `responsiveModelScale` — Responsive model ölçeği
-- **Dönüş**: JSX element (React component)
-
-### [N3_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::mainCategories useMemo
-- **params**: `[]` (useMemo callback)
-- **ic_degiskenler**: yok
-- **Dönüş**: Array — Ana kategorilerin view model listesi
-
-### [N4_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::activeMainCategory useMemo
-- **params**: `[]` (useMemo callback)
-- **ic_degiskenler**: yok
-- **Dönüş**: Object | null — Aktif ana kategori view model
-
-### [N5_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::subcategories useMemo
-- **params**: `[]` (useMemo callback)
-- **ic_degiskenler**: yok
-- **Dönüş**: Array — Alt kategorilerin view model listesi
-
-### [N6_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::mainCategoriesMap useMemo
-- **params**: `[]` (useMemo callback)
-- **ic_degiskenler**:
-  - `map` — Slug -> view model haritası
-- **Dönüş**: Map — Ana kategorilerin haritası
-
-### [N7_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::subcategoriesMap useMemo
-- **params**: `[]` (useMemo callback)
-- **ic_degiskenler**:
-  - `map` — Slug -> view model haritası
-- **Dönüş**: Map — Alt kategorilerin haritası
-
-### [N8_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::handleFocusedItemChange useCallback
-- **params**: `(itemId: string | null)`
-- **ic_degiskenler**:
-  - `itemId` — Odaklanan öğenin ID'si
-  - `title` — Odaklanan öğenin başlığı
-- **Dönüş**: void
-
-### [N9_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::handleFrontCardChange useCallback
-- **params**: `(itemId: string)`
-- **ic_degiskenler**:
-  - `itemId` — Ön karttaki öğenin ID'si
-  - `title` — Ön karttaki öğenin başlığı
-- **Dönüş**: void
-
-### [N10_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::level useEffect
-- **params**: `[]` (useEffect callback)
-- **ic_degiskenler**: yok
-- **Dönüş**: void
-
-### [N11_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::displayItems useMemo
-- **params**: `[]` (useMemo callback)
-- **ic_degiskenler**:
-  - `rawCat` — Ham kategori verisi (DB'den gelen)
-  - `dbModelType` — DB'den gelen model tipi
-- **Dönüş**: Array — OrbitalProductsShowcase için öğe listesi
-
-### [N12_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::displayItems map callback (main)
-- **params**: `(vm)` — View model parametresi
-- **ic_degiskenler**:
-  - `rawCat` — Ham kategori verisi
-  - `dbModelType` — DB'den gelen model tipi
-- **Dönüş**: Object — Görünüm öğesi
-
-### [N13_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::displayItems map callback (subcategory)
-- **params**: `(vm)` — View model parametresi
-- **ic_degiskenler**:
-  - `rawCat` — Ham kategori verisi
-  - `dbModelType` — DB'den gelen model tipi
-- **Dönüş**: Object — Görünüm öğesi
-
-### [N14_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::handleCardClick useCallback
-- **params**: `(itemId: string)`
-- **ic_degiskenler**:
-  - `itemId` — Tıklanan kartın ID'si
-  - `categoryVm` — Ana kategori view model (level='main' durumunda)
-  - `hasSubs` — Alt kategorilerin varlığı kontrolü
-  - `subVm` — Alt kategori view model (level='subcategory' durumunda)
-- **Dönüş**: void
-
-### [N15_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::setTimeout callback (handleCardClick)
-- **params**: `[]` (setTimeout callback)
-- **ic_degiskenler**: yok
-- **Dönüş**: void
-
-### [N16_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::handleBack useCallback
-- **params**: `[]`
-- **ic_degiskenler**: yok
-- **Dönüş**: void
-
-### [N17_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::setTimeout callback (handleBack)
-- **params**: `[]` (setTimeout callback)
-- **ic_degiskenler**: yok
-- **Dönüş**: void
-
-### [N18_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::handleViewAllProducts useCallback
-- **params**: `[]`
-- **ic_degiskenler**: yok
-- **Dönüş**: void
-
-### [N19_NASIL] AST Pointer: CategoryOrbitCarousel.tsx::isMobile useEffect
-- **params**: `[]` (useEffect callback)
-- **ic_degiskenler**:
-  - `checkMobile` — Mobil görünüm kontrol fonksiyonu
-- **Dönüş**: void
+  - `onSubcategorySelect` — Prop: Alt kategori seçildiğinde çağrılan callback fonksiyonu
+  - `compact` — Prop: Compact modda mı gösterileceği (varsayılan: false)
+  - `router` — Next.js useRouter hook'u, sayfa yönlendirmeleri için kullanılır
+  - `categories` — useCategories hook'undan gelen tüm kategoriler dizisi
+  - `categoriesLoading` — useCategories hook'undan gelen yükleme durumu flag'i
+  - `wrapCategory` — useCategoryViewModel hook'undan gelen kategori sarmalama fonksiyonu
+  - `t` — useI18n hook'undan gelen çeviri fonksiyonu
+  - `lang` — useI18n hook'undan gelen aktif dil kodu
+  - `Routes` — useLocalizedRoutes hook'undan gelen lokalize route üretici nesnesi
+  - `level` — State: Ana menüde mi yoksa alt kategorilerde mi olduğunu belirten state ('main' | 'subcategory')
+  - `setLevel` — level state'inin setter fonksiyonu
+  - `activeMainCategorySlug` — State: Seçili ana kategorinin slug'u (null ise hiçbir ana kategori seçili değil)
+  - `setActiveMainCategorySlug` — activeMainCategorySlug state'inin setter fonksiyonu
+  - `isTransitioning` — State: Geçiş animasyonu sırasında true olan flag
+  - `setIsTransitioning` — isTransitioning state'inin setter fonksiyonu
+  - `focusedItemTitle` — State: Odaklanan kartın başlığı (hover/focus durumunda)
+  - `setFocusedItemTitle` — focusedItemTitle state'inin setter fonksiyonu
+  - `frontCardTitle` — State: Ön plandaki kartın başlığı (ilk görünen kart)
+  - `setFrontCardTitle` — frontCardTitle state'inin setter fonksiyonu
+  - `hintIndex` — State: Dönen ipucu mesajlarının indeksi
+  - `setHintIndex` — hintIndex state'inin setter fonksiyonu
+  - `ROTATING_HINTS` — Kullanıcıya gösterilen dönen ipucu mesajları dizisi
+  - `mainCategories` — useMemo: Ana kategorilerin (parent_id olmayan) view model dizisi
+  - `activeMainCategory` — useMemo: Seçili ana kategorinin view model nesnesi veya null
+  - `activeMainUrlSlug` — useMemo: Seçili ana kategorinin lokalize URL slug'u
+  - `subcategories` — useMemo: Seçili ana kategorinin alt kategorilerinin view model dizisi
+  - `mainCategoriesMap` — useMemo: Ana kategorilerin slug -> view model eşleme haritası
+  - `subcategoriesMap` — useMemo: Alt kategorilerin slug -> view model eşleme haritası
+  - `handleFocusedItemChange` — useCallback: Kart odaklandığında/focus kaybettiğinde çağrılan handler
+  - `handleFrontCardChange` — useCallback: Ön plandaki kart değiştiğinde çağrılan handler
+  - `displayItems` — useMemo: OrbitalProductsShowcase bileşenine geçirilecek öğe listesi
+  - `handleCardClick` — useCallback: Kart tıklandığında çağrılan handler (geçiş ve yönlendirme mantığı)
+  - `handleBack` — useCallback: Geri tuşuna basıldığında çağrılan handler
+  - `handleViewAllProducts` — useCallback: Tüm ürünleri görüntüle butonu için handler
+  - `isMobile` — State: Ekranın mobil boyutta olup olmadığını belirten flag
+  - `setIsMobile` — isMobile state'inin setter fonksiyonu
+  - `checkMobile` — useEffect içinde tanımlı: Pencere genişliğine göre mobil durumunu kontrol eden fonksiyon
+  - `responsiveHeight` — Local: Compact mod ve ekran boyutuna göre hesaplanan контейн yüksekliği
+  - `responsiveModelScale` — Local: Compact mod ve ekran boyutuna göre hesaplanan model ölçeği
+- **Dönüş**: JSX (React bileşeni) — Carousel UI'ını render eden React bileşeni
 
 ---
 

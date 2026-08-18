@@ -2,22 +2,40 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\components\Footer.tsx
-skeleton_hash: 91583130499c2de6
+source_path: C:\Users\alize\venthub-wt-altyapi\src\components\Footer.tsx
+skeleton_hash: 27f9b1bbde2c4c97
 entity_hashes:
   func:Footer: 1e0192e85e1f6373
-  overview: 05f327193547be84
+  overview: a3368ce4cddcd9ef
   style_tokens: 266d0ec5d4b33045
-generated_at: 2026-06-14T22:50:16Z
+generated_at: 2026-08-18T07:05:55Z
 ---
 
 ## Genel Bakış
-Bu modül, uygulamanın alt kısmında görünecek olan Footer bileşenini tanımlar. React işlevsel bileşeni olarak uygulanmış olup, sayfanın son kısmında gerekli bağlantı, telif hakkı veya sosyal medya gibi bilgileri sunmak için kullanılır.
+Bu modül, uygulamanın altbilgi (footer) bölümünü render eden tek bir React fonksiyonel bileşeni tanımlar. Bileşen, kategori navigasyonu, çeviri desteği ve telif hakkı bilgilerini içeren bir altbilgi yapısı sunar. Next.js Link bileşeni ve verschiedene context hook'ları kullanarak dinamik bir yapı oluşturulmuştur.
 
 ## Fonksiyon Grupları
 ### Bileşen Tanımı
-Footer bileşeninin oluşturulması ve dışa aktarılması sorumluluğundadır.
+Footer bileşeninin tanımlanması ve dışa aktarılması sorumluluğundadır. Tek bir işlevsel bileşen olarak modülün tüm sorumluluğunu üstlenir.
 - Footer
+
+---
+
+## Mimari Notlar
+
+**Dış Bağımlılıklar:**
+- `CategoryContext` — Kategori verilerini sağlayan context
+- `I18nProvider` — Çoklu dil desteği için çeviri fonksiyonu
+- `Routes` — Uygulama içi rota tanımları
+- `BuildTag` — Sürüm veya yapı bilgisi gösterimi
+
+**Dahili Veri Akışı:**
+- `useI18n` hook'u ile çeviri fonksiyonu (`t`) alınır
+- `useCategories` hook'u ile tüm kategoriler yüklenir
+- Kategoriler `React.useMemo` ile filtrelenerek `mainCategories` elde edilir (performans optimizasyonu)
+
+**Mimari Önemi:**
+Düşük karmaşıklığa sahip, izole bir presentasyon bileşenidir. Herhangi bir state yönetimi veya karmaşık iş mantığı içermez; sadece veriyi alıp görsel olarak sunar.
 
 ---
 
@@ -38,8 +56,10 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## İTHALATLAR (IMPORTS)
 - import: ../contexts/CategoryContext::useCategories
+- import: ../hooks/useLocalizedRoutes::useLocalizedRoutes
 - import: ../i18n/I18nProvider::useI18n
-- import: ../utils/routes::Routes
+- import: ../utils/categoryHelpers::getCategoryDisplayName
+- import: ../utils/categoryHelpers::getLocalizedCategorySlug
 - import: ./BuildTag::BuildTag
 - import: next/link::Link
 - import: react::React
@@ -51,21 +71,26 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 ### [N1_NASIL] AST Pointer: src/components/Footer.tsx::Footer
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `t` — çeviri fonksiyonu, `useI18n` hook'undan elde edilen `t` nesnesi; footer üzerindeki tüm metinleri çevirmek için kullanılır.
-  - `globalCategories` — `useCategories` context'inden gelen tüm kategorilerin dizisi; footer'ın kategori listesi ve diğer bölümlerde kaynak veri olarak kullanılır.
-  - `mainCategories` — `React.useMemo` ile memoize edilmiş değişken; `parent_id` olmayan (üst seviye) kategorilerin ilk 8 elemanını içerir ve footer'ın "Kategoriler" bölümünde gösterilir.
-- **Dönüş**: JSX.Element — `<footer>...</footer>` elementi olarak render edilen footer bileşeni.
+  - `t` — useI18n hook'undan dönen çeviri fonksiyonu; tüm UI metinlerini lokalize eder (ör. `t('header.brandName')`)
+  - `lang` — useI18n hook'undan dönen aktif dil kodu (ör. `'tr'`, `'en'`); `getLocalizedCategorySlug`'a geçirilir
+  - `Routes` — useLocalizedRoutes hook'undan dönen lokalize rota üretici nesne; `Routes.home()`, `Routes.products()`, `Routes.brands()`, `Routes.about()`, `Routes.contact()`, `Routes.destek.home()`, `Routes.destek.sss()`, `Routes.destek.iadeDegisim()`, `Routes.destek.teslimatKargo()`, `Routes.destek.garantiServis()`, `Routes.category(slug)`, `Routes.legal.kvkk()`, `Routes.legal.mesafeliSatis()`, `Routes.legal.onBilgilendirme()`, `Routes.legal.cerez()`, `Routes.legal.gizlilik()`, `Routes.legal.kullanimKosulları()` methodlarıyla kullanılır
+  - `globalCategories` — useCategories hook'undan dönen tüm kategoriler dizisi; useMemo callback'ine bağımlılık olarak verilir
+  - `mainCategories` — `globalCategories` içinden `parent_id`'si olmayan ilk 8 kategoriyi içeren `React.useMemo` ile memoize edilmiş dizi; Categories bölümünde ve `slice(0, 6)` ile alt kategori listesinde kullanılır
+  - `new Date().getFullYear()` — JS Date nesnesi ile mevcut yılın alınması; telif hakkı satırında kullanılır
+- **Referans verilen dış sabitler**: `FOOTER_ICON_ADDRESS`, `FOOTER_ICON_PHONE`, `FOOTER_ICON_MAIL`, `WEEKDAY_HOURS`, `SATURDAY_HOURS`, `HVAC_SUFFIX` — fonksiyon gövdesinde JSX içinde doğrudan referans verilen, dışarıdan import edilmiş sabit değerler
+- **Dönüş**: JSX (`<footer>` elemanı — site alt bilgi bölümünü render eden React bileşeni)
 
-### [N2_NASIL] AST Pointer: src/components/Footer.tsx::mainCategories (useMemo callback)
+### [N2_NASIL] AST Pointer: src/components/Footer.tsx::Footer/useMemo-callback
 - **params**: (parametre yok)
 - **ic_degiskenler**:
-  - `globalCategories` — dış kapsaktan gelen tüm kategoriler dizisi; bu fonksiyon içinde `filter` ve `slice` işlemlerine kaynak olarak kullanılır.
-- **Dönüş**: Category[] — `parent_id` olmayan kategorilerin ilk 8 elemanını içeren yeni dizi; footer'da gösterilecek kategori özetini sağlar.
+  - (yok — `globalCategories` dışarıdan闭包 ile erişilir)
+- **Dönüş**: `Array` — `globalCategories` dizisi içinden `!c.parent_id` filtresi uygulanmış, ilk 8 elemana `slice(0, 8)` ile kırpılmış kategori alt kümesi
 
-### [N3_NASIL] AST Pointer: src/components/Footer.tsx::renderCategoryItem
-- **params**: `category` — bir kategori nesnesi; `slug` ve `name` özelliklerini içerir, bu özellikler link oluşturma ve metin gösteriminde kullanılır.
-- **ic_degiskenler**: (yok) — fonksiyon gövdesinde ek bir değişken tanımlanmaz.
-- **Dönüş**: JSX.Element — `<li>` elementi içinde bir `<Link>` barındıran kategori öğesi; footer'ın kategori listesinde tek bir satır olarak render edilir.
+### [N3_NASIL] AST Pointer: src/components/Footer.tsx::Footer/map-callback
+- **params**: `category` — `mainCategories.slice(0, 6)` dizisi üzerinde `.map()` ile iterasyon sırasında alınan tek bir kategori nesnesi; `category.slug` ve `category.parent_id` alanlarına erişilir
+- **ic_degiskenler**:
+  - (yok — `Routes`, `lang`, `t` dışarıdan闭包 ile erişilir)
+- **Dönüş**: JSX (`<li>` elemanı — tek bir kategori için lokalize edilmiş slug ile link içeren liste öğesi; `getLocalizedCategorySlug(category, lang)` ve `getCategoryDisplayName(category, t)` yardımcı fonksiyonları çağrılarak URL ve display adı üretilir)
 
 ---
 
