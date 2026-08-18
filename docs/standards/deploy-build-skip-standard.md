@@ -137,8 +137,25 @@ ignore-build: VERCEL_GIT_PREVIOUS_SHA yok (ilk dagitim?) -> BUILD
 2. ✅ **Vercel kapısı `success` veriyor**, `pending`'de kalmıyor. Yani korkulan
    "doküman PR'ları merge edilemez hale gelir" senaryosu **gerçekleşmedi** ve
    açık doküman PR'ları için bir tehlike yok.
-3. ❌ **Atlama HİÇ ÇALIŞMADI.** `VERCEL_GIT_PREVIOUS_SHA` boş geldi, betik güvenli
-   tarafa düşüp build etti. Yani T086 bu ana kadar **sıfır tasarruf** sağladı.
+3. ❌ **Atlama ÖNİZLEME dallarında çalışmadı.** `VERCEL_GIT_PREVIOUS_SHA` boş geldi,
+   betik güvenli tarafa düşüp build etti.
+
+> **DÜZELTME (aynı gün, 11:46 master dağıtımı).** Yukarıdaki (3)'ü ilk yazdığımda
+> *"atlama HİÇ çalışmadı, T086 sıfır tasarruf sağladı"* demiştim. **Fazla genişti.**
+> Master (üretim) dağıtımının günlüğü şunu yazıyor:
+>
+> ```
+> ignore-build: build GEREKTIREN degisiklik: src/__tests__/.../currency-not-from-language.test.ts -> BUILD
+> ```
+>
+> Yani **master'da değişken DOLU geliyor** (o dal için son başarılı dağıtım vardır) ve
+> betik gerçek bir taban karşılaştırması yapıp doğru kararı veriyor. Çalışmayan yer
+> **önizleme dalları**: bu depoda kural *bir-iş-bir-dal* olduğu için her önizleme bir
+> dalın ilk dağıtımıdır ve orada böyle bir taban yoktur.
+>
+> Doğru ifade: **T086 üretim tarafında çalışıyordu, önizleme tarafında hiç çalışmadı.**
+> Tasarrufun asıl beklendiği yer önizlemeler olduğu için pratik kazanç yine küçüktü —
+> ama "hiç çalışmadı" demek ölçümden fazlasını iddia etmekti.
 
 **(3) niçin sessizdi:** betik doğru davrandı (bilmiyorsan build et), dolayısıyla
 hiçbir kırmızı üretmedi. Kapı da göremezdi — bekçi betiği *dosya-listesi kipinde*
