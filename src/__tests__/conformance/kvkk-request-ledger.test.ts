@@ -218,23 +218,60 @@ describe('INV-KVKK-1 · veri sahibi talep defteri', () => {
 
   /* ---- müşteri kanalı (PR-2) — RLS satır kapısı YETMEZ, kolon kapısı da şart ---- */
 
-  it('R6: müşteri kanalı — yazılabilir kolonlar ADLA sınırlı (RLS kolon kontrolü YAPMAZ)', () => {
+  it('R6: müşteri kanalı — süreç alanları POLİTİKADA pinlenmiş (kolon-grant kapı DEĞİLDİR)', () => {
     const sql = Object.values(CHANNEL_MIGRATIONS)[0]
     expect(sql, 'müşteri kanalı migration dosyası bulunamadı').toBeTruthy()
     const clean = stripSqlComments(sql!)
 
-    // Kolon-düzeyi insert grant'i ZORUNLU: yoksa müşteri status='completed' yazıp
-    // kendi talebini "sonuçlanmış" gösterebilir, due_at'ı kaydırabilir.
-    const grantMatch = clean.match(/grant\s+insert\s*\(([^)]*)\)\s*\n?\s*on\s+public\.data_subject_requests\s+to\s+authenticated/i)
-    expect(grantMatch, 'kolon-düzeyi insert grant yok — RLS tek başına kolonu korumaz').toBeTruthy()
+    // 2026-08-18 PROD ÖLÇÜMÜ — bu kuralın ilk hâli YANLIŞ ŞEYİ ölçüyordu.
+    // "grant insert (a,b,c)" satırının VARLIĞINI arıyordu ve yemyeşildi. Oysa prod'da
+    // `authenticated` rolünün bu tabloda ZATEN tablo düzeyinde INSERT yetkisi var
+    // (Supabase varsayılanı) ve PostgreSQL'de kolon ayrıcalığı tablo ayrıcalığını
+    // DARALTMAZ, üzerine EKLENİR. Ölçülen metin doğruydu, ETKİSİ sıfırdı: migration
+    // merge edilseydi müşteri status='completed' + due_at=<uzak tarih> yazabilecekti —
+    // yani kapı, tam olarak kapatmak için yazıldığı deliğe kördü.
+    // Bekçi artık kapının GERÇEKTEN durduğu yeri ölçüyor: owner INSERT politikasının
+    // `with check` bloğu (politika bazlı olduğu için admin yolunu etkilemez).
+    const ownerInsert = clean.match(
+      /create\s+policy\s+p_dsr_owner_insert[\s\S]*?with\s+check\s*\(([\s\S]*?)\n\s*\);/i,
+    )
+    expect(
+      ownerInsert,
+      'p_dsr_owner_insert politikasının with check bloğu bulunamadı — müşteri INSERT yolu kısıtsız',
+    ).toBeTruthy()
+    const check = ownerInsert![1]
 
-    const granted = grantMatch![1].split(',').map(c => c.trim())
-    // Süre/durum/sonuç alanları müşteriye ASLA verilmez.
-    for (const forbidden of ['status', 'due_at', 'outcome', 'retained_data_note', 'identity_verified_at', 'completed_at', 'handled_by']) {
-      expect(granted, `'${forbidden}' müşteriye yazma izni verilmiş — defter kirletilebilir`).not.toContain(forbidden)
+    // Kimlik: kullanıcı başkasının adına talep açamaz (Tebliğ m.5).
+    expect(check, 'with check user_id sahipliğini bağlamıyor').toMatch(
+      /user_id\s*=\s*\(\s*select\s+auth\.uid\(\)/i,
+    )
+    expect(check, 'with check applicant_email için JWT bağı kurmuyor').toMatch(
+      /applicant_email\s*=\s*\(\s*select\s+auth\.jwt\(\)/i,
+    )
+
+    // Süreç alanları TEK TEK pinli olmalı — biri düşerse müşteri o alanı belirler.
+    const pinler: Array<[string, RegExp]> = [
+      ['status', /\bstatus\s*=\s*'received'/i],
+      ['due_at', /\bdue_at\s*=\s*received_at\s*\+\s*interval\s*'30 days'/i],
+      ['outcome', /\boutcome\s+is\s+null/i],
+      ['completed_at', /\bcompleted_at\s+is\s+null/i],
+      ['identity_verified_at', /\bidentity_verified_at\s+is\s+null/i],
+      ['handled_by', /\bhandled_by\s+is\s+null/i],
+      ['retained_data_note', /\bretained_data_note\s+is\s+null/i],
+    ]
+    for (const [alan, desen] of pinler) {
+      expect(
+        desen.test(check),
+        `with check '${alan}' alanını pinlemiyor — müşteri bu alanı kendisi belirleyebilir (defter kirletilebilir)`,
+      ).toBe(true)
     }
-    // Müşteri UPDATE edemez: açılan talep sonradan değiştirilemez (ispat izi).
-    expect(/grant\s+update[^;]*data_subject_requests[^;]*authenticated/i.test(clean)).toBe(false)
+
+    // Müşteriye UPDATE POLİTİKASI verilmez: açılan talep sonradan değiştirilemez.
+    // (Politikasız RLS reddeder; tablo grant'i burada da tek başına yetmez.)
+    expect(
+      /create\s+policy[^;]*for\s+update[^;]*to\s+authenticated/i.test(clean),
+      'müşteriye UPDATE politikası verilmiş — ispat izi silinebilir hâle gelir',
+    ).toBe(false)
   })
 
   it('R7: müşteri kanalı — kimlik tevsiki DB\'de zorlanır (applicant_email = JWT email)', () => {
