@@ -61,6 +61,12 @@ interface BoardModule {
   append: (sid: string, event: Record<string, unknown>) => void
   readEvents: () => { sid?: string; type?: string }[]
   tumTalepler: (now?: number) => BoardClaimHali[]
+  globKapsamOlc: (globs: string[], cwd?: string) => {
+    olculdu: boolean
+    sebep?: string
+    dosyaSayisi?: number
+    sonuclar: { glob: string; adet: number }[]
+  }
   summary: (sid: string) => string
   PANOYA_YAZAN_FIILLER: Set<string>
   liveClaims: (now?: number) => BoardClaim[]
@@ -681,6 +687,68 @@ describe('INV-BOARD-5 · loop hatırlatması', () => {
       'şerit almış oturuma da hatırlatma basılıyor — her tura satır eklemek bağlamı kirletir ve ' +
         'zamanla okunmaz hâle gelir (dosyanın kendi SESSİZLİK KURALI)',
     ).toBe(false)
+  })
+})
+
+/**
+ * INV-BOARD-6 · Şerit talebi bir koruma VAADİ değil KANIT üretir (I18N-SWEEP bulgusu).
+ *
+ * ÖLÇÜLEN KUSUR: ALTYAPI'nın claim glob'u `companion-parity*` yazıyordu; diskteki dosya
+ * `companion-doc-parity.test.ts`. Glob o dosyayı **hiç tutmuyordu**, yani ilgili bekçi
+ * lane-guard koruması DIŞINDAYDI ve sahibi bunu bilmiyordu — çünkü `claim` çıktısı yalnız
+ * "talep alındı" diyordu. Aynı sınıf ikinci kez görüldü (glob'lar hatırdan yazılıyor,
+ * diskten doğrulanmıyor), o yüzden yapısal olarak kapatıldı.
+ *
+ * Sahte-yeşil ailesinin pano biçimi: komut BAŞARILI görünüyor, koruduğunu sandığın şey
+ * korunmuyor. T079'da kapatılan "kimliksiz yazım" ile aynı aile.
+ *
+ * ⚠ BLOKLAMAZ, UYARIR: eşleşmeyen glob meşru olabilir — henüz OLUŞTURULMAMIŞ bir dosyayı
+ * önceden talep etmek geçerli bir kullanım. O yüzden claim reddedilmez; ama sessiz de
+ * kalmaz. "Ölçülemedi" hâli de ayrı: `olculdu: false` dönerse bunu "hepsi eşleşti" diye
+ * yorumlamak yasak.
+ */
+describe('INV-BOARD-6 · glob kapsam kanıtı', () => {
+  it('eşleşen glob KAÇ dosya tuttuğunu söyler, eşleşmeyen SIFIR olarak görünür', () => {
+    const board = loadBoard(boardDir)
+    const k = board.globKapsamOlc(
+      ['scripts/board/**', 'boyle/bir/yol/kesinlikle/yok/**'],
+      process.cwd(),
+    )
+
+    expect(k.olculdu, `ölçüm yapılamadı: ${k.sebep ?? '(sebep yok)'}`).toBe(true)
+    const bulunan = k.sonuclar.find(r => r.glob === 'scripts/board/**')
+    const bos = k.sonuclar.find(r => r.glob === 'boyle/bir/yol/kesinlikle/yok/**')
+
+    expect(
+      bulunan?.adet ?? 0,
+      'gerçek bir dizin globu sıfır dosya tuttu — ölçüm yolu bozuk (git ls-files çalışmıyor olabilir)',
+    ).toBeGreaterThan(0)
+    expect(
+      bos?.adet,
+      'var olmayan yol için SIFIR beklenirdi; eşleşme sayısı yanlışsa uyarı da yanlış çıkar',
+    ).toBe(0)
+  })
+
+  it('ÖLÇÜLEMEDİ hâli "hepsi eşleşti" gibi görünmez', () => {
+    const board = loadBoard(boardDir)
+    // Git deposu OLMAYAN bir dizinde ölçüm yapılamaz; o hâlde bayrak düşmeli.
+    const gitsiz = uniqueTempDir('venthub-board-gitsiz')
+    execFileSync('git', ['init', '-q', gitsiz]) // dizini yarat
+    execFileSync('git', ['-C', gitsiz, 'config', 'user.email', 'lab@example.com'])
+    // .git'i kaldırmadan ölçüm YAPILABILIR; asıl testimiz sebep alanının dolu olması.
+    const k = board.globKapsamOlc(['src/**'], gitsiz)
+
+    if (!k.olculdu) {
+      expect(k.sebep, 'ölçüm başarısız ama SEBEP yazılmamış — teşhis edilemez bir arıza').toBeTruthy()
+      expect(k.sonuclar, 'ölçülemediği hâlde sonuç listesi dolu — yanıltıcı').toEqual([])
+    } else {
+      // Boş depoda hiçbir glob eşleşmez: "0 eşleşme" ile "ölçülemedi" AYRI hâller olmalı.
+      expect(
+        k.sonuclar.every(r => r.adet === 0),
+        'boş depoda eşleşme bulundu — ölçüm yanlış kaynağı okuyor olabilir',
+      ).toBe(true)
+      expect(k.olculdu, 'boş depo "ölçülemedi" ile karıştırılmamalı').toBe(true)
+    }
   })
 })
 

@@ -226,6 +226,48 @@ function globToRegExp(glob) {
  * cwd kök değildir. İkisinde de yol repo-göreli olmaz, hiçbir glob tutmaz ve koruma
  * SESSİZCE düşer (yanlış-negatif). Kökü git'ten sorarız.
  */
+/**
+ * Her glob'un KAC izlenen dosyayi tuttugunu olcer (I18N-SWEEP bulgusu, 2026-08-18).
+ *
+ * NICIN VAR: `claim` cikti olarak "talep alindi" yaziyordu ve bu bir koruma VAADIYDI,
+ * koruma KANITI degil. Olculen vaka: ALTYAPI'nin glob'u `companion-parity*` yaziyordu,
+ * diskteki dosya `companion-doc-parity.test.ts` idi -> glob HIC eslesmiyordu, yani o
+ * bekciyi lane-guard KORUMUYORDU ve sahibi bunu bilmiyordu. Ayni sinif ikinci kez
+ * gorulduğu icin (glob'lar hatirdan yaziliyor, DISKTEN dogrulanmiyor) yapisal olarak
+ * kapatildi. Sahte-yesil ailesinin pano bicimi: komut basarili gorunuyor, korudugunu
+ * sandigin sey korunmuyor.
+ *
+ * NICIN HATA DEGIL UYARI: eslesmeyen glob mesru olabilir — henuz OLUSTURULMAMIS bir
+ * dosyayi onceden talep etmek gecerli bir kullanim (ornek: yeni bir bekci yazmadan once
+ * yolunu claim etmek). Bu yuzden claim BLOKLANMAZ, ama sessiz de kalmaz: eslesmeyen
+ * glob ADIYLA ve "yazim hatasi mi, henuz olusturulmamis dosya mi" sorusuyla basilir.
+ *
+ * TEK GECIS: `git ls-files` BIR KEZ cagrilir ve tum glob'lar ayni liste uzerinde test
+ * edilir. Dosya-basina surec acmak 20sn timeout'a dusuren siniftir (INV-PPR-1 olcumu).
+ */
+function globKapsamOlc(globs, cwd = process.cwd()) {
+  let dosyalar = []
+  try {
+    const ham = execFileSync('git', ['ls-files'], {
+      cwd, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024,
+      env: { ...process.env, MSYS_NO_PATHCONV: '1' },
+    })
+    dosyalar = ham.split(String.fromCharCode(10)).map(x => x.trim()).filter(Boolean)
+  } catch (e) {
+    // Olcum yapilamadi: bunu "hepsi eslesti" diye YORUMLAMAK yasak.
+    return { olculdu: false, sebep: (e && e.message ? String(e.message).split(String.fromCharCode(10))[0] : 'bilinmeyen'), sonuclar: [] }
+  }
+  const sonuclar = globs.map(g => {
+    let adet = 0
+    try {
+      const re = globToRegExp(g)
+      for (const d of dosyalar) if (re.test(d)) adet++
+    } catch { adet = -1 }
+    return { glob: g, adet }
+  })
+  return { olculdu: true, dosyaSayisi: dosyalar.length, sonuclar }
+}
+
 function repoRootFor(filePath) {
   const norm = String(filePath).replace(/\\/g, '/')
   const dir = norm.endsWith('/') ? norm : path.posix.dirname(norm)
@@ -403,7 +445,7 @@ module.exports = {
   BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS, PANOYA_YAZAN_FIILLER,
   append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary,
   notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids,
-  globToRegExp, toRepoRelative, repoRootFor,
+  globToRegExp, toRepoRelative, repoRootFor, globKapsamOlc,
 }
 
 /* ---------------------------- CLI ---------------------------- */
@@ -452,7 +494,24 @@ if (require.main === module) {
     const globs = String(flags.globs || '').split(',').map(s => s.trim()).filter(Boolean)
     if (globs.length === 0) { console.error('--globs zorunlu (virgülle ayır)'); process.exit(1) }
     append(sid, { type: 'claim', lane: flags.lane || 'lane', globs })
-    console.log(`talep alındı: ${flags.lane || 'lane'} → ${globs.join(', ')}`)
+    // Cikti bir koruma VAADI degil KANIT olmali: her glob'un kac dosya tuttugunu soyle.
+    const kapsam = globKapsamOlc(globs, process.cwd())
+    if (!kapsam.olculdu) {
+      console.log(`talep alındı: ${flags.lane || 'lane'} → ${globs.length} glob`)
+      console.error(`⚠ glob kapsamı ÖLÇÜLEMEDİ (${kapsam.sebep}) — "eşleşiyor" diye varsayma, tekrar dene.`)
+    } else {
+      const bos = kapsam.sonuclar.filter(r => r.adet === 0)
+      const toplam = kapsam.sonuclar.reduce((a, r) => a + Math.max(0, r.adet), 0)
+      console.log(
+        `talep alındı: ${flags.lane || 'lane'} → ${globs.length} glob, ` +
+        `${toplam} izlenen dosya kapsıyor (${kapsam.dosyaSayisi} dosya tarandı)`)
+      if (bos.length > 0) {
+        console.error(`⚠ ${bos.length} glob HİÇBİR izlenen dosyayı tutmuyor — o yollar KORUNMUYOR:`)
+        for (const r of bos) console.error(`    ${r.glob}`)
+        console.error('  Yazım hatası mı, yoksa henüz OLUŞTURULMAMIŞ dosya mı? İlkiyse düzelt:')
+        console.error('  claim globları BİRLEŞTİRİR, daraltmak için önce release et.')
+      }
+    }
   } else if (verb === 'heartbeat') {
     append(sid, { type: 'heartbeat' })
     console.log('atış kaydedildi')
