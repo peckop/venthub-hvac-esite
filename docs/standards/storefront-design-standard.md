@@ -136,7 +136,10 @@ Kural: serbestlik **token değerleriyle** kurulur; serbestlik alanı hiçbir zam
 
 ## 4. Zorlama katmanları (yol haritası)
 
-1. **INV-9 stil-conformance testi (ratchet):** §5 baseline sayımları; yeni kod sayacı **artıramaz**,
+1. ✅ **INV-9 stil-conformance testi (ratchet) — 2026-08-18'de YAZILDI ve CANLI**
+   (`src/__tests__/conformance/storefront-style-ratchet.test.ts`; 7 ratchet + 2 sert kapı +
+   bayatlık kilidi + vacuous-pass koruması; 10 sabotajla kanıtlandı). Ayrıntı → §5.
+   Özgün tarif: §5 baseline sayımları; yeni kod sayacı **artıramaz**,
    göç dalgaları düşürür (i18n INV-5 ratchet deseni). Statik tarama gotcha'ları →
    `conformance-test-static-scan-gotchas` (import.meta.glob, tam-literal kök glob, stale-guard).
 2. **Rota × breakpoint screenshot taraması (Playwright):** storefront rotaları × {mobil/tablet/desktop}
@@ -148,22 +151,50 @@ Kural: serbestlik **token değerleriyle** kurulur; serbestlik alanı hiçbir zam
 
 ---
 
-## 5. Ratchet baseline (2026-08-13, admin hariç `src/`)
+## 5. Ratchet baseline (admin hariç `src/`) — **CANLI: `INV-9`**
 
-INV-9 için başlangıç tavanları — hedef hepsinde **0**:
+**Kapı yazıldı ve CANLI:** `src/__tests__/conformance/storefront-style-ratchet.test.ts`.
+Tavanların **otoritesi artık testtir**, bu tablo değil — aşağısı okunabilir bir özettir.
 
-| Sayaç (LEGACY desen) | Baseline |
-|---|---|
-| `max-w-7xl` | 49 |
-| Ham gri (`slate-*` + `gray-*` vb.) | ~1368 (slate 1116 + gray 252) |
-| Ham `rounded-xl/2xl/3xl` | 194+ |
-| Ham vurgu (`blue-*` 90 + `indigo-*` 15) | 105 |
-| Display dışı `font-black` | ≤150 (rol ayrımı INV-9 yazılırken netleşir) |
-| Ham `<img>` | INV-9 yazılırken sayılır |
-| Bölüm ölçeği dışı `py-*` | INV-9 yazılırken sayılır |
+| Sayaç (LEGACY desen) | 08-13 | **08-18 tavan** | Tür |
+|---|---|---|---|
+| `max-w-7xl` | 49 | **49** | ratchet |
+| Ham gri (`slate-*` + `gray-*`) | 1396 | **1508** | ratchet |
+| Ham `rounded-xl/2xl/3xl` | 378 | **391** | ratchet |
+| Ham vurgu (`blue-*` + `indigo-*`) | 143 | **148** | ratchet |
+| Display dışı `font-black` | 150 | **133** | ratchet |
+| Keyfî `shadow-[...]` | — | **3** | ratchet |
+| Keyfî `w/h/text/gap-[...]` | — | **6** | ratchet |
+| Ham `<img>` | 0 | **0** | 🔒 sert kapı |
+| Keyfî `p*-[...]` | 0 | **0** | 🔒 sert kapı |
 
-> Sayaçların kesin regex/glob tanımı INV-9 testinin kendisinde yaşar (test = ikinci SSOT yarısı);
-> buradaki sayılar ilk ölçümün kaydıdır, test yazılırken yeniden ölçülüp sabitlenir.
+> ⚠️ **08-13 sütunu ÜÇ satırda düzeltildi (2026-08-18).** Önceki tablo `rounded` için
+> "194+", `blue` için 90 diyordu; aynı regex o commit'te koşulunca gerçek sayılar **378**
+> ve **125** çıktı — yani baseline'ın kendisi yarım sayılmıştı. Sonuç: 08-18 ölçümü ilk
+> bakışta "desen iki katına çıktı" gibi göründü, oysa gerçek sapma **~+132**. **Ders:**
+> ölçüm YÖNTEMİ yazılmamış bir baseline, sonraki ölçümü yanlış alarma çevirir. Bu yüzden
+> her sayacın regex'i ve kapsamı artık testin İÇİNDE yaşıyor (test = SSOT'un ikinci yarısı).
+
+**Tavanlar niçin 08-13'e değil BUGÜNE sabitlendi:** geriye çekmek kapıyı doğuştan kırmızı
+yapardı; kırmızı doğan kapı ya devre dışı bırakılır ya görmezden gelinir (bu depoda
+`eslint` `warn` seviyesinin başına gelen tam buydu — fail-open). Ratchet geçmişi
+cezalandırmaz, **geleceği kapatır**; sapmanın kaydı yukarıdaki tabloda duruyor.
+
+**Bayatlık kilidi:** sayaç tavanın altına düşerse test **kırmızı yanar** ve tavanı
+indirmeni ister. Bu bir regresyon değil ödüldür — ratchet ancak tek yönlü sıkışırsa
+ratchet'tir, yoksa göç dalgasının kazandığı zemin sessizce geri verilebilir.
+
+### 5.1 ÖLÇÜLEMEZ-STATİK (kapı bunları görmez — adıyla işaretli)
+
+Statik tarama şu kuralları **yapısal olarak** göremez; "kapı yeşil" bunların uyulduğu
+anlamına **gelmez**:
+
+| Kural | Niçin statik ölçülemez | Nereye devredildi |
+|---|---|---|
+| §2.6 bölüm dikey ritmi (`py-12/16/24/32`) | İzinli-set dışı 365 isabetin değerleri `py-1/2/3` — buton/rozet dolgusu, bölüm dolgusu değil. Bir elemanın "bölüm" rolünde olduğu className'den bilinemez. Ham sayıyı ratchet yapmak 365 yanlış-KIRMIZI üretirdi. | §4.3 PageKit `<Section density>` primitifi (yapısal zorlama). Statik zorlanabilen dar dilim — keyfî `p*-[...]` — kapıya **alındı**. |
+| §2.7 `object-cover` / `object-contain` ayrımı | Doğru seçim görselin **foto mu teknik diyagram mı** olduğuna bağlı; bu semantik bilgi kodda yok. (Hava-perdeleri kırpma hatası tam bu sınıftı.) | §4.2 Playwright görsel katmanı |
+| §2.3 vurgu hiyerarşisi · §2.5 rol eşleşmesi · §2.1 konteynerin bağlamda doğruluğu | Hepsi "bu eleman hangi rolde" sorusunu gerektirir | §4.2 + kod incelemesi |
+| Kırpma / CLS / hiza / görsel regresyon | Statik kapı bu sınıfı hiç göremez | §4.2 Playwright |
 
 ---
 
