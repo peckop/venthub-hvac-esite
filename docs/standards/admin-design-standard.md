@@ -836,6 +836,60 @@ Mevcut `tokens.js` ölçeği korunur ve iki katman eklenir:
 
 ---
 
+### 4.11 Portal ve TEMA KAPSAMI — doğru sınıf yeterli değildir
+
+> 2026-08-18'de kullanıcı iki ayrı belirti bildirdi: admin modallerinin **paneli şeffaftı**
+> (altındaki tablo satırları modalın içinden görünüyor, etiketlerle çakışıyordu) ve **tema
+> menüsünün seçenekleri okunmuyordu** (koyu temada koyu-üstüne-koyu). Ayrı görünüyorlardı;
+> sebep **tekti**.
+
+#### Mekanizma
+
+Admin token'ları `src/index.css`'te **`[data-admin-theme]` seçicisi altında** tanımlıdır ve
+bu öznitelik `AdminLayout`'un `<div>`lerinde yaşar. Radix `Dialog.Portal` /
+`DropdownMenu.Portal` ve `createPortal`, içeriği **`document.body`ye taşır** — yani portal
+ağacı, değişkenlerin tanımlı olduğu kapsamın **dışında** kalır.
+
+`hsl(var(--admin-surface))` **tanımsız** bir değişkenle geçersiz bir renge dönüşür; tarayıcı
+özelliği hiç uygulamaz ve hesaplanmış değer **şeffafa** düşer. Metinde aynısı olur: renk
+uygulanmaz, metin miras alınan renge iner.
+
+**Bu yüzden `class` denetimi bu kusuru göremez.** Sınıflar (`bg-admin-surface`,
+`text-admin-fg`) tamamen doğruydu. Yanlış olan, dayandıkları değişkenlerin o ağaçta
+tanımsız olmasıydı — yani kusur **kodda değil, kapsamda** yaşıyordu.
+
+#### Kural
+
+**Tema kapsamı `document.body`ye de basılır** (`useAdminThemeBodyScope`), admin yüzeyi
+çözülünce geri alınır. Böylece bugünkü ve gelecekteki **her** portal — üçüncü parti olanlar
+dahil — token'ları görür.
+
+Reddedilen alternatifler ve niçin:
+
+| Alternatif | Niçin değil |
+|---|---|
+| Her portal'a `container` prop'u | Her yeni overlay'de tekrar hatırlanması gereken bir disiplin; üçüncü parti portal'ları hiç kapsamaz. Ayrıca içeriği kabuğun içine almak, portal'ın var oluş sebebi olan yığılma bağlamı sorunlarını geri getirir. |
+| Özniteliği `<html>`e basmak | `[data-admin-theme] select option` gibi genel kurallar ve `color-scheme` **vitrine sızar**. |
+| Değişkenleri `:root`ta tanımlamak | Portal daima AÇIK temayı alır; koyu temada panel açık kalır. Kusurun yerini değiştirir, kaldırmaz. |
+
+#### Zorlama — üç katman, üçü de gerekli
+
+| Katman | Ne ölçer | Sınırı |
+|---|---|---|
+| `admin-theme-invariants` (statik) | `AdminLayout` kancayı gerçekten **çağırıyor** mu — yetim kanca kapısı | Kapsamı ölçmez |
+| `useAdminThemeBodyScope.test.tsx` (jsdom) | Gövdeye basılıyor/güncelleniyor/geri alınıyor mu; **portal içeriğinin tema kapsamı taşıyan bir ATASI var mı** | jsdom `index.css`i uygulamaz → hesaplanmış rengi ölçemez |
+| `admin-smoke.e2e.ts` (gerçek tarayıcı) | Açılmış menünün **hesaplanmış** arka planı şeffaf değil | Kimlik bilgisi yoksa **atlanır** (fail-open) — bu yüzden tek başına yeterli sayılmaz |
+
+> Katmanların **hiçbiri tek başına yetmiyor** ve bu tesadüf değil: statik kapı doğru sınıfı
+> görüp yeşil der, jsdom rengi hesaplamaz, e2e her koşuda çalışmaz. Bu tabloyu okumadan
+> "kapı var" demek, §5'in "ölçülemedi ≠ geçti" ilkesini çiğnemektir.
+
+> **Yan ders (ölçüm hijyeni):** kanca bilerek bozulduğunda iki portal testi **yine yeşil**
+> kaldı — çünkü bir önceki test başarısız olup temizliğine ulaşamamış, gövdede bıraktığı
+> öznitelik sonraki testleri kurtarmıştı. Kapı, kendi ürettiği kirli durumla sahte-yeşil
+> veriyordu. Gövde/`document` gibi **paylaşılan durumu** değiştiren her testte
+> `beforeEach` + `afterEach` temizliği zorunludur.
+
 ## 5. CETVEL (ölçüm aracı)
 
 Skor = ✓ / 40. Kabuk maddeleri **kabuk başına bir kez**, sayfa maddeleri **sayfa başına** ölçülür.
@@ -902,6 +956,7 @@ Skor = ✓ / 40. Kabuk maddeleri **kabuk başına bir kez**, sayfa maddeleri **s
 | **INV-ADMIN-OVERLAY-1** | `window.confirm`/`alert`/`prompt` **0**; `<Toaster/>`'ın admin ağacında mount edildiğinin ispatı | statik + render testi |
 | **INV-ADMIN-OVERLAY-2** | Paylaşılan `Modal`/`ConfirmDialog` dışında `fixed inset-0` overlay yasağı; her dialog'da `role` + `aria-modal` + isim bağı; ESC handler'ının odaklanamayan elemana bağlanma yasağı | statik tarama |
 | **INV-ADMIN-OVERLAY-3** | Overlay katmanında ham `z-30/40/50` ve arbitrary `z-[…]` yasağı; token kullanımı | statik tarama |
+| **Portal tema kapsamı** | AdminLayout tema kapsamını gövdeye basmalı (yetim kanca kapısı); portal içeriğinin kapsam taşıyan atası olmalı; gerçek tarayıcıda menü arka planı şeffaf olmamalı | statik + jsdom + e2e |
 | **INV-ADMIN-SEARCH-1** | Üst-düzey `or()` içinde gömülü kaynağa atıf YASAK (sıfır tolerans); iade yüzeyi view üzerinden okur. Ham kullanıcı metni kuralı burada DEĞİL, INV-FILTER-1'de (duplicate-ruler önlemi) | statik tarama |
 | **INV-ADMIN-DESIGN-1** (ratchet) | `font-black`, `uppercase`, `shadow-[…]`, ham `rounded-xl/2xl/3xl`, ham `slate-*`/`gray-*` sayaçları — **yeni kod artıramaz**, dalgalar düşürür | ratchet (INV-5/INV-9 deseni) |
 | **ESLint kaçağı kapatma** | `tailwindcss/no-arbitrary-value` şu an **yalnız literal `className`'i** görüyor; admin'de 38 arbitrary değer sabit/obje içinde kaçıyor (ölçüldü: o dosyalarda eslint 0 hata veriyor). `settings.tailwindcss.callees` + sabit tarama eklenir | lint |
