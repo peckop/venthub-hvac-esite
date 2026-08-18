@@ -141,12 +141,13 @@ const KNOWN_DEBT = new Set<string>([])
  * 2. `lib/orderStatusService.ts` — SERVİS katmanı, React yok, `t` erişimi yok.
  *    Doğru çözüm hata KODU döndürüp çeviriyi çağırana bırakmak = çağıran API'sini
  *    değiştirir → `utils/whatsapp.ts` ile aynı sınıf, D5'e bırakıldı.
- * 3. `views/account/OrderDetailPage.tsx` — PRICING-STOK şeridinin CANLI claim'inde.
- *    Ölçüldü, sahibine panodan adresli bildirildi; dokunulmadı (şerit disiplini).
+ * ~~3. `views/account/OrderDetailPage.tsx`~~ → **BAYAT MUAFİYET, SATIR SİLİNDİ**
+ *    (2026-08-18). Dosya artık HİÇ ihlal üretmiyor — ölçüldü: satır çıkarılınca kapı
+ *    yeşil kalıyor. Bayat muafiyet fail-open'dır: o dosyaya yarın yeni bir çıplak
+ *    fallback girse kapı SUSARDI. Aşağıdaki bayatlık kilidi artık bunu imkânsız kılıyor.
  */
 const FALLBACK_DEBT = new Set<string>([
   'lib/orderStatusService.ts',
-  'views/account/OrderDetailPage.tsx',
   'views/admin/AdminLogisticsTableBody.tsx',
 ])
 /**
@@ -173,16 +174,23 @@ interface Offender {
   file: string
   attr: string
   value: string
+  /** Hangi desen yakaladı — bayatlık kilidi yalnız `fallback` isabetlerine bakar. */
+  desen: 'attr' | 'textProp' | 'fallback'
 }
 
-function collectOffenders(): Offender[] {
+/**
+ * @param muafiyetsiz `true` ise ADLA verilen muafiyetler UYGULANMAZ. Bayatlık kilidi
+ *   bunu kullanır: bir muafiyetin hâlâ GEREKLİ olup olmadığı, ancak muafiyet
+ *   uygulanmadan ölçülebilir.
+ */
+function collectOffenders(muafiyetsiz = false): Offender[] {
   const offenders: Offender[] = []
 
   for (const [globKey, source] of Object.entries(SOURCES)) {
     const rel = toRelPath(globKey)
     if (rel.includes('__tests__') || rel.includes('.test.')) continue
     if (rel.startsWith(DIRECTORY_LOCALIZED)) continue
-    if (KNOWN_DEBT.has(rel)) continue
+    if (!muafiyetsiz && KNOWN_DEBT.has(rel)) continue
 
     const clean = stripComments(source)
 
@@ -201,8 +209,10 @@ function collectOffenders(): Offender[] {
         ) {
           continue
         }
-        if (FALLBACK_DEBT.has(rel) && pattern === FALLBACK_LITERAL) continue
-        offenders.push({ file: rel, attr, value: value.slice(0, 60) })
+        if (!muafiyetsiz && FALLBACK_DEBT.has(rel) && pattern === FALLBACK_LITERAL) continue
+        const desen =
+          pattern === FALLBACK_LITERAL ? 'fallback' : pattern === ATTR_LITERAL ? 'attr' : 'textProp'
+        offenders.push({ file: rel, attr, value: value.slice(0, 60), desen })
       }
     }
   }
@@ -250,5 +260,46 @@ describe('INV-I18N-ATTR · görünen metin sözlükten gelmeli (attribute + vars
     }
 
     expect(stale, `KNOWN_DEBT bayat:\n  ${stale.join('\n  ')}`).toEqual([])
+  })
+
+  /**
+   * BAYATLIK KİLİDİ — muafiyet listesi kendi kendini temizler.
+   *
+   * NİÇİN VAR (2026-08-18'de YAŞANDI): `views/account/OrderDetailPage.tsx` muafiyet
+   * listesinde duruyordu ama dosya çoktan temizlenmişti. Böyle bir satır zararsız
+   * görünür; DEĞİLDİR. **Bayat muafiyet fail-open'dır**: o dosyaya yarın yeni bir
+   * çıplak fallback girerse kapı SUSAR, üstelik listede "gerekçeli borç" gibi
+   * durduğu için kimse şüphelenmez. Muafiyet, ancak GEREKTİĞİ sürece meşrudur.
+   *
+   * Kilit şunu ölçer: listedeki her dosya, muafiyetler UYGULANMADAN tarandığında
+   * hâlâ en az bir `fallback` ihlali üretmeli. Üretmiyorsa borç ödenmiştir ve satır
+   * silinmelidir — test bunu söyleyerek kırmızı verir.
+   */
+  it('muafiyet listesinde BAYAT satır yok (borç ödendiyse satır silinmeli)', () => {
+    const hepsi = collectOffenders(true)
+
+    // Vacuous-pass koruması: muafiyetsiz tarama hiçbir şey bulmuyorsa ölçüm ölmüştür
+    // ve aşağıdaki her assert boş kümede vacuous olarak geçerdi.
+    expect(
+      hepsi.length,
+      'muafiyetsiz tarama SIFIR isabet döndü — tarayıcı ölmüş olabilir, ölçtüğü şey yok',
+    ).toBeGreaterThan(0)
+
+    const bayat = [...FALLBACK_DEBT].filter(
+      (dosya) => !hepsi.some((o) => o.file === dosya && o.desen === 'fallback'),
+    )
+
+    expect(
+      bayat,
+      'FALLBACK_DEBT listesinde BAYAT satır(lar) var — bu dosyalar artık ihlal üretmiyor, ' +
+        'yani muafiyet gereksiz ve sessizce fail-open bir kapı bırakıyor. Satırı SİL:\n' +
+        bayat.map((d) => `  ${d}`).join('\n'),
+    ).toEqual([])
+
+    const bayatKnown = [...KNOWN_DEBT].filter((dosya) => !hepsi.some((o) => o.file === dosya))
+    expect(
+      bayatKnown,
+      'KNOWN_DEBT listesinde BAYAT satır(lar) var — sil:\n' + bayatKnown.map((d) => `  ${d}`).join('\n'),
+    ).toEqual([])
   })
 })
