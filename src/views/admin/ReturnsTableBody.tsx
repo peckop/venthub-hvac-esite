@@ -758,7 +758,14 @@ const ReturnsTableBody: React.FC = () => {
         }
       }
     },
-    [confirm, hasWriteAccess, table, t, getStatusLabel],
+    /*
+      Bagimlilik BAYAT DEGIL: burada eskiden global `confirm` (window.confirm)
+      listeleniyordu — bu callback icinde hic kullanilmayan, dolayisiyla hicbir
+      sey tazelemeyen bir ad. Gercek bagimlilik `confirmWithReason`; eksik
+      olmasi, saglayici degistiginde bu akisin ESKI onay fonksiyonunu tutmasi
+      demekti. I18N seridi lint uyarisi olarak bildirdi, dogrulandi.
+    */
+    [confirmWithReason, hasWriteAccess, table, t, getStatusLabel],
   )
 
   /* ---- kolonlar (SSOT) ---- */

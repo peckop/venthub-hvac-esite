@@ -902,7 +902,7 @@ Skor = ✓ / 40. Kabuk maddeleri **kabuk başına bir kez**, sayfa maddeleri **s
 | **INV-ADMIN-OVERLAY-1** | `window.confirm`/`alert`/`prompt` **0**; `<Toaster/>`'ın admin ağacında mount edildiğinin ispatı | statik + render testi |
 | **INV-ADMIN-OVERLAY-2** | Paylaşılan `Modal`/`ConfirmDialog` dışında `fixed inset-0` overlay yasağı; her dialog'da `role` + `aria-modal` + isim bağı; ESC handler'ının odaklanamayan elemana bağlanma yasağı | statik tarama |
 | **INV-ADMIN-OVERLAY-3** | Overlay katmanında ham `z-30/40/50` ve arbitrary `z-[…]` yasağı; token kullanımı | statik tarama |
-| **INV-ADMIN-SEARCH-1** | Üst-düzey `or()` içinde gömülü kaynağa atıf YASAK (sıfır tolerans); kullanıcı metninin filtre dilbilgisine ham gömülmesi ratchet; iade yüzeyi view üzerinden okur | statik tarama |
+| **INV-ADMIN-SEARCH-1** | Üst-düzey `or()` içinde gömülü kaynağa atıf YASAK (sıfır tolerans); iade yüzeyi view üzerinden okur. Ham kullanıcı metni kuralı burada DEĞİL, INV-FILTER-1'de (duplicate-ruler önlemi) | statik tarama |
 | **INV-ADMIN-DESIGN-1** (ratchet) | `font-black`, `uppercase`, `shadow-[…]`, ham `rounded-xl/2xl/3xl`, ham `slate-*`/`gray-*` sayaçları — **yeni kod artıramaz**, dalgalar düşürür | ratchet (INV-5/INV-9 deseni) |
 | **ESLint kaçağı kapatma** | `tailwindcss/no-arbitrary-value` şu an **yalnız literal `className`'i** görüyor; admin'de 38 arbitrary değer sabit/obje içinde kaçıyor (ölçüldü: o dosyalarda eslint 0 hata veriyor). `settings.tailwindcss.callees` + sabit tarama eklenir | lint |
 | **Zoom kapısı** | Playwright: 1280×1024 @ %400 → iki-yönlü scroll yok; %200 metin → kırpılma yok | e2e |
@@ -976,6 +976,12 @@ koşul sayısını değiştirir ve sorgu düşer.
 `eqValue`, `orConditions`). `%` ve `_` **bilerek kaçırılmaz**: onlar dilbilgisi değil LIKE
 joker karakterleridir, kaçırmak aramanın anlamını sessizce değiştirirdi.
 
+> **Bu kuralın SSOT'u INV-FILTER-1'dir** (EDGE şeridi, T078-VH) — burada tekrarlanmaz.
+> Aynı sınıfa iki cetvel koymak (*duplicate ruler*) zamanla sessizce ayrışan iki taban
+> çizgisi üretir; OPS-AUDIT kararıyla ratchet tek yerde yaşar. Kural A ise INV-FILTER-1'de
+> **yok** ve onun düzelttiği satırları bile yakalar (aşağıda ölçüldü) — ikisi tamamlayıcıdır,
+> eş değil.
+
 **Tek kolon aranıyorsa `or()` hiç kullanılmaz:** `query.ilike('search_text', \`%${term}%\`)`
 deseni ayrı bir sorgu parametresi olarak taşır ve kullanıcı metni dilbilgisine hiç dokunmaz.
 
@@ -1005,10 +1011,25 @@ Aynı varlık iki yüzeyden aranır: liste sayfası ve komut paleti (`resourceSe
 
 #### Zorlama
 
-**INV-ADMIN-SEARCH-1** (`src/__tests__/conformance/admin-list-search.test.ts`):
-Kural A **sıfır tolerans**; Kural B **ratchet** (kalan ihlaller dosya + şerit sahibiyle
-adlandırılmış, sayı artamaz, taban BAYATLAYAMAZ); Kural C/D iade yüzeyinde bağlanmıştır.
-Kapı altı ayrı sabotajla kanıtlandı; her sabotaj **farklı** bir testi düşürüyor.
+| Kural | Kapı | Sertlik |
+|---|---|---|
+| A — gömülü atıf | **INV-ADMIN-SEARCH-1** | sıfır tolerans |
+| B — ham kullanıcı metni | **INV-FILTER-1** (EDGE) | ratchet, taban adlı |
+| C/D — view + tek kaynak | **INV-ADMIN-SEARCH-1** | iade yüzeyinde bağlı |
+
+**Tamamlayıcılık ÖLÇÜLDÜ, iddia değil.** INV-FILTER-1'in ürettiği şu satır kaçış açısından
+doğrudur ama gömülü atfı korur, yani sorgu hâlâ 400 döner — üstelik yardımcıyı kullandığı
+için **düzelmiş görünür**:
+
+```ts
+orIlikeContains(['reason', 'venthub_orders.order_number'], query)
+```
+
+Kural A'nın dedektör öz-testi tam bu satırı (ve stok hareketleri karşılığını) **kalıcı vaka**
+olarak taşır; yanlış-KIRMIZI vakaları da aynı testtedir, çünkü her şeyi işaretleyen bir
+dedektör de "çalışıyor" görünür.
+
+Kapı ayrı sabotajlarla kanıtlandı; her sabotaj **farklı** bir testi düşürür.
 
 Kapının ölçmediği, **adıyla**: sorgu çalıştırılmaz (sonucun doğruluğu ölçülmez); yorum
 ayıklama yalnız tam-satır yorumlarını atar (satır-sonu yorumu yanlış-KIRMIZI verebilir,

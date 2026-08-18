@@ -18,13 +18,24 @@ import { describe, expect, it } from 'vitest'
  * (`resourceSearchers.ts` · iadeler ve stok hareketleri). Yani bu bir yazım hatası
  * değil, TEKRARLAYAN bir sınıf — kapı bu yüzden var.
  *
- * İKİ AYRI KURAL, İKİ AYRI SERTLİK
+ * TEK KURAL — ve bu bilinçli bir DARALTMA
  *
- *   R-A (SIFIR TOLERANS): üst-düzey `or()` içinde gömülü kaynağa atıf. Bunun
- *        "kısmen çalışan" hâli yok; sorgu düşer. Muafiyet yok.
- *   R-B (RATCHET): kullanıcı metninin filtre DİLBİLGİSİNE ham gömülmesi. #642 bu
- *        sınıfı üç dosyada kapattı ama tekrarını engelleyen hiçbir şey yoktu.
- *        Kalan ihlaller AŞAĞIDA ADIYLA ve SAHİBİYLE yazılıdır; sayı artamaz.
+ * Bu kapı YALNIZ şunu ölçer: üst-düzey `or()` içinde gömülü kaynağa atıf
+ * (SIFIR TOLERANS; "kısmen çalışan" hâli yok, sorgu düşer, muafiyet yok).
+ *
+ * İlk sürümünde ikinci bir kural daha vardı: kullanıcı metninin filtre
+ * DİLBİLGİSİNE ham gömülmesi. O kural aynı gün EDGE şeridinde de yazılmıştı
+ * (**INV-FILTER-1**, T078-VH) ve aynı sınıfa iki cetvel koymak — duplicate ruler —
+ * zamanla sessizce ayrışan iki taban çizgisi üretirdi. OPS-AUDIT kararıyla o
+ * kuralın SSOT'u **INV-FILTER-1**'dir; burada TEKRARLANMAZ.
+ *
+ * İKİSİ TAMAMLAYICI, EŞ DEĞİL — ve bu ölçüldü: INV-FILTER-1'in düzelttiği satır
+ *
+ *     orIlikeContains(['reason', 'venthub_orders.order_number'], query)
+ *
+ * kaçış açısından DOĞRUDUR ama gömülü atfı korur, yani sorgu hâlâ 400 döner —
+ * üstelik artık yardımcıyı kullandığı için DÜZELMİŞ GÖRÜNÜR. Aşağıdaki dedektör
+ * öz-testi tam o satırı vaka olarak taşır.
  *
  * ÖLÇMEDİĞİ ŞEY (adıyla)
  *
@@ -97,18 +108,13 @@ function hasEmbeddedReference(orArg: string): boolean {
   return INLINE_EMBEDDED.test(orArg) || QUOTED_EMBEDDED.test(orArg)
 }
 
-function hasRawInterpolation(orArg: string): boolean {
-  return orArg.includes('${')
-}
-
 interface Ihlal {
   dosya: string
   arg: string
 }
 
-function tara(): { kaynakSayisi: number; orSayisi: number; a: Ihlal[]; b: Map<string, number> } {
+function tara(): { kaynakSayisi: number; orSayisi: number; a: Ihlal[] } {
   const a: Ihlal[] = []
-  const b = new Map<string, number>()
   let orSayisi = 0
   let kaynakSayisi = 0
 
@@ -119,10 +125,9 @@ function tara(): { kaynakSayisi: number; orSayisi: number; a: Ihlal[]; b: Map<st
     for (const arg of orArguments(kod)) {
       orSayisi += 1
       if (hasEmbeddedReference(arg)) a.push({ dosya: yol, arg: arg.trim().slice(0, 160) })
-      if (hasRawInterpolation(arg)) b.set(yol, (b.get(yol) ?? 0) + 1)
     }
   }
-  return { kaynakSayisi, orSayisi, a, b }
+  return { kaynakSayisi, orSayisi, a }
 }
 
 const OLCUM = tara()
@@ -142,16 +147,38 @@ describe('INV-ADMIN-SEARCH-1 · kapsam (stale-guard)', () => {
       `//` yüzünden dedektörü köreltmişti). Bu yüzden dedektör, kaldırdığımız
       GERÇEK kusurun metniyle sınanır — kural değişirse burası da düşer.
     */
-    const eskiKusur = '`reason.ilike.%${q}%,venthub_orders.customer_name.ilike.%${q}%`'
-    expect(hasEmbeddedReference(eskiKusur), 'satır-içi gömülü atıf yakalanmadı').toBe(true)
-    expect(hasRawInterpolation(eskiKusur), 'ham aradeğer yakalanmadı').toBe(true)
+    /*
+      Vakaların ikisi UYDURMA DEĞİL: INV-FILTER-1'in (EDGE, #650) ürettiği GERÇEK
+      satırlar. O PR kaçışı düzeltirken gömülü atfı koruyor; bu kapının onu
+      yakaladığı burada kalıcı olarak bağlanıyor — yoksa "tamamlayıcı" sözü bir
+      iddia olarak kalırdı.
 
-    const yardimciyla = "orIlikeContains(['venthub_orders.customer_name'], term)"
-    expect(hasEmbeddedReference(yardimciyla), 'dizili gömülü kolon adı yakalanmadı').toBe(true)
+      Yanlış-KIRMIZI vakaları da şart: bir dedektör her şeyi işaretleyerek de
+      "çalışıyor" görünebilir.
+    */
+    const vakalar: ReadonlyArray<readonly [string, boolean, string]> = [
+      [
+        "orIlikeContains(['reason', 'venthub_orders.order_number'], query)",
+        true,
+        'INV-FILTER-1 sonrası KIRIK kalan iade satırı',
+      ],
+      [
+        "orIlikeContains(['reason', 'products.name', 'products.sku'], query)",
+        true,
+        'INV-FILTER-1 sonrası KIRIK kalan hareket satırı',
+      ],
+      [
+        '`reason.ilike.%${q}%,venthub_orders.customer_name.ilike.%${q}%`',
+        true,
+        'eski satır-içi biçim',
+      ],
+      ["orIlikeContains(['order_number', 'conversation_id'], query)", false, 'temiz — iki kolon'],
+      ["orIlikeContains(['reason', 'status'], term)", false, 'temiz — yardımcıyla'],
+    ]
 
-    const temiz = "orIlikeContains(['reason', 'status'], term)"
-    expect(hasEmbeddedReference(temiz), 'temiz kullanım yanlışlıkla işaretlendi').toBe(false)
-    expect(hasRawInterpolation(temiz), 'temiz kullanım yanlışlıkla işaretlendi').toBe(false)
+    for (const [girdi, beklenen, ad] of vakalar) {
+      expect(hasEmbeddedReference(girdi), `dedektör yanıldı: ${ad}`).toBe(beklenen)
+    }
   })
 })
 
@@ -171,65 +198,6 @@ describe('INV-ADMIN-SEARCH-1 · R-A üst-düzey or() gömülü kaynağa atamaz',
         '\n\nDoğrusu: ya `{ foreignTable: ... }` ikinci argümanı, ya birleştirmeyi\n' +
         'DB tarafında yapan bir view (bkz. view_admin_returns / view_admin_orders).',
     ).toBe(0)
-  })
-})
-
-/**
- * R-B TABAN ÇİZGİSİ — 2026-08-18 ölçümü.
- *
- * Her satır: dosya → o dosyadaki ham-aradeğerli or() sayısı, ve ŞERİT SAHİBİ.
- * Bu bir muafiyet değil BORÇ kaydıdır: sayı düşebilir, ASLA artamaz. Yeni kod
- * `src/utils/adminQueryFilters.ts` yardımcılarını kullanır.
- */
-const R_B_TABAN: Record<string, number> = {
-  /* ADMIN-CUSTOMER şeridi (benim) — sıradaki dalgada düşecek */
-  '/src/views/admin/ErrorGroupsTableBody.tsx': 1,
-  '/src/views/admin/WebhookEventsTableBody.tsx': 1,
-  '/src/views/admin/MovementsTableBody.tsx': 1,
-  /* PRICING-STOK şeridi */
-  '/src/components/admin/pricing/RuleScopeTargetPicker.tsx': 1,
-  '/src/components/admin/purchasing/CreatePurchaseOrderPanel.tsx': 1,
-  '/src/views/admin/PricePreviewPanel.tsx': 1,
-  '/src/lib/services/pricing.service.ts': 1,
-  /* Vitrin tarafı — kullanıcı metni değil ama değer yine dilbilgisine giriyor */
-  '/src/lib/data/preload.ts': 1,
-  '/src/lib/services/product.service.ts': 1,
-}
-
-describe('INV-ADMIN-SEARCH-1 · R-B kullanıcı metni filtre dilbilgisine gömülmez', () => {
-  it('taban çizgisi AŞILMADI', () => {
-    const asanlar: string[] = []
-    const bilinmeyenler: string[] = []
-
-    for (const [dosya, sayi] of OLCUM.b) {
-      const taban = R_B_TABAN[dosya]
-      if (taban === undefined) bilinmeyenler.push(`${dosya} (${sayi})`)
-      else if (sayi > taban) asanlar.push(`${dosya}: ${sayi} > ${taban}`)
-    }
-
-    expect(
-      bilinmeyenler,
-      'Taban çizgisinde OLMAYAN dosyada ham aradeğerli or() var. Yeni kod\n' +
-        '`orIlikeContains` / `ilikeContains` / `eqValue` kullanmalı (adminQueryFilters):\n' +
-        bilinmeyenler.join('\n'),
-    ).toEqual([])
-
-    expect(asanlar, 'Taban çizgisi AŞILDI:\n' + asanlar.join('\n')).toEqual([])
-  })
-
-  it('taban çizgisi BAYAT DEĞİL', () => {
-    /*
-      BAYAT TABAN da bir kusurdur: bir dosya temizlendiğinde satırı burada kalırsa
-      kapı, ölmüş bir borcu canlı sanar ve gelecekte o dosyaya yeni ihlal SESSİZCE
-      girebilir (1 yerine 1 görülür). Ayrı bir test olması şart — aynı `it` içinde
-      olsaydı "borç arttı" ile "borç öldü" aynı kırmızıyı verirdi ve hangi sabotajın
-      neyi yakaladığı ölçülemezdi.
-    */
-    const olmus = Object.keys(R_B_TABAN).filter((d) => !OLCUM.b.has(d))
-    expect(
-      olmus,
-      'Taban çizgisi BAYAT — bu dosyalar temizlenmiş, satırları silinmeli:\n' + olmus.join('\n'),
-    ).toEqual([])
   })
 })
 
