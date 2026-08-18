@@ -201,6 +201,24 @@ export const tr = {
     nextAria: 'Sonraki'
   },
   products: {
+    categoryOrbit: {
+      hints: {
+        dragRotate: 'Tut Çevir',
+        clickProduct: 'Ürüne Tıkla',
+        swipeLeftRight: 'Sol-Sağ Çevir',
+        selectCategory: 'Kategoriyi Seç',
+      },
+      titles: {
+        exploreProducts: 'Ürün Yelpazemizi Keşfedin',
+        subcategoriesSuffix: 'Alt Kategorileri'
+      },
+      instructions: {
+        mainMobile: 'Dokun: Aç • Çift Dokun: Git',
+        mainDesktop: 'Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git',
+        subMobile: 'Dokunarak Sayfaya Gidin',
+        subDesktop: 'Tıklayarak Ürün Sayfasına Gidin'
+      }
+    },
     categoryCard: {
       seriesCount: '{{count}} seri',
     },

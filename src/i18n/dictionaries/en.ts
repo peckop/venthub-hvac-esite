@@ -807,6 +807,24 @@ export const en: typeof tr = {
     nextAria: 'Next'
   },
   products: {
+    categoryOrbit: {
+      hints: {
+        dragRotate: 'Drag to Rotate',
+        clickProduct: 'Click Product',
+        swipeLeftRight: 'Swipe Left-Right',
+        selectCategory: 'Select Category',
+      },
+      titles: {
+        exploreProducts: 'Explore Our Products',
+        subcategoriesSuffix: 'Subcategories'
+      },
+      instructions: {
+        mainMobile: 'Tap: Open • Double Tap: Go',
+        mainDesktop: 'Single Click: Open Category • Double Click: Go to Page',
+        subMobile: 'Tap to Go to Page',
+        subDesktop: 'Click to Go to Product Page'
+      }
+    },
     categoryCard: {
       seriesCount: '{{count}} series',
     },

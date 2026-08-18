@@ -2,6 +2,8 @@ import { AnimatePresence,motion } from 'framer-motion'
 import { ArrowLeft, Eye, Layers, MessageSquareText, Package } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
 
+import { useI18n } from '@/i18n/I18nProvider'
+
 export interface RadialMenuItem {
     id: string
     label: string
@@ -47,6 +49,7 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
     onSelectQuote,
     onSelectSubcategory
 }) => {
+    const { t } = useI18n()
     const [showSubcategories, setShowSubcategories] = useState(false)
     const [subcategories, setSubcategories] = useState<SubcategoryItem[]>([])
 
@@ -96,7 +99,7 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
     const mainMenuItems: RadialMenuItem[] = [
         {
             id: 'subcategories',
-            label: subcategories.length > 0 ? `Alt Kategoriler (${subcategories.length})` : 'Alt Kategori Yok',
+            label: subcategories.length > 0 ? `${t('category.subcategories')} (${subcategories.length})` : t('common.notFound'),
             icon: <Layers className="w-7 h-7" />,
             color: subcategories.length > 0 ? 'from-cyan-400 via-cyan-500 to-blue-600' : 'from-gray-400 to-gray-500',
             glowColor: subcategories.length > 0 ? 'shadow-cyan-500/50' : 'shadow-gray-500/30',
@@ -104,7 +107,7 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
         },
         {
             id: 'products',
-            label: 'Ürünleri Gör',
+            label: t('common.seeAllProducts'),
             icon: <Eye className="w-7 h-7" />,
             color: 'from-emerald-400 via-emerald-500 to-teal-600',
             glowColor: 'shadow-emerald-500/50',
@@ -115,7 +118,7 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
         },
         {
             id: 'quote',
-            label: 'Teklif Al',
+            label: t('common.getQuote'),
             icon: <MessageSquareText className="w-7 h-7" />,
             color: 'from-amber-400 via-orange-500 to-red-500',
             glowColor: 'shadow-orange-500/50',

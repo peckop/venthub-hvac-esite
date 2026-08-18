@@ -68,7 +68,12 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
     const [frontCardTitle, setFrontCardTitle] = useState<string | null>(null) 
     const [hintIndex, setHintIndex] = useState(0) 
 
-    const ROTATING_HINTS = ['Tut Çevir', 'Ürüne Tıkla', 'Sol-Sağ Çevir', 'Kategoriyi Seç']
+    const ROTATING_HINTS = [
+        t('products.categoryOrbit.hints.dragRotate'),
+        t('products.categoryOrbit.hints.clickProduct'),
+        t('products.categoryOrbit.hints.swipeLeftRight'),
+        t('products.categoryOrbit.hints.selectCategory')
+    ]
 
     // 1. Prepare Main Categories (ViewModels)
     const mainCategories = useMemo(() => {
@@ -295,13 +300,13 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                 >
                     <style>{FADE_IN_CSS}</style>
                     <h2 className="text-xl md:text-3xl font-bold text-white/90">
-                        {focusedItemTitle || frontCardTitle || (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.displayName} Alt Kategorileri`)}
+                        {focusedItemTitle || frontCardTitle || (level === 'main' ? t('products.categoryOrbit.titles.exploreProducts') : `${activeMainCategory?.displayName} ${t('products.categoryOrbit.titles.subcategoriesSuffix')}`)}
                     </h2>
                     <p className="text-white/50 text-xs sm:text-sm mt-2 font-medium tracking-wide">
                         {focusedItemTitle
                             ? (level === 'main'
-                                ? (isMobile ? 'Dokun: Aç • Çift Dokun: Git' : 'Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git')
-                                : (isMobile ? 'Dokunarak Sayfaya Gidin' : 'Tıklayarak Ürün Sayfasına Gidin'))
+                                ? (isMobile ? t('products.categoryOrbit.instructions.mainMobile') : t('products.categoryOrbit.instructions.mainDesktop'))
+                                : (isMobile ? t('products.categoryOrbit.instructions.subMobile') : t('products.categoryOrbit.instructions.subDesktop')))
                             : ROTATING_HINTS[hintIndex]
                         }
                     </p>
