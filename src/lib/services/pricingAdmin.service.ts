@@ -180,6 +180,65 @@ async function categoryIdsWithDescendants(
   return [...collected]
 }
 
+/**
+ * Kapsam çözümünün SSOT'u: `(scope, targetId)` → ürün filtresi tarifi.
+ *
+ * NİÇİN AYRI BİR ADIM: kapsam semantiği önemsiz değil — scope 2 markayı **adıyla**
+ * eşler (`products.brand` metin kolonu, FK değil), scope 3 kategori **alt-ağacını**
+ * gezer (`resolvePrice` §11 ata-cascade'iyle aynı küme). Bu mantık her yeni ölçüm
+ * fonksiyonunda tekrar yazılırsa ikinci kopya doğar; kopyalar sessizce ayrışır ve
+ * panel gerçeğin altında/üstünde sayı gösterir — bu depoda iki kez yaşanan sınıf.
+ * Sayaç, örnekleyici ve para birimi ölçümü ÜÇÜ de buradan beslenir.
+ *
+ * `empty`, "hedef seçilmemiş" ile "hedef bulunamadı"yı aynı yere taşır: her ikisinde
+ * de kapsam boştur, kapsam boşken TÜM ürünlere düşmek (fail-open) yasaktır.
+ */
+type ScopeFilter =
+  | { kind: 'empty' }
+  | { kind: 'all' }
+  | { kind: 'id'; value: string }
+  | { kind: 'brand'; value: string }
+  | { kind: 'categories'; values: string[] }
+
+async function resolveScopeFilter(
+  supabase: SupabaseClient<Database>,
+  scope: number,
+  targetId: string | null,
+): Promise<ScopeFilter> {
+  if (scope === 0 || scope === 1) {
+    return targetId ? { kind: 'id', value: targetId } : { kind: 'empty' }
+  }
+  if (scope === 2) {
+    if (!targetId) return { kind: 'empty' }
+    const name = await brandNameById(supabase, targetId)
+    return name ? { kind: 'brand', value: name } : { kind: 'empty' }
+  }
+  if (scope === 3) {
+    if (!targetId) return { kind: 'empty' }
+    return { kind: 'categories', values: await categoryIdsWithDescendants(supabase, targetId) }
+  }
+  return { kind: 'all' }
+}
+
+/** Çözülmüş kapsamı bir PostgREST sorgusuna uygular. `empty` çağrılmadan önce elenmiş olmalıdır. */
+function withScopeFilter<Q extends ScopeFilterableQuery<Q>>(query: Q, filter: ScopeFilter): Q {
+  switch (filter.kind) {
+    case 'id':
+      return query.eq('id', filter.value)
+    case 'brand':
+      return query.eq('brand', filter.value)
+    case 'categories':
+      return query.in('category_id', filter.values)
+    default:
+      return query
+  }
+}
+
+interface ScopeFilterableQuery<Q> {
+  eq(column: 'id' | 'brand', value: string): Q
+  in(column: 'category_id', values: string[]): Q
+}
+
 /** Aktif (silinmemiş, yayında) ürünler — kapsam ölçümünün ortak tabanı. */
 function activeProductsQuery(supabase: SupabaseClient<Database>) {
   return supabase.from('products').select(PRODUCT_SCOPE_COLUMNS).is('deleted_at', null).eq('status', 'active')
@@ -191,34 +250,16 @@ export async function countProductsInScope(
   scope: number,
   targetId: string | null,
 ): Promise<number> {
+  const filter = await resolveScopeFilter(supabase, scope, targetId)
+  if (filter.kind === 'empty') return 0
+
   const countQuery = supabase
     .from('products')
     .select('id', { count: 'exact', head: true })
     .is('deleted_at', null)
     .eq('status', 'active')
 
-  if (scope === 0 || scope === 1) {
-    if (!targetId) return 0
-    const { count, error } = await countQuery.eq('id', targetId)
-    if (error) throw error
-    return count ?? 0
-  }
-  if (scope === 2) {
-    if (!targetId) return 0
-    const name = await brandNameById(supabase, targetId)
-    if (!name) return 0
-    const { count, error } = await countQuery.eq('brand', name)
-    if (error) throw error
-    return count ?? 0
-  }
-  if (scope === 3) {
-    if (!targetId) return 0
-    const ids = await categoryIdsWithDescendants(supabase, targetId)
-    const { count, error } = await countQuery.in('category_id', ids)
-    if (error) throw error
-    return count ?? 0
-  }
-  const { count, error } = await countQuery
+  const { count, error } = await withScopeFilter(countQuery, filter)
   if (error) throw error
   return count ?? 0
 }
@@ -230,34 +271,76 @@ export async function sampleProductsInScope(
   targetId: string | null,
   n = 3,
 ): Promise<SampleProduct[]> {
-  let rows: ProductScopeRow[] = []
+  const filter = await resolveScopeFilter(supabase, scope, targetId)
+  if (filter.kind === 'empty') return []
 
-  if (scope === 0 || scope === 1) {
-    if (!targetId) return []
-    const { data, error } = await activeProductsQuery(supabase).eq('id', targetId).limit(n)
-    if (error) throw error
-    rows = data ?? []
-  } else if (scope === 2) {
-    if (!targetId) return []
-    const name = await brandNameById(supabase, targetId)
-    if (!name) return []
-    const { data, error } = await activeProductsQuery(supabase).eq('brand', name).limit(n)
-    if (error) throw error
-    rows = data ?? []
-  } else if (scope === 3) {
-    if (!targetId) return []
-    const ids = await categoryIdsWithDescendants(supabase, targetId)
-    const { data, error } = await activeProductsQuery(supabase).in('category_id', ids).limit(n)
-    if (error) throw error
-    rows = data ?? []
-  } else {
-    const { data, error } = await activeProductsQuery(supabase).limit(n)
-    if (error) throw error
-    rows = data ?? []
-  }
+  const { data, error } = await withScopeFilter(activeProductsQuery(supabase), filter).limit(n)
+  if (error) throw error
+  const rows: ProductScopeRow[] = data ?? []
 
   const brandIdByName = await loadBrandIdByName(supabase)
   return rows.map((row) => toPricingProductInput(row, brandIdByName))
+}
+
+/** Kapsam taramasında tek sayfa boyu — PostgREST'in varsayılan satır tavanı da 1000'dir. */
+const SCOPE_SCAN_PAGE = 1000
+/** Sayfa üst sınırı. Aşılırsa SESSİZCE KESMEYİZ, hata atarız (bkz. fonksiyon notu). */
+const SCOPE_SCAN_MAX_PAGES = 50
+
+/**
+ * Kapsamdaki **DISTINCT** alış para birimleri — fx-kilidi kaydı için.
+ *
+ * SÖZLEŞME (fx-lock [D] kararı: kapsamda tek para birimi varsa enstantane kur
+ * kilitlenir, birden çoksa kayıt REDDEDİLİR):
+ *  · **ÖRNEKLEME YOK** — kapsamın TAMAMI taranır. `sampleProductsInScope` bu iş için
+ *    yanlış araçtır: ilk 3 ürün EUR, dördüncüsü USD olabilir ve örnek "tek para birimi"
+ *    yanıtı üretip yanlış kuru kilitler.
+ *  · Aktif + silinmemiş ürünler (diğer kapsam ölçümleriyle aynı taban).
+ *  · Dönen değerler trim+BÜYÜK harf, tekil ve sıralıdır.
+ *  · **Boş dizi = kapsamda aktif ürün YOK.** Bu okuma kesindir çünkü
+ *    `products.purchase_currency` NOT NULL'dır — "ürün var ama para birimi yok" hâli
+ *    doğmaz, dolayısıyla boş dizi belirsiz değildir.
+ *
+ * SESSİZ KESME YASAĞI: PostgREST tek istekte en çok 1000 satır döndürür. Tek sorguyla
+ * okumak, 1000'inci üründen sonrasını sessizce yok sayardı — distinct kümesi eksik
+ * çıkar, panel "tek para birimi" deyip yanlış kuru kilitlerdi. Bu yüzden sayfalanır ve
+ * sayfa sınırı aşılırsa eksik sonuç dönmek yerine HATA atılır.
+ */
+export async function distinctPurchaseCurrenciesInScope(
+  supabase: SupabaseClient<Database>,
+  scope: number,
+  targetId: string | null,
+): Promise<string[]> {
+  const filter = await resolveScopeFilter(supabase, scope, targetId)
+  if (filter.kind === 'empty') return []
+
+  const found = new Set<string>()
+  for (let page = 0; page < SCOPE_SCAN_MAX_PAGES; page += 1) {
+    const from = page * SCOPE_SCAN_PAGE
+    const baseQuery = supabase
+      .from('products')
+      .select('purchase_currency')
+      .is('deleted_at', null)
+      .eq('status', 'active')
+
+    const { data, error } = await withScopeFilter(baseQuery, filter)
+      // Sayfalar arası kararlılık: sırasız `range` aynı satırı iki kez/hiç döndürebilir.
+      .order('id', { ascending: true })
+      .range(from, from + SCOPE_SCAN_PAGE - 1)
+    if (error) throw error
+
+    const rows = data ?? []
+    for (const row of rows) {
+      const currency = (row.purchase_currency ?? '').trim().toUpperCase()
+      if (currency) found.add(currency)
+    }
+    if (rows.length < SCOPE_SCAN_PAGE) return [...found].sort()
+  }
+
+  throw new Error(
+    `distinctPurchaseCurrenciesInScope: kapsam ${SCOPE_SCAN_MAX_PAGES * SCOPE_SCAN_PAGE} üründen büyük. ` +
+      'Eksik para birimi kümesi döndürmek yanlış kur kilitlenmesine yol açacağı için hata atıldı.',
+  )
 }
 
 /* ──────────────────── saf çevriciler ──────────────────── */
