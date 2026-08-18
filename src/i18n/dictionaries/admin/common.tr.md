@@ -3,10 +3,10 @@ domain: general
 source_type: doc
 namespace_type: module
 source_path: C:\Users\alize\venthub-wt-admin\src\i18n\dictionaries\admin\common.tr.ts
-skeleton_hash: 53af75efbe092f73
+skeleton_hash: a954f8da00419b7d
 entity_hashes:
   overview: 43c6db6003831046
-generated_at: 2026-08-15T18:29:39Z
+generated_at: 2026-08-17T18:21:47Z
 ---
 
 ## Genel Bakış

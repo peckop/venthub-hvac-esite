@@ -59,4 +59,17 @@ export const common = {
   saving: 'Saving...',
   settingsLoading: 'Loading settings content...',
   invalidCategory: 'Invalid Category ID (ID Not Found)',
+  /**
+   * Shared tracking number confirmation. It lives in `common` because TWO surfaces use
+   * it: the order shipping modal and the logistics bulk write. Kept separate, the two
+   * translations would drift and the same decision would be asked in two wordings.
+   */
+  sharedTracking: {
+    title: 'This tracking number is already on another order',
+    description:
+      '{{count}} orders carry a tracking number that is already registered on another order. If different customers receive the same tracking link, each of them sees SOMEONE ELSE’S parcel. Are these orders genuinely going out as one consolidated parcel?',
+    confirmLabel: 'Yes, consolidated shipment',
+    cancelLabel: 'No, let me fix the numbers',
+    declined: 'Shipping details were not saved — shared tracking number was not approved.',
+  },
 };

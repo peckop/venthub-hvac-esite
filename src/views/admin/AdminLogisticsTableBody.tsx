@@ -11,6 +11,7 @@ import BulkBar, { type BulkAction } from '@/components/admin/data-table/BulkBar'
 import { DataTableKit } from '@/components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '@/components/admin/data-table/types'
 import ExportMenu from '@/components/admin/ExportMenu'
+import { useConfirm } from '@/components/admin/overlay/ConfirmProvider'
 import { type FetchParams, type FetchResult, useAdminTable } from '@/hooks/useAdminTable'
 import { useRole } from '@/hooks/useRole'
 import { formatDateTime } from '@/i18n/datetime'
@@ -19,6 +20,7 @@ import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAud
 import { ensureSessionFresh } from '@/lib/ensureSessionFresh'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import type { Database } from '@/types/database.types'
+import { invokeShippingUpdate } from '@/utils/adminShipping'
 import {
   adminCardClass,
   adminInputClass,
@@ -100,6 +102,7 @@ async function logisticsFetcher(
 const AdminLogisticsTableBody: React.FC = () => {
   const { t, lang } = useI18n()
   const { canWrite } = useRole()
+  const confirm = useConfirm()
   const hasWriteAccess = canWrite('logistics')
 
   const [globalCarrier, setGlobalCarrier] = useState('Yurtiçi')
@@ -157,6 +160,8 @@ const AdminLogisticsTableBody: React.FC = () => {
 
     setSaving(true)
     let errCount = 0
+    /** Kullanıcının onaylamadığı (bu yüzden YAZILMAYAN) kayıt sayısı — arıza değil karar. */
+    let declined = 0
     try {
       const results = await mutateWithAudit(supabase, {
         resource: 'logistics',
@@ -167,34 +172,63 @@ const AdminLogisticsTableBody: React.FC = () => {
         after: { status: 'shipped', ids: targets.map((r) => r.id) },
         auditedByEdge: false,
         fn: async () => {
-          return await Promise.all(
-            targets.map(async (row) => {
-              const currentCarrier = drafts[row.id]?.carrier ?? row.carrier ?? 'Yurtiçi'
-              const currentTracking = drafts[row.id]?.tracking_number ?? row.tracking_number ?? ''
-              const turl = generateTrackingUrl(currentCarrier, currentTracking)
-              const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
-                body: {
-                  order_id: row.id,
-                  carrier: currentCarrier.trim(),
-                  tracking_number: currentTracking.trim(),
-                  tracking_url: turl,
-                  send_email: true,
-                },
-              })
-              return { id: row.id, ok: !fnErr }
-            }),
+          const send = (row: LogisticsRow, allowShared: boolean) => {
+            const currentCarrier = drafts[row.id]?.carrier ?? row.carrier ?? 'Yurtiçi'
+            const currentTracking = drafts[row.id]?.tracking_number ?? row.tracking_number ?? ''
+            return invokeShippingUpdate(
+              supabase,
+              {
+                order_id: row.id,
+                carrier: currentCarrier.trim(),
+                tracking_number: currentTracking.trim(),
+                tracking_url: generateTrackingUrl(currentCarrier, currentTracking),
+                send_email: true,
+              },
+              allowShared,
+            ).then((res) => ({ id: row.id, res }))
+          }
+
+          const first = await Promise.all(targets.map((row) => send(row, false)))
+
+          /* Takip numarası başka bir siparişte kayıtlıysa sunucu 409 döner. Bu yüzeyde
+             hiç onay sorulmuyordu: admin yalnız "N kayıt güncellenemedi" görüyor,
+             sunucudaki `allow_shared_tracking` kaçış kapısına ULAŞAMIYORDU. Karar
+             adminindir — sorulur, onaylanırsa açık niyet beyanıyla tekrarlanır. */
+          const conflicted = first.filter((r) => !r.res.ok && r.res.conflict)
+          if (conflicted.length === 0) return first
+
+          const approved = await confirm({
+            title: t('admin.common.sharedTracking.title'),
+            description: t('admin.common.sharedTracking.description', { count: String(conflicted.length) }),
+            confirmLabel: t('admin.common.sharedTracking.confirmLabel'),
+            cancelLabel: t('admin.common.sharedTracking.cancelLabel'),
+            tone: 'default',
+          })
+          if (!approved) {
+            declined = conflicted.length
+            return first
+          }
+
+          const retried = await Promise.all(
+            conflicted.map((r) => send(targets.find((x) => x.id === r.id) as LogisticsRow, true)),
           )
+          const byId = new Map(first.map((r) => [r.id, r]))
+          for (const r of retried) byId.set(r.id, r)
+          return [...byId.values()]
         },
       })
 
       const successfulIds: string[] = []
-      results.forEach((res) => {
-        if (res.ok) {
-          successfulIds.push(res.id)
+      results.forEach((entry) => {
+        if (entry.res.ok) {
+          successfulIds.push(entry.id)
         } else {
           errCount++
         }
       })
+      /* Onaylanmayanlar hata sayacından DÜŞÜLÜR: kullanıcının "hayır" demesini
+         "güncellenemedi" diye raporlamak, olmayan bir arızayı aratır. */
+      errCount -= declined
 
       setDrafts((prev) => {
         const next = { ...prev }
@@ -206,8 +240,11 @@ const AdminLogisticsTableBody: React.FC = () => {
 
       if (errCount > 0) {
         toast.error(t('admin.logistics.toasts.bulkUpdateFailed', { count: errCount }))
-      } else {
-        toast.success(t('admin.logistics.toasts.bulkUpdateSuccess', { count: targets.length }))
+      } else if (successfulIds.length > 0) {
+        toast.success(t('admin.logistics.toasts.bulkUpdateSuccess', { count: successfulIds.length }))
+      }
+      if (declined > 0) {
+        toast.info(t('admin.common.sharedTracking.declined'))
       }
 
       table.selection.clear()
@@ -221,7 +258,7 @@ const AdminLogisticsTableBody: React.FC = () => {
     } finally {
       setSaving(false)
     }
-  }, [table, drafts, hasWriteAccess, t])
+  }, [table, drafts, hasWriteAccess, t, confirm])
 
   const exportCsv = useCallback(async () => {
     const rows = await table.fetchAllForExport()
