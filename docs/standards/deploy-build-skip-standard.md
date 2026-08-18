@@ -88,10 +88,10 @@ Ayar **canlı**. Kaynak: **Vercel dashboard** (repo içi yapılandırma dosyası
 1. Vercel → proje `venthub-hvac-esite` → **Settings** → **Build and Deployment**
    → doğrudan bağlantı: `/peckops-projects/venthub-hvac-esite/settings/build-and-deployment`
 2. **Ignored Build Step** → *Behavior*: **Custom**
-3. Komut kutusuna **tam olarak**:
+3. Komut kutusuna **tam olarak** (sondaki `|| exit 1` ZORUNLU — sebebi §D10):
 
 ```
-sh scripts/vercel-ignore-build.sh
+sh scripts/vercel-ignore-build.sh || exit 1
 ```
 
 4. **Save**.
@@ -187,6 +187,48 @@ Bilerek bozularak kanıtlandı:
 İkincisi önemli: `HEAD^`'i yasaklayan **statik** assert bu sabotajı **yakalamadı**
 (sabotaj `git diff HEAD^` değil `git rev-parse HEAD^` yazıyordu). Yakalayan şey
 davranış testiydi — metin arayan kapının neyi göremediğinin canlı örneği.
+
+## D10 — Komutun KENDİSİ çuvallayabilir; çıkış kodu sözleşmesi komutta zorlanır
+
+**Kurulan komut (DEĞİŞMEZ):**
+
+```
+sh scripts/vercel-ignore-build.sh || exit 1
+```
+
+Sondaki `|| exit 1` süs değil, **sözleşmenin zorlanmasıdır**.
+
+**Yaşanmış kusur (2026-08-18, filo çapında):** komut ilk kurulduğunda `|| exit 1` yoktu.
+Betik `#660` ile master'a girdiği için **ondan eski tabanlı her dalda dosya yoktu** ve
+dağıtım günlüğü şunu yazdı:
+
+```
+Running "sh scripts/vercel-ignore-build.sh"
+sh: scripts/vercel-ignore-build.sh: No such file or directory
+```
+
+`sh` **127** ile çıkar. Vercel bu komuttan yalnız **iki** cevap anlar — `0` atla, `1`
+build — ve başka her kodu **dağıtım hatası** sayar. Sonuç: açık 11 PR dalının **10'u**,
+kodunda hiçbir kusur olmadan kırmızı verdi.
+
+**Sınıfın adı:** betiğin İÇİNDE çıkış kodu sözleşmesi üç yerde uyarıyla yazılıydı, ama
+**komutun kendisinin başarısız olabileceği** hiç hesaba katılmamıştı. Yani sözleşme
+korunuyordu — sözleşmeyi çağıran kabuk satırı hariç. *Kapıyı sertleştirirken kapının
+kolunu unutmak.*
+
+`|| exit 1` davranışı:
+
+| Betik | Çıkış | Sonuç |
+|---|---|---|
+| var, "atla" der | 0 | zincir kırılmaz → **ATLA** |
+| var, "build" der | 1 | → **BUILD** |
+| **yok / patlıyor / sözdizimi hatalı** | 127, 2, … | `\|\|` devreye girer → **BUILD** |
+
+Yani bilinmeyen her hâl güvenli tarafa, yani build'e düşer — betiğin kendi iç tasarımıyla
+(D2) aynı yön.
+
+**Bu düzeltmenin alternatifi 10 dalın master alması olurdu:** 10 gönderim, 10 deployment,
+ve kotanın bizi o gün zaten iki kez reddettiği bir ortam. Tek satır, sıfır gönderim.
 
 ## D9 — Kota reddi bir COMMIT harcar (ölçüldü, tahmin çürüdü)
 
