@@ -100,26 +100,64 @@ olma riski taşır — §2'deki boşluk tam olarak böyle oluştu.
 > sorarsa bunu göremez; **setter'ın varlığını** sormalıdır. Bu, `substring-assert-is-not-a-gate`
 > ailesinin ödeme yüzeyindeki hâli: doğru soruyu bir katman yukarıdan sormak.
 
-## 6. A/B'ye bağlı bölüm — **KARAR BEKLİYOR** (Recep)
+## 6. Seçilen varyant — **A: Gömülü form** (karar: Recep, 2026-08-18)
 
-Aşağıdaki iki varyanttan **yalnız biri** kalacak; karar gelince diğeri tek silmeyle gider.
-§1-§5 her iki durumda da geçerlidir.
+Varyant B (barındırılan sayfaya yönlendirme) **elendi**. Karar ölçüme dayandı: arka uç zaten
+uçtan uca çalışıyordu (üç sipariş, üçünde de `payment_token` dolu) ve kırık olan tek şey
+yüzeydi; B'yi seçmek çalışan bir zinciri atıp yerine yönlendirme koymak olurdu.
 
-### Varyant A — Gömülü form (öneri)
-- Yüzey PSP'nin form içeriğini sayfa içinde çalıştırır; kullanıcı siteden çıkmaz.
-- **CSP genişletmesi zorunlu:** `script-src` (PSP betik alan adı) · `frame-src` (PSP çerçevesi)
-  · `form-action` (PSP'ye POST). Üçü de eksikse dal sessizce ölür — K3.
-- Cetvel eki gerekir: `csp-standard.md`'ye "üçüncü taraf ödeme sağlayıcısı" satırı
-  (sahibi LEGAL-SEO).
-- Ek kural adayı: PSP alan adları **tek yerde** listelenir; CSP ile yüzey aynı listeden beslenir
-  (ikinci kopya = sessiz ayrışma).
+**Kullanıcı gerekçesi:** her sayfa geçişi terk üretir ve sepetler yüksek tutarlı (B2B).
+Kullanıcı siteden çıkmaz, marka sürekliliği ve sipariş özeti ekranda kalır.
 
-### Varyant B — Barındırılan sayfaya yönlendirme
-- Yüzey render etmez; tarayıcı PSP'nin sayfasına gider ve döner.
-- **CSP'ye dokunulmaz** → K3/R4/R5 bu varyantta konusuz kalır.
-- Yerine gelen kural: yönlendirme öncesi sipariş kimliğinin **kalıcı** yazıldığı doğrulanır
-  (kullanıcı dönemezse `PaymentWatcher` tek kurtarma yoludur).
-- Bedeli: mevcut gömülü yüzey (div, overlay adımları, ilerleme çubuğu) çöpe gider.
+**Abartılmayacak sınır:** 3D Secure adımında banka ekranı yine devreye girer; fark, o ekranın
+PSP'nin çerçevesi içinde açılmasıdır. "Kullanıcı hiç çıkmaz" cümlesi yanlıştır.
+
+**PCI kapsamı DEĞİŞMEZ:** kart alanları PSP'nin iframe'i içinde kaldığı sürece kart verisi bu
+uygulamaya hiç değmez. A'nın uyum tarafında ek maliyeti yoktur.
+
+### A1 — CSP genişletmesi (zorunlu, sahibi LEGAL-SEO)
+
+`script-src` · `frame-src` · `form-action` · `connect-src` → PSP alan adına izin verir.
+Dördünden biri eksikse dal **sessizce** ölür (K3). Zorlayıcı: `INV-PAY-RENDER-1` R5.
+
+> **İKİ DÜZELTME (2026-08-18, LEGAL-SEO ölçümüyle).** Bu bölümün ilk hâlinde iki yanlış vardı
+> ve ikisi de aynı kökten geliyordu — **bayat kaynaktan okumak**:
+> 1. "`frame-src` hiç tanımlı değil" YANLIŞTI. Direktif `origin/master`'da **vardır**
+>    (`'self'` + youtube + cloudflarestream, PR #630). Yanlış okuma, depoda `master`'ın
+>    gerisinde park etmiş bir çalışma dizininden yapılmıştı.
+> 2. Başlık **`Content-Security-Policy-Report-Only`**'dir — yani CSP bugün **hiçbir şeyi
+>    engellemiyor**. Dolayısıyla ödeme formunun açılmaması **CSP kaynaklı değildi**; sebep
+>    tamamen istemci kodudur (§6 girişindeki üç kusur).
+>
+> **Bunun R5'i geçersiz kılmadığı** özellikle not edilir: rapor-only rejimde eksik ya da
+> yanlış bir liste **yeşil görünür** ve hata ancak `enforce` gününe saklanır — üstelik o gün
+> ödeme yolunda patlar. R5 tam olarak bu gecikmiş patlamayı önlemek içindir.
+> Ders kaydı: [[measurement-source-disk-vs-repo]] — otorite `origin/master`'dır, çalışma
+> dizini değil.
+
+### A2 — Enjeksiyon güvenliğinin sınırı **CSP'dir** (yeni kural, K7)
+
+Gömülü form üçüncü taraf betiğini bu kaynağın (origin) içinde çalıştırır. Bu kabul edilmiş bir
+takastır ama **bedava değildir** ve iki koşulu vardır:
+
+1. **Kaynak kısıtı:** enjekte edilen içerik YALNIZ kendi edge fonksiyonumuzun döndürdüğü PSP
+   yanıtından gelebilir. Kullanıcı girdisinden türeyen hiçbir şey bu yola giremez.
+   İçeriği "sanitize etmek" çözüm DEĞİLDİR — amacı (PSP betiğini çalıştırmak) yok eder.
+2. **Alan kısıtı:** CSP `script-src` PSP alan adıyla sınırlı tutulur. Genel bir gevşetme
+   (ör. yeni bir `'unsafe-*'` ya da joker şema) bu maddeyi ihlal eder.
+
+Yani enjeksiyonun güvenliği enjektörün kendisinde değil, **onu çevreleyen CSP'de** yaşar.
+
+### A3 — PSP alan adları tek listeden beslenir
+
+CSP ile yüzey aynı kaynaktan okur; ikinci kopya sessiz ayrışma üretir.
+
+### A4 — Ölçülmemiş, açık risk
+
+3DS'te banka ACS sayfası PSP'nin çerçevesi içinde mi yoksa üst çerçevede mi açılıyor, gerçek
+bir sandbox ödemesiyle **henüz ölçülmedi**. Üst çerçeveye düşerse `form-action` genişler ve
+banka alan adları sınırsız bir liste olduğundan CSP ile yönetilemez; o hâlde bu madde yeniden
+açılır. **Ölçülene kadar bu satır cetvelde AÇIK kalır** — kapatılmış gibi davranılmaz.
 
 ## 7. Değişiklik kaydı
 
