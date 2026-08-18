@@ -41,8 +41,12 @@ const CANONICAL = 'src/components/products/3d/core/VentHubCanvas.tsx'
  */
 const LEGACY_RAW_CANVAS = new Set<string>([])
 
+/**
+ * Yorum sıyırma — `(?<!:)` ŞART: onsuz `https://x` içindeki `//` yorum sanılır ve
+ * satırın geri kalanı silinir; URL arayan dedektör SESSİZCE kör kalır (T081-VH).
+ */
 function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(?<!:)\/\/[^\n]*/g, '')
 }
 
 function toRel(key: string): string {

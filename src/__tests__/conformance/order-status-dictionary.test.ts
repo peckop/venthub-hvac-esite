@@ -67,7 +67,7 @@ const ODEME_SOZLUGU = ['pending', 'paid', 'failed', 'refunded', 'partial_refunde
 function stripComments(src: string): string {
   return src
     .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
-    .replace(/\/\/[^\n]*/g, (m) => m.replace(/[^\n]/g, ' '))
+    .replace(/(?<!:)\/\/[^\n]*/g, (m) => m.replace(/[^\n]/g, ' '))
 }
 
 type Yazim = { alan: 'status' | 'payment_status'; deger: string }

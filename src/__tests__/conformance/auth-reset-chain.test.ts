@@ -99,7 +99,17 @@ describe('INV-AUTH-1 · şifre-sıfırlama zinciri', () => {
     const updateArgs = extractCallArgs(src, 'updateUser')
     expect(updateArgs, 'supabase.auth.updateUser çağrısı yok').toBeTruthy()
     expect(updateArgs!).toContain('password')
-    expect(src).toContain('hibpPwnedCount')
+    // T077/F3: `toContain('hibpPwnedCount')` IMPORT satırıyla tatmin olurdu — HIBP
+    // kontrolü sökülse bile yeşil kalırdı. ÇAĞRI + argümanı birlikte ölçülür.
+    const hibpArgs = extractCallArgs(src, 'hibpPwnedCount')
+    expect(hibpArgs, 'hibpPwnedCount ÇAĞRISI yok — import tek başına kapıyı geçmez').not.toBeNull()
+    expect(
+      hibpArgs!.trim(),
+      'hibpPwnedCount fakir argümanla çağrılmış — kontrol edilen şifre geçilmiyor',
+    ).not.toBe('')
+    expect(src, 'hibpPwnedCount sonucu beklenmiyor (await yok) — kontrol yarıştırılıyor').toMatch(
+      /await\s+hibpPwnedCount\(/,
+    )
     // Kurtarma ekranında MEVCUT şifre sorulamaz — kullanıcı onu bilmiyor (T056'nın kök sebebi).
     expect(src).not.toContain('signInWithPassword')
   })
@@ -123,7 +133,17 @@ describe('INV-AUTH-1 · şifre-sıfırlama zinciri', () => {
     const src = source('/src/views/AuthCallbackPage.tsx')
     expect(src).toMatch(/get\(\s*'next'\s*\)/)
     expect(src).toContain('Routes.auth.resetPassword()')
-    expect(src).toContain('exchangeCodeForSession')
+    // T077/F3: PKCE takası IMPORT'la değil ÇAĞRIYLA olur; ayrıca argümansız çağrı
+    // (fakir argüman) kodu takas etmez — URL/kod geçilmek ZORUNDA.
+    const exchangeArgs = extractCallArgs(src, 'exchangeCodeForSession')
+    expect(
+      exchangeArgs,
+      'exchangeCodeForSession ÇAĞRISI yok — PKCE e-posta linkleri sessizce başarısız olur',
+    ).not.toBeNull()
+    expect(
+      exchangeArgs!.trim(),
+      'exchangeCodeForSession argümansız çağrılmış — takas edilecek kod/URL geçilmiyor',
+    ).not.toBe('')
     expect(src).toMatch(/has\(\s*'code'\s*\)/)
   })
 

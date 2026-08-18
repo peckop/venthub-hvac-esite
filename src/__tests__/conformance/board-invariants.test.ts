@@ -52,9 +52,16 @@ interface BoardNote {
   text: string
 }
 
+interface BoardClaimHali extends BoardClaim {
+  bayat: boolean
+  yasDk: number | null
+}
+
 interface BoardModule {
   append: (sid: string, event: Record<string, unknown>) => void
   readEvents: () => { sid?: string; type?: string }[]
+  tumTalepler: (now?: number) => BoardClaimHali[]
+  summary: (sid: string) => string
   PANOYA_YAZAN_FIILLER: Set<string>
   liveClaims: (now?: number) => BoardClaim[]
   findConflict: (filePath: string, sid: string, repoRoot?: string) => BoardConflict | null
@@ -525,6 +532,155 @@ describe('INV-BOARD-3 · kimliksiz yazım yok', () => {
       r.stderr,
       '"who" kimliksiz koşup SUSMUŞ — okuyan kendi şeridini listede boşuna arar, çünkü "(sen)" işareti hiç konmaz',
     ).toContain('uyarı')
+  })
+})
+
+/**
+ * INV-BOARD-4 · BAYAT şerit sessizce KAYBOLMASIN (T084-VH).
+ *
+ * `liveClaims` TTL'i dolmuş talebi listeden atar ve bu ENGELLEME için doğrudur. Ama aynı liste
+ * panoyu/brifingi de besliyordu ve orada sessiz bilgi kaybı üretti: 2026-08-18'de EDGE şeridi
+ * 240+ dakika atış almadıktan sonra listeden TAMAMEN kayboldu. "Listede yok" iki bambaşka
+ * durumu aynı gösteriyor: (a) iş bitti, bilinçli bırakıldı · (b) oturum koptu, şerit SAHİPSİZ.
+ * (b) hâlinde o globlara kimse bakmaz ve kimse fark etmez — oysa bu bir devralma kararıdır.
+ *
+ * Düzeltme ilk koşumda gerçek bilgi üretti: EDGE (269dk) yanında I18N-SWEEP (251dk) de bayat
+ * çıktı — ikincisini kimse bilmiyordu, çünkü kaybolmuştu.
+ */
+describe('INV-BOARD-4 · bayat şerit görünür kalır', () => {
+  const SID_CANLI = '11111111-aaaa-4aaa-8aaa-111111111111'
+  const SID_BAYAT = '22222222-bbbb-4bbb-8bbb-222222222222'
+  const SID_BIRAKAN = '33333333-cccc-4ccc-8ccc-333333333333'
+
+  function seed(board: BoardModule): void {
+    board.append(SID_CANLI, { ts: isoAgo(60_000), type: 'claim', lane: 'CANLI', globs: ['src/canli/**'] })
+    // TTL 4 saat; 5 saat atış yok → bayat
+    board.append(SID_BAYAT, { ts: isoAgo(5 * 60 * 60 * 1000), type: 'claim', lane: 'BAYAT-SERIT', globs: ['src/bayat/**'] })
+    board.append(SID_BIRAKAN, { ts: isoAgo(3 * 60 * 60 * 1000), type: 'claim', lane: 'BIRAKAN', globs: ['src/birakan/**'] })
+    board.append(SID_BIRAKAN, { ts: isoAgo(60_000), type: 'release' })
+  }
+
+  it('bayat şerit LISTEDE KALIR (bayat etiketi + yaşıyla), liveClaims ise onu düşürür', () => {
+    const board = loadBoard(boardDir)
+    seed(board)
+
+    const hepsi = board.tumTalepler()
+    const bayat = hepsi.find(c => c.sid === SID_BAYAT)
+
+    expect(
+      bayat,
+      'BAYAT şerit listeden düştü — "listede yok" ifadesi "iş bitti" ile "sahipsiz kaldı"yı ' +
+        'aynı gösterir ve sahipsiz globları kimse fark etmez (EDGE vakası, 240dk)',
+    ).toBeDefined()
+    expect(bayat?.bayat, 'bayat şerit CANLI gibi işaretlenmiş — etiketi olmayan bilgi yanıltır').toBe(true)
+    expect(
+      bayat?.yasDk ?? 0,
+      'yaş bilgisi yok — "ne kadar süre sessiz" olmadan devralma kararı verilemez',
+    ).toBeGreaterThan(240)
+
+    // Engelleme tarafı DEĞİŞMEDİ: bayat şerit canlı listede olmamalı.
+    expect(
+      board.liveClaims().map(c => c.sid),
+      'bayat şerit liveClaims\'e sızmış — ölü oturum yeniden kilitleyebilir hâle gelir',
+    ).not.toContain(SID_BAYAT)
+  })
+
+  it('BIRAKILAN şerit gerçekten düşer — bilinçli kapanış bayatlıkla karıştırılmaz', () => {
+    const board = loadBoard(boardDir)
+    seed(board)
+
+    expect(
+      board.tumTalepler().map(c => c.sid),
+      'release edilmiş şerit hâlâ listede — bilinçli kapanış "sahipsiz kaldı" gibi görünürse ' +
+        'pano gürültüye boğulur ve etiket anlamını yitirir',
+    ).not.toContain(SID_BIRAKAN)
+  })
+
+  it('bayat şerit BLOKLAMAZ (görünürlük ile engelleme AYRI)', () => {
+    const board = loadBoard(boardDir)
+    seed(board)
+
+    const c = board.findConflict('src/bayat/dosya.ts', SID_CANLI, process.cwd())
+    expect(
+      c,
+      'bayat şerit yazmayı engelliyor — görünür kılmak onu tekrar kilide çevirmemeli, ' +
+        'yoksa ölü oturum tüm filoyu durdurur (TTL\'in var olma sebebi bu)',
+    ).toBeNull()
+  })
+
+  it('summary çıktısı BAYAT etiketini ve süresini YAZAR', () => {
+    const board = loadBoard(boardDir)
+    seed(board)
+
+    const cikti = board.summary(SID_CANLI)
+    expect(cikti, 'summary bayat şeridi hiç anmıyor').toContain('BAYAT')
+    expect(cikti, 'bayat şeridin adı çıktıda yok').toContain('BAYAT-SERIT')
+    expect(cikti, 'canlı şerit kaybolmuş').toContain('CANLI')
+    expect(cikti, 'bırakılan şerit yeniden görünür olmuş').not.toContain('BIRAKAN')
+  })
+})
+
+/**
+ * INV-BOARD-5 · Loop kurulum hatırlatması hook TARAFINDAN taşınır (T085-VH).
+ *
+ * Recep'in sabah ritüeli: her pencereye yalnız "günaydın" yazması yeterli olmalı, oturum
+ * kendi loop zincirini KENDİSİ kurmalı. Komutu insanın taşıması, tam olarak bu katmanın
+ * ortadan kaldırmaya çalıştığı "hatırlamaya bağlı adım".
+ *
+ * Tasarım kısıtı: `board-brief.cjs`'in yazılı bir SESSİZLİK KURALI var (söyleyecek şey yoksa
+ * hiçbir şey yazmaz). Bu yüzden hatırlatma HER TURA eklenmiyor: yalnız şerit talep ETMEMİŞ
+ * taze oturum görüyor, şerit alınınca kendiliğinden susuyor.
+ */
+describe('INV-BOARD-5 · loop hatırlatması', () => {
+  const SID_TAZE = '44444444-dddd-4ddd-8ddd-444444444444'
+  const HOOK_YOLU = require.resolve('../../../.claude/hooks/board-brief.cjs')
+
+  function hookKostur(sidDeger: string): string {
+    const ciftler = Object.entries(process.env).filter(([k]) => k !== 'CLAUDE_SESSION_ID')
+    ciftler.push(['VENTHUB_BOARD_DIR', boardDir])
+    const env = Object.fromEntries(ciftler) as typeof process.env
+    const r = spawnSync('node', [HOOK_YOLU], {
+      encoding: 'utf8',
+      env,
+      input: JSON.stringify({ session_id: sidDeger }),
+    })
+    return r.stdout ?? ''
+  }
+
+  it('şerit ALMAMIŞ oturum loop hatırlatmasını görür (pano boş olsa bile)', () => {
+    loadBoard(boardDir) // pano dizinini hazırla, hiç talep yok
+    const cikti = hookKostur(SID_TAZE)
+
+    expect(
+      cikti,
+      'hook hiç çıktı vermedi — pano boşken bile TAZE oturum loop komutunu almalı, yoksa ' +
+        'komutu yine insan taşır (T085\'in tam sebebi)',
+    ).toContain('LOOP:')
+    expect(cikti, 'hatırlatma hangi dosyaya bakılacağını söylemiyor').toContain('session-loop-ritual.md')
+    expect(cikti, 'yedek cron adımı hatırlatmada yok').toContain('CronCreate')
+  })
+
+  it('şerit ALAN oturumda hatırlatma SUSAR — hook KONUŞURKEN bile', () => {
+    const board = loadBoard(boardDir)
+    board.append(SID_TAZE, { ts: isoAgo(30_000), type: 'claim', lane: 'CALISIYOR', globs: ['src/x/**'] })
+    // ⚠ BU SATIR TESTİN KENDİSİNİ KURTARIYOR: ilk sürümde yoktu ve test YANLIŞ SEBEPLE geçti.
+    // Tek talep bu oturumun kendisi olunca hook'un SESSİZLİK KURALI devreye giriyor ve kanca
+    // hiç çıktı vermeden çıkıyordu — yani hatırlatmayı koşulsuz basacak şekilde bozduğumda
+    // (sabotaj) test yine yeşil kaldı, çünkü sabotajlanan satıra hiç ULAŞILMIYORDU.
+    // Başka bir oturumun canlı şeridi eklenince kanca KONUŞMAK ZORUNDA kalıyor ve asıl iddia
+    // ("konuşuyor ama LOOP satırını basmıyor") gerçekten ölçülüyor.
+    board.append('99999999-eeee-4eee-8eee-999999999999', {
+      ts: isoAgo(45_000), type: 'claim', lane: 'BASKA-SERIT', globs: ['src/y/**'],
+    })
+
+    const cikti = hookKostur(SID_TAZE)
+
+    expect(cikti, 'hook hiç konuşmadı — bu testin ön koşulu, başka şerit varken PANO basmasıdır').toContain('PANO:')
+    expect(
+      cikti.includes('LOOP:'),
+      'şerit almış oturuma da hatırlatma basılıyor — her tura satır eklemek bağlamı kirletir ve ' +
+        'zamanla okunmaz hâle gelir (dosyanın kendi SESSİZLİK KURALI)',
+    ).toBe(false)
   })
 })
 

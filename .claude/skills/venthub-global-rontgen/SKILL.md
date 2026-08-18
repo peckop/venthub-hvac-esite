@@ -91,8 +91,8 @@ Sisteme yalan söyleyemezsin. Gözle baktığın hiçbir şeye `PASS` verme, yal
 9. **Veri Bütünlüğü:** UI'da "NaN", "undefined", "[object Object]" kalıntısı → WARNING.
 10. **İyzico İdempotency / Replay Guard:** İyzico ödeme akışında (ödeme başlatma ve webhook uçlarında) idempotency/replay guard — `conversationId` + timestamp kontrolü — yoksa → BLOCKED.
 
-### 🛠️ Next.js 15, PPR, Webhook ve Supabase İleri Seviye Röntgen Kuralları (Enrichment v3)
-11. **Dinamik PPR ve Suspense Sınırı:** `useSearchParams` hook'u kullanan client bileşenleri (filtreler, arama kutusu vb.), SSR zehirlenmesini engellemek için `<Suspense fallback={<Skeleton />}>` sarmalayıcısına sahip olmalıdır.
+### 🛠️ Next.js 15 render/cache, Webhook ve Supabase İleri Seviye Röntgen Kuralları (Enrichment v3)
+11. **Suspense Sınırı (PPR DEĞİL — bu projede PPR kullanılmıyor, `experimental.ppr` yok):** `useSearchParams` hook'u kullanan client bileşenleri (filtreler, arama kutusu vb.), SSR zehirlenmesini engellemek için `<Suspense fallback={<Skeleton />}>` sarmalayıcısına sahip olmalıdır.
 12. **Webhook HMAC Doğrulaması:** `/api/webhook/supabase` ve kargo/ödeme webhook uç noktalarında `hmacValid` veya signature hash doğrulaması aranmalıdır.
 13. **Alternates Language Sitemap SEO alternates:** `sitemap.ts` üzerinde Türkçe/İngilizce alternatifleri (`alternates: { languages: { tr: '...', en: '...' } }`) bulunmalıdır.
 14. **Supabase Altın Üçlü Zinciri:** Migration SQL scriptlerinde `GRANT`, `ENABLE ROW LEVEL SECURITY` ve `CREATE POLICY` zincirinin sırayla uygulandığı denetlenmelidir. `user_metadata` yerine `app_metadata` kullanılmalıdır.

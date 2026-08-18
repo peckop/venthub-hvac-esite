@@ -38,12 +38,40 @@ const SOURCES: Record<string, string> = import.meta.glob(
   { query: '?raw', import: 'default', eager: true },
 )
 
+/**
+ * Yorumları sıyır — `https://` içindeki `//` KORUNUR (`[^:'"\`]` öneki bunu sağlar).
+ * T077 bulgusu F4: bu dosya sıyırma YAPMIYORDU, yani üstteki niçin-yorumlarında geçen
+ * `useFavorites`/`address_line` sözcükleri iddiaları tek başına tatmin ediyordu —
+ * üretim kodu silinse bile YEŞİL kalırdı.
+ */
+function stripComments(src: string): string {
+  return src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:'"`])\/\/[^\n]*/g, '$1')
+}
+
 function source(path: string): string {
   const src = SOURCES[path]
   if (src === undefined) {
     throw new Error(`Kaynak bulunamadı: ${path} — dosya taşındıysa bu testi de güncelle.`)
   }
-  return src
+  return stripComments(src)
+}
+
+/** `fnName(` ÇAĞRISININ argüman gövdesi; import satırı `fnName(` içermediği için doğal olarak atlanır. */
+function callArgs(src: string, fnName: string): string | null {
+  const idx = src.indexOf(`${fnName}(`)
+  if (idx === -1) return null
+  let depth = 0
+  const start = idx + fnName.length
+  for (let i = start; i < src.length; i++) {
+    if (src[i] === '(') depth++
+    else if (src[i] === ')') {
+      depth--
+      if (depth === 0) return src.slice(start + 1, i)
+    }
+  }
+  return null
 }
 
 describe('INV-AUTH-2 · hesap yüzeyi', () => {
@@ -76,7 +104,22 @@ describe('INV-AUTH-2 · hesap yüzeyi', () => {
 
   it('R3: PDP favori kalbi useFavorites ile kalıcı — yerel wishlist state yasak', () => {
     const pdp = source('/src/app/_components/ProductDetailPageView.tsx')
-    expect(pdp).toContain('useFavorites')
+    // T077/F3: `toContain('useFavorites')` IMPORT satırıyla tatmin olurdu — kanca sökülse
+    // bile yeşil kalırdı. Onun yerine ÇAĞRI + kancanın döndürdüğü okuyucunun KULLANIMI
+    // birlikte ölçülür (üçü aynı anda bozulmadan kalp kalıcı olamaz).
+    expect(pdp, 'useFavorites kancası import edilmiyor').toMatch(/from\s*'[^']*hooks\/useFavorites'/)
+    expect(
+      callArgs(pdp, 'useFavorites'),
+      'useFavorites() ÇAĞRISI yok — import tek başına kapıyı geçmez',
+    ).not.toBeNull()
+    expect(
+      pdp,
+      'kalbin durumu isFavorite(...) ile kalıcı kaynaktan türetilmiyor',
+    ).toMatch(/isFavorite\(\s*\w/)
+    expect(
+      pdp,
+      'kalp tıklaması toggleFavorite(...) çağırmıyor — yazma yolu kopuk',
+    ).toMatch(/toggleFavorite\(\s*\w/)
     expect(pdp).not.toMatch(/useState[^)]*isWishlisted|setIsWishlisted/)
   })
 
@@ -84,12 +127,52 @@ describe('INV-AUTH-2 · hesap yüzeyi', () => {
     const overview = source('/src/views/account/AccountOverviewPage.tsx')
     // Yalın kullanım deseni: {x.full_address} doğrudan JSX içinde
     expect(overview).not.toMatch(/\{\s*\w+\.full_address\s*\}/)
-    expect(overview).toContain('address_line')
+
+    // T077/F1: `toContain('address_line')` rename-körüydü — o sözcük dosyada BAŞKA
+    // yerlerde de geçer (tip alanı, form state), fallback silinse bile yeşil kalırdı.
+    // Ölçülen şey artık fallback İFADESİNİN kendisi ve kartın onu kullanması.
+    const fnIdx = overview.indexOf('const formatAddress')
+    expect(
+      fnIdx,
+      'formatAddress yardımcısı yok — adres kartı ham alanı render ediyor olabilir (T059 kusuru)',
+    ).toBeGreaterThan(-1)
+    const fnBody = overview.slice(fnIdx, fnIdx + 300)
+    expect(
+      fnBody,
+      'formatAddress içinde full_address için fallback OPERATÖRÜ (||) yok',
+    ).toMatch(/full_address\s*\|\|/)
+    expect(
+      fnBody,
+      'fallback address_line üzerinden kurulmuyor — adres formu full_address YAZMIYOR',
+    ).toMatch(/address_line/)
+    expect(
+      overview,
+      'adres kartı formatAddress(...) ile render edilmiyor — yardımcı ölü kod',
+    ).toMatch(/\{\s*formatAddress\(\s*\w/)
   })
 
   it('R5: StickyHeader favoriler hedefi Routes SSOT üzerinden ve sayfası mevcut', () => {
     const header = source('/src/components/StickyHeader.tsx')
     expect(header).toContain('Routes.account.favorites()')
     expect(SOURCES['/src/app/[lang]/account/favorites/page.tsx']).toBeDefined()
+  })
+
+  /* ---- dedektör sağlığı: araçların KÖR olmadığı sentetik girdiyle kanıtlanır ---- */
+
+  it('R6: yorum sıyırıcı GERÇEKTEN sıyırıyor ve URL\'leri YEMİYOR', () => {
+    // Sıyırma çalışmazsa R3/R4 yorumdaki sözcüklerle tatmin olur (T077/F4 sınıfı).
+    expect(stripComments('// useFavorites\nconst a = 1')).not.toContain('useFavorites')
+    expect(stripComments('/* address_line */ const b = 2')).not.toContain('address_line')
+    // Ters kusur da ölçülür: `https://` içindeki `//` yorum sanılırsa dedektör körleşir
+    // (CRLF/URL tuzağı — aynı hata csp testlerinde canlı yaşandı).
+    expect(stripComments("const u = 'https://x.dev/a' // not")).toContain('https://x.dev/a')
+  })
+
+  it('R7: callArgs IMPORT satırıyla tatmin OLMUYOR (yanlış-pozitif koruması)', () => {
+    // İddianın kendisi sabotajla sınanır: sadece import varsa null dönmeli.
+    expect(callArgs("import { useFavorites } from './h'\n", 'useFavorites')).toBeNull()
+    // Gerçek çağrıda argüman gövdesi (boş da olsa) dönmeli — dengeli parantez.
+    expect(callArgs('const { isFavorite } = useFavorites()\n', 'useFavorites')).toBe('')
+    expect(callArgs('toggleFavorite(p.id, { x: (1) })', 'toggleFavorite')).toBe('p.id, { x: (1) }')
   })
 })

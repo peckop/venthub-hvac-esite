@@ -116,15 +116,13 @@ const T_CALL_BEFORE_FALLBACK = /t\(\s*(['"])[\w.]+\1\s*\)\s*$/
  *   kendi dosyasında 5 buldu ve hepsini kapattı. Bayatlık testi bu satırın silinmesini
  *   zaten zorluyordu — ratchet çalıştı.
  *
- * - `utils/whatsapp.ts`: `generateSupportMessage()` ham TR WhatsApp metni döndürüyor
- *   (EN kullanıcı Türkçe ön-dolu mesaj alır — gerçek kusur). Ama bu SAF bir util:
- *   `t`/`lang` erişimi YOK, düzeltmek çağıranlara dil geçirmeyi gerektiriyor = ayrı
- *   iş emri. Yarım düzeltmek (util içine sözlük import etmek) DI kuralını bozardı.
- *   JSX içermediği için tüm-desen muafiyeti burada kayıp üretmiyor.
+ * - ~~`utils/whatsapp.ts`~~ → **BORÇ ÖDENDİ, SATIR SİLİNDİ** (D5, 2026-08-17). Altı
+ *   mesaj üreticisi sözlüğe taşındı, `lang` parametresi çağıranlara kadar geçirildi.
+ *   ⚠️ ÖNCEKİ NOTUMDA HATA VARDI: "sözlük importu DI kuralını bozar" demiştim; kural 2
+ *   `lib/services/*` içindeki Supabase client enjeksiyonu hakkındadır, bir util'in
+ *   sözlük okumasıyla ilgisi yoktur. Doğru gerekçe "çağıran API'si değişiyor" idi.
  */
-const KNOWN_DEBT = new Set<string>([
-  'utils/whatsapp.ts',
-])
+const KNOWN_DEBT = new Set<string>([])
 
 /**
  * ÇIPLAK FALLBACK BORCU (yalnız `FALLBACK_LITERAL` deseni için — dosyayı diğer

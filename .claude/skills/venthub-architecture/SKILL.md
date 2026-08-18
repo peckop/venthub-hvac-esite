@@ -2,14 +2,16 @@
 name: venthub-architecture
 description: Defines VentHub architecture, component patterns, and Next.js App Router
   rules. Trigger for creating new components (yeni bileşen oluştur), React Server
-  Components (RSC render), or PPR configuration (PPR config). Do NOT use for git commands,
+  Components (RSC render), or render/cache strategy (statik-ISR sinirlari). PPR icin DEGIL:
+  bu projede PPR KULLANILMIYOR (next.config.mjs'te experimental.ppr yok, 2026-08-15 olculdu).
+  Do NOT use for git commands,
   database resets, or running unit tests.
 category: guards
 metadata:
   triggers:
   - yeni bileşen oluştur
   - RSC render
-  - PPR config
+  - render cache stratejisi
   inputs:
   - code design query
   outputs:
@@ -51,7 +53,7 @@ Dizin yapısı ve "yeni dosya nereye?" kararının SSOT'u = **CLAUDE.md** (her o
 2. **SSR ve Streaming (Suspense):** Ana rotalarda (`products`, `brands`, `home` vb.) `ssr: false` kullanımı KESİNLİKLE yasaktır. Ağır veri yüklemeleri için `React.lazy` yerine Next.js `dynamic` import ve mutlaka `Suspense` kullanılmalıdır. Her `Suspense` alanı için görsel bir `Skeleton` (İskelet) bileşeni tanımlanmalıdır.
 3. **Client-Side Bağımlılıkları:** `window`, `document`, `localStorage` gibi objeler `'use client'` bileşenlerinde bile sadece `useEffect` içinde veya dinamik kontrollerle (`typeof window !== 'undefined'`) kullanılmalıdır. URL parametreleri yönetimi için `window.location` yerine `next/navigation` (`useSearchParams`, `usePathname`) kullanılmalıdır.
 4. **Layout Shift (CLS) Koruması:** Resimlere (`<Image />`) mutlaka `width` ve `height` (veya `aspect-ratio`) verilmelidir. Dinamik yüklenen alanlar için `min-h-[value]` (minimum yükseklik) rezerve edilmelidir.
-5. **Hibrit PPR (Partial Prerendering) Sınırları:** Arama, filtreleme gibi sayfalarda `useSearchParams` hook'unu kullanan tüm bileşenler kesinlikle ve istisnasız `<Suspense fallback={<ProductGridSkeleton />}>` sınırı içerisine alınmalıdır. useSearchParams'ın direkt sayfa kabuğuna sızması engellenerek SSR zehirlenmesi önlenir.
+5. **useSearchParams Suspense Sınırı (SSR zehirlenmesi):** Arama, filtreleme gibi sayfalarda `useSearchParams` hook'unu kullanan tüm bileşenler kesinlikle ve istisnasız `<Suspense fallback={<ProductGridSkeleton />}>` sınırı içerisine alınmalıdır. useSearchParams'ın direkt sayfa kabuğuna sızması engellenerek SSR zehirlenmesi önlenir.
 6. **Adaptör (Adapter) Deseni ve Saf Metrik Motor Kuralı:** Uygulamanın çekirdek mühendislik hesaplamalarını barındıran `src/lib/hvacCalculations.ts` gibi saf (pure) fonksiyonların iç mantığına emperyal birim (CFM, Fahrenheit, in-wg vb.) dönüşümleri KESİNLİKLE eklenemez. Yabancı ölçü birimi gereksinimleri, UI katmanı ile iş mantığı katmanı arasına çekilecek bir `useEngineeringAdapter` gibi bir "Gateway" hook'u üzerinden (Adaptör Deseni ile) çözülmelidir.
 
 ## SEO Mimari Kuralları

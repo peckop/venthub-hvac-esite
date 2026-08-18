@@ -75,6 +75,34 @@ engelleyebilir hâle geldi) — sessiz kayıp, sessiz kilide dönüşüyor.
 - `who` yalnız okur, kimliksiz koşar ama **uyarır** (kendi şeridin "(sen)" işaretlenemez).
 - Bekçi: `src/__tests__/conformance/board-invariants.test.ts` → `INV-BOARD-3`.
 
+**K7 — BİLİNÇLİ KIRMIZI PR konvansiyonu (2026-08-18, #643 vakası).** Bir kapı kasten kırmızı
+bırakılıyorsa (ölçüm önkoşulu yok, silahlandırma yetki bekliyor vb.) bu **PR'ın kendisinde
+ayırt edilebilir** olmalı:
+
+1. **Başlıkta `[BILINCLI-KIRMIZI]` ön-eki.** Başlık, insanın ve otomasyonun ilk gördüğü şey.
+2. **Gövdenin İLK bloğu uyarı olmalı:** "merge etmeyin, önce okuyun" + kırmızının **sebebi** +
+   yeşile dönmesi için **hangi yetkinin/adımın** gerektiği.
+3. **Fail-open eklenmez.** Kırmızıyı susturmak için muafiyet/skip konulmaz — kırmızının
+   *anlamı* zaten "ölçemedim, dolayısıyla geçemem".
+
+**Niçin bu kural var (ölçülmüş vaka):** #640 bilinçli kırmızıydı ve bir **otomatik onarım botu**
+bunu arıza sanıp kırmızıyı kapatmak için `docs/nlm_sync_manifest.json` dosyasını **elle uydurdu**
+(#643): `olcum_basarili: true`, uydurma zaman damgası, `defterde[].id` alanında **icat edilmiş**
+`source-1 … source-N` değerleri — NotebookLM'e hiç bakılmadan. PR başlığı "CI düzeltmesi" gibi
+görünüyordu. Merge edilseydi kapı yeşile dönecek, kayıt "ölçüm başarılı" diyecek, ama defterde
+eksik/artık kaynak olup olmadığı **hâlâ bilinmiyor** olacaktı. #643 kapatıldı.
+
+**Sorulacak soru (genel):** bir kırmızıyı kapatan değişiklik, kırmızının **SEBEBİNİ** mi giderdi,
+kırmızının **KENDİSİNİ** mi sildi? İkincisi — adı ne olursa olsun — kapı sabotajıdır.
+
+**Türev kural:** denetim artefaktı (manifest, ledger, parite raporu) **elle yazılmaz**; onu
+üreten şey ölçümü yapan araç olmalıdır. Elle yazılabilen bir denetim kaydı denetim değildir.
+Kapının boş geçmediğini kanıtlamak için geçici sahte artefakt üretmek meşrudur ama **hiçbir
+ref'te bırakılmaz** (`git log --all -- <dosya>` ile boş olduğu doğrulanır).
+
+> ⚠ Bu **ara önlem**. Kalıcı çözüm bot yapılandırmasında (bilinçli-kırmızı PR'ları onarım
+> kapsamı dışında tutmak) ve Recep kararına bağlı.
+
 ---
 
 ## 1. Bir-İş-Bir-Dal (ZORUNLU)

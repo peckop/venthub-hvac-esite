@@ -16,7 +16,29 @@ export const pricing = {
       unlocked: "Not locked - FX movement flows into this product price.",
       winner: "Deciding scope: {{scope}} - frozen rate: {{rate}}"
     },
+    form: {
+      titleNew: "New FX lock",
+      titleEdit: "Edit FX lock",
+      lockLabel: "FX lock",
+      lockHelp: "While the lock is ON, products in scope are unaffected by currency movement; the current rate is FROZEN on save. While it is off, products follow the rate.",
+      noteLabel: "Note",
+      notePlaceholder: "Why was this lock put in place? (for whoever reads it later)",
+      activeLabel: "Active",
+      priorityLabel: "Priority",
+      priorityHelp: "When several policies share a scope, the higher priority wins.",
+      save: "Save",
+      checking: "Measuring scope...",
+      // Preview shown while turning the lock ON: the admin sees what is frozen BEFORE saving.
+      freezePreview: "Single currency in scope: {{currency}}. Rate to freeze: {{rate}} ({{date}}).",
+      reject: {
+        noProducts: "This scope has NO active products; there is nothing to lock, so nothing was saved.",
+        multiCurrency: "This scope contains {{count}} different purchase currencies ({{currencies}}). Freezing one rate would freeze part of the products at the WRONG rate, so the save was REJECTED. Narrow the scope or define one lock per currency.",
+        rateUnavailable: "No valid rate record found for {{currency}}. A lock cannot be written without provenance (a lock whose source rate is unknown cannot be audited)."
+      }
+    },
     table: {
+      historical: "(historical provenance)",
+      historicalHelp: "The lock is OFF; the rate below is a record frozen in the past, NOT the rate in effect now.",
       target: "Target",
       lock: "Lock",
       locked: "Locked",

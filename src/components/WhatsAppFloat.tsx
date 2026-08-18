@@ -7,10 +7,10 @@ import { getSupportLink, isWhatsAppAvailable } from '../utils/whatsapp'
 import { WhatsAppIcon } from './HVACIcons'
 
 const WhatsAppFloat: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   if (!isWhatsAppAvailable()) return null
-  const link = getSupportLink(t('common.whatsappSupportMessage'))
+  const link = getSupportLink(t('common.whatsappSupportMessage'), lang)
   if (!link) return null
 
   return (

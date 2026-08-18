@@ -7,7 +7,7 @@ description: >-
   KULLAN. Planı uygulamadan ÖNCE bağımsız bir red-team denetiminden geçirir: plandaki her varsayımı
   somut koda dayanarak çürütür ve kanıta dayalı bir red_team_report.md üretir (kod yazmaz/değiştirmez).
   Beş VentHub-özel başlık: (1) RLS/tenant izolasyonu & data bleeding, (2) RSC/'use client' sınırı &
-  PPR/Suspense, (3) Edge runtime kısıtları, (4) webhook HMAC/idempotency & sipariş-iade monotonluğu,
+  RSC/Suspense sınırı, (3) Edge runtime kısıtları, (4) webhook HMAC/idempotency & sipariş-iade monotonluğu,
   (5) migration auto-apply & DI & i18n parity & design-token. Sınır: salt kod bütünlüğü/integrity
   taraması → venthub-auditor; enterprise teslim (10/10) denetimi → venthub-enterprise-audit;
   diff/commit incelemesi → diff-review. Bu skill yalnız PLAN-belgesinin uygulama-öncesi red-team'idir.
@@ -53,11 +53,12 @@ olaylardır — plan bunlardan birine düşüyorsa **Kritik** işaretle.
 - `unstable_cache` / `revalidateTag` anahtarları **`lang` VE `tenantId`** içeriyor mu? Eksikse bir
   tenant'ın cache'i diğerine servis edilir.
 
-**2. RSC / `'use client'` Sınırı & PPR/Suspense (sessiz prerender çökmesi)**
+**2. RSC / `'use client'` Sınırı & Suspense (sessiz prerender çökmesi)**
 - Plan bir Server Component'e (`page.tsx` veya altındaki RSC) **hook** (`useI18n`, `useState`,
   `useSearchParams`, context) ekliyor mu? → `'use client'` gerekir. **`tsc`/`lint`/`test` bunu YAKALAMAZ,
   yalnız `next build` (prerender) patlar.**
-- `useSearchParams` kullanan bileşen `<Suspense fallback={<Skeleton/>}>` ile sarılı mı? Değilse PPR çöker.
+- `useSearchParams` kullanan bileşen `<Suspense fallback={<Skeleton/>}>` ile sarılı mı? Değilse
+  sayfa kabuğu istemciye zorlanır (SSR zehirlenmesi) ve statik üretim bozulur. **Gerekçe PPR DEĞİL:** bu projede PPR kullanılmıyor (`next.config.mjs`'te `experimental.ppr` yok, 2026-08-15 ölçüldü).
 - Ana rotalarda `ssr: false` var mı? → **yasak.**
 - Plan "lint/tsc geçti → güvenli" diyorsa **yanlış**: kapıya **`pnpm build`** dahil mi? (CI'daki
   `build:ci` Vercel'in `next build`'ini eşitlemez — typedRoutes / import-sort farkları.)
