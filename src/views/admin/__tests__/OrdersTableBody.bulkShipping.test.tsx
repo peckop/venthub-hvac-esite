@@ -309,8 +309,25 @@ describe('OrdersTableBody · toplu kargo — sipariş başına takip numarası',
 
     await waitFor(() => expect(sb.invoke).toHaveBeenCalledTimes(2))
     const bodies = sb.invoke.mock.calls.map(
-      (call) => (call[1] as { body: { order_id: string; tracking_number: string } }).body,
+      (call) =>
+        (
+          call[1] as {
+            body: { order_id: string; tracking_number: string; allow_shared_tracking?: unknown }
+          }
+        ).body,
     )
     expect(bodies.every((b) => b.tracking_number === 'TRK-SAME')).toBe(true)
+
+    /**
+     * ONAY, İSTEĞE GİRMİŞ OLMALI (2026-08-17'de eklendi).
+     *
+     * Bu assert eksikken test YEŞİLDİ ama üretimde yazma OLMUYORDU: sunucu aynı takip
+     * numarasını ikinci siparişe yazmayı 409 ile reddediyor, kaçış kapısı yalnız
+     * `allow_shared_tracking: true` ile açılıyordu — ve istemci onu hiç göndermiyordu.
+     * Yani kullanıcı "evet, birleştirilmiş gönderi" diyor, karar toplanıyor ve ÇÖPE
+     * atılıyordu. Testi yeşil tutan şey, sahte istemcinin her çağrıya `error: null`
+     * demesiydi: mock gerçeğin reddettiği isteği kabul ediyordu.
+     */
+    expect(bodies.every((b) => b.allow_shared_tracking === true)).toBe(true)
   })
 })

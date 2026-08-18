@@ -13,6 +13,7 @@ import {
   getCachedProductBySlug,
   preloadFamily,
 } from '../../../../lib/data/preload'
+import { Routes } from '../../../../utils/routes'
 import { ProductDetailPage as PageComponent } from '../../../_components/ProductDetailPageView'
 
 /**
@@ -60,7 +61,21 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     if (detail) {
       const { family, variants } = detail
       // ?sku= canonical'a GİRMEZ — aile URL'i tek kanonik adrestir.
-      const canonicalUrl = `${SITE_URL}/products/${family.slug}`
+      //
+      // DİL ÖNEKİ ŞART (T083-VH). Eskiden burası `${SITE_URL}/products/${slug}` idi ve üç şeyi
+      // aynı anda bozuyordu: (1) `middleware.ts:86` dil öneksiz her kullanıcı rotasını 307 ile
+      // yönlendirdiği için kanonik bir YÖNLENDİRMEYİ gösteriyordu, (2) yönlendirmenin hedefi
+      // `Accept-Language`'a göre seçildiğinden kanonik ZİYARETÇİYE GÖRE değişiyordu,
+      // (3) en pahalısı: `/tr/...` ve `/en/...` sayfalarının İKİSİ DE aynı kanoniği bildiriyordu
+      // → arama motoru kopya sayıp bir dili indeksten düşürebilirdi. `sitemap.ts` doğruyu
+      // bildiriyordu, bu sayfa onu çürütüyordu.
+      // Cetvel: docs/standards/canonical-url-standard.md §4 · bekçi: INV-CANONICAL-2.
+      //
+      // `Routes.product` + dil öneki bileşimi KASITLI: `sitemap.ts` de birebir aynı ifadeyi
+      // kullanır, böylece iki yüzey aynı kaynaktan üretilir ve sessizce ayrışamaz.
+      const trUrl = `${SITE_URL}/tr${Routes.product(family.slug)}`
+      const enUrl = `${SITE_URL}/en${Routes.product(family.slug)}`
+      const canonicalUrl = lang === 'en' ? enUrl : trUrl
       const title = pickLang(family.meta_title, lang) || `${family.name} | VentHub`
       const description =
         pickLang(family.meta_description, lang) ||
@@ -74,6 +89,11 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
         description,
         alternates: {
           canonical: canonicalUrl,
+          languages: {
+            tr: trUrl,
+            en: enUrl,
+            'x-default': trUrl,
+          },
         },
         openGraph: {
           title,

@@ -19,7 +19,9 @@ interface PaginationProps {
 /**
  * F5-B W2.1 — Sunucu-sayfalaması için basit önceki/sonraki + "Sayfa X / Y" göstergesi.
  * Sayfa durumu URL'de (`?page=`) tutulur; diğer sorgu parametreleri korunur.
- * `useSearchParams` kullandığı için çağıran taraf <Suspense> ile sarmalıdır (PPR kuralı).
+ * `useSearchParams` kullandığı için çağıran taraf <Suspense> ile sarmalıdır: sarılmazsa sayfa
+ * kabuğu istemciye zorlanır (SSR zehirlenmesi). PPR kuralı DEĞİL — bu projede PPR kullanılmıyor
+ * (`next.config.mjs`'te `experimental.ppr` yok); SSOT: CLAUDE.md kural 5.
  */
 const Pagination: React.FC<PaginationProps> = ({ page, pageSize, total }) => {
   const { t } = useI18n()

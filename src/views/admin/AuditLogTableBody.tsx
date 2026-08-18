@@ -15,6 +15,7 @@ import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/u
 import { formatDateTime } from '../../i18n/datetime'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { Database } from '../../types/database.types'
+import { eqValue, ilikeContains, orConditions, orIlikeContains } from '../../utils/adminQueryFilters'
 import { adminButtonSecondaryClass, adminInputClass } from '../../utils/adminUi'
 
 /* ---- model ---- */
@@ -51,11 +52,16 @@ async function auditFetcher(
   if (to) query = query.lte('at', `${to}T23:59:59Z`)
   if (action) query = query.eq('action', action)
   if (params.query) {
-    const like = `%${params.query}%`
-    query = query.or(`table_name.ilike.${like},row_pk.ilike.${like},comment.ilike.${like}`)
+    /* Kullanıcı metni filtre GRAMERİNE gömülmez (T078-VH). */
+    query = query.or(orIlikeContains(['table_name', 'row_pk', 'comment'], params.query))
   }
   if (batch) {
-    query = query.or(`after->>batch_id.eq.${batch},comment.ilike.%${batch}%`)
+    /* `batch` ARAMA KUTUSUNDAN DEĞİL, URL filtre parametresinden gelir — yani
+       paylaşılabilir bir bağlantıyla dışarıdan verilebilir. Kaçış burada arama
+       kutusundakinden daha da gereklidir. */
+    query = query.or(
+      orConditions([eqValue('after->>batch_id', batch), ilikeContains('comment', batch)]),
+    )
   }
 
   const offset = (params.page - 1) * params.pageSize

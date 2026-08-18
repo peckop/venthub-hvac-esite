@@ -281,7 +281,11 @@ describe('INV-ADMIN-THEME-5 · tema düzeneği yerinde', () => {
     // bozuk ad, doğru adı alt-dize olarak içeriyor. Kapı yeniden adlandırmayı
     // göremiyordu; bilerek bozmasaydım fark edilmezdi.
     expect(serverLayout).toContain('parseAdminTheme(')
-    expect(serverLayout).toContain('defaultThemeResolved')
+    // Bir üst satır dersi öğrenmişti, BU satır çıplak kalmıştı (T077 taraması):
+    // `defaultThemeResolvedX` de `defaultThemeResolved`'ı alt-dize olarak içerir,
+    // yani prop yeniden adlandırılsa kapı yine yeşil kalırdı. `={` eki sınırı
+    // kurar — JSX'te prop adı ile değer arasına boşluk girmez.
+    expect(serverLayout).toContain('defaultThemeResolved={')
   })
 
   it('semantik token değişkenleri her iki temada da tanımlı', () => {

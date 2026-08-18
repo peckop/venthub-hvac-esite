@@ -32,6 +32,7 @@ import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
 import Seo from '../../components/Seo'
+import { SITE_URL } from '../../config/siteUrl'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
@@ -340,8 +341,6 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   }
 
   const topicSlug = mapSlugToTopic(subCategory?.slug) || mapSlugToTopic(mainCategory?.slug)
-  const [origin, setOrigin] = useState('')
-  useEffect(() => { if (typeof window !== 'undefined') setOrigin(window.location.origin) }, [])
 
   if (!family || !selectedVariant) {
     return (
@@ -357,7 +356,26 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   }
 
   // ?sku= canonical'a GİRMEZ — aile URL'i tek kanonik adrestir.
-  const canonicalUrl = `${origin}${Routes.product(family.slug)}`
+  //
+  // HOST **SSOT'TAN** GELİR, tarayıcıdan DEĞİL. Eskiden `window.location.origin` okunuyordu
+  // (useState + useEffect); iki ayrı arıza üretiyordu: (1) ilk render'da değer boş olduğu için
+  // canonical `/products/slug` gibi HOST'SUZ çıkıyordu, (2) efekt koştuktan sonra da ziyaret
+  // edilen host'u yazıyordu — önizleme deploy'u, alias, staging ne ise o. Yani kanonik adres
+  // "hangi adresten bakıldıysa" ona dönüşüyordu. Bu, 2026-08-15'te K8 olarak kapatılan arızanın
+  // (her deploy'da değişen kanonik adres) aynı sınıfı, başka kılıkta.
+  // Aynı sayfanın `generateMetadata`'sı da bu adresi SITE_URL'den üretir; ikisi artık BİREBİR
+  // aynı. Bekçi: INV-CANONICAL-1.
+  //
+  // DİL ÖNEKİ ŞART (T083-VH). #620'de host'u SSOT'a bağlamak yetmemiş: adres hâlâ dil öneksizdi
+  // ve `middleware.ts:86` onu 307 ile `Accept-Language`'a göre seçilen bir dile yönlendiriyordu.
+  // Yani kanonik yine ziyaretçiye göre değişiyordu — bu sefer host değil DİL üzerinden.
+  // Cetvel: docs/standards/canonical-url-standard.md §4 · bekçi: INV-CANONICAL-2.
+  //
+  // Dil öneki ELLE birleştirilmez, `localizedHref` ile eklenir (CLAUDE.md kural 7). İlk
+  // düzeltmemde `${SITE_URL}/${lang}${Routes.product(...)}` yazmıştım ve I18N şeridinin
+  // INV-2 bekçisi bunu SSOT kaçağı olarak yakaladı — haklıydı: altyapı katmanında elle
+  // `/${lang}` birleştirmek, dil öneki kuralının tek merkezden değişmesini imkânsız kılar.
+  const canonicalUrl = `${SITE_URL}${localizedHref(Routes.product(family.slug), lang)}`
   const variantDescription = selectedVariant.description || pickLang(family.description, lang)
   const metaDesc = variantDescription || t('pdp.descFallback')
   const variantLabel = selectedVariant.model_code || selectedVariant.sku
@@ -967,7 +985,12 @@ const PdpSkuBridge: React.FC<ProductDetailPageProps> = (props) => {
 }
 
 /**
- * useSearchParams kullanan ağaç Suspense ile sarılır (PPR/SSR zehirlenme kuralı).
+ * useSearchParams kullanan ağaç Suspense ile sarılır — SSR zehirlenmesi (CLAUDE.md kural 5).
+ *
+ * NOT (2026-08-17): burada eskiden "PPR/SSR zehirlenme kuralı" yazıyordu. Kural doğru, GEREKÇE
+ * yanlış sınıftandı: bu projede **PPR kullanılmıyor** (`next.config.mjs`'te `experimental.ppr`
+ * yok; 08-15'te ölçüldü). Yanlış gerekçe, kuralın PPR açılırsa geçerli olduğu izlenimi verir;
+ * oysa Suspense sınırı PPR'dan bağımsız olarak BUGÜN zorunludur.
  *
  * Fallback bilinçli olarak boş bir iskelet DEĞİL, VARSAYILAN varyantla render edilmiş
  * tam gövdedir: statik ön-render'da HTML gerçek ürün içeriğiyle çıkar (SEO/LCP),

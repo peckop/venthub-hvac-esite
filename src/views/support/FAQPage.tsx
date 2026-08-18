@@ -7,7 +7,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { getSupportLink, isWhatsAppAvailable } from '../../utils/whatsapp'
 
 const FAQPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const faqs = [
     { q: t('support.faq.q1'), a: t('support.faq.a1') },
     { q: t('support.faq.q2'), a: t('support.faq.a2') },
@@ -33,7 +33,7 @@ const FAQPage: React.FC = () => {
 
       {/* WhatsApp Support for unresolved questions */}
       {isWhatsAppAvailable() && (() => {
-        const whatsappLink = getSupportLink(t('common.whatsapp.faqSupportMessage'))
+        const whatsappLink = getSupportLink(t('common.whatsapp.faqSupportMessage'), lang)
         if (!whatsappLink) return null
 
         return (

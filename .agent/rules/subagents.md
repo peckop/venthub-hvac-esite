@@ -94,7 +94,7 @@ orkestratörün neyi öncelikle doğrulayacağını bilmesi için. Abartılı ke
     3. CDN & CSP: GLB/GLTF dış kaynakları `next.config.mjs` CSP `connect-src`/`img-src`'de mi?
        (`raw.githubusercontent.com`, `raw.githack.com` whitelist'te olmalı — biri eksikse model yüklenmez → kritik.)
     4. ERRORBOUNDARY: WebGL desteklemeyen tarayıcı için Canvas sarmalayıcısında fallback UI'lı ErrorBoundary var mı?
-    5. SSR/PPR: 3D yükleyici bileşen route seviyesinde `<Suspense fallback>` ile sarılı mı? Ana rotada `ssr:false` → bulgu.
+    5. SSR/Suspense (PPR DEĞİL, bu projede kullanılmıyor): 3D yükleyici bileşen route seviyesinde `<Suspense fallback>` ile sarılı mı? Ana rotada `ssr:false` → bulgu.
     6. THREAD ÇEKİŞMESİ: Aynı Canvas/obje üzerinde hem R3F/useFrame hem Framer Motion/GSAP müdahalesi var mı? (jank)
     7. DISPOSE/SIZINTI: geometry/material/texture `dispose` ediliyor mu, `useMemo` ile texture tekilleştirilmiş mi?
        (Mount/unmount döngüsünde GPU bellek sızıntısı → orta/kritik.)

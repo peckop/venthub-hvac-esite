@@ -35,28 +35,51 @@ try {
   board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
 } catch { process.exit(0) } // pano yoksa sessizce geç (koordinasyon katmanı fail-open)
 
-let live = []
+/** Loop hatırlatması bu yaştan sonra susar — sürekli nag etmesin (T085-VH). */
+const LOOP_HATIRLATMA_PENCERESI_MS = 2 * 60 * 60 * 1000
+
+let hepsi = []
 let notes = []
+let seritAldiMi = true
 try {
   board.touch(sid) // kirayı yenile (aralık board.cjs'te kısılı)
   const events = board.readEvents()
-  live = board.liveClaims()
-  const mine = live.find(c => c.sid === sid)
+  // BAYAT şeritler de gelsin: "listede yok" ile "sahipsiz kaldı" ayrı şeyler (T084-VH).
+  hepsi = board.tumTalepler()
+  const mine = hepsi.find(c => c.sid === sid)
   notes = board.notesFor(sid, mine && mine.lane, events)
+  // Bu oturum HİÇ şerit talep etmiş mi? (TTL'e değil GEÇMİŞE bakıyoruz: bir kez claim
+  // ettiyse loop'unu kurmuş sayılır, bayatlasa bile hatırlatma tekrar açılmasın.)
+  const benim = events.filter(e => e.sid === sid)
+  seritAldiMi = benim.some(e => e.type === 'claim')
+  if (!seritAldiMi && benim.length > 0) {
+    const ilk = Math.min(...benim.map(e => Date.parse(e.ts)).filter(Number.isFinite))
+    if (Number.isFinite(ilk) && Date.now() - ilk > LOOP_HATIRLATMA_PENCERESI_MS) seritAldiMi = true
+  }
 } catch (e) {
   process.stderr.write(`[board-brief] pano okunamadı (fail-open): ${e && e.message}\n`)
   process.exit(0)
 }
 
-const others = live.filter(c => c.sid !== sid)
-if (others.length === 0 && notes.length === 0) process.exit(0) // söyleyecek bir şey yok
+const others = hepsi.filter(c => c.sid !== sid)
+// SESSİZLİK KURALINA EK (T085-VH): şerit almamış TAZE oturum, pano boş olsa bile loop
+// hatırlatmasını almalı — Recep'in sabah "günaydın" yazıp başka hiçbir şey yazmaması için
+// komutu İNSAN değil bu kanca taşıyor. Şerit alınınca hatırlatma kendiliğinden kapanır.
+if (others.length === 0 && notes.length === 0 && seritAldiMi) process.exit(0)
 
 const lines = []
 if (others.length > 0) {
   lines.push('PANO: ' + others.map(c => {
-    const mins = Math.max(0, Math.round((Date.now() - Date.parse(c.heartbeat)) / 60000))
-    return `${c.lane}=${String(c.sid).slice(0, 8)} (${c.globs.join(' ')}, ${mins}dk)`
+    const bayat = c.bayat ? ` ⚠BAYAT ${c.yasDk}dk atış yok, bırakılmadı` : ''
+    return `${c.lane}=${String(c.sid).slice(0, 8)} (${c.globs.join(' ')}, ${c.yasDk}dk)${bayat}`
   }).join(' · '))
+}
+if (!seritAldiMi) {
+  lines.push(
+    'LOOP: zincirin kurulu değilse docs/standards/session-loop-ritual.md KOMUT-B ile kur ' +
+    '(OPS-AUDIT oturumuysan KOMUT-A) + yedek olarak CronCreate ile 30dk recurring tur kur ' +
+    '(dakika 0/30 dışı). Şerit talep edince bu satır kendiliğinden susar.',
+  )
 }
 if (notes.length > 0) {
   lines.push('NOT: ' + notes.map(n => `${String(n.sid).slice(0, 8)}→${n.to || 'herkes'} "${n.text}"`).join(' | '))
