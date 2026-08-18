@@ -53,6 +53,63 @@ test.describe('admin runtime smoke', () => {
   })
 
   /**
+   * PORTAL TEMA KAPSAMI — 2026-08-18 kusuru.
+   *
+   * Admin token'ları `[data-admin-theme]` altında tanımlı; Radix portal'ları
+   * içeriği `document.body`ye taşıdığı için o ağaç kapsamın DIŞINDA kalıyordu.
+   * `hsl(var(--admin-surface))` geçersize düşüyor ve yüzey ŞEFFAF kalıyordu:
+   * modal panellerinin içinden alttaki tablo görünüyor, tema menüsünün metni
+   * okunmuyordu.
+   *
+   * NİÇİN BURADA: bu kusur ancak HESAPLANMIŞ stille görülür. jsdom `index.css`i
+   * uygulamaz; statik tarayıcı da dosyada doğru sınıfı görüp yeşil der. Sınıflar
+   * zaten doğruydu — yanlış olan, dayandıkları değişkenlerin tanımsızlığıydı.
+   */
+  test('portal yüzeyleri tema token değişkenlerini görür (şeffaf değil)', async ({ page }) => {
+    await page.goto('/tr/auth/login')
+    await page.fill('input[name="email"]', EMAIL as string)
+    await page.fill('input[name="password"]', PASSWORD as string)
+    await page.click('button[type="submit"]')
+    await page
+      .waitForURL((u) => !u.pathname.includes('/auth/login'), { timeout: 25_000 })
+      .catch(() => { /* yine de /admin denenecek */ })
+
+    await page.goto('/admin')
+
+    const toggle = page.getByTestId('admin-theme-toggle')
+    await expect(toggle, 'tema seçici görünmedi (shell mount olmadı?)').toBeVisible({
+      timeout: 25_000,
+    })
+    await toggle.click()
+
+    const menu = page.locator('[role="menu"]').first()
+    await expect(menu, 'tema menüsü açılmadı').toBeVisible({ timeout: 10_000 })
+
+    /*
+      Tanımsız değişkenli `hsl(var(--x))` geçersizdir; tarayıcı özelliği hiç
+      uygulamaz ve hesaplanmış değer ŞEFFAFA (rgba(0, 0, 0, 0)) düşer. Ölçüm
+      tam olarak budur — "sınıf var mı" değil, "renk gerçekten uygulandı mı".
+    */
+    const menuBg = await menu.evaluate((el) => getComputedStyle(el).backgroundColor)
+    expect(
+      menuBg,
+      `Tema menüsünün arka planı ŞEFFAF (${menuBg}) — portal, admin token kapsamının\n` +
+        'dışında kalmış. Beklenen: AdminLayout tema kapsamını gövdeye de basar.',
+    ).not.toBe('rgba(0, 0, 0, 0)')
+
+    /* Metin rengi de aynı sebeple düşer: koyu temada koyu-üstüne-koyu okunmaz. */
+    const item = menu.locator('[role="menuitemradio"]').first()
+    const itemColor = await item.evaluate((el) => getComputedStyle(el).color)
+    expect(itemColor, 'menü metni renk almamış').not.toBe('rgba(0, 0, 0, 0)')
+
+    /* Gövde işareti, kapsamın gerçekten portal'a ulaştığının doğrudan kanıtı. */
+    await expect(
+      page.locator('body[data-admin-theme]'),
+      'gövdede data-admin-theme yok — portal ağacı token değişkenlerini göremez',
+    ).toHaveCount(1)
+  })
+
+  /**
    * Edge yetki-zinciri smoke — 2026-08-14 (T018 W1).
    *
    * Yukarıdaki test admin'in AÇILDIĞINI ölçer ama hiçbir edge fonksiyonu ÇAĞIRMAZ.

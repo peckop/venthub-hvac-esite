@@ -11,6 +11,7 @@ import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { AdminModal } from '../../components/admin/overlay/AdminModal'
 import { useRole } from '../../hooks/useRole'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -248,7 +249,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                                     {order.customer_phone && <div className="flex items-center gap-3 text-xs text-admin-fg"><ChevronRight size={14} className="text-admin-accent" /> {order.customer_phone}</div>}
                                     <div className="pt-2 flex items-baseline gap-2">
                                         <span className="text-xs font-semibold text-admin-fg-muted">{t('admin.common.total')}:</span>
-                                        <span className="text-xl font-semibold text-admin-fg tracking-tight">{formatCurrency(order.total_amount || 0, lang, { maximumFractionDigits: 0 })}</span>
+                                        <span className="text-xl font-semibold text-admin-fg tracking-tight">{formatCurrency(order.total_amount || 0, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })}</span>
                                     </div>
                                 </div>
                             </section>
@@ -619,7 +620,7 @@ export default function AdminOrdersBoard() {
                                                                         </h4>
                                                                     </div>
                                                                     <div className={`font-semibold text-xs tracking-tight shrink-0 ${snapshot.isDragging ? 'text-admin-accent-fg' : 'text-admin-accent'}`}>
-                                                                        {formatCurrency(order.total_amount || 0, lang, { maximumFractionDigits: 0 })}
+                                                                        {formatCurrency(order.total_amount || 0, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })}
                                                                     </div>
                                                                 </div>
 

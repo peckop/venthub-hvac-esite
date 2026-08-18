@@ -24,6 +24,7 @@ import ProductFormModal from '../../components/admin/products/ProductFormModal'
 import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
@@ -755,14 +756,14 @@ const ProductsTableBody: React.FC = () => {
           hasWriteAccess ? (
             <InlineNumberCell
               value={r.price != null ? String(r.price) : ''}
-              display={r.price != null ? formatCurrency(Number(r.price), lang) : '-'}
+              display={r.price != null ? formatCurrency(Number(r.price), lang, { currency: SYSTEM_CURRENCY }) : '-'}
               widthClass="w-24"
               ariaLabel={t('admin.products.table.price')}
               onSave={(num) => saveInlineEdit(r, 'price', num)}
             />
           ) : (
             <span className="text-sm font-semibold text-admin-fg">
-              {r.price != null ? formatCurrency(Number(r.price), lang) : '-'}
+              {r.price != null ? formatCurrency(Number(r.price), lang, { currency: SYSTEM_CURRENCY }) : '-'}
             </span>
           ),
       },

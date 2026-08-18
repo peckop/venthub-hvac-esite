@@ -23,6 +23,7 @@ import {
   type AdminThemeResolved,
   serializeAdminTheme,
 } from '../../components/admin/shell/themeCookie'
+import { useAdminThemeBodyScope } from '../../components/admin/shell/useAdminThemeBodyScope'
 import { buildBreadcrumbTrail } from '../../config/admin-resources'
 import { useAuth } from '../../hooks/useAuth'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
@@ -140,6 +141,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     media.addEventListener('change', apply)
     return () => media.removeEventListener('change', apply)
   }, [themePreference, tenant.id])
+
+  /* Portal icerigi tema kapsaminin DISINDA kalir — kanca gerekcesiyle birlikte
+     useAdminThemeBodyScope.ts icinde anlatiliyor. */
+  useAdminThemeBodyScope(themeResolved)
 
   const breadcrumb = React.useMemo(
     () => buildBreadcrumbTrail(pathname ?? ''),

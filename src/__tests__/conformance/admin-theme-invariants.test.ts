@@ -288,6 +288,38 @@ describe('INV-ADMIN-THEME-5 · tema düzeneği yerinde', () => {
     expect(serverLayout).toContain('defaultThemeResolved={')
   })
 
+  it('tema kapsamı GÖVDEYE de basılır — portal ağacı için (2026-08-18)', () => {
+    /*
+      Kusur: admin token'ları yalnız `[data-admin-theme]` altında tanımlı ve bu
+      öznitelik yalnız AdminLayout'un `<div>`lerindeydi. Radix `Dialog.Portal` /
+      `DropdownMenu.Portal` içeriği `document.body`ye taşır — portal ağacı
+      kapsamın DIŞINDA kalıyor, `hsl(var(--admin-surface))` geçersize düşüyordu.
+      Görülen: modal panelleri ŞEFFAF, tema menüsü OKUNAMAZ.
+
+      Bu assert YETİM KANCAYI engeller: kancanın kendi davranış testleri
+      (`useAdminThemeBodyScope.test.tsx`) kanca ÇAĞRILMASA da yeşil kalırdı.
+      Burada ölçülen, yerleşimin onu gerçekten çağırdığıdır.
+
+      `(` eki sınır kurar: `useAdminThemeBodyScopeX` de doğru adı alt-dize olarak
+      içerir ve çıplak `toContain` yeniden adlandırmayı GÖREMEZDİ — bu dosyanın
+      iki satır yukarısında aynı ders iki kez yazılı.
+    */
+    const layoutSrc = ALL['/src/views/admin/AdminLayout.tsx'] ?? ''
+    expect(layoutSrc.length, 'AdminLayout.tsx okunamadı').toBeGreaterThan(500)
+    expect(
+      layoutSrc,
+      'AdminLayout tema kapsamını gövdeye basmıyor — portal içindeki her yüzey\n' +
+        '(modal, açılır menü, yan panel) admin token değişkenlerini KAYBEDER.',
+    ).toContain('useAdminThemeBodyScope(')
+
+    const hookSrc = ALL['/src/components/admin/shell/useAdminThemeBodyScope.ts'] ?? ''
+    expect(hookSrc.length, 'useAdminThemeBodyScope.ts okunamadı').toBeGreaterThan(300)
+    expect(
+      hookSrc.includes('document.body') || hookSrc.includes('const { body }'),
+      'Kanca gövdeye yazmıyor.',
+    ).toBe(true)
+  })
+
   it('semantik token değişkenleri her iki temada da tanımlı', () => {
     expect(css).toContain('[data-admin-theme]')
     expect(css).toContain("[data-admin-theme='dark']")

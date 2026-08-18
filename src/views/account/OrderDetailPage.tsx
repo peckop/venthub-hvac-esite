@@ -13,6 +13,7 @@ import type { Product } from '@/types/ui-models'
 import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
+import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -174,7 +175,7 @@ export default function OrderDetailPage() {
   }, [user, id, t, router])
 
   const formatDate = (d?: string | null) => (d ? formatDateTime(d, lang) : '-')
-  const formatPrice = (n: number | string) => formatCurrency(Number(n) || 0, lang, { maximumFractionDigits: 0 })
+  const formatPrice = (n: number | string) => formatCurrency(Number(n) || 0, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })
 
   const handleCopy = async (text?: string) => {
     try { if (!text) return; await navigator.clipboard.writeText(text); toast.success(t('orders.copied')) } catch { toast.error(t('orders.copyFailed')) }
