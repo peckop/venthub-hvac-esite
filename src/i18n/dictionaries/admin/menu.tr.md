@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\i18n\dictionaries\admin\menu.tr.ts
-skeleton_hash: 70d00a417fe9a7ec
+source_path: C:\Users\alize\venthub-wt-altyapi\src\i18n\dictionaries\admin\menu.tr.ts
+skeleton_hash: 9bb892b6e6c28a74
 entity_hashes:
   overview: 34e06702dc3cc9a5
-generated_at: 2026-06-19T20:47:53Z
+generated_at: 2026-08-18T06:48:20Z
 ---
 
 ## Genel Bakış
@@ -32,7 +32,7 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 - **menu** (object) — `{
       groupMain: 'Ana Menü',
       groupSales: 'Satış & Operasyon',
-      g...`
+    ...`
 
 ---
 

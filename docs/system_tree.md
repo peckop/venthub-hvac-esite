@@ -2,18 +2,15 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-08-17T11:53:18.194976+00:00
+compiled_at: 2026-08-18T07:24:31.876331+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-08-18T07:24:31.876331+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
 📂 venthub-hvac/
-├── 📂 ** .agents/**
-│   └── 📂 **explorer_m4_1_gen2/**
-│       └── ⚠️ `handoff.md`
 ├── ⚪ `CHANGELOG.md`
 ├── ⚪ `CLAUDE.md`
 ├── ⚪ `CONTEXT.md`
@@ -24,7 +21,6 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 ├── ⚠️ `TEST_INFRA.md`
 ├── ⚠️ `TEST_READY.md`
 ├── ⚪ `VISION.md`
-├── 📂 **cache/**
 ├── 📂 **docs/**
 │   ├── ⚪ `DURUM-TAKIP.md`
 │   ├── ⚪ `README.md`
@@ -41,6 +37,7 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   ├── ⚪ `legacy-vite-seo-report.md`
 │   │   ├── ⚪ `legacy_homepage_enhancements_2025.md`
 │   │   ├── ⚪ `legacy_smart_routing_plan.md`
+│   │   ├── ⚪ `lighthouse_performance_fix_plan_merged_2026-06-10.md`
 │   │   ├── ⚪ `plan-and-tasklist-current.md`
 │   │   ├── ⚪ `plan-and-tasklist.md`
 │   │   └── ⚪ `project_state_and_skills_audit.md`
@@ -59,6 +56,7 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   ├── ⚪ `product-schema-ground-truth-2026-06-21.md`
 │   │   ├── ⚪ `render-stratejisi-denetimi-2026-08-16.md`
 │   │   ├── ⚪ `secret-exposure-audit-2026-08-15.md`
+│   │   ├── ⚪ `t077-ad-arayan-iddia-taramasi-2026-08-17.md`
 │   │   ├── ⚪ `vibe-coding-20-madde-denetimi-2026-08-13.md`
 │   │   ├── ⚪ `vibe-coding-20-madde-v2-2026-08-16.md`
 │   │   └── ⚪ `yetki-katmani-denetimi-2026-08-15.md`
@@ -103,9 +101,12 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   ├── ⚪ `kademe2-clean-rebuild-2026-08-11.md`
 │   │   ├── ⚪ `product-schema-master-implementation-plan.md`
 │   │   ├── ⚪ `product-schema-standard-brief.md`
+│   │   ├── ⚪ `render-dalga1-plan-2026-08-17.md`
 │   │   ├── ⚪ `saas-funding-and-packaging-2026-06.md`
 │   │   ├── ⚪ `seo-transition-blueprint.md`
 │   │   ├── ⚪ `slug-localization-2026-08-10.md`
+│   │   ├── ⚪ `t047-role-source-plan-2026-08-17.md`
+│   │   ├── ⚪ `t080-odeme-ekrani-bos-2026-08-17.md`
 │   │   ├── ⚪ `tenant-id-hardening-2026-08-15.md`
 │   │   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
 │   │   ├── ⚪ `venthub_saas_faz1_prompt.md`
@@ -132,9 +133,13 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   ├── ⚪ `admin-standard.md`
 │   │   ├── ⚪ `analytics-standard.md`
 │   │   ├── ⚪ `auth-account-standard.md`
+│   │   ├── ⚪ `canonical-url-standard.md`
 │   │   ├── ⚪ `catalog-ingestion-standard.md`
 │   │   ├── ⚪ `category-taxonomy-standard.md`
+│   │   ├── ⚪ `checkout-payment-standard.md`
 │   │   ├── ⚪ `collaboration-protocol.md`
+│   │   ├── ⚪ `companion-doc-standard.md`
+│   │   ├── ⚪ `csp-standard.md`
 │   │   ├── ⚪ `csv-import-export-standard.md`
 │   │   ├── ⚪ `customer-account-standard.md`
 │   │   ├── ⚪ `dealer-module-blueprint.md`
@@ -149,6 +154,7 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   ├── ⚪ `purchasing-standard.md`
 │   │   ├── ⚪ `quote-standard.md`
 │   │   ├── ⚪ `rendering-cache-standard.md`
+│   │   ├── ⚪ `session-loop-ritual.md`
 │   │   ├── ⚪ `storefront-design-standard.md`
 │   │   ├── ⚪ `storefront-reflow-standard.md`
 │   │   └── ⚪ `work-tracking-ssot-standard.md`
@@ -160,8 +166,6 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   ├── ✅ `admin-smoke.e2e.ts`
 │   ├── ✅ `checkout-smoke.e2e.ts`
 │   └── ❌ `reflow.e2e.ts`
-├── 📂 **explorer_m2_3/**
-│   └── ⚠️ `analysis.md`
 ├── ⚠️ `implementation_plan.md`
 ├── 📂 **memory-engine/**
 │   └── ⚪ `README.md`
@@ -284,6 +288,8 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **coupons/**
 │   │   │   │   └── ✅ `page.tsx`
+│   │   │   ├── 📂 **data-requests/**
+│   │   │   │   └── ❌ `page.tsx`
 │   │   │   ├── 📂 **error-groups/**
 │   │   │   │   └── ✅ `page.tsx`
 │   │   │   ├── 📂 **errors/**
@@ -304,6 +310,8 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   │   ├── ✅ `page.tsx`
 │   │   │   ├── 📂 **pricing/**
 │   │   │   │   ├── ✅ `page.tsx`
+│   │   │   │   ├── 📂 **policies/**
+│   │   │   │   │   └── ❌ `page.tsx`
 │   │   │   │   ├── 📂 **preview/**
 │   │   │   │   │   └── ✅ `page.tsx`
 │   │   │   │   └── 📂 **rules/**
@@ -422,6 +430,7 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   │   │   ├── ✅ `CostRefreshModal.tsx`
 │   │   │   │   ├── ✅ `CurrencyRatesCard.tsx`
 │   │   │   │   ├── ✅ `MaterializePricesModal.tsx`
+│   │   │   │   ├── ❌ `PricingPolicyFormModal.tsx`
 │   │   │   │   ├── ✅ `PricingRuleFormModal.tsx`
 │   │   │   │   ├── ✅ `PricingSettingsFormModal.tsx`
 │   │   │   │   └── ✅ `RuleScopeTargetPicker.tsx`
@@ -572,8 +581,7 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
 │   │   │   ├── ✅ `RichTextRenderer.tsx`
-│   │   │   ├── ❌ `VariantSelector.tsx`
-│   │   │   └── 📂 **visual-models/**
+│   │   │   └── ❌ `VariantSelector.tsx`
 │   │   ├── 📂 **quotes/**
 │   │   │   ├── ✅ `QuoteRequestButton.tsx`
 │   │   │   └── ✅ `QuoteRequestModal.tsx`
@@ -648,6 +656,8 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   │   │   ├── ✅ `coupons.tr.ts`
 │   │   │   │   ├── ✅ `dashboard.en.ts`
 │   │   │   │   ├── ✅ `dashboard.tr.ts`
+│   │   │   │   ├── ❌ `dataRequests.en.ts`
+│   │   │   │   ├── ❌ `dataRequests.tr.ts`
 │   │   │   │   ├── ✅ `dataTable.en.ts`
 │   │   │   │   ├── ✅ `dataTable.tr.ts`
 │   │   │   │   ├── ✅ `en.ts`
@@ -713,6 +723,8 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   ├── ✅ `hvacCalculations.ts`
 │   │   ├── 📂 **images/**
 │   │   │   └── ❌ `productImage.ts`
+│   │   ├── 📂 **kvkk/**
+│   │   │   └── ❌ `dueState.ts`
 │   │   ├── ✅ `order.ts`
 │   │   ├── ✅ `orderStatusService.ts`
 │   │   ├── ✅ `pdfAssets.ts`
@@ -728,8 +740,11 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   │   ├── ✅ `address.service.ts`
 │   │   │   ├── ✅ `cart.service.ts`
 │   │   │   ├── ✅ `category.service.ts`
+│   │   │   ├── ❌ `dataSubjectRequest.service.ts`
 │   │   │   ├── ❌ `displayPrice.service.ts`
 │   │   │   ├── ❌ `family.service.ts`
+│   │   │   ├── ❌ `fxLockAdmin.service.ts`
+│   │   │   ├── ❌ `fxRate.service.ts`
 │   │   │   ├── ✅ `inventoryReport.service.ts`
 │   │   │   ├── ✅ `invoice.service.ts`
 │   │   │   ├── ✅ `pricing.service.ts`
@@ -769,6 +784,7 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │   │   └── ✅ `ui-models.ts`
 │   ├── 📂 **utils/**
 │   │   ├── ✅ `3dModelOffsets.ts`
+│   │   ├── ✅ `adminShipping.ts`
 │   │   ├── ✅ `adminUi.ts`
 │   │   ├── ✅ `analytics.ts`
 │   │   ├── ✅ `applicationLinks.ts`
@@ -832,6 +848,8 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │       │   ├── ✅ `AdminCategoriesPage.tsx`
 │       │   ├── ✅ `AdminCouponsPage.tsx`
 │       │   ├── ✅ `AdminDashboardPage.tsx`
+│       │   ├── ❌ `AdminDataRequestsPage.tsx`
+│       │   ├── ❌ `AdminDataRequestsTableBody.tsx`
 │       │   ├── ✅ `AdminErrorGroupsPage.tsx`
 │       │   ├── ✅ `AdminErrorsPage.tsx`
 │       │   ├── ✅ `AdminInventoryPage.tsx`
@@ -862,6 +880,7 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 │       │   ├── ✅ `MovementsTableBody.tsx`
 │       │   ├── ✅ `OrdersTableBody.tsx`
 │       │   ├── ✅ `PricePreviewPanel.tsx`
+│       │   ├── ✅ `PricingPoliciesTableBody.tsx`
 │       │   ├── ✅ `PricingRulesTableBody.tsx`
 │       │   ├── ✅ `ProductsTableBody.tsx`
 │       │   ├── ✅ `ReturnsTableBody.tsx`
@@ -982,23 +1001,32 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 - [ ] `src\app\[lang]\account\favorites\page.tsx`
 - [ ] `src\app\[lang]\account\projects\page.tsx`
 - [ ] `src\app\[lang]\auth\reset-password\page.tsx`
+- [ ] `src\app\admin\data-requests\page.tsx`
+- [ ] `src\app\admin\pricing\policies\page.tsx`
 - [ ] `src\app\admin\purchasing\page.tsx`
 - [ ] `src\app\auth\callback\route.ts`
+- [ ] `src\components\admin\pricing\PricingPolicyFormModal.tsx`
 - [ ] `src\components\admin\purchasing\CreatePurchaseOrderPanel.tsx`
 - [ ] `src\components\analytics\ConsentGatedAnalytics.tsx`
 - [ ] `src\components\consent\CookiePreferencesButton.tsx`
 - [ ] `src\components\products\VariantSelector.tsx`
 - [ ] `src\components\ui\Pagination.tsx`
 - [ ] `src\hooks\useFavorites.ts`
+- [ ] `src\i18n\dictionaries\admin\dataRequests.en.ts`
+- [ ] `src\i18n\dictionaries\admin\dataRequests.tr.ts`
 - [ ] `src\i18n\dictionaries\admin\purchasing.en.ts`
 - [ ] `src\i18n\dictionaries\admin\purchasing.tr.ts`
 - [ ] `src\i18n\dictionaries\admin\theme.tr.ts`
 - [ ] `src\lib\cache\tags.ts`
 - [ ] `src\lib\images\productImage.ts`
+- [ ] `src\lib\kvkk\dueState.ts`
 - [ ] `src\lib\purchasing\poStatusMachine.ts`
 - [ ] `src\lib\seo\jsonld.ts`
+- [ ] `src\lib\services\dataSubjectRequest.service.ts`
 - [ ] `src\lib\services\displayPrice.service.ts`
 - [ ] `src\lib\services\family.service.ts`
+- [ ] `src\lib\services\fxLockAdmin.service.ts`
+- [ ] `src\lib\services\fxRate.service.ts`
 - [ ] `src\lib\services\pricingPolicy.service.ts`
 - [ ] `src\lib\services\product.columns.ts`
 - [ ] `src\lib\services\purchasing.service.ts`
@@ -1007,6 +1035,8 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 - [ ] `src\views\ResetPasswordPage.tsx`
 - [ ] `src\views\account\FavoritesPage.tsx`
 - [ ] `src\views\account\ProjectsPage.tsx`
+- [ ] `src\views\admin\AdminDataRequestsPage.tsx`
+- [ ] `src\views\admin\AdminDataRequestsTableBody.tsx`
 - [ ] `src\views\admin\purchasing\AdminPurchasingPage.tsx`
 - [ ] `src\views\admin\purchasing\PurchasingTableBody.tsx`
 - [ ] `supabase\functions\_shared\origins.ts`
@@ -1016,23 +1046,32 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 - [ ] `src\app\[lang]\account\favorites\page.tsx`
 - [ ] `src\app\[lang]\account\projects\page.tsx`
 - [ ] `src\app\[lang]\auth\reset-password\page.tsx`
+- [ ] `src\app\admin\data-requests\page.tsx`
+- [ ] `src\app\admin\pricing\policies\page.tsx`
 - [ ] `src\app\admin\purchasing\page.tsx`
 - [ ] `src\app\auth\callback\route.ts`
+- [ ] `src\components\admin\pricing\PricingPolicyFormModal.tsx`
 - [ ] `src\components\admin\purchasing\CreatePurchaseOrderPanel.tsx`
 - [ ] `src\components\analytics\ConsentGatedAnalytics.tsx`
 - [ ] `src\components\consent\CookiePreferencesButton.tsx`
 - [ ] `src\components\products\VariantSelector.tsx`
 - [ ] `src\components\ui\Pagination.tsx`
 - [ ] `src\hooks\useFavorites.ts`
+- [ ] `src\i18n\dictionaries\admin\dataRequests.en.ts`
+- [ ] `src\i18n\dictionaries\admin\dataRequests.tr.ts`
 - [ ] `src\i18n\dictionaries\admin\purchasing.en.ts`
 - [ ] `src\i18n\dictionaries\admin\purchasing.tr.ts`
 - [ ] `src\i18n\dictionaries\admin\theme.tr.ts`
 - [ ] `src\lib\cache\tags.ts`
 - [ ] `src\lib\images\productImage.ts`
+- [ ] `src\lib\kvkk\dueState.ts`
 - [ ] `src\lib\purchasing\poStatusMachine.ts`
 - [ ] `src\lib\seo\jsonld.ts`
+- [ ] `src\lib\services\dataSubjectRequest.service.ts`
 - [ ] `src\lib\services\displayPrice.service.ts`
 - [ ] `src\lib\services\family.service.ts`
+- [ ] `src\lib\services\fxLockAdmin.service.ts`
+- [ ] `src\lib\services\fxRate.service.ts`
 - [ ] `src\lib\services\pricingPolicy.service.ts`
 - [ ] `src\lib\services\product.columns.ts`
 - [ ] `src\lib\services\purchasing.service.ts`
@@ -1041,6 +1080,8 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 - [ ] `src\views\ResetPasswordPage.tsx`
 - [ ] `src\views\account\FavoritesPage.tsx`
 - [ ] `src\views\account\ProjectsPage.tsx`
+- [ ] `src\views\admin\AdminDataRequestsPage.tsx`
+- [ ] `src\views\admin\AdminDataRequestsTableBody.tsx`
 - [ ] `src\views\admin\purchasing\AdminPurchasingPage.tsx`
 - [ ] `src\views\admin\purchasing\PurchasingTableBody.tsx`
 - [ ] `supabase\functions\_shared\origins.ts`
@@ -1050,11 +1091,9 @@ Bu belge, otonom derleyici tarafından 2026-08-17T11:53:18.194976+00:00 tarihind
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
-- [⚠️] ` .agents\explorer_m4_1_gen2\handoff.md`
 - [⚠️] `ORIGINAL_REQUEST.md`
 - [⚠️] `TEST_INFRA.md`
 - [⚠️] `TEST_READY.md`
-- [⚠️] `explorer_m2_3\analysis.md`
 - [⚠️] `implementation_plan.md`
 - [⚠️] `next.config.md`
 

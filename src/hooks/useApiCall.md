@@ -2,57 +2,81 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useApiCall.ts
-skeleton_hash: 67bf426da710b5dd
+source_path: C:\Users\alize\venthub-wt-altyapi\src\hooks\useApiCall.ts
+skeleton_hash: 192db5af395b7535
 entity_hashes:
-  func:useApiCall: ad3857eabf77c233
-  overview: 73b0eea2296f391a
-generated_at: 2026-06-19T20:47:53Z
+  func:useApiCall: 42a6f8dca553808c
+  overview: 345d6974057e4bc1
+generated_at: 2026-08-18T06:47:34Z
 ---
 
 ## Genel Bakış
-Bu modül, React uygulamalarında API çağrılarını merkezi ve yeniden kullanılabilir bir şekilde yönetmek için özel bir hook sunar. Temel amacı, tüm HTTP istekleri için tutarlı bir durum yönetim döngüsü (yükleniyor, başarı, hata) sağlamak ve temel istek yapılandırmalarını merkezileştirmektir.
+Bu modül, React uygulamalarında tüm API çağrılarını merkezi olarak yöneten, yeniden kullanılabilir bir hook sunar. Temel amacı, asenkron isteklerin başlatılmasını, yürütülmesini ve sonuçlarının (yükleniyor, başarı, hata) izlenmesini tek bir yapı ile sağlamaktır. Bu sayede bileşenler arasında tutarlı bir veri akışı ve yapılandırma yönetimi elde edilir.
 
 ## Fonksiyon Grupları
-### API Çağrı Orkestrasyonu ve Durum Yönetimi
-Bu grup, tek bir hook ile asenkron API çağrılarının başlatılmasını, yürütülmesini ve sonuçlarının (başarı veya hata) izlenmesini sağlar. Hook, çağrı sürecinde otomatik olarak durum güncellemeleri yaparak bileşenlere stabil bir veri akışı sunar.
-- useApiCall
+### Merkezi API İstek Orkestrasyonu
+Bu grup, hook'un ana sorumluluğunu ve temel yaşam döngüsünü tanımlar. Tek bir `useApiCall` fonksiyonu, verilen bir API çağrısını başlatır, sürecin durumunu (yükleniyor, başarı, hata) otomatik olarak yönetir ve bileşene sonuçları (veri veya hata) sunar. Fonksiyon, component yaşam döngüsüyle entegre çalışarak performans ve bellek sızıntısı sorunlarını önler.
 
-### Özelleştirilebilir İstek Yapılandırması
-Bu grup, varsayılan istek davranışlarının opsiyonel parametrelerle genişletilmesine ve özelleştirilmesine olanak tanır. Uygulama genelindeki ortak yapılandırma ihtiyaçlarını (örn. kimlik doğrulama, zaman aşımları) tek bir noktadan tanımlamayı kolaylaştırır.
-- useApiCall
+### Özelleştirilebilir Yapılandırma Katmanı
+Bu grup, hook'un esnekliğini ve genişletilebilirliğini sağlayan ayarlar boyutunu kapsar. `defaultOptions` parametresi aracılığıyla, tüm istekler için varsayılan başlıklar, zaman aşımları, oturum yönetimi veya özel işleyiciler tanımlanabilir. Bu yapı, farklı API uç noktaları veya ortam koşulları için aynı hook'u kişiselleştirmeye olanak tanır.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
 
-Bu hook, React bileşenleri içinde asenkron API çağrılarını yönetmek için kullanılır. Doğru çalışması için aşağıdaki mimari varsayımlar geçerlidir.
+Bu modül, React bileşen/içinde API çağrılarını yönetmek için merkezi bir hook sunar. Aşağıdaki mimari varsayımlar fonksiyon imzası ve modül yapısına dayanır:
 
-[Aksiyom 1]: Eğer `useApiCall` bir React bileşeni hook bağlamı dışında (örn:普通 bir fonksiyon, sınıf metodu) çağrılırsa, "Invalid hook call" hatası oluşur.
+**[Aksiyom 1]**: Eğer `useApiCall` bir React hook olarak kullanılmıyorsa (React bileşeni veya başka bir hook içinde çağrılmıyorsa), React hooks kurallarını ihlal ederek beklenmeyen davranışlara yol açar.
 
-[Aksiyom 2]: Eğer geçerli bir API endpoint'e erişim (ağ bağlantısı) yoksa, tüm API çağrıları başarısızlık durumuna (`error` dolu, `data` boş) geçer.
+**[Aksiyom 2]**: Eğer `defaultOptions` parametresi sağlanmıyorsa, hook internally tanımlı varsayılan UseApiCallOptions değerleriyle çalışmalıdır; aksi halde API çağrıları yapılandırma eksikliğinden başarısız olur.
 
-[Aksiyom 3]: Eğer `defaultOptions` parametresi olarak geçilen `UseApiCallOptions` yapısı geçerli bir istek yapılandırması (örn: geçerli URL, uygun method) içermiyorsa, istek gönderimi başarısız olur veya beklenmeyen davranış oluşur.
+**[Aksiyom 3]**: Eğer hook çağrıldığında döndürülen nesne/singleton (bilinmiyor) üzerinden API istek fonksiyonları调用 edilmiyorsa, hiçbir HTTP isteği başlatılamaz.
 
-[Aksiyom 4]: Eğer hook'un bağlandığı React bileşeni bileşen ağacından kaldırılırsa (unmount), devam eden asenkron API isteklerinin sonuçları state güncellemesine yol açmaz (memory leak veya "Can't perform a React state update on an unmounted component" uyarısı oluşmaz).
+**[Aksiyom 4]**: Eğer hook'un döndürdüğü durum yönetimi (yükleniyor/başarı/hata) bileşen tarafından readonly olarak ele alınmıyorsa, durum tutarsızlığı ve gereksiz yeniden render'lar oluşur.
+
+**[Aksiyom 5]**: Eğer hook'un çalışması için gerekli olan React bağlamı (Context Provider, HTTP istemcisi vb.) mevcut değilse (bilinmiyor - modül içinde tanımlanmamış), hook çalışmayı başlatamaz.
+
+---
+
+> **Not**: `UseApiCallOptions` tipinin iç yapısı ve hook'un dönüş tipi imza dosyasında açıkça tanımlanmadığından, bu yapılar hakkında kesin aksiyom üretilememiştir. Eski dokümanın tanım bölgesi kesildiğinden, hook'un spesifik dönüş yapısı ve geri çağırma mekanizmaları hakkında `bilinmiyor` olarak işaretlenmiştir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### useApiCall
-**Ne yapar**: Asenkron API çağrıları için `loading`, `data` ve `error` durumlarını yöneten özel bir React hook'u oluşturur. API çağrılarının yürütülmesi sırasında otomatik olarak durum yönetimi sağlar ve başarı/hata senaryoları için toast bildirimleri sunar.
 
-**Nasıl yapar**: `useState` ile `ApiCallState<T>` tipinde bir durum nesnesi oluşturur. Bu durum nesnesi `data`, `loading` ve `error` alanlarını içerir. Hook, çağrıcıya `execute` ve `reset` adlı iki方法 döndürür. `execute` çağrıldığında önce `loading: true` ayarlanır, ardından verilen asenkron fonksiyon çalıştırılır. Fonksiyon başarıyla tamamlanırsa `data` güncellenir ve opsiyonel bir başarı mesajı toast ile gösterilir. Hata durumunda ise `error` state'e yazılır ve hata mesajı toast ile bildirilir. Varsayılan seçenekler, çağrı bazında gelen seçeneklerle birleştirilerek her çağrı için özelleştirme imkanı tanır.
+**Ne yapar**: Asenkron API çağrıları için yüklenme (loading), veri (data) ve hata (error) durumlarını yöneten özel bir React hook'u oluşturur. API çağrılarının standart bir şekilde yürütülmesini sağlar ve başarı/hata senaryoları için yerleşik toast bildirimleri sunar.
+
+**Nasıl yapar**: React'in `useState` hook'u ile `ApiCallState<T>` tipinde bir durum (state) yönetimi kurar. `useCallback` ile `execute` ve `reset` fonksiyonlarını memoize ederek gereksiz yeniden oluşturmaları önler. `useI18n()` hook'undan `t` çeviri fonksiyonunu alarak çok dilli hata mesajları destekler. `execute` fonksiyonu çağrıldığında önce `loading: true` durumuna geçer, ardından verilen `apiFunc` promise'ini bekler. Başarılı olursa sonucu state'e kaydeder ve `showToast` ile `successMessage` seçenekleri aktifse `toast.success` ile bildirim gösterir. Hata oluşursa hatayı `Error` nesnesine dönüştürerek state'e kaydeder ve `toast.error` ile hata bildirimini tetikler. Seçeneklerdeki `showToast` değeri `false` olmadığında hata toast'u gösterilir; bu değerin `undefined` olması da toast gösterimi anlamına gelir.
 
 **Parametreler**:
-- `defaultOptions`: `UseApiCallOptions | undefined` — Tüm execute çağrılarına uygulanacak varsayılan ayarlar. `showToast`, `successMessage` ve `errorMessage` özelliklerini içerebilir. Tanımlanmazsa herhangi bir varsayılan toast ayarı uygulanmaz.
+- `defaultOptions`: `UseApiCallOptions | undefined` — Tüm execute çağrılarına uygulanacak varsayılan toast bildirim ayarlarını içerir. `showToast`, `successMessage` ve `errorMessage` gibi seçenekleri tanımlar. Belirtilmezse hiçbir varsayılan ayar uygulanmaz.
 
-**Dönüş**: `{ data: T | null, loading: boolean, error: Error | null, execute: (apiFunc: () => Promise<T>, options?: UseApiCallOptions) => Promise<T | null>, reset: () => void }` — Mevcut durumu (`data`, `loading`, `error`) ve iki methods (`execute`, `reset`) içeren bir nesne. `data` başarılı çağrı sonucunu, `loading` devam eden bir işlem olup olmadığını, `error` ise son hatayı temsil eder.
+**Dönüş**: `{
+        ...state,
+        execute,
+        reset,
+    }` —currentState'in (`data`, `loading`, `error` alanları) yayıldığı, `execute` ve `reset` metodlarını içeren bir nesne döndürür. `execute` metodu `Promise<T | null>` değerine resolve olur; başarı durumunda `T` tipinde sonucu, hata durumunda `null` döner.
+
+**İç Bileşenler**:
+
+#### execute
+
+**Ne yapar**: Verilen asenkron API fonksiyonunu yürütür, durum yönetimi yapar ve bildirimleri tetikler.
+
+**Nasıl yapar**: Gelen `apiFunc` ve `options` parametrelerindeki seçenekleri `defaultOptions` ile birleştirerek öncelik sırası belirler (çağrı seçenekleri üstüne yazar). Promise'i `await` ile bekler, başarı/hata durumlarını yönetir. Hata yakalandığında `err` değerinin `Error` instance olup olmadığını kontrol eder; değilse `String(err)` ile yeni bir `Error` nesnesi oluşturur. Hata mesajı için sırasıyla `errorMessage`, orijinal hata mesajı ve `t('common.errorGeneric')` çevirisi arasından ilk tanımlı olanı kullanır.
+
+**Parametreler**:
+- `apiFunc`: `() => Promise<T>` — Çalıştırılacak asenkron API fonksiyonu. Parametresiz bir fonksiyon olmalıdır ve `Promise<T>` tipinde sonuç döndürmelidir.
+- `options`: `UseApiCallOptions | undefined` — Bu çağrıya özel seçenekler. `defaultOptions` değerlerini üzerine yazar.
+
+**Dönüş**: `Promise<T | null>` — Başarılı ise `T` tipinde sonuç, hata durumunda `null` döner.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
 - import: react::useCallback
 - import: react::useState
 - import: sonner::toast
@@ -75,27 +99,35 @@ Bu hook, React bileşenleri içinde asenkron API çağrılarını yönetmek içi
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/hooks/useApiCall.ts::useApiCall
-- **params**: `defaultOptions` (可选, 类型 `UseApiCallOptions`)
+### [N1_NASIL] AST Pointer: `src/hooks/useApiCall.ts`::`useApiCall`
+- **params**: `defaultOptions?: UseApiCallOptions` — tüm API çağrılarına uygulanacak varsayılan ayarlar
 - **ic_degiskenler**:
-  - `state` — 由 `useState` 创建的React状态，存储API调用的数据、加载和错误状态。
-  - `execute` — 由 `useCallback` 创建的异步函数，用于执行API调用并更新状态。
-  - `reset` — 由 `useCallback` 创建的函数，用于将状态重置为初始值。
-- **Dönüş**: 返回一个对象，包含扩展的 `state` 属性 (`data`, `loading`, `error`) 以及 `execute` 和 `reset` 方法。
+  - `t` — `useI18n()` hook'undan dönen çeviri fonksiyonu, hata mesajlarında `t('common.errorGeneric')` olarak kullanılır
+  - `state` — `ApiCallState<T>` tipinde state nesnesi, `data`, `loading`, `error` alanlarını tutar
+  - `setState` — `state`'i güncellemek için React setter fonksiyonu
+  - `execute` — `useCallback` ile sarılmış async API çağrısı fonksiyonu, `state` ve `defaultOptions`'a bağımlı
+  - `reset` — `useCallback` ile sarılmış state sıfırlama fonksiyonu, bağımlılığı yok
+- **Dönüş**: `{ ...state, execute, reset }` — spread edilmiş `{ data, loading, error }` + `execute` fonksiyonu + `reset` fonksiyonu
 
-### [N2_NASIL] AST Pointer: src/hooks/useApiCall.ts::execute
-- **params**: `apiFunc` (类型 `() => Promise<T>`), `options` (可选, 类型 `UseApiCallOptions`)
+---
+
+### [N2_NASIL] AST Pointer: `src/hooks/useApiCall.ts`::`useApiCall.execute`
+- **params**: `apiFunc: () => Promise<T>` — çağrılacak asenkron API fonksiyonu; `options?: UseApiCallOptions` — bu çağrıya özgü opsiyonel ayarlar
 - **ic_degiskenler**:
-  - `mergedOptions` — 将 `defaultOptions`（来自外部作用域）与 `options` 合并后的最终选项对象。
-  - `result` — `apiFunc` 执行成功时返回的异步结果。
-  - `err` — `try...catch` 语句捕获的原始错误对象。
-  - `error` — 经过类型检查和包装后的 `Error` 实例。
-- **Dönüş**: 返回 `Promise<T | null>`。成功时返回 `result`，失败时返回 `null`。
+  - `mergedOptions` — `{ ...defaultOptions, ...options }` spread ile birleştirilmiş nesne, caller options override eder
+  - `result` — `await apiFunc()` çağrısının başarılı dönüş değeri tipi `T`
+  - `err` — `catch` bloğu tarafından yakalanan hata, tipi `unknown`
+  - `error` — `err instanceof Error` kontrolü ile elde edilen `Error` nesnesi, `err` Error değilse `new Error(String(err))` ile oluşturulur
+- **Yan etkileri**: `setState` çağrısı ile `loading` ve `error`/`data` state'ini günceller; `mergedOptions.showToast` true ve `successMessage` varsa `toast.success()`; hata durumunda `toast.error()` çağırır
+- **Dönüş**: `Promise<T | null>` — başarılı ise `result` (T), hata ise `null`
 
-### [N3_NASIL] AST Pointer: src/hooks/useApiCall.ts::reset
-- **params**: (无)
-- **ic_degiskenler**: (无)
-- **Dönüş**: 无（函数通过调用 `setState` 产生副作用，重置状态）。
+---
+
+### [N3_NASIL] AST Pointer: `src/hooks/useApiCall.ts`::`useApiCall.reset`
+- **params**: yok
+- **ic_degiskenler**: yok
+- **Yan etkileri**: `setState` çağrısı ile state'i `{ data: null, loading: false, error: null }` değerine sıfırlar
+- **Dönüş**: yok
 
 ---
 

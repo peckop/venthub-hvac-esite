@@ -2,62 +2,71 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\utils\whatsapp.ts
-skeleton_hash: b6956ce3e0acc724
+source_path: C:\Users\alize\venthub-wt-altyapi\src\utils\whatsapp.ts
+skeleton_hash: 0ebe86e482f058df
 entity_hashes:
   func:createWhatsAppLink: 48e63882e6e926f6
   func:formatPhoneNumber: d061dc961d242dd9
-  func:generateContactMessage: e8ee883ed141fd52
-  func:generateFAQSupportMessage: 4d0baf056a250a84
-  func:generateStockInquiryMessage: 70140afcddbd0bcd
-  func:generateSupportMessage: c235bb122d3c44da
-  func:generateTechnicalQuoteMessage: 06a0d3f0059092a0
-  func:getStockInquiryLink: 5b98cfd06bb736c1
-  func:getSupportLink: c9557dee0e999816
-  func:getWhatsAppNumber: 1b0300022a29e138
+  func:generateContactMessage: 0719248ca547e980
+  func:generateFAQSupportMessage: 3036faaba6cde6e3
+  func:generateStockInquiryMessage: b5caad4dd3662222
+  func:generateSupportMessage: 51976565c12a5104
+  func:generateTechnicalQuoteMessage: 044d963f511a7e67
+  func:getStockInquiryLink: 7a68c7e534a44e68
+  func:getSupportLink: 58523dafd2af9ee1
+  func:getWhatsAppNumber: 12ab86a6086c8799
   func:isWhatsAppAvailable: 424fa5ec202a97c6
-  overview: 3ca7064f9419922a
-generated_at: 2026-06-19T20:48:17Z
+  func:msg: 5f0805840d362a92
+  overview: 2529bfce055c545d
+generated_at: 2026-08-18T06:51:23Z
 ---
 
 ## Genel Bakış
-Bu modül, VentHub HVAC projesinde WhatsApp üzerinden müşteri ve iç iletişim süreçlerini kolaylaştırmak için geliştirilmiş bir utility modülüdür. Tüm WhatsApp entegrasyonu ile ilgili işlevleri tek merkezde toplayarak, uygulama içinde tutarlı bir iletişim altyapısı sunar. Telefon numarası formatlama, senaryoya özel mesaj şablonları oluşturma ve tek tıkla kullanılabilir iletişim linkleri üretme gibi temel sorumlulukları üstlenir.
+Bu modül, VentHub projesinde WhatsApp iletişim süreçlerini merkezi olarak yöneten bir yardımcı (utility) modülüdür. Telefon numarası yönetimi, farklı kullanım senaryolarına yönelik otomatik mesaj şablonları oluşturma ve tek tıklamayla açılabilir iletişim bağlantıları üretme gibi temel WhatsApp entegrasyonu işlevlerini bir araya getirir. Modül, uygulama genelinde tutarlı ve yapılandırılabilir bir WhatsApp arayüzü sunar.
 
 ## Fonksiyon Grupları
-### Temel WhatsApp Altyapı Fonksiyonları
-WhatsApp hizmetinin kullanılabilirliğini kontrol eden, sistemdeki kayıtlı resmi WhatsApp numarasını çeken ve telefon numaralarını standart formata dönüştüren temel işlevleri barındırır.
-- getWhatsAppNumber, isWhatsAppAvailable, formatPhoneNumber
+### Altyapı ve Yardımcı Fonksiyonlar
+WhatsApp hizmetinin temel yapı taşlarını ve genel yardımcı işlevleri yönetir. Bu grup, hizmetin kullanılabilirliğini kontrol eder, sistemde tanımlı resmi numaraya erişir, telefon numaralarını standart formatlara dönüştürür ve çoklu dil destekli (i18n) mesaj anahtarlarının çözümlemesini yapar.
+- msg, getWhatsAppNumber, formatPhoneNumber, isWhatsAppAvailable
 
-### Mesaj Şablonu Üretici Fonksiyonları
-Stok sorgulama, müşteri desteği, teknik teklif, SSS ve genel iletişim gibi farklı kullanım senaryolarına özel dinamik WhatsApp mesaj içerikleri üreten fonksiyonları içerir.
+### Senaryo Bazlı Mesaj Şablonu Üreteçleri
+Farklı müşteri veya iç iletişim senaryoları için önceden tanımlanmış, dinamik ve kişiselleştirilebilir WhatsApp mesaj içerikleri üretir. Her fonksiyon, belirli bir duruma (stok sorgulama, destek talebi, teknik teklif vb.) uygun, dille uyumlu bir metin döndürür.
 - generateStockInquiryMessage, generateSupportMessage, generateTechnicalQuoteMessage, generateFAQSupportMessage, generateContactMessage
 
-### WhatsApp Link Üretici Fonksiyonları
-Numara formatlama ve mesaj şablonu oluşturma işlevlerini birleştirerek, kullanıcıların doğrudan tıklayarak WhatsApp sohbetini açabileceği standart iletişim linkleri üretir. Hem genel amaçlı hem de senaryoya özel link üretici fonksiyonları barındırır.
+### Bağlantı (Link) Üreteçleri
+Oluşturulan mesaj şablonlarını ve formatlanmış telefon numaralarını birleştirerek, kullanıcıların doğrudan WhatsApp uygulamasını açarak sohbete başlayabileceği tıklanabilir URL'ler üretir. Bu fonksiyonlar, üst düzey iş akışlarını kolaylaştıran bir arabirim sunar.
 - createWhatsAppLink, getStockInquiryLink, getSupportLink
+
+## Mimari Notlar
+- **Dış Bağımlılıklar**: `msg` fonksiyonu, büyük olasılıkla dinamik olarak yüklenen bir uluslararasılaştırma (i18n) modülüne bağımlıdır. Bu, metinlerin proje dışında tutulmasına ve çoklu dil desteklenmesine olanak tanır.
+- **Veri Kaynağı**: `getWhatsAppNumber` fonksiyonu, numarayı muhtemelen bir yapılandırma dosyasından veya merkezi bir servisten okur; bu da numara değişikliğinde modül içi değişiklik gerektirmediğini gösterir.
+- **Sorumluluk Prensibi**: Modül tek bir amacı (WhatsApp iletişimi) tartışmasız şekilde üstlenir. Üst düzey iş mantığından (sipariş, stok yönetimi vb.) tamamen izole edilmiştir, bu da farklı bir messenger servisine geçiş veya yapılandırma güncellemesi senaryolarında değişimin tek bir noktada yapılmasını sağlar.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-Bu modül, WhatsApp iletişimi için telefon numarası formatlama, şablonlu mesaj üretme ve paylaşılabilir sohbet bağlantısı oluşturma işlemlerini gerçekleştirir, doğru çalışması için aşağıdaki koşulların varlığı zorunludur.
-
-[Aksiyom 1]: Eğer çalışma zamanında cihazda veya sunucuda erişilebilir bir WhatsApp istemcisi/API erişimi yoksa, isWhatsAppAvailable() fonksiyonu doğru kullanılabilirlik durumunu döndüremez, tüm üretilen WhatsApp bağlantıları işlevsiz kalır.
-[Aksiyom 2]: Eğer telefon numarası alan tüm fonksiyonlara (formatPhoneNumber, createWhatsAppLink vb.) iletilen string, geçerli bir telefon numarası desenine uymuyorsa, numara başarıyla formatlanamaz ve oluşturulan sohbet bağlantıları açılamaz.
-[Aksiyom 3]: Eğer fonksiyon imzalarında zorunlu (opsiyonel olmayan) olarak tanımlanan phone, message, productName gibi parametreler ilgili fonksiyonlara iletilmezse, istenen mesaj veya bağlantı oluşturulamaz, çalışma zamanında hata meydana gelir.
-[Aksiyom 4]: Eğer WhatsApp tarafından kullanılan resmi wa.me deep link standardı erişilemez olursa veya kullanım dışı kalırsa, createWhatsAppLink ve tüm get...Link prefixli fonksiyonlar tarafından üretilen bağlantılar çalışmaz.
-[Aksiyom 5]: Eğer modül içinde önceden tanımlı sabit mesaj şablonları yoksa, sıfır veya sadece opsiyonel parametre alan generateFAQSupportMessage(), generateContactMessage() gibi fonksiyonlar geçerli bir ileti metni üretemez.
-[Aksiyom 6]: Eğer opsiyonel parametre olarak tanımlanan sku, subject, projectInfo, name gibi ek bilgiler ilgili fonksiyonlara iletilmezse, üretilen mesajlarda ilgili detaylar eksik kalır, iletilerin içeriği yetersiz olur.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
-### getWhatsAppNumber
-**Ne yapar**: Ortam değişkenlerinden WhatsApp telefon numarasını alır, temizler ve geçerliliğini kontrol eder. Eğer ortam değişkeni eksikse veya numara 10 haneden kısaysa null döndürür, kullanıma hazır sadece sayılardan oluşan bir numara sunar.
-**Nasıl yapar**: Öncelikle ilgili ortam değişkenindeki ham numara değerini çeker, tüm sayısal olmayan karakterleri temizler. Sonra temizlenmiş numaranın uzunluğunu kontrol eder, 10 hane veya daha uzunsa geçerli sayarak ilgili değeri döndürür, aksi halde null döndürür.
+### msg
+**Ne yapar**: Verilen dil ve anahtar kelime için WhatsApp iletişim sözlüğünden yerelleştirilmiş bir mesaj dizesini getirir. İsteğe bağlı değişkenlerle yer tutucuları değiştirerek dinamik mesajlar oluşturur.
+**Nasıl yapar**: Fonksiyon, `lang` parametresine göre İngilizce (`en`) veya Türkçe (`tr`) sözlük nesnesini seçer. Seçilen sözlükten `whatsappMessages` alt nesnesine erişerek `key` ile eşleşen mesajı bulur. Eğer `vars` parametresi sağlanırsa, mesaj içindeki `{{anahtar}}` formatındaki tüm yer tutucuları ilgili değerlerle değiştirir. Bu,正则表达式 kullanarak tüm eşleşmeleri global olarak (tüm出现位置larını) değiştirerek çoklu yer tutucuları destekler.
 **Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz
-**Dönüş**: string | null — Yalnızca sayılardan oluşan temizlenmiş geçerli telefon numarasını, eğer numara geçersiz veya mevcut değilse null değerini döndürür.
+- `lang`: WhatsAppLang — Mesajın dili ('tr' veya 'en' olarak tanımlı bir type).
+- `key`: string — Sözlükte aranacak mesaj anahtarı.
+- `vars`: Record<string, string> — (İsteğe bağlı) Mesaj içindeki yer tutucuları doldurmak için anahtar-değer çiftleri sözlüğü. Anahtarlar, mesajdaki `{{...}}` formatındaki yer tutucu isimlerine karşılık gelir.
+**Dönüş**: string — Yerelleştirilmiş ve değişkenlerle zenginleştirilmiş (varsa) mesaj dizesi.
+
+### getWhatsAppNumber
+**Ne yapar**: Ortam değişkeninden WhatsApp iletişim numarasını alır, temizler ve geçerliliğini doğrular. Numara yoksa veya geçerli değilse null döner.
+**Nasıl yapar**: Fonksiyon, `NEXT_PUBLIC_SHOP_WHATSAPP` ortam değişkeninin değerini kontrol eder. Değer varsa, tüm boşlukları temizler ve yalnızca rakamları tutarak normalize eder. Normalize edilmiş numaranın uzunluğu 10 veya daha fazla ise bu numarayı döner, aksi takdirde null döner. Bu, pre-live aşamasındafallback numarası kullanılmaması gerektiği için WhatsApp öğelerinin gizlenmesini sağlar.
+**Parametreler**: Parametre almaz.
+**Dönüş**: string | null — Geçerli, yalnızca rakamlardan oluşan WhatsApp numarası veya numara geçerli/ayarlı değilse null.
 
 ### formatPhoneNumber
 **Ne yapar**: Ham olarak girilen herhangi bir formatta telefon numarasını WhatsApp kullanımı için uygun hale getirir, tüm sayısal olmayan karakterleri kaldırarak sadece rakamlardan oluşan bir string oluşturur.
@@ -75,42 +84,46 @@ Bu modül, WhatsApp iletişimi için telefon numarası formatlama, şablonlu mes
 **Dönüş**: string — WhatsApp'ı açmak için kullanılabilecek eksiksiz HTTPS URL'sini döndürür.
 
 ### generateStockInquiryMessage
-**Ne yapar**: Ürün stok durumu hakkında soru sormak için standart, önceden doldurulmuş Türkçe bir mesaj oluşturur, isteğe bağlı olarak ürün SKU bilgisini de mesaja ekleyerek kişiselleştirilmiş bir metin sunar.
-**Nasıl yapar**: Hazır şablonundaki Türkçe mesaja, gelen ürün adı ve varsa SKU bilgisini yerleştirerek kullanıcının herhangi bir ek düzenleme yapmasına gerek kalmadan doğrudan gönderebileceği bir stok sorgusu mesajı hazırlar.
+**Ne yapar**: Belirli bir ürünün stok durumunu sormak için önceden doldurulmuş, yapılandırılmış bir mesaj oluşturur. Ürün adı ve opsiyonel SKU kullanarak dil destekli bir mesaj üretir.
+**Nasıl yapar**: Fonksiyon, `sku` parametresi sağlanıp sağlanmadığına bağlı olarak `msg` fonksiyonunu farklı bir anahtarla (`stockInquiryWithSku` veya `stockInquiry`) çağırır. `msg` fonksiyonu, belirtilen dil sözlüğünden ilgeli mesajı çeker ve `product` ile `sku` (varsa) değişkenlerini yerleştirerek döner. Dil parametresi varsayılan olarak 'tr' dir.
 **Parametreler**:
-- productName: string — Stok durumu sorgulanacak ürünün adı
-- sku?: string — İsteğe bağlı olarak ürünün Stok Takip Numarası (SKU) tanımlayıcısı
-**Dönüş**: string — Stok durumu hakkında soru içeren formatlanmış Türkçe bir mesaj döndürür.
+- `productName`: string — Stok durumu sorulan ürünün adı.
+- `sku`: string — (İsteğe bağlı) Ürünün Stok Tutma Birimi (SKU) tanımlayıcısı.
+- `lang`: WhatsAppLang — Mesajın dili (varsayılan: 'tr').
+**Dönüş**: string — Stok sorgulaması için oluşturulmuş dil destekli mesaj dizesi.
 
 ### generateSupportMessage
-**Ne yapar**: Genel destek talebi başlatmak için formatlanmış Türkçe bir mesaj oluşturur, isteğe bağlı olarak destek talebinin konusunu mesaja ekleyerek kişiselleştirilmiş bir destek başlangıç metni sunar.
-**Nasıl yapar**: Varsayılan selamlama ve yardım talebi şablonuna, eğer konu bilgisi girilmişse konu başlığını ekleyerek eksiksiz bir destek mesajı oluşturur, kullanıcının sohbeti başlatırken ek metin girmesine gerek kalmadan doğrudan göndermesini sağlar.
+**Ne yapar**: Genel bir destek talebi başlatmak için yapılandırılmış bir mesaj oluşturur. İsteğe bağlı konu eklenebilir.
+**Nasıl yapar**: Fonksiyon, önce `msg` fonksiyonunu kullanarak 'support' anahtarından temel mesajı alır. Eğer `subject` parametresi sağlanırsa, `subjectLine` anahtarından alınan ve konu adını içeren ek bir satırı temel mesajın sonuna ekler. Dil parametresi varsayılan olarak 'tr' dir.
 **Parametreler**:
-- subject?: string — İsteğe bağlı olarak destek talebinin konusu veya konu hakkındaki detay
-**Dönüş**: string — Destek görüşmesi başlatmak için formatlanmış Türkçe bir mesaj döndürür.
+- `subject`: string — (İsteğe bağlı) Destek talebinin konusu veya konu başlığı.
+- `lang`: WhatsAppLang — Mesajın dili (varsayılan: 'tr').
+**Dönüş**: string — Destek görüşmesini başlatmak için oluşturulmuş, isteğe bağlı konu satırını içeren mesaj dizesi.
 
 ### generateTechnicalQuoteMessage
-**Ne yapar**: Teknik teklif talebi göndermek için yapılandırılmış Türkçe bir mesaj oluşturur, isteğe bağlı olarak ilgili ürün ve proje detaylarını mesaja dahil ederek kapsamlı bir teklif talebi metni sunar.
-**Nasıl yapar**: Teklif talebi için hazırlanmış şablon mesaja, girilmişse ürün adı ve proje kapsamı hakkındaki detayları ekleyerek kişiselleştirilmiş, tüm gerekli bilgileri içeren bir mesaj oluşturur.
+**Ne yapar**: Teknik bir teklif talep etmek için yapılandırılmış, çok bölümlü bir mesaj oluşturur. İsteğe bağlı ürün adı ve proje bilgisi ekleyerek esnek bir yapı sunar.
+**Nasıl yapar**: Fonksiyon, `quoteIntro` anahtarından giriş mesajını alır. Sağlanan opsiyonel parametrelere göre mesajı kademeli olarak büyütür: `productName` varsa `quoteProduct` anahtarından ürün bilgisini, `projectInfo` varsa `quoteProjectInfo` anahtarından proje detayını ekler. `projectInfo` sağlanmazsa, `quoteAskProject` anahtarından proje bilgisi isteyen bir mesaj ekler. Her eklemenin başında bir satır başı karakteri (`\n`) bulunur. Dil parametresi varsayılan olarak 'tr' dir.
 **Parametreler**:
-- productName?: string — İsteğe bağlı olarak ilgilenilen spesifik ürünün adı
-- projectInfo?: string — İsteğe bağlı olarak projenin kapsamı hakkındaki detaylar
-**Dönüş**: string — Teknik teklif talebi için formatlanmış Türkçe bir mesaj döndürür.
+- `productName`: string — (İsteğe bağlı) İlgilenilen belirli ürünün adı.
+- `projectInfo`: string — (İsteğe bağlı) Proje kapsamına ilişkin detaylar.
+- `lang`: WhatsAppLang — Mesajın dili (varsayılan: 'tr').
+**Dönüş**: string — Teknik teklif talebi için oluşturulmuş, yapılandırılmış mesaj dizesi.
 
 ### generateFAQSupportMessage
-**Ne yapar**: SSS (Sıkça Sorulan Sorular) sayfasında aradığı cevabı bulamayan kullanıcılar için standart Türkçe bir yardım talebi mesajı oluşturur, herhangi bir parametreye gerek duymadan sabit şablonunu doğrudan sunar.
-**Nasıl yapar**: Önceden tanımlanmış sabit şablonundaki metni doğrudan döndürerek, kullanıcının herhangi bir ek bilgi girmesine gerek kalmadan doğrudan destek ekibine gönderebileceği bir mesaj sunar.
+**Ne yapar**: Kullanıcının SSS sayfasında aradığı cevabı bulamadığı durumlar için standart bir yardım talebi mesajı oluşturur.
+**Nasıl yapar**: Fonksiyon, doğrudan `msg` fonksiyonunu 'faqSupport' anahtarıyla çağırarak dil destekli standard bir mesaj dizesi döner. Herhangi bir değişken Manipülasyonu veya koşullu mantık içermez. Dil parametresi varsayılan olarak 'tr' dir.
 **Parametreler**:
-- Bu fonksiyon herhangi bir parametre almaz
-**Dönüş**: string — SSS bağlamında yardım talep eden standart Türkçe bir mesaj döndürür, örnek çıktısı "Merhaba! SSS sayfasında aradığım bilgiyi bulamadım. Bana yardımcı olabilir misiniz?" şeklindedir.
+- `lang`: WhatsAppLang — Mesajın dili (varsayılan: 'tr').
+**Dönüş**: string — SSS bağlamında yardım isteyen standart mesaj dizesi.
 
 ### generateContactMessage
-**Ne yapar**: Genel iletişim talepleri için formatlanmış Türkçe bir mesaj oluşturur, isteğe bağlı olarak gönderenin adı ve talebin konusunu mesaja ekleyerek kişiselleştirilmiş bir iletişim başlangıç metni sunar.
-**Nasıl yapar**: Genel iletişim için hazırlanmış şablon mesaja, girilmişse gönderenin adı ve talep konusunu ekleyerek kullanıcının doğrudan gönderebileceği eksiksiz bir iletişim mesajı oluşturur.
+**Ne yapar**: Genel bir iletişim başlatmak için yapılandırılmış bir mesaj oluşturur. Gönderenin adını ve/veya konusunu opsiyonel olarak ekleyebilir.
+**Nasıl yapar**: Fonksiyon, `name` parametresi sağlanıp sağlanmadığına bağlı olarak farklı bir selamlama mesajı seçer: Ad varsa 'contactIntro' (isimle), yoksa 'greeting' (genel selamlama) kullanılır. Ardından, `subject` parametresi varsa 'subjectLine' anahtarından konu eklenir. Son olarak, her zaman 'contactHelp' anahtarından yardımı teşvik eden bir mesaj eklenir. Her bölüm之间有空行 karakteri ile ayrılmıştır. Dil parametresi varsayılan olarak 'tr' dir.
 **Parametreler**:
-- name?: string — İsteğe bağlı olarak mesajı gönderen kişinin adı
-- subject?: string — İsteğe bağlı olarak sorgulamanın konusu
-**Dönüş**: string — Genel iletişim başlatmak için uygun formatlanmış Türkçe bir mesaj döndürür.
+- `name`: string — (İsteğe bağlı) Mesajı gönderen kişinin adı.
+- `subject`: string — (İsteğe bağlı) İletişim talebinin konusu.
+- `lang`: WhatsAppLang — Mesajın dili (varsayılan: 'tr').
+**Dönüş**: string — Genel iletişim başlatmak için oluşturulmuş, opsiyonel isim ve konu satırlarını içeren mesaj dizesi.
 
 ### isWhatsAppAvailable
 **Ne yapar**: Mevcut çalışma ortamında WhatsApp özelliğinin tam olarak yapılandırılmış ve kullanıma hazır olup olmadığını kontrol eder, sadece geçerli bir numara mevcutsa hizmetin kullanılabileceğini bildirir.
@@ -120,39 +133,115 @@ Bu modül, WhatsApp iletişimi için telefon numarası formatlama, şablonlu mes
 **Dönüş**: boolean — Eğer ortam değişkenlerinde geçerli bir WhatsApp numarası mevcutsa true, aksi takdirde false değerini döndürür.
 
 ### getStockInquiryLink
-**Ne yapar**: Belirli bir ürünün stok durumu sorgusu için özel olarak hazırlanmış eksiksiz bir WhatsApp URL'si oluşturur, eğer WhatsApp hizmeti mevcut ortamda yapılandırılmamışsa null döndürür.
-**Nasıl yapar**: Önce WhatsApp'ın kullanılabilirliğini isWhatsAppAvailable fonksiyonu ile kontrol eder, geçerliyse generateStockInquiryMessage ile stok sorgusu mesajını oluşturur, son olarak createWhatsAppLink ile sistemdeki geçerli WhatsApp numarası kullanılarak tam URL'yi birleştirir. Herhangi bir aşamada geçersizlik durumunda null döndürür.
+**Ne yapar**: Belirli bir ürünün stok durumu hakkında WhatsApp üzerinden sorgulama yapmak için kullanılabilecek, önceden doldurulmuş mesajlı tam bir URL oluşturur.
+**Nasıl yapar**: Fonksiyon önce `getWhatsAppNumber` fonksiyonunu çağırarak sistemde yapılandırılmış geçerli bir WhatsApp numarası olup olmadığını kontrol eder. Numara yoksa (`null` dönüyorsa) `null` döner. Numara varsa, `generateStockInquiryMessage` fonksiyonunu kullanarak dil destekli sorgulama mesajını oluşturur ve ardından bu mesaj ile numarayı `createWhatsAppLink` fonksiyonuna (dışarıda tanımlı) vererek tam URL'yi oluşturur ve döner.
 **Parametreler**:
-- productName: string — Stok durumu sorgulanacak ürünün adı
-- sku?: string — İsteğe bağlı olarak ürünün Stok Takip Numarası (SKU)
-**Dönüş**: string | null — Tam olarak yapılandırılmış kullanılabilir WhatsApp URL'sini, eğer WhatsApp hizmeti yapılandırılmamışsa null değerini döndürür.
+- `productName`: string — Stok durumu sorulan ürünün adı.
+- `sku`: string — (İsteğe bağlı) Ürünün SKU kodu.
+- `lang`: WhatsAppLang — Mesajın dili (varsayılan: 'tr').
+**Dönüş**: string | null — Tam WhatsApp URL'si veya WhatsApp numarası yapılandırılmamışsa/numara geçersizse null.
 
 ### getSupportLink
-**Ne yapar**: Bu fonksiyon, genel destek sorguları için tam ve kullanıma hazır bir WhatsApp mesaj URL'i oluşturur. Fonksiyon, belirtilen destek konusunu (subject) içeren bir mesaj linki üretir ve bu linki doğrudan kullanıma sunar.
-
-**Nasıl yapar**: Fonksiyon首先 `getWhatsAppNumber()` yardımıyla yapılandırılmış WhatsApp telefon numarasını alır. Eğer numara mevcut değilse (yani WhatsApp yapılandırılmamışsa) `null` değeri döndürerek sonlanır. Numara mevcutsa, opsiyonel olarak verilen `subject` parametresini kullanarak `generateSupportMessage()` ile bir mesaj metni oluşturur. Son olarak, `createWhatsAppLink()` fonksiyonunu çağırarak telefon numarası ve mesajı birleştirip tam bir WhatsApp URL'i üretir.
-
+**Ne yapar**: Genel bir destek talebi başlatmak için kullanılabilecek, önceden doldurulmuş mesajlı tam bir WhatsApp URL'si oluşturur.
+**Nasıl yapar**: Fonksiyon önce `getWhatsAppNumber` fonksiyonunu çağırarak geçerli bir WhatsApp numarası olup olmadığını kontrol eder. Numara yoksa (`null` dönüyorsa) `null` döner. Numara varsa, `generateSupportMessage` fonksiyonunu kullanarak opsiyonel konu içeren destek mesajını oluşturur ve bu mesaj ile numarayı `createWhatsAppLink` fonksiyonuna (dışarıda tanımlı) vererek tam URL'yi oluşturur ve döner.
 **Parametreler**:
-- subject: string | undefined — Destek isteğinin konusu veya başlığı. Opsiyonel bir parametredir; sağlanmazsa varsayılan bir destek mesajı oluşturulur.
-
-**Dönüş**: string | null — WhatsApp'ın yapılandırılmış olup olmadığına göre tam URL stringi veya `null`. Eğer geçerli bir WhatsApp numarası yapılandırılmışsa, `https://api.whatsapp.com/send?phone=...&text=...` formatında bir URL döndürür; aksi halde `null` döner.
+- `subject`: string — (İsteğe bağlı) Destek talebinin konu başlığı.
+- `lang`: WhatsAppLang — Mesajın dili (varsayılan: 'tr').
+**Dönüş**: string | null — Tam WhatsApp URL'si veya WhatsApp numarası yapılandırılmamışsa/numara geçersizse null.
 
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../i18n/dictionaries/en::en
+- import: ../i18n/dictionaries/tr::tr
 - import: ../lib/utils::buildWhatsAppLink
+
+---
+
+## TYPE ALIASES
+
+### WhatsAppLang
+WhatsApp mesaj metinleri SÖZLÜKTEN gelir (CLAUDE.md kural 7: kullanıcıya görünen metin sözlükte yaşar). Bu dosya `lib/services/*` DEĞİL, dolayısıyla sözlük importu DI kuralını (kural 2 — Supabase client enjeksiyonu) ilgilendirmez. `lang` parametresi tüm üreticilere OPSİYONEL eklendi ve varsayılanı `
+```typescript
+type WhatsAppLang = 'tr' | 'en'
+```
 
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: whatsapp.ts::getWhatsAppNumber
-- **params**: (parametre yok)
+### [N1_NASIL] AST Pointer: src/utils/whatsapp.ts::msg
+- **params**: (lang: WhatsAppLang, key: string, vars?: Record<string, string>)
 - **ic_degiskenler**:
-  - `envWa` — `process.env.NEXT_PUBLIC_SHOP_WHATSAPP` değerini tutar; WhatsApp numarası ENV'den okunur
-  - `raw` — envWa string ve boş değilse_trim'lenmiş hali, değilse boş string; normalize öncesi ham değer
-  - `normalized` — raw değerinden `\D` (rakam dışı) karakterleri temizler; sadece rakamlar kalır
-- **Dönüş**: `string | null` — normalize edilmiş numara 10+ haneliyse string, değilse null
+  - `dict` — Dil parametresine göre选用的 sözlük (en veya tr)
+  - `table` — Sözlükten alınan whatsappMessages nesnesi
+  - `out` — Anahtar kelimeye karşılık gelen mesaj metni veya anahtar kelimenin kendisi
+- **Dönüş**: string
+
+### [N2_NASIL] AST Pointer: src/utils/whatsapp.ts::getWhatsAppNumber
+- **params**: ()
+- **ic_degiskenler**:
+  - `envWa` — NEXT_PUBLIC_SHOP_WHATSAPP ortam değişkeninin değeri
+  - `raw` — Ortam değişkeninden alınan ham telefon numarası dizisi veya boş string
+  - `normalized` — Sadece rakamları içerecek şekilde normalize edilmiş telefon numarası
+- **Dönüş**: string | null
+
+### [N3_NASIL] AST Pointer: src/utils/whatsapp.ts::formatPhoneNumber
+- **params**: (phone: string)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string
+
+### [N4_NASIL] AST Pointer: src/utils/whatsapp.ts::createWhatsAppLink
+- **params**: (phone: string, message: string)
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string
+
+### [N5_NASIL] AST Pointer: src/utils/whatsapp.ts::generateStockInquiryMessage
+- **params**: (productName: string, sku?: string, lang: WhatsAppLang = 'tr')
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string
+
+### [N6_NASIL] AST Pointer: src/utils/whatsapp.ts::generateSupportMessage
+- **params**: (subject?: string, lang: WhatsAppLang = 'tr')
+- **ic_degiskenler**:
+  - `baseMessage` — Dil sözlüğünden alınan temel destek mesajı
+- **Dönüş**: string
+
+### [N7_NASIL] AST Pointer: src/utils/whatsapp.ts::generateTechnicalQuoteMessage
+- **params**: (productName?: string, projectInfo?: string, lang: WhatsAppLang = 'tr')
+- **ic_degiskenler**:
+  - `message` — Oluşturulan teknik teklif mesajının başlangıç değeri
+- **Dönüş**: string
+
+### [N8_NASIL] AST Pointer: src/utils/whatsapp.ts::generateFAQSupportMessage
+- **params**: (lang: WhatsAppLang = 'tr')
+- **ic_degiskenler**: (yok)
+- **Dönüş**: string
+
+### [N9_NASIL] AST Pointer: src/utils/whatsapp.ts::generateContactMessage
+- **params**: (name?: string, subject?: string, lang: WhatsAppLang = 'tr')
+- **ic_degiskenler**:
+  - `message` — Oluşturulan iletişim mesajının başlangıç değeri
+- **Dönüş**: string
+
+### [N10_NASIL] AST Pointer: src/utils/whatsapp.ts::isWhatsAppAvailable
+- **params**: ()
+- **ic_degiskenler**: (yok)
+- **Dönüş**: boolean
+
+### [N11_NASIL] AST Pointer: src/utils/whatsapp.ts::getStockInquiryLink
+- **params**: (productName: string, sku?: string, lang: WhatsAppLang = 'tr')
+- **ic_degiskenler**:
+  - `phone` — getWhatsAppNumber() fonksiyonuyla alınan normalize edilmiş telefon numarası
+  - `message` — generateStockInquiryMessage() ile oluşturulan stok sorgulama mesajı
+- **Dönüş**: string | null
+
+### [N12_NASIL] AST Pointer: src/utils/whatsapp.ts::getSupportLink
+- **params**: (subject?: string, lang: WhatsAppLang = 'tr')
+- **ic_degiskenler**:
+  - `phone` — getWhatsAppNumber() fonksiyonuyla alınan normalize edilmiş telefon numarası
+  - `message` — generateSupportMessage() ile oluşturulan destek mesajı
+- **Dönüş**: string | null
 
 ---
 
@@ -171,18 +260,25 @@ graph TD
     whatsapp_ts__getSupportLink["getSupportLink"]
     whatsapp_ts__getWhatsAppNumber["getWhatsAppNumber"]
     whatsapp_ts__isWhatsAppAvailable["isWhatsAppAvailable"]
-    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__createWhatsAppLink
-    whatsapp_ts__getSupportLink --> whatsapp_ts__generateSupportMessage
-    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__getWhatsAppNumber
-    whatsapp_ts__getSupportLink --> whatsapp_ts__createWhatsAppLink
-    whatsapp_ts__getSupportLink --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__msg["msg"]
     whatsapp_ts__getStockInquiryLink --> whatsapp_ts__generateStockInquiryMessage
     whatsapp_ts__isWhatsAppAvailable --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__generateSupportMessage --> whatsapp_ts__msg
+    whatsapp_ts__getSupportLink --> whatsapp_ts__createWhatsAppLink
+    whatsapp_ts__generateStockInquiryMessage --> whatsapp_ts__msg
+    whatsapp_ts__getSupportLink --> whatsapp_ts__generateSupportMessage
+    whatsapp_ts__generateTechnicalQuoteMessage --> whatsapp_ts__msg
+    whatsapp_ts__generateContactMessage --> whatsapp_ts__msg
+    whatsapp_ts__getSupportLink --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__generateFAQSupportMessage --> whatsapp_ts__msg
+    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__getWhatsAppNumber
+    whatsapp_ts__getStockInquiryLink --> whatsapp_ts__createWhatsAppLink
 ```
 
 ## NODE ID STANDARD
 
   file: src\utils\whatsapp.ts
+  function: src\utils\whatsapp.ts::msg
   function: src\utils\whatsapp.ts::getWhatsAppNumber
   function: src\utils\whatsapp.ts::formatPhoneNumber
   function: src\utils\whatsapp.ts::createWhatsAppLink
@@ -198,6 +294,7 @@ graph TD
 ---
 
 ## DISA AKTARILANLAR (EXPORTS)
+  export: WhatsAppLang
   export: createWhatsAppLink
   export: formatPhoneNumber
   export: generateContactMessage
@@ -209,3 +306,4 @@ graph TD
   export: getSupportLink
   export: getWhatsAppNumber
   export: isWhatsAppAvailable
+  export: msg
