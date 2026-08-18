@@ -2,7 +2,7 @@
 name: plan-challenger
 description: 'VentHub teknik PLANLARINI (docs/plans/*.md) uygulamadan ÖNCE bağımsız
   red-team denetiminden geçirir: plandaki varsayımları somut koda dayanarak ÇÜRÜTÜR
-  (RLS/tenant izolasyon, RSC/use-client sınırı, PPR/Suspense, Edge runtime kısıtları,
+  (RLS/tenant izolasyon, RSC/use-client sınırı, Suspense sınırı, Edge runtime kısıtları,
   webhook idempotency, migration auto-apply, DI, i18n parity) ve red_team_report.md
   üretir. Tetik: planı çürüt, red team denetle, plan challenge, planı stress-test
   et. Kod integrity check için venthub-auditor, enterprise teslim denetimi için venthub-enterprise-audit,
@@ -61,12 +61,13 @@ yaşanmış gerçek olaylardır — plan bunlardan birine düşüyorsa **Kritik*
      bir tenant'ın cache'i diğerine servis edilir.
    * Yeni RLS politikası `auth.uid()` / JWT claim'lerini doğru kaynaktan mı okuyor?
 
-**2. RSC / `'use client'` Sınırı & PPR/Suspense (sessiz prerender çökmesi)**
+**2. RSC / `'use client'` Sınırı & Suspense (sessiz prerender çökmesi)**
    * Plan bir Server Component'e (`page.tsx` veya altındaki RSC) **hook** (`useI18n`, `useState`,
      `useSearchParams`, context) ekliyor mu? → `'use client'` gerekir. **tsc/lint/test bunu YAKALAMAZ,
      yalnız `next build` (prerender) patlar.** (Yaşandı: i18n RSC sınır boşluğu.)
    * `useSearchParams` kullanan bileşen `<Suspense fallback={<Skeleton/>}>` ile sarılı mı? Sarılmazsa
-     PPR derlemesi çöker / tüm sayfa CSR'a zehirlenir.
+     sayfa kabuğu istemciye zorlanır (SSR zehirlenmesi), tüm sayfa CSR'a zehirlenir ve statik
+     üretim bozulur. **Gerekçe PPR DEĞİL:** bu projede PPR kullanılmıyor (`next.config.mjs`'te `experimental.ppr` yok, 2026-08-15 ölçüldü).
    * Ana rotalarda `ssr: false` (dynamic import) var mı? → **yasak.**
    * Plan "lint/tsc geçti → güvenli" diyorsa bu **yanlış**: kapıya **`pnpm build`** dahil edilmiş mi?
      (CI'daki `build:ci` Vercel'in `next build`'ini eşitlemez — typedRoutes ve import-sort farkları.)
