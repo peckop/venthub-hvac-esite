@@ -25,5 +25,6 @@ export const menu = {
       settings: 'Ayarlar',
       pricing: 'Fiyat Ayarları',
       pricingRules: 'Marj Kuralları',
-      pricingPreview: 'Fiyat Önizleme'
+      pricingPreview: 'Fiyat Önizleme',
+      pricingPolicies: 'Kur Kilitleri'
 };

@@ -166,6 +166,39 @@ describe('INV-PRICE-7 — fiyat kilidi (dondurma)', () => {
         'hesaplanmamalı.',
     ).toBe(true)
 
+    /*
+      ⚠️ ÇAĞRI VAR ≠ KAPSAM ÇALIŞIYOR (2026-08-17'de eklendi, ADMIN-CUSTOMER buldu).
+
+      Yukarıdaki iki iddia YALNIZ çağrının varlığını ölçüyordu ve gerçek bir kusuru
+      ELEDİ: `refreshCostInBase` çözücüyü çağırıyordu ama ona `{ id }` geçiyordu.
+      `scopeMatchesProduct` scope 2'de `brandId`, scope 3'te `categoryId` arar; ikisi de
+      `undefined` gelince o kapsamlar HİÇ eşleşmez. Sonuç: marka ve kategori kilitleri
+      materialize halkasında çalışıyor, `cost_in_base` tazelemesinde SESSİZCE yok
+      sayılıyordu — yani "iki halkada da uygulanır" iddiası yeşilken kilit yarımdı.
+
+      Kök sebep girdinin fakirliğiydi: ürün sorgusu marka/kategori kolonlarını hiç
+      çekmiyordu, geçirilecek veri elde bile yoktu. Bu yüzden kural artık ZİNCİRİN
+      TAMAMINI ölçer: veri çekiliyor mu + çözücüye veriliyor mu.
+    */
+    expect(
+      /\.select\(\s*['"`][^'"`]*\bbrand\b[^'"`]*['"`]/.test(refreshGovde),
+      '`refreshCostInBase` ürün sorgusu `brand` kolonunu ÇEKMİYOR. Marka (scope 2) kilidi ' +
+        'bu halkada eşleşemez: geçirilecek veri elde yok.',
+    ).toBe(true)
+
+    expect(
+      /\.select\(\s*['"`][^'"`]*\bcategory_id\b[^'"`]*['"`]/.test(refreshGovde),
+      '`refreshCostInBase` ürün sorgusu `category_id` kolonunu ÇEKMİYOR. Kategori (scope 3) ' +
+        'kilidi bu halkada eşleşemez.',
+    ).toBe(true)
+
+    expect(
+      /brandId\s*:/.test(refreshGovde) && /categoryId\s*:/.test(refreshGovde),
+      '`refreshCostInBase` kilit çözücüsüne FAKİR girdi geçiriyor (yalnız `id`). Dört kapsamın ' +
+        'dördü de çalışsın diye `brandId` ve `categoryId` geçirilmeli — aksi hâlde marka ve ' +
+        'kategori kilitleri bu halkada sessizce yok sayılır ve kilit "yarım" olur.',
+    ).toBe(true)
+
     // Sayaçlar: dondurma bir KARARdır, sessiz atlama değil. Panelde görünmeyen bir atlama,
     // "bu fiyat neden güncellenmedi" sorusunu cevapsız bırakır.
     expect(

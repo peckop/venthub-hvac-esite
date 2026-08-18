@@ -246,7 +246,7 @@ export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> =
                     <TechnicalDrawingAuthority 
                       drawings={[{
                         id: mediaBlock.id,
-                        title: mediaBlock.content.title || 'Teknik Çizim',
+                        title: mediaBlock.content.title || t('common.technicalDrawing'),
                         url: mediaBlock.content.mediaId,
                         format: 'pdf',
                         category: 'dimensions'

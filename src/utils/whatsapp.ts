@@ -1,3 +1,5 @@
+import { en } from '../i18n/dictionaries/en'
+import { tr } from '../i18n/dictionaries/tr'
 import { buildWhatsAppLink } from '../lib/utils'
 
 /**
@@ -10,6 +12,31 @@ import { buildWhatsAppLink } from '../lib/utils'
  * const number = getWhatsAppNumber();
  * if (number) console.log(`Configured number: ${number}`);
  */
+/**
+ * WhatsApp mesaj metinleri SÖZLÜKTEN gelir (CLAUDE.md kural 7: kullanıcıya görünen
+ * metin sözlükte yaşar). Bu dosya `lib/services/*` DEĞİL, dolayısıyla sözlük importu
+ * DI kuralını (kural 2 — Supabase client enjeksiyonu) ilgilendirmez.
+ *
+ * `lang` parametresi tüm üreticilere OPSİYONEL eklendi ve varsayılanı `'tr'`:
+ * mevcut çağıranlar (ve mevcut testler) davranış değiştirmeden çalışmaya devam eder,
+ * dil geçiren çağıran doğru dili alır. Zorunlu yapmak her çağıranı aynı anda
+ * değiştirmeyi gerektirirdi; opsiyonel-varsayılan burada fail-open DEĞİL çünkü
+ * eksik `lang` yanlış YETKİ değil yalnız eski davranış üretir.
+ */
+export type WhatsAppLang = 'tr' | 'en'
+
+function msg(lang: WhatsAppLang, key: string, vars?: Record<string, string>): string {
+  const dict = lang === 'en' ? en : tr
+  const table = (dict as unknown as { whatsappMessages: Record<string, string> }).whatsappMessages
+  let out = table[key] ?? key
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      out = out.replace(new RegExp(`\{\{${k}\}\}`, 'g'), v)
+    }
+  }
+  return out
+}
+
 export function getWhatsAppNumber(): string | null {
   // Not: Pre-live aşamasında fallback numarası kullanmayız. ENV yoksa WhatsApp öğeleri gizlenir.
   const envWa = process.env.NEXT_PUBLIC_SHOP_WHATSAPP
@@ -55,8 +82,10 @@ export function createWhatsAppLink(phone: string, message: string): string {
  * @example
  * generateStockInquiryMessage('Fan X1', 'SKU-999') // returns "Merhaba! Fan X1 (SKU: SKU-999) ürünü için stok durumu hakkında bilgi alabilir miyim?"
  */
-export function generateStockInquiryMessage(productName: string, sku?: string): string {
-  return `Merhaba! ${productName}${sku ? ` (SKU: ${sku})` : ''} ürünü için stok durumu hakkında bilgi alabilir miyim?`
+export function generateStockInquiryMessage(productName: string, sku?: string, lang: WhatsAppLang = 'tr'): string {
+  return sku
+    ? msg(lang, 'stockInquiryWithSku', { product: productName, sku })
+    : msg(lang, 'stockInquiry', { product: productName })
 }
 
 /**
@@ -68,11 +97,11 @@ export function generateStockInquiryMessage(productName: string, sku?: string): 
  * @example
  * generateSupportMessage('Order Issue') // returns "Merhaba! Size nasıl yardımcı olabilirim?\n\nKonu: Order Issue"
  */
-export function generateSupportMessage(subject?: string): string {
-  const baseMessage = 'Merhaba! Size nasıl yardımcı olabilirim?'
+export function generateSupportMessage(subject?: string, lang: WhatsAppLang = 'tr'): string {
+  const baseMessage = msg(lang, 'support')
   return subject ? `${baseMessage}
 
-Konu: ${subject}` : baseMessage
+${msg(lang, 'subjectLine', { subject })}` : baseMessage
 }
 
 /**
@@ -85,20 +114,26 @@ Konu: ${subject}` : baseMessage
  * @example
  * generateTechnicalQuoteMessage('Heavy Fan', 'Mall Project') // includes "Ürün: Heavy Fan" and "Proje Bilgileri: Mall Project"
  */
-export function generateTechnicalQuoteMessage(productName?: string, projectInfo?: string): string {
-  let message = 'Merhaba! Teknik teklif talebi:'
+export function generateTechnicalQuoteMessage(
+  productName?: string,
+  projectInfo?: string,
+  lang: WhatsAppLang = 'tr',
+): string {
+  let message = msg(lang, 'quoteIntro')
 
   if (productName) {
     message += `
 
-Ürün: ${productName}`
+${msg(lang, 'quoteProduct', { product: productName })}`
   }
 
   if (projectInfo) {
     message += `
-Proje Bilgileri: ${projectInfo}`
+${msg(lang, 'quoteProjectInfo', { info: projectInfo })}`
   } else {
-    message += '\n\nProje detaylarınızı paylaşabilir misiniz ? '
+    message += `
+
+${msg(lang, 'quoteAskProject')}`
   }
 
   return message
@@ -112,8 +147,8 @@ Proje Bilgileri: ${projectInfo}`
  * @example
  * generateFAQSupportMessage() // returns "Merhaba! SSS sayfasında aradığım bilgiyi bulamadım. Bana yardımcı olabilir misiniz?"
  */
-export function generateFAQSupportMessage(): string {
-  return 'Merhaba! SSS sayfasında aradığım bilgiyi bulamadım. Bana yardımcı olabilir misiniz?'
+export function generateFAQSupportMessage(lang: WhatsAppLang = 'tr'): string {
+  return msg(lang, 'faqSupport')
 }
 
 /**
@@ -126,20 +161,22 @@ export function generateFAQSupportMessage(): string {
  * @example
  * generateContactMessage('Ali', 'Partnership') // returns "Merhaba! Ben Ali.\n\nKonu: Partnership\n\nSize nasıl yardımcı olabilirim ? "
  */
-export function generateContactMessage(name?: string, subject?: string): string {
-  let message = 'Merhaba!'
-
-  if (name) {
-    message += ` Ben ${name}.`
-  }
+export function generateContactMessage(
+  name?: string,
+  subject?: string,
+  lang: WhatsAppLang = 'tr',
+): string {
+  let message = name ? msg(lang, 'contactIntro', { name }) : msg(lang, 'greeting')
 
   if (subject) {
     message += `
 
-Konu: ${subject}`
+${msg(lang, 'subjectLine', { subject })}`
   }
 
-  message += '\n\nSize nasıl yardımcı olabilirim ? '
+  message += `
+
+${msg(lang, 'contactHelp')}`
 
   return message
 }
@@ -167,11 +204,15 @@ export function isWhatsAppAvailable(): boolean {
  * const link = getStockInquiryLink('Fan X1');
  * if (link) window.open(link);
  */
-export function getStockInquiryLink(productName: string, sku?: string): string | null {
+export function getStockInquiryLink(
+  productName: string,
+  sku?: string,
+  lang: WhatsAppLang = 'tr',
+): string | null {
   const phone = getWhatsAppNumber()
   if (!phone) return null
 
-  const message = generateStockInquiryMessage(productName, sku)
+  const message = generateStockInquiryMessage(productName, sku, lang)
   return createWhatsAppLink(phone, message)
 }
 
@@ -185,11 +226,11 @@ export function getStockInquiryLink(productName: string, sku?: string): string |
  * const link = getSupportLink('Login Issue');
  * if (link) window.open(link);
  */
-export function getSupportLink(subject?: string): string | null {
+export function getSupportLink(subject?: string, lang: WhatsAppLang = 'tr'): string | null {
   const phone = getWhatsAppNumber()
   if (!phone) return null
 
-  const message = generateSupportMessage(subject)
+  const message = generateSupportMessage(subject, lang)
   return createWhatsAppLink(phone, message)
 }
 

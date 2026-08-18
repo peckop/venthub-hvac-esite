@@ -25,5 +25,6 @@ export const menu = {
       settings: 'Settings',
       pricing: 'Pricing Settings',
       pricingRules: 'Margin Rules',
-      pricingPreview: 'Price Preview'
+      pricingPreview: 'Price Preview',
+      pricingPolicies: 'FX Locks'
 };

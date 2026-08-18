@@ -10,9 +10,9 @@ import { useI18n } from '../i18n/I18nProvider'
 import { getSupportLink } from '../utils/whatsapp'
 
 const ContactPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [formSubmitted, setFormSubmitted] = useState(false)
-  const whatsappLink = getSupportLink(t('common.whatsapp.supportMessageDefault'))
+  const whatsappLink = getSupportLink(t('common.whatsapp.supportMessageDefault'), lang)
   const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
   const [contactGridRef, contactGridVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })
   const [formSuccessRef, formSuccessVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
