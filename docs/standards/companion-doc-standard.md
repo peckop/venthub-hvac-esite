@@ -94,17 +94,38 @@ kurulmadı: bekçi ilk günden kırmızı yanarsa görmezden gelinir — bu depo
 17 companion **diskte güncel ama git'te eskiydi**. Bu ayrışma kendisi bir bulgudur ama
 bu bekçinin sorusu değildir; ikize giden şey depo hâlidir.
 
-## C6 — `.cc_docs.yaml` ↔ NotebookLM defteri paritesi (HENÜZ KAPI YOK)
+## C6 — `.cc_docs.yaml` ↔ NotebookLM defteri paritesi (KAPI YAZILDI, SİLAHLANDIRMA BEKLİYOR)
 
 Yaml'da listelenen bir kaynağın deftere gerçekten yüklendiği (ve defterde yaml'da
-olmayan artık kaynak bulunmadığı) ölçülmelidir. **Bugün bir kapı yok**; 2026-08-17'de
-elle yapıldı ve 5 eksik kaynak bulundu.
+olmayan artık kaynak bulunmadığı) ölçülmelidir. 2026-08-17'de elle yapıldı ve **5 eksik
+kaynak** bulundu — yani ikiz, var olduğu sanılan belgeleri hiç görmüyordu.
 
-Kapı yazılamamasının sebebi teknik: conformance testleri ağ kullanamaz, defter durumu
-ise yalnız ağ üzerinden görülür. Tasarım kararı: sync sırasında bir **manifest** yazılsın
-(hangi kaynak hangi id ile yüklendi), bekçi yaml ile manifest'i karşılaştırsın ve
-manifest bayatsa bunu **söylesin**. Manifest üretimi Orion tarafında bir değişiklik
-gerektirir; iş emri açıktır.
+Kapının doğrudan yazılamamasının sebebi teknik: conformance testleri **ağ kullanamaz**,
+defter durumu ise yalnız ağ üzerinden görülür. Bu yüzden iki parçalı:
+
+1. **Üretim (Orion, `orion@fc0aec0` — yapıldı):** sync, yüklemelerden **sonra defteri
+   yeniden listeleyip** `docs/nlm_sync_manifest.json` yazar.
+2. **Bekçi (`INV-DOC-3`, `src/__tests__/conformance/nlm-manifest-parity.test.ts` — yazıldı,
+   PR #640):** yaml ile manifest'i karşılaştırır; beş iddia — manifest var mı ·
+   `olcum_basarili` mı · yaml'daki her kaynak manifest'in beklenen listesinde mi (bayat
+   manifest tespiti) · `eksik` boş mu · `fazla` boş mu.
+
+**Manifest NİYETİ değil ÖLÇÜMÜ yazar.** Niyet listesinden üretilse, yükleme yarıda kalsa
+bile "hepsi yüklendi" derdi — T075'te yakalanan sınıfın aynısı (başarısız işlem denetim
+defterine `success` yazıyordu) ve o sınıfın en sinsi tarafı kaydın **kanıt gibi görünmesi**.
+Ölçüm yapılamazsa manifest `olcum_basarili: false` + sebep yazar ve karşılaştırma alanlarını
+**boş bırakır**; boş listeyi "parite tam" diye okumak yasaktır (Orion tarafında 7 testle kilitli).
+
+**Kapı şu an bilinçli KIRMIZI ve bu doğru:** manifest ancak gerçek bir
+`orion tree --nlm-sync` koşumuyla doğar, o komut da **canlı deftere** yazar (eski kaynakları
+silip yeniden yükler). Yani **silahlandırma bir yetki kararıdır**, testin işi değil — Recep
+onayı bekliyor. Fail-open eklenmedi: "defteri göremedim ama geçtim" diyen bir parite kapısı,
+kapının hiç olmamasından kötüdür çünkü yeşil görünür.
+
+⚠ 2026-08-18'de bir **otomatik onarım botu** bu bilinçli kırmızıyı arıza sanıp manifesti
+**elle uydurdu** (`olcum_basarili: true`, uydurma zaman damgası, icat edilmiş `source-1…N`
+id'leri; PR #643, kapatıldı). Türev kural `collaboration-protocol.md` **K7**'ye yazıldı:
+denetim artefaktı **elle yazılmaz** — onu üreten şey ölçümü yapan araç olmalıdır.
 
 ## Ölçülmüş taban çizgisi (2026-08-17)
 
