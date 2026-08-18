@@ -37,8 +37,12 @@ function inScope(rel: string): boolean {
   return !/\/(materials|core)\//.test(rel) && !/__tests__\/|\.test\./.test(rel)
 }
 
+/**
+ * Yorum sıyırma — `(?<!:)` ŞART: onsuz `https://x` içindeki `//` yorum sanılır ve
+ * satırın geri kalanı silinir; URL arayan dedektör SESSİZCE kör kalır (T081-VH).
+ */
 function stripComments(s: string): string {
-  return s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
+  return s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(?<!:)\/\/[^\n]*/g, '')
 }
 
 /** `useFrame( … )` çağrılarının gövdesini paren-eşleyerek çıkar (callback içi allocate'i izole etmek için). */

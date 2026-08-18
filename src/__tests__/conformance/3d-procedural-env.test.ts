@@ -27,8 +27,12 @@ const SOURCES: Record<string, string> = import.meta.glob('/src/**/*.{ts,tsx}', {
 // <Environment ... files=...> (prosedürel <Environment> = files YOK → eşleşmez).
 const ENV_FILES_RE = /<Environment\s+[^>]*\bfiles\s*=/
 
+/**
+ * Yorum sıyırma — `(?<!:)` ŞART: onsuz `https://x` içindeki `//` yorum sanılır ve
+ * satırın geri kalanı silinir; URL arayan dedektör SESSİZCE kör kalır (T081-VH).
+ */
 function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(?<!:)\/\/[^\n]*/g, '')
 }
 
 describe('INV-3D-4 · prosedürel environment (dosya-Environment YASAK)', () => {
