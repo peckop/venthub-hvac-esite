@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       _migration_ledger: {
@@ -2122,6 +2147,50 @@ export type Database = {
           },
         ]
       }
+      quote_email_events: {
+        Row: {
+          created_at: string
+          email_to: string | null
+          error: string | null
+          id: string
+          provider: string
+          provider_message_id: string | null
+          quote_id: string
+          status: string
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_to?: string | null
+          error?: string | null
+          id?: string
+          provider?: string
+          provider_message_id?: string | null
+          quote_id: string
+          status: string
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_to?: string | null
+          error?: string | null
+          id?: string
+          provider?: string
+          provider_message_id?: string | null
+          quote_id?: string
+          status?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_email_events_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "venthub_quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rate_limits: {
         Row: {
           bucket: string
@@ -3153,6 +3222,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          request_email_sent_at: string | null
           source: string
           source_project_id: string | null
           status: string
@@ -3163,6 +3233,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          request_email_sent_at?: string | null
           source: string
           source_project_id?: string | null
           status?: string
@@ -3173,6 +3244,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          request_email_sent_at?: string | null
           source?: string
           source_project_id?: string | null
           status?: string
@@ -4011,6 +4083,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       contact_department: ["sales", "support", "consulting"],
