@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 /**
- * INV-SCRUB-1 — test takımının KENDİ yorum sıyırıcıları şema-güvenli olmalı.
+ * INV-SCRUB-1 — ölçüm ve otomasyon araçlarının yorum sıyırıcıları şema-güvenli olmalı.
  *
- * ÖLÇÜLEN KATMAN (K6): üretim kodu DEĞİL. Bu kapı yalnızca `src/` altındaki TEST dosyalarının
- * içindeki satır-yorumu sıyırıcı regexlerini ölçer. Yani "ürün doğru mu" değil,
- * **"ürünü ölçen aletler kör mü"** sorusunu sorar.
+ * ÖLÇÜLEN KATMAN (K6): `src/` altındaki TEST dosyaları + `scripts/` altındaki betikler +
+ * `supabase/functions/` altındaki edge fonksiyonları. Sorulan soru "ürün doğru mu" değil,
+ * **"ürünü ölçen ve işleten aletler kör mü"**.
  *
  * NİÇİN VAR (T087-VH · 2026-08-18)
  * ---------------------------------
@@ -42,21 +42,46 @@ declare global {
 }
 
 /**
- * KAPSAM — bilerek `src/` altındaki TÜM test dosyaları.
+ * KAPSAM — üç kök: `src/` test dosyaları, `scripts/` betikleri, `supabase/functions/` edge kodu.
+ * Kapsam iki kez genişletildi ve HER İKİSİNİ DE ölçüm zorladı, tahmin değil.
  *
  * İlk sürüm yalnız `/src/__tests__/**` tarıyordu ve dedektör-sağlık testi bunu YAKALADI:
  * 154 test dosyasının 91'i (%59) o dizinin DIŞINDA yaşıyor (`src/lib/__tests__`,
  * `src/views/admin/__tests__`, bileşen yanı `*.test.tsx`…). Dar kapsam "ihlal yok" derdi ve
  * bu, ölçümden değil körlükten gelen bir yeşil olurdu — kapının kovaladığı kusurun ta kendisi.
  *
- * ÖLÇÜLMEYEN, ADIYLA: `scripts/**` (.cjs) ve `.github/workflows/**` (.yml) içindeki metin
- * sıyırıcıları bu kapının dışındadır — farklı dil, farklı yorum grameri. Oradaki aynı sınıf
- * için ayrı bir kapı gerekir; bu dosya onu ölçtüğünü İDDİA ETMEZ.
+ * İKİNCİ GENİŞLETME (aynı gün): ilk sürüm "`scripts/**` ve `supabase/functions/**` ölçülmüyor"
+ * diye kendi kör noktasını adıyla yazmıştı. O boşluk ÖLÇÜLDÜ: üç kökte de (`scripts` 43 dosya,
+ * `.github` 24, `supabase` 40) ihlal **sıfır** çıktı — yani orada bugün borç YOK. Borç
+ * olmadığı için kapsamı oraya açmak bedava: taban boş kalır, kimse kırmızıya girmez, ama
+ * yarın oraya yazılacak güvensiz bir sıyırıcı ARTIK kapıya takılır.
+ *
+ * O ölçüm önce SAHTE-TEMİZ verdi: probu `printf` ile yazınca `\n` gerçek satır sonuna dönüşüp
+ * deseni bozdu ve üç kökün üçü de "temiz" göründü. Bilerek-boz adımı olmasa "ihlal yok" diye
+ * rapor edilecekti. Prob `node` ile birebir yazıldığında üç kök de ihlali GÖRDÜ. Yani buradaki
+ * sıfır, ölçülmüş bir sıfırdır — ölçülmemiş bir sessizlik değil.
+ *
+ * HÂLÂ ÖLÇÜLMEYEN, ADIYLA: `.github/workflows/**` (.yml). Dedektör orada da çalışıyor (probla
+ * doğrulandı) ama YAML'de bu desen ancak gömülü kabuk/JS içinde geçer; ayrı bir gramer olduğu
+ * için kapsama alınmadı. Bu dosya orayı ölçtüğünü İDDİA ETMEZ.
  */
-const TEST_KAYNAKLARI: Record<string, string> = import.meta.glob(
-  '/src/**/*.{test,spec}.{ts,tsx}',
-  { query: '?raw', import: 'default', eager: true },
-)
+const KAYNAKLAR: Record<string, string> = {
+  ...import.meta.glob('/src/**/*.{test,spec}.{ts,tsx}', {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  }),
+  ...import.meta.glob('/scripts/**/*.{cjs,mjs,js,ts}', {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  }),
+  ...import.meta.glob('/supabase/functions/**/*.ts', {
+    query: '?raw',
+    import: 'default',
+    eager: true,
+  }),
+}
 
 /** Bu dosyanın kendisi — örnek desenleri METİN olarak taşıdığı için ölçüm dışı. */
 const KENDIM = '/src/__tests__/conformance/comment-scrubber-scheme-safety.test.ts'
@@ -142,7 +167,7 @@ function guvensizSatirlar(kaynak: string): number[] {
 
 function ihlalHaritasi(): Map<string, number[]> {
   const harita = new Map<string, number[]>()
-  for (const [yol, kaynak] of Object.entries(TEST_KAYNAKLARI)) {
+  for (const [yol, kaynak] of Object.entries(KAYNAKLAR)) {
     if (yol === KENDIM) continue
     const satirlar = guvensizSatirlar(kaynak)
     if (satirlar.length > 0) harita.set(yol.replace(/^\//, ''), satirlar)
@@ -166,10 +191,10 @@ const TABAN: readonly string[] = [
   'src/__tests__/conformance/purchasing-machine-and-evidence.test.ts', // PRICING
 ]
 
-describe('INV-SCRUB-1 · test takımının kendi yorum sıyırıcıları şema-güvenli', () => {
-  it('dedektör çalışıyor: taranan test dosyası sayısı makul', () => {
+describe('INV-SCRUB-1 · ölçüm ve otomasyon araçlarının yorum sıyırıcıları şema-güvenli', () => {
+  it('dedektör çalışıyor: taranan dosya sayısı makul (test + betik + edge)', () => {
     // Boş/az tarama "temiz" demek değil, "dedektör kör" demektir.
-    expect(Object.keys(TEST_KAYNAKLARI).length).toBeGreaterThan(140)
+    expect(Object.keys(KAYNAKLAR).length).toBeGreaterThan(220)
   })
 
   it('dedektör kendini doğrular: güvensizi yakalar, üç güvenli biçimi ve ilgisizi yakalamaz', () => {
