@@ -179,7 +179,43 @@ describe('INV-LEGAL-3 · taahhüt ↔ mekanizma bağı', () => {
     ).toBe(false)
 
     // Eşik gerçekten dışarıdan alınıyor mu?
-    expect(kodSatirlari).toContain('identityThreshold')
+    //
+    // T077 DÜZELTMESİ — eski hâli `toContain('identityThreshold')` idi ve YEREL SABİT
+    // GÖLGELEMESİNE açıktı: `const identityThreshold = BASKA_SABIT` yazan biri hem bu iddiayı
+    // hem yukarıdaki "12000 gömülmesin" iddiasını geçerdi. Yani kural *"dışarıdan parametre
+    // olarak geliyor"* demek istiyordu, ölçtüğü şey ise *"bu kelime dosyada var"*dı.
+    // Aynı sınıf #620'de INV-CANONICAL-1'i de kandırmıştı. Ad değil, BAĞ aranır.
+
+    // (a) Eşik bir FONKSİYON PARAMETRESİ olmalı — imzanın içinde, gövdede tanımlı değil.
+    const imza = kodSatirlari.match(
+      /export\s+function\s+checkInvoiceIdentity\s*\(([\s\S]*?)\)\s*:/,
+    )
+    expect(
+      imza,
+      'checkInvoiceIdentity imzası bulunamadı — fonksiyon yeniden adlandırıldıysa bu bekçi körleşir.',
+    ).toBeTruthy()
+    expect(
+      /\bidentityThreshold\s*:/.test(imza![1]),
+      'Eşik fonksiyon PARAMETRESİ değil. Gövdede tanımlanan bir sabit bu kuralı sağlamaz — ' +
+        'değer çağıran taraftan geçmelidir.',
+    ).toBe(true)
+
+    // (b) Gövdede aynı adla YEREL TANIM olmamalı (parametreyi gölgeleyip sabitlemesin).
+    expect(
+      /\b(const|let|var)\s+identityThreshold\b/.test(kodSatirlari),
+      'Eşik gövdede yeniden tanımlanmış — parametre gölgeleniyor, dış değer etkisiz kalır.',
+    ).toBe(false)
+
+    // (c) ÇAĞIRAN taraf değeri gerçekten `legal.ts` SSOT alanından geçirmeli.
+    const cagiran = SOURCES['/src/hooks/useCheckoutOrchestrator.ts'] ?? ''
+    expect(
+      /from\s+['"][^'"]*config\/legal['"]/.test(cagiran),
+      'Çağıran `config/legal` SSOT modülünü IMPORT etmiyor — eşik başka yerden geliyor olabilir.',
+    ).toBe(true)
+    expect(
+      /checkInvoiceIdentity\([\s\S]{0,400}?invoiceIdentityThreshold/.test(cagiran),
+      'checkInvoiceIdentity çağrısına `legalConfig.invoiceIdentityThreshold` geçirilmiyor.',
+    ).toBe(true)
   })
 
   it('kurumsal fatura eşikten bağımsız — gevşeme kurumsala sızmamış', () => {
