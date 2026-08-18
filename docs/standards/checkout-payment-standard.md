@@ -118,9 +118,22 @@ uygulamaya hiç değmez. A'nın uyum tarafında ek maliyeti yoktur.
 ### A1 — CSP genişletmesi (zorunlu, sahibi LEGAL-SEO)
 
 `script-src` · `frame-src` · `form-action` · `connect-src` → PSP alan adına izin verir.
-`frame-src` bugüne dek **hiç tanımlı değildi**; tanımsız direktif `default-src`'ye düşer, yani
-"yok" ile "kapalı" aynı sonucu verir. Dördünden biri eksikse dal **sessizce** ölür (K3).
-Zorlayıcı: `INV-PAY-RENDER-1` R5.
+Dördünden biri eksikse dal **sessizce** ölür (K3). Zorlayıcı: `INV-PAY-RENDER-1` R5.
+
+> **İKİ DÜZELTME (2026-08-18, LEGAL-SEO ölçümüyle).** Bu bölümün ilk hâlinde iki yanlış vardı
+> ve ikisi de aynı kökten geliyordu — **bayat kaynaktan okumak**:
+> 1. "`frame-src` hiç tanımlı değil" YANLIŞTI. Direktif `origin/master`'da **vardır**
+>    (`'self'` + youtube + cloudflarestream, PR #630). Yanlış okuma, depoda `master`'ın
+>    gerisinde park etmiş bir çalışma dizininden yapılmıştı.
+> 2. Başlık **`Content-Security-Policy-Report-Only`**'dir — yani CSP bugün **hiçbir şeyi
+>    engellemiyor**. Dolayısıyla ödeme formunun açılmaması **CSP kaynaklı değildi**; sebep
+>    tamamen istemci kodudur (§6 girişindeki üç kusur).
+>
+> **Bunun R5'i geçersiz kılmadığı** özellikle not edilir: rapor-only rejimde eksik ya da
+> yanlış bir liste **yeşil görünür** ve hata ancak `enforce` gününe saklanır — üstelik o gün
+> ödeme yolunda patlar. R5 tam olarak bu gecikmiş patlamayı önlemek içindir.
+> Ders kaydı: [[measurement-source-disk-vs-repo]] — otorite `origin/master`'dır, çalışma
+> dizini değil.
 
 ### A2 — Enjeksiyon güvenliğinin sınırı **CSP'dir** (yeni kural, K7)
 

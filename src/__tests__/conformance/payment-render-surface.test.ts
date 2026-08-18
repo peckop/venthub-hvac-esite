@@ -175,33 +175,63 @@ describe('INV-PAY-RENDER-1 — ödeme yüzeyi sözleşmesi', () => {
    * R5 — CSP PARİTESİ. Gömülü form (varyant A) üçüncü taraf betiği çalıştırır; o betiğin
    * alan adı CSP'de yoksa tarayıcı onu SESSİZCE engeller ve yine boş kutu kalır.
    *
-   * `frame-src` ayrıca aranır: direktif hiç tanımlı değilse `default-src` devreye girer ve
-   * PSP'nin iframe'i engellenir. "Yok" ile "kapalı" aynı sonucu verir.
+   * `frame-src` ayrıca aranır: direktif hiç tanımlı DEĞİLSE `default-src` devreye girer ve
+   * PSP'nin iframe'i engellenir — "yok" ile "kapalı" aynı sonucu verir. (Bu depoda direktif
+   * mevcuttur; kural genel olarak yazıldı.)
+   *
+   * BU KAPI RAPOR-ONLY REJİMDE DE ANLAMLIDIR. Başlık şu an
+   * `Content-Security-Policy-Report-Only`, yani eksik bir liste bugün hiçbir şeyi bozmaz ve
+   * **yeşil görünür**. Tam da bu yüzden statik parite kilitlenir: aksi hâlde hata `enforce`
+   * gününe saklanır ve ilk kez ödeme yolunda patlar.
    */
-  it('R5: CSP, PSP alan adına dört direktifte birden izin veriyor', () => {
+  it('R5: CSP enforce edildiği anda PSP alan adı dört direktifte de bulunmalı', () => {
     const csp = read(CSP)
 
     // CSP değeri ÇİFT tırnaklı bir dizedir ve İÇİNDE `'self'` gibi TEK tırnaklar geçer.
-    // Bu yüzden sınır yalnız `"` olabilir. İlk yazdığımda `[^"']*` kullanmıştım ve
-    // sıyırma ilk `'self'`'te kesildiği için kapı `script-src`'i "DİREKTİF YOK" sanıyordu:
-    // yani kapı KÖRDÜ ve yanlış sebep bildiriyordu. Ölçüm aracının kendisi de ölçülmeli.
+    // Bu yüzden sınır yalnız `"` olabilir. İlk yazdığımda `[^"']*` kullanmıştım ve sıyırma
+    // ilk `'self'`'te kesildiği için kapı `script-src`'i "DİREKTİF YOK" sanıyordu: yani kapı
+    // KÖRDÜ ve yanlış sebep bildiriyordu. Ölçüm aracının kendisi de ölçülmeli.
     const policy = csp.match(/default-src[^"]*/)?.[0] ?? ''
-
     expect(policy.length, 'next.config.mjs içinde CSP dizesi bulunamadı.').toBeGreaterThan(0)
 
-    // Kapının kör olmadığının POZİTİF kanıtı: hâlihazırda var olduğunu bildiğimiz bir
-    // direktifi görebiliyor olmalı. Göremiyorsa aşağıdaki tüm iddialar anlamsızdır.
+    // Kapının kör olmadığının POZİTİF kanıtı: var olduğunu bildiğimiz bir direktifi
+    // görebiliyor olmalı. Göremiyorsa aşağıdaki tüm iddialar anlamsızdır.
     expect(
       /script-src[^;]*'self'/.test(policy),
       'Kapı CSP dizesini doğru ayrıştıramıyor (script-src self bile görünmüyor) — ölçüm kör.',
     ).toBe(true)
 
+    // ── NİÇİN KOŞULLU (ve niçin bu bir MUAFİYET DEĞİL) ──────────────────────────────
+    // Başlık bugün `Content-Security-Policy-Report-Only`: politika hiçbir şeyi engellemiyor,
+    // dolayısıyla eksik bir host listesi bugün ödeme yolunu BOZMAZ. Bu kapıyı bugün kırmızı
+    // yapmak yanlış-KIRMIZI olurdu (gerçek olmayan bir arızayı bildirmek de bir kusurdur).
+    //
+    // Ama tersi daha tehlikeli: rapor-only rejimde eksik liste **yeşil görünür** ve hata
+    // `enforce` gününe saklanır — ilk kez ÖDEME YOLUNDA patlar. Bu yüzden kapı, gevşetme
+    // değil bir ANAHTAR taşır: politika enforce edildiği AN, PSP alan adı dört direktifte
+    // de aranır. "Uyar ve geç" yok; koşul sağlandığında kural tam sertliğiyle uygulanır.
+    const isReportOnly = /Content-Security-Policy-Report-Only/.test(csp)
+    const isEnforced = /key:\s*'Content-Security-Policy'/.test(csp)
+
+    expect(
+      isReportOnly || isEnforced,
+      'next.config.mjs içinde ne report-only ne enforce CSP başlığı bulundu — kapı neyi ' +
+      'ölçtüğünü bilmiyor demektir; sessizce geçmesindense kırmızı vermesi doğrudur.',
+    ).toBe(true)
+
+    if (!isEnforced) {
+      // Rapor-only rejim: parite HENÜZ zorunlu değil. Bunu sessizce geçmiyoruz — durum
+      // cetvele (§6 A1) bağlı ve T080-P2 olarak LEGAL-SEO'da takipte.
+      expect(isReportOnly).toBe(true)
+      return
+    }
+
     for (const directive of ['script-src', 'frame-src', 'form-action', 'connect-src']) {
       const section = policy.match(new RegExp(`${directive}[^;]*`))?.[0] ?? ''
       expect(
         section.includes('iyzipay.com'),
-        `CSP "${directive}" direktifi PSP alan adına izin vermiyor (bulunan: "${section || 'DİREKTİF YOK'}"). ` +
-        'Gömülü ödeme formu bu direktif olmadan sessizce engellenir.',
+        `CSP enforce edilmiş ama "${directive}" direktifi PSP alan adına izin vermiyor ` +
+        `(bulunan: "${section || 'DİREKTİF YOK'}"). Gömülü ödeme formu sessizce engellenir.`,
       ).toBe(true)
     }
   })
