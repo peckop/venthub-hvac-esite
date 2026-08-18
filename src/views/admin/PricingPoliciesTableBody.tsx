@@ -15,6 +15,9 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
+import PricingPolicyFormModal, {
+  type PolicyFormValue,
+} from '../../components/admin/pricing/PricingPolicyFormModal'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { formatDateTime } from '../../i18n/datetime'
@@ -22,10 +25,12 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import type { Database } from '../../types/database.types'
 import {
+  adminButtonPrimaryClass,
   adminButtonSecondaryClass,
   adminCardPaddedClass,
   adminInputClass,
   adminSectionTitleClass,
+  adminTableActionClass,
 } from '../../utils/adminUi'
 
 /**
@@ -56,6 +61,8 @@ interface PolicyRow {
   id: string
   scope: number
   scopeKey: ScopeKey
+  /** Duzenleme formuna tasinir; hangi sutunda durdugu `scope`'a baglidir. */
+  targetId: string | null
   targetName: string
   fxLock: boolean
   frozenRate: number | null
@@ -105,6 +112,7 @@ async function policiesFetcher(
     id: p.id,
     scope: p.scope,
     scopeKey: SCOPE_KEYS[p.scope] ?? 'global',
+    targetId: p.brand_id ?? p.category_id ?? p.product_id ?? null,
     targetName:
       p.scope === 2
         ? brandName.get(p.brand_id ?? '') ?? ''
@@ -263,6 +271,33 @@ const PricingPoliciesTableBody: React.FC = () => {
     syncUrl: true,
   })
 
+  const [formOpen, setFormOpen] = useState(false)
+  const [editing, setEditing] = useState<PolicyFormValue | null>(null)
+
+  const openNew = useCallback(() => {
+    setEditing(null)
+    setFormOpen(true)
+  }, [])
+
+  /**
+   * Satirdan forma gecerken TARIHSEL KUNYE de tasinir: kilit kapaliyken duran
+   * `fx_frozen_rate`, form icinde "su anki kur" gibi gorunmesin diye ayrica
+   * etiketlenir (kararin sahibi bu deger degil, gecmisteki bir olcumdur).
+   */
+  const openEdit = useCallback((row: PolicyRow) => {
+    setEditing({
+      id: row.id,
+      scope: row.scope,
+      targetId: row.targetId,
+      fxLock: row.fxLock,
+      note: row.note ?? '',
+      priority: row.priority,
+      isActive: row.isActive,
+      frozenRate: row.frozenRate,
+    })
+    setFormOpen(true)
+  }, [])
+
   const columns = useMemo<AdminColumn<PolicyRow>[]>(
     () => [
       {
@@ -315,13 +350,33 @@ const PricingPoliciesTableBody: React.FC = () => {
           </span>
         ),
       },
+      {
+        key: 'actions',
+        header: t('admin.common.actions'),
+        cell: (r) => (
+          <button type="button" className={adminTableActionClass} onClick={() => openEdit(r)}>
+            {t('admin.common.edit')}
+          </button>
+        ),
+      },
     ],
-    [t, lang],
+    [t, lang, openEdit],
   )
 
   return (
     <div className="space-y-6 pb-20">
       <EffectiveLockPanel />
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          className={adminButtonPrimaryClass}
+          onClick={openNew}
+          disabled={!canWrite('pricing')}
+        >
+          {t('admin.pricing.policies.form.titleNew')}
+        </button>
+      </div>
 
       <DataTableKit
         table={table}
@@ -344,6 +399,13 @@ const PricingPoliciesTableBody: React.FC = () => {
             description={t('admin.pricing.policies.empty.description')}
           />
         }
+      />
+
+      <PricingPolicyFormModal
+        open={formOpen}
+        policy={editing}
+        onClose={() => setFormOpen(false)}
+        onSaved={() => void table.reload()}
       />
     </div>
   )
