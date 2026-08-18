@@ -24,6 +24,7 @@ import { formatDateTime } from '../../i18n/datetime'
 import { useI18n } from '../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import type { Database } from '../../types/database.types'
+import { orIlikeContains } from '../../utils/adminQueryFilters'
 import {
   adminButtonPrimaryClass,
   adminButtonSecondaryClass,
@@ -146,6 +147,9 @@ const EffectiveLockPanel: React.FC = () => {
   const [result, setResult] = useState<
     | { kind: 'notFound' }
     | { kind: 'found'; label: string; decision: FxLockDecision; winnerScope: ScopeKey | null }
+    /* Sorgu ÇALIŞMADI. `notFound` ile aynı kovaya konursa arıza "ürün yok" kılığına
+       girer — sessiz-boş sınıfının en pahalı biçimi, çünkü admin aramayı bırakır. */
+    | { kind: 'failed' }
     | null
   >(null)
 
@@ -155,11 +159,22 @@ const EffectiveLockPanel: React.FC = () => {
     setBusy(true)
     setResult(null)
     try {
-      const { data: products } = await supabaseBrowserClient
+      const { data: products, error: searchError } = await supabaseBrowserClient
         .from('products')
         .select('id, name, sku, brand, category_id')
-        .or(`sku.ilike.%${q}%,name.ilike.%${q}%`)
+        /* Kullanıcı metni filtre GRAMERİNE gömülmez (T078-VH). */
+        .or(orIlikeContains(['sku', 'name'], q))
         .limit(1)
+
+      /* HATA DALI YUTULMUYOR — bu dosyada 2026-08-17'de düzeltildi. Eskiden yalnız
+         `data` alınıyordu; sorgu HATA verse bile `products` null oluyor ve akış
+         "ürün bulunamadı"ya düşüyordu. Yani arıza, admin'e "böyle bir ürün yok"
+         diye YALAN söylüyordu. Boş sonuç ile başarısız sorgu ayrı şeylerdir ve
+         ayrı görünmelidir; kusuru #619'da ben yazmıştım. */
+      if (searchError) {
+        setResult({ kind: 'failed' })
+        return
+      }
 
       const product = products && products.length > 0 ? products[0] : null
       if (!product) {
@@ -226,6 +241,14 @@ const EffectiveLockPanel: React.FC = () => {
       {result?.kind === 'notFound' && (
         <p role="status" className="mt-4 text-sm text-admin-warning">
           {t('admin.pricing.policies.effective.notFound')}
+        </p>
+      )}
+
+      {/* `role="alert"`: "sonuç yok" bir bilgi, "sorgu çalışmadı" bir ARIZADIR;
+          ekran okuyucuya da farklı önemde duyurulmalı. */}
+      {result?.kind === 'failed' && (
+        <p role="alert" className="mt-4 text-sm text-admin-danger">
+          {t('admin.pricing.policies.effective.failed')}
         </p>
       )}
 

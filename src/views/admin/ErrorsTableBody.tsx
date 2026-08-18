@@ -17,6 +17,7 @@ import { useTenant } from '../../hooks/useTenant'
 import { formatDateTime } from '../../i18n/datetime'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { Database } from '../../types/database.types'
+import { orIlikeContains } from '../../utils/adminQueryFilters'
 import { adminInputClass, adminSelectClass, adminSelectStyle } from '../../utils/adminUi'
 
 /* ---- model ---- */
@@ -54,8 +55,8 @@ async function errorsFetcher(
   if (level) query = query.eq('level', level)
   if (env) query = query.eq('env', env)
   if (params.query) {
-    const like = `%${params.query}%`
-    query = query.or(`url.ilike.${like},message.ilike.${like}`)
+    /* Kullanıcı metni filtre GRAMERİNE gömülmez (T078-VH). */
+    query = query.or(orIlikeContains(['url', 'message'], params.query))
   }
 
   const offset = (params.page - 1) * params.pageSize

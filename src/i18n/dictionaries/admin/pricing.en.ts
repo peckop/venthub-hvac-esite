@@ -9,6 +9,9 @@ export const pricing = {
       check: "Look up",
       checking: "Looking up...",
       notFound: "No product matched this search.",
+      // "No results" and "the query failed" are DIFFERENT things: showing the second
+      // as the first lies to the admin and hides the fault.
+      failed: "The lookup could not run, so NO result is shown. This does NOT mean the product is missing - please retry.",
       locked: "Locked - FX movement does not affect this product price.",
       unlocked: "Not locked - FX movement flows into this product price.",
       winner: "Deciding scope: {{scope}} - frozen rate: {{rate}}"
