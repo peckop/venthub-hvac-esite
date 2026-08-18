@@ -140,9 +140,19 @@ const CheckoutPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-light-gray" data-testid="checkout-root">
+      {/*
+        Örtü YALNIZ gerçekten bir şey beklenirken görünür.
+
+        ESKİDEN: `step === 4 && !payment.formReady` idi ve `setFormReady` HİÇBİR YERDE
+        çağrılmıyordu → `formReady` kalıcı `false` → örtünün kapanma koşulu yoktu; form
+        kusursuz render olsa bile üstünü örtmeye devam ederdi. Üstelik aşama `loading ? 1 : 2`
+        ile seçildiği için hata hâlinde de "Güvenli form yükleniyor" yazıyordu, yani ARIZA
+        İLERLEMEDEN AYIRT EDİLEMİYORDU (T080). Artık aşama ayrık: hata örtüyü kaldırır ve
+        kullanıcı `PaymentIframeContainer` içinde gerçek hata yüzeyini görür.
+      */}
       <SecurePaymentOverlay
-        overlayVisible={step === 4 && !payment.formReady}
-        overlayStep={payment.loading ? 1 : 2}
+        overlayVisible={step === 4 && (payment.phase === 'starting' || payment.phase === 'formLoading')}
+        overlayStep={payment.phase === 'starting' ? 1 : 2}
         overlayPercent={payment.progressPct}
         t={t}
       />
@@ -233,7 +243,12 @@ const CheckoutPage: React.FC = () => {
                   showHelp={showHelp}
                   setShowHelp={setShowHelp}
                   progressPct={payment.progressPct}
-                  overlayStep={payment.loading ? 1 : 2}
+                  overlayStep={payment.phase === 'starting' ? 1 : 2}
+                  phase={payment.phase}
+                  errorMessage={payment.errorMessage}
+                  onFormReady={payment.markFormReady}
+                  onFormFailed={payment.markFormFailed}
+                  onRetry={payment.initiatePayment}
                   t={t}
                 />
               )}
