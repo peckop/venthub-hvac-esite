@@ -352,9 +352,82 @@ gelmemişse `success=false` kalır ve alarm sürer.
 **Etki bugün:** prod'da 0 sipariş var, yani geçmiş veri düzeltmesi gerekmiyor; ama
 kusur canlıya çıktığı ilk stoksuz-kalem siparişinde tetiklenir.
 
+### 13.6 M7 — `search_path` illüzyonu (aynı pakette düzeltilecek)
+
+**Bulgu LEGAL'den, prod'da KENDİM DOĞRULADIM (2026-08-17).** Yazdığım yedi fonksiyon
+(`adjust_stock` ×2, `set_stock` ×2, `process_goods_receipt`,
+`process_order_stock_reduction`, `process_order_stock_restore`) şu satırı taşıyor:
+
+```sql
+set search_path = 'pg_catalog, public'   -- ❌ TEK TIRNAK: tek bir isim
+```
+
+`pg_proc.proconfig` bunu `search_path="pg_catalog, public"` olarak saklıyor — yani
+**"pg_catalog, public" adında tek bir şema**. Böyle bir şema yok, dolayısıyla arama
+yolu fiilen boş.
+
+**Davranış ölçümü (transaction + rollback, prod'a yan etki yok):**
+
+| Ayar | Geçici tablo YOKken | Oturumda `CREATE TEMP TABLE products` VARken |
+|---|---|---|
+| `"pg_catalog, public"` (bugünkü 7 fn) | **NULL** — çözülmez | **geçici tabloyu bulur** ⚠️ |
+| `public` | `public.products` | **geçici tabloyu bulur** ⚠️ |
+| `public, pg_temp` | `public.products` | **`public.products`** ✅ |
+
+> **İlk taslakta yanıldım, ölçüm düzeltti.** "`pg_temp` ASLA yazılmaz" diye yazmıştım;
+> OPS-AUDIT itiraz etti ve haklı çıktı. PostgreSQL'de `pg_temp` search_path'te **açıkça
+> listelenmezse relation aramasında ÖRTÜK OLARAK İLK** sıradadır. Yani `public` tek başına
+> yazıldığında çağıran, kendi oturumunda `CREATE TEMP TABLE products` yapıp SECURITY DEFINER
+> fonksiyonuna **gölge tablo yedirebilir**. `pg_temp`'i açıkça SONA yazmak örtük-ilk kuralını
+> devre dışı bırakır — resmî güvenli biçim budur.
+>
+> Aynı ölçüm bugünkü kusuru da ağırlaştırıyor: bozuk tırnaklı ayar yalnız "hiçbir şey
+> yapmıyor" değil, **aktif olarak savunmasız** — arama yolu boş olduğu için niteliksiz bir
+> referans doğrudan geçici tabloya düşer.
+
+**Neden bugün patlamıyor:** yedi fonksiyonun gövdesi de her nesneyi `public.` ile tam
+niteliyor. Yani satır *koruma sağlıyor* sanılıyor ama **hiçbir şey yapmıyor** — gövdeye
+eklenecek ilk niteliksiz referans anında patlar. Bu bir "illüzyon-sertleştirme": en
+tehlikeli hâli, çünkü denetimde ✅ gibi okunur.
+
+#### Cetvel kuralı — tek doğru desen (yeni fonksiyonlar bunu kopyalasın)
+
+```sql
+set search_path = public, pg_temp     -- ✅ tırnaksız liste; pg_temp EN SONDA
+```
+
+- **`pg_temp` MUTLAKA ve EN SONDA yazılır.** Yazılmazsa relation aramasında örtük olarak
+  **ilk** sıraya geçer ve çağıranın geçici tablosu uygulama tablosunu gölgeler (yukarıdaki
+  ölçüm). Açıkça sona yazmak bu davranışı kapatır.
+- **`pg_catalog` AÇIKÇA YAZILMAZ.** Yazılmazsa örtük olarak *ilk* aranır; yazılırsa
+  yazıldığı sıraya düşer. Bu yüzden `public, pg_catalog` **yanlıştır** — `public`'te
+  aynı adlı bir nesne varsa çekirdek fonksiyonun önüne geçer.
+- Ek şema gerekiyorsa `public` ile `pg_temp` **arasına** girer
+  (ör. webhook fonksiyonu: `set search_path = public, net, vault, pg_temp`).
+- `search_path = ''` (tam niteleme zorunlu) daha katı bir alternatiftir ama **gerekmiyor**:
+  ölçüldü, `public` şemasında `anon`/`authenticated`/`service_role` için **CREATE yetkisi
+  YOK**, yani `public` üzerinden gölgeleme mümkün değil.
+
+#### Planlanan düzeltme (migration — M5/M6 ile AYNI pakette)
+
+Yedi fonksiyon `create or replace` ile yeniden tanımlanır; **tek değişiklik `set` satırı**,
+gövdeler aynen korunur. Sonrasında `proconfig` prod'dan yeniden okunur; **beklenen tek değer**
+`{"search_path=public, pg_temp"}`'tir — yani yukarıdaki tek doğru desenin ta kendisi.
+`{search_path=public}` (pg_temp'siz) bir okuma **KABUL DEĞİLDİR**: gövde tam nitelikli olsa bile
+çağıranın geçici tablosu örtük-ilk kuralıyla öne geçebilir (§13.6 ölçüm tablosu, 2. sütun).
+Ardından mal kabul + stok düşme yolları bir kez çalıştırılıp **pozitif çapa** alınır.
+
+> **Depo geneli (ölçüldü):** 28 SECURITY DEFINER fonksiyonunda **7 ayrı desen** var.
+> 7'si bu bozuk biçimde (benim — M7 kapatır); **6'sı `public, pg_temp` yani ZATEN DOĞRU**
+> (ilk taslakta yanlışlıkla riskli demiştim, düzeltildi); 3'ü `public, pg_catalog`
+> (`pg_temp` yok → gölgelenebilir, ayrıca sıra ters). Şeridim dışındakiler OPS-AUDIT'e
+> iletildi. Bu cetvel yalnız kendi fonksiyonlarımı bağlar ama **doğru örnek** olarak durur.
+
 ### 13.5 Uygulama notları
 
 - Tek migration yeterli (maddeler aynı fonksiyon/tablo kümesini ilgilendiriyor, aynı işlemde).
+- **M7 de aynı migration'a girer** — yedi fonksiyon başka türlü yeniden tanımlanmasa bile
+  `set` satırı için yeniden tanım gerekir; ayrı migration açmak ledger'ı gereksiz şişirir.
 - Damga gerçek saat 14 hane; ledger bayt-sırasının arkasına düşmeli (§9).
 - **Sıra önemli:** önce tetik, sonra grant kısıtı. Ters sırada, grant çekilirken servis
   yazma yolu kısa süre kısıtlı ama kuralsız kalır.
