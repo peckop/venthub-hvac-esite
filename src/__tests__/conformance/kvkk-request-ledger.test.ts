@@ -71,6 +71,22 @@ function source(path: string): string {
   return src
 }
 
+/** `fnName(` ÇAĞRISININ argüman gövdesi; import satırı `fnName(` içermez → doğal olarak atlanır. */
+function callArgs(src: string, fnName: string): string | null {
+  const idx = src.indexOf(`${fnName}(`)
+  if (idx === -1) return null
+  let depth = 0
+  const start = idx + fnName.length
+  for (let i = start; i < src.length; i++) {
+    if (src[i] === '(') depth++
+    else if (src[i] === ')') {
+      depth--
+      if (depth === 0) return src.slice(start + 1, i)
+    }
+  }
+  return null
+}
+
 /**
  * `check (col in ('a','b'))` ve `check (col = any (array['a','b']))` biçimlerinin İKİSİNİ de
  * okur: kolon adı + kısıt anahtar sözcüğünden (`in` / `= any`) sonraki İLK değer listesini
@@ -112,8 +128,13 @@ describe('INV-KVKK-1 · veri sahibi talep defteri', () => {
     expect(thirtyDayMath.test(serviceSrc), 'servis 30 günü kendisi hesaplıyor').toBe(false)
     expect(thirtyDayMath.test(bodySrc), 'admin yüzeyi 30 günü kendisi hesaplıyor').toBe(false)
 
-    // due_at DB'den OKUNUYOR olmalı
-    expect(serviceSrc).toContain('due_at')
+    // due_at DB'den OKUNUYOR olmalı — T077/F1: yalın `toContain('due_at')` rename-körüydü;
+    // o sözcük tip/yorum/başka sorguda da geçer, sıralama silinse bile yeşil kalırdı.
+    // Ölçülen şey artık defterin SON TARİHE göre sıralanması (cetvel §3.5: en yakın süre üstte).
+    expect(
+      serviceSrc,
+      'liste due_at ile ARTAN sıralanmıyor — gecikmeye yakın talep listenin dibinde kaybolur',
+    ).toMatch(/\.order\(\s*'due_at'\s*,\s*\{\s*ascending:\s*true/)
     // insert payload'ında due_at YAZILMAMALI (DB default'u koyar)
     // Yalnız payload NESNESİ denetlenir — `TablesInsert` sözcüğünün ilk geçtiği yer IMPORT
     // satırıdır; oradan dilimlemek tüm dosyayı kapsar ve iddiayı körleştirir (ilk hâli öyleydi).
@@ -136,7 +157,14 @@ describe('INV-KVKK-1 · veri sahibi talep defteri', () => {
 
   it('R4: gecikme UI\'da görünür (izlenen kutu şartı)', () => {
     const bodySrc = stripTsComments(source('/src/views/admin/AdminDataRequestsTableBody.tsx'))
-    expect(bodySrc).toContain('computeDueState')
+    // T077/F3: `toContain('computeDueState')` IMPORT satırıyla tatmin olurdu — hesap
+    // sökülse bile yeşil kalırdı. ÇAĞRI + satırın argüman olarak geçmesi ölçülür.
+    const dueArgs = callArgs(bodySrc, 'computeDueState')
+    expect(dueArgs, 'computeDueState ÇAĞRISI yok — import tek başına kapıyı geçmez').not.toBeNull()
+    expect(
+      dueArgs!.trim(),
+      'computeDueState fakir argümanla çağrılmış — değerlendirilecek satır geçilmiyor',
+    ).not.toBe('')
     expect(bodySrc).toMatch(/overdue/)
     // Gecikme görsel olarak ayrışmalı (hata rengi + uyarı ikonu)
     expect(bodySrc).toMatch(/text-error-red/)
@@ -189,5 +217,12 @@ describe('INV-KVKK-1 · veri sahibi talep defteri', () => {
     );`
     expect(parseCheckValues(sql, 'status')).toEqual(['a', 'b'])
     expect(parseCheckValues(sql, 'nonexistent_column')).toEqual([])
+  })
+
+  it('callArgs sağlığı: IMPORT satırıyla tatmin OLMUYOR (T077 yanlış-pozitif koruması)', () => {
+    // R4'ün dayanağı bu: sadece import varken null dönmeli, gerçek çağrıda argüman dönmeli.
+    expect(callArgs("import { computeDueState } from '@/lib/kvkk/dueState'\n", 'computeDueState')).toBeNull()
+    expect(callArgs('const d = computeDueState(r, now)', 'computeDueState')).toBe('r, now')
+    expect(callArgs('computeDueState()', 'computeDueState')).toBe('')
   })
 })
