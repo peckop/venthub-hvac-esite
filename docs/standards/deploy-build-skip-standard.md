@@ -188,6 +188,36 @@ Bilerek bozularak kanıtlandı:
 (sabotaj `git diff HEAD^` değil `git rev-parse HEAD^` yazıyordu). Yakalayan şey
 davranış testiydi — metin arayan kapının neyi göremediğinin canlı örneği.
 
+## D9 — Kota reddi bir COMMIT harcar (ölçüldü, tahmin çürüdü)
+
+Bu cetvelin varlık sebebi dağıtım israfı, o yüzden kotanın **gerçek** davranışı buraya yazılır.
+
+**Çürüyen model:** "son dağıtımdan ~20 dk sonra gönderim geçer". Vercel'in kendi
+kayıtları bunu reddetti (2026-08-18):
+
+```
+06:49 · 06:50 · 06:53 · 06:54 · 06:57 · 07:04 · 07:04   ← 15 dakikada YEDİ dağıtım
+...
+11:21 geçti (8 dk sonra)   ·   11:33 REDDEDİLDİ (12 dk sonra)
+```
+
+Sabit bir aralık bu veriyi açıklayamaz. **Aralık tahminine dayalı plan kurmayın.**
+
+**Asıl operasyonel kural — asimetri buradadır:**
+
+| Olgu | Sonuç |
+|---|---|
+| Reddedilen deneme **deployment yaratmaz** | Beklemek bedavadır |
+| Reddedilen deneme kırmızı bir **commit status** bırakır | Ve o status **depo tarafından yeniden tetiklenemez** |
+| Yeni deneme = **yeni commit** | ⇒ **kör tekrar COMMIT harcar** |
+
+Yani "olmadıysa tekrar dene" burada masumca bir davranış değil; her denemenin bedeli
+bir commit'tir. Force-push bu depoda yasak olduğu için `--amend` ile kaçamak da yok.
+
+**Bedava prob:** başka bir şeridin açık PR'ında, senin reddinden **sonra** yazılmış bir
+`pending`/`success` Vercel status'u ara. Varsa pencere açıktır. Kendi commit'ini
+harcamadan ölçmenin bilinen tek yolu budur.
+
 ### Geri alma
 
 Ignored Build Step *Behavior*'ı **Automatic**'e çevirmek yeterli; repoda değişiklik
