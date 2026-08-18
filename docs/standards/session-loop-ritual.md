@@ -43,6 +43,28 @@ kur, yoksa zincir sessizce ölür. İşim varken sık (5-10dk), boşken seyrek (
 
 ---
 
+## Her iki komuttan SONRA: YEDEK CRON (zorunlu adım)
+
+Dinamik zincir (`ScheduleWakeup`) **tek noktadan** kopabiliyor: Recep araya girdiğinde tur
+biter ve zincir yeniden kurulmazsa oturum sessizce uyur. Bu yüzden komutu yapıştırdıktan
+sonra her oturum **ikinci bir kanal** kurar:
+
+```
+CronCreate ile 30 dakikalık recurring iş: prompt = o pencerenin KOMUT-A/KOMUT-B metni
+```
+
+- **Dakika 0/30 SEÇME** (ör. `23,53 * * * *`). Herkesin `0/30` seçmesi filoyu aynı ana
+  yığıyor; ayrıca kendi turlarımız da üst üste gelir.
+- Cron **yalnız yedektir**: birincil kanal `ScheduleWakeup`. Cron tetiklerse tur kısa tutulur
+  ve dinamik zincir **yeniden kurulur**.
+- Cron **oturum ömürlüdür** (diske yazılmaz, Claude kapanınca gider) ve **7 günde** kendini
+  siler. Yani sabah pencere yenilendiğinde bu adım da yeniden yapılır.
+- Kurduktan sonra **iş kimliğini panoya bildir** — "kurdum" demek yetmez, kanıt iş kimliğidir.
+
+> Bu adımı **insan hatırlatmaz**: `board-brief` kancası, şerit talep etmemiş taze bir oturuma
+> `LOOP:` satırıyla bunu kendisi söyler (T085-VH, bekçi `INV-BOARD-5`). Şerit alınınca satır
+> kendiliğinden susar — sessizlik kuralı korunur.
+
 ## Notlar
 
 - **Gece kesintisiz otonomi** isteniyorsa bu ritüel yetmez (makine kapanınca durur) →

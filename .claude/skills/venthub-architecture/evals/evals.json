@@ -2,16 +2,16 @@
   "should_trigger": [
     "yeni bileşen oluştur",
     "RSC render",
-    "PPR config",
+    "render cache stratejisi",
     "dashboard için yeni bileşen oluştur",
     "can you configure RSC render for the product page?",
-    "PPR config ayarlarını Next.js App Router ile yap",
+    "useSearchParams kullanan bileşeni Suspense sınırına al",
     "I need to yeni bileşen oluştur for the HVAC controls",
     "RSC render stratejisini server component'lar için belirle",
-    "how do I set up PPR config for partial prerendering?",
+    "should this page be static or ISR?",
     "yeni bileşen oluştur: filtre sidebar'ı",
     "optimize the RSC render pipeline for streaming",
-    "PPR config ile dinamik ve statik kısımları ayır"
+    "bu sayfa hangi render stratejisiyle üretilmeli"
   ],
   "should_not_trigger": [
     "React compound component pattern uygula",
@@ -21,6 +21,8 @@
     "change the color palette for dark mode",
     "translate component labels to English",
     "run lighthouse performance audit",
-    "write an RLS security policy"
+    "write an RLS security policy",
+    "PPR config ayarlarını Next.js App Router ile yap",
+    "how do I set up PPR config for partial prerendering?"
   ]
 }

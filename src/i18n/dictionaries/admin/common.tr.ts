@@ -14,6 +14,8 @@ export const common = {
   filter: 'Filtrele',
   noResults: 'Sonuç bulunamadı',
   loading: 'Yükleniyor...',
+  loadError: 'Veriler yüklenemedi',
+  newBlockTitle: 'Yeni Başlık',
   success: 'İşlem başarılı',
   error: 'Bir hata oluştu',
   ready: 'Hazır',
@@ -57,4 +59,17 @@ export const common = {
   saving: 'Kaydediliyor...',
   settingsLoading: 'Ayarlar içeriği yükleniyor...',
   invalidCategory: 'Geçersiz Kategori Kimliği (ID Not Found)',
+  /**
+   * Paylaşılan takip numarası onayı. `common`'da duruyor çünkü İKİ yüzey kullanıyor:
+   * sipariş kargo modalı ve lojistik toplu yazımı. Ayrı ayrı yazılsaydı iki çeviri
+   * zamanla ayrışır ve aynı karar kullanıcıya iki farklı cümleyle sorulurdu.
+   */
+  sharedTracking: {
+    title: 'Bu takip numarası başka bir siparişte kayıtlı',
+    description:
+      '{{count}} sipariş, başka bir siparişte zaten kayıtlı olan bir takip numarası taşıyor. Farklı müşterilere aynı takip linki giderse her müşteri BAŞKASININ kolisini görür. Bu siparişler gerçekten tek bir birleştirilmiş koliyle mi gönderiliyor?',
+    confirmLabel: 'Evet, birleştirilmiş gönderi',
+    cancelLabel: 'Hayır, numaraları düzelteyim',
+    declined: 'Kargo bilgisi yazılmadı — paylaşılan takip numarası onaylanmadı.',
+  },
 };

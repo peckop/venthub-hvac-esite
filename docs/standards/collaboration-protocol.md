@@ -59,6 +59,50 @@ o Controller işini kendi dalına alır, kendi gate'ler ve merge eder.
 **K5 — Merge hijyeni.** Her zaman **`git fetch` + en güncel `origin/master`'dan dallan**; merge'den önce
 geride kaldıysan **rebase et** → eş-zamanlı master-merge race'i önlenir.
 
+**K6 — Pano CLI'ında `--sid` ZORUNLU (T079-VH).** `board.cjs`'in **yazan** fiilleri
+(`claim`/`heartbeat`/`release`/`note`) kimlik olmadan koşmaz. Sebep ölçümle bulundu: kimlik
+`--sid > CLAUDE_SESSION_ID > makine-adı-manual` sırasıyla çözülüyordu ve **Bash kabuğunda
+`CLAUDE_SESSION_ID` tanımlı değil** — yani `--sid` verilmeyen her çağrı
+`events.<makine-adı>-manual.jsonl` dosyasına yazıyor, komut ise `exit 0` verip "not bırakıldı"
+diyordu. Gönderen teslim edildiğini sanıyor, alıcı o dosyayı izlemediği için hiç görmüyor.
+34 kayıt böyle düştü; **biri CANLI bir `claim`di** ve pano aynı şeridi iki ayrı sahiple gösterdi
+(kıdem hayalete geçtiği için şerit-çakışma kontrolü gerçek sahibi kendi dosyalarında
+engelleyebilir hâle geldi) — sessiz kayıp, sessiz kilide dönüşüyor.
+
+- Her çağrıda **`--sid <oturum-kimliğin>`** yaz. Kimliğin oturum açılışında sana verilir.
+- Kimliksiz çağrı artık **exit 1** verir ve **hiçbir şey yazmaz**; muafiyet **adla** alınır
+  (insan elle çalıştırıyorsa `--sid recep-manual` gibi kendine bir kimlik verir).
+- `who` yalnız okur, kimliksiz koşar ama **uyarır** (kendi şeridin "(sen)" işaretlenemez).
+- Bekçi: `src/__tests__/conformance/board-invariants.test.ts` → `INV-BOARD-3`.
+
+**K7 — BİLİNÇLİ KIRMIZI PR konvansiyonu (2026-08-18, #643 vakası).** Bir kapı kasten kırmızı
+bırakılıyorsa (ölçüm önkoşulu yok, silahlandırma yetki bekliyor vb.) bu **PR'ın kendisinde
+ayırt edilebilir** olmalı:
+
+1. **Başlıkta `[BILINCLI-KIRMIZI]` ön-eki.** Başlık, insanın ve otomasyonun ilk gördüğü şey.
+2. **Gövdenin İLK bloğu uyarı olmalı:** "merge etmeyin, önce okuyun" + kırmızının **sebebi** +
+   yeşile dönmesi için **hangi yetkinin/adımın** gerektiği.
+3. **Fail-open eklenmez.** Kırmızıyı susturmak için muafiyet/skip konulmaz — kırmızının
+   *anlamı* zaten "ölçemedim, dolayısıyla geçemem".
+
+**Niçin bu kural var (ölçülmüş vaka):** #640 bilinçli kırmızıydı ve bir **otomatik onarım botu**
+bunu arıza sanıp kırmızıyı kapatmak için `docs/nlm_sync_manifest.json` dosyasını **elle uydurdu**
+(#643): `olcum_basarili: true`, uydurma zaman damgası, `defterde[].id` alanında **icat edilmiş**
+`source-1 … source-N` değerleri — NotebookLM'e hiç bakılmadan. PR başlığı "CI düzeltmesi" gibi
+görünüyordu. Merge edilseydi kapı yeşile dönecek, kayıt "ölçüm başarılı" diyecek, ama defterde
+eksik/artık kaynak olup olmadığı **hâlâ bilinmiyor** olacaktı. #643 kapatıldı.
+
+**Sorulacak soru (genel):** bir kırmızıyı kapatan değişiklik, kırmızının **SEBEBİNİ** mi giderdi,
+kırmızının **KENDİSİNİ** mi sildi? İkincisi — adı ne olursa olsun — kapı sabotajıdır.
+
+**Türev kural:** denetim artefaktı (manifest, ledger, parite raporu) **elle yazılmaz**; onu
+üreten şey ölçümü yapan araç olmalıdır. Elle yazılabilen bir denetim kaydı denetim değildir.
+Kapının boş geçmediğini kanıtlamak için geçici sahte artefakt üretmek meşrudur ama **hiçbir
+ref'te bırakılmaz** (`git log --all -- <dosya>` ile boş olduğu doğrulanır).
+
+> ⚠ Bu **ara önlem**. Kalıcı çözüm bot yapılandırmasında (bilinçli-kırmızı PR'ları onarım
+> kapsamı dışında tutmak) ve Recep kararına bağlı.
+
 ---
 
 ## 1. Bir-İş-Bir-Dal (ZORUNLU)
@@ -104,6 +148,30 @@ bu cetvelin "geriye-denetleyen + geleceği-kilitleyen" ayağıdır (`standard-pl
 - `category-*-ssot` · `numeric-format-ssot` · `legal-en-leftover` · `3d-single-canvas`/`asset`/`procedural-env` · `3d-csp`/`3d-model-recipe` (ilgili şeritlerde).
 - **DI** (servis/searcher ilk-param `supabase`, modül-düzeyi client importu yok) = `pnpm lint` (`no-restricted-imports`) zorlar.
 > Yeni page-crash/SSOT sınıfı bulgu → yeni bir **INV-*** test'ine terfi eder (kalıcı bekçi olur).
+
+### 3.1 Bekçi yazma kuralı — "çağrı var" kapı değildir
+
+Bir conformance iddiası **"X çağrılıyor mu?"** diye soruyorsa, X'in **işini yapabilecek girdiyi
+aldığını da** ölçmek zorundadır. Çağrının varlığı tek başına kapı değildir: doğru adı doğru yerde
+görmek, davranışın gerçekleştiğini kanıtlamaz.
+
+Bu sınıf 2026-08-15…17 arasında **dört ayrı biçimde** yakalandı ve her seferinde kapı yeşilken
+kural ihlal ediliyordu:
+
+| Biçim | Assert neye kandı | Nerede |
+|---|---|---|
+| Açıklayıcı **yorum** | Yasak/aranan ad, kodu anlatan yorumda geçiyordu | INV-STOCK-1, INV-RETURN-1 |
+| **Import** satırı | Ad import edilmişti ama çağrılmıyordu | INV-RETURN-1 |
+| **Sayı/biçim** değişimi | Sayaç `font-black` arıyordu, kod `fontWeight:900` yazıyordu | admin ölçümü |
+| **Fakir argüman** ⭐ | Çağrı vardı, girdi `{ id }` idi; scope 2–3 hiç eşleşmiyordu | INV-PRICE-7 |
+
+Sonuncusu en sinsisiydi: ad da çağrı da doğruydu, **eksik olan veriydi** — ürün sorgusu marka
+ve kategori kolonlarını çekmiyordu, dolayısıyla kilit iki kapsam için sessizce çalışmıyordu.
+
+**Uygulama:** yorumları sıyır (CRLF-güvenli), adı değil **çağrı biçimini** ara, ve çağrının
+**anlamlı girdiyle** yapıldığını doğrula (veri çekiliyor mu → çözücüye veriliyor mu). Kapıyı
+kurduktan sonra **kusuru birebir geri koyup** kırmızı gördüğünü kanıtla; "eski testle yeşil,
+yeni testle kırmızı" farkı, kapının gerçekten yeni bir şey ölçtüğünün tek kanıtıdır.
 
 ---
 

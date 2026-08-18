@@ -56,8 +56,15 @@ const nextConfig = {
                     { key: 'X-Content-Type-Options', value: 'nosniff' },
                     { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
                     {
+                        // Cetvel: docs/standards/csp-standard.md · bekçi: INV-CSP-1
+                        // (src/__tests__/conformance/csp-origin-coverage.test.ts) + INV-3D-5.
+                        //
+                        // BUGÜN RAPOR-ONLY: hiçbir şeyi engellemez, yalnız ihlali raporlar. Bu yüzden
+                        // aşağıdaki origin'lerin eksik olması bugün GÖRÜNMEZ — ama `Content-Security-Policy`
+                        // anahtarına geçildiği an eksik olan her origin SESSİZCE ölür (konsolda blok,
+                        // panelde veri yok, sebep görünmez). Enforce'a geçiş AYRI karardır; cetvel §5.
                         key: 'Content-Security-Policy-Report-Only',
-                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-insights.com https://raw.githubusercontent.com https://raw.githack.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'"
+                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-insights.com https://raw.githubusercontent.com https://raw.githack.com https://*.google-analytics.com https://api.pwnedpasswords.com; frame-src 'self' https://www.youtube.com https://*.cloudflarestream.com; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'"
                     },
                 ],
             },

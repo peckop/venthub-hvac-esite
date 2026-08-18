@@ -83,13 +83,16 @@ GA açıldığı an YALAN olur, metin de güncellenmeli).
 ## DoD (ne zaman "kurulu" sayılır)
 - [x] **`T020-VH` rıza kapısı bitti** (ön koşul — bkz. §Yapılandırma). Kanıt: "Reddet" seçili
       tarayıcıda GA/GTM script'i **hiç yüklenmiyor** ve tek bir olay gitmiyor. *(PR #524)*
-- [ ] **CSP `script-src`'a GA alan adları eklendi** — `next.config.mjs:59` şu an
-      `Content-Security-Policy-**Report-Only**` ve `script-src 'self' 'unsafe-inline' 'unsafe-eval'`;
-      `googletagmanager.com` / `google-analytics.com` **listede yok**. Bugün zararsız (Report-Only
-      hiçbir şeyi engellemez, yalnız raporlar) ama CSP **uygulanır hâle getirildiği an GA sessizce
-      ölür** — konsolda blok, panelde veri yok, sebep görünmez. İkisi farklı zamanlarda farklı
-      kişilerce yapılırsa bağlantı kurulamaz; bu yüzden buraya yazıldı. `connect-src`'a da
-      `https://*.google-analytics.com` gerekir (olaylar oradan gönderilir).
+- [x] **CSP `script-src`'a GA alan adları eklendi** — `www.googletagmanager.com` `script-src`'e,
+      `https://*.google-analytics.com` (olay ucu) `connect-src`'e girdi. *(2026-08-17)*
+      **Bu madde artık bir bekçiye devredildi:** `INV-CSP-1`
+      (`src/__tests__/conformance/csp-origin-coverage.test.ts`), cetvel `docs/standards/csp-standard.md`.
+      Sebep: buradaki teşhis doğruydu ("kodu yazan ile CSP'yi enforce'a alan farklı zamanlarda
+      çalışır, bağlantı kurulamaz") ama bir **kontrol listesi maddesi** tam olarak o zaman farkına
+      dayanamaz — bekçi dayanır. Nitekim bekçinin ilk koşusunda GA dışında **dört origin daha**
+      eksik çıktı (`api.pwnedpasswords.com`, `www.youtube.com`, `*.cloudflarestream.com`,
+      `fonts.googleapis.com`); hiçbiri bu listede yazmıyordu. CSP'yi **enforce**'a alma kararı
+      ayrıdır ve Recep kapısıdır → `csp-standard.md §5`.
 - [ ] **Çerez Politikası metni güncellendi** — bugün *"Site hâlihazırda analitik/pazarlama çerezi
       kullanmamaktadır"* diyor (PR #512, o gün doğruydu). GA açıldığı an bu cümle yanlış beyan olur;
       çerez tablosuna `_ga`/`_ga_*` satırları + saklama süreleri girilmeli. Dosyalar:
