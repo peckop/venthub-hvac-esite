@@ -115,16 +115,44 @@ KIRMIZI yanar ve geçişi yapanı bu bölüme bakmaya zorlar.
 | `www.youtube.com` | `frame-src` | `VideoAuthority.tsx` YouTube gömüsü | evet |
 | `*.cloudflarestream.com` | `frame-src` | `VideoAuthority.tsx` Cloudflare Stream | **dinamik** — kayıtlı |
 | `fonts.googleapis.com` | `style-src` | `InventoryQrLabel.tsx` yazdırma etiketi `@import` | evet |
+| `*.iyzipay.com` | `script-src`, `frame-src`, `form-action`, `connect-src` | İyzico gömülü ödeme formu (T080) | **hayır** — secret + Edge |
 
 **Bilinen açık kalem (bu cetvelin işi değil, sahibi ADMIN):** `InventoryQrLabel.tsx` bir admin
 yazdırma etiketi için Google Fonts'tan `@import` yapıyor. CSP'ye eklendi (çalışsın diye), ama
 doğru çözüm muhtemelen etiketi yerel fontla basmak — dış bağımlılık ne kadar azsa CSP o kadar dar
 olur. Sahibine bırakıldı.
 
-**Sicilde OLMAYAN ama olabilecek:** İyzico. Bugün ödeme **tam sayfa yönlendirmeyle** gidiyor
-(`useCheckoutPayment.ts` → `window.location.href`), yani CSP'yi ilgilendirmiyor. Gömülü
-checkout form yoluna geçilirse İyzico'nun statik host'u `script-src`'e girmelidir. Spekülatif
-olarak şimdiden eklenmedi — açılmamış bir kapıyı açık tutmak CSP'nin amacına aykırıdır.
+### 6.1 İyzico — gömülü form (2026-08-18, T080-P2)
+
+Bu cetvelin ilk sürümü İyzico'yu sicile ALMAMIŞTI ve gerekçesi doğruydu: ödeme tam sayfa
+yönlendirmeyle gidiyordu, CSP'yi hiç ilgilendirmiyordu. Recep **A = gömülü form** kararını
+verince kapı açıldı ve dört yüzey birden doğdu — script yüklenir, iframe açılır, form POST
+edilir, XHR atılır. Dördü de politikaya girdi.
+
+**Niçin joker (`*.iyzipay.com`), tek tek host değil:** gerçek taban adres `IYZICO_BASE_URL`
+secret'inde yaşıyor (kodda yalnız `sandbox-api.iyzipay.com` yedeği görünür) ve sağlayıcı
+sandbox ile prod için ayrı alt alanlar kullanıyor (`sandbox-api`, `api`, `sandbox-static`,
+`static`). Tek tek yazmak **yanlış host'a demirlemek** riski taşır ve hata ancak enforce
+gününde ödeme yolunda görünür. Joker iki aileyi de kapsar; apex `iyzipay.com`'i **kapsamaz**,
+yani hâlâ dar.
+
+**Kilit:** INV-CSP-1 içinde "ödeme sağlayıcı origin dört direktifte de izinli" iddiası. Bu host
+taramayla bulunamaz (secret'ten kurulur + Edge fonksiyonunda yaşar — §4'ün iki kör sınıfı),
+o yüzden ADIYLA kilitlendi. Dört direktiften biri düşerse kapı, düşen direktifi adıyla
+söyleyerek kırmızı yanar; bilerek bozularak kanıtlandı.
+
+**AÇIK RİSK — ölçülmedi (sahibi PRICING):** 3D Secure adımında bankanın ACS sayfası İyzico'nun
+kendi iframe'i içinde açılıyorsa bizim `frame-src`'imize yalnız iyzipay yeter. Bazı akışlarda
+banka sayfası üst çerçeveye ya da bizim iframe'imize düşebiliyor; o durumda **banka alan
+adları** da gerekir — bu sınırsız bir listedir ve CSP ile yönetilemez. PRICING gerçek sandbox
+ödemesiyle ölçecek. **Enforce kararı bu ölçüm gelmeden verilmemeli** (§5 ön koşullarına ek).
+
+**Rapor ucu YOK (ölçüm, 2026-08-18):** yapılandırmada ne `report-uri` ne `report-to` var.
+Report-Only raporları hiçbir yere gitmiyor, yalnız ziyaretçinin konsoluna düşüyor. Bu doğrudan
+§5'in 2. ön koşulunu **ölçülemez** kılar: "sıfır ihlal kanıtlandı" denemez, çünkü ihlalleri
+toplayan bir yer yok. Bugün sahip olduğumuz şey koruma değil **sessizlik**. Rapor ucu açmak
+koruma modunu DEĞİŞTİRMEZ (risksiz) ve enforce gününe kör gitmeyi önler — Recep kararına
+"ENFORCE-GÜNÜ" kaleminin yanına ayrı bir ön adım olarak yazıldı.
 
 ## 7. İlgili cetveller
 
