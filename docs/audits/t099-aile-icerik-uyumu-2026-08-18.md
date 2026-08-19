@@ -299,7 +299,9 @@ birebir. → **Çıkarma her yerde kusurlu değil.** §5'in "çıkarma kusurlu" 
 delikler kayıptır" varsayımıyla önce 507, sıkı ölçütle 50 aday çıktı. Sayfa 20 görüntüsü bunu
 çürüttü: QE tablosunda `11529/11530/11539/11540` **hiç yok** — kodlar yoğun sayaç değil,
 **varyant ızgarasına** göre atanıyor. En yüksek skorlu adaylar yanlış pozitif çıktı.
-→ Bu sayı **kullanılmayacak**; iş emrine yazılsaydı K2'yi olmayan 50 ürünü aramaya gönderirdi.
+→ Bu sayı **kullanılmayacak**; iş emrine yazılsaydı K2'yi olmayan ~50 kodu aramaya
+gönderirdi. *(Rakamın §11'deki gerçek kayıpla aynı çıkması rastlantıdır — o 50 GERÇEK ve
+sayfadan tek tek okunmuştur, bu 50 ise ÇÜRÜTÜLMÜŞ tahmindir. Karıştırmayın.)*
 
 **(d) İşleyen dedektör: sayfa başına satır sayısı.** Bilinen kayıpları pozitif üretiyor —
 **sayfa 21 (QE kasa tablosu) CSV'de yalnız 1 satır** (`11569`), yani §7'deki 9 kayıp satır tam
@@ -327,32 +329,124 @@ EVO tanıtım) · 46 (LINEO QUIET tanıtım) · 57 (AVenS aksiyel/jet fanlar —
 için iletişime geçiniz"*) · 60, 61 (bölüm ayracı) · 63, 65 (NORDIK / Casals tanıtım) · 70, 73
 (tanıtım) · 71, 72 (NOTLAR) · 74 (arka kapak).
 
-**GERÇEK KAYIP (3 sayfa, 39 ürün) — tam fiyat tablosu, CSV'de HİÇBİRİ YOK:**
+**GERÇEK KAYIP (4 sayfa, 50 ürün) — tam fiyat tablosu, CSV'de HİÇBİRİ YOK:**
+
+> ⚠ **Düzeltme (aynı gün):** ilk sayımım "3 sayfa / 39 ürün"dü. Sayfaları satır satır yeniden
+> döktürünce 47 ve 48'i **14 yerine 15** saymam gerektiği çıktı ve sayfa 49 da aynı sınıfa
+> girdi. Doğru rakam **50**. Göz taraması sayım yerine geçmiyor — kalem kalem döküm şart.
 
 | Sayfa | Bölüm / hat | Satır | Kod biçimi | Fiyat aralığı |
 |---|---|---|---|---|
 | 39 | EXPROOF FANLAR — **CMS ATEX SANTRİFÜJ** | 11 | `253080106XN` … | 764 – 5.874 € |
-| 47 | SANTRİFÜJ FANLAR — **NIMUS** (Casals) | 14 | `NS311280` … | 1.740 – 12.681 € |
-| 48 | SANTRİFÜJ FANLAR — **NIMAX** (Casals) | 14 | `NX313290` … | 1.786 – 14.173 € |
+| 47 | SANTRİFÜJ FANLAR — **NIMUS** (Casals) | 15 | `NS311280` … | 1.740 – 12.681 € |
+| 48 | SANTRİFÜJ FANLAR — **NIMAX** (Casals) | 15 | `NX313290` … | 1.786 – 14.173 € |
+| 49 | PLUG FANLAR — **ENKELFAN EC** | 9 | `ENKEC 155` … | (fiyat sütunu ayrı ölçülecek) |
+
+**Sayfa 49 ayrı bir vaka — çıkarma satırı KAYBETMEDİ, YANLIŞ TABLODAN OKUDU.** CSV'de bu sayfaya
+ait 3 satır var ama kodları `13850` / `16100` / `18600`, adları `**`, "fiyatları" 2,77 / 2,77 /
+53,0. Sayfadaki gerçek ürünler ise `ENKEC 155` … `ENKEC630` (9 model). Yani çıkarıcı **teknik
+özellik tablosundaki sayıları** kod ve fiyat sanmış. → §10(e)'deki "5 bozuk satır"ın 3'ünün kökü
+budur: bunlar silinecek, yerine 9 gerçek ürün gelecek.
 
 **Ortak imza — ve kök sebep bu:** üç tablonun da kodu **harf içeriyor.** Ölçüldü:
 
 - `avensair-fiyat.csv`'deki **484 kodun 484'ü tamamen sayısal**; harf içeren tek kod yok.
 - prod `products` tablosunda **harf içeren `model_code` sayısı 0** (374 üründe).
+- `ENKELFAN` / `ENKEC` adlı ürün ne CSV'de ne prod'da var (ikisi de sorgulandı, 0 satır).
 - `NIMUS` / `NIMAX` / `CMS ATEX` adlı ürün prod'da **0**.
 
 → Kayıp rastgele değil: **çıkarma yalnızca sayısal kodları kabul etmiş**, alfanümerik kodlu her
 satırı sessizce atmış. Bu, §5 ve §7'deki satır-kayıplarından **farklı ve daha büyük bir sınıf**:
 orada tablonun kuyruğu düşmüştü, burada **tablonun tamamı** düşüyor.
 
-**Ticari ağırlık:** bu 39 ürün kataloğun **en pahalı kalemleri** (14.173 €'ya kadar) ve tamamı
+**Ticari ağırlık:** bu 50 ürün kataloğun **en pahalı kalemleri** (14.173 €'ya kadar) ve tamamı
 endüstriyel/ATEX hattı — yani bayi satışının merkezi. Şu an sitede satılamıyorlar ve
 "eksik 136 kod" listesinde de **görünmüyorlar**, çünkü o liste CSV↔DB farkından çıkarılmıştı ve
 bu 39 kod **CSV'ye hiç girmemiş**.
 
-> **484 + 39 = 523'ten büyük.** Gerçek katalog boyutu hâlâ bilinmiyor; §5'in "≥484" alt sınırı
+> **484 + 50 = 534'ten büyük.** Gerçek katalog boyutu hâlâ bilinmiyor; §5'in "≥484" alt sınırı
 > yükseldi ama kapanmadı.
 
 **K1'e eklenen zorunlu adım:** çıkarma betiğinin kod biçimi filtresi bulunacak ve alfanümerik
 kodlar kabul edilecek; ardından **yalnız 3 sayfa değil, tüm katalog** yeniden çıkarılacak —
 çünkü filtre satır bazlı çalıştığından karışık tablolarda da satır düşürmüş olabilir.
+
+### EK-A — KAYIP 50 SATIRIN TAM DÖKÜMÜ (sayfa görüntüsünden, 2026-08-19)
+
+K2'nin girdisi. Kaynak: sayfa görüntüleri (otorite sırası §8). Biçim:
+`kod;model;hava_debisi;fiyat_eur`. Emin olunamayan alanlar `??` ile işaretlidir.
+
+**Sayfa 39 — EXPROOF FANLAR / CMS ATEX SANTRİFÜJ (11 satır)**
+
+```
+253080106XN;VORTICENT CMS ATEX 12/5 T4 0,09kW | Zone 1: FAN (Ex h IIB+H2 T4 Gb) + MOTOR (Ex eb IIC T4 Gb);250 m3/h;764
+253090106XE;VORTICENT CMS ATEX 14/5 T4 0,09kW | Zone 1: FAN (Ex h IIB+H2 T4 Gb) + MOTOR (Ex eb IIC T4 Gb);414 m3/h;775
+253100106XN;VORTICENT CMS ATEX 14/5 T2 0,25kW | Zone 2: FAN (Ex h IIB T3 Gc) + MOTOR (Ex ec IIC T3 Gc);840 m3/h;793
+253110106XN;VORTICENT CMS ATEX 16/6 T2 0,37kW | Zone 2: FAN (Ex h IIB T3 Gc) + MOTOR (Ex ec IIC T3 Gc);1080 m3/h;992
+253260106XN;VORTICENT CMS ATEX 22/9 T4 0,37kW | Zone 2: FAN (Ex h IIB T3 Gc) + MOTOR (Ex ec IIC T3 Gc??);1830 m3/h;1224
+253320106XN;VORTICENT CMS ATEX 25/10 T4 0,75kW | Zone 2: FAN (Ex h IIB T3 Gc) + MOTOR (Ex ec IIC T3 Gc);2830 m3/h;1723
+253410106XN;VORTICENT CMS ATEX 28/11 T4 1,1kW | Zone 2: FAN (Ex h IIB T3 Gc) + MOTOR (Ex ec IIC T3 Gc);3580 m3/h;1967
+253420106XN;VORTICENT CMS ATEX 31/12 T4 2,2kW | Zone 2: FAN (Ex h IIB T3 Gc) + MOTOR (Ex ec IIC T3 Gc);5400 m3/h;2734
+253490106XN;VORTICENT CMS ATEX 35/14 T4 4kW | Zone 2: FAN (Ex h IIB T3 Gc) + MOTOR (Ex ec IIC T3 Gc??);8020 m3/h;3431
+253510106XN;VORTICENT CMS ATEX 40/16 T4 7,5kW | Zone 2: FAN (Ex h IIB T3 Gc) + MOTOR (Ex ec IIC T3 Gc);10570 m3/h;4435
+253530121XN;VORTICENT CMS ATEX 45/18 T4 11kW | Zone 2: FAN (Ex h IIB T3 Gc) + MOTOR (Ex ec IIC T3 Gc);12500 m3/h;5874
+```
+
+**Sayfa 47 — SANTRİFÜJ FANLAR / NIMUS, Casals (15 satır)**
+
+```
+NS311280;NIMUS 311 T2 1,1kW;4710 m3/h;1740
+NS351290;NIMUS 351 T2 2,2kW;6750 m3/h;1972
+NS4012100;NIMUS 401 T2 4kW;9650 m3/h;2413
+NS4512132;NIMUS 451 T2 7,5kW;13740 m3/h;3108
+NS5012160;NIMUS 501 T2 11kW;18850 m3/h;4373
+NS351471;NIMUS 351 T4 0,37kW;3370 m3/h;1757
+NS401480;NIMUS 401 T4 0,55kW;4830 m3/h;1988
+NS451480;NIMUS 451 T4 0,75kW;6870 m3/h;2258
+NS501490;NIMUS 501 T4 1,5kW;9420 m3/h;2596
+NS5624100;NIMUS 561 T4 2,2kW;13250 m3/h;3035
+NS6314112;NIMUS 631 T4 4kW;18850 m3/h;3772
+NS7114132;NIMUS 711 T4 7,5kW;26980 m3/h;4890
+NS8014160;NIMUS 801 T4 15kW;38600 m3/h;7025
+NS9014200;NIMUS 901 T4 30kW;54960 m3/h;9986
+NS10014225;NIMUS 1001 T4 45kW;75390 m3/h;12681
+```
+
+**Sayfa 48 — SANTRİFÜJ FANLAR / NIMAX, Casals (15 satır)**
+
+```
+NX313290;NIMAX 314 T2 1,5kW;5240 m3/h;1818
+NX353290;NIMAX 354 T2 3kW;7880 m3/h;2173
+NX4032112;NIMAX 404 T2 5,5kW;11270 m3/h;2757
+NX4532132;NIMAX 454 T2 11kW;16040 m3/h;4159
+NX5032160;NIMAX 504 T2 15kW;22010 m3/h;4638
+NX353471;NIMAX 354 T4 0,37kW;3940 m3/h;1786
+NX403480;NIMAX 404 T4 0,55kW;5640 m3/h;2024
+NX453490;NIMAX 454 T4 1,1kW;8020 m3/h;2334
+NX503490;NIMAX 504 T4 2,2kW;11010 m3/h;2802
+NX5634100;NIMAX 564 T4 3kW;15460 m3/h;3182
+NX6334132;NIMAX 634 T4 5,5kW;22010 m3/h;4128
+NX7144160;NIMAX 714 T4 11kW;31500 m3/h;5869
+NX8034180;NIMAX 804 T4 18,5kW;45060 m3/h;7928
+NX9034200;NIMAX 904 T4 37kW;64160 m3/h;11338
+NX10034250;NIMAX 1004 T4 55kW;88010 m3/h;14173
+```
+
+**Sayfa 49 — PLUG FANLAR / ENKELFAN EC (9 satır)** — fiyat sütunu bu turda okunmadı,
+K2 öncesi tamamlanacak:
+
+```
+ENKEC 155;ENKELFAN 155 EEC
+ENKEC 190;ENKELFAN 190 EEC
+ENKEC 250;ENKELFAN 250 EEC
+ENKEC 310;ENKELFAN 310 EEC
+ENKEC 355;ENKELFAN 355 EEC
+ENKEC 450;ENKELFAN 450 EEC
+ENKEC 500;ENKELFAN 500 EEC
+ENKEC 560;ENKELFAN 560 EEC
+ENKEC630;ENKELFAN 630 EEC
+```
+
+**Doğrulanan ve kaybı OLMAYAN sayfalar:** 15 (2/2), 20 (23/23), 29 (1/1) — çıkarma bu
+sayfalarda birebir doğru. **Sayfa 21** ise 10 satırın 9'unu kaybetmiş (§7'deki QE kasa vakası,
+görüntüden teyit edildi: `11560` … `11569`).
