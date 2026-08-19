@@ -25,6 +25,7 @@
  */
 import pg from 'pg'
 import fs from 'node:fs'
+import tls from 'node:tls'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -100,10 +101,23 @@ const CHECKS = [
  */
 function resolveTls() {
   const caPath = process.env.PGSSLROOTCERT
-  if (caPath) {
-    return { ca: fs.readFileSync(caPath, 'utf8'), rejectUnauthorized: true }
+  if (!caPath) return { rejectUnauthorized: true }
+
+  const provided = fs.readFileSync(caPath, 'utf8')
+  const blocks = (provided.match(/-----BEGIN CERTIFICATE-----/g) ?? []).length
+  if (blocks === 0) {
+    // Sırrın içeriği PEM değil. En sık sebep: panoya kopyalarken satır sonlarının kaybolması.
+    // Sessizce sistem deposuna düşmek YANLIŞ olurdu — hata mesajı o zaman sertifikayı değil
+    // sunucuyu suçlar ve saatler kaybettirir.
+    throw new Error(`PGSSLROOTCERT bir PEM sertifikasi degil (BEGIN CERTIFICATE blogu yok, ${provided.length} bayt).`)
   }
-  return { rejectUnauthorized: true }
+  console.log(`catalog-integrity: kok sertifika yuklendi (${blocks} blok, ${provided.length} bayt)`)
+
+  // NİÇİN SİSTEM KÖKLERİ DE: `ca` verildiğinde Node varsayılan güven deposunu DEVRE DIŞI
+  // bırakır. Supabase'in doğrudan bağlantısı kendi özel kökünü kullanıyor, havuz (pooler)
+  // ucu ise kamuya açık bir CA kullanabiliyor; yalnız birini vermek diğerini kırar. İkisini
+  // birden vermek doğrulamayı ZAYIFLATMAZ — güvenilen kök kümesini eksiksiz yapar.
+  return { ca: [...tls.rootCertificates, provided], rejectUnauthorized: true }
 }
 
 function loadBaseline() {
