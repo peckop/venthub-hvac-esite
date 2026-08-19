@@ -1,22 +1,3 @@
-/**
- * KOMUT PALETİ ARAYICILARI — arama metni PostgREST filtre GRAMERİNE gömülmez (T078-VH).
- *
- * Dokuz arayıcının dokuzu da aynı deseni kullanıyordu:
- *
- *   .or(kolon.ilike.%<metin>%,digerKolon.ilike.%<metin>%)   ← metin doğrudan gramerin içinde
- *
- * O gramerde virgül koşulları AYIRIR. Yani arama kutusuna virgül yazan admin ("fan, 100")
- * filtrenin YAPISINI değiştiriyordu: yazdığı metnin bir parçası yeni bir koşul olarak
- * okunuyor ve sorgu 400 dönüyordu. Güvenlik açığı DEĞİL (RLS aynı, istemci kendi token'ı) —
- * ama komut paletinde CANLI işlevsel hata.
- *
- * Kaçış TEK yerde yaşar: `@/utils/adminQueryFilters`. Buraya ikinci bir kopya YAZILMADI —
- * yardımcı ADMIN şeridinde yazıldı, burası onu kullanır (tek-yazar ilkesi).
- *
- * BU DOSYADA HATA YUTULMUYOR: dokuz arayıcının dokuzu da `if (error) throw error` diyor,
- * yani kırık sorgu sessiz-boş listeye değil görünür hataya düşüyordu. Sessiz-boşluk sınıfı
- * (hatayı yutup boş liste göstermek) bu dosyanın kusuru DEĞİLDİ — ölçüldü, öyle yazıldı.
- */
 import { SupabaseClient } from '@supabase/supabase-js'
 
 import { adminSearchProducts } from '@/lib/services/product.service'
@@ -36,13 +17,6 @@ export type AdminSearcher = (
   query: string,
   limit: number
 ) => Promise<CommandResult[]>
-
-interface VenthubReturnJoinedRow {
-  id: string
-  reason: string
-  status: string
-  venthub_orders: { order_number: string | null; customer_name: string | null } | { order_number: string | null; customer_name: string | null }[] | null
-}
 
 interface InventoryMovementJoinedRow {
   id: string
@@ -91,21 +65,30 @@ export const searchOrders: AdminSearcher = async (supabase, query, limit) => {
 
 export const searchReturns: AdminSearcher = async (supabase, query, limit) => {
   if (!query || query.trim().length < 2) return []
+  /*
+    T090-VH: burası `venthub_orders.order_number` diye GÖMÜLÜ bir kolona atıf
+    yapıyordu; PostgREST üst-düzey or= içinde gömülü kaynağa atıf kabul etmez, yani
+    komut paletinin iade araması da üretimden beri 400 ile düşüyordu. Artık
+    `view_admin_returns` okunur ve tek `search_text` kolonu aranır — sayfanın
+    kendi aramasıyla AYNI kaynak, iki farklı cevap üretemezler.
+
+    Yan kazanç: view satırı düz olduğu için "ilişki obje mi tek-elemanlı dizi mi"
+    belirsizliğini çözen tip zorlaması da gerekmiyor; satır artık ÜRETİLMİŞ tipten
+    geliyor, elle bildirilen bir şekilden değil.
+  */
   const { data, error } = await supabase
-    .from('venthub_returns')
-    .select('id, reason, status, venthub_orders!inner(order_number, customer_name)')
-    .or(orIlikeContains(['reason', 'venthub_orders.order_number'], query))
+    .from('view_admin_returns')
+    .select('id, reason, status, order_number')
+    .ilike('search_text', `%${query}%`)
     .limit(limit)
   if (error) throw error
-  const rows = (data || []) as unknown as VenthubReturnJoinedRow[]
-  return rows.map((r) => {
-    const order = Array.isArray(r.venthub_orders) ? r.venthub_orders[0] : r.venthub_orders
-    const orderNum = order?.order_number || ''
+  return (data ?? []).map((r) => {
+    const orderNum = r.order_number ?? ''
     return {
       resourceKey: 'returns',
       id: String(r.id),
       title: orderNum ? `Order #${orderNum}` : 'Return Request',
-      subtitle: `${r.reason} (${r.status})`,
+      subtitle: `${r.reason ?? ''} (${r.status ?? ''})`,
       route: `/admin/returns?q=${orderNum}`
     }
   })
@@ -167,7 +150,15 @@ export const searchMovements: AdminSearcher = async (supabase, query, limit) => 
   const { data, error } = await supabase
     .from('inventory_movements')
     .select('id, reason, delta, products!inner(name, sku)')
-    .or(orIlikeContains(['reason', 'products.name', 'products.sku'], query))
+    /*
+      Gömülü kaynağa süzme `foreignTable` ile YAPILIR — üst-düzey or= içinde
+      `products.name` yazmak sorguyu 400'e düşürüyordu (aynı sınıf: T090-VH).
+      `reason` bilinçli olarak DÜŞTÜ: tek sorguda hem ana tabloyu hem gömülü
+      kaynağı OR'lamak PostgREST'te ifade edilemez ve paletin yönlendirdiği
+      /admin/movements sayfası zaten YALNIZ ürün adı/SKU arıyor (MovementsTableBody).
+      İki yüzeyin farklı cevap vermesi, çalışmayan bir `reason` aramasından beterdi.
+    */
+    .or(orIlikeContains(['name', 'sku'], query), { foreignTable: 'products' })
     .limit(limit)
   if (error) throw error
   const rows = (data || []) as unknown as InventoryMovementJoinedRow[]
