@@ -87,24 +87,24 @@ const DataRequestsPage: React.FC = () => {
   return (
     <div className="max-w-3xl">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-industrial-gray tracking-tight flex items-center gap-2">
           <ShieldCheck className="w-6 h-6 text-primary-navy" />
           {t('account.dataRequests.title')}
         </h2>
-        <p className="text-sm text-slate-500 mt-1">{t('account.dataRequests.subtitle')}</p>
+        <p className="text-sm text-steel-gray/70 mt-1">{t('account.dataRequests.subtitle')}</p>
       </div>
 
       {/* Başvuru formu */}
-      <form onSubmit={handleSubmit} className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-6 mb-6">
+      <form onSubmit={handleSubmit} className="bg-white border border-light-gray rounded-hvac-md shadow-sm p-6 mb-6">
         <div className="mb-4">
-          <label htmlFor="dsr-type" className="block text-sm font-medium text-slate-700 mb-1.5">
+          <label htmlFor="dsr-type" className="block text-sm font-medium text-industrial-gray mb-1.5">
             {t('account.dataRequests.typeLabel')}
           </label>
           <select
             id="dsr-type"
             value={reqType}
             onChange={(e) => setReqType(e.target.value as RequestType)}
-            className="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-white text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy"
+            className="w-full px-4 py-2.5 border border-light-gray rounded-hvac-sm bg-white text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy"
           >
             {REQUEST_TYPES.map((value) => (
               <option key={value} value={value}>
@@ -114,15 +114,15 @@ const DataRequestsPage: React.FC = () => {
           </select>
         </div>
 
-        <div className="rounded-xl bg-air-blue/20 p-4 mb-4 text-sm text-steel-gray">
-          <p className="font-medium text-slate-700 mb-1">{t('account.dataRequests.noticeTitle')}</p>
+        <div className="rounded-hvac-md bg-air-blue/20 p-4 mb-4 text-sm text-steel-gray">
+          <p className="font-medium text-industrial-gray mb-1">{t('account.dataRequests.noticeTitle')}</p>
           <p>{t('account.dataRequests.noticeBody')}</p>
         </div>
 
         <button
           type="submit"
           disabled={sending || !user?.email}
-          className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-hvac-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
           {t('account.dataRequests.submit')}
@@ -130,39 +130,39 @@ const DataRequestsPage: React.FC = () => {
       </form>
 
       {/* Kendi taleplerim */}
-      <h3 className="text-lg font-bold text-slate-900 mb-3">{t('account.dataRequests.myRequests')}</h3>
+      <h3 className="text-lg font-bold text-industrial-gray mb-3">{t('account.dataRequests.myRequests')}</h3>
 
       {loading ? (
-        <div className="flex items-center justify-center py-12 text-slate-400">
+        <div className="flex items-center justify-center py-12 text-steel-gray/70">
           <Loader2 className="w-6 h-6 animate-spin" />
         </div>
       ) : rows.length === 0 ? (
-        <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-8 text-center">
-          <p className="text-sm text-slate-500">{t('account.dataRequests.emptyDesc')}</p>
+        <div className="bg-white border border-light-gray rounded-hvac-md shadow-sm p-8 text-center">
+          <p className="text-sm text-steel-gray/70">{t('account.dataRequests.emptyDesc')}</p>
         </div>
       ) : (
         <ul className="space-y-3">
           {rows.map((r) => {
             const due = computeDueState(r, now)
             return (
-              <li key={r.id} className="bg-white border border-slate-200/60 rounded-2xl shadow-sm p-4">
+              <li key={r.id} className="bg-white border border-light-gray rounded-hvac-md shadow-sm p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="text-sm font-bold text-slate-900">
+                    <div className="text-sm font-bold text-industrial-gray">
                       {t(`account.dataRequests.types.${r.request_type}`)}
                     </div>
-                    <div className="text-xs text-slate-500 mt-0.5">
+                    <div className="text-xs text-steel-gray/70 mt-0.5">
                       {t('account.dataRequests.receivedAt', { date: formatDate(r.received_at, lang) })}
                     </div>
                   </div>
-                  <span className="shrink-0 text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700">
+                  <span className="shrink-0 text-xs font-semibold px-2.5 py-1 rounded-hvac-sm bg-light-gray text-industrial-gray">
                     {t(`account.dataRequests.statuses.${r.status}`)}
                   </span>
                 </div>
 
                 <div className="mt-3 flex items-center gap-2 text-xs">
                   {due.frozen ? (
-                    <span className="inline-flex items-center gap-1.5 text-slate-500">
+                    <span className="inline-flex items-center gap-1.5 text-steel-gray/70">
                       <ShieldCheck size={13} /> {t('account.dataRequests.finalized')}
                     </span>
                   ) : due.overdue ? (
@@ -170,7 +170,7 @@ const DataRequestsPage: React.FC = () => {
                       <AlertCircle size={13} /> {t('account.dataRequests.overdue')}
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 text-slate-600">
+                    <span className="inline-flex items-center gap-1.5 text-steel-gray">
                       <Clock size={13} />
                       {t('account.dataRequests.daysLeft', { days: String(Math.max(due.daysLeft, 0)) })}
                     </span>
@@ -178,10 +178,10 @@ const DataRequestsPage: React.FC = () => {
                 </div>
 
                 {r.outcome && (
-                  <p className="mt-3 text-sm text-slate-700 border-l-2 border-primary-navy pl-3">{r.outcome}</p>
+                  <p className="mt-3 text-sm text-industrial-gray border-l-2 border-primary-navy pl-3">{r.outcome}</p>
                 )}
                 {r.retained_data_note && (
-                  <p className="mt-2 text-xs text-slate-500 border-l-2 border-slate-200 pl-3">
+                  <p className="mt-2 text-xs text-steel-gray/70 border-l-2 border-light-gray pl-3">
                     {t('account.dataRequests.retainedLabel')}: {r.retained_data_note}
                   </p>
                 )}
