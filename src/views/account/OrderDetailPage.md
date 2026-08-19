@@ -2,43 +2,42 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\account\OrderDetailPage.tsx
-skeleton_hash: 5bdff96bddcc93df
+source_path: C:\Users\alize\venthub-wt-altyapi\src\views\account\OrderDetailPage.tsx
+skeleton_hash: 884bfc2dd0c01b0e
 entity_hashes:
-  func:OrderDetailPage: ac807f69496e29a7
-  overview: c849ca7afaf0a8b3
+  func:OrderDetailPage: dfa1eb0c67bb7d37
+  overview: c0f73db07d5be692
   style_tokens: 2d7ff3d6e2a546ab
-generated_at: 2026-06-19T20:49:33Z
+generated_at: 2026-08-18T06:53:36Z
 ---
 
 ## Genel Bakış
-Bu modül, kullanıcının hesap panelinden erişebildiği tek bir siparişin tüm detaylarını gösteren bir React sayfa bileşenidir. Sipariş özeti, ürünler, ödeme bilgileri ve teslimat durumu gibi bilgileri düzenli bir arayüzde sunarak kullanıcıya siparişinin tamamını tek bir sayfada inceleme imkânı sağlar.
+Bu modül, kullanıcı hesap panelinden erişilen tek bir siparişin tüm detaylarını görüntüleyen React sayfa bileşenidir. Sipariş özeti, ürünler, ödeme bilgileri ve teslimat durumunu düzenli bir arayüzde sunarak kullanıcıya siparişinin tamamını tek bir sayfada inceleme imkânı sağlar.
 
 ## Fonksiyon Grupları
 ### Ana Sayfa Bileşeni
-Modülün tek bileşeni olup, sipariş verisini alarak sayfa düzenini oluşturur ve ilgili alt bileşenleri bir araya getirerek sipariş detay sayfasını kullanıcıya render eder.
+Modülün tek ve merkezi bileşeni olup, sipariş verisini alarak sayfa düzenini oluşturur ve ilgili alt bileşenleri bir araya getirerek sipariş detay sayfasını kullanıcıya render eder.
 - OrderDetailPage
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-
-Bu modül için verilen fonksiyon gövdesi (implementation body) bulunmamaktadır; yalnızca imza (`def OrderDetailPage()`) ve modül sabitleri (boş) verilmiştir. Bu nedenle, fonksiyon gövdesinden türetilebilecek mimari varsayım tanımlanamamaktadır.
+- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
+- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
+- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### OrderDetailPage
-**Ne yapar**: Kullanıcının belirli bir siparişinin tüm detaylarını (özet, ürünler, kargo, fatura) görüntülediği, sipariş durumunu takip ettiği ve yeniden sipariş/PDF oluşturma gibi işlemleri yapabildiği React bileşenidir.
+**Ne yapar**: Kullanıcının belirli bir siparişinin detaylı görünümünü sunan React bileşenidir. Sipariş özeti, ürünler, kargo takibi ve fatura olmak üzere dört sekmede bilgi görüntüler; sipariş durumunu adım adım gösteren bir ilerleme çubuğu ve yeniden sipariş verme gibi eylemler sunar.
 
-**Nasıl yapar**: Bileşen, URL parametrelerinden sipariş kimliğini alır ve kullanıcının oturum durumunu kontrol eder. Supabase'den `venthub_orders` tablosunu ilişkisel sorguyla (`venthub_order_items` ile join) çekerek sipariş verilerini ve kalemlerini tek seferde yükler. Veriler `Order` ve `OrderItem` tiplerine dönüştürülerek state'e kaydedilir. Bileşen, dil ve rotalama için `useI18n` ve `useLocalizedRoutes` hook'larını, sepet işlemleri için `useCart` hook'unu kullanır. PDF oluşturmak için `jsPDF` ve `jspdf-autotable` modülleri dinamik olarak import edilerek proforma fatura oluşturulur. Sipariş durumuna göre renk kodları ve ilerleme çubuğu hesaplanarak görsel geri bildirim sağlanır.
+**Nasıl yapar**: `useSearchParams` hook'u ile URL'den sipariş ID'sini alır. `useAuth` hook'u ile kimlik doğrulaması kontrol eder; kullanıcı giriş yapmamışsa `useRouter` ile login sayfasına yönlendirme yapar. `useEffect` içindeki `load` asenkron fonksiyonu ile Supabase veritabanından `venthub_orders` tablosuna ilişkisel sorgu (`.select` ile `venthub_order_items` join'i) göndererek tek bir sorguda sipariş ana verilerini ve kalemleri çeker. Ham verileri `Order` ve `OrderItem` tiplerine dönüştürürken `*_snapshot` kolonlarından (`product_name_snapshot`, `unit_price_snapshot`, `product_sku_snapshot`) okuma yaparak sipariş anındaki fiyat ve ürün bilgisini korur (W2b-2 snapshot prensibi). `handleInvoicePdf` fonksiyonunda `jsPDF` ve `jspdf-autotable` paketlerini `Promise.all` ile dinamik import ederek proforma PDF'i oluşturur ve indirir. `handleReorder` fonksiyonunda sipariş kalemlerinden ürünleri sorgulayarak sepete ekler. `useI18n` hook'u ile çoklu dil desteği, `useCart` hook'u ile sepet yönetimi sağlar.
 
-**Parametreler**:
-- Bu bileşen parametre almaz (React fonksiyonel bileşeni, props'u yok).
+**Parametreler**: Parametre almaz (React bileşeni, props’suz fonksiyonel bileşendir).
 
-**Dönüş**:
-- `JSX.Element` — Sipariş detay sayfasının tüm arayüzünü (başlık, durum çubuğu, sekmeli içerik alanı) içeren React JSX yapısı.
+**Dönüş**: JSX.Element — Sipariş detay sayfasını oluşturan React JSX'i; yükleme durumunda spinner, sipariş hazır olduğunda tam sayfa arayüzü döndürür.
 
 ---
 
@@ -49,6 +48,7 @@ Bu modül için verilen fonksiyon gövdesi (implementation body) bulunmamaktadı
 - import: ../../i18n/I18nProvider::useI18n
 - import: ../../i18n/datetime::formatDateTime
 - import: ../../i18n/format::formatCurrency
+- import: ../../lib/services/product.columns::VARIANT_DETAIL_COLUMNS
 - import: @/components/ui/VentImage::VentImage
 - import: @/lib/supabase/client::supabaseBrowserClient
 - import: @/types/ui-models::type { Product }
@@ -77,6 +77,7 @@ Bu modül için verilen fonksiyon gövdesi (implementation body) bulunmamaktadı
 - `id: string`
 - `product_id?: string`
 - `product_name: string`
+- `product_sku?: string`
 - `quantity: number`
 - `unit_price: number`
 - `total_price: number`
@@ -110,145 +111,182 @@ Bu modül için verilen fonksiyon gövdesi (implementation body) bulunmamaktadı
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::authGuardEffect
-- **params**: (parametre yok — anonim arrow, React useEffect callback'i)
-- **ic_degiskenler**: (useEffect scope'undan erişilen hook değişkenleri)
-  - `authLoading` — useAuth hook'undan gelen yükleme durumu flag'i
-  - `user` — useAuth hook'undan gelen mevcut kullanıcı nesnesi, null ise giriş yapılmamıştır
-  - `router` — useRouter() hook'undan gelen Next.js router instance'ı, sayfa yönlendirmesi için kullanılır
-  - `id` — URL parametresinden gelen sipariş identifier'ı, login sonrası yönlendirme URL'i için kullanılır
+### [N1_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::authRedirectEffect
+- **params**: (yok — anonim arrow fonksiyon)
+- **ic_degiskenler**:
+  - `authLoading` — useAuth hook'undan gelen yükleme durumu bayrağı
+  - `user` — useAuth hook'undan gelen oturum açmış kullanıcı nesnesi
+  - `router` — useRouter() navigasyon nesnesi
+  - `id` — useSearchParams'dan gelen sipariş URL parametresi
+  - `Routes.auth.login(...)` — login sayfası rotası, argüman olarak orderDetail rotası verilir
+  - `Routes.account.orderDetail(id)` — mevcut sipariş detay rotası
 - **Dönüş**: yok (yan etki: `router.push` ile login sayfasına yönlendirme)
 
-### [N2_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::useEffectLoadCallback
-- **params**: (parametre yok — anonim arrow, React useEffect callback'i)
+---
+
+### [N2_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::loadEffect
+- **params**: (yok — anonim arrow fonksiyon, useEffect callback)
 - **ic_degiskenler**:
-  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, yoksa load iptal edilir
-  - `id` — useSearchParams veya component prop'undan gelen sipariş ID'si, yoksa load iptal edilir
-- **Dönüş**: yok (yan etki: `load()` asenkron fonksiyonunu çağırır)
+  - `user` — useAuth hook'undan gelen kullanıcı nesnesi; load içinde koruma kontrolü yapılır
+  - `id` — useSearchParams'dan gelen sipariş ID'si; load içinde koruma kontrolü yapılır
+  - `load` — effectscope içinde tanımlı asenkron yardımcı fonksiyon; veri çekme işlemini yürütür ve ardından hemen çağrılır
+- **Dönüş**: yok (yan etki: asenkron veri yükleme, state güncellemeleri)
 
-### [N3_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::load
-- **params**: (parametre yok — inner async function)
+---
+
+### [N3_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::load
+- **params**: (yok — `async function load()`)
 - **ic_degiskenler**:
-  - `user` — useAuth hook'undan gelen kullanıcı nesnesi, null ise fonksiyon erken döner
-  - `id` — sipariş ID'si, string veya undefined, null ise fonksiyon erken döner
-  - `setLoading` — useState setter'ı, yükleme durumunu true/false yapar
-  - `orderData` — supabase sorgusundan dönen tek sipariş kaydı (venthub_orders + venthub_order_items join)
-  - `orderError` — supabase sorgusundan dönen hata nesnesi, varsa throw edilir
-  - `rawItems` — `orderData.venthub_order_items` alanının `Record<string, unknown>[]` türünde ham dizi karşılığı, boş dizi fallback'li
-  - `it` — rawItems.map callback parametresi, her bir ham sipariş kalemi
-  - `unit` — `it.price_at_time` değerinin Number karşılığı, birim fiyat, 0 fallback'li
-  - `qty` — `it.quantity` değerinin Number karşılığı, adet, 0 fallback'li
-  - `mappedItems` — `OrderItem[]` türüne dönüştürülmüş sipariş kalemleri dizisi
-  - `mappedOrder` — `Order` türüne tam olarak eşlenmiş sipariş nesnesi, tüm supabase alanlarını içerir
-  - `e` — catch bloğu hata nesnesi, console.error'a yazılır
-- **Dönüş**: yok (yan etki: `setOrder(mappedOrder)` ile sipariş state'ini günceller, `setLoading(false)` ile yükleme bitirir, `toast.error` ile hata bildirir)
+  - `orderData` — `supabase.from('venthub_orders').select(...).eq('id', id).single()` sorgusundan dönen sipariş ve ilişkili kalemler verisi (ilişkisel sorgu ile tek seferde çekilen ana + detay verisi)
+  - `orderError` — Supabase sorgu sonucundan destructuring ile alınan hata nesnesi; throw ile yukarı fırlatılır
+  - `rawItems` — `orderData.venthub_order_items` alanının `Record<string, unknown>[]` tipine cast edilmiş ham kalem dizisi; `|| []` ile boş dizi fallback'i
+  - `mappedItems` — `rawItems.map(...)` çağrısı ile `OrderItem[]` formatına dönüştürülmüş sipariş kalemleri dizisi
+  - `mappedOrder` — Tüm sipariş alanlarının `Order` tipine dönüştürülmüş tam nesne; snapshot kolonları, fallback değerler ve `user` nesnesinden türetilen alanlar dahil
+  - `e` — try-catch yakalama değişkeni; `console.error` ve `toast.error` ile işlenir
+- **Dönüş**: yok (yan etki: `setOrder(mappedOrder)`, `setLoading(false)`, `toast.error`)
+- **API Çağrıları**: `supabase.from('venthub_orders').select(relationalQuery).eq('id', id).single()`
+- **Dict Erişimleri**: `orderData.id`, `orderData.total_amount`, `orderData.status`, `orderData.payment_status`, `orderData.created_at`, `orderData.customer_name`, `orderData.customer_email`, `orderData.shipping_address`, `orderData.order_number`, `orderData.conversation_id`, `orderData.carrier`, `orderData.tracking_number`, `orderData.tracking_url`, `orderData.shipped_at`, `orderData.delivered_at`, `orderData.shipping_method`, `orderData.invoice_type`, `orderData.invoice_info`, `orderData.legal_consents`, `orderData.venthub_order_items`, `user?.user_metadata?.full_name`, `user?.email`
 
-### [N4_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::mapOrderItemCallback
-- **params**: `it` — `Record<string, unknown>` türünde ham sipariş kalemi objesi
+---
+
+### [N4_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::mapOrderItem
+- **params**: `(it)` — Ham sipariş kalemi satırı (`Record<string, unknown>`)
 - **ic_degiskenler**:
-  - `unit` — `it.price_at_time` değerinin `Number()` karşılığı, birim fiyat, `|| 0` ile fallback
-  - `qty` — `it.quantity` değerinin `Number()` karşılığı, adet miktarı, `|| 0` ile fallback
-- **Dönüş**: `OrderItem` nesnesi — `{ id, product_id, product_name, quantity, unit_price, total_price, product_image_url }`
+  - `unit` — `Number(it.unit_price_snapshot) || 0` hesaplaması ile elde edilen birim fiyat (sayısal, snapshot kolonundan okunur, canlı katalogdan değil)
+  - `qty` — `Number(it.quantity) || 0` hesaplaması ile elde edilen ürün miktarı (sayısal)
+- **Dönüş**: `OrderItem` nesnesi — `id`, `product_id`, `product_name`, `product_sku`, `quantity`, `unit_price`, `total_price` (`unit * qty`), `product_image_url` alanlarını içerir
+- **Dict Erişimleri**: `it.unit_price_snapshot`, `it.quantity`, `it.id`, `it.product_id`, `it.product_name_snapshot`, `it.product_sku_snapshot`, `it.product_image_url`
 
-### [N5_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::copyToClipboard
-- **params**: `text` — `string | undefined`, panoya kopyalanacak metin, undefined veya boşsa fonksiyon erken döner
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok (yan etki: `navigator.clipboard.writeText` ile panoya yazar, `toast.success` veya `toast.error` ile bildirim gösterir)
+---
 
-### [N6_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::generateProformaPDF
-- **params**: `o` — `Order` türüne ait sipariş nesnesi, PDF içeriği bu nesneden üretilir
+### [N5_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::copyToClipboard
+- **params**: `(text?: string)` — Kopyalanacak metin dizgesi (opsiyonel)
 - **ic_degiskenler**:
-  - `jsPDF` — dinamik `import('jspdf')` ile lazy yüklenen PDF oluşturma sınıfı (default export)
-  - `autoTable` — dinamik `import('jspdf-autotable')` ile lazy yüklenen tablo ekleme fonksiyonu (default export)
-  - `doc` — `new jsPDF(...)` ile oluşturulan PDF doküman instance'ı, A4 boyutunda, pt birimi
-  - `orderNo` — sipariş numarası string'i, `o.order_number` varsa `'-'` split'inden [1] alınır, yoksa `o.id.slice(-8).toUpperCase()` fallback
-  - `head` — tablo başlık satırı dizisi, `t()` i18n fonksiyonu ile çevrilmiş sütun başlıkları
-  - `body` — `o.order_items` dizisinin map'lenmesiyle oluşan tablo gövdesi, her satır `[productName, quantity, unitPrice, totalPrice]`
-  - `after` — `doc.lastAutoTable.finalY` değerinden hesaplanan tablo altı Y koordinatı, fallback 100
-  - `e` — catch bloğu hata nesnesi
-- **Dönüş**: yok (yan etki: `doc.save(...)` ile PDF dosyasını indirir, hata durumunda `toast.error` gösterir)
+  - (yok — parametre ve API çağrıları dışında yerel değişken yok)
+- **Dönüş**: yok (yan etki: `navigator.clipboard.writeText(text)`, `toast.success` veya `toast.error`)
+- **API Çağrıları**: `navigator.clipboard.writeText(text)`
 
-### [N7_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::reorderToCart
-- **params**: `o` — `Order` türüne ait sipariş nesnesi, yeniden sipariş verilecek ürünler bu nesneden alınır
+---
+
+### [N6_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::generatePDF
+- **params**: `(o: Order)` — PDF'i oluşturulacak sipariş nesnesi
 - **ic_degiskenler**:
-  - `ids` — sipariş kalemlerinden benzersiz `product_id` değerlerinin string dizisi, `filter(Boolean)` ile undefined olanlar çıkarılır
-  - `names` — `product_id` olmayan kalemlerden benzersiz `product_name` değerlerinin string dizisi
-  - `productMap` — `Record<string, Product>` türüne ait ürün haritası, supabase'den çekilen ürünler burada saklanır
-  - `data` — `supabase.from('products').select(...)` sorgusundan dönen ürün dizisi (id ile sorgulama)
-  - `error` — supabase ürün sorgusundan dönen hata nesnesi
-  - `p` — `data` dizisi üzerindeki `forEach` iterasyon parametresi, her bir Product nesnesi
-  - `data` — ikinci sorgudan (name ile) dönen ürün dizisi
-  - `error` — ikinci sorgudan dönen hata nesnesi
-  - `p` — ikinci sorgu forEach iterasyon parametresi
-  - `added` — sepete eklenen toplam ürün adedi sayacı, başlangıç 0
-  - `it` — `o.order_items` üzerindeki `for...of` iterasyon parametresi
-  - `prod` — `productMap` içinden eşleşen Product nesnesi veya undefined
-  - `e` — catch bloğu hata nesnesi
-- **Dönüş**: yok (yan etki: `addToCart(prod, qty)` ile ürünleri sepete ekler, `router.push(Routes.cart())` ile sepet sayfasına yönlendirir, `toast.success`/`toast.error` ile bildirim gösterir)
+  - `jsPDF` — `import('jspdf')` dinamik import'undan gelen varsayılan dışa aktarım; PDF belge sınıfı
+  - `autoTable` — `import('jspdf-autotable')` dinamik import'undan gelen varsayılan dışa aktarım; tablo ekleme fonksiyonu
+  - `doc` — `new jsPDF({ unit: 'pt', format: 'a4' })` ile oluşturulan PDF belge nesnesi
+  - `orderNo` — Proforma numarası; `o.order_number` varsa `'-'` ile bölünüp ikinci parça alınır, yoksa `o.id.slice(-8).toUpperCase()` fallback'i
+  - `head` — Tablo başlık satırı dizisi: `[t('orders.productCol'), t('orders.qtyCol'), t('orders.unitPriceCol'), t('orders.totalCol')]`
+  - `body` — `o.order_items.map(...)` ile oluşturulan tablo gövde satırları; her satır `[ürünAdı, miktar, birimFiyat, toplamFiyat]` formatında
+  - `after` — Tablonun bittiği Y koordinatı; `(doc as ...).lastAutoTable?.finalY || 100` ile hesaplanır
+  - `e` — try-catch yakalama değişkeni
+- **Dönüş**: yok (yan etki: `doc.save(...)` ile PDF dosyası indirilir, `toast.error` hata durumunda)
+- **Dinamik Importlar**: `import('jspdf')`, `import('jspdf-autotable')`
+- **Dict Erişimleri**: `o.order_number`, `o.created_at`, `o.customer_name`, `o.customer_email`, `o.order_items`, `o.total_amount`
 
-### [N8_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::getStatusColorClass
-- **params**: `status` — `string` türünde sipariş durumu değeri
-- **ic_degiskenler**: (yok — switch/case yapısı içinde parametre directly kullanılır)
-- **Dönüş**: `string` — Tailwind CSS renk class'ı (ör. `'bg-yellow-100 text-yellow-800'`), duruma göre belirlenir
+---
 
-### [N9_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::getStatusText
-- **params**: `status` — `string` türünde sipariş durumu değeri
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `string` — i18n ile çevrilmiş durum metni (ör. `t('orders.pending')`), tanınmayan durum ise ham status string'i döner
-
-### [N10_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::renderStepItem
-- **params**: `s` — step durumu string'i (siparişin o anki aşaması), `idx` — step indeks numarası (number)
+### [N7_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::reorder
+- **params**: `(o: Order)` — Tekrar sipariş verilecek sipariş nesnesi
 - **ic_degiskenler**:
-  - `activeIdx` — mevcut aktif step indeksini hesaplayan değişken (useMemo veya hesaplama sonucu), `idx <= activeIdx` koşuluyla renk belirlenir
-  - `steps` — sipariş akışındaki tüm adım isimlerinin dizisi, `steps.length` ile son adım kontrolü yapılır
-- **Dönüş**: `JSX.Element` — React Fragment içinde step number circle + label + connector bar JSX'i
+  - `ids` — `o.order_items` içindeki `product_id` alanlarının benzersiz, null/undefined filtreli string dizisi; `Array.from(new Set(...))` ile elde edilir
+  - `names` — `product_id`'si olmayan kalemlerin `product_name` değerlerinin benzersiz dizisi; products tablosunda isim ile arama için kullanılır
+  - `productMap` — `Record<string, Product>` sözlüğü; ürün ID'si veya adına göre `Product` nesnesini eşler
+  - `data` — `supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('id', ids)` sorgusundan dönen ürün verisi
+  - `error` — IDs tabanlı Supabase sorgu hatası
+  - `p` — `forEach` callback parametresi; `Product` nesnesi; `productMap[p.id]` veya `productMap[p.name]` olarak kaydedilir
+  - `added` — Sepete eklenen toplam ürün adedi sayacı
+  - `it` — `for...of` döngü değişkeni; `o.order_items` içindeki her sipariş kalemi
+  - `prod` — Mevcut kaleme karşılık gelen `Product` nesnesi; önce `productMap[it.product_id]`, sonra fallback olarak `productMap[it.product_name]` ile bulunur
+  - `e` — try-catch yakalama değişkeni
+- **Dönüş**: yok (yan etki: `addToCart(prod, it.quantity)`, `toast.success`/`toast.error`, `router.push(Routes.cart())`)
+- **API Çağrıları**: `supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('id', ids)`, `supabase.from('products').select(VARIANT_DETAIL_COLUMNS).in('name', names)`
+- **Dict Erişimleri**: `productMap[p.id]`, `productMap[p.name]`, `productMap[it.product_id]`, `productMap[it.product_name]`, `it.product_id`, `it.product_name`, `it.quantity`
 
-### [N11_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::renderTabButton
-- **params**: `tt` — tab identifier string'i (ör. `'overview'`, `'items'`, `'shipping'`, `'invoice'`)
+---
+
+### [N8_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::getStatusColor
+- **params**: `(status: string)` — Sipariş veya ödeme durumu dizgesi
 - **ic_degiskenler**:
-  - `tab` — aktif seçili tab'ın state değeri, `setTab` ile değiştirilir
-  - `setTab` — useState setter'ı, tab değişiminde çağrılır
-- **Dönüş**: `JSX.Element` — tab butonu JSX'i, `onClick` handler ile `setTab(tt)` çağrısı, aktif/pasif conditionally styled
+  - (yok — parametre dışında yerel değişken yok)
+- **Dönüş**: `string` — Tailwind CSS class adı (ör. `'bg-yellow-100 text-yellow-800'`, `'bg-blue-100 text-blue-800'`); durum değerine göre `switch/case` ile belirlenir; `'pending'`, `'paid'`/`'confirmed'`, `'shipped'`, `'delivered'`, `'failed'`/`'cancelled'` ve default kolları vardır
 
-### [N12_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::renderShippingAddress
-- **params**: (parametre yok — anonim arrow)
+---
+
+### [N9_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::getStatusText
+- **params**: `(status: string)` — Sipariş veya ödeme durumu dizgesi
 - **ic_degiskenler**:
-  - `order` — component state'indeki `Order` nesnesi, `shipping_address` alanı kullanılır
-  - `addr` — `order.shipping_address` değerinin `ShippingAddress` türüne cast edilmiş hali
-  - `line1` — `addr.fullAddress` veya `addr.street` değerinden oluşan sokak adresi satırı
-  - `line2` — `addr.city` ve `addr.district || addr.state` değerlerinin `', '` ile birleştirilmiş hali, `filter(Boolean)` ile boş olanlar çıkarılır
-  - `line3` — `addr.postalCode` veya `addr.postal_code` değerinden oluşan posta kodu satırı
-- **Dönüş**: `JSX.Element` — `<div>` içinde adres satırlarını conditionally render eden JSX
+  - (yok — parametre dışında yerel değişken yok)
+- **Dönüş**: `string` — `t()` uluslararasılaştırma fonksiyonu ile çevrilmiş durum metni (ör. `t('orders.pending')`); `'refunded'` durumu ek olarak ele alınır; bilinmeyen durumlarda ham `status` dizgesi döner
 
-### [N13_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::renderOrderItemRow
-- **params**: `item` — `OrderItem` türüne ait sipariş kalemi nesnesi
-- **ic_degiskenler**: (yok — item özellikleri doğrudan JSX içinde kullanılır)
-- **Dönüş**: `JSX.Element` — `<tr>` tablo satırı JSX'i, ürün adı (linkli/linkless), görsel (VentImage), adet, birim fiyat, toplam fiyat sütunları
+---
 
-### [N14_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::renderInvoiceInfo
-- **params**: (parametre yok — anonim arrow)
+### [N10_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderStep
+- **params**: `(s, idx)` — `s`: adım durumu dizgesi, `idx`: adımın sırası (0-tabanlı indeks)
 - **ic_degiskenler**:
-  - `order` — component state'indeki `Order` nesnesi
-  - `info` — `order.invoice_info` değerinin `Record<string, unknown>` türüne cast edilmiş hali
-  - `iv` — inner arrow fonksiyonu, `(k: string) => String(info[k])` veya `'-'` fallback,_invoice_info alanından değer okumak için helper
-- **Dönüş**: `JSX.Element` — kurumsal ise şirket adı/VKN/vergi dairesi, bireysel ise TCKN gösteren JSX
+  - (yok — yerel değişken yok; JSX içinde doğrudan hesaplama)
+- **Dönüş**: JSX `React.Fragment` — Sipariş takip adımını gösteren daire + çizgi bloğu; `idx <= activeIdx` koşulu ile aktif/pasif renklendirme; `getStatusText(s)` ile durum metni; `steps.length - 1` kontrolü ile son adımda çizgi gizlenir
+- **Dict Erişimleri**: `idx <= activeIdx` (dış kapsam değişkeni `activeIdx`)
 
-### [N15_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::renderLegalConsents
-- **params**: (parametre yok — anonim arrow)
-- **ic_degiskenler**:
-  - `order` — component state'indeki `Order` nesnesi
-  - `cons` — `order.legal_consents` değerinin `Record<string, { accepted?: boolean; ts?: string | null }>` türüne cast edilmiş hali
-  - `row` — inner arrow fonksiyonu, `(label: string, k: string) => JSX.Element`, her bir yasal onay satırını render eden helper
-- **Dönüş**: `JSX.Element` — KVKK, mesafeli satış, ön bilgilendirme, sipariş onay, pazarlama onay satırlarını gösteren Fragment JSX
+---
 
-### [N16_NASIL] AST Pointer: src/views/account/OrderDetailPage.tsx::renderConsentRow
-- **params**: `label` — `string` türünde gösterilecek onay etiketi metni, `k` — `string` türünde legal_consents objesindeki key (ör. `'kvkk'`, `'distanceSales'`)
+### [N11_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderTabButton
+- **params**: `(tt)` — Sekme identifier dizgesi (ör. `'overview'`, `'items'`, `'shipping'`, `'invoice'`)
 - **ic_degiskenler**:
-  - `cons` — parent scope'daki `order.legal_consents` cast edilmiş `Record<string, { accepted?: boolean; ts?: string | null }>` nesnesi
-  - `c` — `cons?.[k]` erişimi ile elde edilen tekil onay kaydı, `{ accepted?: boolean; ts?: string | null }` yapısında
-  - `ok` — `!!c?.accepted` boolean flag'i, onay durumu (boolean coercion)
-  - `ts` — `c?.ts` varsa `formatDateTime(c.ts, lang)` ile formatlanmış tarih string'i, yoksa `'-'`
-- **Dönüş**: `JSX.Element` — `<div>` içinde etiket, tarih damgası ve kabul/ret badge'i gösteren JSX
+  - (yok — yerel değişken yok)
+- **Dönüş**: JSX `button` elementi — `onClick={() => setTab(tt)}` ile aktif sekme değiştirilir; `tab === tt` koşulu ile aktif/pasif stil uygulanır; her `tt` değeri için `t()` ile çevrilmiş sekme başlığı gösterilir
+- **Dict Erişimleri**: `tab === tt` (dış kapsam değişkeni `tab`)
+
+---
+
+### [N12_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderShippingAddress
+- **params**: (yok — anonim arrow fonksiyon)
+- **ic_degiskenler**:
+  - `addr` — `order.shipping_address` alanının `ShippingAddress` tipine cast edilmiş hali; kargo adresi nesnesi
+  - `line1` — Tam adres satırı; `addr.fullAddress` varsa o alınır, yoksa `addr.street` fallback'i
+  - `line2` — İlçe/İl bilgisi; `addr.city` ve `addr.district || addr.state` değerlerinin `', '` ile birleşimi; `filter(Boolean)` ile boş değerler temizlenir
+  - `line3` — Posta kodu; `addr.postalCode || addr.postal_code` ile iki farklı isimlendirme desteklenir
+- **Dönüş**: JSX `div` elementi — Adres satırlarını (`line1`, `line2`, `line3`) koşullu olarak gösteren `<p>` blokları
+- **Dict Erişimleri**: `order.shipping_address`, `addr.fullAddress`, `addr.street`, `addr.city`, `addr.district`, `addr.state`, `addr.postalCode`, `addr.postal_code`
+
+---
+
+### [N13_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderOrderItemRow
+- **params**: `(item)` — Tek bir sipariş kalemi nesnesi (`OrderItem`); `product_id`, `product_name`, `product_sku`, `quantity`, `unit_price`, `total_price`, `product_image_url` alanlarını içerir
+- **ic_degiskenler**:
+  - (yok — yerel değişken yok; JSX içinde doğrudan parametre erişimi)
+- **Dönüş**: JSX `tr` elementi — Ürün adı (`item.product_name`), SKU etiketi (`item.product_sku`), ürün görseli (`item.product_image_url` ile `VentImage`), miktar (`item.quantity`), birim fiyat (`item.unit_price` ile `formatPrice`), toplam fiyat (`item.total_price` ile `formatPrice`); `item.product_id` varsa ürün adına `Link` ile tıklanabilir bağlantı eklenir
+- **Dict Erişimleri**: `item.product_id`, `item.product_name`, `item.product_sku`, `item.product_image_url`, `item.quantity`, `item.unit_price`, `item.total_price`
+
+---
+
+### [N14_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderInvoiceInfo
+- **params**: (yok — anonim arrow fonksiyon)
+- **ic_degiskenler**:
+  - `info` — `order.invoice_info` alanının `Record<string, unknown>` tipine cast edilmiş fatura bilgisi sözlüğü; `|| {}` ile boş nesne fallback'i
+  - `iv` — İç helper fonksiyon `(k: string) => string`; `info?.[k]` erişimi ile belirli bir anahtarın değerini `String()` ile döner, yoksa `'-'` döner
+- **Dönüş**: JSX element — `order.invoice_type` `'corporate'` ise kurumsal fatura bilgileri (`companyName`, `vkn`, `taxOffice`); değilse bireysel fatura bilgisi (`tckn`); her alan `iv()` helper'ı ile okunur
+- **Dict Erişimleri**: `order.invoice_info`, `order.invoice_type`, `info?.[k]`, `info[k]`
+
+---
+
+### [N15_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderLegalConsents
+- **params**: (yok — anonim arrow fonksiyon)
+- **ic_degiskenler**:
+  - `cons` — `order.legal_consents` alanının `Record<string, { accepted?: boolean; ts?: string | null }>` tipine cast edilmiş yasal onay sözlüğü; `|| {}` ile boş nesne fallback'i
+  - `row` — İç helper fonksiyon `(label: string, k: string) => JSX`; belirli bir onay kaydının etiketini, kabul durumunu ve zaman damgasını gösterir; `[N16_NASIL]` fonksiyonunun aynısıdır
+- **Dönüş**: JSX fragment — Beş onay satırı: `'kvkk'`, `'distanceSales'`, `'preInfo'`, `'orderConfirm'`, `'marketing'`; her biri `row()` helper'ı ile render edilir
+- **Dict Erişimleri**: `order.legal_consents`, `cons?.[k]`
+
+---
+
+### [N16_NASIL] AST Pointer: `src\views\account\OrderDetailPage.tsx`::renderConsentRow
+- **params**: `(label: string, k: string)` — `label`: Görünen etiket metni, `k`: Onay kaydının sözlük anahtarı
+- **ic_degiskenler**:
+  - `c` — `cons?.[k]` erişimi ile elde edilen tekil onay nesnesi (`{ accepted?: boolean; ts?: string | null }`)
+  - `ok` — `!!c?.accepted` ile hesaplanan boolean; onayın verilip verilmediğini gösterir
+  - `ts` — `c?.ts ? formatDateTime(c.ts, lang) : '-'` ile formatlanmış zaman damgası dizgesi
+- **Dönüş**: JSX `div` elementi — Sol tarafta etiket, sağ tarafta zaman damgası ve onay durumu rozeti (`accepted` ise yeşil, değilse gri); `formatDateTime(c.ts, lang)` ile tarih formatlanır
+- **Dict Erişimleri**: `cons?.[k]`, `c?.accepted`, `c?.ts`
 
 ---
 

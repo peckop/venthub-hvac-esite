@@ -2,15 +2,15 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-admin\src\views\admin\AdminLogisticsTableBody.tsx
-skeleton_hash: 1ca759a637381434
+source_path: C:\Users\alize\venthub-wt-altyapi\src\views\admin\AdminLogisticsTableBody.tsx
+skeleton_hash: 56c26adb9dbbd2b0
 entity_hashes:
   func:AdminLogisticsTableBody: 9b3e77ac7c3852ca
   func:generateTrackingUrl: f7d2db49a1f9760f
   func:logisticsFetcher: 366567b74e09656a
   overview: 48e579b479191242
   style_tokens: e32257fb820f9bd7
-generated_at: 2026-08-17T18:23:15Z
+generated_at: 2026-08-18T06:53:37Z
 ---
 
 ## Genel Bakış

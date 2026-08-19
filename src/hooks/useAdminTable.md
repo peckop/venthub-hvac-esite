@@ -2,58 +2,82 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\hooks\useAdminTable.ts
-skeleton_hash: ad868f4d11b4ad19
+source_path: C:\Users\alize\venthub-wt-altyapi\src\hooks\useAdminTable.ts
+skeleton_hash: 4de4396c1826cb47
 entity_hashes:
-  func:defaultCompare: 910729d834857acb
-  func:getCell: 6ea12562e2b3024f
-  func:matchesQuery: 317428e8b3efdb29
-  func:parseFiltersFromParams: c7f357b6ffe71c45
-  func:parseSortParam: 3867522697dd2aa2
-  func:useAdminTable: d02ad4d320c7db38
-  overview: 49bdd6c4749aaa1d
-generated_at: 2026-06-19T20:47:53Z
+  func:defaultCompare: 97ad9135d8ab982a
+  func:getCell: 732b1ce10a743e82
+  func:matchesQuery: 12aaf86feabd19a0
+  func:parseFiltersFromParams: 50d29f90d4df81b1
+  func:parseSortParam: 0925c7aec25db78a
+  func:useAdminTable: 09419e6d6f9693d3
+  overview: 8459d5ed63095bc6
+generated_at: 2026-08-18T06:47:08Z
 ---
 
 ## Genel Bakış
-`useAdminTable`, admin panellerindeki tabloların durum yönetimi için tasarlanmış bir React custom hook modülüdür. URL parametrelerinden sıralama ve filtreleme bilgilerini parse eder, tablo hücrelerine erişimi standartlaştırır ve arama/filtreleme mantığını merkezileştirir.
+`useAdminTable`, admin panellerindeki tablo bileşenlerinin sıralama, filtreleme, arama ve hücre erişim mantığını merkezi olarak yöneten bir React custom hook modülüdür. URL parametreleri ile senkronize çalışarak tablo durumunun tarayıcı geçmişine bağlanmasını sağlar. Modül,;jenerik yapıda tasarlanmış olup farklı veri türleriyle çalışabilir.
 
 ## Fonksiyon Grupları
 
 ### Hücre Erişim Yardımcıları
-Tablo satırlarındaki hücre değerlerine dinamik olarak erişim sağlayan yardımcı fonksiyonları barındırır.
+Tablo satırlarındaki hücre değerlerinehiyerarşik veya düz anahtar yapısıyla güvenli erişim sağlar.
 - `getCell`
 
-### Sıralama Mantığı
-Varsayılan karşılaştırma fonksiyonu ve URL'den gelen sıralama parametrelerinin parse edilmesini yönetir. `useAdminTable` hook'u tarafından sıralama durumunu başlatmak için kullanılır.
+### Sıralama Altyapısı
+Varsayılan karşılaştırma mantığını ve URL'den gelen sıralama parametrelerinin ayrıştırılmasını kapsar. Sıralama durumunun başlangıç değerlerini oluşturmak için kullanılır.
 - `defaultCompare`, `parseSortParam`
 
-### Filtreleme ve Arama
-Satırların arama sorgusuyla eşleşip eşleşmediğini kontrol eder ve URLSearchParams objesinden filtre değerlerini çıkarır. Hook'un iç filtreleme mantığının temelini oluşturur.
+### Filtreleme ve Arama Mantığı
+Satırların arama sorgusuyla eşleşip eşleşmediğini kontrol eder ve URLSearchParams objesinden filtre değerlerini çıkarır. Hook'un iç arama/filtreleme mantığının temel taşlarını oluşturur.
 - `matchesQuery`, `parseFiltersFromParams`
 
-### Ana Hook (Orkestratör)
-Tüm yardımcı fonksiyonları bir araya getirerek tablonun sıralama, filtreleme, sayfalama ve hücre erişim durumunu tek bir接口 üzerinden sunar. Dış bağımlılık olarak React ve Next.js'in `useSearchParams` hook'una ihtiyaç duyar.
+### Ana Orkestratör Hook
+Tüm yardımcı fonksiyonları bir araya getirerek tablonun sıralama, filtreleme, sayfalama ve hücre erişim durumunu tek bir arayüz üzerinden sunar. React state yönetimi ve Next.js `useSearchParams` entegrasyonunu yönetir.
 - `useAdminTable`
+
+## Bağımlılıklar
+Modül, React'ın `useState`, `useMemo` ve `useCallback` hook'larına doğrudan bağımlıdır. Dinamik olarak Next.js'in `useSearchParams` hook'unu yükler ve URL durumuyla senkronizasyon sağlar. Dışarıya sadece tip tanımları (UseAdminTableOptions, UseAdminTableResult, SortState) açar.
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
-- Bu modül davranışsal mantık içermez (salt veri / konfigürasyon / tip tanımı).
-- [Aksiyom 1]: Modülün dışa açtığı yapı (anahtar kümesi / şema) bir sözleşmedir; tüketiciler bu sabit yapıya bağlıdır — kırıcı değişiklik tüm tüketicileri etkiler.
-- [Aksiyom 2]: Bir öğe ekleme/çıkarma yapısal-uyumlu olmalı; ilgili tipler ve seçiciler aynı commit'te güncel tutulmalıdır.
+
+Bu modül, URL tabanlı tablo durum yönetimi sağlamakla sorumludur. Aşağıdaki mimari varsayımlar, fonksiyon imzalarından türetilmiştir.
+
+---
+
+[Aksiyom 1]: Eğer `getCell` çağrılırken `key` parametresi, `row` nesnesinde mevcut olmayan bir özelliği belirtiyorsa, fonksiyon `undefined` döner.
+
+[Aksiyom 2]: Eğer `parseSortParam` fonksiyonuna geçilen `raw` string'i geçerli bir sıralama formatına uymuyorsa, fonksiyon `null` döner ve geçersiz sıralamareq'i sessizce reddedilir.
+
+[Aksiyom 3]: Eğer `matchesQuery` fonksiyonuna geçirilen `needleLower` parametresi **lowercase (küçük harf)** formatında değilse, büyük/küçük harf duyarsız arama doğru çalışmayabilir. Bu değerin调用前 lowercased olması varsayılmaktadır.
+
+[Aksiyom 4]: Eğer `parseFiltersFromParams` fonksiyonuna geçirilen `URLSearchParams` nesnesi `RESERVED_PARAMS` listesindeki parametreleri içeriyorsa, bu parametreler filtre olarak parse edilmemelidir (aksi halde sıralama sayfası navigasyonu bozulabilir).
+
+[Aksiyom 5]: Eğer `defaultCompare` fonksiyonuna geçirilen `a` ve `b` değerleri karşılaştırılamayan (incomparable) türde ise, dönüş değeri tutarsız olabilir; bu fonksiyonun sayısal veya string değerler için tasarlandığı varsayılmaktadır.
+
+[Aksiyom 6]: Eğer `useAdminTable` hook'u, opsiyonlar aracılığıyla bir `sortParam` veya `filterParams` belirtmiyorsa, bu durum URL parametrelerinden çıkarılacak veya varsayılan değerler atanacaktır — hook her halükarda çalışır durumda olmalıdır.
+
+---
+
+**Not:** Fonksiyon gövdelerine erişim olmadığından, `SortState` yapısının içeriği ve filtre parse formatı hakkında kesin bilgi üretilememiştir.
 
 ---
 
 ## FONKSİYON DETAYLARI
 
 ### getCell
-**Ne yapar**: Belirtilen satır nesnesinden (T türünde) verilen kolon anahtarına karşılık gelen hücre değerini döndürür.
-**Nasıl yapar**: Satır nesnesini `Record<string, unknown>` türüne dönüştürerek anahtar erişimini sağlar. Bu, generic bir satır tipinden dinamik olarak alan değerlerini almayı kolaylaştırır.
+
+**Ne yapar**: Verilen bir satır (row) nesnesinde, belirtilen anahtara (key) karşılık gelen değeri döndürür. Bu fonksiyon, client-mode'da kolon ve facet anahtarlarının satır üzerindeki property'lerine dinamik erişim sağlamak için kullanılır. Jeśli belirtilen key mevcut değilse `undefined` döner.
+
+**Nasıl yapar**: Fonksiyon, jenerik `T` tipindeki row nesnesini `Record<string, unknown>` tipine cast ederek `(row as Record<string, unknown>)[key]` biçiminde dinamik property erişimi gerçekleştirir. Bu sayede Herhangi bir nesnenin string anahtarlı değerine tip-güvenli olmayan ama esnek bir erişim sağlanmış olur.
+
 **Parametreler**:
-- row: T — Hücre değeri alınacak satır nesnesi.
-- key: string — Alınacak değerin anahtarı (kolon adı).
-**Dönüş**: unknown — Anahtarın karşılık geldiği değer; tür dönüşümü yapılmış veya tanımsız olabilir.
+- `row`: `T` — Erişilecek değeri içeren satır nesnesi. Genellikle tablonun bir satırını temsil eden bir veri nesnesidir.
+- `key`: `string` — Erişilmek istenen property'nin anahtarı. Kolon veya facet tanımlayıcısı olarak kullanılır.
+
+**Dönüş**: `unknown` — Belirtilen anahtarın değeri. Anahtar mevcut değilse `undefined` döner.
 
 ### defaultCompare
 **Ne yapar**: İki bilinmeyen tipdeki değeri karşılaştırarak sıralama için sayısal bir sonuç üretir.
@@ -120,6 +144,7 @@ Tüm yardımcı fonksiyonları bir araya getirerek tablonun sıralama, filtrelem
 ---
 
 ## İTHALATLAR (IMPORTS)
+- import: ../i18n/I18nProvider::useI18n
 - import: @/lib/supabase/client::supabaseBrowserClient
 - import: @/types/admin-shared::type { TableSortDir }
 - import: @/types/database.types::type { Database }
@@ -225,209 +250,105 @@ type AdminMode = 'server' | 'client' | 'none'
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: src/hooks/useAdminTable.ts::getCell
-- **params**: `row: T, key: string`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `(row as Record<string, unknown>)[key]` — row objesinin key alanını unknown olarak döndürür
+- **params**: `(row: T, key: string)`
+- **ic_degiskenler**:
+  - `row` — Satır verisi, generic T tipinde
+  - `key` — Erişilecek özelliğin anahtarı
+- **Dönüş**: `unknown` — row objesinin belirtilen key'ine karşılık gelen değer
 
 ### [N2_NASIL] AST Pointer: src/hooks/useAdminTable.ts::defaultCompare
-- **params**: `a: unknown, b: unknown`
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `number` — null karşılaştırması, sayısal fark veya 'tr' locale ile String.localeCompare sonucu
+- **params**: `(a: unknown, b: unknown)`
+- **ic_degiskenler**:
+  - `a` — Birinci karşılaştırma değeri
+  - `b` — İkinci karşılaştırma değeri
+- **Dönüş**: `number` — Sıralama için negatif/sıfır/pozitif sonuç
 
 ### [N3_NASIL] AST Pointer: src/hooks/useAdminTable.ts::matchesQuery
-- **params**: `row: T, needleLower: string`
-- **ic_degiskenler**: `v` — row'un her bir alan değeri (Object.values iterasyonu)
-- **Dönüş**: `boolean` — row'un herhangi bir string değerinin needleLower'ı içerip içermediği
+- **params**: `(row: T, needleLower: string)`
+- **ic_degiskenler**:
+  - `row` — Satır verisi, generic T tipinde
+  - `needleLower` — Küçük harfe çevrilmiş arama terimi
+  - `v` — Satırın değerlerinin her biri (Object.values iterasyonundan)
+- **Dönüş**: `boolean` — Arama terimi satırın herhangi bir alanında bulunuyorsa true
 
 ### [N4_NASIL] AST Pointer: src/hooks/useAdminTable.ts::parseSortParam
-- **params**: `raw: string | null`
-- **ic_degiskenler**: `key` — sıralama alanı adı (colon ile ayrılmış ilk parça), `dir` — sıralama yönü ('desc' veya 'asc')
-- **Dönüş**: `SortState | null` — `{ key, dir }` objesi veya null
+- **params**: `(raw: string | null)`
+- **ic_degiskenler**:
+  - `raw` — Ham sıralama parametresi (ör: "created_at:desc")
+  - `key` — Sıralanacak sütun adı (split sonucu)
+  - `dir` — Sıralama yönü (asc veya desc)
+- **Dönüş**: `SortState | null` — Geçerli sıralama durumu veya null
 
 ### [N5_NASIL] AST Pointer: src/hooks/useAdminTable.ts::parseFiltersFromParams
-- **params**: `params: URLSearchParams`
-- **ic_degiskenler**: `out` — sonuç filtre sözlüğü, `k` — parametre adı, `v` — parametre değeri
-- **Dönüş**: `Record<string, string[]>` — RESERVED_PARAMS olmayan ve değeri boş olmayan tüm parametrelerin virgülle ayrılmış dizi karşılıkları
+- **params**: `(params: URLSearchParams)`
+- **ic_degiskenler**:
+  - `params` — URL arama parametreleri
+  - `out` — Filtre sonuçlarını tutan nesne (Record<string, string[]>)
+  - `k` — Her bir parametre anahtarı (URLSearchParams iterasyonundan)
+  - `v` — Her bir parametre değeri (URLSearchParams iterasyonundan)
+- **Dönüş**: `Record<string, string[]>` — Filtrelerin anahtar-değer çiftleri olarak parsed hali
 
 ### [N6_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useAdminTable
-- **params**: `options: UseAdminTableOptions<T>`
+- **params**: `(options: UseAdminTableOptions<T>)`
 - **ic_degiskenler**:
-  - `resource` — options'tan destructured, tablo/kaynak adı, log mesajlarında kullanılır
-  - `rowId` — options'tan destructured, satır benzersiz tanımlayıcısını üreten fonksiyon
-  - `fetcher` — options'tan destructured, veri çekme fonksiyonu
-  - `pageSizeOpt` — options'tan destructured, varsayılan sayfa boyutu (default 50)
-  - `paginationMode` — options'tan destructured, sayfalama modu ('server'|'client'|'none')
-  - `sortMode` — options'tan destructured, sıralama modu ('server'|'client'|'none')
-  - `initialSort` — options'tan destructured, başlangıç sıralama durumu
-  - `syncUrl` — options'tan destructured, URL ile senkronizasyon flag'i (default true)
-  - `debounceMs` — options'tan destructured, arama debounce gecikmesi (default 300ms)
-  - `initialFilters` — options'tan destructured, başlangıç filtre değerleri
-  - `searchParams` — useSearchParams() hook'undan, URL arama parametrelerine erişim
-  - `router` — useRouter() hook'undan, navigasyon için
-  - `pathname` — usePathname() hook'undan, mevcut URL yolu
-  - `fetcherRef` — fetcher fonksiyonunu ref'te tutar, fetch deps'ine girmesini önler
-  - `rowIdRef` — rowId fonksiyonunu ref'te tutar
-  - `page` — mevcut sayfa numarası state'i
-  - `setPageRaw` — sayfa numarası raw setter
-  - `pageSize` — sayfa boyutu state'i
-  - `setPageSize` — sayfa boyutu setter
-  - `sort` — sıralama durumu state'i (SortState | null)
-  - `setSort` — sıralama setter
-  - `query` — ham arama sorgusu state'i
-  - `setQueryRaw` — ham arama sorgusu setter
-  - `debouncedQuery` — debounce edilmiş arama sorgusu state'i
-  - `setDebouncedQuery` — debounce edilmiş arama sorgusu setter
-  - `filters` — filtre sözlüğü state'i (Record<string, string[]>)
-  - `setFilters` — filtre sözlüğü setter
-  - `rawRows` — ham satır verisi state'i (T[])
-  - `setRawRows` — ham satır verisi setter
-  - `serverTotal` — sunucu tarafı toplam eşleşme sayısı state'i
-  - `setServerTotal` — sunucu toplam sayısı setter
-  - `isLoading` — yükleme durumu state'i
-  - `setIsLoading` — yükleme durumu setter
-  - `error` — hata mesajı state'i (string | null)
-  - `setError` — hata mesajı setter
-  - `selectedIds` — seçili satır ID set'i state'i (Set<string>)
-  - `setSelectedIds` — seçili ID set'i setter
-  - `lastIndexRef` — shift-seçim için son tıklanan satır indeksini tutar (number | null)
-  - `effPage` — server modda geçerli sayfa, client modda 1
-  - `effSortKey` — server modda geçerli sıralama alanı, client modda boş string
-  - `effSortDir` — server modda geçerli sıralama yönü, client modda 'asc'
-  - `effQuery` — server modda geçerli arama sorgusu, client modda boş string
-  - `effFiltersKey` — server modda JSON.stringify edilmiş filtreler, client modda boş string
-  - `serverParams` — useMemo ile hesaplanan FetchParams objesi
-  - `doFetch` — useCallback ile tanımlanan veri çekme fonksiyonu
-  - `processedRows` — useMemo ile hesaplanan client-side işlenmiş satırlar
-  - `totalMatched` — toplam eşleşme sayısı (server veya client moduna göre)
-  - `pageCount` — toplam sayfa sayısı
-  - `rows` — useMemo ile hesaplanan sayfalı satırlar
-  - `lastUrlRef` — son yazılan URL query string'ini tutar
-  - `justWroteRef` — kendi yazımımızın echo'sunu tespit eder
-  - `buildQuery` — useCallback ile tanımlanan URL query string oluşturma fonksiyonu
-  - `setPage` — sayfa numarasını ayarlayan memoized callback
-  - `setQuery` — arama sorgusunu ayarlayan memoized callback
-  - `setFilter` — belirli bir facet anahtarı için filtre değerlerini ayarlayan callback
-  - `clearAll` — tüm filtreleri ve sorguyu sıfırlayan callback
-  - `hasActiveFilters` — useMemo ile hesaplanan aktif filtre olup olmadığını gösteren boolean
-  - `toggleSort` — useCallback ile tanımlanan sıralama toggle fonksiyonu
-  - `rowsRef` — mevcut rows dizisini ref'te tutar
-  - `toggle` — useCallback ile tanımlanan tek satır seçim toggle fonksiyonu (shift-aralık destekli)
-  - `toggleAll` — useCallback ile tanımlanan tüm sayfa satırlarını seç/kaldır fonksiyonu
-  - `clear` — useCallback ile tanımlanan tüm seçimleri temizleyen callback
-  - `isSelected` — useCallback ile tanımlanan belirli bir ID'nin seçili olup olmadığını kontrol eden fonksiyon
-  - `allSelected` — tüm satırların seçili olup olmadığını gösteren boolean
-  - `selectedIdsArr` — selectedIds set'ini useMemo ile diziye dönüştüren memoized değer
-  - `reload` — useCallback ile tanımlanan doFetch'i çağıran yenileme fonksiyonu
-  - `fetchAllForExport` — useCallback ile tanımlanan tüm verileri çekip dizi olarak döndüren fonksiyon
-- **Dönüş**: `UseAdminTableResult<T>` — { rows, allRows, totalMatched, isLoading, error, reload, fetchAllForExport, pagination, sorting, filtering, selection } objesi; yan etkiler: URL senkronizasyonu, veri çekme, konsol hata uyarıları
-
-### [N7_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useEffect(pagination-sort-validation)
-- **params**: (yok — anonim effect)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — yasak/hata kombinasyonlarını konsola error olarak yazar
-
-### [N8_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useState initializer(page)
-- **params**: (yok — anonim lazy initializer)
-- **ic_degiskenler**: `v` — parseInt ile parse edilmiş sayfa numarası
-- **Dönüş**: `number` — URL'den okunan sayfa numarası veya 1
-
-### [N9_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useState initializer(sort)
-- **params**: (yok — anonim lazy initializer)
-- **ic_degiskenler**: `s` — parseSortParam ile parse edilmiş sıralama durumu
-- **Dönüş**: `SortState | null` — URL'den sort veya initialSort veya null
-
-### [N10_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useState initializer(filters)
-- **params**: (yok — anonim lazy initializer)
-- **ic_degiskenler**: `parsed` — parseFiltersFromParams ile parse edilmiş filtre sözlüğü
-- **Dönüş**: `Record<string, string[]>` — URL'den filtreler veya initialFilters veya boş obje
-
-### [N11_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useEffect(debounce)
-- **params**: (yok — anonim effect)
-- **ic_degiskenler**: `t` — setTimeout ID'si
-- **Dönüş**: yok — debounce gecikmesi ile debouncedQuery'yi günceller, cleanup'ta timer'ı temizler
-
-### [N12_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useMemo(serverParams)
-- **params**: (yok — anonim memo)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: `FetchParams` — { page, pageSize, sort, query, filters } objesi
-
-### [N13_NASIL] AST Pointer: src/hooks/useAdminTable.ts::doFetch
-- **params**: (yok)
-- **ic_degiskenler**: `res` — fetcherRef.current() çağrısından dönen yanıt (res.rows ve res.totalMatched)
-- **Dönüş**: `Promise<void>` — rawRows, serverTotal, isLoading ve error state'lerini günceller
-
-### [N14_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useEffect(fetch-trigger)
-- **params**: (yok — anonim effect)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — doFetch() çağırarak veri çeker
-
-### [N15_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useMemo(processedRows)
-- **params**: (yok — anonim memo)
-- **ic_degiskenler**: `needle` — debouncedQuery'nin lowercased hali
-- **Dönüş**: `T[]` — server modda rawRows; client modda arama + filtre + sıralama uygulanmış satırlar
-
-### [N16_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useMemo(rows)
-- **params**: (yok — anonim memo)
-- **ic_degiskenler**: `from` — sayfalama için başlangıç indeksi
-- **Dönüş**: `T[]` — client pagination modda sayfalı satırlar, diğer modlarda processedRows
-
-### [N17_NASIL] AST Pointer: src/hooks/useAdminTable.ts::buildQuery
-- **params**: (yok)
-- **ic_degiskenler**: `params` — URLSearchParams instance'ı
-- **Dönüş**: `string` — page, sort, q ve filter parametrelerinden oluşan URL query string
-
-### [N18_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useEffect(url-write)
-- **params**: (yok — anonim effect)
-- **ic_degiskenler**: `qs` — buildQuery() ile üretilen query string
-- **Dönüş**: yok — syncUrl aktifse ve değişiklik varsa router.replace ile URL'yi günceller
-
-### [N19_NASIL] AST Pointer: src/hooks/useAdminTable.ts::useEffect(url-read)
-- **params**: (yok — anonim effect)
-- **ic_degiskenler**: `current` — mevcut searchParams string'i, `sp` — URLSearchParams instance'ı, `q` — URL'den okunan arama sorgusu
-- **Dönüş**: yok — dış URL değişikliklerinde (geri/ileri) state'leri URL'den yeniler
-
-### [N20_NASIL] AST Pointer: src/hooks/useAdminTable.ts::setFilter
-- **params**: `facetKey: string, values: string[]`
-- **ic_degiskenler**: `prev` — setFilters updater parametresi, mevcut filtre sözlüğü
-- **Dönüş**: yok — filters state'ini günceller ve sayfayı 1'e sıfırlar
-
-### [N21_NASIL] AST Pointer: src/hooks/useAdminTable.ts::clearAll
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — query, debouncedQuery, filters ve page state'lerini sıfırlar
-
-### [N22_NASIL] AST Pointer: src/hooks/useAdminTable.ts::toggleSort
-- **params**: `key: string`
-- **ic_degiskenler**: `prev` — setSort updater parametresi, mevcut sıralama durumu
-- **Dönüş**: yok — sortMode 'none' değilse sıralamayı toggler ve sayfayı 1'e sıfırlar
-
-### [N23_NASIL] AST Pointer: src/hooks/useAdminTable.ts::toggle
-- **params**: `id: string, opts?: { shiftKey?: boolean }`
-- **ic_degiskenler**: `currentRows` — rowsRef.current'tan alınan güncel satırlar, `curIdx` — tıklanan satırın indeksi, `anchor` — lastIndexRef'den yakalanan son tıklama indeksi, `next` — setSelectedIds updater içindeki yeni Set kopyası, `lo` — shift-aralık için alt sınır, `hi` — shift-aralık için üst sınır
-- **Dönüş**: yok — tek satır seçimini toggler veya shift ile aralık seçimi yapar; lastIndexRef'i günceller
-
-### [N24_NASIL] AST Pointer: src/hooks/useAdminTable.ts::toggle (setSelectedIds updater)
-- **params**: `prev` — mevcut selectedIds Set'i
-- **ic_degiskenler**: `next` — prev'in kopyası
-- **Dönüş**: `Set<string>` — güncellenmiş selected ID seti
-
-### [N25_NASIL] AST Pointer: src/hooks/useAdminTable.ts::toggleAll
-- **params**: (yok)
-- **ic_degiskenler**: `currentRows` — rowsRef.current'tan alınan güncel satırlar, `next` — setSelectedIds updater içindeki yeni Set kopyası, `allOnPage` — tüm sayfa satırlarının seçili olup olmadığını gösteren boolean
-- **Dönüş**: yok — tüm sayfa satırlarını seçer veya seçimleri kaldırır
-
-### [N26_NASIL] AST Pointer: src/hooks/useAdminTable.ts::toggleAll (setSelectedIds updater)
-- **params**: `prev` — mevcut selectedIds Set'i
-- **ic_degiskenler**: `next` — prev'in kopyası, `allOnPage` — tüm satırların seçili olup olmadığını kontrol eden boolean
-- **Dönüş**: `Set<string>` — güncellenmiş selected ID seti
-
-### [N27_NASIL] AST Pointer: src/hooks/useAdminTable.ts::clear
-- **params**: (yok)
-- **ic_degiskenler**: (yok)
-- **Dönüş**: yok — selectedIds'i boş Set ile değiştirir, lastIndexRef'i null yapar
-
-### [N28_NASIL] AST Pointer: src/hooks/useAdminTable.ts::reload
-- **params**: (
+  - `t` — useI18n hook'undan çeviri fonksiyonu
+  - `resource` — options'dan, veri kaynağı adı (tablo adı)
+  - `rowId` — options'dan, satır ID'sini seçen fonksiyon
+  - `fetcher` — options'dan, veri çekme fonksiyonu
+  - `pageSizeOpt` — options'dan, sayfa boyutu (varsayılan 50)
+  - `paginationMode` — options'dan, sayfalama modu ('server', 'client', 'none')
+  - `sortMode` — options'dan, sıralama modu ('server', 'client', 'none')
+  - `initialSort` — options'dan, başlangıç sıralama durumu
+  - `syncUrl` — options'dan, URL ile senkronizasyon açma/kapama
+  - `debounceMs` — options'dan, arama gecikme süresi (ms)
+  - `initialFilters` — options'dan, başlangıç filtre değerleri
+  - `searchParams` — useSearchParams() hook'undan URL parametreleri
+  - `router` — useRouter() hook'undan Next.js yönlendirici
+  - `pathname` — usePathname() hook'undan mevcut URL yolu
+  - `fetcherRef` — fetcher fonksiyonunu ref ile saklayan referans
+  - `rowIdRef` — rowId fonksiyonunu ref ile saklayan referans
+  - `page` — Mevcut sayfa numarası state'i
+  - `pageSize` — Sayfa boyutu state'i
+  - `sort` — Sıralama durumu state'i (SortState | null)
+  - `query` — Ham arama sorgusu state'i
+  - `debouncedQuery` — Geciktirilmiş arama sorgusu state'i
+  - `filters` — Filtre değerleri state'i (Record<string, string[]>)
+  - `rawRows` — Ham satır verileri state'i (T[])
+  - `serverTotal` — Sunucu tarafı toplam eşleşme sayısı state'i
+  - `isLoading` — Yükleme durumu state'i
+  - `error` — Hata mesajı state'i
+  - `selectedIds` — Seçili satır ID'leri state'i (Set<string>)
+  - `lastIndexRef` — Son tıklanan satır indeksi referansı
+  - `effPage` — Etkin sayfa (paginationMode'a göre sayfa veya 1)
+  - `effSortKey` — Etkin sıralama anahtarı (sortMode='server' ise)
+  - `effSortDir` — Etkin sıralama yönü (sortMode='server' ise)
+  - `effQuery` — Etkin arama sorgusu (paginationMode='server' ise)
+  - `effFiltersKey` — Etkin filtrelerin JSON anahtarı (paginationMode='server' ise)
+  - `serverParams` — Sunucu isteği parametreleri (useMemo ile hesaplanan)
+  - `doFetch` — Veri çekme fonksiyonu (useCallback ile tanımlanmış)
+  - `processedRows` — İşlenmiş satırlar (client-side filtreleme ve sıralama sonrası)
+  - `totalMatched` — Toplam eşleşme sayısı (sunucu veya client moduna göre)
+  - `pageCount` — Toplam sayfa sayısı
+  - `rows` — Görüntülenecek satırlar (sayfalama uygulanmış hali)
+  - `lastUrlRef` — Son yazılan URL referansı
+  - `justWroteRef` — URL'ye yeni yazıldığını belirten flag referansı
+  - `buildQuery` — URL query string oluşturma fonksiyonu
+  - `setPage` — Sayfa değiştirme fonksiyonu
+  - `setQuery` — Arama sorgusu değiştirme fonksiyonu
+  - `setFilter` — Filtre değiştirme fonksiyonu
+  - `clearAll` — Tüm filtre ve aramayı temizleme fonksiyonu
+  - `hasActiveFilters` — Aktif filtre varsa true dönen memoized değer
+  - `toggleSort` — Sıralama togggle fonksiyonu
+  - `rowsRef` — rows state'ini ref ile saklayan referans
+  - `toggle` — Tek satır seçim togggle fonksiyonu (shift-aralık desteği)
+  - `toggleAll` — Tüm satırları seç/kaldır fonksiyonu
+  - `clear` — Tüm seçimleri temizleme fonksiyonu
+  - `isSelected` — Belirli bir satırın seçili olup olmadığını kontrol eden fonksiyon
+  - `allSelected` — Tüm sayfadaki satırların seçili olup olmadığını belirleyen boolean
+  - `selectedIdsArr` — Seçili ID'lerin array hali
+  - `reload` — Veriyi yeniden çekme fonksiyonu
+  - `fetchAllForExport` — Tüm veriyi dışa aktarma için çekme fonksiyonu
+- **Dönüş**: `UseAdminTableResult<T>` — Admin tablosu için tüm state ve fonksiyonları içeren nesne
 
 ---
 
@@ -441,11 +362,11 @@ graph TD
     useAdminTable_ts__parseFiltersFromParams["parseFiltersFromParams"]
     useAdminTable_ts__parseSortParam["parseSortParam"]
     useAdminTable_ts__useAdminTable["useAdminTable"]
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__getCell
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseSortParam
-    useAdminTable_ts__useAdminTable --> useAdminTable_ts__defaultCompare
     useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseFiltersFromParams
     useAdminTable_ts__useAdminTable --> useAdminTable_ts__matchesQuery
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__defaultCompare
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__getCell
+    useAdminTable_ts__useAdminTable --> useAdminTable_ts__parseSortParam
 ```
 
 ## NODE ID STANDARD
