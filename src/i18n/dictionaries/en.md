@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\i18n\dictionaries\en.ts
-skeleton_hash: d84ad55406c6673c
+source_path: C:\Users\alize\venthub-wt-altyapi\src\i18n\dictionaries\en.ts
+skeleton_hash: 1208b215073caa14
 entity_hashes:
   overview: ae56d958419ef214
-generated_at: 2026-08-17T13:20:04Z
+generated_at: 2026-08-18T06:48:30Z
 ---
 
 ## Genel Bakış
@@ -35,9 +35,9 @@ Bu modül için özel aksiyom tanımlanmamıştır.
 
 ## SABİTLER
 - **en** (object) — `{
-  common: {
-    paginationLabel: 'Pagination',
-    paginationPrevious: 'Pre...`
+  whatsappMessages: {
+    greeting: 'Hello!',
+    stockInquiry: 'Hello! ...`
 
 ---
 

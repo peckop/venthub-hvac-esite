@@ -2,50 +2,53 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\lib\services\pricingAdmin.service.ts
-skeleton_hash: 6fa45e537ae32a96
+source_path: C:\Users\alize\venthub-wt-altyapi\src\lib\services\pricingAdmin.service.ts
+skeleton_hash: 10f6457cc7ed4652
 entity_hashes:
+  func:ScopeFilterableQuery:eq: b0d4a7d1d095dcbd
   func:activeProductsQuery: 8b70307de3dcf767
   func:brandNameById: 257e1a32aea3906c
   func:categoryIdsWithDescendants: 242a635b5c7fa466
   func:coefficientToMarginPct: 3f32b97c3198a2da
-  func:countProductsInScope: ffd2c47eccb84a35
+  func:countProductsInScope: a1838271ad4fab0f
   func:createPricingRule: 949918a25d15ea17
   func:deletePricingRule: 313310a598f7445b
   func:deletePricingRules: 14cee9d782a3ce92
+  func:distinctPurchaseCurrenciesInScope: 23d97df3afca6249
   func:listPricingRules: 30ef9ef5c0a10bdb
   func:loadBrandIdByName: a28b2b8a1c198edc
   func:marginPctToCoefficient: cdf1ad6eff43c2ec
-  func:sampleProductsInScope: d2cecd450f3e2392
+  func:resolveScopeFilter: 13422f05acbddf2f
+  func:sampleProductsInScope: 5907dabf4500b02e
   func:toPricingProductInput: d38e577c142cfed8
   func:updatePricingRule: 5601b347117ac443
-  overview: 5b37d4bd3540b33e
-generated_at: 2026-08-14T09:17:09Z
+  func:withScopeFilter: 2b3e8009205fb17a
+  overview: f4cde8561230f2aa
+generated_at: 2026-08-18T06:49:41Z
 ---
 
 ## Genel Bakış
-Bu modül, fiyatlandırma kurallarının yönetimi ve fiyat hesaplama mantığının desteklenmesi için kullanılan bir servis katmanıdır. Veritabanı üzerinden fiyatlandırma politikalarının temel CRUD işlemlerini yürütür; ayrıca bu kuralların hangi ürünleri kapsayacağını belirlemek için marka, kategori ve ürün kapsamı verilerini hazırlar.
+Bu modül, fiyatlandırma politikalarının merkezi yönetim noktasıdır. Fiyatlandırma kurallarının veritabanındaki yaşam döngüsünü (CRUD) yönetir ve bu kuralların uygulanacağı ürüncope'sunu belirlemek için gerekli olan marka, kategori ve ürün verilerini hazırlar. Modül, veritabanı bağımlılığı (SupabaseClient) üzerinden çalışır ve iş mantığını veri erişiminden ayırır.
 
 ## Fonksiyon Grupları
-### Fiyatlandırma Kuralları CRUD
-Fiyatlandırma kurallarının veritabanında listelenmesi, oluşturulması, güncellenmesi ve silinmesi gibi temel yönetimsel işlemleri koordine eder.
-- listPricingRules, createPricingRule, updatePricingRule, deletePricingRule, deletePricingRules
+### Fiyatlandırma Kuralları Yönetimi
+Bu grup, fiyatlandırma politikalarının temel kayıt silme, ekleme ve güncelleme işlemlerini yönetir.
+- `listPricingRules`, `createPricingRule`, `updatePricingRule`, `deletePricingRule`, `deletePricingRules`
 
-### Ürün Kapsamı ve Veri Hazırlama
-Fiyatlandırma kurallarının hedef aldığı ürünleri belirlemek için marka ve kategori hiyerarşisi ile aktif ürün listelerini sorgular ve düzenler.
-- loadBrandIdByName, toPricingProductInput, brandNameById, categoryIdsWithDescendants, activeProductsQuery, countProductsInScope, sampleProductsInScope
+### Ürün Kapsamı ve Filtreleme Mantığı
+Fiyatlandırma kurallarının hangi ürünleri kapsadığını belirler; marka ve kategori gibi varlıkları kullanarak aktif ürün listelerini filtreler, sayar ve örnekler.
+- `loadBrandIdByName`, `brandNameById`, `categoryIdsWithDescendants`, `resolveScopeFilter`, `withScopeFilter`, `activeProductsQuery`, `countProductsInScope`, `sampleProductsInScope`, `distinctPurchaseCurrenciesInScope`
 
-### Yardımcı Hesaplamalar
-Marj yüzdesi ile fiyat katsayısı arasında dönüşüm yapan, fiyatlandırma mantığını destekleyen saf hesaplama fonksiyonlarıdır.
-- marginPctToCoefficient, coefficientToMarginPct
+### Veri Dönüştürme ve Yardımcı Hesaplamalar
+Veritabanından gelen ham verileri modül için anlamlı formatlara dönüştürür ve fiyatlandırma mantığında kullanılan temel matematiksel dönüşümleri sağlar.
+- `toPricingProductInput`, `marginPctToCoefficient`, `coefficientToMarginPct`
 
 ---
 
 ## AXIOMS – Mimari Varsayımlar
+Bu modül, fiyatlandırma kurallarının CRUD işlemlerini ve fiyat hesaplama için kapsamlı (scope) filtreleme mantığını yönetir. Aşağıdaki mimari varsayımlar, fonksiyon imzaları ve_modül yapısından türetilmiştir.
 
-Bu modül, HVAC fiyatlandırma kuralları için CRUD işlemleri ve fiyatlandırma ile ilgili yardımcı fonksiyonlar sağlar.
-
-[Aksiyom 1]: Eğer `supabase` parametresi geçerli bir Supabase Client instance'ı değilse (örn. `None`, süresi dolmuş token veya yanlış proje URL'si), tüm CRUD ve sorgu fonksiyonları (`listPricingRules`, `createPricingRule`, `updatePricing
+[Aksiyom 1]: Eğer `supabase` parametresi olarak geçerli, yetkilendirilmiş bir Supabase istemcisi (`SupabaseClient<Database>` tipinde) sağlanmazsa, veritabanı tabanlı hiçbir fonksiyon (`listPricingRules`, `createPricingRule`, `updatePricingRule`, `deletePricingRule`, `deletePricingRules`, `loadBrandIdByName`, `brandNameById`,
 
 ---
 
@@ -123,6 +126,23 @@ Bu modül, HVAC fiyatlandırma kuralları için CRUD işlemleri ve fiyatlandırm
 - `rootId`: `string` — Kapsamı hesaplanacak kök kategorinin ID'si.
 **Dönüş**: `Promise<string[]>` — Kök kategori ve tüm alt kategorilerinin ID'lerini içeren dizi.
 
+### resolveScopeFilter
+**Ne yapar**: Verilen kapsam koduna ve hedef kimliğe göre, bir fiyatlandırma kuralının uygulanacağı kapsam filtresini (ScopeFilter) çözümler.
+**Nasıl yapar**: `scope` parametresine bağlı olarak farklı bir mantık izler. scope 0 veya 1 ise, bir ID filtresi veya boş filtre döner. scope 2 ise, marka adını bulup bir marka filtresi oluşturur. scope 3 ise, kategori ve alt kategorilerini alarak bir kategori filtresi döner. Diğer tüm durumlarda (muhtemelen 'all' kapsamı için) tümünü kapsayan bir filtre döner.
+**Parametreler**:
+- supabase: SupabaseClient<Database> — Veritabanı işlemleri için kullanılan Supabase istemcisi.
+- scope: number — Kapsamı belirleyen numerik kod (0, 1, 2, 3).
+- targetId: string | null — Kapsamın odaklanacağı spesifik varlığın (ürün, marka, kategori) ID'si.
+**Dönüş**: Promise<ScopeFilter> — Çözümlenmiş, belirli bir türde (`id`, `brand`, `categories`, `empty` veya `all`) ve değeri içeren bir kapsam filtresi nesnesi.
+
+### withScopeFilter
+**Ne yapar**: Çözümlenmiş bir kapsam filtresini (ScopeFilter), bir PostgREST sorgu nesnesine (query) uygular.
+**Nasıl yapar**: Filtrenin `kind` alanına göre bir `switch` bloğu ile farklı PostgREST filtre metodlarını çağırır. `id` için `.eq('id', ...)`, `brand` için `.eq('brand', ...)`, `categories` için `.in('category_id', ...)` kullanır. `empty` durumu çağrılmadan önce elendiği, `all` durumunda ise sorguya ekstra filtre eklenmediği varsayılır.
+**Parametreler**:
+- query: Q extends ScopeFilterableQuery<Q> — Filtrenin uygulanacağı ve zincirlenebilir PostgREST sorgu nesnesi. Generik yapısı, methodların doğru türde dönmesini sağlar.
+- filter: ScopeFilter — Uygulanacak kapsam filtresi.
+**Dönüş**: Q — Filtre uygulanmış, aynı generik tipte sorgu nesnesi.
+
 ### activeProductsQuery
 **Ne yapar**: Fiyatlandırma kapsamı hesaplamasında kullanılmak üzere, aktif (silinmemiş ve yayında olan) ürünleri sorgulayan bir Supabase sorgu nesnesi döndürür.
 **Nasıl yapar**: Bu fonksiyon bir sorgu oluşturucusudur, çalıştırması istemciye bırakılır. `products` tablosunu sorgular. `PRODUCT_SCOPE_COLUMNS` sabiti ile belirtilen sütunları seçer. `deleted_at` sütunu `null` olan (silinmemiş) ve `status` sütunu `'active'` (yayında) olan kayıtları filtreler. Dönen nesne üzerinde `.then()` veya `await` kullanılarak sorgu çalıştırılabilir.
@@ -131,23 +151,32 @@ Bu modül, HVAC fiyatlandırma kuralları için CRUD işlemleri ve fiyatlandırm
 **Dönüş**: Veri döndürmez; `SupabaseClient` üzerinde zincirlenebilir bir sorgu nesnesi döndürür.
 
 ### countProductsInScope
-**Ne yapar**: Verilen kapsam (scope) ve hedef ID ile eşleşen aktif (silinmemiş ve durumu 'active') ürün sayısını döndürür. Kapsam türüne göre tekil ürün, marka, kategori (alt kategoriler dahil) veya tüm ürünler için sayma yapar.
-**Nasıl yapar**: Supabase istemcisi kullanarak `products` tablosunda `deleted_at` değeri null olan ve `status`'u 'active' olan kayıtlar için bir sayaç sorgusu oluşturur. `scope` parametresinin değerine (0, 1, 2, 3 veya diğer) göre farklı filtreler uygular: scope 0 veya 1 ise doğrudan `id` ile, scope 2 ise verilen `targetId`'ye ait marka adını (`brandNameById` yardımıyla alıp) `brand` alanı ile, scope 3 ise verilen `targetId`'ye ait kategori ID'si ve tüm alt kategorilerini (`categoryIdsWithDescendants` yardımıyla alıp) `category_id` alanı ile filtreleme yapar. Diğer durumlarda (örn. scope 4) tüm aktif ürünleri sayar. Sorgu hataları fırlatılır.
+**Ne yapar**: Belirli bir kapsam ve hedef için aktif ürün sayısını hesaplar.
+**Nasıl yapar**: `resolveScopeFilter` ile kapsam filtresini çözer. Eğer filtre `empty` ise hemen 0 döner. Aksi halde `products` tablosundan, silinmemiş (`deleted_at` null) ve aktif (`status` 'active') olan ürünleri sayar. Bu sayma sorgusuna `withScopeFilter` ile kapsam filtresini uygular ve sonucu döner.
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemleri için kullanılacak yetkilendirilmiş Supabase istemcisi.
-- `scope`: `number` — Ürün kapsamını belirleyen tam sayı. 0/1: Tekil ürün, 2: Marka, 3: Kategori (alt kategoriler dahil), diğerleri: Tüm ürünler.
-- `targetId`: `string | null` — Kapsam türüne göre bir ürün ID'si, marka ID'si veya kategori ID'si. Kapsam 0-3 aralığında ise ve bu değer `null` ise 0 veya boş dizi döner.
-**Dönüş**: `Promise<number>` — Eşleşen aktif ürün sayısını döndürür. Sorgu hatası oluşursa bir hata fırlatır.
+- supabase: SupabaseClient<Database> — Veritabanı istemcisi.
+- scope: number — Kapsam kodu.
+- targetId: string | null — Hedef varlığın ID'si.
+**Dönüş**: Promise<number> — Kapsamdaki aktif ürün sayısı.
 
 ### sampleProductsInScope
-**Ne yapar**: Belirli bir kapsam ve hedef ID ile eşleşen aktif ürünlerden, fiyat karşılaştırması (önce/sonra) için kullanılabilecek sınırlı sayıda örnek (örnek boyutu `n` ile belirlenir) ürün bilgisini (örneklerin)`SampleProduct[]` formatında) döndürür.
-**Nasıl yapar**: `countProductsInScope` fonksiyonuna benzer mantıkla, verilen `scope` ve `targetId` değerine göre filtrelenmiş aktif ürünleri çeker. Filtreleme için `activeProductsQuery` yardımı ile oluşturulmuş bir sorguyu başlatır ve `.limit(n)` ile sonuç sayısını kısıtlar. scope 0/1 için `id`'ye, scope 2 için `brand` alanına, scope 3 için `category_id` alanına göre filtre uygular. Sonuç olarak elde edilen ham satır verileri (`ProductScopeRow[]`), fiyat karşılaştırması için gerekli dönüşüme (`toPricingProductInput`) uğratılır. Dönüşümde `brandIdByName` (marka adından ID'ye eşleme sözlüğü) kullanılır.
+**Ne yapar**: Belirli bir kapsam ve hedeften, fiyat karşılaştırması (ÖNCE/SONRA) için belirli sayıda örnek ürün getirir.
+**Nasıl yapar**: `resolveScopeFilter` ile kapsam filtresini çözer. Filtre `empty` ise boş dizi döner. Aksi halde `activeProductsQuery` ile (dışarıdan tanımlı) aktif ürün sorgusunu başlatır, `withScopeFilter` ile kapsam filtresini uygular ve `.limit(n)` ile örnek sayısını kısıtlar. Dönen ham satır verisini (`ProductScopeRow`), marka ID'lerini eşlemek için `loadBrandIdByName` ve `toPricingProductInput` yardımcı fonksiyonlarını kullanarak `SampleProduct[]` dizisine dönüştürür.
 **Parametreler**:
-- `supabase`: `SupabaseClient<Database>` — Veritabanı işlemleri için kullanılacak yetkilendirilmiş Supabase istemcisi.
-- `scope`: `number` — Ürün kapsamını belirleyen tam sayı. 0/1: Tekil ürün, 2: Marka, 3: Kategori (alt kategoriler dahil), diğerleri: Tüm ürünler.
-- `targetId`: `string | null` — Kapsam türüne göre bir ürün ID'si, marka ID'si veya kategori ID'si. Kapsam 0-3 aralığında ise ve bu değer `null` ise boş dizi döner.
-- `n`: `number` — İstenen örnek (ürün) sayısı. Varsayılan değer 3'tür.
-**Dönüş**: `Promise<SampleProduct[]>` — Dönüştürülmüş örnek ürünlerin bir dizisi. Sorgu veya dönüşüm hataları oluşursa bir hata fırlatır.
+- supabase: SupabaseClient<Database> — Veritabanı istemcisi.
+- scope: number — Kapsam kodu.
+- targetId: string | null — Hedef varlığın ID'si.
+- n: number — İstenen örnek ürün sayısı (varsayılan 3).
+**Dönüş**: Promise<SampleProduct[]> — Örnek ürünlerin, fiyat karşılaştırmasına uygun formatta dizisi.
+
+### distinctPurchaseCurrenciesInScope
+**Ne yapar**: Belirli bir kapsam ve hedef içindeki, benzersiz (DISTINCT) tüm farklı ürün alış para birimlerini döner.
+**Nasıl yapar**: `resolveScopeFilter` ile kapsam filtresini çözer. Filtre `empty` ise boş dizi döner. Aksi halde, kapsamın TAMAMINI tarar (örnekleme yapmaz). Sayfalama (pagination) kullanarak `products` tablosundan aktif ve silinmemiş ürünlerin `purchase_currency` alanını çeker. Her sayfadaki para birimlerini bir `Set`'e ekleyerek benzersizliği sağlar. Sayfalar arası kararlılık için `id` alanına göre sıralama ve `range` kullanır. Maksat sayfa sayısını (`SCOPE_SCAN_MAX_PAGES * SCOPE_SCAN_PAGE`) aşarsa hata fırlatır, çünkü eksik para birimi kümesi yanlış kur kilitlenmesine yol açabilir.
+**Parametreler**:
+- supabase: SupabaseClient<Database> — Veritabanı istemcisi.
+- scope: number — Kapsam kodu.
+- targetId: string | null — Hedef varlığın ID'si.
+**Dönüş**: Promise<string[]> — Kapsamdaki tüm farklı ve büyük harfle normalize edilmiş para birimlerinin sıralı dizisi.
 
 ### marginPctToCoefficient
 **Ne yapar**: Bir marj yüzdesini (örn. %40) fiyatlandırma katsayısına (örn. 1.4) dönüştürür. Bu katsayı, maliyet üzerine eklenecek kar oranını belirlemek için kullanılır.
@@ -162,6 +191,12 @@ Bu modül, HVAC fiyatlandırma kuralları için CRUD işlemleri ve fiyatlandırm
 **Parametreler**:
 - `coefficient`: `number` — Marj yüzdesine dönüştürülecek katsayı.
 **Dönüş**: `number` — Hesaplanan marj yüzdesini döndürür. Girdi sonlu bir sayı değilse `NaN` döner.
+
+### eq
+**Ne yapar**: Bu fonksiyon hakkında kaynak kodda bilgi bulunamamıştır. PostgREST sorgularında koşul filtresi (`equals`) eklemek için kullanılan bir method olabilir, fakat ayrı bir fonksiyon olarak tanımlanmamıştır. Kullanımı muhtemelen `withScopeFilter` içindeki `.eq(...` çağrılarındadır.
+**Nasıl yapar**: Bilgi bulunamadı.
+**Parametreler**: Bilgi bulunamadı.
+**Dönüş**: Bilgi bulunamadı.
 
 ---
 
@@ -182,6 +217,9 @@ Kapsam örneklemesi için gerekli minimum ürün alanları.
 - `brand: string`
 - `category_id: string | null`
 - `cost_in_base: number | null`
+
+### ScopeFilterableQuery
+- `eq(column: 'id' | 'brand', value: string): Q`
 
 ---
 
@@ -215,108 +253,180 @@ type PricingRuleUpdateInput = Omit<PricingRuleUpdate, 'tenant_id' | 'id'>
 type SampleProduct = PricingProductInput & { name: string; sku: string }
 ```
 
+### ScopeFilter
+Kapsam çözümünün SSOT'u: `(scope, targetId)` → ürün filtresi tarifi. NİÇİN AYRI BİR ADIM: kapsam semantiği önemsiz değil — scope 2 markayı **adıyla** eşler (`products.brand` metin kolonu, FK değil), scope 3 kategori **alt-ağacını** gezer (`resolvePrice` §11 ata-cascade'iyle aynı küme). Bu mantık her
+```typescript
+type ScopeFilter = | { kind: 'empty' }
+  | { kind: 'all' }
+  | { kind: 'id'; value: string }
+  | { kind: 'brand'; value: string }
+  | { kind: 'categories'; values: string[] }
+```
+
 ---
 
 ## AST POINTERS
 
-### [N1_NASIL] AST Pointer: pricingAdmin.service.ts::listPricingRules
+### [N1_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::listPricingRules
 - **params**: `(supabase: SupabaseClient<Database>)`
 - **ic_degiskenler**:
-  - `data` — Supabase sorgusundan dönen veri satırları (PricingRuleRow dizisi)
-  - `error` — Supabase sorgusu sırasında oluşabilecek hata nesnesi
-- **Dönüş**: `Promise<PricingRuleRow[]>` — fiyatlandırma kuralları listesi, boş dizi olabilir
+  - `data` — Supabase'den dönen satır listesi (pricing_rule tablosu)
+  - `error` — Supabase sorgusu hata nesnesi, varsa throw edilir
+- **Dönüş**: `PricingRuleRow[]` — sıralı ve limitli pricing rule satırları; data yoksa boş dizi
 
-### [N2_NASIL] AST Pointer: pricingAdmin.service.ts::createPricingRule
+---
+
+### [N2_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::createPricingRule
 - **params**: `(supabase: SupabaseClient<Database>, input: PricingRuleCreateInput)`
 - **ic_degiskenler**:
-  - `data` — oluşturulan tek PricingRuleRow nesnesi
-  - `error` — Supabase insert hatası
-- **Dönüş**: `Promise<PricingRuleRow>` — yeni oluşturulmuş fiyatlandırma kuralı
+  - `data` — insert edilen tek satırın sonucu (single()
+  - `error` — Supabase insert hatası, varsa throw edilir
+- **Dönüş**: `PricingRuleRow` — yeni oluşturulan pricing rule satırı
 
-### [N3_NASIL] AST Pointer: pricingAdmin.service.ts::updatePricingRule
+---
+
+### [N3_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::updatePricingRule
 - **params**: `(supabase: SupabaseClient<Database>, id: string, patch: PricingRuleUpdateInput, updatedBy: string | null)`
 - **ic_degiskenler**:
-  - `payload` — güncelleme için hazırlanmış veri nesnesi (patch'e updated_at ve updated_by eklenir)
-  - `data` — güncellenen tek PricingRuleRow nesnesi
-  - `error` — Supabase update hatası
-- **Dönüş**: `Promise<PricingRuleRow>` — güncellenmiş fiyatlandırma kuralı
+  - `payload` — patch üzerine updated_at ve updated_by eklenmiş güncelleme nesnesi
+  - `data` — update edilen tek satırın sonucu
+  - `error` — Supabase update hatası, varsa throw edilir
+- **Dönüş**: `PricingRuleRow` — güncellenen pricing rule satırı
 
-### [N4_NASIL] AST Pointer: pricingAdmin.service.ts::deletePricingRule
+---
+
+### [N4_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::deletePricingRule
 - **params**: `(supabase: SupabaseClient<Database>, id: string)`
 - **ic_degiskenler**:
-  - `error` — Supabase delete hatası
-- **Dönüş**: `Promise<void>` — silme işlemi başarılıysa boş, değilse error fırlatır
+  - `error` — Supabase delete hatası, varsa throw edilir
+- **Dönüş**: `void` — yan etki olarak tek bir pricing rule silinir
 
-### [N5_NASIL] AST Pointer: pricingAdmin.service.ts::deletePricingRules
+---
+
+### [N5_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::deletePricingRules
 - **params**: `(supabase: SupabaseClient<Database>, ids: string[])`
 - **ic_degiskenler**:
-  - `error` — Supabase toplu delete hatası
-- **Dönüş**: `Promise<void>` — toplu silme işlemi başarılıysa boş, değilse error fırlatır
+  - `error` — Supabase toplu delete hatası, varsa throw edilir
+- **Dönüş**: `void` — ids boşsa erken dönüş, aksi halde toplu silme
 
-### [N6_NASIL] AST Pointer: pricingAdmin.service.ts::loadBrandIdByName
+---
+
+### [N6_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::loadBrandIdByName
 - **params**: `(supabase: SupabaseClient<Database>)`
 - **ic_degiskenler**:
-  - `data` — brands tablosundan gelen {id, name} satırları
-  - `error` — Supabase select hatası
-  - `map` — marka isimlerinden id'ye eşleme yapan Map nesnesi
-- **Dönüş**: `Promise<Map<string, string>>` — marka ismi → marka ID eşleme haritası
+  - `data` — brands tablosundan select edilen id ve name satırları
+  - `error` — Supabase sorgu hatası, varsa throw edilir
+  - `map` — brand name → brand id eşlemesi tutan Map nesnesi
+  - `row` — brands tablosundaki her bir satır (döngü değişkeni)
+- **Dönüş**: `Map<string, string>` — brand adından id'ye eşleme haritası
 
-### [N7_NASIL] AST Pointer: pricingAdmin.service.ts::toPricingProductInput
+---
+
+### [N7_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::toPricingProductInput
 - **params**: `(row: ProductScopeRow, brandIdByName: Map<string, string>)`
-- **ic_degiskenler**: (yok — sadece parametreler kullanılıyor)
-- **Dönüş**: `SampleProduct` — ürün verisini PricingProductInput formatına dönüştürülmüş nesne
+- **ic_degiskenler**: (yok — doğrudan return nesnesi oluşturulur)
+- **Dönüş**: `SampleProduct` — row verilerini ve brandIdByName map lookup'unu içeren fiyatlandırma ürün girdisi nesnesi
 
-### [N8_NASIL] AST Pointer: pricingAdmin.service.ts::brandNameById
+---
+
+### [N8_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::brandNameById
 - **params**: `(supabase: SupabaseClient<Database>, brandId: string)`
 - **ic_degiskenler**:
-  - `data` — brands tablosundan dönen name alanı
-  - `error` — Supabase select hatası
-- **Dönüş**: `Promise<string | null>` — marka ID'sine karşılık gelen marka adı veya null
+  - `data` — brands tablosundan name alanı select edilen tek satır
+  - `error` — Supabase sorgu hatası, varsa throw edilir
+- **Dönüş**: `string | null` — brand adı veya bulunamazsa null
 
-### [N9_NASIL] AST Pointer: pricingAdmin.service.ts::categoryIdsWithDescendants
+---
+
+### [N9_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::categoryIdsWithDescendants
 - **params**: `(supabase: SupabaseClient<Database>, rootId: string)`
 - **ic_degiskenler**:
-  - `data` — categories tablosundan gelen {id, parent_id} satırları
-  - `error` — Supabase select hatası
-  - `childrenOf` — parent_id'den child_id[] eşlemesi yapan Map nesnesi
-  - `collected` — toplanan tüm kategori ID'lerini tutan Set
-  - `queue` — BFS için kullanılan kuyruk dizisi
-  - `current` — kuyruktan çıkarılan mevcut kategori ID'si
-- **Dönüş**: `Promise<string[]>` — rootId ve tüm alt kategorilerin ID listesi
+  - `data` — categories tablosundan id ve parent_id select edilen satırlar
+  - `error` — Supabase sorgu hatası, varsa throw edilir
+  - `childrenOf` — parent_id → child id dizisi eşlemesi yapan Map
+  - `row` — categories tablosundaki her bir satır (döngü değişkeni)
+  - `bucket` — mevcut parent'a ait child listesi (push/bucket kontrolü)
+  - `collected` — toplanan tüm kategori id'lerini tutan Set (rootId dahil)
+  - `queue` — BFS traversal için kuyruk dizisi
+  - `current` — kuyruktan shift edilen aktif kategori id'si
+  - `child` — current'in çocuk kategorileri arasındaki her bir child id
+- **Dönüş**: `string[]` — rootId ve tüm alt kategorilerin id'leri
 
-### [N10_NASIL] AST Pointer: pricingAdmin.service.ts::activeProductsQuery
-- **params**: `(supabase: SupabaseClient<Database>)`
-- **ic_degiskenler**: (yok — sadece parametre kullanılıyor)
-- **Dönüş**: sorgu nesnesi (Promise değil, chain'lenebilir Supabase sorgu nesnesi) — aktif ürünler için filtrelenmiş select sorgusu
+---
 
-### [N11_NASIL] AST Pointer: pricingAdmin.service.ts::countProductsInScope
+### [N10_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::resolveScopeFilter
 - **params**: `(supabase: SupabaseClient<Database>, scope: number, targetId: string | null)`
 - **ic_degiskenler**:
-  - `countQuery` — products tablosunda sayım için hazırlanan temel sorgu (deleted_at null ve status active filtreleri)
-  - `name` — scope=2 için marka adı (brandNameById ile alınır)
-  - `ids` — scope=3 için kategori ID listesi (categoryIdsWithDescendants ile alınır)
-  - `count` — Supabase'den dönen ürün sayısı
-  - `error` — Supabase sayım hatası
-- **Dönüş**: `Promise<number>` — belirtilen kapsamda aktif ürün sayısı
+  - `name` — scope 2 için brandNameById ile çekilen brand adı
+- **Dönüş**: `ScopeFilter` — scope'a göre `{kind: 'id'}`, `{kind: 'brand'}`, `{kind: 'categories'}`, `{kind: 'empty'}` veya `{kind: 'all'}` filtresi
 
-### [N12_NASIL] AST Pointer: pricingAdmin.service.ts::sampleProductsInScope
+---
+
+### [N11_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::withScopeFilter
+- **params**: `(query: Q, filter: ScopeFilter)`
+- **ic_degiskenler**: (yok — switch-case ile query üzerinde zincirleme filtre uygulanır)
+- **Dönüş**: `Q` — filter.kind'a göre eq/in ile kısıtlanmış veya filtresiz query
+
+---
+
+### [N12_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::activeProductsQuery
+- **params**: `(supabase: SupabaseClient<Database>)`
+- **ic_degiskenler**: (yok — doğrudan query chain döner)
+- **Dönüş**: Supabase query builder — products tablosundan deleted_at null ve status active ürünleri seçen sorgu
+
+---
+
+### [N13_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::countProductsInScope
+- **params**: `(supabase: SupabaseClient<Database>, scope: number, targetId: string | null)`
+- **ic_degiskenler**:
+  - `filter` — resolveScopeFilter ile elde edilen kapsam filtresi nesnesi
+  - `countQuery` — products tablosunda count: exact head: true ile sorgu başlatan query builder
+  - `count` — sayfalama yapılmadan toplam ürün sayısını tutan Supabase count sonucu
+  - `error` — Supabase count hatası, varsa throw edilir
+- **Dönüş**: `number` — kapsamda aktif ürün sayısı; filter empty ise 0
+
+---
+
+### [N14_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::sampleProductsInScope
 - **params**: `(supabase: SupabaseClient<Database>, scope: number, targetId: string | null, n = 3)`
 - **ic_degiskenler**:
-  - `rows` — Products tablosundan çekilen ProductScopeRow dizisi
-  - `name` — scope=2 için marka adı (brandNameById ile alınır)
-  - `ids` — scope=3 için kategori ID listesi (categoryIdsWithDescendants ile alınır)
-  - `brandIdByName` — marka isimlerinden id'ye eşleme haritası (loadBrandIdByName ile alınır)
-- **Dönüş**: `Promise<SampleProduct[]>` — belirtilen kapsamdan örnek ürünlerin SampleProduct[] listesi
+  - `filter` — resolveScopeFilter ile elde edilen kapsam filtresi
+  - `data` — activeProductsQuery + withScopeFilter + limit ile dönen ürün satırları
+  - `error` — Supabase sorgu hatası, varsa throw edilir
+  - `rows` — data'nın ProductScopeRow[] olarak tip-lenmiş hali
+  - `brandIdByName` — loadBrandIdByName ile çekilen brand name→id haritası
+- **Dönüş**: `SampleProduct[]` — kapsamdan rastgele örnek ürünlerin fiyatlandırma girdileri; filter empty ise boş dizi
 
-### [N13_NASIL] AST Pointer: pricingAdmin.service.ts::marginPctToCoefficient
+---
+
+### [N15_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::distinctPurchaseCurrenciesInScope
+- **params**: `(supabase: SupabaseClient<Database>, scope: number, targetId: string | null)`
+- **ic_degiskenler**:
+  - `filter` — resolveScopeFilter ile elde edilen kapsam filtresi
+  - `found` — benzersiz para birimlerini tutan Set
+  - `page` — sayfa numarası sayacı (döngü değişkeni, 0..SCOPE_SCAN_MAX_PAGES)
+  - `from` — sayfa başına offset başlangıç indeksi (page × SCOPE_SCAN_PAGE)
+  - `baseQuery` — products tablosundan purchase_currency seçen sorgu builder
+  - `data` — sayfalı ürün satırları (sadece purchase_currency alanı)
+  - `error` — Supabase sorgu hatası, varsa throw edilir
+  - `rows` — data'nın fallback ile boş diziye normalized hali
+  - `row` — rows içindeki her bir satır (döngü değişkeni)
+  - `currency` — row.purchase_currency değerinin trim + upperCase'e çevrilmiş hali
+- **Dönüş**: `string[]` — benzersiz para birimleri alfabetik sıralı; filter empty ise boş dizi; MAX_PAGES aşılırsa hata fırlatılır
+
+---
+
+### [N16_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::marginPctToCoefficient
 - **params**: `(marginPct: number)`
-- **ic_degiskenler**: (yok — sadece parametre kullanılıyor)
-- **Dönüş**: `number` — kâr yüzdesinden fiyat katsayısına dönüşüm (NaN eğer input sonsuzsa)
+- **ic_degiskenler**: (yok — tek satırlık hesaplama)
+- **Dönüş**: `number` — marginPct'den katsayıya dönüşüm (1 + marginPct/100), NaN inputsa NaN; sonuç 4 ondalık basamağa yuvarlanmış
 
-### [N14_NASIL] AST Pointer: pricingAdmin.service.ts::coefficientToMarginPct
+---
+
+### [N17_NASIL] AST Pointer: src/lib/services/pricingAdmin.service.ts::coefficientToMarginPct
 - **params**: `(coefficient: number)`
-- **ic_degiskenler**: (yok — sadece parametre kullanılıyor)
-- **Dönüş**: `number` — fiyat katsayısından kâr yüzdesine dönüşüm (NaN eğer input sonsuzsa)
+- **ic_degiskenler**: (yok — tek satırlık hesaplama)
+- **Dönüş**: `number` — katsayıdan marginPct'ye dönüşüm ((coefficient - 1) × 100), NaN inputsa NaN; sonuç 4 ondalık basamağa yuvarlanmış
 
 ---
 
@@ -332,19 +442,26 @@ graph TD
     pricingAdmin_service_ts__createPricingRule["createPricingRule"]
     pricingAdmin_service_ts__deletePricingRule["deletePricingRule"]
     pricingAdmin_service_ts__deletePricingRules["deletePricingRules"]
+    pricingAdmin_service_ts__distinctPurchaseCurrenciesInScope["distinctPurchaseCurrenciesInScope"]
     pricingAdmin_service_ts__listPricingRules["listPricingRules"]
     pricingAdmin_service_ts__loadBrandIdByName["loadBrandIdByName"]
     pricingAdmin_service_ts__marginPctToCoefficient["marginPctToCoefficient"]
+    pricingAdmin_service_ts__resolveScopeFilter["resolveScopeFilter"]
     pricingAdmin_service_ts__sampleProductsInScope["sampleProductsInScope"]
     pricingAdmin_service_ts__toPricingProductInput["toPricingProductInput"]
     pricingAdmin_service_ts__updatePricingRule["updatePricingRule"]
-    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__loadBrandIdByName
-    pricingAdmin_service_ts__countProductsInScope --> pricingAdmin_service_ts__brandNameById
-    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__categoryIdsWithDescendants
+    pricingAdmin_service_ts__withScopeFilter["withScopeFilter"]
     pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__activeProductsQuery
-    pricingAdmin_service_ts__countProductsInScope --> pricingAdmin_service_ts__categoryIdsWithDescendants
+    pricingAdmin_service_ts__distinctPurchaseCurrenciesInScope --> pricingAdmin_service_ts__withScopeFilter
+    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__withScopeFilter
+    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__loadBrandIdByName
+    pricingAdmin_service_ts__distinctPurchaseCurrenciesInScope --> pricingAdmin_service_ts__resolveScopeFilter
+    pricingAdmin_service_ts__resolveScopeFilter --> pricingAdmin_service_ts__brandNameById
+    pricingAdmin_service_ts__countProductsInScope --> pricingAdmin_service_ts__withScopeFilter
+    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__resolveScopeFilter
     pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__toPricingProductInput
-    pricingAdmin_service_ts__sampleProductsInScope --> pricingAdmin_service_ts__brandNameById
+    pricingAdmin_service_ts__countProductsInScope --> pricingAdmin_service_ts__resolveScopeFilter
+    pricingAdmin_service_ts__resolveScopeFilter --> pricingAdmin_service_ts__categoryIdsWithDescendants
 ```
 
 ## NODE ID STANDARD
@@ -359,9 +476,12 @@ graph TD
   function: src\lib\services\pricingAdmin.service.ts::toPricingProductInput
   function: src\lib\services\pricingAdmin.service.ts::brandNameById
   function: src\lib\services\pricingAdmin.service.ts::categoryIdsWithDescendants
+  function: src\lib\services\pricingAdmin.service.ts::resolveScopeFilter
+  function: src\lib\services\pricingAdmin.service.ts::withScopeFilter
   function: src\lib\services\pricingAdmin.service.ts::activeProductsQuery
   function: src\lib\services\pricingAdmin.service.ts::countProductsInScope
   function: src\lib\services\pricingAdmin.service.ts::sampleProductsInScope
+  function: src\lib\services\pricingAdmin.service.ts::distinctPurchaseCurrenciesInScope
   function: src\lib\services\pricingAdmin.service.ts::marginPctToCoefficient
   function: src\lib\services\pricingAdmin.service.ts::coefficientToMarginPct
 
@@ -380,9 +500,12 @@ graph TD
   export: createPricingRule
   export: deletePricingRule
   export: deletePricingRules
+  export: distinctPurchaseCurrenciesInScope
   export: listPricingRules
   export: loadBrandIdByName
   export: marginPctToCoefficient
+  export: resolveScopeFilter
   export: sampleProductsInScope
   export: toPricingProductInput
   export: updatePricingRule
+  export: withScopeFilter

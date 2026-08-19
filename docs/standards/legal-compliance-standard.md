@@ -57,7 +57,7 @@ kendisini eklemek insanın işidir ve PR incelemesinde aranır.
 | 1 | Zorunlu yasal onaylar alınmadan ödeme başlamaz | Mesafeli Satış Sözl. §4 | `validateLegalConsents` + INV-LEGAL-1 | Kod | ✅ |
 | 2 | Analitik/pazarlama çerezleri yalnız açık rızayla | Çerez Politikası | Rıza kapısı + INV-LEGAL-2 | Kod | ✅ |
 | 3 | Fatura, beyan edilen bilgilere göre düzenlenir | Mesafeli Satış Sözl. §5 | §2 köprü prosedürü | Manuel | 🟡 köprü |
-| 4 | KVKK talepleri 30 gün içinde ücretsiz sonuçlandırılır | KVKK Aydınlatma | §3 prosedürü + `/admin/data-requests` defteri (T063) | Kod + Manuel | 🟡 kanal adresi Recep'te |
+| 4 | KVKK talepleri 30 gün içinde ücretsiz sonuçlandırılır | KVKK Aydınlatma | §3 prosedürü + `/admin/data-requests` defteri (T063) + veri sahibi kanalı (§3.6) | Kod + Manuel | 🟡 kanal adresi Recep'te |
 | 5 | Cayma hâlinde bedel 14 gün içinde iade edilir | Mesafeli Satış Sözl. §7 | `iyzico-refund` (T053-VH) | Kod | 🔴 EDGE-REFUND şeridinde |
 | 6 | Teslimat süresi / kargo firması / iade adresi | Sözl. §6, §7 | `legal.ts` alanları | Konfigürasyon | 🔴 yer tutucu |
 | 7 | Kişisel veri saklama süreleri | KVKK §…, Gizlilik | `legal.ts` retention* | Konfigürasyon | ✅ |
@@ -65,6 +65,7 @@ kendisini eklemek insanın işidir ve PR incelemesinde aranır.
 | 9 | Analitik/pazarlama etiketi rıza olmadan yüklenmez | Çerez Politikası | `ConsentGatedAnalytics` + `trackEvent` kapısı | Kod | ✅ |
 | 10 | Veri sahibi talebi 30 gün içinde sonuçlandırılır | KVKK Aydınlatma | `data_subject_requests` + admin defteri + süre sayacı (INV-KVKK-1) | Kod | ✅ mekanizma · 🟡 adres |
 | 11 | Silme talebinde saklama yükümlülüğü olan veri korunur | KVKK m.7 / VUK | `anonymize_user_personal_data()` | Kod | ✅ prod'da canlı (08-17 ölçüldü) |
+| 12 | Veri sahibi kendi talebini açabilir ve durumunu izleyebilir | KVKK m.11 / Aydınlatma | `/account/data-requests` + `p_dsr_owner_insert` / `p_dsr_owner_select` (§3.6) | Kod | ✅ prod'da canlı; davranışı ölçüldü (08-19, §3.6 kapanış kanıtı) |
 
 **8 numaralı satırın gerekçesi (karar kaydı).** TCKN başta koşulsuz zorunlu tutuldu; mevzuat
 araştırması (2026-08-16) bunun kanunun istediğinden sıkı olduğunu gösterdi. GİB, nihai
@@ -274,10 +275,98 @@ yükü altındadır" şartı pratikte karşılanamıyordu. Kurulan ekranın bağ
    kısıtının birebir kopyasıdır ve bekçi ikisini karşılaştırır: kodda fazladan değer
    seçilirse prod INSERT'i 400 döner, eksik değer varsa admin gerçek durumu göremez.
 
-**Kapsam dışı (bilinçli):** müşteri-tarafı web başvuru formu. Gerekçe iki katmanlı —
-(a) §3.1'e göre hukuki zorunluluk değil, (b) tablonun RLS'i yalnız admin'e açık olduğundan
-müşteri INSERT'i migration gerektirir; migration Recep kapısıdır ve zorunlu olmayan bir
-ürün özelliği için açılmaz. Anonim (hesapsız) başvuru ayrıca e-posta doğrulama akışı ister.
+> **DÜZELTME (2026-08-19).** Bu bölüm önce *"kapsam dışı (bilinçli): müşteri-tarafı web
+> başvuru formu"* diyor ve gerekçeyi iki katmanlı kuruyordu — (a) §3.1'e göre hukuki
+> zorunluluk değil, (b) müşteri INSERT'i migration gerektirir, migration Recep kapısıdır.
+> **(b) bir kapsam gerekçesi değildi:** işin *kimin onayıyla* gireceğini söylüyordu, *girip
+> girmeyeceğini* değil. Bir onay kapısı, kapsam kararı gibi okunmuştu. (a) hâlâ geçerlidir —
+> kanal hukuken zorunlu değildir; yine de kuruldu (T063 PR-2, #637) ve bağlayıcı kuralları
+> **§3.6**'dadır. **Anonim (hesapsız) başvuru kapsam dışı kalmaya devam eder:** kimlik
+> tevsiki §3.6'daki JWT eşitliğine dayanır, oturumu olmayanda böyle bir bağ yoktur; ayrı
+> bir e-posta doğrulama akışı ister.
+
+### 3.6 Veri sahibinin kendi kanalı — `/account/data-requests` (T063 PR-2, 2026-08-19)
+
+§3.5 defterin **admin yüzüdür**; bu bölüm **veri sahibinin yüzüdür**. Giriş yapmış kullanıcı
+kendi talebini açar ve 30 günlük sayacın nerede olduğunu görür. Kanal §3.1 anlamında hukuki
+zorunluluk değildir; şeffaflık ve ispat kolaylığı için kurulmuştur — ve kurulduğu anda
+§3.4'ün ispat yükü artık **iki taraftan** görünür hâle gelir.
+
+Mekanizma: `p_dsr_owner_insert` + `p_dsr_owner_select`
+(`supabase/migrations/20260817143000_dsr_customer_channel.sql`). Bekçi: INV-KVKK-1 R6.
+
+**1. İki ayrı kapı vardır ve ikisi de gereklidir.**
+
+| Kapı | Ne yapar | Nerede |
+|---|---|---|
+| **Satır kapısı** | Kullanıcı yalnız KENDİ satırını görür/yazar | `using (user_id = auth.uid())` · `with check` içindeki kimlik koşulları |
+| **Değer kapısı** | Süreç alanları istemci tarafından BELİRLENEMEZ | Aynı politikanın `with check` bloğu |
+
+Değer kapısı yedi alanı DB default'una pinler: `status` · `due_at` · `outcome` ·
+`completed_at` · `identity_verified_at` · `handled_by` · `retained_data_note`. Bu liste
+keyfi değildir: **sürenin ve sonucun otoritesi DB'dir** (§3.5/2). Pin olmasaydı kullanıcı
+kendi talebini `completed` olarak veya uzak bir `due_at` ile açıp 30 günlük yasal süreyi
+kaydırabilirdi — yani cetvelin 4 ve 10 numaralı taahhütlerini kendi eliyle çürütebilirdi.
+
+**2. Kimlik tevsiki DB'de zorlanır.** `applicant_email` JWT'deki e-postaya **eşit** olmak
+zorundadır. Tebliğ m.5'in "sistemde kayıtlı e-posta" şartının teknik karşılığı budur;
+kullanıcı başkasının adına talep açamaz. Buna karşılık `identity_verified_at` damgasını
+kullanıcı **yazamaz**: oturum teknik bir doğrulamadır, kimlik tevsiki ise hukuki bir
+değerlendirmedir ve admin'e aittir.
+
+**3. UPDATE politikası bilinçli olarak YOKTUR.** Talep açıldıktan sonra veri sahibi onu
+değiştiremez — ispat izi korunur. Geri çekmek isterse kanaldan bildirir, admin `rejected` +
+`outcome` ile kapatır (§3.5/5). RLS'te politika yoksa işlem reddedilir; bu, "unutulmuş
+kural" değil **yazılı bir karardır.**
+
+**4. ⚠️ ÇÜRÜTÜLMÜŞ PREMİS — kolon-GRANT bir kapı DEĞİLDİR.** Bu kanalın ilk yazımı değer
+kısıtını `grant insert (applicant_email, request_type, user_id)` ile kurmaya çalışıyordu.
+Prod'da ölçüldü (2026-08-18): `authenticated` rolünün bu tabloda **zaten tablo düzeyinde**
+INSERT/UPDATE/DELETE yetkisi var (Supabase'in varsayılan `grant all` davranışı) ve
+PostgreSQL'de **kolon ayrıcalığı tablo ayrıcalığını daraltmaz, üzerine eklenir.** Yani
+kolon grant'ı kâğıt üzerinde bir kapıydı, prod'da hiçbir şey kapatmıyordu.
+
+Tablo grant'ını `revoke` etmek de çözüm değildir: admin de aynı `authenticated` rolünde
+çalışır, yetkisini ayrı bir DB rolünden değil `p_dsr_admin_all` politikasından alır. Revoke,
+§3.5'te canlıya alınan admin defterini kırardı. **Doğru yer politikanın kendisidir** — kısıt
+politika bazlı olduğu için yalnız veri sahibinin yolunu bağlar, admin ayrı politikadan geçer.
+
+> **Genel kural (bu vakadan çıkan):** PostgreSQL'de yazılabilir alan kümesini daraltmak
+> isteyen bir tasarım, kısıtı **RLS `with check`** içine koyar. Kolon grant'ı yalnız bir
+> **niyet beyanıdır**; tablo grant'ı durduğu sürece kapı değildir. Bir migration "şu alanlar
+> yazılamaz" diyorsa, incelemede sorulacak soru şudur: *bunu hangi satır reddediyor?*
+
+**5. Kanal, davranışı ölçülmeden "korumalı" sayılmaz.** Statik kanıt (SQL metni, grant
+sorgusu, test sabotajı) burada **ayırt edici değildir**: `with check` hiç çalışmasa da aynı
+görünürdü. Kapanış kanıtı, normal kullanıcı oturumuyla denenen ve **reddedilen** bir
+INSERT'in ham DB hata satırıdır. Bu ölçüm prod'a yazmadan alınabilir — işlem içinde
+`begin … rollback` ile; kabul edilen kol geri alınır, reddedilen kol zaten yazmaz.
+
+**6. Ekranın canlı olması kanalın açık olduğunu göstermez.** UI yarısı master'a merge
+edildiği anda dağıtılır; DB yarısı `supabase-migrate` iş akışına bağlıdır ve **ayrı hızda**
+ilerler. Politikalar inmeden ekran görünür ama hem listeleme hem gönderme sessizce
+reddedilir — *yetkisi yok* yerine *veri yok* yanılgısının ta kendisi (§3.5/4). Bu yüzden §1
+sicilinde kanalın satırı, **iki yarı da ölçülene kadar** ✅ olmaz.
+
+#### Kapanış kanıtı — 2026-08-19 (prod, sıfır yazma)
+
+Migration prod'a indi (`_migration_ledger`: `20260817143000_dsr_customer_channel.sql`,
+`applied_at 2026-08-19 08:50:10+00`) ve kanalın **davranışı** ölçüldü. Yöntem: dört kol,
+her biri `begin … rollback` içinde, `set local role authenticated` + JWT claim'inde
+`app_metadata.user_role = customer`.
+
+| Kol | Deneme | Beklenen | Sonuç |
+|---|---|---|---|
+| A | Geçerli INSERT | Kabul | ✅ `status = received`, `due_at − received_at = 30 days` |
+| B | `status = 'completed'` | Ret | `ERROR: 42501: new row violates row-level security policy for table "data_subject_requests"` |
+| C | `due_at = now() + 3650 days` | Ret | Aynı 42501 satırı |
+| D | Başkasının `user_id` + e-postası | Ret | Aynı 42501 satırı |
+
+**Ayırt edicilik.** Salt ret gözlemi *kanalın kapalı olmasından* ayırt edilemezdi; **kabul
+eden kol tam bu yüzden vardır.** Kabulün admin yolundan gelmediği iki ayrı yoldan gösterildi:
+(1) aynı claim altında `is_admin_user()` **false** ölçüldü; (2) admin politikası devrede
+olsaydı B/C/D de kabul edilirdi (`p_dsr_admin_all`'ın `with check`'i yalnız `is_admin_user()`,
+değer kısıtı yok) — reddedildiler. Ölçüm sonrası prod satır sayısı **0**: artık yok.
 
 ### 3.6 Musteri kanali — /account/data-requests (T063 PR-2, MIGRATION)
 
@@ -426,3 +515,4 @@ kanıtlamaz.
 - `docs/standards/pricing-standard.md` (fatura kalemleri fiyat snapshot'larından okunur)
 - `docs/standards/edge-function-security-standard.md` (iade uçları)
 - İş emirleri: T055-VH (fatura) · T061-VH (KVKK ops) · T053-VH (gerçek iade)
+- `supabase/migrations/20260817143000_dsr_customer_channel.sql` (§3.6 iki kapı; kolon-GRANT çürütmesi dosya başlığında ölçümüyle yazılı)

@@ -2,11 +2,11 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-wt-quote\src\i18n\dictionaries\tr.ts
-skeleton_hash: 3f9d6c5eb7a6789d
+source_path: C:\Users\alize\venthub-wt-altyapi\src\i18n\dictionaries\tr.ts
+skeleton_hash: 52d065184fa1a284
 entity_hashes:
   overview: 84411b9534640216
-generated_at: 2026-08-17T13:20:04Z
+generated_at: 2026-08-18T06:48:34Z
 ---
 
 ## Genel Bakış
@@ -34,9 +34,9 @@ Bu modül saf bir statik veri modülüdür (sözlük/taslak) — çalıştırıl
 
 ## SABİTLER
 - **tr** (object) — `{
-  common: {
-    paginationLabel: 'Sayfalama',
-    paginationPrevious: 'Önce...`
+  whatsappMessages: {
+    greeting: 'Merhaba!',
+    stockInquiry: 'Merha...`
 
 ---
 

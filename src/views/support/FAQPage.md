@@ -2,13 +2,13 @@
 domain: general
 source_type: doc
 namespace_type: module
-source_path: C:\Users\alize\venthub-hvac\src\views\support\FAQPage.tsx
-skeleton_hash: 60014e6004cd7977
+source_path: C:\Users\alize\venthub-wt-altyapi\src\views\support\FAQPage.tsx
+skeleton_hash: a27e70c261bf1d0e
 entity_hashes:
   func:FAQPage: 912e82de3e4ccdbe
   overview: 2138e252fedb352a
   style_tokens: 8147bd10a70e8b20
-generated_at: 2026-06-14T22:21:40Z
+generated_at: 2026-08-18T06:56:02Z
 ---
 
 ## Genel Bakış

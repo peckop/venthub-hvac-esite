@@ -127,6 +127,52 @@ kapının hiç olmamasından kötüdür çünkü yeşil görünür.
 id'leri; PR #643, kapatıldı). Türev kural `collaboration-protocol.md` **K7**'ye yazıldı:
 denetim artefaktı **elle yazılmaz** — onu üreten şey ölçümü yapan araç olmalıdır.
 
+## C7 — COMMIT AÇIĞI: üretim çalışıyor, kayıt tutulmuyor (2026-08-18 ölçümü)
+
+Companion borcunun büyük kısmı **üretim açığı değil commit açığı**. T088'in ilk dilimi
+yapılırken ölçüldü ve iş emrinin şekli değişti.
+
+**Mekanizma.** Companion üretimi `post-commit` kancasında koşar. Yani üretilen artefakt,
+kaynağı değiştiren commit'e **yapısal olarak giremez** — sonraki bir commit'le alınması
+gerekir. Bunu kimse düzenli yapmıyor; dal değiştirildikçe de çalışma kopyasından silinip
+gidiyor. Sonuç: companion diskte **taze**, git'te **bayat**.
+
+**Ölçüm (varsayım değil).** 2026-08-18'de bir worktree'de 23 companion'ın `generated_at`
+damgası `2026-06-19 → 2026-08-18` olmuş hâlde, commit'lenmemiş duruyordu.
+`git diff --ignore-all-space` ile bakıldı: **23'ünün 23'ünde gerçek içerik farkı**,
+yalnız-satır-sonu **sıfır** — yani bu, #589'da kapatılan companion-churn fantomu **değil**.
+Aynı ayrışma 2026-08-17'de de görülmüştü (17 dosya "diskte taze, git'te bayat") ama o zaman
+**sebebi adlandırılmamıştı**.
+
+**İki ayrı sınıf, ayrı çözüm:**
+
+| sınıf | durum | çözüm |
+|---|---|---|
+| **(A)** kaynak yeni | companion diskte taze, commit yok | LLM **değil**, sadece commit |
+| **(B)** kaynak eski | companion hem git'te hem diskte bayat | gerçek üretim gerekir |
+
+(A) sınıfı, C4/C5'in 7 günlük penceresi içinde olduğu için **henüz ihlal değildir** — ama
+commit'lenmezse bir hafta içinde ihlal olarak **olgunlaşır**. Yani borcu ödemekten önce
+**doğmasını engellemek** gerekir.
+
+### Kısa vade: periyodik commit-sweep (ALTYAPI şeridi)
+
+Haftalık bir tarama: üretilmiş ama commit'lenmemiş companion varsa tek PR ile alınır.
+Periyot **7 günlük pencereyle uyumlu** seçildi; daha seyrek olursa (A) sınıfı ihlale döner.
+
+### Uzun vade: seçenekler ve maliyetleri
+
+| seçenek | kazanç | maliyet / risk |
+|---|---|---|
+| `pre-commit`'e taşımak | artefakt aynı commit'e girer | commit süresine LLM gecikmesi biner; 2026-08-15'te tam bu sebeple `post-commit`'e taşınmıştı (bloklayan kanca `--no-verify` alışkanlığı doğurdu, T033) |
+| `pre-push` | commit hızı korunur, push'ta yakalanır | push süresi uzar; birden çok commit birikirse hangi commit'e ait olduğu belirsizleşir |
+| CI'da üretip commit'lemek | yerel makineden bağımsız | CI'ın repoya yazması gerekir (izin + döngü riski); Vercel/Actions maliyeti |
+| **sweep** (seçilen) | mevcut akışı hiç bozmaz | gecikmeli; kaçırılırsa borç birikir → bu yüzden periyodu pencereyle eşlendi |
+
+⚠ **Karar notu:** `pre-commit`'e geri dönmek bu depoda **ölçülmüş bir hatayı tekrarlamak**
+olur. `post-commit` seçimi bilinçliydi; sorun kancanın yerinde değil, **artefaktın kayda
+geçirilmemesinde**. Uzun vade tercihi bot/CI yapılandırmasına dokunduğu için Recep kararıdır.
+
 ## Ölçülmüş taban çizgisi (2026-08-17)
 
 Kod dizinlerinde **668** `.md`; **665** eşli, **2** yetim (temizlendi), **1** muaf.
