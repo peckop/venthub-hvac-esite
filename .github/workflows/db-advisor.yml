@@ -158,8 +158,13 @@ jobs:
         with:
           node-version: '22'
 
+      # --legacy-peer-deps ZORUNLU: depo pnpm ile yonetiliyor ve package.json'da onceden
+      # var olan bir peer catismasi bulunuyor (react-day-picker 8 -> date-fns ^2||^3, depoda
+      # date-fns 4). pnpm buna izin veriyor, npm vermiyor; bayrak olmadan kurulum patliyor ve
+      # kapi VERIYLE ilgisi olmayan bir sebeple kirmizi donuyor. --ignore-scripts: yalnizca
+      # surucu gerekiyor, paket yasam-dongusu betikleri kosmasin.
       - name: Install pg driver only
-        run: npm install --no-save --no-audit --no-fund pg@8
+        run: npm install --no-save --no-audit --no-fund --ignore-scripts --legacy-peer-deps pg@8
 
       - name: Catalog integrity gate
         env:
