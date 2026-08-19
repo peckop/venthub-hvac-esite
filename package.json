@@ -9,7 +9,7 @@
   "scripts": {
     "prepare": "node scripts/setup-hooks.mjs",
     "dev": "cross-env NODE_OPTIONS='--max-old-space-size=8192' next dev",
-    "build": "cross-env NODE_OPTIONS='--max-old-space-size=8192' next build",
+    "build": "node scripts/assert-node-major.mjs && cross-env NODE_OPTIONS='--max-old-space-size=8192' next build",
     "build:ci": "cross-env NODE_OPTIONS='--max-old-space-size=8192' next build",
     "start": "next start",
     "lint": "cross-env NODE_OPTIONS='--max-old-space-size=8192' eslint .",
