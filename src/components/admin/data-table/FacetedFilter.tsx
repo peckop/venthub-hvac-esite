@@ -98,5 +98,3 @@ export function FacetedFilter({ facet, selected, onChange, clearLabel }: Faceted
     </Popover.Root>
   )
 }
-
-export default FacetedFilter
