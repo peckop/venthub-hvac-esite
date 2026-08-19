@@ -214,7 +214,7 @@ T099 "dokuz ailede ad uyuşmuyor" diye açılmıştı. Ölçülen gerçek: **tak
 ≥%28'i hiç içe aktarılmamış + çıkarma kusurlu.** Aile adlarını düzeltmek vitrini doğru gösterir
 ama satılacak ürünün dörtte biri sitede yoktur.
 
-**Önerilen sıra:** (1) çıkarmayı doğrula/yenile → (2) eksik kodları içe aktar (en yüksek ticari
+**Önerilen sıra** (§9 tablosuyla güncellendi — dört katman): (1) çıkarmayı doğrula/yenile → (2) eksik kodları içe aktar (en yüksek ticari
 etki) → (3) aileleri kataloğun ALT satırlarına göre böl, ortak aksesuarları aileden çıkar →
 (4) kuralı cetvele yaz: *aile = katalog alt satırı; kategori = bölüm başlığı; aile adı bölüm
 başlığından TÜRETİLEMEZ.*
@@ -257,3 +257,27 @@ tüm kataloglar yüklü**, katalog/ürün sorularında sorgulanabilir.
 | — | `03-output/avensair-fiyat.csv` | **OTORİTE DEĞİL** — kusurlu olduğu §5'te iki bağımsız örnekle ölçüldü |
 
 Defter bir snapshot'tır ve drift edebilir; **çelişkide kaynak belge ve DB kazanır.**
+
+### 9. T119 KAPSAMI — DÖRT KATMAN, AYRI AYRI FİYATLANDIRILIR
+
+OPS-AUDIT 2026-08-19 13:05Z kararıyla üçüncü sınıf (§7) kabul edildi ve T119 kapsamı dört
+katmana çıktı. §6'daki "önerilen sıra" §7'den ÖNCE yazılmıştı, dolayısıyla eksikti; bağlayıcı
+kapsam aşağıdaki tablodur.
+
+| # | Katman | Girdi (otorite) | Çıktı | Prod yazımı? | Kapı |
+|---|---|---|---|---|---|
+| **K1** | Çıkarma doğrulama | 74 sayfa görüntüsü (§8 sıra 1) | doğrulanmış kod listesi + kayıp raporu | **hayır** — salt okuma | ölçüm raporu; iki bilinen kayıp (§5, §7) yeniden üretilebilmeli |
+| **K2** | Eksik kod aktarımı | K1 çıktısı | ≥136 ürün prod'a | **EVET** | **Recep kapısı** — karar paketi + geri alma planı |
+| **K3** | Aile/bölüm düzeltmesi | katalog alt satırları | aile bölünmesi + ortak aksesuarların aileden çıkarılması + yüzey kuralı cetvele | **EVET** | **Recep kapısı**; cetvel maddesi (§132) + INV testi |
+| **K4** | Zorunlu tamamlayıcı ilişkisi | §7 tablosu, "HIZ ANAHTARI"/"UYGUN MODEL" kolonları | ürün-ürün ilişki modeli + sepet/PDP davranışı | **EVET**, şema dahil | **Recep kapısı** — migration çıkarsa merge de onda |
+
+**Bağımlılık zinciri:** K1 → K2 → K3; **K4 K3'e paralel yürüyebilir** ama K2'nin eksik kodları
+(kasalar `11560–11568`) gelmeden K4 doğrulanamaz — tamamlayıcının kendisi veritabanında yok.
+
+**Neden ayrı fiyatlandırma:** K1 ölçüm işidir ve tek başına değer üretir (kayıp tablosu Recep'in
+kararına girdi). K2 en yüksek ticari etkiye sahip ama en riskli (toplu prod yazımı). K3 yüzeyi
+düzeltir, satılabilirliği değiştirmez. K4 şemaya dokunur, en uzun kuyruk. Tek iş emri gibi
+fiyatlanırsa en riskli katman en hızlı katmanın arkasına saklanır.
+
+**K4 için not:** ilişki modeli `product_families` şemasına dokunabilir; migration doğarsa
+`CLAUDE.md` madde 13 gereği PR'ı yalnız Recep merge eder.
