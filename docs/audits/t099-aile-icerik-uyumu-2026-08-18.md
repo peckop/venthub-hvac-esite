@@ -537,3 +537,35 @@ Kod uzunluğu dağılımı bu teşhisi doğruluyor: **389 kod 5 haneli** (%80), 
 **Bunun bedeli ne olurdu:** §10(e)'deki kapı ("ad boş/yıldız/çok kısa olamaz") uygulanırsa
 `21197 WP` **silinirdi** — gerçek bir ürün, veri temizliği adına yok edilirdi. Kapı yalnız
 **§13'teki mekanizmaya** kurulacak, ada bakarak değil.
+
+### 15. K1 UYGULAMA PLANI ve MALİYET KALEMİ (Recep kapısı)
+
+**Yapılacak iş (§13'ten türetildi):**
+
+| Adım | Ne | Nerede | Risk |
+|---|---|---|---|
+| K1.1 | İstemden `5-digit code` kısıtını kaldır; kod biçimini serbest bırak | `venthub-pdf-ingestor/scripts/visual_ingest_page.py` | düşük — tek satır |
+| K1.2 | İsteme "yalnız **fiyat tablosu** satırları; şema/infografik/standart referansı ürün değildir" kuralını ekle | aynı dosya | düşük |
+| K1.3 | **74 sayfanın tamamını yeniden çıkar** | vision API çağrısı | **maliyet** ↓ |
+| K1.4 | Doğrulama: sayfa başına satır sayısı **+** her sayfadan en az bir satırın alan-alan karşılaştırması (§12) | yeni betik | düşük |
+
+**Neden 4 sayfa değil 74 sayfa:** kusur satır bazlı. Sayfa 62'nin kod biçimi doğruydu ve yine de
+29 satırın 2'si düştü; sayfa 38'in kod biçimi doğruydu ve yine de 1 hayalet satır doğdu. "Kod
+biçimi doğru olan sayfa güvenlidir" hipotezi **iki kez çürüdü** — bu yüzden kısmi yeniden-çıkarma
+yanlış güven üretir.
+
+**Ölçülen maliyet girdileri (tahmin değil, ölçüm):**
+
+- **74 vision çağrısı** (sayfa başına tam olarak bir çağrı, `extract_from_page`)
+- Gönderilen görüntü: JPEG kalite 85 → **toplam 15,3 MB**, ortalama **212 KB/sayfa**
+- Telde base64 olarak: **~20,4 MB**
+- Model: `mimo-v2.5` (`MIMO_BASE_URL=https://token-plan-sgp.xiaomimimo.com/v1`)
+- `temperature=0.0`, çağrı başına `timeout=120s`
+
+> **Birim fiyat bu belgede YAZILMADI** — `mimo-v2.5` sağlayıcısının görüntü/token tarifesi
+> ölçülmedi ve tahmin edilmeyecek. Karar için gereken tek eksik girdi bu; büyüklük mertebesi
+> **ilk çıkarmanın aynısıdır** (aynı 74 sayfa, aynı model, tek geçiş).
+
+**Kapı:** K1.1–K1.2 kod değişikliği (`venthub-pdf-ingestor` deposunda, VentHub şeridi dışında —
+sahibiyle koordine edilecek). **K1.3 harcama doğurur → Recep onayı.** K1.4 çıktısı, K2'nin
+(prod yazımı) ön koşuludur.
