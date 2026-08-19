@@ -281,3 +281,39 @@ fiyatlanırsa en riskli katman en hızlı katmanın arkasına saklanır.
 
 **K4 için not:** ilişki modeli `product_families` şemasına dokunabilir; migration doğarsa
 `CLAUDE.md` madde 13 gereği PR'ı yalnız Recep merge eder.
+
+### 10. K1 İLK ÖLÇÜM — çıkarma kaybı SİSTEMİK DEĞİL, YEREL (2026-08-19, prod yazımı YOK)
+
+Dondurma penceresinde K1'in ölçüm kısmı koşuldu. **Sonuç §5'i daraltıyor ve K1'i ucuzlatıyor.**
+
+**(a) Kaynak dosya sayısı üç, kod kümesi TEK.** `avensair-fiyat.csv` (484),
+`avens_fiyat_listesi_2026_HQ.csv` (484, ek spec kolonları), `avensair_ekstra_urunler_2026.csv`
+(204). Kesişim ölçüldü: **HQ − fiyat = 0**, **ekstra − fiyat = 0** (ekstra bir alt kümedir).
+→ *İçe aktarılmayı bekleyen gizli bir çıkarma yok.* Bu hipotez KAPANDI.
+
+**(b) Sayfa 20 tam doğrulandı: kayıp SIFIR.** Görüntüdeki 23 satır ↔ CSV'deki 23 satır, kod kod
+birebir. → **Çıkarma her yerde kusurlu değil.** §5'in "çıkarma kusurlu" hükmü doğru ama
+*genellenemez*; kayıp belirli tablolarda.
+
+**(c) Kod-aralığı boşluk tahmini GEÇERSİZ — kendi aracımı çürüttüm.** "Ardışık kodlar arasındaki
+delikler kayıptır" varsayımıyla önce 507, sıkı ölçütle 50 aday çıktı. Sayfa 20 görüntüsü bunu
+çürüttü: QE tablosunda `11529/11530/11539/11540` **hiç yok** — kodlar yoğun sayaç değil,
+**varyant ızgarasına** göre atanıyor. En yüksek skorlu adaylar yanlış pozitif çıktı.
+→ Bu sayı **kullanılmayacak**; iş emrine yazılsaydı K2'yi olmayan 50 ürünü aramaya gönderirdi.
+
+**(d) İşleyen dedektör: sayfa başına satır sayısı.** Bilinen kayıpları pozitif üretiyor —
+**sayfa 21 (QE kasa tablosu) CSV'de yalnız 1 satır** (`11569`), yani §7'deki 9 kayıp satır tam
+buradan. Ayrıca **22 sayfada hiç CSV satırı yok** (1–7 kapak/içindekiler beklenen; **37, 39, 46,
+47, 48, 57, 60, 61, 63, 65, 70–74** incelenmeli) ve 4 sayfa 1–3 satırla şüpheli (15, 21, 29, 49).
+→ **K1'in gerçek işi bu ~19 sayfayı görüntüden doğrulamak**, 74 sayfayı yeniden çıkarmak değil.
+
+**(e) YENİ SINIF — bozuk satır: ad kaybolmuş, fiyat saçma.** 5 satır: `13850`, `16100`, `18600`
+(ad `**`, fiyat 2,77 € / 53 €, PLUG FANLAR s.49), `21197` (ad `WP`, s.62), `60079` (ad `II`,
+fiyat 2,00 €, s.38). Prod'da **hiçbiri yok** (sorgulandı, 0 satır) → tehlike **canlı değil,
+gizil**. Ama K2 "eksik 136 kodu aktar" diye toplu koşarsa bu 5 satır **2,77 €'luk ürün** olarak
+vitrine düşer.
+→ **K2 için bağlayıcı kısıt:** aktarım öncesi doğrulama kapısı (ad boş/yıldız olamaz, fiyat alt
+sınırı, kod biçimi) — kapı olmadan aktarım YOK.
+
+**K1'in yeniden fiyatlandırması:** "çıkarmayı baştan doğrula" (74 sayfa) → **"19 şüpheli sayfayı
+görüntüden doğrula + bozuk satır kapısını yaz"**. §9 K1 satırı bu kapsamla okunmalıdır.
