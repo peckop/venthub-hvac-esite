@@ -55,9 +55,22 @@ parçanın asıldığı ÖLÇÜLMEDEN uygulanırsa yanlış yarıya çare yazıl
 
 ## 3. Muafiyetler — ADLA yazılır
 
-| Dosya | Sebep | Kaldırma koşulu |
-|---|---|---|
-| `.github/workflows/db-advisor.yml` | 2026-08-19'da PRICING şeridinin claim'inde (T099 çalışması sürüyor); başka şeridin dosyasına dokunmak protokol ihlali | T099 kapanıp dosya EDGE'e döndüğünde muafiyet SİLİNİR ve kurallar uygulanır |
+**Şu an muafiyet YOK.** Liste bilerek boş: tek muafiyet (`db-advisor.yml`) yazıldığı
+gün filoyu üç kez kilitledi ve 2026-08-19'da kaldırıldı.
+
+> ⚠️ **MUAFİYET YAZARKEN SORULACAK SORU — acıyla öğrenildi.** *Bu dosya yalnız kendi
+> işini mi bloke eder, yoksa PAYLAŞILAN bir kaynağı mı tüketir?* `db-advisor.yml`'in
+> zaman sınırsız apt adımı asıldı, iş düzeyi `timeout-minutes` de olmadığı için
+> GitHub'ın 6 saatlik varsayılanı devreye girdi ve **aynı anda 19 koşum** eşzamanlılık
+> yuvalarını tuttu; gün boyunca 34 koşum elle iptal edildi.
+>
+> İkinci ders: o adımda `continue-on-error: true` VARDI ve yetmedi. **"Hata sayılmıyor"
+> ile "kaynak yakmıyor" aynı şey değildir** — iş kırmızı olmuyordu ama yuvayı yine
+> saatlerce tutuyordu.
+>
+> Paylaşılan kaynak tüketen bir dosyada doğru hamle sessiz muafiyet değil, sahibine
+> acil not + devir talebidir. Yeni bir muafiyet yazılırsa yanına "paylaşılan kaynak:
+> EVET/HAYIR" notu ZORUNLUDUR.
 
 Muafiyet listesi kapının kendi dosyasındadır; süresiz muafiyet yoktur — her satır
 bir kaldırma koşuluyla birlikte yazılır.

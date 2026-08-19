@@ -1,21 +1,61 @@
 name: DB Advisor
 
+# ⚠️ `push` KASITEN yalnız master (T095/EDGE · 2026-08-19).
+# Eskiden dalsız `push:` yazıyordu ve `pull_request` ile BİRLİKTE ateşliyordu: bir dala
+# push atıldığında AYNI commit için İKİ advisor koşumu doğuyordu. Aşağıdaki apt asılması
+# ile birleşince bu, eşzamanlılık yuvalarını iki katı hızda tüketiyordu — 2026-08-19'da
+# bir günde 34 asılı koşum iptal edildi ve filo üç kez kilitlendi.
+# Kapsam kaybı YOK: dal push'unda `pull_request` koşar, master'da `push` koşar.
+# (Aynı gerekçe `ci.yml` ve `e2e-smoke.yml` içinde de yazılı — ev geleneği bu.)
 on:
   push:
+    branches: [master]
   pull_request:
 
 jobs:
   advisor:
     runs-on: ubuntu-latest
+    # İŞ DÜZEYİ ZAMAN SINIRI — yoktu ve bedeli ağırdı. GitHub varsayılanı ALTI SAAT:
+    # apt asılınca her koşum o kadar süre bir eşzamanlılık yuvası tutuyordu. 2026-08-19'da
+    # aynı anda 19 asılı koşum ölçüldü ve TÜM filonun kapıları kuyruğa girdi.
+    # Sınırsız bir adım yalnız kendi işinin riski değildir; paylaşılan havuzu da yakar.
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Postgres client (psql)
+      # ══════════════════════════════════════════════════════════════════════
+      # apt ADIMI KALDIRILDI (2026-08-19 · ölçüldü, tahmin edilmedi)
+      #
+      # Eski hâli `sudo apt-get update && sudo apt-get install -y postgresql-client`
+      # idi ve bugün filoyu üç kez kilitledi. Sonra BAŞARILI bir koşumun günlüğü açıldı:
+      #
+      #   The following NEW packages will be installed:  postgresql-client
+      #   Need to get 11.6 kB of archives.
+      #
+      # ONBİR KİLOBAYT. Kurulan tek şey `postgresql-client` META paketi — içinde ikili
+      # dosya YOK, yalnız işaretçi. Gerçek istemci (`postgresql-client-16`) koşucu
+      # imajında ZATEN VAR; olmasaydı NEW packages listesinde o da görünürdü.
+      #
+      # Yani 24 dakikalık asılmalar, hiçbir şey kurmayan bir tur için ödeniyordu.
+      #
+      # NİÇİN `continue-on-error` YETMİYORDU: adım işi kırmızı yapmıyordu ama ASILMASI
+      # engellenmiyordu — koşum yine 6 saate kadar yuva tutuyordu. "Hata sayılmıyor"
+      # ile "kaynak yakmıyor" AYNI ŞEY DEĞİLDİR.
+      #
+      # FAIL-CLOSED: imaj bir gün psql'i düşürürse bu adım SESSİZ kalmaz, adıyla düşer.
+      # SSOT: docs/standards/ci-runner-install-standard.md §2.6
+      # ══════════════════════════════════════════════════════════════════════
+      - name: psql var mi (kurulum YOK)
+        timeout-minutes: 2
         run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-        continue-on-error: true
+          set -euo pipefail
+          if ! command -v psql >/dev/null 2>&1; then
+            echo "::error::psql kosucu imajinda YOK — kurulum adimi geri gerekiyor."
+            echo "::error::bkz. docs/standards/ci-runner-install-standard.md bolum 2.6"
+            exit 1
+          fi
+          psql --version
 
       - name: Supabase Advisor (SQL checks)
         env:
