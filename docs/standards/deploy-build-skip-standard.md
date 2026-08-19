@@ -1,4 +1,4 @@
-# Dağıtım Atlama Cetveli (Ignored Build Step) — v1.0
+# Dağıtım Atlama Cetveli (Ignored Build Step) — v1.1
 
 > **Kapsam:** Vercel'de hangi değişikliğin build tetikleyeceği.
 > **Bekçi:** `src/__tests__/conformance/build-skip-positive-logic.test.ts` (INV-BUILD-SKIP).
@@ -81,29 +81,201 @@ imkânsız kılar.
 
 ---
 
-## Kurulum — Recep'in yapacağı adım (repo tarafı hazır)
+## Kurulum — YAPILDI (2026-08-18, sahada doğrulandı)
 
-Betik ve bekçi repoda. Kalan tek adım **Vercel dashboard**'da:
+Ayar **canlı**. Kaynak: **Vercel dashboard** (repo içi yapılandırma dosyası DEĞİL — bkz. D7).
 
-1. Vercel → proje `venthub-hvac-esite` → **Settings** → **Git**
-2. **Ignored Build Step** bölümü → *Behavior*: **Custom**
-3. Komut kutusuna **tam olarak** şunu yaz:
+1. Vercel → proje `venthub-hvac-esite` → **Settings** → **Build and Deployment**
+   → doğrudan bağlantı: `/peckops-projects/venthub-hvac-esite/settings/build-and-deployment`
+2. **Ignored Build Step** → *Behavior*: **Custom**
+3. Komut kutusuna **tam olarak** (sondaki `|| exit 1` ZORUNLU — sebebi §D10):
 
 ```
-sh scripts/vercel-ignore-build.sh
+sh scripts/vercel-ignore-build.sh || exit 1
 ```
 
 4. **Save**.
 
-### Kurulumdan sonra DOĞRULANACAK tek şey
+> **DÜZELTME — cetvel iki kişiyi olmayan bir sayfaya gönderdi.** v1.0'da bu adım
+> "Settings → **Git**" yazıyordu; orada **Ignored Build Step diye bir alan yok**.
+> Recep sayfayı arattı, bulamadı; doğru yer **Build and Deployment**. Kusurun sınıfı
+> ölçülmemiş talimatı ölçülmüş gibi yazmaktı — o bölüm zaten "dashboard erişimi bende
+> yok" diye işaretliydi, yani **kendi belirsizliğini taşıyordu ama emir kipiyle konuştu.**
+> Ders: erişemediğim bir yüzeyin adımını yazarken **adı değil, adı ARAMANIN yolunu** ver
+> (ayarın kendi metnini arat), ya da doğrulanana dek "önerilen" diye işaretle.
 
-Salt-Markdown bir PR aç ve **Vercel kapısının PR'da ne rapor ettiğine** bak:
+## D7 — Ayarın TEK kaynağı: dashboard (yapılandırma dosyası ALTERNATİFTİR, EK DEĞİL)
 
-- Kapı **success/neutral** veriyorsa → kurulum tamam, iş bitti.
-- Kapı **pending'de kalıyorsa** → salt-doküman PR'ları merge edilemez hale gelir.
-  Bu durumda ya "Vercel" zorunlu kapı listesinden çıkarılır, ya da Ignored Build Step
-  kaldırılır. **Bu ihtimal ölçülmedi** (dashboard erişimi bende yok) — bu yüzden
-  varsayım olarak değil, doğrulanacak madde olarak yazılıyor.
+Aynı ayar iki yerden verilebilir:
+
+| Kaynak | Durum |
+|---|---|
+| **Vercel dashboard** → Ignored Build Step | ✅ **UYGULANAN** (2026-08-18'den beri canlı) |
+| Repo kökünde `vercel.json` / `vercel.ts` → `ignoreCommand` | ⚠️ **ALTERNATİF — kurulu DEĞİL** |
+
+**İkisini birden koymak yasak.** Vercel dokümanına göre yapılandırma dosyasındaki
+`ignoreCommand` **dashboard ayarını EZER**. Yani dosyayı ekleyen kişi, farkında olmadan
+canlı ayarı devre dışı bırakır ve iki kaynak sessizce çelişir — bu deponun bu hafta
+iki kez yaşadığı **çift-cetvel** sınıfının aynısı.
+
+Yapılandırma dosyasına **geçilecekse**: önce dashboard *Behavior*'ı **Automatic**'e
+çevir, sonra dosyayı ekle. Sıra tersse hangi kaynağın konuştuğu belirsiz kalır.
+
+### Kurulum sonrası ÖLÇÜM — yapıldı (2026-08-18, PR #664)
+
+Deney: içinde **hiç kod değişikliği olmayan**, salt-Markdown bir PR. Dağıtım günlüğünden
+ham satırlar:
+
+```
+Running "sh scripts/vercel-ignore-build.sh"
+ignore-build: VERCEL_GIT_PREVIOUS_SHA yok (ilk dagitim?) -> BUILD
+```
+
+**Üç şey birden öğrenildi:**
+
+1. ✅ **Kurulum çalışıyor.** Betik gerçekten koşuyor — dashboard ayarı canlı.
+2. ✅ **Vercel kapısı `success` veriyor**, `pending`'de kalmıyor. Yani korkulan
+   "doküman PR'ları merge edilemez hale gelir" senaryosu **gerçekleşmedi** ve
+   açık doküman PR'ları için bir tehlike yok.
+3. ❌ **Atlama ÖNİZLEME dallarında çalışmadı.** `VERCEL_GIT_PREVIOUS_SHA` boş geldi,
+   betik güvenli tarafa düşüp build etti.
+
+> **DÜZELTME (aynı gün, 11:46 master dağıtımı).** Yukarıdaki (3)'ü ilk yazdığımda
+> *"atlama HİÇ çalışmadı, T086 sıfır tasarruf sağladı"* demiştim. **Fazla genişti.**
+> Master (üretim) dağıtımının günlüğü şunu yazıyor:
+>
+> ```
+> ignore-build: build GEREKTIREN degisiklik: src/__tests__/.../currency-not-from-language.test.ts -> BUILD
+> ```
+>
+> Yani **master'da değişken DOLU geliyor** (o dal için son başarılı dağıtım vardır) ve
+> betik gerçek bir taban karşılaştırması yapıp doğru kararı veriyor. Çalışmayan yer
+> **önizleme dalları**: bu depoda kural *bir-iş-bir-dal* olduğu için her önizleme bir
+> dalın ilk dağıtımıdır ve orada böyle bir taban yoktur.
+>
+> Doğru ifade: **T086 üretim tarafında çalışıyordu, önizleme tarafında hiç çalışmadı.**
+> Tasarrufun asıl beklendiği yer önizlemeler olduğu için pratik kazanç yine küçüktü —
+> ama "hiç çalışmadı" demek ölçümden fazlasını iddia etmekti.
+
+**(3) niçin sessizdi:** betik doğru davrandı (bilmiyorsan build et), dolayısıyla
+hiçbir kırmızı üretmedi. Kapı da göremezdi — bekçi betiği *dosya-listesi kipinde*
+koşturuyordu ve **taban çözümü o yoldan hiç geçmiyordu**, yani kapının kapsamı
+dışındaydı. Kusurun sınıfı: **ölçülmemiş premis** — "değişken dolu gelir" varsayımı
+hiç sınanmamıştı ve gerekçesi (v1'de yazılıydı) kendi başına doğru olduğu için
+inandırıcı görünüyordu. *Doğru gerekçe, ölçülmemiş premis.*
+
+> **Hâlâ açık olan yarım:** *gerçekten atlanan* bir build'de kapının ne rapor ettiği
+> ölçülmedi — çünkü atlama bir kez bile gerçekleşmedi. Bu düzeltmeden sonraki ilk
+> salt-Markdown PR'ı o yarımı kapatacak; günlükte `taban = ... ortak ata` satırı
+> aranacak. Sonuç buraya yazılır.
+
+## D8 — Karşılaştırma tabanı bir ZİNCİRDİR, tek değişken değil
+
+| Sıra | Taban | Koşul |
+|---|---|---|
+| 1 | `VERCEL_GIT_PREVIOUS_SHA` | Yalnız commit **bu klonda gerçekten varsa** |
+| 2 | `git merge-base HEAD origin/<varsayılan dal>` | (1) çözülemezse |
+| — | *(hiçbiri)* | → **BUILD** |
+
+(1) en doğrusudur: son **başarılı** dağıtımdan bu yana biriken tüm değişiklikleri
+kapsar. Ama **yeni bir dalın ilk dağıtımında yoktur** ve bu depoda kural
+*bir-iş-bir-dal* olduğu için neredeyse her önizleme dağıtımı öyledir.
+
+(2) dalın **tamamını** kapsar; dalın içindeki eski bir kaynak değişikliği de görülür.
+
+**`HEAD^` yasağı sürüyor** ve gerekçesi değişmedi: yalnız son commit'e bakar, arka
+arkaya atlanmış commit'lerden sonra daha eski bir kaynak değişikliğini göremez →
+"kod değişti, deploy olmadı". Ortak ata bu tuzağa düşmez.
+
+Zincirin **hangi adımının kazandığı günlüğe yazılır**. Bu tesadüfi bir ayrıntı değil:
+yukarıdaki kusur tam olarak "hangi dalın çalıştığını göremediğimiz" için sessiz kaldı.
+
+### Kapı bunu nasıl ölçüyor
+
+INV-BUILD-SKIP artık **gerçek geçici git deposu** kurar (`git init`, commit'ler,
+`origin/master`'ı `update-ref` ile yazar — ağ yok) ve betiği o deponun içinde koşturur.
+Bilerek bozularak kanıtlandı:
+
+| Sabotaj | Yakalayan assert |
+|---|---|
+| Zincirin 2. adımını kaldır (v1 davranışı) | *salt-.md dal ATLANIR* → kırmızı |
+| `merge-base` yerine `HEAD^` koy | *dalın önceki commit'inde kod varsa BUILD* → kırmızı |
+
+İkincisi önemli: `HEAD^`'i yasaklayan **statik** assert bu sabotajı **yakalamadı**
+(sabotaj `git diff HEAD^` değil `git rev-parse HEAD^` yazıyordu). Yakalayan şey
+davranış testiydi — metin arayan kapının neyi göremediğinin canlı örneği.
+
+## D10 — Komutun KENDİSİ çuvallayabilir; çıkış kodu sözleşmesi komutta zorlanır
+
+**Kurulan komut (DEĞİŞMEZ):**
+
+```
+sh scripts/vercel-ignore-build.sh || exit 1
+```
+
+Sondaki `|| exit 1` süs değil, **sözleşmenin zorlanmasıdır**.
+
+**Yaşanmış kusur (2026-08-18, filo çapında):** komut ilk kurulduğunda `|| exit 1` yoktu.
+Betik `#660` ile master'a girdiği için **ondan eski tabanlı her dalda dosya yoktu** ve
+dağıtım günlüğü şunu yazdı:
+
+```
+Running "sh scripts/vercel-ignore-build.sh"
+sh: scripts/vercel-ignore-build.sh: No such file or directory
+```
+
+`sh` **127** ile çıkar. Vercel bu komuttan yalnız **iki** cevap anlar — `0` atla, `1`
+build — ve başka her kodu **dağıtım hatası** sayar. Sonuç: açık 11 PR dalının **10'u**,
+kodunda hiçbir kusur olmadan kırmızı verdi.
+
+**Sınıfın adı:** betiğin İÇİNDE çıkış kodu sözleşmesi üç yerde uyarıyla yazılıydı, ama
+**komutun kendisinin başarısız olabileceği** hiç hesaba katılmamıştı. Yani sözleşme
+korunuyordu — sözleşmeyi çağıran kabuk satırı hariç. *Kapıyı sertleştirirken kapının
+kolunu unutmak.*
+
+`|| exit 1` davranışı:
+
+| Betik | Çıkış | Sonuç |
+|---|---|---|
+| var, "atla" der | 0 | zincir kırılmaz → **ATLA** |
+| var, "build" der | 1 | → **BUILD** |
+| **yok / patlıyor / sözdizimi hatalı** | 127, 2, … | `\|\|` devreye girer → **BUILD** |
+
+Yani bilinmeyen her hâl güvenli tarafa, yani build'e düşer — betiğin kendi iç tasarımıyla
+(D2) aynı yön.
+
+**Bu düzeltmenin alternatifi 10 dalın master alması olurdu:** 10 gönderim, 10 deployment,
+ve kotanın bizi o gün zaten iki kez reddettiği bir ortam. Tek satır, sıfır gönderim.
+
+## D9 — Kota reddi bir COMMIT harcar (ölçüldü, tahmin çürüdü)
+
+Bu cetvelin varlık sebebi dağıtım israfı, o yüzden kotanın **gerçek** davranışı buraya yazılır.
+
+**Çürüyen model:** "son dağıtımdan ~20 dk sonra gönderim geçer". Vercel'in kendi
+kayıtları bunu reddetti (2026-08-18):
+
+```
+06:49 · 06:50 · 06:53 · 06:54 · 06:57 · 07:04 · 07:04   ← 15 dakikada YEDİ dağıtım
+...
+11:21 geçti (8 dk sonra)   ·   11:33 REDDEDİLDİ (12 dk sonra)
+```
+
+Sabit bir aralık bu veriyi açıklayamaz. **Aralık tahminine dayalı plan kurmayın.**
+
+**Asıl operasyonel kural — asimetri buradadır:**
+
+| Olgu | Sonuç |
+|---|---|
+| Reddedilen deneme **deployment yaratmaz** | Beklemek bedavadır |
+| Reddedilen deneme kırmızı bir **commit status** bırakır | Ve o status **depo tarafından yeniden tetiklenemez** |
+| Yeni deneme = **yeni commit** | ⇒ **kör tekrar COMMIT harcar** |
+
+Yani "olmadıysa tekrar dene" burada masumca bir davranış değil; her denemenin bedeli
+bir commit'tir. Force-push bu depoda yasak olduğu için `--amend` ile kaçamak da yok.
+
+**Bedava prob:** başka bir şeridin açık PR'ında, senin reddinden **sonra** yazılmış bir
+`pending`/`success` Vercel status'u ara. Varsa pencere açıktır. Kendi commit'ini
+harcamadan ölçmenin bilinen tek yolu budur.
 
 ### Geri alma
 

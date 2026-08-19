@@ -10,6 +10,7 @@ import {
   ResultCard,
   ResultGrid,
   StepIndicator} from '../../components/calculators'
+import { useCalculatorUsage } from '../../hooks/useCalculatorUsage'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
   type AirCurtainApplication,
@@ -81,6 +82,17 @@ const AirCurtainCalcPage: React.FC = () => {
   const [trafficIntensity, setTrafficIntensity] = useState<TrafficIntensity>(
     (searchParams?.get('trafficIntensity') as TrafficIntensity) || 'medium'
   )
+
+  // T021-VH · `calculator_used`. `currentStep` BILEREK dışarıda: olay hesaplama GİRDİLERİNİ
+  // anlatır, sihirbazın hangi adımda olduğunu değil. Taban çizgisi mount anı olduğu için
+  // paylaşılmış bir bağlantıyı açıp hiçbir şeye dokunmayan ziyaretçi olay üretmez. Bkz. hook.
+  useCalculatorUsage('aircurtain', {
+    doorWidth,
+    doorHeight,
+    application,
+    windCondition,
+    trafficIntensity,
+  })
 
   // URL Sync Effect
   useEffect(() => {
