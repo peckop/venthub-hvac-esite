@@ -137,12 +137,17 @@ jobs:
           CA_CERT: ${{ secrets.SUPABASE_CA_CERT }}
         run: |
           set -Eeuo pipefail
-          if [ -n "${DB_URL:-}" ] && [ -n "${CA_CERT:-}" ]; then
+          # Kok sertifika artik DEPODA (scripts/db/checks/supabase-root-2021-ca.pem) - herkese
+          # acik bir belge oldugu icin sir olmasi gerekmiyordu ve elle yapistirma adimi yanlis
+          # dosya riski uretti (olculdu: sirra 1366 baytlik YANLIS sertifika dusmustu, gercek
+          # kok 2179 bayt). Sir hala DESTEKLENIYOR: varsa depo dosyasinin YERINE gecer, boylece
+          # Supabase kokunu dondurdugunde kod degistirmeden mudahale edilebilir.
+          if [ -n "${DB_URL:-}" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
             echo "INV-CATALOG-1: sirlar tam -> kapi KOSACAK"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning title=INV-CATALOG-1 ATLANDI::Sirlar eksik (SUPABASE_DB_URL ve/veya SUPABASE_CA_CERT) -> kapi isi ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda katalog butunlugu OLCULMEDI."
+            echo "::warning title=INV-CATALOG-1 ATLANDI::SUPABASE_DB_URL yok -> kapi isi ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda katalog butunlugu OLCULMEDI."
           fi
 
   catalog-integrity:
@@ -172,6 +177,12 @@ jobs:
           SUPABASE_CA_CERT: ${{ secrets.SUPABASE_CA_CERT }}
         run: |
           set -Eeuo pipefail
-          printf '%s' "$SUPABASE_CA_CERT" > "$RUNNER_TEMP/supabase-ca.crt"
-          export PGSSLROOTCERT="$RUNNER_TEMP/supabase-ca.crt"
+          if [ -n "${SUPABASE_CA_CERT:-}" ]; then
+            printf '%s' "$SUPABASE_CA_CERT" > "$RUNNER_TEMP/supabase-ca.crt"
+            export PGSSLROOTCERT="$RUNNER_TEMP/supabase-ca.crt"
+            echo "INV-CATALOG-1: kok sertifika SIRDAN alindi (depo dosyasinin yerine gecti)"
+          else
+            export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+            echo "INV-CATALOG-1: kok sertifika DEPODAN alindi"
+          fi
           node scripts/db/checks/catalog-integrity.mjs

@@ -104,12 +104,27 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     const precheckStart = wf.indexOf('catalog-integrity-precheck:')
     const precheck = wf.slice(precheckStart, wf.indexOf('  catalog-integrity:', precheckStart + 1))
     expect(precheck.length).toBeGreaterThan(0)
-    for (const secret of ['SUPABASE_DB_URL', 'SUPABASE_CA_CERT']) {
-      expect(precheck.includes('secrets.' + secret + ' }}'), secret + ' ön-kontrolde yok').toBe(true)
-    }
-    for (const v of ['DB_URL', 'CA_CERT']) {
-      expect(precheck.includes('-n "${' + v + ':-}"'), v + ' kabuk koşulunda SINANMIYOR').toBe(true)
-    }
+    expect(precheck.includes('secrets.SUPABASE_DB_URL }}'), 'SUPABASE_DB_URL ön-kontrolde yok').toBe(true)
+    expect(precheck.includes('-n "${DB_URL:-}"'), 'DB_URL kabuk koşulunda SINANMIYOR').toBe(true)
+  })
+
+  it('kök sertifika DEPODA — elle yapıştırılan sırra bağlı değil', () => {
+    // NİÇİN: sertifika halka açık bir belge; sır olmak zorunda değildi ve elle yapıştırma adımı
+    // gerçek bir kusur üretti (sırra 1366 baytlık YANLIŞ sertifika düştü; gerçek kök 2179 bayt).
+    // Depodaki dosya yeniden üretilebilir ve denetlenebilir. Sır hâlâ destekleniyor: varsa
+    // dosyanın YERİNE geçer — Supabase kökünü döndürdüğünde kod değiştirmeden müdahale için.
+    const pem = fs.readFileSync(
+      path.join(process.cwd(), 'scripts', 'db', 'checks', 'supabase-root-2021-ca.pem'),
+      'utf8',
+    )
+    expect(pem).toContain('-----BEGIN CERTIFICATE-----')
+    expect(pem).toContain('-----END CERTIFICATE-----')
+
+    const wf = fs.readFileSync(
+      path.join(process.cwd(), '.github', 'workflows', 'db-advisor.yml'),
+      'utf8',
+    )
+    expect(wf).toContain('scripts/db/checks/supabase-root-2021-ca.pem')
   })
 
   it('kapı, doğrulanmamış TLS ile prod DB\'ye bağlanmaz', () => {
