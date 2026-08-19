@@ -281,3 +281,54 @@ harcamadan ölçmenin bilinen tek yolu budur.
 
 Ignored Build Step *Behavior*'ı **Automatic**'e çevirmek yeterli; repoda değişiklik
 gerekmez. Betik ve bekçi zararsız biçimde durur.
+
+---
+
+## D11 — Kırmızı bir Vercel kapısını uyandıran tek şey PUSH olayıdır
+
+**Ölçüm (ADMIN, 2026-08-19, PR #686):** PR'ı kapatıp yeniden açmak Actions'ı yeniden
+koşturur ama **Vercel'i tetiklemez**.
+
+| taraf | kapat-aç sonrası |
+|---|---|
+| GitHub Actions | `ci`, `admin-smoke`, `advisor`, `catalog-integrity` **yeniden başladı**, hepsi success |
+| Vercel | 25 dakika boyunca **hiçbir şey**: dağıtım kaydı sıfır, tek commit status 25 dk önceki **bayat failure** |
+
+**Ayırt edici kanıt** (bu olmadan "kota yine doldu" denirdi ve yanlış olurdu): aynı
+dakikalarda **başka bir dal** preview dağıtımı aldı — Vercel canlıydı. Ayrıca Vercel kota
+sınırına takıldığında **status yazar**; burada 25 dakika boyunca hiç status yazılmadı.
+*"Reddetti"* ile *"olaydan hiç haberi olmadı"* farkı tam buradadır: reddetseydi iz bırakırdı.
+
+**Sonuç:** Vercel **push olayına** bakar, PR'ın açık/kapalı durumuna değil. "Yeni commit
+üretmeden tetikle" talimatı Actions için doğru, **Vercel için işlevsizdir — ve işlevsizliği
+SESSİZDİR**, çünkü hiçbir şey kırmızı olmaz, sadece hiçbir şey olmaz.
+
+**Çözüm:** ağaç SHA'sı aynı kalan **boş commit** push'lamak. İçerik birebir korunur,
+yalnız yeni bir commit nesnesi doğar ve push olayı Vercel'i uyandırır. Bu betik onu
+**atlamaz**: değişen dosya listesi boş çıkarsa vacuous-skip koruması (`scripts/vercel-ignore-build.sh`,
+"Vacuous-skip koruması" bloğu) *"ölçemedim, atlamıyorum"* deyip BUILD'e düşer.
+
+**Ölçerken:** dağıtım **kaydı** sayısına bak, yalnız status'a değil — bayat status yeni
+sonuç gibi görünür.
+
+## D12 — "Bedava prob" DÜZELTİLDİ: yön değil, SIRA belirleyicidir
+
+Yukarıdaki *Bedava prob* paragrafı olduğu gibi bırakılırsa yanıltır; kendi ölçümümle
+daraltıyorum.
+
+Paragraf "reddinden sonra yazılmış bir success ara, varsa pencere açıktır" diyor. İki
+düzeltme gerekiyor:
+
+1. **Sıra kuralı.** Reddin **öncesindeki** başarı hiçbir şey kanıtlamaz. 2026-08-19 ölçümü:
+   `10:14:11Z` başarı → `10:14:22Z` rate-limited → `10:17:57Z` başarı. Aradaki **11 saniye**,
+   sınırın kesintili olduğunun bugüne kadarki en dar kanıtı. İlk satıra bakıp "kota akıyor"
+   demek yanlış olurdu; hüküm ancak **üçüncü** satırla kurulur.
+
+2. **Probun cevapladığı soru dardır.** "Redden sonra başarı var" = *filo çapında dondurma
+   haksız*. **"Benim gönderimim geçer" DEMEZ.** Kesintili sınırda ikisi ayrılmazsa prob
+   yeşil ışık sanılır, peş peşe gönderim olur ve sınır yeniden dolar — bu bir kez yaşandı.
+
+**Doğru rejim:** dondurma değil **sıralı-tek-tek gönderim**, her gönderimden sonra hedefin
+**kendi kaydından** ölçüm, redde **tekrar yok** (her tekrar bir commit harcar).
+
+İlgili: `docs/standards/measurement-discipline-standard.md` K5.
