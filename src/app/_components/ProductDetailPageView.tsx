@@ -380,6 +380,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const metaDesc = variantDescription || t('pdp.descFallback')
   const variantLabel = selectedVariant.model_code || selectedVariant.sku
   const hasMultipleVariants = variants.length > 1
+  // Varyant adı aile adıyla aynıysa tekrar basmanın anlamı yok; farklıysa GÖSTERİLİR.
+  const showsVariantIdentity = selectedVariant.name !== family.name
   const inlineSelector = hasMultipleVariants && variants.length <= VARIANT_PILL_MAX
   const stockQty = selectedVariant.stock_qty
   const inStock = typeof stockQty === 'number' && stockQty > 0
@@ -485,15 +487,25 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
               )}
             </div>
 
-            {/* Family Name (kanonik başlık) + seçili varyant */}
+            {/* Family Name (kanonik başlık) + SATIN ALINAN KİMLİK (ad + ayırt edici kod).
+                NİÇİN: sepete/siparişe/e-postaya giden metin `product.name`'dir; sayfa yalnız aile
+                adını yazarsa müşteri aldığı şeyin adını İLK KEZ sepette görür (ölçüm: 374/374
+                üründe ad ≠ aile adı). Ad tek başına yetmez — 74 satırda aile içinde çakışıyor;
+                ayırt ediciliği `variantLabel` (model_code || sku) taşıyor, o yüzden İKİSİ birlikte.
+                Ölçüm: docs/audits/t099-aile-icerik-uyumu-2026-08-18.md */}
             <h1 className="text-2xl sm:text-3xl font-black text-industrial-gray leading-hvac-11 mb-2 tracking-tight">
               {family.name}
             </h1>
-            {hasMultipleVariants && (
-              <p className="text-xs font-bold text-steel-gray uppercase tracking-widest mb-4">
-                {t('pdp.variant.selectedModel')}: <span className="text-primary-navy">{variantLabel}</span>
+            {showsVariantIdentity && (
+              <p className="text-base font-bold text-primary-navy leading-hvac-11 mb-1">
+                {selectedVariant.name}
               </p>
             )}
+            {/* KOŞULSUZ: tek üyeli ailede de görünür. Eski hâli `hasMultipleVariants`'a bağlıydı
+                ve kimliği tam da aile adının yanlış olduğu tek-üyeli ailede yutuyordu. */}
+            <p className="text-xs font-bold text-steel-gray uppercase tracking-widest mb-4">
+              {t('pdp.variant.selectedModel')}: <span className="text-primary-navy">{variantLabel}</span>
+            </p>
 
             {/* Smart Engineering Inference (tam Product satırı gerektirir) */}
             {actionProduct && <ProductSmartInference product={actionProduct} />}
@@ -722,7 +734,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
           {isNavSticky && (
             <div className="hidden lg:flex items-center space-x-3 pl-6 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-8 duration-500">
               <div className="flex flex-col items-end mr-2">
-                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px uppercase tracking-tight">{family.name}</span>
+                {/* Satın alma çubuğu: sepete DÜŞECEK ad gösterilir, aile adı değil. */}
+                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-120px uppercase tracking-tight">{selectedVariant.name}</span>
                 <span className="text-xs text-primary-navy font-black tracking-widest">
                   {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                 </span>

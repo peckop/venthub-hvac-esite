@@ -134,6 +134,41 @@ describe('INV-CI-INSTALL-1 — ağdan indiren CI adımı sınırlı ve tekrarlı
     expect(ihlaller).toEqual([])
   })
 
+  /**
+   * KEMER ARİTMETİĞİ — dış kemer içtekini KESMEMELİ.
+   *
+   * İlk sürümde bu kuralı yazmıştım ama kendim ihlal ettim: `retry-bounded.sh 300 3`
+   * en kötü 300x3 + 2x10 = 920sn (15,3dk) sürebilirken adıma 12 dakika vermiştim.
+   * Yani üçüncü deneme HİÇ koşamazdı — "üç kez dener" iddiası kağıt üstünde kalırdı.
+   * Kusur ölçümde değil ARİTMETİKTE'ydi ve ancak yazılınca görülür; bu yüzden kapı.
+   */
+  const aritmetikIhlalleri: string[] = []
+  for (const dosya of dosyalar) {
+    if (MUAF_DOSYALAR.has(dosya)) continue
+    const kaynak = readFileSync(path.join(WORKFLOW_DIR, dosya), 'utf8')
+    for (const adim of adimlariAyikla(dosya, kaynak)) {
+      const govde = yorumlariSil(adim.metin)
+      const sarmal = /retry-bounded\.sh\s+(\d+)\s+(\d+)/.exec(govde)
+      if (!sarmal) continue
+      const sinirSn = Number(sarmal[1])
+      const deneme = Number(sarmal[2])
+      const enKotuSn = sinirSn * deneme + 10 * (deneme - 1) // 10sn = denemeler arası bekleme
+      const dakika = /timeout-minutes:\s*(\d+)/.exec(govde)
+      if (!dakika) continue // kapsam dışı: yukarıdaki iddia zaten yakalıyor
+      const butceSn = Number(dakika[1]) * 60
+      if (butceSn <= enKotuSn) {
+        aritmetikIhlalleri.push(
+          `${dosya} :: ${adim.baslik} — timeout-minutes ${dakika[1]} (${butceSn}sn) ` +
+            `sarmalayıcının en kötü süresinden (${enKotuSn}sn) KÜÇÜK; son deneme hiç koşamaz.`,
+        )
+      }
+    }
+  }
+
+  it('dış kemer (timeout-minutes) sarmalayıcının son denemesini kesmiyor', () => {
+    expect(aritmetikIhlalleri).toEqual([])
+  })
+
   it('muafiyetteki dosya gerçekten var (ölü muafiyet birikmesin)', () => {
     for (const muaf of MUAF_DOSYALAR) expect(dosyalar).toContain(muaf)
   })

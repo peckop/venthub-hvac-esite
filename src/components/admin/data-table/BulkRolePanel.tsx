@@ -64,5 +64,3 @@ export function BulkRolePanel({ onRoleChange, onClose }: BulkRolePanelProps): Re
     </div>
   )
 }
-
-export default BulkRolePanel
