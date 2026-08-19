@@ -127,17 +127,24 @@ function eolKayitlari(): EolKaydi[] {
 }
 
 describe('INV-EOL-1 · index satır sonu', () => {
-  it('hiçbir izlenen metin dosyasının index\'i CRLF olmamalı', () => {
+  it('hiçbir izlenen metin dosyasının index\'i CRLF ya da KARISIK olmamalı', () => {
     const kayitlar = eolKayitlari()
     const kirli = kayitlar
-      .filter(k => k.index === 'i/crlf')
+      // `i/crlf` TEK BASINA YETMEZ - 2026-08-19'da olculdu. `git ls-files --eol` ucuncu bir
+      // deger daha uretir: `i/mixed`, yani blob'un ICINDE hem CRLF hem LF satir var. Belirti
+      // `i/crlf` ile BIREBIR AYNI (dosya sonsuza dek modified, `checkout --` temizlemez), ama
+      // bu kapi `=== 'i/crlf'` diye baktigi icin onu HIC gormedi. Olcum: depoda 4 dosya
+      // `i/mixed` idi (iki admin companion + iki i18n companion) ve tam o dort dosya aylardir
+      // her git komutundan sonra kirli gorunuyordu. Kok sebep sanilan post-commit kancasi
+      // DEGILDI: `git add --renormalize` diff'i SIFIRLADI, uretici hic kosmadan.
+      .filter(k => k.index === 'i/crlf' || k.index === 'i/mixed')
       .filter(k => k.worktree !== 'w/-text') // binary algılanan dosya fantom üretemez
       .filter(k => !MUAF_ONEKLER.some(onek => k.yol.startsWith(onek)))
       .map(k => k.yol)
 
     expect(
       kirli,
-      `Bu dosyaların INDEX'i CRLF. Sonucu: git onları sonsuza dek "modified" gösterir, ` +
+      `Bu dosyaların INDEX'i CRLF ya da KARIŞIK (i/mixed). Sonucu: git onları sonsuza dek "modified" gösterir, ` +
         `"git checkout --" temizlemez ve pull/merge/dal-değiştirme BLOKLANIR ` +
         `(2026-08-17 öncesi 113 dosya böyleydi; ana dizin günlerce master'a çıkamadı).\n` +
         `ÇÖZÜM: git add --renormalize <dosya> && commit.\n` +
