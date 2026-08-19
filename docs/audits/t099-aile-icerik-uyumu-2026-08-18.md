@@ -432,21 +432,57 @@ NX9034200;NIMAX 904 T4 37kW;64160 m3/h;11338
 NX10034250;NIMAX 1004 T4 55kW;88010 m3/h;14173
 ```
 
-**Sayfa 49 — PLUG FANLAR / ENKELFAN EC (9 satır)** — fiyat sütunu bu turda okunmadı,
-K2 öncesi tamamlanacak:
+**Sayfa 49 — PLUG FANLAR / ENKELFAN EC (9 satır)**
 
 ```
-ENKEC 155;ENKELFAN 155 EEC
-ENKEC 190;ENKELFAN 190 EEC
-ENKEC 250;ENKELFAN 250 EEC
-ENKEC 310;ENKELFAN 310 EEC
-ENKEC 355;ENKELFAN 355 EEC
-ENKEC 450;ENKELFAN 450 EEC
-ENKEC 500;ENKELFAN 500 EEC
-ENKEC 560;ENKELFAN 560 EEC
-ENKEC630;ENKELFAN 630 EEC
+ENKEC 155;ENKELFAN 155 EEC;460 m3/h;300
+ENKEC 190;ENKELFAN 190 EEC;760 m3/h;320
+ENKEC 250;ENKELFAN 250 EEC;1640 m3/h;410
+ENKEC 310;ENKELFAN 310 EEC;3160 m3/h;650
+ENKEC 355;ENKELFAN 355 EEC;4890 m3/h;1080
+ENKEC 450;ENKELFAN 450 EEC;6955 m3/h;1240
+ENKEC 500;ENKELFAN 500 EEC;13850 m3/h;2191
+ENKEC 560;ENKELFAN 560 EEC;16100 m3/h;2335
+ENKEC630;ENKELFAN 630 EEC;18600 m3/h;2476
 ```
 
 **Doğrulanan ve kaybı OLMAYAN sayfalar:** 15 (2/2), 20 (23/23), 29 (1/1) — çıkarma bu
 sayfalarda birebir doğru. **Sayfa 21** ise 10 satırın 9'unu kaybetmiş (§7'deki QE kasa vakası,
 görüntüden teyit edildi: `11560` … `11569`).
+
+### 12. SAYFA 49'UN KÖKÜ TAM ÇÖZÜLDÜ — "bozuk satır" değil, SÜTUN EŞLEME HATASI
+
+§10(e)'de "ad kaybolmuş, fiyat saçma" diye üç satır işaretlemiştim. Sayfa görüntüsündeki **iki
+tablo da** (fiyat + teknik özellik) satır satır döküldü ve her sayı yerine oturdu:
+
+| CSV satırı | `model_code` | `model_name` | `price_eur` |
+|---|---|---|---|
+| 1 | `13850` | `**` | `2.77` |
+| 2 | `16100` | `**` | `2.77` |
+| 3 | `18600` | `**` | `53.0` |
+
+**Bu sayıların hiçbiri uydurma değil — hepsi sayfada var, ama BAŞKA sütunlarda:**
+
+- `13850` / `16100` / `18600` → ENKEC 500 / 560 / 630'un **hava debisi (m³/h)**
+- `2.77` → ENKEC 560 ve 630'un **güç değeri (kW)**
+- `53.0` → ENKEC 630'un **ağırlığı (kg)**
+- `**` → teknik tablodaki **ses seviyesi** hücresinin gerçek içeriği (kaynakta da `**` yazıyor)
+
+Yani çıkarıcı fiyat tablosunu değil **teknik özellik tablosunu** okumuş, sütunları
+`kod / ad / fiyat` şemasına yanlış eşlemiş ve üstelik satırlar arası kaymış (bir satırın debisi
+başka satırın kW'ıyla eşleşmiş). `**` bir bozulma işareti değil, **sadık kopyalanmış yanlış
+hücre.**
+
+**Bunun neden önemli olduğu:** §10(e)'de önerdiğim K2 kapısı ("ad boş/yıldız olamaz, fiyat alt
+sınırı") bu üç satırı **yakalardı** — ama yanlış teşhisle. Kapı "bozuk veri" der, oysa gerçek
+kusur **sütun eşlemesi**dir ve aynı kusur *makul görünen* değerler üretirse kapıdan geçer.
+2,77 € şüphe uyandırır; 2.191 € uyandırmaz.
+
+→ **K1'e ikinci zorunlu doğrulama:** her sayfa için CSV satır sayısı **ve** en az bir satırın
+alan-alan görüntüyle karşılaştırılması. Satır sayısı tutuyor diye sütunlar doğru demek değildir.
+
+**Gerçek ENKELFAN fiyatları** (EK-A'da tam liste): 300 – 2.476 €. CSV'deki `2.77` ile arasındaki
+fark 790 kat.
+
+**Aynı sınıf şüphesi, iddia DEĞİL:** `21197` (ad `WP`, 396 €) ve `60079` (ad `II`, 2,00 €) da
+sütun-kayması gibi duruyor ama sayfaları (62 ve 38) bu turda dökülmedi — K1'de doğrulanacak.
