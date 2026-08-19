@@ -133,6 +133,56 @@ koordineli; `is_admin_user`'a dokunulmaz — ayrı iş emri).
 
 ---
 
+## A11 — Rolün TEK otoritesi: `public.user_profiles.role` (T047, 2026-08-18)
+
+**Değişmez:** bir kullanıcının rolü **yalnızca** `public.user_profiles.role`'dür.
+Diğer her yüzey ondan **türer**; hiçbiri bağımsız bir yetki kaynağı değildir.
+
+| Kaynak | Karar | Niçin |
+|---|---|---|
+| `public.user_profiles.role` | ✅ **TEK OTORİTE** | `trg_enforce_role_change` korur (kendi rolünü değiştirme kilidi + rol whitelist'i) |
+| `claims.user_role` / `claims.app_metadata.user_role` | ✅ **türev** | `custom_access_token_hook` her oturum açmada profilden yazar; kural 12'nin istediği yer |
+| Kullanıcı meta rolü (`user_metadata.role`) | ⛔ **YASAK** | Kullanıcı `auth.updateUser({ data })` ile kendisi yazabilir → kendi rolünü yükseltir |
+| Kodda sabit e-posta listesi | ⛔ **YASAK** | Depo PUBLIC; rol değişimi deploy gerektirir; liste **kayıtsız** adreslere önceden yetki verir |
+
+**Ölçülmüş kusur (bu maddenin doğuş sebebi).** 2026-08-18'de dört kaynak canlı
+olarak çelişiyordu: allowlist `super_admin`, profil `admin`, kullanıcı-meta
+`super_admin`, hook `admin`. İki somut açık vardı:
+
+1. `is_admin_user()` COALESCE'unun 3. dalı kullanıcı-yazabilir meta alanını
+   okuyordu. Sömürülmüyordu çünkü hook `claims.user_role`'ü hep dolduruyor ve
+   zincir 1. dalda kısa devre yapıyordu — yani açık **latent**ti.
+   **Latent açık, kapalı açık değildir:** hook devre dışı kalırsa dal aynı anda
+   canlanır ve hiçbir kapı bunu görmez. `20260818081500_role_source_single_authority.sql`
+   dalı kaldırdı.
+2. `src/config/admin.ts`'teki liste beş adres taşıyordu; üçünün prod'da **hiç
+   hesabı yoktu**. Yani liste mevcut kullanıcılara yetki vermiyor, **henüz kayıt
+   olmamış** adreslere önceden yetki veriyordu. Ayrıca `AdminLayout` onu
+   `rbac.ts` sayfa matrisini **baypas** etmek için kullanıyordu.
+
+**Sıra kuralı (ihlal edilirse yönetici kilitlenir):** rol kaynağı daraltılırken
+**önce VERİ, sonra KOD**. Profil rolü hedeflenen değere yükseltilmeden allowlist
+kaldırılırsa, ayrıcalığını o listeden alan yönetici panelinden düşer. Bu sıra
+`INV-AUTH-ROLE` R5 tarafından migration metninde zorlanır.
+
+**Bekçi:** `src/__tests__/conformance/auth-role-source.test.ts` — R1 (fonksiyon
+gövdesi kullanıcı-meta okumaz) · R2 (kaynak kodda yetki için kullanıcı-meta rolü
+okunmaz) · R3 (`admin.ts`'te sabit e-posta yok) · R4 (hook her iki anahtarı da
+yazar — R1'in dayanağı) · R5 (migration'da veri adımı fonksiyondan önce).
+
+### AÇIK KARAR — `is_admin_user()` fallback semantiği (E2)
+
+Fonksiyon `SECURITY INVOKER` (varsayılan). JWT'siz bağlamlarda (tetik/betik) son
+dal `public.user_profiles` okur; çağıranın o satırı okuma hakkı yoksa **sessizce
+`false`** döner. Bugün zararsız görünüyor, ama bir yetki fonksiyonunda sessiz-false
+kabul edilemez bir belirsizliktir. **T047 paketine BİLEREK dahil edilmedi:** aynı
+PR'da hem bir dalı kaldırıp hem fonksiyonun güven duruşunu (`DEFINER`) değiştirmek,
+bir şey bozulduğunda hangisinin sebep olduğunu ölçülemez hale getirir.
+Karar açık; ya `SECURITY DEFINER` yapılır ya da "fallback yalnız JWT'siz bağlamda
+çalışır" burada bir değişmez olarak sabitlenir.
+
+---
+
 # Bölüm B — Hesap Yüzeyi (taşındı)
 
 v0.2'de burada duran hesap-yüzeyi kuralları (B1–B6) kendi cetveline taşındı:
