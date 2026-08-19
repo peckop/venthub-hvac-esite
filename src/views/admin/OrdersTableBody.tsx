@@ -8,6 +8,7 @@ import type { DateRange } from 'react-day-picker'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { orderStatusLabel } from '@/lib/admin/orderStatusLabels'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { invokeShippingUpdate, SharedTrackingDeclinedError } from '@/utils/adminShipping'
 
@@ -111,29 +112,13 @@ function safeDate(iso: string, lang: Lang = 'tr'): string {
   }
 }
 
+/**
+ * Durum etiketi. Kume ve ceviri PAYLASILAN moduldedir (T108-VH): burada kopya
+ * bir switch tutmak, bu dosyada tam olarak processing durumunun DUSMESINE ve
+ * ham DB dizesinin ekrana basilmasina yol acmisti.
+ */
 function prettyStatus(s: string, t: (key: string, params?: Record<string, unknown>) => string): string {
-  if (!s) return s
-  const key = s.toLowerCase()
-  switch (key) {
-    case 'pending':
-      return t('admin.orders.statusLabels.pending')
-    case 'paid':
-      return t('admin.orders.statusLabels.paid')
-    case 'confirmed':
-      return t('admin.orders.statusLabels.confirmed')
-    case 'shipped':
-      return t('admin.orders.statusLabels.shipped')
-    case 'delivered':
-      return t('admin.orders.statusLabels.delivered')
-    case 'cancelled':
-      return t('admin.orders.statusLabels.cancelled')
-    case 'refunded':
-      return t('admin.orders.statusLabels.refunded')
-    case 'partial_refunded':
-      return t('admin.orders.statusLabels.partialRefunded')
-    default:
-      return s
-  }
+  return orderStatusLabel(s, t)
 }
 
 function badgeClass(s: string): string {
@@ -147,6 +132,7 @@ function badgeClass(s: string): string {
       return `${base} bg-admin-surface-3 text-admin-fg-muted border-admin-border ring-1 ring-admin-border`
     case 'paid':
       return `${base} bg-admin-success-weak text-admin-success border-admin-success/30 ring-1 ring-admin-success/30`
+    case 'processing':
     case 'confirmed':
       return `${base} bg-admin-accent-weak text-admin-accent border-admin-accent/30 ring-1 ring-admin-accent/30`
     case 'shipped':

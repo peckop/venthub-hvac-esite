@@ -9,6 +9,7 @@ import { SYSTEM_CURRENCY } from '../../../i18n/currency'
 import { formatDateTime } from '../../../i18n/datetime'
 import { formatCurrency } from '../../../i18n/format'
 import { useI18n } from '../../../i18n/I18nProvider'
+import { orderStatusLabel } from '../../../lib/admin/orderStatusLabels'
 import { adminTableCellClass, adminTableContainerClass,adminTableHeadCellClass } from '../../../utils/adminUi'
 import { Routes } from '../../../utils/routes';
 import AdminEmptyState from '../AdminEmptyState'
@@ -31,25 +32,33 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
     const { lang, t } = useI18n()
     const dragScrollRef = useDragScroll<HTMLDivElement>()
 
+    /*
+     * Gorsel aile. Etiketin KENDISI burada uretilmez - kume ve ceviri
+     * paylasilan modulde (T108-VH). Burada bir kopya switch tutmak, dashboard
+     * un DORT durum tanimasina ve kalan besinin HAM DB dizesi olarak
+     * basilmasina yol acmisti.
+     */
     const getStatusStyles = (status: string) => {
         switch (status) {
-            case 'completed': return 'bg-admin-success-weak text-admin-success ring-admin-success/30'
-            case 'pending': return 'bg-admin-warning-weak text-admin-warning ring-admin-warning/30'
-            case 'processing': return 'bg-admin-accent-weak text-admin-accent ring-admin-accent/30'
-            case 'cancelled': return 'bg-admin-danger-weak text-admin-danger ring-admin-danger/30'
-            default: return 'bg-admin-surface-3 text-admin-fg-muted ring-admin-border'
+            case 'paid':
+            case 'delivered':
+                return 'bg-admin-success-weak text-admin-success ring-admin-success/30'
+            case 'pending':
+            case 'shipped':
+            case 'refunded':
+            case 'partial_refunded':
+                return 'bg-admin-warning-weak text-admin-warning ring-admin-warning/30'
+            case 'confirmed':
+            case 'processing':
+                return 'bg-admin-accent-weak text-admin-accent ring-admin-accent/30'
+            case 'cancelled':
+                return 'bg-admin-danger-weak text-admin-danger ring-admin-danger/30'
+            default:
+                return 'bg-admin-surface-3 text-admin-fg-muted ring-admin-border'
         }
     }
 
-    const getStatusLabel = (s: string) => {
-        switch (s) {
-            case 'completed': return t('admin.dashboard.statusLabels.completed')
-            case 'pending': return t('admin.dashboard.statusLabels.pending')
-            case 'processing': return t('admin.dashboard.statusLabels.processing')
-            case 'cancelled': return t('admin.dashboard.statusLabels.cancelled')
-            default: return s
-        }
-    }
+    const getStatusLabel = (s: string) => orderStatusLabel(s, t)
 
     return (
         <div className="flex flex-col h-full group/table">
@@ -74,7 +83,7 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                     <table className="w-full text-sm text-left whitespace-nowrap border-collapse">
                         <thead>
                             <tr className="bg-admin-surface-2">
-                                <th className={`${adminTableHeadCellClass} py-6 first:pl-8`}>{t('admin.dashboard.table.orderOrQuoteNo')}</th>
+                                <th className={`${adminTableHeadCellClass} py-6 first:pl-8`}>{t('admin.dashboard.table.orderNo')}</th>
                                 <th className={adminTableHeadCellClass}>{t('admin.dashboard.table.date')}</th>
                                 <th className={`${adminTableHeadCellClass} text-right`}>{t('admin.dashboard.table.amount')}</th>
                                 <th className={adminTableHeadCellClass}>{t('admin.dashboard.table.status')}</th>
