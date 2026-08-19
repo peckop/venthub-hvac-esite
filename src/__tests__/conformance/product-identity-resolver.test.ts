@@ -105,7 +105,11 @@ describe('INV-PRODUCT-IDENTITY · kaynak sabitlemesi', () => {
       const govdeSatirlari: string[] = []
       for (const satir of satirlar) {
         govdeSatirlari.push(satir)
-        if (satir === '}') break
+        // trim ZORUNLU: depo CRLF'e normalize ediyor, satir sonunda gorunmez bir
+        // satır-başı karakteri kalıyor ve ham karşılaştırma gövdeyi HİÇ bitiremiyor:
+        // tarama tüm dosyayı yutuyor, kapı da
+        // YANLIŞ-KIRMIZI veriyor. (Tam takımda bir kez gerçekten yaşandı.)
+        if (satir.trim() === '}') break
       }
       const govde = govdeSatirlari.join(' ')
 
