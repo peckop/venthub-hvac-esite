@@ -130,7 +130,16 @@ function loadBaseline() {
  * İhlalleri prod DB'den toplar.
  */
 async function collectFromDatabase(connectionString) {
-  const client = new pg.Client({ connectionString, ssl: resolveTls() })
+  // `sslmode` URL'DEN SÖKÜLÜR. node-postgres bağlantı dizesini kendi ayrıştırıcısıyla okuyor ve
+  // oradaki `sslmode` bizim verdiğimiz `ssl` nesnesinin YERİNE geçebiliyor — o an kök sertifikamız
+  // devre dışı kalıyor ve zincir "self-signed certificate in certificate chain" ile düşüyor.
+  // Belirti sinsiydi: aynı betik aynı sertifikayla YERELDE çalışıyordu (yerel dizede `sslmode` yok),
+  // CI'da çalışmıyordu. Yani kusur koda ya da sertifikaya değil, ikisinin ARASINDAKİ önceliğe aitti.
+  const hadSslMode = /[?&]sslmode=/.test(connectionString)
+  const cleaned = connectionString.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '')
+  if (hadSslMode) console.log('catalog-integrity: baglanti dizesindeki sslmode kaldirildi (TLS ayari kodda belirlenir)')
+
+  const client = new pg.Client({ connectionString: cleaned, ssl: resolveTls() })
   await client.connect()
   const found = new Map()
   try {
