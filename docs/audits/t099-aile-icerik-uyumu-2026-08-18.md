@@ -317,3 +317,42 @@ sınırı, kod biçimi) — kapı olmadan aktarım YOK.
 
 **K1'in yeniden fiyatlandırması:** "çıkarmayı baştan doğrula" (74 sayfa) → **"19 şüpheli sayfayı
 görüntüden doğrula + bozuk satır kapısını yaz"**. §9 K1 satırı bu kapsamla okunmalıdır.
+
+### 11. K1 SAYFA DOĞRULAMASI — YENİ VE EN BÜYÜK SINIF: ALFANÜMERİK KOD AİLESİ TAMAMEN DÜŞMÜŞ
+
+§10(d)'deki 15 sıfır-satırlı sayfanın **tamamı** görüntüden açıldı (2026-08-19). Sonuç ikiye ayrıldı.
+
+**Beklenen boşluk (12 sayfa) — tablo yok, kayıp yok:** 1–7 kapak/içindekiler · 37 (VORT QUADRO
+EVO tanıtım) · 46 (LINEO QUIET tanıtım) · 57 (AVenS aksiyel/jet fanlar — fiyat yok, *"projelendirme
+için iletişime geçiniz"*) · 60, 61 (bölüm ayracı) · 63, 65 (NORDIK / Casals tanıtım) · 70, 73
+(tanıtım) · 71, 72 (NOTLAR) · 74 (arka kapak).
+
+**GERÇEK KAYIP (3 sayfa, 39 ürün) — tam fiyat tablosu, CSV'de HİÇBİRİ YOK:**
+
+| Sayfa | Bölüm / hat | Satır | Kod biçimi | Fiyat aralığı |
+|---|---|---|---|---|
+| 39 | EXPROOF FANLAR — **CMS ATEX SANTRİFÜJ** | 11 | `253080106XN` … | 764 – 5.874 € |
+| 47 | SANTRİFÜJ FANLAR — **NIMUS** (Casals) | 14 | `NS311280` … | 1.740 – 12.681 € |
+| 48 | SANTRİFÜJ FANLAR — **NIMAX** (Casals) | 14 | `NX313290` … | 1.786 – 14.173 € |
+
+**Ortak imza — ve kök sebep bu:** üç tablonun da kodu **harf içeriyor.** Ölçüldü:
+
+- `avensair-fiyat.csv`'deki **484 kodun 484'ü tamamen sayısal**; harf içeren tek kod yok.
+- prod `products` tablosunda **harf içeren `model_code` sayısı 0** (374 üründe).
+- `NIMUS` / `NIMAX` / `CMS ATEX` adlı ürün prod'da **0**.
+
+→ Kayıp rastgele değil: **çıkarma yalnızca sayısal kodları kabul etmiş**, alfanümerik kodlu her
+satırı sessizce atmış. Bu, §5 ve §7'deki satır-kayıplarından **farklı ve daha büyük bir sınıf**:
+orada tablonun kuyruğu düşmüştü, burada **tablonun tamamı** düşüyor.
+
+**Ticari ağırlık:** bu 39 ürün kataloğun **en pahalı kalemleri** (14.173 €'ya kadar) ve tamamı
+endüstriyel/ATEX hattı — yani bayi satışının merkezi. Şu an sitede satılamıyorlar ve
+"eksik 136 kod" listesinde de **görünmüyorlar**, çünkü o liste CSV↔DB farkından çıkarılmıştı ve
+bu 39 kod **CSV'ye hiç girmemiş**.
+
+> **484 + 39 = 523'ten büyük.** Gerçek katalog boyutu hâlâ bilinmiyor; §5'in "≥484" alt sınırı
+> yükseldi ama kapanmadı.
+
+**K1'e eklenen zorunlu adım:** çıkarma betiğinin kod biçimi filtresi bulunacak ve alfanümerik
+kodlar kabul edilecek; ardından **yalnız 3 sayfa değil, tüm katalog** yeniden çıkarılacak —
+çünkü filtre satır bazlı çalıştığından karışık tablolarda da satır düşürmüş olabilir.
