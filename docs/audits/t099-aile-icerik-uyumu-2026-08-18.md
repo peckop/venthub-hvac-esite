@@ -616,3 +616,38 @@ Bu betik ne zaman kullanılırsa **aynı kaybı üretir** → düzeltilmesi doğ
 > **Neden bu düzeltme önemli:** K1.0 atlanıp K1.1 "onarım" sayılsaydı, düzeltilen betik
 > koşulacak, CSV değişmeyecek ve **kapı yeşil görünürken veri aynı kalacaktı.** Sonucun doğru
 > olması gerekçenin denetlenmemesine izin vermiyor.
+
+### 17. K1.0 İLERLEDİ — üretici bulundu; kısıt KURAL DEĞİL, ÖRNEKTEN ÖĞRENİLMİŞ
+
+NotebookLM `venthub-pdf-ingestor` defteri (ID `17eb10ed…`) bağımsız olarak doğruladı ve kaynak
+dosyalar teyit etti:
+
+**Üretici:** `avensair-fiyat.csv`'yi Python betiği değil, **`.agent/skills/venthub-catalog-importer`
+skill'inin çok-ajanlı Kademe-1 akışı** üretiyor (`spec-page-worker` sayfa PNG'sini görsel okur →
+`csv-consolidator` CSV yazar). Defter, spesifik fonksiyon adı için dürüstçe **"BİLMİYORUM"** dedi.
+
+**Ve asıl bulgu — "5 haneli kod" kısıtı hiçbir yerde KURAL olarak yazılmamış:**
+
+- Skill dosyasında yok. Ana sözleşmede (`GOREV-katalog-ice-alim.md`) yok — orada yalnız
+  *"`model_code` = köprü (zorunlu)"* yazıyor, biçim şartı yok.
+- Literal `5-digit code` ifadesi projede **yalnız `visual_ingest_page.py`'de** (2 kez) — ve o
+  betiğin bu CSV'yi ürettiği §16'da çürütüldü.
+- **Ama her belgedeki her `model_code` ÖRNEĞİ 5 haneli:** `11313` (csv-import-export-standard),
+  `61121` (catalog-ingestion-standard), `61181`–`61190` (walkthrough).
+
+→ Sayfayı okuyan ajan kuralı **örneklerden çıkardı.** Kimse "kodlar 5 hanelidir" diye yazmadı;
+yazılmasına gerek kalmadı — **tek biçimli örnek kümesi kuralın yerine geçti.**
+
+**İkinci, ayrı bir kayıp mekanizması (skill satır 64, TASARIM GEREĞİ):**
+
+> *"**SADECE** Avensair fiyat listesinde GEÇEN ürünleri al; Avensair'de olmayan Vortice
+> ürünlerini ATLA"*
+
+Bu kural bilinçli ve savunulabilir — **ama fiyat listesi çıkarması kusurluysa hatayı ÇOĞALTIR:**
+listeden düşen 50 ürün, sonraki her aşamada da "Avensair'de yok" sayılıp elenmiştir. Tek bir
+çıkarma kusuru, bu kural sayesinde **kalıcı bir dışlamaya** dönüşmüş.
+
+**K1.0 DURUMU:** üretici hattı **adıyla belirlendi** (skill akışı); *hangi* istem metninin
+kullanıldığı hâlâ kayıt dışı (ajan koşumu, betik değil). K1.1 artık şu şekilde okunmalı:
+**kısıtı kaldırmak yetmez — belgelere alfanümerik kod ÖRNEKLERİ eklenmeli** (`NS311280`,
+`ENKEC 155`, `253080106XN`), çünkü ajanı yönlendiren şey kural değil örnekti.
