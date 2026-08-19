@@ -43,12 +43,6 @@ const MUAFIYETLER: ReadonlyArray<{ paket: string; peer: string; gerekce: string 
     gerekce:
       'Olculdu 2026-08-19: react-day-picker@8.10.1 yalnizca ^16.8 || ^17 || ^18 beyan ediyor, kurulu react 19.0.0 — paket React 19 destegini HIC beyan etmiyor. Admin tarih filtresi calisiyor (DateRangePicker, AdminInventoryReportPage, MovementsTableBody) ama bu DAVRANIS kaniti degil, yalnizca cokmedigi gozlemi. BILINCLI BORC.',
   },
-  {
-    paket: '@eslint/js',
-    peer: 'eslint',
-    gerekce:
-      'Olculdu 2026-08-19, bu kapinin ILK yakaladigi TAZE ayrisma: package.json "@eslint/js": "^10.0.1" beyan ediyor ama "eslint": ^9 kurulu (9.39.4), yani @eslint/js ana surumu tek basina v10 a cikarilmis. eslint.config.cjs bu paketi gercekten kullaniyor (require("@eslint/js")) ve pnpm lint su an yesil — yani gozlemlenmis bir kirilma YOK, ama bu kanit degil. ONCEKI IKISI GIBI BILINCLI BORC DEGIL: bu bir IS EMRI bekleyen gercek surum ayrismasi, dogru onarim iki surumu ayni ana surumde hizalamak. package.json su an merge kuyrugunda sicak oldugu icin bu PR de degistirilmedi; OPS-AUDIT e bildirildi. Onarildigi anda bayat-muafiyet testi bu satiri SILMEYE zorlar.',
-  },
 ]
 
 type Surum = { ana: number; orta: number; kucuk: number; on: string | null }
