@@ -87,8 +87,44 @@ jobs:
       - name: Install dependencies
         run: pnpm install --prefer-offline --config.allow-scripts true
 
+      # ══════════════════════════════════════════════════════════════════════
+      # KURULUM ADIMI SINIRLANDI (2026-08-19, üç bağımsız koşumla ölçüldü)
+      #
+      # Eski hâli tek satırdı: `playwright install --with-deps chromium`. O satır
+      # 32225114226 · 32225609438 · 32224496574 koşumlarında ~24,5 dakika asılı
+      # kalıp 25 dakikalık iş bütçesini yedi. Asılan kısım tarayıcı indirmesi
+      # DEĞİLDİ — `--with-deps`'in çağırdığı apt'ydi (günlükte azure aynası
+      # erişilemiyor, archive.ubuntu.com'a düşüyor ve 24 dakika tek satır çıktı
+      # üretmiyor). Sağlıklı koşumda aynı adım 1dk18sn: apt ~70sn, tarayıcı ~8sn.
+      #
+      # Bu yüzden adım ÜÇE bölündü ve her parça kendi başına sınırlandı:
+      #   1) apt yapılandırması  → asılma yerine zaman aşımı
+      #   2) sistem bağımlılıkları (apt) → sınırlı + tekrarlı
+      #   3) tarayıcı indirmesi (CDN)    → sınırlı + tekrarlı, önbellekli
+      # `timeout-minutes` ikinci kemerdir: betik bozulursa iş bütçesini yemesin.
+      # ══════════════════════════════════════════════════════════════════════
+      - name: apt sertlestirmesi
+        timeout-minutes: 3
+        run: bash scripts/ci/apt-hardening.sh
+
+      - name: Playwright tarayici onbellegi
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ms-playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ms-playwright-${{ runner.os }}-
+
+      - name: Playwright sistem bagimliliklari
+        timeout-minutes: 12
+        env:
+          RETRY_APT_TEMIZLE: '1'
+        run: bash scripts/ci/retry-bounded.sh 300 3 -- pnpm exec playwright install-deps chromium
+
       - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: bash scripts/ci/retry-bounded.sh 300 3 -- pnpm exec playwright install chromium
 
       - name: Build (real Supabase env)
         run: pnpm run build:ci

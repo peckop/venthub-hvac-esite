@@ -159,6 +159,85 @@ fanı DEĞİL. Worker bu serileri 41'e koyar; "otopark jet" diye ayrı kategori 
 
 ---
 
+## 6.1 Aile↔içerik bütünlüğü kapısı — **INV-CATALOG-1** (v1.2, 2026-08-19)
+
+> **Niçin eklendi:** T099. Müşteri "AVenS Davlumbaz Fanları" sayfasına girdi ve sepetine bir **hız
+> anahtarı** düştü — çünkü o ailenin üç üyesinin üçü de aksesuardı, ailede tek bir davlumbaz fanı
+> yoktu. Kod doğru davranıyordu (`?sku=` yoksa ilk varyant); yanlış olan **veriydi** ve hiçbir kapı
+> onu görmüyordu. Ölçüm: `docs/audits/t099-aile-icerik-uyumu-2026-08-18.md`.
+
+### Ne ölçülür, ne ölçülmez (dürüst sınır)
+
+**ÖLÇÜLMEZ:** "aile adı içeriğine uyuyor mu" — bu bir **yargıdır**. Ne statik tarama ne SQL bunu
+karara bağlayabilir. Kapı diye yazılırsa yalnız **sahte yeşil** üretir ve gerçek kusuru gizler.
+
+**ÖLÇÜLÜR (SQL, kesin):**
+
+| Kontrol | Neyi yakalar |
+|---|---|
+| `dup-name` — aile içinde çakışan ürün adı | Yalnız adı gösteren yüzey (sepet, e-posta, fatura) iki farklı ürünü aynı gösterir |
+| `dup-label` — aile içinde çakışan `model_code`/`sku` | Varyant seçim yüzeyi anlamsızlaşır; **bugün 0, korunmalı** |
+| `orphan` — ailesiz ürün | Kanonik vitrin adresi olmayan ürün |
+| `brand-mix` — aile içinde birden çok (ya da boş) marka | Aile sınırının yanlış çizildiği |
+
+Kapı: `scripts/db/checks/catalog-integrity.mjs` · taban: `catalog-integrity-baseline.json` ·
+karar mantığının sınavı: `src/__tests__/conformance/catalog-integrity-gate.test.ts`.
+
+### Cırcır (ratchet) — niçin "sıfır ihlal" istemiyoruz
+
+Bugünkü 21 ihlal grubunun (74 satır) düzeltilmesi **prod yazımıdır → Recep kapısı**. Kapı bu yüzden
+bilinen ihlalleri **adıyla ve gerekçesiyle** tabana yazar ve **tabanın dışındaki her yeni ihlalde
+KIRMIZI** olur. Böylece sınıf bugünden itibaren geri gelemez; mevcut borç gizlenmez, **sayılır**.
+
+- **Gerekçesiz taban satırı YASAKTIR** — kapı bunu kendi sınavında reddeder.
+- **Taban yalnız küçülür.** Bir veri düzeltmesi yapıldığında ilgili taban satırını silmek,
+  **o işin parçasıdır**; ayrı bir iş değildir.
+- **Bayat taban satırı kırmızı YAPMAZ**, yalnız uyarır. Gerekçe betiğin başlığında: aksi hâlde
+  Recep'in bir veri düzeltmesi, konuyla ilgisi olmayan bir şeridin PR'ını kırardı — yani kapı
+  kimsenin hatası olmadığı bir anda **yanlış kırmızı** verirdi.
+- **Uyar-geç modu YOKTUR.** Yeni ihlal doğrudan kırmızıdır.
+
+### Bağlantı yüzeyi — ölçemeyen kapı YEŞİL DÖNMEZ
+
+CI: `.github/workflows/db-advisor.yml` → iki iş. `catalog-integrity-precheck` **tek** ön-koşulu
+ölçer (`SUPABASE_DB_URL`); `catalog-integrity` yalnız o varsa koşar (`needs` + `if`).
+
+| Durum | Ne olur |
+|---|---|
+| Bağlantı dizesi var | Kapı koşar. Taban dışı yeni ihlalde **KIRMIZI**. |
+| Bağlantı dizesi yok (ör. fork PR'ı) | Kapı işi **hiç koşmaz — "skipped"**. Atlanmış iş **başarılı değildir**; kimse onu "ölçüldü" diye okuyamaz. |
+| Bağlantı dizesi var ama bağlanılamıyor | Betik çıkış **2** — "ÖLÇÜLEMEDİ", iş **KIRMIZI**. |
+
+> ⚠️ **Bu tasarım bir düzeltmedir.** İlk hâlinde sır yokken betik `exit 0` veriyordu ve
+> "ÖLÇÜLEMEDİ" yalnızca bir **etiketti** — iş **yeşil** dönüyordu. Yani kapı, ölçmediği bir şey
+> için "geçti" raporluyordu: sessiz fail-open. Bunu dosyanın sahibi (EDGE) yakaladı ve kanıt
+> istedi. Kural olarak yazılıyor: **bir kapı ölçemediğinde başarı raporlayamaz** — ya kırmızı olur
+> ya hiç koşmaz. `src/__tests__/conformance/catalog-integrity-gate.test.ts` bunu iki iddiayla
+> koruyor ve üç sabotajla kırmızı görüldüğü kanıtlandı (üst-dize tuzağı dahil:
+> `SUPABASE_CA_CERTX` ilk iddiayı yeşil geçiyordu).
+
+TLS doğrulaması **açıktır**; Supabase kök sertifikası `PGSSLROOTCERT` ile verilir (ölçüldü:
+doğrulama açıkken bağlantı `self-signed certificate in certificate chain` ile ölüyor). Doğru
+çözüm kökü **vermek**, doğrulamayı kapatmak değil — bağlantı prod DB kimlik bilgisi taşıyor ve
+repo **PUBLIC**.
+
+**Kökün tek kaynağı depodur:** `scripts/db/checks/supabase-root-2021-ca.pem`. Sır değildir —
+halka açık bir belgedir ve elle yapıştırma adımı gerçek bir kusur üretti (ölçüldü: panoya
+1366 baytlık **yanlış** sertifika düşmüştü; gerçek kök 2179 bayt). Rotasyon, bu dosyanın
+gözden geçirilebilir bir commit ile değiştirilmesidir. **Sır-üstüne-geçer seçeneği yoktur ve
+olmayacaktır:** görünmez bir pano ayarının doğrulanmış dosyayı sessizce ezmesi, tam da
+onarılan kusurun geri gelmesi olurdu. Testte iki iddiayla sabitlendi — hiçbir iş
+`SUPABASE_CA_CERT` okumaz ve `PGSSLROOTCERT` tam olarak **bir** kez atanır — ve ikisi de
+sabotajla kırmızı görüldü.
+
+> **Durum: ÖLÇÜYOR** (mekanizma ilanı kuralı — ilan, ilk gerçek koşumun kanıtına dayanır).
+> 2026-08-19 07:38Z, PR #666: kapı prod DB'ye bağlandı ve şu satırı üretti —
+> `toplam ihlal 21 | tabanda 21 | YENI 0 | bayat taban satiri 0` → YEŞİL.
+> **Recep'ten beklenen bir şey yoktur;** eskiden burada `SUPABASE_CA_CERT` eklemesi isteniyordu,
+> o adım **kaldırıldı**. Kökün depoya alınması bu bekleyişi tamamen ortadan kaldırdı.
+
+---
+
 ## 7. Provenance / ilişki
 
 Kaynak: çapraz-sorgu (`cross_notebook_query` Vortice-Full + Avensair, 2026-06-19) → Avensair'in 27 gerçek bölümü atıfla.
@@ -173,3 +252,6 @@ skill `.agent/skills/venthub-catalog-importer` (çıkarım aracı) · memory `ca
 ---
 
 > v1.0 · 2026-06-19 · İlk sürüm. Eksik cetvel boşluğu kapatıldı (skill vardı, cetvel yoktu).
+> v1.1 · 2026-08-18 · §6.1 INV-CATALOG-1 (aile↔içerik bütünlüğü, cırcır tabanlı) — T099.
+> v1.2 · 2026-08-19 · §6.1 kapı ÖLÇTÜ (07:38Z, PR #666). Kök sertifikanın tek kaynağı depo;
+>   `SUPABASE_CA_CERT` sırrı kaldırıldı, sır-üstüne-geçer yolu testle kapatıldı.
