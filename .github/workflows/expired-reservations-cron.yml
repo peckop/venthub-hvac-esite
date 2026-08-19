@@ -1,0 +1,97 @@
+name: Suresi Dolan Rezervasyonlar (gunluk)
+
+# ==============================================================================
+# NİÇİN VAR (T095-VH · 2026-08-19)
+#
+# `release-expired-reservations` de `order-housekeeping` ile aynı sınıftaydı:
+# yetenek yazılmış, çağıran yok (prod `cron.job` tablosunda tek iş vardı ve o
+# tcmb kuru işiydi). İkisi AYNI iş değil, biri diğerinin yedeği:
+#
+#   · order-housekeeping (30 dakikada bir) — 15/30 dakikalık eşiklerle ödenmemiş
+#     siparişi kapatır. Ana temizleyici budur.
+#   · bu iş (günlük) — `inventory_settings.reservation_timeout_hours` (varsayılan
+#     24 saat) eşiğiyle KALAN her şeyi süpürür ve ayrıca stok geri-vermesini
+#     KANITA bağlı RPC ile dener (`process_order_stock_restore`).
+#
+# İkincisi niçin gerekli: ana temizleyici bir gün hiç koşmazsa (sır düşer, iş
+# devre dışı kalır) tek savunma kalmasın. Ayrıca stok GERÇEKTEN düşülmüş bir
+# sipariş takılırsa yalnız bu yol onu geri verir — ve kanıt (`inventory_movements`
+# içindeki `order_sale` satırı) yoksa hiçbir şey yapmaz (T052-VH: koşulsuz
+# stok-geri-ekleme YASAK; `pending` sipariş için restored_count 0 döner).
+#
+# ⚠️ ÖN KOŞUL: `SUPABASE_SERVICE_ROLE_KEY` + `SUPABASE_PROJECT_REF`. Yoksa iş
+# gürültülü düşer; sessiz atlama bu dosyada da yasak.
+# ==============================================================================
+
+on:
+  schedule:
+    # 03:15 UTC (TR 06:15) — gün dönümü sonrası, mesai öncesi.
+    - cron: '15 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: expired-reservations-cron
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  rezervasyon-suresi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: On kosullari dogrula
+        env:
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          eksik=""
+          [ -n "${SERVICE_KEY:-}" ] || eksik="$eksik SUPABASE_SERVICE_ROLE_KEY"
+          [ -n "${PROJECT_REF:-}" ] || eksik="$eksik SUPABASE_PROJECT_REF"
+          if [ -n "$eksik" ]; then
+            echo "::error::Eksik repo sirri:$eksik — rezervasyon suresi isi KOSMADI."
+            exit 1
+          fi
+
+      - name: release-expired-reservations cagir
+        env:
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          URL="https://${PROJECT_REF}.supabase.co/functions/v1/release-expired-reservations"
+
+          govde=$(mktemp)
+          kod=$(curl -sS -o "$govde" -w '%{http_code}' -X POST "$URL" \
+                  -H "Authorization: Bearer ${SERVICE_KEY}" \
+                  -H 'Content-Type: application/json' \
+                  --max-time 300 || echo "000")
+
+          echo "HTTP $kod"
+          head -c 500 "$govde" || true
+          echo
+
+          if [ "$kod" != "200" ]; then
+            echo "::error::release-expired-reservations HTTP $kod dondu — supurme YAPILMADI."
+            exit 1
+          fi
+
+          # İki geçerli zarf var ve İKİSİ DE başarıdır:
+          #   · süresi dolan yoksa  -> {"message":"No expired reservations found.","released":0}
+          #   · süresi dolan varsa  -> {"success":true,"released_count":N,...}
+          # Yalnız birini aramak, boş günlerde yanlış-KIRMIZI üretirdi.
+          if grep -q '"success"[[:space:]]*:[[:space:]]*true' "$govde"; then
+            sayi=$(grep -oE '"released_count"[[:space:]]*:[[:space:]]*[0-9]+' "$govde" | grep -oE '[0-9]+$' || echo "?")
+            echo "::notice::Suresi dolan rezervasyon supuruldu — serbest birakilan: ${sayi}"
+          elif grep -q 'No expired reservations found' "$govde"; then
+            echo "::notice::Suresi dolan rezervasyon yok."
+          else
+            echo "::error::Taninmayan yanit zarfi — supurme basarisiz sayildi."
+            exit 1
+          fi

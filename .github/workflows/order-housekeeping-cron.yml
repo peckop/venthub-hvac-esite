@@ -1,0 +1,103 @@
+name: Siparis Bakimi (30 dakikada bir)
+
+# ==============================================================================
+# NİÇİN VAR (T095-VH · 2026-08-19)
+#
+# `order-housekeeping` fonksiyonu ödenmemiş `pending` siparişleri kapatmak için
+# YAZILMIŞTI ve iki dalı da doğruydu (token yoksa 30 dakika sonra iptal; token
+# varsa 15 dakika sonra bir kez mutabakat, tutmazsa iptal + payment_status=failed).
+#
+# ⚠️ AMA HİÇBİR ŞEY ONU ÇAĞIRMIYORDU. Ölçüm (2026-08-19, prod):
+#   · cron.job tablosunda TEK iş var — tcmb-rates-sync-daily. Bakım işi YOK.
+#   · Depoda hiçbir workflow, hiçbir istemci kodu bu ucu çağırmıyor.
+#   · Sonuç: 5 sipariş `pending` durumunda ASILI kaldı (en eskisi 2026-08-18 09:06Z,
+#     yani ~23 saat). Beşinin de ödeme işlemi satırı YOK ve stok hareketi YOK —
+#     yani terk edilmiş sepetler; para hareketi olmadı.
+#
+# Bu, T061'de `stock-alert` için yaşanan sınıfın AYNISI: yetenek var, tetikleyici
+# yok. Kod incelemesi bunu göremez çünkü kodda kusur YOKTUR — eksik olan, kodun
+# DIŞINDAKİ çağırandır.
+#
+# ── Niçin pg_cron DEĞİL ─────────────────────────────────────────────────────
+# Gerekçe `stock-alert-cron.yml` ile birebir aynı: bu uç `Authorization: Bearer
+# <service key>` istiyor. pg_cron ile çağırmanın tek yolu anahtarı
+# `cron.job.command` içine DÜZ METİN yazmaktır ve repo PUBLIC. Sır zaten sır
+# olarak saklandığı yer GitHub Actions.
+#
+# ⚠️ ÖN KOŞUL: `SUPABASE_SERVICE_ROLE_KEY` + `SUPABASE_PROJECT_REF` repo sırları.
+# Yoksa iş GÜRÜLTÜLÜ düşer — bilerek. "Sır yoksa sessizce atla" demek, hiç
+# koşmayan bir bakım işini koşuyormuş gibi göstermek olurdu.
+# ==============================================================================
+
+on:
+  schedule:
+    # Fonksiyonun kendi eşikleri 15 ve 30 dakika; 30 dakikalık tur en kötü
+    # durumda eşiğin 60 dakika gerisinde kalır. Daha sık koşmak, mutabakat
+    # çağrısını (iyzico-callback) gereksiz yere çoğaltır.
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: order-housekeeping-cron
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  siparis-bakimi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Örtük `bash -e`'de pipefail YOK — curl 000 dönse bile boru hattı 0 ile geçer.
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: On kosullari dogrula
+        env:
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          eksik=""
+          [ -n "${SERVICE_KEY:-}" ] || eksik="$eksik SUPABASE_SERVICE_ROLE_KEY"
+          [ -n "${PROJECT_REF:-}" ] || eksik="$eksik SUPABASE_PROJECT_REF"
+          if [ -n "$eksik" ]; then
+            echo "::error::Eksik repo sirri:$eksik — siparis bakimi KOSMADI."
+            exit 1
+          fi
+
+      - name: order-housekeeping cagir
+        env:
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          URL="https://${PROJECT_REF}.supabase.co/functions/v1/order-housekeeping"
+
+          govde=$(mktemp)
+          kod=$(curl -sS -o "$govde" -w '%{http_code}' -X POST "$URL" \
+                  -H "Authorization: Bearer ${SERVICE_KEY}" \
+                  -H 'Content-Type: application/json' \
+                  --max-time 300 || echo "000")
+
+          echo "HTTP $kod"
+          head -c 500 "$govde" || true
+          echo
+
+          # Fonksiyon, yazması düşen sipariş varsa BİLEREK 500 döner (ok:false).
+          # O yüzden 200 dışını hata saymak doğru: sessiz "hallettim" yalanı olmasın.
+          if [ "$kod" != "200" ]; then
+            echo "::error::order-housekeeping HTTP $kod dondu — bakim TAMAMLANMADI."
+            exit 1
+          fi
+
+          # HTTP 200 tek basina basari DEGIL: zarfta ok:true aranir.
+          if ! grep -q '"ok"[[:space:]]*:[[:space:]]*true' "$govde"; then
+            echo "::error::Yanit zarfinda ok:true yok — bakim basarisiz sayildi."
+            exit 1
+          fi
+
+          iptal=$(grep -oE '"cancelled_count"[[:space:]]*:[[:space:]]*[0-9]+' "$govde" | grep -oE '[0-9]+$' || echo "?")
+          echo "::notice::Siparis bakimi tamamlandi — token'siz iptal: ${iptal}"
