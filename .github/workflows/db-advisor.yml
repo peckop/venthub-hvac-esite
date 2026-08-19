@@ -174,15 +174,12 @@ jobs:
       - name: Catalog integrity gate
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          SUPABASE_CA_CERT: ${{ secrets.SUPABASE_CA_CERT }}
         run: |
           set -Eeuo pipefail
-          if [ -n "${SUPABASE_CA_CERT:-}" ]; then
-            printf '%s' "$SUPABASE_CA_CERT" > "$RUNNER_TEMP/supabase-ca.crt"
-            export PGSSLROOTCERT="$RUNNER_TEMP/supabase-ca.crt"
-            echo "INV-CATALOG-1: kok sertifika SIRDAN alindi (depo dosyasinin yerine gecti)"
-          else
-            export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
-            echo "INV-CATALOG-1: kok sertifika DEPODAN alindi"
-          fi
+          # Kok sertifikanin TEK kaynagi depo dosyasidir. Sir-ustune-gecer secenegini once
+          # yazdim, sonra kaldirdim: sirdaki belgenin YANLIS oldugunu zaten olcmustuk, yani
+          # sessizce ustune gecen bir sir tam da dogrulanmis dosyayi bozan sey olurdu.
+          # Rotasyon bu dosyanin degistirilmesiyle yapilir - gozden gecirilebilir bir commit
+          # olarak, gorunmez bir pano ayari olarak degil.
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/db/checks/catalog-integrity.mjs
