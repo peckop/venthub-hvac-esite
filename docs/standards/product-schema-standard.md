@@ -155,7 +155,63 @@ CREATE POLICY storage_tenant_isolation ON storage.objects
 
 ---
 
-## 11. Referanslar
+## 11. Ürün KİMLİĞİ — müşteriye hangi ad gösterilir
+
+> **Bekçi:** `src/__tests__/conformance/product-identity-resolver.test.ts` (INV-PRODUCT-IDENTITY)
+> **Çözücü:** `src/utils/productHelpers.ts` — `getProductDisplayName` / `getProductModelLabel`
+
+### 11.1 Kanonik kimlik = `products.name`
+
+Müşteri **aynı ürünün iki farklı adını görmemeli**. Ölçüm (2026-08-19, prod, 374 ürün):
+**374/374 üründe `products.name` aile adından FARKLI.** Ürün detay sayfası yalnız aile
+adını yazdığı için müşteri satın aldığı şeyin adını **ilk kez sepette** görüyordu.
+
+Kanonik kimlik satın alınan satırın adıdır: `products.name`. Sipariş kalemi anlık
+görüntüsü, e-posta ve fatura zaten bunu yazar.
+
+**Aile adı + model birleştirilerek ÜÇÜNCÜ bir ad üretilmez.** Bu, anlık görüntü
+yazarını (Edge fonksiyonu) ve katalog verisini de değiştirmeyi gerektirir; kimlik
+bütünlüğü için yanlış yöndür. Aile adı **seri etiketi** olarak ayrıca gösterilebilir.
+
+### 11.2 Beş yüzey TEK çözücüden beslenir
+
+| Yüzey | Ne gösterir |
+|---|---|
+| Ürün detay (PDP) | `getProductDisplayName` + seri etiketi olarak aile adı |
+| Sepet | aynı çözücü |
+| Sipariş özeti / hesap | `product_name_snapshot` (yazıldığı an çözücüyle aynı değer) |
+| E-posta | aynı snapshot |
+| Yönetim listeleri | aynı çözücü |
+
+Yüzeyin kendi başına ad kurması (`family.name`, `sku`, birleştirme) **yasaktır** —
+kuralın kaç yerde yaşadığını saymadan "düzelttim" demek bu depoda tekrar eden hatadır.
+
+### 11.3 ⚠️ HAM SKU MÜŞTERİYE GÖSTERİLMEZ (bugün "çalışıyor" görünen kural)
+
+Yüzeyde `model_code || sku` biçiminde bir yedek vardı. Ölçüm: **374/374 üründe
+`model_code` DOLU, sıfırında boş** — yani o yedek **bugün hiç çalışmıyor**.
+
+Bu, kuralı gereksiz yapmaz; **tam tersine** tehlikeli yapan şeydir. Katalog hattına
+`model_code`'suz tek bir ürün girdiği an müşteri iç kod (`NIC-11942` gibi) görür ve
+hiçbir kapı bunu görmez. **Latent bir açık, kapalı bir açık değildir** — aynı hafta
+kapatılan `is_admin_user` içindeki ulaşılamaz `user_metadata` dalıyla aynı sınıf.
+
+Kural: `model_code` yoksa **etiket hiç gösterilmez**. `sku`'ya düşmek yasaktır.
+
+### 11.4 Ayırt edicilik neden ada bırakılamaz
+
+Ölçüm: **74 satırda ad, aile içinde başka bir üyeyle çakışıyor.** Yani ad tek başına
+"hangi modeli aldım" sorusunu cevaplamıyor; `model_code` etiketi süs değil, kimliğin
+parçasıdır.
+
+### 11.5 Veri tarafı borcu (açık)
+
+Bu cetvel yüzeyi bağlar; **veriyi bağlamaz.** `products.model_code` bugün 374/374 dolu
+ama bunu zorlayan bir kısıt YOK. Doğru kalıcı çözüm katalog alımında zorunlu alan
+(`catalog-ingestion-standard.md`) ya da DB kısıtıdır. Sahibi: katalog hattı (PRICING).
+Bu madde, kuralın **ölçülemez tarafını** adıyla yazar — kapının kapsamını abartmamak için.
+
+## 12. Referanslar
 
 1.  **Medusa.js v2 Pricing & Attribute Architecture:** [medusajs.com/docs/modules/pricing](https://docs.medusajs.com) (Multi-currency PriceSets and Rule Engines).
 2.  **Shopify Admin API Product/Variant Option Limits:** [shopify.dev/docs/api/admin-graphql/latest/queries/product](https://shopify.dev/docs/api/admin-graphql) (Standardization of selected options).
