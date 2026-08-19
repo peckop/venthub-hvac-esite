@@ -116,15 +116,25 @@ jobs:
           restore-keys: |
             ms-playwright-${{ runner.os }}-
 
+      # ── KEMER ARITMETIGI (ilk surumde YANLISTI, duzeltildi) ──────────────
+      # `timeout-minutes` sarmalayicinin EN KOTU suresini GECMELI, yoksa dis kemer
+      # icteki denemeyi keser. Ilk surum 300sn x 3 deneme (en kotu 920sn = 15,3dk)
+      # yaziyor ama adima 12 dakika veriyordu: ucuncu deneme HIC kosamazdi.
+      #
+      # Ikinci kisit: adim sinirlarinin TOPLAMI is butcesini (25dk) asmamali, yoksa
+      # sinirlama isi kurtarmaz - yine 25 dakika yanar. Bu yuzden deneme sayisi 3'ten
+      # 2'ye indi: 300sn x 2 + 10sn = 610sn = 10,2dk -> adim siniri 11dk.
+      # Iki kurulum adimi = en kotu 22dk < 25dk. Saglikli deger 47 saniye, yani
+      # 300 saniyelik sinir zaten 6 kat pay birakiyor; ucuncu deneme pay degil kumardi.
       - name: Playwright sistem bagimliliklari
-        timeout-minutes: 12
+        timeout-minutes: 11
         env:
           RETRY_APT_TEMIZLE: '1'
-        run: bash scripts/ci/retry-bounded.sh 300 3 -- pnpm exec playwright install-deps chromium
+        run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install-deps chromium
 
       - name: Install Playwright Chromium
-        timeout-minutes: 10
-        run: bash scripts/ci/retry-bounded.sh 300 3 -- pnpm exec playwright install chromium
+        timeout-minutes: 11
+        run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install chromium
 
       - name: Build (real Supabase env)
         run: pnpm run build:ci

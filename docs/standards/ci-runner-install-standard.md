@@ -53,11 +53,59 @@ parçanın asıldığı ÖLÇÜLMEDEN uygulanırsa yanlış yarıya çare yazıl
    gereği — `0`'dır ve üç deneme de düşerken adım yeşil kalıyordu. Davranış
    testiyle yakalandı, varsayımla değil.)
 
+### 2.6 ÖNCE KALDIR, kaldıramıyorsan SINIRLA
+
+Sınırlamak iyidir; hiç çağırmamak daha iyidir. 2026-08-19'da başarılı bir advisor
+koşumunun kurulum günlüğü açıldı ve şunu söyledi:
+
+```
+The following NEW packages will be installed:  postgresql-client
+Need to get 11.6 kB of archives.
+```
+
+**Onbir kilobayt.** apt'nin kurduğu tek şey `postgresql-client` META paketiydi —
+içinde ikili dosya yok, yalnız işaretçi. Gerçek istemci (`postgresql-client-16`)
+koşucu imajında zaten vardı; olmasaydı NEW packages listesinde görünürdü. Yani
+saatlerce süren asılmalar, hiçbir şey kurmayan bir tur için ödeniyordu.
+
+**KURAL:** Bir kurulum adımı yazmadan önce sor: *bu araç koşucu imajında zaten var mı?*
+Varsa adım silinir ve yerine **fail-closed bir bekçi** konur — araç yoksa gürültülü
+düşsün. "Varsayalım ki vardır" demek, bu cetvelin onardığı sınıfın ta kendisidir.
+
+### 2.7 Kemer aritmetiği — dış kemer içtekini KESMEZ
+
+`timeout-minutes`, sarmalayıcının **en kötü** süresinden büyük olmalı:
+
+```
+en kötü = sınır × deneme + 10 sn × (deneme − 1)
+```
+
+Bu kuralı ilk sürümde yazdım ve **kendim ihlal ettim**: `retry-bounded.sh 300 3`
+(en kötü 920 sn = 15,3 dk) yazıp adıma 12 dakika vermiştim — üçüncü deneme hiç
+koşamazdı, yani "üç kez dener" iddiası kâğıt üstünde kalıyordu. Kusur ölçümde değil
+**aritmetikte**ydi; bu yüzden kapıya ayrı bir iddia olarak girdi.
+
+İkinci kısıt: **adım sınırlarının toplamı iş bütçesini aşmamalı.** Aşarsa sınırlama
+işi kurtarmaz, yalnız kimin yaktığını değiştirir. Bu yüzden deneme sayısı 3'ten 2'ye
+indi: sağlıklı süre 47 saniyeyken 300 saniyelik sınır zaten 6 kat pay bırakıyor —
+üçüncü deneme pay değil kumardı.
+
 ## 3. Muafiyetler — ADLA yazılır
 
 | Dosya | Sebep | Kaldırma koşulu |
 |---|---|---|
-| `.github/workflows/db-advisor.yml` | 2026-08-19'da PRICING şeridinin claim'inde (T099 çalışması sürüyor); başka şeridin dosyasına dokunmak protokol ihlali | T099 kapanıp dosya EDGE'e döndüğünde muafiyet SİLİNİR ve kurallar uygulanır |
+| `.github/workflows/db-advisor.yml` | 2026-08-19'da PRICING şeridinin claim'inde; başka şeridin dosyasına dokunmak protokol ihlali | Dosya EDGE'e döndüğünde ya da PRICING deseni uyguladığında muafiyet SİLİNİR |
+
+> ⚠️ **MUAFİYET YAZARKEN SORULACAK SORU — acıyla öğrenildi.** *Bu dosya yalnız kendi
+> işini mi bloke eder, yoksa PAYLAŞILAN bir kaynağı mı tüketir?* Yukarıdaki tek
+> muafiyet, yazıldığı gün **tüm filoyu iki saat kilitledi**: `db-advisor.yml`'in
+> zaman sınırsız apt adımı asıldı, iş düzeyi `timeout-minutes` de olmadığı için
+> GitHub'ın 6 saatlik varsayılanı devreye girdi ve **aynı anda 19 koşum**
+> eşzamanlılık yuvalarını tuttu. Herkesin kapısı kuyruğa girdi.
+>
+> Paylaşılan kaynak tüketen bir dosyada doğru hamle **sessiz muafiyet değil**,
+> sahibine acil not + devir talebidir. Muafiyet satırının yanına "paylaşılan kaynak:
+> EVET/HAYIR" yazılır. Bu dosya için: **EVET**.
 
 Muafiyet listesi kapının kendi dosyasındadır; süresiz muafiyet yoktur — her satır
 bir kaldırma koşuluyla birlikte yazılır.
