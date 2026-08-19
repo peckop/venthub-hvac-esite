@@ -1,5 +1,5 @@
 -- =====================================================================
--- T063 PR-2 · KVKK veri sahibi talebi — MÜŞTERİ KANALI (RLS + kolon grant)
+-- T063 PR-2 · KVKK veri sahibi talebi — MÜŞTERİ KANALI (RLS satır + with-check değer kapısı)
 -- =====================================================================
 -- Cetvel: docs/standards/legal-compliance-standard.md §3.5 / §3.6
 --

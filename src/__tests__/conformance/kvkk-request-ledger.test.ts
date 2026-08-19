@@ -40,7 +40,7 @@ const MIGRATIONS: Record<string, string> = import.meta.glob(
   { query: '?raw', import: 'default', eager: true },
 )
 
-/** Müşteri kanalı migration'ı (PR-2) — RLS + kolon grant. */
+/** Müşteri kanalı migration'ı (PR-2) — RLS satır kapısı + with-check değer kapısı. */
 const CHANNEL_MIGRATIONS: Record<string, string> = import.meta.glob(
   '/supabase/migrations/*_dsr_customer_*.sql',
   { query: '?raw', import: 'default', eager: true },

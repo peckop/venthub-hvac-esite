@@ -25,8 +25,10 @@ import { formatDate } from '../../i18n/datetime'
  *   • "Hesabımı sil" düğmesi — §3.1'e göre hukuki zorunluluk değil ve teknik olarak
  *     silme değil ANONİMLEŞTİRME'dir; yanlış yazılmış bir düğme mevzuata aykırı kayıt
  *     imhası üretir. Talep buradan açılır, yerine getirme admin tarafında yürür.
- *   • Süre/durum/sonuç alanları — kullanıcı bunları YAZAMAZ (kolon-GRANT ile DB'de
- *     kapalı); yalnız görür. Defter ispat aracıdır, tarafların beyanı değil.
+ *   • Süre/durum/sonuç alanları — kullanıcı bunları YAZAMAZ: p_dsr_owner_insert
+ *     politikasının with check bloğu bu alanları DB default'una pinler. KOLON-GRANT
+ *     bunu YAPMAZ (2026-08-18 prod ölçümü; gerekçe migration başlığında). Kullanıcı
+ *     yalnız görür. Defter ispat aracıdır, tarafların beyanı değil.
  *
  * Kimlik tevsiki oturumdan gelir: RLS `applicant_email = JWT email` şartını koyar,
  * yani kullanıcı başkasının adına talep açamaz (Tebliğ m.5 karşılığı).
