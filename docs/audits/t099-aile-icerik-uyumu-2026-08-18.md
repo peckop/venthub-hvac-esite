@@ -569,3 +569,50 @@ yanlış güven üretir.
 **Kapı:** K1.1–K1.2 kod değişikliği (`venthub-pdf-ingestor` deposunda, VentHub şeridi dışında —
 sahibiyle koordine edilecek). **K1.3 harcama doğurur → Recep onayı.** K1.4 çıktısı, K2'nin
 (prod yazımı) ön koşuludur.
+
+### 16. ⚠ DÜZELTME — §13'ün KANITI YARIM: dosya adı DOĞRULANMADI
+
+§13'te "kök sebep bulundu" dedim ve mekanizmayı `visual_ingest_page.py`'nin istemine bağladım.
+Değişikliği hazırlamadan önce kendi iddiamı denetledim ve **atıf çürüdü.** Ne durduğunu, ne
+düştüğünü ayrı ayrı yazıyorum.
+
+**AYAKTA KALAN (veri imzası — bu ölçüm bağımsız):**
+
+- 484 kodun **484'ü sayısal**, harf içeren tek kod yok.
+- **389'u tam 5 haneli** (%80).
+- Sayfa 49'da kod yerine geçen üç değer (`13850`, `16100`, `18600`) — hepsi tam **5 haneli**
+  hava debileri. Model rastgele bir sayı almadı, **5 haneli** olanı aldı.
+- Sayfa 39/47/48'de kodlar harfli ve **tablonun tamamı yok**.
+
+→ Veriyi üreten şey, **"5 haneli kod" biçiminde bir kısıt taşıyordu.** Bu çıkarım veriden
+doğrudan okunur ve ayakta.
+
+**DÜŞEN (atıf):** `avensair-fiyat.csv`'yi **hangi kodun ürettiği bilinmiyor.**
+
+- Depoda `avensair-fiyat.csv`'ye yapılan **her atıf onu OKUYOR** — `direct_generate.py`,
+  `visual_ingest_page.py`, `consolidate_pilot.py`, `validate_and_generate.py`. **Onu YAZAN
+  hiçbir betik yok.**
+- `visual_ingest_page.py`'nin ürettiği alanlar (`name`, `description_en/tr`, `specs`) CSV'nin
+  kolonlarıyla (`price_eur`, `avensair_section`, `page_num`) **örtüşmüyor**; o betik CSV'yi
+  *fiyat haritası* olarak okuyor.
+- Yani "bu betiğin istemi bu CSV'yi üretti" **kanıtlanmadı.** Muhtemel üretici, `.agent/skills/
+  venthub-catalog-importer` içinde tarif edilen **çok-ajanlı akış** (`spec-page-worker` sayfa
+  PNG'sini görsel okuyor) — ama bu da şu an bir *hipotez*.
+
+**Yine de gerçek olan bir kusur:** `5-digit code` ifadesi `visual_ingest_page.py`'de **iki kez**
+geçiyor (satır 51 görsel yol, satır 122 metin yolu) ve projede başka hiçbir yerde geçmiyor.
+Bu betik ne zaman kullanılırsa **aynı kaybı üretir** → düzeltilmesi doğru, ama bu
+"CSV'nin onarımı" **değildir**.
+
+**K1 PLANI DEĞİŞTİ — ÖNÜNE BİR ADIM EKLENDİ:**
+
+| Adım | Ne | Durum |
+|---|---|---|
+| **K1.0 (YENİ, önkoşul)** | `avensair-fiyat.csv`'yi ÜRETEN hattı bul ve adıyla kanıtla (git log, ajan koşum kayıtları, skill akışı) | **yapılmadı** |
+| K1.1 | `visual_ingest_page.py`'deki iki `5-digit code` satırını düzelt | hazırlanabilir (kusur gerçek) |
+| K1.2 | "şema/infografik/standart referansı ürün değildir" kuralı | K1.0'a bağlı — *hangi* isteme ekleneceği bilinmiyor |
+| K1.3 | Tüm katalogu yeniden çıkar | **K1.0 olmadan koşulamaz** |
+
+> **Neden bu düzeltme önemli:** K1.0 atlanıp K1.1 "onarım" sayılsaydı, düzeltilen betik
+> koşulacak, CSV değişmeyecek ve **kapı yeşil görünürken veri aynı kalacaktı.** Sonucun doğru
+> olması gerekçenin denetlenmemesine izin vermiyor.
