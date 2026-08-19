@@ -279,6 +279,54 @@ yükü altındadır" şartı pratikte karşılanamıyordu. Kurulan ekranın bağ
 müşteri INSERT'i migration gerektirir; migration Recep kapısıdır ve zorunlu olmayan bir
 ürün özelliği için açılmaz. Anonim (hesapsız) başvuru ayrıca e-posta doğrulama akışı ister.
 
+### 3.6 Musteri kanali — /account/data-requests (T063 PR-2, MIGRATION)
+
+§3.5 defterin ADMIN yuzunu kurdu; bu bolum veri sahibinin kendi yuzunu tanimlar.
+**Hukuki konum degismedi:** zorunlu kanal hala kayitli e-posta/KEP'tir (§3.1); bu ekran
+onun yerine gecmez, **ek** bir yoldur ve self-servis silme dugmesi DEGILDIR.
+
+Neden migration gerekti: tablonun tek politikasi admin'di, yani giris yapmis kullanici
+KENDI talebini ne acabiliyor ne gorebiliyordu. Iki kapi BIRLIKTE konur:
+
+1. **Satir kapisi (RLS `using`/`with check`):** kullanici yalniz `user_id = auth.uid()`
+   satirini gorur/yazar.
+2. **Deger kapisi (AYNI politikanin `with check` blogu):** satir kapisi tek basina konsa
+   kullanici `status='completed'`, `outcome=...`, `due_at=<uzak tarih>` ile INSERT edip
+   **defteri kirletir** — kendi talebini sonuclanmis gosterebilir ya da yasal sureyi
+   kaydirabilir. Bu yuzden surec alanlarinin her biri politikada **DB default'una
+   pinlenir**: `status='received'`, `due_at = received_at + interval '30 days'`,
+   `outcome/completed_at/identity_verified_at/handled_by/retained_data_note is null`.
+   Istemci farkli bir deger gonderirse INSERT reddedilir. **Musteriye UPDATE POLITIKASI
+   verilmez:** acilan talep degistirilemez, defter ispat aracidir.
+
+> **KOLON-GRANT KAPI DEGILDIR — 2026-08-18 prod olcumu.** Bu bolumun ilk hali deger
+> kapisini `grant insert (applicant_email, request_type, user_id)` ile kurmaya
+> calisiyordu ve kagit uzerinde dogru goruniyordu. Prod olculdugunde varsayim coktu:
+> `authenticated` rolunun bu tabloda **zaten tablo duzeyinde INSERT/UPDATE/DELETE**
+> yetkisi var (Supabase'in varsayilan `grant all on all tables in schema public`
+> davranisi) ve PostgreSQL'de **kolon ayricaligi tablo ayricaligini daraltmaz, uzerine
+> eklenir**. Yani kolon grant'i hicbir seyi kapatmiyordu.
+> Tablo grant'ini `revoke` etmek de cozum degildir: **admin de ayni `authenticated`
+> rolunde** calisir (yetkisi ayri bir DB rolunden degil, `p_dsr_admin_all`
+> politikasindan gelir), dolayisiyla revoke canli admin defterini kirar.
+> **Genel kural:** musteriye yazma acan her migration, kisiti **politika bazinda**
+> kurmalidir — politika yalniz o aktorun yolunu baglar, admin yolu etkilenmez.
+> Ayrica: bir korumanin METNINI yazmak onun ETKISINI kanitlamaz; grant/politika
+> tasarimlari **mevcut zemin olculerek** (roldeki efektif yetkiler) dogrulanir.
+
+**Kimlik tevsiki DB'de zorlanir:** `applicant_email` JWT e-postasina esit olmak
+zorundadir. Tebligin "sistemde kayitli e-posta" sartinin teknik karsiligi budur ve
+kullanicinin baskasi adina talep acmasini engeller. `identity_verified_at` damgasini
+kullanici YAZAMAZ (bilincli): oturumdan gelen talepte kimlik teknik olarak dogrulanmistir
+ama tevsik hukuki bir degerlendirmedir, istemcinin beyani degil.
+
+**Kapsam disi:** anonim (hesapsiz) basvuru — ayrica e-posta dogrulama akisi ister; bugun
+o kisi zorunlu kanali (e-posta/KEP) kullanir ve admin deftere isler.
+
+Bekci: INV-KVKK-1 R6 (politikanin `with check` blogunda yedi surec alaninin pinli
+olmasi + kimlik bagi + musteriye UPDATE politikasi yasagi; 10 sabotajla kanitli),
+R7 (kimlik tevsiki), R8 (musteri yuzeyi defteri degistirmez).
+
 ---
 
 ## 4) Fatura verisi kalitesi
