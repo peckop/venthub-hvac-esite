@@ -12,8 +12,10 @@ import { describe, expect, it } from 'vitest'
  *
  * `analytics-standard.md` on olayla bir ticaret hunisi tanımlıyor (view_item → add_to_cart →
  * begin_checkout → purchase …) ve DoD'sinde "huni olayları akıyor" diye bir kutu taşıyor.
- * Ölçüm: kodda `trackEvent()` çağrı yeri ÜÇ tane ve üçü de gezinme/içerik olayı —
- * `nav_click` (x2) ve `case_study_click`. Hunideki on olayın hiçbiri bağlı değil.
+ * Kapı kurulduğu gün (2026-08-19) ölçüm şuydu: kodda `trackEvent()` çağrı yeri ÜÇ tane ve
+ * üçü de gezinme/içerik olayı — `nav_click` (x2) ve `case_study_click`. Hunideki on olayın
+ * hiçbiri bağlı değildi. Bugünkü durum için sayıya değil, aşağıdaki `HENUZ_BAGLI_DEGIL`
+ * listesine bakılır — güncel kalan tek kayıt odur (ilk düşen: `calculator_used`).
  *
  * Üstelik ateşlenen iki ad, cetvelin kendi tablosunda YAZMIYORDU: tablo yazıldığı günden beri
  * kodun gerisindeydi ve bunu gören bir bekçi yoktu. İki yönlü kayma budur ve bu kapı ikisini de
@@ -54,7 +56,6 @@ const HENUZ_BAGLI_DEGIL = [
   'begin_checkout',
   'purchase',
   'search',
-  'calculator_used',
   'lead_submit',
   'whatsapp_click',
 ] as const
