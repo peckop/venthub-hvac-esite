@@ -1,8 +1,9 @@
 # Ticaret Alan Haritası (Commerce Domain Map) — Standart
 
-Durum: **TASLAK v0.2** (2026-08-19, OPS-AUDIT / T110-VH). v0.2 = EDGE'in üç ölçülmüş
-itirazı işlendi (tablo adları prod'dan doğrulandı; bildirim köprüsü; iki-çalışma-zamanı
-gerçeği). NLM ikizi danışması ve kalan modül sahiplerinin itirazları üzerine v1.0 olur.
+Durum: **TASLAK v0.3** (2026-08-19, OPS-AUDIT / T110-VH). v0.2 = EDGE'in üç ölçülmüş
+itirazı (tablo adları prod'dan doğrulandı; bildirim köprüsü; iki-çalışma-zamanı gerçeği).
+v0.3 = ADMIN'in status/payment_status ayrımı itirazı (DB kısıtlarından ölçüldü).
+NLM ikizi danışması ve kalan modül sahiplerinin itirazları üzerine v1.0 olur.
 
 ## 1. Amaç ve kapsam
 
@@ -42,8 +43,16 @@ ya harita gerekçeli bir PR ile güncellenir.
 
 ## 4. Kavram otoriteleri (tek kaynak)
 
-- **Sipariş durum kümesi:** `src/lib/admin/orderStatusMachine.ts` (kendini SSOT ilan eder).
-  UI'da durum listesi bu otoriteden **türetilir**; elle kopyalanmış küme (switch/enum
+- **Sipariş durumu İKİ AYRI SÖZLÜKTÜR, karıştırmak sessiz kusur üretir:**
+  - `status` otoritesi = DB kısıtı `venthub_orders_status_check` (**6 değer:** pending,
+    confirmed, processing, shipped, delivered, cancelled);
+  - `payment_status` otoritesi = `venthub_orders_payment_status_check` (**5 değer:** pending,
+    paid, failed, refunded, partial_refunded).
+  - `orderStatusMachine.ts` (OrderBoardStatus) bu iki kolonun **birleşimidir** — panonun
+    efektif kümesidir, `status` kolonunun SSOT'u DEĞİLDİR. Ödenen bedel yaşandı: stok
+    düşürme kapısı `status IN (paid, processing)` yazılmıştı; `paid` hiçbir zaman geçerli
+    bir `status` olmadığı için **satışta stok hiç düşmedi** ve işlem "başarılı" damgalandı.
+  UI'da durum listesi otoriteden **türetilir**; elle kopyalanmış küme (switch/enum
   kopyası) yasaktır. Etiket her zaman sözlükten gelir; ham DB dizesi basılamaz. (T108 dersi.)
   **İki çalışma zamanı uyarısı:** otorite TS modülüdür ama sözlüğü iki çalışma zamanı paylaşır
   (web + Deno edge fonksiyonları); Deno tarafı bu modülü import **edemez**, sözlüğü tekrarlar.
