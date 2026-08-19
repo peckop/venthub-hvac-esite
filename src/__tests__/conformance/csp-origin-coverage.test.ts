@@ -300,6 +300,23 @@ describe('INV-CSP-1 · CSP origin kapsaması', () => {
     ).toEqual([])
   })
 
+  it('ödeme sağlayıcı origin dört direktifte de izinli (T080-P2 kilidi)', () => {
+    // İyzico gömülü form dört yüzey kullanır: script yüklenir, iframe açılır, form POST
+    // edilir, XHR atılır. Dördünden BİRİ eksikse enforce gününde ödeme yolu SESSİZCE ölür
+    // (Report-Only bugün hiçbirini göstermez). Host çalışma anında IYZICO_BASE_URL
+    // secret'ından kurulur ve Edge fonksiyonunda yaşar — dedektörün taramadığı iki sınıf
+    // (cetvel §4) — o yüzden burada ADIYLA kilitleniyor, taramaya bırakılmıyor.
+    const ornek = 'sandbox-api.iyzipay.com'
+    const eksik = ['script-src', 'frame-src', 'form-action', 'connect-src'].filter(
+      (d) => !allows(csp, d, ornek),
+    )
+    expect(
+      eksik,
+      `
+Ödeme sağlayıcı origin'i şu direktif(ler)de İZİNLİ DEĞİL: ${eksik.join(', ')}. ` +
+        'Enforce gününde ödeme yolu kırılır; cetvel §6 origin siciline bak.',
+    ).toEqual([])
+  })
   it('CSP enforce edilecekse cetvelin enforce bölümü de güncellenmiş olmalı (Recep kapısı)', () => {
     const key = cspHeaderKey(CONFIG)
     expect(key, 'CSP header anahtarı bulunamadı').not.toBeNull()

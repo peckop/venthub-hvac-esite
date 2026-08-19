@@ -24,7 +24,6 @@ import {
   serializeAdminTheme,
 } from '../../components/admin/shell/themeCookie'
 import { useAdminThemeBodyScope } from '../../components/admin/shell/useAdminThemeBodyScope'
-import { isAdminByEmail } from '../../config/admin'
 import { buildBreadcrumbTrail } from '../../config/admin-resources'
 import { useAuth } from '../../hooks/useAuth'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
@@ -87,7 +86,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     useState<AdminThemeResolved>(defaultThemeResolved)
 
   const loading = authLoading || roleLoading
-  const isEmailAdmin = user?.email ? isAdminByEmail(user.email) : false
 
   useEffect(() => {
     if (loading) return
@@ -169,7 +167,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     )
   }
 
-  if (!isEmailAdmin && !canAccess(pathname ?? '')) {
+  // T047: eskiden burada `!isEmailAdmin &&` vardı ve sabit e-posta listesindeki bir
+  // kullanıcı `rbac.ts` sayfa matrisini TAMAMEN atlıyordu (super_admin'e özel
+  // `/admin/users` dahil). Artık tek karar mercii rol matrisi.
+  if (!canAccess(pathname ?? '')) {
     return (
       <div data-admin-theme={themeResolved}>
         <AccessDenied />

@@ -77,7 +77,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
 
       - name: Fonksiyonları seç
         id: pick
@@ -221,7 +221,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
 
       # Kaynak karşılaştırması CLI ile yapılır: Management API'nin
       # /functions/{slug}/body ucu derlenmiş ESZIP bundle döndürüyor ve
