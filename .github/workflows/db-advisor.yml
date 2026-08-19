@@ -183,3 +183,19 @@ jobs:
           # olarak, gorunmez bir pano ayari olarak degil.
           export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/db/checks/catalog-integrity.mjs
+
+      # Kapi TLS yuzunden kirmizi oldugunda, sunucunun GERCEKTEN sundugu zinciri gosterir.
+      # NICIN VAR: ayni betik ayni sertifikayla YERELDE calisiyor, CI'da calismiyordu; fark
+      # baglanilan SUNUCUDA olmali ve bunu tahminle degil olcumle kapatmak gerekiyor.
+      # Yalniz konak adi ve zincirdeki subject/issuer satirlari yazilir - kimlik bilgisi YOK.
+      - name: TLS zinciri teshisi (yalniz kapi kirmizi olursa)
+        if: failure()
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          HOSTPORT=$(printf '%s' "$SUPABASE_DB_URL" | sed 's#.*@##; s#/.*##; s#?.*##')
+          echo "baglanilan sunucu: $HOSTPORT"
+          echo | openssl s_client -starttls postgres -connect "$HOSTPORT" -showcerts 2>/dev/null             | grep -E "^ *[0-9]+ s:|^ *[0-9]+ i:" || echo "zincir okunamadi"
+          echo "depodaki kok:"
+          openssl x509 -in scripts/db/checks/supabase-root-2021-ca.pem -noout -subject -fingerprint -sha256
