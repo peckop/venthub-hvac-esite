@@ -17,41 +17,32 @@ interface AdminUser {
 }
 
 /**
- * Production-ready admin email list
- * 
- * Admin rolleri artık database'den kontrol edilir:
- * - user_profiles.role = 'admin' olan kullanıcılar admin
- * - user_profiles.role = 'moderator' olan kullanıcılar sınırlı admin
- * - user_profiles.role = 'user' olan kullanıcılar normal kullanıcı
- * 
- * Fallback: E-posta tabanlı sistem (geliştirme veya acil durum)
+ * ⛔ SABİT E-POSTA ALLOWLIST'İ KALDIRILDI (T047, 2026-08-18) — geri EKLEME.
+ *
+ * Buradaki `FALLBACK_ADMIN_EMAILS` beş adres taşıyordu ve `getUserRole` içinde
+ * DB'den ÖNCE çalışıyordu; ikisi de yönetici hesabına arayüzde `super_admin`
+ * döndürüyordu, oysa tek otorite olması gereken `user_profiles.role` `admin` idi.
+ * Üç kaynak (allowlist / `user_metadata` / profil) birbiriyle çelişiyordu.
+ *
+ * KALDIRMA GEREKÇESİ DÜZENLİLİK DEĞİL, ÖLÇÜLMÜŞ BİR AÇIK: listedeki
+ * `admin@venthub.com`, `info@venthub.com`, `alize@venthub.com` adreslerinin
+ * prod'da HİÇ HESABI YOKTU (2026-08-18 ölçümü). Yani liste, var olan kullanıcılara
+ * yetki vermiyordu — HENÜZ KAYIT OLMAMIŞ adreslere ÖNCEDEN yetki veriyordu.
+ * Bu üç adresten biriyle kayıt olan herkes anında yönetici olurdu. Depo ayrıca
+ * 2026-08-15'ten beri PUBLIC, yani liste herkese görünürdü.
+ *
+ * Bugünkü tek otorite: `public.user_profiles.role`. JWT'ye `custom_access_token_hook`
+ * onu `user_role` olarak yazar; `is_admin_user()` de yalnız onu okur
+ * (migration 20260818081500_role_source_single_authority.sql).
+ * Bekçi: INV-AUTH-ROLE (`src/__tests__/conformance/auth-role-source.test.ts`).
  */
-const FALLBACK_ADMIN_EMAILS: string[] = [
-  'admin@venthub.com',
-  'info@venthub.com',
-  'alize@venthub.com',
-  'recep.varlik@gmail.com',
-  'recepvarlk@gmail.com',
-  // Acil durum için e-postalar
-]
-
-// function isProdEnv(): boolean { ... (Removed to avoid unused var)
 
 /**
- * Database'den kullanıcı rolünü getir
+ * Database'den kullanıcı rolünü getir — TEK OTORİTE `user_profiles.role`.
+ *
  * @param userId Kullanıcı ID
- * @param userEmail Opsiyonel email (fallback için)
  */
-export async function getUserRole(userId: string, userEmail?: string): Promise<string> {
-  // 1. Email Fallback (En yüksek öncelikli güvenlik ağı)
-  if (userEmail && isAdminByEmail(userEmail)) {
-    // Özel superadmin emailleri kontrolü
-    if (userEmail === 'recep.varlik@gmail.com' || userEmail === 'recepvarlk@gmail.com') {
-      return 'super_admin'
-    }
-    return 'admin'
-  }
-
+export async function getUserRole(userId: string): Promise<string> {
   try {
     const { supabaseBrowserClient } = await import('../lib/supabase/client')
     const { supabaseStaticClient } = await import('../lib/supabase/static')
@@ -70,9 +61,10 @@ export async function getUserRole(userId: string, userEmail?: string): Promise<s
 
     if (data?.role) return data.role
 
-    // 2. Database'de kayıt yoksa ama email listedeyse (yeni admin kaydı durumu)
-    if (userEmail && isAdminByEmail(userEmail)) return 'admin'
-
+    // Profil satırı yoksa rol YOK. Eskiden burada e-posta listesi devreye girip
+    // 'admin' döndürüyordu — "yeni admin kaydı" senaryosu için. O yol, profili
+    // olmayan birine yetki vermek demekti; doğru akış önce profil satırını
+    // oluşturmaktır (admin panelindeki rol atama akışı).
     return 'user'
   } catch (error) {
     console.warn('getUserRole exception:', error)
@@ -81,53 +73,23 @@ export async function getUserRole(userId: string, userEmail?: string): Promise<s
 }
 
 /**
- * E-posta tabanlı fallback admin kontrolü
+ * ⛔ `isAdminByEmail` KALDIRILDI (T047) — tek çağıranı `AdminLayout` idi ve orada
+ * RBAC sayfa matrisini BAYPAS ediyordu (`if (!isEmailAdmin && !canAccess(path))`),
+ * yani listedeki bir e-posta `rbac.ts`'in sayfa kurallarını tamamen atlıyordu.
+ *
+ * ⛔ `checkAdminAccess` KALDIRILDI (T047) — ÖLÜ KOD idi (depoda tek bir çağıranı
+ * yoktu, testlerde de geçmiyordu) ama içinde üç ayrı fail-open yol taşıyordu:
+ *   1. `NODE_ENV === 'development'` altında e-postası 'alize' ya da 'admin'
+ *      İÇEREN herkese tam yetki (alt dize eşleşmesi — `admin@rakip.com` da geçerdi),
+ *   2. e-posta allowlist'i,
+ *   3. `user.user_metadata.role` — KULLANICININ KENDİ YAZABİLDİĞİ alan; bu,
+ *      `is_admin_user()`'daki DB açığının istemci tarafındaki ikiziydi. DB dalını
+ *      kapatıp bunu bırakmak, aynı kuralın yarısını kapatmak olurdu.
+ *
+ * Silmeden önce ölçüldü (kural: silinen yetenek ölü kod gibi saklanır) —
+ * `grep` ile kaynak ve test ağacında sıfır çağıran doğrulandı.
+ * Bekçi: INV-AUTH-ROLE R3/R4.
  */
-export function isAdminByEmail(email?: string): boolean {
-  if (!email) return false
-  return FALLBACK_ADMIN_EMAILS.includes(email.toLowerCase())
-}
-
-/**
- * Geliştirme ortamında admin kontrolü
- */
-function isDevAdmin(): boolean {
-  const isDev = process.env.NODE_ENV === 'development'
-  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-  return isDev && isLocalhost
-}
-
-/**
- * Senkron admin kontrolü (cache tabанлı)
- * 
- * Bu fonksiyon önceki auth state'den role bilgisini kullanır.
- * Eğer role bilgisi yoksa fallback olarak e-posta kontrolü yapar.
- */
-export function checkAdminAccess(user: { email?: string; user_metadata?: { role?: string } } | null): boolean {
-  if (!user?.email) return false
-
-  // Lokal geliştirmede tam yetki
-  const lowerEmail = user.email.toLowerCase()
-  if (process.env.NODE_ENV === 'development') {
-    if (lowerEmail === 'recep.varlik@gmail.com' || lowerEmail.includes('alize') || lowerEmail.includes('admin')) {
-      return true
-    }
-  }
-
-  // 1) Email Fallback (En yüksek öncelikli güvenlik ağı - her zaman çalışmalı)
-  if (isAdminByEmail(user.email)) return true
-
-  // 2) Supabase metadata rolü
-  const metadataRole = user.user_metadata?.role
-  if (metadataRole && ['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'].includes(metadataRole)) {
-    return true
-  }
-
-  // 3) Lokal dev fallback
-  if (isDevAdmin()) return true
-
-  return false
-}
 
 /**
  * Kullanıcıya admin rolü ata (sadece client tarafında bilgi için)
