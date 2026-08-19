@@ -159,7 +159,7 @@ fanı DEĞİL. Worker bu serileri 41'e koyar; "otopark jet" diye ayrı kategori 
 
 ---
 
-## 6.1 Aile↔içerik bütünlüğü kapısı — **INV-CATALOG-1** (v1.1, 2026-08-18)
+## 6.1 Aile↔içerik bütünlüğü kapısı — **INV-CATALOG-1** (v1.2, 2026-08-19)
 
 > **Niçin eklendi:** T099. Müşteri "AVenS Davlumbaz Fanları" sayfasına girdi ve sepetine bir **hız
 > anahtarı** düştü — çünkü o ailenin üç üyesinin üçü de aksesuardı, ailede tek bir davlumbaz fanı
@@ -199,14 +199,14 @@ KIRMIZI** olur. Böylece sınıf bugünden itibaren geri gelemez; mevcut borç g
 
 ### Bağlantı yüzeyi — ölçemeyen kapı YEŞİL DÖNMEZ
 
-CI: `.github/workflows/db-advisor.yml` → iki iş. `catalog-integrity-precheck` sırların varlığını
-ölçer; `catalog-integrity` **yalnız ikisi de varsa** koşar (`needs` + `if`).
+CI: `.github/workflows/db-advisor.yml` → iki iş. `catalog-integrity-precheck` **tek** ön-koşulu
+ölçer (`SUPABASE_DB_URL`); `catalog-integrity` yalnız o varsa koşar (`needs` + `if`).
 
 | Durum | Ne olur |
 |---|---|
-| İki sır da var | Kapı koşar. Taban dışı yeni ihlalde **KIRMIZI**. |
-| Sır eksik (fork PR'ı, ya da `SUPABASE_CA_CERT` henüz yok) | Kapı işi **hiç koşmaz — "skipped"**. Atlanmış iş **başarılı değildir**; kimse onu "ölçüldü" diye okuyamaz. |
-| Sır var ama bağlantı kurulamaz | Betik çıkış **2** — "ÖLÇÜLEMEDİ", iş **KIRMIZI**. |
+| Bağlantı dizesi var | Kapı koşar. Taban dışı yeni ihlalde **KIRMIZI**. |
+| Bağlantı dizesi yok (ör. fork PR'ı) | Kapı işi **hiç koşmaz — "skipped"**. Atlanmış iş **başarılı değildir**; kimse onu "ölçüldü" diye okuyamaz. |
+| Bağlantı dizesi var ama bağlanılamıyor | Betik çıkış **2** — "ÖLÇÜLEMEDİ", iş **KIRMIZI**. |
 
 > ⚠️ **Bu tasarım bir düzeltmedir.** İlk hâlinde sır yokken betik `exit 0` veriyordu ve
 > "ÖLÇÜLEMEDİ" yalnızca bir **etiketti** — iş **yeşil** dönüyordu. Yani kapı, ölçmediği bir şey
@@ -221,9 +221,20 @@ doğrulama açıkken bağlantı `self-signed certificate in certificate chain` i
 çözüm kökü **vermek**, doğrulamayı kapatmak değil — bağlantı prod DB kimlik bilgisi taşıyor ve
 repo **PUBLIC**.
 
-> **Bu cetvel kapıyı "çalışıyor" diye İLAN ETMEZ.** Durum: **bağlandı, uyuyor.**
-> **Recep'ten beklenen tek şey:** depo sırlarına `SUPABASE_CA_CERT` eklenmesi; ilk gerçekten
-> ölçen koşum görüldüğünde bu bölüm güncellenir (mekanizma ilanı kuralı).
+**Kökün tek kaynağı depodur:** `scripts/db/checks/supabase-root-2021-ca.pem`. Sır değildir —
+halka açık bir belgedir ve elle yapıştırma adımı gerçek bir kusur üretti (ölçüldü: panoya
+1366 baytlık **yanlış** sertifika düşmüştü; gerçek kök 2179 bayt). Rotasyon, bu dosyanın
+gözden geçirilebilir bir commit ile değiştirilmesidir. **Sır-üstüne-geçer seçeneği yoktur ve
+olmayacaktır:** görünmez bir pano ayarının doğrulanmış dosyayı sessizce ezmesi, tam da
+onarılan kusurun geri gelmesi olurdu. Testte iki iddiayla sabitlendi — hiçbir iş
+`SUPABASE_CA_CERT` okumaz ve `PGSSLROOTCERT` tam olarak **bir** kez atanır — ve ikisi de
+sabotajla kırmızı görüldü.
+
+> **Durum: ÖLÇÜYOR** (mekanizma ilanı kuralı — ilan, ilk gerçek koşumun kanıtına dayanır).
+> 2026-08-19 07:38Z, PR #666: kapı prod DB'ye bağlandı ve şu satırı üretti —
+> `toplam ihlal 21 | tabanda 21 | YENI 0 | bayat taban satiri 0` → YEŞİL.
+> **Recep'ten beklenen bir şey yoktur;** eskiden burada `SUPABASE_CA_CERT` eklemesi isteniyordu,
+> o adım **kaldırıldı**. Kökün depoya alınması bu bekleyişi tamamen ortadan kaldırdı.
 
 ---
 
@@ -242,3 +253,5 @@ skill `.agent/skills/venthub-catalog-importer` (çıkarım aracı) · memory `ca
 
 > v1.0 · 2026-06-19 · İlk sürüm. Eksik cetvel boşluğu kapatıldı (skill vardı, cetvel yoktu).
 > v1.1 · 2026-08-18 · §6.1 INV-CATALOG-1 (aile↔içerik bütünlüğü, cırcır tabanlı) — T099.
+> v1.2 · 2026-08-19 · §6.1 kapı ÖLÇTÜ (07:38Z, PR #666). Kök sertifikanın tek kaynağı depo;
+>   `SUPABASE_CA_CERT` sırrı kaldırıldı, sır-üstüne-geçer yolu testle kapatıldı.

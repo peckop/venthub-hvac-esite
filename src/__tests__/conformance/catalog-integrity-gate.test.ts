@@ -111,8 +111,7 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
   it('kök sertifika DEPODA — elle yapıştırılan sırra bağlı değil', () => {
     // NİÇİN: sertifika halka açık bir belge; sır olmak zorunda değildi ve elle yapıştırma adımı
     // gerçek bir kusur üretti (sırra 1366 baytlık YANLIŞ sertifika düştü; gerçek kök 2179 bayt).
-    // Depodaki dosya yeniden üretilebilir ve denetlenebilir. Sır hâlâ destekleniyor: varsa
-    // dosyanın YERİNE geçer — Supabase kökünü döndürdüğünde kod değiştirmeden müdahale için.
+    // Depodaki dosya yeniden üretilebilir ve denetlenebilir; rotasyon = gözden geçirilebilir commit.
     const pem = fs.readFileSync(
       path.join(process.cwd(), 'scripts', 'db', 'checks', 'supabase-root-2021-ca.pem'),
       'utf8',
@@ -125,6 +124,24 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
       'utf8',
     )
     expect(wf).toContain('scripts/db/checks/supabase-root-2021-ca.pem')
+  })
+
+  it('hiçbir iş CA sırrını OKUMAZ — görünmez ezme yolu kapalı', () => {
+    // NIÇIN BU KAPI VAR: "sır varsa depo dosyasının yerine geçsin" seçeneğini bir kez yazdım.
+    // O tasarımda panoya düşen YANLIŞ bir sertifika, doğrulanmış dosyayı sessizce ezerdi — yani
+    // onardığımız kusurun ta kendisi. Sırdaki belgenin yanlış olduğunu ÖLÇTÜK (1366 bayt).
+    // Bu yüzden kök sertifikanın tek kaynağı depodur ve bu tekliği test sabitler.
+    // Yorumlar SIYRILIR: aşağıdaki gerekçe metninde sırrın adı GEÇİYOR; yorumu tarayan bir iddia
+    // bunu "kod sırrı okuyor" sanıp yanlış kırmızı verirdi.
+    const wf = fs
+      .readFileSync(path.join(process.cwd(), '.github', 'workflows', 'db-advisor.yml'), 'utf8')
+      .replace(/\r\n/g, '\n')
+      .replace(/^\s*#[^\n]*$/gm, '')
+    expect(wf).not.toMatch(/secrets\.SUPABASE_CA_CERT/)
+    // PGSSLROOTCERT tek bir yerden, DEPO dosyasından beslenmeli.
+    const assignments = wf.match(/PGSSLROOTCERT=[^\n]*/g) ?? []
+    expect(assignments.length, 'PGSSLROOTCERT tam olarak bir kez atanmalı').toBe(1)
+    expect(assignments[0]).toContain('scripts/db/checks/supabase-root-2021-ca.pem')
   })
 
   it('kapı, doğrulanmamış TLS ile prod DB\'ye bağlanmaz', () => {

@@ -117,8 +117,8 @@ jobs:
   # Yukaridaki advisor isi TAVSIYE verir (|| true + continue-on-error). Bu is ise
   # gercek bir KAPIDIR: tabanin disinda yeni bir ihlal varsa KIRMIZI olur.
   #
-  # NICIN IKI IS: kapi olcemedigi bir durumda ASLA YESIL DONMEMELI. Sirlar yoksa
-  # (ornek: fork PR'i, ya da SUPABASE_CA_CERT henuz eklenmemis) kapi isi hic KOSMAZ,
+  # NICIN IKI IS: kapi olcemedigi bir durumda ASLA YESIL DONMEMELI. Baglanti dizesi yoksa
+  # (ornek: fork PR'i, ya da SUPABASE_DB_URL henuz eklenmemis) kapi isi hic KOSMAZ,
   # GitHub'da "skipped" gorunur. Atlanmis is BASARILI DEGILDIR - kimse onu "olculdu"
   # diye okuyamaz. Eski tasarimda burada `exit 0` vardi ve "OLCULEMEDI" yalnizca bir
   # ETIKETTI; is yesil donuyordu = sessiz fail-open. EDGE (dosya sahibi) bunu yakaladi.
@@ -134,14 +134,15 @@ jobs:
         id: probe
         env:
           DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          CA_CERT: ${{ secrets.SUPABASE_CA_CERT }}
         run: |
           set -Eeuo pipefail
-          # Kok sertifika artik DEPODA (scripts/db/checks/supabase-root-2021-ca.pem) - herkese
-          # acik bir belge oldugu icin sir olmasi gerekmiyordu ve elle yapistirma adimi yanlis
-          # dosya riski uretti (olculdu: sirra 1366 baytlik YANLIS sertifika dusmustu, gercek
-          # kok 2179 bayt). Sir hala DESTEKLENIYOR: varsa depo dosyasinin YERINE gecer, boylece
-          # Supabase kokunu dondurdugunde kod degistirmeden mudahale edilebilir.
+          # ON-KOSUL TEK: baglanti dizesi. Kok sertifika DEPODA duruyor
+          # (scripts/db/checks/supabase-root-2021-ca.pem) - herkese acik bir belge oldugu icin
+          # sir olmasi hic gerekmiyordu ve elle yapistirma adimi gercek bir kusur uretti
+          # (olculdu: sirra 1366 baytlik YANLIS sertifika dusmustu, gercek kok 2179 bayt).
+          # SUPABASE_CA_CERT sirri ARTIK OKUNMUYOR - ne burada ne kapi isinde. Rotasyon, depo
+          # dosyasinin gozden gecirilebilir bir commit ile degistirilmesidir; gorunmez bir pano
+          # ayari sessizce dogrulanmis dosyanin ustune gecerse tam da onardigimiz kusur geri gelir.
           if [ -n "${DB_URL:-}" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
             echo "INV-CATALOG-1: sirlar tam -> kapi KOSACAK"
