@@ -486,3 +486,54 @@ fark 790 kat.
 
 **Aynı sınıf şüphesi, iddia DEĞİL:** `21197` (ad `WP`, 396 €) ve `60079` (ad `II`, 2,00 €) da
 sütun-kayması gibi duruyor ama sayfaları (62 ve 38) bu turda dökülmedi — K1'de doğrulanacak.
+
+### 13. KÖK SEBEP BULUNDU — TEK BİR TALİMAT SATIRI
+
+Çıkarma bir **görsel LLM** ile yapılıyor (`venthub-pdf-ingestor/scripts/visual_ingest_page.py`,
+sayfa görüntüsü → vision API → JSON). Yani **düzeltilecek bir regex/filtre yok.** İstem
+(prompt) okundu; kusurların hepsini açıklayan satır şu:
+
+```
+- model_code (5-digit code, e.g. 11521 or 17160)
+```
+
+**Model bu talimata uydu.** Sonuçları tek tek ölçüldü:
+
+| # | Kusur | Mekanizma | Ölçülen |
+|---|---|---|---|
+| 1 | **Kayıp** | 5 haneli olmayan kodlu tablolar hiç üretilmedi | 50 ürün (s. 39, 47, 48, 49) |
+| 2 | **Sütun kayması** | 5 haneli kod yoksa model sayfadaki *herhangi* bir 5 haneli sayıyı kod yaptı — s.49'da bunlar hava debileriydi (`13850`, `16100`, `18600`) | 3 satır |
+| 3 | **HAYALET ÜRÜN** | tablo olmayan grafikten satır uydurdu: s.38'deki `EN ISO 60079` standart referansından `60079` kodu, şemadaki `II` kutusundan ad, `2,0` fiyat | 1 satır |
+| 4 | **Kısmi kayıp** | tablo bulundu ama satırlar eksik çıktı | s.62: 29→27 · s.21: 10→1 |
+| 5 | **Kayıpsız** | kod biçimi uyunca çıkarma birebir doğru | s.20 (23/23) · s.38'in 14 gerçek satırı · s.15 · s.29 |
+
+Kod uzunluğu dağılımı bu teşhisi doğruluyor: **389 kod 5 haneli** (%80), 81'i 8 haneli, 14'ü
+9 haneli. Yani model istemi çoğunlukla harfiyen uyguladı; saptığı yerlerde de **hep sayısal** kaldı.
+
+> **İstem "5 haneli kod" dediği için katalog "5 haneli kodu olan katalog"a dönüştü.**
+> Kayıp rastgele değil; **talimatın kendisiydi.**
+
+**K1'in doğru işi bu yüzden "filtreyi düzelt" DEĞİL:**
+
+1. İstemdeki `5-digit code` kısıtı kaldırılacak (kod biçimi serbest: `NS311280`, `ENKEC 155`,
+   `253080106XN` hepsi geçerli).
+2. İsteme "yalnızca **fiyat tablosu** satırlarını çıkar; şema/infografik/standart referansı
+   **ürün değildir**" kuralı eklenecek (hayalet ürün sınıfı).
+3. Tüm katalog **yeniden çıkarılacak** — kusur satır bazlı olduğu için doğru çıkan sayfalarda
+   bile satır eksilmiş olabilir (s.62 kanıtı: kod biçimi doğruydu, yine de 2 satır düştü).
+4. Doğrulama: her sayfa için **satır sayısı + en az bir satırın alan-alan** karşılaştırması (§12).
+
+### 14. KENDİ BULGUMU GERİ ALIYORUM — `21197` BOZUK DEĞİL, GERÇEK ÜRÜN
+
+§10(e)'de beş satırı "bozuk" diye işaretlemiştim. Sayfalar döküldü; **biri yanlış suçlamaydı:**
+
+- `21197;WP;396` → sayfa 62 AKSESUARLAR tablosunda **birebir doğru**: kod `21197`, model `WP`,
+  fiyat 396 €. Ad kısa diye bozuk sandım. **Kısa ad bozukluk değildir.**
+- `60079;II;2,0` → **bozuk değil, HAYALET**: sayfa 38'de böyle bir ürün yok; `60079` bir standart
+  numarası (`EN ISO 60079`), `II` bir şema kutusu. Sınıfı "bozuk satır"dan "uydurulmuş satır"a
+  taşındı (§13/3).
+- `13850` / `16100` / `18600` → sütun kayması (§12).
+
+**Bunun bedeli ne olurdu:** §10(e)'deki kapı ("ad boş/yıldız/çok kısa olamaz") uygulanırsa
+`21197 WP` **silinirdi** — gerçek bir ürün, veri temizliği adına yok edilirdi. Kapı yalnız
+**§13'teki mekanizmaya** kurulacak, ada bakarak değil.
