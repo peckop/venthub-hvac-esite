@@ -161,7 +161,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
 
       # --legacy-peer-deps ZORUNLU: depo pnpm ile yonetiliyor ve package.json'da onceden
       # var olan bir peer catismasi bulunuyor (react-day-picker 8 -> date-fns ^2||^3, depoda
