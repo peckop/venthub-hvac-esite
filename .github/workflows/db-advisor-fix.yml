@@ -10,10 +10,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # apt SINIRLANDI (2026-08-19): bu adım 2026-08-19'da 27 dakika asılı kalıp
+      # prod migration'ını geciktirdi; aynı sınıf admin-smoke'ta üç koşumda ölçüldü.
+      # Gerekçenin tamamı scripts/ci/apt-hardening.sh başlığında.
       - name: Install Postgres client (psql)
+        timeout-minutes: 10
+        env:
+          RETRY_APT_TEMIZLE: '1'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
+          bash scripts/ci/apt-hardening.sh
+          bash scripts/ci/retry-bounded.sh 240 3 -- sudo apt-get update
+          bash scripts/ci/retry-bounded.sh 240 3 -- sudo apt-get install -y postgresql-client
 
       - name: Apply advisor fixes (idempotent)
         env:
