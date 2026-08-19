@@ -1,5 +1,7 @@
-import { readdirSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { spawnSync } from 'node:child_process'
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join, resolve } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
@@ -157,6 +159,89 @@ describe('INV-NODE-1 · Node ana sürümü üç yüzeyde hizalı', () => {
       "Şu setup-node adımları sürüm beyan etmiyor ve action'ın varsayılanına düşer:\n  " +
         pinsizAdimlar.join('\n  '),
     ).toEqual([])
+  })
+
+  it('build betiği çalışma-zamanı ölçümünü ZİNCİRLİYOR (sessizce çıkarılamaz)', () => {
+    const pkg = JSON.parse(readFileSync('package.json', 'utf8')) as {
+      scripts?: Record<string, string>
+    }
+    const build = pkg.scripts?.build ?? ''
+
+    // NİÇİN prebuild DEĞİL: depoda .npmrc yok, pnpm'in enable-pre-post-scripts ayarı varsayılan
+    // false. prebuild yazmak HİÇ KOŞMAYAN bir bekçi yazmak olurdu (sessiz-kapalı sınıfı), o yüzden
+    // ölçüm build betiğinin İÇİNDE olmalı ve bu iddia onu orada TUTAR.
+    expect(
+      build,
+      'package.json > scripts.build içinde scripts/assert-node-major.mjs çağrısı YOK. Bu çağrı ' +
+        'olmadan derlemenin gerçekten hangi Node ana sürümünde koştuğu ÖLÇÜLEMEZ (build günlüğü ' +
+        'yazmaz, dağıtım kaydı söylemez) ve iddia belgeye dayalı kalır.',
+    ).toContain('scripts/assert-node-major.mjs')
+
+    expect(
+      readFileSync('scripts/assert-node-major.mjs', 'utf8').length,
+      'scripts/assert-node-major.mjs BOŞ ya da okunamıyor',
+    ).toBeGreaterThan(0)
+  })
+
+  it('ölçüm betiği hedefi DOSYADAN türetiyor (ikinci bir sabit = ikinci bir yalan)', () => {
+    const betik = readFileSync('scripts/assert-node-major.mjs', 'utf8')
+    expect(
+      betik,
+      'Betik package.json > engines.node okumuyor. Hedefi kendi içine yazan bir betik, engines ' +
+        'değişince sessizce ESKİ majoru doğrular — iki kaynak, iki gerçek.',
+    ).toMatch(/engines/)
+    // NİÇİN BU KADAR DAR: ilk yazımda yalnız "VERCEL ya da CI geçiyor mu" diye sordum ve SABOTAJI
+    // KAÇIRDI — betikte ortam adı başka bir satırda (günlük etiketi) da geçtiği için desen yine
+    // eşleşiyordu. İddia artık KATI kapının KENDİ ifadesini ve fail-closed çıkışını arıyor.
+    expect(
+      betik,
+      'Betikte KATI kapının ifadesi (process.env.VERCEL || process.env.CI) YOK. Ortam kontrolü ' +
+        'kaldırılırsa betik ya her yerde bloke eder ya hiçbir yerde — ikisi de cetvele aykırı.',
+    ).toContain('process.env.VERCEL || process.env.CI')
+
+    expect(
+      betik,
+      'Betikte process.exit(1) YOK — ayrışma bulunsa bile derleme DÜŞMEZ, yani uyar-geç = fail-open.',
+    ).toContain('process.exit(1)')
+  })
+
+  /**
+   * DAVRANIŞ TESTİ — niçin metin iddiası YETMEZ: sabotaj denemesinde betikteki fail-closed çıkışı
+   * kaldırdım ve iddia yakaladı, AMA yalnızca TÜM exit(1)'ler gittiği için. KATI dalı cerrahi
+   * biçimde iğdiş edilse (başka bir exit(1) yerinde kalarak) metin taraması SUSARDI. Bu yüzden
+   * betiği gerçekten KOŞTURUYORUZ: geçici bir dizine imkânsız bir hedef yazıp çıkış kodunu ölçüyoruz.
+   */
+  function betigiKostur(hedefMajor: string, env: Record<string, string>): { kod: number; cikti: string } {
+    const dizin = mkdtempSync(join(tmpdir(), 'inv-node-1-'))
+    writeFileSync(join(dizin, 'package.json'), JSON.stringify({ engines: { node: hedefMajor + '.x' } }))
+    const betik = resolve('scripts/assert-node-major.mjs')
+    // stdout VE stderr birlikte okunur: uyarı satırı stderr'e gidiyor ve yalnız stdout okuyan bir
+    // ölçüm onu GÖRMEZ — ilk yazımda tam bu yüzden yanlış-kırmızı aldım.
+    const sonuc = spawnSync(process.execPath, [betik], {
+      cwd: dizin,
+      env: { ...process.env, CI: '', VERCEL: '', ...env },
+      encoding: 'utf8',
+    })
+    return { kod: sonuc.status ?? -1, cikti: String(sonuc.stdout ?? '') + String(sonuc.stderr ?? '') }
+  }
+
+  it('DAVRANIŞ: CI ortamında ayrışmayı görünce çıkış 1 (fail-closed)', () => {
+    const { kod, cikti } = betigiKostur('99', { CI: '1' })
+    expect(kod, 'CI ortamında ayrışma varken çıkış 1 BEKLENİYORDU; alınan kod ' + String(kod) + ' | çıktı: ' + cikti).toBe(1)
+    expect(cikti, 'Ayrışma mesajı hedef majoru ADIYLA söylemiyor').toContain('beklenen 99')
+  })
+
+  it('DAVRANIŞ: lokalde ayrışma BLOKE ETMEZ ama uyarır (muafiyet ADIYLA)', () => {
+    const { kod, cikti } = betigiKostur('99', {})
+    expect(kod, 'Lokal muafiyet cetvelde yazılı; lokalde çıkış 0 bekleniyordu').toBe(0)
+    expect(cikti, 'Lokal koşumda uyarı satırı YOK — sessiz geçmek muafiyet değil körlüktür').toContain('LOKAL UYARI')
+  })
+
+  it('DAVRANIŞ: hizalı major CI ortamında da geçer (kapı yanlış-KIRMIZI vermiyor)', () => {
+    const kosanMajor = process.versions.node.split('.')[0]
+    const { kod, cikti } = betigiKostur(kosanMajor, { CI: '1' })
+    expect(kod, 'Hizalı durumda çıkış 0 bekleniyordu, çıktı: ' + cikti).toBe(0)
+    expect(cikti, 'POZİTİF SATIR yok: betik koştuğu sürümü günlüğe basmalı').toContain('assert-node-major: node v')
   })
 
   it('cetvel dosyası var ve hedef majoru ADIYLA yazıyor', () => {
