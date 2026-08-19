@@ -10,17 +10,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # apt SINIRLANDI (2026-08-19): bu adım 2026-08-19'da 27 dakika asılı kalıp
-      # prod migration'ını geciktirdi; aynı sınıf admin-smoke'ta üç koşumda ölçüldü.
-      # Gerekçenin tamamı scripts/ci/apt-hardening.sh başlığında.
+      # ══════════════════════════════════════════════════════════════════════
+      # apt ADIMI KALDIRILDI (2026-08-19, ölçüldü — tahmin edilmedi)
+      #
+      # Bu adım `sudo apt-get install postgresql-client` çalıştırıyordu ve bugün
+      # filoyu saatlerce kilitledi. Sonra başarılı bir koşumun günlüğü açıldı:
+      #
+      #   The following NEW packages will be installed:  postgresql-client
+      #   Need to get 11.6 kB of archives.
+      #
+      # ONBİR KİLOBAYT. Kurulan tek şey `postgresql-client` META paketi — içinde
+      # ikili dosya YOK, yalnız işaretçi. Gerçek istemci (`postgresql-client-16`)
+      # koşucu imajında ZATEN VAR; olmasaydı NEW packages listesinde o da görünürdü.
+      #
+      # Yani apt turu hiçbir şey kurmuyordu. 24 dakikalık asılmalar, 11 kB'lik bir
+      # işaretçi için ödeniyordu. ÖNCE KALDIR, kaldıramıyorsan SINIRLA — sınırlanmış
+      # bir apt iyidir, ama hiç çağrılmayan apt daha iyidir.
+      #
+      # FAIL-CLOSED: koşucu imajı bir gün psql'i düşürürse bu adım SESSİZ kalmaz,
+      # adıyla kırmızı yanar. "Varsayalım ki vardır" demek, bu dosyanın onardığı
+      # sınıfın ta kendisidir.
+      # ══════════════════════════════════════════════════════════════════════
       - name: Install Postgres client (psql)
-        timeout-minutes: 10
-        env:
-          RETRY_APT_TEMIZLE: '1'
+        timeout-minutes: 2
         run: |
-          bash scripts/ci/apt-hardening.sh
-          bash scripts/ci/retry-bounded.sh 240 3 -- sudo apt-get update
-          bash scripts/ci/retry-bounded.sh 240 3 -- sudo apt-get install -y postgresql-client
+          set -euo pipefail
+          if ! command -v psql >/dev/null 2>&1; then
+            echo "::error::psql kosucu imajinda YOK. Kurulum adimi geri gerekiyor —"
+            echo "::error::bkz. docs/standards/ci-runner-install-standard.md bolum 2.6"
+            exit 1
+          fi
+          psql --version
 
       - name: Apply advisor fixes (idempotent)
         env:
