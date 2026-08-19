@@ -332,3 +332,43 @@ düzeltme gerekiyor:
 **kendi kaydından** ölçüm, redde **tekrar yok** (her tekrar bir commit harcar).
 
 İlgili: `docs/standards/measurement-discipline-standard.md` K5.
+
+## D13 — Atlama UCUZ DEĞİLDİR: sınır, dağıtım kaydı yaratılırken işler
+
+Bu cetvel boyunca örtük bir varsayım taşındı: *"nasılsa build atlanıyor, o gönderim
+kotaya yük bindirmez."* 2026-08-19'da ölçüldü ve **çürüdü**.
+
+**Kanıt — mümkün olan en temiz biçimi:** `aa257ad1` bir **boş commit**. Ağaç SHA'sı
+ebeveyniyle birebir aynı (`d61401ec`), `git diff --name-only` **sıfır** dosya döndürüyor.
+Hiçbir içerik kuralı böyle bir commit'i build'e sokamaz; tanımı gereği atlanır.
+
+Buna rağmen:
+
+```
+commits/aa257ad1/status → Vercel: failure  2026-08-19T13:20:52Z
+                          "Deployment rate limited — retry in 24 hours."
+```
+
+**Hüküm:** sınır **dağıtım kaydı yaratılırken** işliyor — Ignored Build Step'ten **önce**.
+Atlama, dağıtımın *içinde* verilen bir karardır; sınır ise **kapıda** durur. İkisi aynı
+katmanda değil.
+
+**Sonuçları, adıyla:**
+
+1. **`docs/`-only ve `*.md`-only PR'ler ucuz değildir.** Sıralamada tam slot sayılır.
+   Bu cetvelin kendi PR'ı da dahil — yazarı olarak muafiyet istemiyorum.
+2. **Boş commit ile yeniden-tetik de tam slot harcar.** D11 "kırmızıyı uyandıran tek şey
+   push olayıdır" diyor; D13 bunun **fiyatını** ekliyor. Tetik ucuz sanıldığı için kolay
+   verilir — 08-19'da bir yeniden-tetik verildikten 2 dakika sonra duvara çarptı.
+3. D9 ("kota reddi bir COMMIT harcar") ile birlikte okunur: **reddedilen gönderim de
+   maliyetlidir**, yani tekrar denemek maliyeti ikiye katlar, sıfırlamaz.
+
+**Ayırt ederek — hâlâ ÖLÇÜLMEMİŞ olan:** yukarıdaki, **reddin** atlama kararından önce
+geldiğini kanıtlar. **Başarılı** bir atlanan dağıtımın kotadan bir birim düşüp düşmediğini
+kanıtlamaz. Ayrı sorudur ve cevabı için bir slot harcamaya değmez; buraya *bilinmiyor*
+diye yazılır, *ucuz* diye değil.
+
+**Kullanılmayan veri, niçin kullanılmadığı da yazılıyor:** ikinci örnek olarak `37cdc2d9`
+(#691) düşünüldü — 13 dosyanın çoğu `.md`. Ama içinde
+`src/__tests__/conformance/eol-normalization.test.ts` var, yani **md-only değil** ve
+atlama sınıfına hiç girmiyor. Ayırt edici olmayan veri kanıt diye sunulmaz.
