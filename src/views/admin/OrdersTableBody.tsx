@@ -8,7 +8,7 @@ import type { DateRange } from 'react-day-picker'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
-import { ORDER_DB_STATUSES, type OrderDbStatus } from '@/lib/admin/orderStatusDomain'
+import { isRefundedPayment,ORDER_DB_STATUSES, type OrderDbStatus } from '@/lib/admin/orderStatusDomain'
 import { orderStatusLabel } from '@/lib/admin/orderStatusLabels'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { invokeShippingUpdate, SharedTrackingDeclinedError } from '@/utils/adminShipping'
@@ -80,7 +80,7 @@ interface OrderNote {
 const PAGE_SIZE = 50
 
 const ORDER_SELECT =
-  'id,status,conversation_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone'
+  'id,status,payment_status,conversation_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone'
 
 const SORT_COLUMN_MAP: Record<string, string> = {
   created: 'created_at',
@@ -1119,7 +1119,17 @@ const OrdersTableBody: React.FC = () => {
         header: t('admin.orders.table.status'),
         sortable: true,
         hideable: true,
-        cell: (r) => <span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span>,
+        cell: (r) => (
+          <span className="inline-flex items-center gap-1.5">
+            <span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span>
+            {/* Iade ODEME kolonundan turer - status kolonu refunded OLAMAZ (T111-VH). */}
+            {isRefundedPayment(r.payment_status) && (
+              <span className={badgeClass(r.payment_status ?? '')}>
+                {prettyStatus(r.payment_status ?? '', t)}
+              </span>
+            )}
+          </span>
+        ),
       },
       {
         key: 'conversation',
