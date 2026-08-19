@@ -1,7 +1,8 @@
 # Ticaret Alan Haritası (Commerce Domain Map) — Standart
 
-Durum: **TASLAK v0.1** (2026-08-19, OPS-AUDIT / T110-VH). NLM ikizi danışması ve modül
-sahiplerinin itirazları bu sürümün üzerine işlenecek; itiraz penceresi kapanınca v1.0 olur.
+Durum: **TASLAK v0.2** (2026-08-19, OPS-AUDIT / T110-VH). v0.2 = EDGE'in üç ölçülmüş
+itirazı işlendi (tablo adları prod'dan doğrulandı; bildirim köprüsü; iki-çalışma-zamanı
+gerçeği). NLM ikizi danışması ve kalan modül sahiplerinin itirazları üzerine v1.0 olur.
 
 ## 1. Amaç ve kapsam
 
@@ -27,12 +28,13 @@ ya harita gerekçeli bir PR ile güncellenir.
 | Modül | Durum | Ana veri | Açık iş |
 |---|---|---|---|
 | Katalog | canlı | products, categories, product_variants | ürün-adı çözücü (T098) |
-| Sepet + Ödeme | canlı | orders, order_items | — |
-| Sipariş yönetimi | canlı | orders (durum makinesi) | sözlük-etiket kaçağı (T108) |
+| Sepet + Ödeme | canlı | venthub_orders, venthub_order_items | — |
+| Sipariş yönetimi | canlı | venthub_orders (durum makinesi) | sözlük-etiket kaçağı (T108) |
 | Kargo/Lojistik | canlı | shipping_* | — |
 | İade | kısmi | returns | gerçek iade akışı eksik |
 | Satınalma | v1 (T062) | purchasing_* | stok motor köprüsü kapalı |
-| Teklif/RFQ | v1 (T067) | quotes | sipariş köprüsü YOK (T105) |
+| Teklif/RFQ | v1 (T067) | venthub_quotes | sipariş köprüsü YOK (T105) |
+| Zamanlanmış bakım | yeni (#675) | cron.job (pg_cron) | order-housekeeping + release-expired-reservations; sipariş durumu **yazan** aktördür, 08-19'a kadar hiç çağrılmıyordu |
 | Lead/CRM | **eksik** | contact_messages (kısmi) | formlar sahteydi (T104); CRM modülü yok |
 | Bayi | kısmi | pricing segmentleri | bayi-atama ekranı yok (T106) |
 | Fatura/Muhasebe | **yok** | — | karar paketi T107 (hukuki boyutlu, Recep kararı) |
@@ -43,6 +45,10 @@ ya harita gerekçeli bir PR ile güncellenir.
 - **Sipariş durum kümesi:** `src/lib/admin/orderStatusMachine.ts` (kendini SSOT ilan eder).
   UI'da durum listesi bu otoriteden **türetilir**; elle kopyalanmış küme (switch/enum
   kopyası) yasaktır. Etiket her zaman sözlükten gelir; ham DB dizesi basılamaz. (T108 dersi.)
+  **İki çalışma zamanı uyarısı:** otorite TS modülüdür ama sözlüğü iki çalışma zamanı paylaşır
+  (web + Deno edge fonksiyonları); Deno tarafı bu modülü import **edemez**, sözlüğü tekrarlar.
+  Bağlayıcı olan INV kapısıdır (`order-status-dictionary.test.ts`), import değil — aksi
+  yaşandı: order-housekeeping DB kısıtında olmayan `failed` yazıyor, hata yutuluyordu.
 - **Teklif kavramı** yalnız PROJE HATTI yüzeylerinde yaşar: sipariş-yüzeyi sözlük
   anahtarlarında "teklif/quote" kavramı geçemez.
 - **Para birimi:** `currency` zorunlu argümandır, arayüz dilinden türetilmez (INV-CURRENCY-1).
@@ -56,6 +62,10 @@ ya harita gerekçeli bir PR ile güncellenir.
 2. **bayi → fiyat:** bayi segmenti fiyat çözümlemesine girdi verir (pricing servis katmanı).
 3. **lead → teklif:** CRM lead'i tekliflendirilebilir; ters yön yok.
 4. **satınalma → stok:** alış kaydı stok girişi üretir (motor köprüsü v1'de bilinçli kapalı).
+5. **X → bildirim (tek yönlü):** modüller bildirim ucunu tetikleyebilir (örn. venthub_quotes
+   INSERT → pg_net → quote-notification-webhook → e-posta; sipariş → order-confirmation).
+   Bildirim modülü hiçbir modülün durumunu **yazamaz** — yalnız okur; tek istisna kendi
+   idempotency damgası (örn. `request_email_sent_at`).
 
 Bu listede olmayan her modüller-arası yazım/okuma bağımlılığı ihlaldir; yeni köprü
 ancak bu cetvele madde ekleyen bir PR ile açılır.
