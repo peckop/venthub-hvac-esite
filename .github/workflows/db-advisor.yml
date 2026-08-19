@@ -111,3 +111,92 @@ jobs:
           ORDER BY 1,2,3;" || true
           echo "::endgroup::"
         continue-on-error: true
+
+  # ---------------------------------------------------------------------------
+  # INV-CATALOG-1 — katalog butunlugu kapisi (T099).
+  # Yukaridaki advisor isi TAVSIYE verir (|| true + continue-on-error). Bu is ise
+  # gercek bir KAPIDIR: tabanin disinda yeni bir ihlal varsa KIRMIZI olur.
+  #
+  # NICIN IKI IS: kapi olcemedigi bir durumda ASLA YESIL DONMEMELI. Baglanti dizesi yoksa
+  # (ornek: fork PR'i, ya da SUPABASE_DB_URL henuz eklenmemis) kapi isi hic KOSMAZ,
+  # GitHub'da "skipped" gorunur. Atlanmis is BASARILI DEGILDIR - kimse onu "olculdu"
+  # diye okuyamaz. Eski tasarimda burada `exit 0` vardi ve "OLCULEMEDI" yalnizca bir
+  # ETIKETTI; is yesil donuyordu = sessiz fail-open. EDGE (dosya sahibi) bunu yakaladi.
+  #
+  # Cetvel: docs/standards/catalog-ingestion-standard.md 6.1
+  # ---------------------------------------------------------------------------
+  catalog-integrity-precheck:
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.probe.outputs.ready }}
+    steps:
+      - name: Sirlar var mi
+        id: probe
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          # ON-KOSUL TEK: baglanti dizesi. Kok sertifika DEPODA duruyor
+          # (scripts/db/checks/supabase-root-2021-ca.pem) - herkese acik bir belge oldugu icin
+          # sir olmasi hic gerekmiyordu ve elle yapistirma adimi gercek bir kusur uretti
+          # (olculdu: sirra 1366 baytlik YANLIS sertifika dusmustu, gercek kok 2179 bayt).
+          # SUPABASE_CA_CERT sirri ARTIK OKUNMUYOR - ne burada ne kapi isinde. Rotasyon, depo
+          # dosyasinin gozden gecirilebilir bir commit ile degistirilmesidir; gorunmez bir pano
+          # ayari sessizce dogrulanmis dosyanin ustune gecerse tam da onardigimiz kusur geri gelir.
+          if [ -n "${DB_URL:-}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "INV-CATALOG-1: sirlar tam -> kapi KOSACAK"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=INV-CATALOG-1 ATLANDI::SUPABASE_DB_URL yok -> kapi isi ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda katalog butunlugu OLCULMEDI."
+          fi
+
+  catalog-integrity:
+    needs: catalog-integrity-precheck
+    if: needs.catalog-integrity-precheck.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # --legacy-peer-deps ZORUNLU: depo pnpm ile yonetiliyor ve package.json'da onceden
+      # var olan bir peer catismasi bulunuyor (react-day-picker 8 -> date-fns ^2||^3, depoda
+      # date-fns 4). pnpm buna izin veriyor, npm vermiyor; bayrak olmadan kurulum patliyor ve
+      # kapi VERIYLE ilgisi olmayan bir sebeple kirmizi donuyor. --ignore-scripts: yalnizca
+      # surucu gerekiyor, paket yasam-dongusu betikleri kosmasin.
+      - name: Install pg driver only
+        run: npm install --no-save --no-audit --no-fund --ignore-scripts --legacy-peer-deps pg@8
+
+      - name: Catalog integrity gate
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          # Kok sertifikanin TEK kaynagi depo dosyasidir. Sir-ustune-gecer secenegini once
+          # yazdim, sonra kaldirdim: sirdaki belgenin YANLIS oldugunu zaten olcmustuk, yani
+          # sessizce ustune gecen bir sir tam da dogrulanmis dosyayi bozan sey olurdu.
+          # Rotasyon bu dosyanin degistirilmesiyle yapilir - gozden gecirilebilir bir commit
+          # olarak, gorunmez bir pano ayari olarak degil.
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          node scripts/db/checks/catalog-integrity.mjs
+
+      # Kapi TLS yuzunden kirmizi oldugunda, sunucunun GERCEKTEN sundugu zinciri gosterir.
+      # NICIN VAR: ayni betik ayni sertifikayla YERELDE calisiyor, CI'da calismiyordu; fark
+      # baglanilan SUNUCUDA olmali ve bunu tahminle degil olcumle kapatmak gerekiyor.
+      # Yalniz konak adi ve zincirdeki subject/issuer satirlari yazilir - kimlik bilgisi YOK.
+      - name: TLS zinciri teshisi (yalniz kapi kirmizi olursa)
+        if: failure()
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          HOSTPORT=$(printf '%s' "$SUPABASE_DB_URL" | sed 's#.*@##; s#/.*##; s#?.*##')
+          echo "baglanilan sunucu: $HOSTPORT"
+          echo | openssl s_client -starttls postgres -connect "$HOSTPORT" -showcerts 2>/dev/null             | grep -E "^ *[0-9]+ s:|^ *[0-9]+ i:" || echo "zincir okunamadi"
+          echo "depodaki kok:"
+          openssl x509 -in scripts/db/checks/supabase-root-2021-ca.pem -noout -subject -fingerprint -sha256
