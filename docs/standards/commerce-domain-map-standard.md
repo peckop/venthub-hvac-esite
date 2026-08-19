@@ -4,7 +4,9 @@ Durum: **TASLAK v0.3** (2026-08-19, OPS-AUDIT / T110-VH). v0.2 = EDGE'in üç ö
 itirazı (tablo adları prod'dan doğrulandı; bildirim köprüsü; iki-çalışma-zamanı gerçeği).
 v0.3 = ADMIN'in status/payment_status ayrımı itirazı (DB kısıtlarından ölçüldü).
 v0.4 = AUTH'un KVKK itirazı: eksik modül satırı + kolon-kapsamlı köprü biçimi (prod
-fonksiyon gövdesinden ölçüldü). NLM danışması ve kalan itirazlar üzerine v1.0 olur.
+fonksiyon gövdesinden ölçüldü). v0.5 = köprü-1 "HEDEF tasarım" olarak işaretlendi —
+harita var olmayan bir DB değerini şart koşamaz (AUTH T105 ölçümü); T105 taslak-sipariş
+tasarımı yansıtıldı. NLM danışması ve kalan itirazlar üzerine v1.0 olur.
 
 ## 1. Amaç ve kapsam
 
@@ -71,8 +73,12 @@ ya harita gerekçeli bir PR ile güncellenir.
 
 ## 5. İzinli köprüler (kapalı liste)
 
-1. **teklif → sipariş** (T105): teklif kabul edilince sipariş *yaratılır*; sipariş teklifin
-   durumunu yalnız "dönüştürüldü"ye çekebilir, teklif siparişin durumuna dokunamaz.
+1. **teklif → sipariş** (T105, **HEDEF tasarım — bugün mevcut DEĞİL**): teklif kabul
+   edilince sipariş *taslak olarak yaratılır* ve mevcut ödeme akışına devredilir (ikinci
+   para yolu açılmaz); sipariş teklife yalnız `converted` durumu ve `converted_order_id`
+   yazabilir, teklif siparişin durumuna dokunamaz. DB gerçeği (AUTH ölçümü 08-19):
+   `venthub_quotes_status_check`'te `converted` değeri ve `converted_order_id` kolonu
+   YOK — köprü migration ister (Recep kapısı); prod'da 0 teklif olduğundan göç yükü sıfır.
 2. **bayi → fiyat:** bayi segmenti fiyat çözümlemesine girdi verir (pricing servis katmanı).
 3. **lead → teklif:** CRM lead'i tekliflendirilebilir; ters yön yok.
 4. **satınalma → stok:** alış kaydı stok girişi üretir (motor köprüsü v1'de bilinçli kapalı).
