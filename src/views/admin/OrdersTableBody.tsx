@@ -8,6 +8,7 @@ import type { DateRange } from 'react-day-picker'
 import { toast } from 'sonner'
 
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { ORDER_DB_STATUSES, type OrderDbStatus } from '@/lib/admin/orderStatusDomain'
 import { orderStatusLabel } from '@/lib/admin/orderStatusLabels'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { invokeShippingUpdate, SharedTrackingDeclinedError } from '@/utils/adminShipping'
@@ -48,7 +49,9 @@ import {
 /* ---- model ---- */
 interface AdminOrderRow {
   id: string
-  status: 'pending' | 'paid' | 'confirmed' | 'shipped' | 'cancelled' | 'refunded' | 'partial_refunded' | string
+  /* Sipariş durumu: yalnız venthub_orders_status_check sözlüğü (T111-VH). */
+  status: OrderDbStatus | string
+  payment_status?: string | null
   conversation_id?: string | null
   total_amount?: number | null
   created_at: string
@@ -87,16 +90,15 @@ const SORT_COLUMN_MAP: Record<string, string> = {
   amount: 'total_amount',
 }
 
-const ORDER_STATUS_KEYS = [
-  'pending',
-  'paid',
-  'confirmed',
-  'shipped',
-  'delivered',
-  'cancelled',
-  'refunded',
-  'partial_refunded',
-] as const
+/*
+ * Filtre kumesi TURETILIR, kopyalanmaz (T111-VH).
+ *
+ * Eski hali elle yazilmis SEKIZ degerdi ve UCU (paid, refunded,
+ * partial_refunded) ODEME sozlugune aitti - status kolonuna sorgu atildigi
+ * icin o uc filtre HER ZAMAN sifir sonuc donduruyordu. Ayrica processing
+ * EKSIKTI, yani gercek bir durum hic filtrelenemiyordu.
+ */
+const ORDER_STATUS_KEYS = ORDER_DB_STATUSES
 
 /* ---- helper'lar (module-level) ---- */
 function formatAmount(v?: number | null, lang: Lang = 'tr'): string {
