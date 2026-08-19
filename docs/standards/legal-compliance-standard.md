@@ -65,7 +65,7 @@ kendisini eklemek insanın işidir ve PR incelemesinde aranır.
 | 9 | Analitik/pazarlama etiketi rıza olmadan yüklenmez | Çerez Politikası | `ConsentGatedAnalytics` + `trackEvent` kapısı | Kod | ✅ |
 | 10 | Veri sahibi talebi 30 gün içinde sonuçlandırılır | KVKK Aydınlatma | `data_subject_requests` + admin defteri + süre sayacı (INV-KVKK-1) | Kod | ✅ mekanizma · 🟡 adres |
 | 11 | Silme talebinde saklama yükümlülüğü olan veri korunur | KVKK m.7 / VUK | `anonymize_user_personal_data()` | Kod | ✅ prod'da canlı (08-17 ölçüldü) |
-| 12 | Veri sahibi kendi talebini açabilir ve durumunu izleyebilir | KVKK m.11 / Aydınlatma | `/account/data-requests` + `p_dsr_owner_insert` / `p_dsr_owner_select` (§3.6) | Kod | 🟡 UI canlı · politikalar prod'a inmedi (08-19) |
+| 12 | Veri sahibi kendi talebini açabilir ve durumunu izleyebilir | KVKK m.11 / Aydınlatma | `/account/data-requests` + `p_dsr_owner_insert` / `p_dsr_owner_select` (§3.6) | Kod | ✅ prod'da canlı; davranışı ölçüldü (08-19, §3.6 kapanış kanıtı) |
 
 **8 numaralı satırın gerekçesi (karar kaydı).** TCKN başta koşulsuz zorunlu tutuldu; mevzuat
 araştırması (2026-08-16) bunun kanunun istediğinden sıkı olduğunu gösterdi. GİB, nihai
@@ -347,6 +347,26 @@ edildiği anda dağıtılır; DB yarısı `supabase-migrate` iş akışına bağ
 ilerler. Politikalar inmeden ekran görünür ama hem listeleme hem gönderme sessizce
 reddedilir — *yetkisi yok* yerine *veri yok* yanılgısının ta kendisi (§3.5/4). Bu yüzden §1
 sicilinde kanalın satırı, **iki yarı da ölçülene kadar** ✅ olmaz.
+
+#### Kapanış kanıtı — 2026-08-19 (prod, sıfır yazma)
+
+Migration prod'a indi (`_migration_ledger`: `20260817143000_dsr_customer_channel.sql`,
+`applied_at 2026-08-19 08:50:10+00`) ve kanalın **davranışı** ölçüldü. Yöntem: dört kol,
+her biri `begin … rollback` içinde, `set local role authenticated` + JWT claim'inde
+`app_metadata.user_role = customer`.
+
+| Kol | Deneme | Beklenen | Sonuç |
+|---|---|---|---|
+| A | Geçerli INSERT | Kabul | ✅ `status = received`, `due_at − received_at = 30 days` |
+| B | `status = 'completed'` | Ret | `ERROR: 42501: new row violates row-level security policy for table "data_subject_requests"` |
+| C | `due_at = now() + 3650 days` | Ret | Aynı 42501 satırı |
+| D | Başkasının `user_id` + e-postası | Ret | Aynı 42501 satırı |
+
+**Ayırt edicilik.** Salt ret gözlemi *kanalın kapalı olmasından* ayırt edilemezdi; **kabul
+eden kol tam bu yüzden vardır.** Kabulün admin yolundan gelmediği iki ayrı yoldan gösterildi:
+(1) aynı claim altında `is_admin_user()` **false** ölçüldü; (2) admin politikası devrede
+olsaydı B/C/D de kabul edilirdi (`p_dsr_admin_all`'ın `with check`'i yalnız `is_admin_user()`,
+değer kısıtı yok) — reddedildiler. Ölçüm sonrası prod satır sayısı **0**: artık yok.
 
 ### 3.6 Musteri kanali — /account/data-requests (T063 PR-2, MIGRATION)
 
