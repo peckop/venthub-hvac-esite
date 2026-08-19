@@ -3,7 +3,8 @@
 Durum: **TASLAK v0.3** (2026-08-19, OPS-AUDIT / T110-VH). v0.2 = EDGE'in üç ölçülmüş
 itirazı (tablo adları prod'dan doğrulandı; bildirim köprüsü; iki-çalışma-zamanı gerçeği).
 v0.3 = ADMIN'in status/payment_status ayrımı itirazı (DB kısıtlarından ölçüldü).
-NLM ikizi danışması ve kalan modül sahiplerinin itirazları üzerine v1.0 olur.
+v0.4 = AUTH'un KVKK itirazı: eksik modül satırı + kolon-kapsamlı köprü biçimi (prod
+fonksiyon gövdesinden ölçüldü). NLM danışması ve kalan itirazlar üzerine v1.0 olur.
 
 ## 1. Amaç ve kapsam
 
@@ -38,8 +39,9 @@ ya harita gerekçeli bir PR ile güncellenir.
 | Zamanlanmış bakım | yeni (#675) | cron.job (pg_cron) | order-housekeeping + release-expired-reservations; sipariş durumu **yazan** aktördür, 08-19'a kadar hiç çağrılmıyordu |
 | Lead/CRM | **eksik** | contact_messages (kısmi) | formlar sahteydi (T104); CRM modülü yok |
 | Bayi | kısmi | pricing segmentleri | bayi-atama ekranı yok (T106) |
-| Fatura/Muhasebe | **yok** | — | karar paketi T107 (hukuki boyutlu, Recep kararı) |
+| Fatura/Muhasebe | **yok** (ama `user_invoice_profiles` tablosu canlı ve KVKK kapsamında) | user_invoice_profiles | karar paketi T107 (hukuki boyutlu, Recep kararı) |
 | Bildirim | kısmi | — | sipariş-yaşamdöngüsü bildirimleri eksik |
+| Hukuki uyum / KVKK | canlı | data_subject_requests, anonymize_user_personal_data() | cetveli: `legal-compliance-standard.md`; admin defteri #612, müşteri kanalı #637 |
 
 ## 4. Kavram otoriteleri (tek kaynak)
 
@@ -63,6 +65,9 @@ ya harita gerekçeli bir PR ile güncellenir.
 - **Para birimi:** `currency` zorunlu argümandır, arayüz dilinden türetilmez (INV-CURRENCY-1).
 - **Ürün görünen adı:** çözücü fonksiyon üzerinden (T098); `model_code || sku` gibi ham
   geri-düşüşler müşteri yüzeyinde yasak.
+- **Kişisel veri kavramı:** otorite `legal-compliance-standard.md` §3.4 tablosudur (hangi
+  veri silinir / anonimleştirilir / ellenmez). Yeni bir modül kişisel veri tutmaya
+  başlarsa o tabloya satır eklemek modül sahibinin yükümlülüğüdür — sessiz sapma buradan girer.
 
 ## 5. İzinli köprüler (kapalı liste)
 
@@ -75,13 +80,23 @@ ya harita gerekçeli bir PR ile güncellenir.
    INSERT → pg_net → quote-notification-webhook → e-posta; sipariş → order-confirmation).
    Bildirim modülü hiçbir modülün durumunu **yazamaz** — yalnız okur; tek istisna kendi
    idempotency damgası (örn. `request_email_sent_at`).
+6. **KVKK anonimleştirme → tüm kişisel-veri taşıyan modüller (tek yönlü, kolon-kapsamlı,
+   koşullu):** veri sahibi silme talebi kabul edilince `anonymize_user_personal_data()`
+   dokuz tablodaki kişisel alanları siler ya da anonimleştirir. Üç sınır: (a) saklama
+   yükümlülüğü altındaki kayda DOKUNULMAZ (VUK/TTK; KVKK m.7 istisnası); (b) süresi dolmuş
+   kayıtta yalnız kişisel alanlar değişir — tutar, tarih, kalemler KORUNUR; (c) hiçbir
+   modülün DURUM MAKİNESİNE yazılmaz. Ters yön yok; yetki kapısı gövdededir
+   (SECURITY DEFINER + is_admin_user), varsayılan kuru çalışmadır. Davranışı Konfigürasyon'dan
+   okur (`legal.ts` saklama süreleri). Cetvel: `legal-compliance-standard.md` §3.4.
 
+Köprü ifade biçimi: bir köprü yalnız "X, Y'ye yazar" değil, **"X, Y'nin ŞU kolonlarına
+ŞU koşulda yazar"** biçiminde (kolon-kapsamlı, koşullu) da tanımlanabilir — 6. madde örnektir.
 Bu listede olmayan her modüller-arası yazım/okuma bağımlılığı ihlaldir; yeni köprü
 ancak bu cetvele madde ekleyen bir PR ile açılır.
 
 ## 6. Kapılar
 
-- Mevcut: `order-status-dictionary.test.ts`, INV-CURRENCY-1.
+- Mevcut: `order-status-dictionary.test.ts`, INV-CURRENCY-1, INV-KVKK-1, INV-LEGAL-3.
 - Hedef **INV-DOMAIN-1:** sipariş-yüzeyi sözlük anahtarlarında teklif kavramı taraması.
 - Hedef **INV-DOMAIN-2:** durum-kümesi kopyası taraması (ilk biçimi T108 PR'ında).
 - Hedef **INV-PRODUCT-IDENTITY:** ham ürün-kimliği render yasağı (T098 PR'ında).
