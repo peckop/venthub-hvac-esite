@@ -90,6 +90,25 @@ işi kurtarmaz, yalnız kimin yaktığını değiştirir. Bu yüzden deneme say�
 indi: sağlıklı süre 47 saniyeyken 300 saniyelik sınır zaten 6 kat pay bırakıyor —
 üçüncü deneme pay değil kumardı.
 
+### 2.8 Vekili değil ASIL ŞEYİ kapıya koy
+
+Bir kurulum adımının çıkış kodu, yeteneğin **vekilidir** — asıl soru değildir. Asıl
+soru "apt geçti mi" değil, "**tarayıcı açılıyor mu**"dur.
+
+2026-08-19'da master'da ölçüldü: `a8854cf7` koşumunda apt iki denemede de 300 saniyeyi
+doldurdu, üçüncüsü kesildi, `admin-smoke` KIRMIZI yandı — ama gerekli kütüphaneler
+koşucu imajında zaten olabilirdi ve testler pekâlâ koşabilirdi. Kapı yanlış şeyi
+soruyordu.
+
+**KURAL:** Kurulum adımı, yeteneğin kendisini ölçen bir adımla eşleşiyorsa
+**en-iyi-çaba** olabilir (`continue-on-error`), ama o zaman peşinden **gerçek yetenek
+probu** ZORUNLUDUR ve o prob fataldir. Prob olmadan `continue-on-error` yazmak
+fail-open'dır; probla birlikte yazmak kapıyı **güçlendirir**, çünkü vekil yerine
+asıl şey ölçülür.
+
+Burada uygulanışı: `playwright install-deps` en-iyi-çaba; ardından Chromium'u
+gerçekten açıp bir sayfa render eden ~5 saniyelik prob fatal.
+
 ## 3. Muafiyetler — ADLA yazılır
 
 | Dosya | Sebep | Kaldırma koşulu |
