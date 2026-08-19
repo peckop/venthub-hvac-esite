@@ -242,3 +242,18 @@ doğrulaması T119'un ilk adımı olmalı.
 ilişkisi. Katalog kaynağı hazır: "HIZ ANAHTARI" kolonu, "UYGUN MODEL" kolonu, "Lütfen kasa
 seçiniz" blokları. Bu ilişki kurulmadan aile düzeltmesi tek başına müşteriyi doğru ürüne
 götürmez.
+### 8. DOĞRULAMA ARAÇLARI ve OTORİTE SIRASI
+
+Recep bildirdi (2026-08-19): **NotebookLM defteri `Vortice | 07 - TR Distribütör (Avensair)` —
+tüm kataloglar yüklü**, katalog/ürün sorularında sorgulanabilir.
+
+**T119'da otorite sırası (çelişkide üstteki kazanır):**
+
+| # | Kaynak | Not |
+|---|---|---|
+| 1 | **Sayfa görüntüsü** `…/avensair-fiyat-listesi-2026/02-work/pages/page_1..74.png` | 74 sayfanın **tamamı yerelde**; elle gönderilmesine gerek yok |
+| 2 | **prod DB** | gerçek durum |
+| 3 | **NLM defteri** (yukarıdaki) | hızlı çapraz-kontrol, hipotez üretimi |
+| — | `03-output/avensair-fiyat.csv` | **OTORİTE DEĞİL** — kusurlu olduğu §5'te iki bağımsız örnekle ölçüldü |
+
+Defter bir snapshot'tır ve drift edebilir; **çelişkide kaynak belge ve DB kazanır.**
